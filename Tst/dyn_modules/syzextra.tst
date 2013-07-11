@@ -1,22 +1,5 @@
-"ndebug?: ", system("with", "ndebug");
-"om_ndebug?: ", system("with", "om_ndebug");
-
-listvar(Top);
-
-if( system("with", "ndebug") )
-{
-  "Loading the Release version!";
-  LIB("syzextra.so");
-  listvar(Syzextra);
-}
-else
-{
-  "Loading the Debug version!";
-  LIB("syzextra.so");
-  listvar(Syzextra);
-}
-
-
+LIB "tst.lib"; tst_init();
+LIB("syzextra.so");
 noop();
 
 ring r;
@@ -41,7 +24,9 @@ leadrawexp(v);
 
 
 
-def l = res(I, 0); DetailedPrint(l);
+// def l = res(I, 0); // DetailedPrint(l);
+
+tst_status(1);$
 
 exit;
 

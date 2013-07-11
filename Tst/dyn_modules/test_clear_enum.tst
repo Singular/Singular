@@ -1,21 +1,5 @@
-"ndebug?: ", system("with", "ndebug");
-"om_ndebug?: ", system("with", "om_ndebug");
-
-listvar(Top);
-
-if( system("with", "ndebug") )
-{
-  "Loading the Release version!";
-  LIB("syzextra.so");
-  listvar(Syzextra);
-}
-else
-{
-  "Loading the Debug version!";
-  LIB("syzextra.so");
-  listvar(Syzextra);
-}
-
+LIB "tst.lib"; tst_init();
+LIB("syzextra.so");
 
 noop();
 
@@ -426,6 +410,8 @@ cleardenom(_);
 "GB: "; groebner(I); // _[1]=x2+2*xv+v2 _[2]=y2+(a)*x+v3
 "SB: "; std(I);      // _[1]=x2+2*xv+v2 _[2]=y2+(a)*x+v3
 
+
+tst_status(1);$
 
 
 exit;

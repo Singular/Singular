@@ -1,18 +1,6 @@
+LIB "tst.lib"; tst_init();
 echo = 2;
-
-"ndebug?: ", system("with", "ndebug");
-"om_ndebug?: ", system("with", "om_ndebug");
-
-if( system("with", "ndebug") )
-{
-  "Loading the Release version!";
-  LIB("bigintm.so");
-}
-else
-{
-  "Loading the Debug version!";
-  LIB("bigintm.so");
-}
+LIB("bigintm.so");
 
 printBlackboxTypes();
 bigintm_setup();
@@ -43,6 +31,8 @@ a - b;
 a * b;
 
 typeof(_);
+
+tst_status(1);$
 
 $ // the rest is more for checking the Singular interpreter!
 

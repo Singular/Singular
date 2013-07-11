@@ -1,19 +1,7 @@
+LIB "tst.lib"; tst_init();
 echo = 2;
 
-"ndebug?: ", system("with", "ndebug");
-"om_ndebug?: ", system("with", "om_ndebug");
-
-if( system("with", "ndebug") )
-{
-  "Loading the Release version!";
-  LIB("./syzextra.so");
-}
-else
-{
-  "Loading the Debug version!";
-  LIB("./syzextra.so");
-}
-
+LIB("syzextra.so");
 noop();
 
 
@@ -53,6 +41,9 @@ leadcoef(o) / leadcoef(O);
 
 o;
 O;
+
+
+tst_status(1);$
 
 $$$
 

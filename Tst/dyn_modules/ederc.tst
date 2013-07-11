@@ -1,3 +1,4 @@
+LIB "tst.lib"; tst_init();
 /*
 	    input ideal:
 	    
@@ -24,19 +25,7 @@
 */
 echo = 2;
 
-"ndebug?: ", system("with", "ndebug");
-"om_ndebug?: ", system("with", "om_ndebug");
-
-if( system("with", "ndebug") )
-{
-  "Loading the Release version!";
-  LIB("syzextra.so");
-}
-else
-{
-  "Loading the Debug version!";
-  LIB("syzextra.so");
-}
+LIB("syzextra.so");
 
 noop();
 
@@ -133,6 +122,8 @@ DetailedPrint(_);
 yz3*gen(3)-x2t2*gen(3)+x2y*gen(4)-z2t*gen(4);
 DetailedPrint(_);
 // x2y*gen(4)+yz3*gen(3)-z2t*gen(4)-x2t2*gen(3)
+
+tst_status(1);$
 
 exit;
 
