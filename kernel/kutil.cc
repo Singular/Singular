@@ -398,7 +398,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       #ifdef HAVE_RINGS
       ///should check also if the lc is a zero divisor, if it divides all the others
       if (rField_is_Ring(currRing) && currRing->OrdSgn == -1)
-      	if(r->cf->cfDivBy(p_GetCoeff(h,r->cf),lc,r->cf) == 0)
+      	if(n_DivBy(p_GetCoeff(h,r->cf),lc,r->cf) == 0)
       		return;
       #endif
       if (i == r->N) break; // does divide, try next monom
