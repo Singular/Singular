@@ -418,7 +418,7 @@ static inline long p_GetOrder(poly p, ring r)
     {
       case ro_am:
       case ro_wp_neg:
-        return (((long)((p)->exp[r->pOrdIndex]))-POLY_NEGWEIGHT_OFFSET);
+        return ((p->exp[r->pOrdIndex])-POLY_NEGWEIGHT_OFFSET);
       case ro_syzcomp:
       case ro_syz:
       case ro_cp:

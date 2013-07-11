@@ -40,6 +40,7 @@
 #ifdef HAVE_RINGS
 #include <kernel/ideals.h>
 #include <libpolys/coeffs/coeffs.h>
+#include <libpolys/coeffs/rmodulon.h>
 #endif
 
 // define if enterL, enterT should use memmove instead of doing it manually
@@ -341,21 +342,9 @@ void cancelunit (LObject* L,BOOLEAN inNF)
   ring r = L->tailRing;
   poly p = L->GetLmTailRing();
   
-#if ADIDEBUG
-PrintS("\ncancelunit start: ");p_Write(L->p,L->tailRing);
-#endif
-
 #ifdef HAVE_RINGS
     if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))  
   		lc = p_GetCoeff(p,r);  
-  	
-  #if ADIDEBUG
-  poly ppp;
-  ppp=pInit();
-  pSetExp(ppp,1,0);
-  pSetCoeff0(ppp,lc);
-  printf("\n lc = ");pWrite(ppp);	
-  #endif 
 #endif 
 
 #ifdef HAVE_RINGS_LOC
@@ -370,10 +359,6 @@ PrintS("\ncancelunit start: ");p_Write(L->p,L->tailRing);
 //      if ((p_GetExp(p,i,r)>0) && (rIsPolyVar(i, r)==TRUE)) return;
 //    }
   h = pNext(p);
-  
-#if ADIDEBUG  
-PrintS("\nStarting h = ");p_Write(h,L->tailRing);
-#endif
   
   loop
   {
@@ -403,11 +388,7 @@ PrintS("\nStarting h = ");p_Write(h,L->tailRing);
         pNext(L->t_p) = NULL;
       if (L->p != NULL && pNext(L->p) != NULL)
         pNext(L->p) = NULL;
-        
-      #if ADIDEBUG
-      PrintS("\ncancelunit end: ");pWrite(L->p);
-      #endif
-        
+                
       return;
     }
     i = 0;
@@ -1187,6 +1168,11 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   /*- computes the lcm(s[i],p) -*/
   Lp.lcm = pInit();
   pSetCoeff0(Lp.lcm, n_Lcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing->cf));
+  
+  #if ADIDEBUG
+  PrintS("\nLp.lcm (lc) = ");pWrite(Lp.lcm);
+  #endif
+  
   // Lp.lcm == 0
   if (nIsZero(pGetCoeff(Lp.lcm)))
   {
@@ -1207,6 +1193,11 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   }
   // basic product criterion
   pLcm(p,strat->S[i],Lp.lcm);
+  
+  #if ADIDEBUG
+  PrintS("\nLp.lcm (lcm) = ");pWrite(Lp.lcm);
+  #endif
+  
   pSetm(Lp.lcm);
   assume(!strat->sugarCrit);
   if (pHasNotCF(p,strat->S[i]) && n_IsUnit(pGetCoeff(p),currRing->cf)
@@ -2766,6 +2757,11 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
         new_pair=TRUE;
         for (j=0; j<=k; j++)
         {
+        #if ADIDEBUG
+        PrintS("\n initenterpairs: \n");
+        PrintS("		");p_Write(h, strat->tailRing);
+        PrintS("		");p_Write(strat->S[j],strat->tailRing);
+        #endif
           strat->enterOnePair(j,h,ecart,isFromQ,strat, atR);
           //Print("j:%d, Ll:%d\n",j,strat->Ll);
         }

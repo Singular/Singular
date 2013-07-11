@@ -1706,26 +1706,21 @@ loop_count = 1;
 #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
       {
-      	if(currRing->MixedOrder)
-      	{
-        superenterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
+      	superenterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
         
-                #ifdef KDEBUG
         #if ADIDEBUG
         PrintLn();
-				PrintS("		The new pair list L -- after superenterpairs in loop ");
-				printf("%d",loop_count);PrintS(" -- is: "); PrintLn();
-				for(int iii=0;iii<=strat->Ll;iii++)
-				{
-				PrintLn();
-				PrintS("		L[");printf("%d",iii);PrintS("]:");PrintLn();
-				PrintS("		     ");p_Write(strat->L[iii].p1,strat->tailRing);
-				PrintS("		     ");p_Write(strat->L[iii].p2,strat->tailRing);
-				PrintS("		     ");p_Write(strat->L[iii].p,strat->tailRing);
-				}
-				#endif
-				#endif
+		PrintS("		The new pair list L -- after superenterpairs in loop ");
+		printf("%d",loop_count);PrintS(" -- is: "); PrintLn();
+		for(int iii=0;iii<=strat->Ll;iii++)
+		{
+		PrintLn();
+		PrintS("		L[");printf("%d",iii);PrintS("]:");PrintLn();
+		PrintS("		     ");p_Write(strat->L[iii].p1,strat->tailRing);
+		PrintS("		     ");p_Write(strat->L[iii].p2,strat->tailRing);
+		PrintS("		     ");p_Write(strat->L[iii].p,strat->tailRing);
 		}
+		#endif
       }
       
       else
