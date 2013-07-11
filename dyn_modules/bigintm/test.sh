@@ -2,4 +2,4 @@
 
 # env
 
-"$SINGULAR_EXECUTABLE" -teq "$srcdir/bigintm.tst"
+# "$SINGULAR_EXECUTABLE" -teq "$srcdir/bigintm.tst"

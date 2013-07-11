@@ -65,16 +65,16 @@ P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS} -module -export-dynamic -avoid-version -fl
 
 syzextra_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
 
-AM_COLOR_TESTS=always
-
-TESTS_ENVIRONMENT  = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_srcdir}/Singular/LIB:${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables:${abs_builddir}/.libs:${abs_srcdir}'
-TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}' 
-TESTS_ENVIRONMENT += SINGULAR_BIN_DIR='${abs_top_builddir}/Singular' 
-
-TESTS=test_release.sh
-
-# if WANT_DEBUG
-# TESTS+=test_debug.sh
-# endif
-
-EXTRA_DIST = syzextra.tst ederc.tst test_clear_enum.tst test.sh $(TESTS)
+# AM_COLOR_TESTS=always
+#
+# TESTS_ENVIRONMENT  = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_srcdir}/Singular/LIB:${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables:${abs_builddir}/.libs:${abs_srcdir}'
+# TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}'
+# TESTS_ENVIRONMENT += SINGULAR_BIN_DIR='${abs_top_builddir}/Singular'
+#
+# TESTS=test_release.sh
+#
+# # if WANT_DEBUG
+# # TESTS+=test_debug.sh
+# # endif
+#
+# EXTRA_DIST = syzextra.tst ederc.tst test_clear_enum.tst test.sh $(TESTS)

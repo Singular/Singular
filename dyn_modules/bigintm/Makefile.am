@@ -70,16 +70,17 @@ bigintm_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
 # bigintm_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGSG}
 
 
-AM_COLOR_TESTS=always
+# AM_COLOR_TESTS=always
+#
+# TESTS_ENVIRONMENT  = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_srcdir}/Singular/LIB:${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables:${abs_builddir}/.libs:${abs_srcdir}'
+# TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}' 
+# TESTS_ENVIRONMENT += SINGULAR_BIN_DIR='${abs_top_builddir}/Singular'
+#
+# TESTS=test_release.sh
+#
+# # if WANT_DEBUG
+# # TESTS+=test_debug.sh
+# # endif
+#
+# EXTRA_DIST = test.sh $(TESTS)
 
-TESTS_ENVIRONMENT  = SINGULARPATH='${abs_top_builddir}/Singular/LIB:${abs_top_srcdir}/Singular/LIB:${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables:${abs_builddir}/.libs:${abs_srcdir}'
-TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}' 
-TESTS_ENVIRONMENT += SINGULAR_BIN_DIR='${abs_top_builddir}/Singular'
-
-TESTS=test_release.sh
-
-# if WANT_DEBUG
-# TESTS+=test_debug.sh
-# endif
-
-EXTRA_DIST = bigintm.tst test.sh $(TESTS)
