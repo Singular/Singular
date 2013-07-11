@@ -672,6 +672,38 @@ uint ShiftDVec::divisibleBy
   return UINT_MAX;
 }
 
+/* Like divisibleBy, but with the difference, that it only
+ * returns a shift, if dvec1 is divisible by dvec2 from the
+ * right.
+ *
+ * Has to be tested!
+ */
+uint ShiftDVec::RdivisibleBy
+  ( const uint* dvec1, uint dvSize1, 
+    const uint* dvec2, uint dvSize2, int numVars )
+{
+  if(dvSize1 < dvSize2) return UINT_MAX;
+  assume(dvSize2);
+  if(!dvSize2) return UINT_MAX-1;
+
+  if( dvSize2 == 1 ) if( dvec1[0] == dvec2[0] ) return 0;
+                     else                return UINT_MAX;
+
+  do
+  {
+    --dvSize2;
+    --dvSize1;
+    if( dvec2[dvSize2] != dvec1[dvSize1] ) return UINT_MAX;
+  }while( dvSize2 > 1 );
+
+  uint dist_cum = 0;
+  for( uint i = 0; i < dvSize1; ++i ) dist_cum += dvec1[i];
+  dist_cum %= numVars;
+  if( dist_cum == dvec2[0] ) return dvSize1-1;
+
+  return UINT_MAX;
+}
+
 /* Returns the first shift s, where lm(p1) is divided by the 
  * shifted monomial s*lm(p2) (,that is the dvec of lm(p1) has a
  * central overlap with the dvec of lm(p2)). If no such shift

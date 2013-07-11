@@ -48,10 +48,7 @@
 //#include <kernel/SDkutil.h>//do this via kutil.h otherwise...
 
 #include <kernel/SDBase.h>
-#include <kernel/SDReduce.h>
 #include <kernel/SDDebug.h>
-
-#include <kernel/SDDebug/SDDebug.h>
 
 //now our adapted multiplications for:
 //- ksCreateSpoly
@@ -329,23 +326,8 @@ ideal ShiftDVec::bba
    * If I != NULL we want to calculate the GB of the left ideal
    * F in the factor algebra K<X>/I.
    */
+  namespace SD = ShiftDVec;
 
-  namespace SD   = ShiftDVec;
-  namespace SDD  = ShiftDVec::Debug;
-  namespace SDDD = ShiftDVec::Debug::Debugger;
-
-  SD_DEBUG_SEC
-  {
-    using namespace SDDD;
-    // Initialize debugging output; we should use
-    // ShiftDVec::Debug::Free, when
-    // we do no longer need debugging output
-    Init();
-
-    SDD::AbstractLogger* dvm = add_logger("DVec_Memory");
-    dvm->set_output_stream("MemoryLog","w");
-    add_logger("SDExt_Memory")->set_output_stream(dvm);
-  }
   strat->mark_as_SD_Case();
 
 #ifdef KDEBUG
@@ -723,9 +705,6 @@ ideal ShiftDVec::bba
 #endif /* MYTEST */
 #endif /* KDEBUG */
   idTest(strat->Shdl);
-
-  // Free internal memory reserved for loggers
-  SD_DEBUG_SEC{ SDDD::Free(); }
 
   return (strat->Shdl);
 }
@@ -1149,6 +1128,190 @@ void ShiftDVec::initBba( ideal F, SD::kStrategy strat )
     strat->initEcartPair = initEcartPairBba;
 }
 
+
+/* reduction procedure for the homogeneous case
+ * and the case of a degree-ordering
+ * original resides in kstd2.cc
+ */
+int ShiftDVec::redHomog( LObject* h, ::kStrategy strategy )
+{
+  namespace SD = ShiftDVec;
+
+  SD::kStrategy strat = static_cast<SD::kStrategy>(strategy);
+
+  if (strat->tl<0) return 1;
+  assume(h->FDeg == h->pFDeg());
+
+  poly h_p;
+  int i,j,at,pass, ii;
+#if (HAVE_SEV > 0) //BOCO: comments/uncomments sev
+  unsigned long not_sev;
+#endif
+  long reddeg,d;
+
+  pass = j = 0;
+  d = reddeg = h->GetpFDeg();
+#if (HAVE_SEV > 1)
+  h->SetShortExpVector();
+#endif
+  int li;
+  h_p = h->GetLmTailRing();
+#if (HAVE_SEV > 1) //BOCO: comments/uncomments sev
+  not_sev = ~ h->sev;
+#endif
+  loop
+  {
+#ifdef HAVE_SHIFTBBADVEC //BOCO: added code
+    uint shift = 0;
+#endif
+    j = SD::kFindDivisibleByInT
+          ( strat->T, strat->sevT, h, shift, strat );
+    if (j < 0) return 1;
+
+    li = strat->T[j].pLength;
+    ii = j;
+    /*
+     * the polynomial to reduce with (up to the moment) is;
+     * pi with length li
+     */
+    i = j;
+#if 1
+    if (TEST_OPT_LENGTH)
+    loop
+    {
+      /*- search the shortest possible with respect to length -*/
+      i++;
+      if (i > strat->tl)
+        break;
+      if (li<=1)
+        break;
+      /*BOCO:
+       * The original p_LmShortDivisibleBy checks if second arg
+       * divides first arg, we check if first arg is divisibly
+       * by second arg! */
+      if(strat->T[i].pLength < li){
+        TObject t_h(h_p);
+        TObject t_i(strat->T[i].GetLmTailRing());
+        t_h.SD_Ext_Init();
+        t_i.SD_Ext_Init();
+        shift = SD::p_LmShortDivisibleBy
+          (&t_h, strat->sevT[i], &t_i, not_sev, strat->tailRing);
+        /*
+         * the polynomial to reduce with is now;
+         */
+        if(shift < UINT_MAX)
+        {
+          li = strat->T[i].pLength;
+          ii = i;
+        }
+      }
+    }
+#endif
+
+    /*
+     * end of search: have to reduce with pi
+     */
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("red:");
+      h->wrp();
+      PrintS(" with ");
+      strat->T[ii].wrp();
+    }
+#endif
+    assume(strat->fromT == FALSE);
+
+    TObject tmp; //save the unshifted poly
+    tmp.p = strat->T[ii].p;
+    tmp.t_p = strat->T[ii].t_p;
+    if(shift > 0)
+    {
+      strat->T[ii].t_p = p_LPshiftT
+        ( tmp.t_p, shift, 
+          strat->get_uptodeg(),
+          strat->get_lV(), strat, strat->tailRing );
+      strat->T[ii].p = p_LPshiftT
+        ( tmp.p, shift, 
+          strat->get_uptodeg(),
+          strat->get_lV(), strat, currRing );
+    }
+    tmp.tailRing = strat->T[ii].tailRing; //BOCO: added...
+    SD::ksReducePoly(h, &tmp, &(strat->T[ii]) );
+    h->SD_Ext()->freeDVec();
+
+    //BOCO: why did i change it to that?:
+    //ksReducePoly(h,strat->T[ii],strat->kNoetherTail());
+
+    if(shift > 0)
+    {
+      p_Delete(&strat->T[ii].t_p, strat->tailRing); 
+      if(strat->T[ii].p)
+      {
+        strat->T[ii].p->next = NULL;
+        pDelete(&strat->T[ii].p);
+      }
+
+      strat->T[ii].p = tmp.p;
+      strat->T[ii].t_p = tmp.t_p;
+    }
+
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("\nto ");
+      h->wrp();
+      PrintLn();
+    }
+#endif
+
+    h_p = h->GetLmTailRing();
+    if (h_p == NULL)
+    {
+      if (h->lcm!=NULL) pLmFree(h->lcm);
+
+      h->SD_Ext()->freeDVec(); //BOCO TODO: is this necessary ?
+
+#ifdef KDEBUG
+      h->lcm=NULL;
+#endif
+      return 0;
+    }
+    h->SetShortExpVector();
+#if (HAVE_SEV > 1) //BOCO: comments/uncomments sev
+    not_sev = ~ h->sev;
+#endif //#if (HAVE_SEV > 1)
+    /*
+     * try to reduce the s-polynomial h
+     *test first whether h should go to the lazyset L
+     *-if the degree jumps
+     *-if the number of pre-defined reductions jumps
+     */
+    pass++;
+    if ( !TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && 
+         (pass > strat->LazyPass)                     )
+    {
+      h->SetLmCurrRing();
+      at = strat->posInL(strat->L,strat->Ll,h,strat);
+      if (at <= strat->Ll)
+      {
+        int dummy=strat->sl; int shift_dummy;
+        j = SD::kFindDivisibleByInS( strat, &dummy,
+                                     h, shift_dummy );
+        if (j < 0) return 1;
+
+        SD::enterL( &strat->L,&strat->Ll,&strat->Lmax,h,at );
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+          Print(" lazy: -> L%d\n",at);
+#endif
+        h->Clear();
+        return -1;
+      }
+    }
+  }
+}
+
 int ShiftDVec::kFindDivisibleByInS
   ( const SD::kStrategy strat,
     int* max_ind, LObject* L, int shift )
@@ -1307,20 +1470,14 @@ uint ShiftDVec::p_LmShortDivisibleBy
  *  original p_LmDivisibleBy( poly, poly, const ring ) resides
  *  in pInline1.h
  */
-uint ShiftDVec::p_LmDivisibleBy( TObject * t1,
-                                 TObject * t2, 
-                                 const ring r,
-                                 int lV, bool fromRight )
+uint ShiftDVec::p_LmDivisibleBy
+  ( TObject * t1, TObject * t2, const ring r, int lV )
 {
   namespace SD = ShiftDVec;
   p_LmCheckPolyRing1(t2->p, r);
   pIfThen1(t1->p != NULL, p_LmCheckPolyRing1(t2->p, r));
-  if ( p_GetComp(t1->p, r) == 0 ||
-       p_GetComp(t1->p,r) == p_GetComp(t2->p,r) )
-  {
-    return
-      SD::_p_LmDivisibleByNoComp(t1, t2, r, lV, fromRight);
-  }
+  if (p_GetComp(t1->p, r) == 0 || p_GetComp(t1->p,r) == p_GetComp(t2->p,r))
+    return SD::_p_LmDivisibleByNoComp(t1, t2, r, lV);
   return UINT_MAX;
 }
 
@@ -1336,16 +1493,22 @@ uint ShiftDVec::p_LmDivisibleBy( TObject * t1,
  *
  * IMPORTANT:
  *   We may have to care better for the provided Ring!
+ *
+ * BOCO original comment:
+ *   return: FALSE, if there exists i, such that a->exp[i] > b->exp[i]
+ *           TRUE, otherwise
+ *   (1) Consider long vars, instead of single exponents
+ *   (2) Clearly, if la > lb, then FALSE
+ *   (3) Suppose la <= lb, and consider first bits of single exponents in l:
+ *       if TRUE, then value of these bits is la ^ lb
+ *       if FALSE, then la-lb causes an "overflow" into one of those bits, i.e.,
+ *                 la ^ lb != la - lb
  */
-static inline uint
-ShiftDVec::_p_LmDivisibleByNoComp( TObject * t1,
-                                   TObject * t2,
-                                   const ring r,
-                                   int lV, bool fromRight )
+static inline uint ShiftDVec::_p_LmDivisibleByNoComp
+  ( TObject * t1, TObject * t2, const ring r, int lV )
 {
   //BOCO: Well, thats all it does at the moment!
-  return
-    t1->SD_Ext_Init_If_NULL()->divisibleBy(t2, lV, fromRight);
+  return t1->SD_Ext_Init_If_NULL()->divisibleBy( t2, lV );
 }
 
 

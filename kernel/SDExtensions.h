@@ -125,6 +125,30 @@ class ShiftDVec::sTObjectExtension
                             Tobj->SD_Ext()->dvec,
                             Tobj->SD_Ext()->dvSize, numVars );
     }
+
+    uint divisibleBy_Comp( sTObject * Tobj,
+                           sTObject::* tpoff,
+                           ring r, int numVars )
+    {
+      p_LmCheckPolyRing1( Tobj->*tpoff, r );
+      pIfThen1( this->p != NULL,
+                p_LmCheckPolyRing1(Tobj->*tpoff, r) );
+      if ( p_GetComp(this->p, r) == 0 || 
+           p_GetComp(this->p, r) == p_GetComp(Tobj->*tpoff,r) )
+      { return divisibleBy( Tobj, tpoff, r, numVars ); }
+      return UINT_MAX;
+    }
+
+    uint divisibleBy( sTObject * Tobj,
+                      sTObject::* tpoff, ring r, int numVars )
+    {
+      SetDVecIfNULL();
+      Tobj->SD_Ext()->SetDVecIfNULL( Tobj->*tpoff, r );
+      return ShiftDVec::divisibleBy
+                          ( dvec, dvSize,
+                            Tobj->SD_Ext()->dvec,
+                            Tobj->SD_Ext()->dvSize, numVars );
+    }
 };
 
 #endif //ifndef SDEXTENSIONS_H
