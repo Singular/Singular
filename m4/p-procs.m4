@@ -61,7 +61,7 @@ elif test x$NO_P_PROCS_DYNAMIC_GIVEN = xyes -a x$NO_P_PROCS_STATIC_GIVEN = xyes;
     AC_MSG_NOTICE([Enabling dynamic modules and disabling static modules])
     ENABLE_P_PROCS_DYNAMIC="yes"
     ENABLE_P_PROCS_STATIC="no"
-    USEPPROCSDYNAMICLDFLAGS="-rdynamic"
+    USEPPROCSDYNAMICLDFLAGS=""
     AC_CHECK_FUNC(dlopen,,[AC_CHECK_LIB(dl,dlopen,USEPPROCSDYNAMICLD="-ldl", [
       AC_MSG_WARN(Could not use dlopen)
     ]) ])  
@@ -77,6 +77,8 @@ fi
 if test x$ENABLE_P_PROCS_DYNAMIC = xyes; then
   AC_DEFINE(HAVE_DL,1,enable dynamic modules)
   AC_DEFINE(HAVE_DYNAMIC_LOADING,1,enable dynamic modules)
+
+  AX_APPEND_LINK_FLAGS([-rdynamic -flat_namespace -Wl,-bind_at_load -Wl,-undefined,dynamic_lookup])
 fi
 
 AC_SUBST(USEPPROCSDYNAMICLDFLAGS)

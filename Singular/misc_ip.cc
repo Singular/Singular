@@ -11,10 +11,11 @@
 /*****************************************************************************/
 
 // include header files
-#include <misc/auxiliary.h>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
+
+#include <misc/auxiliary.h>
 #include <kernel/mod2.h>
 #include <Singular/si_signals.h>
 
@@ -775,7 +776,7 @@ char * versionString()
                PACKAGE_VERSION, singular_date);
   StringAppendS("\t");
 #ifdef HAVE_FACTORY
-  StringAppend("factory(%s)", factoryVersion);
+  StringAppend("factory(%s){'%s','%s'}", factoryVersion, FACTORY_CFLAGS, FACTORY_LIBS);
 #ifdef HAVE_LIBFAC
   // libfac:
 //  extern const char * libfac_version;
@@ -786,14 +787,21 @@ char * versionString()
 #endif
 
 #if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
-              StringAppend("GMP(%d.%d),",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
+              StringAppend("GMP(%d.%d){'%s','%s'},",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR, GMP_CFLAGS, GMP_LIBS);
 #else
               StringAppendS("GMP(1.3),");
 #endif
 #ifdef HAVE_NTL
 #include <NTL/version.h>
-              StringAppend("NTL(%s),",NTL_VERSION);
+              StringAppend("NTL(%s){'%s','%s'},",NTL_VERSION, NTL_CFLAGS, NTL_LIBS);
 #endif
+
+#ifdef HAVE_FLINT
+// #include <NTL/version.h>
+              StringAppend("FLINT(??){'%s','%s'},", FLINT_CFLAGS, FLINT_LIBS);
+#endif
+   
+
 #if SIZEOF_VOIDP == 8
               StringAppendS("64bit,");
 #else
@@ -875,11 +883,15 @@ char * versionString()
               StringAppendS("ratGB,");
 #endif
               StringAppend("random=%d\n",siRandomStart);
-              StringAppend("\tCC=%s %s,\n\tCXX=%s %s"
+              StringAppend("\tAC_CONFIGURE_ARGS=%s,\n"
+			   "\tCC=%s,FLAGS:%s,\n"
+			   "\tCXX=%s,FLAGS:%s,\n"
+			   "\tDEFS:%s,CPPFLAGS:%s,\n"
+			   "\tLDFLAGS:%s,LIBS:%s "
 #ifdef __GNUC__
-              "(" __VERSION__ ")"
+              "(ver: " __VERSION__ ")"
 #endif
-              "\n",CC,CFLAGS,CXX,CXXFLAGS);
+              "\n",AC_CONFIGURE_ARGS, CC,CFLAGS, CXX,CXXFLAGS,  DEFS,CPPFLAGS,  LDFLAGS,LIBS);
               feStringAppendResources(0);
               feStringAppendBrowsers(0);
               StringAppendS("\n");

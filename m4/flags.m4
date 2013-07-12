@@ -116,8 +116,8 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
   AX_APPEND_LINK_FLAGS(${OPTFLAGS}) 
   AX_APPEND_LINK_FLAGS([-fno-exceptions -fno-rtti -fpermissive])
 #  AX_APPEND_LINK_FLAGS([-fno-implicit-templates]) # see above :(
-  AX_APPEND_LINK_FLAGS([-rdynamic]) 
-  AX_APPEND_LINK_FLAGS([-flat_namespace -Wl,-bind_at_load -Wl,-undefined,dynamic_lookup  -fpermissive -fvisibility=default]) 
+  AX_APPEND_LINK_FLAGS([ -fpermissive -fvisibility=default]) 
+#  AX_APPEND_LINK_FLAGS([ ])
  fi
 
 
