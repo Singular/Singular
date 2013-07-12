@@ -9,9 +9,7 @@
 #ifndef MOD2_H
 #define MOD2_H
 
-#ifndef CXXFLAGS
-#error "PLEASE '#include \"config.h\"' using before mod2.h!!!"
-#endif
+#include <config.h>
 
 
 #include <misc/auxiliary.h>
