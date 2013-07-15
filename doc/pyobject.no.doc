@@ -1,0 +1,77 @@
+@c -*-texinfo-*-
+
+@c ----------------------------------------------------------------------------
+@node  pyobject,countedref,polytope, Data types
+@section pyobject
+@cindex pyobject
+@cindex blackbox
+
+The pyobject is a black box data type in @sc{Singular}
+for handling objects from the programming language @code{python}. It
+needs the @code{python} support of @sc{Singular} to be installed.
+
+Together with some basic operations and funtions, pyobject instances
+access @code{python} functionality from within @sc{Singular} and store
+the results for re-use:
+
+This version of @sc{Singular} does not have support for @code{pyobject}.
+
+@menu
+* pyobject declarations::
+* pyobject expressions::
+* pyobject operations::
+* pyobject related functions::
+@end menu
+
+@c ------------------------------
+@node pyobject declarations, pyobject expressions, pyobject, pyobject
+@subsection pyobject declarations
+@cindex pyobject declarations
+
+Not supported in this version.
+@c ------------------------------
+@node pyobject expressions, pyobject operations, pyobject declarations, pyobject
+@subsection pyobject expressions
+@cindex pyobject expressions
+
+Not supported in this version.
+
+@c ------------------------------
+@node pyobject operations, pyobject related functions, pyobject expressions, pyobject
+@subsection pyobject operations
+@cindex pyobject operations
+
+Not supported in this version.
+
+@c ------------------------------
+@node pyobject related functions,  , pyobject operations, pyobject
+@subsection pyobject related functions
+@cindex pyobject related functions
+
+Not supported in this version.
+
+@c ---------------------------------------
+@menu
+* python_eval::
+* python_import::
+* python_run::
+@end menu
+@c ---------------------------------------
+@node python_eval, python_import, , pyobject related functions
+@subsection python_eval
+@cindex python_eval
+
+Not supported in this version.
+@c ---------------------------------------
+@node python_import, python_run, python_eval, pyobject related functions
+@subsection python_import
+@cindex python_import
+
+Not supported in this version.
+@c ---------------------------------------
+@node python_run, , python_import, pyobject related functions
+@subsection python_run
+@cindex python_run
+
+Not supported in this version.
+@c ---------------------------------------
