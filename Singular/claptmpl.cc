@@ -141,18 +141,18 @@ template class Cache<MinorKey, PolyMinorValue>;
 #ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
 NTL_CLIENT
 #endif
-template class Vec<zz_p>;
-template class Vec<zz_pE>;
+//template class Vec<zz_p>;
+//template class Vec<zz_pE>;
 template class Mat<zz_p>;
 template class Mat<zz_pE>;
 template class Mat<ZZ>;
 template class Vec<Pair<zz_pEX, long> >;
 template class Vec<Pair<GF2EX, long> >;
-template class Vec<Pair<ZZX, long> >;
-template class Vec<Pair<ZZ_pX, long> >;
-template class Vec<Pair<GF2X, long> >;
-template void swap<zz_pE>(Vec<zz_pE>&, Vec<zz_pE>&);
-template long operator==<zz_p>(Vec<zz_p> const&, Vec<zz_p> const&);
+//template class Vec<Pair<ZZX, long> >;
+//template class Vec<Pair<ZZ_pX, long> >;
+//template class Vec<Pair<GF2X, long> >;
+//template void swap<zz_pE>(Vec<zz_pE>&, Vec<zz_pE>&);
+//template long operator==<zz_p>(Vec<zz_p> const&, Vec<zz_p> const&);
 #endif
 
 #endif
