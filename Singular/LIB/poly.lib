@@ -737,7 +737,10 @@ EXAMPLE: example rad_con; shows an example
   {
     execute("ring R=("+charstr(br)+"),(@z,@x(1..n)),(dp(1),"+ordstr(br)+");");
   }
-  execute("minpoly=number("+mp+");");
+  if (mp!="0")
+  {
+    execute("minpoly=number("+mp+");");
+  }
   ideal irrel=@x(1..n);
   map f=br,irrel;
   poly p=f(g);
