@@ -240,15 +240,15 @@ BOOLEAN jjPRINT(leftv res, leftv u)
   {
       case INTVEC_CMD:
         bo=ipPrint_INTVEC(u);
-	break;
+        break;
 
       case INTMAT_CMD:
         bo=ipPrint_INTMAT(u);
-	break;
+        break;
 
       case MATRIX_CMD:
         bo=ipPrint_MA(u);
-	break;
+        break;
 
       case IDEAL_CMD:
       {
@@ -269,12 +269,12 @@ BOOLEAN jjPRINT(leftv res, leftv u)
 
       case VECTOR_CMD:
         bo=ipPrint_V(u);
-	break;
+        break;
 
       case RING_CMD:
       case QRING_CMD:
         bo=ipPrint_RING(u);
-	break;
+        break;
 
       default:
         u->Print();

@@ -131,7 +131,7 @@ void intvec::resize(int new_length)
 
 char * intvec::String(int dim) const
 {
-  return omStrDup(ivString(1, 0, dim));
+  return ivString(1, 0, dim);
 }
 
 #ifndef NDEBUG
@@ -153,13 +153,17 @@ void intvec::view () const
 
 void intvec::show(int notmat,int spaces) const
 {
+  char *s=ivString(notmat,spaces);
   if (spaces>0)
   {
     PrintNSpaces(spaces);
-    PrintS(ivString(notmat,spaces));
+    PrintS(s);
   }
   else
-    PrintS(ivString(notmat,0));
+  {
+    PrintS(s);
+  }
+  omFree(s);
 }
 
 void intvec::operator+=(int intop)

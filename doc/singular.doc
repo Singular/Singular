@@ -655,7 +655,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @c ----------------------------------------------------------
 @node stratify_lib, ,rinvar_lib, Invariant theory
 @subsection stratify_lib
-@c lib stratify.lib no_ex
+@c lib stratify.lib
 @c ----------------------------------------------------------------------------
 @node Symbolic-numerical solving, Visualization, Invariant theory, SINGULAR libraries
 @section Symbolic-numerical solving
@@ -681,7 +681,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @c ---------------------------------------------------------
 @node triang_lib, ntsolve_lib,  solve_lib, Symbolic-numerical solving
 @subsection triang_lib
-@c lib triang.lib no_ex
+@c lib triang.lib
 @c ---------------------------------------------------------
 @node ntsolve_lib, zeroset_lib, triang_lib, Symbolic-numerical solving
 @subsection ntsolve_lib
@@ -709,7 +709,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @c ---------------------------------------------------------
 @node graphics_lib, latex_lib, Visualization, Visualization
 @subsection graphics_lib
-@c lib graphics.lib no_ex
+@c lib graphics.lib
 @c ---------------------------------------------------------
 @node latex_lib, surf_lib, graphics_lib, Visualization
 @subsection latex_lib
@@ -722,7 +722,6 @@ iniD, reslist, sumlist, dividelist, createlist
 @node surfex_lib,, surf_lib, Visualization
 @subsection surfex_lib
 @c lib surfex.lib no_ex
-
 @c ----------------------------------------------------------------------------
 @node Coding theory, System and Control theory, Visualization, SINGULAR libraries
 @section Coding theory
@@ -909,7 +908,7 @@ but not for serious computations.
 @node polybori_lib,,phindex_lib, Miscellaneous libraries
 @subsection polybori_lib
 
-@c lib polybori.lib
+@c lib polybori.lib tag:pyobject
 
 @c ----------------------------------------------------------------------------
 @node Experimental libraries,,Miscellaneous libraries, SINGULAR libraries

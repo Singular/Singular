@@ -189,6 +189,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   {
 #ifndef NDEBUG
     WarnS("Set minpoly over non-transcendental ground field to 0?!");
+    Warn("in >>%s<<",my_yylinebuf);
 #endif
     return FALSE;
   }
