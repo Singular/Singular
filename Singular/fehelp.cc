@@ -181,7 +181,7 @@ void feHelp(char *str)
     char *matches=StringEndS();
     PrintS(matches);
     omFree(matches);
-    PrintS("\n");
+    PrintLn();
     return;
   }
 
