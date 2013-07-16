@@ -11,12 +11,8 @@ SHELL=/bin/sh
 SINGUNAME       = spielwiese
 S_VERSION       = 4-0-0
 
-PYOBECT_TEX =
-#PYOBECT_TEX = pyobject.tex
-
-
 ## directory where info files are installed
-prefix          = /tmp/wawa
+prefix          = /scratch/hannes/billbo-sw
 infodir	        = ${prefix}/info
 bindir	        = @bindir@
 htmldir         = ${prefix}/html
@@ -35,7 +31,7 @@ ftpdir          = /tmp
 ##
 ## needed programs
 ##
-LN_S            = @LN_S@
+LN_S            = ln -s
 INSTALL	        = ../install-sh -c
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_DATA    = ${INSTALL} -m 644
@@ -55,7 +51,7 @@ DVIPS           = dvips
 VERBOSE         = 1 # override this with make VERBOSE=2
 
 # d2t stuff
-SINGULAR        = /tmp/wawa/Singular/Singular
+SINGULAR        = /scratch/hannes/billbo-sw/Singular/Singular
 SINGULAR_LIB_DIR= ../Singular/LIB
 ifeq ($(SINGUNAME),"ix86-Win")
 LIBPARSE        = ${bindir}/libparse.exe
@@ -65,10 +61,20 @@ endif
 DOC_SUBDIR      = ./d2t_singular
 EX_SUBDIR       = ./examples
 CHKSUM_DB       = ${DOC_SUBDIR}/chksum
+# which tags to avoid:
+DOC2TEX_EXAMPLE_EXCLUSIONS = -exclude oldpolymake
+# which tags to avoid:
+TAG		= oldpolymake
 DOC2TEX         = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
                   -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
+		  -exdir ${EX_SUBDIR} ${DOC2TEX_EXAMPLE_EXCLUSIONS}
+
+DOC2TEX_M        = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
+                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
 		  -exdir ${EX_SUBDIR}
-PL2DOC		= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
+
+PL2DOC		= ${PERL} ./pl2doc.pl ${TAG} -db ${CHKSUM_DB}
+PL2DOC_M	= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
 
 # t2h stuff
 TMP_DIR		= tmp
@@ -101,7 +107,7 @@ STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi NEWS.texi \
 DOC2TEX_FILES	= cones.tex countedref.tex decodegb.tex \
 		examples.tex general.tex ti_ip.tex math.tex reference.tex \
 		start.tex types.tex pdata.tex tricks.tex platform.tex \
-		polymake.tex plural.tex letterplace.tex plulibs.tex sca.tex ${PYOBJECT_TEX}
+		plural.tex letterplace.tex plulibs.tex sca.tex pyobject.tex
 
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 
@@ -181,14 +187,14 @@ usercard.ps: usercard.dvi
 # texinfo targets
 #
 manual.tex:  ${MANUAL_FILES} doc2tex.pl ${SINGULAR} singular.doc $(STANDALONE_TEXI_FILES)
-	+${DOC2TEX} -no_fun -o manual.tex singular.doc
+	+${DOC2TEX_M} -no_fun -o manual.tex singular.doc
 
 singular.tex: ${MANUAL_FILES} doc2tex.pl ${LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE} singular.doc $(STANDALONE_TEXI_FILES)
 	+${DOC2TEX} -o singular.tex singular.doc
 
 #pattern rule for tex files
 %_noEx.tex : %.doc doc2tex.pl ${SINGULAR}
-	+${DOC2TEX} -o $@ -no_ex $<
+	+${DOC2TEX_M} -o $@ -no_ex $<
 
 %.tex: %.doc doc2tex.pl ${SINGULAR}
 	+${DOC2TEX} -o $@ $<
@@ -199,7 +205,7 @@ ${DOC_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
 	${LIBPARSE} -i $< > $@
 
 %_noFun.doc : %.pl pl2doc.pl
-	${PL2DOC}  -no_fun -o $@  $<
+	${PL2DOC_M}  -no_fun -o $@  $<
 
 %.doc : %.pl pl2doc.pl
 	${PL2DOC} -o $@ $<
