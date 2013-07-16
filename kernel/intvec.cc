@@ -122,7 +122,7 @@ void intvec::resize(int new_length)
 
 char * intvec::String(int dim) const
 {
-  return omStrDup(ivString(1, 0, dim));
+  return ivString(1, 0, dim);
 }
 
 #ifndef NDEBUG
