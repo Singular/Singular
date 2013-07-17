@@ -2126,7 +2126,7 @@ void p_Content(poly ph, const ring r)
       // special handling for alg. ext.:
       if (getCoeffType(r->cf)==n_algExt)
       {
-        number hzz = n_Init(1, r->cf->extRing->cf);
+        h = n_Init(1, r->cf->extRing->cf);
         p=ph;
         while (p!=NULL)
         { // each monom: coeff in Q_a
@@ -2134,17 +2134,15 @@ void p_Content(poly ph, const ring r)
           poly c_n=c_n_n;
           while (c_n!=NULL)
           { // each monom: coeff in Q
-            d=n_Lcm(hzz,pGetCoeff(c_n),r->cf->extRing->cf);
-            n_Delete(&hzz,r->cf->extRing->cf);
-            hzz=d;
+            d=n_Lcm(h,pGetCoeff(c_n),r->cf->extRing->cf);
+            n_Delete(&h,r->cf->extRing->cf);
+            h=d;
             pIter(c_n);
           }
           pIter(p);
         }
-        /* hzz contains the 1/lcm of all denominators in c_n_n*/
-        h=n_Invers(hzz,r->cf->extRing->cf);
-        n_Delete(&hzz,r->cf->extRing->cf);
-        n_Normalize(h,r->cf->extRing->cf);
+        /* h contains the 1/lcm of all denominators in c_n_n*/
+        //n_Normalize(h,r->cf->extRing->cf);
         if(!n_IsOne(h,r->cf->extRing->cf))
         {
           p=ph;
@@ -2503,7 +2501,6 @@ poly p_Cleardenom(poly p, const ring r)
   }
 #endif
 
-  poly start=p;
 
   number d, h;
 
@@ -2513,14 +2510,14 @@ poly p_Cleardenom(poly p, const ring r)
     p_Content(p,r);
     assume( n_GreaterZero(pGetCoeff(p),C) );
     if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
-    return start;
+    return p;
   }
 #endif
 
   if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY)
   {
     if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
-    return start;
+    return p;
   }
 
   assume(p != NULL);
@@ -2546,10 +2543,11 @@ poly p_Cleardenom(poly p, const ring r)
     assume( n_GreaterZero(pGetCoeff(p),C) );
     if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
 
-    return start;
+    return p;
   }
 
   assume(pNext(p)!=NULL);
+  poly start=p;
 
 #if 0 && CLEARENUMERATORS
 //CF: does not seem to work that well..
