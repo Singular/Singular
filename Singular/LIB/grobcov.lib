@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: grobcov.lib 15811 2013-05-29 15:05:07Z motsak $";
 category="General purpose";
 info="
 LIBRARY:  grobcov.lib   Groebner Cover for parametric ideals.
@@ -221,7 +221,13 @@ ringlist(@RP);
 proc cld(ideal J)
 {
   if (size(J)==0){return(ideal(0));}
+  int te=0;
   def RR=basering;
+  if(not(defined(@RP)))
+  {
+    te=1;
+    setglobalrings();
+  }
   setring(@RP);
   def Ja=imap(RR,J);
   ideal Jb;
@@ -231,6 +237,7 @@ proc cld(ideal J)
   for (i=1;i<=ncols(Ja);i++){if (size(Ja[i])!=0){j++; Jb[j]=cleardenom(Ja[i]);}}
   setring(RR);
   def Jc=imap(@RP,Jb);
+  if(te){kill @R; kill @RP; kill @P;}
   return(Jc);
 };
 
@@ -3717,6 +3724,7 @@ proc KtoPrep(ideal N, ideal W)
 // output: the same terminal vertices grouped by lpp
 proc groupKSWsegments(list T)
 {
+  //"T_T="; T;
   int i; int j;
   list L;
   list lpp; list lppor;
@@ -4043,7 +4051,7 @@ proc  addtolocalclosed(list L1,list L2)
 //         The components are given in canonical P-representation of the subset.
 //              If all levels of a class of locus are 1, then the set is locally closed. Otherwise the level
 //              gives the depth of the component.
-proc locus(list GG)
+proc locus(list GG, list #)
 "USAGE:   locus(G);
                The input must be the grobcov  of a parametrical ideal
 RETURN:  The  locus.
@@ -4062,6 +4070,9 @@ EXAMPLE:  locus; shows an example"
 {
   int t1=1; int t2=1;
   def R=basering;
+  int moverdim=nvars(R);
+  list Lop=#;
+  if(size(Lop)>0){moverdim=Lop[1];}
   setglobalrings();
   list G1; list G2;
   def G=GG;
@@ -4070,7 +4081,9 @@ EXAMPLE:  locus; shows an example"
   for(i=1;i<=size(G);i++)
   {
     attrib(G[i][1],"IsSB",1);
-    d=dim(std(G[i][1]));
+    //d=dim(std(G[i][1]));
+    // ULL
+    d=locusdim(G[i][2],moverdim);
     if(d==0){G1[size(G1)+1]=G[i];}
     else
     {
@@ -4256,11 +4269,12 @@ example
 
 // locusdg is the routine for computing the locus in dinamical geometry.
 //    It detects automatically a possible point that is to be avoided by the mover,
-//    whose coordinates must be the last two coordinates in the definition of the ring.
+//    whose coordinates must be the last coordinates in the definition of the ring (2 last by default,
+//    or the dd last if the option locusdg(G,dd) is specified).
 //    If such a point is detected, then it eliminates the segments of the grobcov that
 //    have this point as solution.
 //    Then it calls locus.
-proc locusdg(list GG)
+proc locusdg(list GG,list #)
 "USAGE:  locusdg(GG) ;
           The argument must be the output of grobcov
 RETURN:  The  components of the locus of points in dinamical geometry
@@ -4271,6 +4285,10 @@ KEYWORDS: ring, locus, grobcov
 EXAMPLE:  locusdg(GG); shows an example"
 {
   def R=basering;
+  int dd=2; int comment=0;
+  list DD=#;
+  if (size(DD)>1){comment=1;}
+  if(size(DD)>0){dd=DD[1];}
   int i; int j; int k;
   def B0=GG[1][2];
   if (equalideals(B0,ideal(1)))
@@ -4306,7 +4324,7 @@ EXAMPLE:  locusdg(GG); shows an example"
     te=indepparameters(N);
     if(te)
     {
-      //"T_N="; N;
+      string("locusdg detected that the mover must avoid point (",N,") in order to obtain the locus");
       // eliminate segments of GG where N is contained in the basis
       list nGP;
       def GP=GG;
@@ -4322,40 +4340,46 @@ EXAMPLE:  locusdg(GG); shows an example"
         }
         if(te==0){nGP[size(nGP)+1]=GP[j];}
       }
-      //"T_nGP="; nGP;
-      // Now eliminate components for which the basis has dim>0, and all elements non reducing to 0
-      // modulo N do not contain the mover coordinates
-      list nnGP; poly r;
-      for(j=1; j<=size(nGP);j++)
-      {
-        if(not(indepparameters(nGP[j][2])))
-        {
-          if(dim(std(nGP[j][1]))==0){nnGP[size(nnGP)+1]=nGP[j];}
-          else
-          {
-            te=1; k=1;
-            while(te and k<=size(nGP[2]))
-            {
-              r=pdivi(nGP[j][2][k],N)[1];
-              if(r==0){k++;}
-              else
-              {
-                if(not(subset(variables(nGP[j][2][k]),vmov )))
-                {
-                  te=0;
-                }
-                else{k++;}
-              }
-            }
-            if(te==1){nnGP[size(nnGP)+1]=nGP[j];}
-          }
-        }
-      }
-    }
-    kill @RP; kill @P; kill @R;
-    return(locus(nnGP));
+   }
   }
+  //"T_nGP="; nGP;
+  kill @RP; kill @P; kill @R;
+  return(locus(nGP,dd));
 }
+//      // Now eliminate components for which the basis has dim>0, and all elements non reducing to 0
+//      // modulo N do not contain the mover coordinates
+//      list nnGP; poly r;
+//      for(j=1; j<=size(nGP);j++)
+//      {
+//        if(not(indepparameters(nGP[j][2])))
+//        {
+//          if(dim(std(nGP[j][1]))==0){nnGP[size(nnGP)+1]=nGP[j];}
+//          else
+//          {
+//            te=1; k=1;
+//            while(te and k<=size(nGP[2]))
+//            {
+//              r=pdivi(nGP[j][2][k],N)[1];
+//              if(r==0){k++;}
+//              else
+//              {
+//                if(not(subset(variables(nGP[j][2][k]),vmov )))
+//                {
+//                  te=0;
+//                }
+//                else{k++;}
+//              }
+//            }
+//            if(te==1){nnGP[size(nnGP)+1]=nGP[j];}
+//          }
+//        }
+//      }
+//
+//    }
+//    kill @RP; kill @P; kill @R;
+//    return(locus(nnGP));
+//  }
+//}
 example
 {"EXAMPLE:"; echo = 2;
   ring R=(0,a,b),(x4,x3,x2,x1),dp;
@@ -4366,6 +4390,50 @@ example
              (a-x1)^2+(b-x2)^2-(x1-x3)^2-(x2-x4)^2;
   short=0;
   locusdg(grobcov(S));
+}
+
+// locusdim
+// input:
+//    B:         ideal, a basis of a segment of the grobcov
+//    dgdim: int, the dimension of the mover (for locusdg)
+//                by default dgdim is equal to the number of variables
+proc locusdim(ideal B, list #)
+{
+  def R=basering;
+  int dgdim;
+  int nv=nvars(R);
+  if (size(#)>0){dgdim=#[1];}
+  else {dgdim=nv;}
+  int d;
+  list v;
+  ideal vi;
+  int i;
+  for(i=1;i<=dgdim;i++)
+  {
+    v[size(v)+1]=varstr(nv-dgdim+i);
+    vi[size(v)+1]=var(nv-dgdim+i);
+  }
+  ideal B0;
+  for(i=1;i<=size(B);i++)
+  {
+    if(subset(variables(B[i]),vi))
+    {
+      B0[size(B0)+1]=B[i];
+    }
+  }
+  //"T_B0="; B0;
+  //"T_v="; v;
+  def RR=ringlist(R);
+  def RR0=RR;
+  RR0[2]=v;
+  def R0=ring(RR0);
+  //ringlist(R0);
+  setring(R0);
+  def B0r=imap(R,B0);
+  B0r=std(B0r);
+  d=dim(B0r);
+  setring R;
+  return(d);
 }
 
 
