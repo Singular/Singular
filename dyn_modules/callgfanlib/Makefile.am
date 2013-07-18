@@ -5,15 +5,11 @@ moduledir = $(libexecdir)/singular/MOD
 if HAVE_GFANLIB
 if ENABLE_P_PROCS_DYNAMIC
   module_LTLIBRARIES=gfanlib.la
-
-if WANT_DEBUG
-  module_LTLIBRARIES+=gfanlib_g.la
-endif
-
 endif
 endif
 
-CXXTEMPLFLAGS	= ${PIPE} -lcddgmp
+
+CXXTEMPLFLAGS	=
 ## -fno-implicit-templates
 ## --no-exceptions
 
@@ -51,7 +47,8 @@ gfanlib_la_CPPFLAGS   = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 # gfanlib_la_CXXFLAGS   = ${NODEBUGCXXFLAGS}
 # gfanlib_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 
-gfanlib_la_LIBADD = ${abs_top_builddir}/gfanlib/libgfan.la -lcddgmp
+
+gfanlib_la_LIBADD = ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
 # gfanlib_g_la_LIBADD = ${gfanlib_la_LIBADD}
 
 if ENABLE_P_PROCS_DYNAMIC
