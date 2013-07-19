@@ -2169,13 +2169,13 @@ void p_Content(poly ph, const ring r)
         p=ph;
         while (p!=NULL)
         { // each monom: coeff in Q_a
-          fraction f=(fraction)pGetCoeff(p); 
+          fraction f=(fraction)pGetCoeff(p);
           poly c_n=NUM(f);
           if (hzz==NULL)
-	  {
-	    hzz=n_Copy(pGetCoeff(c_n),r->cf->extRing->cf); 
-	    pIter(c_n);
-	  }
+          {
+            hzz=n_Copy(pGetCoeff(c_n),r->cf->extRing->cf);
+            pIter(c_n);
+          }
           while ((c_n!=NULL)&&(!n_IsOne(hzz,r->cf->extRing->cf)))
           { // each monom: coeff in Q
             d=n_Gcd(hzz,pGetCoeff(c_n),r->cf->extRing->cf);
@@ -2194,10 +2194,10 @@ void p_Content(poly ph, const ring r)
           p=ph;
           while (p!=NULL)
           { // each monom: coeff in Q_a
-	    fraction f=(fraction)pGetCoeff(p);
+            fraction f=(fraction)pGetCoeff(p);
             NUM(f)=p_Mult_nn(NUM(f),h,r->cf->extRing);
-	    p_Normalize(NUM(f),r->cf->extRing);
-	    pIter(p);
+            p_Normalize(NUM(f),r->cf->extRing);
+            pIter(p);
           }
         }
         n_Delete(&h,r->cf->extRing->cf);
@@ -3621,39 +3621,42 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
   if( nCoeff_is_algExt(srcCf) ) // nCoeff_is_GF(srcCf)?
   {
     zz = (poly) z;
-
-    if( zz == NULL )
-       return NULL;
-
-  } else if (nCoeff_is_transExt(srcCf))
+    if( zz == NULL ) return NULL;
+  }
+  else if (nCoeff_is_transExt(srcCf))
   {
     assume( !IS0(z) );
 
     zz = NUM(z);
     p_Test (zz, srcExtRing);
 
-    if( zz == NULL )
-       return NULL;
-
-    //if( !DENIS1(z) )
-      //WarnS("Not implemented yet: Cannot permute a rational fraction and make a polynomial out of it! Ignorring the denumerator.");
-  } else
-     {
-        assume (FALSE);
-        Werror("Number permutation is not implemented for this data yet!");
-        return NULL;
-     }
+    if( zz == NULL ) return NULL;
+    if( !DENIS1(z) )
+    {
+      if (p_IsConstant(DEN(z),srcExtRing))
+      {
+        number n=pGetCoeff(DEN(z));
+        zz=p_Div_nn(zz,n,srcExtRing);
+      }
+      //else
+      //  WarnS("Not implemented yet: Cannot permute a rational fraction and make a polynomial out of it! Ignorring the denumerator.");
+    }
+  }
+  else
+  {
+    assume (FALSE);
+    Werror("Number permutation is not implemented for this data yet!");
+    return NULL;
+  }
 
   assume( zz != NULL );
   p_Test (zz, srcExtRing);
-
 
   nMapFunc nMap = n_SetMap(srcExtRing->cf, dstCf);
 
   assume( nMap != NULL );
 
   poly qq;
-
   if ((par_perm == NULL) && (rPar(dst) != 0 && rVar (srcExtRing) > 0))
   {
     int* perm;
