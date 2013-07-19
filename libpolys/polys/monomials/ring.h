@@ -50,22 +50,24 @@ typedef void     (*p_SetmProc)(poly p, const ring r);
 
 /// returns a poly from dest_r which is a ShallowCopy of s_p from source_r
 /// assumes that source_r->N == dest_r->N and that orderings are the same
-typedef poly (*pShallowCopyDeleteProc)(poly s_p, ring source_r, ring dest_r, 
+typedef poly (*pShallowCopyDeleteProc)(poly s_p, ring source_r, ring dest_r,
                                        omBin dest_bin);
 
-
+// ro_typ describes what to store at the corresping "data" place in p->exp
+// none of the directly corresponds to a ring ordering (ringorder_*)
+// as each ringorder_* blocks corrsponds to 0..2 sro-blocks
 typedef enum
 {
-  ro_dp, // ordering is a degree ordering
-  ro_wp, // ordering is a weighted degree ordering
-  ro_am, // ordering is am: weights for vars + weights for gen
-  ro_wp64, // ordering is a weighted64 degree ordering
-  ro_wp_neg, // ordering is a weighted degree ordering
-             // with possibly negative weights
-  ro_cp,    // ordering duplicates variables
-  ro_syzcomp, // ordering indicates "subset" of component number (ringorder_S)
-  ro_syz, // ordering  with component number >syzcomp is lower (ringorder_s)
-  ro_isTemp, ro_is, // Induced Syzygy (Schreyer) ordering (and prefix data placeholder dummy) (ringorder_IS)
+  ro_dp, // total degree with weights 1
+  ro_wp, // total weighted degree with weights>0 in wvhdl
+  ro_am, // weights for vars + weights for gen
+  ro_wp64, // weighted64 degree weights in wvhdl
+  ro_wp_neg, // total weighted degree with weights in Z in wvhdl
+             // (with possibly negative weights)
+  ro_cp,    // ??ordering duplicates variables
+  ro_syzcomp, // ??ordering indicates "subset" of component number (ringorder_S)
+  ro_syz, // component number if <=syzcomp else 0 (ringorder_s)
+  ro_isTemp, ro_is, // ??Induced Syzygy (Schreyer) ordering (and prefix data placeholder dummy) (ringorder_IS)
   ro_none
 }
 ro_typ;
@@ -100,7 +102,7 @@ struct sro_am
                 // contents w_{start},... w_{end}, len, mod_w_1, .. mod_w_len, 0
   int *weights_m; // pointers into wvhdl field of length len_gen + 1
                 // len_gen, mod_w_1, .. mod_w_len, 0
-  
+
 };
 typedef struct sro_am sro_am;
 
@@ -249,7 +251,7 @@ struct ip_sring
 //   unsigned long cf->modNumber;  /* Z/cf->modNumber */
 //   int_number    cf->modNumber;
 // #endif
-  
+
   unsigned long options; /* ring dependent options */
 
 //  int        ch;  /* characteristic, rInit */
@@ -353,7 +355,7 @@ ring   rEnvelope(ring r);
 /// we must always have this test!
 static inline bool rIsPluralRing(const ring r)
 {
-  assume(r != NULL); assume(r->cf != NULL);   
+  assume(r != NULL); assume(r->cf != NULL);
 #ifdef HAVE_PLURAL
   nc_struct *n;
   return (r != NULL) && ((n=r->GetNC()) != NULL) /*&& (n->type != nc_error)*/;
@@ -477,7 +479,7 @@ static inline BOOLEAN rField_is_Zp_a(const ring r, int p)
    the SINGULAR svn trunk */
 static inline BOOLEAN rField_is_Q_a(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Q_a(r->cf); }
-   
+
 static inline BOOLEAN rField_is_long_R(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_long_R(r->cf); }
 
@@ -491,7 +493,7 @@ static inline BOOLEAN rField_has_simple_inverse(const ring r)
 static inline BOOLEAN rField_has_simple_Alloc(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_has_simple_Alloc(r->cf); }
 
-/// Alg. or trans. ext. 
+/// Alg. or trans. ext.
 static inline BOOLEAN rField_is_Extension(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Extension(r->cf); } /* Z/p(a) and Q(a)*/
 
@@ -598,33 +600,33 @@ static inline number n_Param(const short iParameter, const ring r)
   assume(C != NULL);
   return n_Param(iParameter, C);
 //   const n_coeffType _filed_type = getCoeffType(C);
-// 
+//
 //   if ( iParameter <= 0 || iParameter > rPar(r) )
 //     // Wrong parameter
 //     return NULL;
-// 
+//
 //   if( _filed_type == n_algExt )
 //     return naParameter(iParameter, C);
-// 
+//
 //   if( _filed_type == n_transExt )
 //     return ntParameter(iParameter, C);
-// 
+//
 //   if (_filed_type == n_GF)// if (nCoeff_is_GF(C))
 //   {
 //     number nfPar (int i, const coeffs);
 //     return nfPar(iParameter, C);
 //   }
-//   
+//
 //   if (_filed_type == n_long_C) // if (nCoeff_is_long_C(C))
 //   {
-//     number   ngcPar(int i, const coeffs r);    
+//     number   ngcPar(int i, const coeffs r);
 //     return ngcPar(iParameter, C);
 //   }
-// 
+//
 //   return NULL;
 }
 
-/// if m == var(i)/1 => return i, 
+/// if m == var(i)/1 => return i,
 int n_IsParam(number m, const ring r);
 
 //#define  rInternalChar(r) ((r)->cf->ch)
@@ -636,7 +638,7 @@ static inline int rInternalChar(const ring r)
   return C->ch;
 }
 
-   
+
 /* R, Q, Fp: FALSE */
 static inline BOOLEAN rIsExtension(const ring r)
 {
