@@ -2129,8 +2129,11 @@ CanonicalForm mulMod2 (const CanonicalForm& A, const CanonicalForm& B,
 
   CanonicalForm F= mod (A, M);
   CanonicalForm G= mod (B, M);
-  if (F.inCoeffDomain() || G.inCoeffDomain())
+  if (F.inCoeffDomain())
+    return G*F;
+  if (G.inCoeffDomain())
     return F*G;
+
   Variable y= M.mvar();
   int degF= degree (F, y);
   int degG= degree (G, y);
@@ -2222,11 +2225,21 @@ CanonicalForm mulMod (const CanonicalForm& A, const CanonicalForm& B,
   CanonicalForm M= MOD.getLast();
   CanonicalForm F= mod (A, M);
   CanonicalForm G= mod (B, M);
-  if (F.inCoeffDomain() || G.inCoeffDomain())
+  if (F.inCoeffDomain())
+    return G*F;
+  if (G.inCoeffDomain())
     return F*G;
 
-  if (size (F) / MOD.length() < 100 || size (G) / MOD.length() < 100)
-    return mod (F*G, MOD);
+  int sizeF= size (F);
+  int sizeG= size (G);
+
+  if (sizeF / MOD.length() < 100 || sizeG / MOD.length() < 100)
+  {
+    if (sizeF < sizeG)
+      return mod (G*F, MOD);
+    else
+      return mod (F*G, MOD);
+  }
 
   Variable y= M.mvar();
   int degF= degree (F, y);
@@ -2286,7 +2299,7 @@ CanonicalForm mulMod (const CanonicalForm& A, const CanonicalForm& B,
   }
   else
   {
-    m= (int) ceil (tmax (degF, degG)/2.0);
+    m= (int) ceil (tmin (degF, degG)/2.0);
     CanonicalForm yToM= power (y, m);
     CanonicalForm F0= mod (F, yToM);
     CanonicalForm F1= div (F, yToM);
