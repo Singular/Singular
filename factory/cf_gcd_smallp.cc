@@ -4242,6 +4242,21 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   if (GG.isUnivariate() && fdivides(GG, FF)) return GG/Lc(GG);
   if (FF == GG) return FF/Lc(FF);
 
+  int maxNumVars= tmax (getNumVars (FF), getNumVars (GG));
+  Variable a, oldA;
+  int sizeF= size (FF);
+  int sizeG= size (GG);
+
+  if (sizeF/maxNumVars > sizePerVars1 && sizeG/maxNumVars > sizePerVars1)
+  {
+    if (hasFirstAlgVar (FF, a) || hasFirstAlgVar (GG, a))
+      return GCD_Fp_extension (FF, GG, a);
+    else if (CFFactory::gettype() == GaloisFieldDomain)
+      return GCD_GF (FF, GG);
+    else
+      return GCD_small_p (FF, GG);
+  }
+
   CanonicalForm F, G, f, g, d, Fb, Gb, Db, Fbt, Gbt, Dbt, B0, B, D0, lcF, lcG,
                 lcD;
   CFArray DD( 1, 2 ), lcDD( 1, 2 );
@@ -4293,10 +4308,9 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
     return N(d*gcd(G,f));
   }
 
-  int maxNumVars= tmax (getNumVars (F), getNumVars (G));
-  Variable a, oldA;
-  int sizeF= size (F);
-  int sizeG= size (G);
+  maxNumVars= tmax (getNumVars (F), getNumVars (G));
+  sizeF= size (F);
+  sizeG= size (G);
 
   if (sizeF/maxNumVars > sizePerVars1 && sizeG/maxNumVars > sizePerVars1)
   {
