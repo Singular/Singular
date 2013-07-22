@@ -114,4 +114,5 @@ int findLonges(int * a, int length);
 int intArrSum(int * a, int length);
 
 bigintmat * iv2bim(intvec * b);
+bigintmat * bimConcat(bigintmat * a, bigintmat * b);
 #endif

@@ -141,6 +141,7 @@ intvec * ivMult(intvec * a, intvec * b);
 //void     ivTriangMat(intvec * imat);
 void     ivTriangIntern(intvec * imat, int &ready, int &all);
 intvec * ivSolveKern(intvec * imat, int ready);
+intvec * ivConcat(intvec * a, intvec * b);
 
 #ifdef MDEBUG
 inline void ivTest(intvec * v)
