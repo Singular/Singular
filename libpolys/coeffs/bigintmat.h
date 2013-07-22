@@ -201,6 +201,5 @@ int intArrSum(int * a, int length);
 class intvec;
 intvec * bim2iv(bigintmat * b);
 bigintmat * iv2bim(intvec * b, const coeffs C);
-
-
+bigintmat * bimConcat(bigintmat * a, bigintmat * b, const coeffs C);
 #endif // #ifndef BIGINTMAT_H

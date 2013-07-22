@@ -772,7 +772,32 @@ static void bimReduce(bigintmat *bimat, int rpiv, int colpos,
   }
 }
 
+// columnwise concatination of two bigintmats
+bigintmat * bimConcat(bigintmat * a, bigintmat * b, const coeffs cf)
+{
+  int ac=a->cols();
+  int r=si_max(a->rows(),b->rows());
+  bigintmat * ab = new bigintmat(r,ac + b->cols(),cf);
 
+  int i,j;
+  for (i=1; i<=a->rows(); i++)
+  {
+    for (j=1; j<=ac; j++)
+    {
+      n_Delete(&(BIMATELEM(*ab,i,j)),cf);
+      BIMATELEM(*ab,i,j)=n_Copy(BIMATELEM(*a,i,j),cf);
+    }
+  }
 
+  for (i=1; i<=b->rows(); i++)
+  {
+    for (j=1; j<=b->cols(); j++)
+    {
+      n_Delete(&(BIMATELEM(*ab,i,j+ac)),cf);
+      BIMATELEM(*ab,i,j+ac)=n_Copy(BIMATELEM(*b,i,j),cf);
+    }
+  }
 
+  return ab;
+}
 

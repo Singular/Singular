@@ -813,6 +813,27 @@ static void ivContent(intvec *w)
     (*w)[i] /= tgcd;
 }
 
+// columnwise concatination of two intvecs
+intvec * ivConcat(intvec * a, intvec * b)
+{
+  int ac=a->cols();
+  int c = ac + b->cols(); int r = si_max(a->rows(),b->rows());
+  intvec * ab = new intvec(r,c,0);
+
+  int i,j;
+  for (i=1; i<=a->rows(); i++)
+  {
+    for(j=1; j<=ac; j++)
+      IMATELEM(*ab,i,j) = IMATELEM(*a,i,j);
+  }
+  for (i=1; i<=b->rows(); i++)
+  {
+    for(j=1; j<=b->cols(); j++)
+      IMATELEM(*ab,i,j+ac) = IMATELEM(*b,i,j);
+  }
+  return ab;
+}
+
 #pragma GCC pop_options
 
 #endif
