@@ -148,14 +148,14 @@ BOOLEAN pcvMinDeg(leftv res,leftv h)
     if(h->Typ()==POLY_CMD)
     {
       res->rtyp=INT_CMD;
-      res->data=(void*)pcvMinDeg((poly)h->Data());
+      res->data=(void*)(long)pcvMinDeg((poly)h->Data());
       return FALSE;
     }
     else
     if(h->Typ()==MATRIX_CMD)
     {
       res->rtyp=INT_CMD;
-      res->data=(void*)pcvMinDeg((matrix)h->Data());
+      res->data=(void*)(long)pcvMinDeg((matrix)h->Data());
       return FALSE;
     }
   }
@@ -399,7 +399,7 @@ BOOLEAN pcvDim(leftv res,leftv h)
       {
         int d1=(int)(long)h->Data();
         res->rtyp=INT_CMD;
-        res->data=(void*)pcvDim(d0,d1);
+        res->data=(void*)(long)pcvDim(d0,d1);
         return FALSE;
       }
     }

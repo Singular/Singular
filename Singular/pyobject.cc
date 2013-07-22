@@ -100,7 +100,7 @@ private:
   void set_python_defaults()
   {
     // Sone python modules needs argc, argv set for some reason
-    char* argv = "";
+    char* argv = (char*)"";
     PySys_SetArgv(1, &argv);
     PyRun_SimpleString("from sys import path, modules");
     PyRun_SimpleString("_SINGULAR_IMPORTED = dict()");
@@ -255,8 +255,8 @@ protected:
     PyObject *pType, *pMessage, *pTraceback;
     PyErr_Fetch(&pType, &pMessage, &pTraceback);
     
-    Werror("pyobject error occured");
-    Werror(PyString_AsString(pMessage));
+    WerrorS("pyobject error occured");
+    WerrorS(PyString_AsString(pMessage));
     
     Py_XDECREF(pType);
     Py_XDECREF(pMessage);
@@ -579,7 +579,7 @@ BOOLEAN pyobject_Op2(int op, leftv res, leftv arg1, leftv arg2)
   { 
     case '<': case '>': case EQUAL_EQUAL: case NOTEQUAL: case GE: case LE:
     {
-      res->data = (void *)lhs.compare(op, PythonCastDynamic(arg2));
+      res->data = (void *)(long)(lhs.compare(op, PythonCastDynamic(arg2)));
       res->rtyp = INT_CMD;
       return FALSE;
     }

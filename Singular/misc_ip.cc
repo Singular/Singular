@@ -48,7 +48,7 @@ void setListEntry(lists L, int index, mpz_t n)
     if ((((ui<<3)>>3)==ui)
     && (mpz_cmp_si(n,(long)ui)==0))
     {
-      L->m[index].rtyp = INT_CMD; L->m[index].data = (void*)ui;
+      L->m[index].rtyp = INT_CMD; L->m[index].data = (void*)(long)ui;
       return;
     }
   }
@@ -62,7 +62,7 @@ void setListEntry_ui(lists L, int index, unsigned long ui)
   int i=(int)ui;
   if ((((unsigned long)i)==ui) && (((i<<3)>>3)==i))
   {
-    L->m[index].rtyp = INT_CMD; L->m[index].data = (void*)i;
+    L->m[index].rtyp = INT_CMD; L->m[index].data = (void*)(long)i;
   }
   else
   {
