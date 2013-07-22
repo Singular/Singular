@@ -1,0 +1,1133 @@
+////////////////////////////////////////////////////////////////////////////////
+version=="version classifyci.lib 4.0.0.0 Jun_2013 ";
+category="Singularities";
+
+info="
+LIBRARY:  classifyci.lib     Isolated complete intersection singularities in characteristic  0
+AUTHORS:  Gerhard Pfister     pfister@mathematik.uni-kl.de
+          Deeba Afzal         deebafzal@gmail.com
+
+
+OVERVIEW:
+   A library for classifying isolated complete intersection singularities for the base field of characteristic  0
+   and for computing weierstrass semigroup of the space curve.Isolated complete intersection singularities were
+   classified by M.Giusti [1] for the base field of characteristic 0. Algorithm for the semigroup of a space
+   curve singularity is given in [2].
+
+REFERENCES:
+[1] Giusti,M:Classification des singularities isolees simples d'intersections completes,
+             C,R.Acad.Sci.Paris Ser.A-B 284(1977),167-169.
+[2] Castellanos,A.,Castellanos,J.,2005:Algorithm for the semigroup of a space curve singularity.
+             Semigroup Forum 70,44-66.
+PROCEDURES:
+ classifyicis(I);  Isolated simple complete intersection singularities for the base field of charateristic  0
+ Semigroup(I);     Weierstrass semigroup of the space curve given by equations
+";
+LIB "classify.lib";
+LIB "classify_aeq.lib";
+LIB "poly.lib";
+LIB "curvepar.lib";
+LIB "algebra.lib";
+
+////////////////////////////////////////////////////////////////////////////////
+proc classifyicis(ideal I)
+"USAGE: classifyicis(I);  I ideal
+ASSUME: I is given by two generators
+PURPOSE:Check whether the ideal defines a complete intersection singularity or not
+RETURN: String  type in the classification of Giusti,M
+@           or The given singularity is not simple
+EXAMPLE: example classifyicis;  shows an example
+"
+{
+   def R=basering;
+   def SS=changeord(list(list("ds",nvars(R))),R);
+   setring SS;
+   ideal I=imap(R,I);
+   string re;
+   if(char(basering)==0)
+   {
+       re=ICIS12(I);
+   }
+    if(char(basering)!=0)
+   {
+          re="The characteristic of basering should be 0";
+   }
+   setring R;
+   return(re);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+   ring R=0,(x,y,z),ds;
+   ideal I=x2+yz,xy+z4;
+   classifyicis(I);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc ICIS12(ideal I)
+{
+  int n=nvars(basering);
+  if(n==2)
+  {
+     return(zerodim_ICIS(I));
+  }
+  if(n==3)
+  {
+     return(onedim_ICIS(I));
+  }
+  if(n>=4)
+  {
+     return("The given singularity is not simple");
+  }
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc zerodim_ICIS(ideal I)
+"USAGE: zerodim_ICIS(l);  I is an ideal
+ASSUME: I is given by two generators
+PURPOSE: Check whether the ideal defines a complete intersection singularity of dimension zero or not
+RETURN: String  type in the classification of Giusti,M, of the 0-dimensional complete inetersection
+@*       or The given singularity is not simple
+EXAMPLE: example zerodim_ICIS; shows an example
+"
+{
+  def R=basering;
+  poly g,h,r;
+  ideal J;
+  int a,b,c,d;
+  map phi;
+  list L;
+  string re;
+  // g=g[0]+g[1]   where ord(g[1])>=3   ,g[0] can be zero
+  // h=h[0]+h[1]    where ord(h[1])>=3    ,h[0] can be zero
+  d=vdim(std(I));
+  if(d==-1)
+  {
+    return("The given singularity is not simple");
+  }
+  a=ord(I[1]);
+  b=ord(I[2]);
+  if((a>=3)&&(b>=3))
+  {                                             //start case1
+    return("The given singularity is not simple");
+  }                                           // end case 1
+  if((a==2&&b>=3)||(a>=3&&b==2))                // start case 2
+  {
+    if(a==2)
+    {
+      g=I[1];
+      h=I[2];
+    }
+    if(b==2)
+    {
+      g=I[2];
+      h=I[1];
+    }
+    L=factorize(jet(g,2));
+    if(size(L[1])==3)
+    {
+      re=findwhichF(g,h,L);
+      return(re);
+    }                                     // end size(L[1]=3)
+    if((size(L[1])==2)&&(L[2][2]==2))
+    {                                     // start (size(L[1])==2)&&(L[2][2]==2)
+      // case (x2,h);
+      r=L[1][2];
+      if(size(r)==2)                //  ax+by  goes to x
+      {
+        matrix M3=coef(r,var(1));
+        M3=subst(M3,var(2),1);
+        matrix A[2][2]=M3[2,1],M3[2,2],0,1;
+        matrix B=inverse(A);
+        phi=R,B[1,1]*var(1)+B[1,2]*var(2),B[2,1]*var(1)+B[2,2]*var(2);
+        g=phi(g);
+        h=phi(h);
+        J=(g,h);
+      }            // end size(r)=2
+      if(size(r)==1)                 // jet(g,2)=ax2 or  by2   goes to x2
+      {
+        if(leadmonom(r)==var(1))
+        {
+          phi=R,var(1)/leadcoef(r),var(2);
+          g=phi(g);
+          h=phi(h);
+        }
+        if(leadmonom(r)==var(2))
+        {
+          phi=R,var(2)/leadcoef(r),var(1);
+          g=phi(g);
+          h=phi(h);
+        }
+        J=(g,h);
+      }                // end size(r)=1
+      c=milnor(g);
+      if((d>=7)&&(c==2))
+      {
+        //"I-series";
+        if(d mod(2)==0)
+        {
+          return("I_"+string(d-1)+":(x2+y3,y"+string(d div 2)+")");
+        }
+        if(d mod(2)!=0)
+        {
+          return("I_"+string(d-1)+":(x2+y3,xy"+string((d-3) div 2)+")");
+        }
+      }
+      if(d==6)
+      {
+        return("G_5:(x2,y3)");
+      }
+      ring R1=0,(var(2),var(1)),ds;
+      setring R1;
+      ideal J=imap(R,J);
+      poly h1=reduce(J[2],std(J[1]),d);
+      poly h2=leadmonom(h1);
+      int ss=deg(h2)-1;
+      if((h2==var(1)^4)&&((c>=3)||(c==-1)))
+      {
+        setring R;
+        return("G_7:(x2,y4)");
+      }
+      if((h2==var(2)*var(1)^2)&&((c>=3)||(c==-1)))
+      {
+        setring R;
+        return("H_"+string(d-1)+":(x2+y"+string(d-4)+",xy2)");
+      }
+      setring R;
+      return("The given singularity is not simple");
+    }                                          // end (size(L[1])==2)&&(L[2][2]==2)
+    if((size(L[1])==2)&&(L[2][2]==1))
+    {
+      def S=factorExt(g);
+      setring S;
+      poly h=imap(R,h);                     // poly g=imap(R,g);  we need not S has already g
+      re= findwhichF(g,h,L);
+      setring R;
+      return(re);
+    }
+  }                                            // end case 2
+  if((a==2)&&(b==2))                  // start case 3
+  {
+    g=I[1];
+    h=I[2];
+    poly Q=testDiv(jet(h,2),jet(g,2));
+    if(Q!=0)
+    {
+      I=(g,h-Q*g);
+      return(zerodim_ICIS(I));
+    }
+    if(Q==0)
+    {
+      L=factorize(jet(g,2));
+      if(size(L[1])==3)
+      {
+        re=findwhichF(g,h,L);
+        return(re);
+      }
+      if((size(L[1])==2)&&(L[2][2]==1))
+      {
+        def S=factorExt(g);
+        setring S;
+        poly h=imap(R,h);
+        re=findwhichF(g,h,L);
+        setring R;
+        return(re);
+      }
+      L=factorize(jet(h,2));
+      if(size(L[1])==3)
+      {
+        re=findwhichF(h,g,L);
+        return(re);
+      }
+      if((size(L[1])==2)&&(L[2][2]==1))
+      {
+        def S=factorExt(h);
+        setring S;
+        poly g=imap(R,g);
+        re=findwhichF(h,g,L);
+        setring R;
+        return(re);
+      }
+      else
+      {    // there exist a s.t g[0]+ah[0] has two different factors.
+        int e=Finda(g,h);
+        I=(g+e*h,h);
+        re=zerodim_ICIS(I);
+        return(re);
+      }
+    }
+  }                                              // end case 3
+}                                                //  proc
+example
+{
+  "EXAMPLE:"; echo=2;
+   ring R=0,(x,y),ds;
+   ideal I=x2+8xy+16y2+y3,xy7+4y8;
+   zerodim_ICIS(I);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc Finda(poly g,poly h)
+"USAGE:  Finda(g,h);  g,h are polynomials
+PURPOSE: Find a such that jet(g,2)+a*jet(h,2) has two different factors
+RETURN: integer a
+{
+  // find  a s.t jet(g,2)+a*jet(h,2) has two different factors.
+  int o;
+  list L=factorize(jet(h,2));
+  if(L[2][2]==1){return(0);}
+  poly r= jet(g,2);
+  list T=factorize(r);
+  while(T[2][2]!=1)
+  {
+    o++;
+    r= r+jet(h,2);
+    T=factorize(r);
+  }
+  return(o);
+}
+/*
+ring R=0,(x,y),ds;
+poly g=x2+xy3;
+poly h=y2+x3+y7;
+finda(g,h);
+*/
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static proc testDiv(poly f,poly g)
+"USAGE:  testDiv(f,g);  f,g are polynomials
+ASSUME: I is given by two generators
+PURPOSE: Check whether  f divides g or not.
+RETURN: poly h(quotient)  if f divides g
+ @*              0 if f does not divide g
+{
+  poly h=f/g;
+  if(f-h*g==0)
+  {
+    return(h);
+  }
+  return(0);
+}
+/*
+   ring R=0,(x,y,ds;
+   poly f=x2+y2;
+   poly g=3x2+3y2
+   testDiv(f,g);
+*/
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ static proc findwhichF(poly g,poly h,list L)
+"USAGE:  findwhichF(g,h,L);  g,h are polynomials,L list of factors of jet(g,2)
+RETURN: string  type F^n,p_n+p-1 in the classification of Giusti,M
+{
+  // return("F^n,p_n+p-1")
+  def R=basering;
+  matrix M,N;
+  ideal J;
+  map si;
+  list T;
+  string rem;
+  //  in each case we want to transform jet(g,2) which has two factors to xy
+// and then find std and know about the type of  "F^n,p_n+p-1"
+  if((size(L[1][2])==2)&&(size(L[1][3])==2))
+  {
+    M=coef(L[1][2],var(1));
+    N=coef(L[1][3],var(1));
+    matrix A[2][2]=M[2,1],M[2,2],N[2,1],N[2,2];
+    A=subst(A,var(1),1,var(2),1);
+    matrix B=inverse(A);
+    si=R,B[1,1]*var(1)+B[1,2]*var(2),B[2,1]*var(1)+B[2,2]*var(2);
+    g=si(g);
+    h=si(h);
+    J=(g,h);
+    J=std(J);
+    // if g and h both of order 2 no problem in that case because deg(J[2])=2 so lead(J[2])=x2,y2,xy does not matter
+    T[1]=deg(lead(J[2]));
+    T[2]=deg(lead(J[3]))-1;
+    rem="F^"+string(T[1])+","+string(T[2])+"_"+string(T[1]+T[2]-1)+":(xy,x"+string(T[1])+"+y"+string(T[2])+")";
+    return(rem);
+  }
+  if((size(L[1][2])==2)&&(size(L[1][3])==1))
+  {
+    // two cases 1- jet(g,2)=(ax+by)*cx,  2-  jet(g,2)=(ax+by)*cy
+    if(leadmonom(L[1][3])==var(1))
+    {
+      M=coef(L[1][2],var(1));
+      M=subst(M,var(2),1);
+      si=R,var(1),-M[2,1]/M[2,2]*var(1)+var(2);
+      g=si(g);
+      h=si(h);
+      J=(g,h);
+      J=std(J);
+      T[1]=deg(lead(J[2]));
+      T[2]=deg(lead(J[3]))-1;
+      rem="F^"+string(T[1])+","+string(T[2])+"_"+string(T[1]+T[2]-1)+":(xy,x"+string(T[1])+"+y"+string(T[2])+")";
+      return(rem);
+    }
+    if(leadmonom(L[1][3])==var(2))
+    {
+      M=coef(L[1][2],var(1));
+      M=subst(M,var(2),1);
+      matrix A[2][2]=M[2,1],M[2,2],0,1;
+      matrix  B=inverse(A);
+      si=R,B[1,1]*var(1)+B[1,2]*var(2),B[2,1]*var(1)+B[2,2]*var(2);
+      g=si(g);
+      h=si(h);
+      J=(g,h);
+      J=std(J);
+      T[1]=deg(lead(J[2]));
+      T[2]=deg(lead(J[3]))-1;
+      rem="F^"+string(T[1])+","+string(T[2])+"_"+string(T[1]+T[2]-1)+":(xy,x"+string(T[1])+"+y"+string(T[2])+")";
+      return(rem);
+    }
+  }
+  else
+  {
+    J=(g,h);
+    J=std(J);
+    T[1]=deg(lead(J[2]));
+    T[2]=deg(lead(J[3]))-1;
+    rem="F^"+string(T[1])+","+string(T[2])+"_"+string(T[1]+T[2]-1)+":(xy,x"+string(T[1])+"+y"+string(T[2])+")";
+    return(rem);
+  }
+}
+/*
+ ring R=0,(x,y),ds;
+poly g=xy+y2+y4;
+poly h=x4+4x3y+6x2y2+4xy3+y4+y7+xy7;
+L=factorize(jet(g,2),2);
+findwhichF(g,h,L);
+*/
+////////////////////////////////////////////////////////////////////////////////
+static proc factorExt(poly g)
+"USAGE:  procExt(g); jet(g,2) is an irreducible polynomial
+PURPOSE: Find the field extension in which jet(g,2) has two different factors
+RETURN: ring S in which jet(g,2) has factors
+{
+  def R=basering;
+  g=simplify(g,1);
+  poly f=jet(g,2);
+  list L=factorize(f);
+  if(L[2][2]==1)
+  {
+    ring S=(0,t),(var(1),var(2)),ds;
+    poly f=fetch(R,f);
+    poly g=fetch(R,g);
+    minpoly=t2+leadcoef(f/(var(1)*var(2)))*t+leadcoef(f/var(2)^2);
+    list L=factorize(f);
+    export L;
+    export g;
+  }
+  else
+  {
+    def S=R;
+    export L;
+  }
+  setring R;
+  return(S);
+}
+/*
+ring R=0,(x,y),ds;
+poly g=x2=y2+x4+xy11;
+factorExt(g);
+*/
+////////////////////////////////////////////////////////////////////////////////
+static proc onedim_ICIS(ideal I)
+"USAGE:  onedim_ICIS(l);  I is an ideal
+ASSUME: I is given by two generators
+PURPOSE: Check whether the ideal defines a complete intersection singularity of dimension 1 or not
+RETURN: String  type in the classification of Giusti,M, of 1-dimesnional complete inetersection singualrity
+@*       or The given singularity is not simple
+EXAMPLE: example onedim_ICIS; shows an example
+"
+{
+  int m,t,r;
+  poly g1,g2,f1,f2;
+  string rem;
+  list A,B;
+  f1=I[1];
+  f2=I[2];
+  // I=nf_icis(I);
+  m=genericmilnor(I);
+  t=tjurina(I);
+  if(m==-1)
+  {
+    return("The given singularity is not simple");
+  }
+  if(m!=t)                // in ICIS milnor=tjurina
+  {
+    return("The given singularity is not simple");
+  }
+  g1=jet(f1,2);
+  g2=jet(f2,2);
+  if((ord(g1)==1)||(ord(g2)==1)){return(arnoldsimple(I,m));}
+  if(g1==0)
+  {
+    return("The given singularity is not simple");
+  }
+  if(g2==0)
+  {
+    return("The given singularity is not simple");
+  }
+  rem=typejet2(g1,g2);
+  if(rem=="type1")
+  {
+    return("S_5:(x2+y2+z2,yz)");
+  }
+  if(rem=="type2")
+  {
+    return("S_"+string(m)+":(x2+y2+z"+string(m-3)+",yz)");
+  }
+  if(rem=="type3")
+  {
+    if(m==7)
+    {
+      return("T_7:(x2+y3+z3,yz)");
+    }
+    if(m==8)
+    {
+      return("T_8:(x2+y3+z4,yz)");
+    }
+    if(m==9)
+    {
+      B=Semigroup(I);
+      B=changeType(B);
+      A=list(list(2,5),list(2,3));
+      if(compLL(A,B))
+      {
+        return("T_9:(x2+y3+z5,yz)");
+      }
+    }
+    return("The given singularity is not simple");
+  }
+  if(rem=="type4")
+  {
+    if(m==7)
+    {
+      return("U_7:(x2+yz,xy+z3)");
+    }
+    if(m==8)
+    {
+      return("U_8:(x2+yz+z3,xy)");
+    }
+    if(m==9)
+    {
+      return("U_9:(x2+yz,xy+z4)");
+    }
+    return("The given singularity is not simple");
+  }
+  if(rem=="type5")
+  {
+    if(m==8)
+    {
+      return("W_8:(x2+z3,y2+xz)");
+    }
+    if(m==9)
+    {
+      return("W_9:(x2+yz2,y2+xz)");
+    }
+    return("The given singularity is not simple");
+  }
+  if(rem=="type6")
+  {
+    if(m==9)
+    {
+      return("Z_9:(x2+z3,y2+z3)");
+    }
+    if(m==10)
+    {
+      return("Z_10:(x2+yz2,y2+z3)");
+    }
+    return("The given singularity is not simple");
+  }
+  if(rem=="not simple")
+  {
+    return("The given singularity is not simple");
+  }
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+   ring R=0,(x,y,z),ds;
+   ideal I=x2+8xy+16y2+2xz+8yz+z2+yz2+9z3,y2+xz+22yz+82z2;
+   onedim_ICIS(I);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc arnoldsimple(ideal I,int m)
+"USAGE:  arnoldsimple(I,m);  I is an ideal, m is an integer greater or equal to milnor number of the ideal I
+ASSUME: I is given by two generators and one of the generator of the ideal I is of order 1
+PURPOSE: check whether the ideal defines a  hypersurface simple complete intersection singularity or not
+RETURN: string  type in the classification of Arnold,
+@*       or The given singularity is not simple
+EXAMPLE: example arnoldsimple; shows an example
+"
+{
+ //if one generator is of order 1 we reduce case to hypersurface case
+  def R=basering;
+  if(ord(I[1])==1)
+  {
+    poly g=specialNF(I[2],I[1],m);
+    ring S=0,(var(2),var(3)),ds;
+    setring S;
+    poly g=imap(R,g);
+    string dd=complexSingType(g);
+    int e=modality(g);
+    setring R;
+    if(e==0)
+    {
+      return(dd);
+    }
+    if(e!=0)
+    {
+      return( "The given singularity is not simple");
+    }
+  }
+  if(ord(I[2])==1)
+  {
+    I=I[2],I[1];
+    return(arnoldsimple(I,m));
+  }
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+   ring R=0,(x,y,z),ds;
+   ideal I=x+y2,y3+z4+xy11;
+   arnoldsimple(I,6);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc specialNF(poly g,poly f,int m)
+"USAGE:  specialNF(g,f);  g,f are polynomials, m is an integer greater or equal to milnor number of the ideal I=(g,h)
+ASSUME: f is of order 1 and f=x+higher
+RETURN: poly g not involving x (Using implicit fn thm)
+{
+  poly k;
+  list T=linearpart(g,f);
+  f=T[1];
+  g=T[2];
+  poly h=var(1)-f;
+  while(1)
+  {
+    g=subst(g,var(1),h);
+    k=jet(g,m);
+    if(diff(k,var(1))==0)
+    {
+      break;
+    }
+  }
+  return(k);
+}
+/*
+ring R=0,(x,y,z),ds;
+poly f=x+y2;
+poly g=y3+z4+xy11;
+speciaNF(g,f,6);
+*/
+////////////////////////////////////////////////////////////////////////////////
+static proc linearpart(poly g,poly f)          //   f=linear part+higher,g   output list T,T[1]=x+higher term,T[2]=g
+"USAGE:  specialNF(g,f);  g,f are polynomials
+ASSUME: f=lineat part+higher that is f is of order 1
+RETURN: list T, T[1]=x+higher and T[2]=g'
+{
+  def R=basering;
+  poly i,j,k;
+  list T;
+  i=diff(jet(f,1),var(1));
+  j=diff(jet(f,1),var(2));
+  k=diff(jet(f,1),var(3));
+  if(i!=0)
+  {
+    ideal M=maxideal(1);
+    M[1]=(var(1)-((j*var(2)+k*var(3))/leadcoef(f)))/leadcoef(f);
+    map phi=R,M;
+    f=phi(f);
+    g=phi(g);
+  }
+  if(i==0)
+  {
+    if(j!=0)
+    {
+      map phi=R,var(2),var(1),var(3);
+      f=phi(f);
+      g=phi(g);
+      return(linearpart(g,f));
+    }
+    if(k!=0)
+    {
+      map phi=R,var(3),var(2),var(1);
+      f=phi(f);
+      g=phi(g);
+      return(linearpart(g,f));
+    }
+  }
+  T[1]=f;
+  T[2]=g;
+  return(T);
+}
+/*
+ring R=0,(x,y,z),ds;
+poly f=x+2y+y2;
+poly g=y3+z4+zy11;
+lineatpart(g,f);
+*/
+////////////////////////////////////////////////////////////////////////////////
+static  proc typejet2(poly g1,poly g2)
+"USAGE:  typejet2(g1,g2);  g1,g2 are polynomials
+ASSUME: g1,g2 are homogenous polynomials of degree 2
+PURPOSE: Check whether (g1,g2) is a quadratic form in the list of Guisti or not
+RETURN: string  type for the quadratic forms appearing in Guist's list
+@*       or not simple
+{
+  def R=basering;
+  ideal I=(g1,g2);
+  def S=absPrimdecGTZ(I);
+  setring S;
+  list L,T;
+  int e,i,j;
+  intvec a,a1;
+  L=primary_decomp;
+  for(j=1;j<=size(L);j++)
+  {
+    if(dim(std(L[j][1]))!=2)
+    {
+      return("not simple");
+    }
+  }
+  T=absolute_primes;
+  for(i=1;i<=size(T);i++)
+  {
+    e=e+T[i][2];
+  }
+  if(e==4)
+  {
+    setring R;
+    return("type1");
+  }
+  if(e==3)
+  {
+    setring R;
+    return("type2");
+  }
+  if(e==2)
+  {
+    ideal J=std(L[1][1]);
+    ideal J1=std(L[2][1]);
+    a=hilbPoly(J);
+    a1=hilbPoly(J1);
+    if((a[2]==2)&&(a1[2]==2))
+    {
+      setring R;
+      return("type3");
+    }
+    if(((a[2]==3)&&(a1[2]==1))||((a[2]==1)&&(a1[2]==3)))                      //||(a[2]==1)&&(a1[2]==3))
+    {
+      setring R;
+      return("type4");
+    }
+  }
+  if(e==1)
+  {
+    setring R;             // I lies in R and zero in S1
+    ideal JJ=radical(I);
+    JJ=JJ^3;
+    ideal JJJ=reduce(JJ,std(I));
+    if(size(JJJ)==0)
+    {
+      return("type6");
+    }
+    if(size(JJJ)!=0)
+    {
+      return("type5");
+    }
+  }
+  setring R;
+  return("not simple");
+}
+/*
+ring R=0,(x,y,z),ds;
+poly g1=x2+yz;
+poly g2=xy;
+typejet2(g1,g2);
+*/
+////////////////////////////////////////////////////////////////////////////////
+static proc compL(list L,list M)
+{
+  int l,m,i,j;
+  l=size(L);
+  m=size(M);
+  if(l!=m)
+  {return(0);}
+  for(i=1;i<=m;i++)
+  {
+    if(L[i]!=M[i])
+    {return(0);}
+  }
+  return(1);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc compLL(list L,list M)
+"USAGE:  compLL(L,M);  L, M are lists
+PURPOSE: Check whether the lists are equal or not
+RETURN: 1 if both lists are equal upto a permutation
+ @*              0 if both are not equal
+{
+  int l,m,i,j,s;
+  l=size(L);
+  m=size(M);
+  if(l!=m)
+  {return(0);}
+  for(i=1;i<=m;i++)
+  {
+    for(j=1;j<=m;j++)
+    {
+      if(compL(L[i],M[j]))
+      {
+        s++;
+        break;
+      }
+    }
+  }
+  if(s==m)
+  {return(1);}
+  if(s!=m)
+  {
+    return(0);
+  }
+}
+/*
+ring R=0,(x,y,z),ds;
+list L=(1),(2,3),(2,5);
+list T=(2,3),(1),(2,5);
+compLL(L,T);
+*/
+////////////////////////////////////////////////////////////////////////////////
+static proc changeType(list L)
+"USAGE:  changeType(L);  L is a list of intvectors
+PURPOSE: Change the list of intvectors to the list of lists
+RETURN: List of lists
+{
+  int i,j;
+  list T;
+  for(i=1;i<=size(L);i++)
+  {
+    list S;
+    for(j=1;j<=size(L[i]);j++)
+    {
+      S[j]=L[i][j];
+    }
+    T[size(T)+1]=S;
+    kill S;
+  }
+  return(T);
+}
+/*
+ring R=0,(x,y,z),ds;
+list B=(4,6,7);
+changeType(B);
+*/
+////////////////////////////////////////////////////////////////////////////////
+static proc genericmilnor(ideal I)
+"USAGE:  genericmilnor(l);  I is an ideal
+PURPOSE: Computes the milnor number of generic linear combination of the ideal I
+RETURN: Milnor number of I if it is finite
+@*       or -1 if it is not finite
+{
+  int m=milnor(I);
+  int i,a,b;
+  if(m>=0)
+  {
+    return(m);
+  }
+  def R=basering;
+  def R1=changechar(32003,R);
+  setring R1;
+  ideal I;
+  while(i<10)
+  {
+    i++;
+    a=random(-100,100);
+    b=random(-100,100);
+    while(a==0)
+    {
+      a=random(-100,100);
+    }
+    while(b==0)
+    {
+      b=random(-100,100);
+    }
+    I=imap(R,I);
+    I[1]=a*I[1]+b*I[2];
+    m=milnor(I);
+    if(m>=0)
+    {
+      setring R;
+      return(m);
+    }
+  }
+  setring R;
+  return(-1);
+}
+/*
+   ring R=0,(x,y,z),ds;
+   ideal I=x2+z3,y2+z3;
+   genericmilnor(I);
+*/
+////////////////////////////////////////////////////////////////////////////////
+static proc Semigroup(ideal I)
+"USAGE:  Semigroup(l);  I is an ideal
+PURPOSE: Computes the semigroup of the ideal I corresponding to each branch
+RETURN: list of semigroup of ideal I corresponding to each branch
+EXAMPLE: Semigroup; shows an example
+"
+{
+  list L=facstd(I);
+  list RE,JE,PE;
+  if(size(L)==1)
+  {
+     RE=CurveRes(L[1]);
+     RE=semi_group(RE);
+     return(RE);
+  }
+  ideal J,K;
+  list T,T1,T2,T3,T4,T5,H;
+  int i,j,l;
+  for(i=1;i<=size(L);i++)
+  {
+    RE=CurveRes(radical(L[i])) ;
+    T1[i]=semi_group(RE);
+    for(j=i+1;j<=size(L);j++)
+    {
+      JE=CurveRes(radical(L[j]));
+      T2[j]=semi_group(JE);
+      J=L[i]+L[j];
+      if(dim(std(J))!=1)
+      {
+        break;
+      }
+      K=slocus(J);
+      if(K[1]==1)
+      { T3=1;}
+      else
+      {
+        PE=CurveRes(radical(J));
+        T3=semi_group(PE);
+      }
+      T4=commonpartlists(T1[i],T3);
+      T5=commonpartlists(T2[j],T3);
+      if(compLL(T4,T5))
+      {
+        T1[i]=del(T1[i],T4);
+      }
+    }
+    for(l=1;l<=size(T1[i]);l++)
+    {
+      H[size(H)+1]=T1[i][l];
+    }
+  }
+  return(H);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+   ring R=0,(x,y,z),ds;
+   ideal I=x2+y3+z5,yz;
+   classifyicis(I);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc del(list L,list M)
+"USAGE:  del(L,M);  L and M are two lists
+PURPOSE: Delete common part of list M from List L
+RETURN: list L
+{
+  int i,j;
+  for(i=1;i<=size(M);i++)
+  {
+    for(j=1;j<=size(L);j++)
+    {
+      if(compL(L[j],M[i]))
+      {L=delete(L,j);}
+    }
+  }
+  return(L);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc commonpartlists(list L,list M)
+"USAGE:  commonpart(L,M);  L and M are two lists
+PURPOSE: Computes the intersetion of two list
+RETURN: list T
+{
+   list T;
+   int i,m,l,j,k;
+   m=size(M);
+   l=size(L);
+   if(l>=m)
+   {
+     for(i=1;i<=m;i++)
+     {
+       for(j=1;j<=l;j++)
+       {
+         if(compLL(M[i],L[j]))
+         {
+           T[k+1]=M[i];
+           k++;
+         }
+       }
+     }
+   }
+   return(T);
+}
+////////////////////////////////////////////////////////////////////////////////
+static proc semi_group(list H)
+"USAGE:  semi_group(H);  H list
+COMPUTE:Weierstrass semigroup of space curve C,which is given by an ideal
+RETURN: list A  , which gives generators set of the Weierstrass semigroup corresponding to each irreducible component of C
+{
+   int i,d,u,v,w,k;
+   int j=1;
+   int e=1;
+   def R=basering;
+
+   list A;
+   string mpo;
+   list LL;
+   for(k=1;k<=size(H);k++)
+   {
+     LL=CurveParam(H[k]);
+     def S=LL[1];
+     setring S;
+     list TT;
+     for(i=1;i<=size(Param);i++)
+     {
+       d=deg(Param[i][2]);
+       TT=Param[i];
+       mpo=string(Param[i][2]);
+       ring S1=(0,a),(t),ds;
+       setring S1;
+       execute("minpoly="+mpo+";");
+       list TT=imap(S,TT);
+       list T;
+       ideal J1;
+       for(u=1;u<=size(TT[1]);u++)
+       {
+         J1[u]=TT[1][u];
+       }
+       J1=simplify(J1,2);
+       J1=sagbiM(J1);
+       w=ConductorBound(J1);
+       J1=lead(J1);
+       list TTT;
+       for(v=1;v<=size(J1);v++)
+       {
+         TTT[v]=J1[v];
+       }
+       for(j=1;j<=d;j++)
+       {
+         T=WSemigroup(TTT,w);
+         A[e]=T[1];       //  intersted only in semigroup
+         e++;
+       }
+       setring S;
+       kill S1;
+       kill T;
+     }
+     setring R;
+     kill S;
+   }
+   return(A);
+}
+//==============================Examples======================================
+/*
+//=========Examples of Isolated simple complete intersection singularities======
+ring R=0,(x,y),ds;
+ideal M=maxideal(1);
+//======================
+ideal I=x2+y3,xy11;
+M[1]=x;
+M[2]=x+3y+xy;
+map phi=R,M;
+I=phi(I);
+classifyicis(I);
+//======================
+ideal I=xy,x5+y4;
+M[1]=x+4y;
+M[2]=y;
+map phi=R,M;
+I=phi(I);
+classifyicis(I);
+//======================
+ideal I=x2,y4;
+M[1]=x+xy2;
+M[2]=x+y+x2+y2;
+map phi=R,M;
+I=phi(I);
+classifyicis(I)
+//===========================================
+ideal I=x2+y11,x2y3+xy4;
+classifyicis(I);
+//======================
+ring S=0,(u,v),dp;
+ideal N=maxideal(1);
+//======================
+ideal J=u2+v7,uv2;
+N[1]=u+3v+uv+u3v;
+N[2]=v;
+map si=S,N;
+J=si(J);
+classifyicis(J);
+//======================
+ideal J=u2+v2+uv5+v11,uv4+v5;
+classifyicis(I);
+//===========================================
+ring R=0,(x,y,z),ds;
+ideal M=maxideal(1);
+//======================
+ideal I=x2+y3+z5,yz;
+classifyicis(I);
+//======================
+ideal I=x2+z3,y2+z3;
+classificis(I);
+//======================
+ideal I=x2+yz+z3,xy;
+M[3]=x+4y+3z+x2y;
+map phi=R,M;
+I=phi(I);
+classifyicis(I);
+//======================
+ideal I=x2+y3+z6,yz+xy3;
+classifyicis(I);
+//============================================
+ideal I=x2+z3,y2+xz;
+M[2]=x+3y;
+map phi=R,M;
+I=phi(I);
+classifyicis(I);
+//============================================
+ring S=0,(u,v,w),ds;
+ideal M=maxideal(1);
+ideal I=u2+vw+w3,uv;
+M[1]=u+3v+3vw+w2;
+ map phi=S,M;
+ I=phi(I);
+classifyicis(I);
+//==========Examples of Semigroup of the space curves====================
+ring R=0,(x,y,z),ds;
+ideal I=xy+z3,xz+z2y2+y6;
+Semigroup(I);
+//======================
+ideal I=xy,xz+z3+z2y3+y11;
+Semigroup(I);
+//======================
+ideal I=xy+z4,xz+y6+yz2;
+Semigroup(I);
+//======================
+ideal I=xy+z2,x2+z2y+5y4;
+Semigroup(I);
+//======================
+ideal I=x2+yz2,y2+z3;
+Semigroup(I);
+//======================
+ideal I=x2+yz,xy+z4;
+Semigroup(I);
+//======================
+ideal I=xy,xz+z3+z2y5+2y15;
+Semigroup(I);
+//======================
+ideal I=xy,xz+z3+zy9;
+Semigroup(I);
+//======================
+*/
