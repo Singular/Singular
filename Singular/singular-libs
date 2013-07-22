@@ -40,8 +40,10 @@ SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 # svn propset svn:keywords "Id" yourlib.lib
 # for new libs
 
-SLIB1 = classifyceq.lib divisors.lib decomp.lib ffsolve.lib findifs.lib finitediff.lib locnormal.lib \
-        JMBTest.lib JMSConst.lib modnormal.lib multigrading.lib numerAlg.lib numerDecom.lib\
+SLIB1 = classifyci.lib classifyceq.lib divisors.lib decomp.lib ffsolve.lib\
+        findifs.lib finitediff.lib locnormal.lib \
+        JMBTest.lib JMSConst.lib modnormal.lib multigrading.lib\
+	numerAlg.lib numerDecom.lib\
 	orbitparam.lib parallel.lib realizationMatroids.lib \
         ringgb.lib symodstd.lib polybori.lib
 
