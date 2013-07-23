@@ -926,7 +926,7 @@ example
   "EXAMPLE:"; echo=2;
    ring R=0,(x,y,z),ds;
    ideal I=x2+y3+z5,yz;
-   classifyicis(I);
+   Semigroup(I);
 }
 ////////////////////////////////////////////////////////////////////////////////
 static proc del(list L,list M)
