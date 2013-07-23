@@ -868,7 +868,7 @@ RETURN: Milnor number of I if it is finite
    genericmilnor(I);
 */
 ////////////////////////////////////////////////////////////////////////////////
-static proc Semigroup(ideal I)
+proc Semigroup(ideal I)
 "USAGE:  Semigroup(l);  I is an ideal
 PURPOSE: Computes the semigroup of the ideal I corresponding to each branch
 RETURN: list of semigroup of ideal I corresponding to each branch
