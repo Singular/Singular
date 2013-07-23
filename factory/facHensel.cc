@@ -6,7 +6,8 @@
  * This file implements functions to lift factors via Hensel lifting.
  *
  * ABSTRACT: Hensel lifting is described in "Efficient Multivariate
- * Factorization over Finite Fields" by L. Bernardin & M. Monagon.
+ * Factorization over Finite Fields" by L. Bernardin & M. Monagon and 
+ * "Algorithms for Computer Algebra" by Geddes, Czapor, Labahn
  *
  * @author Martin Lee
  *
@@ -29,6 +30,12 @@
 #ifdef HAVE_NTL
 #include <NTL/lzz_pEX.h>
 #include "NTLconvert.h"
+
+TIMING_DEFINE_PRINT (diotime)
+TIMING_DEFINE_PRINT (product1)
+TIMING_DEFINE_PRINT (product2)
+TIMING_DEFINE_PRINT (hensel23)
+TIMING_DEFINE_PRINT (hensel)
 
 static
 CFList productsNTL (const CFList& factors, const CanonicalForm& M)
@@ -478,6 +485,8 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
   return result;
 }
 
+/// solve \f$ 1=\sum_{i=1}^n{\delta_{i} \prod_{j\neq i}{f_j}} \f$ mod \f$p^k\f$
+/// over Q(alpha) by p-adic lifting
 CFList
 diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
                      const CFList& factors, modpk& b, const Variable& alpha)
@@ -686,6 +695,10 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
   return result;
 }
 
+
+/// solve \f$ 1=\sum_{i=1}^n{\delta_{i} \prod_{j\neq i}{f_j}} \f$ mod \f$p^k\f$
+/// over Q(alpha) by first computing mod \f$p\f$ and if no zero divisor occured
+/// compute it mod \f$p^k\f$
 CFList
 diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
                const CFList& factors, modpk& b, const Variable& alpha)
@@ -2006,8 +2019,8 @@ nonMonicHenselLift12 (const CanonicalForm& F, CFList& factors, int l,
 }
 
 
-/// solve \f$ E=sum_{i= 1}^{r}{\sigma_{i}prod_{j=1, j\neq i}^{r}{f_{i}}}\f$
-/// mod M, products contains \f$ prod_{j=1, j\neq i}^{r}{f_{i}}} \f$
+/// solve \f$ E=\sum_{i= 1}^r{\sigma_{i}\prod_{j=1, j\neq i}^{r}{f_{i}}}\f$
+/// mod M, @a products contains \f$ \prod_{j=1, j\neq i}^{r}{f_{j}} \f$
 CFList
 diophantine (const CFList& recResult, const CFList& factors,
              const CFList& products, const CFList& M, const CanonicalForm& E,
@@ -2050,7 +2063,7 @@ diophantine (const CFList& recResult, const CFList& factors,
   CanonicalForm e= E;
   CFListIterator j= products;
   for (CFListIterator i= recDiophantine; i.hasItem(); i++, j++)
-    e -= i.getItem()*j.getItem();
+    e -= j.getItem()*i.getItem();
 
   CFList result= recDiophantine;
   int d= degree (M.getLast());
@@ -2072,7 +2085,7 @@ diophantine (const CFList& recResult, const CFList& factors,
       for (j= recDiophantine; j.hasItem(); j++, k++, l++)
       {
         k.getItem() += j.getItem()*power (y, i);
-        e -= j.getItem()*power (y, i)*l.getItem();
+        e -= l.getItem()*(j.getItem()*power (y, i));
       }
     }
     if (e.isZero())
@@ -2120,6 +2133,7 @@ nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
   CFArray buf= CFArray (diophant.length());
 
   // actual lifting
+  TIMING_START (diotime);
   CFList diophantine2= diophantine (diophant, factors, products, MOD, E,
                                     noOneToOne);
 
@@ -2132,8 +2146,10 @@ nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
     buf[k]= i.getItem();
     bufFactors[k] += xToJ*i.getItem();
   }
+  TIMING_END_AND_PRINT (diotime, "time for dio: ");
 
   // update Pi [0]
+  TIMING_START (product2);
   int degBuf0= degree (bufFactors[0], x);
   int degBuf1= degree (bufFactors[1], x);
   if (degBuf0 > 0 && degBuf1 > 0)
@@ -2318,6 +2334,7 @@ nonMonicHenselStep (const CanonicalForm& F, const CFList& factors,
 
     Pi[l] += tmp[l]*xToJ*F.mvar();
   }
+  TIMING_END_AND_PRINT (product2, "time for product in hensel step: ");
   return;
 }
 
@@ -2528,7 +2545,9 @@ nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const
   bufF= mod (bufF, y);
   bufF= mod (bufF, Variable (3));
 
+  TIMING_START (diotime);
   diophant= diophantine (bufF, bufFactors2);
+  TIMING_END_AND_PRINT (diotime, "time for dio in 23: ");
 
   CFMatrix M= CFMatrix (liftBound, bufFactors2.length() - 1);
 
@@ -2592,8 +2611,10 @@ nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const
 
   CFList products;
   bufF= mod (F, Variable (3));
+  TIMING_START (product1);
   for (CFListIterator k= factors; k.hasItem(); k++)
     products.append (bufF/k.getItem());
+  TIMING_END_AND_PRINT (product1, "time for product1 in 23: ");
 
   CFList MOD= CFList (power (v, liftBound));
   MOD.insert (yToL);
@@ -2656,6 +2677,7 @@ nonMonicHenselLift (const CFList& F, const CFList& factors, const CFList& LCs,
   CFList products;
   CanonicalForm quot, bufF= F.getFirst();
 
+  TIMING_START (product1);
   for (int i= 0; i < bufFactors.size(); i++)
   {
     if (degree (bufFactors[i], y) > 0)
@@ -2677,6 +2699,7 @@ nonMonicHenselLift (const CFList& F, const CFList& factors, const CFList& LCs,
       products.append (quot);
     }
   }
+  TIMING_END_AND_PRINT (product1, "time for product1 in further hensel:" );
 
   for (int d= 1; d < lNew; d++)
   {
@@ -2704,9 +2727,11 @@ nonMonicHenselLift (const CFList& eval, const CFList& factors,
   CFMatrix M= CFMatrix (liftBound[1], factors.length() - 1);
   int k= 0;
 
+  TIMING_START (hensel23);
   CFList result=
   nonMonicHenselLift23 (eval.getFirst(), factors, LCs [0], diophant, bufPi,
                         liftBound[1], liftBound[0], noOneToOne);
+  TIMING_END_AND_PRINT (hensel23, "time for 23: ");
 
   if (noOneToOne)
     return CFList();
@@ -2728,8 +2753,10 @@ nonMonicHenselLift (const CFList& eval, const CFList& factors,
   {
     bufEval.append (j.getItem());
     M= CFMatrix (liftBound[i], factors.length() - 1);
+    TIMING_START (hensel);
     result= nonMonicHenselLift (bufEval, result, LCs [i-1], diophant, bufPi, M,
                                 liftBound[i-1], liftBound[i], MOD, noOneToOne);
+    TIMING_END_AND_PRINT (hensel, "time for further hensel: ");
     if (noOneToOne)
       return result;
     MOD.append (power (Variable (i + 2), liftBound[i]));

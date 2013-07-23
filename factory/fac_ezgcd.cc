@@ -429,6 +429,27 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
         bool internal )
 {
   bool isRat= isOn (SW_RATIONAL);
+
+  int maxNumVars= tmax (getNumVars (FF), getNumVars (GG));
+  int sizeF= size (FF);
+  int sizeG= size (GG);
+
+
+  if (!isRat)
+    On (SW_RATIONAL);
+  if (sizeF/maxNumVars > 500 && sizeG/maxNumVars > 500)
+  {
+    Off(SW_USE_EZGCD);
+    CanonicalForm result=gcd( FF, GG );
+    On(SW_USE_EZGCD);
+    if (!isRat)
+      Off (SW_RATIONAL);
+    result /= icontent (result);
+    DEBDECLEVEL( cerr, "ezgcd" );
+    return result;
+  }
+
+
   CanonicalForm F, G, f, g, d, Fb, Gb, Db, Fbt, Gbt, Dbt, B0, B, D0, lcF, lcG,
                 lcD, cand, contcand, result;
   CFArray DD( 1, 2 ), lcDD( 1, 2 );
@@ -494,10 +515,9 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
     return N(d*gcd(G,f));
   }
 
-  int maxNumVars= tmax (getNumVars (F), getNumVars (G));
-  int sizeF= size (F);
-  int sizeG= size (G);
-
+  maxNumVars= tmax (getNumVars (F), getNumVars (G));
+  sizeF= size (F);
+  sizeG= size (G);
 
   if (!isRat)
     On (SW_RATIONAL);
