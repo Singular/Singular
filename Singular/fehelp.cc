@@ -87,7 +87,7 @@ static int heCurrentHelpBrowserIndex= -1;
  * Definition: available help browsers
  *
  *****************************************************************/
-// order is improtant -- first possible help is chosen
+// order is important -- first possible help is chosen
 // moved to LIB/help.cnf
 static heBrowser_s *heHelpBrowsers=NULL;
 
@@ -661,26 +661,43 @@ static int heReKey2Entry (char* filename, char* key, heEntry hentry)
 }
 
 // test for h being a string and print it
-static BOOLEAN hePrintHelpStr(const idhdl hh,const char *id,const char *pa)
+static void hePrintHelpStr(const idhdl hh,const char *id,const char *pa)
 {
   if ((hh!=NULL) && (IDTYP(hh)==STRING_CMD))
   {
     PrintS(IDSTRING(hh));
     PrintLn();
-    return TRUE;
   }
   else
     Print("`%s` not found in package %s\n",id,pa);
-  return TRUE;;
 }
 // try to find the help string as a loaded procedure or library
 // if found, display the help and return TRUE
 // otherwise, return FALSE
 static BOOLEAN heOnlineHelp(char* s)
 {
-  idhdl h=IDROOT->get(s,myynest);
   char *ss;
+  idhdl h;
 
+  if ((ss=strstr(s,"::"))!=NULL)
+  {
+    *ss='\0';
+    ss+=2;
+    h=ggetid(s);
+    if (h!=NULL)
+    {
+      Print("help for %s from package %s\n",ss,s);
+      char s_help[200];
+      strcpy(s_help,ss);
+      strcat(s_help,"_help");
+      idhdl hh=IDPACKAGE(h)->idroot->get(s_help,0);
+      hePrintHelpStr(hh,s_help,s);
+      return TRUE;
+    }
+    else Print("package %s not found\n",s);
+    return TRUE; /* do not search the manual */
+  }
+  h=IDROOT->get(s,myynest);
   // try help for a procedure
   if (h!=NULL)
   {
@@ -702,25 +719,10 @@ static BOOLEAN heOnlineHelp(char* s)
     else if (IDTYP(h)==PACKAGE_CMD)
     {
       idhdl hh=IDPACKAGE(h)->idroot->get("info",0);
-      return hePrintHelpStr(hh,"info",s);
+      hePrintHelpStr(hh,"info",s);
+      return TRUE;
     }
-  }
-  else if ((ss=strstr(s,"::"))!=NULL)
-  {
-    *ss='\0';
-    ss+=2;
-    h=ggetid(s);
-    if (h!=NULL)
-    {
-      Print("help for %s from package %s\n",ss,s);
-      char s_help[200];
-      strcpy(s_help,ss);
-      strcat(s_help,"_help");
-      idhdl hh=IDPACKAGE(h)->idroot->get(s_help,0);
-      return hePrintHelpStr(hh,s_help,s);
-    }
-    else Print("package %s not found\n",s);
-    return TRUE; /* do not search the manual */
+    return FALSE;
   }
 
   // try help for a library
@@ -1049,7 +1051,7 @@ static void heGenHelp(heEntry hentry, int br)
     }
   }
   Print("running `%s`\n",sys);
-  int dummy=system(sys);
+  (void)system(sys);
 }
 
 #ifdef ix86_Win
@@ -1084,20 +1086,20 @@ static void heWinHelp(heEntry hentry)
 }
 #endif
 
-static BOOLEAN heDummyInit(int warn, int br)
+static BOOLEAN heDummyInit(int /*warn*/, int /*br*/)
 {
   return TRUE;
 }
-static void heDummyHelp(heEntry hentry, int br)
+static void heDummyHelp(heEntry /*hentry*/, int /*br*/)
 {
   Werror("No functioning help browser available.");
 }
 
-static BOOLEAN heEmacsInit(int warn, int br)
+static BOOLEAN heEmacsInit(int /*warn*/, int /*br*/)
 {
   return TRUE;
 }
-static void heEmacsHelp(heEntry hentry, int br)
+static void heEmacsHelp(heEntry hentry, int /*br*/)
 {
   WarnS("Your help command could not be executed. Use");
   Warn("C-h C-s %s",
@@ -1106,7 +1108,7 @@ static void heEmacsHelp(heEntry hentry, int br)
   Warn("information on Singular running under Emacs, type C-h m.");
 }
 static int singular_manual(char *str);
-static void heBuiltinHelp(heEntry hentry, int br)
+static void heBuiltinHelp(heEntry hentry, int /*br*/)
 {
   char* node = omStrDup(hentry != NULL && *(hentry->node) != '\0' ?
                        hentry->node : "Top");
