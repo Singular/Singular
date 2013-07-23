@@ -98,7 +98,7 @@ static int heCurrentHelpBrowserIndex= -1;
  * Definition: available help browsers
  *
  *****************************************************************/
-// order is improtant -- first possible help is choosen
+// order is important -- first possible help is chosen
 // moved to LIB/help.cnf
 static heBrowser_s *heHelpBrowsers=NULL;
 
@@ -116,6 +116,10 @@ void feHelp(char *str)
     str[MAX_HE_ENTRY_LENGTH - 3] = '\0';
 
   BOOLEAN key_is_regexp = (strchr(str, '*') != NULL);
+
+  // try proc help and library help
+  if (! key_is_regexp && heOnlineHelp(str)) return;
+
   heEntry_s hentry;
   memset(&hentry,0,sizeof(hentry));
   char* idxfile = feResource('x' /*"IdxFile"*/);
@@ -126,9 +130,6 @@ void feHelp(char *str)
     heBrowserHelp(&hentry);
     return;
   }
-
-  // try proc help and library help
-  if (! key_is_regexp && heOnlineHelp(str)) return;
 
   // Try to match approximately with key in index file
   if (idxfile != NULL)
@@ -190,8 +191,8 @@ void feHelp(char *str)
     Warn("Try one of");
     char *matches=StringEndS();
     PrintS(matches);
-    PrintLn();
     omFree(matches);
+    PrintLn();
     return;
   }
 
@@ -686,9 +687,28 @@ static void hePrintHelpStr(const idhdl hh,const char *id,const char *pa)
 // otherwise, return FALSE
 static BOOLEAN heOnlineHelp(char* s)
 {
-  idhdl h=IDROOT->get(s,myynest);
   char *ss;
+  idhdl h;
 
+  if ((ss=strstr(s,"::"))!=NULL)
+  {
+    *ss='\0';
+    ss+=2;
+    h=ggetid(s);
+    if (h!=NULL)
+    {
+      Print("help for %s from package %s\n",ss,s);
+      char s_help[200];
+      strcpy(s_help,ss);
+      strcat(s_help,"_help");
+      idhdl hh=IDPACKAGE(h)->idroot->get(s_help,0);
+      hePrintHelpStr(hh,s_help,s);
+      return TRUE;
+    }
+    else Print("package %s not found\n",s);
+    return TRUE; /* do not search the manual */
+  }
+  h=IDROOT->get(s,myynest);
   // try help for a procedure
   if (h!=NULL)
   {
@@ -706,35 +726,12 @@ static BOOLEAN heOnlineHelp(char* s)
         }
         return TRUE;
       }
-      else
-      {
-        char s_help[200];
-        strcpy(s_help,s);
-        strcat(s_help,"_help");
-        idhdl hh=IDROOT->get(s_help,0);
-        hePrintHelpStr(hh,s_help,"Top");
-      }
     }
     else if (IDTYP(h)==PACKAGE_CMD)
     {
       idhdl hh=IDPACKAGE(h)->idroot->get("info",0);
       hePrintHelpStr(hh,"info",s);
-    }
-    else if ((ss=strstr(s,"::"))!=NULL)
-    {
-      *ss='\0';
-      ss+=2;
-      h=ggetid(s);
-      if (h!=NULL)
-      {
-        Print("help for %s from package %s\n",ss,s);
-        char s_help[200];
-        strcpy(s_help,ss);
-        strcat(s_help,"_help");
-        idhdl hh=IDPACKAGE(h)->idroot->get(s_help,0);
-        hePrintHelpStr(hh,s_help,s);
-      }
-      else Print("package %s not found\n",s);
+      return TRUE;
     }
     return FALSE;
   }
@@ -891,14 +888,14 @@ static BOOLEAN heGenInit(int warn, int br)
       case 'h': /* html dir */
                if (feResource(*p, warn) == NULL)
                {
-                 if (warn) Warn("ressource `%c` not found",*p);
+                 if (warn) Warn("resource `%c` not found",*p);
                  return FALSE;
                }
                break;
       case 'D': /* DISPLAY */
                if (getenv("DISPLAY") == NULL)
                {
-                 if (warn) WarnS("ressource `D` not found");
+                 if (warn) WarnS("resource `D` not found");
                  return FALSE;
                }
                break;
@@ -983,7 +980,6 @@ static void heWinHelp(heEntry hentry, int br)
 static void heGenHelp(heEntry hentry, int br)
 {
   char sys[MAX_SYSCMD_LEN];
-  // char url[MAXPATHLEN];
   const char *p=heHelpBrowsers[br].action;
   if (p==NULL) {PrintS("no action ?\n"); return;}
   memset(sys,0,MAX_SYSCMD_LEN);
@@ -1066,7 +1062,7 @@ static void heGenHelp(heEntry hentry, int br)
     }
   }
   Print("running `%s`\n",sys);
-  /*int dummy=*/ (void) system(sys);
+  (void) system(sys);
 }
 
 #ifdef ix86_Win
