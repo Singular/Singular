@@ -667,7 +667,7 @@ RETURN: An ideal.The sagbi bases of I.
 EXAMPLE: example sagbiAlg;  shows an example
 {
     def R=basering;
-    def O=changeord("Ds");
+    def O=changeord(list(list("Ds",nvars(R))));
     setring O;
     ideal I=imap(R,I);
     ideal L;
@@ -716,7 +716,7 @@ RETURN: An ideal. the sagbi bases for the differential module.
 EXAMPLE: example sagbiMod;  shows an example
 {
   def R=basering;//up till now the ordering of the base ring is ds
-  def O=changeord("Ds");
+  def O=changeord(list(list("Ds",nvars(R))));
   setring O;
   ideal I=imap(R,I);
   ideal G=imap(R,G);
@@ -1376,7 +1376,7 @@ static proc enlargeP(poly h,list P,ideal I)
 ring r=0,t,Ds;
 ideal I=4t3,7t6+10t9;
 ideal G=t4,t7+t10;
-sagbiMOD(I,G,18);
+sagbiMod(I,G,18);
 */
 
 ////////////////////////////////////////////////////////////////////////////////

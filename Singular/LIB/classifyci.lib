@@ -35,7 +35,7 @@ proc classifyicis(ideal I)
 ASSUME: I is given by two generators
 PURPOSE:Check whether the ideal defines a complete intersection singularity or not
 RETURN: String  type in the classification of Giusti,M
-@           or The given singularity is not simple
+@*           or The given singularity is not simple
 EXAMPLE: example classifyicis;  shows an example
 "
 {
@@ -1007,8 +1007,8 @@ RETURN: list A  , which gives generators set of the Weierstrass semigroup corres
          J1[u]=TT[1][u];
        }
        J1=simplify(J1,2);
-       J1=sagbiM(J1);
-       w=ConductorBound(J1);
+       J1=sagbiAlg(J1);
+       w=Classify_aeq::ConductorBound(J1);
        J1=lead(J1);
        list TTT;
        for(v=1;v<=size(J1);v++)
