@@ -1007,7 +1007,7 @@ RETURN: list A  , which gives generators set of the Weierstrass semigroup corres
          J1[u]=TT[1][u];
        }
        J1=simplify(J1,2);
-       J1=sagbiM(J1);
+       J1=sagbiMod(J1);
        w=ConductorBound(J1);
        J1=lead(J1);
        list TTT;

@@ -1376,7 +1376,7 @@ static proc enlargeP(poly h,list P,ideal I)
 ring r=0,t,Ds;
 ideal I=4t3,7t6+10t9;
 ideal G=t4,t7+t10;
-sagbiMOD(I,G,18);
+sagbiMod(I,G,18);
 */
 
 ////////////////////////////////////////////////////////////////////////////////
