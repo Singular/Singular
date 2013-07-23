@@ -1,0 +1,8 @@
+#!/bin/bash
+export SI_TOPDIR=
+g++ -I$SI_TOPDIR -O -c concat_im.cc -DOM_NDEBUG -DNDEBUG -fPIC -DPIC -o concat_im.o
+
+g++ -shared -o concat_im.so concat_im.o
+
+#cp concat_im.so $SI_TOPDIR/x86_64-Linux/MOD/.
+#cp concat_im.so $SI_TOPDIR/Singular/MOD/.
