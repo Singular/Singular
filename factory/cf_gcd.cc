@@ -479,11 +479,12 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
 // Used by gcd_poly_univar0().
 //
 //}}}
+
 static CanonicalForm
-balance_p ( const CanonicalForm & f, const CanonicalForm & q )
+balance_p ( const CanonicalForm & f, const CanonicalForm & q, const CanonicalForm & qh )
 {
     Variable x = f.mvar();
-    CanonicalForm result = 0, qh = q / 2;
+    CanonicalForm result = 0;
     CanonicalForm c;
     CFIterator i;
     for ( i = f; i.hasTerms(); i++ )
@@ -497,9 +498,16 @@ balance_p ( const CanonicalForm & f, const CanonicalForm & q )
             result += power( x, i.exp() ) * c;
         }
         else
-          result += power( x, i.exp() ) * balance_p(c,q);
+          result += power( x, i.exp() ) * balance_p(c,q,qh);
     }
     return result;
+}
+
+static CanonicalForm
+balance_p ( const CanonicalForm & f, const CanonicalForm & q )
+{
+    CanonicalForm qh = q / 2;
+    return balance_p (f, q, qh);
 }
 
 /*static CanonicalForm
@@ -1268,11 +1276,10 @@ cf_prepgcd( const CanonicalForm & f, const CanonicalForm & g, int & cc, int & p1
 
 TIMING_DEFINE_PRINT(chinrem_termination)
 TIMING_DEFINE_PRINT(chinrem_recursion)
-TIMING_DEFINE_PRINT(chinrem_reconstruction)
 
 CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 {
-  CanonicalForm f, g, cl, q(0), Dp, newD, D, newq;
+  CanonicalForm f, g, cl, q(0), Dp, newD, D, newq, newqh;
   int p, i, dp_deg, d_deg=-1;
 
   CanonicalForm cd ( bCommonDen( FF ));
@@ -1292,6 +1299,9 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
   //g /=vcontent(g,Variable(1));
 
   CanonicalForm Dn, test= 0;
+  CanonicalForm lcf, lcg;
+  lcf= f.lc();
+  lcg= g.lc();
   cl =  gcd (f.lc(),g.lc());
   CanonicalForm gcdcfcg= gcd (cf, cg);
   CanonicalForm fp, gp;
@@ -1321,7 +1331,7 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
   bool equal= false;
   i = cf_getNumBigPrimes() - 1;
 
-  CanonicalForm cof, cog, cofp, cogp, newCof, newCog, cofn, cogn;
+  CanonicalForm cof, cog, cofp, cogp, newCof, newCog, cofn, cogn, cDn;
   int maxNumVars= tmax (getNumVars (f), getNumVars (g));
   //Off (SW_RATIONAL);
   while ( true )
@@ -1355,8 +1365,11 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     TIMING_END_AND_PRINT (chinrem_recursion,
                           "time for gcd mod p in modular gcd: ");
     Dp /=Dp.lc();
+    Dp *= mapinto (cl);
     cofp /= lc (cofp);
+    cofp *= mapinto (lcf);
     cogp /= lc (cogp);
+    cogp *= mapinto (lcg);
     setCharacteristic( 0 );
     dp_deg=totaldegree(Dp);
     if ( dp_deg == 0 )
@@ -1371,6 +1384,9 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       cog= mapinto (cogp);
       d_deg=dp_deg;
       q = p;
+      Dn= balance_p (D, p);
+      cofn= balance_p (cof, p);
+      cogn= balance_p (cog, p);
     }
     else
     {
@@ -1381,6 +1397,14 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
         chineseRemainder( cog, q, mapinto (cogp), p, newCog, newq);
         cof= newCof;
         cog= newCog;
+        newqh= newq/2;
+        Dn= balance_p (newD, newq, newqh);
+        cofn= balance_p (newCof, newq, newqh);
+        cogn= balance_p (newCog, newq, newqh);
+        if (test != Dn) //balance_p (newD, newq))
+          test= balance_p (newD, newq);
+        else
+          equal= true;
         q = newq;
         D = newD;
       }
@@ -1395,6 +1419,9 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
         d_deg=dp_deg;
         test= 0;
         equal= false;
+        Dn= balance_p (D, p);
+        cofn= balance_p (cof, p);
+        cogn= balance_p (cog, p);
       }
       else
       {
@@ -1404,25 +1431,12 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     }
     if ( i >= 0 )
     {
-      TIMING_START (chinrem_reconstruction);
-      Dn= Farey(D,q);
-      cofn= Farey(cof,q);
-      cogn= Farey(cog,q);
-      TIMING_END_AND_PRINT (chinrem_reconstruction,
-                           "time for rational reconstruction in modular gcd: ");
-      int is_rat= isOn (SW_RATIONAL);
-      On (SW_RATIONAL);
-      cd = bCommonDen( Dn ); // we need On(SW_RATIONAL)
-      cofn *= bCommonDen (cofn);
-      cogn *= bCommonDen (cogn);
-      if (!is_rat)
-        Off (SW_RATIONAL);
-      Dn *=cd;
-      if (test != Dn)
-        test= Dn;
-      else
-        equal= true;
-      //Dn /=vcontent(Dn,Variable(1));
+      cDn= icontent (Dn);
+      Dn /= cDn;
+      cofn /= cl/cDn;
+      //cofn /= icontent (cofn);
+      cogn /= cl/cDn;
+      //cogn /= icontent (cogn);
       TIMING_START (chinrem_termination);
       if ((terminationTest (f,g, cofn, cogn, Dn)) ||
           ((equal || q > b) && fdivides (Dn, f) && fdivides (Dn, g)))
