@@ -16,7 +16,8 @@ OVERVIEW:
   The first procedure 'primdecZ' can be used in parallel.
 
 PROCEDURES:
- primdecZ(I);       compute the primary decomposition of I
+ primdecZ(I);       compute the primary decomposition of ideal I
+ primdecZM(I);      compute the primary decomposition of module I
  minAssZ(I);        compute the minimal associated primes of I
  radicalZ(I);       compute the radical of I
  heightZ(I);        compute the height of I
@@ -223,7 +224,7 @@ EXAMPLE: example primdecZ; shows an example
                J=imap(R,K);
                J=simplify(J,2);
                attrib(J,"isSB",1);
-               IS=maxIndependSet(J);
+               IS=Primdec::maxIndependSet(J);
                setring R;
                //=== computing the pseudo primary and extract it
                N=J,s;
@@ -808,7 +809,7 @@ EXAMPLE: example equidimZ; shows an example
                   J=imap(R,K);
                   J=simplify(J,2);
                   attrib(J,"isSB",1);
-                  IS=maxIndependSet(J);
+                  IS=Primdec::maxIndependSet(J);
                   setring R;
                   //=== computing the pseudo primary and extract it
                   N=J,s;
@@ -1098,7 +1099,7 @@ static proc extractZ(ideal J, int j, list L, list B)
          I=simplify(I,2);
          //=== this is our way to obtain the coefficients in Z[u] of the
          //=== leading terms of the Groebner basis above
-         string quotring=prepareQuotientring(nvars(basering)-L[1][3]);
+         string quotring=Primdec::prepareQuotientring(nvars(basering)-L[1][3]);
          execute(quotring);
          ideal I=imap(Shelp,I);
          list C;
@@ -1183,88 +1184,6 @@ static proc satZ(ideal I,poly h)
       J=normalizeZ(J);
    }
    return(J);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-static proc prepareQuotientring (int nnp)
-{
-//=== this is from primdec.lib, it is static there, should be imported later
-//=== if it is no more static
-  ideal @ih,@jh;
-  int npar=npars(basering);
-  int @n;
-
-  string quotring= "ring quring = ("+charstr(basering);
-  for(@n=nnp+1;@n<=nvars(basering);@n++)
-  {
-     quotring=quotring+",var("+string(@n)+")";
-     @ih=@ih+var(@n);
-  }
-
-  quotring=quotring+"),(var(1)";
-  @jh=@jh+var(1);
-  for(@n=2;@n<=nnp;@n++)
-  {
-     quotring=quotring+",var("+string(@n)+")";
-     @jh=@jh+var(@n);
-  }
-  quotring=quotring+"),(C,lp);";
-
-  return(quotring);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-static proc maxIndependSet (ideal j)
-{
-//=== this is from primdec.lib, it is static there, should be imported later
-//=== if it is no more static
-  int n,k,di;
-
-  list resu,hilf;
-  if(size(j)==0)
-  {
-     resu[1]=varstr(basering);
-     resu[2]=ordstr(basering);
-     resu[3]=0;
-     return(list(resu));
-  }
-  string var1,var2;
-  list v=indepSet(j,0);
-
-  for(n=1;n<=size(v);n++)
-  {
-    di=0;
-    var1="";
-    var2="";
-    for(k=1;k<=size(v[n]);k++)
-    {
-      if(v[n][k]!=0)
-      {
-        di++;
-        var2=var2+"var("+string(k)+"),";
-      }
-      else
-      {
-        var1=var1+"var("+string(k)+"),";
-      }
-    }
-    if(di>0)
-    {
-      var1=var1+var2;
-      var1=var1[1..size(var1)-1];
-      hilf[1]=var1;
-      hilf[2]="lp";
-      hilf[3]=di;
-      resu[n]=hilf;
-    }
-    else
-    {
-      resu[n]=varstr(basering),ordstr(basering),0;
-    }
-  }
-  return(resu);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1401,6 +1320,191 @@ static proc testPrimaryZ(ideal I, list L)
    if(!i){return(1);}
    return(0);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc pseudo_primdecZM(module N)
+{
+   ideal I=quotient(N,freemodule(nrows(N)));
+   if(size(I)==0){return(list(list(N,I)));}
+   
+   list B=minAssZ(I);
+   list S,R,L;
+   ideal K;
+   if(size(B)==0){return(S);}
+   for(int i=1;i<=size(B);i++)
+   {
+      S[i]=separatorsZ(i,B);
+   }
+   for(i=1;i<=size(B);i++)
+   {
+      L=sat(N,S[i]);
+      K[i]=S[i]^L[2];
+      R[i]=list(L[1],B[i]);
+   }
+   L=pseudo_primdecZM(N+K*freemodule(nrows(N)));
+   for(i=1;i<=size(L);i++)
+   {
+      R[size(R)+1]=L[i];
+   }
+   return(R);
+}
+
+
+
+static proc prepare_extractZM(list L)
+{
+   def R=basering;
+   module N=L[1];
+   ideal I=quotient(N,freemodule(nrows(N)));
+   list B=primdecZ(I);
+   list M;
+   if(size(B)==1){return(M);}
+   I=std(I);
+   list rl=ringlist(R);
+   if(deg(I[1])==0)
+   {
+      execute("int p="+string(I[1])+";");
+      rl[1]=p;
+   }
+   else
+   {
+      rl[1]=0;
+   }
+   def Shelp =ring(rl);
+   setring Shelp;
+   ideal I=imap(R,I);
+   I=std(I);
+   M=Primdec::maxIndependSet(I);
+   setring R;
+   return(M);
+}
+
+
+static proc extractZM(list M, list L)
+{
+   //=== M is a list of a pseudo primary module and the corresponding prime
+   //=== L is a list of maximal independent sets for P
+   def R=basering;
+   ideal P=M[2];
+   module I=M[1];
+   poly h=1;
+
+   //=== size(L)=0 means P is maximal ideal and I is primary
+   if(size(L)>0)
+   {
+      if(L[1][3]!=0)
+      {
+         //=== if u in x is an independent set of L then we compute a Groebner
+         //=== Basis in Z[u][x-u]
+         execute("ring S=integer,("+L[1][1]+"),lp;");
+         module I=imap(R,I);
+         I=std(I);
+         list rl=ringlist(S);
+         rl[1]=0;
+         def Shelp =ring(rl);
+         setring Shelp;
+         module I=imap(S,I);
+         //=== this is our way to obtain the coefficients in Z[u] of the
+         //=== leading terms of the Groebner basis above
+         string quotring=Primdec::prepareQuotientring(nvars(basering)-L[1][3]);
+         execute(quotring);
+         module I=imap(Shelp,I);
+         list C;
+         int i;
+         for(i=1;i<=size(I);i++)
+         {
+            C[i]=leadcoef(I[i]);
+         }
+         setring Shelp;
+         list C=imap(quring,C);
+         setring R;
+         list C=imap(Shelp,C);
+      }
+      else
+      {
+         // this is the case that P=<p>, p prime 
+         I=std(I);
+         ideal IC=simplify(flatten(lead(I)),2);
+         list C;
+         int i;
+         for(i=1;i<=size(IC);i++)
+         {
+            C[i]=I[i];
+         }
+         list rl=ringlist(R);
+         rl[1]=0;
+         def Shelp =ring(rl);
+      }
+      for(i=1;i<=size(C);i++)
+      {
+         if(deg(C[i])>0){h=h*C[i];}  // das muss noch besser gemacht werden,
+                                     // nicht ausmultiplizieren!
+      }
+      setring Shelp;
+      poly h=imap(R,h);
+      ideal fac=factorize(h,1);
+      setring R;
+      list II;
+      h=1;
+      ideal fac=imap(Shelp,fac);
+      for(i=1;i<=size(fac);i++)
+      {
+         II=sat(I,fac[i]);
+          I=II[1];
+          h=h*fac[i]^II[2];
+      }
+   }
+   I=std(I);
+   return(list(I,h));
+}
+
+
+proc primdecZM(module N)
+"USAGE:  primdecZM(N); N module
+RETURN:  a list pr of primary modules and their associated primes:
+@format
+   pr[i][1]   the i-th primary component,
+   pr[i][2]   the i-th prime component.
+@end format
+EXAMPLE: example primdecZM; shows an example
+"
+{
+  list P,K,S;
+  int i,j;
+  list L=pseudo_primdecZM(N);
+  list M,O;
+  for(i=1;i<=size(L);i++)
+  {
+     if(size(L[i][2])!=0)
+     {
+        M=prepare_extractZM(L[i]);
+        O=extractZM(L[i],M);
+        P[size(P)+1]=list(O[1],L[i][2]);
+        K[size(K)+1]=L[i][1]+O[2]*freemodule(nrows(L[i][1]));
+     }
+     else
+     {
+        P[size(P)+1]=L[i];
+     }
+  }
+  for(j=1;j<=size(K);j++)
+  {
+     S=primdecZM(K[j]);
+     for(i=1;i<=size(S);i++)
+     {
+        P[size(P)+1]=S[i];
+     }
+  }
+  return(P);
+}
+example
+{ "EXAMPLE:";  echo = 2;
+   ring R=integer,(x,y),(c,lp);
+   module N=[0,0,xy2-x2-xy],[0,y,x],[0,x,2xy-x],[x,0,-xy],[0,0,18x];
+   primdecZM(N);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1601,4 +1705,26 @@ ideal I=35,
         s*T^2-p*s*P-p*S*T-2,
         p^3*P^2-1,
         F^2*f^3-1;
+
+ring R=integer,(x,y),(c,lp);
+module N=[0,0,xy2-x2-xy],[0,y,x],[0,x,2xy-x],[x,0,-xy],[0,0,18x];
+
+ring R=integer,(x,y),(c,lp);
+module N=[0,0,xy2-x2-xy],[0,y,x],[0,x,2xy-x],[x,0,-xy],[0,0,18];
+
+ring R=integer,(x,y),(c,lp);
+module N=[-y,7,0],[2y3-y2],[3x,y2],[2y-y2,x],[4,5x3];
+
+ring r=integer,(x,y),(c,lp);
+module N=[0,0,xy2-x2-xy],[0,y,x],[0,x,xy-x],[x,0,-xy],[5x,0,0];
+
+ring R2=integer,(a(1),a(2),a(3),b(1),b(2),b(3)),(c,lp);
+module N=[a(1)*b(1),a(2)*b(1),a(3)*b(1)],[a(1)*b(2),a(2)*b(2),a(3)*b(2)],[a(1)*b(3),a(2)*b(3),a(3)*b(3)];
+
+ring R3=integer,(x,y,z),(c,lp);
+module N=[y2+z2,xy,xz],[xy,x2+z2,yz],[xz,yz,x2+y2];
+
+ring R4=integer,(x,y,z,a,b,c),(c,lp);
+module N=[x3y2z2c,x2y3z2c,x2y2z3c],[x3y2z2b,x2y3z2b,x2y2z3b],[x3y2z2a,x2y3z2a,x2y2z3a];
+
 */
