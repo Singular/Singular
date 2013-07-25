@@ -7,7 +7,7 @@ endif
 SUBDIRS = resources omalloc xalloc $(USE_FACTORY) \
 libpolys kernel numeric gfanlib dyn_modules \
 IntegerProgramming Singular dox \
-emacs debian redhat desktop 
+emacs debian redhat desktop
 
 # PACKAGES = $(SUBDIRS)
 # TESTDIRS = omalloc $(USE_FACTORY) libpolys kernel Singular dyn_modules

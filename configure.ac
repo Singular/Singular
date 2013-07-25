@@ -41,9 +41,9 @@ AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv)
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 if test -z "$DOXYGEN";
    then AC_MSG_WARN([Doxygen not found - continuing without Doxygen support])
-fi 
+fi
 AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
-                                                                    
+
 LT_INIT
 
 link_all_deplibs=yes
@@ -84,6 +84,7 @@ SING_CHECK_FACTORY
 SING_CHECK_READLINE
 SING_CHECK_DBM
 SING_CHECK_GFANLIB
+SING_CHECK_POLYMAKE
 
 ### the following is needed due to the use of om_sing_opt_show_mem in misc_ip.cc...
 #ac_configure_args="$ac_configure_args --with-external-config_h=../Singular/omSingularConfig.h"
@@ -144,11 +145,11 @@ AC_DEFINE_UNQUOTED([DEFS],"$DEFS",[DEFS])
 AC_DEFINE_UNQUOTED([CPPFLAGS],"$CPPFLAGS",[CPPFLAGS])
 AC_DEFINE_UNQUOTED([LDFLAGS],"$LDFLAGS",[LDFLAGS])
 AC_DEFINE_UNQUOTED([LIBS],"$LIBS",[LIBS])
- 
-  
+
+
 SING_SHOW_FLAGS([Compiler/linker flags: ])
 
-    
+
 AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([dox/Doxyfile])])
 AC_CONFIG_FILES([dox/Makefile])
 
@@ -172,6 +173,7 @@ AC_CONFIG_FILES([dyn_modules/Makefile])
 AC_CONFIG_FILES([dyn_modules/bigintm/Makefile])
 AC_CONFIG_FILES([dyn_modules/syzextra/Makefile])
 AC_CONFIG_FILES([dyn_modules/callgfanlib/Makefile])
+AC_CONFIG_FILES([dyn_modules/callpolymake/Makefile])
 
 AC_CONFIG_FILES([Singular/Makefile])
 
