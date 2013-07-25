@@ -46,6 +46,9 @@ AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
                                                                     
 LT_INIT
 
+link_all_deplibs=yes
+link_all_deplibs_CXX=yes
+
 # Checks for libraries.
 AC_CHECK_LIB(rt,clock_gettime)
 AC_CHECK_LIB(pthread,pthread_create)

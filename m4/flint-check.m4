@@ -29,8 +29,8 @@ AC_ARG_WITH(flint,
 			FLINT_HOME_PATH="${DEFAULT_CHECKING_PATH}"
 	      elif test "$withval" != no ; then
 			FLINT_HOME_PATH="$withval"
-	     fi], )
-#	     [FLINT_HOME_PATH="${DEFAULT_CHECKING_PATH}"])
+	     fi],
+	     [FLINT_HOME_PATH="${DEFAULT_CHECKING_PATH}"])
 
 min_flint_version=ifelse([$1], ,2.3,$1)
 
