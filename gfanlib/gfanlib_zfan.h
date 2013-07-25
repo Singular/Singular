@@ -104,6 +104,7 @@ public:
    * Writes to string
    */
   std::string toString(int flags=0)const;
+  std::string toStringJustRaysAndMaximalCones(int flags=0)const;
   /**
    * Returns the dimension of the ambient space.
    */

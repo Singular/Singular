@@ -1,10 +1,14 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
 #include <kernel/mod2.h>
 
 #include <bbcone.h>
 #include <bbfan.h>
 #include <bbpolytope.h>
 #include <gitfan.h>
-#include"Singular/ipid.h"
+#include "Singular/ipid.h"
 
 template class gfan::Vector<gfan::Integer>;
 template class gfan::Vector<gfan::Rational>;

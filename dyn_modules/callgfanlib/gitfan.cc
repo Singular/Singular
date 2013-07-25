@@ -163,7 +163,7 @@ BOOLEAN refineCones(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == LIST_CMD))
   {
     leftv v=u->next;
-    if ((u != NULL) && (v->Typ() == BIGINTMAT_CMD))
+    if ((v != NULL) && (v->Typ() == BIGINTMAT_CMD))
     {
       lists cones = (lists) u->Data();
       bigintmat* bim = (bigintmat*) v->Data();
@@ -256,7 +256,116 @@ BOOLEAN refineCones(leftv res, leftv args)
   return TRUE;
 }
 
+
+static int binomial(int n, int k)
+{
+  if (n<k)
+    return(0);
+  gfan::Integer num = 1;
+  gfan::Integer den = 1;
+  for (int i=1; i<=k; i++)
+    den = den*i;
+  for (int j=n-k+1; j<=n; j++)
+    num = num*j;
+  gfan::Integer bin = num/den;
+  return(bin.toInt());
+}
+
+
+intvec* intToAface(unsigned int v0, int n, int k)
+{
+  intvec* v = new intvec(k);
+  int j = 0;
+  for (int i=0; i<n; i++)
+  {
+    if (v0 & (1<<i))
+      (*v)[j++] = i+1;
+  }
+  return v;
+}
+
+
+BOOLEAN listOfAfacesToCheck(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == INT_CMD))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == INT_CMD))
+    {
+      int n = (int)(long) u->Data();
+      int k = (int)(long) v->Data();
+      unsigned int v = 0;
+      for (int i=0; i<k; i++)
+        v |= 1<<i;  // sets the first k bits of v as 1
+
+      lists L = (lists)omAllocBin(slists_bin);
+      int count = (int) binomial(n,k); L->Init(count);
+      unsigned int t;
+      while (!(v & (1<<n)))
+      {
+        L->m[--count].rtyp = INTVEC_CMD;
+        L->m[count].data = (void*) intToAface(v,n,k);
+
+        // t gets v's least significant 0 bits set to 1
+        t = v | (v - 1);
+        // Next set to 1 the most significant bit to change,
+        // set to 0 the least significant ones, and add the necessary 1 bits.
+        v = (t + 1) | (((~t & -~t) - 1) >> (__builtin_ctz(v) + 1));
+      }
+      res->rtyp = LIST_CMD;
+      res->data = (void*) L;
+      return FALSE;
+    }
+  }
+  WerrorS("listOfAfacesToCheck: unexpected parameter");
+  return TRUE;
+}
+
+
+BOOLEAN nextAfaceToCheck(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == INTVEC_CMD))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == INT_CMD))
+    {
+      leftv w = v->next;
+      if ((w != NULL) && (w->Typ() == INT_CMD))
+      {
+        intvec* aface = (intvec*) u->Data();
+        int ambientDimension = (int)(long) v->Data();
+        int dimension = (int)(long) w->Data();
+
+        unsigned int af = 0;
+        for (int i=0; i<aface->length(); i++)
+          af |= 1<<((*aface)[i]-1);
+
+        unsigned int t = af | (af - 1);
+        af = (t + 1) | (((~t & -~t) - 1) >> (__builtin_ctz(af) + 1));
+
+        if (af & (1<<ambientDimension))
+        {
+          res->rtyp = INTVEC_CMD;
+          res->data = (void*) new intvec(1);
+          return FALSE;
+        }
+
+        res->rtyp = INTVEC_CMD;
+        res->data = (void*) intToAface(af,ambientDimension,dimension);
+        return FALSE;
+      }
+    }
+  }
+  WerrorS("nextAfaceToCheck: unexpected parameter");
+  return TRUE;
+}
+
+
 void gitfan_setup(SModulFunctions* p)
 {
   p->iiAddCproc("","refineCones",FALSE,refineCones);
+  p->iiAddCproc("","listOfAfacesToCheck",FALSE,listOfAfacesToCheck);
+  p->iiAddCproc("","nextAfaceToCheck",FALSE,nextAfaceToCheck);
 }

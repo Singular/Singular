@@ -23,7 +23,7 @@ bigintmat* zMatrixToBigintmat(const gfan::ZMatrix &zm);
 gfan::ZMatrix* bigintmatToZMatrix(const bigintmat &bim);
 gfan::ZVector* bigintmatToZVector(const bigintmat &bim);
 
-gfan::ZVector* intStar2ZVector(const int d, const int* i);
+gfan::ZVector intStar2ZVector(const int d, const int* i);
 char* toString(gfan::ZMatrix const &m);
 std::string toString(const gfan::ZCone* const c);
 
