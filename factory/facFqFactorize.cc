@@ -142,9 +142,10 @@ CanonicalForm myCompress (const CanonicalForm& F, CFMap& N)
   for (int i= 0; i <= n; i++)
   {
     degsf[i]= 0;
-    swap [i]= new int [2];
+    swap [i]= new int [3];
     swap [i] [0]= 0;
     swap [i] [1]= 0;
+    swap [i] [2]= 0;
   }
   int i= 1;
   n= 1;
@@ -156,12 +157,13 @@ CanonicalForm myCompress (const CanonicalForm& F, CFMap& N)
     while( degsf[i] == 0 ) i++;
     swap[n][0]= i;
     swap[n][1]= size (LC (F,i));
+    swap[n][2]= degsf [i];
     if (i != n)
       result= swapvar (result, Variable (n), Variable(i));
     n++; i++;
   }
 
-  int buf1, buf2;
+  int buf1, buf2, buf3;
   n--;
 
   for (i= 1; i < n; i++)
@@ -172,10 +174,26 @@ CanonicalForm myCompress (const CanonicalForm& F, CFMap& N)
       {
         buf1= swap [j + 1] [0];
         buf2= swap [j + 1] [1];
+        buf3= swap [j + 1] [2];
         swap[j + 1] [0]= swap[j] [0];
         swap[j + 1] [1]= swap[j] [1];
+        swap[j + 1] [2]= swap[j] [2];
         swap[j][0]= buf1;
         swap[j][1]= buf2;
+        swap[j][2]= buf3;
+        result= swapvar (result, Variable (j + 1), Variable (j));
+      }
+      else if (swap[j][1] == swap[j + 1][1] && swap[j][2] < swap[j + 1][2])
+      {
+        buf1= swap [j + 1] [0];
+        buf2= swap [j + 1] [1];
+        buf3= swap [j + 1] [2];
+        swap[j + 1] [0]= swap[j] [0];
+        swap[j + 1] [1]= swap[j] [1];
+        swap[j + 1] [2]= swap[j] [2];
+        swap[j][0]= buf1;
+        swap[j][1]= buf2;
+        swap[j][2]= buf3;
         result= swapvar (result, Variable (j + 1), Variable (j));
       }
     }

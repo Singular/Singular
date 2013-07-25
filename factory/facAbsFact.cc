@@ -515,12 +515,9 @@ differentevalpoint:
 
   bool earlySuccess= false;
   CFList earlyFactors;
-  TIMING_START (fac_bi_hensel_lift);
   uniFactors= henselLiftAndEarly
               (F, earlySuccess, earlyFactors, degs, liftBound,
                uniFactors, dummy, evaluation, b, den);
-  TIMING_END_AND_PRINT (fac_bi_hensel_lift,
-                        "time for bivariate hensel lifting over Q: ");
   DEBOUTLN (cerr, "lifted factors= " << uniFactors);
 
   CanonicalForm MODl= power (y, liftBound);
@@ -531,11 +528,8 @@ differentevalpoint:
 
   CFList biFactors;
 
-  TIMING_START (fac_bi_factor_recombination);
   biFactors= factorRecombination (uniFactors, F, MODl, degs, evaluation, 1,
                                   uniFactors.length()/2, b, den);
-  TIMING_END_AND_PRINT (fac_bi_factor_recombination,
-                        "time for bivariate factor recombination over Q: ");
 
   On (SW_RATIONAL);
 

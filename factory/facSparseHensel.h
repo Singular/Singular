@@ -199,7 +199,7 @@ getTerms (const CanonicalForm& F)
 
 /// helper function for getBiTerms
 inline CFArray
-getBiTerms_helper (const CanonicalForm& F, const CFMap& M)
+getBiTerms_helper (const CanonicalForm& F, const CFMap& M, int threshold)
 {
   CFArray buf= CFArray (size (F));
   int k= 0, level= F.level() - 1;
@@ -214,14 +214,18 @@ getBiTerms_helper (const CanonicalForm& F, const CFMap& M)
     {
       buf[k]= M (i.coeff())*power (one,i.exp());
       k++;
+      if (k > threshold)
+        break;
       continue;
     }
     j= i.coeff();
-    for (;j.hasTerms(); j++, k++)
+    for (;j.hasTerms() && k <= threshold; j++, k++)
       buf[k]= power (one,i.exp())*power (two,j.exp())*M (j.coeff());
+    if (k > threshold)
+      break;
   }
   CFArray result= CFArray (k);
-  for (int i= 0; i < k; i++)
+  for (int i= 0; i < k && k <= threshold; i++)
     result[i]= buf[i];
   return result;
 }
@@ -229,7 +233,7 @@ getBiTerms_helper (const CanonicalForm& F, const CFMap& M)
 /// get terms of @a F where F is considered a bivariate poly in Variable(1),
 /// Variable (2)
 inline CFArray
-getBiTerms (const CanonicalForm& F)
+getBiTerms (const CanonicalForm& F, int threshold)
 {
   if (F.inCoeffDomain())
   {
@@ -254,7 +258,7 @@ getBiTerms (const CanonicalForm& F)
   G= swapvar (F, Variable (1), F.mvar());
   G= swapvar (G, Variable (2), Variable (F.level() - 1));
 
-  CFArray result= getBiTerms_helper (G, M);
+  CFArray result= getBiTerms_helper (G, M, threshold);
   return result;
 }
 

@@ -47,7 +47,7 @@ CanonicalForm GF2FalphaRep (const CanonicalForm& F, const Variable& alpha);
 CanonicalForm Falpha2GFRep (const CanonicalForm& F);
 
 /// map from \f$ F_p(\alpha) \f$ to \f$ F_p(\beta) \f$ such that 
-/// \f$ F\in\F_p(\alpha) \f$ is mapped onto \f$ \beta \f$
+/// \f$ F\in F_p(\alpha) \f$ is mapped onto \f$ \beta \f$
 ///
 /// @return @a map returns the image of @a primElem such that the above 
 /// described properties hold
@@ -63,12 +63,12 @@ map (const CanonicalForm& primElem,///< [in] primitive element of
                                    ///< minimal polynomial
     );
 
-/// compute minimal polynomial of \f$ F\in\F_p(\alpha)\backslash\F_p \f$ via NTL
+/// compute minimal polynomial of \f$ F\in F_p(\alpha)\backslash F_p \f$ via NTL
 ///
 /// @return @a findMinPoly computes the minimal polynomial of F
 CanonicalForm
 findMinPoly (const CanonicalForm& F, ///< [in] an element of 
-                                     ///< \f$ \F_p(\alpha)\backslash\F_p \f$
+                                     ///< \f$ F_p(\alpha)\backslash F_p \f$
              const Variable& alpha   ///< [in] algebraic variable
             );
 
