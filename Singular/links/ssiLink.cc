@@ -439,6 +439,9 @@ number ssiReadBigInt(ssiInfo *d)
    case 3:
      {// read int or mpz_t or mpz_t, mpz_t
        number n=(number)omAlloc0(sizeof(snumber_dummy));
+       #ifdef LDEBUG
+       ((number_dummy)n)->debug=123456;
+       #endif
        s_readmpz(d->f_read,((number_dummy)n)->z);
        ((number_dummy)n)->s=sub_type;
        return n;
@@ -465,6 +468,9 @@ static number ssiReadQNumber(ssiInfo *d)
      case 1:
        {// read mpz_t, mpz_t
          number n=(number)omAlloc0(sizeof(snumber_dummy));
+         #ifdef LDEBUG
+         ((number_dummy)n)->debug=123456;
+         #endif
          mpz_init(((number_dummy)n)->z);
          mpz_init(((number_dummy)n)->n);
          s_readmpz(d->f_read,((number_dummy)n)->z);
@@ -476,6 +482,9 @@ static number ssiReadQNumber(ssiInfo *d)
      case 3:
        {// read mpz_t
          number n=(number)omAlloc0(sizeof(snumber_dummy));
+         #ifdef LDEBUG
+         ((number_dummy)n)->debug=123456;
+         #endif
          mpz_init(((number_dummy)n)->z);
          s_readmpz(d->f_read,((number_dummy)n)->z);
          ((number_dummy)n)->s=3; /*sub_type*/
@@ -490,6 +499,9 @@ static number ssiReadQNumber(ssiInfo *d)
      case 6:
        {// read raw mpz_t, mpz_t
          number n=(number)omAlloc0(sizeof(snumber_dummy));
+         #ifdef LDEBUG
+         ((number_dummy)n)->debug=123456;
+         #endif
          mpz_init(((number_dummy)n)->z);
          mpz_init(((number_dummy)n)->n);
          s_readmpz_base (d->f_read,((number_dummy)n)->z, 32);
@@ -500,6 +512,9 @@ static number ssiReadQNumber(ssiInfo *d)
      case 8:
        {// read raw mpz_t
          number n=(number)omAlloc0(sizeof(snumber_dummy));
+         #ifdef LDEBUG
+         ((number_dummy)n)->debug=123456;
+         #endif
          mpz_init(((number_dummy)n)->z);
          s_readmpz_base (d->f_read,((number_dummy)n)->z, 32);
          ((number_dummy)n)->s=sub_type=3; /*subtype-5*/
