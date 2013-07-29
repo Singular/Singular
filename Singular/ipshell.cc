@@ -2170,7 +2170,7 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
         Warn("%d is invalid characteristic of ground field. %d is used.", ch, l);
         ch = l;
       }
-      R->cf = nInitChar(n_Zp, (void*)ch);
+      R->cf = nInitChar(n_Zp, (void*)(long)ch);
     }
   }
   else if (L->m[0].Typ()==LIST_CMD) // something complicated...
@@ -2728,7 +2728,7 @@ BOOLEAN syBetti2(leftv res, leftv u, leftv w)
   res->data=(void *)syBettiOfComputation(syzstr,minim,&row_shift,weights);
   //row_shift += add_row_shift;
   //Print("row_shift=%d, add_row_shift=%d\n",row_shift,add_row_shift);
-  atSet(res,omStrDup("rowShift"),(void*)add_row_shift,INT_CMD);
+  atSet(res,omStrDup("rowShift"),(void*)(long)add_row_shift,INT_CMD);
 
   return FALSE;
 }
@@ -2995,9 +2995,9 @@ lists   getList( spectrum& spec )
     L->m[4].rtyp = INTVEC_CMD; //  denomiantors
     L->m[5].rtyp = INTVEC_CMD; //  multiplicities
 
-    L->m[0].data = (void*)spec.mu;
-    L->m[1].data = (void*)spec.pg;
-    L->m[2].data = (void*)spec.n;
+    L->m[0].data = (void*)(long)spec.mu;
+    L->m[1].data = (void*)(long)spec.pg;
+    L->m[2].data = (void*)(long)spec.n;
     L->m[3].data = (void*)num;
     L->m[4].data = (void*)den;
     L->m[5].data = (void*)mult;
@@ -3358,7 +3358,7 @@ spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int 
       *L = (lists)omAllocBin( slists_bin);
       (*L)->Init( 1 );
       (*L)->m[0].rtyp = INT_CMD;    //  milnor number
-      (*L)->m[0].data = (void*)mu;
+      (*L)->m[0].data = (void*)(long)mu;
 
       return spectrumDegenerate;
     }
@@ -3375,9 +3375,9 @@ spectrumState   spectrumStateFromList( spectrumPolyList& speclist, lists *L,int 
   (*L)->m[4].rtyp = INTVEC_CMD; //  denomiantors
   (*L)->m[5].rtyp = INTVEC_CMD; //  multiplicities
 
-  (*L)->m[0].data = (void*)mu;
-  (*L)->m[1].data = (void*)pg;
-  (*L)->m[2].data = (void*)n;
+  (*L)->m[0].data = (void*)(long)mu;
+  (*L)->m[1].data = (void*)(long)pg;
+  (*L)->m[2].data = (void*)(long)n;
   (*L)->m[3].data = (void*)nom;
   (*L)->m[4].data = (void*)den;
   (*L)->m[5].data = (void*)mult;
@@ -4115,9 +4115,9 @@ BOOLEAN    semicProc3   ( leftv res,leftv u,leftv v,leftv w )
 
     res->rtyp = INT_CMD;
     if (qh)
-      res->data = (void*)(s1.mult_spectrumh( s2 ));
+      res->data = (void*)(long)(s1.mult_spectrumh( s2 ));
     else
-      res->data = (void*)(s1.mult_spectrum( s2 ));
+      res->data = (void*)(long)(s1.mult_spectrum( s2 ));
   }
 
   // -----------------
@@ -4214,7 +4214,7 @@ BOOLEAN loSimplex( leftv res, leftv args )
   lres->m[0].data=(void*)LP->mapToMatrix(m);
 
   lres->m[1].rtyp= INT_CMD;   // found a solution?
-  lres->m[1].data=(void*)LP->icase;
+  lres->m[1].data=(void*)(long)LP->icase;
 
   lres->m[2].rtyp= INTVEC_CMD;
   lres->m[2].data=(void*)LP->posvToIV();
@@ -4223,10 +4223,10 @@ BOOLEAN loSimplex( leftv res, leftv args )
   lres->m[3].data=(void*)LP->zrovToIV();
 
   lres->m[4].rtyp= INT_CMD;
-  lres->m[4].data=(void*)LP->m;
+  lres->m[4].data=(void*)(long)LP->m;
 
   lres->m[5].rtyp= INT_CMD;
-  lres->m[5].data=(void*)LP->n;
+  lres->m[5].data=(void*)(long)LP->n;
 
   res->data= (void*)lres;
 
@@ -5760,7 +5760,7 @@ BOOLEAN iiApplyINTVEC(leftv res, leftv a, int op, leftv proc)
   {
     memset(&tmp_in,0,sizeof(tmp_in));
     tmp_in.rtyp=INT_CMD;
-    tmp_in.data=(void*)(*aa)[i];
+    tmp_in.data=(void*)(long)(*aa)[i];
     if (proc==NULL)
       bo=iiExprArith1(&tmp_out,&tmp_in,op);
     else

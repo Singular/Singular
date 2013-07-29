@@ -3264,7 +3264,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         h = h->next;
         ideal GI = (ideal) h->Data();
         res->rtyp = INT_CMD;
-        res->data = (void *) testGB(I, GI);
+        res->data = (void *)(long) testGB(I, GI);
         return(FALSE);
       }
       else
