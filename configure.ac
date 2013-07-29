@@ -33,9 +33,9 @@ AC_PROG_INSTALL
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS(unistd.h iostream.h)
+AC_CHECK_HEADERS(unistd.h iostream.h sys/time.h sys/times.h asm/sigcontext.h)
 
-AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv)
+AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv pselect)
 
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])

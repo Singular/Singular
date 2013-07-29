@@ -71,7 +71,7 @@ struct snumber_dummy
 typedef struct snumber_dummy  *number_dummy;
 
 #ifdef HAVE_SIMPLEIPC
-#include <Singular/simpleipc.h>
+#include <Singular/links/simpleipc.h>
 #endif
 //#if (_POSIX_C_SOURCE >= 200112L) || (_XOPEN_SOURCE >= 600)
 //#define HAVE_PSELECT
@@ -1564,9 +1564,6 @@ int slStatusSsiL(lists L, int timeout)
 //           i>0: (at least) L[i] is ready
   si_link l;
   ssiInfo *d;
-  #ifdef HAVE_MPSR
-  MP_Link_pt dd;
-  #endif
   int d_fd;
   fd_set  mask, fdmask;
   FD_ZERO(&fdmask);
@@ -1574,13 +1571,8 @@ int slStatusSsiL(lists L, int timeout)
   int max_fd=0; /* 1 + max fd in fd_set */
 
   /* timeout */
-  #ifdef HAVE_PSELECT
-  struct timespec wt;
-  struct timespec *wt_ptr=&wt;
-  #else
   struct timeval wt;
   struct timeval *wt_ptr=&wt;
-  #endif
   int startingtime = getRTimer()/TIMER_RESOLUTION;  // in seconds
   if (timeout== -1)
   {
@@ -1589,24 +1581,7 @@ int slStatusSsiL(lists L, int timeout)
   else
   {
     wt.tv_sec  = timeout / 1000000;
-  #ifdef HAVE_PSELECT
-    wt.tv_nsec = 1000 * (timeout % 1000000);
-  #else
     wt.tv_usec = timeout % 1000000;
-  #endif
-  }
-
-  /* signal mask for pselect() */
-  sigset_t sigmask;
-  if(sigprocmask(SIG_SETMASK, NULL, &sigmask) < 0)
-  {
-    WerrorS("error in sigprocmask()");
-    return -2;
-  }
-  if(sigaddset(&sigmask, SIGCHLD) < 0)
-  {
-    WerrorS("error in sigaddset()");
-    return -2;
   }
 
   /* auxiliary variables */
@@ -1631,31 +1606,9 @@ int slStatusSsiL(lists L, int timeout)
       || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=0)
         && (strcmp(l->mode,"launch")!=0) && (strcmp(l->mode,"connect")!=0)))
       {
-        WerrorS("all links must be of type ssi:fork, ssi:tcp, ssi:connect,");
-        WerrorS(" MPtcp:fork or MPtcp:launch");
+        WerrorS("all links must be of type ssi:fork, ssi:tcp, ssi:connect");
         return -2;
       }
-    #ifdef HAVE_MPSR
-      if (strcmp(l->m->type,"ssi")==0)
-      {
-        d=(ssiInfo*)l->data;
-        d_fd=d->fd_read;
-        if (!s_isready(d->f_read))
-        {
-          FD_SET(d_fd, &fdmask);
-          if (d_fd > max_fd) max_fd=d_fd;
-        }
-        else
-          return i+1;
-      }
-      else
-      {
-        dd=(MP_Link_pt)l->data;
-        d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
-        FD_SET(d_fd, &fdmask);
-        if (d_fd > max_fd) max_fd=d_fd;
-      }
-    #else
       d=(ssiInfo*)l->data;
       d_fd=d->fd_read;
       if (!s_isready(d->f_read))
@@ -1665,7 +1618,6 @@ int slStatusSsiL(lists L, int timeout)
       }
       else
         return i+1;
-    #endif
     }
   }
   max_fd++;
@@ -1685,13 +1637,7 @@ do_select:
   #ifdef HAVE_SIMPLEIPC
   sipc_semaphore_release(0);
   #endif
-  #ifdef HAVE_PSELECT
-  s = si_pselect(max_fd, &mask, NULL, NULL, wt_ptr, &sigmask);
-  #else
-  SSI_BLOCK_CHLD;
   s = si_select(max_fd, &mask, NULL, NULL, wt_ptr);
-  SSI_UNBLOCK_CHLD;
-  #endif
   #ifdef HAVE_SIMPLEIPC
   sipc_semaphore_acquire(0);
   #endif
@@ -1714,25 +1660,9 @@ do_select:
       if (L->m[i].rtyp==LINK_CMD)
       {
         l=(si_link)L->m[i].Data();
-        #ifdef HAVE_MPSR
-        if (strcmp(l->m->type,"ssi")!=0)
-        {
-          // for MP links, return here:
-          dd=(MP_Link_pt)l->data;
-          d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
-          if(j==d_fd) return i+1;
-        }
-        else
-        {
-          d=(ssiInfo*)l->data;
-          d_fd=d->fd_read;
-          if(j==d_fd) break;
-        }
-        #else
         d=(ssiInfo*)l->data;
         d_fd=d->fd_read;
         if(j==d_fd) break;
-        #endif
       }
     }
     // only ssi links:
@@ -1764,11 +1694,7 @@ do_select:
           timeout = si_max(0,
              timeout - 1000000*(getRTimer()/TIMER_RESOLUTION - startingtime));
           wt.tv_sec  = timeout / 1000000;
-          #ifdef HAVE_PSELECT
-          wt.tv_nsec = 1000 * (timeout % 1000000);
-          #else
           wt.tv_usec = (timeout % 1000000);
-          #endif
         }
         goto do_select;
       }

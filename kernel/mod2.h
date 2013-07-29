@@ -56,6 +56,10 @@
 
 #endif
 
+/* include simpleipc/semaphore code, link against librt/libpthread */
+#define HAVE_SIMPLEIPC 1
+
+
 /* linear algebra extensions from pcv.h/pcv.cc */
 #define HAVE_PCV 1
 
