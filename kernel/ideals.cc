@@ -42,7 +42,7 @@
 #include <kernel/kstd1.h>
 #include <kernel/syz.h>
 
-#include <kernel/longrat.h>
+#include <libpolys/coeffs/longrat.h>
 
 
 /* #define WITH_OLD_MINOR */

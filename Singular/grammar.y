@@ -43,7 +43,7 @@
 #include <polys/monomials/maps.h>
 #include <kernel/syz.h>
 #include <Singular/lists.h>
-#include <kernel/longrat.h>
+#include <libpolys/coeffs/longrat.h>
 #include <Singular/libparse.h>
 #include <coeffs/bigintmat.h>
 

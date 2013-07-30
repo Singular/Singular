@@ -951,7 +951,7 @@ BOOLEAN jjBETTI2(leftv res, leftv u, leftv v)
   if (r==NULL) return TRUE;
   res->data=(char *)syBetti(r,len,&reg,weights,(int)(long)v->Data());
   omFreeSize((ADDRESS)r,(len)*sizeof(ideal));
-  atSet(res,omStrDup("rowShift"),(void*)add_row_shift,INT_CMD);
+  atSet(res,omStrDup("rowShift"),(void*)(long)add_row_shift,INT_CMD);
   if (weights!=NULL) delete weights;
   return FALSE;
 }
@@ -1613,7 +1613,7 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   // ----------------------------------------
   // 0: char/ cf - ring
   L->m[0].rtyp=INT_CMD;
-  L->m[0].data=(void *)r->cf->ch;
+  L->m[0].data=(void *)(long)r->cf->ch;
   // ----------------------------------------
   // 1: list (var)
   lists LL=(lists)omAlloc0Bin(slists_bin);

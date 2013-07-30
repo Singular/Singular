@@ -6,8 +6,8 @@
 #include <misc/auxiliary.h>
 #include <kernel/structs.h>
 #include <kernel/polys.h>
-#include <kernel/longrat.h>
 #include <coeffs/numbers.h>
+#include <libpolys/coeffs/longrat.h>
 #include <kernel/febase.h>
 #include <polys/monomials/ring.h>
 #include <omalloc/omalloc.h>

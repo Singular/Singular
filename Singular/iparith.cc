@@ -5159,7 +5159,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
 }
 static BOOLEAN jjUNIVARIATE(leftv res, leftv v)
 {
-  res->data=(char *)pIsUnivariate((poly)v->Data());
+  res->data=(char *)(long)pIsUnivariate((poly)v->Data());
   return FALSE;
 }
 static BOOLEAN jjVAR1(leftv res, leftv v)
@@ -5380,12 +5380,12 @@ static BOOLEAN jjstrlen(leftv res, leftv v)
 }
 static BOOLEAN jjpLength(leftv res, leftv v)
 {
-  res->data = (char *)pLength((poly)v->Data());
+  res->data = (char *)(long)pLength((poly)v->Data());
   return FALSE;
 }
 static BOOLEAN jjidElem(leftv res, leftv v)
 {
-  res->data = (char *)idElem((ideal)v->Data());
+  res->data = (char *)(long)idElem((ideal)v->Data());
   return FALSE;
 }
 static BOOLEAN jjmpDetBareiss(leftv res, leftv v)
@@ -5462,12 +5462,12 @@ static BOOLEAN jjrParStr(leftv res, leftv v)
 }
 static BOOLEAN jjCOUNT_RES(leftv res, leftv v)
 {
-  res->data=(char *)sySize((syStrategy)v->Data());
+  res->data=(char *)(long)sySize((syStrategy)v->Data());
   return FALSE;
 }
 static BOOLEAN jjDIM_R(leftv res, leftv v)
 {
-  res->data = (char *)syDim((syStrategy)v->Data());
+  res->data = (char *)(long)syDim((syStrategy)v->Data());
   return FALSE;
 }
 static BOOLEAN jjidTransp(leftv res, leftv v)
@@ -7076,13 +7076,13 @@ static BOOLEAN jjLU_INVERSE(leftv res, leftv v)
   if (invertible)
   {
     ll->Init(2);
-    ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)invertible;
+    ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)(long)invertible;
     ll->m[1].rtyp=MATRIX_CMD; ll->m[1].data=(void *)iMat;
   }
   else
   {
     ll->Init(1);
-    ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)invertible;
+    ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)(long)invertible;
   }
 
   res->data=(char*)ll;
@@ -7160,14 +7160,14 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
   if (solvable)
   {
     ll->Init(3);
-    ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)solvable;
+    ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)(long)solvable;
     ll->m[1].rtyp=MATRIX_CMD; ll->m[1].data=(void *)xVec;
     ll->m[2].rtyp=MATRIX_CMD; ll->m[2].data=(void *)homogSolSpace;
   }
   else
   {
     ll->Init(1);
-    ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)solvable;
+    ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)(long)solvable;
   }
 
   res->data=(char*)ll;

@@ -17,7 +17,7 @@
 #include <polys/kbuckets.h>
 
 #include <kernel/ideals.h>
-#include <kernel/longrat.h>
+#include <libpolys/coeffs/longrat.h>
 #include <kernel/febase.h>
 #include <kernel/kutil.h>
 

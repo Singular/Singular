@@ -29,7 +29,7 @@
 #include <polys/nc/nc.h>
 #include <polys/nc/sca.h>
 #include <polys/prCopy.h>
-#include <kernel/longrat.h>
+#include <libpolys/coeffs/longrat.h>
 #include <coeffs/modulop.h>
 #define BUCKETS_FOR_NORO_RED 1
 #define SR_HDL(A) ((long)(A))

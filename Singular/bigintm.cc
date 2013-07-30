@@ -11,7 +11,7 @@
 #include <Singular/blackbox.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
-#include <kernel/longrat.h>
+#include <libpolys/coeffs//longrat.h>
 #include <Singular/subexpr.h>
 #include <Singular/bigintm.h>
 

@@ -24,7 +24,7 @@
 #include <polys/monomials/ring.h>
 
 #include <kernel/febase.h>
-#include <kernel/longrat.h>
+#include <libpolys/coeffs/longrat.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/syz.h>

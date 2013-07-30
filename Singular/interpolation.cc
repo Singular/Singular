@@ -19,7 +19,6 @@
 
 #include <coeffs/longrat.h>
 
-#include <kernel/longrat.h>
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
 

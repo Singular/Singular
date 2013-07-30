@@ -31,7 +31,7 @@
 #include <polys/monomials/ring.h>
 #include <kernel/polys.h>
 
-#include <kernel/longrat.h>
+#include <libpolys/coeffs/longrat.h>
 // #include <coeffs/longrat.h>
 
 #include <kernel/febase.h>

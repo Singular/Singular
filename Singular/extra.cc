@@ -782,7 +782,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
                                      sizeof(int) * r) != 0))
             r--;
           res->rtyp = INT_CMD;
-          res->data = (void*)r;
+          res->data = (void*)(long)r;
           return FALSE;
         }
         else
@@ -947,14 +947,14 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         if (solvable)
         {
           ll->Init(3);
-          ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)solvable;
+          ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)(long)solvable;
           ll->m[1].rtyp=MATRIX_CMD; ll->m[1].data=(void *)xVec;
           ll->m[2].rtyp=MATRIX_CMD; ll->m[2].data=(void *)homogSolSpace;
         }
         else
         {
           ll->Init(1);
-          ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)solvable;
+          ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)(long)solvable;
         }
         res->rtyp = LIST_CMD;
         res->data=(char*)ll;
@@ -970,7 +970,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           int timeMillisec = (int)(long)h->next->Data();
           int n = slStatusSsiL(L, timeMillisec * 1000);
           res->rtyp = INT_CMD;
-          res->data = (void*)n;
+          res->data = (void*)(long)n;
           return FALSE;
         }
         else
@@ -1251,9 +1251,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       {
 
         if ((h!=NULL) && (h->Typ()==INT_CMD))
-          res->data=(void *)setNCExtensions( (int)((long)(h->Data())) );
+          res->data=(void *)(long)setNCExtensions( (int)((long)(h->Data())) );
         else
-          res->data=(void *)getNCExtensions();
+          res->data=(void *)(long)getNCExtensions();
 
         res->rtyp=INT_CMD;
         return FALSE;
@@ -1265,9 +1265,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         res->rtyp=INT_CMD;
 
         if( rIsPluralRing(currRing) )
-          res->data=(void *)ncRingType(currRing);
+          res->data=(void *)(long)ncRingType(currRing);
         else
-          res->data=(void *)(-1);
+          res->data=(void *)(-1L);
 
         return FALSE;
       }
@@ -1442,7 +1442,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         res->data = (void*) walkNextWeight(((intvec*) h->Data()),
                                            ((intvec*) h->next->Data()),
                                            (ideal) h->next->next->Data());
-        if (res->data == (void*) 0 || res->data == (void*) 1)
+        if (res->data == NULL || res->data == (void*) 1L)
         {
           res->rtyp = INT_CMD;
         }
@@ -2546,7 +2546,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           }
           rComplete(currRing);
           res->rtyp = INT_CMD;
-          res->data = 0;
+          res->data = (void*)0L;
           return FALSE;
         }
         else
@@ -2859,13 +2859,13 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         L->m[0].rtyp=STRING_CMD;               // newtonnumber;
         L->m[0].data=(void *)omStrDup(r.nZahl);
         L->m[1].rtyp=INT_CMD;
-        L->m[1].data=(void *)r.achse;          // flag for unoccupied axes
+        L->m[1].data=(void *)(long)r.achse;          // flag for unoccupied axes
         L->m[2].rtyp=INT_CMD;
-        L->m[2].data=(void *)r.deg;            // #degenerations
+        L->m[2].data=(void *)(long)r.deg;            // #degenerations
         if ( r.deg != 0)              // only if degenerations exist
         {
           L->m[3].rtyp=INT_CMD;
-          L->m[3].data=(void *)r.anz_punkte;     // #points
+          L->m[3].data=(void *)(long)r.anz_punkte;     // #points
           //---<>--number of points------
           int anz = r.anz_punkte;    // number of points
           int dim = (currRing->N);     // dimension
