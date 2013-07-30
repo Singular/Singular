@@ -38,7 +38,6 @@
 #include "sdb.h"
 #include "feOpt.h"
 #include "distrib.h"
-#include "bigintm.h"
 #include "mmalloc.h"
 #include "tok.h"
 #include "fegetopt.h"
@@ -140,8 +139,6 @@ int main(          /* main entry to Singular */
 #endif
 
   /* say hello */
-  //for official version: not active
-  //bigintm_setup();
 
   if (TEST_V_QUIET)
   {

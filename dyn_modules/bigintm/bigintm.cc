@@ -6,7 +6,7 @@
 
 #include <omalloc/omalloc.h>
 #include <coeffs/coeffs.h>
-#include <kernel/longrat.h>
+#include <coeffs/longrat.h>
 
 #include <kernel/febase.h>
 
