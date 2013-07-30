@@ -93,7 +93,6 @@ SOURCES =    Minor.cc\
    MinorProcessor.cc\
    links/asciiLink.cc\
    attrib.cc\
-   bigintm.cc\
    blackbox.cc\
    calcSVD.cc\
    cntrlc.cc\
@@ -154,7 +153,6 @@ SingularHEADERS =    Cache.h \
    MinorInterface.h \
    MinorProcessor.h \
    attrib.h \
-   bigintm.h \
    blackbox.h \
    cntrlc.h \
    countedref.h \
