@@ -28,8 +28,9 @@
 ///         that defines the minimal field extension over which the irreducible
 ///         factor is defined and the multiplicity of the absolute irreducible
 ///         factor
-CFAFList absFactorizeMain (const CanonicalForm& F ///<[in] s.a.
-                          );
+CFAFList absBiFactorizeMain (const CanonicalForm& F, ///<[in] s.a.
+                             bool full= false
+                            );
 #endif
 
 /// normalize factors, i.e. make factors monic
@@ -48,47 +49,13 @@ void normalize (CFAFList & L)
 ///         that defines the minimal field extension over which the irreducible
 ///         factor is defined and the multiplicity of the absolute irreducible
 ///         factor
-static inline
 CFAFList uniAbsFactorize (const CanonicalForm& F ///<[in] univariate poly over Q
-                         )
-{
-  CFFList rationalFactors= factorize (F);
-  CFFListIterator i= rationalFactors;
-  i++;
-  Variable alpha;
-  CFAFList result;
-  CFFList QaFactors;
-  CFFListIterator iter;
-  for (; i.hasItem(); i++)
-  {
-    if (degree (i.getItem().factor()) == 1)
-    {
-      result.append (CFAFactor (i.getItem().factor(), 1, i.getItem().exp()));
-      continue;
-    }
-    alpha= rootOf (i.getItem().factor());
-    QaFactors= factorize (i.getItem().factor(), alpha);
-    iter= QaFactors;
-    if (iter.getItem().factor().inCoeffDomain())
-      iter++;
-    for (;iter.hasItem(); iter++)
-    {
-      if (degree (iter.getItem().factor()) == 1)
-      {
-        result.append (CFAFactor (iter.getItem().factor(), getMipo (alpha),
-                                  i.getItem().exp()));
-        break;
-      }
-    }
-  }
-  result.insert (CFAFactor (rationalFactors.getFirst().factor(), 1, 1));
-  return result;
-}
+                         );
 
 /*BEGINPUBLIC*/
 
 #ifdef HAVE_NTL
-CFAFList absFactorize (const CanonicalForm& G);
+CFAFList absBiFactorize (const CanonicalForm& G);
 #endif
 
 /*ENDPUBLIC*/
