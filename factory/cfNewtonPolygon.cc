@@ -1172,7 +1172,9 @@ bool modularIrredTest (const CanonicalForm& F)
     Off (SW_RATIONAL);
 
   if (isRat)
+  {
     ASSERT (bCommonDen (F).isOne(), "poly over Z expected");
+  }
 
   CanonicalForm Fp, N= maxNorm (F);
   int tdeg= totaldegree (F);
@@ -1249,7 +1251,9 @@ modularIrredTestWithShift (const CanonicalForm& F)
     Off (SW_RATIONAL);
 
   if (isRat)
+  {
     ASSERT (bCommonDen (F).isOne(), "poly over Z expected");
+  }
 
   Variable x= Variable (1);
   Variable y= Variable (2);
