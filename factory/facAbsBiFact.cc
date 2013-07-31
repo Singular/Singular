@@ -1,7 +1,7 @@
 /*****************************************************************************\
  * Computer Algebra System SINGULAR
 \*****************************************************************************/
-/** @file facAbsFact.cc
+/** @file facAbsBiFact.cc
  *
  * @author Martin Lee
  *
@@ -15,7 +15,7 @@
 #include "timing.h"
 #include "debug.h"
 
-#include "facAbsFact.h"
+#include "facAbsBiFact.h"
 #include "facBivar.h"
 #include "facFqBivar.h"
 #include "cf_reval.h"
