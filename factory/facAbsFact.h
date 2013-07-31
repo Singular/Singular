@@ -1,7 +1,7 @@
 /*****************************************************************************\
  * Computer Algebra System SINGULAR
 \*****************************************************************************/
-/** @file facAbsMultiFact.h
+/** @file facAbsFact.h
  *
  * absolute multivariate factorization over Q
  *

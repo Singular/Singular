@@ -1,13 +1,14 @@
 /*****************************************************************************\
  * Computer Algebra System SINGULAR
 \*****************************************************************************/
-/** @file facAbsMultiFact.cc
+/** @file facAbsFact.cc
  *
  * @author Martin Lee
  *
  **/
 /*****************************************************************************/
 
+#include "config.h"
 #include "timing.h"
 #include "debug.h"
 
@@ -370,7 +371,7 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
     bufAeval= CFList();
     TIMING_START (abs_fac_evaluation);
     bufEvaluation= evalPoints4AbsFact (bufA, bufAeval, E);
-    TIMING_END_AND_PRINT (abs_fac_evaluation, 
+    TIMING_END_AND_PRINT (abs_fac_evaluation,
                           "time to find evaluation point in abs fact: ");
     E.nextpoint();
     evalPoly= 0;
