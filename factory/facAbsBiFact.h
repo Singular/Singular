@@ -14,10 +14,7 @@
 #ifndef FAC_ABS_BI_FACT_H
 #define FAC_ABS_BI_FACT_H
 
-#include "cf_assert.h"
-
-#include "cf_algorithm.h"
-#include "cf_map.h"
+#include "canonicalform.h"
 
 #ifdef HAVE_NTL
 /// main absolute factorization routine, expects bivariate poly which is
