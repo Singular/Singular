@@ -1,7 +1,7 @@
 /*****************************************************************************\
  * Computer Algebra System SINGULAR
 \*****************************************************************************/
-/** @file facAbsFact.h
+/** @file facAbsBiFact.h
  *
  * bivariate absolute factorization over Q described in "Modular Las Vegas
  * Algorithms for Polynomial Absolute Factorization" by Bertone, Chèze, Galligo
@@ -11,8 +11,8 @@
  **/
 /*****************************************************************************/
 
-#ifndef FAC_ABS_FACT_H
-#define FAC_ABS_FACT_H
+#ifndef FAC_ABS_BI_FACT_H
+#define FAC_ABS_BI_FACT_H
 
 #include "assert.h"
 
