@@ -108,4 +108,7 @@
 /*MAKEHEADER PUBLIC ONLY*/
 #include "facAbsBiFact.h"
 
+/*MAKEHEADER PUBLIC ONLY*/
+#include "facAbsFact.h"
+
 #endif /* ! INCL_FACTORY_H */
