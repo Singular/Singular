@@ -37,6 +37,11 @@ void decompress (CFFList& factors, ///< [in,out] a list of factors
                  const CFMap& N    ///< [in] a map
                 );
 
+/// as above
+void decompress (CFAFList& factors, ///< [in,out] a list of factors
+                 const CFMap& N    ///< [in] a map
+                );
+
 /// first swap Variables in @a factors1 if necessary, then append @a factors2
 /// and @a factors3 on @a factors1 and finally decompress @a factors1
 void appendSwapDecompress (CFList& factors1,       ///< [in,out] a list of polys
@@ -67,7 +72,7 @@ bool isInExtension (const CanonicalForm& F,      ///< [in] a poly over
                                                  ///< defining a subfield of
                                                  ///< Fq if we are not over some
                                                  ///< GF
-                    const int k,                 ///< some int k such that k 
+                    const int k,                 ///< some int k such that k
                                                  ///< divides l if we are not
                                                  ///< over some Fq
                     const CanonicalForm& delta,  ///< [in] image of gamma
@@ -188,7 +193,7 @@ CFArray logarithmicDerivative (const CanonicalForm& F,///<[in] a bivariate poly
 /// @return an array of coefficients of the logarithmic derivative of G mod
 ///         Variable (2)^l
 CFArray
-logarithmicDerivative (const CanonicalForm& F,   ///< [in] bivariate poly 
+logarithmicDerivative (const CanonicalForm& F,   ///< [in] bivariate poly
                                                  ///< truncated at Variable(2)^l
                        const CanonicalForm& G,   ///< [in] a factor of F
                        int l,                    ///< [in] lifting precision
@@ -198,8 +203,8 @@ logarithmicDerivative (const CanonicalForm& F,   ///< [in] bivariate poly
                        CanonicalForm& Q          ///< [in, out] F/G
                       );
 
-/// compute bounds for logarithmic derivative as described in K. Belabas, 
-/// M. van Hoeij, J. Klüners, and A. Steel, Factoring polynomials over global 
+/// compute bounds for logarithmic derivative as described in K. Belabas,
+/// M. van Hoeij, J. Klüners, and A. Steel, Factoring polynomials over global
 /// fields
 ///
 /// @return @a computeBounds returns bounds as described above
@@ -224,7 +229,7 @@ computeBoundsWrtDiffMainvar
 ///
 /// @return coefficients of \f$ x^i \f$ for \f$i\geq k\f$
 /// @sa {getCoeffs (const CanonicalForm&, const int, const Variable&),
-/// getCoeffs (const CanonicalForm&, const int, const int, const int, 
+/// getCoeffs (const CanonicalForm&, const int, const int, const int,
 /// const Variable&, const CanonicalForm&, const mat_zz_p&)}
 CFArray
 getCoeffs (const CanonicalForm& F,///< [in] compressed bivariate poly over F_p
@@ -236,10 +241,10 @@ getCoeffs (const CanonicalForm& F,///< [in] compressed bivariate poly over F_p
 ///
 /// @return coefficients of \f$ x^i \f$ for \f$i\geq k\f$
 /// @sa {getCoeffs (const CanonicalForm&, const int),
-/// getCoeffs (const CanonicalForm&, const int, const int, const int, 
+/// getCoeffs (const CanonicalForm&, const int, const int, const int,
 /// const Variable&, const CanonicalForm&, const mat_zz_p&)}
 CFArray
-getCoeffs (const CanonicalForm& F,///< [in] compressed bivariate poly over 
+getCoeffs (const CanonicalForm& F,///< [in] compressed bivariate poly over
                                   ///< F_p(alpha)
            const int k,           ///< [in] some int
            const Variable& alpha  ///< [in] algebraic variable
@@ -280,7 +285,7 @@ int substituteCheck (const CFList& L ///< [in] a list of univariate polys
 
 /// substitute x^d by x in F
 void
-subst (const CanonicalForm& F, ///< [in] a polynomial 
+subst (const CanonicalForm& F, ///< [in] a polynomial
        CanonicalForm& A,       ///< [in,out] returns F with x^d replaced by x
        const int d,            ///< d > 1 such that a substitution x^d -> x
                                ///< [in] is possible
@@ -298,7 +303,7 @@ reverseSubst (const CanonicalForm& F, ///< [in] a poly
 
 /// reverse a substitution x^d->x
 void
-reverseSubst (CFList& L,        ///< [in,out] a list of polys, returns the 
+reverseSubst (CFList& L,        ///< [in,out] a list of polys, returns the
                                 ///< given list with x replaced by x^d
               const int d,      ///< [in] an integer > 0
               const Variable& x ///< [in] a Variable

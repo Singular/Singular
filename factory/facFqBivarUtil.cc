@@ -55,6 +55,13 @@ void decompress (CFFList& factors, const CFMap& N)
     i.getItem()= CFFactor (N (i.getItem().factor()), i.getItem().exp());
 }
 
+void decompress (CFAFList& factors, const CFMap& N)
+{
+  for (CFAFListIterator i= factors; i.hasItem(); i++)
+    i.getItem()= CFAFactor (N (i.getItem().factor()), i.getItem().minpoly(),
+                            i.getItem().exp());
+}
+
 void appendSwapDecompress (CFList& factors1, const CFList& factors2,
                            const CFList& factors3, const bool swap1,
                            const bool swap2, const CFMap& N)
