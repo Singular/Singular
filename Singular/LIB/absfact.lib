@@ -742,12 +742,6 @@ EXAMPLE: example absBiFactorize; shows an example
 
   poly p=imap(MP,p);
 
-  if (size (variables (p)) > 2)
-  {
-    ERROR("// absfact.lib::absBiFactorize is not implemented for polynomials "
-          +"with more than 2 variables");
-  }
-
   // special treatment in the homogeneous case, dropping one variable
   // by substituting the first variable by 1
   int ho=homog(p);
