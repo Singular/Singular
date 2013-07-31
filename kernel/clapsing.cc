@@ -1113,11 +1113,6 @@ ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & num
   }
   CanonicalForm F( convSingTrPFactoryP( f ) );
 
-  if (getNumVars (F) > 2)
-  {
-    WerrorS( feNotImplemented );
-    return res;
-  }
   CFAFList absFactors= absFactorize (F);
 
   int n= absFactors.length();
