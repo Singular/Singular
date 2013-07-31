@@ -159,4 +159,44 @@ def T=absBiFactorize (f3);
 setring T;
 absolute_factors;
 
+ring r2=0,(x,y,z,w),dp;
+poly f=(x2+y2+z2)^2+w4;
+def S =absFactorize(f);
+setring(S);
+absolute_factors;
+setring r2;
+def T=absBiFactorize (f);
+setring T;
+absolute_factors;
+
+ring r1=(0,a,b),(x,y),dp;
+poly p=(a3-a2b+27ab3-27b4)/(a+b5)*x2+(a2+27b3)*y;
+def S = absFactorize(p);
+setring(S);
+absolute_factors;
+setring r1;
+def T=absBiFactorize (p);
+setring T;
+absolute_factors;
+
+ring r3=0,(x,y,z,w),dp;
+poly f=(x2+y2+z2)^4+w8;
+def S =absFactorize(f);
+setring(S);
+absolute_factors;
+setring r3;
+def T=absBiFactorize (f);
+setring T;
+absolute_factors;
+
+ring R = 0, (x,y,z), dp;
+poly f = y4+z2-y2*(1-x2);
+def S = absFactorize(f);
+setring S;
+absolute_factors;
+setring R;
+def T=absBiFactorize (f);
+setring T;
+absolute_factors;
+
 tst_status(1);$
