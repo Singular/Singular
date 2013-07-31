@@ -768,7 +768,6 @@ tryAgainWithoutHeu:
       iter.getItem()= swapvar (iter.getItem(), w, y);
   }
 
-  swap (factors, 0, 0, x);
   append (factors, contentAFactors);
   decompress (factors, N);
   if (isOn (SW_RATIONAL))
