@@ -354,7 +354,7 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
   CFAFList factors;
   A *= bCommonDen (A);
   CFList Aeval, list, evaluation, bufEvaluation, bufAeval;
-  int factorNums= 2;
+  int factorNums= 1;
   CFAFList absBiFactors, absBufBiFactors;
   CanonicalForm evalPoly;
   int lift, bufLift, lengthAeval2= A.level()-2;
@@ -393,7 +393,6 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
     bufLift= degree (A, y) + 1 + degree (LC(A, x), y);
 
     TIMING_START (abs_fac_bi_factorizer);
-    CFFList test= factorize (bufAeval.getFirst());
     absBufBiFactors= absBiFactorizeMain (bufAeval.getFirst(), true);
     TIMING_END_AND_PRINT (abs_fac_bi_factorizer,
                           "time for bivariate factorization in abs fact: ");
