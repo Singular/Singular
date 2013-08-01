@@ -848,7 +848,7 @@ EXAMPLE: example lcm; shows an example
          break;
        }
      }
-     if(deg(p)==-1)
+     if(p==0)
      {
        return(1);
      }
@@ -859,12 +859,12 @@ EXAMPLE: example lcm; shows an example
            q=gcd(p,i[k]);
            if(maxdeg(q)==0)
            {
-                 p=p*i[k];
+             p=p*i[k];
            }
            else
            {
-              p=p/q;
-              p=p*i[k];
+             p=p/q;
+             p=p*i[k];
            }
         }
      }
