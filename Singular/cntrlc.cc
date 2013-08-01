@@ -9,7 +9,6 @@
 #ifdef DecAlpha_OSF1
 #define _XOPEN_SOURCE_EXTENDED
 #endif /* MP3-Y2 0.022UF */
-
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -21,24 +20,22 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
+
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
-
-#include <kernel/polys.h>
+#include <Singular/tok.h>
+#include <Singular/ipshell.h>
 #include <kernel/febase.h>
 void sig_chld_hdl(int sig); /*#include <Singular/links/ssiLink.h>*/
-//#include <Singular/feOpt.h>
-//#include <Singular/silink.h>
-//#include <Singular/ssiLink.h>
+#include <Singular/cntrlc.h>
+#include <Singular/feOpt.h>
 #include <Singular/si_signals.h>
-
-#include "tok.h"
-#include "ipshell.h"
-#include "cntrlc.h"
-#include "feOpt.h"
-#include "links/silink.h"
+#include <Singular/links/silink.h>
+#include <Singular/links/ssiLink.h>
 
 /* undef, if you don't want GDB to come up on error */
+
+#define CALL_GDB
 
 #if defined(__OPTIMIZE__) && defined(CALL_GDB)
 #undef CALL_GDB
@@ -92,13 +89,18 @@ void sig_pipe_hdl(int /*sig*/)
 
 void sig_term_hdl(int /*sig*/)
 {
- while (ssiToBeClosed!=NULL)
- {
-   slClose(ssiToBeClosed->l);
-   if (ssiToBeClosed==NULL) break;
-   ssiToBeClosed=(link_list)ssiToBeClosed->next;
- }
- exit(1);
+  if (ssiToBeClosed_inactive)
+  {
+    ssiToBeClosed_inactive=FALSE;
+    while (ssiToBeClosed!=NULL)
+    {
+      slClose(ssiToBeClosed->l);
+      if (ssiToBeClosed==NULL) break;
+      ssiToBeClosed=(link_list)ssiToBeClosed->next;
+    }
+    exit(1);
+  }
+  //else: we already shutting down: let's do m2_end ist work
 }
 
 /*---------------------------------------------------------------------*
@@ -120,7 +122,7 @@ typedef void (*si_hdl_typ)(int);
  * Functions declarations
  *
  *---------------------------------------------------------------------*/
-void sigint_handler(int sig);
+void sigint_handler(int /*sig*/);
 
 si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler);
 
@@ -282,6 +284,7 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
 #endif /* CALL_GDB */
   exit(0);
 }
+
 #else
 
 /*---------------------------------------------------------------------*/
@@ -309,7 +312,6 @@ void sigsegv_handler(int sig)
   }
   #endif /* __OPTIMIZE__ */
   #if defined(unix)
-  /* debug(..) does not work under HPUX (because ptrace does not work..) */
   #ifdef CALL_GDB
   if (sig!=SIGINT) debug(STACK_TRACE);
   #endif /* CALL_GDB */
@@ -317,6 +319,7 @@ void sigsegv_handler(int sig)
   exit(0);
 }
 #endif
+
 
 /*2
 * signal handler for SIGINT
