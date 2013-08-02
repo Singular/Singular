@@ -471,8 +471,8 @@ extEarlyFactorDetect (
 /// looks for a (F.level() - 1)-tuple such that the resulting univariate
 /// polynomial has main variable Variable (1), is squarefree and its degree
 /// coincides with degree(F) and the bivariate one is primitive wrt.
-/// Variable(1), and successively evaluated polynomials have the same degree in 
-/// their main variable as F has, fails if there are no valid evaluation points, 
+/// Variable(1), and successively evaluated polynomials have the same degree in
+/// their main variable as F has, fails if there are no valid evaluation points,
 /// eval contains the intermediate evaluated polynomials.
 ///
 /// @return @a evalPoints returns an evaluation point, which is valid if and
@@ -526,22 +526,22 @@ extFactorize (const CanonicalForm& F,   ///< [in] poly to be factored
 /// compute the LCM of the contents of @a A wrt to each variable occuring in @a
 /// A.
 ///
-/// @return @a lcmContent returns the LCM of the contents of @a A wrt to each 
+/// @return @a lcmContent returns the LCM of the contents of @a A wrt to each
 ///         variable occuring in @a A.
 CanonicalForm
-lcmContent (const CanonicalForm& A, ///< [in] a compressed multivariate poly 
+lcmContent (const CanonicalForm& A, ///< [in] a compressed multivariate poly
             CFList& contentAi       ///< [in,out] an empty list, returns a list
-                                    ///< of the contents of @a A wrt to each 
+                                    ///< of the contents of @a A wrt to each
                                     ///< variable occuring in @a A starting from
                                     ///< @a A.mvar().
            );
 
-/// compress a polynomial s.t. \f$ deg_{x_{i}} (F) >= deg_{x_{i+1}} (F) \f$ and 
+/// compress a polynomial s.t. \f$ deg_{x_{i}} (F) >= deg_{x_{i+1}} (F) \f$ and
 /// no gaps between the variables occur
 ///
 /// @return a compressed poly with the above properties
 CanonicalForm myCompress (const CanonicalForm& F, ///< [in] a poly
-                          CFMap& N                ///< [in,out] a map to 
+                          CFMap& N                ///< [in,out] a map to
                                                   ///< decompress
                          );
 
@@ -578,7 +578,7 @@ refineBiFactors (const CanonicalForm& A,  ///< [in] some poly
 
 /// plug in evalPoint for y in a list of polys
 ///
-/// @return returns a list of the evaluated polys, these evaluated polys are 
+/// @return returns a list of the evaluated polys, these evaluated polys are
 /// made monic
 CFList
 buildUniFactors (const CFList& biFactors,       ///< [in] a list of polys
@@ -606,7 +606,7 @@ getLeadingCoeffs (const CanonicalForm& A,  ///< [in] some poly
                  );
 
 /// normalize precomputed leading coefficients such that leading coefficients
-/// evaluated at @a evaluation in K^(n-2) equal the leading coeffs wrt 
+/// evaluated at @a evaluation in K^(n-2) equal the leading coeffs wrt
 /// Variable(1) of bivariate factors and change @a A and @a Aeval accordingly
 void
 prepareLeadingCoeffs (CFList*& LCs,               ///<[in,out]
@@ -640,11 +640,11 @@ leadingCoeffReconstruction (const CanonicalForm& F,///<[in] poly to be factored
 CFList
 distributeContent (
           const CFList& L,                        ///<[in] list of polys, first
-                                                  ///< entry the content to be 
+                                                  ///< entry the content to be
                                                   ///< distributed
-          const CFList* differentSecondVarFactors,///<[in] factorization wrt 
+          const CFList* differentSecondVarFactors,///<[in] factorization wrt
                                                   ///< different second vars
-          int length                              ///<[in] length of 
+          int length                              ///<[in] length of
                                                   ///<differentSecondVarFactors
                   );
 
@@ -658,7 +658,7 @@ gcdFreeBasis (CFFList& factors1, ///< [in,out] list of factors, returns gcd free
 
 /// computes a list l of length length(LCFFactors)+1 of polynomials such that
 /// prod (l)=LCF, note that the first entry of l may be non constant. Intended
-/// to be used to precompute coefficients of a polynomial f from its bivariate 
+/// to be used to precompute coefficients of a polynomial f from its bivariate
 /// factorizations.
 ///
 /// @return see above
@@ -794,4 +794,3 @@ LCHeuristic4 (const CFList& oldBiFactors,   ///<[in] bivariate factors
 
 #endif
 /* FAC_FQ_FACTORIZE_H */
-
