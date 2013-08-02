@@ -7,7 +7,7 @@
  * a finite field.
  *
  * ABSTRACT: "Efficient Multivariate Factorization over Finite Fields" by
- * L. Bernardin & M. Monagon. Precomputation of leading coefficients is 
+ * L. Bernardin & M. Monagon. Precomputation of leading coefficients is
  * described in "Sparse Hensel lifting" by E. Kaltofen
  *
  * @author Martin Lee
@@ -2010,7 +2010,7 @@ recombination (const CFList& factors1, const CFList& factors2, int s, int thres,
       }
     }
     s++;
-    if (T.length() < 2*s || T.length() == s) 
+    if (T.length() < 2*s || T.length() == s)
     {
       delete [] v;
       result.append (prod (T));
@@ -3633,4 +3633,3 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
 #endif
 /* HAVE_NTL */
-
