@@ -125,7 +125,7 @@ RothsteinTrager (const CanonicalForm& F, const CFList& factors,
   CanonicalForm derivH= deriv (H, x);
   CanonicalForm w= G*derivH;
   Variable y= Variable (F.level()+1);
-  w= replacevar (w, alpha, y); //teuer
+  w= replacevar (w, alpha, y);
 
   int s= totaldegree (F)/totaldegree (H);
 
@@ -224,58 +224,7 @@ CFList evalPoints4AbsFact (const CanonicalForm& F, CFList& eval, Evaluation& E)
   return result;
 }
 
-void
-evaluationWRTDifferentSecondVars4AbsFact (CFList*& Aeval,
-                                          const CFList& evaluation,
-                                          const CanonicalForm& A)
-{
-  CanonicalForm tmp;
-  CFList tmp2;
-  CFFList uniFactors;
-  CFListIterator iter;
-  bool preserveDegree= true;
-  Variable x= Variable (1);
-  int j, degAi, degA1= degree (A,1);
-  for (int i= A.level(); i > 2; i--)
-  {
-    tmp= A;
-    tmp2= CFList();
-    iter= evaluation;
-    preserveDegree= true;
-    degAi= degree (A,i);
-    for (j= A.level(); j > 1; j--, iter++)
-    {
-      if (j == i)
-        continue;
-      else
-      {
-        tmp= tmp (iter.getItem(), j);
-        tmp2.insert (tmp);
-        if ((degree (tmp, i) != degAi) ||
-            (degree (tmp, 1) != degA1))
-        {
-          preserveDegree= false;
-          break;
-        }
-      }
-    }
-    if (!content(tmp,1).inCoeffDomain())
-      preserveDegree= false;
-    if (!(gcd (deriv (tmp,x), tmp)).inCoeffDomain())
-      preserveDegree= false;
-    uniFactors= factorize (tmp);
-    if (uniFactors.getFirst().factor().inCoeffDomain())
-      uniFactors.removeFirst();
-    if (uniFactors.length() > 1 || uniFactors.getFirst().exp() > 1)
-      preserveDegree= false;
-    if (preserveDegree)
-      Aeval [i - 3]= tmp2;
-    else
-      Aeval [i - 3]= CFList();
-  }
-}
-
-CFAFList absFactorize (const CanonicalForm& G ///<[in] bivariate poly over Q
+CFAFList absFactorize (const CanonicalForm& G
                            )
 {
   //TODO handle homogeneous input, is already done in LIB interface but still...
@@ -380,7 +329,7 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
     evalPoly= 0;
 
     TIMING_START (abs_fac_evaluation);
-    evaluationWRTDifferentSecondVars4AbsFact (bufAeval2, bufEvaluation, A);
+    evaluationWRTDifferentSecondVars (bufAeval2, bufEvaluation, A);
     TIMING_END_AND_PRINT (abs_fac_evaluation,
                           "time to eval wrt diff second vars in abs fact: ");
 
@@ -421,7 +370,8 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
     else
     {
       if (absBufBiFactors.length() < absBiFactors.length() ||
-          ((bufLift < lift) && (absBufBiFactors.length() == absBiFactors.length())) ||
+          ((bufLift < lift) &&
+          (absBufBiFactors.length() == absBiFactors.length())) ||
           counter > differentSecondVar)
       {
         Aeval= bufAeval;
@@ -495,7 +445,7 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
       {
         for (CFListIterator iter= rationalFactors; iter.hasItem(); iter++)
         {
-          if (totaldegree (iter.getItem())*degree (getMipo (v)) == totaldegree (G))
+          if (totaldegre(iter.getItem())*degree(getMipo(v)) == totaldegree (G))
           {
             factors= CFAFList (CFAFactor (iter.getItem(), getMipo (v), 1));
             found= true;
@@ -549,7 +499,8 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
   leadingCoeffs.removeFirst();
 
   if (!LCmultiplierIsConst)
-    distributeLCmultiplier (A, leadingCoeffs, biFactors, evaluation, LCmultiplier);
+    distributeLCmultiplier (A, leadingCoeffs, biFactors, evaluation,
+                            LCmultiplier);
 
   //prepare leading coefficients
   CFList* leadingCoeffs2= new CFList [lengthAeval2];
@@ -594,7 +545,7 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
 
       for (CFListIterator iter= rationalFactors; iter.hasItem(); iter++)
       {
-        if (totaldegree (iter.getItem())*degree (getMipo (v)) == totaldegree (G))
+        if (totaldegree(iter.getItem())*degree (getMipo (v)) == totaldegree (G))
         {
           factors= CFAFList (CFAFactor (iter.getItem(), getMipo (v), 1));
           found=true;
@@ -645,7 +596,7 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
       rationalFactors= oldFactors;
       CFList contents, LCs;
       bool foundTrueMultiplier= false;
-      LCHeuristic2 (LCmultiplier, rationalFactors, leadingCoeffs2[lengthAeval2-1],
+      LCHeuristic2 (LCmultiplier,rationalFactors,leadingCoeffs2[lengthAeval2-1],
                     contents, LCs, foundTrueMultiplier);
       if (foundTrueMultiplier)
       {
@@ -659,14 +610,14 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
       else
       {
         bool foundMultiplier= false;
-        LCHeuristic3 (LCmultiplier, rationalFactors, oldBiFactors, contents, oldAeval,
-                      A, leadingCoeffs2, lengthAeval2, foundMultiplier);
+        LCHeuristic3 (LCmultiplier, rationalFactors, oldBiFactors, contents,
+                      oldAeval,A,leadingCoeffs2, lengthAeval2, foundMultiplier);
         // coming from above: divide out more LCmultiplier if possible
         if (foundMultiplier)
         {
           foundMultiplier= false;
-          LCHeuristic4 (oldBiFactors, oldAeval, contents, rationalFactors, testVars,
-                        lengthAeval2, leadingCoeffs2, A, LCmultiplier,
+          LCHeuristic4 (oldBiFactors, oldAeval, contents, rationalFactors,
+                        testVars, lengthAeval2, leadingCoeffs2, A, LCmultiplier,
                         foundMultiplier);
         }
         else
@@ -811,7 +762,7 @@ tryAgainWithoutHeu:
                         "time to clear denominators in abs fact: ");
 
   TIMING_START (abs_fac_hensel_lift);
-  rationalFactors= nonMonicHenselLift (Aeval, biFactors, leadingCoeffs2, diophant,
+  rationalFactors= nonMonicHenselLift (Aeval, biFactors,leadingCoeffs2,diophant,
                                Pi, liftBounds, liftBoundsLength, noOneToOne);
   TIMING_END_AND_PRINT (abs_fac_hensel_lift,
                         "time for non monic hensel lifting in abs fact: ");
