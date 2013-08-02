@@ -11,14 +11,32 @@ AS_HELP_STRING([--enable-gfanlib], [Enables gfanlib, a package for basic convex 
 AC_MSG_CHECKING(whether to build with gfanlib)
 if test "x$ENABLE_GFANLIB" = xyes; then
  AC_MSG_RESULT(yes)
- AC_CHECK_LIB(cddgmp,dd_set_global_constants,[
-  CDDGMPLDFLAGS="-lcddgmp"
-  PASSED_ALL_TESTS_FOR_GFANLIB="yes";
-  ],[
-  PASSED_ALL_TESTS_FOR_GFANLIB="no";
-  echo "Error! cddgmp needed!"
-  exit -1
-  ])
+ AC_LANG_PUSH(C++)
+ SAVE_LIBS=$LIBS
+ LIBS="$LIBS -lcddgmp"
+AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([#include <cdd/setoper.h>
+  #include <cdd/cdd.h>],
+    [dd_set_global_constants()])],
+  [LIBS="$SAVE_LIBS -lcddgmp"] [CDDGMPLDFLAGS="-lcddgmp"] 
+  [PASSED_ALL_TESTS_FOR_GFANLIB="yes"],
+  [AC_MSG_WARN([libcddgmp is not installed.])] 
+  [PASSED_ALL_TESTS_FOR_GFANLIB="no"
+  ]
+)
+if test "$PASSED_ALL_TESTS_FOR_GFANLIB" != yes; then
+AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([#include <setoper.h>
+  #include "cdd.h"],
+    [dd_set_global_constants()])],
+  [LIBS="$SAVE_LIBS -lcddgmp"] [CDDGMPLDFLAGS="-lcddgmp"] 
+  [PASSED_ALL_TESTS_FOR_GFANLIB="yes"],
+  [AC_MSG_WARN([libcddgmp is not installed.])] 
+  [PASSED_ALL_TESTS_FOR_GFANLIB="no";
+  exit 1]
+)
+fi
+  AC_LANG_POP()
 else
  AC_MSG_RESULT(no)
  PASSED_ALL_TESTS_FOR_GFANLIB="no";
