@@ -445,7 +445,7 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
       {
         for (CFListIterator iter= rationalFactors; iter.hasItem(); iter++)
         {
-          if (totaldegre(iter.getItem())*degree(getMipo(v)) == totaldegree (G))
+          if (totaldegree(iter.getItem())*degree(getMipo(v)) == totaldegree (G))
           {
             factors= CFAFList (CFAFactor (iter.getItem(), getMipo (v), 1));
             found= true;
