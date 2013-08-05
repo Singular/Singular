@@ -131,7 +131,7 @@ std::string toString(const gfan::ZCone* const c)
   if (ineqs!=NULL)
   {
     s<<ineqs<<std::endl;
-    delete ineqs;
+    omFree(ineqs);
   }
 
   gfan::ZMatrix e=c->getEquations();
@@ -143,7 +143,7 @@ std::string toString(const gfan::ZCone* const c)
   if (eqs!=NULL)
   {
     s<<eqs<<std::endl;
-    delete eqs;
+    omFree(eqs);
   }
 
   if (c->areExtremeRaysKnown())
@@ -154,7 +154,7 @@ std::string toString(const gfan::ZCone* const c)
     if (rs!=NULL)
     {
       s<<rs<<std::endl;
-      delete rs;
+      omFree(rs);
     }
     gfan::ZMatrix l=c->generatorsOfLinealitySpace();
     char* ls = toString(l);
@@ -162,7 +162,7 @@ std::string toString(const gfan::ZCone* const c)
     if (ls!=NULL)
     {
       s<<ls<<std::endl;
-      delete ls;
+      omFree(ls);
     }
   }
 
