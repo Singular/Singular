@@ -244,11 +244,29 @@ int main( int, char *argv[] )
      return(1);
   }
    
-
-   
    // init path names etc.
 //  feInitResources(argv[0]); //???
   siInit(argv[0]); // ?
+
+  if( char *s = versionString() )
+  { 
+    PrintS(s);
+    omFree(s);
+  }
+   
+   
+
+  StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
+  feStringAppendResources(0);
+  StringAppendS("\n"); 
+  if( char * s = StringEndS() )
+  {
+    PrintS(s);
+    omFree(s);
+  }
+   
+   
+   
 
   // Libpolys tests:
 
@@ -260,15 +278,8 @@ int main( int, char *argv[] )
   n[2]=omStrDup("z2");
 
 
+
 /*
-  StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
-  feStringAppendResources(0);
-  StringAppendS("\n"); 
-  char * s = StringEndS();
-  PrintS(s);
-  omFree(s);
-
-
   ring R=rDefault(32003,3,n);
   // make R the default ring:
   rChangeCurrRing(R);
