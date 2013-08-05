@@ -186,7 +186,6 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 
 // headers in Singular/
 #include "attrib.h"
-#include "bigintm.h"
 #include "blackbox.h"
 #include "Cache.h"
 #include "CacheImplementation.h"
