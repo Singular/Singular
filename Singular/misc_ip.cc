@@ -771,10 +771,10 @@ char * showOption()
 char * versionString()
 {
   StringSetS("");
-  StringAppend("Singular for %s version %s (%s)  %s\nwith\n", // %d-
+  StringAppend("Singular for %s version %s (%s, %d bit) %s, SHA1: $Id$",
                S_UNAME, S_VERSION1, // SINGULAR_VERSION,
-               PACKAGE_VERSION, singular_date);
-  StringAppendS("\t");
+               PACKAGE_VERSION, SIZEOF_LONG*8, singular_date);
+  StringAppendS("\nwith\n\t");
 #ifdef HAVE_FACTORY
   StringAppend("factory(%s){'%s','%s'}", factoryVersion, FACTORY_CFLAGS, FACTORY_LIBS);
 #ifdef HAVE_LIBFAC
