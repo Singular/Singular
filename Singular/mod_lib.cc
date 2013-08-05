@@ -32,6 +32,9 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   const unsigned char mach_o64[]={0xfe,0xed,0xfa,0xcf,0};
   const unsigned char mach_O64[]={0xcf,0xfa,0xed,0xfe,0};
 
+  const unsigned char mach_FAT[]={0xca,0xfe,0xba,0xbe,0};
+  const unsigned char mach_fat[]={0xbe,0xba,0xfe,0xca,0};
+
   int i=0;
   while(si_builtin_libs[i]!=NULL)
   {
@@ -91,6 +94,14 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   }
 
   if( (strncmp(buf, (const char *)mach_o64, 4)==0) || (strncmp(buf, (const char *)mach_O64, 4)==0)) /* generic Mach-O 64-bit module */
+  {
+    LT = LT_MACH_O;
+    //omFree(newlib);
+    //newlib = omStrDup(libnamebuf);
+    goto lib_type_end;
+  }
+
+  if( (strncmp(buf, (const char *)mach_FAT, 4)==0) || (strncmp(buf, (const char *)mach_fat, 4)==0)) /* generic Mach-O fat universal module */
   {
     LT = LT_MACH_O;
     //omFree(newlib);
