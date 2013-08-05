@@ -2,4 +2,13 @@
 dyn_modules/ederc.tst
 dyn_modules/p_content.tst
 dyn_modules/syzextra.tst
-dyn_modules/test_clear_enum.tst
+; dyn_modules/test_clear_enum.tst
+Manual/python_eval.tst
+Manual/python_import.tst
+Manual/python_run.tst
+Manual/pyobject.tst
+Manual/pyobject_declarations.tst
+Manual/pyobject_expressions.tst
+Manual/pyobject_operations.tst
+Manual/pyobject_related_functions.tst
+Manual/pyobject_related_functions_1.tst
