@@ -1,5 +1,6 @@
 #include <factory/factory.h>
 #include <resources/feFopen.h>
+#include "cf_assert.h"
 
 int mmInit(void) {
 #ifdef SINGULAR
@@ -100,7 +101,16 @@ extern void feInitResources(const char* argv0 = NULL);
 int main( int, char *argv[] )
 {
   int ret = 0;
-  
+
+  ASSERT( sizeof(long) == SIZEOF_LONG, "Bad config.h: wrong size of long!"  );
+
+  if( sizeof(long) != SIZEOF_LONG )
+  {
+    printf("Bad config.h: wrong size of long!");
+
+    return(1);
+  }
+   
   feInitResources(argv[0]);
 
 //  On (SW_USE_EZGCD); On (SW_USE_EZGCD_P); // TODO&NOTE: these switches lead to failed tests (with nonzero p)!

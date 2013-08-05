@@ -255,6 +255,16 @@ bool Test(const n_coeffType type, void* p = NULL)
 
 int main( int, char *argv[] ) 
 {
+  assume( sizeof(long) == SIZEOF_LONG );
+
+  if( sizeof(long) != SIZEOF_LONG )
+  {
+    WerrorS("Bad config.h: wrong size of long!");
+
+    return(1);
+  }
+
+   
   feInitResources(argv[0]);
 
   StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");

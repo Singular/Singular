@@ -235,7 +235,18 @@ void siInit(char *);
 
 int main( int, char *argv[] )
 {
-  // init path names etc.
+  assume( sizeof(long) == SIZEOF_LONG );
+   
+  if( sizeof(long) != SIZEOF_LONG )
+  {
+     WerrorS("Bad config.h: wrong size of long!");
+     
+     return(1);
+  }
+   
+
+   
+   // init path names etc.
 //  feInitResources(argv[0]); //???
   siInit(argv[0]); // ?
 
