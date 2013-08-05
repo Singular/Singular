@@ -1,4 +1,4 @@
-LIB "tst.lib"; tst_init();
+LIB "tst.lib"; tst_init(); LIB("pyobject.so");
   python_import("os");
   name;                         // e. g. 'posix'
   sep;                          // pathname separator

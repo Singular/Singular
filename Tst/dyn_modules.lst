@@ -12,3 +12,5 @@ Manual/pyobject_expressions.tst
 Manual/pyobject_operations.tst
 Manual/pyobject_related_functions.tst
 Manual/pyobject_related_functions_1.tst
+Short/pyobject.tst
+; Short/polybori_s.tst ;; needs Polybori
