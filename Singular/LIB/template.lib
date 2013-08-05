@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version="version template.lib 4.0.0.0 Jun_2013 ";
+version="version template.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Miscellaneous";
 // summary description of the library
 info="

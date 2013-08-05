@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version rinvar.lib 4.0.0.0 Jun_2013 ";
+version="version rinvar.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups

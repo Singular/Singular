@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-version="version standard.lib 4.0.0.0 Jun_2013 ";
+version="version standard.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -1062,19 +1062,19 @@ EXAMPLE: example groebner;  shows an example"
   //define conversion:
   if( find(method,"hilb") && !find(method,"fglm") )
   {
-     conversion = "hilb";
+     conversion = "hilb"; // $Id$
   }
   if( find(method,"fglm") && !find(method,"hilb") )
   {
-    conversion = "fglm";
+    conversion = "fglm"; // $Id$
   }
   if( find(method,"fglm") && find(method,"hilb") )
   {
-    conversion = "hilborfglm";
+    conversion = "hilborfglm"; // $Id$
   }
   if( !find(method,"fglm") && !find(method,"hilb") )
   {
-    conversion = "no";
+    conversion = "no"; // $Id$
   }
 
   //define partovar:

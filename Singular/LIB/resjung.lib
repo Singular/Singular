@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version resjung.lib 4.0.0.0 Jun_2013 ";
+version="version resjung.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  jung.lib      Resolution of surface singularities (Desingularization)

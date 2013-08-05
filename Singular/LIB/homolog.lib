@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version homolog.lib 4.0.0.0 Jun_2013 ";
+version="version homolog.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra

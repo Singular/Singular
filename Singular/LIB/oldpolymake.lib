@@ -1,5 +1,5 @@
 ////
-version="version oldpolymake.lib 4.0.0.0 Jun_2013 ";
+version="version oldpolymake.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Tropical Geometry";
 info="
 LIBRARY:   oldpolymake.lib  Computations with polytopes and fans,

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version resolve.lib 4.0.0.0 Jun_2013 ";
+version="version resolve.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:  resolve.lib      Resolution of singularities (Desingularization)

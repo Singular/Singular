@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version gmspoly.lib 4.0.0.0 Jun_2013 ";
+version="version gmspoly.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Singularities";
 
 info="

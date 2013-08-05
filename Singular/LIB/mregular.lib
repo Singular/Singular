@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version mregular.lib 4.0.0.0 Jun_2013 ";
+version="version mregular.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: mregular.lib   Castelnuovo-Mumford regularity of homogeneous ideals

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-version="version dmodvar.lib 4.0.0.0 Jun_2013 ";
+version="version dmodvar.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Noncommutative";
 info="
 LIBRARY: dmodvar.lib     Algebraic D-modules for varieties

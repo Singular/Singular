@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version monomialideal.lib 4.0.0.0 Jun_2013 ";
+version="version monomialideal.lib 4.0.0.0 Jun_2013 "; // $Id$
 category = "Commutative algebra";
 info = "
 LIBRARY: monomialideal.lib   Primary and irreducible decompositions of monomial

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version latex.lib 4.0.0.0 Jun_2013 ";
+version="version latex.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
