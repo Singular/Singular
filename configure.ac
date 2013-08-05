@@ -73,9 +73,9 @@ SING_CHECK_CPU
 
 #check for host:
 AC_CANONICAL_HOST
+
 case $host_os in
-  *cygwin* ) LIBPREFIX="-Xlinker -Bdynamic";;
-  * ) LIBPREFIX="";;
+  *cygwin* ) AX_APPEND_LINK_FLAGS([-Wl,-Bdynamic]);;
 esac
 
 

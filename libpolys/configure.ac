@@ -64,13 +64,13 @@ SING_CHECK_CPU
 
 #check for host:
 AC_CANONICAL_HOST
+
 case $host_os in
-  *cygwin* ) LIBPREFIX="-Xlinker -Bdynamic";;
-  * ) LIBPREFIX="";;
+  *cygwin* ) AX_APPEND_LINK_FLAGS([-Wl,-Bdynamic]);;
 esac
 
 dnl INCLUDES=""
-dnl dnl OS specific flags and options
+dnl dnl OS specific flags and options (does work without the following:) 
 dnl case "$host" in
 dnl     *-*-freebsd*)
 dnl         LIBS="$LIBS -L/usr/local/lib -lc"
