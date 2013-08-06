@@ -43,6 +43,11 @@ the 3-1-6 pre-release series).
 @item @nref{sba}: an F5 like Groebner base computation
 @end itemize
 
+@heading New libraries
+@itemize
+@item @nref{classifyci_lib}: Isolated complete intersection singularities in characteristic  0
+@end itemize
+
 @heading Porting
 
 @itemize @bullet
