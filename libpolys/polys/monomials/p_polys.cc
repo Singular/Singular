@@ -60,6 +60,8 @@
 #include "clapsing.h"
 #endif
 
+#define ADIDEBUG 0
+
 /*
  * lift ideal with coeffs over Z (mod N) to Q via Farey
  */
@@ -1232,6 +1234,13 @@ BOOLEAN p_OneComp(poly p, const ring r)
 */
 int p_IsPurePower(const poly p, const ring r)
 {
+#ifdef HAVE_RINGS 
+  if (rField_is_Ring(r))
+  	{
+  	if (p == NULL) return 0;
+  	if (!n_IsUnit(pGetCoeff(p), r->cf)) return 0;
+  	}
+#endif
   int i,k=0;
 
   for (i=r->N;i;i--)
@@ -2821,8 +2830,8 @@ void p_ProjectiveUnique(poly ph, const ring r)
   if (rField_is_Ring(r))
   {
     p_Content(ph,r);
-    assume( n_GreaterZero(pGetCoeff(ph),C) );
     if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
+	assume( n_GreaterZero(pGetCoeff(ph),C) );
     return;
   }
 #endif

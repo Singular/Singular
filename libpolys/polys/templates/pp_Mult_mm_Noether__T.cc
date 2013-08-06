@@ -28,6 +28,7 @@ LINKAGE poly pp_Mult_mm_Noether__T(poly p, const poly m, const poly spNoether, i
   }
   spolyrec rp;
   poly q = &rp, r;
+  number n;
   const unsigned long *spNoether_exp = spNoether->exp;
   number ln = pGetCoeff(m);
   omBin bin = ri->PolyBin;
@@ -51,10 +52,24 @@ LINKAGE poly pp_Mult_mm_Noether__T(poly p, const poly m, const poly spNoether, i
     break;
 
     Continue:
-    l++;
-    q = pNext(q) = r;
-    pSetCoeff0(q, n_Mult__T(ln, pGetCoeff(p), ri));
-    pIter(p);
+     
+    n = n_Mult__T(ln, pGetCoeff(p), ri);
+     
+    #ifdef HAVE_RINGS
+    if(n_IsZero__T(n, ri))
+    {
+      n_Delete__T(&n, ri); 
+      p_FreeBinAddr(r, ri);       
+    } else     
+    #endif
+    { 
+      l++;
+      q = pNext(q) = r;
+      pSetCoeff0(q, n);
+    }
+     
+    pIter(p);       
+    
   } while (p != NULL);
 
   if (ll < 0)

@@ -984,6 +984,21 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
 {
   int  i;
   int  k = ak;
+  
+  #if HAVE_RINGS
+  if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
+  {
+  //consider just monic generators (over rings with zero-divisors)
+  ideal SS=id_Copy(S,tailRing);
+  for(i=0;i<=idElem(SS);i++)
+  	{
+  	if(pIsPurePower(SS->m[i])==0)
+  		p_Delete(&SS->m[i],tailRing);
+  	}
+  	S=id_Copy(SS,tailRing);
+  }
+  #endif
+
   hNvar = (currRing->N);
   hexist = hInit(S, Q, &hNexist, tailRing);
   if (k!=0)
