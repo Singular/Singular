@@ -1732,7 +1732,13 @@ loop_count = 1;
                     strat, strat->tl);
 
       // apply hilbert criterion
-      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+      if (hilb!=NULL) 
+      	{
+      	if (strat->homog==isHomog)
+      		khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+      	else
+      		khCheckLocInhom(Q,w,hilb,hilbcount,strat);
+      	}
 
       // clear strat->P
       if (strat->P.lcm!=NULL)

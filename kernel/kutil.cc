@@ -7239,6 +7239,18 @@ void enterSyz(LObject p, kStrategy strat)
 
 void initHilbCrit(ideal/*F*/, ideal /*Q*/, intvec **hilb,kStrategy strat)
 {
+
+  //if the ordering is local, then hilb criterion 
+  //can be used also if tzhe ideal is not homogenous
+  if((currRing->OrdSgn == -1) && (currRing->MixedOrder == 0 ))
+  #ifdef HAVE_RINGS
+  {
+  if(rField_is_Ring(currRing))
+  	*hilb=NULL;
+  else
+   	return;
+  }
+#endif
   if (strat->homog!=isHomog)
   {
     *hilb=NULL;

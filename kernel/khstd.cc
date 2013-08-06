@@ -8,15 +8,19 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
+
 #include <kernel/mod2.h>
-#include <kernel/febase.h>
 #include <misc/options.h>
-#include <kernel/polys.h>
 #include <misc/intvec.h>
+#include <polys/simpleideals.h>
+#include <kernel/febase.h>
+#include <kernel/polys.h>
 #include <kernel/kutil.h>
 #include <kernel/stairc.h>
 #include <kernel/kstd1.h>
 #include <kernel/khstd.h>
+
+#define ADIDEBUG 0
 
 
 /*2
@@ -125,4 +129,75 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
       deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
     }
   }
+}
+
+
+void khCheckLocInhom(ideal Q, intvec *w, intvec *hilb, int &count,
+             kStrategy strat)
+             
+/*
+This will be used for the local orderings in the case of the inhomogenous ideals.
+Assume f1,...,fs are already in the standard basis. Test if hilb(LM(f1),...,LM(fs),1)
+is equal to the inputed one. 
+If no, do nothing.
+If Yes, we know that all polys that we need are already in the standard basis
+so delete all the remaining pairs
+*/
+{
+int i;
+ideal Lm;
+intvec *newhilb;
+
+Lm = id_Head(strat->Shdl,currRing);
+
+newhilb =hHstdSeries(Lm,w,strat->kHomW,Q,currRing);
+
+#if ADIDEBUG
+PrintS("\nOriginal\n");
+int   j, l, k;
+  if (hilb == NULL)
+    return;
+  l = hilb->length()-1;
+  k = (*hilb)[l];
+  for (i = 0; i < l; i++)
+  {
+    j = (*hilb)[i];
+    if (j != 0)
+    {
+      Print("//  %8d t^%d\n", j, i+k);
+    }
+  }
+  PrintS("\nActual\n");
+  if (newhilb == NULL)
+    return;
+  l = newhilb->length()-1;
+  k = (*newhilb)[l];
+  for (i = 0; i < l; i++)
+  {
+    j = (*newhilb)[i];
+    if (j != 0)
+    {
+      Print("//  %8d t^%d\n", j, i+k);
+    }
+  }
+#endif
+
+if(newhilb->compare(hilb) == 0)
+	{
+		while (strat->Ll>=0)
+          {
+            count++;
+            if(TEST_OPT_PROT)
+            {
+              PrintS("h");
+              mflush();
+            }
+            deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+          }
+          delete newhilb;
+          return;
+   }
+   
+id_Delete(&Lm,currRing);
+	
 }
