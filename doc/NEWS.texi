@@ -21,6 +21,12 @@
 
 @heading News for version @value{VERSION}
 
+@heading New libraries
+@itemize
+@item @nref{classifyci_lib}: Isolated complete intersection singularities in characteristic  0
+@end itemize
+
+
 @heading New @sc{Singular} libraries
 @itemize @bullet
 @item new library: classifyceq.lib:  simple hypersurface singularities in characteristic p (@nref{classifyceq_lib})
