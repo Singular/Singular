@@ -378,17 +378,17 @@ char* bigintmat::String()
 char* bigintmat::StringAsPrinted()
 {
   if ((col==0) || (row==0))
-    PrintS("");
+    return NULL;
   else
   {
     int * colwid = getwid(80);
-    char * ps;
     if (colwid == NULL)
     {
       WerrorS("not enough space to print bigintmat");
       WerrorS("try string(...) for a unformatted output");
-      return ps;
+      return NULL;
     }
+    char * ps;
     int slength = 0;
     for (int j=0; j<col; j++)
       slength += colwid[j]*row;
