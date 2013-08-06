@@ -2486,14 +2486,14 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
   rRenameVars(R);
   rComplete(R);
 
-#ifdef HAVE_RINGS
+/*#ifdef HAVE_RINGS
 // currently, coefficients which are ring elements require a global ordering:
   if (rField_is_Ring(R) && (R->OrdSgn==-1))
   {
     WerrorS("global ordering required for these coefficients");
     goto rCompose_err;
   }
-#endif
+#endif*/
 
 
   // ------------------------ Q-IDEAL ------------------------
@@ -5328,14 +5328,14 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   if (rComplete(R,1))
     goto rInitError;
 
-#ifdef HAVE_RINGS
+/*#ifdef HAVE_RINGS
 // currently, coefficients which are ring elements require a global ordering:
   if (rField_is_Ring(R) && (R->OrdSgn==-1))
   {
     WerrorS("global ordering required for these coefficients");
     goto rInitError;
   }
-#endif
+#endif*/
 
   rTest(R);
 

@@ -25,7 +25,6 @@
 
 #include <kernel/polys.h>
 
-
 #define HAVE_TAIL_BIN
 // This doesn't really work, fixme, if necessary
 // #define HAVE_LM_BIN
@@ -1003,7 +1002,7 @@ KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
 #ifdef HAVE_RINGS
 // get m1 = LCM(LM(p1), LM(p2))/LM(p1)
 //     m2 = LCM(LM(p1), LM(p2))/LM(p2)   in tailRing
-//    lcm = LCM(LM(p1), LM(p2)           in leadRing
+//    lcm = LCM(LM(p1), LM(p2))          in leadRing
 KINLINE void k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadRing,
                                poly &m1, poly &m2, poly &lcm, const ring tailRing)
 {

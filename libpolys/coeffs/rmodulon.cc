@@ -24,6 +24,11 @@
 
 #include <string.h>
 
+#include <polys/monomials/p_polys.h>
+#include <kernel/polys.h>
+
+#define ADIDEBUG 0
+
 /// Our Type!
 static const n_coeffType ID = n_Zn;
 static const n_coeffType ID2 = n_Znm;
@@ -97,6 +102,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->nCoeffIsEqual = nrnCoeffsEqual;
   r->cfInit_bigint = nrnMapQ;
   r->cfKillChar    = ndKillChar;
+
 #ifdef LDEBUG
   r->cfDBTest      = nrnDBTest;
 #endif
@@ -219,6 +225,12 @@ number nrnGcd(number a, number b, const coeffs r)
   if ((a == NULL) && (b == NULL)) return nrnInit(0,r);
   int_number erg = (int_number)omAllocBin(gmp_nrz_bin);
   mpz_init_set(erg, r->modNumber);
+  //had a problem here: in Z/10 nrnGcd(4,4) = 2
+  /*#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing) && currRing->OrdSgn == -1)
+  	if(nEqual(a,b)) 
+  		return a;
+  #endif*/
   if (a != NULL) mpz_gcd(erg, erg, (int_number)a);
   if (b != NULL) mpz_gcd(erg, erg, (int_number)b);
   return (number)erg;
@@ -354,7 +366,25 @@ BOOLEAN nrnDivBy(number a, number b, const coeffs r)
   else
   { /* b divides a iff b/gcd(a, b) is a unit in the given ring: */
     number n = nrnGcd(a, b, r);
-    mpz_tdiv_q((int_number)n, (int_number)b, (int_number)n);
+    
+    #if ADIDEBUG
+    poly ppp=pInit();
+	pSetExp(ppp,1,0);
+	pSetCoeff0(ppp,a);
+	printf("\nNEW:\n a = ");pWrite(ppp);
+	pSetCoeff0(ppp,b);
+	printf("\n b = ");pWrite(ppp);
+	pSetCoeff0(ppp,n);
+	printf("\n nrnGcd = ");pWrite(ppp);
+	#endif
+	
+	mpz_tdiv_q((int_number)n, (int_number)b, (int_number)n);
+	
+    #if ADIDEBUG
+    pSetCoeff0(ppp,n);
+	printf("\n b/nrnGcd = ");pWrite(ppp);
+    #endif
+
     bool result = nrnIsUnit(n, r);
     nrnDelete(&n, NULL);
     return result;

@@ -34,3 +34,5 @@ New/std_prot_l.tst
 New/std_prot_error.tst
 New/std_prot.tst
 New/interred_prot.tst
+New/ringlocal.tst
+New/hilblocinhom.tst
