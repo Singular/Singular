@@ -175,7 +175,7 @@ void p_Setm_General(poly p, const ring r)
   {
     loop
     {
-      long ord=0;
+      unsigned long ord=0;
       sro_ord* o=&(r->typ[pos]);
       switch(o->ord_typ)
       {
@@ -198,7 +198,7 @@ void p_Setm_General(poly p, const ring r)
           e=o->data.wp.end;
           int *w=o->data.wp.weights;
 #if 1
-          for(int i=a;i<=e;i++) ord+=p_GetExp(p,i,r)*w[i-a];
+          for(int i=a;i<=e;i++) ord+=((unsigned long)p_GetExp(p,i,r))*((unsigned long)w[i-a]);
 #else
           long ai;
           int ei,wi;
