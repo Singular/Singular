@@ -741,6 +741,9 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
 {
   int k= F.level() - 1;
   Variable x= Variable (1);
+  CanonicalForm LCF=LC (F, x);
+  CFList LCFeval;
+
   CFList result;
   FFRandom genFF;
   GFRandom genGF;
@@ -816,16 +819,29 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
     }
     int l= F.level();
     eval.insert (F);
+    LCFeval.insert (LCF);
     bool bad= false;
     for (CFListIterator i= result; i.hasItem(); i++, l--)
     {
       eval.insert (eval.getFirst()(i.getItem(), l));
+      LCFeval.insert (LCFeval.getFirst()(i.getItem(), l));
       if (degree (eval.getFirst(), l - 1) != degree (F, l - 1))
       {
         if (!find (list, random))
           list.append (random);
         result= CFList();
         eval= CFList();
+        LCFeval= CFList();
+        bad= true;
+        break;
+      }
+      if ((l != 2) && (degree (LCFeval.getFirst(), l-1) != degree (LCF, l-1)))
+      {
+        if (!find (list, random))
+          list.append (random);
+        result= CFList();
+        eval= CFList();
+        LCFeval= CFList();
         bad= true;
         break;
       }
@@ -839,6 +855,7 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
       if (!find (list, random))
         list.append (random);
       result= CFList();
+      LCFeval= CFList();
       eval= CFList();
       continue;
     }
@@ -850,6 +867,7 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
       if (!find (list, random))
         list.append (random);
       result= CFList();
+      LCFeval= CFList();
       eval= CFList();
       continue;
     }
@@ -861,6 +879,7 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
       if (!find (list, random))
         list.append (random);
       result= CFList();
+      LCFeval= CFList();
       eval= CFList();
       continue;
     }
