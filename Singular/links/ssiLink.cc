@@ -45,10 +45,6 @@
 #include <Singular/links/s_buff.h>
 #include <Singular/links/ssiLink.h>
 
-#ifdef HAVE_MPSR
-#include <Singular/mpsr.h>
-#endif
-
 #ifdef HAVE_SIMPLEIPC
 #include <Singular/links/simpleipc.h>
 #endif
@@ -1490,9 +1486,6 @@ int slStatusSsiL(lists L, int timeout)
 //           i>0: (at least) L[i] is ready
   si_link l;
   ssiInfo *d;
-  #ifdef HAVE_MPSR
-  MP_Link_pt dd;
-  #endif
   int d_fd;
   fd_set  mask, fdmask;
   FD_ZERO(&fdmask);
@@ -1535,11 +1528,9 @@ int slStatusSsiL(lists L, int timeout)
       || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=0)
         && (strcmp(l->mode,"launch")!=0) && (strcmp(l->mode,"connect")!=0)))
       {
-        WerrorS("all links must be of type ssi:fork, ssi:tcp, ssi:connect,");
-        WerrorS(" MPtcp:fork or MPtcp:launch");
+        WerrorS("all links must be of type ssi:fork, ssi:tcp, ssi:connect");
         return -2;
       }
-    #ifdef HAVE_MPSR
       if (strcmp(l->m->type,"ssi")==0)
       {
         d=(ssiInfo*)l->data;
@@ -1554,22 +1545,9 @@ int slStatusSsiL(lists L, int timeout)
       }
       else
       {
-        dd=(MP_Link_pt)l->data;
-        d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
-        FD_SET(d_fd, &fdmask);
-        if (d_fd > max_fd) max_fd=d_fd;
+        Werror("wrong link type >>%s<<",l->m->type);
+        return -2;
       }
-    #else
-      d=(ssiInfo*)l->data;
-      d_fd=d->fd_read;
-      if (!s_isready(d->f_read))
-      {
-        FD_SET(d_fd, &fdmask);
-        if (d_fd > max_fd) max_fd=d_fd;
-      }
-      else
-        return i+1;
-    #endif
     }
   }
   max_fd++;
@@ -1612,25 +1590,17 @@ do_select:
       if (L->m[i].rtyp==LINK_CMD)
       {
         l=(si_link)L->m[i].Data();
-        #ifdef HAVE_MPSR
-        if (strcmp(l->m->type,"ssi")!=0)
-        {
-          // for MP links, return here:
-          dd=(MP_Link_pt)l->data;
-          d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
-          if(j==d_fd) return i+1;
-        }
-        else
+        if (strcmp(l->m->type,"ssi")==0)
         {
           d=(ssiInfo*)l->data;
           d_fd=d->fd_read;
           if(j==d_fd) break;
         }
-        #else
-        d=(ssiInfo*)l->data;
-        d_fd=d->fd_read;
-        if(j==d_fd) break;
-        #endif
+        else
+        {
+          Werror("wrong link type >>%s<<",l->m->type);
+          return -2;
+        }
       }
     }
     // only ssi links:
