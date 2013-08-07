@@ -59,7 +59,6 @@ using std::vector;
 #include <kernel/febase.h>
 #include <misc/options.h>
 #include <kernel/polys.h>
-#include <kernel/modulop.h>
 #include <kernel/kutil.h>
 #include <kernel/kInline.h>
 #include <kernel/kstd1.h>

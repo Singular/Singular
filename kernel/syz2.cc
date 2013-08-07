@@ -27,8 +27,6 @@
 
 #include <kernel/polys.h>
 
-// #include <kernel/modulop.h>
-
 #include <kernel/febase.h>
 #include <kernel/kstd1.h>
 #include <kernel/kutil.h>

@@ -20,7 +20,6 @@
 //#include "cntrlc.h"
 #include <misc/intvec.h>
 #include <coeffs/numbers.h>
-#include <kernel/modulop.h>
 #include <kernel/ideals.h>
 #include <misc/intvec.h>
 #include <polys/monomials/ring.h>

@@ -75,7 +75,7 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h \
 	eigenval.h units.h \
 	ratgring.h shiftgb.h nc.h \
-	preimage.h timer.h kInline.h modulop.h fast_mult.h \
+	preimage.h timer.h kInline.h fast_mult.h \
 	digitech.h tgb.h ringgb.h tgbgauss.h tgb_internal.h \
 	linearAlgebra.h \
 	f5c.h f5data.h f5gb.h f5lists.h

@@ -70,7 +70,6 @@
 #include <kernel/fast_mult.h>
 #include <kernel/digitech.h>
 #include <kernel/stairc.h>
-#include <kernel/modulop.h>
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
 #include <kernel/kstd1.h>

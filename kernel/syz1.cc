@@ -28,7 +28,6 @@
 #include <kernel/kutil.h>
 #include <kernel/stairc.h>
 //#include "cntrlc.h"
-#include <kernel/modulop.h>
 #include <kernel/ideals.h>
 #include <kernel/syz.h>
 // #include <kernel/idrec.h>
