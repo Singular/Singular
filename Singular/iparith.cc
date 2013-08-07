@@ -34,7 +34,6 @@
 #include <polys/weight.h>
 
 
-#include <kernel/modulop.h>
 #include <kernel/stairc.h>
 #include <kernel/mod2.h>
 #include <kernel/polys.h>

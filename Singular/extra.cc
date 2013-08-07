@@ -172,6 +172,10 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #include "gms.h"
 #endif
 
+#ifdef HAVE_SIMPLEIPC
+#include "Singular/links/simpleipc.h"
+#endif
+
 /*
  *   New function/system-calls that will be included as dynamic module
  * should be inserted here.
@@ -3795,6 +3799,27 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
                 */
 
   #endif
+/*==================== semaphore =================*/
+#ifdef HAVE_SIMPLEIPC
+    if (strcmp(sys_cmd,"semaphore")==0)
+    {
+      if((h!=NULL) && (h->Typ()==STRING_CMD) && (h->next!=NULL) && (h->next->Typ()==INT_CMD))
+      {
+        int v=1;
+        if ((h->next->next!=NULL)&& (h->next->next->Typ()==INT_CMD))
+          v=(int)(long)h->next->next->Data();
+        res->data=(char *)simpleipc_cmd((char *)h->Data(),(int)(long)h->next->Data(),v);
+        res->rtyp=INT_CMD;
+        return FALSE;
+      }
+      else
+      {
+        WerrorS("Usage: system(\"semaphore\",<cmd>,int)");
+        return TRUE;
+      }
+    }
+    else
+#endif
 /*======================= demon_list =====================*/
   if (strcmp(sys_cmd,"denom_list")==0)
   {
