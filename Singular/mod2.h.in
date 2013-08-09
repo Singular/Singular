@@ -12,6 +12,8 @@
 /*******************************************************************
  * Defines which are set by configure
  ******************************************************************/
+/* Define if MathicGB is available */
+#undef HAVE_MATHICGB
 /* Define to use dynamic linking */
 #undef HAVE_DL
 /* Define to use readline lib for fancy display: configure result */

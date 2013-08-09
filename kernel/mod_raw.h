@@ -53,6 +53,7 @@ const char * dynl_error();
 /// use @c add(name) to add built-in library to macro
 #define SI_FOREACH_BUILTIN(add)\
   add(staticdemo)\
+  add(singmathic)\
   SI_BUILTIN_PYOBJECT(add)
 
 
