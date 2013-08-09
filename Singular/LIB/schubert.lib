@@ -21,7 +21,7 @@ PROCEDURES:
     makeVariety(int,ideal)            create a variety
     productVariety(variety,variety)   product of two varieties
     ChowRing(variety)                 create the Chow ring of a variety
-    dimension(variety)                dimension of a variety
+    Dimension(variety)                dimension of a variety
     relations(variety)                relations of a variety
     Grassmannian(int,int)             create a Grassmannian as a variety
     projectiveSpace(int)              create a projective space as a variety
@@ -286,7 +286,7 @@ proc makeVariety(int d, ideal i)
     return(V);
 }
 
-proc dimension(variety V)
+proc Dimension(variety V)
 {
     return (V.dimension);
 }
@@ -369,7 +369,7 @@ example
     "EXAMPLE:"; echo=2;
     def G24 = Grassmannian(2,4);
     G24;
-    def r = G24.baseRing;
+    def r = G24.baseRing; setring r;
     subBundle;
     quotientBundle;
     G24.dimension;

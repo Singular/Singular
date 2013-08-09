@@ -21,11 +21,38 @@
 
 @heading News for version @value{VERSION}
 
-@heading New libraries
-@itemize
-@item @nref{classifyci_lib}: Isolated complete intersection singularities in characteristic  0
+@sc{Singular} changes to e new build system and a different internal structure
+and will be published as @sc{Singular 4}. New developments will only happen
+in this new branch of @sc{Singular} but @sc{Singular 3} will receive bug fixes for a while. New libraries will appear in both branches if possible.
+
+@heading New @sc{Singular} libraries
+@itemize @bullet
+@item new library: classifyci.lib: Isolated complete intersection singularities in characteristic  0 (@nref{classifyci_lib})
+@item new library: schubert.lib:  Proceduces for Intersection Theory (@nref{schubert_lib})
 @end itemize
 
+@heading Changed @sc{Singular} libraries
+@itemize @bullet
+@item
+improved grobcov.lib (@nref{grobcov_lib})
+@end itemize
+
+@heading Changed @sc{Singular} commands
+@itemize @bullet
+@end itemize
+
+@heading Internal Changes
+@itemize @bullet
+@item
+several bug fixes in factorization code, optional use of FLINT 2
+@item
+polymake/gfan interface extended
+@item
+interface for dynamic modules improved
+@end itemize
+@heading --------------------------------------------------------------------
+@heading Older versions:
+@heading News for version 3-1-6
 
 @heading New @sc{Singular} libraries
 @itemize @bullet
@@ -43,7 +70,7 @@
 @item new librart: ratgb.lib: Groebner bases in Ore localizations (@nref{ratgb_lib})
 @item new librart: dmodloc.lib: Localization of algebraic D-module (@nref{dmodloc_lib})
 @item new librart: ncpreim.lib: Non-commutative elimination and preimage (@nref{ncpreim_lib})
-@item library for Dingular 4: derham.lib:  Computation of deRham cohomology (@nref{derham_lib})
+@item library for Singular 4: derham.lib:  Computation of deRham cohomology (@nref{derham_lib})
 @end itemize
 
 @heading Changed @sc{Singular} libraries
@@ -68,8 +95,6 @@ polymake/gfan interface extended
 @item
 interface to @code{iiMake_proc} changed
 @end itemize
-@heading --------------------------------------------------------------------
-@heading Older versions:
 @heading News for version 3-1-5
 
 @heading New data types
