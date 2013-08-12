@@ -1950,8 +1950,9 @@ any of the above orderings and the extra weight vector may be combined
 to yield product or block orderings
 @end table
 
-The orderings @code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, and
-@code{Ds} may be followed by an int_expression in parentheses giving the
+The orderings @code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds},
+@code{Ds} and @code{rp} may be followed by an int_expression in
+parentheses giving the
 size of the block. For the last block the size is calculated
 automatically. For weighted orderings, the size of the block is given
 by the size of the weight vector. The same holds analogously for matrix
