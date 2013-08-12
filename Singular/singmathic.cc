@@ -118,7 +118,8 @@ BOOLEAN mathicgb(leftv result, leftv arg)
       toMathic.appendTermBegin();
       for (int i = 1; i <= currRing->N; ++i)
         toMathic.appendExponent(i - 1, pGetExp(p, i));
-      toMathic.appendTermDone(reinterpret_cast<int>(pGetCoeff(p)));
+      const long coefLong = reinterpret_cast<long>(pGetCoeff(p));
+      toMathic.appendTermDone(static_cast<int>(coefLong));
     }
     toMathic.appendPolynomialDone();
   }
