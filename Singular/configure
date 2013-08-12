@@ -753,9 +753,9 @@ with_svd
 with_Plural
 with_NTL
 with_RatGB
+with_mathicgb
 with_flint
 enable_countedref
-with_mathicgb
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1405,6 +1405,7 @@ Optional Packages:
   --without-Plural        do compile without Plural support
   --with-NTL              build for use with NTL.
   --with-ratGB            do compile with ratGB support (experimental)
+  --with-mathicgb=yes|no  Use the MathicGB library. Default is no.
   --with-flint=<path>|yes|no  Use FLINT library. If argument is no, you do not have
                             the library installed on your machine (set as
 			    default). If argument is yes or <empty> that means
@@ -1412,7 +1413,6 @@ Optional Packages:
 			    path (/usr or /usr/local). Otherwise you give the
 			    <path> to the directory which contain the library.
 
-  --with-mathicgb=yes|no  Use the MathicGB library. Default is no.
 
 Some influential environment variables:
   CC          C compiler command
@@ -5461,7 +5461,6 @@ fi
 # MathicGB
 if test "x$with_mathicgb" = xyes; then :
 
-  #AC_LANG_PUSH([C++])
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for TBB_runtime_interface_version in -ltbb" >&5
 $as_echo_n "checking for TBB_runtime_interface_version in -ltbb... " >&6; }
 if ${ac_cv_lib_tbb_TBB_runtime_interface_version+:} false; then :
@@ -5654,10 +5653,8 @@ if test "x$ac_cv_header_mathicgb_h" = xyes; then :
 fi
 
 
-  #AC_LANG_POP([C++])
   $as_echo "#define HAVE_MATHICGB 1" >>confdefs.h
 
-#  AC_SUBST(HAVE_MATHICGB_VALUE, 1)
 
 fi
 
@@ -9767,6 +9764,16 @@ fi
 DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
 
 
+# Check whether --with-mathicgb was given.
+if test "${with_mathicgb+set}" = set; then :
+  withval=$with_mathicgb;
+else
+  with_mathicgb="no"
+
+fi
+
+
+
 # Check whether --with-flint was given.
 if test "${with_flint+set}" = set; then :
   withval=$with_flint; if test "$withval" = yes ; then
@@ -10068,17 +10075,6 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 fi
-
-
-
-# Check whether --with-mathicgb was given.
-if test "${with_mathicgb+set}" = set; then :
-  withval=$with_mathicgb;
-else
-  with_mathicgb="no"
-
-fi
-
 
 OUTPUT_MAKEFILES="Makefile ../kernel/Makefile"
 

@@ -1,11 +1,11 @@
-#include "Singular/mod2.h" // general settings/macros
+#include "Singular/mod2.h"
 #include "kernel/ring.h"
 #include "kernel/febase.h"
 #include "kernel/ideals.h"
 #include "kernel/polys.h"
 #include "kernel/numbers.h"
-// for Print,PrintS, WerrorS
-#include "Singular/ipid.h" // for SModulFunctions, leftv
+#include "kernel/options.h"
+#include "Singular/ipid.h"
 
 #ifdef HAVE_MATHICGB
 
@@ -21,7 +21,7 @@ public:
   MathicToSingStream(Coefficient modulus, VarIndex varCount):
     mModulus(modulus),
     mVarCount(varCount),
-    polyCount(0),
+    mPolyCount(0),
     mTerm(0),
     mIdeal(0)
   {}
@@ -36,14 +36,14 @@ public:
   void idealBegin(size_t polyCount) {
     deleteIdeal();
     mIdeal = idInit(polyCount);
-    polyCount = 0;
+    mPolyCount = 0;
   }
 
   void appendPolynomialBegin(size_t termCount) {}
 
   void appendTermBegin() {
     if (mTerm == 0)
-      mTerm = mIdeal->m[polyCount] = pInit();
+      mTerm = mIdeal->m[mPolyCount] = pInit();
     else
       mTerm = mTerm->next = pInit();
   }
@@ -58,7 +58,7 @@ public:
   }
 
   void appendPolynomialDone() {
-    ++polyCount;
+    ++mPolyCount;
     mTerm = 0;
   }
 
@@ -83,7 +83,7 @@ private:
 
   const Coefficient mModulus;
   const VarIndex mVarCount;
-  size_t polyCount;
+  size_t mPolyCount;
   poly mTerm;
   ::ideal mIdeal;
 };
@@ -102,6 +102,9 @@ BOOLEAN mathicgb(leftv result, leftv arg)
   const int characteristic = n_GetChar(currRing);
   const int varCount = currRing->N;
   mgb::GroebnerConfiguration conf(characteristic, varCount);
+  if (TEST_OPT_PROT)
+    conf.setLogging("all");
+
   mgb::GroebnerInputIdealStream toMathic(conf);
 
   const ideal id = static_cast<const ideal>(arg->Data());
