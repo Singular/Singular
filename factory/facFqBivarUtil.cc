@@ -469,6 +469,12 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
   logDeriv= mulMod2 (q, deriv (G, y), xToL);
   TIMING_END_AND_PRINT (fac_log_deriv_mul, "time to multiply in logderiv1: ");
 
+  if (degree (logDeriv, x) == 0)
+  {
+    Q= q;
+    return CFArray();
+  }
+
   int j= degree (logDeriv, y) + 1;
   CFArray result= CFArray (j);
   CFIterator ii;
@@ -546,6 +552,12 @@ logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
   TIMING_START (fac_log_deriv_mul);
   logDeriv= mulMod2 (q, deriv (G, y), xToL);
   TIMING_END_AND_PRINT (fac_log_deriv_mul, "time for mul in logderiv2: ");
+
+  if (degree (logDeriv, x) == 0)
+  {
+    Q= q;
+    return CFArray();
+  }
 
   int j= degree (logDeriv,y) + 1;
   CFArray result= CFArray (j);
