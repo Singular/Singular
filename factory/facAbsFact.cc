@@ -261,6 +261,8 @@ CFAFList absFactorize (const CanonicalForm& G
   ASSERT (getCharacteristic() == 0, "expected poly over Q");
 
   CanonicalForm F= G;
+
+  CanonicalForm LcF= Lc (F);
   bool isRat= isOn (SW_RATIONAL);
   if (isRat)
     F *= bCommonDen (F);
@@ -286,7 +288,9 @@ CFAFList absFactorize (const CanonicalForm& G
     result= Union (result, resultBuf);
   }
 
-  result.insert (CFAFactor (rationalFactors.getFirst().factor(), 1, 1));
+  if (isRat)
+    normalize (result);
+  result.insert (CFAFactor (LcF, 1, 1));
 
   return result;
 }
@@ -485,9 +489,8 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
         }
         // necessary since extension may be too large
         if (!found)
-        {
           factors= RothsteinTrager (A, rationalFactors, v, evaluation);
-        }
+
         decompress (factors, N);
         normalize (factors);
         delete [] Aeval2;
@@ -586,6 +589,7 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
       // necessary since extension may be too large
       if (!found)
         factors= RothsteinTrager (A, rationalFactors, v, evaluation);
+
       decompress (factors, N);
       normalize (factors);
       delete [] index;
