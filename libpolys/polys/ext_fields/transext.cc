@@ -1099,7 +1099,10 @@ void heuristicGcdCancellation(number a, const coeffs cf)
   if (IS0(a)) return;
 
   fraction f = (fraction)a;
-  if (DENIS1(f) || NUMIS1(f)) { COM(f) = 0; ntTest(a); return; }
+  if (COM(f)!=0) p_Normalize(NUM(f), ntRing);
+  if (DENIS1(f) || NUMIS1(f)) { COM(f) = 0; return; }
+
+  p_Normalize(DEN(f), ntRing);
 
   assume( DEN(f) != NULL );
 
@@ -1152,10 +1155,10 @@ void definiteGcdCancellation(number a, const coeffs cf,
   fraction f = (fraction)a;
 
   if (IS0(a)) return;
-  if (NUM(f)!=NULL) p_Normalize(NUM(f), ntRing);
-  if (DEN(f)!=NULL) p_Normalize(DEN(f), ntRing);
   if (!simpleTestsHaveAlreadyBeenPerformed)
   {
+    p_Normalize(NUM(f), ntRing);
+    if (DEN(f)!=NULL) p_Normalize(DEN(f), ntRing);
     if (DENIS1(f) || NUMIS1(f)) { COM(f) = 0; return; }
 
     /* check whether NUM(f) = DEN(f), and - if so - replace 'a' by 1 */
@@ -1168,16 +1171,67 @@ void definiteGcdCancellation(number a, const coeffs cf,
       return;
     }
   }
+  if (rField_is_Q(ntRing))
+  {
+    number c=n_Copy(pGetCoeff(NUM(f)),ntCoeffs);
+    poly p=pNext(NUM(f));
+    while((p!=NULL)&&(!n_IsOne(c,ntCoeffs)))
+    {
+      number cc=n_Gcd(c,pGetCoeff(p),ntCoeffs);
+      n_Delete(&c,ntCoeffs);
+      c=cc;
+      pIter(p);
+    };
+    p=DEN(f);
+    while((p!=NULL)&&(!n_IsOne(c,ntCoeffs)))
+    {
+      number cc=n_Gcd(c,pGetCoeff(p),ntCoeffs);
+      n_Delete(&c,ntCoeffs);
+      c=cc;
+      pIter(p);
+    };
+    if(!n_IsOne(c,ntCoeffs))
+    {
+      p=NUM(f);
+      do
+      {
+        number cc=n_Div(pGetCoeff(p),c,ntCoeffs);
+        n_Normalize(cc,ntCoeffs);
+        p_SetCoeff(p,cc,ntRing);
+        pIter(p);
+      } while(p!=NULL);
+      p=DEN(f);
+      do
+      {
+        number cc=n_Div(pGetCoeff(p),c,ntCoeffs);
+        n_Normalize(cc,ntCoeffs);
+        p_SetCoeff(p,cc,ntRing);
+        pIter(p);
+      } while(p!=NULL);
+      n_Delete(&c,ntCoeffs);
+      if(pNext(DEN(f))==NULL)
+      {
+        if (p_IsOne(DEN(f),ntRing))
+        {
+          p_LmDelete(&DEN(f),ntRing);
+          COM(f)=0;
+          return;
+        }
+        else
+        {
+          return;
+        }
+      }
+    }
+  }
 
 #ifdef HAVE_FACTORY
-  /* Note that, over Q, singclap_gcd will remove the denominators in all
-     rational coefficients of pNum and pDen, before starting to compute
-     the gcd. Thus, we do not need to ensure that the coefficients of
-     pNum and pDen live in Z; they may well be elements of Q\Z. */
-  /* singclap_gcd destroys its arguments; we hence need copies: */
-  poly pGcd = singclap_gcd(p_Copy(NUM(f), ntRing), p_Copy(DEN(f), ntRing), cf->extRing);
-  if (p_IsConstant(pGcd, ntRing) &&
-      n_IsOne(p_GetCoeff(pGcd, ntRing), ntCoeffs))
+  poly pGcd;
+  /* here we assume: NUM(f), DEN(f) !=NULL, in Z_a reqp. Z/p_a */
+    pGcd = singclap_gcd_r(NUM(f), DEN(f), ntRing);
+  if (p_IsConstant(pGcd, ntRing)
+  //&& n_IsOne(p_GetCoeff(pGcd, ntRing), ntCoeffs)
+  )
   { /* gcd = 1; nothing to cancel;
        Suppose the given rational function field is over Q. Although the
        gcd is 1, we may have produced fractional coefficients in NUM(f),
@@ -1349,7 +1403,7 @@ number ntLcm(number a, number b, const coeffs cf)
      rational coefficients of pa and pb, before starting to compute
      the gcd. Thus, we do not need to ensure that the coefficients of
      pa and pb live in Z; they may well be elements of Q\Z. */
-  poly pGcd = singclap_gcd(pa, pb, cf->extRing);
+  poly pGcd = singclap_gcd(pa, pb, ntRing);
   if (p_IsConstant(pGcd, ntRing) &&
       n_IsOne(p_GetCoeff(pGcd, ntRing), ntCoeffs))
   { /* gcd = 1; return pa*pb*/

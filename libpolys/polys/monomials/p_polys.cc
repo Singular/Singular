@@ -1236,10 +1236,10 @@ int p_IsPurePower(const poly p, const ring r)
 {
 #ifdef HAVE_RINGS 
   if (rField_is_Ring(r))
-  	{
-  	if (p == NULL) return 0;
-  	if (!n_IsUnit(pGetCoeff(p), r->cf)) return 0;
-  	}
+          {
+          if (p == NULL) return 0;
+          if (!n_IsUnit(pGetCoeff(p), r->cf)) return 0;
+          }
 #endif
   int i,k=0;
 
@@ -2177,7 +2177,7 @@ void p_Content(poly ph, const ring r)
         number hzz =NULL;
         p=ph;
         while (p!=NULL)
-        { // each monom: coeff in Q_a
+        { // each monom: coeff in Q_a (Z_a)
           fraction f=(fraction)pGetCoeff(p);
           poly c_n=NUM(f);
           if (hzz==NULL)
@@ -2186,7 +2186,7 @@ void p_Content(poly ph, const ring r)
             pIter(c_n);
           }
           while ((c_n!=NULL)&&(!n_IsOne(hzz,r->cf->extRing->cf)))
-          { // each monom: coeff in Q
+          { // each monom: coeff in Q (Z)
             d=n_Gcd(hzz,pGetCoeff(c_n),r->cf->extRing->cf);
             n_Delete(&hzz,r->cf->extRing->cf);
             hzz=d;
@@ -2202,7 +2202,7 @@ void p_Content(poly ph, const ring r)
         {
           p=ph;
           while (p!=NULL)
-          { // each monom: coeff in Q_a
+          { // each monom: coeff in Q_a (Z_a)
             fraction f=(fraction)pGetCoeff(p);
             NUM(f)=p_Mult_nn(NUM(f),h,r->cf->extRing);
             p_Normalize(NUM(f),r->cf->extRing);
@@ -2549,9 +2549,9 @@ poly p_Cleardenom(poly p, const ring r)
     */
       p_SetCoeff(p,n_Init(1,r->cf),r);
 
-    assume( n_GreaterZero(pGetCoeff(p),C) );
+    /*assume( n_GreaterZero(pGetCoeff(p),C) );
     if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
-
+    */
     return p;
   }
 
@@ -2612,7 +2612,7 @@ poly p_Cleardenom(poly p, const ring r)
       }
       n_Delete(&h,r->cf);
     }
-    if (h!=NULL) n_Delete(&h,r->cf);
+    n_Delete(&h,r->cf);
     p=start;
 
     p_Content(p,r);
@@ -2831,7 +2831,7 @@ void p_ProjectiveUnique(poly ph, const ring r)
   {
     p_Content(ph,r);
     if(!n_GreaterZero(pGetCoeff(ph),C)) ph = p_Neg(ph,r);
-	assume( n_GreaterZero(pGetCoeff(ph),C) );
+        assume( n_GreaterZero(pGetCoeff(ph),C) );
     return;
   }
 #endif

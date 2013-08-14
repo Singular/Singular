@@ -58,21 +58,57 @@
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
-static poly singclap_gcd_r ( poly f, poly g, const ring r )
+poly singclap_gcd_r ( poly f, poly g, const ring r )
 {
   poly res=NULL;
 
   assume(f!=NULL);
   assume(g!=NULL);
 
-  if((pNext(f)==NULL) && (pNext(g)==NULL))
+  if(pNext(f)==NULL) 
   {
     poly p=p_One(r);
+    if (pNext(g)==NULL)
+    {
+      for(int i=rVar(r);i>0;i--)
+        p_SetExp(p,i,si_min(p_GetExp(f,i,r),p_GetExp(g,i,r)),r);
+      p_Setm(p,r);
+      return p;
+    }
+#if 0
+    else
+    {
+      poly h=g;
+      for(int i=rVar(r);i>0;i--)
+        p_SetExp(p,i,p_GetExp(f,i,r),r);
+      while(h!=NULL)
+      {
+        for(int i=rVar(r);i>0;i--)
+          p_SetExp(p,i,si_min(p_GetExp(p,i,r),p_GetExp(h,i,r)),r);
+	pIter(h);
+      }
+      p_Setm(p,r);
+      return p;
+    }
+#endif
+  }
+#if 0
+  else if (pNext(g)==NULL)
+  {
+    poly p=p_One(r);
+    poly h=f;
     for(int i=rVar(r);i>0;i--)
-      p_SetExp(p,i,si_min(p_GetExp(f,i,r),p_GetExp(g,i,r)),r);
+      p_SetExp(p,i,p_GetExp(g,i,r),r);
+    while(h!=NULL)
+    {
+      for(int i=rVar(r);i>0;i--)
+        p_SetExp(p,i,si_min(p_GetExp(p,i,r),p_GetExp(h,i,r)),r);
+      pIter(h);
+    }
     p_Setm(p,r);
     return p;
   }
+#endif
 
   Off(SW_RATIONAL);
   if (rField_is_Q(r) || (rField_is_Zp(r)))
