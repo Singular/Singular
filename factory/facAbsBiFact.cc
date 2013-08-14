@@ -226,6 +226,7 @@ int choosePoint (const CanonicalForm& F, int tdegF, CFArray& eval, bool rec)
 CFAFList absBiFactorizeMain (const CanonicalForm& G, bool full)
 {
   CanonicalForm F= bCommonDen (G)*G;
+  bool isRat= isOn (SW_RATIONAL);
   Off (SW_RATIONAL);
   F /= icontent (F);
   On (SW_RATIONAL);
@@ -247,6 +248,7 @@ differentevalpoint:
     p= choosePoint (F, tdegF, eval, rec);
     TIMING_END_AND_PRINT (fac_evalpoint, "time to find eval point: ");
 
+    //after here isOn (SW_RATIONAL)==false
     setCharacteristic (p);
     Fp=F.mapinto();
     factors= factorize (Fp);
@@ -258,6 +260,8 @@ differentevalpoint:
     {
       if (absIrredTest (Fp))
       {
+        if (isRat)
+          On (SW_RATIONAL);
         setCharacteristic(0);
         return CFAFList (CFAFactor (G, 1, 1));
       }
@@ -266,6 +270,8 @@ differentevalpoint:
         setCharacteristic (0);
         if (modularIrredTestWithShift (F))
         {
+          if (isRat)
+            On (SW_RATIONAL);
           return CFAFList (CFAFactor (G, 1, 1));
         }
         rec= true;
@@ -689,6 +695,11 @@ differentevalpoint:
     F= bufF;
     goto differentevalpoint;
   }
+
+  if (isRat)
+    On (SW_RATIONAL);
+  else
+    Off (SW_RATIONAL);
 
   return result;
 }
