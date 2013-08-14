@@ -1113,6 +1113,10 @@ ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & num
   }
   CanonicalForm F( convSingTrPFactoryP( f ) );
 
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
+
   CFAFList absFactors= absFactorize (F);
 
   int n= absFactors.length();
@@ -1134,9 +1138,6 @@ ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & num
     i++;
     iter++;
   }
-  bool isRat= isOn (SW_RATIONAL);
-  if (!isRat)
-    On (SW_RATIONAL);
   for (; iter.hasItem(); iter++, i++)
   {
     (**exps)[i]= iter.getItem().exp();
