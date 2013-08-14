@@ -132,10 +132,15 @@ RothsteinTrager (const CanonicalForm& F, const CFList& factors,
   return RothsteinTragerResultant (F, w, s, evaluation, y);
 }
 
-CFList evalPoints4AbsFact (const CanonicalForm& F, CFList& eval, Evaluation& E)
+CFList
+evalPoints4AbsFact (const CanonicalForm& F, CFList& eval, Evaluation& E,
+                    int& intervalSize)
 {
   CFList result;
   Variable x= Variable (1);
+
+  CanonicalForm LCF= LC (F, x);
+  CFList LCFeval= CFList();
 
   bool found= false;
   bool allZero= true;
@@ -143,13 +148,24 @@ CFList evalPoints4AbsFact (const CanonicalForm& F, CFList& eval, Evaluation& E)
   CanonicalForm deriv_x, gcd_deriv;
   CFFList uniFactors;
   CFListIterator iter;
+  int count= 0;
   do
   {
+    count++;
+    if (count==E.max() - E.min() + 1)
+    {
+      count= 1;
+      intervalSize++;
+      E= REvaluation (E.min(), E.max(), IntRandom (intervalSize));
+      E.nextpoint();
+    }
     eval.insert (F);
+    LCFeval.insert (LCF);
     bool bad= false;
     for (int i= E.max(); i >= E.min(); i--)
     {
       eval.insert (eval.getFirst()( E [i], i));
+      LCFeval.insert (LCFeval.getFirst()( E [i], i));
       result.append (E[i]);
       if (!E[i].isZero())
         allZero= false;
@@ -159,6 +175,7 @@ CFList evalPoints4AbsFact (const CanonicalForm& F, CFList& eval, Evaluation& E)
       {
         result= CFList();
         eval= CFList();
+        LCFeval= CFList();
         bad= true;
         foundZero= false;
         break;
@@ -166,6 +183,15 @@ CFList evalPoints4AbsFact (const CanonicalForm& F, CFList& eval, Evaluation& E)
       if (degree (eval.getFirst(), i - 1) != degree (F, i - 1))
       {
         result= CFList();
+        LCFeval= CFList();
+        eval= CFList();
+        bad= true;
+        break;
+      }
+      if ((i != 2) && (degree (LCFeval.getFirst(), i-1) != degree (LCF, i-1)))
+      {
+        result= CFList();
+        LCFeval= CFList();
         eval= CFList();
         bad= true;
         break;
@@ -182,6 +208,7 @@ CFList evalPoints4AbsFact (const CanonicalForm& F, CFList& eval, Evaluation& E)
     {
       result= CFList();
       eval= CFList();
+      LCFeval= CFList();
       E.nextpoint();
       continue;
     }
@@ -192,6 +219,7 @@ CFList evalPoints4AbsFact (const CanonicalForm& F, CFList& eval, Evaluation& E)
     {
       result= CFList();
       eval= CFList();
+      LCFeval= CFList();
       E.nextpoint();
       continue;
     }
@@ -202,6 +230,7 @@ CFList evalPoints4AbsFact (const CanonicalForm& F, CFList& eval, Evaluation& E)
     {
       result= CFList();
       eval= CFList();
+      LCFeval= CFList();
       E.nextpoint();
       continue;
     }
@@ -212,6 +241,7 @@ CFList evalPoints4AbsFact (const CanonicalForm& F, CFList& eval, Evaluation& E)
     {
       result= CFList();
       eval= CFList();
+      LCFeval= CFList();
       E.nextpoint();
       continue;
     }
@@ -315,14 +345,15 @@ CFAFList absFactorizeMain (const CanonicalForm& G)
 
   // several bivariate factorizations
   TIMING_START (abs_fac_bifactor_total);
-  REvaluation E (2, A.level(), IntRandom (25));
+  int absValue= 2;
+  REvaluation E (2, A.level(), IntRandom (absValue));
   for (int i= 0; i < factorNums; i++)
   {
     counter= 0;
     bufA= A;
     bufAeval= CFList();
     TIMING_START (abs_fac_evaluation);
-    bufEvaluation= evalPoints4AbsFact (bufA, bufAeval, E);
+    bufEvaluation= evalPoints4AbsFact (bufA, bufAeval, E, absValue);
     TIMING_END_AND_PRINT (abs_fac_evaluation,
                           "time to find evaluation point in abs fact: ");
     E.nextpoint();
