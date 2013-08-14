@@ -35,6 +35,7 @@ CFAFList uniAbsFactorize (const CanonicalForm& F)
 {
   CFFList rationalFactors= factorize (F);
   CFFListIterator i= rationalFactors;
+  CanonicalForm LcF= rationalFactors.getFirst().factor();
   i++;
   Variable alpha;
   CFAFList result;
@@ -51,7 +52,10 @@ CFAFList uniAbsFactorize (const CanonicalForm& F)
     QaFactors= factorize (i.getItem().factor(), alpha);
     iter= QaFactors;
     if (iter.getItem().factor().inCoeffDomain())
+    {
+      LcF *= iter.getItem().factor();
       iter++;
+    }
     for (;iter.hasItem(); iter++)
     {
       if (degree (iter.getItem().factor()) == 1)
@@ -62,7 +66,7 @@ CFAFList uniAbsFactorize (const CanonicalForm& F)
       }
     }
   }
-  result.insert (CFAFactor (rationalFactors.getFirst().factor(), 1, 1));
+  result.insert (CFAFactor (LcF, 1, 1));
   return result;
 }
 
