@@ -152,68 +152,108 @@ CFAFList absBiFactorize (const CanonicalForm& G ///<[in] bivariate poly over Q
 }
 
 //TODO optimize choice of p -> choose p as large as possible (better than small p since factorization mod p does not require field extension, also less lifting)
-int choosePoint (const CanonicalForm& F, int tdegF, CFArray& eval, bool rec)
+int
+choosePoint (const CanonicalForm& F, int tdegF, CFArray& eval, bool rec,
+             int absValue)
 {
-  REvaluation E1 (1, 1, IntRandom (25));
-  REvaluation E2 (2, 2, IntRandom (25));
+  REvaluation E1 (1, 1, IntRandom (absValue));
+  REvaluation E2 (2, 2, IntRandom (absValue));
   if (rec)
   {
     E1.nextpoint();
     E2.nextpoint();
   }
+
   CanonicalForm f, f1, f2, Fp;
   int i, p;
-  eval=CFArray (2);
+  CFFList f1Factors, f2Factors;
+  CFFListIterator iter;
+  int count= 0;
   while (1)
   {
-    f1= E1(F);
-    if (!f1.isZero() && factorize (f1).length() == 2)
+    count++;
+    f1= E1 (F);
+    if (!f1.isZero() && degree (f1) == degree (F,2))
     {
-      Off (SW_RATIONAL);
-      f= E2(f1);
-      f2= E2 (F);
-      if ((!f.isZero()) && (abs(f)>cf_getSmallPrime (cf_getNumSmallPrimes()-1)))
+      f1Factors= factorize (f1);
+      if (f1Factors.getFirst().factor().inCoeffDomain())
+        f1Factors.removeFirst();
+      if (f1Factors.length() == 1 && f1Factors.getFirst().exp() == 1)
       {
-        for (i= cf_getNumPrimes()-1; i >= 0; i--)
+        f= E2(f1);
+        f2= E2 (F);
+        f2Factors= factorize (f2);
+        Off (SW_RATIONAL);
+        if (f2Factors.getFirst().factor().inCoeffDomain())
+          f2Factors.removeFirst();
+        if (f2Factors.length() == 1 && f2Factors.getFirst().exp() == 1)
         {
-          if (f % CanonicalForm (cf_getPrime (i)) == 0)
+          ZZX NTLf1= convertFacCF2NTLZZX (f1);
+          ZZX NTLf2= convertFacCF2NTLZZX (f2);
+          ZZ NTLD1= discriminant (NTLf1);
+          ZZ NTLD2= discriminant (NTLf2);
+          CanonicalForm D1= convertZZ2CF (NTLD1);
+          CanonicalForm D2= convertZZ2CF (NTLD2);
+          if ((!f.isZero()) &&
+              (abs(f)>cf_getSmallPrime (cf_getNumSmallPrimes()-1)))
           {
-            p= cf_getPrime(i);
-            Fp= mod (F,p);
-            if (totaldegree (Fp) == tdegF &&
-                degree (mod (f2,p), 1) == degree (F,1) &&
-                degree (mod (f1, p),2) == degree (F,2))
+            for (i= cf_getNumPrimes()-1; i >= 0; i--)
             {
-              eval[0]= E1[1];
-              eval[1]= E2[2];
-              return p;
+              if (f % CanonicalForm (cf_getPrime (i)) == 0)
+              {
+                p= cf_getPrime(i);
+                Fp= mod (F,p);
+                if (totaldegree (Fp) == tdegF &&
+                    degree (mod (f2,p), 1) == degree (F,1) &&
+                    degree (mod (f1, p),2) == degree (F,2))
+                {
+                  if (mod (D1, p) != 0 && mod (D2, p) != 0)
+                  {
+                    eval[0]= E1[1];
+                    eval[1]= E2[2];
+                    return p;
+                  }
+                }
+              }
+            }
+          }
+          else if (!f.isZero())
+          {
+            for (i= cf_getNumSmallPrimes()-1; i >= 0; i--)
+            {
+              if (f % CanonicalForm (cf_getSmallPrime (i)) == 0)
+              {
+                p= cf_getSmallPrime (i);
+                Fp= mod (F,p);
+                if (totaldegree (Fp) == tdegF &&
+                    degree (mod (f2, p),1) == degree (F,1) &&
+                    degree (mod (f1,p),2) == degree (F,2))
+                {
+                  if (mod (D1, p) != 0 && mod (D2, p) != 0)
+                  {
+                    eval[0]= E1[1];
+                    eval[1]= E2[2];
+                    return p;
+                  }
+                }
+              }
             }
           }
         }
+        E2.nextpoint();
+        On (SW_RATIONAL);
       }
-      else if (!f.isZero())
-      {
-        for (i= cf_getNumSmallPrimes()-1; i >= 0; i--)
-        {
-          if (f % CanonicalForm (cf_getSmallPrime (i)) == 0)
-          {
-            p= cf_getSmallPrime (i);
-            Fp= mod (F,p);
-            if (totaldegree (Fp) == tdegF &&
-                degree (mod (f2, p),1) == degree (F,1) &&
-                degree (mod (f1,p),2) == degree (F,2))
-            {
-              eval[0]= E1[1];
-              eval[1]= E2[2];
-              return p;
-            }
-          }
-        }
-      }
-      E2.nextpoint();
-      On (SW_RATIONAL);
     }
     E1.nextpoint();
+    if (count == 2)
+    {
+      count= 0;
+      absValue++;
+      E1=REvaluation (1, 1, IntRandom (absValue));
+      E2=REvaluation (2, 2, IntRandom (absValue));
+      E1.nextpoint();
+      E2.nextpoint();
+    }
   }
   return 0;
 }
@@ -226,7 +266,6 @@ CFAFList absBiFactorizeMain (const CanonicalForm& G, bool full)
   Off (SW_RATIONAL);
   F /= icontent (F);
   On (SW_RATIONAL);
-  CFArray eval;
   int minTdeg, tdegF= totaldegree (F);
   CanonicalForm Fp, smallestFactor;
   int p;
@@ -237,11 +276,13 @@ CFAFList absBiFactorizeMain (const CanonicalForm& G, bool full)
   Variable y= Variable (2);
   CanonicalForm bufF= F;
   CFFListIterator iter;
+  CFArray eval= CFArray (2);
+  int absValue= 1;
 differentevalpoint:
   while (1)
   {
     TIMING_START (fac_evalpoint);
-    p= choosePoint (F, tdegF, eval, rec);
+    p= choosePoint (F, tdegF, eval, rec, absValue);
     TIMING_END_AND_PRINT (fac_evalpoint, "time to find eval point: ");
 
     //after here isOn (SW_RATIONAL)==false
