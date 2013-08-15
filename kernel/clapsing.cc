@@ -1094,7 +1094,7 @@ notImpl:
   return res;
 }
 #ifdef HAVE_NTL
-ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors)
+ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors)
 {
   pTest(f);
 
