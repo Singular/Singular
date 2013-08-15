@@ -317,7 +317,7 @@ differentevalpoint:
                !gcd (Gpx, smallestFactorEvalx).inCoeffDomain());
   bool yValid= !(Gpy.inCoeffDomain() || smallestFactorEvaly.inCoeffDomain() ||
                !gcd (Gpy, smallestFactorEvaly).inCoeffDomain());
-  if (!xValid && !yValid)
+  if (!xValid || !yValid)
   {
     rec= true;
     setCharacteristic (0);
@@ -328,25 +328,9 @@ differentevalpoint:
 
   CanonicalForm mipo;
 
-  int loop, i;
-  if (xValid && yValid)
-  {
-    loop= 3;
-    i=1;
-  }
-  else if (xValid)
-  {
-    loop= 3;
-    i=2;
-  }
-  else
-  {
-    loop= 2;
-    i=1;
-  }
-
-  CFArray mipos= CFArray (loop-i);
-  for (; i < loop; i++)
+  CFArray mipos= CFArray (2);
+  CFFList mipoFactors;
+  for (int i= 1; i < 3; i++)
   {
     CanonicalForm Fi= F(eval[i-1],i);
 
@@ -423,13 +407,13 @@ differentevalpoint:
     zz_pX NTLFpi, NTLGpi;
     if (i == 2)
     {
-      NTLFpi= convertFacCF2NTLzzpX (smallestFactorEvalx/lc (smallestFactorEvalx));
-      NTLGpi= convertFacCF2NTLzzpX (Gpx/lc (Gpx));
+      NTLFpi=convertFacCF2NTLzzpX (smallestFactorEvalx/lc(smallestFactorEvalx));
+      NTLGpi=convertFacCF2NTLzzpX (Gpx/lc (Gpx));
     }
     else
     {
-      NTLFpi= convertFacCF2NTLzzpX (smallestFactorEvaly/lc (smallestFactorEvaly));
-      NTLGpi= convertFacCF2NTLzzpX (Gpy/lc (Gpy));
+      NTLFpi=convertFacCF2NTLzzpX (smallestFactorEvaly/lc(smallestFactorEvaly));
+      NTLGpi=convertFacCF2NTLzzpX (Gpy/lc (Gpy));
     }
     vec_zz_pX modFactors;
     modFactors.SetLength(2);
@@ -474,8 +458,9 @@ differentevalpoint:
     for (int j= 1; j <= s; j++)
       mipo += M (j,1)*power (x,s-j);
 
-    CFFList mipoFactors= factorize (mipo);
-    mipoFactors.removeFirst();
+    mipoFactors= factorize (mipo);
+    if (mipoFactors.getFirst().factor().inCoeffDomain())
+      mipoFactors.removeFirst();
 
 #ifdef HAVE_FLINT
     fmpz_poly_clear (v[0]);
@@ -489,51 +474,102 @@ differentevalpoint:
 #endif
 
     if (mipoFactors.length() > 1 ||
-        (mipoFactors.length() == 1 && mipoFactors.getFirst().exp() > 1))
+        (mipoFactors.length() == 1 && mipoFactors.getFirst().exp() > 1) ||
+         mipo.inCoeffDomain())
     {
-      if (i+1 >= loop && ((loop-i == 1) || (loop-i==2 && mipos[0].isZero())))
-      {
         rec=true;
         goto differentevalpoint;
-      }
     }
     else
-      mipos[loop-i-1]= mipo;
+      mipos[i-1]= mipo;
+  }
+
+  if (degree (mipos[0]) != degree (mipos[1]))
+  {
+    rec=true;
+    goto differentevalpoint;
   }
 
   On (SW_RATIONAL);
-  if (xValid && yValid && !mipos[0].isZero() && !mipos[1].isZero())
+  if (maxNorm (mipos[0]) < maxNorm (mipos[1]))
+    alpha= rootOf (mipos[0]);
+  else
+    alpha= rootOf (mipos[1]);
+
+  int wrongMipo= 0;
+
+  Variable beta;
+  if (maxNorm (mipos[0]) < maxNorm (mipos[1]))
   {
-    if (maxNorm (mipos[0]) < maxNorm (mipos[1]))
-      alpha= rootOf (mipos[0]);
-    else
-      alpha= rootOf (mipos[1]);
-  }
-  else if (xValid && yValid)
-  {
-    if (mipos[0].isZero())
-      alpha= rootOf (mipos[1]);
-    else
-      alpha= rootOf (mipos[0]);
+    mipoFactors= factorize (mipos[1], alpha);
+    if (mipoFactors.getFirst().factor().inCoeffDomain())
+      mipoFactors.removeFirst();
+    for (iter= mipoFactors; iter.hasItem(); iter++)
+    {
+      if (degree (iter.getItem().factor()) > 1)
+        wrongMipo++;
+    }
+    if (wrongMipo == mipoFactors.length())
+    {
+      rec=true;
+      goto differentevalpoint;
+    }
+    wrongMipo= 0;
+    beta= rootOf (mipos[1]);
+    mipoFactors= factorize (mipos[0], beta);
+    if (mipoFactors.getFirst().factor().inCoeffDomain())
+      mipoFactors.removeFirst();
+    for (iter= mipoFactors; iter.hasItem(); iter++)
+    {
+      if (degree (iter.getItem().factor()) > 1)
+        wrongMipo++;
+    }
+    if (wrongMipo == mipoFactors.length())
+    {
+      rec=true;
+      goto differentevalpoint;
+    }
   }
   else
-    alpha= rootOf (mipo);
+  {
+    mipoFactors= factorize (mipos[0], alpha);
+    if (mipoFactors.getFirst().factor().inCoeffDomain())
+      mipoFactors.removeFirst();
+    for (iter= mipoFactors; iter.hasItem(); iter++)
+    {
+      if (degree (iter.getItem().factor()) > 1)
+        wrongMipo++;
+    }
+    if (wrongMipo == mipoFactors.length())
+    {
+      rec=true;
+      goto differentevalpoint;
+    }
+    wrongMipo= 0;
+    beta= rootOf (mipos[0]);
+    mipoFactors= factorize (mipos[1], beta);
+    if (mipoFactors.getFirst().factor().inCoeffDomain())
+      mipoFactors.removeFirst();
+    for (iter= mipoFactors; iter.hasItem(); iter++)
+    {
+      if (degree (iter.getItem().factor()) > 1)
+        wrongMipo++;
+    }
+    if (wrongMipo == mipoFactors.length())
+    {
+      rec=true;
+      goto differentevalpoint;
+    }
+  }
+
 
   CanonicalForm F1;
-  CFFList QaF1Factors;
-  int wrongMipo= 0;
-  if (xValid && yValid)
-  {
-    if (degree (F,1) > minTdeg)
-      F1= F (eval[1], 2);
-    else
-      F1= F (eval[0], 1);
-  }
-  else if (xValid)
+  if (degree (F,1) > minTdeg)
     F1= F (eval[1], 2);
   else
     F1= F (eval[0], 1);
 
+  CFFList QaF1Factors;
   bool swap= false;
   if (F1.level() == 2)
   {
@@ -542,6 +578,7 @@ differentevalpoint:
     F= swapvar (F, x, y);
   }
 
+  wrongMipo= 0;
   QaF1Factors= factorize (F1, alpha);
   if (QaF1Factors.getFirst().factor().inCoeffDomain())
     QaF1Factors.removeFirst();
@@ -553,35 +590,9 @@ differentevalpoint:
 
   if (wrongMipo == QaF1Factors.length())
   {
-    if (xValid && yValid && !mipos[0].isZero() && !mipos[1].isZero())
-    {
-      if (maxNorm (mipos[0]) < maxNorm (mipos[1])) //try the other minpoly
-        alpha= rootOf (mipos[1]);
-      else
-        alpha= rootOf (mipos[0]);
-    }
-    else
-    {
-      rec= true;
-      F= bufF;
-      goto differentevalpoint;
-    }
-
-    wrongMipo= 0;
-    QaF1Factors= factorize (F1, alpha);
-    if (QaF1Factors.getFirst().factor().inCoeffDomain())
-      QaF1Factors.removeFirst();
-    for (iter= QaF1Factors; iter.hasItem(); iter++)
-    {
-      if (degree (iter.getItem().factor()) > minTdeg)
-        wrongMipo++;
-    }
-    if (wrongMipo == QaF1Factors.length())
-    {
-      rec= true;
-      F= bufF;
-      goto differentevalpoint;
-    }
+    rec= true;
+    F= bufF;
+    goto differentevalpoint;
   }
 
   CanonicalForm evaluation;
