@@ -181,11 +181,15 @@ absolute_factors;
 
 ring r3=0,(x,y,z,w),dp;
 poly f=(x2+y2+z2)^4+w8;
+tst_status();
 def S =absFactorize(f);
+tst_status();
 setring(S);
 absolute_factors;
 setring r3;
+tst_status();
 def T=absFactorizeBCG (f);
+tst_status();
 setring T;
 absolute_factors;
 
