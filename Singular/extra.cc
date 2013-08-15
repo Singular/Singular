@@ -3568,7 +3568,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   /*================= absBiFact ======================*/
-      if (strcmp(sys_cmd, "absBiFact") == 0)
+      if (strcmp(sys_cmd, "absFact") == 0)
       {
         if (h!=NULL)
         {
@@ -3578,7 +3578,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             intvec *v=NULL;
             ideal mipos= NULL;
             int n= 0;
-            ideal f=singclap_absBiFactorize((poly)(h->Data()), mipos, &v, n);
+            ideal f=singclap_absFactorize((poly)(h->Data()), mipos, &v, n);
             if (f==NULL) return TRUE;
             ivTest(v);
             lists l=(lists)omAllocBin(slists_bin);
