@@ -1,5 +1,5 @@
 /*
- * lib_zmatrix.h
+ * libf279_zmatrix.h
  *
  *  Created on: Sep 28, 2010
  *      Author: anders
@@ -310,6 +310,9 @@ public:
     assert(integral || typ::isField());
     int retSwaps=0;
     int currentRow=0;
+
+    if (height<2)
+      return 0;
 
     for(int i=0;i<width;i++)
       {
