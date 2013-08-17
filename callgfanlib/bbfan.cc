@@ -7,6 +7,7 @@
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/longrat.h>
+#include <kernel/polys.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipshell.h>
 #include <Singular/lists.h>
@@ -872,6 +873,113 @@ BOOLEAN fanViaCones(leftv res, leftv args)
   return TRUE;
 }
 
+BOOLEAN tropicalVariety(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == POLY_CMD))
+  {
+    int n = rVar(currRing);
+    gfan::ZFan* zf = new gfan::ZFan(n);
+    int* expv1 = (int*)omAlloc((n+1)*sizeof(int));
+    int* expv2 = (int*)omAlloc((n+1)*sizeof(int));
+    int* expvr = (int*)omAlloc((n+1)*sizeof(int));
+    gfan::ZVector expw1 = gfan::ZVector(n);
+    gfan::ZVector expw2 = gfan::ZVector(n);
+    gfan::ZVector expwr = gfan::ZVector(n);
+    gfan::ZMatrix eq, ineq;
+    for (poly s1=(poly)u->Data(); s1!=NULL; pIter(s1))
+    {
+      pGetExpV(s1,expv1);
+      expw1 = intStar2ZVector(n,expv1);
+      for (poly s2=pNext(s1); s2!=NULL; pIter(s2))
+      {
+        pGetExpV(s2,expv2);
+        expw2 = intStar2ZVector(n,expv2);
+        eq = gfan::ZMatrix(0,n);
+        eq.appendRow(expw1-expw2);
+        ineq = gfan::ZMatrix(0,n);
+        for (poly r=(poly)u->Data(); r!=NULL; pIter(r))
+        {
+          pGetExpV(r,expvr);
+          expwr = intStar2ZVector(n,expvr);
+          if ((r!=s1) && (r!=s2))
+          {
+            ineq.appendRow(expw1-expwr);
+          }
+        }
+        gfan::ZCone zc = gfan::ZCone(ineq,eq);
+        zf->insert(zc);
+      }
+    }
+    omFreeSize(expv1,(n+1)*sizeof(int));
+    omFreeSize(expv2,(n+1)*sizeof(int));
+    omFreeSize(expvr,(n+1)*sizeof(int));
+    res->rtyp = fanID;
+    res->data = (void*) zf;
+    return FALSE;
+  }
+  WerrorS("tropicalVariety: unexpected parameters");
+  return TRUE;
+}
+
+gfan::ZFan* commonRefinement(gfan::ZFan* zf, gfan::ZFan* zg)
+{
+  assume(zf->getAmbientDimension() == zg->getAmbientDimension());
+
+  // gather all maximal cones of f and g
+  std::list<gfan::ZCone> maximalConesOfF;
+  for (int d=0; d<=zf->getAmbientDimension(); d++)
+  {
+    for (int i=0; i<zf->numberOfConesOfDimension(d,0,1); i++)
+    {
+      maximalConesOfF.push_back(zf->getCone(d,i,0,1));
+    }
+  }
+
+  std::list<gfan::ZCone> maximalConesOfG;
+  for (int d=0; d<=zg->getAmbientDimension(); d++)
+  {
+    for (int i=0; i<zg->numberOfConesOfDimension(d,0,1); i++)
+    {
+      maximalConesOfG.push_back(zg->getCone(d,i,0,1));
+    }
+  }
+
+  // construct a new fan out of their intersections
+  gfan::ZFan* zr = new gfan::ZFan(zf->getAmbientDimension());
+  for (std::list<gfan::ZCone>::iterator itf=maximalConesOfF.begin();
+       itf != maximalConesOfF.end(); itf++)
+  {
+    for (std::list<gfan::ZCone>::iterator itg=maximalConesOfG.begin();
+         itg != maximalConesOfG.end(); itg++)
+    {
+      zr->insert(intersection(*itf,*itg));
+    }
+  }
+
+  return zr;
+}
+
+BOOLEAN commonRefinement(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == fanID))
+  {
+    leftv v=u->next;
+    if ((v != NULL) && (v->Typ() == fanID))
+    {
+      gfan::ZFan* zf = (gfan::ZFan*) u->Data();
+      gfan::ZFan* zg = (gfan::ZFan*) v->Data();
+      gfan::ZFan* zr = commonRefinement(zf,zg);
+      res->rtyp = fanID;
+      res->data = (void*) zr;
+      return FALSE;
+    }
+  }
+  WerrorS("commonRefinement: unexpected parameters");
+  return TRUE;
+}
+
 // BOOLEAN grFan(leftv res, leftv h)
 // {
 //   /*======== GFAN ==============*/
@@ -954,6 +1062,8 @@ void bbfan_setup()
   iiAddCproc("","fanFromString",FALSE,fanFromString);
   iiAddCproc("","fanViaCones",FALSE,fanViaCones);
   iiAddCproc("","numberOfConesWithVector",FALSE,numberOfConesWithVector);
+  iiAddCproc("","tropicalVariety",FALSE,tropicalVariety);
+  iiAddCproc("","commonRefinement",FALSE,commonRefinement);
   // iiAddCproc("","isComplete",FALSE,isComplete);  not working as expected, should leave this to polymake
   iiAddCproc("","fVector",FALSE,fVector);
   iiAddCproc("","containsInCollection",FALSE,containsInCollection);

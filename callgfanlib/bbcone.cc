@@ -100,6 +100,14 @@ gfan::ZVector* bigintmatToZVector(const bigintmat &bim)
   return zv;
 }
 
+gfan::ZVector intStar2ZVector(const int d, const int* i)
+{
+  gfan::ZVector zv(d);
+  for(int j=0; j<d; j++)
+    zv[j]=i[j+1];
+  return zv;
+}
+
 char* toString(gfan::ZMatrix const &zm)
 {
   bigintmat* bim = zMatrixToBigintmat(zm);
@@ -612,7 +620,7 @@ BOOLEAN coneViaRays(leftv res, leftv args)
 BOOLEAN inequalities(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && ((u->Typ() == coneID) || (u->Typ() == polytopeID)))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
 
@@ -628,7 +636,7 @@ BOOLEAN inequalities(leftv res, leftv args)
 BOOLEAN equations(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && ((u->Typ() == coneID) || (u->Typ() == polytopeID)))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->getEquations();
@@ -643,7 +651,7 @@ BOOLEAN equations(leftv res, leftv args)
 BOOLEAN facets(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && ((u->Typ() == coneID) || (u->Typ() == polytopeID)))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zm = zc->getFacets();
@@ -651,13 +659,6 @@ BOOLEAN facets(leftv res, leftv args)
     res->data = (void*) zMatrixToBigintmat(zm);
     return FALSE;
   }
-  if ((u != NULL) && (u->Typ() == polytopeID))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      res->rtyp = BIGINTMAT_CMD;
-      res->data = (void*) getFacetNormals(zc);
-      return FALSE;
-    }
   WerrorS("facets: unexpected parameters");
   return TRUE;
 }
@@ -665,7 +666,7 @@ BOOLEAN facets(leftv res, leftv args)
 BOOLEAN impliedEquations(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && ((u->Typ() == coneID) || (u->Typ() == polytopeID)))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->getImpliedEquations();
@@ -680,7 +681,7 @@ BOOLEAN impliedEquations(leftv res, leftv args)
 BOOLEAN generatorsOfSpan(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && ((u->Typ() == coneID) || (u->Typ() == polytopeID)))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->generatorsOfSpan();
@@ -695,7 +696,7 @@ BOOLEAN generatorsOfSpan(leftv res, leftv args)
 BOOLEAN generatorsOfLinealitySpace(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && ((u->Typ() == coneID) || (u->Typ() == polytopeID)))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->generatorsOfLinealitySpace();
