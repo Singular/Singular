@@ -1694,7 +1694,7 @@ intvec* singntl_LLL(intvec*  m, const ring)
   return mm;
 }
 
-ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors, const ring r)
+ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors, const ring r)
 {
   p_Test(f, r);
 
