@@ -275,7 +275,7 @@ Singular ESingular TSingular $(optional_Singular_programs): ${abs_builddir}/LIB
 nodist_Singular_SOURCES = libSingular.la
 # nodist_Singularg_SOURCES =  libSingular_g.la
 
-Singular_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
+Singular_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 # Singularg_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 Singular_LDADD = libSingular.la
@@ -296,7 +296,7 @@ Singular_LDFLAGS = -static ${AMLDFLAGS}
 # Singulard_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 # Singulardg_CXXFLAGS = -g -Wextra -Wall -Wno-long-long -pedantic ${PIPE} $(CXXTEMPLFLAGS)
 
-Singulard_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
+Singulard_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 nodist_Singulard_SOURCES = libSingular.la
 
 # Singulardg_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
