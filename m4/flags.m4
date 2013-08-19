@@ -103,20 +103,20 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  fi
  
  if test "x${ENABLE_OPTIMIZATION}" != xno; then 
-  OPTFLAGS="-DOM_NDEBUG -DNDEBUG -O2 -Wno-unused-function -Wno-unused-parameter -Wno-unused-variable -fomit-frame-pointer -fwrapv -fpermissive -fvisibility=default"
+  OPTFLAGS="-DOM_NDEBUG -DNDEBUG -O3 -Wno-unused-function -Wno-unused-parameter -Wno-unused-variable -fomit-frame-pointer -fwrapv -fvisibility=default -finline-functions -fno-exceptions -fno-rtti -fno-threadsafe-statics -fno-enforce-eh-specs -fconserve-space"
   #  -O3 - crashes gcc???!!!  
+  # -fpermissive 
   AC_LANG_PUSH([C])
   AX_APPEND_COMPILE_FLAGS(${OPTFLAGS}, [CFLAGS])
   AC_LANG_POP([C])
   AC_LANG_PUSH([C++])
   AX_APPEND_COMPILE_FLAGS(${OPTFLAGS}, [CXXFLAGS])
-  AX_APPEND_COMPILE_FLAGS([-fno-exceptions -fno-rtti -fpermissive], [CXXFLAGS])
-  # AX_APPEND_COMPILE_FLAGS([-fno-implicit-templates], [CXXFLAGS]) # problems due to STL
+#   AX_APPEND_COMPILE_FLAGS([-fno-threadsafe-statics -fno-enforce-eh-specs -fconserve-space], [CXXFLAGS])
+###  AX_APPEND_COMPILE_FLAGS([-fno-implicit-templates], [CXXFLAGS]) # problems due to STL
   AC_LANG_POP([C++])
   AX_APPEND_LINK_FLAGS(${OPTFLAGS}) 
-  AX_APPEND_LINK_FLAGS([-fno-exceptions -fno-rtti -fpermissive])
-#  AX_APPEND_LINK_FLAGS([-fno-implicit-templates]) # see above :(
-  AX_APPEND_LINK_FLAGS([ -fpermissive -fvisibility=default]) 
+#  AX_APPEND_LINK_FLAGS([-fno-threadsafe-statics -fno-enforce-eh-specs -fconserve-space])
+###  AX_APPEND_LINK_FLAGS([-fno-implicit-templates]) # see above :(
 #  AX_APPEND_LINK_FLAGS([ ])
  fi
 
