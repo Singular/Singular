@@ -1372,7 +1372,7 @@ void initSba(ideal F,kStrategy strat)
     strat->LazyPass *=4;
     strat->red2 = redHomog;
   }
-#ifdef HAVE_RINGS || HAVE_RINGS_LOC  //TODO Oliver
+#if defined(HAVE_RINGS) || defined(HAVE_RINGS_LOC)  //TODO Oliver
   if (rField_is_Ring(currRing))
   {
     if(currRing->OrdSgn == -1)
@@ -1742,8 +1742,8 @@ loop_count = 1;
 
       // clear strat->P
       if (strat->P.lcm!=NULL)
-#ifdef HAVE_RINGS || HAVE_RINGS_LOC
-        pLmDelete(strat->P.lcm);
+#if defined(HAVE_RINGS) || defined(HAVE_RINGS_LOC)
+	 pLmDelete(strat->P.lcm);
 #else
         pLmFree(strat->P.lcm);
 #endif
