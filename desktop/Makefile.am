@@ -4,20 +4,20 @@ iconsdir = $(datadir)/icons
 icons_DATA = Singular.png
 
 desktopdir = $(datadir)/applications
-desktop_DATA = $(builddir)/Singular.desktop $(builddir)/Singular-manual.desktop
+desktop_DATA = Singular.desktop Singular-manual.desktop
 
 substvars = sed \
 	-e 's![@]docdir[@]!$(docdir)!g' \
 	-e 's![@]datadir[@]!$(datadir)!g' \
 	-e 's![@]PACKAGE_VERSION[@]!$(PACKAGE_VERSION)!g'
 
-Singular.desktop: $(abs_srcdir)/Singular.desktop.in Makefile
-	$(AM_V_GEN) $(substvars) $< > $@
+Singular.desktop: $(abs_srcdir)/Singular.desktop.in
+	$(AM_V_GEN) $(substvars) $(abs_srcdir)/Singular.desktop.in > $@
 
 #	$(do_subst) < $(srcdir)/automake.in > automake
 
-Singular-manual.desktop: $(abs_srcdir)/Singular-manual.desktop.in Makefile
-	$(AM_V_GEN) $(substvars) $< > $@
+Singular-manual.desktop: $(abs_srcdir)/Singular-manual.desktop.in
+	$(AM_V_GEN) $(substvars) $(abs_srcdir)/Singular-manual.desktop.in > $@
 
 desktop_in = Singular.desktop.in Singular-manual.desktop.in
 
