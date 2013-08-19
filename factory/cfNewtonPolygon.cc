@@ -64,7 +64,7 @@ void swap (int** points, int i, int j)
 static
 bool isLess (int* point1, int* point2)
 {
-  int area= point1[0]*point2[1]- point1[1]*point2[0];
+  long area= point1[0]*point2[1]- point1[1]*point2[0];
   if (area > 0) return true;
   if (area == 0)
   {
@@ -107,8 +107,8 @@ void sort (int** points, int sizePoints)
 static
 bool isConvex (int* point1, int* point2, int* point3)
 {
-  int relArea= (point1[0] - point2[0])*(point3[1] - point2[1]) -
-               (point1[1] - point2[1])*(point3[0] - point2[0]);
+  long relArea= (point1[0] - point2[0])*(point3[1] - point2[1]) -
+                (point1[1] - point2[1])*(point3[0] - point2[0]);
   if (relArea < 0)
     return true;
   if (relArea == 0)
@@ -152,7 +152,7 @@ int grahamScan (int** points, int sizePoints)
   }
   if (i + 1 <= sizePoints || i == sizePoints)
   {
-    int relArea=
+    long relArea=
     (points [i-2][0] - points [i-1][0])*(points [0][1] - points [i-1][1])-
     (points [i-2][1] - points [i-1][1])*(points [0][0] - points [i-1][0]);
     if (relArea == 0)
