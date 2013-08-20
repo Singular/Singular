@@ -95,6 +95,8 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
   const VarIndex varCount = conf.varCount();
 
   bool didSetComponentBefore = false;
+  mgb::GroebnerConfiguration::BaseOrder baseOrder =
+    mgb::GroebnerConfiguration::RevLexDescendingBaseOrder;
 
   std::vector<Exponent> gradings;
   for (int block = 0; r->order[block] != ringorder_no; ++block) {
@@ -148,18 +150,18 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
     // *** single-graded/ungraded lex/revlex orders
     // a(w): w-graded and that's it
     // a64(w): w-graded with 64-bit weights (not supported here)
-    // lp: lex from left
-    // Dp: 1-graded, lex from left
-    // Ds: -1-graded, lex from left
-    // Wp(w): w-graded, lex from left
-    // Ws(w): -w-graded, lex from left
-    // rp: lex from right
-    // rs: revlex from right
-    // dp: 1-graded, revlex from right
-    // ds: -1-graded, revlex from right
-    // wp(w): w-graded, revlex from right
-    // ws(w): -w-graded, revlex from right
-    // ls: revlex from left
+    //    lp:               lex from  left (descending)
+    //    Dp:  1-graded,    lex from  left (descending)
+    //    Ds: -1-graded,    lex from  left (descending)
+    // Wp(w):  w-graded,    lex from  left (descending)
+    // Ws(w): -w-graded,    lex from  left (descending)
+    //    rp:               lex from right (ascending)
+    //    rs:            revlex from right (descending)
+    //    dp:  1-graded, revlex from right (descending)
+    //    ds: -1-graded, revlex from right (descending)
+    // wp(w):  w-graded, revlex from right (descending)
+    // ws(w): -w-graded, revlex from right (descending)
+    //    ls:            revlex from  left (ascending)
 
     if (type == ringorder_a64) {
       WerrorS("Block type a64 not supported for MathicGB interface.");
@@ -216,7 +218,22 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
       type == ringorder_wp ||
       type == ringorder_ws;
     if (lexFromLeft || lexFromRight || revlexFromLeft || revlexFromRight) {
-      // todo: support using baseOrder when possible
+      const int next = r->order[block + 1];
+      bool final = next == ringorder_no;
+      if (!final && r->order[block + 2] == ringorder_no)
+        final = next == ringorder_c || next == ringorder_C;
+      if (final) {
+        if (lexFromRight)
+          baseOrder = mgb::GroebnerConfiguration::LexAscendingBaseOrder;
+        else if (revlexFromRight)
+          baseOrder = mgb::GroebnerConfiguration::RevLexDescendingBaseOrder;
+        else if (lexFromLeft)
+          baseOrder = mgb::GroebnerConfiguration::LexDescendingBaseOrder;
+        else
+          baseOrder = mgb::GroebnerConfiguration::RevLexAscendingBaseOrder;
+        continue;
+      }
+
       const size_t begin = gradings.size();
       gradings.resize(begin + dim * varCount);
       const Exponent value = (lexFromLeft || lexFromRight) ? 1 : -1;
@@ -282,10 +299,7 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
     return false;
   }
 
-  if (!conf.setMonomialOrder(
-    mgb::GroebnerConfiguration::LexicographicBaseOrder,
-    gradings
-  )) {
+  if (!conf.setMonomialOrder(baseOrder, gradings)) {
     WerrorS("MathicGB does not support non-global orders.");
     return false;
   }
@@ -309,10 +323,9 @@ bool prOrderMatrix(ring r) {
       std::cerr << ' ' << gradings[row * varCount + col];
     std::cerr << '\n';
   }
-  std::cerr << "Base order: " <<
-    (conf.monomialOrder().first ==
-      mgb::GroebnerConfiguration::LexicographicBaseOrder ?
-      "lex" : "revlex")
+  std::cerr
+    << "Base order: "
+    << mgb::GroebnerConfiguration::baseOrderName(conf.monomialOrder().first)
     << '\n';
   std::cerr << "Component before: " << conf.componentBefore() << '\n';
   std::cerr << "Components ascending: " << conf.componentsAscending() << '\n';
@@ -436,8 +449,18 @@ void prOrder(ring r) {
 }
 
 BOOLEAN prOrderX(leftv result, leftv arg) {
+  if (currRing == 0) {
+    WerrorS("There is no current ring.");
+    return TRUE;
+  }
   prOrder(currRing);
   prOrderMatrix(currRing);
+  result->rtyp=NONE;
+  return FALSE;
+}
+
+BOOLEAN setRingGlobal(leftv result, leftv arg) {
+  currRing->OrdSgn = 1;
   result->rtyp=NONE;
   return FALSE;
 }
@@ -511,6 +534,12 @@ int singmathic_mod_init(SModulFunctions* psModulFunctions)
     "mathicgb_prOrder",
     FALSE,
     prOrderX
+  );
+  psModulFunctions->iiAddCproc(
+    (currPack->libname ? currPack->libname : ""),
+    "mathicgb_setRingGlobal",
+    FALSE,
+    setRingGlobal
   );
   return 1;
 }
