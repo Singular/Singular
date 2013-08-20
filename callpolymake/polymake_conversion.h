@@ -14,13 +14,14 @@
 #include <polymake/Integer.h>
 #include <polymake/Set.h>
 #include <polymake/common/lattice_tools.h>
+#include <polymake/IncidenceMatrix.h>
 
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>
 
 #include <kernel/intvec.h>
 
-/* Functions for converting Integers, Rationals and their Matrices 
+/* Functions for converting Integers, Rationals and their Matrices
    in between C++, gfan, polymake and singular */
 
 /* gfan -> polymake */
@@ -43,8 +44,11 @@ gfan::QMatrix PmMatrixRational2GfQMatrix (const polymake::Matrix<polymake::Ratio
 int PmInteger2Int(const polymake::Integer& pi, bool &ok);
 intvec* PmVectorInteger2Intvec (const polymake::Vector<polymake::Integer>* vi, bool &ok);
 intvec* PmMatrixInteger2Intvec (polymake::Matrix<polymake::Integer>* mi, bool &ok);
-// intvec* PmIncidenceMatrix2Intvec (polymake::IncidenceMatrix<polymake::NonSymmetric>* icmat);
+lists PmIncidenceMatrix2ListOfIntvecs (polymake::IncidenceMatrix<polymake::NonSymmetric>* icmat);
+lists PmAdjacencyMatrix2ListOfEdges (polymake::IncidenceMatrix<polymake::NonSymmetric>* icmat);
 intvec* PmSetInteger2Intvec (polymake::Set<polymake::Integer>* si, bool &b);
+number PmInteger2Number (const polymake::Integer& pi);
+bigintmat* PmMatrixInteger2Bigintmat (polymake::Matrix<polymake::Integer>* mi);
 
 /* polymake <- singular */
 
