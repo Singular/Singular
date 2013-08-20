@@ -1,11 +1,19 @@
-#include "Singular/mod2.h"
-#include "kernel/ring.h"
-#include "kernel/febase.h"
-#include "kernel/ideals.h"
-#include "kernel/polys.h"
-#include "kernel/numbers.h"
-#include "kernel/options.h"
-#include "Singular/ipid.h"
+// include header files
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
+#include <misc/auxiliary.h>
+#include <kernel/mod2.h>
+
+#include <misc/options.h>
+
+#include <kernel/febase.h>
+#include <kernel/ideals.h>
+#include <kernel/polys.h>
+
+#include <Singular/ipid.h>
+#include <Singular/mod_lib.h>
 
 #ifdef HAVE_MATHICGB
 
@@ -520,7 +528,7 @@ BOOLEAN mathicgb(leftv result, leftv arg)
 template void mgb::computeGroebnerBasis<MathicToSingStream>
   (mgb::GroebnerInputIdealStream&, MathicToSingStream&);
 
-int singmathic_mod_init(SModulFunctions* psModulFunctions)
+int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
 {
   PrintS("Initializing Singular-Mathic interface Singmathic.\n");
   psModulFunctions->iiAddCproc(
@@ -544,15 +552,16 @@ int singmathic_mod_init(SModulFunctions* psModulFunctions)
   return 1;
 }
 
-#else
+#else /* HAVE_MATHICGB */
 
-int singmathic_mod_init(SModulFunctions* psModulFunctions)
+int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
 {
-  PrintS(
+  WerrorS(
     "Cannot initialize the Singular interface to MathicGB "
     "as this Singular executable was built without support "
     "for MathicGB."
   );
+  return 0;
 }
 
-#endif
+#endif /* HAVE_MATHICGB */
