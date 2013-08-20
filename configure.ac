@@ -10,6 +10,9 @@ AC_CONFIG_SRCDIR([Singular/tesths.cc])
 
 AC_CONFIG_HEADER([config.h])
 
+dnl Apparently, this is required for using an AC_CHECK_HEADER within AS_IF(...), at least on Cygwin.
+AC_USE_SYSTEM_EXTENSIONS
+
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
 
@@ -56,6 +59,8 @@ AC_CHECK_LIB(pthread,pthread_create)
 LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 LB_CHECK_FLINT(2.3,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
+LB_CHECK_MATHICGB
+
 
 AX_PYTHON_DEFAULT()
 AX_PYTHON_WITH_VERSION([2.4])
@@ -86,6 +91,7 @@ SING_CHECK_POLYMAKE
 
 ### the following is needed due to the use of om_sing_opt_show_mem in misc_ip.cc...
 #ac_configure_args="$ac_configure_args --with-external-config_h=../Singular/omSingularConfig.h"
+
 
 AC_ARG_ENABLE(omalloc, AS_HELP_STRING([--disable-omalloc], [do NOT use omalloc within the factory]),
  [if test "x$enableval"  = "xyes"; then

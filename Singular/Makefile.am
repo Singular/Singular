@@ -137,6 +137,7 @@ SOURCES =    Minor.cc\
    links/semaphore.c\
    subexpr.cc\
    pyobject_setup.cc\
+   singmathic.cc\
    walk.cc\
    walk_ip.cc\
    wrapper.cc\
