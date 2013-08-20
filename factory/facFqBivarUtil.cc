@@ -742,8 +742,19 @@ int * computeBounds (const CanonicalForm& F, int& n, bool& isIrreducible)
   minY= newtonPolyg [0] [1];
   maxX= minX;
   maxY= minY;
+  int indZero= 0;
   for (int i= 1; i < sizeOfNewtonPolygon; i++)
   {
+    if (newtonPolyg[i][1] == 0)
+    {
+      if (newtonPolyg[indZero][1] == 0)
+      {
+        if (newtonPolyg[indZero][0] < newtonPolyg[i][0])
+          indZero= i;
+      }
+      else
+        indZero= i;
+    }
     if (minX > newtonPolyg [i] [0])
       minX= newtonPolyg [i] [0];
     if (maxX < newtonPolyg [i] [0])
@@ -754,9 +765,67 @@ int * computeBounds (const CanonicalForm& F, int& n, bool& isIrreducible)
       maxY= newtonPolyg [i] [1];
   }
 
-  int k= maxX;
+  int slopeNum, slopeDen, constTerm;
+  bool negativeSlope=false;
+  if (indZero != sizeOfNewtonPolygon - 1)
+  {
+    slopeNum= newtonPolyg[indZero+1][0]-newtonPolyg[indZero][0];
+    slopeDen= newtonPolyg[indZero+1][1];
+    constTerm= newtonPolyg[indZero][0];
+  }
+  else
+  {
+    slopeNum= newtonPolyg[0][0]-newtonPolyg[indZero][0];
+    slopeDen= newtonPolyg[0][1];
+    constTerm= newtonPolyg[indZero][0];
+  }
+  if (slopeNum < 0)
+  {
+    slopeNum= -slopeNum;
+    negativeSlope= true;
+  }
+  int k= 0;
   for (int i= 0; i < n; i++)
   {
+    if (((indZero+1) < sizeOfNewtonPolygon && (i+1) > newtonPolyg[indZero+1][1])
+        || ((indZero+1) >= sizeOfNewtonPolygon && (i+1) > newtonPolyg[0][1]))
+    {
+      if (indZero + 1 != sizeOfNewtonPolygon)
+        indZero++;
+      else
+        indZero= 0;
+      if (indZero != sizeOfNewtonPolygon - 1)
+      {
+        slopeNum= newtonPolyg[indZero+1][0]-newtonPolyg[indZero][0];
+        slopeDen= newtonPolyg[indZero+1][1]-newtonPolyg[indZero][1];
+        constTerm= newtonPolyg[indZero][0];
+      }
+      else
+      {
+        slopeNum= newtonPolyg[0][0]-newtonPolyg[indZero][0];
+        slopeDen= newtonPolyg[0][1]-newtonPolyg[indZero][1];
+        constTerm= newtonPolyg[indZero][0];
+      }
+      if (slopeNum < 0)
+      {
+        negativeSlope= true;
+        slopeNum= - slopeNum;
+        k= (int) -(((long) slopeNum*((i+1)-newtonPolyg[indZero][1])+slopeDen-1)/
+                   slopeDen) + constTerm;
+      }
+      else
+        k= (int) (((long) slopeNum*((i+1)-newtonPolyg[indZero][1])) / slopeDen)
+                  + constTerm;
+    }
+    else
+    {
+      if (negativeSlope)
+        k= (int) -(((long) slopeNum*((i+1)-newtonPolyg[indZero][1])+slopeDen-1)/
+                   slopeDen) + constTerm;
+      else
+        k= (int) ((long) slopeNum*((i+1)-newtonPolyg[indZero][1])) / slopeDen
+                  + constTerm;
+    }
     if (i + 1 > maxY || i + 1 < minY)
     {
       result [i]= 0;
@@ -765,15 +834,15 @@ int * computeBounds (const CanonicalForm& F, int& n, bool& isIrreducible)
     int* point= new int [2];
     point [0]= k;
     point [1]= i + 1;
-    while (!isInPolygon (newtonPolyg, sizeOfNewtonPolygon, point) && k > 0)
-    {
-      k--;
-      point [0]= k;
-    }
+    if (!isInPolygon (newtonPolyg, sizeOfNewtonPolygon, point) && k > 0)
+      k= 0;
     result [i]= k;
-    k= maxX;
     delete [] point;
   }
+
+  for (int i= 0; i < sizeOfNewtonPolygon; i++)
+    delete [] newtonPolyg[i];
+  delete [] newtonPolyg;
 
   return result;
 }
@@ -827,8 +896,19 @@ computeBoundsWrtDiffMainvar (const CanonicalForm& F, int& n,
   minY= newtonPolyg [0] [1];
   maxX= minX;
   maxY= minY;
+  int indZero= 0;
   for (int i= 1; i < sizeOfNewtonPolygon; i++)
   {
+    if (newtonPolyg[i][0] == 0)
+    {
+      if (newtonPolyg[indZero][0] == 0)
+      {
+        if (newtonPolyg[indZero][1] < newtonPolyg[i][1])
+          indZero= i;
+      }
+      else
+        indZero= i;
+    }
     if (minX > newtonPolyg [i] [0])
       minX= newtonPolyg [i] [0];
     if (maxX < newtonPolyg [i] [0])
@@ -839,9 +919,67 @@ computeBoundsWrtDiffMainvar (const CanonicalForm& F, int& n,
       maxY= newtonPolyg [i] [1];
   }
 
-  int k= maxY;
+  int slopeNum, slopeDen, constTerm;
+  bool negativeSlope=false;
+  if (indZero != sizeOfNewtonPolygon - 1)
+  {
+    slopeNum= newtonPolyg[indZero+1][1]-newtonPolyg[indZero][1];
+    slopeDen= newtonPolyg[indZero+1][0];
+    constTerm= newtonPolyg[indZero][1];
+  }
+  else
+  {
+    slopeNum= newtonPolyg[0][1]-newtonPolyg[indZero][1];
+    slopeDen= newtonPolyg[0][0];
+    constTerm= newtonPolyg[indZero][1];
+  }
+  if (slopeNum < 0)
+  {
+    slopeNum= -slopeNum;
+    negativeSlope= true;
+  }
+  int k= 0;
   for (int i= 0; i < n; i++)
   {
+    if (((indZero+1) < sizeOfNewtonPolygon && (i+1) > newtonPolyg[indZero+1][0])
+        || ((indZero+1) >= sizeOfNewtonPolygon && (i+1) > newtonPolyg[0][0]))
+    {
+      if (indZero + 1 != sizeOfNewtonPolygon)
+        indZero++;
+      else
+        indZero= 0;
+      if (indZero != sizeOfNewtonPolygon - 1)
+      {
+        slopeNum= newtonPolyg[indZero+1][1]-newtonPolyg[indZero][1];
+        slopeDen= newtonPolyg[indZero+1][0]-newtonPolyg[indZero][0];
+        constTerm= newtonPolyg[indZero][1];
+      }
+      else
+      {
+        slopeNum= newtonPolyg[0][1]-newtonPolyg[indZero][1];
+        slopeDen= newtonPolyg[0][0]-newtonPolyg[indZero][0];
+        constTerm= newtonPolyg[indZero][1];
+      }
+      if (slopeNum < 0)
+      {
+        negativeSlope= true;
+        slopeNum= - slopeNum;
+        k= (int) -(((long) slopeNum*((i+1)-newtonPolyg[indZero][0])+slopeDen-1)/
+                   slopeDen) + constTerm;
+      }
+      else
+        k= (int) (((long) slopeNum*((i+1)-newtonPolyg[indZero][0])) / slopeDen)
+                  + constTerm;
+    }
+    else
+    {
+      if (negativeSlope)
+        k= (int) -(((long) slopeNum*((i+1)-newtonPolyg[indZero][0])+slopeDen-1)/
+                   slopeDen) + constTerm;
+      else
+        k= (int) ((long) slopeNum*((i+1)-newtonPolyg[indZero][0])) / slopeDen
+                  + constTerm;
+    }
     if (i + 1 > maxX || i + 1 < minX)
     {
       result [i]= 0;
@@ -850,15 +988,15 @@ computeBoundsWrtDiffMainvar (const CanonicalForm& F, int& n,
     int* point= new int [2];
     point [0]= i + 1;
     point [1]= k;
-    while (!isInPolygon (newtonPolyg, sizeOfNewtonPolygon, point) && k > 0)
-    {
-      k--;
-      point [1]= k;
-    }
+    if (!isInPolygon (newtonPolyg, sizeOfNewtonPolygon, point) && k > 0)
+      k= 0;
     result [i]= k;
-    k= maxY;
     delete [] point;
   }
+
+  for (int i= 0; i < sizeOfNewtonPolygon; i++)
+    delete [] newtonPolyg[i];
+  delete [] newtonPolyg;
 
   return result;
 }
