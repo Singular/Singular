@@ -279,7 +279,7 @@ EXAMPLE: not available (for technical reasons)
      outfile=system("getenv","PWD") + "/" + outfile;
   }
   j=system("sh", "dot -Tjpg " + @filename + " -o "+ outfile);
-  j=system("sh","/usr/bin/X11/xv " + outfile + "&");
+  j=system("sh","xv " + outfile + "&");
 //---------------------------------------------------------------------------
 // Clean up public directories if necessary
 //---------------------------------------------------------------------------
@@ -576,12 +576,12 @@ EXAMPLE: not available (for technical reasons)
      j=system("sh", "surf -n " + fnamebase +string(endCharts[i]) + ".surf");
      if(!defined(outfile))
      {
-        j=system("sh","/usr/bin/X11/xv " + fnamebase
+        j=system("sh","xv " + fnamebase
                        + string(endCharts[i]) + ".ras &");
      }
      else
      {
-        j=system("sh","/usr/bin/X11/xv " + outfile
+        j=system("sh","xv " + outfile
                        + string(endCharts[i]) + ".ras &");
         kill outfile;
      }
