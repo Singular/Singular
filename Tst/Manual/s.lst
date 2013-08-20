@@ -84,7 +84,6 @@ breakpoint.tst
 cantoradd.tst
 Center.tst
 chaincrit.tst
-changeord.tst
 changevar.tst
 closetex.tst
 coeffs_1.tst
@@ -314,7 +313,6 @@ diag.tst
 diagInvariants.tst
 dimMon.tst
 divisor.tst
-dump.tst
 elimlinearpart.tst
 elimRing.tst
 equalJinI.tst
@@ -347,7 +345,6 @@ Long_coefficients.tst
 matrix_type_cast.tst
 Max.tst
 maxabs.tst
-minMult.tst
 Miscellaneous_oddities_4.tst
 nameof.tst
 _names.tst
@@ -413,7 +410,6 @@ ERROR.tst
 exteriorBasis.tst
 gcdN.tst
 genericmat.tst
-getdump.tst
 GKdim.tst
 hessenberg.tst
 Identifier_resolution_1.tst
@@ -682,7 +678,6 @@ texfactorize.tst
 Tor.tst
 U_D_O.tst
 view.tst
-watchdog.tst
 weierstrDiv.tst
 writeNmzPaths.tst
 ademRelations.tst
@@ -1212,7 +1207,6 @@ lst2str.tst
 makeLetterplaceRing.tst
 makeUso11.tst
 number_pi.tst
-pnormalform.tst
 primary_char0.tst
 restrictionModule.tst
 smith.tst
@@ -1362,7 +1356,6 @@ algebraicDependence.tst
 facGBIdeal.tst
 jungfib.tst
 BrillNoether.tst
-grobcov.tst
 nrRootsProbab.tst
 esIdeal.tst
 extcurve.tst
@@ -1371,8 +1364,6 @@ normal.tst
 BINresol.tst
 operatorBM.tst
 decodeRandom.tst
-buildtreetoMaple.tst
-cgsdr.tst
 decode.tst
 Eresol.tst
 multiDegBasis.tst
@@ -1390,7 +1381,6 @@ prepSV.tst
 cgs.tst
 sysBin.tst
 makeUe8.tst
-cgsdrold.tst
 euler.tst
 realzero.tst
 Solving_systems_of_polynomial_equations.tst
@@ -1410,13 +1400,11 @@ paraConic.tst
 irred_secondary_char0.tst
 jungnormal.tst
 deRhamCohom.tst
-gencase1.tst
 deRhamCohomIdeal.tst
 realrad.tst
 abstractR.tst
 jungresolve.tst
 discrepancy.tst
-cantreetoMaple.tst
 perron.tst
 homogfacFirstQWeyl_all.tst
 homogfacFirstQWeyl.tst
@@ -1436,5 +1424,4 @@ timeStd.tst
 assPrimes.tst
 facFirstShift.tst
 spectralNeg.tst
-grobcovold.tst
 SannfsBFCT.tst
