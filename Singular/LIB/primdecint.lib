@@ -1063,7 +1063,6 @@ static proc separatorsZ(int j, list B)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
 static proc extractZ(ideal J, int j, list L, list B)
 {
    //=== P is an associated prime of J, the corresponding primary ideal is
@@ -1084,7 +1083,8 @@ static proc extractZ(ideal J, int j, list L, list B)
    {
       if(L[1][3]!=0)
       {
-         //=== if u in x is an independent set of L then we compute a Groebner
+         //=== if u in x is an independent set of L then we compute a
+Groebner
          //=== Basis in Z[u][x-u]
          execute("ring S=integer,("+L[1][1]+"),lp;");
          ideal I=imap(R,I);
@@ -1096,20 +1096,32 @@ static proc extractZ(ideal J, int j, list L, list B)
          ideal I=imap(S,I);
          I[1]=0;
          I=simplify(I,2);
-         //=== this is our way to obtain the coefficients in Z[u] of the
-         //=== leading terms of the Groebner basis above
-         string quotring=prepareQuotientring(nvars(basering)-L[1][3]);
-         execute(quotring);
-         ideal I=imap(Shelp,I);
-         list C;
-         int i;
-         for(i=1;i<=size(I);i++)
+         if(L[1][3]==nvars(basering))
          {
-            C[i]=leadcoef(I[i]);
+            list C;
+            int i;
+            for(i=1;i<=size(I);i++)
+            {
+               C[i]=I[i];
+            }
          }
-         setring Shelp;
-         list C=imap(quring,C);
-
+         else
+         {
+            //=== this is our way to obtain the coefficients in Z[u] of the
+            //=== leading terms of the Groebner basis above
+            string
+quotring=Primdec::prepareQuotientring(nvars(basering)-L[1][3]);
+            execute(quotring);
+            ideal I=imap(Shelp,I);
+            list C;
+            int i;
+            for(i=1;i<=size(I);i++)
+            {
+               C[i]=leadcoef(I[i]);
+            }
+            setring Shelp;
+            list C=imap(quring,C);
+         }
          setring R;
          list C=imap(Shelp,C);
       }
