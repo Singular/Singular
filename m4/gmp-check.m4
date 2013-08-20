@@ -32,6 +32,8 @@ BACKUP_LIBS=${LIBS}
 
 AC_MSG_CHECKING(for GMP >= $min_gmp_version)
 
+AC_LANG_PUSH([C])
+
 for GMP_HOME in ${GMP_HOME_PATH} 
   do	
 #	if test -r "$GMP_HOME/include/gmp.h"; then
@@ -40,8 +42,8 @@ for GMP_HOME in ${GMP_HOME_PATH}
 			GMP_CFLAGS="-I${GMP_HOME}/include"
 			GMP_LIBS="-L${GMP_HOME}/lib -lgmp"	
 		else
-			GMP_CFLAGS="${BACKUP_CFLAGS}"
-			GMP_LIBS="${BACKUP_LIBS} -lgmp"		
+			GMP_CFLAGS=""
+			GMP_LIBS="-lgmp"
 		fi
 	
 		CFLAGS="${BACKUP_CFLAGS} ${GMP_CFLAGS}"
@@ -107,6 +109,7 @@ for GMP_HOME in ${GMP_HOME_PATH}
 #		gmp_found="no"	
 #	fi
 done
+AC_LANG_POP([C])
 
 if test "x$gmp_found" != "xyes"; then
 	if test -n "$gmp_problem"; then
