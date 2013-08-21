@@ -35,39 +35,41 @@
 TIMING_DEFINE_PRINT(fac_Qa_factorize)
 TIMING_DEFINE_PRINT(fac_evalpoint)
 
-CFAFList uniAbsFactorize (const CanonicalForm& F)
+CFAFList uniAbsFactorize (const CanonicalForm& F, bool full)
 {
-  CFFList rationalFactors= factorize (F);
-  CFFListIterator i= rationalFactors;
-  CanonicalForm LcF= rationalFactors.getFirst().factor();
-  i++;
-  Variable alpha;
   CFAFList result;
+  if (degree (F) == 1)
+  {
+    bool isRat= isOn (SW_RATIONAL);
+    On (SW_RATIONAL);
+    result= CFAFList (CFAFactor (F/Lc(F), 1, 1));
+    result.insert (CFAFactor (Lc (F), 1, 1));
+    if (!isRat)
+      Off (SW_RATIONAL);
+    return result;
+  }
+  CanonicalForm LcF= 1;
+  Variable alpha;
   CFFList QaFactors;
   CFFListIterator iter;
-  for (; i.hasItem(); i++)
+  alpha= rootOf (F);
+  QaFactors= factorize (F, alpha);
+  iter= QaFactors;
+  if (iter.getItem().factor().inCoeffDomain())
   {
-    if (degree (i.getItem().factor()) == 1)
+    LcF = iter.getItem().factor();
+    iter++;
+  }
+  for (;iter.hasItem(); iter++)
+  {
+    if (full)
+      result.append (CFAFactor (iter.getItem().factor(), getMipo (alpha),
+                                iter.getItem().exp()));
+    if (!full && degree (iter.getItem().factor()) == 1)
     {
-      result.append (CFAFactor (i.getItem().factor(), 1, i.getItem().exp()));
-      continue;
-    }
-    alpha= rootOf (i.getItem().factor());
-    QaFactors= factorize (i.getItem().factor(), alpha);
-    iter= QaFactors;
-    if (iter.getItem().factor().inCoeffDomain())
-    {
-      LcF *= iter.getItem().factor();
-      iter++;
-    }
-    for (;iter.hasItem(); iter++)
-    {
-      if (degree (iter.getItem().factor()) == 1)
-      {
-        result.append (CFAFactor (iter.getItem().factor(), getMipo (alpha),
-                                  i.getItem().exp()));
-        break;
-      }
+      result.append (CFAFactor (iter.getItem().factor(), getMipo (alpha),
+                                iter.getItem().exp()));
+      break;
     }
   }
   result.insert (CFAFactor (LcF, 1, 1));
@@ -270,6 +272,71 @@ CFAFList absBiFactorizeMain (const CanonicalForm& G, bool full)
   Off (SW_RATIONAL);
   F /= icontent (F);
   On (SW_RATIONAL);
+
+  mpz_t * M=new mpz_t [4];
+  mpz_init (M[0]);
+  mpz_init (M[1]);
+  mpz_init (M[2]);
+  mpz_init (M[3]);
+
+  mpz_t * S=new mpz_t [2];
+  mpz_init (S[0]);
+  mpz_init (S[1]);
+
+  F= compress (F, M, S);
+
+  if (F.isUnivariate())
+  {
+    if (degree (F) == 1)
+    {
+      mpz_clear (M[0]);
+      mpz_clear (M[1]);
+      mpz_clear (M[2]);
+      mpz_clear (M[3]);
+      delete [] M;
+
+      mpz_clear (S[0]);
+      mpz_clear (S[1]);
+      delete [] S;
+      if (!isRat)
+        Off (SW_RATIONAL);
+      return CFAFList (CFAFactor (G, 1, 1));
+    }
+    CFAFList result= uniAbsFactorize (F, full);
+    if (result.getFirst().factor().inCoeffDomain())
+      result.removeFirst();
+    for (CFAFListIterator iter=result; iter.hasItem(); iter++)
+      iter.getItem()= CFAFactor (decompress (iter.getItem().factor(), M, S),
+                                 iter.getItem().minpoly(),iter.getItem().exp());
+    mpz_clear (M[0]);
+    mpz_clear (M[1]);
+    mpz_clear (M[2]);
+    mpz_clear (M[3]);
+    delete [] M;
+
+    mpz_clear (S[0]);
+    mpz_clear (S[1]);
+    delete [] S;
+    if (!isRat)
+      Off (SW_RATIONAL);
+    return result;
+  }
+
+  if (degree (F, 1) == 1 || degree (F, 2) == 1)
+  {
+    mpz_clear (M[0]);
+    mpz_clear (M[1]);
+    mpz_clear (M[2]);
+    mpz_clear (M[3]);
+    delete [] M;
+
+    mpz_clear (S[0]);
+    mpz_clear (S[1]);
+    delete [] S;
+    if (!isRat)
+      Off (SW_RATIONAL);
+    return CFAFList (CFAFactor (G, 1, 1));
+  }
   int minTdeg, tdegF= totaldegree (F);
   CanonicalForm Fp, smallestFactor;
   int p;
@@ -304,6 +371,15 @@ differentevalpoint:
         if (isRat)
           On (SW_RATIONAL);
         setCharacteristic(0);
+        mpz_clear (M[0]);
+        mpz_clear (M[1]);
+        mpz_clear (M[2]);
+        mpz_clear (M[3]);
+        delete [] M;
+
+        mpz_clear (S[0]);
+        mpz_clear (S[1]);
+        delete [] S;
         return CFAFList (CFAFactor (G, 1, 1));
       }
       else
@@ -313,6 +389,15 @@ differentevalpoint:
         {
           if (isRat)
             On (SW_RATIONAL);
+          mpz_clear (M[0]);
+          mpz_clear (M[1]);
+          mpz_clear (M[2]);
+          mpz_clear (M[3]);
+          delete [] M;
+
+          mpz_clear (S[0]);
+          mpz_clear (S[1]);
+          delete [] S;
           return CFAFList (CFAFactor (G, 1, 1));
         }
         rec= true;
@@ -728,12 +813,14 @@ differentevalpoint:
   for (CFListIterator i= biFactors; i.hasItem(); i++)
   {
     if (full)
-      result.append (CFAFactor (i.getItem(), getMipo (alpha), 1));
+      result.append (CFAFactor (decompress (i.getItem(), M, S),
+                                getMipo (alpha), 1));
 
     if (totaldegree (i.getItem()) == minTdeg)
     {
       if (!full)
-        result= CFAFList (CFAFactor (i.getItem(), getMipo (alpha), 1));
+        result= CFAFList (CFAFactor (decompress (i.getItem(), M, S),
+                                     getMipo (alpha), 1));
       found= true;
 
       if (!full)
@@ -752,6 +839,16 @@ differentevalpoint:
     On (SW_RATIONAL);
   else
     Off (SW_RATIONAL);
+
+  mpz_clear (M[0]);
+  mpz_clear (M[1]);
+  mpz_clear (M[2]);
+  mpz_clear (M[3]);
+  delete [] M;
+
+  mpz_clear (S[0]);
+  mpz_clear (S[1]);
+  delete [] S;
 
   return result;
 }
