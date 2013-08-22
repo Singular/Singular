@@ -32,7 +32,7 @@
 #include <polys/sparsmat.h>
 #include <Singular/mod_lib.h>
 #include <polys/weight.h>
-
+#include <polys/ext_fields/transext.h>
 
 #include <kernel/stairc.h>
 #include <kernel/mod2.h>
@@ -4365,6 +4365,18 @@ static BOOLEAN jjJACOB_P(leftv res, leftv v)
     i->m[k-1]=pDiff(p,k);
   }
   res->data = (char *)i;
+  return FALSE;
+}
+static BOOLEAN jjDIFF_COEF(leftv res, leftv u, leftv v)
+{
+  if (currRing->cf->type!=n_transExt) 
+  { 
+    WerrorS("differentiation not defined in the coefficient ring");
+    return TRUE;
+  }
+  number n = (number) u->Data();
+  number k = (number) v->Data();
+  res->data = ntDiff(n,k,currRing->cf);
   return FALSE;
 }
 /*2
