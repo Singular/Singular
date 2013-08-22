@@ -39,23 +39,23 @@ dnl Check for existence
 BACKUP_CFLAGS=${CFLAGS}
 BACKUP_LIBS=${LIBS}
 
-AC_LANG_PUSH(C)
-
 if test -n "$FLINT_HOME_PATH"; then
 AC_MSG_CHECKING(for FLINT >= $min_flint_version)
 fi
 
+AC_LANG_PUSH([C])
+
 for FLINT_HOME in ${FLINT_HOME_PATH} 
  do	
-if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
+## if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
 
-	if test "x$FLINT_HOME" != "x/usr"; then
+#	if test "x$FLINT_HOME" != "x/usr"; then
 		FLINT_CFLAGS="-I${FLINT_HOME}/include/flint"
 		FLINT_LIBS="-L${FLINT_HOME}/lib -lflint -lmpfr -lmpir"
-	else
-		FLINT_CFLAGS=
-		FLINT_LIBS="-lflint"		
-	fi	
+#	else
+#		FLINT_CFLAGS=""
+#		FLINT_LIBS="-lflint"		
+#	fi	
 	CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS}" 
 	LIBS="${BACKUP_LIBS} ${FLINT_LIBS}"
 
@@ -85,10 +85,16 @@ if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
 	unset FLINT_CFLAGS
 	unset FLINT_LIBS	
 	])
-else
-	flint_found="no"
-fi
+#else
+#	flint_found="no"
+#fi
 done
+AC_LANG_POP([C])
+
+CFLAGS=${BACKUP_CFLAGS}
+LIBS=${BACKUP_LIBS}
+#unset LD_LIBRARY_PATH
+
 
 if test "x$flint_found" = "xyes" ; then		
 	AC_SUBST(FLINT_CFLAGS)
@@ -113,13 +119,6 @@ elif test   "x$flint_found" = "xno";  then
 	ifelse([$3], , :, [$3])	
 fi	
 
-AC_LANG_POP
-
 AM_CONDITIONAL(SING_HAVE_FLINT, test "x$HAVE_FLINT" = "xyes")
-
-CFLAGS=${BACKUP_CFLAGS}
-LIBS=${BACKUP_LIBS}
-#unset LD_LIBRARY_PATH
-
 ])
 

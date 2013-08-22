@@ -25,8 +25,7 @@ AC_DEFUN([LB_CHECK_MATHICGB],
   AC_CHECK_LIB(mathicgb, libmathicgbIsPresent, [],
     [AC_MSG_ERROR([Cannot find the MathicGB library.])], [-lstdc++])
   AC_CHECK_HEADER([mathicgb.h])
-  AH_TEMPLATE([HAVE_MATHICGB], [have mathicgb])
-  AC_DEFINE(HAVE_MATHICGB)
+  AC_DEFINE(HAVE_MATHICGB,1,[Define if mathicgb is to be used])
  ])
  #
 ])

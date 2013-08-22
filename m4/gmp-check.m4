@@ -95,6 +95,8 @@ for GMP_HOME in ${GMP_HOME_PATH}
 				echo "whether your GMP version is new enough. I am assuming it is."
 				AC_SUBST(GMP_CFLAGS)
 				AC_SUBST(GMP_LIBS)
+				AC_SUBST(GMP_HOME)
+				HAVE_GMP=yes
 				AC_DEFINE(HAVE_GMP,1,[Define if GMP is installed])	
 				ifelse([$2], , :, [$2])
 				break
@@ -111,6 +113,11 @@ for GMP_HOME in ${GMP_HOME_PATH}
 done
 AC_LANG_POP([C])
 
+CFLAGS=${BACKUP_CFLAGS}
+LIBS=${BACKUP_LIBS}
+#unset LD_LIBRARY_PATH
+
+
 if test "x$gmp_found" != "xyes"; then
 	if test -n "$gmp_problem"; then
 		AC_MSG_RESULT(problem)
@@ -121,9 +128,5 @@ if test "x$gmp_found" != "xyes"; then
 	ifelse($3, , :, $3)
 fi
 
-
-CFLAGS=${BACKUP_CFLAGS}
-LIBS=${BACKUP_LIBS}
-#unset LD_LIBRARY_PATH
-
+AM_CONDITIONAL(SING_HAVE_GMP, test "x$HAVE_GMP" = "xyes")
 ])
