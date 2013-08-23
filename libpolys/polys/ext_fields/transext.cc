@@ -377,9 +377,13 @@ number ntGetDenom(number &a, const coeffs cf)
   DEN (result)= NULL;
   COM (result)= 0;
 
-
+  if (a==NULL) 
+  {
+    NUM (result)= p_One(ntRing);
+    return (number)result;
+  }    
   const BOOLEAN denis1 = DENIS1 (f);
-
+ 
   if( IS0(f) || (denis1 && getCoeffType (ntCoeffs) != n_Q) ) // */1 or 0
   {
     NUM (result)= p_One(ntRing);
