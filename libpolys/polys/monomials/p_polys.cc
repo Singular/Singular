@@ -2171,7 +2171,7 @@ void p_Content(poly ph, const ring r)
         }
         n_Delete(&h,r->cf->extRing->cf);
       }
-      else
+      /*else
       {
       // special handling for rat. functions.:
         number hzz =NULL;
@@ -2195,7 +2195,7 @@ void p_Content(poly ph, const ring r)
           pIter(p);
         }
         /* hzz contains the gcd of all numerators in f*/
-        h=n_Invers(hzz,r->cf->extRing->cf);
+        /*h=n_Invers(hzz,r->cf->extRing->cf);
         n_Delete(&hzz,r->cf->extRing->cf);
         n_Normalize(h,r->cf->extRing->cf);
         if(!n_IsOne(h,r->cf->extRing->cf))
@@ -2210,7 +2210,7 @@ void p_Content(poly ph, const ring r)
           }
         }
         n_Delete(&h,r->cf->extRing->cf);
-      }
+      }*/
     }
   }
   if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
