@@ -517,6 +517,7 @@ BOOLEAN mathicgb(leftv result, leftv arg)
   return FALSE;
 }
 
+template class std::vector<Exponent>;
 template void mgb::computeGroebnerBasis<MathicToSingStream>
   (mgb::GroebnerInputIdealStream&, MathicToSingStream&);
 
