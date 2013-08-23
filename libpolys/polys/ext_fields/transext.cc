@@ -771,7 +771,6 @@ number ntDiff(number a, number d, const coeffs cf)
   poly g = p_Copy(NUM(fa), ntRing);
   poly f = p_Copy(DEN(fa), ntRing);
   poly dg =p_Diff(g,k,ntRing);
-
   if (DENIS1(fa)) {
 
      fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
@@ -788,6 +787,7 @@ number ntDiff(number a, number d, const coeffs cf)
   NUM(result) = p_Add_q(fg,gf,ntRing);
   DEN(result) = p_Mult_q(p_Copy(f,ntRing), f, ntRing);
   COM(result) = COM(fa) + COM(fa) + DIFF_COMPLEXITY;
+  if (NUM(result)==NULL) return(NULL);
   heuristicGcdCancellation((number)result, cf);
 
   return (number)result;
