@@ -1155,10 +1155,12 @@ void definiteGcdCancellation(number a, const coeffs cf,
   fraction f = (fraction)a;
 
   if (IS0(a)) return;
+  if (NUM(f)!=NULL) p_Normalize(NUM(f), ntRing);
+  if (DEN(f)!=NULL) p_Normalize(DEN(f), ntRing);
   if (!simpleTestsHaveAlreadyBeenPerformed)
   {
-    p_Normalize(NUM(f), ntRing);
-    if (DEN(f)!=NULL) p_Normalize(DEN(f), ntRing);
+    //p_Normalize(NUM(f), ntRing);
+    //if (DEN(f)!=NULL) p_Normalize(DEN(f), ntRing);
     if (DENIS1(f) || NUMIS1(f)) { COM(f) = 0; return; }
 
     /* check whether NUM(f) = DEN(f), and - if so - replace 'a' by 1 */
@@ -1171,7 +1173,7 @@ void definiteGcdCancellation(number a, const coeffs cf,
       return;
     }
   }
-  if (rField_is_Q(ntRing))
+  /*if (rField_is_Q(ntRing))
   {
     number c=n_Copy(pGetCoeff(NUM(f)),ntCoeffs);
     poly p=pNext(NUM(f));
@@ -1223,14 +1225,14 @@ void definiteGcdCancellation(number a, const coeffs cf,
         }
       }
     }
-  }
+  }*/
 
 #ifdef HAVE_FACTORY
   poly pGcd;
   /* here we assume: NUM(f), DEN(f) !=NULL, in Z_a reqp. Z/p_a */
     pGcd = singclap_gcd_r(NUM(f), DEN(f), ntRing);
   if (p_IsConstant(pGcd, ntRing)
-  //&& n_IsOne(p_GetCoeff(pGcd, ntRing), ntCoeffs)
+  && n_IsOne(p_GetCoeff(pGcd, ntRing), ntCoeffs)
   )
   { /* gcd = 1; nothing to cancel;
        Suppose the given rational function field is over Q. Although the
