@@ -768,6 +768,21 @@ char * showOption()
   return StringEndS();
 }
 
+/* version strings */
+#ifdef HAVE_FLINT
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+#ifndef __GMP_BITS_PER_MP_LIMB
+#define __GMP_BITS_PER_MP_LIMB GMP_LIMB_BITS
+#endif
+#include <flint/flint.h>
+#ifdef __cplusplus
+}
+#endif
+#endif
+
 char * versionString()
 {
   StringSetS("");
@@ -796,11 +811,11 @@ char * versionString()
               StringAppend("NTL(%s){'%s','%s'},",NTL_VERSION, NTL_CFLAGS, NTL_LIBS);
 #endif
 
+#ifdef HAVE_FACTORY
 #ifdef HAVE_FLINT
-// #include <NTL/version.h>
-              StringAppend("FLINT(??){'%s','%s'},", FLINT_CFLAGS, FLINT_LIBS);
+              StringAppend("FLINT(%s){'%s','%s'},",version, FLINT_CFLAGS, FLINT_LIBS);
 #endif
-   
+#endif
 
 #if SIZEOF_VOIDP == 8
               StringAppendS("64bit,");
