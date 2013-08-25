@@ -417,6 +417,20 @@ lists primeFactorisation(const number n, const int pBound)
 // libfac:
   extern const char * libfac_version;
   extern const char * libfac_date;
+/* version strings */
+#ifdef HAVE_FLINT
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+#ifndef __GMP_BITS_PER_MP_LIMB
+#define __GMP_BITS_PER_MP_LIMB GMP_LIMB_BITS
+#endif
+#include <flint/flint.h>
+#ifdef __cplusplus
+}
+#endif
+#endif
 #endif
 
 /* version strings */
@@ -797,6 +811,11 @@ char * versionString()
 #ifdef HAVE_NTL
 #include <NTL/version.h>
               StringAppend("NTL(%s),",NTL_VERSION);
+#endif
+#ifdef HAVE_FACTORY
+#ifdef HAVE_FLINT
+              StringAppend("FLINT(%s),",version);
+#endif
 #endif
 #ifdef HAVE_MPSR
               StringAppend("MP(%s),",MP_VERSION);
