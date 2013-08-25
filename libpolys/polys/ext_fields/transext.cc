@@ -1155,10 +1155,12 @@ void definiteGcdCancellation(number a, const coeffs cf,
   fraction f = (fraction)a;
 
   if (IS0(a)) return;
+  if (NUM(f)!=NULL) p_Normalize(NUM(f), ntRing);
+  if (DEN(f)!=NULL) p_Normalize(DEN(f), ntRing);
   if (!simpleTestsHaveAlreadyBeenPerformed)
   {
-    p_Normalize(NUM(f), ntRing);
-    if (DEN(f)!=NULL) p_Normalize(DEN(f), ntRing);
+    //p_Normalize(NUM(f), ntRing);
+    //if (DEN(f)!=NULL) p_Normalize(DEN(f), ntRing);
     if (DENIS1(f) || NUMIS1(f)) { COM(f) = 0; return; }
 
     /* check whether NUM(f) = DEN(f), and - if so - replace 'a' by 1 */
@@ -1171,7 +1173,7 @@ void definiteGcdCancellation(number a, const coeffs cf,
       return;
     }
   }
-  if (rField_is_Q(ntRing))
+  /*if (rField_is_Q(ntRing))
   {
     number c=n_Copy(pGetCoeff(NUM(f)),ntCoeffs);
     poly p=pNext(NUM(f));
@@ -1223,14 +1225,14 @@ void definiteGcdCancellation(number a, const coeffs cf,
         }
       }
     }
-  }
+  }*/
 
 #ifdef HAVE_FACTORY
   poly pGcd;
   /* here we assume: NUM(f), DEN(f) !=NULL, in Z_a reqp. Z/p_a */
     pGcd = singclap_gcd_r(NUM(f), DEN(f), ntRing);
   if (p_IsConstant(pGcd, ntRing)
-  //&& n_IsOne(p_GetCoeff(pGcd, ntRing), ntCoeffs)
+  && n_IsOne(p_GetCoeff(pGcd, ntRing), ntCoeffs)
   )
   { /* gcd = 1; nothing to cancel;
        Suppose the given rational function field is over Q. Although the
@@ -1399,11 +1401,59 @@ number ntLcm(number a, number b, const coeffs cf)
   poly pa = p_Copy(NUM(fa), ntRing);
   poly pb = p_Copy(DEN(fb), ntRing);
 
+  poly pGcd;
+  if (nCoeff_is_Q(ntCoeffs))
+  {
+    if (p_IsConstant(pa,ntRing) && p_IsConstant(pb,ntRing))
+    {
+      pGcd = pa;
+      p_SetCoeff (pGcd, n_Gcd (pGetCoeff(pGcd), pGetCoeff(pb), ntCoeffs), ntRing);
+    }
+    else
+    {
+      number contentpa, contentpb, tmp;
+
+      contentpb= p_GetCoeff(pb, ntRing);
+      pIter(pb);
+      while (pb != NULL)
+      {
+        tmp = n_Gcd(contentpb, p_GetCoeff(pb, ntRing) , ntCoeffs);
+        n_Delete(&contentpb, ntCoeffs);
+        contentpb = tmp;
+        pIter(pb);
+      }
+
+      contentpa= p_GetCoeff(pa, ntRing);
+      pIter(pa);
+      while (pa != NULL)
+      {
+        tmp = n_Gcd(contentpa, p_GetCoeff(pa, ntRing), ntCoeffs);
+        n_Delete(&contentpa, ntCoeffs);
+        contentpa = tmp;
+        pIter(pa);
+      }
+
+      tmp= n_Gcd (contentpb, contentpa, ntCoeffs);
+      n_Delete(&contentpa, ntCoeffs);
+      n_Delete(&contentpb, ntCoeffs);
+      contentpa= tmp;
+      p_Delete(&pb, ntRing);
+      p_Delete(&pa, ntRing);
+
+      /* singclap_gcd destroys its arguments; we hence need copies: */
+      pGcd = singclap_gcd(p_Copy(NUM(fa),ntRing), p_Copy(DEN(fb),ntRing), ntRing);
+      pGcd= p_Mult_nn (pGcd, contentpa, ntRing);
+      n_Delete(&contentpa, ntCoeffs);
+    }
+  }
+  else
+    pGcd = singclap_gcd(pa, pb, cf->extRing);
+
   /* Note that, over Q, singclap_gcd will remove the denominators in all
      rational coefficients of pa and pb, before starting to compute
      the gcd. Thus, we do not need to ensure that the coefficients of
      pa and pb live in Z; they may well be elements of Q\Z. */
-  poly pGcd = singclap_gcd(pa, pb, ntRing);
+
   if (p_IsConstant(pGcd, ntRing) &&
       n_IsOne(p_GetCoeff(pGcd, ntRing), ntCoeffs))
   { /* gcd = 1; return pa*pb*/
@@ -1441,15 +1491,62 @@ number ntGcd(number a, number b, const coeffs cf)
 #ifdef HAVE_FACTORY
   fraction fa = (fraction)a;
   fraction fb = (fraction)b;
-  /* singclap_gcd destroys its arguments; we hence need copies: */
+
   poly pa = p_Copy(NUM(fa), ntRing);
   poly pb = p_Copy(NUM(fb), ntRing);
 
+  poly pGcd;
+  if (nCoeff_is_Q(ntCoeffs))
+  {
+    if (p_IsConstant(pa,ntRing) && p_IsConstant(pb,ntRing))
+    {
+      pGcd = pa;
+      p_SetCoeff (pGcd, n_Gcd (pGetCoeff(pGcd), pGetCoeff(pb), ntCoeffs), ntRing);
+    }
+    else
+    {
+      number contentpa, contentpb, tmp;
+
+      contentpb= p_GetCoeff(pb, ntRing);
+      pIter(pb);
+      while (pb != NULL)
+      {
+        tmp = n_Gcd(contentpb, p_GetCoeff(pb, ntRing) , ntCoeffs);
+        n_Delete(&contentpb, ntCoeffs);
+        contentpb = tmp;
+        pIter(pb);
+      }
+
+      contentpa= p_GetCoeff(pa, ntRing);
+      pIter(pa);
+      while (pa != NULL)
+      {
+        tmp = n_Gcd(contentpa, p_GetCoeff(pa, ntRing), ntCoeffs);
+        n_Delete(&contentpa, ntCoeffs);
+        contentpa = tmp;
+        pIter(pa);
+      }
+
+      tmp= n_Gcd (contentpb, contentpa, ntCoeffs);
+      n_Delete(&contentpa, ntCoeffs);
+      n_Delete(&contentpb, ntCoeffs);
+      contentpa= tmp;
+      p_Delete(&pb, ntRing);
+      p_Delete(&pa, ntRing);
+
+      /* singclap_gcd destroys its arguments; we hence need copies: */
+      pGcd = singclap_gcd(p_Copy(NUM(fa),ntRing), p_Copy(NUM(fb),ntRing), ntRing);
+      pGcd= p_Mult_nn (pGcd, contentpa, ntRing);
+      n_Delete(&contentpa, ntCoeffs);
+    }
+  }
+  else
+    pGcd = singclap_gcd(pa, pb, cf->extRing);
   /* Note that, over Q, singclap_gcd will remove the denominators in all
      rational coefficients of pa and pb, before starting to compute
      the gcd. Thus, we do not need to ensure that the coefficients of
      pa and pb live in Z; they may well be elements of Q\Z. */
-  poly pGcd = singclap_gcd(pa, pb, cf->extRing);
+
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(result) = pGcd;
   ntTest((number)result); // !!!!
