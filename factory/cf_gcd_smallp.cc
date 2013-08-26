@@ -2091,6 +2091,9 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   if (G.isUnivariate() && fdivides(G, F)) return G/Lc(G);
   if (F == G) return F/Lc(F);
 
+  ASSERT (degree (A, 1) == 0, "expected degree (F, 1) == 0");
+  ASSERT (degree (B, 1) == 0, "expected degree (G, 1) == 0");
+
   CFMap M,N;
   int best_level= myCompress (A, B, M, N, false);
 
@@ -2101,8 +2104,6 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   B= M(B);
 
   Variable x= Variable (1);
-  ASSERT (degree (A, x) == 0, "expected degree (F, 1) == 0");
-  ASSERT (degree (B, x) == 0, "expected degree (G, 1) == 0");
 
   //univariate case
   if (A.isUnivariate() && B.isUnivariate())
@@ -2349,6 +2350,9 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   if (G.isUnivariate() && fdivides(G, F)) return G/Lc(G);
   if (F == G) return F/Lc(F);
 
+  ASSERT (degree (A, 1) == 0, "expected degree (F, 1) == 0");
+  ASSERT (degree (B, 1) == 0, "expected degree (G, 1) == 0");
+
   CFMap M,N;
   int best_level= myCompress (A, B, M, N, false);
 
@@ -2359,8 +2363,6 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   B= M(B);
 
   Variable x= Variable (1);
-  ASSERT (degree (A, x) == 0, "expected degree (F, 1) == 0");
-  ASSERT (degree (B, x) == 0, "expected degree (G, 1) == 0");
 
   //univariate case
   if (A.isUnivariate() && B.isUnivariate())

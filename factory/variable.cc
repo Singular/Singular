@@ -49,7 +49,7 @@ Variable::Variable( int l, bool flag ) : _level(l)
 
 Variable::Variable( int l ) : _level(l)
 {
-    ASSERT( l > 0 && l != LEVELQUOT, "illegal level" );
+    //ASSERT( l > 0 && l != LEVELQUOT, "illegal level" );
 }
 
 Variable::Variable( char name )
