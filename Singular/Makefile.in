@@ -87,10 +87,10 @@ CFLAGS		= @CFLAGS@ ${PIPE}
 CXXFLAGS	= @CXXFLAGS@ -I.. -I@prefix@ ${PIPE}
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@ -I.. -I@prefix@
 ifneq ($(SINGUNAME),ix86-Win)
-CPPFLAGS	= -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@ @PYTHON_CPPFLAGS@
+CPPFLAGS	= -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@ @PYTHON_CPPFLAGS@ @FLINT_CFLAGS@
 else
 ## Dirs after @CPPFLAGS@ are for PySingular
-CPPFLAGS	= -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@ @PYTHON_CPPFLAGS@
+CPPFLAGS	= -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@ @PYTHON_CPPFLAGS@ @FLINT_CFLAGS@
 ## -I/usr/include/python2.4 -I/usr/local/include -I../modules/python
 endif
 DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@

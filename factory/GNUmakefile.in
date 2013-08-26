@@ -96,16 +96,16 @@ WARNFLAGS =	-Wall
 # flags to translate library c files
 LIBCFLAGS =	$(WARNFLAGS) \
 		-I. -I.. -I$(srcdir) -I${prefix} -I$(includedir) \
-		$(DEFS) $(CPPFLAGS) $(CFLAGS) $(FLINT_CFLAGS)
+		 @FLINT_CFLAGS@ $(DEFS) $(CPPFLAGS) $(CFLAGS)
 
 # flags to translate library c++ files
 LIBCXXFLAGS =	$(WARNFLAGS) -fno-implicit-templates \
 		-I. -I.. -I$(srcdir) -I${prefix} -I$(includedir) \
-		$(DEFS) $(CPPFLAGS) $(CXXFLAGS) $(FLINT_CFLAGS)
+		 @FLINT_CFLAGS@ $(DEFS) $(CPPFLAGS) $(CXXFLAGS)
 
 LIBCGGFLAGS =	$(WARNFLAGS) -fno-implicit-templates \
 		-I. -I.. -I$(srcdir) -I${prefix} -I$(includedir) \
-		$(DEFS) $(CPPFLAGS) $(FLINT_CFLAGS)
+		 @FLINT_CFLAGS@ $(DEFS) $(CPPFLAGS)
 
 # flags to translate ftmpl_inst.cc
 TMPLCXXFLAGS =	$(LIBCXXFLAGS)
