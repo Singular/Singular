@@ -2291,8 +2291,8 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
 
   if (Monoms.size() == 0)
     Monoms= getMonoms (skel);
-  if (coeffMonoms == NULL)
-    coeffMonoms= new CFArray [skelSize];
+
+  coeffMonoms= new CFArray [skelSize];
   j= 0;
   for (CFIterator i= skel; i.hasTerms(); i++, j++)
     coeffMonoms[j]= getMonoms (i.coeff());
@@ -2348,6 +2348,7 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   delete[] pEvalPoints;
   delete[] pM;
   delete[] pL;
+  delete[] coeffMonoms;
 
   if (alpha.level() != 1 && V_buf != alpha)
   {
@@ -2360,7 +2361,6 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     return result;
   else
   {
-    delete[] coeffMonoms;
     fail= true;
     return 0;
   }
@@ -2555,8 +2555,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   if (Monoms.size() == 0)
     Monoms= getMonoms (skel);
 
-  if (coeffMonoms == NULL)
-    coeffMonoms= new CFArray [skelSize];
+  coeffMonoms= new CFArray [skelSize];
 
   j= 0;
   for (CFIterator i= skel; i.hasTerms(); i++, j++)
@@ -2867,25 +2866,18 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
       result= mapDown (result, prim_elem, im_prim_elem, alpha, u, v);
     }
     result= N(result);
+    delete[] pEvalPoints;
+    delete[] pMat;
+    delete[] pL;
+    delete[] coeffMonoms;
+    delete[] pM;
+
+    if (bufpEvalPoints != NULL)
+      delete [] bufpEvalPoints;
     if (fdivides (result, F) && fdivides (result, G))
-    {
-      delete[] pEvalPoints;
-      delete[] pMat;
-      delete[] pL;
-      delete[] pM;
-      if (bufpEvalPoints != NULL)
-        delete [] bufpEvalPoints;
       return result;
-    }
     else
     {
-      delete[] pEvalPoints;
-      delete[] pMat;
-      delete[] pL;
-      delete[] coeffMonoms;
-      delete[] pM;
-      if (bufpEvalPoints != NULL)
-        delete [] bufpEvalPoints;
       fail= true;
       return 0;
     }
@@ -2951,6 +2943,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   delete[] pMat;
   delete[] pL;
   delete[] pM;
+  delete[] coeffMonoms;
 
   if (alpha.level() != 1 && V_buf != alpha)
   {
@@ -2963,7 +2956,6 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     return result;
   else
   {
-    delete[] coeffMonoms;
     fail= true;
     return 0;
   }
@@ -3193,7 +3185,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
     if (getCharacteristic () > 3 && size (skeleton) < 100)
     {
       CFArray Monoms;
-      CFArray *coeffMonoms= NULL;
+      CFArray *coeffMonoms;
       do //second do
       {
         random_element= randomElement (m, V_buf, l, fail);
@@ -3628,7 +3620,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
     if ((getCharacteristic() > 3 && size (skeleton) < 200))
     {
       CFArray Monoms;
-      CFArray* coeffMonoms= NULL;
+      CFArray* coeffMonoms;
 
       do //second do
       {
