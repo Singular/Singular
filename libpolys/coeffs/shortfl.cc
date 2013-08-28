@@ -440,6 +440,8 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
   mpf_t e;
   mpf_init(e);
   mpf_set_z(e,z);
+  int sign= mpf_sgn(e);
+  mpf_abs (e, e);
 
   /* if number was an integer, we are done*/
   if(IS_INT(from))
@@ -452,7 +454,7 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
     double basis;
     signed long int exp;
     basis = mpf_get_d_2exp(&exp, e);
-    float f= mpf_sgn(e)*ldexp(basis,exp);
+    float f= sign*ldexp(basis,exp);
     mpf_clear(e);
     return nf(f).N();
   }
@@ -478,7 +480,7 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
   double basis;
   signed long int exp;
   basis = mpf_get_d_2exp(&exp, q);
-  float f = mpf_sgn(e)*ldexp(basis,exp);
+  float f = sign*ldexp(basis,exp);
   mpf_clear(e);
   mpf_clear(d);
   mpf_clear(q);
