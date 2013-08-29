@@ -14,7 +14,7 @@
 #include "cf_assert.h"
 #include "cf_reval.h"
 
-//#include "templates/ftmpl_array.cc"
+#include "templates/ftmpl_array.cc"
 //#include "templates/ftmpl_factor.cc"
 #include "templates/ftmpl_list.cc"
 //#include "templates/ftmpl_functions.h"
@@ -47,8 +47,8 @@ template OSTREAM & operator << ( OSTREAM &, const List<Variable> & );
 template OSTREAM & operator << ( OSTREAM &, const Array<int> & );
 #endif
 
-template class Array<int>;
-template class Array<Variable>;
+//template class Array<int>;
+//template class Array<Variable>;
 
 // for database
 #ifdef HAVE_DATABASE
