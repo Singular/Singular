@@ -31,6 +31,7 @@
 #ifndef NOSTREAMIO
 #ifdef HAVE_CSTDIO
 #include <cstdio>
+#include <cstdlib>
 #else
 extern "C" {
 #include <stdio.h>
