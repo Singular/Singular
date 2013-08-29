@@ -270,15 +270,14 @@ EOD`
 	fi
 	AC_MSG_RESULT([$PYTHON_EXTRA_LIBS])
 	AC_SUBST(PYTHON_EXTRA_LIBS)
-
+	
 	#
-	# linking flags needed when embedding
+	# linking flags needed when embedding: LINKFORSHARED is buggy  on OSX  see http://bugs.python.org/issue3588 and  http://stackoverflow.com/questions/6490513/vim-failing-to-compile-with-python-on-os-x
 	#
 	AC_MSG_CHECKING(python extra linking flags)
 	if test -z "$PYTHON_EXTRA_LDFLAGS"; then
-		PYTHON_EXTRA_LDFLAGS=`$PYTHON -c "import distutils.sysconfig; \
-			conf = distutils.sysconfig.get_config_var; \
-			print (conf('LINKFORSHARED'))"`
+		PYTHON_EXTRA_LDFLAGS=`$PYTHON -c "import distutils.sysconfig;conf=distutils.sysconfig.get_config_var; l=conf('LINKFORSHARED'); \
+print(l if l!='-u _PyMac_Error Python.framework/Versions/2.7/Python' else '-u _PyMac_Error -framework Python -F'+conf('PYTHONFRAMEWORKPREFIX') );"`
 	fi
 	AC_MSG_RESULT([$PYTHON_EXTRA_LDFLAGS])
 	AC_SUBST(PYTHON_EXTRA_LDFLAGS)

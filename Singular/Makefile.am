@@ -50,16 +50,11 @@ module_LTLIBRARIES = pyobject.la
 
 pyobject_la_SOURCES = pyobject.cc
 
-# pyobject_la_CPPFLAGS   = ${AM_CPPFLAGS} ${NODEBUGDEFS}
-# pyobject_g_la_CPPFLAGS = ${AM_CPPFLAGS}
+pyobject_la_CXXFLAGS = $(PYTHON_CSPEC)
+pyobject_la_CPPFLAGS = $(PYTHON_CPPFLAGS)  ${AM_CPPFLAGS}
 
-pyobject_la_CXXFLAGS = @PYTHON_CSPEC@
-pyobject_la_CFLAGS   = @PYTHON_CSPEC@ 
-
-# ${NODEBUGCXXFLAGS} 
-# pyobject_g_la_CXXFLAGS = ${DEBUGCXXFLAGS} @PYTHON_CSPEC@
-
-pyobject_la_LDFLAGS = ${AMLDFLAGS} @PYTHON_LSPEC@ -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
+pyobject_la_LIBS    = $(PYTHON_EXTRA_LIBS)
+pyobject_la_LDFLAGS = ${AMLDFLAGS} $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) $(PYTHON_LSPEC) -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 ###  -export-dynamic -shared -module -avoid-version (add to all DMs?)
 
 
