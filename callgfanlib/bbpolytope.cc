@@ -42,9 +42,9 @@ BOOLEAN bbpolytope_Assign(leftv l, leftv r)
 {
   gfan::ZCone* newZc;
   if (r==NULL)
-  { 
-    if (l->Data()!=NULL) 
-    {   
+  {
+    if (l->Data()!=NULL)
+    {
       gfan::ZCone* zd = (gfan::ZCone*)l->Data();
       delete zd;
     }
@@ -53,7 +53,7 @@ BOOLEAN bbpolytope_Assign(leftv l, leftv r)
   else if (r->Typ()==l->Typ())
   {
     if (l->Data()!=NULL)
-    {   
+    {
       gfan::ZCone* zd = (gfan::ZCone*)l->Data();
       delete zd;
     }
@@ -69,7 +69,7 @@ BOOLEAN bbpolytope_Assign(leftv l, leftv r)
   //     return TRUE;
   //   }
   //   if (l->Data()!=NULL)
-  //   {   
+  //   {
   //     gfan::ZCone* zd = (gfan::ZCone*)l->Data();
   //     delete zd;
   //   }
@@ -80,7 +80,7 @@ BOOLEAN bbpolytope_Assign(leftv l, leftv r)
     Werror("assign Type(%d) = Type(%d) not implemented",l->Typ(),r->Typ());
     return TRUE;
   }
- 
+
   if (l->rtyp==IDHDL)
   {
     IDDATA((idhdl)l->data) = (char*) newZc;
@@ -112,7 +112,7 @@ void bbpolytope_destroy(blackbox *b, void *d)
 }
 
 void* bbpolytope_Copy(blackbox*b, void *d)
-{       
+{
   gfan::ZCone* zc = (gfan::ZCone*)d;
   gfan::ZCone* newZc = new gfan::ZCone(*zc);
   return newZc;
@@ -128,7 +128,7 @@ static BOOLEAN ppCONERAYS1(leftv res, leftv v)
   if (v->Typ() == INTMAT_CMD)
   {
     intvec* rays0 = (intvec*) v->Data();
-    rays = iv2bim(rays0);     
+    rays = iv2bim(rays0);
   }
   else
     rays = (bigintmat*) v->Data();
@@ -160,7 +160,7 @@ static BOOLEAN ppCONERAYS3(leftv res, leftv u, leftv v)
   if (u->Typ() == INTMAT_CMD)
   {
     intvec* rays0 = (intvec*) u->Data();
-    rays = iv2bim(rays0);     
+    rays = iv2bim(rays0);
   }
   else
     rays = (bigintmat*) u->Data();
@@ -209,7 +209,7 @@ static BOOLEAN ppCONENORMALS1(leftv res, leftv v)
   if (v->Typ() == INTMAT_CMD)
   {
     intvec* ineq0 = (intvec*) v->Data();
-    ineq = iv2bim(ineq0);     
+    ineq = iv2bim(ineq0);
   }
   else
     ineq = (bigintmat*) v->Data();
@@ -234,14 +234,14 @@ static BOOLEAN ppCONENORMALS2(leftv res, leftv u, leftv v)
   if (u->Typ() == INTMAT_CMD)
   {
     intvec* ineq0 = (intvec*) u->Data();
-    ineq = iv2bim(ineq0);     
+    ineq = iv2bim(ineq0);
   }
   else
     ineq = (bigintmat*) u->Data();
   if (v->Typ() == INTMAT_CMD)
   {
     intvec* eq0 = (intvec*) v->Data();
-    eq = iv2bim(eq0);     
+    eq = iv2bim(eq0);
   }
   else
     eq = (bigintmat*) v->Data();
@@ -280,14 +280,14 @@ static BOOLEAN ppCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
   if (u->Typ() == INTMAT_CMD)
   {
     intvec* ineq0 = (intvec*) u->Data();
-    ineq = iv2bim(ineq0);     
+    ineq = iv2bim(ineq0);
   }
   else
     ineq = (bigintmat*) u->Data();
   if (v->Typ() == INTMAT_CMD)
   {
     intvec* eq0 = (intvec*) v->Data();
-    eq = iv2bim(eq0);     
+    eq = iv2bim(eq0);
   }
   else
     eq = (bigintmat*) v->Data();
@@ -353,12 +353,6 @@ BOOLEAN vertices(leftv res, leftv args)
     }
   WerrorS("vertices: unexpected parameters");
   return TRUE;
-}
-
-bigintmat* getFacetNormals(gfan::ZCone* zc)
-{
-  gfan::ZMatrix zmat = zc->getFacets();
-  return zMatrixToBigintmat(zmat);
 }
 
 int getAmbientDimension(gfan::ZCone* zc) // zc is meant to represent a polytope here
@@ -475,9 +469,9 @@ void bbpolytope_setup()
   /********************************************************/
   /* the following functions are implemented in bbcone.cc */
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
-  // iiAddCproc("","getCodimension",FALSE,getAmbientDimension);                      
+  // iiAddCproc("","getCodimension",FALSE,getAmbientDimension);
   // iiAddCproc("","getDimension",FALSE,getDimension);
-  // iiAddCproc("","getFacetNormals",FALSE,getFacetNormals);  
+  // iiAddCproc("","getFacetNormals",FALSE,getFacetNormals);
   /********************************************************/
   /* the following functions are identical to those in bbcone.cc */
   // iiAddCproc("","setLinearForms",FALSE,setLinearForms);
@@ -489,7 +483,7 @@ void bbpolytope_setup()
   // iiAddCproc("","getEquations",FALSE,getEquations);
   // iiAddCproc("","getInequalities",FALSE,getInequalities);
   polytopeID=setBlackboxStuff(b,"polytope");
-  //Print("created type %d (polytope)\n",polytopeID); 
+  //Print("created type %d (polytope)\n",polytopeID);
 }
 
 #endif

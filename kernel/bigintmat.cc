@@ -315,13 +315,13 @@ char* bigintmat::String()
 char* bigintmat::StringAsPrinted()
 {
   if ((col==0) || (row==0))
-    return 0;
+    return NULL;
   int * colwid = getwid(80);
   if (colwid == NULL)
   {
     WerrorS("not enough space to print bigintmat");
     WerrorS("try string(...) for a unformatted output");
-    return 0;
+    return NULL;
   }
   char * ps;
   int slength = 0;

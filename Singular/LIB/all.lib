@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib 14883 2012-05-09 16:00:16Z motsak $";
+version="$Id: all.lib.tmpl 13536 2010-10-18 13:32:34Z hannes $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -115,3 +115,8 @@ LIB "ncfactor.lib";
 LIB "nctools.lib";
 LIB "perron.lib";
 LIB "qmatrix.lib";
+LIB "purityfiltration.lib";
+LIB "nchomolog.lib";
+LIB "ratgb.lib";
+LIB "dmodloc.lib";
+LIB "ncpreim.lib";
