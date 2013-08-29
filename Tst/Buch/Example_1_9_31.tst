@@ -5,22 +5,25 @@ tst_init();
 
 LIB "ncalg.lib";
 def R = makeQso3(3);
-setring R;
+setring R; R;
 option(redSB); option(redTail); // for reduced output
-ideal K = x+y+z,y+z,z;
-module S = syz(K);        // the (left) syzygy module of K
-print(S);                       
 
-ideal tst = ideal(transpose(S)*transpose(K));
-print(matrix(tst));
+ideal K = x+y+z,y+z,z;
+option(); module S = syz(K);        // the (left) syzygy module of K
+print(S); print( size( module(transpose(S)*transpose(K)) ) );
 
 K = x,y,z;
-S = syz(K);
-print(S);
+option(); S = syz(K);
+print(S); print( size( module(transpose(S)*transpose(K)) ) );
 
 option(returnSB);
-S = syz(K);      
-print(S);
+
+option(); S = syz(K);      
+print(S); print( size( module(transpose(S)*transpose(K)) ) );
+
+K = x+y+z,y+z,z;
+option(); S = syz(K);        // the (left) syzygy module of K
+print(S); print( size( module(transpose(S)*transpose(K)) ) );
 
 tst_status(1);$
 
