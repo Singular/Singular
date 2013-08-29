@@ -508,7 +508,12 @@ degreesRec ( const CanonicalForm & f, int * degs )
 int * degrees ( const CanonicalForm & f, int * degs )
 {
     if ( f.inCoeffDomain() )
-        return 0;
+    {
+        if (degs != 0)
+          return degs;
+        else
+          return 0;
+    }
     else
     {
         int level = f.level();
