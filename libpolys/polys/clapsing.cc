@@ -1694,7 +1694,7 @@ intvec* singntl_LLL(intvec*  m, const ring)
   return mm;
 }
 
-ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors, const ring r)
+ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors, const ring r)
 {
   p_Test(f, r);
 
@@ -1713,11 +1713,10 @@ ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & num
   }
   CanonicalForm F( convSingTrPFactoryP( f, r) );
 
-  if (getNumVars (F) > 2)
-  {
-    WerrorS( feNotImplemented );
-    return res;
-  }
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
+
   CFAFList absFactors= absFactorize (F);
 
   int n= absFactors.length();
@@ -1739,9 +1738,6 @@ ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & num
     i++;
     iter++;
   }
-  bool isRat= isOn (SW_RATIONAL);
-  if (!isRat)
-    On (SW_RATIONAL);
   for (; iter.hasItem(); iter++, i++)
   {
     (**exps)[i]= iter.getItem().exp();

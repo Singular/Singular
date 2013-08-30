@@ -51,6 +51,9 @@ CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
   CFList result;
   Variable x= Variable (1);
 
+  CanonicalForm LCF=LC (F,x);
+  CFList LCFeval;
+
   bool found= false;
   bool allZero= true;
   bool foundZero= false;
@@ -59,10 +62,12 @@ CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
   do
   {
     eval.insert (F);
+    LCFeval.insert (LCF);
     bool bad= false;
     for (int i= E.max(); i >= E.min(); i--)
     {
       eval.insert (eval.getFirst()( E [i], i));
+      LCFeval.insert (LCFeval.getFirst() (E [i], i));
       result.append (E[i]);
       if (!E[i].isZero())
         allZero= false;
@@ -72,6 +77,7 @@ CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
       {
         result= CFList();
         eval= CFList();
+        LCFeval= CFList();
         bad= true;
         foundZero= false;
         break;
@@ -80,6 +86,15 @@ CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
       {
         result= CFList();
         eval= CFList();
+        LCFeval= CFList();
+        bad= true;
+        break;
+      }
+      if ((i != 2) && (degree (LCFeval.getFirst(), i-1) != degree (LCF, i-1)))
+      {
+        result= CFList();
+        eval= CFList();
+        LCFeval= CFList();
         bad= true;
         break;
       }
@@ -95,6 +110,7 @@ CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
     {
       result= CFList();
       eval= CFList();
+      LCFeval= CFList();
       E.nextpoint();
       continue;
     }
@@ -105,6 +121,7 @@ CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
     {
       result= CFList();
       eval= CFList();
+      LCFeval= CFList();
       E.nextpoint();
       continue;
     }
@@ -115,6 +132,7 @@ CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
     {
       result= CFList();
       eval= CFList();
+      LCFeval= CFList();
       E.nextpoint();
       continue;
     }
@@ -768,7 +786,6 @@ tryAgainWithoutHeu:
       iter.getItem()= swapvar (iter.getItem(), w, y);
   }
 
-  swap (factors, 0, 0, x);
   append (factors, contentAFactors);
   decompress (factors, N);
   if (isOn (SW_RATIONAL))
