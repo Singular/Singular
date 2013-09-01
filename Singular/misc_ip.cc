@@ -786,7 +786,7 @@ extern "C"
 char * versionString()
 {
   StringSetS("");
-  StringAppend("Singular for %s version %s (%s, %d bit) %s, SHA1: $Id$",
+  StringAppend("Singular for %s version %s (%s, %d bit) %s",
                S_UNAME, S_VERSION1, // SINGULAR_VERSION,
                PACKAGE_VERSION, SIZEOF_LONG*8, singular_date);
   StringAppendS("\nwith\n\t");
