@@ -112,3 +112,4 @@ stamp-h2
 test-driver
 singular.png
 *.trs
+.tarball-git-version
