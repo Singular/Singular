@@ -113,3 +113,4 @@ test-driver
 singular.png
 *.trs
 .tarball-git-version
+.DS_Store
