@@ -1,14 +1,16 @@
 #!/bin/bash
 
 GIT_WORK_TREE=`dirname "$0"`
-
-if [ -d "$GIT_WORK_TREE/.git" ] && v=`git log --pretty=format:'%h on %ci by %an: "%s"' --abbrev-commit -1 2>/dev/null | sed 's/\"/\\\"/g'`
+## :'%h on %ci by %an: "%s"' --abbrev-commit | sed 's/\"/\\\"/g'
+if [ -d "$GIT_WORK_TREE/.git" ] && v=`git log --pretty=format:'%h' --abbrev-commit -1 2>/dev/null`
 then
- dirty=`sh -c "git diff-index --name-status HEAD 2>/dev/null | sed -e 's|^\([A-Z]\).*|\1|g' | tr -d '\012'"` && [ -n "$dirty" ] && echo -n "$v * $dirty"
+ dirty=`sh -c "git diff-index --name-status HEAD 2>/dev/null | sed -e 's|^\([A-Z]\).*|\1|g' | tr -d '\012'"` && [ -n "$dirty" ] && echo -n "$v|$dirty" && exit 0
 else
- [ -r "$1" ] && cat "$1" && exit 0
- echo -n "UNKNOWN_GIT_VERSION"
+ F="$1"
+ if [ -r "$F" ];
+ then 
+   cat "$F"
+ else  
+   echo -n "UNKNOWN_GIT_VERSION"
+ fi  
 fi
-
-
-exit 0
