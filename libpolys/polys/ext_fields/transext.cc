@@ -370,21 +370,26 @@ number ntGetNumerator(number &a, const coeffs cf)
 number ntGetDenom(number &a, const coeffs cf)
 {
   ntTest(a);
-  definiteGcdCancellation(a, cf, FALSE);
-  fraction f = (fraction)a;
 
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   DEN (result)= NULL;
   COM (result)= 0;
 
-  if (a==NULL) 
+  if (IS0(a)) 
   {
-    NUM (result)= p_One(ntRing);
+    NUM (result) = p_One(ntRing);
     return (number)result;
-  }    
+  }
+     
+  definiteGcdCancellation(a, cf, FALSE);
+   
+  fraction f = (fraction)a;
+   
+  assume( !IS0(f) );
+
   const BOOLEAN denis1 = DENIS1 (f);
  
-  if( IS0(f) || (denis1 && getCoeffType (ntCoeffs) != n_Q) ) // */1 or 0
+  if( denis1 && (getCoeffType (ntCoeffs) != n_Q) ) // */1 or 0
   {
     NUM (result)= p_One(ntRing);
     ntTest((number)result);
