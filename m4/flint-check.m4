@@ -50,7 +50,7 @@ for FLINT_HOME in ${FLINT_HOME_PATH}
 ## if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
 
 #	if test "x$FLINT_HOME" != "x/usr"; then
-		FLINT_CFLAGS="-I${FLINT_HOME}/include/flint"
+		FLINT_CFLAGS="-I${FLINT_HOME}/include/"
 		FLINT_LIBS="-L${FLINT_HOME}/lib -lflint -lmpfr -lmpir"
 #	else
 #		FLINT_CFLAGS=""
@@ -60,11 +60,11 @@ for FLINT_HOME in ${FLINT_HOME_PATH}
 	LIBS="${BACKUP_LIBS} ${FLINT_LIBS}"
 
 	AC_TRY_LINK(
-	[#include <fmpz.h>],
+	[#include <flint/fmpz.h>],
 	[fmpz_t a; fmpz_init (a);],
 	[
 	AC_TRY_RUN(
-	[#include <flint.h>
+	[#include <flint/flint.h>
 	int main () { if ((int) version[0] < 2) return -1; else return 0; }	
 	],[
 	flint_found="yes"	
