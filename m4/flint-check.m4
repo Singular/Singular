@@ -49,13 +49,17 @@ for FLINT_HOME in ${FLINT_HOME_PATH}
  do	
 ## if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
 
-#	if test "x$FLINT_HOME" != "x/usr"; then
+	if test "x$FLINT_HOME" != "x/usr"; then
 		FLINT_CFLAGS="-I${FLINT_HOME}/include/"
-		FLINT_LIBS="-L${FLINT_HOME}/lib -lflint -lmpfr -lmpir"
-#	else
-#		FLINT_CFLAGS=""
-#		FLINT_LIBS="-lflint"		
-#	fi	
+		FLINT_LIBS="-L${FLINT_HOME}/lib"
+	else
+		FLINT_CFLAGS=""
+		FLINT_LIBS=""		
+	fi
+	
+	# we suppose that mpfr and mpir to be in the same place or available by default
+	FLINT_LIBS="$FLINT_LIBS -lflint -lmpfr -lmpir"
+	
 	CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS}" 
 	LIBS="${BACKUP_LIBS} ${FLINT_LIBS}"
 
