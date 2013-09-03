@@ -4369,7 +4369,7 @@ static BOOLEAN jjJACOB_P(leftv res, leftv v)
 }
 static BOOLEAN jjDIFF_COEF(leftv res, leftv u, leftv v)
 {
-  if (currRing->cf->type!=n_transExt) 
+  if (!nCoeff_is_transExt(currRing->cf)) 
   { 
     WerrorS("differentiation not defined in the coefficient ring");
     return TRUE;

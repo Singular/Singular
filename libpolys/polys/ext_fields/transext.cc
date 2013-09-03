@@ -752,6 +752,7 @@ number ntDiff(number a, number d, const coeffs cf)
   ntTest(d);
 
   fraction t = (fraction) d;
+  if (IS0(d)) WerrorS("ringvar expected");
   if (!DENIS1(t))
   {
     WerrorS("expected differentiation by a variable");
