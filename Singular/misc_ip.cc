@@ -34,6 +34,7 @@
 #include "ipid.h"
 #include "feOpt.h"
 #include "links/silink.h"
+#include "mod_lib.h"
 
 // the following 2 inline functions are just convenience shortcuts for Frank's code:
 static inline void number2mpz(number n, mpz_t m){ n_MPZ(m, n, coeffs_BIGINT); }
@@ -898,6 +899,13 @@ char * versionString()
               StringAppendS("ratGB,");
 #endif
               StringAppend("random=%d\n",siRandomStart);
+   
+#define SI_SHOW_BUILTIN_MODULE(name) StringAppend(" %s", #name);
+              StringAppendS("built-in modules: {");
+              SI_FOREACH_BUILTIN(SI_SHOW_BUILTIN_MODULE)
+              StringAppendS("}\n");
+#undef SI_SHOW_BUILTIN_MODULE
+     
               StringAppend("\tAC_CONFIGURE_ARGS=%s,\n"
 			   "\tCC=%s,FLAGS:%s,\n"
 			   "\tCXX=%s,FLAGS:%s,\n"
