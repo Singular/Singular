@@ -767,27 +767,22 @@ number ntDiff(number a, number d, const coeffs cf)
   if (IS0(a)) return ntCopy(a, cf);
 
   fraction fa = (fraction)a;
-
-  poly g = p_Copy(NUM(fa), ntRing);
-  poly f = p_Copy(DEN(fa), ntRing);
-  poly dg =p_Diff(g,k,ntRing);
   if (DENIS1(fa)) {
 
      fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-     NUM(result) = dg;
+     NUM(result) = p_Diff(NUM(fa),k,ntRing);
      DEN(result) = NULL;
      COM(result) = COM(fa);
      return (number)result;
   }
 
-  poly df =p_Diff(f,k,ntRing);
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  poly fg = p_Mult_q(p_Copy(f,ntRing),dg,ntRing);
-  poly gf = p_Neg(p_Mult_q(g,df,ntRing),ntRing);
-  NUM(result) = p_Add_q(fg,gf,ntRing);
-  DEN(result) = p_Mult_q(p_Copy(f,ntRing), f, ntRing);
-  COM(result) = COM(fa) + COM(fa) + DIFF_COMPLEXITY;
+  poly fg = p_Mult_q(p_Copy(DEN(fa),ntRing),p_Diff(NUM(fa),k,ntRing),ntRing);
+  poly gf = p_Mult_q(p_Copy(NUM(fa),ntRing),p_Diff(DEN(fa),k,ntRing),ntRing);
+  NUM(result) = p_Sub(fg,gf,ntRing);
   if (NUM(result)==NULL) return(NULL);
+  DEN(result) = pp_Mult_qq(DEN(fa), DEN(fa), ntRing);
+  COM(result) = COM(fa) + COM(fa) + DIFF_COMPLEXITY;
   heuristicGcdCancellation((number)result, cf);
 
   return (number)result;
