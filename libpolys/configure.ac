@@ -3,7 +3,7 @@ AC_INIT([libpolys], [3.1.2.sw])
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_SRCDIR([reporter/reporter.h])
-AC_CONFIG_HEADER([config.h misc/auxiliary.h])
+AC_CONFIG_HEADER([libpolysconfig.h misc/auxiliary.h])
 
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
@@ -12,6 +12,9 @@ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 dnl Check if build env is sane
 AM_SANITY_CHECK
+
+# Add pre'prefixed config
+AX_PREFIX_CONFIG_H([libpolysconfig.h],[],[libpolysconfig.h])
 
 # - Check for CC and CXX but be careful about CFLAGS.
 SING_RESET_FLAGS()

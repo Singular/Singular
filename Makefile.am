@@ -18,3 +18,8 @@ bin_SCRIPTS = libsingular-config
 
 dist-hook:
 	$(srcdir)/git-version-gen $(srcdir)/.tarball-git-version > $(distdir)/.tarball-git-version
+
+
+configheaderdir = ${includedir}/singular/
+nodist_configheader_HEADERS = singularconfig.h
+

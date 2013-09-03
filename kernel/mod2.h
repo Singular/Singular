@@ -12,7 +12,7 @@
 
 #ifdef HAVE_CONFIG_H
 /* config.h is a private header that will not be installed and thus cannot be unconditionally included */
-# include "config.h"
+# include "singularconfig.h"
 #endif /* HAVE_CONFIG_H */
 
 

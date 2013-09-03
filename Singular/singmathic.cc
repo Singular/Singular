@@ -1,6 +1,6 @@
 // include header files
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "singularconfig.h"
 #endif /* HAVE_CONFIG_H */
 
 #include <misc/auxiliary.h>

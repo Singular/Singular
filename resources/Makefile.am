@@ -37,5 +37,6 @@ libresources_includedir  =$(includedir)/resources/
 
 libresources_include_HEADERS = omFindExec.h feResource.h feFopen.h
 
+nodist_libresources_include_HEADERS = resourcesconfig.h
 
 

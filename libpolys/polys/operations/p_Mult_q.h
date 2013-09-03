@@ -16,9 +16,6 @@
 
 struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
 
-// #include "config.h"
-// #include <polys/structs.h>
-
 // Use buckets if min(pLength(p), pLength(q)) >= MIN_LENGTH_BUCKET
 // Not thoroughly tested what is best
 #ifndef MIN_LENGTH_BUCKET

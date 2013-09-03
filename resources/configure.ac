@@ -3,7 +3,7 @@ AC_INIT([libresources], [3.1.4.sw])
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_SRCDIR([omFindExec.h])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADER([resourcesconfig.h])
 
 AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
@@ -12,6 +12,9 @@ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 dnl Check if build env is sane
 AM_SANITY_CHECK
+
+# Add pre'prefixed config
+AX_PREFIX_CONFIG_H([resourcesconfig.h],[],[resourcesconfig.h])
 
 SING_RESET_FLAGS()
 SING_CHECK_SET_ARGS()

@@ -6,7 +6,7 @@
  *******************************************************************/
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "resourcesconfig.h"
 #endif /* HAVE_CONFIG_H */
 
 #if defined(HAVE_UNISTD_H) && defined(STDC_HEADERS)

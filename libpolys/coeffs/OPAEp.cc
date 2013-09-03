@@ -5,7 +5,7 @@
 * Dense Polynomials modulo p
 */
 //Schauen was hier überhaupt sinn macht
-#include "config.h"
+#include "libpolysconfig.h"
 #include <misc/auxiliary.h>
 
 #ifdef HAVE_FACTORY

@@ -13,7 +13,7 @@
 #include <time.h>
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "singularconfig.h"
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 

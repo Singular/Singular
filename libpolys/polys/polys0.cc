@@ -8,7 +8,7 @@
 
 /* includes */
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "libpolysconfig.h"
 #endif /* HAVE_CONFIG_H */
 // #include <polys/structs.h>
 #include <coeffs/numbers.h>

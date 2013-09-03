@@ -8,7 +8,7 @@ AC_CONFIG_AUX_DIR([.])
 
 AC_CONFIG_SRCDIR([Singular/tesths.cc])
 
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADER([singularconfig.h])
 
 dnl Apparently, this is required for using an AC_CHECK_HEADER within AS_IF(...), at least on Cygwin.
 AC_USE_SYSTEM_EXTENSIONS
@@ -20,6 +20,9 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 
 dnl Check if build env is sane
 AM_SANITY_CHECK
+
+# Add pre'prefixed config
+AX_PREFIX_CONFIG_H([singularconfig.h],[],[singularconfig.h])
 
 SING_RESET_FLAGS()
 SING_CHECK_SET_ARGS()

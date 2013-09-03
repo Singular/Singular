@@ -114,3 +114,4 @@ singular.png
 *.trs
 .tarball-git-version
 .DS_Store
+singularconfig.h
