@@ -1992,7 +1992,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static proc substpart(ideal endid, ideal endphi, int homo, intvec rw)
+proc substpart(ideal endid, ideal endphi, int homo, intvec rw) // procedure is also used by normalint.lib
 
 "//Repeated application of elimpart to endid, until no variables can be
 //directy substituded. homo=1 if input is homogeneous, rw contains
@@ -4744,7 +4744,7 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc lineUpLast(ideal U, poly c)
+proc lineUpLast(ideal U, poly c) // procedure is also used by normalint.lib
 // Sets c as the last generator of U.
 {
   int i;
@@ -4768,7 +4768,7 @@ static proc lineUpLast(ideal U, poly c)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc lineUp(ideal U, poly c)
+proc lineUp(ideal U, poly c) // procedure is also used by normalint.lib
 // Sets c as the first generator of U.
 {
   int i;
@@ -5124,7 +5124,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc changeDenominatorQ(ideal U1, poly c1, poly c2)
+proc changeDenominatorQ(ideal U1, poly c1, poly c2) // procedure is also used by normalint.lib
 {
 // Given a ring in the form 1/c1 * U, it computes a new U2 st the ring
 // is 1/c2 * U2.
@@ -5142,7 +5142,7 @@ static proc changeDenominatorQ(ideal U1, poly c1, poly c2)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc checkInclusions(ideal U1, ideal U2)
+proc checkInclusions(ideal U1, ideal U2) // procedure is also used by normalint.lib
 {
 // Checks if the identity A = Hom(J, J) of Grauert-Remmert criterion is
 // satisfied.
@@ -5191,7 +5191,7 @@ static proc checkInclusions(ideal U1, ideal U2)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc degSubring(poly p, intvec @v)
+proc degSubring(poly p, intvec @v) // procedure is also used by normalint.lib
 {
 // Computes the degree of a polynomial taking only some variables as variables
 // and the others as parameters.
@@ -5210,7 +5210,7 @@ static proc degSubring(poly p, intvec @v)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc mapBackIdeal(ideal I, poly c, intvec @v)
+proc mapBackIdeal(ideal I, poly c, intvec @v) // procedure is also used by normalint.lib
 {
 // Modifies all polynomials in I so that a map x(i) -> y(i)/c can be
 // carried out.
@@ -5227,7 +5227,7 @@ static proc mapBackIdeal(ideal I, poly c, intvec @v)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc mapBackPoly(poly p, poly c, intvec @v)
+proc mapBackPoly(poly p, poly c, intvec @v) // procedure is also used by normalint.lib
 {
 // Multiplies each monomial of p by a power of c so that a map x(i) -> y(i)/c
 // can be carried out.
