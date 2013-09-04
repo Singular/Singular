@@ -32,6 +32,11 @@
 *
 *           TODO: the description above needs a major update!!!
 */
+
+
+
+
+
 #define TRANSEXT_PRIVATES
 
 #ifdef HAVE_CONFIG_H
@@ -66,6 +71,7 @@
 /* constants for controlling the complexity of numbers */
 #define ADD_COMPLEXITY 1   /**< complexity increase due to + and - */
 #define MULT_COMPLEXITY 2   /**< complexity increase due to * and / */
+#define DIFF_COMPLEXITY 2   /**< complexity increase due to * and / */
 #define BOUND_COMPLEXITY 10   /**< maximum complexity of a number */
 
 /// TRUE iff num. represents 1
@@ -739,6 +745,54 @@ void ntCoeffWrite(const coeffs cf, BOOLEAN details)
   PrintS("//   K: "); n_CoeffWrite(cf->extRing->cf);
 */
 }
+
+number ntDiff(number a, number d, const coeffs cf)
+{
+  ntTest(a);
+  ntTest(d);
+
+  fraction t = (fraction) d;
+  if (IS0(d)) 
+  {
+    WerrorS("ringvar expected");
+    return NULL;
+  }
+  if (!DENIS1(t))
+  {
+    WerrorS("expected differentiation by a variable");
+    return a;
+  }
+  int k=p_Var(NUM(t),ntRing);
+  if (k==0)
+  {
+    WerrorS("expected differentiation by a variable");
+    return a;
+  }
+
+  if (IS0(a)) return ntCopy(a, cf);
+
+  fraction fa = (fraction)a;
+  if (DENIS1(fa)) {
+
+     fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+     NUM(result) = p_Diff(NUM(fa),k,ntRing);
+     DEN(result) = NULL;
+     COM(result) = COM(fa);
+     return (number)result;
+  }
+
+  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+  poly fg = p_Mult_q(p_Copy(DEN(fa),ntRing),p_Diff(NUM(fa),k,ntRing),ntRing);
+  poly gf = p_Mult_q(p_Copy(NUM(fa),ntRing),p_Diff(DEN(fa),k,ntRing),ntRing);
+  NUM(result) = p_Sub(fg,gf,ntRing);
+  if (NUM(result)==NULL) return(NULL);
+  DEN(result) = pp_Mult_qq(DEN(fa), DEN(fa), ntRing);
+  COM(result) = COM(fa) + COM(fa) + DIFF_COMPLEXITY;
+  heuristicGcdCancellation((number)result, cf);
+
+  return (number)result;
+}
+
 
 number ntAdd(number a, number b, const coeffs cf)
 {

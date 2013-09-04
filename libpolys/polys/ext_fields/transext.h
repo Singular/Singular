@@ -97,6 +97,8 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst);
 /// Initialize the coeffs object
 BOOLEAN  ntInitChar(coeffs cf, void* infoStruct);
 
+number ntDiff(number a, number d, const coeffs cf);
+
 /* Private hidden interface
 BOOLEAN  ntGreaterZero(number a, const coeffs cf); 
 BOOLEAN  ntGreater(number a, number b, const coeffs cf);
