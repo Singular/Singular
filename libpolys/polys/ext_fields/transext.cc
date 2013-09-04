@@ -751,22 +751,22 @@ number ntDiff(number a, number d, const coeffs cf)
   ntTest(a);
   ntTest(d);
 
-  fraction t = (fraction) d;
   if (IS0(d)) 
   {
     WerrorS("ringvar expected");
     return NULL;
   }
+  fraction t = (fraction) d;
   if (!DENIS1(t))
   {
     WerrorS("expected differentiation by a variable");
-    return a;
+    return NULL;
   }
   int k=p_Var(NUM(t),ntRing);
   if (k==0)
   {
     WerrorS("expected differentiation by a variable");
-    return a;
+    return NULL;
   }
 
   if (IS0(a)) return ntCopy(a, cf);
