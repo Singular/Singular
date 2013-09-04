@@ -1394,12 +1394,18 @@ the same as the type of the first argument
 @code{diff (} ideal_expression@code{,} ideal_expression @code{)}
 @item @strong{Type:}
 matrix
+@item @strong{Syntax:}
+@code{diff (} number_expression@code{,} ring_parameter @code{)}
+@item @strong{Type:}
+number
 @item @strong{Purpose:}
 computes the partial derivative of a polynomial object by a ring variable
 (first forms)
 @*respectively differentiates each polynomial (1..n) of the second ideal
 by the differential operator corresponding to each polynomial (1..m) in the first
 ideal, producing an m x n matrix.
+@*respectively if the coefficient ring is a transcendental field extension, differentiates a
+  number (that is, a rational function) by a transcendental variable (ring parameter).
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1413,6 +1419,10 @@ ideal, producing an m x n matrix.
   // corresponds to differential operators
   // d2/dx2, d2/dx2+d2/dydz, d3/dxdydz:
   print(diff(i,j));
+  // differentiation of rational functions:
+  ring R=(0,t),(x),dp;
+  number f = t^2/(1-t)^2;
+  diff(f,t);
 @c example
 @end smallexample
 @end table
