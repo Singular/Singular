@@ -140,7 +140,7 @@ HAVE_MPSR       = @HAVE_MPSR@
 #
 # Handle libSINGULAR stuff
 #
-LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc
+LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline @FLINT_LIBS@ -lgmp -lomalloc
 
 SO_SUFFIX = so
 
@@ -173,14 +173,14 @@ ifeq ($(SINGUNAME),ix86-Win)
 SO_SUFFIX = dll
 MODULE_SUFFIX    = dll
 LIBSINGULAR_FLAGS = -shared
-LIBSINGULAR_LIBS = -lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc  -lhtmlhelp
+LIBSINGULAR_LIBS = -lsingfac -lsingcf -lntl -lreadline @FLINT_LIBS@ -lgmp -lomalloc  -lhtmlhelp
 endif
 
 ifeq ($(SINGUNAME),ix86-SunOS)
 SO_SUFFIX  = so
 MODULE_SUFFIX    = so
 LIBSINGULAR_FLAGS = -shared
-LIBSINGULAR_LIBS = -lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc
+LIBSINGULAR_LIBS = -lsingfac -lsingcf -lntl -lreadline @FLINT_LIBS@ -lgmp -lomalloc
 endif
 
 #
