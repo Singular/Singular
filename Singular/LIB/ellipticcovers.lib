@@ -391,7 +391,7 @@ EXAMPLE:  example gromovWitten; shows an example
 "
 {
   if (typeof(P)=="number") {
-  list xl = ringlist(R)[1][2];
+  list xl = ringlist(basering)[1][2];
   int j;
   for(j=1; j<=size(xl); j++){
      execute("number n= "+xl[j]);
