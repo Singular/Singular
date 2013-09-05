@@ -79,8 +79,8 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
 static inline
 CanonicalForm sparseGCDFp (const CanonicalForm& A, const CanonicalForm& B)
 {
-  ASSERT (CFFactory::gettype() == GaloisFieldDomain, 
-          "GF as base field expected");
+  ASSERT (CFFactory::gettype() == FiniteFieldDomain,
+          "Fp as base field expected");
   CFList list;
   bool topLevel= true;
   return sparseGCDFp (A, B, topLevel, list);
