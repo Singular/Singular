@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////
 
 
-//#include <templates/ftmpl_array.cc>
+#include <factory/templates/ftmpl_array.cc>
 //#include <templates/ftmpl_factor.cc>
 #include <templates/ftmpl_list.h>
 #include <factory/templates/ftmpl_list.cc>
@@ -75,8 +75,8 @@ template OSTREAM & operator << ( OSTREAM &, const List<Variable> & );
 template OSTREAM & operator << ( OSTREAM &, const Array<int> & );
 #endif
 
-template class Array<int>;
-template class Array<Variable>;
+//template class Array<int>;
+//template class Array<Variable>;
 //template class Array<REvaluation>;
 
 // for database
