@@ -1094,7 +1094,7 @@ notImpl:
   return res;
 }
 #ifdef HAVE_NTL
-ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors)
+ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFactors)
 {
   pTest(f);
 
@@ -1113,11 +1113,10 @@ ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & num
   }
   CanonicalForm F( convSingTrPFactoryP( f ) );
 
-  if (getNumVars (F) > 2)
-  {
-    WerrorS( feNotImplemented );
-    return res;
-  }
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
+
   CFAFList absFactors= absFactorize (F);
 
   int n= absFactors.length();
@@ -1139,9 +1138,6 @@ ideal singclap_absBiFactorize ( poly f, ideal & mipos, intvec ** exps, int & num
     i++;
     iter++;
   }
-  bool isRat= isOn (SW_RATIONAL);
-  if (!isRat)
-    On (SW_RATIONAL);
   for (; iter.hasItem(); iter++, i++)
   {
     (**exps)[i]= iter.getItem().exp();

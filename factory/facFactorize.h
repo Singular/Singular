@@ -22,6 +22,19 @@
 TIMING_DEFINE_PRINT (fac_squarefree)
 TIMING_DEFINE_PRINT (fac_factor_squarefree)
 
+/// Factorization of A wrt. to different second vars
+void
+factorizationWRTDifferentSecondVars (
+                          const CanonicalForm& A, ///<[in] poly
+                          CFList*& Aeval,         ///<[in,out] A evaluated wrt.
+                                                  ///< different second vars
+                                                  ///< returns bivariate factors
+                          int& minFactorsLength,  ///<[in,out] minimal length of
+                                                  ///< bivariate factors
+                          bool& irred,            ///<[in,out] Is A irreducible?
+                          const Variable& w       ///<[in] alg. variable
+                                    );
+
 /// Factorization over Q (a)
 ///
 /// @return @a multiFactorize returns a factorization of F

@@ -6,6 +6,7 @@ LIBRARY: absfact.lib   Absolute factorization for characteristic 0
 AUTHORS: Wolfram Decker,       decker at math.uni-sb.de
          Gregoire Lecerf,      lecerf at math.uvsq.fr
          Gerhard Pfister,      pfister at mathematik.uni-kl.de
+         Martin Lee,           mlee at mathematik.uni-kl.de
 
 OVERVIEW:
 A library for computing the absolute factorization of multivariate
@@ -15,17 +16,22 @@ irreducible factor by factorizing over some finite extension field L
 (which is chosen such that V(f) has a smooth point with coordinates in L).
 Then a minimal extension field is determined making use of the
 Rothstein-Trager partial fraction decomposition algorithm.
+absFactorizeBCG uses the algorithm of Bertone, Cheze and Galligo for bivariate
+polynomials and similar ideas as above to reduce to this case.
 
 REFERENCES:
 G. Cheze, G. Lecerf: Lifting and recombination techniques for absolute
                   factorization. Journal of Complexity, 23(3):380-420, 2007.
+C. Bertone, G. Cheze, and A. Galligo: Modular las vegas algorithms for
+                  polynomial absolute factorization. J. Symb. Comput.,
+                  45(12):1280-1295, December 2010
 
 KEYWORDS: factorization; absolute factorization.
 SEE ALSO: factorize
 
 PROCEDURES:
   absFactorize();        absolute factorization of poly
-  absBiFactorize();      absolute factorization of bivariate poly
+  absFactorizeBCG();     absolute factorization of poly
 ";
 
 ////////////////////////////////////////////////////////////////////
@@ -608,8 +614,8 @@ example
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-proc absBiFactorize(poly p, list #)
-"USAGE:  absBiFactorize(p [,s]);   p poly, s string
+proc absFactorizeBCG(poly p, list #)
+"USAGE:  absFactorizeBCG(p [,s]);   p poly, s string
 ASSUME: coefficient field is the field of rational numbers or a
         transcendental extension thereof
 RETURN: ring @code{R} which is obtained from the current basering
@@ -634,27 +640,26 @@ RETURN: ring @code{R} which is obtained from the current basering
         @code{absolute_factors[3][j]} coincides with @code{absolute_factors[3][1]},
         no field extension was necessary for the @code{j}th (class of)
         absolute factor(s).
-NOTE:   The input polynomial p is assumed to be bivariate or to contain one para-
-        meter and one variable. All factors are presented denominator- and 
-        content-free. The constant factor (first entry) is chosen such that the
-        product of all (!) the (denominator- and content-free) absolute factors
-        of @code{p} equals @code{p / absolute_factors[1][1]}.
+NOTE:   All factors are presented denominator- and content-free. The constant
+        factor (first entry) is chosen such that the product of all (!) the
+        (denominator- and content-free) absolute factors of @code{p} equals
+        @code{p / absolute_factors[1][1]}.
 SEE ALSO: factorize, absPrimdecGTZ, absFactorize
-EXAMPLE: example absBiFactorize; shows an example
+EXAMPLE: example absFactorizeBCG; shows an example
 "
 {
   int dblevel = printlevel - voice + 2;
-  dbprint(dblevel,"Entering absfact.lib::absBiFactorize with ",p);
+  dbprint(dblevel,"Entering absfact.lib::absFactorizeBCG with ",p);
   def MP = basering;
   int i;
   if (char(MP) != 0)
   {
-    ERROR("// absfact.lib::absBiFactorize is only implemented for "+
+    ERROR("// absfact.lib::absFactorizeBCG is only implemented for "+
           "characteristic 0");
   }
   if(minpoly!=0)
   {
-    ERROR("// absfact.lib::absBiFactorize is not implemented for algebraic "
+    ERROR("// absfact.lib::absFactorizeBCG is not implemented for algebraic "
           +"extensions");
   }
 
@@ -742,12 +747,6 @@ EXAMPLE: example absBiFactorize; shows an example
 
   poly p=imap(MP,p);
 
-  if (size (variables (p)) > 2)
-  {
-    ERROR("// absfact.lib::absBiFactorize is not implemented for polynomials "
-          +"with more than 2 variables");
-  }
-
   // special treatment in the homogeneous case, dropping one variable
   // by substituting the first variable by 1
   int ho=homog(p);
@@ -758,7 +757,7 @@ EXAMPLE: example absBiFactorize; shows an example
     int di=deg(p);
   }
 
-  list tmpf=system ("absBiFact", p);
+  list tmpf=system ("absFact", p);
 
   // the homogeneous case, homogenizing the result
   // the new variable has to have degree 0
@@ -821,7 +820,7 @@ EXAMPLE: example absBiFactorize; shows an example
   setring(MP);
 
   dbprint( printlevel-voice+3,"
-// 'absBiFactorize' created a ring, in which a list absolute_factors (the
+// 'absFactorizeBCG' created a ring, in which a list absolute_factors (the
 // absolute factors) is stored.
 // To access the list of absolute factors, type (if the name S was assigned
 // to the return value):
@@ -833,7 +832,7 @@ example
   "EXAMPLE:"; echo = 2;
   ring R = (0), (x,y), lp;
   poly p = (-7*x^2 + 2*x*y^2 + 6*x + y^4 + 14*y^2 + 47)*(5x2+y2)^3*(x-y)^4;
-  def S = absBiFactorize(p) ;
+  def S = absFactorizeBCG(p) ;
   setring(S);
   absolute_factors;
 }
