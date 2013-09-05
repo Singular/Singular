@@ -7,6 +7,7 @@
 */
 
 #include <string.h>
+#include <math.h>
 #include <kernel/mod2.h>
 #include <omalloc/mylimits.h>
 #include <kernel/structs.h>
@@ -317,110 +318,65 @@ int nrGetChar()
 #define mpz_size1(A) (ABS((A)->_mp_size))
 */
 #define SR_HDL(A) ((long)(A))
-#define mpz_isNeg(A) ((A)->_mp_size<0)
-#define mpz_limb_size(A) ((A)->_mp_size)
-#define mpz_limb_d(A) ((A)->_mp_d)
-#define MPZ_DIV(A,B,C) mpz_tdiv_q((A),(B),(C))
 #define IS_INT(A) ((A)->s==3)
 #define IS_IMM(A) (SR_HDL(A)&SR_INT)
 #define GET_NOM(A) ((A)->z)
 #define GET_DENOM(A) ((A)->n)
-#define MPZ_INIT mpz_init
-#define MPZ_CLEAR mpz_clear
 
 number nrMapQ(number from)
 {
-  mpz_t h;
-  mpz_ptr g,z,n;
-  int i,j,t,s;
-  float ba,rr,rn,y;
-
   if (IS_IMM(from))
     return nf((float)nlInt(from,NULL /* dummy for nlInt*/)).N();
-  z=GET_NOM(from);
-  s=0X10000;
-  ba=(float)s;
-  ba*=ba;
-  rr=0.0;
-  i=mpz_size1(z);
+
+  /* read out the enumerator */
+  mpz_ptr z=GET_NOM(from);
+  int i = mpz_size1(z);
+  mpf_t e;
+  mpf_init(e);
+  mpf_set_z(e,z);
+
+  /* if number was an integer, we are done*/
   if(IS_INT(from))
   {
     if(i>4)
     {
       WerrorS("float overflow");
-      return nf(rr).N();
+      return nf(0.0).N();
     }
-    i--;
-    rr=(float)mpz_limb_d(z)[i];
-    while(i>0)
-    {
-      i--;
-      y=(float)mpz_limb_d(z)[i];
-      rr=rr*ba+y;
-    }
-    if(mpz_isNeg(z))
-      rr=-rr;
-    return nf(rr).N();
+    double basis;
+    signed long int exp;
+    basis = mpf_get_d_2exp(&exp, e);
+    float f= mpf_sgn(e)*ldexp(basis,exp);
+    mpf_clear(e);
+    return nf(f).N();
   }
-  n=GET_DENOM(from);
-  j=s=mpz_limb_size(n);
-  if(j>i)
+
+  /* else read out the denominator */
+  mpz_ptr n = GET_DENOM(from);
+  int j = mpz_size1(n);
+  if(j-i>4)
   {
-    g=n; n=z; z=g;
-    t=j; j=i; i=t;
+    WerrorS("float overflow");
+    mpf_clear(e);
+    return nf(0.0).N();
   }
-  t=i-j;
-  if(t>4)
-  {
-    if(j==s)
-      WerrorS("float overflow");
-    return nf(rr).N();
-  }
-  if(t>1)
-  {
-    g=h;
-    MPZ_INIT(g);
-    MPZ_DIV(g,z,n);
-    t=mpz_size1(g);
-    if(t>4)
-    {
-      MPZ_CLEAR(g);
-      if(j==s)
-        WerrorS("float overflow");
-      return nf(rr).N();
-    }
-    t--;
-    rr=(float)mpz_limb_d(g)[t];
-    while(t)
-    {
-      t--;
-      y=(float)mpz_limb_d(g)[t];
-      rr=rr*ba+y;
-    }
-    MPZ_CLEAR(g);
-    if(j!=s)
-      rr=1.0/rr;
-    if(mpz_isNeg(z))
-      rr=-rr;
-    return nf(rr).N();
-  }
-  rn=(float)mpz_limb_d(n)[j-1];
-  rr=(float)mpz_limb_d(z)[i-1];
-  if(j>1)
-  {
-    rn=rn*ba+(float)mpz_limb_d(n)[j-2];
-    rr=rr*ba+(float)mpz_limb_d(z)[i-2];
-    i--;
-  }
-  if(t!=0)
-    rr=rr*ba+(float)mpz_limb_d(z)[i-2];
-  if(j==s)
-    rr=rr/rn;
-  else
-    rr=rn/rr;
-  if(mpz_isNeg(z))
-    rr=-rr;
-  return nf(rr).N();
+  mpf_t d;
+  mpf_init(d);
+  mpf_set_z(d,n);
+
+  /* and compute the quotient */
+  mpf_t q;
+  mpf_init(q);
+  mpf_div(q,e,d);
+
+  double basis;
+  signed long int exp;
+  basis = mpf_get_d_2exp(&exp, q);
+  float f = mpf_sgn(e)*ldexp(basis,exp);
+  mpf_clear(e);
+  mpf_clear(d);
+  mpf_clear(q);
+  return nf(f).N();
 }
 
 static number nrMapP(number from)
