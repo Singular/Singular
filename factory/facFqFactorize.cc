@@ -7,7 +7,7 @@
  * a finite field.
  *
  * ABSTRACT: "Efficient Multivariate Factorization over Finite Fields" by
- * L. Bernardin & M. Monagon. Precomputation of leading coefficients is 
+ * L. Bernardin & M. Monagon. Precomputation of leading coefficients is
  * described in "Sparse Hensel lifting" by E. Kaltofen
  *
  * @author Martin Lee
@@ -740,6 +740,9 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
 {
   int k= F.level() - 1;
   Variable x= Variable (1);
+  CanonicalForm LCF=LC (F, x);
+  CFList LCFeval;
+
   CFList result;
   FFRandom genFF;
   GFRandom genGF;
@@ -815,16 +818,29 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
     }
     int l= F.level();
     eval.insert (F);
+    LCFeval.insert (LCF);
     bool bad= false;
     for (CFListIterator i= result; i.hasItem(); i++, l--)
     {
       eval.insert (eval.getFirst()(i.getItem(), l));
+      LCFeval.insert (LCFeval.getFirst()(i.getItem(), l));
       if (degree (eval.getFirst(), l - 1) != degree (F, l - 1))
       {
         if (!find (list, random))
           list.append (random);
         result= CFList();
         eval= CFList();
+        LCFeval= CFList();
+        bad= true;
+        break;
+      }
+      if ((l != 2) && (degree (LCFeval.getFirst(), l-1) != degree (LCF, l-1)))
+      {
+        if (!find (list, random))
+          list.append (random);
+        result= CFList();
+        eval= CFList();
+        LCFeval= CFList();
         bad= true;
         break;
       }
@@ -838,6 +854,7 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
       if (!find (list, random))
         list.append (random);
       result= CFList();
+      LCFeval= CFList();
       eval= CFList();
       continue;
     }
@@ -849,6 +866,7 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
       if (!find (list, random))
         list.append (random);
       result= CFList();
+      LCFeval= CFList();
       eval= CFList();
       continue;
     }
@@ -860,6 +878,7 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
       if (!find (list, random))
         list.append (random);
       result= CFList();
+      LCFeval= CFList();
       eval= CFList();
       continue;
     }
@@ -2009,7 +2028,7 @@ recombination (const CFList& factors1, const CFList& factors2, int s, int thres,
       }
     }
     s++;
-    if (T.length() < 2*s || T.length() == s) 
+    if (T.length() < 2*s || T.length() == s)
     {
       delete [] v;
       result.append (prod (T));
@@ -3632,4 +3651,3 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
 #endif
 /* HAVE_NTL */
-

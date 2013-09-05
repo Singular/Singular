@@ -1,5 +1,5 @@
 ;; Test which should pass shifted exponents
-absbifact
+absfact
 abusalem
 alexpoly
 algebralib
