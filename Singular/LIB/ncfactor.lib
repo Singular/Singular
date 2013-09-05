@@ -1169,6 +1169,9 @@ Performing commutative factorization.");
 already a complete factorization and do not have to go through the factors recursively.");
     return(result);
   }
+  dbprint(p,dbprintWhitespace + "We have the following intermediate list of inhomogeneous
+factorizations:");
+  dbprint(p,result);
   dbprint(p,dbprintWhitespace +" recursively check factors for irreducibility");
   list recursivetemp;
   int changedSomething;
@@ -1216,6 +1219,8 @@ already a complete factorization and do not have to go through the factors recur
     resultWithInterchanges = resultWithInterchanges +
                              checkForHomogInhomogInterchangability(result[i],2,size(result[i]));
   }//applying the interchanges to result
+  dbprint(p,dbprintWhitespace + "With interchanges, the result is:");
+  dbprint(p,resultWithInterchanges);
   //now, refine the possible redundant list
   return( delete_dublicates_noteval(resultWithInterchanges) );
 }//proc facFirstWeyl
@@ -1254,10 +1259,10 @@ ASSUMPTIONS:
 {//checkForHomogInhomogInterchangability
   int p = printlevel-voice+2;
   string dbprintWhitespace = "";
-  int i; int j;
+  int i; int j; int k;
   for (i = 1; i<=voice;i++)
   {dbprintWhitespace = dbprintWhitespace + " ";}
-  if (size(factors) <= 2 || posLeft == posRight - 1)
+  if (size(factors) <= 2 || posLeft >= posRight - 1)
   {//easiest case: There is nothing to swap
     return (list(factors));
   }//easiest case: There is nothing to swap
@@ -1283,13 +1288,16 @@ ASSUMPTIONS:
         for (j = size(factors); j >=1; j--)
         {//creating a new entry for the resulting list, replacing the swap in factors
           if (j==i+1)
-          {tempSwapsTempEntry = insert(tempSwapsTempEntry, attemptToSwap[1][2]);}
+          {
+            for (k = size(attemptToSwap[1]); k >=1 ; k--)
+            {
+              tempSwapsTempEntry = insert(tempSwapsTempEntry, attemptToSwap[1][k]);
+            }
+            j--; //Because we changed entry i+1 and i
+          }
           else
           {
-            if (j == i)
-            {tempSwapsTempEntry = insert(tempSwapsTempEntry, attemptToSwap[1][1]);}
-            else
-            {tempSwapsTempEntry = insert(tempSwapsTempEntry,factors[j]);}
+            tempSwapsTempEntry = insert(tempSwapsTempEntry,factors[j]);
           }
         }//creating a new entry for the resulting list, replacing the swap in factors
         tempSwaps = insert(tempSwaps,list(list(i+1,posRight),tempSwapsTempEntry));
@@ -1309,13 +1317,16 @@ ASSUMPTIONS:
           for (j = size(factors); j >=1; j--)
           {//creating a new entry for the resulting list, replacing the swap in factors
             if (j==i+1)
-            {tempSwapsTempEntry = insert(tempSwapsTempEntry, attemptToSwap[1][2]);}
+            {
+              for (k = size(attemptToSwap[1]); k >=1 ; k--)
+              {
+                tempSwapsTempEntry = insert(tempSwapsTempEntry, attemptToSwap[1][k]);
+              }
+              j--; //Because we changed entry i+1 and i
+            }
             else
             {
-              if (j == i)
-              {tempSwapsTempEntry = insert(tempSwapsTempEntry, attemptToSwap[1][1]);}
-              else
-              {tempSwapsTempEntry = insert(tempSwapsTempEntry,factors[j]);}
+              tempSwapsTempEntry = insert(tempSwapsTempEntry,factors[j]);
             }
           }//creating a new entry for the resulting list, replacing the swap in factors
           tempSwaps = insert(tempSwaps,list(list(posLeft,i),tempSwapsTempEntry));
@@ -1323,7 +1334,6 @@ ASSUMPTIONS:
       }//position i+1 is homogeneous, position i is not ==> trying to swap
     }
   }//checking within the window posLeft <--> posRight, if there are interchanges possible
-
   //Now we will recursively call the function for all swapped entries.
   dbprint(p,dbprintWhitespace+ "Our list of different factorizations is now:");
   dbprint(p,tempSwaps);
@@ -1433,6 +1443,8 @@ fac. and ret. its result");
         result[1] = insert(result[1],inhomogeneousFactorsToFactorize[posInhomogFac][j][k],
                            posInhomogPoly-1);
       }//Inserting factorizations
+      dbprint(p,dbprintWhitespace + "Added a factorization to result, namely:");
+      dbprint(p, result[1]);
     }
   }//going through all by now calculated factorizations
   dbprint(p,dbprintWhitespace +" Done");
