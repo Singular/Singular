@@ -3,6 +3,10 @@ AC_INIT(tesths.cc)
 AC_CONFIG_HEADER(mod2.h)
 AC_CONFIG_MACRO_DIR(../factory)
 
+dnl Apparently, this is required for using an AC_CHECK_HEADER within a
+dnl AS_IF(...), at least on Cygwin.
+AC_USE_SYSTEM_EXTENSIONS
+
 # Check for FLINT
 # Bradford Hovinen, 2001-06-13
 # Modified by Pascal Giorgi, 2003-12-03
@@ -13,6 +17,7 @@ AC_CONFIG_MACRO_DIR(../factory)
 # stolen from Manish Singh
 # Shamelessly stolen from Owen Taylor
 
+
 dnl LB_CHECK_FLINT ([MINIMUM-VERSION [, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl
 dnl Test for FLINT and define
@@ -21,6 +26,15 @@ dnl FLINT_CFLAGS and FLINT_LIBS
 AC_DEFUN([LB_CHECK_FLINT],
 [
 DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
+
+AC_ARG_WITH(mathicgb,
+  [AS_HELP_STRING(
+    [--with-mathicgb=yes|no],
+    [Use the MathicGB library. Default is no.]
+  )],
+  [],
+  [with_mathicgb="no"]
+)
 
 AC_ARG_WITH(flint,
 [  --with-flint=<path>|yes|no  Use FLINT library. If argument is no, you do not have
@@ -682,8 +696,8 @@ test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib"
 test "x$includedir" = 'x${prefix}/include' && includedir="${exec_prefix}/include"
 
 # add to -I to CPPFLAGS and and -L to LDFLAGS, just to be sure
-LDFLAGS="-L${libdir} ${LDFLAGS}"
-CPPFLAGS="-I${includedir} ${CPPFLAGS}"
+LDFLAGS="-L ${libdir} ${LDFLAGS}"
+CPPFLAGS="-I ${includedir} ${CPPFLAGS}"
 
 # this is a work-around to include the right term.h
 if test "$ac_cv_singuname" = SunOS-5; then
@@ -694,6 +708,21 @@ fi
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Checks for programs.
 dnl
+
+# MathicGB
+AS_IF([test "x$with_mathicgb" = xyes], [
+  dnl Checking these pre-requisites and adding them to libs is necessary
+  dnl for some reason, at least on Cygwin.
+  AC_CHECK_LIB([tbb], [TBB_runtime_interface_version], [], [])
+  AC_CHECK_LIB(memtailor, libmemtailorIsPresent, [],
+    [AC_MSG_ERROR([Cannot find libmemtailor, which is required for MathicGB.])])
+  AC_CHECK_LIB(mathic, libmathicIsPresent, [],
+    [AC_MSG_ERROR([Cannot find libmathic, which is required for MathicGB.])])
+  AC_CHECK_LIB(mathicgb, libmathicgbIsPresent, [],
+    [AC_MSG_ERROR([Cannot find the MathicGB library.])], [-lstdc++])
+  AC_CHECK_HEADER([mathicgb.h])
+  AC_DEFINE(HAVE_MATHICGB)
+])
 
 # lex
 if test "${with_lex+set}" != set; then
@@ -1505,7 +1534,6 @@ else
   AC_DEFINE(HAVE_RATGRING)
   AC_MSG_RESULT(yes)
 fi
-
 
 OUTPUT_MAKEFILES="Makefile ../kernel/Makefile"
 
