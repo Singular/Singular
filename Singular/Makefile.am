@@ -16,6 +16,7 @@ ACLOCAL_AMFLAGS = -I ../m4
 # NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG
 # 
 
+GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-version)
 
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/factory
@@ -23,7 +24,7 @@ else
   USE_FACTORY =
 endif
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DHAVE_CONFIG_H
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DHAVE_CONFIG_H  -DGIT_VERSION='"$(GIT_VERSION)"'
 AMLDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys  -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
 
 ########################### Dynamic Modules... #########################
@@ -278,9 +279,7 @@ Singular_LDADD = libSingular.la
 
 # Singularg_LDADD = libSingular_g.la ${top_builddir}/numeric/libnumeric_g.la ${top_builddir}/kernel/libkernel_g.la ${top_builddir}/libpolys/polys/libpolys_g.la -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
 
-GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-version)
-
-Singular_CPPFLAGS = ${AM_CPPFLAGS} -DGIT_VERSION='"$(GIT_VERSION)"'
+# Singular_CPPFLAGS = ${AM_CPPFLAGS} -DGIT_VERSION='"$(GIT_VERSION)"'
 
 # Singularg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 # Singular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
@@ -306,7 +305,7 @@ Singulard_LDADD = libSingular.la
 
 # Singulardg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
 
-Singulard_CPPFLAGS = ${AM_CPPFLAGS}  -DGIT_VERSION='"$(GIT_VERSION)"'
+# Singulard_CPPFLAGS = ${AM_CPPFLAGS}  -DGIT_VERSION='"$(GIT_VERSION)"'
 
 # Singulard_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 # Singulardg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
