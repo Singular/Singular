@@ -44,7 +44,7 @@ SLIB1 = classifyci.lib classify_aeq.lib ffsolve.lib decomp.lib template.lib\
         findifs.lib finitediff.lib \
         locnormal.lib modnormal.lib \
 	JMBTest.lib JMSConst.lib multigrading.lib parallel.lib realizationMatroids.lib ringgb.lib \
-	schreyer.lib symodstd.lib derham.lib polybori.lib
+	schreyer.lib symodstd.lib derham.lib polybori.lib ellipticcovers.lib
 
 PLIBS = bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib fpadim.lib \
 	freegb.lib gkdim.lib involut.lib ncalg.lib ncdecomp.lib \
