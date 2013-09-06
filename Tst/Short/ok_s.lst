@@ -208,8 +208,12 @@ mora_7
 mora_9
 ; mpsr_s
 mres_s
+ncfactor_example2_7FromMaster_s
 ncfactor_example_all_procedures_s
 ncfactor_inhomog_s
+ncfactor_koepf_s
+ncfactor_koepfShift_s
+ncfactor_tsai_s
 normal
 parallel_s
 paraplan_s
