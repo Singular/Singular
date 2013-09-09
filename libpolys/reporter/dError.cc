@@ -67,6 +67,7 @@ int dReportError(const char* fmt, ...)
   omPrintCurrentBackTraceMax(stderr, 8);
 #endif
 
+#if 0
 #ifdef HAVE_EXECINFO_H
   ret = backtrace( buffer, SIZE ); // execinfo.h
   fprintf(stderr, "\nExecinfo backtrace (with %zd stack frames): \n", ret);
@@ -119,6 +120,7 @@ int dReportError(const char* fmt, ...)
     fprintf (stderr, " %s\n", ss + 2);
   }
   malloc_free (ptr);
+#endif
 #endif
 
 #undef SIZE
