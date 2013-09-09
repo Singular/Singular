@@ -771,17 +771,13 @@ char * showOption()
 
 /* version strings */
 #ifdef HAVE_FLINT
-#ifdef __cplusplus
 extern "C"
 {
-#endif
 #ifndef __GMP_BITS_PER_MP_LIMB
 #define __GMP_BITS_PER_MP_LIMB GMP_LIMB_BITS
 #endif
 #include <flint/flint.h>
-#ifdef __cplusplus
 }
-#endif
 #endif
 
 char * versionString(/*const bool bShowDetails = false*/ )
@@ -899,18 +895,18 @@ char * versionString(/*const bool bShowDetails = false*/ )
               StringAppendS("ratGB,");
 #endif
               StringAppend("random=%d\n",siRandomStart);
-   
+
 #define SI_SHOW_BUILTIN_MODULE(name) StringAppend(" %s", #name);
               StringAppendS("built-in modules: {");
               SI_FOREACH_BUILTIN(SI_SHOW_BUILTIN_MODULE)
               StringAppendS("}\n");
 #undef SI_SHOW_BUILTIN_MODULE
-     
-              StringAppend("\tAC_CONFIGURE_ARGS=%s,\n"
-			   "\tCC=%s,FLAGS:%s,\n"
-			   "\tCXX=%s,FLAGS:%s,\n"
-			   "\tDEFS:%s,CPPFLAGS:%s,\n"
-			   "\tLDFLAGS:%s,LIBS:%s "
+
+              StringAppend("AC_CONFIGURE_ARGS=%s,\n"
+                           "CC=%s,FLAGS:%s,\n"
+                           "CXX=%s,FLAGS:%s,\n"
+                           "DEFS:%s,CPPFLAGS:%s,\n"
+                           "LDFLAGS:%s,LIBS:%s "
 #ifdef __GNUC__
               "(ver: " __VERSION__ ")"
 #endif

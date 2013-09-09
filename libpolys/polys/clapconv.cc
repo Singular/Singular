@@ -379,8 +379,7 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs, const
     for ( int i = rVar(r); i>0; i-- )
       p_SetExp( term, i ,exp[i], r);
     //if (rRing_has_Comp(currRing)) p_SetComp(term, 0, currRing); // done by pInit
-    pGetCoeff(term) = ALLOC0_RNUMBER(); // Q!?
-    NUM(pGetCoeff(term))=convFactoryPSingP( f, r->cf->extRing );
+    pGetCoeff(term)=ntInit(convFactoryPSingP( f, r->cf->extRing ), r->cf);
     p_Setm( term,r );
     result = p_Add_q( result, term,r );
   }

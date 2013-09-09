@@ -3646,6 +3646,7 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
       {
         number n=pGetCoeff(DEN(z));
         zz=p_Div_nn(zz,n,srcExtRing);
+        p_Normalize(zz,srcExtRing);
       }
       //else
       //  WarnS("Not implemented yet: Cannot permute a rational fraction and make a polynomial out of it! Ignorring the denumerator.");
