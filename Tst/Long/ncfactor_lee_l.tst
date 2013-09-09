@@ -1,6 +1,5 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id$");
 LIB "ncfactor.lib";
 
 ring R = 0,(x,d),dp;
@@ -11,5 +10,4 @@ def l=facFirstWeyl(L);
 testNCfac (l, L);
 l;
 
-tst_status();
 tst_status(1); $
