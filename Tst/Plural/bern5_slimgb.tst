@@ -1,11 +1,8 @@
-// $Id$
-
 LIB "tst.lib";
 
 LIB "poly.lib";
 
 tst_init();
-tst_ignore("CVS: $Id$");
 
 proc char_out(ideal i){
   return(sort(simplify(lead(i),1))[1]);
@@ -31,6 +28,5 @@ F=(x1^3+x2^2)*(x1^2+x2^3);
 I=I,F;
 ideal J=slimgb(I);
 char_out(J);
-
 
 tst_status(1);$
