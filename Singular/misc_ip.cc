@@ -902,11 +902,11 @@ char * versionString(/*const bool bShowDetails = false*/ )
               StringAppendS("}\n");
 #undef SI_SHOW_BUILTIN_MODULE
 
-              StringAppend("AC_CONFIGURE_ARGS=%s,\n"
-                           "CC=%s,FLAGS:%s,\n"
-                           "CXX=%s,FLAGS:%s,\n"
-                           "DEFS:%s,CPPFLAGS:%s,\n"
-                           "LDFLAGS:%s,LIBS:%s "
+              StringAppend("AC_CONFIGURE_ARGS = %s,\n"
+                           "CC = %s,FLAGS : %s,\n"
+                           "CXX = %s,FLAGS : %s,\n"
+                           "DEFS : %s,CPPFLAGS : %s,\n"
+                           "LDFLAGS : %s,LIBS : %s "
 #ifdef __GNUC__
               "(ver: " __VERSION__ ")"
 #endif
