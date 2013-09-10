@@ -310,7 +310,7 @@ BOOLEAN sm_CheckDet(ideal I, int d, BOOLEAN sw, const ring r)
   int s,t,i;
   poly p;
 
-  if ((d>100) || (rIsExtension(r)))
+  if (d>100)
     return sw;
   if (!rField_is_Q(r))
     return sw;

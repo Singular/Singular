@@ -635,15 +635,6 @@ static inline int rInternalChar(const ring r)
 }
 
 
-/* R, Q, Fp: FALSE */
-static inline BOOLEAN rIsExtension(const ring r)
-{
-  assume(r != NULL);
-  const coeffs C = r->cf;
-  assume(C != NULL);
-  return nCoeff_is_Extension(C) || nCoeff_is_GF(C) || nCoeff_is_long_C(C);
-}
-
 /// Tests whether '(r->cf->minpoly) == NULL'
 static inline BOOLEAN rMinpolyIsNULL(const ring r)
 {

@@ -1795,57 +1795,47 @@ lists rDecompose(const ring r)
     rDecomposeRing(&(L->m[0]),r);
   }
 #endif
-  else if (rIsExtension(r))
+  else if ( r->cf->extRing!=NULL )// nCoeff_is_algExt(r->cf))
   {
-    if ( r->cf->extRing!=NULL )// nCoeff_is_algExt(r->cf))
-    {
-      rDecomposeCF(&(L->m[0]), r->cf->extRing, r);
-    }
-    else
-    {
-      assume( nCoeff_is_GF(r->cf) );
+    rDecomposeCF(&(L->m[0]), r->cf->extRing, r);
+  }
+  else if(rField_is_GF(r))
+  {
+    lists Lc=(lists)omAlloc0Bin(slists_bin);
+    Lc->Init(4);
+    // char:
+    Lc->m[0].rtyp=INT_CMD;
+    Lc->m[0].data=(void*)r->cf->m_nfCharQ;
+    // var:
+    lists Lv=(lists)omAlloc0Bin(slists_bin);
+    Lv->Init(1);
+    Lv->m[0].rtyp=STRING_CMD;
+    Lv->m[0].data=(void *)omStrDup(*rParameter(r));
+    Lc->m[1].rtyp=LIST_CMD;
+    Lc->m[1].data=(void*)Lv;
+    // ord:
+    lists Lo=(lists)omAlloc0Bin(slists_bin);
+    Lo->Init(1);
+    lists Loo=(lists)omAlloc0Bin(slists_bin);
+    Loo->Init(2);
+    Loo->m[0].rtyp=STRING_CMD;
+    Loo->m[0].data=(void *)omStrDup(rSimpleOrdStr(ringorder_lp));
 
-      lists Lc=(lists)omAlloc0Bin(slists_bin);
-      Lc->Init(4);
-      // char:
-      Lc->m[0].rtyp=INT_CMD;
-      Lc->m[0].data=(void*)r->cf->m_nfCharQ;
-      // var:
-      lists Lv=(lists)omAlloc0Bin(slists_bin);
-      Lv->Init(1);
-      Lv->m[0].rtyp=STRING_CMD;
-      Lv->m[0].data=(void *)omStrDup(*rParameter(r));
-      Lc->m[1].rtyp=LIST_CMD;
-      Lc->m[1].data=(void*)Lv;
-      // ord:
-      lists Lo=(lists)omAlloc0Bin(slists_bin);
-      Lo->Init(1);
-      lists Loo=(lists)omAlloc0Bin(slists_bin);
-      Loo->Init(2);
-      Loo->m[0].rtyp=STRING_CMD;
-      Loo->m[0].data=(void *)omStrDup(rSimpleOrdStr(ringorder_lp));
+    intvec *iv=new intvec(1); (*iv)[0]=1;
+    Loo->m[1].rtyp=INTVEC_CMD;
+    Loo->m[1].data=(void *)iv;
 
-      intvec *iv=new intvec(1); (*iv)[0]=1;
-      Loo->m[1].rtyp=INTVEC_CMD;
-      Loo->m[1].data=(void *)iv;
+    Lo->m[0].rtyp=LIST_CMD;
+    Lo->m[0].data=(void*)Loo;
 
-      Lo->m[0].rtyp=LIST_CMD;
-      Lo->m[0].data=(void*)Loo;
-
-      Lc->m[2].rtyp=LIST_CMD;
-      Lc->m[2].data=(void*)Lo;
-      // q-ideal:
-      Lc->m[3].rtyp=IDEAL_CMD;
-      Lc->m[3].data=(void *)idInit(1,1);
-      // ----------------------
-      L->m[0].rtyp=LIST_CMD;
-      L->m[0].data=(void*)Lc;
-    }
-    if (L->m[0].rtyp==0)
-    {
-      //omFreeBin(slists_bin,(void *)L);
-      return NULL;
-    }
+    Lc->m[2].rtyp=LIST_CMD;
+    Lc->m[2].data=(void*)Lo;
+    // q-ideal:
+    Lc->m[3].rtyp=IDEAL_CMD;
+    Lc->m[3].data=(void *)idInit(1,1);
+    // ----------------------
+    L->m[0].rtyp=LIST_CMD;
+    L->m[0].data=(void*)Lc;
   }
   else
   {
