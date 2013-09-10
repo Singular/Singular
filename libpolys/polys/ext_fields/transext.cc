@@ -354,7 +354,7 @@ number ntCopy(number a, const coeffs cf)
   fraction f = (fraction)a;
   poly g = p_Copy(NUM(f), ntRing);
   poly h = NULL; if (!DENIS1(f)) h = p_Copy(DEN(f), ntRing);
-  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+  fraction result = (fraction)omAllocBin(fractionObjectBin);
   NUM(result) = g;
   DEN(result) = h;
   COM(result) = COM(f);
@@ -415,8 +415,8 @@ number ntGetNumerator(number &a, const coeffs cf)
   // Call ntNormalize instead of above?!?
 
   NUM (result) = p_Copy (NUM (f), ntRing); // ???
-  DEN (result) = NULL;
-  COM (result) = 0;
+  //DEN (result) = NULL; // done by ..Alloc0..
+  //COM (result) = 0; // done by ..Alloc0..
 
   ntTest((number)result);
   //check_N((number)result,cf);
@@ -430,8 +430,8 @@ number ntGetDenom(number &a, const coeffs cf)
   ntTest(a);
 
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  DEN (result)= NULL;
-  COM (result)= 0;
+  //DEN (result)= NULL; // done by ..Alloc0..
+  //COM (result)= 0; // done by ..Alloc0..
 
   if (IS0(a))
   {
@@ -596,16 +596,17 @@ number ntInit_bigint(number longratBigIntNumber, const coeffs src, const coeffs 
   if( n_IsOne(den, C) )
   {
      NUM(result) = p_NSet(n, A);
-     DEN(result) = NULL;
+     //DEN(result) = NULL; // done by ..Alloc0..
      n_Delete(&den, C);
-  } else
+  }
+  else
   {
      DEN(result) = p_NSet(den, A);
      NUM(result) = p_NSet(n_GetNumerator(n, C), A);
      n_Delete(&n, C);
   }
 
-  COM(result) = 0;
+  //COM(result) = 0; // done by ..Alloc0..
 
   ntTest((number)result);
   //check_N((number)result,cf);
@@ -675,7 +676,7 @@ number ntInit(poly p, const coeffs cf)
 
   p_Normalize(p, ntRing);
   NUM(f) = p;
-  COM(f) = 0;
+  //COM(f) = 0; // done by omAlloc0
 
   //check_N((number)f,cf);
   ntTest((number)f);
@@ -818,7 +819,7 @@ number ntDiff(number a, number d, const coeffs cf)
   ntTest(a);
   ntTest(d);
 
-  if (IS0(d)) 
+  if (IS0(d))
   {
     WerrorS("ringvar expected");
     return NULL;
@@ -839,17 +840,16 @@ number ntDiff(number a, number d, const coeffs cf)
   if (IS0(a)) return ntCopy(a, cf);
 
   fraction fa = (fraction)a;
+  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   if (DENIS1(fa))
   {
-     fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
      NUM(result) = p_Diff(NUM(fa),k,ntRing);
-     DEN(result) = NULL;
+     //DEN(result) = NULL; // done by ..Alloc0..
      COM(result) = COM(fa);
      //check_N((number)result,cf);
      return (number)result;
   }
 
-  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   poly fg = p_Mult_q(p_Copy(DEN(fa),ntRing),p_Diff(NUM(fa),k,ntRing),ntRing);
   poly gf = p_Mult_q(p_Copy(NUM(fa),ntRing),p_Diff(DEN(fa),k,ntRing),ntRing);
   NUM(result) = p_Sub(fg,gf,ntRing);
@@ -891,7 +891,7 @@ number ntAdd(number a, number b, const coeffs cf)
                                                    p_Copy(DEN(fb), ntRing),
                                                    ntRing);
 
-  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+  fraction result = (fraction)omAllocBin(fractionObjectBin);
   NUM(result) = g;
   DEN(result) = f;
   COM(result) = COM(fa) + COM(fb) + ADD_COMPLEXITY;
@@ -931,7 +931,7 @@ number ntSub(number a, number b, const coeffs cf)
                                                    p_Copy(DEN(fb), ntRing),
                                                    ntRing);
 
-  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+  fraction result = (fraction)omAllocBin(fractionObjectBin);
   NUM(result) = g;
   DEN(result) = f;
   COM(result) = COM(fa) + COM(fb) + ADD_COMPLEXITY;
@@ -957,7 +957,7 @@ number ntMult(number a, number b, const coeffs cf)
 
   if (g == NULL) return NULL; // may happen due to zero divisors???
 
-  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+  fraction result = (fraction)omAllocBin(fractionObjectBin);
 
   NUM(result) = g;
 
@@ -1787,17 +1787,17 @@ number ntInvers(number a, const coeffs cf)
     {
       if (p_IsOne(num_f, ntRing))
       {
-        DEN(result)=NULL;
+        //DEN(result)=NULL;// Alloc0
         COM(result) = 0;
         p_Delete(&num_f,ntRing);
       }
     }
   }
-  else
-  {
-    DEN(result) = NULL;
-    COM(result) = 0;
-  }
+  //else// Alloc0
+  //{
+  //  DEN(result) = NULL;
+  //  COM(result) = 0;
+  //}
   ntTest((number)result); // !!!!
   //check_N((number)result,cf);
   return (number)result;
@@ -1866,7 +1866,7 @@ number ntCopyMap(number a, const coeffs cf, const coeffs dst)
   if (!DENIS1(f))
      h = prCopyR(DEN(f), rSrc, rDst);
 
-  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+  fraction result = (fraction)omAllocBin(fractionObjectBin);
 
   NUM(result) = g;
   DEN(result) = h;
@@ -1915,7 +1915,7 @@ number ntMapPP(number a, const coeffs src, const coeffs dst)
   poly p = p_One(dst->extRing);
   p_SetCoeff(p, n_Copy(a, src), dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
-  NUM(f) = p; DEN(f) = NULL; COM(f) = 0;
+  NUM(f) = p; // DEN(f) = NULL; COM(f) = 0;
   assume(n_Test((number)f, dst));
   //check_N((number)f,dst);
   return (number)f;
@@ -1938,7 +1938,7 @@ number ntMapUP(number a, const coeffs src, const coeffs dst)
   p = p_One(dst->extRing);
   p_SetCoeff(p, q, dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
-  NUM(f) = p; DEN(f) = NULL; COM(f) = 0;
+  NUM(f) = p; // DEN(f) = NULL; COM(f) = 0;
   assume(n_Test((number)f, dst));
   //check_N((number)f,dst);
   return (number)f;
@@ -2079,8 +2079,8 @@ static number ntParameter(const int iParameter, const coeffs cf)
 
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(f) = p;
-  DEN(f) = NULL;
-  COM(f) = 0;
+  //DEN(f) = NULL;
+  //COM(f) = 0;
 
   ntTest((number)f);
 
