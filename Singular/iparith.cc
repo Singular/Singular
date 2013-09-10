@@ -4058,10 +4058,7 @@ static BOOLEAN jjEXECUTE(leftv, leftv v)
 static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
   lists L=(lists)omAllocBin(slists_bin);
-  if (rField_is_Zp(currRing)
-  || rField_is_Q(currRing)
-  || rField_is_Zp_a(currRing)
-  || rField_is_Q_a(currRing))
+  if (currRing->cf->convSingNFactoryN!=NULL) /* conversion to factory*/
   {
     ideal_list p,h;
     h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
@@ -6383,9 +6380,8 @@ static BOOLEAN jjSUBST_Test(leftv v,leftv w,
 #endif
   if ((ringvar=pVar(p))==0)
   {
-    if ((p!=NULL) && rField_is_Extension(currRing))
+    if ((p!=NULL) && (currRing->cf->extRing!=NULL))
     {
-      assume(currRing->cf->extRing!=NULL);
       number n = pGetCoeff(p);
       ringvar= -n_IsParam(n, currRing);
     }

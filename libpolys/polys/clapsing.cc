@@ -118,7 +118,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
     res=convFactoryPSingP( gcd( F, G ) , r);
   }
   // and over Q(a) / Fp(a)
-  else if ( rField_is_Extension(r))
+  else if ( r->cf->extRing!=NULL )
   {
     if ( rField_is_Q_a(r)) setCharacteristic( 0 );
     else                   setCharacteristic( rChar(r) );
@@ -174,7 +174,7 @@ void singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
     if (!b1) Off (SW_USE_EZGCD_P);
   }
   // and over Q(a) / Fp(a)
-  else if ( rField_is_Extension(r))
+  else if ( r->cf->extRing )
   {
     if ( rField_is_Q_a(r)) setCharacteristic( 0 );
     else                   setCharacteristic( rChar(r) );
@@ -269,7 +269,7 @@ poly singclap_resultant ( poly f, poly g , poly x, const ring r)
     goto resultant_returns_res;
   }
   // and over Q(a) / Fp(a)
-  else if (rField_is_Extension(r))
+  else if (r->cf->extRing!=NULL)
   {
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
     else               setCharacteristic( rChar(r) );
@@ -415,7 +415,7 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb , const 
     Off(SW_RATIONAL);
   }
   // and over Q(a) / Fp(a)
-  else if ( rField_is_Extension(r))
+  else if ( r->cf->extRing!=NULL )
   {
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
     else                 setCharacteristic( rChar(r) );
@@ -484,7 +484,7 @@ poly singclap_pdivide ( poly f, poly g, const ring r )
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
     res = convFactoryPSingP( F / G,r );
   }
-  else if (rField_is_Extension(r))
+  else if (r->cf->extRing!=NULL)
   {
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
     else               setCharacteristic( rChar(r) );
@@ -634,7 +634,7 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
       F=convSingPFactoryP( f,r );
       FAC=convSingPFactoryP( fac,r );
     }
-    else if (rField_is_Extension(r))
+    else if (r->cf->extRing!=NULL)
     {
       if (r->cf->extRing->qideal!=NULL)
       {
@@ -667,7 +667,7 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
         {
           q = convFactoryPSingP( Q,r );
         }
-        else if (rField_is_Extension(r))
+        else if (r->cf->extRing!=NULL)
         {
           if (r->cf->extRing->qideal!=NULL)
           {
@@ -835,7 +835,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
     L = factorize( F );
   }
   // and over Q(a) / Fp(a)
-  else if (rField_is_Extension(r))
+  else if (r->cf->extRing!=NULL)
   {
     if (rField_is_Q_a (r)) setCharacteristic (0);
     else                   setCharacteristic( rChar(r) );
@@ -897,7 +897,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       else if (rField_is_GF())
         res->m[j] = convFactoryGFSingGF( J.getItem().factor() );
 #endif
-      else if (rField_is_Extension(r))     /* Q(a), Fp(a) */
+      else if (r->cf->extRing!=NULL)     /* Q(a), Fp(a) */
       {
 #ifndef NDEBUG
         intvec *w=NULL;
@@ -932,7 +932,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       }
     }
 #ifndef NDEBUG
-    if (rField_is_Extension(r) && (!p_IsConstantPoly(ff,r)))
+    if ((r->cf->extRing!=NULL) && (!p_IsConstantPoly(ff,r)))
     {
       singclap_factorize_retry++;
       if (singclap_factorize_retry<3)
@@ -1206,7 +1206,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
     CanonicalForm F( convSingPFactoryP( f,r ) );
     L = sqrFree( F );
   }
-  else if (rField_is_Extension(r))
+  else if (r->cf->extRing!=NULL)
   {
     if (rField_is_Q_a (r)) setCharacteristic (0);
     else                   setCharacteristic( rChar(r) );
@@ -1270,7 +1270,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
       if (with_exps!=1 && with_exps!=3) (**v)[j] = J.getItem().exp();
       if (rField_is_Zp(r) || rField_is_Q(r))
         res->m[j] = convFactoryPSingP( J.getItem().factor(),r );
-      else if (rField_is_Extension(r))     /* Q(a), Fp(a) */
+      else if (r->cf->extRing!=NULL)     /* Q(a), Fp(a) */
       {
         if (r->cf->extRing->qideal==NULL)
           res->m[j]=convFactoryPSingTrP( J.getItem().factor(),r );

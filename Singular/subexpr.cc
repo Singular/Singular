@@ -1482,7 +1482,8 @@ void syMake(leftv v,const char * id, idhdl packhdl)
         v->rtyp = POLY_CMD;
         return;
       }
-      if(rField_is_Extension(currRing)&&((vnr=r_IsRingVar(id, currRing->cf->extRing))>=0))
+      if((currRing->cf->extRing!=NULL)
+      &&((vnr=r_IsRingVar(id, currRing->cf->extRing))>=0))
       {
         BOOLEAN ok=FALSE;
         poly p = pmInit(id,ok);

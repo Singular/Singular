@@ -1797,11 +1797,8 @@ lists rDecompose(const ring r)
 #endif
   else if (rIsExtension(r))
   {
-    if ( rField_is_Extension(r) )// nCoeff_is_algExt(r->cf))
+    if ( r->cf->extRing!=NULL )// nCoeff_is_algExt(r->cf))
     {
-      assume( r->cf != NULL );
-      assume( r->cf->extRing != NULL );
-
       rDecomposeCF(&(L->m[0]), r->cf->extRing, r);
     }
     else

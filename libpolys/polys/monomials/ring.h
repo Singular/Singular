@@ -493,10 +493,6 @@ static inline BOOLEAN rField_has_simple_inverse(const ring r)
 static inline BOOLEAN rField_has_simple_Alloc(const ring r)
 { assume(r != NULL); assume(r->cf != NULL); return nCoeff_has_simple_Alloc(r->cf); }
 
-/// Alg. or trans. ext.
-static inline BOOLEAN rField_is_Extension(const ring r)
-{ assume(r != NULL); assume(r->cf != NULL); return nCoeff_is_Extension(r->cf); } /* Z/p(a) and Q(a)*/
-
 n_coeffType rFieldType(const ring r);
 
 /// this needs to be called whenever a new ring is created: new fields
@@ -645,7 +641,6 @@ static inline BOOLEAN rIsExtension(const ring r)
   assume(r != NULL);
   const coeffs C = r->cf;
   assume(C != NULL);
-//  assume( (rParameter(r)!=NULL) == rField_is_Extension(r) ); // ?
   return nCoeff_is_Extension(C) || nCoeff_is_GF(C) || nCoeff_is_long_C(C);
 }
 
