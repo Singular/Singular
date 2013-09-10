@@ -212,7 +212,7 @@ EXAMPLE:  example propagator; shows an example
     return(p);
   }
   if ((typeof(xy)=="graph")||(typeof(d)=="list"))  {
-    list xl = ringlist(R)[1][2];
+    list xl = ringlist(basering)[1][2];
     list ed = xy.edges;
     number f=1;
     for (int j=1; j<=size(ed); j++){
@@ -407,7 +407,7 @@ EXAMPLE:  example gromovWitten; shows an example
   }
   if (typeof(P)=="graph"){
      if (size(#)>1){
-       return(gromovWitten(propagator(G,#)));
+       return(gromovWitten(propagator(P,#)));
      } else {
       int d =#[1];
       list pa = partitions(size(P.edges),d);
@@ -415,7 +415,7 @@ EXAMPLE:  example gromovWitten; shows an example
       int ti;
       for (int j=1; j<=size(pa); j++) {
        ti=timer;
-       re[j]=gromovWitten(propagator(G,pa[j]));
+       re[j]=gromovWitten(propagator(P,pa[j]));
        ti=timer-ti;
        //print(string(j)+" / "+string(size(pa))+"    "+string(pa[j])+"     "+string(re[j])+"      "+string(sum(re))+"     "+string(ti));
       }
@@ -460,7 +460,7 @@ EXAMPLE:  example computeGromovWitten; shows an example
       if ((j>=st)&(j<=en)){
        ti=timer;
        //pararg[j]=list(propagator(G,pa[j]));
-       re[j]=gromovWitten(propagator(G,pa[j]));
+       re[j]=gromovWitten(propagator(P,pa[j]));
        ti=timer-ti;
        if (vb>0){print(string(j)+" / "+string(size(pa))+"    "+string(pa[j])+"     "+string(re[j])+"      "+string(sum(re))+"     "+string(ti));}
       } else {re[j]=s;}

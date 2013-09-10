@@ -843,6 +843,7 @@ number ntDiff(number a, number d, const coeffs cf)
   {
      fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
      NUM(result) = p_Diff(NUM(fa),k,ntRing);
+     if (NUM(result)==NULL) return(NULL);
      DEN(result) = NULL;
      COM(result) = COM(fa);
      //check_N((number)result,cf);
