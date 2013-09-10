@@ -845,6 +845,11 @@ number ntDiff(number a, number d, const coeffs cf)
   {
      NUM(result) = p_Diff(NUM(fa),k,ntRing);
      //DEN(result) = NULL; // done by ..Alloc0..
+     if (NUM(result)==NULL) 
+     {
+       ntDelete(&result,cf);
+       return(NULL);
+     }
      COM(result) = COM(fa);
      //check_N((number)result,cf);
      return (number)result;
