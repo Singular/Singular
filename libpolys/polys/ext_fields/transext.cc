@@ -1425,6 +1425,13 @@ void definiteGcdCancellation(number a, const coeffs cf,
     {
       NUM(f) = p_Neg(NUM(f), ntRing);
       DEN(f) = p_Neg(DEN(f), ntRing);
+      if (p_IsConstant(DEN(f), ntRing) &&
+        n_IsOne(p_GetCoeff(DEN(f), ntRing), ntCoeffs))
+      {
+        /* DEN(f) = 1 needs to be represented by NULL! */
+        p_Delete(&DEN(f), ntRing);
+        DEN (f) = NULL;
+      }
     }
 #endif /* HAVE_FACTORY */
 
