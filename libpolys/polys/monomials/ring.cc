@@ -3396,20 +3396,18 @@ static void rSetOption(ring r)
     r->options &= ~Sy_bit(OPT_REDTHROUGH);
 
   // set intStrategy
-#ifdef HAVE_RINGS
-  if (
-         rField_is_Extension(r)
+  if ( (r->cf->extRing!=NULL)
       || rField_is_Q(r)
-      || rField_is_Ring(r))
-#else
-  if (rField_is_Extension(r) || rField_is_Q(r))
+#ifdef HAVE_RINGS
+      || rField_is_Ring(r)
 #endif
+  )
     r->options |= Sy_bit(OPT_INTSTRATEGY);
   else
     r->options &= ~Sy_bit(OPT_INTSTRATEGY);
 
   // set redTail
-  if (r->LexOrder || r->OrdSgn == -1 || rField_is_Extension(r))
+  if (r->LexOrder || r->OrdSgn == -1 || (r->cf->extRing!=NULL))
     r->options &= ~Sy_bit(OPT_REDTAIL);
   else
     r->options |= Sy_bit(OPT_REDTAIL);

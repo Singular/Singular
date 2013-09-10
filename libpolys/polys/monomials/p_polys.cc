@@ -3617,7 +3617,7 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
   assume( srcCf != NULL );
 
   assume( !nCoeff_is_GF(srcCf) );
-  assume( rField_is_Extension(src) );
+  assume( src->cf->extRing!=NULL );
 
   poly zz = NULL;
 

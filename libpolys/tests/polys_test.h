@@ -2046,7 +2046,7 @@ public:
     TS_ASSERT( !rField_is_Zp(s, 11) );
     TS_ASSERT( !rField_is_Zp(s, 13) );
     TS_ASSERT( !rField_is_GF(s) );
-    TS_ASSERT( rField_is_Extension(s) );
+    TS_ASSERT( (s->cf->extRing!=NULL) );
     TS_ASSERT( !rField_is_GF(s, 25) );
     TS_ASSERT_EQUALS(rVar(s), 2);
 
@@ -2147,7 +2147,7 @@ public:
     TS_ASSERT( !rField_is_Zp(s, 11) );
     TS_ASSERT( !rField_is_Zp(s, 13) );
     TS_ASSERT( !rField_is_GF(s) );
-    TS_ASSERT( rField_is_Extension(s) );
+    TS_ASSERT( (s->cf->extRing!=NULL) );
     TS_ASSERT( !rField_is_GF(s, 25) );
     TS_ASSERT_EQUALS(rVar(s), 3);
 
@@ -2292,7 +2292,7 @@ public:
     TS_ASSERT( !rField_is_Zp(s, 11) );
     TS_ASSERT( !rField_is_Zp(s, 17) );
     TS_ASSERT( !rField_is_GF(s) );
-    TS_ASSERT( rField_is_Extension(s) );
+    TS_ASSERT( (s->cf->extRing!=NULL) );
     TS_ASSERT( !rField_is_GF(s, 25) );
     TS_ASSERT_EQUALS(rVar(s), 3);
 
@@ -2365,7 +2365,7 @@ public:
     TS_ASSERT( !rField_is_Zp(s, 11) );
     TS_ASSERT( !rField_is_Zp(s, 17) );
     TS_ASSERT( !rField_is_GF(s) );
-    TS_ASSERT( rField_is_Extension(s) );
+    TS_ASSERT( (s->cf->extRing!=NULL) );
     TS_ASSERT( !rField_is_GF(s, 25) );
     TS_ASSERT_EQUALS(rVar(s), 3);
 
@@ -2478,7 +2478,7 @@ public:
     TS_ASSERT( !rField_is_Zp(s, 11) );
     TS_ASSERT( !rField_is_Zp(s, 17) );
     TS_ASSERT( !rField_is_GF(s) );
-    TS_ASSERT( rField_is_Extension(s) );
+    TS_ASSERT( (s->cf->extRing!=NULL) );
     TS_ASSERT( !rField_is_GF(s, 25) );
     TS_ASSERT_EQUALS(rVar(s), 1);
 
@@ -2589,7 +2589,7 @@ public:
     TS_ASSERT( !rField_is_Zp(s, 11) );
     TS_ASSERT( !rField_is_Zp(s, 17) );
     TS_ASSERT( !rField_is_GF(s) );
-    TS_ASSERT( rField_is_Extension(s) );
+    TS_ASSERT( (s->cf->extRing!=NULL) );
     TS_ASSERT( !rField_is_GF(s, 25) );
     TS_ASSERT_EQUALS(rVar(s), 3);
     
