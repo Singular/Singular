@@ -5113,6 +5113,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
         TransExtInfo extParam;
 
         extParam.r = rDefault( ch, pars, names); // Q/Zp [ p_1, ... p_pars ]
+	for(int i=pars-1; i>=0;i--)
+	{
+	  omFree(names[i]);
+	}
+	omFree(names);
 
         cf = nInitChar(n_transExt, &extParam);
       }

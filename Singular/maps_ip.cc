@@ -300,7 +300,8 @@ poly pSubstPar(poly p, int par, poly image)
     {
       pSetCoeff(pp, n_Invers(d, currRing->cf));
       n_Delete(&d, currRing); // d = NULL;
-    } else
+    }
+    else
       pSetCoeff(pp, nInit(1));
 
     //PrintS("->");pWrite((poly)(v->data));
