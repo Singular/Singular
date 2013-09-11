@@ -847,7 +847,7 @@ number ntDiff(number a, number d, const coeffs cf)
      //DEN(result) = NULL; // done by ..Alloc0..
      if (NUM(result)==NULL) 
      {
-       ntDelete(&result,cf);
+       omFreeBin((ADDRESS)result, fractionObjectBin);
        return(NULL);
      }
      COM(result) = COM(fa);
