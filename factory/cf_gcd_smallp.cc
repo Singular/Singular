@@ -736,7 +736,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       {
         if (((degree (ppCoF,1)+degree (ppH,1) == bound1) &&
              (degree (ppCoG,1)+degree (ppH,1) == bound2) &&
-             terminationTest (ppA, ppB, ppCoF, ppCoG, ppH)) || 
+             terminationTest (ppA, ppB, ppCoF, ppCoG, ppH)) ||
              (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
         {
           CFList u, v;
@@ -1721,6 +1721,7 @@ gaussianElimFp (CFMatrix& M, CFArray& L)
   long rk= nmod_mat_rref (FLINTN);
 
   N= convertNmod_mat_t2FacCFMatrix (FLINTN);
+  delete N;
   nmod_mat_clear (FLINTN);
 #else
   int p= getCharacteristic ();
@@ -1730,9 +1731,11 @@ gaussianElimFp (CFMatrix& M, CFArray& L)
     zz_p::init (p);
   }
   mat_zz_p *NTLN= convertFacCFMatrix2NTLmat_zz_p(*N);
+  delete N;
   long rk= gauss (*NTLN);
 
   N= convertNTLmat_zz_p2FacCFMatrix (*NTLN);
+  delete NTLN;
 #endif
 
   L= CFArray (M.rows());
@@ -1808,12 +1811,12 @@ solveSystemFp (const CFMatrix& M, const CFArray& L)
   mat_zz_p *NTLN= convertFacCFMatrix2NTLmat_zz_p(*N);
   long rk= gauss (*NTLN);
 #endif
+  delete N;
   if (rk != M.columns())
   {
 #ifdef HAVE_FLINT
     nmod_mat_clear (FLINTN);
 #endif
-    delete N;
     return CFArray();
   }
 #ifdef HAVE_FLINT
@@ -1821,6 +1824,7 @@ solveSystemFp (const CFMatrix& M, const CFArray& L)
   nmod_mat_clear (FLINTN);
 #else
   N= convertNTLmat_zz_p2FacCFMatrix (*NTLN);
+  delete NTLN;
 #endif
   CFArray A= readOffSolution (*N, rk);
 
