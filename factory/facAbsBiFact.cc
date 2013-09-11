@@ -478,27 +478,30 @@ differentevalpoint:
       liftedSmallestFactor= liftedSmallestFactor (eval[1],1);
 
     On (SW_SYMMETRIC_FF);
-    CFMatrix M= CFMatrix (s, s);
-    M(s,s)= power (CanonicalForm (p), k);
+    CFMatrix *M= new CFMatrix (s, s);
+    (*M)(s,s)= power (CanonicalForm (p), k);
     for (int j= 1; j < s; j++)
     {
-      M (j,j)= 1;
-      M (j+1,j)= -liftedSmallestFactor;
+      (*M) (j,j)= 1;
+      (*M) (j+1,j)= -liftedSmallestFactor;
     }
 
-    mat_ZZ NTLM= *convertFacCFMatrix2NTLmat_ZZ (M);
+    mat_ZZ * NTLM= convertFacCFMatrix2NTLmat_ZZ (*M);
 
     ZZ det;
 
-    transpose (NTLM, NTLM);
-    (void) LLL (det, NTLM, 1L, 1L); //use floating point LLL ?
-    transpose (NTLM, NTLM);
-    M= *convertNTLmat_ZZ2FacCFMatrix (NTLM);
+    transpose (*NTLM, *NTLM);
+    (void) LLL (det, *NTLM, 1L, 1L); //use floating point LLL ?
+    transpose (*NTLM, *NTLM);
+    delete M;
+    M= convertNTLmat_ZZ2FacCFMatrix (*NTLM);
+    delete NTLM;
 
     mipo= 0;
     for (int j= 1; j <= s; j++)
-      mipo += M (j,1)*power (x,s-j);
+      mipo += (*M) (j,1)*power (x,s-j);
 
+    delete M;
     mipoFactors= factorize (mipo);
     if (mipoFactors.getFirst().factor().inCoeffDomain())
       mipoFactors.removeFirst();
