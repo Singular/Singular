@@ -18,17 +18,17 @@ AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werro
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
-
 # Add pre'prefixed config
 AX_PREFIX_CONFIG_H([omConfig.h],[],[omConfig.h])
 
 AC_SUBST(VERSION)
 
+SING_RESET_FLAGS()
+# SING_CHECK_SET_ARGS()
+
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl help for configure
 dnl
-###### SING_RESET_FLAGS()
-###### SING_CHECK_SET_ARGS()
 
 AC_ARG_WITH(
   external-config_h,
