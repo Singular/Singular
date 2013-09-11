@@ -1792,8 +1792,8 @@ number ntInvers(number a, const coeffs cf)
     {
       if (p_IsOne(num_f, ntRing))
       {
-        //DEN(result)=NULL;// Alloc0
-        COM(result) = 0;
+        DEN(result)=NULL;
+        //COM(result) = 0;
         p_Delete(&num_f,ntRing);
       }
     }
