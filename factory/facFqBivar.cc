@@ -2424,6 +2424,7 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
 
         if (NTLN.NumCols() == 1)
         {
@@ -2748,6 +2749,7 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
 
         if (GF)
           setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
@@ -2764,6 +2766,8 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
         }
       }
     }
+
+    delete NTLMat;
 
     if (NTLN.NumCols() == 1)
     {
@@ -3091,6 +3095,7 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
 
         if (NTLN.NumCols() == 1)
         {
@@ -3259,6 +3264,7 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
 #endif
 
 #ifdef HAVE_FLINT
@@ -3426,6 +3432,7 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
 #endif
 #ifdef HAVE_FLINT
         if (nmod_mat_ncols (FLINTN) == 1)
@@ -3599,6 +3606,7 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
         if (NTLN.NumCols() == 1)
         {
           delete [] A;
@@ -3799,6 +3807,7 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
 
         if (GF)
           setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
@@ -3809,6 +3818,7 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
           CanonicalForm tmp= F (y - evaluation, y);
           CFList source, dest;
           tmp= mapDown (tmp, info, source, dest);
+          delete NTLMat;
           delete [] A;
           delete [] bounds;
           F= 1;
@@ -3816,6 +3826,8 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
         }
       }
     }
+
+    delete NTLMat;
 
     if (NTLN.NumCols() < oldNumCols - factorsFound)
     {
@@ -3948,6 +3960,8 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
+
         if (NTLN.NumCols() == 1)
         {
           delete [] A;
@@ -4109,6 +4123,7 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
 #endif
 #ifdef HAVE_FLINT
         if (nmod_mat_ncols (FLINTN) == 1)
@@ -4314,6 +4329,7 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
 #endif
 #ifdef HAVE_FLINT
         if (nmod_mat_ncols (FLINTN) == 1)
@@ -4433,6 +4449,8 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
+
         if (NTLN.NumCols() == 1)
         {
           delete [] A;
@@ -4591,6 +4609,7 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
 
         if (GF)
           setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
@@ -4602,10 +4621,14 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
           CFList source, dest;
           tmp= mapDown (tmp, info, source, dest);
           delete [] A;
+          delete NTLMat;
           return CFList (tmp);
         }
       }
     }
+
+    delete NTLMat;
+
     if (NTLN.NumCols() == 1)
     {
       Variable y= Variable (2);
@@ -4752,6 +4775,7 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
 #endif
 #ifdef HAVE_FLINT
         if (nmod_mat_ncols (FLINTN) == 1)
@@ -4917,6 +4941,7 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
 #endif
 #ifdef HAVE_FLINT
         if (nmod_mat_ncols (FLINTN) == 1)
@@ -5096,6 +5121,7 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
         if (NTLN.NumCols() == 1)
         {
           irreducible= true;
@@ -5290,6 +5316,7 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
         if (GF)
           setCharacteristic (getCharacteristic(), degMipo, info.getGFName());
 
@@ -5300,6 +5327,7 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
         }
       }
     }
+    delete NTLMat;
     if (NTLN.NumCols() == 1)
     {
       irreducible= true;
@@ -5485,6 +5513,7 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
         kernel (NTLK, NTLK);
         transpose (NTLK, NTLK);
         NTLN *= NTLK;
+        delete NTLC;
 #endif
 #ifdef HAVE_FLINT
         if (nmod_mat_ncols (FLINTN) == 1)
