@@ -1707,9 +1707,9 @@ void rDecomposeC(leftv h,const ring R)
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
     LL->m[0].rtyp=INT_CMD;
-    LL->m[0].data=(void *)si_max(R->cf->float_len,SHORT_REAL_LENGTH/2);
+    LL->m[0].data=(void *)(long)si_max(R->cf->float_len,SHORT_REAL_LENGTH/2);
     LL->m[1].rtyp=INT_CMD;
-    LL->m[1].data=(void *)si_max(R->cf->float_len2,SHORT_REAL_LENGTH);
+    LL->m[1].data=(void *)(long)si_max(R->cf->float_len2,SHORT_REAL_LENGTH);
   L->m[1].rtyp=LIST_CMD;
   L->m[1].data=(void *)LL;
   // ----------------------------------------
@@ -1805,7 +1805,7 @@ lists rDecompose(const ring r)
     Lc->Init(4);
     // char:
     Lc->m[0].rtyp=INT_CMD;
-    Lc->m[0].data=(void*)r->cf->m_nfCharQ;
+    Lc->m[0].data=(void*)(long)r->cf->m_nfCharQ;
     // var:
     lists Lv=(lists)omAlloc0Bin(slists_bin);
     Lv->Init(1);
@@ -1840,7 +1840,7 @@ lists rDecompose(const ring r)
   else
   {
     L->m[0].rtyp=INT_CMD;
-    L->m[0].data=(void *)r->cf->ch;
+    L->m[0].data=(void *)(long)r->cf->ch;
   }
   // ----------------------------------------
   // 1: list (var)
@@ -5176,19 +5176,28 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   {
     modBase = (int_number) omAlloc(sizeof(mpz_t));
     mpz_init_set_si(modBase, 0);
-    if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+    if (pn->next!=NULL)
     {
-      mpz_set_ui(modBase, (int)(long) pn->next->Data());
-      pn=pn->next;
-      if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+      if (pn->next->Typ()==INT_CMD)
       {
-        modExponent = (long) pn->next->Data();
+        mpz_set_ui(modBase, (int)(long) pn->next->Data());
         pn=pn->next;
+        if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+        {
+          modExponent = (long) pn->next->Data();
+          pn=pn->next;
+        }
+        while ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+        {
+          mpz_mul_ui(modBase, modBase, (int)(long) pn->next->Data());
+          pn=pn->next;
+        }
       }
-      while ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+      else if (pn->next->Typ()==BIGINT_CMD)
       {
-        mpz_mul_ui(modBase, modBase, (int)(long) pn->next->Data());
-        pn=pn->next;
+        number p=(number)pn->next->CopyD();
+        nlGMP(p,(number)modBase,coeffs_BIGINT);
+	nlDelete(&p,coeffs_BIGINT);
       }
     }
     else
