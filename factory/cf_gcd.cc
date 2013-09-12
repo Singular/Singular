@@ -339,30 +339,8 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     if (fac_NTL_char!=getCharacteristic())
     {
       fac_NTL_char=getCharacteristic();
-      #ifdef NTL_ZZ
-      ZZ r;
-      r=getCharacteristic();
-      ZZ_pContext ccc(r);
-      #else
-      zz_pContext ccc(getCharacteristic());
-      #endif
-      ccc.restore();
-      #ifdef NTL_ZZ
-      ZZ_p::init(r);
-      #else
       zz_p::init(getCharacteristic());
-      #endif
     }
-    #ifdef NTL_ZZ
-    ZZ_pX F1=convertFacCF2NTLZZpX(f);
-    ZZ_pX G1=convertFacCF2NTLZZpX(g);
-    ZZ_pX R;
-    ZZ_pX A,B;
-    XGCD(R,A,B,F1,G1);
-    a=convertNTLZZpX2CF(A,f.mvar());
-    b=convertNTLZZpX2CF(B,f.mvar());
-    return convertNTLZZpX2CF(R,f.mvar());
-    #else
     zz_pX F1=convertFacCF2NTLzzpX(f);
     zz_pX G1=convertFacCF2NTLzzpX(g);
     zz_pX R;
@@ -371,7 +349,6 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     a=convertNTLzzpX2CF(A,f.mvar());
     b=convertNTLzzpX2CF(B,f.mvar());
     return convertNTLzzpX2CF(R,f.mvar());
-    #endif
   }
 #endif
 #ifdef HAVE_FLINT
@@ -1125,31 +1102,12 @@ gcd_univar_ntlp( const CanonicalForm & F, const CanonicalForm & G )
   if (fac_NTL_char!=getCharacteristic())
   {
     fac_NTL_char=getCharacteristic();
-    #ifdef NTL_ZZ
-    ZZ r;
-    r=getCharacteristic();
-    ZZ_pContext ccc(r);
-    #else
-    zz_pContext ccc(getCharacteristic());
-    #endif
-    ccc.restore();
-    #ifdef NTL_ZZ
-    ZZ_p::init(r);
-    #else
     zz_p::init(getCharacteristic());
-    #endif
   }
-  #ifdef NTL_ZZ
-  ZZ_pX F1=convertFacCF2NTLZZpX(F);
-  ZZ_pX G1=convertFacCF2NTLZZpX(G);
-  ZZ_pX R=GCD(F1,G1);
-  return  convertNTLZZpX2CF(R,F.mvar());
-  #else
   zz_pX F1=convertFacCF2NTLzzpX(F);
   zz_pX G1=convertFacCF2NTLzzpX(G);
   zz_pX R=GCD(F1,G1);
   return  convertNTLzzpX2CF(R,F.mvar());
-  #endif
 }
 #endif
 #endif

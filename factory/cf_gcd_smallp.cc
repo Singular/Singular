@@ -1717,7 +1717,9 @@ gaussianElimFp (CFMatrix& M, CFArray& L)
   mat_zz_p *NTLN= convertFacCFMatrix2NTLmat_zz_p(*N);
   long rk= gauss (*NTLN);
 
+  delete N;
   N= convertNTLmat_zz_p2FacCFMatrix (*NTLN);
+  delete NTLN;
 
   L= CFArray (M.rows());
   for (int i= 0; i < M.rows(); i++)
@@ -1752,7 +1754,9 @@ gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
   mat_zz_pE *NTLN= convertFacCFMatrix2NTLmat_zz_pE(*N);
   long rk= gauss (*NTLN);
 
+  delete N;
   N= convertNTLmat_zz_pE2FacCFMatrix (*NTLN, alpha);
+  delete NTLN;
 
   M= (*N) (1, M.rows(), 1, M.columns());
   L= CFArray (M.rows());
@@ -1785,12 +1789,16 @@ solveSystemFp (const CFMatrix& M, const CFArray& L)
   }
   mat_zz_p *NTLN= convertFacCFMatrix2NTLmat_zz_p(*N);
   long rk= gauss (*NTLN);
+
+  delete N;
   if (rk != M.columns())
   {
-    delete N;
+    delete NTLN;
     return CFArray();
   }
+
   N= convertNTLmat_zz_p2FacCFMatrix (*NTLN);
+  delete NTLN;
 
   CFArray A= readOffSolution (*N, rk);
 
@@ -1821,13 +1829,17 @@ solveSystemFq (const CFMatrix& M, const CFArray& L, const Variable& alpha)
   zz_pE::init (NTLMipo);
   mat_zz_pE *NTLN= convertFacCFMatrix2NTLmat_zz_pE(*N);
   long rk= gauss (*NTLN);
+
+  delete N;
   if (rk != M.columns())
   {
-    delete N;
+    delete NTLN;
     return CFArray();
   }
+
   N= convertNTLmat_zz_pE2FacCFMatrix (*NTLN, alpha);
 
+  delete NTLN;
   CFArray A= readOffSolution (*N, rk);
 
   delete N;
