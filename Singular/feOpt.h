@@ -32,17 +32,12 @@ typedef enum {FE_OPT_UNDEF}  feOptIndex;
 #endif
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void feOptHelp(const char* name);
 
 void* feGetOptValue(feOptIndex opt);
 
 
 #ifdef __cplusplus
-}
 
 inline void* feOptValue(feOptIndex opt)
 {
