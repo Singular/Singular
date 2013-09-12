@@ -47,15 +47,6 @@ SI_EINTR_SAVE_FUNC(int, select,
                    (nfds,readfds, writefds, exceptfds, timeout)
                    )
 
-#ifdef HAVE_PSELECT
-SI_EINTR_SAVE_FUNC(int, pselect,
-                   (int nfds, fd_set *readfds, fd_set *writefds,
-                    fd_set *exceptfds, const struct timespec *timeout,
-                    const sigset_t *sigmask),
-                   (nfds, readfds, writefds, exceptfds, timeout,sigmask)
-                   )
-#endif
-
 SI_EINTR_SAVE_FUNC(pid_t, wait, (int *status), (status))
 SI_EINTR_SAVE_FUNC(pid_t, waitpid, (pid_t pid, int *status, int options),
                    (pid, status, options))
