@@ -1376,9 +1376,8 @@ void definiteGcdCancellation(number a, const coeffs cf,
   }*/
 
 #ifdef HAVE_FACTORY
-  poly pGcd;
   /* here we assume: NUM(f), DEN(f) !=NULL, in Z_a reqp. Z/p_a */
-    pGcd = singclap_gcd_r(NUM(f), DEN(f), ntRing);
+  poly pGcd = singclap_gcd_and_divide(NUM(f), DEN(f), ntRing);
   if (p_IsConstant(pGcd, ntRing)
   && n_IsOne(p_GetCoeff(pGcd, ntRing), ntCoeffs)
   )
@@ -1390,9 +1389,6 @@ void definiteGcdCancellation(number a, const coeffs cf,
     if (nCoeff_is_Zp(ntCoeffs) && p_IsConstant (DEN (f), ntRing))
     {
       NUM (f) = p_Div_nn (NUM (f), p_GetCoeff (DEN(f),ntRing), ntRing);
-      //poly newNum= singclap_pdivide (NUM(f), DEN (f), ntRing);
-      //p_Delete(&NUM (f), ntRing);
-      //NUM (f)= newNum;
       p_Delete(&DEN (f), ntRing);
       DEN (f) = NULL;
       COM (f) = 0;
@@ -1401,25 +1397,25 @@ void definiteGcdCancellation(number a, const coeffs cf,
   else
   { /* We divide both NUM(f) and DEN(f) by the gcd which is known
        to be != 1. */
-    poly newNum = singclap_pdivide(NUM(f), pGcd, ntRing);
-    p_Delete(&NUM(f), ntRing);
-    NUM(f) = newNum;
-    poly newDen = singclap_pdivide(DEN(f), pGcd, ntRing);
-    p_Delete(&DEN(f), ntRing);
-    DEN(f) = newDen;
     if (p_IsConstant(DEN(f), ntRing) &&
         n_IsOne(p_GetCoeff(DEN(f), ntRing), ntCoeffs))
     {
       /* DEN(f) = 1 needs to be represented by NULL! */
       p_Delete(&DEN(f), ntRing);
-      newDen = NULL;
+      DEN(f) = NULL;
     }
     else
     { /* Note that over Q, by cancelling the gcd, we may have produced
          fractional coefficients in NUM(f), DEN(f), or both. The next
          call will remove those nested fractions, in case there are
          any. */
-      if (nCoeff_is_Q(ntCoeffs)) handleNestedFractionsOverQ(f, cf);
+      if (nCoeff_is_Zp(ntCoeffs) && p_IsConstant (DEN (f), ntRing))
+      {
+        NUM (f) = p_Div_nn (NUM (f), p_GetCoeff (DEN(f),ntRing), ntRing);
+        p_Delete(&DEN (f), ntRing);
+        DEN (f) = NULL;
+        COM (f) = 0;
+      } else if (nCoeff_is_Q(ntCoeffs)) handleNestedFractionsOverQ(f, cf);
     }
   }
   COM(f) = 0;

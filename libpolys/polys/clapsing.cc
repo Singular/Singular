@@ -146,14 +146,24 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   return res;
 }
 
-void singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
+poly singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
 {
   poly res=NULL;
 
-  if (f!=NULL) p_Cleardenom(f, r);
-  if (g!=NULL) p_Cleardenom(g, r);
-  else         return; // g==0 => but do a p_Cleardenom(f)
-  if (f==NULL) return; // f==0 => but do a p_Cleardenom(g)
+  if (g == NULL)
+  {
+    res= p_Copy (f,r);
+    p_Delete (&f, r);
+    f=p_One (r);
+    return res;
+  }
+  if (f==NULL)
+  {
+    res= p_Copy (g,r);
+    p_Delete (&g, r);
+    g=p_One (r);
+    return res;
+  }
 
   Off(SW_RATIONAL);
   CanonicalForm F,G,GCD;
@@ -168,9 +178,12 @@ void singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
     {
       p_Delete(&f,r);
       p_Delete(&g,r);
+      if (getCharacteristic() == 0)
+        On (SW_RATIONAL);
       f=convFactoryPSingP( F/GCD, r);
       g=convFactoryPSingP( G/GCD, r);
     }
+    res=convFactoryPSingP( GCD , r);
     if (!b1) Off (SW_USE_EZGCD_P);
   }
   // and over Q(a) / Fp(a)
@@ -192,9 +205,12 @@ void singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
       {
         p_Delete(&f,r);
         p_Delete(&g,r);
+        if (getCharacteristic() == 0)
+          On (SW_RATIONAL);
         f= convFactoryAPSingAP( F/GCD,r );
         g= convFactoryAPSingAP( G/GCD,r );
       }
+      res= convFactoryAPSingAP( GCD,r );
       if (!b1) Off(SW_USE_QGCD);
     }
     else
@@ -206,14 +222,18 @@ void singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
       {
         p_Delete(&f,r);
         p_Delete(&g,r);
+        if (getCharacteristic() == 0)
+          On (SW_RATIONAL);
         f= convFactoryPSingTrP( F/GCD,r );
         g= convFactoryPSingTrP( G/GCD,r );
       }
+      res= convFactoryPSingTrP( GCD,r );
     }
   }
   else
     WerrorS( feNotImplemented );
   Off(SW_RATIONAL);
+  return res;
 }
 
 poly singclap_gcd ( poly f, poly g, const ring r)
