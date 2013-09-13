@@ -1405,17 +1405,14 @@ void definiteGcdCancellation(number a, const coeffs cf,
       DEN(f) = NULL;
     }
     else
-    { /* Note that over Q, by cancelling the gcd, we may have produced
-         fractional coefficients in NUM(f), DEN(f), or both. The next
-         call will remove those nested fractions, in case there are
-         any. */
+    {
       if (nCoeff_is_Zp(ntCoeffs) && p_IsConstant (DEN (f), ntRing))
       {
         NUM (f) = p_Div_nn (NUM (f), p_GetCoeff (DEN(f),ntRing), ntRing);
         p_Delete(&DEN (f), ntRing);
         DEN (f) = NULL;
         COM (f) = 0;
-      } else if (nCoeff_is_Q(ntCoeffs)) handleNestedFractionsOverQ(f, cf);
+      }
     }
   }
   COM(f) = 0;

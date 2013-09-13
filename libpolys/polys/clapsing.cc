@@ -180,8 +180,24 @@ poly singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
       p_Delete(&g,r);
       if (getCharacteristic() == 0)
         On (SW_RATIONAL);
-      f=convFactoryPSingP( F/GCD, r);
-      g=convFactoryPSingP( G/GCD, r);
+      F /= GCD;
+      G /= GCD;
+      if (getCharacteristic() == 0)
+      {
+        CanonicalForm denF= bCommonDen (F);
+        CanonicalForm denG= bCommonDen (G);
+        G *= denG;
+        F *= denF;
+        Off (SW_RATIONAL);
+        CanonicalForm gcddenFdenG= gcd (denG, denF);
+        denG /= gcddenFdenG;
+        denF /= gcddenFdenG;
+        On (SW_RATIONAL);
+        G *= denF;
+        F *= denG;
+      }
+      f=convFactoryPSingP( F, r);
+      g=convFactoryPSingP( G, r);
     }
     res=convFactoryPSingP( GCD , r);
     if (!b1) Off (SW_USE_EZGCD_P);
@@ -207,8 +223,24 @@ poly singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
         p_Delete(&g,r);
         if (getCharacteristic() == 0)
           On (SW_RATIONAL);
-        f= convFactoryAPSingAP( F/GCD,r );
-        g= convFactoryAPSingAP( G/GCD,r );
+        F /= GCD;
+        G /= GCD;
+        if (getCharacteristic() == 0)
+        {
+          CanonicalForm denF= bCommonDen (F);
+          CanonicalForm denG= bCommonDen (G);
+          G *= denG;
+          F *= denF;
+          Off (SW_RATIONAL);
+          CanonicalForm gcddenFdenG= gcd (denG, denF);
+          denG /= gcddenFdenG;
+          denF /= gcddenFdenG;
+          On (SW_RATIONAL);
+          G *= denF;
+          F *= denG;
+        }
+        f= convFactoryAPSingAP( F,r );
+        g= convFactoryAPSingAP( G,r );
       }
       res= convFactoryAPSingAP( GCD,r );
       if (!b1) Off(SW_USE_QGCD);
@@ -224,8 +256,24 @@ poly singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
         p_Delete(&g,r);
         if (getCharacteristic() == 0)
           On (SW_RATIONAL);
-        f= convFactoryPSingTrP( F/GCD,r );
-        g= convFactoryPSingTrP( G/GCD,r );
+        F /= GCD;
+        G /= GCD;
+        if (getCharacteristic() == 0)
+        {
+          CanonicalForm denF= bCommonDen (F);
+          CanonicalForm denG= bCommonDen (G);
+          G *= denG;
+          F *= denF;
+          Off (SW_RATIONAL);
+          CanonicalForm gcddenFdenG= gcd (denG, denF);
+          denG /= gcddenFdenG;
+          denF /= gcddenFdenG;
+          On (SW_RATIONAL);
+          G *= denF;
+          F *= denG;
+        }
+        f= convFactoryPSingTrP( F,r );
+        g= convFactoryPSingTrP( G,r );
       }
       res= convFactoryPSingTrP( GCD,r );
     }
