@@ -32,7 +32,7 @@ poly singclap_gcd ( poly f, poly g, const ring r );
 poly singclap_gcd_r ( poly f, poly g, const ring r );
 
 /// clears denominators of f and g, divides by gcd(f,g)
-void singclap_gcd_and_divide ( poly& f, poly& g, const ring r);
+poly singclap_gcd_and_divide ( poly& f, poly& g, const ring r);
 
 // commented out!
 // poly singclap_alglcm ( poly f, poly g, const ring r );
