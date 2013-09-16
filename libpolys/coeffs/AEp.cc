@@ -866,7 +866,7 @@ int p_poly::is_zero()
 
 int p_poly::is_one()
 {
-    if (deg=0)
+    if (deg==0)
     {
         if (mpz_cmp_ui(coef[0],1)==0) { return 1; }
         else { return 0; }

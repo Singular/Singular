@@ -755,7 +755,7 @@ int Q_poly::is_zero()
 //Überprüft ob das Q_polynom 1 ist
 int Q_poly::is_one()
 {
-    if (deg=0)
+    if (deg==0)
     {
         if (mpz_cmp(coef[0],denom)==0) { return 1; }
         else { return 0; }

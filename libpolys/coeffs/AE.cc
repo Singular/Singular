@@ -844,7 +844,7 @@ int int_poly::is_zero()
 
 int int_poly::is_one()
 {
-    if (deg=0)
+    if (deg==0)
     {
         if (mpz_cmpabs_ui(coef[0],1)==0) { return 1; }
         else { return 0; }
