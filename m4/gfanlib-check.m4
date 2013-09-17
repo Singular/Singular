@@ -13,12 +13,12 @@ if test "x$ENABLE_GFANLIB" = xyes; then
  AC_MSG_RESULT(yes)
  AC_LANG_PUSH(C++)
  SAVE_LIBS=$LIBS
- LIBS="$LIBS -lcddgmp"
+ LIBS="-lcddgmp $GMP_LIBS $LIBS"
 AC_LINK_IFELSE(
   [AC_LANG_PROGRAM([#include <cdd/setoper.h>
   #include <cdd/cdd.h>],
     [dd_set_global_constants()])],
-  [LIBS="$SAVE_LIBS -lcddgmp"] [CDDGMPLDFLAGS="-lcddgmp"] 
+  [LIBS="-lcddgmp $SAVE_LIBS"] [CDDGMPLDFLAGS="-lcddgmp"] 
   [PASSED_ALL_TESTS_FOR_GFANLIB="yes"],
   [AC_MSG_WARN([libcddgmp is not installed.])] 
   [PASSED_ALL_TESTS_FOR_GFANLIB="no"
