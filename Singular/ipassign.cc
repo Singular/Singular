@@ -821,6 +821,11 @@ static BOOLEAN jiA_PACKAGE(leftv res, leftv a, Subexpr)
   jiAssignAttr(res,a);
   return FALSE;
 }
+static BOOLEAN jiA_DEF(leftv res, leftv a, Subexpr e)
+{
+  res->data=(void *)0;
+  return FALSE;
+}
 /*=================== table =================*/
 #define IPASSIGN
 #define D(A)     A
@@ -845,7 +850,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
     if (!errorreported) Werror("left side `%s` is undefined",l->Fullname());
     return TRUE;
   }
-  if((rt==DEF_CMD)||(rt==NONE))
+  if(rt==NONE)
   {
     WarnS("right side is not a datum, assignment ignored");
     // if (!errorreported)
