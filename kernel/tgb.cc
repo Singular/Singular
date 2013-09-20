@@ -195,7 +195,7 @@ int QlogSize (number n)
   if (nl==0L) return 0;
   if (nl==1L)
   {
-    long i = n_Int(n,currRing->cf);
+    long i = SR_TO_INT (n);
     unsigned long v;
     v = (i >= 0) ? i : -i;
     int r = 0;
