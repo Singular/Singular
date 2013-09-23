@@ -27,7 +27,7 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_build
 
 FACTORSRC1 =	factor/SqrFree.cc factor/Factor.cc \
 		factor/MVMultiHensel.cc factor/Truefactor.cc \
-		factor/helpstuff.cc factor/homogfactor.cc factor/version.cc
+		factor/helpstuff.cc factor/homogfactor.cc factor/version.c
 
 FACTORSRC2 =	factor/tmpl_inst.cc  
 

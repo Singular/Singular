@@ -4,7 +4,7 @@
 #ifndef FACTOR_H
 #define FACTOR_H
 
-#include <factory.h>
+#include <factory/factory.h>
 
 .INCLUDE factor/interrupt.h
 

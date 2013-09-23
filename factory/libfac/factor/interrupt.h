@@ -9,7 +9,7 @@
 
 /*BEGINPUBLIC*/
 // Set this to a nonzero value to interrupt the computation
-extern int libfac_interruptflag;
+extern "C" int libfac_interruptflag;
 /*ENDPUBLIC*/
 
 inline int

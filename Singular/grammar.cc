@@ -239,7 +239,7 @@ void yyerror(const char * fmt)
 #ifdef HAVE_FACTORY
   // libfac:
 #ifdef HAVE_LIBFAC
-  extern int libfac_interruptflag;
+  //extern int libfac_interruptflag;
   libfac_interruptflag=0;
 #endif // #ifdef HAVE_LIBFAC
 #endif

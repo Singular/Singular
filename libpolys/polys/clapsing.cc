@@ -768,9 +768,6 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
 
 #ifdef HAVE_FACTORY
 int singclap_factorize_retry;
-# ifdef HAVE_LIBFAC
-  extern int libfac_interruptflag;
-# endif
 #endif
 
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
