@@ -1576,6 +1576,14 @@ void syMake(leftv v,const char * id, idhdl packhdl)
           v->rtyp = POLY_CMD;
           v->name = id;
         }
+        if (TEST_V_ALLWARN /*&& (myynest>0)*/
+        && ((r_IsRingVar(id, currRing)>=0)
+          || ((currRing->cf->extRing!=NULL)
+             &&(r_IsRingVar(id, currRing->cf->extRing)>=0))))
+        {
+        // WARNING: do not use ring variable names in procedures
+          Warn("use of variable >>%s<< in a procedure in line %s",id);
+        }
         return;
       }
     }
