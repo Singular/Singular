@@ -62,5 +62,5 @@ expectedDimension = 1;
 if (not (dim(i)==expectedDimension ) ) 
 {  ERROR ("dim test: expected  dim( ideal(2,x-y) ) = "+string(expectedDimension)+",but got "+string(dim(i))+"  for ring " + rngStr );   }
 
-tst_status(1);
+tst_status(1);$
 
