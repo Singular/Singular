@@ -36,7 +36,6 @@
 static const int bundle_size = 100;
 static const int bundle_size_noro = 10000;
 static const int delay_factor = 3;
-int QlogSize (number n);
 #define ADD_LATER_SIZE 500
 #if 1
 static omBin lm_bin = NULL;
@@ -63,7 +62,7 @@ int slim_nsize (number n, ring r)
   }
   if(rField_is_Q (r))
   {
-    return QlogSize (n);
+    return nlQlogSize (n, r->cf);
   }
   else
   {
@@ -177,39 +176,6 @@ int kSBucketLength (kBucket * b, poly lm)
   return s;
 }
 #endif
-struct snumber_dummy
-{
-  mpz_t z;
-  mpz_t n;
-  #if defined(LDEBUG)
-  int debug;
-  #endif
-  BOOLEAN s;
-};
-typedef struct snumber_dummy  *number_dummy;
-
-
-int QlogSize (number n)
-{
-  long nl=n_Size(n,currRing->cf);
-  if (nl==0L) return 0;
-  if (nl==1L)
-  {
-    long i = SR_TO_INT (n);
-    unsigned long v;
-    v = (i >= 0) ? i : -i;
-    int r = 0;
-
-    while(v >>= 1)
-    {
-      r++;
-    }
-    return r + 1;
-  }
-  //assume denominator is 0
-  number_dummy nn=(number_dummy)n;
-  return mpz_sizeinbase (nn->z, 2);
-}
 
 #ifdef LEN_VAR3
 static inline wlen_type pSLength (poly p, int l)
@@ -218,7 +184,7 @@ static inline wlen_type pSLength (poly p, int l)
   number coef = pGetCoeff (p);
   if(rField_is_Q (currRing))
   {
-    c = QlogSize (coef);
+    c = nlQlogSize (coef, currRing->cf);
   }
   else
     c = nSize (coef);
@@ -249,7 +215,7 @@ wlen_type kSBucketLength (kBucket * b, poly lm = NULL)
   //c=nSize(pGetCoeff(lm));
   if(rField_is_Q (currRing))
   {
-    c = QlogSize (coef);
+    c = nlQlogSize (coef, currRing->cf);
   }
   else
     c = nSize (coef);
@@ -266,7 +232,7 @@ wlen_type kSBucketLength (kBucket * b, poly lm = NULL)
   {
     if(rField_is_Q (currRing))
     {
-      int modifier = QlogSize (pGetCoeff (b->coef[0]));
+      int modifier = nlQlogSize (pGetCoeff (b->coef[0]), currRing->cf);
       c += modifier;
     }
     else
@@ -296,7 +262,7 @@ static inline wlen_type pSLength (poly p, int l)
   number coef = pGetCoeff (p);
   if(rField_is_Q (currRing))
   {
-    c = QlogSize (coef);
+    c = nlQlogSize (coef, currRing->cf);
   }
   else
     c = nSize (coef);
@@ -322,7 +288,7 @@ wlen_type kSBucketLength (kBucket * b, poly lm = NULL)
   //c=nSize(pGetCoeff(lm));
   if(rField_is_Q (currRing))
   {
-    c = QlogSize (coef);
+    c = nlQlogSize (coef, currRing->cf);
   }
   else
     c = nSize (coef);
@@ -339,7 +305,7 @@ wlen_type kSBucketLength (kBucket * b, poly lm = NULL)
   {
     if(rField_is_Q (currRing))
     {
-      int modifier = QlogSize (pGetCoeff (b->coef[0]));
+      int modifier = nlQlogSize (pGetCoeff (b->coef[0]), currRing->cf);
       c += modifier;
     }
     else
@@ -571,7 +537,7 @@ static inline wlen_type pQuality (poly p, slimgb_alg * c, int l = -1)
       number coef = pGetCoeff (p);
       if(rField_is_Q (currRing))
       {
-        cs = QlogSize (coef);
+        cs = nlQlogSize (coef, currRing->cf);
       }
       else
         cs = nSize (coef);
@@ -625,7 +591,7 @@ wlen_type red_object::guess_quality (slimgb_alg * c)
       //c=nSize(pGetCoeff(lm));
       if(rField_is_Q (currRing))
       {
-        cs = QlogSize (coef);
+        cs = nlQlogSize (coef, currRing->cf);
       }
       else
         cs = nSize (coef);
@@ -634,7 +600,7 @@ wlen_type red_object::guess_quality (slimgb_alg * c)
       {
         if(rField_is_Q (currRing))
         {
-          int modifier = QlogSize (pGetCoeff (bucket->coef[0]));
+          int modifier = nlQlogSize (pGetCoeff (bucket->coef[0]), currRing->cf);
           cs += modifier;
         }
         else
