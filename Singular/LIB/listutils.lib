@@ -43,7 +43,7 @@ EXAMPLE:  example extendList;
 {
   int idx;  
 
-  int sizeOfSecondList = size( anotherListReference ); // prevent infine loop for the case that references coincide.
+  int sizeOfSecondList = size( anotherListReference ); // prevent infinite loop for the case that references coincide.
   for ( idx=1; idx <= sizeOfSecondList; idx++)
   {
        listReference[ size(listReference) + 1 ] = anotherListReference[ idx ];

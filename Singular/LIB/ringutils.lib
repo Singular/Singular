@@ -46,9 +46,9 @@ EXAMPLE:  example hasNamePrefixConflict;
   {
        variableName = existingVariableNameList[ idx ]; 
 
-     if ( size( variableName )==0 )     {  ~;  ERROR("variable name is emply");          }
+     if ( size( variableName )==0 )     {   ERROR("variable name is emply");          }
 
-     if ( variableName[1] ==" " )           {    ERROR("variable has a leading space");    }
+     if ( variableName[1] ==" " )           {    ERROR("variable has leading white space");    }
      if ( 1 == find( variableName, newVariableName) )
      {
         return (1); // there is a prefix conflict.
