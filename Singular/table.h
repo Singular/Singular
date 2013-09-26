@@ -874,7 +874,7 @@ cmdnames cmds[] =
   { "delete",      0, DELETE_CMD ,        CMD_2},
   { "det",         0, DET_CMD ,           CMD_1},
   { "diff",        0, DIFF_CMD ,          CMD_2},
-  { "dim",         0, DIM_CMD ,           CMD_1},
+  { "dim",         0, DIM_CMD ,           CMD_12},
   { "div",         0, INTDIV_CMD ,        MULDIV_OP},
   { "division",    0, DIVISION_CMD ,      CMD_M},
   { "dump",        0, DUMP_CMD,           CMD_1},
