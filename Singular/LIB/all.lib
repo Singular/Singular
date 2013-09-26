@@ -1,8 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib.tmpl 13536 2010-10-18 13:32:34Z hannes $";
+version="$Id$";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
+AUTHORS:  Singular team (automatically generated, do not edit)
 
 use: help Singular libraries; for a list of the libraries
 ";
