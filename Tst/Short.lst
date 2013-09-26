@@ -74,6 +74,7 @@ Short/bug_homog.tst
 Short/bug_interpol.tst
 Short/bug_mres.tst
 ;;;; Short/bug_M.tst
+Short/bug_name_conflict_in_zeroRad.tst
 Short/bug_napMultT.tst
 Short/bug_newstruct3.tst
 Short/bug_pd.tst
@@ -171,6 +172,7 @@ Short/Katsura_6_32003_lp_slimgb.tst
 Short/latex.tst
 Short/liftstd_s.tst
 Short/lift_s.tst
+Short/listutils_s.tst
 Short/lres_s.tst
 Short/minor_s.tst
 Short/modstd.tst
@@ -222,6 +224,7 @@ Short/ringmaps.tst
 Short/ringmod2m.tst
 Short/ringmodn.tst
 Short/ringsum.tst
+Short/ringutils_s.tst
 Short/ringz.tst
 Short/rInit.tst
 Short/schwarz_6_32003_lp.tst
@@ -244,6 +247,7 @@ Short/sres_s.tst
 Short/std_s.tst
 ;MP Short/stratify.tst
 Short/string.tst
+Short/stringutils_s.tst
 ;;; Short/symodstd.tst ; the test  is also in Long/
 Short/test_c_dp.tst
 Short/triang_s.tst

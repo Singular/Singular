@@ -1,0 +1,147 @@
+version="$Id$";
+category="   ";
+info=" 
+LIBRARY:  listutils.lib    utils for list manipulation 
+AUTHORS:  Jakob Kroeker,  kroeker@math.uni-hannover.de
+
+OVERVIEW:
+  A helper library for processing lists.
+
+PROCEDURES:
+extendList( lista, listb );     extends a list by elements of another list
+
+testExtendList();             a test for  @code{extendList}
+";
+
+
+
+// extend the 'sourceList' list by elements of  'addList'
+proc extendList( listReference, anotherListReference )
+"
+USAGE:        @code{ extendList( listParameter , anotherList  );}
+@*            @code{extendList( listReference, anotherListReference );}
+
+
+ASSUME:
+    
+@code{typeof (listParameter) == list } and   @code{typeof (anotherList) == list} 
+@*        or 
+@*        @code{typeof (listReference) == reference} and @code{typeof (anotherListReference) == reference}
+
+RETURN:
+
+    in case that lists passed as ordinary copys
+@*  returns a new list consisting of concatenation of original lists
+@*
+@*   in case that lists passed as references: 
+@*   returns a modified @code{listReference} which is extended by the elements of the second parameter @code{anotherListReference}
+@*
+
+
+EXAMPLE:  example extendList;
+"
+{
+  int idx;  
+
+  int sizeOfSecondList = size( anotherListReference ); // prevent infine loop for the case that references coincide.
+  for ( idx=1; idx <= sizeOfSecondList; idx++)
+  {
+       listReference[ size(listReference) + 1 ] = anotherListReference[ idx ];
+       dbprint(printlevel-voice,"listReference = ", listReference);
+  }
+  return (listReference);
+}
+example
+{  "EXAMPLE:";
+   echo = 2;
+   list originalList, additionalElements ;
+   //
+   originalList [1] = "a";
+   //
+   additionalElements [1]= "c";     additionalElements [2]= "d";  
+   //
+   //
+   /*** concatenating lists without passing references: ***/
+   //
+   // extendList() gets a copy of list 'originalList' and  concatenates elements of 'additionalElements' to that copy.
+   def extendedList = extendList( originalList, additionalElements );
+   extendedList;
+   // originalList remains unchanged:
+   originalList;
+   //
+   //
+   /*** concatenating lists using references ***/
+   //
+   system("reference");
+   reference originalListRef = originalList;
+   reference additionalElementsRef = additionalElements;
+    //
+   // don't:
+   // extendedList = extendList( originalListRef, additionalElementsRef );
+   // or 
+   // list extendedNewList = extendList( originalListRef, additionalElementsRef );
+   //
+   // (returned type is reference, but extendedList is a list => will result in incorrect data.
+   // instead kill 'extendedList' and autodeduce returned type using def:
+   //
+   kill extendedList;
+   //
+   def extendedList = extendList( originalListRef, additionalElementsRef );
+   // extendList() works directly on  a reference of originalList, which is extended
+   originalList; // originalList  is modified an same as extendedList
+   //
+   extendedList;  
+
+}
+
+
+//  test for 'extendList' procedure. 
+// 'testExtendList' is not part of the user interface
+// 'testExtendList' has to be public, since 1. otherwise it cannot be accessed in a test file.
+// 2. Also for that setup it is possible to quickly rerun a selected test inside of Singular.
+// 3. the test is not too far away from the code and changes are higher that the test gets updated 
+proc testExtendList()
+"
+USAGE:    @code{testExtendList();} //will throw an error in case the test for  @code{extendList(..)} fails.
+"
+{
+    system("reference");
+    list originalList, additionalElements ;
+    def extendedList = extendList( originalList, additionalElements );
+   //
+    if ( size(extendedList)>0 )   {  ERROR("testExtendList: concatenation of empty lists not empty"); }
+   //
+    additionalElements [1]= "c";     additionalElements [2]= "d";    additionalElements [3]= "e";
+   //
+   reference originalListRef = originalList;
+   reference additionalElementsRef = additionalElements;
+   //
+   // don't:
+   // extendedList = extendList( originalListRef, additionalElementsRef );
+   // or 
+   // list extendedNewList = extendList( originalListRef, additionalElementsRef );
+   //
+   // (returned type is reference, but extendedList is a list => will result in incorrect data.
+   // instead kill 'extendedList' and autodeduce returned type using def:
+  
+    kill extendedList; 
+    def extendedList = extendList( originalListRef, additionalElementsRef );
+
+    if ( not (size(extendedList)==3) )   {  ERROR("testExtendList: concatenation of [] and ['c','d','e'] failed"); }
+    kill originalListRef;
+    kill originalList;  
+    list originalList;
+
+    reference originalListRef = originalList;
+    originalList [1] = "a";
+    def result = extendList( originalListRef, additionalElementsRef );
+    if ( not (size(originalList)==4) )  
+    {  ERROR("testExtendList: concatenation of ['a'] and ['c','d','e'] failed"); }
+    if ( not ( originalList[1]=="a" and  originalList[2]=="c" and originalList[3]=="d" and originalList[4]=="e" ) )
+    {  ERROR("testExtendList: concatenation of ['a'] and ['c','d','e'] failed"); }
+ 
+     // should not result in infine loop
+     result = extendList( originalListRef, originalListRef ); // should not result in infine loop
+}
+
+
