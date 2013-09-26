@@ -96,14 +96,17 @@ gaussReducer::reduce( fglmVector thev )
     // fglmASSERT( pdenom == NULL );
     pdenom= nInit( 1 );
     number vdenom = v.clearDenom();
-    if ( ! nIsOne( vdenom ) && ! nIsZero( vdenom ) ) {
+    if ( ! nIsOne( vdenom ) && ! nIsZero( vdenom ) )
+    {
         p.setelem( p.size(), vdenom );
     }
-    else {
+    else
+    {
         nDelete( & vdenom );
     }
     number gcd = v.gcd();
-    if ( ! nIsOne( gcd ) && ! nIsZero( gcd ) ) {
+    if ( ! nIsOne( gcd ) && ! nIsZero( gcd ) )
+    {
         v /= gcd;
         number temp= nMult( pdenom, gcd );
         nDelete( & pdenom );
@@ -112,8 +115,10 @@ gaussReducer::reduce( fglmVector thev )
     nDelete( & gcd );
 
     int k;
-    for ( k= 1; k <= size; k++ ) {
-        if ( ! v.elemIsZero( perm[k] ) ) {
+    for ( k= 1; k <= size; k++ )
+    {
+        if ( ! v.elemIsZero( perm[k] ) )
+        {
             fac1= elems[k].fac;
             fac2= nCopy( v.getconstelem( perm[k] ) );
             v.nihilate( fac1, fac2, elems[k].v );
@@ -129,7 +134,8 @@ gaussReducer::reduce( fglmVector thev )
             nDelete( & fac1 );
             nDelete( & fac2 );
             number gcd = v.gcd();
-            if ( ! nIsOne( gcd ) && ! nIsZero( gcd ) ) {
+            if ( ! nIsOne( gcd ) && ! nIsZero( gcd ) )
+            {
                 v/= gcd;
                 number temp = nMult( pdenom, gcd );
                 nDelete( & pdenom );
@@ -140,7 +146,8 @@ gaussReducer::reduce( fglmVector thev )
             temp= nGcd( pdenom, gcd, currRing );
             nDelete( & gcd );
             gcd= temp;
-            if ( ! nIsZero( gcd ) && ! nIsOne( gcd ) ) {
+            if ( ! nIsZero( gcd ) && ! nIsOne( gcd ) )
+            {
                 p/= gcd;
                 temp= nDiv( pdenom, gcd );
                 nDelete( & pdenom );
