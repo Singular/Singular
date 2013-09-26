@@ -12,7 +12,11 @@ proc testRadicalZ()
     return();
 }
 
+// to fix wathchdoc parse issues:
+ ring rng=integer,( a,b,y(1),d ),dp;
+
 // the test fails, if inside of radicalZ will be an infinite loop
+
 watchdog(1,"testRadicalZ()");
 
 

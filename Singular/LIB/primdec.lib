@@ -3804,8 +3804,7 @@ example
    // get variable name, which has no conflicts with existing ones.
    string newVarPrefix = getNewVariableName( varList );
 
-   string nR = "ring @S="+string(p)+",(y(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
-   //string nR = "ring @S="+string(p)+",("+newVarPrefix+"(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
+   string nR = "ring @S="+string(p)+",("+newVarPrefix+"(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
   
    execute(nR);
 
@@ -3818,10 +3817,9 @@ example
    for(i=1;i<=m;i++)
    {
       J=J,var(i)^k-var(m+n+i);
-      el=el*y(i); ;
       if ( defined(elCmd) )    {  kill elCmd; }
-      //string elCmd = "el=el*" + newVarPrefix + "(i);" ;
-      //execute(elCmd);
+      string elCmd = "el=el*" + newVarPrefix + "(i);" ;
+      execute(elCmd);
    }
    J=eliminate(J,el);
    setring R;
