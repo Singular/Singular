@@ -491,13 +491,11 @@ void p_Content(poly ph, const ring r)
     if (ph!=NULL)
     {
       number k = nGetUnit(pGetCoeff(ph));
-      if (!nGreaterZero(pGetCoeff(ph))) k = nNeg(k); // in-place negation
       if (!nIsOne(k))
       {
         number tmpNumber = k;
         k = nInvers(k);
         nDelete(&tmpNumber);
-        poly h = pNext(ph);
         p_Mult_nn(ph,k,currRing);
         pNormalize(ph);
       }
@@ -959,6 +957,7 @@ poly p_Cleardenom(poly ph, const ring r)
   if (rField_is_Ring(r))
   {
     p_Content(ph,r);
+    if(!n_GreaterZero(pGetCoeff(ph),r)) ph = p_Neg(ph,r);
     return start;
   }
 #endif
