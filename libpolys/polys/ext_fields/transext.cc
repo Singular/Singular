@@ -1386,12 +1386,18 @@ void definiteGcdCancellation(number a, const coeffs cf,
        gcd is 1, we may have produced fractional coefficients in NUM(f),
        DEN(f), or both, due to previous arithmetics. The next call will
        remove those nested fractions, in case there are any. */
-    if (nCoeff_is_Zp(ntCoeffs) && p_IsConstant (DEN (f), ntRing))
+    if (nCoeff_is_Zp(ntCoeffs))
     {
       NUM (f) = p_Div_nn (NUM (f), p_GetCoeff (DEN(f),ntRing), ntRing);
-      p_Delete(&DEN (f), ntRing);
-      DEN (f) = NULL;
-      COM (f) = 0;
+      if (p_IsConstant (DEN (f), ntRing))
+      {
+        p_Delete(&DEN (f), ntRing);
+        DEN (f) = NULL;
+      }
+      else
+      {
+        p_Norm (DEN (f),ntRing);
+      }
     } else if (nCoeff_is_Q(ntCoeffs)) handleNestedFractionsOverQ(f, cf);
   }
   else
@@ -1406,12 +1412,18 @@ void definiteGcdCancellation(number a, const coeffs cf,
     }
     else
     {
-      if (nCoeff_is_Zp(ntCoeffs) && p_IsConstant (DEN (f), ntRing))
+      if (nCoeff_is_Zp(ntCoeffs))
       {
         NUM (f) = p_Div_nn (NUM (f), p_GetCoeff (DEN(f),ntRing), ntRing);
-        p_Delete(&DEN (f), ntRing);
-        DEN (f) = NULL;
-        COM (f) = 0;
+        if (p_IsConstant (DEN (f), ntRing))
+        {
+          p_Delete(&DEN (f), ntRing);
+          DEN (f) = NULL;
+        }
+        else
+        {
+          p_Norm (DEN (f),ntRing);
+        }
       }
     }
   }
