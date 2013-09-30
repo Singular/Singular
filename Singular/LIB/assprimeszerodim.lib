@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="$Id: assprimeszerodim.lib 14661 2012-03-05 11:00:14Z motsak $";
+version="version assprimeszerodim.lib 3-1-7-0 Sep_2013 ";
 category = "Commutative Algebra";
 info="
 LIBRARY:  assprimeszerodim.lib   associated primes of a zero-dimensional ideal

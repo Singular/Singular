@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: atkins.lib 14203 2011-05-05 12:19:42Z hannes $";
+version="version atkins.lib 3-1-7-0 Sep_2013 ";
 category="Teaching";
 info="
 LIBRARY:  atkins.lib     Procedures for teaching cryptography

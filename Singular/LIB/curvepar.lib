@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////
-version="$Id: curvepar.lib 14489 2012-01-11 09:00:06Z motsak $";
+version="version curvepar.lib 3-1-7-0 Sep_2013 ";
 category="Singularity Theory";
 info="
 LIBRARY:  curvepar.lib  Resolution of space curve singularities, semi-group

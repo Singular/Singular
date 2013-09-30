@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: rootsur.lib 14388 2011-09-27 15:09:53Z hannes $";
+version="version rootsur.lib 3-1-7-0 Sep_2013 ";
 category="Teaching";
 info="
 LIBRARY: rootsur.lib   Counting number of real roots of univariate polynomial

@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: KVequiv.lib 13536 2010-10-18 13:32:34Z hannes $";
+version="version KVequiv.lib 3-1-7-0 Sep_2013 ";
 info="
 LIBRARY:  KVequiv.lib    PROCEDURES RELATED TO K_V-EQUIVALENCE
 AUTHOR:   Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de

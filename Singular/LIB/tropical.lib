@@ -1,5 +1,5 @@
 //
-version="$Id: tropical.lib 14887 2012-05-09 16:00:19Z motsak $";
+version="version tropical.lib 3-1-7-0 Sep_2013 ";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry

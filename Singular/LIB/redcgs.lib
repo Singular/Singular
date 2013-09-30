@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: redcgs.lib 13745 2010-12-09 10:49:32Z hannes $";
+version="version redcgs.lib 3-1-7-0 Sep_2013 ";
 category="General purpose";
 info="
 LIBRARY:  redcgs.lib      Reduced Comprehensive Groebner Systems.

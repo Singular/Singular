@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: groups.lib 13499 2010-10-15 09:55:26Z hannes $";
+version="version groups.lib 3-1-7-0 Sep_2013 ";
 category="Applications";
 info="
 LIBRARY:  groups.lib      Finite Group Theory

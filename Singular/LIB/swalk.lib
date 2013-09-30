@@ -1,5 +1,5 @@
 //
-version="$Id: swalk.lib 13499 2010-10-15 09:55:26Z hannes $";
+version="version swalk.lib 3-1-7-0 Sep_2013 ";
 category="Commutative Algebra";
 info="
 LIBRARY: swalk.lib               Sagbi Walk Conversion Algorithm

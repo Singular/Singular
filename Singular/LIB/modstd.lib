@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib 15322 2012-10-12 12:00:07Z motsak $";
+version="version modstd.lib 3-1-7-0 Sep_2013 ";
 category = "Commutative Algebra";
 info="
 LIBRARY:  modstd.lib      Groebner basis of ideals

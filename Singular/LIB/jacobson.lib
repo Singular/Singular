@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: jacobson.lib 14246 2011-05-26 11:55:32Z hannes $";
+version="version jacobson.lib 3-1-7-0 Sep_2013 ";
 category="System and Control Theory";
 info="
 LIBRARY: jacobson.lib     Algorithms for Smith and Jacobson Normal Form

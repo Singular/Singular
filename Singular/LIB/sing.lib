@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: sing.lib 14840 2012-04-20 14:00:13Z motsak $";
+version="version sing.lib 3-1-7-0 Sep_2013 ";
 category="Singularities";
 info="
 LIBRARY:  sing.lib      Invariants of Singularities

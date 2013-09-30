@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: ratgb.lib 13467 2010-10-13 12:37:12Z hannes $";
+version="version ratgb.lib 3-1-7-0 Sep_2013 ";
 category="Noncommutative";
 info="
 LIBRARY: ratgb.lib  Groebner bases in Ore localizations of noncommutative G-algebras

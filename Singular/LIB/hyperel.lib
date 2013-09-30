@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: hyperel.lib 14203 2011-05-05 12:19:42Z hannes $";
+version="version hyperel.lib 3-1-7-0 Sep_2013 ";
 category="Teaching";
 info="
 LIBRARY:    hyperel.lib

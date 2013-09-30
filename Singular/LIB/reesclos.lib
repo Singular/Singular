@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: reesclos.lib 14005 2011-03-17 11:20:42Z hannes $";
+version="version reesclos.lib 3-1-7-0 Sep_2013 ";
 category="Commutative Algebra";
 
 info="

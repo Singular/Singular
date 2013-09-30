@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: grobcov.lib 15811 2013-05-29 15:05:07Z motsak $";
+version="version grobcov.lib 3-1-7-0 Sep_2013 ";
 category="General purpose";
 info="
 LIBRARY:  grobcov.lib   Groebner Cover for parametric ideals.

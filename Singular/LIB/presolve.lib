@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib 14203 2011-05-05 12:19:42Z hannes $";
+version="version presolve.lib 3-1-7-0 Sep_2013 ";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations

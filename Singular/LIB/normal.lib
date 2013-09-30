@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib 15094 2012-07-10 10:00:17Z motsak $";
+version="version normal.lib 3-1-7-0 Sep_2013 ";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings

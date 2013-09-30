@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: signcond.lib 13733 2010-12-06 13:30:59Z hannes $";
+version="version signcond.lib 3-1-7-0 Sep_2013 ";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: signcond.lib Routines for computing realizable sign conditions

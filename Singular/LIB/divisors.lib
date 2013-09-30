@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="$Id: divisors.lib$";
+version="version divisors.lib 3-1-7-0 Sep_2013 ";
 category = "Commutative Algebra";
 info="
 LIBRARY:  divisors.lib      Divisors and P-Divisors

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncall.lib 13499 2010-10-15 09:55:26Z hannes $";
+version="version ncall.lib 3-1-7-0 Sep_2013 ";
 category = "Noncommutative";
 info="
 LIBRARY:  ncall.lib   Load all noncommutative libraries

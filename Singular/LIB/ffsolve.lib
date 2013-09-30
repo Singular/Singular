@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////
-version="$Id: ffsolve.lib f0fdb24 2012-04-23 12:50:26 UTC$";
+version="version ffsolve.lib 3-1-7-0 Sep_2013 ";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: ffsolve.lib        multivariate equation solving over finite fields

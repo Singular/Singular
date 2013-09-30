@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: phindex.lib 12571 2010-03-01 11:19:13Z hannes $";
+version="version phindex.lib 3-1-7-0 Sep_2013 ";
 category=" ";
 info="
 LIBRARY : phindex.lib Procedures to compute the index of real analytic vector fields

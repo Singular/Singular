@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncdecomp.lib 13727 2010-12-05 17:29:15Z levandov $";
+version="version ncdecomp.lib 3-1-7-0 Sep_2013 ";
 category="Noncommutative";
 info="
 LIBRARY:  ncdecomp.lib     Decomposition of a module into its central characters

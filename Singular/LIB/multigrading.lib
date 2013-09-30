@@ -1,7 +1,7 @@
 // -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 // Vi-modeline: vim: filetype=c:syntax:shiftwidth=2:tabstop=8:textwidth=0:expandtab
 ///////////////////////////////////////////////////////////////////
-version="$Id: multigrading.lib 14203 2011-05-05 12:19:42Z hannes $";
+version="version multigrading.lib 3-1-7-0 Sep_2013 ";
 category="Combinatorial Commutative Algebra";
 info="
 LIBRARY:  multigrading.lib          Multigraded Rings

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version ncpreim.lib 3-1-7-0 Sep_2013 ";
 category="Noncommutative";
 info="
 LIBRARY: ncpreim.lib    Non-commutative elimination and preimage computations

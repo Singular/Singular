@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: ainvar.lib 13742 2010-12-08 14:24:58Z hannes $";
+version="version ainvar.lib 3-1-7-0 Sep_2013 ";
 category="Invariant theory";
 info="
 LIBRARY: ainvar.lib    Invariant Rings of the Additive Group

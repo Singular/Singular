@@ -1,5 +1,5 @@
 //
-version="$Id: alexpoly.lib 14661 2012-03-05 11:00:14Z motsak $";
+version="version alexpoly.lib 3-1-7-0 Sep_2013 ";
 category="Singularities";
 info="
 LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normalTools.lib,v 1.0 2010/05/19 Exp$";
+version="version locnormal.lib 3-1-7-0 Sep_2013 ";
 category="Commutative Algebra";
 info="
 LIBRARY: locnormal.lib   Normalization of affine domains using local methods

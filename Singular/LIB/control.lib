@@ -1,5 +1,5 @@
 //
-version="$Id: control.lib 13733 2010-12-06 13:30:59Z hannes $";
+version="version control.lib 3-1-7-0 Sep_2013 ";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib     Algebraic analysis tools for System and Control Theory

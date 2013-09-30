@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version numerDecom.lib 3-1-7-0 Sep_2013 ";
 category="Algebraic Geometry";
 info="
 LIBRARY:  NumDecom.lib    Numerical Decomposition of Ideals

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib 13499 2010-10-15 09:55:26Z hannes $";
+version="version inout.lib 3-1-7-0 Sep_2013 ";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: spectrum.lib 13691 2010-12-02 13:51:28Z hannes $";
+version="version spectrum.lib 3-1-7-0 Sep_2013 ";
 category="Singularities";
 info="
 LIBRARY:  spectrum.lib  Singularity Spectrum for Nondegenerate Singularities

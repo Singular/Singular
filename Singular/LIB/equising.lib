@@ -1,5 +1,5 @@
 //
-version="$Id: equising.lib 14192 2011-05-04 14:45:40Z hannes $";
+version="version equising.lib 3-1-7-0 Sep_2013 ";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves

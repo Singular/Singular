@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version ="$Id$";
+version="version classify_aeq.lib 3-1-7-0 Sep_2013 ";
 category="Singularities";
 info="
 LIBRARY: classifyAeq.lib         Simple Space Curve singularities in characteristic 0

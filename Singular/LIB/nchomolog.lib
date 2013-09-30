@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: nchomolog.lib 12231 2009-11-02 10:12:22Z hannes $";
+version="version nchomolog.lib 3-1-7-0 Sep_2013 ";
 category="Noncommutative";
 info="
 LIBRARY:  nchomolog.lib   Procedures for Noncommutative Homological Algebra
