@@ -2756,6 +2756,8 @@ Useful for mapping from a homogenized ring to the original ring or
 for mappings from/to rings with/without parameters. Compared with
 @code{fetch}, @code{imap} uses the names of variables and parameters.
 Unlike @code{map} and @code{fetch} @code{imap} can map parameters to variables.
+@*Mapping rational functions which are not polynomials to polynomials is undefined
+(i.e. the result depends on the version).
 @item @strong{Example:}
 @smallexample
 @c example
