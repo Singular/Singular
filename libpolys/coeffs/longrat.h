@@ -13,6 +13,10 @@
 #include <coeffs/si_gmp.h>
 #include <coeffs/coeffs.h>
 
+#ifndef NDEBUG
+#include <polys/monomials/ring.h>
+#endif
+
 struct snumber;
 typedef struct snumber  *number;
 
