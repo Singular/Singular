@@ -1,8 +1,8 @@
 #include <polymake_conversion.h>
 
-#include <callgfanlib/bbcone.h>
-#include <callgfanlib/bbfan.h>
-#include <callgfanlib/bbpolytope.h>
+#include <dyn_modules/callgfanlib/bbcone.h>
+#include <dyn_modules/callgfanlib/bbfan.h>
+#include <dyn_modules/callgfanlib/bbpolytope.h>
 
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>

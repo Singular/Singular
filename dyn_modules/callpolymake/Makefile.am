@@ -9,7 +9,7 @@ endif
 endif
 
 # forcefully enable exceptions for polymake
-POLYMAKE_CFLAGS = -fexceptions
+POLYMAKE_CFLAGS = -fexceptions -frtti
 
 AM_LDFLAGS	= -release ${PACKAGE_VERSION} ${PM_LDFLAGS}
 
@@ -18,8 +18,9 @@ SOURCES = polymake_conversion.cc polymake_documentation.cc polymake_wrapper.cc
 polymake_la_SOURCES = $(SOURCES)
 
 MYINCLUDES = -I${top_srcdir} -I${top_builddir} -I${srcdir} \
--I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
-$(GMP_CFLAGS) ${PM_INC} ${PM_CFLAGS} ${POLYMAKE_CFLAGS}
+-I${top_srcdir}/libpolys -I${top_builddir}/libpolys  \
+-I${top_builddir}/factory/include $(GMP_CFLAGS) $(PM_INC) $(PM_CFLAGS) \
+$(POLYMAKE_CFLAGS) $(FACTORY_CFLAGS)
 
 P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
 

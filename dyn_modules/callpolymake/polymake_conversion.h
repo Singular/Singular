@@ -3,8 +3,6 @@
 
 #include <kernel/mod2.h>
 
-#ifdef HAVE_FANS
-
 #include <gmpxx.h>
 
 #include <polymake/Main.h>
@@ -60,5 +58,4 @@ polymake::perl::Object* ZCone2PmCone (gfan::ZCone* zc);
 polymake::perl::Object* ZPolytope2PmPolytope (gfan::ZCone* zc);
 polymake::perl::Object* ZFan2PmFan (gfan::ZFan* zf);
 
-#endif
 #endif
