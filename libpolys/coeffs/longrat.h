@@ -13,10 +13,6 @@
 #include <coeffs/si_gmp.h>
 #include <coeffs/coeffs.h>
 
-#ifndef NDEBUG
-#include <polys/monomials/ring.h>
-#endif
-
 struct snumber;
 typedef struct snumber  *number;
 
@@ -138,7 +134,6 @@ int      nlSize(number n, const coeffs r);
 
 static inline int nlQlogSize (number n, const coeffs r)
 {
-  assume( nCoeff_is_Q (r) );
 
   long nl=nlSize(n,r);
   if (nl==0L) return 0;
