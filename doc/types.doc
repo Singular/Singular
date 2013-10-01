@@ -3761,8 +3761,8 @@ For the definition of the 'coefficients', see @ref{Rings and orderings}.
 'ordering' is a list of block orderings where each block ordering is either
 @enumerate
 @item
-@code{lp}, @code{dp}, @code{Dp}, @code{rp}, @code{ls}, @code{ds}, or @code{Ds}
-optionally followed by a size parameter in parentheses.
+@code{lp}, @code{dp}, @code{Dp}, @code{rp}, @code{ls}, @code{ds}, @code{Ds},
+or @code{rs} optionally followed by a size parameter in parentheses.
 
 @item
 @code{wp}, @code{Wp}, @code{ws}, @code{Ws}, or @code{a} followed by a
