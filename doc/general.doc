@@ -1872,8 +1872,10 @@ In a ring declaration, @sc{Singular} offers the following orderings:
 lexicographical ordering
 
 @item @code{rp}
-reverse lexicographical ordering, i.e. a lexicographical ordering
+reverse lexicographical ordering, i.e. a lexicographical ordering from the right 
 with 1 < x_1 < ... <x_n
+(should not be used as it reverses the "natural" x_1 > ... > x_n,
+reorder the variables instead)
 
 @item @code{dp}
 degree reverse lexicographical ordering
@@ -1898,6 +1900,11 @@ character in their name.
 @table @asis
 @item @code{ls}
 negative lexicographical ordering
+
+@item @code{rs}
+negative reverse lexicographical ordering, i.e. a lexicographical ordering from the right
+(should not be used as it reverses the "natural" x_1 < ... < x_n,
+reorder the variables instead)
 
 @item @code{ds}
 negative degree reverse lexicographical ordering
