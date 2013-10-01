@@ -86,10 +86,13 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  
  AC_LANG_PUSH([C++])
  AX_APPEND_COMPILE_FLAGS(${FLAGS}, [CXXFLAGS])
+ AX_APPEND_COMPILE_FLAGS([-fexceptions -frtti], [POLYMAKE_CXXFLAGS])
  AC_LANG_POP([C++])
 
  AX_APPEND_LINK_FLAGS(${FLAGS}) 
- 
+
+ AC_SUBST(POLYMAKE_CXXFLAGS)
+
  if test "x${ENABLE_DEBUG}" == xyes; then
   DBGFLAGS="-g -O0 -ftrapv -fdiagnostics-show-option -Wall -Wextra"
   #  -pedantic too strict ??? -Wvla -Wno-long-long ???
@@ -119,7 +122,6 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
 ###  AX_APPEND_LINK_FLAGS([-fno-implicit-templates]) # see above :(
 #  AX_APPEND_LINK_FLAGS([ ])
  fi
-
 
 # SING_SHOW_FLAGS([before PROG_C_CC])
 

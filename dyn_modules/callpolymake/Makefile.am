@@ -15,6 +15,8 @@ AM_LDFLAGS	= -release ${PACKAGE_VERSION} ${PM_LDFLAGS}
 
 SOURCES = polymake_conversion.cc polymake_documentation.cc polymake_wrapper.cc
 
+CXXFLAGS += $(POLYMAKE_CXXFLAGS)
+
 polymake_la_SOURCES = $(SOURCES)
 
 MYINCLUDES = -I${top_srcdir} -I${top_builddir} -I${srcdir} \
