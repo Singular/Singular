@@ -698,7 +698,7 @@ void ZCone::ensureStateAsMinimum(int s)const
         {
           QMatrix m=ZToQMatrix(equations);
           m.reduce();
-          m.REformToRREform();
+          m.REformToRREform(true);
           ZMatrix inequalities2(0,equations.getWidth());
           for(int i=0;i<inequalities.getHeight();i++)
             {
@@ -1223,7 +1223,6 @@ bool ZCone::hasFace(ZCone const &f)const
   temp1.canonicalize();
   ZCone temp2=f;
   temp2.canonicalize();
-
   return !(temp2!=temp1);
 }
 
