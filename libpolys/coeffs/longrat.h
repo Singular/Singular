@@ -8,6 +8,7 @@
 */
 #include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
+#include <reporter/reporter.h>
 
 #include <coeffs/si_gmp.h>
 #include <coeffs/coeffs.h>
@@ -133,7 +134,7 @@ int      nlSize(number n, const coeffs r);
 
 static inline int nlQlogSize (number n, const coeffs r)
 {
-  assume( rField_is_Q (r) );
+  assume( nCoeff_is_Q (r) );
 
   long nl=nlSize(n,r);
   if (nl==0L) return 0;
