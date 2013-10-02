@@ -3791,7 +3791,7 @@ example
    for(i=1;i<=m;i++)
    {
       J=J,var(i)^k-var(m+n+i);
-      el=el*@y(i);
+      el=el*var(i);
    }
 
    J=eliminate(J,el);
