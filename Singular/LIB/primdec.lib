@@ -3817,9 +3817,7 @@ example
    for(i=1;i<=m;i++)
    {
       J=J,var(i)^k-var(m+n+i);
-      if ( defined(elCmd) )    {  kill elCmd; }
-      string elCmd = "el=el*" + newVarPrefix + "(i);" ;
-      execute(elCmd);
+      el=el*var(i);
    }
    J=eliminate(J,el);
    setring R;
