@@ -71,6 +71,7 @@ CHANGELOG
  moved commRing to dmodloc.lib
 12.12.12: typos
 17.12.12: docu
+24.09.13: bugfix preimageNC naming conflict if f is map from ring called 'B'
 */
 
 
@@ -660,20 +661,13 @@ EXAMPLE:  example preimageNC; shows examples
   setring A;
   ideal mm = maxideal(1);
   setring B;
-  if (typeof(#[2])=="map")
+  if (typeof(#[2])=="map" || typeof(#[2])=="ideal")
   {
-    map phi = #[2];
+    map phi = A,ideal(#[2]);
   }
   else
   {
-    if (typeof(#[2])=="ideal")
-    {
-      map phi = A,#[2];
-    }
-    else
-    {
-      ERROR("Second argument must define a map from the specified ring to the basering.");
-    }
+    ERROR("Second argument must define a map from the specified ring to the basering.");
   }
   if (typeof(#[3])<>"ideal")
   {
