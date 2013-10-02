@@ -324,6 +324,9 @@ public:
     int retSwaps=0;
     int currentRow=0;
 
+    if (height<2)
+      return 0;
+
     for(int i=0;i<width;i++)
       {
         int s=findRowIndex(i,currentRow);
