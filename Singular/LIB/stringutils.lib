@@ -1,0 +1,190 @@
+///////////////////////////////
+version="$Id$";
+category="   ";
+info=" 
+LIBRARY:  stringutils.lib    string manipulation 
+AUTHORS:  Jakob Kroeker,  kroeker@math.uni-hannover.de,
+
+OVERVIEW:
+
+  A helper library for string processing .
+
+PROCEDURES: 
+
+splitString();   split a string array into parts where the array elements separated by a single character. 
+
+assembleStringArray();   compose a string (array) from parts, while inserting a separator character between elements. 
+@*                       CAUTION: it is not checked, that a separator does not occur as regular character 
+                         in the chunkList entries. Thus  there is no guarantee that the operation is reversible.
+
+";
+
+
+proc splitString( string stringToSplit, string delimiter )
+"
+USAGE:    @code{splitString( stringToSplit, delimiter );}
+ 
+PARAMETERS:
+
+@code{stringToSplit}: a string array in which entries are separated by a special character ( the @code{delimiter} )
+
+@code{delimiter}: the array field separation character
+
+
+
+RETURN:
+
+   a list of entries in the input string array.
+
+
+EXAMPLE:  example splitString;
+"
+{
+   if ( not (size(delimiter)==1) )     
+   { ERROR("splitString: extected size of separator   1"); }
+
+   list chunks;
+   int pos;
+
+   //special case for empty input string:
+
+   if ( size(stringToSplit)==0 ) {   return (chunks);    }
+
+   string stringPart="";
+    for ( pos=1; pos<= size(stringToSplit); pos++)
+    {
+        if ( stringToSplit[pos] == delimiter ) 
+        {
+            chunks[ size(chunks) + 1 ] = stringPart;
+            stringPart="";
+        }
+        else
+        {
+            stringPart = stringPart + stringToSplit[pos];  
+        }     
+    }
+    chunks[ size(chunks) + 1 ] = stringPart;
+    return (chunks);
+}
+example
+{
+    string stringToSplit = "a,bc,def,";
+    string delimiter = ",";
+
+    def chunks = splitString( stringToSplit, delimiter);
+    chunks;
+}
+
+
+//  test for 'splitString' procedure. 
+// 'testSplitString' is not part of the user interface
+// 'testSplitString' has to be public, since 1. otherwise it cannot be accessed in a test file.
+// 2. Also for that setup it is possible to quickly rerun a selected test inside of Singular.
+// 3. the test is not too far away from the code and changes are higher that the test gets updated 
+proc testSplitString()
+"
+USAGE:    @code{testSplitString();} //will throw an error in case the test for  @code{splitString(..)} fails.
+"
+{
+    string stringToSplit;
+
+  
+    def chunks = splitString(stringToSplit,",");
+
+    if (not (typeof(chunks)=="list")) 
+    { ERROR ("testSplitString :  incorrect return type of splitString "); }
+    if (not (size(chunks)==0)) { ERROR ("empty string splitted into several parts."); }
+
+    stringToSplit= "a,bc,def,";
+    chunks = splitString(stringToSplit,",");
+
+    if (not (typeof(chunks)=="list")) 
+    { ERROR ("testSplitString :  incorrect return type of splitString "); }
+
+    string errorInSplitString = "testSplitString :  incorrect splitting of 'a,bc,def,'";
+    if (not (size(chunks)==4)) { ERROR (errorInSplitString); }
+    if (not (chunks[1]=="a"))  { ERROR (errorInSplitString); }
+    if (not (chunks[2]=="bc"))  { ERROR (errorInSplitString); }
+    if (not (chunks[3]=="def")) { ERROR (errorInSplitString); }
+    if (not (chunks[4]==""))    { ERROR (errorInSplitString); }
+
+
+    
+}
+
+
+
+
+proc assembleStringArray(list chunkList, string separator)
+"
+USAGE:    @code{assembleStringArray( chunkList, delimiter );}
+ 
+
+ASSUME:
+    
+@code{chunkList}: is a list of strings 
+@* @code{delimiter}: a string (preferred size: =1 )
+
+RETURN:
+
+   a string (array) composed of entries in @code{chunkList}, separated by the given  @code{delimiter} 
+
+TODO: give a warning in case the delimiter is a substring 
+
+EXAMPLE:  example assembleStringArray;
+"
+{
+    if ( not (size(separator)==1) )    { ERROR("assembleString: extected size of separator   1"); }
+    string resultString = "";
+    int pos;
+    for (pos=1; pos <=size(chunkList); pos++ )
+    {  
+       if ( not (typeof( chunkList[pos] )=="string") )          
+       { ERROR("assembleString, error: all entries in chunkList has to be of string type"); }
+
+       resultString = resultString + chunkList[pos];
+       if (pos< size(chunkList)) 
+       {
+           resultString = resultString +separator;
+       }
+    }
+   return (resultString);
+}
+example
+{
+     list chunkList ;
+     string separator = ",";
+     chunkList[1] = "a";    chunkList[2] = "";    chunkList[3] = "bc";
+     def assembledString = assembleStringArray(chunkList,separator) ;
+     assembledString;
+}
+
+
+//  test for 'assembleStringArray' procedure. 
+// 'testAssembleStringArray' is not part of the user interface
+// 'testAssembleStringArray' has to be public, since 1. otherwise it cannot be accessed in a test file.
+// 2. Also for that setup it is possible to quickly rerun a selected test inside of Singular.
+// 3. the test is not too far away from the code and changes are higher that the test gets updated 
+proc testAssembleStringArray()
+"
+USAGE:    @code{testAssembleStringArray();} //will throw an error in case the test for  @code{assembleStringArray(..)} fails.
+"
+{
+     list chunkList ;
+     string separator = ",";
+     string assembledString ;
+     assembledString = assembleStringArray(chunkList,separator) ;
+     if ( not (assembledString=="") )  { ERROR ("testAssembleString failed"); }
+
+     chunkList[1] = "a";
+     chunkList[2] = "";
+     chunkList[3] = "bc";
+     chunkList[4] = "";
+   
+     assembledString = assembleStringArray(chunkList,separator) ;
+
+     if ( not (assembledString=="a,,bc,") )  { ERROR ("testAssembleString failed"); }
+}
+
+
+
