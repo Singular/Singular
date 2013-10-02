@@ -957,8 +957,8 @@ the normal fan of p.
 @end table
 @c --------------------------------------------------------------------------------
 @node vertexAdjacencyGraph,vertexEdgeGraph,normalFan(polymake),polymake_so
-@subsubsection normalFan
-@cindex normalFan
+@subsubsection vertexAdjacencyGraph
+@cindex vertexAdjacencyGraph
 @table @code
 @item @strong{Syntax:}
 @code{Polymake::vertexAdjacencyGraph(} polytope p @code{)}
@@ -989,8 +989,8 @@ the i-th intvec lists all vertices which are adjacent to the i-1th vertex
 @end table
 @c --------------------------------------------------------------------------------
 @node vertexEdgeGraph,visual,vertexAdjacencyGraph,polymake_so
-@subsubsection normalFan
-@cindex normalFan
+@subsubsection vertexEdgeGraph
+@cindex vertexEdgeGraph
 @table @code
 @item @strong{Syntax:}
 @code{Polymake::vertexEdgeGraph(} polytope p @code{)}
@@ -1019,7 +1019,7 @@ the second entry is a list of intvecs specifying the edges of the polytope.
 @end smallexample
 @end table
 @c --------------------------------------------------------------------------------
-@node visual,,normalFan(polymake),polymake_so
+@node visual,,vertexEdgeGraph,polymake_so
 @subsubsection visual
 @cindex visual
 @table @code
