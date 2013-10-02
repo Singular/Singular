@@ -2608,7 +2608,8 @@ redefining and overriding a variable is shown in the following example:
 User defined names should start with a letter and consist of letters and
 digits only.  As an exception to this rule, the characters @code{@@},
 and @code{_} may
-be used as part of a name, too.  Capital and small letters are
+be used as part of a name, too (@code{@@} as the first letter is reserved
+for purposes of library routines). Capital and small letters are
 distinguished.  Indexed names are built as a name followed by an
 int_expression in parentheses.  A list of indexed names can be built as
 a name followed by an intvec_expression in parentheses.
