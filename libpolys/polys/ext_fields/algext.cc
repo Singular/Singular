@@ -1417,6 +1417,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->iNumberOfParameters = rVar(R);
   cf->pParameterNames = R->names;
   cf->cfParameter = naParameter;
+  cf->has_simple_Inverse= R->cf->has_simple_Inverse;
 
   if( nCoeff_is_Q(R->cf) )
   {
