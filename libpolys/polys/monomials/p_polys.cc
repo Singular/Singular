@@ -2212,40 +2212,6 @@ void p_Content(poly ph, const ring r)
         n_Delete(&h,r->cf->extRing->cf);
       }*/
     }
-
-    /* normalize ph over a transcendental extension s.t.
-       lead (ph) is > 0 if extRing->cf == Q
-       or lead (ph) is monic if extRing->cf == Zp*/
-    const coeffs C = r->cf;
-    if (nCoeff_is_transExt(C))
-    {
-      p= ph;
-      h= p_GetCoeff (p, C);
-      fraction f = (fraction) h;
-      poly g = NUM(f);
-      number n=p_GetCoeff (g,C->extRing->cf);
-      if (rField_is_Q (C->extRing))
-      {
-        if (!n_GreaterZero(n,C->extRing->cf))
-        {
-          p=p_Neg (p,r);
-        }
-      }
-      else if (rField_is_Zp(C->extRing))
-      {
-        if (!n_IsOne (n, C->extRing->cf))
-        {
-          n=n_Invers (n,C->extRing->cf);
-          nMapFunc nMap;
-          nMap= n_SetMap (C->extRing->cf, C);
-          number ninv= nMap (n,C->extRing->cf, C);
-          p=p_Mult_nn (p, ninv, r);
-          n_Delete (&ninv, C);
-          n_Delete (&n, C->extRing->cf);
-        }
-      }
-      p= ph;
-    }
   }
   if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
 }
@@ -2904,6 +2870,41 @@ void p_ProjectiveUnique(poly ph, const ring r)
   }
 
   p_Cleardenom(ph, r); //performs also a p_Content
+  
+  
+    /* normalize ph over a transcendental extension s.t.
+       lead (ph) is > 0 if extRing->cf == Q
+       or lead (ph) is monic if extRing->cf == Zp*/
+    if (nCoeff_is_transExt(C))
+    {
+      p= ph;
+      h= p_GetCoeff (p, C);
+      fraction f = (fraction) h;
+      poly g = NUM(f);
+      number n=p_GetCoeff (g,C->extRing->cf);
+      if (rField_is_Q (C->extRing))
+      {
+        if (!n_GreaterZero(n,C->extRing->cf))
+        {
+          p=p_Neg (p,r);
+        }
+      }
+      else if (rField_is_Zp(C->extRing))
+      {
+        if (!n_IsOne (n, C->extRing->cf))
+        {
+          n=n_Invers (n,C->extRing->cf);
+          nMapFunc nMap;
+          nMap= n_SetMap (C->extRing->cf, C);
+          number ninv= nMap (n,C->extRing->cf, C);
+          p=p_Mult_nn (p, ninv, r);
+          n_Delete (&ninv, C);
+          n_Delete (&n, C->extRing->cf);
+        }
+      }
+      p= ph;
+    }
+    
   return;
 }
 
