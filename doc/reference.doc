@@ -1936,7 +1936,9 @@ number, poly, vector, ideal, module, matrix or list
 maps objects between rings.
 @code{fetch} is the identity map between rings and qrings,
 the i-th variable of the source ring is mapped to the i-th
-variable of the basering.  The coefficient fields must be compatible.
+variable of the basering.
+If the basering has less variables than the source ring these variables are mapped to zero.
+The coefficient fields must be compatible.
 (See @ref{map} for a description of possible mappings between
 different ground fields).
 @*@code{fetch} offers a convenient way to change
