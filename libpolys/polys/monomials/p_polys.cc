@@ -2854,7 +2854,7 @@ void p_ProjectiveUnique(poly ph, const ring r)
 
   assume(pNext(p)!=NULL);
 
-  if(!rField_is_Q(r)) // && rField_has_simple_inverse(r)) //make monic over Zp !
+  if(!rField_is_Q(r) && rField_has_simple_inverse(r)) //make monic over Zp !
   {
     h = p_GetCoeff(p, C);
     number hInv = n_Invers(h, C);
