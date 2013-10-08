@@ -70,7 +70,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc is_active (poly f, id)
+proc is_active (poly f,def id)
 "USAGE:   is_active(f,id); f poly, id ideal or module
 RETURN:  1 if f is an active element modulo id (i.e. dim(id)=dim(id+f*R^n)+1,
          if id is a submodule of R^n) resp. 0 if f is not active.
@@ -176,7 +176,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc is_reg (poly f, id)
+proc is_reg (poly f,def id)
 "USAGE:   is_reg(f,id); f poly, id ideal or module
 RETURN:  1 if multiplication with f is injective modulo id, 0 otherwise
 NOTE:    Let R be the basering and id a submodule of R^n. The procedure checks
@@ -480,7 +480,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc Tjurina (id, list #)
+proc Tjurina (def id, list #)
 "USAGE:   Tjurina(id[,<any>]);  id=ideal or poly
 ASSUME:  id=ICIS (isolated complete intersection singularity)
 RETURN:  standard basis of Tjurina-module of id,
@@ -864,7 +864,7 @@ example
    printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc codim (id1, id2)
+proc codim (def id1,def id2)
 "USAGE:   codim(id1,id2); id1,id2 ideal or module, both must be standard bases
 RETURN:  int, which is:
          1. the vectorspace dimension of id1/id2 if id2 is contained in id1
@@ -1005,7 +1005,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc tangentcone (id,list #)
+proc tangentcone (def id,list #)
 "USAGE:   tangentcone(id [,n]); id = ideal, n = int
 RETURN:  the tangent cone of id
 NOTE:    The procedure works for any monomial ordering.
@@ -1046,7 +1046,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc locstd (id)
+proc locstd (def id)
 "USAGE:   locstd (id); id = ideal
 RETURN:  a standard basis for a local degree ordering
 NOTE:    the procedure homogenizes id w.r.t. a new 1st variable @t@, computes

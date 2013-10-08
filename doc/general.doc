@@ -1872,7 +1872,7 @@ In a ring declaration, @sc{Singular} offers the following orderings:
 lexicographical ordering
 
 @item @code{rp}
-reverse lexicographical ordering, i.e. a lexicographical ordering from the right 
+reverse lexicographical ordering, i.e. a lexicographical ordering from the right
 with 1 < x_1 < ... <x_n
 (should not be used as it reverses the "natural" x_1 > ... > x_n,
 reorder the variables instead)
@@ -3243,14 +3243,13 @@ proc x2 (ideal i, int j)
     // which can be converted to ideal resp. int
 @}
 
-proc x3 (i,j)
+proc x3 (def i,def j)
 @{
 ... // can only be called with 2 arguments
     // of any type
-    // (i,j) is the same as (def i,def j)
 @}
 
-proc x5 (i,list #)
+proc x5 (def i,list #)
 @{
 ... // can only be called with at least 1 argument
     // number of arguments: size(#)+1
@@ -3265,9 +3264,9 @@ x5(2,3);
 @* A parameter may have any type (including the types @code{proc}
    and @code{ring}).
 @*If a parameter is of type ring, then it
-   can only be specified by name, but not with a type. For instance:
+   can only be specified by trhe type @code{def}, but not with the type @code{ring}. For instance:
 @smallexample
-proc x6 (r)
+proc x6 (def r)
 @{
 ... // this is correct, r may be of any type, even of type ring
 @}

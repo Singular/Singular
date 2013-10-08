@@ -817,7 +817,7 @@ example
 }
 
 
-static proc runNormaliz(intmat sgr,nmz_mode, list #)
+static proc runNormaliz(intmat sgr,def nmz_mode, list #)
 {
     if(!queryInt("nmz_files_keep_switch"))
     {

@@ -241,7 +241,7 @@ proc cld(ideal J)
   return(Jc);
 };
 
-proc memberpos(f,J)
+proc memberpos(def f,def J)
 //"USAGE:  memberpos(f,J);
 //         (f,J) expected (polynomial,ideal)
 //               or       (int,list(int))
@@ -365,7 +365,7 @@ proc memberpos(f,J)
 //  memberpos(1,L);
 //}
 
-proc subset(J,K)
+proc subset(def J,def K)
 //"USAGE:   subset(J,K);
 //          (J,K)  expected (ideal,ideal)
 //                   or     (list, list)
@@ -841,7 +841,7 @@ proc redgbn(ideal F, ideal E, ideal N)
 };
 
 // eliminates repeated elements form an ideal or matrix or module or intmat or bigintmat
-proc elimrepeated(F)
+proc elimrepeated(def F)
 {
   int i;
   def FF=F;
@@ -856,7 +856,7 @@ proc elimrepeated(F)
   return(FF);
 }
 
-proc elimrepeatedvl(F)
+proc elimrepeatedvl(def F)
 {
   int i;
   def FF=F;
@@ -908,7 +908,7 @@ proc delintvec(intvec V, int i)
 // Purpose: test if a polynomial is homogeneous in the variables or not
 // input:  poly f
 // output  1 if f is homogeneous, 0 if not
-proc ishomog(f)
+proc ishomog(def f)
 {
   int i; poly r; int d; int dr;
   if (f==0){return(1);}
@@ -1024,7 +1024,7 @@ proc incquotient(ideal N, poly f)
 }
 
 // eliminates the ith element from a list or an intvec
-proc elimfromlist(l, int i)
+proc elimfromlist(def l, int i)
 {
   if(typeof(l)=="list"){list L;}
   if (typeof(l)=="intvec"){intvec L;}
@@ -3291,7 +3291,7 @@ proc precombint(list L)
 //                     0 if combine is to be used)
 //                     vv[2]=selind, the index for which the generic basis
 //                     already specializes well if combine is not to be used (vv[1]=1).
-proc precombinediscussion(L,crep)
+proc precombinediscussion(def L,def crep)
 {
   int tes=1; int selind; int i1; int j1; poly p; poly lcp; intvec vv;
   if (size(L)==1){vv=1,1; return(vv);}

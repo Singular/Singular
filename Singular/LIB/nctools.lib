@@ -191,7 +191,7 @@ example
 
 // This procedure computes ei+ej-f with f running in Newton(pij) and deletes the zero rows
 
-static proc Cij(intmat M, int i,j)
+static proc Cij(intmat M, int i,int j)
 {
   M=(-1)*M;
   int nc=ncols(M);

@@ -49,7 +49,7 @@ LIB "poly.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc subst1(id, int m)
+static proc subst1(def id, int m)
 {
 //id = poly/ideal/list, substitute the first m variables occuring in id by 1
 
@@ -78,7 +78,7 @@ static proc subst1(id, int m)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-proc nonMonomials(id)
+proc nonMonomials(def id)
 "USAGE:  nonMonomials(id); id = <list of vectors> or <list of lists> or <module>
          or <matrix>.@*
          Let A= {a1,...,as} be a set of points in K^n, ai:=(ai1,...,ain), then
@@ -377,7 +377,7 @@ example
 
 ////////////////////////////////////////////////////////////////////////////////
 
-proc facGBIdeal(id)
+proc facGBIdeal(def id)
 "USAGE:  facGBIdeal(id); id = <list of vectors> or <list of lists> or <module>
          or <matrix>.@*
          Let A= {a1,...,as} be a set of points in K^n, ai:=(ai1,...,ain), then

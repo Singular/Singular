@@ -102,7 +102,7 @@ proc MonoDec(poly p, matrix M)
 }
 
 //----------------------------- main program --------------------
-proc KSker (int p,q)
+proc KSker (int p,int q)
 "USAGE:  KSker(int p,q); p,q relatively prime integers
 RETURN:  nothing; exports ring KSring, matrix KSkernel and list 'weights';
          KSkernel is a matrix of coefficients of the
@@ -326,7 +326,7 @@ example
 //-------------------------- ALGORITHM I ----------------------
 
 //---------------------------- sub procedure ------------------
-proc seq(int p,q)
+proc seq(int p,int q)
 // computes u,v such that 1<=u<=p-1, qu=1(mod p)
 //                        1<=v<=q-1, pv=1(mod q)
 {
@@ -463,7 +463,7 @@ example
  F;
 }
 
-proc KScoef(int i,j,P,Q, list qq);
+proc KScoef(int i,int j,int P,int Q, list qq);
 "USAGE:  KScoef(int i,j,P,Q, list qq);
 RETURN:  exports ring RC and number C within it. C is
          the coefficient of the word defined in the list qq,

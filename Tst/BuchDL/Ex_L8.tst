@@ -246,7 +246,7 @@ size(P);
 size(S);
 //->   12
 
-proc min_generating_set (matrix P,S)
+proc min_generating_set (matrix P,matrix S)
 "USAGE:  min_generating_set(P,S);   P,S matrix
 ASSUME: The entries of P,S are homogeneous and ordered by ascending 
         degrees. The first entry of S equals 1. (As satisfied by 

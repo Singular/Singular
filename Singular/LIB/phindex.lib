@@ -27,7 +27,7 @@ LIB "primdec.lib";
 LIB "zeroset.lib";
 
 /////////////////////////////////////////////////////////////////////////////
-proc signatureL(M,int #)
+proc signatureL(matrix M,int #)
 "USAGE:    signatureL(M[,r]); M symmetric matrix, r int (optional).
 RETURN:   the signature of M of type int or if r is given and !=0 then
           intvec with (signature, nr. of +, nr. of -) is returned.
@@ -50,10 +50,6 @@ THEORY:   Given the matrix M, we construct the quadratic form associated. Afterw
 EXAMPLE:  example signatureL; shows an example
 "
 {
-  if(typeof(M)!="matrix")
-  {
-    ERROR("** The argument is not a matrix type");
-  }
   option(noprot);
   option(noredefine);
   int nv1=ncols(M);
@@ -95,7 +91,7 @@ example
   signatureL(H);
 }
 ////////////////////////////////////////////////////////////////////////
-proc signatureLqf(h,int #)
+proc signatureLqf(poly h,int #)
 "USAGE:    signatureLqf(h); h quadratic form (poly type).
 RETURN:   the signature of h of type int or if r is given and !=0 then
           intvec with (signature, nr. of +, nr. of -) is returned.
@@ -223,7 +219,7 @@ example
   signatureLqf(Bx);
 }
 /////////////////////////////////////////////////////////////////////////////
-proc PH_ais(I)
+proc PH_ais(def I)
 "USAGE:    PH_ais(I); I ideal of coordinates of the vector field.
 RETURN:   the Poincare-Hopf index of type int.
 NOTE:     the isolated singularity must be algebraically isolated.
@@ -346,7 +342,7 @@ example
   PH_ais(I);
 }
 ///////////////////////////////////////////////////////////////////////////
-proc PH_nais(I)
+proc PH_nais(def I)
 "USAGE:    PH_nais(I); I ideal of coordinates of the vector field.
 RETURN:   the Poincare-Hopf index of type int.
 NOTE:     the vector field must be a non algebraically isolated singularity

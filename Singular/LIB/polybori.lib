@@ -255,7 +255,7 @@ proc lead_coef_bpoly(bpoly pp)
 ///////////////////////////////////////////////////////////////////////
 // converts a Singular ring into a Boolean ring
 
-proc ring2bring(r)
+proc ring2bring(def r)
 {
   bring rb;
   rb.pyring = boolean_poly_ring(r);
@@ -314,7 +314,7 @@ static proc bring_mark_cache(list #)
 }
 
 // look up whether we cached this conversion before
-static proc bring_from_cache(r)
+static proc bring_from_cache(def r)
 { 
   bring_mark_cache();
   def result1 = python_eval("_SINGULAR_RINGS.get('" + string(r) + "', (lambda: None))");
@@ -323,7 +323,7 @@ static proc bring_from_cache(r)
 }
 
 // insert computed result into cache
-static proc bring_to_cache(r, pyobject newring)
+static proc bring_to_cache(def r, pyobject newring)
 {
   def value = WeakRingRef(newring);
   python_eval("_SINGULAR_RINGS")."__setitem__"(string(r), value);
@@ -332,7 +332,7 @@ static proc bring_to_cache(r, pyobject newring)
 ///////////////////////////////////////////////////////////////////////
 // converts a Singular ring into a python ring
 
-proc boolean_poly_ring(r)
+proc boolean_poly_ring(def r)
 {
   def cached = bring_from_cache(r);
   if (int(cached != int(0))) { return (cached); }
@@ -395,7 +395,7 @@ proc bideal_add(bideal arg1, bideal arg2)
 ///////////////////////////////////////////////////////////////////////
 // checks the equality of two bpolys
 
-proc bpoly_check(bpoly pb1, pb2)
+proc bpoly_check(bpoly pb1,bpoly pb2)
 {
   return(pb1.boolpoly==pb2.boolpoly);
 }
@@ -403,7 +403,7 @@ proc bpoly_check(bpoly pb1, pb2)
 ///////////////////////////////////////////////////////////////////////
 // computes the multiplication of two bpolys
 
-proc bpoly_mult(bpoly pb1, pb2)
+proc bpoly_mult(bpoly pb1,bpoly pb2)
 {
   bpoly bpol;
   bpol.boolpoly=pb1.boolpoly*pb2.boolpoly;

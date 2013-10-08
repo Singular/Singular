@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-proc mapIsFinite(R,map phi,ideal I)
+proc mapIsFinite(def R,map phi,ideal I)
 {
    def S=basering;
    setring R;

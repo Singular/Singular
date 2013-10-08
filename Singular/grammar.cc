@@ -805,8 +805,8 @@ static const yytype_uint16 yyrline[] =
     1176,  1192,  1211,  1215,  1219,  1224,  1228,  1232,  1236,  1240,
     1245,  1251,  1257,  1263,  1269,  1275,  1281,  1293,  1300,  1304,
     1341,  1351,  1357,  1357,  1360,  1432,  1436,  1465,  1478,  1495,
-    1504,  1509,  1517,  1529,  1548,  1558,  1577,  1600,  1606,  1618,
-    1624
+    1504,  1509,  1517,  1529,  1548,  1558,  1577,  1600,  1606,  1619,
+    1625
 };
 #endif
 
@@ -4103,7 +4103,8 @@ yyreduce:
     {
             // decl. of type proc p(i)
             sleftv tmp_expr;
-            if ((yyvsp[(1) - (2)].i)==ALIAS_CMD) MYYERROR("alias requires a type");
+            if ((yyvsp[(1) - (2)].i)==ALIAS_CMD) MYYERROR("alias requires a type")
+            else Warn("missing type, assuming `def` in >>%s<<",VoiceName());
             if ((iiDeclCommand(&tmp_expr,&(yyvsp[(2) - (2)].lv),myynest,DEF_CMD,&IDROOT))
             || (iiParameter(&tmp_expr)))
               YYERROR;
@@ -4113,7 +4114,7 @@ yyreduce:
   case 169:
 
 /* Line 1464 of yacc.c  */
-#line 1619 "grammar.y"
+#line 1620 "grammar.y"
     {
             iiRETURNEXPR.Copy(&(yyvsp[(3) - (4)].lv));
             (yyvsp[(3) - (4)].lv).CleanUp();
@@ -4124,7 +4125,7 @@ yyreduce:
   case 170:
 
 /* Line 1464 of yacc.c  */
-#line 1625 "grammar.y"
+#line 1626 "grammar.y"
     {
             if ((yyvsp[(1) - (3)].i)==RETURN)
             {
@@ -4138,7 +4139,7 @@ yyreduce:
 
 
 /* Line 1464 of yacc.c  */
-#line 4142 "grammar.cc"
+#line 4143 "grammar.cc"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

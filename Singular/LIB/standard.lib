@@ -142,7 +142,7 @@ example
 
 /////////////////////////////////////////////////////////////////////////////
 
-proc stdhilb(i,list #)
+proc stdhilb(def i,list #)
 "SYNTAX: @code{stdhilb (} ideal_expression @code{)} @*
          @code{stdhilb (} module_expression @code{)} @*
          @code{stdhilb (} ideal_expression, intvec_expression @code{)}@*
@@ -733,7 +733,7 @@ example
 }
 
 //////////////////////////////////////////////////////////////////////////////
-proc qslimgb (i)
+proc qslimgb (def i)
 "USAGE:   qslimgb(i); i ideal or module
 RETURN:  same type as input, a standard basis of i computed with slimgb
 NOTE:    Only as long as slimgb does not know qrings qslimgb should be used
@@ -1480,7 +1480,7 @@ example
 }
 /////////////////////////////////////////////////////////////////////////
 
-proc quot (m1,m2,list #)
+proc quot (def m1,def m2,list #)
 "SYNTAX: @code{quot (} module_expression@code{,} module_expression @code{)}
          @*@code{quot (} module_expression@code{,} module_expression@code{,}
             int_expression @code{)}
@@ -2169,7 +2169,7 @@ example
 /*
                                 Versuche:
 ///////////////////////////////////////////////////////////////////////////////
-proc downsizeSB (I, list #)
+proc downsizeSB (def I, list #)
 "USAGE:   downsizeSB(I [,l]); I ideal, l list of integers [default: l=0]
 RETURN:  intvec, say v, with v[j] either 1 or 0. We have v[j]=1 if
          leadmonom(I[j]) is divisible by some leadmonom(I[k]) or if

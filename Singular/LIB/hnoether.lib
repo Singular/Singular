@@ -470,7 +470,7 @@ NOTE:   this procedure is only useful in characteristic zero, because otherwise
 //////////////////////////////////////////////////////////////////////////////
 
 
-proc develop
+proc develop(list #)
 "USAGE:   develop(f [,n]); f poly, n int
 ASSUME:  f is a bivariate polynomial (in the first 2 ring variables) and
          irreducible as power series (for reducible f use @code{hnexpansion}).
@@ -3266,8 +3266,8 @@ SEE ALSO: hnexpansion, develop, extdevelop, param
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static proc HN (list HNE_RingDATA,poly fneu,int grenze,Aufruf_Ebene,
-                     essential,getauscht,intvec hne_conj,int conj_factor)
+static proc HN (list HNE_RingDATA,poly fneu,int grenze,def Aufruf_Ebene,
+                def essential,def getauscht,intvec hne_conj,int conj_factor)
 "NOTE: This procedure is only for internal use, it is called via pre_HN
 RETURN: list: first entry = list of HNErings,
               second entry = number of new base ring (0 for HNEring,

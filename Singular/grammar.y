@@ -1607,7 +1607,8 @@ parametercmd:
           {
             // decl. of type proc p(i)
             sleftv tmp_expr;
-            if ($1==ALIAS_CMD) MYYERROR("alias requires a type");
+            if ($1==ALIAS_CMD) MYYERROR("alias requires a type")
+            else Warn("missing type, assuming `def` in >>%s<<",VoiceName());
             if ((iiDeclCommand(&tmp_expr,&$2,myynest,DEF_CMD,&IDROOT))
             || (iiParameter(&tmp_expr)))
               YYERROR;

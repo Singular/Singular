@@ -395,7 +395,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc fetchall (R, list #)
+proc fetchall (def R, list #)
 "USAGE:   fetchall(R[,s]);  R=ring/qring, s=string
 CREATE:  fetch all objects of ring R (of type poly/ideal/vector/module/number/matrix)
          into the basering.
@@ -441,7 +441,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc imapall (R, list #)
+proc imapall (def R, list #)
 "USAGE:   imapall(R[,s]);  R=ring/qring, s=string
 CREATE:  map all objects of ring R (of type poly/ideal/vector/module/number/matrix)
          into the basering by applying imap to all objects of R.
@@ -487,7 +487,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc mapall (R, ideal i, list #)
+proc mapall (def R, ideal i, list #)
 "USAGE:   mapall(R,i[,s]);  R=ring/qring, i=ideal of basering, s=string
 CREATE:  map all objects of ring R (of type poly/ideal/vector/module/number/
          matrix, map) into the basering by mapping the j-th variable of R to
@@ -541,7 +541,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc ord_test (r)
+proc ord_test (def r)
 "USAGE:   ord_test(r);  r ring/qring
 RETURN:  int 1 (resp. -1, resp. 0) if ordering of r is global (resp. local,
          resp. mixed)

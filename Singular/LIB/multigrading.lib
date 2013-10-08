@@ -5428,7 +5428,7 @@ example
 
 
 /******************************************************/
-proc factorgroup(G,H)
+proc factorgroup(list G,list H)
 "USAGE: factorgroup(G,H); list G, list H
 PURPOSE: returns a representation of the factor group G mod H using the first isomorphism thm
 RETURNS: list
@@ -5488,7 +5488,7 @@ example
 }
 
 /******************************************************/
-proc productgroup(G,H)
+proc productgroup(list G,list H)
 "USAGE: productgroup(G,H); list G, list H
 PURPOSE: Returns a representation of the group G x H
 RETURNS: list

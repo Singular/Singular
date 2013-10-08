@@ -3,7 +3,7 @@ info = "solution to Exercise 3.4";
 //
 LIB "matrix.lib";
 // 
-proc ker_Mod (matrix alp, module phi,psi)
+proc ker_Mod (matrix alp, module phi,module psi)
 "USAGE:   ker_Mod(alp,phi,psi);   alp matrix, phi,psi modules
 RETURN:  module
 NOTE:    The generators for the output module are the columns of a
@@ -25,7 +25,7 @@ example
   print(ker_Mod(alp,phi,psi));
 }
 
-proc Ext_Mod (int i, module phi,psi)
+proc Ext_Mod (int i, module phi,module psi)
 "USAGE:   Ext_Mod(i,phi,psi);    i int, phi,psi modules
 RETURN:  module
 NOTE:    The generators for the output module are the columns of a 

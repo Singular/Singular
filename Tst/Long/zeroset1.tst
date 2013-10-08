@@ -22,7 +22,7 @@ tst_init();
  
 
 
-proc TestzerosetLIB(S)
+proc TestzerosetLIB(def S)
 // plug in the elements from the zero-set in the generators of the ideal
 // result should be 0,0,...,0.
 {

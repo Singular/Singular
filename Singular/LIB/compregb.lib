@@ -172,7 +172,7 @@ static proc cgs_main(ideal Polys)
   return(Bases);
 }
 
-proc cgs(ideal Polys, list Vars, list Paras, RingVar, RingAll)
+proc cgs(ideal Polys, list Vars, list Paras,def RingVar,def RingAll)
 "USAGE: cgs(Polys,Vars,Paras,RingVar,RingAll); Polys an ideal, Vars, the list
         of variables, Paras the list of parameters, RingVar the ring with
         Paras as parameters, RingAll the ring with Paras as variables

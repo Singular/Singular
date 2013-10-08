@@ -237,7 +237,7 @@ example
   print(t[2]); // the Smith form of m
 }
 
-static proc diagonal_with_trafo( R, matrix MA, int B)
+static proc diagonal_with_trafo(def R, matrix MA, int B)
 {
 
 int ppl = printlevel-voice+2;
