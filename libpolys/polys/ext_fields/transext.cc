@@ -2438,6 +2438,9 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->iNumberOfParameters = rVar(R);
   cf->pParameterNames = R->names;
   cf->cfParameter = ntParameter;
+  cf->has_simple_Inverse= FALSE;
+  /* cf->has_simple_Alloc= FALSE; */
+
 
   if( nCoeff_is_Q(R->cf) )
     cf->cfClearContent = ntClearContent;
