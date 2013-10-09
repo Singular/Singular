@@ -380,6 +380,7 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     minFactorsLength= biFactors.length();
   else if (biFactors.length() > minFactorsLength)
     refineBiFactors (A, biFactors, Aeval2, evaluation, minFactorsLength);
+  minFactorsLength= tmin (minFactorsLength, biFactors.length());
 
   if (differentSecondVar == lengthAeval2)
   {
