@@ -25,7 +25,7 @@ else
 endif
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DHAVE_CONFIG_H  -DGIT_VERSION='"$(GIT_VERSION)"'
-AMLDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys  -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
+AM_LDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys  -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
 
 ########################### Dynamic Modules... #########################
 if ENABLE_P_PROCS_DYNAMIC
@@ -55,7 +55,7 @@ pyobject_la_CXXFLAGS = $(PYTHON_CSPEC)
 pyobject_la_CPPFLAGS = $(PYTHON_CPPFLAGS)  ${AM_CPPFLAGS}
 
 pyobject_la_LIBS    = $(PYTHON_EXTRA_LIBS)
-pyobject_la_LDFLAGS = ${AMLDFLAGS} $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) $(PYTHON_LSPEC) -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
+pyobject_la_LDFLAGS = ${AM_LDFLAGS} $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) $(PYTHON_LSPEC) -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 ###  -export-dynamic -shared -module -avoid-version (add to all DMs?)
 
 
@@ -206,7 +206,7 @@ SingularHEADERS =    Cache.h \
 nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc ${EMBED_PYOBJECT}
 # nodist_libSingular_g_la_SOURCES = iparith.inc
 
-libSingular_la_LDFLAGS    =  -release ${PACKAGE_VERSION} ${AMLDFLAGS} ${EMBED_PYOBJECT} \
+libSingular_la_LDFLAGS    =  -release ${PACKAGE_VERSION} ${AM_LDFLAGS} ${EMBED_PYOBJECT} \
 -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc \
 $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 
@@ -284,8 +284,8 @@ Singular_LDADD = libSingular.la
 # Singularg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 # Singular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
-Singular_LDFLAGS = -static ${AMLDFLAGS}
-# Singularg_LDFLAGS = -static ${AMLDFLAGS}
+Singular_LDFLAGS = -static ${AM_LDFLAGS}
+# Singularg_LDFLAGS = -static ${AM_LDFLAGS}
 
 
 # Singulard_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
@@ -311,8 +311,8 @@ Singulard_LDADD = libSingular.la
 # Singulardg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 # Singulard_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
-Singulard_LDFLAGS = ${AMLDFLAGS}
-# Singulardg_LDFLAGS = ${AMLDFLAGS}
+Singulard_LDFLAGS = ${AM_LDFLAGS}
+# Singulardg_LDFLAGS = ${AM_LDFLAGS}
 
 
 #### ESingular
@@ -321,7 +321,7 @@ Singulard_LDFLAGS = ${AMLDFLAGS}
 # ESingular_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 #ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DESINGULAR -DPROTO
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO
-ESingular_LDFLAGS = -static ${AMLDFLAGS}
+ESingular_LDFLAGS = -static ${AM_LDFLAGS}
 ESingular_LDADD =   -lreporter -lmisc -lomalloc -lresources
 
 ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
@@ -332,7 +332,7 @@ ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
 # TSingular_CXXFLAGS = -O3 -fomit-frame-pointer -Wextra -Wall -Wno-long-long ${PIPE} $(CXXTEMPLFLAGS)
 #TSingular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG -DTSINGULAR -DPROTO
 TSingular_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR -DPROTO
-TSingular_LDFLAGS = -static ${AMLDFLAGS}
+TSingular_LDFLAGS = -static ${AM_LDFLAGS}
 TSingular_LDADD =   -lreporter -lmisc -lomalloc -lresources
 
 TSingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptTS.inc feOpt.cc
@@ -350,7 +350,7 @@ libparse_SOURCES = libparse.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 # # libSingular.la -lnumeric
 libparse_LDADD = -lomalloc
-libparse_LDFLAGS = -static ${AMLDFLAGS}
+libparse_LDFLAGS = -static ${AM_LDFLAGS}
 # TODO for libparse:
 # multiple definition of `category_out': libparse.cc v.s. utils.cc
 # undefined reference to `iiInitSingularProcinfo(procinfo*, char const*, char const*, int, long, int)'
@@ -418,8 +418,8 @@ test_s_r_LDADD = libSingular.la
 #test_s_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 #test_s_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
-test_s_r_LDFLAGS = -static ${AMLDFLAGS}
-#test_s_g_LDFLAGS = -static ${AMLDFLAGS}
+test_s_r_LDFLAGS = -static ${AM_LDFLAGS}
+#test_s_g_LDFLAGS = -static ${AM_LDFLAGS}
 
 
 # Dynamic versions
@@ -441,8 +441,8 @@ test_d_r_LDADD = libSingular.la
 # test_d_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 # test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
-#test_d_r_LDFLAGS = ${AMLDFLAGS}
-# test_d_g_LDFLAGS = ${AMLDFLAGS}
+#test_d_r_LDFLAGS = ${AM_LDFLAGS}
+# test_d_g_LDFLAGS = ${AM_LDFLAGS}
 
 #########################################################
 

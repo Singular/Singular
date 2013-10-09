@@ -89,7 +89,7 @@ else
   USE_FACTORY =
 endif
 
-AMLDFLAGS = -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter  -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
+AM_LDFLAGS = -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter  -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
 
 
 ### TODO: the following has to be addapted...
@@ -120,8 +120,8 @@ test_s_r_LDADD = -lkernel -lpolys -lcoeffs -lreporter -lmisc $(FACTORY_LIBS) -lo
 # test_s_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 test_s_r_CPPFLAGS = ${AM_CPPFLAGS}
 
-test_s_r_LDFLAGS = -static ${AMLDFLAGS}
-# test_s_g_LDFLAGS = -static ${AMLDFLAGS}
+test_s_r_LDFLAGS = -static ${AM_LDFLAGS}
+# test_s_g_LDFLAGS = -static ${AM_LDFLAGS}
 
 
 # test_d_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
@@ -140,8 +140,8 @@ test_d_r_LDADD = -lkernel -lpolys -lcoeffs  -lreporter -lmisc $(FACTORY_LIBS) -l
 # test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 test_d_r_CPPFLAGS = ${AM_CPPFLAGS}
 
-test_d_r_LDFLAGS = ${AMLDFLAGS}
-# test_d_g_LDFLAGS = ${AMLDFLAGS}
+test_d_r_LDFLAGS = ${AM_LDFLAGS}
+# test_d_g_LDFLAGS = ${AM_LDFLAGS}
 
 # These files are built first
 # BUILT_SOURCES = MOD

@@ -27,7 +27,7 @@ MYINCLUDES =  -I${top_srcdir} -I${top_builddir} -I${srcdir} \
 -I${top_srcdir}/factory/include -I${top_builddir}/factory/include \
 $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS)
 
-AMLDFLAGS	= -release ${PACKAGE_VERSION}
+AM_LDFLAGS	= -release ${PACKAGE_VERSION}
 #  -L${abs_top_builddir}/gfanlib/
 # -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel \
 # -L${top_builddir}/libpolys/polys $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
@@ -52,9 +52,9 @@ gfanlib_la_LIBADD = ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
 # gfanlib_g_la_LIBADD = ${gfanlib_la_LIBADD}
 
 if ENABLE_P_PROCS_DYNAMIC
-  P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS} -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
+  P_PROCS_MODULE_LDFLAGS = ${AM_LDFLAGS} -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 else
-  P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS}
+  P_PROCS_MODULE_LDFLAGS = ${AM_LDFLAGS}
 endif
 
 # Add under Mac OS X: -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup

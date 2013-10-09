@@ -309,7 +309,7 @@ TESTS = test-s-r test-d-r
 #endif
 check_PROGRAMS = $(TESTS)
 
-AMLDFLAGS =  -L${builddir}
+AM_LDFLAGS =  -L${builddir}
 
 TESTSSOURCES = test.cc
 
@@ -328,8 +328,8 @@ test_s_r_SOURCES = $(TESTSSOURCES)
 #ftmpl_inst.o
 test_s_r_LDADD = -lfactory $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIB)
 
-test_s_r_LDFLAGS = -static ${AMLDFLAGS}
-# test_s_g_LDFLAGS = -static ${AMLDFLAGS}
+test_s_r_LDFLAGS = -static ${AM_LDFLAGS}
+# test_s_g_LDFLAGS = -static ${AM_LDFLAGS}
 
 # test_d_g_SOURCES = $(TESTSSOURCES)
 # test_d_g_CFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long -fomit-frame-pointer 
@@ -341,5 +341,5 @@ test_d_r_SOURCES = $(TESTSSOURCES)
 #ftmpl_inst.o
 test_d_r_LDADD = -lfactory $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIB)
 
-test_d_r_LDFLAGS = ${AMLDFLAGS}
-# test_d_g_LDFLAGS = ${AMLDFLAGS}
+test_d_r_LDFLAGS = ${AM_LDFLAGS}
+# test_d_g_LDFLAGS = ${AM_LDFLAGS}

@@ -11,7 +11,7 @@ endif
 # forcefully enable exceptions for polymake
 POLYMAKE_CFLAGS = -fexceptions
 
-AMLDFLAGS	= -release ${PACKAGE_VERSION} ${PM_LDFLAGS}
+AM_LDFLAGS	= -release ${PACKAGE_VERSION} ${PM_LDFLAGS}
 
 SOURCES = polymake_conversion.cc polymake_documentation.cc polymake_wrapper.cc
 
@@ -28,9 +28,9 @@ polymake_la_CXXFLAGS = ${POLYMAKE_CFLAGS}
 polymake_la_CFLAGS = ${POLYMAKE_CFLAGS}
 
 if ENABLE_P_PROCS_DYNAMIC
-  P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS} -shared -module
+  P_PROCS_MODULE_LDFLAGS = ${AM_LDFLAGS} -shared -module
 else
-  P_PROCS_MODULE_LDFLAGS = ${AMLDFLAGS}
+  P_PROCS_MODULE_LDFLAGS = ${AM_LDFLAGS}
 endif
 
 # Add under Mac OS X: -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
