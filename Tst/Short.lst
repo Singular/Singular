@@ -137,6 +137,7 @@ Short/equising_s.tst
 ;;;; Short/facstd.tst
 Short/factorizep_s.tst
 Short/factorizeQa_s.tst
+Short/factorizeQ_s.tst
 Short/fetch_s.tst
 Short/fglm1_s.tst
 Short/fglmquot1_s.tst
