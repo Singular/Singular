@@ -4054,8 +4054,6 @@ void rDebugPrint(ring r)
   for(j=0;j<r->OrdSize;j++)
   {
     Print("  typ %s", TYP[r->typ[j].ord_typ]);
-
-
     if (r->typ[j].ord_typ==ro_syz)
     {
       const short place = r->typ[j].data.syz.place;

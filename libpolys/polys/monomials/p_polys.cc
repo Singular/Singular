@@ -3682,8 +3682,8 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
         zz=p_Div_nn(zz,n,srcExtRing);
         p_Normalize(zz,srcExtRing);
       }
-      //else
-      //  WarnS("Not implemented yet: Cannot permute a rational fraction and make a polynomial out of it! Ignorring the denumerator.");
+      else
+        WarnS("Not defined: Cannot map a rational fraction and make a polynomial out of it! Ignoring the denumerator.");
     }
   }
   else
