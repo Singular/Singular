@@ -85,6 +85,13 @@ BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r)
     l->rtyp=STRING_CMD;
     return FALSE;
   }
+  else if (op==NAMEOF_CMD)
+  {
+    if (r->name==NULL) l->data=omStrDup("");
+    else               l->data=omStrDup(r->name);
+    l->rtyp=STRING_CMD;
+    return FALSE;
+  }
 
   return WrongOp("blackbox_Op1", op, r);
 }
