@@ -1051,6 +1051,16 @@ static void heGenHelp(heEntry hentry, int br)
                    i=strlen(sys);
                    break;
                  }
+	case 'v': /* version number*/
+                 {
+                   char temp[256];
+                   sprintf(temp,"%d-%d-%d",SINGULAR_VERSION/1000,
+		                 (SINGULAR_VERSION % 1000)/100,
+		                 (SINGULAR_VERSION % 100));
+                   strcat(sys,temp);
+                   i=strlen(sys);
+                   break;
+                 }
         default: break;
       }
       p++;

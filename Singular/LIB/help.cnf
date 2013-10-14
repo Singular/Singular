@@ -20,6 +20,7 @@
 #             (in the form http://www.singular.uni-kl.de/some/dir/sing_123.htm)
 #  %i: the complete path of singular.hlp
 #  %n: the info node
+#  %v: Singular version (in the form 4-0-0)
 #----------------------------------------------------
 # the default help browsers builtin, dummy and emacs are always 
 #   available and should NOT be mentioned here
@@ -41,4 +42,15 @@ tkinfo!xDiE:tkinfo:!tkinfo '(%i)%n' &
 xinfo!xDiE:xterm:E:info:!xterm -e info -f %i --node='%n' &
 info!xiE:info:!info -f %i --node='%n'
 lynx!xhE:lynx:!lynx %h
+#----------------------------------------------------------------
+# dummy versions for pure online help
+mac-www!E:open:O:ix86Mac-darwin:!open http://www.singular.uni-kl.de/Manual/%v/ &
+mac-www!E:open:O:ppcMac-darwin:!open http://www.singular.uni-kl.de/Manual/%v/ &
+mozilla-www!DE:mozilla:!(mozilla -remote "openURL(http://www.singular.uni-kl.de/Manual/%v/)")||(mozilla http://www.singular.uni-kl.de/Manual/%v/) &
+firefox-www!DE:firefox:!firefox http://www.singular.uni-kl.de/Manual/%v/ &
+konqueror-www!DE:konqueror:!konqueror http://www.singular.uni-kl.de/Manual/%v/ &
+galeon-www!DE:galeon:!galeon -n http://www.singular.uni-kl.de/Manual/%v/ &
+netscape-www!DE:netscape:!(netscape -remote "openURL(http://www.singular.uni-kl.de/Manual/%v/)")||(netscape http://www.singular.uni-kl.de/Manual/%v/) &
+safari-www!E:/Applications/Safari.app:!open /Applications/Safari.app http://www.singular.uni-kl.de/Manual/%v/
+lynx-www!E:lynx:!lynx http://www.singular.uni-kl.de/Manual/%v/
 
