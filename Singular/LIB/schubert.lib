@@ -1,43 +1,28 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version schubert.lib 3-1-7-0 Sep_2013 ";
-
+version="version schubert.lib 3-1-7-0 Oct_2013 ";
 category="Algebraic Geometry";
 info="
-LIBRARY:    Schubert.lib   Proceduces for Intersection Theory
+LIBRARY:    Schubert.lib    Proceduces for Intersection Theory
 
-AUTHOR:     Hiep Dang,  email: hiep@mathematik.uni-kl.de
+AUTHOR:     Hiep Dang,      email: hiep@mathematik.uni-kl.de
 
 OVERVIEW:
 
-    We implement two new classes (variety and sheaf) and methods for computing
-    with them. Here a variety is represented by the dimension and the Chow ring.
-    A sheaf on a variety is represented by the Chern character.
-
+    We implement new classes (variety, sheaf, stack, graph) and methods for
+    computing with them. Here a variety is represented by a nonnegative integer
+    which is its dimension and a graded ring which is its Chow ring. A sheaf is
+    represented by a variety and a polynomial which is its Chern character.
     In particular, we implement the concrete varieties such as projective spaces
-    , Grassmannians, and projective bundles. Finally, the most important thing
-    is a method for computing the intersection numbers (degrees of 0-cycles).
+    , Grassmannians, and projective bundles.
 
-PROCEDURES:
-    makeVariety(int,ideal)            create a variety
-    productVariety(variety,variety)   product of two varieties
-    ChowRing(variety)                 create the Chow ring of a variety
-    Dimension(variety)                dimension of a variety
-    relations(variety)                relations of a variety
-    Grassmannian(int,int)             create a Grassmannian as a variety
-    projectiveSpace(int)              create a projective space as a variety
-    projectiveBundle(sheaf)           create a projective bundle as a variety
-    integral(variety,poly)            degree of a 0-cycle on a variety
-    makeSheaf(variety,poly)           create a sheaf
-    ChernCharacter(sheaf)             the Chern character of a sheaf
-    totalChernClass(sheaf)            the total Chern class of a sheaf
-    ChernClass(sheaf,int)             the k-th Chern class of a sheaf
-    topChernClass(sheaf)              the top Chern class of a sheaf
-    totalSegreClass(sheaf)            the total Segre class of a sheaf
-    dualSheaf(sheaf)                  the dual of a sheaf
-    tensorSheaf(sheaf,sheaf)          the tensor of two sheaves
-    symmetricPowerSheaf(sheaf,int)    the k-th symmetric power of a sheaf
-    minusSheaf(sheaf,sheaf)           the quotient of two sheaves
-    plusSheaf(sheaf,sheaf)            the direct sum of two sheaves
+    An important task of this library is related to the computation of
+    Gromov-Witten invariants. In particular, we implement new tools for the
+    computation in equivariant intersection theory. These tools are based on the
+    localization of moduli spaces of stable maps and Bott's formula. They are
+    useful for the computation of Gromov-Witten invariants. In order to do this,
+    we have to deal with moduli spaces of stable maps, which were introduced by
+    Kontsevich, and the graphs corresponding to the fixed point components of a
+    torus action on the moduli spaces of stable maps.
 
 REFERENCES:
 
@@ -51,7 +36,67 @@ REFERENCES:
     Charley Crissman, Schubert2-A Macaulay2 package for computation in
                 intersection theory, 2010.
 
-KEYWORDS:        Intersection Theory, Enumerative Geometry, Schubert Calculus
+    Maxim Kontsevich, Enumeration of rational curves via torus actions, 1995.
+
+PROCEDURES:
+    mod_init()                          create new objects in this library
+    makeVariety(int,ideal)              create a variety
+    printVariety(variety)               print procedure for a variety
+    productVariety(variety,variety)     make the product of two varieties
+    ChowRing(variety)                   create the Chow ring of a variety
+    Grassmannian(int,int)               create a Grassmannian as a variety
+    projectiveSpace(int)                create a projective space as a variety
+    projectiveBundle(sheaf)             create a projective bundle as a variety
+    integral(variety,poly)              degree of a 0-cycle on a variety
+    makeSheaf(variety,poly)             create a sheaf
+    printSheaf(sheaf)                   print procedure for sheaves
+    rankSheaf(sheaf)                    return the rank of a sheaf
+    totalChernClass(sheaf)              compute the total Chern class of a sheaf
+    ChernClass(sheaf,int)               compute the k-th Chern class of a sheaf
+    topChernClass(sheaf)                compute the top Chern class of a sheaf
+    totalSegreClass(sheaf)              compute the total Segre class of a sheaf
+    dualSheaf(sheaf)                    make the dual of a sheaf
+    tensorSheaf(sheaf,sheaf)            make the tensor of two sheaves
+    symmetricPowerSheaf(sheaf,int)      make the k-th symmetric power of a sheaf
+    quotSheaf(sheaf,sheaf)              make the quotient of two sheaves
+    addSheaf(sheaf,sheaf)               make the direct sum of two sheaves
+    makeGraph(list,list)                create a graph from a list of vertices
+                                        and a list of edges
+    printGraph(graph)                   print procedure for graphs
+    moduliSpace(variety,int)            create a moduli space of stable maps as
+                                        an algebraic stack
+    printStack(stack)                   print procedure for stacks
+    dimStack(stack)                     compute the dimension of a stack
+    fixedPoints(stack)                  compute the list of graphs corresponding
+                                        the fixed point components of a torus
+                                        action on the stack
+    contributionBundle(stack,graph)     compute the contribution bundle on a
+                                        stack at a graph
+    normalBundle(stack,graph)           compute the normal bundle on a stack at
+                                        a graph
+    multipleCover(int)                  compute the contribution of multiple
+                                        covers of a smooth rational curve as a
+                                        Gromov-Witten invariant
+    linesHypersurface(int)              compute the number of lines on a general
+                                        hypersurface
+    rationalCurve(int,list)             compute the Gromov-Witten invariant
+                                        corresponding the number of rational
+                                        curves on a general Calabi-Yau threefold
+    part(poly,int)                      compute a homogeneous component of a
+                                        polynomial.
+    parts(poly,int,int)                 compute the sum of homogeneous
+                                        components of a polynomial
+    logg(poly,int)                      compute Chern characters from total
+                                        Chern classes.
+    expp(poly,int)                      compute total Chern classes from Chern
+                                        characters
+    SchubertClass(list)                 compute the Schubert classes on a
+                                        Grassmannian
+    dualPartition(list)                 compute the dual of a partition
+
+KEYWORDS:       Intersection Theory; Enumerative Geometry; Schubert Calculus;
+                Bott's formula.
+
 ";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,38 +105,1424 @@ LIB "general.lib";
 LIB "homolog.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
-/// create new classes: varieties and sheaves //////////////////////////////////
+/////////// create new objects in this library  ////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 proc mod_init()
+"USAGE:     mod_init();
+THEORY:     This is to create new objects in this library such as variety,
+            sheaf, stack, and graph.
+KEYWORDS:   variety, sheaf, stack, graph
+EXAMPLE:    example mod_init(); shows an example
+"
 {
     newstruct("variety","int dimension, ring baseRing, ideal relations");
     newstruct("sheaf","variety currentVariety, poly ChernCharacter");
+    newstruct("graph","list vertices, list edges");
+    newstruct("stack","variety currentVariety, int degreeCurve");
 
-    system("install","variety","print",variety_print,1);
+    system("install","variety","print",printVariety,1);
     system("install","variety","*",productVariety,2);
-    system("install","sheaf","print",sheaf_print,1);
+    system("install","sheaf","print",printSheaf,1);
     system("install","sheaf","*",tensorSheaf,2);
-    system("install","sheaf","+",plusSheaf,2);
-    system("install","sheaf","-",minusSheaf,2);
+    system("install","sheaf","+",addSheaf,2);
+    system("install","sheaf","-",quotSheaf,2);
+    system("install","sheaf","^",symmetricPowerSheaf,2);
+    system("install","graph","print",printGraph,1);
+    system("install","stack","print",printStack,1);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    mod_init();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//////// Procedures concerned with moduli spaces of stable maps ////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+proc printStack(stack M)
+"USAGE:     printStack(M); M stack
+ASSUME:     M is a moduli space of stable maps.
+THEORY:     This is the print function used by Singular to print a stack.
+KEYWORDS:   stack, moduli space of stable maps
+EXAMPLE:    example printStack; shows an example
+"
+{
+    "A moduli space of dimension", dimStack(M);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring r = 0,(x),dp;
+    variety P = projectiveSpace(4);
+    stack M = moduliSpace(P,2);
+    M;
+}
+
+proc moduliSpace(variety V, int d)
+"USAGE:     moduliSpace(V,d); V variety, d int
+ASSUME:     V is a projective space and d is a positive integer.
+THEORY:     This is the function used by Singular to create a moduli space of
+            stable maps from a genus zero curve to a projective space.
+KEYWORDS:   stack, moduli space of stable maps, rational curves
+EXAMPLE:    example moduliSpace; shows an example
+"
+{
+    stack M;
+    M.currentVariety = V;
+    M.degreeCurve = d;
+    return(M);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring r = 0,(x),dp;
+    variety P = projectiveSpace(4);
+    stack M = moduliSpace(P,2);
+    M;
+}
+
+proc dimStack(stack M)
+"USAGE:     dimStack(M); M stack
+RETURN:     int
+INPUT:      M is a moduli space of stable maps.
+OUTPUT:     the dimension of moduli space of stable maps.
+KEYWORDS:   dimension, moduli space of stable maps, rational curves
+EXAMPLE:    example dimStack; shows an example
+"
+{
+    variety V = M.currentVariety;
+    int n = V.dimension;
+    int d = M.degreeCurve;
+    return (n*d+n+d-3);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring r = 0,(x),dp;
+    variety P = projectiveSpace(4);
+    stack M = moduliSpace(P,2);
+    dimStack(M);
+}
+
+proc fixedPoints(stack M)
+"USAGE:     fixedPoints(M); M stack
+RETURN:     list
+INPUT:      M is a moduli space of stable maps.
+OUTPUT:     a list of graphs corresponding the fixed point components of a torus
+            action on a moduli space of stable maps.
+KEYWORDS:   fixed points, moduli space of stable maps, graph
+EXAMPLE:    example fixedPoints; shows an example
+"
+{
+    int i,j,k,h,m,n,p;
+    list l;
+    int d = M.degreeCurve;
+    variety V = M.currentVariety;
+    int r = V.dimension;
+    for (i=0;i<=r;i++)
+    {
+        for (j=0;j<=r;j++)
+        {
+            if (i <> j)
+            {
+                l = insert(l,list(graph1(d,i,j),2*d),size(l));
+            }
+        }
+    }
+    if (d == 2)
+    {
+        for (i=0;i<=r;i++)
+        {
+            for (j=0;j<=r;j++)
+            {
+                for (k=0;k<=r;k++)
+                {
+                    if (i <> j and j <> k)
+                    {
+                        l = insert(l,list(graph2(list(1,1),i,j,k),2),size(l));
+                    }
+                }
+            }
+        }
+    }
+    if (d == 3)
+    {
+        for (i=0;i<=r;i++)
+        {
+            for (j=0;j<=r;j++)
+            {
+                for (k=0;k<=r;k++)
+                {
+                    if (i <> j and j <> k)
+                    {
+                        l = insert(l,list(graph2(list(2,1),i,j,k),2),size(l));
+                        for (h=0;h<=r;h++)
+                        {
+                            if (h <> k)
+                            {
+                                l = insert(l,list(graph31(list(1,1,1),i,j,k,h),2),size(l));
+                            }
+                            if (h <> j)
+                            {
+                                l = insert(l,list(graph32(list(1,1,1),i,j,k,h),6),size(l));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (d == 4)
+    {
+        for (i=0;i<=r;i++)
+        {
+            for (j=0;j<=r;j++)
+            {
+                for (k=0;k<=r;k++)
+                {
+                    if (i <> j and j <> k)
+                    {
+                        l = insert(l,list(graph2(list(3,1),i,j,k),3),size(l));
+                        l = insert(l,list(graph2(list(2,2),i,j,k),8),size(l));
+                        for (h=0;h<=r;h++)
+                        {
+                            if (h <> k)
+                            {
+                                l = insert(l,list(graph31(list(2,1,1),i,j,k,h),2),size(l));
+                                l = insert(l,list(graph31(list(1,2,1),i,j,k,h),4),size(l));
+                            }
+                            if (h <> j)
+                            {
+                                l = insert(l,list(graph32(list(2,1,1),i,j,k,h),4),size(l));
+                            }
+                            for (m=0;m<=r;m++)
+                            {
+                                if (k <> h and m <> h)
+                                {
+                                    l = insert(l,list(graph41(list(1,1,1,1),i,j,k,h,m),2),size(l));
+                                }
+                                if (k <> h and m <> k)
+                                {
+                                    l = insert(l,list(graph42(list(1,1,1,1),i,j,k,h,m),2),size(l));
+                                }
+                                if (h <> j and m <> j)
+                                {
+                                    l = insert(l,list(graph43(list(1,1,1,1),i,j,k,h,m),24),size(l));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (d == 5)
+    {
+        for (i=0;i<=r;i++)
+        {
+            for (j=0;j<=r;j++)
+            {
+                for (k=0;k<=r;k++)
+                {
+                    if (i <> j and j <> k)
+                    {
+                        l = insert(l,list(graph2(list(4,1),i,j,k),4),size(l));
+                        l = insert(l,list(graph2(list(3,2),i,j,k),6),size(l));
+                        for (h=0;h<=r;h++)
+                        {
+                            if (k <> h)
+                            {
+                                l = insert(l,list(graph31(list(3,1,1),i,j,k,h),3),size(l));
+                                l = insert(l,list(graph31(list(1,3,1),i,j,k,h),6),size(l));
+                                l = insert(l,list(graph31(list(2,2,1),i,j,k,h),4),size(l));
+                                l = insert(l,list(graph31(list(2,1,2),i,j,k,h),8),size(l));
+                            }
+                            if (j <> h)
+                            {
+                                l = insert(l,list(graph32(list(3,1,1),i,j,k,h),6),size(l));
+                                l = insert(l,list(graph32(list(2,2,1),i,j,k,h),8),size(l));
+                            }
+                            for (m=0;m<=r;m++)
+                            {
+                                if (k <> h and h <> m)
+                                {
+                                    l = insert(l,list(graph41(list(2,1,1,1),i,j,k,h,m),2),size(l));
+                                    l = insert(l,list(graph41(list(1,2,1,1),i,j,k,h,m),2),size(l));
+                                }
+                                if (k <> h and k <> m)
+                                {
+                                    l = insert(l,list(graph42(list(2,1,1,1),i,j,k,h,m),4),size(l));
+                                    l = insert(l,list(graph42(list(1,2,1,1),i,j,k,h,m),4),size(l));
+                                    l = insert(l,list(graph42(list(1,1,2,1),i,j,k,h,m),2),size(l));
+                                }
+                                if (j <> h and j <> m)
+                                {
+                                    l = insert(l,list(graph43(list(2,1,1,1),i,j,k,h,m),12),size(l));
+                                }
+                                for (n=0;n<=r;n++)
+                                {
+                                    if (k <> h and h <> m and m <> n)
+                                    {
+                                        l = insert(l,list(graph51(list(1,1,1,1,1),i,j,k,h,m,n),2),size(l));
+                                    }
+                                    if (k <> h and h <> m and h <> n)
+                                    {
+                                        l = insert(l,list(graph52(list(1,1,1,1,1),i,j,k,h,m,n),2),size(l));
+                                    }
+                                    if (k <> h and k <> m and k <> n)
+                                    {
+                                        l = insert(l,list(graph53(list(1,1,1,1,1),i,j,k,h,m,n),6),size(l));
+                                    }
+                                    if (j <> h and h <> m and h <> n)
+                                    {
+                                        l = insert(l,list(graph54(list(1,1,1,1,1),i,j,k,h,m,n),8),size(l));
+                                    }
+                                    if (k <> h and k <> m and h <> n)
+                                    {
+                                        l = insert(l,list(graph55(list(1,1,1,1,1),i,j,k,h,m,n),2),size(l));
+                                    }
+                                    if (j <> h and j <> m and j <> n)
+                                    {
+                                        l = insert(l,list(graph56(list(1,1,1,1,1),i,j,k,h,m,n),120),size(l));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (d == 6)
+    {
+        for (i=0;i<=r;i++)
+        {
+            for (j=0;j<=r;j++)
+            {
+                for (k=0;k<=r;k++)
+                {
+                    if (i <> j and j <> k)
+                    {
+                        l = insert(l,list(graph2(list(5,1),i,j,k),5),size(l));
+                        l = insert(l,list(graph2(list(4,2),i,j,k),8),size(l));
+                        l = insert(l,list(graph2(list(3,3),i,j,k),18),size(l));
+                        for (h=0;h<=r;h++)
+                        {
+                            if (k <> h)
+                            {
+                                l = insert(l,list(graph31(list(4,1,1),i,j,k,h),4),size(l));
+                                l = insert(l,list(graph31(list(1,4,1),i,j,k,h),8),size(l));
+                                l = insert(l,list(graph31(list(3,2,1),i,j,k,h),6),size(l));
+                                l = insert(l,list(graph31(list(3,1,2),i,j,k,h),6),size(l));
+                                l = insert(l,list(graph31(list(1,3,2),i,j,k,h),6),size(l));
+                                l = insert(l,list(graph31(list(2,2,2),i,j,k,h),16),size(l));
+                            }
+                            if (j <> h)
+                            {
+                                l = insert(l,list(graph32(list(4,1,1),i,j,k,h),8),size(l));
+                                l = insert(l,list(graph32(list(3,2,1),i,j,k,h),6),size(l));
+                                l = insert(l,list(graph32(list(2,2,2),i,j,k,h),48),size(l));
+                            }
+                            for (m=0;m<=r;m++)
+                            {
+                                if (k <> h and h <> m)
+                                {
+                                    l = insert(l,list(graph41(list(3,1,1,1),i,j,k,h,m),3),size(l));
+                                    l = insert(l,list(graph41(list(1,3,1,1),i,j,k,h,m),3),size(l));
+                                    l = insert(l,list(graph41(list(2,2,1,1),i,j,k,h,m),4),size(l));
+                                    l = insert(l,list(graph41(list(2,1,2,1),i,j,k,h,m),4),size(l));
+                                    l = insert(l,list(graph41(list(2,1,1,2),i,j,k,h,m),8),size(l));
+                                    l = insert(l,list(graph41(list(1,2,2,1),i,j,k,h,m),8),size(l));
+                                }
+                                if (k <> h and k <> m)
+                                {
+                                    l = insert(l,list(graph42(list(3,1,1,1),i,j,k,h,m),6),size(l));
+                                    l = insert(l,list(graph42(list(1,3,1,1),i,j,k,h,m),6),size(l));
+                                    l = insert(l,list(graph42(list(1,1,3,1),i,j,k,h,m),3),size(l));
+                                    l = insert(l,list(graph42(list(2,2,1,1),i,j,k,h,m),8),size(l));
+                                    l = insert(l,list(graph42(list(1,1,2,2),i,j,k,h,m),8),size(l));
+                                    l = insert(l,list(graph42(list(2,1,2,1),i,j,k,h,m),4),size(l));
+                                    l = insert(l,list(graph42(list(1,2,2,1),i,j,k,h,m),4),size(l));
+                                }
+                                if (j <> h and j <> m)
+                                {
+                                    l = insert(l,list(graph43(list(3,1,1,1),i,j,k,h,m),18),size(l));
+                                    l = insert(l,list(graph43(list(2,2,1,1),i,j,k,h,m),16),size(l));
+                                }
+                                for (n=0;n<=r;n++)
+                                {
+                                    if (k <> h and h <> m and m <> n)
+                                    {
+                                        l = insert(l,list(graph51(list(2,1,1,1,1),i,j,k,h,m,n),2),size(l));
+                                        l = insert(l,list(graph51(list(1,2,1,1,1),i,j,k,h,m,n),2),size(l));
+                                        l = insert(l,list(graph51(list(1,1,2,1,1),i,j,k,h,m,n),4),size(l));
+                                    }
+                                    if (k <> h and h <> m and h <> n)
+                                    {
+                                        l = insert(l,list(graph52(list(2,1,1,1,1),i,j,k,h,m,n),4),size(l));
+                                        l = insert(l,list(graph52(list(1,2,1,1,1),i,j,k,h,m,n),4),size(l));
+                                        l = insert(l,list(graph52(list(1,1,2,1,1),i,j,k,h,m,n),4),size(l));
+                                        l = insert(l,list(graph52(list(1,1,1,2,1),i,j,k,h,m,n),2),size(l));
+                                    }
+                                    if (k <> h and k <> m and k <> n)
+                                    {
+                                        l = insert(l,list(graph53(list(2,1,1,1,1),i,j,k,h,m,n),12),size(l));
+                                        l = insert(l,list(graph53(list(1,2,1,1,1),i,j,k,h,m,n),12),size(l));
+                                        l = insert(l,list(graph53(list(1,1,2,1,1),i,j,k,h,m,n),4),size(l));
+                                    }
+                                    if (j <> h and h <> m and h <> n)
+                                    {
+                                        l = insert(l,list(graph54(list(2,1,1,1,1),i,j,k,h,m,n),4),size(l));
+                                        l = insert(l,list(graph54(list(1,1,2,1,1),i,j,k,h,m,n),16),size(l));
+                                    }
+                                    if (k <> h and k <> m and h <> n)
+                                    {
+                                        l = insert(l,list(graph55(list(2,1,1,1,1),i,j,k,h,m,n),2),size(l));
+                                        l = insert(l,list(graph55(list(1,2,1,1,1),i,j,k,h,m,n),2),size(l));
+                                        l = insert(l,list(graph55(list(1,1,1,2,1),i,j,k,h,m,n),4),size(l));
+                                    }
+                                    if (j <> h and j <> m and j <> n)
+                                    {
+                                        l = insert(l,list(graph56(list(2,1,1,1,1),i,j,k,h,m,n),48),size(l));
+                                    }
+                                    for (p=0;p<=r;p++)
+                                    {
+                                        if (k <> h and h <> m and m <> n and n <> p)
+                                        {
+                                            l = insert(l,list(graph61(list(1,1,1,1,1,1),i,j,k,h,m,n,p),2),size(l));
+                                        }
+                                        if (k <> h and h <> m and m <> n and m <> p)
+                                        {
+                                            l = insert(l,list(graph62(list(1,1,1,1,1,1),i,j,k,h,m,n,p),2),size(l));
+                                        }
+                                        if (k <> h and h <> m and h <> n and n <> p)
+                                        {
+                                            l = insert(l,list(graph63(list(1,1,1,1,1,1),i,j,k,h,m,n,p),1),size(l));
+                                        }
+                                        if (k <> h and h <> m and h <> n and h <> p)
+                                        {
+                                            l = insert(l,list(graph64(list(1,1,1,1,1,1),i,j,k,h,m,n,p),6),size(l));
+                                        }
+                                        if (k <> h and k <> m and k <> n and n <> p)
+                                        {
+                                            l = insert(l,list(graph65(list(1,1,1,1,1,1),i,j,k,h,m,n,p),4),size(l));
+                                        }
+                                        if (k <> h and k <> m and m <> p and h <> n)
+                                        {
+                                            l = insert(l,list(graph66(list(1,1,1,1,1,1),i,j,k,h,m,n,p),6),size(l));
+                                        }
+                                        if (j <> h and h <> m and m <> n and m <> p)
+                                        {
+                                            l = insert(l,list(graph67(list(1,1,1,1,1,1),i,j,k,h,m,n,p),8),size(l));
+                                        }
+                                        if (j <> h and h <> m and h <> n and h <> p)
+                                        {
+                                            l = insert(l,list(graph68(list(1,1,1,1,1,1),i,j,k,h,m,n,p),12),size(l));
+                                        }
+                                        if (j <> h and h <> m and h <> n and n <> p)
+                                        {
+                                            l = insert(l,list(graph69(list(1,1,1,1,1,1),i,j,k,h,m,n,p),2),size(l));
+                                        }
+                                        if (k <> h and k <> m and k <> n and k <> p)
+                                        {
+                                            l = insert(l,list(graph610(list(1,1,1,1,1,1),i,j,k,h,m,n,p),24),size(l));
+                                        }
+                                        if (j <> h and j <> m and j <> n and j <> p)
+                                        {
+                                            l = insert(l,list(graph611(list(1,1,1,1,1,1),i,j,k,h,m,n,p),720),size(l));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return (l);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring r = 0,(x),dp;
+    variety P = projectiveSpace(4);
+    stack M = moduliSpace(P,2);
+    def F = fixedPoints(M);
+    size(F);
+    typeof(F[1]) == "list";
+    typeof(F[1][1]) == "graph";
+    typeof(F[1][2]) == "int";
+}
+
+static proc torusList(variety P)
+"USAGE:     torusList(P); P variety
+RETURN:     list
+INPUT:      P is a projective space
+OUTPUT:     a list of numbers
+THEORY:     This is a procedure concerning the enumeration of rational curves.
+KEYWORDS:   torus action
+EXAMPLE:    example torusList; shows an example
+"
+{
+    int i;
+    int n = P.dimension;
+    list l;
+    for (i=0;i<=n;i++)
+    {
+        l = insert(l,number(5^i),size(l));
+    }
+    return (l);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring r = 0,(x),dp;
+    variety P = projectiveSpace(4);
+    def L = torusList(P);
+    L;
+}
+
+proc contributionBundle(stack M, graph G, list #)
+"USAGE:     contributionBundle(M,G,#); M stack, G graph, # list
+RETURN:     number
+INPUT:      M is a moduli space of stable maps, G is a graph, # is a list.
+OUTPUT:     a number corresponding to the contribution bundle on a moduli space
+            of stable maps at a fixed point component (graph)
+KEYWORDS:   contribution bundle, graph, multiple cover, rational curve,
+SEE ALSO:   normalBundle
+EXAMPLE:    example contributionBundle; shows an example
+"
+{
+    def R = basering;
+    setring R;
+    int i,j,a;
+    variety P = M.currentVariety;
+    def L = torusList(P);
+    int r = P.dimension;
+    int d;
+    if (size(#)==0) {d = 2*r - 3;}
+    else
+    {
+        if (typeof(#[1]) == "int") {d = #[1];}
+        else {Error("invalid optional argument");}
+    }
+    list e = G.edges;
+    list v = G.vertices;
+    number E = 1;
+    number V = 1;
+    if (r == 1)
+    {
+        for (i=1;i<=size(v);i++)
+        {
+            V = V*(-L[v[i][1]+1])^(v[i][2]-1);
+        }
+        for (j=1;j<=size(e);j++)
+        {
+            number f = 1;
+            if (e[j][3]<>1)
+            {
+                for (a=1;a<e[j][3];a++)
+                {
+                    f=f*(-a*L[e[j][1]+1]-(e[j][3]-a)*L[e[j][2]+1])/e[j][3];
+                }
+            }
+            E = E*f;
+            kill f;
+        }
+        return ((E*V)^2);
+    }
+    else
+    {
+        for (i=1;i<=size(v);i++)
+        {
+            V = V*((d*L[v[i][1]+1])^(v[i][2]-1));
+        }
+        for (j=1;j<=size(e);j++)
+        {
+            number f = 1;
+            for (a=0;a<=d*e[j][3];a++)
+            {
+                f = f*((a*L[e[j][1]+1]+(d*e[j][3]-a)*L[e[j][2]+1])/e[j][3]);
+            }
+            E = E*f;
+            kill f;
+        }
+        return (E/V);
+    }
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring r = 0,(x),dp;
+    variety P = projectiveSpace(4);
+    stack M = moduliSpace(P,2);
+    def F = fixedPoints(M);
+    graph G = F[1][1];
+    number f = contributionBundle(M,G);
+    number g = contributionBundle(M,G,5);
+    f == g;
+}
+
+proc normalBundle(stack M, graph G)
+"USAGE:     normalBundle(M,G); M stack, G graph
+RETURN:     number
+INPUT:      M is a moduli space of stable maps, G is a graph
+OUTPUT:     a number corresponding to the normal bundle on a moduli space of
+            stable maps at a graph
+KEYWORDS:   normal bundle, graph, rational curves, mutiple covers, lines on
+            hypersurfaces
+SEE ALSO:   contributionBundle
+EXAMPLE:    example normalBundle; shows an example
+{
+    def R = basering;
+    setring R;
+    variety P = M.currentVariety;
+    def L = torusList(P);
+    int n = P.dimension;
+    list e = G.edges;
+    list v = G.vertices;
+    int i,j,k,h,b,m,a;
+    number N = 1;
+    for (j=1;j<=size(e);j++)
+    {
+        int d = e[j][3];
+        number c = (-1)^d*factorial(d)^2;
+        number y = c*(L[e[j][1]+1]-L[e[j][2]+1])^(2*d)/(d^(2*d));
+        for (k=0;k<=n;k++)
+        {
+            if (k <> e[j][1] and k <> e[j][2])
+            {
+                for (a=0;a<=d;a++)
+                {
+                    y=y*((a*L[e[j][1]+1]+(d-a)*L[e[j][2]+1])/d - L[k+1]);
+                }
+            }
+        }
+        N = N*y;
+        kill y,d,c;
+    }
+    for (i=1;i<=size(v);i++)
+    {
+        number F = 1;
+        for (h=3;h<=size(v[i]);h++)
+        {
+            F = F*(L[v[i][h][1]+1]-L[v[i][h][2]+1])/v[i][h][3];
+        }
+        if (v[i][2] == 1)
+        {
+            N = N/F;
+            kill F;
+        }
+        else
+        {
+            number z = 1;
+            for (m=0;m<=n;m++)
+            {
+                if (m<>v[i][1])
+                {
+                    z = z*(L[v[i][1]+1]-L[m+1]);
+                }
+            }
+            if (v[i][2] == 3)
+            {
+                N = N*F/z^2;
+                kill F,z;
+            }
+            else
+            {
+                number g = 0;
+                for (b=3;b<=size(v[i]);b++)
+                {
+                    g = g + v[i][b][3]/(L[v[i][b][1]+1]-L[v[i][b][2]+1]);
+                }
+                N = N*F*g^(3-v[i][2])/(z^(v[i][2]-1));
+                kill g,F,z;
+            }
+        }
+    }
+    return (N);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring r = 0,(x),dp;
+    variety P = projectiveSpace(4);
+    stack M = moduliSpace(P,2);
+    def F = fixedPoints(M);
+    graph G = F[1][1];
+    number f = normalBundle(M,G);
+    f <> 0;
+}
+
+proc multipleCover(int d)
+"USAGE:     multipleCover(d); d int
+RETURN:     number
+THEORY:     This is the contribution of degree d multiple covers of a smooth
+            rational curve as a Gromov-Witten invariant.
+KEYWORDS:   Gromov-Witten invariants, multiple covers
+SEE ALSO:   rationalCurve, linesHypersurface
+EXAMPLE:    example multipleCover; shows an example
+"
+{
+    def R = basering;
+    setring R;
+    variety P = projectiveSpace(1);
+    stack M = moduliSpace(P,d);
+    def F = fixedPoints(M);
+    int i;
+    number r = 0;
+    for (i=1;i<=size(F);i++)
+    {
+        graph G = F[i][1];
+        number s = contributionBundle(M,G);
+        number t = F[i][2]*normalBundle(M,G);
+        r = r + s/t;
+        kill s,t,G;
+    }
+    return (r);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring r = 0,(x),dp;
+    multipleCover(1);
+    multipleCover(2);
+    multipleCover(3);
+    multipleCover(4);
+    multipleCover(5);
+}
+
+proc linesHypersurface(int n)
+"USAGE:     linesHypersurface(n); n int
+RETURN:     number
+THEORY:     This is the number of lines on a general hypersurface of degree
+            d = 2n-3 in an n-dimensional projective space.
+KEYWORDS:   Gromov-Witten invariants, lines on hypersurfaces
+SEE ALSO:   linesHypersurface, multipleCover
+EXAMPLE:    example linesHypersurface; shows an example
+"
+{
+    def R = basering;
+    setring R;
+    variety P = projectiveSpace(n);
+    stack M = moduliSpace(P,1);
+    def F = fixedPoints(M);
+    int i;
+    poly r = 0;
+    for (i=1;i<=size(F);i++)
+    {
+        graph G = F[i][1];
+        number s = contributionBundle(M,G);
+        number t = F[i][2]*normalBundle(M,G);
+        r = r + s/t;
+        kill s,t,G;
+    }
+    return (r);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring r = 0,(x),dp;
+    linesHypersurface(2);
+    linesHypersurface(3);
+    linesHypersurface(4);
+    linesHypersurface(5);
+    linesHypersurface(6);
+    linesHypersurface(7);
+    linesHypersurface(8);
+    linesHypersurface(9);
+    linesHypersurface(10);
+}
+
+proc rationalCurve(int d, list #)
+"USAGE:     rationalCurve(d,#); d int, # list
+RETURN:     number
+THEORY:     This is the Gromov-Witten invariant corresponding the number of
+            rational curves on a general Calabi-Yau threefold.
+KEYWORDS:   Gromov-Witten invariants, rational curves on Calabi-Yau threefolds
+SEE ALSO:   linesHypersurface, multipleCover
+EXAMPLE:    example rationalCurve; shows an example
+"
+{
+    def R = basering;
+    setring R;
+    int n,i,j;
+    if (size(#) == 0) {n = 4; list l = 5;}
+    else {n = size(#)+3; list l = #;}
+    variety P = projectiveSpace(n);
+    stack M = moduliSpace(P,d);
+    def F = fixedPoints(M);
+    number r = 0;
+    for (i=1;i<=size(F);i++)
+    {
+        graph G = F[i][1];
+        number s = 1;
+        for (j=1;j<=size(l);j++)
+        {
+            s = s*contributionBundle(M,G,list(l[j]));
+        }
+        number t = F[i][2]*normalBundle(M,G);
+        r = r + s/t;
+        kill s,t,G;
+    }
+    return (r);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring r = 0,(x),dp;
+    rationalCurve(1);
+    /*
+    rationalCurve(2);
+    rationalCurve(3);
+    rationalCurve(4);
+    rationalCurve(5);
+    rationalCurve(1,list(4,2));
+    rationalCurve(1,list(3,3));
+    rationalCurve(1,list(3,2,2));
+    rationalCurve(1,list(2,2,2,2));
+    rationalCurve(2,list(4,2));
+    rationalCurve(2,list(3,3));
+    rationalCurve(2,list(3,2,2));
+    rationalCurve(2,list(2,2,2,2));
+    rationalCurve(3,list(4,2));
+    rationalCurve(3,list(3,3));
+    rationalCurve(3,list(3,2,2));
+    rationalCurve(3,list(2,2,2,2));
+    rationalCurve(4,list(4,2));
+    rationalCurve(4,list(3,3));
+    rationalCurve(4,list(3,2,2));
+    rationalCurve(4,list(2,2,2,2));
+    rationalCurve(5,list(4,2));
+    rationalCurve(5,list(3,3));
+    rationalCurve(5,list(3,2,2));
+    rationalCurve(5,list(2,2,2,2));
+    */
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/////////// Procedures concerned with graphs ///////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+proc printGraph(graph G)
+"USAGE:     printGraph(G); G graph
+ASSUME:     G is a graph.
+THEORY:     This is the print function used by Singular to print a graph.
+KEYWORDS:   graph
+EXAMPLE:    example printGraph; shows an example
+"
+{
+    "A graph with", size(G.vertices), "vertices and", size(G.edges), "edges";
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring R=(0,x1,x2,x3,x4),(q1,q2,q3,q4,q5,q6),dp;
+    graph G = makeGraph(list(list(0,1,list(0,1,2)),list(1,1,list(1,0,2))),
+    list(list(0,1,2)));
+    G;
+}
+
+proc makeGraph(list v, list e)
+"USAGE:     makeGraph(v,e); v list, e list
+ASSUME:     v is a list of vertices, e is a list of edges.
+RETURN:     graph with vertices v and edges e.
+THEORY:     Creates a graph from a list of vertices and edges.
+KEYWORDS:   graph
+EXAMPLE:    example makeGraph; shows an example
+{
+    graph G;
+    G.vertices = v;
+    G.edges = e;
+    return(G);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring R=(0,x1,x2,x3,x4),(q1,q2,q3,q4,q5,q6),dp;
+    graph G = makeGraph(list(list(0,1,list(0,1,2)),list(1,1,list(1,0,2))),
+    list(list(0,1,2)));
+    G;
+}
+
+static proc graph1(int d, int i, int j)
+{
+    graph G;
+    list f1 = i,j,d;
+    list f2 = j,i,d;
+    list v1 = i,1,f1;
+    list v2 = j,1,f2;
+    G.vertices = v1,v2;
+    G.edges = list(f1);
+    return (G);
+}
+
+static proc graph2(list d, int i, int j, int k)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,1,f4;
+    G.vertices = v1,v2,v3;
+    G.edges = f1,f3;
+    return (G);
+}
+
+static proc graph31(list d, int i, int j, int k, int h)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = h,k,d[3];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,2,f4,f5;
+    list v4 = h,1,f6;
+    G.vertices = v1,v2,v3,v4;
+    G.edges = f1,f3,f5;
+    return (G);
+}
+
+static proc graph32(list d, int i, int j, int k, int h)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = j,h,d[3];
+    list f5 = k,j,d[2];
+    list f6 = h,j,d[3];
+    list v1 = i,1,f1;
+    list v2 = j,3,f2,f3,f4;
+    list v3 = k,1,f5;
+    list v4 = h,1,f6;
+    G.vertices = v1,v2,v3,v4;
+    G.edges = f1,f3,f4;
+    return (G);
+}
+
+static proc graph41(list d, int i, int j, int k, int h, int l)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = h,k,d[3];
+    list f7 = h,l,d[4];
+    list f8 = l,h,d[4];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,2,f4,f5;
+    list v4 = h,2,f6,f7;
+    list v5 = l,1,f8;
+    G.vertices = v1,v2,v3,v4,v5;
+    G.edges = f1,f3,f5,f7;
+    return (G);
+}
+
+static proc graph42(list d, int i, int j, int k, int h, int l)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = k,l,d[4];
+    list f7 = h,k,d[3];
+    list f8 = l,k,d[4];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,3,f4,f5,f6;
+    list v4 = h,1,f7;
+    list v5 = l,1,f8;
+    G.vertices = v1,v2,v3,v4,v5;
+    G.edges = f1,f3,f5,f6;
+    return (G);
+}
+
+static proc graph43(list d, int i, int j, int k, int h, int l)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = j,h,d[3];
+    list f5 = j,l,d[4];
+    list f6 = k,j,d[2];
+    list f7 = h,j,d[3];
+    list f8 = l,j,d[4];
+    list v1 = i,1,f1;
+    list v2 = j,4,f2,f3,f4,f5;
+    list v3 = k,1,f6;
+    list v4 = h,1,f7;
+    list v5 = l,1,f8;
+    G.vertices = v1,v2,v3,v4,v5;
+    G.edges = f1,f3,f4,f5;
+    return (G);
+}
+
+static proc graph51(list d, int i, int j, int k, int h, int m, int n)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = h,k,d[3];
+    list f7 = h,m,d[4];
+    list f8 = m,h,d[4];
+    list f9 = m,n,d[5];
+    list f10 = n,m,d[5];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,2,f4,f5;
+    list v4 = h,2,f6,f7;
+    list v5 = m,2,f8,f9;
+    list v6 = n,1,f10;
+    G.vertices = v1,v2,v3,v4,v5,v6;
+    G.edges = f1,f3,f5,f7,f9;
+    return (G);
+}
+
+static proc graph52(list d, int i, int j, int k, int h, int m, int n)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = h,k,d[3];
+    list f7 = h,m,d[4];
+    list f8 = m,h,d[4];
+    list f9 = h,n,d[5];
+    list f10 = n,h,d[5];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,2,f4,f5;
+    list v4 = h,3,f6,f7,f9;
+    list v5 = m,1,f8;
+    list v6 = n,1,f10;
+    G.vertices = v1,v2,v3,v4,v5,v6;
+    G.edges = f1,f3,f5,f7,f9;
+    return (G);
+}
+
+static proc graph53(list d, int i, int j, int k, int h, int m, int n)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = h,k,d[3];
+    list f7 = k,m,d[4];
+    list f8 = m,k,d[4];
+    list f9 = k,n,d[5];
+    list f10 = n,k,d[5];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,4,f4,f5,f7,f9;
+    list v4 = h,1,f6;
+    list v5 = m,1,f8;
+    list v6 = n,1,f10;
+    G.vertices = v1,v2,v3,v4,v5,v6;
+    G.edges = f1,f3,f5,f7,f9;
+    return (G);
+}
+
+static proc graph54(list d, int i, int j, int k, int h, int m, int n)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = j,h,d[3];
+    list f6 = h,j,d[3];
+    list f7 = h,m,d[4];
+    list f8 = m,h,d[4];
+    list f9 = h,n,d[5];
+    list f10 = n,h,d[5];
+    list v1 = i,1,f1;
+    list v2 = j,3,f2,f3,f5;
+    list v3 = k,1,f4;
+    list v4 = h,3,f6,f7,f9;
+    list v5 = m,1,f8;
+    list v6 = n,1,f10;
+    G.vertices = v1,v2,v3,v4,v5,v6;
+    G.edges = f1,f3,f5,f7,f9;
+    return (G);
+}
+
+static proc graph55(list d, int i, int j, int k, int h, int m, int n)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = h,k,d[3];
+    list f7 = k,m,d[4];
+    list f8 = m,k,d[4];
+    list f9 = h,n,d[5];
+    list f10 = n,h,d[5];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,3,f4,f5,f7;
+    list v4 = h,2,f6,f9;
+    list v5 = m,1,f8;
+    list v6 = n,1,f10;
+    G.vertices = v1,v2,v3,v4,v5,v6;
+    G.edges = f1,f3,f5,f7,f9;
+    return (G);
+}
+
+static proc graph56(list d, int i, int j, int k, int h, int m, int n)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = j,h,d[3];
+    list f6 = h,j,d[3];
+    list f7 = j,m,d[4];
+    list f8 = m,j,d[4];
+    list f9 = j,n,d[5];
+    list f10 = n,j,d[5];
+    list v1 = i,1,f1;
+    list v2 = j,5,f2,f3,f5,f7,f9;
+    list v3 = k,1,f4;
+    list v4 = h,1,f6;
+    list v5 = m,1,f8;
+    list v6 = n,1,f10;
+    G.vertices = v1,v2,v3,v4,v5,v6;
+    G.edges = f1,f3,f5,f7,f9;
+    return (G);
+}
+
+static proc graph61(list d, int i, int j, int k, int h, int m, int n, int p)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = h,k,d[3];
+    list f7 = h,m,d[4];
+    list f8 = m,h,d[4];
+    list f9 = m,n,d[5];
+    list f10 = n,m,d[5];
+    list f11 = n,p,d[6];
+    list f12 = p,n,d[6];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,2,f4,f5;
+    list v4 = h,2,f6,f7;
+    list v5 = m,2,f8,f9;
+    list v6 = n,2,f10,f11;
+    list v7 = p,1,f12;
+    G.vertices = v1,v2,v3,v4,v5,v6,v7;
+    G.edges = f1,f3,f5,f7,f9,f11;
+    return (G);
+}
+
+static proc graph62(list d, int i, int j, int k, int h, int m, int n, int p)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = h,k,d[3];
+    list f7 = h,m,d[4];
+    list f8 = m,h,d[4];
+    list f9 = m,n,d[5];
+    list f10 = n,m,d[5];
+    list f11 = m,p,d[6];
+    list f12 = p,m,d[6];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,2,f4,f5;
+    list v4 = h,2,f6,f7;
+    list v5 = m,3,f8,f9,f11;
+    list v6 = n,1,f10;
+    list v7 = p,1,f12;
+    G.vertices = v1,v2,v3,v4,v5,v6,v7;
+    G.edges = f1,f3,f5,f7,f9,f11;
+    return (G);
+}
+
+static proc graph63(list d, int i, int j, int k, int h, int m, int n, int p)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = h,k,d[3];
+    list f7 = h,m,d[4];
+    list f8 = m,h,d[4];
+    list f9 = h,n,d[5];
+    list f10 = n,h,d[5];
+    list f11 = n,p,d[6];
+    list f12 = p,n,d[6];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,2,f4,f5;
+    list v4 = h,3,f6,f7,f9;
+    list v5 = m,1,f8;
+    list v6 = n,2,f10,f11;
+    list v7 = p,1,f12;
+    G.vertices = v1,v2,v3,v4,v5,v6,v7;
+    G.edges = f1,f3,f5,f7,f9,f11;
+    return (G);
+}
+
+static proc graph64(list d, int i, int j, int k, int h, int m, int n, int p)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = h,k,d[3];
+    list f7 = h,m,d[4];
+    list f8 = m,h,d[4];
+    list f9 = h,n,d[5];
+    list f10 = n,h,d[5];
+    list f11 = h,p,d[6];
+    list f12 = p,h,d[6];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,2,f4,f5;
+    list v4 = h,4,f6,f7,f9,f11;
+    list v5 = m,1,f8;
+    list v6 = n,1,f10;
+    list v7 = p,1,f12;
+    G.vertices = v1,v2,v3,v4,v5,v6,v7;
+    G.edges = f1,f3,f5,f7,f9,f11;
+    return (G);
+}
+
+static proc graph65(list d, int i, int j, int k, int h, int m, int n, int p)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = h,k,d[3];
+    list f7 = k,m,d[4];
+    list f8 = m,k,d[4];
+    list f9 = k,n,d[5];
+    list f10 = n,k,d[5];
+    list f11 = n,p,d[6];
+    list f12 = p,n,d[6];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,4,f4,f5,f7,f9;
+    list v4 = h,1,f6;
+    list v5 = m,1,f8;
+    list v6 = n,2,f10,f11;
+    list v7 = p,1,f12;
+    G.vertices = v1,v2,v3,v4,v5,v6,v7;
+    G.edges = f1,f3,f5,f7,f9,f11;
+    return (G);
+}
+
+static proc graph66(list d, int i, int j, int k, int h, int m, int n, int p)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = h,k,d[3];
+    list f7 = k,m,d[4];
+    list f8 = m,k,d[4];
+    list f9 = h,n,d[5];
+    list f10 = n,h,d[5];
+    list f11 = m,p,d[6];
+    list f12 = p,m,d[6];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,3,f4,f5,f7;
+    list v4 = h,2,f6,f9;
+    list v5 = m,1,f8,f11;
+    list v6 = n,1,f10;
+    list v7 = p,1,f12;
+    G.vertices = v1,v2,v3,v4,v5,v6,v7;
+    G.edges = f1,f3,f5,f7,f9,f11;
+    return (G);
+}
+
+static proc graph67(list d, int i, int j, int k, int h, int m, int n, int p)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = j,h,d[3];
+    list f6 = h,j,d[3];
+    list f7 = h,m,d[4];
+    list f8 = m,h,d[4];
+    list f9 = m,n,d[5];
+    list f10 = n,m,d[5];
+    list f11 = m,p,d[6];
+    list f12 = p,m,d[6];
+    list v1 = i,1,f1;
+    list v2 = j,3,f2,f3,f5;
+    list v3 = k,1,f4;
+    list v4 = h,2,f6,f7;
+    list v5 = m,3,f8,f9,f11;
+    list v6 = n,1,f10;
+    list v7 = p,1,f12;
+    G.vertices = v1,v2,v3,v4,v5,v6,v7;
+    G.edges = f1,f3,f5,f7,f9,f11;
+    return (G);
+}
+
+static proc graph68(list d, int i, int j, int k, int h, int m, int n, int p)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = j,h,d[3];
+    list f6 = h,j,d[3];
+    list f7 = h,m,d[4];
+    list f8 = m,h,d[4];
+    list f9 = h,n,d[5];
+    list f10 = n,h,d[5];
+    list f11 = h,p,d[6];
+    list f12 = p,h,d[6];
+    list v1 = i,1,f1;
+    list v2 = j,3,f2,f3,f5;
+    list v3 = k,1,f4;
+    list v4 = h,4,f6,f7,f9,f11;
+    list v5 = m,1,f8;
+    list v6 = n,1,f10;
+    list v7 = p,1,f12;
+    G.vertices = v1,v2,v3,v4,v5,v6,v7;
+    G.edges = f1,f3,f5,f7,f9,f11;
+    return (G);
+}
+
+static proc graph69(list d, int i, int j, int k, int h, int m, int n, int p)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = j,h,d[3];
+    list f6 = h,j,d[3];
+    list f7 = h,m,d[4];
+    list f8 = m,h,d[4];
+    list f9 = h,n,d[5];
+    list f10 = n,h,d[5];
+    list f11 = n,p,d[6];
+    list f12 = p,n,d[6];
+    list v1 = i,1,f1;
+    list v2 = j,3,f2,f3,f5;
+    list v3 = k,1,f4;
+    list v4 = h,3,f6,f7,f9;
+    list v5 = m,1,f8;
+    list v6 = n,2,f10,f11;
+    list v7 = p,1,f12;
+    G.vertices = v1,v2,v3,v4,v5,v6,v7;
+    G.edges = f1,f3,f5,f7,f9,f11;
+    return (G);
+}
+
+static proc graph610(list d, int i, int j, int k, int h, int m, int n, int p)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = k,h,d[3];
+    list f6 = h,k,d[3];
+    list f7 = k,m,d[4];
+    list f8 = m,k,d[4];
+    list f9 = k,n,d[5];
+    list f10 = n,k,d[5];
+    list f11 = k,p,d[6];
+    list f12 = p,k,d[6];
+    list v1 = i,1,f1;
+    list v2 = j,2,f2,f3;
+    list v3 = k,5,f4,f5,f7,f9,f11;
+    list v4 = h,1,f6;
+    list v5 = m,1,f8;
+    list v6 = n,1,f10;
+    list v7 = p,1,f12;
+    G.vertices = v1,v2,v3,v4,v5,v6,v7;
+    G.edges = f1,f3,f5,f7,f9,f11;
+    return (G);
+}
+
+static proc graph611(list d, int i, int j, int k, int h, int m, int n, int p)
+{
+    graph G;
+    list f1 = i,j,d[1];
+    list f2 = j,i,d[1];
+    list f3 = j,k,d[2];
+    list f4 = k,j,d[2];
+    list f5 = j,h,d[3];
+    list f6 = h,j,d[3];
+    list f7 = j,m,d[4];
+    list f8 = m,j,d[4];
+    list f9 = j,n,d[5];
+    list f10 = n,j,d[5];
+    list f11 = j,p,d[6];
+    list f12 = p,j,d[6];
+    list v1 = i,1,f1;
+    list v2 = j,6,f2,f3,f5,f7,f9,f11;
+    list v3 = k,1,f4;
+    list v4 = h,1,f6;
+    list v5 = m,1,f8;
+    list v6 = n,1,f10;
+    list v7 = p,1,f12;
+    G.vertices = v1,v2,v3,v4,v5,v6,v7;
+    G.edges = f1,f3,f5,f7,f9,f11;
+    return (G);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Auxilary Static Procedures in this Library /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//////// - part     ////////////////////////////////////////////////////////////
-//////// - parts    ////////////////////////////////////////////////////////////
-//////// - logg     ////////////////////////////////////////////////////////////
-//////// - expp     ////////////////////////////////////////////////////////////
-//////// - adams    ////////////////////////////////////////////////////////////
-//////// - wedges   ////////////////////////////////////////////////////////////
-//////// - schur    ////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 
 proc part(poly f, int n)
 "USAGE:     part(f,n); f poly, n int
 RETURN:     poly
-PURPOSE:    return the homogeneous component of degree n of the polynomial f.
+PURPOSE:    computing the homogeneous component of a polynomial.
 EXAMPLE:    example part; shows examples
 "
 {
@@ -120,8 +1551,8 @@ example
 proc parts(poly f, int i, int j)
 "USAGE:     parts(f,i,j); f poly, i int, j int
 RETURN:     poly
-PURPOSE:    return a polynomial which is the sum of the homogeneous components
-            of degree from i to j of the polynomial f.
+THEORY:     computing a polynomial which is the sum of the homogeneous
+            components of a polynomial.
 EXAMPLE:    example parts; shows examples
 "
 {
@@ -140,10 +1571,11 @@ example
     poly f = 1+x+x2+x3+x4+y+y2+y3+z+z2+xy+xz+yz+xyz;
     parts(f,2,4);
 }
+
 proc logg(poly f, int n)
 "USAGE:     logg(f,n); f poly, n int
 RETURN:     poly
-PURPOSE:    computing the Chern character from the total Chern class.
+THEORY:     computing Chern characters from total Chern classes.
 EXAMPLE:    example logg; shows examples
 "
 {
@@ -183,7 +1615,7 @@ example
 proc expp(poly f, int n)
 "USAGE:     expp(f,n); f poly, n int
 RETURN:     poly
-PURPOSE:    computing the total Chern class from the Chern character.
+PURPOSE:    computing total Chern classes from Chern characters.
 EXAMPLE:    example expp; shows examples
 "
 {
@@ -268,15 +1700,38 @@ static proc schur(list p, poly f)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//////// Procedures concerned with varieties ///////////////////////////////////
+//////// Procedures concerned with abstract varieties //////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-proc variety_print(variety V)
+proc printVariety(variety V)
+"USAGE:     printVariety(V); V variety
+ASSUME:     V is an abstract variety
+THEORY:     This is the print function used by Singular to print an abstract
+            variety.
+KEYWORDS:   abstract variety, projective space, Grassmannian
+EXAMPLE:    example printVariety; shows an example
+"
 {
     "A variety of dimension", V.dimension;
 }
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring r = 0, (h,e), wp(1,1);
+    ideal rels = he,h2+e2;
+    variety V = makeVariety(2,rels);
+    V;
+}
 
 proc makeVariety(int d, ideal i)
+"USAGE:     makeVariety(d,i); d int, i ideal
+ASSUME:     d is a nonnegative integer, i is an ideal
+RETURN:     variety
+THEORY:     create an abstract variety which has dimension d, and its Chow ring
+            should be a quotient ring
+KEYWORDS:   abstract variety, projective space, Grassmannian
+EXAMPLE:    example makeVariety; shows an example
+"
 {
     def R = basering;
     variety V;
@@ -285,13 +1740,24 @@ proc makeVariety(int d, ideal i)
     V.relations = i;
     return(V);
 }
-
-proc Dimension(variety V)
+example
 {
-    return (V.dimension);
+    "EXAMPLE:"; echo=2;
+    ring r = 0, (h,e), wp(1,1);
+    ideal rels = he,h2+e2;
+    variety V = makeVariety(2,rels);
+    V;
+    V.dimension;
+    V.relations;
 }
 
 proc ChowRing(variety V)
+"USAGE:     ChowRing(V); V variety
+ASSUME:     V is an abstract variety
+RETURN:     qring
+KEYWORDS:   Chow ring, abstract variety, projective space, Grassmannian
+EXAMPLE:    example makeVariety; shows an example
+"
 {
     def R = V.baseRing;
     setring R;
@@ -299,13 +1765,14 @@ proc ChowRing(variety V)
     qring CR = std(rels);
     return (CR);
 }
-
-proc relations(variety V)
+example
 {
-    def R = V.baseRing;
-    setring R;
-    ideal i = V.relations;
-    return (i);
+    "EXAMPLE:"; echo=2;
+    ring r = 0, (h,e), wp(1,1);
+    ideal rels = he,h2+e2;
+    int d = 2;
+    variety V = makeVariety(2,rels);
+    ChowRing(V);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -313,15 +1780,17 @@ proc relations(variety V)
 proc Grassmannian(int k, int n, list #)
 "USAGE:     Grassmannian(k,n); k int, n int
 RETURN:     variety
-PURPOSE:    create a variety as a Grassmannian G(k,n). This variety has
-            diemnsion k(n-k) and its Chow ring is the quotient ring of a
-            polynomial ring in n-k variables q(1),...,q(n-k) which are the
-            Chern classes of the tautological quotient bundle on the
-            Grassmannian G(k,n), modulo the ideal generated by n-k polynomials
-            which come from the Giambelli formula. The monomial ordering of this
-            ring is 'wp' with vector (1..k,1..n-k). Moreover, we export the
-            Chern characters of the tautological subbundle and quotient bundle
-            on G(k,n) (say 'subBundle' and 'quotientBundle').
+THEORY:     create a Grassmannian G(k,n) as an abstract variety. This abstract
+            variety has diemnsion k(n-k) and its Chow ring is the quotient ring
+            of a polynomial ring in n-k variables q(1),...,q(n-k), which are the
+            Chern classes of tautological quotient bundle on G(k,n), modulo some
+            ideal generated by n-k polynomials which come from the Giambelli
+            formula. The monomial ordering of this Chow ring is 'wp' with vector
+            (1..k,1..n-k). Moreover, we export the Chern characters of
+            tautological subbundle and quotient bundle on G(k,n)
+            (say 'subBundle' and 'quotientBundle').
+KEYWORDS:   Grassmannian, abstract variety, Schubert calculus
+SEE ALSO:   projectiveSpace, projectiveBundle
 EXAMPLE:    example Grassmannian; shows examples
 "
 {
@@ -367,9 +1836,10 @@ EXAMPLE:    example Grassmannian; shows examples
 example
 {
     "EXAMPLE:"; echo=2;
-    def G24 = Grassmannian(2,4);
+    variety G24 = Grassmannian(2,4);
     G24;
-    def r = G24.baseRing; setring r;
+    def r = G24.baseRing;
+    setring r;
     subBundle;
     quotientBundle;
     G24.dimension;
@@ -380,9 +1850,11 @@ example
 proc projectiveSpace(int n, list #)
 "USAGE:     projectiveSpace(n); n int
 RETURN:     variety
-PURPOSE:    create a variety as a projective space of dimension n. The Chow ring
-            is the quotient ring in one variable h modulo the ideal generated by
-            h^(n+1).
+THEORY:     create a projective space of dimension n as an abstract variety. Its
+            Chow ring is a quotient ring in one variable h modulo the ideal
+            generated by h^(n+1).
+KEYWORDS:   projective space, abstract variety
+SEE ALSO:   Grassmannian, projectiveBundle
 EXAMPLE:    example projectiveSpace; shows examples
 "
 {
@@ -418,7 +1890,7 @@ EXAMPLE:    example projectiveSpace; shows examples
 example
 {
     "EXAMPLE:"; echo=2;
-    def P = projectiveSpace(3);
+    variety P = projectiveSpace(3);
     P;
     P.dimension;
     def r = P.baseRing;
@@ -429,8 +1901,12 @@ example
 
 proc projectiveBundle(sheaf S, list #)
 "USAGE:     projectiveBundle(S); S sheaf
+INPUT:      a sheaf on an abstract variety
 RETURN:     variety
-PURPOSE:    create a variety which we work on.
+THEORY:     create a projective bundle as an abstract variety. This is related
+            to the enumeration of conics.
+KEYWORDS:   projective bundle, abstract variety, sheaf, enumeration of conics
+SEE ALSO:   projectiveSpace, Grassmannian
 EXAMPLE:    example projectiveBundle; shows examples
 "
 {
@@ -469,20 +1945,28 @@ EXAMPLE:    example projectiveBundle; shows examples
 example
 {
     "EXAMPLE:"; echo=2;
-    def G35 = Grassmannian(3,5);
-    def R = G35.baseRing;
-    setring R;
-    def S = makeSheaf(G35, subBundle);
-    def B = symmetricPowerSheaf(dualSheaf(S),2);
-    def PB = projectiveBundle(B);
+    variety G = Grassmannian(3,5);
+    def r = G.baseRing;
+    setring r;
+    sheaf S = makeSheaf(G,subBundle);
+    sheaf B = dualSheaf(S)^2;
+    variety PB = projectiveBundle(B);
     PB;
-    def P = PB.baseRing;
-    setring P;
+    def R = PB.baseRing;
+    setring R;
     QuotientBundle;
     ChowRing(PB);
 }
 
 proc productVariety(variety U, variety V)
+"USAGE:     productVariety(U,V); U variety, V variety
+INPUT:      two abstract varieties
+OUTPUT:     a product variety as an abstract variety
+RETURN:     variety
+KEYWORDS:   product variety, abstract variety
+SEE ALSO:   projectiveSpace, Grassmannian, projectiveBundle
+EXAMPLE:    example productVariety; shows examples
+"
 {
     //def br = basering;
     def ur = U.baseRing; setring ur;
@@ -497,17 +1981,34 @@ proc productVariety(variety U, variety V)
     ideal i1 = imap(ur,ii1);
     ideal i2 = imap(vr,ii2);
     W.relations = i1 + i2;
+    setring ur;
+    kill ii1;
+    setring vr;
+    kill ii2;
     //setring br;
     return (W);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    variety P = projectiveSpace(3);
+    variety G = Grassmannian(2,4);
+    variety W = productVariety(P,G);
+    W;
+    W.dimension == P.dimension + G.dimension;
+    def r = W.baseRing;
+    setring r;
+    W.relations;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 proc integral(variety V, poly f)
 "USAGE:     integral(V,f); V variety, f poly
+INPUT:      a abstract variety and a polynomial
 RETURN:     int
-PURPOSE:    compute the intersection numbers.
-EXAMPLE:    example integral; shows examples
+PURPOSE:    computing intersection numbers.
+EXAMPLE:    example integral; shows an example
 "
 {
     def R = V.baseRing;
@@ -518,17 +2019,18 @@ EXAMPLE:    example integral; shows examples
 example
 {
     "EXAMPLE:"; echo=2;
-    def G24 = Grassmannian(2,4);
-    def R = G24.baseRing;
-    setring R;
-    integral(G24,q(1)^4);
+    variety G = Grassmannian(2,4);
+    def r = G.baseRing;
+    setring r;
+    integral(G,q(1)^4);
 }
 
 proc SchubertClass(list p)
 "USAGE:     SchubertClass(p); p list
+INPUT:      a list of integers which is a partition
 RETURN:     poly
-PURPOSE:    compute the Schubert class on a Grassmannian.
-EXAMPLE:    example SchubertClass; shows examples
+PURPOSE:    compute the Schubert classes on a Grassmannian.
+EXAMPLE:    example SchubertClass; shows an example
 "
 {
     def R = basering;
@@ -545,7 +2047,7 @@ EXAMPLE:    example SchubertClass; shows examples
 example
 {
     "EXAMPLE:"; echo=2;
-    def G = Grassmannian(2,4);
+    variety G = Grassmannian(2,4);
     def r = G.baseRing;
     setring r;
     list p = 1,1;
@@ -555,6 +2057,13 @@ example
 ////////////////////////////////////////////////////////////////////////////////
 
 proc dualPartition(int k, int n, list p)
+"USAGE:     dualPartition(k,n,p); k int, n int, p list
+INPUT:      two integers and a partition
+RETURN:     list
+PURPOSE:    compute the dual of a partition.
+SEE ALSO:   SchubertClass
+EXAMPLE:    example dualPartition; shows an example
+"
 {
     while (size(p) < k)
     {
@@ -568,25 +2077,50 @@ proc dualPartition(int k, int n, list p)
     }
     return (l);
 }
-
-////////////////////////////////////////////////////////////////////////////////
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring r = 0,(x),dp;
+    dualPartition(2,4,list(2,1));
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////// Procedures concerned with sheaves ///////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////
-
-proc sheaf_print(sheaf S)
+proc printSheaf(sheaf S)
+"USAGE:     printSheaf(S); S sheaf
+RETURN:     string
+INPUT:      a sheaf
+THEORY:     This is the print function used by Singular to print a sheaf.
+SEE ALSO:   makeSheaf, rankSheaf
+EXAMPLE:    example printSheaf; shows an example
+"
 {
-    def V = S.currentVariety;
-    def R = V.baseRing;
-    setring R;
-    poly f = S.ChernCharacter;
-    "A sheaf of rank ", int(part(f,0));
+    "A sheaf of rank ", rankSheaf(S);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    variety X;
+    X.dimension = 4;
+    ring r = 0,(c(1..2),d(1..3)),wp(1..2,1..3);
+    setring r;
+    X.baseRing = r;
+    poly c = 1 + c(1) + c(2);
+    poly ch = 2 + logg(c,4);
+    sheaf S = makeSheaf(X,ch);
+    S;
 }
 
 proc makeSheaf(variety V, poly ch)
+"USAGE:     makeSheaf(V,ch); V variety, ch poly
+RETURN:     sheaf
+THEORY:     create a sheaf on an abstract variety, and its Chern character is
+            the polynomial ch.
+SEE ALSO:   printSheaf, rankSheaf
+EXAMPLE:    example makeSheaf; shows an example
+"
 {
     def R = basering;
     sheaf S;
@@ -594,26 +2128,30 @@ proc makeSheaf(variety V, poly ch)
     S.ChernCharacter = ch;
     return(S);
 }
-
-proc currentVariety(sheaf S)
+example
 {
-    return (S.currentVariety);
-}
-
-proc ChernCharacter(sheaf S)
-{
-    return (S.ChernCharacter)
+    "EXAMPLE:"; echo=2;
+    variety X;
+    X.dimension = 4;
+    ring r = 0,(c(1..2),d(1..3)),wp(1..2,1..3);
+    setring r;
+    X.baseRing = r;
+    poly c = 1 + c(1) + c(2);
+    poly ch = 2 + logg(c,4);
+    sheaf S = makeSheaf(X,ch);
+    S;
 }
 
 proc rankSheaf(sheaf S)
 "USAGE:     rankSheaf(S); S sheaf
 RETURN:     int
-INPUT:      S -- a sheaf
-OUTPUT:     an integer which is the rank of the sheaf S.
-EXAMPLE:    example rankSheaf(S); shows examples
+INPUT:      S is a sheaf
+OUTPUT:     a positive integer which is the rank of a sheaf.
+SEE ALSO:   makeSheaf, printSheaf
+EXAMPLE:    example rankSheaf; shows an example
 "
 {
-    def V = S.currentVariety;
+    variety V = S.currentVariety;
     def R = V.baseRing;
     setring R;
     poly f = S.ChernCharacter;
@@ -622,22 +2160,23 @@ EXAMPLE:    example rankSheaf(S); shows examples
 example
 {
     "EXAMPLE:"; echo=2;
-    def G24 = Grassmannian(2,4);
-    def R = G24.baseRing;
+    variety G = Grassmannian(2,4);
+    def R = G.baseRing;
     setring R;
-    def S = makeSheaf(G24,subBundle);
+    sheaf S = makeSheaf(G,subBundle);
     rankSheaf(S);
 }
 
 proc totalChernClass(sheaf S)
-"USAGE:     totalChernClass(S); f sheaf
+"USAGE:     totalChernClass(S); S sheaf
 RETURN:     poly
-INPUT:      S -- a sheaf
-OUTPUT:     a polynomial which is the total Chern class of the sheaf S
-EXAMPLE:    example totalChernClass(S); shows examples
+INPUT:      S is a sheaf
+OUTPUT:     a polynomial which is the total Chern class of a sheaf
+SEE ALSO:   totalSegreClass, topChernClass, ChernClass
+EXAMPLE:    example totalChernClass; shows an example
 "
 {
-    def V = S.currentVariety;
+    variety V = S.currentVariety;
     int d = V.dimension;
     def R = V.baseRing;
     setring R;
@@ -646,18 +2185,57 @@ EXAMPLE:    example totalChernClass(S); shows examples
     ideal rels = std(V.relations);
     return (reduce(f,rels));
 }
+example
+{
+    "EXAMPLE:"; echo=2;
+    variety X;
+    X.dimension = 4;
+    ring r = 0,(c(1..2),d(1..3)),wp(1..2,1..3);
+    setring r;
+    X.baseRing = r;
+    poly c = 1 + c(1) + c(2);
+    poly ch = 2 + logg(c,4);
+    sheaf E = makeSheaf(X,ch);
+    sheaf S = E^3;
+    totalChernClass(S);
+}
 
 proc ChernClass(sheaf S, int i)
+"USAGE:     ChernClass(S,i); S sheaf, i int
+INPUT:      S is a sheaf, i is a nonnegative integer
+RETURN:     poly
+THEORY:     This is the i-th Chern class of a sheaf
+SEE ALSO:   topChernClass, totalChernClass
+EXAMPLE:    example ChernClass; shows an example
+"
 {
     return (part(totalChernClass(S),i));
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    variety X;
+    X.dimension = 4;
+    ring r = 0,(c(1..2),d(1..3)),wp(1..2,1..3);
+    setring r;
+    X.baseRing = r;
+    poly c = 1 + c(1) + c(2);
+    poly ch = 2 + logg(c,4);
+    sheaf E = makeSheaf(X,ch);
+    sheaf S = E^3;
+    ChernClass(S,1);
+    ChernClass(S,2);
+    ChernClass(S,3);
+    ChernClass(S,4);
 }
 
 proc topChernClass(sheaf S)
 "USAGE:     topChernClass(S); S sheaf
 RETURN:     poly
-INPUT:      S -- a sheaf
-OUTPUT:     the top Chern class of the sheaf S
-EXAMPLE:    example topChernClass(S); shows examples
+INPUT:      S is a sheaf
+THEORY:     This is the top Chern class of a sheaf
+SEE ALSO:   ChernClass, totalChernClass
+EXAMPLE:    example topChernClass; shows an example
 "
 {
     return (ChernClass(S,rankSheaf(S)));
@@ -665,24 +2243,25 @@ EXAMPLE:    example topChernClass(S); shows examples
 example
 {
     "EXAMPLE:"; echo=2;
-    def G24 = Grassmannian(2,4);
-    def R = G24.baseRing;
+    variety G = Grassmannian(2,4);
+    def R = G.baseRing;
     setring R;
-    def S = makeSheaf(G24,quotientBundle);
-    def B = symmetricPowerSheaf(S,3);
+    sheaf S = makeSheaf(G,quotientBundle);
+    sheaf B = S^3;
     topChernClass(B);
 }
 
 proc totalSegreClass(sheaf S)
 "USAGE:     totalSegreClass(S); S sheaf
 RETURN:     poly
-INPUT:      S -- a sheaf
-OUTPUT:     a polynomial which is the total Segre class of the sheaf S.
-EXAMPLE:    example totalSegreClass(S); shows examples
+INPUT:      S is a sheaf
+THEORY:     This is the total Segre class of a sheaf.
+SEE AlSO:   totalChernClass
+EXAMPLE:    example totalSegreClass; shows an example
 "
 {
     //def D = dualSheaf(S);
-    def V = S.currentVariety;
+    variety V = S.currentVariety;
     def R = V.baseRing;
     setring R;
     poly f = totalChernClass(S);
@@ -702,22 +2281,22 @@ EXAMPLE:    example totalSegreClass(S); shows examples
 example
 {
     "EXAMPLE:"; echo=2;
-    def G24 = Grassmannian(2,4);
-    def R = G24.baseRing;
+    variety G = Grassmannian(2,4);
+    def R = G.baseRing;
     setring R;
-    def S = makeSheaf(G24,subBundle);
+    sheaf S = makeSheaf(G,subBundle);
     totalSegreClass(S);
 }
 
 proc dualSheaf(sheaf S)
 "USAGE:     dualSheaf(S); S sheaf
 RETURN:     sheaf
-INPUT:      S -- a sheaf
-OUTPUT:     the dual of the sheaf S
-EXAMPLE:    example dualSheaf(S); shows examples
+THEORY:     This is the dual of a sheaf
+SEE ALSO:   addSheaf, symmetricPowerSheaf, tensorSheaf, quotSheaf
+EXAMPLE:    example dualSheaf; shows examples
 "
 {
-    def V = S.currentVariety;
+    variety V = S.currentVariety;
     int d = V.dimension;
     def R = V.baseRing;
     setring R;
@@ -731,24 +2310,25 @@ EXAMPLE:    example dualSheaf(S); shows examples
 example
 {
     "EXAMPLE:"; echo=2;
-    def G24 = Grassmannian(2,4);
-    def R = G24.baseRing;
+    variety G = Grassmannian(2,4);
+    def R = G.baseRing;
     setring R;
-    def S = makeSheaf(G24,subBundle);
-    dualSheaf(S);
+    sheaf S = makeSheaf(G,subBundle);
+    sheaf D = dualSheaf(S);
+    D;
 }
 
 proc tensorSheaf(sheaf A, sheaf B)
 "USAGE:     tensorSheaf(A,B); A sheaf, B sheaf
 RETURN:     sheaf
-INPUT:      A, B -- two sheaves
-OUTPUT:     the tensor of two sheaves A and B
-EXAMPLE:    example tensorSheaf(A,B); shows examples
+THEORY:     This is the tensor product of two sheaves
+SEE ALSO:   addSheaf, symmetricPowerSheaf, quotSheaf, dualSheaf
+EXAMPLE:    example tensorSheaf; shows examples
 "
 {
     sheaf S;
-    def V1 = A.currentVariety;
-    def V2 = B.currentVariety;
+    variety V1 = A.currentVariety;
+    variety V2 = B.currentVariety;
     def R1 = V1.baseRing;
     setring R1;
     poly c1 = A.ChernCharacter;
@@ -776,24 +2356,24 @@ EXAMPLE:    example tensorSheaf(A,B); shows examples
 example
 {
     "EXAMPLE:"; echo=2;
-    def G34 = Grassmannian(3,4);
-    def R = G34.baseRing;
+    variety G = Grassmannian(3,4);
+    def R = G.baseRing;
     setring R;
-    def S = makeSheaf(G34,subBundle);
-    def Q = makeSheaf(G34, quotientBundle);
-    S*Q;
+    sheaf S = makeSheaf(G,subBundle);
+    sheaf Q = makeSheaf(G,quotientBundle);
+    sheaf T = S*Q;
+    T;
 }
 
 proc symmetricPowerSheaf(sheaf S, int n)
 "USAGE:     symmetricPowerSheaf(S,n); S sheaf, n int
 RETURN:     sheaf
-INPUT:      S -- a sheaf
-            n -- an integer
-OUTPUT:     the n-th symmetric power of the sheaf S
-EXAMPLE:    example symmetricPowerSheaf(S,n); shows examples
+THEORY:     This is the n-th symmetric power of a sheaf
+SEE ALSO:   quotSheaf, addSheaf, tensorSheaf, dualSheaf
+EXAMPLE:    example symmetricPowerSheaf; shows examples
 "
 {
-    def V = S.currentVariety;
+    variety V = S.currentVariety;
     def R = V.baseRing;
     setring R;
     int r = rankSheaf(S);
@@ -830,19 +2410,28 @@ EXAMPLE:    example symmetricPowerSheaf(S,n); shows examples
 example
 {
     "EXAMPLE:"; echo=2;
-    def G24 = Grassmannian(2,4);
-    def R = G24.baseRing;
+    variety G = Grassmannian(2,4);
+    def R = G.baseRing;
     setring R;
-    def S = makeSheaf(G24,quotientBundle);
-    def B = symmetricPowerSheaf(S,3);
+    sheaf S = makeSheaf(G,quotientBundle);
+    sheaf B = symmetricPowerSheaf(S,3);
     B;
+    sheaf A = S^3;
+    A;
+    A.ChernCharacter == B.ChernCharacter;
 }
 
-proc minusSheaf(sheaf A, sheaf B)
+proc quotSheaf(sheaf A, sheaf B)
+"USAGE:     quotSheaf(A,B); A sheaf, B sheaf
+RETURN:     sheaf
+THEORY:     This is the quotient of two sheaves
+SEE ALSO:   addSheaf, symmetricPowerSheaf, tensorSheaf, dualSheaf
+EXAMPLE:    example quotSheaf; shows an example
+"
 {
     sheaf S;
-    def V1 = A.currentVariety;
-    def V2 = B.currentVariety;
+    variety V1 = A.currentVariety;
+    variety V2 = B.currentVariety;
     def R1 = V1.baseRing;
     setring R1;
     poly c1 = A.ChernCharacter;
@@ -865,12 +2454,36 @@ proc minusSheaf(sheaf A, sheaf B)
         return (S);
     }
 }
+example
+{
+    "EXAMPLE:"; echo=2;
+    variety G = Grassmannian(3,5);
+    def r = G.baseRing;
+    setring r;
+    sheaf S = makeSheaf(G,subBundle);
+    sheaf B = dualSheaf(S)^2;
+    sheaf B3 = dualSheaf(S)^3;
+    sheaf B5 = dualSheaf(S)^5;
+    variety PB = projectiveBundle(B);
+    def R = PB.baseRing;
+    setring R;
+    sheaf Q = makeSheaf(PB,QuotientBundle);
+    sheaf V = dualSheaf(Q)*B3;
+    sheaf A = B5 - V;
+    A;
+}
 
-proc plusSheaf(sheaf A, sheaf B)
+proc addSheaf(sheaf A, sheaf B)
+"USAGE:     addSheaf(A,B); A sheaf, B sheaf
+RETURN:     sheaf
+THEORY:     This is the direct sum of two sheaves.
+SEE ALSO:   quotSheaf, symmetricPowerSheaf, tensorSheaf, dualSheaf
+EXAMPLE:    example addSheaf; shows an example
+"
 {
     sheaf S;
-    def V1 = A.currentVariety;
-    def V2 = B.currentVariety;
+    variety V1 = A.currentVariety;
+    variety V2 = B.currentVariety;
     def R1 = V1.baseRing;
     setring R1;
     poly c1 = A.ChernCharacter;
@@ -893,66 +2506,16 @@ proc plusSheaf(sheaf A, sheaf B)
         return (S);
     }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-
-proc geometricMultiplicity(ideal I, ideal J)
-"USAGE:     geometricMultiplicity(I,J); I,J = ideals
-RETURN:     int
-INPUT:      I, J -- two ideals
-OTPUT:      an integer which is the intersection multiplicity of two subvarieties
-            defined by the ideals I, J at the origin.
-EXAMPLE:    example geometricMultiplicity(I,J); shows examples
-"
-{
-    def R = basering;
-    setring R;
-    ideal K = I + J;
-    int v = vdim(std(K));
-    return (v);
-}
 example
 {
     "EXAMPLE:"; echo=2;
-    ring r = 0, (x,y,z,w), ds;
-    ideal I = xz,xw,yz,yw;
-    ideal J = x-z,y-w;
-    geometricMultiplicity(I,J);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-proc serreMultiplicity(ideal I, ideal J)
-"USAGE:     serreMultiplicity(I,J); I,J = ideals
-RETURN:     int
-INPUT:      I, J -- two ideals
-OUTPUT:     the intersection multiplicity (defined by J. P. Serre)
-            of two subvarieties defined by the ideals I, J at the origin.
-EXAMPLE:    example serreMultiplicity(I,J); shows examples
-"
-{
-    def R = basering;
-    setring R;
-    int i = 0;
-    int s = 0;
-    module m = std(Tor(i,I,J));
-    int t = sum(hilb(m,2));
-    kill m;
-    while (t != 0)
-    {
-        s = s + ((-1)^i)*t;
-        i++;
-        module m = std(Tor(i,I,J));
-        t = sum(hilb(m,2));
-        kill m;
-    }
-    return (s);
-}
-example
-{
-    "EXAMPLE:"; echo=2;
-    ring r = 0, (x,y,z,w), ds;
-    ideal I = xz,xw,yz,yw;
-    ideal J = x-z,y-w;
-    serreMultiplicity(I,J);
+    variety G = Grassmannian(3,5);
+    def r = G.baseRing;
+    setring r;
+    sheaf S = makeSheaf(G,subBundle);
+    sheaf Q = makeSheaf(G,quotientBundle);
+    sheaf D = S + Q;
+    D;
+    D.ChernCharacter == rankSheaf(D);
+    totalChernClass(D) == 1;
 }
