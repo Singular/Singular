@@ -724,7 +724,7 @@ EXAMPLE:example MVComplex; shows an example
              because we want to plug in the same root r in all s-parametric
              annihilators we computed for L[i]  ->this will ensure  we can compute
              the maps of the MV complex*/
-          minroot=Derham::minIntRoot(findminintroot);
+          minroot=minIntRootD(findminintroot);
           for (j=1; j<=i; j++)
             {
               for (k=1; k<=k1[j]; k++)
@@ -810,7 +810,7 @@ EXAMPLE:example MVComplex; shows an example
                    computed above,because we want to plug in the same root r in all
                    s-parametric annihilators we computed for L[i]  ->this will
                    ensure  we can compute the maps of the MV complex*/
-              minroot=Derham::minIntRoot(findminintroot);
+              minroot=minIntRootD(findminintroot);
               for (j=1; j<=i; j++)
                 {
                   for (k=1; k<=k1[j]; k++)
@@ -4229,7 +4229,7 @@ static proc globalBFunOT(list L,list #)
    list L=fetch(W,L);
    for (i=1; i<=size(G4); i++)
      {
-       minmax[i]=Derham::minIntRoot(G4[i],1);
+       minmax[i]=minIntRootD(G4[i],1);
        if (size(minmax[i])!=0)
          {
            mini=insert(mini,minmax[i][1]+Min(L[i][2]));
@@ -5530,8 +5530,8 @@ static proc nDeg (matrix M,intvec m)
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-static proc minIntRoot(list L,list #)
-"USAGE:minIntRoot(L [,M]); L list, M optinonal list
+static proc minIntRootD(list L,list #)
+"USAGE:minIntRootD(L [,M]); L list, M optinonal list
 ASSUME:L a list of univariate polynomials with rational coefficients @*
        the variable of the polynomial is s if size(#)==0 (needed for proc
        MVComplex) and t else (needed for globalBFun)
