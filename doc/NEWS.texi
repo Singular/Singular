@@ -36,7 +36,7 @@ name spaces (@nref{package})
 @end itemize
 Besides theses internal changes, @sc{Singular} version 4 offers many new
 features and functionalities (which were partly already incorporated in
-the 3-1-6 pre-release series).
+the 3-1-6/7 pre-release series).
 
 @heading New commands
 @itemize
@@ -46,7 +46,15 @@ the 3-1-6 pre-release series).
 @heading New libraries
 @itemize
 @item @nref{classifyci_lib}: Isolated complete intersection singularities in characteristic  0
+@item @xref{schubert_lib}:  Proceduces for Intersection Theory
 @end itemize
+
+@heading Changed @sc{Singular} libraries
+@itemize @bullet
+@item
+improved grobcov.lib (@nref{grobcov_lib})
+@end itemize
+
 
 @heading Porting
 
