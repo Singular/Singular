@@ -27,8 +27,8 @@ in this new branch of @sc{Singular} but @sc{Singular 3} will receive bug fixes f
 
 @heading New @sc{Singular} libraries
 @itemize @bullet
-@item new library: classifyci.lib: Isolated complete intersection singularities in characteristic  0 (@nref{classifyci_lib})
-@item new library: schubert.lib:  Proceduces for Intersection Theory (@nref{schubert_lib})
+@item classifyci.lib: Isolated complete intersection singularities in characteristic  0 (@nref{classifyci_lib})
+@item schubert.lib:  Proceduces for Intersection Theory (@nref{schubert_lib})
 @end itemize
 
 @heading Changed @sc{Singular} libraries
