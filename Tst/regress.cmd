@@ -748,7 +748,7 @@ sub tst_check
         $exit_status = Diff($root);
         if ($exit_status)
         {
-	  unless ($verbosity == 0)
+	  unless ($verbosity < 3)
 	  {
 	    print "\n";
 	    mysystem("$cat \"$root.diff\"");
