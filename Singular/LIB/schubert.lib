@@ -1,6 +1,5 @@
-//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 version="version schubert.lib 4.0.0.0 Jun_2013 "; // $Id$
-
 category="Algebraic Geometry";
 info="
 LIBRARY:    Schubert.lib    Proceduces for Intersection Theory
@@ -16,29 +15,6 @@ OVERVIEW:
     In particular, we implement the concrete varieties such as projective spaces
     , Grassmannians, and projective bundles.
 
-<<<<<<< HEAD
-PROCEDURES:
-    makeVariety(int,ideal)            create a variety
-    productVariety(variety,variety)   product of two varieties
-    ChowRing(variety)                 create the Chow ring of a variety
-    dimension(variety)                dimension of a variety
-    relations(variety)                relations of a variety
-    Grassmannian(int,int)             create a Grassmannian as a variety
-    projectiveSpace(int)              create a projective space as a variety
-    projectiveBundle(sheaf)           create a projective bundle as a variety
-    integral(variety,poly)            degree of a 0-cycle on a variety
-    makeSheaf(variety,poly)           create a sheaf
-    ChernCharacter(sheaf)             the Chern character of a sheaf
-    totalChernClass(sheaf)            the total Chern class of a sheaf
-    ChernClass(sheaf,int)             the k-th Chern class of a sheaf
-    topChernClass(sheaf)              the top Chern class of a sheaf
-    totalSegreClass(sheaf)            the total Segre class of a sheaf
-    dualSheaf(sheaf)                  the dual of a sheaf
-    tensorSheaf(sheaf,sheaf)          the tensor of two sheaves
-    symmetricPowerSheaf(sheaf,int)    the k-th symmetric power of a sheaf
-    minusSheaf(sheaf,sheaf)           the quotient of two sheaves
-    plusSheaf(sheaf,sheaf)            the direct sum of two sheaves
-=======
     An important task of this library is related to the computation of
     Gromov-Witten invariants. In particular, we implement new tools for the
     computation in equivariant intersection theory. These tools are based on the
@@ -47,7 +23,6 @@ PROCEDURES:
     we have to deal with moduli spaces of stable maps, which were introduced by
     Kontsevich, and the graphs corresponding to the fixed point components of a
     torus action on the moduli spaces of stable maps.
->>>>>>> 2ba3231... chg: new version of schubert.lib
 
 REFERENCES:
 
@@ -1765,12 +1740,7 @@ EXAMPLE:    example makeVariety; shows an example
     V.relations = i;
     return(V);
 }
-<<<<<<< HEAD
-
-proc dimension(variety V)
-=======
 example
->>>>>>> 2ba3231... chg: new version of schubert.lib
 {
     "EXAMPLE:"; echo=2;
     ring r = 0, (h,e), wp(1,1);
@@ -1869,10 +1839,7 @@ example
     variety G24 = Grassmannian(2,4);
     G24;
     def r = G24.baseRing;
-<<<<<<< HEAD
-=======
     setring r;
->>>>>>> 2ba3231... chg: new version of schubert.lib
     subBundle;
     quotientBundle;
     G24.dimension;
