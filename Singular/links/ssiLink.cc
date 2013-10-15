@@ -1293,6 +1293,8 @@ BOOLEAN ssiWrite(si_link l, leftv data)
   {
     int tt=data->Typ();
     void *dd=data->Data();
+    if ((dd==NULL) && (data->name!=NULL) && (tt==0)) tt=DEF_CMD;
+      // return pure undefined names as def
 
     switch(tt /*data->Typ()*/)
     {
