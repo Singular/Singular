@@ -27,6 +27,7 @@ PROCEDURES:
  determinacy(f);     an upper bound for the determinacy
 ";
 
+LIB "linalg.lib";
 LIB "elim.lib";
 LIB "primdec.lib";
 LIB "classify.lib";
@@ -474,8 +475,7 @@ proc realmorsesplit(poly f, list #)
 "
 USAGE:    realmorsesplit(f[, mu]); f poly, mu int
 RETURN:   a list consisting of the corank of f, the inertia index, an upper
-          bound for the determinacy, the residual form of f and
-          the transformation
+          bound for the determinacy, and the residual form of f
 NOTE:     The characteristic of the basering must be zero, the monomial order
           must be local, f must be contained in maxideal(2) and the Milnor
           number of f must be finite.
@@ -485,8 +485,7 @@ SEE ALSO: morsesplit
 KEYWORDS: Morse lemma; Splitting lemma
 EXAMPLE:  example morsesplit; shows an example"
 {
-  /* auxiliary variables */
-  int i, j;
+  int i;
 
   /* error check */
   if(char(basering) != 0)
@@ -531,115 +530,84 @@ EXAMPLE:  example morsesplit; shows an example"
       +"non-negative and finite.");
   }
 
-  /* preliminary stuff */
-  list S;
+  /* compute the determinacy */
   int k = determinacy(f, mu);
   f = jet(f, k);
-  def br = basering;
-  map Phi = br, maxideal(1);
-  map phi;
-  poly a, p, r;
 
-  /* treat the variables one by one */
-  for(i = 1; i <= n; i++)
-  {
-    if(jet(f, 2)/var(i) == 0)
-    {
-      S = insert(S, i);
-    }
-    else
-    {
-      f, a, p, r = rewriteformorsesplit(f, k, i);
-      if(jet(a, 0) == 0)
-      {
-        for(j = i+1; j <= n; j++)
-        {
-          if(jet(f, 2)/(var(i)*var(j)) != 0)
-          {
-            break;
-          }
-        }
-        phi = br, maxideal(1);
-        phi[j] = var(j)+var(i);
-        Phi = phi(Phi);
-        f = phi(f);
-      }
-      f, a, p, r = rewriteformorsesplit(f, k, i);
-      while(p != 0)
-      {
-        phi = br, maxideal(1);
-        phi[i] = var(i)-p/(2*jet(a, 0));
-        Phi = phi(Phi);
-        f = phi(f);
-        f, a, p, r = rewriteformorsesplit(f, k, i);
-      }
-    }
-  }
-
-  /* sort variables according to corank */
-  int cr = size(S);
-  phi = br, 0:n;
-  j = 1;
-  for(i = size(S); i > 0; i--)
-  {
-    phi[S[i]] = var(j);
-    j++;
-  }
-  for(i = 1; i <= n; i++)
-  {
-    if(phi[i] == 0)
-    {
-      phi[i] = var(j);
-      j++;
-    }
-  }
-  Phi = phi(Phi);
-  f = phi(f);
-
-  /* compute the inertia index lambda */
+  /* get jet(f, 2) right */
+  matrix H = concat(jet(jacob(jacob(f)), 0)/2, unitmat(n));
+  H = sym_reduce(H);
+  intvec perm_zero;
+  intvec perm_neg;
+  intvec perm_pos;
+  int c;
   int lambda;
-  list negCoeff, posCoeff;
-  number ai;
-  poly f2 = jet(f, 2);
   for(i = 1; i <= n; i++)
   {
-    ai = number(f2/var(i)^2);
-    if(ai < 0)
+    if(H[i, i] == 0)
     {
+      perm_zero = perm_zero, i;
+      c++;
+    }
+    if(H[i, i] < 0)
+    {
+      perm_neg = perm_neg, i;
       lambda++;
-      negCoeff = insert(negCoeff, i);
     }
-    if(ai > 0)
+    if(H[i, i] > 0)
     {
-      posCoeff = insert(posCoeff, i);
+      perm_pos = perm_pos, i;
     }
   }
-
-  /* sort variables according to lambda */
-  phi = br, maxideal(1);
-  j = cr+1;
-  for(i = size(negCoeff); i > 0; i--)
+  intvec perm;
+  if(size(perm_zero) > 1)
   {
-    phi[negCoeff[i]] = var(j);
-    j++;
+    perm = perm, perm_zero[2..size(perm_zero)];
   }
-  for(i = size(posCoeff); i > 0; i--)
+  if(size(perm_neg) > 1)
   {
-    phi[posCoeff[i]] = var(j);
-    j++;
+    perm = perm, perm_neg[2..size(perm_neg)];
   }
-  Phi = phi(Phi);
+  if(size(perm_pos) > 1)
+  {
+    perm = perm, perm_pos[2..size(perm_pos)];
+  }
+  perm = perm[2..size(perm)];
+  matrix T[n][n];
+  matrix D[1][n];
+  for(i = 1; i <= n; i++)
+  {
+    T[1..n, i] = H[perm[i], (n+1)..(2*n)];
+    D[1, i] = H[perm[i], perm[i]];
+  }
+  map phi = basering, matrix(maxideal(1))*transpose(T);
   f = phi(f);
+  f = jet(f, k);
 
-  /* compute residual form */
-  phi = br, maxideal(1);
-  for(i = size(S)+1; i <= n; i++)
+  /* separate the variables */
+  phi = basering, maxideal(1);
+  map corank_part = basering, maxideal(1);
+  for(i = c+1; i <= n; i++)
   {
-    phi[i] = 0;
+    corank_part[i] = 0;
   }
-  f = phi(f);
+  poly h = f-jet(f, 2)-corank_part(f);
+  poly hi;
+  while(h != 0)
+  {
+    for(i = c+1; i <= n; i++)
+    {
+      hi = h/var(i);
+      phi[i] = var(i)-hi/(2*D[1, i]);
+      h = h-hi*var(i);
+    }
+    f = phi(f);
+    f = jet(f, k);
+    h = f-jet(f, 2)-corank_part(f);
+  }
+  poly g = cleardenom(f-jet(f, 2));
 
-  return(list(cr, lambda, k, f, Phi));
+  return(list(c, lambda, k, g));
 }
 example
 {
@@ -648,6 +616,44 @@ example
   ring r = 0, (x,y,z), ds;
   poly f = (x2+3y-2z)^2+xyz-(x-y3+x2z3)^3;
   realmorsesplit(f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/*
+   symmetric Gauss algorithm
+
+   If A is not a square matrix, then the largest upper or left submatrix
+   is assumed to be symmetric.
+*/
+proc sym_reduce(matrix A)
+{
+  int r = nrows(A);
+  int c = ncols(A);
+  int n = r;
+  if(n > c)
+  {
+    n = c;
+  }
+  poly q;
+  int i, j;
+  for(i = 1; i <= n; i++)
+  {
+    for(j = i+1; j <= n; j++)
+    {
+      if(A[i, j] != 0)
+      {
+        while(A[i, i] == 0)
+        {
+          A[1..r, i] = A[1..r, i]+A[1..r, j];
+          A[i, 1..c] = A[i, 1..c]+A[j, 1..c];
+        }
+        q = A[i, j]/A[i, i];
+        A[1..r, j] = A[1..r, j]-q*A[1..r, i];
+        A[j, 1..c] = A[j, 1..c]-q*A[i, 1..c];
+      }
+    }
+  }
+  return(A);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
