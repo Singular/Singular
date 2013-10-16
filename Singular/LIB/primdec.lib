@@ -50,6 +50,7 @@ LIB "matrix.lib";
 LIB "triang.lib";
 LIB "absfact.lib";
 LIB "ring.lib";
+LIB "ringutils.lib";
 ///////////////////////////////////////////////////////////////////////////////
 //
 //                      Gianni/Trager/Zacharias
@@ -3729,7 +3730,15 @@ example
  NOTE:  Algorithm of Kemper
  EXAMPLE: example zeroRad; shows an example
 {
-   if(homog(I)==1){return(maxideal(1));}
+   dbprint(printlevel-voice, " zeroRad(I) call ");
+   dbprint(printlevel-voice, " R=baserint =  ",basering);
+   dbprint(printlevel-voice, " I=  ", I);
+   dbprint(printlevel-voice, " #  ", #);
+   if( homog(I)==1 )
+   {
+     dbprint(printlevel-voice, " zeroRad returned ideal =maxideal(1) " );
+      return( maxideal(1) ); 
+   }
    //I needs to be a reduced standard basis
    def R=basering;
    int m=npars(R);
@@ -3746,7 +3755,9 @@ example
        if(e[i]!=0) break;
      }
      I[1]=sep(I[1],i)[1];
-     return(interred(I));
+     dbprint(printlevel-voice, " zeroRad returned ideal interred(I)  = ", interred(I) );
+
+     return( interred(I) );
    }
    intvec op=option(get);
 
@@ -3766,9 +3777,15 @@ example
    if((k==0)||(m==0)) //the separable case
    {
     intvec save=option(get);option(redSB);
-    I=interred(I+F);option(set,save);return(I);
+    I=interred(I+F);option(set,save);
+    dbprint(printlevel-voice, " zeroRad returned ideal I = ",I);
+    return(I);
    }
-   I=simplify(I,1);
+
+   dbprint(printlevel-voice, " I = ",I);
+   I=simplify(I,1); 
+   dbprint(printlevel-voice, " simplified I = ",I);
+    
 
    for(i=1;i<=n;i++)             //consider all polynomials over
    {                             //Fp(t(1)^(p^-k),...,t(m)^(p^-k))
@@ -3778,8 +3795,17 @@ example
    string cR="ring @R="+string(p)+",("+parstr(R)+","+varstr(R)+"),dp;";
    execute(cR);
    ideal F=imap(R,F);
+   // jk: fixing variable name conflict
+   def varList = splitString( varstr(R),"," );
+   def parList = splitString( parstr(R),"," );
 
-   string nR="ring @S="+string(p)+",(y(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
+   varList = extendList(varList, parList );
+
+   // get variable name, which has no conflicts with existing ones.
+   string newVarPrefix = getNewVariableName( varList );
+
+   string nR = "ring @S="+string(p)+",("+newVarPrefix+"(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
+  
    execute(nR);
 
    ideal G=fetch(@R,F);    //G[i](t(1)^(p^-k),...,t(m)^(p^-k),x(i))=sep(F[i])
@@ -3787,16 +3813,16 @@ example
    ideal I=imap(R,I);
    ideal J=I+G;
    poly el=1;
-   k=p^k;
+   k=p^k; 
    for(i=1;i<=m;i++)
    {
       J=J,var(i)^k-var(m+n+i);
-      el=el*y(i);
+      el=el*var(i);
    }
-
    J=eliminate(J,el);
    setring R;
    ideal J=imap(@S,J);
+   dbprint(printlevel-voice, " zeroRad returned ideal = ",J);
    return(J);
 }
 example
@@ -5856,9 +5882,10 @@ static proc radicalSL(ideal I, list #)
   while(stop == 0)
   {
     dbprint (printlevel-voice, "// We call radLoopR to find new prime ideals.");
-    primes = radicalSLIteration(I, rad);                         // A list of primes or intersections of primes, not included in P
+    primes = radicalSLIteration(I, rad);                       
+    dbprint (printlevel-voice, "// A list of primes or intersections of primes, not included in P = rad(I) ");
     dbprint (printlevel - voice, "// Output of Iteration Step:");
-    dbprint (printlevel - voice, primes);
+    dbprint (printlevel - voice, "primes: ", primes);
     if (size(primes) > 0)
     {
       dbprint (printlevel - voice, "// We intersect P with the ideal just obtained.");

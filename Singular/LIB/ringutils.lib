@@ -1,0 +1,251 @@
+version="$Id$";
+category="   ";
+info=" 
+LIBRARY:  ringutils.lib    utils for ring usage 
+AUTHORS:  Jakob Kroeker,  kroeker@math.uni-hannover.de,
+
+OVERVIEW:
+
+  A helper library for usage of rings.
+
+PROCEDURES:
+
+
+getNewVariableName(); get a variable name which is not in conflict with given ones
+
+getNewRingVariableName(); get a  variable name which is not in conflict with variables of a given ring
+";
+
+
+LIB "stringutils.lib"; 
+LIB "listutils.lib";
+
+
+static proc hasNamePrefixConflict( string newVariableName, existingVariableNameList  )
+"
+USAGE:    @code{getNewVariableName( newVariableName, existingVariableNameList );}
+ 
+PARAMETERS:
+
+@code{varList}: a list of variable names which should not be in conflict with the new name
+
+RETURN:
+
+     true, if the @code{newVariableName} is in conflict with one of the names in the given @code{existingVariableNameList}
+@*   false otherwise.
+
+
+EXAMPLE:  example hasNamePrefixConflict;
+"
+{
+
+  int    idx;
+  string variableName;
+
+  for (idx=1; idx<= size(existingVariableNameList); idx++)
+  {
+       variableName = existingVariableNameList[ idx ]; 
+
+     if ( size( variableName )==0 )     {   ERROR("variable name is emply");          }
+
+     if ( variableName[1] ==" " )           {    ERROR("variable has leading white space");    }
+     if ( 1 == find( variableName, newVariableName) )
+     {
+        return (1); // there is a prefix conflict.
+     }
+  }
+  return(0);
+}
+example
+{
+    ring rng = 0,(x,y,z(1) ),dp;    
+    def  variableStringArray = varstr(rng);
+    def  parameterStringArray = varstr(rng);
+    def variableNameList = splitString( variableStringArray, "," );
+    def parameterNameList = splitString( parameterStringArray, "," );
+    def nameList = extendList(variableNameList, parameterNameList);
+   
+    string newVariableName = "x";
+    // check for conflict of "x" with rng variables:
+    int hasConflict = hasNamePrefixConflict( newVariableName, nameList  );
+    hasConflict;
+}
+
+//  test for 'hasNamePrefixConflict' procedure. 
+// 'testHasNamePrefixConflict' is not part of the user interface
+// 'testHasNamePrefixConflict' has to be public, since 1. otherwise it cannot be accessed in a test file.
+// 2. Also for that setup it is possible to quickly rerun a selected test inside of Singular.
+// 3. the test is not too far away from the code and changes are higher that the test gets updated 
+proc testHasNamePrefixConflict()
+"
+USAGE:    @code{testHasNamePrefixConflict(  );} // throws an error in case the test fails 
+"{
+    ring rng = 0,(x,y,z(1) ),dp;
+    def  varListString = varstr(rng);
+    def varList = splitString( varListString,"," );
+ 
+    string newVariableName="x";
+    int hasConflict = hasNamePrefixConflict( newVariableName, varList  );
+    if (not hasConflict) {  ERROR("testStringVariablePrefixConflict : expected conflict with x !");  }
+    
+    newVariableName="z";
+    hasConflict = hasNamePrefixConflict( newVariableName, varList  );
+    if (not hasConflict) {  ERROR("testStringVariablePrefixConflict : expected conflict with z !");  }
+
+    newVariableName="a";
+    hasConflict = hasNamePrefixConflict(  newVariableName,varList );
+    if (hasConflict) 
+    {  ERROR("testStringVariablePrefixConflict :  conflict with a not expected !");  }
+}
+
+
+proc getNewVariableName( varList )
+"
+USAGE:    @code{getNewVariableName( varList );}
+ 
+PARAMETERS:
+
+@code{varList}: a list of variable names which should not be in conflict with the new name
+
+RETURN:
+
+   a variable name which is not in conflict with given variable names.
+
+
+EXAMPLE:  example getNewVariableName;
+"
+{
+
+   string alphabet="abcdefghijklmnopqrstuvwxyz";
+   
+   proc rndPos(alphabet)
+   {
+       int rndPos = random( 1, size(alphabet) );  
+       return (rndPos);
+   }
+   
+  string newVarName = "" ;
+
+  int maxTrials = 100;
+  int trial  = 1;
+
+  while (trial <= maxTrials)
+  {
+     newVarName = "x" + alphabet[ rndPos(alphabet) ];
+
+     if ( 0 == hasNamePrefixConflict(newVarName, varList) )
+     {
+       return (newVarName); 
+     }
+    
+     trial = trial+1;
+  }
+  ERROR("getNewVariableName: failed to create a new variable prefix");
+
+}
+example
+{
+    ring rng = 0,(x,y,z(1) ),dp;
+    def  variableStringArray = varstr(rng);
+    def  parameterStringArray = parstr(rng);
+    //
+    variableStringArray;
+    //
+    parameterStringArray;
+    //
+    def variableNameList = splitString( variableStringArray, "," );
+    def parameterNameList = splitString( parameterStringArray, "," );
+    //
+    variableNameList;
+    //
+    parameterNameList;
+    //
+    def nameList = extendList(variableNameList, parameterNameList);
+    //
+    nameList;
+    //
+    // get a variable name which is not in conflict with ring variables and parameters:
+    string newVariableName = getNewVariableName( nameList );
+    newVariableName;
+}
+
+
+
+proc getNewRingVariableName( rng )
+"
+USAGE:    @code{getNewRingVariableName( rng );}
+ 
+PARAMETERS:
+
+@code{rng}: a ring 
+
+RETURN:
+
+   a variable name which is not in conflict with existing variables and parameters of given ring.
+
+
+EXAMPLE:  example getNewRingVariableName;
+"
+{
+
+   def varList = Stringutils::splitString( varstr(rng),"," );
+   def parList = Stringutils::splitString( parstr(rng),"," );
+
+   varList=Listutils::extendList(varList, parList );
+
+   return (getNewVariableName(varList));
+
+}
+example
+{
+    ring rng = 0,(x,y,z(1) ),dp;
+    string newVariableName = getNewVariableName(rng);
+    newVariableName;
+}
+
+
+//  test for 'getNewVariableName' procedure. 
+// 'testGetNewVariableName' is not part of the user interface
+// 'testGetNewVariableName' has to be public, since 1. otherwise it cannot be accessed in a test file.
+// 2. Also for that setup it is possible to quickly rerun a selected test inside of Singular.
+// 3. the test is not too far away from the code and changes are higher that the test gets updated 
+proc testGetNewVariableName()
+"
+USAGE:    @code{testGetNewVariableName(  );} // throws an error in case the test fails 
+"
+{
+   system("reference");
+    ring rng = 0,(x,y,z(1) ),dp;
+    def  varListString = varstr(rng);
+    def varList = splitString( varListString, "," );
+ 
+    string newVarPrefix = getNewVariableName(rng);
+    if ( size(newVarPrefix)<2 ) {  ERROR("testGetNewVariablePrefix: new variable too short ") ; }
+    if ( hasNamePrefixConflict( newVarPrefix,varList) ) 
+    {  ERROR("testGetNewVariablePrefix: there is a potential name conflict ") ; }
+}
+
+//  test for 'getNewRingVariableName' procedure. 
+// 'testGetNewRingVariableName' is not part of the user interface
+// 'testGetNewRingVariableName' has to be public, since 1. otherwise it cannot be accessed in a test file.
+// 2. Also for that setup it is possible to quickly rerun a selected test inside of Singular.
+// 3. the test is not too far away from the code and changes are higher that the test gets updated 
+proc testGetNewRingVariableName()
+"
+USAGE:    @code{testGetNewRingVariableName(  );} // throws an error in case the test fails 
+"
+{
+   system("reference");
+    ring rng = 0,(x,y,z(1) ),dp;
+ 
+    string newVarPrefix = getNewRingVariableName(rng);
+    if ( size(newVarPrefix)<2 ) {  ERROR("testGetNewVariablePrefix: new variable too short ") ; }
+
+    def  varListString = varstr(rng);
+    def varList = splitString( varListString, "," );
+
+    if ( hasNamePrefixConflict( newVarPrefix,varList) ) 
+    {  ERROR("testGetNewVariablePrefix: there is a potential name conflict ") ; }
+}
+
+
