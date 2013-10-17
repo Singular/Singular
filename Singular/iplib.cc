@@ -540,7 +540,7 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, sleftv* sl)
     case LANG_C:
                  leftv res = (leftv)omAlloc0Bin(sleftv_bin);
                  err = (pi->data.o.function)(res, sl);
-                 iiRETURNEXPR.Copy(res);
+                 memcpy(&iiRETURNEXPR,res,sizeof(iiRETURNEXPR));
                  omFreeBin((ADDRESS)res,  sleftv_bin);
                  break;
   }
