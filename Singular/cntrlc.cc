@@ -199,9 +199,9 @@ struct sigcontext_struct {
         unsigned long oldmask;
         unsigned long cr2;
 };
+typedef struct sigcontext_struct sigcontext;
 #endif
 #define HAVE_SIGSTRUCT
-typedef struct sigcontext_struct sigcontext;
 #endif
 
 #if defined(x86_64_Linux)
