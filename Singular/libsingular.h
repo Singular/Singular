@@ -7,7 +7,7 @@
 #include <kernel/structs.h>
 #include <kernel/polys.h>
 #include <coeffs/numbers.h>
-#include <libpolys/coeffs/longrat.h>
+#include <coeffs/longrat.h>
 #include <kernel/febase.h>
 #include <polys/monomials/ring.h>
 #include <omalloc/omalloc.h>
