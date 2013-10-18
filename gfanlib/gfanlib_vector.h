@@ -100,7 +100,7 @@ public:
     {
       if(size()<b.size())return true;
       if(size()>b.size())return false;
-      for(int i=0;i<size();i++)
+      for(unsigned i=0;i<size();i++)
         {
           if(v[i]<b[i])return true;
           if(b[i]<v[i])return false;
