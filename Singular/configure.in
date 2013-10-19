@@ -696,8 +696,8 @@ test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib"
 test "x$includedir" = 'x${prefix}/include' && includedir="${exec_prefix}/include"
 
 # add to -I to CPPFLAGS and and -L to LDFLAGS, just to be sure
-LDFLAGS="-L ${libdir} ${LDFLAGS}"
-CPPFLAGS="-I ${includedir} ${CPPFLAGS}"
+LDFLAGS="-L${libdir} ${LDFLAGS}"
+CPPFLAGS="-I${includedir} ${CPPFLAGS}"
 
 # this is a work-around to include the right term.h
 if test "$ac_cv_singuname" = SunOS-5; then
