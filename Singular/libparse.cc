@@ -1620,11 +1620,7 @@ YY_RULE_SETUP
                printpi(pi);
                pi_clear(pi);
              }
-             #ifdef STANDALONE_PARSER
              pi = (procinfo *)malloc(sizeof(procinfo));
-             #else
-             pi = (procinfo *)omAlloc(sizeof(procinfo));
-             #endif
              iiInitSingularProcinfo(pi, newlib, proc, yylplineno,
                                     current_pos(0), p_static);
              #else /*STANDALONE_PARSER*/
