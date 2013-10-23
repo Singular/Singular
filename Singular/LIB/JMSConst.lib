@@ -36,7 +36,9 @@ PROCEDURES:
 BorelCheck(ideal,r)       checks whether the given ideal is Borel
 JMarkedScheme(list, list, list, int)  computes authomatically all the J-marked scheme
 ";
-LIB "all.lib";
+LIB "presolve.lib";
+LIB "qhmoduli.lib";
+LIB "monomialideal.lib";
 ////////////////////////////////////////////////////////////////////
 proc BorelCheck(ideal Borid,def r)
 "USAGE:    BorelCheck(Borid,r); Borid ideal, r ring
