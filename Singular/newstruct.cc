@@ -86,29 +86,35 @@ char * newstruct_String(blackbox *b, void *d)
     {
       StringAppendS(a->name);
       StringAppendS("=");
-      char *tmp=StringEndS();
       if ((!RingDependend(a->typ))
       || ((l->m[a->pos-1].data==(void *)currRing)
          && (currRing!=NULL)))
       {
-        StringSetS(tmp);
         if (l->m[a->pos].rtyp==LIST_CMD)
         {
           StringAppendS("<list>");
         }
-        else
+        else if (l->m[a->pos].rtyp<=MAX_TOK)
         {
           char *tmp2=l->m[a->pos].String();
           if ((strlen(tmp2)>80)||(strchr(tmp2,'\n')!=NULL))
           {
-            StringAppend("<%s>",Tok2Cmdname(l->m[a->pos].rtyp));
+            StringAppendS("<");
+            StringAppendS(Tok2Cmdname(l->m[a->pos].rtyp));
+            StringAppendS(">");
           }
           else StringAppendS(tmp2);
           omFree(tmp2);
         }
+	else
+        {
+          StringAppendS("<");
+          StringAppendS(Tok2Cmdname(l->m[a->pos].rtyp));
+          StringAppendS(">");
+        }
+
       }
       else StringAppendS("??");
-      omFree(tmp);
       if (a->next==NULL) break;
       StringAppendS("\n");
       if(errorreported) break;
