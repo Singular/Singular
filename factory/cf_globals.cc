@@ -12,7 +12,6 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include "cf_switches.h"
 
 //{{{ extern const char factoryVersion[];
 //{{{ docu
@@ -40,15 +39,3 @@ extern const char factoryVersion[] = "@(#) factoryVersion = " FACTORYVERSION;
 extern const char factoryConfiguration[] = "@(#) factoryConfiguration = " FACTORYCONFIGURATION;
 //}}}
 
-//{{{ CFSwitches cf_glob_switches;
-//{{{ docu
-//
-// cf_glob_switches - factory switches.
-//
-// This is the only object of type CFSwitches in factory.  It is
-// used either directly in the low level algorithms or by the
-// functions On(), Off(), isOn() defined in canonicalform.cc.
-//
-//}}}
-CFSwitches cf_glob_switches;
-//}}}

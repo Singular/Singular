@@ -53,17 +53,36 @@ class CFSwitches
 private:
     bool switches [CFSwitchesMax];
 
+    CFSwitches ();
 public:
     // constructors, destructors
-    CFSwitches ();
     ~CFSwitches () {}
 
+    static CFSwitches& getInstance() 
+    {
+       static CFSwitches singleton;
+       return singleton;
+    }
     // selectors
     void On ( int s ) { switches[s] = true; }
     void Off ( int s ) { switches[s] = false; }
     bool isOn ( int s ) const { return switches[s]; }
     bool isOff ( int s ) const { return ! switches[s]; }
 };
+//}}}
+//{{{ CFSwitches cf_glob_switches;
+//{{{ docu
+//
+// cf_glob_switches - factory switches.
+//
+// This is the only object of type CFSwitches in factory.  It is
+// used either directly in the low level algorithms or by the
+// functions On(), Off(), isOn() defined in canonicalform.cc.
+//
+//}}}
+// extern CFSwitches& cf_glob_switches;
+// CFSwitches& cf_glob_switches = CFSwitches::getInstance();
+#define cf_glob_switches (CFSwitches::getInstance())
 //}}}
 
 #endif /* ! INCL_CF_SWITCHES_H */

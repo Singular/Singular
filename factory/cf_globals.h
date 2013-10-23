@@ -20,6 +20,5 @@ extern const char factoryConfiguration[];
 
 /*ENDPUBLIC*/
 
-extern CFSwitches cf_glob_switches;
 
 #endif /* ! INCL_CF_GLOBALS_H */
