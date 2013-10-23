@@ -1934,13 +1934,16 @@ char * iiStringMatrix(matrix im, int dim,char ch)
   int j,jj = MATCOLS(im);
   poly *pp = im->m;
   StringSetS("");
+  char ch_s[2];
+  ch_s[0]=ch;
+  ch_s[1]='\0';
 
   for (i=0; i<ii; i++)
   {
     for (j=0; j<jj; j++)
     {
       pString0(*pp++);
-      StringAppend("%c",ch);
+      StringAppendS(ch_s);
       if (dim > 1) StringAppendS("\n");
     }
   }
