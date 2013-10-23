@@ -778,6 +778,10 @@ char * iiStringMatrix(matrix im, int dim, const ring r, char ch)
   int i,ii = MATROWS(im);
   int j,jj = MATCOLS(im);
   poly *pp = im->m;
+  char ch_s[2];
+  ch_s[0]=ch;
+  ch_s[1]='\0';
+
   StringSetS("");
 
   for (i=0; i<ii; i++)
@@ -785,7 +789,7 @@ char * iiStringMatrix(matrix im, int dim, const ring r, char ch)
     for (j=0; j<jj; j++)
     {
       p_String0(*pp++, r);
-      StringAppend("%c",ch);
+      StringAppendS(ch_s);
       if (dim > 1) StringAppendS("\n");
     }
   }
