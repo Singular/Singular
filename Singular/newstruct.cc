@@ -97,16 +97,25 @@ char * newstruct_String(blackbox *b, void *d)
         {
           StringAppendS("<list>");
         }
-        else
+        else if (l->m[a->pos].rtyp<=MAX_TOK)
         {
           char *tmp2=omStrDup(l->m[a->pos].String());
           if ((strlen(tmp2)>80)||(strchr(tmp2,'\n')!=NULL))
           {
-            StringAppend("<%s>",Tok2Cmdname(l->m[a->pos].rtyp));
+            StringAppendS("<");
+            StringAppendS(Tok2Cmdname(l->m[a->pos].rtyp));
+            StringAppendS(">");
           }
           else StringAppendS(tmp2);
           omFree(tmp2);
         }
+	else
+        {
+          StringAppendS("<");
+          StringAppendS(Tok2Cmdname(l->m[a->pos].rtyp));
+          StringAppendS(">");
+        }
+
       }
       else StringAppendS("??");
       if (a->next==NULL) break;
