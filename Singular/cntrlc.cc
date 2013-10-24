@@ -171,7 +171,7 @@ si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler)
 
 
 /*---------------------------------------------------------------------*/
-#if defined(ix86_Linux)
+#if defined(__linux__) && defined(__i386)
   #if !defined(HAVE_SIGCONTEXT) && !defined(HAVE_ASM_SIGCONTEXT_H)
 // we need the following structure sigcontext_struct.
 // if configure finds asm/singcontext.h we assume
@@ -206,7 +206,7 @@ struct sigcontext_struct {
 typedef struct sigcontext_struct sigcontext;
 #endif
 
-#if defined(x86_64_Linux)
+#if defined(__linux__) && defined(__amd64)
 #define HAVE_SIGSTRUCT
 #endif
 
