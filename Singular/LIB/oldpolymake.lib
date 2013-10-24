@@ -86,9 +86,13 @@ KEYWORDS:    polytope; fan; secondary fan; secondary polytope; polymake;
 LIB "poly.lib";
 LIB "linalg.lib";
 LIB "random.lib";
-LIB "polymake.so";
 ////////////////////////////////////////////////////////////////////////////////
 
+static proc mod_init ()
+{
+  LIB "gfanlib.so";
+  LIB "polymake.so";
+}
 
 /////////////////////////////////////////////////////////////////////////////
 /// PROCEDURES USING POLYMAKE
@@ -1668,7 +1672,7 @@ EXAMPLE: example picksFormula;   shows an example"
   // Pick's formula says that the lattice area A, the number g of interior 
   // points and
   // the number b of boundary points are connected by the formula: A=b+2g-2
-  return(list(area,bdpts,(area-bdpts+2)/2));
+  return(list(area,bdpts,(area-bdpts+2) div 2));
 }
 example
 {
