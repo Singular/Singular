@@ -199,7 +199,7 @@ const char* feSetOptValue(feOptIndex opt, int optarg)
     if (feOptSpec[opt].type == feOptString)
       return "option value needs to be an integer";
 
-    feOptSpec[opt].value = (void*) optarg;
+    feOptSpec[opt].value = (void*)(long) optarg;
   }
   return feOptAction(opt);
 }

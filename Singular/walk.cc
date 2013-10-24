@@ -2184,8 +2184,8 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
         Overflow_Error = TRUE;
         PrintS("\n// ** OVERFLOW in \"MwalkNextWeightCC\": ");
         mpz_out_str( stdout, 10, vec[j]);
-        PrintS(" is greater than 2147483647 (max. integer representation)");
-        Print("\n//  So vector[%d] := %d is wrong!!\n",j+1, vec[j]);
+        PrintS(" is greater than 2147483647 (max. integer representation)\n");
+        //Print("//  So vector[%d] := %d is wrong!!\n",j+1, vec[j]);// vec[j] is mpz_t
       }
     }
   }
