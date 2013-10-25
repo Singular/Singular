@@ -12,7 +12,7 @@ PROCEDURES:
  elim2(id,..)         variables .. eliminated from id (different algorithm)
  nselect(id,v)        select generators not containing variables given by v
  sat(id,j)            saturated quotient of ideal/module id by ideal j
- select(id,v])        select generators containing all variables given by v
+ select(id,v)         select generators containing all variables given by v
  select1(id,v)        select generators containing one variable given by v
            (parameters in square brackets [] are optional)
 ";
@@ -429,6 +429,7 @@ EXAMPLE: example elim; shows an example
   }
   int pr = printlevel - voice + 2;   //for ring display if printlevel > 0
   def BR = basering;
+  intvec save_opt=option(get);
   list lER;                          //for list returned by elimRing
 //-------------------------------- check input -------------------------------
   poly vars;
@@ -537,6 +538,7 @@ EXAMPLE: example elim; shows an example
      "// result is a SB in the following ring:";
       ER;
    }
+   option(set,save_opt);
    setring BR;
    return(imap(ER,id));
 }
