@@ -6,26 +6,18 @@
 #include <polymake/Integer.h>
 #include <polymake/Set.h>
 #include <polymake/common/lattice_tools.h>
-// #include <polymake/perl/macros.h>
-// #include <polymake/IncidenceMatrix.h>
+#include <polymake/IncidenceMatrix.h>
 
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>
 
 #include <kernel/mod2.h>
-// #include <kernel/structs.h>
-// #include <kernel/febase.h>
 #include <libpolys/misc/intvec.h>
-
-// #include <callgfanlib/bbcone.h>
-// #include <callgfanlib/bbfan.h>
-// #include <callgfanlib/bbpolytope.h>
-
-// #include <Singular/blackbox.h>
-// #include <Singular/ipshell.h>
-// #include <Singular/subexpr.h>
-// #include <Singular/tok.h>
-
+#include <libpolys/coeffs/numbers.h>
+#include <libpolys/coeffs/bigintmat.h>
+#include <Singular/lists.h>
+#include <Singular/ipid.h> // for bigints,
+// is there really nothing better than this?
 
 /* Functions for converting Integers, Rationals and their Matrices
    in between C++, gfan, polymake and singular */
@@ -135,6 +127,19 @@ int PmInteger2Int(const polymake::Integer& pi, bool &ok)
   return i;
 }
 
+number PmInteger2Number (const polymake::Integer& pi)
+{
+  mpz_class cache(pi.get_rep());
+  long m = 268435456;
+  if(mpz_cmp_si(cache.get_mpz_t(),m))
+  {
+    int temp = (int) mpz_get_si(cache.get_mpz_t());
+    return n_Init(temp,coeffs_BIGINT);
+  }
+  else
+    return n_InitMPZ(cache.get_mpz_t(),coeffs_BIGINT);
+}
+
 intvec* PmVectorInteger2Intvec (const polymake::Vector<polymake::Integer>* vi, bool &ok)
 {
   intvec* iv = new intvec(vi->size());
@@ -160,16 +165,83 @@ intvec* PmMatrixInteger2Intvec (polymake::Matrix<polymake::Integer>* mi, bool &o
   return iv;
 }
 
-// intvec* PmIncidenceMatrix2Intvec (polymake::IncidenceMatrix<polymake::NonSymmetric>* icmat)
-// {
-//   int rows = icmat->rows();
-//   int cols = icmat->cols();
-//   intvec* iv = new intvec(rows,cols,0);
-//   for (int r = 1; r <= rows; r++)
-//     for (int c = 1; c <= cols; c++)
-//       IMATELEM(*iv,r,c) = (int) (*icmat).row(r).exists(c);
-//   return iv;
-// }
+bigintmat* PmMatrixInteger2Bigintmat (polymake::Matrix<polymake::Integer>* mi)
+{
+  int rows = mi->rows();
+  int cols = mi->cols();
+  bigintmat* bim= new bigintmat(rows,cols,coeffs_BIGINT);
+  const polymake::Integer* pi = concat_rows(*mi).begin();
+  for (int r = 1; r <= rows; r++)
+    for (int c = 1; c <= cols; c++)
+    {
+      number temp = PmInteger2Number(*pi);
+      bim->set(r,c,temp);
+      n_Delete(&temp,coeffs_BIGINT);
+      pi++;
+    }
+  return bim;
+}
+
+lists PmIncidenceMatrix2ListOfIntvecs (polymake::IncidenceMatrix<polymake::NonSymmetric>* icmat)
+{
+  int rows = icmat->rows();
+  int cols = icmat->cols();
+  lists L = (lists)omAllocBin(slists_bin);
+  L->Init(rows);
+
+  for (int r = 0; r < rows; r++)
+  {
+    intvec* iv = new intvec(cols); int i=0;
+    for (int c = 0; c < cols; c++)
+    {
+      if ((*icmat).row(r).exists(c))
+      { (*iv)[i]=c; i++; }
+    }
+    iv->resize(i);
+    L->m[r].rtyp = INTVEC_CMD;
+    L->m[r].data = (void*) iv;
+  }
+
+  return L;
+}
+
+lists PmAdjacencyMatrix2ListOfEdges (polymake::IncidenceMatrix<polymake::NonSymmetric>* icmat)
+{
+  int rows = icmat->rows();
+  int cols = icmat->cols();
+
+  // counting number of edges
+  int i=0; int r, c;
+  for (r=0; r<rows; r++)
+  {
+    for (c=0; c<cols; c++)
+    {
+      if ((*icmat).row(r).exists(c) && r<c)
+        i++;
+    }
+  }
+
+  lists L = (lists)omAllocBin(slists_bin);
+  L->Init(i);
+
+  i=0;
+  for (r=0; r<rows; r++)
+  {
+    for (c=0; c<cols; c++)
+    {
+      if ((*icmat).row(r).exists(c) && r<c)
+      {
+        intvec* iv = new intvec(2);
+        (*iv)[0]=r; (*iv)[1]=c;
+        L->m[i].rtyp = INTVEC_CMD;
+        L->m[i].data = (void*) iv;
+        i++;
+      }
+    }
+  }
+
+  return L;
+}
 
 intvec* PmSetInteger2Intvec (polymake::Set<polymake::Integer>* si, bool &b)
 {

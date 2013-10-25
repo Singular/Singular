@@ -282,7 +282,7 @@ the number of elements in the hilbertBasis can be computed through Polymake::nHi
 @smallexample
 @c example no_comp
   intmat M[3][3]=1,2,-1, 1,-1,2, 1,-1,-1;
-  cone c = coneViaRays(M);
+  cone c = coneViaPoints(M);
   Polymake::hilbertBasis(c);
 @c example
 @end smallexample
@@ -526,13 +526,13 @@ int
 @smallexample
 @c example no_comp
   intmat M[2][2]=1,0, 0,1;
-  cone c1 = coneViaRays(M);
+  cone c1 = coneViaPoints(M);
   Polymake::isSmooth(c1);
   intmat N[3][3]=1,0, 1,2;
-  cone c2 = coneViaRays(N);
+  cone c2 = coneViaPoints(N);
   Polymake::isSmooth(c2);
   intmat M[2][2]=1,0, 0,1;
-  cone c = coneViaRays(M);
+  cone c = coneViaPoints(M);
   fan F1 = emptyFan(2);
   insertCone(F1,c);
   Polymake::isSmooth(F1);
@@ -933,7 +933,7 @@ the number of lattice points in p.
 @end smallexample
 @end table
 @c --------------------------------------------------------------------------------
-@node normalFan(polymake),visual,nLatticePoints,polymake_so
+@node normalFan(polymake),vertexAdjacencyGraph,nLatticePoints,polymake_so
 @subsubsection normalFan
 @cindex normalFan
 @table @code
@@ -947,14 +947,59 @@ the normal fan of p.
 @smallexample
 @c example no_comp
   intmat M[6][4] = 1,1,0,0, 1,0,1,0, 1,0,-1,0, 1,0,0,1, 1,0,0,-1, 1,-1,0,0;
-  polytope p = Polymake::polytopeViaPoints(M);
+  polytope p = polytopeViaPoints(M);
   fan f = normalFan(p);
   f;
 @c example
 @end smallexample
 @end table
 @c --------------------------------------------------------------------------------
-@node visual,,normalFan(polymake),polymake_so
+@node vertexAdjacencyGraph,vertexEdgeGraph,normalFan(polymake),polymake_so
+@subsubsection vertexAdjacencyGraph
+@cindex vertexAdjacencyGraph
+@table @code
+@item @strong{Syntax:}
+@code{Polymake::vertexAdjacencyGraph(} polytope p @code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+the first entry is a bigintmat containing all vertices as row vectors,
+and therefore assigning all vertices an integer.
+the second entry is a list of intvecs representing the adjacency graph of the vertices of p,
+the intvec in position i contains all vertices j which are connected to vertex i 
+via an edge of p.
+@item @strong{Example:}
+@smallexample
+@c example no_comp
+  intmat M[6][4] = 1,1,0,0, 1,0,1,0, 1,0,-1,0, 1,0,0,1, 1,0,0,-1, 1,-1,0,0;
+  polytope p = polytopeViaPoints(M);
+  list L = Polymake::vertexAdjacencyGraph(p);
+  L;
+@c example
+@c --------------------------------------------------------------------------------
+@node vertexEdgeGraph,visual,vertexAdjacencyGraph,polymake_so
+@subsubsection vertexEdgeGraph
+@cindex vertexEdgeGraph
+@table @code
+@item @strong{Syntax:}
+@code{Polymake::vertexEdgeGraph(} polytope p @code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+the first entry is a bigintmat containing all vertices as row vectors,
+and therefore assigning all vertices an integer.
+the second entry is a list of intvecs representing the edge graph of the vertices of p,
+each intvec represents an edge of p connecting vertex i with vertex j.
+@item @strong{Example:}
+@smallexample
+@c example no_comp
+  intmat M[6][4] = 1,1,0,0, 1,0,1,0, 1,0,-1,0, 1,0,0,1, 1,0,0,-1, 1,-1,0,0;
+  polytope p = polytopeViaPoints(M);
+  list L = Polymake::vertexEdgeGraph(p);
+  L;
+@c example
+@c --------------------------------------------------------------------------------
+@node visual,,vertexEdgeGraph,polymake_so
 @subsubsection visual
 @cindex visual
 @table @code
@@ -969,7 +1014,7 @@ the normal fan of p.
 @smallexample
 @c example no_comp
   intmat M[6][4] = 1,1,0,0, 1,0,1,0, 1,0,-1,0, 1,0,0,1, 1,0,0,-1, 1,-1,0,0;
-  polytope p = Polymake::polytopeViaPoints(M);
+  polytope p = polytopeViaPoints(M);
   Polymake::visual(p);
   fan f = normalFan(p);
   Polymake::visual(f);

@@ -1,12 +1,3 @@
-#include <polymake_conversion.h>
-
-#include <dyn_modules/callgfanlib/bbcone.h>
-#include <dyn_modules/callgfanlib/bbfan.h>
-#include <dyn_modules/callgfanlib/bbpolytope.h>
-
-#include <Singular/blackbox.h>
-#include <Singular/ipshell.h>
-#include <Singular/subexpr.h>
 #include <Singular/ipid.h>
 
 void init_polymake_help()
@@ -202,5 +193,15 @@ void init_polymake_help()
     "USAGE:    normalFan(polytope p)\nRETURN:   fan,\nKEYWORDS: polytopes; polymake; visualization;\nEXAMPLE:  example visual shows an example\n";
 
     module_help_proc("polymake.so","normalFan", normalFan_help);
+
+  const char* vertexAdjacencyGraph_help =
+    "USAGE:    vertexAdjacencyGraph(polytope p)\nRETURN:   list,\nKEYWORDS: polytopes; polymake;\nEXAMPLE:  example visual shows an example\n";
+
+    module_help_proc("polymake.so","vertexAdjacencyGraph", normalFan_help);
+
+  const char* vertexEdgeGraph_help =
+    "USAGE:    vertexEdgeGraph(polytope p)\nRETURN:   list,\nKEYWORDS: polytopes; polymake;\nEXAMPLE:  example visual shows an example\n";
+
+    module_help_proc("polymake.so","vertexEdgeGraph", normalFan_help);
 
 }
