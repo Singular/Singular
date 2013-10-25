@@ -58,7 +58,7 @@ public:
     // constructors, destructors
     ~CFSwitches () {}
 
-    static CFSwitches& getInstance() 
+    static inline CFSwitches& getInstance() 
     {
        static CFSwitches singleton;
        return singleton;
