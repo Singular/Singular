@@ -108,7 +108,18 @@ int siRand();
 #define ABS(x) ((x)<0?(-(x)):(x))
 #endif
 
-extern omBin char_ptr_bin;
+class CGlobals
+{
+ public: 
+ static inline const omBin& getCharPtrBin()
+ {
+  static omBin _char_ptr_bin = omGetSpecBin(sizeof(char*));
+  return _char_ptr_bin;
+ }
+};
+
+#define char_ptr_bin (CGlobals::getCharPtrBin())
+
 
 #endif
 

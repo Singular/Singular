@@ -25,8 +25,6 @@
 
 /* init bins */
 
-omBin char_ptr_bin = omGetSpecBin(sizeof(char*));
-
 /*0 implementation*/
 
 /*2
