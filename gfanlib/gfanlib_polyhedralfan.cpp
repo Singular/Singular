@@ -351,7 +351,7 @@ ZMatrix generatorsOfLinealitySpace=cones.begin()->generatorsOfLinealitySpace();/
       set<int> indices;
 
       bool notAll=false;
-      for(int j=0;j<theCone.indices.size();j++)
+      for(unsigned j=0;j<theCone.indices.size();j++)
         if(dot(rays[theCone.indices[j]],facetCandidates[i]).sign()==0)
           indices.insert(theCone.indices[j]);
         else
@@ -394,7 +394,7 @@ ZMatrix generatorsOfLinealitySpace=cones.begin()->generatorsOfLinealitySpace();/
 
 void addFacesToSymmetricComplex(SymmetricComplex &c, ZCone const &cone, ZMatrix const &facetCandidates, ZMatrix const &generatorsOfLinealitySpace)
 {
-  ZMatrix const &rays=c.getVertices();
+  // ZMatrix const &rays=c.getVertices();
   std::set<int> indices;
 
 //  for(int j=0;j<rays.getHeight();j++)if(cone.contains(rays[j]))indices.insert(j);
@@ -501,7 +501,7 @@ SymmetricComplex PolyhedralFan::toSymmetricComplex()const
           return symCom;
 }
 
-std::string PolyhedralFan::toString(int flags)const
+std::string PolyhedralFan::toString(int /*flags*/)const
 //void PolyhedralFan::printWithIndices(class Printer *p, bool printMultiplicities, SymmetryGroup *sym, bool group, bool ignoreCones, bool xml, bool tPlaneSort, vector<string> const *comments)const
 {
   stringstream ret;

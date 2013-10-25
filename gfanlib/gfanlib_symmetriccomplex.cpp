@@ -14,9 +14,9 @@
 namespace gfan{
 
 SymmetricComplex::Cone::Cone(std::set<int> const &indices_, int dimension_, Integer multiplicity_, bool sortWithSymmetry, SymmetricComplex const &complex):
+  isKnownToBeNonMaximalFlag(false),
   dimension(dimension_),
   multiplicity(multiplicity_),
-  isKnownToBeNonMaximalFlag(false),
   sortKeyPermutation(complex.n)
 {
   indices=IntVector(indices_.size());
@@ -26,7 +26,7 @@ SymmetricComplex::Cone::Cone(std::set<int> const &indices_, int dimension_, Inte
 
   ZMatrix const &vertices=complex.getVertices();
   ZVector sum(vertices.getWidth());
-  for(int i=0;i<indices.size();i++)
+  for(unsigned i=0;i<indices.size();i++)
     sum+=vertices[indices[i]];
 
   if(sortWithSymmetry)
@@ -55,17 +55,17 @@ void SymmetricComplex::Cone::remap(SymmetricComplex &complex)
 {
   ZMatrix const &vertices=complex.getVertices();
   ZVector sum(vertices.getWidth());
-  for(int i=0;i<indices.size();i++)
+  for(unsigned i=0;i<indices.size();i++)
     sum+=vertices[indices[i]];
 
   int n=sum.size();
   Permutation const &bestPermutation=sortKeyPermutation;
 
-  assert(bestPermutation.size()==n);
+  assert((int)bestPermutation.size()==n);
 
   IntVector indicesNew(indices.size());
   int I=0;
-  for(int i=0;i<indices.size();i++,I++)
+  for(unsigned i=0;i<indices.size();i++,I++)
     {
       ZVector ny=bestPermutation.apply(complex.vertices[indices[i]]);
       std::map<ZVector,int>::const_iterator it=complex.indexMap.find(ny);
@@ -79,7 +79,7 @@ void SymmetricComplex::Cone::remap(SymmetricComplex &complex)
 std::set<int> SymmetricComplex::Cone::indexSet()const
 {
   std::set<int> ret;
-  for(int i=0;i<indices.size();i++)
+  for(unsigned i=0;i<indices.size();i++)
     ret.insert(indices[i]);
 
   return ret;
@@ -88,11 +88,11 @@ std::set<int> SymmetricComplex::Cone::indexSet()const
 bool SymmetricComplex::Cone::isSubsetOf(Cone const &c)const
 {
   int next=0;
-  for(int i=0;i<indices.size();i++)
+  for(unsigned i=0;i<indices.size();i++)
     {
       while(1)
         {
-          if(next>=c.indices.size())return false;
+          if(next>=(int)c.indices.size())return false;
           if(indices[i]==c.indices[next])break;
           next++;
         }
@@ -104,7 +104,7 @@ bool SymmetricComplex::Cone::isSubsetOf(Cone const &c)const
 SymmetricComplex::Cone SymmetricComplex::Cone::permuted(Permutation const &permutation, SymmetricComplex const &complex, bool withSymmetry)const
 {
   std::set<int> r;
-  for(int i=0;i<indices.size();i++)
+  for(unsigned i=0;i<indices.size();i++)
     {
       ZVector ny=permutation.apply(complex.vertices[indices[i]]);
       std::map<ZVector,int>::const_iterator it=complex.indexMap.find(ny);
@@ -138,7 +138,7 @@ bool SymmetricComplex::Cone::isSimplicial(int linealityDim)const
 ZMatrix SymmetricComplex::Cone::orthogonalComplement(SymmetricComplex &complex)const
 {
   ZMatrix l;
-  for(int i=0;i<indices.size();i++)
+  for(unsigned i=0;i<indices.size();i++)
     l.appendRow(complex.vertices[indices[i]]);
 
   return l.reduceAndComputeKernel();
@@ -149,9 +149,9 @@ ZMatrix SymmetricComplex::Cone::orthogonalComplement(SymmetricComplex &complex)c
 
 SymmetricComplex::SymmetricComplex(ZMatrix const &rays, ZMatrix const &linealitySpace_, SymmetryGroup const &sym_):
   n(rays.getWidth()),
+  linealitySpace(canonicalizeSubspace(linealitySpace_)),
   sym(sym_),
-  dimension(-1),
-  linealitySpace(canonicalizeSubspace(linealitySpace_))
+  dimension(-1)
 {
   assert(rays.getWidth()==linealitySpace.getWidth());
 //  vertices=rowsToIntegerMatrix(v,n);
@@ -221,13 +221,12 @@ bool SymmetricComplex::isMaximal(Cone const &c)const
   return true;
 }
 
-/*
+#if 0
 IntVector SymmetricComplex::dimensionsAtInfinity()const
 {
   /* Using a double description like method this routine computes the
      dimension of the intersection of each cone in the complex with
      the plane x_0=0 */
-/*
   IntVector ret(cones.size());
 
   int I=0;
@@ -246,7 +245,7 @@ IntVector SymmetricComplex::dimensionsAtInfinity()const
     }
   return ret;
 }
-*/
+#endif
 
 void SymmetricComplex::buildConeLists(bool onlyMaximal, bool compressed, std::vector<std::vector<IntVector > >*conelist/*, ZMatrix *multiplicities*/)const
 {
@@ -258,21 +257,21 @@ void SymmetricComplex::buildConeLists(bool onlyMaximal, bool compressed, std::ve
     {
       int numberOfOrbitsOutput=0;
       int numberOfOrbitsOfThisDimension=0;
-      bool newDimension=true;
+      // bool newDimension=true;
         {
           int I=0;
           for(ConeContainer::const_iterator i=cones.begin();i!=cones.end();i++,I++)
-                  if(i->dimension==d)
-                    {
-                  numberOfOrbitsOfThisDimension++;
+            if(i->dimension==d)
+            {
+              numberOfOrbitsOfThisDimension++;
               if(!onlyMaximal || isMaximal(*i))
                 {
                   numberOfOrbitsOutput++;
-                  bool isMax=isMaximal(*i);
-                  bool newOrbit=true;
+                  // bool isMax=isMaximal(*i);
+                  // bool newOrbit=true;
                   std::set<std::set<int> > temp;
-                    for(SymmetryGroup::ElementContainer::const_iterator k=sym.elements.begin();k!=sym.elements.end();k++)
-                      {
+                  for(SymmetryGroup::ElementContainer::const_iterator k=sym.elements.begin();k!=sym.elements.end();k++)
+                    {
                         Cone temp1=i->permuted(*k,*this,false);
                         temp.insert(temp1.indexSet());
                         if(compressed)break;
@@ -290,17 +289,17 @@ void SymmetricComplex::buildConeLists(bool onlyMaximal, bool compressed, std::ve
                           if(newDimension)*multiplicities << "\t# Dimension "<<d;
                           *multiplicities << std::endl;
                         }*/
-                      newOrbit=false;
-                      newDimension=false;
+                      // newOrbit=false;
+                      // newDimension=false;
                     }
-              }
-                    }
+                }
+            }
         }
     }
 
 }
 
-std::string SymmetricComplex::toStringJustCones(int dimLow, int dimHigh, bool onlyMaximal, bool group, std::ostream *multiplicities, bool compressed, bool tPlaneSort)const
+std::string SymmetricComplex::toStringJustCones(int dimLow, int dimHigh, bool onlyMaximal, bool group, std::ostream *multiplicities, bool compressed, bool /*tPlaneSort*/)const
 {
   std::stringstream ret;
 
@@ -391,7 +390,7 @@ ZVector SymmetricComplex::fvector(bool boundedPart)const
       if(boundedPart)
         {
           bool isBounded=true;
-          for(int j=0;j<i->indices.size();j++)
+          for(unsigned j=0;j<i->indices.size();j++)
             if(vertices[i->indices[j]][0].sign()==0)isBounded=false;
           doAdd=isBounded;
         }
@@ -691,7 +690,7 @@ IntegerMatrix SymmetricComplex::boundaryMap(int d)
   ZCone SymmetricComplex::makeZCone(IntVector const &indices)const
   {
     ZMatrix generators(indices.size(),getAmbientDimension());
-    for(int i=0;i<indices.size();i++)
+    for(unsigned i=0;i<indices.size();i++)
       generators[i]=vertices[indices[i]];
     return ZCone::givenByRays(generators,linealitySpace);
   }

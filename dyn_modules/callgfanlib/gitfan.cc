@@ -39,8 +39,8 @@ namespace gitfan
     gfan::ZCone c = f.eta;
     gfan::ZVector v = f.interiorPoint;
     gfan::ZVector w = f.facetNormal;
-    assume(c.ambientDimension() == v.size());
-    assume(c.ambientDimension() == w.size());
+    assume(c.ambientDimension() == (int)v.size());
+    assume(c.ambientDimension() == (int)w.size());
     assume(c.contains(v));
     assume(!c.contains(w));
 #endif
@@ -52,8 +52,8 @@ namespace gitfan
     facetNormal(w)
   {
 #ifndef NDEBUG
-    assume(c.ambientDimension() == v.size());
-    assume(c.ambientDimension() == w.size());
+    assume(c.ambientDimension() == (int)v.size());
+    assume(c.ambientDimension() == (int)w.size());
     assume(c.contains(v));
     assume(!c.contains(w));
 #endif
@@ -65,8 +65,8 @@ namespace gitfan
     gfan::ZCone c = this->eta;
     gfan::ZVector v = this->interiorPoint;
     gfan::ZVector w = this->facetNormal;
-    assume(c.ambientDimension() == v.size());
-    assume(c.ambientDimension() == w.size());
+    assume(c.ambientDimension() == (int)v.size());
+    assume(c.ambientDimension() == (int)w.size());
     assume(c.contains(v));
     assume(!c.contains(w));
 #endif
@@ -113,7 +113,7 @@ static gitfan::facets interiorFacets(const gfan::ZCone &zc, const gfan::ZCone &b
      **/
     return F;
 
-  int index = 0;
+  // int index = 0;
   /* next we iterate over each of the r facets, build the respective cone and add it to the list */
   /* this is the i=0 case */
   gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);

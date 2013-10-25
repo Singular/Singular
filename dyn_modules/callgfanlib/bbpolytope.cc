@@ -37,7 +37,7 @@ std::string bbpolytopeToString(gfan::ZCone const &c)
   return s.str();
 }
 
-void *bbpolytope_Init(blackbox *b)
+void *bbpolytope_Init(blackbox* /*b*/)
 {
   return (void*)(new gfan::ZCone());
 }
@@ -96,7 +96,7 @@ BOOLEAN bbpolytope_Assign(leftv l, leftv r)
   return FALSE;
 }
 
-char* bbpolytope_String(blackbox *b, void *d)
+char* bbpolytope_String(blackbox* /*b*/, void *d)
 { if (d==NULL) return omStrDup("invalid object");
    else
    {
@@ -106,7 +106,7 @@ char* bbpolytope_String(blackbox *b, void *d)
    }
 }
 
-void bbpolytope_destroy(blackbox *b, void *d)
+void bbpolytope_destroy(blackbox* /*b*/, void *d)
 {
   if (d!=NULL)
   {
@@ -115,7 +115,7 @@ void bbpolytope_destroy(blackbox *b, void *d)
   }
 }
 
-void* bbpolytope_Copy(blackbox*b, void *d)
+void* bbpolytope_Copy(blackbox* /*b*/, void *d)
 {
   gfan::ZCone* zc = (gfan::ZCone*)d;
   gfan::ZCone* newZc = new gfan::ZCone(*zc);
@@ -359,12 +359,6 @@ BOOLEAN vertices(leftv res, leftv args)
   return TRUE;
 }
 
-bigintmat* getFacetNormals(gfan::ZCone* zc)
-{
-  gfan::ZMatrix zmat = zc->getFacets();
-  return zMatrixToBigintmat(zmat);
-}
-
 int getAmbientDimension(gfan::ZCone* zc) // zc is meant to represent a polytope here
 {                                        // hence ambientDimension-1
   return zc->ambientDimension()-1;
@@ -481,9 +475,9 @@ void bbpolytope_setup(SModulFunctions* p)
   // iiAddCproc("","getAmbientDimension",FALSE,getAmbientDimension);
   // iiAddCproc("","getCodimension",FALSE,getAmbientDimension);
   // iiAddCproc("","getDimension",FALSE,getDimension);
-  // iiAddCproc("","getFacetNormals",FALSE,getFacetNormals);
   /********************************************************/
   /* the following functions are identical to those in bbcone.cc */
+  // iiAddCproc("","facets",FALSE,facets);
   // iiAddCproc("","setLinearForms",FALSE,setLinearForms);
   // iiAddCproc("","getLinearForms",FALSE,getLinearForms);
   // iiAddCproc("","setMultiplicity",FALSE,setMultiplicity);

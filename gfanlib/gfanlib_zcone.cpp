@@ -43,13 +43,13 @@ class LpSolver
     dd_rowrange m_input,i;
     dd_colrange d_input,j;
     dd_RepresentationType rep=dd_Inequality;
-    dd_boolean found=dd_FALSE, newformat=dd_FALSE, successful=dd_FALSE;
-    char command[dd_linelenmax], comsave[dd_linelenmax];
+    // dd_boolean found=dd_FALSE, newformat=dd_FALSE, successful=dd_FALSE;
+    // char command[dd_linelenmax], comsave[dd_linelenmax];
     dd_NumberType NT;
 
     (*Error)=dd_NoError;
 
-    rep=dd_Inequality; newformat=dd_TRUE;
+    rep=dd_Inequality; // newformat=dd_TRUE;
 
     m_input=g.getHeight();
     d_input=n+1;
@@ -69,7 +69,7 @@ class LpSolver
       }
     }
 
-    successful=dd_TRUE;
+    // successful=dd_TRUE;
 
     return M;
   }
@@ -107,20 +107,20 @@ class LpSolver
   static bool isFacet(ZMatrix const &g, int index)
   {
     bool ret;
-    dd_MatrixPtr M=NULL,M2=NULL,M3=NULL;
-    dd_colrange d;
+    dd_MatrixPtr M=NULL/*,M2=NULL,M3=NULL*/;
+    // dd_colrange d;
     dd_ErrorType err=dd_NoError;
-    dd_rowset redrows,linrows,ignoredrows, basisrows;
-    dd_colset ignoredcols, basiscols;
-    dd_DataFileType inputfile;
-    FILE *reading=NULL;
+    // dd_rowset redrows,linrows,ignoredrows, basisrows;
+    // dd_colset ignoredcols, basiscols;
+    // dd_DataFileType inputfile;
+    // FILE *reading=NULL;
 
     cddinitGmp();
 
     M=ZMatrix2MatrixGmp(g, &err);
     if (err!=dd_NoError) goto _L99;
 
-    d=M->colsize;
+    // d=M->colsize;
 
     static dd_Arow temp;
     dd_InitializeArow(g.getWidth()+1,&temp);
@@ -338,11 +338,11 @@ public:
 
     if(numberOfRows==0)return;//the full space, so description is already irredundant
 
-    dd_rowset r=NULL;
+    // dd_rowset r=NULL;
     ZMatrix g=inequalities;
     g.append(equations);
 
-    dd_LPSolverType solver=dd_DualSimplex;
+    // dd_LPSolverType solver=dd_DualSimplex;
     dd_MatrixPtr A=NULL;
     dd_ErrorType err=dd_NoError;
 
@@ -401,7 +401,7 @@ public:
     int numberOfInequalities=inequalities.getHeight();
     int numberOfRows=numberOfEqualities+numberOfInequalities;
 
-    dd_rowset r=NULL;
+    // dd_rowset r=NULL;
     ZMatrix g=inequalities;
     g.append(equations);
 
@@ -447,7 +447,7 @@ _L99:
   }
   void dual(ZMatrix const &inequalities, ZMatrix const &equations, ZMatrix &dualInequalities, ZMatrix &dualEquations)
   {
-    int result;
+    // int result;
 
     dd_MatrixPtr A=NULL;
     dd_ErrorType err=dd_NoError;
@@ -471,8 +471,8 @@ _L99:
     dd_FreePolyhedra(poly);
 
     return;
-   _L99:
-    assert(0);
+   // _L99:
+   //  assert(0);
   }
   // this procedure is take from cddio.c.
   static void dd_ComputeAinc(dd_PolyhedraPtr poly)
@@ -555,7 +555,7 @@ _L99:
   {
     int dim2=inequalities.getHeight();
     if(dim2==0)return std::vector<std::vector<int> >();
-    int dimension=inequalities.getWidth();
+    // int dimension=inequalities.getWidth();
 
     dd_MatrixPtr A=NULL;
     dd_ErrorType err=dd_NoError;
@@ -602,9 +602,9 @@ _L99:
     dd_FreePolyhedra(poly);
 
     return ret;
-   _L99:
-    assert(0);
-    return std::vector<std::vector<int> >();
+   // _L99:
+   //  assert(0);
+   //  return std::vector<std::vector<int> >();
   }
 
 };
@@ -706,8 +706,8 @@ void ZCone::ensureStateAsMinimum(int s)const
             }
           inequalities=LpSolver::fastNormals(inequalities2);
           goto noFallBack;
-        fallBack://alternativ (disabled)
-          lpSolver.removeRedundantRows(inequalities,equations,true);
+        // fallBack://alternativ (disabled)
+        //   lpSolver.removeRedundantRows(inequalities,equations,true);
         noFallBack:;
         }
       else
@@ -729,7 +729,7 @@ void ZCone::ensureStateAsMinimum(int s)const
     state=s;
 }
 
-std::ostream &operator<<(std::ostream &f, ZCone const &c)
+void operator<<(std::ostream &f, ZCone const &c)
 {
   f<<"Ambient dimension:"<<c.n<<std::endl;
   f<<"Inequalities:"<<std::endl;
@@ -740,27 +740,27 @@ std::ostream &operator<<(std::ostream &f, ZCone const &c)
 
 
 ZCone::ZCone(int ambientDimension):
+  preassumptions(PCP_impliedEquationsKnown|PCP_facetsKnown),
+  state(1),
+  n(ambientDimension),
+  multiplicity(1),
+  linearForms(ZMatrix(0,ambientDimension)),
   inequalities(ZMatrix(0,ambientDimension)),
   equations(ZMatrix(0,ambientDimension)),
-  n(ambientDimension),
-  state(1),
-  preassumptions(PCP_impliedEquationsKnown|PCP_facetsKnown),
-  multiplicity(1),
-  haveExtremeRaysBeenCached(false),
-  linearForms(ZMatrix(0,ambientDimension))
+  haveExtremeRaysBeenCached(false)
 {
 }
 
 
 ZCone::ZCone(ZMatrix const &inequalities_, ZMatrix const &equations_, int preassumptions_):
+  preassumptions(preassumptions_),
+  state(0),
+  n(inequalities_.getWidth()),
+  multiplicity(1),
+  linearForms(ZMatrix(0,inequalities_.getWidth())),
   inequalities(inequalities_),
   equations(equations_),
-  state(0),
-  preassumptions(preassumptions_),
-  multiplicity(1),
-  haveExtremeRaysBeenCached(false),
-  n(inequalities_.getWidth()),
-  linearForms(ZMatrix(0,inequalities_.getWidth()))
+  haveExtremeRaysBeenCached(false)
   {
   assert(preassumptions_<4);//OTHERWISE WE ARE DOING SOMETHING STUPID LIKE SPECIFYING AMBIENT DIMENSION
   assert(equations_.getWidth()==n);
@@ -1041,7 +1041,7 @@ ZMatrix ZCone::extremeRays(ZMatrix const *generatorsOfLinealitySpace)const
   ZMatrix ret(0,n);
   std::vector<std::vector<int> > indices=lpSolver.extremeRaysInequalityIndices(inequalities);
 
-  for(int i=0;i<indices.size();i++)
+  for(unsigned i=0;i<indices.size();i++)
     {
       /* At this point we know lineality space, implied equations and
          also inequalities for the ray. To construct a vector on the
@@ -1081,11 +1081,11 @@ ZMatrix ZCone::extremeRays(ZMatrix const *generatorsOfLinealitySpace)const
 
 
           std::vector<int> asVector(inequalities.getHeight());
-          for(int j=0;j<indices[i].size();j++){asVector[indices[i][j]]=1;}
+          for(unsigned j=0;j<indices[i].size();j++){asVector[indices[i][j]]=1;}
           ZMatrix equations=this->equations;
           ZVector theInequality;
 
-          for(int j=0;j<asVector.size();j++)
+          for(unsigned j=0;j<asVector.size();j++)
             if(asVector[j])
               equations.appendRow(inequalities[j]);
             else
@@ -1228,7 +1228,7 @@ bool ZCone::hasFace(ZCone const &f)const
 
 ZCone ZCone::faceContaining(ZVector const &v)const
 {
-  assert(n==v.size());
+  assert(n==(int)v.size());
   assert(contains(v));
   ZMatrix newEquations=equations;
   ZMatrix newInequalities(0,n);

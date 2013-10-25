@@ -1,5 +1,6 @@
 #include <polymake_conversion.h>
 #include <polymake_documentation.h>
+#include <polymake/Graph.h>
 
 #include <dyn_modules/callgfanlib/bbcone.h>
 #include <dyn_modules/callgfanlib/bbfan.h>
@@ -1679,15 +1680,86 @@ BOOLEAN PMpolytopeViaVertices(leftv res, leftv args)
   return TRUE;
 }
 
+
+BOOLEAN PMvertexAdjacencyGraph(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    gfan::ZCone* zp = (gfan::ZCone*) u->Data();
+    lists output=(lists)omAllocBin(slists_bin); output->Init(2);
+    try
+    {
+      polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
+      polymake::Matrix<polymake::Integer> vert0 = p->give("VERTICES");
+      bigintmat* vert1 = PmMatrixInteger2Bigintmat(&vert0);
+      output->m[0].rtyp = BIGINTMAT_CMD;
+      output->m[0].data = (void*) vert1;
+
+      polymake::Graph<> gr=p->give("GRAPH.ADJACENCY");
+      polymake::IncidenceMatrix<polymake::NonSymmetric> adj = adjacency_matrix(gr);
+      lists listOfEdges = PmIncidenceMatrix2ListOfIntvecs(&adj);
+      output->m[1].rtyp = LIST_CMD;
+      output->m[1].data = (void*) listOfEdges;
+      delete p;
+    }
+    catch (const std::exception& ex)
+    {
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+      return TRUE;
+    }
+    res->rtyp = LIST_CMD;
+    res->data = (void*) output;
+    return FALSE;
+  }
+  WerrorS("vertexEdgeGraph: unexpected parameters");
+  return TRUE;
+}
+
+
+BOOLEAN PMvertexEdgeGraph(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == polytopeID))
+  {
+    gfan::ZCone* zp = (gfan::ZCone*) u->Data();
+    lists output=(lists)omAllocBin(slists_bin); output->Init(2);
+    try
+    {
+      polymake::perl::Object* p = ZPolytope2PmPolytope(zp);
+      polymake::Matrix<polymake::Integer> vert0 = p->give("VERTICES");
+      bigintmat* vert1 = PmMatrixInteger2Bigintmat(&vert0);
+      output->m[0].rtyp = BIGINTMAT_CMD;
+      output->m[0].data = (void*) vert1;
+
+      polymake::Graph<> gr=p->give("GRAPH.ADJACENCY");
+      polymake::IncidenceMatrix<polymake::NonSymmetric> adj = adjacency_matrix(gr);
+      lists listOfEdges = PmAdjacencyMatrix2ListOfEdges(&adj);
+      output->m[1].rtyp = LIST_CMD;
+      output->m[1].data = (void*) listOfEdges;
+      delete p;
+    }
+    catch (const std::exception& ex)
+    {
+      WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+      return TRUE;
+    }
+    res->rtyp = LIST_CMD;
+    res->data = (void*) output;
+    return FALSE;
+  }
+  WerrorS("vertexEdgeGraph: unexpected parameters");
+  return TRUE;
+}
+
+
 extern "C" int mod_init(SModulFunctions* p)
 {
   if (init_polymake==NULL)
     {init_polymake = new polymake::Main();}
   init_polymake->set_application("fan");
-  // iiAddCproc("","cube",FALSE,cube);
-  // iiAddCproc("","cross",FALSE,cross);
-  //p->iiAddCproc("polymake.so","coneViaPoints",FALSE,PMconeViaRays);
-  p->iiAddCproc("polymake.so","polytopeViaVertices",FALSE,PMpolytopeViaVertices);
+  // p->iiAddCproc("polymake.so","coneViaPoints",FALSE,PMconeViaRays);
+  // p->iiAddCproc("polymake.so","polytopeViaPoints",FALSE,PMpolytopeViaVertices);
   p->iiAddCproc("polymake.so","isLatticePolytope",FALSE,PMisLatticePolytope);
   p->iiAddCproc("polymake.so","isBounded",FALSE,PMisBounded);
   p->iiAddCproc("polymake.so","isReflexive",FALSE,PMisReflexive);
@@ -1701,7 +1773,7 @@ extern "C" int mod_init(SModulFunctions* p)
   p->iiAddCproc("polymake.so","latticeDegree",FALSE,PMlatticeDegree);
   p->iiAddCproc("polymake.so","latticeCodegree",FALSE,PMlatticeCodegree);
   p->iiAddCproc("polymake.so","ehrhartPolynomialCoeff",FALSE,PMehrhartPolynomialCoeff);
-  //p->iiAddCproc("polymake.so","fVector",FALSE,PMfVector);
+  p->iiAddCproc("polymake.so","fVector",FALSE,PMfVector);
   p->iiAddCproc("polymake.so","hVector",FALSE,PMhVector);
   p->iiAddCproc("polymake.so","hStarVector",FALSE,PMhStarVector);
   p->iiAddCproc("polymake.so","isNormal",FALSE,PMisNormal);
@@ -1726,15 +1798,8 @@ extern "C" int mod_init(SModulFunctions* p)
   p->iiAddCproc("polymake.so","minimalValue",FALSE,PMminimalValue);
   p->iiAddCproc("polymake.so","visual",FALSE,visual);
   p->iiAddCproc("polymake.so","normalFan",FALSE,normalFan);
-  // iiAddCproc("","testingtypes",FALSE,testingtypes);
-  // iiAddCproc("","testingintvec",FALSE,testingintvec);
-  // iiAddCproc("","testingcones",FALSE,testingcones);
-  // iiAddCproc("","testingpolytopes",FALSE,testingpolytopes);
-  // iiAddCproc("","testingfans",FALSE,testingfans);
-  // iiAddCproc("","testingvisuals",FALSE,testingvisuals);
-  // iiAddCproc("","testingstrings",FALSE,testingstrings);
-  // iiAddCproc("","testingmatrices",FALSE,testingmatrices);
-  // iiAddCproc("","loadPolymakeDocumentation",FALSE,loadPolymakeDocumentation);
+  p->iiAddCproc("polymake.so","vertexAdjacencyGraph",FALSE,PMvertexAdjacencyGraph);
+  p->iiAddCproc("polymake.so","vertexEdgeGraph",FALSE,PMvertexEdgeGraph);
 
   blackbox* b=getBlackboxStuff(polytopeID);
   b->blackbox_Op2=bbpolytope_Op2;
