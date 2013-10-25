@@ -79,7 +79,7 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
 
 # SING_SHOW_FLAGS([checking flags....])
 
- FLAGS="-pipe"
+ FLAGS="-pipe -fno-common"
  AC_LANG_PUSH([C])
  AX_APPEND_COMPILE_FLAGS(${FLAGS}, [CFLAGS])
  AC_LANG_POP([C])
@@ -91,7 +91,7 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  AX_APPEND_LINK_FLAGS(${FLAGS}) 
  
  if test "x${ENABLE_DEBUG}" == xyes; then
-  DBGFLAGS="-g -O0 -ftrapv -fdiagnostics-show-option -Wall -Wextra"
+  DBGFLAGS="-g -ftrapv -fdiagnostics-show-option -Wall -Wextra"
   #  -pedantic too strict ??? -Wvla -Wno-long-long ???
   AC_LANG_PUSH([C])
   AX_APPEND_COMPILE_FLAGS(${DBGFLAGS}, [CFLAGS])
