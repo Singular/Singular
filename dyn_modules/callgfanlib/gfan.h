@@ -260,16 +260,16 @@ class gcone
 // 		friend class facet;
 };
 lists lprepareResult(gcone *gc, const int n);
-static int64 int64gcd(const int64 &a, const int64 &b);
-static int intgcd(const int &a, const int &b);
-static int dotProduct(const int64vec &iva, const int64vec &ivb);
-static bool isParallel(const int64vec &a, const int64vec &b);
-static int64vec *ivNeg(/*const*/ int64vec *iv);
-static void idDebugPrint(const ideal &I);
-static volatile void showSLA(facet &f);
-static bool isMonomial(const ideal &I);
-static bool ivAreEqual(const int64vec &a, const int64vec &b);
-static bool areEqual2(facet *f, facet *g);
-static bool areEqual( facet *f, facet *g);
+/* static int64 int64gcd(const int64 &a, const int64 &b); */
+/* static int intgcd(const int &a, const int &b); */
+/* static int dotProduct(const int64vec &iva, const int64vec &ivb); */
+/* static bool isParallel(const int64vec &a, const int64vec &b); */
+/* static int64vec *ivNeg(/\*const*\/ int64vec *iv); */
+/* static void idDebugPrint(const ideal &I); */
+/* static volatile void showSLA(facet &f); */
+/* static bool isMonomial(const ideal &I); */
+/* static bool ivAreEqual(const int64vec &a, const int64vec &b); */
+/* static bool areEqual2(facet *f, facet *g); */
+/* static bool areEqual( facet *f, facet *g); */
 // bool iv64isStrictlyPositive(int64vec *);
 #endif

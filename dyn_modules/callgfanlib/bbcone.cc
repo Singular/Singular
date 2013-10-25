@@ -169,7 +169,7 @@ std::string toString(const gfan::ZCone* const c)
   return s.str();
 }
 
-void* bbcone_Init(blackbox *b)
+void* bbcone_Init(blackbox* /*b*/)
 {
   return (void*)(new gfan::ZCone());
 }
@@ -228,7 +228,7 @@ BOOLEAN bbcone_Assign(leftv l, leftv r)
   return FALSE;
 }
 
-char * bbcone_String(blackbox *b, void *d)
+char* bbcone_String(blackbox* /*b*/, void *d)
 {
   if (d==NULL) return omStrDup("invalid object");
   else
@@ -238,7 +238,7 @@ char * bbcone_String(blackbox *b, void *d)
   }
 }
 
-void bbcone_destroy(blackbox *b, void *d)
+void bbcone_destroy(blackbox* /*b*/, void *d)
 {
   if (d!=NULL)
   {
@@ -247,7 +247,7 @@ void bbcone_destroy(blackbox *b, void *d)
   }
 }
 
-void* bbcone_Copy(blackbox*b, void *d)
+void* bbcone_Copy(blackbox* /*b*/, void *d)
 {
   gfan::ZCone* zc = (gfan::ZCone*)d;
   gfan::ZCone* newZc = new gfan::ZCone(*zc);
@@ -621,7 +621,7 @@ BOOLEAN coneViaRays(leftv res, leftv args)
 BOOLEAN inequalities(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && (u->Typ() == coneID || u->Typ() == polytopeID))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
 
@@ -637,7 +637,7 @@ BOOLEAN inequalities(leftv res, leftv args)
 BOOLEAN equations(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && (u->Typ() == coneID || u->Typ() == polytopeID))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->getEquations();
@@ -652,7 +652,7 @@ BOOLEAN equations(leftv res, leftv args)
 BOOLEAN facets(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && (u->Typ() == coneID || u->Typ() == polytopeID))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zm = zc->getFacets();
@@ -660,13 +660,6 @@ BOOLEAN facets(leftv res, leftv args)
     res->data = (void*) zMatrixToBigintmat(zm);
     return FALSE;
   }
-  if ((u != NULL) && (u->Typ() == polytopeID))
-    {
-      gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-      res->rtyp = BIGINTMAT_CMD;
-      res->data = (void*) getFacetNormals(zc);
-      return FALSE;
-    }
   WerrorS("facets: unexpected parameters");
   return TRUE;
 }
@@ -674,7 +667,7 @@ BOOLEAN facets(leftv res, leftv args)
 BOOLEAN impliedEquations(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && (u->Typ() == coneID || u->Typ() == polytopeID))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->getImpliedEquations();
@@ -689,7 +682,7 @@ BOOLEAN impliedEquations(leftv res, leftv args)
 BOOLEAN generatorsOfSpan(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && (u->Typ() == coneID || u->Typ() == polytopeID))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->generatorsOfSpan();
@@ -704,7 +697,7 @@ BOOLEAN generatorsOfSpan(leftv res, leftv args)
 BOOLEAN generatorsOfLinealitySpace(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == coneID))
+  if ((u != NULL) && (u->Typ() == coneID || u->Typ() == polytopeID))
   {
     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
     gfan::ZMatrix zmat = zc->generatorsOfLinealitySpace();
@@ -1645,6 +1638,58 @@ BOOLEAN maximalGroebnerCone(leftv res, leftv args)
 }
 
 
+lists listOfFacets(const gfan::ZCone &zc)
+{
+  gfan::ZMatrix inequalities = zc.getFacets();
+  gfan::ZMatrix equations = zc.getImpliedEquations();
+  lists L = (lists)omAllocBin(slists_bin);
+  int r = inequalities.getHeight();
+  int c = inequalities.getWidth();
+  L->Init(r);
+
+  /* next we iterate over each of the r facets, build the respective cone and add it to the list */
+  /* this is the i=0 case */
+  gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
+  gfan::ZMatrix newEquations = equations;
+  newEquations.appendRow(inequalities[0]);
+  L->m[0].rtyp = coneID; L->m[0].data=(void*) new gfan::ZCone(newInequalities,newEquations);
+
+  /* these are the cases i=1,...,r-2 */
+  for (int i=1; i<r-1; i++)
+  {
+    newInequalities = inequalities.submatrix(0,0,i-1,c);
+    newInequalities.append(inequalities.submatrix(i+1,0,r,c));
+    newEquations = equations;
+    newEquations.appendRow(inequalities[i]);
+    L->m[i].rtyp = coneID; L->m[i].data=(void*) new gfan::ZCone(newInequalities,newEquations);
+  }
+
+  /* this is the i=r-1 case */
+  newInequalities = inequalities.submatrix(0,0,r-1,c);
+  newEquations = equations;
+  newEquations.appendRow(inequalities[r]);
+  L->m[r-1].rtyp = coneID; L->m[r-1].data=(void*) new gfan::ZCone(newInequalities,newEquations);
+
+  return L;
+}
+
+
+BOOLEAN listOfFacets(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == coneID))
+  {
+    gfan::ZCone* zc = (gfan::ZCone*) u->Data();
+    lists L = listOfFacets(*zc);
+    res->rtyp = LIST_CMD;
+    res->data = (void*) L;
+    return FALSE;
+  }
+  WerrorS("listOfFacets: unexpected parameters");
+  return TRUE;
+}
+
+
 poly initial(poly p)
 {
   poly g = p;
@@ -1683,7 +1728,7 @@ BOOLEAN initial(leftv res, leftv args)
     {
       ideal I = (ideal) u->Data();
       ideal inI = idInit(IDELEMS(I));
-      poly g; poly h; long d;
+      poly g;
       for (int i=0; i<IDELEMS(I); i++)
       {
         g = (poly) I->m[i];
@@ -1907,6 +1952,7 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("","span",FALSE,impliedEquations);
   p->iiAddCproc("","uniquePoint",FALSE,uniquePoint);
   p->iiAddCproc("","listContainsCone",FALSE,containsCone);
+  p->iiAddCproc("","listOfFacets",FALSE,listOfFacets);
   p->iiAddCproc("","maximalGroebnerCone",FALSE,maximalGroebnerCone);
   p->iiAddCproc("","groebnerCone",FALSE,groebnerCone);
   p->iiAddCproc("","initial",FALSE,initial);
