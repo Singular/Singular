@@ -13,5 +13,7 @@
 #define OM_MALLOC_FREE     free
 #define OM_MALLOC_VALLOC   valloc
 #define OM_MALLOC_VFREE(addr, size) OM_MALLOC_FREE(addr)
+/* the following will work under Mac OS X */
+#define OM_MALLOC_SIZEOF_ADDR(addr)  (malloc_size(addr))
 
 #endif /* OM_MALLOC_SYSTEM_H */

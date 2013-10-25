@@ -165,6 +165,7 @@ dnl Set compiler, linker flags so that we can work with omalloc
 BACKUP_CFLAGS=$CFLAGS
 BACKUP_CXXFLAGS=$CXXFLAGS
 BACKUP_LDFLAGS=$LDFLAGS
+
 CFLAGS="$CFLAGS -I$srcdir"
 CXXFLAGS="$CXXFLAGS -I$srcdir"
 
@@ -305,9 +306,13 @@ AC_TRY_RUN([
 main()
 {
   void* addr = OM_MALLOC_MALLOC(512);
+#ifdef OM_MALLOC_SIZEOF_ADDR 
   if (OM_MALLOC_SIZEOF_ADDR(addr) < 512)
     exit(1);
   exit(0);
+#else
+  exit(1);
+#endif
 }
 ], ac_cv_malloc_sizeof_addr="${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}", ac_cv_malloc_sizeof_addr=no, ac_cv_malloc_sizeof_addr=no)
 if test "${ac_cv_malloc_sizeof_addr}" = no; then
@@ -319,12 +324,6 @@ fi
 if test "$ac_cv_malloc_sizeof_addr" != no; then
 AC_DEFINE(OM_MALLOC_PROVIDES_SIZEOF_ADDR,1,"Whether malloc provides SIZEOF_ADDR")
 fi
-
-dnl Restore user-specified CFLAGS, CXXFLAGS, LIBS
-
-CFLAGS=$BACKUP_CFLAGS
-CXXFLAGS=$BACKUP_CXXFLAGS
-LDFLAGS=$BACKUP_LDFLAGS
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check whether valloc is provided and that it works
@@ -600,6 +599,11 @@ AC_MSG_RESULT(Void_t)
 AC_DEFINE(OM_PROVIDE_MALLOC,0,[Provide NO standard routines!])
 
 
+dnl Restore user-specified CFLAGS, CXXFLAGS, LIBS
+
+CFLAGS=$BACKUP_CFLAGS
+CXXFLAGS=$BACKUP_CXXFLAGS
+LDFLAGS=$BACKUP_LDFLAGS
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl wrap it up
