@@ -68,7 +68,7 @@ public:
     }
   void appendRow(Vector<typ> const &v)
     {
-      assert(v.size()==width);
+      assert((int)v.size()==width);
       rows.push_back(v);
       height++;
     }
@@ -409,7 +409,7 @@ public:
   Vector<typ> canonicalize(Vector<typ> v)const
   {
     assert(typ::isField());
-    assert(v.size()==getWidth());
+    assert((int)v.size()==getWidth());
 
     int pivotI=-1;
     int pivotJ=-1;

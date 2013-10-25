@@ -155,7 +155,7 @@ public:
   {
     return mpq_sgn(value);
   }
-  static Rational gcd(Rational const &a, Rational const &b, Rational &s, Rational &t)
+  static Rational gcd(Rational const &a, Rational const /*&b*/, Rational /*&s*/, Rational /*t*/)
   {
 /*    mpz_t r;
     mpz_init(r);

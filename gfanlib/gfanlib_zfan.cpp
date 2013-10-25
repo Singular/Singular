@@ -15,7 +15,7 @@ namespace gfan
   static int numberOf(std::vector<std::vector<IntVector> > T, int dimension)
   {
     assert(dimension>=0);
-    if(dimension>=T.size())return 0;
+    if(dimension>=(int)T.size())return 0;
     return T[dimension].size();
   }
   std::vector<std::vector<IntVector> > &ZFan::table(bool orbit, bool maximal)const
@@ -161,7 +161,7 @@ namespace gfan
         ZFan ret(sym);
 
 //        log2 cerr<< "Number of orbits to expand "<<cones.size()<<endl;
-        for(int i=0;i<cones.size();i++)
+        for(unsigned i=0;i<cones.size();i++)
         //  if(coneIndices==0 || coneIndices->count(i))
             {
 //              log2 cerr<<"Expanding symmetries of cone"<<endl;
@@ -201,8 +201,8 @@ namespace gfan
       }
   }
   ZFan::ZFan(ZFan const& f):
-    complex(0),
     coneCollection(0),
+    complex(0),
     cones(f.table(0,0)),
     maximalCones(f.table(0,1)),
     coneOrbits(f.table(1,0)),

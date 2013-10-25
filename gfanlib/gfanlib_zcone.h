@@ -351,7 +351,7 @@ public:
      * The ambient space of the returned cone has dimension newn.
      */
    // PolyhedralCone projection(int newn)const;
-    friend std::ostream &operator<<(std::ostream &f, ZCone const &c);
+    friend void operator<<(std::ostream &f, ZCone const &c);
 };
 
 };

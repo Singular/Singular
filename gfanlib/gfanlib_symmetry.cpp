@@ -24,13 +24,13 @@ class Trie
                 }
                 TrieNode(IntVector const &v, int i)
                 {
-                        if(i<v.size())
+                  if(i<(int)v.size())
                         m[v[i]]=TrieNode(v,i+1);
                 }
                 int stabilizerSize(ZVector const &v, int i)const
                 {
                   int ret=0;
-                  if(i==v.size())return 1;
+                  if(i==(int)v.size())return 1;
                   for(Map::const_iterator j=m.begin();j!=m.end();j++)
                     {
                       if(v[i]==v[j->first])
@@ -40,7 +40,7 @@ class Trie
                 }
                 void search(ZVector const &v, ZVector  &building, Permutation &tempPerm, Permutation &ret, ZVector &optimal, int i, bool &isImproving)const
                 {
-                        if(i==v.size()){ret=tempPerm;optimal=building;isImproving=false;return;}
+                  if(i==(int)v.size()){ret=tempPerm;optimal=building;isImproving=false;return;}
                         if(isImproving)
                                 building[i]=-0x7fffffff;
                         else
@@ -60,7 +60,7 @@ class Trie
                 }
                 void searchStabalizer(ZVector const &v, ZVector  &building, Permutation &tempPerm, Permutation &ret, ZVector &optimal, int i, bool &isImproving, ZVector const &toBeFixed)const
                 {
-                        if(i==v.size())
+                  if(i==(int)v.size())
                                 if(!(tempPerm.apply(v)<optimal))
                                         {
                                         ret=tempPerm;
@@ -101,7 +101,7 @@ class Trie
         //      void doubleSearch();
                 void insert(Permutation const &v, int i)
                 {
-                        if(i==v.size())return;
+                  if(i==(int)v.size())return;
                         if(m.count(v[i]))
                                 m[v[i]].insert(v,i+1);
                         else
@@ -131,8 +131,8 @@ public:
         TrieNode theTree;
         int n;
         Trie(int n_):
-                n(n_),
-                theTree(Permutation(n_),0)
+                theTree(Permutation(n_),0),
+                n(n_)
         {
         }
         int size()const
@@ -275,7 +275,7 @@ Permutation Permutation::apply(Permutation const &b)const
 {
   IntVector ret(size());
   assert(size()==b.size());
-  for(int i=0;i<size();i++)ret[i]=b[(*this)[i]];
+  for(unsigned i=0;i<size();i++)ret[i]=b[(*this)[i]];
   return Permutation(ret);
 }
 
@@ -283,7 +283,7 @@ Permutation Permutation::applyInverse(Permutation const &b)const
 {
   IntVector ret(size());
   assert(size()==b.size());
-  for(int i=0;i<size();i++)ret[(*this)[i]]=b[i];
+  for(unsigned i=0;i<size();i++)ret[(*this)[i]]=b[i];
   return Permutation(ret);
 }
 
@@ -291,7 +291,7 @@ IntVector Permutation::apply(IntVector const &v)const
 {
   IntVector ret(size());
   assert(size()==v.size());
-  for(int i=0;i<size();i++)ret[i]=v[(*this)[i]];
+  for(unsigned i=0;i<size();i++)ret[i]=v[(*this)[i]];
   return ret;
 }
 
@@ -299,7 +299,7 @@ ZVector Permutation::apply(ZVector const &v)const
 {
   ZVector ret(size());
   assert(size()==v.size());
-  for(int i=0;i<size();i++)ret[i]=v[(*this)[i]];
+  for(unsigned i=0;i<size();i++)ret[i]=v[(*this)[i]];
   return ret;
 }
 
@@ -308,7 +308,7 @@ ZVector Permutation::applyInverse(ZVector const &v)const
 {
   ZVector ret(size());
   assert(size()==v.size());
-  for(int i=0;i<size();i++)ret[(*this)[i]]=v[i];
+  for(unsigned i=0;i<size();i++)ret[(*this)[i]]=v[i];
   return ret;
 }
 //ZVector apply(ZVector const &v)const;
@@ -430,8 +430,8 @@ int SymmetryGroup::orbitSize(ZVector const &stable)const
 
 ZVector Permutation::fundamentalDomainInequality()const
 {
-  for(int i=0;i<size();i++)
-    if((*this)[i]!=i)
+  for(unsigned i=0;i<size();i++)
+    if((*this)[i]!=(int)i)
       return ZVector::standardVector(size(),i)-ZVector::standardVector(size(),(*this)[i]);
   return ZVector(size());
 }
