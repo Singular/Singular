@@ -4914,6 +4914,11 @@ to their default values on a change of the current basering.
 @cindex none, option
 turns off all options (including the @code{prompt} option).
 @c ---------
+@item @code{warn}
+@c ---------
+@cindex warn, option
+be aware of pitfalls.
+@rc ---------
 @item @code{returnSB}
 @cindex returnSB, option
 the functions @code{syz}, @code{intersect}, @code{quotient},
@@ -4949,7 +4954,7 @@ which was used in @sc{Singular} version before 2-0
 (and which may lead to faster or slower computations, depending on the example)
 @item @code{length}
 @cindex length, option
-select shorter reduceers in std computations,
+select shorter reducers in std computations,
 @c ---------
 @item @code{notRegularity}
 @cindex notRegularity, option
