@@ -45,22 +45,9 @@ then
 fi
 
 # if setoper.h is there, assume that also cdd.h is there
-#AC_CHECK_HEADERS([cdd/cdd.h cdd.h],,,
-#[
-## include <setoper.h>
-#])
-
-if test "$ac_cv_header_cdd_h" == no -a "$ac_cv_header_cdd_cdd_h" == no
-then
-	AC_MSG_WARN([Error, cdd.h is missing!])
-fi
 
 if test "x$ENABLE_GFANLIB" = xyes; then
 if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no -a "$ac_cv_header_cddlib_setoper_h" == no
-then
-	exit 1
-fi
-if test "$ac_cv_header_cdd_h" == no -a "$ac_cv_header_cdd_cdd_h" == no
 then
 	exit 1
 fi

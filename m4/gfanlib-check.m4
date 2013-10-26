@@ -32,8 +32,20 @@ AC_LINK_IFELSE(
   [LIBS="$SAVE_LIBS -lcddgmp"] [CDDGMPLDFLAGS="-lcddgmp"] 
   [PASSED_ALL_TESTS_FOR_GFANLIB="yes"],
   [AC_MSG_WARN([libcddgmp is not installed.])] 
-  [PASSED_ALL_TESTS_FOR_GFANLIB="no";
-  exit 1]
+  [PASSED_ALL_TESTS_FOR_GFANLIB="no"
+  ]
+)
+fi
+if test "$PASSED_ALL_TESTS_FOR_GFANLIB" != yes; then
+AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([#include <cddlib/setoper.h>
+  #include "cddlib/cdd.h"],
+    [dd_set_global_constants()])],
+  [LIBS="$SAVE_LIBS -lcddgmp"] [CDDGMPLDFLAGS="-lcddgmp"] 
+  [PASSED_ALL_TESTS_FOR_GFANLIB="yes"],
+  [AC_MSG_WARN([libcddgmp is not installed.])] 
+  [PASSED_ALL_TESTS_FOR_GFANLIB="no"
+  ]
 )
 fi
   AC_LANG_POP()

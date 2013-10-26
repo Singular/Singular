@@ -13,6 +13,10 @@ Author: monerjan
 #include <cdd/setoper.h>
 #include <cdd/cdd.h>
 #include <cdd/cddmp.h>
+#elif HAVE_CDDLIB_SETOPER_H
+#include <cddlib/setoper.h>
+#include <cddlib/cdd.h>
+#include <cddlib/cddmp.h>
 #else
 #include <setoper.h>
 #include <cdd.h>
