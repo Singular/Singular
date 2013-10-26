@@ -1131,7 +1131,7 @@ void * sleftv::Data()
           Werror("wrong range[%d] in intvec(%d)",index,iv->length());
       }
       else
-        r=(char *)((*iv)[index-1]);
+        r=(char *)(long)((*iv)[index-1]);
       break;
     }
     case INTMAT_CMD:
@@ -1147,7 +1147,7 @@ void * sleftv::Data()
                                                      iv->rows(),iv->cols());
       }
       else
-        r=(char *)(IMATELEM((*iv),index,e->next->start));
+        r=(char *)(long)(IMATELEM((*iv),index,e->next->start));
       break;
     }
     case BIGINTMAT_CMD:

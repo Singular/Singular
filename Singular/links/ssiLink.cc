@@ -157,7 +157,7 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
       #else
       long nn=SR_TO_INT(n);
       if ((nn<POW_2_28)||(nn>= -POW_2_28))
-        fprintf(d->f_write,"4 %ld ",((LONG)nn));
+        fprintf(d->f_write,"4 %ld ",nn);
       else
       {
         mpz_t tmp;
