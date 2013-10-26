@@ -56,16 +56,13 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   assume(f!=NULL);
   assume(g!=NULL);
 
-  if(pNext(f)==NULL) 
+  if(pNext(f)==NULL && pNext(g)==NULL)
   {
     poly p=p_One(r);
-    if (pNext(g)==NULL)
-    {
-      for(int i=rVar(r);i>0;i--)
-        p_SetExp(p,i,si_min(p_GetExp(f,i,r),p_GetExp(g,i,r)),r);
-      p_Setm(p,r);
-      return p;
-    }
+    for(int i=rVar(r);i>0;i--)
+      p_SetExp(p,i,si_min(p_GetExp(f,i,r),p_GetExp(g,i,r)),r);
+    p_Setm(p,r);
+    return p;
 #if 0
     else
     {
