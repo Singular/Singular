@@ -38,8 +38,8 @@ SING_CHECK_GFANLIB
 #	AC_MSG_WARN([Error, gmp.h is missing!])
 #	exit 1
 # fi
-AC_CHECK_HEADERS([cdd/setoper.h setoper.h])
-if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no
+AC_CHECK_HEADERS([cdd/setoper.h setoper.h cddlib/setoper.h])
+if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no -a "$ac_cv_header_cddlib_setoper_h" == no
 then
 	AC_MSG_WARN([Error, setoper.h is missing!])
 fi
@@ -56,7 +56,7 @@ then
 fi
 
 if test "x$ENABLE_GFANLIB" = xyes; then
-if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no
+if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no -a "$ac_cv_header_cddlib_setoper_h" == no
 then
 	exit 1
 fi
