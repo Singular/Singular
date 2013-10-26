@@ -8,15 +8,15 @@
 #include <string.h>
 
 #ifdef HAVE_CONFIG_H
-#include <omalloc/omConfig.h>
+#include "omConfig.h"
 #endif
 
 #ifndef OM_NDEBUG
 
-#include <omalloc/omDerivedConfig.h>
-#include <omalloc/omStructs.h>
-#include <omalloc/omRet2Info.h>
-#include <omalloc/omGetBackTrace.h>
+#include "omDerivedConfig.h"
+#include "omStructs.h"
+#include "omRet2Info.h"
+#include "omGetBackTrace.h"
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
