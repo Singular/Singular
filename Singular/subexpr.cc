@@ -410,7 +410,7 @@ static inline void * s_internalCopy(const int t,  void *d)
     case QRING_CMD:
       {
         ring r=(ring)d;
-        r->ref++;
+        if (r!=NULL) r->ref++;
         //Print("+  ring %d, ref %d\n",r,r->ref);
         return d;
       }

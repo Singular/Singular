@@ -158,7 +158,7 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
     if(SR_HDL(n) & SR_INT)
     {
       #if SIZEOF_LONG == 4
-      fprintf(d->f_write,"4 %ld ",((LONG)SR_TO_INT(n)));
+      fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
       #else
       long nn=SR_TO_INT(n);
       if ((nn<POW_2_28)||(nn>= -POW_2_28))
@@ -204,48 +204,56 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... */
   if (d->r!=NULL) rKill(d->r);
   d->r=r;
-  d->r->ref++;
-  fprintf(d->f_write,"%d %d ",r->ch,r->N);
+  if (r!=NULL) 
+  {
+    /*d->*/r->ref++;
+    fprintf(d->f_write,"%d %d ",r->ch,r->N);
 
-  int i;
-  for(i=0;i<r->N;i++)
-  {
-    fprintf(d->f_write,"%d %s ",(int)strlen(r->names[i]),r->names[i]);
-  }
-  /* number of orderings:*/
-  i=0;
-  while (r->order[i]!=0) i++;
-  fprintf(d->f_write,"%d ",i);
-  /* each ordering block: */
-  i=0;
-  while(r->order[i]!=0)
-  {
-    fprintf(d->f_write,"%d %d %d ",r->order[i],r->block0[i], r->block1[i]);
-    switch(r->order[i])
+    int i;
+    for(i=0;i<r->N;i++)
     {
-      case ringorder_a:
-      case ringorder_wp:
-      case ringorder_Wp:
-      case ringorder_ws:
-      case ringorder_Ws:
-      case ringorder_aa:
+      fprintf(d->f_write,"%d %s ",(int)strlen(r->names[i]),r->names[i]);
+    }
+    /* number of orderings:*/
+    i=0;
+    // remember dummy ring: everything 0:
+    if (r->order!=NULL) while (r->order[i]!=0) i++;
+    fprintf(d->f_write,"%d ",i);
+    /* each ordering block: */
+    i=0;
+    if (r->order!=NULL) while(r->order[i]!=0)
+    {
+      fprintf(d->f_write,"%d %d %d ",r->order[i],r->block0[i], r->block1[i]);
+      switch(r->order[i])
       {
-        int ii;
-        for(ii=r->block0[i];ii<=r->block1[i];ii++)
-          fprintf(d->f_write,"%d ",r->wvhdl[i][ii-r->block0[i]]);
-      }
-      break;
-
-      case ringorder_a64:
-      case ringorder_M:
-      case ringorder_L:
-      case ringorder_IS:
-        Werror("ring oder not implemented for ssi:%d",r->order[i]);
+        case ringorder_a:
+        case ringorder_wp:
+        case ringorder_Wp:
+        case ringorder_ws:
+        case ringorder_Ws:
+        case ringorder_aa:
+        {
+          int ii;
+          for(ii=r->block0[i];ii<=r->block1[i];ii++)
+            fprintf(d->f_write,"%d ",r->wvhdl[i][ii-r->block0[i]]);
+        }
         break;
 
-      default: break;
+        case ringorder_a64:
+        case ringorder_M:
+        case ringorder_L:
+        case ringorder_IS:
+          Werror("ring oder not implemented for ssi:%d",r->order[i]);
+          break;
+
+        default: break;
+      }
+      i++;
     }
-    i++;
+  }
+  else /* dummy ring r==NULL*/
+  {
+    fprintf(d->f_write,"0 0 0 "/*,r->ch,r->N, blocks*/);
   }
 }
 
@@ -482,7 +490,7 @@ ring ssiReadRing(ssiInfo *d)
   char **names;
   ch=s_readint(d->f_read);
   N=s_readint(d->f_read);
-  names=(char**)omAlloc(N*sizeof(char*));
+  names=(char**)omalloc(N*sizeof(char*));
   for(i=0;i<N;i++)
   {
     names[i]=ssiReadString(d);
@@ -525,7 +533,8 @@ ring ssiReadRing(ssiInfo *d)
       default: break;
     }
   }
-  return rDefault(ch,N,names,num_ord,ord,block0,block1,wvhdl);
+  if (N==0) return NULL;
+  else return rDefault(ch,N,names,num_ord,ord,block0,block1,wvhdl);
 }
 
 poly ssiReadPoly(ssiInfo *D)
@@ -1184,11 +1193,14 @@ leftv ssiRead1(si_link l)
     case 15:
     case 5:{
              d->r=ssiReadRing(d);
-             d->r->ref++;
              res->rtyp=RING_CMD;
              res->data=(char*)d->r;
              // we are in the top-level, so set the basering to d->r:
-             ssiSetCurrRing(d->r);
+             if (d->r!=NULL)
+	     {
+	       d->r->ref++;
+               ssiSetCurrRing(d->r);
+	     }
              if (t==15) return ssiRead1(l);
            }
            break;
