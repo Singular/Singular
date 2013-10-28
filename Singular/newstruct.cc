@@ -353,7 +353,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
           }
           if (nm==NULL)
           {
-            Werror("member %s nor found", a2->name);
+            Werror("member %s not found", a2->name);
             return TRUE;
           }
           if (search_ring)
@@ -515,6 +515,8 @@ void *newstruct_Init(blackbox *b)
   while (nm!=NULL)
   {
     l->m[nm->pos].rtyp=nm->typ;
+    if (RingDependend(nm->typ))
+      l->m[nm->pos-1].rtyp=RING_CMD;
     l->m[nm->pos].data=idrecDataInit(nm->typ);
     nm=nm->next;
   }
@@ -753,7 +755,9 @@ void newstructShow(newstruct_desc d)
   elem=d->member;
   while (elem!=NULL)
   {
-    Print(">>%s<< at pos %d, type %d\n",elem->name,elem->pos,elem->typ);
+    Print(">>%s<< at pos %d, type %d (%s)\n",elem->name,elem->pos,elem->typ,Tok2Cmdname(elem->typ));
+    if (RingDependend(elem->typ))
+      Print(">>r_%s<< at pos %d, shadow ring\n",elem->name,elem->pos-1);
     elem=elem->next;
   }
 }

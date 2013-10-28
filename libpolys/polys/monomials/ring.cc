@@ -728,15 +728,20 @@ char * rParStr(ring r)
 
 char * rString(ring r)
 {
-  char *ch=rCharStr(r);
-  char *var=rVarStr(r);
-  char *ord=rOrdStr(r);
-  char *res=(char *)omAlloc(strlen(ch)+strlen(var)+strlen(ord)+9);
-  sprintf(res,"(%s),(%s),(%s)",ch,var,ord);
-  omFree((ADDRESS)ch);
-  omFree((ADDRESS)var);
-  omFree((ADDRESS)ord);
-  return res;
+  if (r!=NULL)
+  {
+    char *ch=rCharStr(r);
+    char *var=rVarStr(r);
+    char *ord=rOrdStr(r);
+    char *res=(char *)omAlloc(strlen(ch)+strlen(var)+strlen(ord)+9);
+    sprintf(res,"(%s),(%s),(%s)",ch,var,ord);
+    omFree((ADDRESS)ch);
+    omFree((ADDRESS)var);
+    omFree((ADDRESS)ord);
+    return res;
+  }
+  else
+    return omStrDup("NULL");
 }
 
 
