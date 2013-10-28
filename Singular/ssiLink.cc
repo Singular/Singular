@@ -533,7 +533,13 @@ ring ssiReadRing(ssiInfo *d)
       default: break;
     }
   }
-  if (N==0) return NULL;
+  if (N==0)
+  {
+    omFree(ord);
+    omFree(block0);
+    omFree(block1);
+    omFree(wvhdl);
+  }
   else return rDefault(ch,N,names,num_ord,ord,block0,block1,wvhdl);
 }
 
