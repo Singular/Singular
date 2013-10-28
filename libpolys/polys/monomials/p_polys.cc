@@ -2517,7 +2517,6 @@ poly p_Cleardenom(poly p, const ring r)
   if (rField_is_Ring(r))
   {
     p_Content(p,r);
-    assume( n_GreaterZero(pGetCoeff(p),C) );
     if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
     return p;
   }
@@ -2626,7 +2625,6 @@ poly p_Cleardenom(poly p, const ring r)
 #endif
   }
 
-  assume( n_GreaterZero(pGetCoeff(p),C) );
   if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
 
   return start;
