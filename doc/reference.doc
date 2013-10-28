@@ -3729,15 +3729,15 @@ See
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-lists all (user-)defined names in the current namespace:
+lists all (user-)defined names:
 @itemize @bullet
-@item @code{listvar()}: all currently visible names except procedures,
+@item @code{listvar()}: all currently visible names except procedures in the current namespace,
 @item @code{listvar(}type@code{)}: all currently visible names of the given
 type,
 @item @code{listvar(}ring_name@code{)}: all names which belong to the given
 ring,
 @item @code{listvar(}name@code{)}: the object with the given name,
-@item @code{listvar(all)}: all names except procedures.
+@item @code{listvar(all)}: all names except procedures in the current and @code{Top} namespace.
 @end itemize
 The current basering is marked with a @code{*}.  The nesting level of
 variables in procedures is shown in square brackets.
