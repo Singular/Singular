@@ -29,7 +29,7 @@ LT_INIT
 # Checks for header files.
 AC_HEADER_STDC
 
-LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
+LB_CHECK_GMP(4.0,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 SING_CHECK_GFANLIB
 
 # AC_CHECK_HEADERS([gmp.h])
