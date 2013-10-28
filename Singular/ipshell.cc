@@ -411,6 +411,8 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
   {
     if (strcmp(what,"all")==0)
     {
+      if (currPack!=basePack)
+        list_cmd(-1,NULL,prefix,iterate,fullname); // list current package
       really_all=TRUE;
       h=basePack->idroot;
     }
