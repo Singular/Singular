@@ -26,6 +26,7 @@ gfan::ZMatrix* bigintmatToZMatrix(const bigintmat &bim);
 gfan::ZVector* bigintmatToZVector(const bigintmat &bim);
 
 gfan::ZVector intStar2ZVector(const int d, const int* i);
+int* ZVectorToIntStar(const gfan::ZVector &v, bool &overflow);
 char* toString(gfan::ZMatrix const &m);
 std::string toString(const gfan::ZCone* const c);
 

@@ -114,6 +114,23 @@ gfan::ZVector intStar2ZVector(const int d, const int* i)
   return zv;
 }
 
+int* ZVectorToIntStar(const gfan::ZVector &v, bool &overflow)
+{
+  int* w = (int*) omAlloc(v.size()*sizeof(int));
+  for (unsigned i=0; i<v.size(); i++)
+  {
+    if (!v[i].fitsInInt())
+    {
+      omFree(w);
+      WerrorS("intoverflow converting gfan:ZVector to int*");
+      overflow = true;
+      return NULL;
+    }
+    w[i]=v[i].toInt();
+  }
+  return w;
+}
+
 char* toString(gfan::ZMatrix const &zm)
 {
   bigintmat* bim = zMatrixToBigintmat(zm);
