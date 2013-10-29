@@ -131,7 +131,7 @@ EXAMPLE: example polymakePolytope;   shows an example"
   // add a first column to polytope as homogenising coordinate
   points=intmatAddFirstColumn(points,"points");
   polytope polytop=polytopeViaPoints(points);
-  list graph=vertexAdjacencyGraph(polytop)[2]; 
+  list graph=vertexAdjacencyGraph(polytop)[2];
   int i,j;
   for (i=1;i<=size(graph);i++)
   {
@@ -265,7 +265,7 @@ example
 
 /////////////////////////////////////////////////////////////////////////////
 
-proc normalFan (intmat vertices,intmat affinehull,list graph,int er,list #)
+proc normalFan (def vertices, def affinehull,list graph,int er,list #)
 "USAGE:  normalFan (vert,aff,graph,rays,[,#]);   vert,aff intmat,  graph list, rays int, # string
 ASSUME:  - vert is an integer matrix whose rows are the coordinate of 
            the vertices of a convex lattice polytope; 
@@ -302,6 +302,12 @@ NOTE:    - the procedure calls for its computation polymake by Ewgenij Gawrilow,
            u00,u10,u01,u11 then you must hand over the string u11,u10,u01,u11
 EXAMPLE: example normalFan;   shows an example"
 {
+  if (typeof(affinehull) != "intmat" && typeof (affinehull) != "bigintmat")
+  {
+    ERROR("normalFan: input affinehull has to be either intmat or bigintmat");
+    list L;
+    return (L);
+  }
   list ineq; // stores the inequalities of the cones
   int i,j,k;
   // we work over the following ring  
@@ -333,8 +339,14 @@ EXAMPLE: example normalFan;   shows an example"
     // the inequalities describing the dual cone in the normal fan
     list pp;  // contain strings representing the inequalities 
               // describing the normal cone
-    intmat ie[size(graph[i])][ncols(vertices)]; // contains the inequalities 
-                                                // as rows
+    if (typeof (vertices) == "intmat")
+    {
+      intmat ie[size(graph[i])][ncols(vertices)]; // contains the inequalities 
+    }                                             // as rows
+    if (typeof (vertices) == "bigintmat")
+    {
+      bigintmat ie[size(graph[i])][ncols(vertices)]; // contains the inequalities 
+    }                                                // as rows
     // consider all the vertices to which the ith vertex in the 
     // polytope is connected by an edge
     for (j=1;j<=size(graph[i]);j++)
@@ -2058,30 +2070,61 @@ NOTE:        the procedure is called by findOrientedBoundary"
   return(sp);
 }
 
-static proc intmatcoldelete (intmat w,int i)
+static proc intmatcoldelete (def w,int i)
 "USAGE:      intmatcoldelete(w,i); w intmat, i int
 RETURN:      intmat, the integer matrix w with the ith comlumn deleted
 NOTE:        the procedure is called by intmatsort and normalFan"
 {
-  if ((i<1) or (i>ncols(w)) or (ncols(w)==1))
+  if (typeof(w)=="intmat")
   {
-    return(w);
+    if ((i<1) or (i>ncols(w)) or (ncols(w)==1))
+    {
+      return(w);
+    }
+    if (i==1)
+    {
+      intmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),2..ncols(w)];
+      return(M);
+    }
+    if (i==ncols(w))
+    {
+      intmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),1..ncols(w)-1];
+      return(M);
+    }
+    else
+    {
+      intmat M[nrows(w)][i-1]=w[1..nrows(w),1..i-1];
+      intmat N[nrows(w)][ncols(w)-i]=w[1..nrows(w),i+1..ncols(w)];
+      return(intmatconcat(M,N));
+    }
   }
-  if (i==1)
+  if (typeof(w)=="bigintmat")
   {
-    intmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),2..ncols(w)];
-    return(M);
-  }
-  if (i==ncols(w))
+    if ((i<1) or (i>ncols(w)) or (ncols(w)==1))
+    {
+      return(w);
+    }
+    if (i==1)
+    {
+      bigintmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),2..ncols(w)];
+      return(M);
+    }
+    if (i==ncols(w))
+    {
+      bigintmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),1..ncols(w)-1];
+      return(M);
+    }
+    else
+    {
+      bigintmat MN[nrows(w)][ncols(w)-1];
+      MN[1..nrows(w),1..i-1]=w[1..nrows(w),1..i-1];
+      MN[1..nrows(w),i..ncols(w)-1]=w[1..nrows(w),i+1..ncols(w)];
+      return(MN);
+    }
+  } else
   {
-    intmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),1..ncols(w)-1];
-    return(M);
-  }
-  else
-  {
-    intmat M[nrows(w)][i-1]=w[1..nrows(w),1..i-1];
-    intmat N[nrows(w)][ncols(w)-i]=w[1..nrows(w),i+1..ncols(w)];
-    return(intmatconcat(M,N));
+    ERROR("intmatcoldelete: input matrix has to be of type intmat or bigintmat");
+    intmat M; return(M);
   }
 }
 
@@ -2378,7 +2421,7 @@ NOTE:        the procedure is called by fan"
   return(list(coord,coords,latex));
 }
 
-static proc intmatAddFirstColumn (intmat M,string art)
+static proc intmatAddFirstColumn (def M,string art)
 "USAGE:  intmatAddFirstColumn(M,art);  M intmat, art string
 ASSUME:  - M is an integer matrix where a first column of 0's or 1's should be added
 @*       - art is one of the following strings:
@@ -2386,24 +2429,54 @@ ASSUME:  - M is an integer matrix where a first column of 0's or 1's should be a
 @*         + 'points' : indicating that a first column of 1's should be added 
 RETURN:  intmat, a first column has been added to the matrix"
 {
-  intmat N[nrows(M)][ncols(M)+1];
-  int i,j;
-  for (i=1;i<=nrows(M);i++)
+  if (typeof (M) == "intmat")
   {
-    if (art=="rays")
+    intmat N[nrows(M)][ncols(M)+1];
+    int i,j;
+    for (i=1;i<=nrows(M);i++)
     {
-      N[i,1]=0;
+      if (art=="rays")
+      {
+        N[i,1]=0;
+      }
+      else
+      {
+        N[i,1]=1;
+      }
+      for (j=1;j<=ncols(M);j++)
+      {
+        N[i,j+1]=M[i,j];
+      }
     }
-    else
-    {
-      N[i,1]=1;
-    }
-    for (j=1;j<=ncols(M);j++)
-    {
-      N[i,j+1]=M[i,j];
-    }
+    return(N);
   }
-  return(N);
+  if (typeof (M) == "bigintmat")
+  {
+    bigintmat N[nrows(M)][ncols(M)+1];
+    int i,j;
+    for (i=1;i<=nrows(M);i++)
+    {
+      if (art=="rays")
+      {
+        N[i,1]=0;
+      }
+      else
+      {
+        N[i,1]=1;
+      }
+      for (j=1;j<=ncols(M);j++)
+      {
+        N[i,j+1]=M[i,j];
+      }
+    }
+    return(N);
+  }
+  else
+  {
+    ERROR ("intmatAddFirstColumn: input matrix has to be either intmat or bigintmat");
+    intmat N;
+    return (N);
+  }
 }
 
 
