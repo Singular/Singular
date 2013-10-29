@@ -485,10 +485,13 @@ ring ssiReadRing(ssiInfo *d)
   char **names;
   ch=s_readint(d->f_read);
   N=s_readint(d->f_read);
-  names=(char**)omalloc(N*sizeof(char*));
-  for(i=0;i<N;i++)
+  if (N!=0)
   {
-    names[i]=ssiReadString(d);
+    names=(char**)omAlloc(N*sizeof(char*));
+    for(i=0;i<N;i++)
+    {
+      names[i]=ssiReadString(d);
+    }
   }
   // read the orderings:
   int num_ord; // number of orderings
