@@ -11,8 +11,9 @@ endif
 # forcefully enable exceptions for polymake
 POLYMAKE_CFLAGS = -fexceptions -frtti
 
-AM_LDFLAGS	= -release ${PACKAGE_VERSION} ${PM_LDFLAGS}
-
+AM_LDFLAGS	= ${PM_LDFLAGS}
+# -release ${PACKAGE_VERSION}
+  
 SOURCES = polymake_conversion.cc polymake_documentation.cc polymake_wrapper.cc
 
 CXXFLAGS += $(POLYMAKE_CXXFLAGS)

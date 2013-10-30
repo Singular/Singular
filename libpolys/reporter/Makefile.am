@@ -31,7 +31,7 @@ SOURCES  = dError.cc reporter.cc
 libreporter_la_SOURCES   = $(SOURCES)
 # libreporter_g_la_SOURCES = $(SOURCES)
 
-libreporter_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+## libreporter_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 libreporter_includedir  =$(includedir)/singular/reporter
 

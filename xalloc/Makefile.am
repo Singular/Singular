@@ -23,7 +23,7 @@ AM_CPPFLAGS = -I${srcdir} -DHAVE_CONFIG_H
 libomalloc_la_SOURCES  =$(SOURCES)
 #libomalloc_g_la_SOURCES=$(SOURCES)
 
-libomalloc_la_LDFLAGS  = -release ${PACKAGE_VERSION}
+### libomalloc_la_LDFLAGS  = -release ${PACKAGE_VERSION}
 
 #libomalloc_la_CFLAGS		= -O3 ${PIPE}
 #libomalloc_g_la_CFLAGS	= -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE}

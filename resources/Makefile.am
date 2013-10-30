@@ -31,7 +31,7 @@ SOURCES  = omFindExec.c feResource.cc feFopen.cc
 libresources_la_SOURCES   = $(SOURCES)
 # libresources_g_la_SOURCES = $(SOURCES)
 
-libresources_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+### libresources_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 libresources_includedir  =$(includedir)/resources/
 

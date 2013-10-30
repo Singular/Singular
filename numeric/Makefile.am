@@ -29,7 +29,7 @@ SOURCES  = mpr_base.cc mpr_inout.cc mpr_numeric.cc
 libnumeric_la_SOURCES   = $(SOURCES)
 # libnumeric_g_la_SOURCES = $(SOURCES)
 
-libnumeric_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+### libnumeric_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 libnumeric_includedir  =$(includedir)/singular/numeric/
 

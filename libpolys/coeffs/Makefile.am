@@ -26,7 +26,7 @@ libcoeffsdir = $(libdir)/singular
 # libcoeffs_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
 # libcoeffs_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
-libcoeffs_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+### libcoeffs_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 
 # noinst_HEADERS= \

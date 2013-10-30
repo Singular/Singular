@@ -38,7 +38,7 @@ libomalloc_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
 # libomalloc_g_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
 
 
-libomalloc_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+# libomalloc_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 libomalloc_la_CFLAGS    = -O2
 
 nodist_libomalloc_la_SOURCES = omTables.inc omTables.h mylimits.h

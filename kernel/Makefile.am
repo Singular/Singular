@@ -35,7 +35,7 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top
 # libkernel_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
 # libkernel_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
-libkernel_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+### libkernel_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 
 SOURCES = polys.cc febase.cc feread.cc \

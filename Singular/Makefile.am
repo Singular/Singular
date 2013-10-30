@@ -206,7 +206,8 @@ SingularHEADERS =    Cache.h \
 nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc ${EMBED_PYOBJECT}
 # nodist_libSingular_g_la_SOURCES = iparith.inc
 
-libSingular_la_LDFLAGS    =  -release ${PACKAGE_VERSION} ${AM_LDFLAGS} ${EMBED_PYOBJECT} \
+# -release ${PACKAGE_VERSION} 
+libSingular_la_LDFLAGS    = ${AM_LDFLAGS} ${EMBED_PYOBJECT} \
 -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc \
 $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 

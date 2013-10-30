@@ -151,7 +151,7 @@ EXTRA_libpolys_la_SOURCES = templates/p_Procs_Static.cc templates/p_Procs_Dynami
 # libpolys_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
 libpolys_la_CPPFLAGS = ${NODEBUGDEFS} ${AM_CPPFLAGS}
 
-libpolys_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+### libpolys_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 
 #################################################
