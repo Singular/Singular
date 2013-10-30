@@ -77,7 +77,7 @@ public:
 procinfo *iiInitSingularProcinfo(procinfo* pi, const char *libname,
               const char *procname, int line, long pos, BOOLEAN pstatic=FALSE);
 
-int yylplex(char *libname, const char *libfile, lib_style_types *lib_style,
+int yylplex(const char *libname, const char *libfile, lib_style_types *lib_style,
            idhdl pl, BOOLEAN autoexport=FALSE, lp_modes=LOAD_LIB);
 
 void reinit_yylp();

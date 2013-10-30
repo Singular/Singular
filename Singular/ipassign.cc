@@ -1065,7 +1065,7 @@ static BOOLEAN jiA_INTVEC_L(leftv l,leftv r)
   t.rtyp=INT_CMD;
   while ((i<iv->length())&&(l!=NULL))
   {
-    t.data=(char *)(*iv)[i];
+    t.data=(char *)(long)(*iv)[i];
     h=l->next;
     l->next=NULL;
     nok=jiAssign_1(l,&t);

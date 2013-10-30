@@ -709,9 +709,9 @@ const char * nr2mRead (const char *s, number *a, const coeffs r)
     s = nr2mEati(s, &n,r);
   }
   if (n == 1)
-    *a = (number)z;
+    *a = (number)(long)z;
   else
-      *a = nr2mDiv((number)z,(number)n,r);
+      *a = nr2mDiv((number)(long)z,(number)(long)n,r);
   return s;
 }
 #endif

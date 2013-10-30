@@ -1121,70 +1121,70 @@ struct sConvertTypes dConvertTypes[] =
 {
 //   input type       output type     convert procedure
 //  int -> bigint
-   { INT_CMD,         BIGINT_CMD,     D(iiI2BI) , NULL },
+   { INT_CMD,         BIGINT_CMD,     D(iiI2BI) , NULL_VAL },
 //  int -> number
-   { INT_CMD,         NUMBER_CMD,     D(iiI2N) , NULL },
-   { BIGINT_CMD,      NUMBER_CMD,     D(iiBI2N) , NULL },
+   { INT_CMD,         NUMBER_CMD,     D(iiI2N) , NULL_VAL },
+   { BIGINT_CMD,      NUMBER_CMD,     D(iiBI2N) , NULL_VAL },
 //  int -> poly
-   { INT_CMD,         POLY_CMD,       D(iiI2P) , NULL },
-   { BIGINT_CMD,      POLY_CMD,       D(iiBI2P) , NULL },
+   { INT_CMD,         POLY_CMD,       D(iiI2P) , NULL_VAL },
+   { BIGINT_CMD,      POLY_CMD,       D(iiBI2P) , NULL_VAL },
 //  int -> vector
-   { INT_CMD,         VECTOR_CMD,     D(iiI2V) , NULL },
-   { BIGINT_CMD,      VECTOR_CMD,     D(iiBI2V) , NULL },
+   { INT_CMD,         VECTOR_CMD,     D(iiI2V) , NULL_VAL },
+   { BIGINT_CMD,      VECTOR_CMD,     D(iiBI2V) , NULL_VAL },
 //  int -> ideal
-   { INT_CMD,         IDEAL_CMD,      D(iiI2Id) , NULL },
-   { BIGINT_CMD,      IDEAL_CMD,      D(iiBI2Id) , NULL },
+   { INT_CMD,         IDEAL_CMD,      D(iiI2Id) , NULL_VAL },
+   { BIGINT_CMD,      IDEAL_CMD,      D(iiBI2Id) , NULL_VAL },
 //  int -> matrix
-   { INT_CMD,         MATRIX_CMD,     D(iiI2Id) , NULL },
-   { BIGINT_CMD,      MATRIX_CMD,     D(iiBI2Id) , NULL },
+   { INT_CMD,         MATRIX_CMD,     D(iiI2Id) , NULL_VAL },
+   { BIGINT_CMD,      MATRIX_CMD,     D(iiBI2Id) , NULL_VAL },
 //  int -> intvec
-   { INT_CMD,         INTVEC_CMD,     D(iiI2Iv) , NULL },
+   { INT_CMD,         INTVEC_CMD,     D(iiI2Iv) , NULL_VAL },
 //  intvec -> intmat
-   { INTVEC_CMD,      INTMAT_CMD,     D(iiDummy), NULL },
+   { INTVEC_CMD,      INTMAT_CMD,     D(iiDummy), NULL_VAL },
 //  intvec -> matrix
-   { INTVEC_CMD,      MATRIX_CMD,     D(iiIm2Ma) , NULL },
+   { INTVEC_CMD,      MATRIX_CMD,     D(iiIm2Ma) , NULL_VAL },
 //  intmat -> bigintmat
-   { INTMAT_CMD,      BIGINTMAT_CMD,  D(iiIm2Bim) , NULL },
+   { INTMAT_CMD,      BIGINTMAT_CMD,  D(iiIm2Bim) , NULL_VAL },
 //  bigintmat -> intmat
-   { BIGINTMAT_CMD,   INTMAT_CMD,     D(iiBim2Im) , NULL },
+   { BIGINTMAT_CMD,   INTMAT_CMD,     D(iiBim2Im) , NULL_VAL },
 //  intmat -> matrix
-   { INTMAT_CMD,      MATRIX_CMD,     D(iiIm2Ma) , NULL },
+   { INTMAT_CMD,      MATRIX_CMD,     D(iiIm2Ma) , NULL_VAL },
 //  number -> poly
-   { NUMBER_CMD,      POLY_CMD,       D(iiN2P)  , NULL },
+   { NUMBER_CMD,      POLY_CMD,       D(iiN2P)  , NULL_VAL },
 //  number -> matrix
-   { NUMBER_CMD,      MATRIX_CMD,     D(iiN2Ma)  , NULL },
+   { NUMBER_CMD,      MATRIX_CMD,     D(iiN2Ma)  , NULL_VAL },
 //  number -> ideal
 //  number -> vector
 //  number -> module
 //  poly -> number
 //  poly -> ideal
-   { POLY_CMD,        IDEAL_CMD,      D(iiP2Id) , NULL },
+   { POLY_CMD,        IDEAL_CMD,      D(iiP2Id) , NULL_VAL },
 //  poly -> vector
-   { POLY_CMD,        VECTOR_CMD,     D(iiP2V) , NULL },
+   { POLY_CMD,        VECTOR_CMD,     D(iiP2V) , NULL_VAL },
 //  poly -> matrix
-   { POLY_CMD,        MATRIX_CMD,     D(iiP2Id) , NULL },
+   { POLY_CMD,        MATRIX_CMD,     D(iiP2Id) , NULL_VAL },
 //  vector -> module
-   { VECTOR_CMD,      MODUL_CMD,      D(iiP2Id) , NULL },
+   { VECTOR_CMD,      MODUL_CMD,      D(iiP2Id) , NULL_VAL },
 //  vector -> matrix
-   { VECTOR_CMD,      MATRIX_CMD,     D(iiV2Ma) , NULL },
+   { VECTOR_CMD,      MATRIX_CMD,     D(iiV2Ma) , NULL_VAL },
 //  ideal -> module
-   { IDEAL_CMD,       MODUL_CMD,      D(iiMa2Mo) , NULL },
+   { IDEAL_CMD,       MODUL_CMD,      D(iiMa2Mo) , NULL_VAL },
 //  ideal -> matrix
-   { IDEAL_CMD,       MATRIX_CMD,     D(iiDummy) , NULL },
+   { IDEAL_CMD,       MATRIX_CMD,     D(iiDummy) , NULL_VAL },
 //  module -> matrix
-   { MODUL_CMD,       MATRIX_CMD,     D(iiMo2Ma) , NULL },
+   { MODUL_CMD,       MATRIX_CMD,     D(iiMo2Ma) , NULL_VAL },
 //  matrix -> ideal
 //  matrix -> module
-   { MATRIX_CMD,      MODUL_CMD,      D(iiMa2Mo) , NULL },
+   { MATRIX_CMD,      MODUL_CMD,      D(iiMa2Mo) , NULL_VAL },
 //  intvec
 //  link
-   { STRING_CMD,      LINK_CMD,       D(iiS2Link) , NULL },
+   { STRING_CMD,      LINK_CMD,       D(iiS2Link) , NULL_VAL },
 // resolution -> list
-   { RESOLUTION_CMD,  LIST_CMD,       NULL /*iiR2L*/ , D(iiR2L_l) },
+   { RESOLUTION_CMD,  LIST_CMD,       NULL_VAL /*iiR2L*/ , D(iiR2L_l) },
 // list -> resolution
-   { LIST_CMD,        RESOLUTION_CMD, D(iiL2R) , NULL },
+   { LIST_CMD,        RESOLUTION_CMD, D(iiL2R) , NULL_VAL},
 //  end of list
-   { 0,               0,              NULL , NULL }
+   { 0,               0,              NULL_VAL , NULL_VAL }
 };
 #endif
 #ifdef IPASSIGN

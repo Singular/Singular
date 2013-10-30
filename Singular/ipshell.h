@@ -68,7 +68,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
    if  no, returns FALSE
 */
 /// load lib/module given in v
-BOOLEAN jjLOAD(char *s, BOOLEAN autoexport = FALSE);
+BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport = FALSE);
 BOOLEAN iiLocateLib(const char* lib, char* where);
 leftv   iiMap(map theMap, const char * what);
 void    iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
@@ -90,7 +90,7 @@ void    iiDebug();
 BOOLEAN iiCheckRing(int i);
 poly    iiHighCorner(ideal i, int ak);
 char *  iiConvName(const char *libname);
-BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, char *newlib,
+BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char *newlib,
                          idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror);
 
 // converts a resolution into a list of modules

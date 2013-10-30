@@ -5257,13 +5257,13 @@ BOOLEAN jjWAITALL1(leftv res, leftv u)
   return FALSE;
 }
 
-BOOLEAN jjLOAD(char *s, BOOLEAN autoexport)
+BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
 {
   char libnamebuf[256];
   lib_types LT = type_of_LIB(s, libnamebuf);
 
 #ifdef HAVE_DYNAMIC_LOADING
-  extern BOOLEAN load_modules(char *newlib, char *fullpath, BOOLEAN autoexport);
+  extern BOOLEAN load_modules(const char *newlib, char *fullpath, BOOLEAN autoexport);
 #endif /* HAVE_DYNAMIC_LOADING */
   switch(LT)
   {
@@ -5302,7 +5302,7 @@ BOOLEAN jjLOAD(char *s, BOOLEAN autoexport)
         return bo;
       }
       case LT_BUILTIN:
-        SModulFunc_t iiGetBuiltinModInit(char*);
+        SModulFunc_t iiGetBuiltinModInit(const char*);
         return load_builtin(s,autoexport, iiGetBuiltinModInit(s));
       case LT_MACH_O:
       case LT_ELF:

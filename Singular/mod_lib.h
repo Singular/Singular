@@ -6,7 +6,7 @@
 
 #include <polys/mod_raw.h>  /* for lib_types */
 
-lib_types type_of_LIB(char *newlib, char *fullname);
+lib_types type_of_LIB(const char *newlib, char *fullname);
 
 #ifdef EMBED_PYTHON
 #define SI_BUILTIN_PYOBJECT(add) add(pyobject) add(syzextra)

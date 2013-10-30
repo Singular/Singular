@@ -1204,7 +1204,7 @@ do                                            \
 while(0)
 
 #undef YY_DECL
-#define YY_DECL int yylex(char *newlib, const char *libfile, \
+#define YY_DECL int yylex(const char *newlib, const char *libfile, \
                            lib_style_types *lib_style, \
                            idhdl pl, BOOLEAN autoexport, lp_modes mode)
 #undef YY_INPUT

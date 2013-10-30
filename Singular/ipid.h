@@ -82,7 +82,7 @@ extern idhdl      currRingHdl;
 /* ================================================================== */
 /* module support */
 typedef int (*SModulFunc_t)(SModulFunctions*);
-BOOLEAN load_builtin(char *newlib, BOOLEAN autoexport, SModulFunc_t init);
+BOOLEAN load_builtin(const char *newlib, BOOLEAN autoexport, SModulFunc_t init);
 void module_help_main(const char *newlib,const char *help);
 void module_help_proc(const char *newlib,const char *p, const char *help);
 

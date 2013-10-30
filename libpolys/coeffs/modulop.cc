@@ -363,7 +363,7 @@ const char * npRead (const char *s, number *a, const coeffs r)
     s = npEati(s, &n, r);
   }
   if (n == 1)
-    *a = (number)z;
+    *a = (number)(long)z;
   else
   {
     if ((z==0)&&(n==0)) WerrorS(nDivBy0);
@@ -371,10 +371,10 @@ const char * npRead (const char *s, number *a, const coeffs r)
     {
 #ifdef NV_OPS
       if (r->ch>NV_MAX_PRIME)
-        *a = nvDiv((number)z,(number)n,r);
+        *a = nvDiv((number)(long)z,(number)(long)n,r);
       else
 #endif
-        *a = npDiv((number)z,(number)n,r);
+        *a = npDiv((number)(long)z,(number)(long)n,r);
     }
   }
   assume( n_Test(*a, r) );
@@ -616,7 +616,7 @@ static number npMapLongR(number from, const coeffs /*src*/, const coeffs dst_r)
 #endif
   dest = res->z;
 
-  int in=0;
+  long in=0;
   if (e<0)
   {
     al = dest->_mp_size = size;

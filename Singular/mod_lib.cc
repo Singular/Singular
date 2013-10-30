@@ -24,7 +24,7 @@ const char * const si_builtin_libs[] = { SI_FOREACH_BUILTIN(SI_BUILTIN_LIBSTR) N
 
 #define BYTES_TO_CHECK 7
 
-lib_types type_of_LIB(char *newlib, char *libnamebuf)
+lib_types type_of_LIB(const char *newlib, char *libnamebuf)
 {
   const unsigned char mach_o[]={0xfe,0xed,0xfa,0xce,0};
   const unsigned char mach_O[]={0xce,0xfa,0xed,0xfe,0};

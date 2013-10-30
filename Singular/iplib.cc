@@ -48,7 +48,7 @@
 
 
 #ifdef HAVE_DYNAMIC_LOADING
-BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport);
+BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport);
 #endif
 
 #ifdef HAVE_LIBPARSER
@@ -740,7 +740,7 @@ int staticdemo_mod_init(SModulFunctions*){ PrintS("init of staticdemo\n"); retur
 
 
 SModulFunc_t
-iiGetBuiltinModInit(char* libname)
+iiGetBuiltinModInit(const char* libname)
 {
   SI_FOREACH_BUILTIN(SI_GET_BUILTIN_MOD_INIT)
 
@@ -918,7 +918,7 @@ static void iiRunInit(package p)
   }
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, char*newlib,
+BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char*newlib,
              idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror)
 {
   extern FILE *yylpin;
@@ -1102,7 +1102,7 @@ int iiAddCprocTop(const char *libname, const char *procname, BOOLEAN pstatic,
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #ifdef HAVE_DYNAMIC_LOADING
-BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
+BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
 {
 #ifdef HAVE_STATIC
   WerrorS("mod_init: static version can not load modules");
@@ -1185,7 +1185,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
 }
 #endif /* HAVE_DYNAMIC_LOADING */
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-BOOLEAN load_builtin(char *newlib, BOOLEAN autoexport, SModulFunc_t init)
+BOOLEAN load_builtin(const char *newlib, BOOLEAN autoexport, SModulFunc_t init)
 {
   int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
                  BOOLEAN(*func)(leftv res, leftv v));
@@ -1385,7 +1385,7 @@ void piShowProcList()
 //}
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #ifdef HAVE_LIBPARSER
-void libstack::push(char */*p*/, char *libn)
+void libstack::push(const char */*p*/, char *libn)
 {
   libstackv lp;
   if( !iiGetLibStatus(libn))
@@ -1406,7 +1406,7 @@ void libstack::push(char */*p*/, char *libn)
   }
 }
 
-libstackv libstack::pop(char */*p*/)
+libstackv libstack::pop(const char */*p*/)
 {
   libstackv ls = this;
   //omFree((ADDRESS)ls->libname);

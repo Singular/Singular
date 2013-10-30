@@ -359,7 +359,7 @@ lists primeFactorisation(const number n, const int pBound)
   for (i = 0; i < index; i++)
   {
     multiplicitiesL->m[i].rtyp = INT_CMD;
-    multiplicitiesL->m[i].data = (void*)multiplicities[i];
+    multiplicitiesL->m[i].data = (void*)(long)multiplicities[i];
   }
   omFree(multiplicities);
 

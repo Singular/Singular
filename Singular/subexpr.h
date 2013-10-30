@@ -119,8 +119,8 @@ class libstack
   char      *libname;
   BOOLEAN   to_be_done;
   int       cnt;
-  void      push(char *p, char * libname);
-  libstackv pop(char *p);
+  void      push(const char *p, char * libname);
+  libstackv pop(const char *p);
   inline char *get() { return(libname); }
 };
 #endif /* HAVE_LIBPARSER */

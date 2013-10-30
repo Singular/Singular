@@ -3495,7 +3495,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         {
           lV=(int)((long)(h->Data()));
           res->rtyp = INT_CMD;
-          res->data = (void*)pLastVblock(p, lV);
+          res->data = (void*)(long)pLastVblock(p, lV);
         }
         else return TRUE;
         return FALSE;
@@ -3736,7 +3736,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           double error= atof (s);
           int irred= probIrredTest (F, error);
           res->rtyp= INT_CMD;
-          res->data= (void*)irred;
+          res->data= (void*)(long)irred;
           return FALSE;
         }
         else return TRUE;
@@ -3807,7 +3807,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         int v=1;
         if ((h->next->next!=NULL)&& (h->next->next->Typ()==INT_CMD))
           v=(int)(long)h->next->next->Data();
-        res->data=(char *)simpleipc_cmd((char *)h->Data(),(int)(long)h->next->Data(),v);
+        res->data=(char *)(long)simpleipc_cmd((char *)h->Data(),(int)(long)h->next->Data(),v);
         res->rtyp=INT_CMD;
         return FALSE;
       }
