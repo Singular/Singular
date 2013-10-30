@@ -4,8 +4,15 @@ if ENABLE_FACTORY
   USE_FACTORY = factory
 endif
 
+if HAVE_GFANLIB 
+  USE_GFANLIB = gfanlib
+endif
+
+
+
+
 SUBDIRS = resources omalloc xalloc $(USE_FACTORY) \
-libpolys kernel numeric gfanlib dyn_modules \
+libpolys kernel numeric $(USE_GFANLIB) dyn_modules \
 IntegerProgramming Singular dox \
 emacs debian redhat desktop
 

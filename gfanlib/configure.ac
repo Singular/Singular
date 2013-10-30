@@ -49,7 +49,7 @@ fi
 if test "x$ENABLE_GFANLIB" = xyes; then
 if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no -a "$ac_cv_header_cddlib_setoper_h" == no
 then
-	exit 1
+	exit 0
 fi
 fi
 
