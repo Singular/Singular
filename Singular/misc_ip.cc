@@ -785,40 +785,21 @@ char * versionString(/*const bool bShowDetails = false*/ )
   StringSetS("");
   StringAppend("Singular for %s version %s (%s, %d bit) %s #%s",
                S_UNAME, S_VERSION1, // SINGULAR_VERSION,
-               PACKAGE_VERSION, SIZEOF_LONG*8, singular_date, GIT_VERSION);
+               PACKAGE_VERSION, SIZEOF_VOIDP*8, singular_date, GIT_VERSION);
   StringAppendS("\nwith\n\t");
-#ifdef HAVE_FACTORY
-  StringAppend("factory(%s){'%s','%s'}", factoryVersion, FACTORY_CFLAGS, FACTORY_LIBS);
-#ifdef HAVE_LIBFAC
-  // libfac:
-//  extern const char * libfac_version;
-//  extern const char * libfac_date;
-  StringAppend("+libfac");
-#endif // #ifdef HAVE_LIBFAC
-  StringAppend(",");
-#endif
 
 #if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
-              StringAppend("GMP(%d.%d){'%s','%s'},",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR, GMP_CFLAGS, GMP_LIBS);
-#else
-              StringAppendS("GMP(1.3),");
+              StringAppend("GMP(%d.%d),",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
 #endif
 #ifdef HAVE_NTL
 #include <NTL/version.h>
-              StringAppend("NTL(%s){'%s','%s'},",NTL_VERSION, NTL_CFLAGS, NTL_LIBS);
+              StringAppend("NTL(%s),",NTL_VERSION);
 #endif
 
-#ifdef HAVE_FACTORY
 #ifdef HAVE_FLINT
               StringAppend("FLINT(%s){'%s','%s'},",version, FLINT_CFLAGS, FLINT_LIBS);
 #endif
-#endif
 
-#if SIZEOF_VOIDP == 8
-              StringAppendS("64bit,");
-#else
-              StringAppendS("32bit,");
-#endif
 #if defined(HAVE_DYN_RL)
               if (fe_fgets_stdin==fe_fgets_dummy)
                 StringAppendS("no input,");
@@ -855,9 +836,6 @@ char * versionString(/*const bool bShowDetails = false*/ )
               StringAppendS("dynamic modules,");
 #endif
               if (p_procs_dynamic) StringAppendS("dynamic p_Procs,");
-#ifdef TEST
-              StringAppendS("TESTs,");
-#endif
 #if YYDEBUG
               StringAppendS("YYDEBUG=1,");
 #endif
