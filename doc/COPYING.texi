@@ -102,7 +102,7 @@ anonymous ftp through the following addresses:
 @copyright{} Anders Jensen
 @* @uref{http://home.imf.au.dk/jensen/software/gfan/gfan.html}
 @item Singular-Factory
-@copyright{} Greuel/Stobbe, University of Kaiserslautern:
+@copyright{} Gert-Martin Greuel/R@"udiger Stobbe/Martin Lee, University of Kaiserslautern:
 @* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Factory}
 @item Singular-libfac
 @copyright{}  Messollen, University of Saarbr@"ucken:
@@ -122,6 +122,9 @@ Some external programs are optional:
 @uref{http://www.4ti2.de/}
 @item gfan (used by tropical.lib, @pxref{tropical_lib})
 @uref{http://www.math.tu-berlin.de/~jensen/software/gfan/gfan.html}
+@item FLINT
+@copyright{} Bill Hart, Sebastian Pancratz, Fredrik Johansson
+@* @uref{http://www.flintlib.org}
 @item graphviz (used by resgraph.lib, @pxref{resgraph_lib})
 @uref{http://www.graphviz.org/}
 @item normaliz (used by normaliz.lib, @pxref{normaliz_lib})
