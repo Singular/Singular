@@ -58,10 +58,10 @@ for FLINT_HOME in ${FLINT_HOME_PATH}
 	fi
 	
 	# we suppose that mpfr and mpir to be in the same place or available by default
-	FLINT_LIBS="$FLINT_LIBS -lflint -lmpfr -lmpir"
+	FLINT_LIBS="$FLINT_LIBS -lflint -lmpfr"
 	
-	CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS}" 
-	LIBS="${BACKUP_LIBS} ${FLINT_LIBS}"
+	CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CFLAGS}" 
+	LIBS="${BACKUP_LIBS} ${FLINT_LIBS} ${GMP_LIBS}"
 
 	AC_TRY_LINK(
 	[#include <flint/fmpz.h>],
