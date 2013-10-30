@@ -30,6 +30,13 @@ LIB "parallel.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static proc mod_init()
+{
+   newstruct("ideal_primeTest", "ideal Ideal");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 proc mixedTest()
 "USAGE:  mixedTest();
 RETURN:  1 if ordering of basering is mixed, 0 else
@@ -378,7 +385,7 @@ proc primeTest(def II, bigint p)
 {
    if(typeof(II) == "string")
    {
-      execute("ideal I = "+II+";");
+      ideal I = `II`.Ideal;
    }
    else
    {
@@ -479,6 +486,9 @@ EXAMPLE: example primeList; shows an example
       list parallelResults;
       list arguments;
       int neededPrimes = neededSize-size(L);
+      ideal_primeTest Id;
+      Id.Ideal = I;
+      export(Id);
       while(neededPrimes > 0)
       {
          arguments = list();
@@ -487,7 +497,7 @@ EXAMPLE: example primeList; shows an example
          {
             p = prime(p-1);
             if(p == 2) { ERROR("no more primes"); }
-            arguments[i] = list("I", p);
+            arguments[i] = list("Id", p);
          }
          parallelResults = parallelWaitAll("primeTest", arguments,
             list(list(list(ncores))));
