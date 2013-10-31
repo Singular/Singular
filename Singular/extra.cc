@@ -121,11 +121,6 @@
 #include <kernel/spectrum.h>
 #endif
 
-#if defined(HPUX_10) || defined(HPUX_9)
-extern "C" int setenv(const char *name, const char *value, int overwrite);
-#endif
-
-
 #ifdef HAVE_PLURAL
 #include <polys/nc/nc.h>
 #include <polys/nc/ncSAMult.h> // for CMultiplier etc classes

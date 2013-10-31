@@ -759,13 +759,6 @@ int fe_init_dyn_rl()
   int res=0;
   loop
   {
-    #if defined(HPUX_9) || defined(HPUX_10)
-    fe_rl_hdl=dynl_open("libreadline.sl");
-    if (fe_rl_hdl==NULL)
-      fe_rl_hdl=dynl_open("/lib/libreadline.sl");
-    if (fe_rl_hdl==NULL)
-      fe_rl_hdl=dynl_open("/usr/lib/libreadline.sl");
-    #else
     fe_rl_hdl=dynl_open("libreadline.so");
     if (fe_rl_hdl==NULL) fe_rl_hdl=dynl_open("libreadline.so.2");
     if (fe_rl_hdl==NULL) fe_rl_hdl=dynl_open("libreadline.so.3");
@@ -773,7 +766,6 @@ int fe_init_dyn_rl()
     if (fe_rl_hdl==NULL) fe_rl_hdl=dynl_open("libreadline.so.5");
     if (fe_rl_hdl==NULL) fe_rl_hdl=dynl_open("libreadline.so.6");
     if (fe_rl_hdl==NULL) fe_rl_hdl=dynl_open("libreadline.so.7");
-    #endif
     if (fe_rl_hdl==NULL) { return 1;}
 
     fe_filename_completion_function=
