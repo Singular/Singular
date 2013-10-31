@@ -16,6 +16,7 @@
 #include <ctype.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <unistd.h>
 
 
 #ifdef HAVE_CONFIG_H
@@ -60,42 +61,40 @@ void* dynl_open_binary_warn(const char* binary_name, const char* msg)
 {
   void* handle = NULL;
   char* binary_name_so=NULL;
-
-  // try %b/MOD first
-  {
-    const char* bin_dir = feGetResource('b');
-    const int binary_name_so_length = 6 + strlen(DL_TAIL)
-               + strlen(binary_name)
-               +strlen(DIR_SEPP)*2
-               +strlen(bin_dir);
-    binary_name_so = (char *)omAlloc0( binary_name_so_length * sizeof(char) );
-    snprintf(binary_name_so, binary_name_so_length, "%s%s%s%s%s%s", bin_dir, DIR_SEPP,"MOD",DIR_SEPP,binary_name, DL_TAIL);
-    handle = dynl_open(binary_name_so);
-
-  }
+  BOOLEAN found=FALSE;
 
   // try P_PROCS_DIR (%P)
-  if (handle == NULL)
+  char* proc_path = feGetResource('P');
+  if (proc_path != NULL)
   {
-    const char* proc_dir = feGetResource('P');
-    if (proc_dir != NULL)
+    char *p;
+    char *q;
+    p=proc_path;
+    int binary_name_so_length = 3 + strlen(DL_TAIL) + strlen(binary_name) + strlen(DIR_SEPP) + strlen(proc_path);
+    binary_name_so = (char *)omAlloc0( binary_name_so_length * sizeof(char) );
+    while((p!=NULL)&&(*p!='\0'))
     {
-      if (binary_name_so!=NULL) omFree(binary_name_so);
-      const int binary_name_so_length = 3 + strlen(DL_TAIL) + strlen(binary_name) + strlen(DIR_SEPP) + strlen(proc_dir);
-      binary_name_so = (char *)omAlloc0( binary_name_so_length * sizeof(char) );
-      snprintf(binary_name_so, binary_name_so_length, "%s%s%s%s", proc_dir, DIR_SEPP, binary_name, DL_TAIL);
-      handle = dynl_open(binary_name_so);
+      q=strchr(p,fePathSep);
+      if (q!=NULL) *q='\0';
+      strcpy(binary_name_so,p);
+      if (q!=NULL) *q=fePathSep;
+      strcat(binary_name_so,DIR_SEPP);
+      strcat(binary_name_so,binary_name);
+      strcat(binary_name_so,DL_TAIL);
+      if(!access(binary_name_so, R_OK)) { found=TRUE; break; }
+      if (q!=NULL) p=q+1; else p=NULL;
     }
+    if (found) handle = dynl_open(binary_name_so);
   }
 
   if (handle == NULL && ! warn_handle)
   {
-      Warn("Could not find dynamic library: %s%s (tried %s)",
-              binary_name, DL_TAIL,binary_name_so);
-      Warn("Error message from system: %s", dynl_error());
-      if (msg != NULL) Warn("%s", msg);
-      Warn("See the INSTALL section in the Singular manual for details.");
-      warn_handle = TRUE;
+    Warn("Could not find dynamic library: %s%s (path %s)",
+            binary_name, DL_TAIL,proc_path);
+    if (found) Warn("Error message from system: %s", dynl_error());
+    if (msg != NULL) Warn("%s", msg);
+    Warn("See the INSTALL section in the Singular manual for details.");
+    warn_handle = TRUE;
   }
   omfree((ADDRESS)binary_name_so );
 

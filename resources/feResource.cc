@@ -41,7 +41,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 // define RESOURCE_DEBUG for chattering about resource management
 // #define RESOURCE_DEBUG
 
-#define SINGULAR_DEFAULT_DIR "/usr/local/Singular/"
+#define SINGULAR_DEFAULT_DIR PREFIX
 
 /*****************************************************************
  *
@@ -62,25 +62,23 @@ feResourceConfig_s feResourceConfigs[] =
    "%D/singular/LIB;"
    "%r/share/singular/LIB;"
    "%b/../share/singular/LIB;"
+   // gftables:
    "%D/factory;"
    "%r/share/factory;"
-   "%b/../share/factory;"
-   "%r/libexec/singular/MOD;"
-   "%b/../libexec/singular/MOD;"
    "%b/LIB;"
-   "%r/LIB;"
-   "%d/LIB;"
-   "%b/MOD;"
-   "%r/MOD;"
-   "%d/MOD;"
-   "%b;"
    "%b/../factory;"
-   "%b/../../factory",
-   ""},
+   // path for dynamic modules, should match ProcDir:
+   "%b/MOD;"
+   LIBEXEC_DIR "/singular/MOD;"
+   "%b",
+   (char *)""},
   {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/Singular",          (char *)""},
   {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "",                  (char *)""},
-  // should be changed to %b/../libexec/singular/pProcs/:
-  {"ProcDir",   'P',    feResDir,   "SINGULAR_PROCS_DIR",   "%r/libexec/singular/MOD/",                  (char *)""},
+  // should be changed to %b/../lib/singular/pProcs/:
+  {"ProcDir",   'P',    feResPath,  "SINGULAR_PROCS_DIR",
+     "%b/MOD;"
+     LIBEXEC_DIR "/singular/MOD;"
+     "%r/libexec/singular/MOD",                  (char *)""},
   {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                (char *)""},
   {"DataDir",   'D',    feResDir,   "SINGULAR_DATA_DIR",    "%b/../share/",          (char *)""},
   {"DefaultDir",'d',    feResDir,   "SINGULAR_DEFAULT_DIR",  SINGULAR_DEFAULT_DIR,  (char *)""},
@@ -187,6 +185,7 @@ void feInitResources(const char* argv0)
   feResource('r');
   // don't complain about stuff when initializing SingularPath
   feResource('s',0);
+  feResource('P');
 
 #if defined(HAVE_SETENV) || defined(HAVE_PUTENV)
   char* path = feResource('p');
