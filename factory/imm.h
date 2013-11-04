@@ -56,7 +56,7 @@ const INT64 MAXIMMEDIATELL = 268435454LL;
 
 inline long imm2int ( const InternalCF * const imm )
 {
-    return ((long)imm) >> 2;
+    return ((intptr_t)imm) >> 2;
 }
 
 inline InternalCF * int2imm ( long i )
@@ -69,10 +69,10 @@ inline InternalCF * int2imm ( long i )
 inline int imm2int ( const InternalCF * const imm )
 {
     // this could be better done by masking the sign bit
-    if ( ((int)((long)imm)) < 0 )
-        return -((-(long)imm) >> 2);
+    if ( ((int)((intptr_t)imm)) < 0 )
+        return -((-(intptr_t)imm) >> 2);
     else
-        return (long)imm >> 2;
+        return (intptr_t)imm >> 2;
 }
 
 inline InternalCF * int2imm ( long i )
@@ -101,7 +101,7 @@ inline InternalCF * int2imm_gf ( long i )
 inline int is_imm ( const InternalCF * const ptr )
 {
     // returns 0 if ptr is not immediate
-    return ( (long)ptr & 3 );
+    return ( (intptr_t)ptr & 3 );
 }
 #endif
 
