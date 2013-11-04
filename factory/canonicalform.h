@@ -17,6 +17,8 @@
 # endif
 #endif /* NOSTREAMIO */
 
+#include <stdint.h>
+
 #include "cf_defs.h"
 #include "variable.h"
 #include <factory/cf_gmp.h>

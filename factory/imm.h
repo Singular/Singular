@@ -3,6 +3,8 @@
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
 
+#include <stdint.h>
+
 // #include "config.h"
 
 #ifndef NOSTREAMIO
