@@ -4,6 +4,7 @@
 #define INCL_IMM_H
 
 #include <config.h>
+#include <stdint.h>
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM

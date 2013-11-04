@@ -21,6 +21,7 @@
 //}}}
 
 #include <factory/factoryconf.h>
+#include <stdint.h>
 
 #ifndef NOSTREAMIO
 #  ifdef HAVE_IOSTREAM
