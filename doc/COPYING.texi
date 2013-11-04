@@ -98,11 +98,14 @@ anonymous ftp through the following addresses:
 @item cdd (C implementation of the Double Description Method of Motzkin et al)
 @copyright{} Komei Fukuda
 @* @uref{http://www.ifor.math.ethz.ch/~fukuda/cdd_home}
+@item FLINT
+@copyright{} Bill Hart, Sebastian Pancratz, Fredrik Johansson
+@* @uref{http://www.flintlib.org}
 @item gfanlib
 @copyright{} Anders Jensen
 @* @uref{http://home.imf.au.dk/jensen/software/gfan/gfan.html}
 @item Singular-Factory
-@copyright{} Greuel/Stobbe, University of Kaiserslautern:
+@copyright{} Gert-Martin Greuel/R@"udiger Stobbe/Martin Lee, University of Kaiserslautern:
 @* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Factory}
 @item Singular-libfac
 @copyright{}  Messollen, University of Saarbr@"ucken:
@@ -166,7 +169,7 @@ Mathematisches Forschunginstitut Oberwolfach,
 Oklahoma State University,
 RWTH Aachen,
 Universidad de Buenos Aires,
-Université de Versailles Saint-Quentin-en-Yvelines,
+Universit@'e de Versailles Saint-Quentin-en-Yvelines,
 University of G@"ottingen,
 University of Hannover,
 University of La Laguna
@@ -209,7 +212,7 @@ Lars Kastner,
 Junaid Alan Khan,
 Kai Kr@"uger,
 Santiago Laplagne,
-Grégoire Lecerf,
+Gr@'egoire Lecerf,
 Martin Lee,
 Viktor Levandovskyy,
 Benjamin Lorenz,
