@@ -50,7 +50,7 @@ class InternalCF;
 inline int is_imm ( const InternalCF * const ptr )
 {
     // returns 0 if ptr is not immediate
-    return ( ((int)((long)ptr)) & 3 );
+    return ( ((int)((intptr_t)ptr)) & 3 );
 }
 
 

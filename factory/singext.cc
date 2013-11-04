@@ -55,7 +55,7 @@ void gmp_denominator ( const CanonicalForm & f, mpz_ptr result )
 int gf_value (const CanonicalForm & f )
 {
     InternalCF * ff = f.getval();
-    return ((long)ff) >>2;
+    return ((intptr_t)ff) >>2;
 }
 
 CanonicalForm
