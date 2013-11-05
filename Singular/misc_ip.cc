@@ -1043,73 +1043,82 @@ int singular_fstat(int fd, struct stat *buf)
 * the global exit routine of Singular
 */
 extern "C" {
+/* Note: We cannot use a mutex here because mutexes are not async-safe, but
+ * m2_end is called by sig_term_hdl(). Anyway, the race condition in the first
+ * few lines of m2_end() should not matter.
+ */
+volatile BOOLEAN m2_end_called = FALSE;
 
 void m2_end(int i)
 {
-  fe_reset_input_mode();
-  #ifdef PAGE_TEST
-  mmEndStat();
-  #endif
-  fe_reset_input_mode();
-  if (ssiToBeClosed_inactive)
+  if (!m2_end_called)
   {
-    link_list hh=ssiToBeClosed;
-    while(hh!=NULL)
+    m2_end_called = TRUE;
+    fe_reset_input_mode();
+#ifdef PAGE_TEST
+    mmEndStat();
+#endif
+    fe_reset_input_mode();
+    if (ssiToBeClosed_inactive)
     {
-      //Print("close %s\n",hh->l->name);
-      slPrepClose(hh->l);
-      hh=(link_list)hh->next;
-    }
-    ssiToBeClosed_inactive=FALSE;
-
-    idhdl h = currPack->idroot;
-    while(h != NULL)
-    {
-      if(IDTYP(h) == LINK_CMD)
+      link_list hh=ssiToBeClosed;
+      while(hh!=NULL)
       {
-        idhdl hh=h->next;
-        //Print("kill %s\n",IDID(h));
-        killhdl(h, currPack);
-        h = hh;
+        //Print("close %s\n",hh->l->name);
+        slPrepClose(hh->l);
+        hh=(link_list)hh->next;
+      }
+      ssiToBeClosed_inactive=FALSE;
+
+      idhdl h = currPack->idroot;
+      while(h != NULL)
+      {
+        if(IDTYP(h) == LINK_CMD)
+        {
+          idhdl hh=h->next;
+          //Print("kill %s\n",IDID(h));
+          killhdl(h, currPack);
+          h = hh;
+        }
+        else
+        {
+          h = h->next;
+        }
+      }
+      hh=ssiToBeClosed;
+      while(hh!=NULL)
+      {
+        //Print("close %s\n",hh->l->name);
+        slClose(hh->l);
+        hh=ssiToBeClosed;
+      }
+    }
+    if (!singular_in_batchmode)
+    {
+      if (i<=0)
+      {
+        if (TEST_V_QUIET)
+        {
+          if (i==0)
+            printf("Auf Wiedersehen.\n");
+          else
+            printf("\n$Bye.\n");
+        }
+        //#ifdef sun
+        //  #ifndef __svr4__
+        //    _cleanup();
+        //    _exit(0);
+        //  #endif
+        //#endif
+        i=0;
       }
       else
       {
-        h = h->next;
-      }
-    }
-    hh=ssiToBeClosed;
-    while(hh!=NULL)
-    {
-      //Print("close %s\n",hh->l->name);
-      slClose(hh->l);
-      hh=ssiToBeClosed;
-    }
-  }
-  if (!singular_in_batchmode)
-  {
-    if (i<=0)
-    {
-      if (TEST_V_QUIET)
-      {
-        if (i==0)
-          printf("Auf Wiedersehen.\n");
-        else
-          printf("\n$Bye.\n");
-      }
-      //#ifdef sun
-      //  #ifndef __svr4__
-      //    _cleanup();
-      //    _exit(0);
-      //  #endif
-      //#endif
-      i=0;
-    }
-    else
-    {
         printf("\nhalt %d\n",i);
+      }
     }
+    exit(i);
   }
-  exit(i);
 }
 }
 
