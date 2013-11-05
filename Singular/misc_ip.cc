@@ -24,6 +24,10 @@
 #include <factory/factory.h>
 #endif
 
+#ifdef HAVE_SIMPLEIPC
+#include <Singular/links/simpleipc.h>
+#endif
+
 #include <coeffs/si_gmp.h>
 #include <coeffs/coeffs.h>
 
@@ -1054,6 +1058,19 @@ void m2_end(int i)
   if (!m2_end_called)
   {
     m2_end_called = TRUE;
+#ifdef HAVE_SIMPLEIPC
+    for (int i = SIPC_MAX_SEMAPHORES; i >= 0; i--)
+    {
+      if (semaphore[i] != NULL)
+      {
+        while (sem_acquired[i] > 0)
+        {
+          sem_post(semaphore[i]);
+          sem_acquired[i]--;
+        }
+      }
+    }
+#endif   // HAVE_SIMPLEIPC
     fe_reset_input_mode();
 #ifdef PAGE_TEST
     mmEndStat();
