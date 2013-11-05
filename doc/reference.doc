@@ -4985,7 +4985,7 @@ turns off all options (including the @code{prompt} option).
 @c ---------
 @cindex warn, option
 be aware of pitfalls.
-@rc ---------
+@c ---------
 @item @code{returnSB}
 @cindex returnSB, option
 the functions @code{syz}, @code{intersect}, @code{quotient},
