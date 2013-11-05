@@ -788,8 +788,12 @@ char * versionString(/*const bool bShowDetails = false*/ )
                PACKAGE_VERSION, SIZEOF_VOIDP*8, singular_date, GIT_VERSION);
   StringAppendS("\nwith\n\t");
 
-#if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
-              StringAppend("GMP(%d.%d),",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
+#if defined(mpir_version)
+              StringAppend("MPIR(%s)~GMP(%s),", mpir_version, gmp_version);
+#elif defined(gmp_version)
+	      // #if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
+	      //              StringAppend("GMP(%d.%d),",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
+              StringAppend("GMP(%s),", gmp_version);
 #endif
 #ifdef HAVE_NTL
 #include <NTL/version.h>
@@ -797,7 +801,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #endif
 
 #ifdef HAVE_FLINT
-              StringAppend("FLINT(%s){'%s','%s'},",version, FLINT_CFLAGS, FLINT_LIBS);
+              StringAppend("FLINT(%s),",version);
 #endif
 
 #if defined(HAVE_DYN_RL)
