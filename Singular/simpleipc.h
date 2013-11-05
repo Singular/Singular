@@ -1,3 +1,5 @@
+#include <semaphore.h>
+
 #ifndef _SIMPLEIPC_H
 #define _SIMPLEIPC_H
 
@@ -8,6 +10,9 @@ extern "C"
 #define SIPC_MAX_SEMAPHORES 256
 
 #define USE_SEM_INIT 0
+
+extern sem_t *semaphore[SIPC_MAX_SEMAPHORES];
+extern int sem_acquired[SIPC_MAX_SEMAPHORES];
 
 int sipc_semaphore_init(int id, int count);
 int sipc_semaphore_exists(int id);
