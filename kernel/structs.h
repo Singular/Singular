@@ -9,10 +9,6 @@
 
 /* for omBin */
 #include <omalloc/omalloc.h>
-#include <misc/auxiliary.h>
-#include <kernel/polys.h>
-#include <polys/coeffrings.h>
-
 #ifdef HAVE_RINGS
 #include <coeffs/si_gmp.h>
 #endif
@@ -28,6 +24,10 @@
 
 /* C++-part */
 #ifdef __cplusplus
+#include <misc/auxiliary.h>
+#include <kernel/polys.h>
+#include <polys/coeffrings.h>
+
 class sleftv;
 class procinfo;
 class skStrategy;
