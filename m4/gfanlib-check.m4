@@ -8,6 +8,8 @@ AS_HELP_STRING([--enable-gfanlib], [Enables gfanlib, a package for basic convex 
 [ENABLE_GFANLIB="yes"],
 [ENABLE_GFANLIB="no"])
 
+SAVE_LIBS=$LIBS
+
 AC_MSG_CHECKING(whether to build with gfanlib)
 if test "x$ENABLE_GFANLIB" = xyes; then
  AC_MSG_RESULT(yes)
