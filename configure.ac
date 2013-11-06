@@ -56,8 +56,8 @@ link_all_deplibs=yes
 link_all_deplibs_CXX=yes
 
 # Checks for libraries.
-AC_CHECK_LIB(rt,clock_gettime)
 AC_CHECK_LIB(pthread,pthread_create)
+AC_CHECK_LIB(rt,clock_gettime)
 
 LB_CHECK_GMP(4.0,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
