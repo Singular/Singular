@@ -25,6 +25,7 @@
 #include <kernel/polys.h>
 #include <Singular/feOpt.h>
 #include <Singular/version.h>
+#include <Singular/misc_ip.h>
 #include <Singular/silink.h>
 #include <Singular/ssiLink.h>
 #include <Singular/si_signals.h>
@@ -85,20 +86,16 @@ void sig_pipe_hdl(int sig)
  }
 }
 
+volatile BOOLEAN do_shutdown = FALSE;
+volatile int defer_shutdown = 0;
+
 void sig_term_hdl(int sig)
 {
-  if (ssiToBeClosed_inactive)
+  do_shutdown = TRUE;
+  if (!defer_shutdown)
   {
-    ssiToBeClosed_inactive=FALSE;
-    while (ssiToBeClosed!=NULL)
-    {
-      slClose(ssiToBeClosed->l);
-      if (ssiToBeClosed==NULL) break;
-      ssiToBeClosed=(link_list)ssiToBeClosed->next;
-    }
-    exit(1);
+    m2_end(1);
   }
-  //else: we already shutting down: let's do m2_end ist work
 }
 
 /*---------------------------------------------------------------------*

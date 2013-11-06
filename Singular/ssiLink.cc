@@ -807,6 +807,9 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
             hh=nn;
           }
           ssiToBeClosed->next=NULL;
+#ifdef HAVE_SIMPLEIPC
+          memset(sem_acquired, 0, SIPC_MAX_SEMAPHORES*sizeof(sem_acquired[0]));
+#endif   // HAVE_SIMPLEIPC
           si_close(pc[1]); si_close(cp[0]);
           d->f_write=fdopen(cp[1],"w");
           d->f_read=s_open(pc[0]);
