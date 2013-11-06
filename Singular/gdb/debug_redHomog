@@ -24,9 +24,10 @@ commands
   silent
   set $lm_div_cnt = $lm_div_cnt + 1
   printf "Counter p_LmDivisibleBy: %d\n", $lm_div_cnt
-  if $lm_div_cnt != 12
-    continue
-  end
+  #if $lm_div_cnt != 12
+  #  continue
+  #end
+  continue
 end
 
 blc ShiftDVec::redHomog 'not_sev = ~ h->sev'

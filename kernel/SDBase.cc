@@ -341,8 +341,11 @@ ideal ShiftDVec::bba
     // ShiftDVec::Debug::Free, when
     // we do no longer need debugging output
     Init();
-  }
 
+    SDD::AbstractLogger* dvm = add_logger("DVec_Memory");
+    dvm->set_output_stream("MemoryLog","w");
+    add_logger("SDExt_Memory")->set_output_stream(dvm);
+  }
   strat->mark_as_SD_Case();
 
 #ifdef KDEBUG
@@ -1304,14 +1307,20 @@ uint ShiftDVec::p_LmShortDivisibleBy
  *  original p_LmDivisibleBy( poly, poly, const ring ) resides
  *  in pInline1.h
  */
-uint ShiftDVec::p_LmDivisibleBy
-  ( TObject * t1, TObject * t2, const ring r, int lV )
+uint ShiftDVec::p_LmDivisibleBy( TObject * t1,
+                                 TObject * t2, 
+                                 const ring r,
+                                 int lV, bool fromRight )
 {
   namespace SD = ShiftDVec;
   p_LmCheckPolyRing1(t2->p, r);
   pIfThen1(t1->p != NULL, p_LmCheckPolyRing1(t2->p, r));
-  if (p_GetComp(t1->p, r) == 0 || p_GetComp(t1->p,r) == p_GetComp(t2->p,r))
-    return SD::_p_LmDivisibleByNoComp(t1, t2, r, lV);
+  if ( p_GetComp(t1->p, r) == 0 ||
+       p_GetComp(t1->p,r) == p_GetComp(t2->p,r) )
+  {
+    return
+      SD::_p_LmDivisibleByNoComp(t1, t2, r, lV, fromRight);
+  }
   return UINT_MAX;
 }
 
@@ -1327,22 +1336,16 @@ uint ShiftDVec::p_LmDivisibleBy
  *
  * IMPORTANT:
  *   We may have to care better for the provided Ring!
- *
- * BOCO original comment:
- *   return: FALSE, if there exists i, such that a->exp[i] > b->exp[i]
- *           TRUE, otherwise
- *   (1) Consider long vars, instead of single exponents
- *   (2) Clearly, if la > lb, then FALSE
- *   (3) Suppose la <= lb, and consider first bits of single exponents in l:
- *       if TRUE, then value of these bits is la ^ lb
- *       if FALSE, then la-lb causes an "overflow" into one of those bits, i.e.,
- *                 la ^ lb != la - lb
  */
-static inline uint ShiftDVec::_p_LmDivisibleByNoComp
-  ( TObject * t1, TObject * t2, const ring r, int lV )
+static inline uint
+ShiftDVec::_p_LmDivisibleByNoComp( TObject * t1,
+                                   TObject * t2,
+                                   const ring r,
+                                   int lV, bool fromRight )
 {
   //BOCO: Well, thats all it does at the moment!
-  return t1->SD_Ext_Init_If_NULL()->divisibleBy( t2, lV );
+  return
+    t1->SD_Ext_Init_If_NULL()->divisibleBy(t2, lV, fromRight);
 }
 
 

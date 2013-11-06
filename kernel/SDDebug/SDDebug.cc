@@ -21,10 +21,20 @@ SDDebug::PolyFormat SDDebug::pf = SDDebug::PolyFormat();
 SDDebug::DefaultLogger::DefaultLogger() :
   filename(NULL), output_stream(NULL), pf(NULL) {}
 
+/* filename != NULL:
+ * logger is owner of output stream corresponding to filename
+ *
+ * filename == NULL && output_stream != NULL
+ * logger has output stream output_stream, but this stream
+ * was created somewhere else -> do not fclose it!
+ */
 SDDebug::DefaultLogger::~DefaultLogger()
 {
-  if(output_stream) fclose(output_stream);
-  if(filename)      delete filename;
+  if(filename)
+  {
+    delete filename;
+    fclose(output_stream);
+  }
 }
 
 
@@ -50,13 +60,18 @@ SDDebug::ALogger&
 SDDebug::DefaultLogger::operator<<( special spcl )
 {
   char* output;
+  int len_time;
   switch( spcl )
   {
     case Date:
       time_t now; time(&now);
       output = ctime(&now);
-      int len_time = strlen( output );
+      len_time = strlen( output );
       output[len_time-1] = '\0';
+      break;
+    case Flush:
+      if( output_stream ) fflush( output_stream );
+      return *this;
   }
 
   if( !output_stream ) PrintS( output );
@@ -114,6 +129,8 @@ void SDDebug::DefaultLogger::set_output_stream( FILE* stream )
 void SDDebug::DefaultLogger::set_output_stream
   ( const char* filename_, const char* mode )
 {
+  assume( mode[0] != 'r' || mode[1] == '+' );
+
   if( this->filename )
   {
     delete this->filename;
@@ -122,6 +139,27 @@ void SDDebug::DefaultLogger::set_output_stream
   this->filename = new char[strlen(filename_)+1];
   strcpy( this->filename, filename_ );
   output_stream = fopen( filename_, mode );
+}
+
+// REMARK:
+// logger should be of type DefaultLogger; otherwise this
+// function will do nothing.
+void SDDebug::DefaultLogger::set_output_stream(ALogger* logger)
+{
+  DefaultLogger* lg = dynamic_cast<DefaultLogger*>(logger);
+
+  if( lg )
+  {
+    if( this->filename )
+    {
+      delete this->filename;
+      fclose(output_stream);
+      filename = NULL;
+    }
+
+    output_stream = lg->output_stream;
+  }
+  else assume(0); // not so good ...
 }
 
 #endif

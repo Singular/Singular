@@ -29,10 +29,13 @@ namespace ShiftDVec
   uint p_LmShortDivisibleBy
     ( TObject* t1,unsigned long sev_t1,
       TObject* t2,unsigned long not_sev_t2, const ring r );
-  uint p_LmDivisibleBy
-    (TObject * t1, TObject * t2, const ring r, int lV);
+  uint p_LmDivisibleBy( TObject * t1, TObject * t2,
+                        const ring r, int lV,
+                        bool fromRight = false );
   static inline uint _p_LmDivisibleByNoComp
-    (TObject * t1, TObject * t2, const ring r, int lV);
+                      ( TObject * t1, TObject * t2,
+                        const ring r, int lV,
+                        bool fromRight = false );
   int kFindDivisibleByInT
     ( const TSet& T,
       const unsigned long* sevT, LObject* L, 

@@ -25,6 +25,8 @@
 #include <kernel/polys.h> //For pTotaldegree and the like
 #include <kernel/febase.h> //For Print stuff
 
+#include <kernel/SDDebug/SDDebug.h>
+
 typedef skStrategy* kStrategy;
 typedef class ShiftDVec::sTObjectExtension TExt;
 typedef class ShiftDVec::sLObjectExtension LExt;
@@ -49,6 +51,14 @@ ShiftDVec::sTObjectExtension* sTObject::SD_Ext_Init()
   if( SD_Object_Extension ) SD_Ext_Delete();
 
   SD_Object_Extension = new ShiftDVec::sTObjectExtension(this);
+
+  SD_DEBUG_LOG("SDExt_Memory")
+    << __FILE__ << ":" << __LINE__  << " -- "
+    << "new" << " -- "
+    << ShiftDVec::Debug::addr(SD_Object_Extension)
+    <<"\n" << ShiftDVec::Debug::AbstractLogger::Flush;
+
+
   SD_Ext()->Extension_Type = TExt::TObject_Extension;
   SD_Ext()->Set_Number_Of_Possesors(1);
 
@@ -97,6 +107,13 @@ void sTObject::SD_Ext_Delete()
 
   if( SD_Ext()->number_of_possesors == 0)
   {
+
+    SD_DEBUG_LOG("SDExt_Memory")
+    << __FILE__ << ":" << __LINE__  << " -- "
+    << "delete" << " -- " 
+    << ShiftDVec::Debug::addr(SD_Object_Extension)
+    << "\n" << ShiftDVec::Debug::AbstractLogger::Flush;
+
     switch( SD_Ext()->Extension_Type )
     {
       case TExt::TObject_Extension:
@@ -131,6 +148,12 @@ ShiftDVec::sLObjectExtension* sLObject::SD_LExt_Init()
   if( SD_Object_Extension ) { SD_Ext_Delete(); }
     
   LExt* ext = new LExt(this);
+ 
+  SD_DEBUG_LOG("SDExt_Memory")
+  << __FILE__ << ":" << __LINE__  << " -- "
+  << "new" << " -- " << ShiftDVec::Debug::addr(ext)
+  << "\n" << ShiftDVec::Debug::AbstractLogger::Flush;
+
   SD_Object_Extension = ext;
   SD_Ext()->Extension_Type = TExt::LObject_Extension;
   SD_Ext()->Set_Number_Of_Possesors(1);
@@ -241,6 +264,11 @@ void ShiftDVec::sTObjectExtension::freeDVec()
 {
   if(this && dvec)
   {
+    SD_DEBUG_LOG("DVec_Memory")
+     << __FILE__ << ":" << __LINE__  << " -- "
+     << "omFreeSize" << " -- " << ShiftDVec::Debug::addr(dvec)
+     << "\n" << ShiftDVec::Debug::AbstractLogger::Flush;
+
     omFreeSize( (ADDRESS)dvec, sizeof(uint) * dvSize );
     dvec = NULL;
     dvSize = 0;
@@ -504,6 +532,12 @@ uint ShiftDVec::CreateDVec (poly p, ring r, uint*& dvec)
   if(!dvSize){dvec = NULL; return 0;}
   dvec = (uint *)omAlloc0(dvSize*sizeof(uint));
 
+  SD_DEBUG_LOG("DVec_Memory")
+   << __FILE__ << ":" << __LINE__  << " -- "
+   << "omAlloc0" << " -- " << ShiftDVec::Debug::addr(dvec)
+   << "\n" << ShiftDVec::Debug::AbstractLogger::Flush;
+
+
   uint * it = dvec;
 
   /* transform lm(p) to shift invariant distance vector
@@ -635,6 +669,38 @@ uint ShiftDVec::divisibleBy
   }
 
   omFreeSize((ADDRESS)tmpVec, sizeof(uint)*tmpSize);
+  return UINT_MAX;
+}
+
+/* Like divisibleBy, but with the difference, that it only
+ * returns a shift, if dvec1 is divisible by dvec2 from the
+ * right.
+ *
+ * Has to be tested!
+ */
+uint ShiftDVec::RdivisibleBy
+  ( const uint* dvec1, uint dvSize1, 
+    const uint* dvec2, uint dvSize2, int numVars )
+{
+  if(dvSize1 < dvSize2) return UINT_MAX;
+  assume(dvSize2);
+  if(!dvSize2) return UINT_MAX-1;
+
+  if( dvSize2 == 1 ) if( dvec1[0] == dvec2[0] ) return 0;
+                     else                return UINT_MAX;
+
+  do
+  {
+    --dvSize2;
+    --dvSize1;
+    if( dvec2[dvSize2] != dvec1[dvSize1] ) return UINT_MAX;
+  }while( dvSize2 > 1 );
+
+  uint dist_cum = 0;
+  for( uint i = 0; i < dvSize1; ++i ) dist_cum += dvec1[i];
+  dist_cum %= numVars;
+  if( dist_cum == dvec2[0] ) return dvSize1-1;
+
   return UINT_MAX;
 }
 

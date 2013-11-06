@@ -32,7 +32,7 @@ class SDDebug::AbstractLogger
 
     virtual ~AbstractLogger() {}
 
-    enum special { Date };
+    enum special { Date, Flush };
 
     virtual ALogger& operator<<( const char* str ) = 0;
     virtual ALogger& operator<<( int number ) = 0;
@@ -45,6 +45,7 @@ class SDDebug::AbstractLogger
     virtual void set_output_stream( FILE* stream ) = 0;
     virtual void set_output_stream
       ( const char* filename, const char* mode ) = 0;
+    virtual void set_output_stream( ALogger* logger ) = 0;
 };
 
 class SDDebug::DummyLogger : public AbstractLogger
@@ -62,6 +63,7 @@ class SDDebug::DummyLogger : public AbstractLogger
     virtual void set_output_stream( FILE* stream ) {}
     virtual void set_output_stream
       ( const char* filename, const char* mode ) {}
+    virtual void set_output_stream( ALogger* logger ) {}
 };
 
 #endif

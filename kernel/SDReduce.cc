@@ -1,3 +1,5 @@
+// vim: set foldmethod=syntax:
+
 #include <kutil.h>
 #include <SDBase.h>
 #include <SDReduce.h>
@@ -20,7 +22,6 @@ int ShiftDVec::redHomog( LObject* h, ::kStrategy strategy )
   assume(h->FDeg == h->pFDeg());
 
   int i,j, pass, ii;
-  unsigned long not_sev;
   long reddeg,d;
 
   pass = j = 0;
@@ -28,12 +29,10 @@ int ShiftDVec::redHomog( LObject* h, ::kStrategy strategy )
   h->SetShortExpVector();
   h->GetLmTailRing();
   int li;
-  not_sev = ~ h->sev;
   loop
   {
     uint shift = 0;
-    j = SD::kFindDivisibleByInT
-          ( strat->T, strat->sevT, h, shift, strat );
+    j = RD::kFindDivisibleByInUT( h, shift, strat );
     if (j < 0) return 1;
 
     li = strat->T[j].pLength;
@@ -44,23 +43,23 @@ int ShiftDVec::redHomog( LObject* h, ::kStrategy strategy )
     //pi with length li
 
     if( TEST_OPT_LENGTH )
-      ii = RD::red_get_opt_len( &shift,strat, i,li,not_sev, h );
+      ii = RD::red_get_opt_len( &shift,strat, i,li, h );
 
     // end of search: have to reduce with pi
     RD::red_reduce_with( h, strat->T+ii, shift, strat );
 
-    not_sev = RD::after_red( h );
+    if( !RD::after_red( h ) ) return 0;
 
     int ret;
-    if( (ret = RD::red_with_S(h, strat, &pass)) ) return ret;
+    if( (ret = RD::red_with_US(h, strat, &pass)) ) return ret;
   }
 }
 
 /*- search the shortest possible with respect to length -*/
 int ShiftDVec::Reduce::red_get_opt_len
-  ( uint* shift, SD::kStrategy strat,
-    int i, int li, unsigned long not_sev, LObject* h )
+  (uint* shift, SD::kStrategy strat, int i, int li, LObject* h)
 {
+  unsigned long not_sev = ~ h->sev;
   int ii;
   poly h_p;
   ring r;
@@ -179,7 +178,7 @@ unsigned long ShiftDVec::Reduce::after_red( LObject* h )
   }
 
   h->SetShortExpVector();
-  return ~ h->sev;
+  return 1;
 }
 
 /*
@@ -188,9 +187,11 @@ unsigned long ShiftDVec::Reduce::after_red( LObject* h )
  *-if the degree jumps
  *-if the number of pre-defined reductions jumps
  */
-int ShiftDVec::Reduce::red_with_S
+int ShiftDVec::Reduce::red_with_US
   ( LObject* h, SD::kStrategy strat, int* pass )
 {
+  namespace RD = ShiftDVec::Reduce;
+
   (*pass)++;
   if ( !TEST_OPT_REDTHROUGH &&
        (strat->Ll >= 0)     && (*pass > strat->LazyPass) )
@@ -199,9 +200,8 @@ int ShiftDVec::Reduce::red_with_S
     int at = strat->posInL(strat->L,strat->Ll,h,strat);
     if (at <= strat->Ll)
     {
-      int dummy=strat->sl; int shift_dummy;
-      int j = SD::kFindDivisibleByInS( strat, &dummy,
-                                       h, shift_dummy );
+      uint shift_dummy;
+      int j = RD::kFindDivisibleByInUS(h, shift_dummy, strat );
       if (j < 0) return 1;
 
       SD::enterL( &strat->L,&strat->Ll,&strat->Lmax,h,at );
@@ -214,4 +214,188 @@ int ShiftDVec::Reduce::red_with_S
   }
 
   return 0;
+}
+
+
+/* BOCO: 
+ * This version of the function is used in redtailBba.
+ * It overloads its non-dvec version.
+ *
+ * WARNING:
+ * The Returned object may have to be shifted, to devide L,
+ * therefor shift will be set.
+ * If uptodeg == 0, we will not care, if the reduction of L->p
+ * with a found poly p in S violates the degree bound,
+ * otherwise we do (by not returning p, if the reduction
+ * violates the degree bound).
+ */
+TObject * ShiftDVec::Reduce::kFindDivisibleByInS
+  ( SD::kStrategy strat, int pos,
+    LObject* L, TObject* T, 
+    uint & shift, int lV, int uptodeg, long ecart )
+{
+  namespace SD = ShiftDVec;
+
+  int j = 0;
+
+  const unsigned long not_sev = ~L->sev;
+  const unsigned long* sev = strat->sevS;
+
+  poly p;
+  ring r;
+  L->GetLm(p, r);
+  L->SD_Ext()->SetDVecIfNULL(p, r);
+
+  if (r == currRing)
+  {
+    loop
+    {
+      if (j > pos) return NULL;
+      if ( strat->tl < 0 || strat->S_2_R[j] == -1 )
+      {
+        /*BOCO:
+         * The original p_LmDivisibleBy checks if second arg
+         * divides first arg, we check if first arg is divisibly
+         * by second arg! */
+        sTObject t(strat->S[j]);
+        t.SD_Ext_Init()->SetDVec();
+        shift = p_LmDivisibleBy( L, &t, r, lV,
+                                 strat->is_lgb_case() );
+      }
+      else
+      {
+        strat->S_2_T(j)->SD_Ext_Init()->SetDVecIfNULL();
+        shift = p_LmDivisibleBy( L, strat->S_2_T(j),
+                                 r, lV, strat->is_lgb_case() );
+      }
+      if ( shift < UINT_MAX && 
+           ( strat->homog ||
+             !redViolatesDeg
+               ( L->p, strat->S[j], uptodeg,
+                 currRing, currRing, strat->tailRing ) ) )
+      { break; }
+      j++;
+    }
+    // if called from NF, T objects do not exist:
+    if (strat->tl < 0 || strat->S_2_R[j] == -1)
+    {
+      T->Set(strat->S[j], r, strat->tailRing);
+      return T;
+    }
+    else return strat->S_2_T(j);
+  }
+  else
+  {
+    TObject* t;
+    loop
+    {
+      if (j > pos) return NULL;
+      assume(strat->S_2_R[j] != -1);
+      /*BOCO: TODO: Why do we have Problems with this?
+      if ( !(ecart== LONG_MAX || ecart>= strat->ecartS[j]) )
+      */
+      if(true)
+      {
+        t = strat->S_2_T(j);
+        assume( t != NULL && t->t_p != NULL &&
+                t->tailRing == r && t->p == strat->S[j] );
+        strat->S_2_T(j)->SD_Ext_Init()
+                       ->SetDVecIfNULL(t->t_p, r);
+        /*BOCO:
+         * The original p_LmDivisibleBy checks if second arg
+         * divides first arg, we check if first arg is divisibly
+         * by second arg! */
+        shift = p_LmDivisibleBy( L, t, r, lV,
+                                 strat->is_lgb_case() );
+        if ( shift < UINT_MAX && 
+             ( strat->homog || 
+               !redViolatesDeg(p, t->t_p, uptodeg, r, r, r) ) )
+        { return t; }
+      }
+      j++;
+    }
+  }
+
+/*BOCO: - undefined return value? -
+ *  I think it may happen, that the return Value of this
+ *  function is undefined. Maybe it would be clearer to return
+ *  something
+ return NULL;
+ */
+}
+
+int ShiftDVec::Reduce::kFindDivisibleByInT
+  ( const TSet &T, int tlen,
+    const unsigned long* sevT, LObject * L, 
+    uint & shift, SD::kStrategy strat, const int start )
+{
+  namespace SD = ShiftDVec;
+
+  unsigned long not_sev = ~L->sev;
+
+  int j = start;
+  int ret;  //BOCO: added
+
+  poly p=L->p;
+  ring r=currRing;
+
+  //BOCO: TODO: 
+  //I think the following line is souperflous -> remove it!
+  if (p==NULL)  { r=L->tailRing; p=L->t_p; }
+
+  L->GetLm(p, r);
+
+  //BOCO: added following line
+  L->SD_Ext_Init_If_NULL();
+
+  poly TObject::*pp;
+  pp = (r == currRing ? &TObject::p : &TObject::t_p);
+
+  int lV = strat->get_lV();
+  int uptodeg = strat->get_uptodeg();
+  int get_right_divisor = strat->is_lgb_case() && T==strat->T;
+  loop
+  {
+    if (j > tlen) {ret = -1; break;};
+    shift = L->SD_Ext()->divisibleBy_Comp( &T[j], pp, r, lV,
+                                           get_right_divisor );
+    int rvd = redViolatesDeg(L, &T[j], uptodeg, currRing);
+    if ( shift < UINT_MAX && (strat->homog || !rvd) )
+    { ret = j; break; }
+    j++;
+  }
+
+  return ret;  //BOCO: added
+}
+
+int ShiftDVec::Reduce::kFindDivisibleByInUT
+  ( LObject* h, uint& shift, SD::kStrategy strat )
+{
+  namespace RD = ShiftDVec::Reduce;
+
+  int j = RD::kFindDivisibleByInT
+           (strat->T, strat->tl, strat->sevT, h, shift, strat);
+
+  if( j < 0 && !strat->is_lgb_case() ) return j;
+
+  return
+    RD::kFindDivisibleByInT( strat->U,
+                             strat->get_size_of_U()-1,
+                             strat->sevT, h, shift, strat );
+}
+
+int ShiftDVec::Reduce::kFindDivisibleByInUS
+  ( LObject* h, uint& shift, SD::kStrategy strat )
+{
+  namespace RD = ShiftDVec::Reduce;
+
+  int j = SD::kFindDivisibleByInS( strat,
+                                   &(strat->sl), h, shift );
+
+  if( j < 0 && !strat->is_lgb_case() ) return j;
+
+  return
+    RD::kFindDivisibleByInT( strat->U,
+                             strat->get_size_of_U()-1,
+                             strat->sevT, h, shift, strat );
 }

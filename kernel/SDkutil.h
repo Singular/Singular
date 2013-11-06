@@ -48,6 +48,10 @@ namespace ShiftDVec
   uint divisibleBy
     ( sTObject * t1, sTObject * t2, int numVars );
 
+  uint RdivisibleBy
+      ( const uint* dvec1, uint dvSize1, 
+        const uint* dvec2, uint dvSize2, int numVars );
+
   uint findRightOverlaps
     ( TObject * t1, TObject * t2, 
       int numVars, int maxDeg, uint ** overlaps );
@@ -182,14 +186,63 @@ class ShiftDVec::sTObjectExtension
 
     void freeDVec(); 
 
-    uint divisibleBy( sTObject * Tobj, int numVars )
+    uint divisibleBy( sTObject * Tobj,
+                      int numVars, bool fromRight = false )
     {
       SetDVecIfNULL();
       Tobj->SD_Ext()->SetDVecIfNULL();
-      return ShiftDVec::divisibleBy
-                          ( dvec, dvSize,
-                            Tobj->SD_Ext()->dvec,
-                            Tobj->SD_Ext()->dvSize, numVars );
+      if( fromRight )
+      {
+        return ShiftDVec::divisibleBy
+                           ( dvec, dvSize,
+                             Tobj->SD_Ext()->dvec,
+                             Tobj->SD_Ext()->dvSize, numVars );
+      }
+      else
+      {
+        return ShiftDVec::RdivisibleBy
+                           ( dvec, dvSize,
+                             Tobj->SD_Ext()->dvec,
+                             Tobj->SD_Ext()->dvSize, numVars );
+      }
+    }
+
+    uint divisibleBy_Comp( sTObject * Tobj,
+                           poly sTObject::*tpoff,
+                           ring r, int numVars,
+                           bool fromRight = false )
+    {
+      p_LmCheckPolyRing1( Tobj->*tpoff, r );
+      pIfThen1( T->p != NULL,
+                p_LmCheckPolyRing1(Tobj->*tpoff, r) );
+      if ( p_GetComp(T->p, r) == 0 || 
+           p_GetComp(T->p, r) == p_GetComp(Tobj->*tpoff,r) )
+      { return
+          divisibleBy( Tobj, tpoff, r, numVars, fromRight ); }
+      return UINT_MAX;
+    }
+
+    uint divisibleBy( sTObject * Tobj,
+                      poly sTObject::* tpoff,
+                      ring r, int numVars, bool fromRight )
+    {
+      SetDVecIfNULL();
+      Tobj->SD_Ext()->SetDVecIfNULL( Tobj->*tpoff, r );
+
+      if( fromRight )
+      {
+        return ShiftDVec::divisibleBy
+                           ( dvec, dvSize,
+                             Tobj->SD_Ext()->dvec,
+                             Tobj->SD_Ext()->dvSize, numVars );
+      }
+      else
+      {
+        return ShiftDVec::RdivisibleBy
+                           ( dvec, dvSize,
+                             Tobj->SD_Ext()->dvec,
+                             Tobj->SD_Ext()->dvSize, numVars );
+      }
     }
 };
 
@@ -259,6 +312,8 @@ class ShiftDVec::skStrategy : public ::skStrategy
     uint get_size_of_U(){return size_of_U;}
     uint translate_index_U_to_R(uint i){/*TODO*/ assume(0);}
     TObject* get_U_at(uint i){return &(U[i]);}
+
+    bool is_lgb_case() { return false; /*TODO*/ }
 };
 
 
