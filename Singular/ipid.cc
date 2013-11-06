@@ -47,6 +47,7 @@ omBin sip_command_bin = omGetSpecBin(sizeof(sip_command));
 omBin sip_package_bin = omGetSpecBin(sizeof(sip_package));
 //omBin ip_package_bin = omGetSpecBin(sizeof(ip_package));
 omBin idrec_bin = omGetSpecBin(sizeof(idrec));
+omBin char_ptr_bin =  omGetSpecBin(sizeof(char*));
 
 coeffs coeffs_BIGINT;
 
