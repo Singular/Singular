@@ -39,19 +39,19 @@ SING_CHECK_GFANLIB
 #	exit 1
 # fi
 AC_CHECK_HEADERS([cdd/setoper.h setoper.h cddlib/setoper.h])
-if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no -a "$ac_cv_header_cddlib_setoper_h" == no
-then
-	AC_MSG_WARN([Error, setoper.h is missing!])
-fi
+# if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no -a "$ac_cv_header_cddlib_setoper_h" == no
+#then
+#	AC_MSG_WARN([Error, setoper.h is missing!])
+#fi
 
 # if setoper.h is there, assume that also cdd.h is there
 
-if test "x$ENABLE_GFANLIB" = xyes; then
-if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no -a "$ac_cv_header_cddlib_setoper_h" == no
-then
-	exit 0
-fi
-fi
+#if test "x$ENABLE_GFANLIB" = xyes; then
+#if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no -a "$ac_cv_header_cddlib_setoper_h" == no
+#then
+###	exit 0
+#fi
+#fi
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE

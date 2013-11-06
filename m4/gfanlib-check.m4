@@ -8,7 +8,7 @@ AS_HELP_STRING([--enable-gfanlib], [Enables gfanlib, a package for basic convex 
 [ENABLE_GFANLIB="yes"],
 [ENABLE_GFANLIB="no"])
 
-SAVE_LIBS=$LIBS
+BACKUP_LIBS=$LIBS
 
 AC_MSG_CHECKING(whether to build with gfanlib)
 if test "x$ENABLE_GFANLIB" = xyes; then
@@ -56,7 +56,7 @@ else
  PASSED_ALL_TESTS_FOR_GFANLIB="no";
 fi
 
-LIBS=$SAVE_LIBS
+LIBS=$BACKUP_LIBS
 
 AM_CONDITIONAL(HAVE_GFANLIB, test "x$PASSED_ALL_TESTS_FOR_GFANLIB" = xyes)
 
