@@ -62,13 +62,13 @@ AC_CHECK_LIB(rt,clock_gettime)
 LB_CHECK_GMP(4.0,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 LB_CHECK_FLINT(2.3,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
-LB_CHECK_MATHICGB
 
+AC_CONFIG_GOOGLE_PERFTOOLS()
 
 AX_PYTHON_DEFAULT()
 AX_PYTHON_WITH_VERSION([2.4])
 
-AC_CONFIG_GOOGLE_PERFTOOLS()
+LB_CHECK_MATHICGB
 
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
@@ -85,12 +85,13 @@ case $host_os in
 esac
 
 
+SING_CHECK_POLYMAKE
+SING_CHECK_GFANLIB
+
 SING_CHECK_P_PROCS
 SING_CHECK_FACTORY
 SING_CHECK_READLINE
 SING_CHECK_DBM
-SING_CHECK_GFANLIB
-SING_CHECK_POLYMAKE
 
 ### the following is needed due to the use of om_sing_opt_show_mem in misc_ip.cc...
 #ac_configure_args="$ac_configure_args --with-external-config_h=../Singular/omSingularConfig.h"
