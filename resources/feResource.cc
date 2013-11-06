@@ -70,6 +70,7 @@ feResourceConfig_s feResourceConfigs[] =
    // path for dynamic modules, should match ProcDir:
    "%b/MOD;"
    LIBEXEC_DIR "/singular/MOD;"
+   LIB_DIR "/singular/MOD;"
    "%b",
    (char *)""},
   {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/Singular",          (char *)""},
@@ -78,6 +79,7 @@ feResourceConfig_s feResourceConfigs[] =
   {"ProcDir",   'P',    feResPath,  "SINGULAR_PROCS_DIR",
      "%b/MOD;"
      LIBEXEC_DIR "/singular/MOD;"
+     LIB_DIR "/singular/MOD;"
      "%r/libexec/singular/MOD",                  (char *)""},
   {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                (char *)""},
   {"DataDir",   'D',    feResDir,   "SINGULAR_DATA_DIR",    "%b/../share/",          (char *)""},
