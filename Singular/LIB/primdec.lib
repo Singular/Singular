@@ -3768,7 +3768,7 @@ example
     intvec save=option(get);option(redSB);
     I=interred(I+F);option(set,save);return(I);
    }
-   I=simplify(I,1);
+   //I=simplify(I,1);
 
    for(i=1;i<=n;i++)             //consider all polynomials over
    {                             //Fp(t(1)^(p^-k),...,t(m)^(p^-k))
@@ -3779,7 +3779,12 @@ example
    execute(cR);
    ideal F=imap(R,F);
 
-   string nR="ring @S="+string(p)+",(y(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
+   string nR1="ring @S1="+string(p)+",("+varstr(R)+","+parstr(R)+",@y(1..m)),dp;";
+   execute(nR1);
+   list lR=ringlist(@S1)[2];
+   lR=lR[(size(lR)-m+1)..(size(lR))];
+
+   string nR="ring @S="+string(p)+",("+string(lR)+","+varstr(R)+","+parstr(R)+"),dp;";
    execute(nR);
 
    ideal G=fetch(@R,F);    //G[i](t(1)^(p^-k),...,t(m)^(p^-k),x(i))=sep(F[i])
@@ -3791,7 +3796,7 @@ example
    for(i=1;i<=m;i++)
    {
       J=J,var(i)^k-var(m+n+i);
-      el=el*y(i);
+      el=el*var(i);
    }
 
    J=eliminate(J,el);

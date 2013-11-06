@@ -22,7 +22,7 @@ N_(G,b) of stable maps of branch type b from a genus g curve of topological type
 to the elliptic curve by computing a path integral 
 over a rational function. The path integral is computed as a residue.
 
-The sum of N_(G,b) over all branch types b of sum d gives the
+The sum of N_(G,b) over all branch types b of sum d gives N_(G,d)*|Aut(G)|, with the
 Gromov-Witten invariant N_(G,d) of degree d stable maps from a genus g curve
 of topological type G to the elliptic curve.
 
@@ -379,9 +379,9 @@ ASSUME:  P is a propagator, or @*
 RETURN:  Gromov-Witten invariant.
 THEORY:  Computes @*
 
-         - the Gromov-Witten of a given propagator P, or @*
+         - the Gromov-Witten invariant of a given propagator P, or @*
 
-         - the invariant N_(G,d) where d is the degree of the covering, or @*
+         - the invariant N_(G,d)*|Aut(G)| where d is the degree of the covering, or @*
 
          - the number N_(G,b) of coverings with source G and target an elliptic curves with branch type a over a 
          fixed base point (that is, the i-th edge passes over the base point with multiplicity b[i]).@*
