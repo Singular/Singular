@@ -1,0 +1,40 @@
+source gdb/bos_gdb_ext.py
+
+define disable_output
+   set logging redirect on
+   set logging file /dev/null
+   set logging on
+end
+
+define enable_output
+   set logging on
+   set logging file gridbdv.txt
+end
+
+break ShiftDVec::bba
+commands
+  set $lm_div_cnt=0
+  set $rh_cnt=0
+  continue
+end
+
+
+blc ShiftDVec::p_LmDivisibleBy 'p_GetComp(t1->p, r)'
+commands
+  silent
+  set $lm_div_cnt = $lm_div_cnt + 1
+  printf "Counter p_LmDivisibleBy: %d\n", $lm_div_cnt
+  if $lm_div_cnt != 12
+    continue
+  end
+end
+
+blc ShiftDVec::redHomog 'not_sev = ~ h->sev'
+commands
+  silent
+  set $rh_cnt = $rh_cnt + 1
+  printf "Counter redHomog: %d\n", $rh_cnt
+  continue
+end
+
+# vim: set ft=gdb:
