@@ -115,3 +115,8 @@ singular.png
 .tarball-git-version
 .DS_Store
 singularconfig.h
+singularconfig.h.in
+libpolys/libpolysconfig.h.in
+libpolys/libpolysconfig.h
+resources/resourcesconfig.h
+resources/resourcesconfig.h.in
