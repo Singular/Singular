@@ -87,6 +87,8 @@ PROCEDURES:
     rationalCurve(int,list)             compute the Gromov-Witten invariant
                                         corresponding the number of rational
                                         curves on a general Calabi-Yau threefold
+    sumofquotients(stack,list)          prepare a command for parallel
+                                        computation
     part(poly,int)                      compute a homogeneous component of a
                                         polynomial.
     parts(poly,int,int)                 compute the sum of homogeneous
@@ -108,6 +110,7 @@ KEYWORDS:       Intersection theory; Enumerative geometry; Schubert calculus;
 
 LIB "general.lib";
 LIB "homolog.lib";
+LIB "parallel.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 /////////// create new objects in this library  ////////////////////////////////
@@ -843,6 +846,42 @@ example
     linesHypersurface(10);
 }
 
+proc sumofquotients(stack M, list F, list #)
+"USAGE:     sumofquotient(M,F,#); M stack, F list, # list
+RETURN:     number
+THEORY:     This is useful for the parallel computation of rationalCurve.
+KEYWORDS:   Gromov-Witten invariants, rational curves on Calabi-Yau threefolds
+EXAMPLE:    example sumofquotients; shows an example
+"
+{
+    if (size(#) == 0) {list l = 5;}
+    else {list l = #;}
+    number sum = 0;
+    number s, t;
+    int i,j;
+    for (i = size(F); i > 0; i--)
+    {
+        s = 1;
+        for (j=1;j<=size(l);j++)
+        {
+            s = s*contributionBundle(M,F[i][1],list(l[j]));
+        }
+        t = F[i][2]*normalBundle(M,F[i][1]);
+        sum = sum + s/t;
+    }
+    return(sum);
+}
+example
+{
+    "EXAMPLE:"; echo=2;
+    ring r = 0,x,dp;
+    variety P = projectiveSpace(4);
+    stack M = moduliSpace(P,2);
+    list F = fixedPoints(M);
+    sumofquotients(M,F);
+    sumofquotients(M,F,list(5));
+}
+
 proc rationalCurve(int d, list #)
 "USAGE:     rationalCurve(d,#); d int, # list
 RETURN:     number
@@ -855,24 +894,28 @@ EXAMPLE:    example rationalCurve; shows an example
 {
     def R = basering;
     setring R;
-    int n,i,j;
+    int n,i;
     if (size(#) == 0) {n = 4; list l = 5;}
     else {n = size(#)+3; list l = #;}
     variety P = projectiveSpace(n);
     stack M = moduliSpace(P,d);
     def F = fixedPoints(M);
-    number r = 0;
-    for (i=1;i<=size(F);i++)
+    int ncpus = system("cpu");
+    int sizeF = size(F);
+    list args;
+    int from = 1;
+    int to;
+    for (i = 1; i <= ncpus; i++)
     {
-        graph G = F[i][1];
-        number s = 1;
-        for (j=1;j<=size(l);j++)
-        {
-            s = s*contributionBundle(M,G,list(l[j]));
-        }
-        number t = F[i][2]*normalBundle(M,G);
-        r = r + s/t;
-        kill s,t,G;
+        to = (sizeF*i) div ncpus;
+        args[i] = list(M, list(F[from..to]), l);
+        from = to+1;
+    }
+    list results = parallelWaitAll("sumofquotients", args);
+    number r = 0;
+    for (i = 1; i <= ncpus; i++)
+    {
+        r = r + results[i];
     }
     return (r);
 }
@@ -901,6 +944,7 @@ example
     rationalCurve(4,list(3,3));
     rationalCurve(4,list(3,2,2));
     rationalCurve(4,list(2,2,2,2));
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
