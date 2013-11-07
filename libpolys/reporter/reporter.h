@@ -29,6 +29,10 @@ extern int  traceit ;
 #define TRACE_SHOW_LINE1  16
 #define TRACE_BREAKPOINT  32
 #define TRACE_TMP_BREAKPOINT  64
+#define TRACE_CALL       128
+#define TRACE_ASSIGN     256
+#define TRACE_CONV       512
+
 
 #define SI_PROT_I    1
 #define SI_PROT_O    2
