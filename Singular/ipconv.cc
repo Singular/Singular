@@ -358,7 +358,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
     if((dConvertTypes[index].i_typ==inputType)
     &&(dConvertTypes[index].o_typ==outputType))
     {
-      if(TEST_V_ALLWARN)
+      if(traceit&TRACE_CONV)
       {
         Print("automatic  conversion %s -> %s\n",
         Tok2Cmdname(inputType),Tok2Cmdname(outputType));

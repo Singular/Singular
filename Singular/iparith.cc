@@ -7763,7 +7763,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
         {
           if (check_valid(dArith2[i].valid_for,op)) break;
         }
-        if (TEST_V_ALLWARN)
+        if (traceit&TRACE_CALL)
           Print("call %s(%s,%s)\n",iiTwoOps(op),Tok2Cmdname(at),Tok2Cmdname(bt));
         if ((call_failed=dArith2[i].p(res,a,b)))
         {
@@ -7797,7 +7797,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
             {
               if (check_valid(dArith2[i].valid_for,op)) break;
             }
-            if (TEST_V_ALLWARN)
+            if (traceit&TRACE_CALL)
               Print("call %s(%s,%s)\n",iiTwoOps(op),
               Tok2Cmdname(an->rtyp),Tok2Cmdname(bn->rtyp));
             failed= ((iiConvert(at,dArith2[i].arg1,ai,a,an))
@@ -7930,7 +7930,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         {
           if (check_valid(dArith1[i].valid_for,op)) break;
         }
-        if (TEST_V_ALLWARN)
+        if (traceit&TRACE_CALL)
           Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(at));
         if (r<0)
         {
@@ -7998,7 +7998,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
           }
           else
           {
-            if (TEST_V_ALLWARN)
+            if (traceit&TRACE_CALL)
               Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(an->rtyp));
             if (an->Next() != NULL)
             {
@@ -8102,7 +8102,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
         {
           if (check_valid(dArith3[i].valid_for,op)) break;
         }
-        if (TEST_V_ALLWARN)
+        if (traceit&TRACE_CALL)
           Print("call %s(%s,%s,%s)\n",
             iiTwoOps(op),Tok2Cmdname(at),Tok2Cmdname(bt),Tok2Cmdname(ct));
         if ((call_failed=dArith3[i].p(res,a,b,c)))
@@ -8139,7 +8139,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
               {
                 if (check_valid(dArith3[i].valid_for,op)) break;
               }
-              if (TEST_V_ALLWARN)
+              if (traceit&TRACE_CALL)
                 Print("call %s(%s,%s,%s)\n",
                   iiTwoOps(op),Tok2Cmdname(an->rtyp),
                   Tok2Cmdname(bn->rtyp),Tok2Cmdname(cn->rtyp));
@@ -8322,7 +8322,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
         {
           if (check_valid(dArithM[i].valid_for,op)) break;
         }
-        if (TEST_V_ALLWARN)
+        if (traceit&TRACE_CALL)
           Print("call %s(... (%d args))\n", iiTwoOps(op),args);
         if (dArithM[i].p(res,a))
         {

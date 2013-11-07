@@ -802,7 +802,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
     && (dAssign[i].res!=0)) i++;
   if (dAssign[i].res!=0)
   {
-    if (TEST_V_ALLWARN) Print("assign %s=%s\n",Tok2Cmdname(lt),Tok2Cmdname(rt));
+    if (traceit&TRACE_ASSIGN) Print("assign %s=%s\n",Tok2Cmdname(lt),Tok2Cmdname(rt));
     BOOLEAN b;
     b=dAssign[i].p(ld,r,l->e);
     if(l!=ld) /* i.e. l is IDHDL, l->data is ld */
@@ -829,7 +829,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
         if(!failed)
         {
           failed= dAssign[i].p(ld,rn,l->e);
-          if (TEST_V_ALLWARN)
+          if (traceit&TRACE_ASSIGN)
             Print("assign %s=%s ok? %d\n",Tok2Cmdname(lt),Tok2Cmdname(rn->rtyp),!failed);
         }
         // everything done, clean up temp. variables
@@ -1096,7 +1096,7 @@ static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
   {
     if (i>=iv->length())
     {
-      if (TEST_V_ALLWARN)
+      if (traceit&TRACE_ASSIGN)
       {
         Warn("expression list length(%d) does not match intmat size(%d)",
               iv->length()+exprlist_length(hh),iv->length());
@@ -1138,7 +1138,7 @@ static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
   {
     if (i>=bim->length())
     {
-      if (TEST_V_ALLWARN)
+      if (traceit&TRACE_ASSIGN)
       {
         Warn("expression list length(%d) does not match bigintmat size(%d)",
               bim->length()+exprlist_length(hh),bim->length());
@@ -1440,7 +1440,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
       }
       if(like_lists)
       {
-        if (TEST_V_ALLWARN) PrintS("assign list[..]=...or similiar\n");
+        if (traceit&TRACE_ASSIGN) PrintS("assign list[..]=...or similiar\n");
         if (like_lists==1)
         {
           // check blackbox/newtype type:
@@ -1624,7 +1624,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
         num=olm->cols()*olm->rows();
         lm=mpNew(olm->rows(),olm->cols());
         int el;
-        if ((TEST_V_ALLWARN) && (num!=(el=exprlist_length(hh))))
+        if ((traceit&TRACE_ASSIGN) && (num!=(el=exprlist_length(hh))))
         {
           Warn("expression list length(%d) does not match matrix size(%d)",el,num);
         }
