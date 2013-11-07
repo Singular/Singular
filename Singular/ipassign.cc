@@ -789,14 +789,6 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   leftv ld=l;
   if ((l->rtyp==IDHDL)&&(lt!=QRING_CMD)&&(lt!=RING_CMD))
     ld=(leftv)l->data;
-  if (lt>MAX_TOK)
-  {
-    blackbox *bb=getBlackboxStuff(lt);
-#ifdef BLACKBOX_DEVEL
-    Print("bb-assign: bb=%lx\n",bb);
-#endif
-    return (bb==NULL) || bb->blackbox_Assign(l,r);
-  }
   while (((dAssign[i].res!=lt)
       || (dAssign[i].arg!=rt))
     && (dAssign[i].res!=0)) i++;
@@ -1469,6 +1461,14 @@ BOOLEAN iiAssign(leftv l, leftv r)
       }
     }
     // end of handling elems of list and similar
+    if (lt>MAX_TOK)
+    {
+      blackbox *bb=getBlackboxStuff(lt);
+#ifdef BLACKBOX_DEVEL
+      Print("bb-assign: bb=%lx\n",bb);
+#endif
+      return (bb==NULL) || bb->blackbox_Assign(l,r);
+    }
     rl=r->listLength();
     if (rl==1)
     {
