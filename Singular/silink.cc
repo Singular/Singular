@@ -27,6 +27,7 @@
 #include <kernel/ideals.h>
 #include <kernel/numbers.h>
 #include <kernel/intvec.h>
+#include <Singular/cntrlc.h>
 #include <Singular/ssiLink.h>
 #include <Singular/pipeLink.h>
 #include <Singular/si_signals.h>
@@ -134,6 +135,7 @@ BOOLEAN slInit(si_link l, char *istr)
 
 void slCleanUp(si_link l)
 {
+  defer_shutdown++;
   (l->ref)--;
   if (l->ref == 0)
   {
@@ -146,13 +148,18 @@ void slCleanUp(si_link l)
     omFree((ADDRESS)l->mode);
     memset((void *) l, 0, sizeof(ip_link));
   }
+  defer_shutdown--;
+  if (!defer_shutdown && do_shutdown) m2_end(1);
 }
 
 void slKill(si_link l)
 {
+  defer_shutdown++;
   slCleanUp(l);
   if ((l!=NULL) &&(l->ref == 0))
     omFreeBin((ADDRESS)l,  ip_link_bin);
+  defer_shutdown--;
+  if (!defer_shutdown && do_shutdown) m2_end(1);
 }
 
 const char* slStatus(si_link l, const char *request)
