@@ -415,7 +415,7 @@ differentevalpoint:
     nmod_poly_factor_insert (nmodFactors, FLINTFpi, 1L);
     nmod_poly_factor_insert (nmodFactors, FLINTGpi, 1L);
 
-    long * link= new long [2];
+    slong * link= new slong [2];
     fmpz_poly_t *v= new fmpz_poly_t[2];
     fmpz_poly_t *w= new fmpz_poly_t[2];
     fmpz_poly_init(v[0]);

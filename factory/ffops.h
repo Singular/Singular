@@ -11,8 +11,8 @@
 #endif
 
 /* define type of your compilers 64 bit integer type */
-#ifndef INT64
-#define INT64 long long int
+#ifndef FACTORY_INT64
+#define FACTORY_INT64 long long int
 #endif
 
 extern int ff_prime;
@@ -76,9 +76,9 @@ inline int ff_longnorm ( const long a )
 #endif
 }
 
-inline int ff_bignorm ( const INT64 a )
+inline int ff_bignorm ( const FACTORY_INT64 a )
 {
-    int n = (int)(a % (INT64)ff_prime);
+    int n = (int)(a % (FACTORY_INT64)ff_prime);
 #if defined(i386) || defined(NTL_AVOID_BRANCHING)
     n += (n >> 31) & ff_prime;
     return n;
@@ -133,7 +133,7 @@ inline int ff_neg ( const int a )
 inline int ff_mul ( const int a, const int b )
 {
     if ( ff_big )
-        return ff_bignorm( (INT64)a * (INT64)b );
+        return ff_bignorm( (FACTORY_INT64)a * (FACTORY_INT64)b );
     else
         return ff_longnorm ( (long)a * (long)b );
 }
