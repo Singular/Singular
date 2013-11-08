@@ -5066,7 +5066,12 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     }
     else
     {
-      ch = IsPrime(ch);
+      int ch2=IsPrime(ch);
+      if (ch2!=ch)
+      {
+        Warn("%d is invalid as characteristic of the ground field. 32003 is used.", ch);
+        ch = 32003;
+      }
     }
   }
   // allocated ring and set ch
