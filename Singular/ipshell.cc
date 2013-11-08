@@ -5068,12 +5068,12 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     {
       if (ch!=0)
       {
-        if (ch<2)
+        int ch2=IsPrime(ch);
+        if ((ch<2)||(ch!=ch2))
         {
-          Warn("%d is invalid characteristic of ground field. 32003 is used.", ch);
+          Warn("%d is invalid as characteristic of the ground field. 32003 is used.", ch);
           ch=32003;
         }
-        ch=IsPrime(ch);
         cf = nInitChar(n_Zp, (void*)(long)ch);
       }
       else
@@ -5229,6 +5229,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       }
       else
       {
+        if (mpz_cmp_ui(modBase,0)==0)
+        {
+          WerrorS("modulus must not be 0");
+          goto rInitError;
+        }
         //ringtype = 3;
         ZnmInfo info;
         info.base= modBase;
@@ -5239,6 +5244,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     // just a module m > 1
     else if (cf == NULL)
     {
+      if (mpz_cmp_ui(modBase,0)==0)
+      {
+        WerrorS("modulus must not be 0");
+        goto rInitError;
+      }
       //ringtype = 2;
       ZnmInfo info;
       info.base= modBase;
