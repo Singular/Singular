@@ -137,7 +137,8 @@ SOURCES =    Minor.cc\
    walk.cc\
    walk_ip.cc\
    wrapper.cc\
-   fereadl.c mmstd.c claptmpl.cc
+   fereadl.c mmstd.c claptmpl.cc\
+   rlimit.c
 
 #   links/slInit_Dynamic.cc
 
