@@ -38,6 +38,7 @@
 #include <kernel/bigintmat.h>
 #include <kernel/options.h>
 #include <kernel/timer.h>
+#include <Singular/rlimit.h>
 #include <Singular/subexpr.h>
 #include <Singular/silink.h>
 #include <Singular/cntrlc.h>
@@ -781,7 +782,16 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         int cp[2];
         pipe(pc);
         pipe(cp);
-        pid_t pid=fork();
+        pid_t pid = fork();
+        if (pid == -1 && errno == EAGAIN)   // RLIMIT_NPROC too low?
+        {
+          raise_rlimit_nproc();
+          pid = fork();
+        }
+        if (pid == -1)
+        {
+          WerrorS("could not fork");
+        }
         if (pid==0) /*fork: child*/
         {
           /* block SIGINT */
