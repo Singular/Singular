@@ -763,6 +763,11 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
 {
   int id=0;
   blackboxIsCmd(bbname,id);
+  if (id<MAX_TOK)
+  {
+    Werror(">>%s<< is not a newstruct type",bbname);
+    return TRUE;
+  }
   blackbox *bb=getBlackboxStuff(id);
   newstruct_desc desc=(newstruct_desc)bb->data;
   newstruct_proc p=(newstruct_proc)omAlloc(sizeof(*p));
