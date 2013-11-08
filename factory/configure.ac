@@ -106,9 +106,9 @@ AC_ARG_ENABLE(
   ,
   enable_debugoutput=no)
 
-AH_TEMPLATE([INT64], [Defenition for INT64])
+AH_TEMPLATE([FACTORY_INT64], [Defenition for FACTORY_INT64])
 # Always long long int???!
-AC_DEFINE([INT64], [long long int]) 
+AC_DEFINE([FACTORY_INT64], [long long int]) 
 
 DX_INIT_DOXYGEN($PACKAGE_NAME, MYDOXYGENCONFIG)
 

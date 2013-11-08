@@ -32,8 +32,8 @@ const long FFMARK = 2;
 const long GFMARK = 3;
 
 /* define type of your compilers 64 bit integer type */
-#ifndef INT64
-#define INT64 long long int
+#ifndef FACTORY_INT64
+#define FACTORY_INT64 long long int
 #endif
 
 #if SIZEOF_LONG == 4
@@ -45,11 +45,11 @@ const long MAXIMMEDIATE = (1L<<60)-2L;  // 2^60-2
 #endif
 
 #if defined(WINNT) && ! defined(__GNUC__)
-const INT64 MINIMMEDIATELL = -268435454i64;
-const INT64 MAXIMMEDIATELL = 268435454i64;
+const FACTORY_INT64 MINIMMEDIATELL = -268435454i64;
+const FACTORY_INT64 MAXIMMEDIATELL = 268435454i64;
 #else
-const INT64 MINIMMEDIATELL = -268435454LL;
-const INT64 MAXIMMEDIATELL = 268435454LL;
+const FACTORY_INT64 MINIMMEDIATELL = -268435454LL;
+const FACTORY_INT64 MAXIMMEDIATELL = 268435454LL;
 #endif
 
 //{{{ conversion functions
@@ -302,30 +302,30 @@ imm_mul ( InternalCF * lhs, InternalCF * rhs )
     long a = imm2int( lhs );
     long b = imm2int( rhs );
     int sa= 1;
-    unsigned INT64 aa, bb;
+    unsigned FACTORY_INT64 aa, bb;
     if (a < 0)
     {
       sa= -1;
-      aa= (unsigned INT64) (-a);
+      aa= (unsigned FACTORY_INT64) (-a);
     }
     else
-      aa= (unsigned INT64) a;
+      aa= (unsigned FACTORY_INT64) a;
     if (b < 0)
     {
       sa= -sa;
-      bb= (unsigned INT64) (-b);
+      bb= (unsigned FACTORY_INT64) (-b);
     }
     else
-      bb= (unsigned INT64) b;
-    unsigned INT64 result = aa*bb;
+      bb= (unsigned FACTORY_INT64) b;
+    unsigned FACTORY_INT64 result = aa*bb;
     #if SIZEOF_LONG == 4
-    if (result>(unsigned INT64)MAXIMMEDIATE)
+    if (result>(unsigned FACTORY_INT64)MAXIMMEDIATE)
     {
         InternalCF * res = CFFactory::basic( IntegerDomain, a, true );
         return res->mulcoeff( rhs );
     }
     #else
-    if ( ( a!=0L ) && ((result/aa!=bb) || (result>(unsigned INT64) MAXIMMEDIATE) ))
+    if ( ( a!=0L ) && ((result/aa!=bb) || (result>(unsigned FACTORY_INT64) MAXIMMEDIATE) ))
     {
         InternalCF * res = CFFactory::basic( IntegerDomain, a, true );
         return res->mulcoeff( rhs );

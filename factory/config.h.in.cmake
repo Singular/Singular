@@ -84,7 +84,7 @@
 #cmakedefine DEBUGOUTPUT 1
 
 /* define type of your compilers 64 bit integer type */
-#define INT64 long long int
+#define FACTORY_INT64 long long int
 
 #cmakedefine HAVE_NTL 1
 
