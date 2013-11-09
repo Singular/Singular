@@ -6,6 +6,7 @@
  * Purpose: set resource limits
  ***************************************************************/
 
+#include <stdint.h>
 #include <sys/resource.h>
 
 #include "rlimit.h"
