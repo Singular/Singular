@@ -1083,14 +1083,14 @@ void m2_end(int i)
   {
     m2_end_called = TRUE;
 #ifdef HAVE_SIMPLEIPC
-    for (int i = SIPC_MAX_SEMAPHORES; i >= 0; i--)
+    for (int j = SIPC_MAX_SEMAPHORES; j >= 0; j--)
     {
-      if (semaphore[i] != NULL)
+      if (semaphore[j] != NULL)
       {
-        while (sem_acquired[i] > 0)
+        while (sem_acquired[j] > 0)
         {
-          sem_post(semaphore[i]);
-          sem_acquired[i]--;
+          sem_post(semaphore[j]);
+          sem_acquired[j]--;
         }
       }
     }
