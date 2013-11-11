@@ -30,7 +30,7 @@ int raise_rlimit_nproc()
     nproc.rlim_cur = 512;
   }
   if ((nproc.rlim_max == RLIM_INFINITY || 2*nproc.rlim_cur <= nproc.rlim_max)
-      && nproc.rlim_cur < 2*nproc.rlim_cur)
+      && nproc.rlim_cur < 65536)
   {
     nproc.rlim_cur = 2*nproc.rlim_cur;
   }
