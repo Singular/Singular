@@ -1338,14 +1338,29 @@ bool ShiftDVec::GM3
   return false;
 }
 
-/* BOCO: 
- * This is an adapted version of enterOnePairNormal. It will
- * enter a pair corresponding to a self overlap into B and
- * return a pointer to the pair entered. The entered pair is
- * (H->p, shift*H->p).
- * BOCO IMPORTANT:
- * Unfortunatly, The shift of H is not in R; we will link to an
- * unshiftet version.                                        */
+/**
+ *  \short Enter a pair corresponding to a self overlap into
+ *  strat->B and return a pointer to the pair entered. 
+ *
+ *  The pair entered will be stored in an ShiftDVec::LObject say
+ *  L. L will contain the two Letterplace polynomials L.p1 and
+ *  L.p2 (as pointers, no new memory is allocated for them).
+ *  These polynomials will build the S-polynomial
+ *  L.p1 - L.shift*L.p2, where L.shift is the shift defining the
+ *  overlap the pair (L.p1, L.p2 and L.shift*L.p2 the polynomial
+ *  obtained by shifting L.p2 by L.shift .
+ *
+ *  The code of this function was obtained by modifying
+ *  void enterOnePairNormal( int i,poly p,
+ *                           int ecart, int isFromQ,
+ *                           kStrategy strat, int atR = -1)
+ *  ( Note to myself:
+ *    No change to it in current singular Spielwiese )
+ *
+ * TODO: implement this!
+ * TODO: comment input parameters!
+ * TODO: test this in doxygen!
+ */
 LObject* ShiftDVec::enterOnePair
   ( poly p1, int atR1,
     int isFromQ1, int ecart1,

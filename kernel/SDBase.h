@@ -60,7 +60,7 @@ namespace ShiftDVec
   void enterpairs 
     ( LObject* H, int k, int ecart,
       int pos, SD::kStrategy strat, int atR );
-      LObject* enterOnePair
+  LObject* enterOnePair
     ( poly p1, int atR1,
       int isFromQ1, int ecart1,
       poly p2, uint shift, int atR2,
