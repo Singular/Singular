@@ -1624,14 +1624,7 @@ do_select:
   }
 
   /* check with select: chars waiting: no -> not ready */
-  #ifdef HAVE_SIMPLEIPC
-  sipc_semaphore_release(0);
-  #endif
   s = si_select(max_fd, &mask, NULL, NULL, wt_ptr);
-  #ifdef HAVE_SIMPLEIPC
-  sipc_semaphore_acquire(0);
-  #endif
-
   if (s==-1)
   {
     WerrorS("error in select call");
