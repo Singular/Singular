@@ -1004,7 +1004,7 @@ KINLINE void k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadR
   m2 = p_Init(tailRing);
   lcm = p_Init(leadRing);
 
-  for (i = leadRing->N; i>=1; i--)
+  for (i = leadRing->N; i>=0; i--)
   {
     e1 = p_GetExp(p1,i,leadRing);
     e2 = p_GetExp(p2,i,leadRing);
@@ -1023,15 +1023,6 @@ KINLINE void k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadR
     }
     p_SetExp(lcm,i,s, leadRing);
   }
-  if ((s=pGetComp(p1))!=0)
-  {
-    p_SetComp(lcm,s, leadRing);
-  } 
-  else if ((s=pGetComp(p2))!=0)
-  {
-    p_SetComp(lcm,s, leadRing);
-  } 
-  // else p_SetComp(lcm,0,tailRing); // done by p_Init
 
   p_Setm(m1, tailRing);
   p_Setm(m2, tailRing);
