@@ -1015,12 +1015,14 @@ KINLINE void k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadR
       //p_SetExp(m1,i,0, tailRing); // done by p_Init
       s = e1;
     }
-    else
+    else if (x < 0)
     {
       p_SetExp(m1,i,-x, tailRing);
       //p_SetExp(m2,i,0, tailRing); // done by p_Init
       s = e2;
     }
+    else
+      s = 0;
     p_SetExp(lcm,i,s, leadRing);
   }
 
