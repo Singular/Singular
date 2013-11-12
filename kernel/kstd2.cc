@@ -36,6 +36,9 @@
 #define PLURAL_INTERNAL_DECLARATIONS 1
 #endif
 
+/***********************************************
+ * SBA stuff -- start
+***********************************************/
 #define DEBUGF50  0
 #define DEBUGF51  0
 
@@ -44,10 +47,19 @@
 //#define DEBUGF5 1
 #endif
 
-#define F5C       1
+#define F5C       0
 #if F5C
   #define F5CTAILRED 0
 #endif
+
+#define SBA_PRODUCT_CRITERION         0
+#define SBA_PRINT_ZERO_REDUCTIONS     0
+#define SBA_PRINT_SIZE_G              0
+#define SBA_PRINT_SIZE_SYZ            0
+#define SBA_PRINT_PRODUCT_CRITERION   0
+/***********************************************
+ * SBA stuff -- done
+***********************************************/
 
 #include <kernel/kutil.h>
 #include <misc/options.h>
@@ -1489,6 +1501,11 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   //    induced Schreyer order.
   // The corresponding orders are computed in sbaRing(), depending
   // on the flag strat->incremental
+  long zeroreductions     = 0;
+  long product_criterion  = 0;
+  long size_g             = 0;
+  long size_syz           = 0;
+
   ideal F = F0;
   ring sRing, currRingOld;
   currRingOld  = currRing; 
@@ -1513,7 +1530,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int   srmax,lrmax, red_result = 1;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
-  long zeroreductions = 0;
   LObject L;
   // BOOLEAN withT     = FALSE;
   strat->max_lower_index = 0;
@@ -1683,10 +1699,21 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       pWrite(strat->P.p);
 #endif
       /* reduction of the element choosen from L */
-      if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat, strat->P.checked+1))
-        red_result = strat->red(&strat->P,strat);
-      else
-      {
+      if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat, strat->P.checked+1)) {
+#if SBA_PRODUCT_CRITERION
+        if (strat->P.checked == 3) {
+          product_criterion++;
+          enterSyz(strat->P, strat);
+          if (strat->P.lcm!=NULL)
+            pLmFree(strat->P.lcm);
+          red_result = 2;
+        } else {
+          red_result = strat->red(&strat->P,strat);
+        }
+#else
+      red_result = strat->red(&strat->P,strat);
+#endif
+      } else {
         if (strat->P.lcm!=NULL)
           pLmFree(strat->P.lcm);
         red_result = 2;
@@ -1970,6 +1997,13 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   }
   else if (TEST_OPT_PROT) PrintLn();
 
+#if SBA_PRINT_SIZE_G
+  size_g   = strat->sl+1;
+#endif
+#if SBA_PRINT_SIZE_SYZ
+  size_syz = strat->syzl+1;
+#endif
+
   exitSba(strat);
 //  if (TEST_OPT_WEIGHTM)
 //  {
@@ -2017,8 +2051,22 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     oo++;
   }
 #endif
-  printf("ZERO REDUCTIONS: %ld\n",zeroreductions);
-  zeroreductions  = 0;
+#if SBA_PRINT_ZERO_REDUCTIONS
+  printf("ZERO REDUCTIONS:   %ld\n",zeroreductions);
+#endif
+#if SBA_PRINT_SIZE_G
+  printf("SIZE OF G:         %ld\n",size_g);
+#endif
+#if SBA_PRINT_SIZE_SYZ
+  printf("SIZE OF SYZ:       %ld\n",size_syz);
+#endif
+#if SBA_PRINT_PRODUCT_CRITERION
+  printf("PRODUCT CRITERIA:  %ld\n",product_criterion);
+#endif
+  zeroreductions    = 0;
+  size_g            = 0;
+  size_syz          = 0;
+  product_criterion = 0;
   return (strat->Shdl);
 }
 
