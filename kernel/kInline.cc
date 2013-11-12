@@ -1022,7 +1022,7 @@ KINLINE void k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadR
       s = e2;
     }
     else
-      s = 0;
+      s = e1; // e1==e2
     p_SetExp(lcm,i,s, leadRing);
   }
 
