@@ -1820,9 +1820,6 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   sSigMult = currRing->p_Procs->pp_Mult_mm(sSigMult,m2,currRing);
   sSigMultNegSev = ~p_GetShortExpVector(sSigMult,currRing);
 
-  pDelete (&m1);
-  pDelete (&m2);
-
 //#if 1
 #ifdef DEBUGF5
   Print("----------------\n");
@@ -1842,6 +1839,8 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
     strat->cp++;
     pLmFree(Lp.lcm);
     Lp.lcm=NULL;
+    pDelete (&m1);
+    pDelete (&m2);
     return;
   }
   // in any case Lp is checked up to the next strat->P which is added
@@ -1867,6 +1866,8 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
     pDelete(&sSigMult);
     pLmFree(Lp.lcm);
     Lp.lcm=NULL;
+    pDelete (&m1);
+    pDelete (&m2);
     return;
   }
   // at this point it is clear that the pair will be added to L, since it has
@@ -1888,6 +1889,19 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
     Lp.sig    = sSigMult;
     Lp.sevSig = ~sSigMultNegSev;
   }
+// adds buchberger's first criterion
+  if (pLmCmp(m2,pHead(p)) == 0) {
+    Lp.checked  = 3; // 3 == Product Criterion
+#if 0
+    enterSyz(Lp, strat);
+    Lp.lcm=NULL;
+    pDelete (&m1);
+    pDelete (&m2);
+    return;
+#endif
+  }
+  pDelete (&m1);
+  pDelete (&m2);
 #if DEBUGF5
   printf("SIGNATURE OF PAIR:  ");
   pWrite(Lp.sig);
