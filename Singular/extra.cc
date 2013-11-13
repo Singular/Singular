@@ -749,7 +749,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
                                      sizeof(int) * r) != 0))
             r--;
           res->rtyp = INT_CMD;
-          res->data = (void*)r;
+          res->data = (void*)(long)r;
           return FALSE;
         }
         else
@@ -914,14 +914,14 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         if (solvable)
         {
           ll->Init(3);
-          ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)solvable;
+          ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)(long)solvable;
           ll->m[1].rtyp=MATRIX_CMD; ll->m[1].data=(void *)xVec;
           ll->m[2].rtyp=MATRIX_CMD; ll->m[2].data=(void *)homogSolSpace;
         }
         else
         {
           ll->Init(1);
-          ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)solvable;
+          ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)(long)solvable;
         }
         res->rtyp = LIST_CMD;
         res->data=(char*)ll;
@@ -937,7 +937,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           int timeMillisec = (int)(long)h->next->Data();
           int n = slStatusSsiL(L, timeMillisec * 1000);
           res->rtyp = INT_CMD;
-          res->data = (void*)n;
+          res->data = (void*)(long)n;
           return FALSE;
         }
         else
@@ -1213,9 +1213,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       {
 
         if ((h!=NULL) && (h->Typ()==INT_CMD))
-          res->data=(void *)setNCExtensions( (int)((long)(h->Data())) );
+          res->data=(void *)(long)setNCExtensions( (int)((long)(h->Data())) );
         else
-          res->data=(void *)getNCExtensions();
+          res->data=(void *)(long)getNCExtensions();
 
         res->rtyp=INT_CMD;
         return FALSE;
@@ -3140,7 +3140,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         h = h->next;
         ideal GI = (ideal) h->Data();
         res->rtyp = INT_CMD;
-        res->data = (void *) testGB(I, GI);
+        res->data = (void *)(long)testGB(I, GI);
         return(FALSE);
       }
       else
@@ -3162,9 +3162,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         if (rIsSCA(r))
         {
           if(strcmp(sys_cmd, "AltVarStart") == 0)
-            res->data = (void*)scaFirstAltVar(r);
+            res->data = (void*)(long)scaFirstAltVar(r);
           else
-            res->data = (void*)scaLastAltVar(r);
+            res->data = (void*)(long)scaLastAltVar(r);
           return FALSE;
         }
 
@@ -3610,7 +3610,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           double error= atof (s);
           int irred= probIrredTest (F, error);
           res->rtyp= INT_CMD;
-          res->data= (void*)irred;
+          res->data= (void*)(long)irred;
           return FALSE;
         }
         else return TRUE;
@@ -3681,7 +3681,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         int v=1;
         if ((h->next->next!=NULL)&& (h->next->next->Typ()==INT_CMD))
           v=(int)(long)h->next->next->Data();
-        res->data=(char *)simpleipc_cmd((char *)h->Data(),(int)(long)h->next->Data(),v);
+        res->data=(char *)(long)simpleipc_cmd((char *)h->Data(),(int)(long)h->next->Data(),v);
         res->rtyp=INT_CMD;
         return FALSE;
       }
