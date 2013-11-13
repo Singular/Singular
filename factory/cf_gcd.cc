@@ -391,24 +391,34 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     {
       XGCD(RR,A,B,F1,G1,1);
       CanonicalForm rr=convertZZ2CF(RR);
-      ASSERT (!rr.isZero(), "NTL:XGCD failed");
-      a=convertNTLZZX2CF(A,f.mvar())*fc/rr;
-      b=convertNTLZZX2CF(B,f.mvar())*gc/rr;
-      return CanonicalForm(1);
+      if(!rr.isZero())
+      {
+        a=convertNTLZZX2CF(A,f.mvar())*fc/rr;
+        b=convertNTLZZX2CF(B,f.mvar())*gc/rr;
+        return CanonicalForm(1);
+      }
+      else
+      {
+        Off(SW_USE_NTL_GCD_0);
+	r=extgcd(f,g,a,b);
+	On(SW_USE_NTL_GCD_0);
+      }
     }
     else
     {
-      fc=bCommonDen(f);
-      gc=bCommonDen(g);
-      F1=convertFacCF2NTLZZX(f*fc/r);
-      G1=convertFacCF2NTLZZX(g*gc/r);
       XGCD(RR,A,B,F1,G1,1);
-      a=convertNTLZZX2CF(A,f.mvar())*fc;
-      b=convertNTLZZX2CF(B,f.mvar())*gc;
       CanonicalForm rr=convertZZ2CF(RR);
-      ASSERT (!rr.isZero(), "NTL:XGCD failed");
-      a /= rr;
-      b /= rr;
+      if (!rr.isZero())
+      {
+        a=convertNTLZZX2CF(A,f.mvar())*fc;
+        b=convertNTLZZX2CF(B,f.mvar())*gc;
+      }
+      else
+      {
+        Off(SW_USE_NTL_GCD_0);
+	r=extgcd(f,g,a,b);
+	On(SW_USE_NTL_GCD_0);
+      }
       return r;
     }
   }
