@@ -515,10 +515,6 @@ elemexpr:
           {
             if(iiExprArith2(&$$, &$1, COLONCOLON, &$3)) YYERROR;
           }
-        | elemexpr '.' elemexpr
-          {
-            if(iiExprArith2(&$$, &$1, '.', &$3)) YYERROR;
-          }
         | elemexpr '('  ')'
           {
             if(iiExprArith1(&$$,&$1,'(')) YYERROR;
@@ -734,6 +730,10 @@ expr:   expr_arithmetic
         | RING_CMD '(' expr ')'
           {
             if(iiExprArith1(&$$,&$3,RING_CMD)) YYERROR;
+          }
+        | expr '.' elemexpr
+          {
+            if(iiExprArith2(&$$, &$1, '.', &$3)) YYERROR;
           }
         | APPLY '('  expr ',' CMD_1 ')'
           {
