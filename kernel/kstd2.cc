@@ -49,14 +49,17 @@
 
 #define F5C       0
 #if F5C
-  #define F5CTAILRED 0
+  #define F5CTAILRED 1
 #endif
 
 #define SBA_PRODUCT_CRITERION         0
-#define SBA_PRINT_ZERO_REDUCTIONS     0
-#define SBA_PRINT_SIZE_G              0
-#define SBA_PRINT_SIZE_SYZ            0
+#define SBA_PRINT_ZERO_REDUCTIONS     1
+#define SBA_PRINT_REDUCTION_STEPS     1
+#define SBA_PRINT_SIZE_G              1
+#define SBA_PRINT_SIZE_SYZ            1
 #define SBA_PRINT_PRODUCT_CRITERION   0
+
+long sba_reduction_steps;
 /***********************************************
  * SBA stuff -- done
 ***********************************************/
@@ -618,6 +621,9 @@ int redSig (LObject* h,kStrategy strat)
     printf("INDEX OF REDUCER T: %d\n",ii);
 #endif
     sigSafe = ksReducePolySig(h, &(strat->T[ii]), strat->S_2_R[ii], NULL, NULL, strat);
+#if SBA_PRINT_REDUCTION_STEPS
+    sba_reduction_steps++;
+#endif
     // if reduction has taken place, i.e. the reduction was sig-safe
     // otherwise start is already at the next position and the loop
     // searching reducers in T goes on from index start
@@ -1505,6 +1511,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   long product_criterion  = 0;
   long size_g             = 0;
   long size_syz           = 0;
+  // global variable
+  sba_reduction_steps     = 0;
 
   ideal F = F0;
   ring sRing, currRingOld;
@@ -2054,6 +2062,9 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #if SBA_PRINT_ZERO_REDUCTIONS
   printf("ZERO REDUCTIONS:   %ld\n",zeroreductions);
 #endif
+#if SBA_PRINT_REDUCTION_STEPS
+  printf("TOP S-REDUCTIONS:  %ld\n",sba_reduction_steps);
+#endif
 #if SBA_PRINT_SIZE_G
   printf("SIZE OF G:         %ld\n",size_g);
 #endif
@@ -2063,10 +2074,11 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #if SBA_PRINT_PRODUCT_CRITERION
   printf("PRODUCT CRITERIA:  %ld\n",product_criterion);
 #endif
-  zeroreductions    = 0;
-  size_g            = 0;
-  size_syz          = 0;
-  product_criterion = 0;
+  zeroreductions      = 0;
+  size_g              = 0;
+  size_syz            = 0;
+  product_criterion   = 0;
+  sba_reduction_steps = 0;
   return (strat->Shdl);
 }
 
