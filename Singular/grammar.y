@@ -507,6 +507,10 @@ elemexpr:
           {
             if(iiExprArith2(&$$, &$1, COLONCOLON, &$3)) YYERROR;
           }
+        | expr '.' elemexpr
+          {
+            if(iiExprArith2(&$$, &$1, '.', &$3)) YYERROR;
+          }
         | elemexpr '('  ')'
           {
             if(iiExprArith1(&$$,&$1,'(')) YYERROR;
@@ -591,41 +595,6 @@ elemexpr:
         | PROC_CMD '(' expr ')'
           {
             if(iiExprArith1(&$$,&$3,$1)) YYERROR;
-          }
-        ;
-
-exprlist:
-        exprlist ',' expr
-          {
-            leftv v = &$1;
-            while (v->next!=NULL)
-            {
-              v=v->next;
-            }
-            v->next = (leftv)omAllocBin(sleftv_bin);
-            memcpy(v->next,&($3),sizeof(sleftv));
-            $$ = $1;
-          }
-        | expr
-          {
-            $$ = $1;
-          }
-        ;
-
-expr:   expr_arithmetic
-          {
-            /*if ($1.typ == eunknown) YYERROR;*/
-            $$ = $1;
-          }
-        | elemexpr       { $$ = $1; }
-        | '(' exprlist ')'    { $$ = $2; }
-        | expr '[' expr ',' expr ']'
-          {
-            if(iiExprArith3(&$$,'[',&$1,&$3,&$5)) YYERROR;
-          }
-        | expr '[' expr ']'
-          {
-            if(iiExprArith2(&$$,&$1,'[',&$3)) YYERROR;
           }
         | ROOT_DECL '(' expr ')'
           {
@@ -723,9 +692,40 @@ expr:   expr_arithmetic
           {
             if(iiExprArith1(&$$,&$3,RING_CMD)) YYERROR;
           }
-        | expr '.' elemexpr
+        ;
+
+exprlist:
+        exprlist ',' expr
           {
-            if(iiExprArith2(&$$, &$1, '.', &$3)) YYERROR;
+            leftv v = &$1;
+            while (v->next!=NULL)
+            {
+              v=v->next;
+            }
+            v->next = (leftv)omAllocBin(sleftv_bin);
+            memcpy(v->next,&($3),sizeof(sleftv));
+            $$ = $1;
+          }
+        | expr
+          {
+            $$ = $1;
+          }
+        ;
+
+expr:   expr_arithmetic
+          {
+            /*if ($1.typ == eunknown) YYERROR;*/
+            $$ = $1;
+          }
+        | elemexpr       { $$ = $1; }
+        | '(' exprlist ')'    { $$ = $2; }
+        | expr '[' expr ',' expr ']'
+          {
+            if(iiExprArith3(&$$,'[',&$1,&$3,&$5)) YYERROR;
+          }
+        | expr '[' expr ']'
+          {
+            if(iiExprArith2(&$$,&$1,'[',&$3)) YYERROR;
           }
         | APPLY '('  expr ',' CMD_1 ')'
           {
