@@ -2444,7 +2444,7 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
     {
       Werror("not enough variables (%d) for ordering block %d, scanned so far:",R->N,j+1);
       for(int ii=0;ii<=j;ii++)
-        Werror("ord[%d]: %s from v%d to v%d\n",ii+1,rSimpleOrdStr(R->order[ii]),R->block0[ii],R->block1[ii]);
+        Werror("ord[%d]: %s from v%d to v%d",ii+1,rSimpleOrdStr(R->order[ii]),R->block0[ii],R->block1[ii]);
       goto rCompose_err;
     }
     if (check_comp)
