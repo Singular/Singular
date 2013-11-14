@@ -909,7 +909,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
     }
 //idPrint(res[syzIndex+1]);
 
-    if ((syzIndex==0))
+    if ( /*(*/ syzIndex==0 /*)*/ )
     {
       if ((hom==isHomog)|| (rHasGlobalOrdering(origR)))
       {

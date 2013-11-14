@@ -501,7 +501,7 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
 }
 static BOOLEAN jiA_1x1INTMAT(leftv res, leftv a,Subexpr e)
 {
-  if ((res->rtyp!=INTMAT_CMD) /*|| (e!=NULL) - TRUE because of type int */)
+  if (/*(*/ res->rtyp!=INTMAT_CMD /*)*/) /*|| (e!=NULL) - TRUE because of type int */ 
   {
     // no error message: assignment simply fails
     return TRUE;
@@ -523,7 +523,7 @@ static BOOLEAN jiA_1x1INTMAT(leftv res, leftv a,Subexpr e)
 }
 static BOOLEAN jiA_1x1MATRIX(leftv res, leftv a,Subexpr e)
 {
-  if ((res->rtyp!=MATRIX_CMD) /*|| (e!=NULL) - TRUE because of type poly */)
+  if (/*(*/ res->rtyp!=MATRIX_CMD /*)*/) /*|| (e!=NULL) - TRUE because of type poly */ 
   {
     // no error message: assignment simply fails
     return TRUE;
@@ -845,7 +845,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   }
 
   int lt=l->Typ();
-  if((lt==0)/*&&(l->name!=NULL)*/)
+  if (/*(*/ lt==0 /*)*/) /*&&(l->name!=NULL)*/ 
   {
     if (!errorreported) Werror("left side `%s` is undefined",l->Fullname());
     return TRUE;

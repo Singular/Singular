@@ -700,7 +700,7 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
 
   const int pos = rGetISPos(p, r);
 
-  if( (-1 == pos) )
+  if(  /*(*/ -1 == pos /*)*/  )
   {
     WerrorS("`GetInducedData([int])` called on incompatible ring (not created by 'MakeInducedSchreyerOrdering'!)");
     return TRUE;
@@ -776,7 +776,7 @@ static BOOLEAN SetInducedReferrence(leftv res, leftv h)
 
   const int posIS = rGetISPos(p, r);
 
-  if( (-1 == posIS) )
+  if(  /*(*/ -1 == posIS /*)*/  )
   {
     WerrorS("`SetInducedReferrence(<ideal/module>, [int[, int]])` called on incompatible ring (not created by 'MakeInducedSchreyerOrdering'!)");
     return TRUE;

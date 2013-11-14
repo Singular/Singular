@@ -844,7 +844,7 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
   TIMING_START(factorize_time);
   // search an "optimal" main variavble
   int mv=F.level();
-  if ((mv != LEVELBASE) /* && (! F.isUnivariate()) */)
+  if (/*(*/ mv != LEVELBASE /*)*/) /* && (! F.isUnivariate()) */ 
   {
      mv=find_mvar(F);
      if (mv!=F.level())

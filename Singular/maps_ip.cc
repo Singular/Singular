@@ -116,7 +116,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       if ((what==FETCH_CMD)&& (preimage_r->cf==currRing->cf))
         res->data=(void *)prCopyR( (poly)data, preimage_r, currRing);
       else
-      if ((what==IMAP_CMD) || ((what==FETCH_CMD) /* && (nMap!=nCopy)*/))
+	if ( (what==IMAP_CMD) || /*(*/ (what==FETCH_CMD) /*)*/) /* && (nMap!=nCopy)*/
         res->data=(void *)p_PermPoly((poly)data,perm,preimage_r,currRing, nMap,par_perm,P);
       else /*if (what==MAP_CMD)*/
       {
@@ -154,7 +154,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         }
       }
       else
-      if ((what==IMAP_CMD) || ((what==FETCH_CMD) /* && (nMap!=nCopy)*/))
+	if ( (what==IMAP_CMD) || /*(*/ (what==FETCH_CMD) /*)*/) /* && (nMap!=nCopy)*/
       {
         for (i=R*C-1;i>=0;i--)
         {

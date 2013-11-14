@@ -476,7 +476,7 @@ poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing)
   p_Test(pMonom, rRing);
 #endif
 
-  if( ( pPoly == NULL ) /*|| ( pMonom == NULL )*/ )
+  if (/*(*/  pPoly == NULL  /*)*/) /*|| ( pMonom == NULL )*/ 
     return NULL;
 
   const int iComponentMonomM = p_GetComp(pMonom, rRing);

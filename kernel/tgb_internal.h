@@ -1109,7 +1109,7 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(
    for(i=0;i<len;i++)
    {
      MonRedResNP<number_type> red=mon[i];
-     if ((red.ref))
+     if ( /*(*/ red.ref /*)*/ )
      {
        if (red.ref->row)
        {
@@ -1952,7 +1952,7 @@ template<class number_type> poly NoroCache<number_type>::lookup(poly term, BOOLE
   DataNoroCacheNode<number_type>* res_holder=(DataNoroCacheNode<number_type>*) parent->getBranch(p_GetExp(term,i,currRing));
   if (res_holder){
     succ=TRUE;
-    if ((res_holder->value_len==backLinkCode)){
+    if ( /*(*/ res_holder->value_len==backLinkCode /*)*/ ){
       len=1;
       return term;
     }

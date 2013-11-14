@@ -468,7 +468,7 @@ static poly maPoly_EvalMon(poly src, ring src_r, poly* dest_id, ring dest_r)
         p_Delete(&p,dest_r);
         return NULL;
       }
-      if ((p==NULL) /* && (e>0)*/)
+      if (/*(*/ p==NULL /*)*/) /* && (e>0)*/ 
       {
         p=p_Copy(pp /*dest_id[i-1]*/,dest_r);
         e--;
@@ -714,7 +714,7 @@ void maPoly_Optimize(mapoly mpoly, ring src_r)
   while (iter->next!=NULL)
   {
     choice=iter->next;
-    if ((iter->f1==NULL))
+    if ( /*(*/ iter->f1==NULL /*)*/ )
     {
       ggT=maFindBestggT(iter, choice, fp, fq,src_r);
       if (choice!=NULL)

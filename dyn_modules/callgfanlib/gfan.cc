@@ -1687,7 +1687,7 @@ inline void gcone::flip(ideal gb, facet *f)                //Compute "the other 
         ring srcRing=currRing;
         ring tmpRing;
 
-        if( (srcRing->order[0]!=ringorder_a))
+        if(  /*(*/ srcRing->order[0]!=ringorder_a /*)*/ )
         {
                 int64vec *iv;// = new int64vec(this->numVars);
                 iv = ivNeg(fNormal);//ivNeg uses iv64Copy -> new

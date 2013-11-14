@@ -3037,7 +3037,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   ideal u_id=(ideal)u->Data();
 
   maxl--;
-  if ((maxl==-1) /*&& (iiOp!=MRES_CMD)*/)
+  if (/*(*/ maxl==-1 /*)*/) /*&& (iiOp!=MRES_CMD)*/ 
   {
     maxl = currRing->N-1+2*(iiOp==MRES_CMD);
     if (currQuotient!=NULL)
@@ -3152,7 +3152,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   ideal u_id=(ideal)u->Data();
 
   maxl--;
-  if ((maxl==-1) /*&& (iiOp!=MRES_CMD)*/)
+  if (/*(*/ maxl==-1 /*)*/) /*&& (iiOp!=MRES_CMD)*/ 
   {
     maxl = currRing->N-1+2*(iiOp==MRES_CMD);
     if (currQuotient!=NULL)

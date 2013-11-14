@@ -1513,7 +1513,7 @@ const char * ntRead(const char *s, number *a, const coeffs cf)
 
 void ntNormalize (number &a, const coeffs cf)
 {
-  if ((a!=NULL))
+  if ( /*(*/ a!=NULL /*)*/ )
   {
     definiteGcdCancellation(a, cf, FALSE);
     if ((DEN(a)!=NULL)
