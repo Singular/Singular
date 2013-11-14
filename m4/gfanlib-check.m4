@@ -15,8 +15,9 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
 
  AC_CHECK_HEADERS([setoper.h cdd/setoper.h cddlib/setoper.h])
 
- if test "x$ac_cv_header_setoper_h" = xno -a "x$ac_cv_header_cdd_setoper_h" = xno -a "x$ac_cv_header_cddlib_setoper_h" = xno; then
-   AC_MSG_WARN([Note that setoper.h is missing!])
+ if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no -a "$ac_cv_header_cddlib_setoper_h" == no
+ then
+	AC_MSG_WARN([Error, setoper.h is missing!])
  fi
 
  AC_MSG_CHECKING([whether libcddgmp is usable])
@@ -55,6 +56,7 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
 
  LIBS=$BACKUP_LIBS
 
+<<<<<<< HEAD
  if test "x$PASSED_ALL_TESTS_FOR_GFANLIB" = x1; then
   AC_MSG_RESULT([yes])
   AC_SUBST(CDDGMPLDFLAGS)
@@ -65,6 +67,14 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
    AC_MSG_ERROR([Error, could not use libcddgmp])
   fi
  fi
+<<<<<<< HEAD
+=======
+=======
+ AC_MSG_RESULT(no)
+
+ AC_SUBST(CDDGMPLDFLAGS)
+>>>>>>> fix: missing -lcddgmp flag when linking libgfan.so
+>>>>>>> fix: missing -lcddgmp flag when linking libgfan.so
 else
  AC_MSG_RESULT(no)
  PASSED_ALL_TESTS_FOR_GFANLIB="0"
