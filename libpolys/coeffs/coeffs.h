@@ -217,9 +217,7 @@ struct n_Procs_s
    // Hence one can use the string to allow creation of R-elts using the
    // unbound name of the special element.
    const char *  (*cfRead)(const char * s, number * a, const coeffs r);
-
    void    (*cfNormalize)(number &a, const coeffs r);
-
    BOOLEAN (*cfGreater)(number a,number b, const coeffs r),
             /// tests
            (*cfEqual)(number a,number b, const coeffs r),
@@ -543,7 +541,7 @@ static FORCE_INLINE number n_InitMPZ(mpz_t n,     const coeffs r)
 
 /// conversion of n to an int; 0 if not possible
 /// in Z/pZ: the representing int lying in (-p/2 .. p/2]
-static FORCE_INLINE long n_Int(number &n,       const coeffs r)
+static FORCE_INLINE int n_Int(number &n,       const coeffs r)
 { STATISTIC(n_Int); assume(r != NULL); assume(r->cfInt!=NULL); return r->cfInt(n,r); }
 
 /// conversion of n to a GMP integer; 0 if not possible
@@ -609,6 +607,10 @@ static FORCE_INLINE number n_GetNumerator(number& n, const coeffs r)
 
 /// return the quotient of 'a' and 'b', i.e., a/b;
 /// raise an error if 'b' is not invertible in r
+<<<<<<< HEAD
+=======
+/// exception in Z: raises an error if 'a' is not divisible by 'b'
+>>>>>>> fix: wrong comment on errors in n_Div for Z
 static FORCE_INLINE number n_Div(number a, number b, const coeffs r)
 { STATISTIC(n_Div); assume(r != NULL); assume(r->cfDiv!=NULL); return r->cfDiv(a,b,r); }
 
@@ -659,7 +661,6 @@ static FORCE_INLINE number n_Add(number a, number b, const coeffs r)
 
  return sum;
 }
-
 
 /// return the difference of 'a' and 'b', i.e., a-b
 static FORCE_INLINE number n_Sub(number a, number b, const coeffs r)
