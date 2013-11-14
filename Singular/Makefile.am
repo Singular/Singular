@@ -198,7 +198,8 @@ SingularHEADERS =    Cache.h \
    subexpr.h \
    table.h \
    tok.h \
-   walk.h
+   walk.h \
+   rlimit.h
 
 
 # -DMAKE_DISTRIBUTION 
