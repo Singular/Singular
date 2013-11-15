@@ -223,20 +223,21 @@ AC_DEFUN([AX_PYTHON_CSPEC],
     AC_ARG_VAR( [PYTHON], [Python Executable Path] )
     if test -n "$PYTHON"
     then
-        ax_python_prefix=`${PYTHON} -c "import sys; print sys.prefix"`
+        ax_python_prefix=`${PYTHON}-config --prefix`
         if test -z "$ax_python_prefix"
         then
             AC_MSG_ERROR([Python Prefix is not known])
         fi
-        ax_python_execprefix=`${PYTHON} -c "import sys; print sys.exec_prefix"`
-        ax_python_version=`$PYTHON -c "import sys; print sys.version[[:3]]"`
-        ax_python_includespec="-I${ax_python_prefix}/include/python${ax_python_version}"
-        if test x"$python_prefix" != x"$python_execprefix"; then
-            ax_python_execspec="-I${ax_python_execprefix}/include/python${ax_python_version}"
-            ax_python_includespec="${ax_python_includespec} $ax_python_execspec"
-        fi
-        ax_python_ccshared=`${PYTHON} -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('CFLAGSFORSHARED')"`
-        ax_python_cspec="${ax_python_ccshared} ${ax_python_includespec}"
+#        ax_python_execprefix=`${PYTHON}-config --exec-prefix`
+#        ax_python_version=`$PYTHON -c "import sys; print sys.version[[:3]]"`
+#        ax_python_includespec="-I${ax_python_prefix}/include/python${ax_python_version}"
+#        if test x"$python_prefix" != x"$python_execprefix"; then
+#            ax_python_execspec="-I${ax_python_execprefix}/include/python${ax_python_version}"
+#            ax_python_includespec="${ax_python_includespec} $ax_python_execspec"
+#        fi
+        ax_python_cspec=`${PYTHON}-config --cflags | sed -e "s@ -arch i386@@" -e "s@ -arch x86_64@@" -e 's@ -g@@g' -e 's@ -mno-fused-madd@@g'`
+        #   or -Qunused-arguments / clang :(
+#        ax_python_cspec="${ax_python_ccshared} ${ax_python_includespec}"
         AC_SUBST([PYTHON_CSPEC], [${ax_python_cspec}])
         AC_MSG_NOTICE([PYTHON_CSPEC=${ax_python_cspec}])
     fi
@@ -268,9 +269,11 @@ AC_DEFUN([AX_PYTHON_INSIST],
 
 AC_DEFUN([AX_PYTHON_LSPEC],
 [
+
     AC_ARG_VAR( [PYTHON], [Python Executable Path] )
     if test -n "$PYTHON"
     then
+
         AX_PYTHON_RUN([
 import sys
 import distutils.sysconfig
@@ -307,8 +310,14 @@ else:
 strLinkSpec += " %s" % (dictConfig.get('LINKFORSHARED'))
 print strLinkSpec
         ])
-        AC_SUBST([PYTHON_LSPEC], [${ax_python_output}])
-        AC_MSG_NOTICE([PYTHON_LSPEC=${ax_python_output}])
+        
+#        AC_SUBST([PYTHON_LSPEC], [${ax_python_output}])
+#        AC_MSG_NOTICE([PYTHON_LSPEC=${ax_python_output}])
+
+        ax_python_lspec=`${PYTHON}-config --ldflags | sed -e "s@ -arch i386@@" -e "s@ -arch x86_64@@" -e 's@ -g@@g'`
+        AC_SUBST([PYTHON_LSPEC], [${ax_python_lspec}])
+        AC_MSG_NOTICE([PYTHON_LSPEC=${ax_python_lspec}])
+
     fi
 ])
 

@@ -18,13 +18,20 @@ ACLOCAL_AMFLAGS = -I ../m4
 
 GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-version)
 
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DHAVE_CONFIG_H  -DGIT_VERSION='"$(GIT_VERSION)"'
+
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/factory
 else
   USE_FACTORY =
 endif
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DHAVE_CONFIG_H  -DGIT_VERSION='"$(GIT_VERSION)"'
+if HAVE_GFANLIB
+  USE_GFANLIB = ${top_builddir}/dyn_modules/callgfanlib/gfanlib.la ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
+else
+  USE_GFANLIB = 
+endif
+
 AM_LDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys  -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
 
 ########################### Dynamic Modules... #########################
@@ -34,18 +41,6 @@ else !ENABLE_P_PROCS_DYNAMIC
   moduledir = $(libdir)/singular
 endif !ENABLE_P_PROCS_DYNAMIC
 
-if PYTHON_USE
-  PY=pyobject.la
-else !PYTHON_USE
-  PY=
-endif !PYTHON_USE
-
-if SI_EMBED_PYTHON
-  EMBED_PYOBJECT = ${PY} ${top_builddir}/dyn_modules/syzextra/syzextra.la 
-else !SI_EMBED_PYTHON
-  EMBED_PYOBJECT = 
-endif !SI_EMBED_PYTHON
-
 ##########################################################################
 module_LTLIBRARIES = pyobject.la
 
@@ -54,12 +49,21 @@ pyobject_la_SOURCES = pyobject.cc
 pyobject_la_CXXFLAGS = $(PYTHON_CSPEC)
 pyobject_la_CPPFLAGS = $(PYTHON_CPPFLAGS)  ${AM_CPPFLAGS}
 
-pyobject_la_LIBS    = $(PYTHON_EXTRA_LIBS)
-pyobject_la_LDFLAGS = ${AM_LDFLAGS} $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) $(PYTHON_LSPEC) -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
+pyobject_la_LDFLAGS = $(PYTHON_EXTRA_LIBS)  $(PYTHON_LSPEC) ${AM_LDFLAGS} $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 ###  -export-dynamic -shared -module -avoid-version (add to all DMs?)
 
+##########################################################################
+if PYTHON_USE
+  PY=pyobject.la  $(PYTHON_EXTRA_LIBS)  $(PYTHON_LSPEC) ${AM_LDFLAGS} $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) 
+else !PYTHON_USE
+  PY=
+endif !PYTHON_USE
 
-########################### libSingular* #########################
+if SI_EMBED_PYTHON
+ EMBED_PYOBJECT   = ${PY} ${top_builddir}/dyn_modules/syzextra/syzextra.la ${USE_GFANLIB}
+else !SI_EMBED_PYTHON
+  EMBED_PYOBJECT = 
+endif !SI_EMBED_PYTHON
 
 # if WANT_DEBUG
 #   LIB_G=libSingular_g.la
@@ -205,8 +209,7 @@ SingularHEADERS =    Cache.h \
 # -DMAKE_DISTRIBUTION 
 
 # plural_cmd.inc
-nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc ${EMBED_PYOBJECT}
-# nodist_libSingular_g_la_SOURCES = iparith.inc
+nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc 
 
 # -release ${PACKAGE_VERSION} 
 libSingular_la_LDFLAGS    = ${AM_LDFLAGS} ${EMBED_PYOBJECT} \
@@ -278,8 +281,9 @@ nodist_Singular_SOURCES = libSingular.la
 Singular_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 # Singularg_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
-Singular_LDADD = libSingular.la
+Singular_LDADD = libSingular.la ${EMBED_PYOBJECT}
 
+Singular_LDFLAGS = -static ${AM_LDFLAGS} ${EMBED_PYOBJECT}
 # Singularg_LDADD = libSingular_g.la ${top_builddir}/numeric/libnumeric_g.la ${top_builddir}/kernel/libkernel_g.la ${top_builddir}/libpolys/polys/libpolys_g.la -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
 
 # Singular_CPPFLAGS = ${AM_CPPFLAGS} -DGIT_VERSION='"$(GIT_VERSION)"'
@@ -287,7 +291,6 @@ Singular_LDADD = libSingular.la
 # Singularg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 # Singular_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
-Singular_LDFLAGS = -static ${AM_LDFLAGS}
 # Singularg_LDFLAGS = -static ${AM_LDFLAGS}
 
 
@@ -304,8 +307,7 @@ nodist_Singulard_SOURCES = libSingular.la
 # nodist_Singulardg_SOURCES =  libSingular_g.la
 
 #  ${EMBED_PYOBJECT_LDFLAGS}  ${EMBED_PYOBJECT_LDFLAGS}
-Singulard_LDADD = libSingular.la
-
+Singulard_LDADD = libSingular.la ${EMBED_PYOBJECT}
 # Singulardg_LDADD = libSingular_g.la -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g $(FACTORY_LIBS) -lomalloc_g -lresources_g $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS}  ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT_LDFLAGS}
 
 # Singulard_CPPFLAGS = ${AM_CPPFLAGS}  -DGIT_VERSION='"$(GIT_VERSION)"'
@@ -314,8 +316,7 @@ Singulard_LDADD = libSingular.la
 # Singulardg_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 # Singulard_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
-Singulard_LDFLAGS = ${AM_LDFLAGS}
-# Singulardg_LDFLAGS = ${AM_LDFLAGS}
+Singulard_LDFLAGS = ${AM_LDFLAGS} ${EMBED_PYOBJECT}
 
 
 #### ESingular

@@ -67,7 +67,7 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
                 # So, let's search the PATH Environment Variable.
                 AC_PATH_PROGS(
                     [PYTHON],
-                    [python2 python],
+                    [python2.7 python2.6 python2.5 python2.4 python2.3 python2.2 python2.1 python2 python],
                     [],
                     $2
                 )

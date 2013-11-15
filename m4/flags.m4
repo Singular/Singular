@@ -104,11 +104,13 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
   AC_LANG_POP([C++])
   AX_APPEND_LINK_FLAGS(${DBGFLAGS})
  fi
- 
+
+ ## for clang: -Wunneeded-internal-declaration 
+
  if test "x${ENABLE_OPTIMIZATION}" != xno; then 
   OPTFLAGS="-DOM_NDEBUG -DNDEBUG -O3 -Wno-unused-function -Wno-trigraphs -Wno-unused-parameter -Wno-unused-variable -fomit-frame-pointer -fwrapv -fvisibility=default -finline-functions -fno-exceptions -fno-rtti -fno-threadsafe-statics -fno-enforce-eh-specs -fconserve-space -funroll-loops"
   #  -O3 - crashes gcc???!!!  
-  # -fpermissive 
+  # -fpermissive  
   AC_LANG_PUSH([C])
   AX_APPEND_COMPILE_FLAGS(${OPTFLAGS}, [CFLAGS])
   AC_LANG_POP([C])
@@ -122,6 +124,17 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
 ###  AX_APPEND_LINK_FLAGS([-fno-implicit-templates]) # see above :(
 #  AX_APPEND_LINK_FLAGS([ ])
  fi
+
+ FLAGS2="-Qunused-arguments"
+ AC_LANG_PUSH([C])
+ AX_APPEND_COMPILE_FLAGS(${FLAGS2}, [CFLAGS])
+ AC_LANG_POP([C])
+ 
+ AC_LANG_PUSH([C++])
+ AX_APPEND_COMPILE_FLAGS(${FLAGS2}, [CXXFLAGS])
+ AC_LANG_POP([C++])
+
+ AX_APPEND_LINK_FLAGS(${FLAGS2}) 
 
 # SING_SHOW_FLAGS([before PROG_C_CC])
 
