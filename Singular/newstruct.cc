@@ -127,7 +127,8 @@ lists lCopy_newstruct(lists L)
   N->Init(n+1);
   for(;n>=0;n--)
   {
-    if (RingDependend(L->m[n].rtyp))
+    if (RingDependend(L->m[n].rtyp)
+    ||((L->m[n].rtyp==LIST_CMD)&&lRingDependend((lists)L->m[n].data)))
     {
       assume((L->m[n-1].rtyp==RING_CMD) || (L->m[n-1].data==NULL));
       if(L->m[n-1].data!=NULL)
@@ -367,7 +368,8 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
             else Werror("ring of this member is not set and no basering found");
             return r==NULL;
           }
-          else if (RingDependend(nm->typ))
+          else if (RingDependend(nm->typ)
+	  || (al->m[nm->pos].RingDependend()))
           {
             if (al->m[nm->pos].data==NULL)
             {
@@ -399,6 +401,14 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
               currRing->ref++;
             }
           }
+	  else if ((nm->typ==DEF_CMD)||(nm->typ==LIST_CMD))
+	  {
+	    if (al->m[nm->pos-1].data==NULL)
+	    {
+	      al->m[nm->pos-1].data=(void*)currRing;
+	      if (currRing!=NULL) currRing->ref++;
+	    }
+	  }
           Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
           r->start = nm->pos+1;
           memcpy(res,a1,sizeof(sleftv));
@@ -515,7 +525,7 @@ void *newstruct_Init(blackbox *b)
   while (nm!=NULL)
   {
     l->m[nm->pos].rtyp=nm->typ;
-    if (RingDependend(nm->typ))
+    if (RingDependend(nm->typ) ||(nm->typ==DEF_CMD)||(nm->typ==LIST_CMD))
       l->m[nm->pos-1].rtyp=RING_CMD;
     l->m[nm->pos].data=idrecDataInit(nm->typ);
     nm=nm->next;
@@ -666,7 +676,7 @@ static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
       currRingHdl=save_ring;
       return NULL;
     }
-    if (RingDependend(t))
+    if (RingDependend(t) || (t==DEF_CMD)||(t==LIST_CMD))
       res->size++;    // one additional field for the ring (before the data)
     //Print("found type %s at real-pos %d",start,res->size);
     elem=(newstruct_member)omAlloc0(sizeof(*elem));
@@ -707,6 +717,7 @@ static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
   omFree(ss);
   currRingHdl=save_ring;
   //Print("new type with %d elements\n",res->size);
+  //newstructShow(res);
   return res;
 error_in_newstruct_def:
    omFree(elem);
@@ -756,7 +767,7 @@ void newstructShow(newstruct_desc d)
   while (elem!=NULL)
   {
     Print(">>%s<< at pos %d, type %d (%s)\n",elem->name,elem->pos,elem->typ,Tok2Cmdname(elem->typ));
-    if (RingDependend(elem->typ))
+    if (RingDependend(elem->typ)|| (elem->typ==DEF_CMD) ||(elem->typ==LIST_CMD))
       Print(">>r_%s<< at pos %d, shadow ring\n",elem->name,elem->pos-1);
     elem=elem->next;
   }
