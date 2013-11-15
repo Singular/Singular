@@ -730,6 +730,33 @@ example
    Q;
 }
 
+static proc algeModStd(ideal i,list #)
+{
+//reduces modStd over algebraic extensions to the one over a polynomial ring
+   list L=#;
+   def R=basering;
+   int n=nvars(R);
+   list rl=ringlist(R);
+   poly p=minpoly;
+   rl[2][n+1]=rl[1][2][1];
+   rl[1]=rl[1][1];
+   rl[3][size(rl[3])+1]=rl[3][size(rl[3])];
+   rl[3][size(rl[3])-1]=list("dp",1);
+   def S=ring(rl);
+   setring S;
+   poly p=imap(R,p);
+   ideal i=imap(R,i);
+   i=i,p;
+   ideal j=modStd(i,L);
+   if(j[1]==p)
+   {
+      j[1]=0;
+   }
+   j=simplify(j,2);
+   setring R;
+   ideal j=imap(S,j);
+   return(j);
+}
 ////////////////////////////// main procedures /////////////////////////////////
 
 proc modStd(ideal I, list #)
@@ -763,8 +790,31 @@ EXAMPLE: example modStd; shows an example
 
    def R0 = basering;
    list rl = ringlist(R0);
-   if((npars(R0) > 0) || (rl[1] > 0))
+
+   int algebraic;
+   if(size(#)>0)
    {
+      if(#[1]<=0)
+      {
+         algebraic=1;
+         #[1]=-#[1];
+         if(#[1]==0){list LK;#=LK;}
+      }
+   }
+
+   if((npars(R0) > 0) || (rl[1][1] > 0))
+   {
+      if(npars(R0)==1)
+      {
+         if(minpoly!=0)
+         {
+            list LM=#;
+            if(size(LM)==0){LM[1]=0;}
+            LM[1]=-LM[1];
+            return(algeModStd(I,LM));
+         }
+      }
+
       ERROR("Characteristic of basering should be zero, basering should
              have no parameters.");
    }
@@ -1029,6 +1079,7 @@ EXAMPLE: example modStd; shows an example
          }
       }
    }
+   if(algebraic){variant=2;}
 
    list P,T1,T2,T3,LL;
 
