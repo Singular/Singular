@@ -8,8 +8,16 @@
 
 lib_types type_of_LIB(const char *newlib, char *fullname);
 
+
+#if HAVE_GFANLIB 
+#define SI_BUILTIN_GFANLIB(add) add(gfanlib)
+#else
+#define SI_BUILTIN_GFANLIB(add) 
+#endif
+
+
 #ifdef EMBED_PYTHON
-#define SI_BUILTIN_PYOBJECT(add) add(pyobject) add(syzextra)
+#define SI_BUILTIN_PYOBJECT(add) add(pyobject)  add(syzextra)      SI_BUILTIN_GFANLIB(add)
 //TODO: the line above means that syzextra should be staticly embedded IFF pyobjects do so :(
 #else
 #define SI_BUILTIN_PYOBJECT(add) 
