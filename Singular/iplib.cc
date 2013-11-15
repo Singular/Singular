@@ -732,12 +732,10 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   return err;
 }
 
-int staticdemo_mod_init(SModulFunctions*){ PrintS("init of staticdemo\n"); return (0); }
+int SI_MOD_INIT(staticdemo)(SModulFunctions*){ PrintS("init of staticdemo\n"); return (0); }
 
 #define SI_GET_BUILTIN_MOD_INIT(name) \
-  int SI_MOD_INIT(name)(SModulFunctions*); \
-  if (strcmp(libname, #name ".so") == 0) {  return SI_MOD_INIT(name); }
-
+ if (strcmp(libname, #name ".so") == 0){ int SI_MOD_INIT(name)(SModulFunctions*); return SI_MOD_INIT(name); }
 
 SModulFunc_t
 iiGetBuiltinModInit(const char* libname)

@@ -550,7 +550,7 @@ int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
     FALSE,
     setRingGlobal
   );
-  return 1;
+  return 0;
 }
 
 #else /* HAVE_MATHICGB */
@@ -562,7 +562,7 @@ int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
     "as this Singular executable was built without support "
     "for MathicGB."
   );
-  return 0;
+  return 1;
 }
 
 #endif /* HAVE_MATHICGB */
