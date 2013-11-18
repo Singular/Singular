@@ -1320,7 +1320,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
   return FALSE;
 }
 
-BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
+BOOLEAN iiInternalExport (leftv v, int toLev, package rootpack)
 {
   idhdl h=(idhdl)v->data;
   if(h==NULL)
@@ -1330,8 +1330,6 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
   }
   package frompack=v->req_packhdl;
   if (frompack==NULL) frompack=currPack;
-  package rootpack = IDPACKAGE(roothdl);
-//  Print("iiInternalExport('%s',%d,%s->%s) typ:%d\n", v->name, toLev, IDID(currPackHdl),IDID(roothdl),v->Typ());
   if ((RingDependend(IDTYP(h)))
   || ((IDTYP(h)==LIST_CMD)
      && (lRingDependend(IDLIST(h)))
@@ -1370,9 +1368,6 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
 
 BOOLEAN iiExport (leftv v, int toLev)
 {
-#ifndef NDEBUG
-  checkall();
-#endif
   BOOLEAN nok=FALSE;
   leftv r=v;
   while (v!=NULL)
@@ -1393,20 +1388,12 @@ BOOLEAN iiExport (leftv v, int toLev)
     v=v->next;
   }
   r->CleanUp();
-#ifndef NDEBUG
-  checkall();
-#endif
   return nok;
 }
 
 /*assume root!=idroot*/
-BOOLEAN iiExport (leftv v, int toLev, idhdl root)
+BOOLEAN iiExport (leftv v, int toLev, package pack)
 {
-#ifndef NDEBUG
-  checkall();
-#endif
-  //  Print("iiExport1: pack=%s\n",IDID(root));
-  package pack=IDPACKAGE(root);
   BOOLEAN nok=FALSE;
   leftv rv=v;
   while (v!=NULL)
@@ -1443,7 +1430,7 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
         }
       }
       //Print("iiExport: pack=%s\n",IDID(root));
-      if(iiInternalExport(v, toLev, root))
+      if(iiInternalExport(v, toLev, pack))
       {
         rv->CleanUp();
         return TRUE;
@@ -1452,9 +1439,6 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
     v=v->next;
   }
   rv->CleanUp();
-#ifndef NDEBUG
-  checkall();
-#endif
   return nok;
 }
 

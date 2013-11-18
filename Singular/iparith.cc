@@ -2056,7 +2056,7 @@ static BOOLEAN jjELIMIN_IV(leftv res, leftv u, leftv v)
 static BOOLEAN jjEXPORTTO(leftv res, leftv u, leftv v)
 {
   //Print("exportto %s -> %s\n",v->Name(),u->Name() );
-  return iiExport(v,0,(idhdl)u->data);
+  return iiExport(v,0,IDPACKAGE((idhdl)u->data));
 }
 static BOOLEAN jjERROR(leftv res, leftv u)
 {
