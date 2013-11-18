@@ -1173,7 +1173,7 @@ exportcmd:
         {
           if (basePack!=$2.req_packhdl)
           {
-            if(iiExport(&$2,0,currPackHdl)) YYERROR;
+            if(iiExport(&$2,0,currPack)) YYERROR;
           }
           else
             if (iiExport(&$2,0)) YYERROR;

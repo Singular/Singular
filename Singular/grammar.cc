@@ -3642,7 +3642,7 @@ yyreduce:
     {
           if (basePack!=(yyvsp[(2) - (2)].lv).req_packhdl)
           {
-            if(iiExport(&(yyvsp[(2) - (2)].lv),0,currPackHdl)) YYERROR;
+            if(iiExport(&(yyvsp[(2) - (2)].lv),0,currPack)) YYERROR;
           }
           else
             if (iiExport(&(yyvsp[(2) - (2)].lv),0)) YYERROR;

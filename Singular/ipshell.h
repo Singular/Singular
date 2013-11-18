@@ -56,8 +56,8 @@ int     IsPrime(int i);
 
 BOOLEAN iiWRITE(leftv res,leftv exprlist);
 BOOLEAN iiExport(leftv v, int toLev);
-BOOLEAN iiExport(leftv v, int toLev, idhdl roothdl);
-BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl);
+BOOLEAN iiExport(leftv v, int toLev, package pack);
+BOOLEAN iiInternalExport (leftv v, int toLev, package pack);
 char *  iiGetLibName(procinfov v);
 char *  iiGetLibProcBuffer( procinfov pi, int part=1 );
 char *  iiProcName(char *buf, char & ct, char* &e);
