@@ -707,7 +707,7 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         if(isupper(u->name[0]))
         {
           const char *c=u->name+1;
-          while((*c!='\0')&&(islower(*c))) c++;
+          while((*c!='\0')&&(islower(*c)||(isdigit(*c)))) c++;
           if (*c!='\0')
             name_err=1;
           else
