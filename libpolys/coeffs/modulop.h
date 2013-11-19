@@ -10,9 +10,9 @@
 
 // defines are in struct.h
 // define if a*b is with mod instead of tables
-//#define HAVE_MULT_MOD 
+//#define HAVE_MULT_MOD
 // define if a/b is with mod instead of tables
-//#define HAVE_DIV_MOD 
+//#define HAVE_DIV_MOD
 // define if an if should be used
 //#define HAVE_GENERIC_ADD
 
@@ -70,7 +70,7 @@ extern unsigned short *npLogTable;
 // {
 //    double ab;
 //    long q, res;
-// 
+//
 //    ab = ((double) ((int)a)) * ((double) ((int)b));
 //    q  = (long) (ab/((double) npPrimeM));  // q could be off by (+/-) 1
 //    res = (long) (ab - ((double) q)*((double) npPrimeM));
@@ -82,7 +82,7 @@ extern unsigned short *npLogTable;
 #ifdef HAVE_MULT_MOD
 static inline number npMultM(number a, number b, const coeffs r)
 {
-  return (number) 
+  return (number)
     ((((unsigned long) a)*((unsigned long) b)) % ((unsigned long) r->ch));
 }
 #else

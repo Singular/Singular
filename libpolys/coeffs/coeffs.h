@@ -76,7 +76,7 @@ typedef void (*nCoeffsEnumeratorFunc)(ICoeffsEnumerator& numberCollectionEnumera
 
 
 /// Creation data needed for finite fields
-typedef struct 
+typedef struct
 {
   int GFChar;
   int GFDegree;
@@ -122,22 +122,22 @@ struct n_Procs_s
                                 // or NULL
    // general stuff
    numberfunc cfMult, cfSub ,cfAdd ,cfDiv, cfIntDiv, cfIntMod, cfExactDiv;
-   
+
    /// init with an integer
    number  (*cfInit)(long i,const coeffs r);
 
    /// init with a GMP integer
    number  (*cfInitMPZ)(mpz_t i, const coeffs r);
-   
+
    /// how complicated, (0) => 0, or positive
    int     (*cfSize)(number n, const coeffs r);
-   
+
    /// convertion to int, 0 if impossible
    int     (*cfInt)(number &n, const coeffs r);
 
    /// Converts a non-negative number n into a GMP number, 0 if impossible
    void     (*cfMPZ)(mpz_t result, number &n, const coeffs r);
-   
+
    /// changes argument  inline: a:= -a
    /// return -a! (no copy is returned)
    /// the result should be assigned to the original argument: e.g. a = n_Neg(a,r)
@@ -151,14 +151,14 @@ struct n_Procs_s
 
    /// print a given number (long format)
    void    (*cfWriteLong)(number &a, const coeffs r);
-   
+
    /// print a given number in a shorter way, if possible
    /// e.g. in K(a): a2 instead of a^2
    void    (*cfWriteShort)(number &a, const coeffs r);
-   
+
    const char *  (*cfRead)(const char * s, number * a, const coeffs r);
    void    (*cfNormalize)(number &a, const coeffs r);
-   
+
 #ifdef HAVE_RINGS
    int     (*cfDivComp)(number a,number b,const coeffs r);
    BOOLEAN (*cfIsUnit)(number a,const coeffs r);
@@ -166,7 +166,7 @@ struct n_Procs_s
    BOOLEAN (*cfDivBy)(number a, number b, const coeffs r);
 #endif
 
-   
+
    BOOLEAN (*cfGreater)(number a,number b, const coeffs r),
             /// tests
            (*cfEqual)(number a,number b, const coeffs r),
@@ -210,7 +210,7 @@ struct n_Procs_s
 
    /// create i^th parameter or NULL if not possible
    number  (*cfParameter)(const int i, const coeffs r);
-       
+
    /// function pointer behind n_ClearContent
    nCoeffsEnumeratorFunc cfClearContent;
 
@@ -229,7 +229,7 @@ struct n_Procs_s
 #endif
 
    /// the 0 as constant, NULL by default
-   number nNULL; 
+   number nNULL;
    int     char_flag;
    int     ref;
    /// how many variables of factort are already used by this coeff
@@ -301,7 +301,7 @@ struct n_Procs_s
   short      float_len2; /* additional char-flags, rInit */
 
 //  BOOLEAN   CanShortOut; //< if the elements can be printed in short format
-//		       // this is set to FALSE if a parameter name has >2 chars
+//                       // this is set to FALSE if a parameter name has >2 chars
 //  BOOLEAN   ShortOut; //< if the elements should print in short format
 
 // ---------------------------------------------------
@@ -313,7 +313,7 @@ struct n_Procs_s
   int m_nfCharQ1; ///< q-1
   unsigned short *m_nfPlus1Table;
   int *m_nfMinPoly;
-  
+
 // ---------------------------------------------------
 // for Zp:
 #ifdef HAVE_DIV_MOD
@@ -607,9 +607,9 @@ static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenum
 static inline BOOLEAN n_DBTest(number, const char*, const int, const coeffs)
 #endif
 {
-  assume(r != NULL); 
+  assume(r != NULL);
 #ifdef LDEBUG
-  assume(r->cfDBTest != NULL); 
+  assume(r->cfDBTest != NULL);
   return r->cfDBTest(n, filename, linenumber, r);
 #else
   return TRUE;
@@ -639,7 +639,7 @@ static inline BOOLEAN nCoeff_is_Ring(const coeffs r)
 /// returns TRUE, if r is not a field and r has no zero divisors (i.e is a domain)
 static inline BOOLEAN nCoeff_is_Domain(const coeffs r)
 {
-  assume(r != NULL); 
+  assume(r != NULL);
 #ifdef HAVE_RINGS
   return (getCoeffType(r)==n_Z || ((getCoeffType(r)!=n_Z2m) && (getCoeffType(r)!=n_Zn) && (getCoeffType(r)!=n_Znm)));
 #else
@@ -678,8 +678,8 @@ static inline number n_Farey(number a, number b, const coeffs r)
 }
 
 static inline int n_ParDeg(number n, const coeffs r)
-{ 
-  assume(r != NULL); assume(r->cfParDeg != NULL); return r->cfParDeg(n,r); 
+{
+  assume(r != NULL); assume(r->cfParDeg != NULL); return r->cfParDeg(n,r);
 }
 
 /// Returns the number of parameters
@@ -696,25 +696,24 @@ static inline number n_Param(const int iParameter, const coeffs r)
   assume(r != NULL);
   assume((iParameter >= 1) || (iParameter <= n_NumberOfParameters(r)));
   assume(r->cfParameter != NULL);
-  return r->cfParameter(iParameter, r);  
+  return r->cfParameter(iParameter, r);
 }
 
-
 static inline number  n_Init_bigint(number i, const coeffs dummy,
-		const coeffs dst)
+                const coeffs dst)
 {
-  assume(dummy != NULL && dst != NULL); assume(dst->cfInit_bigint!=NULL); 
+  assume(dummy != NULL && dst != NULL); assume(dst->cfInit_bigint!=NULL);
   return dst->cfInit_bigint(i, dummy, dst);
 }
 
 static inline number  n_RePart(number i, const coeffs cf)
 {
-  assume(cf != NULL); assume(cf->cfRePart!=NULL); 
+  assume(cf != NULL); assume(cf->cfRePart!=NULL);
   return cf->cfRePart(i,cf);
 }
 static inline number  n_ImPart(number i, const coeffs cf)
 {
-  assume(cf != NULL); assume(cf->cfImPart!=NULL); 
+  assume(cf != NULL); assume(cf->cfImPart!=NULL);
   return cf->cfImPart(i,cf);
 }
 

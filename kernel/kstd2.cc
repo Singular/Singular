@@ -1503,7 +1503,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   // ring order stuff:
   // in sba we have (until now) two possibilities:
   // 1. an incremental computation w.r.t. (C,monomial order)
-  // 2. a (possibly non-incremental) computation w.r.t. the 
+  // 2. a (possibly non-incremental) computation w.r.t. the
   //    induced Schreyer order.
   // The corresponding orders are computed in sbaRing(), depending
   // on the flag strat->incremental
@@ -1516,7 +1516,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
   ideal F = F0;
   ring sRing, currRingOld;
-  currRingOld  = currRing; 
+  currRingOld  = currRing;
   if (strat->incremental)
   {
     sRing = sbaRing(strat);
@@ -1626,10 +1626,10 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #if F5C
       // 1. interreduction of the current standard basis
       // 2. generation of new principal syzygy rules for syzCriterion
-      f5c ( strat, olddeg, minimcnt, hilbeledeg, hilbcount, srmax, 
+      f5c ( strat, olddeg, minimcnt, hilbeledeg, hilbcount, srmax,
             lrmax, reduc, Q, w, hilb );
 #endif
-      // initialize new syzygy rules for the next iteration step  
+      // initialize new syzygy rules for the next iteration step
       initSyzRules(strat);
     }
     /*********************************************************************
@@ -1756,8 +1756,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     {
       // get the polynomial (canonicalize bucket, make sure P.p is set)
       strat->P.GetP(strat->lmBin);
-      
-      // sig-safe computations may lead to wrong FDeg computation, thus we need 
+
+      // sig-safe computations may lead to wrong FDeg computation, thus we need
       // to recompute it to make sure everything is alright
       (strat->P).FDeg = (strat->P).pFDeg();
       // in the homogeneous case FDeg >= pFDeg (sugar/honey)
@@ -1869,17 +1869,17 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
             strat->syz[i] = pCopy(strat->P.sig);
             // add LM(F->m[i]) to the signature to get a Schreyer order
             // without changing the underlying polynomial ring at all
-            p_ExpVectorAdd (strat->syz[i],strat->S[ps],currRing);  
+            p_ExpVectorAdd (strat->syz[i],strat->S[ps],currRing);
             // since p_Add_q() destroys all input
-            // data we need to recreate help 
+            // data we need to recreate help
             // each time
             // ----------------------------------------------------------
-            // in the Schreyer order we always know that the multiplied 
+            // in the Schreyer order we always know that the multiplied
             // module monomial strat->P.sig gives the leading monomial of
             // the corresponding principal syzygy
             // => we do not need to compute the "real" syzygy completely
             poly help = pCopy(strat->sig[ps]);
-            p_ExpVectorAdd (help,strat->P.p,currRing);  
+            p_ExpVectorAdd (help,strat->P.p,currRing);
             strat->syz[i] = p_Add_q(strat->syz[i],help,currRing);
             //printf("%d. SYZ  ",i+1);
             //pWrite(strat->syz[i]);
@@ -1888,8 +1888,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           }
         }
       }
-        enterT(strat->P, strat);
-        strat->T[strat->tl].is_sigsafe = FALSE;
+      enterT(strat->P, strat);
+      strat->T[strat->tl].is_sigsafe = FALSE;
 #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
         superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
@@ -2238,7 +2238,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
 *    safe) reduction process (including tail reductions)
 * 3. strat->S and strat->T are completely new computed in these steps
 ********************************************************************/
-void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg, 
+void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
           int& hilbcount, int& srmax, int& lrmax, int& reduc, ideal Q,
           intvec *w,intvec *hilb )
 {
@@ -2265,7 +2265,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
       {
         if (currRing->OrdSgn==-1)
         {
-          cancelunit(&h);  
+          cancelunit(&h);
           deleteHC(&h, strat);
         }
         if (h.p!=NULL)
@@ -2493,7 +2493,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
     strat->T[cc].sevSig     = pGetShortExpVector(strat->T[cc].sig);
     strat->sig[cc]          = strat->T[cc].sig;
     strat->sevSig[cc]       = strat->T[cc].sevSig;
-    strat->T[cc].is_sigsafe = TRUE;  
+    strat->T[cc].is_sigsafe = TRUE;
     cc++;
   }
   strat->max_lower_index = strat->tl;

@@ -34,13 +34,13 @@ static const n_coeffType ID = n_Zp;
 static inline number nvMultM(number a, number b, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
-  
+
 #if SIZEOF_LONG == 4
 #define ULONG64 (unsigned long long)(unsigned long)
 #else
 #define ULONG64 (unsigned long)
 #endif
-  return (number) 
+  return (number)
       (unsigned long)((ULONG64 a)*(ULONG64 b) % (ULONG64 r->ch));
 }
 number  nvMult        (number a, number b, const coeffs r);
@@ -55,7 +55,7 @@ void    nvPower       (number a, int i, number * result, const coeffs r);
 BOOLEAN npGreaterZero (number k, const coeffs r)
 {
   assume( n_Test(k, r) );
-  
+
   int h = (int)((long) k);
   return ((int)h !=0) && (h <= (r->ch>>1));
 }
@@ -77,7 +77,7 @@ number npMult (number a,number b, const coeffs r)
     return (number)0;
   number c = npMultM(a,b, r);
   assume( n_Test(c, r) );
-  return c;  
+  return c;
 }
 
 /*2
@@ -91,7 +91,7 @@ number npInit (long i, const coeffs r)
   number c = (number)ii;
   assume( n_Test(c, r) );
   return c;
-  
+
 }
 
 
@@ -101,7 +101,7 @@ number npInit (long i, const coeffs r)
 int npInt(number &n, const coeffs r)
 {
   assume( n_Test(n, r) );
-  
+
   if ((long)n > (((long)r->ch) >>1)) return (int)((long)n -((long)r->ch));
   else                               return (int)((long)n);
 }
@@ -110,11 +110,11 @@ number npAdd (number a, number b, const coeffs r)
 {
   assume( n_Test(a, r) );
   assume( n_Test(b, r) );
-  
+
   number c = npAddM(a,b, r);
 
   assume( n_Test(c, r) );
-  
+
   return c;
 }
 
@@ -122,7 +122,7 @@ number npSub (number a, number b, const coeffs r)
 {
   assume( n_Test(a, r) );
   assume( n_Test(b, r) );
-  
+
   number c = npSubM(a,b,r);
 
   assume( n_Test(c, r) );
@@ -133,21 +133,21 @@ number npSub (number a, number b, const coeffs r)
 BOOLEAN npIsZero (number  a, const coeffs r)
 {
   assume( n_Test(a, r) );
-  
+
   return 0 == (long)a;
 }
 
 BOOLEAN npIsOne (number a, const coeffs r)
 {
   assume( n_Test(a, r) );
-  
+
   return 1 == (long)a;
 }
 
 BOOLEAN npIsMOne (number a, const coeffs r)
 {
   assume( n_Test(a, r) );
-  
+
   return ((r->npPminus1M == (long)a)&&((long)1!=(long)a));
 }
 
@@ -230,14 +230,14 @@ number npDiv (number a,number b, const coeffs r)
   if ((long)a==0)
     return (number)0;
   number d;
-  
+
 #ifndef HAVE_DIV_MOD
   if ((long)b==0)
   {
     WerrorS(nDivBy0);
     return (number)0;
   }
-  
+
   int s = r->npLogTable[(long)a] - r->npLogTable[(long)b];
   if (s < 0)
     s += r->npPminus1M;
@@ -249,39 +249,39 @@ number npDiv (number a,number b, const coeffs r)
 
   assume( n_Test(d, r) );
   return d;
-  
+
 }
 number  npInvers (number c, const coeffs r)
 {
   assume( n_Test(c, r) );
-  
+
   if ((long)c==0)
   {
     WerrorS("1/0");
     return (number)0;
   }
   number d = npInversM(c,r);
-  
+
   assume( n_Test(d, r) );
   return d;
-  
+
 }
 
 number npNeg (number c, const coeffs r)
 {
   assume( n_Test(c, r) );
-  
+
   if ((long)c==0) return c;
 
-#if 0  
-  number d = npNegM(c,r);  
+#if 0
+  number d = npNegM(c,r);
   assume( n_Test(d, r) );
   return d;
 #else
-  c = npNegM(c,r);  
+  c = npNegM(c,r);
   assume( n_Test(c, r) );
   return c;
-#endif  
+#endif
 }
 
 BOOLEAN npGreater (number a,number b, const coeffs r)
@@ -297,16 +297,16 @@ BOOLEAN npEqual (number a,number b, const coeffs r)
 {
   assume( n_Test(a, r) );
   assume( n_Test(b, r) );
-  
+
 //  return (long)a == (long)b;
-  
+
   return npEqualM(a,b,r);
 }
 
 void npWrite (number &a, const coeffs r)
 {
   assume( n_Test(a, r) );
-  
+
   if ((long)a>(((long)r->ch) >>1)) StringAppend("-%d",(int)(((long)r->ch)-((long)a)));
   else                             StringAppend("%d",(int)((long)a));
 }
@@ -435,7 +435,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   const int c = (int) (long) p;
 
   assume( c > 0 );
-  
+
   int i, w;
 
   r->ch = c;
@@ -506,7 +506,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->convSingNFactoryN=npConvSingNFactoryN;
   r->convFactoryNSingN=npConvFactoryNSingN;
 #endif
-  
+
   // the variables:
   r->nNULL = (number)0;
   r->type = n_Zp;
@@ -538,7 +538,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
           r->npExpTable[i] =(int)(((long)w * (long)r->npExpTable[i-1])
                                % r->ch);
           r->npLogTable[r->npExpTable[i]] = i;
-          if /*(i == r->ch - 1 ) ||*/ (/*(*/ r->npExpTable[i] == 1 /*)*/) 
+          if /*(i == r->ch - 1 ) ||*/ (/*(*/ r->npExpTable[i] == 1 /*)*/)
             break;
         }
         if (i == r->ch - 1)
@@ -756,10 +756,10 @@ inline long nvInvMod(long a, const coeffs R)
   return InvMod(a, R);
 #else
 /// TODO: use "long InvMod(long a, const coeffs R)"?!
-  
+
    long  s;
 
-   long  u, u0, u1, u2, q, r; // v0, v1, v2, 
+   long  u, u0, u1, u2, q, r; // v0, v1, v2,
 
    u1=1; // v1=0;
    u2=0; // v2=1;
