@@ -20,7 +20,7 @@ class ip_smatrix; typedef ip_smatrix *       matrix;
    if an algorithm is provided, it must be one of "Bareiss" or
    "Laplace"; when a cache is used, the underlying algorithm
    is automatically Laplace */
-   
+
 /**
 * Returns the specified set of minors (= subdeterminantes) of the
 * given matrix. These minors form the set of generators of the ideal

@@ -366,11 +366,11 @@ void prOrder(ring r) {
     case ringorder_M:
       std::cout << "M";
       break;
-      
+
     case ringorder_S: ///< S?
       std::cout << "S";
       break;
-      
+
     case ringorder_s: ///< s?
       std::cout << "s";
       break;
@@ -378,7 +378,7 @@ void prOrder(ring r) {
     case ringorder_lp:
       std::cout << "lp";
       break;
-      
+
     case ringorder_dp:
       std::cout << "dp";
       break;

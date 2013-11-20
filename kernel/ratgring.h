@@ -14,7 +14,7 @@
 
 /* MACROS */
 
-/* the part, related to the interface */ 
+/* the part, related to the interface */
 
 /* ring nc_rCreateNCcomm(ring r); */
 
@@ -48,7 +48,7 @@ poly nc_rat_ReduceSpolyNew(poly p1, poly p2, int ishift, ring r);
 /* other routines we need in addition : */
 // poly nc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r);
 // poly nc_mm_Mult_p(const poly m, poly p, const ring r);
-// poly nc_mm_Mult_nn (int *F, int *G, const ring r); 
+// poly nc_mm_Mult_nn (int *F, int *G, const ring r);
 // poly nc_mm_Mult_uu (int *F,int jG,int bG, const ring r);
 
 // /* subst: */

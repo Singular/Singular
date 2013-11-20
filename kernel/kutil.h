@@ -78,7 +78,7 @@ public:
     i_r;        // index of TObject in R set, or -1 if not in T
   BOOLEAN is_normalized; // true, if pNorm was called on p, false otherwise
   // used in incremental sba() with F5C:
-  // we know some of the redundant elements in 
+  // we know some of the redundant elements in
   // strat->T beforehand, so we can just discard
   // them and do not need to consider them in the
   // interreduction process
@@ -90,10 +90,10 @@ public:
   BOOLEAN is_sigsafe;
 
 
-#ifdef HAVE_PLURAL  
+#ifdef HAVE_PLURAL
   BOOLEAN is_special; // true, it is a new special S-poly (e.g. for SCA)
 #endif
-  
+
   // initialization
   KINLINE void Init(ring r = currRing);
   KINLINE sTObject(ring tailRing = currRing);
@@ -419,7 +419,7 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR = -1);
 void enterSSba (LObject p,int atS,kStrategy strat, int atR = -1);
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
-int posInS (const kStrategy strat, const int length, const poly p, 
+int posInS (const kStrategy strat, const int length, const poly p,
             const int ecart_p);
 int posInT0 (const TSet set,const int length,LObject &p);
 int posInT1 (const TSet set,const int length,LObject &p);
@@ -507,9 +507,9 @@ void initS (ideal F, ideal Q,kStrategy strat);
 void initSL (ideal F, ideal Q,kStrategy strat);
 void initSLSba (ideal F, ideal Q,kStrategy strat);
 /*************************************************
- * when initializing a new bunch of principal 
+ * when initializing a new bunch of principal
  * syzygies at the beginning of a new iteration
- * step in a signature-based algorithm we 
+ * step in a signature-based algorithm we
  * compute ONLY the leading elements of those
  * syzygies, NOT the whole syzygy
  * NOTE: this needs to be adjusted for a more
@@ -623,7 +623,7 @@ poly kNF2 (ideal F, ideal Q, poly q, kStrategy strat, int lazyReduce);
 ideal kNF2 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce);
 void initBba(ideal F,kStrategy strat);
 void initSba(ideal F,kStrategy strat);
-void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg, 
+void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
           int& hilbcount, int& srmax, int& lrmax, int& reduc, ideal Q,
           intvec *w,intvec *hilb );
 
@@ -770,7 +770,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 
 void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR,int uptodeg, int lV);
 
-void initenterpairsShift (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR,int uptodeg, int lV); 
+void initenterpairsShift (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR,int uptodeg, int lV);
 
 void updateSShift(kStrategy strat,int uptodeg,int lV);
 

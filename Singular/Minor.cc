@@ -12,7 +12,7 @@
 using namespace std;
 
 void MinorKey::reset()
-{                     
+{
   _numberOfRowBlocks = 0;
   _numberOfColumnBlocks = 0;
   delete [] _rowKey;
@@ -58,7 +58,7 @@ MinorKey& MinorKey::operator=(const MinorKey& mk)
       _rowKey[r] = mk.getRowKey(r);
   for (int c = 0; c < _numberOfColumnBlocks; c++)
       _columnKey[c] = mk.getColumnKey(c);
-      
+
   return *this;
 }
 
@@ -706,7 +706,7 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk)
     {
       if ((blockCount - 1 >= mkBlockIndex) &&
         (shiftedBit & this->getColumnKey(mkBlockIndex))) hitBits++;
-      else if (shiftedBit & currentInt) 
+      else if (shiftedBit & currentInt)
       {
         newBitToBeSet = shiftedBit;
         newBitBlockIndex = mkBlockIndex;

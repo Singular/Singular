@@ -1,8 +1,8 @@
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file misc_ip.h
- * 
+ *
  * This file provides miscellaneous functionality.
  *
  * ABSTRACT: This file provides the following miscellaneous functionality:

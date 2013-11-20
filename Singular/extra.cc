@@ -2180,14 +2180,14 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         intvec* arg2 = (intvec*) h->next->Data();
         intvec* arg3 = (intvec*) h->next->next->Data();
         int arg4 = (int)(long) h->next->next->next->Data();
-        
+
         ideal result = (ideal) Mfrwalk(arg1, arg2, arg3, arg4);
 
         res->rtyp = IDEAL_CMD;
         res->data =  result;
 
         return FALSE;
-      } 
+      }
       else
 
   #ifdef TRAN_Orig
@@ -3926,7 +3926,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     number erg=n_Add(a,b,AEp);
     p_poly* h= reinterpret_cast<p_poly*> (erg);
     h->p_poly_print();
-   
+
     return FALSE;
   }
   else

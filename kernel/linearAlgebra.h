@@ -1,8 +1,8 @@
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file lineareAlgebra.h
- * 
+ *
  * This file provides basic linear algebra functionality.
  *
  * ABSTRACT: This file provides basic algorithms from linear algebra over
@@ -514,7 +514,7 @@ int quadraticSolve(
  * This code was placed here since the algorithm works by successively solving
  * d linear equation systems. It is hence an application of other methods
  * defined in this h-file and its corresponding cc-file.
- * 
+ *
  **/
 void henselFactors(
        const int xIndex,  /**< [in]  index of x in {1, ..., nvars(basering)} */

@@ -273,7 +273,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
     //          c_p=nc_rat_ReduceSpolyNew(strat->S[c_j],pCopy((*h).p), currRing->real_var_start-1,currRing);
     //        Print("nach nc_rat_ReduceSpolyNew ");wrp(c_p);PrintLn();
     //        pDelete(&((*h).p));
-    
+
         c_p=nc_rat_ReduceSpolyNew(strat->S[c_j],(*h).p, currRing->real_var_start-1,currRing);
         (*h).p=c_p;
         if (!TEST_OPT_INTSTRATEGY)

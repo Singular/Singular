@@ -181,13 +181,7 @@ lists evEigenvals(matrix M)
         MATELEM(M0,i,i)=pSub(MATELEM(M0,i,i),pCopy(t));
 
       intvec *m0;
-#ifdef HAVE_FACTORY      
       ideal e0=singclap_factorize(mp_DetBareiss(M,currRing),&m0,2, currRing);
-#else
-      WarnS("cannot factorize due to missing module 'factory'");
-      ideal e0=NULL;
-#endif
-      
       if (e0==NULL)
       {
         l->Init(0);

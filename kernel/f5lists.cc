@@ -38,7 +38,7 @@ PNode* PNode::getNext() {
 }
 PNode* PNode::insert(poly p) {
   poly q = pOne();
-  q = pCopy(p); 
+  q = pCopy(p);
   PNode* temp = this;
   if(NULL == temp) {
     PNode* pn = new PNode(q,temp);
@@ -82,7 +82,7 @@ PList::PList() {
 void PList::insert(poly p) {
   first = first->insert(p);
 }
-  
+
 
 /*
 PNode* PList::insert(poly p) {
@@ -136,7 +136,7 @@ LNode::LNode(LPolyOld* lp) {
     data                =   lp;
     next                =   NULL;
 }
-       
+
 LNode::LNode(LPolyOld* lp, LNode* l) {
 //Print("HIER LNODE\n");
     data                =   lp;
@@ -148,7 +148,7 @@ LPolyOld* lp           =   new LPolyOld(t,i,p,r);
 data                =   lp;
 next                =   NULL;
 }
-       
+
 LNode::LNode(poly t, int i, poly p, RuleOld* r, LNode* l) {
     LPolyOld* lp           =   new LPolyOld(t,i,p,r);
     data                =   lp;
@@ -159,11 +159,11 @@ LNode::LNode(LNode* ln) {
     data                =   ln->getLPolyOld();
     next                =   ln->getNext();
 }
-        
+
 LNode::~LNode() {
     //delete next;
     //Print("DELETE LNODE\n");
-    delete data;   
+    delete data;
 }
 
 void LNode::deleteAll() {
@@ -190,7 +190,7 @@ inline LNode* LNode::insert(LPolyOld* lp) {
         return newElement;
     }
 }
-        
+
 inline LNode* LNode::insert(poly t, int i, poly p, RuleOld* r) {
     if(NULL == this) {
         LNode* newElement   =   new LNode(t,i,p,r,this);
@@ -211,7 +211,7 @@ inline LNode* LNode::insertSP(LPolyOld* lp) {
     //pWrite(lp->getTerm());
     return newElement;
 }
-        
+
 inline LNode* LNode::insertSP(poly t, int i, poly p, RuleOld* r) {
     LNode* newElement   =   new LNode(t, i, p, r, this);
      //Print("INSERTED IN SPOLYLIST: ");
@@ -252,7 +252,7 @@ inline LNode* LNode::insertByLabel(poly t, int i, poly p, RuleOld* r) {
                     temp = temp->next;
                     //Print("%p\n",temp);
                     //Print("%p\n",temp->data);
-                    
+
                     //Print("%p\n",temp->next);
                 }
             }
@@ -301,7 +301,7 @@ inline LNode* LNode::insertByLabel(LNode* l) {
                     temp = temp->next;
                     //Print("%p\n",temp);
                     //Print("%p\n",temp->data);
-                    
+
                     //Print("%p\n",temp->next);
                 }
             }
@@ -442,7 +442,7 @@ LList::LList(poly t,int i,poly p,RuleOld* r) {
     first   =   new LNode(t,i,p,r);
     last    =   first;
     length  =   1;
-} 
+}
 
 LList::~LList() {
     LNode* temp;
@@ -557,16 +557,16 @@ LTagNode::LTagNode(LNode* l) {
     data = l;
     next = NULL;
 }
-       
+
 LTagNode::LTagNode(LNode* l, LTagNode* n) {
     data = l;
     next = n;
 }
 
  LTagNode::~LTagNode() {
-    delete data;   
+    delete data;
 }
-       
+
 // declaration with first as parameter due to sorting of LTagList
 LTagNode* LTagNode::insert(LNode* l) {
     LTagNode* newElement  = new LTagNode(l, this);
@@ -606,7 +606,7 @@ functions working on the class LTagList
 */
 LTagList::LTagList() {
     LTagNode* first =   new LTagNode();
-    
+
     length          =   0;
 }
 
@@ -678,18 +678,18 @@ functions working on the class CNode
 */
 
 CNode::CNode() {
-    data    =   NULL;   
-    next    =   NULL;    
+    data    =   NULL;
+    next    =   NULL;
 }
 
 CNode::CNode(CPairOld* c) {
-    data    =   c;   
-    next    =   NULL;    
+    data    =   c;
+    next    =   NULL;
 }
 
 CNode::CNode(CPairOld* c, CNode* n) {
-    data    =   c;   
-    next    =   n;    
+    data    =   c;
+    next    =   n;
 }
 
 CNode::~CNode() {
@@ -698,7 +698,7 @@ CNode::~CNode() {
 
 // insert sorts the critical pairs firstly by increasing total degree, secondly by increasing label
 // note: as all critical pairs have the same index here, the second sort is done on the terms of the labels
-// working only with linked, but not doubly linked lists due to memory usage we have to check the 
+// working only with linked, but not doubly linked lists due to memory usage we have to check the
 // insertion around the first element separately from the insertion around all other elements in the list
 CNode* CNode::insert(CPairOld* c) {
     if(NULL == this) {
@@ -723,7 +723,7 @@ CNode* CNode::insert(CPairOld* c) {
                 //Print("Insert Deg\n");
                 CNode* temp = this;
                 while(  NULL != temp->next) {
-                    if(temp->next->data->getDeg() == c->getDeg() ) { 
+                    if(temp->next->data->getDeg() == c->getDeg() ) {
                         if(1 == pLmCmp(u1,ppMult_qq(temp->next->data->getT1(),temp->next->data->getLp1Term()))) {
                             temp = temp->next;
                         }
@@ -731,7 +731,7 @@ CNode* CNode::insert(CPairOld* c) {
                             CNode* newElement   =   new CNode(c, temp->next);
                             temp->next          =   newElement;
                             return this;
-                        } 
+                        }
                     }
                     else {
                         CNode* newElement   =   new CNode(c, temp->next);
@@ -746,14 +746,14 @@ CNode* CNode::insert(CPairOld* c) {
         } // outer if-clause
         if( c->getDeg() > this->data->getDeg() ) { // greater degree than the first list element
             CNode* temp =   this;
-            while( NULL != temp->next ) {   
+            while( NULL != temp->next ) {
                 if( c->getDeg() < temp->next->data->getDeg() ) {
                     CNode* newElement   =   new CNode(c, temp->next);
                     temp->next          =   newElement;
                     return this;
                 }
                 if( c->getDeg() == temp->next->data->getDeg() ) {
-                    if(1 != pLmCmp(u1,ppMult_qq(temp->next->data->getT1(),temp->next->data->getLp1Term()))) { 
+                    if(1 != pLmCmp(u1,ppMult_qq(temp->next->data->getT1(),temp->next->data->getLp1Term()))) {
                         CNode* newElement   =   new CNode(c, temp->next);
                         temp->next          =   newElement;
                         return this;
@@ -761,7 +761,7 @@ CNode* CNode::insert(CPairOld* c) {
                     else {
                         temp = temp->next;
                         while(  NULL != temp->next ) {
-                            if( temp->next->data->getDeg() == c->getDeg() ) { 
+                            if( temp->next->data->getDeg() == c->getDeg() ) {
                                 if(1 == pLmCmp(u1,ppMult_qq(temp->next->data->getT1(),
                                                temp->next->data->getLp1Term()))) {
                                     temp = temp->next;
@@ -770,7 +770,7 @@ CNode* CNode::insert(CPairOld* c) {
                                     CNode* newElement   =   new CNode(c, temp->next);
                                     temp->next          =   newElement;
                                     return this;
-                                } 
+                                }
                             }
                             else {
                                 CNode* newElement   =   new CNode(c, temp->next);
@@ -809,8 +809,8 @@ CNode* CNode::getMinDeg() {
         while(NULL != temp->next && temp->next->data->getDeg() == this->data->getDeg()) {
             temp = temp->next;
         }
-        CNode* returnCNode  =   temp->next;    
-        // every CListOld should end with a (NULL,NULL) element for a similar behaviour 
+        CNode* returnCNode  =   temp->next;
+        // every CListOld should end with a (NULL,NULL) element for a similar behaviour
         // using termination conditions throughout the algorithm
         temp->next          =   NULL;
         return returnCNode;
@@ -999,7 +999,7 @@ RNode* RNode::insert(int i, poly t) {
 
 
 RNode* RNode::insertOrdered(RuleOld* r) {
-    RNode* newElement   =   new RNode(r); 
+    RNode* newElement   =   new RNode(r);
     RNode* temp         =   this;
     if(NULL == temp) {
         newElement->next =   temp;
@@ -1021,7 +1021,7 @@ RNode* RNode::insertOrdered(RuleOld* r) {
 
 RNode* RNode::getNext() {
     return next;
-}    
+}
 
 RuleOld* RNode::getRuleOld() {
     return data;
@@ -1073,7 +1073,7 @@ RList::~RList() {
         delete  temp;
     }
     //Print("FERTIG\n");
-} 
+}
 
 void RList::insert(int i, poly t) {
     first = first->insert(i,t);
@@ -1109,22 +1109,22 @@ RTagNode::RTagNode() {
     data = NULL;
     next = NULL;
 }
- 
+
 RTagNode::RTagNode(RNode* r) {
     data = r;
     next = NULL;
 }
-       
+
 RTagNode::RTagNode(RNode* r, RTagNode* n) {
-    
+
     data = r;
     next = n;
 }
 
 RTagNode::~RTagNode() {
-    delete data;   
+    delete data;
 }
-       
+
 // declaration with first as parameter due to sorting of RTagList
 RTagNode* RTagNode::insert(RNode* r) {
     //Print("Hier1\n");
@@ -1155,9 +1155,9 @@ RNode* RTagNode::get(int idx, int length) {
     }
     else {
         int j;
-        RTagNode* temp = this; 
+        RTagNode* temp = this;
     //Print("\n\nHIER IN GET IDX\n");
-    //Print("FOR LOOP: %d\n",length-idx+1);    
+    //Print("FOR LOOP: %d\n",length-idx+1);
     for(j=1; j<=length-idx+1; j++) {
             temp = temp->next;
         }

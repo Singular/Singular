@@ -113,7 +113,7 @@ extern "C" {
     #define rl_filename_completion_function filename_completion_function
     #define rl_completion_matches           completion_matches
   #endif
-  #ifndef READLINE_READLINE_H_OK  
+  #ifndef READLINE_READLINE_H_OK
     /* declare everything we need explicitely and do not rely on includes */
     extern char * rl_readline_name;
     extern char *rl_line_buffer;
@@ -148,7 +148,7 @@ char * fe_fgets_stdin_rl(const char *pr,char *s, int size);
 *   array of matches, or NULL if there aren't any.
 */
 #if defined(HAVE_DYN_RL)
-extern "C" 
+extern "C"
 {
   int fe_init_dyn_rl();
   char *(*fe_filename_completion_function)(); /* 3 */

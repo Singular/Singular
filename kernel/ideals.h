@@ -28,12 +28,12 @@ void idDelEquals(ideal id);
 
 /// delete an ideal
 inline void idDelete (ideal* h, ring r = currRing)
-{ 
-  id_Delete(h, r); 
+{
+  id_Delete(h, r);
 }
 
 /// initialise the maximal ideal (at 0)
-//ideal id_MaxIdeal(int deg, const ring r); 
+//ideal id_MaxIdeal(int deg, const ring r);
 #define idMaxIdeal(D) id_MaxIdeal(D,currRing)
 
 /// index of generator with leading term in ground ring (if any); otherwise -1
@@ -47,7 +47,7 @@ static inline int idSize(const ideal id)
   int j = IDELEMS(id) - 1;
   poly* mm = id->m;
   while ((j >= 0) && (mm[j] == NULL)) j--;
-  return (j + 1); 
+  return (j + 1);
 }
 
 

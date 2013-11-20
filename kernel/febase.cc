@@ -45,7 +45,7 @@ int     printlevel = 0;
 int     colmax = 80;
 char    prompt_char = '>'; /*1 either '>' or '.'*/
 int     yylineno  = 0;
-int  myynest = -1; 
+int  myynest = -1;
 int  traceit = 0;
 char       my_yylinebuf[80];
 

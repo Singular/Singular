@@ -75,10 +75,10 @@ int ksReducePoly(LObject* PR,
   if (rIsPluralRing(currRing))
   {
     // for the time being: we know currRing==strat->tailRing
-    // no exp-bound checking needed 
+    // no exp-bound checking needed
     // (only needed if exp-bound(tailring)<exp-b(currRing))
     if (PR->bucket!=NULL)  nc_kBucketPolyRed(PR->bucket, p2,coef);
-    else 
+    else
     {
       poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);
       assume(_p != NULL);
@@ -149,12 +149,12 @@ int ksReducePoly(LObject* PR,
     PR->GetP();
     poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
     PR->Clear(); // does the right things
-    PR->p = qq; 
+    PR->p = qq;
     PR->t_p = NULL;
     PR->SetShortExpVector();
   }
 #endif
-  
+
 #if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
   if (TEST_OPT_DEBUG)
   {
@@ -201,7 +201,7 @@ int ksReducePolySig(LObject* PR,
    * TODO:
    * --------------------------------------------
    * if strat->incremental
-   * Since we are subdividing lower index and 
+   * Since we are subdividing lower index and
    * current index reductions it is enough to
    * look at the polynomial part of the signature
    * for a check. This should speed-up checking
@@ -211,7 +211,7 @@ int ksReducePolySig(LObject* PR,
    * due to the fact that we are using the induced
    * Schreyer order
    *
-   * nevertheless, this different behaviour is 
+   * nevertheless, this different behaviour is
    * taken care of by is_sigsafe
    * => one reduction procedure can be used for
    * both, the incremental and the non-incremental
@@ -257,7 +257,7 @@ int ksReducePolySig(LObject* PR,
     // go on with the computations only if the signature of p2 is greater than the
     // signature of fm*p1
     if(sigSafe != 1)
-    { 
+    {
       PR->is_redundant = TRUE;
       return 3;
     }
@@ -282,10 +282,10 @@ int ksReducePolySig(LObject* PR,
   if (rIsPluralRing(currRing))
   {
     // for the time being: we know currRing==strat->tailRing
-    // no exp-bound checking needed 
+    // no exp-bound checking needed
     // (only needed if exp-bound(tailring)<exp-b(currRing))
     if (PR->bucket!=NULL)  nc_kBucketPolyRed(PR->bucket, p2,coef);
-    else 
+    else
     {
       poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);
       assume(_p != NULL);
@@ -356,7 +356,7 @@ int ksReducePolySig(LObject* PR,
     PR->GetP();
     poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
     PR->Clear(); // does the right things
-    PR->p = qq; 
+    PR->p = qq;
     PR->t_p = NULL;
     PR->SetShortExpVector();
   }
@@ -484,7 +484,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
     Pair->GetP();
     poly qq = p_Shrink(Pair->p, currRing->isLPring, currRing);
     Pair->Clear(); // does the right things
-    Pair->p = qq; 
+    Pair->p = qq;
     Pair->t_p = NULL;
     Pair->SetShortExpVector();
   }
@@ -539,7 +539,7 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
     PR->GetP();
     poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
     PR->Clear(); // does the right things
-    PR->p = qq; 
+    PR->p = qq;
     PR->t_p = NULL;
     PR->SetShortExpVector();
   }

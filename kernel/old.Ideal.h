@@ -16,14 +16,14 @@ template <class poly_type> class IdealBase {
   typedef typename std::vector<poly_type>::allocator_type allocator_type;
  IdealBase(){
  }
-  
- IdealBase(iterator first, 
-	     iterator last,
-	     const typename
-	     std::vector<poly_type>::allocator_type& __a = allocator_type()):
+
+ IdealBase(iterator first,
+             iterator last,
+             const typename
+             std::vector<poly_type>::allocator_type& __a = allocator_type()):
    storage(first,last,__a)
    {
-   
+
  }
  ring getRing() const{
   //FIXME: is a hack
@@ -83,18 +83,18 @@ public IdealBase<Poly>{
       storage.push_back(Poly(i->m[j],r));
     }
   }
-  Ideal(iterator first, 
-	iterator last,
-	const allocator_type& __a = allocator_type()):
+  Ideal(iterator first,
+        iterator last,
+        const allocator_type& __a = allocator_type()):
     IdealBase<Poly>(first,last,__a){
   }
  ideal as_ideal() const{
    //no checks for rings
    int s=size();
-   
+
    if (s==0)
     s=1;
-   
+
    ideal result=idInit(s,1);
    result->m[0]=NULL;
    s=size();
@@ -113,13 +113,13 @@ public:
     }
   }
   ideal as_module() const{
-    
+
    //no checks for rings
         int s=size();
-   
+
         if (s==0)
         s=1;
-   
+
         ideal result=idInit(s,1);
         result->m[0]=NULL;
         s=size();
@@ -132,11 +132,11 @@ public:
         else
             result->rank=idRankFreeModule(result,storage[0].getRing());
    return result;
-    
+
   }
-  Module(iterator first, 
-	iterator last,
-	const allocator_type& __a = allocator_type()):
+  Module(iterator first,
+        iterator last,
+        const allocator_type& __a = allocator_type()):
     IdealBase<Vector>(first,last,__a){
   }
   Module(){

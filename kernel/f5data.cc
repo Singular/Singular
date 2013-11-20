@@ -3,7 +3,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT: lpolynomial definition 
+* ABSTRACT: lpolynomial definition
 */
 #ifdef HAVE_CONFIG_H
 #include "singularconfig.h"
@@ -29,7 +29,7 @@
 #include <kernel/f5lists.h>
 /*
 =====================
-everything is inlined 
+everything is inlined
 =====================
 */
 #endif

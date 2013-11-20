@@ -56,7 +56,7 @@ static inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const i
       else
         gb = gnc_gr_bba;
     }
-    
+
     r->GetNC()->p_Procs.GB = cast_A_to_vptr(gb);
   }
 

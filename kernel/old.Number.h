@@ -14,7 +14,7 @@ inline void intrusive_ptr_release(ring r){
     if (r->ref<=0) rDelete(r);
     else {
     r->ref--;
-    
+
     }
     //Print("ref count after release: %d", r->ref);
 }
@@ -28,7 +28,7 @@ class Poly;
 //class TrivialErrorHandler;
 class Vector;
 class Number{
-  
+
  public:
   friend Number operator+(const Number& n1, const Number& n2);
   friend Number operator-(const Number& n1, const Number& n2);
@@ -116,7 +116,7 @@ class Number{
     n=n_Init(n2,r.get());
     return *this;
   }
-  
+
   Number& operator+=(int n2){
     number n2n=n_Init(n2,r.get());
     number nv=n_Add(n,n2n,r.get());
@@ -142,7 +142,7 @@ class Number{
     n=nv;
     return *this;
   }
-  Number& operator/=(int n2){  
+  Number& operator/=(int n2){
     number n2n=n_Init(n2,r.get());
     number nv=n_Div(n,n2n,r.get());
     n_Delete(&n,r.get());
@@ -186,7 +186,7 @@ class Number{
     number towrite=n;
     n_Write(towrite,r.get());
   }
-  
+
   ~Number(){
     if (r!=NULL)
       n_Delete(&n,r.get());

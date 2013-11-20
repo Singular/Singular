@@ -526,7 +526,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
   idDelete(&twr);
   if (modcomp!=NULL) (*modcomp)->show(0,0);
 #endif
-   
+
   newmodcomp = new intvec(Fl+2);
   //for (j=0;j<Fl;j++) pWrite(F[j]);
   //PrintLn();
@@ -667,7 +667,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
               for(k=j;k<Fl;k++) pDelete(&(pairs[k]));
               omFreeSize((ADDRESS)pairs,(Fl + gencQ)*sizeof(poly));
               for(k=0;k<IDELEMS(result);k++) pDelete(&((*Shdl)[k]));
-	       
+
 	      kBucketDestroy(&(sy0buck));
               return result;
             }
@@ -734,7 +734,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
   omFreeSize((ADDRESS)Flength,Fl*sizeof(int));
   delete *modcomp;
   *modcomp = newmodcomp;
-   
+
   kBucketDestroy(&(sy0buck));
   return result;
 }
@@ -895,16 +895,16 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       *length += 4;
       res=newres;
     }
-     
+
     if ((hom==isHomog)|| (rHasGlobalOrdering(origR)))
     {
       if (syzIndex==0) syInitSort(res[0],&modcomp);
-       
+
       if ((syzIndex==0) && !rRing_has_CompLastBlock(currRing))
         res[syzIndex+1] = sySchreyersSyzygiesFB(res[syzIndex],&modcomp,mW,FALSE);
       else
         res[syzIndex+1] = sySchreyersSyzygiesFB(res[syzIndex],&modcomp,mW);
-       
+
       mW = res[syzIndex];
     }
 //idPrint(res[syzIndex+1]);

@@ -12,7 +12,7 @@
 /*
 ============================
 ============================
-classes for lists used in F5 
+classes for lists used in F5
 ============================
 ============================
 */
@@ -34,7 +34,7 @@ class RTagList;
  * class PNode of nodes of polynomials
  */
 class PNode {
-  private: 
+  private:
     poly   data;
     PNode*  next;
   public:
@@ -55,8 +55,8 @@ class PList {
     void insert(poly p);
     bool check(poly p);
     void print();
-}; 
-    
+};
+
 /*
 =======================================
 class LNode (nodes for lists of LPolyOlds)
@@ -101,7 +101,7 @@ class LNode {
         // get the data from the LPolyOld saved in LNode
         poly    getPoly();
         poly    getTerm();
-        int     getIndex(); 
+        int     getIndex();
         RuleOld*   getRuleOld();
         bool    getDel();
         // set the data from the LPolyOld saved in LNode
@@ -208,7 +208,7 @@ LNode*  getcompletedRedCheck();
 
 /*
 ======================================================================================
-class TopRed(return values of subalgorithm TopRed in f5gb.cc), i.e. the first elements 
+class TopRed(return values of subalgorithm TopRed in f5gb.cc), i.e. the first elements
              of the lists LList* completed & LList* sPolyList
 ======================================================================================
 */
@@ -237,9 +237,9 @@ class CNode {
                 CNode();
                 CNode(CPairOld* c);
                 CNode(CPairOld* c, CNode* n);
-                ~CNode(); 
-        CNode*  insert(CPairOld* c); 
-        CNode*  insertWithoutSort(CPairOld* cp); 
+                ~CNode();
+        CNode*  insert(CPairOld* c);
+        CNode*  insertWithoutSort(CPairOld* cp);
         CNode*  getMinDeg();
         CPairOld*  getData();
         CNode*  getNext();
@@ -249,10 +249,10 @@ class CNode {
         poly    getLp2Poly();
         poly    getLp1Term();
         poly    getLp2Term();
-        poly    getT1(); 
-        poly*   getAdT1();  
-        poly    getT2(); 
-        poly*   getAdT2();  
+        poly    getT1();
+        poly*   getAdT1();
+        poly    getT2();
+        poly*   getAdT2();
         int     getLp1Index();
         int     getLp2Index();
         bool    getDel();
@@ -271,9 +271,9 @@ class CListOld {
         CNode*  first;
     public:
                 // for initialization of CListOlds, last element alwas has data=NULL and next=NULL
-                CListOld(); 
-                CListOld(CPairOld* c); 
-                ~CListOld(); 
+                CListOld();
+                CListOld(CPairOld* c);
+                ~CListOld();
         CNode*  getFirst();
         void    insert(CPairOld* c);
         void    insertWithoutSort(CPairOld* c);

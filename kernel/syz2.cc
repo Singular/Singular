@@ -87,9 +87,9 @@ static void syCreateNewPairs_Hilb(syStrategy syzstr, int index,
 
   while ((l>0) && ((syzstr->resPairs[index])[l-1].lcm==NULL)) l--;
   rr = l-1;
-  while ((rr>=0) && (((syzstr->resPairs[index])[rr].p==NULL) || 
+  while ((rr>=0) && (((syzstr->resPairs[index])[rr].p==NULL) ||
         ((syzstr->resPairs[index])[rr].order>actdeg))) rr--;
-  r2 = rr+1; 
+  r2 = rr+1;
   while ((rr>=0) && ((syzstr->resPairs[index])[rr].order==actdeg)
          && ((syzstr->resPairs[index])[rr].syzind<0))
   {
@@ -122,7 +122,7 @@ static void syCreateNewPairs_Hilb(syStrategy syzstr, int index,
           tcp = cp;
           if (tcp!=NULL)
           {
-            while ((tcp!=NULL) && 
+            while ((tcp!=NULL) &&
               ((tcp->first_poly!=i)||(tcp->second_poly!=r1))) tcp = tcp->next;
           }
           if (tcp==NULL)
@@ -133,7 +133,7 @@ static void syCreateNewPairs_Hilb(syStrategy syzstr, int index,
             pSetm(p);
             j = 0;
             while (j<i)
-            { 
+            {
               if (nP->m[j]!=NULL)
               {
                 if (pLmDivisibleByNoComp(nP->m[j],p))
@@ -174,7 +174,7 @@ Print("Hier: %d, %d\n",j,i);
                       ti=0;
                       while ((ti<l) && (((syzstr->resPairs[index])[ti].ind1!=j)||
                              ((syzstr->resPairs[index])[ti].ind2!=i))) ti++;
-                      if (ti<l) 
+                      if (ti<l)
                       {
 #ifdef SHOW_SPRFL
 Print("gefunden in Mod %d: ",index); poly_write((syzstr->resPairs[index])[ti].lcm);
@@ -570,7 +570,7 @@ Print("<H%d>",toGo);
 #endif
   while (kk>=0)
   {
-    if (toGo==0) 
+    if (toGo==0)
     {
       while (kk>=0)
       {
@@ -616,9 +616,9 @@ PrintS("sPoly: ");poly_write(tso.p);
         kBucketInit(syzstr->syz_bucket,tso.syz,-1);
         q = kBucketGetLm(syzstr->bucket);
         j = 0;
-        while (j<kres) 
+        while (j<kres)
         {
-          if ((redset[j].p!=NULL) && (pLmDivisibleBy(redset[j].p,q)) 
+          if ((redset[j].p!=NULL) && (pLmDivisibleBy(redset[j].p,q))
               && ((redset[j].ind1!=tso.ind1) || (redset[j].ind2!=tso.ind2)))
           {
 #ifdef SHOW_RED
@@ -760,14 +760,14 @@ Print("naechstes i ist: %d",i);
     {
       i = 0;
       delete spl1;
-      spl1 = ivStrip(spl2); 
+      spl1 = ivStrip(spl2);
       delete spl2;
       if (spl1!=NULL)
       {
         there_are_superfluous = -1;
         kk = (*spl1)[i]-1;
       }
-    } 
+    }
 #endif
 #ifdef USE_HEURISTIC2
     if ((kk<0) && (toGo>0))
@@ -917,7 +917,7 @@ static void syReOrdResult_Hilb(syStrategy syzstr,int maxindex,int maxdeg)
   (*syzstr->betti)[0] = 1;
   for (i=1;i<=syzstr->length;i++)
   {
-    if (!idIs0(syzstr->orderedRes[i])) 
+    if (!idIs0(syzstr->orderedRes[i]))
     {
       toreor = syzstr->orderedRes[i];
       k = IDELEMS(toreor);
@@ -930,7 +930,7 @@ static void syReOrdResult_Hilb(syStrategy syzstr,int maxindex,int maxdeg)
         reor->m[j] = toreor->m[j];
         toreor->m[j] = NULL;
       }
-      m = 0; 
+      m = 0;
       for (j=0;j<togo;j++)
       {
         if (syzstr->res[i]->m[j]!=NULL)
@@ -951,7 +951,7 @@ static void syReOrdResult_Hilb(syStrategy syzstr,int maxindex,int maxdeg)
 }
 
 /*2
-* the CoCoA-algorithm for free resolutions, using a formula 
+* the CoCoA-algorithm for free resolutions, using a formula
 * for remaining pairs based on Hilbert-functions
 */
 syStrategy syHilb(ideal arg,int * length)
@@ -971,7 +971,7 @@ syStrategy syHilb(ideal arg,int * length)
     syzstr->minres[0] = idInit(1,arg->rank);
     return syzstr;
   }
-  
+
   // Creare dp,S ring and change to it
   syzstr->syRing = rAssure_dp_C(origR);
   rChangeCurrRing(syzstr->syRing);
@@ -1086,7 +1086,7 @@ crit_fails = 0;
   if (temp!=NULL) idDelete(&temp);
   kBucketDestroy(&(syzstr->bucket));
   kBucketDestroy(&(syzstr->syz_bucket));
-  if (origR != syzstr->syRing)  
+  if (origR != syzstr->syRing)
     rChangeCurrRing(origR);
   else
     currRing =  origR;

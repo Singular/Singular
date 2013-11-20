@@ -1,5 +1,5 @@
 #define PLURAL_INTERNAL_DECLARATIONS
-   
+
 #ifdef HAVE_CONFIG_H
 #include "singularconfig.h"
 #endif /* HAVE_CONFIG_H */
@@ -286,7 +286,7 @@ ideal Approx_Step(ideal L)
     pSetm(x);
     var[i]=pCopy(x);
   }
-  // init NF's 
+  // init NF's
   for (i=1; i<=N; i++ )
   {
     h2 = idInit(idI,1);
@@ -305,7 +305,7 @@ ideal Approx_Step(ideal L)
       else
     h2->m[j]=0;
     }
-    // W[1..idElems(I)] 
+    // W[1..idElems(I)]
     if (flag >0)
     {
       // compute syzygies with values in I
@@ -371,7 +371,7 @@ ideal Approx_Step(ideal L)
       S[syzcnt]=kStd(s_h3,currQuotient,(tHomog)FALSE,NULL,NULL);
       syzcnt++;
       idDelete(&s_h3);
-    } // end if flag >0 
+    } // end if flag >0
     else
     {
       flagcnt++;

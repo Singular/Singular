@@ -55,7 +55,7 @@ static tgb_sparse_matrix* build_sparse_matrix(poly* p,int p_index,poly* done, in
 }
 #endif
   for(i=0;i<p_index;i++)
-{ 
+{
     // Print("%i ter Eintrag:%s\n",i,pString(p[i]));
   mac_poly m=NULL;
   mac_poly* set_this=&m;
@@ -74,7 +74,7 @@ static tgb_sparse_matrix* build_sparse_matrix(poly* p,int p_index,poly* done, in
     v=done_index-1-v;
     (*set_this)=new mac_poly_r();
     (*set_this)->exp=v;
-       
+
     (*set_this)->coef=nCopy(p_i->coef);
     set_this=&(*set_this)->next;
     p_i=p_i->next;
@@ -101,7 +101,7 @@ static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, 
 }
 #endif
   for(i=0;i<p_index;i++)
-{ 
+{
     // Print("%i ter Eintrag:%s\n",i,pString(p[i]));
   poly p_i=p[i];
   while(p_i)
@@ -154,7 +154,7 @@ static int retranslate(poly* m,tgb_sparse_matrix* mat,poly* done, slimgb_alg* c)
       mat->free_row(i);
       continue;
     }
-    
+
     m[m_index]=pInit();
     int v=mat->min_col_not_zero_in_row(i);
     //v=done_index-1-pos; => pos=done_index-1-v=mat->get_columns()-1-v
@@ -163,13 +163,13 @@ static int retranslate(poly* m,tgb_sparse_matrix* mat,poly* done, slimgb_alg* c)
     pGetExpV(done[pos],ev);
     pSetExpV(m[m_index],ev);
     omfree(ev);
-    
+
     poly p=m[m_index];
     pSetCoeff(p,mat->get(i,v));
     while((v=mat->next_col_not_zero(i,v))!=mat->get_columns())
     {
       poly pn=pInit();
-      
+
       //v=done_index-1-pos; => pos=done_index-1-v=mat->get_columns()-1-v
       pos=mat->get_columns()-1-v;
       ev=(int*) omalloc((c->r->N+1)*sizeof(int));
@@ -202,10 +202,10 @@ static int monom_poly_crit(const void* ap1, const void* ap2){
   p1=((monom_poly*) ap1);
   p2=((monom_poly*)ap2);
   if(((unsigned long) p1->f)>((unsigned long) p2->f)) return 1;
-  if(((unsigned long) p1->f)<((unsigned long)p2->f)) return -1;  
+  if(((unsigned long) p1->f)<((unsigned long)p2->f)) return -1;
 
   return pLmCmp(p1->m,p2->m);
- 
+
 }
 static int posInMonomPolys (monom_poly*  p, int pn, monom_poly & qe,slimgb_alg* c)
 {
@@ -250,13 +250,13 @@ static void simplify(monom_poly& h, slimgb_alg* c){
   if((i<posm)&&(F->mp[i].f!=h.f)) break;
   if ((h.f==F->mp[i].f) &&(p_LmDivisibleBy(F->mp[i].m,h.m,c->r)))
   {
-	
-	//	Print("found");
-       
-	  //according to the algorithm you should test (!(pIsConstant(F[i].m)))
-	  //but I think this is only because of bad formulation
+
+        //        Print("found");
+
+          //according to the algorithm you should test (!(pIsConstant(F[i].m)))
+          //but I think this is only because of bad formulation
     int j;
-	
+
     poly lm=pLmInit(h.f);
     pSetCoeff(lm,nInit(1));
 
@@ -271,12 +271,12 @@ static void simplify(monom_poly& h, slimgb_alg* c){
       j=pos-1;
     assume(j!=-1);
       //        if(j==-1) Print("\n jAltert \n");
-// 	for(j=0;j<F_minus->size;j++)
-// 	{
-// 	  if (pLmEqual(F_minus->p[j],lm))
-// 	    break;
-// 	}
-// 	assume(j<F_minus->size);
+//         for(j=0;j<F_minus->size;j++)
+//         {
+//           if (pLmEqual(F_minus->p[j],lm))
+//             break;
+//         }
+//         assume(j<F_minus->size);
     pDelete(&lm);
     if(j>=0)
     {
@@ -321,7 +321,7 @@ void go_on_F4 (slimgb_alg* c){
   //choose pairs and preprocess symbolically
   while(chosen_index<max_par)
   {
-    
+
     //    sorted_pair_node* s=c->apairs[c->pair_top];
     sorted_pair_node* s;
     if(c->pair_top>=0)
@@ -340,7 +340,7 @@ void go_on_F4 (slimgb_alg* c){
     if(s->i>=0)
     {
       //replace_pair(s->i,s->j,c);
-      if(s->i==s->j) 
+      if(s->i==s->j)
       {
         free_sorted_pair_node(s,c->r);
         continue;
@@ -351,9 +351,9 @@ void go_on_F4 (slimgb_alg* c){
     BOOLEAN only_free=FALSE;
     if(s->i>=0)
     {
-      
+
       poly lcm=pOne();
-      
+
       pLcm(c->S->m[s->i], c->S->m[s->j], lcm);
       pSetm(lcm);
       assume(lcm!=NULL);
@@ -370,7 +370,7 @@ void go_on_F4 (slimgb_alg* c){
       done[done_index++]=lcm;
       if(chosen_index+1>=chosen_size)
       {
-	//max_par must be greater equal 2
+        //max_par must be greater equal 2
         chosen_size+=si_max(max_par,2);
         chosen=(monom_poly*) omrealloc(chosen,chosen_size*sizeof(monom_poly));
       }
@@ -394,7 +394,7 @@ void go_on_F4 (slimgb_alg* c){
       chosen[chosen_index++]=h;
       //must carefull remember to destroy such a h;
       poly_list_node* next=c->to_destroy;
-      
+
       c->to_destroy=(poly_list_node*) omalloc(sizeof(poly_list_node));
       c->to_destroy->p=h.f;
       c->to_destroy->next=next;
@@ -408,8 +408,8 @@ void go_on_F4 (slimgb_alg* c){
       free_sorted_pair_node(s,c->r);
     else
       omfree(s);
-    
-  
+
+
 
   }
   c->normal_forms+=nfs;
@@ -425,7 +425,7 @@ void go_on_F4 (slimgb_alg* c){
     //Print(" to %s",pString(chosen[i].m));
     //Print(", %s \n", pString(chosen[i].f));
   }
-  
+
   //next Step remove duplicate entries
   qsort(chosen,chosen_index,sizeof(monom_poly),monom_poly_crit);
   int pos=0;
@@ -488,7 +488,7 @@ void go_on_F4 (slimgb_alg* c){
   m=(poly*) omalloc(m_size*sizeof(poly));
   //q=(poly*) omalloc(m_size*sizeof(poly));
 
-  
+
 
   for(i=0;i<p_index;i++)
 {
@@ -519,7 +519,7 @@ void go_on_F4 (slimgb_alg* c){
   while(m_index>0)
 {
 #ifdef TGB_DEBUG
-      
+
       for(i=0;i<done_index;i++)
 {
   pTest(done[i]);
@@ -528,13 +528,13 @@ void go_on_F4 (slimgb_alg* c){
 
     qsort(m, m_index,sizeof(poly),pLmCmp_func);
 
-    
+
     pos=0;
 #ifdef TGB_DEBUG
-      
+
       for(i=0;i<done_index;i++)
 {
-	
+
   pTest(done[i]);
 }
 #endif
@@ -592,12 +592,12 @@ void go_on_F4 (slimgb_alg* c){
   for (my_i=0;my_i<done_index;my_i++)
     pTest(done[my_i]);
 }
-#endif      
+#endif
       if(((done_index>pos)&&(pLmEqual(m[i],done[pos]))) ||(pos>0) &&(pLmEqual(m[i],done[pos-1])))
-	in_done=TRUE;
+        in_done=TRUE;
       if (!(in_done))
 {
-       
+
   int S_pos=kFindDivisibleByInS_easy(c->strat,m[i], pGetShortExpVector(m[i]));
   if(S_pos>=0)
   {
@@ -621,20 +621,20 @@ void go_on_F4 (slimgb_alg* c){
   for (my_i=0;my_i<done_index;my_i++)
     pTest(done[my_i]);
 }
-#endif      
-	memmove(&(done[pos+1]),&(done[pos]), (done_index-pos)*sizeof(poly));
-	done[pos]=m[i];
+#endif
+        memmove(&(done[pos+1]),&(done[pos]), (done_index-pos)*sizeof(poly));
+        done[pos]=m[i];
  done_index++;
 #ifdef TGB_DEBUG
 {
   int my_i;
   for (my_i=0;my_i<done_index;my_i++)
   {
-	    //	    Print("Position %i pos %i size %i\n",my_i,pos,done_index);
+            //            Print("Position %i pos %i size %i\n",my_i,pos,done_index);
     pTest(done[my_i]);
   }
 }
-#endif      
+#endif
 }
       else
         pDelete(&m[i]);
@@ -717,22 +717,22 @@ void go_on_F4 (slimgb_alg* c){
 }
 #endif
   assume(p_index==chosen_index);
-  
+
  //  tgb_matrix* mat=build_matrix(p,p_index,done, done_index,c);
- 
+
 //   simple_gauss2(mat);
   tgb_sparse_matrix* mat=build_sparse_matrix(p,p_index,done, done_index,c);
   simple_gauss(mat,c);
   m_size=mat->get_rows();
   m=(poly*) omalloc(m_size*sizeof(poly));
   m_index=retranslate(m,mat,done,c);
-  
+
   mat=NULL;
   for(i=0;i<done_index;i++)
     pDelete(&done[i]);
   omfree(done);
   done=NULL;
-  //next Step addElements to basis 
+  //next Step addElements to basis
   int F_plus_size=m_index;
   poly* F_plus=(poly*)omalloc(F_plus_size*sizeof(poly));
   int F_plus_index=0;
@@ -751,7 +751,7 @@ void go_on_F4 (slimgb_alg* c){
   BOOLEAN minus=FALSE;
   if(((p_index>pos)&&(pLmEqual(m[i],p[pos]))) ||(pos>0) &&(pLmEqual(m[i],p[pos-1])))
     minus=TRUE;
-   
+
   if(minus)
   {
     F_minus[F_minus_index++]=m[i];
@@ -771,8 +771,8 @@ void go_on_F4 (slimgb_alg* c){
 //     for(j=0;j<p_index;j++)
 //       if (pLmEqual(p[j],m[i]))
 //       {
-// 	minus=TRUE;
-// 	break;
+//         minus=TRUE;
+//         break;
 //       }
 //     if(minus)
 //     {
@@ -792,7 +792,7 @@ void go_on_F4 (slimgb_alg* c){
   assume((F_plus_index+F_minus_index)==m_index);
   if (TEST_OPT_PROT)
     Print("%i]", F_plus_index);
-  for(i=0;i<p_index;i++) 
+  for(i=0;i<p_index;i++)
     pDelete(&p[i]);
   omfree(p);
   p=NULL;
@@ -823,23 +823,23 @@ void go_on_F4 (slimgb_alg* c){
   (*F_i)->size=chosen_index;
   (*F_i)->mp=chosen;
   (*F_i)->next=NULL;
-  
+
   if(F_plus_index>0)
 {
   int j;
   int* ibuf=(int*) omalloc(F_plus_index*sizeof(int));
   sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(F_plus_index*sizeof(sorted_pair_node**));
-  
+
   for(j=0;j<F_plus_index;j++)
   {
     int len;
     poly p=F_plus[j];
-    
+
     // delete buf[j];
     //remember to free res here
     //    p=redTailShort(p, c->strat);
     sbuf[j]=add_to_basis_ideal_quotient(p,c,ibuf+j);
-    
+
   }
   int sum=0;
   for(j=0;j<F_plus_index;j++)

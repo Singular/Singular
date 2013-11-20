@@ -2,8 +2,8 @@
  *  File:    omSingularConfig.h
  *  Purpose: declaration of External Config stuff for omalloc
  *           This file is inlcuded by omDefaultConfig.h, i.e., at the the time
- *           the omalloc library is built. Any changes to the default config 
- *           of omalloc should be done here (and, of course, you need to 
+ *           the omalloc library is built. Any changes to the default config
+ *           of omalloc should be done here (and, of course, you need to
  *           rebuilt the library).
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 8/00

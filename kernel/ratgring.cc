@@ -37,7 +37,7 @@ void pLcmRat(poly a, poly b, poly m, int rat_shift)
     pSetExp(m,i, si_max( pGetExp(a,i), pGetExp(b,i)));
   }
   pSetComp(m, si_max(pGetComp(a), pGetComp(b)));
-  /* Don't do a pSetm here, otherwise hres/lres chockes */ 
+  /* Don't do a pSetm here, otherwise hres/lres chockes */
 }
 
 /*2
@@ -84,7 +84,7 @@ poly p_LcmRat(const poly a, const poly b, const long lCompM, const ring r)
 //     }
 //   }
 //   pSetComp(m, si_max(pGetComp(a), pGetComp(b)));
-//   /* Don't do a pSetm here, otherwise hres/lres chockes */ 
+//   /* Don't do a pSetm here, otherwise hres/lres chockes */
 // }
 
 /* returns a subpoly of p, s.t. its monomials have the same D-part */
@@ -104,7 +104,7 @@ poly p_HeadRat(poly p, int ishift, ring r)
   return res;
 }
 
-/* returns x-coeff of p, i.e. a poly in x, s.t. corresponding xd-monomials 
+/* returns x-coeff of p, i.e. a poly in x, s.t. corresponding xd-monomials
 have the same D-part and the component 0
 does not destroy p
 */
@@ -142,7 +142,7 @@ void p_LmDeleteAndNextRat(poly *p, int ishift, ring r)
     //    Print("while: ");p_wrp(*p,r);Print(" ");
   }
   //  p_wrp(*p,r);Print(" ");
-  //  PrintS("end\n"); 
+  //  PrintS("end\n");
   p_LmDelete(&q,r);
 }
 
@@ -152,7 +152,7 @@ void p_ExpVectorDiffRat(poly pr, poly p1, poly p2, int ishift, ring r)
 {
   p_LmCheckPolyRing1(p1, r);
   p_LmCheckPolyRing1(p2, r);
-  p_LmCheckPolyRing1(pr, r); 
+  p_LmCheckPolyRing1(pr, r);
   int i;
   poly t=pr;
   int e1,e2;
@@ -165,7 +165,7 @@ void p_ExpVectorDiffRat(poly pr, poly p1, poly p2, int ishift, ring r)
     {
 #ifdef PDEBUG
       PrintS("negative ExpVectorDiff\n");
-#endif    
+#endif
       p_Delete(&t,r);
       break;
     }
@@ -200,12 +200,12 @@ ideal ncGCD2(poly p, poly q, const ring r)
   K1 = pTakeOutComp(&K, 1); // 1st component is taken out from K
 //  pShift(&K,-2); // 2nd component to 0th comp.
   K2 = pTakeOutComp(&K, 1);
-//  K2 = K; 
+//  K2 = K;
 
   PrintS("syz1: "); p_wrp(K1,r);
   PrintS("syz2: "); p_wrp(K2,r);
 
-  /* checking signs before multiplying */    
+  /* checking signs before multiplying */
   number ck1 = p_GetCoeff(K1,r);
   number ck2 = p_GetCoeff(K2,r);
   BOOLEAN bck1, bck2;
@@ -251,7 +251,7 @@ ideal ncGCD(poly p, poly q, const ring r)
   return(h);
 }
 
-/* PINLINE1 void p_ExpVectorDiff 
+/* PINLINE1 void p_ExpVectorDiff
    remains as is -> BUT we can do memory shift on smaller number of exp's */
 
 
@@ -344,7 +344,7 @@ ideal ncGCD(poly p, poly q, const ring r)
 //   pShift(&K,-2); // 2nd component to 0th comp.
 //   K2 = K;
 
-//   /* checking signs before multiplying */    
+//   /* checking signs before multiplying */
 //   number ck1 = p_GetCoeff(K1,r);
 //   number ck2 = p_GetCoeff(K2,r);
 //   BOOLEAN bck1, bck2;
@@ -472,7 +472,7 @@ poly nc_rat_CreateSpoly(poly pp1, poly pp2, int ishift, const ring r)
   PrintS("g: "); p_wrp(p2,r); PrintS("\n");
   PrintS("k: "); p_wrp(K,r); PrintS("\n");
 #endif
-  
+
   ideal ncsyz = ncGCD(C,K,r);
   poly KK = ncsyz->m[0]; ncsyz->m[0]=NULL; //p_Copy(ncsyz->m[0],r); // k'
   poly CC = ncsyz->m[1]; ncsyz->m[1]= NULL; //p_Copy(ncsyz->m[1],r); // c'
@@ -486,12 +486,12 @@ poly nc_rat_CreateSpoly(poly pp1, poly pp2, int ishift, const ring r)
 
 
 #ifdef PDEBUG
-  PrintS(" t_f: "); p_wrp(p1,r); PrintS("\n");  
-  PrintS(" t_g: "); p_wrp(p2,r); PrintS("\n");  
-  PrintS(" r_f: "); p_wrp(HF,r); PrintS("\n");  
-  PrintS(" r_g: "); p_wrp(HG,r); PrintS("\n");  
-  PrintS(" c': "); p_wrp(CC,r); PrintS("\n");  
-  PrintS(" k': "); p_wrp(KK,r); PrintS("\n");  
+  PrintS(" t_f: "); p_wrp(p1,r); PrintS("\n");
+  PrintS(" t_g: "); p_wrp(p2,r); PrintS("\n");
+  PrintS(" r_f: "); p_wrp(HF,r); PrintS("\n");
+  PrintS(" r_g: "); p_wrp(HG,r); PrintS("\n");
+  PrintS(" c': "); p_wrp(CC,r); PrintS("\n");
+  PrintS(" k': "); p_wrp(KK,r); PrintS("\n");
 
 #endif
 
@@ -588,8 +588,8 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
 
 #ifdef PDEBUG
   PrintS("t_g: "); p_wrp(out,r);
-  PrintS("k': "); p_wrp(KK,r); PrintS("\n");  
-  PrintS("p': "); p_wrp(PP,r); PrintS("\n");  
+  PrintS("k': "); p_wrp(KK,r); PrintS("\n");
+  PrintS("p': "); p_wrp(PP,r); PrintS("\n");
 #endif
   id_Delete(&ncsyz,r);
   p_LmDeleteAndNextRat(&p2, is, r); // t_f
@@ -608,7 +608,7 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
 #endif
 
 //  out = r->nc->p_Procs.mm_Mult_p(m, out, r); // d^aplha t_g
-  out = nc_mm_Mult_p(m, out, r); // d^aplha t_g  
+  out = nc_mm_Mult_p(m, out, r); // d^aplha t_g
   p_Delete(&m,r);
 
 #ifdef PDEBUG
@@ -642,7 +642,7 @@ BOOLEAN p_DivisibleByRat(poly a, poly b, int ishift, const ring r)
   PrintS("invoke p_DivByRat with a = ");
   p_wrp(p_Head(a,r),r);
   PrintS(" and b= ");
-  p_wrp(p_Head(b,r),r); 
+  p_wrp(p_Head(b,r),r);
   PrintLn();
 #endif
   int i;
@@ -675,7 +675,7 @@ int redRat (poly* h, poly *reducer, int *red_length, int rl, int ishift, ring r)
       if ((l>red_length[i]) && (p_DivisibleByRat(reducer[i],*h,ishift,r)))
       {
         j=i; l=red_length[i];
-	//        PrintS(" yes\n");
+        //        PrintS(" yes\n");
       }
       //      else PrintS(" no\n");
     }
@@ -692,7 +692,7 @@ int redRat (poly* h, poly *reducer, int *red_length, int rl, int ishift, ring r)
       p_wrp(reducer[j],r);
     }
     poly hh=nc_rat_ReduceSpolyNew(reducer[j], *h, ishift, r);
-    //    p_Delete(h,r); 
+    //    p_Delete(h,r);
     *h=hh;
     if (TEST_OPT_DEBUG)
     {
@@ -773,14 +773,14 @@ void pContentRat(poly &ph)
   // there are dd>=1 mindeg elements
   // and pmideglen is the coordinate of one of the smallest among them
 
-  //  poly g = singclap_gcd(p_Copy(p,r),p_Copy(q,r)); 
+  //  poly g = singclap_gcd(p_Copy(p,r),p_Copy(q,r));
   //  return naGcd(d,d2,currRing);
 
   // adjoin pContentRat here?
   for(i=0; i<=k; i++)
   {
     d=singclap_gcd(d,pCopy(C[i]));
-    if (pTotaldegree(d)==0) 
+    if (pTotaldegree(d)==0)
     {
       // cleanup, pContent, return
       pDelete(&d);
@@ -799,8 +799,8 @@ void pContentRat(poly &ph)
    pDelete(&C[i]);
    C[i]=h;
   }
-  
-  // zusammensetzen, 
+
+  // zusammensetzen,
   p=NULL; // just to be sure
   for(i=0; i<=k; i++)
   {

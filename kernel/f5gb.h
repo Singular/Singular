@@ -37,8 +37,8 @@ bool compareMonomials(int* m1, int** m2, int numberOfRuleOlds);
 
 /*
 ==================================================
-computes incrementally gbs of subsets of the input 
-gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
+computes incrementally gbs of subsets of the input
+gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}
 ==================================================
 */
 LList* F5inc(int i, poly f_i, LList* gPrev,LList* reducers, ideal gbPrev, poly ONE, LTagList* lTag, RList* rules, RTagList* rTag, int plus ,int termination);
@@ -46,8 +46,8 @@ LList* F5inc(int i, poly f_i, LList* gPrev,LList* reducers, ideal gbPrev, poly O
 /*
 ================================================================
 computes a list of critical pairs for the next reduction process
-the first element is always "useful" thus the critical pair 
-computed is either "useful" or "useless" depending on the second 
+the first element is always "useful" thus the critical pair
+computed is either "useful" or "useless" depending on the second
 element which generates the critical pair.
 first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
@@ -63,16 +63,16 @@ bool checkDGB(LList* gPrev);
  * Arris Check if we are finished after the current degree step:
  * Checks all remaining critical pairs, i.e. those of higher degree,
  * by the two Buchberger criteria.
- * return value: 0, if all remaining critical pairs are deleted by 
+ * return value: 0, if all remaining critical pairs are deleted by
  *                  Buchberger's criteria
  *               1, otherwise
  */
-bool arrisCheck(CNode* first,LNode* firstGCurr, long arrisdeg); 
+bool arrisCheck(CNode* first,LNode* firstGCurr, long arrisdeg);
 
 /*
 ================================================================
 computes a list of critical pairs for the next reduction process
-the first element is always "useless" thus the critical pair 
+the first element is always "useless" thus the critical pair
 computed is "useless".
 first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
@@ -130,17 +130,17 @@ inline void newReduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, LL
 
 /*!
  * ================================================================================
- * searches for reducers of temp similar to the symbolic preprocessing of F4  and 
+ * searches for reducers of temp similar to the symbolic preprocessing of F4  and
  * divides them into a "good" and "bad" part:
- * 
+ *
  * the "good" ones are the reducers which do not corrupt the label of temp, with
  * these the normal form of temp is computed
  *
- * the "bad" ones are the reducers which corrupt the label of temp, they are tested 
+ * the "bad" ones are the reducers which corrupt the label of temp, they are tested
  * later on for possible new RuleOlds and S-polynomials to be added to the algorithm
  * ================================================================================
  */
-void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, LList* reducers, CListOld* critPairs, RList* rules, LTagList* lTag, RTagList* rTag, int termination, PList* rejectedGBList, int plus); 
+void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, LList* reducers, CListOld* critPairs, RList* rules, LTagList* lTag, RTagList* rTag, int termination, PList* rejectedGBList, int plus);
 
 /*
 =====================================================================================
@@ -148,7 +148,7 @@ top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomia
 the same index whereas the labels are taken into account
 =====================================================================================
 */
-inline void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CListOld* critPairs, RList* RuleOlds, LTagList* lTag, RTagList* rTag, ideal gbPrev, PList* rejectedGBList, int plus); 
+inline void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CListOld* critPairs, RList* RuleOlds, LTagList* lTag, RTagList* rTag, ideal gbPrev, PList* rejectedGBList, int plus);
 
 /*
 =======================================================================================
@@ -158,7 +158,7 @@ is taken into account
 =======================================================================================
 
 poly p_MergeEq_q(poly p, poly q, const ring r);
-*/    
+*/
 /*
 =====================================================================
 subalgorithm to find a possible reductor for the labeled polynomial l

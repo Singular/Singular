@@ -5,7 +5,7 @@
  *  File:    fast_maps.cc
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann), hannes (Hannes Schoenemann),
- *           bricken (Michael Brickenstein) 
+ *           bricken (Michael Brickenstein)
  *  Created: 01/02
  *******************************************************************/
 
@@ -33,7 +33,7 @@ public:
   macoeff   coeff;      // list of coeffs to use
 };
 
-class macoeff_s 
+class macoeff_s
 {
 public:
   macoeff       next;
@@ -59,15 +59,15 @@ void maPoly_Out(mapoly mpoly, ring src_ring, ring dest_r = NULL);
 // if bucket != NULL, a coeff with the bucket is created, as well
 mapoly maMonomial_Create(poly p, ring , sBucket_pt bucket = NULL);
 // unconditionally destroys a maMonomial:
-// src: LmFree 
-// dest: p_Delete 
+// src: LmFree
+// dest: p_Delete
 // coeffs: delete list
 void maMonomial_Destroy(mapoly monomial, ring src_r, ring dest_r = NULL);
 // decrements ref counter, if 0, calls Destroy
 inline mapoly maMonomial_Free(mapoly monomial, ring src_r, ring dest_r = NULL)
 {
   monomial->ref--;
-  if (monomial->ref <= 0) 
+  if (monomial->ref <= 0)
   { maMonomial_Destroy(monomial, src_r, dest_r); return NULL;}
   return monomial;
 }
@@ -86,13 +86,13 @@ void maPoly_Optimize(mapoly mpoly, ring src_r);
 void maPoly_Eval(mapoly mpoly, ring src_r, ideal dest_id, ring dest_r, int total_cost);
 
 // creates mpoly and  mideal
-void maMap_CreatePolyIdeal(ideal map_id, ring map_r, 
+void maMap_CreatePolyIdeal(ideal map_id, ring map_r,
                            ring src_r, ring dest_r,
                            mapoly &mp, maideal &mideal);
 // creates src_r: rings with weights
 //         dest_r: where we do our computations
-void maMap_CreateRings(ideal map_id, ring map_r, 
-                       ideal image_id, ring image_r, 
+void maMap_CreateRings(ideal map_id, ring map_r,
+                       ideal image_id, ring image_r,
                        ring &src_r, ring &dest_r, BOOLEAN &no_sort);
 
 // collects tthe results into an ideal and destroys maideal

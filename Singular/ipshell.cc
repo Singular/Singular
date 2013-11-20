@@ -5089,7 +5089,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       }
       else // (0/p, a, b, ..., z)
       {
-	if ((ch!=0) && (ch!=IsPrime(ch))) 
+	if ((ch!=0) && (ch!=IsPrime(ch)))
 	{
 	  WerrorS("too many parameters");
 	  goto rInitError;

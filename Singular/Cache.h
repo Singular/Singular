@@ -75,7 +75,7 @@ template<class KeyClass, class ValueClass> class Cache
      * as long as the pair <c>key(_rank(i)) -->  value(_rank(i))</c>.
      */
    std::list<int> _rank;
-  
+
      /**
      * _key is sorted in ascending order, i.e.,
      * <em>j < i  ==>  _key(j) < _key(i),</em>
@@ -83,7 +83,7 @@ template<class KeyClass, class ValueClass> class Cache
      * in KeyClass.
      */
      std::list<KeyClass> _key;
-  
+
      /**
      *  _value captures the actual objects of interest;<br>
      * \c _value[i] corresponds to \c _key[i] and may be retrieved
@@ -91,12 +91,12 @@ template<class KeyClass, class ValueClass> class Cache
      * argument \c _key[i]).
      */
      std::list<ValueClass> _value;
-     
+
      /**
      * container for the weights of all cached values
      */
      std::list<int> _weights;
-  
+
      /**
      * a pointer to some element of _key;
      * We make this mutable so that methods which leave the cache
@@ -104,7 +104,7 @@ template<class KeyClass, class ValueClass> class Cache
      * const, as the user would expect for these methods.
      */
      mutable typename std::list<KeyClass>::const_iterator _itKey;
-     
+
      /**
      * a pointer to some element of _value;
      * We make this mutable so that methods which leave the cache
@@ -112,7 +112,7 @@ template<class KeyClass, class ValueClass> class Cache
      * const, as the user would expect for these methods.
      */
      mutable typename std::list<ValueClass>::const_iterator _itValue;
-  
+
      /**
      * for storing the momentary weight of the given cache;<br>
      * This is the sum of \c _value[i].getWeight() over all \e i,
@@ -120,7 +120,7 @@ template<class KeyClass, class ValueClass> class Cache
      * to all weights stored in _weights.
      */
      int _weight;
-  
+
      /**
      * the bound for the number of cached <c>key --> value</c> pairs;<br>
      * The cache will automatically ensure that this bound will never be
@@ -128,7 +128,7 @@ template<class KeyClass, class ValueClass> class Cache
      * see Cache::shrink (const KeyClass&) and Cache::deleteLast ().
      */
      int _maxEntries;
-  
+
      /**
      * the bound on total cache weight;<br>
      * The cache will automatically ensure that this bound will never be
@@ -136,7 +136,7 @@ template<class KeyClass, class ValueClass> class Cache
      * see Cache::shrink (const KeyClass&) and Cache::deleteLast ().
      */
      int _maxWeight;
-  
+
      /**
      * A method for providing the index of a given key in the vector _key.
      * Either _key contains the given key, then its index will be returned.
@@ -147,7 +147,7 @@ template<class KeyClass, class ValueClass> class Cache
      * @see Cache::hasKey (const KeyClass&) const
      */
      int getIndexInKey (const KeyClass& key) const;
-  
+
      /**
      * A method for providing the index of a given value in the vector _rank.
      * Based on the rank of the given value, the position in _rank at which
@@ -158,7 +158,7 @@ template<class KeyClass, class ValueClass> class Cache
      * @return the actual or would-be index of value in _rank
      */
      int getIndexInRank (const ValueClass& value) const;
-  
+
      /**
      * A method for shrinking the given cache so that it meet the bounds on
      * the maximum number of entries and total weight again.
@@ -168,7 +168,7 @@ template<class KeyClass, class ValueClass> class Cache
      * @return true iff shrinking deleted a pair (key --> *)
      */
      bool shrink (const KeyClass& key);
-  
+
      /**
      * A method for deleting the least-ranked cache entry.
      * The method returns true iff the deleted pair (k --> v)
@@ -183,21 +183,21 @@ template<class KeyClass, class ValueClass> class Cache
      * The method makes sure that all member vectors be empty.
      */
      Cache();
-  
+
      /**
      * A destructor for class Cache.
      * The method clears all member vectors. (This includes that
      * destructors are invoked, accordingly.)
      */
      ~Cache();
-  
+
      /**
      * Copy implementation for class Cache.
      * Apart from copying all flat members, all vectors are being
      * deep-copied.
      */
      Cache (const Cache& c);
-  
+
      /**
      * A user-suited constructor for class Cache.
      * The method makes sure that all member vectors be empty.
@@ -209,7 +209,7 @@ template<class KeyClass, class ValueClass> class Cache
      * @param maxWeight the (positive) maximum weight of the cache
      */
      Cache (const int maxEntries, const int maxWeight);
-  
+
      /**
      * A method for retrieving the momentary weight of the cache.
      * The return value will always be less than or equal to the result
@@ -221,7 +221,7 @@ template<class KeyClass, class ValueClass> class Cache
      * @see MinorValue::getWeight () const
      */
      int getWeight () const;
-  
+
      /**
      * A method for retrieving the momentary number of (key --> value) pairs
      * in the cache.
@@ -231,7 +231,7 @@ template<class KeyClass, class ValueClass> class Cache
      * @see Cache::getMaxNumberOfEntries () const
      */
      int getNumberOfEntries () const;
-  
+
      /**
      * A method for retrieving the maximum number of (key --> value) pairs
      * in the cache.
@@ -240,7 +240,7 @@ template<class KeyClass, class ValueClass> class Cache
      * @see Cache::Cache (const int, const int)
      */
      int getMaxNumberOfEntries () const;
-  
+
      /**
      * A method for retrieving the maximum weight of the cache.
      * @return the maximum weight of the cache
@@ -248,7 +248,7 @@ template<class KeyClass, class ValueClass> class Cache
      * @see Cache::Cache (const int, const int)
      */
      int getMaxWeight () const;
-  
+
      /**
      * Checks whether the cache contains a pair (k --> v) such that
      * k equals the given key.
@@ -263,7 +263,7 @@ template<class KeyClass, class ValueClass> class Cache
      * @see Cache::getValue (const KeyClass&) const
      */
      bool hasKey (const KeyClass& key) const;
-  
+
      /**
      * Returns the value for a given key.
      * The method assumes that there is actually an entry of the form
@@ -279,7 +279,7 @@ template<class KeyClass, class ValueClass> class Cache
      * @see Cache::hasKey (const KeyClass&) const
      */
      ValueClass getValue (const KeyClass& key) const;
-  
+
      /**
      * Inserts the pair (key --> value) in the cache.
      * If there is already some entry (key --> value'), then value will be
@@ -300,13 +300,13 @@ template<class KeyClass, class ValueClass> class Cache
      * @see Cache::getValue (const KeyClass&) const
      */
      bool put (const KeyClass& key, const ValueClass& value);
-  
+
      /**
      * Clears the cache so that it has no entry. This method will also
      * enforce destruction of all former entries of the cache.
      */
      void clear ();
-  
+
      /**
      * A method for providing a printable version of the represented
      * cache, including all contained (key --> value) pairs.
@@ -314,7 +314,7 @@ template<class KeyClass, class ValueClass> class Cache
      *         string
      */
    std::string toString () const;
-  
+
      /**
      * A method for printing a string representation of the given cache to
      * std::cout. This includes string representations of all contained

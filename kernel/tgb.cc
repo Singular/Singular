@@ -5145,8 +5145,8 @@ template class std::vector<DataNoroCacheNode<unsigned int>*>;
 template class std::vector<DataNoroCacheNode<unsigned short>*>;
 template class std::vector<PolySimple>;
 
-template void std::sort( CoefIdx<unsigned char>* , CoefIdx<unsigned char>*  ); 
-template void std::sort( CoefIdx<unsigned int>*  , CoefIdx<unsigned int>*   ); 
+template void std::sort( CoefIdx<unsigned char>* , CoefIdx<unsigned char>*  );
+template void std::sort( CoefIdx<unsigned int>*  , CoefIdx<unsigned int>*   );
 template void std::sort( CoefIdx<unsigned short>*, CoefIdx<unsigned short>* );
 
 template void std::sort_heap<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);

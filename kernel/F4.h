@@ -1,7 +1,7 @@
 //
 // C++ Interface: F4
 //
-// Description: 
+// Description:
 //
 //
 // Author: Michael Brickenstein <bricken@mathematik.uni-kl.de>, (C) 2005

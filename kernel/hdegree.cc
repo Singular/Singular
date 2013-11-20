@@ -984,7 +984,7 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
 {
   int  i;
   int  k = ak;
-  
+
   #if HAVE_RINGS
   if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
   {
@@ -1449,14 +1449,14 @@ ende:
     }
     assume(p_ind!=NULL);
     assume(res->m[ind]==p_ind);
-    hEdge=p_ind; 
+    hEdge=p_ind;
     res->m[ind]=NULL;
     nDelete(&pGetCoeff(hEdge));
     pGetCoeff(hEdge)=NULL;
     for(i=(currRing->N);i>0;i--)
       pIncrExp(hEdge,i);
     pSetm(hEdge);
-    
+
     idDelete(&res);
     return;
   }

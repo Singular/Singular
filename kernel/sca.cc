@@ -104,7 +104,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   if( currRing != _currRing ) rChangeCurrRing(_currRing);
   assume( currRing == _currRing );
 
-  
+
 #if MYTEST
    PrintS("<sca_gr_bba>\n");
 #endif
@@ -361,7 +361,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 #endif
 
   if( currRing != save )     rChangeCurrRing(save);
-  
+
   return (strat->Shdl);
 }
 
@@ -483,7 +483,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec *
     if (test_PosInL!=NULL) strat->posInL=test_PosInL;
     kDebugPrint(strat);
   }
-  
+
 
   ///////////////////////////////////////////////////////////////
   // SCA:
@@ -730,10 +730,10 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec *
 
         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
 
- 
- 
- 
-#if 0   
+
+
+
+#if 0
         h.sev = pGetShortExpVector(h.p);
         strat->initEcart(&h);
 
@@ -780,8 +780,8 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec *
           pos = strat->posInL(strat->L,strat->Ll,&h,strat);
 
          enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
-// the end of "#if 0" (comment) 
-#endif 
+// the end of "#if 0" (comment)
+#endif
 
       } // for all x_i \in Ann(lm(P))
     } // if red(P) != NULL
@@ -850,7 +850,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec *
 #endif
 
   if( currRing != save )     rChangeCurrRing(save);
-  
+
   return (strat->Shdl);
 }
 
@@ -919,7 +919,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec *
 
 #ifdef PDEBUG
   assume( strat->homog == bIdHomog );
-#endif 
+#endif
 
 #ifdef HAVE_ASSUME
   sca_mora_count++;
@@ -1228,7 +1228,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec *
   id_Delete( &tempF, currRing);
 
   if( currRing != save )     rChangeCurrRing(save);
-  
+
   return (strat->Shdl);
 }
 

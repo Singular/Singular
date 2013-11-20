@@ -80,7 +80,7 @@ public:
     }
 
     spectrum( const spectrum& );
-   
+
     ~spectrum( );
 
     spectrum operator = ( const spectrum& );

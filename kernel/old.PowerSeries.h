@@ -7,9 +7,9 @@ public std::
 iterator<
   std::input_iterator_tag,
   typename traits::expansion_type,
-  int, 
+  int,
   shared_ptr<const typename traits::expansion_type>,
-  const typename traits::expansion_type 
+  const typename traits::expansion_type
   > {
  private:
   typedef typename traits::denominator_type denominator_type;
@@ -22,9 +22,9 @@ iterator<
   expansion_type data;
   denominator_type lastPot;
  public:
-  PowerSeriesInputIterator(numerator_type num_arg, 
-			   denominator_type den_arg):
-    data(den_arg.getRing()), 
+  PowerSeriesInputIterator(numerator_type num_arg,
+                           denominator_type den_arg):
+    data(den_arg.getRing()),
     lastPot(den_arg.getRing()),
     numerator(num_arg),
     denominator(den_arg){
@@ -36,30 +36,30 @@ iterator<
     typename traits::denominator_type::iterator it=denominator.begin();
     typename traits::denominator_type::iterator end=denominator.end();
     while(it!=end){
-     
+
       if ((*it).isConstant()){
-	//change this type
-	c=denominator_type(*it).leadCoef();
-	
-	break;
+        //change this type
+        c=denominator_type(*it).leadCoef();
+
+        break;
       }
-      
+
       ++it;
-      
-      
- 
+
+
+
     }
     c=Number(1,r)/c;
     numerator*=c;
     denominator*=c;
     toPot=denominator+denominator_type(-1,r);
-    
+
     toPot*=Number(-1,r);
     //change this type
     lastPot=denominator_type(1,r);
     data=numerator;
     state=0;
-    
+
   }
   PowerSeriesInputIterator(){
     state=-1;
@@ -71,7 +71,7 @@ iterator<
     expansion_type remove(r);
     while(it!=end){
       if(it->lmTotalDegree()<state){
-	remove+=expansion_type(*it);
+        remove+=expansion_type(*it);
       }
       it++;
     }
@@ -85,9 +85,9 @@ iterator<
     expansion_type res(r);
     while(it!=end){
       if(it->lmTotalDegree()==state)
-	{
-	  res+=expansion_type(*it);
-	}
+        {
+          res+=expansion_type(*it);
+        }
       it++;
     }
     return res;
@@ -96,12 +96,12 @@ iterator<
     state++;
     shorten();
     lastPot*=toPot;
-    
+
     data+=lastPot*numerator;
-    
- 
+
+
     return *this;
-    
+
   }
   //bad if this are iterators for different PowerSeries
   bool operator==(const PowerSeriesInputIterator& t2){
@@ -135,7 +135,7 @@ template<class traits> class PowerSeriesBase{
   denominator_type denominator;
   numerator_type numerator;
  public:
-  
+
   PowerSeriesBase(){
   }
   PowerSeriesBase(const numerator_type &a, const denominator_type & b):numerator(a),denominator(b){
@@ -149,7 +149,7 @@ template<class traits> class PowerSeriesBase{
   iterator end(){
     return iterator();
   }
-  
+
 
 };
 class PowerSeriesPolyTraits;

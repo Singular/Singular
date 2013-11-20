@@ -4,7 +4,7 @@
 #include <misc/intvec.h>
 class Intvec: public std::vector<int>{
 public:
-  Intvec(iterator first, 
+  Intvec(iterator first,
 	iterator last,
 	const allocator_type& __a = allocator_type()):
     std::vector<int>(first,last,__a){
@@ -19,7 +19,7 @@ public:
   intvec* allocate_legacy_intvec_copy() const{
     int s=size();
     intvec* iv=new intvec(s);
-    
+
     for(int i=0;i<s;i++){
       (*iv)[i]=(*this)[i];
     }

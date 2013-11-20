@@ -65,11 +65,11 @@ public:
 
   ~PythonInterpreter()  { if(m_owns_python) Py_Finalize();  }
 
-  /// Initialize unique (singleton) python interpreter instance, 
+  /// Initialize unique (singleton) python interpreter instance,
   /// and set Singular type identifier
   static void init(id_type num) { instance().m_id = num; }
 
-  /// Get Singular type identitfier 
+  /// Get Singular type identitfier
   static id_type id() { return instance().m_id; }
 
 private:
@@ -77,9 +77,9 @@ private:
   PythonInterpreter():
     m_id(0), m_owns_python(false)  { start_python(); }
 
-  /// Static initialization - 
+  /// Static initialization -
   /// safely takes care of destruction on program termination
-  static PythonInterpreter& instance() 
+  static PythonInterpreter& instance()
   {
     static PythonInterpreter init_interpreter;
     return init_interpreter;
@@ -90,7 +90,7 @@ private:
     if (!Py_IsInitialized()) init_python();
     set_python_defaults();
   }
- 
+
   void init_python()
   {
     Py_Initialize();
@@ -109,7 +109,7 @@ private:
     sprintf(cmd, "path.insert(0, '%s')", feGetResource('b'));
     PyRun_SimpleString(cmd);
     PyRun_SimpleString("del path");  // cleanup
-  }    
+  }
 
   id_type m_id;
   bool m_owns_python;
@@ -130,12 +130,12 @@ public:
   struct sequence_tag{};
 
   PythonObject(): m_ptr(Py_None) { }
-  PythonObject(ptr_type ptr): m_ptr(ptr) { 
+  PythonObject(ptr_type ptr): m_ptr(ptr) {
     if (!ptr && handle_exception()) m_ptr = Py_None;
   }
 
   ptr_type check_context(ptr_type ptr) const {
-    if(ptr) sync_contexts(); 
+    if(ptr) sync_contexts();
     return ptr;
   }
   /// Unary operations
@@ -174,11 +174,11 @@ public:
   }
 
   /// Ternary operations
-  self operator()(int op, const self& arg1, const self& arg2) const 
+  self operator()(int op, const self& arg1, const self& arg2) const
   {
     switch(op)
     {
-      case ATTRIB_CMD: 
+      case ATTRIB_CMD:
         if(PyObject_SetAttr(*this, arg1, arg2) == -1) handle_exception();
         return self();
     }
@@ -209,13 +209,13 @@ public:
   }
 
   void import_as(const char* name) const {
-    idhdl handle = enterid(omStrDup(name), 0, DEF_CMD, 
+    idhdl handle = enterid(omStrDup(name), 0, DEF_CMD,
                            &IDROOT, FALSE);
 
     if (handle)
     {
       IDDATA(handle) = (char*)m_ptr;
-      Py_XINCREF(m_ptr); 
+      Py_XINCREF(m_ptr);
       IDTYP(handle) =  PythonInterpreter::id();
     }
     else { Werror("Importing pyobject to Singular failed"); }
@@ -227,13 +227,13 @@ public:
 
   self attr(const self& arg) const { return PyObject_GetAttr(*this, arg); }
 
-  self del_attr(const self& arg) const 
+  self del_attr(const self& arg) const
   {
-    if (!PyObject_HasAttr(*this, arg)) 
+    if (!PyObject_HasAttr(*this, arg))
       Werror("Cannot delete attribute %s.", arg.repr());
     else
-      PyObject_DelAttr(*this, arg); 
-  
+      PyObject_DelAttr(*this, arg);
+
     return self();
   }
 
@@ -251,17 +251,17 @@ protected:
   BOOLEAN handle_exception() const {
 
     if(!PyErr_Occurred()) return FALSE;
-    
+
     PyObject *pType, *pMessage, *pTraceback;
     PyErr_Fetch(&pType, &pMessage, &pTraceback);
-    
+
     WerrorS("pyobject error occured");
     WerrorS(PyString_AsString(pMessage));
-    
+
     Py_XDECREF(pType);
     Py_XDECREF(pMessage);
     Py_XDECREF(pTraceback);
-    
+
     PyErr_Clear();
     return TRUE;
   }
@@ -276,13 +276,13 @@ protected:
 
   int py_opid(int op) const{
     switch(op)
-    { 
+    {
       case '<':  return Py_LT;
       case '>':  return Py_GT;
       case EQUAL_EQUAL:  return Py_EQ;
       case NOTEQUAL:  return Py_NE;
-      case GE:  return Py_GE; 
-      case LE:  return Py_LE; 
+      case GE:  return Py_GE;
+      case LE:  return Py_LE;
     }
     return -1;
   }
@@ -314,7 +314,7 @@ private:
  * This template class does conversion of Singular objects to python objects on
  * compile-time.
  *
- * @note The Singular objects are assumed to be equivalent to the template argument. 
+ * @note The Singular objects are assumed to be equivalent to the template argument.
  **/
 template <class CastType = PythonObject::ptr_type>
 class PythonCastStatic:
@@ -364,7 +364,7 @@ private:
   PythonObject get(leftv value, int typeId)
   {
     if (typeId == PythonInterpreter::id()) return PythonCastStatic<>(value);
-    
+
     switch (typeId)
     {
     case INT_CMD:    return PythonCastStatic<long>(value);
@@ -375,15 +375,15 @@ private:
 
     sleftv tmp;
     BOOLEAN newstruct_equal(int, leftv, leftv); // declaring overloaded '='
-    if (!newstruct_equal(PythonInterpreter::id(), &tmp, value))  
-      return PythonCastStatic<>(&tmp);        
+    if (!newstruct_equal(PythonInterpreter::id(), &tmp, value))
+      return PythonCastStatic<>(&tmp);
 
     if (typeId > MAX_TOK)       // custom types
     {
       blackbox *bbx = getBlackboxStuff(typeId);
       assume(bbx != NULL);
       if (! bbx->blackbox_Op1(PythonInterpreter::id(), &tmp, value))
-        return PythonCastStatic<>(&tmp);        
+        return PythonCastStatic<>(&tmp);
     }
 
     Werror("type '%s` incompatible with 'pyobject`", iiTwoOps(typeId));
@@ -412,14 +412,14 @@ public:
   PythonCastStatic(leftv value):
     PythonObject(PyTuple_New(size(value)))  { append_to(value); }
 
-  
+
 private:
-  size_t size(leftv iter, size_t distance = 0) const 
+  size_t size(leftv iter, size_t distance = 0) const
   {
-    if (iter) { do { ++distance; } while((iter = iter->next)); }; 
+    if (iter) { do { ++distance; } while((iter = iter->next)); };
     return distance;
   }
-  
+
   void append_to(leftv iter) const
   {
     for(size_t idx = 0; iter != NULL; iter = iter->next)
@@ -518,7 +518,7 @@ char* pyobject_String(blackbox *b, void* ptr)
 
 /// blackbox support - copy element
 void* pyobject_Copy(blackbox*b, void* ptr)
-{ 
+{
     Py_XINCREF(ptr);
     return ptr;
 }
@@ -534,10 +534,10 @@ BOOLEAN pyobject_Assign(leftv l, leftv r)
     IDDATA((idhdl)l->data) = (char *)result;
   else
     l->data = (void *)result;
-  
+
   return !result;
 }
-                                                                     
+
 
 /// blackbox support - unary operations
 BOOLEAN pyobject_Op1(int op, leftv res, leftv head)
@@ -558,7 +558,7 @@ BOOLEAN pyobject_Op1(int op, leftv res, leftv head)
     }
     case TYPEOF_CMD:
       res->data = (void*) omStrDup("pyobject");
-      res->rtyp = STRING_CMD;  
+      res->rtyp = STRING_CMD;
       return FALSE;
   }
 
@@ -576,7 +576,7 @@ BOOLEAN pyobject_Op2(int op, leftv res, leftv arg1, leftv arg2)
   PythonCastStatic<> lhs(arg1);
 
   switch(op)                    // built-in return types and special cases first
-  { 
+  {
     case '<': case '>': case EQUAL_EQUAL: case NOTEQUAL: case GE: case LE:
     {
       res->data = (void *)(long)(lhs.compare(op, PythonCastDynamic(arg2)));
@@ -690,7 +690,7 @@ void sync_contexts()
 
   }
 
-  PythonObject deletedElts = 
+  PythonObject deletedElts =
     python_eval("list(set(_SINGULAR_IMPORTED.iterkeys()) - \
      set(_SINGULAR_NEW.iterkeys()))");
   len = deletedElts.size();
@@ -709,9 +709,9 @@ void sync_contexts()
 
 
 blackbox* pyobject_blackbox(int& tok) {
-  if(blackboxIsCmd("pyobject", tok) != ROOT_DECL) 
+  if(blackboxIsCmd("pyobject", tok) != ROOT_DECL)
   {
-    tok = setBlackboxStuff((blackbox*)omAlloc0(sizeof(blackbox)), 
+    tok = setBlackboxStuff((blackbox*)omAlloc0(sizeof(blackbox)),
 			   "pyobject");
   }
   return getBlackboxStuff(tok);
@@ -727,7 +727,7 @@ int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
 {
   int tok = -1;
   blackbox* bbx = pyobject_blackbox(tok);
-  if (bbx->blackbox_Init != pyobject_Init) 
+  if (bbx->blackbox_Init != pyobject_Init)
   {
     bbx->blackbox_destroy = pyobject_destroy;
     bbx->blackbox_String  = pyobject_String;
@@ -739,22 +739,22 @@ int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
     bbx->blackbox_Op3     = pyobject_Op3;
     bbx->blackbox_OpM     = pyobject_OpM;
     bbx->data             = (void*)omAlloc0(newstruct_desc_size());
-    
+
     PythonInterpreter::init(tok);
 
     PYOBJECT_ADD_C_PROC(python_import);
     PYOBJECT_ADD_C_PROC(python_eval);
-    PYOBJECT_ADD_C_PROC(python_run); 
+    PYOBJECT_ADD_C_PROC(python_run);
   }
   return 0;
 }
 #undef PYOBJECT_ADD_C_PROC
 
 #ifndef EMBED_PYTHON
-extern "C" { 
+extern "C" {
   int mod_init(SModulFunctions* psModulFunctions)
-  { 
-    return SI_MOD_INIT(pyobject)(psModulFunctions); 
+  {
+    return SI_MOD_INIT(pyobject)(psModulFunctions);
   }
 }
 #endif

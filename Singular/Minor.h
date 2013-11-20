@@ -186,7 +186,7 @@ class MinorKey
      * just to make the compiler happy
      */
      MinorKey& operator=(const MinorKey&);
-     
+
      /**
      * just to make the compiler happy
      */
@@ -410,25 +410,25 @@ class MinorValue
     * the current minor
     */
     int _retrievals;
-    
+
     /**
     * -1 iff cache is not used, otherwise the maximum number of potential
     * retrievals of this minor (e.g. when the minor would be kept in cache
     * forever)
     */
     int _potentialRetrievals;
-    
+
     /**
     * a store for the actual number of multiplications to compute the current
     * minor
     */
     int _multiplications;
-    
+
     /**
     * a store for the actual number of additions to compute the current minor
     */
     int _additions;
-    
+
     /**
     * a store for the accumulated number of multiplications to compute the
     * current minor;
@@ -437,7 +437,7 @@ class MinorValue
     * performed again.)
     */
     int _accumulatedMult;
-    
+
     /**
     * a store for the accumulated number of additions to compute the current
     * minor;
@@ -446,7 +446,7 @@ class MinorValue
     * performed again.)
     */
     int _accumulatedSum;
-    
+
     /**
     * A method for obtaining a rank measure for the given MinorValue.<br>
     * Rank measures are used to compare any two instances of MinorValue. The
@@ -462,7 +462,7 @@ class MinorValue
     * @see MinorValue::operator< (const MinorValue& mv)
     */
     int rankMeasure1 () const;
-    
+
     /**
     * A method for obtaining a rank measure for the given MinorValue.<br>
     * Rank measures are used to compare any two instances of MinorValue. The
@@ -480,7 +480,7 @@ class MinorValue
     * @see MinorValue::operator< (const MinorValue& mv)
     */
     int rankMeasure2 () const;
-    
+
     /**
     * A method for obtaining a rank measure for the given MinorValue.<br>
     * Rank measures are used to compare any two instances of MinorValue. The
@@ -497,7 +497,7 @@ class MinorValue
     * @see MinorValue::operator< (const MinorValue& mv)
     */
     int rankMeasure3 () const;
-    
+
     /**
     * A method for obtaining a rank measure for the given MinorValue.<br>
     * Rank measures are used to compare any two instances of MinorValue. The
@@ -514,7 +514,7 @@ class MinorValue
     * @see MinorValue::operator< (const MinorValue& mv)
     */
     int rankMeasure4 () const;
-    
+
     /**
     * A method for obtaining a rank measure for the given MinorValue.<br>
     * Rank measures are used to compare any two instances of MinorValue. The
@@ -531,13 +531,13 @@ class MinorValue
     * @see MinorValue::operator< (const MinorValue& mv)
     */
     int rankMeasure5 () const;
-    
+
     /**
     * private store for the current value ranking strategy;
     * This member can be set using MinorValue::SetRankingStrategy (const int).
     */
     static int g_rankingStrategy;
-    
+
     /**
     * Accessor for the static private field g_rankingStrategy.
     */
@@ -547,12 +547,12 @@ class MinorValue
     * just to make the compiler happy
     */
     bool operator== (const MinorValue& mv) const;
-    
+
     /**
     * just to make the compiler happy
     */
     bool operator< (const MinorValue& mv) const;
-    
+
     /**
     * A method for retrieving the weight of a given MinorValue.
     * The implementation of Cache uses this function to determine the total
@@ -565,7 +565,7 @@ class MinorValue
     * @see Cache::getWeight () const
     */
     virtual int getWeight () const;
-    
+
     /**
     * A method for accessing the number of retrievals of this minor. Multiple
     * retrievals will occur when computing large minors by means of cached
@@ -574,7 +574,7 @@ class MinorValue
     * @see MinorValue::getPotentialRetrievals () const
     */
     int getRetrievals () const;
-    
+
     /**
     * A method for accessing the maximum number of potential retrievals of
     * this minor. Multiple retrievals will occur when computing large minors
@@ -584,7 +584,7 @@ class MinorValue
     * @see MinorValue::getRetrievals () const
     */
     int getPotentialRetrievals () const;
-    
+
     /**
     * A method for accessing the multiplications performed while computing
     * this minor.
@@ -599,7 +599,7 @@ class MinorValue
     * @see MinorValue::getAccumulatedMultiplications () const
     */
     int getMultiplications () const;
-    
+
     /**
     * A method for accessing the multiplications performed while computing
     * this minor, including all nested multiplications.
@@ -612,7 +612,7 @@ class MinorValue
     * @see MinorValue::getMultiplications () const
     */
     int getAccumulatedMultiplications () const;
-    
+
     /**
     * A method for accessing the additions performed while computing this
     * minor.
@@ -635,7 +635,7 @@ class MinorValue
     * @see MinorValue::getAdditions () const
     */
     int getAccumulatedAdditions () const;
-    
+
     /**
     * A method for incrementing the number of performed retrievals of \a this
     * instance of MinorValue.<br>
@@ -653,7 +653,7 @@ class MinorValue
     * the Cache.
     */
     void incrementRetrievals ();
-    
+
     /**
     * A method for obtaining a rank measure for theiven MinorValue.<br>
     * Rank measures are used to compare any two instances of MinorValue. The
@@ -670,7 +670,7 @@ class MinorValue
     * @see MinorProcessor::SetCacheStrategy (const int)
     */
     int getUtility () const;
-    
+
     /**
     * A method for determining the value ranking strategy.<br>
     * This setting has a direct effect on how long the given MinorValue
@@ -679,14 +679,14 @@ class MinorValue
     * @param rankingStrategy an int, so far one of 1, 2, ..., 5
     */
     static void SetRankingStrategy (const int rankingStrategy);
-    
+
     /**
     * A method for providing a printable version of the represented MinorValue.
     * @return a printable version of the given instance as instance of class
     *         string
     */
    virtual std::string toString () const;
-    
+
     /**
     * A method for printing a string representation of the given MinorValue
     * to std::cout.
@@ -755,13 +755,13 @@ class IntMinorValue : public MinorValue
     * Destructor
     */
     virtual ~IntMinorValue ();
-    
+
     /**
     * Accessor for the private field _result.
     * @result the result encoded in this class instance
     */
     int getResult() const;
-    
+
     /**
     * Accessor for the current weight of this class instance.
     * @result the current weight of this class instance
@@ -832,7 +832,7 @@ class PolyMinorValue : public MinorValue
     * Assignment operator which creates a deep copy.
     */
     void operator= (const PolyMinorValue& mv);
-    
+
     /**
     * just to make the compiler happy
     */
@@ -842,19 +842,19 @@ class PolyMinorValue : public MinorValue
     * Destructor
     */
     virtual ~PolyMinorValue ();
-    
+
     /**
     * Accessor for the private field _result.
     * @result the result encoded in this class instance
     */
     poly getResult() const;
-    
+
     /**
     * Accessor for the current weight of this class instance.
     * @result the current weight of this class instance
     */
     int getWeight () const;
-    
+
     /**
     * A method for providing a printable version of the represented MinorValue.
     * @return a printable version of the given instance as instance of class

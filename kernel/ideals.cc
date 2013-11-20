@@ -1218,7 +1218,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
 
   intvec * weights;
   hom = (tHomog)idHomModule(h1,currQuotient,&weights);
-  if /**addOnlyOne &&*/ (/*(*/ !h1IsStb /*)*/) 
+  if /**addOnlyOne &&*/ (/*(*/ !h1IsStb /*)*/)
     temph1 = kStd(h1,currQuotient,hom,&weights,NULL);
   else
     temph1 = idCopy(h1);
@@ -2566,10 +2566,10 @@ void idKeepFirstK(ideal id, const int k)
    {
       if (id->m[i] != NULL) pDelete(&id->m[i]);
    }
-   int kk=k;                                                                                                                 
-   if (k==0) kk=1; /* ideals must have at least one element(0)*/                                                             
-   pEnlargeSet(&(id->m), IDELEMS(id), kk-IDELEMS(id));                                                                       
-   IDELEMS(id) = kk; 
+   int kk=k;
+   if (k==0) kk=1; /* ideals must have at least one element(0)*/
+   pEnlargeSet(&(id->m), IDELEMS(id), kk-IDELEMS(id));
+   IDELEMS(id) = kk;
 }
 
 /*

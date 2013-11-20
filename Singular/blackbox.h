@@ -69,7 +69,7 @@ void blackbox_default_Print(blackbox *b,void *d);
 blackbox* getBlackboxStuff(const int t);
 /// return the name to the type given by t (r/o)
 const char *    getBlackboxName(const int t);
-/// used by scanner: returns ROOT_DECL for known types 
+/// used by scanner: returns ROOT_DECL for known types
 /// (and the type number in @c tok)
 int blackboxIsCmd(const char *n, int & tok);
 /// define a new type

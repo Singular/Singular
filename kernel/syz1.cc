@@ -1997,7 +1997,7 @@ void syPrint(syStrategy syzstr, const char *sn)
       }
     }
   }
-   
+
   int sl=strlen(sn);
   syPrintEmptySpaces1(sl);
   int k = 0;
@@ -2460,7 +2460,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   syzstr->syRing = rAssure_dp_S(origR);
   assume(syzstr->syRing != origR); // why?
   rChangeCurrRing(syzstr->syRing);
-   
+
   // set initial ShiftedComps
   currcomponents = (int*)omAlloc0((arg->rank+1)*sizeof(int));
   currShiftedComponents = (long*)omAlloc0((arg->rank+1)*sizeof(long));

@@ -618,8 +618,8 @@ int main( int, char *argv[] )
 
     return(1);
   }
-   
-   
+
+
   feInitResources(argv[0]);
 
   StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");

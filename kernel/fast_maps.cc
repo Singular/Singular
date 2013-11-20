@@ -468,7 +468,7 @@ static poly maPoly_EvalMon(poly src, ring src_r, poly* dest_id, ring dest_r)
         p_Delete(&p,dest_r);
         return NULL;
       }
-      if (/*(*/ p==NULL /*)*/) /* && (e>0)*/ 
+      if (/*(*/ p==NULL /*)*/) /* && (e>0)*/
       {
         p=p_Copy(pp /*dest_id[i-1]*/,dest_r);
         e--;
@@ -481,7 +481,7 @@ static poly maPoly_EvalMon(poly src, ring src_r, poly* dest_id, ring dest_r)
     }
   }
   if (is_const)
-  { 
+  {
     assume(p==NULL);
     p=p_ISet(1,dest_r);
   }

@@ -14,5 +14,5 @@ extern "C" {
 #include <gmp.h>
 #endif
 
-#endif 
+#endif
 #endif /* ! INCL_CF_GMP_H */

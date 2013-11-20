@@ -231,7 +231,7 @@ structure of RuleOlds(i.e. already computed / known labels)
 */
 class RuleOld {
     private:
-        int     index;      // index of the labeled polynomial the RuleOld comes from 
+        int     index;      // index of the labeled polynomial the RuleOld comes from
         poly    term;       // term of the labeled polynomial the RuleOld comes from
     public:
         inline          RuleOld(int i, poly term);

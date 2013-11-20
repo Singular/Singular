@@ -415,7 +415,7 @@ IntMinorValue IntMinorProcessor::getNextMinor(const int characteristic,
   else if (strcmp(algorithm, "Bareiss") == 0)
     return getMinorPrivateBareiss(_minorSize, _minor, characteristic, iSB);
   else assume(false);
-  
+
   /* The following code is never reached and just there to make the
      compiler happy: */
   return IntMinorValue();
@@ -932,7 +932,7 @@ PolyMinorValue PolyMinorProcessor::getNextMinor(const char* algorithm,
   else if (strcmp(algorithm, "Bareiss") == 0)
     return getMinorPrivateBareiss(_minorSize, _minor, iSB);
   else assume(false);
-    
+
   /* The following code is never reached and just there to make the
      compiler happy: */
   return PolyMinorValue();
@@ -1443,7 +1443,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateBareiss(const int k,
           {
             complexity = 0;
             while ((pp != NULL) && (complexity < minComplexity))
-            { 
+            {
               complexity += nSize(pGetCoeff(pp)); pp = pNext(pp);
             }
             if (complexity < minComplexity)

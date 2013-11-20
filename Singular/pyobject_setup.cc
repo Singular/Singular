@@ -34,7 +34,7 @@ static BOOLEAN pyobject_load()
 void* pyobject_autoload(blackbox* bbx)
 {
   assume(bbx != NULL);
-  return (pyobject_load() || (bbx->blackbox_Init == pyobject_autoload)? 
+  return (pyobject_load() || (bbx->blackbox_Init == pyobject_autoload)?
 	  NULL: bbx->blackbox_Init(bbx));
 }
 
@@ -44,7 +44,7 @@ void pyobject_default_destroy(blackbox  */*b*/, void */*d*/)
 }
 
 // Setting up an empty blackbox type, which can be filled with pyobject
-void pyobject_setup() 
+void pyobject_setup()
 {
   blackbox *bbx = (blackbox*)omAlloc0(sizeof(blackbox));
   bbx->blackbox_Init = pyobject_autoload;
@@ -59,7 +59,7 @@ BOOLEAN pyobject_ensure() {
   blackbox* bbx = (blackboxIsCmd("pyobject", tok) == ROOT_DECL?
                    getBlackboxStuff(tok): (blackbox*)NULL);
   if (bbx == NULL) return TRUE;
-  return (bbx->blackbox_Init == pyobject_autoload?  pyobject_load(): FALSE);  
+  return (bbx->blackbox_Init == pyobject_autoload?  pyobject_load(): FALSE);
 }
 
 

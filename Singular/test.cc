@@ -236,37 +236,37 @@ void siInit(char *);
 int main( int, char *argv[] )
 {
   assume( sizeof(long) == SIZEOF_LONG );
-   
+
   if( sizeof(long) != SIZEOF_LONG )
   {
      WerrorS("Bad config.h: wrong size of long!");
-     
+
      return(1);
   }
-   
+
    // init path names etc.
 //  feInitResources(argv[0]); //???
   siInit(argv[0]); // ?
 
   if( char *s = versionString() )
-  { 
+  {
     PrintS(s);
     omFree(s);
   }
-   
-   
+
+
 
   StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
   feStringAppendResources(0);
-  StringAppendS("\n"); 
+  StringAppendS("\n");
   if( char * s = StringEndS() )
   {
     PrintS(s);
     omFree(s);
   }
-   
-   
-   
+
+
+
 
   // Libpolys tests:
 

@@ -1000,7 +1000,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
             Print("empty set L[%p] because:L[%p]\n",(void*)Lj,(void*)Li);
           }
           // delete L[j],
-          Li=L; 
+          Li=L;
           if (Lj_prev!=NULL)
           {
             Lj=Lj_prev;

@@ -245,7 +245,7 @@ extern BOOLEAN  pVectorOut;
  *
  ***************************************************************/
 inline int pWeight(int i, const ring R = currRing){ return p_Weight(i, R); }
- 
+
 
 static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 #define pWTotaldegree(p) p_WTotaldegree(p,currRing)
@@ -305,7 +305,7 @@ BOOLEAN   pIsHomogeneous (poly p);
 // component == comp and *p of all other monoms *lq == pLength(*q)
 // On return all components pf *q == 0
 inline void pTakeOutComp(poly *p, long comp, poly *q, int *lq, const ring R = currRing)
-{ 
+{
   return p_TakeOutComp(p, comp, q, lq, R);
 }
 

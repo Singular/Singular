@@ -84,7 +84,7 @@ poly p_Mult_nn_pthread(poly p, const number n, const ring r)
       thread_data_array[t].n = n;
       thread_data_array[t].r = r;
       //p_Mult_nn_doMult(&(thread_data_array[t]));
-      rc = pthread_create(&threads[t], &attr, p_Mult_nn_doMult, 
+      rc = pthread_create(&threads[t], &attr, p_Mult_nn_doMult,
         (void *) &thread_data_array[t]);
       if (rc)
       {
@@ -107,7 +107,7 @@ poly p_Mult_nn_pthread(poly p, const number n, const ring r)
         exit(-1);
       }
     }
- 
+
     return q;
   }
   else

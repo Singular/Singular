@@ -70,14 +70,14 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(theImageRing))
   {
-    if ((rIsPluralRing(sourcering)) && (ncRingType(sourcering)!=nc_comm)) 
+    if ((rIsPluralRing(sourcering)) && (ncRingType(sourcering)!=nc_comm))
     {
       Werror("Sorry, not yet implemented for noncomm. rings");
       return NULL;
     }
   }
 #endif
-  
+
   int i,j;
   poly p,/*pp,*/q;
   ideal temp1;
@@ -103,7 +103,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
   }
 
   const ring save_ring = currRing; if (currRing!=tmpR) rChangeCurrRing(tmpR); // due to kStd
-  
+
   if (id==NULL)
     j = 0;
   else
@@ -119,8 +119,8 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
     if ((i<IDELEMS(theMap)) && (theMap->m[i]!=NULL))
     {
       p = p_SortMerge(
-		      pChangeSizeOfPoly(theImageRing, theMap->m[i], 1, imagepvariables, tmpR),
-		      tmpR);
+                      pChangeSizeOfPoly(theImageRing, theMap->m[i], 1, imagepvariables, tmpR),
+                      tmpR);
       p=p_Add_q(p,q,tmpR);
     }
     else
@@ -133,14 +133,14 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
   for (i=sourcering->N;i<sourcering->N+j0;i++)
   {
     temp1->m[i] = p_SortMerge(
-			      pChangeSizeOfPoly(theImageRing, id->m[i-sourcering->N], 1, imagepvariables, tmpR),
-			      tmpR);
+                              pChangeSizeOfPoly(theImageRing, id->m[i-sourcering->N], 1, imagepvariables, tmpR),
+                              tmpR);
   }
   for (i=sourcering->N+j0;i<sourcering->N+j;i++)
   {
     temp1->m[i] = p_SortMerge(
-			      pChangeSizeOfPoly(theImageRing, theImageRing->qideal->m[i-sourcering->N-j0], 1, imagepvariables, tmpR),
-			      tmpR);
+                              pChangeSizeOfPoly(theImageRing, theImageRing->qideal->m[i-sourcering->N-j0], 1, imagepvariables, tmpR),
+                              tmpR);
   }
   // we ignore here homogenity - may be changed later:
 
@@ -162,8 +162,8 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
     if (p!=NULL)
     {
       q = p_SortMerge(
-		      pChangeSizeOfPoly(tmpR, p, imagepvariables+1, N, sourcering),
-		      sourcering);
+                      pChangeSizeOfPoly(tmpR, p, imagepvariables+1, N, sourcering),
+                      sourcering);
       if (j>=IDELEMS(temp1))
       {
         pEnlargeSet(&(temp1->m),IDELEMS(temp1),5);
@@ -177,7 +177,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
   idSkipZeroes(temp1);
 
   if (currRing!=save_ring) rChangeCurrRing(save_ring);
-  
+
   rDelete(tmpR);
   return temp1;
 }

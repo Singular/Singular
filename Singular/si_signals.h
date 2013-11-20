@@ -51,11 +51,11 @@ SI_EINTR_SAVE_FUNC(pid_t, wait, (int *status), (status))
 SI_EINTR_SAVE_FUNC(pid_t, waitpid, (pid_t pid, int *status, int options),
                    (pid, status, options))
 
-//SI_EINTR_SAVE_FUNC(int, waitid, 
+//SI_EINTR_SAVE_FUNC(int, waitid,
 //                   (idtype_t idtype, id_t id, siginfo_t *infop, int options),
 //                   (idtype, id, infop, options))
 
-SI_EINTR_SAVE_FUNC(ssize_t,  read, (int fd, void *buf, size_t count), 
+SI_EINTR_SAVE_FUNC(ssize_t,  read, (int fd, void *buf, size_t count),
                    (fd, buf, count))
 
 
@@ -104,7 +104,7 @@ si_nanosleep(const struct timespec *req, struct timespec *rem) {
   {
     res = nanosleep(req, rem);
   } while((rem != NULL) && (res < 0) && (errno == EINTR));
-  return res;   
+  return res;
 }
 
 static inline unsigned int
@@ -124,7 +124,7 @@ SI_EINTR_SAVE_FUNC(int, dup2, (int oldfd, int newfd), (oldfd, newfd))
 
 SI_EINTR_SAVE_FUNC(int, unlink, (const char *pathname), (pathname))
 
-SI_EINTR_SAVE_SCANF(int, vscanf, 
+SI_EINTR_SAVE_SCANF(int, vscanf,
 		   (const char *format, va_list ap),
 		   (format, ap))
 
@@ -138,7 +138,7 @@ int si_scanf(const char *format, ...)
   return res;
 }
 
-SI_EINTR_SAVE_SCANF(int, vfscanf, 
+SI_EINTR_SAVE_SCANF(int, vfscanf,
 		   (FILE *stream, const char *format, va_list ap),
 		   (stream, format, ap))
 
@@ -152,11 +152,11 @@ si_fscanf(FILE *stream, const char *format, ...)
   return res;
 }
 
-SI_EINTR_SAVE_SCANF(int, vsscanf, 
+SI_EINTR_SAVE_SCANF(int, vsscanf,
 		   (const char *str, const char *format, va_list ap),
 		   (str, format, ap))
 
-static inline int 
+static inline int
 si_sscanf(const char *str, const char *format, ...)
 {
   va_list argptr;
@@ -175,7 +175,7 @@ SI_EINTR_SAVE_FUNC(int, lstat, (const char *path, struct stat *buf),
 
 
 SI_EINTR_SAVE_FUNC(int, sigaction,
-                   (int signum, const struct sigaction *act, 
+                   (int signum, const struct sigaction *act,
                     struct sigaction *oldact),
                    (signum, act, oldact))
 
@@ -184,7 +184,7 @@ SI_EINTR_SAVE_FUNC(int, sigaction,
 SI_EINTR_SAVE_FUNC(int, siginterrupt, (int sig, int flag),
                    (sig, flag))
 #else
-#define si_siginterrupt(arg1, arg2) 
+#define si_siginterrupt(arg1, arg2)
 #endif
 
 

@@ -16,7 +16,7 @@
 BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt);
 
 #if 0
-extern "C" 
+extern "C"
 {
   void   Print(char* fmt, ...);
   void   PrintLn();
