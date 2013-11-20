@@ -2918,8 +2918,9 @@ void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, i
       // Print("j:%d, Ll:%d\n",j,strat->Ll);
 //      if (((unsigned long) pGetCoeff(h) % (unsigned long) pGetCoeff(strat->S[j]) != 0) &&
 //         ((unsigned long) pGetCoeff(strat->S[j]) % (unsigned long) pGetCoeff(h) != 0))
-      if ( iCompH == pGetComp(strat->S[j])
+      if (( iCompH == pGetComp(strat->S[j])
       || (0 == pGetComp(strat->S[j])))
+      && ((iCompH<=strat->syzComp)||(strat->syzComp==0)))
       {
         enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR);
       }
