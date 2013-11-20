@@ -399,6 +399,12 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
       {
         Off(SW_USE_NTL_GCD_0);
         r=extgcd(f,g,a,b);
+        if (isOn(SW_RATIONAL))
+        {
+          a/=r.lc();
+          b/=r.lc();
+          r/=r.lc();
+        }
         On(SW_USE_NTL_GCD_0);
       }
     }
@@ -415,7 +421,7 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
       {
         Off(SW_USE_NTL_GCD_0);
         r=extgcd(f,g,a,b);
-        if i(isOn(SW_RATIONAL))
+        if (isOn(SW_RATIONAL))
         {
           a/=r.lc();
           b/=r.lc();
