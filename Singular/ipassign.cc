@@ -1124,8 +1124,16 @@ static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
     }
     hh = hh->next;
   }
-  if (IDINTVEC((idhdl)l->data)!=NULL) delete IDINTVEC((idhdl)l->data);
-  IDINTVEC((idhdl)l->data)=iv;
+  if (l->rtyp==IDHDL)
+  {
+    if (IDINTVEC((idhdl)l->data)!=NULL) delete IDINTVEC((idhdl)l->data);
+    IDINTVEC((idhdl)l->data)=iv;
+  }
+  else
+  {
+    if (l->data!=NULL) delete ((intvec*)l->data);
+    l->data=(char*)iv;
+  }
   return FALSE;
 }
 static BOOLEAN jjA_L_BIGINTMAT(leftv l,leftv r,bigintmat *bim)
@@ -1357,11 +1365,23 @@ static BOOLEAN jiAssign_list(leftv l, leftv r)
   BOOLEAN b;
   if (/*(ld->rtyp!=LIST_CMD)
   &&*/(ld->e==NULL)
-  &&(ld->Typ()!=r->Typ()))
+  && (ld->Typ()!=r->Typ()))
   {
     sleftv tmp;
     memset(&tmp,0,sizeof(sleftv));
     tmp.rtyp=DEF_CMD;
+    b=iiAssign(&tmp,r);
+    ld->CleanUp();
+    memcpy(ld,&tmp,sizeof(sleftv));
+  }
+  else if ((ld->e==NULL)
+  && (ld->Typ()==r->Typ())
+  && (ld->Typ()<MAX_TOK))
+  {
+    sleftv tmp;
+    memset(&tmp,0,sizeof(sleftv));
+    tmp.rtyp=r->Typ();
+    tmp.data=(char*)idrecDataInit(r->Typ());
     b=iiAssign(&tmp,r);
     ld->CleanUp();
     memcpy(ld,&tmp,sizeof(sleftv));
