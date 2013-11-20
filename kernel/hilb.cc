@@ -16,10 +16,23 @@
 #include <misc/intvec.h>
 #include <kernel/hutil.h>
 #include <kernel/stairc.h>
+//ADICHANGES:
+#include <kernel/ideals.h>
+#include <kernel/kstd1.h>
+#include<gmp.h>
+#include<vector>
+
 
 static int  **Qpol;
 static int  *Q0, *Ql;
 static int  hLength;
+//ADICHANGES
+static int NNN;
+static mpz_t ec;
+static mpz_ptr hilbertcoef = (mpz_ptr)omAlloc(NNN*sizeof(mpz_t));
+std::vector<int> hilbertpowers;
+std::vector<int> hilbertpowerssorted;
+    
 
 static int hMinModulweight(intvec *modulweight)
 {
@@ -212,10 +225,423 @@ static void hWDegree(intvec *wdegree)
     }
   }
 }
+// ---------------------------------- ADICHANGES ---------------------------------------------
+//!!!!!!!!!!!!!!!!!!!!! Just for Monomial Ideals !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+void PutInVector(int degvalue, int oldposition, int where)
+{
+    hilbertpowerssorted.resize(hilbertpowerssorted.size()+2);
+    int i;
+    for(i=hilbertpowerssorted.size()-1;i>=where+2;i--)
+    {
+        hilbertpowerssorted[i] = hilbertpowerssorted[i-2];
+    }
+    hilbertpowerssorted[where] = degvalue;
+    hilbertpowerssorted[where+1] = oldposition;
+}
 
+void SortPowerVec()
+{
+    int i,j;
+    int test;
+    bool flag;
+    hilbertpowerssorted.resize(2);
+    hilbertpowerssorted[0] = hilbertpowers[0];
+    hilbertpowerssorted[1] = 0;
+    for(i=1;i<hilbertpowers.size();i++)
+    {
+        flag=TRUE;
+        if(hilbertpowers[i]<=hilbertpowerssorted[0])
+        {
+            flag=FALSE;
+            PutInVector(hilbertpowers[i], i, 0);
+        }
+        if(hilbertpowers[i]>=hilbertpowerssorted[hilbertpowerssorted.size()-2])
+        {
+            flag=FALSE;
+            PutInVector(hilbertpowers[i], i, hilbertpowerssorted.size()-2);
+        }
+        if(flag==TRUE)
+        {
+            for(j=2;(j<=hilbertpowerssorted.size()-4)&&(flag);j=j+2)
+            {
+                if(hilbertpowers[i]<=hilbertpowerssorted[j])
+                {
+                    flag=FALSE;
+                    PutInVector(hilbertpowers[i], i, j);
+                }
+            }
+        }
+        //printf("\n----------------TEST----------------\n");
+        //for(test=0;test<hilbertpowerssorted.size();test++)
+        //    {
+        //        printf(" %d ", hilbertpowerssorted[test]);
+        //    }   
+        
+    }
+}
+
+int DegMon(poly p, ring tailRing)
+{
+    int i,deg;
+    deg = 0;
+    for(i=0;i<=tailRing->N;i++)
+    {
+        deg = deg + p_GetExp(p, i, tailRing);
+    }
+    return(deg);
+}
+
+poly SearchP(ideal I, ring tailRing)
+{
+    int i,j,exp;
+    poly res;
+    for(i=IDELEMS(I)-1;i>=0;i--)
+    {
+        if(DegMon(I->m[i], tailRing)>=2)
+        {
+            res = p_ISet(1, tailRing);
+            res = p_Copy(I->m[i], tailRing);
+            for(j=0;j<=tailRing->N;j++)
+            {
+                exp = p_GetExp(I->m[i], j, tailRing);
+                if(exp > 0)
+                {
+                    p_SetExp(res, j, exp - 1, tailRing);
+                    return(res);
+                }
+            }
+        }
+    }
+    return(NULL);
+}
+
+poly ChoosePVar (ideal I, ring tailRing)
+{
+    bool flag=TRUE;
+    int i,j;
+    poly res;
+    for(i=1;i<=tailRing->N;i++)
+    {
+        flag=TRUE;
+        for(j=IDELEMS(I)-1;(j>=0)&&(flag);j--)
+        {
+            if(p_GetExp(I->m[j], i, tailRing)>0)
+            {
+                flag=FALSE;
+            }
+        }
+        
+        if(flag == TRUE)
+        {
+            res = p_ISet(1, tailRing);
+            p_SetExp(res, i, 1, tailRing);
+            //idPrint(I);
+            //pWrite(res);
+            return(res);
+        }
+    }
+    return(NULL); //i.e. it is the maximal ideal
+}
+
+ideal idSimplify(ideal I, ring tailRing)
+{
+    int i,j;
+    bool flag;
+    /*std::vector<int>  var;
+    for(i=0;i<=tailRing->N;i++)
+    {
+        if(p_GetExp(I->[IDELEMS(I)-1], tailRing)>0)
+        {
+            var.resize(var.size()+1);
+            var[var.size()-1] = i;
+        }
+    }
+    */
+    for(i=IDELEMS(I)-2;i>=0;i--)
+    {
+        flag=TRUE;
+        for(j=0;(j<=tailRing->N)&&(flag);j++)
+        {
+            if(p_GetExp(I->m[i], j, tailRing) < p_GetExp(I->m[IDELEMS(I)-1], j, tailRing))
+            {
+                flag=FALSE;
+            }
+        }
+        if(flag)
+        {
+            I->m[i]=NULL;
+        }
+    }
+    idSkipZeroes(I);
+    return(I);
+}
+
+
+void eulerchar (ideal I, ring tailRing)
+{
+    //gmp_printf("\nEuler char: %Zd\n", ec);
+    mpz_t dummy;
+    if( idElem(I) == 0)
+    {
+        mpz_init(dummy);
+        //change: era 1 in loc de 0
+        mpz_set_si(dummy, 1);
+        mpz_sub(ec, ec, dummy);
+        return;
+    }
+    if( idElem(I) == 1)
+    {
+        if(!p_IsOne(I->m[0], tailRing))
+        {
+            //aici nu era nimic
+            //mpz_set_si(dummy, 1);
+            //mpz_add(ec, ec, dummy);
+            return;
+        }
+        else
+        {
+            mpz_init(dummy);
+            mpz_set_si(dummy, 1);
+            mpz_sub(ec, ec, dummy);
+            return;
+        }
+    }
+    ideal p = idInit(1,1);
+    p->m[0] = SearchP(I, tailRing);
+    //idPrint(I);
+    //printf("\nSearchP founded: \n");pWrite(p->m[0]);
+    if(p->m[0] == NULL)
+    {
+        mpz_init(dummy);
+        mpz_set_si(dummy, IDELEMS(I)-1);
+        mpz_add(ec, ec, dummy);
+        return;
+    }
+    ideal Ip = idQuot(I,p,TRUE,TRUE);
+    ideal Iplusp = id_Add(I,p,tailRing);
+    Iplusp=idSimplify(Iplusp, tailRing);
+    //mpz_t i,j;
+    //i = eulerchar(Ip, ec, tailRing);
+    //j = eulerchar(Iplusp, ec, tailRing);
+    //mpz_add(ec, i,j);
+    eulerchar(Ip, tailRing);
+    eulerchar(Iplusp, tailRing);
+    return;
+}
+
+poly SqFree (ideal I, ring tailRing)
+{
+    int i,j;
+    bool flag=TRUE;
+    poly notsqrfree = NULL;
+    for(i=IDELEMS(I)-1;(i>=0)&&(flag);i--)
+    {
+        for(j=0;(j<=tailRing->N)&&(flag);j++)
+        {
+            if(p_GetExp(I->m[i],j,tailRing)>1)
+            {
+                flag=FALSE;
+                notsqrfree = p_ISet(1,tailRing);
+                p_SetExp(notsqrfree,j,1,tailRing);
+            }
+        }
+    }
+    return(notsqrfree);
+}
+
+void rouneslice(ideal I, ideal S, poly q, ring tailRing, poly x)
+{
+    int i,j;
+    int dummy;
+    mpz_t dummympz;
+    poly m;
+    ideal p, koszsimp;
+    I = idMinBase(I);
+    
+    //Work on it
+    //----------- PRUNING OF S ---------------
+    S = idMinBase(S);
+    for(i=IDELEMS(S)-1;i>=0;i--)
+    {
+        if(kNF(I,NULL,S->m[i],NULL,NULL)==NULL)
+        {
+            S->m[i]=NULL;
+        }
+    }
+    idSkipZeroes(S);
+    //----------------------------------------
+    for(i=IDELEMS(I)-1;i>=0;i--)
+    {
+        m = p_Copy(I->m[i],tailRing);
+        for(j=0;j<=tailRing->N;j++)
+        {
+            dummy = p_GetExp(m,j,tailRing);
+            if(dummy > 0)
+            {
+                p_SetExp(m,j,dummy-1,tailRing);
+            }       
+        }
+        if(kNF(S,NULL,m,NULL,NULL)==NULL)
+        {
+            I->m[i]=NULL;
+            //printf("\n Check if m is in S: \n");pWrite(m);idPrint(S);
+            //printf("\n Deleted, since pi(m) is in S\n");pWrite(m);
+        }
+    }
+    idSkipZeroes(I);
+    
+    //----------- MORE PRUNING OF S ------------
+    //strictly divide???    
+    //------------------------------------------
+
+    //printf("Ideal I: \n");idPrint(I);
+    //printf("Ideal S: \n");idPrint(S);
+    //printf("Poly  q: \n");pWrite(q);
+    if(idElem(I)==0)
+    {
+        //I = 0
+        //printf("\nx does not divide lcm(I)");
+        //pWrite(x);pWrite(m);idPrint(I);
+        printf("\nEmpty Set: ");pWrite(q);
+        return;
+    }
+    m = p_ISet(1,tailRing);
+    for(i=0;i<=tailRing->N;i++)
+    {
+        dummy=0;
+        for(j=IDELEMS(I)-1;j>=0;j--)
+        {
+            if(p_GetExp(I->m[j],i,tailRing) > dummy)
+            {
+                dummy = p_GetExp(I->m[j],i,tailRing);
+            }
+        }
+        p_SetExp(m,i,dummy,tailRing);
+    }
+    p_Setm(m,tailRing);
+    if(p_DivisibleBy(x,m,tailRing)==FALSE)
+    {
+        //printf("\nx does not divide lcm(I)");
+        //pWrite(x);pWrite(m);idPrint(I);
+        //printf("\nEmpty set");pWrite(q);
+        return;
+    }
+    m = SqFree(I, tailRing);
+    koszsimp = idInit(IDELEMS(I),1);
+    if(m==NULL)
+    {
+        printf("\n      Corner: ");
+        pWrite(q);
+        printf("\n      With the facets of the simplex:\n");
+        for(i=IDELEMS(I)-1;i>=0;i--)
+        {
+            m = p_ISet(1,tailRing);
+            //m = p_Divide(x,I->m[i],tailRing);
+            for(j=tailRing->N; j>=0; j--)
+            {
+                p_SetExp(m,j, p_GetExp(x,j,tailRing)- p_GetExp(I->m[i],j,tailRing),tailRing);
+            }
+            printf("    ");
+            p_Setm(m, tailRing);
+            p_Write(m, tailRing);
+            koszsimp->m[i] = p_Copy(m, tailRing);
+        }
+        printf("\n Euler Characteristic = ");
+        mpz_init(dummympz);
+        eulerchar(koszsimp, tailRing);
+        //gmp_printf("dummy %Zd \n", dummympz);
+        gmp_printf("ec %Zd \n", ec);
+        mpz_set(dummympz, ec);
+        mpz_sub(ec, ec, ec);
+        hilbertcoef = (mpz_ptr)omRealloc(hilbertcoef, (NNN+1)*sizeof(mpz_t));
+        mpz_init(&hilbertcoef[NNN]);
+        mpz_set(&hilbertcoef[NNN], dummympz);
+        hilbertpowers.resize(NNN+1);
+        hilbertpowers[NNN] = DegMon(q, tailRing);
+        NNN++;
+        return;
+    }
+    if(IDELEMS(S)!=1)
+    {
+        m = SearchP(S, tailRing);
+        if(m == NULL)
+        {
+            m = ChoosePVar(S, tailRing);
+        }
+    }
+    p = idInit(1,1);
+    p->m[0] = m;
+    printf("Poly  p: \n");pWrite(m);
+    ideal Ip = idQuot(I,p,TRUE,TRUE);
+    ideal Sp = idQuot(S,p,TRUE,TRUE);
+    ideal Splusp = id_Add(S,p,tailRing);
+    Splusp = idSimplify(Splusp, tailRing);
+    poly pq = pp_Mult_mm(q,m,tailRing);
+    rouneslice(Ip, Sp, pq, tailRing, x);
+    rouneslice(I, Splusp, q, tailRing, x);
+    return;
+}
+
+void slicehilb(ideal I, ring tailRing)
+{
+    printf("Adi changes are here: \n");
+    int i;
+    ideal S = idInit(0,1);
+    poly q = p_ISet(1,tailRing);
+    ideal X = idInit(1,1);
+    X->m[0]=p_One(tailRing);
+    for(i=1;i<=tailRing->N;i++)
+    {
+            p_SetExp(X->m[0],i,1,tailRing);   
+    }
+    p_Setm(X->m[0],tailRing);
+    I = id_Mult(I,X,tailRing);
+    printf("\n-------------RouneSlice--------------\n");
+    rouneslice(I,S,q,tailRing,X->m[0]);
+    for(i=0;i<NNN;i++)
+    {
+        gmp_printf(" %Zd ", &hilbertcoef[i]);
+    }
+    printf("\n");
+    for(i=0;i<NNN;i++)
+    {
+        printf(" %d ", hilbertpowers[i]);
+    }
+    SortPowerVec(); 
+    printf("\n");
+    for(i=0;i<hilbertpowerssorted.size();i++)
+    {
+        printf(" %d ", hilbertpowerssorted[i]);
+    }
+    mpz_t coefhilb;
+    mpz_t dummy;
+    mpz_init(coefhilb);
+    mpz_init(dummy);
+    printf("\n//        1 t^0");
+    for(i=0;i<hilbertpowerssorted.size();i=i+2)
+    {
+        mpz_set(dummy, &hilbertcoef[hilbertpowerssorted[i+1]]);
+        mpz_add(coefhilb, coefhilb, dummy);
+        while((hilbertpowerssorted[i]==hilbertpowerssorted[i+2]) && (i<=hilbertpowerssorted.size()-2))
+        {
+            i=i+2;
+            mpz_add(coefhilb, coefhilb, &hilbertcoef[hilbertpowerssorted[i+1]]);
+        }
+        if(mpz_sgn(coefhilb)!=0)
+        {
+            gmp_printf("\n//        %Zd t^%d",coefhilb,hilbertpowerssorted[i]);
+        }
+        mpz_sub(coefhilb, coefhilb, coefhilb);
+    }
+    omFreeSize(hilbertcoef, NNN*sizeof(mpz_t));
+    printf("\n-------------------------------------\n");
+}
+
+// -------------------------------- END OF CHANGES -------------------------------------------
 static intvec * hSeries(ideal S, intvec *modulweight,
                 int /*notstc*/, intvec *wdegree, ideal Q, ring tailRing)
 {
+  slicehilb(S,tailRing); // ADICHANGES
   intvec *work, *hseries1=NULL;
   int  mc;
   int  p0;
@@ -470,4 +896,6 @@ void hLookSeries(ideal S, intvec *modulweight, ideal Q)
     delete hseries1;
   delete hseries2;
 }
+
+
 
