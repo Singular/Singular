@@ -227,7 +227,7 @@ static void hWDegree(intvec *wdegree)
 }
 // ---------------------------------- ADICHANGES ---------------------------------------------
 //!!!!!!!!!!!!!!!!!!!!! Just for Monomial Ideals !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-void PutInVector(int degvalue, int oldposition, int where)
+static void PutInVector(int degvalue, int oldposition, int where)
 {
     hilbertpowerssorted.resize(hilbertpowerssorted.size()+2);
     int i;
@@ -239,7 +239,7 @@ void PutInVector(int degvalue, int oldposition, int where)
     hilbertpowerssorted[where+1] = oldposition;
 }
 
-void SortPowerVec()
+static void SortPowerVec()
 {
     int i,j;
     int test;
@@ -255,7 +255,7 @@ void SortPowerVec()
             flag=FALSE;
             PutInVector(hilbertpowers[i], i, 0);
         }
-        if(hilbertpowers[i]>=hilbertpowerssorted[hilbertpowerssorted.size()-2])
+        if((hilbertpowers[i]>=hilbertpowerssorted[hilbertpowerssorted.size()-2]) && (flag == TRUE))
         {
             flag=FALSE;
             PutInVector(hilbertpowers[i], i, hilbertpowerssorted.size()-2);
@@ -280,18 +280,18 @@ void SortPowerVec()
     }
 }
 
-int DegMon(poly p, ring tailRing)
+static int DegMon(poly p, ring tailRing)
 {
     int i,deg;
     deg = 0;
-    for(i=0;i<=tailRing->N;i++)
+    for(i=1;i<=tailRing->N;i++)
     {
         deg = deg + p_GetExp(p, i, tailRing);
     }
     return(deg);
 }
 
-poly SearchP(ideal I, ring tailRing)
+static poly SearchP(ideal I, ring tailRing)
 {
     int i,j,exp;
     poly res;
@@ -301,7 +301,7 @@ poly SearchP(ideal I, ring tailRing)
         {
             res = p_ISet(1, tailRing);
             res = p_Copy(I->m[i], tailRing);
-            for(j=0;j<=tailRing->N;j++)
+            for(j=1;j<=tailRing->N;j++)
             {
                 exp = p_GetExp(I->m[i], j, tailRing);
                 if(exp > 0)
@@ -315,7 +315,7 @@ poly SearchP(ideal I, ring tailRing)
     return(NULL);
 }
 
-poly ChoosePVar (ideal I, ring tailRing)
+static poly ChoosePVar (ideal I, ring tailRing)
 {
     bool flag=TRUE;
     int i,j;
@@ -343,12 +343,12 @@ poly ChoosePVar (ideal I, ring tailRing)
     return(NULL); //i.e. it is the maximal ideal
 }
 
-ideal idSimplify(ideal I, ring tailRing)
+static ideal idSimplify(ideal I, ring tailRing)
 {
     int i,j;
     bool flag;
     /*std::vector<int>  var;
-    for(i=0;i<=tailRing->N;i++)
+    for(i=1;i<=tailRing->N;i++)
     {
         if(p_GetExp(I->[IDELEMS(I)-1], tailRing)>0)
         {
@@ -360,7 +360,7 @@ ideal idSimplify(ideal I, ring tailRing)
     for(i=IDELEMS(I)-2;i>=0;i--)
     {
         flag=TRUE;
-        for(j=0;(j<=tailRing->N)&&(flag);j++)
+        for(j=1;(j<=tailRing->N)&&(flag);j++)
         {
             if(p_GetExp(I->m[i], j, tailRing) < p_GetExp(I->m[IDELEMS(I)-1], j, tailRing))
             {
@@ -377,14 +377,13 @@ ideal idSimplify(ideal I, ring tailRing)
 }
 
 
-void eulerchar (ideal I, ring tailRing)
+/*static void eulerchar (ideal I, ring tailRing)
 {
     //gmp_printf("\nEuler char: %Zd\n", ec);
     mpz_t dummy;
     if( idElem(I) == 0)
     {
         mpz_init(dummy);
-        //change: era 1 in loc de 0
         mpz_set_si(dummy, 1);
         mpz_sub(ec, ec, dummy);
         return;
@@ -393,9 +392,6 @@ void eulerchar (ideal I, ring tailRing)
     {
         if(!p_IsOne(I->m[0], tailRing))
         {
-            //aici nu era nimic
-            //mpz_set_si(dummy, 1);
-            //mpz_add(ec, ec, dummy);
             return;
         }
         else
@@ -420,23 +416,78 @@ void eulerchar (ideal I, ring tailRing)
     ideal Ip = idQuot(I,p,TRUE,TRUE);
     ideal Iplusp = id_Add(I,p,tailRing);
     Iplusp=idSimplify(Iplusp, tailRing);
-    //mpz_t i,j;
-    //i = eulerchar(Ip, ec, tailRing);
-    //j = eulerchar(Iplusp, ec, tailRing);
-    //mpz_add(ec, i,j);
     eulerchar(Ip, tailRing);
     eulerchar(Iplusp, tailRing);
     return;
+}*/
+
+static bool JustVar(ideal I, ring tailRing)
+{
+    int i,j;
+    bool foundone;
+    for(i=0;i<=IDELEMS(I)-1;i++)
+    {
+        foundone = FALSE;
+        for(j = 1;j<=tailRing->N;j++)
+        {
+            if(p_GetExp(I->m[i], j, tailRing)>0)
+            {
+                if(foundone == TRUE)
+                {
+                    return(FALSE);
+                }
+                foundone = TRUE;
+            }
+        }        
+    }
+    return(TRUE);
 }
 
-poly SqFree (ideal I, ring tailRing)
+static void eulerchar (ideal I, ring tailRing, int variables)
+{
+    //gmp_printf("\nEuler char: %Zd\n", ec);
+    mpz_t dummy;
+    if(JustVar(I, tailRing) == TRUE)
+    {
+        if(IDELEMS(I) == variables)
+        {
+            mpz_init(dummy);
+            if((variables % 2) == 0)
+                {mpz_set_si(dummy, 1);}
+            else
+                {mpz_set_si(dummy, -1);}
+            mpz_add(ec, ec, dummy);
+        }
+        return;        
+    }
+    ideal p = idInit(1,1);
+    p->m[0] = SearchP(I, tailRing);
+    //idPrint(I);
+    //printf("\nSearchP founded: \n");pWrite(p->m[0]);
+    ideal Ip = idQuot(I,p,TRUE,TRUE);
+    ideal Iplusp = id_Add(I,p,tailRing);
+    Iplusp=idSimplify(Iplusp, tailRing);
+    int i,howmanyvarinp = 0;
+    for(i = 1;i<=tailRing->N;i++)
+    {
+        if(p_GetExp(p->m[0],i,tailRing)>0)
+        {
+            howmanyvarinp++;
+        }
+    }    
+    eulerchar(Ip, tailRing, variables-howmanyvarinp);
+    eulerchar(Iplusp, tailRing, variables);
+    return;
+}
+
+static poly SqFree (ideal I, ring tailRing)
 {
     int i,j;
     bool flag=TRUE;
     poly notsqrfree = NULL;
     for(i=IDELEMS(I)-1;(i>=0)&&(flag);i--)
     {
-        for(j=0;(j<=tailRing->N)&&(flag);j++)
+        for(j=1;(j<=tailRing->N)&&(flag);j++)
         {
             if(p_GetExp(I->m[i],j,tailRing)>1)
             {
@@ -449,7 +500,7 @@ poly SqFree (ideal I, ring tailRing)
     return(notsqrfree);
 }
 
-void rouneslice(ideal I, ideal S, poly q, ring tailRing, poly x)
+static void rouneslice(ideal I, ideal S, poly q, ring tailRing, poly x)
 {
     int i,j;
     int dummy;
@@ -473,7 +524,7 @@ void rouneslice(ideal I, ideal S, poly q, ring tailRing, poly x)
     for(i=IDELEMS(I)-1;i>=0;i--)
     {
         m = p_Copy(I->m[i],tailRing);
-        for(j=0;j<=tailRing->N;j++)
+        for(j=1;j<=tailRing->N;j++)
         {
             dummy = p_GetExp(m,j,tailRing);
             if(dummy > 0)
@@ -506,7 +557,7 @@ void rouneslice(ideal I, ideal S, poly q, ring tailRing, poly x)
         return;
     }
     m = p_ISet(1,tailRing);
-    for(i=0;i<=tailRing->N;i++)
+    for(i=1;i<=tailRing->N;i++)
     {
         dummy=0;
         for(j=IDELEMS(I)-1;j>=0;j--)
@@ -537,10 +588,13 @@ void rouneslice(ideal I, ideal S, poly q, ring tailRing, poly x)
         {
             m = p_ISet(1,tailRing);
             //m = p_Divide(x,I->m[i],tailRing);
-            for(j=tailRing->N; j>=0; j--)
+            //      THIS IS FOR THE OTHER IDEA FOR COMPUTING THE EULER CHARACTERISTIC!!!! INSTEAD
+            m = I->m[i];
+            /*for(j=tailRing->N; j>=1; j--)
             {
                 p_SetExp(m,j, p_GetExp(x,j,tailRing)- p_GetExp(I->m[i],j,tailRing),tailRing);
-            }
+            }*/
+            
             printf("    ");
             p_Setm(m, tailRing);
             p_Write(m, tailRing);
@@ -548,7 +602,7 @@ void rouneslice(ideal I, ideal S, poly q, ring tailRing, poly x)
         }
         printf("\n Euler Characteristic = ");
         mpz_init(dummympz);
-        eulerchar(koszsimp, tailRing);
+        eulerchar(koszsimp, tailRing, tailRing->N);
         //gmp_printf("dummy %Zd \n", dummympz);
         gmp_printf("ec %Zd \n", ec);
         mpz_set(dummympz, ec);
@@ -582,7 +636,7 @@ void rouneslice(ideal I, ideal S, poly q, ring tailRing, poly x)
     return;
 }
 
-void slicehilb(ideal I, ring tailRing)
+static void slicehilb(ideal I, ring tailRing)
 {
     printf("Adi changes are here: \n");
     int i;
