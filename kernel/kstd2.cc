@@ -47,7 +47,7 @@
 //#define DEBUGF5 1
 #endif
 
-#define F5C       0
+#define F5C       1
 #if F5C
   #define F5CTAILRED 1
 #endif
@@ -55,11 +55,13 @@
 #define SBA_PRODUCT_CRITERION         0
 #define SBA_PRINT_ZERO_REDUCTIONS     1
 #define SBA_PRINT_REDUCTION_STEPS     1
+#define SBA_PRINT_OPERATIONS          1
 #define SBA_PRINT_SIZE_G              1
 #define SBA_PRINT_SIZE_SYZ            1
 #define SBA_PRINT_PRODUCT_CRITERION   0
 
 long sba_reduction_steps;
+long sba_operations;
 /***********************************************
  * SBA stuff -- done
 ***********************************************/
@@ -622,7 +624,12 @@ int redSig (LObject* h,kStrategy strat)
 #endif
     sigSafe = ksReducePolySig(h, &(strat->T[ii]), strat->S_2_R[ii], NULL, NULL, strat);
 #if SBA_PRINT_REDUCTION_STEPS
-    sba_reduction_steps++;
+    if (sigSafe != 3)
+      sba_reduction_steps++;
+#endif
+#if SBA_PRINT_OPERATIONS
+    if (sigSafe != 3)
+      sba_operations  +=  pLength(strat->T[ii].p);
 #endif
     // if reduction has taken place, i.e. the reduction was sig-safe
     // otherwise start is already at the next position and the loop
@@ -1513,6 +1520,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   long size_syz           = 0;
   // global variable
   sba_reduction_steps     = 0;
+  sba_operations          = 0;
 
   ideal F = F0;
   ring sRing, currRingOld;
@@ -1539,7 +1547,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
   LObject L;
-  // BOOLEAN withT     = FALSE;
+  BOOLEAN withT     = FALSE;
   strat->max_lower_index = 0;
 
   //initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
@@ -2065,6 +2073,9 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #if SBA_PRINT_REDUCTION_STEPS
   printf("TOP S-REDUCTIONS:  %ld\n",sba_reduction_steps);
 #endif
+#if SBA_OPERATIONS
+  printf("OPERATIONS:        %ld\n",sba_operations);
+#endif
 #if SBA_PRINT_SIZE_G
   printf("SIZE OF G:         %ld\n",size_g);
 #endif
@@ -2079,6 +2090,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   size_syz            = 0;
   product_criterion   = 0;
   sba_reduction_steps = 0;
+  sba_operations      = 0;
   return (strat->Shdl);
 }
 
@@ -2401,6 +2413,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
       // in the ring case we cannot expect LC(f) = 1,
       // therefore we call pContent instead of pNorm
 #if F5CTAILRED
+      BOOLEAN withT = TRUE;
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
         strat->P.pCleardenom();
