@@ -259,7 +259,7 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
         if (! newstruct_Op1(l->Typ(), &tmp, r))  return newstruct_Assign(l, &tmp);
       }
     }
-    if (l->Typ()==r->Typ())
+    else /*if (l->Typ()==r->Typ())*/
     {
       if (l->Data()!=NULL)
       {
@@ -369,7 +369,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
             return r==NULL;
           }
           else if (RingDependend(nm->typ)
-	  || (al->m[nm->pos].RingDependend()))
+          || (al->m[nm->pos].RingDependend()))
           {
             if (al->m[nm->pos].data==NULL)
             {
@@ -401,14 +401,14 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
               currRing->ref++;
             }
           }
-	  else if ((nm->typ==DEF_CMD)||(nm->typ==LIST_CMD))
-	  {
-	    if (al->m[nm->pos-1].data==NULL)
-	    {
-	      al->m[nm->pos-1].data=(void*)currRing;
-	      if (currRing!=NULL) currRing->ref++;
-	    }
-	  }
+          else if ((nm->typ==DEF_CMD)||(nm->typ==LIST_CMD))
+          {
+            if (al->m[nm->pos-1].data==NULL)
+            {
+              al->m[nm->pos-1].data=(void*)currRing;
+              if (currRing!=NULL) currRing->ref++;
+            }
+          }
           Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
           r->start = nm->pos+1;
           memcpy(res,a1,sizeof(sleftv));
@@ -617,7 +617,11 @@ void newstruct_Print(blackbox *b,void *d)
     hh.typ=PROC_CMD;
     hh.data.pinf=p->p;
     sl=iiMake_proc(&hh,NULL,&tmp);
-    if (!sl) iiRETURNEXPR.CleanUp();
+    if (!sl)
+    {
+      if (iiRETURNEXPR.Typ()!=NONE) Warn("ignoring return value (%s)",Tok2Cmdname(iiRETURNEXPR.Typ()));
+      iiRETURNEXPR.CleanUp();
+    }
     iiRETURNEXPR.Init();
   }
   else
@@ -770,6 +774,12 @@ void newstructShow(newstruct_desc d)
     if (RingDependend(elem->typ)|| (elem->typ==DEF_CMD) ||(elem->typ==LIST_CMD))
       Print(">>r_%s<< at pos %d, shadow ring\n",elem->name,elem->pos-1);
     elem=elem->next;
+  }
+  newstruct_proc p=d->procs;
+  while (p!=NULL)
+  {
+    Print("op:%d(%s) with %d args -> %s\n",p->t,iiTwoOps(p->t),p->args,p->p->procname);
+    p=p->next;
   }
 }
 

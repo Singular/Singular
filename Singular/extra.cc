@@ -101,6 +101,7 @@
 #include "links/silink.h"
 #include "walk.h"
 #include <Singular/newstruct.h>
+#include <Singular/blackbox.h>
 #include <Singular/pyobject_setup.h>
 
 
@@ -3833,9 +3834,35 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
       return newstruct_set_proc((char*)h->Data(),(char*)h->next->Data(),
                                 (int)(long)h->next->next->next->Data(),
-				(procinfov)h->next->next->Data());
+                                (procinfov)h->next->next->Data());
     }
     return TRUE;
+  }
+  else
+  if (strcmp(sys_cmd,"newstruct")==0)
+  {
+    if ((h!=NULL) && (h->Typ()==STRING_CMD))
+    {
+      int id=0;
+      blackboxIsCmd((char*)h->Data(),id);
+      if (id>0)
+      {
+        blackbox *bb=getBlackboxStuff(id);
+	if (BB_LIKE_LIST(bb))
+	{
+          newstruct_desc desc=(newstruct_desc)bb->data;
+          newstructShow(desc);
+          return FALSE;
+	}
+      }
+    }
+    return TRUE;
+  }
+  else
+  if (strcmp(sys_cmd,"blackbox")==0)
+  {
+    printBlackboxTypes();
+    return FALSE;
   }
   else
 /*==================== reserved port =================*/
