@@ -256,7 +256,7 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
         if (! newstruct_Op1(l->Typ(), &tmp, r))  return newstruct_Assign(l, &tmp);
       }
     }
-    else /*if (l->Typ()==r->Typ())*/
+    if (l->Typ()==r->Typ())
     {
       if (l->Data()!=NULL)
       {
@@ -276,7 +276,6 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
       return FALSE;
     }
   }
-
   else
   {
     assume(l->Typ() > MAX_TOK);
