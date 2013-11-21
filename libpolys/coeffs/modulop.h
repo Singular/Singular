@@ -159,7 +159,7 @@ static inline BOOLEAN npIsZeroM (number  a, const coeffs)
 // }
 
 
-#define npNegM(A,r)      (number)(r->ch-(long)(A))
+#define npNegM(A,r)      (number)((long)r->ch-(long)(A))
 #define npEqualM(A,B,r)  ((A)==(B))
 
 
