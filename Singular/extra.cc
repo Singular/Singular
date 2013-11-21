@@ -3717,6 +3717,32 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     return TRUE;
   }
   else
+  if (strcmp(sys_cmd,"newstruct")==0)
+  {
+    if ((h!=NULL) && (h->Typ()==STRING_CMD))
+    {
+      int id=0;
+      blackboxIsCmd((char*)h->Data(),id);
+      if (id>0)
+      {
+        blackbox *bb=getBlackboxStuff(id);
+       if (BB_LIKE_LIST(bb))
+       {
+          newstruct_desc desc=(newstruct_desc)bb->data;
+          newstructShow(desc);
+          return FALSE;
+       }
+      }
+    }
+    return TRUE;
+  }
+  else
+  if (strcmp(sys_cmd,"blackbox")==0)
+  {
+    printBlackboxTypes();
+    return FALSE;
+  }
+  else
 /*==================== newstruct =================*/
   if (strcmp(sys_cmd,"newstruct")==0)
   {
