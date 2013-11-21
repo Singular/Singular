@@ -124,6 +124,12 @@ static inline number npSubM(number a, number b, const coeffs r)
   return (number)((long)a<(long)b ?
                        r->ch-(long)b+(long)a : (long)a-(long)b);
 }
+
+static inline number npNegM(number a, const coeffs r)
+{
+  return (number)((long)(r->ch)-(long)(a));
+}
+
 #else
 static inline number npAddM(number a, number b, const coeffs r)
 {
@@ -146,6 +152,19 @@ static inline number npSubM(number a, number b, const coeffs r)
 #endif
    return (number)res;
 }
+
+
+static inline number npNegM(number b, const coeffs r)
+{
+   long res =  - (long)b;
+#if SIZEOF_LONG == 8
+   res += (res >> 63) & r->ch;
+#else
+   res += (res >> 31) & r->ch;
+#endif
+   return (number)res;
+}
+
 #endif
 
 static inline BOOLEAN npIsZeroM (number  a, const coeffs)
@@ -159,7 +178,9 @@ static inline BOOLEAN npIsZeroM (number  a, const coeffs)
 // }
 
 
-#define npNegM(A,r)      (number)((long)r->ch-(long)(A))
+
+
+
 #define npEqualM(A,B,r)  ((A)==(B))
 
 
