@@ -203,7 +203,7 @@ LIB "solve.lib";
 LIB "poly.lib";
 LIB "elim.lib";
 LIB "linalg.lib";
-LIB "oldpolymake.lib";
+LIB "polymake.lib";
 LIB "primdec.lib";
 LIB "absfact.lib";
 LIB "hnoether.lib";
@@ -6909,7 +6909,7 @@ NOTE:        called by clearintmat"
 static proc intmatcoldelete (intmat w,int i)
 "USAGE:      intmatcoldelete(w,i); w intmat, i int
 RETURN:      intmat, the integer matrix w with the ith comlumn deleted
-NOTE:        the procedure is called by intmatsort and normalFan"
+NOTE:        the procedure is called by intmatsort and normalFanL"
 {
   if ((i<1) or (i>ncols(w)) or (ncols(w)==1))
   {

@@ -2,14 +2,14 @@
 // Tests for polymake lib
 LIB "tst.lib";
 tst_init();
-LIB "oldpolymake.lib";
+LIB "polymake.lib";
 ///////////////////////////////////////////////////////////////////////////
 // A) Test for Procedures using Polymake
 ///////////////////////////////////////////////////////////////////////////
 example polymakePolytope;
-example newtonPolytope;
+example newtonPolytopeP;
 example newtonPolytopeLP;
-example normalFan;
+example normalFanL;
 example groebnerFan;
 ///////////////////////////////////////////////////////////////////////////
 // B) Test for Procedures using Topcom
