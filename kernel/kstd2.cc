@@ -52,16 +52,23 @@
   #define F5CTAILRED 1
 #endif
 
-#define SBA_PRODUCT_CRITERION         0
-#define SBA_PRINT_ZERO_REDUCTIONS     1
-#define SBA_PRINT_REDUCTION_STEPS     1
-#define SBA_PRINT_OPERATIONS          1
-#define SBA_PRINT_SIZE_G              1
-#define SBA_PRINT_SIZE_SYZ            1
-#define SBA_PRINT_PRODUCT_CRITERION   0
+#define SBA_PRODUCT_CRITERION               0
+#define SBA_PRINT_ZERO_REDUCTIONS           1
+#define SBA_PRINT_REDUCTION_STEPS           1
+#define SBA_PRINT_OPERATIONS                1
+#define SBA_PRINT_INTERREDUCTION_STEPS      1
+#define SBA_PRINT_INTERREDUCTION_OPERATIONS 1
+#define SBA_PRINT_SIZE_G                    1
+#define SBA_PRINT_SIZE_SYZ                  1
+#define SBA_PRINT_PRODUCT_CRITERION         0
 
+// counts sba's reduction steps
 long sba_reduction_steps;
 long sba_operations;
+
+// counts interreduction steps if sba is used incrementally
+long sba_interreduction_steps;
+long sba_interreduction_operations;
 /***********************************************
  * SBA stuff -- done
 ***********************************************/
@@ -467,6 +474,12 @@ int redHomog (LObject* h,kStrategy strat)
     assume(strat->fromT == FALSE);
 
     ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
+#if SBA_PRINT_INTERREDUCTION_STEPS
+    sba_interreduction_steps++;
+#endif
+#if SBA_PRINT_INTERREDUCTION_OPERATIONS
+    sba_interreduction_operations  +=  pLength(strat->T[ii].p);
+#endif
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -778,6 +791,12 @@ int redLazy (LObject* h,kStrategy strat)
 #endif
 
     ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
+#if SBA_PRINT_INTERREDUCTION_STEPS
+    sba_interreduction_steps++;
+#endif
+#if SBA_PRINT_INTERREDUCTION_OPERATIONS
+    sba_interreduction_operations  +=  pLength(strat->T[ii].p);
+#endif
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -948,6 +967,12 @@ int redHoney (LObject* h, kStrategy strat)
 
     number coef;
     ksReducePoly(h,&(strat->T[ii]),strat->kNoetherTail(),&coef,strat);
+#if SBA_PRINT_INTERREDUCTION_STEPS
+    sba_interreduction_steps++;
+#endif
+#if SBA_PRINT_INTERREDUCTION_OPERATIONS
+    sba_interreduction_operations  +=  pLength(strat->T[ii].p);
+#endif
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
@@ -1514,13 +1539,15 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   //    induced Schreyer order.
   // The corresponding orders are computed in sbaRing(), depending
   // on the flag strat->incremental
-  long zeroreductions     = 0;
-  long product_criterion  = 0;
-  long size_g             = 0;
-  long size_syz           = 0;
+  long zeroreductions           = 0;
+  long product_criterion        = 0;
+  long size_g                   = 0;
+  long size_syz                 = 0;
   // global variable
-  sba_reduction_steps     = 0;
-  sba_operations          = 0;
+  sba_reduction_steps           = 0;
+  sba_operations                = 0;
+  sba_interreduction_steps      = 0;
+  sba_interreduction_operations = 0;
 
   ideal F = F0;
   ring sRing, currRingOld;
@@ -2068,29 +2095,49 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   }
 #endif
 #if SBA_PRINT_ZERO_REDUCTIONS
-  printf("ZERO REDUCTIONS:   %ld\n",zeroreductions);
+  printf("----------------------------------------------------------\n");
+  printf("ZERO REDUCTIONS:            %ld\n",zeroreductions);
 #endif
 #if SBA_PRINT_REDUCTION_STEPS
-  printf("TOP S-REDUCTIONS:  %ld\n",sba_reduction_steps);
+  printf("----------------------------------------------------------\n");
+  printf("TOP S-REDUCTIONS:           %ld\n",sba_reduction_steps);
 #endif
-#if SBA_OPERATIONS
-  printf("OPERATIONS:        %ld\n",sba_operations);
+#if SBA_PRINT_OPERATIONS
+  printf("OPERATIONS:                 %ld\n",sba_operations);
+#endif
+#if SBA_PRINT_INTERREDUCTION_STEPS
+  printf("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n");
+  printf("INTERREDUCTIONS:            %ld\n",sba_interreduction_steps);
+#endif
+#if SBA_PRINT_INTERREDUCTION_OPERATIONS
+  printf("INTERREDUCTION OPERATIONS:  %ld\n",sba_interreduction_operations);
+#endif
+#if SBA_PRINT_INTERREDUCTION_STEPS
+  printf("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n");
+  printf("ALL REDUCTIONS:             %ld\n",sba_reduction_steps+sba_interreduction_steps);
+#endif
+#if SBA_PRINT_INTERREDUCTION_OPERATIONS
+  printf("ALL OPERATIONS:             %ld\n",sba_operations+sba_interreduction_operations);
 #endif
 #if SBA_PRINT_SIZE_G
-  printf("SIZE OF G:         %ld\n",size_g);
+  printf("----------------------------------------------------------\n");
+  printf("SIZE OF G:                  %ld\n",size_g);
 #endif
 #if SBA_PRINT_SIZE_SYZ
-  printf("SIZE OF SYZ:       %ld\n",size_syz);
+  printf("SIZE OF SYZ:                %ld\n",size_syz);
+  printf("----------------------------------------------------------\n");
 #endif
 #if SBA_PRINT_PRODUCT_CRITERION
-  printf("PRODUCT CRITERIA:  %ld\n",product_criterion);
+  printf("PRODUCT CRITERIA:           %ld\n",product_criterion);
 #endif
-  zeroreductions      = 0;
-  size_g              = 0;
-  size_syz            = 0;
-  product_criterion   = 0;
-  sba_reduction_steps = 0;
-  sba_operations      = 0;
+  zeroreductions                = 0;
+  size_g                        = 0;
+  size_syz                      = 0;
+  product_criterion             = 0;
+  sba_reduction_steps           = 0;
+  sba_operations                = 0;
+  sba_interreduction_steps      = 0;
+  sba_interreduction_operations = 0;
   return (strat->Shdl);
 }
 
