@@ -52,6 +52,7 @@
   #define F5CTAILRED 1
 #endif
 
+#define SBA_TAIL_RED                        0
 #define SBA_PRODUCT_CRITERION               0
 #define SBA_PRINT_ZERO_REDUCTIONS           1
 #define SBA_PRINT_REDUCTION_STEPS           1
@@ -1817,13 +1818,14 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
       // therefore we call pContent instead of pNorm
-      /*
+#if SBA_TAIL_RED
+      pWrite(strat->P.p);
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
         strat->P.pCleardenom();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
         {
-          strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
+          strat->P.p = redtailSba(&(strat->P),pos-1,strat, withT);
           strat->P.pCleardenom();
         }
       }
@@ -1831,9 +1833,11 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       {
         strat->P.pNorm();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
-          strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
+          strat->P.p = redtailSba(&(strat->P),pos-1,strat, withT);
       }
-      */
+      pWrite(strat->P.p);
+      printf("-\n");
+#endif
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
 #if MYTEST
@@ -1933,8 +1937,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         enterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       // posInS only depends on the leading term
       strat->enterS(strat->P, pos, strat, strat->tl);
-//#if 1
-#if DEBUGF50
+#if 1
+//#if DEBUGF50
     printf("---------------------------\n");
     Print(" %d. ELEMENT ADDED TO GCURR:\n",strat->sl+1);
     Print("LEAD POLY:  "); pWrite(pHead(strat->S[strat->sl]));
