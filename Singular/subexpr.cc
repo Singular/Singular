@@ -1472,7 +1472,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     /*&& (!yyInRingConstruction)*/)
     {
       int vnr;
-      if ((vnr=r_IsRingVar(id, currRing))>=0)
+      if ((vnr=r_IsRingVar(id, currRing->names,currRing->N))>=0)
       {
         poly p=pOne();
         pSetExp(p,vnr+1,1);
@@ -1482,8 +1482,9 @@ void syMake(leftv v,const char * id, idhdl packhdl)
         v->rtyp = POLY_CMD;
         return;
       }
-      if((currRing->cf->extRing!=NULL)
-      &&((vnr=r_IsRingVar(id, currRing->cf->extRing))>=0))
+      if((n_NumberOfParameters(currRing->cf)>0)
+      &&((vnr=r_IsRingVar(id, (char**)n_ParameterNames(currRing->cf),
+                              n_NumberOfParameters(currRing->cf))>=0)))
       {
         BOOLEAN ok=FALSE;
         poly p = pmInit(id,ok);
@@ -1577,9 +1578,10 @@ void syMake(leftv v,const char * id, idhdl packhdl)
           v->name = id;
         }
         if (TEST_V_ALLWARN /*&& (myynest>0)*/
-        && ((r_IsRingVar(id, currRing)>=0)
-          || ((currRing->cf->extRing!=NULL)
-             &&(r_IsRingVar(id, currRing->cf->extRing)>=0))))
+        && ((r_IsRingVar(id, currRing->names,currRing->N)>=0)
+          || ((n_NumberOfParameters(currRing->cf)>0)
+             &&(r_IsRingVar(id, (char**)n_ParameterNames(currRing->cf),
+	                        n_NumberOfParameters(currRing->cf))>=0))))
         {
         // WARNING: do not use ring variable names in procedures
           Warn("use of variable >>%s<< in a procedure in line %s",id);

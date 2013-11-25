@@ -220,19 +220,15 @@ int rTypeOfMatrixOrder(intvec * order)
   return typ;
 }
 
-/*2
- * set a new ring from the data:
- s: name, chr: ch, varnames: rv, ordering: ord, typ: typ
- */
 
-int r_IsRingVar(const char *n, ring r)
+int r_IsRingVar(const char *n, char**names,int N)
 {
-  if ((r!=NULL) && (r->names!=NULL))
+  if (names!=NULL)
   {
-    for (int i=0; i<r->N; i++)
+    for (int i=0; i<N; i++)
     {
-      if (r->names[i]==NULL) return -1;
-      if (strcmp(n,r->names[i]) == 0) return (int)i;
+      if (names[i]==NULL) return -1;
+      if (strcmp(n,names[i]) == 0) return (int)i;
     }
   }
   return -1;

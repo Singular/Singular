@@ -4344,7 +4344,8 @@ static BOOLEAN jjIS_RINGVAR_P(leftv res, leftv v)
 }
 static BOOLEAN jjIS_RINGVAR_S(leftv res, leftv v)
 {
-  res->data = (char *)(long)(r_IsRingVar((char *)v->Data(), currRing)+1);
+  res->data = (char *)(long)(r_IsRingVar((char *)v->Data(), currRing->names,
+                                                            currRing->N)+1);
   return FALSE;
 }
 static BOOLEAN jjIS_RINGVAR0(leftv res, leftv)

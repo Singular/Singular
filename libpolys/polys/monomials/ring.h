@@ -343,7 +343,7 @@ ring   rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int
 ring   rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int **wvhdl=NULL);
 
 // #define rIsRingVar(A) r_IsRingVar(A,currRing)
-int    r_IsRingVar(const char *n, ring r);
+int    r_IsRingVar(const char *n, char**names, int N);
 void   rWrite(ring r, BOOLEAN details = FALSE);
 ring   rCopy(ring r);
 ring   rCopy0(const ring r, BOOLEAN copy_qideal = TRUE, BOOLEAN copy_ordering = TRUE);

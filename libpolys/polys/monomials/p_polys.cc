@@ -1370,7 +1370,7 @@ const char * p_Read(const char *st, poly &rc, const ring r)
   if (s==st)
   /* i.e. it does not start with a coeff: test if it is a ringvar*/
   {
-    j = r_IsRingVar(s,r);
+    j = r_IsRingVar(s,r->names,r->N);
     if (j >= 0)
     {
       p_IncrExp(rc,1+j,r);
@@ -1383,7 +1383,7 @@ const char * p_Read(const char *st, poly &rc, const ring r)
     char ss[2];
     ss[0] = *s++;
     ss[1] = '\0';
-    j = r_IsRingVar(ss,r);
+    j = r_IsRingVar(ss,r->names,r->N);
     if (j >= 0)
     {
       const char *s_save=s;
