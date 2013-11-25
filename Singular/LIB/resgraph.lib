@@ -6,12 +6,12 @@ LIBRARY:  resgraph.lib            Visualization of Resolution Data
 
 AUTHOR: A. Fruehbis-Krueger,  anne@mathematik.uni-kl.de,
 
-NOTE: This library uses the external programs surf, graphviz and xv.
+NOTE: This library uses the external programs surf, graphviz and imagemagick.
 @*    Input data is assumed to originate from resolve.lib and reszeta.lib
 
 PROCEDURES:
-InterDiv(M[,name])   dual graph of resolution of a surface (uses graphviz,xv)
-ResTree(L,M[,name])  tree of charts of resolution (uses graphviz,xv)
+InterDiv(M[,name])   dual graph of resolution of a surface (uses graphviz,imagemagick)
+ResTree(L,M[,name])  tree of charts of resolution (uses graphviz,imagemagick)
 finalCharts(L,...)   pictures of final charts of surface (uses surf)
 ";
 
@@ -26,7 +26,7 @@ ASSUME:  - M is first list entry of output of 'intersectionDiv'
 CREATE:  file 'name.jpg' containing dual graph of resolution
 @*       if filename is given
 NOTE:    only available on UNIX-type systems and programs
-@*       'xv' (X11/Xorg package) and 'dot' (Graphviz package) need to
+@*       'display' (imagemagick package) and 'dot' (Graphviz package) need to
 @*       be in the standard search PATH
 RETURN:  nothing, only generating graphics output in separate window
 EXAMPLE: not available (for technical reasons)
@@ -84,16 +84,16 @@ EXAMPLE: not available (for technical reasons)
   write(eing,"}");
   close(eing);
 //---------------------------------------------------------------------------
-// produce graphics output using the programs dot and xv
+// produce graphics output using the programs dot and display
 //---------------------------------------------------------------------------
   string outfile=@filename + ".jpg";
   if(!find(outfile,"/"))
   {
-//--- xv needs fully qualified path to file
+//--- display needs fully qualified path to file
      outfile=system("getenv","PWD") + "/" + outfile;
   }
   j=system("sh","dot -Tjpg " + @filename + " -o "+ outfile);
-  j=system("sh","xv " + outfile + " &");
+  j=system("sh","display " + outfile + " &");
 //---------------------------------------------------------------------------
 // clean up if necessary
 //---------------------------------------------------------------------------
@@ -159,7 +159,7 @@ ASSUME:  - L is the output of 'resolve' from resolve.lib
 CREATE:  file 'name.jpg' containing the tree of charts of L
 @*       if filename is given
 NOTE:    only available on UNIX-type systems and programs
-@*       'xv' (X11/Xorg package) and 'dot' (Graphviz package) need to
+@*       'display' (imagemagick package) and 'dot' (Graphviz package) need to
 @*       be in the standard search PATH
 RETURN:  nothing, only generating graphics output in separate window
 EXAMPLE: not available (for technical reasons)
@@ -270,16 +270,16 @@ EXAMPLE: not available (for technical reasons)
   write(eing,"}");
   close(eing);
 //---------------------------------------------------------------------------
-// Create the graphics output using the programs dot and xv
+// Create the graphics output using the programs dot and display
 //---------------------------------------------------------------------------
   string outfile=@filename + ".jpg";
   if(!find(outfile,"/"))
   {
-//--- xv needs fully qualified path to file
+//--- display needs fully qualified path to file
      outfile=system("getenv","PWD") + "/" + outfile;
   }
   j=system("sh", "dot -Tjpg " + @filename + " -o "+ outfile);
-  j=system("sh","/usr/bin/X11/xv " + outfile + "&");
+  j=system("sh","display " + outfile + "&");
 //---------------------------------------------------------------------------
 // Clean up public directories if necessary
 //---------------------------------------------------------------------------
@@ -309,7 +309,7 @@ ASSUME:  - L1 is the output of 'resolve' from resolve.lib
 CREATE:  - new windows in which surf-images of the final charts are presented
 @*       - several '.ras' files in the directory in which 'name' resides
 NOTE:    only available on UNIX-type systems
-@*       external programs 'surf' and 'xv' (X11/Xorg package) need to be
+@*       external programs 'surf' and 'display' (imagemagick package) need to be
 @*       in the standard search PATH
 RETURN:  nothing, only generating graphics output in separate window
 EXAMPLE: not available (for technical reasons)
@@ -555,7 +555,7 @@ EXAMPLE: not available (for technical reasons)
      }
      if(!find(fnamebase,"/"))
      {
-//--- xv needs fully qualified path to file
+//--- display needs fully qualified path to file
          if(defined(outfile)) {kill outfile;}
          string outfile=system("getenv","PWD") + "/" + fnamebase;
      }
@@ -576,12 +576,12 @@ EXAMPLE: not available (for technical reasons)
      j=system("sh", "surf -n " + fnamebase +string(endCharts[i]) + ".surf");
      if(!defined(outfile))
      {
-        j=system("sh","/usr/bin/X11/xv " + fnamebase
+        j=system("sh","display " + fnamebase
                        + string(endCharts[i]) + ".ras &");
      }
      else
      {
-        j=system("sh","/usr/bin/X11/xv " + outfile
+        j=system("sh","display " + outfile
                        + string(endCharts[i]) + ".ras &");
         kill outfile;
      }
