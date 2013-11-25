@@ -56,11 +56,9 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>
 
-#ifdef HAVE_FACTORY
 #include <polys/clapsing.h>
 #include <polys/clapconv.h>
 #include <factory/factory.h>
-#endif
 
 #include <polys/ext_fields/transext.h>
 #include <polys/prCopy.h>
@@ -1375,7 +1373,6 @@ void definiteGcdCancellation(number a, const coeffs cf,
     }
   }*/
 
-#ifdef HAVE_FACTORY
   /* here we assume: NUM(f), DEN(f) !=NULL, in Z_a reqp. Z/p_a */
   poly pGcd = singclap_gcd_and_divide(NUM(f), DEN(f), ntRing);
   if (p_IsConstant(pGcd, ntRing)
@@ -1443,8 +1440,6 @@ void definiteGcdCancellation(number a, const coeffs cf,
         DEN (f) = NULL;
       }
     }
-#endif /* HAVE_FACTORY */
-
   ntTest(a); // !!!!
 }
 
@@ -1555,7 +1550,6 @@ number ntLcm(number a, number b, const coeffs cf)
   ntTest(b);
   fraction fb = (fraction)b;
   if ((b==NULL)||(DEN(fb)==NULL)) return ntCopy(a,cf);
-#ifdef HAVE_FACTORY
   fraction fa = (fraction)a;
   /* singclap_gcd destroys its arguments; we hence need copies: */
   poly pa = p_Copy(NUM(fa), ntRing);
@@ -1635,10 +1629,6 @@ number ntLcm(number a, number b, const coeffs cf)
     ntTest((number)result); // !!!!
     return (number)result;
 
-#else
-  Print("// factory needed: transext.cc:ntLcm\n");
-  return NULL;
-#endif /* HAVE_FACTORY */
   return NULL;
 }
 
@@ -1648,7 +1638,6 @@ number ntGcd(number a, number b, const coeffs cf)
   ntTest(b);
   if (a==NULL) return ntCopy(b,cf);
   if (b==NULL) return ntCopy(a,cf);
-#ifdef HAVE_FACTORY
   fraction fa = (fraction)a;
   fraction fb = (fraction)b;
 
@@ -1711,10 +1700,6 @@ number ntGcd(number a, number b, const coeffs cf)
   NUM(result) = pGcd;
   ntTest((number)result); // !!!!
   return (number)result;
-#else
-  Print("// factory needed: transext.cc:ntGcd\n");
-  return NULL;
-#endif /* HAVE_FACTORY */
 }
 
 int ntSize(number a, const coeffs cf)
@@ -2044,7 +2029,6 @@ void ntKillChar(coeffs cf)
   if ((--cf->extRing->ref) == 0)
     rDelete(cf->extRing);
 }
-#ifdef HAVE_FACTORY
 number ntConvFactoryNSingN( const CanonicalForm n, const coeffs cf)
 {
   if (n.isZero()) return NULL;
@@ -2065,7 +2049,6 @@ CanonicalForm ntConvSingNFactoryN( number n, BOOLEAN /*setChar*/, const coeffs c
   fraction f = (fraction)n;
   return convSingPFactoryP(NUM(f),ntRing);
 }
-#endif
 
 static int ntParDeg(number a, const coeffs cf)
 {
@@ -2425,14 +2408,8 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   else
     cf->cfWriteShort = ntWriteLong;
 
-#ifndef HAVE_FACTORY
-  PrintS("// Warning: The 'factory' module is not available.\n");
-  PrintS("//          Hence gcd's cannot be cancelled in any\n");
-  PrintS("//          computed fraction!\n");
-#else
   cf->convFactoryNSingN =ntConvFactoryNSingN;
   cf->convSingNFactoryN =ntConvSingNFactoryN;
-#endif
   cf->cfParDeg = ntParDeg;
 
   cf->iNumberOfParameters = rVar(R);

@@ -1,8 +1,6 @@
 #ifndef SINGULAR_FGLM_H
 #define SINGULAR_FGLM_H
 
-#ifdef HAVE_FACTORY
-
 #include <misc/auxiliary.h>
 
 #include <kernel/ideals.h>
@@ -34,8 +32,5 @@ BOOLEAN findUniProc( leftv result, leftv first);
 
 // homogeneous FGLM
 ideal fglmhomProc(leftv first, leftv second);
-
-
-#endif // #ifdef HAVE_FACTORY
 
 #endif // #ifndef SINGULAR_FGLM_H

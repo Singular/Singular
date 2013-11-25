@@ -12,7 +12,6 @@
 #endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 
-#ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 
@@ -451,4 +450,3 @@ convRecGFGF ( const CanonicalForm & f, int * exp, poly & result )
 }
 
 #endif
-#endif /* HAVE_FACTORY */

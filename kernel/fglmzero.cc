@@ -23,7 +23,6 @@
 #include <kernel/mod2.h>
 
 
-#ifdef HAVE_FACTORY
 // assumes, that NOSTREAMIO is set in factoryconf.h, which is included
 // by templates/list.h.
 
@@ -1251,8 +1250,6 @@ template class List<fglmDelem>;
 template class ListItem<fglmDelem>;
 template class ListIterator<fglmDelem>;
 
-
-#endif
 
 // ----------------------------------------------------------------------------
 // Local Variables: ***

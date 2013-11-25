@@ -16,7 +16,6 @@
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
-#ifdef HAVE_FACTORY
 #include <omalloc/omalloc.h>
 #include <kernel/structs.h>
 #include <coeffs/numbers.h>
@@ -531,7 +530,6 @@ number fglmVector::clearDenom ()
   return theLcm;
 }
 
-#endif
 // ----------------------------------------------------------------------------
 // Local Variables: ***
 // compile-command: "make Singular" ***

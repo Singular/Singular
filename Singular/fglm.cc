@@ -20,9 +20,6 @@
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
-#ifdef HAVE_FACTORY
-
-
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
 
@@ -495,7 +492,6 @@ findUniProc( leftv result, leftv first )
 
     return FALSE;
 }
-#endif
 // ----------------------------------------------------------------------------
 // Local Variables: ***
 // compile-command: "make Singular" ***

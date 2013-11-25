@@ -14,10 +14,7 @@
 #endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 
-#ifdef HAVE_FACTORY
 #include <factory/factory.h>
-#endif
-
 
 #include "coeffs.h"
 #include <coeffs/numbers.h>
@@ -229,7 +226,6 @@ BOOLEAN ndIsUnit(number a, const coeffs r) { return !n_IsZero(a,r); }
 number  ndExtGcd (number, number, number *, number *, const coeffs r) { return n_Init(1,r); }
 #endif
 
-#ifdef HAVE_FACTORY
 CanonicalForm ndConvSingNFactoryN( number, BOOLEAN /*setChar*/, const coeffs)
 {
   CanonicalForm term(0);
@@ -242,7 +238,6 @@ number ndConvFactoryNSingN( const CanonicalForm, const coeffs)
   Werror("no conversion from factory");
   return NULL;
 }
-#endif
 
 number  ndInit_bigint(number, const coeffs, const coeffs)
 {

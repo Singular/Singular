@@ -2363,7 +2363,6 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
 
 #include <polys/clapsing.h>
 
-#ifdef HAVE_FACTORY
 #if 0
 poly id_GCD(poly f, poly g, const ring r)
 {
@@ -2397,7 +2396,6 @@ poly id_GCD(poly f, poly g, const ring r)
   return gcd_p;
 }
 #endif
-#endif
 
 #if 0
 /*2
@@ -2407,7 +2405,6 @@ poly id_GCD(poly f, poly g, const ring r)
 * assume: q[i]!=0
 * destroys xx
 */
-#ifdef HAVE_FACTORY
 ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
 {
   int cnt=IDELEMS(xx[0])*xx[0]->nrows;
@@ -2466,7 +2463,6 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
   omFree(xx);
   return result;
 }
-#endif
 #endif
 /* currently unsed:
 ideal idChineseRemainder(ideal *xx, intvec *iv)

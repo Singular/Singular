@@ -47,12 +47,9 @@
 
 #include <polys/PolyEnumerator.h>
 
-#ifdef HAVE_FACTORY
 #include <factory/factory.h>
 #include <polys/clapconv.h>
 #include <polys/clapsing.h>
-#endif
-
 
 #include <polys/ext_fields/algext.h>
 #define TRANSEXT_PRIVATES 1
@@ -799,7 +796,6 @@ void  naNormalize(number &a, const coeffs cf)
   a=(number)aa;
 }
 
-#ifdef HAVE_FACTORY
 number naConvFactoryNSingN( const CanonicalForm n, const coeffs cf)
 {
   if (n.isZero()) return NULL;
@@ -813,8 +809,6 @@ CanonicalForm naConvSingNFactoryN( number n, BOOLEAN /*setChar*/, const coeffs c
 
   return convSingPFactoryP((poly)n,naRing);
 }
-#endif
-
 
 /* IMPORTANT NOTE: Since an algebraic field extension is again a field,
                    the gcd of two elements is not very interesting. (It
@@ -1408,10 +1402,8 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->nCoeffIsEqual  = naCoeffIsEqual;
   cf->cfInvers       = naInvers;
   cf->cfIntDiv       = naDiv; // ???
-#ifdef HAVE_FACTORY
   cf->convFactoryNSingN=naConvFactoryNSingN;
   cf->convSingNFactoryN=naConvSingNFactoryN;
-#endif
   cf->cfParDeg = naParDeg;
 
   cf->iNumberOfParameters = rVar(R);

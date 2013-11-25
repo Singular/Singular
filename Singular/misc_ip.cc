@@ -19,10 +19,8 @@
 #include <kernel/mod2.h>
 #include <Singular/si_signals.h>
 
-#ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
-#endif
 
 #ifdef HAVE_SIMPLEIPC
 #include <Singular/links/simpleipc.h>
@@ -1162,7 +1160,6 @@ extern "C"
 */
 void siInit(char *name)
 {
-#ifdef HAVE_FACTORY
 // factory default settings: -----------------------------------------------
   On(SW_USE_NTL);
   On(SW_USE_NTL_GCD_0); // On -> seg11 in Old/algnorm, Old/factor...
@@ -1174,7 +1171,6 @@ void siInit(char *name)
   On(SW_USE_QGCD);
   Off(SW_USE_NTL_SORT); // may be changed by an command line option
   factoryError=WerrorS;
-#endif
 
 // memory initialization: -----------------------------------------------
     om_Opts.OutOfMemoryFunc = omSingOutOfMemoryFunc;
@@ -1228,9 +1224,7 @@ void siInit(char *name)
   if (t==0) t=1;
   initRTimer();
   siSeed=t;
-#ifdef HAVE_FACTORY
   factoryseed(t);
-#endif
   siRandomStart=t;
   feOptSpec[FE_OPT_RANDOM].value = (void*) ((long)siRandomStart);
 
@@ -1266,12 +1260,10 @@ void siInit(char *name)
 
 /*
 #ifdef LIBSINGULAR
-#ifdef HAVE_FACTORY
 // the init routines of factory need mmInit
 int mmInit( void )
 {
   return 1;
 }
-#endif
 #endif
 */

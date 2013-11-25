@@ -9,8 +9,6 @@
 #ifndef INCL_FACTORYSING_H
 #define INCL_FACTORYSING_H
 
-#ifdef HAVE_FACTORY
-
 class bigintmat;
 class intvec;
 
@@ -63,10 +61,8 @@ ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & n, co
 
 BOOLEAN singclap_isSqrFree(poly f, const ring r);
 
-# ifdef HAVE_LIBFAC
  matrix singclap_irrCharSeries ( ideal I, const ring r);
  char* singclap_neworder ( ideal I, const ring r);
-# endif 
 
 poly singclap_det( const matrix m, const ring r );
 int singclap_det_i( intvec * m, const ring r );
@@ -74,8 +70,6 @@ number singclap_det_bi( bigintmat * m, const coeffs cf);
 
 number   nChineseRemainder(number *x, number *q,int rl, const coeffs r);
 
-
-#endif /* HAVE_FACTORY */
 
 #endif /* INCL_FACTORYSING_H */
 

@@ -14,8 +14,6 @@
 
 #include <misc/auxiliary.h>
 
-#ifdef HAVE_FACTORY
-
 #define SI_DONT_HAVE_GLOBAL_VARS
 
 #include <misc/auxiliary.h>
@@ -23,9 +21,7 @@
 
 #include <factory/factory.h>
 
-#ifdef HAVE_LIBFAC
 #    include <factory/libfac/libfac.h>
-#endif
 
 
 #include <omalloc/omalloc.h>
@@ -766,9 +762,7 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac, const ring r)
   return TRUE;
 }
 
-#ifdef HAVE_FACTORY
 int singclap_factorize_retry;
-#endif
 
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
 /* destroys f, sets *v */
@@ -1384,7 +1378,6 @@ notImpl:
   return res;
 }
 
-#ifdef HAVE_LIBFAC
 matrix singclap_irrCharSeries ( ideal I, const ring r)
 {
   if (idIs0(I)) return mpNew(1,1);
@@ -1559,7 +1552,6 @@ char* singclap_neworder ( ideal I, const ring r)
   if (s[strlen(s)-1]==',') s[strlen(s)-1]='\0';
   return s;
 }
-#endif /*HAVE_LIBFAC*/
 
 BOOLEAN singclap_isSqrFree(poly f, const ring r)
 {
@@ -1836,5 +1828,3 @@ ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & numFa
 #endif
 #endif /* HAVE_NTL */
 
-
-#endif /* HAVE_FACTORY */

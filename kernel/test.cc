@@ -5,9 +5,7 @@
 
 #include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
-#ifdef HAVE_FACTORY
 #include <factory/factory.h> // :(
-#endif
 
 #include <misc/intvec.h>
 #include <misc/int64vec.h>
@@ -52,11 +50,9 @@
 #include <polys/clapsing.h>
 
 
-#ifdef HAVE_FACTORY
 // The following are needed due to FACTORY (e.g. initCanonicalForm)
 int initializeGMP(){ return 1; }
 int mmInit(void) {return 1; }
-#endif
 
 // // TODO: DUE to the use of HALT in npolygon.cc :(((
 extern "C" {void m2_end(int i){exit(i);}}

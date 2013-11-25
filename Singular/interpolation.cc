@@ -7,10 +7,8 @@
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #include <misc/options.h>
-#ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #  include <factory/factory.h>
-#endif /* HAVE_FACTORY */
 
 #include <misc/intvec.h>
 
@@ -1041,18 +1039,10 @@ void PresentGenerator (int i)  // only for debuging, writes a generator in its f
 }
 #endif
 
-#ifdef HAVE_FACTORY
 static modp_number TakePrime (modp_number /*p*/)  // takes "previous" (smaller) prime
-#else
-static modp_number TakePrime (modp_number p)  // takes "previous" (smaller) prime
-#endif
 {
-#ifdef HAVE_FACTORY
     myp_index--;
     return cf_getSmallPrime(myp_index);
-#else
-    return IsPrime(p-1);
-#endif
 }
 
 static void PrepareChinese (int n) // initialization for CRA
@@ -1635,9 +1625,7 @@ ideal interpolation(lists L, intvec *v)
   int modp_cycles=10;
   bool correct_gen=false;
   if (only_modp) modp_cycles=1;
-  #ifdef HAVE_FACTORY
   myp_index=cf_getNumSmallPrimes ();
-  #endif
 
   while ((!correct_gen)&&(myp_index>1))
   {

@@ -13,10 +13,8 @@
 #include <kernel/mod2.h>
 #include <misc/auxiliary.h>
 
-#ifdef HAVE_FACTORY
-// #define SI_DONT_HAVE_GLOBAL_VARS
+#define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
-#endif
 
 
 #include <stdlib.h>
@@ -147,16 +145,8 @@
 #define HAVE_EXTENDED_SYSTEM 1
 #endif
 
-#ifdef HAVE_FACTORY
-#define SI_DONT_HAVE_GLOBAL_VARS
-
-#ifdef HAVE_LIBFAC
-//#include <factory/libfac/libfac.h>
-#endif
-
 #include <polys/clapconv.h>
 #include <kernel/kstdfac.h>
-#endif
 
 #include <polys/clapsing.h>
 
@@ -436,10 +426,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           #ifdef HAVE_DLD
             TEST_FOR("DLD")
           #endif
-          #ifdef HAVE_FACTORY
-            TEST_FOR("factory")
+            //TEST_FOR("factory")
             //TEST_FOR("libfac")
-          #endif
           #ifdef HAVE_READLINE
             TEST_FOR("readline")
           #endif
@@ -635,9 +623,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         {
           siRandomStart=(int)((long)h->Data());
           siSeed=siRandomStart;
-  #ifdef HAVE_FACTORY
           factoryseed(siRandomStart);
-  #endif
           return FALSE;
         }
         else if (h != NULL)
@@ -979,10 +965,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
   /*==================== neworder =============================*/
   // should go below
-  #ifdef HAVE_FACTORY
       if(strcmp(sys_cmd,"neworder")==0)
       {
-#if defined(HAVE_LIBFAC)
         if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
         {
           res->rtyp=STRING_CMD;
@@ -991,13 +975,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         }
         else
           WerrorS("ideal expected");
-#else
-  Werror("Sorry: not yet re-factored: see libpolys/polys/clapsing.cc");
-  return FALSE;
-#endif
       }
       else
-  #endif
   //#ifndef HAVE_DYNAMIC_LOADING
   /*==================== pcv ==================================*/
   #ifdef HAVE_PCV
@@ -2687,7 +2666,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 //       }
 //       else
   /*==================== isSqrFree =============================*/
-  #ifdef HAVE_FACTORY
       if(strcmp(sys_cmd,"isSqrFree")==0)
       {
         if ((h!=NULL) &&(h->Typ()==POLY_CMD))
@@ -2700,7 +2678,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           WerrorS("poly expected");
       }
       else
-  #endif
   /*==================== pDivStat =============================*/
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if(strcmp(sys_cmd,"pDivStat")==0)
@@ -2747,7 +2724,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  #ifdef HAVE_FACTORY
   /*==================== fastcomb =============================*/
       if(strcmp(sys_cmd,"fastcomb")==0)
       {
@@ -2790,7 +2766,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           WerrorS("ideal expected");
       }
       else
-  #endif
   #if 0 /* debug only */
   /*==================== listall ===================================*/
       if(strcmp(sys_cmd,"listall")==0)
@@ -3595,7 +3570,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   /*==================== gcd-varianten =================*/
-  #ifdef HAVE_FACTORY
       if (strcmp(sys_cmd, "gcd") == 0)
       {
         if (h==NULL)
@@ -3632,7 +3606,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         else return TRUE;
       }
       else
-  #endif
   /*==================== subring =================*/
       if (strcmp(sys_cmd, "subring") == 0)
       {
@@ -3647,7 +3620,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   /*==================== HNF =================*/
-  #ifdef HAVE_FACTORY
   #ifdef HAVE_NTL
       if (strcmp(sys_cmd, "HNF") == 0)
       {
@@ -3721,7 +3693,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         else return TRUE;
       }
       else
-      #endif
   /*================= probIrredTest ======================*/
       if (strcmp (sys_cmd, "probIrredTest") == 0)
       {

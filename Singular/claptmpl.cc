@@ -12,7 +12,6 @@
 #include <kernel/mod2.h>
 //#include <vector>
 //using namespace std;
-#ifdef HAVE_FACTORY
   #define SINGULAR 1
   #include <factory/factory.h>
   #include <factory/templates/ftmpl_list.cc>
@@ -25,7 +24,6 @@
 
   template class List<fglmDelem>;
   template class ListIterator<fglmDelem>;
-#endif
 
 // ----------------------------------------------------------------------------
 //  kmatrix.cc

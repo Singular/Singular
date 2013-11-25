@@ -10,9 +10,7 @@
 #endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 
-#ifdef HAVE_FACTORY
 #include <factory/factory.h>
-#endif
 
 #include <string.h>
 #include <omalloc/omalloc.h>
@@ -406,7 +404,6 @@ static BOOLEAN npCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
   /* test, if r is an instance of nInitCoeffs(n,parameter) */
   return (n==n_Zp) && (r->ch==(int)(long)parameter);
 }
-#ifdef HAVE_FACTORY
 CanonicalForm npConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
 {
   if (setChar) setCharacteristic( r->ch );
@@ -426,8 +423,6 @@ number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)
     return NULL;
   }
 }
-#endif
-
 
 BOOLEAN npInitChar(coeffs r, void* p)
 {
@@ -502,10 +497,8 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfDBTest=npDBTest;
 #endif
 
-#ifdef HAVE_FACTORY
   r->convSingNFactoryN=npConvSingNFactoryN;
   r->convFactoryNSingN=npConvFactoryNSingN;
-#endif
 
   // the variables:
   r->nNULL = (number)0;
@@ -681,14 +674,12 @@ number npMapMachineInt(number from, const coeffs /*src*/,const coeffs dst)
 }
 #endif
 
-#ifdef HAVE_FACTORY
 number npMapCanonicalForm (number a, const coeffs /*src*/, const coeffs dst)
 {
   setCharacteristic (dst ->ch);
   CanonicalForm f= CanonicalForm ((InternalCF*)(a));
   return (number) (f.intval());
 }
-#endif
 
 nMapFunc npSetMap(const coeffs src, const coeffs dst)
 {
@@ -721,12 +712,10 @@ nMapFunc npSetMap(const coeffs src, const coeffs dst)
   {
     return npMapLongR;
   }
-#ifdef HAVE_FACTORY
   if (nCoeff_is_CF (src))
   {
     return npMapCanonicalForm;
   }
-#endif
   return NULL;      /* default */
 }
 

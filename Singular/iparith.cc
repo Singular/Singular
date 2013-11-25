@@ -67,13 +67,11 @@
 #include <Singular/misc_ip.h>
 #include <Singular/linearAlgebra_ip.h>
 
-#ifdef HAVE_FACTORY
 #  include <factory/factory.h>
 #  include <polys/clapsing.h>
 #  include <kernel/kstdfac.h>
 #  include <kernel/fglm.h>
 #  include <Singular/fglm.h>
-#endif /* HAVE_FACTORY */
 
 #include <Singular/interpolation.h>
 
@@ -1214,7 +1212,6 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
   if ((pNext(q)!=NULL) && (!rField_is_Ring(currRing)))
   { /* This means that q != 0 consists of at least two terms.
        Moreover, currRing is over a field. */
-#ifdef HAVE_FACTORY
     if(pGetComp(p)==0)
     {
       res->data=(void*)(singclap_pdivide(p /*(poly)(u->Data())*/ ,
@@ -1252,10 +1249,6 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
       idDelete(&I);
       res->data=(void *)p;
     }
-#else /* HAVE_FACTORY */
-    WerrorS("division only by a monomial");
-    return TRUE;
-#endif /* HAVE_FACTORY */
   }
   else
   { /* This means that q != 0 consists of just one term,
@@ -1296,13 +1289,8 @@ static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
     {
       if (pNext(q)!=NULL)
       {
-      #ifdef HAVE_FACTORY
         MATELEM(mm,i,j) = singclap_pdivide( MATELEM(m,i,j) ,
                                            q /*(poly)(v->Data())*/, currRing );
-#else /* HAVE_FACTORY */
-        WerrorS("division only by a monomial");
-        return TRUE;
-#endif /* HAVE_FACTORY */
       }
       else
         MATELEM(mm,i,j) = pDivideM(pCopy(MATELEM(m,i,j)),pHead(q));
@@ -1644,7 +1632,6 @@ static BOOLEAN jjMAP(leftv res, leftv u, leftv v)
   omFreeBin((ADDRESS)sl, sleftv_bin);
   return FALSE;
 }
-#ifdef HAVE_FACTORY
 static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
 {
   intvec *c=(intvec*)u->Data();
@@ -1668,7 +1655,6 @@ static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
   res->data=(char *)n;
   return FALSE;
 }
-#endif
 #if 0
 static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 {
@@ -1732,7 +1718,6 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
   return FALSE;
 }
 #endif
-#ifdef HAVE_FACTORY
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
   lists c=(lists)u->CopyD(); // list of ideal or bigint/int
@@ -1866,7 +1851,6 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   res->rtyp=return_type;
   return FALSE;
 }
-#endif
 static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
 {
   poly p=(poly)v->Data();
@@ -2117,7 +2101,6 @@ static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
   res->data=(char *)L;
   return FALSE;
 }
-#ifdef HAVE_FACTORY
 static BOOLEAN jjEXTGCD_P(leftv res, leftv u, leftv v)
 {
   poly r,pa,pb;
@@ -2204,7 +2187,6 @@ static BOOLEAN jjFACSTD2(leftv res, leftv v, leftv w)
   res->data=(void *)L;
   return FALSE;
 }
-#endif /* HAVE_FACTORY */
 static BOOLEAN jjFAREY_BI(leftv res, leftv u, leftv v)
 {
   if (rField_is_Q(currRing))
@@ -2366,7 +2348,6 @@ static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGCD_BI(leftv res, leftv u, leftv v)
 {
-#ifdef HAVE_FACTORY
   number n1 = (number) u->CopyD();
   number n2 = (number) v->CopyD();
   CanonicalForm C1, C2;
@@ -2376,21 +2357,6 @@ static BOOLEAN jjGCD_BI(leftv res, leftv u, leftv v)
   number g = coeffs_BIGINT->convFactoryNSingN (G,coeffs_BIGINT);
   res->data = g;
   return FALSE;
-#else
-  number a=(number) u->Data();
-  number b=(number) v->Data();
-  if (n_IsZero(a,coeffs_BIGINT))
-  {
-    if (n_IsZero(b,coeffs_BIGINT)) res->data=(char *)n_Init(1,coeffs_BIGINT);
-    else                           res->data=(char *)n_Copy(b,coeffs_BIGINT);
-  }
-  else
-  {
-    if (n_IsZero(b,coeffs_BIGINT))  res->data=(char *)n_Copy(a,coeffs_BIGINT);
-    else res->data=(char *)n_Gcd(a, b, coeffs_BIGINT);
-  }
-  return FALSE;
-#endif
 }
 static BOOLEAN jjGCD_N(leftv res, leftv u, leftv v)
 {
@@ -2408,14 +2374,12 @@ static BOOLEAN jjGCD_N(leftv res, leftv u, leftv v)
   }
   return FALSE;
 }
-#ifdef HAVE_FACTORY
 static BOOLEAN jjGCD_P(leftv res, leftv u, leftv v)
 {
   res->data=(void *)singclap_gcd((poly)(u->CopyD(POLY_CMD)),
                                  (poly)(v->CopyD(POLY_CMD)),currRing);
   return FALSE;
 }
-#endif /* HAVE_FACTORY */
 static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
 {
 #ifdef HAVE_RINGS
@@ -3329,7 +3293,6 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
   res->data = (char * )id;
   return FALSE;
 }
-#ifdef HAVE_FACTORY
 extern int singclap_factorize_retry;
 static BOOLEAN jjSQR_FREE2(leftv res, leftv u, leftv dummy)
 {
@@ -3378,7 +3341,6 @@ static BOOLEAN jjSQR_FREE2(leftv res, leftv u, leftv dummy)
   WerrorS("invalid switch");
   return FALSE;
 }
-#endif
 static BOOLEAN jjSTATUS2(leftv res, leftv u, leftv v)
 {
   res->data = omStrDup(slStatus((si_link) u->Data(), (char *) v->Data()));
@@ -3823,12 +3785,8 @@ static BOOLEAN jjCOUNT_RG(leftv res, leftv v)
   if (rField_is_Zp(r)||rField_is_GF(r)) elems=r->cf->ch;
   else if (rField_is_Zp_a(r) && (r->cf->type==n_algExt))
   {
-#ifdef HAVE_FACTORY
     extern int ipower ( int b, int n ); /* factory/cf_util */
     elems=ipower(r->cf->ch,r->cf->extRing->pFDeg(r->cf->extRing->qideal->m[0],r->cf->extRing));
-#else
-    elems=(int)pow((double) r->cf->ch,(double)r->cf->extRing->pFDeg(r->cf->extRing->qideal->m[0],r->cf->extRing));
-#endif
   }
   res->data = (char *)(long)elems;
   return FALSE;
@@ -3919,10 +3877,6 @@ static BOOLEAN jjNUMERATOR(leftv res, leftv v)
   return FALSE;
 }
 
-
-
-
-#ifdef HAVE_FACTORY
 static BOOLEAN jjDET(leftv res, leftv v)
 {
   matrix m=(matrix)v->Data();
@@ -3982,7 +3936,6 @@ static BOOLEAN jjDET_S(leftv res, leftv v)
   res->data = (char *)p;
   return FALSE;
 }
-#endif
 static BOOLEAN jjDIM(leftv res, leftv v)
 {
   assumeStdFlag(v);
@@ -4054,7 +4007,6 @@ static BOOLEAN jjEXECUTE(leftv, leftv v)
   newBuffer(s,BT_execute);
   return yyparse();
 }
-#ifdef HAVE_FACTORY
 static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
   lists L=(lists)omAllocBin(slists_bin);
@@ -4111,7 +4063,6 @@ static BOOLEAN jjFAC_P(leftv res, leftv u)
   res->data=(void *)l;
   return FALSE;
 }
-#endif
 static BOOLEAN jjGETDUMP(leftv, leftv v)
 {
   si_link l = (si_link)v->Data();
@@ -5009,7 +4960,6 @@ static BOOLEAN jjSort_Id(leftv res, leftv v)
   res->data = (char *)idSort((ideal)v->Data());
   return FALSE;
 }
-#ifdef HAVE_FACTORY
 static BOOLEAN jjSQR_FREE(leftv res, leftv u)
 {
   singclap_factorize_retry=0;
@@ -5026,7 +4976,6 @@ static BOOLEAN jjSQR_FREE(leftv res, leftv u)
   res->data=(void *)l;
   return FALSE;
 }
-#endif
 #if 1
 static BOOLEAN jjSYZYGY(leftv res, leftv v)
 {
@@ -5356,9 +5305,7 @@ void jjInitTab1()
         case (int)jjpLength:      dArith1[i].p=(proc1)pLength; break;
         case (int)jjidElem:       dArith1[i].p=(proc1)idElem; break;
         case (int)jjidVec2Ideal:  dArith1[i].p=(proc1)idVec2Ideal; break;
-#ifndef HAVE_FACTORY
         case (int)jjmpDetBareiss: dArith1[i].p=(proc1)mpDetBareiss; break;
-#endif
         case (int)jjidFreeModule: dArith1[i].p=(proc1)idFreeModule; break;
         case (int)jjrCharStr:     dArith1[i].p=(proc1)rCharStr; break;
 #ifndef MDEBUG
@@ -7535,7 +7482,7 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
      - (poly h, int d, poly f0, poly g0, int xIndex, int yIndec),
                                                 optional: all 4 optional args
      (The defaults are xIndex = 1, yIndex = 2, f0 and g0 polynomials as found
-      by singclap_factorize in the case that HAVE_FACTORY is defined and h(0, y)
+      by singclap_factorize and h(0, y)
       has exactly two distinct monic factors [possibly with exponent > 1].)
      result:
      - list with the two factors f and g such that
@@ -7624,7 +7571,6 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
   /* computation of f0 and g0 if missing */
   if (factorsGiven == 0)
   {
-#ifdef HAVE_FACTORY
     poly h0 = pSubst(pCopy(h), xIndex, NULL);
     intvec* v = NULL;
     ideal i = singclap_factorize(h0, &v, 0,currRing);
@@ -7643,10 +7589,6 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
     f0 = pPower(pCopy(i->m[1]), (*v)[1]);
     g0 = pPower(pCopy(i->m[2]), (*v)[2]);
     idDelete(&i);
-#else
-    WerrorS("cannot factorize h(0,y) due to missing module 'factory'");
-    return TRUE;
-#endif
   }
 
   poly f; poly g;

@@ -3,9 +3,7 @@
 #include <Singular/libsingular.h>
 #include <unistd.h>
 
-#ifdef HAVE_FACTORY
 int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
-#endif
 
 
 int main( int, char *argv[] ) 

@@ -13,7 +13,6 @@
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
-#ifdef  HAVE_FACTORY
 #include <kernel/structs.h>
 #include <coeffs/numbers.h>
 #include <polys/monomials/ring.h>
@@ -209,4 +208,3 @@ gaussReducer::getDependence()
 // page-delimiter: "^\\(\\|//!\\)" ***
 // fold-internal-margins: nil ***
 // End: ***
-#endif // HAVE_FACTORY

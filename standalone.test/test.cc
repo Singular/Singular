@@ -7,10 +7,8 @@
 #include <reporter/reporter.h>
 #include <resources/feResource.h>
 
-#ifdef HAVE_FACTORY
 // int initializeGMP(){ return 1; }
 int mmInit(void) {return 1; }
-#endif
 
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>

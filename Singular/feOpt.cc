@@ -13,10 +13,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
-#endif
 
 #define FE_OPT_STRUCTURE
 #include "feOpt.h"
@@ -259,9 +257,7 @@ static const char* feOptAction(feOptIndex opt)
         siRandomStart = (unsigned int) ((unsigned long)
 			                  (feOptSpec[FE_OPT_RANDOM].value));
         siSeed=siRandomStart;
-#ifdef HAVE_FACTORY
         factoryseed(siRandomStart);
-#endif
         return NULL;
 
       case FE_OPT_EMACS:

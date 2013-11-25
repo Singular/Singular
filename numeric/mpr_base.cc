@@ -26,9 +26,7 @@
 #include <polys/matpol.h>
 #include <polys/sparsmat.h>
 
-#ifdef HAVE_FACTORY
 #include <polys/clapsing.h>
-#endif
 
 #include <kernel/febase.h>
 #include <kernel/polys.h>
@@ -2574,11 +2572,7 @@ number resMatrixDense::getDetAt( const number* evpoint )
   mprSTICKYPROT(ST__DET);
 
   // evaluate determinant of matrix m using factory singclap_det
-#ifdef HAVE_FACTORY
   poly res= singclap_det( m, currRing );
-#else
-  poly res= NULL;
-#endif
 
   // avoid errors for det==0
   number numres;
@@ -2638,11 +2632,7 @@ number resMatrixDense::getSubDet()
     j++;
   }
 
-#ifdef HAVE_FACTORY
   poly res= singclap_det( mat, currRing );
-#else
-  poly res= NULL;
-#endif
 
   number numres;
   if ((res != NULL) && (!nIsZero(pGetCoeff( res ))) )
@@ -2712,10 +2702,8 @@ uResultant::uResultant( const ideal _gls, const resMatType _rmt, BOOLEAN extIdea
     resMat= new resMatrixSparse( gls );
     break;
   case denseResMat:
-#ifdef HAVE_FACTORY
     resMat= new resMatrixDense( gls );
     break;
-#endif
   default:
     WerrorS("uResultant::uResultant: Unknown resultant matrix type choosen!");
   }

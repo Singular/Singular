@@ -15,9 +15,7 @@
 
 #include <coeffs/Enumerator.h>
 
-#ifdef HAVE_FACTORY
 class CanonicalForm;
-#endif
 
 enum n_coeffType
 {
@@ -217,11 +215,8 @@ struct n_Procs_s
    /// function pointer behind n_ClearDenominators
    nCoeffsEnumeratorFunc cfClearDenominators;
 
-#ifdef HAVE_FACTORY
    number (*convFactoryNSingN)( const CanonicalForm n, const coeffs r);
    CanonicalForm (*convSingNFactoryN)( number n, BOOLEAN setChar, const coeffs r );
-#endif
-
 
 #ifdef LDEBUG
    /// Test: is "a" a correct number?

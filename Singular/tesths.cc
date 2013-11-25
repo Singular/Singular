@@ -16,10 +16,8 @@
 #include <misc/auxiliary.h>
 #include <misc/options.h>
 
-#ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
-#endif
 
 #include <kernel/febase.h>
 #include <kernel/timer.h>
@@ -62,9 +60,7 @@ extern int siInit(char *);
 
 #if ! defined(LIBSINGULAR)
 
-#ifdef HAVE_FACTORY
 int initializeGMP(){ return 1; }
-#endif
 
 int mmInit( void )
 {
@@ -158,9 +154,7 @@ int main(          /* main entry to Singular */
   }
   else
   {
-#ifdef HAVE_FACTORY
     if (feOptValue(FE_OPT_SORT)) On(SW_USE_NTL_SORT);
-#endif
 #ifdef HAVE_SDB
     sdb_flags = 0;
 #endif

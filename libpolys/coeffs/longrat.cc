@@ -10,9 +10,7 @@
 #endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 
-#ifdef HAVE_FACTORY
 #include <factory/factory.h>
-#endif
 
 #include <coeffs/longrat.h>
 
@@ -259,7 +257,6 @@ BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs /*r*/)
 }
 #endif
 
-#ifdef HAVE_FACTORY
 CanonicalForm nlConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs /*r*/ )
 {
   if (setChar) setCharacteristic( 0 );
@@ -326,7 +323,7 @@ number nlConvFactoryNSingN( const CanonicalForm n, const coeffs r)
     return z;
   }
 }
-#endif
+
 number nlRInit (long i);
 
 static number nlMapR(number from, const coeffs src, const coeffs dst)
@@ -2608,7 +2605,6 @@ void    nlCoeffWrite  (const coeffs, BOOLEAN /*details*/)
 number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, const coeffs CF)
 // elemenst in the array are x[0..(rl-1)], q[0..(rl-1)]
 {
-#ifdef HAVE_FACTORY
   setCharacteristic( 0 ); // only in char 0
   Off(SW_RATIONAL);
   CFArray X(rl), Q(rl);
@@ -2635,10 +2631,6 @@ number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, const c
     nlDelete(&p,CF);
   }
   return n;
-#else
-  WerrorS("not implemented");
-  return nlInit(0,CF);
-#endif
 }
 number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C)
 {
@@ -2898,10 +2890,8 @@ BOOLEAN nlInitChar(coeffs r, void*)
   // debug stuff
   r->cfDBTest=nlDBTest;
 #endif
-#ifdef HAVE_FACTORY
   r->convSingNFactoryN=nlConvSingNFactoryN;
   r->convFactoryNSingN=nlConvFactoryNSingN;
-#endif
 
   // the variables: general stuff (required)
   r->nNULL = INT_TO_SR(0);

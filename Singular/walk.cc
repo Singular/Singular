@@ -89,9 +89,7 @@
 #include <polys/prCopy.h>
 #include <polys/monomials/ring.h>
 //#include <polys/ext_fields/longalg.h>
-#ifdef HAVE_FACTORY
 #include <polys/clapsing.h>
-#endif
 
 #include <coeffs/mpr_complex.h>
 

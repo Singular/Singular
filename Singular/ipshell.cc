@@ -14,10 +14,8 @@
 #include <misc/options.h>
 #include <misc/mylimits.h>
 
-#ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
-#endif
 
 #include <Singular/maps_ip.h>
 #include <Singular/tok.h>
@@ -566,7 +564,6 @@ int exprlist_length(leftv v)
 int iiIsPrime0(unsigned p)  /* brute force !!!! */
 {
   unsigned i,j=0 /*only to avoid compiler warnings*/;
-#ifdef HAVE_FACTORY
   if (p<=32749) // max. small prime in factory
   {
     int a=0;
@@ -583,33 +580,20 @@ int iiIsPrime0(unsigned p)  /* brute force !!!! */
     if (p>j) return j;
     else     return cf_getSmallPrime(i-1);
   }
-#endif
-#ifdef HAVE_FACTORY
   unsigned end_i=cf_getNumSmallPrimes()-1;
-#else
-  unsigned end_i=p/2;
-#endif
   unsigned end_p=(unsigned)sqrt((double)p);
 restart:
   for (i=0; i<end_i; i++)
   {
-#ifdef HAVE_FACTORY
     j=cf_getSmallPrime(i);
-#else
-    if (i==0) j=2;
-    else j=2*i-1;
-#endif
     if ((p%j) == 0)
     {
-    #ifdef HAVE_FACTORY
       if (p<=32751) return iiIsPrime0(p-2);
-    #endif
       p-=2;
       goto restart;
     }
     if (j > end_p) return p;
   }
-#ifdef HAVE_FACTORY
   if (i>=end_i)
   {
     while(j<=end_p)
@@ -623,7 +607,6 @@ restart:
       }
     }
   }
-#endif
   return p;
 }
 int IsPrime(int p)  /* brute force !!!! */
@@ -2886,25 +2869,15 @@ BOOLEAN jjIS_SQR_FREE(leftv res, leftv u)
 
 BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w)
 {
-#ifdef HAVE_FACTORY
   res->data=singclap_resultant((poly)u->CopyD(),(poly)v->CopyD(),
                   (poly)w->CopyD(), currRing);
   return errorreported;
-#else
-  Werror("Sorry: not yet re-factored: see libpolys/polys/clapsing.cc");
-  return FALSE;
-#endif
 }
 
 BOOLEAN jjCHARSERIES(leftv res, leftv u)
 {
-#if defined(HAVE_FACTORY) && defined(HAVE_LIBFAC)
   res->data=singclap_irrCharSeries((ideal)u->Data(), currRing);
   return (res->data==NULL);
-#else
-  Werror("Sorry: not yet re-factored: see libpolys/polys/clapsing.cc");
-  return FALSE;
-#endif
 }
 
 // from semic.cc

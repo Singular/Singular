@@ -56,9 +56,7 @@
 #endif
 
 #include "coeffrings.h"
-#ifdef HAVE_FACTORY
 #include "clapsing.h"
-#endif
 
 #define ADIDEBUG 0
 
@@ -2415,14 +2413,12 @@ static number p_InitContent(poly ph, const ring r)
 //      }
 //    }
 //    nDelete(&h);
-//#ifdef HAVE_FACTORY
 //    if ( (nGetChar() == 1) || (nGetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
 //    {
 //      pTest(ph);
 //      singclap_divide_content(ph);
 //      pTest(ph);
 //    }
-//#endif
 //  }
 //}
 #if 0
@@ -2474,13 +2470,11 @@ void p_Content(poly ph, const ring r)
       }
     }
     n_Delete(&h,r->cf);
-#ifdef HAVE_FACTORY
     //if ( (n_GetChar(r) == 1) || (n_GetChar(r) < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
     //{
     //  singclap_divide_content(ph);
     //  if(!n_GreaterZero(pGetCoeff(ph),r)) ph = p_Neg(ph,r);
     //}
-#endif
   }
 }
 #endif

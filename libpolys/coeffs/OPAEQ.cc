@@ -8,9 +8,7 @@
 #include "libpolysconfig.h"
 #include <misc/auxiliary.h>
 
-#ifdef HAVE_FACTORY
 #include <factory/factory.h>
-#endif
 
 #include <string.h>
 #include <omalloc/omalloc.h>

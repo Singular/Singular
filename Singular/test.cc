@@ -1,8 +1,6 @@
 #include <misc/auxiliary.h>
 
-#ifdef HAVE_FACTORY
 #include <factory/factory.h> // :(
-#endif
 
 #include <omalloc/omalloc.h>
 
@@ -49,10 +47,8 @@
 #include <polys/clapsing.h>
 
 
-#ifdef HAVE_FACTORY
 int initializeGMP(){ return 1; } // NEEDED FOR MAIN APP. LINKING!!!
 int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
-#endif
 
 
 #include <coeffs/numbers.h>

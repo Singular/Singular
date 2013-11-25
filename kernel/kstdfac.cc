@@ -21,14 +21,10 @@
 #include <polys/weight.h>
 //#include "ipshell.h"
 #include <misc/intvec.h>
-#ifdef HAVE_FACTORY
 #include <polys/clapsing.h>
-#endif
 #include <kernel/ideals.h>
 #include <kernel/timer.h>
 #include <kernel/kstdfac.h>
-
-#ifdef HAVE_FACTORY
 
 #ifndef NDEBUG
 int strat_nr=0;
@@ -256,16 +252,7 @@ BOOLEAN k_factorize(poly p,ideal &rfac, ideal &fac_copy)
   int facdeg=currRing->pFDeg(p,currRing);
   ideal fac=singclap_factorize(pCopy(p),NULL,1,currRing);
   int fac_elems;
-#ifndef HAVE_FACTORY
-  if (fac==NULL)
-  {
-    fac=idInit(1,1);
-    fac->m[0]=pCopy(p);
-    fac_elems=1;
-  }
-  else
-#endif
-    fac_elems=IDELEMS(fac);
+  fac_elems=IDELEMS(fac);
   rfac=fac;
   fac_copy=idInit(fac_elems,1);
 
@@ -888,11 +875,9 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
   return (strat->Shdl);
 }
-#endif
 
 ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
 {
-#ifdef HAVE_FACTORY
   ideal r;
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
@@ -1039,7 +1024,4 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   }
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
   return L;
-#else
-  return NULL;
-#endif
 }

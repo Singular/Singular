@@ -578,35 +578,8 @@ const char * nfRead (const char *s, number *a, const coeffs r)
   return s;
 }
 
-#ifdef HAVE_FACTORY
 int gf_tab_numdigits62 ( int q );
 int convertback62 ( char * p, int n );
-#else
-static int gf_tab_numdigits62 ( int q )
-{
-    if ( q < 62 )          return 1;
-    else  if ( q < 62*62 ) return 2;
-    /*else*/               return 3;
-}
-
-static int convback62 ( char c )
-{
-    if ( c >= '0' && c <= '9' )
-        return int(c) - int('0');
-    else  if ( c >= 'A' && c <= 'Z' )
-        return int(c) - int('A') + 10;
-    else
-        return int(c) - int('a') + 36;
-}
-
-static int convertback62 ( char * p, int n )
-{
-    int r = 0;
-    for ( int j = 0; j < n; j++ )
-        r = r * 62 + convback62( p[j] );
-    return r;
-}
-#endif
 
 int nfMinPoly[16];
 

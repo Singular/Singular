@@ -10,15 +10,9 @@
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
-#ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #  include <factory/factory.h>
 /* libfac version strings */
-#ifdef HAVE_LIBFAC
-//  extern const char * libfac_version;
-//  extern const char * libfac_date;
-#endif // #ifdef HAVE_LIBFAC
-#endif
 
 #include <coeffs/si_gmp.h>
 #include <omalloc/omalloc.h>

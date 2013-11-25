@@ -31,10 +31,8 @@
 
 #include <polys/nc/gb_hack.h>
 
-#ifdef HAVE_FACTORY
 int initializeGMP(){ return 1; } // due to Factory...
 int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
-#endif
 
 // #pragma GCC diagnostic ignored "-Wwrite-strings"
 namespace

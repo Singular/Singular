@@ -12,8 +12,6 @@
 #ifndef FGLM_H
 #define FGLM_H
 
-#ifdef HAVE_FACTORY
-
 #include <kernel/polys.h>
 #include <kernel/structs.h>
 #include <kernel/fglmvec.h>
@@ -84,5 +82,4 @@ fglmzero( ring sourceRing, ideal & sourceIdeal, ring destRing, ideal & destideal
 
 BOOLEAN fglmquot( ideal sourceIdeal, poly quot, ideal & destIdeal );
 
-#endif
 #endif
