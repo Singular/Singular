@@ -261,7 +261,7 @@ int ksReducePolySig(LObject* PR,
       PR->is_redundant = TRUE;
       return 3;
     }
-    PW->is_sigsafe  = TRUE;
+    //PW->is_sigsafe  = TRUE;
   }
   PR->is_redundant = FALSE;
   poly p1 = PR->GetLmTailRing();   // p2 | p1

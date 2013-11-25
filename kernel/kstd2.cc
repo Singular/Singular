@@ -1575,7 +1575,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
   LObject L;
-  BOOLEAN withT     = FALSE;
+  BOOLEAN withT     = TRUE;
   strat->max_lower_index = 0;
 
   //initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
@@ -1769,23 +1769,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     {
         if (!kStratChangeTailRing(strat)) { Werror("OVERFLOW.."); break;}
     }
-    if (strat->incremental)
-    {
-      for (int jj = 0; jj<strat->tl+1; jj++)
-      {
-        if (pGetComp(strat->T[jj].sig) == strat->currIdx)
-        {
-          strat->T[jj].is_sigsafe = FALSE;
-        }
-      }
-    }
-    else
-    {
-      for (int jj = 0; jj<strat->tl+1; jj++)
-      {
-        strat->T[jj].is_sigsafe = FALSE;
-      }
-    }
 
     // reduction to non-zero new poly
     if (red_result == 1)
@@ -1819,7 +1802,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // in the ring case we cannot expect LC(f) = 1,
       // therefore we call pContent instead of pNorm
 #if SBA_TAIL_RED
-      pWrite(strat->P.p);
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
         strat->P.pCleardenom();
@@ -1835,9 +1817,27 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
           strat->P.p = redtailSba(&(strat->P),pos-1,strat, withT);
       }
-      pWrite(strat->P.p);
-      printf("-\n");
 #endif
+
+    // remove sigsafe label since it is no longer valid for the next element to
+    // be reduced
+    if (strat->incremental)
+    {
+      for (int jj = 0; jj<strat->tl+1; jj++)
+      {
+        if (pGetComp(strat->T[jj].sig) == strat->currIdx)
+        {
+          strat->T[jj].is_sigsafe = FALSE;
+        }
+      }
+    }
+    else
+    {
+      for (int jj = 0; jj<strat->tl+1; jj++)
+      {
+        strat->T[jj].is_sigsafe = FALSE;
+      }
+    }
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
 #if MYTEST
@@ -1937,8 +1937,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         enterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       // posInS only depends on the leading term
       strat->enterS(strat->P, pos, strat, strat->tl);
-#if 1
-//#if DEBUGF50
+//#if 1
+#if DEBUGF50
     printf("---------------------------\n");
     Print(" %d. ELEMENT ADDED TO GCURR:\n",strat->sl+1);
     Print("LEAD POLY:  "); pWrite(pHead(strat->S[strat->sl]));
