@@ -1080,14 +1080,11 @@ KINLINE int ksReducePolyTailSig(LObject* PR, TObject* PW, LObject* Red)
 
   assume(PR->GetLmCurrRing() != PW->GetLmCurrRing());
   Red->HeadNormalize();
+  /*
   printf("------------------------\n");
   pWrite(Red->GetLmCurrRing());
+  */
   ret = ksReducePolySig(Red, PW, 1, NULL, &coef);
-  if (ret == 3) {
-    pWrite(Red->GetLmCurrRing());
-    printf("not sig-safe\n");
-    printf("------------------------\n");
-  }
   if (!ret)
   {
     if (! n_IsOne(coef, currRing->cf))
