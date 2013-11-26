@@ -441,7 +441,8 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfClearDenominators != NULL);
     
 #ifdef LDEBUG
-    assume(n->cfDBTest!=NULL);
+    if(n->cfDBTest==NULL)
+    { n->cfDBTest=ndDBTest;Warn("cfDBTest is NULL for coeff %d",t); }
 #endif
     assume(n->type==t);
      

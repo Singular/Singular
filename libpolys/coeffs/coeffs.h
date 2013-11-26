@@ -157,12 +157,6 @@ struct n_Procs_s
    const char *  (*cfRead)(const char * s, number * a, const coeffs r);
    void    (*cfNormalize)(number &a, const coeffs r);
 
-#ifdef HAVE_RINGS
-   int     (*cfDivComp)(number a,number b,const coeffs r);
-   BOOLEAN (*cfIsUnit)(number a,const coeffs r);
-   number  (*cfGetUnit)(number a,const coeffs r);
-   BOOLEAN (*cfDivBy)(number a, number b, const coeffs r);
-#endif
 
 
    BOOLEAN (*cfGreater)(number a,number b, const coeffs r),
@@ -218,10 +212,6 @@ struct n_Procs_s
    number (*convFactoryNSingN)( const CanonicalForm n, const coeffs r);
    CanonicalForm (*convSingNFactoryN)( number n, BOOLEAN setChar, const coeffs r );
 
-#ifdef LDEBUG
-   /// Test: is "a" a correct number?
-   BOOLEAN (*cfDBTest)(number a, const char *f, const int l, const coeffs r);
-#endif
 
    /// the 0 as constant, NULL by default
    number nNULL;
@@ -254,32 +244,6 @@ struct n_Procs_s
   //                     //< extRing->qideal->[0]
 
 
-//-------------------------------------------
-#ifdef HAVE_RINGS
-  /* The following members are for representing the ring Z/n,
-     where n is not a prime. We distinguish four cases:
-     1.) n has at least two distinct prime factors. Then
-         modBase stores n, modExponent stores 1, modNumber
-         stores n, and mod2mMask is not used;
-     2.) n = p^k for some odd prime p and k > 1. Then
-         modBase stores p, modExponent stores k, modNumber
-         stores n, and mod2mMask is not used;
-     3.) n = 2^k for some k > 1; moreover, 2^k - 1 fits in
-         an unsigned long. Then modBase stores 2, modExponent
-         stores k, modNumber is not used, and mod2mMask stores
-         2^k - 1, i.e., the bit mask '111..1' of length k.
-     4.) n = 2^k for some k > 1; but 2^k - 1 does not fit in
-         an unsigned long. Then modBase stores 2, modExponent
-         stores k, modNumber stores n, and mod2mMask is not
-         used;
-     Cases 1.), 2.), and 4.) are covered by the implementation
-     in the files rmodulon.h and rmodulon.cc, whereas case 3.)
-     is implemented in the files rmodulo2m.h and rmodulo2m.cc. */
-  int_number    modBase;
-  unsigned long modExponent;
-  int_number    modNumber;
-  unsigned long mod2mMask;
-#endif
   int        ch;  /* characteristic, set by the local *InitChar methods;
                      In field extensions or extensions towers, the
                      characteristic can be accessed from any of the
@@ -311,15 +275,46 @@ struct n_Procs_s
 
 // ---------------------------------------------------
 // for Zp:
-#ifdef HAVE_DIV_MOD
   unsigned short *npInvTable;
-#endif
-#if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
   unsigned short *npExpTable;
   unsigned short *npLogTable;
-#endif
    //   int npPrimeM; // NOTE: npPrimeM is deprecated, please use ch instead!
   int npPminus1M; ///< characteristic - 1
+//-------------------------------------------
+#ifdef HAVE_RINGS
+   int     (*cfDivComp)(number a,number b,const coeffs r);
+   BOOLEAN (*cfIsUnit)(number a,const coeffs r);
+   number  (*cfGetUnit)(number a,const coeffs r);
+   BOOLEAN (*cfDivBy)(number a, number b, const coeffs r);
+  /* The following members are for representing the ring Z/n,
+     where n is not a prime. We distinguish four cases:
+     1.) n has at least two distinct prime factors. Then
+         modBase stores n, modExponent stores 1, modNumber
+         stores n, and mod2mMask is not used;
+     2.) n = p^k for some odd prime p and k > 1. Then
+         modBase stores p, modExponent stores k, modNumber
+         stores n, and mod2mMask is not used;
+     3.) n = 2^k for some k > 1; moreover, 2^k - 1 fits in
+         an unsigned long. Then modBase stores 2, modExponent
+         stores k, modNumber is not used, and mod2mMask stores
+         2^k - 1, i.e., the bit mask '111..1' of length k.
+     4.) n = 2^k for some k > 1; but 2^k - 1 does not fit in
+         an unsigned long. Then modBase stores 2, modExponent
+         stores k, modNumber stores n, and mod2mMask is not
+         used;
+     Cases 1.), 2.), and 4.) are covered by the implementation
+     in the files rmodulon.h and rmodulon.cc, whereas case 3.)
+     is implemented in the files rmodulo2m.h and rmodulo2m.cc. */
+  int_number    modBase;
+  unsigned long modExponent;
+  int_number    modNumber;
+  unsigned long mod2mMask;
+#endif
+#ifdef LDEBUG
+   // must be last entry:
+   /// Test: is "a" a correct number?
+   BOOLEAN (*cfDBTest)(number a, const char *f, const int l, const coeffs r);
+#endif
 };
 //
 // test properties and type
