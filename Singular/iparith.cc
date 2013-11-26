@@ -599,7 +599,9 @@ static BOOLEAN jjPOWER_N(leftv res, leftv u, leftv v)
     e=-e;
     d=1;
   }
-  nPower(n,e,(number*)&res->data);
+  number r;
+  nPower(n,e,(number*)&r);
+  res->data=(char*)r;
   if (d) nDelete(&n);
   if (u!=NULL) return jjOP_REST(res,u,v);
   return FALSE;
