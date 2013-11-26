@@ -222,6 +222,9 @@ int ksReducePolySig(LObject* PR,
   //printf("COMPARE IDX: %ld -- %ld\n",idx,strat->currIdx);
   if (!PW->is_sigsafe)
   {
+    PR->SetLmCurrRing();
+    //poly f1 = pCopy(PR->GetLmTailRing());   // p2 | p1
+    //poly f2 = PW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
     poly f1 = p_Copy(PR->GetLmCurrRing(),currRing);
     poly f2 = PW->GetLmCurrRing();
     poly sigMult = pCopy(PW->sig);   // copy signature of reducer
