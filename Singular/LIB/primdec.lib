@@ -39,6 +39,7 @@ PROCEDURES:
  equidimMaxEHV(I); equidimensional locus of I via Eisenbud,Huneke,Vasconcelos
  zerodec(I);       zerodimensional decomposition via Monico
  absPrimdecGTZ(I); the absolute prime components of I
+ sep(f,k);         the separabel part of f as polynomial in Fp(t1,...,tm)
 ";
 
 LIB "general.lib";
