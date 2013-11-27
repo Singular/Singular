@@ -967,7 +967,7 @@ Comments should be send to the author of the library directly.
 @node divisors_lib,ffsolve_lib,classifyci_lib, Experimental libraries
 @subsection divisors_lib
 
-@c lib divisors.lib
+@c lib divisors.lib no_ex
 @c ----------------------------------------------------------
 @node ffsolve_lib, findifs_lib, divisors_lib, Experimental libraries
 @subsection ffsolve_lib
