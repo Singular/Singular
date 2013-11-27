@@ -1144,7 +1144,7 @@ BOOLEAN ssiClose(si_link l)
         t.tv_nsec=100000000; // <=100 ms
         struct timespec rem;
         int r;
-        int wait;
+        int wait=0;
         do
         {
           r = nanosleep(&t, &rem);
