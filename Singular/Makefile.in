@@ -573,6 +573,7 @@ installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	-for file in ${pattern_mod}; do \
 	  ${INSTALL_PROGRAM} $$file ${bindir_mod}; \
 	done
+	${INSTALL_PROGRAM} singularsurf ${RUN_SINGULARS} ${bindir}
 	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
 	${INSTALL_PROGRAM} ESingular TSingular ${bindir}
 	${INSTALL_PROGRAM} surfex ${bindir}
