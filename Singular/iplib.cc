@@ -327,7 +327,10 @@ BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
   ((save1!=save11)||(save2!=verbose)) &&
   (pi->libname!=NULL) && (pi->libname[0]!='\0'))
   {
-    Warn("option changed in proc %s from %s",pi->procname,pi->libname);
+    if ((pi->libname!=NULL) && (pi->libname[0]!='\0'))
+      Warn("option changed in proc %s from %s",pi->procname,pi->libname);
+    else
+      Warn("option changed in proc %s",pi->procname);
     int i;
     for (i=0; optionStruct[i].setval!=0; i++)
     {
