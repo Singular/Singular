@@ -63,7 +63,7 @@ LIB "paraplanecurves.lib";
 LIB "phindex.lib";
 LIB "pointid.lib";
 LIB "poly.lib";
-LIB "oldpolymake.lib";
+//LIB "oldpolymake.lib";
 LIB "presolve.lib";
 LIB "primdec.lib";
 LIB "primdecint.lib";
