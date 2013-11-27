@@ -1139,14 +1139,27 @@ BOOLEAN ssiClose(si_link l)
         struct timespec t;
         t.tv_sec=0;
         t.tv_nsec=100000000; // <=100 ms
-        int r=si_nanosleep(&t,NULL);
-        if((r==0) && (si_waitpid(d->pid,NULL,WNOHANG)==0))
+        struct timespec rem;
+        int r;
+        int wait;
+        do
+        {
+          r = nanosleep(&t, &rem);
+          t = rem;
+        } while ((r < 0) && (errno == EINTR)
+            && ((wait = si_waitpid(d->pid,NULL,WNOHANG)) == 0));
+        if ((r == 0) && (wait == 0))
         {
           kill(d->pid,15);
           t.tv_sec=5; // <=5s
           t.tv_nsec=0;
-          r=si_nanosleep(&t,NULL);
-          if((r==0)&&(si_waitpid(d->pid,NULL,WNOHANG)==0))
+          do
+          {
+            r = nanosleep(&t, &rem);
+            t = rem;
+          } while ((r < 0) && (errno == EINTR)
+              && ((wait = si_waitpid(d->pid,NULL,WNOHANG)) == 0));
+          if ((r == 0) && (wait == 0))
           {
             kill(d->pid,9); // just to be sure
             si_waitpid(d->pid,NULL,0);
