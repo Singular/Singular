@@ -246,6 +246,7 @@ BOOLEAN slClose(si_link l)
   if(! SI_LINK_OPEN_P(l))
     return FALSE;
 
+  defer_shutdown++;
   BOOLEAN res = TRUE;
   if (l->m->Close != NULL)
   {
@@ -254,6 +255,8 @@ BOOLEAN slClose(si_link l)
       Werror("close: Error for link of type: %s, mode: %s, name: %s",
            l->m->type, l->mode, l->name);
   }
+  defer_shutdown--;
+  if (!defer_shutdown && do_shutdown) m2_end(1);
   return res;
 }
 
