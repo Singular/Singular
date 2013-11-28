@@ -52,7 +52,7 @@
   #define F5CTAILRED 1
 #endif
 
-#define SBA_TAIL_RED                        0
+#define SBA_TAIL_RED                        1
 #define SBA_PRODUCT_CRITERION               0
 #define SBA_PRINT_ZERO_REDUCTIONS           1
 #define SBA_PRINT_REDUCTION_STEPS           1
