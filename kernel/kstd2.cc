@@ -62,7 +62,7 @@
 #define SBA_PRINT_PRODUCT_CRITERION         0
 
 // counts sba's reduction steps
-#if SBA_PRNT_REDUCTION_STEPS
+#if SBA_PRINT_REDUCTION_STEPS
 long sba_reduction_steps;
 long sba_interreduction_steps;
 #endif
@@ -1674,7 +1674,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   // 2. a (possibly non-incremental) computation w.r.t. the
   //    induced Schreyer order.
   // The corresponding orders are computed in sbaRing(), depending
-  // on the flag strat->incremental
+  // on the flag strat->sbaOrder
 #if SBA_PRINT_ZERO_REDUCTIONS
   long zeroreductions           = 0;
 #endif
@@ -1700,7 +1700,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   ideal F = F0;
   ring sRing, currRingOld;
   currRingOld  = currRing;
-  if (strat->incremental)
+  if (strat->sbaOrder == 1)
   {
     sRing = sbaRing(strat);
     if (sRing!=currRingOld)
@@ -1803,7 +1803,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if (strat->Ll<0) break;
       else strat->noClearS=TRUE;
     }
-    if (strat->incremental && pGetComp(strat->L[strat->Ll].sig) != strat->currIdx)
+    if (strat->sbaOrder == 1 && pGetComp(strat->L[strat->Ll].sig) != strat->currIdx)
     {
       strat->currIdx  = pGetComp(strat->L[strat->Ll].sig);
 #if F5C
@@ -1968,7 +1968,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
     // remove sigsafe label since it is no longer valid for the next element to
     // be reduced
-    if (strat->incremental)
+    if (strat->sbaOrder == 1)
     {
       for (int jj = 0; jj<strat->tl+1; jj++)
       {
@@ -2016,7 +2016,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // enter into S, L, and T
       //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
-      if(!strat->incremental)
+      if(!strat->sbaOrder == 1)
       {
         BOOLEAN overwrite = TRUE;
         for (int tk=0; tk<strat->sl+1; tk++)
@@ -2228,7 +2228,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     strat->Shdl->m[i] = NULL;
   }
 #endif
-  if (strat->incremental && sRing!=currRingOld)
+  if (strat->sbaOrder == 1 && sRing!=currRingOld)
   {
     rChangeCurrRing (currRingOld);
     F0          = idrMoveR (F, sRing, currRing);
