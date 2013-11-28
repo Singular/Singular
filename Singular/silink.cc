@@ -195,6 +195,10 @@ const char* slStatus(si_link l, const char *request)
 }
 
 //--------------------------------------------------------------------------
+BOOLEAN slSetRingDummy(si_link, ring)
+{
+  return FALSE;
+}
 BOOLEAN slOpen(si_link l, short flag, leftv h)
 {
   BOOLEAN res = TRUE;
@@ -220,6 +224,7 @@ BOOLEAN slOpen(si_link l, short flag, leftv h)
              c, l->m->type, l->mode, l->name);
     }
   }
+  if (l->m->SetRing==NULL) l->m->SetRing=slSetRingDummy;
   return res;
 }
 

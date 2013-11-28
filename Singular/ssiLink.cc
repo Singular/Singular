@@ -57,7 +57,8 @@
 
 #include <Singular/si_signals.h>
 
-#define SSI_VERSION 5
+#define SSI_VERSION 6  
+// 5->6: changed newstruct representation
 
 // 64 bit version:
 //#if SIZEOF_LONG == 8
@@ -1334,6 +1335,19 @@ no_ring: WerrorS("no ring");
   return NULL;
 }
 //**************************************************************************/
+BOOLEAN ssiSetRing(si_link l, ring r)
+{
+  if(SI_LINK_W_OPEN_P(l)==0)
+     if (slOpen(l,SI_LINK_OPEN|SI_LINK_WRITE,NULL)) return TRUE;
+  ssiInfo *d = (ssiInfo *)l->data;
+  if (d->r!=r)
+  {
+    fputs("15 ",d->f_write);
+    ssiWriteRing(d,r);
+  }
+  return FALSE;
+}
+//**************************************************************************/
 BOOLEAN ssiWrite(si_link l, leftv data)
 {
   if(SI_LINK_W_OPEN_P(l)==0)
@@ -1465,6 +1479,7 @@ si_link_extension slInitSsiExtension(si_link_extension s)
   s->GetDump=ssiGetDump;
 
   s->Status=slStatusSsi;
+  s->SetRing=ssiSetRing;
   s->type="ssi";
   return s;
 }
