@@ -21,7 +21,7 @@ typedef leftv      (*slRead2Proc)(si_link l, leftv a);
 typedef BOOLEAN    (*slDumpProc)(si_link l);
 typedef BOOLEAN    (*slGetDumpProc)(si_link l);
 typedef const char* (*slStatusProc)(si_link l, const char *request);
-typedef BOOLEAN    (*slSetRingProc)(si_link l, ring r);
+typedef BOOLEAN    (*slSetRingProc)(si_link l, ring r, BOOLEAN send);
 
 struct s_si_link_extension
 {

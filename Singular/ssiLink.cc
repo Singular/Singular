@@ -57,7 +57,7 @@
 
 #include <Singular/si_signals.h>
 
-#define SSI_VERSION 6  
+#define SSI_VERSION 6
 // 5->6: changed newstruct representation
 
 // 64 bit version:
@@ -168,11 +168,11 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
       else
       {
         mpz_t tmp;
-	mpz_init_set_si(tmp,nn);
+        mpz_init_set_si(tmp,nn);
         fputs("8 ",d->f_write);
         mpz_out_str (d->f_write,32, tmp);
         fputc(' ',d->f_write);
-	mpz_clear(tmp);
+        mpz_clear(tmp);
       }
       #endif
       //if (d->f_debug!=NULL) fprintf(d->f_debug,"number: short \"%ld\" ",SR_TO_INT(n));
@@ -206,7 +206,7 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... */
   if (d->r!=NULL) rKill(d->r);
   d->r=r;
-  if (r!=NULL) 
+  if (r!=NULL)
   {
     /*d->*/r->ref++;
     fprintf(d->f_write,"%d %d ",r->ch,r->N);
@@ -439,11 +439,11 @@ static number ssiReadQNumber(ssiInfo *d)
      case 4:
        {
          LONG dd=s_readlong(d->f_read);
-	 //#if SIZEOF_LONG == 8
+         //#if SIZEOF_LONG == 8
          return INT_TO_SR(dd);
-	 //#else
-	 //return nlInit(dd,NULL);
-	 //#endif
+         //#else
+         //return nlInit(dd,NULL);
+         //#endif
        }
      case 5:
      case 6:
@@ -1233,10 +1233,10 @@ leftv ssiRead1(si_link l)
              res->data=(char*)d->r;
              // we are in the top-level, so set the basering to d->r:
              if (d->r!=NULL)
-	     {
-	       d->r->ref++;
+             {
+               d->r->ref++;
                ssiSetCurrRing(d->r);
-	     }
+             }
              if (t==15) return ssiRead1(l);
            }
            break;
@@ -1292,7 +1292,7 @@ leftv ssiRead1(si_link l)
              break;
     case 19: res->rtyp=BIGINTMAT_CMD;
              res->data=ssiReadBigintmat(d);
-	     break;
+             break;
     case 20: ssiReadBlackbox(res,l);
              break;
     // ------------
@@ -1335,16 +1335,21 @@ no_ring: WerrorS("no ring");
   return NULL;
 }
 //**************************************************************************/
-BOOLEAN ssiSetRing(si_link l, ring r)
+BOOLEAN ssiSetRing(si_link l, ring r, BOOLEAN send)
 {
   if(SI_LINK_W_OPEN_P(l)==0)
      if (slOpen(l,SI_LINK_OPEN|SI_LINK_WRITE,NULL)) return TRUE;
   ssiInfo *d = (ssiInfo *)l->data;
   if (d->r!=r)
   {
-    fputs("15 ",d->f_write);
-    ssiWriteRing(d,r);
+    if (send)
+    {
+      fputs("15 ",d->f_write);
+      ssiWriteRing(d,r);
+    }
+    d->r=r;
   }
+  if (currRing!=r) rChangeCurrRing(r);
   return FALSE;
 }
 //**************************************************************************/
@@ -2053,7 +2058,7 @@ BOOLEAN ssiGetDump(si_link l)
 // 18 intmat
 // 19 bigintmat <r> <c> ...
 //
-// 20 blackbox <name> ...
+// 20 blackbox <name> 1 <len> ...
 //
 // 98: verify version: <ssi-version> <MAX_TOK> <OPT1> <OPT2>
 // 99: quit Singular

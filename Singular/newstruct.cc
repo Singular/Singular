@@ -580,7 +580,7 @@ BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
   f->m->Write(f, &l);
   // set all entries corresponding to "real" mebers to 1 in rings
   char *rings=(char*)omAlloc0(Ll+1);
-  newstruct_member elem;
+  newstruct_member elem=dd->member;
   while (elem!=NULL)
   {
     rings[elem->pos]='\1';
@@ -588,26 +588,21 @@ BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
   }
   int i;
   BOOLEAN ring_changed=FALSE;
+  ring save_ring=currRing;
   for(i=0;i<=Ll;i++)
   {
     if (rings[i]=='\0') // ring entry for pos i+1
     {
-      if (ll->m[i].data==NULL)
-      {
-        f->m->Write(f,&(ll->m[i]));
-      }
-      else if(ll->m[i].data!=(char*)currRing)
+      if (ll->m[i].data!=NULL)
       {
         ring_changed=TRUE;
-        f->m->SetRing(f,(ring)ll->m[i].data);
-        f->m->Write(f,&(ll->m[i]));
+        f->m->SetRing(f,(ring)ll->m[i].data,TRUE);
       }
     }
-    else
-      f->m->Write(f,&(ll->m[i]));
+    f->m->Write(f,&(ll->m[i]));
   }
   if (ring_changed)
-    f->m->SetRing(f,currRing);
+    f->m->SetRing(f,save_ring,FALSE);
 }
 
 BOOLEAN newstruct_deserialize(blackbox **b, void **d, si_link f)
