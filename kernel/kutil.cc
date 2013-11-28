@@ -5936,7 +5936,7 @@ void initSLSba (ideal F, ideal Q,kStrategy strat)
   strat->Shdl   =   idInit(i,F->rank);
   strat->S      =   strat->Shdl->m;
   strat->sig    =   (poly *)omAlloc0(i*sizeof(poly));
-  if (!strat->incremental)
+  if (strat->sbaOrder != 1)
   {
     strat->syz    = (poly *)omAlloc0(i*sizeof(poly));
     strat->sevSyz = initsevS(i);
@@ -5998,7 +5998,7 @@ void initSLSba (ideal F, ideal Q,kStrategy strat)
       // of the corresponding initial polynomials generating the ideal
       // => we can keep the underlying monomial order and get a Schreyer
       //    order without any bigger overhead
-      if (!strat->incremental)
+      if (strat->sbaOrder != 1)
       {
         p_ExpVectorAdd (h.sig,F->m[i],currRing);
       }
@@ -6035,7 +6035,7 @@ void initSLSba (ideal F, ideal Q,kStrategy strat)
         }
       }
       /*
-      if (!strat->incremental)
+      if (strat->sbaOrder != 1)
       {
         for(j=0;j<i;j++)
         {
@@ -7340,7 +7340,7 @@ void initSbaCrit(kStrategy strat)
    * kSba() in kstd1.cc
    *****************************************/
   //strat->rewCrit1     = faugereRewCriterion;
-  if (strat->incremental)
+  if (strat->sbaOrder == 1)
   {
     strat->syzCrit  = syzCriterionInc;
   }
@@ -7764,7 +7764,7 @@ void exitSba (kStrategy strat)
   omFreeSize((ADDRESS)strat->sevSig,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   omFreeSize((ADDRESS)strat->syz,(strat->syzmax)*sizeof(poly));
   omFreeSize((ADDRESS)strat->sevSyz,(strat->syzmax)*sizeof(unsigned long));
-  if (strat->incremental)
+  if (strat->sbaOrder == 1)
   {
     omFreeSize(strat->syzIdx,(strat->syzidxmax)*sizeof(int));
   }
@@ -8253,8 +8253,8 @@ void kStratInitChangeTailRing(kStrategy strat)
 ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
 {
   int n = rBlocks(r); // Including trailing zero!
-  // if incremental => use (C,monomial order from r)
-  if (strat->incremental)
+  // if sbaOrder == 1 => use (C,monomial order from r)
+  if (strat->sbaOrder == 1)
   {
     if (r->order[0] == ringorder_C || r->order[0] == ringorder_c)
     {
@@ -8297,7 +8297,7 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
     return (res);
   }
 
-  // not incremental => use Schreyer order
+  // not sbaOrder == 1 => use Schreyer order
   // this is done by a trick when initializing the signatures
   // in initSLSba():
   // Instead of using the signature 1e_i for F->m[i], we start
