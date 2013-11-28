@@ -19,7 +19,10 @@ static int blackboxTableCnt=0;
 #define BLACKBOX_OFFSET (MAX_TOK+1)
 blackbox* getBlackboxStuff(const int t)
 {
-  return (blackboxTable[t-BLACKBOX_OFFSET]);
+  if (t>MAX_TOK)  /*MAX_TOK+1 is BLACKBOX_OFFSET*/
+    return (blackboxTable[t-BLACKBOX_OFFSET]);
+  else
+    return NULL;
 }
 
 
