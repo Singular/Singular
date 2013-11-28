@@ -1073,30 +1073,6 @@ KINLINE int ksReducePolyTail(LObject* PR, TObject* PW, LObject* Red)
   return ret;
 }
 
-KINLINE int ksReducePolyTailSig(LObject* PR, TObject* PW, LObject* Red)
-{
-  BOOLEAN ret;
-  number coef;
-
-  assume(PR->GetLmCurrRing() != PW->GetLmCurrRing());
-  Red->HeadNormalize();
-  /*
-  printf("------------------------\n");
-  pWrite(Red->GetLmCurrRing());
-  */
-  ret = ksReducePolySig(Red, PW, 1, NULL, &coef);
-  if (!ret)
-  {
-    if (! n_IsOne(coef, currRing->cf))
-    {
-      PR->Mult_nn(coef);
-      // HANNES: mark for Normalize
-    }
-    n_Delete(&coef, currRing->cf);
-  }
-  return ret;
-}
-
 /***************************************************************
  *
  * Routines for backwards-Compatibility

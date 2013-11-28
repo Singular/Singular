@@ -530,6 +530,32 @@ int redHomog (LObject* h,kStrategy strat)
   }
 }
 
+KINLINE int ksReducePolyTailSig(LObject* PR, TObject* PW, LObject* Red)
+{
+  BOOLEAN ret;
+  number coef;
+
+  assume(PR->GetLmCurrRing() != PW->GetLmCurrRing());
+  Red->HeadNormalize();
+  /*
+  printf("------------------------\n");
+  pWrite(Red->GetLmCurrRing());
+  */
+  ret = ksReducePolySig(Red, PW, 1, NULL, &coef);
+
+
+  if (!ret)
+  {
+    if (! n_IsOne(coef, currRing->cf))
+    {
+      PR->Mult_nn(coef);
+      // HANNES: mark for Normalize
+    }
+    n_Delete(&coef, currRing->cf);
+  }
+  return ret;
+}
+
 /*2
 *  reduction procedure for signature-based standard
 *  basis algorithms:
@@ -705,6 +731,114 @@ int redSig (LObject* h,kStrategy strat)
       }
     }
   }
+}
+
+// tail reduction for SBA
+poly redtailSba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN normalize)
+{
+#define REDTAIL_CANONICALIZE 100
+  strat->redTailChange=FALSE;
+  if (strat->noTailReduction) return L->GetLmCurrRing();
+  poly h, p;
+  p = h = L->GetLmTailRing();
+  if ((h==NULL) || (pNext(h)==NULL))
+    return L->GetLmCurrRing();
+
+  TObject* With;
+  // placeholder in case strat->tl < 0
+  TObject  With_s(strat->tailRing);
+
+  LObject Ln(pNext(h), strat->tailRing);
+  Ln.sig      = L->sig;
+  Ln.sevSig   = L->sevSig;
+  Ln.pLength  = L->GetpLength() - 1;
+
+  pNext(h) = NULL;
+  if (L->p != NULL) pNext(L->p) = NULL;
+  L->pLength = 1;
+
+  Ln.PrepareRed(strat->use_buckets);
+
+  int cnt=REDTAIL_CANONICALIZE;
+  while(!Ln.IsNull())
+  {
+    loop
+    {
+      Ln.SetShortExpVector();
+      if (withT)
+      {
+        int j;
+        j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
+        if (j < 0) break;
+        With = &(strat->T[j]);
+      }
+      else
+      {
+        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+        if (With == NULL) break;
+      }
+      cnt--;
+      if (cnt==0)
+      {
+        cnt=REDTAIL_CANONICALIZE;
+        /*poly tmp=*/Ln.CanonicalizeP();
+        if (normalize)
+        {
+          Ln.Normalize();
+          //pNormalize(tmp);
+          //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+        }
+      }
+      if (normalize && (!TEST_OPT_INTSTRATEGY) && (!nIsOne(pGetCoeff(With->p))))
+      {
+        With->pNorm();
+      }
+      strat->redTailChange=TRUE;
+      int ret = ksReducePolyTailSig(L, With, &Ln);
+#if SBA_PRINT_REDUCTION_STEPS
+      if (ret != 3)
+        sba_reduction_steps++;
+#endif
+#if SBA_PRINT_OPERATIONS
+      if (ret != 3)
+        sba_operations  +=  pLength(With->p);
+#endif
+      if (ret)
+      {
+        // reducing the tail would violate the exp bound
+        //  set a flag and hope for a retry (in bba)
+        strat->completeReduce_retry=TRUE;
+        if ((Ln.p != NULL) && (Ln.t_p != NULL)) Ln.p=NULL;
+        do
+        {
+          pNext(h) = Ln.LmExtractAndIter();
+          pIter(h);
+          L->pLength++;
+        } while (!Ln.IsNull());
+        goto all_done;
+      }
+      if (Ln.IsNull()) goto all_done;
+      if (! withT) With_s.Init(currRing);
+    }
+    pNext(h) = Ln.LmExtractAndIter();
+    pIter(h);
+    pNormalize(h);
+    L->pLength++;
+  }
+
+  all_done:
+  Ln.Delete();
+  if (L->p != NULL) pNext(L->p) = pNext(p);
+
+  if (strat->redTailChange)
+  {
+    L->length = 0;
+  }
+
+  //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
+  //L->Normalize(); // HANNES: should have a test
+  assume(kTest_L(L));
+  return L->GetLmCurrRing();
 }
 
 /*2
