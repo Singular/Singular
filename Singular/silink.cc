@@ -224,8 +224,8 @@ BOOLEAN slOpen(si_link l, short flag, leftv h)
         Werror("open: Error for link %s of type: %s, mode: %s, name: %s",
              c, l->m->type, l->mode, l->name);
     }
+    if (l->m->SetRing==NULL) l->m->SetRing=slSetRingDummy;
   }
-  if (l->m->SetRing==NULL) l->m->SetRing=slSetRingDummy;
   return res;
 }
 
