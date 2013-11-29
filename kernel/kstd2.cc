@@ -54,11 +54,11 @@
 
 #define SBA_TAIL_RED                        1
 #define SBA_PRODUCT_CRITERION               0
-#define SBA_PRINT_ZERO_REDUCTIONS           0
-#define SBA_PRINT_REDUCTION_STEPS           0
-#define SBA_PRINT_OPERATIONS                0
-#define SBA_PRINT_SIZE_G                    0
-#define SBA_PRINT_SIZE_SYZ                  0
+#define SBA_PRINT_ZERO_REDUCTIONS           1
+#define SBA_PRINT_REDUCTION_STEPS           1
+#define SBA_PRINT_OPERATIONS                1
+#define SBA_PRINT_SIZE_G                    1
+#define SBA_PRINT_SIZE_SYZ                  1
 #define SBA_PRINT_PRODUCT_CRITERION         0
 
 // counts sba's reduction steps
@@ -1697,7 +1697,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   sba_interreduction_operations = 0;
 #endif
 
-  ideal F = F0;
+  ideal F1 = F0;
   ring sRing, currRingOld;
   currRingOld  = currRing;
   if (strat->sbaOrder == 1)
@@ -1706,9 +1706,14 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (sRing!=currRingOld)
     {
       rChangeCurrRing (sRing);
-      F = idrMoveR (F0, currRingOld, currRing);
+      F1 = idrMoveR (F0, currRingOld, currRing);
     }
   }
+  // sort ideal F
+  ideal F       = idInit(IDELEMS(F1),F1->rank);
+  intvec *sort  = idSort(F1);
+  for (int i=0; i<sort->length();++i)
+    F->m[i] = F1->m[(*sort)[i]-1];
 #if 0
   printf("SBA COMPUTATIONS DONE IN THE FOLLOWING RING:\n");
   rWrite (currRing);
@@ -1887,7 +1892,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 //#if 1
 #ifdef DEBUGF5
       Print("Poly before red: ");
-      pWrite(strat->P.p);
+      pWrite(pHead(strat->P.p));
+      pWrite(strat->P.sig);
 #endif
       /* reduction of the element choosen from L */
       if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat, strat->P.checked+1)) {
@@ -2016,7 +2022,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // enter into S, L, and T
       //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
-      if(strat->sbaOrder != 1)
+      if(strat->sbaOrder == 0)
       {
         BOOLEAN overwrite = TRUE;
         for (int tk=0; tk<strat->sl+1; tk++)
@@ -2232,7 +2238,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (strat->sbaOrder == 1 && sRing!=currRingOld)
   {
     rChangeCurrRing (currRingOld);
-    F0          = idrMoveR (F, sRing, currRing);
+    F0          = idrMoveR (F1, sRing, currRing);
     strat->Shdl = idrMoveR_NoSort (strat->Shdl, sRing, currRing);
     rDelete (sRing);
   }
