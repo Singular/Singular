@@ -78,7 +78,7 @@ feResourceConfig_s feResourceConfigs[] =
   {"ProcDir",   'P',    feResPath,  "SINGULAR_PROCS_DIR",
      "%b/MOD;"
      LIBEXEC_DIR "/singular/MOD;"
-     LIB_DIR "/MOD;"   /*debian*/
+     LIB_DIR "/singular/MOD;"   /*debian: -> /usr/lib/singular/MOD */
      "%r/libexec/singular/MOD",                  (char *)""},
   {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                (char *)""},
   {"DataDir",   'D',    feResDir,   "SINGULAR_DATA_DIR",    "%b/../share/",          (char *)""},
