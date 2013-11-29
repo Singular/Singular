@@ -577,23 +577,57 @@ BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
   l.data=(void*)getBlackboxName(dd->id);
   f->m->Write(f, &l);
   lists ll=(lists)d;
-  memset(&l,0,sizeof(l));
-  l.rtyp=LIST_CMD;
-  l.data=ll;
+  int Ll=lSize(ll);
+  l.rtyp=INT_CMD;
+  l.data=(void*)(long)Ll;
   f->m->Write(f, &l);
-  return FALSE;
+  // set all entries corresponding to "real" mebers to 1 in rings
+  char *rings=(char*)omAlloc0(Ll+1);
+  newstruct_member elem=dd->member;
+  while (elem!=NULL)
+  {
+    rings[elem->pos]='\1';
+    elem=elem->next;
+  }
+  int i;
+  BOOLEAN ring_changed=FALSE;
+  ring save_ring=currRing;
+  for(i=0;i<=Ll;i++)
+  {
+    if (rings[i]=='\0') // ring entry for pos i+1
+    {
+      if (ll->m[i].data!=NULL)
+      {
+        ring_changed=TRUE;
+        f->m->SetRing(f,(ring)ll->m[i].data,TRUE);
+      }
+    }
+    f->m->Write(f,&(ll->m[i]));
+  }
+  if (ring_changed)
+    f->m->SetRing(f,save_ring,FALSE);
 }
 
-BOOLEAN newstruct_deserialize(blackbox **/*b*/, void **d, si_link f)
+BOOLEAN newstruct_deserialize(blackbox **b, void **d, si_link f)
 {
-  // newstruct is serialiazed as a list,
+  // newstruct is serialiazed as analog to a list,
   // just read a list and take data,
   // rtyp must be set correctly (to the blackbox id) by routine calling
   // newstruct_deserialize
-  leftv l=f->m->Read(f);
+  leftv l=f->m->Read(f); // int: length of list
+  int Ll=(int)(long)(l->data);
+  omFree(l);
+  lists L=(lists)omAllocBin(slists_bin);
+  L->Init(Ll+1);
+  for(int i=0;i<=Ll;i++)
+  {
+    l=f->m->Read(f);
+    memcpy(&(L->m[i]),l,sizeof(sleftv));
+    omFree(l);
+  }
   //newstruct_desc n=(newstruct_desc)b->data;
   //TODO: check compatibility of list l->data with description in n
-  *d=l->data;
+  *d=L;
   return FALSE;
 }
 
@@ -762,6 +796,7 @@ newstruct_desc newstructChildFromString(const char *parent, const char *s)
 
   return scanNewstructFromString(s,res);
 }
+
 void newstructShow(newstruct_desc d)
 {
   newstruct_member elem;

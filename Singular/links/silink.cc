@@ -191,6 +191,11 @@ const char* slStatus(si_link l, const char *request)
 }
 
 //--------------------------------------------------------------------------
+BOOLEAN slSetRingDummy(si_link, ring r, BOOLEAN send)
+{
+  if (currRing!=r) rChangeCurrRing(r);
+  return FALSE;
+}
 BOOLEAN slOpen(si_link l, short flag, leftv h)
 {
   BOOLEAN res = TRUE;
@@ -217,6 +222,7 @@ BOOLEAN slOpen(si_link l, short flag, leftv h)
         Werror("open: Error for link %s of type: %s, mode: %s, name: %s",
              c, l->m->type, l->mode, l->name);
     }
+    if (l->m->SetRing==NULL) l->m->SetRing=slSetRingDummy;
   }
   return res;
 }
