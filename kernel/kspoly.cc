@@ -200,13 +200,13 @@ int ksReducePolySig(LObject* PR,
    *
    * TODO:
    * --------------------------------------------
-   * if strat->incremental
+   * if strat->sbaOrder == 1
    * Since we are subdividing lower index and
    * current index reductions it is enough to
    * look at the polynomial part of the signature
    * for a check. This should speed-up checking
    * a lot!
-   * if !strat->incremental
+   * if !strat->sbaOrder == 0
    * We are not subdividing lower and current index
    * due to the fact that we are using the induced
    * Schreyer order
