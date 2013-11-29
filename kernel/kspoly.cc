@@ -237,7 +237,7 @@ int ksReducePolySig(LObject* PR,
     pWrite(sigMult);
     printf("--------------\n");
 #endif
-    sigMult = pp_Mult_qq(f1,sigMult,currRing);
+    sigMult = p_Mult_q(f1,sigMult,currRing);
 //#if 1
 #ifdef DEBUGF5
     printf("------------------- IN KSREDUCEPOLYSIG: --------------------\n");
@@ -255,7 +255,7 @@ int ksReducePolySig(LObject* PR,
     printf("%d -- %d sig\n",sigSafe,PW->is_sigsafe);
 
 #endif
-    pDelete(&f1);
+    //pDelete(&f1);
     pDelete(&sigMult);
     // go on with the computations only if the signature of p2 is greater than the
     // signature of fm*p1
