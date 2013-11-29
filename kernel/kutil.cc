@@ -5998,7 +5998,7 @@ void initSLSba (ideal F, ideal Q,kStrategy strat)
       // of the corresponding initial polynomials generating the ideal
       // => we can keep the underlying monomial order and get a Schreyer
       //    order without any bigger overhead
-      if (strat->sbaOrder != 1)
+      if (strat->sbaOrder == 0)
       {
         p_ExpVectorAdd (h.sig,F->m[i],currRing);
       }
