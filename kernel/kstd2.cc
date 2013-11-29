@@ -2022,7 +2022,17 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // enter into S, L, and T
       //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
-      if(strat->sbaOrder == 0)
+      enterT(strat->P, strat);
+      strat->T[strat->tl].is_sigsafe = FALSE;
+#ifdef HAVE_RINGS
+      if (rField_is_Ring(currRing))
+        superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+      else
+#endif
+        enterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+      // posInS only depends on the leading term
+      strat->enterS(strat->P, pos, strat, strat->tl);
+      if(strat->sbaOrder != 1)
       {
         BOOLEAN overwrite = TRUE;
         for (int tk=0; tk<strat->sl+1; tk++)
@@ -2081,16 +2091,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           }
         }
       }
-      enterT(strat->P, strat);
-      strat->T[strat->tl].is_sigsafe = FALSE;
-#ifdef HAVE_RINGS
-      if (rField_is_Ring(currRing))
-        superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
-      else
-#endif
-        enterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
-      // posInS only depends on the leading term
-      strat->enterS(strat->P, pos, strat, strat->tl);
 //#if 1
 #if DEBUGF50
     printf("---------------------------\n");
@@ -2270,7 +2270,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   printf("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n");
   printf("INTERREDUCTIONS:            %ld\n",sba_interreduction_steps);
 #endif
-#if SBA_PRINT_REDUCTION_OPERATIONS
+#if SBA_PRINT_OPERATIONS
   printf("INTERREDUCTION OPERATIONS:  %ld\n",sba_interreduction_operations);
 #endif
 #if SBA_PRINT_REDUCTION_STEPS
