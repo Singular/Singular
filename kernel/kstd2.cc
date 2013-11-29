@@ -2016,7 +2016,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // enter into S, L, and T
       //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
-      if(!strat->sbaOrder == 1)
+      if(strat->sbaOrder != 1)
       {
         BOOLEAN overwrite = TRUE;
         for (int tk=0; tk<strat->sl+1; tk++)
@@ -2055,7 +2055,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
             strat->syz[i] = pCopy(strat->P.sig);
             // add LM(F->m[i]) to the signature to get a Schreyer order
             // without changing the underlying polynomial ring at all
-            p_ExpVectorAdd (strat->syz[i],strat->S[ps],currRing);
+            if (strat->sbaOrder == 0)
+              p_ExpVectorAdd (strat->syz[i],strat->S[ps],currRing);
             // since p_Add_q() destroys all input
             // data we need to recreate help
             // each time
