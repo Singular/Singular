@@ -187,7 +187,8 @@ public:
                       // critical pair creation => when entering the
                       // reduction process it is enough to start a second
                       // rewritten criterion check from checked+1 onwards
-                      // NOTE: If checked = 3 then the corresponding pair is
+  BOOLEAN prod_crit;
+                      // NOTE: If prod_crit = TRUE then the corresponding pair is
                       // detected by Buchberger's Product Criterion and can be
                       // deleted
   poly  p1,p2; /*- the pair p comes from,

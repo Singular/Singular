@@ -1898,7 +1898,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       /* reduction of the element choosen from L */
       if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat, strat->P.checked+1)) {
 #if SBA_PRODUCT_CRITERION
-        if (strat->P.checked == 3) {
+        if (strat->P.prd_crit) {
           product_criterion++;
           enterSyz(strat->P, strat);
           if (strat->P.lcm!=NULL)
@@ -1911,6 +1911,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       red_result = strat->red(&strat->P,strat);
 #endif
       } else {
+        pDelete(&strat->P.sig);
         if (strat->P.lcm!=NULL)
           pLmFree(strat->P.lcm);
         red_result = 2;
