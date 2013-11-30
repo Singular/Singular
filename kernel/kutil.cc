@@ -1891,7 +1891,7 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   }
 // adds buchberger's first criterion
   if (pLmCmp(m2,pHead(p)) == 0) {
-    Lp.checked  = 3; // 3 == Product Criterion
+    Lp.prod_crit = TRUE; // Product Criterion
 #if 0
     enterSyz(Lp, strat);
     Lp.lcm=NULL;
@@ -5224,6 +5224,7 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy s
     }
     if (strat->L[strat->Ll].GetLmCurrRing() == NULL)
     {
+      pDelete(&strat->P.sig);
       strat->P.Delete();
       strat->P = strat->L[strat->Ll];
       strat->Ll--;
@@ -5238,6 +5239,7 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy s
       }
       else
       {
+        pDelete(&strat->P.sig);
         strat->P.Delete();
         strat->P = strat->L[strat->Ll];
         strat->Ll--;
