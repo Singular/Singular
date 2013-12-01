@@ -971,6 +971,8 @@ void tropical_setup(SModulFunctions* p)
 #ifndef NDEBUG
   // p->iiAddCproc("","divideByGcd",FALSE,divideByGcd);
   p->iiAddCproc("","pReduce",FALSE,pReduce);
+  p->iiAddCproc("","reduceInitially0",FALSE,reduceInitially0);
+  p->iiAddCproc("","reduceInitially1",FALSE,reduceInitially1);
 #endif //NDEBUG
   // p->iiAddCproc("","initialReduction",FALSE,initialReduction);
   p->iiAddCproc("","homogeneitySpace",FALSE,homogeneitySpace);
