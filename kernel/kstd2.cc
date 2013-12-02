@@ -54,11 +54,11 @@
 
 #define SBA_TAIL_RED                        1
 #define SBA_PRODUCT_CRITERION               0
-#define SBA_PRINT_ZERO_REDUCTIONS           1
-#define SBA_PRINT_REDUCTION_STEPS           1
-#define SBA_PRINT_OPERATIONS                1
-#define SBA_PRINT_SIZE_G                    1
-#define SBA_PRINT_SIZE_SYZ                  1
+#define SBA_PRINT_ZERO_REDUCTIONS           0
+#define SBA_PRINT_REDUCTION_STEPS           0
+#define SBA_PRINT_OPERATIONS                0
+#define SBA_PRINT_SIZE_G                    0
+#define SBA_PRINT_SIZE_SYZ                  0
 #define SBA_PRINT_PRODUCT_CRITERION         0
 
 // counts sba's reduction steps
@@ -479,7 +479,7 @@ int redHomog (LObject* h,kStrategy strat)
 #if SBA_PRINT_REDUCTION_STEPS
     sba_interreduction_steps++;
 #endif
-#if SBA_PRINT_REDUCTION_OPERATIONS
+#if SBA_PRINT_OPERATIONS
     sba_interreduction_operations  +=  pLength(strat->T[ii].p);
 #endif
 
@@ -1815,88 +1815,85 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // 1. interreduction of the current standard basis
       // 2. generation of new principal syzygy rules for syzCriterion
       f5c ( strat, olddeg, minimcnt, hilbeledeg, hilbcount, srmax,
-            lrmax, reduc, Q, w, hilb );
+          lrmax, reduc, Q, w, hilb );
 #endif
       // initialize new syzygy rules for the next iteration step
       initSyzRules(strat);
     }
     /*********************************************************************
-     * interrreduction step is done, we can go on with the next iteration
-     * step of the signature-based algorithm
-     ********************************************************************/
+      * interrreduction step is done, we can go on with the next iteration
+      * step of the signature-based algorithm
+      ********************************************************************/
     /* picks the last element from the lazyset L */
     strat->P = strat->L[strat->Ll];
     strat->Ll--;
-//#if 1
+    /* reduction of the element choosen from L */
+    if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat, strat->P.checked+1)) {
+      //#if 1
 #ifdef DEBUGF5
-    Print("SIG OF NEXT PAIR TO HANDLE IN SIG-BASED ALGORITHM\n");
-    Print("-------------------------------------------------\n");
-    pWrite(strat->P.sig);
-    pWrite(pHead(strat->P.p));
-    pWrite(pHead(strat->P.p1));
-    pWrite(pHead(strat->P.p2));
-    Print("-------------------------------------------------\n");
-#endif
-    if (pNext(strat->P.p) == strat->tail)
-    {
-      // deletes the short spoly
-#ifdef HAVE_RINGS
-      if (rField_is_Ring(currRing))
-        pLmDelete(strat->P.p);
-      else
-#endif
-        pLmFree(strat->P.p);
-
-      // TODO: needs some masking
-      // TODO: masking needs to vanish once the signature
-      //       sutff is completely implemented
-      strat->P.p = NULL;
-      poly m1 = NULL, m2 = NULL;
-
-      // check that spoly creation is ok
-      while (strat->tailRing != currRing &&
-             !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
-      {
-        assume(m1 == NULL && m2 == NULL);
-        // if not, change to a ring where exponents are at least
-        // large enough
-        if (!kStratChangeTailRing(strat))
-        {
-          WerrorS("OVERFLOW...");
-          break;
-        }
-      }
-      // create the real one
-      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
-                    strat->tailRing, m1, m2, strat->R);
-
-    }
-    else if (strat->P.p1 == NULL)
-    {
-      if (strat->minim > 0)
-        strat->P.p2=p_Copy(strat->P.p, currRing, strat->tailRing);
-      // for input polys, prepare reduction
-      strat->P.PrepareRed(strat->use_buckets);
-    }
-
-    if (strat->P.p == NULL && strat->P.t_p == NULL)
-    {
-      red_result = 0;
-    }
-    else
-    {
-      if (TEST_OPT_PROT)
-        message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
-                &olddeg,&reduc,strat, red_result);
-
-//#if 1
-#ifdef DEBUGF5
-      Print("Poly before red: ");
-      pWrite(pHead(strat->P.p));
+      Print("SIG OF NEXT PAIR TO HANDLE IN SIG-BASED ALGORITHM\n");
+      Print("-------------------------------------------------\n");
       pWrite(strat->P.sig);
+      pWrite(pHead(strat->P.p));
+      pWrite(pHead(strat->P.p1));
+      pWrite(pHead(strat->P.p2));
+      Print("-------------------------------------------------\n");
 #endif
-      /* reduction of the element choosen from L */
-      if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat, strat->P.checked+1)) {
+      if (pNext(strat->P.p) == strat->tail)
+      {
+        // deletes the short spoly
+#ifdef HAVE_RINGS
+        if (rField_is_Ring(currRing))
+          pLmDelete(strat->P.p);
+        else
+#endif
+          pLmFree(strat->P.p);
+
+        // TODO: needs some masking
+        // TODO: masking needs to vanish once the signature
+        //       sutff is completely implemented
+        strat->P.p = NULL;
+        poly m1 = NULL, m2 = NULL;
+
+        // check that spoly creation is ok
+        while (strat->tailRing != currRing &&
+            !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
+        {
+          assume(m1 == NULL && m2 == NULL);
+          // if not, change to a ring where exponents are at least
+          // large enough
+          if (!kStratChangeTailRing(strat))
+          {
+            WerrorS("OVERFLOW...");
+            break;
+          }
+        }
+        // create the real one
+        ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
+            strat->tailRing, m1, m2, strat->R);
+
+      }
+      else if (strat->P.p1 == NULL)
+      {
+        if (strat->minim > 0)
+          strat->P.p2=p_Copy(strat->P.p, currRing, strat->tailRing);
+        // for input polys, prepare reduction
+        strat->P.PrepareRed(strat->use_buckets);
+      }
+
+      if (strat->P.p == NULL && strat->P.t_p == NULL)
+      {
+        red_result = 0;
+      }
+      else
+      {
+
+        //#if 1
+#ifdef DEBUGF5
+        Print("Poly before red: ");
+        pWrite(pHead(strat->P.p));
+        pWrite(strat->P.sig);
+#endif
 #if SBA_PRODUCT_CRITERION
         if (strat->P.prd_crit) {
           product_criterion++;
@@ -1908,16 +1905,16 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           red_result = strat->red(&strat->P,strat);
         }
 #else
-      red_result = strat->red(&strat->P,strat);
+        red_result = strat->red(&strat->P,strat);
 #endif
-      } else {
+      }
+    } else {
         pDelete(&strat->P.sig);
         if (strat->P.lcm!=NULL)
           pLmFree(strat->P.lcm);
         red_result = 2;
       }
       if (errorreported)  break;
-    }
 
     if (strat->overflow)
     {
