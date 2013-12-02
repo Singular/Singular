@@ -973,6 +973,7 @@ void tropical_setup(SModulFunctions* p)
   p->iiAddCproc("","pReduce",FALSE,pReduce);
   p->iiAddCproc("","reduceInitially0",FALSE,reduceInitially0);
   p->iiAddCproc("","reduceInitially1",FALSE,reduceInitially1);
+  p->iiAddCproc("","reduceInitially2",FALSE,reduceInitially2);
 #endif //NDEBUG
   // p->iiAddCproc("","initialReduction",FALSE,initialReduction);
   p->iiAddCproc("","homogeneitySpace",FALSE,homogeneitySpace);
