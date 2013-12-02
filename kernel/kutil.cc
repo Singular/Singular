@@ -5188,36 +5188,6 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy s
   //printf("Arri Rewritten Criterion\n");
   while (strat->Ll > 0 && pLmEqual(strat->L[strat->Ll].sig,strat->P.sig))
   {
-    // deletes the short spoly
-#ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing))
-      pLmDelete(strat->L[strat->Ll].p);
-    else
-#endif
-      pLmFree(strat->L[strat->Ll].p);
-
-    // TODO: needs some masking
-    // TODO: masking needs to vanish once the signature
-    //       sutff is completely implemented
-    strat->L[strat->Ll].p = NULL;
-    poly m1 = NULL, m2 = NULL;
-
-    // check that spoly creation is ok
-    while (strat->tailRing != currRing &&
-          !kCheckSpolyCreation(&(strat->L[strat->Ll]), strat, m1, m2))
-    {
-      assume(m1 == NULL && m2 == NULL);
-      // if not, change to a ring where exponents are at least
-      // large enough
-      if (!kStratChangeTailRing(strat))
-      {
-        WerrorS("OVERFLOW...");
-        break;
-      }
-    }
-    // create the real one
-    ksCreateSpoly(&(strat->L[strat->Ll]), NULL, strat->use_buckets,
-                  strat->tailRing, m1, m2, strat->R);
     if (strat->P.GetLmCurrRing() == NULL)
     {
       deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
@@ -5240,23 +5210,30 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy s
       else
       {
         pDelete(&strat->P.sig);
-        strat->P.Delete();
         strat->P = strat->L[strat->Ll];
         strat->Ll--;
       }
     }
   }
+  poly p1 = pOne();
+  poly p2 = pOne();
   for (int ii=strat->sl; ii>-1; ii--)
   {
     if (p_LmShortDivisibleBy(strat->sig[ii], strat->sevSig[ii], strat->P.sig, ~strat->P.sevSig, currRing))
     {
-      if (!(pLmCmp(ppMult_mm(strat->P.sig,pHead(strat->S[ii])),ppMult_mm(strat->sig[ii],strat->P.GetLmCurrRing())) == 1))
+      p_ExpVectorSum(p1,strat->P.sig,strat->S[ii],currRing);
+      p_ExpVectorSum(p2,strat->sig[ii],strat->P.p,currRing);
+      if (!(pLmCmp(p1,p2) == 1))
       {
-        strat->P.Delete();
+        pDelete(&strat->P.sig);
+        pDelete(&p1);
+        pDelete(&p2);
         return TRUE;
       }
     }
   }
+  pDelete(&p1);
+  pDelete(&p2);
   return FALSE;
 }
 
