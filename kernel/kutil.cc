@@ -5209,7 +5209,7 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy s
       }
       else
       {
-        pDelete(&strat->P.sig);
+        //pDelete(&strat->P.sig);
         strat->P = strat->L[strat->Ll];
         strat->Ll--;
       }
@@ -5225,7 +5225,7 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy s
       p_ExpVectorSum(p2,strat->sig[ii],strat->P.p,currRing);
       if (!(pLmCmp(p1,p2) == 1))
       {
-        pDelete(&strat->P.sig);
+        //pDelete(&strat->P.sig);
         pDelete(&p1);
         pDelete(&p2);
         return TRUE;
