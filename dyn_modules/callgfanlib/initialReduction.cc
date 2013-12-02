@@ -111,14 +111,16 @@ static inline poly firstTermDivisibleBy(const poly g, const poly m)
 
 /***
  * reduces h initially with respect to g,
- * returns NULL if h was initially reduced in the first place. if reductions have taken place,
- * returns a pointer to a term from which onwards changes have taken place.
+ * returns false if h was initially reduced in the first place,
+ * returns true if reductions have taken place.
  * assumes that h and g are in pReduced form and homogeneous in x of the same degree
  **/
-poly reduceInitially(poly &h, const poly g)
+bool reduceInitially(poly &h, const poly g)
 {
-  poly hCache=h;
-  if (p_LeadmonomDivisibleBy(g,hCache,currRing))
+  poly hCache;
+  for (hCache=h; hCache; pIter(hCache))
+    if (p_LeadmonomDivisibleBy(g,hCache,currRing)) break;
+  if (hCache)
   {
     number gAlpha = p_GetCoeff(g,currRing);
     poly hAlphaT = p_Init(currRing);
@@ -131,25 +133,9 @@ poly reduceInitially(poly &h, const poly g)
                 p_Neg(p_Mult_q(p_Copy(g,currRing),hAlphaT,currRing),currRing),
                 currRing);
     pTest(h);
-    return(h);
+    return true;
   }
-  for (; pNext(hCache); pIter(hCache))
-    if (p_LeadmonomDivisibleBy(g,pNext(hCache),currRing)) break;
-  if (pNext(hCache))
-  {
-    number gAlpha = p_GetCoeff(g,currRing);
-    poly hAlphaT = p_Init(currRing);
-    p_SetCoeff(hAlphaT,n_Copy(p_GetCoeff(pNext(hCache),currRing),currRing->cf),currRing);
-    p_SetExp(hAlphaT,1,p_GetExp(pNext(hCache),1,currRing)-p_GetExp(g,1,currRing),currRing);
-    for (int i=2; i<=currRing->N; i++)
-      p_SetExp(hAlphaT,i,0,currRing);
-    p_Setm(hAlphaT,currRing); pTest(hAlphaT);
-    h = p_Add_q(p_Mult_nn(h,gAlpha,currRing),
-                p_Neg(p_Mult_q(p_Copy(g,currRing),hAlphaT,currRing),currRing),
-                currRing);
-    pTest(h);
-  }
-  return pNext(hCache);
+  return false;
 }
 
 
@@ -220,35 +206,16 @@ bool reduceInitially(ideal I, const number p)
   /***
    * the first pass. removing terms with the same monomials in x as lt(g_i) out of g_j for i<j
    **/
-  poly cache = NULL;
   for (i=0; i<IDELEMS(I)-1; i++)
-  {
     for (j=i+1; j<IDELEMS(I); j++)
-    {
-      cache = reduceInitially(I->m[j], I->m[i]);
-      if (cache)
-      {
-        if(pReduce(cache,p)) return true;
-        cache = NULL;
-      }
-    }
-  }
+      if (reduceInitially(I->m[j], I->m[i]) && pReduce(I->m[j],p)) return true;
 
   /***
    * the second pass. removing terms divisible by lt(g_j) out of g_i for i<j
    **/
   for (i=0; i<IDELEMS(I)-1; i++)
-  {
     for (j=i+1; j<IDELEMS(I); j++)
-    {
-      cache = reduceInitially(I->m[i], I->m[j]);
-      if (cache)
-      {
-        if (pReduce(cache,p)) return true;
-        cache = NULL;
-      }
-    }
-  }
+      if (reduceInitially(I->m[i], I->m[j]) && pReduce(I->m[i],p)) return true;
   return false;
 }
 
