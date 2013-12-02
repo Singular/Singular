@@ -1909,9 +1909,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
       }
     } else {
-        pDelete(&strat->P.sig);
-        if (strat->P.lcm!=NULL)
-          pLmFree(strat->P.lcm);
         red_result = 2;
       }
       if (errorreported)  break;
