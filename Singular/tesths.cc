@@ -46,10 +46,6 @@
 #include <factory/factory.h>
 #endif
 
-#ifdef HAVE_SIMPLEIPC
-#include <Singular/simpleipc.h>
-#endif
-
 #include <Singular/si_signals.h>
 
 extern int siInit(char *);
@@ -123,12 +119,6 @@ int main(          /* main entry to Singular */
     }
     if (optc == 'h') exit(0);
   }
-
-// semaphore0: CPUs --------------------------------------------------
-#ifdef HAVE_SIMPLEIPC
-  int cpus = (int)(long)feOptValue(FE_OPT_CPUS);
-  sipc_semaphore_init(0, cpus-1);
-#endif
 
   /* say hello */
   //for official version: not active
