@@ -187,7 +187,8 @@ public:
                       // critical pair creation => when entering the
                       // reduction process it is enough to start a second
                       // rewritten criterion check from checked+1 onwards
-                      // NOTE: If checked = 3 then the corresponding pair is
+  BOOLEAN prod_crit;
+                      // NOTE: If prod_crit = TRUE then the corresponding pair is
                       // detected by Buchberger's Product Criterion and can be
                       // deleted
   poly  p1,p2; /*- the pair p comes from,
@@ -309,7 +310,7 @@ public:
   intset syzIdx;// index in the syz array at which the first
                 // syzygy of component i comes up
                 // important for signature-based algorithms
-  BOOLEAN incremental;
+  unsigned sbaOrder;
   unsigned long currIdx;
   int max_lower_index;
   intset lenS;
@@ -465,6 +466,8 @@ KINLINE poly redtailBba_Z (poly p,int pos,kStrategy strat);
 poly redtailBba_Z (LObject* L, int pos, kStrategy strat );
 #endif
 poly redtailBba (LObject *L, int pos,kStrategy strat,
+                 BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
+poly redtailSba (LObject *L, int pos,kStrategy strat,
                  BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
 poly redtailBba (TObject *T, int pos,kStrategy strat);
 poly redtail (poly p,int pos,kStrategy strat);

@@ -1891,7 +1891,7 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   }
 // adds buchberger's first criterion
   if (pLmCmp(m2,pHead(p)) == 0) {
-    Lp.checked  = 3; // 3 == Product Criterion
+    Lp.prod_crit = TRUE; // Product Criterion
 #if 0
     enterSyz(Lp, strat);
     Lp.lcm=NULL;
@@ -5066,7 +5066,7 @@ BOOLEAN syzCriterion(poly sig, unsigned long not_sevSig, kStrategy strat)
   {
 //#if 1
 #ifdef DEBUGF5
-    Print("checking with: %d --  ",k);
+    Print("checking with: %d --  \n",k);
     pWrite(pHead(strat->syz[k]));
 #endif
     if (p_LmShortDivisibleBy(strat->syz[k], strat->sevSyz[k], sig, not_sevSig, currRing))
@@ -5188,47 +5188,24 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy s
   //printf("Arri Rewritten Criterion\n");
   while (strat->Ll > 0 && pLmEqual(strat->L[strat->Ll].sig,strat->P.sig))
   {
-    // deletes the short spoly
-#ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing))
-      pLmDelete(strat->L[strat->Ll].p);
-    else
-#endif
-      pLmFree(strat->L[strat->Ll].p);
-
-    // TODO: needs some masking
-    // TODO: masking needs to vanish once the signature
-    //       sutff is completely implemented
-    strat->L[strat->Ll].p = NULL;
-    poly m1 = NULL, m2 = NULL;
-
-    // check that spoly creation is ok
-    while (strat->tailRing != currRing &&
-          !kCheckSpolyCreation(&(strat->L[strat->Ll]), strat, m1, m2))
-    {
-      assume(m1 == NULL && m2 == NULL);
-      // if not, change to a ring where exponents are at least
-      // large enough
-      if (!kStratChangeTailRing(strat))
-      {
-        WerrorS("OVERFLOW...");
-        break;
-      }
-    }
-    // create the real one
-    ksCreateSpoly(&(strat->L[strat->Ll]), NULL, strat->use_buckets,
-                  strat->tailRing, m1, m2, strat->R);
+    /*
     if (strat->P.GetLmCurrRing() == NULL)
     {
+      printf("---\n");
+      pWrite(strat->P.GetLmCurrRing());
       deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
     }
+    */
+    /*
     if (strat->L[strat->Ll].GetLmCurrRing() == NULL)
     {
+      printf("---\n");
+      pDelete(&strat->P.sig);
       strat->P.Delete();
       strat->P = strat->L[strat->Ll];
       strat->Ll--;
     }
-
+    */ 
     if ((strat->P.GetLmCurrRing() != NULL)
     && (strat->L[strat->Ll].GetLmCurrRing() != NULL))
     {
@@ -5238,23 +5215,33 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy s
       }
       else
       {
-        strat->P.Delete();
+        pDelete(&strat->P.sig);
+        //strat->P.Delete();
         strat->P = strat->L[strat->Ll];
         strat->Ll--;
       }
     }
   }
+  poly p1 = pOne();
+  poly p2 = pOne();
   for (int ii=strat->sl; ii>-1; ii--)
   {
     if (p_LmShortDivisibleBy(strat->sig[ii], strat->sevSig[ii], strat->P.sig, ~strat->P.sevSig, currRing))
     {
-      if (!(pLmCmp(ppMult_mm(strat->P.sig,pHead(strat->S[ii])),ppMult_mm(strat->sig[ii],strat->P.GetLmCurrRing())) == 1))
+      p_ExpVectorSum(p1,strat->P.sig,strat->S[ii],currRing);
+      p_ExpVectorSum(p2,strat->sig[ii],strat->P.p,currRing);
+      if (!(pLmCmp(p1,p2) == 1))
       {
-        strat->P.Delete();
+        pDelete(&strat->P.sig);
+        //strat->P.Delete();
+        pDelete(&p1);
+        pDelete(&p2);
         return TRUE;
       }
     }
   }
+  pDelete(&p1);
+  pDelete(&p2);
   return FALSE;
 }
 
@@ -5936,7 +5923,7 @@ void initSLSba (ideal F, ideal Q,kStrategy strat)
   strat->Shdl   =   idInit(i,F->rank);
   strat->S      =   strat->Shdl->m;
   strat->sig    =   (poly *)omAlloc0(i*sizeof(poly));
-  if (!strat->incremental)
+  if (strat->sbaOrder != 1)
   {
     strat->syz    = (poly *)omAlloc0(i*sizeof(poly));
     strat->sevSyz = initsevS(i);
@@ -5998,7 +5985,7 @@ void initSLSba (ideal F, ideal Q,kStrategy strat)
       // of the corresponding initial polynomials generating the ideal
       // => we can keep the underlying monomial order and get a Schreyer
       //    order without any bigger overhead
-      if (!strat->incremental)
+      if (strat->sbaOrder == 0)
       {
         p_ExpVectorAdd (h.sig,F->m[i],currRing);
       }
@@ -6035,7 +6022,7 @@ void initSLSba (ideal F, ideal Q,kStrategy strat)
         }
       }
       /*
-      if (!strat->incremental)
+      if (strat->sbaOrder != 1)
       {
         for(j=0;j<i;j++)
         {
@@ -7340,7 +7327,7 @@ void initSbaCrit(kStrategy strat)
    * kSba() in kstd1.cc
    *****************************************/
   //strat->rewCrit1     = faugereRewCriterion;
-  if (strat->incremental)
+  if (strat->sbaOrder == 1)
   {
     strat->syzCrit  = syzCriterionInc;
   }
@@ -7764,7 +7751,7 @@ void exitSba (kStrategy strat)
   omFreeSize((ADDRESS)strat->sevSig,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   omFreeSize((ADDRESS)strat->syz,(strat->syzmax)*sizeof(poly));
   omFreeSize((ADDRESS)strat->sevSyz,(strat->syzmax)*sizeof(unsigned long));
-  if (strat->incremental)
+  if (strat->sbaOrder == 1)
   {
     omFreeSize(strat->syzIdx,(strat->syzidxmax)*sizeof(int));
   }
@@ -8253,8 +8240,8 @@ void kStratInitChangeTailRing(kStrategy strat)
 ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
 {
   int n = rBlocks(r); // Including trailing zero!
-  // if incremental => use (C,monomial order from r)
-  if (strat->incremental)
+  // if sbaOrder == 1 => use (C,monomial order from r)
+  if (strat->sbaOrder == 1)
   {
     if (r->order[0] == ringorder_C || r->order[0] == ringorder_c)
     {
@@ -8297,7 +8284,7 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
     return (res);
   }
 
-  // not incremental => use Schreyer order
+  // not sbaOrder == 1 => use Schreyer order
   // this is done by a trick when initializing the signatures
   // in initSLSba():
   // Instead of using the signature 1e_i for F->m[i], we start
