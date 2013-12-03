@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version modstd.lib 3-1-7-0 Sep_2013 ";
+version="version modstd.lib 3-1-7-0 Dec_2013 ";
 category = "Commutative Algebra";
 info="
 LIBRARY:  modstd.lib      Groebner basis of ideals
@@ -499,8 +499,7 @@ EXAMPLE: example primeList; shows an example
             if(p == 2) { ERROR("no more primes"); }
             arguments[i] = list("Id", p);
          }
-         parallelResults = parallelWaitAll("primeTest", arguments,
-            list(list(list(ncores))));
+         parallelResults = parallelWaitAll("primeTest", arguments, 0, ncores);
          for(i = size(arguments); i > 0; i--)
          {
             if(parallelResults[i])
@@ -1238,8 +1237,7 @@ EXAMPLE: example modStd; shows an example
          {
             arguments_farey[i] = list(ideal(H[i]), N);
          }
-         results_farey = parallelWaitAll("farey", arguments_farey,
-                                         list(list(list(n1))));
+         results_farey = parallelWaitAll("farey", arguments_farey, 0, n1);
          for(i = ncols(H); i > 0; i--)
          {
             J[i] = results_farey[i][1];
