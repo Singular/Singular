@@ -312,6 +312,7 @@ value of type int is the multiplicity (see @ref{mult})
 @node bareiss, betti, attrib, Functions
 @subsection bareiss
 @cindex bareiss
+@index linear algebra
 
 @table @code
 @item @strong{Syntax:}
@@ -3810,6 +3811,7 @@ See
 @subsection ludecomp
 @cindex ludecomp
 @cindex LU-decomposition of a matrix of numbers
+@cindex linear algebra
 
 @table @code
 @item @strong{Syntax:}
@@ -3861,6 +3863,7 @@ See
 @subsection luinverse
 @cindex luinverse
 @cindex inverse of a matrix via its LU-decomposition
+@cindex linear algebra
 
 @table @code
 @item @strong{Syntax:}
@@ -3932,6 +3935,7 @@ See
 @subsection lusolve
 @cindex lusolve
 @cindex solve a linear equation system A*x = b via the LU-decomposition of A
+@cindex linear algebra
 
 @table @code
 @item @strong{Syntax:}
@@ -4374,6 +4378,7 @@ See
 @node mpresmat, mres, monomial, Functions
 @subsection mpresmat
 @cindex mpresmat
+@cindex resultant
 @table @code
 @item @strong{Syntax:}
 @code{mpresmat (} ideal_expression@code{,} int_expression @code{)}
