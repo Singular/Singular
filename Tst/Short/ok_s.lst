@@ -241,6 +241,7 @@ realizationMatroids
 rInit
 reduce_s
 res_s
+resources_s
 resultantp_s
 ringlist-z
 ringmaps
@@ -268,6 +269,7 @@ sres_s
 std_s
 ;MP stratify
 string
+tasks_s
 test_c_dp
 triang_s
 tst_s
