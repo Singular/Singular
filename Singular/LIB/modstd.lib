@@ -509,6 +509,7 @@ EXAMPLE: example primeList; shows an example
          }
          neededPrimes = neededSize-size(L);
       }
+      kill Id;
       if(size(L) > neededSize)
       {
          L = L[1..neededSize];
