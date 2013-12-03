@@ -5066,7 +5066,7 @@ BOOLEAN syzCriterion(poly sig, unsigned long not_sevSig, kStrategy strat)
   {
 //#if 1
 #ifdef DEBUGF5
-    Print("checking with: %d --  ",k);
+    Print("checking with: %d --  \n",k);
     pWrite(pHead(strat->syz[k]));
 #endif
     if (p_LmShortDivisibleBy(strat->syz[k], strat->sevSyz[k], sig, not_sevSig, currRing))
@@ -5188,18 +5188,24 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy s
   //printf("Arri Rewritten Criterion\n");
   while (strat->Ll > 0 && pLmEqual(strat->L[strat->Ll].sig,strat->P.sig))
   {
+    /*
     if (strat->P.GetLmCurrRing() == NULL)
     {
+      printf("---\n");
+      pWrite(strat->P.GetLmCurrRing());
       deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
     }
+    */
+    /*
     if (strat->L[strat->Ll].GetLmCurrRing() == NULL)
     {
+      printf("---\n");
       pDelete(&strat->P.sig);
       strat->P.Delete();
       strat->P = strat->L[strat->Ll];
       strat->Ll--;
     }
-
+    */ 
     if ((strat->P.GetLmCurrRing() != NULL)
     && (strat->L[strat->Ll].GetLmCurrRing() != NULL))
     {
@@ -5209,7 +5215,8 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy s
       }
       else
       {
-        //pDelete(&strat->P.sig);
+        pDelete(&strat->P.sig);
+        //strat->P.Delete();
         strat->P = strat->L[strat->Ll];
         strat->Ll--;
       }
@@ -5225,7 +5232,8 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, kStrategy s
       p_ExpVectorSum(p2,strat->sig[ii],strat->P.p,currRing);
       if (!(pLmCmp(p1,p2) == 1))
       {
-        //pDelete(&strat->P.sig);
+        pDelete(&strat->P.sig);
+        //strat->P.Delete();
         pDelete(&p1);
         pDelete(&p2);
         return TRUE;
