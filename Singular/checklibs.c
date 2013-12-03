@@ -218,8 +218,8 @@ void scan_info(int *l)
     else
     {
       p=buf;
-      while(*p==' ') p++;
-      if (*p=='@') { p++; texinfo+=(isalpha(*p)); }
+      if (strchr(buf,'@')!=NULL)
+      { texinfo++; printf("%s",buf); }
     }
     get_next(); (*l)++;
   }
@@ -252,7 +252,7 @@ void scan_info(int *l)
     }
     if (texinfo>0)
     {
-      printf("warning: %d texinfo commands %d header lines: should be used very rarely!\n",texinfo,header);
+      printf("warning: %d texinfo commands in %d header lines: should be used very rarely!\n",texinfo,header);
     }
 }
 
