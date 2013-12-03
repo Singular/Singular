@@ -1,0 +1,161 @@
+////////////////////////////////////////////////////////////////////
+version="version resources.lib 4.0.0.0 Dec_2013 "; // $Id$
+category="General purpose";
+info="
+LIBRARY:   resources.lib  Tools to manage the computational resources
+
+AUTHOR:    Andreas Steenpass, e-mail: steenpass@mathematik.uni-kl.de
+
+OVERVIEW:
+The purpose of this library is to manage the computational resources of
+a Singular session. The library tasks.lib and any library build upon tasks.lib
+respect these settings, i.e. they will not use more computational resources
+than provided via resources.lib.
+
+The provided procedures and their implementation are currently quite simple.
+The library can be extended later on to support, e.g., distributed computations
+on several servers.
+
+KEYWORDS:  parallelization; distributed computing; semaphores
+
+SEE ALSO:  tasks_lib, parallel_lib
+
+PROCEDURES:
+  addcores();  add an integer to the number of available processor cores
+  setcores();  set the number of available processor cores
+  getcores();  get the number of available processor cores
+  semaphore(); initialize a new semaphore
+";
+
+/* initialize (lib-)global variables */
+static proc mod_init()
+{
+    int sem_cores = semaphore(system("--cpus"))-1;
+    exportto(Resources, sem_cores);
+    int NCORES = system("semaphore", "get_value", sem_cores)+1;
+    exportto(Resources, NCORES);
+}
+
+proc addcores(int n)
+"USAGE:   addcores(n), n int
+RETURN:   the adjusted number of available processor cores, after n has been
+          added to it. If n is negative, this number is reduced.
+NOTE:     The number of available processor cores must be at least 1. Reducing
+          this number may take some time.
+       @* This procedure should only be called in the main process of a
+          Singular session and not within any task defined via tasks.lib.
+SEE ALSO: setcores, getcores, tasks_lib, parallel_lib
+EXAMPLE:  example addcores; shows an example"
+{
+    /* check for errors */
+    if (NCORES+n < 1) {
+        ERROR("The number of cores to use must be at least 1.");
+    }
+
+    /* change the value of the semaphore */
+    int i;
+    int tmp;
+    if (n >= 0) {
+        for (i = n; i > 0; i--) {
+            tmp = system("semaphore", "release", sem_cores);
+        }
+    }
+    else {
+        for (i = n; i < 0; i++) {
+            tmp = system("semaphore", "acquire", sem_cores);
+        }
+    }
+
+    /* adjust and return NCORES */
+    NCORES = NCORES+n;
+    return(NCORES);
+}
+example
+{
+    "EXAMPLE:";
+    echo = 2;
+    setcores(4);
+    addcores(-2);
+}
+
+proc setcores(int n)
+"USAGE:   setcores(n), n int
+RETURN:   n. The number of available processor cores is set to n and n is
+          returned.
+NOTE:     The number of available processor cores must be at least 1. Reducing
+          this number may take some time.
+       @* This procedure should only be called in the main process of a
+          Singular session and not within any task defined via tasks.lib.
+SEE ALSO: addcores, getcores, tasks_lib, parallel_lib
+EXAMPLE:  example setcores; shows an example"
+{
+    return(addcores(n-NCORES));
+}
+example
+{
+    "EXAMPLE:";
+    echo = 2;
+    setcores(2);
+    setcores(4);
+}
+
+proc getcores()
+"USAGE:   getcores(n), n int
+RETURN:   the number of available processor cores.
+NOTE:     This procedure should only be called in the main process of
+          a Singular session and not within any task defined via tasks.lib.
+SEE ALSO: addcores, setcores, tasks_lib, parallel_lib
+EXAMPLE:  example getcores; shows an example"
+{
+    return(NCORES);
+}
+example
+{
+    "EXAMPLE:";
+    echo = 2;
+    setcores(4);
+    getcores();
+}
+
+proc semaphore(int n)
+"USAGE:   semaphore(n), n int
+RETURN:   the index of a new semaphore initialized with n.
+EXAMPLE:  example semaphore; shows an example"
+{
+    int i = 1;
+    while (system("semaphore", "exists", i) == 1) {
+        i++;
+    }
+    if (system("semaphore", "init", i, n) != 1) {
+        ERROR("no more semphores");
+    }
+    return(i);
+}
+example
+{
+    "EXAMPLE:";
+    echo = 2;
+    int sem = semaphore(1);
+    system("semaphore", "acquire", sem);
+    system("semaphore", "try_acquire", sem);
+    system("semaphore", "release", sem);
+    system("semaphore", "try_acquire", sem);
+}
+
+/* wrapper for the now obsolete optional parameter in parallel.lib for the
+ * number of processor cores
+ */
+static proc setcores_subtree(int n)
+{
+    list oldvalues = list(sem_cores, NCORES);
+    sem_cores = semaphore(n-1);
+    NCORES = n;
+    return(oldvalues);
+}
+
+static proc resetcores_subtree(list oldvalues)
+{
+    sem_cores = oldvalues[1];
+    NCORES = oldvalues[2];
+}
+
