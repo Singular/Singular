@@ -312,7 +312,7 @@ value of type int is the multiplicity (see @ref{mult})
 @node bareiss, betti, attrib, Functions
 @subsection bareiss
 @cindex bareiss
-@index linear algebra
+@cindex linear algebra
 
 @table @code
 @item @strong{Syntax:}
