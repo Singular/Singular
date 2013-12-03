@@ -54,11 +54,11 @@
 
 #define SBA_TAIL_RED                        1
 #define SBA_PRODUCT_CRITERION               0
-#define SBA_PRINT_ZERO_REDUCTIONS           0
-#define SBA_PRINT_REDUCTION_STEPS           0
-#define SBA_PRINT_OPERATIONS                0
-#define SBA_PRINT_SIZE_G                    0
-#define SBA_PRINT_SIZE_SYZ                  0
+#define SBA_PRINT_ZERO_REDUCTIONS           1
+#define SBA_PRINT_REDUCTION_STEPS           1
+#define SBA_PRINT_OPERATIONS                1
+#define SBA_PRINT_SIZE_G                    1
+#define SBA_PRINT_SIZE_SYZ                  1
 #define SBA_PRINT_PRODUCT_CRITERION         0
 
 // counts sba's reduction steps
@@ -1790,15 +1790,15 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if (TEST_OPT_DEBUG) messageSets(strat);
     #endif
     if (strat->Ll== 0) strat->interpt=TRUE;
+    /*
     if (TEST_OPT_DEGBOUND
         && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
             || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
-      /*
-       *stops computation if
-       * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
-       *a predefined number Kstd1_deg
-       */
+      
+       //stops computation if
+       // 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
+       //a predefined number Kstd1_deg
       while ((strat->Ll >= 0)
         && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
         && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
@@ -1808,6 +1808,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if (strat->Ll<0) break;
       else strat->noClearS=TRUE;
     }
+    */
     if (strat->sbaOrder == 1 && pGetComp(strat->L[strat->Ll].sig) != strat->currIdx)
     {
       strat->currIdx  = pGetComp(strat->L[strat->Ll].sig);
@@ -1828,6 +1829,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     strat->P = strat->L[strat->Ll];
     strat->Ll--;
     /* reduction of the element choosen from L */
+
     if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat, strat->P.checked+1)) {
       //#if 1
 #ifdef DEBUGF5
@@ -1842,17 +1844,18 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if (pNext(strat->P.p) == strat->tail)
       {
         // deletes the short spoly
+        /*
 #ifdef HAVE_RINGS
         if (rField_is_Ring(currRing))
           pLmDelete(strat->P.p);
         else
 #endif
           pLmFree(strat->P.p);
-
-        // TODO: needs some masking
-        // TODO: masking needs to vanish once the signature
-        //       sutff is completely implemented
-        strat->P.p = NULL;
+*/
+          // TODO: needs some masking
+          // TODO: masking needs to vanish once the signature
+          //       sutff is completely implemented
+          strat->P.p = NULL;
         poly m1 = NULL, m2 = NULL;
 
         // check that spoly creation is ok
@@ -1880,14 +1883,12 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         // for input polys, prepare reduction
         strat->P.PrepareRed(strat->use_buckets);
       }
-
       if (strat->P.p == NULL && strat->P.t_p == NULL)
       {
         red_result = 0;
       }
       else
       {
-
         //#if 1
 #ifdef DEBUGF5
         Print("Poly before red: ");
@@ -1909,9 +1910,24 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
       }
     } else {
-        red_result = 2;
-      }
-      if (errorreported)  break;
+      /*
+      if (strat->P.lcm != NULL)
+        pLmFree(strat->P.lcm);
+        */
+      red_result = 2;
+    }
+    if (errorreported)  break;
+
+//#if 1
+#ifdef DEBUGF5
+    if (red_result != 0) {
+        Print("Poly after red: ");
+        pWrite(pHead(strat->P.p));
+        pWrite(strat->P.GetLmCurrRing());
+        pWrite(strat->P.sig);
+        printf("%d\n",red_result);
+    }
+#endif
 
     if (strat->overflow)
     {
@@ -1950,20 +1966,22 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // in the ring case we cannot expect LC(f) = 1,
       // therefore we call pContent instead of pNorm
 #if SBA_TAIL_RED
-      if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
-      {
-        strat->P.pCleardenom();
-        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+      if (strat->sbaOrder != 2) {
+        if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
         {
-          strat->P.p = redtailSba(&(strat->P),pos-1,strat, withT);
           strat->P.pCleardenom();
+          if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+          {
+            strat->P.p = redtailSba(&(strat->P),pos-1,strat, withT);
+            strat->P.pCleardenom();
+          }
         }
-      }
-      else
-      {
-        strat->P.pNorm();
-        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
-          strat->P.p = redtailSba(&(strat->P),pos-1,strat, withT);
+        else
+        {
+          strat->P.pNorm();
+          if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+            strat->P.p = redtailSba(&(strat->P),pos-1,strat, withT);
+        }
       }
 #endif
 
@@ -2019,6 +2037,11 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
       enterT(strat->P, strat);
       strat->T[strat->tl].is_sigsafe = FALSE;
+      /*
+      printf("hier\n");
+      pWrite(strat->P.GetLmCurrRing());
+      pWrite(strat->P.sig);
+      */
 #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
         superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
