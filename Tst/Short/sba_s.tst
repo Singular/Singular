@@ -128,6 +128,8 @@ for (k=3; k<=6; k++)
   string bench = cyclicn(k);
   sprintf(bench);
   ideal f; 
+  f = sba(i,2,0);
+  f = sba(i,2,1);
   f = sba(i,1,0);
   f = sba(i,1,1);
   f = sba(i,0,0);
@@ -136,6 +138,8 @@ for (k=3; k<=6; k++)
   string bench = cyclicnh(k);
   sprintf(bench);
   ideal f; 
+  f = sba(i,2,0);
+  f = sba(i,2,1);
   f = sba(i,1,0);
   f = sba(i,1,1);
   f = sba(i,0,0);
@@ -144,6 +148,8 @@ for (k=3; k<=6; k++)
   string bench = katsuran(k);
   sprintf(bench);
   ideal f; 
+  f = sba(i,2,0);
+  f = sba(i,2,1);
   f = sba(i,1,0);
   f = sba(i,1,1);
   f = sba(i,0,0);
@@ -152,6 +158,8 @@ for (k=3; k<=6; k++)
   string bench = katsuranh(k);
   sprintf(bench);
   ideal f; 
+  f = sba(i,2,0);
+  f = sba(i,2,1);
   f = sba(i,1,0);
   f = sba(i,1,1);
   f = sba(i,0,0);
@@ -160,6 +168,8 @@ for (k=3; k<=6; k++)
   string bench = econ(k);
   sprintf(bench);
   ideal f; 
+  f = sba(i,2,0);
+  f = sba(i,2,1);
   f = sba(i,1,0);
   f = sba(i,1,1);
   f = sba(i,0,0);
@@ -168,6 +178,8 @@ for (k=3; k<=6; k++)
   string bench = econh(k);
   sprintf(bench);
   ideal f; 
+  f = sba(i,2,0);
+  f = sba(i,2,1);
   f = sba(i,1,0);
   f = sba(i,1,1);
   f = sba(i,0,0);
