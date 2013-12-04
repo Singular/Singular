@@ -48,12 +48,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <errno.h>
-#ifdef HAVE_SIMPLEIPC
-#include <Singular/links/simpleipc.h>
-#endif
-
-
-
 
 
 extern int siInit(char *);
@@ -126,13 +120,6 @@ int main(          /* main entry to Singular */
     }
     if (optc == 'h') exit(0);
   }
-
-// semaphore0: CPUs --------------------------------------------------
-#ifdef HAVE_SIMPLEIPC
-  feOptIndex cpu_opt = feGetOptIndex("cpus");
-  int cpus = (int)(long)feOptValue(FE_OPT_CPUS);
-  sipc_semaphore_init(0, cpus-1);
-#endif
 
   /* say hello */
 

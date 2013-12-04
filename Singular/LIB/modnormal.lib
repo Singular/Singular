@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version modnormal.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version modnormal.lib 4.0.0.0 Dec_2013 "; // $Id$
 category = "Commutative Algebra";
 info="
 LIBRARY:  modnormal.lib    Normalization of affine domains using modular methods
@@ -313,8 +313,7 @@ EXAMPLE: example modNormal; shows an example
       {
         modarguments[j-(k-1)*n2-sh] = list(I, L[j], condu, printTimings, #);
       }
-      modresults = parallelWaitAll("modpNormal", modarguments,
-        list(list(list(ncores))));
+      modresults = parallelWaitAll("modpNormal", modarguments, 0, ncores);
       for(j = (k-1)*n2+1+sh; j <= k*n2+1; j++)
       {
         resultNormalX[j] = modresults[j-(k-1)*n2-sh][1];
