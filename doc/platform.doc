@@ -64,7 +64,7 @@ from our FTP site
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/}.
 @end display
 
-@include README_download.texi
+@c @include README_download.texi
 
 @c ----------------------------------------------------------
 @node Unix installation instructions, Windows installation instructions, Download instructions, Release Notes
@@ -73,7 +73,7 @@ from our FTP site
 @cindex instructions, Unix installation
 @cindex howto, install on Unix
 
-@include INSTALL_unix.texi
+@c @include INSTALL_unix.texi
 
 @c ----------------------------------------------------------
 @node Windows installation instructions, Macintosh installation instructions, Unix installation instructions, Release Notes
@@ -82,7 +82,7 @@ from our FTP site
 @cindex instructions, Windows installation
 @cindex howto, install on Windows
 
-@include INSTALL_win.texi
+@c @include INSTALL_win.texi
 
 @c ----------------------------------------------------------
 @node Macintosh installation instructions,,Windows installation instructions, Release Notes
@@ -92,11 +92,6 @@ from our FTP site
 @cindex howto, install on Macintosh
 
 @strong{Installation of the provided binaries}
-
-Do not use the Finder for the installation!
-
-(The expert might wish to read the INSTALL_unix.html file in the UNIX
-directory for alternatives).
 
 Installation via fink
 
