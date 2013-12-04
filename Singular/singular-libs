@@ -44,8 +44,8 @@ SLIB1 = classifyci.lib classifyceq.lib divisors.lib decomp.lib ffsolve.lib\
         findifs.lib finitediff.lib locnormal.lib \
         JMBTest.lib JMSConst.lib modnormal.lib multigrading.lib\
 	numerAlg.lib numerDecom.lib\
-	orbitparam.lib parallel.lib realizationMatroids.lib \
-        ringgb.lib schubert.lib symodstd.lib polybori.lib
+	orbitparam.lib parallel.lib realizationMatroids.lib resources.lib \
+        ringgb.lib schubert.lib symodstd.lib tasks.lib polybori.lib
 
 PLIBS = bfun.lib  central.lib  dmod.lib  dmodapp.lib dmodvar.lib fpadim.lib \
 	freegb.lib  gkdim.lib  involut.lib  ncalg.lib  ncdecomp.lib \
