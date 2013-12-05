@@ -5195,7 +5195,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       {
         if (mpz_cmp_ui(modBase,0)==0)
         {
-          WerrorS("modulus must not be 0");
+          WerrorS("modulus must not be 0 or parameter not allowed");
           goto rInitError;
         }
         //ringtype = 3;
@@ -5210,7 +5210,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     {
       if (mpz_cmp_ui(modBase,0)==0)
       {
-        WerrorS("modulus must not be 0");
+        WerrorS("modulus must not be 0 or parameter not allowed");
         goto rInitError;
       }
       //ringtype = 2;
