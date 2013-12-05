@@ -30,7 +30,7 @@ PROCEDURES:
 /* initialize (lib-)global variables */
 static proc mod_init()
 {
-    int sem_cores = semaphore(system("--cpus"))-1;
+    int sem_cores = semaphore(system("--cpus")-1);
     exportto(Resources, sem_cores);
     int NCORES = system("semaphore", "get_value", sem_cores)+1;
     exportto(Resources, NCORES);
@@ -122,7 +122,7 @@ proc semaphore(int n)
 RETURN:   the index of a new semaphore initialized with n.
 EXAMPLE:  example semaphore; shows an example"
 {
-    int i = 1;
+    int i = 0;
     while (system("semaphore", "exists", i) == 1) {
         i++;
     }
