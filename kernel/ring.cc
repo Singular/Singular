@@ -690,8 +690,13 @@ char * rCharStr(ring r)
   if (r->parameter==NULL)
   {
     i=r->ch;
-    if(i==-1)
-      s=omStrDup("real");                    /* R */
+    if(rField_is_R(r))
+      s=omStrDup("real"); /* R */
+    else if (rField_is_long_R(r))
+    {
+      s=(char*)omAlloc(27);
+      snprintf(s,27,"real,%d,%d",r->float_len,r->float_len2);
+    }
     else
     {
       s=(char *)omAlloc(MAX_INT_LEN+1);
@@ -701,8 +706,8 @@ char * rCharStr(ring r)
   }
   if (rField_is_long_C(r))
   {
-    s=(char *)omAlloc(21+strlen(r->parameter[0]));
-    sprintf(s,"complex,%d,%s",r->float_len,r->parameter[0]);   /* C */
+    s=(char *)omAlloc(31+strlen(r->parameter[0]));
+    sprintf(s,"complex,%d,%d,%s",r->float_len,r->float_len2,r->parameter[0]);   /* C */
     return s;
   }
   int l=0;
