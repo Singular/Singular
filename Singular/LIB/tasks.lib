@@ -14,11 +14,11 @@ the procedures in this library and they can even be started recursively, i.e.
 from within other tasks.
 
 tasks.lib respects the limits for computational resources defined
-in @ref{resources.lib}, i.e., all tasks within the same Singular session will
+in @ref{resources_lib}, i.e., all tasks within the same Singular session will
 not use more computational resources than provided via resources.lib, even if
 tasks are started recursively.
 
-The Singular library @ref{parallel.lib} provides implementations of several
+The Singular library @ref{parallel_lib} provides implementations of several
 parallel 'skeletons' based on tasks.lib.
 
 KEYWORDS:  parallelization; distributed computing; task
