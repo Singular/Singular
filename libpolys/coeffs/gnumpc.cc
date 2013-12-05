@@ -457,12 +457,21 @@ static void ngcKillChar(coeffs r)
   omFreeSize((ADDRESS)p, P * sizeof(char*));  
 }
 
+static char* ngcCoeffString(const coeffs r)
+{
+  const char *p=n_ParameterNames(r)[0];
+  char *s=(char*)omAlloc(21+strlen(p));
+  sprintf(s,"complex,%d,%s",r->float_len,p);
+  return s;
+}
+
 BOOLEAN ngcInitChar(coeffs n, void* parameter)
 {
   assume( getCoeffType(n) == ID );
 
   n->cfKillChar = ngcKillChar;
   n->ch = 0;
+  n->cfCoeffString=ngcCoeffString;
 
   n->cfDelete  = ngcDelete;
   n->cfNormalize=ndNormalize;

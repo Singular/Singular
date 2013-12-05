@@ -46,6 +46,12 @@ static BOOLEAN nrnCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
   return (n==n_Zn) && (mpz_cmp_ui(r->modNumber,(long)parameter)==0);
 }
 
+static char* nrnCoeffString(const coeffs r)
+{
+  char* s = (char*) omAlloc(7+11+2);
+  sprintf(s,"integer,%lu",r->modExponent);
+  return s;
+}
 
 /* for initializing function pointers */
 BOOLEAN nrnInitChar (coeffs r, void* p)
@@ -59,6 +65,8 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   /* next computation may yield wrong characteristic as r->modNumber
      is a GMP number */
   r->ch = mpz_get_ui(r->modNumber);
+
+  r->cfCoeffString = nrnCoeffString;
 
   r->cfInit        = nrnInit;
   r->cfDelete      = nrnDelete;

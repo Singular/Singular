@@ -2825,6 +2825,11 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
 
 }
 
+static char* nlCoeffString(const coeffs r)
+{
+  return omStrDup("0");
+}
+
 BOOLEAN nlInitChar(coeffs r, void*)
 {
   assume( getCoeffType(r) == ID );
@@ -2832,6 +2837,7 @@ BOOLEAN nlInitChar(coeffs r, void*)
 
   r->nCoeffIsEqual=ndCoeffIsEqual;
   r->cfKillChar = ndKillChar; /* dummy */
+  r->cfCoeffString=nlCoeffString;
 
   r->cfInitMPZ = nlInitMPZ;
   r->cfMPZ  = nlMPZ;

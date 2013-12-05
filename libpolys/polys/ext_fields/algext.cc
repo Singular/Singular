@@ -1326,7 +1326,28 @@ void naKillChar(coeffs cf)
      rDelete(cf->extRing);
 }
 
-
+char* naCoeffString(const coeffs r) // currently also for tranext.
+{
+  const char* const* p=n_ParameterNames(r);
+  int l=0;
+  int i;
+  for(i=0; i<n_NumberOfParameters(r);i++)
+  {
+    l+=(strlen(p[i])+1);
+  }
+  char *s=(char *)omAlloc(l+10+1);
+  s[0]='\0';
+  snprintf(s,10+1,"%d",r->ch); /* Fp(a) or Q(a) */
+  char tt[2];
+  tt[0]=',';
+  tt[1]='\0';
+  for(i=0; i<n_NumberOfParameters(r);i++)
+  {
+    strcat(s,tt);
+    strcat(s,p[i]);
+  }
+  return s;
+}
 
 BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 {
@@ -1357,6 +1378,8 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   #ifdef LDEBUG
   p_Test((poly)naMinpoly, naRing);
   #endif
+
+  cf->cfCoeffString = naCoeffString;
 
   cf->cfGreaterZero  = naGreaterZero;
   cf->cfGreater      = naGreater;

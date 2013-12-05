@@ -2364,6 +2364,8 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
      directly accessible in cf: */
   cf->ch = R->cf->ch;
   cf->factoryVarOffset = R->cf->factoryVarOffset + rVar(R);
+  extern char* naCoeffString(const coeffs r);
+  cf->cfCoeffString = naCoeffString;
 
   cf->cfGreaterZero  = ntGreaterZero;
   cf->cfGreater      = ntGreater;

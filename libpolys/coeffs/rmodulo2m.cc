@@ -45,6 +45,14 @@ BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
   }
   return FALSE;
 }
+
+static char* nr2mCoeffString(const coeffs r)
+{
+  char* s = (char*) omAlloc(11+11);
+  sprintf(s,"integer,2,%lu",r->modExponent);
+  return s;
+}
+
 /* for initializing function pointers */
 BOOLEAN nr2mInitChar (coeffs r, void* p)
 {
@@ -52,6 +60,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   nr2mInitExp((int)(long)(p), r);
   r->cfKillChar    = ndKillChar; /* dummy*/
   r->nCoeffIsEqual = nr2mCoeffIsEqual;
+  r->cfCoeffString = nr2mCoeffString;
 
   r->modBase = (int_number) omAllocBin (gmp_nrz_bin);
   mpz_init_set_si (r->modBase, 2L);

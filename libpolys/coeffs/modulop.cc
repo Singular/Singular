@@ -424,6 +424,13 @@ number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)
   }
 }
 
+static char* npCoeffString(const coeffs r)
+{
+  char *s=(char*)omAlloc(11);
+  snprintf(s,11,"%d",r->ch);
+  return s;
+}
+
 BOOLEAN npInitChar(coeffs r, void* p)
 {
   assume( getCoeffType(r) == ID );
@@ -439,6 +446,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   //r->cfInitChar=npInitChar;
   r->cfKillChar=npKillChar;
   r->nCoeffIsEqual=npCoeffsEqual;
+  r->cfCoeffString=npCoeffString;
 
   r->cfMult  = npMult;
   r->cfSub   = npSub;

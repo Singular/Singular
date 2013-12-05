@@ -49,6 +49,11 @@ n_Procs_s *cf_root=NULL;
 
 void   nNew(number* d) { *d=NULL; }
 void   ndDelete(number* d, const coeffs) { *d=NULL; }
+char* ndCoeffString(const coeffs r)
+{
+  char *s=(char *)omAlloc(11);snprintf(s,11,"Coeffs(%d)",r->type);
+  return s;
+}
 void   ndInpMult(number &a, number b, const coeffs r)
 {
   number n=n_Mult(a,b,r);
@@ -322,6 +327,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfName =  ndName;
     n->cfImPart=ndReturn0;
     n->cfDelete= ndDelete;
+    n->cfCoeffString = ndCoeffString; // should alway be changed!
     n->cfInpMult=ndInpMult;
     n->cfInpAdd=ndInpAdd;
     n->cfCopy = ndCopy;
@@ -384,6 +390,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 
     assume(n->nCoeffIsEqual!=NULL);
     assume(n->cfSetChar!=NULL);
+    assume(n->cfCoeffString!=ndCoeffString);
     assume(n->cfMult!=NULL);
     assume(n->cfSub!=NULL);
     assume(n->cfAdd!=NULL);
@@ -450,6 +457,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     if(n->cfKillChar==NULL) Warn("cfKillChar is NULL for coeff %d",t);
     if(n->cfWriteLong==NULL) Warn("cfWrite is NULL for coeff %d",t);
     if(n->cfWriteShort==NULL) Warn("cfWriteShort is NULL for coeff %d",t);
+    if(n->cfCoeffString==ndCoeffString) Warn("cfCoeffString is undefined for coeff %d",t);
 #endif
      
    if( n->nNULL == NULL )

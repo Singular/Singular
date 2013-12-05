@@ -382,11 +382,16 @@ void    nrzCoeffWrite  (const coeffs, BOOLEAN /*details*/)
   PrintS("//   coeff. ring is : Integers\n");
 }
 
+static char* nrzCoeffString(const coeffs r)
+{
+  return omStrDup("integer");
+}
 
 BOOLEAN nrzInitChar(coeffs r,  void *)
 {
   assume( getCoeffType(r) == ID );
   r->nCoeffIsEqual = ndCoeffIsEqual;
+  r->cfCoeffString = nrzCoeffString;
   r->cfKillChar = ndKillChar;
   r->cfMult  = nrzMult;
   r->cfSub   = nrzSub;

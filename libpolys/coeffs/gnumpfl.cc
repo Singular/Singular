@@ -401,6 +401,13 @@ void ngfSetChar(const coeffs r)
   setGMPFloatDigits(r->float_len, r->float_len2);
 }
 
+static char* ngfCoeffString(const coeffs r)
+{
+  char *s=(char*)omAlloc(27);
+  snprintf(s,27,"real,%d,%d",r->float_len,r->float_len2);
+  return s;
+}
+
 BOOLEAN ngfInitChar(coeffs n, void *parameter)
 {
   assume( getCoeffType(n) == ID );
@@ -409,6 +416,7 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
 
   n->cfSetChar = ngfSetChar;
   n->ch = 0;
+  n->cfCoeffString=ngfCoeffString;
   
   n->cfDelete  = ngfDelete;
   n->cfNormalize=ndNormalize;

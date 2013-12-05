@@ -629,6 +629,11 @@ nMapFunc nrSetMap(const coeffs src, const coeffs dst)
   return NULL;
 }
 
+static char* nrCoeffString(const coeffs r)
+{
+  return omStrDup("real");
+}
+
 BOOLEAN nrInitChar(coeffs n, void* p)
 {
   assume( getCoeffType(n) == ID );
@@ -637,6 +642,7 @@ BOOLEAN nrInitChar(coeffs n, void* p)
 
   n->cfKillChar = ndKillChar; /* dummy */
   n->ch = 0;
+  n->cfCoeffString = nrCoeffString;
 
   n->cfInit = nrInit;
   n->cfInt  = nrInt;
