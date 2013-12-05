@@ -949,6 +949,8 @@ Comments should be send to the author of the library directly.
 * parallel_lib:: Tools for parallelization
 * realclassify_lib:: Classification of real singularities
 * realizationMatroids_lib:: Realizability for Tropical Fan Curves
+* resources_lib:: Tools to manage the computational resources
+* tasks_lib:: A parallel framework based on tasks
 * schubert_lib:: Intersection Theory
 * symodstd_lib:: Groebner bases for symmetric ideals
 * derham_lib:: Computation of deRham cohomology (Singular 4)
@@ -1070,11 +1072,19 @@ Todos/Issues:
 @c lib realclassify.lib
 
 @c ----------------------------------------------------------
-@node realizationMatroids_lib,schubert_lib,realclassify_lib, Experimental libraries
+@node realizationMatroids_lib,resources_lib,realclassify_lib, Experimental libraries
 @subsection realizationMatroids_lib
 @c lib realizationMatroids.lib
 @c ----------------------------------------------------------
-@node schubert_lib,symodstd_lib,realizationMatroids_lib, Experimental libraries
+@node resources_lib,tasks_lib,realizationMatroids_lib, Experimental libraries
+@subsection resources_lib
+@c lib resources.lib
+@c ----------------------------------------------------------
+@node tasks_lib,schubert_lib,resources_lib, Experimental libraries
+@subsection tasks_lib
+@c lib tasks.lib
+@c ----------------------------------------------------------
+@node schubert_lib,symodstd_lib,tasks_lib, Experimental libraries
 @subsection schubert_lib
 @c lib schubert.lib
 @c ----------------------------------------------------------

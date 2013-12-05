@@ -38,7 +38,7 @@ IMPORTANT NOTE:
 
 PROCEDURES USING POLYMAKE:
   polymakePolytope()  computes the vertices of a polytope using polymake
-  newtonPolytope()    computes the Newton polytope of a polynomial
+  newtonPolytopeO()    computes the Newton polytope of a polynomial
   newtonPolytopeLP()  computes the lattice points of the Newton polytope
   normalFan()         computes the normal fan of a polytope
   groebnerFan()       computes the Groebner fan of a polynomial
@@ -165,8 +165,8 @@ example
 
 /////////////////////////////////////////////////////////////////////////////
 
-proc newtonPolytope (poly f)
-"USAGE: newtonPolytope(f);  f poly
+proc newtonPolytopeO (poly f)
+"USAGE: newtonPolytopeO(f);  f poly
 RETURN: list, L with four entries
 @*            L[1] : an integer matrix whose rows are the coordinates of vertices
                      of the Newton polytope of f
@@ -188,7 +188,7 @@ NOTE: -  if we replace the first column of L[4] by zeros, i.e. if we move
 @*    -  the procedure calls for its computation polymake by Ewgenij Gawrilow,
          TU Berlin and Michael Joswig, so it only works if polymake is installed;
          see http://www.math.tu-berlin.de/polymake/
-EXAMPLE: example newtonPolytope;   shows an example"
+EXAMPLE: example newtonPolytopeO;   shows an example"
 {
   int i,j;
   // compute the list of exponent vectors of the polynomial, 
@@ -212,7 +212,7 @@ example
    matrix M[4][1]=1,x,y,z;
    poly f=y3+x2+xy+2xz+yz+z2+1;
    // the Newton polytope of f is
-   list np=newtonPolytope(f);
+   list np=newtonPolytopeO(f);
    // the vertices of the Newton polytope are:
    np[1];
    // its dimension is
@@ -224,7 +224,7 @@ example
    //////////////////////////
    f=x2-y3;
    // the Newton polytope of f is
-   np=newtonPolytope(f);
+   np=newtonPolytopeO(f);
    // the vertices of the Newton polytope are:
    np[1];
    // its dimension is
@@ -405,7 +405,7 @@ example
    matrix M[4][1]=1,x,y,z;
    poly f=y3+x2+xy+2xz+yz+z2+1;
    // the Newton polytope of f is
-   list np=newtonPolytope(f);
+   list np=newtonPolytopeO(f);
    // the Groebner fan of f, i.e. the normal fan of the Newton polytope
    list gf=normalFan(np[1],np[4],np[3],1,"x,y,z");
    // the number of cones in the Groebner fan of f is:
@@ -459,7 +459,7 @@ EXAMPLE: example groebnerFan;   shows an example"
     f=f-lead(f);
   }
   // call polymakePolytope with exponents
-  list newtonp=polymakePolytope(exponents);
+  list newtonp=polymakePolytopeO(exponents);
   // get the variables as string
   string variablen;
   for (i=1;i<=nvars(basering);i++)
