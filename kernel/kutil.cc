@@ -1964,6 +1964,8 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   if (Lp.p == NULL)
   {
     if (Lp.lcm!=NULL) pLmFree(Lp.lcm);
+    int pos = posInSyz(strat, Lp.sig);
+    enterSyz(Lp, strat, pos);
   }
   else
   {
@@ -1990,8 +1992,8 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
     if (pLmCmp(m2,pHead(p)) == 0) {
       Lp.prod_crit = TRUE; // Product Criterion
 #if 0
-      int pos = posInSyz(Lp.sig);
-      enterSyz(Lp, strat,pos);
+      int pos = posInSyz(strat, Lp.sig);
+      enterSyz(Lp, strat, pos);
       Lp.lcm=NULL;
       pDelete (&m1);
       pDelete (&m2);
