@@ -226,15 +226,13 @@ AC_CONFIG_FILES([Singular/Makefile])
 
 AC_CONFIG_FILES([IntegerProgramming/Makefile])
 
-AC_CONFIG_FILES([redhat/singular.spec])
-# AC_CONFIG_FILES([desktop/Singular.desktop])
-# AC_CONFIG_FILES([desktop/Singular-manual.desktop])
-
 AC_CONFIG_FILES([libsingular-config])
 
-AC_CONFIG_FILES([redhat/Makefile])
 AC_CONFIG_FILES([emacs/Makefile])
+
 AC_CONFIG_FILES([debian/Makefile])
+AC_CONFIG_FILES([redhat/Makefile])
+AC_CONFIG_FILES([redhat/singular.spec])
 AC_CONFIG_FILES([desktop/Makefile])
 
 AC_OUTPUT

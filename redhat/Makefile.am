@@ -2,5 +2,6 @@ ACLOCAL_AMFLAGS = -I ../m4
 
 REDHAT = singular.spec
 	
-EXTRA_DIST = singular.spec
+EXTRA_DIST = $(REDHAT)
+
 CLEANFILES = $(REDHAT)
