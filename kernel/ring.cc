@@ -668,8 +668,8 @@ char * rCharStr(ring r)
   }
   if(rField_is_Ring_2toM(r))
   {
-    char* s = (char*) omAlloc(7+10+2);
-    sprintf(s,"integer,%lu",r->ringflagb);
+    char* s = (char*) omAlloc(7+2+10+2);
+    sprintf(s,"integer,2,%lu",r->ringflagb);
     return s;
   }
   if(rField_is_Ring_ModN(r))
