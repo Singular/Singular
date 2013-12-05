@@ -48,8 +48,12 @@ static BOOLEAN nrnCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
 
 static char* nrnCoeffString(const coeffs r)
 {
-  char* s = (char*) omAlloc(7+11+2);
-  sprintf(s,"integer,%lu",r->modExponent);
+  long l = (long)mpz_sizeinbase(r->modBase, 10) + 2;
+  char* b = (char*) omAlloc(l);
+  b= mpz_get_str (b, 10, r->modBase);
+  char* s = (char*) omAlloc(7+2+l);
+  sprintf(s,"integer,%s",b);
+  omFreeSize(b,l);
   return s;
 }
 
