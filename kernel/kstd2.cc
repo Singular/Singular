@@ -1820,6 +1820,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
       // initialize new syzygy rules for the next iteration step
       initSyzRules(strat);
+
     }
     /*********************************************************************
       * interrreduction step is done, we can go on with the next iteration
@@ -1830,7 +1831,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     strat->Ll--;
     /* reduction of the element choosen from L */
 
-    if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat, strat->P.checked+1)) {
+    if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat->P.GetLmCurrRing(), strat, strat->P.checked+1)) {
       //#if 1
 #ifdef DEBUGF5
       Print("SIG OF NEXT PAIR TO HANDLE IN SIG-BASED ALGORITHM\n");
@@ -1898,7 +1899,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #if SBA_PRODUCT_CRITERION
         if (strat->P.prd_crit) {
           product_criterion++;
-          enterSyz(strat->P, strat);
+          int pos = posInSyz(strat, strat->P.sig);
+          enterSyz(strat->P, strat, pos);
           if (strat->P.lcm!=NULL)
             pLmFree(strat->P.lcm);
           red_result = 2;
@@ -2111,7 +2113,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
 //#if 1
 #if DEBUGF50
-    printf("---------------------------\n");
+    //printf("---------------------------\n");
     Print(" %d. ELEMENT ADDED TO GCURR:\n",strat->sl+1);
     Print("LEAD POLY:  "); pWrite(pHead(strat->S[strat->sl]));
     Print("SIGNATURE:  "); pWrite(strat->sig[strat->sl]);
@@ -2156,7 +2158,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #if SBA_PRINT_ZERO_REDUCTIONS
         zeroreductions++;
 #endif
-        enterSyz(strat->P,strat);
+        int pos = posInSyz(strat, strat->P.sig);
+        enterSyz(strat->P, strat, pos);
 //#if 1
 #ifdef DEBUGF5
         Print("ADDING STUFF TO SYZ :  ");
@@ -2222,9 +2225,9 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   size_g   = strat->sl+1;
 #endif
 #if SBA_PRINT_SIZE_SYZ
-  size_syz = strat->syzl+1;
+  // that is correct, syzl is counting one too far
+  size_syz = strat->syzl;
 #endif
-
   exitSba(strat);
 //  if (TEST_OPT_WEIGHTM)
 //  {

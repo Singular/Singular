@@ -2267,11 +2267,13 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
   {
     strat->rewCrit1 = arriRewDummy;
     strat->rewCrit2 = arriRewCriterion;
+    strat->rewCrit3 = arriRewCriterionPre;
   }
   else
   {
     strat->rewCrit1 = faugereRewCriterion;
     strat->rewCrit2 = faugereRewCriterion;
+    strat->rewCrit3 = faugereRewCriterion;
   }
 
   if(!TEST_OPT_RETURN_SB)
