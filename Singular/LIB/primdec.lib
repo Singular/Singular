@@ -805,7 +805,7 @@ static proc splitCharp(list l)
     }
   }
   l=l+keep1;
-  option(set,op)
+  option(set,op);
   return(l);
 }
 
