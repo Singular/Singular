@@ -1,4 +1,5 @@
-// option("warn"); when enabling warn option, I get a degfault.
+// when enabling warn option, segfault when calling 'genus(i,1)'
+// option("warn"); 
 
 LIB "tst.lib";
 tst_init();
