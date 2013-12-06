@@ -4638,7 +4638,6 @@ int posInSyz (const kStrategy strat, poly sig)
 if (strat->syzl==0) return 0;
 if (pLmCmp(strat->syz[strat->syzl-1],sig) != currRing->OrdSgn)
   return strat->syzl;
-
 int i;
 int an = 0;
 int en= strat->syzl-1;
@@ -5090,9 +5089,10 @@ BOOLEAN syzCriterion(poly sig, unsigned long not_sevSig, kStrategy strat)
 #endif
   for (int k=0; k<strat->syzl; k++)
   {
+    //printf("-%d",k);
 //#if 1
 #ifdef DEBUGF5
-    Print("checking with: %d --  \n",k);
+    Print("checking with: %d / %d --  \n",k,strat->syzl);
     pWrite(pHead(strat->syz[k]));
 #endif
     if (p_LmShortDivisibleBy(strat->syz[k], strat->sevSyz[k], sig, not_sevSig, currRing))
@@ -5101,10 +5101,11 @@ BOOLEAN syzCriterion(poly sig, unsigned long not_sevSig, kStrategy strat)
 #ifdef DEBUGF5
       printf("DELETE!\n");
 #endif
+      //printf("- T -\n\n");
       return TRUE;
     }
-    //k++;
   }
+  //printf("- F -\n\n");
   return FALSE;
 }
 
@@ -5115,7 +5116,7 @@ BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
 {
 //#if 1
 #ifdef DEBUGF5
-  Print("syzygy criterion checks:  ");
+  Print("--- syzygy criterion checks:  ");
   pWrite(sig);
 #endif
   int comp = p_GetComp(sig, currRing);
@@ -5138,14 +5139,13 @@ BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
     }
     for (int k=min; k<max; k++)
     {
-#ifdef DEBUGF5
+#ifdef F5DEBUG
       printf("COMP %d/%d - MIN %d - MAX %d - SYZL %ld\n",comp,strat->currIdx,min,max,strat->syzl);
       Print("checking with: %d --  ",k);
       pWrite(pHead(strat->syz[k]));
 #endif
       if (p_LmShortDivisibleBy(strat->syz[k], strat->sevSyz[k], sig, not_sevSig, currRing))
         return TRUE;
-      //k++;
     }
     return FALSE;
   }
@@ -6113,7 +6113,8 @@ void initSyzRules (kStrategy strat)
     strat->syzIdx     = initec(comp);
     strat->sevSyz     = initsevS(ps);
     strat->syz        = (poly *)omAlloc(ps*sizeof(poly));
-    strat->syzl       = strat->syzmax = ps;
+    strat->syzmax     = ps;
+    strat->syzl       = 0;
     strat->syzidxmax  = comp;
 #if defined(DEBUGF5) || defined(DEBUGF51)
     printf("------------- GENERATING SYZ RULES NEW ---------------\n");
@@ -6151,23 +6152,21 @@ void initSyzRules (kStrategy strat)
         }
         strat->syzIdx[j]  = ctr;
         j++;
+        LObject Q;
+        int pos;
         for (k = 0; k<i; k++)
         {
-          poly p          = pOne();
-          p_ExpVectorCopy(p,strat->S[k],currRing);
-          strat->syz[ctr] = p;
-          p_SetCompP (strat->syz[ctr], comp, currRing);
-          poly q          = p_Copy(p, currRing);
+          Q.sig          = pOne();
+          p_ExpVectorCopy(Q.sig,strat->S[k],currRing);
+          p_SetCompP (Q.sig, comp, currRing);
+          poly q          = p_One(currRing);
           p_ExpVectorCopy(q,strat->S[i],currRing);
           q               = p_Neg (q, currRing);
           p_SetCompP (q, p_GetComp(strat->sig[k], currRing), currRing);
-          strat->syz[ctr] = p_Add_q (strat->syz[ctr], q, currRing);
-#if defined(DEBUGF5) || defined(DEBUGF51)
-//#if 1
-          printf(". . \n");
-          pWrite(strat->syz[ctr]);
-#endif
-          strat->sevSyz[ctr] = p_GetShortExpVector(strat->syz[ctr],currRing);
+          Q.sig = p_Add_q (Q.sig, q, currRing);
+          Q.sevSig  = p_GetShortExpVector(Q.sig,currRing);
+          pos = posInSyz(strat, Q.sig);
+          enterSyz(Q, strat, pos);
           ctr++;
         }
       }
@@ -6193,23 +6192,21 @@ void initSyzRules (kStrategy strat)
       j++;
     }
     strat->syzIdx[j]  = ctr;
+    LObject Q;
+    int pos;
     for (k = 0; k<strat->sl+1; k++)
     {
-      poly p          = pOne();
-      p_ExpVectorCopy(p,strat->S[k],currRing);
-      strat->syz[ctr] = p;
-      p_SetCompP (strat->syz[ctr], comp, currRing);
-      poly q          = p_Copy(p, currRing);
+      Q.sig          = pOne();
+      p_ExpVectorCopy(Q.sig,strat->S[k],currRing);
+      p_SetCompP (Q.sig, comp, currRing);
+      poly q          = p_One(currRing);
       p_ExpVectorCopy(q,strat->L[strat->Ll].p,currRing);
       q               = p_Neg (q, currRing);
       p_SetCompP (q, p_GetComp(strat->sig[k], currRing), currRing);
-      strat->syz[ctr] = p_Add_q (strat->syz[ctr], q, currRing);
-//#if 1
-#if DEBUGF5 || DEBUGF51
-      printf("..");
-      pWrite(strat->syz[ctr]);
-#endif
-      strat->sevSyz[ctr] = p_GetShortExpVector(strat->syz[ctr],currRing);
+      Q.sig = p_Add_q (Q.sig, q, currRing);
+      Q.sevSig = p_GetShortExpVector(Q.sig,currRing);
+      pos = posInSyz(strat, Q.sig);
+      enterSyz(Q, strat, pos);
       ctr++;
     }
 //#if 1
@@ -6219,9 +6216,14 @@ void initSyzRules (kStrategy strat)
     printf("syzmax %d\n",strat->syzmax);
     printf("ps     %d\n",ps);
     Print("--------------------------------\n");
-    for(i=0;i<=ps-1;i++)
+    for(i=0;i<=strat->syzl-1;i++)
     {
+      printf("%d - ",i);
       pWrite(strat->syz[i]);
+    }
+    for(i=0;i<strat->currIdx;i++)
+    {
+      printf("%d - %d\n",i,strat->syzIdx[i]);
     }
     Print("--------------------------------\n");
 #endif
@@ -7232,7 +7234,7 @@ void enterSyz(LObject p, kStrategy strat, int atT)
 {
   int i;
   strat->newt = TRUE;
-  if (strat->syzl == strat->syzmax)
+  if (strat->syzl == strat->syzmax-1)
   {
     pEnlargeSet(&strat->syz,strat->syzmax,setmaxTinc);
     strat->sevSyz = (unsigned long*) omRealloc0Size(strat->sevSyz,
@@ -7241,7 +7243,7 @@ void enterSyz(LObject p, kStrategy strat, int atT)
                                                   *sizeof(unsigned long));
     strat->syzmax += setmaxTinc;
   }
-  if (atT < strat->syzl-1)
+  if (atT < strat->syzl)
   {
 #ifdef ENTER_USE_MEMMOVE
     memmove(&(strat->syz[atT+1]), &(strat->syz[atT]),
@@ -7257,14 +7259,14 @@ void enterSyz(LObject p, kStrategy strat, int atT)
 #endif
     }
   }
-  i = strat->syzl;
-  //i = atT;
-  strat->syz[i] = p.sig;
-  strat->sevSyz[i] = p.sevSig;
+  //i = strat->syzl;
+  i = atT;
+  strat->syz[atT] = p.sig;
+  strat->sevSyz[atT] = p.sevSig;
   strat->syzl++;
-#ifdef DEBUGF5
-  Print("last element in strat->syz: %d--%d  ",i+1,strat->syzmax);
-  pWrite(strat->syz[i]);
+#if F5DEBUG
+  Print("element in strat->syz: %d--%d  ",atT+1,strat->syzmax);
+  pWrite(strat->syz[atT]);
 #endif
   // recheck pairs in strat->L with new rule and delete correspondingly
   int cc = strat->Ll;
@@ -7277,6 +7279,19 @@ void enterSyz(LObject p, kStrategy strat, int atT)
     }
     cc--;
   }
+//#if 1
+#ifdef DEBUGF5
+    Print("--- Syzygies ---\n");
+    printf("syzl   %d\n",strat->syzl);
+    printf("syzmax %d\n",strat->syzmax);
+    Print("--------------------------------\n");
+    for(i=0;i<=strat->syzl-1;i++)
+    {
+      printf("%d - ",i);
+      pWrite(strat->syz[i]);
+    }
+    Print("--------------------------------\n");
+#endif
 }
 
 
