@@ -54,11 +54,11 @@
 
 #define SBA_TAIL_RED                        1
 #define SBA_PRODUCT_CRITERION               0
-#define SBA_PRINT_ZERO_REDUCTIONS           0
-#define SBA_PRINT_REDUCTION_STEPS           0
-#define SBA_PRINT_OPERATIONS                0
-#define SBA_PRINT_SIZE_G                    0
-#define SBA_PRINT_SIZE_SYZ                  0
+#define SBA_PRINT_ZERO_REDUCTIONS           1
+#define SBA_PRINT_REDUCTION_STEPS           1
+#define SBA_PRINT_OPERATIONS                1
+#define SBA_PRINT_SIZE_G                    1
+#define SBA_PRINT_SIZE_SYZ                  1
 #define SBA_PRINT_PRODUCT_CRITERION         0
 
 // counts sba's reduction steps
@@ -1714,9 +1714,10 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   intvec *sort  = idSort(F1);
   for (int i=0; i<sort->length();++i)
     F->m[i] = F1->m[(*sort)[i]-1];
-#if 0
+#if 1
   printf("SBA COMPUTATIONS DONE IN THE FOLLOWING RING:\n");
   rWrite (currRing);
+  printf("ordSgn = %d\n",currRing->OrdSgn);
   printf("\n");
 #endif
 #ifdef KDEBUG
@@ -2074,6 +2075,70 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           pSetComp (strat->P.sig,cmp);
 
           strat->P.sevSig = pGetShortExpVector (strat->P.sig);
+          int i;
+          for(int ps=0;ps<strat->sl+1;ps++)
+          {
+
+            strat->newt = TRUE;
+            if (strat->syzl == strat->syzmax)
+            {
+              pEnlargeSet(&strat->syz,strat->syzmax,setmaxTinc);
+              strat->sevSyz = (unsigned long*) omRealloc0Size(strat->sevSyz,
+                  (strat->syzmax)*sizeof(unsigned long),
+                  ((strat->syzmax)+setmaxTinc)
+                  *sizeof(unsigned long));
+              strat->syzmax += setmaxTinc;
+            }
+            LObject Q;
+            Q.sig = pCopy(strat->P.sig);
+            // add LM(F->m[i]) to the signature to get a Schreyer order
+            // without changing the underlying polynomial ring at all
+            if (strat->sbaOrder == 0)
+              p_ExpVectorAdd (Q.sig,strat->S[ps],currRing);
+            // since p_Add_q() destroys all input
+            // data we need to recreate help
+            // each time
+            // ----------------------------------------------------------
+            // in the Schreyer order we always know that the multiplied
+            // module monomial strat->P.sig gives the leading monomial of
+            // the corresponding principal syzygy
+            // => we do not need to compute the "real" syzygy completely
+            poly help = pCopy(strat->sig[ps]);
+            p_ExpVectorAdd (help,strat->P.p,currRing);
+            Q.sig = p_Add_q(Q.sig,help,currRing);
+            //printf("%d. SYZ  ",i+1);
+            //pWrite(strat->syz[i]);
+            Q.sevSig = p_GetShortExpVector(Q.sig,currRing);
+            i = posInSyz(strat, Q.sig);
+            enterSyz(Q, strat, i);
+          }
+        }
+      }
+      // deg - idx - lp/rp
+      // => we need to add syzygies with indices > pGetComp(strat->P.sig)
+      /*
+      if(strat->sbaOrder == 3)
+      {
+        BOOLEAN overwrite = TRUE;
+        for (int tk=0; tk<strat->sl+1; tk++)
+        {
+          if (pGetComp(strat->sig[tk]) == pGetComp(strat->P.sig))
+          {
+            //printf("TK %d / %d\n",tk,strat->sl);
+            overwrite = FALSE;
+            break;
+          }
+        }
+        //printf("OVERWRITE %d\n",overwrite);
+        if (overwrite)
+        {
+          int cmp = pGetComp(strat->P.sig);
+          int* vv = (int*)omAlloc((currRing->N+1)*sizeof(int));
+          pGetExpV (strat->P.p,vv);
+          pSetExpV (strat->P.sig, vv);
+          pSetComp (strat->P.sig,cmp);
+
+          strat->P.sevSig = pGetShortExpVector (strat->P.sig);
           for(int ps=0;ps<strat->sl+1;ps++)
           {
             int i = strat->syzl;
@@ -2111,9 +2176,10 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           }
         }
       }
+      */
 //#if 1
 #if DEBUGF50
-    //printf("---------------------------\n");
+    printf("---------------------------\n");
     Print(" %d. ELEMENT ADDED TO GCURR:\n",strat->sl+1);
     Print("LEAD POLY:  "); pWrite(pHead(strat->S[strat->sl]));
     Print("SIGNATURE:  "); pWrite(strat->sig[strat->sl]);
