@@ -786,8 +786,8 @@ static proc splitCharp(list l)
           rp=delete(rp,1);
           rp=delete(rp,1);
           keep1=keep1+rp;
-          option(noredSB);
 
+          option(noredSB);
         }
         kill RL;
       }
