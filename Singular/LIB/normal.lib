@@ -4018,9 +4018,9 @@ static proc substpartSpecial(ideal endid, ideal endphi)
 // attempted.
 static proc computeRing(ideal J, ideal I, list #)
 {
-  int i, ii, jj;
+  int i, ii,jj;
   intvec V;                          // to be used for variable weights
-  def y = printlevel-voice+2;
+  int y = printlevel-voice+2;
   def R = basering;
   poly c = J[1];                     // the denominator
   list gnirlist = ringlist(basering);
