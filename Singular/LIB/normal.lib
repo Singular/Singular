@@ -2434,7 +2434,7 @@ EXAMPLE: example genus; shows an example
 
    if(size(#)!=0)
    {                              //uses the normalization to compute delta
-      list nor=normal(I);
+      list nor=normal(I,"withDelta");
       delt=nor[size(nor)][2];
       genus=genus-delt-deltainf;
       setring R0;
