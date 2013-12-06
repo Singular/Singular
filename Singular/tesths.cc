@@ -52,8 +52,6 @@
 
 extern int siInit(char *);
 
-#if ! defined(LIBSINGULAR)
-
 int initializeGMP(){ return 1; }
 
 int mmInit( void )
@@ -235,5 +233,4 @@ int main(          /* main entry to Singular */
   m2_end(0);
   return 0;
 }
-#endif // not LIBSINGULAR
 
