@@ -1584,7 +1584,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
 	                        n_NumberOfParameters(currRing->cf))>=0))))
         {
         // WARNING: do not use ring variable names in procedures
-          Warn("use of variable >>%s<< in a procedure in line %s",id);
+          Warn("use of variable >>%s<< in a procedure in line %s",id,my_yylinebuf);
         }
         return;
       }
