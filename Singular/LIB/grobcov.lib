@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version grobcov.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version grobcov.lib 4-0-0-0 Dec_2013 ";
 category="General purpose";
 info="
 LIBRARY:  grobcov.lib   Groebner Cover for parametric ideals.
@@ -14,8 +14,7 @@ PURPOSE:  Comprehensive Groebner Systems, Groebner Cover, Canonical Forms,
           Journal of Symbolic Computation 45 (2010) 1391-1425.
           The locus algorithm and definitions will be
           published in a forthcoming paper by Abanades, Botana, Montes, Recio:
-          \''Geometrical locus of points using the Groebner cover\''.
-
+          \''An Algebraic Taxonomy for Locus Computation in Dynamic Geometry\''.
 
           The central routine is grobcov. Given a parametric
           ideal, grobcov outputs its Canonical Groebner Cover, consisting
@@ -68,74 +67,85 @@ NOTATIONS: All given and determined polynomials and ideals are in the
 
 PROCEDURES:
 
-grobcov(F);        Is the basic routine giving the canonical
-                   Groebner cover of the parametric ideal F.
-                   This routine accepts many options, that
-                   allow to obtain results even when the canonical
-                   computation does not finish in reasonable time.
+grobcov(F); Is the basic routine giving the canonical
+            Groebner cover of the parametric ideal F.
+            This routine accepts many options, that
+            allow to obtain results even when the canonical
+            computation does not finish in reasonable time.
 
-cgsdr(F);          Is the procedure for obtaining a first disjoint,
-                   reduced Comprehensive Groebner System that
-                   is used in grobcov, but that can be used
-                   independently if only the CGS is required.
-                   It is a more efficient routine than buildtree
-                   (the own routine that is no more used). It uses
-                   now KSW algorithm.
+cgsdr(F);   Is the procedure for obtaining a first disjoint,
+            reduced Comprehensive Groebner System that
+            is used in grobcov, that can also be used
+            independently if only the CGS is required.
+            It is a more efficient routine than buildtree
+            (the own routine that is no more used). It uses
+            now KSW algorithm.
 
 setglobalrings();  Generates the global rings @R, @P and @PR that are
-                   respectively the rings Q[a][x], Q[a], Q[x,a].
-                   It is called inside each of the fundamental routines
-                   of the library: grobcov, cgsdr and killed before
-                   the output.
-                   If the user want to use some other internal routine,
-                   then setglobalrings() is to be called before, as
-                   the rings @R, @P and @RP are needed in most of them.
-                   globally, and more internal routines can be used, but
-                   these rings are killed by the call to any of the
-                   basic routines.
+            respectively the rings Q[a][x], Q[a], Q[x,a].
+            It is called inside each of the fundamental routines
+            of the library: grobcov, cgsdr, locus, locusdg and killed before
+            the output.
+            So, if the user want to use some other internal routine,
+            then setglobalrings() is to be called before, as most of them use
+            these rings.
 
-pdivi(f,F);     Performs a pseudodivision of a parametric polynomial
-                   by a parametric ideal.
+pdivi(f,F); Performs a pseudodivision of a parametric polynomial
+            by a parametric ideal.
+            Can be used without calling presiouly setglobalrings(),
 
 pnormalf(f,E,N);   Reduces a parametric polynomial f over V(E) \ V(N)
-                   E is the null ideal and N the non-null ideal
-                   over the parameters.
+            E is the null ideal and N the non-null ideal
+            over the parameters.
+            Can be used without calling presiouly setglobalrings(),
+
+Prep(N,M);  Computes the P-representation of V(N) \ V(M).
+            Can be used without calling previously setglobalrings().
 
 extend(GC); When the grobcov of an ideal has been computed
-                   with the default option ('ext',0) and the explicit
-                   option ('rep',2) (which is not the default), then
-                   one can call extend (GC) (and options) to obtain the
-                   full representation of the bases. With the default
-                   option ('ext',0) only the generic representation of
-                   the bases are computed, and one can obtain the full
-                   representation using extend.
+            with the default option ('ext',0) and the explicit
+            option ('rep',2) (which is not the default), then
+            one can call extend (GC) (and options) to obtain the
+            full representation of the bases. With the default
+            option ('ext',0) only the generic representation of
+            the bases are computed, and one can obtain the full
+            representation using extend.
+            Can be used without calling presiouly setglobalrings(),
 
-locus(G):   Special routine for determining the locus of points
-                   of  objects. Given a parametric ideal J with
-                   parameters (a_1,..a_m) and variables (x_1,..,xn),
-                   representing the system determining
-                   the locus of points (a_1,..,a_m)) who verify certain
-                   properties, computing the grobcov G of
-                   J and applying to it locus, determines the different
-                   classes of locus components. They can be
-                   Normal, Special, Accumulation point, Degenerate.
-                   The output are the components given in P-canonical form
-                   of two constructible sets: Normal, and Non-Normal
-                   The Normal Set has Normal and Special components
-                   The Non-Normal set has Accumulation and Degenerate components.
-                   The description of the algorithm and definitions will be
-                   given in a forthcoming paper by Abanades, Botana, Montes, Recio:
-                   ''Geometrical locus of points using the Groebner cover''
+locus(G);   Special routine for determining the locus of points
+            of  objects. Given a parametric ideal J with
+            parameters (a_1,..a_m) and variables (x_1,..,xn),
+            representing the system determining
+            the locus of points (a_1,..,a_m)) who verify certain
+            properties, computing the grobcov G of
+            J and applying to it locus, determines the different
+            classes of locus components. They can be
+            Normal, Special, Accumulation point, Degenerate.
+            The output are the components given in P-canonical form
+            of two constructible sets: Normal, and Non-Normal
+            The Normal Set has Normal and Special components
+            The Non-Normal set has Accumulation and Degenerate components.
+            The description of the algorithm and definitions will be
+            given in a forthcoming paper by Abanades, Botana, Montes, Recio:
+            ''An Algebraic Taxonomy for Locus Computation in Dynamic Geometry''.
+            Can be used without calling presiouly setglobalrings(),
 
-locusdg(G):  Is a special routine for computing the locus in dinamical geometry.
-                    It detects automatically a possible point that is to be avoided by the mover,
-                    whose coordinates must be the last two coordinates in the definition of the ring.
-                    If such a point is detected, then it eliminates the segments of the grobcov
-                    depending on the point that is to be avoided.
-                    Then it calls locus.
+locusdg(G); Is a special routine for computing the locus in dinamical geometry.
+            It detects automatically a possible point that is to be avoided by the mover,
+            whose coordinates must be the last two coordinates in the definition of the ring.
+            If such a point is detected, then it eliminates the segments of the grobcov
+            depending on the point that is to be avoided.
+            Then it calls locus.
+            Can be used without calling presiouly setglobalrings(),
 
-locusto(L):  Transforms the output of locus to a string that
-                  can be reed from different computational systems.
+locusto(L); Transforms the output of locus to a string that
+            can be reed from different computational systems.
+            Can be used without calling presiouly setglobalrings(),
+
+addcons(L); Given a disjoint set of locally closed subsets in P-representation,
+            it returns the canonical P-representation of the constructible
+            set formed by the union of them.
+            Can be used without calling presiouly setglobalrings(),
 
 SEE ALSO: compregb_lib
 ";
@@ -153,9 +163,12 @@ LIB "qhmoduli.lib";
 // Release 2: (private)
 // Initial data: 6-9-2009
 // Final data: 25-10-2011
-// Release 3: (this release, public)
+// Release 3:
 // Initial data: 1-7-2012
 // Final data: 4-9-2012
+// Release 4: (this release, public)
+// Initial data: 4-9-2012
+// Final data: 21-11-2013
 // basering Q[a][x];
 
 // ************ Begin of buildtree ******************************
@@ -165,8 +178,8 @@ proc setglobalrings()
           No arguments
 RETURN:   After its call the rings @R=Q[a][x], @P=Q[a], @RP=Q[x,a] are
           defined as global variables.
-NOTE:     It is called internally by the fundamental routines of the
-          library grobcov, cgsdr, extend, pdivi, pnormalf, locus, locusto,
+NOTE: It is called internally by the fundamental routines of the
+          library grobcov, cgsdr, extend, pdivi, pnormalf, locus, locusdg, locusto,
           and killed before the output.
           The user does not need to call it, except when it is interested
           in using some internal routine of the library that
@@ -209,15 +222,15 @@ ringlist(@P);
 ringlist(@RP);
 }
 
-//*************Auxilliary routines**************
+//*************Auxiliary routines**************
 
 // cld : clears denominators of an ideal and normalizes to content 1
-//       can be used in @R or @P or @RP
+//        can be used in @R or @P or @RP
 // input:
-//    ideal J (J can be also poly), but the output is an ideal;
+//        ideal J (J can be also poly), but the output is an ideal;
 // output:
-//    ideal Jc (the new form of ideal J without denominators and
-//       normalized to content 1)
+//        ideal Jc (the new form of ideal J without denominators and
+//        normalized to content 1)
 proc cld(ideal J)
 {
   if (size(J)==0){return(ideal(0));}
@@ -368,7 +381,7 @@ proc memberpos(f,J)
 proc subset(J,K)
 //"USAGE:   subset(J,K);
 //          (J,K)  expected (ideal,ideal)
-//                   or     (list, list)
+//                  or     (list, list)
 //RETURN:   1 if all the elements of J are in K, 0 if not.
 //EXAMPLE:  subset; shows an example;"
 {
@@ -418,10 +431,10 @@ proc simpqcoeffs(poly n,poly m)
   return (s);
 }
 
-// pdivi : pseudodivision of a poly f by a parametric ideal F in Q[a][x].
+// pdivi : pseudodivision of a parametric polynomial f by a parametric ideal F in Q[a][x].
 // input:
-//   poly  f (in the parametric ring @R)
-//   ideal F (in the parametric ring @R)
+//   poly  f
+//   ideal F
 // output:
 //   list (poly r, ideal q, poly mu)
 proc pdivi(poly f,ideal F)
@@ -437,12 +450,15 @@ NOTE:     pseudodivision of a poly f by an ideal F in @R. Returns a
 KEYWORDS: division, reduce
 EXAMPLE:  pdivi; shows an example"
 {
-  int te=0;
-  if (defined(@P)==1){te=1;}
-  else{setglobalrings();}
-  def R=basering;
   int i;
   int j;
+//  string("T_f=",f);
+  poly v=1;
+  for(i=1;i<=nvars(basering);i++){v=v*var(i);}
+  int te=0;
+  def R=basering;
+  if (defined(@P)==1){te=1;}
+  else{setglobalrings();}
   poly r=0;
   poly mu=1;
   def p=f;
@@ -475,6 +491,7 @@ EXAMPLE:  pdivi; shows an example"
         mu=mu*nu;
         rho=qlc[1]*qlm;
         p=nu*p-rho*F[i];
+//        string("i=",i,"  coef(p,v)=",coef(p,v));
         r=nu*r;
         for (j=1;j<=size(F);j++){q[j]=nu*q[j];}
         q[i]=q[i]+rho;
@@ -486,6 +503,7 @@ EXAMPLE:  pdivi; shows an example"
     {
       r=r+lcp*lpp;
       p=p-lcp*lpp;
+//      string("pasa al rem p=",p);
     }
   }
   list res=r,q,mu;
@@ -844,9 +862,13 @@ proc redgbn(ideal F, ideal E, ideal N)
 proc elimrepeated(F)
 {
   int i;
+  int nt;
+  if (typeof(F)=="ideal"){nt=ncols(F);}
+  else{nt=size(F);}
+
   def FF=F;
   FF=F[1];
-  for (i=2;i<=ncols(F);i++)
+  for (i=2;i<=nt;i++)
   {
     if (not(memberpos(F[i],FF)[1]))
     {
@@ -978,8 +1000,6 @@ proc incquotient(ideal N, poly f)
 {
   poly g; int i;
   ideal Nb; ideal Na=N;
-
-  // begins incquotient
   if (size(Na)==1)
   {
     g=gcd(Na[1],f);
@@ -1054,6 +1074,10 @@ proc elimfromlist(l, int i)
   return(L);
 }
 
+// Auxiliary routine to define an order for ideals
+// Returns 1 if the ideal a is shoud precede ideal b by sorting them in idbefid order
+//             2 if the the contrary happen
+//             0 if the order is not relevant
 proc idbefid(ideal a, ideal b)
 {
   poly fa; poly fb; poly la; poly lb;
@@ -1085,6 +1109,7 @@ proc idbefid(ideal a, ideal b)
   }
 }
 
+// sort a list of ideals using idbefid
 proc sortlistideals(list L)
 {
   int i; int j; int n;
@@ -1138,13 +1163,17 @@ proc equallistideals(list L, list M)
 //    the ((p_1,(p_11,p_1k_1)),..,(p_r,(p_r1,p_rk_r)));
 //    the Prep of V(N)\V(M)
 // Assumed to work in the ring @P of the parameters
+// Can be used without calling previously setglobalrings().
 proc Prep(ideal N, ideal M)
 {
+  int te;
   if (N[1]==1)
   {
     return(list(list(ideal(1),list(ideal(1)))));
   }
   def RR=basering;
+  if(defined(@P)){te=1;}
+  else{te=0; setglobalrings();}
   setring(@P);
   ideal Np=imap(RR,N);
   ideal Mp=imap(RR,M);
@@ -1174,7 +1203,9 @@ proc Prep(ideal N, ideal M)
   }
   if (size(prep)==0){prep=list(list(ideal(1),list(ideal(1))));}
   setring(RR);
-  return(imap(@P,prep));
+  def pprep=imap(@P,prep);
+  if(te==0){kill @P; kill @R; kill @RP;}
+  return(pprep);
 }
 
 // PtoCrep
@@ -1186,6 +1217,8 @@ proc Prep(ideal N, ideal M)
 //    list (ideal ida, ideal idb)
 //    the C-representaion of V(N)\V(M) = V(ida)\V(idb)
 // Assumed to work in the ring @P of the parameters
+// If the routine is to be called from the top, a previous call to
+// setglobalrings() is needed.
 proc PtoCrep(list L)
 {
   def RR=basering;
@@ -1292,8 +1325,10 @@ NOTE:     The basering R, must be of the form Q[a][x], a=parameters,
 KEYWORDS: CGS, disjoint, reduced, Comprehensive Groebner System
 EXAMPLE:  cgsdr; shows an example"
 {
+  int te;
   def RR=basering;
-  setglobalrings();
+  if(defined(@P)){te=1;}
+  else{te=0; setglobalrings();}
   // INITIALIZING OPTIONS
   int i; int j;
   int can=2;
@@ -1451,7 +1486,7 @@ EXAMPLE:  cgsdr; shows an example"
       }
     }
   }
-  if(defined(@P)){kill @P; kill @R; kill @RP;}
+  if(te==0){kill @P; kill @R; kill @RP;}
   return(GS);
 }
 example
@@ -1468,7 +1503,7 @@ example
 }
 
 // input:  internal routine called by cgsdr at the end to group the
-//         lpp segments and improve the output
+//            lpp segments and improve the output
 // output: grouped segments by lpp obtained in cgsdr
 proc grsegments(list T)
 {
@@ -1504,6 +1539,8 @@ proc grsegments(list T)
 // idcontains
 // input: ideal p, ideal q
 // output: 1 if p contains q,  0 otherwise
+// If the routine is to be called from the top, a previous call to
+// setglobalrings() is needed.
 proc idcontains(ideal p, ideal q)
 {
   int t; int i;
@@ -1529,6 +1566,8 @@ proc idcontains(ideal p, ideal q)
 //   to the minimal ideals in the list
 // input: L (list of ideals)
 // output: the list of integers corresponding to the minimal ideals in L
+// If the routine is to be called from the top, a previous call to
+// setglobalrings() is needed.
 proc selectminideals(list L)
 {
   if (size(L)==0){return(L)};
@@ -1567,7 +1606,7 @@ proc selectminideals(list L)
 }
 
 // LCUnion
-// Given a list of the P-representations of locally closed segments
+// Given a list of the P-representations of disjoint locally closed segments
 // for which we know that the union is also locally closed
 // it returns the P-representation of its union
 // input:  L list of segments in P-representation
@@ -1575,13 +1614,21 @@ proc selectminideals(list L)
 //      where i represents a segment
 // output: P-representation of the union
 //       ((P_j,(P_j1,...,P_jk_j | j=1..t)))
+// If the routine is to be called from the top, a previous call to
+// setglobalrings() is needed.
+// Auxiliary routine called by grobcov and addcons
+// A previous call to setglobarings() is needed if it is to be used at the top.
 proc LCUnion(list LL)
 {
   def RR=basering;
   setring(@P);
+  int care;
   def L=imap(RR,LL);
   int i; int j; int k; list H; list C; list T;
-  list L0; list P0; list P; list Q0; list Q;
+  list L0; list P0; list P; list Q0; list Q;  intvec Qi;
+  if(not(defined(@Q2))){list @Q2;}
+  else{kill @Q2; list @Q2;}
+  exportto(Top,@Q2);
   for (i=1;i<=size(L);i++)
   {
     for (j=1;j<=size(L[i]);j++)
@@ -1591,10 +1638,20 @@ proc LCUnion(list LL)
     }
   }
   Q0=selectminideals(P0);
+  //"T_3Q0="; Q0;
+  kill P; list P;
   for (i=1;i<=size(Q0);i++)
   {
-    Q[i]=L0[Q0[i]];
-    P[i]=L[Q[i][1]][Q[i][2]];
+    Qi=L0[Q0[i]];
+    Q[size(Q)+1]=Qi;
+      P[size(P)+1]=L[Qi[1]][Qi[2]];
+  }
+  @Q2=Q;
+  if(size(P)==0)
+  {
+    setring(RR);
+    list TT;
+    return(TT);
   }
   // P is the list of the maximal components of the union
   //   with the corresponding initial holes.
@@ -1610,28 +1667,35 @@ proc LCUnion(list LL)
         for (j=1;j<=size(L[i]);j++)
         {
           C[size(C)+1]=L[i][j];
+          C[size(C)][3]=intvec(i,j);
         }
       }
     }
-    T[size(T)+1]=list(Q[k],P[k][1],addpart(H,C));
+    if(size(P[k])>=3){T[size(T)+1]=list(Q[k],P[k][1],addpart(H,C),P[k][3]);}
+    else{T[size(T)+1]=list(Q[k],P[k][1],addpart(H,C));}
   }
+  @Q2=sortpairs(@Q2);
   setring(RR);
   def TT=imap(@P,T);
   return(TT);
 }
 
-// Called by LCUnion to modify the holes of a primepart of the union
+// Auxiliary routine
+// called by LCUnion to modify the holes of a primepart of the union
 // by the addition of the segments that do not correspond to that part
 // Works on @P ring.
 // Input:
 //   H=(p_i1,..,p_is) the holes of a component to be transformed by the addition of
 //        the segments C that do not correspond to that component
-//   C=((q_1,(q_11,..,q_1l_1)),..,(q_k,(q_k1,..,q_kl_k)))
+//   C=((q_1,(q_11,..,q_1l_1),pos1),..,(q_k,(q_k1,..,q_kl_k),posk))
+// posi=(i,j) position of the component
 //        the list of segments to be added to the holes
 proc addpart(list H, list C)
 {
   list Q; int i; int j; int k; int l; int t; int t1;
   Q=H; intvec notQ; list QQ; list addq;
+  // @Q2=list of (i,j) positions of the components that have been aded to some hole of the maximal ideals
+  //          plus those of the components added to the holes.
   ideal q;
   i=1;
   while (i<=size(Q))
@@ -1644,6 +1708,7 @@ proc addpart(list H, list C)
       {
         if (equalideals(q,C[j][1]))
         {
+          @Q2[size(@Q2)+1]=C[j][3];
           t=0;
           for (k=1;k<=size(C[j][2]);k++)
           {
@@ -1665,6 +1730,7 @@ proc addpart(list H, list C)
             if (t1)
             {
               addq[size(addq)+1]=C[j][2][k];
+              @Q2[size(@Q2)+1]=C[j][3];
             }
           }
           if((size(notQ)==1) and (notQ[1]==0)){notQ[1]=i;}
@@ -1696,7 +1762,7 @@ proc addpart(list H, list C)
   return(addpartfine(QQ,C));
 }
 
-// Called by addpart to finish the modification of the holes of a primepart
+// Auxiliary routine called by addpart to finish the modification of the holes of a primepart
 // of the union by the addition of the segments that do not correspond to
 // that part.
 // Works on @P ring.
@@ -1786,30 +1852,7 @@ proc addpartfine(list H, list C0)
   return(imap(@P,Q1));
 }
 
-// specswellCrep
-// input:
-//   given two corresponding polynomials g1 and g2 with the same lpp
-//   g1 belonging to the basis in the segment ida1,idb1
-//   g2 belonging to the basis in the segment ida2,idb2
-// output:
-//   1 if g1 spezializes well to g2 on the whole (ida2,idb2) segment
-//   0 if not
-proc specswellCrep(poly g1, poly g2, ideal ida2)
-{
-  poly S;
-  S=leadcoef(g2)*g1-leadcoef(g1)*g2;
-  def RR=basering;
-  setring(@RPt);
-  def SR=imap(RR,S);
-  def ida2R=imap(RR,ida2);
-  attrib(ida2R,"isSB",1);
-  poly S2R=reduce(SR,ida2R);
-  setring(RR);
-  def S2=imap(@RPt,S2R);
-  if (S2==0){return(1);}   // and (nonnullCrep(leadcoef(g1),ida2,idb2))
-  else {return(0);}
-}
-
+// Auxiliary routine for grobcov: ideal F is assumed to be homogeneous
 // gcover
 // input: ideal F: a generating set of a homogeneous ideal in Q[a][x]
 //    list #: optional
@@ -1880,6 +1923,7 @@ proc gcover(ideal F,list #)
     }
     LCU=LCUnion(pairspP);
     kill prep; list prep;
+    kill crep; list crep;
     for(k=1;k<=size(LCU);k++)
     {
       prep[k]=list(LCU[k][2],LCU[k][3]);
@@ -1944,7 +1988,7 @@ proc gcover(ideal F,list #)
     else{B=BB;}
     for(j=1;j<=size(B);j++)
     {
-      B[j]=pnormalf(B[j],crep[1],N);
+      B[j]=pnormalf(B[j],crep[1],crep[2]);
     }
     S[i]=list(lpp,B,prep,crep,lpph);
     if(comment>=1)
@@ -2014,7 +2058,7 @@ proc grobcov(ideal F,list #)
                 (single polynomials, but not specializing to non-zero at
                 each point of the segment. With option (\"ext\",1) the
                 full representation of the bases is computed (possible
-                shaves) and sometimes a simpler result is obtained.
+                sheaves) and sometimes a simpler result is obtained.
             \"rep\",0-1-2: The default is (\"rep\",0) and then the segments
                 are given in canonical P-representation. Option (\"rep\",1)
                 represents the segments in canonical C-representation,
@@ -2203,10 +2247,11 @@ example
   grobcov(F);
 }
 
-// input. GC the grobcov of an ideal in generic representation of the
+// Input. GC the grobcov of an ideal in generic representation of the
 //        bases computed with option option ("rep",2).
-// output The grobcov in full representation.
-// option ("comment",1) shows the time.
+// Output The grobcov in full representation.
+// Option ("comment",1) shows the time.
+// Can be called from the top
 proc extend(list GC, list #);
 "USAGE:   extend(GC); When the grobcov of an ideal has been computed
           with the default option (\"ext\",0) and the explicit option
@@ -2393,7 +2438,7 @@ example
   "Full representation="; FGC;
 }
 
-
+// Auxiliary routine
 // nonzerodivisor
 // input:
 //    poly g in K[a],
@@ -2434,6 +2479,7 @@ proc nonzerodivisor(poly gr, list Pr)
   return(fr);
 }
 
+// Auxiliary routine
 // deltai
 // input:
 //   int i:
@@ -2474,6 +2520,7 @@ proc deltai(int i, list LPr)
   return(list(fr,fnr));
 }
 
+// Auxiliary routine
 // combine
 // input: a list of pairs ((p1,P1),..,(pr,Pr)) where
 //    ideal pi is a prime component
@@ -2497,6 +2544,7 @@ proc combine(list L, ideal F)
   return(f);
 }
 
+// Auxiliary routine
 // elimconstfac: eliminate the factors in the polynom f that are in K[a]
 // input:
 //   poly f:
@@ -2522,6 +2570,7 @@ proc elimconstfac(poly f)
   return(f2);
 };
 
+//Auxiliary routine
 // nullin
 // input:
 //   poly f:  a polynomial in Q[a]
@@ -2543,7 +2592,10 @@ proc nullin(poly f,ideal P)
   return(t);
 }
 
+// Auxiliary routine
 // monoms
+// Input: A polynomial f
+// Output: The list of leading terms
 proc monoms(poly f)
 {
   list L;
@@ -2562,6 +2614,7 @@ proc monoms(poly f)
   return(L);
 }
 
+// Auxiliary routine called by extend
 // extend0
 // input:
 //   poly f: a generic polynomial in the basis
@@ -2621,6 +2674,7 @@ proc extend0(poly f, ideal idp, ideal idq)
   }
 }
 
+// Auxiliary routine
 // findindexpolys
 // input:
 //   list coefs=( (q11,..,q1r_1),..,(qs1,..,qsr_1) )
@@ -2669,6 +2723,7 @@ proc findindexpolys(list coefs)
   return(combpolys);
 }
 
+// Auxiliary routine
 // extendcoef: given Q,P in K[a] where P/Q specializes on an open and dense subset
 //      of the whole V(p1 int...int pr), it returns a basis of the module
 //      of all syzygies equivalent to P/Q,
@@ -2697,6 +2752,7 @@ proc extendcoef(poly P, poly Q, ideal idp, ideal idq)
   return(CC);
 }
 
+// Auxiliary routine
 // selectregularfun
 // input:
 //   list L of the polynomials matrix CC
@@ -2754,6 +2810,7 @@ proc selectregularfun(matrix CC, ideal NN, ideal MM)
   return(imap(@P,Cs));
 }
 
+// Auxiliary routine
 // searchinlist
 // input:
 //   intvec c:
@@ -2775,6 +2832,7 @@ proc searchinlist(intvec c,list L)
   return(T);
 }
 
+// Auxiliary routine
 // comb: the list of combinations of elements (1,..n) of order p
 proc comb(int n, int p)
 {
@@ -2811,6 +2869,7 @@ proc comb(int n, int p)
   }
 }
 
+// Auxiliary routine
 // selectminsheaves
 // Input: L=((v_11,..,v_1k_1),..,(v_s1,..,v_sk_s))
 //    where:
@@ -2833,6 +2892,7 @@ proc selectminsheaves(list L)
   return(smsheaves(C[1],C[2]));
 }
 
+// Auxiliary routine
 // smsheaves
 // Input:
 //   list C of all the combrep
@@ -2867,6 +2927,7 @@ proc smsheaves(list C, list L)
   return(LL);
 }
 
+// Auxiliary routine
 // allsheaves
 // Input: L=((v_11,..,v_1k_1),..,(v_s1,..,v_sk_s))
 //    where:
@@ -2909,6 +2970,7 @@ proc allsheaves(list L)
   return(list(LL,LLS));
 }
 
+// Auxiliary routine
 // numones
 // Input:
 //   intvec v of (0,1) in each position
@@ -2925,6 +2987,7 @@ proc numones(intvec v, intvec pos)
   return(n);
 }
 
+// Auxiliary routine
 // pos
 // Input:  intvec p of zeros and ones
 // Output: intvec W of the positions where p has ones.
@@ -2939,6 +3002,7 @@ proc pos(intvec p)
   return(W);
 }
 
+// Auxiliary routine
 // actualize: actualizes zeroes of p
 // Input:
 //   intvec p: of zeroes and ones
@@ -2956,6 +3020,7 @@ proc actualize(intvec p, intvec c)
   return(pp);
 }
 
+// Auxiliary routine
 // combrep
 // Input: V=(n_1,..,n_i)
 // Output: L=(v_1,..,v_p) where p=prod_j=1^i (n_j)
@@ -2989,6 +3054,7 @@ proc combrep(intvec V)
   return(L);
 }
 
+// Auxiliary routine
 proc reducemodN(poly f,ideal E)
 {
   def RR=basering;
@@ -3004,6 +3070,7 @@ proc reducemodN(poly f,ideal E)
   return(f1);
 }
 
+// Auxiliary routine
 // intersp: computes the intersection of the ideals in S in @P
 proc intersp(list S)
 {
@@ -3016,6 +3083,7 @@ proc intersp(list S)
   return(imap(@P,NP));
 }
 
+// Auxiliary routine
 // radicalmember
 proc radicalmember(poly f,ideal ida)
 {
@@ -3038,6 +3106,7 @@ proc radicalmember(poly f,ideal ida)
   return(te);
 }
 
+// Auxiliary routine
 // NonNull: returns 1 if the poly f is nonnull on V(E)\V(N), 0 otherwise.
 proc NonNull(poly f, ideal E, ideal N)
 {
@@ -3058,6 +3127,7 @@ proc NonNull(poly f, ideal E, ideal N)
   return(te);
 }
 
+// Auxiliary routine
 // selectextendcoef
 // input:
 //    matrix CC: CC=(p_a1 .. p_ar_a)
@@ -3116,6 +3186,7 @@ proc selectextendcoef(matrix CC, ideal ida, ideal idb)
   return(imap(@P,caout));
 }
 
+// Auxiliary routine
 // input:
 //   ideal E1: in some basering (depends only on the parameters)
 //   ideal E2: in some basering (depends only on the parameters)
@@ -3132,6 +3203,7 @@ proc plusP(ideal E1,ideal E2)
   return(imap(@P,Ep));
 }
 
+// Auxiliary routine
 // reform
 // input:
 //   list combpolys: (v1,..,vs)
@@ -3215,6 +3287,7 @@ proc reform(list combpolys, intvec numdens)
   return(combp1);
 }
 
+// Auxiliary routine
 // nonnullCrep
 proc nonnullCrep(poly f0,ideal ida0,ideal idb0)
 {
@@ -3237,6 +3310,7 @@ proc nonnullCrep(poly f0,ideal ida0,ideal idb0)
   return(te);
 }
 
+// Auxiliary routine
 // precombint
 // input:  L: list of ideals (works in @P)
 // output: F0: ideal of polys. F0[i] is a poly in the intersection of
@@ -3283,42 +3357,8 @@ proc precombint(list L)
   return(F0);
 }
 
-// precombinediscussion
-// not used, can be deleted
-// input:  list L: the LCU segment with bases for each pi component
-// output: intvec vv:  vv[1]=(1 if the generic polynomial of the vv[2]
-//                     component already specializes well,
-//                     0 if combine is to be used)
-//                     vv[2]=selind, the index for which the generic basis
-//                     already specializes well if combine is not to be used (vv[1]=1).
-proc precombinediscussion(L,crep)
-{
-  int tes=1; int selind; int i1; int j1; poly p; poly lcp; intvec vv;
-  if (size(L)==1){vv=1,1; return(vv);}
-  for (i1=1;i1<=size(L);i1++)
-  {
-    tes=1;
-    p=L[i1][2];
-    lcp=leadcoef(p);
 
-
-    if(nonnullCrep(lcp,crep[1],crep[2]))
-    {
-      for(j1=1;j1<=size(L);j1++)
-      {
-        if(i1!=j1)
-        {
-          if(specswellCrep(p,L[j1][2],L[j1][1])==0){tes=0; break;}
-        }
-      }
-    }
-    else{tes=0;}
-    if(tes){selind=i1; break;}
-  }
-  vv=tes,selind;
-  return(vv);
-}
-
+// Auxiliary routine
 // minAssGTZ eliminating denominators
 proc minGTZ(ideal N);
 {
@@ -3336,6 +3376,7 @@ proc minGTZ(ideal N);
 
 //********************* Begin KapurSunWang *************************
 
+// Auxiliary routine
 // inconsistent
 // Input:
 //   ideal E: of null conditions
@@ -3371,6 +3412,7 @@ proc inconsistent(ideal E, ideal N)
   return(te);
 }
 
+// Auxiliary routine
 // MDBasis: Minimal Dickson Basis
 proc MDBasis(ideal G)
 {
@@ -3396,6 +3438,7 @@ proc MDBasis(ideal G)
   return(MD);
 }
 
+// Auxiliary routine
 // primepartZ
 proc primepartZ(poly f);
 {
@@ -3496,6 +3539,7 @@ proc KSW(ideal F, list #)
   return(CG);
 }
 
+// Auxiliary routine
 // sqf
 // This is for releases of Singular before 3-5-1
 // proc sqf(poly f)
@@ -3515,6 +3559,7 @@ proc KSW(ideal F, list #)
 //   return(ffff);
 // }
 
+// Auxiliary routine
 // sqf
 proc sqf(poly f)
 {
@@ -3528,6 +3573,7 @@ proc sqf(poly f)
 }
 
 
+// Auxiliary routine
 // KSW0: Kapur-Sun-Wang algorithm for computing a CGS, called by KSW
 // Input:
 //   F:   parametric ideal to be discussed
@@ -3574,8 +3620,9 @@ proc KSW0(ideal F, ideal E, ideal N, int comment)
   if (memberpos(1,G)[1]==1)
   {
     if(comment>1){"Basis 1 is found"; E; N;}
-    return(E0,N0,ideal(1));
-  }
+    list KK; KK[1]=list(E0,N0,ideal(1));
+    return(KK);
+   }
   ideal Gr; ideal Gm; ideal GM;
   for (i=1;i<=size(G);i++)
   {
@@ -3653,6 +3700,7 @@ proc KSW0(ideal F, ideal E, ideal N, int comment)
   return(CGS);
 }
 
+// Auxiliary routine
 // KSWtocgsdr
 proc KSWtocgsdr(list L)
 {
@@ -3671,6 +3719,7 @@ proc KSWtocgsdr(list L)
   return(CG);
 }
 
+// Auxiliary routine
 // KtoPrep
 // Computes the P-representaion of a K-representation (N,W) of a set
 // input:
@@ -3719,6 +3768,7 @@ proc KtoPrep(ideal N, ideal W)
   return(LL);
 }
 
+// Auxiliary routine
 // groupKSWsegments
 // input:  the list of vertices of KSW
 // output: the same terminal vertices grouped by lpp
@@ -3754,7 +3804,6 @@ proc groupKSWsegments(list T)
 
 //******************** Begin locus ******************************
 
-
 // indepparameters
 // Auxiliary routine to detect "Special" components of the locus
 // Input: ideal B
@@ -3776,8 +3825,7 @@ proc indepparameters(ideal B)
   else{return(0);}
 }
 
-
-// dimP0: Auxiliar routine
+// dimP0: Auxiliary routine
 // if the dimension in @P of an ideal in the parameters has dimension 0 then it returns 0
 // else it retuns 1
 proc dimP0(ideal N)
@@ -3793,7 +3841,7 @@ proc dimP0(ideal N)
   return(te);
 }
 
-// Auxiliar routine.
+// Auxiliary routine.
 // input:    ideals E and F (assumed in ring @P
 // returns: 1 if ideal E is contained in ideal F (assumed F is std basis)
 //              0 if not
@@ -3816,273 +3864,191 @@ proc containedideal(ideal E, ideal F)
   return(t);
 }
 
-// AddCons: given a set of locally closed components of a selection of
-//       segments of the Grobner cover, it builds the canonical P-representation
-//       of the corresponding constructible set, including levels it they are
-// input: a list L of a selection of segments of the Groebner cover
-//       given a a set of components of the form
-//       ( (p_1,(p_11,..,p_1k_1).. (p_s,(p_s1,..,p_sk_s))
-// output: The canonical P-representation of adding the given components.
-proc AddCons(list L)
+// addcons: given a set of locally closed sets given in P-representation,
+//       (particularly a subset of components of a selection of segments
+//       of the Grobner cover), it builds the canonical P-representation
+//       of the corresponding constructible set, of its union, including levels it they are.
+// input: a list L of disjoint segments (for exmple a selection of segments of the Groebner cover)
+//       of the form
+//       ( ( (p1_1,(p1_11,..,p1_1k_1).. (p1_s,(p1_s1,..,p1_sk_s)),..,
+//         ( (pn_1,(pn_11,..,pn_1j_1).. (pn_s,(pn_s1,..,pn_sj_s))   )
+// output: The canonical P-representation of the  constructible set resulting by
+//       adding the given components.
+//       The first element of each component can be ignored. It is only for internal use.
+//       The fifth element of each component is the level of the constructible set
+//       of the component.
+//       It is no need a previous call to setglobalrings()
+proc addcons(list L)
+"USAGE:   addcons(  ( ( (p1_1,(p1_11,..,p1_1k_1).. (p1_s,(p1_s1,..,p1_sk_s)),..,
+  ( (pn_1,(pn_11,..,pn_1j_1).. (pn_s,(pn_s1,..,pn_sj_s))   )   )
+  a list L of locally closed sets in P-representation
+RETURN: the canonical P-representation of the constructible set of the union.
+NOTE:   It is called internally by the routines locus, locusdg,
+
+KEYWORDS: P-representation, constructible set
+EXAMPLE:  adccons; shows an example"
 {
-  // First step: Selecting the top varieties
-  list L1; list L2; list LL; int i; int j; int t;
-  list Lend;
+  int te;
+  if(defined(@P)){te=1;}
+  else{setglobalrings();}
+  list notadded; list P0;
+  int i; int j; int k; int l;
+  intvec v; intvec v1; intvec v0;
+  ideal J; list K;
   for(i=1;i<=size(L);i++)
   {
-    t=1;
-    for(j=1;j<=size(L);j++)
+    for(j=1;j<=size(L[i]);j++)
     {
-      if(i!=j)
+        v=i,j;
+        notadded[size(notadded)+1]=v;
+    }
+  }
+  //"T_notadded="; notadded;
+  int level=1;
+  list P=L;
+  list LL;
+  list Ln;
+  //int cont=0;
+  while(size(notadded)>0)
+  {
+    kill notadded; list notadded;
+    for(i=1;i<=size(P);i++)
+    {
+      for(j=1;j<=size(P[i]);j++)
       {
-        if(containedideal(L[j][1],L[i][1])==1)
-        {t=0;
-         // "the ideal "; L[j][1]; "is contained in ideal "; L[i][1];
-          j=size(L);
-        }
+          v=i,j;
+          notadded[size(notadded)+1]=v;
       }
     }
-    if(t==1){L1[size(L1)+1]=L[i];}
-    else{L2[size(L2)+1]=L[i];}
+    //"T_notadded="; notadded;
+     //cont++;
+     P0=P;
+     Ln=LCUnion(P);
+     //"T_Ln="; Ln;
+     notadded=minuselements(notadded,@Q2);
+     //"T_@Q2="; @Q2;
+     //"T_notadded="; notadded;
+     for(i=1;i<=size(Ln);i++)
+     {
+       //Ln[i][4]=  ; JA HAURIA DE VENIR DE LCUnion
+       Ln[i][5]=level;
+       LL[size(LL)+1]=Ln[i];
+     }
+     i=0;j=0;
+     v=0,0;
+     v0=0,0;
+     kill P; list P;
+     for(l=1;l<=size(notadded);l++)
+     {
+       v1=notadded[l];
+       if(v1[1]<>v0[1]){i++;j=1; P[i]=K;} // list P[i];
+       else
+       {
+         if(v1[2]<>v0[2])
+         {
+           j=j+1;
+         }
+       }
+       v=i,j;
+       //"T_v1="; v1;
+       P[i][j]=K; P[i][j][1]=J; P[i][j][2]=K;
+       P[i][j][1]=P0[v1[1]][v1[2]][1];
+       //"T_P0[v1[1]][v1[2]][2]="; P0[v1[1]][v1[2]][2];
+       //"T_size(P0[v1[1]][v1[2]][2])="; size(P0[v1[1]][v1[2]][2]);
+       for(k=1;k<=size(P0[v1[1]][v1[2]][2]);k++)
+       {
+         P[i][j][2][k]=P0[v1[1]][v1[2]][2][k];
+         //string("T_P[",i,"][",j,"][2][",k,"]="); P[i][j][2][k];
+       }
+       v0=v1;
+       //"T_P_1="; P;
+     }
+     //"T_P="; P;
+     level++;
+     //if(cont>3){break;}
+     //kill notadded; list notadded;
   }
-  // Second step: Adding segments to obtain a locally closed sets for each level
-  int lev=1;
-  if(size(L2)==0)
-  {
-     for(i=1;i<=size(L1);i++)
-     {
-       if(size(L1[i])>=3)
-       {L1[i][3]=string(string(L1[i][3]),",",lev);}
-       else{L1[i][3]=string(lev);}
-     }
-   return(L1);
-  }
-   while(size(L2)>0)
-   {
-     LL=addtolocalclosed(L1,L2);
-     for(i=1;i<=size(LL[1]);i++)
-     {
-       if(size(LL[1][i])>=3)
-       {LL[1][i][3]=string(string(LL[1][i][3]),",",lev);}
-       else{LL[1][i][3]=string(lev);}
-       Lend[size(Lend)+1]=LL[1][i];
-     }
-     L2=LL[2];
-     lev++;
-   }
-   return(Lend);
-}
-
-// input: Two lists of P-components to be added.
-//           L1 contains the top components, and L2 the remaining components
-//           each of the form ( (p_1,(p_11,..,p_1k_1).. (p_s,(p_s1,..,p_sk_s))
-// output: A list of two lists:
-//           The first one contains the P-representation of the top components added
-//           The second contains the components that have not yet been added when
-//           the total subset is not locally closed. If so addtolocalclosed is to be called
-//           at new after separating the new top and remaining components in order
-//           to compute the next level of the constructible set.
-//           The input and the output must be in the ring @P of parameters.
-proc  addtolocalclosed(list L1,list L2)
-{
-   // Second step: Adding segments to obtain a locally closed set
-   // L1 contains the top components (ideals and descendants)
-   // L2 contains the nontop components (ideals and descendants)
-   list LL; int i; int j; int t; intvec Added; int mesvoltes=1; intvec alreadyadded; list LN;
-   int k; int l; int m; ideal top; ideal hole; ideal nhole; intvec nottoadd; int t0; list h;
-   LL=L1;
-   LN=L2;
-   while(mesvoltes)
-   {
-     //"volta";
-     for(i=1;i<=size(L1);i++)
-     {
-        Added=Added,alreadyadded;
-        Added=sort(elimrepeatedvl(Added))[1];
-        kill alreadyadded; intvec alreadyadded;
-        top=LL[i][1][1];
-        j=1;
-        while(j<=size(LL[i][2]))
-        {
-           kill nottoadd; intvec nottoadd;
-           hole=LL[i][2][j];
-           t0=1;
-           k=1;
-           while(t0 and k<=size(LN))
-           {
-              if (equalideals(hole,LN[k][1])==1)
-              {
-                 t0=0;
-                  if(alreadyadded==intvec(0)){alreadyadded[1]=k;}
-                 else{alreadyadded[size(alreadyadded)+1]=k;}
-                 LL[i][2]=elimfromlist(LL[i][2],j);
-                 j=j-1;
-                 for(l=1;l<=size(LN[k][2]);l++)
-                 {
-                   nhole=LN[k][2][l],LL[i][1];
-                   nhole=std(nhole);
-                   t=1; m=1;
-                    while(t and m<=size(LL[i][2]))
-                    {
-                       if(containedideal(LL[i][2][m],nhole)==1)
-                       {
-                         t=0;
-                       }
-                       m++;
-                    }
-                    if(t==0){nottoadd[size(nottoadd)+1]=l;}
-                  }
-                 for(m=1;m<=size(LN[k][2]);m++)
-                 {
-                     if(memberpos(m,nottoadd)[1]==0)
-                    {
-                       LL[i][2][size(LL[i][2])+1]=LN[k][2][m];
-                    }
-                 }
-              }
-              k++;
-
-           }
-           j++;
-        }
-        if(size(LL[i][2])==0 and size(LL[i][1])>0){LL[i][2][1]=ideal(1);}
-     }
-     h=1,1;
-     while((h[1]==1) and (alreadyadded!=intvec(0)))
-     {
-       h=memberpos(0,alreadyadded);
-       if(h[1]==1){alreadyadded=elimfromlist(alreadyadded,h[2]);}
-     }
-     if(alreadyadded!=intvec(0))
-     {alreadyadded=sort(elimrepeatedvl(alreadyadded))[1];}
-     if(Added==intvec(0)){Added=alreadyadded;}
-     else{
-       Added=Added,alreadyadded;
-       Added=sort(elimrepeatedvl(Added))[1];
-     }
-     h=1,1;
-     while((h[1]==1) and (Added!=intvec(0)))
-     {
-       h=memberpos(0,Added);
-       if(h[1]==1){Added=elimfromlist(Added,h[2]);}
-     }
-     if (alreadyadded==intvec(0))
-     {
-       mesvoltes=0;
-     }
-  }
-  if(Added!=intvec(0)){Added=sort(elimrepeatedvl(Added))[1]; }
-  if(Added!=intvec(0))
-  {
-    for(i=1;i<=size(Added);i++)
-    {
-      if(size(LN)>0){LN=elimfromlist(LN,Added[size(Added)+1-i]);}
-    }
-  }
-  for (i=1;i<=size(LL);i++)
-  {
-    for(j=1;j<=size(LL[i][2]);j++)
-    {
-      hole=LL[i][2][j];
-      for (k=1;k<=size(LL);k++)
-      {
-        if(k!=i)
-        {
-          if(containedideal(LL[k][1],hole))
-          {
-            LL[i][2]=elimfromlist(LL[i][2],j);
-            for(l=1;l<=size(LL[k][2]);l++)
-            {
-              nhole=hole,LL[k][2][l];
-              nhole=std(nhole);
-              if(equalideals(nhole,ideal(1))==0)
-              {
-                m=1; t=1;
-                while(t and m<size(LL[i][2]))
-                {
-                  if(containedideal(LL[i][2][m],nhole)){t=0;}
-                  m++;
-                }
-                if(t==1){LL[i][2][size(LL[i][2])+1]=nhole;}
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  LL[1]=LL; LL[2]=LN;
+  kill @Q2;
+  if(te==0){kill @P; kill @R; kill @RP;}
+  //"T_LL_sortida addcons="; LL; "Fi sortida";
   return(LL);
 }
+example
+{
+  "EXAMPLE:"; echo = 2;
+   ring R=(0,a,b),(x1,y1,x2,y2,p,r),dp;
+   ideal S93=(a+1)^2+b^2-(p+1)^2,
+                    (a-1)^2+b^2-(1-r)^2,
+                    a*y1-b*x1-y1+b,
+                    a*y2-b*x2+y2-b,
+                    -2*y1+b*x1-(a+p)*y1+b,
+                    2*y2+b*x2-(a+r)*y2-b,
+                    (x1+1)^2+y1^2-(x2-1)^2-y2^2;
+  short=0;
+  "System S93="; S93; " ";
+  def GC93=grobcov(S93);
+  "grobcov(S93)="; GC93; " ";
+  int i;
+  list H;
+  for(i=1;i<=size(GC93);i++){H[i]=GC93[i][3];}
+  "H="; H;
+  "addcons(H)="; addcons(H);
+}
 
-// locus(G):  Special routine for determining the locus of points
-//                of  objects. Given a parametric ideal J with
-//                parameters (a_1,..a_m) and variables (x_1,..,xn),
-//                representing the system determining
-//                the locus of points (a_1,..,a_m)) who verify certain
-//                properties, computing the grobcov G of
-//                J and applying to it locus, determines the different
-//                classes of locus components. They can be
-//                Normal, Special, Accumulation point, Degenerate.
-//                The output are the components given in P-canonical form
-//                of at most 4 constructible sets: Normal, Special, Accumulation,
-//                Degenerate.
-//                The description of the algorithm and definitions will be
-//                given in a forthcoming paper by Abanades, Botana, Montes Recio.
+// Takes a list of intvec and sorts it and eliminates repeated elements.
+// Auxiliary routine used in addcons
+proc sortpairs(L)
+{
+  def L1=sort(L);
+  def L2=elimrepeated(L1[1]);
+  return(L2);
+}
 
-// input:      The output G of the grobcov (in generic representation, which is the default)
+// Eliminates the pairs of L1 that are also in L2.
+// Auxiliary routine used in addcons
+proc minuselements(list L1,list L2)
+{
+  int i;
+  list L3;
+  for (i=1;i<=size(L1);i++)
+  {
+    if(not(memberpos(L1[i],L2)[1])){L3[size(L3)+1]=L1[i];}
+  }
+  return(L3);
+}
+
+// locus0(G): Private routine used by locus (the public routine), that
+//                builds the diferent components.
+// input:      The output G of the grobcov (in generic representation, which is the default option)
 // output:
 //         list, the canonical P-representation of the Normal and Non-Normal locus:
 //              The Normal locus has two kind of components: Normal and Special.
 //              The Non-normal locus has two kind of components: Accumulation and Degenerate.
-//              Normal components: for each point in the component,
-//              the number of solutions in the variables is finite, and
-//              the solutions depend on the point in the component if the component is not 0-dimensional.
-//              Special components:  for each point in the component,
-//              the number of solutions in the variables is finite,
-//              the component is not 0-dimensional, but the solutions do not depend on the
-//              values of the parameters in the component.
-//              Accumlation points: are 0-dimensional components for which it exist
-//              an infinite number of solutions.
-//              Degenerate components: are components of dimension greater than 0 for which
-//              for every point in the component there exist infinite solutions.
+//              This routine is compemented by locus that calls it in order to eliminate problems
+//              with degenerate points of the mover.
 //         The output components are given as
 //              ((p1,(p11,..p1s_1),type_1,level_1),..,(pk,(pk1,..pks_k),type_k,level_k)
 //         The components are given in canonical P-representation of the subset.
 //              If all levels of a class of locus are 1, then the set is locally closed. Otherwise the level
 //              gives the depth of the component.
-proc locus(list GG, list #)
-"USAGE:   locus(G);
-               The input must be the grobcov  of a parametrical ideal
-RETURN:  The  locus.
-               The output are the components of two constructible subsets of the locus
-               of the parametrical system.: Normal and Non-normal.
-               These components are
-               given as a list of  (pi,(pi1,..pis_i),type_i,level_i) varying i,
-               where the p's are prime ideals, the type can be: Normal, Special,
-               Accumulation, Degenerate.
-NOTE:      It can only be called after computing the grobcov of the
-               parametrical ideal in generic representation ('ext',0),
-               which is the default.
-               The basering R, must be of the form Q[a_1,..,a_m][x_1,..,x_n].
-KEYWORDS: geometrical locus, locus, loci.
-EXAMPLE:  locus; shows an example"
+proc locus0(list GG, list #)
 {
   int t1=1; int t2=1;
   def R=basering;
   int moverdim=nvars(R);
+  list HHH;
+  if (GG[1][1][1]==1 and GG[1][2][1]==1 and GG[1][3][1][1][1]==0 and GG[1][3][1][2][1]==1){return(HHH);}
   list Lop=#;
   if(size(Lop)>0){moverdim=Lop[1];}
   setglobalrings();
   list G1; list G2;
   def G=GG;
+  list Q1; list Q2;
   int i; int d; int j; int k;
   t1=1;
   for(i=1;i<=size(G);i++)
   {
     attrib(G[i][1],"IsSB",1);
-    //d=dim(std(G[i][1]));
-    // ULL
     d=locusdim(G[i][2],moverdim);
     if(d==0){G1[size(G1)+1]=G[i];}
     else
@@ -4130,11 +4096,11 @@ EXAMPLE:  locus; shows an example"
         {
           P1[i][3][j]=P1[i][3][j]*h[k];
         }
-        //P1[i][3][j]=normalize(P1[i][3][j]);
       }
     }
   }
   else{list P1;}
+  ideal BB;
   for(i=1;i<=size(P1);i++)
   {
     if (indepparameters(P1[i][3])==1){P1[i][3]="Special";}
@@ -4148,28 +4114,33 @@ EXAMPLE:  locus; shows an example"
       P2[size(P2)+1]=list(G2[i][3][k][1],G2[i][3][k][2]);
     }
   }
+  list l;
+  for(i=1;i<=size(P1);i++){Q1[i]=l; Q1[i][1]=P1[i];} P1=Q1;
+  for(i=1;i<=size(P2);i++){Q2[i]=l; Q2[i][1]=P2[i];} P2=Q2;
+
   setring @P;
-  // CANVIAR
+  ideal J;
   if(t1==1)
   {
     def C1=imap(R,P1);
-    def L1=AddCons(C1);
+    def L1=addcons(C1);
    }
   else{list C1; list L1; kill P1; list P1;}
   if(t2==1)
   {
     def C2=imap(R,P2);
-    def L2=AddCons(C2);
+    def L2=addcons(C2);
   }
   else{list L2; list C2; kill P2; list P2;}
     for(i=1;i<=size(L2);i++)
     {
-      d=dim(std(L2[i][1]));
+      J=std(L2[i][2]);
+      d=dim(J); // AQUI
       if(d==0)
       {
-        L2[i][3]=string("Accumulation,",L2[i][3]);
+        L2[i][4]=string("Accumulation",L2[i][4]);
       }
-      else{L2[i][3]=string("Degenerate,",L2[i][3]);}
+      else{L2[i][4]=string("Degenerate",L2[i][4]);}
     }
   list LN;
   if(t1==1)
@@ -4184,18 +4155,483 @@ EXAMPLE:  locus; shows an example"
   def L=imap(@P,LN);
   for(i=1;i<=size(L);i++){if(size(L[i][2])==0){L[i][2]=ideal(1);}}
   kill @R; kill @RP; kill @P;
-  return(L);
+  list LL;
+  for(i=1;i<=size(L);i++)
+  {
+    LL[i]=l;
+    LL[i]=elimfromlist(L[i],1);
+  }
+  return(LL);
+}
+
+// locus0dg(G): Private routine used by locusdg (the public routine), that
+//                builds the diferent components used in Dynamical Geometry
+// input:      The output G of the grobcov (in generic representation, which is the default option)
+// output:
+//         list, the canonical P-representation of the Relevant components of the locus in Dynamical Geometry,
+//              i.e. the Normal and Accumulation components.
+//              This routine is compemented by locusdg that calls it in order to eliminate problems
+//              with degenerate points of the mover.
+//         The output components are given as
+//              ((p1,(p11,..p1s_1),type_1,level_1),..,(pk,(pk1,..pks_k),type_k,level_k)
+//              whwre type_i is always "Relevant".
+//         The components are given in canonical P-representation of the subset.
+//              If all levels of a class of locus are 1, then the set is locally closed. Otherwise the level
+//              gives the depth of the component.
+proc locus0dg(list GG, list #)
+{
+  int t1=1; int t2=1;
+  def R=basering;
+  int moverdim=nvars(R);
+  list HHH;
+  if (GG[1][1][1]==1 and GG[1][2][1]==1 and GG[1][3][1][1][1]==0 and GG[1][3][1][2][1]==1){return(HHH);}
+  list Lop=#;
+  if(size(Lop)>0){moverdim=Lop[1];}
+  setglobalrings();
+  list G1; list G2;
+  def G=GG;
+  list Q1; list Q2;
+  int i; int d; int j; int k;
+  t1=1;
+  for(i=1;i<=size(G);i++)
+  {
+    attrib(G[i][1],"IsSB",1);
+    d=locusdim(G[i][2],moverdim);
+    if(d==0){G1[size(G1)+1]=G[i];}
+    else
+    {
+      if(d>0){G2[size(G2)+1]=G[i];}
+    }
+  }
+  if(size(G1)==0){t1=0;}
+  if(size(G2)==0){t2=0;}
+  setring(@RP);
+  if(t1)
+  {
+    list G1RP=imap(R,G1);
+  }
+  else {list G1RP;}
+  list P1RP;
+  ideal B;
+  for(i=1;i<=size(G1RP);i++)
+  {
+     kill B;
+     ideal B;
+     for(k=1;k<=size(G1RP[i][3]);k++)
+     {
+       attrib(G1RP[i][3][k][1],"IsSB",1);
+       G1RP[i][3][k][1]=std(G1RP[i][3][k][1]);
+       for(j=1;j<=size(G1RP[i][2]);j++)
+       {
+         B[j]=reduce(G1RP[i][2][j],G1RP[i][3][k][1]);
+       }
+       P1RP[size(P1RP)+1]=list(G1RP[i][3][k][1],G1RP[i][3][k][2],B);
+     }
+  }
+  setring(R);
+  ideal h;
+  if(t1)
+  {
+    def P1=imap(@RP,P1RP);
+    for(i=1;i<=size(P1);i++)
+    {
+      for(j=1;j<=size(P1[i][3]);j++)
+      {
+        h=factorize(P1[i][3][j],1);
+        P1[i][3][j]=h[1];
+        for(k=2;k<=size(h);k++)
+        {
+          P1[i][3][j]=P1[i][3][j]*h[k];
+        }
+      }
+    }
+  }
+  else{list P1;}
+  ideal BB;
+  for(i=1;i<=size(P1);i++)
+  {
+    if (indepparameters(P1[i][3])==1){P1[i][3]="Special";}
+    else{P1[i][3]="Relevant";}
+  }
+  list P2;
+  for(i=1;i<=size(G2);i++)
+  {
+    for(k=1;k<=size(G2[i][3]);k++)
+    {
+      P2[size(P2)+1]=list(G2[i][3][k][1],G2[i][3][k][2]);
+    }
+  }
+  list l;
+  for(i=1;i<=size(P1);i++){Q1[i]=l; Q1[i][1]=P1[i];} P1=Q1;
+  for(i=1;i<=size(P2);i++){Q2[i]=l; Q2[i][1]=P2[i];} P2=Q2;
+
+  setring @P;
+  ideal J;
+  if(t1==1)
+  {
+    def C1=imap(R,P1);
+    def L1=addcons(C1);
+   }
+  else{list C1; list L1; kill P1; list P1;}
+  if(t2==1)
+  {
+    def C2=imap(R,P2);
+    def L2=addcons(C2);
+  }
+  else{list L2; list C2; kill P2; list P2;}
+    for(i=1;i<=size(L2);i++)
+    {
+      J=std(L2[i][2]);
+      d=dim(J); // AQUI
+      if(d==0)
+      {
+        L2[i][4]=string("Relevant",L2[i][4]);
+      }
+      else{L2[i][4]=string("Degenerate",L2[i][4]);}
+    }
+  list LN;
+  list ll; list l0;
+  if(t1==1)
+  {
+    for(i=1;i<=size(L1);i++)
+    {
+      if(L1[i][4]=="Relevant")
+      {
+       LN[size(LN)+1]=l0;
+       LN[size(LN)][1]=L1[i];
+     }
+    }
+  }
+  if(t2==1)
+  {
+    for(i=1;i<=size(L2);i++)
+    {
+      if(L2[i][4]=="Relevant")
+      {
+        LN[size(LN)+1]=l0;
+        LN[size(LN)][1]=L2[i];
+      }
+    }
+  }
+  list LNN;
+  kill ll; list ll; list lll; list llll;
+  for(i=1;i<=size(LN);i++)
+  {
+      LNN[size(LNN)+1]=l0;
+      ll=LN[i][1]; lll[1]=ll[2]; lll[2]=ll[3]; lll[3]=ll[4]; LNN[size(LNN)][1]=lll;
+  }
+  kill LN; list LN;
+  LN=addcons(LNN);
+  setring(R);
+  def L=imap(@P,LN);
+  for(i=1;i<=size(L);i++){if(size(L[i][2])==0){L[i][2]=ideal(1);}}
+  kill @R; kill @RP; kill @P;
+  list LL;
+  for(i=1;i<=size(L);i++)
+  {
+    LL[i]=l;
+    LL[i]=elimfromlist(L[i],1);
+  }
+  return(LL);
+}
+
+
+//  locus(G):  Special routine for determining the locus of points
+//                 of  geometrical constructions. Given a parametric ideal J with
+//                 parameters (a_1,..a_m) and variables (x_1,..,xn),
+//                 representing the system determining
+//                 the locus of points (a_1,..,a_m) who verify certain
+//                 properties, computing the grobcov G of
+//                 J and applying to it locus, determines the different
+//                 classes of locus components. The components can be
+//                 Normal, Special, Accumulation, Degenerate.
+//                 The output are the components given in P-canonical form
+//                 of at most 4 constructible sets: Normal, Special, Accumulation,
+//                 Degenerate.
+//                 The description of the algorithm and definitions is
+//                 given in a forthcoming paper by Abanades, Botana, Montes, Recio.
+//                 Usually locus problems have mover coordinates, variables and tracer coordinates.
+//                 The mover coordinates are to be placed as the last variables, and by default,
+//                 its number is 2. If one consider locus problems in higer dimensions, the number of
+//                 mover coordinates (placed as the last variables) is to be given as an option.
+//
+//  input:      The output G of the grobcov (in generic representation, which is the default option for grobcov)
+//  output:
+//          list, the canonical P-representation of the Normal and Non-Normal locus:
+//               The Normal locus has two kind of components: Normal and Special.
+//               The Non-normal locus has two kind of components: Accumulation and Degenerate.
+//               Normal components: for each point in the component,
+//               the number of solutions in the variables is finite, and
+//               the solutions depend on the point in the component if the component is not 0-dimensional.
+//               Special components:  for each point in the component,
+//               the number of solutions in the variables is finite,
+//               the component is not 0-dimensional, but the solutions do not depend on the
+//               values of the parameters in the component.
+//               Accumlation points: are 0-dimensional components for which it exist
+//               an infinite number of solutions.
+//               Degenerate components: are components of dimension greater than 0 for which
+//               for every point in the component there exist infinite solutions.
+//          The output components are given as
+//               ((p1,(p11,..p1s_1),type_1,level_1),..,(pk,(pk1,..pks_k),type_k,level_k)
+//          The components are given in canonical P-representation of the subset.
+//               If all levels of a class of locus are 1, then the set is locally closed. Otherwise the level
+//               gives the depth of the component of the constructible set.
+proc locus(list GG, list #)
+  "USAGE:   locus(G);
+                 The input must be the grobcov  of a parametrical ideal
+  RETURN:  The  locus.
+                 The output are the components of four constructible subsets of the locus
+                 of the parametrical system: Normal , Special, Accumulation and Degenerate.
+                 These components are
+                 given as a list of  (pi,(pi1,..pis_i),type_i,level_i) varying i,
+                 where the p's are prime ideals, the type can be: Normal, Special,
+                 Accumulation, Degenerate.
+  NOTE:      It can only be called after computing the grobcov of the
+                 parametrical ideal in generic representation ('ext',0),
+                 which is the default.
+                 The basering R, must be of the form Q[a_1,..,a_m][x_1,..,x_n].
+  KEYWORDS: geometrical locus, locus, loci.
+  EXAMPLE:  locus; shows an example"
+{
+  def R=basering;
+  int dd=2; int comment=0;
+  list DD=#;
+  if (size(DD)>1){comment=1;}
+  if(size(DD)>0){dd=DD[1];}
+  int i; int j; int k;
+  def B0=GG[1][2];
+  if (equalideals(B0,ideal(1)))
+  {
+    return(locus0(GG));
+  }
+  else
+  {
+    int n=nvars(R);
+    ideal vmov=var(n-1),var(n);
+    ideal N;
+    intvec xw; intvec yw;
+    for(i=1;i<=n-1;i++){xw[i]=0;}
+    xw[n]=1;
+    for(i=1;i<=n;i++){yw[i]=0;}
+    yw[n-1]=1;
+    poly px; poly py;
+    int te=1;
+    i=1;
+    while( te and i<=size(B0))
+    {
+      if((deg(B0[i],xw)==1) and (deg(B0[i])==1)){px=B0[i]; te=0;}
+      i++;
+    }
+    i=1; te=1;
+    while( te and i<=size(B0))
+    {
+      if((deg(B0[i],yw)==1) and (deg(B0[i])==1)){py=B0[i]; te=0;}
+      i++;
+    }
+    N=px,py;
+    setglobalrings();
+    te=indepparameters(N);
+    if(te)
+    {
+      string("locus detected that the mover must avoid point (",N,") in order to obtain the correct locus");
+      // eliminates segments of GG where N is contained in the basis
+      list nGP;
+      def GP=GG;
+      ideal BP;
+      for(j=1;j<=size(GP);j++)
+      {
+        te=1; k=1;
+        BP=GP[j][2];
+        while((te==1) and (k<=size(N)))
+        {
+          if(pdivi(N[k],BP)[1]!=0){te=0;}
+          k++;
+        }
+        if(te==0){nGP[size(nGP)+1]=GP[j];}
+      }
+   }
+  }
+  kill @RP; kill @P; kill @R;
+  return(locus0(nGP,dd));
 }
 example
 {"EXAMPLE:"; echo = 2;
+  ring R=(0,a,b),(x4,x3,x2,x1),dp;
+  ideal S=(x1-3)^2+(x2-1)^2-9,
+             (4-x2)*(x3-3)+(x1-3)*(x4-1),
+             (3-x1)*(x3-x1)+(4-x2)*(x4-x2),
+             (4-x4)*a+(x3-3)*b+3*x4-4*x3,
+             (a-x1)^2+(b-x2)^2-(x1-x3)^2-(x2-x4)^2;
+  short=0;
+  locus(grobcov(S)); " ";
+  kill R;
   ring R=(0,a,b),(x,y),dp;
   short=0;
   "Concoid";
   ideal S96=x^2+y^2-4,(b-2)*x-a*y+2*a,(a-x)^2+(b-y)^2-1;
   "System="; S96; " ";
   locus(grobcov(S96));
+  kill R; ring R=(0,x,y),(x1,x2),dp;
+  ideal S=-(x - 5)*(x1 - 1) - (x2 - 2)*(y - 2),
+              (x1 - 5)^2 + (x2 - 2)^2 - 4,
+              -2*(x - 5)*(x2 - 2) + 2*(x1 - 5)*(y - 2);
+ "System="; S;
+  locus(grobcov(S)); " ";
+  ideal S1=-(x - x1)*(x1 - 4) + (x2 - y)*(x2 - 4),
+                (x1 - 4)^2 + (x2 - 2)^2 - 4,
+                -2*(x1 - 4)*(2*x2 - y - 4) - 2*(x - 2*x1 + 4)*(x2 - 2);
+ "System="; S1;
+  locus(grobcov(S1));
 }
 
+//  locusdg(G):  Special routine for determining the locus of points
+//                 of  geometrical constructions. Given a parametric ideal J with
+//                 parameters (a_1,..a_m) and variables (x_1,..,xn),
+//                 representing the system determining
+//                 the locus of points (a_1,..,a_m) who verify certain
+//                 properties, computing the grobcov G of
+//                 J and applying to it locus, determines the different
+//                 classes of locus components. The components can be
+//                 Normal, Special, Accumulation point, Degenerate.
+//                 The output are the components given in P-canonical form
+//                 of at most 4 constructible sets: Normal, Special, Accumulation,
+//                 Degenerate.
+//                 The description of the algorithm and definitions is
+//                 given in a forthcoming paper by Abanades, Botana, Montes, Recio.
+//                 Usually locus problems have mover coordinates, variables and tracer coordinates.
+//                 The mover coordinates are to be placed as the last variables, and by default,
+//                 its number is 2. If onw consider locus problems in higer dimensions, the number of
+//                 mover coordinates (placed as the last variables) is to be given as an option.
+//
+//  input:      The output G of the grobcov (in generic representation, which is the default option for grobcov)
+//  output:
+//          list, the canonical P-representation of the Normal and Non-Normal locus:
+//               The Normal locus has two kind of components: Normal and Special.
+//               The Non-normal locus has two kind of components: Accumulation and Degenerate.
+//               Normal components: for each point in the component,
+//               the number of solutions in the variables is finite, and
+//               the solutions depend on the point in the component if the component is not 0-dimensional.
+//               Special components:  for each point in the component,
+//               the number of solutions in the variables is finite,
+//               the component is not 0-dimensional, but the solutions do not depend on the
+//               values of the parameters in the component.
+//               Accumlation points: are 0-dimensional components for which it exist
+//               an infinite number of solutions.
+//               Degenerate components: are components of dimension greater than 0 for which
+//               for every point in the component there exist infinite solutions.
+//          The output components are given as
+//               ((p1,(p11,..p1s_1),type_1,level_1),..,(pk,(pk1,..pks_k),type_k,level_k)
+//          The components are given in canonical P-representation of the subset.
+//               If all levels of a class of locus are 1, then the set is locally closed. Otherwise the level
+//               gives the depth of the component of the constructible set.
+proc locusdg(list GG, list #)
+  "USAGE:   locus(G);
+                 The input must be the grobcov  of a parametrical ideal
+  RETURN:  The  locus.
+                 The output are the components of two constructible subsets of the locus
+                 of the parametrical system.: Normal and Non-normal.
+                 These components are
+                 given as a list of  (pi,(pi1,..pis_i),type_i,level_i) varying i,
+                 where the p's are prime ideals, the type can be: Normal, Special,
+                 Accumulation, Degenerate.
+  NOTE:      It can only be called after computing the grobcov of the
+                 parametrical ideal in generic representation ('ext',0),
+                 which is the default.
+                 The basering R, must be of the form Q[a_1,..,a_m][x_1,..,x_n].
+  KEYWORDS: geometrical locus, locus, loci.
+  EXAMPLE:  locusdg; shows an example"
+{
+  def R=basering;
+  int dd=2; int comment=0;
+  list DD=#;
+  if (size(DD)>1){comment=1;}
+  if(size(DD)>0){dd=DD[1];}
+  int i; int j; int k;
+  def B0=GG[1][2];
+  if (equalideals(B0,ideal(1)))
+  {
+    return(locus0dg(GG));
+  }
+  else
+  {
+    int n=nvars(R);
+    ideal vmov=var(n-1),var(n);
+    ideal N;
+    intvec xw; intvec yw;
+    for(i=1;i<=n-1;i++){xw[i]=0;}
+    xw[n]=1;
+    for(i=1;i<=n;i++){yw[i]=0;}
+    yw[n-1]=1;
+    poly px; poly py;
+    int te=1;
+    i=1;
+    while( te and i<=size(B0))
+    {
+      if((deg(B0[i],xw)==1) and (deg(B0[i])==1)){px=B0[i]; te=0;}
+      i++;
+    }
+    i=1; te=1;
+    while( te and i<=size(B0))
+    {
+      if((deg(B0[i],yw)==1) and (deg(B0[i])==1)){py=B0[i]; te=0;}
+      i++;
+    }
+    N=px,py;
+    setglobalrings();
+    te=indepparameters(N);
+    if(te)
+    {
+      string("locus detected that the mover must avoid point (",N,") in order to obtain the correct locus");
+      // eliminates segments of GG where N is contained in the basis
+      list nGP;
+      def GP=GG;
+      ideal BP;
+      for(j=1;j<=size(GP);j++)
+      {
+        te=1; k=1;
+        BP=GP[j][2];
+        while((te==1) and (k<=size(N)))
+        {
+          if(pdivi(N[k],BP)[1]!=0){te=0;}
+          k++;
+        }
+        if(te==0){nGP[size(nGP)+1]=GP[j];}
+      }
+   }
+  }
+  //"T_nGP="; nGP;
+  kill @RP; kill @P; kill @R;
+  return(locus0dg(nGP,dd));
+}
+example
+{"EXAMPLE:"; echo = 2;
+  ring R=(0,a,b),(x4,x3,x2,x1),dp;
+  ideal S=(x1-3)^2+(x2-1)^2-9,
+             (4-x2)*(x3-3)+(x1-3)*(x4-1),
+             (3-x1)*(x3-x1)+(4-x2)*(x4-x2),
+             (4-x4)*a+(x3-3)*b+3*x4-4*x3,
+             (a-x1)^2+(b-x2)^2-(x1-x3)^2-(x2-x4)^2;
+  short=0;
+  locus(grobcov(S)); " ";
+  kill R;
+  ring R=(0,a,b),(x,y),dp;
+  short=0;
+  "Concoid";
+  ideal S96=x^2+y^2-4,(b-2)*x-a*y+2*a,(a-x)^2+(b-y)^2-1;
+  "System="; S96; " ";
+  locusdg(grobcov(S96));
+  kill R; ring R=(0,x,y),(x1,x2),dp;
+  ideal S=-(x - 5)*(x1 - 1) - (x2 - 2)*(y - 2),
+              (x1 - 5)^2 + (x2 - 2)^2 - 4,
+              -2*(x - 5)*(x2 - 2) + 2*(x1 - 5)*(y - 2);
+ "System="; S;
+  locusdg(grobcov(S)); " ";
+  ideal S1=-(x - x1)*(x1 - 4) + (x2 - y)*(x2 - 4),
+                (x1 - 4)^2 + (x2 - 2)^2 - 4,
+                -2*(x1 - 4)*(2*x2 - y - 4) - 2*(x - 2*x1 + 4)*(x2 - 2);
+ "System="; S1;
+  locusdg(grobcov(S1));
+}
 
 // locusto: Transforms the output of locus to a string that
 //      can be read by different computational systems.
@@ -4204,11 +4640,10 @@ example
 // output:
 //     string s: The output of locus converted to a string readable by other programs
 proc locusto(list L)
-"USAGE:   locusto(G);
+"USAGE:   locusto(L);
           The argument must be the output of locus of a parametrical ideal
           It transforms the output into a string in standard form
           readable in many languages (Geogebra).
-
 RETURN: The locus in string standard form
 NOTE:     It can only be called after computing the locus(grobcov(F)) of the
               parametrical ideal.
@@ -4217,8 +4652,8 @@ KEYWORDS: geometrical locus, locus, loci.
 EXAMPLE:  locusto; shows an example"
 {
   int i; int j; int k;
-  string s;
-  s="[";
+  string s="["; string sf="]"; string st=s+sf;
+  if(size(L)==0){return(st);}
   ideal p;
   ideal q;
   for(i=1;i<=size(L);i++)
@@ -4267,131 +4702,7 @@ example
   locusto(locus(grobcov(S96)));
 }
 
-// locusdg is the routine for computing the locus in dinamical geometry.
-//    It detects automatically a possible point that is to be avoided by the mover,
-//    whose coordinates must be the last coordinates in the definition of the ring (2 last by default,
-//    or the dd last if the option locusdg(G,dd) is specified).
-//    If such a point is detected, then it eliminates the segments of the grobcov that
-//    have this point as solution.
-//    Then it calls locus.
-proc locusdg(list GG,list #)
-"USAGE:  locusdg(GG) ;
-          The argument must be the output of grobcov
-RETURN:  The  components of the locus of points in dinamical geometry
-NOTE:  The basering R, must be of the form Q[a][x], a=parameters,
-          x=variables, and the mover coordinates must be the two last variables in the
-          definition of the ring.
-KEYWORDS: ring, locus, grobcov
-EXAMPLE:  locusdg(GG); shows an example"
-{
-  def R=basering;
-  int dd=2; int comment=0;
-  list DD=#;
-  if (size(DD)>1){comment=1;}
-  if(size(DD)>0){dd=DD[1];}
-  int i; int j; int k;
-  def B0=GG[1][2];
-  if (equalideals(B0,ideal(1)))
-  {
-    return(locus(GG));
-  }
-  else
-  {
-    int n=nvars(R);
-    ideal vmov=var(n-1),var(n);
-    ideal N;
-    intvec xw; intvec yw;
-    for(i=1;i<=n-1;i++){xw[i]=0;}
-    xw[n]=1;
-    for(i=1;i<=n;i++){yw[i]=0;}
-    yw[n-1]=1;
-    poly px; poly py;
-    int te=1;
-    i=1;
-    while( te and i<=size(B0))
-    {
-      if((deg(B0[i],xw)==1) and (deg(B0[i])==1)){px=B0[i]; te=0;}
-      i++;
-    }
-    i=1; te=1;
-    while( te and i<=size(B0))
-    {
-      if((deg(B0[i],yw)==1) and (deg(B0[i])==1)){py=B0[i]; te=0;}
-      i++;
-    }
-    N=px,py;
-    setglobalrings();
-    te=indepparameters(N);
-    if(te)
-    {
-      string("locusdg detected that the mover must avoid point (",N,") in order to obtain the locus");
-      // eliminate segments of GG where N is contained in the basis
-      list nGP;
-      def GP=GG;
-      ideal BP;
-      for(j=1;j<=size(GP);j++)
-      {
-        te=1; k=1;
-        BP=GP[j][2];
-        while((te==1) and (k<=size(N)))
-        {
-          if(pdivi(N[k],BP)[1]!=0){te=0;}
-          k++;
-        }
-        if(te==0){nGP[size(nGP)+1]=GP[j];}
-      }
-   }
-  }
-  //"T_nGP="; nGP;
-  kill @RP; kill @P; kill @R;
-  return(locus(nGP,dd));
-}
-//      // Now eliminate components for which the basis has dim>0, and all elements non reducing to 0
-//      // modulo N do not contain the mover coordinates
-//      list nnGP; poly r;
-//      for(j=1; j<=size(nGP);j++)
-//      {
-//        if(not(indepparameters(nGP[j][2])))
-//        {
-//          if(dim(std(nGP[j][1]))==0){nnGP[size(nnGP)+1]=nGP[j];}
-//          else
-//          {
-//            te=1; k=1;
-//            while(te and k<=size(nGP[2]))
-//            {
-//              r=pdivi(nGP[j][2][k],N)[1];
-//              if(r==0){k++;}
-//              else
-//              {
-//                if(not(subset(variables(nGP[j][2][k]),vmov )))
-//                {
-//                  te=0;
-//                }
-//                else{k++;}
-//              }
-//            }
-//            if(te==1){nnGP[size(nnGP)+1]=nGP[j];}
-//          }
-//        }
-//      }
-//
-//    }
-//    kill @RP; kill @P; kill @R;
-//    return(locus(nnGP));
-//  }
-//}
-example
-{"EXAMPLE:"; echo = 2;
-  ring R=(0,a,b),(x4,x3,x2,x1),dp;
-  ideal S=(x1-3)^2+(x2-1)^2-9,
-             (4-x2)*(x3-3)+(x1-3)*(x4-1),
-             (3-x1)*(x3-x1)+(4-x2)*(x4-x2),
-             (4-x4)*a+(x3-3)*b+3*x4-4*x3,
-             (a-x1)^2+(b-x2)^2-(x1-x3)^2-(x2-x4)^2;
-  short=0;
-  locusdg(grobcov(S));
-}
-
+// Auxiliary routione
 // locusdim
 // input:
 //    B:         ideal, a basis of a segment of the grobcov
@@ -4436,6 +4747,62 @@ proc locusdim(ideal B, list #)
   return(d);
 }
 
+// locusdgto: Transforms the output of locus to a string that
+//      can be read by different computational systems.
+// input:
+//     list L: The output of locus
+// output:
+//     string s: The output of locus converted to a string readable by other programs
+//                   Outputs only the relevant dynamical geometry components.
+//                   Without unnecessary parenthesis
+proc locusdgto(list LL)
+{
+  def RR=basering;
+  int i; int j; int k; int short0=short;
+  int te=0;
+  if(defined(@P)){te=1;}
+  else{setglobalrings();}
+  setring @P;
+  short=0;
+  def L=imap(RR,LL);
+  string s="["; string sf="]"; string st=s+sf;
+  if(size(L)==0){return(st);}
+  ideal p;
+  ideal q;
+  for(i=1;i<=size(L);i++)
+  {
+    if(L[i][3]=="Relevant")
+    {
+      s=string(s,"[[");
+      for (j=1;j<=size(L[i][1]);j++)
+      {
+        s=string(s,L[i][1][j],",");
+      }
+      s[size(s)]="]";
+      s=string(s,",[");
+      for(j=1;j<=size(L[i][2]);j++)
+      {
+        s=string(s,"[");
+        for(k=1;k<=size(L[i][2][j]);k++)
+        {
+          s=string(s,L[i][2][j][k],",");
+        }
+        s[size(s)]="]";
+        s=string(s,",");
+      }
+      s[size(s)]="]";
+      s=string(s,"]");
+      s[size(s)]="]";
+      s=string(s,",");
+    }
+  }
+  if(s=="["){s="[]";}
+  else{s[size(s)]="]";}
+  setring(RR);
+  short=short0;
+  if(te==0){kill @P; kill @R; kill @RP;}
+  return(s);
+}
 
 //********************* End locus ****************************
 ;
