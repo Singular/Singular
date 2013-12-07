@@ -1,5 +1,5 @@
-////////////////////////////////////////////////////////////////////////////////
-version="version primdecint.lib 3-1-7-0 Sep_2013 ";
+//////////////////////////////////////////////////////////////////////////////
+version="version primdecint.lib 3.1.7.0 Dec_2013 ";
 category = "Commutative Algebra";
 info="
 LIBRARY:  primdecint.lib   primary decomposition of an ideal in the polynomial
@@ -1063,7 +1063,7 @@ static proc separatorsZ(int j, list B)
    return(s);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 static proc extractZ(ideal J, int j, list L, list B)
 {
    //=== P is an associated prime of J, the corresponding primary ideal is
@@ -1096,19 +1096,20 @@ static proc extractZ(ideal J, int j, list L, list B)
          ideal I=imap(S,I);
          I[1]=0;
          I=simplify(I,2);
-         //=== this is our way to obtain the coefficients in Z[u] of the
-         //=== leading terms of the Groebner basis above
-         string quotring=Primdec::prepareQuotientring(nvars(basering)-L[1][3]);
-         execute(quotring);
-         ideal I=imap(Shelp,I);
-         list C;
-         int i;
-         for(i=1;i<=size(I);i++)
+         if(L[1][3]==nvars(basering))
+         {
+            list C;
+            int i;
+            for(i=1;i<=size(I);i++)
+            {
+               C[i]=I[i];
+            }
+         }
+         else
          {
             //=== this is our way to obtain the coefficients in Z[u] of the
             //=== leading terms of the Groebner basis above
-            string
-quotring=Primdec::prepareQuotientring(nvars(basering)-L[1][3]);
+            string quotring=Primdec::prepareQuotientring(nvars(basering)-L[1][3]);
             execute(quotring);
             ideal I=imap(Shelp,I);
             list C;
@@ -1201,7 +1202,7 @@ static proc quotientOneZ(ideal I, poly f)
 {
 //=== this is needed because quotient(I,f) does not work properly, should be
 //=== replaced by quotient later
-   if ( f==0 ) { return( ideal(1) ); }   
+   if ( f==0 ) { return( ideal(1) ); }
    def R=basering;
    int i;
    ideal K=intersectZ(I,ideal(f));
@@ -1226,7 +1227,7 @@ static proc quotientZ(ideal I, ideal J)
 {
 //=== this is needed because quotient(I,J) does not work properly, should be
 //=== replaced by quotient later
-   if ( f==0 ) { return( ideal(1) ); }   
+   if ( size(J)==0 ) { return( ideal(1) ); }
    int i;
    ideal K=quotientOneZ(I,J[1]);
    for(i=2;i<=size(J);i++)
