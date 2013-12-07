@@ -1202,6 +1202,7 @@ static proc quotientOneZ(ideal I, poly f)
 {
 //=== this is needed because quotient(I,f) does not work properly, should be
 //=== replaced by quotient later
+   if ( f==0 ) { return( ideal(1) ); }   
    def R=basering;
    int i;
    ideal K=intersectZ(I,ideal(f));
@@ -1226,6 +1227,7 @@ static proc quotientZ(ideal I, ideal J)
 {
 //=== this is needed because quotient(I,J) does not work properly, should be
 //=== replaced by quotient later
+   if ( size(J)==0 ) { return( ideal(1) ); }
    int i;
    ideal K=quotientOneZ(I,J[1]);
    for(i=2;i<=size(J);i++)
