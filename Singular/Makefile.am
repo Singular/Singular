@@ -247,6 +247,7 @@ Singulard_LDADD = libSingular.la ${EMBED_PYOBJECT}
 
 Singulard_LDFLAGS = ${AM_LDFLAGS} ${EMBED_PYOBJECT}
 
+bin_SCRIPTS = singularsurf
 
 #### ESingular
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO
