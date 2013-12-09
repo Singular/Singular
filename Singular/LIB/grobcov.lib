@@ -67,85 +67,85 @@ NOTATIONS: All given and determined polynomials and ideals are in the
 
 PROCEDURES:
 
-grobcov(F); Is the basic routine giving the canonical
-            Groebner cover of the parametric ideal F.
-            This routine accepts many options, that
-            allow to obtain results even when the canonical
-            computation does not finish in reasonable time.
+grobcov(F);  Is the basic routine giving the canonical
+                   Groebner cover of the parametric ideal F.
+                   This routine accepts many options, that
+                   allow to obtain results even when the canonical
+                   computation does not finish in reasonable time.
 
-cgsdr(F);   Is the procedure for obtaining a first disjoint,
-            reduced Comprehensive Groebner System that
-            is used in grobcov, that can also be used
-            independently if only the CGS is required.
-            It is a more efficient routine than buildtree
-            (the own routine that is no more used). It uses
-            now KSW algorithm.
+cgsdr(F);      Is the procedure for obtaining a first disjoint,
+                   reduced Comprehensive Groebner System that
+                   is used in grobcov, that can also be used
+                   independently if only the CGS is required.
+                   It is a more efficient routine than buildtree
+                   (the own routine that is no more used). It uses
+                   now KSW algorithm.
 
 setglobalrings();  Generates the global rings @R, @P and @PR that are
-            respectively the rings Q[a][x], Q[a], Q[x,a].
-            It is called inside each of the fundamental routines
-            of the library: grobcov, cgsdr, locus, locusdg and killed before
-            the output.
-            So, if the user want to use some other internal routine,
-            then setglobalrings() is to be called before, as most of them use
-            these rings.
+                   respectively the rings Q[a][x], Q[a], Q[x,a].
+                   It is called inside each of the fundamental routines
+                   of the library: grobcov, cgsdr, locus, locusdg and killed before
+                   the output.
+                   So, if the user want to use some other internal routine,
+                   then setglobalrings() is to be called before, as most of them use
+                   these rings.
 
-pdivi(f,F); Performs a pseudodivision of a parametric polynomial
-            by a parametric ideal.
-            Can be used without calling presiouly setglobalrings(),
+pdivi(f,F);     Performs a pseudodivision of a parametric polynomial
+                   by a parametric ideal.
+                   Can be used without calling presiouly setglobalrings(),
 
 pnormalf(f,E,N);   Reduces a parametric polynomial f over V(E) \ V(N)
-            E is the null ideal and N the non-null ideal
-            over the parameters.
-            Can be used without calling presiouly setglobalrings(),
+                   E is the null ideal and N the non-null ideal
+                   over the parameters.
+                   Can be used without calling presiouly setglobalrings(),
 
-Prep(N,M);  Computes the P-representation of V(N) \ V(M).
-            Can be used without calling previously setglobalrings().
+Prep(N,M);   Computes the P-representation of V(N) \ V(M).
+                   Can be used without calling previously setglobalrings().
 
 extend(GC); When the grobcov of an ideal has been computed
-            with the default option ('ext',0) and the explicit
-            option ('rep',2) (which is not the default), then
-            one can call extend (GC) (and options) to obtain the
-            full representation of the bases. With the default
-            option ('ext',0) only the generic representation of
-            the bases are computed, and one can obtain the full
-            representation using extend.
-            Can be used without calling presiouly setglobalrings(),
+                   with the default option ('ext',0) and the explicit
+                   option ('rep',2) (which is not the default), then
+                   one can call extend (GC) (and options) to obtain the
+                   full representation of the bases. With the default
+                   option ('ext',0) only the generic representation of
+                   the bases are computed, and one can obtain the full
+                   representation using extend.
+                   Can be used without calling presiouly setglobalrings(),
 
-locus(G);   Special routine for determining the locus of points
-            of  objects. Given a parametric ideal J with
-            parameters (a_1,..a_m) and variables (x_1,..,xn),
-            representing the system determining
-            the locus of points (a_1,..,a_m)) who verify certain
-            properties, computing the grobcov G of
-            J and applying to it locus, determines the different
-            classes of locus components. They can be
-            Normal, Special, Accumulation point, Degenerate.
-            The output are the components given in P-canonical form
-            of two constructible sets: Normal, and Non-Normal
-            The Normal Set has Normal and Special components
-            The Non-Normal set has Accumulation and Degenerate components.
-            The description of the algorithm and definitions will be
-            given in a forthcoming paper by Abanades, Botana, Montes, Recio:
-            ''An Algebraic Taxonomy for Locus Computation in Dynamic Geometry''.
-            Can be used without calling presiouly setglobalrings(),
+locus(G);     Special routine for determining the locus of points
+                   of  objects. Given a parametric ideal J with
+                   parameters (a_1,..a_m) and variables (x_1,..,xn),
+                   representing the system determining
+                   the locus of points (a_1,..,a_m)) who verify certain
+                   properties, computing the grobcov G of
+                   J and applying to it locus, determines the different
+                   classes of locus components. They can be
+                   Normal, Special, Accumulation point, Degenerate.
+                   The output are the components given in P-canonical form
+                   of two constructible sets: Normal, and Non-Normal
+                   The Normal Set has Normal and Special components
+                   The Non-Normal set has Accumulation and Degenerate components.
+                   The description of the algorithm and definitions will be
+                   given in a forthcoming paper by Abanades, Botana, Montes, Recio:
+                   ''An Algebraic Taxonomy for Locus Computation in Dynamic Geometry''.
+                   Can be used without calling presiouly setglobalrings(),
 
-locusdg(G); Is a special routine for computing the locus in dinamical geometry.
-            It detects automatically a possible point that is to be avoided by the mover,
-            whose coordinates must be the last two coordinates in the definition of the ring.
-            If such a point is detected, then it eliminates the segments of the grobcov
-            depending on the point that is to be avoided.
-            Then it calls locus.
-            Can be used without calling presiouly setglobalrings(),
+locusdg(G);  Is a special routine for computing the locus in dinamical geometry.
+                    It detects automatically a possible point that is to be avoided by the mover,
+                    whose coordinates must be the last two coordinates in the definition of the ring.
+                    If such a point is detected, then it eliminates the segments of the grobcov
+                    depending on the point that is to be avoided.
+                    Then it calls locus.
+                    Can be used without calling presiouly setglobalrings(),
 
-locusto(L); Transforms the output of locus to a string that
-            can be reed from different computational systems.
-            Can be used without calling presiouly setglobalrings(),
+locusto(L);  Transforms the output of locus to a string that
+                  can be reed from different computational systems.
+                  Can be used without calling presiouly setglobalrings(),
 
 addcons(L); Given a disjoint set of locally closed subsets in P-representation,
-            it returns the canonical P-representation of the constructible
-            set formed by the union of them.
-            Can be used without calling presiouly setglobalrings(),
+                  it returns the canonical P-representation of the constructible set
+                  formed by the union of them.
+                  Can be used without calling presiouly setglobalrings(),
 
 SEE ALSO: compregb_lib
 ";
@@ -3968,7 +3968,7 @@ EXAMPLE:  adccons; shows an example"
      //if(cont>3){break;}
      //kill notadded; list notadded;
   }
-  kill @Q2;
+  if(defined(@Q2)){kill @Q2;}
   if(te==0){kill @P; kill @R; kill @RP;}
   //"T_LL_sortida addcons="; LL; "Fi sortida";
   return(LL);
@@ -4180,7 +4180,7 @@ proc locus0(list GG, list #)
 //              gives the depth of the component.
 proc locus0dg(list GG, list #)
 {
-  int t1=1; int t2=1;
+  int t1=1; int t2=1; int ojo;
   def R=basering;
   int moverdim=nvars(R);
   list HHH;
@@ -4322,9 +4322,14 @@ proc locus0dg(list GG, list #)
   }
   kill LN; list LN;
   LN=addcons(LNN);
+  if(size(LN)==0){ojo=1;}
   setring(R);
-  def L=imap(@P,LN);
-  for(i=1;i<=size(L);i++){if(size(L[i][2])==0){L[i][2]=ideal(1);}}
+  if(ojo==1){list L;}
+  else
+  {
+    def L=imap(@P,LN);
+    for(i=1;i<=size(L);i++){if(size(L[i][2])==0){L[i][2]=ideal(1);}}
+  }
   kill @R; kill @RP; kill @P;
   list LL;
   for(i=1;i<=size(L);i++)
@@ -4758,13 +4763,17 @@ proc locusdim(ideal B, list #)
 proc locusdgto(list LL)
 {
   def RR=basering;
-  int i; int j; int k; int short0=short;
+  int i; int j; int k; int short0=short; int ojo;
   int te=0;
   if(defined(@P)){te=1;}
   else{setglobalrings();}
   setring @P;
   short=0;
-  def L=imap(RR,LL);
+  if(size(LL)==0){ojo=1; list L;}
+  else
+  {
+    def L=imap(RR,LL);
+  }
   string s="["; string sf="]"; string st=s+sf;
   if(size(L)==0){return(st);}
   ideal p;
