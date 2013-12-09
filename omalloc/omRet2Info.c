@@ -199,6 +199,7 @@ int omFilterRetInfo_i(omRetInfo info, int max, int i)
 
 int _omPrintBackTrace(void** bt, int max, FILE* fd , OM_FLR_DECL)
 {
+#ifndef __OPTIMIZE__
   int i = 0;
 
   omRetInfo_t info[OM_MAX_BACKTRACE_DEPTH];
@@ -261,14 +262,22 @@ int _omPrintBackTrace(void** bt, int max, FILE* fd , OM_FLR_DECL)
 #else
     return omPrintRetInfo(info, i, fd, "\n  #%i at %L in %N");
 #endif
+#else
+  return 0;
+#endif
 }
 
 int _omPrintCurrentBackTrace(FILE* fd , OM_FLR_DECL)
 {
+#ifdef __OPTIMIZE__
+  /* does not work without -g */
+  return 0;
+#else
   int i;
   void* bt[OM_MAX_BACKTRACE_DEPTH];
 
   i = omGetBackTrace(bt, 1, OM_MAX_BACKTRACE_DEPTH);
   return _omPrintBackTrace(bt, i, fd , OM_FLR_VAL);
+#endif
 }
 #endif /* ! OM_NDEBUG */
