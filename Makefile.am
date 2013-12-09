@@ -14,7 +14,7 @@ emacs debian redhat desktop
 
 EXTRA_DIST = README autogen.sh git-version-gen
 
-bin_SCRIPTS = libsingular-config
+bin_SCRIPTS = libsingular-config singularsurf
 
 dist-hook:
 	$(srcdir)/git-version-gen $(srcdir)/.tarball-git-version > $(distdir)/.tarball-git-version
