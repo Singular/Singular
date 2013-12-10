@@ -153,19 +153,20 @@
      RINGVAR = 370,
      PROC_DEF = 371,
      APPLY = 372,
-     BREAK_CMD = 373,
-     CONTINUE_CMD = 374,
-     ELSE_CMD = 375,
-     EVAL = 376,
-     QUOTE = 377,
-     FOR_CMD = 378,
-     IF_CMD = 379,
-     SYS_BREAK = 380,
-     WHILE_CMD = 381,
-     RETURN = 382,
-     PARAMETER = 383,
-     SYSVAR = 384,
-     UMINUS = 385
+     ASSUME_CMD = 373,
+     BREAK_CMD = 374,
+     CONTINUE_CMD = 375,
+     ELSE_CMD = 376,
+     EVAL = 377,
+     QUOTE = 378,
+     FOR_CMD = 379,
+     IF_CMD = 380,
+     SYS_BREAK = 381,
+     WHILE_CMD = 382,
+     RETURN = 383,
+     PARAMETER = 384,
+     SYSVAR = 385,
+     UMINUS = 386
    };
 #endif
 
