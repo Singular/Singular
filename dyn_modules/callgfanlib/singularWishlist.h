@@ -56,4 +56,16 @@ static inline BOOLEAN p_LeadmonomDivisibleBy(poly a, poly b, const ring r)
   return FALSE;
 }
 
+inline void idShallowDelete (ideal *h)
+{
+  int j,elems;
+  if (*h == NULL)
+    return;
+  elems=j=(*h)->nrows*(*h)->ncols;
+  if (j>0)
+    omFreeSize((ADDRESS)((*h)->m),sizeof(poly)*elems);
+  omFreeBin((ADDRESS)*h, sip_sideal_bin);
+  *h=NULL;
+}
+
 #endif
