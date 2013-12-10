@@ -4082,6 +4082,7 @@ easiest way to leave the procedure is to type some brackets or @code{"}
 and then @key{RETURN} .
 
 @menu
+* ASSUME::
 * Tracing of procedures::
 * Source code debugger::
 * Break points::
@@ -4090,8 +4091,33 @@ and then @key{RETURN} .
 @end menu
 
 @c ---------------------------------------
-@node Tracing of procedures,Source code debugger,Debugging tools,Debugging tools
+@node ASSUME,Tracing of procedures,Debugging tools,Debugging tools
+@subsection ASSUME
+@cindex ASSUME
+
+@table @code
+@item @strong{Syntax:}
+@code{ASSUME (} int_expression @code{,} expression @code{)}
+@item @strong{Purpose:}
+Tests the expression for correctness if the int_expression is smaller
+as a variable @code{assumeLevel}. If no such variable exist the int expression
+is compared against 0.
+If the expression is evaluated and not true (i.e. does not evaluate to @code{int(0)} an error is raised.
+@item @strong{Example:}
+@smallexample
+@c example error
+  ASSUME(0,2==2); // always tested
+  ASSUME(1,1==2); // not evaluated
+  int assumeLevel=2;
+  ASSUME(1,1==2);
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node Tracing of procedures,Source code debugger,ASSUME,Debugging tools
 @subsection Tracing of procedures
+@cindex TRACE
 Setting the @code{TRACE} variable to 1 (resp.@: 3) results in reporting of
 all procedure entries and exits (resp.@: together with line numbers).
 If @code{TRACE} is set to 4, @code{Singular}
