@@ -7,6 +7,8 @@
 *.swp
 *.lo
 *.la
+*.gcno
+*.gcda
 *~
 .libs
 AUTOGEN_generated_stuff
