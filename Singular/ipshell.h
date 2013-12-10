@@ -246,5 +246,6 @@ void paPrint(const char *n,package p);
 /* ================================================================== */
 
 
+BOOLEAN iiTestAssume(leftv a, leftv b);
 #endif
 

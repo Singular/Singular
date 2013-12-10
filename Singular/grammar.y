@@ -314,6 +314,7 @@ void yyerror(const char * fmt)
 
 /* control */
 %token <i> APPLY
+%token <i> ASSUME_CMD
 %token <i> BREAK_CMD
 %token <i> CONTINUE_CMD
 %token <i> ELSE_CMD
@@ -776,6 +777,12 @@ expr:   expr_arithmetic
             siq--;
             #endif
           }
+	| assume_start expr ',' expr quote_end
+	  {
+	    iiTestAssume(&$2,&$4);
+            memset(&$$,0,sizeof($$));
+            $$.rtyp=NONE;
+	  }
         | EVAL  '('
           {
             #ifdef SIQ
@@ -795,6 +802,14 @@ expr:   expr_arithmetic
           ;
 
 quote_start:    QUOTE  '('
+          {
+            #ifdef SIQ
+            siq++;
+            #endif
+          }
+          ;
+
+assume_start:    ASSUME_CMD '('
           {
             #ifdef SIQ
             siq++;

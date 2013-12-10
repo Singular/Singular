@@ -797,6 +797,7 @@ struct sValCmdM dArithM[]=
 cmdnames cmds[] =
 {  // name-string alias tokval          toktype
   { "$INVALID$",   0, -1,                 0},
+  { "ASSUME",      0, ASSUME_CMD,         ASSUME_CMD},
   { "LIB",         0, LIB_CMD ,           SYSVAR},
   { "alias",       0, ALIAS_CMD ,         PARAMETER},
   { "and",         0, '&' ,               LOGIC_OP},
