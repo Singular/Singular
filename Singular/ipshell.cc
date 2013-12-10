@@ -5651,3 +5651,26 @@ BOOLEAN iiApply(leftv res, leftv a, int op, leftv proc)
   WerrorS("first argument to `apply` must allow an index");
   return TRUE;
 }
+
+BOOLEAN iiTestAssume(leftv a, leftv b)
+{
+  // assume a: level
+  if ((a->Typ()==INT_CMD)&&((long)a->Data()>=0))
+  {
+    int lev=(long)a->Data();
+    int startlev=0;
+    idhdl h=ggetid("assumeLevel");
+    if ((h!=NULL)&&(IDTYP(h)==INT_CMD)) startlev=(long)IDINT(h);
+    if(lev <=startlev)
+    {
+      BOOLEAN bo=b->Eval();
+      if (bo) { WerrorS("syntax error in ASSUME");return TRUE;}
+      if (b->Typ()!=INT_CMD) { WerrorS("ASUMME(<level>,<int expr>)");return TRUE; }
+      if (b->Data()==NULL) { WerrorS("ASSUME failed");return TRUE;}
+    }
+  }
+  else
+     b->CleanUp();
+  a->CleanUp();
+  return FALSE;
+}

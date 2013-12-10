@@ -199,5 +199,7 @@ void paPrint(const char *n,package p);
 #ifndef NDEBUG
 void checkall();
 #endif
+
+BOOLEAN iiTestAssume(leftv a, leftv b);
 #endif
 
