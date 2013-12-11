@@ -23,3 +23,5 @@ dist-hook:
 configheaderdir = ${includedir}/singular/
 nodist_configheader_HEADERS = singularconfig.h
 
+dist_man1_MANS = doc/singular.man
+
