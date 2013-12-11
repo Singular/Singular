@@ -2127,13 +2127,15 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         for (int i=cmp+1; i<=max_cmp; ++i) {
           Q.sig = p_One(currRing);
           p_SetExpV(Q.sig, vv, currRing);
+          // F->m[i-1] corresponds to index i
+          p_ExpVectorAdd(Q.sig,F->m[i-1],currRing);
           p_SetComp(Q.sig, i, currRing);
           pos = posInSyz(strat, Q.sig);
           enterSyz(Q, strat, pos);
         }
       }
-//#if 1
-#if DEBUGF50
+#if 1
+//#if DEBUGF50
     printf("---------------------------\n");
     Print(" %d. ELEMENT ADDED TO GCURR:\n",strat->sl+1);
     Print("LEAD POLY:  "); pWrite(pHead(strat->S[strat->sl]));
@@ -2181,10 +2183,10 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
         int pos = posInSyz(strat, strat->P.sig);
         enterSyz(strat->P, strat, pos);
-//#if 1
-#ifdef DEBUGF5
+#if 1
+//#ifdef DEBUGF5
         Print("ADDING STUFF TO SYZ :  ");
-        pWrite(strat->P.p);
+        //pWrite(strat->P.p);
         pWrite(strat->P.sig);
 #endif
       }
