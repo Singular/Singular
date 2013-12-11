@@ -2735,23 +2735,39 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R);
 number naChineseRemainder(number *x, number *q,int rl, const ring r)
 {
   poly *xx=(poly*)omAlloc0(rl*sizeof(poly));
+  poly *yy=(poly*)omAlloc0(rl*sizeof(poly));
   number *qq=(number*)omAlloc0(rl*sizeof(number));
   number *temp=(number*)omAlloc0(rl*sizeof(number));
   lnumber t;
-  for(int i=rl-1;i>=0;i--)
+  int i;
+  for(i=rl-1;i>=0;i--)
   {
     if(x[i]!=NULL)
     {
       t=(lnumber)x[i];
       xx[i]=t->z;
+      if (t->n==NULL) yy[i]=p_One(r->algring);
+      else            yy[i]=p_Copy(t->n,r->algring);
     }
     t=(lnumber)q[i];
     qq[i]=pGetCoeff(t->z);
   }
+  number *qq2=(number*)omAlloc0(rl*sizeof(number));
+  memcpy(qq2,qq,rl*sizeof(number));
+  number *temp2=(number*)omAlloc0(rl*sizeof(number));
+  memcpy(temp2,temp,rl*sizeof(number));
   poly rr=p_ChineseRemainder(xx,temp,qq,rl,r->algring);
   t=ALLOC0_LNUMBER();
   t->z=rr;
-  t->s=2;
+  //t->s=0;
+  rr=p_ChineseRemainder(yy,temp2,qq2,rl,r->algring);
+  if ((rr!=NULL) && (pNext(rr)==NULL)
+  && (n_IsOne(pGetCoeff(rr),r->algring)))
+  {
+    p_Delete(&rr,r->algring);
+    t->s=2;
+  }
+  t->n=rr;
   return (number)t;
 }
 
@@ -2760,14 +2776,14 @@ number naFarey(number nN, number nP, const ring r)
 {
   lnumber N = (lnumber)nN;
   /* nP is a BIGINT_CMD */
-  if (N->n!=NULL)
-  {
-    WerrorS("rational function not allowed in naFarey");
-    return NULL;
-  }
   if (N==NULL) return NULL;
   lnumber rr=ALLOC0_LNUMBER();
   rr->z=p_Farey(N->z,nP,r->algring);
-  rr->s = 2;
+  if (N->n==NULL)
+    rr->s = 2;
+  else
+  {
+    rr->n=p_Farey(N->n,nP,r->algring);
+  }
   return (number)rr;
 }

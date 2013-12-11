@@ -4232,18 +4232,12 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R)
     {
       //Print("new mon:");pWrite(h);
       p_SetCoeff(h,n,R);
-      #if 1
       pNext(h)=res_p;
       res_p=h; // building res_p in reverse order!
-      #else
-      res_p=p_Add_q(res_p,h,R);
-      #endif
     }
   }
-  #if 1
   res_p=pReverse(res_p);
-  pTest(res_p);
-  #endif
+  p_Test(res_p,R);
   return res_p;
 }
 ideal idChineseRemainder(ideal *xx, number *q, int rl)
