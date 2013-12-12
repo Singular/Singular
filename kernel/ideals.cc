@@ -1785,7 +1785,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
 
   k=si_max(1,(int)idRankFreeModule(h1));
 
-  if ((k==1) && (!lift3)) verbose |=Sy_bit(V_IDLIFT);
+  if (!lift3) verbose |=Sy_bit(V_IDLIFT);
 
   ring orig_ring = currRing;
   ring syz_ring = rCurrRingAssure_SyzComp();

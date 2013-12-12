@@ -1184,38 +1184,44 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
 
       // enter into S, L, and T
-      //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
+      if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
+      {
         enterT(strat->P, strat);
 #ifdef HAVE_RINGS
-      if (rField_is_Ring(currRing))
-        superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
-      else
+        if (rField_is_Ring(currRing))
+          superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+        else
 #endif
-        enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
-      // posInS only depends on the leading term
-      strat->enterS(strat->P, pos, strat, strat->tl);
+          enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+        // posInS only depends on the leading term
+        strat->enterS(strat->P, pos, strat, strat->tl);
 #if 0
-      int pl=pLength(strat->P.p);
-      if (pl==1)
-      {
-        //if (TEST_OPT_PROT)
-        //PrintS("<1>");
-      }
-      else if (pl==2)
-      {
-        //if (TEST_OPT_PROT)
-        //PrintS("<2>");
-      }
+        int pl=pLength(strat->P.p);
+        if (pl==1)
+        {
+          //if (TEST_OPT_PROT)
+          //PrintS("<1>");
+        }
+        else if (pl==2)
+        {
+          //if (TEST_OPT_PROT)
+          //PrintS("<2>");
+        }
 #endif
-      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+        if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
+        if (strat->sl>srmax) srmax = strat->sl;
+      }
+      else
+      {
+        // clean P
+      }
       if (strat->P.lcm!=NULL)
 #ifdef HAVE_RINGS
         pLmDelete(strat->P.lcm);
 #else
         pLmFree(strat->P.lcm);
 #endif
-      if (strat->sl>srmax) srmax = strat->sl;
     }
     else if (strat->P.p1 == NULL && strat->minim > 0)
     {
