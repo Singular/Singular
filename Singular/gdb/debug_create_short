@@ -1,0 +1,134 @@
+# ksCreateShortSpoly is not yet working correct
+# compare it with original version (from older letterplace implementation)
+
+# include helpers and bos_gdb_ext.py first
+
+break ShiftDVec::bba
+commands
+  set $short_cnt=0
+  set $after_cnt=0
+  continue
+end
+
+blc ShiftDVec::enterOnePair 'Lp.p = SD::ksCreateShortSpoly'
+commands
+  silent
+  if $after_cnt != 31
+    continue
+  end
+end
+
+blc ShiftDVec::enterOnePair 'enterL'
+commands
+  silent
+  printf "\nin enterOnePair after ksCreateShortSpoly\n" 
+  printf "Counter: %d\n", $after_cnt
+  call (void)fflush(0x0)
+  pll Lp
+  printf "Lp.FDeg: %d\n", Lp.FDeg
+  set $after_cnt = $after_cnt + 1
+  continue
+end
+
+#blc ShiftDVec::bba 'strat->Ll--;'
+#commands
+#  silent
+#  printf "\nAfter picking strat->L[strat->Ll]\n" 
+#  printf "Counter: %d\n", $after_cnt
+#  call p_Write( strat->P.p, currRing, strat->tailRing )
+#  call p_Write( strat->P.t_p, strat->tailRing, strat->tailRing )
+#  printf "P.FDeg: %d\n", strat->P.FDeg
+#  call (void)fflush(0x0)
+#  continue
+#end
+#
+#blc ShiftDVec::bba 'ShiftDVec::ksCreateSpoly'
+#commands
+#  silent
+#  printf "\nBefore ksCreateSpoly\n" 
+#  printf "Counter: %d\n", $after_cnt
+#  pll strat->P
+#  call (void)fflush(0x0)
+#  if $after_cnt != 40
+#    continue
+#  end
+#end
+#
+#blc ShiftDVec::bba 'strat->P.PrepareRed(strat->use_buckets);'
+#commands
+#  silent
+#  printf "\nBefore PrepareRed (strat->P.p + strat->P.t_p)\n" 
+#  printf "Counter: %d\n", $after_cnt
+#  call p_Write( strat->P.p, currRing, strat->tailRing )
+#  call p_Write( strat->P.t_p, strat->tailRing, strat->tailRing )
+#  call (void)fflush(0x0)
+#  continue
+#end
+#
+#blc ShiftDVec::bba 'if (strat->P.p == NULL && strat->P.t_p == NULL)'
+#commands
+#  silent
+#  printf "After PrepareRed\n" 
+#  call p_Write( strat->P.p, currRing, strat->tailRing )
+#  call p_Write( strat->P.t_p, strat->tailRing, strat->tailRing )
+#  call (void)fflush(0x0)
+#  continue
+#end
+#
+#blc ShiftDVec::bba 'if (errorreported)  break'
+#commands
+#  silent
+#  printf "\n\nAfter reducing strat->P\n" 
+#  printf "Counter: %d\n", $after_cnt
+#  call p_Write( strat->P.t_p, strat->tailRing, strat->tailRing )
+#  call (void)fflush(0x0)
+#  continue
+#end
+
+# print Lp.p, p1 and p2 after ksCreateShortSpoly in SDPairs.cc
+#blc ShiftDVec::enterOnePair 'Lp.p == NULL'
+#commands
+#  silent
+#  # TODO: conditional does not yet work with blc!
+#  if $short_cnt < 7 || 1
+#    printf "\nAfter ksCreateShortSpoly in enterOnePair.\nCounter: %d\n", $short_cnt
+#    printf "p:   "
+#    call (void)fflush(0x0)
+#    pct Lp.p
+#    printf "p1:  "
+#    call (void)fflush(0x0)
+#    pct p1
+#    printf "p2:  "
+#    call (void)fflush(0x0)
+#    pct p2
+#    set $short_cnt = $short_cnt + 1
+#    continue
+#  end
+#end
+
+#blc ShiftDVec::enterOnePair 'isFromQ1!=0'
+#commands
+#  silent
+#  if $short_cnt != 1
+#    continue
+#  end
+#end
+
+# p1 and p2 before ksCreateShortSpoly in SDPairs.cc
+#blc ShiftDVec::enterOnePair 'isFromQ1!=0'
+#commands
+#  silent
+#  # TODO: conditional does not yet work with blc!
+#  if $short_cnt < 7
+#    printf "\nBefore ksCreateShortSpoly in enterOnePair. Counter: %d\n", $short_cnt
+#    printf "p1:  "
+#    call (void)fflush(0x0)
+#    pct p1
+#    printf "p2:  "
+#    call (void)fflush(0x0)
+#    pct p2
+#    continue
+#  end
+#end
+
+# vim: set ft=gdb:

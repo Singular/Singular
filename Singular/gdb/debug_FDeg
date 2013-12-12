@@ -1,0 +1,49 @@
+# problems with reduction (redLP) ...
+
+# include helpers and bos_gdb_ext.py first
+
+break ShiftDVec::bba
+commands
+  silent
+  set $fdeg_cnt=0
+  continue
+end
+
+blc ShiftDVec::bba 'if( strat->P.SD_Ext() ) strat->P.SD_Ext()->T = &(strat->P);'
+commands
+  silent
+  continue
+  if ($fdeg_cnt % 10) == 0
+    printf "\n\nCounter: %d\n", $fdeg_cnt
+    set $fdeg_cnt = $fdeg_cnt + 1
+    flush
+    #pll strat->P
+    printf "\n"
+  else
+    set $fdeg_cnt = $fdeg_cnt + 1
+    continue
+  end
+end
+
+b ShiftDVec::ksCreateShortSpoly
+commands
+  silent
+  if pTotaldegree(p2) == 7
+    if pTotaldegree(p1) == 6
+    printf "\n\nCounter: %d\n", $fdeg_cnt
+    set $fdeg_cnt = $fdeg_cnt + 1
+    flush
+    pp p1 tailRing
+    pp p2 tailRing
+    printf "\n"
+    else
+      set $fdeg_cnt = $fdeg_cnt + 1
+      continue
+    end
+  else
+    set $fdeg_cnt = $fdeg_cnt + 1
+    continue
+  end
+end
+
+# vim: set ft=gdb :

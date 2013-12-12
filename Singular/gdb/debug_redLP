@@ -1,0 +1,57 @@
+# problems with reduction (redLP) ...
+
+# include helpers and bos_gdb_ext.py first
+
+break ShiftDVec::bba
+commands
+  set $redlp_cnt=0
+  continue
+end
+
+blc ShiftDVec::bba 'red_result = strat->red(&strat->P,strat);'
+commands
+  silent
+  printf "\n"
+  pss
+  printf "Befor Red: "
+  if strat->P.p != 0x0
+    pct strat->P.p
+  else
+    ptt strat->P.t_p
+  end
+  continue
+end
+
+blc ShiftDVec::bba 'strat->enterS'
+commands
+  silent
+  set $redlp_cnt = $redlp_cnt + 1
+  if ($redlp_cnt % 10) == 0 || 1
+    printf "\rAfter Red: "
+    pct strat->P.p
+  end
+  if $redlp_cnt < 20
+    continue
+  end
+  printf "\n"
+end
+
+#blc ShiftDVec::redLP 'j = RD::kFindDivisibleByInUT( h, shift, strat );'
+#commands
+#  silent
+#  set $redlp_cnt = $redlp_cnt + 1
+#  if ($redlp_cnt % 10) == 0
+#    printf "\n\nCounter: %3d", $redlp_cnt
+#    printf "\n\nS:\n"
+#    call (void)fflush(0x0)
+#    pss
+#    printf "\nh:\n"
+#    pll h
+#    call (void)fflush(0x0)
+#  end
+#  if $redlp_cnt < 8
+#    continue
+#  end
+#end
+
+# vim: set ft=gdb :

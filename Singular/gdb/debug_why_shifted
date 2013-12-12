@@ -1,0 +1,31 @@
+# somehow p1 in enterOnePair got shifted - where? why?
+# (it's wrong!)
+# no, I was wrong, used ptt instead of pct
+
+# include helpers and bos_gdb_ext.py first
+
+break ShiftDVec::bba
+commands
+  set $shift_cnt=0
+  continue
+end
+
+# print H->p and strat->S[i] before enterOnePair
+blc ShiftDVec::enterOverlaps 'SD::enterOnePair'
+commands
+  silent
+  # TODO: conditional does not yet work with blc!
+  if $shift_cnt < 7
+    printf "\nBefore enterOnePair in enterOverlaps."
+    printf "\nH->p:         "
+    call (void)fflush(0x0)
+    pct H->p
+    printf "strat->S[i]:  "
+    call (void)fflush(0x0)
+    pct strat->S[i]
+    set $shift_cnt = $shift_cnt + 1
+    continue
+  end
+end
+
+# vim: set ft=gdb:

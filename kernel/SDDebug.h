@@ -59,7 +59,6 @@
 #define DEBOGRI 1
 #endif
 
-
 #if DEBOGRI > 0
 
 //This has to be changed to make it work again
@@ -72,6 +71,9 @@ namespace ShiftDVec
   namespace SD = ShiftDVec;
 
   class DeBoGri;
+
+  void ExtensionTTest(sTObject* T, int tl);
+  void DegreeTTest(sTObject* T, int tl);
 
   bool deBoGriPrint
     ( const char* description, 
@@ -117,8 +119,40 @@ namespace ShiftDVec
   void deBoGriTTest(kStrategy strat);
 #endif
 
+  void memory_log( const char* descr,
+                   const void* ptr, int line, const char* file );
+  void* dAlloc(size_t size, int line, const char* file);
+  void* dAlloc0(size_t size, int line, const char* file);
+  void  dFreeSize( void* ptr, size_t size,
+                   int line, const char* file );
+  void* dReallocSize( void* ptr,
+                      size_t size_old,
+                      size_t size_new,
+                      int line, const char* file );
+  char* backtrace_string();
+  poly dp_LPshiftT( poly p, int sh, kStrategy strat,
+                    const ring r, int line, const char* file );
+  poly dp_mLPshift( poly p, int sh, kStrategy strat,
+                    const ring r, int line, const char* file );
+  void dFreeSize( void* ptr, size_t size,
+                   int line, const char* file );
+  poly dp_Init( ring r, int line, const char* file );
+  poly dp_Head( poly p, ring r,
+                int line, const char* file );
+  poly dp_Copy( poly p, ring rh, ring rt,
+                int line, const char* file );
+  void dp_LmFree( poly p, ring r,
+                  int line, const char* file );
+  void dp_LmFree( poly* p, ring r,
+                  int line, const char* file );
+  void dp_Delete( poly* p, ring r,
+                  int line, const char* file );
+  void dp_Delete( poly* p, ring rlm, ring rtl,
+                  int line, const char* file );
+  void dp_LmDelete( poly p, ring r,
+                    int line, const char* file );
 
-typedef skStrategy* kStrategy;
+  typedef skStrategy* kStrategy;
 
 
 #if DEBOGRI > 0
@@ -191,12 +225,44 @@ class ShiftDVec::DeBoGri
 #define deBoGriPrintCounter(description, flag) \
   deBoGriPrint(counter, description, flag)
 
+#define OMALLOC( size, ptype )\
+  ShiftDVec::dAlloc( (size)*sizeof(ptype), __LINE__, __FILE__ )
+
+#define OMALLOC_0( size, ptype )\
+  ShiftDVec::dAlloc0( (size)*sizeof(ptype), __LINE__, __FILE__ )
+
+#define OMFREES( ptr, size, ptype )\
+  ShiftDVec::dFreeSize((void*)(ptr),\
+                       (size)*sizeof(ptype), __LINE__, __FILE__)
+
+#define OMREALLOCS( ptr, size_old, size_new, ptype )\
+  ShiftDVec::dReallocSize( (void*)(ptr),\
+                           (size_old)*sizeof(ptype),\
+                           (size_new)*sizeof(ptype),\
+                           __LINE__, __FILE__ )
+
+#define MEMORY_LOG(descr, ptr)\
+  ShiftDVec::memory_log(descr, ptr, __LINE__, __FILE__)
+#define P_INIT(r)      dp_Init( r, __LINE__, __FILE__ )
+#define P_HEAD(p, r)   dp_Head( p, r, __LINE__, __FILE__ )
+#define P_COPY(p, rlm, rtl)\
+  dp_Copy( p, rlm, rtl, __LINE__, __FILE__ )
+#define P_DELETE(...)  dp_Delete(__VA_ARGS__, __LINE__, __FILE__)
+#define P_LMFREE(p, r)   dp_LmFree( p, r, __LINE__, __FILE__ )
+#define P_LMDELETE(p, r) dp_LmDelete( p, r, __LINE__, __FILE__ )
+#define PMLP_SHIFT( p, sh, strat, r )\
+  dp_mLPshift( p, sh, strat, r, __LINE__, __FILE__ )
+#define PLP_SHIFT_T( p, sh, strat, r )\
+  dp_LPshiftT( p, sh, strat, r, __LINE__, __FILE__ )
+
 #ifndef HAVE_DEBOTRITEST
 #define deBoGriTTest(x1) ((void) 0)
 #endif
 
 #else //#if DEBOGRI > 0 i.e DEBOGRI <= 0
 
+#define ExtensionTTest(...) ((void) 0)
+#define DegreeTTest(...) ((void) 0)
 #define deBoGriTTest(x1) ((void) 0)
 #define loGriToFile(...) ((void) 0)
 #define initDeBoGri(...) ((void) 0)
@@ -210,10 +276,34 @@ class ShiftDVec::DeBoGri
 #define deBoGriIncCounter() ((void) 0)
 #define lmHasZeroShift(...) ((void) 0)
 
+#define OMALLOC( size, ptype )   omAlloc( (size)*sizeof(ptype) )
+#define OMALLOC_0( size, ptype ) omAlloc0( (size)*sizeof(ptype) )
+#define OMFREES( ptr, size, ptype )\
+  omFreeSize( (void*)(ptr), (size)*sizeof(ptype) )
+#define OMREALLOCS( ptr, size_old, size_new, ptype )\
+  omReallocSize( ptr,\
+                 (size_old)*sizeof(ptype),\
+                 (size_new)*sizeof(ptype)   )
+
+#define MEMORY_LOG(...) ((void) 0)
+#define P_INIT(r)              p_Init(r)
+#define P_HEAD(p, r)           p_Head(p, r)
+#define P_COPY(p, rlm, rtl)    p_Copy(p, rlm, rtl)
+#define P_DELETE(...)          p_Delete(__VA_ARGS__)
+#define P_LMFREE(p, r)         p_LmFree(p, r)
+#define P_LMDELETE(p, r)       p_LmDelete(p, r)
+#define PMLP_SHIFT( p, sh, strat, r )\
+  ::p_mLPshift( p, sh, strat->get_uptodeg(), strat->get_lV(), r )
+#define PLP_SHIFT_T( p, sh, strat, r )\
+  p_LPshiftT( p, sh,\
+              strat->get_uptodeg(), strat->get_lV(), strat, r )
+
 #endif //#if DEBOGRI > 0
 
 
 #endif //ifndef SDDEBUG_H
 
 
-/* vim: set foldmethod=syntax : */
+// vim: set foldmethod=syntax :
+// vim: set textwidth=65 :
+// vim: set colorcolumn=+1 :

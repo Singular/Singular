@@ -1,8 +1,18 @@
 break dErrorBreak
-#source gdb/helpers
-#source gdb/bos_gdb_ext.py
+source gdb/helpers
+source gdb/bos_gdb_ext.py
+#source gdb/debug_FDeg
+#source gdb/debug_order_of_pairs
+#source gdb/debug_create_short
+#source gdb/debug_everything
+#source gdb/debug_initenterpairs
+#source gdb/debug_redLP
+#source gdb/debug_S
+#source gdb/debug_L
+#source gdb/debug_LS
+#source gdb/print_set_sizes
 
-#set pagination off
+set pagination off
 #set logging overwrite on
 #set logging redirect on
 #set logging file log-file.txt
@@ -28,3 +38,5 @@ break dErrorBreak
 # call dup(0)
 
 # source gdb/debug_redHomog
+# source gdb/debug_FDeg
+# blc ShiftDVec::bba 'red_result = strat->red(&strat->P,strat);'

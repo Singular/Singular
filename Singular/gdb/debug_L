@@ -1,0 +1,18 @@
+# problems with reduction (redLP) ...
+
+# include helpers and bos_gdb_ext.py first
+
+break ShiftDVec::bba
+commands
+  set $strat_cnt=0
+  continue
+end
+
+blc ShiftDVec::bba 'SD::enterpairs'
+commands
+  silent
+  set $strat_cnt = $strat_cnt + 1
+  printf "\n\nBefore entering Pairs %03d:\n", $strat_cnt
+end
+
+# vim: set ft=gdb :

@@ -1,20 +1,44 @@
-// vim: set foldmethod=syntax:
+/*! @file
+ *
+ * @brief Reduction of Letterplace Polynomials
+ *
+ * This file is part of the Letterplace ShiftDVec Project
+ *
+ * @author Grischa Studzinski
+ * @author Benjamin Schnitzler benjaminschnitzler@googlemail.com
+ *
+ * @copyright see main copyright notice for Singular
+ *
+ * \todo Which procedures have to be adapted for spielwiese?
+ * \todo Test and debug procedures from this file
+ * \todo Find out, which files we have to include
+ * \todo add documentation, where missing
+ */
 
 #include <kutil.h>
+#include <SDDebug.h>
 #include <SDBase.h>
 #include <SDReduce.h>
 #include <SDMultiplication.h>
 
 #include <misc/options.h> // for TEST_OPT_LENGTH macro
 
-/* reduction procedure for the homogeneous case
- * and the case of a degree-ordering
- * original resides in kstd2.cc
+/** @brief Reduction Procedure for the Homogeneous case
+ *         and the case of a Degree-Ordering for Letterplace
+ *
+ *  This function was derived from redHomog.
+ *
+ *  We want to reduce h with elements from strat->T or strat->U
+ *
+ *  \todo explanation (of parameters, too)
+ *  \todo explanation of strat->T and strat->U
  */
-int ShiftDVec::redHomog( LObject* h, ::kStrategy strategy )
+int ShiftDVec::redLP( LObject* h, ::kStrategy strategy )
 {
   namespace SD = ShiftDVec;
   namespace RD = ShiftDVec::Reduce;
+
+  ExtensionTTest(h, -2);
 
   SD::kStrategy strat = static_cast<SD::kStrategy>(strategy);
 
@@ -55,7 +79,11 @@ int ShiftDVec::redHomog( LObject* h, ::kStrategy strategy )
   }
 }
 
-/*- search the shortest possible with respect to length -*/
+/** @brief Search the shortest possible Divisor with respect to
+ *         length in strat->T
+ *
+ *  \todo review and explain this procedure and its parameters
+ */ 
 int ShiftDVec::Reduce::red_get_opt_len
   (uint* shift, SD::kStrategy strat, int i, int li, LObject* h)
 {
@@ -117,10 +145,14 @@ void ShiftDVec::Reduce::debug_red_to_print( LObject* to )
 #endif
 }
 
+/* Reduction Procedure for ShiftDVec Letterplace
+ *
+ * \todo explain function and parameters in detail
+ */
 void
-ShiftDVec::Reduce::red_reduce_with(LObject* red,
-                                   TObject* with,
-                                   uint shift, kStrategy strat)
+ShiftDVec::Reduce::red_reduce_with( LObject* red,
+                                    TObject* with,
+                                    uint sh, kStrategy strat )
 {
   if (TEST_OPT_DEBUG) debug_red_with_print( red, with );
   assume(strat->fromT == FALSE);
@@ -128,28 +160,22 @@ ShiftDVec::Reduce::red_reduce_with(LObject* red,
   TObject tmp; //save the unshifted poly
   tmp.p = with->p;
   tmp.t_p = with->t_p;
-  if(shift > 0)
+  if(sh > 0)
   {
-    with->t_p = p_LPshiftT
-      ( tmp.t_p, shift, 
-        strat->get_uptodeg(),
-        strat->get_lV(), strat, strat->tailRing );
-    with->p = p_LPshiftT
-      ( tmp.p, shift, 
-        strat->get_uptodeg(),
-        strat->get_lV(), strat, currRing );
+    with->t_p = PLP_SHIFT_T(tmp.t_p, sh, strat, strat->tailRing);
+    with->p   = PLP_SHIFT_T( tmp.p, sh, strat, currRing );
   }
   tmp.tailRing = with->tailRing; //BOCO: added...
-  SD::ksReducePoly( red, &tmp, with );
+  SD::ksReducePoly( red, &tmp, with, NULL, NULL, strat );
   red->SD_Ext()->freeDVec();
 
-  if(shift > 0)
+  if(sh > 0)
   {
-    p_Delete(&(with->t_p), strat->tailRing); 
+    P_DELETE(&(with->t_p), strat->tailRing); 
     if(with->p)
     {
       with->p->next = NULL;
-      pDelete(&(with->p));
+      P_DELETE(&(with->p), currRing);
     }
 
     with->p = tmp.p;
@@ -167,7 +193,7 @@ unsigned long ShiftDVec::Reduce::after_red( LObject* h )
 
   if (h_p == NULL)
   {
-    if (h->lcm!=NULL) pLmFree(h->lcm);
+    if (h->lcm!=NULL) P_LMFREE(h->lcm, currRing);
 
     h->SD_Ext()->freeDVec(); //BOCO TODO: is this necessary ?
 
@@ -331,6 +357,9 @@ int ShiftDVec::Reduce::kFindDivisibleByInT
 {
   namespace SD = ShiftDVec;
 
+  ExtensionTTest(T, tlen);
+  ExtensionTTest(L, -2);
+
   unsigned long not_sev = ~L->sev;
 
   int j = start;
@@ -368,6 +397,14 @@ int ShiftDVec::Reduce::kFindDivisibleByInT
   return ret;  //BOCO: added
 }
 
+/** @brief find a divisor in strat->T or strat->U
+ *
+ *  \todo I have forgotten, what strat->U is. An additional set
+ *        of divisors?
+ *  \todo explain this function and its parameters (or let it be,
+ *        since an explanation for kFindDivisibleByInT would be
+ *        sufficient).
+ */
 int ShiftDVec::Reduce::kFindDivisibleByInUT
   ( LObject* h, uint& shift, SD::kStrategy strat )
 {
@@ -376,7 +413,7 @@ int ShiftDVec::Reduce::kFindDivisibleByInUT
   int j = RD::kFindDivisibleByInT
            (strat->T, strat->tl, strat->sevT, h, shift, strat);
 
-  if( j < 0 && !strat->is_lgb_case() ) return j;
+  if( j >= 0 || !strat->is_lgb_case() ) return j;
 
   return
     RD::kFindDivisibleByInT( strat->U,
@@ -392,10 +429,14 @@ int ShiftDVec::Reduce::kFindDivisibleByInUS
   int j = SD::kFindDivisibleByInS( strat,
                                    &(strat->sl), h, shift );
 
-  if( j < 0 && !strat->is_lgb_case() ) return j;
+  if( j >= 0 || !strat->is_lgb_case() ) return j;
 
   return
     RD::kFindDivisibleByInT( strat->U,
                              strat->get_size_of_U()-1,
                              strat->sevT, h, shift, strat );
 }
+
+// vim: set foldmethod=syntax :
+// vim: set textwidth=65 :
+// vim: set colorcolumn=+1 :

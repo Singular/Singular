@@ -1,0 +1,56 @@
+# order in which pairs are are entered into L is different in new/old version. I
+# want to figure out why and to revise the change in the new version.
+
+# include helpers and bos_gdb_ext.py first
+
+break ShiftDVec::bba
+commands
+  set $enter_cnt=0
+  set $terms_cnt=0
+  set $enter_cnt=0
+  continue
+end
+
+# print strat->L after enterpairs
+#blc ShiftDVec::bba 'strat->enterS'
+#commands
+#  silent
+#  if $enter_cnt < 7
+#    printf "After enterpairs. Counter: %d\n", $enter_cnt
+#    call fflush(0x0)
+#    pls
+#    set $enter_cnt = $enter_cnt + 1
+#    continue
+#  end
+#end
+
+# print m1 and m2 in kCheckSpolyCreation after k_GetLeadTerms
+#blc ShiftDVec::kCheckSpolyCreation '// shift changes: extra'
+#commands
+#  silent
+#  if $terms_cnt < 8
+#    printf "After k_GetLeadTerms in kCheckSp... . Counter: %d\n", $terms_cnt
+#    printf "m1:  "
+#    call (void)fflush(0x0)
+#    ptt m1
+#    printf "m2:  "
+#    call (void)fflush(0x0)
+#    ptt m2
+#    set $terms_cnt = $terms_cnt + 1
+#    continue
+#  end
+#end
+
+blc ShiftDVec::enterOnePair 'enterL'
+commands
+  silent
+  if $enter_cnt < 8 || 1
+    printf "\nin enterOnePair before enterL. Counter: %d\n", $enter_cnt
+    call (void)fflush(0x0)
+    pll Lp
+    set $enter_cnt = $enter_cnt + 1
+    continue
+  end
+end
+
+# vim: set ft=gdb:

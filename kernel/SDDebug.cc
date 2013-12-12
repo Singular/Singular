@@ -1,4 +1,4 @@
-#include <SDDebug.h>
+#include <kernel/SDDebug.h>
 /* file:        SDDebug.cc
  * authors:     Grischa Studzinski & Benjamin Schnitzler
  * created:     ask git
@@ -11,7 +11,49 @@
 //#include <kernel/SDkutil.h>//do this via kutil.h otherwise...
 #include <kutil.h>
 
+#if DEBOGRI > 0
+#include <execinfo.h>  // for backtrace procedures (linux only)
+#endif
+
 namespace SD = ShiftDVec;
+
+#if DEBOGRI > 0
+/** Test if SD Extentions are initialized correct
+ *
+ * \remark
+ *   Following the a strange Singular tradition, tl is equal to
+ *   the number of TObjects in T plus one! If tl == -2, then
+ *   T is assumed to be a pointer to a single TObject.
+ */
+void ShiftDVec::ExtensionTTest(sTObject* T, int tl)
+{
+  if(tl == -1 || tl < -2) return;
+  if(tl == -2)
+    if(T->SD_Ext()) assume(T->SD_Ext()->T == T);
+  else
+    for(int i = 0; i <= tl; ++i)
+      if(T[i].SD_Ext()) assume(T[i].SD_Ext()->T == T+i);
+}
+#endif
+
+#if DEBOGRI > 0
+/** Test if T->FDeg is initialized correctly
+ *
+ * \remark
+ *   Following the a strange Singular tradition, tl is equal to
+ *   the number of TObjects in T plus one! If tl == -2, then
+ *   T is assumed to be a pointer to a single TObject.
+ */
+void ShiftDVec::DegreeTTest(sTObject* T, int tl)
+{
+  if(tl == -1 || tl < -2) return;
+  if(tl == -2)            assume( T->FDeg == T->pFDeg() );
+  else
+    for(int i = 0; i <= tl; ++i)
+      assume( T[i].FDeg == T[i].pFDeg() );
+}
+#endif
+
 
 void ShiftDVec::dvecWrite(const poly p, ring r)
 {
@@ -343,4 +385,165 @@ void ShiftDVec::deBoGriTTest(kStrategy strat)
 }
 #endif
 
-/* vim: set foldmethod=syntax : */
+
+#if DEBOGRI > 0
+char* ShiftDVec::backtrace_string()
+{
+  const int bt_buf_size = 32;
+  const int bt_str_buf_size = 1024;
+
+  void* bt_buffer[bt_buf_size];
+  static char ret_str[bt_str_buf_size];
+  strcpy(ret_str, "    ");
+
+  int act_depth = backtrace(bt_buffer, bt_buf_size);
+  char** bt_symbols = backtrace_symbols(bt_buffer, act_depth);
+
+  for(int i = 0; i < act_depth; ++i)
+  {
+    if( strchr(bt_symbols[i], '+') )
+    {
+      char* first = strchr(bt_symbols[i], '(');
+      ++first;
+      if( i > 0 ) strncat(ret_str, "\n    ", bt_str_buf_size);
+      strncat(ret_str, strtok(first, "+"), bt_str_buf_size);
+    }
+  }
+
+  return ret_str;
+}
+
+void ShiftDVec::memory_log( const char* descr,
+                            const void* ptr,
+                            int line, const char* file )
+{
+  static FILE* fd_mem_log = NULL;
+
+  if(!fd_mem_log) fd_mem_log = fopen("SDMemory.log", "w");
+
+
+  fprintf( fd_mem_log, "%-15s %-15p", descr, ptr );
+  fprintf( fd_mem_log, "  %4d:%-22s\n", line, file );
+
+  char* bt = backtrace_string();
+  fprintf( fd_mem_log, "%s\n", bt );
+
+  fflush( fd_mem_log );
+}
+
+void* ShiftDVec::dAlloc(size_t size, int line, const char* file)
+{
+  void* ptr = omAlloc(size);
+  memory_log( "omAlloc", ptr, line, file );
+  return ptr;
+}
+
+void* ShiftDVec::dAlloc0( size_t size, int line, const char* file)
+{
+  void* ptr = omAlloc0(size);
+  memory_log( "omAlloc0", ptr, line, file );
+  return ptr;
+}
+
+void* ShiftDVec::dReallocSize( void* ptr,
+                               size_t size_old,
+                               size_t size_new,
+                               int line, const char* file )
+{
+  memory_log( "omReallocSize", ptr, line, file );
+  ptr = omReallocSize( ptr, size_old, size_new );
+  memory_log( "omReallocSize", ptr, line, file );
+  return ptr;
+}
+
+void ShiftDVec::dFreeSize( void* ptr, size_t size,
+                            int line, const char* file )
+{
+
+  memory_log( "omFreeSize", ptr, line, file );
+  omFreeSize( ptr, size );
+}
+
+poly ShiftDVec::dp_Init( ring r, int line, const char* file )
+{
+  poly p = p_Init(r);
+  memory_log( "p_Init", p, line, file );
+  return p;
+}
+
+poly ShiftDVec::dp_Head( poly p, ring r,
+                         int line, const char* file )
+{
+  p = p_Head(p, r);
+  memory_log( "p_Head", p, line, file );
+  return p;
+}
+
+poly ShiftDVec::dp_Copy( poly p, ring rh, ring rt,
+                         int line, const char* file )
+{
+  p = p_Copy(p, rh, rt);
+  memory_log( "p_Copy", p, line, file );
+  return p;
+}
+
+void ShiftDVec::dp_LmFree( poly p, ring r,
+                           int line, const char* file )
+{
+  memory_log( "p_LmFree", p, line, file );
+  p_LmFree(p, r);
+}
+
+void ShiftDVec::dp_LmFree( poly* p, ring r,
+                           int line, const char* file )
+{
+  memory_log( "p_LmFree", *p, line, file );
+  p_LmFree(p, r);
+}
+
+void ShiftDVec::dp_Delete( poly* p, ring r,
+                           int line, const char* file )
+{
+  memory_log( "p_Delete", *p, line, file );
+  p_Delete(p, r);
+}
+
+void ShiftDVec::dp_Delete( poly* p, ring rlm, ring rtl,
+                           int line, const char* file )
+{
+  memory_log( "p_Delete", *p, line, file );
+  p_Delete(p, rlm, rtl);
+}
+
+void ShiftDVec::dp_LmDelete( poly p, ring r,
+                             int line, const char* file )
+{
+  memory_log( "p_LmDelete", p, line, file );
+  p_LmDelete(p, r);
+}
+
+poly ShiftDVec::dp_LPshiftT( poly p, int sh,
+                             kStrategy strat, const ring r,
+                             int line, const char* file )
+{
+  p = p_LPshiftT( p, sh,
+                  strat->get_uptodeg(),
+                  strat->get_lV(), strat, r );
+  memory_log( "dp_LPshiftT", p, line, file );
+  return p;
+}
+
+poly ShiftDVec::dp_mLPshift( poly p, int sh,
+                             kStrategy strat, const ring r,
+                             int line, const char* file )
+{
+  p = p_mLPshift( p, sh,
+                  strat->get_uptodeg(), strat->get_lV(), r );
+  memory_log( "dp_mLPshift", p, line, file );
+  return p;
+}
+#endif
+
+// vim: set foldmethod=syntax :
+// vim: set textwidth=65 :
+// vim: set colorcolumn=+1 :

@@ -1,14 +1,21 @@
-/* file:        SDkutil.cc
- * authors:     Grischa Studzinski & Benjamin Schnitzler
- * created:     ask git
- * last change: ask git
+/*! @file
  *
- * TODO:
- * a lot (see SDkutil.h)
- * - loop
- *     search for (semantic and syntax) bugs
- *   until all bugs are cleared
- * (unfortunatly the above statement does not compile)
+ * @brief Various Helper Functions and Definitions for the
+ *        Classes used in the Letterplace ShiftDVec
+ *        Implementation
+ *
+ * This file is part of the Letterplace ShiftDVec Project
+ *
+ * @author Grischa Studzinski
+ * @author Benjamin Schnitzler benjaminschnitzler@googlemail.com
+ *
+ * @copyright see main copyright notice for Singular
+ *
+ * \todo Reflect about todo
+ * \todo Adaption for the new 'shift free' version of the algorithm
+ * \todo good (doxygen) Documentation is yet to be created for the
+ *       functions in this file
+ * \todo Which functions do need a change for Spielwiese
  */
 
 #include <kernel/kutil.h>
@@ -50,14 +57,8 @@ ShiftDVec::sTObjectExtension* sTObject::SD_Ext_Init()
 {
   if( SD_Object_Extension ) SD_Ext_Delete();
 
-  SD_Object_Extension = new ShiftDVec::sTObjectExtension(this);
-
-  SD_DEBUG_LOG("SDExt_Memory")
-    << __FILE__ << ":" << __LINE__  << " -- "
-    << "new" << " -- "
-    << ShiftDVec::Debug::addr(SD_Object_Extension)
-    <<"\n" << ShiftDVec::Debug::AbstractLogger::Flush;
-
+  SD_Object_Extension = new TExt(this);
+  MEMORY_LOG("new TExt", SD_Object_Extension);
 
   SD_Ext()->Extension_Type = TExt::TObject_Extension;
   SD_Ext()->Set_Number_Of_Possesors(1);
@@ -76,18 +77,83 @@ ShiftDVec::sTObjectExtension* sTObject::SD_Ext_Init_If_NULL()
  * other object will retain possession of the extension.
  */
 ShiftDVec::sTObjectExtension*
-sTObject::Own_Extension_From(sTObject* Other_Possesor)
+sTObject::Own_Extension_From(const sTObject* Other_Possessor)
 {
-  assume( Other_Possesor->SD_Ext() != NULL );
-  assume( SD_Object_Extension == NULL );
-  assume( SD_Object_Extension != Other_Possesor->SD_Ext() );
-
-  if( SD_Object_Extension ) SD_Ext_Delete();
-  if( Other_Possesor->SD_Ext() != NULL )
+  if( SD_Ext() )
   {
-    SD_Object_Extension = Other_Possesor->SD_Ext();
-    SD_Ext()->number_of_possesors += 1;
+    if( SD_Ext() == Other_Possessor->SD_Ext() ) return SD_Ext();
+    SD_Ext_Delete();
   }
+
+  if( Other_Possessor->SD_Ext() == NULL )
+    return SD_Object_Extension = NULL;
+
+  SD_Object_Extension = Other_Possessor->SD_Ext();
+  SD_Ext()->number_of_possesors += 1;
+
+  return SD_Ext();
+}
+
+/* BOCO:
+ * Get possesion of an extension from an other sTObject. The
+ * other object will loose the extension.
+ */
+ShiftDVec::sTObjectExtension*
+sTObject::Acquire_Extension_From(sTObject* Other_Possessor)
+{
+  if( SD_Ext() )
+  {
+    if( SD_Ext() == Other_Possessor->SD_Ext() )
+    {
+      Other_Possessor->SD_Ext_Delete();
+      SD_Ext()->T = this;
+      return SD_Ext();
+    }
+    SD_Ext_Delete();
+  }
+
+  if( Other_Possessor->SD_Ext() == NULL )
+    return SD_Object_Extension = NULL;
+
+  SD_Object_Extension = Other_Possessor->SD_Ext();
+  SD_Ext()->number_of_possesors += 1;
+  Other_Possessor->SD_Ext_Delete();
+
+  SD_Ext()->T = this;
+
+  return SD_Ext();
+}
+
+/** Copy the extension from another object
+ *
+ *  Copy everything (but set number_of_possessors to 1)!
+ *  Deepcopy of everything, EXCEPT the DVec, whose pointer is
+ *  just acquired!
+ *
+ *  \todo this is not a good idea...
+ *  \todo optionally make it possible to deepcopy DVec!
+ */
+ShiftDVec::sTObjectExtension*
+sLObject::Copy_Extension_From(const sTObject* from_this)
+{
+  assume( SD_Object_Extension == NULL );
+
+  if( !from_this->SD_Ext() ) return (SD_Object_Extension=NULL);
+
+  switch( from_this->SD_Ext()->Extension_Type )
+  {
+    case TExt::TObject_Extension:
+      SD_Ext_Init();
+      break;
+    case TExt::LObject_Extension:
+      SD_LExt_Init()->shift_p2 = from_this->SD_LExt()->shift_p2;
+      break;
+    default:
+      assume(0);
+  }
+
+  SD_Ext()->dvec   = from_this->SD_Ext()->dvec;
+  SD_Ext()->dvSize = from_this->SD_Ext()->dvSize;
 
   return SD_Object_Extension;
 }
@@ -104,21 +170,17 @@ void sTObject::SD_Ext_Delete()
 
   SD_Ext()->number_of_possesors -= 1;
   assume(SD_Ext()->number_of_possesors >= 0);
+  assume(SD_Ext()->number_of_possesors < 9999);
 
   if( SD_Ext()->number_of_possesors == 0)
   {
-
-    SD_DEBUG_LOG("SDExt_Memory")
-    << __FILE__ << ":" << __LINE__  << " -- "
-    << "delete" << " -- " 
-    << ShiftDVec::Debug::addr(SD_Object_Extension)
-    << "\n" << ShiftDVec::Debug::AbstractLogger::Flush;
-
     switch( SD_Ext()->Extension_Type )
     {
       case TExt::TObject_Extension:
+        MEMORY_LOG("delete TExt", SD_Object_Extension);
         delete SD_Object_Extension;  break;
       case TExt::LObject_Extension:
+        MEMORY_LOG("delete LExt", SD_Object_Extension);
         delete static_cast<ShiftDVec::sLObjectExtension*>
               (SD_Object_Extension); break;
       default:
@@ -148,11 +210,7 @@ ShiftDVec::sLObjectExtension* sLObject::SD_LExt_Init()
   if( SD_Object_Extension ) { SD_Ext_Delete(); }
     
   LExt* ext = new LExt(this);
- 
-  SD_DEBUG_LOG("SDExt_Memory")
-  << __FILE__ << ":" << __LINE__  << " -- "
-  << "new" << " -- " << ShiftDVec::Debug::addr(ext)
-  << "\n" << ShiftDVec::Debug::AbstractLogger::Flush;
+  MEMORY_LOG("new LExt", ext);
 
   SD_Object_Extension = ext;
   SD_Ext()->Extension_Type = TExt::LObject_Extension;
@@ -264,12 +322,7 @@ void ShiftDVec::sTObjectExtension::freeDVec()
 {
   if(this && dvec)
   {
-    SD_DEBUG_LOG("DVec_Memory")
-     << __FILE__ << ":" << __LINE__  << " -- "
-     << "omFreeSize" << " -- " << ShiftDVec::Debug::addr(dvec)
-     << "\n" << ShiftDVec::Debug::AbstractLogger::Flush;
-
-    omFreeSize( (ADDRESS)dvec, sizeof(uint) * dvSize );
+    OMFREES( dvec, dvSize, uint );
     dvec = NULL;
     dvSize = 0;
   }
@@ -335,7 +388,7 @@ void ShiftDVec::sLObjectExtension::SetLcmDVec(ring r)
 
   assume(dvSize > 0);
 
-  dvec = (uint *)omAlloc0( dvSize*sizeof(uint) );
+  dvec = (uint *)OMALLOC_0( dvSize, uint );
 
   uint * it = dvec;
 
@@ -528,15 +581,10 @@ uint ShiftDVec::CreateDVec (poly p, ring r, uint*& dvec)
 
   //I hope this is the right way to get the total deg. of lm(p)
   uint dvSize = p_Totaldegree(p, r);
-  assume(dvSize < 1000);
+  if(dvSize == 0){dvec = NULL; return 0;}
+  assume(dvSize < 1000); // this is funny, but often recued me
   if(!dvSize){dvec = NULL; return 0;}
-  dvec = (uint *)omAlloc0(dvSize*sizeof(uint));
-
-  SD_DEBUG_LOG("DVec_Memory")
-   << __FILE__ << ":" << __LINE__  << " -- "
-   << "omAlloc0" << " -- " << ShiftDVec::Debug::addr(dvec)
-   << "\n" << ShiftDVec::Debug::AbstractLogger::Flush;
-
+  dvec = (uint *) OMALLOC_0( dvSize, uint );
 
   uint * it = dvec;
 
@@ -596,7 +644,7 @@ uint ShiftDVec::divisibleBy
   if(dvSize1 < dvSize2) return UINT_MAX;
   if(!dvSize2) return UINT_MAX-1;
 
-  uint * tmpVec = (uint *)omAlloc0(dvSize1*sizeof(uint));
+  uint * tmpVec = (uint *)OMALLOC_0( dvSize1, uint );
   memcpy((void*)tmpVec,(void*)dvec1,dvSize1*sizeof(uint));
 
   //overflow can not happen since dvSize1 <= dvSize2
@@ -607,17 +655,17 @@ uint ShiftDVec::divisibleBy
   {
     if(!memcmp((void*)(tmpVec+shift),(void*)dvec2,cmpLen))
     {
-      omFreeSize((ADDRESS)tmpVec, sizeof(uint)*dvSize1);
+      OMFREES( tmpVec, dvSize1, uint );
       return shift;
     }
     tmpVec[shift+1] = tmpVec[shift] + tmpVec[shift+1] - numVars;
   }
   if(!memcmp((void*)(tmpVec+shift),(void*)dvec2,cmpLen))
   {
-    omFreeSize((ADDRESS)tmpVec, sizeof(uint)*dvSize1);
+    OMFREES( tmpVec, dvSize1, uint );
     return shift;
   }
-  omFreeSize((ADDRESS)tmpVec, sizeof(uint)*dvSize1);
+  OMFREES( tmpVec, dvSize1, uint );
   return UINT_MAX;
 }
 
@@ -651,7 +699,7 @@ uint ShiftDVec::divisibleBy
   assume(maxShift + dvSize2 < dvSize1);
 
   uint tmpSize = (maxShift - minShift + dvSize2);
-  uint * tmpVec = (uint *) omAlloc0( tmpSize*sizeof(uint) );
+  uint * tmpVec = (uint *) OMALLOC_0( tmpSize, uint );
 
   memcpy
     ((void*)tmpVec,(void*)(dvec1+minShift),tmpSize*sizeof(uint));
@@ -662,13 +710,13 @@ uint ShiftDVec::divisibleBy
   size_t cmpLen = dvSize2 * sizeof(uint);
   for(int shift=0; shift <= maxShift - minShift; ++shift){
     if(!memcmp((void*)(tmpVec+shift),(void*)dvec2,cmpLen)){
-      omFreeSize((ADDRESS)tmpVec, sizeof(uint)*tmpSize);
+      OMFREES( tmpVec, tmpSize, uint );
       return shift;
     }
     tmpVec[shift+1] = tmpVec[shift] + tmpVec[shift+1] - numVars;
   }
 
-  omFreeSize((ADDRESS)tmpVec, sizeof(uint)*tmpSize);
+  OMFREES( tmpVec, tmpSize, uint );
   return UINT_MAX;
 }
 
@@ -822,16 +870,20 @@ BOOLEAN ShiftDVec::redViolatesDeg
   return tg_b + tg_a - tg_b > uptodeg;
 }
 
-/* Returns true, if the creation of the s-poly of poly a and
- * poly b would violate the degree bound, false otherwise.
- * shift has to be the shift of a, such that b and shift a
- * have overlap, example with shift = 3 (x^2yz and y^3x^2)
- *    xxyz | poly a
- * yyyxx   | poly b
- * Will always return false, if uptodeg == 0.
- * WARNING/TODO:
- * Recently changed! Has to be tested again. Is it right, how we
- * handle Rings?
+/** Test for Degree Bound Violation before entering Pair
+ *
+ *  Returns true, if the creation of the s-poly of poly a and
+ *  poly b would violate the degree bound, false otherwise.
+ *  shift has to be the shift of a, such that b and shift a
+ *  have overlap, example with shift = 3 (x^2yz and y^3x^2)
+ *     xxyz | poly a
+ *  yyyxx   | poly b
+ *  Will always return false, if uptodeg == 0.
+ *  WARNING/TODO:
+ *  Recently changed! Has to be tested again. Is it right, how we
+ *  handle Rings?
+ *
+ *  \todo doxygen explaination of parameters
  */
 bool ShiftDVec::createSPviolatesDeg
   ( poly a, poly b, uint shifta, int uptodeg,
@@ -880,4 +932,97 @@ bool ShiftDVec::shiftViolatesDeg
   return false;
 }
 
-/* vim: set foldmethod=syntax : */
+/** return a copy of a (letterplace) monomial in another ring
+ *
+ *  the number of exponents copied (equal to zero/one) is
+ *  determined by nexp, which defaults to the largest possible,
+ *  if negative.
+ *
+ *  copies lm(p1) while switching from r1 to r2 to lm(p2)
+ *  p2 should be initialized correctly
+ *  ( e.g. by setting p2 = p_init(r2) )
+ *
+ *  \remarks
+ *    - It's not very efficient and p_Setm has to be invoked on
+ *      the output. ( I could have done it slightly more
+ *      efficient, but I liked to do it like this... . I
+ *      shouldn't do that... .)
+ *    - The input polynomial has to be a letterplace polynomial
+ *      without gaps.
+ *    - returns the unweighted Totaldegree of the polynomial
+ *    - We could just return i/lV-1, as long as our ring has at
+ *      least two variables ;)
+ *
+ *  \todo test this function
+ */
+long ShiftDVec::p_lmCopy( poly p1, ring r1,
+                          poly p2, ring r2,
+                          int lV, long nexp )
+{
+  long i = 1;
+  long maxi = nexp > 0 ? nexp : r1->N;
+  do{
+    // We will loop, until we found an empty block, or until we
+    // considered all variables
+    do{
+      if( p_GetExp(p1, i, r1) )     // found a nonzero exponent
+      {                             // in this block, thus ...
+        p_SetExp(p2, i, 1, r2);
+        i = i + (lV - (i-1) % lV);  // ... we can move
+        goto nextblock;             // to the next block
+      }
+    }while( ++i % lV != 1 );        // found a block of zeros, so
+    return (i-1)/lV - 1;            // we may return (end of p1)
+    nextblock: ;
+  }while(i <= maxi);
+
+  return maxi/lV;
+}
+
+/** copy p2 into p1 beginning after offset o1 in p1 and o2 in p2
+ *
+ *  If this sounds confusing: A part of the exponent of p2 will
+ *  be copied into the exponet of p1 starting at exp[o1+1] in p1.
+ *  The part to be copied is everything in p2->exp starting from
+ *  o2+1. If this sound still confusing: The reason is probable,
+ *  that I drank lots of tea (Viktor allways makes very tasty
+ *  green tea - I luve it :) ).
+ *  \remarks
+ *    - This function was just created, when I somewhere was in
+ *      need of it. I love the symmetrie in it, which, funnily,
+ *      was a complete and utter coincidence
+ *    - returns the unweighted Totaldegree of the resulting
+ *      polynomial
+ *    - possibly this could be changed to be slightly more
+ *      efficient
+ *    - nexp ??? completely unused !!!
+ *
+ *  \todo test this function
+ */
+long ShiftDVec::p_lmAppend( poly p1, long o1, ring r1,
+                            poly p2, long o2, ring r2,
+                            int lV,  long nexp )
+{
+  long i = 1;
+  long maxi = o2 > o1 ? r1->N - o2 : r1->N - o1;  // maxi :)
+  do{
+    do{
+      // We will loop, until we found an empty block, or until we
+      // considered all variables
+      if( p_GetExp(p2, o2+i, r2) )  // found a nonzero exponent
+      {                             // in this block, thus ...
+        p_SetExp(p1, o1+i, 1, r1);
+        i = i + (lV - (i-1) % lV);  // ... we can move
+        goto nextblock;             // to the next block
+      }
+    }while( ++i % lV != 1 );        // found a block of zeros, so
+    return (o1+i-1)/lV - 1;         // we may return (end of p2)
+    nextblock: ;
+  }while( i <= maxi );
+
+  return maxi/lV;
+}
+
+// vim: set foldmethod=syntax :
+// vim: set textwidth=65 :
+// vim: set colorcolumn=+1 :

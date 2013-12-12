@@ -70,8 +70,8 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	kutil.h \
 	SDkutil.h \
 	SDDebug.h SDBase.h SDMultiplication.h SDReduce.h \
-	SDDebug/SDDebugger.h SDDebug/SDDebug.h \
-        SDDebug/SDLogger.h \
+	SDDebug/SDDebugger.h SDDebug/SDDebug.h SDPairs.h \
+  SDDebug/SDLogger.h \
 	khstd.h kstd1.h \
 	fglm.h fglmgauss.h fglmvec.h \
 	GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h \

@@ -1,0 +1,31 @@
+# some overlaps are not found - I want to correct that
+
+# include helpers and bos_gdb_ext.py first !!!
+
+break ShiftDVec::bba
+commands
+  silent
+  set $inent_cnt=0
+  continue
+end
+
+b ShiftDVec::initenterpairs
+commands
+  silent
+  printf "\n\nAt initenterpairs\n"
+  printf "Counter:%2d\n", $inent_cnt
+  if strat->sl > -1
+    printf "strat->S:\n"
+    pss
+  else
+    printf "strat->S is empty\n"
+  end
+  printf "H:\n"
+  pll H
+  set $inent_cnt = $inent_cnt + 1
+  if $inent_cnt <= 2
+    continue
+  end
+end
+
+# vim: set ft=gdb :

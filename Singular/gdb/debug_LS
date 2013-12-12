@@ -1,0 +1,33 @@
+# problems with reduction (redLP) ...
+
+# include helpers and bos_gdb_ext.py first
+
+break ShiftDVec::bba
+commands
+  set $strat_cnt=0
+  continue
+end
+
+blc ShiftDVec::bba 'red_result = strat->red'
+commands
+  silent
+  printf "\nstrat->P before reduction %03d:\n", $strat_cnt
+  pll strat->P
+  if $strat_cnt < 6
+    continue
+  end
+end
+
+blc ShiftDVec::bba 'if (hilb!=NULL)'
+commands
+  silent
+  printf "\nstrat->S after enterS %03d:\n", $strat_cnt
+  set $strat_cnt = $strat_cnt + 1
+  continue
+#  pss
+#  if $strat_cnt < 20
+#    continue
+#  end
+end
+
+# vim: set ft=gdb :

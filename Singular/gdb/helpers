@@ -16,6 +16,7 @@ define print_p_curryking
 end
 
 define pct
+  
   print_p_curryking $arg0
 end
 
@@ -31,8 +32,12 @@ define Pctt
   if $arg0.p == 0x0
     ptt $arg0.t_p
   else
-    ptt $arg0.t_p
+    pct $arg0.p
   end
+end
+
+define pp
+  call (void)p_Write($arg0, currRing, $arg1)
 end
 
 define disable_output
@@ -43,6 +48,105 @@ end
 
 define enable_output
    set logging off
+end
+
+define print_L
+  call Print("L.p:    ")
+  pct $arg0.p
+  call Print("L.t_p:  ")
+  ptt $arg0.t_p
+  call Print("L.p1:   ")
+  pct $arg0.p1
+  call Print("L.p2:   ")
+  pct $arg0.p2
+  if (LObject*)$arg0
+    set $ext = $arg0->SD_Ext()
+  else
+    set $ext = $arg0.SD_Ext()
+  end
+  if $ext != 0x0 
+    if $ext->Extension_Type == ShiftDVec::sTObjectExtension::LObject_Extension
+      if (LObject*)$arg0
+        set $lext = $arg0->SD_LExt()
+      else
+        set $lext = $arg0.SD_LExt()
+      end
+      printf "Shift of p2:  %d", $lext->shift_p2
+      call (void)fflush(0x0)
+    else
+      call Print("Object has TObject Extension")
+    end
+  else
+    call Print("Object has no extension!")
+  end
+end
+
+# $arg0 - The LSet
+# $arg1 - size of LSet
+define print_LSet
+  set $i = 0
+  while $i < $arg1
+    call (void)Print("\nLSet at nr.:  ")
+    printf "%d\n", $i
+    call (void)fflush(0x0)
+    print_L $arg0[$i]
+    set $i = $i + 1
+    printf "\n"
+  end
+  printf "\n"
+  call (void)fflush(0x0)
+end
+
+# $arg0 - C-array of polynomials
+# $arg1 - size of that array
+# $arg2 - lmRing
+# $arg3 - tailRing
+define print_polyarr
+  set $i = 0
+  while $i < $arg1
+    printf "Poly Nr.%2d: ", $i
+    call (void)fflush(0x0)
+    call (void)p_Write($arg0[$i], $arg2, $arg3)
+    set $i = $i + 1
+  end
+  call (void)fflush(0x0)
+end
+
+# $arg0 - dvec (C-array of unsigned integers)
+# $arg1 - size of that array
+define print_dvec
+  set $i = 0
+  printf "("
+  while $i < $arg1
+    printf "%d", $arg0[$i]
+    if $i < $arg1-1
+      printf " "
+    end
+    set $i = $i + 1
+  end
+  printf ")"
+end
+
+define pdv
+  print_dvec $arg0->SD_Ext()->dvec $arg0->SD_Ext()->dvSize
+end
+
+define pss
+  print_polyarr strat->S strat->sl+1 currRing strat->tailRing
+end
+
+define pls
+  print_LSet strat->L strat->Ll+1
+end
+
+define pll
+  print_L $arg0
+  printf "\n"
+  call (void)fflush(0x0)
+end
+
+define flush
+  call (void)fflush(0x0)
 end
 
 # vim: set ft=gdb :

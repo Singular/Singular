@@ -1,0 +1,50 @@
+# ksCreateShortSpoly is not yet working correct
+# compare it with original version (from older letterplace implementation)
+
+# include helpers and bos_gdb_ext.py first
+
+break ShiftDVec::bba
+commands
+  set $every_cnt=0
+  continue
+end
+
+blc ShiftDVec::bba 'strat->Ll--;'
+commands
+  silent
+  printf "\nAfter picking strat->L[strat->Ll]\n" 
+  printf "Counter: %d\n", $every_cnt
+  printf "strat->P:\n"
+  call (void)fflush(0x0)
+  pll strat->P
+  continue
+end
+
+blc ShiftDVec::bba 'if (red_result == 1)'
+commands
+  silent
+  printf "\nTesting for red_result at ShiftDVec::bba\n" 
+  printf "Counter: %d\n", $every_cnt
+  printf "red_result: %d\n", red_result
+  printf "strat->P:\n"
+  call (void)fflush(0x0)
+  pll strat->P
+  if $every_cnt < 5
+    set $every_cnt = $every_cnt + 1
+    continue
+  end
+end
+
+#blc ShiftDVec::kMergeBintoL 'enterL'
+#commands
+#  silent
+#  printf "\nBefore entering into strat->L\n" 
+#  printf "Counter: %d\n", $every_cnt
+#  pll strat->B[i]
+##  if $every_cnt < 20
+##    set $every_cnt = $every_cnt + 1
+##    continue
+##  end
+#end
+
+# vim: set ft=gdb:

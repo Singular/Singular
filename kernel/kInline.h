@@ -917,8 +917,10 @@ KINLINE long sLObject::Comp()
 
 KINLINE sLObject& sLObject::operator=(const sTObject& t)
 {
+  if( SD_Ext() ) SD_Ext_Delete();
   memset( this, 0, sizeof(sTObject) );
-  memcpy(this, &t, sizeof(sTObject));
+  memcpy( this, &t, sizeof(sTObject) );
+  if( t.SD_Ext() ) t.SD_Ext()->Increase_Number_Of_Possessors();
   return *this;
 }
 

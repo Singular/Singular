@@ -112,13 +112,19 @@ public:
   void SD_Ext_Delete();
 
   // hostile acquisition (well, not really)
-  ShiftDVec::sTObjectExtension* Own_Extension_From
-                                  ( sTObject* Other_Possesor );
+  ShiftDVec::sTObjectExtension*
+  Own_Extension_From( const sTObject* Other_Possesor );
+
+  // hostile acquisition (now really)
+  ShiftDVec::sTObjectExtension*
+  Acquire_Extension_From( sTObject* Other_Possesor );
 
   // access of the extension
   ShiftDVec::sTObjectExtension * SD_Ext() const
   { return SD_Object_Extension; }
   ShiftDVec::sLObjectExtension* SD_LExt() const;//in SDkutil.cc
+
+  void Set_Extension_To_NULL(){ SD_Object_Extension = NULL; }
 #endif
   
   // initialization
@@ -229,6 +235,9 @@ public:
 #ifdef HAVE_SHIFT_BBA_DVEC
   ShiftDVec::sLObjectExtension * SD_LExt_Init();//in SDkutil.cc
   ShiftDVec::sLObjectExtension * SD_LExt_Init_If_NULL();
+
+  ShiftDVec::sTObjectExtension*
+  Copy_Extension_From(const sTObject* from_this);
 #endif
 
   // initialization

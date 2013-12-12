@@ -4,7 +4,7 @@
 
 namespace ShiftDVec
 {
-  int redHomog( LObject* h, ::kStrategy strategy );
+  int redLP( LObject* h, ::kStrategy strategy );
 
   namespace Reduce
   {

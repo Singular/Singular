@@ -75,7 +75,7 @@ ideal ShiftDVec::leftgbdvc
 //BOCO: original resides in kstd1.cc
 //GRICO:update for left Bba
 //needed to initialize a new reduction??
-//like SD::redHomogLeft
+//like SD::redLPLeft
 void ShiftDVec::initBba( ideal F, ideal J, SD::kStrategy strat )
 {
   namespace SD = ShiftDVec;
@@ -89,9 +89,7 @@ void ShiftDVec::initBba( ideal F, ideal J, SD::kStrategy strat )
   //  We do not use redHoney/redLazy/redRing at the moment;
   //  See original code for reference
   //TODO:
-  //  redHomog also applies to the inhomogenous case
-  //  -> rename it!
-  strat->red = SD::redHomog;
+  strat->red = SD::redLP;
 
   if (currRing->pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
@@ -127,11 +125,11 @@ void ShiftDVec::LeftGB::initenterpairs
  
     //BOCO: arrays for overlaps
     uint** overlaps =
-      (uint**)omAlloc(strat->get_size_of_I()*sizeof(uint*));
+      (uint**)OMALLOC( strat->get_size_of_I(), uint* );
 
     //Sizes for above arrays
     uint* ovl_sizes =
-      (uint*)omAlloc(strat->get_size_of_I()*sizeof(uint));
+      (uint*)OMALLOC( strat->get_size_of_I(), uint );
 
     //BOCO: Find the overlaps
     for (int j = 0; j <= strat->get_size_of_I(); j++)
@@ -147,11 +145,9 @@ void ShiftDVec::LeftGB::initenterpairs
     //BOCO: Free arrays with overlaps
     for (int j = 0; j <= strat->get_size_of_I; j++)
       if( ovl_sizes[j] )
-        omFreeSize
-          ((ADDRESS)overlaps[j], sizeof(uint)*r_ovl_sizes[j]);
+        OMFREES( overlaps[j], r_ovl_sizes[j], uint );
 
-    omFreeSize( (ADDRESS)overlaps,
-                sizeof(uint)*strat->get_size_of_I() );
+    OMFREES( overlaps, strat->get_size_of_I(), uint );
   }
 
   //This was formerly done in the chainCrit.
@@ -277,7 +273,7 @@ void ShiftDVec::LeftGB::init_I( ideal I, SD::kStrategy strat )
     {
       TObject h;
 
-      h.p = pCopy(I->p[i]);
+      h.p = P_COPY(I->p[i], currRing, currRing);
       if (h.p!=NULL)
       {
         if (currRing->OrdSgn==-1)
@@ -446,4 +442,6 @@ void ShiftDVec::LeftGB::enterOverlaps
   }
 }
 
-/* vim: set foldmethod=syntax: */
+// vim: set foldmethod=syntax :
+// vim: set textwidth=65 :
+// vim: set colorcolumn=+1 :

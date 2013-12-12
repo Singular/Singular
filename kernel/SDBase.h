@@ -120,6 +120,7 @@ namespace ShiftDVec
   void DeBoGriTestGM
     ( TSet tset, int k,
       TObject* H, int uptodeg, int lVblock );
+  void TidyUp( ShiftDVec::kStrategy strat, ring curr );
 }
 
 #endif

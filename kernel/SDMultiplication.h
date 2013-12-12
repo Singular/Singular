@@ -1,3 +1,16 @@
+/*! @file
+ *
+ * @brief Function declarations for functions in SDMultiplication.cc
+ *        in namespace ShiftDVec
+ *
+ * This file is part of the Letterplace ShiftDVec Project
+ *
+ * @author Grischa Studzinski
+ * @author Benjamin Schnitzler benjaminschnitzler@googlemail.com
+ *
+ * @copyright see main copyright notice for Singular
+ */
+
 #ifndef SDMULTIPLICATION_H
 #define SDMULTIPLICATION_H
 
@@ -34,8 +47,9 @@ namespace ShiftDVec
       number *coef = NULL, SD::kStrategy strat = NULL );
 
   void ksCreateSpoly
-    ( LObject* Pair, poly spNoether, int use_buckets, 
-      ring tailRing, poly m1, poly m2, TObject** R    );
+    ( LObject* Pair, poly spNoether,
+      int use_buckets, ring tailRing,
+      poly m1, poly m2, TObject** R, kStrategy strat );
 
   int ksReducePolyTail
     ( LObject* PR, TObject* UPW, TObject* SPW, 
@@ -48,11 +62,18 @@ namespace ShiftDVec
   BOOLEAN kCheckSpolyCreation
     ( LObject *L, ShiftDVec::kStrategy strat, poly &m1, poly &m2 );
 
-  BOOLEAN k_GetLeadTerms
-    ( const poly p1, const poly p2, 
-      const ring p_r, poly &m1, poly &m2, const ring m_r );
+  BOOLEAN k_GetLeadTerms( const poly p1,
+                          const poly p2, uint shift_p2,
+                          const ring p_r, poly &m1, poly &m2,
+                          const ring m_r, SD::kStrategy strat );
+
+  poly ksCreateShortSpoly( poly p1, poly p2,
+                           uint shift_p2, int lV, ring tailRng );
 
   typedef skStrategy* kStrategy;
-
 }
 #endif
+
+// vim: set foldmethod=syntax :
+// vim: set textwidth=65 :
+// vim: set colorcolumn=+1 :

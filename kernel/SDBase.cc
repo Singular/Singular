@@ -124,8 +124,7 @@ static inline void enlargeL
 
 //BOCO: static function copied from kutil.cc
 inline static unsigned long* initsevS (const int maxnr)
-{ return 
-    (unsigned long*)omAlloc0(maxnr*sizeof(unsigned long)); }
+{ return (unsigned long*)omAlloc0(maxnr*sizeof(unsigned long)); }
 
 //BOCO: static function copied from kutil.cc
 inline static int* initS_2_R (const int maxnr)
@@ -184,6 +183,7 @@ ideal ShiftDVec::kStd
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   SD::skStrategy * strat=new SD::skStrategy;
+  MEMORY_LOG("new strat", strat);
 
 #ifdef HAVE_SHIFTBBADVEC //BOCO: added code
   strat->init_lV(lV);
@@ -334,6 +334,7 @@ ideal ShiftDVec::bba
   namespace SDD  = ShiftDVec::Debug;
   namespace SDDD = ShiftDVec::Debug::Debugger;
 
+
   SD_DEBUG_SEC
   {
     using namespace SDDD;
@@ -438,6 +439,10 @@ ideal ShiftDVec::bba
     }
     /* picks the last element from the lazyset L */
     strat->P = strat->L[strat->Ll];
+    if( strat->P.SD_Ext() ) strat->P.SD_Ext()->T = &(strat->P);
+    //strat->P.Set_Extension_To_NULL();
+    //strat->P.Copy_Extension_From(&(strat->L[strat->Ll]));
+    ExtensionTTest(&(strat->P), -2);
     strat->Ll--;
 
     deBoGriTTest(strat);
@@ -449,7 +454,7 @@ ideal ShiftDVec::bba
         pLmDelete(strat->P.p);
       else
 #endif
-        pLmFree(strat->P.p);
+        P_LMFREE(strat->P.p, currRing);
       strat->P.p = NULL;
       poly m1 = NULL, m2 = NULL;
 
@@ -479,12 +484,12 @@ ideal ShiftDVec::bba
       // create the real one
       ShiftDVec::ksCreateSpoly
         ( &(strat->P), NULL, strat->use_buckets,
-           strat->tailRing, m1, m2, strat->R );
+           strat->tailRing, m1, m2, strat->R, strat );
     }
     else if (strat->P.p1 == NULL)
     {
       if (strat->minim > 0)
-        strat->P.p2=p_Copy(strat->P.p, currRing, strat->tailRing);
+        strat->P.p2=P_COPY(strat->P.p, currRing, strat->tailRing);
       // for input polys, prepare reduction
       strat->P.PrepareRed(strat->use_buckets);
     }
@@ -500,7 +505,9 @@ ideal ShiftDVec::bba
                 &olddeg,&reduc,strat, red_result);
 
       /* reduction of the element choosen from L */
+      ExtensionTTest(&(strat->P), -2);
       red_result = strat->red(&strat->P,strat);
+      ExtensionTTest(&(strat->P), -2);
       if (errorreported)  break;
     }
 
@@ -563,9 +570,8 @@ ideal ShiftDVec::bba
       {
         if (strat->minim==1)
         {
-          strat->M->m[minimcnt]=p_Copy(strat->P.p,currRing,strat->tailRing);
-          loGriToFile("p_Delete in bba in shiftDVec.cc ",0 ,1024, (void*)strat->P.p2); 
-          p_Delete(&strat->P.p2, currRing, strat->tailRing);
+          strat->M->m[minimcnt]=P_COPY(strat->P.p,currRing,strat->tailRing);
+          P_DELETE(&strat->P.p2, currRing, strat->tailRing);
           //strat->P.p2 = NULL;  //BOCO: Did I add that? Why?
         }
         else
@@ -625,7 +631,7 @@ ideal ShiftDVec::bba
 #ifdef HAVE_RINGS
         pLmDelete(strat->P.lcm);
 #else
-        pLmFree(strat->P.lcm);
+        P_LMFREE(strat->P.lcm, currRing);
 #endif
       }
     }else{
@@ -634,17 +640,11 @@ ideal ShiftDVec::bba
 #endif
     }
 
-    //BOCO: we always want to delete the second poly, because
-    //      it is a shift and will not be used anywhere else
-    if(strat->P.p2)
-    {
-      pDelete(&strat->P.p2);
-      strat->P.p2 = NULL;
-    }
-
     deBoGriTTest(strat);
 #ifdef KDEBUG
-    memset(&(strat->P), 0, sizeof(strat->P));
+    //BOCO: I commented out the next statement...
+    //memset(&(strat->P), 0, sizeof(strat->P));
+    //TODO: I guess we have to delete the Extension here...
 #endif /* KDEBUG */
     kTest_TS(strat);
   }
@@ -727,7 +727,20 @@ ideal ShiftDVec::bba
   // Free internal memory reserved for loggers
   SD_DEBUG_SEC{ SDDD::Free(); }
 
+  ShiftDVec::TidyUp( strat, currRing );
+
+  // TODO: I guess the destructor of strat->P may be invoked with
+  // an undefined SD_Object_Extension somewhere. This may lead to
+  // crashes, if we do not set that to NULL. So what should we do
+  // here??? Is that ok?
+  strat->P.SD_Object_Extension = NULL;
   return (strat->Shdl);
+}
+
+void ShiftDVec::TidyUp( ShiftDVec::kStrategy strat, ring curr )
+{
+  OMFREES( strat->tailRing->omap, strat->tailRing->N+1, int );
+  OMFREES( curr->omap, curr->N+1, int );
 }
 
 
@@ -749,7 +762,7 @@ void ShiftDVec::updateResult
   {
     for (l=IDELEMS(r)-1;l>=0;l--)
       if ((r->m[l]!=NULL) && (pGetComp(r->m[l])==0))
-        pDelete(&r->m[l]); // and set it to NULL
+        P_DELETE(&r->m[l], currRing); // and set it to NULL
     int q;
     poly p;
     for (l=IDELEMS(r)-1;l>=0;l--)
@@ -787,10 +800,10 @@ void ShiftDVec::updateResult
             {
               p=r->m[l];
               r->m[l]=kNF(Q,NULL,p);
-              pDelete(&p);
+              P_DELETE(&p, currRing);
             }
             else
-              pDelete(&r->m[l]); // and set it to NULL
+              P_DELETE(&r->m[l], currRing); // and set it to NULL
             break;
           }
         }
@@ -815,11 +828,11 @@ void ShiftDVec::updateResult
             {
               p=r->m[l];
               r->m[l]=kNF(Q,NULL,p);
-              pDelete(&p);
+              P_DELETE(&p, currRing);
               reduction_found=TRUE;
             }
             else
-              pDelete(&r->m[l]); // and set it to NULL
+              P_DELETE(&r->m[l], currRing); // and set it to NULL
             break;
           }
         }
@@ -855,7 +868,7 @@ void ShiftDVec::updateResult
             if ( (l!=q) && 
                  (shift < UINT_MAX) && (r->m[q]!=NULL) &&
                  (strat->homog || !reduction_violates_degree) )
-            { pDelete(&r->m[q]); }
+            { P_DELETE(&r->m[q], currRing); }
           }
         }
       }
@@ -869,16 +882,11 @@ void ShiftDVec::updateResult
 static BOOLEAN sloppy_max = FALSE;
 #endif /* KDEBUG */
 
-#if 0 //BOCO: original code (replaced)
-      //TODO: CLEANUP: remove this
-void completeReduce (kStrategy strat, BOOLEAN withT)
-#else //replacement
 void ShiftDVec::completeReduce
   ( SD::kStrategy strat, BOOLEAN withT )
 {
   namespace SD = ShiftDVec;
 
-#endif
   int i;
   int low = (((currRing->OrdSgn==1) && (strat->ak==0)) ? 1 : 0);
   LObject L;
@@ -934,7 +942,7 @@ void ShiftDVec::completeReduce
 
       if (strat->redTailChange && strat->tailRing != currRing)
       {
-        if (T_j->max != NULL) p_LmFree(T_j->max, strat->tailRing);
+        if (T_j->max != NULL) P_LMFREE(T_j->max, strat->tailRing);
         if (pNext(T_j->p) != NULL)
           T_j->max = p_GetMaxExpP(pNext(T_j->p), strat->tailRing);
         else
@@ -1054,10 +1062,9 @@ poly ShiftDVec::redtail
       {
         //should do just a shallow copy
         With = new TObject(*WithTmp);
-        With->p = p_LPshiftT
-          ( WithTmp->p, shift,
-            strat->get_uptodeg(),
-            strat->get_lV(), strat, currRing );
+        MEMORY_LOG("new TObj", With);
+        With->p =
+          PLP_SHIFT_T( WithTmp->p, shift, strat, currRing );
         /* BOCO: With->p has to be deleted later; i hope we
          * can just choose currRing for p_LPshift here */
         
@@ -1088,8 +1095,9 @@ poly ShiftDVec::redtail
       e = strat->tailRing->pLDeg(hn, &l, strat->tailRing) - op;
       if(shift != 0)
       {
-        pDelete(&With->p); 
+        P_DELETE(&With->p, currRing); 
         shift=0; 
+        MEMORY_LOG("delete TObj", With);
         delete With;
       }
     }
@@ -1100,7 +1108,8 @@ poly ShiftDVec::redtail
   all_done:
   if(shift != 0)
   {
-    pDelete(&With->p); 
+    P_DELETE(&With->p, currRing); 
+    MEMORY_LOG("delete TObj", With);
     delete With;
   }
   if (strat->redTailChange)
@@ -1134,10 +1143,7 @@ void ShiftDVec::initBba( ideal F, SD::kStrategy strat )
   //BOCO:
   //  We do not use redHoney/redLazy/redRing at the moment;
   //  See original code for reference
-  //TODO:
-  //  redHomog also applies to the inhomogenous case
-  //  -> rename it!
-  strat->red = SD::redHomog;
+  strat->red = SD::redLP;
 
   if (currRing->pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
@@ -1232,16 +1238,14 @@ poly ShiftDVec::redBba
     TObject * t;
     if(!(t = strat->s_2_t(j))) 
     { TObject tt(strat->S[j]); t = &tt; }
-    uint shift = SD::p_LmShortDivisibleBy
+    uint sh = SD::p_LmShortDivisibleBy
       (h, strat->sevS[j], t, not_sev, currRing);
     int reduction_violates_degree = redViolatesDeg
       ( h, t, strat->get_uptodeg(), currRing );
-    if( shift < UINT_MAX && 
+    if( sh < UINT_MAX && 
         (strat->homog || !reduction_violates_degree) )
     {
-      poly pTemp = p_LPshiftT( strat->S[j], shift, 
-                               strat->get_uptodeg(),
-                               strat->get_lV(),strat,currRing );
+      poly pTemp = PLP_SHIFT_T(strat->S[j], sh, strat,currRing);
       TObject tTemp(pTemp);
       TObject noShift(strat->S[j]);
 
@@ -1252,7 +1256,7 @@ poly ShiftDVec::redBba
 
       //BOCO: after reduction lm has changed:
       h->SD_Ext()->freeDVec();
-      if(shift > 0) pDelete(&pTemp); 
+      if(sh > 0) P_DELETE(&pTemp, currRing); 
       if (h->p==NULL) return NULL;
       j = 0;
 #if (HAVE_SEV > 1) //BOCO: comments/uncomments sev
@@ -1393,6 +1397,7 @@ int ShiftDVec::kFindDivisibleByInT
 
   //BOCO: added following line
   L->SD_Ext_Init();
+  //TODO: shouldn't be necessary - 
 
 
 #if (HAVE_SEV > 2) //BOCO: comments/uncomments sev
@@ -1597,7 +1602,7 @@ poly ShiftDVec::redtailBba
   Ln.PrepareRed(strat->use_buckets);
 
   int cnt=REDTAIL_CANONICALIZE;
-  uint shift = 0;
+  uint sh = 0;
 
   TObject uTmp;
   uTmp.t_p = NULL;
@@ -1607,7 +1612,7 @@ poly ShiftDVec::redtailBba
     assume(h != NULL);
     assume(Ln.p == NULL || pTotaldegree(Ln.p) < 1000);
 #ifdef HAVE_SHIFTBBADVEC //BOCO: added code
-    shift = 0;
+    sh = 0;
 #endif
     loop
     {
@@ -1619,7 +1624,7 @@ poly ShiftDVec::redtailBba
       {
         int j;
         j = kFindDivisibleByInT
-          ( strat->T, strat->sevT, &Ln, shift, strat );
+          ( strat->T, strat->sevT, &Ln, sh, strat );
         assume(h != NULL);
 
         if (j < 0)
@@ -1627,23 +1632,18 @@ poly ShiftDVec::redtailBba
           assume(h != NULL);
           break;
         }
-        assume(shift < UINT_MAX);
+        assume(sh < UINT_MAX);
 
         With = &(strat->T[j]);
         uTmp.p = With->p;
         uTmp.t_p = With->t_p;
         uTmp.tailRing = With->tailRing; //BOCO:may not need that
-        if(shift != 0)
+        if(sh != 0)
         //Our divisor is a shift (and thus not in T or S)
         {
-          With->t_p = p_LPshiftT
-            ( uTmp.t_p, shift,
-              strat->get_uptodeg(),
-              strat->get_lV(), strat, strat->tailRing );
-          With->p = ::p_mLPshift
-            ( uTmp.p, shift,
-              strat->get_uptodeg(),
-              strat->get_lV(), currRing );
+          With->t_p = PLP_SHIFT_T( uTmp.t_p, sh,
+                                   strat, strat->tailRing );
+          With->p = PMLP_SHIFT( uTmp.p, sh, strat, currRing );
           if(With->t_p) With->p->next = With->t_p->next;
           //BOCO: With->p and With->t_p have to be deleted later, 
           //see below
@@ -1653,23 +1653,18 @@ poly ShiftDVec::redtailBba
       else
       {
         With = kFindDivisibleByInS
-          ( strat, pos, &Ln, &With_s, shift, strat->get_lV() );
+          ( strat, pos, &Ln, &With_s, sh, strat->get_lV() );
 
         if (With == NULL) { break; }
 
         uTmp.p = With->p;
         uTmp.t_p = With->t_p;
-        if(shift != 0)
+        if(sh != 0)
         //BOCO: Our divisor is a shift (and thus not in T or S)
         {
-          With->t_p = p_LPshiftT
-            ( uTmp.t_p, shift,
-              strat->get_uptodeg(),
-              strat->get_lV(), strat, strat->tailRing );
-          With->p = ::p_mLPshift
-            ( uTmp.p, shift,
-              strat->get_uptodeg(),
-              strat->get_lV(), currRing );
+          With->t_p = PLP_SHIFT_T( uTmp.t_p, sh,
+                                   strat, strat->tailRing );
+          With->p = PMLP_SHIFT( uTmp.p, sh, strat, currRing );
           if(With->t_p) With->p->next = With->t_p->next;
           //BOCO: With->p has to be deleted later, see below
 
@@ -1719,13 +1714,13 @@ poly ShiftDVec::redtailBba
       if (! withT) With_s.Init(currRing);
       // BOCO: p does not correspond to any object in S,T or R,
       //       if the shift is not zero.
-      if(shift != 0 && shift < UINT_MAX)
+      if(sh != 0 && sh < UINT_MAX)
       {
-        pDelete(&(With->t_p)); 
+        P_DELETE(&(With->t_p), currRing); 
         With->t_p = uTmp.t_p; 
-        if(With->p) { pLmFree(&(With->p)); }
+        if(With->p) { P_LMFREE(&(With->p), currRing); }
         With->p = uTmp.p; 
-        shift = 0;
+        sh = 0;
       }
 
       Ln.SD_Ext()->freeDVec();
@@ -1747,13 +1742,13 @@ poly ShiftDVec::redtailBba
 
   all_done:
 
-  if(shift != 0 && shift < UINT_MAX)
+  if(sh != 0 && sh < UINT_MAX)
   {
-    pDelete(&(With->t_p)); 
+    P_DELETE(&(With->t_p), currRing); 
     With->t_p = uTmp.t_p; 
-    if(With->p) { pLmFree(&(With->p)); }
+    if(With->p) { P_LMFREE(&(With->p), currRing); }
     With->p = uTmp.p; 
-    shift = 0;
+    sh = 0;
   }
   Ln.Delete();
   Ln.SD_Ext()->freeDVec();
@@ -1806,7 +1801,7 @@ void ShiftDVec::updateS( BOOLEAN toT, SD::kStrategy strat )
         change=FALSE;
         if (((strat->fromQ==NULL) || (strat->fromQ[i]==0)) && (i>0))
         {
-          redSi = pHead(strat->S[i]);
+          redSi = P_HEAD(strat->S[i], currRing);
           LObject h(strat->S[i]);
           strat->S[i] = redBba(&h,i-1,strat);
           /*BOCO:
@@ -2028,6 +2023,17 @@ LObject* ShiftDVec::enterL
 
   (*length)++;
   (*set)[at] = *p;
+  if( p->SD_Ext() )
+  {
+    (*set)[at].SD_Ext()->T = (*set) + at;
+    p->Set_Extension_To_NULL();
+  }
+
+  ExtensionTTest(&((*set)[at]), -2);
+
+  assume( !(*set)[at].SD_Ext() ||
+           (*set)[at].SD_Ext()->Extension_Type
+                == sTObjectExtension::LObject_Extension );
 
   return &(*set)[at];
 }
@@ -2150,7 +2156,7 @@ void ShiftDVec::initBuchMora
   /*- creating temp data structures------------------- -*/
   strat->cp = 0;
   strat->c3 = 0;
-  strat->tail = pInit();
+  strat->tail = P_INIT(currRing);
   /*- set s -*/
   strat->sl = -1;
   /*- set L -*/
@@ -2187,3 +2193,7 @@ void ShiftDVec::initBuchMora
     omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
   strat->fromQ=NULL;
 }
+
+// vim: set foldmethod=syntax :
+// vim: set textwidth=65 :
+// vim: set colorcolumn=+1 :

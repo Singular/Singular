@@ -1,0 +1,55 @@
+# measure size of sets
+
+b ShiftDVec::bba
+commands
+  silent
+  set $sum_sl = 0
+  set $sum_Ll = 0
+  set $sum_tl = 0
+  set $max_Ll = 0
+  set $max_tl = 0
+  set $max_tl_add_Ll = 0
+  set $Ll_at_max_add = 0
+  continue
+end
+
+blc ShiftDVec::bba 'if (hilb!=NULL)'
+commands
+  silent
+  set $sum_sl = $sum_sl + strat->sl
+  set $sum_Ll = $sum_Ll + strat->Ll
+  set $sum_tl = $sum_tl + strat->tl
+  set $tl_add_Ll = strat->tl + strat->Ll
+  if $tl_add_Ll > $max_tl_add_Ll
+    set $max_tl_add_Ll = $tl_add_Ll
+    set $Ll_at_max_add = strat->Ll
+  end
+  if strat->tl > $max_tl
+    set $max_tl = strat->tl
+  end
+  if strat->Ll > $max_Ll
+    set $max_Ll = strat->Ll
+  end
+#  printf "\nstrat->sl: %02d",   strat->sl
+#  printf "\nstrat->Ll: %02d\n", strat->Ll
+#  printf "\nstrat->tl: %02d\n", strat->tl
+  continue
+end
+
+blc ShiftDVec::bba 'PrintS("bba finish GB: currRing: "); rWrite(currRing);'
+commands
+  silent
+  printf "\nstrat->sl: %02d",   strat->sl
+  printf "\nstrat->Ll: %02d", strat->Ll
+  printf "\nstrat->tl: %02d", strat->tl
+  printf "\nsum strat->sl: %02d",   $sum_sl
+  printf "\nsum strat->Ll: %02d", $sum_Ll
+  printf "\nsum strat->tl: %02d", $sum_tl
+  printf "\nmax sum strat->tl + strat->Ll: %02d", $max_tl_add_Ll
+  printf "\nstrat->Ll at this maximu: %02d", $Ll_at_max_add
+  printf "\nmax strat->Ll: %02d", $max_Ll
+  printf "\nmax strat->tl: %02d\n", $max_tl
+  continue
+end
+
+# vim: set ft=gdb :

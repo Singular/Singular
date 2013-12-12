@@ -94,6 +94,13 @@ namespace ShiftDVec
   int cmpDVecProper
       ( sTObject* T1, uint beginT1,
         sTObject* T2, uint beginT2, uint size, int lV );
+
+  long p_lmCopy( poly p1, ring r1,
+                 poly p2, ring r2, int lV, long nexp=-1 );
+
+  long p_lmAppend( poly p1, long o1, ring r1,
+                   poly p2, long o2, ring r2,
+                   int lV, long nexp=-1 );
 }
 
 
@@ -128,10 +135,6 @@ class ShiftDVec::sTObjectExtension
     uint * dvec; //Distance Vector of lm(p)
     uint dvSize; //size of the >>uint * dvec<< array
 
-    uint  shift; //shift of polynomial
-    //TODO: this shift shall replace the necessity of storing
-    //      shifts of polynomials, when creating pairs
-
     //uint pIsInR; //already i_r in ::sTObject
 
     // constructor
@@ -143,6 +146,8 @@ class ShiftDVec::sTObjectExtension
 
     void Set_Number_Of_Possesors(int num)
     { number_of_possesors = num; }
+
+    void Increase_Number_Of_Possessors(){ ++number_of_possesors; }
 
     void dumbInit(sTObject* _T){ T = _T; dvec = NULL; }
 
@@ -193,14 +198,14 @@ class ShiftDVec::sTObjectExtension
       Tobj->SD_Ext()->SetDVecIfNULL();
       if( fromRight )
       {
-        return ShiftDVec::divisibleBy
+        return ShiftDVec::RdivisibleBy
                            ( dvec, dvSize,
                              Tobj->SD_Ext()->dvec,
                              Tobj->SD_Ext()->dvSize, numVars );
       }
       else
       {
-        return ShiftDVec::RdivisibleBy
+        return ShiftDVec::divisibleBy
                            ( dvec, dvSize,
                              Tobj->SD_Ext()->dvec,
                              Tobj->SD_Ext()->dvSize, numVars );
@@ -231,14 +236,14 @@ class ShiftDVec::sTObjectExtension
 
       if( fromRight )
       {
-        return ShiftDVec::divisibleBy
+        return ShiftDVec::RdivisibleBy
                            ( dvec, dvSize,
                              Tobj->SD_Ext()->dvec,
                              Tobj->SD_Ext()->dvSize, numVars );
       }
       else
       {
-        return ShiftDVec::RdivisibleBy
+        return ShiftDVec::divisibleBy
                            ( dvec, dvSize,
                              Tobj->SD_Ext()->dvec,
                              Tobj->SD_Ext()->dvSize, numVars );
@@ -250,6 +255,8 @@ class ShiftDVec::sLObjectExtension :
   public ShiftDVec::sTObjectExtension
 {
   public:
+    uint shift_p2;
+
     // constructor
     sLObjectExtension(sLObject* T) : sTObjectExtension(T) {}
 
@@ -347,4 +354,6 @@ poly TemplateTestLPDV( poly p, poly q, int uptodeg, int lV );
 
 #endif  //#ifndef SDKUTIL_H
 
-/* vim: set foldmethod=syntax : */
+// vim: set foldmethod=syntax :
+// vim: set textwidth=65 :
+// vim: set colorcolumn=+1 :

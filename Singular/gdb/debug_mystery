@@ -1,0 +1,35 @@
+# It's a kind of magic (where is the bug ???)
+
+# include helpers and bos_gdb_ext.py first
+
+break ShiftDVec::bba
+commands
+  set $mysty_cnt=0
+  continue
+end
+
+blc ShiftDVec::bba 'enterpairs'
+commands
+  silent
+  set $mysty_cnt = $mysty_cnt + 1
+  if ($mysty_cnt % 10) == 0
+    printf "\n\nCounter: %3d\n", $mysty_cnt
+    pss
+    call (void)fflush(0x0)
+  end
+  continue
+end
+
+#blc ShiftDVec::enterOnePair 'enterL'
+#commands
+#  silent
+#  printf "\n\nBefore entering new Pair %3d\n", $mysty_cnt
+#  call (void)fflush(0x0)
+#  pll Lp
+#  set $mysty_cnt = $mysty_cnt + 1
+#  if $mysty_cnt != 100 && $mysty_cnt != 200 && $mysty_cnt != 300
+#    continue
+#  end
+#end
+
+# vim: set ft=gdb :
