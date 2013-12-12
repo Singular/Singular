@@ -52,6 +52,7 @@
   #define F5CTAILRED 1
 #endif
 
+#define SBA_INTERRED_START                  0
 #define SBA_TAIL_RED                        1
 #define SBA_PRODUCT_CRITERION               0
 #define SBA_PRINT_ZERO_REDUCTIONS           0
@@ -1714,6 +1715,9 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   intvec *sort  = idSort(F1);
   for (int i=0; i<sort->length();++i)
     F->m[i] = F1->m[(*sort)[i]-1];
+#if SBA_INTERRED_START
+  F = kInterRed(F,NULL);
+#endif
 #if F5DEBUG
   printf("SBA COMPUTATIONS DONE IN THE FOLLOWING RING:\n");
   rWrite (currRing);
@@ -2103,7 +2107,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
             // module monomial strat->P.sig gives the leading monomial of
             // the corresponding principal syzygy
             // => we do not need to compute the "real" syzygy completely
-            poly help = pCopy(strat->sig[ps]);
+            poly help = p_Copy(strat->sig[ps],currRing);
             p_ExpVectorAdd (help,strat->P.p,currRing);
             Q.sig = p_Add_q(Q.sig,help,currRing);
             //printf("%d. SYZ  ",i+1);
@@ -2116,7 +2120,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
       // deg - idx - lp/rp
       // => we need to add syzygies with indices > pGetComp(strat->P.sig)
-      if(strat->sbaOrder == 3)
+      if(strat->sbaOrder == 0 || strat->sbaOrder == 3)
       {
         int cmp     = pGetComp(strat->P.sig);
         int max_cmp = IDELEMS(F);
@@ -2124,18 +2128,52 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         pGetExpV (strat->P.p,vv);
         LObject Q;
         int pos;
-        for (int i=cmp+1; i<=max_cmp; ++i) {
-          Q.sig = p_One(currRing);
-          p_SetExpV(Q.sig, vv, currRing);
-          // F->m[i-1] corresponds to index i
-          p_ExpVectorAdd(Q.sig,F->m[i-1],currRing);
-          p_SetComp(Q.sig, i, currRing);
-          pos = posInSyz(strat, Q.sig);
-          enterSyz(Q, strat, pos);
+        int idx = p_GetComp(strat->P.sig,currRing);
+        //printf("++ -- adding syzygies -- ++\n");
+        // if new element is the first one in this index
+        if (strat->currIdx < idx) {
+          for (int i=0; i<strat->sl; ++i) {
+            Q.sig = p_Copy(strat->P.sig,currRing);
+            p_ExpVectorAdd(Q.sig,strat->S[i],currRing);
+            poly help = p_Copy(strat->sig[i],currRing);
+            p_ExpVectorAdd(help,strat->P.p,currRing);
+            Q.sig = p_Add_q(Q.sig,help,currRing);
+            //pWrite(Q.sig);
+            pos = posInSyz(strat, Q.sig);
+            enterSyz(Q, strat, pos);
+          }
+          strat->currIdx = idx;
+        } else {
+          // if the element is not the first one in the given index we build all
+          // possible syzygies with elements of higher index
+          for (int i=cmp+1; i<=max_cmp; ++i) {
+            pos = -1;
+            for (int j=0; j<strat->sl; ++j) {
+              if (p_GetComp(strat->sig[j],currRing) == i) {
+                pos = j;
+                break;
+              }
+            }
+            if (pos != -1) {
+              Q.sig = p_One(currRing);
+              p_SetExpV(Q.sig, vv, currRing);
+              // F->m[i-1] corresponds to index i
+              p_ExpVectorAdd(Q.sig,F->m[i-1],currRing);
+              p_SetComp(Q.sig, i, currRing);
+              poly help = p_Copy(strat->P.sig,currRing);
+              p_ExpVectorAdd(help,strat->S[pos],currRing);
+              Q.sig = p_Add_q(Q.sig,help,currRing);
+              if (p_LmCmp(Q.sig,strat->syz[strat->syzl-1],currRing) == -currRing->OrdSgn) {
+                pos = posInSyz(strat, Q.sig);
+                enterSyz(Q, strat, pos);
+              }
+            }
+          }
+          //printf("++ -- done adding syzygies -- ++\n");
         }
       }
-#if 1
-//#if DEBUGF50
+//#if 1
+#if DEBUGF50
     printf("---------------------------\n");
     Print(" %d. ELEMENT ADDED TO GCURR:\n",strat->sl+1);
     Print("LEAD POLY:  "); pWrite(pHead(strat->S[strat->sl]));
@@ -2183,8 +2221,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
         int pos = posInSyz(strat, strat->P.sig);
         enterSyz(strat->P, strat, pos);
-#if 1
-//#ifdef DEBUGF5
+//#if 1
+#ifdef DEBUGF5
         Print("ADDING STUFF TO SYZ :  ");
         //pWrite(strat->P.p);
         pWrite(strat->P.sig);
