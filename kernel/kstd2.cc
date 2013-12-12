@@ -1701,7 +1701,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   ideal F1 = F0;
   ring sRing, currRingOld;
   currRingOld  = currRing;
-  if (strat->sbaOrder == 1)
+  if (strat->sbaOrder == 1 || strat->sbaOrder == 3)
   {
     sRing = sbaRing(strat);
     if (sRing!=currRingOld)
@@ -2317,7 +2317,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     strat->Shdl->m[i] = NULL;
   }
 #endif
-  if (strat->sbaOrder == 1 && sRing!=currRingOld)
+  if ((strat->sbaOrder == 1 || strat->sbaOrder == 3) && sRing!=currRingOld)
   {
     rChangeCurrRing (currRingOld);
     F0          = idrMoveR (F1, sRing, currRing);

@@ -8313,8 +8313,58 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
 
     // new 1st block
     res->order[0]   = ringorder_C; // Prefix
+    //res->block0[0]  = 1;
+    //res->block1[0]  = res->N;
+    //res->wvhdl[j]   = NULL;
+    // res->order [j] = 0; // The End!
+    rComplete(res, 1);
+#ifdef HAVE_PLURAL
+    if (rIsPluralRing(r))
+    {
+      if ( nc_rComplete(r, res, false) ) // no qideal!
+      {
+#ifndef NDEBUG
+        WarnS("error in nc_rComplete");
+#endif
+        // cleanup?
+
+        //      rDelete(res);
+        //      return r;
+
+        // just go on..
+      }
+    }
+#endif
+    strat->tailRing = res;
+    return (res);
+  }
+  // if sbaOrder == 3 => degree - position - ring order
+  if (strat->sbaOrder == 3)
+  {
+    printf("hh\n");
+    ring res = rCopy0(r, FALSE, TRUE);
+    for (int i=2; i<n; i++)
+    {
+      printf("i %d\n",i);
+      res->order[i] = res->order[i-2];
+      res->block0[i] = res->block0[i-2];
+      res->block1[i] = res->block1[i-2];
+      res->wvhdl[i] = res->wvhdl[i-2];
+    }
+    printf("hh2\n");
+
+    // new 1st block
+    res->order[0]   = ringorder_a; // Prefix
     res->block0[0]  = 1;
-    res->block1[0]  = res->N;
+    res->wvhdl[0]   = (int *)omAlloc(res->N*sizeof(int));
+    for (int i=0; i<res->N; ++i)
+      res->wvhdl[0][i]  = 1;
+    res->block1[0]  = si_min(1+res->N, rVar(res));
+
+    // new 2nd block
+    res->order[1]   = ringorder_C; // Prefix
+    res->block0[1]  = 1;
+    res->block1[1]  = res->N;
     //res->wvhdl[j]   = NULL;
     // res->order [j] = 0; // The End!
     rComplete(res, 1);
