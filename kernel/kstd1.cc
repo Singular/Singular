@@ -2968,66 +2968,72 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
 #endif
 
       // enter into S, L, and T
-      //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
+      if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
+      {
         enterT(strat->P, strat);
-      // posInS only depends on the leading term
-      strat->enterS(strat->P, pos, strat, strat->tl);
+        // posInS only depends on the leading term
+        strat->enterS(strat->P, pos, strat, strat->tl);
 
+        if (pos<strat->sl)
+        {
+          need_retry++;
+          // move all "larger" elements fromS to L
+          // remove them from T
+          int ii=pos+1;
+          for(;ii<=strat->sl;ii++)
+          {
+            LObject h;
+            memset(&h,0,sizeof(h));
+            h.tailRing=strat->tailRing;
+            h.p=strat->S[ii]; strat->S[ii]=NULL;
+            strat->initEcart(&h);
+            h.sev=strat->sevS[ii];
+            int jj=strat->tl;
+            while (jj>=0)
+            {
+              if (strat->T[jj].p==h.p)
+              {
+                strat->T[jj].p=NULL;
+                if (jj<strat->tl)
+                {
+                  memmove(&(strat->T[jj]),&(strat->T[jj+1]),
+                          (strat->tl-jj)*sizeof(strat->T[jj]));
+                  memmove(&(strat->sevT[jj]),&(strat->sevT[jj+1]),
+                          (strat->tl-jj)*sizeof(strat->sevT[jj]));
+                }
+                strat->tl--;
+                break;
+              }
+              jj--;
+            }
+            int lpos=strat->posInL(strat->L,strat->Ll,&h,strat);
+            enterL(&strat->L,&strat->Ll,&strat->Lmax,h,lpos);
+            #ifdef KDEBUG
+            if (TEST_OPT_DEBUG)
+            {
+              Print("move S[%d] -> L[%d]: ",ii,pos);
+              p_wrp(h.p,currRing, strat->tailRing);
+              PrintLn();
+            }
+            #endif
+          }
+          if (strat->fromQ!=NULL)
+          {
+            for(ii=pos+1;ii<=strat->sl;ii++) strat->fromQ[ii]=0;
+          }
+          strat->sl=pos;
+        }
+      }
+      else
+      {
+        // clean P
+      }
       if (strat->P.lcm!=NULL)
 #ifdef HAVE_RINGS
         pLmDelete(strat->P.lcm);
 #else
         pLmFree(strat->P.lcm);
 #endif
-      if (pos<strat->sl)
-      {
-        need_retry++;
-        // move all "larger" elements fromS to L
-        // remove them from T
-        int ii=pos+1;
-        for(;ii<=strat->sl;ii++)
-        {
-          LObject h;
-          memset(&h,0,sizeof(h));
-          h.tailRing=strat->tailRing;
-          h.p=strat->S[ii]; strat->S[ii]=NULL;
-          strat->initEcart(&h);
-          h.sev=strat->sevS[ii];
-          int jj=strat->tl;
-          while (jj>=0)
-          {
-            if (strat->T[jj].p==h.p)
-            {
-              strat->T[jj].p=NULL;
-              if (jj<strat->tl)
-              {
-                memmove(&(strat->T[jj]),&(strat->T[jj+1]),
-                        (strat->tl-jj)*sizeof(strat->T[jj]));
-                memmove(&(strat->sevT[jj]),&(strat->sevT[jj+1]),
-                        (strat->tl-jj)*sizeof(strat->sevT[jj]));
-              }
-              strat->tl--;
-              break;
-            }
-            jj--;
-          }
-          int lpos=strat->posInL(strat->L,strat->Ll,&h,strat);
-          enterL(&strat->L,&strat->Ll,&strat->Lmax,h,lpos);
-          #ifdef KDEBUG
-          if (TEST_OPT_DEBUG)
-          {
-            Print("move S[%d] -> L[%d]: ",ii,pos);
-            p_wrp(h.p,currRing, strat->tailRing);
-            PrintLn();
-          }
-          #endif
-        }
-        if (strat->fromQ!=NULL)
-        {
-          for(ii=pos+1;ii<=strat->sl;ii++) strat->fromQ[ii]=0;
-        }
-        strat->sl=pos;
-      }
     }
 
 #ifdef KDEBUG
