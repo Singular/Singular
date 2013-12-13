@@ -931,7 +931,7 @@ int redLazy (LObject* h,kStrategy strat)
 #if SBA_PRINT_REDUCTION_STEPS
     sba_interreduction_steps++;
 #endif
-#if SBA_PRINT_REDUCTION_OPERATIONS
+#if SBA_PRINT_OPERATIONS
     sba_interreduction_operations  +=  pLength(strat->T[ii].p);
 #endif
 
@@ -1107,7 +1107,7 @@ int redHoney (LObject* h, kStrategy strat)
 #if SBA_PRINT_REDUCTION_STEPS
     sba_interreduction_steps++;
 #endif
-#if SBA_PRINT_REDUCTION_OPERATIONS
+#if SBA_PRINT_OPERATIONS
     sba_interreduction_operations  +=  pLength(strat->T[ii].p);
 #endif
 #ifdef KDEBUG
