@@ -8302,21 +8302,29 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
     {
       return r;
     }
-    ring res = rCopy0(r, FALSE, TRUE);
-    for (int i=1; i<n-1; i++)
+    ring res = rCopy0(r, TRUE, FALSE);
+    res->order  = (int *)omAlloc0((n+1)*sizeof(int));
+    res->block0 = (int *)omAlloc0((n+1)*sizeof(int));
+    res->block1 = (int *)omAlloc0((n+1)*sizeof(int));
+    int **wvhdl = (int **)omAlloc0((n+1)*sizeof(int*));
+    res->wvhdl  = wvhdl;
+    for (int i=1; i<n; i++)
     {
-      res->order[i] = res->order[i-1];
-      res->block0[i] = res->block0[i-1];
-      res->block1[i] = res->block1[i-1];
-      res->wvhdl[i] = res->wvhdl[i-1];
+      res->order[i]   = r->order[i-1];
+      res->block0[i]  = r->block0[i-1];
+      res->block1[i]  = r->block1[i-1];
+      res->wvhdl[i]   = r->wvhdl[i-1];
     }
 
     // new 1st block
     res->order[0]   = ringorder_C; // Prefix
-    //res->block0[0]  = 1;
-    //res->block1[0]  = res->N;
-    //res->wvhdl[j]   = NULL;
-    // res->order [j] = 0; // The End!
+    // removes useless secondary component order if defined in old ring
+    for (int i=rBlocks(res); i>0; --i) {
+      if (res->order[i] == ringorder_C || res->order[i] == ringorder_c) {
+        res->order[i] = 0;
+        break;
+      }
+    }
     rComplete(res, 1);
 #ifdef HAVE_PLURAL
     if (rIsPluralRing(r))
@@ -8341,17 +8349,19 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
   // if sbaOrder == 3 => degree - position - ring order
   if (strat->sbaOrder == 3)
   {
-    printf("hh\n");
-    ring res = rCopy0(r, FALSE, TRUE);
-    for (int i=2; i<n; i++)
+    ring res = rCopy0(r, TRUE, FALSE);
+    res->order  = (int *)omAlloc0((n+2)*sizeof(int));
+    res->block0 = (int *)omAlloc0((n+2)*sizeof(int));
+    res->block1 = (int *)omAlloc0((n+2)*sizeof(int));
+    int **wvhdl = (int **)omAlloc0((n+2)*sizeof(int*));
+    res->wvhdl  = wvhdl;
+    for (int i=2; i<n+2; i++)
     {
-      printf("i %d\n",i);
-      res->order[i] = res->order[i-2];
-      res->block0[i] = res->block0[i-2];
-      res->block1[i] = res->block1[i-2];
-      res->wvhdl[i] = res->wvhdl[i-2];
+      res->order[i]   = r->order[i-2];
+      res->block0[i]  = r->block0[i-2];
+      res->block1[i]  = r->block1[i-2];
+      res->wvhdl[i]   = r->wvhdl[i-2];
     }
-    printf("hh2\n");
 
     // new 1st block
     res->order[0]   = ringorder_a; // Prefix
@@ -8359,14 +8369,17 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
     res->wvhdl[0]   = (int *)omAlloc(res->N*sizeof(int));
     for (int i=0; i<res->N; ++i)
       res->wvhdl[0][i]  = 1;
-    res->block1[0]  = si_min(1+res->N, rVar(res));
-
+    res->block1[0]  = si_min(res->N, rVar(res));
     // new 2nd block
     res->order[1]   = ringorder_C; // Prefix
-    res->block0[1]  = 1;
-    res->block1[1]  = res->N;
-    //res->wvhdl[j]   = NULL;
-    // res->order [j] = 0; // The End!
+    res->wvhdl[1]   = NULL;
+    // removes useless secondary component order if defined in old ring
+    for (int i=rBlocks(res); i>0; --i) {
+      if (res->order[i] == ringorder_C || res->order[i] == ringorder_c) {
+        res->order[i] = 0;
+        break;
+      }
+    }
     rComplete(res, 1);
 #ifdef HAVE_PLURAL
     if (rIsPluralRing(r))

@@ -2163,7 +2163,12 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
               poly help = p_Copy(strat->P.sig,currRing);
               p_ExpVectorAdd(help,strat->S[pos],currRing);
               Q.sig = p_Add_q(Q.sig,help,currRing);
-              if (p_LmCmp(Q.sig,strat->syz[strat->syzl-1],currRing) == -currRing->OrdSgn) {
+              if (strat->sbaOrder == 0) {
+                if (p_LmCmp(Q.sig,strat->syz[strat->syzl-1],currRing) == -currRing->OrdSgn) {
+                  pos = posInSyz(strat, Q.sig);
+                  enterSyz(Q, strat, pos);
+                }
+              } else {
                 pos = posInSyz(strat, Q.sig);
                 enterSyz(Q, strat, pos);
               }
