@@ -439,6 +439,7 @@ static inline void * s_internalCopy(const int t,  void *d)
 
 void s_internalDelete(const int t,  void *d, const ring r)
 {
+  assume(d!=NULL);
   switch (t)
   {
     case INTVEC_CMD:

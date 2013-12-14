@@ -419,7 +419,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   }
   else if ((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
     rKill(h);
-  else
+  else if (IDDATA(h)!=NULL)
     s_internalDelete(IDTYP(h),IDDATA(h),r);
   //  general  -------------------------------------------------------------
   // now dechain it and delete idrec
