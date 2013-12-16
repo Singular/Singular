@@ -45,6 +45,13 @@ extern "C"
 #include <flint/fmpq_poly.h>
 #include <flint/nmod_mat.h>
 #include <flint/fmpz_mat.h>
+#if (__FLINT_VERSION_MINOR >= 4)
+#include <flint/fq.h>
+#include <flint/fq_poly.h>
+#include <flint/fq_nmod.h>
+#include <flint/fq_nmod_poly.h>
+#include <flint/fq_nmod_mat.h>
+#endif
 #ifdef __cplusplus
 }
 #endif
@@ -72,7 +79,7 @@ void convertFacCF2Fmpz_poly_t (fmpz_poly_t result, const CanonicalForm& f)
     convertCF2Fmpz (fmpz_poly_get_coeff_ptr(result, i.exp()), i.coeff());
 }
 
-CanonicalForm convertFmpz2CF (fmpz_t coefficient)
+CanonicalForm convertFmpz2CF (const fmpz_t coefficient)
 {
   if (fmpz_cmp_si (coefficient, MINIMMEDIATE) >= 0 &&
       fmpz_cmp_si (coefficient, MAXIMMEDIATE) <= 0)
@@ -90,7 +97,8 @@ CanonicalForm convertFmpz2CF (fmpz_t coefficient)
   }
 }
 
-CanonicalForm convertFmpz_poly_t2FacCF (fmpz_poly_t poly, const Variable& x)
+CanonicalForm
+convertFmpz_poly_t2FacCF (const fmpz_poly_t poly, const Variable& x)
 {
   CanonicalForm result= 0;
   fmpz* coeff;
@@ -103,7 +111,8 @@ CanonicalForm convertFmpz_poly_t2FacCF (fmpz_poly_t poly, const Variable& x)
   return result;
 }
 
-void convertFacCF2nmod_poly_t (nmod_poly_t result, const CanonicalForm& f)
+void
+convertFacCF2nmod_poly_t (nmod_poly_t result, const CanonicalForm& f)
 {
   bool save_sym_ff= isOn (SW_SYMMETRIC_FF);
   if (save_sym_ff) Off (SW_SYMMETRIC_FF);
@@ -124,7 +133,8 @@ void convertFacCF2nmod_poly_t (nmod_poly_t result, const CanonicalForm& f)
   if (save_sym_ff) On (SW_SYMMETRIC_FF);
 }
 
-CanonicalForm convertnmod_poly_t2FacCF (nmod_poly_t poly, const Variable& x)
+CanonicalForm
+convertnmod_poly_t2FacCF (const nmod_poly_t poly, const Variable& x)
 {
   CanonicalForm result= 0;
   for (int i= 0; i < nmod_poly_length (poly); i++)
@@ -187,7 +197,8 @@ CanonicalForm convertFmpq_t2CF (const fmpq_t q)
     return make_cf (nnum, nden, false);
 }
 
-CanonicalForm convertFmpq_poly_t2FacCF (fmpq_poly_t p, const Variable& x)
+CanonicalForm
+convertFmpq_poly_t2FacCF (const fmpq_poly_t p, const Variable& x)
 {
   CanonicalForm result= 0;
   fmpq_t coeff;
@@ -225,8 +236,8 @@ void convertFacCF2Fmpq_poly_t (fmpq_poly_t result, const CanonicalForm& f)
 }
 
 CFFList
-convertFLINTnmod_poly_factor2FacCFFList (nmod_poly_factor_t fac,
-                                          mp_limb_t leadingCoeff,
+convertFLINTnmod_poly_factor2FacCFFList (const nmod_poly_factor_t fac,
+                                          const mp_limb_t leadingCoeff,
                                           const Variable& x
                                          )
 {
@@ -237,10 +248,30 @@ convertFLINTnmod_poly_factor2FacCFFList (nmod_poly_factor_t fac,
   long i;
 
   for (i = 0; i < fac->num; i++)
-    result.append (CFFactor (convertnmod_poly_t2FacCF ((nmod_poly_t &)fac->p[i],x),
+    result.append (CFFactor (convertnmod_poly_t2FacCF (
+                             (nmod_poly_t &)fac->p[i],x),
                              fac->exp[i]));
   return result;
 }
+
+#if __FLINT_VERSION_MINOR >= 4
+CFFList
+convertFLINTFq_nmod_poly_factor2FacCFFList (const fq_nmod_poly_factor_t fac,
+                                       const Variable& x, const Variable& alpha,
+                                       const fq_nmod_ctx_t fq_con
+                                         )
+{
+  CFFList result;
+
+  long i;
+
+  for (i = 0; i < fac->num; i++)
+    result.append (CFFactor (convertFq_nmod_poly_t2FacCF (
+                             (fq_nmod_poly_t &)fac->poly[i], x, alpha, fq_con),
+                             fac->exp[i]));
+  return result;
+}
+#endif
 
 void
 convertFacCF2Fmpz_mod_poly_t (fmpz_mod_poly_t result, const CanonicalForm& f,
@@ -254,7 +285,7 @@ convertFacCF2Fmpz_mod_poly_t (fmpz_mod_poly_t result, const CanonicalForm& f,
 }
 
 CanonicalForm
-convertFmpz_mod_poly_t2FacCF (fmpz_mod_poly_t poly, const Variable& x,
+convertFmpz_mod_poly_t2FacCF (const fmpz_mod_poly_t poly, const Variable& x,
                               const modpk& b)
 {
   fmpz_poly_t buf;
@@ -265,7 +296,136 @@ convertFmpz_mod_poly_t2FacCF (fmpz_mod_poly_t poly, const Variable& x,
   return b (result);
 }
 
-void convertFacCFMatrix2Fmpz_mat_t (fmpz_mat_t M, CFMatrix &m)
+#if __FLINT_VERSION_MINOR >= 4
+void
+convertFacCF2Fq_nmod_t (fq_nmod_t result, const CanonicalForm& f,
+                        const fq_nmod_ctx_t ctx)
+{
+  bool save_sym_ff= isOn (SW_SYMMETRIC_FF);
+  if (save_sym_ff) Off (SW_SYMMETRIC_FF);
+  for (CFIterator i= f; i.hasTerms(); i++)
+  {
+    CanonicalForm c= i.coeff();
+    if (!c.isImm()) c=c.mapinto(); //c%= getCharacteristic();
+    if (!c.isImm())
+    {  //This case will never happen if the characteristic is in fact a prime
+       // number, since all coefficients are represented as immediates
+       printf("convertFacCF2Fq_nmod_t: coefficient not immediate!, char=%d\n",
+              getCharacteristic());
+    }
+    else
+    {
+      STICKYASSERT (i.exp() <= fq_nmod_ctx_degree(ctx), "convertFacCF2Fq_nmod_t: element is not reduced");
+      nmod_poly_set_coeff_ui (result, i.exp(), c.intval());
+    }
+  }
+  if (save_sym_ff) On (SW_SYMMETRIC_FF);
+}
+
+CanonicalForm
+convertFq_nmod_t2FacCF (const fq_nmod_t poly, const Variable& alpha)
+{
+  return convertnmod_poly_t2FacCF (poly, alpha);
+}
+
+void
+convertFacCF2Fq_t (fq_t result, const CanonicalForm& f, const fq_ctx_t ctx)
+{
+  fmpz_poly_init2 (result, fq_ctx_degree(ctx));
+  ASSERT (degree (f) < fq_ctx_degree (ctx), "input is not reduced");
+  _fmpz_poly_set_length(result, degree(f)+1);
+  for (CFIterator i= f; i.hasTerms(); i++)
+    convertCF2Fmpz (fmpz_poly_get_coeff_ptr(result, i.exp()), i.coeff());
+  _fmpz_vec_scalar_mod_fmpz (result->coeffs, result->coeffs, degree (f) + 1,
+                             &ctx->p);
+  _fmpz_poly_normalise (result);
+}
+
+CanonicalForm
+convertFq_t2FacCF (const fq_t poly, const Variable& alpha)
+{
+  return convertFmpz_poly_t2FacCF (poly, alpha);
+}
+
+void
+convertFacCF2Fq_poly_t (fq_poly_t result, const CanonicalForm& f,
+                        const fq_ctx_t ctx)
+{
+  fq_poly_init2 (result, degree (f)+1, ctx);
+  _fq_poly_set_length (result, degree (f) + 1, ctx);
+  fmpz_poly_t buf;
+  for (CFIterator i= f; i.hasTerms(); i++)
+  {
+    convertFacCF2Fmpz_poly_t (buf, i.coeff());
+    _fmpz_vec_scalar_mod_fmpz (buf->coeffs, buf->coeffs, degree (i.coeff()) + 1,
+                               &ctx->p);
+    _fmpz_poly_normalise (buf);
+    fq_poly_set_coeff (result, i.exp(), buf, ctx);
+    fmpz_poly_clear (buf);
+  }
+}
+
+void
+convertFacCF2Fq_nmod_poly_t (fq_nmod_poly_t result, const CanonicalForm& f,
+                             const fq_nmod_ctx_t ctx)
+{
+  fq_nmod_poly_init2 (result, degree (f)+1, ctx);
+  _fq_nmod_poly_set_length (result, degree (f) + 1, ctx);
+  fq_nmod_t buf;
+  fq_nmod_init2 (buf, ctx);
+  for (CFIterator i= f; i.hasTerms(); i++)
+  {
+    convertFacCF2Fq_nmod_t (buf, i.coeff(), ctx);
+    fq_nmod_poly_set_coeff (result, i.exp(), buf, ctx);
+    fq_nmod_zero (buf, ctx);
+  }
+  fq_nmod_clear (buf, ctx);
+}
+
+CanonicalForm
+convertFq_poly_t2FacCF (const fq_poly_t p, const Variable& x,
+                        const Variable& alpha, const fq_ctx_t ctx)
+{
+  CanonicalForm result= 0;
+  fq_t coeff;
+  long n= fq_poly_length (p, ctx);
+  fq_init2 (coeff, ctx);
+  for (long i= 0; i < n; i++)
+  {
+    fq_poly_get_coeff (coeff, p, i, ctx);
+    if (fq_is_zero (coeff, ctx))
+      continue;
+    result += convertFq_t2FacCF (coeff, alpha)*power (x, i);
+    fq_zero (coeff, ctx);
+  }
+  fq_clear (coeff, ctx);
+
+  return result;
+}
+
+CanonicalForm
+convertFq_nmod_poly_t2FacCF (const fq_nmod_poly_t p, const Variable& x,
+                             const Variable& alpha, const fq_nmod_ctx_t ctx)
+{
+  CanonicalForm result= 0;
+  fq_nmod_t coeff;
+  long n= fq_nmod_poly_length (p, ctx);
+  fq_nmod_init2 (coeff, ctx);
+  for (long i= 0; i < n; i++)
+  {
+    fq_nmod_poly_get_coeff (coeff, p, i, ctx);
+    if (fq_nmod_is_zero (coeff, ctx))
+      continue;
+    result += convertFq_nmod_t2FacCF (coeff, alpha)*power (x, i);
+    fq_nmod_zero (coeff, ctx);
+  }
+  fq_nmod_clear (coeff, ctx);
+
+  return result;
+}
+#endif
+
+void convertFacCFMatrix2Fmpz_mat_t (fmpz_mat_t M, const CFMatrix &m)
 {
   fmpz_mat_init (M, (long) m.rows(), (long) m.columns());
 
@@ -278,7 +438,7 @@ void convertFacCFMatrix2Fmpz_mat_t (fmpz_mat_t M, CFMatrix &m)
     }
   }
 }
-CFMatrix* convertFmpz_mat_t2FacCFMatrix(fmpz_mat_t m)
+CFMatrix* convertFmpz_mat_t2FacCFMatrix(const fmpz_mat_t m)
 {
   CFMatrix *res=new CFMatrix(fmpz_mat_nrows (m),fmpz_mat_ncols (m));
   int i,j;
@@ -292,7 +452,7 @@ CFMatrix* convertFmpz_mat_t2FacCFMatrix(fmpz_mat_t m)
   return res;
 }
 
-void convertFacCFMatrix2nmod_mat_t (nmod_mat_t M, CFMatrix &m)
+void convertFacCFMatrix2nmod_mat_t (nmod_mat_t M, const CFMatrix &m)
 {
   nmod_mat_init (M, (long) m.rows(), (long) m.columns(), getCharacteristic());
 
@@ -310,7 +470,7 @@ void convertFacCFMatrix2nmod_mat_t (nmod_mat_t M, CFMatrix &m)
   if (save_sym_ff) On (SW_SYMMETRIC_FF);
 }
 
-CFMatrix* convertNmod_mat_t2FacCFMatrix(nmod_mat_t m)
+CFMatrix* convertNmod_mat_t2FacCFMatrix(const nmod_mat_t m)
 {
   CFMatrix *res=new CFMatrix(nmod_mat_nrows (m), nmod_mat_ncols (m));
   int i,j;
@@ -323,6 +483,42 @@ CFMatrix* convertNmod_mat_t2FacCFMatrix(nmod_mat_t m)
   }
   return res;
 }
+
+#if __FLINT_VERSION_MINOR >= 4
+void
+convertFacCFMatrix2Fq_nmod_mat_t (fq_nmod_mat_t M,
+                                  const fq_nmod_ctx_t fq_con, const CFMatrix &m)
+{
+  fq_nmod_mat_init (M, (long) m.rows(), (long) m.columns(), fq_con);
+  int i,j;
+  for(i=m.rows();i>0;i--)
+  {
+    for(j=m.columns();j>0;j--)
+    {
+      convertFacCF2nmod_poly_t (M->rows[i-1]+j-1, m (i,j));
+    }
+  }
+}
+
+CFMatrix*
+convertFq_nmod_mat_t2FacCFMatrix(const fq_nmod_mat_t m,
+                                 const fq_nmod_ctx_t& fq_con,
+                                 const Variable& alpha)
+{
+  CFMatrix *res=new CFMatrix(fq_nmod_mat_nrows (m, fq_con),
+                             fq_nmod_mat_ncols (m, fq_con));
+  int i,j;
+  for(i=res->rows();i>0;i--)
+  {
+    for(j=res->columns();j>0;j--)
+    {
+      (*res)(i,j)=convertFq_nmod_t2FacCF (fq_nmod_mat_entry (m, i-1, j-1),
+                                          alpha);
+    }
+  }
+  return res;
+}
+#endif
 
 #endif
 
