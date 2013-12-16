@@ -1097,22 +1097,61 @@ void kronSubFp (nmod_poly_t result, const CanonicalForm& A, int d)
 {
   int degAy= degree (A);
   nmod_poly_init2 (result, getCharacteristic(), d*(degAy + 1));
+  _nmod_poly_set_length (result, d*(degAy + 1));
+  flint_mpn_zero (result->coeffs, d*(degAy+1));
 
   nmod_poly_t buf;
 
-  int j, k, bufRepLength;
+  int k;
   for (CFIterator i= A; i.hasTerms(); i++)
   {
     convertFacCF2nmod_poly_t (buf, i.coeff());
-
     k= i.exp()*d;
-    bufRepLength= (int) nmod_poly_length (buf);
-    for (j= 0; j < bufRepLength; j++)
-      nmod_poly_set_coeff_ui (result, j + k, nmod_poly_get_coeff_ui (buf, j));
+    flint_mpn_copyi (result->coeffs+k, buf->coeffs, nmod_poly_length(buf));
+
     nmod_poly_clear (buf);
   }
   _nmod_poly_normalise (result);
 }
+
+#if (__FLINT_VERSION_MINOR >= 4)
+void
+kronSubFq (fq_nmod_poly_t result, const CanonicalForm& A, int d,
+           const fq_nmod_ctx_t fq_con)
+{
+  int degAy= degree (A);
+  fq_nmod_poly_init2 (result, d*(degAy + 1), fq_con);
+  _fq_nmod_poly_set_length (result, d*(degAy + 1), fq_con);
+  _fq_nmod_vec_zero (result->coeffs, d*(degAy + 1), fq_con);
+
+  fq_nmod_poly_t buf1;
+
+  nmod_poly_t buf2;
+
+  int k;
+
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    if (i.coeff().inCoeffDomain())
+    {
+      convertFacCF2nmod_poly_t (buf2, i.coeff());
+      fq_nmod_poly_init2 (buf1, 1, fq_con);
+      fq_nmod_poly_set_coeff (buf1, 0, buf2, fq_con);
+      nmod_poly_clear (buf2);
+    }
+    else
+      convertFacCF2Fq_nmod_poly_t (buf1, i.coeff(), fq_con);
+
+    k= i.exp()*d;
+    _fq_nmod_vec_set (result->coeffs+k, buf1->coeffs,
+                      fq_nmod_poly_length (buf1, fq_con), fq_con);
+
+    fq_nmod_poly_clear (buf1, fq_con);
+  }
+
+  _fq_nmod_poly_normalise (result, fq_con);
+}
+#endif
 
 void kronSubQa (fmpq_poly_t result, const CanonicalForm& A, int d1, int d2)
 {
@@ -1198,6 +1237,52 @@ kronSubReciproFp (nmod_poly_t subA1, nmod_poly_t subA2, const CanonicalForm& A,
   _nmod_poly_normalise (subA1);
   _nmod_poly_normalise (subA2);
 }
+
+#if (__FLINT_VERSION_MINOR >= 4)
+void
+kronSubReciproFq (fq_nmod_poly_t subA1, fq_nmod_poly_t subA2,
+                  const CanonicalForm& A, int d, const fq_nmod_ctx_t fq_con)
+{
+  int degAy= degree (A);
+  fq_nmod_poly_init2 (subA1, d*(degAy + 2), fq_con);
+  fq_nmod_poly_init2 (subA2, d*(degAy + 2), fq_con);
+
+  _fq_nmod_poly_set_length (subA1, d*(degAy + 2), fq_con);
+  _fq_nmod_vec_zero (subA1->coeffs, d*(degAy + 2), fq_con);
+
+  _fq_nmod_poly_set_length (subA2, d*(degAy + 2), fq_con);
+  _fq_nmod_vec_zero (subA2->coeffs, d*(degAy + 2), fq_con);
+
+  fq_nmod_poly_t buf1;
+
+  nmod_poly_t buf2;
+
+  int k, kk;
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    if (i.coeff().inCoeffDomain())
+    {
+      convertFacCF2nmod_poly_t (buf2, i.coeff());
+      fq_nmod_poly_init2 (buf1, 1, fq_con);
+      fq_nmod_poly_set_coeff (buf1, 0, buf2, fq_con);
+      nmod_poly_clear (buf2);
+    }
+    else
+      convertFacCF2Fq_nmod_poly_t (buf1, i.coeff(), fq_con);
+
+    k= i.exp()*d;
+    kk= (degAy - i.exp())*d;
+    _fq_nmod_vec_add (subA1->coeffs+k, subA1->coeffs+k, buf1->coeffs,
+                      fq_nmod_poly_length(buf1, fq_con), fq_con);
+    _fq_nmod_vec_add (subA2->coeffs+kk, subA2->coeffs+kk, buf1->coeffs,
+                      fq_nmod_poly_length(buf1, fq_con), fq_con);
+
+    fq_nmod_poly_clear (buf1, fq_con);
+  }
+  _fq_nmod_poly_normalise (subA1, fq_con);
+  _fq_nmod_poly_normalise (subA2, fq_con);
+}
+#endif
 
 void
 kronSubReciproQ (fmpz_poly_t subA1, fmpz_poly_t subA2, const CanonicalForm& A,
@@ -1470,6 +1555,111 @@ reverseSubstReciproFp (const nmod_poly_t F, const nmod_poly_t G, int d, int k)
   return result;
 }
 
+#if (__FLINT_VERSION_MINOR >= 4)
+CanonicalForm
+reverseSubstReciproFq (const fq_nmod_poly_t F, const fq_nmod_poly_t G, int d,
+                       int k, const Variable& alpha, const fq_nmod_ctx_t fq_con)
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+
+  fq_nmod_poly_t f, g;
+  int degf= fq_nmod_poly_degree(F, fq_con);
+  int degg= fq_nmod_poly_degree(G, fq_con);
+
+  fq_nmod_poly_t buf1,buf2, buf3;
+
+  fq_nmod_poly_init (f, fq_con);
+  fq_nmod_poly_init (g, fq_con);
+  fq_nmod_poly_set (f, F, fq_con);
+  fq_nmod_poly_set (g, G, fq_con);
+  if (fq_nmod_poly_length (f, fq_con) < (long) d*(k + 1)) //zero padding
+    fq_nmod_poly_fit_length (f, (long) d*(k + 1), fq_con);
+
+  CanonicalForm result= 0;
+  int i= 0;
+  int lf= 0;
+  int lg= d*k;
+  int degfSubLf= degf;
+  int deggSubLg= degg-lg;
+  int repLengthBuf2, repLengthBuf1, tmp;
+  while (degf >= lf || lg >= 0)
+  {
+    if (degfSubLf >= d)
+      repLengthBuf1= d;
+    else if (degfSubLf < 0)
+      repLengthBuf1= 0;
+    else
+      repLengthBuf1= degfSubLf + 1;
+    fq_nmod_poly_init2 (buf1, repLengthBuf1, fq_con);
+    _fq_nmod_poly_set_length (buf1, repLengthBuf1, fq_con);
+
+    _fq_nmod_vec_set (buf1->coeffs, f->coeffs + lf, repLengthBuf1, fq_con);
+    _fq_nmod_poly_normalise (buf1, fq_con);
+
+    repLengthBuf1= fq_nmod_poly_length (buf1, fq_con);
+
+    if (deggSubLg >= d - 1)
+      repLengthBuf2= d - 1;
+    else if (deggSubLg < 0)
+      repLengthBuf2= 0;
+    else
+      repLengthBuf2= deggSubLg + 1;
+
+    fq_nmod_poly_init2 (buf2, repLengthBuf2, fq_con);
+    _fq_nmod_poly_set_length (buf2, repLengthBuf2, fq_con);
+    _fq_nmod_vec_set (buf2->coeffs, g->coeffs + lg, repLengthBuf2, fq_con);
+
+    _fq_nmod_poly_normalise (buf2, fq_con);
+    repLengthBuf2= fq_nmod_poly_length (buf2, fq_con);
+
+    fq_nmod_poly_init2 (buf3, repLengthBuf2 + d, fq_con);
+    _fq_nmod_poly_set_length (buf3, repLengthBuf2 + d, fq_con);
+    _fq_nmod_vec_set (buf3->coeffs, buf1->coeffs, repLengthBuf1, fq_con);
+    _fq_nmod_vec_set (buf3->coeffs + d, buf2->coeffs, repLengthBuf2, fq_con);
+
+    _fq_nmod_poly_normalise (buf3, fq_con);
+
+    result += convertFq_nmod_poly_t2FacCF (buf3, x, alpha, fq_con)*power (y, i);
+    i++;
+
+
+    lf= i*d;
+    degfSubLf= degf - lf;
+
+    lg= d*(k - i);
+    deggSubLg= degg - lg;
+
+    if (lg >= 0 && deggSubLg > 0)
+    {
+      if (repLengthBuf2 > degfSubLf + 1)
+        degfSubLf= repLengthBuf2 - 1;
+      tmp= tmin (repLengthBuf1, deggSubLg + 1);
+      _fq_nmod_vec_sub (g->coeffs + lg, g->coeffs + lg, buf1-> coeffs,
+                        tmp, fq_con);
+    }
+    if (lg < 0)
+    {
+      fq_nmod_poly_clear (buf1, fq_con);
+      fq_nmod_poly_clear (buf2, fq_con);
+      fq_nmod_poly_clear (buf3, fq_con);
+      break;
+    }
+    if (degfSubLf >= 0)
+      _fq_nmod_vec_sub (f->coeffs + lf, f->coeffs + lf, buf2->coeffs,
+                        repLengthBuf2, fq_con);
+    fq_nmod_poly_clear (buf1, fq_con);
+    fq_nmod_poly_clear (buf2, fq_con);
+    fq_nmod_poly_clear (buf3, fq_con);
+  }
+
+  fq_nmod_poly_clear (f, fq_con);
+  fq_nmod_poly_clear (g, fq_con);
+
+  return result;
+}
+#endif
+
 CanonicalForm
 reverseSubstReciproQ (const fmpz_poly_t F, const fmpz_poly_t G, int d, int k)
 {
@@ -1604,20 +1794,54 @@ reverseSubstReciproQ (const fmpz_poly_t F, const fmpz_poly_t G, int d, int k)
   return result;
 }
 
+#if (__FLINT_VERSION_MINOR >= 4)
+CanonicalForm
+reverseSubstFq (const fq_nmod_poly_t F, int d, const Variable& alpha,
+                const fq_nmod_ctx_t fq_con)
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+
+  fq_nmod_poly_t buf;
+  CanonicalForm result= 0;
+  int i= 0;
+  int degf= fq_nmod_poly_degree(F, fq_con);
+  int k= 0;
+  int degfSubK, repLength;
+  while (degf >= k)
+  {
+    degfSubK= degf - k;
+    if (degfSubK >= d)
+      repLength= d;
+    else
+      repLength= degfSubK + 1;
+
+    fq_nmod_poly_init2 (buf, repLength, fq_con);
+    _fq_nmod_poly_set_length (buf, repLength, fq_con);
+    _fq_nmod_vec_set (buf->coeffs, F->coeffs+k, repLength, fq_con);
+    _fq_nmod_poly_normalise (buf, fq_con);
+
+    result += convertFq_nmod_poly_t2FacCF (buf, x, alpha, fq_con)*power (y, i);
+    i++;
+    k= d*i;
+    fq_nmod_poly_clear (buf, fq_con);
+  }
+
+  return result;
+}
+#endif
+
 CanonicalForm reverseSubstFp (const nmod_poly_t F, int d)
 {
   Variable y= Variable (2);
   Variable x= Variable (1);
 
-  nmod_poly_t f;
   mp_limb_t ninv= n_preinvert_limb (getCharacteristic());
-  nmod_poly_init_preinv (f, getCharacteristic(), ninv);
-  nmod_poly_set (f, F);
 
   nmod_poly_t buf;
   CanonicalForm result= 0;
   int i= 0;
-  int degf= nmod_poly_degree(f);
+  int degf= nmod_poly_degree(F);
   int k= 0;
   int degfSubK, repLength, j;
   while (degf >= k)
@@ -1630,7 +1854,7 @@ CanonicalForm reverseSubstFp (const nmod_poly_t F, int d)
 
     nmod_poly_init2_preinv (buf, getCharacteristic(), ninv, repLength);
     for (j= 0; j < repLength; j++)
-      nmod_poly_set_coeff_ui (buf, j, nmod_poly_get_coeff_ui (f, j + k));
+      nmod_poly_set_coeff_ui (buf, j, nmod_poly_get_coeff_ui (F, j + k));
     _nmod_poly_normalise (buf);
 
     result += convertnmod_poly_t2FacCF (buf, x)*power (y, i);
@@ -1638,7 +1862,6 @@ CanonicalForm reverseSubstFp (const nmod_poly_t F, int d)
     k= d*i;
     nmod_poly_clear (buf);
   }
-  nmod_poly_clear (f);
 
   return result;
 }
@@ -1711,6 +1934,83 @@ mulMod2FLINTFp (const CanonicalForm& F, const CanonicalForm& G, const
   nmod_poly_clear (FLINTB);
   return A;
 }
+
+#if (__FLINT_VERSION_MINOR >= 4)
+CanonicalForm
+mulMod2FLINTFqReci (const CanonicalForm& F, const CanonicalForm& G, const
+                    CanonicalForm& M, const Variable& alpha,
+                    const fq_nmod_ctx_t fq_con)
+{
+  int d1= degree (F, 1) + degree (G, 1) + 1;
+  d1 /= 2;
+  d1 += 1;
+
+  fq_nmod_poly_t F1, F2;
+  kronSubReciproFq (F1, F2, F, d1, fq_con);
+
+  fq_nmod_poly_t G1, G2;
+  kronSubReciproFq (G1, G2, G, d1, fq_con);
+
+  int k= d1*degree (M);
+  fq_nmod_poly_mullow (F1, F1, G1, (long) k, fq_con);
+
+  int degtailF= degree (tailcoeff (F), 1);;
+  int degtailG= degree (tailcoeff (G), 1);
+  int taildegF= taildegree (F);
+  int taildegG= taildegree (G);
+
+  int b= fq_nmod_poly_degree (F2, fq_con) + fq_nmod_poly_degree (G2, fq_con) - k
+         - degtailF - degtailG + d1*(2+taildegF + taildegG);
+
+  fq_nmod_poly_reverse (F2, F2, fq_nmod_poly_degree (F2, fq_con), fq_con);
+  fq_nmod_poly_reverse (G2, G2, fq_nmod_poly_degree (G2, fq_con), fq_con);
+  fq_nmod_poly_mullow (F2, F2, G2, b+1, fq_con);
+  fq_nmod_poly_reverse (F2, F2, b, fq_con);
+
+  int d2= tmax (fq_nmod_poly_degree (F2, fq_con)/d1,
+                fq_nmod_poly_degree (F1, fq_con)/d1);
+
+  CanonicalForm result= reverseSubstReciproFq (F1, F2, d1, d2, alpha, fq_con);
+
+  fq_nmod_poly_clear (F1, fq_con);
+  fq_nmod_poly_clear (F2, fq_con);
+  fq_nmod_poly_clear (G1, fq_con);
+  fq_nmod_poly_clear (G2, fq_con);
+  return result;
+}
+
+CanonicalForm
+mulMod2FLINTFq (const CanonicalForm& F, const CanonicalForm& G, const
+                CanonicalForm& M, const Variable& alpha,
+                const fq_nmod_ctx_t fq_con)
+{
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+
+  int degAx= degree (A, 1);
+  int degAy= degree (A, 2);
+  int degBx= degree (B, 1);
+  int degBy= degree (B, 2);
+  int d1= degAx + 1 + degBx;
+  int d2= tmax (degAy, degBy);
+
+  if (d1 > 128 && d2 > 160 && (degAy == degBy) && (2*degAy > degree (M)))
+    return mulMod2FLINTFqReci (A, B, M, alpha, fq_con);
+
+  fq_nmod_poly_t FLINTA, FLINTB;
+  kronSubFq (FLINTA, A, d1, fq_con);
+  kronSubFq (FLINTB, B, d1, fq_con);
+
+  int k= d1*degree (M);
+  fq_nmod_poly_mullow (FLINTA, FLINTA, FLINTB, (long) k, fq_con);
+
+  A= reverseSubstFq (FLINTA, d1, alpha, fq_con);
+
+  fq_nmod_poly_clear (FLINTA, fq_con);
+  fq_nmod_poly_clear (FLINTB, fq_con);
+  return A;
+}
+#endif
 
 CanonicalForm
 mulMod2FLINTQReci (const CanonicalForm& F, const CanonicalForm& G, const
@@ -2251,7 +2551,7 @@ CanonicalForm reverseSubstFp (const zz_pX& F, int d)
   return result;
 }
 
-// assumes input to be reduced mod M and to be an element of Fq not Fp
+// assumes input to be reduced mod M and to be an element of Fp
 CanonicalForm
 mulMod2NTLFpReci (const CanonicalForm& F, const CanonicalForm& G, const
                   CanonicalForm& M)
@@ -2360,6 +2660,17 @@ mulMod2NTLFq (const CanonicalForm& F, const CanonicalForm& G, const
 
   if (hasFirstAlgVar (A, alpha) || hasFirstAlgVar (B, alpha))
   {
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+    nmod_poly_t FLINTmipo;
+    convertFacCF2nmod_poly_t (FLINTmipo, getMipo (alpha));
+
+    fq_nmod_ctx_t fq_con;
+    fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+    A= mulMod2FLINTFq (A, B, M, alpha, fq_con);
+    nmod_poly_clear (FLINTmipo);
+    fq_nmod_ctx_clear (fq_con);
+#else
     int degAx= degree (A, 1);
     int degAy= degree (A, 2);
     int degBx= degree (B, 1);
@@ -2387,15 +2698,17 @@ mulMod2NTLFq (const CanonicalForm& F, const CanonicalForm& G, const
     MulTrunc (NTLA, NTLA, NTLB, (long) k);
 
     A= reverseSubstFq (NTLA, d1, alpha);
-
-    return A;
+#endif
   }
   else
+  {
 #ifdef HAVE_FLINT
-    return mulMod2FLINTFp (A, B, M);
+    A= mulMod2FLINTFp (A, B, M);
 #else
-    return mulMod2NTLFp (A, B, M);
+    A= mulMod2NTLFp (A, B, M);
 #endif
+  }
+  return A;
 }
 
 CanonicalForm mulMod2 (const CanonicalForm& A, const CanonicalForm& B,
@@ -2760,12 +3073,35 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, const CanonicalForm&
     }
     else
     {
+      Variable y= Variable (2);
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+      nmod_poly_t FLINTmipo;
+      fq_nmod_ctx_t fq_con;
+
+      nmod_poly_init (FLINTmipo, getCharacteristic());
+      convertFacCF2nmod_poly_t (FLINTmipo, M);
+
+      fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+
+      fq_nmod_poly_t FLINTA, FLINTB;
+      convertFacCF2Fq_nmod_poly_t (FLINTA, swapvar (A, x, y), fq_con);
+      convertFacCF2Fq_nmod_poly_t (FLINTB, swapvar (B, x, y), fq_con);
+
+      fq_nmod_poly_divrem (FLINTA, FLINTB, FLINTA, FLINTB, fq_con);
+
+      Q= convertFq_nmod_poly_t2FacCF (FLINTA, x, y, fq_con);
+
+      fq_nmod_poly_clear (FLINTA, fq_con);
+      fq_nmod_poly_clear (FLINTB, fq_con);
+      nmod_poly_clear (FLINTmipo);
+      fq_nmod_ctx_clear (fq_con);
+#else
       bool zz_pEbak= zz_pE::initialized();
       zz_pEBak bak;
       if (zz_pEbak)
         bak.save();
       zz_pX mipo= convertFacCF2NTLzzpX (M);
-      Variable y= Variable (2);
       zz_pEX NTLA, NTLB;
       NTLA= convertFacCF2NTLzz_pEX (swapvar (A, x, y), mipo);
       NTLB= convertFacCF2NTLzz_pEX (swapvar (B, x, y), mipo);
@@ -2773,6 +3109,7 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, const CanonicalForm&
       Q= convertNTLzz_pEX2CF (NTLA, x, y);
       if (zz_pEbak)
         bak.restore();
+#endif
     }
   }
 
@@ -2819,8 +3156,31 @@ newtonDivrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
     }
     else
     {
-      zz_pX mipo= convertFacCF2NTLzzpX (M);
       Variable y= Variable (2);
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+      nmod_poly_t FLINTmipo;
+      fq_nmod_ctx_t fq_con;
+
+      nmod_poly_init (FLINTmipo, getCharacteristic());
+      convertFacCF2nmod_poly_t (FLINTmipo, M);
+
+      fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+      fq_nmod_poly_t FLINTA, FLINTB;
+      convertFacCF2Fq_nmod_poly_t (FLINTA, swapvar (A, x, y), fq_con);
+      convertFacCF2Fq_nmod_poly_t (FLINTB, swapvar (B, x, y), fq_con);
+
+      fq_nmod_poly_divrem (FLINTA, FLINTB, FLINTA, FLINTB, fq_con);
+
+      Q= convertFq_nmod_poly_t2FacCF (FLINTA, x, y, fq_con);
+      R= convertFq_nmod_poly_t2FacCF (FLINTB, x, y, fq_con);
+
+      fq_nmod_poly_clear (FLINTA, fq_con);
+      fq_nmod_poly_clear (FLINTB, fq_con);
+      nmod_poly_clear (FLINTmipo);
+      fq_nmod_ctx_clear (fq_con);
+#else
+      zz_pX mipo= convertFacCF2NTLzzpX (M);
       zz_pEX NTLA, NTLB;
       NTLA= convertFacCF2NTLzz_pEX (swapvar (A, x, y), mipo);
       NTLB= convertFacCF2NTLzz_pEX (swapvar (B, x, y), mipo);
@@ -2828,6 +3188,7 @@ newtonDivrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
       DivRem (NTLQ, NTLR, NTLA, NTLB);
       Q= convertNTLzz_pEX2CF (NTLQ, x, y);
       R= convertNTLzz_pEX2CF (NTLR, x, y);
+#endif
     }
   }
 }
@@ -3149,11 +3510,31 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
     Variable alpha;
     if (hasFirstAlgVar (A, alpha) || hasFirstAlgVar (B, alpha))
     {
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+      nmod_poly_t FLINTmipo;
+      fq_nmod_ctx_t fq_con;
+
+      nmod_poly_init (FLINTmipo, getCharacteristic());
+      convertFacCF2nmod_poly_t (FLINTmipo, getMipo (alpha));
+
+      fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+      fq_nmod_poly_t FLINTA, FLINTB;
+      convertFacCF2Fq_nmod_poly_t (FLINTA, A, fq_con);
+      convertFacCF2Fq_nmod_poly_t (FLINTB, B, fq_con);
+      int result= fq_nmod_poly_divides (FLINTA, FLINTB, FLINTA, fq_con);
+      fq_nmod_poly_clear (FLINTA, fq_con);
+      fq_nmod_poly_clear (FLINTB, fq_con);
+      nmod_poly_clear (FLINTmipo);
+      fq_nmod_ctx_clear (fq_con);
+      return result;
+#else
       zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
       zz_pE::init (NTLMipo);
       zz_pEX NTLA= convertFacCF2NTLzz_pEX (A, NTLMipo);
       zz_pEX NTLB= convertFacCF2NTLzz_pEX (B, NTLMipo);
       return divide (NTLB, NTLA);
+#endif
     }
 #ifdef HAVE_FLINT
     nmod_poly_t FLINTA, FLINTB;
