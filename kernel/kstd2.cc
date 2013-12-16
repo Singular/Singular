@@ -1902,8 +1902,10 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         pWrite(strat->P.sig);
 #endif
 #if SBA_PRODUCT_CRITERION
-        if (strat->P.prd_crit) {
+        if (strat->P.prod_crit) {
+#if SBA_PRINT_PRODUCT_CRITERION
           product_criterion++;
+#endif
           int pos = posInSyz(strat, strat->P.sig);
           enterSyz(strat->P, strat, pos);
           if (strat->P.lcm!=NULL)
