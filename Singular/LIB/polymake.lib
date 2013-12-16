@@ -1,27 +1,32 @@
-////
-version="version oldpolymake.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version oldpolymake.lib 4.0.0.0 Jun_2013 ";
 category="Tropical Geometry";
 info="
-LIBRARY:   oldpolymake.lib  Computations with polytopes and fans,
-                            interface to polymake and TOPCOM
+LIBRARY:   polymake.lib    Computations with polytopes and fans,
+                           interface to polymake and TOPCOM
 AUTHOR:    Thomas Markwig,  email: keilen@mathematik.uni-kl.de
 
 WARNING:
    Most procedures will not work unless polymake or topcom is installed and
    if so, they will only work with the operating system LINUX!
-   For more detailed information see the following note or consult the
+   For more detailed information see IMPORTANT NOTE respectively consult the
    help string of the procedures.
 
-NOTE:
+   The conventions used in this library for polytopes and fans, e.g. the
+   length and labeling of their vertices resp. rays, differs from the conventions
+   used in polymake and thus from the conventions used in the polymake
+   extension polymake.so of Singular. We recommend to use the newer polymake.so
+   whenever possible.
+
+IMPORTANT NOTE:
    Even though this is a Singular library for computing polytopes and fans
    such as the Newton polytope or the Groebner fan of a polynomial, most of
    the hard computations are NOT done by Singular but by the program
 @* - polymake by Ewgenij Gawrilow, TU Berlin and Michael Joswig, TU Darmstadt
 @*   (see http://www.math.tu-berlin.de/polymake/),
-@* respectively (only in the procedure triangularions) by the program
-@* - topcom by Joerg Rambau, Universitaet Bayreuth (see http://www.uni-bayreuth.de/
-     departments/wirtschaftsmathematik/rambau/TOPCOM);
-@*   This library should rather be seen as an interface which allows to use a
+@* respectively (only in the procedure triangulations) by the program
+@* - topcom by Joerg Rambau, Universitaet Bayreuth (see
+@*   http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM);
+@*   this library should rather be seen as an interface which allows to use a
      (very limited) number of options which polymake respectively topcom offers
      to compute with polytopes and fans and to make the results available in
      Singular for further computations;
@@ -31,31 +36,30 @@ NOTE:
 @*   Note, though, that the procedures concerned with planar polygons are
      independent of both, polymake and topcom.
 
-PROCEDURES:
-  polymakePolytope()   computes the vertices of a polytope using polymake
-  newtonPolytopeP()     computes the Newton polytope of a polynomial
-  newtonPolytopeLP()   computes the lattice points of the Newton polytope
-  normalFan()          computes the normal fan of a polytope
-  groebnerFan()        computes the Groebner fan of a polynomial
-  intmatToPolymake()   transforms an integer matrix into polymake format
-  polymakeToIntmat()   transforms polymake output into an integer matrix
+PROCEDURES USING POLYMAKE:
+  polymakePolytope()  computes the vertices of a polytope using polymake
+  newtonPolytopeP()    computes the Newton polytope of a polynomial
+  newtonPolytopeLP()  computes the lattice points of the Newton polytope
+  normalFanL()         computes the normal fan of a polytope
+  groebnerFan()       computes the Groebner fan of a polynomial
 
-  triangulations()     computes all triangulations of a marked polytope
-  secondaryPolytope()  computes the secondary polytope of a marked polytope
+PROCEDURES USING TOPCOM:
+  triangulations()    computes all triangulations of a marked polytope
+  secondaryPolytope() computes the secondary polytope of a marked polytope
 
-  secondaryFan()       computes the secondary fan of a marked polytope
+PROCEDURES USING POLYMAKE AND TOPCOM:
+  secondaryFan()      computes the secondary fan of a marked polytope
 
-  cycleLength()      computes the cycleLength of cycle
-  splitPolygon()     splits a marked polygon into vertices, facets, interior points
-  eta()              computes the eta-vector of a triangulation
-  findOrientedBoundary()    computes the boundary of a convex hull
-  cyclePoints()      computes lattice points connected to some lattice point
-  latticeArea()      computes the lattice area of a polygon
-  picksFormula()     computes the ingrediants of Pick's formula for a polygon
-  ellipticNF()       computes the normal form of an elliptic polygon
-  ellipticNFDB()     displays the 16 normal forms of elliptic polygons
-
-  polymakeKeepTmpFiles()  determines if the files created in /tmp should be kept
+PROCEDURES CONERNED WITH PLANAR POLYGONS:
+  cycleLength()    computes the cycleLength of cycle
+  splitPolygon()   splits a marked polygon into vertices, facets, interior points
+  eta()            computes the eta-vector of a triangulation
+  findOrientedBoundary()  computes the boundary of a convex hull
+  cyclePoints()    computes lattice points connected to some lattice point
+  latticeArea()    computes the lattice area of a polygon
+  picksFormula()   computes the ingrediants of Pick's formula for a polygon
+  ellipticNF()     computes the normal form of an elliptic polygon
+  ellipticNFDB()   displays the 16 normal forms of elliptic polygons
 
 KEYWORDS:    polytope; fan; secondary fan; secondary polytope; polymake;
              Newton polytope; Groebner fan
@@ -84,28 +88,33 @@ LIB "linalg.lib";
 LIB "random.lib";
 ////////////////////////////////////////////////////////////////////////////////
 
+static proc mod_init ()
+{
+  LIB "gfanlib.so";
+  LIB "polymake.so";
+}
 
 /////////////////////////////////////////////////////////////////////////////
 /// PROCEDURES USING POLYMAKE
 /////////////////////////////////////////////////////////////////////////////
 
-proc polymakePolytope (intmat polytop,list #)
-"USAGE:  polymakePolytope(polytope[,#]);   polytope list, # string
-ASSUME:  each row of polytope gives the coordinates of a lattice point of a
+proc polymakePolytope (intmat points)
+"USAGE:  polymakePolytope(points);   polytope intmat
+ASSUME:  each row of points gives the coordinates of a lattice point of a
          polytope with their affine coordinates as given by the output of
          secondaryPolytope
 PURPOSE: the procedure calls polymake to compute the vertices of the polytope
          as well as its dimension and information on its facets
-RETURN:  list L with four entries
+RETURN:  list, L with four entries
 @*            L[1] : an integer matrix whose rows are the coordinates of vertices
                      of the polytope
 @*            L[2] : the dimension of the polytope
-@*            L[3] : a list whose i-th entry explains to which vertices the
+@*            L[3] : a list whose ith entry explains to which vertices the
                      ith vertex of the Newton polytope is connected
                      -- i.e. L[3][i] is an integer vector and an entry k in
                         there means that the vertex L[1][i] is connected to the
                         vertex L[1][k]
-@*            L[4] : an integer matrix whose rows mulitplied by
+@*            L[4] : an matrix of type bigintmat whose rows mulitplied by
                      (1,var(1),...,var(nvar)) give a linear system of equations
                      describing the affine hull of the polytope,
                      i.e. the smallest affine space containing the polytope
@@ -117,115 +126,21 @@ NOTE: -  for its computations the procedure calls the program polymake by
 @*    -  note that in the vertex edge graph we have changed the polymake
          convention which starts indexing its vertices by zero while we start
          with one !
-@*    -  the procedure creates the file  /tmp/polytope.polymake which contains
-         the polytope in polymake format; if you wish to use this for further
-         computations with polymake, you have to use the procedure
-         polymakeKeepTmpFiles in before
-@*    -  moreover, the procedure creates the file /tmp/polytope.output which
-         it deletes again before ending
-@*    -  it is possible to provide an optional second argument a string
-         which then will be used instead of 'polytope' in the name of the
-         polymake output file
 EXAMPLE: example polymakePolytope;   shows an example"
 {
-  // the header for the file secendarypolytope.polymake
-  string sp="_application polytope
-_version 2.2
-_type RationalPolytope
-
-POINTS
-";
+  // add a first column to polytope as homogenising coordinate
+  points=intmatAddFirstColumn(points,"points");
+  polytope polytop=polytopeViaPoints(points);
+  list graph=vertexAdjacencyGraph(polytop)[2];
   int i,j;
-  // set the name for the polymake output file
-  if (size(#)>0)
+  for (i=1;i<=size(graph);i++)
   {
-    if (typeof(#[1])=="string")
+    for (j=1;j<=size(graph[i]);j++)
     {
-      string dateiname=#[1];
-    }
-    else
-    {
-      string dateiname="polytope";
+      graph[i][j]=graph[i][j]+1;
     }
   }
-  else
-  {
-    string dateiname="polytope";
-  }
-  // create the lattice point list for polymake
-  sp=sp+intmatToPolymake(polytop,"points");
-  // initialise dateiname.polymake and compute the vertices
-  write(":w /tmp/"+dateiname+".polymake",sp);
-  system("sh","cd /tmp; polymake "+dateiname+".polymake VERTICES > "+dateiname+".output");
-  string vertices=read("/tmp/"+dateiname+".output");
-  system("sh","/bin/rm /tmp/"+dateiname+".output");
-  intmat np=polymakeToIntmat(vertices,"affine");
-  // compute the dimension
-  system("sh","cd /tmp; polymake "+dateiname+".polymake DIM > "+dateiname+".output");
-  string pdim=read("/tmp/"+dateiname+".output");
-  system("sh","/bin/rm /tmp/"+dateiname+".output");
-  pdim=pdim[5,size(pdim)-6];
-  execute("int nd="+pdim+";");
-  // compute the vertex-edge graph
-  system("sh","cd /tmp; polymake "+dateiname+".polymake GRAPH > "+dateiname+".output");
-  string vertexedgegraph=read("/tmp/"+dateiname+".output");
-  system("sh","/bin/rm /tmp/"+dateiname+".output");
-  vertexedgegraph=vertexedgegraph[7,size(vertexedgegraph)-8];
-  string newveg;
-  for (i=1;i<=size(vertexedgegraph);i++)
-  {
-    if (vertexedgegraph[i]=="{")
-    {
-      newveg=newveg+"intvec(";
-    }
-    else
-    {
-      if (vertexedgegraph[i]=="}")
-      {
-        newveg=newveg+"),";
-      }
-      else
-      {
-        if (vertexedgegraph[i]==" ")
-        {
-          newveg=newveg+",";
-        }
-        else
-        {
-          newveg=newveg+vertexedgegraph[i];
-        }
-      }
-    }
-  }
-  newveg=newveg[1,size(newveg)-1];
-  execute("list nveg="+newveg+";");
-  // raise each entry in nveg by one
-  for (i=1;i<=size(nveg);i++)
-  {
-    for (j=1;j<=size(nveg[i]);j++)
-    {
-      nveg[i][j]=nveg[i][j]+1;
-    }
-  }
-  // compute the affine hull
-  system("sh","cd /tmp; polymake "+dateiname+".polymake AFFINE_HULL > "+dateiname+".output");
-  string equations=read("/tmp/"+dateiname+".output");
-  system("sh","/bin/rm /tmp/"+dateiname+".output");
-  if (size(equations)>14)
-  {
-    intmat neq=polymakeToIntmat(equations,"cleardenom");
-  }
-  else
-  {
-    intmat neq[1][ncols(polytop)+1];
-  }
-  // delete the tmp-files, if polymakekeeptmpfiles is not set
-  if (defined(polymakekeeptmpfiles)==0)
-  {
-    system("sh","/bin/rm /tmp/"+dateiname+".polymake");
-  }
-  // return the files
-  return(list(np,nd,nveg,neq));
+  return(list(intmatcoldelete(vertices(polytop),1),dimension(polytop),graph,equations(polytop)));
 }
 example
 {
@@ -246,14 +161,14 @@ example
    // the affine hull has the equation
    ring r=0,x(1..4),dp;
    matrix M[5][1]=1,x(1),x(2),x(3),x(4);
-   np[4]*M;
+   intmat(np[4])*M;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 
-proc newtonPolytopeP (poly f,list #)
-"USAGE: newtonPolytopeP(f[,#]);  f poly, # string
-RETURN: list L with four entries
+proc newtonPolytopeP (poly f)
+"USAGE: newtonPolytopeP(f);  f poly
+RETURN: list, L with four entries
 @*            L[1] : an integer matrix whose rows are the coordinates of vertices
                      of the Newton polytope of f
 @*            L[2] : the dimension of the Newton polytope of f
@@ -262,26 +177,18 @@ RETURN: list L with four entries
                      -- i.e. L[3][i] is an integer vector and an entry k in
                         there means that the vertex L[1][i] is
                         connected to the vertex L[1][k]
-@*            L[4] : an integer matrix whose rows mulitplied by
+@*            L[4] : an matrix of type bigintmat whose rows mulitplied by
                      (1,var(1),...,var(nvar)) give a linear system of equations
                      describing the affine hull of the Newton polytope, i.e. the
                      smallest affine space containing the Newton polytope
 NOTE: -  if we replace the first column of L[4] by zeros, i.e. if we move
          the affine hull to the origin, then we get the equations for the
-         orthogonal comploment of the linearity space of the normal fan dual
+         orthogonal complement of the linearity space of the normal fan dual
          to the Newton polytope, i.e. we get the EQUATIONS that
          we need as input for polymake when computing the normal fan
 @*    -  the procedure calls for its computation polymake by Ewgenij Gawrilow,
          TU Berlin and Michael Joswig, so it only works if polymake is installed;
          see http://www.math.tu-berlin.de/polymake/
-@*    -  the procedure creates the file  /tmp/newtonPolytope.polymake which
-         contains the polytope in polymake format and which can be used for
-         further computations with polymake
-@*    -  moreover, the procedure creates the file /tmp/newtonPolytope.output
-         and deletes it again before ending
-@*    -  it is possible to give as an optional second argument a string
-         which then will be used instead of 'newtonPolytope' in the name of
-         the polymake output file
 EXAMPLE: example newtonPolytopeP;   shows an example"
 {
   int i,j;
@@ -295,12 +202,8 @@ EXAMPLE: example newtonPolytopeP;   shows an example"
     exponents[i,1..nvars(basering)]=leadexp(f);
     f=f-lead(f);
   }
-  if (size(#)==0)
-  {
-    #[1]="newtonPolytope";
-  }
   // call polymakePolytope with exponents
-  return(polymakePolytope(exponents,#));
+  return(polymakePolytope(exponents));
 }
 example
 {
@@ -329,7 +232,7 @@ example
    np[2];
    // the Newton polytope is contained in the affine space given
    //     by the equations
-   np[4]*M;
+   intmat(np[4])*M;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -338,7 +241,7 @@ proc newtonPolytopeLP (poly f)
 "USAGE:  newtonPolytopeLP(f);  f poly
 RETURN: list, the exponent vectors of the monomials occuring in f,
               i.e. the lattice points of the Newton polytope of f
-EXAMPLE: example normalFan;   shows an example"
+EXAMPLE: example newtonPolytopeLP;   shows an example"
 {
   list np;
   int i=1;
@@ -362,8 +265,8 @@ example
 
 /////////////////////////////////////////////////////////////////////////////
 
-proc normalFan (intmat vertices,intmat affinehull,list graph,int er,list #)
-"USAGE:  normalFan (vert,aff,graph,rays,[,#]);   vert,aff intmat,  graph list, rays int, # string
+proc normalFanL (def vertices, def affinehull,list graph,int er,list #)
+"USAGE:  normalFanL (vert,aff,graph,rays,[,#]);   vert,aff intmat,  graph list, rays int, # string
 ASSUME:  - vert is an integer matrix whose rows are the coordinate of
            the vertices of a convex lattice polytope;
 @*       - aff describes the affine hull of this polytope, i.e.
@@ -395,10 +298,16 @@ NOTE:    - the procedure calls for its computation polymake by Ewgenij Gawrilow,
            see http://www.math.tu-berlin.de/polymake/
 @*       - in the optional argument # it is possible to hand over other names
            for the variables to be used -- be careful, the format must be correct
-           which is not tested, e.g. if you want the variable names to be
-           u00,u10,u01,u11 then you must hand over the string 'u11,u10,u01,u11'
-EXAMPLE: example normalFan;   shows an example"
+           and that is not tested, e.g. if you want the variable names to be
+           u00,u10,u01,u11 then you must hand over the string u11,u10,u01,u11
+EXAMPLE: example normalFanL;   shows an example"
 {
+  if (typeof(affinehull) != "intmat" && typeof (affinehull) != "bigintmat")
+  {
+    ERROR("normalFanL: input affinehull has to be either intmat or bigintmat");
+    list L;
+    return (L);
+  }
   list ineq; // stores the inequalities of the cones
   int i,j,k;
   // we work over the following ring
@@ -430,8 +339,14 @@ EXAMPLE: example normalFan;   shows an example"
     // the inequalities describing the dual cone in the normal fan
     list pp;  // contain strings representing the inequalities
               // describing the normal cone
-    intmat ie[size(graph[i])][ncols(vertices)]; // contains the inequalities
-                                                // as rows
+    if (typeof (vertices) == "intmat")
+    {
+      intmat ie[size(graph[i])][ncols(vertices)]; // contains the inequalities
+    }                                             // as rows
+    if (typeof (vertices) == "bigintmat")
+    {
+      bigintmat ie[size(graph[i])][ncols(vertices)]; // contains the inequalities
+    }                                                // as rows
     // consider all the vertices to which the ith vertex in the
     // polytope is connected by an edge
     for (j=1;j<=size(graph[i]);j++)
@@ -468,57 +383,29 @@ EXAMPLE: example normalFan;   shows an example"
     kill ie,pp; // kill certain lists
   }
   // remove the first column of affine hull to compute the linearity space
-  intmat linearity=intmatcoldelete(affinehull,1);
+  bigintmat linearity[1][ncols(vertices)];
+  if (nrows(affinehull)>0)
+  {
+    linearity=intmatcoldelete(affinehull,1);
+  }
   //////////////////////////////////////////////////////////////////
   // Compute next the extreme rays of the cones
   //////////////////////////////////////////////////////////////////
   if (er==1)
   {
     list extremerays; // keeps the result
-    string polymake; // keeps polymake output
-    // the header for ineq.polymake
-    string head="_application polytope
-_version 2.2
-_type RationalPolytope
-
-INEQUALITIES
-";
-    // the tail for both polymake files
-    string tail="
-EQUATIONS
-";
-    tail=tail+intmatToPolymake(linearity,"rays");
-    string ungleichungen; // keeps the inequalities for the polymake code
+    cone kegel;
+    bigintmat linearspan=intmatAddFirstColumn(linearity,"rays");
     intmat M; // the matrix keeping the inequalities
-    // create the file ineq.output
-    write(":w /tmp/ineq.output","");
-    int dimension; // keeps the dimension of the intersection the
-                   // bad cones with the u11tobeseencone
     for (i=1;i<=size(ineq);i++)
     {
-      i,". Cone of ",nrows(vertices); // indicate how many
-                                      // vertices have been dealt with
-      ungleichungen=intmatToPolymake(ineq[i][1],"rays");
-      // write the inequalities to ineq.polymake and call polymake
-      write(":w /tmp/ineq.polymake",head+ungleichungen+tail);
-      ungleichungen=""; // clear ungleichungen
-      system("sh","cd /tmp; /bin/rm ineq.output; polymake ineq.polymake VERTICES > ineq.output");
-      // read the result of polymake
-      polymake=read("/tmp/ineq.output");
-      intmat VERT=polymakeToIntmat(polymake,"affine");
-      extremerays[i]=VERT;
-      kill VERT;
+      kegel=coneViaInequalities(intmatAddFirstColumn(ineq[i][1],"rays"),linearspan);
+      extremerays[i]=intmatcoldelete(rays(kegel),1);
     }
     for (i=1;i<=size(ineq);i++)
     {
       ineq[i]=ineq[i]+list(extremerays[i]);
     }
-  }
-  // delete the tmp-files, if polymakekeeptmpfiles is not set
-  if (defined(polymakekeeptmpfiles)==0)
-  {
-    system("sh","/bin/rm /tmp/ineq.polymake");
-    system("sh","/bin/rm /tmp/ineq.output");
   }
   // get the linearity space
   return(list(ineq,linearity));
@@ -533,7 +420,7 @@ example
    // the Newton polytope of f is
    list np=newtonPolytopeP(f);
    // the Groebner fan of f, i.e. the normal fan of the Newton polytope
-   list gf=normalFan(np[1],np[4],np[3],1,"x,y,z");
+   list gf=normalFanL(np[1],np[4],np[3],1,"x,y,z");
    // the number of cones in the Groebner fan of f is:
    size(gf[1]);
    // the inequalities of the first cone as matrix are:
@@ -548,8 +435,8 @@ example
 
 /////////////////////////////////////////////////////////////////////////////
 
-proc groebnerFan (poly f,list #)
-"USAGE:  groebnerFan(f[,#]);  f poly, # string
+proc groebnerFan (poly f)
+"USAGE:  groebnerFan(f);  f poly
 RETURN:  list, the ith entry of L[1] contains information about the ith cone
                in the Groebner fan dual to the ith vertex in the Newton
                polytope of the f
@@ -563,21 +450,15 @@ RETURN:  list, the ith entry of L[1] contains information about the ith cone
                       of the fan, i.e. the linear space which is contained
                       in each cone
 @*             L[3] = the Newton polytope of f in the format of the procedure
-                      newtonPolytope
-@*             L[4] = integer matrix where each row represents the exponet
+                      newtonPolytopeP
+@*             L[4] = integer matrix where each row represents the exponent
                       vector of one monomial occuring in the input polynomial
 NOTE: - if you have already computed the Newton polytope of f then you might want
-        to use the procedure normalFan instead in order to avoid doing costly
+        to use the procedure normalFanL instead in order to avoid doing costly
         computation twice
 @*    - the procedure calls for its computation polymake by Ewgenij Gawrilow,
         TU Berlin and Michael Joswig, so it only works if polymake is installed;
         see http://www.math.tu-berlin.de/polymake/
-@*    - the procedure creates the file  /tmp/newtonPolytope.polymake which
-        contains the Newton polytope of f in polymake format and which can
-        be used for further computations with polymake
-@*    - it is possible to give as an optional second argument as string which
-        then will be used instead of 'newtonPolytope' in the name of the
-        polymake output file
 EXAMPLE: example groebnerFan;   shows an example"
 {
   int i,j;
@@ -590,12 +471,8 @@ EXAMPLE: example groebnerFan;   shows an example"
     exponents[i,1..nvars(basering)]=leadexp(f);
     f=f-lead(f);
   }
-  if (size(#)==0)
-  {
-    #[1]="newtonPolytope";
-  }
   // call polymakePolytope with exponents
-  list newtonp=polymakePolytope(exponents,"newtonPolytope");
+  list newtonp=polymakePolytope(exponents);
   // get the variables as string
   string variablen;
   for (i=1;i<=nvars(basering);i++)
@@ -603,8 +480,8 @@ EXAMPLE: example groebnerFan;   shows an example"
     variablen=variablen+string(var(i))+",";
   }
   variablen=variablen[1,size(variablen)-1];
-  // call normalFan in order to compute the Groebner fan
-  list gf=normalFan(newtonp[1],newtonp[4],newtonp[3],1,variablen);
+  // call normalFanL in order to compute the Groebner fan
+  list gf=normalFanL(newtonp[1],newtonp[4],newtonp[3],1,variablen);
   // append newtonp to gf
   gf[3]=newtonp;
   // append the exponent vectors to gf
@@ -641,196 +518,12 @@ example
 
 
 
-/////////////////////////////////////////////////////////////////////////////
-
-proc intmatToPolymake (intmat M,string art)
-"USAGE:  intmatToPolymake(M,art);  M intmat, art string
-ASSUME:  - M is an integer matrix which should be transformed into polymake
-           format;
-@*       - art is one of the following strings:
-@*           + 'rays'   : indicating that a first column of 0's should be added
-@*           + 'points' : indicating that a first column of 1's should be added
-RETURN:  string, the matrix is transformed in a string and a first column has
-                 been added
-EXAMPLE: example intmatToPolymake;   shows an example"
-{
-  if (art=="rays")
-  {
-    string anf="0 ";
-  }
-  else
-  {
-    string anf="1 ";
-  }
-  string sp;
-  int i,j;
-  // create the lattice point list for polymake
-  for (i=1;i<=nrows(M);i++)
-  {
-    sp=sp+anf;
-    for (j=1;j<=ncols(M);j++)
-    {
-      sp=sp+string(M[i,j])+" ";
-      if (j==ncols(M))
-      {
-        sp=sp+"
-";
-      }
-    }
-  }
-  return(sp);
-}
-example
-{
-   "EXAMPLE:";
-   echo=2;
-   intmat M[3][4]=1,2,3,4,5,6,7,8,9,10,11,12;
-   intmatToPolymake(M,"rays");
-   intmatToPolymake(M,"points");
-}
-
-/////////////////////////////////////////////////////////////////////////////
-
-proc polymakeToIntmat (string pm,string art)
-"USAGE:  polymakeToIntmat(pm,art);  pm, art string
-ASSUME:  pm is the result of calling polymake with one 'argument' like
-         VERTICES, AFFINE_HULL, etc., so that the first row of the string is
-         the name of the corresponding 'argument' and the further rows contain
-         the result which consists of vectors either over the integers
-         or over the rationals
-RETURN:  intmat, the rows of the matrix are basically the vectors in pm, starting
-                 from the second row, where each row has been multiplied with the
-                 lowest common multiple of the denominators of its entries as if
-                 it is an integer matrix; moreover, if art=='affine', then
-                 the first column is omitted since we only want affine
-                 coordinates
-EXAMPLE: example polymakeToIntmat;   shows an example"
-{
-  // we need a line break
-  string zeilenumbruch="
-";
-  // remove the 'argment' name, i.e. the first row of pm
-  while (pm[1]!=zeilenumbruch)
-  {
-    pm=stringdelete(pm,1);
-  }
-  pm=stringdelete(pm,1);
-  // find out how many entries each vector has, namely one more
-  // than 'spaces' in a row
-  int i=1;
-  int s=1;
-  int z=1;
-  while (pm[i]!=zeilenumbruch)
-  {
-    if (pm[i]==" ")
-    {
-      s++;
-    }
-    i++;
-  }
-  // if we want to have affine coordinates
-  if (art=="affine")
-  {
-    s--; // then there is one column less
-    // and the entry of the first column (in the first row) has to be removed
-    while (pm[1]!=" ")
-    {
-      pm=stringdelete(pm,1);
-    }
-    pm=stringdelete(pm,1);
-  }
-  // we add two line breaks at the end in order to have this as
-  // a stopping criterion
-  pm=pm+zeilenumbruch+zeilenumbruch;
-  // we now have to work through each row
-  for (i=1;i<=size(pm);i++)
-  {
-    // if there are two consecutive line breaks we are done
-    if ((pm[i]==zeilenumbruch) and (pm[i+1]==zeilenumbruch))
-    {
-      i=size(pm)+1;
-    }
-    else
-    {
-      // a line break has to be replaced by a comma
-      if (pm[i]==zeilenumbruch)
-      {
-        z++;
-        pm[i]=",";
-        // if we want to have affine coordinates,
-        // then we have to delete the first entry in each row
-        if (art=="affine")
-        {
-         while (pm[i+1]!=" ")
-         {
-           pm=stringdelete(pm,i+1);
-         }
-         pm=stringdelete(pm,i+1);
-        }
-      }
-      // a space has to be replaced by a comma
-      if (pm[i]==" ")
-      {
-        pm[i]=",";
-      }
-    }
-  }
-  // if we have introduced superflous commata at the end, they should be removed
-  while (pm[size(pm)]==",")
-  {
-    pm=stringdelete(pm,size(pm));
-  }
-  // since the matrix could be over the rationals,
-  // we need a ring with rational coefficients
-  ring zwischering=0,x,lp;
-  // create the matrix with the elements of pm as entries
-  execute("matrix mm["+string(z)+"]["+string(s)+"]="+pm+";");
-  // transform this into an integer matrix
-  matrix M[1][ncols(mm)]; // takes a row of mm
-  int cm;  // takes a lowest common multiple
-  // multiply each row by an integer such that its entries are integers
-  for (int j=1;j<=nrows(mm);j++)
-  {
-    M=mm[j,1..ncols(mm)];
-    cm=commondenominator(M);
-    for (i=1;i<=ncols(mm);i++)
-    {
-      mm[j,i]=cm*mm[j,i];
-    }
-  }
-  // transform the matrix mm into an integer matrix
-  execute("intmat im["+string(z)+"]["+string(s)+"]="+string(mm)+";");
-  return(im);
-}
-example
-{
-   "EXAMPLE:";
-   echo=2;
-   // this is the usual output of some polymake computation
-   string pm="VERTICES
-0 1 3 5/3 1/3 -1 -23/3 -1/3 5/3 1/3 1
-0 1 3 -23/3 5/3 1 5/3 1/3 1/3 -1/3 -1
-0 1 1 1/3 -1/3 -1 5/3 1/3 -23/3 5/3 3
-0 1 1 5/3 -23/3 3 1/3 5/3 -1/3 1/3 -1
-0 1 -1 1/3 5/3 3 -1/3 -23/3 1/3 5/3 1
-0 1 -1 -1/3 1/3 1 1/3 5/3 5/3 -23/3 3
-0 1 -1 1 3 -5 -1 3 -1 1 -1
-0 1 -1 -1 -1 -1 1 1 3 3 -5
-0 1 -5 3 1 -1 3 -1 1 -1 -1
-
-";
-   intmat PM=polymakeToIntmat(pm,"affine");
-   // note that the first column has been removed, since we asked for
-   // affine coordinates, and the denominators have been cleared
-   print(PM);
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 /// PROCEDURES USING TOPCOM
 ///////////////////////////////////////////////////////////////////////////////
 
-proc triangulations (list polygon)
-"USAGE:  triangulations(polygon); list polygon
+proc triangulations (list polygon,list #)
+"USAGE:  triangulations(polygon[,#]); list polygon, list #
 ASSUME:  polygon is a list of integer vectors of the same size representing
          the affine coordinates of the lattice points
 PURPOSE: the procedure considers the marked polytope given as the convex hull of
@@ -845,13 +538,15 @@ NOTE:- the procedure calls for its computations the program points2triangs
        therefore is necessary that this program is installed in order to use
        this  procedure; see
 @*     http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM
+@*   - if you only want to have the regular triangulations the procedure should
+       be called with the string 'regular' as optional argument
 @*   - the procedure creates the files /tmp/triangulationsinput and
        /tmp/triangulationsoutput;
        the former is used as input for points2triangs and the latter is its
        output containing the triangulations of corresponding to points in the
        format of points2triangs; if you wish to use this for further
-       computations with topcom, you have to use the procedure
-       polymakeKeepTmpFiles in before
+       computations with topcom, you have to call the procedure with the
+       string 'keepfiles' as optional argument
 @*   - note that an integer i in an integer vector representing a triangle
        refers to the ith lattice point, i.e. polygon[i]; this convention is
        different from TOPCOM's convention, where i would refer to the i-1st
@@ -859,6 +554,25 @@ NOTE:- the procedure calls for its computations the program points2triangs
 EXAMPLE: example triangulations;   shows an example"
 {
   int i,j;
+  // check for optional arguments
+  int regular,keepfiles;
+  if (size(#)>0)
+  {
+    for (i=1;i<=size(#);i++)
+    {
+      if (typeof(#[i])=="string")
+      {
+        if (#[i]=="keepfiles")
+        {
+          keepfiles=1;
+        }
+        if (#[i]=="regular")
+        {
+          regular=1;
+        }
+      }
+    }
+  }
   // prepare the input for points2triangs by writing the input polygon in the
   // necessary format
   string spi="[";
@@ -874,10 +588,17 @@ EXAMPLE: example triangulations;   shows an example"
   spi=spi+"]";
   write(":w /tmp/triangulationsinput",spi);
   // call points2triangs
-  system("sh","cd /tmp; points2triangs < triangulationsinput > triangulationsoutput");
+  if (regular==1) // compute only regular triangulations
+  {
+    system("sh","cd /tmp; points2triangs --regular < triangulationsinput > triangulationsoutput");
+  }
+  else // compute all triangulations
+  {
+    system("sh","cd /tmp; points2triangs < triangulationsinput > triangulationsoutput");
+  }
   string p2t=read("/tmp/triangulationsoutput"); // takes result of points2triangs
-  // delete the tmp-files, if polymakekeeptmpfiles is not set
-  if (defined(polymakekeeptmpfiles)==0)
+  // delete the tmp-files, if no second argument is given
+  if (keepfiles==0)
   {
     system("sh","cd /tmp; rm -f triangulationsinput; rm -f triangulationsoutput");
   }
@@ -952,7 +673,17 @@ EXAMPLE: example triangulations;   shows an example"
             }
             else
             {
-              np2t=np2t+p2t[i];
+              if (p2t[i]=="[")
+              {
+                // in Topcom version 17.4 (and maybe also in earlier versions) the list
+                // of triangulations is indexed starting with index 0, in Singular
+                // we have to start with index 1
+                np2t=np2t+p2t[i]+"1+";
+              }
+              else
+              {
+                np2t=np2t+p2t[i];
+              }
             }
           }
         }
@@ -961,6 +692,12 @@ EXAMPLE: example triangulations;   shows an example"
   }
   list T;
   execute(np2t);
+  // depending on the version of Topcom, the list T has or has not an entry T[1]
+  // if it has none, the entry should be removed
+  while (typeof(T[1])=="none")
+  {
+    T=delete(T,1);
+  }
   // raise each index by one
   for (i=1;i<=size(T);i++)
   {
@@ -999,8 +736,8 @@ PURPOSE: the procedure considers the marked polytope given as the convex hull of
          the procedure triangulations
 RETURN:  list, say L, such that:
 @*             L[1] = intmat, each row gives the affine coordinates of a lattice
-                      point in the secondary polytope given by the marked polytope
-                      corresponding to polygon
+                      point in the secondary polytope given by the marked
+                      polytope corresponding to polygon
 @*             L[2] = the list of corresponding triangulations
 NOTE: if the triangluations are not handed over as optional argument the
       procedure calls for its computation of these triangulations the program
@@ -1113,8 +850,8 @@ NOTE:- the procedure calls for its computation polymake by Ewgenij Gawrilow,
        TU Berlin and Michael Joswig, so it only works if polymake is installed;
        see http://www.math.tu-berlin.de/polymake/
 @*   - in the optional argument # it is possible to hand over other names for
-       the variables to be used -- be careful, the format must be correct
-       which is not tested, e.g. if you want the variable names to be
+       the variables to be used -- be careful, the format must be correct and
+       that is not tested, e.g. if you want the variable names to be
        u00,u10,u01,u11 then you must hand over the string 'u11,u10,u01,u11'
 @*   - if the triangluations are not handed over as optional argument the
        procedure calls for its computation of these triangulations the program
@@ -1134,7 +871,7 @@ EXAMPLE: example secondaryFan;   shows an example"
   }
   list sp=secondaryPolytope(polygon,triang);
   list spp=polymakePolytope(sp[1]);
-  list sf=normalFan(spp[1],spp[4],spp[3],1);
+  list sf=normalFanL(spp[1],spp[4],spp[3],1);
   return(list(sf[1],sf[2],spp,triang));
 }
 example
@@ -1377,7 +1114,7 @@ ASSUME:  polygon has the format of the output of splitPolygon, i.e. it is a
                       and polygon[3][j][2] being the identifying index;
 @*       triang is a list of integer vectors all of size three describing a
          triangulation of the polygon described by polygon; if an entry of
-         triang is the vector (i,j,k) then the triangle is built from the vertices
+         triang is the vector (i,j,k) then the triangle is built by the vertices
          with indices i, j and k
 RETURN:  intvec, the integer vector eta describing that vertex of the Newton
                  polytope discriminant of the polygone whose dual cone in the
@@ -1947,7 +1684,7 @@ EXAMPLE: example picksFormula;   shows an example"
   // Pick's formula says that the lattice area A, the number g of interior
   // points and
   // the number b of boundary points are connected by the formula: A=b+2g-2
-  return(list(area,bdpts,(area-bdpts+2)/2));
+  return(list(area,bdpts,(area-bdpts+2) div 2));
 }
 example
 {
@@ -1972,7 +1709,7 @@ example
 proc ellipticNF (list polygon)
 "USAGE:  ellipticNF(polygon);   polygon list
 ASSUME:  polygon is a list of integer vectors in the plane such that their
-         convex hull C has precisely one interior lattice point, i.e. C is the
+         convex hull C has precisely one interior lattice point; i.e. C is the
          Newton polygon of an elliptic curve
 PURPOSE: compute the normal form of the polygon with respect to the unimodular
          affine transformations T=A*x+v; there are sixteen different normal forms
@@ -1990,7 +1727,7 @@ EXAMPLE: example ellipticNF;   shows an example"
 {
   int i;            // index
   intvec edge;      // stores the vector of an edge
-  intvec boundary;  // stores lattice lengths of the edges of the Newton cylce
+  intvec boundary;  // stores lattice lengths of the edges of the Newton cycle
   // find the vertices of the Newton cycle and order it clockwise
   list pg=findOrientedBoundary(polygon)[2];
   // check if there is precisely one interior point in the Newton polygon
@@ -2301,36 +2038,6 @@ example
 
 
 /////////////////////////////////////////////////////////////////////////////////
-/// AUXILARY PROCEDURES
-/////////////////////////////////////////////////////////////////////////////////
-
-proc polymakeKeepTmpFiles (int i)
-"USAGE:  polymakeKeepTmpFiles(int i);   i int
-PURPOSE: some procedures create files in the directory /tmp which are used for
-         computations with polymake respectively topcom; these will be removed
-         when the corresponding procedure is left; however, it might be
-         desireable to keep them for further computations with either polymake or
-         topcom; this can be achieved by this procedure; call the procedure as:
-@*       - polymakeKeepTmpFiles(1); - then the files will be kept
-@*       - polymakeKeepTmpFiles(0); - then files will be removed in the future
-RETURN:  none"
-{
-  if ((i==1) and (defined(polymakekeeptmpfiles)==0))
-  {
-    int polymakekeeptmpfiles;
-    export(polymakekeeptmpfiles);
-  }
-  if (i!=1)
-  {
-    if (defined(polymakekeeptmpfiles))
-    {
-      kill polymakekeeptmpfiles;
-    }
-  }
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
 /// AUXILARY PROCEDURES, WHICH ARE DECLARED STATIC
 /////////////////////////////////////////////////////////////////////////////////
@@ -2363,30 +2070,61 @@ NOTE:        the procedure is called by findOrientedBoundary"
   return(sp);
 }
 
-static proc intmatcoldelete (intmat w,int i)
+static proc intmatcoldelete (def w,int i)
 "USAGE:      intmatcoldelete(w,i); w intmat, i int
 RETURN:      intmat, the integer matrix w with the ith comlumn deleted
-NOTE:        the procedure is called by intmatsort and normalFan"
+NOTE:        the procedure is called by intmatsort and normalFanL"
 {
-  if ((i<1) or (i>ncols(w)) or (ncols(w)==1))
+  if (typeof(w)=="intmat")
   {
-    return(w);
+    if ((i<1) or (i>ncols(w)) or (ncols(w)==1))
+    {
+      return(w);
+    }
+    if (i==1)
+    {
+      intmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),2..ncols(w)];
+      return(M);
+    }
+    if (i==ncols(w))
+    {
+      intmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),1..ncols(w)-1];
+      return(M);
+    }
+    else
+    {
+      intmat M[nrows(w)][i-1]=w[1..nrows(w),1..i-1];
+      intmat N[nrows(w)][ncols(w)-i]=w[1..nrows(w),i+1..ncols(w)];
+      return(intmatconcat(M,N));
+    }
   }
-  if (i==1)
+  if (typeof(w)=="bigintmat")
   {
-    intmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),2..ncols(w)];
-    return(M);
-  }
-  if (i==ncols(w))
+    if ((i<1) or (i>ncols(w)) or (ncols(w)==1))
+    {
+      return(w);
+    }
+    if (i==1)
+    {
+      bigintmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),2..ncols(w)];
+      return(M);
+    }
+    if (i==ncols(w))
+    {
+      bigintmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),1..ncols(w)-1];
+      return(M);
+    }
+    else
+    {
+      bigintmat MN[nrows(w)][ncols(w)-1];
+      MN[1..nrows(w),1..i-1]=w[1..nrows(w),1..i-1];
+      MN[1..nrows(w),i..ncols(w)-1]=w[1..nrows(w),i+1..ncols(w)];
+      return(MN);
+    }
+  } else
   {
-    intmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),1..ncols(w)-1];
-    return(M);
-  }
-  else
-  {
-    intmat M[nrows(w)][i-1]=w[1..nrows(w),1..i-1];
-    intmat N[nrows(w)][ncols(w)-i]=w[1..nrows(w),i+1..ncols(w)];
-    return(intmatconcat(M,N));
+    ERROR("intmatcoldelete: input matrix has to be of type intmat or bigintmat");
+    intmat M; return(M);
   }
 }
 
@@ -2682,3 +2420,64 @@ NOTE:        the procedure is called by fan"
   latex=latex[1,size(latex)-1];
   return(list(coord,coords,latex));
 }
+
+static proc intmatAddFirstColumn (def M,string art)
+"USAGE:  intmatAddFirstColumn(M,art);  M intmat, art string
+ASSUME:  - M is an integer matrix where a first column of 0's or 1's should be added
+@*       - art is one of the following strings:
+@*         + 'rays'   : indicating that a first column of 0's should be added
+@*         + 'points' : indicating that a first column of 1's should be added
+RETURN:  intmat, a first column has been added to the matrix"
+{
+  if (typeof (M) == "intmat")
+  {
+    intmat N[nrows(M)][ncols(M)+1];
+    int i,j;
+    for (i=1;i<=nrows(M);i++)
+    {
+      if (art=="rays")
+      {
+        N[i,1]=0;
+      }
+      else
+      {
+        N[i,1]=1;
+      }
+      for (j=1;j<=ncols(M);j++)
+      {
+        N[i,j+1]=M[i,j];
+      }
+    }
+    return(N);
+  }
+  if (typeof (M) == "bigintmat")
+  {
+    bigintmat N[nrows(M)][ncols(M)+1];
+    int i,j;
+    for (i=1;i<=nrows(M);i++)
+    {
+      if (art=="rays")
+      {
+        N[i,1]=0;
+      }
+      else
+      {
+        N[i,1]=1;
+      }
+      for (j=1;j<=ncols(M);j++)
+      {
+        N[i,j+1]=M[i,j];
+      }
+    }
+    return(N);
+  }
+  else
+  {
+    ERROR ("intmatAddFirstColumn: input matrix has to be either intmat or bigintmat");
+    intmat N;
+    return (N);
+  }
+}
+
+
+

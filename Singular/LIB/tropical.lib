@@ -1,5 +1,5 @@
-///////////////////////////////////////////////////////////
-version="version tropical.lib 4.0.0.0 Jun_2013 "; // $Id$
+//
+version="$Id$";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry
@@ -649,9 +649,9 @@ EXAMPLE: example tropicalLifting;   shows an example"
         {
           // pass first to a ring where a and @a
           // are variables in order to use maps
-          string @mp= string(minpoly);
+          poly mp=minpoly;
           ring INTERRING=char(LIFTRING),(t,@a,a),dp;
-          execute("poly mp=" + @mp + ";");
+          poly mp=imap(LIFTRING,mp);
           ideal LIFT=imap(LIFTRING,LIFT);
           kill LIFTRING;
           // replace @a by a in minpoly and in LIFT
@@ -1011,10 +1011,10 @@ EXAMPLE:   example puiseuxExpansion;   shows an example"
   if ((1<var(1)) or (1<var(2)))
   {
     def GLOBALRING=basering;
-    string @mp= string(minpoly);
+    number mp=minpoly;
     execute("ring LOCALRING=("+charstr(basering)+"),("+varstr(basering)+"),ds;");
-    execute("minpoly= " + @mp + ";");
     poly f=imap(GLOBALRING,f);
+    minpoly=imap(GLOBALRING,mp);
   }
   // check if a substitution is necessary
   int noResubst;
@@ -1048,11 +1048,10 @@ EXAMPLE:   example puiseuxExpansion;   shows an example"
     // if the base field has a minimal polynomial change the base ring and the ideal
     if (minpoly!=0)
     {
-      string @mp= string(minpoly);
+      poly mp=minpoly;
       def OLDRING=basering;
       execute("ring NEWRING=0,("+varstr(basering)+","+parstr(basering)+"),ds;");
-      execute("ideal I = " + @mp + ";");
-      I = I,imap(OLDRING,f);
+      ideal I=imap(OLDRING,mp),imap(OLDRING,f);
     }
     else
     {
@@ -1064,8 +1063,8 @@ EXAMPLE:   example puiseuxExpansion;   shows an example"
     {
       w=NewtP[jj]-NewtP[jj+1];
       ggteiler=gcd(w[1],w[2]);
-      zw=w[1]/ggteiler;
-      w[1]=w[2]/ggteiler;
+      zw=w[1] div ggteiler;
+      w[1]=w[2] div ggteiler;
       w[2]=zw;
       // if we have introduced a third variable for the parameter, then w needs a third component
       if (nvars(basering)==3)
@@ -1133,9 +1132,9 @@ EXAMPLE:   example puiseuxExpansion;   shows an example"
     }
     else
     {
-      string @mp= string(minpoly);
+      poly mp=minpoly;
       ring degreering=0,a,dp;
-      execute("poly mp=" + @mp + ";");
+      poly mp=imap(countring,mp);
       numberofbranchesfound=numberofbranchesfound+deg(mp);
       setring countring;
       kill degreering;
@@ -1157,7 +1156,8 @@ example
    echo=2;
    ring r=0,(x,y),ds;
    poly f=x2-y4+x5y7;
-   puiseuxExpansion(puiseuxExpansion(f,3));
+   puiseuxExpansion(f,3,"subst");
+   displayPuiseuxExpansion(puiseuxExpansion(f,3));
 }
 
 proc displayPuiseuxExpansion (list puiseux,list #)
@@ -1539,8 +1539,8 @@ EXAMPLE:     example tropicalCurve;   shows an example"
       normalvector=pairs[i][j][2]-pairs[i][j][1];
       ggt=gcd(normalvector[1],normalvector[2]);   // the gcd of the entries
       zw=normalvector[2];    // create the outward pointing normal vector
-      normalvector[2]=-normalvector[1]/ggt;
-      normalvector[1]=zw/ggt;
+      normalvector[2]=-normalvector[1] div ggt;
+      normalvector[1]=zw div ggt;
       if (size(#)==0) // we are computing w.r.t. minimum
       {
         ubedges[k]=list(normalvector,ggt); // store outward pointing normal vec.
@@ -2717,8 +2717,12 @@ EXAMPLE:     example weightVectorToOrderMatrix;   shows an example"
       {           // fill the order matrix O with unit vectors
         if(k<>j)  // except the unit vector of the non-zero component
         {
-          intvec u; u[size(w)]=0; u[k]=1;
-          O[r,1..size(w)]=u; r=r+1;
+          intvec u;
+          u[size(w)]=0; 
+          u[k]=1;
+          O[r,1..size(w)]=u; 
+          r=r+1;
+          kill u;
         }
       }
       return(O);
@@ -4707,8 +4711,8 @@ NOTE:    - the procedure is also called recursively by itself, and
         list NewtP=newtonpoly(i[1]);
         wneu=NewtP[1]-NewtP[2];
         int ggteiler=gcd(wneu[1],wneu[2]);
-        wneu[1]=-wneu[1]/ggteiler;
-        wneu[2]=wneu[2]/ggteiler;
+        wneu[1]=-wneu[1] div ggteiler;
+        wneu[2]=wneu[2] div ggteiler;
         if (wneu[1]>0)
         {
           wneu=-wneu;
@@ -4806,7 +4810,7 @@ NOTE:    - the procedure is also called recursively by itself, and
   }
   for (jj=1;jj<=anzahlvariablen+numberdeletedvariables-1;jj++)
   {
-    PARA[jj]=(PARA[jj]+a[jj+1])*t^(tw[jj+1]*tweight/ww[1]);
+    PARA[jj]=(PARA[jj]+a[jj+1])*t^(tw[jj+1]*tweight div ww[1]);
   }
   // if we have reached the stop-level, i.e. either
   // we had only to compute up to order 1
@@ -5352,41 +5356,41 @@ NOTE:    the procedure is called from displayTropicalLifting"
   {
     if (koeffizienten[j-ord(p)+1]!=0)
     {
-      if ((j-(N*wj)/w1)==0)
+      if ((j-(N*wj) div w1)==0)
       {
         dp=dp+displaycoef(koeffizienten[j-ord(p)+1]);
       }
-      if (((j-(N*wj)/w1)==1) and (N!=1))
+      if (((j-(N*wj) div w1)==1) and (N!=1))
       {
         dp=dp+displaycoef(koeffizienten[j-ord(p)+1])+"*t^(1/"+string(N)+")";
       }
-      if (((j-(N*wj)/w1)==1) and (N==1))
+      if (((j-(N*wj) div w1)==1) and (N==1))
       {
         dp=dp+displaycoef(koeffizienten[j-ord(p)+1])+"*t";
       }
-      if (((j-(N*wj)/w1)==-1) and (N==1))
+      if (((j-(N*wj) div w1)==-1) and (N==1))
       {
         dp=dp+displaycoef(koeffizienten[j-ord(p)+1])+"*1/t";
       }
-      if (((j-(N*wj)/w1)==-1) and (N!=1))
+      if (((j-(N*wj) div w1)==-1) and (N!=1))
       {
         dp=dp+displaycoef(koeffizienten[j-ord(p)+1])+"*1/t^(1/"+string(N)+")";
       }
-      if (((j-(N*wj)/w1)>1) and (N==1))
+      if (((j-(N*wj) div w1)>1) and (N==1))
       {
-        dp=dp+displaycoef(koeffizienten[j-ord(p)+1])+"*t^"+string(j-(N*wj)/w1);
+        dp=dp+displaycoef(koeffizienten[j-ord(p)+1])+"*t^"+string(j-(N*wj) div w1);
       }
-      if (((j-(N*wj)/w1)>1) and (N!=1))
+      if (((j-(N*wj) div w1)>1) and (N!=1))
       {
-        dp=dp+displaycoef(koeffizienten[j-ord(p)+1])+"*t^("+string(j-(N*wj)/w1)+"/"+string(N)+")";
+        dp=dp+displaycoef(koeffizienten[j-ord(p)+1])+"*t^("+string(j-(N*wj) div w1)+"/"+string(N)+")";
       }
-      if (((j-(N*wj)/w1)<-1) and (N==1))
+      if (((j-(N*wj) div w1)<-1) and (N==1))
       {
         dp=dp+displaycoef(koeffizienten[j-ord(p)+1])+"*1/t^"+string(wj-j);
       }
-      if (((j-(N*wj)/w1)<-1) and (N!=1))
+      if (((j-(N*wj) div w1)<-1) and (N!=1))
       {
-        dp=dp+displaycoef(koeffizienten[j-ord(p)+1])+"*1/t^("+string((N*wj)/w1-j)+"/"+string(N)+")";
+        dp=dp+displaycoef(koeffizienten[j-ord(p)+1])+"*1/t^("+string((N*wj) div w1-j)+"/"+string(N)+")";
       }
       if (j<deg(p))
       {
@@ -5494,9 +5498,9 @@ NOTE:     the procedure is called from tropicalLifting"
     else // absolute primary decomposition was used
     {
       setring LIFTRing;
-      string @mp= string(minpoly);
+      poly mp=minpoly;
       execute("ring TESTRing=("+charstr(LIFTRing)+"),("+varstr(BASERING)+"),dp;");
-      execute("minpoly= " + @mp + ";");
+      minpoly=number(imap(LIFTRing,mp));
       ideal i=imap(BASERING,i);
     }
   }
@@ -5768,8 +5772,8 @@ NOTE:    - the procedure is also called recursively by itself, and
             {
               wneu=NewtP[jjj]-NewtP[jjj+1];
               int ggteiler=gcd(wneu[1],wneu[2]);
-              wneu[1]=-wneu[1]/ggteiler;
-              wneu[2]=wneu[2]/ggteiler;
+              wneu[1]=-wneu[1] div ggteiler;
+              wneu[2]=wneu[2] div ggteiler;
               if (wneu[1]>0)
               {
                 wneu=-wneu;
@@ -5868,7 +5872,7 @@ NOTE:    - the procedure is also called recursively by itself, and
         if (anzahlvariablen<nvars(basering))
         {
           execute("ring PARARing=("+string(char(basering))+",@a),t,ls;");
-          minpoly=number(imap(PREGFANRING,m)); // ?
+          minpoly=number(imap(PREGFANRING,m));
         }
         else
         {
@@ -5907,7 +5911,7 @@ NOTE:    - the procedure is also called recursively by itself, and
         setring PARARing;
         for (jjj=1;jjj<=anzahlvariablen+numberdeletedvariables-1;jjj++)
         {
-          PARA[jjj]=(PARA[jjj]+zeros[size(zeros)][jjj+1])*t^(ww[jjj+1]*tweight/ww[1]);
+          PARA[jjj]=(PARA[jjj]+zeros[size(zeros)][jjj+1])*t^(ww[jjj+1]*tweight div ww[1]);
         }
         // delete the last entry in zero, since that one has
         // been used for the transformation
@@ -6032,7 +6036,7 @@ NOTE:    - the procedure is called from inside the recursive
     else
     {
       I=subst(i,var(lastvar),0);
-      while (subst(I[1],t,0)==0)
+      while ((I[1]!=0) and (subst(I[1],t,0)==0))
       {
         I[1]=I[1]/t;
       }
@@ -7813,8 +7817,8 @@ NOTE:    the procedure is called by jInvariant"
     poly num=c4^3;
     poly denom=delta*hn^5;
     poly ggt=gcd(num,denom);
-    num=num/ggt;
-    denom=denom/ggt;
+    num=num div ggt;
+    denom=denom div ggt;
     setring BASERING;
     poly num=imap(TRING,num);
     poly denom=imap(TRING,denom);

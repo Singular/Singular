@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment this file contains the main structure of the manual
+x@comment this file contains the main structure of the manual
 
 
 @c ------------------------
@@ -875,16 +875,16 @@ but not for serious computations.
 @cindex Tropical Geometry
 
 @menu
-* oldpolymake_lib:: interface to polymake and TOPCOM
+* polymake_lib:: interface to polymake and TOPCOM
 * tropical_lib:: interface to gfan
 @end menu
 @c ----------------------------------------------------------
-@node oldpolymake_lib,tropical_lib,Tropical Geometry, Tropical Geometry
-@subsection oldpolymake_lib
-@c lib oldpolymake.lib no_ex
+@node polymake_lib,tropical_lib,Tropical Geometry, Tropical Geometry
+@subsection polymake_lib
+@c lib polymake.lib no_ex
 
 @c ----------------------------------------------------------
-@node tropical_lib,, oldpolymake_lib, Tropical Geometry
+@node tropical_lib,, polymake_lib, Tropical Geometry
 @subsection tropical_lib
 
 @c lib tropical.lib no_ex
