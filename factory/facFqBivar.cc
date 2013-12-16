@@ -162,11 +162,13 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   ASSERT (A.isUnivariate(),
           "univariate polynomial expected or constant expected");
   CFFList factorsA;
+#ifndef HAVE_FLINT
   if (fac_NTL_char != getCharacteristic())
   {
     fac_NTL_char= getCharacteristic();
     zz_p::init (getCharacteristic());
   }
+#endif
   if (GF)
   {
     int k= getGFDegree();
@@ -177,6 +179,33 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
     CanonicalForm buf= GF2FalphaRep (A, beta);
     if (getCharacteristic() > 2)
     {
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+      nmod_poly_t FLINTmipo, leadingCoeff;
+      fq_nmod_ctx_t fq_con;
+      fq_nmod_poly_t FLINTA;
+      fq_nmod_poly_factor_t FLINTFactorsA;
+
+      nmod_poly_init (FLINTmipo, getCharacteristic());
+      convertFacCF2nmod_poly_t (FLINTmipo, mipo.mapinto());
+
+      fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+      convertFacCF2Fq_nmod_poly_t (FLINTA, A, fq_con);
+      fq_nmod_poly_make_monic (FLINTA, FLINTA, fq_con);
+
+      fq_nmod_poly_factor_init (FLINTFactorsA, fq_con);
+      nmod_poly_init (leadingCoeff, getCharacteristic());
+
+      fq_nmod_poly_factor (FLINTFactorsA, leadingCoeff, FLINTA, fq_con);
+
+      factorsA= convertFLINTFq_nmod_poly_factor2FacCFFList (FLINTFactorsA, x, beta, fq_con);
+
+      fq_nmod_poly_factor_clear (FLINTFactorsA, fq_con);
+      fq_nmod_poly_clear (FLINTA, fq_con);
+      nmod_poly_clear (FLINTmipo);
+      nmod_poly_clear (leadingCoeff);
+      fq_nmod_ctx_clear (fq_con);
+#else
       zz_pX NTLMipo= convertFacCF2NTLzzpX (mipo.mapinto());
       zz_pE::init (NTLMipo);
       zz_pEX NTLA= convertFacCF2NTLzz_pEX (buf, NTLMipo);
@@ -185,6 +214,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
       zz_pE multi= to_zz_pE (1);
       factorsA= convertNTLvec_pair_zzpEX_long2FacCFFList (NTLFactorsA, multi,
                                                          x, beta);
+#endif
     }
     else
     {
@@ -209,6 +239,33 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   {
     if (getCharacteristic() > 2)
     {
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+      nmod_poly_t FLINTmipo, leadingCoeff;
+      fq_nmod_ctx_t fq_con;
+      fq_nmod_poly_t FLINTA;
+      fq_nmod_poly_factor_t FLINTFactorsA;
+
+      nmod_poly_init (FLINTmipo, getCharacteristic());
+      convertFacCF2nmod_poly_t (FLINTmipo, getMipo (alpha));
+
+      fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+      convertFacCF2Fq_nmod_poly_t (FLINTA, A, fq_con);
+      fq_nmod_poly_make_monic (FLINTA, FLINTA, fq_con);
+
+      fq_nmod_poly_factor_init (FLINTFactorsA, fq_con);
+      nmod_poly_init (leadingCoeff, getCharacteristic());
+
+      fq_nmod_poly_factor (FLINTFactorsA, leadingCoeff, FLINTA, fq_con);
+
+      factorsA= convertFLINTFq_nmod_poly_factor2FacCFFList (FLINTFactorsA, x, alpha, fq_con);
+
+      fq_nmod_poly_factor_clear (FLINTFactorsA, fq_con);
+      fq_nmod_poly_clear (FLINTA, fq_con);
+      nmod_poly_clear (FLINTmipo);
+      nmod_poly_clear (leadingCoeff);
+      fq_nmod_ctx_clear (fq_con);
+#else
       zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
       zz_pE::init (NTLMipo);
       zz_pEX NTLA= convertFacCF2NTLzz_pEX (A, NTLMipo);
@@ -217,6 +274,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
       zz_pE multi= to_zz_pE (1);
       factorsA= convertNTLvec_pair_zzpEX_long2FacCFFList (NTLFactorsA, multi,
                                                            x, alpha);
+#endif
     }
     else
     {
