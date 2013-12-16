@@ -22,7 +22,7 @@ SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
 	noether.lib normal.lib normaliz.lib ntsolve.lib \
 	paraplanecurves.lib phindex.lib \
 	pointid.lib poly.lib \
-	polymake.lib presolve.lib primdec.lib primdecint.lib \
+	presolve.lib primdec.lib primdecint.lib \
 	primitiv.lib qhmoduli.lib random.lib realclassify.lib \
 	realrad.lib reesclos.lib resbinomial.lib \
 	resgraph.lib resjung.lib resolve.lib \
@@ -31,7 +31,7 @@ SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
 	solve.lib spcurve.lib spectrum.lib standard.lib stratify.lib \
 	surf.lib surfacesignature.lib surfex.lib \
 	teachstd.lib toric.lib triang.lib \
-	tropical.lib weierstr.lib zeroset.lib
+	weierstr.lib zeroset.lib
 
 # libs in beta testing:
 # the will be included in share.tar.gz, but not in all.lib
@@ -47,10 +47,10 @@ SLIB1 = classifyci.lib classify_aeq.lib \
         gitfan.lib \
         locnormal.lib modnormal.lib \
 	JMBTest.lib JMSConst.lib multigrading.lib\
-        orbitparam.lib parallel.lib \
+        orbitparam.lib parallel.lib polymake.lib\
 	realizationMatroids.lib resources.lib ringgb.lib \
 	schreyer.lib symodstd.lib derham.lib polybori.lib ellipticcovers.lib \
-	schubert.lib tasks.lib
+	schubert.lib tasks.lib tropical.lib
 
 PLIBS = bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib fpadim.lib \
 	freegb.lib gkdim.lib involut.lib ncalg.lib ncdecomp.lib \

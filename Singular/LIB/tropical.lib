@@ -203,7 +203,7 @@ LIB "solve.lib";
 LIB "poly.lib";
 LIB "elim.lib";
 LIB "linalg.lib";
-LIB "oldpolymake.lib";
+LIB "polymake.lib";
 LIB "primdec.lib";
 LIB "absfact.lib";
 LIB "hnoether.lib";
@@ -2718,9 +2718,9 @@ EXAMPLE:     example weightVectorToOrderMatrix;   shows an example"
         if(k<>j)  // except the unit vector of the non-zero component
         {
           intvec u;
-          u[size(w)]=0; 
+          u[size(w)]=0;
           u[k]=1;
-          O[r,1..size(w)]=u; 
+          O[r,1..size(w)]=u;
           r=r+1;
           kill u;
         }
