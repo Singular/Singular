@@ -404,7 +404,6 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
     {
       if (b.getp() != 0)
       {
-        ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
         CanonicalForm mipo= getMipo (alpha);
         bool is_rat= isOn (SW_RATIONAL);
         if (!is_rat)
@@ -412,12 +411,44 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         mipo *=bCommonDen (mipo);
         if (!is_rat)
           Off (SW_RATIONAL);
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+        fmpz_t FLINTp;
+        fmpz_mod_poly_t FLINTmipo;
+        fq_ctx_t fq_con;
+        fq_poly_t FLINTF, FLINTG;
+
+        fmpz_init (FLINTp);
+
+        convertCF2Fmpz (FLINTp, b.getpk());
+
+        convertFacCF2Fmpz_mod_poly_t (FLINTmipo, mipo, FLINTp);
+
+        fq_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+        convertFacCF2Fq_poly_t (FLINTF, F, fq_con);
+        convertFacCF2Fq_poly_t (FLINTG, G, fq_con);
+
+        fq_poly_mul (FLINTF, FLINTF, FLINTG, fq_con);
+
+        CanonicalForm result= convertFq_poly_t2FacCF (FLINTF, F.mvar(),
+                                                      alpha, fq_con);
+
+        fmpz_clear (FLINTp);
+        fmpz_mod_poly_clear (FLINTmipo);
+        fq_poly_clear (FLINTF, fq_con);
+        fq_poly_clear (FLINTG, fq_con);
+        fq_ctx_clear (fq_con);
+        return b (result);
+#else
+        ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
         ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (mipo));
         ZZ_pE::init (NTLmipo);
         ZZ_pEX NTLg= convertFacCF2NTLZZ_pEX (G, NTLmipo);
         ZZ_pEX NTLf= convertFacCF2NTLZZ_pEX (F, NTLmipo);
         mul (NTLf, NTLf, NTLg);
+
         return b (convertNTLZZ_pEX2CF (NTLf, F.mvar(), alpha));
+#endif
       }
 #ifdef HAVE_FLINT
       CanonicalForm result= mulFLINTQa (F, G, alpha);
@@ -438,7 +469,7 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         convertFacCF2Fmpz_mod_poly_t (FLINTF, F, FLINTpk);
         convertFacCF2Fmpz_mod_poly_t (FLINTG, G, FLINTpk);
         fmpz_mod_poly_mul (FLINTF, FLINTF, FLINTG);
-        CanonicalForm result= convertFmpz_mod_poly_t2FacCF (FLINTF, F.mvar(), b);
+        CanonicalForm result= convertFmpz_mod_poly_t2FacCF (FLINTF, F.mvar(),b);
         fmpz_mod_poly_clear (FLINTG);
         fmpz_mod_poly_clear (FLINTF);
         fmpz_clear (FLINTpk);
@@ -465,11 +496,73 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
       {
         if (hasFirstAlgVar (G, alpha) || hasFirstAlgVar (F, alpha))
         {
-          ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+          fmpz_t FLINTp;
+          fmpz_mod_poly_t FLINTmipo;
+          fq_ctx_t fq_con;
+
+          fmpz_init (FLINTp);
+          convertCF2Fmpz (FLINTp, b.getpk());
+
+          convertFacCF2Fmpz_mod_poly_t (FLINTmipo, getMipo (alpha), FLINTp);
+
+          fq_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+          CanonicalForm result;
+
           if (F.inCoeffDomain() && !G.inCoeffDomain())
           {
-            ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (getMipo (alpha)));
-            ZZ_pE::init (NTLmipo);
+            fq_poly_t FLINTG;
+            fmpz_poly_t FLINTF;
+            convertFacCF2Fmpz_poly_t (FLINTF, F);
+            convertFacCF2Fq_poly_t (FLINTG, G, fq_con);
+
+            fq_poly_scalar_mul_fq (FLINTG, FLINTG, FLINTF, fq_con);
+
+            result= convertFq_poly_t2FacCF (FLINTG, G.mvar(), alpha, fq_con);
+            fmpz_poly_clear (FLINTF);
+            fq_poly_clear (FLINTG, fq_con);
+          }
+          else if (!F.inCoeffDomain() && G.inCoeffDomain())
+          {
+            fq_poly_t FLINTF;
+            fmpz_poly_t FLINTG;
+
+            convertFacCF2Fmpz_poly_t (FLINTG, G);
+            convertFacCF2Fq_poly_t (FLINTF, F, fq_con);
+
+            fq_poly_scalar_mul_fq (FLINTF, FLINTF, FLINTG, fq_con);
+
+            result= convertFq_poly_t2FacCF (FLINTF, F.mvar(), alpha, fq_con);
+            fmpz_poly_clear (FLINTG);
+            fq_poly_clear (FLINTF, fq_con);
+          }
+          else
+          {
+            fq_t FLINTF, FLINTG;
+
+            convertFacCF2Fq_t (FLINTF, F, fq_con);
+            convertFacCF2Fq_t (FLINTG, G, fq_con);
+
+            fq_mul (FLINTF, FLINTF, FLINTG, fq_con);
+
+            result= convertFq_t2FacCF (FLINTF, alpha);
+            fq_clear (FLINTF, fq_con);
+            fq_clear (FLINTG, fq_con);
+          }
+
+          fmpz_clear (FLINTp);
+          fmpz_mod_poly_clear (FLINTmipo);
+          fq_ctx_clear (fq_con);
+
+          return b (result);
+#else
+          ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
+          ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (getMipo (alpha)));
+          ZZ_pE::init (NTLmipo);
+
+          if (F.inCoeffDomain() && !G.inCoeffDomain())
+          {
             ZZ_pEX NTLg= convertFacCF2NTLZZ_pEX (G, NTLmipo);
             ZZ_pX NTLf= convertFacCF2NTLZZpX (F);
             mul (NTLg, to_ZZ_pE (NTLf), NTLg);
@@ -477,8 +570,6 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
           }
           else if (!F.inCoeffDomain() && G.inCoeffDomain())
           {
-            ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (getMipo (alpha)));
-            ZZ_pE::init (NTLmipo);
             ZZ_pX NTLg= convertFacCF2NTLZZpX (G);
             ZZ_pEX NTLf= convertFacCF2NTLZZ_pEX (F, NTLmipo);
             mul (NTLf, NTLf, to_ZZ_pE (NTLg));
@@ -486,14 +577,13 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
           }
           else
           {
-            ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (getMipo (alpha)));
-            ZZ_pE::init (NTLmipo);
             ZZ_pX NTLg= convertFacCF2NTLZZpX (G);
             ZZ_pX NTLf= convertFacCF2NTLZZpX (F);
             ZZ_pE result;
             mul (result, to_ZZ_pE (NTLg), to_ZZ_pE (NTLf));
             return b (convertNTLZZpX2CF (rep (result), alpha));
           }
+#endif
         }
       }
       return b (F*G);
@@ -513,12 +603,35 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
   CanonicalForm result;
   if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
   {
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+    nmod_poly_t FLINTmipo;
+    fq_nmod_ctx_t fq_con;
+
+    nmod_poly_init (FLINTmipo, getCharacteristic());
+    convertFacCF2nmod_poly_t (FLINTmipo, getMipo (alpha));
+
+    fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+    fq_nmod_poly_t FLINTF, FLINTG;
+    convertFacCF2Fq_nmod_poly_t (FLINTF, F, fq_con);
+    convertFacCF2Fq_nmod_poly_t (FLINTG, G, fq_con);
+
+    fq_nmod_poly_mul (FLINTF, FLINTF, FLINTG, fq_con);
+
+    result= convertFq_nmod_poly_t2FacCF (FLINTF, F.mvar(), alpha, fq_con);
+
+    fq_nmod_poly_clear (FLINTF, fq_con);
+    fq_nmod_poly_clear (FLINTG, fq_con);
+    nmod_poly_clear (FLINTmipo);
+    fq_nmod_ctx_clear (fq_con);
+#else
     zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
     zz_pE::init (NTLMipo);
     zz_pEX NTLF= convertFacCF2NTLzz_pEX (F, NTLMipo);
     zz_pEX NTLG= convertFacCF2NTLzz_pEX (G, NTLMipo);
     mul (NTLF, NTLF, NTLG);
     result= convertNTLzz_pEX2CF(NTLF, F.mvar(), alpha);
+#endif
   }
   else
   {
@@ -604,6 +717,36 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
     {
       if (b.getp() != 0)
       {
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+        fmpz_t FLINTp;
+        fmpz_mod_poly_t FLINTmipo;
+        fq_ctx_t fq_con;
+        fq_poly_t FLINTF, FLINTG;
+
+        fmpz_init (FLINTp);
+
+        convertCF2Fmpz (FLINTp, b.getpk());
+
+        convertFacCF2Fmpz_mod_poly_t (FLINTmipo, getMipo (alpha), FLINTp);
+
+        fq_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+        convertFacCF2Fq_poly_t (FLINTF, F, fq_con);
+        convertFacCF2Fq_poly_t (FLINTG, G, fq_con);
+
+        fq_poly_rem (FLINTF, FLINTF, FLINTG, fq_con);
+
+        CanonicalForm result= convertFq_poly_t2FacCF (FLINTF, F.mvar(),
+                                                      alpha, fq_con);
+
+        fmpz_clear (FLINTp);
+        fmpz_mod_poly_clear (FLINTmipo);
+        fq_poly_clear (FLINTF, fq_con);
+        fq_poly_clear (FLINTG, fq_con);
+        fq_ctx_clear (fq_con);
+
+        return b(result);
+#else
         ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
         ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (getMipo (alpha)));
         ZZ_pE::init (NTLmipo);
@@ -611,6 +754,7 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         ZZ_pEX NTLf= convertFacCF2NTLZZ_pEX (F, NTLmipo);
         rem (NTLf, NTLf, NTLg);
         return b (convertNTLZZ_pEX2CF (NTLf, F.mvar(), alpha));
+#endif
       }
 #ifdef HAVE_FLINT
       CanonicalForm Q, R;
@@ -633,12 +777,35 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
   CanonicalForm result;
   if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
   {
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+    nmod_poly_t FLINTmipo;
+    fq_nmod_ctx_t fq_con;
+
+    nmod_poly_init (FLINTmipo, getCharacteristic());
+    convertFacCF2nmod_poly_t (FLINTmipo, getMipo (alpha));
+
+    fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+    fq_nmod_poly_t FLINTF, FLINTG;
+    convertFacCF2Fq_nmod_poly_t (FLINTF, F, fq_con);
+    convertFacCF2Fq_nmod_poly_t (FLINTG, G, fq_con);
+
+    fq_nmod_poly_rem (FLINTF, FLINTF, FLINTG, fq_con);
+
+    result= convertFq_nmod_poly_t2FacCF (FLINTF, F.mvar(), alpha, fq_con);
+
+    fq_nmod_poly_clear (FLINTF, fq_con);
+    fq_nmod_poly_clear (FLINTG, fq_con);
+    nmod_poly_clear (FLINTmipo);
+    fq_nmod_ctx_clear (fq_con);
+#else
     zz_pX NTLMipo= convertFacCF2NTLzzpX(getMipo (alpha));
     zz_pE::init (NTLMipo);
     zz_pEX NTLF= convertFacCF2NTLzz_pEX (F, NTLMipo);
     zz_pEX NTLG= convertFacCF2NTLzz_pEX (G, NTLMipo);
     rem (NTLF, NTLF, NTLG);
     result= convertNTLzz_pEX2CF(NTLF, F.mvar(), alpha);
+#endif
   }
   else
   {
@@ -678,6 +845,34 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         Variable alpha;
         hasFirstAlgVar (F, alpha);
         hasFirstAlgVar (G, alpha);
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+        fmpz_t FLINTp;
+        fmpz_mod_poly_t FLINTmipo;
+        fq_ctx_t fq_con;
+        fq_t FLINTF, FLINTG;
+
+        fmpz_init (FLINTp);
+        convertCF2Fmpz (FLINTp, b.getpk());
+
+        convertFacCF2Fmpz_mod_poly_t (FLINTmipo, getMipo (alpha), FLINTp);
+
+        fq_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+        convertFacCF2Fq_t (FLINTF, F, fq_con);
+        convertFacCF2Fq_t (FLINTG, G, fq_con);
+
+        fq_inv (FLINTG, FLINTG, fq_con);
+        fq_mul (FLINTF, FLINTF, FLINTG, fq_con);
+
+        CanonicalForm result= convertFq_t2FacCF (FLINTF, alpha);
+
+        fmpz_clear (FLINTp);
+        fmpz_mod_poly_clear (FLINTmipo);
+        fq_clear (FLINTF, fq_con);
+        fq_clear (FLINTG, fq_con);
+        fq_ctx_clear (fq_con);
+        return b (result);
+#else
         ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
         ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (getMipo (alpha)));
         ZZ_pE::init (NTLmipo);
@@ -686,6 +881,7 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         ZZ_pE result;
         div (result, to_ZZ_pE (NTLf), to_ZZ_pE (NTLg));
         return b (convertNTLZZpX2CF (rep (result), alpha));
+#endif
       }
       return b(div (F,G));
     }
@@ -699,6 +895,36 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
       {
         Variable alpha;
         hasFirstAlgVar (G, alpha);
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+        fmpz_t FLINTp;
+        fmpz_mod_poly_t FLINTmipo;
+        fq_ctx_t fq_con;
+        fq_poly_t FLINTF;
+        fq_t FLINTG;
+
+        fmpz_init (FLINTp);
+        convertCF2Fmpz (FLINTp, b.getpk());
+
+        convertFacCF2Fmpz_mod_poly_t (FLINTmipo, getMipo (alpha), FLINTp);
+
+        fq_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+        convertFacCF2Fq_poly_t (FLINTF, F, fq_con);
+        convertFacCF2Fq_t (FLINTG, G, fq_con);
+
+        fq_inv (FLINTG, FLINTG, fq_con);
+        fq_poly_scalar_mul_fq (FLINTF, FLINTF, FLINTG, fq_con);
+
+        CanonicalForm result= convertFq_poly_t2FacCF (FLINTF, F.mvar(),
+                                                      alpha, fq_con);
+
+        fmpz_clear (FLINTp);
+        fmpz_mod_poly_clear (FLINTmipo);
+        fq_poly_clear (FLINTF, fq_con);
+        fq_clear (FLINTG, fq_con);
+        fq_ctx_clear (fq_con);
+        return b (result);
+#else
         ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
         ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (getMipo (alpha)));
         ZZ_pE::init (NTLmipo);
@@ -706,6 +932,7 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         ZZ_pEX NTLf= convertFacCF2NTLZZ_pEX (F, NTLmipo);
         div (NTLf, NTLf, to_ZZ_pE (NTLg));
         return b (convertNTLZZ_pEX2CF (NTLf, F.mvar(), alpha));
+#endif
       }
       return b(div (F,G));
     }
@@ -753,6 +980,34 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
     {
       if (b.getp() != 0)
       {
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+        fmpz_t FLINTp;
+        fmpz_mod_poly_t FLINTmipo;
+        fq_ctx_t fq_con;
+        fq_poly_t FLINTF, FLINTG;
+
+        fmpz_init (FLINTp);
+        convertCF2Fmpz (FLINTp, b.getpk());
+
+        convertFacCF2Fmpz_mod_poly_t (FLINTmipo, getMipo (alpha), FLINTp);
+
+        fq_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+        convertFacCF2Fq_poly_t (FLINTF, F, fq_con);
+        convertFacCF2Fq_poly_t (FLINTG, G, fq_con);
+
+        fq_poly_divrem (FLINTF, FLINTG, FLINTF, FLINTG, fq_con);
+
+        CanonicalForm result= convertFq_poly_t2FacCF (FLINTF, F.mvar(),
+                                                      alpha, fq_con);
+
+        fmpz_clear (FLINTp);
+        fmpz_mod_poly_clear (FLINTmipo);
+        fq_ctx_clear (fq_con);
+        fq_poly_clear (FLINTF, fq_con);
+        fq_poly_clear (FLINTG, fq_con);
+        return b (result);
+#else
         ZZ_p::init (convertFacCF2NTLZZ (b.getpk()));
         ZZ_pX NTLmipo= to_ZZ_pX (convertFacCF2NTLZZX (getMipo (alpha)));
         ZZ_pE::init (NTLmipo);
@@ -760,6 +1015,7 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
         ZZ_pEX NTLf= convertFacCF2NTLZZ_pEX (F, NTLmipo);
         div (NTLf, NTLf, NTLg);
         return b (convertNTLZZ_pEX2CF (NTLf, F.mvar(), alpha));
+#endif
       }
 #ifdef HAVE_FLINT
       CanonicalForm Q;
@@ -782,12 +1038,35 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
   CanonicalForm result;
   if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
   {
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+    nmod_poly_t FLINTmipo;
+    fq_nmod_ctx_t fq_con;
+
+    nmod_poly_init (FLINTmipo, getCharacteristic());
+    convertFacCF2nmod_poly_t (FLINTmipo, getMipo (alpha));
+
+    fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+    fq_nmod_poly_t FLINTF, FLINTG;
+    convertFacCF2Fq_nmod_poly_t (FLINTF, F, fq_con);
+    convertFacCF2Fq_nmod_poly_t (FLINTG, G, fq_con);
+
+    fq_nmod_poly_divrem (FLINTF, FLINTG, FLINTF, FLINTG, fq_con);
+
+    result= convertFq_nmod_poly_t2FacCF (FLINTF, F.mvar(), alpha, fq_con);
+
+    fq_nmod_poly_clear (FLINTF, fq_con);
+    fq_nmod_poly_clear (FLINTG, fq_con);
+    nmod_poly_clear (FLINTmipo);
+    fq_nmod_ctx_clear (fq_con);
+#else
     zz_pX NTLMipo= convertFacCF2NTLzzpX(getMipo (alpha));
     zz_pE::init (NTLMipo);
     zz_pEX NTLF= convertFacCF2NTLzz_pEX (F, NTLMipo);
     zz_pEX NTLG= convertFacCF2NTLzz_pEX (G, NTLMipo);
     div (NTLF, NTLF, NTLG);
     result= convertNTLzz_pEX2CF(NTLF, F.mvar(), alpha);
+#endif
   }
   else
   {
