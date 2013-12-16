@@ -76,6 +76,9 @@ class ShiftDVec::sTObjectExtension
 
     void dumbInit(sTObject* _T){ T = _T; dvec = NULL; }
 
+    // hack for enterL
+    void Increase_Number_Of_Possessors(){ ++number_of_possesors; }
+
     void SetDVecIfNULL(poly p, ring r)
     { if(!dvec) SetDVec(p, r); }
 

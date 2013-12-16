@@ -134,7 +134,36 @@ inline static int* initS_2_R (const int maxnr)
 //the work begins
 
 
-//ideal freegb(ideal I, int uptodeg, int lVblock)
+/** Call for extra.cc
+ *
+ * @param[in] I            This must be some kind of bacteria.
+ * @param[in] uptodeg      This is equal to the highest allowed
+ *                         position in the letterplace
+ *                         polynomials in I (positions start
+ *                         with 1); This can be in most cases
+ *                         understood as the maximum number of
+ *                         variables allowed in the polynomial.
+ *                         (it is in fact equal to the maximum
+ *                         number of variables allowed in the
+ *                         polynomial, if the letterplace
+ *                         polynomial contains no gaps, is not
+ *                         shifted and has no two variables with
+ *                         the same position.)
+ * @param[in] lVblock      In Singular the letterplace
+ *                         polynomials are divided in blocks
+ *                         internally. Each block corresponds to
+ *                         a position in the polynomial and
+ *                         stores, which variable is at this
+ *                         position. lVblock tells how many
+ *                         entries for variables are in a block;
+ *                         with other words: this is the number
+ *                         of variables in the original
+ *                         non-letterplace, non-commutative ring.
+ * @param[in] deBoGriFlags The bits set in this variable
+ *                         determine, which Debug-Output will be
+ *                         done. Only works in debug mode (d.i.
+ *                         using Singularg) .
+ */
 ideal ShiftDVec::freegbdvc
   (ideal I, int uptodeg, int lVblock, long deBoGriFlags)
 {

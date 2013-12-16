@@ -425,7 +425,7 @@ considered in earlier loops.
 \endverbatim
  *
  *  \todo This function has to be reviewed and tested thoroughly.
- *  \todo explain this $?&X/§! function!
+ *  \todo explain this $?&X/§! function! Properly!
  *  \todo reflect once more, if we really can leave out those
  *        cases discussed above
  *  \todo split this procedure into several procedures
@@ -1191,37 +1191,12 @@ void ShiftDVec::p_Lcm( poly p1, poly p2,
   if(p2s) P_DELETE( &p2s, r );
 }
 
-#if 0
-/* untested and unused, just an idea... No, forget it!!! */
-void ShiftDVec::p_Lcm( poly p1, poly p2,
-                       uint shift_lm_p2,
-                       poly return_lcm, ring r )
-{
-  poly p = p1;
-  long i_lcm_off = 0;
-  do
-  {
-    long i_p = 1;
-    { // this is a loop
-      nextblock: ;
-      // We will loop through p1/p2, until we found an empty
-      // block, or considered all variables
-      for(long j = 0; j < lV; ++j)
-        if( p_GetExp(p, i_p+j, r) )
-        {
-          p_SetExp(return_lcm, i_p+i_lcm_off+j, 1, r);
-          i
-          if( i_p += lV > rVar(r) ) return; // return if all vars
-          else goto nextblock; //considered or move to next block
-        }
-      i_lcm_off = i_p - 1; //now 'append' p2 to return_lcm
-    }
-  }while( p != p2 && p = p2 ); //first consider p1, then p2
-}
-#endif
-
 /** Merge the temporary pair set B into the pair set L
  *
+ *  This procedure is used at the end of initenterpairs, when the
+ *  new pairs were entered into strat->B . strat->B will be
+ *  merged into strat->L . The position of the new pairs in L
+ *  will be determined by strat->posInL .
  * \todo document this function
  */
 void ShiftDVec::kMergeBintoL( SD::kStrategy strat )
