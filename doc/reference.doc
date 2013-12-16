@@ -6374,6 +6374,7 @@ of the basis
 @item
 @code{2}: term over position order, non-incremental computation
 @end enumerate
+@code{3}: Schreyer-weighted degree over index over leading term
 @*The third argument specifies the rewrite order @code{sba} uses:
 @enumerate
 @item
