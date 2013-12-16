@@ -945,11 +945,11 @@ Comments should be send to the author of the library directly.
 * realizationMatroids_lib:: Realizability for Tropical Fan Curves
 * resources_lib:: Tools to manage the computational resources
 * tasks_lib:: A parallel framework based on tasks
-* schubert_lib:: Intersection Theory
 * symodstd_lib:: Groebner bases for symmetric ideals
 * derham_lib:: Computation of deRham cohomology (Singular 4)
 * schreyer_lib:: Helpers for Schreyer resolution
 @end menu
+@c * schubert_lib:: Intersection Theory
 @c ----------------------------------------------------------
 @node classifyceq_lib,classifyci_lib, , Experimental libraries
 @subsection classifyceq_lib
@@ -1075,18 +1075,23 @@ Todos/Issues:
 @subsection resources_lib
 @c lib resources.lib
 @c ----------------------------------------------------------
-@node tasks_lib,schubert_lib,resources_lib, Experimental libraries
+@c @node tasks_lib,schubert_lib,resources_lib, Experimental libraries
+@c @subsection tasks_lib
+@c @c lib tasks.lib
+@c @c ----------------------------------------------------------
+@c @node schubert_lib,symodstd_lib,tasks_lib, Experimental libraries
+@c @subsection schubert_lib
+@c @c lib schubert.lib
+@c @c ----------------------------------------------------------
+@c @node symodstd_lib,derham_lib,schubert_lib, Experimental libraries
+@c ----------------------------------------------------------
+@node tasks_lib,symodstd_lib,resources_lib, Experimental libraries
 @subsection tasks_lib
 @c lib tasks.lib
 @c ----------------------------------------------------------
-@node schubert_lib,symodstd_lib,tasks_lib, Experimental libraries
-@subsection schubert_lib
-@c lib schubert.lib
-@c ----------------------------------------------------------
-@node symodstd_lib,derham_lib,schubert_lib, Experimental libraries
+@node symodstd_lib,derham_lib,tasks_lib, Experimental libraries
 @subsection symodstd_lib
 @c lib symodstd.lib
-
 @c ----------------------------------------------------------
 @node derham_lib,schreyer_lib,symodstd_lib, Experimental libraries
 @subsection derham_lib

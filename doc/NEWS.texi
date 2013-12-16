@@ -41,18 +41,21 @@ the 3-1-6/7 pre-release series).
 @heading New commands
 @itemize
 @item @nref{sba}: an F5 like Groebner base computation
+@item @nref{ASSUME}: support for debugging libraries
 @end itemize
 
 @heading New libraries
 @itemize
 @item @nref{classifyci_lib}: Isolated complete intersection singularities in characteristic  0
-@item @xref{schubert_lib}:  Proceduces for Intersection Theory
+@item @nref{derham_lib}: Computation of deRham cohomology
 @end itemize
 
 @heading Changed @sc{Singular} libraries
 @itemize @bullet
 @item
 improved grobcov.lib (@nref{grobcov_lib})
+@item
+fixed normal.lib (@nref{normal_lib})
 @end itemize
 
 
