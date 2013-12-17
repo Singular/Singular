@@ -3445,10 +3445,9 @@ A version string is part of the header of a library.
 @item @strong{Purpose:}
   Defines the version number of a library. It is displayed when the library is loaded.
 @item @strong{Example:}
-@code{version="$}@code{Id: sample.lib 13320 2010-09-29 09:31:38Z someone $";}
+@code{version="version sample.lib 4.0.0.0 Dec_2013 ";}
 @item @strong{Note:}
-It is common practice to simply define the version string to be
-@code{"$I}@code{d:$"} and let a version control system expand it.
+Syntax: @code{version<space><filename><space><version><space><date><space>}
 @end table
 
 @c -------------------------------------------------------------------
