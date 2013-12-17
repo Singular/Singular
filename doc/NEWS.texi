@@ -33,6 +33,8 @@ Major new features are:
 non-commutative extension @nref{Non-commutative subsystem}
 @item
 name spaces (@nref{package})
+@item
+algebraic/transcendental extension rewritten
 @end itemize
 Besides theses internal changes, @sc{Singular} version 4 offers many new
 features and functionalities (which were partly already incorporated in
