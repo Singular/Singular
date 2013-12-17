@@ -6214,7 +6214,7 @@ the quotient ideal.
 @end enumerate
 From a list of such structure, a new ring may be defined by the command @code{ring}
 ( see the following example ).
-@item @string{Note:} All data which depends on a ring belong to the current ring,
+@item @strong{Note:} All data which depends on a ring belong to the current ring,
 not to a ring which can be contructed fron a modified list.
 These data will be mapped via fetch to the ring to be constructed.
 @item @strong{Example:}
