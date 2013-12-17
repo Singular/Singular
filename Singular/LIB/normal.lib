@@ -4444,11 +4444,12 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
         // I = I1 \cap I2
         printlevel = printlevel + 1;
         ideal JDefault = 0; // Now it uses the default J;
-        list nor1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault)[1];
-        list nor2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault)[1];
+        list nor1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault);
+        list nor2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault);
         printlevel = printlevel - 1;
         option(set,save_opt);
-        return(list(nor1, nor2));
+        list res = nor1 + nor2;
+        return(res);
       }
     }
   }
@@ -4567,11 +4568,12 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
       printlevel = printlevel + 1;
 
       ideal JDefault = 0;  // Now it uses the default J;
-      list nor1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault)[1];
-      list nor2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault)[1];
+      list nor1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault);
+      list nor2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault);
       printlevel = printlevel - 1;
       option(set,save_opt);
-      return(list(nor1, nor2));
+      list res = nor1 + nor2;
+      return(res);
     }
   }
 
