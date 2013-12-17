@@ -334,7 +334,7 @@ proc globalSections(divisor D)
 "USAGE:  globalSections(A); A = divisor.@*
 ASSUME:  A is a divisor on X.
 RETURN:  a list with a basis of the space of global sections of D.
-THEORY:  We assume that the qring of X satisfies the S2-condition. We compute sat((f*J) : I) /f
+THEORY:  We assume that the qring of X satisfies the S2-condition and that X is smooth. We compute sat((f*J) : I) /f
          where D = (I)-(J).
 KEYWORDS: divisors
 EXAMPLE: example globalSections; shows an example
@@ -369,7 +369,7 @@ KEYWORDS: divisors
 EXAMPLE: example degreeDivisor; shows an example
 "
 {
-  return( deg(std(A.num))-deg(std(A.den)));
+  return( mult(std(A.num))-mult(std(A.den)));
 }
 example
 { "EXAMPLE:";
