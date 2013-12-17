@@ -1097,7 +1097,7 @@ void kronSubFp (nmod_poly_t result, const CanonicalForm& A, int d)
 {
   int degAy= degree (A);
   nmod_poly_init2 (result, getCharacteristic(), d*(degAy + 1));
-  _nmod_poly_set_length (result, d*(degAy + 1));
+  result->length= d*(degAy + 1);
   flint_mpn_zero (result->coeffs, d*(degAy+1));
 
   nmod_poly_t buf;

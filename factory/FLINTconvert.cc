@@ -202,7 +202,7 @@ convertFmpq_poly_t2FacCF (const fmpq_poly_t p, const Variable& x)
 {
   CanonicalForm result= 0;
   fmpq_t coeff;
-  long n= fmpq_poly_length (p);
+  long n= p->length;
   for (long i= 0; i < n; i++)
   {
     fmpq_init (coeff);
