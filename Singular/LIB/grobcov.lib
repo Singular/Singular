@@ -112,7 +112,7 @@ extend(GC); When the grobcov of an ideal has been computed
                    representation using extend.
                    Can be used without calling presiouly setglobalrings(),
 
-locus(G);     Special routine for determining the locus of points
+locus(G):     Special routine for determining the locus of points
                    of  objects. Given a parametric ideal J with
                    parameters (a_1,..a_m) and variables (x_1,..,xn),
                    representing the system determining
@@ -130,7 +130,7 @@ locus(G);     Special routine for determining the locus of points
                    ''An Algebraic Taxonomy for Locus Computation in Dynamic Geometry''.
                    Can be used without calling presiouly setglobalrings(),
 
-locusdg(G);  Is a special routine for computing the locus in dinamical geometry.
+locusdg(G):  Is a special routine for computing the locus in dinamical geometry.
                     It detects automatically a possible point that is to be avoided by the mover,
                     whose coordinates must be the last two coordinates in the definition of the ring.
                     If such a point is detected, then it eliminates the segments of the grobcov
@@ -138,11 +138,11 @@ locusdg(G);  Is a special routine for computing the locus in dinamical geometry.
                     Then it calls locus.
                     Can be used without calling presiouly setglobalrings(),
 
-locusto(L);  Transforms the output of locus to a string that
+locusto(L):  Transforms the output of locus to a string that
                   can be reed from different computational systems.
                   Can be used without calling presiouly setglobalrings(),
 
-addcons(L); Given a disjoint set of locally closed subsets in P-representation,
+addcons(L): Given a disjoint set of locally closed subsets in P-representation,
                   it returns the canonical P-representation of the constructible set
                   formed by the union of them.
                   Can be used without calling presiouly setglobalrings(),
@@ -1221,7 +1221,10 @@ proc Prep(ideal N, ideal M)
 // setglobalrings() is needed.
 proc PtoCrep(list L)
 {
+  int te=0;
   def RR=basering;
+  if(defined(@P)){te=1;}
+  else{te=0; setglobalrings();}
   setring(@P);
   def Lp=imap(RR,L);
   int i; int j;
@@ -1239,7 +1242,9 @@ proc PtoCrep(list L)
   }
   def La=list(ida,idb);
   setring(RR);
-  return(imap(@P,La));
+  def LL=imap(@P,La);
+  if(te==0){kill @P; kill @R; kill @RP;}
+  return(LL);
 }
 
 // input: F a parametric ideal in Q[a][x]
@@ -3894,7 +3899,13 @@ EXAMPLE:  adccons; shows an example"
   list notadded; list P0;
   int i; int j; int k; int l;
   intvec v; intvec v1; intvec v0;
-  ideal J; list K;
+  ideal J; list K; list L1;
+  for(i=1;i<=size(L);i++)
+  {
+    if(equalideals(L[i][1][1],ideal(1))==0)
+    {L1[size(L1)+1]=L[i];}
+  }
+  L=L1;
   for(i=1;i<=size(L);i++)
   {
     for(j=1;j<=size(L[i]);j++)
