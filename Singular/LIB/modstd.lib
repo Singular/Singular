@@ -32,7 +32,7 @@ LIB "parallel.lib";
 
 static proc mod_init()
 {
-   newstruct("ideal_primeTest", "ideal Ideal");
+   newstruct("idealPrimeTest", "ideal Ideal");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -486,7 +486,7 @@ EXAMPLE: example primeList; shows an example
       list parallelResults;
       list arguments;
       int neededPrimes = neededSize-size(L);
-      ideal_primeTest Id;
+      idealPrimeTest Id;
       Id.Ideal = I;
       export(Id);
       while(neededPrimes > 0)
