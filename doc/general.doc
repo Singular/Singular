@@ -4109,6 +4109,8 @@ If the expression is evaluated and not true (i.e. does not evaluate to @code{int
   ASSUME(1,1==2); // not evaluated
   int assumeLevel=2;
   ASSUME(1,1==2);
+  // setting a different assumeLvele for poly.lib:
+  int Poly::assumeLevel=2;
 @c example
 @end smallexample
 @end table
