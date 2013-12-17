@@ -183,7 +183,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
 
       fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
 
-      convertFacCF2Fq_nmod_poly_t (FLINTA, A, fq_con);
+      convertFacCF2Fq_nmod_poly_t (FLINTA, buf, fq_con);
       fq_nmod_poly_make_monic (FLINTA, FLINTA, fq_con);
 
       fq_nmod_poly_factor_init (FLINTFactorsA, fq_con);
@@ -191,7 +191,8 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
 
       fq_nmod_poly_factor (FLINTFactorsA, leadingCoeff, FLINTA, fq_con);
 
-      factorsA= convertFLINTFq_nmod_poly_factor2FacCFFList (FLINTFactorsA, x, beta, fq_con);
+      factorsA= convertFLINTFq_nmod_poly_factor2FacCFFList (FLINTFactorsA, x,
+                                                            beta, fq_con);
 
       fq_nmod_poly_factor_clear (FLINTFactorsA, fq_con);
       fq_nmod_poly_clear (FLINTA, fq_con);
@@ -256,7 +257,8 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
 
       fq_nmod_poly_factor (FLINTFactorsA, leadingCoeff, FLINTA, fq_con);
 
-      factorsA= convertFLINTFq_nmod_poly_factor2FacCFFList (FLINTFactorsA, x, alpha, fq_con);
+      factorsA= convertFLINTFq_nmod_poly_factor2FacCFFList (FLINTFactorsA, x,
+                                                            alpha, fq_con);
 
       fq_nmod_poly_factor_clear (FLINTFactorsA, fq_con);
       fq_nmod_poly_clear (FLINTA, fq_con);
