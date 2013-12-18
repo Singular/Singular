@@ -1375,22 +1375,22 @@ static inline void p_ExpVectorSub(poly p1, poly p2, const ring r)
 
 }
 // ExpVector(p1) += ExpVector(p2) - ExpVector(p3)
-//static inline void p_ExpVectorAddSub(poly p1, poly p2, poly p3, const ring r)
-//{
-//  p_LmCheckPolyRing1(p1, r);
-//  p_LmCheckPolyRing1(p2, r);
-//  p_LmCheckPolyRing1(p3, r);
-//#if PDEBUG >= 1
-//  for (int i=1; i<=r->N; i++)
-//    pAssume1(p_GetExp(p1, i, r) + p_GetExp(p2, i, r) >= p_GetExp(p3, i, r));
-//  pAssume1(p_GetComp(p1, r) == 0 ||
-//           (p_GetComp(p2, r) - p_GetComp(p3, r) == 0) ||
-//           (p_GetComp(p1, r) == p_GetComp(p2, r) - p_GetComp(p3, r)));
-//#endif
-//
-//  p_MemAddSub_LengthGeneral(p1->exp, p2->exp, p3->exp, r->ExpL_Size);
-//  // no need to adjust in case of NegWeights
-//}
+static inline void p_ExpVectorAddSub(poly p1, poly p2, poly p3, const ring r)
+{
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
+  p_LmCheckPolyRing1(p3, r);
+#if PDEBUG >= 1
+  for (int i=1; i<=r->N; i++)
+    pAssume1(p_GetExp(p1, i, r) + p_GetExp(p2, i, r) >= p_GetExp(p3, i, r));
+  pAssume1(p_GetComp(p1, r) == 0 ||
+           (p_GetComp(p2, r) - p_GetComp(p3, r) == 0) ||
+           (p_GetComp(p1, r) == p_GetComp(p2, r) - p_GetComp(p3, r)));
+#endif
+
+  p_MemAddSub_LengthGeneral(p1->exp, p2->exp, p3->exp, r->ExpL_Size);
+  // no need to adjust in case of NegWeights
+}
 
 // ExpVector(pr) = ExpVector(p1) - ExpVector(p2)
 static inline void p_ExpVectorDiff(poly pr, poly p1, poly p2, const ring r)

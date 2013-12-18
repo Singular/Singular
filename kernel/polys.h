@@ -79,12 +79,12 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
  *
  ***************************************************************/
 
-#define pExpVectorCopy(d_p, s_p)    p_ExpVectorCopy(d_p, s_p, currRing)
-#define pExpVectorAdd(p1, p2)       p_ExpVectorAdd(p1, p2, currRing)
-#define pExpVectorSub(p1, p2)       p_ExpVectorSub(p1, p2, currRing)
-#define pExpVectorAddSub(p1, p2, p3)p_ExpVectorAddSub(p1, p2, p3, currRing)
-#define pExpVectorSum(pr, p1, p2)   p_ExpVectorSum(pr, p1, p2, currRing)
-#define pExpVectorDiff(pr, p1, p2)  p_ExpVectorDiff(pr, p1, p2, currRing)
+#define pExpVectorCopy(d_p, s_p)      p_ExpVectorCopy(d_p, s_p, currRing)
+#define pExpVectorAdd(p1, p2)         p_ExpVectorAdd(p1, p2, currRing)
+#define pExpVectorSub(p1, p2)         p_ExpVectorSub(p1, p2, currRing)
+#define pExpVectorAddSub(p1, p2, p3)  p_ExpVectorAddSub(p1, p2, p3, currRing)
+#define pExpVectorSum(pr, p1, p2)     p_ExpVectorSum(pr, p1, p2, currRing)
+#define pExpVectorDiff(pr, p1, p2)    p_ExpVectorDiff(pr, p1, p2, currRing)
 
 // Gets a copy of (resp. set) the exponent vector, where e is assumed
 // to point to (r->N +1)*sizeof(long) memory. Exponents are
