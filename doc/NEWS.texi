@@ -21,52 +21,66 @@
 
 @heading News for version @value{VERSION}
 
-The version 4-0-0 is the first in the new
-release series version 4-0.
+Version 4-0-0 is a milestone relase of Singular.
+The new release series 4 aims for an entirely modularized system
+simplifying connectivity with other systems and paving the way
+for parallel computations.
+As one step in this direction, in Singular 4-0-0, 
+the representation of coefficient rings has been separated from the representation
+of polynomials which allows for easy integration of new types of coefficient fields.
 
-@sc{Singular} version 4 has a greater functionality and an improved architecture.
-Major new features are:
+@sc{Singular} 4-0-0's list of improvements and new
+functionality further extends that of 
+the 3-1-6/7 pre-release series.
+One highlight is the implementation
+of Walther's algorithm for computing deRham cohomology.
+
+New commands
+@itemize
+@item @nref{sba}: an F5 like Groebner basis algorithm
+@item @nref{ASSUME}: support for debugging libraries
+@end itemize
+
+New libraries
+@itemize
+@item @nref{classifyci_lib}: Isolated complete intersection singularities in characteristic  0
+@item @nref{derham_lib}: Computation of deRham cohomology
+@item @nref{ellipticcovers_lib}: Gromov Witten numbers of elliptic curves
+@item @nref{orbitparam_lib}: Parametrizing unipotent orbits
+@end itemize
+
+Improved libraries
+@itemize @bullet
+@item
+Compute GIT-fans: (@nref{gitfan_lib})
+@item
+Groebner Cover for parametric ideals (@nref{grobcov_lib})
+@item
+Normalization of Affine Rings (@nref{normal_lib})
+@item
+An abstraction layer for parallel skeletons (@nref{parallel_lib})
+@item
+Classification of real singularities (@nref{realclassify_lib})
+@item
+and many more with small fixes
+@end itemize
+
+Kernel improvements
 @itemize
 @item
 @nref{Dynamic modules}
 @item
-non-commutative extension @nref{Non-commutative subsystem}
+@nref{Non-commutative subsystem}
 @item
 name spaces (@nref{package})
 @item
-algebraic/transcendental extension rewritten
-@end itemize
-Besides theses internal changes, @sc{Singular} version 4 offers many new
-features and functionalities (which were partly already incorporated in
-the 3-1-6/7 pre-release series).
-
-@heading New commands
-@itemize
-@item @nref{sba}: an F5 like Groebner base computation
-@item @nref{ASSUME}: support for debugging libraries
+algebraic/transcendental field extensions
 @end itemize
 
-@heading New libraries
-@itemize
-@item @nref{classifyci_lib}: Isolated complete intersection singularities in characteristic  0
-@item @nref{derham_lib}: Computation of deRham cohomology
-@end itemize
+Availability
 
-@heading Changed @sc{Singular} libraries
-@itemize @bullet
-@item
-improved grobcov.lib (@nref{grobcov_lib})
-@item
-fixed normal.lib (@nref{normal_lib})
-@end itemize
-
-
-@heading Porting
-
-@itemize @bullet
-@item @sc{Singular} is available for ix86-Linux,
+@sc{Singular} is available for ix86-Linux,
 SunOS-5, ix86-Win (runs on Windows),
 FreeBSD, Mac OS X, x86_64-Linux (AMD64/Opteron/EM64T),
 IA64-Linux
-@end itemize
 

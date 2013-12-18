@@ -369,6 +369,9 @@ LIB "all.lib";
 * homolog_lib:: procedures for homological algebra
 * integralbasis_lib:: Integral basis in algebraic function fields
 * intprog_lib:: Integer Programming
+* lll_lib:: Integral LLL-Algorithm
+* locnormal_lib:: Normalization of affine domains using local methods
+* modnormal_lib:: Normalization of affine domains using modular methods
 * modstd_lib:: Groebner basis of ideals via modular computations
 * monomialideal_lib:: Primary and irreducible decompositions of monomial ideals
 * mprimdec_lib:: procedures for primary decomposition of modules
@@ -384,6 +387,7 @@ LIB "all.lib";
 * reesclos_lib:: Rees Algebra and integral closure of an ideal
 * sagbi_lib:: Subalgebras bases Analogous to Groebner bases for ideals
 * sing4ti2_lib:: interface to program 4ti2
+* symodstd_lib:: Groebner bases for symmetric ideals
 * toric_lib:: toric ideals
 @end menu
 
@@ -420,11 +424,23 @@ LIB "all.lib";
 @subsection integralbasis_lib
 @c lib integralbasis.lib
 @c ----------------------------------------------------------
-@node intprog_lib, modstd_lib, integralbasis_lib, Commutative algebra
+@node intprog_lib, lll_lib, integralbasis_lib, Commutative algebra
 @subsection intprog_lib
 @c lib intprog.lib
+@c ----------------------------------------------------------
+@node lll_lib, locnormal_lib, intprog_lib, Commutative algebra
+@subsection lll_lib
+@c lib lll.lib
+@c ----------------------------------------------------------
+@node locnormal_lib, modnormal_lib, lll_lib,  Commutative algebra
+@subsection locnormal_lib
+@c lib locnormal.lib
+@c ----------------------------------------------------------
+@node modnormal_lib, modstd_lib, locnormal_lib,  Commutative algebra
+@subsection modnormal_lib
+@c lib modnormal.lib
 @c ---------------------------------------------------------
-@node modstd_lib, monomialideal_lib, intprog_lib, Commutative algebra
+@node modstd_lib, monomialideal_lib, modnormal_lib, Commutative algebra
 @subsection modstd_lib
 @c lib modstd.lib
 @c ---------------------------------------------------------
@@ -470,7 +486,7 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node realrad_lib, reesclos_lib, primitiv_lib, Commutative algebra
 @subsection realrad_lib
-@c @c lib realrad.lib
+@c lib realrad.lib
 @c ---------------------------------------------------------
 @node reesclos_lib, sagbi_lib, realrad_lib, Commutative algebra
 @subsection reesclos_lib
@@ -480,11 +496,15 @@ LIB "all.lib";
 @subsection sagbi_lib
 @c lib sagbi.lib
 @c ---------------------------------------------------------
-@node sing4ti2_lib, toric_lib, sagbi_lib, Commutative algebra
+@node sing4ti2_lib, symodstd_lib, sagbi_lib, Commutative algebra
 @subsection sing4ti2_lib
 @c lib sing4ti2.lib tag:sing4ti2
+@c ----------------------------------------------------------
+@node symodstd_lib,toric_lib,sing4ti2_lib, Commutative algebra
+@subsection symodstd_lib
+@c lib symodstd.lib
 @c ---------------------------------------------------------
-@node toric_lib, , sing4ti2_lib, Commutative algebra
+@node toric_lib, , symodstd_lib, Commutative algebra
 @subsection toric_lib
 @c lib toric.lib
 @c ---------------------------------------------------------
@@ -500,6 +520,8 @@ LIB "all.lib";
 * resolve_lib:: Resolution of Singularities
 * reszeta_lib:: Applications of Resolution of Singularities
 * sheafcoh_lib:: Procedures for Computing Sheaf Cohomology
+* JMBTest_lib:: performs J-Marked basis test
+* JMSConst_lib::  constructing J-Marked Schemes
 @end menu
 
 @c ---------------------------------------------------------
@@ -537,9 +559,17 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection reszeta_lib
 @c lib reszeta.lib
 @c ---------------------------------------------------------
-@node sheafcoh_lib, ,reszeta_lib, Algebraic geometry
+@node sheafcoh_lib, JMBTest_lib, reszeta_lib, Algebraic geometry
 @subsection sheafcoh_lib
 @c lib sheafcoh.lib tag:memory
+@c ----------------------------------------------------------
+@node JMBTest_lib, JMSConst_lib, sheafcoh_lib, Algebraic geometry
+@subsection JMBTest_lib
+@c lib JMBTest.lib
+@c ----------------------------------------------------------
+@node JMSConst_lib, , JMBTest_lib, Algebraic geometry
+@subsection JMSConst_lib
+@c lib JMSConst.lib
 @c ----------------------------------------------------------------------------
 @node Singularities, Invariant theory, Algebraic geometry, SINGULAR libraries
 @section Singularities
@@ -662,6 +692,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @cindex Symbolic-numerical solving
 
 @menu
+* ffsolve_lib:: multivariate equation solving over finite fields
 * presolve_lib:: procedures for pre-solving polynomial equations
 * solve_lib:: procedures to solve polynomial systems
 * triang_lib:: procedures for decomposing zero-dimensional ideals
@@ -671,7 +702,11 @@ iniD, reslist, sumlist, dividelist, createlist
 @end menu
 
 @c ---------------------------------------------------------
-@node presolve_lib, solve_lib, Symbolic-numerical solving, Symbolic-numerical solving
+@node ffsolve_lib, presolve_lib, Symbolic-numerical solving, Symbolic-numerical solving
+@subsection ffsolve_lib
+@c lib ffsolve.lib
+@c ---------------------------------------------------------
+@node presolve_lib, solve_lib, ffsolve_lib, Symbolic-numerical solving
 @subsection presolve_lib
 @c lib presolve.lib
 @c ---------------------------------------------------------
@@ -752,6 +787,7 @@ iniD, reslist, sumlist, dividelist, createlist
 * Control theory background:: An overview of the theory
 * control_lib:: Algebraic analysis tools for System and Control Theory
 * jacobson_lib:: Algorithms for Smith and Jacobson Normal Form
+* findifs_lib:: Tools for the finite difference schemes
 @end menu
 
 @c ---------------------------------------------------------
@@ -807,10 +843,14 @@ of autonomy degrees.
 @c lib control.lib
 
 @c ---------------------------------------------------------
-@node jacobson_lib, , control_lib, System and Control theory
+@node jacobson_lib, findifs_lib, control_lib, System and Control theory
 @subsection jacobson_lib
 @c lib jacobson.lib
 
+@c ----------------------------------------------------------
+@node findifs_lib, , jacobson_lib, System and Control theory
+@subsection findifs_lib
+@c lib findifs.lib
 @c ----------------------------------------------------------------------------
 @node Teaching, Tropical Geometry, System and Control theory, SINGULAR libraries
 @section Teaching
@@ -876,15 +916,20 @@ but not for serious computations.
 
 @menu
 * polymake_lib:: interface to polymake and TOPCOM
+* realizationMatroids_lib:: Realizability for Tropical Fan Curves
 * tropical_lib:: interface to gfan
 @end menu
 @c ----------------------------------------------------------
-@node polymake_lib,tropical_lib,Tropical Geometry, Tropical Geometry
+@node polymake_lib,realizationMatroids_lib,Tropical Geometry, Tropical Geometry
 @subsection polymake_lib
 @c lib polymake.lib no_ex
 
 @c ----------------------------------------------------------
-@node tropical_lib,, polymake_lib, Tropical Geometry
+@node realizationMatroids_lib,tropical_lib,polymake_lib, Tropical Geometry
+@subsection realizationMatroids_lib
+@c lib realizationMatroids.lib
+@c ----------------------------------------------------------
+@node tropical_lib,, realizationMatroids_lib, Tropical Geometry
 @subsection tropical_lib
 
 @c lib tropical.lib no_ex
@@ -927,25 +972,17 @@ Comments should be send to the author of the library directly.
 * classifyceq_lib:: simple hypersurface singularities in charateristic p > 0
 * classifyci_lib:: isolated complete intersection singularities in char 0
 * divisors_lib:: Divisors and P-Divisors
-* ffsolve_lib:: multivariate equation solving over finite fields
-* findifs_lib:: Tools for the finite difference schemes
+* ellipticcovers_lib::  Gromov Witten numbers of elliptic curves
 * finitediff_lib:: finite difference schemes for linear differential equations
 * gitfan_lib:: Compute GIT-fans
-* lll_lib:: Integral LLL-Algorithm
-* locnormal_lib:: Normalization of affine domains using local methods
-* JMBTest_lib:: performs J-Marked basis test
-* JMSConst_lib::  constructing J-Marked Schemes
 * orbitparam_lib:: Parametrizing unipotent orbits
-* modnormal_lib:: Normalization of affine domains using modular methods
 * multigrading_lib:: Multigradings and related computations
 * numerAlg_lib::  Numerical Algebraic Algorithms
 * numerDecom_lib:: Bertini interface
 * parallel_lib:: Tools for parallelization
 * realclassify_lib:: Classification of real singularities
-* realizationMatroids_lib:: Realizability for Tropical Fan Curves
 * resources_lib:: Tools to manage the computational resources
 * tasks_lib:: A parallel framework based on tasks
-* symodstd_lib:: Groebner bases for symmetric ideals
 * derham_lib:: Computation of deRham cohomology (Singular 4)
 * schreyer_lib:: Helpers for Schreyer resolution
 @end menu
@@ -961,22 +998,17 @@ Comments should be send to the author of the library directly.
 
 @c lib classifyci.lib
 @c ----------------------------------------------------------
-@node divisors_lib,ffsolve_lib,classifyci_lib, Experimental libraries
+@node divisors_lib,ellipticcovers_lib,classifyci_lib, Experimental libraries
 @subsection divisors_lib
 
 @c lib divisors.lib no_ex
 @c ----------------------------------------------------------
-@node ffsolve_lib, findifs_lib, divisors_lib, Experimental libraries
-@subsection ffsolve_lib
+@node ellipticcovers_lib,finitediff_lib,divisors_lib, Experimental libraries
+@subsection ellipticcovers_lib
 
-@c @c lib ffsolve.lib
+@c lib ellipticcovers.lib
 @c ----------------------------------------------------------
-@node findifs_lib, finitediff_lib, ffsolve_lib, Experimental libraries
-@subsection findifs_lib
-
-@c lib findifs.lib
-@c ----------------------------------------------------------
-@node finitediff_lib,gitfan_lib, findifs_lib, Experimental libraries
+@node finitediff_lib,gitfan_lib, ellipticcovers_lib, Experimental libraries
 @subsection finitediff_lib
 
 Issues:
@@ -993,37 +1025,15 @@ Issues:
 @c lib finitediff.lib
 
 @c ----------------------------------------------------------
-@node gitfan_lib,lll_lib, finitediff_lib, Experimental libraries
+@node gitfan_lib,orbitparam_lib, finitediff_lib, Experimental libraries
 @subsection gitfan_lib
-
-@c @c lib gitfan.lib
-
+@c lib gitfan.lib
 @c ----------------------------------------------------------
-@node lll_lib, locnormal_lib, gitfan_lib, Experimental libraries
-@subsection lll_lib
-@c lib lll.lib
-@c ----------------------------------------------------------
-@node locnormal_lib, JMBTest_lib, lll_lib, Experimental libraries
-@subsection locnormal_lib
-@c lib locnormal.lib
-@c ----------------------------------------------------------
-@node JMBTest_lib, JMSConst_lib, locnormal_lib, Experimental libraries
-@subsection JMBTest_lib
-@c lib JMBTest.lib
-@c ----------------------------------------------------------
-@node JMSConst_lib, orbitparam_lib, JMBTest_lib, Experimental libraries
-@subsection JMSConst_lib
-@c lib JMSConst.lib
-@c ----------------------------------------------------------
-@node orbitparam_lib, modnormal_lib, JMSConst_lib, Experimental libraries
+@node orbitparam_lib, multigrading_lib, gitfan_lib, Experimental libraries
 @subsection orbitparam_lib
 @c lib orbitparam.lib
 @c ----------------------------------------------------------
-@node modnormal_lib, multigrading_lib, orbitparam_lib, Experimental libraries
-@subsection modnormal_lib
-@c lib modnormal.lib
-@c ----------------------------------------------------------
-@node multigrading_lib,numerAlg_lib,modnormal_lib, Experimental libraries
+@node multigrading_lib,numerAlg_lib,orbitparam_lib, Experimental libraries
 @subsection multigrading_lib
 
 Todos/Issues:
@@ -1062,16 +1072,12 @@ Todos/Issues:
 
 @c lib parallel.lib
 @c ----------------------------------------------------------
-@node realclassify_lib,realizationMatroids_lib, parallel_lib, Experimental libraries
+@node realclassify_lib,resources_lib, parallel_lib, Experimental libraries
 @subsection realclassify_lib
 @c lib realclassify.lib
 
 @c ----------------------------------------------------------
-@node realizationMatroids_lib,resources_lib,realclassify_lib, Experimental libraries
-@subsection realizationMatroids_lib
-@c lib realizationMatroids.lib
-@c ----------------------------------------------------------
-@node resources_lib,tasks_lib,realizationMatroids_lib, Experimental libraries
+@node resources_lib,tasks_lib,realclassify_lib, Experimental libraries
 @subsection resources_lib
 @c lib resources.lib
 @c ----------------------------------------------------------
@@ -1079,21 +1085,17 @@ Todos/Issues:
 @c @subsection tasks_lib
 @c @c lib tasks.lib
 @c @c ----------------------------------------------------------
-@c @node schubert_lib,symodstd_lib,tasks_lib, Experimental libraries
+@c @node schubert_lib,derham_lib,tasks_lib, Experimental libraries
 @c @subsection schubert_lib
 @c @c lib schubert.lib
 @c @c ----------------------------------------------------------
-@c @node symodstd_lib,derham_lib,schubert_lib, Experimental libraries
+@c @node tasks_lib,derham_lib,schubert_lib, Experimental libraries
 @c ----------------------------------------------------------
-@node tasks_lib,symodstd_lib,resources_lib, Experimental libraries
+@node tasks_lib,derham_lib,resources_lib, Experimental libraries
 @subsection tasks_lib
 @c lib tasks.lib
 @c ----------------------------------------------------------
-@node symodstd_lib,derham_lib,tasks_lib, Experimental libraries
-@subsection symodstd_lib
-@c lib symodstd.lib
-@c ----------------------------------------------------------
-@node derham_lib,schreyer_lib,symodstd_lib, Experimental libraries
+@node derham_lib,schreyer_lib,tasks_lib, Experimental libraries
 @subsection derham_lib
 
 @c lib derham.lib
