@@ -1421,7 +1421,7 @@ void initSba(ideal F,kStrategy strat)
   // for sig-safe reductions in signature-based
   // standard basis computations
   strat->red          = redSig;
-  //strat->incremental  = TRUE;
+  //strat->sbaOrder  = 1;
   strat->currIdx      = 1;
 }
 
@@ -2252,7 +2252,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   return r;
 }
 
-ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int incremental, int arri, intvec *hilb,int syzComp,
+ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intvec *hilb,int syzComp,
           int newIdeal, intvec *vw)
 {
   if(idIs0(F))
@@ -2262,23 +2262,18 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int incremental, int arri, in
   BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   kStrategy strat=new skStrategy;
-  if (incremental!=0)
-  {
-    strat->incremental = TRUE;
-  }
-  else
-  {
-    strat->incremental = FALSE;
-  }
+  strat->sbaOrder = sbaOrder;
   if (arri!=0)
   {
     strat->rewCrit1 = arriRewDummy;
     strat->rewCrit2 = arriRewCriterion;
+    strat->rewCrit3 = arriRewCriterionPre;
   }
   else
   {
     strat->rewCrit1 = faugereRewCriterion;
     strat->rewCrit2 = faugereRewCriterion;
+    strat->rewCrit3 = faugereRewCriterion;
   }
 
   if(!TEST_OPT_RETURN_SB)

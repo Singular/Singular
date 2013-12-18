@@ -6356,7 +6356,7 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{sba (} ideal_expression@code{)}
-@*@code{std (} ideal_expression@code{,} int_expression@code{,} int_expression @code{)}
+@*@code{sba (} ideal_expression@code{,} int_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
@@ -6365,33 +6365,42 @@ monomial ordering of the basering.
 A standard basis is a set of generators such that
 the leading terms generate the leading ideal, resp.@: module.
 @*Use optional
-second and thirds arguments of type int to determine the respective variant of
+second and third arguments of type int to determine the respective variant of
 the signature-based standard basis algorithm:
-@*@code{sba(i,1,1)} computes the basis incrementally using an improved version
-of the algorithm described in
-@code{http://dx.doi.org/10.1016/j.jsc.2011.05.004}.
-@*@code{sba(i,1,0)} computes the basis incrementally using an improved version
-of the algorithm described in
-@code{http://dx.doi.org/10.1016/j.jsc.2010.06.019}.
-@*@code{sba(i,0,1)} computes the basis non-incrementally using the induced
-Schreyer order on the signatures together with an improved version
-of the algorithm described in @code{http://dx.doi.org/10.1016/j.jsc.2011.05.004}.
-@*@code{sba(i,0,0)} computes the basis non-incrementally using the induced
-Schreyer order on the signatures together with an improved version
-of the algorithm described in @code{http://dx.doi.org/10.1145/780506.780516}.
-@*@code{sba(i)} corresponds to @code{sba(i,0,1)}.
+@*The second argument specifies the internal module order @code{sba} uses:
+@enumerate
+@item
+@code{0}: induced Schreyer order on the signatures, non-incremental computation
+of the basis
+@item
+@code{1}: position over term order, incremental computation of the basis
+@item
+@code{2}: term over position order, non-incremental computation
+@end enumerate
+@code{3}: Schreyer-weighted degree over index over leading term
+@*The third argument specifies the rewrite order @code{sba} uses:
+@enumerate
+@item
+@code{0}: using the rewrite order described in
+@code{http://dx.doi.org/10.1016/j.jsc.2010.06.019}
+@item
+@code{1}: using the rewrite order described in
+@code{http://dx.doi.org/10.1016/j.jsc.2011.05.004}
+@end enumerate
+@*The standard call of @code{sba(i)} corresponds to @code{sba(i,0,1)}.
 @item @strong{Note:}
 The
 standard basis is computed with an optimized version of known signature-based
 algorithms like Faugere's F5 Algorithm. Whereas the correctness of the
 algorithms is only guaranteed for global orderings, timings for pure
-lexicographical orderings can be slow. In those situation you should try to
+lexicographical orderings can be slow. In this situation you should try to
 compute the basis w.r.t. the graded reverse-lexicographic ordering and then
 convert to a basis for the lexicographical ordering using other methods (see
 @pxref{fglm} and @pxref{grwalk_lib}). If the algorithms tend to use too much
 memory, you should try the other implemented standard basis algorithms (see
 @pxref{std}, @pxref{groebner}, and @pxref{slimgb}).
-
+@* Note that the behaviour of @code{sba} on an example can be rather different
+depending on which variant you choose (second and third argument).
 @item @strong{Example:}
 @smallexample
 @c example

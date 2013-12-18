@@ -179,15 +179,14 @@ class sLObject : public sTObject
 
 public:
   unsigned long sev;
-  unsigned long from; // from which polynomial it comes from
-            // this is important for signature-based
-            // algorithms
+  unsigned long from; // index in sig up to which the correspongin LObject was already checked
   unsigned long checked; // this is the index of S up to which
                       // the corresponding LObject was already checked in
                       // critical pair creation => when entering the
                       // reduction process it is enough to start a second
                       // rewritten criterion check from checked+1 onwards
-                      // NOTE: If checked = 3 then the corresponding pair is
+  BOOLEAN prod_crit;
+                      // NOTE: If prod_crit = TRUE then the corresponding pair is
                       // detected by Buchberger's Product Criterion and can be
                       // deleted
   poly  p1,p2; /*- the pair p comes from,
@@ -288,8 +287,9 @@ public:
   void (*enterOnePair) (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR /*= -1*/);
   void (*chainCrit) (poly p,int ecart,kStrategy strat);
   BOOLEAN (*syzCrit) (poly sig, unsigned long not_sevSig, kStrategy strat);
-  BOOLEAN (*rewCrit1) (poly sig, unsigned long not_sevSig, kStrategy strat, int start /*= 0*/);
-  BOOLEAN (*rewCrit2) (poly sig, unsigned long not_sevSig, kStrategy strat, int start /*= 0*/);
+  BOOLEAN (*rewCrit1) (poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start /*= 0*/);
+  BOOLEAN (*rewCrit2) (poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start /*= 0*/);
+  BOOLEAN (*rewCrit3) (poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start /*= 0*/);
   pFDegProc pOrigFDeg;
   pLDegProc pOrigLDeg;
   pFDegProc pOrigFDeg_TailRing;
@@ -309,7 +309,7 @@ public:
   intset syzIdx;// index in the syz array at which the first
                 // syzygy of component i comes up
                 // important for signature-based algorithms
-  BOOLEAN incremental;
+  unsigned sbaOrder;
   unsigned long currIdx;
   int max_lower_index;
   intset lenS;
@@ -445,6 +445,7 @@ int posInLF5C (const LSet set, const int length,
                LObject* L,const kStrategy strat);
 int posInLSig (const LSet set, const int length,
                LObject* L,const kStrategy strat);
+int posInSyz (const kStrategy strat, const poly sig);
 int posInL0 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL11 (const LSet set, const int length,
@@ -465,6 +466,8 @@ KINLINE poly redtailBba_Z (poly p,int pos,kStrategy strat);
 poly redtailBba_Z (LObject* L, int pos, kStrategy strat );
 #endif
 poly redtailBba (LObject *L, int pos,kStrategy strat,
+                 BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
+poly redtailSba (LObject *L, int pos,kStrategy strat,
                  BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
 poly redtailBba (TObject *T, int pos,kStrategy strat);
 poly redtail (poly p,int pos,kStrategy strat);
@@ -517,7 +520,7 @@ void initSLSba (ideal F, ideal Q,kStrategy strat);
  ***********************************************/
 void initSyzRules (kStrategy strat);
 void updateS(BOOLEAN toT,kStrategy strat);
-void enterSyz (LObject p,kStrategy strat);
+void enterSyz (LObject p,kStrategy strat, int atT);
 void enterT (LObject p,kStrategy strat, int atT = -1);
 void cancelunit (LObject* p,BOOLEAN inNF=FALSE);
 void HEckeTest (poly pp,kStrategy strat);
@@ -541,9 +544,10 @@ BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(kStrategy strat);
 BOOLEAN syzCriterion(poly sig, unsigned long not_sevSig, kStrategy strat);
 BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat);
-KINLINE BOOLEAN arriRewDummy(poly sig, unsigned long not_sevSig, kStrategy strat, int start);
-BOOLEAN arriRewCriterion(poly sig, unsigned long not_sevSig, kStrategy strat, int start);
-BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, kStrategy strat, int start);
+KINLINE BOOLEAN arriRewDummy(poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start);
+BOOLEAN arriRewCriterion(poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start);
+BOOLEAN arriRewCriterionPre(poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start);
+BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start);
 BOOLEAN findMinLMPair(poly sig, unsigned long not_sevSig, kStrategy strat, int start);
 // returns index of p in TSet, or -1 if not found
 int kFindInT(poly p, TSet T, int tlength);

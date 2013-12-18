@@ -200,13 +200,13 @@ int ksReducePolySig(LObject* PR,
    *
    * TODO:
    * --------------------------------------------
-   * if strat->incremental
+   * if strat->sbaOrder == 1
    * Since we are subdividing lower index and
    * current index reductions it is enough to
    * look at the polynomial part of the signature
    * for a check. This should speed-up checking
    * a lot!
-   * if !strat->incremental
+   * if !strat->sbaOrder == 0
    * We are not subdividing lower and current index
    * due to the fact that we are using the induced
    * Schreyer order
@@ -222,7 +222,12 @@ int ksReducePolySig(LObject* PR,
   //printf("COMPARE IDX: %ld -- %ld\n",idx,strat->currIdx);
   if (!PW->is_sigsafe)
   {
-    poly f1 = p_Copy(PR->GetLmCurrRing(),currRing);
+    poly ftmp;
+    ring rtmp;
+    PR->SetLmCurrRing();
+    poly f1 = pCopy(PR->GetLmCurrRing());
+    //PR->GetLm(ftmp,rtmp);
+    //poly f1 = k_LmInit_tailRing_2_currRing(ftmp,rtmp);
     poly f2 = PW->GetLmCurrRing();
     poly sigMult = pCopy(PW->sig);   // copy signature of reducer
     p_ExpVectorSub(f1, f2, currRing); // Calculate the Monomial we must multiply to p2
@@ -234,7 +239,7 @@ int ksReducePolySig(LObject* PR,
     pWrite(sigMult);
     printf("--------------\n");
 #endif
-    sigMult = pp_Mult_qq(f1,sigMult,currRing);
+    sigMult = p_Mult_q(f1,sigMult,currRing);
 //#if 1
 #ifdef DEBUGF5
     printf("------------------- IN KSREDUCEPOLYSIG: --------------------\n");
@@ -252,7 +257,7 @@ int ksReducePolySig(LObject* PR,
     printf("%d -- %d sig\n",sigSafe,PW->is_sigsafe);
 
 #endif
-    pDelete(&f1);
+    //pDelete(&f1);
     pDelete(&sigMult);
     // go on with the computations only if the signature of p2 is greater than the
     // signature of fm*p1
@@ -261,7 +266,7 @@ int ksReducePolySig(LObject* PR,
       PR->is_redundant = TRUE;
       return 3;
     }
-    PW->is_sigsafe  = TRUE;
+    //PW->is_sigsafe  = TRUE;
   }
   PR->is_redundant = FALSE;
   poly p1 = PR->GetLmTailRing();   // p2 | p1
