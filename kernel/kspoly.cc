@@ -224,8 +224,10 @@ int ksReducePolySig(LObject* PR,
   {
     poly ftmp;
     ring rtmp;
-    PR->GetLm(ftmp,rtmp);
-    poly f1 = k_LmInit_tailRing_2_currRing(ftmp,rtmp);
+    PR->SetLmCurrRing();
+    poly f1 = pCopy(PR->GetLmCurrRing());
+    //PR->GetLm(ftmp,rtmp);
+    //poly f1 = k_LmInit_tailRing_2_currRing(ftmp,rtmp);
     poly f2 = PW->GetLmCurrRing();
     poly sigMult = pCopy(PW->sig);   // copy signature of reducer
     p_ExpVectorSub(f1, f2, currRing); // Calculate the Monomial we must multiply to p2
