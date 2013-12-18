@@ -1383,7 +1383,7 @@ static inline void p_ExpVectorAddSub(poly p1, poly p2, poly p3, const ring r)
 #if PDEBUG >= 1
   for (int i=1; i<=r->N; i++)
     pAssume1(p_GetExp(p1, i, r) + p_GetExp(p2, i, r) >= p_GetExp(p3, i, r));
-    pAssume1(p_GetComp(p1, r) == 0 ||
+  pAssume1(p_GetComp(p1, r) == 0 ||
            (p_GetComp(p2, r) - p_GetComp(p3, r) == 0) ||
            (p_GetComp(p1, r) == p_GetComp(p2, r) - p_GetComp(p3, r)));
 #endif
