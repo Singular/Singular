@@ -1202,7 +1202,7 @@ static proc quotientOneZ(ideal I, poly f)
 {
 //=== this is needed because quotient(I,f) does not work properly, should be
 //=== replaced by quotient later
-   if ( f==0 ) { return( ideal(1) ); }   
+   if ( f==0 ) { return( ideal(1) ); }
    def R=basering;
    int i;
    ideal K=intersectZ(I,ideal(f));
@@ -1339,7 +1339,7 @@ static proc pseudo_primdecZM(module N)
 {
    ideal I=quotient(N,freemodule(nrows(N)));
    if(size(I)==0){return(list(list(N,I)));}
-   
+
    list B=minAssZ(I);
    list S,R,L;
    ideal K;
@@ -1435,7 +1435,7 @@ static proc extractZM(list M, list L)
       }
       else
       {
-         // this is the case that P=<p>, p prime 
+         // this is the case that P=<p>, p prime
          I=std(I);
          ideal IC=simplify(flatten(lead(I)),2);
          list C;
