@@ -94,7 +94,7 @@ Install the necessary packages:
   @end itemize
 @item
 Install flint 2.4:
-@code{./configure --with-gmp=/usr --prefix=$HOME/tmp --disable-shared --with-mpfr=/usr}
+@code{./configure --with-gmp=/usr --prefix=$HOME/tmp --disable-shared}
 @*@code{make && make install}
 @item
 Install Singular

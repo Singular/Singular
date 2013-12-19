@@ -22,7 +22,7 @@
 @heading News for version @value{VERSION}
 
 Version 4-0-0 is a milestone relase of Singular.
-The new release series 4 aims for an entirely modularized system
+The new release series 4 aims for an entirely modularized architecture
 simplifying connectivity with other systems and paving the way
 for parallel computations.
 As  a first step in modularization, the new  release features an internal
@@ -39,7 +39,7 @@ New functionality
 @item Gromov-Witten numbers of elliptic curves (@nref{ellipticcovers_lib})
 @item classification of isolated complete intersection singularities in char. 0 (@nref{classifyci_lib})
 @item parametrization of unipotent orbits of nilpotent Lie groups (@nref{orbitparam_lib})
-@item F5-like Gröbner basis algorithm (@nref{sba})
+@item F5-like Groebner basis algorithm (@nref{sba})
 @item element-wise application of functions to data structures (@nref{apply})
 @item support for debugging libraries (@nref{ASSUME})
 @end itemize
@@ -48,11 +48,11 @@ Improved functionality
 
 @itemize
 @item
-Groebner Cover for parametric ideals (@nref{grobcov_lib})
+Groebner cover for parametric ideals (@nref{grobcov_lib})
 @item
-Normalization of affine Rings (@nref{normal_lib})
+normalization of affine rings (@nref{normal_lib})
 @item
-Classification of real singularities (@nref{realclassify_lib})
+classification of real singularities (@nref{realclassify_lib})
 @item
 GIT-fans: (@nref{gitfan_lib})
 @item
@@ -60,7 +60,7 @@ algebraic/transcendental field extensions
 @item
 @nref{Non-commutative subsystem}
 @item
-An abstraction layer for parallel computations (@nref{parallel_lib})
+an abstraction layer for parallel computations (@nref{parallel_lib})
 @item
 run-time loading of supplementary kernel code (@nref{Dynamic modules})
 @item
@@ -69,6 +69,6 @@ interpreter language support for name spaces (@nref{package})
 
 Availability
 
-@sc{Singular} is available for Linux, Mac OS X, Windows, FreeBSD and
+@sc{Singular} is available as source code and for Linux, Mac OS X, Windows, FreeBSD and
 SunOS-5.
 
