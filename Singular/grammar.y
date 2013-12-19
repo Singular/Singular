@@ -876,10 +876,15 @@ expr_arithmetic:
           }
         | NOT expr
           {
-            memset(&$$,0,sizeof($$));
-            int i; TESTSETINT($2,i);
-            $$.rtyp  = INT_CMD;
-            $$.data = (void *)(long)(i == 0 ? 1 : 0);
+            if (siq>0)
+            { if (iiExprArith1(&$$,&$2,NOT)) YYERROR; }
+	    else
+	    {
+              memset(&$$,0,sizeof($$));
+              int i; TESTSETINT($2,i);
+              $$.rtyp  = INT_CMD;
+              $$.data = (void *)(long)(i == 0 ? 1 : 0);
+	    }
           }
         | '-' expr %prec UMINUS
           {

@@ -4603,6 +4603,11 @@ static BOOLEAN jjNAMES_I(leftv res, leftv v)
   res->data=ipNameListLev((IDROOT),(int)(long)v->Data());
   return FALSE;
 }
+static BOOLEAN jjNOT(leftv res, leftv v)
+{
+  res->data=(char*)(long)((long)v->Data()==0 ? 1 : 0);
+  return FALSE;
+}
 static BOOLEAN jjNVARS(leftv res, leftv v)
 {
   res->data = (char *)(long)(((ring)(v->Data()))->N);
