@@ -9,7 +9,7 @@ OVERVIEW:
 @* The library contains helper procedures for computing a Schreyer resoltion (cf. [SFO]), 
    originally meant to be used by @code{derham.lib} (which requires resolutions over the homogenized Weyl algebra). 
    The library works both in the commutative and non-commutative setting (cf. [MO]). 
-   Here, we call a free resolution a Schreyer resolution if any higher syzygy module is a Groebner basis of a previous one 
+   Here, we call a free resolution a Schreyer resolution if each syzygy module is given by a Groebner basis
    with respect to the corresponding Schreyer ordering. 
    A Schreyer resolution can be much bigger than a minimal resolution of the same module, but may be easier to construct.
 @* The input for the resolution computations is a set of vectors @code{M} in form of a module over some basering @code{R}.
@@ -18,8 +18,8 @@ OVERVIEW:
    a ring (endowed with a special ring ordering that will be extended in the course of a resolution computation) 
    containing a list of modules @code{RES} and a module @code{MRES}:
 @* The list of modules @code{RES} contains the images of maps (also called syzygy modules) substituting the
-   computed beginning of a Schreyer resolution, that is, each syzygy module is a Groebner basis 
-   of the previous one with respect to a corresponding Schreyer induced ordering. 
+   computed beginning of a Schreyer resolution, that is, each syzygy module is given by a Groebner basis 
+   with respect to the corresponding Schreyer ordering. 
 @* The list @code{RES} starts with a zero map given by @code{rank(M)} zero generators indicating that the image of 
    the first differential map is zero. The second map @code{RES[2]} is given by @code{M}, which indicates that 
    the resolution of @code{(R^rank(M))/M} is being computed.
