@@ -5627,8 +5627,6 @@ BOOLEAN iiApplyLIST(leftv res, leftv a, int op, leftv proc)
   }
   res->data=(void*)r;
   return FALSE;
-  WerrorS("not implemented");
-  return TRUE;
 }
 BOOLEAN iiApply(leftv res, leftv a, int op, leftv proc)
 {
