@@ -765,6 +765,7 @@ be terminated by an explicit (i.e., system) kill command if running on a differe
 The purpose of the following example is to illustrate the use of dynamic
 modules. Giving an example on how to write a dynamic module is beyond the
 scope of this manual.
+A technical reference is given at @url{http://www.singular.uni-kl.de/Manual/modules.pdf}.
 
 In this example, we use a dynamic module, residing in the file @code{kstd.so},
 which allows ignoring all but the first j entries of vectors when

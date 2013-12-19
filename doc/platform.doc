@@ -50,18 +50,18 @@
 @cindex instructions, downloading
 @cindex howto, download
 
-@sc{Singular} is available as binary program for most common hard-
+@sc{Singular} is available as source and binary program for most common hard-
 and software platforms.
 Instructions to download and install @sc{Singular} can be found
 at
 @display
-@uref{http://www.singular.uni-kl.de/download.html}.
+@uref{http://www.singular.uni-kl.de/index.php/singular-download.html}.
 @end display
 
 Release versions of @sc{Singular} are also available
 from our FTP site
 @display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/}.
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/4-0-0/}.
 @end display
 
 @c @include README_download.texi
@@ -73,7 +73,45 @@ from our FTP site
 @cindex instructions, Unix installation
 @cindex howto, install on Unix
 
-@c @include INSTALL_unix.texi
+@itemize
+@item
+Install the necessary packages:
+  @itemize
+  @item
+  libtool
+  @item
+  gnu make
+  @item
+  gcc, g++
+  @item
+  libreadline
+  @item
+  gmp
+  @item
+  ntl
+  @item
+  libcdd
+  @end itemize
+@item
+Install flint 2.4:
+@code{./configure --with-gmp=/usr --prefix=$HOME/tmp --disable-shared --with-mpfr=/usr}
+@*@code{make && make install}
+@item
+Install Singular
+@code{./configure --with-flint=$HOME/tmp --enable-gfanlib --prefix=$HOME/Singular4}
+@*@code{make && make install}
+@*(@code{$HOME/Singular4/bin/Singular} is the main execuatble)
+@item (optional)
+install 4ti2
+@item (optional)
+install surf/surfer
+@item (optional)
+install normaliz 2.7
+@end itemize
+
+See also
+@url{https://github.com/Singular/Sources/wiki/Step-by-Step-Installation-Instructions-for-Singular}
+which includes instructions adapted for debian and fedora based systems.
 
 @c ----------------------------------------------------------
 @node Windows installation instructions, Macintosh installation instructions, Unix installation instructions, Release Notes
@@ -82,7 +120,10 @@ from our FTP site
 @cindex instructions, Windows installation
 @cindex howto, install on Windows
 
-@c @include INSTALL_win.texi
+Singular relies on Cygwin as its environment under Windows.
+There is a 32bit and a 64bit version of Cygwin.
+
+@url{https://github.com/Singular/Sources/wiki/Step-by-Step-Installation-Instructions-for-Singular}
 
 @c ----------------------------------------------------------
 @node Macintosh installation instructions,,Windows installation instructions, Release Notes
@@ -92,33 +133,5 @@ from our FTP site
 @cindex howto, install on Macintosh
 
 @strong{Installation of the provided binaries}
+@url{https://github.com/Singular/Sources/wiki/Step-by-Step-Installation-Instructions-for-Singular}
 
-Installation via fink
-
-Fink is a well-known package format for Mac OS X.
-(see http://fink.sf.net)
-
-There are two packages: singular-doc and singular.
-
-If you have fink installed, choose one of the two possibilities:
-
-@itemize
-@item
-   type in a shell:
-     @code{fink selfupdate}
-     @*@code{fink install singular singular-doc}
-
-@item
-using the Fink Commander:
-
-   @itemize
-   @item
-   Start your Fink Commander
-   @item
-   After updating the package list,
-   there should appear "singular" and "singular-doc" as packages
-   @item
-   Install it from sources (Fink will do that for you automatically.)
-   @end itemize
-
-@end itemize

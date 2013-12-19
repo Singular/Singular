@@ -25,62 +25,50 @@ Version 4-0-0 is a milestone relase of Singular.
 The new release series 4 aims for an entirely modularized system
 simplifying connectivity with other systems and paving the way
 for parallel computations.
-As one step in this direction, in Singular 4-0-0, 
-the representation of coefficient rings has been separated from the representation
-of polynomials which allows for easy integration of new types of coefficient fields.
+As  a first step in modularization, the new  release features an internal
+structural separation of coefficient rings and polynomial rings.
+This allows for a flexible integration of new coefficient rings.
 
-@sc{Singular} 4-0-0's list of improvements and new
-functionality further extends that of 
-the 3-1-6/7 pre-release series.
-One highlight is the implementation
-of Walther's algorithm for computing deRham cohomology.
+@sc{Singular} 4-0-0's list of new functionality and significant
+improvements further extends that of the 3-1-6/7 prerelease series.
 
-New commands
+New functionality
+
 @itemize
-@item @nref{sba}: an F5 like Groebner basis algorithm
-@item @nref{ASSUME}: support for debugging libraries
+@item de Rham cohomology of complements of algebraic varieties (@nref{derham_lib})
+@item Gromov-Witten numbers of elliptic curves (@nref{ellipticcovers_lib})
+@item classification of isolated complete intersection singularities in char. 0 (@nref{classifyci_lib})
+@item parametrization of unipotent orbits of nilpotent Lie groups (@nref{orbitparam_lib})
+@item F5-like Gröbner basis algorithm (@nref{sba})
+@item element-wise application of functions to data structures (@nref{apply})
+@item support for debugging libraries (@nref{ASSUME})
 @end itemize
 
-New libraries
-@itemize
-@item @nref{classifyci_lib}: Isolated complete intersection singularities in characteristic  0
-@item @nref{derham_lib}: Computation of deRham cohomology
-@item @nref{ellipticcovers_lib}: Gromov Witten numbers of elliptic curves
-@item @nref{orbitparam_lib}: Parametrizing unipotent orbits
-@end itemize
+Improved functionality
 
-Improved libraries
-@itemize @bullet
-@item
-Compute GIT-fans: (@nref{gitfan_lib})
+@itemize
 @item
 Groebner Cover for parametric ideals (@nref{grobcov_lib})
 @item
-Normalization of Affine Rings (@nref{normal_lib})
-@item
-An abstraction layer for parallel skeletons (@nref{parallel_lib})
+Normalization of affine Rings (@nref{normal_lib})
 @item
 Classification of real singularities (@nref{realclassify_lib})
 @item
-and many more with small fixes
-@end itemize
-
-Kernel improvements
-@itemize
+GIT-fans: (@nref{gitfan_lib})
 @item
-@nref{Dynamic modules}
+algebraic/transcendental field extensions
 @item
 @nref{Non-commutative subsystem}
 @item
-name spaces (@nref{package})
+An abstraction layer for parallel computations (@nref{parallel_lib})
 @item
-algebraic/transcendental field extensions
+run-time loading of supplementary kernel code (@nref{Dynamic modules})
+@item
+interpreter language support for name spaces (@nref{package})
 @end itemize
 
 Availability
 
-@sc{Singular} is available for ix86-Linux,
-SunOS-5, ix86-Win (runs on Windows),
-FreeBSD, Mac OS X, x86_64-Linux (AMD64/Opteron/EM64T),
-IA64-Linux
+@sc{Singular} is available for Linux, Mac OS X, Windows, FreeBSD and
+SunOS-5.
 
