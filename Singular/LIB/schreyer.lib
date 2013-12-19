@@ -6,29 +6,30 @@ LIBRARY: schreyer.lib     Helpers for computing a Schreyer resolution in @code{d
 AUTHOR:  Oleksandr Motsak <U@D>, where U={motsak}, D={mathematik.uni-kl.de}
 KEYWORDS: Schreyer ordering; Schreyer resolution; syzygy
 OVERVIEW:
-@* The library contains helper procedures for computing a Schreyer resultion (cf. [SFO])
-   for @code{derham.lib} also in non-commutative setting (cf. [MO]). 
-   We call a free resulution a Schreyer resolution if any higher syzygy is a Goebner base of a previous one 
+@* The library contains helper procedures for computing a Schreyer resoltion (cf. [SFO]), 
+   originally meant to be used by @code{derham.lib} (which requires resolutions over the homogenized Weyl algebra). 
+   The library works both in the commutative and non-commutative setting (cf. [MO]). 
+   Here, we call a free resolution a Schreyer resolution if any higher syzygy module is a Groebner basis of a previous one 
    with respect to the corresponding Schreyer ordering. 
-   Schreyer resolution can be much bigger than a minimal resolution of the same module one but can be easier to construct.
-@* Input for resolution computations is a set of vectors @code{M} in form of a module over some basering @code{R}.
+   A Schreyer resolution can be much bigger than a minimal resolution of the same module, but may be easier to construct.
+@* The input for the resolution computations is a set of vectors @code{M} in form of a module over some basering @code{R}.
    The ring @code{R} may be non-commutative, in which case the ring ordering should be global.
 @* These procedures produce/work with partial Schreyer resolutions of @code{(R^rank(M))/M} in form of 
    a ring (endowed with a special ring ordering that will be extended in the course of a resolution computation) 
    containing a list of modules @code{RES} and a module @code{MRES}:
-@* The list of modules @code{RES} contains the images of maps (also called syzygies) substituting the
-   computed beginning of a Schreyer resolution, that is, each syzygy module is a Groebner Basis 
-   of the previous one with respect to corresponding Schreyer induced ordering. 
+@* The list of modules @code{RES} contains the images of maps (also called syzygy modules) substituting the
+   computed beginning of a Schreyer resolution, that is, each syzygy module is a Groebner basis 
+   of the previous one with respect to a corresponding Schreyer induced ordering. 
 @* The list @code{RES} starts with a zero map given by @code{rank(M)} zero generators indicating that the image of 
    the first differential map is zero. The second map @code{RES[2]} is given by @code{M}, which indicates that 
-   the resolution is of @code{(R^rank(M))/M} is being computed.
+   the resolution of @code{(R^rank(M))/M} is being computed.
 @* The module @code{MRES} is a direct sum of modules from @code{RES} and thus comprises all computed differentials.
 @* Syzygies are shifted so that @code{gen(i)} is mapped to @code{MRES[i]} under the differential map.
-@* Schreyer ordering extends the starting module ordering on @code{M} (defined in Singular by the basering @code{R}) 
+@* The Schreyer ordering succesively extends the starting module ordering on @code{M} (defined in Singular by the basering @code{R}) 
    and is extended to higher syzygies using the following definition:
 @*        a < b if and only if (d(a) < d(b)) OR ( (d(a) = d(b) AND (comp(a) < comp(b)) ), 
 @* where @code{d(a)} is the image of a under the differential (given by @code{MRES}), 
-   and @code{comp(a)} is the mod. component, for any module terms @code{a} and @code{b} from the same free module.
+   and @code{comp(a)} is the module component, for any module terms @code{a} and @code{b} from the same higher syzygy module.
 REFERENCES:
 [SFO] Schreyer, F.O.: Die Berechnung von Syzygien mit dem verallgemeinerten Weierstrassschen Divisionssatz,
       Master's thesis, Univ. Hamburg, 1980. 
