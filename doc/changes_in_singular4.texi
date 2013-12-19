@@ -94,7 +94,7 @@ The following new libraries @ref{derham_lib}, @ref{schreyer_lib} depend on it:
 @c table @asis
 @itemize @bullet
 @item The tree structure of the binary Singular distribution has been changed. 
-The typical tree now looks as show at @code{https://github.com/Singular/Sources/wiki/Sw-tree}
+The typical tree now looks as show at @uref{https://github.com/Singular/Sources/wiki/Sw-tree}
 
 @item Accordingly Singular search paths (where Singular searches for libraries, dynamic modules, etc.) have been changed. You can display them by calling Singular by @code{Singular -v}.
 
@@ -160,7 +160,7 @@ rings and a supporting framework for making them
 accessible to the user.
 
 In particular we have separated everything related to coeffcient rings into a separate library @code{libcoeffs}.
-Dependency tree between restructured packages is show at @code{http://www.mathematik.uni-kl.de/~motsak/dox/singular.png}
+Dependency tree between restructured packages is show at @uref{http://www.mathematik.uni-kl.de/~motsak/dox/singular.png}
 
 @end itemize
 @c @end table
