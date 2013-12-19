@@ -2,15 +2,15 @@
 version="version schreyer.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="General purpose";
 info="
-LIBRARY: schreyer.lib     Helpers for computing a Schreyer resolution in derham.lib 
+LIBRARY: schreyer.lib     Helpers for computing a Schreyer resolution in @code{derham.lib}
 AUTHOR:  Oleksandr Motsak <U@D>, where U={motsak}, D={mathematik.uni-kl.de}
+KEYWORDS: Schreyer ordering; Schreyer resolution; syzygy
 
 PROCEDURES:
- Sres(M,len)      compute Schreyer resolution of module M of maximal length len
- Ssyz(M)          compute Schreyer resolution of module M of length 1
- Scontinue(len)   extend currently active resolution by (at most) len syszygies
+Sres(M,len)     compute Schreyer resolution of module M of maximal length len
+Ssyz(M)         compute Schreyer resolution of module M of length 1
+Scontinue(len)  extend currently active resolution by (at most) len syszygies
 
-KEYWORDS: Schreyer ordering; Schreyer resolution; syzygy
 NOTE:  requires the dynamic or built-in module: syzextra
 ";
 
@@ -393,25 +393,24 @@ example
 proc Sres(module M, int l)
 "USAGE:  Sres(module M, int len)
 RETURN:  ring, containing a Schreyer resolution
-PURPOSE: computes a Schreyer resolution of (basering^rank(M))/M with at most len syzygy modules,
-         computed with respect to a Schreyer (induced) ordering.
-NOTE:    Input is a set of vectors M over a basering. basering may be non-commutative. 
-NOTE:    Schreyer resolution is represented by a list of modules RES and a module MRES 
+PURPOSE: computes a Schreyer resolution of (basering^rank(M))/M with at most len syzygy modules
+NOTE:    input is a set of vectors M over a basering. The ring basering may be non-commutative.
+@*       If given len is zero then nvars(basering) + 1 is used instead.
+@*       Schreyer resolution is represented by a list of modules RES and a module MRES 
          belonging to a specially constructed ring, which is endowed with a Schreyer ordering.
-         The list of modules RES contains the images of maps (also called syzygies) subsituting the
+@*       The list of modules RES contains the images of maps (also called syzygies) subsituting the
          computed beginning of a Schreyer free resolution of (baseRing^rank(M))/M.
-         The leading zero map RES[1] with rank(M) zero generators indicates that the image of 
+@*       The leading zero map RES[1] with rank(M) zero generators indicates that the image of 
          the first differential map is zero. The second map RES[2] is given by M, which indicates that 
          the resolution is of (baseRing^rank(M))/M is being computed.
-         The module MRES is a direct sum of modules from RES and comprises all computed differential maps.
-         Syzygies are shifted so that gen(i) is mapped to MRES[i] under the differential.
-         Syzygies are given by Groebner bases with respect to corresponding Schreyer orderings.
-NOTE:    Schreyer ordering extends an arbitrary starting module ordeing (defined by basering) 
+@*       The module MRES is a direct sum of modules from RES and comprises all computed differential maps.
+@*       Syzygies are shifted so that gen(i) is mapped to MRES[i] under the differential.
+@*       Schreyer ordering extends an arbitrary starting module ordeing (defined by basering) 
          and is extended to higher syzygt modules using the following definition:
-         a < b if and only if (d(a) < d(b)) OR ( (d(a) = d(b) AND (comp(a) < comp(b)) ), 
-         where d(a) is the image of a under the differential (given by MRES), 
+@*       a < b if and only if (d(a) < d(b)) OR ( (d(a) = d(b) AND (comp(a) < comp(b)) ), 
+@*       where d(a) is the image of a under the differential (given by MRES), 
          and comp(a) is the mod. component, for any module terms a and b.
-NOTE:    If len == 0 then len is set to be nvars(basering) + 1
+@*       Syzygies are given by Groebner bases with respect to corresponding Schreyer orderings.
 EXAMPLE: example Sres; shows an example
 "
 {
