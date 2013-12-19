@@ -7969,6 +7969,7 @@ See
 @*List of all supported control structures.
 @end ifinfo
 @menu
+* apply::
 * break::
 * breakpoint::
 * continue::
@@ -8012,7 +8013,40 @@ if ( i>j )
 @end table
 
 @c ---------------------------------------
-@node break, breakpoint, Control structures, Control structures
+@node apply, break, Control structures, Control structures
+@subsection apply
+@cindex apply
+@table @code
+@item @strong{Syntax:}
+@code{apply(} expression @code{,} function @code{);}
+@item @strong{Purpose:}
+applies the function to all elements of the first argument.
+The first argument must be of type
+@code{intvec},
+@code{intmat},
+@c @code{bigintmat},
+@c @code{ideal},
+@c @code{module},
+@c @code{matrix},
+or @code{list}.
+The result will be of the same type as the first argument.
+The function must be a kernel command or a procedure which takes one
+argument and returns a type which can be an element of the result.
+@item @strong{Example:}
+@smallexample
+while (1)
+@{
+  @dots{}
+  if ( @dots{} )
+  @{
+    break; // leave the while block
+  @}
+@}
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node break, breakpoint, apply, Control structures
 @subsection break
 @cindex break
 @table @code
