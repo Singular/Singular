@@ -8034,14 +8034,11 @@ The function must be a kernel command or a procedure which takes one
 argument and returns a type which can be an element of the result.
 @item @strong{Example:}
 @smallexample
-while (1)
-@{
-  @dots{}
-  if ( @dots{} )
-  @{
-    break; // leave the while block
-  @}
-@}
+@c example
+proc p(int x) {return(x^2);}
+intvec v=1,2,3;
+apply(v,p);
+@c example
 @end smallexample
 @end table
 
