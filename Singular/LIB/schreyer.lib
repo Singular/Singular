@@ -5,13 +5,42 @@ info="
 LIBRARY: schreyer.lib     Helpers for computing a Schreyer resolution in @code{derham.lib}
 AUTHOR:  Oleksandr Motsak <U@D>, where U={motsak}, D={mathematik.uni-kl.de}
 KEYWORDS: Schreyer ordering; Schreyer resolution; syzygy
+OVERVIEW:
+@* The library contains helper procedures for computing a Schreyer resultion (cf. [SFO])
+   for @code{derham.lib} also in non-commutative setting (cf. [MO]). 
+   We call a free resulution a Schreyer resolution if any higher syzygy is a Goebner base of a previous one 
+   with respect to the corresponding Schreyer ordering. 
+   Schreyer resolution can be much bigger than a minimal resolution of the same module one but can be easier to construct.
+@* Input for resolution computations is a set of vectors @code{M} in form of a module over some basering @code{R}.
+   The ring @code{R} may be non-commutative, in which case the ring ordering should be global.
+@* These procedures produce/work with partial Schreyer resolutions of @code{(R^rank(M))/M} in form of 
+   a ring (endowed with a special ring ordering that will be extended in the course of a resolution computation) 
+   containing a list of modules @code{RES} and a module @code{MRES}:
+@* The list of modules @code{RES} contains the images of maps (also called syzygies) substituting the
+   computed beginning of a Schreyer resolution, that is, each syzygy module is a Groebner Basis 
+   of the previous one with respect to corresponding Schreyer induced ordering. 
+@* The list @code{RES} starts with a zero map given by @code{rank(M)} zero generators indicating that the image of 
+   the first differential map is zero. The second map @code{RES[2]} is given by @code{M}, which indicates that 
+   the resolution is of @code{(R^rank(M))/M} is being computed.
+@* The module @code{MRES} is a direct sum of modules from @code{RES} and thus comprises all computed differentials.
+@* Syzygies are shifted so that @code{gen(i)} is mapped to @code{MRES[i]} under the differential map.
+@* Schreyer ordering extends the starting module ordering on @code{M} (defined in Singular by the basering @code{R}) 
+   and is extended to higher syzygies using the following definition:
+@*        a < b if and only if (d(a) < d(b)) OR ( (d(a) = d(b) AND (comp(a) < comp(b)) ), 
+@* where @code{d(a)} is the image of a under the differential (given by @code{MRES}), 
+   and @code{comp(a)} is the mod. component, for any module terms @code{a} and @code{b} from the same free module.
+REFERENCES:
+[SFO] Schreyer, F.O.: Die Berechnung von Syzygien mit dem verallgemeinerten Weierstrassschen Divisionssatz,
+      Master's thesis, Univ. Hamburg, 1980. 
+[MO]  Motsak, O.: Non-commutative Computer Algebra with applications: Graded commutative algebra and related 
+      structures in Singular with applications, Ph.D. thesis, TU Kaiserslautern, 2010
+
+NOTE:  requires the dynamic or built-in module @code{syzextra}
 
 PROCEDURES:
-Sres(M,len)     compute Schreyer resolution of module M of maximal length len
-Ssyz(M)         compute Schreyer resolution of module M of length 1
-Scontinue(len)  extend currently active resolution by (at most) len syszygies
-
-NOTE:  requires the dynamic or built-in module: syzextra
+  Sres(M,len)     compute Schreyer resolution of module M of maximal length len
+  Ssyz(M)         compute Schreyer resolution of module M of length 1
+  Scontinue(len)  extend currently active resolution by (at most) len syszygies
 ";
 
 static proc prepareSyz( module I, list # )
@@ -331,7 +360,7 @@ proc Scontinue(int l)
 "USAGE:  Scontinue(int len)
 RETURN:  nothing, instead it changes the currently active resolution
 PURPOSE: extends the currently active resolution by at most len syzygies 
-NOTE:    must be used within a ring returned by Sres or Ssyz
+ASSUME:  must be used within a ring returned by Sres or Ssyz
 EXAMPLE: example Scontinue; shows an example
 "
 {
@@ -361,8 +390,8 @@ example
 proc Ssyz(module M)
 "USAGE:  Ssyz(module M)
 RETURN:  ring, containing a Schreyer resolution
-PURPOSE: computes a Schreyer resolution of M of length 1
-NOTE:    the output is explained in Sres
+PURPOSE: computes a Schreyer resolution of M of length 1 (see the library overview)
+SEE ALSO: Sres
 EXAMPLE: example Ssyz; shows an example
 "
 {
@@ -393,24 +422,9 @@ example
 proc Sres(module M, int l)
 "USAGE:  Sres(module M, int len)
 RETURN:  ring, containing a Schreyer resolution
-PURPOSE: computes a Schreyer resolution of (basering^rank(M))/M with at most len syzygy modules
-NOTE:    input is a set of vectors M over a basering. The ring basering may be non-commutative.
-@*       If given len is zero then nvars(basering) + 1 is used instead.
-@*       Schreyer resolution is represented by a list of modules RES and a module MRES 
-         belonging to a specially constructed ring, which is endowed with a Schreyer ordering.
-@*       The list of modules RES contains the images of maps (also called syzygies) subsituting the
-         computed beginning of a Schreyer free resolution of (baseRing^rank(M))/M.
-@*       The leading zero map RES[1] with rank(M) zero generators indicates that the image of 
-         the first differential map is zero. The second map RES[2] is given by M, which indicates that 
-         the resolution is of (baseRing^rank(M))/M is being computed.
-@*       The module MRES is a direct sum of modules from RES and comprises all computed differential maps.
-@*       Syzygies are shifted so that gen(i) is mapped to MRES[i] under the differential.
-@*       Schreyer ordering extends an arbitrary starting module ordeing (defined by basering) 
-         and is extended to higher syzygt modules using the following definition:
-@*       a < b if and only if (d(a) < d(b)) OR ( (d(a) = d(b) AND (comp(a) < comp(b)) ), 
-@*       where d(a) is the image of a under the differential (given by MRES), 
-         and comp(a) is the mod. component, for any module terms a and b.
-@*       Syzygies are given by Groebner bases with respect to corresponding Schreyer orderings.
+PURPOSE: computes a Schreyer resolution of M of length at most len (see the library overview)
+NOTE:    If given len is zero then nvars(basering) + 1 is used instead.
+SEE ALSO: Ssyz
 EXAMPLE: example Sres; shows an example
 "
 {
