@@ -50,11 +50,24 @@ Formally global Singular @ref{option} now belong to individual polynomial rings.
 @c table @asis
 @itemize @bullet
 @item @code{intStrategy}
-@item @code{degBound}
-@item @code{multBound}
-????
+@item @code{redTail}
+@item @code{redThrough}
 @end itemize
 @c @end table
+
+Also the following settings now belong to individual (currently active) polynomial rings:
+
+@c @item @code{degBound}
+@c @item @code{multBound}
+
+@c table @asis
+@itemize @bullet
+@item @code{short}
+@item @code{minpoly}
+@item @code{noether}
+@end itemize
+@c @end table
+
 
 Hence setting these options only affects the current ring. Be aware of this
 when switching between different rings, since the options affect the
@@ -80,8 +93,8 @@ The following new libraries @ref{derham_lib}, @ref{schreyer_lib} depend on it:
 
 @c table @asis
 @itemize @bullet
-@item The tree structure of the binary Singular distribution has been changed. The typical tree now looks as follows:
-      *** add tree ***
+@item The tree structure of the binary Singular distribution has been changed. 
+The typical tree now looks as show at @code{https://github.com/Singular/Sources/wiki/Sw-tree}
 
 @item Accordingly Singular search paths (where Singular searches for libraries, dynamic modules, etc.) have been changed. You can display them by calling Singular by @code{Singular -v}.
 
@@ -147,14 +160,16 @@ rings and a supporting framework for making them
 accessible to the user.
 
 In particular we have separated everything related to coeffcient rings into a separate library @code{libcoeffs}.
+Dependency tree between restructured packages is show at @code{http://www.mathematik.uni-kl.de/~motsak/dox/singular.png}
 
 @end itemize
 @c @end table
 
 
 
-@subsubheading Changes to build system
-@cindex Changes to build system
+@c @subsubheading Changes to build system
+@c @cindex Changes to build system
+
 
 @c ---------------------------------------------------------------------------
 @node Building Singular, , Notes for developers, Singular 3 and Singular 4
