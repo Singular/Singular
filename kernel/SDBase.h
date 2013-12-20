@@ -1,9 +1,23 @@
+/*! @file
+ *
+ * @brief Function declarations for functions in SDBase.cc
+ *
+ * This file is part of the Letterplace ShiftDVec Project
+ *
+ * @author Grischa Studzinski
+ * @author Benjamin Schnitzler benjaminschnitzler@googlemail.com
+ *
+ * @copyright see main copyright notice for Singular
+ */
 #include <mod2.h>
 #include <SDkutil.h>
 
 #ifndef SDBASE_H
 #define SDBASE_H
 
+/*! @brief The namespace containing nearly all functions
+ *         related especially to the LPDV project.
+ */
 namespace ShiftDVec
 {
   namespace SD = ShiftDVec;
@@ -124,3 +138,7 @@ namespace ShiftDVec
 }
 
 #endif
+
+// vim: set foldmethod=syntax :
+// vim: set textwidth=65 :
+// vim: set colorcolumn=+1 :

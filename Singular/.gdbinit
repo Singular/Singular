@@ -1,6 +1,7 @@
 break dErrorBreak
 source gdb/helpers
 source gdb/bos_gdb_ext.py
+
 #source gdb/debug_FDeg
 #source gdb/debug_order_of_pairs
 #source gdb/debug_create_short
@@ -11,6 +12,7 @@ source gdb/bos_gdb_ext.py
 #source gdb/debug_L
 #source gdb/debug_LS
 #source gdb/print_set_sizes
+source gdb/watch_posInL
 
 set pagination off
 #set logging overwrite on

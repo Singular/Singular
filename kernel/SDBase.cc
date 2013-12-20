@@ -1,27 +1,30 @@
-/* file:        SDBase.cc
- * authors:     Grischa Studzinski & Benjamin Schnitzler
- * created:     ask git
- * last change: ask git
+/*! @file
  *
- * DESCRIPTION:
- * This file contains extensions to some structures and
- * functions defined in kutil.h (...Object, ...Strategy, etc.).
+ * @brief This file contains the main routines for the BBa and
+ *        all routines, which do not relate well to the contents
+ *        of the other files.
  *
- * TODO:
- * 1. clean up, remove unecessary comments and old uncommented
- *    code; instead comment, when applicable, from where a
- *    function stems from
- * 2. divide this file in smaller portions
- * 3. move to current singular version; adapt functions;
- *    currRing is no longer global; look up, if some of these
- *    functions changed in the newest version and how they
- *    changed, adapt these changes if possible
- * 4. look for all TODO remarks in this file and try to resolve
- *    the TODO
- * 5. (always) pray; sacrifice some lambs to the goddess of
- *    code
- * 6. things from the global TODO list
- * 7. contemplate about what I have forgotten here
+ * This file is part of the Letterplace ShiftDVec Project
+ *
+ * @author Grischa Studzinski
+ * @author Benjamin Schnitzler benjaminschnitzler@googlemail.com
+ *
+ * @copyright see main copyright notice for Singular
+ *
+ * \todo clean up, remove unecessary comments and old uncommented
+ *       code; instead comment, when applicable, from where a
+ *       function stems from
+ * \todo divide this file in smaller portions
+ * \todo move to current singular version; adapt functions;
+ *       currRing is no longer global; look up, if some of these
+ *       functions changed in the newest version and how they
+ *       changed, adapt these changes if possible
+ * \todo look for all TODO remarks in this file and try to
+ *       resolve the TODO
+ * \todo (always) pray; sacrifice some lambs to the goddess of
+ *       code
+ * \todo things from the global TODO list
+ * \todo contemplate about what I have forgotten here
  */
 
 // define to enable tailRings (TODO: do this properly)
@@ -163,6 +166,14 @@ inline static int* initS_2_R (const int maxnr)
  *                         determine, which Debug-Output will be
  *                         done. Only works in debug mode (d.i.
  *                         using Singularg) .
+ *
+ * @return                 Part of the GB, or maybe the complete
+ *                         GB, depending on the value of uptodeg.
+ *                         (Be aware, that, even if the GB
+ *                         contains only elements with length
+ *                         smaller or equal to uptodeg, it may
+ *                         not be calculated completely by this
+ *                         algorithm)
  */
 ideal ShiftDVec::freegbdvc
   (ideal I, int uptodeg, int lVblock, long deBoGriFlags)
@@ -194,12 +205,38 @@ ideal ShiftDVec::freegbdvc
 }
 
 
-/* BOCO: original header (replaced)
- * TODO: CLEANUP: remove comment
-ideal kStd
-  ( ideal F, ideal Q, tHomog h, intvec ** w, 
-    intvec *hilb, int syzComp, int newIdeal, intvec *vw )
-*/
+/** Initialization, Decision how to call bba
+ *
+ * This procedure creates - among other things - the strategy
+ * which stores all important sets and settings for the bba
+ * algorithm. It contains also function pointers, which are set
+ * at the begin of ShiftDVec::bba and which determine how
+ * the algorithm for different settings behaves (e.g. homogeneous
+ * input, etc.) .
+ *
+ * \par
+ * For an Explanation with more depth ask the original developers
+ * of the (kommutative) BBa-Algorithm.
+ *
+ * @param[in] F        The Set of Generators of our Ideal
+ *                     (formerly known as I, but someone thought
+ *                     F is a nicer name)
+ * @param[in] Q        I believe that this could be an additional
+ *                     set of elements, who we know of to be
+ *                     already elements of the Groebner basis; We
+ *                     do not yet have implemented the
+ *                     possibility to make use of this, yet (or
+ *                     we may have done it, but it was never
+ *                     tested).
+ * @param[in] lV       This was already explained in the comment
+ *                     for ShiftDVec::freegbdvc (formerly named
+ *                     lVblock)
+ * @param[in] uptodeg  This was already explained in the comment
+ *                     for ShiftDVec::freegbdvc
+ * @param[in] others   Ask the original developers...
+ *
+ * @return             See ShiftDVec::freegbdvc .
+ */
 ideal ShiftDVec::kStd
   ( ideal F, ideal Q, tHomog h, intvec ** w, intvec *hilb,
     int syzComp, int newIdeal, intvec *vw, int uptodeg, int lV )
@@ -291,42 +328,11 @@ ideal ShiftDVec::kStd
 #endif
 
 #endif
-/* BOCO: (deleted) not of interest for us
-#ifdef HAVE_PLURAL
-  if (rIsPluralRing(currRing))
-  {
-    const BOOLEAN bIsSCA  = rIsSCA(currRing) && strat->z2homog; // for Z_2 prod-crit
-    strat->no_prod_crit   = ! bIsSCA;
-    if (w!=NULL)
-      r = nc_GB(F, Q, *w, hilb, strat, currRing);
-    else
-      r = nc_GB(F, Q, NULL, hilb, strat, currRing);
-  }
+  ideal I = NULL; //BOCO: TODO
+  if (w!=NULL)
+    r=SD::bba(F,Q,I,*w,hilb,strat);
   else
-#endif
-#ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing))
-    r=bba(F,Q,NULL,hilb,strat);
-  else
-#endif
-  {
-    if (currRing->OrdSgn==-1)
-    {
-      if (w!=NULL)
-        r=mora(F,Q,*w,hilb,strat);
-      else
-        r=mora(F,Q,NULL,hilb,strat);
-    }
-    else
-*/
-    {
-      ideal I = NULL; //BOCO: TODO
-      if (w!=NULL)
-        r=SD::bba(F,Q,I,*w,hilb,strat);
-      else
-        r=SD::bba(F,Q,I,NULL,hilb,strat);
-    }
-//  } //BOCO: (deleted) see above
+    r=SD::bba(F,Q,I,NULL,hilb,strat);
 #ifdef KDEBUG
   idTest(r);
 #endif
@@ -350,6 +356,59 @@ static int bba_count = 0;
 void kDebugPrint(kStrategy strat);
 
 
+/** This is Buchbergers's Algorithm (Letterplace Variant)
+ *
+ *
+ * The algorithm is an adapted variant of its conventional
+ * kommutative variant.
+ *
+ * For a description of the paramters have a look at
+ * ShiftDVec::kStd and ShiftDVec::freegbdvc .
+ *
+ * <h3>BR Rough description of this procedure</h3>
+ *
+ * \par The beginning
+ * At the beginning various initializations are made. Function
+ * pointers in strat are set, to determine, how the algorithm
+ * behaves for different settings and the the most important
+ * sets are initialized:
+ * + strat->S - This set will be worked on mainly; at the
+ *              beginning, it will be initialized with the
+ *              polynomials of I (which will however take a small
+ *              detour by entering strat->L first), later, as new
+ *              S-Polynomials are built, they will also enter
+ *              strat->S (if the do not reduce to 0)
+ * + strat->T - The set of reductors; This should be a superset
+ *              of strat->S ??? The Reductors are used to filter
+ *              Elements from strat->S and for the
+ *              tail-reduction.
+ * + strat->R - Another ordering of strat->T ???
+ * + strat->L - When new pairs are build, they enter strat->L
+ *              firstly, before new S-Polynomials are made of
+ *              them.
+ *
+ * \par The main loop
+ * After being done with initialization, the BBa enters the main
+ * loop (and firstly initializes strat->L and strat->S with
+ * elements I), takes elements from strat->L, builds pairs with
+ * them and the elements from strat->S, applies criterions for
+ * filtering some of them and tries to clear some elements from
+ * strat->S (all that via ShiftDVec::enterpairs). After that, new
+ * pairs are entered again to strat->L and the loop continues,
+ * either until all new S-Polynomials reduce to 0 (Then we have a
+ * complete GB), or until strat->uptodeg would be violated during
+ * creation of the new S-Polynomials (this doesn't necessarily
+ * mean, that the new S-Polynomials would violate this bound).
+ *
+ * \par Afterwards
+ * After the main loop, final reductions take place; if
+ * option(redTail) is set, tail-reduction will take place.
+ * Afterwards all resources should be freed (but I wouldn't be
+ * surprised about some not yet sealed memory leaks).
+ *
+ * \todo parts of the comment to this procedure may be wrong -
+ *       correct them!
+ */
 ideal ShiftDVec::bba
   ( ideal F, ideal Q, ideal I,
     intvec *w,intvec *hilb,ShiftDVec::kStrategy strat )
@@ -766,6 +825,10 @@ ideal ShiftDVec::bba
   return (strat->Shdl);
 }
 
+/** Letterplace specific Tidy Up
+ *
+ * Clean up some memory we used for our improved multiplication.
+ */
 void ShiftDVec::TidyUp( ShiftDVec::kStrategy strat, ring curr )
 {
   OMFREES( strat->tailRing->omap, strat->tailRing->N+1, int );
@@ -773,13 +836,16 @@ void ShiftDVec::TidyUp( ShiftDVec::kStrategy strat, ring curr )
 }
 
 
-/*2
+/**
+ * This function was stolen from kernel/kutil.cc; we had to make
+ * some small changes. The original comment followes.
+ *
+ * \par original comment
  * in the case of a standardbase of a module over a qring:
  * replace polynomials in i by ak vectors,
  * (the polynomial * unit vectors gen(1)..gen(ak)
  * in every case (also for ideals:)
  * deletes divisible vectors/polynomials
- * BOCO: original resides in kutil.cc
  */
 void ShiftDVec::updateResult
   ( ideal r,ideal Q, ShiftDVec::kStrategy strat )
@@ -911,6 +977,13 @@ void ShiftDVec::updateResult
 static BOOLEAN sloppy_max = FALSE;
 #endif /* KDEBUG */
 
+/** Complete Reduction of the Standard Basis
+ *
+ * \todo explain withT - in which cases do we reduce only with
+ *                       polynomials from S ?
+ *
+ * Use option(redSB) to turn it on.
+ */
 void ShiftDVec::completeReduce
   ( SD::kStrategy strat, BOOLEAN withT )
 {
@@ -1037,9 +1110,18 @@ void ShiftDVec::completeReduce
 }
 
 
-/* BOCO: used in completeReduce
- * WARNING: We only consider the homogenous case at the moment.
+/** Reduce the tail of a polynomial
+ *
+ * Reduces the tail of L->p, d.i. p_Next(L->p), d.i. the
+ * polynomial obtained by throwing lm(L->p) away.
+ *
+ * @param[in,out]   L     the tail of L->p will be reduced
+ * @param[in]       pos   elements in strat->S with higher index
+ *                        are not considered for reduction
+ *
  * The original resides in kutil.cc
+ *
+ * \todo do we only reduce with elements from strat->S ?
  */
 poly ShiftDVec::redtail
   (LObject* L, int pos, ShiftDVec::kStrategy strat)
@@ -1150,7 +1232,12 @@ poly ShiftDVec::redtail
   return p;
 }
 
-//BOCO: original resides in kutil.cc
+/** Reduce the tail of a polynomial
+ *
+ * This is just a wrapper around
+ * ShiftDVec::redtail(LObject*, int, ShiftDVec::kStrategy) .
+ *
+ */
 poly ShiftDVec::redtail(poly p, int pos, SD::kStrategy strat)
 {
   namespace SD = ShiftDVec;
@@ -1159,7 +1246,14 @@ poly ShiftDVec::redtail(poly p, int pos, SD::kStrategy strat)
 }
 
 
-//BOCO: original resides in kstd1.cc
+/** Some initializations for strat
+ *
+ * Initializes:
+ * - strat->enterS
+ * - strat->red
+ * - strat->initEcart
+ * - strat->initEcartPair
+ */
 void ShiftDVec::initBba( ideal F, SD::kStrategy strat )
 {
   namespace SD = ShiftDVec;
@@ -1184,6 +1278,26 @@ void ShiftDVec::initBba( ideal F, SD::kStrategy strat )
     strat->initEcartPair = initEcartPairBba;
 }
 
+/** Find a divisor of L in strat->S
+ *
+ * @param[in]    L          We want to find a divisor for the
+ *                          polynomial represented by L.
+ * @param[out]   max_ind    Depending on the ordering of the
+ *                          polynomials, max_ind is determined to
+ *                          be the greatest index in S up to
+ *                          which we have to test, if lm(S[j])
+ *                          (j <= max_ind) divides lm(L) . (With
+ *                          other words: the gratest index, such
+ *                          that deg(lm(S[j])) <= deg(lm(L)),
+ *                          where deg is the degree defined by
+ *                          the ordering.)
+ *
+ * \todo Why do we create t_p? We could just use L -> correct
+ *       that!
+ * \todo Remove shift from the parameter list. Passing a shift
+ *       makes no sense here.
+ * \todo is my comment to max_ind correct ?
+ */
 int ShiftDVec::kFindDivisibleByInS
   ( const SD::kStrategy strat,
     int* max_ind, LObject* L, int shift )
@@ -1234,16 +1348,15 @@ int ShiftDVec::kFindDivisibleByInS
 }
 
 
-/*2
- * BOCO:
- *   This function will overload the redBba function of the
- *   bba-Algorithm for the non-commutative dvec-case. The
- *   original comment does still apply; however, h is no longer
- *   of type poly, but of type TObject. Same goes for the
- *   return value of this function.
- * BOCO original comment from kutil.cc:
- *   reduces h using the set S
- *   procedure used in updateS
+/** Some reduction function
+ *
+ * This function is used by ShiftDVec::updateS, which in turn is
+ * used by ShiftDVec::initBuchMora . So this seems to be a
+ * reduction of the polynomials in S with themselves, before the
+ * mail BBa is started.
+ *
+ * \todo Abolish shifting!
+ * \todo Clear TODO from function body.
  */
 poly ShiftDVec::redBba
   ( LObject * h, int maxIndex, SD::kStrategy strat )
@@ -1278,7 +1391,7 @@ poly ShiftDVec::redBba
       TObject tTemp(pTemp);
       TObject noShift(strat->S[j]);
 
-      //BOCO: hope that is ok... is it nescessary?...
+      //BOCO TODO: hope that is ok... is it nescessary?...
       tTemp.tailRing = noShift.tailRing = strat->tailRing;
       SD::ksReducePoly( h, &noShift,
                         &tTemp, strat->kNoetherTail() );
@@ -1805,11 +1918,20 @@ KINLINE poly ShiftDVec::redtailBba
 }
 
 
-/*2
- * BOCO: original comment
+/** Normalform of strat->S
+ * This function is used by ShiftDVec::updateS, which in turn is
+ * used by ShiftDVec::initBuchMora . So this procedure seems to
+ * reduce the polynomials in S, before the main BBa is started.
+ *
+ * \remarks
+ *   - Look at the comments in the source code of this file
+ *
+ * \par original comment
  * updates S:
  * the result is a set of polynomials which are in
  * normalform with respect to S
+ *
+ * \todo In which cases is this function used (option(???))
  */
 void ShiftDVec::updateS( BOOLEAN toT, SD::kStrategy strat )
 {
@@ -1957,6 +2079,18 @@ void ShiftDVec::updateS( BOOLEAN toT, SD::kStrategy strat )
 }
 
 
+/** Determines which criterions on the pairs are used
+ *
+ * This procedure should determine, which criterions for
+ * filtering pairs are used. And which functions to get pairs. In
+ * our Letterplace implementation however the only criterion
+ * which can explicitly be shutdown is Gebauer-Moeller.
+ *
+ * \todo We should review this procedure to make it compatible
+ *       with our Algorithm. In its current state its pretty
+ *       useless, I guess. Do we need it at all? What choices do
+ *       have to make anyway?
+ */
 void ShiftDVec::initBuchMoraCrit(ShiftDVec::kStrategy strat)
 {
   namespace SD = ShiftDVec;
@@ -2018,13 +2152,25 @@ void ShiftDVec::initBuchMoraCrit(ShiftDVec::kStrategy strat)
 }
 
 
-/* BOCO: original comment from kutil.cc
- *  enters p at position at in L
- * BOCO:
- *  - We will return a pointer to the LObject in [[set]] .
- * WARNING (if an error occeurs: check):
- *  p is now is passed as a pointer instead of passing it by
- *  value (may save us one copy).
+/** Enter an LObject into an LSet at a given position
+ * 
+ * @param[in]     p       - The LObject we want to enter into set
+ * @param[in,out] set     - The set (pointer to an array of
+ *                          LObjects) into which we want to enter
+ *                          p; set might be modified (extended)
+ *                          by the philosophy enlargeL
+ * @param[in]     at      - The position at which to insert p
+ * @param[in,out] LSetmax - If the size of set exceeds this
+ *                          threshold it will be increased (and
+ *                          threshold will probably be adapted).
+ *
+ * @return A pointer to the position in set, where L was written
+ *         to
+ *
+ * \remarks
+ *   - The memory of p is just copied (no deep copy)
+ *   - The ShiftDVec::Extension of p is set to NULL after the
+ *     copy, to avoid having two objects with the same extension.
  */
 LObject* ShiftDVec::enterL
   ( LSet *set,
@@ -2071,6 +2217,10 @@ LObject* ShiftDVec::enterL
 //functions with nearly no change
 
 
+/** Initialize strat->S and strat->L
+ *
+ * \todo This function needs proper explanations.
+ */
 void ShiftDVec::initSL( ideal F, ideal Q, SD::kStrategy strat )
 {
   namespace SD = ShiftDVec;
@@ -2174,6 +2324,13 @@ void ShiftDVec::initSL( ideal F, ideal Q, SD::kStrategy strat )
   }
 }
 
+/** Some Initializations at start of BBa
+ *
+ * In some case also normalization of strat->S - see
+ * ShiftDVec::updateS .
+ *
+ * \todo This function needs proper explanations.
+ */
 void ShiftDVec::initBuchMora
   ( ideal F,ideal Q,SD::kStrategy strat )
 {

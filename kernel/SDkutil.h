@@ -1,13 +1,49 @@
-/* file:        SDkutil.h
- * authors:     Grischa Studzinski & Benjamin Schnitzler
- * created:     ask git
- * last change: ask git
+/*! @file
  *
- * DESCRIPTION:
  * This file contains extensions to some structures and
  * functions defined in kutil.h (...Object, ...Strategy, etc.).
  *
- * TODO: bidubidu
+ * @brief This file contains extensions to some structures and
+ *        declarations of utility functions and some analogs to
+ *        functions from kutil.h .
+ *
+ * This file is part of the Letterplace ShiftDVec Project
+ *
+ * @author Grischa Studzinski
+ * @author Benjamin Schnitzler benjaminschnitzler@googlemail.com
+ *
+ * @copyright see main copyright notice for Singular
+ *
+ *
+ * \par Object Extensions and Inheritance:
+ *
+\verbatim
+sTObject --- contains ---> ShiftDVec::sTObjectExtension
+    ^                                   ^
+    |                                   |
+sLObject --- contains ---> ShiftDVec::sLObjectExtension
+\endverbatim
+ * The sTObjectExtension contains the DVec for it corresponding
+ * sTObject.
+ *
+ * If the sLObjectExtension corresponds to an sLObject, which is
+ * a pair, from which we want to build an S-Polynomial, this pair
+ * theoretically consists of an unshifted and a shifted
+ * polynomial; however, we will only store the shift of the
+ * second polynomial in the Extension.
+ *
+ * Note to myself: Better do not use private members in any of
+ * the classes, since the standard does not define, how members
+ * from the private/public areas are lay out in memory (in
+ * which order) and this might be important for the singular
+ * memory management.
+ *
+ *
+ * \todo The extensions could be stored in sets paralell to
+ *       strat->L and strat->T using Singular memory management.
+ * \todo For Release: Tidy up; remove unnessesary procedures;
+ *       remove debug stuff (partially and improve what is left)
+ * \todo many other things
  */
 
 #include <kernel/kutil.h>
@@ -107,33 +143,33 @@ namespace ShiftDVec
 /* classes/class extensions for ShiftDVec case */
 
 
-/* Object Extensions and Inheritance:
+/** This extension corresponds to an sTObject
  *
- * sTObject --- contains ---> ShiftDVec::sTObjectExtension
- *     ^                                   ^
- *     |                                   |
- * sLObject --- contains ---> ShiftDVec::sLObjectExtension
- *
- * Note to myself: Better do not use private members in any of
- * the classes, since the standard does not define, how members
- * from the private/public areas are lay out in memory (in
- * which order) and this might be important for the singular
- * memory management.
+ * It contains different procedures for creating a dvec of the
+ * polynomials of the sTObject and to check divisibility of
+ * monomials by having divisibility criterions for dvecs and
+ * checking them.
  */
-
 class ShiftDVec::sTObjectExtension
 {
   public:
-    // This is used for simulating polymorphism
+    /** We simulate polymorphism by storing the type of the
+     *  extension
+     */
     enum { TObject_Extension = 1,
            LObject_Extension = 2 } Extension_Type;
 
-    // How many Objects do possess a pointer to this extension
+    /** It may be possible to have several Objects storing the
+     *  same extension. We count how many do, so that we can
+     *  delete the Extension, when the last possesor is deleted.
+     *
+     *  \todo nice idea, but not really necessary! Remove it!
+     */
     int number_of_possesors;
 
-    sTObject* T; //The sTObject, this object is contained in
-    uint * dvec; //Distance Vector of lm(p)
-    uint dvSize; //size of the >>uint * dvec<< array
+    sTObject* T; //!< The sTObject, this object is contained in
+    uint * dvec; //!< Distance Vector of lm(p)
+    uint dvSize; //!< size of the >>uint * dvec<< array
 
     //uint pIsInR; //already i_r in ::sTObject
 
@@ -147,24 +183,26 @@ class ShiftDVec::sTObjectExtension
     void Set_Number_Of_Possesors(int num)
     { number_of_possesors = num; }
 
-    void Increase_Number_Of_Possessors(){ ++number_of_possesors; }
+    void Increase_Number_Of_Possessors(){++number_of_possesors;}
 
     void dumbInit(sTObject* _T){ T = _T; dvec = NULL; }
 
+    //! Initialize the distance vector of this extension
     void SetDVecIfNULL(poly p, ring r)
     { if(!dvec) SetDVec(p, r); }
 
+    //! Initialize the distance vector of this extension
     void SetDVecIfNULL()
     { if(!dvec) SetDVec(); }
     
-    // Initialize the distance vector of an ShiftDVec::sTObject
+    //! Initialize the distance vector of this extension
     void SetDVec(poly p, ring r)
     {
       freeDVec(); 
       dvSize = CreateDVec(p, r, dvec); 
     }
 
-    // Initialize the distance vector of an ShiftDVec::sTObject
+    //! Initialize the distance vector of this extension
     void SetDVec()
     {
       freeDVec();
@@ -174,14 +212,17 @@ class ShiftDVec::sTObjectExtension
         dvSize = CreateDVec(T->p, currRing, dvec);
     }
 
+    //! Initialize the distance vector of this extension
     void SetDVec(uint* dv) {dvec = dv;}
 
     uint*  GetDVec(); 
     uint  getDVecAtIndex(uint index) {return dvec[index];}
     uint GetDVsize(); 
 
+    //! \todo Delete this function
     int cmpDVec(sTObject* toCompare);
 
+    //! \todo Delete this function
     int cmpDVec
       (sTObject* T1, uint begin, uint beginT1, uint size);
 
@@ -191,6 +232,16 @@ class ShiftDVec::sTObjectExtension
 
     void freeDVec(); 
 
+    /** @brief Test if this->dvec is divisible by the polynomial
+     *         of Tobj. We will return the first shift.
+     *
+     *  If fromRight is true, we will only check, if this->dvec
+     *  will be divided from the right, d.i. if Tobj dvec
+     *  corresponds to a tail of this->dvec .
+     *
+     *  If the dvecs do not exist (are equal to NULL) they will
+     *  be created.
+     */
     uint divisibleBy( sTObject * Tobj,
                       int numVars, bool fromRight = false )
     {
@@ -212,6 +263,9 @@ class ShiftDVec::sTObjectExtension
       }
     }
 
+    /** @brief Check first if the component is zero or if the
+     *         components of both polynomials equal.
+     */
     uint divisibleBy_Comp( sTObject * Tobj,
                            poly sTObject::*tpoff,
                            ring r, int numVars,
@@ -227,6 +281,19 @@ class ShiftDVec::sTObjectExtension
       return UINT_MAX;
     }
 
+    /** @brief Test if this->dvec is divisible by the polynomial
+     *         of Tobj. We will return the first shift.
+     *
+     *
+     *  This procecure is similar to
+     *  uint divisibleBy( sTObject * Tobj,
+     *                    int numVars, bool fromRight = false )
+     *  except for, that we can decide, if we want to use Tobj->p
+     *  or Tobj->t_p
+     *
+     *  \todo This function is complicate to use. Do we really
+     *        need it?
+     */
     uint divisibleBy( sTObject * Tobj,
                       poly sTObject::* tpoff,
                       ring r, int numVars, bool fromRight )
@@ -251,6 +318,15 @@ class ShiftDVec::sTObjectExtension
     }
 };
 
+/** This extension corresponds to a Pair (an sLObject)
+ *
+ * It contains different procedures for creating a dvec of an
+ * S-Polynomial or comparing the Lcm of different S-Polynomials,
+ * which are used for Gebauer-Moeller .
+ *
+ * \todo are all these lcm procedures really used at the moment?
+ *       We should get rid of the stuff, we don't need.
+ */
 class ShiftDVec::sLObjectExtension :
   public ShiftDVec::sTObjectExtension
 {
@@ -286,23 +362,34 @@ class ShiftDVec::sLObjectExtension :
     { return static_cast<sLObject*>(T); }
 };
 
+/** Extended skStrategy class for the LPDV project
+ *
+ * We store some useful additional information here (like uptodeg
+ * and lV). We plan also to store some additional information and
+ * an additional set for Left-GB calculation.
+ *
+ * \todo We should have parallel to the T/L sets some extension
+ *       sets here to be more Singular conforment. And to have
+ *       better an cleaner memory-management.
+ */
 class ShiftDVec::skStrategy : public ::skStrategy
 {
   public:
-    /* BOCO DESCRIPTION:
+    /** LeftGB calculation - factored ideal U (in K<X>/U)
+     *
      * This is needed for the calculation of a left GB in a
      * factor algebra K<X>/U; so this will be used in the
      * ShiftDVec::LeftGB namespace
      *
-     * BOCO TODO:
-     * U is probably subset of R; so either we will keep
-     * references to the Objects in R here, or we will delete
-     * them completely and instead let get_U_at(i) handle the
-     * translation from R to U at index i. We will decide that
-     * later. However: we have to care for the Initialization
-     * somewhere.
-     *   Question: Will U be part of T ??? - I don't think so,
-     * but again: What was the difference between T and R ?
+     * \todo U is probably subset of R; so either we will keep
+     *       references to the Objects in R here, or we will
+     *       delete them completely and instead let get_U_at(i)
+     *       handle the translation from R to U at index i. We
+     *       will decide that later. However: we have to care for
+     *       the Initialization somewhere.
+     *       Question: Will U be part of T ??? - I don't think
+     *       so, but again: What was the difference between T and
+     *       R ?
      */
     TObject* U; //first index:0; last index: size_of_U-1
     uint size_of_U; // This is, what it says!

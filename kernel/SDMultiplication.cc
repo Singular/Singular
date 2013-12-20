@@ -642,12 +642,7 @@ int ShiftDVec::ksReducePolyTail
 }
 
 //BOCO: used in redtailBba (kutil.cc)
-#if 0  // original header from kInline.h
-KINLINE int ksReducePolyTail
-  (LObject* PR, TObject* PW, LObject* Red)
-#else  //replacement
 int ShiftDVec::ksReducePolyTail
-#endif
   ( LObject* PR, TObject* UPW, TObject* SPW, LObject* Red )
 {
   BOOLEAN ret;

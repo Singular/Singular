@@ -1,0 +1,8 @@
+blc ShiftDVec::kStd 'MEMORY_LOG("new strat", strat);'
+commands
+  silent
+  watch strat->posInL
+  continue
+end
+
+# vim: set ft=gdb :

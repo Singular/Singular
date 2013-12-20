@@ -15,9 +15,6 @@
 #ifndef SDPAIRS_H
 #define SDPAIRS_H
 
-/*! @brief The namespace containing the major part of functions
- *         for the LPDV project.
- */
 namespace ShiftDVec
 {
   namespace SD = ShiftDVec;
