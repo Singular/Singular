@@ -2,7 +2,7 @@
 version="version ellipticcovers.lib 4.0.0.0 Dec_2013 ";
 category="Commutative Algebra";
 info="
-LIBRARY:  ellipticCovers.lib    Gromov Witten numbers of elliptic curves
+LIBRARY:  ellipticCovers.lib    Gromov-Witten numbers of elliptic curves
 
 AUTHORS:  J. Boehm, boehm @ mathematik.uni-kl.de
           A. Buchholz, buchholz @ math.uni-sb.de
@@ -33,7 +33,7 @@ The key function computing the numbers N_(G,b) and N_(G,d) is gromovWitten.
 
 References:
 
-[BBM] J. Boehm, A. Buchholz, H. Markwig: Tropical mirror symmetry for elliptic curves, arXiv *** (2013).
+[BBM] J. Boehm, A. Buchholz, H. Markwig: Tropical mirror symmetry for elliptic curves, arXiv:1309.5893 (2013).
 
 KEYWORDS:
 tropical geometry; mirror symmetry; tropical mirror symmetry; Gromov-Witten invariants; elliptic curves; propagator; Feynman graph; path integral
