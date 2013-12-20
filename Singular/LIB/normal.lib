@@ -2158,7 +2158,8 @@ proc genus(ideal I,list #)
 "USAGE:   genus(I) or genus(I,<option>); I a 1-dimensional ideal
 RETURN:  an integer, the geometric genus p_g = p_a - delta of the projective
          curve defined by i, where p_a is the arithmetic genus.
-NOTE:    delta is the sum of all local delta-invariants of the singularities,
+NOTE:    genus always treats projective curves and takes projective closure if input is affine 1-dim variety.
+         delta is the sum of all local delta-invariants of the singularities,
          i.e. dim(R'/R), R' the normalization of the local ring R of the
          singularity. @*
          genus(I,"nor") uses the normalization to compute delta. Usually genus(I,"nor")
