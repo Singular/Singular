@@ -5465,8 +5465,9 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 #endif
 static BOOLEAN jjnInt(leftv res, leftv u)
 {
-  number n=(number)u->Data();
+  number n=(number)u->CopyD(); // n_Int may call n_Normalize
   res->data=(char *)(long)n_Int(n,currRing->cf);
+  n_Delete(&n,currRing->cf);
   return FALSE;
 }
 static BOOLEAN jjnlInt(leftv res, leftv u)
