@@ -4076,7 +4076,7 @@ and then @key{RETURN} .
 @item @strong{Purpose:}
 Tests the expression for correctness if the int_expression is smaller
 as a variable @code{assumeLevel}. If no such variable exist the int expression
-is compared against 0.
+is compared against 0. It is possible to define a separate @code{assumeLevel} for each library.
 If the expression is evaluated and not true (i.e. does not evaluate to @code{int(0)} an error is raised.
 @item @strong{Example:}
 @smallexample
@@ -4085,7 +4085,7 @@ If the expression is evaluated and not true (i.e. does not evaluate to @code{int
   ASSUME(1,1==2); // not evaluated
   int assumeLevel=2;
   ASSUME(1,1==2);
-  // setting a different assumeLvele for poly.lib:
+  // setting a different assumeLevel for poly.lib:
   int Poly::assumeLevel=2;
 @c example
 @end smallexample
