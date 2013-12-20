@@ -83,9 +83,9 @@ feResourceConfig_s feResourceConfigs[] =
   {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                (char *)""},
   {"DataDir",   'D',    feResDir,   "SINGULAR_DATA_DIR",    "%b/../share/",          (char *)""},
   {"DefaultDir",'d',    feResDir,   "SINGULAR_DEFAULT_DIR",  SINGULAR_DEFAULT_DIR,  (char *)""},
-  {"InfoFile",  'i',    feResFile,  "SINGULAR_INFO_FILE",   "%r/info/singular.hlp", (char *)""},
-  {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%r/doc/singular.idx",  (char *)""},
-  {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%r/html",              (char *)""},
+  {"InfoFile",  'i',    feResFile,  "SINGULAR_INFO_FILE",   "%D/info/singular.hlp", (char *)""},
+  {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%D/doc/singular.idx",  (char *)""},
+  {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%D/singular/html",              (char *)""},
 #ifdef ix86_Win
   {"HtmlHelpFile",'C',  feResFile,  "SINGULAR_CHM_FILE",    "%r/doc/Manual.chm",    (char *)""},
 #endif
