@@ -2,7 +2,7 @@
 version="version orbitparam.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Algebraic Geometry";
 info="
-LIBRARY:  orbitparam.lib   Parametrizing unipotent orbits
+LIBRARY:  orbitparam.lib   Parametrizing orbits of unipotent actions
 
 AUTHORS:  J. Boehm, boehm at mathematik.uni-kl.de @*
           S. Papadakis, papadak at math.ist.utl.pt @*
