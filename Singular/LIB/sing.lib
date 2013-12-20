@@ -361,12 +361,18 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc slocus (ideal i)
+proc slocus(ideal i)
 "USAGE:   slocus(i);  i ideal
-RETURN:  ideal of singular locus of i
+RETURN:  ideal of singular locus of i. Quotient rings and rings with integer coefficients are currently not supported.
 EXAMPLE: example slocus; shows an example
 "
 {
+  // quotient rings currently not supported
+  ASSUME( 0, 0==isQuotientRing(basering) ); 
+  // integer coefficient rings currently not supported
+  ASSUME( 0, 0==hasIntegerCoefficientRing(basering) ); 
+
+
   def R=basering;
   int j,k;
   ideal res;
@@ -414,9 +420,17 @@ EXAMPLE: example slocus; shows an example
 "
 {
   ideal ist=std(i);
-  if(deg(ist[1])==0){return(ist);}
-  int cod  = nvars(basering)-dim(ist);
-  i        = i+minor(jacob(i),cod);
+  if ( size(ist)==0 ) // we have a zero ideal
+  { 
+     // the zero locus of the zero ideal is nonsingular
+     return( ideal(1) ) ;
+  }
+  if( deg( ist[1] ) == 0 ) // the ideal has a constant generator
+  {
+    return(ist);
+  }
+  int cod  = nvars(basering) - dim(ist);
+  i        = i + minor( jacob(i), cod );
   return(i);
 }
 example
