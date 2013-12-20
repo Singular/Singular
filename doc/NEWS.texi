@@ -38,7 +38,7 @@ New functionality
 @item de Rham cohomology of complements of algebraic varieties (@nref{derham_lib})
 @item Gromov-Witten numbers of elliptic curves (@nref{ellipticcovers_lib})
 @item classification of isolated complete intersection singularities in characteristic 0 (@nref{classifyci_lib})
-@item parametrization of unipotent orbits of nilpotent Lie groups (@nref{orbitparam_lib})
+@item parametrization of orbits of unipotent actions (@nref{orbitparam_lib})
 @item F5-like Groebner basis algorithm (@nref{sba})
 @item element-wise application of functions to data structures (@nref{apply})
 @item support for debugging libraries (@nref{ASSUME})
