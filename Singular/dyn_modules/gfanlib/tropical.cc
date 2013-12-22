@@ -4,7 +4,8 @@
 #include <libpolys/polys/clapsing.h>
 #include <bbcone.h>
 
-#include <initialReduction.h>
+#include <ppinitialReduction.h>
+#include <ttinitialReduction.h>
 
 poly initial(poly p)
 {
@@ -468,6 +469,7 @@ void tropical_setup(SModulFunctions* p)
   p->iiAddCproc("","reduceInitially2",FALSE,reduceInitially2);
   p->iiAddCproc("","reduceInitially3",FALSE,reduceInitially3);
   p->iiAddCproc("","reduceInitially4",FALSE,reduceInitially4);
+  p->iiAddCproc("","ttpReduce",FALSE,pReduce);
 #endif //NDEBUG
   p->iiAddCproc("","reduceInitially",FALSE,reduceInitially);
   p->iiAddCproc("","homogeneitySpace",FALSE,homogeneitySpace);
