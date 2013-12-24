@@ -199,7 +199,7 @@ $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${US
 
 
 
-libSingular_includedir = ${includedir}/singular/Singular/
+libSingular_includedir = ${includedir}/singular/Singular
 nobase_libSingular_include_HEADERS = $(SingularHEADERS)
 
 #########################################################

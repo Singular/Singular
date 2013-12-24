@@ -80,7 +80,7 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	linearAlgebra.h \
 	f5c.h f5data.h f5gb.h f5lists.h
 
-libkernel_includedir  =${includedir}/singular/kernel/
+libkernel_includedir  =${includedir}/singular/kernel
 libkernel_include_HEADERS   = $(KERNELHEADERS)
 
 if ENABLE_FACTORY

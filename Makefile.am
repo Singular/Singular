@@ -20,7 +20,7 @@ dist-hook:
 	$(srcdir)/git-version-gen $(srcdir)/.tarball-git-version > $(distdir)/.tarball-git-version
 
 
-configheaderdir = ${includedir}/singular/
+configheaderdir = ${includedir}/singular
 nodist_configheader_HEADERS = singularconfig.h
 
 dist_man1_MANS = doc/singular.man

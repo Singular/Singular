@@ -7,5 +7,5 @@ SUBDIRS=$(PACKAGES)
 
 TESTDIRS=coeffs tests
 
-configheaderdir = ${includedir}/singular/
+configheaderdir = ${includedir}/singular
 nodist_configheader_HEADERS = libpolysconfig.h

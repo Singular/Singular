@@ -31,7 +31,7 @@ libnumeric_la_SOURCES   = $(SOURCES)
 
 ### libnumeric_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
-libnumeric_includedir  =$(includedir)/singular/numeric/
+libnumeric_includedir  =$(includedir)/singular/numeric
 
 libnumeric_include_HEADERS = mpr_base.h mpr_inout.h mpr_numeric.h
 

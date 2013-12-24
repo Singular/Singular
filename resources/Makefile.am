@@ -8,7 +8,7 @@ ACLOCAL_AMFLAGS = -I ../m4
 
 libresources_LTLIBRARIES = libresources.la
 # ${LIB_G}
-libresourcesdir = $(libdir)/
+#libresourcesdir = $(libdir)/
 
 #CXXTEMPLFLAGS =-ftrapv 
 ### -fno-implicit-templates
@@ -33,7 +33,7 @@ libresources_la_SOURCES   = $(SOURCES)
 
 ### libresources_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
-libresources_includedir  =$(includedir)/resources/
+libresources_includedir  =$(includedir)/resources
 
 libresources_include_HEADERS = omFindExec.h feResource.h feFopen.h
 
