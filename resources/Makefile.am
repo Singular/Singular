@@ -8,7 +8,7 @@ ACLOCAL_AMFLAGS = -I ../m4
 
 libresources_LTLIBRARIES = libresources.la
 # ${LIB_G}
-#libresourcesdir = $(libdir)/
+libresourcesdir = $(libdir)
 
 #CXXTEMPLFLAGS =-ftrapv 
 ### -fno-implicit-templates

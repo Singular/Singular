@@ -4,7 +4,7 @@ if HAVE_GFANLIB
   libgfan_LTLIBRARIES=libgfan.la
 endif
 
-# libgfandir = $(libdir)
+libgfandir = $(libdir)
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -DGMPRATIONAL -DHAVE_CONFIG_H
 
