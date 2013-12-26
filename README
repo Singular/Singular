@@ -1,15 +1,16 @@
-Rules for inlude files:
-- include files from the current subdir via #include "abc.h"
-- include header from other subdirs vai #include <def.h>
-  ( do NOT use a specific path - this may change!)
-- include privtae header files via path: #include "../other_dir/ppp.h"
-  - should be avoided!
+Singular is a computer algebra system for polynomial computations, with
+special emphasis on commutative and non-commutative algebra, algebraic
+geometry, and singularity theory. It is free and open-source under the
+GNU General Public Licence.
 
-Classes of files
-- public header:
-  - should be installed at a central place ($includedir)
-  - should itself only include other public headers
-- private header: 
-  - will not be installed at other places
-  - will (usually) only be included from that subdir
+Installation instructions:
+  https://github.com/Singular/Sources/wiki/Step-by-Step-Installation-Instructions-for-Singular
 
+Homepage:
+  http://www.singular.uni-kl.de/
+
+Source code:
+  https://github.com/Singular/Sources
+
+User Manual:
+  http://www.singular.uni-kl.de/Manual/4-0-0/
