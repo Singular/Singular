@@ -3,7 +3,7 @@ special emphasis on commutative and non-commutative algebra, algebraic
 geometry, and singularity theory. It is free and open-source under the
 GNU General Public Licence.
 
-Installation instructions:
+Installation instructions from source code:
   https://github.com/Singular/Sources/wiki/Step-by-Step-Installation-Instructions-for-Singular
 
 Homepage:
@@ -13,4 +13,4 @@ Source code:
   https://github.com/Singular/Sources
 
 User Manual:
-  http://www.singular.uni-kl.de/Manual/4-0-0/
+  http://www.singular.uni-kl.de/Manual/latest
