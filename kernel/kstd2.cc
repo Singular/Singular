@@ -53,14 +53,15 @@
 #endif
 
 #define SBA_INTERRED_START                  0
+#define SBA_INTERRED_END                    1
 #define SBA_TAIL_RED                        1
-#define SBA_PRODUCT_CRITERION               0
-#define SBA_PRINT_ZERO_REDUCTIONS           0
-#define SBA_PRINT_REDUCTION_STEPS           0
-#define SBA_PRINT_OPERATIONS                0
-#define SBA_PRINT_SIZE_G                    0
-#define SBA_PRINT_SIZE_SYZ                  0
-#define SBA_PRINT_PRODUCT_CRITERION         0
+#define SBA_PRODUCT_CRITERION               1
+#define SBA_PRINT_ZERO_REDUCTIONS           1
+#define SBA_PRINT_REDUCTION_STEPS           1
+#define SBA_PRINT_OPERATIONS                1
+#define SBA_PRINT_SIZE_G                    1
+#define SBA_PRINT_SIZE_SYZ                  1
+#define SBA_PRINT_PRODUCT_CRITERION         1
 
 // counts sba's reduction steps
 #if SBA_PRINT_REDUCTION_STEPS
@@ -1685,6 +1686,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   long product_criterion        = 0;
 #endif
 #if SBA_PRINT_SIZE_G
+  long size_g_non_red           = 0; // size of g in sba without removing mulitples
   long size_g                   = 0;
 #endif
 #if SBA_PRINT_SIZE_SYZ
@@ -1713,10 +1715,13 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
   }
   // sort ideal F
+  //
   ideal F       = idInit(IDELEMS(F1),F1->rank);
   intvec *sort  = idSort(F1);
   for (int i=0; i<sort->length();++i)
     F->m[i] = F1->m[(*sort)[i]-1];
+  for (int i=0; i<IDELEMS(F);++i)
+    pWrite(F->m[i]);
 #if SBA_INTERRED_START
   F = kInterRed(F,NULL);
 #endif
@@ -2291,9 +2296,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   }
   else if (TEST_OPT_PROT) PrintLn();
 
-#if SBA_PRINT_SIZE_G
-  size_g   = strat->sl+1;
-#endif
 #if SBA_PRINT_SIZE_SYZ
   // that is correct, syzl is counting one too far
   size_syz = strat->syzl;
@@ -2320,11 +2322,17 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   // entries of strat->Shdl which are dirty, i.e. not correct, but also not NULL
   // => we need to delete them before return the ideal
 #if F5C
+  int ctr = IDELEMS(strat->Shdl);
   for(int i=strat->sl+1;i<IDELEMS(strat->Shdl);i++)
   {
-    //pDelete (&strat->Shdl->m[i]);
+    pDelete (&strat->Shdl->m[i]);
     strat->Shdl->m[i] = NULL;
+    ctr--;
   }
+  strat->Shdl->ncols  = ctr;
+#endif
+#if SBA_PRINT_SIZE_G
+  size_g_non_red  = IDELEMS(strat->Shdl);
 #endif
   if ((strat->sbaOrder == 1 || strat->sbaOrder == 3) && sRing!=currRingOld)
   {
@@ -2334,6 +2342,28 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     rDelete (sRing);
   }
   idTest(strat->Shdl);
+  ideal shdl  = idInit(IDELEMS(strat->Shdl),strat->Shdl->rank);
+  sort  = idSort(strat->Shdl);
+  ctr = IDELEMS(shdl);
+  for (int i=0; i<sort->length();++i)
+    shdl->m[i]  = strat->Shdl->m[(*sort)[i]-1];
+  for (int i=IDELEMS(shdl)-1; i>-1; --i) {
+    for (int j=0; j<i; ++j) {
+      if (shdl->m[j] != NULL && shdl->m[i] != NULL &&
+          p_LmDivisibleByNoComp(shdl->m[j],shdl->m[i],currRing)) {
+        pDelete(&shdl->m[i]);
+        shdl->m[i] = NULL;
+        ctr--;
+      }
+    }
+  }
+  idSkipZeroes(shdl);
+  strat->Shdl = shdl;
+#if SBA_INTERRED_END
+#endif
+#if SBA_PRINT_SIZE_G
+  size_g   = IDELEMS(strat->Shdl);
+#endif
 
 #ifdef DEBUGF5
   printf("SIZE OF SHDL: %d\n",IDELEMS(strat->Shdl));
@@ -2377,8 +2407,9 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
 #if SBA_PRINT_SIZE_G
   printf("----------------------------------------------------------\n");
-  printf("SIZE OF G:                  %ld\n",size_g);
-  size_g  = 0;
+  printf("SIZE OF G:                  %ld / %ld\n",size_g,size_g_non_red);
+  size_g          = 0;
+  size_g_non_red  = 0;
 #endif
 #if SBA_PRINT_SIZE_SYZ
   printf("SIZE OF SYZ:                %ld\n",size_syz);
