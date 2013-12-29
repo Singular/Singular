@@ -179,7 +179,6 @@ class sLObject : public sTObject
 
 public:
   unsigned long sev;
-  unsigned long from; // index in sig up to which the correspongin LObject was already checked
   unsigned long checked; // this is the index of S up to which
                       // the corresponding LObject was already checked in
                       // critical pair creation => when entering the
