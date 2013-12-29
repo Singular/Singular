@@ -55,13 +55,13 @@
 #define SBA_INTERRED_START                  0
 #define SBA_INTERRED_END                    1
 #define SBA_TAIL_RED                        1
-#define SBA_PRODUCT_CRITERION               1
-#define SBA_PRINT_ZERO_REDUCTIONS           1
-#define SBA_PRINT_REDUCTION_STEPS           1
-#define SBA_PRINT_OPERATIONS                1
-#define SBA_PRINT_SIZE_G                    1
-#define SBA_PRINT_SIZE_SYZ                  1
-#define SBA_PRINT_PRODUCT_CRITERION         1
+#define SBA_PRODUCT_CRITERION               0
+#define SBA_PRINT_ZERO_REDUCTIONS           0
+#define SBA_PRINT_REDUCTION_STEPS           0
+#define SBA_PRINT_OPERATIONS                0
+#define SBA_PRINT_SIZE_G                    0
+#define SBA_PRINT_SIZE_SYZ                  0
+#define SBA_PRINT_PRODUCT_CRITERION         0
 
 // counts sba's reduction steps
 #if SBA_PRINT_REDUCTION_STEPS
