@@ -1,0 +1,3 @@
+[submodule "LpDVopt"]
+	path = LpDVopt
+	url = git@github.com:bschnitz/LpDVopt.git
