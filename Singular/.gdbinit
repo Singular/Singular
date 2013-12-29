@@ -12,9 +12,19 @@ source gdb/bos_gdb_ext.py
 #source gdb/debug_L
 #source gdb/debug_LS
 #source gdb/print_set_sizes
-source gdb/watch_posInL
+#source gdb/watch_posInL
+
+source gdb/print_sets
+#print_sets__start_of_main_loop 0 0 1
+print_sets__after_picking_pair 0 0 1
+
+#set logging on
+#set logging redirect on
+#set logging overwrite on
+#set logging file Watch_LSet.log
 
 set pagination off
+
 #set logging overwrite on
 #set logging redirect on
 #set logging file log-file.txt
