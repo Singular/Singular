@@ -6365,10 +6365,10 @@ monomial ordering of the basering.
 A standard basis is a set of generators such that
 the leading terms generate the leading ideal, resp.@: module.
 @*Use optional
-second and third arguments of type int to determine the respective variant of
+second and third arguments of type @code{int} to determine the respective variant of
 the signature-based standard basis algorithm:
 @*The second argument specifies the internal module order @code{sba} uses:
-@enumerate
+@itemize
 @item
 @code{0}: induced Schreyer order on the signatures, non-incremental computation
 of the basis
@@ -6376,17 +6376,18 @@ of the basis
 @code{1}: position over term order, incremental computation of the basis
 @item
 @code{2}: term over position order, non-incremental computation
-@end enumerate
+@item
 @code{3}: Schreyer-weighted degree over index over leading term
+@end itemize
 @*The third argument specifies the rewrite order @code{sba} uses:
-@enumerate
+@itemize
 @item
 @code{0}: using the rewrite order described in
 @code{http://dx.doi.org/10.1016/j.jsc.2010.06.019}
 @item
 @code{1}: using the rewrite order described in
 @code{http://dx.doi.org/10.1016/j.jsc.2011.05.004}
-@end enumerate
+@end itemize
 @*The standard call of @code{sba(i)} corresponds to @code{sba(i,0,1)}.
 @item @strong{Note:}
 The
@@ -6395,9 +6396,9 @@ algorithms like Faugere's F5 Algorithm. Whereas the correctness of the
 algorithms is only guaranteed for global orderings, timings for pure
 lexicographical orderings can be slow. In this situation you should try to
 compute the basis w.r.t. the graded reverse-lexicographic ordering and then
-convert to a basis for the lexicographical ordering using other methods (see
+convert to a basis for the lexicographical ordering using other methods (
 @pxref{fglm} and @pxref{grwalk_lib}). If the algorithms tend to use too much
-memory, you should try the other implemented standard basis algorithms (see
+memory, you should try the other implemented standard basis algorithms (
 @pxref{std}, @pxref{groebner}, and @pxref{slimgb}).
 @* Note that the behaviour of @code{sba} on an example can be rather different
 depending on which variant you choose (second and third argument).
