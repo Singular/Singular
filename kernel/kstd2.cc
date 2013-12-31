@@ -1685,7 +1685,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   long product_criterion        = 0;
 #endif
 #if SBA_PRINT_SIZE_G
-  long size_g                   = 0;
+  int size_g                    = 0;
+  int size_g_non_red            = 0;
 #endif
 #if SBA_PRINT_SIZE_SYZ
   long size_syz                 = 0;
@@ -2291,9 +2292,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   }
   else if (TEST_OPT_PROT) PrintLn();
 
-#if SBA_PRINT_SIZE_G
-  size_g   = strat->sl+1;
-#endif
 #if SBA_PRINT_SIZE_SYZ
   // that is correct, syzl is counting one too far
   size_syz = strat->syzl;
@@ -2316,15 +2314,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   PrintS("bba_end: currRing: "); rWrite(currRing);
 #endif /* MYTEST */
 #endif /* KDEBUG */
-  // using F5C it is possible that there is some data stored in the last
-  // entries of strat->Shdl which are dirty, i.e. not correct, but also not NULL
-  // => we need to delete them before return the ideal
-#if F5C
-  for(int i=strat->sl+1;i<IDELEMS(strat->Shdl);i++)
-  {
-    //pDelete (&strat->Shdl->m[i]);
-    strat->Shdl->m[i] = NULL;
-  }
+#if SBA_PRINT_SIZE_G
+  size_g_non_red  = IDELEMS(strat->Shdl);
 #endif
   if ((strat->sbaOrder == 1 || strat->sbaOrder == 3) && sRing!=currRingOld)
   {
@@ -2333,8 +2324,13 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     strat->Shdl = idrMoveR_NoSort (strat->Shdl, sRing, currRing);
     rDelete (sRing);
   }
+  id_DelDiv(strat->Shdl, currRing);
+  idSkipZeroes(strat->Shdl);
   idTest(strat->Shdl);
 
+#if SBA_PRINT_SIZE_G
+  size_g   = IDELEMS(strat->Shdl);
+#endif
 #ifdef DEBUGF5
   printf("SIZE OF SHDL: %d\n",IDELEMS(strat->Shdl));
   int oo = 0;
@@ -2377,8 +2373,9 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
 #if SBA_PRINT_SIZE_G
   printf("----------------------------------------------------------\n");
-  printf("SIZE OF G:                  %ld\n",size_g);
-  size_g  = 0;
+  printf("SIZE OF G:                  %d / %d\n",size_g,size_g_non_red);
+  size_g          = 0;
+  size_g_non_red  = 0;
 #endif
 #if SBA_PRINT_SIZE_SYZ
   printf("SIZE OF SYZ:                %ld\n",size_syz);
