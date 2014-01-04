@@ -9,7 +9,7 @@ noinst_LTLIBRARIES=libomalloc.la
 # libomalloc_includedir=$(includedir)/omalloc
 #libomalloc_include_HEADERS = omalloc.h
 
-SOURCES = dummy.c
+SOURCES = dummy.c omalloc.h
 
 AM_CPPFLAGS = -I${srcdir} -DHAVE_CONFIG_H 
 
