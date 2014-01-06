@@ -1,17 +1,38 @@
 #! /bin/bash
 
 C="$0"
-C=`readlink -f "$C"`
+O=`pwd`
+
+##C=`readlink -f "$C"`:::
+cd `dirname "$C"`
+C=`basename "$C"`
+
+# Iterate down a (possible) chain of symlinks 
+while [ -L "$C" ]  
+do                 
+    C=`readlink "$C"`
+    cd `dirname "$C"`
+    C=`basename "$C"`
+done
+
+cd `dirname "$C"` 
+C=`pwd`
 C=`dirname "$C"`
 C=`ls -d1 "$C"`
 
+cd "$O"
+
 # NOTE: if you moved this config please either use the above or
 # make sure the following variables are up to date
-prefix="$C/../"
+prefix="$C"
+exec_prefix=${prefix}
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib
+
 #prefix=@prefix@ 
-exec_prefix=@exec_prefix@
-includedir=@includedir@
-libdir=@libdir@
+#exec_prefix=@exec_prefix@
+#includedir=@includedir@
+#libdir=@libdir@
 
 ECHO="echo"
 ECHOn="printf"
@@ -24,8 +45,6 @@ Usage: libpolys-config [OPTION]
 Known values for OPTION are:
 
   --prefix		show libpolys installation prefix 
-  --libsg		print library linking information (with debug)
-  --cflagsg		print pre-processor and compiler flags (with debug)
   --libs		print library linking information
   --cflags		print pre-processor and compiler flags
   --help		display this help and exit
@@ -67,16 +86,8 @@ while test $# -gt 0; do
 	usage 0
 	;;
 
-    --cflagsg)
-	${ECHOn} " -I${includedir} -I${includedir}/singular @FACTORY_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@"
-	;;
-
     --cflags)
 	${ECHOn} " -I${includedir} -I${includedir}/singular @FACTORY_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@ -DNDEBUG -DOM_NDEBUG"
-	;;
-
-    --libsg)
-	${ECHOn} " -L${libdir} -L${libdir}/singular -lSingular_g -lnumeric_g -lkernel_g -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g @FACTORY_LIBS@ -lomalloc_g -lresources_g @NTL_LIBS@ @USEPPROCSDYNAMICLD@ @GMP_LIBS@" 
 	;;
 
     --libs)
