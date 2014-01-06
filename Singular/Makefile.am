@@ -228,7 +228,7 @@ Singular_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 Singular_LDADD = libSingular.la ${EMBED_PYOBJECT}
 
-Singular_LDFLAGS = -static ${AM_LDFLAGS} ${EMBED_PYOBJECT}
+Singular_LDFLAGS = ${AM_LDFLAGS} ${EMBED_PYOBJECT}
 
 Singulard_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 nodist_Singulard_SOURCES = libSingular.la
@@ -242,14 +242,14 @@ dist_bin_SCRIPTS = singularsurf
 
 #### ESingular
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO
-ESingular_LDFLAGS = -static ${AM_LDFLAGS}
+# ESingular_LDFLAGS = -static ${AM_LDFLAGS}
 ESingular_LDADD =   -lreporter -lmisc -lomalloc -lresources
 
 ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
 
 #### same for TSingular
 TSingular_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR -DPROTO
-TSingular_LDFLAGS = -static ${AM_LDFLAGS}
+# TSingular_LDFLAGS = -static ${AM_LDFLAGS}
 TSingular_LDADD =   -lreporter -lmisc -lomalloc -lresources
 
 TSingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptTS.inc feOpt.cc
@@ -263,7 +263,7 @@ libparse_SOURCES = libparse.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 # # libSingular.la -lnumeric
 libparse_LDADD = -lomalloc
-libparse_LDFLAGS = -static ${AM_LDFLAGS}
+# libparse_LDFLAGS = -static ${AM_LDFLAGS}
 # TODO for libparse: DONE by Hans???
 # multiple definition of `category_out': libparse.cc v.s. utils.cc
 # undefined reference to `iiInitSingularProcinfo(procinfo*, char const*, char const*, int, long, int)'
