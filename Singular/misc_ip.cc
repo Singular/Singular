@@ -786,7 +786,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
 {
   StringSetS("");
   StringAppend("Singular for %s version %s (%s, %d bit) %s #%s",
-               S_UNAME, S_VERSION1, // SINGULAR_VERSION,
+               S_UNAME, VERSION, // SINGULAR_VERSION,
                PACKAGE_VERSION, SIZEOF_VOIDP*8, singular_date, GIT_VERSION);
   StringAppendS("\nwith\n\t");
 

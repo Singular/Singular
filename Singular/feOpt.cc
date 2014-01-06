@@ -354,7 +354,7 @@ void feOptHelp(const char* name)
 #ifdef ESINGULAR
   printf("ESingular: A Program that starts-up Singular within emacs, for\n");
 #endif
-  printf("Singular version %s -- a CAS for polynomial computations. Usage:\n", S_VERSION1);
+  printf("Singular version %s -- a CAS for polynomial computations. Usage:\n", VERSION);
   printf("   %s [options] [file1 [file2 ...]]\n", name);
   printf("Options:\n");
 

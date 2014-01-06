@@ -23,9 +23,6 @@
 #define SINGULAR_SUB_VERSION 0
 #define S_ROOT_DIR ""
 
-/* Define version date as a string - temporarily*/
-#define S_VERSION2 ""
-
 /*******************************************************************
  * Defines which are not set by configure
  ******************************************************************/

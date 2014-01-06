@@ -73,11 +73,6 @@
 
 // TODO: the following should go to some config.h... no?
 
-/* Define version as a string */
-#ifndef S_VERSION1
-#define S_VERSION1 "spielwiese"
-#endif
-
 /* Absolute pathname of root directory of Singular source */
 #ifndef S_ROOT_DIR
 #define S_ROOT_DIR ""
