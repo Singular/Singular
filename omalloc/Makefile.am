@@ -1,12 +1,6 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
-
 lib_LTLIBRARIES=libomalloc.la
-# libomalloc_g.la
-
-#if WANT_DEBUG
-## lib_LTLIBRARIES+=
-#endif
 
 libomalloc_includedir=$(includedir)/omalloc
 
@@ -35,22 +29,17 @@ EXTRA_DIST = omalloc.c omtTestAlloc.c omtTest.h omMmap.c
 AM_CPPFLAGS =-I${top_srcdir}/.. -I${top_builddir}/..  -DHAVE_CONFIG_H
 
 libomalloc_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
-# libomalloc_g_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
-
 
 # libomalloc_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 libomalloc_la_CFLAGS    = -O2
 
 nodist_libomalloc_la_SOURCES = omTables.inc omTables.h mylimits.h
-# nodist_libomalloc_g_la_SOURCES = omTables.inc omTables.h mylimits.h
-
 nodist_libomalloc_include_HEADERS = omConfig.h mylimits.h omTables.h
 
 ### NOTE: "_g" (debug) means full library
 ### libomalloc_la_CPPFLAGS= -DOM_ALLOC_INTERNAL -DHAVE_CONFIG_H -DOM_NDEBUG
 
 libomalloc_la_CPPFLAGS  = ${AM_CPPFLAGS} -DOM_ALLOC_INTERNAL
-# libomalloc_g_la_CPPFLAGS= ${AM_CPPFLAGS} -DOM_ALLOC_INTERNAL -DHAVE_CONFIG_H
 
 BUILT_SOURCES = omTables.inc omTables.h
 
@@ -69,64 +58,19 @@ CLEANFILES = $(BUILT_SOURCES)
 
 ####################################################
 ## Test program
-##
-# AM_LDFLAGS = -L${top_builddir}/omalloc -L${top_builddir}/../omalloc
 
-TESTS = omtTest-s-m omtTest-d-m
-# omtTest-d-g  omtTest-s-g 
-
-#if WANT_DEBUG
-## TESTS+=
-#endif
+TESTS = omtTest-m omtTest-r
 
 check_PROGRAMS = $(TESTS)
 
-
-EXTRA_PROGRAMS = omtTest-s-r omtTest-d-r
-#### tests fail: omtTest-s-r omtTest-d-r due to  
-# !!!expect omError_UnalignedAddr
-# ***omError_UnalignedAddr: addr is unaligned
-#  occured at:  ../../omalloc/omtTestError.c:260
-#   occured for (invalid) addr: 0x7fc5c3602811 (error=14)
-# +++ok  omError_UnalignedAddr
-# 
-# !!!expect omError_NullSizeAlloc
-# 2669 Segmentation fault 
+# EXTRA_PROGRAMS = omtTest-r
 
 OMTTESTSSOURCES = omtTestReal.c omtTestDebug.c omtTestKeep.c omtTestError.c omtTest.c
 
-# omtTest_s_g_SOURCES  = $(OMTTESTSSOURCES)
-# # omtTest_s_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
-# # omtTest_s_g_CFLAGS  = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE}
-# omtTest_s_g_LDADD    = libomalloc.la
-# omtTest_s_g_LDFLAGS  = -L${builddir} -static
+omtTest_m_CPPFLAGS = ${AM_CPPFLAGS} -DOM_TEST_MALLOC
+omtTest_m_SOURCES  = $(OMTTESTSSOURCES)
+omtTest_m_LDADD    = libomalloc.la
 
-omtTest_s_m_CPPFLAGS = ${AM_CPPFLAGS} -DOM_TEST_MALLOC
-omtTest_s_m_SOURCES  = $(OMTTESTSSOURCES)
-omtTest_s_m_LDADD    = libomalloc.la
-omtTest_s_m_LDFLAGS  = -L${builddir} -static
+omtTest_r_SOURCES  = $(OMTTESTSSOURCES)
+omtTest_r_LDADD    = libomalloc.la
 
-omtTest_s_r_SOURCES  = $(OMTTESTSSOURCES)
-omtTest_s_r_CPPFLAGS = ${AM_CPPFLAGS}
-# omtTest_s_r_CFLAGS  = -O3 ${PIPE}
-omtTest_s_r_LDADD    = libomalloc.la
-omtTest_s_r_LDFLAGS  = -L${builddir} -static
-
-
-
-# omtTest_d_g_SOURCES  = $(OMTTESTSSOURCES)
-# # omtTest_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
-# # omtTest_d_g_CFLAGS  = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE}
-# omtTest_d_g_LDADD    = libomalloc.la
-# omtTest_d_g_LDFLAGS  = -L${builddir}
-
-omtTest_d_m_CPPFLAGS = ${AM_CPPFLAGS} -DOM_TEST_MALLOC
-omtTest_d_m_SOURCES  = $(OMTTESTSSOURCES)
-omtTest_d_m_LDADD    = libomalloc.la
-omtTest_d_m_LDFLAGS  = -L${builddir}
-
-omtTest_d_r_SOURCES  = $(OMTTESTSSOURCES)
-omtTest_d_r_CPPFLAGS = ${AM_CPPFLAGS} -DOM_NDEBUG
-# omtTest_d_r_CFLAGS  = -O3 ${PIPE}
-omtTest_d_r_LDADD    = libomalloc.la
-omtTest_d_r_LDFLAGS  = -L${builddir}

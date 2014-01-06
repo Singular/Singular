@@ -1,14 +1,5 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
-#LD_DYN_FLAGS	= -ldl -rdynamic
-#LD_LIBC	        = -lc
-#SFLAGS		= -fpic -DPIC
-#SLDFLAGS	= -shared
-#STATIC_LDFLAGS	= -static
-
-# WARNCFLAGS = -Wunused-parameter
-# clang has also: -Wunneeded-internal-declaration
-
 GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-version)
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DHAVE_CONFIG_H  -DGIT_VERSION='"$(GIT_VERSION)"'
@@ -299,26 +290,13 @@ all.lib: ${srcdir}/make_alllib.sh ${srcdir}/LIB/all.lib.tmpl ${singularlibrary}
 TESTS_ENVIRONMENT = SINGULARPATH='${top_builddir}/Singular/LIB:${top_srcdir}/Singular/LIB:${top_builddir}/libpolys/polys/.libs:${top_builddir}/factory/gftables'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${top_builddir}'
 
-TESTS=test-s-r test-d-r
+TESTS=test
 
 check_PROGRAMS=$(TESTS)
 
-# Static versions
-test_s_r_SOURCES = test.cc
+test_SOURCES = test.cc
 # ${EMBED_PYOBJECT_LDFLAGS}
-test_s_r_LDADD = libSingular.la 
-
-#-lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc \
-# $(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) \
-# $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
-#${EMBED_PYOBJECT}
-#${EMBED_PYOBJECT_LDFLAGS}
-
-test_s_r_LDFLAGS = -static ${AM_LDFLAGS}
-
-# Dynamic versions
-test_d_r_SOURCES = test.cc
-test_d_r_LDADD = libSingular.la 
+test_LDADD = libSingular.la 
 
 #########################################################
 

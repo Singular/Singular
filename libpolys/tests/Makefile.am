@@ -1,105 +1,19 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-# CXXTEMPLFLAGS =-ftrapv ## -O0 ## -fno-implicit-templates
-
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS} -DHAVE_CONFIG_H
 
-# if WANT_DEBUG
-# TESTS = simple_test \
-#     coeffs_test_s_r coeffs_test_s_g coeffs_test_d_r coeffs_test_d_g \
-#     polys_test_s_r polys_test_s_g polys_test_d_r polys_test_d_g \
-#     rings_test_s_r rings_test_s_g rings_test_d_r rings_test_d_g
-# else
 TESTS = simple_test \
-    coeffs_test_s_r coeffs_test_d_r \
-    polys_test_s_r polys_test_d_r \
-    rings_test_s_r rings_test_d_r
-# endif
+    coeffs_test \
+    polys_test \
+    rings_test
 
 check_PROGRAMS = $(TESTS)
 
 nodist_simple_test_SOURCES = simple_test_runner.cpp
 
-nodist_coeffs_test_s_r_SOURCES = coeffs_test_runner.cpp
-nodist_polys_test_s_r_SOURCES = polys_test_runner.cpp
-nodist_rings_test_s_r_SOURCES = rings_test_runner.cpp
-
-# nodist_coeffs_test_s_g_SOURCES = coeffs_test_runner.cpp
-# nodist_polys_test_s_g_SOURCES = polys_test_runner.cpp
-# nodist_rings_test_s_g_SOURCES = rings_test_runner.cpp
-
-
-nodist_coeffs_test_d_r_SOURCES = coeffs_test_runner.cpp
-nodist_polys_test_d_r_SOURCES = polys_test_runner.cpp
-nodist_rings_test_d_r_SOURCES = rings_test_runner.cpp
-
-# nodist_coeffs_test_d_g_SOURCES = coeffs_test_runner.cpp
-# nodist_polys_test_d_g_SOURCES = polys_test_runner.cpp
-# nodist_rings_test_d_g_SOURCES = rings_test_runner.cpp
-
-
-
-# RELEASECFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-# RELEASECXXFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-#RELEASECPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-#RELEASECPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
-
-# coeffs_test_s_r_CFLAGS =${RELEASECFLAGS} 
-# polys_test_s_r_CFLAGS = ${RELEASECFLAGS}
-# rings_test_s_r_CFLAGS = ${RELEASECFLAGS}
-# 
-# coeffs_test_d_r_CFLAGS =${RELEASECFLAGS} 
-# polys_test_d_r_CFLAGS = ${RELEASECFLAGS}
-# rings_test_d_r_CFLAGS = ${RELEASECFLAGS}
-
-
-# coeffs_test_s_r_CXXFLAGS =${RELEASECXXFLAGS} 
-# polys_test_s_r_CXXFLAGS = ${RELEASECXXFLAGS}
-# rings_test_s_r_CXXFLAGS = ${RELEASECXXFLAGS}
-# 
-# coeffs_test_d_r_CXXFLAGS =${RELEASECXXFLAGS} 
-# polys_test_d_r_CXXFLAGS = ${RELEASECXXFLAGS}
-# rings_test_d_r_CXXFLAGS = ${RELEASECXXFLAGS}
-
-
-# coeffs_test_s_r_CPPFLAGS =${RELEASECPPFLAGS} 
-# polys_test_s_r_CPPFLAGS = ${RELEASECPPFLAGS}
-# rings_test_s_r_CPPFLAGS = ${RELEASECPPFLAGS}
-# 
-# coeffs_test_d_r_CPPFLAGS =${RELEASECPPFLAGS} 
-# polys_test_d_r_CPPFLAGS = ${RELEASECPPFLAGS}
-# rings_test_d_r_CPPFLAGS = ${RELEASECPPFLAGS}
-
-
-###  -pedantic
-# DEBUGCFLAGS = $(AM_CFLAGS) -g -Wextra -Wall -Wno-long-long ${PIPE}
-# DEBUGCXXFLAGS = $(AM_CXXFLAGS) ${DEBUGCFLAGS} ${CXXTEMPLFLAGS}
-# DEBUGCPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
-# 
-# coeffs_test_s_g_CFLAGS =${DEBUGCFLAGS} 
-# polys_test_s_g_CFLAGS = ${DEBUGCFLAGS}
-# rings_test_s_g_CFLAGS = ${DEBUGCFLAGS}
-# 
-# coeffs_test_d_g_CFLAGS =${DEBUGCFLAGS} 
-# polys_test_d_g_CFLAGS = ${DEBUGCFLAGS}
-# rings_test_d_g_CFLAGS = ${DEBUGCFLAGS}
-# 
-# coeffs_test_s_g_CXXFLAGS =${DEBUGCXXFLAGS} 
-# polys_test_s_g_CXXFLAGS = ${DEBUGCXXFLAGS}
-# rings_test_s_g_CXXFLAGS = ${DEBUGCXXFLAGS}
-# 
-# coeffs_test_d_g_CXXFLAGS =${DEBUGCXXFLAGS} 
-# polys_test_d_g_CXXFLAGS = ${DEBUGCXXFLAGS}
-# rings_test_d_g_CXXFLAGS = ${DEBUGCXXFLAGS}
-# 
-# coeffs_test_d_g_CPPFLAGS =${DEBUGCPPFLAGS} 
-# polys_test_d_g_CPPFLAGS = ${DEBUGCPPFLAGS}
-# rings_test_d_g_CPPFLAGS = ${DEBUGCPPFLAGS}
-# 
-# coeffs_test_s_g_CPPFLAGS =${DEBUGCPPFLAGS} 
-# polys_test_s_g_CPPFLAGS = ${DEBUGCPPFLAGS}
-# rings_test_s_g_CPPFLAGS = ${DEBUGCPPFLAGS}
-
+nodist_coeffs_test_SOURCES = coeffs_test_runner.cpp
+nodist_polys_test_SOURCES = polys_test_runner.cpp
+nodist_rings_test_SOURCES = rings_test_runner.cpp
 
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/../factory
@@ -109,44 +23,12 @@ endif
 
 AM_LDFLAGS = -L${top_builddir}/polys -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc -L${top_builddir}/../resources
 
+polys_test_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS}
+rings_test_LDFLAGS = $(polys_test_LDFLAGS)
 
-coeffs_test_s_r_LDFLAGS = ${AM_LDFLAGS} -static 
-# coeffs_test_s_g_LDFLAGS = ${AM_LDFLAGS} -static 
-
-
-polys_test_s_r_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS} -static
-rings_test_s_r_LDFLAGS = $(polys_test_s_r_LDFLAGS)
-
-# polys_test_s_g_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS} -static
-# rings_test_s_g_LDFLAGS = $(polys_test_s_g_LDFLAGS)
-
-polys_test_d_r_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS}
-rings_test_d_r_LDFLAGS = $(polys_test_d_r_LDFLAGS)
-
-# polys_test_d_g_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS}
-# rings_test_d_g_LDFLAGS = $(polys_test_d_g_LDFLAGS)
-
-
-coeffs_test_s_r_LDADD = -lcoeffs -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lresources ${NTL_LIBS} ${GMP_LIBS} 
-polys_test_s_r_LDADD = -lpolys -lcoeffs -lreporter -lmisc ${USEPPROCSDYNAMICLD} ${FACTORY_LIBS} -lomalloc -lresources ${NTL_LIBS} ${GMP_LIBS} 
-rings_test_s_r_LDADD = $(polys_test_s_r_LDADD)
-
-# coeffs_test_s_g_LDADD = -lcoeffs_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g -lresources_g ${NTL_LIBS} ${GMP_LIBS} 
-# polys_test_s_g_LDADD = -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g ${USEPPROCSDYNAMICLD} ${FACTORY_LIBS} -lomalloc_g -lresources_g ${NTL_LIBS} ${GMP_LIBS} 
-# rings_test_s_g_LDADD = $(polys_test_s_g_LDADD)
-
-coeffs_test_d_r_LDADD = -lcoeffs -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lresources ${NTL_LIBS} ${GMP_LIBS} 
-polys_test_d_r_LDADD = -lpolys -lcoeffs -lreporter -lmisc ${USEPPROCSDYNAMICLD} ${FACTORY_LIBS} -lomalloc -lresources ${NTL_LIBS} ${GMP_LIBS}
-rings_test_d_r_LDADD = $(polys_test_d_r_LDADD)
-
-# coeffs_test_d_g_LDADD = -lcoeffs_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g -lresources_g ${NTL_LIBS} ${GMP_LIBS} 
-# polys_test_d_g_LDADD = -lpolys_g -lcoeffs_g -lreporter_g -lmisc_g ${USEPPROCSDYNAMICLD} ${FACTORY_LIBS} -lomalloc_g -lresources_g ${NTL_LIBS} ${GMP_LIBS}
-# rings_test_d_g_LDADD = $(polys_test_d_g_LDADD)
-
-
-
-
-
+coeffs_test_LDADD = -lcoeffs -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lresources ${NTL_LIBS} ${GMP_LIBS}
+polys_test_LDADD = -lpolys ${USEPPROCSDYNAMICLD} $(coeffs_test_LDADD)
+rings_test_LDADD = $(polys_test_LDADD)
 
 
 BUILT_SOURCES = gftables MOD \

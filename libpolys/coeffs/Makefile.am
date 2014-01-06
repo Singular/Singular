@@ -1,33 +1,9 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-# CXXTEMPLFLAGS =-ftrapv  
-## -fno-implicit-templates
-
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS}  -DHAVE_CONFIG_H
 
-# if WANT_DEBUG
-#   LIB_G=libcoeffs_g.la
-# else
-#   LIB_G=
-# endif
-
 libcoeffs_LTLIBRARIES = libcoeffs.la 
-# ${LIB_G}
 libcoeffsdir = $(libdir)/singular
-
-# libcoeffs_la_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
-# libcoeffs_g_la_CFLAGS = ${PIPE}
-# 
-# libcoeffs_la_CXXFLAGS   = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS}
-# libcoeffs_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
-# # -fdiagnostics-show-option 
-# 
-# libcoeffs_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-# libcoeffs_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
-
-# libcoeffs_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
-### libcoeffs_la_LDFLAGS    = -release ${PACKAGE_VERSION}
-
 
 # noinst_HEADERS= \
 #	gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h \
@@ -42,14 +18,18 @@ SOURCES = \
   bigintmat.cc  AE.cc OPAE.cc AEp.cc OPAEp.cc AEQ.cc OPAEQ.cc
 
 libcoeffs_la_SOURCES   = $(SOURCES)
-# libcoeffs_g_la_SOURCES = $(SOURCES)
 
 libcoeffs_includedir  =$(includedir)/singular/coeffs
 libcoeffs_include_HEADERS = coeffs.h numbers.h si_gmp.h gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h rintegers.h rmodulo2m.h rmodulon.h shortfl.h mpr_complex.h mpr_global.h \
   bigintmat.h Enumerator.h AE.h OPAE.h AEp.h OPAEp.h AEQ.h OPAEQ.h
 
+TESTS_ENVIRONMENT = SINGULARPATH='${top_srcdir}/../factory:${top_builddir}/../factory'
+TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='$(top_builddir)' 
 
-## for testing...
+TESTS = test
+
+check_PROGRAMS = $(TESTS)
+
 if ENABLE_FACTORY
   USE_FACTORY = -L${top_builddir}/../factory
 else
@@ -58,60 +38,5 @@ endif
 
 AM_LDFLAGS = -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc -L${top_builddir}/../resources
 
-TESTS_ENVIRONMENT = SINGULARPATH='${top_srcdir}/../factory:${top_builddir}/../factory'
-TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='$(top_builddir)' 
-
-# if WANT_DEBUG
-# TESTS = test_s_g test_s_r test_d_g test_d_r
-# else
-TESTS = test_s_r test_d_r
-# endif
-
-check_PROGRAMS = $(TESTS)
-
-test_s_r_SOURCES = test.cc
-# test_s_g_SOURCES = test.cc
-
-test_d_r_SOURCES = test.cc
-# test_d_g_SOURCES = test.cc
-
-
-test_s_r_LDADD = -lcoeffs -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lresources ${NTL_LIBS} ${GMP_LIBS} 
-# test_s_g_LDADD = -lcoeffs_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g -lresources_g ${NTL_LIBS} ${GMP_LIBS} 
-
-test_d_r_LDADD = -lcoeffs -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lresources ${NTL_LIBS} ${GMP_LIBS} 
-# test_d_g_LDADD = -lcoeffs_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g -lresources_g ${NTL_LIBS} ${GMP_LIBS} 
-
-
-# test_s_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-# #test_s_g_CFLAGS = ${PIPE}
-# 
-# test_d_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
-# #test_d_g_CFLAGS = ${PIPE}
-
-
-
-# test_s_r_CXXFLAGS = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS} 
-# # -fimplicit-templates
-# test_s_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
-# # -fimplicit-templates
-# # -fdiagnostics-show-option 
-# test_d_r_CXXFLAGS = -O3 -fomit-frame-pointer ${PIPE} ${CXXTEMPLFLAGS} 
-# test_d_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
-
-
-
-# test_s_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-# test_s_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
-# 
-# test_d_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
-# test_d_g_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
-# test_s_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
-# test_d_r_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
-
-
-test_s_r_LDFLAGS = -static ${AM_LDFLAGS}
-# test_s_g_LDFLAGS = -static ${AM_LDFLAGS}
-
-test_d_r_LDFLAGS = ${AM_LDFLAGS}
-# test_d_g_LDFLAGS = ${AM_LDFLAGS}
+test_SOURCES = test.cc
+test_LDADD   = -lcoeffs -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lresources ${NTL_LIBS} ${GMP_LIBS} 
