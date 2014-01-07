@@ -45,6 +45,7 @@ TIMING_DEFINE_PRINT (product2)
 TIMING_DEFINE_PRINT (hensel23)
 TIMING_DEFINE_PRINT (hensel)
 
+#if (!(HAVE_FLINT && __FLINT_VERSION_MINOR >= 4))
 static
 CFList productsNTL (const CFList& factors, const CanonicalForm& M)
 {
@@ -82,6 +83,7 @@ CFList productsNTL (const CFList& factors, const CanonicalForm& M)
   }
   return result;
 }
+#endif
 
 #if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
 static
