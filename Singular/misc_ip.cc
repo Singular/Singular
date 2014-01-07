@@ -860,14 +860,23 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef OM_NDEBUG
               StringAppendS("OM_NDEBUG,");
 #endif
+#ifdef SING_NDEBUG
+              StringAppendS("SING_NDEBUG,");
+#endif
 #ifdef PDEBUG
               StringAppendS("PDEBUG,");
 #endif
 #ifdef KDEBUG
               StringAppendS("KDEBUG,");
 #endif
-#ifndef __OPTIMIZE__
-              StringAppendS("-g,");
+#ifdef __OPTIMIZE__
+              StringAppendS("CC:OPTIMIZE,");
+#endif
+#ifdef __OPTIMIZE_SIZE__
+              StringAppendS("CC:OPTIMIZE_SIZE,");
+#endif
+#ifdef __NO_INLINE__
+              StringAppendS("CC:NO_INLINE,");
 #endif
 #ifdef HAVE_EIGENVAL
               StringAppendS("eigenvalues,");
