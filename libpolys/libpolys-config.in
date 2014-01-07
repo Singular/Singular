@@ -30,6 +30,8 @@
 #libdir=${exec_prefix}/lib
 
 prefix=@prefix@ 
+exec_prefix=@exec_prefix@
+
 includedir=@includedir@
 libdir=@libdir@
 
