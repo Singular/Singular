@@ -7,7 +7,7 @@
 #ifndef OM_GET_BACKTRACE_H
 #define OM_GET_BACKTRACE_H
 
-#if defined(OM_GET_BACKTRACE_WORKS) && !defined(OM_NDEBUG)
+#if defined(OM_GET_BACKTRACE_WORKS) && !defined(OM_NDEBUG) && !defined(__OPTIMIZE__)
 void omInitGetBackTrace();
 int omGetBackTrace(void** bt, int start, int max);
 #else
