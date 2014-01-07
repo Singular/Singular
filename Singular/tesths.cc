@@ -52,7 +52,7 @@
 
 extern int siInit(char *);
 
-int initializeGMP(){ return 1; }
+// int initializeGMP(){ return 1; }
 
 int mmInit( void )
 {

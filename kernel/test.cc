@@ -51,7 +51,7 @@
 
 
 // The following are needed due to FACTORY (e.g. initCanonicalForm)
-int initializeGMP(){ return 1; }
+// int initializeGMP(){ return 1; }
 int mmInit(void) {return 1; }
 
 // // TODO: DUE to the use of HALT in npolygon.cc :(((
