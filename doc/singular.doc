@@ -369,6 +369,7 @@ LIB "all.lib";
 * algebra_lib:: procedures for computing with algebras and maps
 * assprimeszerodim_lib:: associated primes of a zero-dimensional ideal
 * cisimplicial_lib:: is the toric ideal of a simplicial toric variety a complete intersection?
+* ehv_lib:: alternative primary decomposition of ideals
 * elim_lib:: procedures for elimination, saturation and blowing up
 * grwalk_lib:: Groebner walk and Fraktal walk
 * homolog_lib:: procedures for homological algebra
@@ -405,11 +406,15 @@ LIB "all.lib";
 @subsection assprimeszerodim_lib
 @c lib assprimeszerodim.lib
 @c ---------------------------------------------------------
-@node cisimplicial_lib, elim_lib, assprimeszerodim_lib, Commutative algebra
+@node cisimplicial_lib, ehv_lib, assprimeszerodim_lib, Commutative algebra
 @subsection cisimplicial_lib
 @c lib cisimplicial.lib
 @c ----------------------------------------------------------
-@node elim_lib, grwalk_lib, cisimplicial_lib, Commutative algebra
+@node ehv_lib, elim_lib, assprimeszerodim_lib, Commutative algebra
+@subsection ehv_lib
+@c lib ehv.lib
+@c ----------------------------------------------------------
+@node elim_lib, grwalk_lib, cehv_lib, Commutative algebra
 @subsection elim_lib
 @c lib elim.lib
 @c ----------------------------------------------------------
