@@ -31,6 +31,10 @@
 #include "facHensel.h"
 #include "facMul.h"
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
+
 TIMING_DEFINE_PRINT(fac_log_deriv_div)
 TIMING_DEFINE_PRINT(fac_log_deriv_mul)
 TIMING_DEFINE_PRINT(fac_log_deriv_pre)
@@ -674,6 +678,67 @@ getCoeffs (const CanonicalForm& G, const int k, const int l, const int degMipo,
   NTLF.rep= M*NTLF.rep;
   NTLF.normalize();
   F= convertNTLzzpX2CF (NTLF, y);
+
+  if (degree (F, 2) < k)
+    return CFArray();
+
+  CFArray result= CFArray (degree (F) - k + 1);
+
+  CFIterator j= F;
+  for (int i= degree (F); i >= k; i--)
+  {
+    if (j.exp() == i)
+    {
+      result [i - k]= j.coeff();
+      j++;
+      if (!j.hasTerms())
+        return result;
+    }
+    else
+      result[i - k]= 0;
+  }
+  return result;
+}
+#endif
+
+#ifdef HAVE_FLINT
+CFArray
+getCoeffs (const CanonicalForm& G, const int k, const int l, const int degMipo,
+           const Variable& alpha, const CanonicalForm& evaluation,
+           const nmod_mat_t M)
+{
+  ASSERT (G.isUnivariate() || G.inCoeffDomain(), "univariate input expected");
+  CanonicalForm F= G (G.mvar() - evaluation, G.mvar());
+  if (F.isZero())
+    return CFArray ();
+
+  Variable y= Variable (2);
+  F= F (power (y, degMipo), y);
+  F= F (y, alpha);
+
+  nmod_poly_t FLINTF;
+  nmod_mat_t MFLINTF, mulResult;
+  nmod_mat_init (MFLINTF, l*degMipo, 1, getCharacteristic());
+  nmod_mat_init (mulResult, l*degMipo, 1, getCharacteristic());
+
+  convertFacCF2nmod_poly_t (FLINTF, F);
+
+  slong i;
+
+  for (i= 0; i < FLINTF->length; i++)
+    nmod_mat_entry (MFLINTF, i, 0)= FLINTF->coeffs[i];
+
+  for (; i < MFLINTF->r; i++)
+    nmod_mat_entry (MFLINTF, i, 0)= UWORD(0);
+
+  nmod_mat_mul (mulResult, M, MFLINTF);
+
+  F= 0;
+  for (i= 0; i < mulResult->r; i++)
+    F += CanonicalForm ((long) nmod_mat_entry (mulResult, i, 0))*power (y, i);
+
+  nmod_mat_clear (MFLINTF);
+  nmod_mat_clear (mulResult);
 
   if (degree (F, 2) < k)
     return CFArray();

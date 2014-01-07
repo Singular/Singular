@@ -22,6 +22,10 @@
 #include "NTLconvert.h"
 #endif
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
+
 /// append @a factors2 on @a factors1
 void append (CFList& factors1,       ///< [in,out] a list of polys
              const CFList& factors2  ///< [in] a list of polys
@@ -265,6 +269,24 @@ getCoeffs (const CanonicalForm& F,         ///< [in] compressed bivariate poly
            const Variable& alpha,          ///< [in] algebraic variable
            const CanonicalForm& evaluation,///< [in] evaluation point
            const mat_zz_p& M               ///< [in] bases change matrix
+          );
+#endif
+
+#ifdef HAVE_FLINT
+/// extract coefficients of \f$ x^i \f$ for \f$i\geq k\f$ where \f$ x \f$ is
+/// a variable of level 1
+///
+/// @return coefficients of \f$ x^i \f$ for \f$i\geq k\f$
+/// @sa {getCoeffs (const CanonicalForm&, const int, const Variable& alpha),
+/// getCoeffs (const CanonicalForm&, const int)}
+CFArray
+getCoeffs (const CanonicalForm& F,         ///< [in] compressed bivariate poly
+           const int k,                    ///< [in] some int
+           const int l,                    ///< [in] precision
+           const int degMipo,              ///< [in] degree of minimal poly
+           const Variable& alpha,          ///< [in] algebraic variable
+           const CanonicalForm& evaluation,///< [in] evaluation point
+           const nmod_mat_t M              ///< [in] bases change matrix
           );
 #endif
 
