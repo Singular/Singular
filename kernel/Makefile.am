@@ -1,8 +1,6 @@
 ACLOCAL_AMFLAGS = -I ../m4
 # TODO: use ${top_srcdir} instead of .. in the above?
 
-
-
 libkernel_LTLIBRARIES = libkernel.la 
 libkerneldir = $(libdir)/singular
 
@@ -31,6 +29,7 @@ SOURCES = polys.cc febase.cc feread.cc \
 
 libkernel_la_SOURCES   = $(SOURCES)
 
+
 KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	structs.h \
 	syz.h \
@@ -53,13 +52,12 @@ libkernel_includedir  =${includedir}/singular/kernel
 libkernel_include_HEADERS   = $(KERNELHEADERS)
 
 if ENABLE_FACTORY
-  USE_FACTORY = -L${top_builddir}/factory
+  USE_FACTORY = ${top_builddir}/factory/libfactory.la
 else
   USE_FACTORY =
 endif
 
-AM_LDFLAGS = -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter  -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
-
+libkernel_la_LIBADD   =  ${top_builddir}/libpolys/polys/libpolys.la $(USE_FACTORY) 
 
 ### TODO: the following has to be addapted...
 TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables'
@@ -70,9 +68,7 @@ TESTS = test
 check_PROGRAMS = $(TESTS)
 
 test_SOURCES = test.cc
-test_LDADD = -lkernel -lpolys -lcoeffs -lreporter -lmisc \
-$(FACTORY_LIBS) -lomalloc -lresources $(NTL_LIBS) $(GMP_LIBS) \
-${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+test_LDADD = libkernel.la ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 
 
 # These files are built first

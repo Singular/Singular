@@ -36,6 +36,8 @@ LT_INIT
 # Checks for libraries.
 LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
+## LB_CHECK_FLINT(2.3,,AC_MSG_WARN([Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
+
 
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
@@ -98,6 +100,18 @@ AC_DEFINE([NOSTREAMIO],[1],[DISABLE_GMP_CPP])
 
 AX_PYTHON_DEFAULT()
 AX_PYTHON_WITH_VERSION([2.4])
+
+AC_DEFINE_UNQUOTED([FACTORY_CFLAGS],"$FACTORY_CFLAGS",[FACTORY_CFLAGS])
+AC_DEFINE_UNQUOTED([FACTORY_LIBS],"$FACTORY_LIBS",[FACTORY_LIBS])
+
+AC_DEFINE_UNQUOTED([NTL_CFLAGS],"$NTL_CFLAGS",[NTL_CFLAGS])
+AC_DEFINE_UNQUOTED([NTL_LIBS],"$NTL_LIBS",[NTL_LIBS])
+
+AC_DEFINE_UNQUOTED([GMP_CFLAGS],"$GMP_CFLAGS",[GMP_CFLAGS])
+AC_DEFINE_UNQUOTED([GMP_LIBS],"$GMP_LIBS",[GMP_LIBS])
+
+# AC_DEFINE_UNQUOTED([FLINT_CFLAGS],"$FLINT_CFLAGS",[FLINT_CFLAGS])
+# AC_DEFINE_UNQUOTED([FLINT_LIBS],"$FLINT_LIBS",[FLINT_LIBS])
 
 ## AC_DEFINE([HAVE_POLYEXTENSIONS], [1], [Enable the algebraic & transcendental extensions])
 

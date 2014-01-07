@@ -5,9 +5,7 @@ SOURCES = mod_main.cc DebugPrint.cc DebugPrint.h myNF.cc myNF.h singularxx_defs.
 MYINCLUDES =  -I${top_srcdir} -I${top_builddir} -I${srcdir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
 -I${top_srcdir}/factory/include -I${top_builddir}/factory/include \
-$(FACTORY_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) 
-
-AM_LDFLAGS = ${GOOGLE_PERFTOOL_LDFLAGS} 
+$(FACTORY_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) $(GOOGLE_PERFTOOLS_CFLAGS)
 
 module_LTLIBRARIES=syzextra.la 
 
@@ -24,7 +22,7 @@ P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version -flat_namespace 
 
 syzextra_la_SOURCES   = $(SOURCES)
 syzextra_la_CPPFLAGS  = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
-syzextra_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS}
+syzextra_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} ${GOOGLE_PERFTOOL_LDFLAGS} 
 
 # AM_COLOR_TESTS=always
 #
@@ -33,9 +31,5 @@ syzextra_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS}
 # TESTS_ENVIRONMENT += SINGULAR_BIN_DIR='${abs_top_builddir}/Singular'
 #
 # TESTS=test_release.sh
-#
-# # if WANT_DEBUG
-# # TESTS+=test_debug.sh
-# # endif
 #
 # EXTRA_DIST = syzextra.tst ederc.tst test_clear_enum.tst test.sh $(TESTS)

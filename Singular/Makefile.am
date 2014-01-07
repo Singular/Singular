@@ -4,19 +4,13 @@ GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DHAVE_CONFIG_H  -DGIT_VERSION='"$(GIT_VERSION)"'
 
-if ENABLE_FACTORY
-  USE_FACTORY = -L${top_builddir}/factory
-else
-  USE_FACTORY =
-endif
-
 if HAVE_GFANLIB
   USE_GFANLIB = ${top_builddir}/dyn_modules/callgfanlib/gfanlib.la ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
 else
   USE_GFANLIB = 
 endif
 
-AM_LDFLAGS = -L${top_builddir}/Singular -L${top_builddir}/numeric -L${top_builddir}/kernel -L${top_builddir}/libpolys/polys  -L${top_builddir}/libpolys/coeffs -L${top_builddir}/libpolys/reporter -L${top_builddir}/libpolys/misc $(USE_FACTORY) -L${top_builddir}/omalloc -L${top_builddir}/resources
+# AM_LDFLAGS = libSingular.la ${top_builddir}/numeric/libnumeric.la ${top_builddir}/kernel/libkernel.la
 
 ########################### Dynamic Modules... #########################
 if ENABLE_P_PROCS_DYNAMIC
@@ -38,7 +32,7 @@ pyobject_la_LDFLAGS = $(PYTHON_EXTRA_LIBS)  $(PYTHON_LSPEC) ${AM_LDFLAGS} $(PYTH
 
 ##########################################################################
 if PYTHON_USE
-  PY=pyobject.la  $(PYTHON_EXTRA_LIBS)  $(PYTHON_LSPEC) ${AM_LDFLAGS} $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) 
+  PY=pyobject.la  $(PYTHON_EXTRA_LIBS)  $(PYTHON_LSPEC) libSingular.la ${top_builddir}/numeric/libnumeric.la ${top_builddir}/kernel/libkernel.la $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) 
 else !PYTHON_USE
   PY=
 endif !PYTHON_USE
@@ -178,16 +172,10 @@ SingularHEADERS =    Cache.h \
 # plural_cmd.inc
 nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc 
 
-libSingular_la_LDFLAGS    = ${AM_LDFLAGS} ${EMBED_PYOBJECT} \
--lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc \
-$(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+libSingular_la_LDFLAGS    = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 
-libSingular_la_LIBADD      = ${EMBED_PYOBJECT} \
--lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc \
-$(FACTORY_LIBS) -lomalloc -lresources $(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS) ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-
-# ${top_builddir}/numeric/libnumeric.la ${top_builddir}/kernel/libkernel.la ${top_builddir}/libpolys/polys/libpolys.la 
-
+libSingular_la_LIBADD      = ${EMBED_PYOBJECT} ${top_builddir}/numeric/libnumeric.la ${top_builddir}/kernel/libkernel.la \
+${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 
 
 libSingular_includedir = ${includedir}/singular/Singular
@@ -212,7 +200,7 @@ feOptTS_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR
 
 ########################### Singular* #########################
 
-EXTRA_PROGRAMS =  libparse Singulard
+EXTRA_PROGRAMS =  libparse Singulars
 
 # the "optional_programs" variable should be defined in the configure
 # script, and listed in an AC_SUBST macro
@@ -222,35 +210,35 @@ bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 
 Singular ESingular TSingular $(optional_Singular_programs): ${abs_builddir}/LIB
 
-nodist_Singular_SOURCES = libSingular.la
-
 Singular_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 Singular_LDADD = libSingular.la ${EMBED_PYOBJECT}
 
-Singular_LDFLAGS = ${AM_LDFLAGS} ${EMBED_PYOBJECT}
+# Singular_LDFLAGS = ${EMBED_PYOBJECT}
 
-Singulard_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
-nodist_Singulard_SOURCES = libSingular.la
+Singulars_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 #  ${EMBED_PYOBJECT_LDFLAGS}  ${EMBED_PYOBJECT_LDFLAGS}
-Singulard_LDADD = libSingular.la ${EMBED_PYOBJECT}
+Singulars_LDADD = libSingular.la ${EMBED_PYOBJECT}
 
-Singulard_LDFLAGS = ${AM_LDFLAGS} ${EMBED_PYOBJECT}
+# Singulars_LDFLAGS = -static ${AM_LDFLAGS} ${EMBED_PYOBJECT}
 
 dist_bin_SCRIPTS = singularsurf
 
 #### ESingular
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO
 # ESingular_LDFLAGS = -static ${AM_LDFLAGS}
-ESingular_LDADD =   -lreporter -lmisc -lomalloc -lresources
+ESingular_LDADD =  ${top_builddir}/libpolys/reporter/libreporter.la \
+${top_builddir}/libpolys/misc/libmisc.la 
+
 
 ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
 
 #### same for TSingular
 TSingular_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR -DPROTO
 # TSingular_LDFLAGS = -static ${AM_LDFLAGS}
-TSingular_LDADD =   -lreporter -lmisc -lomalloc -lresources
+TSingular_LDADD =   ${top_builddir}/libpolys/reporter/libreporter.la \
+${top_builddir}/libpolys/misc/libmisc.la 
 
 TSingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptTS.inc feOpt.cc
 # utils.cc utils.h
@@ -261,8 +249,7 @@ libparse_CPPFLAGS = ${AM_CPPFLAGS} -DSTANDALONE_PARSER
 
 libparse_SOURCES = libparse.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
-# # libSingular.la -lnumeric
-libparse_LDADD = -lomalloc
+libparse_LDADD = ${top_builddir}/omalloc/libomalloc.la
 # libparse_LDFLAGS = -static ${AM_LDFLAGS}
 # TODO for libparse: DONE by Hans???
 # multiple definition of `category_out': libparse.cc v.s. utils.cc

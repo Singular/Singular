@@ -7,7 +7,10 @@ AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include $(FLINT_CFLAGS) ${GMP_CF
 
 lib_LTLIBRARIES = libfactory.la
 
-libfactory_la_LIBADD     = ${builddir}/libfac/libfac.la $(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
+libfactory_la_LIBADD     = ${builddir}/libfac/libfac.la \
+${builddir}/../omalloc/libomalloc.la ${builddir}/../resources/libresources.la \
+$(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
+
 ### libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 # factory source files
@@ -223,7 +226,7 @@ gftables/9 gftables/9409 gftables/961
 
 EXTRA_PROGRAMS = gengftables 
 gengftables_SOURCES = gengftables-conway.cc
-gengftables_LDADD = -L${builddir} -lfactory $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
+gengftables_LDADD = libfactory.la $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
 
 
 ####################################################
