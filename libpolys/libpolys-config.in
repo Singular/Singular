@@ -92,6 +92,10 @@ while test $# -gt 0; do
 	${ECHOn} " -I${includedir} -I${includedir}/singular @FACTORY_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@ -DSING_NDEBUG -DOM_NDEBUG"
 	;;
 
+    --cflagswithdebug)
+	${ECHOn} " -I${includedir} -I${includedir}/singular @FACTORY_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@
+	;;
+
     --libs)
 	${ECHOn} " -L${libdir} -L${libdir}/singular -lpolys -lcoeffs -lreporter -lmisc @FACTORY_LIBS@ -lomalloc -lresources @NTL_LIBS@ @USEPPROCSDYNAMICLD@ @GMP_LIBS@" 
 	;;
