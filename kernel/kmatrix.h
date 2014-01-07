@@ -122,7 +122,7 @@ template<class K>
     {
         a = new K[k];
 
-        #ifndef NDEBUG
+        #ifndef SING_NDEBUG
         if( a == (K*)NULL )
         {
             #ifdef KMATRIX_PRINT

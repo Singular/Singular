@@ -35,7 +35,7 @@ namespace gitfan
     interiorPoint(f.interiorPoint),
     facetNormal(f.facetNormal)
   {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     gfan::ZCone c = f.eta;
     gfan::ZVector v = f.interiorPoint;
     gfan::ZVector w = f.facetNormal;
@@ -51,7 +51,7 @@ namespace gitfan
     interiorPoint(v),
     facetNormal(w)
   {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     assume(c.ambientDimension() == (int)v.size());
     assume(c.ambientDimension() == (int)w.size());
     assume(c.contains(v));
@@ -61,7 +61,7 @@ namespace gitfan
 
   facet::~facet()
   {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     gfan::ZCone c = this->eta;
     gfan::ZVector v = this->interiorPoint;
     gfan::ZVector w = this->facetNormal;

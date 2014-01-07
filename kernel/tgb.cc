@@ -2517,7 +2517,7 @@ poly noro_red_non_unique (poly p, int &len, NoroCache * cache, slimgb_alg * c)
     poly t = p;
     pIter (p);
     pNext (t) = NULL;
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     number coef_debug = p_GetCoeff (t, currRing);
 #endif
     MonRedRes red = noro_red_mon (t, FALSE, cache, c);
@@ -4486,7 +4486,7 @@ canonicalize_region (red_object * los, int l, int u, slimgb_alg * /*c*/)
   }
 }
 
-#ifdef NDEBUG
+#ifdef SING_NDEBUG
 static void
 multi_reduction_find (red_object * los, int /*losl*/, slimgb_alg * c, int startf,
                       find_erg & erg)

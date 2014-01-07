@@ -2795,7 +2795,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 #endif
 
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
   id_Test((ideal)CCC, curr);
   id_Test((ideal)DDD, curr);
   p_Test(CCN, curr);
@@ -2895,7 +2895,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
       for(j=i+1; j<=r->N; j++)
         MATELEM(C,i,j) = prCopyR_NoSort(CN, curr, r); // nc_p_CopyPut(CN, r); // copy CN from curr into r
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     id_Test((ideal)C, r);
 #endif
 
@@ -2936,7 +2936,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
     if( bCopyInput )
     {
       C = mp_Copy(CC, curr, r); // Copy C into r!!!???
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       id_Test((ideal)C, r);
 #endif
       bCnew = true;
@@ -2968,7 +2968,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
       for(i=1; i<r->N; i++)
         for(j=i+1; j<=r->N; j++)
           MATELEM(D,i,j) = prCopyR_NoSort(DN, curr, r); // project DN into r->GetNC()->basering!
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
   id_Test((ideal)D, r);
 #endif
   }
@@ -2995,7 +2995,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
     if( bCopyInput )
     {
       D = mp_Copy(DD, curr, r); // Copy DD into r!!!
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       id_Test((ideal)D, r);
 #endif
       bDnew = true;
@@ -3046,7 +3046,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
   // Setup new NC structure!!!
   if (r->GetNC() != NULL)
   {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     WarnS("Changing the NC-structure of an existing NC-ring!!!");
 #endif    
     nc_rKill(r);

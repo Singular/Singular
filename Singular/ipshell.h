@@ -209,7 +209,7 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
                BOOLEAN(*func)(leftv res, leftv v));
 
 void iiCheckPack(package &p);
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 void checkall();
 #endif
 

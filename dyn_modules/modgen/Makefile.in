@@ -45,7 +45,7 @@ MODGEN		= $(bindir)/modgen
 ## compiler and linker options
 ##
 CFLAGS	+= -fno-rtti -fno-exceptions -O3 -w -fomit-frame-pointer -pipe -fno-implicit-templates \
-	-g -I${includedir} -I../include -I${topsrcdir}/.. -DNDEBUG -DMODULE_GENERATOR \
+	-g -I${includedir} -I../include -I${topsrcdir}/.. -DSING_NDEBUG -DMODULE_GENERATOR \
 	-D${SING_UNAME}
 LIBS	+= -L/usr/local/lib
 

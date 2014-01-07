@@ -22,7 +22,7 @@ libreporterdir = $(libdir)/singular
 # libreporter_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # # -fdiagnostics-show-option 
 
-# libreporter_la_CPPFLAGS   = ${AM_CPPFLAGS} -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
+# libreporter_la_CPPFLAGS   = ${AM_CPPFLAGS} -DSING_NDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
 # libreporter_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 # libreporter_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 

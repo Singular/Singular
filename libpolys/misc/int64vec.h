@@ -30,7 +30,7 @@ public:
   int64vec(intvec* iv);
   int64& operator[](int i)
     {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       if((i<0)||(i>=row*col))
       {
         Werror("wrong int64vec index:%d\n",i);
@@ -40,7 +40,7 @@ public:
     }
   inline const int64& operator[](int i) const
     {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       if((i<0)||(i>=row*col))
       {
         Werror("wrong int64vec index:%d\n",i);

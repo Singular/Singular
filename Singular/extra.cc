@@ -448,7 +448,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           #ifdef OM_NDEBUG
             TEST_FOR("om_ndebug")
           #endif
-          #ifdef NDEBUG
+          #ifdef SING_NDEBUG
             TEST_FOR("ndebug")
           #endif
             {};
@@ -3077,7 +3077,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else
   #endif
   /*==================== facstd_debug ==================================*/
-  #if !defined(NDEBUG)
+  #if !defined(SING_NDEBUG)
       if(strcmp(sys_cmd,"facstd")==0)
       {
         extern int strat_nr;

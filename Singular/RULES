@@ -41,7 +41,7 @@ Error messages:
   report errors via Werror/WerrorS, warnings via Warn/WarnS
 - trust other parts of Singular:
   - only very fast tests
-  - have a complete test of the input in debug mode (#ifndef NDEBUG)
+  - have a complete test of the input in debug mode (#ifndef SING_NDEBUG)
 - report internal errors via dReportError
 
 Indentiation:

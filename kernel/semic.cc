@@ -62,7 +62,7 @@ void spectrum::copy_new( int k )
         s = new Rational[k];
         w = new int[k];
 
-        #ifndef NDEBUG
+        #ifndef SING_NDEBUG
         if( s == (Rational*)NULL || w == (int*)NULL )
         {
             #ifdef SEMIC_PRINT

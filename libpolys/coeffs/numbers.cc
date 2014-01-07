@@ -453,7 +453,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 #endif
     assume(n->type==t);
      
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     if(n->cfKillChar==NULL) Warn("cfKillChar is NULL for coeff %d",t);
     if(n->cfWriteLong==NULL) Warn("cfWrite is NULL for coeff %d",t);
     if(n->cfWriteShort==NULL) Warn("cfWriteShort is NULL for coeff %d",t);

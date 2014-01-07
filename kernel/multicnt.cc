@@ -35,7 +35,7 @@ void    multiCnt::copy_new( int n )
     {
         cnt = new int[n];
 
-        #ifndef NDEBUG
+        #ifndef SING_NDEBUG
         if( cnt == (int*)NULL )
         {
             #ifdef MULTICNT_PRINT

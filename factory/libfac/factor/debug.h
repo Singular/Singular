@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef NDEBUG
+#ifdef SING_NDEBUG
 #define ASSERT(ignore1,ignore2)do {} while (0)
 #else
 #define ASSERT(expression,message) \

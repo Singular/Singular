@@ -194,15 +194,15 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
 
 /*******************************************************************
  * DEBUG OPTIONS
- * -- only significant for for compiling without -DNDEBUG
+ * -- only significant for for compiling without -DSING_NDEBUG
  * -- you better know what your are doing, if you touch this
  ******************************************************************/
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 
 /* undefine to enable inline */
 #define NO_INLINE
 
-/* undefine to disable assume -- should normally be defined for NDEBUG */
+/* undefine to disable assume -- should normally be defined for SING_NDEBUG */
 #define HAVE_ASSUME
 
 /* undef PDEBUG to disable checks of polys
@@ -369,14 +369,14 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
 #define YYDEBUG 1
 
 #endif 
-/* end of debugging option (ifndef NDEBUG) */
+/* end of debugging option (ifndef SING_NDEBUG) */
 
 
 
 #ifdef _DEBUG
 #      define FORCE_INLINE inline
 #else
-#ifdef NDEBUG
+#ifdef SING_NDEBUG
 #if   defined(_MSC_VER)
 #      define FORCE_INLINE __forceinline
 #elif defined(__GNUC__) && __GNUC__ > 3
@@ -387,7 +387,7 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
 #else
 #      define FORCE_INLINE inline
 #endif
-/* NDEBUG */
+/* SING_NDEBUG */
 #endif
 /* _DEBUG */
 

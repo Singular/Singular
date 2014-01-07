@@ -319,7 +319,7 @@ void fePrintOptValues()
   while (feOptSpec[i].name != 0)
   {
     if (feOptSpec[i].help != NULL && feOptSpec[i].type != feOptUntyped
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
         && *(feOptSpec[i].help) != '/'
 #endif
         )
@@ -361,7 +361,7 @@ void feOptHelp(const char* name)
   while (feOptSpec[i].name != 0)
   {
     if (feOptSpec[i].help != NULL
-#ifdef NDEBUG
+#ifdef SING_NDEBUG
         && *(feOptSpec[i].help) != '/'
 #endif
         )

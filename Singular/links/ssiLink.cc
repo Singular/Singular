@@ -1306,7 +1306,7 @@ leftv ssiRead1(si_link l)
                   Print("incompatible versions of ssi: %d/%d vs %d/%d",
                                   SSI_VERSION,MAX_TOK,n98_v,n98_m);
                 }
-                #ifndef NDEBUG
+                #ifndef SING_NDEBUG
                 if (TEST_OPT_DEBUG)
                   Print("// opening ssi-%d, MAX_TOK=%d\n",n98_v,n98_m);
                 #endif

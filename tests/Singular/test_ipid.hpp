@@ -1,7 +1,7 @@
 #ifndef _test_ipid_hpp_
 #define _test_ipid_hpp_
 
-#define NDEBUG
+#define SING_NDEBUG
 
 
 #include <Singular/utils.h>

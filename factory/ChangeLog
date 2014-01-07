@@ -1519,7 +1519,7 @@ Thu Jun  5 15:03:48 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	* configure.in: checks on sizeof(int) == sizeof(void *) == 4
 	  removed
 
-	* debug.h: dependency on #define NDEBUG removed
+	* debug.h: dependency on #define SING_NDEBUG removed
 
 	* factoryconf.template: doc fix
 
@@ -1607,9 +1607,9 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 	"TIMING macros" we mean one (or more) of the macros defined in
 	debug.h, cf_assert.h, and timing.h, resp.
 
-	* cf_assert.h (NOASSERT, NDEBUG): #define NDEBUG to switch off
+	* cf_assert.h (NOASSERT, SING_NDEBUG): #define SING_NDEBUG to switch off
 	  assertions replaced by #define NOASSERT.  For sake of backward
-	  compatibility NDEBUG works, too.
+	  compatibility SING_NDEBUG works, too.
 
 	* cf_assert.h (DEBINCLEVEL, DEBDECLEVEL, DEBOUTSL, DEBOUT, DEBOUTLN):
 	  DEBOUT macros moved to debug.h
@@ -1664,7 +1664,7 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 	* fac_univar.cc: debug output rewritten
 	  (hprint): calls to hprint() wrapped by calls to #define
  	  DEBOUTHPRINT, which definition depends on #define DEBUGOUTPUT
-	  (instead of NDEBUG, as before).  All callers changed.
+	  (instead of SING_NDEBUG, as before).  All callers changed.
 
 	* cf_linsys.cc: superfluous #define TIMING removed
 	* fac_distrib.cc: superfluous #undef DEBUGOUTPUT removed
@@ -1696,7 +1696,7 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
  	  callers changed.
 
 	* debug.h (DEBUGOUTPUT): #define DEBUGOUTPUT is switched off now
-	  if #define NDEBUG is switched on
+	  if #define SING_NDEBUG is switched on
 
 	* fac_univar.cc (ZFactorizeUnivariate): timing stuff changed to
 	  calls of TIMING macros

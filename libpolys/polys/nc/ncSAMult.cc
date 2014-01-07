@@ -25,7 +25,7 @@
 #ifdef HAVE_PLURAL
 
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 #define OUTPUT MYTEST
 #else
 #define OUTPUT 0

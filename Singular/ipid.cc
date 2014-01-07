@@ -319,7 +319,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
     }
   }
   *root = (*root)->set(s, lev, t, init);
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
   checkall();
 #endif
   return *root;

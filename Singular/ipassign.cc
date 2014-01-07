@@ -187,7 +187,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
 {
   if( !nCoeff_is_transExt(currRing->cf) && (currRing->idroot == NULL) && n_IsZero((number)a->Data(), currRing->cf) )
   {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     WarnS("Set minpoly over non-transcendental ground field to 0?!");
     Warn("in >>%s<<",my_yylinebuf);
 #endif
@@ -198,7 +198,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   if ( !nCoeff_is_transExt(currRing->cf) )
   {
 //    return TRUE;
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     WarnS("Trying to set minpoly over non-transcendental ground field...");
 #endif
   }
@@ -206,7 +206,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   if ( currRing->idroot != NULL )
   {
 //    return TRUE;
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     idhdl p = currRing->idroot;
 
     WarnS("no minpoly allowed if there are local objects belonging to the basering: ");
@@ -230,7 +230,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
 
     if( nCoeff_is_transExt(currRing->cf) )
     {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       WarnS("minpoly is already 0...");
 #endif
       return FALSE;
@@ -244,7 +244,7 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
   // remove all object currently in the ring
   while(currRing->idroot!=NULL)
   {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     Warn("killing a local object due to minpoly change: %s", IDID(currRing->idroot));
 #endif
     killhdl2(currRing->idroot,&(currRing->idroot),currRing);

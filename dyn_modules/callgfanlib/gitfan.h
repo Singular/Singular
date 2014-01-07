@@ -36,7 +36,7 @@ namespace gitfan
     {
       const gfan::ZVector v1 = f.interiorPoint;
       const gfan::ZVector v2 = g.interiorPoint;
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       assume(v1.size() == v2.size());
 #endif
       return v1 < v2;

@@ -26,7 +26,7 @@
 
 #define PLURAL_INTERNAL_DECLARATIONS
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 #define OUTPUT MYTEST
 #else
 #define OUTPUT 0

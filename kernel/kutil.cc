@@ -15,11 +15,11 @@
 #endif /* HAVE_CONFIG_H */
 #include "mod2.h"
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 # define MYTEST 0
-#else /* ifndef NDEBUG */
+#else /* ifndef SING_NDEBUG */
 # define MYTEST 0
-#endif /* ifndef NDEBUG */
+#endif /* ifndef SING_NDEBUG */
 
 
 #include <misc/mylimits.h>
@@ -8331,7 +8331,7 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
     {
       if ( nc_rComplete(r, res, false) ) // no qideal!
       {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
         WarnS("error in nc_rComplete");
 #endif
         // cleanup?
@@ -8386,7 +8386,7 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
     {
       if ( nc_rComplete(r, res, false) ) // no qideal!
       {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
         WarnS("error in nc_rComplete");
 #endif
         // cleanup?
@@ -8515,7 +8515,7 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
 skStrategy::skStrategy()
 {
   memset(this, 0, sizeof(skStrategy));
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
   strat_nr++;
   nr=strat_nr;
   if (strat_fac_debug) Print("s(%d) created\n",nr);
@@ -8824,7 +8824,7 @@ void kDebugPrint(kStrategy strat)
        assume( TEST_OPT_WEIGHTM );
     }
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     rDebugPrint(currRing);
 #endif
 }

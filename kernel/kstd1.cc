@@ -13,11 +13,11 @@
 // define if buckets should be used
 #define MORA_USE_BUCKETS
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 # define MYTEST 0
-#else /* ifndef NDEBUG */
+#else /* ifndef SING_NDEBUG */
 # define MYTEST 0
-#endif /* ifndef NDEBUG */
+#endif /* ifndef SING_NDEBUG */
 
 #define ADIDEBUG 0
 #define ADIDEBUG_NF 0

@@ -305,7 +305,7 @@ newline                  {
                            mmStat(-500);
                            #endif
                            #ifdef OM_TRACK
-			   #ifndef NDEBUG
+			   #ifndef SING_NDEBUG
                              omPrintUsedTrackAddrs(stdout, 10);
                            #endif
                            #endif

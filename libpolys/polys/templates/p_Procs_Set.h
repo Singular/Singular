@@ -181,7 +181,7 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
          r->OrdSgn == 1 || r->LexOrder);
 */
 #ifdef HAVE_PLURAL
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
   if (rIsPluralRing(r))
   {
     dReportError("Setting pProcs in p_ProcsSet (rDebugPrint!?)!!!");

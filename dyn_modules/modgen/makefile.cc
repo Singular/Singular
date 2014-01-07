@@ -90,7 +90,7 @@ void build_head_section(
   fprintf(fp, "SINGULARROOT\t= ../..\n");
   fprintf(fp, "SINGUNAME\t= %s\n",SINGUNAME);
 #warning "PROBLEM: nice place for include file has to be found"
-  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I${SINGULARROOT} -I${SINGULARROOT}/${SINGUNAME}/include\n");
+  fprintf(fp, "CFLAGS\t= -DSING_NDEBUG -DBUILD_MODULE -I. -I${SINGULARROOT} -I${SINGULARROOT}/${SINGUNAME}/include\n");
   fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I${SINGULARROOT} -I${SINGULARROOT}/${SINGUNAME}/include\n");
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");

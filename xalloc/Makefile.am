@@ -17,6 +17,6 @@ libomalloc_la_SOURCES  =$(SOURCES)
 
 ### libomalloc_la_LDFLAGS  = -release ${PACKAGE_VERSION}
 
-# libomalloc_la_CPPFLAGS  += ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+# libomalloc_la_CPPFLAGS  += ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DSING_NDEBUG -DOM_NDEBUG
 # libomalloc_la_CPPFLAGS = ${AM_CPPFLAGS}
 

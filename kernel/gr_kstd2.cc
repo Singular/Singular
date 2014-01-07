@@ -1314,7 +1314,7 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
 ideal gnc_gr_mora(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
 {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
   // Not yet!
   WarnS("Sorry, non-commutative mora is not yet implemented!");
 #endif

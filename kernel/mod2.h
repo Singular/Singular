@@ -156,15 +156,15 @@
 
 /*******************************************************************
  * DEBUG OPTIONS
- * -- only significant for for compiling without -DNDEBUG
+ * -- only significant for for compiling without -DSING_NDEBUG
  * -- you better know what your are doing, if you touch this
  ******************************************************************/
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 
 /* undefine to enable inline */
 #define NO_INLINE
 
-/* undefine to disable assume -- should normally be defined for NDEBUG */
+/* undefine to disable assume -- should normally be defined for SING_NDEBUG */
 #define HAVE_ASSUME
 
 /* undef PDEBUG to disable checks of polys
@@ -365,14 +365,14 @@
 #endif
 
 
-#else /* not NDEBUG **************************************************** */
+#else /* not SING_NDEBUG **************************************************** */
 
 #define NO_PDEBUG
 
 /* define YYDEBUG 1 for debugging bison texts, 0 otherwise */
 #define YYDEBUG 0
 
-#endif /* not NDEBUG */
+#endif /* not SING_NDEBUG */
 
 /*******************************************************************
  *

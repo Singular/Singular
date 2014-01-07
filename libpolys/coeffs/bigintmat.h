@@ -70,7 +70,7 @@ class bigintmat
 
     inline number& operator[](int i)
     {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       if((i<0)||(i>=row*col))
       {
         Werror("wrong bigintmat index:%d\n",i);
@@ -82,7 +82,7 @@ class bigintmat
     }
     inline const number& operator[](int i) const
     {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       if((i<0)||(i>=row*col))
       {
         Werror("wrong bigintmat index:%d\n",i);
@@ -156,7 +156,7 @@ class bigintmat
       {
         n_Delete(&(v[i]), basecoeffs()); v[i] = n;
       }
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       else
       {
         Werror("wrong bigintmat index:%d\n",i);

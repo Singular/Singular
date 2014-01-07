@@ -118,7 +118,7 @@ C/C++-Style guide for Singular
 
   - kernel routines have to document their requirements,
     the checks have to be done in the interpreter.
-    Repeat the checks only within #ifndef NDEBUG/#endif
+    Repeat the checks only within #ifndef SING_NDEBUG/#endif
     or via assert.
   - input should be checked to conform with the documentation via assume
     (if this is simple)

@@ -99,7 +99,7 @@ static unsigned long maGetMaxExp(ideal pi_id, ring pi_r, ideal map_id, ring map_
 **
 *F  debugging stuff
 */
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 void maMonomial_Out(mapoly monomial, ring src_r, ring dest_r)
 {
   p_wrp(monomial->src, src_r);

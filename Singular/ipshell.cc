@@ -5239,7 +5239,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   else
   {
     Werror("Wrong or unknown ground field specification");
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     sleftv* p = pn;
     while (p != NULL)
     {

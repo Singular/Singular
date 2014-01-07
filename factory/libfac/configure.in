@@ -76,7 +76,7 @@ if test "${CXXFLAGS+set}" != set; then
     CXXFLAGS="-g"
   else
     CXXFLAGS="-O"
-    AC_DEFINE(NDEBUG)
+    AC_DEFINE(SING_NDEBUG)
   fi
 fi
 

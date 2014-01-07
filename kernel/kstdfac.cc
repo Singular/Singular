@@ -26,7 +26,7 @@
 #include <kernel/timer.h>
 #include <kernel/kstdfac.h>
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 int strat_nr=0;
 int strat_fac_debug=0;
 #endif
@@ -276,7 +276,7 @@ BOOLEAN k_factorize(poly p,ideal &rfac, ideal &fac_copy)
         while(ii>0) { PrintS("F"); ii--; }
       }
     }
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     else if (strat_fac_debug)
     {
       pWrite(p);
@@ -400,7 +400,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
           PrintLn();
         }
       }
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       if(strat_fac_debug)
       {
         int ii;
@@ -431,7 +431,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
             poly r=kNF(n->Shdl,NULL,n->D->m[j],0,KSTD_NF_LAZY | KSTD_NF_NONORM);
             if (r==NULL)
             {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
               if(strat_fac_debug)
               {
                 Print("empty set s(%d) because: D[%d] -> 0\n",
@@ -483,7 +483,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
           if ((n->sl>=0)&&(n->S[0]!=NULL))
           {
             ideal r=kNF(n->Shdl,NULL,Lj->d,0,KSTD_NF_LAZY | KSTD_NF_NONORM);
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
               if(strat_fac_debug)
               {
                 Print("empty set s(%d) because:L[%d]\n",n->nr,Lj->nr);
@@ -718,7 +718,7 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
             PrintLn();
           }
         }
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
         if(strat_fac_debug)
         {
           int ii;
@@ -749,7 +749,7 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
               poly r=kNF(n->Shdl,NULL,n->D->m[j],0,KSTD_NF_LAZY | KSTD_NF_NONORM);
               if (r==NULL)
               {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
                 if(strat_fac_debug)
                 {
                   Print("empty set s(%d) because: D[%d] -> 0\n",
@@ -805,7 +805,7 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
               ideal r=kNF(n->Shdl,NULL,Lj->d,0,KSTD_NF_LAZY | KSTD_NF_NONORM);
               if (idIs0(r))
               {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
                 if(strat_fac_debug)
                 {
                   Print("empty set s(%d) because:L[%d]\n",n->nr,Lj->nr);
@@ -953,7 +953,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
     {
       ideal_list LL=(ideal_list)omAlloc(sizeof(*LL));
       LL->d=r;
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       LL->nr=strat->nr;
 #endif
       LL->next=L;
@@ -974,7 +974,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
         ideal r=kNF(Lj->d,NULL,Li->d,0,KSTD_NF_LAZY | KSTD_NF_NONORM);
         if (idIs0(r))
         {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
           if(strat_fac_debug)
           {
             Print("empty set L(%d) because:L(%d)\n",Lj->nr,Li->nr);

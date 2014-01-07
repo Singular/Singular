@@ -218,10 +218,10 @@ static inline number jjLONG2N(long d)
 
 static inline void view(const intvec* v)
 {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
   v->view();
 #else
-  // This code duplication is only due to Hannes's #ifndef NDEBUG!
+  // This code duplication is only due to Hannes's #ifndef SING_NDEBUG!
   Print ("intvec: {rows: %d, cols: %d, length: %d, Values: \n", v->rows(), v->cols(), v->length());
 
   for (int i = 0; i < v->rows(); i++)

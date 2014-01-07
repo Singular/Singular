@@ -17,11 +17,11 @@
 typedef double mprfloat;
 
 // --------------------------- debugging stuff ----------------------------
-#if !defined(NDEBUG)
+#if !defined(SING_NDEBUG)
 //#define mprDEBUG_ALL
 #endif
 
-#if !defined(NDEBUG) || defined(mprDEBUG_ALL)
+#if !defined(SING_NDEBUG) || defined(mprDEBUG_ALL)
 //#define mprDEBUG_PROT
 #endif
 

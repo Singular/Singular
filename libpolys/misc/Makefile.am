@@ -21,7 +21,7 @@ libmiscdir = $(libdir)/singular
 # libmisc_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # # -fdiagnostics-show-option 
  
-# libmisc_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+# libmisc_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DSING_NDEBUG -DOM_NDEBUG
 # libmisc_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 # libmisc_la_CPPFLAGS = ${AM_CPPFLAGS}
 
@@ -54,7 +54,7 @@ libintvec_la_SOURCES = intvec.cc
 # libintvec_la_CXXFLAGS = -O3 -fomit-frame-pointer ${PIPE} -fwrapv -fno-implicit-templates
 # libintvec_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} -fwrapv -fno-implicit-templates
 
-# libintvec_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+# libintvec_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DSING_NDEBUG -DOM_NDEBUG
 # libintvec_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 # libintvec_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 

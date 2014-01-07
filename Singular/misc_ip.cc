@@ -1005,7 +1005,7 @@ void listall(int showproc)
 }
 #endif
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 void checkall()
 {
       idhdl hh=basePack->idroot;

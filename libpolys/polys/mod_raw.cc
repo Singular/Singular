@@ -49,7 +49,7 @@
 static BOOLEAN warn_handle = FALSE;
 static BOOLEAN warn_proc = FALSE;
 #ifndef DL_TAIL
-#ifdef NDEBUG
+#ifdef SING_NDEBUG
 #define DL_TAIL ".so"
 #else
 #define DL_TAIL ".so"

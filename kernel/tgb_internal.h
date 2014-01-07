@@ -918,7 +918,7 @@ while(it!=end)
 #endif
 return res;
 }
-#ifdef NDEBUG
+#ifdef SING_NDEBUG
 template <class number_type> void add_coef_times_sparse(number_type* const temp_array,
 int /*temp_size*/,SparseRow<number_type>* row, number coef)
 #else
@@ -964,7 +964,7 @@ int temp_size,SparseRow<number_type>* row, number coef)
 
   }
 }
-#ifdef NDEBUG
+#ifdef SING_NDEBUG
 template <class number_type> void add_coef_times_dense(number_type* const temp_array,
 int /*temp_size*/,const number_type* row, int len,number coef)
 #else
@@ -1010,7 +1010,7 @@ int temp_size,const number_type* row, int len,number coef)
 
   }
 }
-#ifdef NDEBUG
+#ifdef SING_NDEBUG
 template <class number_type> void add_dense(number_type* const temp_array,
 int /*temp_size*/,const number_type* row, int len)
 #else
@@ -1034,7 +1034,7 @@ int temp_size,const number_type* row, int len)
   }
 
 }
-#ifdef NDEBUG
+#ifdef SING_NDEBUG
 template <class number_type> void sub_dense(number_type* const temp_array,
 int /*temp_size*/,const number_type* row, int len)
 #else
@@ -1060,7 +1060,7 @@ int temp_size,const number_type* row, int len)
 
 }
 
-#ifdef NDEBUG
+#ifdef SING_NDEBUG
 template <class number_type> void add_sparse(number_type* const temp_array,int /*temp_size*/,SparseRow<number_type>* row)
 #else
 template <class number_type> void add_sparse(number_type* const temp_array,int temp_size,SparseRow<number_type>* row)
@@ -1078,7 +1078,7 @@ template <class number_type> void add_sparse(number_type* const temp_array,int t
           assume(idx<temp_size);
         }
 }
-#ifdef NDEBUG
+#ifdef SING_NDEBUG
 template <class number_type> void sub_sparse(number_type* const temp_array,int /*temp_size*/,SparseRow<number_type>* row)
 #else
 template <class number_type> void sub_sparse(number_type* const temp_array,int temp_size,SparseRow<number_type>* row)

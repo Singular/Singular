@@ -1,7 +1,7 @@
 /* emacs edit mode for this file is -*- C -*- */
 
 /* This is for compatibility with standard cf_assert.h */
-#if defined (NDEBUG) && ! defined (NOASSERT)
+#if defined (SING_NDEBUG) && ! defined (NOASSERT)
 #define NOASSERT
 #endif
 

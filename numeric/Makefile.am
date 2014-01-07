@@ -21,7 +21,7 @@ libnumericdir = $(libdir)/singular
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys ${GMP_CFLAGS} -I${top_srcdir}/factory/include -I${top_builddir}/factory/include ${FACTORY_CFLAGS} ${NTL_CFLAGS}  -DHAVE_CONFIG_H
 
-# libnumeric_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+# libnumeric_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DSING_NDEBUG -DOM_NDEBUG
 # libnumeric_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
 # libnumeric_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
 

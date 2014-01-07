@@ -429,7 +429,7 @@ try_specializePoly(const CanonicalForm & f, const Variable & Extension, int deg,
     //    ok= specialize_agvariable( ff, deg, Substitutionlist, k, j, g );
     //    if ( ! ok ) return 0; // we failed
     //  }
-      #ifndef NDEBUG
+      #ifndef SING_NDEBUG
         //printf("libfac: try_specializePoly: extension level >0\n");
       #endif
       return 0; // we failed

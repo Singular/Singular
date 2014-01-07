@@ -1971,7 +1971,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
   // there is no 0<t<1 and define the next weight vector that is equal to the current weight vector
   if(mpz_cmp(t_nenner, t_null) == 0)
   {
-    #ifndef NDEBUG
+    #ifndef SING_NDEBUG
     Print("\n//MwalkNextWeightCC: t_nenner ist Null!");
     #endif
     delete diff_weight;

@@ -20,7 +20,7 @@ noinst_LTLIBRARIES=libfac.la
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${builddir} -I${srcdir}/.. -I${builddir}/.. -I${srcdir}/../include  -I${builddir}/../include -I${srcdir}/factor  -I${builddir}/factor -I${srcdir}/charset -I${builddir}/charset ${GMP_CFLAGS} ${NTL_CFLAGS}  -DHAVE_CONFIG_H
 
-# libfac_la_CPPFLAGS   = ${AM_CPPFLAGS} -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
+# libfac_la_CPPFLAGS   = ${AM_CPPFLAGS} -DSING_NDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
 # libfac_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
 
 # libfac_la_LDFLAGS    = -release ${PACKAGE_VERSION}

@@ -300,7 +300,7 @@ void    newtonPolygon::copy_new( int k )
   {
     l = new linearForm[k];
 
-    #ifndef NDEBUG
+    #ifndef SING_NDEBUG
       if( l == (linearForm*)NULL )
       {
         #ifdef  NPOLYGON_PRINT

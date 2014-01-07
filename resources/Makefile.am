@@ -24,7 +24,7 @@ AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -DHAVE_CONFIG_H
 
 # libresources_la_CPPFLAGS   += ${AM_CPPFLAGS}
 
-#libresources_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DNDEBUG -DOM_NDEBUG
+#libresources_la_CPPFLAGS   = ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DSING_NDEBUG -DOM_NDEBUG
 #libresources_g_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H 
 
 SOURCES  = omFindExec.c feResource.cc feFopen.cc

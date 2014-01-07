@@ -55,7 +55,7 @@ public:
     { return ((i<row) && (i>=0) && (j<col) && (j>=0)); }
   inline int& operator[](int i)
     {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       if((i<0)||(i>=row*col))
       {
         Werror("wrong intvec index:%d\n",i);
@@ -65,7 +65,7 @@ public:
     }
   inline const int& operator[](int i) const
     {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       if((i<0)||(i>=row*col))
       {
         Werror("wrong intvec index:%d\n",i);
@@ -87,7 +87,7 @@ public:
   inline int  rows() const { return row; }
   inline void length(int l) { row = l; col = 1; }
   void show(int mat=0,int spaces=0) const;
-  #ifndef NDEBUG
+  #ifndef SING_NDEBUG
   void view() const;
   #endif
 

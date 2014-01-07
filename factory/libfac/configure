@@ -601,7 +601,7 @@ if test "${CXXFLAGS+set}" != set; then
   else
     CXXFLAGS="-O"
     cat >> confdefs.h <<\EOF
-#define NDEBUG 1
+#define SING_NDEBUG 1
 EOF
 
   fi

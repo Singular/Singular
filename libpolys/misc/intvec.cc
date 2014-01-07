@@ -134,7 +134,7 @@ char * intvec::String(int dim) const
   return ivString(1, 0, dim);
 }
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 // debug only
 void intvec::view () const
 {

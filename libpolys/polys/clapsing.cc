@@ -524,7 +524,7 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb , const 
     WerrorS( feNotImplemented );
     return TRUE;
   }
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
   // checking the result of extgcd:
   poly dummy;
   dummy=p_Sub(p_Add_q(pp_Mult_qq(f,pa,r),pp_Mult_qq(g,pb,r),r),p_Copy(res,r),r);
@@ -958,13 +958,13 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
 #endif
       else if (r->cf->extRing!=NULL)     /* Q(a), Fp(a) */
       {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
         intvec *w=NULL;
         if (v!=NULL) w=*v;
 #endif
         if (r->cf->extRing->qideal==NULL)
         {
-#ifdef NDEBUG
+#ifdef SING_NDEBUG
           res->m[j]= convFactoryPSingTrP( J.getItem().factor(),r );
 #else
           if(!count_Factors(res,w,j,ff,convFactoryPSingTrP( J.getItem().factor(),r ),r))
@@ -977,7 +977,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
         }
         else
         {
-#ifdef NDEBUG
+#ifdef SING_NDEBUG
           res->m[j]= convFactoryAPSingAP( J.getItem().factor(),r );
 #else
           if (!count_Factors(res,w,j,ff,convFactoryAPSingAP( J.getItem().factor(),r ),r))
@@ -990,7 +990,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
         }
       }
     }
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     if ((r->cf->extRing!=NULL) && (!p_IsConstantPoly(ff,r)))
     {
       singclap_factorize_retry++;

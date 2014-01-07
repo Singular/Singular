@@ -111,7 +111,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
   assume(rIsSCA(currRing));
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
   idTest(F);
   idTest(Q);
 #endif
@@ -384,7 +384,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec *
 
   assume(rIsSCA(currRing));
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
   idTest(F);
   idTest(Q);
 #endif

@@ -325,7 +325,7 @@ void   rWrite(ring r, BOOLEAN details)
     if (r->order[l] == ringorder_s)
     {
       assume( l == 0 );
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       Print("  syzcomp at %d",r->typ[l].data.syz.limit);
 #endif
       continue;
@@ -1404,13 +1404,13 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   {
     if (copy_qideal)
     {
-      #ifndef NDEBUG
+      #ifndef SING_NDEBUG
       if (!copy_ordering)
         WerrorS("internal error: rCopy0(Q,TRUE,FALSE)");
       else
       #endif
       {
-      #ifndef NDEBUG
+      #ifndef SING_NDEBUG
         WarnS("internal bad stuff: rCopy0(Q,TRUE,TRUE)");
       #endif
         rComplete(res);
@@ -1560,13 +1560,13 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
   {
     if (copy_qideal)
     {
-      #ifndef NDEBUG
+      #ifndef SING_NDEBUG
       if (!copy_ordering)
         WerrorS("internal error: rCopy0(Q,TRUE,FALSE)");
       else
       #endif
       {
-      #ifndef NDEBUG
+      #ifndef SING_NDEBUG
         WarnS("internal bad stuff: rCopy0(Q,TRUE,TRUE)");
       #endif
         rComplete(res);
@@ -2314,11 +2314,11 @@ static void rO_Syz(int &place, int &bitplace, int &prev_ord,
   place++;
 }
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 # define MYTEST 0
-#else /* ifndef NDEBUG */
+#else /* ifndef SING_NDEBUG */
 # define MYTEST 0
-#endif /* ifndef NDEBUG */
+#endif /* ifndef SING_NDEBUG */
 
 static void rO_ISPrefix(int &place, int &bitplace, int &prev_ord,
     long *o, int /*N*/, int *v, sro_ord &ord_struct)
@@ -2609,7 +2609,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
     {
       case ringorder_S:
       {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
         Warn("Error: unhandled ordering in rModifyRing: ringorder_S = [%d]", r_ord);
 #endif
         order[j]=r_ord; /*r->order[i];*/
@@ -2665,7 +2665,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
       {
         if (omit_comp)
         {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
           Warn("Error: WRONG USAGE of rModifyRing: cannot omit component due to the ordering block [%d]: %d (ringorder_IS)", i, r_ord);
 #endif
           omit_comp = FALSE;
@@ -2679,7 +2679,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
         assume((i == 0) && (j == 0));
         if (omit_comp)
         {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
           Warn("WRONG USAGE? of rModifyRing: omitting component due to the ordering block [%d]: %d (ringorder_s)", i, r_ord);
 #endif
           omit_comp = FALSE;
@@ -2785,7 +2785,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   {
     if ( nc_rComplete(r, res, false) ) // no qideal!
     {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       WarnS("error in nc_rComplete");
 #endif
       // cleanup?
@@ -2842,7 +2842,7 @@ ring rModifyRing_Wp(ring r, int* weights)
   {
     if ( nc_rComplete(r, res, false) ) // no qideal!
     {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       WarnS("error in nc_rComplete");
 #endif
       // cleanup?
@@ -2903,7 +2903,7 @@ ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsign
     {
       if ( nc_rComplete(r, res, false) ) // no qideal!
       {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
         WarnS("error in nc_rComplete");
 #endif
         // cleanup?
@@ -3256,7 +3256,7 @@ static void rSetDegStuff(ring r)
 
   if( rGetISPos(0, r) != -1 ) // Are there Schreyer induced blocks?
   {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       assume( r->pFDeg == p_Deg || r->pFDeg == p_WTotaldegree || r->pFDeg == p_Totaldegree);
 #endif
 
@@ -3807,7 +3807,7 @@ void rUnComplete(ring r)
           assume( r->typ[i].data.syzcomp.ShiftedComponents == NULL );
           assume( r->typ[i].data.syzcomp.Components        == NULL );
 //          WarnS( "rUnComplete : ord_typ == ro_syzcomp was unhandled!!! Possibly memory leak!!!"  );
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 //          assume(0);
 #endif
         }
@@ -4009,7 +4009,7 @@ void rDebugPrint(ring r)
 //      for( int k = 0; k <= r->N; k++) if (r->typ[j].data.is.pVarOffset[k] != -1) Print("[%2d]: %04x; ", k, r->typ[j].data.is.pVarOffset[k]);
 
       Print("  limit %d",r->typ[j].data.is.limit);
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       //PrintS("  F: ");idShow(r->typ[j].data.is.F, r, r, 1);
 #endif
 
@@ -4175,7 +4175,7 @@ static inline void m_DebugPrint(const poly p, const ring R)
 }
 
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 /// debug-print at most nTerms (2 by default) terms from poly/vector p,
 /// assuming that lt(p) lives in lmRing and tail(p) lives in tailRing.
 void p_DebugPrint(const poly p, const ring lmRing, const ring tailRing, const int nTerms)
@@ -4327,7 +4327,7 @@ ring rAssure_SyzComp(const ring r, BOOLEAN complete)
 
   if ( r->order[0] == ringorder_IS )
   {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     WarnS("rAssure_SyzComp: input ring has an IS-ordering!");
 #endif
 //    return r;
@@ -4363,7 +4363,7 @@ ring rAssure_SyzComp(const ring r, BOOLEAN complete)
     {
       if ( nc_rComplete(r, res, false) ) // no qideal!
       {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
         WarnS("error in nc_rComplete");      // cleanup?//      rDelete(res);//      return r;      // just go on..
 #endif
       }
@@ -4467,7 +4467,7 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
   {
     if ( nc_rComplete(r, res, false) ) // no qideal!
     {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       WarnS("error in nc_rComplete");
 #endif
       // just go on..
@@ -4540,7 +4540,7 @@ ring rAssure_HasComp(const ring r)
   {
     if ( nc_rComplete(r, new_r, false) ) // no qideal!
     {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       WarnS("error in nc_rComplete");      // cleanup?//      rDelete(res);//      return r;      // just go on..
 #endif
     }
@@ -4591,7 +4591,7 @@ ring rAssure_CompLastBlock(ring r, BOOLEAN complete)
         {
           if ( nc_rComplete(r, new_r, false) ) // no qideal!
           {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
             WarnS("error in nc_rComplete");   // cleanup?//      rDelete(res);//      return r;      // just go on..
 #endif
           }
@@ -4625,7 +4625,7 @@ ring rAssure_SyzComp_CompLastBlock(const ring r, BOOLEAN)
    {
        if ( nc_rComplete(old_r, new_r, false) ) // no qideal!
        {
-# ifndef NDEBUG
+# ifndef SING_NDEBUG
           WarnS("error in nc_rComplete"); // cleanup?      rDelete(res);       return r;  // just go on...?
 # endif
        }
@@ -4643,7 +4643,7 @@ ring rAssure_SyzComp_CompLastBlock(const ring r, BOOLEAN)
    if( rIsPluralRing(old_r) )
      if( nc_SetupQuotient(new_r, old_r, true) )
        {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
           WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
 #endif
        }
@@ -4699,7 +4699,7 @@ static ring rAssure_Global(rRingOrder_t b1, rRingOrder_t b2, const ring r)
   {
     if ( nc_rComplete(r, res, false) ) // no qideal!
     {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       WarnS("error in nc_rComplete");
 #endif
     }
@@ -4779,7 +4779,7 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int 
     {
       if ( nc_rComplete(r, res, false) ) // no qideal!
       {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
         WarnS("error in nc_rComplete");      // cleanup?//      rDelete(res);//      return r;      // just go on..
 #endif
       }
@@ -4962,7 +4962,7 @@ void rSetSyzComp(int k, const ring r)
     }
     if(k < r->typ[0].data.syz.limit) // ?
     {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       Warn("rSetSyzComp called with smaller limit (%d) as before (%d)", k, r->typ[0].data.syz.limit);
 #endif
       r->typ[0].data.syz.curr_index = 1 + r->typ[0].data.syz.syz_index[k];
@@ -4978,7 +4978,7 @@ void rSetSyzComp(int k, const ring r)
            )
   {
 //      (r->typ[currRing->typ[0].data.isTemp.suffixpos].data.is.limit == k)
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     Warn("rSetSyzComp(%d) in an IS ring! Be careful!", k);
 #endif
   }

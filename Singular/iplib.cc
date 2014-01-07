@@ -420,7 +420,7 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
 
     //Print("kill locals for %s (level %d)\n",IDID(pn),myynest);
     killlocals(myynest);
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     checkall();
 #endif
     //Print("end kill locals for %s (%d)\n",IDID(pn),myynest);
@@ -1057,7 +1057,7 @@ int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
   procinfov pi;
   idhdl h;
 
-  #ifndef NDEBUG
+  #ifndef SING_NDEBUG
   int dummy;
   if (IsCmd(procname,dummy))
   {

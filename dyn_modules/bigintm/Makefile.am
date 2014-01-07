@@ -26,7 +26,7 @@ endif
 # NODEBUGCFLAGS   = -O3 -w -fomit-frame-pointer ${PIPE}
 # NODEBUGCXXFLAGS = -O3 -w -fomit-frame-pointer ${CXXTEMPLFLAGS} -fno-exceptions -fno-rtti
 # ## -fno-implicit-templates?
-# NODEBUGDEFS = -DNDEBUG -DOM_NDEBUG 
+# NODEBUGDEFS = -DSING_NDEBUG -DOM_NDEBUG 
 
 # -DHAVE_CONFIG_H??
 

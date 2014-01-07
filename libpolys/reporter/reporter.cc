@@ -71,7 +71,7 @@ void StringAppend(const char *fmt, ...)
     int l=s-feBuffer;
     feBuffer=(char *)omReallocSize((void *)feBuffer,feBufferLength,
                                                      more);
-#if (!defined(NDEBUG)) && (!defined(OM_NDEBUG)) && defined(HAVE_CONFIG_H)
+#if (!defined(SING_NDEBUG)) && (!defined(OM_NDEBUG)) && defined(HAVE_CONFIG_H)
     omMarkAsStaticAddr(feBuffer);
 #endif
     feBufferLength=more;

@@ -649,7 +649,7 @@ void mod_create_makefile(moddefv module)
   write_header(fp, module->name, "#");
   fprintf(fp, "CC\t= gcc\n");
   fprintf(fp, "CXX\t= gcc\n");
-  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I../include\n");
+  fprintf(fp, "CFLAGS\t= -DSING_NDEBUG -DBUILD_MODULE -I. -I../include\n");
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");
   fprintf(fp, "SRCS\t= ");

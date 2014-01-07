@@ -46,7 +46,7 @@
 // #include <???/ideals.h>
 // #include <???/int64vec.h>
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 // #include <???/febase.h>
 #endif
 
@@ -159,11 +159,11 @@ static int _componentsExternal = 0;
 
 BOOLEAN pSetm_error=0;
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 # define MYTEST 0
-#else /* ifndef NDEBUG */
+#else /* ifndef SING_NDEBUG */
 # define MYTEST 0
-#endif /* ifndef NDEBUG */
+#endif /* ifndef SING_NDEBUG */
 
 void p_Setm_General(poly p, const ring r)
 {
@@ -353,7 +353,7 @@ void p_Setm_General(poly p, const ring r)
         {
           assume(p != NULL);
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 #if MYTEST
           Print("p_Setm_General: ro_isTemp ord: pos: %d, p: ", pos);  p_DebugPrint(p, r, r, 1);
 #endif
@@ -380,7 +380,7 @@ void p_Setm_General(poly p, const ring r)
               assume( p_GetExp(p, r, vo) == p_GetExp(p, i, r) ); // copy put them verbatim
             }
           }
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
           for( int i = 1; i <= r->N; i++ ) // No v[0] here!!!
           {
             const int vo = pVarOffset[i];
@@ -401,7 +401,7 @@ void p_Setm_General(poly p, const ring r)
         // Suffix for Induced Schreyer ordering
         case ro_is:
         {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 #if MYTEST
           Print("p_Setm_General: ro_is ord: pos: %d, p: ", pos);  p_DebugPrint(p, r, r, 1);
 #endif
@@ -419,7 +419,7 @@ void p_Setm_General(poly p, const ring r)
 
           if( F != NULL && c > limit )
           {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 #if MYTEST
             Print("p_Setm_General: ro_is : in rSetm: pos: %d, c: %d >  limit: %d\n", c, pos, limit); // p_DebugPrint(p, r, r, 1);
             PrintS("preComputed Values: ");
@@ -448,7 +448,7 @@ void p_Setm_General(poly p, const ring r)
 
             assume(pp != NULL);
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 #if MYTEST
             Print("Respective F[c - %d: %d] pp: ", limit, c);
             p_DebugPrint(pp, r, r, 1);
@@ -461,7 +461,7 @@ void p_Setm_General(poly p, const ring r)
 
 //          const int st = o->data.isTemp.start;
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
             Print("p_Setm_General: is(-Temp-) :: c: %d, limit: %d, [st:%d] ===>>> %ld\n", c, limit, start, p->exp[start]);
 #endif
 
@@ -482,7 +482,7 @@ void p_Setm_General(poly p, const ring r)
             }
 
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
             const int* const pVarOffset = o->data.is.pVarOffset;
 
             assume( pVarOffset != NULL );
@@ -512,7 +512,7 @@ void p_Setm_General(poly p, const ring r)
             if( vo != -1 )
               p->exp[vo] = c; // initial component v[0]!
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 #if MYTEST
             Print("ELSE p_Setm_General: ro_is :: c: %d <= limit: %d, vo: %d, exp: %d\n", c, limit, vo, p->exp[vo]);
             p_DebugPrint(p, r, r, 1);
@@ -681,7 +681,7 @@ long p_WTotaldegree(poly p, const ring r)
         //break;
         return j;
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       default:
         Print("missing order %d in p_WTotaldegree\n",r->order[i]);
         break;

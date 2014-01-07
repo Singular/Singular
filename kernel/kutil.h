@@ -169,7 +169,7 @@ public:
 #endif
 };
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 extern int strat_nr;
 extern int strat_fac_debug;
 #endif
@@ -340,7 +340,7 @@ public:
   ring tailRing;
   omBin lmBin;
   omBin tailBin;
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
   int nr;
 #endif
   int cp,c3;

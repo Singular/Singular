@@ -89,7 +89,7 @@ checkok( const CFList & PS, CFList & FS2){
   return 1;
 }
 
-#ifdef MCHARSETNDEBUG
+#ifdef MCHARSETSING_NDEBUG
 #  define DEBUGOUTPUT
 #else
 #  undef DEBUGOUTPUT
@@ -109,7 +109,7 @@ MCharSetN( const CFList &PS, PremForm & Remembern ){
     DEBOUTLN(CERR, "MCharSetN: CS= ", CSet);
 //     if ( getNumVars(CSet.getFirst()) > 1 ){
 //       //CSet = removecontent(CSet, Remembern);
-// #ifdef MCHARSETNDEBUG
+// #ifdef MCHARSETSING_NDEBUG
 //       CERR << "MCharSetN: CSet= " << CSet << "\n";
 // #endif
 //     }

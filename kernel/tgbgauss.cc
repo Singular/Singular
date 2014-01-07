@@ -227,7 +227,7 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* /*c*/)
       {
         assume(mat->min_col_not_zero_in_row(i)>=col);
         assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
         int first=row_cache[i];
         assume(first!=matcol);
 #endif
@@ -263,7 +263,7 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* /*c*/)
       assume(col_area_index<=max_area_index);
       assume(mat->min_col_not_zero_in_row(i)>=col);
       assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
       int first=row_cache[i];
       assume(first!=matcol);
 #endif
@@ -838,7 +838,7 @@ void tgb_sparse_matrix::row_normalize(int row)
     mac_poly m=mp[row];
     while (m!=NULL)
     {
-      #ifndef NDEBUG
+      #ifndef SING_NDEBUG
       if (currRing==r) {nTest(m->coef);}
       #endif
       n_Normalize(m->coef,r);

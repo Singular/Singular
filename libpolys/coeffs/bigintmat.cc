@@ -206,7 +206,7 @@ bigintmat * bimMult(bigintmat * a, bigintmat * b)
 
   if (ca != rb)
   {
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     Werror("wrong bigintmat sizes at multiplication a * b: acols: %d != brows: %d\n", ca, rb);
 #endif
     return NULL;
@@ -309,7 +309,7 @@ int bigintmat::compare(const bigintmat* op) const
 {
   assume (basecoeffs() == op->basecoeffs() );
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
   if (basecoeffs() != op->basecoeffs() )
     WerrorS("wrong bigintmat comparison: different basecoeffs!\n");
 #endif

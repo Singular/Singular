@@ -48,7 +48,7 @@ else:
         LDMODULESUFFIX=".so",
         SHLIBSUFFIX = ".so",
         CPPPATH = SING_INCLUDES,
-        CPPDEFINES = ["NDEBUG", "OM_NDEBUG"],
+        CPPDEFINES = ["SING_NDEBUG", "OM_NDEBUG"],
         CXXFLAGS = "-O3 -fomit-frame-pointer -fno-rtti " + CXXTEMPLFLAGS,
         CCFLAGS="-O3 -fomit-frame-pointer ",
         LDMODULEFLAGS = BUNDLETEMPFLAGS,

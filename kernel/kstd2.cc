@@ -17,11 +17,11 @@
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
 # define MYTEST 0
-#else /* ifndef NDEBUG */
+#else /* ifndef SING_NDEBUG */
 # define MYTEST 0
-#endif /* ifndef NDEBUG */
+#endif /* ifndef SING_NDEBUG */
 
 #if MYTEST
 # ifdef HAVE_TAIL_RING
