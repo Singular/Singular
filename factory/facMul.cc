@@ -62,31 +62,30 @@ reverseSubstQa (const fmpz_poly_t F, int d, const Variable& x,
   int degf= fmpz_poly_degree (F);
   int k= 0;
   int degfSubK;
-  int repLength, j;
-  CanonicalForm coeff, ff;
-  fmpz* tmp;
+  int repLength;
+  fmpq_poly_t buf;
+  fmpq_poly_t mipo;
+  convertFacCF2Fmpq_poly_t (mipo, getMipo(alpha));
   while (degf >= k)
   {
-    coeff= 0;
     degfSubK= degf - k;
     if (degfSubK >= d)
       repLength= d;
     else
       repLength= degfSubK + 1;
 
-    for (j= 0; j < repLength; j++)
-    {
-      tmp= fmpz_poly_get_coeff_ptr (F, j+k);
-      if (!fmpz_is_zero (tmp))
-      {
-        ff= convertFmpz2CF (tmp);
-        coeff += ff*power (alpha, j); //TODO faster reduction mod alpha
-      }
-    }
-    result += coeff*power (x, i);
+    fmpq_poly_init2 (buf, repLength);
+    _fmpq_poly_set_length (buf, repLength);
+    _fmpz_vec_set (buf->coeffs, F->coeffs + k, repLength);
+    _fmpq_poly_normalise (buf);
+    fmpq_poly_rem (buf, buf, mipo);
+
+    result += convertFmpq_poly_t2FacCF (buf, alpha)*power (x, i);
+    fmpq_poly_clear (buf);
     i++;
     k= d*i;
   }
+  fmpq_poly_clear (mipo);
   result /= den;
   return result;
 }
@@ -1153,7 +1152,7 @@ kronSubFq (fq_nmod_poly_t result, const CanonicalForm& A, int d,
 }
 #endif
 
-void kronSubQa (fmpq_poly_t result, const CanonicalForm& A, int d1, int d2)
+/*void kronSubQa (fmpq_poly_t result, const CanonicalForm& A, int d1, int d2)
 {
   int degAy= degree (A);
   fmpq_poly_init2 (result, d1*(degAy + 1));
@@ -1196,6 +1195,40 @@ void kronSubQa (fmpq_poly_t result, const CanonicalForm& A, int d1, int d2)
   }
   fmpq_clear (coeff);
   _fmpq_poly_normalise (result);
+}*/
+
+void kronSubQa (fmpz_poly_t result, const CanonicalForm& A, int d1, int d2)
+{
+  int degAy= degree (A);
+  fmpz_poly_init2 (result, d1*(degAy + 1));
+  _fmpz_poly_set_length (result, d1*(degAy + 1));
+
+  fmpz_poly_t buf;
+
+  int k;
+  CFIterator j;
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    if (i.coeff().inCoeffDomain())
+    {
+      k= d1*i.exp();
+      convertFacCF2Fmpz_poly_t (buf, i.coeff());
+      _fmpz_vec_set (result->coeffs + k, buf->coeffs, buf->length);
+      fmpz_poly_clear (buf);
+    }
+    else
+    {
+      for (j= i.coeff(); j.hasTerms(); j++)
+      {
+        k= d1*i.exp();
+        k += d2*j.exp();
+        convertFacCF2Fmpz_poly_t (buf, j.coeff());
+        _fmpz_vec_set (result->coeffs + k, buf->coeffs, buf->length);
+        fmpz_poly_clear (buf);
+      }
+    }
+  }
+  _fmpz_poly_normalise (result);
 }
 
 void
@@ -1293,30 +1326,19 @@ kronSubReciproQ (fmpz_poly_t subA1, fmpz_poly_t subA2, const CanonicalForm& A,
   fmpz_poly_init2 (subA2, d*(degAy + 2));
 
   fmpz_poly_t buf;
-  fmpz_t coeff1, coeff2;
 
-  int k, kk, j, bufRepLength;
+  int k, kk;
   for (CFIterator i= A; i.hasTerms(); i++)
   {
     convertFacCF2Fmpz_poly_t (buf, i.coeff());
 
     k= i.exp()*d;
     kk= (degAy - i.exp())*d;
-    bufRepLength= (int) fmpz_poly_length (buf);
-    for (j= 0; j < bufRepLength; j++)
-    {
-      fmpz_poly_get_coeff_fmpz (coeff1, subA1, j+k);
-      fmpz_poly_get_coeff_fmpz (coeff2, buf, j);
-      fmpz_add (coeff1, coeff1, coeff2);
-      fmpz_poly_set_coeff_fmpz (subA1, j + k, coeff1);
-      fmpz_poly_get_coeff_fmpz (coeff1, subA2, j + kk);
-      fmpz_add (coeff1, coeff1, coeff2);
-      fmpz_poly_set_coeff_fmpz (subA2, j + kk, coeff1);
-    }
+    _fmpz_vec_add (subA1->coeffs+k, subA1->coeffs + k, buf->coeffs, buf->length);
+    _fmpz_vec_add (subA2->coeffs+kk, subA2->coeffs + kk, buf->coeffs, buf->length);
     fmpz_poly_clear (buf);
   }
-  fmpz_clear (coeff1);
-  fmpz_clear (coeff2);
+
   _fmpz_poly_normalise (subA1);
   _fmpz_poly_normalise (subA2);
 }
@@ -1326,17 +1348,12 @@ CanonicalForm reverseSubstQ (const fmpz_poly_t F, int d)
   Variable y= Variable (2);
   Variable x= Variable (1);
 
-  fmpz_poly_t f;
-  fmpz_poly_init (f);
-  fmpz_poly_set (f, F);
-
   fmpz_poly_t buf;
   CanonicalForm result= 0;
   int i= 0;
-  int degf= fmpz_poly_degree(f);
+  int degf= fmpz_poly_degree(F);
   int k= 0;
-  int degfSubK, repLength, j;
-  fmpz_t coeff;
+  int degfSubK, repLength;
   while (degf >= k)
   {
     degfSubK= degf - k;
@@ -1346,26 +1363,20 @@ CanonicalForm reverseSubstQ (const fmpz_poly_t F, int d)
       repLength= degfSubK + 1;
 
     fmpz_poly_init2 (buf, repLength);
-    fmpz_init (coeff);
-    for (j= 0; j < repLength; j++)
-    {
-      fmpz_poly_get_coeff_fmpz (coeff, f, j + k);
-      fmpz_poly_set_coeff_fmpz (buf, j, coeff);
-    }
+    _fmpz_poly_set_length (buf, repLength);
+    _fmpz_vec_set (buf->coeffs, F->coeffs+k, repLength);
     _fmpz_poly_normalise (buf);
 
     result += convertFmpz_poly_t2FacCF (buf, x)*power (y, i);
     i++;
     k= d*i;
     fmpz_poly_clear (buf);
-    fmpz_clear (coeff);
   }
-  fmpz_poly_clear (f);
 
   return result;
 }
 
-CanonicalForm
+/*CanonicalForm
 reverseSubstQa (const fmpq_poly_t F, int d1, int d2, const Variable& alpha,
                 const fmpq_poly_t mipo)
 {
@@ -1434,6 +1445,63 @@ reverseSubstQa (const fmpq_poly_t F, int d1, int d2, const Variable& alpha,
   }
 
   fmpq_poly_clear (f);
+  return result;
+}*/
+
+CanonicalForm
+reverseSubstQa (const fmpz_poly_t F, int d1, int d2, const Variable& alpha,
+                const fmpq_poly_t mipo)
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+
+  fmpq_poly_t buf;
+  CanonicalForm result= 0, result2;
+  int i= 0;
+  int degf= fmpz_poly_degree(F);
+  int k= 0;
+  int degfSubK;
+  int repLength;
+  while (degf >= k)
+  {
+    degfSubK= degf - k;
+    if (degfSubK >= d1)
+      repLength= d1;
+    else
+      repLength= degfSubK + 1;
+
+    int j= 0;
+    result2= 0;
+    while (j*d2 < repLength)
+    {
+      fmpq_poly_init2 (buf, d2);
+      _fmpq_poly_set_length (buf, d2);
+      _fmpz_vec_set (buf->coeffs, F->coeffs + k*j*d2, d2);
+      _fmpq_poly_normalise (buf);
+      fmpq_poly_rem (buf, buf, mipo);
+      result2 += convertFmpq_poly_t2FacCF (buf, alpha)*power (x, j);
+      j++;
+      fmpq_poly_clear (buf);
+    }
+    if (repLength - j*d2 != 0 && j*d2 - repLength < d2)
+    {
+      j--;
+      repLength -= j*d2;
+      fmpq_poly_init2 (buf, repLength);
+      _fmpq_poly_set_length (buf, repLength);
+      j++;
+      _fmpz_vec_set (buf->coeffs, F->coeffs + k + j*d2, repLength);
+      _fmpq_poly_normalise (buf);
+      fmpq_poly_rem (buf, buf, mipo);
+      result2 += convertFmpq_poly_t2FacCF (buf, alpha)*power (x, j);
+      fmpq_poly_clear (buf);
+    }
+
+    result += result2*power (y, i);
+    i++;
+    k= d1*i;
+  }
+
   return result;
 }
 
@@ -1673,7 +1741,6 @@ reverseSubstReciproQ (const fmpz_poly_t F, const fmpz_poly_t G, int d, int k)
   fmpz_poly_set (g, G);
   int degf= fmpz_poly_degree(f);
   int degg= fmpz_poly_degree(g);
-
 
   fmpz_poly_t buf1,buf2, buf3;
 
@@ -2077,7 +2144,7 @@ mulMod2FLINTQ (const CanonicalForm& F, const CanonicalForm& G, const
   return A/(f*g);
 }
 
-CanonicalForm
+/*CanonicalForm
 mulMod2FLINTQa (const CanonicalForm& F, const CanonicalForm& G,
                 const CanonicalForm& M)
 {
@@ -2107,6 +2174,43 @@ mulMod2FLINTQa (const CanonicalForm& F, const CanonicalForm& G,
   fmpq_poly_clear (FLINTF);
   fmpq_poly_clear (FLINTG);
   return result;
+}*/
+
+CanonicalForm
+mulMod2FLINTQa (const CanonicalForm& F, const CanonicalForm& G,
+                const CanonicalForm& M)
+{
+  Variable a;
+  if (!hasFirstAlgVar (F,a) && !hasFirstAlgVar (G, a))
+    return mulMod2FLINTQ (F, G, M);
+  CanonicalForm A= F, B= G;
+
+  int degFx= degree (F, 1);
+  int degFa= degree (F, a);
+  int degGx= degree (G, 1);
+  int degGa= degree (G, a);
+
+  int d2= degFa+degGa+1;
+  int d1= degFx + 1 + degGx;
+  d1 *= d2;
+
+  CanonicalForm f= bCommonDen (F);
+  CanonicalForm g= bCommonDen (G);
+  A *= f;
+  B *= g;
+
+  fmpz_poly_t FLINTF, FLINTG;
+  kronSubQa (FLINTF, A, d1, d2);
+  kronSubQa (FLINTG, B, d1, d2);
+
+  fmpz_poly_mullow (FLINTF, FLINTF, FLINTG, d1*degree (M));
+
+  fmpq_poly_t mipo;
+  convertFacCF2Fmpq_poly_t (mipo, getMipo (a));
+  A= reverseSubstQa (FLINTF, d1, d2, a, mipo);
+  fmpz_poly_clear (FLINTF);
+  fmpz_poly_clear (FLINTG);
+  return A/(f*g);
 }
 
 #endif
