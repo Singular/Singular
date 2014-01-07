@@ -93,7 +93,7 @@ while test $# -gt 0; do
 	;;
 
     --cflagswithdebug)
-	${ECHOn} " -I${includedir} -I${includedir}/singular @FACTORY_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@
+	${ECHOn} " -I${includedir} -I${includedir}/singular @FACTORY_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@"
 	;;
 
     --libs)
