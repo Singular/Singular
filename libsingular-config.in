@@ -1,38 +1,37 @@
 #! /bin/bash
 
-C="$0"
-O=`pwd`
-
-##C=`readlink -f "$C"`:::
-cd `dirname "$C"`
-C=`basename "$C"`
-
-# Iterate down a (possible) chain of symlinks 
-while [ -L "$C" ]  
-do                 
-    C=`readlink "$C"`
-    cd `dirname "$C"`
-    C=`basename "$C"`
-done
-
-cd `dirname "$C"` 
-C=`pwd`
-C=`dirname "$C"`
-C=`ls -d1 "$C"`
-
-cd "$O"
+#C="$0"
+#O=`pwd`
+#
+###C=`readlink -f "$C"`:::
+#cd `dirname "$C"`
+#C=`basename "$C"`
+#
+## Iterate down a (possible) chain of symlinks 
+#while [ -L "$C" ]  
+#do                 
+#    C=`readlink "$C"`
+#    cd `dirname "$C"`
+#    C=`basename "$C"`
+#done
+#
+#cd `dirname "$C"` 
+#C=`pwd`
+#C=`dirname "$C"`
+#C=`ls -d1 "$C"`
+#
+#cd "$O"
 
 # NOTE: if you moved this config please either use the above or
 # make sure the following variables are up to date
-prefix="$C"
-exec_prefix=${prefix}
-includedir=${prefix}/include
-libdir=${exec_prefix}/lib
+#prefix="$C"
+#exec_prefix=${prefix}
+#includedir=${prefix}/include
+#libdir=${exec_prefix}/lib
 
-#prefix=@prefix@ 
-#exec_prefix=@exec_prefix@
-#includedir=@includedir@
-#libdir=@libdir@
+prefix=@prefix@ 
+includedir=@includedir@
+libdir=@libdir@
 
 ECHO="echo"
 ECHOn="printf"
