@@ -1280,7 +1280,7 @@ template<class number_type> void write_minus_coef_idx_to_buffer(CoefIdx<number_t
   {
     assume(coef_array[j]!=0);
     CoefIdx<number_type> ci;
-    ci.coef=F4mat_to_number_type(npNegM((number)coef_array[j],currRing->cf));
+    ci.coef=F4mat_to_number_type(npNegM((number)(unsigned long)coef_array[j],currRing->cf));
     ci.idx=idx_array[j];
     pairs[pos++]=ci;
   }
