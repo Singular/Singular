@@ -1367,7 +1367,7 @@ BOOLEAN iiExport (leftv v, int toLev)
   {
     if ((v->name==NULL)||(v->rtyp==0)||(v->e!=NULL))
     {
-      WerrorS("cannot export");
+      Werror("cannot export:%s of internal type %d",v->name,v->rtyp);
       nok=TRUE;
     }
     else
@@ -1394,7 +1394,7 @@ BOOLEAN iiExport (leftv v, int toLev, package pack)
     if ((v->name==NULL)||(v->rtyp==0)||(v->e!=NULL)
     )
     {
-      WerrorS("cannot export");
+      Werror("cannot export:%s of internal type %d",v->name,v->rtyp);
       nok=TRUE;
     }
     else
