@@ -756,7 +756,7 @@ static BOOLEAN heOnlineHelp(char* s)
 
   char libnamebuf[128];
   FILE *fp=NULL;
-  // first, search for library of that name in LIB string
+  // first, search for library of that name
   if ((str[1]!='\0') &&
       ((iiLocateLib(str, libnamebuf) && (fp=feFopen(libnamebuf, "rb")) !=NULL)
        ||
