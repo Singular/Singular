@@ -96,7 +96,7 @@ while test $# -gt 0; do
 	;;
 
     --libs)
-	${ECHOn} " -L${libdir} -L${libdir}/singular -lSingular -lnumeric -lkernel -lpolys -lcoeffs -lreporter -lmisc @FACTORY_LIBS@ -lomalloc -lresources @FLINT_LIBS@ @NTL_LIBS@ @USEPPROCSDYNAMICLD@ @GMP_LIBS@" 
+	${ECHOn} " ${libdir}/singular/libSingular.la @USEPPROCSDYNAMICLD@" 
 	;;
 
     *)
