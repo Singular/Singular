@@ -32,7 +32,7 @@ pyobject_la_LDFLAGS = $(PYTHON_EXTRA_LIBS)  $(PYTHON_LSPEC) ${AM_LDFLAGS} $(PYTH
 
 ##########################################################################
 if PYTHON_USE
-  PY=pyobject.la  $(PYTHON_EXTRA_LIBS)  $(PYTHON_LSPEC) libSingular.la ${top_builddir}/numeric/libnumeric.la ${top_builddir}/kernel/libkernel.la $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) 
+  PY=pyobject.la  $(PYTHON_EXTRA_LIBS)  $(PYTHON_LSPEC) $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) 
 else !PYTHON_USE
   PY=
 endif !PYTHON_USE
@@ -229,7 +229,8 @@ dist_bin_SCRIPTS = singularsurf
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO
 # ESingular_LDFLAGS = -static ${AM_LDFLAGS}
 ESingular_LDADD =  ${top_builddir}/libpolys/reporter/libreporter.la \
-${top_builddir}/libpolys/misc/libmisc.la 
+${top_builddir}/libpolys/misc/libmisc.la ${top_builddir}/omalloc/libomalloc.la \
+${top_builddir}/resources/libresources.la
 
 
 ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
@@ -237,8 +238,9 @@ ESingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptES.inc feOpt.cc
 #### same for TSingular
 TSingular_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR -DPROTO
 # TSingular_LDFLAGS = -static ${AM_LDFLAGS}
-TSingular_LDADD =   ${top_builddir}/libpolys/reporter/libreporter.la \
-${top_builddir}/libpolys/misc/libmisc.la 
+TSingular_LDADD = ${top_builddir}/libpolys/reporter/libreporter.la \
+${top_builddir}/libpolys/misc/libmisc.la ${top_builddir}/omalloc/libomalloc.la \
+${top_builddir}/resources/libresources.la
 
 TSingular_SOURCES = emacs.cc fegetopt.c fegetopt.h feOptTS.inc feOpt.cc
 # utils.cc utils.h

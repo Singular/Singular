@@ -1,8 +1,8 @@
 ACLOCAL_AMFLAGS = -I ../m4
 # TODO: use ${top_srcdir} instead of .. in the above?
 
-libkernel_LTLIBRARIES = libkernel.la 
-libkerneldir = $(libdir)/singular
+noinst_LTLIBRARIES = libkernel.la 
+###### libkerneldir = $(libdir)/singular
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS)  
 
@@ -48,8 +48,8 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	linearAlgebra.h \
 	f5c.h f5data.h f5gb.h f5lists.h
 
-libkernel_includedir  =${includedir}/singular/kernel
-libkernel_include_HEADERS   = $(KERNELHEADERS)
+libkernel_la_includedir  =${includedir}/singular/kernel
+libkernel_la_include_HEADERS   = $(KERNELHEADERS)
 
 if ENABLE_FACTORY
   USE_FACTORY = ${top_builddir}/factory/libfactory.la
@@ -58,6 +58,7 @@ else
 endif
 
 libkernel_la_LIBADD   =  ${top_builddir}/libpolys/polys/libpolys.la $(USE_FACTORY) 
+### libkernel_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 ### TODO: the following has to be addapted...
 TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables'
