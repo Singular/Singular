@@ -38,6 +38,7 @@ static int Mask[8]={0x80,0x40,0x20,0x10,0x8,0x4,0x2,0x1};
 pFDegProc jDeg;
 #define pow_(x) jDeg((x),currRing)
 
+#if 0
 void Debug()
 {
   LCI it=T->root;
@@ -64,6 +65,7 @@ void Debug()
   }
   PrintS("===================================\n");
 }
+#endif
 
 int ReducePolyLead(Poly *x,Poly *y)
 {
@@ -255,7 +257,7 @@ void NFL(Poly *p, TreeM *F)
         count=0;
       }
 #else
-      if (count>500)
+      if (count>50)
       {
         kBucketClear(p->root_b,&p->root,&p->root_l);
         pSimpleContent(p->root,2);
@@ -786,10 +788,12 @@ static void go_right(NodeM *current,poly_function disp)
   }
 }
 
+#if 0
 void ForEach(TreeM *t,poly_function disp)
 {
   go_right(t->root,disp);
 }
+#endif
 
 void DestroyTree(NodeM *G)
 {
@@ -960,13 +964,16 @@ void Initialization(char *Ord)
 
 static Poly *h;
 
+#if 0
 void insert_in_G(Poly *x)
 {
  insert_(&G,x);
 }
+#endif
 
 void T2G();
 
+#if 0
 void Q2TG()
 {
   LCI t;
@@ -982,6 +989,7 @@ void Q2TG()
     GCF(t);
   }
 }
+#endif
 
 int ComputeBasis(jList *_lT,jList *_lQ)
 {
