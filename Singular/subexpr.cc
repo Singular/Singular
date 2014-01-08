@@ -530,12 +530,12 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case QRING_CMD:
     {
       ring R=(ring)d;
+      if ((R!=currRing)||(R->ref>=0))
+        rKill(R);
       #ifdef TEST
-      if ((R==currRing)&&(R->ref<=0))
+      else	
         Print("currRing? ref=%d\n",R->ref);
-      else
       #endif
-      rKill(R);
       break;
     }
     case RESOLUTION_CMD:
@@ -1332,6 +1332,7 @@ leftv sleftv::LData()
   return this;
 }
 
+#if 0
 leftv sleftv::LHdl()
 {
   if (e!=NULL)
@@ -1358,6 +1359,7 @@ leftv sleftv::LHdl()
   }
   return this;
 }
+#endif
 
 BOOLEAN assumeStdFlag(leftv h)
 {
