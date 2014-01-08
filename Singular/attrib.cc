@@ -105,6 +105,7 @@ attr sattr::get(const char * s)
   return NULL;
 }
 
+#if 0
 void * atGet(idhdl root,const char * name)
 {
   attr temp = root->attribute->get(name);
@@ -124,6 +125,7 @@ void * atGet(leftv root,const char * name)
   else
     return NULL;
 }
+#endif
 
 void * atGet(idhdl root,const char * name, int t)
 {
@@ -224,6 +226,7 @@ void at_KillAll(idhdl root, const ring r)
   root->attribute->killAll(r);
   root->attribute = NULL;
 }
+
 void at_KillAll(leftv root, const ring r)
 {
   root->attribute->killAll(r);
