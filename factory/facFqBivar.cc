@@ -1424,6 +1424,7 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
                              uniFactors, info, eval, dummy, den);
 }
 
+#ifndef HAVE_FLINT
 long isReduced (const mat_zz_p& M)
 {
   long i, j, nonZero;
@@ -1440,6 +1441,7 @@ long isReduced (const mat_zz_p& M)
   }
   return 1;
 }
+#endif
 
 #ifdef HAVE_FLINT
 long isReduced (const nmod_mat_t M)
@@ -1477,6 +1479,7 @@ long isReduced (const mat_zz_pE& M)
   return 1;
 }
 
+#ifndef HAVE_FLINT
 int * extractZeroOneVecs (const mat_zz_p& M)
 {
   long i, j;
@@ -1500,6 +1503,7 @@ int * extractZeroOneVecs (const mat_zz_p& M)
   }
   return result;
 }
+#endif
 
 #ifdef HAVE_FLINT
 int * extractZeroOneVecs (const nmod_mat_t M)
@@ -1633,6 +1637,7 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
     F= bufF (y+eval,y);
 }
 
+#ifndef HAVE_FLINT
 void
 reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
                    factors, const int liftBound, int& factorsFound, int*&
@@ -1714,6 +1719,7 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
   if (reconstructedFactors.length() != 0)
     F= bufF (y+eval,y);
 }
+#endif
 
 #ifdef HAVE_FLINT
 void
@@ -1899,6 +1905,7 @@ monicReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
   return result;
 }
 
+#ifndef HAVE_FLINT
 CFList
 extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
                    precision, const mat_zz_p& N, const ExtensionInfo& info,
@@ -1977,6 +1984,7 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
   factors= bufFactors;
   return result;
 }
+#endif
 
 #ifdef HAVE_FLINT
 CFList
@@ -2059,6 +2067,7 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
 }
 #endif
 
+#ifndef HAVE_FLINT
 CFList
 reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
                 int precision, const mat_zz_p& N, const CanonicalForm& eval)
@@ -2107,6 +2116,7 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
   factors= bufFactors;
   return result;
 }
+#endif
 
 #ifdef HAVE_FLINT
 CFList
@@ -2159,6 +2169,7 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
 }
 #endif
 
+#ifndef HAVE_FLINT
 void
 extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
                       CFList& factors, const int liftBound, int& factorsFound,
@@ -2286,6 +2297,7 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
     }
   }
 }
+#endif
 
 #ifdef HAVE_FLINT
 void
@@ -2417,6 +2429,7 @@ extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
 }
 #endif
 
+#ifndef HAVE_FLINT
 //over Fp
 int
 liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
@@ -2539,6 +2552,7 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
   }
   return l;
 }
+#endif
 
 #ifdef HAVE_FLINT
 int
@@ -2677,6 +2691,7 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds, int
 }
 #endif
 
+#ifndef HAVE_FLINT
 //over field extension
 int
 extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
@@ -2872,6 +2887,7 @@ extLiftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
   }
   return l;
 }
+#endif
 
 #ifdef HAVE_FLINT
 //over field extension
@@ -5975,6 +5991,7 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
   return CFList();
 }
 
+#ifndef HAVE_FLINT
 void
 refineAndRestartLift (const CanonicalForm& F, const mat_zz_p& NTLN, int
                       liftBound, int l, CFList& factors, CFMatrix& M, CFArray&
@@ -6004,6 +6021,7 @@ refineAndRestartLift (const CanonicalForm& F, const mat_zz_p& NTLN, int
   factors.insert (LCF);
   henselLift12 (F, factors, l, Pi, diophant, M);
 }
+#endif
 
 #ifdef HAVE_FLINT
 void
