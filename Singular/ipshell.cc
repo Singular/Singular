@@ -1257,7 +1257,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
   //Print("iiInternalExport('%s',%d)%s\n", v->name, toLev,"");
   if (IDLEV(h)==0)
   {
-    if (!BVERBOSE(V_REDEFINE)) Warn("`%s` is already global",IDID(h));
+    if (BVERBOSE(V_REDEFINE)) Warn("`%s` is already global",IDID(h));
   }
   else
   {
@@ -1404,7 +1404,7 @@ BOOLEAN iiExport (leftv v, int toLev, package pack)
       {
         if ((pack==currPack) && (old==(idhdl)v->data))
         {
-          if (!BVERBOSE(V_REDEFINE)) Warn("`%s` is already global",IDID(old));
+          if (BVERBOSE(V_REDEFINE)) Warn("`%s` is already global",IDID(old));
           break;
         }
         else if (IDTYP(old)==v->Typ())
