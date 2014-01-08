@@ -631,14 +631,6 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
   return F;
 }
 
-#ifdef HAVE_NTL
-CanonicalForm fntl ( const CanonicalForm & f, int j )
-{
-  ZZX f1=convertFacCF2NTLZZX(f);
-  return convertZZ2CF(coeff(f1,j));
-}
-#endif
-
 CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 {
   if ( f.inCoeffDomain() )
