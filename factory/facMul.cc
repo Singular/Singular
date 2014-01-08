@@ -56,7 +56,6 @@ CanonicalForm
 reverseSubstQa (const fmpz_poly_t F, int d, const Variable& x,
                 const Variable& alpha, const CanonicalForm& den)
 {
-
   CanonicalForm result= 0;
   int i= 0;
   int degf= fmpz_poly_degree (F);
@@ -2215,6 +2214,7 @@ mulMod2FLINTQa (const CanonicalForm& F, const CanonicalForm& G,
 
 #endif
 
+#ifndef HAVE_FLINT
 zz_pX kronSubFp (const CanonicalForm& A, int d)
 {
   int degAy= degree (A);
@@ -2244,7 +2244,9 @@ zz_pX kronSubFp (const CanonicalForm& A, int d)
 
   return result;
 }
+#endif
 
+#if (!(HAVE_FLINT && __FLINT_VERSION_MINOR >= 4))
 zz_pEX kronSubFq (const CanonicalForm& A, int d, const Variable& alpha)
 {
   int degAy= degree (A);
@@ -2323,7 +2325,9 @@ kronSubReciproFq (zz_pEX& subA1, zz_pEX& subA2,const CanonicalForm& A, int d,
   subA1.normalize();
   subA2.normalize();
 }
+#endif
 
+#ifndef HAVE_FLINT
 void
 kronSubReciproFp (zz_pX& subA1, zz_pX& subA2, const CanonicalForm& A, int d)
 {
@@ -2356,7 +2360,9 @@ kronSubReciproFp (zz_pX& subA1, zz_pX& subA2, const CanonicalForm& A, int d)
   subA1.normalize();
   subA2.normalize();
 }
+#endif
 
+#if (!(HAVE_FLINT && __FLINT_VERSION_MINOR >= 4))
 CanonicalForm
 reverseSubstReciproFq (const zz_pEX& F, const zz_pEX& G, int d, int k,
                        const Variable& alpha)
@@ -2468,7 +2474,9 @@ reverseSubstReciproFq (const zz_pEX& F, const zz_pEX& G, int d, int k,
 
   return result;
 }
+#endif
 
+#ifndef HAVE_FLINT
 CanonicalForm
 reverseSubstReciproFp (const zz_pX& F, const zz_pX& G, int d, int k)
 {
@@ -2580,7 +2588,9 @@ reverseSubstReciproFp (const zz_pX& F, const zz_pX& G, int d, int k)
 
   return result;
 }
+#endif
 
+#if (!(HAVE_FLINT && __FLINT_VERSION_MINOR >= 4))
 CanonicalForm reverseSubstFq (const zz_pEX& F, int d, const Variable& alpha)
 {
   Variable y= Variable (2);
@@ -2617,7 +2627,9 @@ CanonicalForm reverseSubstFq (const zz_pEX& F, int d, const Variable& alpha)
 
   return result;
 }
+#endif
 
+#ifndef HAVE_FLINT
 CanonicalForm reverseSubstFp (const zz_pX& F, int d)
 {
   Variable y= Variable (2);
@@ -2715,7 +2727,9 @@ mulMod2NTLFp (const CanonicalForm& F, const CanonicalForm& G, const
 
   return A;
 }
+#endif
 
+#if (!(HAVE_FLINT && __FLINT_VERSION_MINOR >= 4))
 // assumes input to be reduced mod M and to be an element of Fq not Fp
 CanonicalForm
 mulMod2NTLFqReci (const CanonicalForm& F, const CanonicalForm& G, const
@@ -2747,6 +2761,7 @@ mulMod2NTLFqReci (const CanonicalForm& F, const CanonicalForm& G, const
   int d2= tmax (deg (F2)/d1, deg (F1)/d1);
   return reverseSubstReciproFq (F1, F2, d1, d2, alpha);
 }
+#endif
 
 #ifdef HAVE_FLINT
 CanonicalForm
