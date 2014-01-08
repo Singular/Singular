@@ -527,6 +527,7 @@ balance ( const CanonicalForm & f, const CanonicalForm & q )
 }*/
 //}}}
 
+#ifndef HAVE_NTL
 static CanonicalForm gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primitive )
 {
   CanonicalForm f, g, c, cg, cl, BB, B, M, q, Dp, newD, D, newq;
@@ -611,6 +612,7 @@ static CanonicalForm gcd_poly_univar0( const CanonicalForm & F, const CanonicalF
     DEBOUTLN( cerr, "another try ..." );
   }
 }
+#endif
 
 static CanonicalForm
 gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
@@ -795,7 +797,9 @@ gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
             return gcd_univar_ntl0(pi, pi1 ) * C;
 #endif
 #endif
+#ifndef HAVE_NTL
         return gcd_poly_univar0( pi, pi1, true ) * C;
+#endif
     }
     else if ( gcd_test_one( pi1, pi, true, d ) )
       return C;
