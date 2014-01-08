@@ -1,10 +1,5 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-DEBUGCXXFLAGS   =
-NODEBUGCFLAGS   =
-NODEBUGCXXFLAGS =
-NODEBUGDEFS     =
-
 AM_CPPFLAGS	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${GMP_CFLAGS}  
 
 
@@ -63,15 +58,10 @@ EXTRA_DIST = \
 	templates/p_Merge_q__T.cc templates/p_Add_q__T.cc templates/p_Neg__T.cc
 
 
-p_Procs_FieldGeneral_la_CPPFLAGS = -Dp_Procs_FieldGeneral ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGDEFS}
-p_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGDEFS}
-p_Procs_FieldQ_la_CPPFLAGS = -Dp_Procs_FieldQ ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGDEFS}
-p_Procs_FieldZp_la_CPPFLAGS = -Dp_Procs_FieldZp ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGDEFS}
-
-p_Procs_FieldGeneral_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
-p_Procs_FieldIndep_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
-p_Procs_FieldQ_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
-p_Procs_FieldZp_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
+p_Procs_FieldGeneral_la_CPPFLAGS = -Dp_Procs_FieldGeneral ${P_PROCS_CPPFLAGS_COMMON}
+p_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON}
+p_Procs_FieldQ_la_CPPFLAGS = -Dp_Procs_FieldQ ${P_PROCS_CPPFLAGS_COMMON}
+p_Procs_FieldZp_la_CPPFLAGS = -Dp_Procs_FieldZp ${P_PROCS_CPPFLAGS_COMMON}
 
 P_PROCS_MODULE_LDFLAGS = -shared -module -dynamic -export-dynamic -avoid-version -weak_reference_mismatches weak -undefined dynamic_lookup -Wl,-undefined -Wl,dynamic_lookup -flat_namespace
 
@@ -102,7 +92,6 @@ libpolys_la_SOURCES = ${SOURCES}
 
 EXTRA_libpolys_la_SOURCES = templates/p_Procs_Static.cc templates/p_Procs_Dynamic.cc
 
-libpolys_la_CPPFLAGS = ${NODEBUGDEFS} ${AM_CPPFLAGS}
 
 libpolys_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 libpolys_la_LIBADD = ${top_builddir}/coeffs/libcoeffs.la

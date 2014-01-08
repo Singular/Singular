@@ -1,8 +1,14 @@
+#ifdef HAVE_CONFIG_H
+#include "singularconfig.h"
+#endif /* HAVE_CONFIG_H */
+
+#include <kernel/mod2.h>
+
+#include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
 
 #include <factory/factory.h> // :(
 
-#include <omalloc/omalloc.h>
 
 #include <misc/intvec.h>
 #include <misc/int64vec.h>
@@ -54,11 +60,6 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 #include <coeffs/numbers.h>
 #include <kernel/polys.h>
 
-
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
-#include <kernel/mod2.h>
 
 #include <kernel/structs.h>
 
