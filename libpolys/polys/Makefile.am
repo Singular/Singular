@@ -5,7 +5,7 @@ NODEBUGCFLAGS   =
 NODEBUGCXXFLAGS =
 NODEBUGDEFS     =
 
-AM_CPPFLAGS	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${GMP_CFLAGS}  -DHAVE_CONFIG_H
+AM_CPPFLAGS	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${GMP_CFLAGS}  
 
 
 if ENABLE_P_PROCS_STATIC

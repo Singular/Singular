@@ -4,7 +4,7 @@ libnumeric_LTLIBRARIES = libnumeric.la
 
 libnumericdir = $(libdir)/singular
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys ${GMP_CFLAGS} -I${top_srcdir}/factory/include -I${top_builddir}/factory/include ${FACTORY_CFLAGS} ${NTL_CFLAGS}  -DHAVE_CONFIG_H
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys ${GMP_CFLAGS} -I${top_srcdir}/factory/include -I${top_builddir}/factory/include ${FACTORY_CFLAGS} ${NTL_CFLAGS}  
 
 SOURCES  = mpr_base.cc mpr_inout.cc mpr_numeric.cc
 libnumeric_la_SOURCES   = $(SOURCES)

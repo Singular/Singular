@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS = -I ../m4
 PACKAGES=include/factory libfac
 SUBDIRS=$(PACKAGES)
 
-AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include $(FLINT_CFLAGS) ${GMP_CFLAGS} ${NTL_CFLAGS} ${OMALLOC_CFLAGS} -DHAVE_CONFIG_H
+AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include $(FLINT_CFLAGS) ${GMP_CFLAGS} ${NTL_CFLAGS} ${OMALLOC_CFLAGS} 
 
 lib_LTLIBRARIES = libfactory.la
 

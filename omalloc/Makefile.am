@@ -26,7 +26,7 @@ omalloc_provide.c omAllocFunc.c
 
 EXTRA_DIST = omalloc.c omtTestAlloc.c omtTest.h omMmap.c
 
-AM_CPPFLAGS =-I${top_srcdir}/.. -I${top_builddir}/..  -DHAVE_CONFIG_H
+AM_CPPFLAGS =-I${top_srcdir}/.. -I${top_builddir}/..  
 
 libomalloc_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
 
@@ -37,7 +37,7 @@ nodist_libomalloc_la_SOURCES = omTables.inc omTables.h mylimits.h
 nodist_libomalloc_include_HEADERS = omConfig.h mylimits.h omTables.h
 
 ### NOTE: "_g" (debug) means full library
-### libomalloc_la_CPPFLAGS= -DOM_ALLOC_INTERNAL -DHAVE_CONFIG_H -DOM_NDEBUG
+### libomalloc_la_CPPFLAGS= -DOM_ALLOC_INTERNAL  -DOM_NDEBUG
 
 libomalloc_la_CPPFLAGS  = ${AM_CPPFLAGS} -DOM_ALLOC_INTERNAL
 

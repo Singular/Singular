@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..  -DHAVE_CONFIG_H
+AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..  
 
 libmisc_LTLIBRARIES = libmisc.la 
 libmiscdir = $(libdir)/singular

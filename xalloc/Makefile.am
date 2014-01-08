@@ -11,12 +11,12 @@ noinst_LTLIBRARIES=libomalloc.la
 
 SOURCES = dummy.c omalloc.h
 
-AM_CPPFLAGS = -I${srcdir} -DHAVE_CONFIG_H 
+AM_CPPFLAGS = -I${srcdir}  
 
 libomalloc_la_SOURCES  =$(SOURCES)
 
 ### libomalloc_la_LDFLAGS  = -release ${PACKAGE_VERSION}
 
-# libomalloc_la_CPPFLAGS  += ${AM_CPPFLAGS} -DHAVE_CONFIG_H -DSING_NDEBUG -DOM_NDEBUG
+# libomalloc_la_CPPFLAGS  += ${AM_CPPFLAGS}  -DSING_NDEBUG -DOM_NDEBUG
 # libomalloc_la_CPPFLAGS = ${AM_CPPFLAGS}
 

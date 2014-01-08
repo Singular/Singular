@@ -5,7 +5,7 @@ libresources_LTLIBRARIES = libresources.la
 libresourcesdir = $(libdir)
 
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -DHAVE_CONFIG_H
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} 
 
 
 SOURCES  = omFindExec.c feResource.cc feFopen.cc

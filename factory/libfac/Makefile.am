@@ -18,10 +18,10 @@ noinst_LTLIBRARIES=libfac.la
 #libfac_g_la_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${builddir} -I${srcdir}/.. -I${builddir}/.. -I${srcdir}/../include  -I${builddir}/../include -I${srcdir}/factor  -I${builddir}/factor -I${srcdir}/charset -I${builddir}/charset ${GMP_CFLAGS} ${NTL_CFLAGS}  -DHAVE_CONFIG_H
+AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${builddir} -I${srcdir}/.. -I${builddir}/.. -I${srcdir}/../include  -I${builddir}/../include -I${srcdir}/factor  -I${builddir}/factor -I${srcdir}/charset -I${builddir}/charset ${GMP_CFLAGS} ${NTL_CFLAGS}  
 
-# libfac_la_CPPFLAGS   = ${AM_CPPFLAGS} -DSING_NDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
-# libfac_la_CPPFLAGS = ${AM_CPPFLAGS} -DHAVE_CONFIG_H
+# libfac_la_CPPFLAGS   = ${AM_CPPFLAGS} -DSING_NDEBUG -DOM_NDEBUG 
+# libfac_la_CPPFLAGS = ${AM_CPPFLAGS} 
 
 # libfac_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
