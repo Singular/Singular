@@ -118,6 +118,7 @@ class MinorKey
      */
      void reset();
 
+     #ifndef SING_NDEBUG
      /**
      * A method for counting the number of set bits.
      * For a == 1, the number of set bits in _rowKey will be counted;
@@ -127,6 +128,7 @@ class MinorKey
      * @return the number of set bits either in _rowKey or _columnKey
      */
      int getSetBits (const int a) const;
+     #endif
 
      /**
      * For letting MinorProcessor see the private methods of this class.
@@ -393,13 +395,13 @@ class MinorKey
      * @return a printable version of the given instance as instance of class
      * string
      */
-   std::string toString () const;
+     std::string toString () const;
 
      /**
      * A method for printing a string representation of the given MinorKey to
      * std::cout.
      */
-     void print () const;
+     //void print () const;
 };
 
 class MinorValue

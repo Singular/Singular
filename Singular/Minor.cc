@@ -114,10 +114,10 @@ MinorKey::~MinorKey()
   _columnKey = 0;
 }
 
-void MinorKey::print() const
-{
-  PrintS(this->toString().c_str());
-}
+//void MinorKey::print() const
+//{
+//  PrintS(this->toString().c_str());
+//}
 
 int MinorKey::getAbsoluteRowIndex(const int i) const
 {
@@ -309,6 +309,7 @@ int MinorKey::getNumberOfColumnBlocks() const
   return _numberOfColumnBlocks;
 }
 
+#ifndef SING_NDEBUG
 int MinorKey::getSetBits(const int a) const
 {
   int b = 0;
@@ -342,6 +343,7 @@ int MinorKey::getSetBits(const int a) const
   }
   return b;
 }
+#endif
 
 MinorKey MinorKey::getSubMinorKey (const int absoluteEraseRowIndex,
                                    const int absoluteEraseColumnIndex) const
@@ -798,7 +800,8 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk)
 }
 
 string MinorKey::toString() const
-{
+{ return ""; }
+/*
   string t;
   string s = "(";
   unsigned int z = 0;
@@ -832,6 +835,7 @@ string MinorKey::toString() const
   s += ")";
   return s;
 }
+*/
 
 int MinorValue::g_rankingStrategy = -1;
 
