@@ -73,7 +73,7 @@ public:
   {
     clog << "Creating  Z/13[t]: " << endl;
 
-    char* n[] = {"t"};
+    char* n[] = { (char*)"t"};
     ring r = rDefault( 13, 1, n);     
     TS_ASSERT_DIFFERS( r, NULLp );
 
@@ -97,7 +97,7 @@ public:
   {
     clog << "Creating  Q[s]: " << endl;
 
-    char* n[] = {"s"};
+    char* n[] = {(char*)"s"};
     ring r = rDefault( 0, 1, n);     
     TS_ASSERT_DIFFERS( r, NULLp );
 
@@ -120,7 +120,7 @@ public:
   {
      clog << "Creating  Z/11[x, y, z]: " << endl;
      
-     char* n[] = {"x", "y", "z"};
+     char* n[] = {(char*)"x", (char*)"y", (char*)"z"};
      ring r = rDefault( 11, 3, n);     
      TS_ASSERT_DIFFERS( r, NULLp );
 
@@ -144,7 +144,7 @@ public:
   {
      clog << "Creating  QQ[x, y, z, u]: " << endl;
 
-     char* n[] = {"x", "y", "z", "u"};
+     char* n[] = {(char*)"x", (char*)"y", (char*)"z", (char*)"u"};
      ring r = rDefault( 0, 4, n);     
      TS_ASSERT_DIFFERS( r, NULLp );
 
@@ -168,7 +168,7 @@ public:
    {
      clog << "Creating  GF[t]: " << endl;
 
-     char* n[] = {"t"};
+     char* n[] = {(char*)"t"};
 
      GFInfo param;
 
@@ -212,7 +212,7 @@ public:
      clog << "Creating  QQ[x, y, z, u]: " << endl;
 
      const int N = 4;
-     char* n[N] = {"x", "y", "z", "u"};
+     char* n[N] = {(char*)"x", (char*)"y", (char*)"z", (char*)"u"};
 
 
      const int D = 2;

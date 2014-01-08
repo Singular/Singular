@@ -186,7 +186,7 @@ void TestSum(const ring r, const int N)
   TS_ASSERT( p_EqualPolys(s, ss, r) );
   TS_ASSERT( p_EqualPolys(ss, s, r) );
 
-  TODO(somebody, fix the delete method!);
+//   TODO(somebody, fix the delete method!);
 
   Delete(sum1, r);
   Delete(res, r);
@@ -1842,7 +1842,7 @@ public:
   {
     clog << "Creating  Z/13[t]: " << endl;
 
-    char* n[] = {"t"};
+    char* n[] = {(char*)"t"};
     ring r = rDefault( 13, 1, n);
     TS_ASSERT_DIFFERS( r, NULLp );
 
@@ -1866,7 +1866,7 @@ public:
   {
     clog << "Creating  Q[s]: " << endl;
 
-    char* n[] = {"s"};
+    char* n[] = {(char*)"s"};
     ring r = rDefault( 0, 1, n);
     TS_ASSERT_DIFFERS( r, NULLp );
 
@@ -1889,7 +1889,7 @@ public:
   {
      clog << "Creating  Z/11[x, y, z]: " << endl;
 
-     char* n[] = {"x", "y", "z"};
+     char* n[] = {(char*)"x", (char*)"y", (char*)"z"};
      ring r = rDefault( 11, 3, n);
      TS_ASSERT_DIFFERS( r, NULLp );
 
@@ -1912,7 +1912,7 @@ public:
    {
      clog << "Creating  QQ[x, y, z, u]: " << endl;
 
-     char* n[] = {"x", "y", "z", "u"};
+     char* n[] = {(char*)"x", (char*)"y", (char*)"z", (char*)"u"};
      ring r = rDefault( 0, 4, n);
      TS_ASSERT_DIFFERS( r, NULLp );
 
@@ -1936,7 +1936,7 @@ public:
    {
      clog << "Creating  GF[t]: " << endl;
 
-     char* n[] = {"t"};
+     char* n[] = {(char*)"t"};
 
      GFInfo param;
 
@@ -1978,7 +1978,7 @@ public:
   {
     clog << "Start by creating Q[a]..." << endl;
 
-    char* n[] = {"a"};
+    char* n[] = {(char*)"a"};
     ring r = rDefault( 0, 1, n);   // Q[a]
     TS_ASSERT_DIFFERS( r, NULLp );
 
@@ -2034,7 +2034,7 @@ public:
     clog << "Finally create the polynomial ring (Q[a]/<a2+1>)[x, y]..."
          << endl;
 
-    char* m[] = {"x", "y"};
+    char* m[] = {(char*)"x", (char*)"y"};
     ring s = rDefault(cf, 2, m);   // (Q[a]/<a2+1>)[x, y]
     TS_ASSERT_DIFFERS(s, NULLp);
 
@@ -2079,7 +2079,7 @@ public:
   {
     clog << "Start by creating Q[b]..." << endl;
 
-    char* n[] = {"b"};
+    char* n[] = {(char*)"b"};
     ring r = rDefault( 0, 1, n);   // Q[b]
     TS_ASSERT_DIFFERS( r, NULLp );
 
@@ -2135,7 +2135,7 @@ public:
     clog << "Finally create the polynomial ring (Q[b]/<b^7+17>)[u, v, w]..."
          << endl;
 
-    char* m[] = {"u", "v", "w"};
+    char* m[] = {(char*)"u", (char*)"v", (char*)"w"};
     ring s = rDefault(cf, 3, m);   // (Q[b]/<b^7+17>)[u, v, w]
     TS_ASSERT_DIFFERS(s, NULLp);
 
@@ -2224,7 +2224,7 @@ public:
   {
     clog << "Start by creating Z_17[a]..." << endl;
 
-    char* n[] = {"a"};
+    char* n[] = {(char*)"a"};
     ring r = rDefault( 17, 1, n);   // Z/17Z[a]
     TS_ASSERT_DIFFERS( r, NULLp );
 
@@ -2280,7 +2280,7 @@ public:
     clog << "Finally create the polynomial ring (Z_17[a]/<a^2+3>)[u, v, w]..."
          << endl;
 
-    char* m[] = {"u", "v", "w"};
+    char* m[] = {(char*)"u", (char*)"v", (char*)"w"};
     ring s = rDefault(cf, 3, m);   // (Z_17[a]/<a^2+3>)[u, v, w]
     TS_ASSERT_DIFFERS(s, NULLp);
 
@@ -2304,7 +2304,7 @@ public:
   {
     clog << "Start by creating Q[s, t]..." << endl;
 
-    char* n[] = {"s", "t"};
+    char* n[] = {(char*)"s", (char*)"t"};
     ring r = rDefault( 0, 2, n);   // Q[s, t]
     TS_ASSERT_DIFFERS( r, NULLp );
 
@@ -2353,7 +2353,7 @@ public:
     clog << "Finally create the polynomial ring Q(s, t)[x, y, z]..."
          << endl;
 
-    char* m[] = {"x", "y", "z"};
+    char* m[] = {(char*)"x", (char*)"y", (char*)"z"};
     ring s = rDefault(cf, 3, m);   // Q(s, t)[x, y, z]
     TS_ASSERT_DIFFERS(s, NULLp);
 
@@ -2415,7 +2415,7 @@ public:
   {
     clog << "Start by creating Q[q]..." << endl;
 
-    char* n[] = {"q"};
+    char* n[] = {(char*)"q"};
     ring r = rDefault( 0, 1, n);   // Q[q]
     r->order[0] = ringorder_dp;
     TS_ASSERT_DIFFERS( r, NULLp );
@@ -2465,7 +2465,7 @@ public:
     clog << "Finally create the polynomial ring Q(q)[t]..."
          << endl;
 
-    char* m[] = {"t"};
+    char* m[] = {(char*)"t"};
     ring s = rDefault(cf, 1, m);   // Q(q)[t]
     s->order[0] = ringorder_dp;
     TS_ASSERT_DIFFERS(s, NULLp);
@@ -2536,7 +2536,7 @@ public:
   {
     clog << "Start by creating Q[s, t]..." << endl;
 
-    char* n[] = {"s", "t"};
+    char* n[] = {(char*)"s", (char*)"t"};
     ring r = rDefault( 0, 2, n);   // Q[s, t]
     TS_ASSERT_DIFFERS( r, NULLp );
 
@@ -2577,7 +2577,7 @@ public:
     clog << "Finally create the polynomial ring Q(s, t)[x, y, z]..."
          << endl;
 
-    char* m[] = {"x", "y", "z"};
+    char* m[] = {(char*)"x", (char*)"y", (char*)"z"};
     ring s = rDefault(cf, 3, m);   // Q(s, t)[x, y, z]
     TS_ASSERT_DIFFERS(s, NULLp);
 
