@@ -798,7 +798,7 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
 {
   char *plib = iiConvName(lib);
   idhdl pl = basePack->idroot->get(plib,0);
-  if( (pl!=NULL) && (IDTYPr(pl)==PACKAGE_CMD) &&
+  if( (pl!=NULL) && (IDTYP(pl)==PACKAGE_CMD) &&
     (IDPACKAGE(pl)->language == LANG_SINGULAR))
   {
     strncpy(where,IDPACKAGE(pl)->libname,127);
