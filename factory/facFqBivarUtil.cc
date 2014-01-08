@@ -723,13 +723,16 @@ getCoeffs (const CanonicalForm& G, const int k, const int l, const int degMipo,
 
   convertFacCF2nmod_poly_t (FLINTF, F);
 
+#ifndef slong
+#define slong long
+#endif
   slong i;
 
   for (i= 0; i < FLINTF->length; i++)
     nmod_mat_entry (MFLINTF, i, 0)= FLINTF->coeffs[i];
 
   for (; i < MFLINTF->r; i++)
-    nmod_mat_entry (MFLINTF, i, 0)= UWORD(0);
+    nmod_mat_entry (MFLINTF, i, 0)= 0;
 
   nmod_mat_mul (mulResult, M, MFLINTF);
 
