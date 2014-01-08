@@ -25,3 +25,5 @@ nodist_configheader_HEADERS = singularconfig.h
 
 dist_man1_MANS = doc/Singular.man doc/ESingular.man doc/TSingular.man
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = Singular.pc

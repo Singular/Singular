@@ -172,7 +172,7 @@ SingularHEADERS =    Cache.h \
 # plural_cmd.inc
 nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc 
 
-libSingular_la_LDFLAGS    = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
+libSingular_la_LDFLAGS    = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION}
 
 libSingular_la_LIBADD      = ${EMBED_PYOBJECT} ${top_builddir}/numeric/libnumeric.la ${top_builddir}/kernel/libkernel.la \
 ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}

@@ -1,4 +1,4 @@
-AC_INIT([libpolys], [3.1.2.sw])
+AC_INIT([libpolys], [4.0.0])
 
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([.])
@@ -121,5 +121,5 @@ AC_CONFIG_FILES([reporter/Makefile])
 AC_CONFIG_FILES([coeffs/Makefile])
 AC_CONFIG_FILES([polys/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
-AC_CONFIG_FILES([libpolys-config])
+AC_CONFIG_FILES([libpolys-config libpolys.pc])
 AC_OUTPUT

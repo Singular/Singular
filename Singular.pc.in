@@ -1,0 +1,17 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libSingular
+Description: The Singular high level functionality
+Version: @PACKAGE_VERSION@
+URL: https://github.com/Singular/Sources/
+
+Requires: omalloc resources factory libpolys
+# Conflicts: 
+
+Cflags: -I${includedir} -I${includedir}/singular @FACTORY_CFLAGS@ @FLINT_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@ -DSING_NDEBUG -DOM_NDEBUG
+Libs: -L${libdir} -lSingular  @USEPPROCSDYNAMICLD@
+# Libs.private: 
+

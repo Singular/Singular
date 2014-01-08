@@ -11,7 +11,7 @@ libfactory_la_LIBADD     = ${builddir}/libfac/libfac.la \
 ${builddir}/../omalloc/libomalloc.la ${builddir}/../resources/libresources.la \
 $(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
 
-### libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 # factory source files
 SOURCES = \
@@ -297,3 +297,8 @@ TESTADDLIBDEBUG = $(TESTADDLIBDIRS) $(OMALLOC_G_LDADD)
 
 test_SOURCES = $(TESTSSOURCES)
 test_LDADD = libfactory.la $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIB)
+
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = factory.pc
+

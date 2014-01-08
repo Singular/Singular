@@ -1,4 +1,4 @@
-AC_INIT([libresources], [4.0.0])
+AC_INIT([resources], [4.0.0])
 
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([.])
@@ -70,5 +70,5 @@ AX_RECURSIVE_EVAL([[$]datadir], [config_datadir])
 AX_NORMALIZE_PATH([config_datadir],['/'])
 AC_DEFINE_UNQUOTED([DATA_DIR],"$config_datadir",[datadir])
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([resources.pc Makefile])
 AC_OUTPUT

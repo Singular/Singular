@@ -608,6 +608,6 @@ LDFLAGS=$BACKUP_LDFLAGS
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl wrap it up
 dnl
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile omalloc.pc])
 AC_OUTPUT
 

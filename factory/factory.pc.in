@@ -1,0 +1,17 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: @PACKAGE@
+Description: The Singular factorization library
+Version: @PACKAGE_VERSION@
+URL: https://github.com/Singular/Sources/tree/spielwiese/@PACKAGE@
+
+Requires: omalloc resources
+# Conflicts: 
+
+Cflags: -I${includedir} -DOM_NDEBUG -DSING_NDEBUG @FLINT_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@
+Libs: -L${libdir} -l@PACKAGE@ @FLINT_LIBS@ @NTL_LIBS@ @GMP_LIBS@
+# Libs.private: 
+

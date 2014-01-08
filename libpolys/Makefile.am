@@ -9,3 +9,6 @@ TESTDIRS=coeffs tests
 
 configheaderdir = ${includedir}/singular
 nodist_configheader_HEADERS = libpolysconfig.h
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libpolys.pc
