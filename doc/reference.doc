@@ -3299,11 +3299,12 @@ See
 @cindex killattrib
 @table @code
 @item @strong{Syntax:}
-@code{killattrib (} name@code{,} string_expression @code{)}
+@code{killattrib (} name @code{)}
+@*@code{killattrib (} name@code{,} string_expression @code{)}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-deletes the attribute given as the second argument.
+deletes all attributes respective the attribute given as the second argument.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3312,6 +3313,9 @@ deletes the attribute given as the second argument.
   attrib(i,"isSB",1);
   attrib(i);
   killattrib(i,"isSB");
+  attrib(i);
+  attrib(i,"isSB",1);
+  killattrib(i);
   attrib(i);
 @c example
 @end smallexample
