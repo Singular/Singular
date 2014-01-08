@@ -54,7 +54,7 @@ typedef ListNode** LI;
 Poly* FindMinList(jList *);
 void DestroyTree(NodeM *);
 NodeM* create();
-void ForEach(TreeM *,poly_function);
+//void ForEach(TreeM *,poly_function);
 void ControlProlong(Poly *);
 Poly* is_div_(TreeM *root, poly item);
 void insert_(TreeM **tree, Poly *item);
