@@ -276,11 +276,6 @@ feOptIndex feGetOptIndex(int optc)
   return FE_OPT_UNDEF;
 }
 
-void* feGetOptValue(feOptIndex opt)
-{
-  return feOptSpec[(int)opt].value;
-}
-
 ///////////////////////////////////////////////////////////////
 //
 // Setting Values

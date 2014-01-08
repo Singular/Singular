@@ -348,7 +348,7 @@ void sigint_handler(int sig)
     {
       fprintf(stderr,"// ** Interrupt at cmd:`%s` in line:'%s'\n",
         Tok2Cmdname(iiOp),my_yylinebuf);
-      if (feGetOptValue(FE_OPT_EMACS) == NULL)
+      if (feOptValue(FE_OPT_EMACS) == NULL)
       {
         fputs("abort after this command(a), abort immediately(r), print backtrace(b), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
         c = fgetc(stdin);
@@ -383,7 +383,7 @@ void sigint_handler(int sig)
       case 'a':
                 siCntrlc++;
       case 'c':
-                if ((feGetOptValue(FE_OPT_EMACS) == NULL) && (default_opt!=' '))
+                if ((feOptValue(FE_OPT_EMACS) == NULL) && (default_opt!=' '))
                 {
                   /* Read until a newline or EOF */
                   while (c != EOF && c != '\n') c = fgetc(stdin);

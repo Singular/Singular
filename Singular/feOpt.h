@@ -34,13 +34,10 @@ typedef enum {FE_OPT_UNDEF}  feOptIndex;
 extern "C" {
 #endif
 
-void* feGetOptValue(feOptIndex opt);
-
-
 #ifdef __cplusplus
 }
 
-inline void* feOptValue(feOptIndex opt)
+static inline void* feOptValue(feOptIndex opt)
 {
   return feOptSpec[(int)opt].value;
 }
