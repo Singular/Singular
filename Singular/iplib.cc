@@ -796,33 +796,16 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
 */
 BOOLEAN iiLocateLib(const char* lib, char* where)
 {
-  idhdl hl;
-
-  char *p;
-
-  hl = IDROOT->get("LIB", 0);
-  if (hl == NULL || (p=strstr(IDSTRING(hl), lib)) == NULL) return FALSE;
-  if ((p!=IDSTRING(hl)) && (*(p-1)!=',')) return FALSE;
-
-  if (strstr(IDSTRING(hl), ",") == NULL)
+  char *plib = iiConvName(lib);
+  idhdl pl = basePack->idroot->get(plib,0);
+  if( (pl!=NULL) && (IDTYPr(pl)==PACKAGE_CMD) &&
+    (IDPACKAGE(pl)->language == LANG_SINGULAR))
   {
-    strcpy(where, IDSTRING(hl));
+    strncpy(where,IDPACKAGE(pl)->libname,127);
+    return TRUE;
   }
   else
-  {
-    char* tmp = omStrDup(IDSTRING(hl));
-    char* tok = strtok(tmp, ",");
-    do
-    {
-      if (strstr(tok, lib) != NULL) break;
-      tok = strtok(NULL, ",");
-    }
-    while (tok != NULL);
-    assume(tok != NULL);
-    strcpy(where, tok);
-    omFree(tmp);
-  }
-  return TRUE;
+    return FALSE;;
 }
 
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force )
@@ -994,13 +977,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
               const char *procname, int line, long pos, BOOLEAN pstatic)
 {
   pi->libname = omStrDup(libname);
-
-  if( strcmp(procname,"_init")==0)
-  {
-    pi->procname = iiConvName(libname);
-  }
-  else
-    pi->procname = omStrDup(procname);
+  pi->procname = omStrDup(procname);
   pi->language = LANG_SINGULAR;
   pi->ref = 1;
   pi->pack = NULL;
@@ -1019,36 +996,6 @@ procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
   pi->data.s.help_chksum = 0;
   return(pi);
 }
-
-#if 0
-// TODO!?
-procinfo *iiInitSingularProcinfo(procinfo* pi, const char *libname,
-                                 const char *procname, int line, long pos,
-                                 BOOLEAN pstatic /*= FALSE*/)
-{
-  pi->libname = (char *)malloc(strlen(libname)+1);
-  memcpy(pi->libname, libname, strlen(libname));
-  *(pi->libname+strlen(libname)) = '\0';
-
-  pi->procname = (char *)malloc(strlen(procname)+1);
-  strcpy(pi->procname, procname/*, strlen(procname)*/);
-  pi->language = LANG_SINGULAR;
-  pi->ref = 1;
-  pi->is_static = pstatic;
-  pi->data.s.proc_start = pos;
-  pi->data.s.def_end    = 0L;
-  pi->data.s.help_start = 0L;
-  pi->data.s.body_start = 0L;
-  pi->data.s.body_end   = 0L;
-  pi->data.s.example_start = 0L;
-  pi->data.s.proc_lineno = line;
-  pi->data.s.body_lineno = 0;
-  pi->data.s.example_lineno = 0;
-  pi->data.s.body = NULL;
-  pi->data.s.help_chksum = 0;
-  return(pi);
-}
-#endif
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 int iiAddCproc(const char *libname, const char *procname, BOOLEAN pstatic,
