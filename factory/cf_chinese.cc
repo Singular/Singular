@@ -160,6 +160,7 @@ chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, C
 }
 //}}}
 
+#ifndef HAVE_NTL
 CanonicalForm Farey_n (CanonicalForm N, const CanonicalForm P)
 //"USAGE:  Farey_n (N,P); P, N number;
 //RETURN:  a rational number a/b such that a/b=N mod P
@@ -189,6 +190,7 @@ CanonicalForm Farey_n (CanonicalForm N, const CanonicalForm P)
    }
    return(0);
 }
+#endif
 
 CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
 {
