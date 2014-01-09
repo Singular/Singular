@@ -11,7 +11,6 @@
 #include "imm.h"
 #include "int_pp.h"
 #include "cf_primes.h"
-#include "cf_binom.h"
 #include "cf_util.h"
 
 static int theCharacteristic = 0;
@@ -40,7 +39,6 @@ void setCharacteristic( int c )
         ff_big = c > cf_getSmallPrime( cf_getNumSmallPrimes()-1 );
         if (c > 536870909) factoryError("characteristic is too large(max is 2^29)");
         ff_setprime( c );
-        resetFPT();
     }
 }
 

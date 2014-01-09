@@ -59,9 +59,6 @@
 #include "canonicalform.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
-#include "cf_binom.h"
-
-/*MAKEHEADER PUBLIC ONLY*/
 #include "cf_algorithm.h"
 
 /*MAKEHEADER PUBLIC ONLY*/

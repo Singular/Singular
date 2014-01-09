@@ -15,7 +15,6 @@
 #include "cf_algorithm.h"
 #include "imm.h"
 #include "gfops.h"
-#include "cf_binom.h"
 
 #include <factory/cf_gmp.h>
 
@@ -41,7 +40,6 @@ initCanonicalForm( void )
 #endif
 
         (void)initializeCharacteristic();
-        initPT();
         initialized = true;
     }
     return 1;

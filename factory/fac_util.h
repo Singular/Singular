@@ -33,24 +33,6 @@ public:
 
 CanonicalForm replaceLc( const CanonicalForm & f, const CanonicalForm & c );
 
-CanonicalForm remainder( const CanonicalForm & f, const CanonicalForm & g, const modpk & pk );
-
-void divremainder( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & quot, CanonicalForm & rem, const modpk & pk );
-
-bool Hensel ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evaluation & A, const modpk & bound, const Variable & x );
-
-/* some special array functions */
-
-CanonicalForm sum ( const CFArray & a, int f, int l );
-
-CanonicalForm prod ( const CFArray & a, int f, int l );
-
-CanonicalForm sum ( const CFArray & a );
-
-CanonicalForm prod ( const CFArray & a );
-
-CanonicalForm crossprod ( const CFArray & a, const CFArray & b );
-
 /*ENDPUBLIC*/
 
 bool gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int & d );
