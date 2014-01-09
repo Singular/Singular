@@ -1,5 +1,7 @@
-p_Procs_Dynamic.inc
-p_Procs_Static.inc
-prCopy.inc
-testr
-testg
+/p_Procs_Dynamic.inc
+/p_Procs_Static.inc
+/prCopy.inc
+/test
+/test-suite.log
+/test.log
+
