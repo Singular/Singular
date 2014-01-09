@@ -46,7 +46,7 @@ endif !SI_EMBED_PYTHON
 ########################### libSingular* #########################
 
 libSingular_LTLIBRARIES = libSingular.la 
-libSingulardir = $(libdir)/singular
+libSingulardir = $(libdir)
 
 libSingular_la_CPPFLAGS = ${AM_CPPFLAGS} -DLIBSINGULAR
 
