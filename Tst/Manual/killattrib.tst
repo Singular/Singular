@@ -5,4 +5,9 @@ LIB "tst.lib"; tst_init();
   attrib(i);
   killattrib(i,"isSB");
   attrib(i);
+  attrib(i,"isSB",1);
+  attrib(i,"colour","red");
+  attrib(i);
+  killattrib(i);
+  attrib(i);
 tst_status(1);$
