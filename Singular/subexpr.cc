@@ -381,6 +381,8 @@ BOOLEAN sleftv::RingDependend()
     return TRUE;
   if (rt==LIST_CMD)
     return lRingDependend((lists)Data());
+  if (this->next!=NULL)
+    return this->next->RingDependend();
   return FALSE;
 }
 

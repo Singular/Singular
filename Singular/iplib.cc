@@ -567,10 +567,7 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, sleftv* sl)
   {
     if (currRing!=NULL)
     {
-      if (((iiRETURNEXPR.Typ()>BEGIN_RING)
-        && (iiRETURNEXPR.Typ()<END_RING))
-      || ((iiRETURNEXPR.Typ()==LIST_CMD)
-        && (lRingDependend((lists)iiRETURNEXPR.Data()))))
+      if (iiRETURNEXPR.RingDependend())
       {
         //idhdl hn;
         const char *n;
@@ -610,10 +607,7 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, sleftv* sl)
     //if (currRingHdl!=NULL)
     //Print(" curr:%s\n",IDID(currRingHdl));
     //Print("pr:%x, curr: %x\n",procstack->cRing,currRing);
-    if (((iiRETURNEXPR.Typ()>BEGIN_RING)
-      && (iiRETURNEXPR.Typ()<END_RING))
-    || ((iiRETURNEXPR.Typ()==LIST_CMD)
-      && (lRingDependend((lists)iiRETURNEXPR.Data()))))
+    if (iiRETURNEXPR.RingDependend())
     {
       //idhdl hn;
       char *n;
