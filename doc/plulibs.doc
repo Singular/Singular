@@ -32,6 +32,7 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * ncalg_lib::  Definitions of important G- and GR-algebras
 * ncdecomp_lib::  Algorithmic decomposition of a module with central characters
 * ncfactor_lib::  Tools for factorization in some noncommutative algebras
+* ncpreim_lib:: Non-commutative elimination and preimage computations
 * nctools_lib::  General tools for noncommutative algebras
 * perron_lib::  Method of Perron to compute algebraic dependence
 * qmatrix_lib::  Quantum matrices, quantum minors and symmetric groups
@@ -85,11 +86,15 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 @section ncdecomp_lib
 @c lib ncdecomp.lib
 @c ----------------------------------------------------------
-@node ncfactor_lib, nctools_lib, ncdecomp_lib, Non-commutative libraries
+@node ncfactor_lib, ncpreimlib, ncdecomp_lib, Non-commutative libraries
 @section ncfactor_lib
 @c lib ncfactor.lib
 @c ----------------------------------------------------------
-@node nctools_lib, perron_lib, ncfactor_lib, Non-commutative libraries
+@node ncpreim_lib, nctools_lib, ncdecomp_lib, Non-commutative libraries
+@section ncpreim_lib
+@c lib ncpreim.lib
+@c ----------------------------------------------------------
+@node nctools_lib, perron_lib, ncpreim_lib, Non-commutative libraries
 @section nctools_lib
 @c lib nctools.lib
 @c ----------------------------------------------------------
