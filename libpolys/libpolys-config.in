@@ -88,15 +88,11 @@ while test $# -gt 0; do
 	;;
 
     --cflags)
-	${ECHOn} " -I${includedir} -I${includedir}/singular @FACTORY_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@ -DSING_NDEBUG -DOM_NDEBUG"
-	;;
-
-    --cflagswithdebug)
-	${ECHOn} " -I${includedir} -I${includedir}/singular @FACTORY_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@"
+	${ECHOn} " -I${includedir} -I${includedir}/singular @SINGULAR_CFLAGS@ @FACTORY_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@ "
 	;;
 
     --libs)
-	${ECHOn} " -L${libdir}/singular/libpolys.la" 
+	${ECHOn} " -L${libdir} -lpolys"
 	;;
 
     *)

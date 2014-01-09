@@ -21,7 +21,7 @@ endif
 
 
 libpolys_LTLIBRARIES = libpolys.la
-libpolysdir = $(libdir)/singular
+libpolysdir = $(libdir)
 
 SOURCES = \
 	monomials/monomials.cc monomials/p_polys.cc monomials/ring.cc monomials/maps.cc \

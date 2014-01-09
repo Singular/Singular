@@ -36,9 +36,6 @@ libomalloc_la_CFLAGS    = -O2
 nodist_libomalloc_la_SOURCES = omTables.inc omTables.h mylimits.h
 nodist_libomalloc_include_HEADERS = omConfig.h mylimits.h omTables.h
 
-### NOTE: "_g" (debug) means full library
-### libomalloc_la_CPPFLAGS= -DOM_ALLOC_INTERNAL  -DOM_NDEBUG
-
 libomalloc_la_CPPFLAGS  = ${AM_CPPFLAGS} -DOM_ALLOC_INTERNAL
 
 BUILT_SOURCES = omTables.inc omTables.h
