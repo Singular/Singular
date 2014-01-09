@@ -1243,14 +1243,6 @@ FindUnivariateWrapper( ideal source, ideal & destIdeal )
         return FALSE;
 }
 
-template class List<fglmSelem>;
-template class ListItem<fglmSelem>;
-template class ListIterator<fglmSelem>;
-template class List<fglmDelem>;
-template class ListItem<fglmDelem>;
-template class ListIterator<fglmDelem>;
-
-
 // ----------------------------------------------------------------------------
 // Local Variables: ***
 // compile-command: "make Singular" ***

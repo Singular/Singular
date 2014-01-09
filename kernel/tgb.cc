@@ -5047,6 +5047,7 @@ void simple_reducer::pre_reduce (red_object * /*r*/, int /*l*/, int /*u*/)
 {
 }
 
+#if 0
 template int pos_helper<int, int*>(skStrategy*, spolyrec*, int, int*, spolyrec**);
 template int pos_helper<long, long*>(skStrategy*, spolyrec*, long, long*, spolyrec**);
 
@@ -5156,7 +5157,7 @@ template void std::sort_heap<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*,
 template void std::make_heap<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);
 template void std::make_heap<CoefIdx<unsigned int>*>(CoefIdx<unsigned int>*, CoefIdx<unsigned int>*);
 template void std::make_heap<CoefIdx<unsigned short>*>(CoefIdx<unsigned short>*, CoefIdx<unsigned short>*);
-
+#endif
 
 #if 0
 template void std::__final_insertion_sort<CoefIdx<unsigned char>*>(CoefIdx<unsigned char>*, CoefIdx<unsigned char>*);

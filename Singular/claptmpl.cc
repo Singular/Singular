@@ -18,11 +18,11 @@
   #include <kernel/fglm.h>
 
 // templates for fglm:
-
   template class List<fglmSelem>;
+  template class ListItem<fglmSelem>;
   template class ListIterator<fglmSelem>;
-
   template class List<fglmDelem>;
+  template class ListItem<fglmDelem>;
   template class ListIterator<fglmDelem>;
 
 // ----------------------------------------------------------------------------
@@ -44,7 +44,7 @@
 #include <kernel/GMPrat.h>
 #include <kernel/kmatrix.h>
 
-template    class   KMatrix<Rational>;
+template class KMatrix<Rational>;
 
 #ifdef   KMATRIX_PRINT
 template    OSTREAM &   operator << ( OSTREAM&,const KMatrix<Rational>& );
