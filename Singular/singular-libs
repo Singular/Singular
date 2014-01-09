@@ -56,6 +56,7 @@ SLIB1 = classifyceq.lib classifyci.lib classify_aeq.lib \
 PLIBS = bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib fpadim.lib \
 	freegb.lib gkdim.lib involut.lib ncalg.lib ncdecomp.lib \
 	ncfactor.lib ncpreim.lib nctools.lib perron.lib qmatrix.lib \
+        purityfiltration.lib nchomolog.lib ratgb.lib \
 	ncall.lib
 
 
