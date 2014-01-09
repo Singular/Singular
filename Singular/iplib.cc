@@ -418,6 +418,88 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   {
     err=iiAllStart(pi,pi->data.s.body,BT_proc,pi->data.s.body_lineno-(v!=NULL));
 
+#ifdef USE_IILOCALRING
+#if 0
+  if(procstack->cRing != iiLocalRing[myynest]) Print("iiMake_proc: 1 ring not saved procs:%x, iiLocal:%x\n",procstack->cRing, iiLocalRing[myynest]);
+#endif
+    if (iiLocalRing[myynest-1] != currRing)
+    {
+      if (iiRETURNEXPR.RingDependend())
+      {
+        //idhdl hn;
+        const char *n;
+        const char *o;
+        idhdl nh=NULL, oh=NULL;
+        if (iiLocalRing[myynest-1]!=NULL)
+          oh=rFindHdl(iiLocalRing[myynest-1],NULL, NULL);
+        if (oh!=NULL)          o=oh->id;
+        else                   o="none";
+        if (currRing!=NULL)
+          nh=rFindHdl(currRing,NULL, NULL);
+        if (nh!=NULL)          n=nh->id;
+        else                   n="none";
+        Werror("ring change during procedure call: %s -> %s (level %d)",o,n,myynest);
+        iiRETURNEXPR.CleanUp();
+        err=TRUE;
+      }
+      currRing=iiLocalRing[myynest-1];
+    }
+    if ((currRing==NULL)
+    && (currRingHdl!=NULL))
+      currRing=IDRING(currRingHdl);
+    else
+    if ((currRing!=NULL) &&
+      ((currRingHdl==NULL)||(IDRING(currRingHdl)!=currRing)
+       ||(IDLEV(currRingHdl)>=myynest-1)))
+    {
+      rSetHdl(rFindHdl(currRing,NULL, NULL));
+      iiLocalRing[myynest-1]=NULL;
+    }
+#else /* USE_IILOCALRING */
+    if (procstack->cRing != currRing)
+    {
+      //if (procstack->cRingHdl!=NULL)
+      //Print("procstack:%s,",IDID(procstack->cRingHdl));
+      //if (currRingHdl!=NULL)
+      //Print(" curr:%s\n",IDID(currRingHdl));
+      //Print("pr:%x, curr: %x\n",procstack->cRing,currRing);
+      if (iiRETURNEXPR.RingDependend())
+      {
+        //idhdl hn;
+        char *n;
+        char *o;
+        if (procstack->cRing!=NULL)
+        {
+          //PrintS("reset ring\n");
+          procstack->cRingHdl=rFindHdl(procstack->cRing,NULL, NULL);
+          if (procstack->cRingHdl==NULL)
+            procstack->cRingHdl=
+              rFindHdl(procstack->cRing,NULL,procstack->currPack->idroot);
+          if (procstack->cRingHdl==NULL)
+            procstack->cRingHdl=
+              rFindHdl(procstack->cRing,NULL,basePack->idroot);
+          o=IDID(procstack->cRingHdl);
+          currRing=procstack->cRing;
+          currRingHdl=procstack->cRingHdl;
+        }
+        else                            o="none";
+        if (currRing!=NULL)             n=IDID(currRingHdl);
+        else                            n="none";
+        if (currRing==NULL)
+        {
+          Werror("ring change during procedure call: %s -> %s",o,n);
+          iiRETURNEXPR.CleanUp();
+          err=TRUE;
+        }
+      }
+      if (procstack->cRingHdl!=NULL)
+      {
+        rSetHdl(procstack->cRingHdl);
+      }
+      else
+      { currRingHdl=NULL; currRing=NULL; }
+    }
+#endif /* USE_IILOCALRING */
     //Print("kill locals for %s (level %d)\n",IDID(pn),myynest);
     killlocals(myynest);
 #ifndef SING_NDEBUG
@@ -559,91 +641,6 @@ BOOLEAN iiMake_proc(idhdl pn, package pack, sleftv* sl)
     iiRETURNEXPR.CleanUp();
     //iiRETURNEXPR.Init(); //done by CleanUp
   }
-#ifdef USE_IILOCALRING
-#if 0
-  if(procstack->cRing != iiLocalRing[myynest]) Print("iiMake_proc: 1 ring not saved procs:%x, iiLocal:%x\n",procstack->cRing, iiLocalRing[myynest]);
-#endif
-  if (iiLocalRing[myynest] != currRing)
-  {
-    if (currRing!=NULL)
-    {
-      if (iiRETURNEXPR.RingDependend())
-      {
-        //idhdl hn;
-        const char *n;
-        const char *o;
-        idhdl nh=NULL, oh=NULL;
-        if (iiLocalRing[myynest]!=NULL)
-          oh=rFindHdl(iiLocalRing[myynest],NULL, NULL);
-        if (oh!=NULL)          o=oh->id;
-        else                   o="none";
-        if (currRing!=NULL)
-          nh=rFindHdl(currRing,NULL, NULL);
-        if (nh!=NULL)          n=nh->id;
-        else                   n="none";
-        Werror("ring change during procedure call: %s -> %s (level %d)",o,n,myynest);
-        iiRETURNEXPR.CleanUp();
-        err=TRUE;
-      }
-    }
-    currRing=iiLocalRing[myynest];
-  }
-  if ((currRing==NULL)
-  && (currRingHdl!=NULL))
-    currRing=IDRING(currRingHdl);
-  else
-  if ((currRing!=NULL) &&
-    ((currRingHdl==NULL)||(IDRING(currRingHdl)!=currRing)
-     ||(IDLEV(currRingHdl)>=myynest)))
-  {
-    rSetHdl(rFindHdl(currRing,NULL, NULL));
-    iiLocalRing[myynest]=NULL;
-  }
-#else /* USE_IILOCALRING */
-  if (procstack->cRing != currRing)
-  {
-    //if (procstack->cRingHdl!=NULL)
-    //Print("procstack:%s,",IDID(procstack->cRingHdl));
-    //if (currRingHdl!=NULL)
-    //Print(" curr:%s\n",IDID(currRingHdl));
-    //Print("pr:%x, curr: %x\n",procstack->cRing,currRing);
-    if (iiRETURNEXPR.RingDependend())
-    {
-      //idhdl hn;
-      char *n;
-      char *o;
-      if (procstack->cRing!=NULL)
-      {
-        //PrintS("reset ring\n");
-        procstack->cRingHdl=rFindHdl(procstack->cRing,NULL, NULL);
-        if (procstack->cRingHdl==NULL)
-          procstack->cRingHdl=
-           rFindHdl(procstack->cRing,NULL,procstack->currPack->idroot);
-        if (procstack->cRingHdl==NULL)
-          procstack->cRingHdl=
-           rFindHdl(procstack->cRing,NULL,basePack->idroot);
-        o=IDID(procstack->cRingHdl);
-        currRing=procstack->cRing;
-        currRingHdl=procstack->cRingHdl;
-      }
-      else                            o="none";
-      if (currRing!=NULL)             n=IDID(currRingHdl);
-      else                            n="none";
-      if (currRing==NULL)
-      {
-        Werror("ring change during procedure call: %s -> %s",o,n);
-        iiRETURNEXPR.CleanUp();
-        err=TRUE;
-      }
-    }
-    if (procstack->cRingHdl!=NULL)
-    {
-      rSetHdl(procstack->cRingHdl);
-    }
-    else
-    { currRingHdl=NULL; currRing=NULL; }
-  }
-#endif /* USE_IILOCALRING */
   if (iiCurrArgs!=NULL)
   {
     if (!err) Warn("too many arguments for %s",IDID(pn));

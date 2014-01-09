@@ -5548,11 +5548,11 @@ void rKill(ring r)
       {
         sLastPrinted.CleanUp();
       }
-      if ((myynest>0) && (iiRETURNEXPR.RingDependend()))
-      {
-        WerrorS("return value depends on local ring variable (export missing ?)");
-        iiRETURNEXPR.CleanUp();
-      }
+      //if ((myynest>0) && (iiRETURNEXPR.RingDependend()))
+      //{
+      //  WerrorS("return value depends on local ring variable (export missing ?)");
+      //  iiRETURNEXPR.CleanUp();
+      //}
       currRing=NULL;
       currRingHdl=NULL;
     }
