@@ -221,7 +221,7 @@ Singulars_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 #  ${EMBED_PYOBJECT_LDFLAGS}  ${EMBED_PYOBJECT_LDFLAGS}
 Singulars_LDADD = libSingular.la ${EMBED_PYOBJECT}
 
-# Singulars_LDFLAGS = -static ${AM_LDFLAGS} ${EMBED_PYOBJECT}
+Singulars_LDFLAGS = -static ${AM_LDFLAGS} ${EMBED_PYOBJECT}
 
 dist_bin_SCRIPTS = singularsurf
 
