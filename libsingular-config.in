@@ -96,7 +96,7 @@ while test $# -gt 0; do
 	;;
 
     --libs)
-	${ECHOn} " ${libdir}/singular/libSingular.la @USEPPROCSDYNAMICLD@" 
+	${ECHOn} " ${libdir}/libSingular.la @USEPPROCSDYNAMICLD@"
 	;;
 
     *)
