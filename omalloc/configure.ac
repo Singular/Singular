@@ -490,8 +490,13 @@ int test_backtrace()
 int main()
 {
    int i;
+   #ifdef __APPLE__
+   /* omGetBackTrace crashes on OsX for i>2 */
+   i=0;
+   #else
    omInitGetBackTrace();
    i = test_backtrace();
+   #endif
    if (i > 0) exit(0);
    else exit(i+10);
 }
