@@ -166,7 +166,7 @@ void Matrix<T>::print( OSTREAM& s ) const
 }
 #endif /* NOSTREAMIO */
 
-template <class T>
+/*template <class T>
 Matrix<T> operator+ ( const Matrix<T>& lhs, const Matrix<T>& rhs )
 {
     ASSERT( lhs.NR == rhs.NR && lhs.NC == rhs.NC, "incompatible matrices" );
@@ -225,7 +225,7 @@ Matrix<T> operator* ( const Matrix<T>& lhs, const Matrix<T>& rhs )
 		res[i][j]+= lhs.elems[i][k] * rhs.elems[k][j];
 	}
     return res;
-}
+}*/
 
 template <class T>
 SubMatrix<T>::SubMatrix( int rmin, int rmax, int cmin, int cmax, const Matrix<T> & m ) : r_min(rmin), r_max(rmax), c_min(cmin), c_max(cmax), M((Matrix<T>&)m) {}

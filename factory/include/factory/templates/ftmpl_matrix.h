@@ -58,7 +58,7 @@ public:
 #endif /* NOSTREAMIO */
     friend class SubMatrix<T>;
 };
-    template <class T>
+    /*template <class T>
     Matrix<T> operator+ ( const Matrix<T>& lhs, const Matrix<T>& rhs );
     template <class T>
     Matrix<T> operator- ( const Matrix<T>& lhs, const Matrix<T>& rhs );
@@ -67,7 +67,7 @@ public:
     template <class T>
     Matrix<T> operator* ( const Matrix<T>& lhs, const T& rhs );
     template <class T>
-    Matrix<T> operator* ( const T& lhs, const Matrix<T>& rhs );
+    Matrix<T> operator* ( const T& lhs, const Matrix<T>& rhs );*/
 
 template <class T>
 class SubMatrix
