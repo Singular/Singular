@@ -193,6 +193,12 @@ AC_DEFINE_UNQUOTED([BIN_DIR],"$config_bindir",[bindir])
 AX_RECURSIVE_EVAL([[$]datadir], [config_datadir])
 AX_NORMALIZE_PATH([config_datadir],['/'])
 AC_DEFINE_UNQUOTED([DATA_DIR],"$config_datadir",[datadir])
+AC_SUBST(DATA_DIR)
+
+AX_RECURSIVE_EVAL([[$]docdir], [config_docdir])
+AX_NORMALIZE_PATH([config_docdir],['/'])
+AC_DEFINE_UNQUOTED([DOC_DIR],"$config_docdir",[docdir])
+AC_SUBST(DOC_DIR)
 
 SING_SHOW_FLAGS([Compiler/linker flags: ])
 
@@ -233,6 +239,6 @@ AC_CONFIG_FILES([emacs/Makefile])
 AC_CONFIG_FILES([debian/Makefile])
 AC_CONFIG_FILES([redhat/Makefile])
 AC_CONFIG_FILES([redhat/singular.spec])
-AC_CONFIG_FILES([desktop/Makefile])
+AC_CONFIG_FILES([desktop/Makefile desktop/Singular.desktop desktop/Singular-manual.desktop])
 
 AC_OUTPUT

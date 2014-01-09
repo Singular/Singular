@@ -8,8 +8,8 @@ Comment[es]=
 Comment[fr]=lire le manuel d'utilisation de Singular @PACKAGE_VERSION@
 Comment[ru]=
 Type=Link
-URL=file://@docdir@/html/index.htm
-Icon=@datadir@/icons/Singular.png
+URL=file://@DOC_DIR@/html/index.htm
+Icon=@DATA_DIR@/icons/Singular.png
 Categories=Math;Science;Development;Education;Documentation;
 Encoding=UTF-8
 
