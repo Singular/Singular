@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version all.lib 3-1-7-0 Sep_2013 ";
+version="$Id$";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -27,6 +27,7 @@ LIB "crypto.lib";
 LIB "curvepar.lib";
 LIB "decodegb.lib";
 LIB "deform.lib";
+LIB "ehv.lib";
 LIB "elim.lib";
 LIB "equising.lib";
 LIB "finvar.lib";
@@ -113,6 +114,7 @@ LIB "involut.lib";
 LIB "ncalg.lib";
 LIB "ncdecomp.lib";
 LIB "ncfactor.lib";
+LIB "ncpreim.lib";
 LIB "nctools.lib";
 LIB "perron.lib";
 LIB "qmatrix.lib";
