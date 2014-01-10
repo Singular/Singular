@@ -2816,6 +2816,8 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
     p_SetComp(strat->L[cd].sig,cc+1,currRing);
     cc++;
   }
+  for (cc=strat->sl+1; cc<IDELEMS(strat->Shdl); ++cc)
+    strat->Shdl->m[cc]  = NULL;
 //#if 1
 #if DEBUGF5
   Print("------------------- STRAT S ---------------------\n");
