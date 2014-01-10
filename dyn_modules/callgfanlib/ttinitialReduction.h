@@ -1,17 +1,17 @@
-#ifndef INITIALREDUCTION_H
-#define INITIALREDUCTION_H
+#ifndef TTINITIALREDUCTION_H
+#define TTINITIALREDUCTION_H
 
 #include <kernel/structs.h>
 
-#ifndef N_DEBUG
+#ifndef NDEBUG
 BOOLEAN ttpReduce(leftv res, leftv args);
-/* BOOLEAN reduceInitially0(leftv res, leftv args); */
-/* BOOLEAN reduceInitially1(leftv res, leftv args); */
-/* BOOLEAN reduceInitially2(leftv res, leftv args); */
-/* BOOLEAN reduceInitially3(leftv res, leftv args); */
-/* BOOLEAN reduceInitially4(leftv res, leftv args); */
+BOOLEAN ttreduceInitially0(leftv res, leftv args);
+BOOLEAN ttreduceInitially1(leftv res, leftv args);
+BOOLEAN ttreduceInitially2(leftv res, leftv args);
+BOOLEAN ttreduceInitially3(leftv res, leftv args);
+BOOLEAN ttreduceInitially4(leftv res, leftv args);
 #endif
 
-/* BOOLEAN reduceInitially(leftv res, leftv args); */
+BOOLEAN ttreduceInitially(leftv res, leftv args);
 
 #endif

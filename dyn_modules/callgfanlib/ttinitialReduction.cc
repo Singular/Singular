@@ -1,21 +1,19 @@
-#include <kernel/polys.h>
 #include <Singular/ipid.h>
 
 #include <libpolys/polys/monomials/p_polys.h>
+#include <libpolys/polys/clapsing.h>
 #include <singularWishlist.h>
 
 #include <map>
 #include <set>
 
-#define KEEP_COEFF_SMALL 1
+#define KEEP_COEFF_SMALL 0
 
 /***
- * changes a polynomial g with the help p-t such that
- * 1) each term of g has a distinct monomial in x
- * 2) no term of g has a coefficient divisible by p
- * in particular, this means that all g_\alpha can be obtained
- * by reading the coefficients and that g is initially reduced
- * with respect to p-t
+ * if KEEP_COEFF_SMALL is set, alters all coefficients of a polynomial g
+ * to be in range between 0 and p-1 with the help of p-t.
+ * In particular the result will be reduced with respect to p-t.
+ * if KEEP_COEFF_SMALL is not set, reduces g initially with respect to p-t.
  **/
 static bool pReduce(poly g, const number p)
 {
@@ -23,9 +21,39 @@ static bool pReduce(poly g, const number p)
   pNext(g) = NULL; poly gEnd = g;
   poly gCache;
 
-  number coeff, pPower; int power; poly subst;
+  number coeff; int power; poly subst;
   while(toBeChecked)
   {
+#if KEEP_COEFF_SMALL
+    if (n_Greater(p_GetCoeff(toBeChecked,currRing),p,currRing->cf) ||
+        n_Equal(p_GetCoeff(toBeChecked,currRing),p,currRing->cf))
+    {
+      coeff = n_IntDiv(p_GetCoeff(toBeChecked,currRing),p,currRing->cf);
+      p_SetCoeff(toBeChecked,
+                 n_IntMod(p_GetCoeff(toBeChecked,currRing),p,currRing->cf),
+                 currRing);
+      subst = p_LmInit(toBeChecked,currRing);
+      p_AddExp(subst,1,1,currRing);
+      p_SetCoeff(subst,coeff,currRing);
+      p_Setm(subst,currRing); pTest(subst);
+      pNext(toBeChecked)=p_Add_q(pNext(toBeChecked),subst,currRing);
+      pTest(toBeChecked);
+    }
+    else
+    {
+      number negcoeff = n_Neg(p_GetCoeff(toBeChecked,currRing),currRing->cf);
+      if (n_GreaterZero(negcoeff,currRing->cf))
+      {
+        number coeffdiv = n_IntDiv(p_GetCoeff(toBeChecked,currRing),p,currRing->cf);
+        number coeffmod = n_IntMod(p_GetCoeff(toBeChecked,currRing),p,currRing->cf);
+        if (n_IsZero(coeffmod,currRing->cf))
+        {
+          poly subst = p_LmInit(toBeChecked,currRing);
+        }
+      }
+      n_Delete(negcoeff,currRing->cf);
+    }
+#else
     for (gCache = g; gCache; pIter(gCache))
       if (p_LeadmonomDivisibleBy(gCache,toBeChecked,currRing)) break;
     if (!gCache)
@@ -54,27 +82,19 @@ static bool pReduce(poly g, const number p)
       }
       else
       {
-#ifdef KEEP_COEFF_SMALL
-        if (n_Greater(p_GetCoeff(toBeChecked,currRing),p,currRing->cf))
-        {
-          coeff = n_IntDiv(p_GetCoeff(toBeChecked,currRing),p,currRing->cf);
-          p_SetCoeff(toBeChecked,
-                     n_IntMod(p_GetCoeff(toBeChecked,currRing),p,currRing->cf),
-                     currRing);
-          subst = p_LmInit(toBeChecked,currRing);
-          p_AddExp(subst,1,1,currRing);
-          p_SetCoeff(subst,coeff,currRing);
-          p_Setm(subst,currRing); pTest(subst);
-          pNext(toBeChecked)=p_Add_q(pNext(toBeChecked),subst,currRing);
-          pTest(toBeChecked);
-        }
-#endif
         pNext(gEnd)=toBeChecked;
         pIter(gEnd); pIter(toBeChecked);
         pNext(gEnd)=NULL;
       }
     }
+    else
+    {
+      pNext(gEnd)=toBeChecked;
+      pIter(gEnd); pIter(toBeChecked);
+      pNext(gEnd)=NULL;
+    }
   }
+#endif
   return false;
 }
 
@@ -105,14 +125,13 @@ BOOLEAN ttpReduce(leftv res, leftv args)
 #endif //NDEBUG
 
 
-#if 0
 /***
  * reduces h initially with respect to g,
  * returns false if h was initially reduced in the first place,
  * returns true if reductions have taken place.
  * assumes that h and g are in pReduced form and homogeneous in x of the same degree
  **/
-bool reduceInitially(poly &h, const poly g)
+bool ttreduceInitially(poly &h, const poly g)
 {
   pTest(h); pTest(g); poly hCache;
   for (hCache=h; hCache; pIter(hCache))
@@ -138,7 +157,7 @@ bool reduceInitially(poly &h, const poly g)
 
 
 #ifndef NDEBUG
-BOOLEAN reduceInitially0(leftv res, leftv args)
+BOOLEAN ttreduceInitially0(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == POLY_CMD))
@@ -151,14 +170,14 @@ BOOLEAN reduceInitially0(leftv res, leftv args)
       Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
       h = (poly) u->CopyD();
       g = (poly) v->CopyD();
-      (void)reduceInitially(h,g);
+      (void)ttreduceInitially(h,g);
       p_Delete(&h,currRing);
       p_Delete(&g,currRing);
       omUpdateInfo();
       Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
       h = (poly) u->CopyD();
       g = (poly) v->CopyD();
-      (void)reduceInitially(h,g);
+      (void)ttreduceInitially(h,g);
       p_Delete(&g,currRing);
       res->rtyp = POLY_CMD;
       res->data = (char*) h;
@@ -175,7 +194,7 @@ BOOLEAN reduceInitially0(leftv res, leftv args)
  * also sorts the generators of I with respect to the leading monomials in descending order.
  * assumes that I is generated by elements which are homogeneous in x of the same degree.
  **/
-bool reduceInitially(ideal I, const number p)
+bool ttreduceInitially(ideal I, const number p)
 {
   int m=idSize(I),n=m; poly cache;
   do
@@ -201,20 +220,20 @@ bool reduceInitially(ideal I, const number p)
    **/
   for (int i=0; i<m-1; i++)
     for (int j=i+1; j<m; j++)
-      if (reduceInitially(I->m[j], I->m[i]) && pReduce(I->m[j],p)) return true;
+      if (ttreduceInitially(I->m[j], I->m[i]) && pReduce(I->m[j],p)) return true;
 
   /***
    * the second pass. removing terms divisible by lt(g_j) out of g_i for i<j
    **/
   for (int i=0; i<m-1; i++)
     for (int j=i+1; j<m; j++)
-      if (reduceInitially(I->m[i], I->m[j]) && pReduce(I->m[i],p)) return true;
+      if (ttreduceInitially(I->m[i], I->m[j]) && pReduce(I->m[i],p)) return true;
   return false;
 }
 
 
 #ifndef NDEBUG
-BOOLEAN reduceInitially1(leftv res, leftv args)
+BOOLEAN ttreduceInitially1(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
@@ -227,14 +246,14 @@ BOOLEAN reduceInitially1(leftv res, leftv args)
       Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
       I = (ideal) u->CopyD();
       p = (number) v->CopyD();
-      (void) reduceInitially(I,p);
+      (void) ttreduceInitially(I,p);
       id_Delete(&I,currRing);
       n_Delete(&p,currRing->cf);
       omUpdateInfo();
       Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
       I = (ideal) u->CopyD();
       p = (number) v->CopyD();
-      (void) reduceInitially(I,p);
+      (void) ttreduceInitially(I,p);
       n_Delete(&p,currRing->cf);
       res->rtyp = IDEAL_CMD;
       res->data = (char*) I;
@@ -250,7 +269,7 @@ BOOLEAN reduceInitially1(leftv res, leftv args)
  * inserts g into I and reduces I with respect to itself and p-t
  * assumes that I was already sorted and initially reduced in the first place
  **/
-bool reduceInitially(ideal I, const number p, const poly g)
+bool ttreduceInitially(ideal I, const number p, const poly g)
 {
   int n=idSize(I);
   idInsertPoly(I,g);
@@ -272,9 +291,9 @@ bool reduceInitially(ideal I, const number p, const poly g)
    * removing terms with the same monomials in x as lt(g_j) out of g_k for j<k
    **/
   for (int i=0; i<j; i++)
-    if (reduceInitially(I->m[j], I->m[i]) && pReduce(I->m[j],p)) return true;
+    if (ttreduceInitially(I->m[j], I->m[i]) && pReduce(I->m[j],p)) return true;
   for (int k=j+1; k<n; k++)
-    if (reduceInitially(I->m[k], I->m[j]) && pReduce(I->m[k],p)) return true;
+    if (ttreduceInitially(I->m[k], I->m[j]) && pReduce(I->m[k],p)) return true;
 
   /***
    * the second pass. removing terms divisible by lt(g_j) and lt(g_k) out of g_i for i<j<k
@@ -282,16 +301,16 @@ bool reduceInitially(ideal I, const number p, const poly g)
    **/
   for (int i=0; i<j; i++)
     for (int k=j; k<n; k++)
-      if (reduceInitially(I->m[i], I->m[k]) && pReduce(I->m[i],p)) return true;
+      if (ttreduceInitially(I->m[i], I->m[k]) && pReduce(I->m[i],p)) return true;
   for (int k=j+1; k<n; k++)
-    if (reduceInitially(I->m[j],I->m[k]) && pReduce(I->m[j],p)) return true;
+    if (ttreduceInitially(I->m[j],I->m[k]) && pReduce(I->m[j],p)) return true;
 
   return false;
 }
 
 
 #ifndef NDEBUG
-BOOLEAN reduceInitially2(leftv res, leftv args)
+BOOLEAN ttreduceInitially2(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
@@ -308,7 +327,7 @@ BOOLEAN reduceInitially2(leftv res, leftv args)
         I = (ideal) u->CopyD();
         p = (number) v->CopyD();
         g = (poly) w->CopyD();
-        (void) reduceInitially(I,p,g);
+        (void) ttreduceInitially(I,p,g);
         id_Delete(&I,currRing);
         n_Delete(&p,currRing->cf);
         omUpdateInfo();
@@ -316,7 +335,7 @@ BOOLEAN reduceInitially2(leftv res, leftv args)
         I = (ideal) u->CopyD();
         p = (number) v->CopyD();
         g = (poly) w->CopyD();
-        (void) reduceInitially(I,p,g);
+        (void) ttreduceInitially(I,p,g);
         n_Delete(&p,currRing->cf);
         res->rtyp = IDEAL_CMD;
         res->data = (char*) I;
@@ -335,12 +354,12 @@ BOOLEAN reduceInitially2(leftv res, leftv args)
  * assumes that the generators of H are homogeneous in x of the same degree,
  * assumes that the generators of G are homogeneous in x of lesser degree.
  **/
-bool reduceInitially(ideal H, const number p, const ideal G)
+bool ttreduceInitially(ideal H, const number p, const ideal G)
 {
   /***
    * Step 1: reduce H initially with respect to itself and with respect to p-t
    **/
-  if (reduceInitially(H,p)) return true;
+  if (ttreduceInitially(H,p)) return true;
 
   /***
    * Step 2: initialize a working list T and an ideal I in which the reductions will take place
@@ -385,7 +404,7 @@ bool reduceInitially(ideal H, const number p, const ideal G)
         p_SetExp(g,j,p_GetExp(pNext(T->m[0]),j,currRing)-p_GetExp(G->m[i],j,currRing),currRing);
       p_SetCoeff(g,n_Init(1,currRing->cf),currRing); p_Setm(g,currRing);
       g = p_Mult_q(g,p_Copy(G->m[i],currRing),currRing);
-      reduceInitially(I,p,g);
+      ttreduceInitially(I,p,g);
     }
     else
       pIter(T->m[0]);
@@ -440,7 +459,7 @@ bool reduceInitially(ideal H, const number p, const ideal G)
 
 
 #ifndef NDEBUG
-BOOLEAN reduceInitially3(leftv res, leftv args)
+BOOLEAN ttreduceInitially3(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
@@ -457,7 +476,7 @@ BOOLEAN reduceInitially3(leftv res, leftv args)
         H = (ideal) u->CopyD();
         p = (number) v->CopyD();
         G = (ideal) w->CopyD();
-        (void) reduceInitially(H,p,G);
+        (void) ttreduceInitially(H,p,G);
         id_Delete(&H,currRing);
         id_Delete(&G,currRing);
         n_Delete(&p,currRing->cf);
@@ -466,7 +485,7 @@ BOOLEAN reduceInitially3(leftv res, leftv args)
         H = (ideal) u->CopyD();
         p = (number) v->CopyD();
         G = (ideal) w->CopyD();
-        (void) reduceInitially(H,p,G);
+        (void) ttreduceInitially(H,p,G);
         n_Delete(&p,currRing->cf);
         id_Delete(&G,currRing);
         res->rtyp = IDEAL_CMD;
@@ -484,7 +503,7 @@ BOOLEAN reduceInitially3(leftv res, leftv args)
  * reduces I initially with respect to itself.
  * assumes that the generators of I are homogeneous in x and that p-t is in I.
  **/
-bool reduceInitially(ideal I)
+bool ttreduceInitially(ideal I)
 {
   /***
    * Step 1: split up I into components of same degree in x
@@ -521,7 +540,7 @@ bool reduceInitially(ideal I)
    *  and all lower components
    **/
   it++; Hi = it->second; n--;
-  if (reduceInitially(Hi,p)) return true;
+  if (ttreduceInitially(Hi,p)) return true;
 
   ideal G = idInit(n); int m=0;
   ideal GG = (ideal) omAllocBin(sip_sideal_bin);
@@ -559,7 +578,7 @@ bool reduceInitially(ideal I)
         G->m[i] = Hi->m[kH++];
     }
     m += l; IDELEMS(GG) = m; GG->m = &G->m[n-m];
-    if (reduceInitially(it->second,p,GG)) return true;
+    if (ttreduceInitially(it->second,p,GG)) return true;
     idShallowDelete(&Hi); Hi = it->second;
   }
   idShallowDelete(&Hi);
@@ -570,7 +589,7 @@ bool reduceInitially(ideal I)
 
 
 #ifndef NDEBUG
-BOOLEAN reduceInitially4(leftv res, leftv args)
+BOOLEAN ttreduceInitially4(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
@@ -579,12 +598,12 @@ BOOLEAN reduceInitially4(leftv res, leftv args)
     omUpdateInfo();
     Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
     I = (ideal) u->CopyD();
-    (void) reduceInitially(I);
+    (void) ttreduceInitially(I);
     id_Delete(&I,currRing);
     omUpdateInfo();
     Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
     I = (ideal) u->CopyD();
-    (void) reduceInitially(I);
+    (void) ttreduceInitially(I);
     res->rtyp = IDEAL_CMD;
     res->data = (char*) I;
     return FALSE;
@@ -594,18 +613,16 @@ BOOLEAN reduceInitially4(leftv res, leftv args)
 #endif
 
 
-BOOLEAN reduceInitially(leftv res, leftv args)
+BOOLEAN ttreduceInitially(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
   {
     ideal I = (ideal) u->CopyD();
-    (void) reduceInitially(I);
+    (void) ttreduceInitially(I);
     res->rtyp = IDEAL_CMD;
     res->data = (char*) I;
     return FALSE;
   }
   return TRUE;
 }
-
-#endif

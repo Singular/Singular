@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-SOURCES = bbcone.cc bbcone.h bbfan.cc bbfan.h bbpolytope.cc bbpolytope.h gfan.h gitfan.cc gitfan.h gfanlib.cc
+SOURCES = bbcone.cc bbcone.h bbfan.cc bbfan.h bbpolytope.cc bbpolytope.h gfan.h gitfan.cc gitfan.h ppinitialReduction.cc ppinitialReduction.h ttinitialReduction.cc ttinitialReduction.h containsMonomial.cc containsMonomial.h tropical.cc tropical.h gfanlib.cc
 
 MY_CPPFLAGS =  -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
