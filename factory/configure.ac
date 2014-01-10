@@ -16,7 +16,7 @@ AC_INIT([factory], [4.0.0])
 AC_CONFIG_SRCDIR(canonicalform.cc)
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([.])
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADER([_config.h])
 
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -25,7 +25,7 @@ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 AM_MAINTAINER_MODE([enable])
 
 # Add pre'prefixed config
-AX_PREFIX_CONFIG_H([config.h],[],[config.h])
+AX_PREFIX_CONFIG_H([config.h],[],[_config.h])
 
 #
 # - check for CC and CXX but be careful about CFLAGS.

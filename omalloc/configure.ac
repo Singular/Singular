@@ -10,7 +10,7 @@ AC_INIT([omalloc],[0.9.6])
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_SRCDIR(om_Alloc.c)
-AC_CONFIG_HEADER(omConfig.h)
+AC_CONFIG_HEADER([_config.h])
 
 SING_RESET_FLAGS()
 
@@ -22,7 +22,7 @@ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 AM_SANITY_CHECK
 
 # Add pre'prefixed config
-AX_PREFIX_CONFIG_H([omConfig.h],[],[omConfig.h])
+AX_PREFIX_CONFIG_H([omConfig.h],[],[_config.h])
 
 # SING_CHECK_SET_ARGS()
 

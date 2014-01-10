@@ -3,7 +3,7 @@ AC_INIT([libpolys], [4.0.0])
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_SRCDIR([reporter/reporter.h])
-AC_CONFIG_HEADER([libpolysconfig.h misc/auxiliary.h])
+AC_CONFIG_HEADER([_config.h])
 
 AM_MAINTAINER_MODE([enable])
 
@@ -15,7 +15,7 @@ dnl Check if build env is sane
 AM_SANITY_CHECK
 
 # Add pre'prefixed config
-AX_PREFIX_CONFIG_H([libpolysconfig.h],[],[libpolysconfig.h])
+AX_PREFIX_CONFIG_H([libpolysconfig.h],[],[_config.h])
 
 # - Check for CC and CXX but be careful about CFLAGS.
 SING_RESET_FLAGS()
@@ -121,5 +121,5 @@ AC_CONFIG_FILES([reporter/Makefile])
 AC_CONFIG_FILES([coeffs/Makefile])
 AC_CONFIG_FILES([polys/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
-AC_CONFIG_FILES([libpolys-config libpolys.pc])
+AC_CONFIG_FILES([libpolys-config libpolys.pc  misc/auxiliary.h])
 AC_OUTPUT

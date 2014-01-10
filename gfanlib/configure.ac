@@ -5,14 +5,14 @@ AC_PREREQ([2.63])
 AC_INIT([libgfan], [0.1], [ren@mathematik.uni-kl.de])
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_SRCDIR([gfanlib.h])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADER([_config.h])
 
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 # Add pre'prefixed config
-AX_PREFIX_CONFIG_H([config.h],[],[config.h])
+AX_PREFIX_CONFIG_H([config.h],[],[_config.h])
 
 AM_MAINTAINER_MODE([enable])
 
