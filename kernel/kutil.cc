@@ -5162,7 +5162,7 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
   printf("rewritten criterion checks:  ");
   pWrite(sig);
 #endif
-  for(int k = strat->sl; k>start; k--)
+  for(int k = strat->sl; k>=start; k--)
   {
 //#if 1
 #ifdef DEBUGF5
