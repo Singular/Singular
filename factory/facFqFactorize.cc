@@ -885,6 +885,17 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
       continue;
     }
 
+    contentx= content (i.getItem());
+    if (degree (contentx) > 0)
+    {
+      if (!find (list, random))
+        list.append (random);
+      result= CFList();
+      LCFeval= CFList();
+      eval= CFList();
+      continue;
+    }
+
     if (list.length() >= bound)
     {
       fail= true;
@@ -1969,6 +1980,8 @@ evaluationWRTDifferentSecondVars (CFList*& Aeval, const CFList& evaluation,
       }
     }
     if (!content(tmp,1).inCoeffDomain())
+      preserveDegree= false;
+    if (!content(tmp).inCoeffDomain())
       preserveDegree= false;
     if (!(gcd (deriv (tmp,x), tmp)).inCoeffDomain())
       preserveDegree= false;
