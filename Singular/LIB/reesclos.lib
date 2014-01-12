@@ -5,13 +5,18 @@ category="Commutative Algebra";
 info="
 LIBRARY:     reesclos.lib   PROCEDURES TO COMPUTE THE INT. CLOSURE OF AN IDEAL
 AUTHOR:      Tobias Hirsch, email: hirsch@math.tu-cottbus.de
+             Janko Boehm, email: boehm@mathematik.uni-kl.de
+             Magdaleen Marais, email: magdaleen@aims.ac.za
 
 OVERVIEW:
  A library to compute the integral closure of an ideal I in a polynomial ring
  R=k[x(1),...,x(n)] using the Rees Algebra R[It] of I. It computes the integral
- closure of R[It] (in the same manner as done in the library 'normal.lib'),
+ closure of R[It],
  which is a graded subalgebra of R[t]. The degree-k-component is the integral
  closure of the k-th power of I.
+
+ In contrast to the previous version, the library uses 'normal.lib' to compute the 
+ integral closure of R[It]. This improves the performance considerably.
 
 PROCEDURES:
  ReesAlgebra(I);        computes the Rees Algebra of an ideal I
@@ -117,266 +122,14 @@ RETURN:   quotients of elements of k[x,t] representing generators of the
   def R(1) = L[1];
   setring R(1);                   // declaration of variables used later
   ideal ker(1)=ker;               // in STEP 2
-  poly p;
-
-  // some auxiliary variables
-
-  int i=1;         // counts the number of steps to reach the closure of R(1)
-  int check=0;     // a 'boolean' variable for several checks
-
-  /////// STEP 1: ///////////////////////////////////////////////////////////
-  // construct R(i) step by step as done in normal.lib; 2 differences:     //
-  //  - since the input is a prime ideal, no splitting will occur          //
-  //  - the intermediate rings and nonzerodivisors for J are remembered    //
-  ///////////////////////////////////////////////////////////////////////////
-
-  if (dblvl>0)
-  {
-    "// STEP 1: Compute the integral closure of R[It]";
-  }
-
-  list RS;
-
-  while (check==0)  // repeat until the closure is reached
-  {
-    // construction of HomJJ, J an ideal containing the non-normal locus
-    // of R(i)/ker(i), as done in normalizationPrimes in normal.lib for
-    // the special case that we are working with a prime ideal
-
-    if (dblvl>0)
-    {
-      "";
-      "// We are in step",i;
-      pause();
-    }
-
-    if (homog(ker(i))==1)
-    {
-      list SM=mstd(ker(i));
-    }
-    else
-    {
-      list SM=groebner(ker(i)),ker(i);
-    }
-
-    if (dblvl>0)
-    {
-      "// Standard basis of the current ideal:";
-      SM[1];
-    }
-
-    // In the first iteration, we have to compute the singular locus
-    // "from scratch". In further iterations, we can fetch it from the
-    // previous one but have to compute its radical.
-
-    if (i==1)
-    {
-      ideal J=minor(jacob(SM[2]),nvars(basering)-dim(SM[1]));
-      ideal sin=J+SM[2];
-      if (homog(sin)==1)
-      {
-        list JM=mstd(sin);
-      }
-      else
-      {
-        list JM=groebner(sin),sin;
-      }
-
-      J=radical(JM[2]);
-    }
-    else
-    {
-      ideal J=radical(JM[2]);
-    }
-
-    if (dblvl>0)
-    {
-      "// Radical of the singular locus:";
-      J;
-    }
-
-    ideal SL=simplify(reduce(JM[2],SM[1]),2);
-    JM =J,J;
-    poly nzd=SL[1];           // universal denominator for HomJJ
-
-    if (dblvl>0)
-    {
-      "// The non-zerodivisor";
-      nzd;
-      pause();
-    }
-
-    list RR=SM[1],SM[2],JM[2],SL[1];
-    RS=HomJJ(RR);
-
-    if (RS[2]==1)             // we've reached the integral closure
-    {
-      if (dblvl>0)
-      {
-        "";
-        "// We've reached the integral closure after",i,"iterations";
-        pause();
-      }
-      check=1;
-    }
-    else                      // prepare the next iteration with new
-    {                         // ring R(i+1)
-      ideal MJ=JM[2];
-
-      def R(i+1)=RS[1];       // the data of and some variable decla-
-      setring R(i+1);         // rations in R(i+1) needed in STEP 2
-      ideal ker(i+1)=endid;
-      map phi=R(i),endphi;
-      poly p;
-
-      list JM=mstd(simplify(phi(MJ)+ker(i+1),4)); // fetch the singular locus
-      i++;
-    }
-  }
-
-  if (i==1)                     // R[It] (and thus I) was integrally
-  {                             // closed ==> we're already done
-        list result="closed";
-        return(result);
-  }
-
-
-  /////// STEP 2: ////////////////////////////////////////////////////////
-  // compute representations of the ring variables of R(i) as fractions //
-  // of elements of R(1);                                               //
-  ////////////////////////////////////////////////////////////////////////
-
-  int length=nvars(R(i));  // the number of variables of the last ring
-  int j,k,n;               // some counters
-  string mapstr;           // will be used while constructing preimages
-
-  list preimages;          // here the fractions are stored in the
-                           // form var(j)=preimages[j]/preimages[length+1]
-                           // ('=' means identification via the inclusion)
-                           // the last entry corresponds to nzd in R(i)
-
-  // For each variable (counter j) and for each intermediate ring (k):
-  // find preimages of var(j)*endphi(nzd_k-1) in R(k-1).
-  // Finally, do the same for nzd.
-
-  if (dblvl>0)
-  {
-    "// STEP 2: Compute fractions representing the ring variables of";
-    "           the last ring";
-  }
-
-  for (j=1;j<=length+1;j++)
-  {
-    setring R(i);
-
-    if (j<=length)          // do it with for ring variables...
-    {
-      p=var(j);
-    }
-    else                   // ...and finally for nzd in R(i)
-    {
-      p=1;
-    }
-
-    // get back from R(i) to R(1) step by step
-
-    for (k=i;k>1;k--)
-    {
-      // clear the fraction in the representation in R(i)
-
-      p=p*phi(nzd);
-
-      // compute the preimage of [p mod ker(k)] under phi in R(k-1):
-      // as p is an element of im(phi), there is a polynomial h such that
-      // h(vars(R(k-1)) is mapped to [p mod ker (k)], and h can be com-
-      // puted as the normal form of a w.r.t <ker(k),Z(n)-phi(k)(n)> in R(k)[Z]
-
-         // compute this normal form h...
-
-      if (j==1)    // in the first iteration: construct S(k)=R(k)[Z], fetch
-                   // endphi (the ideal defining phi) and ker(k) and construct
-                   // the ideal from above
-      {
-        execute ("ring S(k) = "+charstr(R(k))+",("+varstr(R(k))+",Z(1.."+string(ncols(endphi))+")),(dp("+string(nvars(R(k)))+"),dp("+string(ncols(endphi))+"));");
-        ideal endphi = imap(R(k),endphi);
-        ideal J = imap(R(k),ker(k));
-        for (n=1;n<=ncols(endphi);n++)
-        {
-          J=J+(Z(n)-endphi[n]);
-        }
-        J=groebner(J);
-        poly h=NF(imap(R(k),p),J);
-      }
-      else
-      {
-        setring S(k);
-        h=NF(imap(R(k),p),J);
-      }
-
-         // and compute h(vars(R(k-1)))
-
-      setring R(k-1);
-      if (j==1)  // in the first iteration: compute backmap:S(k)-->R(k-1)
-      {
-        mapstr="map backmap = S(k),";
-        for (n=1;n<=nvars(R(k));n++)
-        {
-          mapstr=mapstr+"0,";
-        }
-        execute (mapstr+"maxideal(1);");
-      }
-
-      p=NF(backmap(h),std(ker(k-1)));
-    }
-
-    // when down to R(1), store the result in the list preimages
-
-    preimages=insert(preimages,p,j-1);
-    if (dblvl>0)
-    {
-      if (j<=length)
-      {
-        "numerator of variable ",j,":",p;
-      }
-      else
-      {
-        "";
-        "and finally the 'universal' denominator:",p;
-      }
-    }
-  }
-
-  // at the end: go back to the original basering and construct gene-
-  // rators of the closure of I
-
+  list nor = normal(ker);
+  list preimages=nor[2];
   setring Kxt;
   map psi=R(1),mapI;              // from ReesAlgebra: the map Rees->Kxt
-
-  list images=psi(preimages);
-
-  if (dblvl>-1)
-  {
-    pause();
-    "";
-    "// Get back to the original basering and construct the";
-    "// generators of the closure of I";
-    "";
-    "// Back in k[x,t], the fractions, stored in the list images:";
-    for (int j=1;j<=size(images);j++)
-    {
-      if (j<size(images))
-      {
-        "numerator",j,":",images[j];
-      }
-      else
-      {
-        "";
-        "denominator:  ",images[j];
-      }
-    }
-    pause();
-  }
-  return (images);
+  ideal images=(psi(preimages))[1];
+  images=images[size(images)]*ideal(psi)+images;
+  list imagesl = images[1..size(images)];
+  return(imagesl);
 }
 
 
