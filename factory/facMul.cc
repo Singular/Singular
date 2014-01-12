@@ -2020,18 +2020,17 @@ mulMod2FLINTFqReci (const CanonicalForm& F, const CanonicalForm& G, const
   int k= d1*degree (M);
   fq_nmod_poly_mullow (F1, F1, G1, (long) k, fq_con);
 
-  int degtailF= degree (tailcoeff (F), 1);;
+  int degtailF= degree (tailcoeff (F), 1);
   int degtailG= degree (tailcoeff (G), 1);
   int taildegF= taildegree (F);
   int taildegG= taildegree (G);
 
-  int b= fq_nmod_poly_degree (F2, fq_con) + fq_nmod_poly_degree (G2, fq_con) - k
-         - degtailF - degtailG + d1*(2+taildegF + taildegG);
+  int b= k + degtailF + degtailG - d1*(2+taildegF + taildegG);
 
-  fq_nmod_poly_reverse (F2, F2, fq_nmod_poly_degree (F2, fq_con), fq_con);
-  fq_nmod_poly_reverse (G2, G2, fq_nmod_poly_degree (G2, fq_con), fq_con);
+  fq_nmod_poly_reverse (F2, F2, fq_nmod_poly_length (F2, fq_con), fq_con);
+  fq_nmod_poly_reverse (G2, G2, fq_nmod_poly_length (G2, fq_con), fq_con);
   fq_nmod_poly_mullow (F2, F2, G2, b+1, fq_con);
-  fq_nmod_poly_reverse (F2, F2, b, fq_con);
+  fq_nmod_poly_reverse (F2, F2, b+1, fq_con);
 
   int d2= tmax (fq_nmod_poly_degree (F2, fq_con)/d1,
                 fq_nmod_poly_degree (F1, fq_con)/d1);
