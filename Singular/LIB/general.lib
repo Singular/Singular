@@ -1,5 +1,5 @@
-//////////////////////////////////////////////////////////////////////////////
-version="version general.lib 4.0.0.0 Jun_2013 "; // $Id$
+///////////////////////////////////////////////////////////////////////////////
+version="version general.lib 4.0.0.1 Jan_2014 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -540,7 +540,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc product (id, list #)
+proc product (def id, list #)
 "USAGE:    product(id[,v]); id ideal/vector/module/matrix/intvec/intmat/list,
           v intvec  (default: v=1..number of entries of id)
 ASSUME:   list members can be multiplied.
@@ -652,7 +652,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sort (id, list #)
+proc sort (def id, list #)
 "USAGE:   sort(id[,v,o,n]); id = ideal/module/intvec/list
 @*       sort may be called with 1, 2 or 3 arguments in the following way:
 @*       sort(id[,v,n]); v=intvec of positive integers, n=integer,
@@ -799,7 +799,7 @@ static proc lsum (int n, list l)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sum (id, list #)
+proc sum (def id, list #)
 "USAGE:    sum(id[,v]); id ideal/vector/module/matrix/intvec/intmat/list,
           v intvec  (default: v=1..number of entries of id)
 ASSUME:   list members can be added.
@@ -1017,7 +1017,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc primecoeffs(J, list #)
+proc primecoeffs(def J, list #)
 "USAGE:   primecoeffs(J[,p]); J any type which can be converted to a matrix
          e.g. ideal, matrix, vector, module, int, intvec
          p = integer
@@ -1204,7 +1204,6 @@ EXAMPLE: example timeStd; shows an example
           def result = imap(PP, result);
           kill PP;
         }
-        attrib(result,"isSB",1);
       }
       close(l_fork);
       return (result);

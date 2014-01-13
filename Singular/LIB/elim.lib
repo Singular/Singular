@@ -1,5 +1,5 @@
-//////////////////////////////////////////////////////////////////////////////
-version="version elim.lib 4.0.0.0 Jun_2013 "; // $Id$
+///////////////////////////////////////////////////////////////////////////////
+version="version elim.lib 4.0.0.1 Jan_2014 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -395,7 +395,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc elim (id, list #)
+proc elim (def id, list #)
 "USAGE:   elim(id,arg[,s]);  id ideal/module, arg can be either an intvec v or
          a product p of variables (type poly), s a string determining the
          method which can be \"slimgb\" or \"std\" or, additionally,
@@ -563,7 +563,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc elim2 (id, intvec va)
+proc elim2 (def id, intvec va)
 "USAGE:   elim2(id,v);  id ideal/module, v intvec
 RETURNS: ideal/module obtained from id by eliminating variables in v
 NOTE:    no special monomial ordering is required, result is a SB with
@@ -602,7 +602,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc elim1 (id, list #)
+proc elim1 (def id, list #)
 "USAGE:   elim1(id,arg); id ideal/module, arg can be either an intvec v or a
          product p of variables (type poly)
 RETURN: ideal/module obtained from id by eliminating either the variables
@@ -663,7 +663,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc nselect (id, intvec v)
+proc nselect (def id, intvec v)
 "USAGE:   nselect(id,v); id = ideal, module or matrix, v = intvec
 RETURN:  generators (or columns) of id not containing the variables with index
          an entry of v
@@ -716,7 +716,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sat (id, ideal j)
+proc sat (def id, ideal j)
 "USAGE:   sat(id,j);  id=ideal/module, j=ideal
 RETURN:  list of an ideal/module [1] and an integer [2]:
          [1] = saturation of id with respect to j (= union_(k=1...) of id:j^k)
@@ -756,7 +756,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc select (id, intvec v)
+proc select (def id, intvec v)
 "USAGE:   select(id,n[,m]); id = ideal/module/matrix, v = intvec
 RETURN:  generators/columns of id containing all variables with index
          an entry of v
@@ -812,7 +812,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc select1 (id, intvec v)
+proc select1 (def id, intvec v)
 "USAGE:   select1(id,v); id = ideal/module/matrix, v = intvec
 RETURN:  generators/columns of id containing at least one of the variables
          with index an entry of v

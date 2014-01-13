@@ -470,7 +470,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc maxdeg1 (id,list #)
+proc maxdeg1 (def id,list #)
 "USAGE:   maxdeg1(id[,v]);  id=poly/ideal/vector/module/matrix, v=intvec
 RETURN:  integer, maximal [weighted] degree of monomials of id independent of
          ring ordering, maxdeg1 of i-th variable is v[i] (default: v=1..1).
