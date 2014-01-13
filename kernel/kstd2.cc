@@ -7,11 +7,6 @@
 
 // #define PDEBUG 2
 
-// TODO: why the following is here instead of mod2.h???
-
-// define to enable tailRings
-#define HAVE_TAIL_RING
-
 #include <kernel/mod2.h>
 
 #ifndef NDEBUG

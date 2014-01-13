@@ -5698,6 +5698,12 @@ void enterT(LObject p, kStrategy strat, int atT)
     }
   }
 #endif
+#ifdef HAVE_TAIL_RING
+  if (currRing!=strat->tailRing)
+  {
+    p.t_p=p.GetLmTailRing();
+  }
+#endif
   strat->newt = TRUE;
   if (atT < 0)
     atT = strat->posInT(strat->T, strat->tl, p);
