@@ -1475,7 +1475,7 @@ reverseSubstQa (const fmpz_poly_t F, int d1, int d2, const Variable& alpha,
     {
       fmpq_poly_init2 (buf, d2);
       _fmpq_poly_set_length (buf, d2);
-      _fmpz_vec_set (buf->coeffs, F->coeffs + k*j*d2, d2);
+      _fmpz_vec_set (buf->coeffs, F->coeffs + k + j*d2, d2);
       _fmpq_poly_normalise (buf);
       fmpq_poly_rem (buf, buf, mipo);
       result2 += convertFmpq_poly_t2FacCF (buf, alpha)*power (x, j);
