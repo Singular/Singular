@@ -91,7 +91,7 @@ feResourceConfig_s feResourceConfigs[] =
 #endif
   {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/index.php/singular-manual.html",    (char *)""},
   {"ExDir",     'm',    feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",          (char *)""},
-  {"Path",      'p',    feResPath,  NULL,                   "%b;$PATH",             (char *)""},
+  {"Path",      'p',    feResPath,  NULL,                   "%b;%P;$PATH",             (char *)""},
 
   {"emacs",     'E',    feResBinary,"ESINGULAR_EMACS",      "%b/emacs",             (char *)""},
   {"xemacs",    'A',    feResBinary,"ESINGULAR_EMACS",      "%b/xemacs",            (char *)""},

@@ -223,7 +223,8 @@ Singulars_LDADD = libSingular.la ${EMBED_PYOBJECT}
 
 Singulars_LDFLAGS = -static ${AM_LDFLAGS} ${EMBED_PYOBJECT}
 
-dist_bin_SCRIPTS = singularsurf
+scriptdir = $(libexecdir)/singular/MOD
+dist_script_SCRIPTS = singularsurf
 
 #### ESingular
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO
