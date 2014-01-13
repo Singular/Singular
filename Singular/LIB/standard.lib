@@ -1,5 +1,5 @@
-//////////////////////////////////////////////////////////////////////////////
-version="version standard.lib 3-1-7-0 Sep_2013 ";
+///////////////////////////////////////////////////////////////////////////
+version="version standard.lib 4.0.0.0 Jun_2013 "; // $Id: b4a42faf1bc6c56da7aa39dc2c466b23f45b8027 $
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -491,9 +491,9 @@ EXAMPLE: example par2varRing; shows an example"
   list rlist = ringlist(P);
   list parlist = rlist[1];
   rlist[1] = parlist[1];
-  poly Minpoly = minpoly;     //check for minpoly:
-  int sm = size(Minpoly);
 
+  string @Minpoly = string(minpoly);     //check for minpoly:
+  int sm = size(minpoly);
   //now create new ring
   for( ii = 1; ii <= s; ii++)
   {
@@ -533,7 +533,7 @@ EXAMPLE: example par2varRing; shows an example"
   else
   {
     if( find(option(),"prot") ){"//add minpoly to input";}
-    poly Minpoly = imap(P,Minpoly);
+    execute("poly Minpoly = " + @Minpoly + " ;");
     for( ii = 1; ii <= s; ii++)
     {
       def Id(ii) = imap(P,Id(ii));
@@ -986,9 +986,9 @@ EXAMPLE: example groebner;  shows an example"
  //=========== we are still here -- do the actual computation =============
 
 //--------------------- save data from basering ---------------------------
-  poly Minpoly = minpoly;      //minimal polynomial
+  string @Minpoly = string(minpoly);      //minimal polynomial
   int was_minpoly;             //remembers if there was a minpoly in P
-  if (size(Minpoly) > 0)
+  if (size(minpoly) > 0)
   {
      was_minpoly = 1;
   }
@@ -1062,19 +1062,19 @@ EXAMPLE: example groebner;  shows an example"
   //define conversion:
   if( find(method,"hilb") && !find(method,"fglm") )
   {
-     conversion = "hilb";
+     conversion = "hilb"; // $Id: b4a42faf1bc6c56da7aa39dc2c466b23f45b8027 $
   }
   if( find(method,"fglm") && !find(method,"hilb") )
   {
-    conversion = "fglm";
+    conversion = "fglm"; // $Id: b4a42faf1bc6c56da7aa39dc2c466b23f45b8027 $
   }
   if( find(method,"fglm") && find(method,"hilb") )
   {
-    conversion = "hilborfglm";
+    conversion = "hilborfglm"; // $Id: b4a42faf1bc6c56da7aa39dc2c466b23f45b8027 $
   }
   if( !find(method,"fglm") && !find(method,"hilb") )
   {
-    conversion = "no";
+    conversion = "no"; // $Id: b4a42faf1bc6c56da7aa39dc2c466b23f45b8027 $
   }
 
   //define partovar:
@@ -1242,7 +1242,7 @@ EXAMPLE: example groebner;  shows an example"
 
   if (was_minpoly)
   {
-    ideal Minpoly = imap(P,Minpoly);
+    execute("ideal Minpoly = " + @Minpoly + ";");
     attrib(Minpoly,"isSB",1);
     i = simplify(NF(i,Minpoly),2);
   }

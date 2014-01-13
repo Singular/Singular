@@ -1,5 +1,5 @@
-///////////////////////////////////////////////////////////////////////////////
-version="version primdec.lib 3-1-7-0 Sep_2013 ";
+////////////////////////////////////////////////////////////////////////////
+version="version primdec.lib 3-1-7-0 Jan_2014 ";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -708,9 +708,10 @@ static proc splitCharp(list l)
   {
     return(l);
   }
+  def op = option(get);
   def P=basering;
   int i,j,k,m,q,d,o;
-  int n=nvars(basering);
+  int n = nvars(basering);
   ideal s,t,u,sact;
   poly ni;
   string minp,gnir,va;
@@ -768,6 +769,7 @@ static proc splitCharp(list l)
         if((size(sact)==1)&&(m>2))
         {
           setring RL;
+
           option(redSB);
           t=std(t);
 
@@ -784,6 +786,7 @@ static proc splitCharp(list l)
           rp=delete(rp,1);
           rp=delete(rp,1);
           keep1=keep1+rp;
+
           option(noredSB);
         }
         kill RL;
@@ -802,6 +805,7 @@ static proc splitCharp(list l)
     }
   }
   l=l+keep1;
+  option(set,op);
   return(l);
 }
 
@@ -1897,7 +1901,8 @@ EXAMPLE: example minAssPrimes; shows an example
    }
    list @res,empty;
    ideal ser;
-   option(redSB);
+   def op = option( get );
+   option( redSB );
    list @pr=facstd(i);
    //if(size(@pr)==1)
 //   {
@@ -1922,7 +1927,8 @@ EXAMPLE: example minAssPrimes; shows an example
 //         kill gnir1;
 //      }
 //   }
-    option(noredSB);
+   // option( noredSB );
+   option( set, op );
    int j,k,odim,ndim,count;
    attrib(@pr[1],"isSB",1);
    if(#[1]==77)
@@ -2095,8 +2101,13 @@ EXAMPLE: example minAssPrimes; shows an example
     }
   }
 
-  if(dim(i) == -1){setring P0;return(ideal(1));}
-  if((dim(i) == 0) && (npars(P) == 0))
+  if( dim(i) == -1 ) 
+  {  
+    option( set,op );
+    setring P0; 
+    return( ideal(1) ); 
+  }
+  if( (dim(i) == 0 ) && ( npars(P) == 0) )
   {
     int di = vdim(i);
     execute ("ring gnir=("+charstr(P)+"),("+varstr(P)+"),lp;");
@@ -2545,13 +2556,15 @@ proc algeDeco(ideal i, int w)
    def R=basering;
    int n=nvars(R);
 
+   def op = option(get); 
+
 //---Anfang Provisorium
    if((size(i)==2) && (w==2))
    {
-      option(redSB);
-      ideal J=std(i);
-      option(noredSB);
-      if((size(J)==2)&&(deg(J[1])==1))
+      option( redSB );
+      ideal J = std(i);
+      option( noredSB );
+      if ((size(J)==2)&&(deg(J[1])==1))
       {
          ideal keep;
          poly f;
@@ -2576,6 +2589,7 @@ proc algeDeco(ideal i, int w)
             L=J[1],K[j];
             resu[j]=L;
          }
+         option( set, op );
          return(resu);
       }
    }
@@ -2651,7 +2665,8 @@ proc algeDeco(ideal i, int w)
    {
       re=convList(pr);
    }
-   return(re);
+   option( set, op );
+   return( re );
 }
 ///////////////////////////////////////////////////////////////////////////////
 static proc prepare_absprimdec(list primary)
@@ -3769,7 +3784,7 @@ example
     intvec save=option(get);option(redSB);
     I=interred(I+F);option(set,save);return(I);
    }
-   I=simplify(I,1);
+   //I=simplify(I,1);
 
    for(i=1;i<=n;i++)             //consider all polynomials over
    {                             //Fp(t(1)^(p^-k),...,t(m)^(p^-k))
@@ -3780,7 +3795,12 @@ example
    execute(cR);
    ideal F=imap(R,F);
 
-   string nR="ring @S="+string(p)+",(y(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
+   string nR1="ring @S1="+string(p)+",("+varstr(R)+","+parstr(R)+",@y(1..m)),dp;";
+   execute(nR1);
+   list lR=ringlist(@S1)[2];
+   lR=lR[(size(lR)-m+1)..(size(lR))];
+
+   string nR="ring @S="+string(p)+",("+string(lR)+","+varstr(R)+","+parstr(R)+"),dp;";
    execute(nR);
 
    ideal G=fetch(@R,F);    //G[i](t(1)^(p^-k),...,t(m)^(p^-k),x(i))=sep(F[i])
@@ -3792,7 +3812,7 @@ example
    for(i=1;i<=m;i++)
    {
       J=J,var(i)^k-var(m+n+i);
-      el=el*y(i);
+      el=el*var(i);
    }
 
    J=eliminate(J,el);
@@ -7003,6 +7023,7 @@ EXAMPLE: example newDecompStep; shows an example
       }
       primary=resu;
     }
+    option(set,op);
     if (intersectOption == "intersect")
     {
       return(list(primary, fetch(gnir,@j)));
