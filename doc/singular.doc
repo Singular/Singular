@@ -409,11 +409,11 @@ LIB "all.lib";
 @subsection cisimplicial_lib
 @c lib cisimplicial.lib
 @c ----------------------------------------------------------
-@node ehv_lib, elim_lib, assprimeszerodim_lib, Commutative algebra
+@node ehv_lib, elim_lib, cisimplicial_lib, Commutative algebra
 @subsection ehv_lib
 @c lib ehv.lib
 @c ----------------------------------------------------------
-@node elim_lib, grwalk_lib, cehv_lib, Commutative algebra
+@node elim_lib, grwalk_lib, ehv_lib, Commutative algebra
 @subsection elim_lib
 @c lib elim.lib
 @c ----------------------------------------------------------
