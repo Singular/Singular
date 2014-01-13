@@ -127,8 +127,10 @@ RETURN:   quotients of elements of k[x,t] representing generators of the
   setring Kxt;
   map psi=R(1),mapI;              // from ReesAlgebra: the map Rees->Kxt
   ideal images=(psi(preimages))[1];
-  images=images[size(images)]*ideal(psi)+images;
+  ideal psii = images[size(images)]*ideal(psi);
   list imagesl = images[1..size(images)];
+  list psil =psii[1..size(psii)];
+  imagesl=psil+imagesl;
   return(imagesl);
 }
 
@@ -387,7 +389,6 @@ EXAMPLE:  example normalI; shows an example
   // construct the fractions corresponding to the generators of the
   // closure of I and its powers, depending on # (in fact, they will
   // not be real fractions, of course). This is done in ClosurePower.
-
   list result = ClosurePower(images,#);
 
   // finally fetch the result to the old basering
