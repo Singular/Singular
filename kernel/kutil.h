@@ -19,6 +19,9 @@
 
 #include <kernel/structs.h>
 
+// define if tailrings should be used
+#define HAVE_TAIL_RING
+
 #if 1
 #define setmax 16
 #define setmaxL ((4096-12)/sizeof(LObject))

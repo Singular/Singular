@@ -7,8 +7,6 @@
 
 // TODO: why the following is here instead of mod2.h???
 
-// define if tailrings should be used
-#define HAVE_TAIL_RING
 
 // define if buckets should be used
 #define MORA_USE_BUCKETS
