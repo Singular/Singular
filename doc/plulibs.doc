@@ -40,7 +40,6 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 * nchomolog_lib:: Noncommutative Homological Algebra
 * ratgb_lib:: Groebner bases in Ore localizations of noncommutative G-algebras
 * dmodloc_lib:: Localization of algebraic D-modules
-* ncpreim_lib:: Non-commutative elimination and preimage computation
 @end menu
 
 @c as @c lib generates parts of sections, but we need subsections:
@@ -91,11 +90,11 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 @section ncdecomp_lib
 @c lib ncdecomp.lib
 @c ----------------------------------------------------------
-@node ncfactor_lib, ncpreimlib, ncdecomp_lib, Non-commutative libraries
+@node ncfactor_lib, ncpreim_lib, ncdecomp_lib, Non-commutative libraries
 @section ncfactor_lib
 @c lib ncfactor.lib
 @c ----------------------------------------------------------
-@node ncpreim_lib, nctools_lib, ncdecomp_lib, Non-commutative libraries
+@node ncpreim_lib, nctools_lib, ncfactor_lib, Non-commutative libraries
 @section ncpreim_lib
 @c lib ncpreim.lib
 @c ----------------------------------------------------------
@@ -132,16 +131,11 @@ Status: experimental
 @c Status: experimental
 @c @c lib bimodules.lib
 @c ----------------------------------------------------------
-@c @node dmodloc_lib, ncpreim_lib, bimodules_lib, Non-commutative libraries
-@node dmodloc_lib, ncpreim_lib, ratgb_lib, Non-commutative libraries
+@c @node dmodloc_lib, , bimodules_lib, Non-commutative libraries
+@node dmodloc_lib, , ratgb_lib, Non-commutative libraries
 @section dmodloc_lib
 Status: experimental
 @c lib dmodloc.lib
-@c ----------------------------------------------------------
-@node ncpreim_lib, , dmodloc_lib, Non-commutative libraries
-@section ncpreim_lib
-Status: experimental
-@c lib ncpreim.lib
 @c ----------------------------------------------------------
 @raisesections
 
