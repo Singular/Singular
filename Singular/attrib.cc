@@ -64,8 +64,11 @@ attr sattr::Copy()
 
 static void attr_free(attr h, const ring r=currRing)
 {
-  s_internalDelete(h->atyp,h->data,r);
-  h->data=NULL;
+  if (h->data!=NULL) /*avoid assume failure */
+  {
+    s_internalDelete(h->atyp,h->data,r);
+    h->data=NULL;
+  }
 }
 
 attr sattr::set(const char * s, void * d, int t)
