@@ -120,7 +120,7 @@ static proc imageideal()
   return(IDEAL);
 }
 /////////////////////////////////////
-proc u(D,list #)
+proc u(string D,list #)
 "USAGE: u(D[,#]); D a string that occurs in the list of @derivatives, # an optional list of integers.
 RETURN: type vector; gives the vector, that corresponds with gen(n)*m, where m is the monomial defined by #
 EXAMPLE: example u; shows an example

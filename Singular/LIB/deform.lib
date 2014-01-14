@@ -741,7 +741,7 @@ example
   print(matrix(kbaseM)*A-matrix(reduce(N,std(M))));
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc lift_kbase (N, M)
+proc lift_kbase (def N,def M)
 "USAGE:   lift_kbase(N,M); N,M=poly/ideal/vector/module
 RETURN:  matrix A, coefficient matrix expressing N as linear combination of
          k-basis of M. Let the k-basis have k elements and size(N)=c columns.

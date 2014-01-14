@@ -330,7 +330,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc show (@@id, list #)
+proc show (def @@id, list #)
 "USAGE:   show(id);   id any object of basering or of type ring/qring
 @*       show(R,s);  R=ring, s=string (s = name of an object belonging to R)
 DISPLAY: display id/s in a compact format together with some information
@@ -562,7 +562,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc showrecursive (@@id,poly p,list #)
+proc showrecursive (def @@id,poly p,list #)
 "USAGE:   showrecursive(id,p[,ord]); id any object of basering, p= product of
          variables and ord=string (any allowed ordstr)
 DISPLAY: display 'id' in a recursive format as a polynomial in the variables

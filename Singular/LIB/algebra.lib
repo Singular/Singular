@@ -440,7 +440,7 @@ example
    printlevel = p;
 }
 //////////////////////////////////////////////////////////////////////////////
-proc alg_kernel( map phi, pr, list #)
+proc alg_kernel( map phi, def pr, list #)
 "USAGE:   alg_kernel(phi,pr[,s,c]); phi map to basering, pr preimage ring,
          s string (name of kernel in pr), c integer.
 RETURN:  a string, the kernel of phi as string.
@@ -515,7 +515,7 @@ example
 }
 //////////////////////////////////////////////////////////////////////////////
 
-proc is_injective( map phi, pr,list #)
+proc is_injective( map phi,def pr,list #)
 "USAGE:   is_injective(phi,pr[,c,s]); phi map, pr preimage ring, c int, s string
 RETURN:
 @format
@@ -679,7 +679,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc is_bijective ( map phi, pr )
+proc is_bijective ( map phi,def pr )
 "USAGE:   is_bijective(phi,pr); phi map to basering, pr preimage ring
 RETURN:  an integer,  1 if phi is bijective, 0 if not
 NOTE:    The algorithm checks first injectivity and then surjectivity.
@@ -984,7 +984,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc mapIsFinite(map phi, R, list #)
+proc mapIsFinite(map phi,def R, list #)
 "USAGE:   mapIsFinite(phi,R[,J]); R the preimage ring of the map
          phi: R ---> basering
          J an ideal in the basering, J = 0 if not given
@@ -1039,7 +1039,7 @@ example
 }
 //////////////////////////////////////////////////////////////////////////////
 
-proc nonZeroEntry(id)
+proc nonZeroEntry(def id)
 "USAGE:  nonZeroEntry(id); id=object for which the test 'id[i]!=0', i=1,..,N,
          N=size(id) (resp. ncols(id) for id of type ideal or module)
          is defined (e.g. ideal, vector, list of polynomials, intvec,...)

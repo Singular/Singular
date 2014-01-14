@@ -40,7 +40,7 @@ LIB "presolve.lib";
 LIB "qhmoduli.lib";
 LIB "monomialideal.lib";
 ////////////////////////////////////////////////////////////////////
-proc BorelCheck(ideal Borid,r)
+proc BorelCheck(ideal Borid,def r)
 "USAGE:    BorelCheck(Borid,r); Borid ideal, r ring
 RETURN:   int: d
 NOTE:     Input must be a monomial ideal.
@@ -748,7 +748,7 @@ example
  NewWeight(3);
 }
 ////////////////////////////////////////////////////////////////////
-proc FinalVm(list V1 , list G1 , r)
+proc FinalVm(list V1 , list G1 , def r)
 "USAGE:     FinalVm(V1, G1, r);  V1 list,  G1 list , r
 RETURN:   intvec: u
 EXAMPLE:  example FinalVm; shows an example"
@@ -888,7 +888,7 @@ list G2F=list(list(r1,r2,r3),list(r4));
  FinalVm(VConst(G2F,6,r) , G2F, r);
 }
 ////////////////////////////////////////////////////////////////////
-proc VmConstructor(list G, int c,r)
+proc VmConstructor(list G, int c,def r)
 "USAGE:     VmConstructor(G,c); G list, c int
 RETURN:   list: R
 NOTE:     At the end separated by degree.
@@ -1084,7 +1084,7 @@ list EK,D=EKPolynomials(G2F);
 MultEKPolys(EK[2],G2F);
 }
 ////////////////////////////////////////////////////////////////////
-proc SchemeEq(list W, list EK,list D,list Q,r)
+proc SchemeEq(list W, list EK,list D,list Q,def r)
 "USAGE:    SchemeEq(W,EK,D,Q,r);  W list, EK list, D list, Q list, r ring
 RETURN:    int: i
 NOTE:
@@ -1294,7 +1294,7 @@ list Jms=SchemeEq(W,EK,D,P,K);
 Jms;}
 
 //////////////////////////////////////////////////////////////////////
-proc JMarkedScheme(ideal Borid,r)
+proc JMarkedScheme(ideal Borid,def r)
 "USAGE:    JMarkedScheme(Borid, r);  Borid ideal, r ring
 RETURN:    list: Jms
 NOTE:

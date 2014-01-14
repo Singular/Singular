@@ -284,7 +284,7 @@ static proc invo_poly(poly m, map theta)
 //   return(n);
 }
 ///////////////////////////////////////////////////////////////////////////////////
-proc involution(m, map theta)
+proc involution(def m, map theta)
 "USAGE:  involution(m, theta); m is a poly/vector/ideal/matrix/module, theta is a map
 RETURN:  object of the same type as m
 PURPOSE: applies the involution, presented by theta to the object m

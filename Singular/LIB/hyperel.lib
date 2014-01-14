@@ -126,7 +126,7 @@ example
 
 //====================== Remainder of a polynomial division ===================
 
-proc divrem(f,g)
+proc divrem(poly f,poly g)
 "USAGE:   divrem(f,g);  f,g poly
 RETURN:  remainder of the division f/g
 NOTE:    Computes R, s.t. f=a*g + R, and deg(R) < deg(g)

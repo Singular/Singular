@@ -3260,7 +3260,7 @@ NOTE:       The procedure must be called from the ring Proj_R=CURVE[1][2]
   return(answer);
 }
 ///////////////////////////////////////////////////////////////////////////////
-static proc local_eq (poly H,SS,int m)
+static proc local_eq (poly H,def SS,int m)
 {
   // computes a local equation of polynomial H in the ring SS related to the place
   //     "m"
@@ -3481,7 +3481,7 @@ static proc simplifyRF (ideal F)
   return(ideal(division(F,auxp)[1]));
 }
 ///////////////////////////////////////////////////////////////////////////////
-static proc sumRF (F,G)
+static proc sumRF (def F,def G)
 {
   // sum of two "rational functions" F,G given by either a pair
   // numerator/denominator or a poly
@@ -3520,7 +3520,7 @@ static proc sumRF (F,G)
   }
 }
 ///////////////////////////////////////////////////////////////////////////////
-static proc negRF (F)
+static proc negRF (def F)
 {
   // returns -F as rational function
   if (typeof(F)=="ideal")
@@ -3535,7 +3535,7 @@ static proc negRF (F)
   }
 }
 ///////////////////////////////////////////////////////////////////////////////
-static proc escprodRF (l,F)
+static proc escprodRF (def l,def F)
 {
   // computes l*F as rational function
   // l should be either a number or a polynomial of degree zero
@@ -3554,7 +3554,7 @@ static proc escprodRF (l,F)
 
 // ******** procedures to compute Weierstrass semigroups ********
 
-static proc orderRF (ideal F,SS,int m)
+static proc orderRF (ideal F,def SS,int m)
 "USAGE:  orderRF(F,SS,m); F an ideal, SS a ring and m an integer
 RETURN: list with the order (int) and the leading coefficient (number)
 NOTE:   F represents a rational function, thus the procedure must be
@@ -3715,7 +3715,7 @@ example
 
 // axiliary procedure for permuting a list or intvec
 
-proc permute_L (L,P)
+proc permute_L (def L,def P)
 "USAGE:    permute_L( L, P ); L,P either intvecs or lists
 RETURN:   list obtained from L by applying the permutation given by P.
 NOTE:     If P is a list, all entries must be integers.
@@ -3756,7 +3756,7 @@ example
   permute_L(L,P);
 }
 ///////////////////////////////////////////////////////////////////////////////
-static proc evalRF (ideal F,SS,int m)
+static proc evalRF (ideal F,def SS,int m)
 "USAGE:     evalRF(F,SS,m), where F is an ideal, SS is a ring and m is an
             integer
 RETURN:     the evaluation (number) of F at the place given by SS,m if it is
@@ -3794,7 +3794,7 @@ NOTE:       F represents a rational function, thus the procedure must be
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc gen_mat (list LF,intvec LP,RP)
+static proc gen_mat (list LF,intvec LP,def RP)
 "USAGE:      gen_mat(LF,LP,RP); LF list of rational functions,
             LP intvec of rational places and RP a local ring
 RETURN:     a generator matrix of the evaluation code given by LF and LP

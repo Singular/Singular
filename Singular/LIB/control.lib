@@ -66,7 +66,7 @@ NOTE:  the procedure is used in the procedure 'view' to have a better formatted 
   return(s);
 }
 //-----------------------------------------------------------------------------
-proc view(M)
+proc view(def M)
 "USAGE:  view(M);   M is of any type
 RETURN:  no return value
 PURPOSE:  procedure for (well-) formatted output of modules, matrices, lists of modules, matrices; shows everything even if entries are long

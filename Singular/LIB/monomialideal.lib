@@ -2210,7 +2210,7 @@ static proc generic (ideal I)
 // generico que le asociamos.                                       //
 //////////////////////////////////////////////////////////////////////
 //
-static proc nonGeneric (EXP,NEWEXP,Faces,sizI)
+static proc nonGeneric (def EXP,def NEWEXP,def Faces,def sizI)
 {
   int nvar = nvars(basering);
   int sizFaces = size(Faces);
@@ -3298,7 +3298,7 @@ static proc pivot (ideal I , poly lcmMin, ideal S)
 }
 //////////////////////////////////////////////////////////////////////
 //
-static proc simplification (I)
+static proc simplification (def I)
 {
   // VARIABLES
   int i, j, k, cont, numdeleted;

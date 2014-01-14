@@ -22,7 +22,7 @@ LIB "general.lib";
 LIB "algebra.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sortier(id)
+proc sortier(def id)
 "USAGE:   sortier(id);  id ideal/module
 RETURN:  the same ideal/module but with generators ordered by their
          leading terms, starting with the smallest
@@ -53,7 +53,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc derivate (matrix m, id)
+proc derivate (matrix m, def id)
 "USAGE:  derivate(m,id);  m matrix, id poly/vector/ideal
 ASSUME:  m is an nx1 matrix, where n = number of variables of the basering
 RETURN:  poly/vector/ideal (same type as input), result of applying the

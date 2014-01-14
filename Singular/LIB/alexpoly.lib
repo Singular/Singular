@@ -1868,7 +1868,7 @@ NOTE:     This procedure is only for internal use; it is called in irred_res_gra
 
 
 
-static proc adjust_tot_mult (intvec rtm_fix, rtm_var, rmt_fix, rmt_var, p, q, stricttransforms, int k)
+static proc adjust_tot_mult (intvec rtm_fix, intvec rtm_var, intvec rmt_fix, intvec rmt_var, def p, def q, def stricttransforms, int k)
 "USAGE:   adjust_tot_mult(v1,v2,v3,v4,p,q,st,k); v1,...,st intvecs and k an integer
 RETURN:   intvec rtm_var, adjusted total multiplicities
 NOTE:     This procedure is only for internal use; it is called in totalmultiplicities.
@@ -2067,7 +2067,7 @@ NOTE:     This procedure is only for internal use; it is called in Tau_es.
 }
 
 
-static proc move_row (intmat M, int i,j)
+static proc move_row (intmat M, int i,int j)
 "USAGE:    move_row(M,i,j), intmat M, int i,j
 RETURN:   intmat, the matrix M with j-th row now i-th row and the remaining rows moved accordingly.
 NOTE:     This procedure is only for internal use; it is called in move_row_col.
@@ -2100,7 +2100,7 @@ NOTE:     This procedure is only for internal use; it is called in move_row_col.
   return(N);
 }
 
-static proc move_col (intmat M, int i,j)
+static proc move_col (intmat M, int i,int j)
 "USAGE:    move_col(M,i,j), intmat M, int i,j
 RETURN:   intmat, the matrix M with j-th column now i-th column and the remaining columns moved accordingly.
 NOTE:     This procedure is only for internal use; it is called in move_row_col.
@@ -2109,7 +2109,7 @@ NOTE:     This procedure is only for internal use; it is called in move_row_col.
   return(transpose(move_row(transpose(M),i,j)));
 }
 
-static proc move_row_col (intmat M,int i,j)
+static proc move_row_col (intmat M,int i,int j)
 "USAGE:    move_row(M,i,j), intmat M, int i,j
 RETURN:   intmat, the matrix M with j-th row/column now i-th row/column and the remaining
           rows and columns moved accordingly.
@@ -2151,7 +2151,7 @@ NOTE:     This procedure is only for internal use; it is called in tau_es.
 
 
 
-static proc sort_branches (intmat contact, list graphs, list totmult, list multpl, int k,l)
+static proc sort_branches (intmat contact, list graphs, list totmult, list multpl, int k,int l)
 "USAGE:    sort_branches(K,L,M,N,k,l); K intmat, L,M,N lists, k,l integers
 ASSUME:   K = contact matrix of the branches of a curve, L = their resolutiongraphs,
           M = their totalmultiplicities, N = their multiplicities

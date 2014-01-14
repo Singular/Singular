@@ -198,7 +198,7 @@ example
   allPositive(w);
 }
 
-static proc findFirst (list l, i)
+static proc findFirst (list l, def i)
 "USAGE:  findFirst(l,i);  l a list, i an argument of any type
 RETURN:  int, the position of the first appearance of i in l,
 @*       or 0 if i is not a member of l

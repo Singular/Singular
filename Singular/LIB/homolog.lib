@@ -224,7 +224,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc cupproduct (module M,N,P,int p,q,list #)
+proc cupproduct (module M,module N,module P,int p,int q,list #)
 "USAGE:   cupproduct(M,N,P,p,q[,any]);  M,N,P modules, p,q integers
 COMPUTE: cup-product Ext^p(M',N') x Ext^q(N',P') ---> Ext^(p+q)(M',P'),
          where M':=R^m/M, if M in R^m, R basering (i.e. M':=coker(matrix(M)))
@@ -1926,7 +1926,7 @@ example
 }
 
 // taken from qhmoduli.lib
-static proc Max(data)
+static proc Max(def data)
 "USAGE:   Max(data); intvec/list of integers
 PURPOSE: find the maximal integer contained in 'data'
 RETURN:  list

@@ -84,7 +84,7 @@ static proc pTestNormal(ideal I, list L, int p, ideal normalIP)
 // Computes the normalization of I in characterisitic p.
 // Returns an ideal Out such that the normalization mod p is the
 // module 1/condu * Out
-static proc modpNormal(ideal I, int p, poly condu,printTimings,list #)
+static proc modpNormal(ideal I, int p, poly condu,int printTimings,list #)
 {
   int tt = timer;
   int liftRelations;

@@ -48,7 +48,7 @@ LIB "nctools.lib"; // for superCommutative
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc compress (A)
+proc compress (def A)
 "USAGE:   compress(A); A matrix/ideal/module/intmat/intvec
 RETURN:  same type, zero columns/generators from A deleted
          (if A=intvec, zero elements are deleted)
@@ -291,7 +291,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc power ( A, int n)
+proc power (def A, int n)
 "USAGE:   power(A,n);  A a square-matrix of type intmat or matrix, n=integer>=0
 RETURN:  intmat resp. matrix, the n-th power of A
 NOTE:    for A=intmat and big n the result may be wrong because of int overflow
@@ -327,7 +327,7 @@ EXAMPLE: example power; shows an example
    }
    if( n == 1 ) { return (A); }
 //---------------------------- sub procedure ----------------------------------
-   proc matpow (A, int n)
+   proc matpow (def A, int n)
    {
       def B = A*A;
       int ii= 2;
