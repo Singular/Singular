@@ -23,7 +23,7 @@ PROCEDURES:
  normalI(I[,p[,r]]);    computes the integral closure of an ideal I using R[It]
 ";
 
-LIB "normal.lib";       // for HomJJ
+LIB "locnormal.lib";       // for HomJJ
 LIB "standard.lib";     // for groebner
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -102,8 +102,8 @@ example
 ////////////////////////////////////////////////////////////////////////////
 
 static
-proc ClosureRees (list L)
-"USAGE:    ClosureRees (L); L a list
+proc ClosureRees (list L, int useLocNormal)
+"USAGE:    ClosureRees (L,useLocNormal); L a list, useLocNormal an integer
 ASSUME:   L is a list containing
           - a ring L[1], inside L[1] an ideal ker such that L[1]/ker is
             isomorphic to the Rees Algebra R[It] of an ideal I in k[x]
@@ -122,11 +122,18 @@ RETURN:   quotients of elements of k[x,t] representing generators of the
   def R(1) = L[1];
   setring R(1);                   // declaration of variables used later
   ideal ker(1)=ker;               // in STEP 2
-  list nor = normal(ker);
-  list preimages=nor[2];
+  if (useLocNormal==1) {
+      list preimages1 = locNormal(ker);
+      ideal preimagesI=preimages1[1];
+      list preimagesL = list(preimagesI[2..size(preimagesI)])+list(preimagesI[1]);
+      ideal preimages = ideal(preimagesL[1..size(preimagesL)]);
+  } else {
+      list nor = normal(ker);
+      ideal preimages=nor[2][1];
+  }
   setring Kxt;
   map psi=R(1),mapI;              // from ReesAlgebra: the map Rees->Kxt
-  ideal images=(psi(preimages))[1];
+  ideal images=psi(preimages);
   ideal psii = images[size(images)]*ideal(psi);
   list imagesl = images[1..size(images)];
   list psil =psii[1..size(psii)];
@@ -264,7 +271,7 @@ RETURN:   the integral closure of I, ... I^#[1]. If # is not given, compute
 ////////////////////////////////////////////////////////////////////////////
 
 proc normalI(ideal I, list #)
-"USAGE:    normalI (I [,p[,r]]); I an ideal, p and r optional integers
+"USAGE:    normalI (I [,p [,r [,l]]]); I an ideal, p, r, and l optional integers
 RETURN:   the integral closure of I, ..., I^p, where I is an ideal in the
           polynomial ring R=k[x(1),...x(n)]. If p is not given, or p==0,
           compute the closure of all powers up to the maximum degree in t
@@ -272,6 +279,7 @@ RETURN:   the integral closure of I, ..., I^p, where I is an ideal in the
           closure is not just the sum/product of the smaller). If r
           is given and r==1, normalI starts with a check whether I is already a
           radical ideal.
+          If l==1 then locNormal instead of normal is used to compute normalization.
           The result is a list containing the closure of the desired powers of
           I as ideals of the basering.
 DISPLAY:  The procedure displays more comments for higher printlevel.
@@ -304,9 +312,13 @@ EXAMPLE:  example normalI; shows an example
   }
 
   int testrad=0;      // do the radical check?
+  int uselocNormal=0;
   if (size(#)>1)
   {
     testrad=#[2];
+    if (size(#)==3) {
+                 uselocNormal=#[3];
+    }
   }
 
   if (testrad==1)
@@ -362,7 +374,7 @@ EXAMPLE:  example normalI; shows an example
   // rators, the last entry is the 'universal' denominator
 
   setring Kxt;
-  list images = ClosureRees(Rees);
+  list images = ClosureRees(Rees,uselocNormal);
 
   // ClosureRees was done after the first HomJJ-call
   // ==> I is integrally closed, and images consists of the only entry "closed"

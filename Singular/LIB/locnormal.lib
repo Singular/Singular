@@ -141,8 +141,9 @@ EXAMPLE: example locNormal; shows an example
   dbprint(dbg, "Computing the jacobian ideal...");
   ideal J = minor(jacob(IMin), nvars(basering) - d, I);
   t=timer;
-  J = modStd(J);
-  if (printTimings==1) {"Time for modStd Jacobian "+string(timer-t);}
+  int ch = char(basering);
+  if (ch==0) {J = modStd(J);} else {J = std(J);}
+  if (printTimings==1) {"Time for modStd/std Jacobian "+string(timer-t);}
 
   setring R;
   ideal J = fetch(Q, J);
@@ -197,9 +198,9 @@ EXAMPLE: example locNormal; shows an example
   }
 
   t=timer;
-  resu = modStd(resu);
+  if (ch==0) {resu = modStd(resu);} else {resu = std(resu);}
   if (printTimings==1) {
-     "Time for combining the local results, modStd "+string(timer-t);
+     "Time for combining the local results, modStd/std "+string(timer-t);
   }
 
   totalTime = timer - totalTime;
