@@ -227,30 +227,32 @@ void s_readmpz_base(s_buff F, mpz_ptr a, int base)
     c=s_getc(F);
   } while((!F->is_eof) && (c<=' '));
   if (c=='-') { neg=-1; c=s_getc(F); }
+  char *str=(char*)omAlloc0(128);
+  int str_l=128;
+  int str_p=0;
   while(c>' ')
   {
-    if (isdigit(c))
+    if ((isdigit(c))
+    || ((c>='a') && (c<='z'))
+    || ((c>='A') && (c<='Z')))
     {
-      mpz_mul_ui(a,a,base);
-      mpz_add_ui(a,a,(c-'0'));
-    }
-    else if ((c>='a') && (c<='z'))
-    {
-      mpz_mul_ui(a,a,base);
-      mpz_add_ui(a,a,(c-'a'+10));
-    }
-    else if ((c>='A') && (c<='Z'))
-    {
-      mpz_mul_ui(a,a,base);
-      mpz_add_ui(a,a,(c-'A'+10));
+      str[str_p]=c;
+      str_p++;
     }
     else
     {
       s_ungetc(c,F);
       break;
     }
+    if (str_p>=str_l)
+    {
+      str_l=str_l*2;
+      str=(char*)omRealloc0(str,str_l);
+    }
     c=s_getc(F);
   }
+  mpz_set_str(a,str,base);
+  omFreeSize(str,str_l);
   if (neg==-1) mpz_neg(a,a);
 }
 int s_iseof(s_buff F)
