@@ -24,7 +24,6 @@ extern "C" {
 #define OM_T_STR
 #define OM_T_ALLOC
 #define OM_T_REALLOC
-#undef OM_NDEBUG
 #endif
 #endif
 

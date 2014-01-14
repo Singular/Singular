@@ -59,12 +59,11 @@ int dReportError(const char* fmt, ...)
 #ifndef MAKE_DISTRIBUTION
   fprintf(stderr, "\n// ***dError: ");
   vfprintf(stderr, fmt, ap);
-#if 0
-    if !defined(OM_NDEBUG) && defined(HAVE_CONFIG_H)
-#endif
-#if  defined(HAVE_CONFIG_H)
+#if  defined(HAVE_CONFIG_H) && !defined(OM_NDEBUG)
+  #ifdef omPrintCurrentBackTraceMax
   fprintf(stderr, " occured at: \n");
   omPrintCurrentBackTraceMax(stderr, 8);
+  #endif
 #endif
 
 #if 0
@@ -128,7 +127,7 @@ int dReportError(const char* fmt, ...)
   
   dErrorBreak();
 #else
-  fprintf(stderr, "\n// !!! YOU HAVE FOUND A BUG IN SINGULAR::Spielwiese.");
+  fprintf(stderr, "\n// !!! YOU HAVE FOUND A BUG IN SINGULAR.");
   fprintf(stderr, "// !!! Please, email the input\n// and the following error message to singular@mathematik.uni-kl.de")
   vfprintf(stderr, fmt, ap);
 #endif
