@@ -72,6 +72,8 @@
 #define POW_2_28 (1L<<28)
 #define LONG int
 #endif
+
+#define SSI_BASE 16
 typedef struct
 {
   s_buff f_read;
@@ -170,7 +172,7 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
         mpz_t tmp;
         mpz_init_set_si(tmp,nn);
         fputs("8 ",d->f_write);
-        mpz_out_str (d->f_write,32, tmp);
+        mpz_out_str (d->f_write,SSI_BASE, tmp);
         fputc(' ',d->f_write);
         mpz_clear(tmp);
       }
@@ -181,9 +183,9 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
     {
       //gmp_fprintf(d->f_write,"%d %Zd %Zd ",n->s,n->z,n->n);
       fprintf(d->f_write,"%d ",n->s+5);
-      mpz_out_str (d->f_write,32, n->z);
+      mpz_out_str (d->f_write,SSI_BASE, n->z);
       fputc(' ',d->f_write);
-      mpz_out_str (d->f_write,32, n->n);
+      mpz_out_str (d->f_write,SSI_BASE, n->n);
       fputc(' ',d->f_write);
 
       //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: s=%d gmp/gmp \"%Zd %Zd\" ",n->s,n->z,n->n);
@@ -192,7 +194,7 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
     {
       //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
       fputs("8 ",d->f_write);
-      mpz_out_str (d->f_write,32, n->z);
+      mpz_out_str (d->f_write,SSI_BASE, n->z);
       fputc(' ',d->f_write);
 
       //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: gmp \"%Zd\" ",n->z);
@@ -450,15 +452,15 @@ static number ssiReadQNumber(ssiInfo *d)
        {// read raw mpz_t, mpz_t
          number n=nlRInit(0);
          mpz_init(n->n);
-         s_readmpz_base (d->f_read,n->z, 32);
-         s_readmpz_base (d->f_read,n->n, 32);
+         s_readmpz_base (d->f_read,n->z, SSI_BASE);
+         s_readmpz_base (d->f_read,n->n, SSI_BASE);
          n->s=sub_type-5;
          return n;
        }
      case 8:
        {// read raw mpz_t
          number n=nlRInit(0);
-         s_readmpz_base (d->f_read,n->z, 32);
+         s_readmpz_base (d->f_read,n->z, SSI_BASE);
          n->s=sub_type=3; /*subtype-5*/
          return n;
        }
