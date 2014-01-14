@@ -1,5 +1,5 @@
-//////////////////////////////////////////////////////////////////////////////
-version="version dmod.lib 3-1-7-0 Sep_2013 ";
+/////////////////////////////////////////////////////////////////////////////
+version="version dmod.lib 3-1-7-1 jan_2014 ";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -1720,6 +1720,7 @@ EXAMPLE: example annfsRB; shows examples
   dbprint(ppl,"// -3-1- the ring @R4 is ready");
   dbprint(ppl-1, @R4);
   ideal K4 = imap(@R2,K2);
+  intvec saveopt=option(get);
   option(redSB);
   dbprint(ppl,"// -3-2- the final cosmetic std");
   K4 = engine(K4,eng);  // std does the job too
@@ -1730,6 +1731,7 @@ EXAMPLE: example annfsRB; shows examples
   export BS;
   ideal LD = K4;
   export LD;
+  option(set,saveopt);
   return(@R4);
 }
 example
