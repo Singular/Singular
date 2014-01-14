@@ -214,7 +214,7 @@ Singular_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 Singular_LDADD = libSingular.la ${EMBED_PYOBJECT}
 
-# Singular_LDFLAGS = ${EMBED_PYOBJECT}
+Singular_LDFLAGS = -static ${EMBED_PYOBJECT}
 
 Singulars_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
@@ -253,10 +253,7 @@ libparse_CPPFLAGS = ${AM_CPPFLAGS} -DSTANDALONE_PARSER
 libparse_SOURCES = libparse.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 libparse_LDADD = ${top_builddir}/omalloc/libomalloc.la
-# libparse_LDFLAGS = -static ${AM_LDFLAGS}
-# TODO for libparse: DONE by Hans???
-# multiple definition of `category_out': libparse.cc v.s. utils.cc
-# undefined reference to `iiInitSingularProcinfo(procinfo*, char const*, char const*, int, long, int)'
+libparse_LDFLAGS = -static ${AM_LDFLAGS}
 
 #########################################################
 # the Singular library (*.lib files)
