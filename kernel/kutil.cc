@@ -8328,7 +8328,6 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
     for (int i=rBlocks(res); i>0; --i) {
       if (res->order[i] == ringorder_C || res->order[i] == ringorder_c) {
         res->order[i] = 0;
-        break;
       }
     }
     rComplete(res, 1);
@@ -8380,10 +8379,9 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
     res->order[1]   = ringorder_C; // Prefix
     res->wvhdl[1]   = NULL;
     // removes useless secondary component order if defined in old ring
-    for (int i=rBlocks(res); i>0; --i) {
+    for (int i=rBlocks(res); i>1; --i) {
       if (res->order[i] == ringorder_C || res->order[i] == ringorder_c) {
         res->order[i] = 0;
-        break;
       }
     }
     rComplete(res, 1);
