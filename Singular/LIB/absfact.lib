@@ -602,7 +602,8 @@ EXAMPLE: example absFactorize; shows an example
 // absolute factors) is stored.
 // To access the list of absolute factors, type (if the name S was assigned
 // to the return value):
-        setring(S); absolute_factors; ");
+//        setring(S); absolute_factors;
+  ");
   return(MPo);
 }
 example
@@ -826,7 +827,8 @@ EXAMPLE: example absFactorizeBCG; shows an example
 // absolute factors) is stored.
 // To access the list of absolute factors, type (if the name S was assigned
 // to the return value):
-        setring(S); absolute_factors; ");
+//        setring(S); absolute_factors;
+  ");
   return(MPo);
 }
 example
