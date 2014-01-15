@@ -594,7 +594,7 @@ static proc res_deg ()
   return(ext);
 }
 ///////////////////////////////////////////////////////////////////////////////
-static proc Frobenius (etwas,int r)
+static proc Frobenius (def etwas,int r)
 {
   // applies the Frobenius map over F_{p^r} to an object defined over an
   //   extension of such field
@@ -761,7 +761,7 @@ static proc conj_bs (list L,int r)
   return(branches);
 }
 ///////////////////////////////////////////////////////////////////////////////
-static proc subfield (sf)
+static proc subfield (def sf)
 {
   // writes the generator "a" of a subfield of the coefficients field of
   //   basering in terms of the current generator (also called "a") as a
@@ -857,7 +857,7 @@ static proc subfield (sf)
   }
 }
 ///////////////////////////////////////////////////////////////////////////////
-static proc importdatum (sf,string datum,string rel)
+static proc importdatum (def sf,string datum,string rel)
 {
   // fetchs a poly with name "datum" to the current basering from the ring sf
   //   such that the generator is given by string "rel"
@@ -890,7 +890,7 @@ static proc importdatum (sf,string datum,string rel)
   }
 }
 ///////////////////////////////////////////////////////////////////////////////
-static proc rationalize (lf,string datum,string rel)
+static proc rationalize (def lf,string datum,string rel)
 {
   // fetchs a poly with name "datum" to the current basering from the ring lf
   //   and larger coefficients field, where the generator of current ring is
@@ -1778,7 +1778,7 @@ check=0;
   return(update_CURVE);
 }
 ///////////////////////////////////////////////////////////////////////////////
-static proc local_conductor (int k,SS)
+static proc local_conductor (int k,def SS)
 {
   // computes the degree of the local conductor at a place of a plane curve
   // if the point is non-singular the result will be zero

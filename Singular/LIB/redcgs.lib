@@ -248,7 +248,7 @@ proc cld(ideal J)
   return(Jc);
 }
 
-proc memberpos(f,J)
+proc memberpos(def f,def J)
 "USAGE:  memberpos(f,J);
          (f,J) expected (polynomial,ideal)
                or       (int,list(int))
@@ -372,7 +372,7 @@ EXAMPLE: memberpos; shows an example"
 }
 
 
-proc subset(J,K)
+proc subset(def J,def K)
 "USAGE:   subset(J,K);
           (J,K)  expected (ideal,ideal)
                    or     (list, list)
@@ -3131,7 +3131,7 @@ proc nextbrother(intvec labu)
 }
 
 // gives the first child of vertex fu
-proc firstchild(labfu)
+proc firstchild(def labfu)
 {
   intvec labfu0=labfu;
   labfu0[size(labfu0)+1]=0;
@@ -3568,7 +3568,7 @@ proc ctrecwrite(LLa, list L, string T, intvec lab, int n)
 // Purpose: test if a polynomial is homogeneous in the variables or not
 // input:  poly f
 // output  1 if f is homogeneous, 0 if not
-proc ishomog(f)
+proc ishomog(def f)
 {
   int i; poly r; int d; int dr;
   if (f==0){return(1);}

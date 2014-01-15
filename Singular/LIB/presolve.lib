@@ -30,7 +30,7 @@ LIB "matrix.lib";
 LIB "ring.lib";
 LIB "elim.lib";
 ///////////////////////////////////////////////////////////////////////////////
-proc shortid (id,int n,list #)
+proc shortid (def id,int n,list #)
 "USAGE:   shortid(id,n[,e]); id= ideal/module, n,e=integers
 RETURN:  - if called with two arguments or e=0:
 @*       same type as id, containing generators of id having <= n terms.
@@ -85,7 +85,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc degreepart (id,int d1,int d2,list #)
+proc degreepart (def id,int d1,int d2,list #)
 "USAGE:   degreepart(id,d1,d2[,v]);  id=ideal/module, d1,d1=integers, v=intvec
 RETURN:  list of size 2,
          _[1]: generators of id of [v-weighted] total degree >= d1 and <= d2
@@ -141,7 +141,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc linearpart (id)
+proc linearpart (def id)
 "USAGE:   linearpart(id);  id=ideal/module
 RETURN:  list of size 2,
          _[1]: generators of id of total degree <= 1
@@ -665,7 +665,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc faststd (@id, list #)
+proc faststd (def @id, list #)
 "USAGE:   faststd(id [,\"hilb\",\"sort\",\"dec\",o,\"blocks\"]);
          id=ideal/module, o=string (allowed:\"lp\",\"dp\",\"Dp\",\"ls\",
          \"ds\",\"Ds\"),  \"hilb\",\"sort\",\"dec\",\"block\" options for
@@ -835,7 +835,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc findvars(id, list #)
+proc findvars(def id, list #)
 "USAGE:   findvars(id [,any] ); id=poly/ideal/vector/module/matrix, any=any type
 RETURN:  if no second argument is present: ideal of variables occuring in id,@*
          if a second argument is given (of any type): list L with 4 entries:
@@ -884,7 +884,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc hilbvec (@id, list #)
+proc hilbvec (def @id, list #)
 "USAGE:   hilbvec(id[,c,o]); id=poly/ideal/vector/module/matrix, c,o=strings,@*
           c=char, o=ordering used by @code{hilb} (default: c=\"32003\", o=\"dp\")
 RETURN:  intvec of 1st Hilbert-series of id, computed in char c and ordering o
@@ -915,7 +915,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc tolessvars (id ,list #)
+proc tolessvars (def id ,list #)
 "USAGE:   tolessvars(id [,s1,s2] ); id poly/ideal/vector/module/matrix,
           s1=string (new ordering)@*
           [default: s1=\"dp\" or \"ds\" depending on whether the first block
@@ -982,7 +982,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc solvelinearpart (id,list #)
+proc solvelinearpart (def id,list #)
 "USAGE:   solvelinearpart(id [,n] );  id=ideal/module, n=integer (default: n=0)
 RETURN:  (interreduced) generators of id of degree <=1 in reduced triangular
          form if n=0 [non-reduced triangular form if n!=0]
@@ -1031,7 +1031,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sortandmap (@id, list #)
+proc sortandmap (def @id, list #)
 "USAGE:   sortandmap(id [,n1,p1,n2,p2...,o1,m1,o2,m2...]);@*
          id=poly/ideal/vector/module,@*
          p1,p2,...= polynomials (product of variables),@*
@@ -1127,7 +1127,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sortvars (id, list #)
+proc sortvars (def id, list #)
 "USAGE:   sortvars(id[,n1,p1,n2,p2,...]);@*
          id=poly/ideal/vector/module,@*
          p1,p2,...= polynomials (product of vars),@*
@@ -1189,7 +1189,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc valvars (id, list #)
+proc valvars (def id, list #)
 "USAGE:   valvars(id[,n1,p1,n2,p2,...]);@*
          id=poly/ideal/vector/module,@*
          p1,p2,...= polynomials (product of vars),@*

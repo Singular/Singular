@@ -278,7 +278,7 @@ example
 // to use matricial notation in the calculus but use list notation in input and output.
 // n is the order of the quantum matrix algebra where we are working.
 
-static proc itoij(int i, n)
+static proc itoij(int i,int n)
 {
   intvec ij=0,0;
   ij[1]=((i-1) div n)+1;
@@ -286,7 +286,7 @@ static proc itoij(int i, n)
   return(ij);
 }
 
-static proc ijtoi(int i, j, n)
+static proc ijtoi(int i,int j,int n)
 {
   return((j-1)+n*(i-1)+1);
 }

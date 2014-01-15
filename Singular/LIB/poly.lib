@@ -91,7 +91,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc substitute (I,list #)
+proc substitute (def I,list #)
 "USAGE:  - case 1: typeof(#[1])==poly:
            substitute (I,v,f[,v1,f1,v2,f2,...]); I object of basering which
            can be mapped, v,v1,v2,.. ring variables, f,f1,f2,... poly
@@ -380,7 +380,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc maxcoef (f)
+proc maxcoef (def f)
 "USAGE:   maxcoef(f);  f  poly/ideal/vector/module/matrix
 RETURN:  maximal length of coefficient of f of type int (by measuring the
          length of the string of each coefficient)
@@ -417,7 +417,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc maxdeg (id)
+proc maxdeg (def id)
 "USAGE:   maxdeg(id);  id  poly/ideal/vector/module/matrix
 RETURN:  int/intmat, each component equals maximal degree of monomials in the
          corresponding component of id, independent of ring ordering
@@ -552,7 +552,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc mindeg (id)
+proc mindeg (def id)
 "USAGE:   mindeg(id);  id  poly/ideal/vector/module/matrix
 RETURN:  minimal degree/s of monomials of id, independent of ring ordering
          (mindeg of each variable is 1) of type int if id of type poly, else
@@ -605,7 +605,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc mindeg1 (id, list #)
+proc mindeg1 (def id, list #)
 "USAGE:   mindeg1(id[,v]);  id=poly/ideal/vector/module/matrix, v=intvec
 RETURN:  integer, minimal [weighted] degree of monomials of id independent of
          ring ordering, mindeg1 of i-th variable is v[i] (default v=1..1).
@@ -686,7 +686,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc normalize (id)
+proc normalize (def id)
 "USAGE:   normalize(id);  id=poly/vector/ideal/module
 RETURN:  object of same type
          each element is normalized with leading coefficient equal to 1
@@ -768,7 +768,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc lcm (id, list #)
+proc lcm (def id, list #)
 "USAGE:   lcm(p[,q]); p int/intvec q a list of integers or
           p poly/ideal q a list of polynomials
 RETURN:  the least common multiple of p and q:
@@ -885,7 +885,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc content(f)
+proc content(def f)
 "USAGE:   content(f); f polynomial/vector
 RETURN:  number, the content (greatest common factor of coefficients)
          of the polynomial/vector f

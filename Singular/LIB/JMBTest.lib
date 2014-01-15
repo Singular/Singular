@@ -532,7 +532,7 @@ example
  NewWeight(3);
 }
 ////////////////////////////////////////////////////////////////////
-proc FinalVm(list V1 , list G1 , r)
+proc FinalVm(list V1 , list G1 ,def r)
 "USAGE:     FinalVm(V1, G1, r);  V1 list,  G1 list , r
 RETURN:   intvec: u
 EXAMPLE:  example NewWeight; shows an example"
@@ -662,7 +662,7 @@ list G2F=list(list(r1,r2,r3),list(r4));
  FinalVm(VConst(G2F,6,r) , G2F, r);
 }
 ////////////////////////////////////////////////////////////////////
-proc ConstructorMain(list G, int c,r)
+proc ConstructorMain(list G, int c,def r)
 "USAGE:    Costruttore(G,c); G list, c int
 RETURN:   list: R
 NOTE:     At the end separated by degree.
@@ -854,7 +854,7 @@ list EK,D=EKPolys(G2F);
 EKPolynomials(EK[1],G2F);
 }
 ////////////////////////////////////////////////////////////////////
-proc TestJMark(list G1,r)
+proc TestJMark(list G1,def r)
 "USAGE:    TestJMark(G);  G list
 RETURN:    int: i
 NOTE:

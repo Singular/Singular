@@ -25,7 +25,7 @@ LIB "general.lib";
 LIB "matrix.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
-proc genericid (id, list #)
+proc genericid (def id, list #)
 "USAGE:   genericid(id[,p,b]);  id ideal/module, p,b integers
 RETURN:  system of generators of id which are generic, sparse, triagonal linear
          combinations of given generators with coefficients in [1,b] and
@@ -53,7 +53,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc randomid (id, list #)
+proc randomid (def id, list #)
 "USAGE:   randomid(id[,k,b]);  id ideal/module, b,k integers
 RETURN:  ideal/module having k generators which are random linear combinations
          of generators of id with coefficients in the interval [-b,b]

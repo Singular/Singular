@@ -1238,7 +1238,7 @@ example
 /////BRANDNEW!!!!////////////////////
 //////////////////////////////////////////////////
 
-static proc checkForHomogInhomogInterchangability(list factors, posLeft, posRight)
+static proc checkForHomogInhomogInterchangability(list factors,int posLeft,int posRight)
 "
 INPUT:  A list consisting of factors of a certain polynomial in the first Weyl
         algebra, factors, and a position from the left and the right, where the last swap was done.
@@ -3045,8 +3045,8 @@ example
 //is the first Weyl algebra. The polynomial must only contain
 //the two arguments, which are also given by the user.
 
-proc facSubWeyl(poly h, X, D)
-"USAGE:  facSubWeyl(h,x,y); h, X, D polynomials
+proc facSubWeyl(poly h, def X, def D)
+"USAGE:  facSubWeyl(h,x,D); h, X, D polynomials
 RETURN: list
 ASSUME: X and D are variables of a basering, which satisfy DX = XD +1.
 @* That is,  they generate the copy of the first Weyl algebra in a basering.
@@ -3529,7 +3529,7 @@ can already be mapped without a problem.");
   return(result);
 }//combineNonnegative
 
-static proc fromWeylToShiftPoly(poly h, sAlgebra)
+static proc fromWeylToShiftPoly(poly h,def sAlgebra)
 "
 USAGE: Given a polynomial in the first Weyl algebra, this method returns it -- if possible --
        as an element in the first shift algebra, which is given in the method header.
