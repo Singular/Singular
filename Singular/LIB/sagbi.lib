@@ -53,7 +53,7 @@ static proc uniqueVariableName (string variableName)
   return(variableName);
 }
 
-static proc extendRing(r, ideal leadTermsAlgebra, int method) {
+static proc extendRing(def r, ideal leadTermsAlgebra, int method) {
   /* Extends ring r with additional variables. If k=ncols(leadTermsAlgebra) and
    * r contains already m additional variables @y, the procedure adds k-m variables
    * @y(m+1)...@y(k) to the ring.
@@ -124,7 +124,7 @@ static proc stdKernPhi(ideal kernNew, ideal kernOld, ideal leadTermsAlgebra,int 
 }
 
 
-static proc spolynomialsGB(ideal algebra,r,int method)
+static proc spolynomialsGB(ideal algebra,def r,int method)
 {
   /* This procedure does the actual S-polynomial calculation using Groebner basis methods and is
    * called by the procedures sagbiSPoly,sagbi and sagbiPart. As this procedure is called
@@ -256,7 +256,7 @@ static proc spolynomialsToric(ideal algebra) {
 }
 
 
-static proc reductionGB(ideal F, ideal algebra,r, int tailreduction,int method,int parRed)
+static proc reductionGB(ideal F, ideal algebra,def r, int tailreduction,int method,int parRed)
 {
   /* This procedure does the actual SAGBI/subalgebra reduction using GB methods and is
    * called by the procedures sagbiReduce,sagbi and sagbiPart
@@ -636,7 +636,7 @@ example
 }
 
 
-proc sagbiReduce(idealORpoly, ideal algebra, list #)
+proc sagbiReduce(def idealORpoly, ideal algebra, list #)
 "USAGE: sagbiReduce(I, A[, tr, mt]); I, A ideals, tr, mt optional integers
 RETURN: ideal of remainders of I after SAGBI reduction by A
 ASSUME: basering is not a qring

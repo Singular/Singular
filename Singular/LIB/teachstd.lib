@@ -34,7 +34,7 @@ PROCEDURES:
 LIB "poly.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
-proc ecart(f)
+proc ecart(def f)
 "USAGE:   ecart(f); f poly or vector
 RETURN:  the ecart e of f of type int
 EXAMPLE: example ecart; shows an example
@@ -51,7 +51,7 @@ example
    ecart((y+z+x+xyz)**2);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc leadmonomial(f)
+proc leadmonomial(def f)
 "USAGE:   leadmonomial(f); f poly or vector
 RETURN:  the leading monomial of f of type poly
 NOTE:    if f is of type poly, leadmonomial(f)=leadmonom(f), if f is of type
@@ -79,7 +79,7 @@ example
    leadmonomial([(y+z+x+xyz)^2,xyz5]);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc tail(f)
+proc tail(def f)
 "USAGE:   tail(f); f poly or vector
 RETURN:  f-lead(f), the tail of f of type poly
 EXAMPLE: example tail; shows an example
@@ -96,7 +96,7 @@ example
    tail((y+z+x+xyz)**2);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc sameComponent(f,g)
+proc sameComponent(def f,def g)
 "USAGE:   sameComponent(f,g); f,g poly or vector
 RETURN:  1 if f and g are of type poly or if f and g are of type vector and
          their leading monomials involve the same module component,
@@ -125,7 +125,7 @@ example
    sameComponent(y+z+x+xyz, xy+z5);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc monomialLcm(m,n)
+proc monomialLcm(def m,def n)
 "USAGE:   monomialLcm(m,n); m,n of type poly or vector
 RETURN:  least common multiple of leading monomials of m and n, of type poly
 NOTE:    if m = (x1...xr)^(a1,...,ar)*gen(i) (gen(i)=1 if m is of type poly)
@@ -170,7 +170,7 @@ example
    monomialLcm([xy2,xz3],[yz3]);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc spoly(f,g,list #)
+proc spoly(def f,def g,list #)
 "USAGE:   spoly(f,g[,s]); f,g poly or vector, s int
 RETURN:  the s-polynomial of f and g, of type poly or vector
          if s!=0 the symmetric s-polynomial (without division) is returned
@@ -221,7 +221,7 @@ example
    spoly([5x2+x2y,z5],[x2,y3,y4]);       //s-poly for vectors
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc minEcart(T,h)
+proc minEcart(def T,def h)
 "USAGE:   minEcart(T,h); T ideal or module, h poly or vector
 RETURN:  element g from T such that leadmonom(g) divides leadmonom(h)@*
          ecart(g) is minimal with this property (if T != 0);
@@ -310,7 +310,7 @@ example
    minEcart(T,h);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc NFMora(f,G,list #)
+proc NFMora(def f,def G,list #)
 "USAGE:   NFMora(f,G[,s]); f poly or vector,G ideal or module, s int
 RETURN:  the Mora normal form of f w.r.t. G, same type as f
          if s!=0 the symmetric s-polynomial (without division) is used
@@ -406,7 +406,7 @@ example
    NFMora(v,M);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc prodcrit(f,g,list #)
+proc prodcrit(def f,def g,list #)
 "USAGE:   prodcrit(f,g[,o]); f,g poly or vector, and optional int argument o
 RETURN:  1 if product criterion applies in the same module component,
          2 if lead(f) and lead(g) involve different components, 0 else
@@ -464,7 +464,7 @@ example
    prodcrit(v,w);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc chaincrit(f,g,h)
+proc chaincrit(def f,def g,def h)
 "USAGE:   chaincrit(f,g,h); f,g,h poly or module
 RETURN:  1 if chain criterion applies, 0 else
 NOTE:    if chain criterion applies to f,g,h we can delete (g,h) from pairset
@@ -493,7 +493,7 @@ example
    chaincrit(u,v,w);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc pairset(G)
+proc pairset(def G)
 "USAGE:   pairset(G); G ideal or module
 RETURN:  list L,
          L[1] = the pairset of G as list (not containing pairs for
@@ -568,7 +568,7 @@ example
    pairset(T);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc updatePairs(P,S,h)
+proc updatePairs(def P,def S,def h)
 "USAGE:   updatePairs(P,S,h); P list, S ideal or module, h poly or vector@*
          P a list of pairs of polys or vectors (obtained from pairset)
 RETURN:  list Q,
@@ -637,7 +637,7 @@ example
    updatePairs(P,T,[x2+x2y,y3+xyz]);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc standard(id, list #)
+proc standard(def id, list #)
 "USAGE:   standard(i[,s]); id ideal or module, s int
 RETURN:  a standard basis of id, using generalized Mora's algorithm
          which is Buchberger's algorithm for global monomial orderings.
@@ -741,7 +741,7 @@ example
    standard(M);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc localstd (id)
+proc localstd (def id)
 "USAGE:   localstd(id); id = ideal
 RETURN:  A standard basis for a local degree ordering, using Lazard's method.
 NOTE:    The procedure homogenizes id w.r.t. a new 1st variable local@t,

@@ -1229,7 +1229,7 @@ ASSUME:  size(sol) = size(index) <= nvars(basering)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc SimplifyZeroset(data)
+proc SimplifyZeroset(def data)
 "USAGE:   SimplifyZeroset(data); list data
 PURPOSE: reduce the entries of the elements of 'data' w.r.t. the ideal 'mpoly'
          'data' is a list of ideals/lists.
@@ -1269,7 +1269,7 @@ ASSUME:  n <= nvars(basering)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc containedQ(data, f, list #)
+proc containedQ(def data,def f, list #)
 "USAGE:    containedQ(data, f [, opt]); data=list; f=any type; opt=integer
 PURPOSE:  test if f is an element of data.
 RETURN:   int
@@ -1300,7 +1300,7 @@ OPTIONS:  opt = 0 : use '==' for comparing f with elements from data@*
 
 //////////////////////////////////////////////////////////////////////////////
 
-proc sameQ(a, b)
+proc sameQ(def a,def b)
 "USAGE:    sameQ(a, b); a,b=list/intvec
 PURPOSE:  test a == b elementwise, i.e., a[i] = b[i].
 RETURN:   int
@@ -1354,7 +1354,7 @@ NOTE: outdated, use reduce instead
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc SimplifyData(data)
+static proc SimplifyData(def data)
 "USAGE:   SimplifyData(data); ideal/list data;
 PURPOSE: reduces the entries of 'data' w.r.t. the ideal 'mpoly' if they contain
          the algebraic number 'a'
@@ -1379,7 +1379,7 @@ ASSUME:  basering = Q[x_1,...,x_n,a]
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc TransferRing(R)
+static proc TransferRing(def R)
 "USAGE:   TransferRing(R);
 PURPOSE: creates a new ring containing the same variables as R, but without
          parameters. If R contains a parameter then this parameter is added

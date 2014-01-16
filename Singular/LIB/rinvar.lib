@@ -196,7 +196,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc HilbertWeights(ideal I, wt)
+proc HilbertWeights(ideal I,intvec wt)
 "USAGE:   HilbertWeights(I, w); ideal I, intvec wt
 PURPOSE: compute the weights of the "slack" variables needed for the
          computation of the algebraic relations of the generators of 'I' s.t.
@@ -215,7 +215,7 @@ ASSUME: basering = K[t_1,...,t_m,...], 'I' is quasihomogenous w.r.t. 'w' and
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc HilbertSeries(ideal I, wt)
+proc HilbertSeries(ideal I,intvec wt)
 "USAGE:   HilbertSeries(I, w); ideal I, intvec wt
 PURPOSE: compute the polynomial p of the Hilbert Series, represented by p/q, of
          the ring K[t_1,...,t_m,y_1,...,y_r]/I1 where 'w' are the weights of
@@ -270,7 +270,7 @@ RETURN:  poly
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc ImageVariety(ideal I, F, list #)
+proc ImageVariety(ideal I,ideal F, list #)
 "USAGE:   ImageVariety(ideal I, F [, w]);ideal I; F is a list/ideal, intvec w.
 PURPOSE: compute the Zariski closure of the image of the variety of I under
          the morphism F.
@@ -355,7 +355,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc LinearizeAction(ideal Grp, Gaction, int nrs)
+proc LinearizeAction(ideal Grp,def Gaction, int nrs)
 "USAGE:   LinearizeAction(G,action,r); ideal G, action; int r
 PURPOSE: linearize the group action 'action' and find an equivariant embedding
          of K^m where m = size(action).
@@ -503,7 +503,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc LinearActionQ(Gaction, int nrs)
+proc LinearActionQ(def Gaction, int nrs)
 "USAGE:   LinearActionQ(action,nrs); ideal action, int nrs
 PURPOSE: check whether the action defined by 'action' is linear w.r.t. the
          variables var(nrs + 1...nvars(basering)).
@@ -728,7 +728,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc InvariantQ(poly f, ideal G, action)
+proc InvariantQ(poly f, ideal G,def action)
 "USAGE:   InvariantQ(f, G, action); poly f; ideal G, action
 PURPOSE: check whether the polynomial f is invariant w.r.t. G, where G acts via
          'action' on K^m.
@@ -848,7 +848,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc NullCone(ideal G, action)
+proc NullCone(ideal G,def action)
 "USAGE:   NullCone(G, action); ideal G, action
 PURPOSE: compute the ideal of the nullcone of the linear action of G on K^n,
          given by 'action', by means of Deksen's algorithm
@@ -1103,7 +1103,7 @@ RETURN: list
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc RingVarProduct(index)
+proc RingVarProduct(def index)
 // list of indices
 {
   poly f = 1;
