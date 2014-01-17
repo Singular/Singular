@@ -469,7 +469,8 @@ static proc startTasks_child(list localtasks, int pid_parent)
     int nfinished;
         // the number of local tasks with internal state 3 (result sent) or
         // -1 (stopped)
-    intvec queue = 0, 1..nlocaltasks, 0;   // zeroes for easier handling
+    intvec queue = 1..nlocaltasks;
+    int next = 1;
 
     list links;
     links[nlocaltasks+1] = l(pid_parent);
@@ -480,7 +481,16 @@ static proc startTasks_child(list localtasks, int pid_parent)
     // data sent by other processes
     int code;
     int id;
-    intvec demanded_tasks = 0, 0;   // zeroes for easier handling
+    if (!defined(demanded_tasks)) {
+        intvec demanded_tasks;
+        int demanded_tasks_index = 1;
+        exportto(Tasks, demanded_tasks);
+        exportto(Tasks, demanded_tasks_index);
+    }
+    else {
+        demanded_tasks = 0;
+        demanded_tasks_index = 1;
+    }
     int ndemanded = -1;
 
     // internal counts
@@ -488,10 +498,12 @@ static proc startTasks_child(list localtasks, int pid_parent)
     int results_sent;
 
     // auxiliary variables
+    intvec waiting_tasks;
     int wait;
     int deadlock;
     int tmp;
     int i;
+    int j;
 
     while (nwaiting > 0) {
         wait = 0;
@@ -529,12 +541,12 @@ static proc startTasks_child(list localtasks, int pid_parent)
                 links[nlinks] = ll(pid)(nlinks);
                 write(links[nlinks],
                     quote(startTasks_grandchild(
-                    eval(localtasks[queue[2]].index), eval(pid_parent),
+                    eval(localtasks[queue[next]].index), eval(pid_parent),
                     eval(pid), eval(nlinks), eval(sem_write))));
-                assignment[queue[2]] = nlinks;
-                state[queue[2]] = 1;
+                assignment[queue[next]] = nlinks;
+                state[queue[next]] = 1;
                 nwaiting--;
-                queue = 0, queue[3..size(queue)];
+                next++;
             }
             // wait == 0
         }
@@ -543,9 +555,8 @@ static proc startTasks_child(list localtasks, int pid_parent)
             if (code == 1) {   // result computed
                 id = read(links[wait]);
                 state[id] = 2;
-                if (ndemanded > 0 && isElement(demanded_tasks, id)) {
+                if (ndemanded > 0 && removeDemanded(id)) {
                     write(links[wait], 1);
-                    demanded_tasks = removeFromIntvec(demanded_tasks, id);
                     ndemanded--;
                     results_sent++;
                 }
@@ -557,19 +568,20 @@ static proc startTasks_child(list localtasks, int pid_parent)
             if (code == 0) {   // stopTask
                 id = read(l(pid_parent));
                 if (state[id] == 0) {   // waiting
-                    queue = removeFromIntvec(queue, id);
+                    queue = give_priority(queue, intvec(id));
+                    next++;
                 }
                 if (state[id] == 1 || state[id] == 2) {  // started or computed
                     close(links[assignment[id]]);
                     open(links[assignment[id]]);
                     write(links[assignment[id]],
                         quote(startTasks_grandchild(
-                        eval(localtasks[queue[2]].index), eval(pid_parent),
+                        eval(localtasks[queue[next]].index), eval(pid_parent),
                         eval(pid), eval(assignment[id]), eval(sem_write))));
-                    assignment[queue[2]] = assignment[id];
+                    assignment[queue[next]] = assignment[id];
                     assignment[id] = 0;
-                    state[queue[2]] = 1;
-                    queue = 0, queue[3..size(queue)];
+                    state[queue[next]] = 1;
+                    next++;
                 }
                 // state[id] == -1 (stopped) or state[id] == 3 (sent)
                 // should not happen
@@ -579,33 +591,47 @@ static proc startTasks_child(list localtasks, int pid_parent)
             }
             if (code == 1) {   // waitTasks
                 demanded_tasks = read(l(pid_parent));
+                demanded_tasks_index = size(demanded_tasks);
                 ndemanded = read(l(pid_parent));
-                if (ndemanded > size(demanded_tasks)-2) {
-                    ndemanded = size(demanded_tasks)-2;
+                if (ndemanded > demanded_tasks_index) {
+                    ndemanded = demanded_tasks_index;
                 }
-                if (demanded_tasks == 0:2 && ndemanded == -1) {
+                if (demanded_tasks == 0 && ndemanded == -1) {
                     write(l(pid_parent), results_sent);
+                    continue;
                 }
                 else {
                     results_sent = 0;
                 }
+                demanded_tasks = demanded_tasks[demanded_tasks_index..1];
                 deadlock = 0;
-                for (i = size(demanded_tasks)-1; i > 1; i--) {
+                waiting_tasks = 0:demanded_tasks_index;
+                j = 0;
+                for (i = demanded_tasks_index; i > 0; i--) {
                     id = demanded_tasks[i];
                     if (state[id] == 0) {   // waiting
-                        queue = give_priority(queue, id);
+                        j++;
+                        waiting_tasks[j] = id;
                         deadlock = 1;
+                    }
+                }
+                if (j > 0) {
+                    waiting_tasks = waiting_tasks[1..j];
+                    queue = queue[next..size(queue)];
+                    next = 1;
+                    queue = give_priority(queue, waiting_tasks);
+                    waiting_tasks = 0;
+                }
+                for (i = demanded_tasks_index; i > 0; i--) {
+                    id = demanded_tasks[i];
+                    if (state[id] == 1) {   // started
+                        deadlock = 0;
                     }
                     if (state[id] == 2) {   // computed
                         write(links[assignment[id]], 1);
-                        demanded_tasks = removeFromIntvec(demanded_tasks, id);
+                        tmp = removeDemanded(id);
                         ndemanded--;
                         results_sent++;
-                    }
-                }
-                for (i = size(demanded_tasks)-1; i > 1; i--) {
-                    id = demanded_tasks[i];
-                    if (state[id] == 1) {   // started
                         deadlock = 0;
                     }
                 }
@@ -617,18 +643,20 @@ static proc startTasks_child(list localtasks, int pid_parent)
                     links[nlinks] = ll(pid)(nlinks);
                     write(links[nlinks],
                         quote(startTasks_grandchild(
-                        eval(localtasks[queue[2]].index), eval(pid_parent),
+                        eval(localtasks[queue[next]].index), eval(pid_parent),
                         eval(pid), eval(nlinks), eval(sem_write))));
-                    assignment[queue[2]] = nlinks;
-                    state[queue[2]] = 1;
+                    assignment[queue[next]] = nlinks;
+                    state[queue[next]] = 1;
                     nwaiting--;
-                    queue = 0, queue[3..size(queue)];
+                    next++;
                 }
             }
             if (code == 2) {   // pollTask
                 id = read(l(pid_parent));
                 if (state[id] == 0) {   // waiting
-                    queue = give_priority(queue, id);
+                    queue = queue[next..size(queue)];
+                    next = 1;
+                    queue = give_priority(queue, intvec(id));
                 }
                 if (state[id] == 2) {   // computed
                     write(links[assignment[id]], 1);
@@ -639,15 +667,15 @@ static proc startTasks_child(list localtasks, int pid_parent)
                 id = read(l(pid_parent));
                 write(links[assignment[id]],
                     quote(startTasks_grandchild(
-                    eval(localtasks[queue[2]].index), eval(pid_parent),
+                    eval(localtasks[queue[next]].index), eval(pid_parent),
                     eval(pid), eval(assignment[id]), eval(sem_write))));
-                assignment[queue[2]] = assignment[id];
+                assignment[queue[next]] = assignment[id];
                 assignment[id] = 0;
-                state[queue[2]] = 1;
+                state[queue[next]] = 1;
                 state[id] = 3;
                 nwaiting--;
                 nfinished++;
-                queue = 0, queue[3..size(queue)];
+                next++;
             }
         }
     }
@@ -658,9 +686,8 @@ static proc startTasks_child(list localtasks, int pid_parent)
             if (code == 1) {   // result computed
                 id = read(links[wait]);
                 state[id] = 2;
-                if (ndemanded > 0 && isElement(demanded_tasks, id)) {
+                if (ndemanded > 0 && removeDemanded(id)) {
                     write(links[wait], 1);
-                    demanded_tasks = removeFromIntvec(demanded_tasks, id);
                     ndemanded--;
                     results_sent++;
                 }
@@ -686,21 +713,24 @@ static proc startTasks_child(list localtasks, int pid_parent)
             }
             if (code == 1) {   // waitTasks
                 demanded_tasks = read(l(pid_parent));
+                demanded_tasks_index = size(demanded_tasks);
                 ndemanded = read(l(pid_parent));
-                if (ndemanded > size(demanded_tasks)-2) {
-                    ndemanded = size(demanded_tasks)-2;
+                if (ndemanded > demanded_tasks_index) {
+                    ndemanded = demanded_tasks_index;
                 }
-                if (demanded_tasks == 0:2 && ndemanded == -1) {
+                if (demanded_tasks == 0 && ndemanded == -1) {
                     write(l(pid_parent), results_sent);
+                    continue;
                 }
                 else {
                     results_sent = 0;
                 }
-                for (i = size(demanded_tasks)-1; i > 1; i--) {
+                demanded_tasks = demanded_tasks[demanded_tasks_index..1];
+                for (i = demanded_tasks_index; i > 0; i--) {
                     id = demanded_tasks[i];
                     if (state[id] == 2) {   // computed
                         write(links[assignment[id]], 1);
-                        demanded_tasks = removeFromIntvec(demanded_tasks, id);
+                        tmp = removeDemanded(id);
                         ndemanded--;
                         results_sent++;
                     }
@@ -751,47 +781,73 @@ static proc startTasks_grandchild(int index, int pid_grandparent,
     return(2);
 }
 
-/* Check if n is an element of v[2..(size(v)-1)].
- * Note that v[1] and v[size(v)] are not checked.
+/* Remove id from demanded_tasks and return 1, if id is an element of
+ * demanded_tasks; return 0, otherwise. Note:
+ * - demanded_tasks and demanded_tasks_index are (lib-)global objects
+ *   exported in startTasks_child().
+ * - demanded_tasks_index is used to avoid copying. It is defined to be
+ *   the greatest integer with demanded_tasks[demanded_tasks_index] != 0
+ *   and demanded_tasks[demanded_tasks_index+1] == 0 (if defined).
  */
-static proc isElement(alias intvec v, alias int n)
+static proc removeDemanded(alias int id)
 {
+    if (demanded_tasks[demanded_tasks_index] == id) {
+        demanded_tasks[demanded_tasks_index] = 0;
+        demanded_tasks_index--;
+        return(1);
+    }
     int i;
-    for (i = size(v)-1; i > 1; i--) {
-        if (v[i] == n) {
+    for (i = demanded_tasks_index-1; i > 0; i--) {
+        if (demanded_tasks[i] == id) {
+            demanded_tasks[i..demanded_tasks_index]
+                = demanded_tasks[(i+1)..demanded_tasks_index], 0;
+            demanded_tasks_index--;
             return(1);
         }
     }
     return(0);
 }
 
-/* Remove the first occurence (if any) of n in v[2..(size(v)-1)].
- * Note that v[1] and v[size(v)] are not checked.
+/* Move the elements in 'preferred' to the beginning of 'queue'. We may assume
+ * that
+ * - 'preferred' is a subset of 'queue';
+ * - the elements of 'preferred' are distinct and non-zero;
+ * - the elements of 'queue' are distinct and non-zero.
+ * For performance reasons, we may also assume that 'queue' and 'preferred' are
+ * more or less ordered in most cases. Note that queue has the format
+ * '0, indices, 0'.
  */
-static proc removeFromIntvec(intvec v, int n)
-{
-    int size_v = size(v);
-    int i;
-    for (i = size_v-1; i > 1; i--) {
-        if (v[i] == n) {
-            return(v[1..(i-1)], v[(i+1)..size_v]);
-        }
-    }
-    return(v);
-}
-
-/* Move the first occurence (if any) of id in queue[2..(size(queue)-1)] to
- * queue[2]. Note that queue[1] and queue[size(v)] are not checked.
- */
-static proc give_priority(intvec queue, int id)
+static proc give_priority(intvec queue, intvec preferred)
 {
     int size_queue = size(queue);
+    int size_preferred = size(preferred);
+    if (size_queue == size_preferred) {
+        return(queue);
+    }
+    int index = size_queue;
     int i;
-    for (i = size_queue-1; i > 2; i--) {
-        if (queue[i] == id) {
-            return(0, id, queue[2..(i-1)], queue[(i+1)..size_queue]);
+    int j;
+    for (i = size_preferred; i > 0; i--) {
+        for (j = size_queue; j > 0; j--) {
+            if (queue[index] == preferred[i]) {
+                queue[index] = 0;
+                break;
+            }
+            index--;
+            if (index == 0) {
+                index = size_queue;
+            }
         }
     }
+    intvec not_preferred = 0:(size_queue-size_preferred);
+    index = 1;
+    for (i = 1; i <= size_queue; i++) {
+        if (queue[i]) {
+            not_preferred[index] = queue[i];
+            index++;
+        }
+    }
+    queue = preferred, not_preferred;
     return(queue);
 }
 
@@ -920,7 +976,7 @@ EXAMPLE:  example waitTasks; shows an example"
             }
             if (!sorted_in) {
                 requests[size(requests)+1] = list(tasks[T[i].index].linkID,
-                    intvec(0, tasks[T[i].index].id),
+                    intvec(tasks[T[i].index].id),
                     tasks[T[i].index].links[2]);
                 links[size(links)+1] = tasks[T[i].index].links[1];
             }
@@ -929,7 +985,6 @@ EXAMPLE:  example waitTasks; shows an example"
 
     /* send the reqests */
     for (j = size(requests); j > 0; j--) {
-        requests[j][2][size(requests[j][2])+1] = 0;
         write(requests[j][3], 1);
         write(requests[j][3], requests[j][2]);
         write(requests[j][3], N-ncompleted);
@@ -982,7 +1037,7 @@ EXAMPLE:  example waitTasks; shows an example"
     /* end communication process */
     for (j = size(requests); j > 0; j--) {
         write(requests[j][3], 1);
-        write(requests[j][3], 0:2);
+        write(requests[j][3], 0);
         write(requests[j][3], -1);
     }
     int results_sent;
