@@ -576,6 +576,30 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
     DEBOUTLN( cerr, "D(b) = " << Db );
     delta = degree( Db );
     /// ---> A3
+    if (delta == degF)
+    {
+      if (degF <= degG  && fdivides (F, G))
+      {
+        DEBDECLEVEL( cerr, "ezgcd" );
+        if (!isRat)
+          Off (SW_RATIONAL);
+        return N (d*F);
+      }
+      else
+        delta--;
+    }
+    else if (delta == degG)
+    {
+      if (degG <= degF && fdivides( G, F ))
+      {
+        DEBDECLEVEL( cerr, "ezgcd" );
+        if (!isRat)
+          Off (SW_RATIONAL);
+        return N (d*G);
+      }
+      else
+        delta--;
+    }
     if ( delta == 0 )
     {
       DEBDECLEVEL( cerr, "ezgcd" );
@@ -585,7 +609,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
     }
     /// ---> A4
     //deltaold = delta;
-    while ( 1 ) 
+    while ( 1 )
     {
       bt = b;
       TIMING_START (ez_eval)
@@ -643,6 +667,13 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
         }
         else
           delta--;
+      }
+      if ( delta == 0 )
+      {
+        DEBDECLEVEL( cerr, "ezgcd" );
+        if (!isRat)
+          Off (SW_RATIONAL);
+        return N (d);
       }
     }
     if ( delta != degF && delta != degG )

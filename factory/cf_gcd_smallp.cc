@@ -4478,6 +4478,52 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
     }
     TIMING_END_AND_PRINT (ez_p_eval, "time for eval point search in EZ_P1: ");
     delta = degree( Db );
+    if (delta == degF)
+    {
+      if (degF <= degG && fdivides (F, G))
+      {
+        if (passToGF)
+        {
+          CanonicalForm mipo= gf_mipo;
+          setCharacteristic (p);
+          Variable alpha= rootOf (mipo.mapinto());
+          F= GF2FalphaRep (F, alpha);
+        }
+        if (k > 1)
+        {
+          F= GFMapDown (F, k);
+          setCharacteristic (p, k, gf_name);
+        }
+        if (extOfExt)
+          F= mapDown (F, primElem, imPrimElem, oldA, dest, source);
+        return N (d*F);
+      }
+      else
+        delta--;
+    }
+    else if (delta == degG)
+    {
+      if (degG <= degF && fdivides (G, F))
+      {
+        if (passToGF)
+        {
+          CanonicalForm mipo= gf_mipo;
+          setCharacteristic (p);
+          Variable alpha= rootOf (mipo.mapinto());
+          G= GF2FalphaRep (G, alpha);
+        }
+        if (k > 1)
+        {
+          G= GFMapDown (G, k);
+          setCharacteristic (p, k, gf_name);
+        }
+        if (extOfExt)
+          G= mapDown (G, primElem, imPrimElem, oldA, dest, source);
+        return N (d*G);
+      }
+      else
+        delta--;
+    }
     if( delta == 0 )
     {
       if (passToGF)
@@ -4580,6 +4626,14 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         }
         else
           delta--;
+      }
+      if( delta == 0 )
+      {
+        if (passToGF)
+          setCharacteristic (p);
+        if (k > 1)
+          setCharacteristic (p, k, gf_name);
+        return N (d);
       }
     }
     if( delta != degF && delta != degG )
