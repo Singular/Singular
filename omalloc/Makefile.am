@@ -52,7 +52,7 @@ nodist_omTables_SOURCES = omConfig.h
 omTables_CPPFLAGS = ${AM_CPPFLAGS} -DOM_GENERATE_INC
 
 CLEANFILES = $(BUILT_SOURCES)
-
+DISTCLEANFILES = omConfig.h
 ####################################################
 ## Test program
 
@@ -73,3 +73,4 @@ omtTest_r_LDADD    = libomalloc.la
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = omalloc.pc
+

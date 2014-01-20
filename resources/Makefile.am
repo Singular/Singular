@@ -18,7 +18,7 @@ libresources_includedir  =$(includedir)/resources
 libresources_include_HEADERS = omFindExec.h feResource.h feFopen.h
 
 nodist_libresources_include_HEADERS = resourcesconfig.h
-
+DISTCLEANFILES = $(nodist_libresources_include_HEADERS)
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = resources.pc
