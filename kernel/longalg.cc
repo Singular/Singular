@@ -2393,6 +2393,20 @@ nMapFunc naSetMap(const ring src, const ring dst)
         return naCopy;    /* Q(a) -> Q(a) */
       return naMapQaQb;   /* Q(a..) -> Q(a..) */
     }
+    if (rField_is_Zp_a(src))   /* Z/p(a) -> Q(a) */
+    {
+      int i;
+      naParsToCopy=0;
+      for(i=0;i<rPar(src);i++)
+      {
+        if ((i>=rPar(dst))
+        ||(strcmp(src->parameter[i],dst->parameter[i])!=0))
+           return NULL;
+        naParsToCopy++;
+      }
+      nacMap = nlSetMap(src->algring, dst->algring);
+      return naMapQaQb;
+    }
   }
   /*-----------------------------------------------------*/
   if (rField_is_Zp_a(dst)) /* -> Z/p(a) */
@@ -2435,6 +2449,21 @@ nMapFunc naSetMap(const ring src, const ring dst)
       && (nacMap==nacCopy))
         return naCopy;    /* Z/p(a) -> Z/p(a) */
       return naMapQaQb;   /* Z/p(a),Z/p'(a) -> Z/p(b)*/
+    }
+    if (rField_is_Q_a(src))
+    {
+      int i;
+      naParsToCopy=0;
+      for(i=0;i<rPar(src);i++)
+      {
+        if ((i>=rPar(dst))
+        ||(strcmp(src->parameter[i],dst->parameter[i])!=0))
+           return NULL;
+        naParsToCopy++;
+      }
+      npPrimeM = dst->algring->ch;
+      nacMap = npSetMap(src->algring, dst->algring);
+      return naMapQaQb;
     }
   }
   return NULL;      /* default */
