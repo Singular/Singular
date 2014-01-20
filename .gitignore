@@ -30,9 +30,6 @@ MOD
 /Singular/svnver
 /dyn_modules/modgen/modgen
 /dyn_modules/modgen/pathnames.h
-/emacs/cmd-cmpl.el
-/emacs/lib-cmpl.el
-/emacs/lib-temp
 ar-lib
 config.h
 configure

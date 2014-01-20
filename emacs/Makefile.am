@@ -7,9 +7,11 @@ EMACS = \
     COPYING \
     NEWS \
     singular.el \
-    singular.xpm  .emacs-general  .emacs-singular
+    singular.xpm  .emacs-general  .emacs-singular \
+    cmd-cmpl.el ex-cmpl.el hlp-cmpl.el lib-cmpl.el
+#++ hlp-cmpl.el lib-cmpl.el ex-cmpl.el cmd-cmpl.el: for now from Master Singular
 
-#++ hlp-cmpl.el lib-cmpl.el ex-cmpl.el cmd-cmpl.el ??
+
 #-- BUGS     cmpl.pl     ESingular.emacs21     lib.pl     Makefile.in     singular.el.decl
 
 dist_emacs_DATA = $(EMACS)
