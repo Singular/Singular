@@ -1390,8 +1390,7 @@ matrix singclap_irrCharSeries ( ideal I, const ring r)
   On(SW_SYMMETRIC_FF);
   CFList L;
   ListCFList LL;
-  if (((rChar(r) == 0) || (rChar(r) > 1) )
-  && (rPar(r)==0))
+  if (rField_is_Q(r) || rField_is_Zp(r))
   {
     setCharacteristic( rChar(r) );
     for(i=0;i<IDELEMS(I);i++)
@@ -1406,11 +1405,9 @@ matrix singclap_irrCharSeries ( ideal I, const ring r)
     }
   }
   // and over Q(a) / Fp(a)
-  else if (( rChar(r)==1 ) // Q(a)
-  || (rChar(r) <-1))       // Fp(a)
+  else if (nCoeff_is_transExt (r->cf))
   {
-    if (rChar(r)==1) setCharacteristic( 0 );
-    else               setCharacteristic( -rChar(r) );
+    setCharacteristic( rChar(r) );
     for(i=0;i<IDELEMS(I);i++)
     {
       poly p=I->m[i];
@@ -1460,7 +1457,7 @@ matrix singclap_irrCharSeries ( ideal I, const ring r)
   {
     for (n=1, Li = LLi.getItem(); Li.hasItem(); Li++, n++)
     {
-      if ( (rChar(r) == 0) || (rChar(r) > 1) )
+      if (rField_is_Q(r) || rField_is_Zp(r))
         MATELEM(res,m,n)=convFactoryPSingP(Li.getItem(),r);
       else
         MATELEM(res,m,n)=convFactoryPSingTrP(Li.getItem(),r);
@@ -1476,24 +1473,34 @@ char* singclap_neworder ( ideal I, const ring r)
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
   CFList L;
-  if (((rChar(r) == 0) || (rChar(r) > 1) )
-  && (rPar(r)==0))
+  poly p;
+  if (rField_is_Q(r) || rField_is_Zp(r))
   {
     setCharacteristic( rChar(r) );
     for(i=0;i<IDELEMS(I);i++)
     {
-      L.append(convSingPFactoryP(I->m[i],r));
+      poly p=I->m[i];
+      if (p!=NULL)
+      {
+        p=p_Copy(p,r);
+        p_Cleardenom(p, r);
+        L.append(convSingPFactoryP(p,r));
+      }
     }
   }
   // and over Q(a) / Fp(a)
-  else if (( rChar(r)==1 ) // Q(a)
-  || (rChar(r) <-1))       // Fp(a)
+  else if (nCoeff_is_transExt (r->cf))
   {
-    if (rChar(r)==1) setCharacteristic( 0 );
-    else               setCharacteristic( -rChar(r) );
+    setCharacteristic( rChar(r) );
     for(i=0;i<IDELEMS(I);i++)
     {
-      L.append(convSingTrPFactoryP(I->m[i],r));
+      poly p=I->m[i];
+      if (p!=NULL)
+      {
+        p=p_Copy(p,r);
+        p_Cleardenom(p, r);
+        L.append(convSingTrPFactoryP(p,r));
+      }
     }
   }
   else
