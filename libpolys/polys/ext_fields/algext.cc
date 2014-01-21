@@ -50,6 +50,7 @@
 #include <factory/factory.h>
 #include <polys/clapconv.h>
 #include <polys/clapsing.h>
+#include <polys/prCopy.h>
 
 #include <polys/ext_fields/algext.h>
 #define TRANSEXT_PRIVATES 1
@@ -1006,6 +1007,48 @@ number naMapUP(number a, const coeffs src, const coeffs dst)
   return (number)result;
 }
 
+number naGenMap(number a, const coeffs cf, const coeffs dst)
+{
+  if (a==NULL) return NULL;
+
+  const ring rSrc = cf->extRing;
+  const ring rDst = dst->extRing;
+
+  const nMapFunc nMap=n_SetMap(rSrc->cf,rDst->cf);
+  poly f = (poly)a;
+  poly g = prMapR(f, nMap, rSrc, rDst);
+
+  assume(n_Test((number)g, dst));
+  return (number)g;
+}
+
+number naGenTrans2AlgExt(number a, const coeffs cf, const coeffs dst)
+{
+  if (a==NULL) return NULL;
+
+  const ring rSrc = cf->extRing;
+  const ring rDst = dst->extRing;
+
+  const nMapFunc nMap=n_SetMap(rSrc->cf,rDst->cf);
+  fraction f = (fraction)a;
+  poly g = prMapR(NUM(f), nMap, rSrc, rDst);
+
+  number result;
+  poly h = NULL;
+
+  if (!DENIS1(f))
+     h = prMapR(DEN(f), nMap, rSrc, rDst);
+
+  if (h!=NULL)
+    result=naDiv((number)g,(number)h,dst);
+
+  p_Delete(&g,dst->extRing);
+  if (h!=NULL)
+    p_Delete(&h,dst->extRing);
+  assume(n_Test((number)result, dst));
+  return (number)result;
+}
+
 nMapFunc naSetMap(const coeffs src, const coeffs dst)
 {
   /* dst is expected to be an algebraic field extension */
@@ -1017,8 +1060,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
   coeffs bDst = nCoeff_bottom(dst, h); /* the bottom field in the tower dst */
   coeffs bSrc = nCoeff_bottom(src, h); /* the bottom field in the tower src */
 
-  /* for the time being, we only provide maps if h = 1 and if b is Q or
-     some field Z/pZ: */
+  /* for the time being, we only provide maps if h = 1 or 0 */
   if (h==0)
   {
     if (nCoeff_is_Q(src) && nCoeff_is_Q(bDst))
@@ -1037,33 +1079,20 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
   if ((!nCoeff_is_Zp(bDst)) && (!nCoeff_is_Q(bDst))) return NULL;
   if ((!nCoeff_is_Zp(bSrc)) && (!nCoeff_is_Q(bSrc))) return NULL;
 
-  if (nCoeff_is_Q(bSrc) && nCoeff_is_Q(bDst))
+  nMapFunc nMap=n_SetMap(src->extRing->cf,dst->extRing->cf);
+  if (rSamePolyRep(src->extRing, dst->extRing) && (strcmp(rRingVar(0, src->extRing), rRingVar(0, dst->extRing)) == 0))
   {
-    if (rSamePolyRep(src->extRing, dst->extRing) && (strcmp(rRingVar(0, src->extRing), rRingVar(0, dst->extRing)) == 0))
-    {
-      if (src->type==n_algExt)
-         return ndCopyMap; // naCopyMap;         /// Q(a)   --> Q(a)
-      else
-         return naCopyTrans2AlgExt;
-    }
+    if (src->type==n_algExt)
+       return ndCopyMap; // naCopyMap;         /// K(a)   --> K(a)
     else
-      return NULL;                               /// Q(b)   --> Q(a)
+       return naCopyTrans2AlgExt;
   }
-
-  if (nCoeff_is_Zp(bSrc) && nCoeff_is_Zp(bDst))
+  else if ((nMap!=NULL) && (strcmp(rRingVar(0,src->extRing),rRingVar(0,dst->extRing))==0) && (rVar (src->extRing) == rVar (dst->extRing)))
   {
-    if (rSamePolyRep(src->extRing, dst->extRing) && (strcmp(rRingVar(0,src->extRing),rRingVar(0,dst->extRing))==0))
-    {
-      if (src->type==n_algExt)
-        return ndCopyMap; // naCopyMap;          /// Z/p(a) --> Z/p(a)
-      else
-         return naCopyTrans2AlgExt;
-    }
-    else if ((strcmp(rRingVar(0,src->extRing),rRingVar(0,dst->extRing))==0) && (rVar (src->extRing) == rVar (dst->extRing)))
-    {
-      if (src->type==n_transExt)
-        return naCopyTrans2AlgExt;
-    }
+    if (src->type==n_algExt)
+       return naGenMap; // naCopyMap;         /// K(a)   --> K'(a)
+    else
+       return naGenTrans2AlgExt;
   }
 
   return NULL;                                           /// default

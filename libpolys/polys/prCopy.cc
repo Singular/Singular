@@ -44,6 +44,36 @@ poly prCopyR(poly p, ring src_r, ring dest_r)
   return res;
 }
 
+poly prMapR(poly src, nMapFunc nMap, ring src_r, ring dest_r)
+{
+  if (src==NULL) return NULL;
+  int _min = si_min(dest_r->N, src_r->N);
+
+  spolyrec dest_s;
+
+  poly dest = &dest_s;
+
+  while (src != NULL)
+  {
+    poly prev=dest;
+    pNext(dest) = (poly) p_New(dest_r); pIter(dest);
+
+    pSetCoeff0(dest, nMap(pGetCoeff(src),src_r->cf,dest_r->cf));
+    prCopyEvector(dest, dest_r, src, src_r, _min);
+    if (n_IsZero(pGetCoeff(dest),dest_r->cf))
+    {
+      p_LmDelete(pNext(prev),dest_r);
+      dest=pNext(prev);
+    }
+    pIter(src);
+  }
+  pNext(dest) = NULL;
+  dest = pNext(&dest_s);
+  dest=p_SortAdd(dest, dest_r);
+  p_Test(dest, dest_r);
+  return dest;
+}
+
 poly prCopyR_NoSort(poly p, ring src_r, ring dest_r)
 {
   poly res;
@@ -204,14 +234,14 @@ idrMove(ideal &id, ring src_r, ring dest_r, prCopyProc_t prproc)
 {
   assume(src_r->cf==dest_r->cf);
   assume( prproc != NULL );
-   
+
   if (id == NULL) return NULL;
 
   ideal res = id; id = NULL;
 
   for (int i = IDELEMS(res) - 1; i >= 0; i--)
     res->m[i] = prproc(res->m[i], src_r, dest_r);
-   
+
   return res;
 }
 

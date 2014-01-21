@@ -843,7 +843,7 @@ number ntDiff(number a, number d, const coeffs cf)
   {
      NUM(result) = p_Diff(NUM(fa),k,ntRing);
      //DEN(result) = NULL; // done by ..Alloc0..
-     if (NUM(result)==NULL) 
+     if (NUM(result)==NULL)
      {
        omFreeBin((ADDRESS)result, fractionObjectBin);
        return(NULL);
@@ -1837,14 +1837,10 @@ number ntMapP0(number a, const coeffs src, const coeffs dst)
   return ntInit(p_NSet(q, dst->extRing), dst);
 }
 
-/* assumes that either src = Q(t_1, ..., t_s), dst = Q(t_1, ..., t_s), or
-                       src = Z/p(t_1, ..., t_s), dst = Z/p(t_1, ..., t_s) */
+ /* assumes that either src = K(t_1, ..., t_s), dst = K(t_1, ..., t_s) */
 number ntCopyMap(number a, const coeffs cf, const coeffs dst)
 {
-//  if (n_IsZero(a, cf)) return NULL;
-
   ntTest(a);
-
   if (IS0(a)) return NULL;
 
   const ring rSrc = cf->extRing;
@@ -1871,11 +1867,47 @@ number ntCopyMap(number a, const coeffs cf, const coeffs dst)
   return (number)result;
 }
 
+number ntGenMap(number a, const coeffs cf, const coeffs dst)
+{
+  ntTest(a);
+  if (IS0(a)) return NULL;
+
+  const ring rSrc = cf->extRing;
+  const ring rDst = dst->extRing;
+
+  const nMapFunc nMap=n_SetMap(rSrc->cf,rDst->cf);
+  fraction f = (fraction)a;
+  poly g = prMapR(NUM(f), nMap, rSrc, rDst);
+
+  poly h = NULL;
+
+  if (!DENIS1(f))
+     h = prMapR(DEN(f), nMap, rSrc, rDst);
+
+  fraction result = (fraction)omAllocBin(fractionObjectBin);
+
+  NUM(result) = g;
+  DEN(result) = h;
+  COM(result) = COM(f);
+  //check_N((number)result,dst);
+  assume(n_Test((number)result, dst));
+  return (number)result;
+}
+
 number ntCopyAlg(number a, const coeffs cf, const coeffs dst)
 {
   assume( n_Test(a, cf) );
   if (n_IsZero(a, cf)) return NULL;
   return ntInit(prCopyR((poly)a, cf->extRing, dst->extRing),dst);
+}
+
+number ntGenAlg(number a, const coeffs cf, const coeffs dst)
+{
+  assume( n_Test(a, cf) );
+  if (n_IsZero(a, cf)) return NULL;
+
+  const nMapFunc nMap=n_SetMap(cf->extRing->cf,dst->extRing->cf);
+  return ntInit(prMapR((poly)a, nMap, cf->extRing, dst->extRing),dst);
 }
 
 /* assumes that src = Q, dst = Z/p(t_1, ..., t_s) */
@@ -1967,43 +1999,33 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
     }
   }
   if (h != 1) return NULL;
-  if ((!nCoeff_is_Zp(bDst)) && (!nCoeff_is_Q(bDst))) return NULL;
+  //if ((!nCoeff_is_Zp(bDst)) && (!nCoeff_is_Q(bDst))) return NULL;
 
   /* Let T denote the sequence of transcendental extension variables, i.e.,
      K[t_1, ..., t_s] =: K[T];
      Let moreover, for any such sequence T, T' denote any subsequence of T
      of the form t_1, ..., t_w with w <= s. */
 
-  if ((!nCoeff_is_Zp(bSrc)) && (!nCoeff_is_Q(bSrc))) return NULL;
+  if (rVar(src->extRing) > rVar(dst->extRing))
+     return NULL;
 
-  if (nCoeff_is_Q(bSrc) && nCoeff_is_Q(bDst))
-  {
-    if (rVar(src->extRing) > rVar(dst->extRing))
+  for (int i = 0; i < rVar(src->extRing); i++)
+    if (strcmp(rRingVar(i, src->extRing), rRingVar(i, dst->extRing)) != 0)
        return NULL;
 
-    for (int i = 0; i < rVar(src->extRing); i++)
-      if (strcmp(rRingVar(i, src->extRing), rRingVar(i, dst->extRing)) != 0)
-         return NULL;
-
-    if (src->type==n_transExt)
-       return ntCopyMap;          /// Q(T')   --> Q(T)
-    else
-       return ntCopyAlg;
+  if (src->type==n_transExt)
+  {
+     if (src->extRing->cf==dst->extRing->cf)
+       return ntCopyMap;          /// K(T')   --> K(T)
+     else
+       return ntGenMap;          /// K(T')   --> K'(T)
   }
-
-  if (nCoeff_is_Zp(bSrc) && nCoeff_is_Zp(bDst))
+  else
   {
-    if (rVar(src->extRing) > rVar(dst->extRing))
-       return NULL;
-
-    for (int i = 0; i < rVar(src->extRing); i++)
-      if (strcmp(rRingVar(i, src->extRing), rRingVar(i, dst->extRing)) != 0)
-         return NULL;
-
-    if (src->type==n_transExt)
-       return ntCopyMap;         /// Z/p(T') --> Z/p(T)
-    else
-       return ntCopyAlg;
+     if (src->extRing->cf==dst->extRing->cf)
+       return ntCopyAlg;          /// K(T')   --> K(T)
+     else
+       return ntGenAlg;          /// K(T')   --> K'(T)
   }
 
   return NULL;                                 /// default

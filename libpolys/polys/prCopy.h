@@ -41,4 +41,6 @@ ideal idrShallowCopyR(ideal id, ring r, ring dest_r );
 
 /// Copy leading terms of id[i] via prHeeadR into dest_r
 ideal idrHeadR(ideal id, ring r, ring dest_r );
+
+poly prMapR(poly src, nMapFunc nMap, ring src_r, ring dest_r);
 #endif
