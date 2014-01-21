@@ -829,6 +829,8 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           d->fd_read=pc[0];
           d->fd_write=cp[1];
           l->data=d;
+          d->r=currRing;
+          if (d->r!=NULL) d->r->ref++;
           omFree(l->mode);
           l->mode = omStrDup(mode);
           singular_in_batchmode=TRUE;
@@ -865,6 +867,8 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           d->fd_write=pc[1];
           SI_LINK_SET_RW_OPEN_P(l);
           d->send_quit_at_exit=1;
+          d->r=currRing;
+          if (d->r!=NULL) d->r->ref++;
         }
         else
         {
