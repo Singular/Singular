@@ -31,6 +31,10 @@
 #include "facHensel.h"
 #include "facMul.h"
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
+
 TIMING_DEFINE_PRINT(fac_log_deriv_div)
 TIMING_DEFINE_PRINT(fac_log_deriv_mul)
 TIMING_DEFINE_PRINT(fac_log_deriv_pre)
@@ -697,6 +701,70 @@ getCoeffs (const CanonicalForm& G, const int k, const int l, const int degMipo,
 }
 #endif
 
+#ifdef HAVE_FLINT
+CFArray
+getCoeffs (const CanonicalForm& G, const int k, const int l, const int degMipo,
+           const Variable& alpha, const CanonicalForm& evaluation,
+           const nmod_mat_t M)
+{
+  ASSERT (G.isUnivariate() || G.inCoeffDomain(), "univariate input expected");
+  CanonicalForm F= G (G.mvar() - evaluation, G.mvar());
+  if (F.isZero())
+    return CFArray ();
+
+  Variable y= Variable (2);
+  F= F (power (y, degMipo), y);
+  F= F (y, alpha);
+
+  nmod_poly_t FLINTF;
+  nmod_mat_t MFLINTF, mulResult;
+  nmod_mat_init (MFLINTF, l*degMipo, 1, getCharacteristic());
+  nmod_mat_init (mulResult, l*degMipo, 1, getCharacteristic());
+
+  convertFacCF2nmod_poly_t (FLINTF, F);
+
+#ifndef slong
+#define slong long
+#endif
+  slong i;
+
+  for (i= 0; i < FLINTF->length; i++)
+    nmod_mat_entry (MFLINTF, i, 0)= FLINTF->coeffs[i];
+
+  for (; i < MFLINTF->r; i++)
+    nmod_mat_entry (MFLINTF, i, 0)= 0;
+
+  nmod_mat_mul (mulResult, M, MFLINTF);
+
+  F= 0;
+  for (i= 0; i < mulResult->r; i++)
+    F += CanonicalForm ((long) nmod_mat_entry (mulResult, i, 0))*power (y, i);
+
+  nmod_mat_clear (MFLINTF);
+  nmod_mat_clear (mulResult);
+
+  if (degree (F, 2) < k)
+    return CFArray();
+
+  CFArray result= CFArray (degree (F) - k + 1);
+
+  CFIterator j= F;
+  for (int i= degree (F); i >= k; i--)
+  {
+    if (j.exp() == i)
+    {
+      result [i - k]= j.coeff();
+      j++;
+      if (!j.hasTerms())
+        return result;
+    }
+    else
+      result[i - k]= 0;
+  }
+  return result;
+}
+#endif
+
 int * computeBounds (const CanonicalForm& F, int& n, bool& isIrreducible)
 {
   n= degree (F, 1);
@@ -787,6 +855,7 @@ int * computeBounds (const CanonicalForm& F, int& n, bool& isIrreducible)
     negativeSlope= true;
   }
   int k= 0;
+  int* point= new int [2];
   for (int i= 0; i < n; i++)
   {
     if (((indZero+1) < sizeOfNewtonPolygon && (i+1) > newtonPolyg[indZero+1][1])
@@ -833,14 +902,14 @@ int * computeBounds (const CanonicalForm& F, int& n, bool& isIrreducible)
       result [i]= 0;
       continue;
     }
-    int* point= new int [2];
     point [0]= k;
     point [1]= i + 1;
     if (!isInPolygon (newtonPolyg, sizeOfNewtonPolygon, point) && k > 0)
       k= 0;
     result [i]= k;
-    delete [] point;
   }
+
+  delete [] point;
 
   for (int i= 0; i < sizeOfNewtonPolygon; i++)
     delete [] newtonPolyg[i];
@@ -893,6 +962,16 @@ computeBoundsWrtDiffMainvar (const CanonicalForm& F, int& n,
     }
   }
 
+  int swap;
+  for (int i= 0; i < sizeOfNewtonPolygon; i++)
+  {
+    swap= newtonPolyg[i][1];
+    newtonPolyg[i][1]=newtonPolyg[i][0];
+    newtonPolyg[i][0]= swap;
+  }
+
+  sizeOfNewtonPolygon= polygon(newtonPolyg, sizeOfNewtonPolygon);
+
   int minX, minY, maxX, maxY;
   minX= newtonPolyg [0] [0];
   minY= newtonPolyg [0] [1];
@@ -901,11 +980,11 @@ computeBoundsWrtDiffMainvar (const CanonicalForm& F, int& n,
   int indZero= 0;
   for (int i= 1; i < sizeOfNewtonPolygon; i++)
   {
-    if (newtonPolyg[i][0] == 0)
+    if (newtonPolyg[i][1] == 0)
     {
-      if (newtonPolyg[indZero][0] == 0)
+      if (newtonPolyg[indZero][1] == 0)
       {
-        if (newtonPolyg[indZero][1] < newtonPolyg[i][1])
+        if (newtonPolyg[indZero][0] < newtonPolyg[i][0])
           indZero= i;
       }
       else
@@ -925,15 +1004,15 @@ computeBoundsWrtDiffMainvar (const CanonicalForm& F, int& n,
   bool negativeSlope=false;
   if (indZero != sizeOfNewtonPolygon - 1)
   {
-    slopeNum= newtonPolyg[indZero+1][1]-newtonPolyg[indZero][1];
-    slopeDen= newtonPolyg[indZero+1][0];
-    constTerm= newtonPolyg[indZero][1];
+    slopeNum= newtonPolyg[indZero+1][0]-newtonPolyg[indZero][0];
+    slopeDen= newtonPolyg[indZero+1][1];
+    constTerm= newtonPolyg[indZero][0];
   }
   else
   {
-    slopeNum= newtonPolyg[0][1]-newtonPolyg[indZero][1];
-    slopeDen= newtonPolyg[0][0];
-    constTerm= newtonPolyg[indZero][1];
+    slopeNum= newtonPolyg[0][0]-newtonPolyg[indZero][0];
+    slopeDen= newtonPolyg[0][1];
+    constTerm= newtonPolyg[indZero][0];
   }
   if (slopeNum < 0)
   {
@@ -941,10 +1020,12 @@ computeBoundsWrtDiffMainvar (const CanonicalForm& F, int& n,
     negativeSlope= true;
   }
   int k= 0;
+
+  int* point= new int [2];
   for (int i= 0; i < n; i++)
   {
-    if (((indZero+1) < sizeOfNewtonPolygon && (i+1) > newtonPolyg[indZero+1][0])
-        || ((indZero+1) >= sizeOfNewtonPolygon && (i+1) > newtonPolyg[0][0]))
+    if (((indZero+1) < sizeOfNewtonPolygon && (i+1) > newtonPolyg[indZero+1][1])
+        || ((indZero+1) >= sizeOfNewtonPolygon && (i+1) > newtonPolyg[0][1]))
     {
       if (indZero + 1 != sizeOfNewtonPolygon)
         indZero++;
@@ -952,49 +1033,50 @@ computeBoundsWrtDiffMainvar (const CanonicalForm& F, int& n,
         indZero= 0;
       if (indZero != sizeOfNewtonPolygon - 1)
       {
-        slopeNum= newtonPolyg[indZero+1][1]-newtonPolyg[indZero][1];
-        slopeDen= newtonPolyg[indZero+1][0]-newtonPolyg[indZero][0];
-        constTerm= newtonPolyg[indZero][1];
+        slopeNum= newtonPolyg[indZero+1][0]-newtonPolyg[indZero][0];
+        slopeDen= newtonPolyg[indZero+1][1]-newtonPolyg[indZero][1];
+        constTerm= newtonPolyg[indZero][0];
       }
       else
       {
-        slopeNum= newtonPolyg[0][1]-newtonPolyg[indZero][1];
-        slopeDen= newtonPolyg[0][0]-newtonPolyg[indZero][0];
-        constTerm= newtonPolyg[indZero][1];
+        slopeNum= newtonPolyg[0][0]-newtonPolyg[indZero][0];
+        slopeDen= newtonPolyg[0][1]-newtonPolyg[indZero][1];
+        constTerm= newtonPolyg[indZero][0];
       }
       if (slopeNum < 0)
       {
         negativeSlope= true;
         slopeNum= - slopeNum;
-        k= (int) -(((long) slopeNum*((i+1)-newtonPolyg[indZero][0])+slopeDen-1)/
+        k= (int) -(((long) slopeNum*((i+1)-newtonPolyg[indZero][1])+slopeDen-1)/
                    slopeDen) + constTerm;
       }
       else
-        k= (int) (((long) slopeNum*((i+1)-newtonPolyg[indZero][0])) / slopeDen)
+        k= (int) (((long) slopeNum*((i+1)-newtonPolyg[indZero][1])) / slopeDen)
                   + constTerm;
     }
     else
     {
       if (negativeSlope)
-        k= (int) -(((long) slopeNum*((i+1)-newtonPolyg[indZero][0])+slopeDen-1)/
+        k= (int) -(((long) slopeNum*((i+1)-newtonPolyg[indZero][1])+slopeDen-1)/
                    slopeDen) + constTerm;
       else
-        k= (int) ((long) slopeNum*((i+1)-newtonPolyg[indZero][0])) / slopeDen
+        k= (int) ((long) slopeNum*((i+1)-newtonPolyg[indZero][1])) / slopeDen
                   + constTerm;
     }
-    if (i + 1 > maxX || i + 1 < minX)
+    if (i + 1 > maxY || i + 1 < minY)
     {
       result [i]= 0;
       continue;
     }
-    int* point= new int [2];
-    point [0]= i + 1;
-    point [1]= k;
+
+    point [0]= k;
+    point [1]= i + 1;
     if (!isInPolygon (newtonPolyg, sizeOfNewtonPolygon, point) && k > 0)
       k= 0;
     result [i]= k;
-    delete [] point;
   }
+
+  delete [] point;
 
   for (int i= 0; i < sizeOfNewtonPolygon; i++)
     delete [] newtonPolyg[i];

@@ -238,6 +238,7 @@ void tryInvert( const CanonicalForm & F, const CanonicalForm & M, CanonicalForm 
     inv = replacevar( inv, x, a ); // change back to alg var
 }
 
+#ifndef HAVE_NTL
 void tryDivrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
                 CanonicalForm& R, CanonicalForm& inv, const CanonicalForm& mipo,
                 bool& fail)
@@ -344,6 +345,7 @@ void tryEuclid( const CanonicalForm & A, const CanonicalForm & B, const Canonica
       P = rem;
   }
 }
+#endif
 
 bool hasFirstAlgVar( const CanonicalForm & f, Variable & a )
 {
@@ -971,6 +973,7 @@ CanonicalForm firstLC(const CanonicalForm & f)
   return ret;
 }
 
+#ifndef HAVE_NTL
 void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail )
 { // F, G are univariate polynomials (i.e. they have exactly one polynomial variable)
   // F and G must have the same level AND level > 0
@@ -1040,7 +1043,7 @@ void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, const Canonica
       P = rem;
   }
 }
-
+#endif
 
 static CanonicalForm trycontent ( const CanonicalForm & f, const Variable & x, const CanonicalForm & M, bool & fail )
 { // as 'content', but takes care of zero divisors
@@ -1088,179 +1091,5 @@ static CanonicalForm trycf_content ( const CanonicalForm & f, const CanonicalFor
     return result;
   }
   return abs( f );
-}
-
-void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail )
-{
-  // F, G are univariate polynomials (i.e. they have exactly one polynomial variable)
-  // F and G must have the same level AND level > 0
-  // we try to calculate gcd(f,g) = s*F + t*G
-  // if a zero divisor is encontered, 'fail' is set to one
-  Variable a, b;
-  if( !hasFirstAlgVar(F,a) && !hasFirstAlgVar(G,b) ) // note lazy evaluation
-  {
-    result = extgcd( F, G, s, t ); // no zero divisors possible
-    return;
-  }
-  if( b.level() > a.level() )
-    a = b;
-  // here: a is the biggest alg. var in F and G
-  CanonicalForm M = getMipo(a);
-  CanonicalForm P;
-  if( degree(F) > degree(G) )
-  {
-    P=F; result=G; s=0; t=1;
-  }
-  else
-  {
-    P=G; result=F; s=1; t=0;
-  }
-  CanonicalForm inv, rem, q, u, v;
-  // here: degree(P) >= degree(result)
-  while(true)
-  {
-    tryInvert( Lc(result), M, inv, fail );
-    if(fail)
-      return;
-    // here: Lc(result) is invertible modulo M
-    q = Lc(P)*inv * power( P.mvar(), degree(P)-degree(result) );
-    rem = P - q*result;
-    // here: s*F + t*G = result
-    if( rem.isZero() )
-    {
-      s*=inv;
-      t*=inv;
-      result *= inv; // monify result
-      return;
-    }
-    P=result;
-    result=rem;
-    rem=u-q*s;
-    u=s;
-    s=rem;
-    rem=v-q*t;
-    v=t;
-    t=rem;
-  }
-}
-
-void tryCRA( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew, bool & fail )
-{ // polys of level <= 1 are considered coefficients. q1,q2 are assumed to be coprime
-  // xnew = x1 mod q1 (coefficientwise in the above sense)
-  // xnew = x2 mod q2
-  // qnew = q1*q2
-  CanonicalForm tmp;
-  if(x1.level() <= 1 && x2.level() <= 1) // base case
-  {
-    tryExtgcd(q1,q2,tmp,xnew,qnew,fail);
-    if(fail)
-      return;
-    xnew = x1 + (x2-x1) * xnew * q1;
-    qnew = q1*q2;
-    xnew = mod(xnew,qnew);
-    return;
-  }
-  CanonicalForm tmp2;
-  xnew = 0;
-  qnew = q1 * q2;
-  // here: x1.level() > 1 || x2.level() > 1
-  if(x1.level() > x2.level())
-  {
-    for(CFIterator i=x1; i.hasTerms(); i++)
-    {
-      if(i.exp() == 0) // const. term
-      {
-        tryCRA(i.coeff(),q1,x2,q2,tmp,tmp2,fail);
-        if(fail)
-          return;
-        xnew += tmp;
-      }
-      else
-      {
-        tryCRA(i.coeff(),q1,0,q2,tmp,tmp2,fail);
-        if(fail)
-          return;
-        xnew += tmp * power(x1.mvar(),i.exp());
-      }
-    }
-    return;
-  }
-  // here: x1.level() <= x2.level() && ( x1.level() > 1 || x2.level() > 1 )
-  if(x2.level() > x1.level())
-  {
-    for(CFIterator j=x2; j.hasTerms(); j++)
-    {
-      if(j.exp() == 0) // const. term
-      {
-        tryCRA(x1,q1,j.coeff(),q2,tmp,tmp2,fail);
-        if(fail)
-          return;
-        xnew += tmp;
-      }
-      else
-      {
-        tryCRA(0,q1,j.coeff(),q2,tmp,tmp2,fail);
-        if(fail)
-          return;
-        xnew += tmp * power(x2.mvar(),j.exp());
-      }
-    }
-    return;
-  }
-  // here: x1.level() == x2.level() && x1.level() > 1 && x2.level() > 1
-  CFIterator i = x1;
-  CFIterator j = x2;
-  while(i.hasTerms() || j.hasTerms())
-  {
-    if(i.hasTerms())
-    {
-      if(j.hasTerms())
-      {
-        if(i.exp() == j.exp())
-        {
-          tryCRA(i.coeff(),q1,j.coeff(),q2,tmp,tmp2,fail);
-          if(fail)
-            return;
-          xnew += tmp * power(x1.mvar(),i.exp());
-          i++; j++;
-        }
-        else
-        {
-          if(i.exp() < j.exp())
-          {
-            tryCRA(i.coeff(),q1,0,q2,tmp,tmp2,fail);
-            if(fail)
-              return;
-            xnew += tmp * power(x1.mvar(),i.exp());
-            i++;
-          }
-          else // i.exp() > j.exp()
-          {
-            tryCRA(0,q1,j.coeff(),q2,tmp,tmp2,fail);
-            if(fail)
-              return;
-            xnew += tmp * power(x1.mvar(),j.exp());
-            j++;
-          }
-        }
-      }
-      else // j is out of terms
-      {
-        tryCRA(i.coeff(),q1,0,q2,tmp,tmp2,fail);
-        if(fail)
-          return;
-        xnew += tmp * power(x1.mvar(),i.exp());
-        i++;
-      }
-    }
-    else // i is out of terms
-    {
-      tryCRA(0,q1,j.coeff(),q2,tmp,tmp2,fail);
-      if(fail)
-        return;
-      xnew += tmp * power(x1.mvar(),j.exp());
-      j++;
-    }
-  }
 }
 

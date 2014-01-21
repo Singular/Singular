@@ -631,14 +631,6 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
   return F;
 }
 
-#ifdef HAVE_NTL
-CanonicalForm fntl ( const CanonicalForm & f, int j )
-{
-  ZZX f1=convertFacCF2NTLZZX(f);
-  return convertZZ2CF(coeff(f1,j));
-}
-#endif
-
 CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 {
   if ( f.inCoeffDomain() )
@@ -656,6 +648,29 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
       //USE NTL
       if (ch>2)
       {
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+        nmod_poly_t FLINTmipo, leadingCoeff;
+        fq_nmod_ctx_t fq_con;
+
+        nmod_poly_init (FLINTmipo, getCharacteristic());
+        nmod_poly_init (leadingCoeff, getCharacteristic());
+        convertFacCF2nmod_poly_t (FLINTmipo, getMipo (alpha));
+
+        fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+        fq_nmod_poly_t FLINTF;
+        convertFacCF2Fq_nmod_poly_t (FLINTF, f, fq_con);
+        fq_nmod_poly_factor_t res;
+        fq_nmod_poly_factor_init (res, fq_con);
+        fq_nmod_poly_factor (res, leadingCoeff, FLINTF, fq_con);
+        F= convertFLINTFq_nmod_poly_factor2FacCFFList (res, f.mvar(), alpha, fq_con);
+        F.insert (CFFactor (Lc (f), 1));
+
+        fq_nmod_poly_factor_clear (res, fq_con);
+        fq_nmod_poly_clear (FLINTF, fq_con);
+        nmod_poly_clear (FLINTmipo);
+        nmod_poly_clear (leadingCoeff);
+        fq_nmod_ctx_clear (fq_con);
+#else
         // First all cases with characteristic !=2
         // set remainder
         if (fac_NTL_char != getCharacteristic())
@@ -681,6 +696,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 
         // return converted result
         F=convertNTLvec_pair_zzpEX_long2FacCFFList(factors,leadcoeff,f.mvar(),alpha);
+#endif
       }
       else if (/*getCharacteristic()*/ch==2)
       {

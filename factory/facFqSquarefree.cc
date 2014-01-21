@@ -29,6 +29,10 @@
 #include "NTLconvert.h"
 #endif
 
+#ifdef HAVE_FLINT
+#include "FLINTconvert.h"
+#endif
+
 static inline
 CanonicalForm
 pthRoot (const CanonicalForm & F, const int & q)
@@ -64,6 +68,50 @@ pthRoot (const CanonicalForm & F, const ZZ& q, const Variable& alpha)
     zz_pE NTLA2= to_zz_pE (NTLA);
     power (NTLA2, NTLA2, q/p);
     A= convertNTLzzpE2CF (NTLA2, alpha);
+    return A;
+  }
+  else
+  {
+    CanonicalForm buf= 0;
+    for (CFIterator i= A; i.hasTerms(); i++)
+      buf= buf + power(A.mvar(), i.exp()/p)*pthRoot (i.coeff(), q, alpha);
+    return buf;
+  }
+}
+#endif
+
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+CanonicalForm
+pthRoot (const CanonicalForm & F, const fmpz_t& q, const Variable& alpha)
+{
+  CanonicalForm A= F;
+  int p= getCharacteristic ();
+  if (A.inCoeffDomain())
+  {
+    nmod_poly_t FLINTmipo;
+    fq_nmod_ctx_t fq_con;
+    fmpz_t qp;
+    fq_nmod_t FLINTA;
+
+    nmod_poly_init (FLINTmipo, p);
+    convertFacCF2nmod_poly_t (FLINTmipo, getMipo (alpha));
+
+    fq_nmod_ctx_init_modulus (fq_con, FLINTmipo, "Z");
+
+    fq_nmod_init2 (FLINTA, fq_con);
+
+    convertFacCF2Fq_nmod_t (FLINTA, A, fq_con);
+
+    fmpz_init_set (qp, q);
+    fmpz_divexact_si (qp, qp, p);
+
+    fq_nmod_pow (FLINTA, FLINTA, qp, fq_con);
+    A= convertFq_nmod_t2FacCF (FLINTA, alpha);
+
+    fmpz_clear (qp);
+    nmod_poly_clear (FLINTmipo);
+    fq_nmod_clear (FLINTA, fq_con);
+    fq_nmod_ctx_clear (fq_con);
     return A;
   }
   else
@@ -194,7 +242,16 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
   if (alpha.level() == 1)
 #endif
     buffer= pthRoot (A, ipower (p, k));
-#ifdef HAVE_NTL
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+  else
+  {
+    fmpz_t qq;
+    fmpz_init_set_ui (qq, p);
+    fmpz_pow_ui (qq, qq, k);
+    buffer= pthRoot (A, qq, alpha);
+    fmpz_clear (qq);
+  }
+#else
   else
   {
     ZZ q;
