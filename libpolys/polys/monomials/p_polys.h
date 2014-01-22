@@ -234,7 +234,7 @@ static inline  unsigned long p_SetComp(poly p, unsigned long c, ring r)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(rRing_has_Comp(r));
-  __p_GetComp(p,r) = c;
+  if (r->pCompIndex>=0) __p_GetComp(p,r) = c;
   return c;
 }
 // sets component of poly a to i

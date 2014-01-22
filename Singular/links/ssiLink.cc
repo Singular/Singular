@@ -32,6 +32,8 @@
 #include <libpolys/polys/matpol.h>
 #include <libpolys/polys/simpleideals.h>
 #include <libpolys/polys/monomials/p_polys.h>
+#define TRANSEXT_PRIVATES 1 // allow access to transext internals
+#include <libpolys/polys/ext_fields/transext.h>
 #include <libpolys/coeffs/longrat.h>
 #include <libpolys/misc/intvec.h>
 #include <libpolys/coeffs/bigintmat.h>
@@ -136,6 +138,79 @@ void ssiWriteBigInt(const ssiInfo *d, const number n)
   else WerrorS("illiegal bigint");
 }
 
+void ssiWritePoly_R(const ssiInfo *d, int typ, poly p, const ring r);
+void ssiWriteNumber_CF(const ssiInfo *d, const number n, const coeffs cf)
+{
+  // syntax is as follows:
+  // case 1 Z/p:   3 <int>
+  // case 2 Q:     3 4 <int>
+  //        or     3 0 <mpz_t nominator> <mpz_t denominator>
+  //        or     3 1  dto.
+  //        or     3 3 <mpz_t nominator>
+  //        or     3 5 <mpz_t raw nom.> <mpz_t raw denom.>
+  //        or     3 6 <mpz_t raw nom.> <mpz_t raw denom.>
+  //        or     3 7 <mpz_t raw nom.>
+  if(getCoeffType(cf)==n_Zp)
+  {
+    fprintf(d->f_write,"%d ",(int)(long)n);
+    //if (d->f_debug!=NULL) fprintf(d->f_debug,"number: \"%ld\" ",(int)(long)n);
+  }
+  else if (getCoeffType(cf)==n_Q)
+  {
+    if(SR_HDL(n) & SR_INT)
+    {
+      #if SIZEOF_LONG == 4
+      fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
+      #else
+      long nn=SR_TO_INT(n);
+      if ((nn<POW_2_28)||(nn>= -POW_2_28))
+        fprintf(d->f_write,"4 %ld ",nn);
+      else
+      {
+        mpz_t tmp;
+        mpz_init_set_si(tmp,nn);
+        fputs("8 ",d->f_write);
+        mpz_out_str (d->f_write,SSI_BASE, tmp);
+        fputc(' ',d->f_write);
+        mpz_clear(tmp);
+      }
+      #endif
+      //if (d->f_debug!=NULL) fprintf(d->f_debug,"number: short \"%ld\" ",SR_TO_INT(n));
+    }
+    else if (n->s<2)
+    {
+      //gmp_fprintf(d->f_write,"%d %Zd %Zd ",n->s,n->z,n->n);
+      fprintf(d->f_write,"%d ",n->s+5);
+      mpz_out_str (d->f_write,SSI_BASE, n->z);
+      fputc(' ',d->f_write);
+      mpz_out_str (d->f_write,SSI_BASE, n->n);
+      fputc(' ',d->f_write);
+
+      //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: s=%d gmp/gmp \"%Zd %Zd\" ",n->s,n->z,n->n);
+    }
+    else /*n->s==3*/
+    {
+      //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
+      fputs("8 ",d->f_write);
+      mpz_out_str (d->f_write,SSI_BASE, n->z);
+      fputc(' ',d->f_write);
+
+      //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: gmp \"%Zd\" ",n->z);
+    }
+  }
+  else if (getCoeffType(cf)==n_transExt)
+  {
+    fraction f=(fraction)n;
+    ssiWritePoly_R(d,POLY_CMD,NUM(f),cf->extRing);
+    ssiWritePoly_R(d,POLY_CMD,DEN(f),cf->extRing);
+  }
+  else if (getCoeffType(cf)==n_algExt)
+  {
+    ssiWritePoly_R(d,POLY_CMD,(poly)n,cf->extRing);
+  }
+  else WerrorS("coeff field not implemented");
+}
+
 void ssiWriteNumber(const ssiInfo *d, const number n)
 {
   // syntax is as follows:
@@ -201,12 +276,24 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
 void ssiWriteRing(ssiInfo *d,const ring r)
 {
   /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... */
-  if (d->r!=NULL) rKill(d->r);
-  d->r=r;
+  /* ch=-1: transext, coeff ring follows */
+  /* ch=-2: algext, coeff ring and minpoly follows */
+  if (r==currRing) // see recursive calls for transExt/algExt
+  {
+    if (d->r!=NULL) rKill(d->r);
+    d->r=r;
+  }
   if (r!=NULL)
   {
     /*d->*/r->ref++;
-    fprintf(d->f_write,"%d %d ",n_GetChar(r->cf),r->N);
+    if (rField_is_Q(r) || rField_is_Zp(r))
+      fprintf(d->f_write,"%d %d ",n_GetChar(r->cf),r->N);
+    else if (rFieldType(r)==n_transExt)
+      fprintf(d->f_write,"-1 %d ",r->N);
+    else if (rFieldType(r)==n_algExt)
+      fprintf(d->f_write,"-2 %d ",r->N);
+    else /*dummy*/
+      fprintf(d->f_write,"0 %d ",r->N);
 
     int i;
     for(i=0;i<r->N;i++)
@@ -249,6 +336,15 @@ void ssiWriteRing(ssiInfo *d,const ring r)
       }
       i++;
     }
+    if ((rFieldType(r)==n_transExt)
+    || (rFieldType(r)==n_algExt))
+    {
+      ssiWriteRing(d,r->cf->extRing);
+      if  (rFieldType(r)==n_algExt)
+      {
+        ssiWritePoly_R(d,POLY_CMD,r->cf->extRing->qideal->m[0],r->cf->extRing);
+      }
+    }
   }
   else /* dummy ring r==NULL*/
   {
@@ -256,23 +352,28 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   }
 }
 
-void ssiWritePoly(ssiInfo *d, int typ, poly p)
+void ssiWritePoly_R(const ssiInfo *d, int typ, poly p, const ring r)
 {
   fprintf(d->f_write,"%d ",pLength(p));//number of terms
   int i;
 
   while(p!=NULL)
   {
-    ssiWriteNumber(d,pGetCoeff(p));
+    ssiWriteNumber_CF(d,pGetCoeff(p),r->cf);
     //nWrite(fich,pGetCoeff(p));
-    fprintf(d->f_write,"%ld ",p_GetComp(p,d->r));//component
+    fprintf(d->f_write,"%ld ",p_GetComp(p,r));//component
 
-    for(int j=1;j<=rVar(d->r);j++)
+    for(int j=1;j<=rVar(r);j++)
     {
-      fprintf(d->f_write,"%ld ",p_GetExp(p,j,d->r ));//x^j
+      fprintf(d->f_write,"%ld ",p_GetExp(p,j,r ));//x^j
     }
     pIter(p);
   }
+}
+
+void ssiWritePoly(const ssiInfo *d, int typ, poly p)
+{
+  ssiWritePoly_R(d,typ,p,d->r);
 }
 
 void ssiWriteIdeal(ssiInfo *d, int typ,ideal I)
@@ -465,6 +566,39 @@ static number ssiReadQNumber(ssiInfo *d)
   }
   return NULL;
 }
+
+poly ssiReadPoly_R(ssiInfo *D, const ring r);
+number ssiReadNumber_CF(ssiInfo *d, const coeffs cf)
+{
+  if (getCoeffType(cf) == n_Q)
+  {
+     return ssiReadQNumber(d);
+  }
+  else if (getCoeffType(cf) == n_Zp)
+  {
+    // read int
+    int dd;
+    dd=s_readint(d->f_read);
+    return (number)(long)dd;
+  }
+  else if (getCoeffType(cf) == n_transExt)
+  {
+    // poly poly
+    fraction f=(fraction)n_Init(1,cf);
+    p_Delete(&NUM(f),cf->extRing);
+    NUM(f)=ssiReadPoly_R(d,cf->extRing);
+    DEN(f)=ssiReadPoly_R(d,cf->extRing);
+    return (number)f;
+  }
+  else if (getCoeffType(cf) == n_algExt)
+  {
+    // poly
+    return (number)ssiReadPoly_R(d,cf->extRing);
+  }
+  else Werror("coeffs not implemented in ssiReadNumber");
+  return NULL;
+}
+
 number ssiReadNumber(ssiInfo *d)
 {
   if (rField_is_Q(d->r))
@@ -543,12 +677,32 @@ ring ssiReadRing(ssiInfo *d)
     omFree(wvhdl);
     return NULL;
   }
-  else return rDefault(ch,N,names,num_ord,ord,block0,block1,wvhdl);
-
-  return rDefault(ch,N,names,num_ord,ord,block0,block1,wvhdl);
+  else if (ch>=0) /* Q, Z/p */
+    return rDefault(ch,N,names,num_ord,ord,block0,block1,wvhdl);
+  else if (ch==-1) /* trans ext. */
+  {
+    TransExtInfo T;
+    T.r=ssiReadRing(d);
+    coeffs cf=nInitChar(n_transExt,&T);
+    return rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
+  }
+  else if (ch==-2) /* alg ext. */
+  {
+    TransExtInfo T;
+    T.r=ssiReadRing(d);
+    T.r->qideal=idInit(1,1);
+    T.r->qideal->m[0]=ssiReadPoly_R(d,T.r);
+    coeffs cf=nInitChar(n_algExt,&T);
+    return rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
+  }
+  else
+  {
+    Werror("ssi: read unknown coeffs type (%d)",ch);
+    return NULL;
+  }
 }
 
-poly ssiReadPoly(ssiInfo *D)
+poly ssiReadPoly_R(ssiInfo *D, const ring r)
 {
 // < # of terms> < term1> < .....
   int n,i,l;
@@ -562,23 +716,29 @@ poly ssiReadPoly(ssiInfo *D)
   for(l=0;l<n;l++) // read n terms
   {
 // coef,comp.exp1,..exp N
-    p=p_Init(D->r);
-    pGetCoeff(p)=ssiReadNumber(D);
+    p=p_Init(r);
+    pSetCoeff0(p,ssiReadNumber_CF(D,r->cf));
     int d;
     d=s_readint(D->f_read);
-    p_SetComp(p,d,D->r);
-    for(i=1;i<=rVar(D->r);i++)
+    p_SetComp(p,d,r);
+    for(i=1;i<=rVar(r);i++)
     {
       d=s_readint(D->f_read);
-      p_SetExp(p,i,d,D->r);
+      p_SetExp(p,i,d,r);
     }
-    p_Setm(p,D->r);
-    p_Test(p,D->r);
+    p_Setm(p,r);
+    p_Test(p,r);
     if (ret==NULL) ret=p;
     else           pNext(prev)=p;
     prev=p;
  }
  return ret;
+}
+
+poly ssiReadPoly(ssiInfo *D)
+{
+// < # of terms> < term1> < .....
+  return ssiReadPoly_R(D,D->r);
 }
 
 ideal ssiReadIdeal(ssiInfo *d)
@@ -825,8 +985,8 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           d->f_read=s_open(pc[0]);
           d->fd_read=pc[0];
           d->fd_write=cp[1];
-	  d->r=currRing;
-	  if (d->r!=NULL) d->r->ref++;
+	  //d->r=currRing;
+	  //if (d->r!=NULL) d->r->ref++;
           l->data=d;
           omFree(l->mode);
           l->mode = omStrDup(mode);
@@ -864,8 +1024,8 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           d->fd_write=pc[1];
           SI_LINK_SET_RW_OPEN_P(l);
           d->send_quit_at_exit=1;
-	  d->r=currRing;
-	  if (d->r!=NULL) d->r->ref++;
+	  //d->r=currRing;
+	  //if (d->r!=NULL) d->r->ref++;
         }
         else
         {
