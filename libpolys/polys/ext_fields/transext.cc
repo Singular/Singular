@@ -2385,6 +2385,15 @@ number  ntChineseRemainder(number *x, number *q,int rl, BOOLEAN sym,const coeffs
   return ((number)result);
 }
 
+number  ntFarey(number p, number n, const coeffs cf)
+{
+  // n is really a bigint
+  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+  NUM(result)=p_Farey(p_Copy(NUM((fraction)p),cf->extRing),n,cf->extRing);
+  DEN(result)=p_Farey(p_Copy(DEN((fraction)p),cf->extRing),n,cf->extRing);
+  return ((number)result);
+}
+
 BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 {
 
@@ -2420,7 +2429,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfIsMOne       = ntIsMOne;
   cf->cfInit         = ntInit;
   cf->cfInit_bigint  = ntInit_bigint;
-  //cf->cfFarey
+  cf->cfFarey        = ntFarey;
   cf->cfChineseRemainder = ntChineseRemainder;
   cf->cfInt          = ntInt;
   cf->cfNeg          = ntNeg;

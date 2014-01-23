@@ -1390,6 +1390,13 @@ number  naChineseRemainder(number *x, number *q,int rl, BOOLEAN sym,const coeffs
   return ((number)result);
 }
 
+number  naFarey(number p, number n, const coeffs cf)
+{
+  // n is really a bigint
+  poly result=p_Farey(p_Copy((poly)p,cf->extRing),n,cf->extRing);
+  return ((number)result);
+}
+
 
 BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 {
@@ -1431,7 +1438,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfIsMOne       = naIsMOne;
   cf->cfInit         = naInit;
   cf->cfInit_bigint  = naInit_bigint;
-  // cf->cfFarey
+  cf->cfFarey        = naFarey;
   cf->cfChineseRemainder= naChineseRemainder;
   cf->cfInt          = naInt;
   cf->cfNeg          = naNeg;
