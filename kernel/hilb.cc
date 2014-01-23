@@ -21,6 +21,8 @@
 #include <kernel/kstd1.h>
 #include<gmp.h>
 #include<vector>
+//TIMER
+#include<time.h>
 
 
 static int  **Qpol;
@@ -30,9 +32,13 @@ static int  hLength;
 static int NNN;
 static mpz_t ec;
 static mpz_ptr hilbertcoef = (mpz_ptr)omAlloc(NNN*sizeof(mpz_t));
-std::vector<int> hilbertpowers;
-std::vector<int> hilbertpowerssorted;
-    
+static std::vector<int> hilbertpowers;
+static std::vector<int> hilbertpowerssorted;
+static std::vector<int> degsort;
+static std::vector<int> eulerprop;
+static ideal eulersimp;
+static int steps, prune = 0, moreprune = 0, eulerstep, eulerskips=0;
+   
 
 static int hMinModulweight(intvec *modulweight)
 {
@@ -227,6 +233,78 @@ static void hWDegree(intvec *wdegree)
 }
 // ---------------------------------- ADICHANGES ---------------------------------------------
 //!!!!!!!!!!!!!!!!!!!!! Just for Monomial Ideals !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+//idQuot(I,p) for I monomial ideal, p a ideal with a single monomial.
+ideal idQuotMon(ideal I, ideal p)
+{
+    #if 0
+    if(idIs0(I))
+    {
+        return(I);
+    }
+    if(idIs0(p))
+    {
+        ideal res = idInit(1,1);
+        res->m[0] = pOne();
+        return(res);
+    }
+    ideal res = idInit(IDELEMS(I),1);
+    int i,j;
+    bool flag;
+    int dummy;
+    for(i = 0; i<IDELEMS(I); i++)
+    {
+        res->m[i] = p_Copy(I->m[i], currRing);
+        flag = TRUE;
+        for(j = 1; (j<=currRing->N) && (flag); j++)
+        {
+            dummy = p_GetExp(p->m[0], j, currRing);
+            if(dummy > 0)
+            {
+                if(p_GetExp(I->m[i], j, currRing) < dummy)
+                {
+                    flag = FALSE;
+                }
+                else
+                {
+                    p_SetExp(res->m[i], j, p_GetExp(I->m[i], j, currRing) - dummy, currRing);
+                }
+            }
+        }
+        if(!flag)
+        {
+            res->m[i] = NULL;
+        }
+        else
+        {
+            p_Setm(res->m[i], currRing);
+        }
+    }
+    idSkipZeroes(res);
+    if(idIs0(res))
+    {
+        for(i = 0; i< IDELEMS(I); i++)
+        {
+            res->m[i] = p_Copy(I->m[i], currRing);
+        }
+    }
+    printf("\n      ------ idQuotMon\n");
+    idPrint(I);
+    idPrint(p);
+    idPrint(res);getchar();
+    return(res);
+    #else
+    ideal res;
+    res = idQuot(I,p,TRUE,TRUE);
+    //printf("\n      ------ idQuotMon\n");
+    //idPrint(I);
+    //idPrint(p);
+    //idPrint(res);getchar();
+    return(res);
+    #endif
+} 
+
+//puts in hilbertpowerssorted the two new entries and shifts if needed the old ones
 static void PutInVector(int degvalue, int oldposition, int where)
 {
     hilbertpowerssorted.resize(hilbertpowerssorted.size()+2);
@@ -239,11 +317,13 @@ static void PutInVector(int degvalue, int oldposition, int where)
     hilbertpowerssorted[where+1] = oldposition;
 }
 
+//sorts hilbertpowers (new finds the positions)
 static void SortPowerVec()
 {
     int i,j;
     int test;
     bool flag;
+    //printf("Size of hilbertpowers: %i", hilbertpowers.size());
     hilbertpowerssorted.resize(2);
     hilbertpowerssorted[0] = hilbertpowers[0];
     hilbertpowerssorted[1] = 0;
@@ -271,98 +351,33 @@ static void SortPowerVec()
                 }
             }
         }
-        //printf("\n----------------TEST----------------\n");
-        //for(test=0;test<hilbertpowerssorted.size();test++)
-        //    {
-        //        printf(" %d ", hilbertpowerssorted[test]);
-        //    }   
-        
     }
 }
 
-static int DegMon(poly p, ring tailRing)
+//returns the degree of the monomial
+static int DegMon(poly p)
 {
     int i,deg;
     deg = 0;
-    for(i=1;i<=tailRing->N;i++)
+    for(i=1;i<=currRing->N;i++)
     {
-        deg = deg + p_GetExp(p, i, tailRing);
+        deg = deg + p_GetExp(p, i, currRing);
     }
     return(deg);
 }
 
-static poly SearchP(ideal I, ring tailRing)
-{
-    int i,j,exp;
-    poly res;
-    for(i=IDELEMS(I)-1;i>=0;i--)
-    {
-        if(DegMon(I->m[i], tailRing)>=2)
-        {
-            res = p_ISet(1, tailRing);
-            res = p_Copy(I->m[i], tailRing);
-            for(j=1;j<=tailRing->N;j++)
-            {
-                exp = p_GetExp(I->m[i], j, tailRing);
-                if(exp > 0)
-                {
-                    p_SetExp(res, j, exp - 1, tailRing);
-                    return(res);
-                }
-            }
-        }
-    }
-    return(NULL);
-}
-
-static poly ChoosePVar (ideal I, ring tailRing)
-{
-    bool flag=TRUE;
-    int i,j;
-    poly res;
-    for(i=1;i<=tailRing->N;i++)
-    {
-        flag=TRUE;
-        for(j=IDELEMS(I)-1;(j>=0)&&(flag);j--)
-        {
-            if(p_GetExp(I->m[j], i, tailRing)>0)
-            {
-                flag=FALSE;
-            }
-        }
-        
-        if(flag == TRUE)
-        {
-            res = p_ISet(1, tailRing);
-            p_SetExp(res, i, 1, tailRing);
-            //idPrint(I);
-            //pWrite(res);
-            return(res);
-        }
-    }
-    return(NULL); //i.e. it is the maximal ideal
-}
-
-static ideal idSimplify(ideal I, ring tailRing)
+//divides all monomials by the last entry 
+static ideal idSimplify(ideal I)
 {
     int i,j;
     bool flag;
-    /*std::vector<int>  var;
-    for(i=1;i<=tailRing->N;i++)
-    {
-        if(p_GetExp(I->[IDELEMS(I)-1], tailRing)>0)
-        {
-            var.resize(var.size()+1);
-            var[var.size()-1] = i;
-        }
-    }
-    */
+    #if 0
     for(i=IDELEMS(I)-2;i>=0;i--)
     {
         flag=TRUE;
-        for(j=1;(j<=tailRing->N)&&(flag);j++)
+        for(j=1;(j<=currRing->N)&&(flag);j++)
         {
-            if(p_GetExp(I->m[i], j, tailRing) < p_GetExp(I->m[IDELEMS(I)-1], j, tailRing))
+            if(p_GetExp(I->m[i], j, currRing) < p_GetExp(I->m[IDELEMS(I)-1], j, currRing))
             {
                 flag=FALSE;
             }
@@ -372,65 +387,528 @@ static ideal idSimplify(ideal I, ring tailRing)
             I->m[i]=NULL;
         }
     }
+    #else
+    for(i=IDELEMS(I)-2;i>=0;i--)
+    {
+        if(p_DivisibleBy(I->m[IDELEMS(I)-1], I->m[i], currRing))
+        {
+            I->m[i] = NULL;
+        }
+    }
+    #endif
     idSkipZeroes(I);
     return(I);
 }
 
-
-/*static void eulerchar (ideal I, ring tailRing)
+//Puts in sorted vector the degrees of generators of I
+static void PutIn(int degvalue, int oldposition, int where)
 {
-    //gmp_printf("\nEuler char: %Zd\n", ec);
-    mpz_t dummy;
-    if( idElem(I) == 0)
+    int i;
+    for(i=degsort.size()-1;i>=where+2;i--)
     {
-        mpz_init(dummy);
-        mpz_set_si(dummy, 1);
-        mpz_sub(ec, ec, dummy);
+        degsort[i] = degsort[i-2];
+    }
+    degsort[where] = degvalue;
+    degsort[where+1] = oldposition;
+}
+
+//it sorts the ideal by the degrees
+static ideal SortByDeg(ideal I)
+{
+    //idPrint(I);
+    clock_t t;
+    t=clock();
+    if(idIs0(I))
+    {
+        return(I);
+    }
+    ideal res = idInit(IDELEMS(I),1);
+    std::vector<int> deg;
+    deg.resize(IDELEMS(I));
+    int i,j;
+    bool flag;
+    for(i=0;i<IDELEMS(I);i++)
+    {
+        deg[i] = DegMon(I->m[i]);
+    }
+    degsort.resize(2);
+    degsort[0] = deg[0];
+    degsort[1] = 0;
+    for(i=1;i<IDELEMS(I);i++)
+    {
+        degsort.resize(degsort.size()+2);
+        flag=TRUE;
+        if(deg[i]<=degsort[0])
+        {
+            flag=FALSE;
+            PutIn(deg[i], i, 0);
+        }
+        if((deg[i]>=degsort[degsort.size()-2]) && (flag == TRUE))
+        {
+            flag=FALSE;
+            PutIn(deg[i], i, degsort.size()-2);
+        }
+        if(flag==TRUE)
+        {
+            for(j=2;(j<=degsort.size()-4)&&(flag);j=j+2)
+            {
+                if(deg[i]<=degsort[j])
+                {
+                    flag=FALSE;
+                    PutIn(deg[i], i, j);
+                }
+            }
+        }
+    }
+    //for(i = 0;i<degsort.size();i++)
+    //{printf(" %i",degsort[i]);}printf("\n");printf("I has %i el",IDELEMS(I));getchar();
+    for(i=0;i<IDELEMS(I);i++)
+    {
+        res->m[i] = pCopy(I->m[degsort[2*i+1]]);
+    }
+    //idPrint(res);
+    degsort.clear();
+    degsort.resize(0);
+    /*if(((float)(clock()-t)/CLOCKS_PER_SEC)!=0)
+    {
+        printf("\nSortDeg took %f\n",(float)(clock()-t)/CLOCKS_PER_SEC);
+    }*/
+    return(res);
+}
+
+//id_Add for monomials (hoping it is faster)
+static ideal idAddMon(ideal I, ideal p)
+{
+    //printf("\nI and p\n");idPrint(I);pWrite(p->m[0]);
+    #if 1
+    idInsertPoly(I,p->m[0]);
+    #else
+    I = id_Add(I,p,currRing);
+    #endif
+    idSkipZeroes(I);
+    I = idSimplify(I);
+    //printf("\nBLA in idAddMon\n");idPrint(I);
+    I = SortByDeg(I);
+    return(I);
+}
+
+#if 0
+//Constructs a list of the simplices (for which we have to compute the Euler Characteristic)
+static void eulerSimpAdd(ideal newsimp)
+{
+    if(idIs0(newsimp))
+    {
         return;
     }
-    if( idElem(I) == 1)
+    ideal P;
+    int i;
+    bool flag;
+    P = idInit(1,1);
+    for(i=0;i<IDELEMS(newsimp);i++)
     {
-        if(!p_IsOne(I->m[0], tailRing))
+        P->m[0] = pAdd(P->m[0], pCopy(newsimp->m[i]));
+    }
+    poly p = pCopy(P->m[0]);
+    //idPrint(eulersimp);
+    //idPrint(newsimp);
+    //idPrint(P);
+    int terms = 0, deg = 0, howmanyvars = 0;
+    terms = IDELEMS(newsimp);
+    deg = DegMon(newsimp->m[0]);
+    flag=TRUE;
+    for(i=1;(i<IDELEMS(newsimp))&&(flag==TRUE);i++)
+    {
+        
+        if(deg != DegMon(newsimp->m[i]))
         {
-            return;
+            //The ideal is not homogenous
+            flag=FALSE;
+        }
+    }
+    if(!flag)
+    {
+        deg = 0;
+    }
+    int* e;
+    howmanyvars = pGetVariables(p, e);
+    flag = FALSE;
+    int thisone;
+    //idPrint(eulersimp);
+    if(idIs0(eulersimp))
+    {
+        eulersimp = idAddMon(eulersimp, P);
+        eulerprop.resize(eulerprop.size()+3);
+        eulerprop[eulerprop.size()-3] = terms ;
+        eulerprop[eulerprop.size()-2] = deg ;
+        eulerprop[eulerprop.size()-1] = howmanyvars ;
+        return;
+    }
+    //for(i=0;i<IDELEMS(eulersimp);i++)
+    //{
+    //    printf("\n%i %i %i\n",eulerprop[3*i],eulerprop[3*i+1],eulerprop[3*i+2]);
+    //}
+    i=0;
+    
+    for(i = 0; (i<IDELEMS(eulersimp)) && (!flag);i++)
+    {
+        if((eulerprop[3*i] == terms) && (eulerprop[3*i+1] == deg) && (eulerprop[3*i+2] == howmanyvars))
+        {
+            //  !!!!!!!!!!!!!!!!!!!have to do it!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //if(TestIfIsSame(p, eulersimp->m[i]))
+            {
+                flag = TRUE;
+                thisone = i;
+                //It is the the same simplex, and hence we already know it's euler characteristic
+            }
+        }
+    }
+    if(!flag)
+    {
+        eulersimp = idAddMon(eulersimp, P);
+        eulerprop.resize(eulerprop.size()+3);
+        eulerprop[eulerprop.size()-3] = terms ;
+        eulerprop[eulerprop.size()-2] = deg ;
+        eulerprop[eulerprop.size()-1] = howmanyvars ;
+    }
+    if(flag)
+    {
+        eulerskips++;
+        hilbertcoef = (mpz_ptr)omRealloc(hilbertcoef, (NNN+1)*sizeof(mpz_t));
+        mpz_init(&hilbertcoef[NNN]);
+        mpz_set(&hilbertcoef[NNN], &hilbertcoef[thisone]);
+        hilbertpowers.resize(NNN+1);
+        NNN++;
+    }
+    return;
+}
+#endif
+
+//searches for a variable that is not yet used (assumes that the ideal is sqrfree)
+static poly ChoosePVar (ideal I)
+{
+    idPrint(I);
+    printf("\nThere is a variable which is not yet used... ChangePVar\n");getchar();
+    bool flag=TRUE;
+    int i,j;
+    poly res;
+    for(i=1;i<=currRing->N;i++)
+    {
+        flag=TRUE;
+        for(j=IDELEMS(I)-1;(j>=0)&&(flag);j--)
+        {
+            if(p_GetExp(I->m[j], i, currRing)>0)
+            {
+                flag=FALSE;
+            }
+        }
+        
+        if(flag == TRUE)
+        {
+            res = p_ISet(1, currRing);
+            p_SetExp(res, i, 1, currRing);
+            p_Setm(res,currRing);
+            return(res);
         }
         else
         {
-            mpz_init(dummy);
-            mpz_set_si(dummy, 1);
-            mpz_sub(ec, ec, dummy);
-            return;
+            p_Delete(&res, currRing);
         }
     }
-    ideal p = idInit(1,1);
-    p->m[0] = SearchP(I, tailRing);
-    //idPrint(I);
-    //printf("\nSearchP founded: \n");pWrite(p->m[0]);
-    if(p->m[0] == NULL)
-    {
-        mpz_init(dummy);
-        mpz_set_si(dummy, IDELEMS(I)-1);
-        mpz_add(ec, ec, dummy);
-        return;
-    }
-    ideal Ip = idQuot(I,p,TRUE,TRUE);
-    ideal Iplusp = id_Add(I,p,tailRing);
-    Iplusp=idSimplify(Iplusp, tailRing);
-    eulerchar(Ip, tailRing);
-    eulerchar(Iplusp, tailRing);
-    return;
-}*/
+    return(NULL); //i.e. it is the maximal ideal
+}
 
-static bool JustVar(ideal I, ring tailRing)
+//choice XL: last entry divided by x (xy10z15 -> y9z14)
+static poly ChoosePXL(ideal I)
 {
+    int i,j,dummy=0;
+    poly m;
+    for(i = IDELEMS(I)-1; (i>=0) && (dummy == 0); i--)
+    {
+        for(j = 1; (j<=currRing->N) && (dummy == 0); j++)
+        {
+            if(p_GetExp(I->m[i],j, currRing)>1)
+            {
+                dummy = 1;
+            }
+        }
+    }
+    m = p_Copy(I->m[i+1],currRing);
+    for(j = 1; j<=currRing->N; j++)
+    {
+        dummy = p_GetExp(m,j,currRing);
+        if(dummy >= 1)
+        {
+            p_SetExp(m, j, dummy-1, currRing);
+        }
+    }
+    if(!p_IsOne(m, currRing))
+    {
+        p_Setm(m, currRing);
+        return(m);
+    }
+    m = ChoosePVar(I);
+    return(m);
+}
+
+//choice XF: first entry divided by x (xy10z15 -> y9z14)
+static poly ChoosePXF(ideal I)
+{
+    int i,j,dummy=0;
+    poly m;
+    for(i =0 ; (i<=IDELEMS(I)-1) && (dummy == 0); i++)
+    {
+        for(j = 1; (j<=currRing->N) && (dummy == 0); j++)
+        {
+            if(p_GetExp(I->m[i],j, currRing)>1)
+            {
+                dummy = 1;
+            }
+        }
+    }
+    m = p_Copy(I->m[i-1],currRing);
+    for(j = 1; j<=currRing->N; j++)
+    {
+        dummy = p_GetExp(m,j,currRing);
+        if(dummy >= 1)
+        {
+            p_SetExp(m, j, dummy-1, currRing);
+        }
+    }
+    if(!p_IsOne(m, currRing))
+    {
+        p_Setm(m, currRing);
+        return(m);
+    }
+    m = ChoosePVar(I);
+    return(m);
+}
+
+//choice OL: last entry the first power (xy10z15 -> xy9z15)
+static poly ChoosePOL(ideal I)
+{
+    int i,j,dummy;
+    poly m;
+    for(i = IDELEMS(I)-1;i>=0;i--)
+    {
+        m = p_Copy(I->m[i],currRing);
+        for(j=1;j<=currRing->N;j++)
+        {
+            dummy = p_GetExp(m,j,currRing);
+            if(dummy > 0)
+            {
+                p_SetExp(m,j,dummy-1,currRing);
+                p_Setm(m,currRing);
+            }       
+        }
+        if(!p_IsOne(m, currRing))
+        {
+            return(m);
+        }
+        else
+        {
+            p_Delete(&m,currRing);
+        }
+    }
+    m = ChoosePVar(I);
+    return(m);
+}
+
+//choice OF: first entry the first power (xy10z15 -> xy9z15)
+static poly ChoosePOF(ideal I)
+{
+    int i,j,dummy;
+    poly m;
+    for(i = 0 ;i<=IDELEMS(I)-1;i++)
+    {
+        m = p_Copy(I->m[i],currRing);
+        for(j=1;j<=currRing->N;j++)
+        {
+            dummy = p_GetExp(m,j,currRing);
+            if(dummy > 0)
+            {
+                p_SetExp(m,j,dummy-1,currRing);
+                p_Setm(m,currRing);
+            }       
+        }
+        if(!p_IsOne(m, currRing))
+        {
+            return(m);
+        }
+        else
+        {
+            p_Delete(&m,currRing);
+        }
+    }
+    m = ChoosePVar(I);
+    return(m);
+}
+
+//choice VL: last entry the first variable with power (xy10z15 -> y)
+static poly ChoosePVL(ideal I)
+{
+    int i,j,dummy;
+    bool flag = TRUE;
+    poly m = p_ISet(1,currRing);
+    for(i = IDELEMS(I)-1;(i>=0) && (flag);i--)
+    {
+        flag = TRUE;
+        for(j=1;(j<=currRing->N) && (flag);j++)
+        {
+            dummy = p_GetExp(I->m[i],j,currRing);
+            if(dummy >= 2)
+            {
+                p_SetExp(m,j,1,currRing);
+                p_Setm(m,currRing);
+                flag = FALSE;
+            }       
+        }
+        if(!p_IsOne(m, currRing))
+        {
+            return(m);
+        }
+    }
+    m = ChoosePVar(I);
+    return(m);
+}
+
+//choice VF: first entry the first variable with power (xy10z15 -> y)
+static poly ChoosePVF(ideal I)
+{
+    int i,j,dummy;
+    bool flag = TRUE;
+    poly m = p_ISet(1,currRing);
+    for(i = 0;(i<=IDELEMS(I)-1) && (flag);i++)
+    {
+        flag = TRUE;
+        for(j=1;(j<=currRing->N) && (flag);j++)
+        {
+            dummy = p_GetExp(I->m[i],j,currRing);
+            if(dummy >= 2)
+            {
+                p_SetExp(m,j,1,currRing);
+                p_Setm(m,currRing);
+                flag = FALSE;
+            }       
+        }
+        if(!p_IsOne(m, currRing))
+        {
+            return(m);
+        }
+    }
+    m = ChoosePVar(I);
+    return(m);
+}
+
+//choice JL: last entry just variable with power (xy10z15 -> y10)
+static poly ChoosePJL(ideal I)
+{
+    int i,j,dummy;
+    bool flag = TRUE;
+    poly m = p_ISet(1,currRing);
+    for(i = IDELEMS(I)-1;(i>=0) && (flag);i--)
+    {
+        flag = TRUE;
+        for(j=1;(j<=currRing->N) && (flag);j++)
+        {
+            dummy = p_GetExp(I->m[i],j,currRing);
+            if(dummy >= 2)
+            {
+                p_SetExp(m,j,dummy-1,currRing);
+                p_Setm(m,currRing);
+                flag = FALSE;
+            }       
+        }
+        if(!p_IsOne(m, currRing))
+        {
+            return(m);
+        }
+    }
+    m = ChoosePVar(I);
+    return(m);
+}
+
+//choice JF: last entry just variable with power -1 (xy10z15 -> y9)
+static poly ChoosePJF(ideal I)
+{
+    int i,j,dummy;
+    bool flag = TRUE;
+    poly m = p_ISet(1,currRing);
+    for(i = 0;(i<=IDELEMS(I)-1) && (flag);i++)
+    {
+        flag = TRUE;
+        for(j=1;(j<=currRing->N) && (flag);j++)
+        {
+            dummy = p_GetExp(I->m[i],j,currRing);
+            if(dummy >= 2)
+            {
+                p_SetExp(m,j,dummy-1,currRing);
+                p_Setm(m,currRing);
+                flag = FALSE;
+            }       
+        }
+        if(!p_IsOne(m, currRing))
+        {
+            return(m);
+        }
+    }
+    m = ChoosePVar(I);
+    return(m);
+}
+
+//chooses 1 \neq p \not\in S. This choice should be made optimal
+static poly ChooseP(ideal I)
+{
+    //idPrint(I);
+    poly m;
+    //  TEST TO SEE WHICH ONE IS BETTER
+    //m = ChoosePXL(I);
+    //m = ChoosePXF(I);
+    //m = ChoosePOL(I);
+    //m = ChoosePOF(I);
+    //m = ChoosePVL(I);
+    //m = ChoosePVF(I);
+    //m = ChoosePJL(I);
+    m = ChoosePJF(I);
+    //printf("\nMy choice was \n");pWrite(m);getchar();
+    return(m);
+}
+
+//searches for a monomial of degree d>=2 and divides it by a variable (result monomial of deg d-1)
+static poly SearchP(ideal I)
+{
+    int i,j,exp;
+    poly res;
+    if(DegMon(I->m[IDELEMS(I)-1])<=1)
+    {
+        res = ChoosePVar(I);
+        return(res);
+    }
+    i = IDELEMS(I)-1;
+    res = p_Copy(I->m[i], currRing);
+    for(j=1;j<=currRing->N;j++)
+    {
+        exp = p_GetExp(I->m[i], j, currRing);
+        if(exp > 0)
+        {
+            p_SetExp(res, j, exp - 1, currRing);
+            p_Setm(res,currRing);
+            return(res);
+        }
+    }
+}
+
+//test if the ideal is of the form (x1, ..., xr)
+static bool JustVar(ideal I)
+{
+    #if 0
     int i,j;
     bool foundone;
     for(i=0;i<=IDELEMS(I)-1;i++)
     {
         foundone = FALSE;
-        for(j = 1;j<=tailRing->N;j++)
+        for(j = 1;j<=currRing->N;j++)
         {
-            if(p_GetExp(I->m[i], j, tailRing)>0)
+            if(p_GetExp(I->m[i], j, currRing)>0)
             {
                 if(foundone == TRUE)
                 {
@@ -441,13 +919,24 @@ static bool JustVar(ideal I, ring tailRing)
         }        
     }
     return(TRUE);
+    #else
+    if(DegMon(I->m[IDELEMS(I)-1])>1)
+    {
+        return(FALSE);
+    }
+    return(TRUE);
+    #endif
 }
 
-static void eulerchar (ideal I, ring tailRing, int variables)
+//computes the Euler Characteristic of the ideal
+static void eulerchar (ideal I, int variables)
 {
-    //gmp_printf("\nEuler char: %Zd\n", ec);
+  loop
+  {
+    //idPrint(I);printf("%i", variables);
+    eulerstep++;
     mpz_t dummy;
-    if(JustVar(I, tailRing) == TRUE)
+    if(JustVar(I) == TRUE)
     {
         if(IDELEMS(I) == variables)
         {
@@ -458,201 +947,429 @@ static void eulerchar (ideal I, ring tailRing, int variables)
                 {mpz_set_si(dummy, -1);}
             mpz_add(ec, ec, dummy);
         }
+        //mpz_clear(dummy);
         return;        
     }
     ideal p = idInit(1,1);
-    p->m[0] = SearchP(I, tailRing);
-    //idPrint(I);
-    //printf("\nSearchP founded: \n");pWrite(p->m[0]);
-    ideal Ip = idQuot(I,p,TRUE,TRUE);
-    ideal Iplusp = id_Add(I,p,tailRing);
-    Iplusp=idSimplify(Iplusp, tailRing);
+    p->m[0] = SearchP(I);
+    //pWrite(p->m[0]);
+    ideal Ip = idQuotMon(I,p);
+    Ip = SortByDeg(Ip);
     int i,howmanyvarinp = 0;
-    for(i = 1;i<=tailRing->N;i++)
+    for(i = 1;i<=currRing->N;i++)
     {
-        if(p_GetExp(p->m[0],i,tailRing)>0)
+        if(p_GetExp(p->m[0],i,currRing)>0)
         {
             howmanyvarinp++;
         }
     }    
-    eulerchar(Ip, tailRing, variables-howmanyvarinp);
-    eulerchar(Iplusp, tailRing, variables);
-    return;
+    eulerchar(Ip, variables-howmanyvarinp);
+    id_Delete(&Ip, currRing);
+    //ideal Iplusp = idAddMon(I,p);
+    //eulerchar(Iplusp, variables);
+    //id_Delete(&Iplusp, currRing);
+    //return;
+    I = idAddMon(I,p);
+  }
 }
 
-static poly SqFree (ideal I, ring tailRing)
+//tests if an ideal is Square Free, if no, returns the variable which appears at powers >1
+static poly SqFree (ideal I)
 {
     int i,j;
     bool flag=TRUE;
     poly notsqrfree = NULL;
+    if(DegMon(I->m[IDELEMS(I)-1])<=1)
+    {
+        return(notsqrfree);
+    }
     for(i=IDELEMS(I)-1;(i>=0)&&(flag);i--)
     {
-        for(j=1;(j<=tailRing->N)&&(flag);j++)
+        for(j=1;(j<=currRing->N)&&(flag);j++)
         {
-            if(p_GetExp(I->m[i],j,tailRing)>1)
+            if(p_GetExp(I->m[i],j,currRing)>1)
             {
                 flag=FALSE;
-                notsqrfree = p_ISet(1,tailRing);
-                p_SetExp(notsqrfree,j,1,tailRing);
+                notsqrfree = p_ISet(1,currRing);
+                p_SetExp(notsqrfree,j,1,currRing);
             }
         }
+    }
+    if(notsqrfree != NULL)
+    {
+        p_Setm(notsqrfree,currRing);
     }
     return(notsqrfree);
 }
 
-static void rouneslice(ideal I, ideal S, poly q, ring tailRing, poly x)
+//checks if a polynomial is in I
+static bool IsIn(poly p, ideal I)
 {
-    int i,j;
-    int dummy;
-    mpz_t dummympz;
-    poly m;
-    ideal p, koszsimp;
-    I = idMinBase(I);
-    
-    //Work on it
-    //----------- PRUNING OF S ---------------
-    S = idMinBase(S);
-    for(i=IDELEMS(S)-1;i>=0;i--)
+    //assumes that I is ordered by degree
+    if(idIs0(I))
     {
-        if(kNF(I,NULL,S->m[i],NULL,NULL)==NULL)
+        if(p==poly(0))
         {
-            S->m[i]=NULL;
+            return(TRUE);
+        }
+        else
+        {
+            return(FALSE);
         }
     }
-    idSkipZeroes(S);
-    //----------------------------------------
-    for(i=IDELEMS(I)-1;i>=0;i--)
+    if(p==poly(0))
     {
-        m = p_Copy(I->m[i],tailRing);
-        for(j=1;j<=tailRing->N;j++)
+        return(FALSE);
+    }
+    //if(DegMon(p)<DegMon(I->m[IDELEMS(I)-1]))
+    //{
+    //    return(FALSE);
+    //}
+    #if 0
+    if(p == NULL)
+    {
+        if(IDELEMS(I) == 0)
         {
-            dummy = p_GetExp(m,j,tailRing);
-            if(dummy > 0)
+            return(TRUE);
+        }
+        if(IDELEMS(I) == 1)
+        {
+            if(I->m[0] == poly(0))
             {
-                p_SetExp(m,j,dummy-1,tailRing);
-            }       
+                return(TRUE);
+            }
         }
-        if(kNF(S,NULL,m,NULL,NULL)==NULL)
-        {
-            I->m[i]=NULL;
-            //printf("\n Check if m is in S: \n");pWrite(m);idPrint(S);
-            //printf("\n Deleted, since pi(m) is in S\n");pWrite(m);
-        }
+        return(FALSE);
     }
-    idSkipZeroes(I);
-    
-    //----------- MORE PRUNING OF S ------------
-    //strictly divide???    
-    //------------------------------------------
-
-    //printf("Ideal I: \n");idPrint(I);
-    //printf("Ideal S: \n");idPrint(S);
-    //printf("Poly  q: \n");pWrite(q);
-    if(idElem(I)==0)
+    if(IDELEMS(I)==0)
     {
-        //I = 0
-        //printf("\nx does not divide lcm(I)");
-        //pWrite(x);pWrite(m);idPrint(I);
-        printf("\nEmpty Set: ");pWrite(q);
-        return;
+        return(FALSE);
     }
-    m = p_ISet(1,tailRing);
-    for(i=1;i<=tailRing->N;i++)
+    if(IDELEMS(I) == 1)
+    {
+        if(I->m[0] == poly(0))
+            {
+                return(FALSE);
+            }    
+    }
+    #endif
+    int i,j;
+    bool flag;
+    for(i = 0;i<IDELEMS(I);i++)
+    {
+        flag = TRUE;
+        for(j = 1;(j<=currRing->N) &&(flag);j++)
+        {
+            if(p_GetExp(p, j, currRing)<p_GetExp(I->m[i], j, currRing))
+            {
+                flag = FALSE;
+            }
+        }
+        if(flag)
+        {
+            return(TRUE);
+        }
+    }
+    return(FALSE);
+}
+
+//computes the lcm of min I, I monomial ideal
+static poly LCMmon(ideal I)
+{
+    if(idIs0(I))
+    {
+        return(NULL);
+    }
+    poly m;
+    int dummy,i,j;
+    m = p_ISet(1,currRing);
+    for(i=1;i<=currRing->N;i++)
     {
         dummy=0;
         for(j=IDELEMS(I)-1;j>=0;j--)
         {
-            if(p_GetExp(I->m[j],i,tailRing) > dummy)
+            if(p_GetExp(I->m[j],i,currRing) > dummy)
             {
-                dummy = p_GetExp(I->m[j],i,tailRing);
+                dummy = p_GetExp(I->m[j],i,currRing);
             }
         }
-        p_SetExp(m,i,dummy,tailRing);
+        p_SetExp(m,i,dummy,currRing);
     }
-    p_Setm(m,tailRing);
-    if(p_DivisibleBy(x,m,tailRing)==FALSE)
+    p_Setm(m,currRing);
+    return(m);
+}
+
+#if 0
+//return TRUE if a | b, a, b monomials
+static bool Divides(poly a, poly b)
+{
+    if(a == NULL)
+    {
+        return(FALSE);
+    }
+    if(b == NULL)
+    {
+        return(TRUE);
+    }
+    int i;
+    for(i=1;i<=currRing->N;i++)
+    {
+        if(p_GetExp(a,i,currRing) > p_GetExp(b,i,currRing))
+        {
+            return(FALSE);
+        }
+    }
+    return(TRUE);
+}
+#endif
+
+//the Roune Slice Algorithm
+void rouneslice(ideal I, ideal S, poly q, poly x)
+{
+  loop
+  {
+    steps++;
+    int i,j;
+    int dummy;
+    mpz_t dummympz;
+    poly m;
+    clock_t t;
+    t=clock();
+    ideal p, koszsimp;
+    //----------- PRUNING OF S ---------------
+    //S SHOULD IN THIS POINT BE ORDERED BY DEGREE
+    for(i=IDELEMS(S)-1;i>=0;i--)
+    {
+        if(IsIn(S->m[i],I))
+        {
+            //idPrint(I);idPrint(S);getchar();
+            S->m[i]=NULL;
+            prune++;
+        }
+    }
+    idSkipZeroes(S);
+    /*if(((float)(clock()-t)/CLOCKS_PER_SEC)!=0)
+    {
+        printf("\nPruning S took %f\n",(float)(clock()-t)/CLOCKS_PER_SEC);
+        //idPrint(I);idPrint(S);getchar();
+    }*/
+    //----------------------------------------
+    t = clock();
+    for(i=IDELEMS(I)-1;i>=0;i--)
+    {
+        m = p_Copy(I->m[i],currRing);
+        for(j=1;j<=currRing->N;j++)
+        {
+            dummy = p_GetExp(m,j,currRing);
+            if(dummy > 0)
+            {
+                p_SetExp(m,j,dummy-1,currRing);
+            }       
+        }
+        p_Setm(m, currRing);
+        //printf("\n Check if m is in S: %i\n", IsIn(m,S));pWrite(m);idPrint(S);
+        if(IsIn(m,S))
+        {
+            //printf("\nIt was deleted: \n");pWrite(I->m[i]);
+            I->m[i]=NULL;
+            //printf("\n Deleted, since pi(m) is in S\n");pWrite(m);
+        }
+    }
+    idSkipZeroes(I);
+    /*if(((float)(clock()-t)/CLOCKS_PER_SEC)!=0)
+    {
+        printf("\nConstructing I' took %f\n",(float)(clock()-t)/CLOCKS_PER_SEC);
+    }*/
+    //----------- MORE PRUNING OF S ------------
+    t = clock();
+    m = LCMmon(I); 
+    if(m != NULL)
+    {
+        for(i=0;i<IDELEMS(S);i++)
+        {      
+            if(!(p_DivisibleBy(S->m[i], m, currRing)))  
+            {
+                S->m[i] = NULL;
+                j++;
+                moreprune++;
+            }
+            else
+            {
+                if(pLmEqual(S->m[i],m))
+                {
+                    S->m[i] = NULL;
+                    moreprune++;
+                }
+            }
+        }
+    idSkipZeroes(S);
+    }
+    /*if(((float)(clock()-t)/CLOCKS_PER_SEC)!=0)
+    {
+        printf("\nMore Pruning S took %f\n",(float)(clock()-t)/CLOCKS_PER_SEC);
+    }*/
+    //------------------------------------------
+    I = SortByDeg(I);
+    //printf("\n---------------------------\n");
+    //printf("\n      I\n");idPrint(I);
+    //printf("\n      S\n");idPrint(S);
+    //printf("\n      q\n");pWrite(q);
+    //getchar();
+    
+    if(idIs0(I))
+    {
+        /*if(!pIsConstantPoly(q))
+        {
+            mpz_init(dummympz);
+            mpz_set_si(dummympz, -1);
+            hilbertcoef = (mpz_ptr)omRealloc(hilbertcoef, (NNN+1)*sizeof(mpz_t));
+            mpz_init(&hilbertcoef[NNN]);
+            mpz_set(&hilbertcoef[NNN], dummympz);
+            hilbertpowers.resize(NNN+1);
+            hilbertpowers[NNN] = DegMon(q);
+            NNN++;
+            pWrite(q);
+            //printf("\nOld ERROR\n");getchar();
+        }*/
+        id_Delete(&I, currRing);
+        id_Delete(&S, currRing);
+        p_Delete(&m, currRing);
+        break;
+        //return;
+    }
+    S = SortByDeg(S);
+    m = LCMmon(I);
+    if(!p_DivisibleBy(x,m, currRing))
     {
         //printf("\nx does not divide lcm(I)");
         //pWrite(x);pWrite(m);idPrint(I);
         //printf("\nEmpty set");pWrite(q);
-        return;
+        //idPrint(S);pWrite(q);
+        //getchar();
+        id_Delete(&I, currRing);
+        id_Delete(&S, currRing);
+        p_Delete(&m, currRing);
+        //return;
+        break;
     }
-    m = SqFree(I, tailRing);
+    m = SqFree(I);
     koszsimp = idInit(IDELEMS(I),1);
     if(m==NULL)
     {
-        printf("\n      Corner: ");
-        pWrite(q);
-        printf("\n      With the facets of the simplex:\n");
+        //printf("\n      Corner: ");
+        //pWrite(q);
+        //printf("\n      With the facets of the dual simplex:\n");
         for(i=IDELEMS(I)-1;i>=0;i--)
         {
-            m = p_ISet(1,tailRing);
-            //m = p_Divide(x,I->m[i],tailRing);
-            //      THIS IS FOR THE OTHER IDEA FOR COMPUTING THE EULER CHARACTERISTIC!!!! INSTEAD
-            m = I->m[i];
-            /*for(j=tailRing->N; j>=1; j--)
+            koszsimp->m[i] = I->m[i];
+            //pWrite(koszsimp->m[i]);
+            /*for(j = 1;j<=currRing->N;j++)
             {
-                p_SetExp(m,j, p_GetExp(x,j,tailRing)- p_GetExp(I->m[i],j,tailRing),tailRing);
+                if(p_GetExp(koszsimp->m[i],j,currRing)!=0)
+                {
+                    p_SetExp(koszsimp->m[i],j,0,currRing);
+                }
+                else
+                {
+                    p_SetExp(koszsimp->m[i],j,1,currRing);
+                }
             }*/
-            
-            printf("    ");
-            p_Setm(m, tailRing);
-            p_Write(m, tailRing);
-            koszsimp->m[i] = p_Copy(m, tailRing);
+            //pWrite(koszsimp->m[i]);
         }
-        printf("\n Euler Characteristic = ");
+        //idPrint(koszsimp);
+        //getchar();
+        //printf("\n Euler Characteristic = ");
         mpz_init(dummympz);
-        eulerchar(koszsimp, tailRing, tailRing->N);
+        t = clock();
+        eulerstep=0;
+        //idPrint(koszsimp);
+        //getchar();
+        eulerchar(koszsimp, currRing->N);
+        if(((float)(clock()-t)/CLOCKS_PER_SEC)!=0)
+        {
+            //printf("\nEulerChar took %f \n",(float)(clock()-t)/CLOCKS_PER_SEC);
+            //idPrint(koszsimp);getchar();
+        }
+        //printf("\nEulerChar tooked %i steps\n", eulerstep);
         //gmp_printf("dummy %Zd \n", dummympz);
-        gmp_printf("ec %Zd \n", ec);
+        //gmp_printf("ec %Zd \n", ec);
+        //getchar();
+        //if(DegMon(q)==7) {getchar();}
         mpz_set(dummympz, ec);
         mpz_sub(ec, ec, ec);
         hilbertcoef = (mpz_ptr)omRealloc(hilbertcoef, (NNN+1)*sizeof(mpz_t));
         mpz_init(&hilbertcoef[NNN]);
         mpz_set(&hilbertcoef[NNN], dummympz);
+        mpz_clear(dummympz);
         hilbertpowers.resize(NNN+1);
-        hilbertpowers[NNN] = DegMon(q, tailRing);
+        hilbertpowers[NNN] = DegMon(q);
         NNN++;
-        return;
+        break;
+        //return;
     }
+    #if 0
     if(IDELEMS(S)!=1)
     {
-        m = SearchP(S, tailRing);
+        m = SearchP(S);
         if(m == NULL)
         {
-            m = ChoosePVar(S, tailRing);
+            m = ChoosePVar(S);
         }
     }
+    #else
+    m = ChooseP(I);
+    #endif
     p = idInit(1,1);
     p->m[0] = m;
-    printf("Poly  p: \n");pWrite(m);
-    ideal Ip = idQuot(I,p,TRUE,TRUE);
-    ideal Sp = idQuot(S,p,TRUE,TRUE);
-    ideal Splusp = id_Add(S,p,tailRing);
-    Splusp = idSimplify(Splusp, tailRing);
-    poly pq = pp_Mult_mm(q,m,tailRing);
-    rouneslice(Ip, Sp, pq, tailRing, x);
-    rouneslice(I, Splusp, q, tailRing, x);
-    return;
+    //idPrint(I);idPrint(p);
+    //idTest(I);idTest(p);
+    ideal Ip = idQuotMon(I,p);
+    Ip = SortByDeg(Ip);
+    ideal Sp = idQuotMon(S,p);
+    Sp = SortByDeg(Sp);
+    //printf("\np, q = \n");pWrite(m);pWrite(q);
+    poly pq = pp_Mult_mm(q,m,currRing);
+    rouneslice(Ip, Sp, pq, x);
+    //idPrint(Ip);
+    //id_Delete(&Ip, currRing);
+    //id_Delete(&Sp, currRing);
+    S = idAddMon(S,p);
+    //p->m[0]=NULL; id_Delete(&p, currRing); // p->m[0] was also in S
+    p_Delete(&pq,currRing);
+    //Splusp = idSimplify(Splusp);
+  //  rouneslice(I, S, q, x);  tail-recursion solved via loop
+
+    //id_Delete(&Splusp, currRing);
+    //return;
+  }
 }
 
-static void slicehilb(ideal I, ring tailRing)
+
+//it computes the first hilbert series by means of Roune Slice Algorithm
+void slicehilb(ideal I)
 {
+    I = SortByDeg(I);
     printf("Adi changes are here: \n");
     int i;
-    ideal S = idInit(0,1);
-    poly q = p_ISet(1,tailRing);
+    eulersimp = idInit(1,1);
+    ideal S = idInit(1,1);
+    poly q = p_ISet(1,currRing);
     ideal X = idInit(1,1);
-    X->m[0]=p_One(tailRing);
-    for(i=1;i<=tailRing->N;i++)
+    X->m[0]=p_One(currRing);
+    for(i=1;i<=currRing->N;i++)
     {
-            p_SetExp(X->m[0],i,1,tailRing);   
+            p_SetExp(X->m[0],i,1,currRing);   
     }
-    p_Setm(X->m[0],tailRing);
-    I = id_Mult(I,X,tailRing);
+    p_Setm(X->m[0],currRing);
+    I = id_Mult(I,X,currRing);
     printf("\n-------------RouneSlice--------------\n");
-    rouneslice(I,S,q,tailRing,X->m[0]);
-    for(i=0;i<NNN;i++)
+    steps=0;
+    rouneslice(I,S,q,X->m[0]);
+    printf("\nIn total Prune got rid of %i elements\n",prune);
+    printf("\nIn total More Prune got rid of %i elements\n",moreprune);
+    //printf("\nWe skipped computing the EulerChar for %i simplices\n",eulerskips);
+    printf("\nSteps of rouneslice: %i\n\n", steps);
+    /*for(i=0;i<NNN;i++)
     {
         gmp_printf(" %Zd ", &hilbertcoef[i]);
     }
@@ -660,18 +1377,18 @@ static void slicehilb(ideal I, ring tailRing)
     for(i=0;i<NNN;i++)
     {
         printf(" %d ", hilbertpowers[i]);
-    }
-    SortPowerVec(); 
-    printf("\n");
+    }*/
+    SortPowerVec();
+    /*printf("\n");
     for(i=0;i<hilbertpowerssorted.size();i++)
     {
         printf(" %d ", hilbertpowerssorted[i]);
-    }
+    }*/
     mpz_t coefhilb;
     mpz_t dummy;
     mpz_init(coefhilb);
     mpz_init(dummy);
-    printf("\n//        1 t^0");
+    printf("\n//  %8d t^0",1);
     for(i=0;i<hilbertpowerssorted.size();i=i+2)
     {
         mpz_set(dummy, &hilbertcoef[hilbertpowerssorted[i+1]]);
@@ -683,7 +1400,7 @@ static void slicehilb(ideal I, ring tailRing)
         }
         if(mpz_sgn(coefhilb)!=0)
         {
-            gmp_printf("\n//        %Zd t^%d",coefhilb,hilbertpowerssorted[i]);
+            gmp_printf("\n//  %8Zd t^%d",coefhilb,hilbertpowerssorted[i]);
         }
         mpz_sub(coefhilb, coefhilb, coefhilb);
     }
@@ -695,7 +1412,6 @@ static void slicehilb(ideal I, ring tailRing)
 static intvec * hSeries(ideal S, intvec *modulweight,
                 int /*notstc*/, intvec *wdegree, ideal Q, ring tailRing)
 {
-  slicehilb(S,tailRing); // ADICHANGES
   intvec *work, *hseries1=NULL;
   int  mc;
   int  p0;
@@ -930,10 +1646,14 @@ static void hPrintHilb(intvec *hseries)
 */
 void hLookSeries(ideal S, intvec *modulweight, ideal Q)
 {
+  clock_t t;    // ADICHANGES
+  t = clock(); // ADICHANGES
   int co, mu, l;
   intvec *hseries2;
   intvec *hseries1 = hFirstSeries(S, modulweight, Q);
   hPrintHilb(hseries1);
+  printf("\nTime for Original: %f\n",((float)(clock()-t))/CLOCKS_PER_SEC); getchar(); // ADICHANGES
+  #if 0
   l = hseries1->length()-1;
   if (l > 1)
     hseries2 = hSecondSeries(hseries1);
@@ -949,6 +1669,12 @@ void hLookSeries(ideal S, intvec *modulweight, ideal Q)
   if (l>1)
     delete hseries1;
   delete hseries2;
+  #endif
+  clock_t now;    // ADICHANGES
+  now = clock(); // ADICHANGES
+  slicehilb(S); // ADICHANGES
+  printf("\nTime for Slice Algorithm: %f \n\n", ((float)(clock()-now))/CLOCKS_PER_SEC);    // ADICHANGES
+  
 }
 
 
