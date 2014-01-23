@@ -1378,6 +1378,19 @@ char* naCoeffString(const coeffs r) // currently also for tranext.
   return s;
 }
 
+number  naChineseRemainder(number *x, number *q,int rl, BOOLEAN sym,const coeffs cf)
+{
+  poly *P=(poly*)omAlloc(rl*sizeof(poly*));
+  number *X=(number *)omAlloc(rl*sizeof(number));
+  int i;
+  for(i=0;i<rl;i++) P[i]=p_Copy((poly)(x[i]),cf->extRing);
+  poly result=p_ChineseRemainder(P,X,q,rl,cf->extRing);
+  omFreeSize(X,rl*sizeof(number));
+  omFreeSize(P,rl*sizeof(poly*));
+  return ((number)result);
+}
+
+
 BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 {
   assume( infoStruct != NULL );
@@ -1418,6 +1431,8 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfIsMOne       = naIsMOne;
   cf->cfInit         = naInit;
   cf->cfInit_bigint  = naInit_bigint;
+  // cf->cfFarey
+  cf->cfChineseRemainder= naChineseRemainder;
   cf->cfInt          = naInt;
   cf->cfNeg          = naNeg;
   cf->cfAdd          = naAdd;

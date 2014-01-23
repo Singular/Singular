@@ -2362,6 +2362,29 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   ntTest(c);
 }
 
+number  ntChineseRemainder(number *x, number *q,int rl, BOOLEAN sym,const coeffs cf)
+{
+  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+  int i;
+
+  poly *P=(poly*)omAlloc(rl*sizeof(poly*));
+  number *X=(number *)omAlloc(rl*sizeof(number));
+
+  for(i=0;i<rl;i++) P[i]=p_Copy(NUM((fraction)(x[i])),cf->extRing);
+  NUM(result)=p_ChineseRemainder(P,X,q,rl,cf->extRing);
+
+  for(i=0;i<rl;i++)
+  {
+    P[i]=p_Copy(DEN((fraction)(x[i])),cf->extRing);
+    if (P[i]==NULL) P[i]=p_One(cf->extRing);
+  }
+  DEN(result)=p_ChineseRemainder(P,X,q,rl,cf->extRing);
+
+  omFreeSize(X,rl*sizeof(number));
+  omFreeSize(P,rl*sizeof(poly*));
+  return ((number)result);
+}
+
 BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 {
 
@@ -2397,6 +2420,8 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfIsMOne       = ntIsMOne;
   cf->cfInit         = ntInit;
   cf->cfInit_bigint  = ntInit_bigint;
+  //cf->cfFarey
+  cf->cfChineseRemainder = ntChineseRemainder;
   cf->cfInt          = ntInt;
   cf->cfNeg          = ntNeg;
   cf->cfAdd          = ntAdd;

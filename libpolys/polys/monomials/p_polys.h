@@ -233,7 +233,6 @@ poly      p_Subst(poly p, int n, poly e, const ring r);
 static inline  unsigned long p_SetComp(poly p, unsigned long c, ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  pAssume2(rRing_has_Comp(r));
   if (r->pCompIndex>=0) __p_GetComp(p,r) = c;
   return c;
 }
