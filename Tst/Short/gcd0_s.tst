@@ -251,4 +251,23 @@ gcd(f, g);
 f=(-256*u^3*v+128*u^2*v^2-16*u*v^3);
 g=(-64*u^3+48*u^2*v^2+32*u^2*v-192*u^2-12*u*v^3-4*u*v^2+48*u*v);
 gcd(f, g);
+
+ring r=0,(x,y),dp;
+poly f1; poly f2;
+for (int i=0; i<1000; i++)
+{
+f1=f1+x^(10000-i)*y^i;
+f2=f2+y^(10000-i)*x^i;
+}
+tst_status();
+poly p=gcd(f1,f2);
+tst_status();
+ideal I = f1,f2;
+matrix M=syz(I);
+tst_status();
+poly q=f2/M[1,1];
+tst_status();
+
+simplify(p,1)-simplify(q,1);
+
 tst_status(1);$
