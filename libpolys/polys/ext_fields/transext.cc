@@ -2382,6 +2382,11 @@ number  ntChineseRemainder(number *x, number *q,int rl, BOOLEAN sym,const coeffs
 
   omFreeSize(X,rl*sizeof(number));
   omFreeSize(P,rl*sizeof(poly*));
+  if (p_IsConstant(DEN(result), ntRing)
+  && n_IsOne(pGetCoeff(DEN(result)), ntCoeffs))
+  {
+    p_Delete(&DEN(result),ntRing);
+  }
   return ((number)result);
 }
 

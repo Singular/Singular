@@ -1786,7 +1786,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   {
     for(i=rl-1;i>=0;i--)
     {
-      q[i]=n_Init((*p)[i], currRing->cf);
+      q[i]=n_Init((*p)[i], coeffs_BIGINT);
     }
   }
   else
@@ -1795,32 +1795,19 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     {
       if (pl->m[i].Typ()==INT_CMD)
       {
-        if (return_type==BIGINT_CMD)
-          q[i]=n_Init((int)(long)pl->m[i].Data(),coeffs_BIGINT);
-        else
-          q[i]=n_Init((int)(long)pl->m[i].Data(),currRing->cf);
+        q[i]=n_Init((int)(long)pl->m[i].Data(),coeffs_BIGINT);
       }
       else if (pl->m[i].Typ()==BIGINT_CMD)
       {
-        if (return_type==BIGINT_CMD)
-          q[i]=n_Copy((number)(pl->m[i].Data()),coeffs_BIGINT);
-        else
-          q[i]=n_Init_bigint((number)(pl->m[i].Data()),coeffs_BIGINT,currRing->cf);
+        q[i]=n_Copy((number)(pl->m[i].Data()),coeffs_BIGINT);
       }
       else
       {
         Werror("bigint expected at pos %d",i+1);
-        if (return_type==BIGINT_CMD)
         for(i++;i<rl;i++)
         {
           n_Delete(&(q[i]),coeffs_BIGINT);
         }
-        else
-        for(i++;i<rl;i++)
-        {
-          n_Delete(&(q[i]),currRing);
-        }
-
         omFree(x); // delete c
         omFree(q); // delete pl
         if (xx!=NULL) omFree(xx); // delete c
@@ -1839,15 +1826,9 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     // deletes also x
     res->data=(char *)result;
   }
-  if (return_type==BIGINT_CMD)
   for(i=rl-1;i>=0;i--)
   {
     n_Delete(&(q[i]),coeffs_BIGINT);
-  }
-  else
-  for(i=rl-1;i>=0;i--)
-  {
-    n_Delete(&(q[i]),currRing);
   }
   omFree(q);
   res->rtyp=return_type;

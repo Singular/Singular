@@ -2630,6 +2630,7 @@ number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, const c
     nlDelete(&p2,CF);
     nlDelete(&p,CF);
   }
+  nlNormalize(n,CF);
   return n;
 }
 number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C)
