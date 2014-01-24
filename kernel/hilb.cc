@@ -237,33 +237,42 @@ static void hWDegree(intvec *wdegree)
 //idQuot(I,p) for I monomial ideal, p a ideal with a single monomial.
 ideal idQuotMon(ideal I, ideal p)
 {
-    #if 0
+    //printf("\nOriginal:\n");idPrint(idQuot(I,p,TRUE,TRUE));
+    #if 1
     if(idIs0(I))
     {
-        return(I);
+        ideal res = idInit(1,1);
+        res->m[0] = poly(0);
+        /*printf("\n      ------ idQuotMon\n");
+    idPrint(I);
+    idPrint(p);
+    idPrint(I);getchar();*/
+        return(res);
     }
     if(idIs0(p))
     {
         ideal res = idInit(1,1);
         res->m[0] = pOne();
+        /*printf("\n      ------ idQuotMon\n");
+    idPrint(I);
+    idPrint(p);
+    idPrint(res);getchar();*/
         return(res);
     }
     ideal res = idInit(IDELEMS(I),1);
     int i,j;
-    bool flag;
     int dummy;
     for(i = 0; i<IDELEMS(I); i++)
     {
         res->m[i] = p_Copy(I->m[i], currRing);
-        flag = TRUE;
-        for(j = 1; (j<=currRing->N) && (flag); j++)
+        for(j = 1; (j<=currRing->N) ; j++)
         {
             dummy = p_GetExp(p->m[0], j, currRing);
             if(dummy > 0)
             {
                 if(p_GetExp(I->m[i], j, currRing) < dummy)
                 {
-                    flag = FALSE;
+                    p_SetExp(res->m[i], j, 0, currRing);
                 }
                 else
                 {
@@ -271,37 +280,19 @@ ideal idQuotMon(ideal I, ideal p)
                 }
             }
         }
-        if(!flag)
-        {
-            res->m[i] = NULL;
-        }
-        else
-        {
-            p_Setm(res->m[i], currRing);
-        }
+        p_Setm(res->m[i], currRing);
     }
+    res = idMinBase(res);
     idSkipZeroes(res);
-    if(idIs0(res))
-    {
-        for(i = 0; i< IDELEMS(I); i++)
-        {
-            res->m[i] = p_Copy(I->m[i], currRing);
-        }
-    }
-    printf("\n      ------ idQuotMon\n");
-    idPrint(I);
-    idPrint(p);
-    idPrint(res);getchar();
-    return(res);
     #else
     ideal res;
     res = idQuot(I,p,TRUE,TRUE);
-    //printf("\n      ------ idQuotMon\n");
-    //idPrint(I);
-    //idPrint(p);
-    //idPrint(res);getchar();
-    return(res);
     #endif
+    /*printf("\n      ------ idQuotMon\n");
+    idPrint(I);
+    idPrint(p);
+    idPrint(res);*/
+    return(res);
 } 
 
 //puts in hilbertpowerssorted the two new entries and shifts if needed the old ones
@@ -867,8 +858,8 @@ static poly ChooseP(ideal I)
     //m = ChoosePOF(I);
     //m = ChoosePVL(I);
     //m = ChoosePVF(I);
-    //m = ChoosePJL(I);
-    m = ChoosePJF(I);
+    m = ChoosePJL(I);
+    //m = ChoosePJF(I);
     //printf("\nMy choice was \n");pWrite(m);getchar();
     return(m);
 }
@@ -1210,11 +1201,11 @@ void rouneslice(ideal I, ideal S, poly q, poly x)
     }*/
     //------------------------------------------
     I = SortByDeg(I);
-    //printf("\n---------------------------\n");
-    //printf("\n      I\n");idPrint(I);
-    //printf("\n      S\n");idPrint(S);
-    //printf("\n      q\n");pWrite(q);
-    //getchar();
+    /*printf("\n---------------------------\n");
+    printf("\n      I\n");idPrint(I);
+    printf("\n      S\n");idPrint(S);
+    printf("\n      q\n");pWrite(q);
+    getchar();*/
     
     if(idIs0(I))
     {
@@ -1307,25 +1298,14 @@ void rouneslice(ideal I, ideal S, poly q, poly x)
         break;
         //return;
     }
-    #if 0
-    if(IDELEMS(S)!=1)
-    {
-        m = SearchP(S);
-        if(m == NULL)
-        {
-            m = ChoosePVar(S);
-        }
-    }
-    #else
     m = ChooseP(I);
-    #endif
     p = idInit(1,1);
     p->m[0] = m;
     //idPrint(I);idPrint(p);
     //idTest(I);idTest(p);
     ideal Ip = idQuotMon(I,p);
     Ip = SortByDeg(Ip);
-    ideal Sp = idQuotMon(S,p);
+    ideal Sp = idQuotMon(I,p);
     Sp = SortByDeg(Sp);
     //printf("\np, q = \n");pWrite(m);pWrite(q);
     poly pq = pp_Mult_mm(q,m,currRing);
