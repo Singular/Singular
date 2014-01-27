@@ -298,6 +298,12 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
     res->rtyp=INT_CMD;
     res->data=(void *)(((ring)v->Data())->OrdSgn==1);
   }
+  else if ((strcmp(name,"ring_cf")==0)
+  &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
+  {
+    res->rtyp=INT_CMD;
+    res->data=(void *)(rField_is_Ring((ring)v->Data()));
+  }
   else if (strcmp(name,"qringNF")==0)
   {
     res->rtyp=INT_CMD;
