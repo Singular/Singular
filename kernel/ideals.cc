@@ -1670,6 +1670,9 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   && (setRegularity)
   && (h==isHomog)
   && (!rIsPluralRing(currRing))
+  #ifdef HAVE_RINGS
+  && (rField_is_Ring(currRing))
+  #endif
   )
   {
     ring dp_C_ring = rCurrRingAssure_dp_C();
