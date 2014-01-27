@@ -1735,6 +1735,10 @@ rOrderType_t rGetOrderType(ring r)
     return rOrderType_General;
 }
 
+BOOLEAN rHas_c_Ordering(const ring r)
+{
+  return (r->order[0] == ringorder_c);
+}
 BOOLEAN rHasSimpleOrder(const ring r)
 {
   if (r->order[0] == ringorder_unspec) return TRUE;
@@ -4324,7 +4328,6 @@ void rGetSComps(int** currComponents, long** currShiftedComponents, int *length,
 ring rAssure_SyzComp(const ring r, BOOLEAN complete)
 {
   if ( r->order[0] == ringorder_s ) return r;
-  if ( r->order[0] == ringorder_c ) return r;
 
   if ( r->order[0] == ringorder_IS )
   {

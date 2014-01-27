@@ -731,6 +731,7 @@ ring   rAssure_TDeg(const ring r, int start_var, int end_var, int &pos);
 int rGetMaxSyzComp(int i, const ring r);
 
 BOOLEAN rHasSimpleOrder(const ring r);
+BOOLEAN rHas_c_Ordering(const ring r);
 
 /// returns TRUE, if simple lp or ls ordering
 BOOLEAN rHasSimpleLexOrder(const ring r);
