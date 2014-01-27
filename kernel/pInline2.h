@@ -69,27 +69,26 @@ PINLINE2 void p_Setm(poly p, const ring r)
 }
 
 // component
-PINLINE2  unsigned long p_SetComp(poly p, unsigned long c, ring r)
+PINLINE2  unsigned long p_SetComp(poly p, unsigned long c, const ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  pAssume2(rRing_has_Comp(r));
-  __p_GetComp(p,r) = c;
+  if (r->pCompIndex>=0) __p_GetComp(p,r) = c;
   return c;
 }
-PINLINE2 unsigned long p_AddComp(poly p, unsigned long v, ring r)
+PINLINE2 unsigned long p_AddComp(poly p, unsigned long v, const ring r)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(rRing_has_Comp(r));
   return __p_GetComp(p,r) += v;
 }
-PINLINE2 unsigned long p_SubComp(poly p, unsigned long v, ring r)
+PINLINE2 unsigned long p_SubComp(poly p, unsigned long v, const ring r)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(rRing_has_Comp(r));
   pPolyAssume2(__p_GetComp(p,r) >= v,p,r);
   return __p_GetComp(p,r) -= v;
 }
-PINLINE2 int p_Comp_k_n(poly a, poly b, int k, ring r)
+PINLINE2 int p_Comp_k_n(poly a, poly b, int k, const ring r)
 {
   if ((a==NULL) || (b==NULL) ) return FALSE;
   p_LmCheckPolyRing2(a, r);
