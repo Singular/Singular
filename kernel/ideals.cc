@@ -662,7 +662,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   && (h==isHomog)
   && (!rIsPluralRing(currRing))
   #ifdef HAVE_RINGS
-  && (rField_is_Ring(currRing))
+  && (!rField_is_Ring(currRing))
   #endif
   )
   {
