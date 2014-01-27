@@ -2155,7 +2155,7 @@ static proc deltaP(ideal I)
 }
 
 proc genus(ideal I,list #)
-"USAGE:   genus(I) or genus(I,<option>); I a 1-dimensional ideal
+"USAGE:   genus(I) or genus(I,<option>); I a 1-dimensional ideal over a perfect field
 RETURN:  an integer, the geometric genus p_g = p_a - delta of the projective
          curve defined by i, where p_a is the arithmetic genus.
 NOTE:    delta is the sum of all local delta-invariants of the singularities,
