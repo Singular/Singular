@@ -2755,7 +2755,7 @@ EXAMPLE: example deltaLoc;  shows an example
       }
 
       if(w>=1){"Newton-Polygon is degenerated";"";}
-
+/* need to re-consider the degree bound (de):
       // the following can certainly be made more efficient when replacing
       // 'hnexpansion' (used only for computing number of branches) by
       // successive blowing-up + test if Newton polygon degenerate:
@@ -2788,7 +2788,7 @@ EXAMPLE: example deltaLoc;  shows an example
          option(set,save_opt);
          return(list(d*(mu+nb-1) div 2,d*tau,d*nb));
       }
-
+*/
       f=jet(f,deg(hc)+2);
       if(w>=1){"now we have to use Hamburger-Noether (Puiseux) expansion";}
       ideal fac=factorize(f,1);
