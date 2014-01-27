@@ -126,6 +126,7 @@ Short/cyc5_lp.tst
 Short/dbm_s.tst
 Short/decodegb.tst
 Short/deform_s.tst
+Short/dim-test_for_rings_over_integers.tst
 Short/div_lift_s.tst
 Short/ecyclic_5_32003_lp.tst
 Short/ecyclic_6_32003_lp.tst
