@@ -5645,6 +5645,8 @@ BOOLEAN iiTestAssume(leftv a, leftv b)
   // assume a: level
   if ((a->Typ()==INT_CMD)&&((long)a->Data()>=0))
   {
+    char       assume_yylinebuf[80];
+    strncpy(assume_yylinebuf,my_yylinebuf,79);
     int lev=(long)a->Data();
     int startlev=0;
     idhdl h=ggetid("assumeLevel");
@@ -5654,7 +5656,7 @@ BOOLEAN iiTestAssume(leftv a, leftv b)
       BOOLEAN bo=b->Eval();
       if (bo) { WerrorS("syntax error in ASSUME");return TRUE;}
       if (b->Typ()!=INT_CMD) { WerrorS("ASUMME(<level>,<int expr>)");return TRUE; }
-      if (b->Data()==NULL) { WerrorS("ASSUME failed");return TRUE;}
+      if (b->Data()==NULL) { Werror("ASSUME failed:%s",assume_yylinebuf);return TRUE;}
     }
   }
   else
