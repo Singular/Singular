@@ -4324,6 +4324,7 @@ void rGetSComps(int** currComponents, long** currShiftedComponents, int *length,
 ring rAssure_SyzComp(const ring r, BOOLEAN complete)
 {
   if ( r->order[0] == ringorder_s ) return r;
+  if ( r->order[0] == ringorder_c ) return r;
 
   if ( r->order[0] == ringorder_IS )
   {
