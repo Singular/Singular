@@ -21,11 +21,52 @@ PROCEDURES:
  preimageLoc(R,phi,Q)     computes preimage for non-global orderings
  rootofUnity(n);          the minimal polynomial for the n-th primitive root of unity
              (parameters in square brackets [] are optional)
+ optionIsSet(opt)         check if as a string given option is set or not.
 ";
 
 LIB "inout.lib";
 LIB "general.lib";
 LIB "primdec.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+proc optionIsSet(string optionName)
+"
+USAGE:       @code{optionIsSet( optionName );}
+PARAMETERS:  @code{optionName}: a name(string) of an option of interest
+RETURN:      true, if the by  @code{optionName} given option is active, false otherwise.
+EXAMPLE:     example optionIsSet;
+"
+{
+   def op = option(get);
+   //sanity check, if option is valid. will raise an error if not
+   option(optionName);    option("no" + optionName);
+   option(set,op);
+   // first entry is currently a comment "//options:", which is not an option.
+   int pos = find(option(), optionName, 11 );
+   return(pos>0);
+}
+example
+{ 
+    // check if the option "warn" is set.
+    optionIsSet("warn");
+    option("warn");
+    // now the option is set
+    optionIsSet("warn");
+
+    option("nowarn");
+    // now the option is unset
+    optionIsSet("warn");
+}
+
+
+static proc testOptionIsSet()
+{
+     option("warn");
+     ASSUME(0, optionIsSet("warn") );
+     option("nowarn");
+     ASSUME(0, 0 == optionIsSet("warn") );
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 proc changechar (list @L, list #)
