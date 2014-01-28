@@ -50,6 +50,7 @@ Short/bug_49.tst
 Short/bug_50.tst
 Short/bug_51.tst
 Short/bug_52.tst
+Short/bug_526.tst
 Short/bug_53.tst
 Short/bug_54.tst
 Short/bug_55.tst
@@ -228,6 +229,7 @@ Short/ringmaps.tst
 Short/ringmod2m.tst
 Short/ringmodn.tst
 Short/ringsum.tst
+Short/ringutils_s.tst
 Short/ringz.tst
 Short/rInit.tst
 Short/schwarz_6_32003_lp.tst
