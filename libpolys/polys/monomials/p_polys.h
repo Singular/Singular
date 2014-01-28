@@ -76,6 +76,9 @@ long p_DegW(poly p, const short *w, const ring R);
 /// return TRUE if all monoms have the same component
 BOOLEAN   p_OneComp(poly p, const ring r);
 
+/// check whether leading coefficient is invertible, i.e. p can be made monic
+bool      p_IsPureMonomial(const poly p, const ring r);
+
 /// return i, if head depends only on var(i)
 int       p_IsPurePower(const poly p, const ring r);
 

@@ -992,7 +992,7 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
   ideal SS=id_Copy(S,tailRing);
   for(i=0;i<=idElem(SS);i++)
   	{
-  	if(pIsPurePower(SS->m[i])==0)
+  	if(p_IsPureMonomial(SS->m[i], currRing)==0)
   		p_Delete(&SS->m[i],tailRing);
   	}
   	S=id_Copy(SS,tailRing);

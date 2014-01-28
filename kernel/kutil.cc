@@ -395,7 +395,8 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       i++;
       if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ; // does not divide
       #ifdef HAVE_RINGS
-      ///should check also if the lc is a zero divisor, if it divides all the others
+      // Note: As long as qring j forbidden if j contains integer (i.e. ground rings are 
+      //       domains), no zerodivisor test needed  CAUTION
       if (rField_is_Ring(currRing) && currRing->OrdSgn == -1)
               if(n_DivBy(p_GetCoeff(h,r->cf),lc,r->cf) == 0)
                       return;
@@ -1393,7 +1394,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
   poly m1, m2, gcd;
 
   d = n_ExtGcd(pGetCoeff(p), pGetCoeff(strat->S[i]), &s, &t, currRing->cf);
-
+  
   if (nIsZero(s) || nIsZero(t))  // evtl. durch divBy tests ersetzen
   {
     nDelete(&d);
@@ -3590,6 +3591,7 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
   #if ADIDEBUG
   PrintLn();
+  //getchar();
   PrintS("Enter superenterpairs");
   PrintLn();
   int iii = strat->Ll;
@@ -5780,13 +5782,6 @@ void initS (ideal F, ideal Q, kStrategy strat)
       h.p = pCopy(F->m[i]);
       if (currRing->OrdSgn==-1)
       {
-                    /*#ifdef HAVE_RINGS
-                          if (rField_is_Ring(currRing))
-                            {
-                            h.pCleardenom();
-                            }
-                          else
-                                #endif*/
         cancelunit(&h);  /*- tries to cancel a unit -*/
         deleteHC(&h, strat);
       }
@@ -8021,9 +8016,6 @@ BOOLEAN newHEdge(kStrategy strat)
   /* compare old and new noether*/
   newNoether = pLmInit(strat->kHEdge);
   j = p_FDeg(newNoether,currRing);
-/*  #ifdef HAVE_RINGS
-  if (!rField_is_Ring(currRing))
-  #endif */
   for (i=1; i<=(currRing->N); i++)
   {
     if (pGetExp(newNoether, i) > 0) pDecrExp(newNoether,i);
