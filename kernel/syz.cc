@@ -535,7 +535,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
       res[/*syzIndex+*/1] = idSyzygies(res[0/*syzIndex*/],hom,&w,FALSE,setRegularity,&Kstd1_deg);
       if ((!TEST_OPT_NOTREGULARITY) && (Kstd1_deg>0)
       #ifdef HAVE_RINGS
-      && (!rField_is_Ring(currRing)
+      && (!rField_is_Ring(currRing))
       #endif
       ) si_opt_1 |= Sy_bit(OPT_DEGBOUND);
     }
