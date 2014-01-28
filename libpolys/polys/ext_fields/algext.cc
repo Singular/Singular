@@ -1033,18 +1033,21 @@ number naGenTrans2AlgExt(number a, const coeffs cf, const coeffs dst)
   fraction f = (fraction)a;
   poly g = prMapR(NUM(f), nMap, rSrc, rDst);
 
-  number result;
+  number result=NULL;
   poly h = NULL;
 
   if (!DENIS1(f))
      h = prMapR(DEN(f), nMap, rSrc, rDst);
 
   if (h!=NULL)
+  {
     result=naDiv((number)g,(number)h,dst);
-
-  p_Delete(&g,dst->extRing);
-  if (h!=NULL)
+    p_Delete(&g,dst->extRing);
     p_Delete(&h,dst->extRing);
+  }
+  else
+    result=(number)g;
+
   assume(n_Test((number)result, dst));
   return (number)result;
 }
