@@ -886,7 +886,7 @@ static proc testIsQuotientRing()
    ASSUME(0, 0 == isQuotientRing(rng2) ) ;
 
    qring qrng2=0;
-   ASSUME(0, isQuotientRing(qrng2) ) ;
+   ASSUME(0, not isQuotientRing(qrng2) ) ;
 
    ring rng3 = 0,x,dp;
    ASSUME(0, 0 == isQuotientRing(rng3) ) ;
