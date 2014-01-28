@@ -12,6 +12,5 @@ proc testRingUtils()
 testRingUtils();
 
 
-tst_status(1);
-quit;
+tst_status(1); $;
 
