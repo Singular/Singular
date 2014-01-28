@@ -1217,7 +1217,6 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
   if (k==0)
     k = 1;
   if ((k2==0) && (k>1)) *addOnlyOne = FALSE;
-*addOnlyOne = FALSE;
   intvec * weights;
   hom = (tHomog)idHomModule(h1,currQuotient,&weights);
   if /**addOnlyOne &&*/ (/*(*/ !h1IsStb /*)*/)
@@ -1307,7 +1306,6 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
     #endif
     si_opt_1 |= Sy_bit(OPT_SB_1);
   }
-  idPrint(h4);
   idDelete(&temph1);
   return h4;
 }

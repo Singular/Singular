@@ -344,7 +344,6 @@ int redRing (LObject* h,kStrategy strat)
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0) return 1;
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat); // with debug output
-    //pWrite(strat->T[j].p);rWrite(currRing);getchar();
 
     if (h->GetLmTailRing() == NULL)
     {
