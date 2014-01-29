@@ -7590,7 +7590,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   if(TEST_OPT_SB_1)
   {
     #ifdef HAVE_RINGS
-    if(!rField_is_Ring)
+    if(!rField_is_Ring(currRing))
     #endif
     {
         int i;
@@ -7619,7 +7619,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   if (!TEST_OPT_SB_1)
   {
     #ifdef HAVE_RINGS
-    if(!rField_is_Ring)
+    if(!rField_is_Ring(currRing))
     #endif
     updateS(TRUE,strat);
   }
@@ -7779,7 +7779,7 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
   if(TEST_OPT_SB_1)
   {
     #ifdef HAVE_RINGS
-    if(!rField_is_Ring)
+    if(!rField_is_Ring(currRing))
     #endif
     {
         int i;
@@ -7808,7 +7808,7 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
   if (!TEST_OPT_SB_1)
   {
     #ifdef HAVE_RINGS
-    if(!rField_is_Ring)
+    if(!rField_is_Ring(currRing))
     #endif
     updateS(TRUE,strat);
   }
@@ -9040,7 +9040,7 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
   if(TEST_OPT_SB_1)
   {
     #ifdef HAVE_RINGS
-    if(!rField_is_Ring)
+    if(!rField_is_Ring(currRing))
     #endif
     {
         int i;
@@ -9070,7 +9070,7 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
   {
     /* the only change: we do not fill the set T*/
     #ifdef HAVE_RINGS
-    if(!rField_is_Ring)
+    if(!rField_is_Ring(currRing))
     #endif
     updateS(FALSE,strat);
   }

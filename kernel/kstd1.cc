@@ -2134,7 +2134,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     strat->syzComp = syzComp;
   if (TEST_OPT_SB_1)
     #ifdef HAVE_RINGS
-    if(!rField_is_Ring)
+    if(!rField_is_Ring(currRing))
     #endif
     strat->newIdeal = newIdeal;
   if (rField_has_simple_inverse(currRing))
@@ -2281,7 +2281,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
     strat->syzComp = syzComp;
   if (TEST_OPT_SB_1)
     #ifdef HAVE_RINGS
-    if(!rField_is_Ring)
+    if(!rField_is_Ring(currRing))
     #endif
     strat->newIdeal = newIdeal;
   if (rField_has_simple_inverse(currRing))
@@ -2408,7 +2408,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
     strat->syzComp = syzComp;
   if (TEST_OPT_SB_1)
     #ifdef HAVE_RINGS
-    if(!rField_is_Ring)
+    if(!rField_is_Ring(currRing))
     #endif
     strat->newIdeal = newIdeal;
   if (rField_has_simple_inverse(currRing))

@@ -1607,7 +1607,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (TEST_OPT_SB_1)
   {
     #ifdef HAVE_RINGS
-    if(!rField_is_Ring)
+    if(!rField_is_Ring(currRing))
     #endif
     {
         int k=1;
@@ -2259,7 +2259,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (TEST_OPT_SB_1)
   {
     #ifdef HAVE_RINGS
-    if(!rField_is_Ring)
+    if(!rField_is_Ring(currRing))
     #endif
     {
         int k=1;

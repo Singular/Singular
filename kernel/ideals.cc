@@ -1302,7 +1302,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
     }
     h4->m[IDELEMS(h4)-1] = p;
     #ifdef HAVE_RINGS
-    if(!rField_is_Ring)
+    if(!rField_is_Ring(currRing))
     #endif
     si_opt_1 |= Sy_bit(OPT_SB_1);
   }
