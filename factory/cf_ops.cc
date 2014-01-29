@@ -72,6 +72,7 @@ swapvar_between ( const CanonicalForm & f, CanonicalForm & result, const Canonic
         for ( CFIterator i = f; i.hasTerms(); i++ )
             swapvar_between( i.coeff(), result, term * power( f.mvar(), i.exp() ), expx2 );
 }
+#if 0
 static CanonicalForm
 swapvar_between1 ( const CanonicalForm & f )
 {
@@ -96,6 +97,7 @@ swapvar_between1 ( const CanonicalForm & f )
         return result;
     }
 }
+#endif
 //}}}
 
 //{{{ static void swapvar_rec ( const CanonicalForm & f, CanonicalForm & result, const CanonicalForm & term )
@@ -132,6 +134,7 @@ swapvar_rec ( const CanonicalForm & f, CanonicalForm & result, const CanonicalFo
         for ( CFIterator i = f; i.hasTerms(); i++ )
             swapvar_rec( i.coeff(), result, term * power( f.mvar(), i.exp() ) );
 }
+#if 0
 static CanonicalForm
 swapvar_rec1 ( const CanonicalForm & f )
 {
@@ -154,6 +157,7 @@ swapvar_rec1 ( const CanonicalForm & f )
         return result;
     }
 }
+#endif
 //}}}
 
 //{{{ CanonicalForm swapvar ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
@@ -192,6 +196,7 @@ swapvar ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
         return result;
     }
 }
+#if 0
 CanonicalForm
 swapvar1 ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
 {
@@ -216,6 +221,7 @@ swapvar1 ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
             return swapvar_rec1( f );
     }
 }
+#endif
 //}}}
 
 //{{{ static CanonicalForm replacevar_between ( const CanonicalForm & f )

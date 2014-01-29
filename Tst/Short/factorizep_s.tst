@@ -501,4 +501,44 @@ minpoly=(s6-11914s5+3952s4-5439s3-15290s2-15431s+15606);
 poly f=x32003+y32003+(-15819s5+10130s4-13478s3-9892s2+7280s+7612)+z32003;
 factorize (f);
 
+kill r;
+
+ring r=(17,a),(b,x,y),dp;
+minpoly= a2+a+1;
+poly f= -3*x*y^18+(4*a+1)*x^17*y-8*x^4*y^14+(-2*a-5)*x^17-x^2*y^15+(5*a+3)*x^16-7*x^13*y^3+(4*a+4)*x^11*y^5+(8*a-2)*x^5*y^11+(-7*a+8)*x^10*y^5+(8*a+8)*x^11*y^3+(-a+3)*x^7*y^7-7*x^5*y^9+(a-6)*x*y^13+(6*a-4)*x^7*y^6+(-8*a)*x^5*y^8+(-2*a-2)*y^13+(-2*a-5)*x^12+5*x^6*y^6+(a+7)*x^5*y^7+(-2*a+3)*x^4*y^8+6*x^10*y+(-2*a+8)*x^9*y^2+5*x*y^10+(-3*a+5)*y^11+(-a-4)*y^10+(2*a)*x^6*y^3+(6*a)*x^8+(-a+6)*x^3*y^5-5*y^8+(-4*a+7)*x^6+(-8*a-6)*x^3*y^3+(4*a+4)*x*y^5+(3*a-2)*x^4*y+(8*a-7)*x^2*y^3+4*x*y^4+5*y^4+(6*a-6)*x^3+(4*a+5)*x^2*y+(7*a-2)*x*y-8*y^2+(-6*a+7)*y+(-5*a-2);
+poly g= (6*a+5)*x*y^3+(-3*a-6)*x+(6*a+1);
+poly h= (-7*a+8)*x^2*y+4*y^3+6*x+(-4*a+7)*y+4;
+poly k=f*g*h;
+def l=factorize (k); testfactors (l, k);
+
+kill r;
+
+ring r=(2,a),(x,y,z,s,t,u,v),dp;
+minpoly=a2+a+1;
+poly f= y*z^4*t+y*z^3*s*u+x^2*y*z*u^2+z^3*s*u^2+y*z*s^2*t*v+x*s^2*u*v^2+s*v^5+x*y^4+(a)*x*z^2*s*u+(a)*y*z*s^2*u+y^3*t*u+s^3*t*u+x*z*s*u^2+x*u^4+t*u*v^3+(a)*t*v^4+x*t^2*u+(a+1)*x*y*s*v+(a)*y*z*t*v+(a+1)*s^2*t*v+(a)*y^2*t+y*z*t+x^2*u+x*u^2+s*u^2+(a+1)*u^2+(a+1)*s+v;
+poly g= x*y^2*z*s*t+z^2*s^3*t+x^2*z^2*s*u+x^2*s^2*t*u+t^5*u+x^2*z^2*u^2+x*z*t*u^3+x*s^4*v+y^2*z^2*t*v+y*z*s*t*u*v+x*s*u^2*v^2+(a)*x*y^2*z*u+x*y*z^2*u+(a)*z*u^4+y*z^3*v+(a)*z^3*s*v+(a)*x*z^2*t*v+(a)*z*s^2*t*v+(a)*x*y*t^2*v+t^4*v+y*s*t*u*v+y^2*t*v^2+y*t*u*v^2+(a)*y*s*v^3+y*z^3+(a)*z*s*t*u+(a+1)*s*t*u^2+(a+1)*t^2*u^2+(a+1)*u^4+(a+1)*x^2*s*v+y*s^2*v+y^2*u*v+(a)*x*t*u*v+(a)*y*t*u*v+t^2*u*v+(a)*s*u^2*v+(a)*z^2*v^2+x*u*v^2+(a+1)*t*u*v^2+s*t*u+s^2+(a)*y*t+t^2+(a+1)*s*v;
+poly h= y^2*z*t+x^3*u+z*t^2*u+x^2*z*v+y^3+y*t^2+(a)*t^3+z^2*u+(a)*x*t*u+(a+1)*x*v+z*v+(a+1)*u*v+v+1;
+poly k=f*g*h;
+def l=factorize (k); testfactors (l, k);
+
+kill r;
+
+ring r=(2,a),(x,y),dp;
+minpoly= a2+a+1;
+poly f= (a)*x^4*y^2+(a)*x*y^5+x*y^4+(a+1)*x^4+(a)*x^3+x*y^2;
+poly g= x^2*y^6+x^6*y+x*y^6+(a)*x^3*y^3+x^4+x^3*y+(a+1)*x*y^2+(a+1)*x^2+(a)*x*y+x+1;
+poly h= x^7*y+x^6*y^2+x^6*y+x*y^5+x*y^2+y+(a+1);
+poly k=f*g*h;
+def l=factorize (k); testfactors (l, k);
+
+kill r;
+
+ring r=(17,a),(x,y,z,s,t,u,v),dp;
+minpoly=a2+a+1;
+poly f= -5*y^4*z*s+2*z^2*s^4+6*y^2*z^2*s*t+7*z^2*s^2*t^2+3*x*y^2*z*s*u+4*x*z^3*s*u-x^3*s*t*u+4*y^2*s^2*t*u+2*y*t^3*u^2-8*y^5*v+4*y*z*s^2*t*v-8*y*s^2*t^2*v-8*x*t^3*u*v+4*x^2*z*s*v^2-2*x^2*z^3+2*x*s*t^3+3*s^2*t^3+(-6*a+6)*x*y*z*u^2-3*y*z*s*u^2+(4*a-4)*t^2*u^3+(8*a-8)*x*y*s*t*v+3*z^2*t^2*v-7*z*s*u^2*v+7*x*t*u^2*v+(5*a-5)*y^2*s*v^2+(4*a-4)*y*t^2*v^2-6*z^2*u*v^2+2*x*s*u*v^2+(-6*a+6)*t^2*u*v^2+(5*a-5)*x*t*v^3-8*z*t*v^3+(-3*a+3)*u*v^4+(2*a)*x*y*z^2+(-4*a)*z^3*s-6*x^2*z*t-4*s^3*t+(8*a-8)*y*z*t^2+2*y^2*z*u+(-8*a)*x*z*s*u+(2*a)*u^4+(8*a)*x^3*v+6*x^2*y*v+(-5*a)*z^2*s*v+2*y^2*t*v+(-5*a)*y^2*v^2-6*z^2*v^2-8*y^2*z-4*y*z*s+(-7*a+7)*z^2*s+(-5*a-3)*z*s*t+(6*a)*x*u^2+6*y*u^2+(-6*a)*t*u^2+(-a+8)*z*s*v+(-8*a-4)*z*t*v+(-2*a-1)*t*u*v+(-a)*t*v^2+8*z*t+(-a+8)*s*v+6*x+2;
+poly g= 5*x^5*y-4*x^3*y*z^2+2*x^3*z*s^2+x^2*s*t^3+5*x^5*u+7*x*y*z^3*u+z^2*s^3*u-4*y*z^2*s*t*u-7*x*y*t^3*u+3*z^2*t^3*u+3*s*t^4*u-x*y^3*u^2+8*z^2*u^4+5*x*y^2*z*u*v-2*x^2*z^2*u*v-4*x*y*z*s*u*v-2*s^3*t*u*v-7*z^2*t^2*u*v+3*x*y^2*u^2*v+2*y*s*t*u^2*v+4*y^2*z*s*v^2+7*z^3*u*v^2+5*s^2*u^2*v^2+2*y^2*z*v^3-2*z^3*v^3+t^2*v^4-8*v^6-x*y^3*z+2*x^2*z*s^2+(-6*a+6)*x^4*t+(-5*a+5)*x^3*s*t+(-5*a+5)*x*y*z*t^2+3*y*s*t^3-y*z*s*u^2+6*z*s*t*u^2-4*y^2*u^3+(8*a-8)*y*z*u^3+5*y^3*z*v+(3*a-3)*y*z^3*v-2*x^2*s*t*v+(8*a-8)*s^2*t^2*v+8*x*s*t*u*v+(-2*a+2)*t^2*u^2*v-2*z*s*u*v^2-u^3*v^2+5*x*y*v^3+(a-1)*x^3*y+(a)*y^3*z+(4*a-4)*x*y*z^2+(5*a)*x*y^2*s+(2*a-2)*y*z^2*s-7*y*z*s^2+(3*a-3)*z^3*t+(-a)*z^2*s*t+(3*a)*y*s^2*t+4*y*z*t^2+(3*a)*z^3*u+(7*a)*z^2*t*u+(-4*a)*x*s*t*u-3*x*s*u^2-6*z*u^3+(-2*a)*x*y*z*v+(7*a-7)*z*t*u*v-3*x*s*v^2-8*z*s*v^2+(a-1)*s*u*v^2+4*t*u*v^2+(-8*a-4)*x^2*s+(-8*a)*z^2*s+(-8*a+8)*s^3+(6*a)*x^2*t+(-6*a-3)*z*t^2+(-6*a+6)*x*y*u+(5*a)*s^2*u+(8*a+2)*u^3+(a+2)*t^2*v+8*t*v^2+(5*a+5)*x^2-4*x*s+(7*a+8)*t^2+(a-8)*s*v-8*y+(4*a+8)*z+(-3*a+7)*t-5;
+poly h= 7*y^4-2*x*y^2*z-2*x^3*s+6*x^2*y*t-2*y*s^2*t+z*t^2*u-s^2*u^2+2*z*t*u*v+2*u^2*v^2+(-8*a+8)*x*z^2-8*x*z*t+(8*a-8)*z^2*t+(-7*a+7)*y*z*u+(3*a-3)*x*y*v+z^2*v+8*x*s*v+(8*a-8)*y*s*v+(-4*a+4)*t^2*v+(6*a-6)*u^2*v-6*x*z+(-4*a+4)*s^2-7*x*t+(5*a-5)*u*v-2*u+(-7*a-6);
+poly k=f*g*h;
+def l=factorize (k); testfactors (l,k);
+
 tst_status(1);$

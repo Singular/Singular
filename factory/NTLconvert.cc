@@ -7,10 +7,6 @@
 #include "cf_defs.h"
 #include "canonicalform.h"
 #include "cf_iter.h"
-#include "fac_berlekamp.h"
-#include "fac_cantzass.h"
-#include "fac_univar.h"
-#include "fac_multivar.h"
 #include "fac_sqrfree.h"
 #include "cf_algorithm.h"
 

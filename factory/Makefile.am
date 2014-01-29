@@ -18,7 +18,6 @@ SOURCES = \
 		algext.cc \
 		canonicalform.cc \
 		cf_algorithm.cc \
-		cf_binom.cc \
 		cf_char.cc \
 		cf_chinese.cc \
 		cf_cyclo.cc \
@@ -53,16 +52,9 @@ SOURCES = \
 		facAbsFact.cc \
 		facAlgExt.cc \
 		facBivar.cc \
-		fac_berlekamp.cc \
-		fac_cantzass.cc \
-		fac_distrib.cc \
 		fac_ezgcd.cc \
 		facFactorize.cc \
-		fac_iterfor.cc \
-		fac_multihensel.cc \
-		fac_multivar.cc \
 		fac_sqrfree.cc \
-		fac_univar.cc \
 		fac_util.cc \
 		facFqBivar.cc \
 		facFqBivarUtil.cc \
@@ -105,7 +97,6 @@ factory_headers = \
 		canonicalform.h \
 		cf_algorithm.h \
 		cf_cyclo.h \
-		cf_binom.h \
 		cf_defs.h \
 		cf_eval.h \
 		cf_factory.h \
@@ -132,14 +123,8 @@ factory_headers = \
 		facAbsFact.h \
 		facAlgExt.h \
 		facBivar.h \
-		fac_berlekamp.h \
-		fac_cantzass.h \
-		fac_distrib.h \
 		facFactorize.h \
-		fac_iterfor.h \
-		fac_multivar.h \
 		fac_sqrfree.h \
-		fac_univar.h \
 		fac_util.h \
 		facFqBivar.h \
 		facFqBivarUtil.h \

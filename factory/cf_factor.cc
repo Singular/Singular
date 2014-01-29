@@ -19,10 +19,6 @@
 #include "cf_defs.h"
 #include "canonicalform.h"
 #include "cf_iter.h"
-#include "fac_berlekamp.h"
-#include "fac_cantzass.h"
-#include "fac_univar.h"
-#include "fac_multivar.h"
 #include "fac_sqrfree.h"
 #include "cf_algorithm.h"
 #include "facFqFactorize.h"
@@ -492,10 +488,8 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       else
 #endif //HAVE_NTL
       {  // Use Factory without NTL
-        if ( isOn( SW_BERLEKAMP ) )
-          F=FpFactorizeUnivariateB( f, issqrfree );
-        else
-          F=FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
+        factoryError ("uniivariate factorization not implemented");
+        return CFFList (CFFactor (f, 1));
       }
     }
     else
@@ -572,20 +566,11 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
             F.insert( new_first );
           }
         }
-        //if ( F.getFirst().factor().isOne() )
-        //{
-        //  F.removeFirst();
-        //}
-        //printf("NTL:\n");out_cff(F);
-        //F=ZFactorizeUnivariate( fz, issqrfree );
-        //printf("fac.:\n");out_cff(F);
       }
       #else
       {
-        //Use Factory without NTL
-        //F = ZFactorizeUnivariate( fz, issqrfree );
-	factoryError ("univariate factorization over Z not implemented"); 
-	return CFFList (CFFactor (f, 1));
+        factoryError ("univariate factorization over Z not implemented"); 
+        return CFFList (CFFactor (f, 1));
       }
       #endif
     }
@@ -738,7 +723,8 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     else
     #endif
     {
-      F=FpFactorizeUnivariateCZ( f, false, 1, alpha, Variable() );
+      factoryError ("univariate factorization not implemented");
+      return CFFList (CFFactor (f, 1));
     }
   }
   else if (ch>0)

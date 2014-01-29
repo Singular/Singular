@@ -840,10 +840,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   // use factory/libfac in general ==============================
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
-#ifdef HAVE_NTL
-  extern int prime_number;
-  if(rField_is_Q(r)) prime_number=0;
-#endif
   CFFList L;
   number N=NULL;
   number NN=NULL;
@@ -1214,10 +1210,6 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r)
   // use factory/libfac in general ==============================
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
-  #ifdef HAVE_NTL
-  extern int prime_number;
-  if(rField_is_Q(r)) prime_number=0;
-  #endif
   CFFList L;
   number N=NULL;
   number NN=NULL;
