@@ -31,9 +31,9 @@ LIB "primdec.lib";
 ///////////////////////////////////////////////////////////////////////////////
 proc optionIsSet(string optionName)
 "
-USAGE:       @code{optionIsSet( optionName );}
-PARAMETERS:  @code{optionName}: a name(string) of an option of interest
-RETURN:      true, if the by  @code{optionName} given option is active, false otherwise.
+USAGE:       optionIsSet( optionName )
+PARAMETERS:  optionName: a name as string of an option of interest
+RETURN:      true, if the by optionName given option is active, false otherwise.
 EXAMPLE:     example optionIsSet;
 "
 {
