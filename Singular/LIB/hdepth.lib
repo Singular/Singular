@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 version="version hdepth.lib 4.0.0.0 Jun_2013"; // 
-category=" ?? ";
+category="Commutative Algebra";
 info="
 LIBRARY: hdepth.lib     Procedures for computing hdepth_1
 AUTHORS: Popescu, A.,     popescu@mathematik.uni-kl.de
@@ -11,7 +11,7 @@ KEYWORDS: hdepth, library
 
 
 PROCEDURES:
-  hdepth(M [,debug]);        hdepth_1 computation of a module M
+  hdepth(M [,debug]);        hdepth_1 computation of a module M (wrt Z-grading)
   hdepth_p(g, d, debug) the minimum number t <= d s.t. 1/g^t is positive 
 ";
 
@@ -154,8 +154,8 @@ example
   "EXAMPLE:";echo=2;
   ring R = 0,t,ds;
   poly f = 2-3t-2t2+2t3+4t4;
-  hdepth(f,5,0);
-  hdepth(f,5,1);
+  hdepth_p(f,5,0);
+  hdepth_p(f,5,1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ EXAMPLE: example hdepth; shows examples
     else 
         {debug = 1;}
     M = std(M);
-    int d=dim(M);
+    int d=nvars(basering)-dim(M);
     intvec v=hilb(M,2);
     ring R = 0,t,ds;
     poly hp=hilbconstruct(v);
