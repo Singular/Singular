@@ -242,7 +242,7 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
   if (alpha.level() == 1)
 #endif
     buffer= pthRoot (A, ipower (p, k));
-#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if (HAVE_NTL && HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
   else
   {
     fmpz_t qq;
