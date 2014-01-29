@@ -251,7 +251,7 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
     buffer= pthRoot (A, qq, alpha);
     fmpz_clear (qq);
   }
-#else
+#elif defined(HAVE_NTL)
   else
   {
     ZZ q;
