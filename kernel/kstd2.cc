@@ -343,7 +343,6 @@ int redRing (LObject* h,kStrategy strat)
   {
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0) return 1;
-
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat); // with debug output
 
     if (h->GetLmTailRing() == NULL)
@@ -1607,18 +1606,23 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
   if (TEST_OPT_SB_1)
   {
-    int k=1;
-    int j;
-    while(k<=strat->sl)
+    #ifdef HAVE_RINGS
+    if(!rField_is_Ring)
+    #endif
     {
-      j=0;
-      loop
-      {
-        if (j>=k) break;
-        clearS(strat->S[j],strat->sevS[j],&k,&j,strat);
-        j++;
-      }
-      k++;
+        int k=1;
+        int j;
+        while(k<=strat->sl)
+        {
+          j=0;
+          loop
+          {
+            if (j>=k) break;
+            clearS(strat->S[j],strat->sevS[j],&k,&j,strat);
+            j++;
+          }
+          k++;
+        }
     }
   }
 
@@ -2254,18 +2258,23 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
   if (TEST_OPT_SB_1)
   {
-    int k=1;
-    int j;
-    while(k<=strat->sl)
+    #ifdef HAVE_RINGS
+    if(!rField_is_Ring)
+    #endif
     {
-      j=0;
-      loop
-      {
-        if (j>=k) break;
-        clearS(strat->S[j],strat->sevS[j],&k,&j,strat);
-        j++;
-      }
-      k++;
+        int k=1;
+        int j;
+        while(k<=strat->sl)
+        {
+          j=0;
+          loop
+          {
+            if (j>=k) break;
+            clearS(strat->S[j],strat->sevS[j],&k,&j,strat);
+            j++;
+          }
+          k++;
+        }
     }
   }
 

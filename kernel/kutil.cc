@@ -7589,20 +7589,25 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   }
   if(TEST_OPT_SB_1)
   {
-    int i;
-    ideal P=idInit(IDELEMS(F)-strat->newIdeal,F->rank);
-    for (i=strat->newIdeal;i<IDELEMS(F);i++)
+    #ifdef HAVE_RINGS
+    if(!rField_is_Ring)
+    #endif
     {
-      P->m[i-strat->newIdeal] = F->m[i];
-      F->m[i] = NULL;
+        int i;
+        ideal P=idInit(IDELEMS(F)-strat->newIdeal,F->rank);
+        for (i=strat->newIdeal;i<IDELEMS(F);i++)
+        {
+          P->m[i-strat->newIdeal] = F->m[i];
+          F->m[i] = NULL;
+        }
+        initSSpecial(F,Q,P,strat);
+        for (i=strat->newIdeal;i<IDELEMS(F);i++)
+        {
+          F->m[i] = P->m[i-strat->newIdeal];
+          P->m[i-strat->newIdeal] = NULL;
+        }
+        idDelete(&P);
     }
-    initSSpecial(F,Q,P,strat);
-    for (i=strat->newIdeal;i<IDELEMS(F);i++)
-    {
-      F->m[i] = P->m[i-strat->newIdeal];
-      P->m[i-strat->newIdeal] = NULL;
-    }
-    idDelete(&P);
   }
   else
   {
@@ -7613,6 +7618,9 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   strat->noTailReduction = !TEST_OPT_REDTAIL;
   if (!TEST_OPT_SB_1)
   {
+    #ifdef HAVE_RINGS
+    if(!rField_is_Ring)
+    #endif
     updateS(TRUE,strat);
   }
   if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
@@ -7770,20 +7778,25 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
   }
   if(TEST_OPT_SB_1)
   {
-    int i;
-    ideal P=idInit(IDELEMS(F)-strat->newIdeal,F->rank);
-    for (i=strat->newIdeal;i<IDELEMS(F);i++)
+    #ifdef HAVE_RINGS
+    if(!rField_is_Ring)
+    #endif
     {
-      P->m[i-strat->newIdeal] = F->m[i];
-      F->m[i] = NULL;
+        int i;
+        ideal P=idInit(IDELEMS(F)-strat->newIdeal,F->rank);
+        for (i=strat->newIdeal;i<IDELEMS(F);i++)
+        {
+          P->m[i-strat->newIdeal] = F->m[i];
+          F->m[i] = NULL;
+        }
+        initSSpecialSba(F,Q,P,strat);
+        for (i=strat->newIdeal;i<IDELEMS(F);i++)
+        {
+          F->m[i] = P->m[i-strat->newIdeal];
+          P->m[i-strat->newIdeal] = NULL;
+        }
+        idDelete(&P);
     }
-    initSSpecialSba(F,Q,P,strat);
-    for (i=strat->newIdeal;i<IDELEMS(F);i++)
-    {
-      F->m[i] = P->m[i-strat->newIdeal];
-      P->m[i-strat->newIdeal] = NULL;
-    }
-    idDelete(&P);
   }
   else
   {
@@ -7794,6 +7807,9 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
   strat->noTailReduction = !TEST_OPT_REDTAIL;
   if (!TEST_OPT_SB_1)
   {
+    #ifdef HAVE_RINGS
+    if(!rField_is_Ring)
+    #endif
     updateS(TRUE,strat);
   }
   if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
@@ -9023,20 +9039,25 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
   }
   if(TEST_OPT_SB_1)
   {
-    int i;
-    ideal P=idInit(IDELEMS(F)-strat->newIdeal,F->rank);
-    for (i=strat->newIdeal;i<IDELEMS(F);i++)
+    #ifdef HAVE_RINGS
+    if(!rField_is_Ring)
+    #endif
     {
-      P->m[i-strat->newIdeal] = F->m[i];
-      F->m[i] = NULL;
+        int i;
+        ideal P=idInit(IDELEMS(F)-strat->newIdeal,F->rank);
+        for (i=strat->newIdeal;i<IDELEMS(F);i++)
+        {
+          P->m[i-strat->newIdeal] = F->m[i];
+          F->m[i] = NULL;
+        }
+        initSSpecial(F,Q,P,strat);
+        for (i=strat->newIdeal;i<IDELEMS(F);i++)
+        {
+          F->m[i] = P->m[i-strat->newIdeal];
+          P->m[i-strat->newIdeal] = NULL;
+        }
+        idDelete(&P);
     }
-    initSSpecial(F,Q,P,strat);
-    for (i=strat->newIdeal;i<IDELEMS(F);i++)
-    {
-      F->m[i] = P->m[i-strat->newIdeal];
-      P->m[i-strat->newIdeal] = NULL;
-    }
-    idDelete(&P);
   }
   else
   {
@@ -9048,6 +9069,9 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
   if (!TEST_OPT_SB_1)
   {
     /* the only change: we do not fill the set T*/
+    #ifdef HAVE_RINGS
+    if(!rField_is_Ring)
+    #endif
     updateS(FALSE,strat);
   }
   if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));

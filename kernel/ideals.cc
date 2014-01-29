@@ -1213,12 +1213,10 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
   int k1 = id_RankFreeModule(h1,currRing);
   int k2 = id_RankFreeModule(h2,currRing);
   tHomog   hom=isNotHomog;
-
   k=si_max(k1,k2);
   if (k==0)
     k = 1;
   if ((k2==0) && (k>1)) *addOnlyOne = FALSE;
-
   intvec * weights;
   hom = (tHomog)idHomModule(h1,currQuotient,&weights);
   if /**addOnlyOne &&*/ (/*(*/ !h1IsStb /*)*/)
@@ -1303,6 +1301,9 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
       h4->m[i] = h4->m[i+1];
     }
     h4->m[IDELEMS(h4)-1] = p;
+    #ifdef HAVE_RINGS
+    if(!rField_is_Ring)
+    #endif
     si_opt_1 |= Sy_bit(OPT_SB_1);
   }
   idDelete(&temph1);

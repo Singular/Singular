@@ -2493,6 +2493,20 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           return FALSE;
         }
         else
+  /*==================== setsyzcomp ==================================*/
+      if(strcmp(sys_cmd,"setsyzcomp")==0)
+      {
+      
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+         {
+           int k = (int)(long)h->Data();
+           if ( currRing->order[0] == ringorder_s )
+           {
+                rSetSyzComp(k, currRing);
+           }
+          }
+      
+      }
   /*==================== ring debug ==================================*/
         if(strcmp(sys_cmd,"r")==0)
         {
