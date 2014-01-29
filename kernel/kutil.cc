@@ -7616,11 +7616,12 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   }
   strat->fromT = FALSE;
   strat->noTailReduction = !TEST_OPT_REDTAIL;
-  if (!TEST_OPT_SB_1)
+  if ((!TEST_OPT_SB_1)
+  #ifdef HAVE_RINGS
+  || (rField_is_Ring(currRing))
+  #endif
+  )
   {
-    #ifdef HAVE_RINGS
-    if(!rField_is_Ring(currRing))
-    #endif
     updateS(TRUE,strat);
   }
   if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
