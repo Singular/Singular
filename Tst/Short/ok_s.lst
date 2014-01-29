@@ -5,6 +5,7 @@ alexpoly
 algebralib
 alias
 allres_s
+arcAtPoint
 barei_s
 betti_s
 bug_1
@@ -51,6 +52,7 @@ bug_5
 bug_50
 bug_51
 bug_52
+bug_526
 bug_53
 bug_54
 bug_55
@@ -77,6 +79,7 @@ bug_mres
 bug_napMultT
 bug_newstruct
 bug_newstruct2
+bug_newstruct3
 bug_pd
 bug_presolve
 bug_primdec
@@ -88,6 +91,9 @@ bug_radcon
 bug_reduce
 bug_rp
 bug_ring_quot
+bug_sres
+bug_sres_betti
+bug_sres_cyc5
 bug_tr132
 bug_tr134
 bug_tr158
@@ -101,8 +107,6 @@ bug_tr237
 bug_tr239
 ; do not try bug_tr276 without 2.2 GB RAM free
 ; bug_tr276
-; do not try bug_tr280 without MP
-; bug_tr280
 bug_tr288
 bug_tr300
 bug_tr306
@@ -123,17 +127,15 @@ bug_tr485
 bug_tr501
 bug_532_s
 bug_538_s
+bug_x_i_j
 brnoeth_s
 countedref_s
-cyc5_lp
-bug_sres
-bug_sres_betti
-bug_sres_cyc5
-bug_x_i_j
 classify_s
+cyc5_lp
 dbm_s
 deform_s
 decodegb
+dim-test_for_rings_over_integers
 div_lift_s
 ecyclic_5_32003_lp
 ecyclic_6_32003_lp
@@ -178,7 +180,6 @@ gcd_univar_p_alpha_s
 gerhard_1_32003_lp
 Gonnet-83_32003_dp_slim
 Gonnet-83_1_32003_dp_slim
-;MP general_s
 graphics
 groebner_s
 highcorner_s
@@ -211,7 +212,6 @@ mora_5
 mora_6
 mora_7
 mora_9
-; mpsr_s
 mres_s
 ncfactor_example2_7FromMaster_s
 ncfactor_example_all_procedures_s
@@ -236,6 +236,8 @@ primefactors
 primitiv_s
 qhw_s
 quotient_s
+rcyclic_13_32003_lp
+rcyclic_14_32003_lp
 rcyclic_15_32003_lp
 rcyclic_16_32003_lp
 rcyclic_17_32003_lp
@@ -245,6 +247,7 @@ reesclos
 rInit
 reduce_s
 res_s
+resjung
 resources_s
 resultantp_s
 ringlist-z
@@ -252,7 +255,9 @@ ringmaps
 ringmod2m
 ringmodn
 ringsum
+ringutils_s
 ringz
+rInit
 schwarz_6_32003_lp 
 schwarz_7_32003_lp
 schwarz_8_32003_lp
@@ -271,7 +276,6 @@ spcurve
 spectrumlib
 sres_s
 std_s
-;MP stratify
 string
 tasks_s
 test_c_dp
@@ -320,3 +324,4 @@ zerodim_8_32003_lp_slimgb
 zerodim_9_32003_lp_slimgb
 Zdim_s
 ZidealAdd_s
+sba_s
