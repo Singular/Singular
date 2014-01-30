@@ -7587,11 +7587,11 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
     if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
     if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
   }
-  if(TEST_OPT_SB_1)
+  #ifdef HAVE_RINGS
+  if(!rField_is_Ring(currRing))
+  #endif
   {
-    #ifdef HAVE_RINGS
-    if(!rField_is_Ring(currRing))
-    #endif
+    if(TEST_OPT_SB_1)
     {
         int i;
         ideal P=idInit(IDELEMS(F)-strat->newIdeal,F->rank);
@@ -7777,11 +7777,11 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
     if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
     if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
   }
-  if(TEST_OPT_SB_1)
+  #ifdef HAVE_RINGS
+  if(!rField_is_Ring(currRing))
+  #endif
   {
-    #ifdef HAVE_RINGS
-    if(!rField_is_Ring(currRing))
-    #endif
+    if(TEST_OPT_SB_1)
     {
         int i;
         ideal P=idInit(IDELEMS(F)-strat->newIdeal,F->rank);
@@ -9038,11 +9038,11 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
     if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
     if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
   }
-  if(TEST_OPT_SB_1)
+  #ifdef HAVE_RINGS
+  if(!rField_is_Ring(currRing))
+  #endif
   {
-    #ifdef HAVE_RINGS
-    if(!rField_is_Ring(currRing))
-    #endif
+    if(TEST_OPT_SB_1)
     {
         int i;
         ideal P=idInit(IDELEMS(F)-strat->newIdeal,F->rank);
