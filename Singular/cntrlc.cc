@@ -425,7 +425,7 @@ static void debug (int method)
   }
   int pid;
   char buf[16];
-  char * args[4] = { (char*)"gdb", (char*)"Singularg", NULL, NULL };
+  char * args[4] = { (char*)"gdb", (char*)"Singular", NULL, NULL };
 
   #ifdef HAVE_FEREAD
   if (fe_is_raw_tty) fe_temp_reset();
