@@ -1056,7 +1056,7 @@ static void heGenHelp(heEntry hentry, int br)
                    char temp[256];
                    sprintf(temp,"%d-%d-%d",SINGULAR_VERSION/1000,
 		                 (SINGULAR_VERSION % 1000)/100,
-		                 (SINGULAR_VERSION % 100));
+		                 (SINGULAR_VERSION % 100)/10);
                    strcat(sys,temp);
                    i=strlen(sys);
                    break;
