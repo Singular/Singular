@@ -29,15 +29,7 @@ static int  **Qpol;
 static int  *Q0, *Ql;
 static int  hLength;
 //ADICHANGES
-static int NNN;
-static mpz_t ec;
-static mpz_ptr hilbertcoef = (mpz_ptr)omAlloc(NNN*sizeof(mpz_t));
-static std::vector<int> hilbertpowers;
-static std::vector<int> hilbertpowerssorted;
 static std::vector<int> degsort;
-static std::vector<int> eulerprop;
-static ideal eulersimp;
-static int steps, prune = 0, moreprune = 0, eulerstep, eulerskips=0;
    
 
 static int hMinModulweight(intvec *modulweight)
@@ -293,56 +285,6 @@ ideal idQuotMon(ideal I, ideal p)
     idPrint(p);
     idPrint(res);*/
     return(res);
-} 
-
-//puts in hilbertpowerssorted the two new entries and shifts if needed the old ones
-static void PutInVector(int degvalue, int oldposition, int where)
-{
-    hilbertpowerssorted.resize(hilbertpowerssorted.size()+2);
-    int i;
-    for(i=hilbertpowerssorted.size()-1;i>=where+2;i--)
-    {
-        hilbertpowerssorted[i] = hilbertpowerssorted[i-2];
-    }
-    hilbertpowerssorted[where] = degvalue;
-    hilbertpowerssorted[where+1] = oldposition;
-}
-
-//sorts hilbertpowers (new finds the positions)
-static void SortPowerVec()
-{
-    int i,j;
-    int test;
-    bool flag;
-    //printf("Size of hilbertpowers: %i", hilbertpowers.size());
-    hilbertpowerssorted.resize(2);
-    hilbertpowerssorted[0] = hilbertpowers[0];
-    hilbertpowerssorted[1] = 0;
-    for(i=1;i<hilbertpowers.size();i++)
-    {
-        flag=TRUE;
-        if(hilbertpowers[i]<=hilbertpowerssorted[0])
-        {
-            flag=FALSE;
-            PutInVector(hilbertpowers[i], i, 0);
-        }
-        if((hilbertpowers[i]>=hilbertpowerssorted[hilbertpowerssorted.size()-2]) && (flag == TRUE))
-        {
-            flag=FALSE;
-            PutInVector(hilbertpowers[i], i, hilbertpowerssorted.size()-2);
-        }
-        if(flag==TRUE)
-        {
-            for(j=2;(j<=hilbertpowerssorted.size()-4)&&(flag);j=j+2)
-            {
-                if(hilbertpowers[i]<=hilbertpowerssorted[j])
-                {
-                    flag=FALSE;
-                    PutInVector(hilbertpowers[i], i, j);
-                }
-            }
-        }
-    }
 }
 
 //returns the degree of the monomial
@@ -482,97 +424,6 @@ static ideal idAddMon(ideal I, ideal p)
     I = SortByDeg(I);
     return(I);
 }
-
-#if 0
-//Constructs a list of the simplices (for which we have to compute the Euler Characteristic)
-static void eulerSimpAdd(ideal newsimp)
-{
-    if(idIs0(newsimp))
-    {
-        return;
-    }
-    ideal P;
-    int i;
-    bool flag;
-    P = idInit(1,1);
-    for(i=0;i<IDELEMS(newsimp);i++)
-    {
-        P->m[0] = pAdd(P->m[0], pCopy(newsimp->m[i]));
-    }
-    poly p = pCopy(P->m[0]);
-    //idPrint(eulersimp);
-    //idPrint(newsimp);
-    //idPrint(P);
-    int terms = 0, deg = 0, howmanyvars = 0;
-    terms = IDELEMS(newsimp);
-    deg = DegMon(newsimp->m[0]);
-    flag=TRUE;
-    for(i=1;(i<IDELEMS(newsimp))&&(flag==TRUE);i++)
-    {
-        
-        if(deg != DegMon(newsimp->m[i]))
-        {
-            //The ideal is not homogenous
-            flag=FALSE;
-        }
-    }
-    if(!flag)
-    {
-        deg = 0;
-    }
-    int* e;
-    howmanyvars = pGetVariables(p, e);
-    flag = FALSE;
-    int thisone;
-    //idPrint(eulersimp);
-    if(idIs0(eulersimp))
-    {
-        eulersimp = idAddMon(eulersimp, P);
-        eulerprop.resize(eulerprop.size()+3);
-        eulerprop[eulerprop.size()-3] = terms ;
-        eulerprop[eulerprop.size()-2] = deg ;
-        eulerprop[eulerprop.size()-1] = howmanyvars ;
-        return;
-    }
-    //for(i=0;i<IDELEMS(eulersimp);i++)
-    //{
-    //    printf("\n%i %i %i\n",eulerprop[3*i],eulerprop[3*i+1],eulerprop[3*i+2]);
-    //}
-    i=0;
-    
-    for(i = 0; (i<IDELEMS(eulersimp)) && (!flag);i++)
-    {
-        if((eulerprop[3*i] == terms) && (eulerprop[3*i+1] == deg) && (eulerprop[3*i+2] == howmanyvars))
-        {
-            //  !!!!!!!!!!!!!!!!!!!have to do it!!!!!!!!!!!!!!!!!!!!!!!!!!
-            //if(TestIfIsSame(p, eulersimp->m[i]))
-            {
-                flag = TRUE;
-                thisone = i;
-                //It is the the same simplex, and hence we already know it's euler characteristic
-            }
-        }
-    }
-    if(!flag)
-    {
-        eulersimp = idAddMon(eulersimp, P);
-        eulerprop.resize(eulerprop.size()+3);
-        eulerprop[eulerprop.size()-3] = terms ;
-        eulerprop[eulerprop.size()-2] = deg ;
-        eulerprop[eulerprop.size()-1] = howmanyvars ;
-    }
-    if(flag)
-    {
-        eulerskips++;
-        hilbertcoef = (mpz_ptr)omRealloc(hilbertcoef, (NNN+1)*sizeof(mpz_t));
-        mpz_init(&hilbertcoef[NNN]);
-        mpz_set(&hilbertcoef[NNN], &hilbertcoef[thisone]);
-        hilbertpowers.resize(NNN+1);
-        NNN++;
-    }
-    return;
-}
-#endif
 
 //searches for a variable that is not yet used (assumes that the ideal is sqrfree)
 static poly ChoosePVar (ideal I)
@@ -920,12 +771,10 @@ static bool JustVar(ideal I)
 }
 
 //computes the Euler Characteristic of the ideal
-static void eulerchar (ideal I, int variables)
+static void eulerchar (ideal I, int variables, mpz_ptr ec)
 {
   loop
   {
-    //idPrint(I);printf("%i", variables);
-    eulerstep++;
     mpz_t dummy;
     if(JustVar(I) == TRUE)
     {
@@ -943,7 +792,6 @@ static void eulerchar (ideal I, int variables)
     }
     ideal p = idInit(1,1);
     p->m[0] = SearchP(I);
-    //pWrite(p->m[0]);
     ideal Ip = idQuotMon(I,p);
     Ip = SortByDeg(Ip);
     int i,howmanyvarinp = 0;
@@ -954,12 +802,8 @@ static void eulerchar (ideal I, int variables)
             howmanyvarinp++;
         }
     }    
-    eulerchar(Ip, variables-howmanyvarinp);
+    eulerchar(Ip, variables-howmanyvarinp, ec);
     id_Delete(&Ip, currRing);
-    //ideal Iplusp = idAddMon(I,p);
-    //eulerchar(Iplusp, variables);
-    //id_Delete(&Iplusp, currRing);
-    //return;
     I = idAddMon(I,p);
   }
 }
@@ -1012,38 +856,6 @@ static bool IsIn(poly p, ideal I)
     {
         return(FALSE);
     }
-    //if(DegMon(p)<DegMon(I->m[IDELEMS(I)-1]))
-    //{
-    //    return(FALSE);
-    //}
-    #if 0
-    if(p == NULL)
-    {
-        if(IDELEMS(I) == 0)
-        {
-            return(TRUE);
-        }
-        if(IDELEMS(I) == 1)
-        {
-            if(I->m[0] == poly(0))
-            {
-                return(TRUE);
-            }
-        }
-        return(FALSE);
-    }
-    if(IDELEMS(I)==0)
-    {
-        return(FALSE);
-    }
-    if(IDELEMS(I) == 1)
-    {
-        if(I->m[0] == poly(0))
-            {
-                return(FALSE);
-            }    
-    }
-    #endif
     int i,j;
     bool flag;
     for(i = 0;i<IDELEMS(I);i++)
@@ -1090,39 +902,14 @@ static poly LCMmon(ideal I)
     return(m);
 }
 
-#if 0
-//return TRUE if a | b, a, b monomials
-static bool Divides(poly a, poly b)
-{
-    if(a == NULL)
-    {
-        return(FALSE);
-    }
-    if(b == NULL)
-    {
-        return(TRUE);
-    }
-    int i;
-    for(i=1;i<=currRing->N;i++)
-    {
-        if(p_GetExp(a,i,currRing) > p_GetExp(b,i,currRing))
-        {
-            return(FALSE);
-        }
-    }
-    return(TRUE);
-}
-#endif
-
 //the Roune Slice Algorithm
-void rouneslice(ideal I, ideal S, poly q, poly x)
+void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, int &steps, int &NNN, mpz_ptr &hilbertcoef, int* &hilbpower)
 {
   loop
   {
-    steps++;
+    (steps)++;
     int i,j;
     int dummy;
-    mpz_t dummympz;
     poly m;
     clock_t t;
     t=clock();
@@ -1133,7 +920,6 @@ void rouneslice(ideal I, ideal S, poly q, poly x)
     {
         if(IsIn(S->m[i],I))
         {
-            //idPrint(I);idPrint(S);getchar();
             S->m[i]=NULL;
             prune++;
         }
@@ -1158,10 +944,8 @@ void rouneslice(ideal I, ideal S, poly q, poly x)
             }       
         }
         p_Setm(m, currRing);
-        //printf("\n Check if m is in S: %i\n", IsIn(m,S));pWrite(m);idPrint(S);
         if(IsIn(m,S))
         {
-            //printf("\nIt was deleted: \n");pWrite(I->m[i]);
             I->m[i]=NULL;
             //printf("\n Deleted, since pi(m) is in S\n");pWrite(m);
         }
@@ -1209,34 +993,17 @@ void rouneslice(ideal I, ideal S, poly q, poly x)
     
     if(idIs0(I))
     {
-        /*if(!pIsConstantPoly(q))
-        {
-            mpz_init(dummympz);
-            mpz_set_si(dummympz, -1);
-            hilbertcoef = (mpz_ptr)omRealloc(hilbertcoef, (NNN+1)*sizeof(mpz_t));
-            mpz_init(&hilbertcoef[NNN]);
-            mpz_set(&hilbertcoef[NNN], dummympz);
-            hilbertpowers.resize(NNN+1);
-            hilbertpowers[NNN] = DegMon(q);
-            NNN++;
-            pWrite(q);
-            //printf("\nOld ERROR\n");getchar();
-        }*/
         id_Delete(&I, currRing);
         id_Delete(&S, currRing);
         p_Delete(&m, currRing);
         break;
-        //return;
     }
     S = SortByDeg(S);
     m = LCMmon(I);
     if(!p_DivisibleBy(x,m, currRing))
     {
         //printf("\nx does not divide lcm(I)");
-        //pWrite(x);pWrite(m);idPrint(I);
         //printf("\nEmpty set");pWrite(q);
-        //idPrint(S);pWrite(q);
-        //getchar();
         id_Delete(&I, currRing);
         id_Delete(&S, currRing);
         p_Delete(&m, currRing);
@@ -1253,85 +1020,92 @@ void rouneslice(ideal I, ideal S, poly q, poly x)
         for(i=IDELEMS(I)-1;i>=0;i--)
         {
             koszsimp->m[i] = I->m[i];
-            //pWrite(koszsimp->m[i]);
-            /*for(j = 1;j<=currRing->N;j++)
-            {
-                if(p_GetExp(koszsimp->m[i],j,currRing)!=0)
-                {
-                    p_SetExp(koszsimp->m[i],j,0,currRing);
-                }
-                else
-                {
-                    p_SetExp(koszsimp->m[i],j,1,currRing);
-                }
-            }*/
-            //pWrite(koszsimp->m[i]);
         }
         //idPrint(koszsimp);
         //getchar();
         //printf("\n Euler Characteristic = ");
-        mpz_init(dummympz);
         t = clock();
-        eulerstep=0;
         //idPrint(koszsimp);
         //getchar();
-        eulerchar(koszsimp, currRing->N);
-        if(((float)(clock()-t)/CLOCKS_PER_SEC)!=0)
+        mpz_t ec;
+        mpz_init(ec);
+        mpz_ptr ec_ptr = ec;
+        eulerchar(koszsimp, currRing->N, ec_ptr);
+        bool flag = FALSE;
+        if(NNN==0)
+            {
+                hilbertcoef = (mpz_ptr)omAlloc((NNN+1)*sizeof(mpz_t));
+                hilbpower = (int*)omAlloc((NNN+1)*sizeof(int));
+                mpz_init( &hilbertcoef[NNN]);
+                mpz_set(  &hilbertcoef[NNN], ec);
+                mpz_clear(ec);
+                hilbpower[NNN] = DegMon(q);
+                NNN++;
+            }
+        else
         {
-            //printf("\nEulerChar took %f \n",(float)(clock()-t)/CLOCKS_PER_SEC);
-            //idPrint(koszsimp);getchar();
+            //I look if the power appears already
+            for(i = 0;(i<NNN)&&(flag == FALSE)&&(DegMon(q)>=hilbpower[i]);i++)
+            {
+                if((hilbpower[i]) == (DegMon(q)))
+                {
+                    flag = TRUE;
+                    mpz_add(&hilbertcoef[i],&hilbertcoef[i],ec_ptr);
+                }
+            }
+            if(flag == FALSE)
+            {
+                hilbertcoef = (mpz_ptr)omRealloc(hilbertcoef, (NNN+1)*sizeof(mpz_t));
+                hilbpower = (int*)omRealloc(hilbpower, (NNN+1)*sizeof(int));
+                mpz_init(&hilbertcoef[NNN]);
+                for(j = NNN; j>i; j--)
+                {
+                    mpz_set(&hilbertcoef[j],&hilbertcoef[j-1]);
+                    hilbpower[j] = hilbpower[j-1];
+                }
+                mpz_set(  &hilbertcoef[i], ec);
+                mpz_clear(ec);
+                hilbpower[i] = DegMon(q);
+                NNN++;
+            }
         }
-        //printf("\nEulerChar tooked %i steps\n", eulerstep);
-        //gmp_printf("dummy %Zd \n", dummympz);
-        //gmp_printf("ec %Zd \n", ec);
+        #if 0
+        for(i = 0; i<NNN; i++)
+        {
+            gmp_printf("\n//  %8Zd t^%d",&hilbertcoef[i],hilbpower[i]);
+        }
+        printf("\n");
         //getchar();
-        //if(DegMon(q)==7) {getchar();}
-        mpz_set(dummympz, ec);
-        mpz_sub(ec, ec, ec);
-        hilbertcoef = (mpz_ptr)omRealloc(hilbertcoef, (NNN+1)*sizeof(mpz_t));
-        mpz_init(&hilbertcoef[NNN]);
-        mpz_set(&hilbertcoef[NNN], dummympz);
-        mpz_clear(dummympz);
-        hilbertpowers.resize(NNN+1);
-        hilbertpowers[NNN] = DegMon(q);
-        NNN++;
+        #endif
         break;
-        //return;
     }
     m = ChooseP(I);
     p = idInit(1,1);
     p->m[0] = m;
-    //idPrint(I);idPrint(p);
-    //idTest(I);idTest(p);
     ideal Ip = idQuotMon(I,p);
     Ip = SortByDeg(Ip);
     ideal Sp = idQuotMon(I,p);
     Sp = SortByDeg(Sp);
-    //printf("\np, q = \n");pWrite(m);pWrite(q);
     poly pq = pp_Mult_mm(q,m,currRing);
-    rouneslice(Ip, Sp, pq, x);
-    //idPrint(Ip);
-    //id_Delete(&Ip, currRing);
-    //id_Delete(&Sp, currRing);
+    rouneslice(Ip, Sp, pq, x, prune, moreprune, steps, NNN, hilbertcoef,hilbpower);
+    id_Delete(&Ip, currRing);
+    id_Delete(&Sp, currRing);
     S = idAddMon(S,p);
-    //p->m[0]=NULL; id_Delete(&p, currRing); // p->m[0] was also in S
+    p->m[0]=NULL; 
+    id_Delete(&p, currRing); // p->m[0] was also in S
     p_Delete(&pq,currRing);
-    //Splusp = idSimplify(Splusp);
-  //  rouneslice(I, S, q, x);  tail-recursion solved via loop
-
-    //id_Delete(&Splusp, currRing);
-    //return;
   }
 }
-
 
 //it computes the first hilbert series by means of Roune Slice Algorithm
 void slicehilb(ideal I)
 {
     I = SortByDeg(I);
     printf("Adi changes are here: \n");
-    int i;
-    eulersimp = idInit(1,1);
+    int i, NNN = 0;
+    int steps = 0, prune = 0, moreprune = 0;
+    mpz_ptr hilbertcoef;
+    int *hilbpower;
     ideal S = idInit(1,1);
     poly q = p_ISet(1,currRing);
     ideal X = idInit(1,1);
@@ -1343,48 +1117,24 @@ void slicehilb(ideal I)
     p_Setm(X->m[0],currRing);
     I = id_Mult(I,X,currRing);
     printf("\n-------------RouneSlice--------------\n");
-    steps=0;
-    rouneslice(I,S,q,X->m[0]);
+    rouneslice(I,S,q,X->m[0],prune, moreprune, steps, NNN, hilbertcoef, hilbpower);
     printf("\nIn total Prune got rid of %i elements\n",prune);
     printf("\nIn total More Prune got rid of %i elements\n",moreprune);
-    //printf("\nWe skipped computing the EulerChar for %i simplices\n",eulerskips);
     printf("\nSteps of rouneslice: %i\n\n", steps);
-    /*for(i=0;i<NNN;i++)
-    {
-        gmp_printf(" %Zd ", &hilbertcoef[i]);
-    }
-    printf("\n");
-    for(i=0;i<NNN;i++)
-    {
-        printf(" %d ", hilbertpowers[i]);
-    }*/
-    SortPowerVec();
-    /*printf("\n");
-    for(i=0;i<hilbertpowerssorted.size();i++)
-    {
-        printf(" %d ", hilbertpowerssorted[i]);
-    }*/
     mpz_t coefhilb;
     mpz_t dummy;
     mpz_init(coefhilb);
     mpz_init(dummy);
     printf("\n//  %8d t^0",1);
-    for(i=0;i<hilbertpowerssorted.size();i=i+2)
+    for(i = 0; i<NNN; i++)
     {
-        mpz_set(dummy, &hilbertcoef[hilbertpowerssorted[i+1]]);
-        mpz_add(coefhilb, coefhilb, dummy);
-        while((hilbertpowerssorted[i]==hilbertpowerssorted[i+2]) && (i<=hilbertpowerssorted.size()-2))
+        if(mpz_sgn(&hilbertcoef[i])!=0)
         {
-            i=i+2;
-            mpz_add(coefhilb, coefhilb, &hilbertcoef[hilbertpowerssorted[i+1]]);
+            gmp_printf("\n//  %8Zd t^%d",&hilbertcoef[i],hilbpower[i]);
         }
-        if(mpz_sgn(coefhilb)!=0)
-        {
-            gmp_printf("\n//  %8Zd t^%d",coefhilb,hilbertpowerssorted[i]);
-        }
-        mpz_sub(coefhilb, coefhilb, coefhilb);
     }
-    omFreeSize(hilbertcoef, NNN*sizeof(mpz_t));
+    omFreeSize(hilbertcoef, (NNN)*sizeof(mpz_t));
+    omFreeSize(hilbpower, (NNN)*sizeof(int));
     printf("\n-------------------------------------\n");
 }
 
