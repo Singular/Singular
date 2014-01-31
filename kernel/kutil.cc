@@ -7588,7 +7588,11 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
     if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
   }
   #ifdef HAVE_RINGS
-  if(!rField_is_Ring(currRing))
+  if(rField_is_Ring(currRing))
+  {
+    /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
+  }
+  else
   #endif
   {
     if(TEST_OPT_SB_1)
@@ -7608,11 +7612,12 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
         }
         idDelete(&P);
     }
-  }
-  else
-  {
-    /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
-    // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
+  
+    else
+    {
+      /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
+      // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
+    }
   }
   strat->fromT = FALSE;
   strat->noTailReduction = !TEST_OPT_REDTAIL;
@@ -7778,7 +7783,11 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
     if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
   }
   #ifdef HAVE_RINGS
-  if(!rField_is_Ring(currRing))
+  if(rField_is_Ring(currRing))
+  {
+    /*Shdl=*/initSLSba(F, Q,strat); /*sets also S, ecartS, fromQ */
+  }
+  else
   #endif
   {
     if(TEST_OPT_SB_1)
@@ -7798,11 +7807,11 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
         }
         idDelete(&P);
     }
-  }
-  else
-  {
-    /*Shdl=*/initSLSba(F, Q,strat); /*sets also S, ecartS, fromQ */
-    // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
+    else
+    {
+      /*Shdl=*/initSLSba(F, Q,strat); /*sets also S, ecartS, fromQ */
+      // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
+    }
   }
   strat->fromT = FALSE;
   strat->noTailReduction = !TEST_OPT_REDTAIL;
@@ -9039,7 +9048,10 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
     if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
   }
   #ifdef HAVE_RINGS
-  if(!rField_is_Ring(currRing))
+  if(rField_is_Ring(currRing))
+  {
+    /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
+  }
   #endif
   {
     if(TEST_OPT_SB_1)
@@ -9059,11 +9071,11 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
         }
         idDelete(&P);
     }
-  }
-  else
-  {
-    /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
-    // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
+    else
+    {
+      /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
+      // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
+    }
   }
   strat->fromT = FALSE;
   strat->noTailReduction = !TEST_OPT_REDTAIL;
