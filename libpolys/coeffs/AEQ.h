@@ -90,9 +90,9 @@ public:
     void Q_poly_gcd(Q_poly,Q_poly);                //Standard GGT
     void Q_poly_extgcd(Q_poly &,Q_poly &,Q_poly &, Q_poly, Q_poly);        //Erweiterter Standard GGT
     int is_equal(Q_poly &);                        // Test auf Gleichheit
-    int is_zero();                                // Test auf Gleichheit mit 0
-    int is_one();                                // Test auf Gleichheit mit 1
-    int is_monic();                                // testet, ob das Q_polynom normiert ist
+    int is_zero() const;                                // Test auf Gleichheit mit 0
+    int is_one() const;                                // Test auf Gleichheit mit 1
+    int is_monic() const;                                // testet, ob das Q_polynom normiert ist
 
     // Ein und Ausgabe
     void Q_poly_insert();                        // Eingabe von Q_polynom

@@ -817,7 +817,7 @@ void int_poly::poly_set_zero()
 
 //Vergleiche ob 2 int_polynome gleich return 1 falls ja sont 0
 
-int int_poly::is_equal(const int_poly g)
+int int_poly::is_equal(const int_poly g) const
 {
     if (deg!=g.deg)
         return 0;
@@ -833,7 +833,7 @@ int int_poly::is_equal(const int_poly g)
 
 //Überprüft ob das int_polynom 0 ist
 
-int int_poly::is_zero()
+int int_poly::is_zero() const
 {
     if (deg<0)
         return 1;
@@ -842,7 +842,7 @@ int int_poly::is_zero()
 
 }
 
-int int_poly::is_one()
+int int_poly::is_one() const
 {
     if (deg==0)
     {
@@ -852,7 +852,7 @@ int int_poly::is_one()
     else { return 0; }
 }
 
-int int_poly::is_monic()
+int int_poly::is_monic() const
 {
     if (mpz_cmpabs_ui(coef[deg],1)==0)
         return 1;

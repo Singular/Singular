@@ -87,10 +87,10 @@ public:
     void p_poly_horner_p_poly(p_poly, p_poly);        //Setzt p_polynom in p_polynom mittels Horner Schema ein
     void p_poly_gcd(p_poly,p_poly);                //Standard GGT
     void p_poly_extgcd(p_poly &,p_poly &,p_poly &, p_poly, p_poly);        //Erweiterter Standard GGT
-    int is_equal(const p_poly);                // Test auf Gleichheit
-    int is_zero();                                // Test auf Gleichheit mit 0
-    int is_one();                                // Test auf Gleichheit mit 1
-    int is_monic();                                // testet, ob das p_polynom normiert ist
+    int is_equal(const p_poly) const;                // Test auf Gleichheit
+    int is_zero() const;                                // Test auf Gleichheit mit 0
+    int is_one() const;                                // Test auf Gleichheit mit 1
+    int is_monic() const;                                // testet, ob das p_polynom normiert ist
 
     // Ein und Ausgabe
     void p_poly_insert();                        // Eingabe von p_polynom

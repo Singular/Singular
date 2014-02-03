@@ -742,7 +742,7 @@ int Q_poly::is_equal(Q_poly &g)
 }
 
 //Überprüft ob das Q_polynom 0 ist
-int Q_poly::is_zero()
+int Q_poly::is_zero() const
 {
     if (deg<0)
         return 1;
@@ -753,7 +753,7 @@ int Q_poly::is_zero()
 
 
 //Überprüft ob das Q_polynom 1 ist
-int Q_poly::is_one()
+int Q_poly::is_one() const
 {
     if (deg==0)
     {
@@ -763,7 +763,7 @@ int Q_poly::is_one()
     else { return 0; }
 }
 
-int Q_poly::is_monic()
+int Q_poly::is_monic() const
 {
     if (mpz_cmp(coef[deg],denom)==0)
         return 1;

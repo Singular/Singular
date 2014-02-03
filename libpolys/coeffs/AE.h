@@ -95,10 +95,10 @@ public:
     void poly_subgcd( int_poly, int_poly);                // Subresulatant GCD
     void poly_subgcd_to(int_poly);
     void poly_extsubgcd(int_poly&, int_poly&,int_poly &,int_poly,int_poly);
-    int is_equal(const int_poly);                // Test auf Gleichheit
-    int is_zero();                                // Test auf Gleichheit mit 0
-    int is_one();                                // Test auf Gleichheit mit 1
-    int is_monic();                                // testet, ob das int_polynom normiert ist
+    int is_equal(const int_poly) const;                // Test auf Gleichheit
+    int is_zero() const;                                // Test auf Gleichheit mit 0
+    int is_one() const;                                // Test auf Gleichheit mit 1
+    int is_monic() const;                                // testet, ob das int_polynom normiert ist
 
 
     // Ein und Ausgabe

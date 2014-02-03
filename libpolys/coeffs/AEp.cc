@@ -839,7 +839,7 @@ void p_poly::p_poly_set_zero()
 
 //Vergleiche ob 2 p_polynome gleich return 1 falls ja sont 0
 
-int p_poly::is_equal(const p_poly g)
+int p_poly::is_equal(const p_poly g) const
 {
     if (deg!=g.deg)
         return 0;
@@ -855,7 +855,7 @@ int p_poly::is_equal(const p_poly g)
 
 //Überprüft ob das p_polynom 0 ist
 
-int p_poly::is_zero()
+int p_poly::is_zero() const
 {
     if (deg<0)
         return 1;
@@ -864,7 +864,7 @@ int p_poly::is_zero()
 
 }
 
-int p_poly::is_one()
+int p_poly::is_one() const
 {
     if (deg==0)
     {
@@ -874,7 +874,7 @@ int p_poly::is_one()
     else { return 0; }
 }
 
-int p_poly::is_monic()
+int p_poly::is_monic() const
 {
     if (mpz_cmpabs_ui(coef[deg],1)==0)
         return 1;
