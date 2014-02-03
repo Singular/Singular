@@ -350,11 +350,12 @@ int matrix::compute_nonzero_kernel_vector()
   int min_index=-1;
   for(int i=0;i<_kernel_dimension;i++)
     if(M[i]>BigInt(0))
+    {
       if(min_index==-1)
         min_index=i;
-      else
-        if(M[i]<M[min_index])
-          min_index=i;
+      else if(M[i]<M[min_index])
+        min_index=i;
+    }
 
   // Now, H[min_index] is the vector to be transformed into a nonnegative one.
   // For a better overview, it is swapped with the first vector
@@ -444,11 +445,12 @@ int matrix::compute_nonzero_kernel_vector()
     int min_index=0;
     for(int i=current_position;i<_kernel_dimension;i++)
       if(M[i]>BigInt(0))
+      {
         if(min_index==0)
           min_index=i;
-        else
-          if(M[i]<M[min_index])
-            min_index=i;
+        else if(M[i]<M[min_index])
+          min_index=i;
+      }
 
     // Now, a multiple of H[min_index] will be added to the already constructed
     // vector H[0].
@@ -638,6 +640,7 @@ int matrix::hosten_shapiro(int*& sat_var)
     {
       for(int j=0;j<columns;j++)
         if(ideal_saturated_by_var[j]==FALSE)
+        {
           if(H[k][j]> BigInt(0))
             // ideal has to be saturated by the variables corresponding
             // to positive components
@@ -646,16 +649,17 @@ int matrix::hosten_shapiro(int*& sat_var)
             ideal_saturated_by_var[j]=TRUE;
             number_of_sat_var++;
           }
-          else
-            if(H[k][j]< BigInt(0))
+          else if(H[k][j]< BigInt(0))
               // then the ideal is automatically saturated by the variables
               // corresponding to negative components
               ideal_saturated_by_var[j]=TRUE;
+        }
     }
     else
     {
       for(int j=0;j<columns;j++)
         if(ideal_saturated_by_var[j]==FALSE)
+        {
           if(H[k][j]< BigInt(0))
             // ideal has to be saturated by the variables corresponding
             // to negative components
@@ -664,11 +668,11 @@ int matrix::hosten_shapiro(int*& sat_var)
             ideal_saturated_by_var[j]=TRUE;
             number_of_sat_var++;
           }
-          else
-            if(H[k][j]> BigInt(0))
+          else if(H[k][j]> BigInt(0))
               // then the ideal is automatically saturated by the variables
               // corresponding to positive components
               ideal_saturated_by_var[j]=TRUE;
+        }
     }
   }
 

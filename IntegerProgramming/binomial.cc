@@ -146,14 +146,15 @@ binomial::binomial(const short& number_of_variables, const Integer* exponents)
 #endif  // SUPPORT_VARIABLES_LAST
 
     if(i<size_of_support_vectors)
+    {
       // variable i is considered in the support vectors
       if(actual_entry>0)
         head_support|=(1<<i);
         // bit i of head_support is set to 1 (counting from 0)
-      else
-        if(actual_entry<0)
-          tail_support|=(1<<i);
-    // bit i of tail_support is set to 1
+      else if(actual_entry<0)
+        tail_support|=(1<<i);
+        // bit i of tail_support is set to 1
+    }
   }
 
 }
@@ -208,14 +209,15 @@ binomial::binomial(const short& number_of_variables, const Integer* exponents,
 #endif  // SUPPORT_VARIABLES_LAST
 
     if(i<size_of_support_vectors)
+    {
       // variable i is considered in the support vectors
       if(actual_entry>0)
         head_support|=(1<<i);
         // bit i of head_support is set to 1 (counting from 0)
-      else
-        if(actual_entry<0)
-          tail_support|=(1<<i);
-    // bit i of tail_support is set to 1
+      else if(actual_entry<0)
+        tail_support|=(1<<i);
+        // bit i of tail_support is set to 1
+    }
   }
 
 }
@@ -880,11 +882,12 @@ int binomial::reduce_head_by(const binomial& b, const term_ordering& w)
     actual_entry*=sign;
 
     if(i<size_of_support_vectors)
+    {
       if(actual_entry>0)
         head_support|=(1<<i);
-      else
-        if(actual_entry<0)
-          tail_support|=(1<<i);
+      else if(actual_entry<0)
+        tail_support|=(1<<i);
+    }
   }
 
 #endif  // SUPPORT_VARIABLES_LAST
@@ -931,11 +934,12 @@ int binomial::reduce_tail_by(const binomial& b, const term_ordering& w)
     // to avoid unnecessary pointer arithmetic
 
     if(i<size_of_support_vectors)
+    {
       if(actual_entry>0)
         head_support|=(1<<i);
-      else
-        if(actual_entry<0)
-          tail_support|=(1<<i);
+      else if(actual_entry<0)
+        tail_support|=(1<<i);
+    }
   }
 
 #endif  // SUPPORT_VARIABLES_FIRST
@@ -949,11 +953,12 @@ int binomial::reduce_tail_by(const binomial& b, const term_ordering& w)
     // to avoid unneccessary pointer arithmetic
 
     if(i<size_of_support_vectors)
+    {
       if(actual_entry>0)
         head_support|=(1<<i);
-      else
-        if(actual_entry<0)
-          tail_support|=(1<<i);
+      else if(actual_entry<0)
+        tail_support|=(1<<i);
+    }
   }
 
 #endif  // SUPPORT_VARIABLES_LAST
@@ -1026,11 +1031,12 @@ binomial& S_binomial(const binomial& a, const binomial& b,
     actual_entry*=sign;
 
     if(i<size_of_support_vectors)
+    {
       if(actual_entry>0)
         result.head_support|=(1<<i);
-      else
-        if(actual_entry<0)
-          result.tail_support|=(1<<i);
+      else if(actual_entry<0)
+        result.tail_support|=(1<<i);
+    }
   }
 
 #endif  // SUPPORT_VARIABLES_FIRST
@@ -1047,11 +1053,12 @@ binomial& S_binomial(const binomial& a, const binomial& b,
     actual_entry*=sign;
 
     if(i<size_of_support_vectors)
+    {
       if(actual_entry>0)
         result.head_support|=(1<<i);
-      else
-        if(actual_entry<0)
+      else if(actual_entry<0)
           result.tail_support|=(1<<i);
+    }
   }
 
 #endif  // SUPPORT_VARIABLES_LAST
@@ -1410,9 +1417,8 @@ BOOLEAN binomial::drop_elimination_variables(const term_ordering& w)
     Integer actual_entry=exponent_vector[i];
     if(actual_entry>0)
       head_support|=(1<<i);
-    else
-      if(actual_entry[i]<0)
-        tail_support|=(1<<i);
+    else if(actual_entry[i]<0)
+      tail_support|=(1<<i);
   }
 
 #endif  // SUPPORT_VARIABLES_FIRST
@@ -1425,9 +1431,8 @@ BOOLEAN binomial::drop_elimination_variables(const term_ordering& w)
     Integer actual_entry=exponent_vector[_number_of_variables-1-i];
     if(actual_entry>0)
       head_support|=(1<<i);
-    else
-      if(actual_entry<0)
-        tail_support|=(1<<i);
+    else if(actual_entry<0)
+      tail_support|=(1<<i);
   }
 
 #endif  // SUPPORT_VARIABLES_LAST
@@ -1497,9 +1502,8 @@ BOOLEAN binomial::drop_last_weighted_variable(const term_ordering& w)
     Integer actual_entry=exponent_vector[i];
     if(actual_entry>0)
       head_support|=(1<<i);
-    else
-      if(actual_entry<0)
-        tail_support|=(1<<i);
+    else if(actual_entry<0)
+      tail_support|=(1<<i);
   }
 
 #endif  // SUPPORT_VARIABLES_FIRST
@@ -1512,9 +1516,8 @@ BOOLEAN binomial::drop_last_weighted_variable(const term_ordering& w)
     Integer actual_entry=exponent_vector[_number_of_variables-1-i];
     if(actual_entry>0)
       head_support|=(1<<i);
-    else
-      if(actual_entry<0)
-        tail_support|=(1<<i);
+    else if(actual_entry<0)
+      tail_support|=(1<<i);
   }
 
 #endif  // SUPPORT_VARIABLES_LAST
