@@ -417,6 +417,7 @@ AC_MSG_RESULT(yes)
 AC_DEFINE(OM_NDEBUG,1,"Disable debug")
 with_track=no
 fi
+AM_CONDITIONAL([WANT_DEBUG],[test x"$with_debug" = xyes])
 
 AC_MSG_CHECKING(whether to have tracking debug functionality)
 if test "$with_track" != no; then
