@@ -296,7 +296,7 @@ void int_poly::poly_sub_mon_to(mpz_t a, int i)
 //Multiplikation mit Monom
 void int_poly::poly_mon_mult(const int_poly f, int n)
 {
-    if (f,is_zero()==1)
+    if (f.is_zero()==1)
     {
         poly_set_zero();
     }
