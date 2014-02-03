@@ -1,0 +1,75 @@
+/////////////////////////////////////////////////////////////////////////////
+version="version ideal.lib 4.0.0.0 ";
+category="General purpose";
+info="
+LIBRARY:  ideal.lib      Manipulating Ideals and Modules
+
+PROCEDURES:
+ isSubset(I,J)             check if ideal I is subset of ideal J.
+ isSubset_assumeSB(I,stdJ) check if ideal I is subset of ideal stdJ.
+";
+
+LIB "ring.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc isSubset_assumeSB(ideal I, ideal stdJ)
+"USAGE:   isSubset_assumeSB(I,stdJ); I, stdJ ideals, where stdJ is assumed as standard basis
+RETURN:  integer, 1 if I is a subset of stdJ and 0 otherwise
+NOTE:    if stdJ is not a standard basis the result may be wrong
+"
+{
+  ASSUME( 0, 1==attrib(stdJ, "isSB")); 
+  // ASSUME( 3, isSB(stdJ) ); //check, if ideal stdJ is really SB
+  int s = ncols(I);
+  for(int i=1; i<=s; i++)
+    {
+      if(reduce(I[i],stdJ)!=0)
+        {
+          return(0);
+        }
+    }
+  return(1);
+}
+example
+{
+    ring rng = 0,(x,y),dp;
+    ideal J = x+y, 0, y;
+    ideal I = x;
+    isSubset_assumeSB(I, groebner(J) );    //=1 
+    ideal I2 = 5;
+    isSubset_assumeSB(I2, groebner(J) );   //=0 
+}
+
+
+proc isSubset(ideal I, ideal J)
+"USAGE:   isSubset(I,J); I, J ideals
+RETURN:  integer, 1 if I is a subset of J and 0 otherwise
+"
+{   
+   def gJ = groebner(J);
+   int s = ncols(I);
+   for(int i=1; i<=s; i++)
+   {
+      if(reduce( I[i], gJ ) != 0) //compare with the zero polynomial
+      {
+          return(0);
+      }
+   }
+   return(1);
+}
+example
+{
+    ring rng = 0,(x,y),dp;
+    ideal I = x, y;
+    ideal J = x;
+    isSubset(J, I);    //=1 
+    ideal J2 = 5;
+    isSubset(J2, I);   //=0 
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+
+
