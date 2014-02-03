@@ -1456,7 +1456,6 @@ void initMora(ideal F,kStrategy strat)
       strat->red = redRiloc;
   #endif
 
-   /*reads the ecartWeights used for Graebes method from the
   /*reads the ecartWeights used for Graebes method from the
    *intvec ecart and set ecartWeights
    */
