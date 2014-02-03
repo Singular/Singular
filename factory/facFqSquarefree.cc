@@ -238,11 +238,11 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
     return CFFList (CFFactor (F/Lc(F), 1));
 
   CanonicalForm buffer;
-#ifdef HAVE_NTL
+#if defined(HAVE_NTL) || (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
   if (alpha.level() == 1)
 #endif
     buffer= pthRoot (A, ipower (p, k));
-#if (HAVE_NTL && HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
   else
   {
     fmpz_t qq;
