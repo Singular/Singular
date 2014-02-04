@@ -417,7 +417,8 @@ static si_link_extension slTypeInit(si_link_extension s, const char* type)
   s->next = NULL;
   si_link_extension ns = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
 
-  if (0) 0; // dummy
+  if (0)
+    ; // dummy
 #ifdef HAVE_DBM
   else if (strcmp(type, "DBM") == 0)
     s->next = slInitDBMExtension(ns);
