@@ -268,7 +268,7 @@ protected:
 
   void append_iter(self iterator) {
     ptr_type item;
-    while (item = PyIter_Next(iterator)) {
+    while ((item = PyIter_Next(iterator))) {
       PyList_Append(*this, item);
       Py_DECREF(item);
     }
