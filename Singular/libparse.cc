@@ -3375,7 +3375,7 @@ extern "C" {
     if(brace2>0) { yylp_errno=YYLP_MISS_BR2; }
     if(brace3>0) { yylp_errno=YYLP_MISS_BR3; }
     if(quote>0) { yylp_errno=YYLP_MISSQUOT; }
-    /* printf("{=%d, (=%d, [=%d\n", brace1, brace2, brace3);/**/
+    //printf("{=%d, (=%d, [=%d\n", brace1, brace2, brace3);
     if(feof(yyin)) return 1; else return 0;
   }
 }

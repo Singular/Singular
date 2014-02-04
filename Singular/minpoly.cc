@@ -362,6 +362,7 @@ int NewVectorMatrix::findSmallestNonpivot ()
       return i;
     }
   }
+  abort();
 }
 
 int NewVectorMatrix::findLargestNonpivot ()

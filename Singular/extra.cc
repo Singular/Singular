@@ -3870,7 +3870,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   else
   if (strcmp(sys_cmd,"reservedLink")==0)
   {
-    si_link ssiCommandLink();
+    extern si_link ssiCommandLink();
     res->rtyp=LINK_CMD;
     si_link p=ssiCommandLink();
     res->data=(void*)p;

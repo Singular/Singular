@@ -606,6 +606,7 @@ BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
   }
   if (ring_changed)
     f->m->SetRing(f,save_ring,FALSE);
+  return FALSE;
 }
 
 BOOLEAN newstruct_deserialize(blackbox **b, void **d, si_link f)

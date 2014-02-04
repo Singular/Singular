@@ -46,7 +46,7 @@ p_poly::~p_poly()
 
 //Reduktion modulo p
 
-p_poly p_poly::p_poly_reduce(p_poly f,int p)
+void p_poly::p_poly_reduce(p_poly f,int p)
 {
     if (f.is_zero()==0)
     {
@@ -69,7 +69,7 @@ p_poly p_poly::p_poly_reduce(p_poly f,int p)
 //Additionen
 
 //Standard - Addition
-p_poly p_poly::p_poly_add(const p_poly a, const p_poly b)
+void p_poly::p_poly_add(const p_poly a, const p_poly b)
 {
     if (a.deg >=b.deg)
     {
@@ -101,13 +101,13 @@ p_poly p_poly::p_poly_add(const p_poly a, const p_poly b)
 
 //Überschreibende Addition
 
-p_poly p_poly::p_poly_add_to(const p_poly g)
+void p_poly::p_poly_add_to(const p_poly g)
 {
     this->p_poly_add(*this,g);
 }
 
 //Addition einer Konstanten
-p_poly p_poly::p_poly_add_const(p_poly f,const mpz_t a)
+void p_poly::p_poly_add_const(p_poly f,const mpz_t a)
 {
     if (f.is_zero()==1 && mpz_divisible_ui_p(a,f.mod)==0)
         p_poly_set(a,f.mod);
@@ -128,13 +128,13 @@ p_poly p_poly::p_poly_add_const(p_poly f,const mpz_t a)
 
 //To Variante Addition einer Konstanten
 
-p_poly p_poly::p_poly_add_const_to(const mpz_t a)
+void p_poly::p_poly_add_const_to(const mpz_t a)
 {
     this->p_poly_add_const(*this,a);
 }
 
 //Monom Addition
-p_poly p_poly::p_poly_add_mon(const p_poly f, mpz_t a, int i)
+void p_poly::p_poly_add_mon(const p_poly f, mpz_t a, int i)
 {
     p_poly_set(f);
     if (i<=deg  && is_zero()==0)
@@ -176,7 +176,7 @@ p_poly p_poly::p_poly_add_mon(const p_poly f, mpz_t a, int i)
 }
 
 //To Variante Monomaddition
-p_poly p_poly::p_poly_add_mon_to(mpz_t a, int i)
+void p_poly::p_poly_add_mon_to(mpz_t a, int i)
 {
 
     if (i<=deg  && is_zero()==0)
@@ -217,7 +217,7 @@ p_poly p_poly::p_poly_add_mon_to(mpz_t a, int i)
 
 //Subtraktionen
 
-p_poly p_poly::p_poly_sub(const p_poly a, const p_poly b)
+void p_poly::p_poly_sub(const p_poly a, const p_poly b)
 {
     if (a.deg >=b.deg)
     {
@@ -249,13 +249,13 @@ p_poly p_poly::p_poly_sub(const p_poly a, const p_poly b)
 
 //Überschreibende Subtraktion
 
-p_poly p_poly::p_poly_sub_to(const p_poly b)
+void p_poly::p_poly_sub_to(const p_poly b)
 {
     this->p_poly_sub(*this,b);
 }
 
 //Subtraktion einer Konstanten
-p_poly p_poly::p_poly_sub_const(p_poly f,const mpz_t a)
+void p_poly::p_poly_sub_const(p_poly f,const mpz_t a)
 {
     if (f.is_zero()==1)
     {
@@ -277,14 +277,14 @@ p_poly p_poly::p_poly_sub_const(p_poly f,const mpz_t a)
 
 //To Variante Subtraktion einer Konstanten
 
-p_poly p_poly::p_poly_sub_const_to(const mpz_t a)
+void p_poly::p_poly_sub_const_to(const mpz_t a)
 {
     this->p_poly_sub_const(*this,a);
 }
 
 
 //Monom Subtraktion
-p_poly p_poly::p_poly_sub_mon(const p_poly f , mpz_t a, int i)
+void p_poly::p_poly_sub_mon(const p_poly f , mpz_t a, int i)
 {
     mpz_t temp;
     mpz_neg(temp,a);
@@ -292,7 +292,7 @@ p_poly p_poly::p_poly_sub_mon(const p_poly f , mpz_t a, int i)
 }
 
 //To Variante Monomaddition
-p_poly p_poly::p_poly_sub_mon_to(mpz_t a, int i)
+void p_poly::p_poly_sub_mon_to(mpz_t a, int i)
 {
     mpz_t temp;
     mpz_neg(temp,a);
@@ -303,7 +303,7 @@ p_poly p_poly::p_poly_sub_mon_to(mpz_t a, int i)
 //Multiplikationen
 
 //Multiplikation mit Monom
-p_poly p_poly::p_poly_mon_mult( p_poly f, int n)
+void p_poly::p_poly_mon_mult( p_poly f, int n)
 {
     if (f.is_zero()==1)
     {p_poly_set_zero();}
@@ -327,7 +327,7 @@ p_poly p_poly::p_poly_mon_mult( p_poly f, int n)
     }
 }
 
-p_poly p_poly::p_poly_mon_mult_to(const int n)
+void p_poly::p_poly_mon_mult_to(const int n)
 {
     this->p_poly_mon_mult(*this,n);
 }
@@ -335,7 +335,7 @@ p_poly p_poly::p_poly_mon_mult_to(const int n)
 
 //Multiplikation mit Skalar
 
-p_poly p_poly::p_poly_scalar_mult(const p_poly g, const mpz_t n)
+void p_poly::p_poly_scalar_mult(const p_poly g, const mpz_t n)
 {
     if (mpz_divisible_ui_p(n,g.mod)!=0)
         p_poly_set_zero();
@@ -356,7 +356,7 @@ p_poly p_poly::p_poly_scalar_mult(const p_poly g, const mpz_t n)
 
 
 
-p_poly p_poly::p_poly_scalar_mult(const mpz_t n, const p_poly g)
+void p_poly::p_poly_scalar_mult(const mpz_t n, const p_poly g)
 {
     if (mpz_divisible_ui_p(n,g.mod)!=0)
         p_poly_set_zero();
@@ -381,7 +381,7 @@ p_poly p_poly::p_poly_scalar_mult(const mpz_t n, const p_poly g)
 }
 
 
-p_poly p_poly::p_poly_scalar_mult_to(const mpz_t n)
+void p_poly::p_poly_scalar_mult_to(const mpz_t n)
 {
     this->p_poly_scalar_mult(*this,n);
 }
@@ -390,7 +390,7 @@ p_poly p_poly::p_poly_scalar_mult_to(const mpz_t n)
 
 // Negation
 
-p_poly p_poly::p_poly_neg()
+void p_poly::p_poly_neg()
 {
     for (int i=0;i<=deg;i++)
     {
@@ -399,7 +399,7 @@ p_poly p_poly::p_poly_neg()
 }
 
 // Naive Multiplikation
-p_poly p_poly::p_poly_mult_n(p_poly a,p_poly b)
+void p_poly::p_poly_mult_n(p_poly a,p_poly b)
 {
     //Reduktion mod p
     a.p_poly_reduce(a,a.mod);
@@ -451,14 +451,14 @@ p_poly p_poly::p_poly_mult_n(p_poly a,p_poly b)
 
 //Überschreibende Multiplikation
 
-p_poly p_poly::p_poly_mult_n_to(const p_poly g)
+void p_poly::p_poly_mult_n_to(const p_poly g)
 {
     this->p_poly_mult_n(*this,g);
 
 }
 
 // Karatsuba-Multiplikation (Weimerskirch/Paar Alg. 1), ACHTUNG VORLÄUFIGE VERSION, macht noch Fehler beim Grad und ist unelegant !!!
-p_poly p_poly::p_poly_mult_ka( p_poly A,  p_poly B)
+void p_poly::p_poly_mult_ka( p_poly A,  p_poly B)
 {
 
     if (A.is_zero()==1 || B.is_zero()==1)
@@ -527,7 +527,7 @@ p_poly p_poly::p_poly_mult_ka( p_poly A,  p_poly B)
 
 //Skalare Divisionen
 
-p_poly p_poly::p_poly_scalar_div( const p_poly g, const mpz_t n)
+void p_poly::p_poly_scalar_div( const p_poly g, const mpz_t n)
 {
 
     if (mpz_divisible_ui_p(n,g.mod)==0) // überprüft invertierbarkeit
@@ -555,13 +555,13 @@ p_poly p_poly::p_poly_scalar_div( const p_poly g, const mpz_t n)
 }
 
 
-p_poly p_poly::p_poly_scalar_div_to(const mpz_t n)
+void p_poly::p_poly_scalar_div_to(const mpz_t n)
 {
     this->p_poly_scalar_div(*this,n);
 }
 
 // Division durch Monom - Quotient
-p_poly p_poly::p_poly_mon_div(const p_poly f, const int n)
+void p_poly::p_poly_mon_div(const p_poly f, const int n)
 {
     if (f.deg<n)
     {
@@ -580,7 +580,7 @@ p_poly p_poly::p_poly_mon_div(const p_poly f, const int n)
 }
 
 // Division durch Monom - Rest
-p_poly p_poly::p_poly_mon_div_rem(const p_poly f, const int n)
+void p_poly::p_poly_mon_div_rem(const p_poly f, const int n)
 {
     if (f.deg<n)
     {
@@ -604,7 +604,7 @@ p_poly p_poly::p_poly_mon_div_rem(const p_poly f, const int n)
 
 //Euklidische Division nach Cohen Algo 3.1.1 (degA muss größer gleich deg B sein)!!
 
-p_poly p_poly::p_poly_div_rem( p_poly A,  p_poly B)
+void p_poly::p_poly_div_rem( p_poly A,  p_poly B)
 {
 
     if (B.is_zero()==0)
@@ -649,7 +649,7 @@ p_poly p_poly::p_poly_div_rem( p_poly A,  p_poly B)
 }
 //To Variante von Algo 3.1.1 im Cohen
 
-p_poly p_poly::p_poly_div_rem_to(const p_poly B)
+void p_poly::p_poly_div_rem_to(const p_poly B)
 {
     this->p_poly_div_rem(*this,B);
 
@@ -659,7 +659,7 @@ p_poly p_poly::p_poly_div_rem_to(const p_poly B)
 
 
 //Exakte Division nach Cohen 3.1.1
-p_poly p_poly::p_poly_div(p_poly &Q, p_poly &R, p_poly A,  p_poly B)
+void p_poly::p_poly_div(p_poly &Q, p_poly &R, p_poly A,  p_poly B)
 {
     if (B.is_zero()==0)
     {
@@ -715,7 +715,7 @@ p_poly p_poly::p_poly_div(p_poly &Q, p_poly &R, p_poly A,  p_poly B)
 
 //To Varainte der exakten Division
 
-p_poly p_poly::p_poly_div_to(p_poly &Q,p_poly &R, p_poly B)
+void p_poly::p_poly_div_to(p_poly &Q,p_poly &R, p_poly B)
 {
     this->p_poly_div(Q ,R,*this,B);
 }
@@ -724,14 +724,14 @@ p_poly p_poly::p_poly_div_to(p_poly &Q,p_poly &R, p_poly B)
 // Kombinationen
 
 // a := a*b + c
-p_poly p_poly::p_poly_multadd_to(const p_poly b, const p_poly c)
+void p_poly::p_poly_multadd_to(const p_poly b, const p_poly c)
 {
     p_poly_mult_n_to(b);
     p_poly_add_to(c);
 }
 
 //a=a*b-c
-p_poly p_poly::p_poly_multsub_to(const p_poly b, const p_poly c)
+void p_poly::p_poly_multsub_to(const p_poly b, const p_poly c)
 {
     p_poly_mult_n_to(b);
     p_poly_sub_to(c);
@@ -741,7 +741,7 @@ p_poly p_poly::p_poly_multsub_to(const p_poly b, const p_poly c)
 
 /*
 // a := (a+b)* c
-p_poly p_poly::poly_addmult_to(const p_poly b, const p_poly c)
+void p_poly::poly_addmult_to(const p_poly b, const p_poly c)
 {
         p_poly a(deg,coef);
         a.poly_add_to(b);
@@ -799,7 +799,7 @@ void p_poly::p_poly_horner_p_poly( p_poly A, p_poly B)
 
 
 //setze p_polynom auf p_polynom b
-p_poly p_poly::p_poly_set(const p_poly b)
+void p_poly::p_poly_set(const p_poly b)
 {
     deg=b.deg;
     mod=b.mod;
@@ -813,7 +813,7 @@ p_poly p_poly::p_poly_set(const p_poly b)
 }
 
 // setze p_polynom auf konstantes p_polynom b
-p_poly p_poly::p_poly_set(const mpz_t b,int p)
+void p_poly::p_poly_set(const mpz_t b,int p)
 {
     deg=0;
     mod=p;
@@ -831,7 +831,7 @@ p_poly p_poly::p_poly_set(const mpz_t b,int p)
 
 
 //setze p_polynom auf Nullpolynom
-p_poly p_poly::p_poly_set_zero()
+void p_poly::p_poly_set_zero()
 {
     deg = -1;
 }
@@ -839,7 +839,7 @@ p_poly p_poly::p_poly_set_zero()
 
 //Vergleiche ob 2 p_polynome gleich return 1 falls ja sont 0
 
-int p_poly::is_equal(const p_poly g)
+int p_poly::is_equal(const p_poly g) const
 {
     if (deg!=g.deg)
         return 0;
@@ -855,7 +855,7 @@ int p_poly::is_equal(const p_poly g)
 
 //Überprüft ob das p_polynom 0 ist
 
-int p_poly::is_zero()
+int p_poly::is_zero() const
 {
     if (deg<0)
         return 1;
@@ -864,7 +864,7 @@ int p_poly::is_zero()
 
 }
 
-int p_poly::is_one()
+int p_poly::is_one() const
 {
     if (deg==0)
     {
@@ -874,7 +874,7 @@ int p_poly::is_one()
     else { return 0; }
 }
 
-int p_poly::is_monic()
+int p_poly::is_monic() const
 {
     if (mpz_cmpabs_ui(coef[deg],1)==0)
         return 1;
@@ -884,7 +884,7 @@ int p_poly::is_monic()
 
 // klassischer GGT nach Cohen 3.2.1
 
-p_poly p_poly::p_poly_gcd( p_poly A,  p_poly B)
+void p_poly::p_poly_gcd( p_poly A,  p_poly B)
 {
 
     //Reduktion mod p
@@ -916,7 +916,7 @@ p_poly p_poly::p_poly_gcd( p_poly A,  p_poly B)
 
 //Nach nach Fieker 2.12 Symbolisches Rechnen (2012)
 // gibt g=s*A+t*B aus
-p_poly p_poly::p_poly_extgcd(p_poly &s,p_poly &t,p_poly &g, p_poly A, p_poly B)
+void p_poly::p_poly_extgcd(p_poly &s,p_poly &t,p_poly &g, p_poly A, p_poly B)
 {
 
     //Reduktion mod p

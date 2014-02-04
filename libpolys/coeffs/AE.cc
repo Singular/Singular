@@ -48,7 +48,7 @@ int_poly::~int_poly()
 //Additionen
 
 //Standard - Addition
-int_poly int_poly::poly_add(const int_poly a, const int_poly b)
+void int_poly::poly_add(const int_poly a, const int_poly b)
 {
     if (a.deg >=b.deg)
     {
@@ -77,13 +77,13 @@ int_poly int_poly::poly_add(const int_poly a, const int_poly b)
 
 //Überschreibende Addition
 
-int_poly int_poly::poly_add_to(const int_poly g)
+void int_poly::poly_add_to(const int_poly g)
 {
     this->poly_add(*this,g);
 }
 
 //Addition einer Konstanten
-int_poly int_poly::poly_add_const(int_poly f,const mpz_t a)
+void int_poly::poly_add_const(int_poly f,const mpz_t a)
 {
     if (f.is_zero()==1)
         poly_set(a);
@@ -101,13 +101,13 @@ int_poly int_poly::poly_add_const(int_poly f,const mpz_t a)
 
 //To Variante Addition einer Konstanten
 
-int_poly int_poly::poly_add_const_to(const mpz_t a)
+void int_poly::poly_add_const_to(const mpz_t a)
 {
     this->poly_add_const(*this,a);
 }
 
 //Monom Addition
-int_poly int_poly::poly_add_mon(int_poly f, mpz_t a, int i)
+void int_poly::poly_add_mon(int_poly f, mpz_t a, int i)
 {
     poly_set(f);
 
@@ -140,7 +140,7 @@ int_poly int_poly::poly_add_mon(int_poly f, mpz_t a, int i)
 }
 
 //To Variante Monomaddition
-int_poly int_poly::poly_add_mon_to(mpz_t a, int i)
+void int_poly::poly_add_mon_to(mpz_t a, int i)
 {
     if (i<=deg  && is_zero()==0)
     {
@@ -174,7 +174,7 @@ int_poly int_poly::poly_add_mon_to(mpz_t a, int i)
 
 //Subtraktionen
 
-int_poly int_poly::poly_sub(const int_poly a, const int_poly b)
+void int_poly::poly_sub(const int_poly a, const int_poly b)
 {
     int_poly temp;
     temp.poly_set(b);
@@ -192,13 +192,13 @@ int_poly int_poly::poly_sub(const int_poly a, const int_poly b)
 
 //Überschreibende Subtraktion
 
-int_poly int_poly::poly_sub_to(const int_poly b)
+void int_poly::poly_sub_to(const int_poly b)
 {
     this->poly_sub(*this,b);
 }
 
 //Subtraktion einer Konstanten
-int_poly int_poly::poly_sub_const(int_poly f,const mpz_t a)
+void int_poly::poly_sub_const(int_poly f,const mpz_t a)
 {
     if (f.is_zero()==1)
     {
@@ -221,14 +221,14 @@ int_poly int_poly::poly_sub_const(int_poly f,const mpz_t a)
 
 //To Variante Subtraktion einer Konstanten
 
-int_poly int_poly::poly_sub_const_to(const mpz_t a)
+void int_poly::poly_sub_const_to(const mpz_t a)
 {
     this->poly_sub_const(*this,a);
 }
 
 
 //Monom Subtraktion
-int_poly int_poly::poly_sub_mon(const int_poly f , mpz_t a, int i)
+void int_poly::poly_sub_mon(const int_poly f , mpz_t a, int i)
 {
     poly_set(f);
 
@@ -260,7 +260,7 @@ int_poly int_poly::poly_sub_mon(const int_poly f , mpz_t a, int i)
 }
 
 //To Variante Monomaddition
-int_poly int_poly::poly_sub_mon_to(mpz_t a, int i)
+void int_poly::poly_sub_mon_to(mpz_t a, int i)
 {
 
     if (i<=deg && is_zero()!=1)
@@ -294,9 +294,9 @@ int_poly int_poly::poly_sub_mon_to(mpz_t a, int i)
 //Multiplikationen
 
 //Multiplikation mit Monom
-int_poly int_poly::poly_mon_mult(const int_poly f, int n)
+void int_poly::poly_mon_mult(const int_poly f, int n)
 {
-    if (f,is_zero()==1)
+    if (f.is_zero()==1)
     {
         poly_set_zero();
     }
@@ -314,7 +314,7 @@ int_poly int_poly::poly_mon_mult(const int_poly f, int n)
     }
 }
 
-int_poly int_poly::poly_mon_mult_to(const int n)
+void int_poly::poly_mon_mult_to(const int n)
 {
     this->poly_mon_mult(*this,n);
 }
@@ -322,7 +322,7 @@ int_poly int_poly::poly_mon_mult_to(const int n)
 
 //Multiplikation mit Skalar
 
-int_poly int_poly::poly_scalar_mult(const int_poly g, const mpz_t n)
+void int_poly::poly_scalar_mult(const int_poly g, const mpz_t n)
 {
     if (mpz_sgn(n)==0)
         poly_set_zero();
@@ -341,7 +341,7 @@ int_poly int_poly::poly_scalar_mult(const int_poly g, const mpz_t n)
 
 
 
-int_poly int_poly::poly_scalar_mult(const mpz_t n, const int_poly g)
+void int_poly::poly_scalar_mult(const mpz_t n, const int_poly g)
 {
     if (mpz_sgn(n)==0)
         poly_set_zero();
@@ -359,7 +359,7 @@ int_poly int_poly::poly_scalar_mult(const mpz_t n, const int_poly g)
 }
 
 
-int_poly int_poly::poly_scalar_mult_to(const mpz_t n)
+void int_poly::poly_scalar_mult_to(const mpz_t n)
 {
     this->poly_scalar_mult(*this,n);
 }
@@ -368,7 +368,7 @@ int_poly int_poly::poly_scalar_mult_to(const mpz_t n)
 
 // Negation
 
-int_poly int_poly::poly_neg()
+void int_poly::poly_neg()
 {
     for (int i=0;i<=deg;i++)
     {
@@ -377,7 +377,7 @@ int_poly int_poly::poly_neg()
 }
 
 // Naive Multiplikation
-int_poly int_poly::poly_mult_n(int_poly a,int_poly b)
+void int_poly::poly_mult_n(int_poly a,int_poly b)
 {
 
     if (a.is_zero()==1 || b.is_zero()==1)
@@ -421,14 +421,14 @@ int_poly int_poly::poly_mult_n(int_poly a,int_poly b)
 
 //Überschreibende Multiplikation
 
-int_poly int_poly::poly_mult_n_to(const int_poly g)
+void int_poly::poly_mult_n_to(const int_poly g)
 {
     this->poly_mult_n(*this,g);
 
 }
 
 // Karatsuba-Multiplikation (Weimerskirch/Paar Alg. 1), ACHTUNG VORLÄUFIGE VERSION, macht noch Fehler beim Grad und ist unelegant !!!
-int_poly int_poly::poly_mult_ka( int_poly A,  int_poly B)
+void int_poly::poly_mult_ka( int_poly A,  int_poly B)
 {
 
     if (A.is_zero()==1 || B.is_zero()==1)
@@ -486,7 +486,7 @@ int_poly int_poly::poly_mult_ka( int_poly A,  int_poly B)
 
 //Skalare Divisionen
 
-int_poly int_poly::poly_scalar_div( const int_poly g, const mpz_t n)
+void int_poly::poly_scalar_div( const int_poly g, const mpz_t n)
 {
     deg=g.deg;
     mpz_t temp;
@@ -499,13 +499,13 @@ int_poly int_poly::poly_scalar_div( const int_poly g, const mpz_t n)
 }
 
 
-int_poly int_poly::poly_scalar_div_to(const mpz_t n)
+void int_poly::poly_scalar_div_to(const mpz_t n)
 {
     this->poly_scalar_div(*this,n);
 }
 
 // Division durch Monom -  results in Quotient without remainder
-int_poly int_poly::poly_mon_div(const int_poly f, const int n)
+void int_poly::poly_mon_div(const int_poly f, const int n)
 {
     if (f.deg<n)
     {
@@ -522,7 +522,7 @@ int_poly int_poly::poly_mon_div(const int_poly f, const int n)
 }
 
 // Division durch Monom - Rest
-int_poly int_poly::poly_mon_div_rem(const int_poly f, const int n)
+void int_poly::poly_mon_div_rem(const int_poly f, const int n)
 {
     if (f.deg<n)
     {
@@ -542,7 +542,7 @@ int_poly int_poly::poly_mon_div_rem(const int_poly f, const int n)
 
 
 //Exakte Division nach Cohen 3.1.1 (works only if B!=0)
-int_poly int_poly::poly_div(int_poly &Q,int_poly &R, int_poly A,  int_poly B)
+void int_poly::poly_div(int_poly &Q,int_poly &R, int_poly A,  int_poly B)
 {
     if (B.is_zero()==0)
     {
@@ -573,14 +573,14 @@ int_poly int_poly::poly_div(int_poly &Q,int_poly &R, int_poly A,  int_poly B)
 
 //To Varainte der exakten Division
 
-int_poly int_poly::poly_div_to(int_poly &Q,int_poly &R,const int_poly B)
+void int_poly::poly_div_to(int_poly &Q,int_poly &R,const int_poly B)
 {
     this->poly_div( Q, R,*this,B);
 }
 
 // pseudo Division nach Cohen 3.1.2 (geht eleganter)
 
-int_poly int_poly::poly_pseudodiv_rem( int_poly A,  int_poly B)
+void int_poly::poly_pseudodiv_rem( int_poly A,  int_poly B)
 {
 
     if (B.is_zero()==0)
@@ -609,7 +609,7 @@ int_poly int_poly::poly_pseudodiv_rem( int_poly A,  int_poly B)
 
 //To Variante Algo 3.1.2 nach Cohen
 
-int_poly int_poly::poly_pseudodiv_rem_to(const int_poly B)
+void int_poly::poly_pseudodiv_rem_to(const int_poly B)
 {
     this->poly_pseudodiv_rem(*this,B);
 }
@@ -618,7 +618,7 @@ int_poly int_poly::poly_pseudodiv_rem_to(const int_poly B)
 //Pseudodivision nach Kaplan, M. Computeralgebra 4.6 welche q^e*A=Q*B+R
 //berechnet und entsprechendes in Q und R hineinschreibt
 
-int_poly int_poly::poly_pseudodiv(int_poly &Q, int_poly &R, int_poly A,  int_poly B)
+void int_poly::poly_pseudodiv(int_poly &Q, int_poly &R, int_poly A,  int_poly B)
 {
 
     if (B.is_zero()==0)
@@ -677,7 +677,7 @@ int_poly int_poly::poly_pseudodiv(int_poly &Q, int_poly &R, int_poly A,  int_pol
 
 //To Variante Algo 3.1.2 nach Cohen
 
-int_poly int_poly::poly_pseudodiv_to(int_poly &Q, int_poly &R, int_poly B)
+void int_poly::poly_pseudodiv_to(int_poly &Q, int_poly &R, int_poly B)
 {
     this->poly_pseudodiv(Q, R,*this,B);
 }
@@ -685,14 +685,14 @@ int_poly int_poly::poly_pseudodiv_to(int_poly &Q, int_poly &R, int_poly B)
 // Kombinationen
 
 // a := a*b + c
-int_poly int_poly::poly_multadd_to(const int_poly b, const int_poly c)
+void int_poly::poly_multadd_to(const int_poly b, const int_poly c)
 {
     poly_mult_n_to(b);
     poly_add_to(c);
 }
 
 //a=a*b-c
-int_poly int_poly::poly_multsub_to(const int_poly b, const int_poly c)
+void int_poly::poly_multsub_to(const int_poly b, const int_poly c)
 {
     poly_mult_n_to(b);
     poly_sub_to(c);
@@ -702,7 +702,7 @@ int_poly int_poly::poly_multsub_to(const int_poly b, const int_poly c)
 
 /*
 // a := (a+b)* c
-int_poly int_poly::poly_addmult_to(const int_poly b, const int_poly c)
+void int_poly::poly_addmult_to(const int_poly b, const int_poly c)
 {
         int_poly a(deg,coef);
         a.poly_add_to(b);
@@ -740,7 +740,7 @@ void int_poly::poly_cont(mpz_t& cont)
 //ÜBERSCHREIBT DAS int_polyNOM WELCHES DEN BEFEHL AUFRUFT!!!!
 
 
-int_poly int_poly::poly_pp(int_poly f)
+void int_poly::poly_pp(int_poly f)
 {
     mpz_t cont;
     f.poly_cont(cont); // cont ist auf den Inhalt von f gesetzt.
@@ -790,7 +790,7 @@ void int_poly::poly_horner_int_poly(const int_poly A,const int_poly B)
 
 
 //setze int_polynom auf int_polynom b
-int_poly int_poly::poly_set(const int_poly b)
+void int_poly::poly_set(const int_poly b)
 {
     deg=b.deg;
     for(int i=0;i<=deg;i++)
@@ -801,7 +801,7 @@ int_poly int_poly::poly_set(const int_poly b)
 }
 
 // setze int_polynom auf konstantes int_polynom b
-int_poly int_poly::poly_set(const mpz_t b)
+void int_poly::poly_set(const mpz_t b)
 {
     deg=0;
     mpz_init_set(coef[0],b);
@@ -809,7 +809,7 @@ int_poly int_poly::poly_set(const mpz_t b)
 
 
 //setze int_polynom auf Nullint_polynom
-int_poly int_poly::poly_set_zero()
+void int_poly::poly_set_zero()
 {
     deg = -1;
 }
@@ -817,7 +817,7 @@ int_poly int_poly::poly_set_zero()
 
 //Vergleiche ob 2 int_polynome gleich return 1 falls ja sont 0
 
-int int_poly::is_equal(const int_poly g)
+int int_poly::is_equal(const int_poly g) const
 {
     if (deg!=g.deg)
         return 0;
@@ -833,7 +833,7 @@ int int_poly::is_equal(const int_poly g)
 
 //Überprüft ob das int_polynom 0 ist
 
-int int_poly::is_zero()
+int int_poly::is_zero() const
 {
     if (deg<0)
         return 1;
@@ -842,7 +842,7 @@ int int_poly::is_zero()
 
 }
 
-int int_poly::is_one()
+int int_poly::is_one() const
 {
     if (deg==0)
     {
@@ -852,7 +852,7 @@ int int_poly::is_one()
     else { return 0; }
 }
 
-int int_poly::is_monic()
+int int_poly::is_monic() const
 {
     if (mpz_cmpabs_ui(coef[deg],1)==0)
         return 1;
@@ -862,7 +862,7 @@ int int_poly::is_monic()
 
 // klassischer GGT nach Cohen 3.2.1
 
-int_poly int_poly::poly_gcd( int_poly A,  int_poly B)
+void int_poly::poly_gcd( int_poly A,  int_poly B)
 {
     if (A.deg<B.deg)
         poly_gcd(B,A);
@@ -897,7 +897,7 @@ int_poly int_poly::poly_gcd( int_poly A,  int_poly B)
 // Bpp ist das B in den Schritten ab 2
 
 
-int_poly int_poly::poly_ppgcd(int_poly A,int_poly B)
+void int_poly::poly_ppgcd(int_poly A,int_poly B)
 {
     if(A.deg<B.deg)
     {
@@ -955,7 +955,7 @@ int_poly int_poly::poly_ppgcd(int_poly A,int_poly B)
 // To Variante ppgcd
 
 
-int_poly int_poly::poly_ppgcd_to(int_poly B)
+void int_poly::poly_ppgcd_to(int_poly B)
 {
     this->poly_ppgcd(*this,B);
 }
@@ -964,7 +964,7 @@ int_poly int_poly::poly_ppgcd_to(int_poly B)
 
 // GGT nach Cohen, Algorithmus 3.3.1 (Subresultant int_polynomial GCD) TO DO: Optimierung bzgl. Mehrfachberechnung)
 // Bpp ist das B in den Schritten ab 2
-int_poly int_poly::poly_subgcd(int_poly A, int_poly B)
+void int_poly::poly_subgcd(int_poly A, int_poly B)
 {
     //Initialisierung und Reduktionen
     if(A.deg<B.deg)
@@ -1049,7 +1049,7 @@ int_poly int_poly::poly_subgcd(int_poly A, int_poly B)
 
 // To Varianta Subresultanten
 
-int_poly int_poly::poly_subgcd_to(int_poly B)
+void int_poly::poly_subgcd_to(int_poly B)
 {
     this->poly_subgcd(*this,B);
 }
@@ -1057,7 +1057,7 @@ int_poly int_poly::poly_subgcd_to(int_poly B)
 
 //Extended Subresultant GCD; see Kaplan, M. Computeralgebra, chapter 4.6
 //returns g=r*A+t*B IT WORKS DONT TOUCH IT!!!!!!!!
-int_poly int_poly::poly_extsubgcd(int_poly& r, int_poly& t,int_poly &g,int_poly A,int_poly B)
+void int_poly::poly_extsubgcd(int_poly& r, int_poly& t,int_poly &g,int_poly A,int_poly B)
 {
     if (A.deg<B.deg)
         poly_extsubgcd(t,r,g,B,A);

@@ -2192,8 +2192,8 @@ void p_Content(poly ph, const ring r)
           }
           pIter(p);
         }
-        /* hzz contains the gcd of all numerators in f*/
-        /*h=n_Invers(hzz,r->cf->extRing->cf);
+        // hzz contains the gcd of all numerators in f
+        h=n_Invers(hzz,r->cf->extRing->cf);
         n_Delete(&hzz,r->cf->extRing->cf);
         n_Normalize(h,r->cf->extRing->cf);
         if(!n_IsOne(h,r->cf->extRing->cf))

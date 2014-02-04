@@ -41,7 +41,7 @@ Q_poly::~Q_poly()
 */
 
 // Kürzen  --  MACHT NOCH MIST!
-Q_poly Q_poly::Q_poly_reduce()
+void Q_poly::Q_poly_reduce()
 {
     if (is_zero()==1)
     {
@@ -78,7 +78,7 @@ Q_poly Q_poly::Q_poly_reduce()
 }
 
 // Koeffizienten mit b erweitern
-Q_poly Q_poly::Q_poly_extend(mpz_t b)
+void Q_poly::Q_poly_extend(mpz_t b)
 {
         mpz_mul(denom,denom,b);
         for (int i=0;i<=deg;i++)
@@ -94,7 +94,7 @@ Q_poly Q_poly::Q_poly_extend(mpz_t b)
 //Additionen
 
 //Standard - Addition
-Q_poly Q_poly::Q_poly_add(const Q_poly a, const Q_poly b)
+void Q_poly::Q_poly_add(const Q_poly a, const Q_poly b)
 {
     if (a.deg >= b.deg)
     {
@@ -128,13 +128,13 @@ Q_poly Q_poly::Q_poly_add(const Q_poly a, const Q_poly b)
 
 //Überschreibende Addition
 
-Q_poly Q_poly::Q_poly_add_to(const Q_poly g)
+void Q_poly::Q_poly_add_to(const Q_poly g)
 {
     this->Q_poly_add(*this,g);
 }
 
 //Addition einer Konstanten
-Q_poly Q_poly::Q_poly_add_const(Q_poly f, const mpz_t a)
+void Q_poly::Q_poly_add_const(Q_poly f, const mpz_t a)
 {
     if (f.is_zero()==1)
     {
@@ -155,13 +155,13 @@ Q_poly Q_poly::Q_poly_add_const(Q_poly f, const mpz_t a)
 
 //To Variante Addition einer Konstanten
 
-Q_poly Q_poly::Q_poly_add_const_to(const mpz_t a)
+void Q_poly::Q_poly_add_const_to(const mpz_t a)
 {
     this->Q_poly_add_const(*this,a);
 }
 
 //Monom Addition
-Q_poly Q_poly::Q_poly_add_mon(const Q_poly f, mpz_t a, int i)
+void Q_poly::Q_poly_add_mon(const Q_poly f, mpz_t a, int i)
 {
     Q_poly_set(f);
     if (i<=deg  && is_zero()==0)
@@ -200,14 +200,14 @@ Q_poly Q_poly::Q_poly_add_mon(const Q_poly f, mpz_t a, int i)
 }
 
 //To Variante Monomaddition
-Q_poly Q_poly::Q_poly_add_mon_to(mpz_t a, int i)
+void Q_poly::Q_poly_add_mon_to(mpz_t a, int i)
 {
     this->Q_poly_add_mon(*this,a,i);
 }
 
 //Subtraktionen
 
-Q_poly Q_poly::Q_poly_sub(const Q_poly a, const Q_poly b)
+void Q_poly::Q_poly_sub(const Q_poly a, const Q_poly b)
 {
     Q_poly temp;
     temp.Q_poly_set(b);
@@ -218,13 +218,13 @@ Q_poly Q_poly::Q_poly_sub(const Q_poly a, const Q_poly b)
 
 //Überschreibende Subtraktion
 
-Q_poly Q_poly::Q_poly_sub_to(const Q_poly b)
+void Q_poly::Q_poly_sub_to(const Q_poly b)
 {
     this->Q_poly_sub(*this,b);
 }
 
 //Subtraktion einer Konstanten
-Q_poly Q_poly::Q_poly_sub_const(Q_poly f,const mpz_t a)
+void Q_poly::Q_poly_sub_const(Q_poly f,const mpz_t a)
 {
     if (f.is_zero()==1)
     {
@@ -244,14 +244,14 @@ Q_poly Q_poly::Q_poly_sub_const(Q_poly f,const mpz_t a)
 
 //To Variante Subtraktion einer Konstanten
 
-Q_poly Q_poly::Q_poly_sub_const_to(const mpz_t a)
+void Q_poly::Q_poly_sub_const_to(const mpz_t a)
 {
     this->Q_poly_sub_const(*this,a);
 }
 
 
 //Monom Subtraktion
-Q_poly Q_poly::Q_poly_sub_mon(const Q_poly f , mpz_t a, int i)
+void Q_poly::Q_poly_sub_mon(const Q_poly f , mpz_t a, int i)
 {
     mpz_t temp;
     mpz_init_set_ui(temp,0);
@@ -260,7 +260,7 @@ Q_poly Q_poly::Q_poly_sub_mon(const Q_poly f , mpz_t a, int i)
 }
 
 //To Variante Monomsubtraktion
-Q_poly Q_poly::Q_poly_sub_mon_to(mpz_t a, int i)
+void Q_poly::Q_poly_sub_mon_to(mpz_t a, int i)
 {
     this->Q_poly_sub_mon(*this,a,i);
 }
@@ -269,7 +269,7 @@ Q_poly Q_poly::Q_poly_sub_mon_to(mpz_t a, int i)
 //Multiplikationen
 
 //Multiplikation mit Monom
-Q_poly Q_poly::Q_poly_mon_mult(const Q_poly f, int n)
+void Q_poly::Q_poly_mon_mult(const Q_poly f, int n)
 {
     deg=f.deg+n;
     mpz_init_set(denom,f.denom);
@@ -283,7 +283,7 @@ Q_poly Q_poly::Q_poly_mon_mult(const Q_poly f, int n)
     }
 }
 
-Q_poly Q_poly::Q_poly_mon_mult_to(const int n)
+void Q_poly::Q_poly_mon_mult_to(const int n)
 {
     this->Q_poly_mon_mult(*this,n);
 }
@@ -291,7 +291,7 @@ Q_poly Q_poly::Q_poly_mon_mult_to(const int n)
 
 //Multiplikation mit Skalar
 
-Q_poly Q_poly::Q_poly_scalar_mult(const Q_poly g, const mpz_t n)
+void Q_poly::Q_poly_scalar_mult(const Q_poly g, const mpz_t n)
 {
     deg=g.deg;
     mpz_init_set(denom,g.denom);
@@ -307,7 +307,7 @@ Q_poly Q_poly::Q_poly_scalar_mult(const Q_poly g, const mpz_t n)
 
 
 
-Q_poly Q_poly::Q_poly_scalar_mult(const mpz_t n, const Q_poly g)
+void Q_poly::Q_poly_scalar_mult(const mpz_t n, const Q_poly g)
 {
     deg=g.deg;
     mpz_init_set(denom,g.denom);
@@ -322,7 +322,7 @@ Q_poly Q_poly::Q_poly_scalar_mult(const mpz_t n, const Q_poly g)
 }
 
 
-Q_poly Q_poly::Q_poly_scalar_mult_to(const mpz_t n)
+void Q_poly::Q_poly_scalar_mult_to(const mpz_t n)
 {
     this->Q_poly_scalar_mult(*this,n);
 }
@@ -331,13 +331,13 @@ Q_poly Q_poly::Q_poly_scalar_mult_to(const mpz_t n)
 
 // Negation
 
-Q_poly Q_poly::Q_poly_neg()
+void Q_poly::Q_poly_neg()
 {
     mpz_neg(denom,denom);
 }
 
 // Naive Multiplikation
-Q_poly Q_poly::Q_poly_mult_n(Q_poly a,Q_poly b)
+void Q_poly::Q_poly_mult_n(Q_poly a,Q_poly b)
 {
 
     if (a.is_zero()==1 || b.is_zero()==1)
@@ -379,13 +379,13 @@ Q_poly Q_poly::Q_poly_mult_n(Q_poly a,Q_poly b)
 
 //Überschreibende Multiplikation
 
-Q_poly Q_poly::Q_poly_mult_n_to(const Q_poly g)
+void Q_poly::Q_poly_mult_n_to(const Q_poly g)
 {
     this->Q_poly_mult_n(*this,g);
 }
 
 // Karatsuba-Multiplikation (Weimerskirch/Paar Alg. 1), ACHTUNG VORLÄUFIGE VERSION, macht noch Fehler beim Grad und ist unelegant !!!
-Q_poly Q_poly::Q_poly_mult_ka(const Q_poly A, const Q_poly B)
+void Q_poly::Q_poly_mult_ka(const Q_poly A, const Q_poly B)
 {
     // Größeren Grad feststellen
     int n;
@@ -435,7 +435,7 @@ Q_poly Q_poly::Q_poly_mult_ka(const Q_poly A, const Q_poly B)
 
 //Skalare Divisionen
 
-Q_poly Q_poly::Q_poly_scalar_div(const Q_poly g, const mpz_t n)
+void Q_poly::Q_poly_scalar_div(const Q_poly g, const mpz_t n)
 {
     if (mpz_sgn(n)!=0) // überprüft Teilung durch 0
     {
@@ -445,13 +445,13 @@ Q_poly Q_poly::Q_poly_scalar_div(const Q_poly g, const mpz_t n)
 }
 
 
-Q_poly Q_poly::Q_poly_scalar_div_to(const mpz_t n)
+void Q_poly::Q_poly_scalar_div_to(const mpz_t n)
 {
     this->Q_poly_scalar_div(*this,n);
 }
 
 // Division durch Monom - Quotient
-Q_poly Q_poly::Q_poly_mon_div(const Q_poly f, const int n)
+void Q_poly::Q_poly_mon_div(const Q_poly f, const int n)
 {
     if (f.deg<n)
     {
@@ -470,7 +470,7 @@ Q_poly Q_poly::Q_poly_mon_div(const Q_poly f, const int n)
 }
 
 // Division durch Monom - Rest
-Q_poly Q_poly::Q_poly_mon_div_rem(const Q_poly f, const int n)
+void Q_poly::Q_poly_mon_div_rem(const Q_poly f, const int n)
 {
     if (f.deg<n)
     {
@@ -500,7 +500,7 @@ Q_poly Q_poly::Q_poly_mon_div_rem(const Q_poly f, const int n)
 
 // Euklidische Division nach Cohen Algo 3.1.1 (degA muss größer gleich deg B sein)!!
 
-Q_poly Q_poly::Q_poly_div_rem(const Q_poly A, const Q_poly B)
+void Q_poly::Q_poly_div_rem(const Q_poly A, const Q_poly B)
 {
 
     // Initialisierungen: Vergiss zunächst die Hauptnenner von A und B (--> R bzw. Bint)
@@ -548,14 +548,14 @@ Q_poly Q_poly::Q_poly_div_rem(const Q_poly A, const Q_poly B)
 
 //To Variante von Algo 3.1.1 im Cohen
 
-Q_poly Q_poly::Q_poly_div_rem_to(const Q_poly B)
+void Q_poly::Q_poly_div_rem_to(const Q_poly B)
 {
     this->Q_poly_div_rem(*this,B);
 }
 
 
 // Division nach Cohen 3.1.2 (gibt R und Q aus) --> Führt Pseudo-Division durch, korrigiert den Faktor aber im Nenner
-Q_poly Q_poly::Q_poly_div(Q_poly &Q, Q_poly &R, const Q_poly A, const Q_poly B)
+void Q_poly::Q_poly_div(Q_poly &Q, Q_poly &R, const Q_poly A, const Q_poly B)
 {
 
     // Initialisierungen: Vergiss zunächst die Hauptnenner von A und B (--> R bzw. Bint)
@@ -612,7 +612,7 @@ Q_poly Q_poly::Q_poly_div(Q_poly &Q, Q_poly &R, const Q_poly A, const Q_poly B)
 
 //To Variante der exakten Division
 
-Q_poly Q_poly::Q_poly_div_to(Q_poly &Q,Q_poly &R,const Q_poly B)
+void Q_poly::Q_poly_div_to(Q_poly &Q,Q_poly &R,const Q_poly B)
 {
     this->Q_poly_div(Q,R,*this,B);
 }
@@ -621,14 +621,14 @@ Q_poly Q_poly::Q_poly_div_to(Q_poly &Q,Q_poly &R,const Q_poly B)
 // Kombinationen
 
 // a := a*b + c
-Q_poly Q_poly::Q_poly_multadd_to(const Q_poly b, const Q_poly c)
+void Q_poly::Q_poly_multadd_to(const Q_poly b, const Q_poly c)
 {
     Q_poly_mult_n_to(b);
     Q_poly_add_to(c);
 }
 
 //a=a*b-c
-Q_poly Q_poly::Q_poly_multsub_to(const Q_poly b, const Q_poly c)
+void Q_poly::Q_poly_multsub_to(const Q_poly b, const Q_poly c)
 {
     Q_poly_mult_n_to(b);
     Q_poly_sub_to(c);
@@ -638,7 +638,7 @@ Q_poly Q_poly::Q_poly_multsub_to(const Q_poly b, const Q_poly c)
 
 /*
 // a := (a+b)* c
-Q_poly Q_poly::poly_addmult_to(const Q_poly b, const Q_poly c)
+void Q_poly::poly_addmult_to(const Q_poly b, const Q_poly c)
 {
         Q_poly a(deg,coef);
         a.poly_add_to(b);
@@ -684,7 +684,7 @@ void Q_poly::Q_poly_horner_Q_poly(const Q_poly A,const Q_poly B)
 
 
 //setze Q_polynom auf Q_polynom b
-Q_poly Q_poly::Q_poly_set(const Q_poly b)
+void Q_poly::Q_poly_set(const Q_poly b)
 {
     deg=b.deg;
     mpz_init_set(denom,b.denom);
@@ -697,7 +697,7 @@ Q_poly Q_poly::Q_poly_set(const Q_poly b)
 
 
 // setze Q_polynom auf konstantes Q_polynom b/d
-Q_poly Q_poly::Q_poly_set(const mpz_t b, const mpz_t d)
+void Q_poly::Q_poly_set(const mpz_t b, const mpz_t d)
 {
     deg=0;
     mpz_init_set(denom,d);
@@ -705,7 +705,7 @@ Q_poly Q_poly::Q_poly_set(const mpz_t b, const mpz_t d)
 }
 
 // setze Q_polynom auf konstantes Z_polynom b
-Q_poly Q_poly::Q_poly_set(const mpz_t b)
+void Q_poly::Q_poly_set(const mpz_t b)
 {
     deg=0;
     mpz_init_set_ui(denom,1);
@@ -714,7 +714,7 @@ Q_poly Q_poly::Q_poly_set(const mpz_t b)
 
 
 //setze Q_polynom auf Nullpolynom
-Q_poly Q_poly::Q_poly_set_zero()
+void Q_poly::Q_poly_set_zero()
 {
     deg = -1;
 }
@@ -742,7 +742,7 @@ int Q_poly::is_equal(Q_poly &g)
 }
 
 //Überprüft ob das Q_polynom 0 ist
-int Q_poly::is_zero()
+int Q_poly::is_zero() const
 {
     if (deg<0)
         return 1;
@@ -753,7 +753,7 @@ int Q_poly::is_zero()
 
 
 //Überprüft ob das Q_polynom 1 ist
-int Q_poly::is_one()
+int Q_poly::is_one() const
 {
     if (deg==0)
     {
@@ -763,7 +763,7 @@ int Q_poly::is_one()
     else { return 0; }
 }
 
-int Q_poly::is_monic()
+int Q_poly::is_monic() const
 {
     if (mpz_cmp(coef[deg],denom)==0)
         return 1;
@@ -773,7 +773,7 @@ int Q_poly::is_monic()
 
 // klassischer GGT nach Cohen 3.2.1
 
-Q_poly Q_poly::Q_poly_gcd(Q_poly A, Q_poly B)
+void Q_poly::Q_poly_gcd(Q_poly A, Q_poly B)
 {
 
     if (A.deg<B.deg)
@@ -804,7 +804,7 @@ Q_poly Q_poly::Q_poly_gcd(Q_poly A, Q_poly B)
 
 // Nach nach Fieker 2.12 Symbolisches Rechnen (2012) MACHT PROBLEME
 // gibt g=s*A+t*B aus
-Q_poly Q_poly::Q_poly_extgcd(Q_poly &s,Q_poly &t,Q_poly &g, Q_poly A, Q_poly B)
+void Q_poly::Q_poly_extgcd(Q_poly &s,Q_poly &t,Q_poly &g, Q_poly A, Q_poly B)
 {
     if (A.deg<B.deg)
         Q_poly_extgcd(t,s,g,B,A);

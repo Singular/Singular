@@ -1069,7 +1069,7 @@ static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy /*syzstr*/,
   {
     for (j=0;j<i;j++)
     {
-      if ((pGetComp(add_generators->m[j])==pGetComp(add_generators->m[i])))
+      if (pGetComp(add_generators->m[j]) == pGetComp(add_generators->m[i]))
       {
         p = pOne();
         pLcm(add_generators->m[j],add_generators->m[i],p);
