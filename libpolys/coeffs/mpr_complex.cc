@@ -96,12 +96,12 @@ void gmp_float::setFromStr(const char * in )
     *c_in = '0';
     strcpy(&(c_in[1]), in);
 
-    mpf_set_str( t, c_in, 10 );
+    if(mpf_set_str( t, c_in, 10 )s!=0) WerrorS("syntax error in GMP float");
     omFreeSize((void*)c_in, len);
   }
   else
   {
-    mpf_set_str( t, in, 10 );
+    if(mpf_set_str( t, in, 10 )!=0) WerrorS("syntax error in GMP float");
   }
   if (neg)  mpf_neg( t, t );
 }
