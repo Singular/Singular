@@ -33,7 +33,7 @@ PROCEDURES:
                                       in the localization w.r.t P
   componentEHV(I,P,L [,Strategy]);    a P-primary component for I
   primdecEHV(I [,Strategy]);          a minimal primary decomposition of I
-  compareLists(L, K);                 procedure for comparing the output of
+  primDecsAreEquivalent(L, K);        procedure for comparing the output of
                                       primary decomposition algorithms (checks
                                       if the computed associated primes coincide)
 ";
@@ -1368,10 +1368,10 @@ example
 
 
 /////////////////////////////////////////////////////////////////////
-proc compareLists(list L, list K)
-"USAGE:   checkLists(L,K); L,K list of ideals
+proc primDecsAreEquivalent(list L, list K)
+"USAGE:   primDecsAreEquivalent(L,K); L,K list of ideals
 RETURN:  integer, 1 if the lists are the same up to ordering and 0 otherwise
-EXAMPLE: example checkLists; shows an example"
+EXAMPLE: example primDecsAreEquivalent; shows an example"
 {
   int s1 = size(L);
   int s2 = size(K);
@@ -1408,6 +1408,10 @@ EXAMPLE: example checkLists; shows an example"
             }
         }
     }
+  if ( size(N) != s1 ) 
+  { 
+     return(0);
+  }
   return(1);
 }
 
@@ -1419,6 +1423,27 @@ example
   ideal i = x2,xy;
   list L1 = primdecGTZ(i);
   list L2 = primdecEHV(i);
-  compareLists(L1,L2);
+  primDecsAreEquivalent(L1,L2);
+}
+
+static proc testPrimDecsAreEquivalent()
+{
+    ring rng = 0 ,x,dp;
+    list L1, L2;
+
+    // test1. different sizes
+    L1[1] = list( ideal(0), ideal(0)  );
+    ASSUME(0, 0 == primDecsAreEquivalent(L1,L2) );
+    // test2. same size, but different content
+    L2[1] = list( ideal(1), ideal(1)  );
+
+    ASSUME(0, 0 == primDecsAreEquivalent(L1,L2) );
+
+    // test3. equivalent content
+    L1[1] = list( ideal(0), ideal(0)  );
+    L1[2] = list( ideal(x), ideal(x)  );
+    L2[1] = list( ideal(x), ideal(x)  );
+    L2[2] = list( ideal(0), ideal(0)  );
+    ASSUME(0, 1 == primDecsAreEquivalent(L1,L2) );
 }
 
