@@ -31,8 +31,6 @@
 
 #include <polys/nc/gb_hack.h>
 
-int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
-
 // #pragma GCC diagnostic ignored "-Wwrite-strings"
 namespace
 {

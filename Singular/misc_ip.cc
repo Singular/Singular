@@ -1266,13 +1266,3 @@ void siInit(char *name)
   }
   errorreported = 0;
 }
-
-/*
-#ifdef LIBSINGULAR
-// the init routines of factory need mmInit
-int mmInit( void )
-{
-  return 1;
-}
-#endif
-*/

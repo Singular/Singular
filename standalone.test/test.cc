@@ -7,8 +7,6 @@
 #include <reporter/reporter.h>
 #include <resources/feResource.h>
 
-int mmInit(void) {return 1; }
-
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
 

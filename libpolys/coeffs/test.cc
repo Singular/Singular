@@ -24,8 +24,6 @@
 #include <coeffs/rintegers.h>
 
 
-int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
-
 #include <iostream>
 
 using namespace std;

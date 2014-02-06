@@ -53,9 +53,6 @@
 #include <polys/clapsing.h>
 
 
-int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
-
-
 #include <coeffs/numbers.h>
 #include <kernel/polys.h>
 

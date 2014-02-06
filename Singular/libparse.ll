@@ -10,8 +10,6 @@
 #ifdef STANDALONE_PARSER
   #include <Singular/utils.h>
 
-  int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
-
   #define HAVE_LIBPARSER
   #define YYLPDEBUG 1
   #define myfread fread
