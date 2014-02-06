@@ -21,15 +21,11 @@
 #include <kernel/kstd1.h>
 #include<gmp.h>
 #include<vector>
-//TIMER
-#include<time.h>
 
 
 static int  **Qpol;
 static int  *Q0, *Ql;
 static int  hLength;
-//ADICHANGES
-static std::vector<int> degsort;
    
 
 static int hMinModulweight(intvec *modulweight)
@@ -229,6 +225,7 @@ static void hWDegree(intvec *wdegree)
 //returns the degree of the monomial
 static int DegMon(poly p)
 {
+    #if 1
     int i,deg;
     deg = 0;
     for(i=1;i<=currRing->N;i++)
@@ -236,54 +233,12 @@ static int DegMon(poly p)
         deg = deg + p_GetExp(p, i, currRing);
     }
     return(deg);
-}
-
-//divides all monomials by the last entry 
-static ideal idSimplify(ideal I)
-{
-    int i,j;
-    bool flag;
-    #if 0
-    for(i=IDELEMS(I)-2;i>=0;i--)
-    {
-        flag=TRUE;
-        for(j=1;(j<=currRing->N)&&(flag);j++)
-        {
-            if(p_GetExp(I->m[i], j, currRing) < p_GetExp(I->m[IDELEMS(I)-1], j, currRing))
-            {
-                flag=FALSE;
-            }
-        }
-        if(flag)
-        {
-            I->m[i]=NULL;
-        }
-    }
     #else
-    for(i=IDELEMS(I)-2;i>=0;i--)
-    {
-        if(p_DivisibleBy(I->m[IDELEMS(I)-1], I->m[i], currRing))
-        {
-            I->m[i] = NULL;
-        }
-    }
+    return(p_Deg(p, currRing));
     #endif
-    idSkipZeroes(I);
-    return(I);
 }
 
-//Puts in sorted vector the degrees of generators of I
-static void PutIn(int degvalue, int oldposition, int where)
-{
-    int i;
-    for(i=degsort.size()-1;i>=where+2;i--)
-    {
-        degsort[i] = degsort[i-2];
-    }
-    degsort[where] = degvalue;
-    degsort[where+1] = oldposition;
-}
-
+//Tests if the ideal is sorted by degree
 static bool idDegSortTest(ideal I)
 {
     if((I == NULL)||(idIs0(I)))
@@ -307,53 +262,57 @@ static bool idDegSortTest(ideal I)
 static ideal SortByDeg_p(ideal I, poly p)
 {
     int i,j;
-    //printf("\nBegin of SortByDeg_p\n");
-    //idPrint(Iorig);pWrite(p);
-    //idPrint(Iorig);
-    //ideal I = idCopy(Iorig);
     if((I == NULL) || (idIs0(I)))
     {
         ideal res = idInit(1,1);
         res->m[0] = p;
         return(res);
     }
-    //ideal I = idCopy(Iorig);
-    //idPrint(I);pWrite(p);
     idSkipZeroes(I);
     #if 1
     for(i = 0; (i<IDELEMS(I)) && (DegMon(I->m[i])<=DegMon(p)); i++)
     {
         if(p_DivisibleBy( I->m[i],p, currRing))
         {
-            //idPrint(I);pWrite(p);
-            //printf("\np will be deleted...\n");
-            //getchar();
             return(I);
         }
     }
     for(i = IDELEMS(I)-1; (i>=0) && (DegMon(I->m[i])>=DegMon(p)); i--)
     {
-        //printf("\nCheck if p divides I->m[i]\n");pWrite(p);pWrite(I->m[i]);
         if(p_DivisibleBy(p,I->m[i], currRing))
         {
-            //printf("\nHere Down\n");
-            //printf("\n");
-            //idPrint(I);pWrite(p);
-            //printf("\nI[%i] will be deleted...\n",i);
-            //getchar();
             I->m[i] = NULL;
         }
     }
     if(idIs0(I))
     {
+        idSkipZeroes(I);
         I->m[0] = p;
         return(I);
     }
-    //printf("\nNo luck till now...\n");
-    //printf("\n");
     #endif
     idSkipZeroes(I);
-    //idPrint(I);pWrite(p);
+    //First I take the case when all generators have the same degree
+    if(DegMon(I->m[0]) == DegMon(I->m[IDELEMS(I)-1]))
+    {
+        if(DegMon(p)<DegMon(I->m[0]))
+        {
+            idInsertPoly(I,p);
+            idSkipZeroes(I);
+            for(i=IDELEMS(I)-1;i>=1; i--)
+            {
+                I->m[i] = I->m[i-1];
+            }
+            I->m[0] = p;
+            return(I);
+        }
+        if(DegMon(p)>=DegMon(I->m[IDELEMS(I)-1]))
+        {
+            idInsertPoly(I,p);
+            idSkipZeroes(I);
+            return(I);
+        }
+    }
     if(DegMon(p)<=DegMon(I->m[0]))
     {
         idInsertPoly(I,p);
@@ -363,24 +322,16 @@ static ideal SortByDeg_p(ideal I, poly p)
             I->m[i] = I->m[i-1];
         }
         I->m[0] = p;
-        //I = idMinBase(I);
         return(I);
     }
     if(DegMon(p)>=DegMon(I->m[IDELEMS(I)-1]))
     {
         idInsertPoly(I,p);
         idSkipZeroes(I);
-        //I = idMinBase(I);
         return(I);
     }
     for(i = IDELEMS(I)-2; ;)
     {
-        if(i==-1)
-        {
-            //Shouldn't happen
-            printf("\n        ERROR\n");
-            break;
-        }
         if(DegMon(p)==DegMon(I->m[i]))
         {
             idInsertPoly(I,p);
@@ -400,9 +351,7 @@ static ideal SortByDeg_p(ideal I, poly p)
             {
                 I->m[j] = I->m[j-1];
             }
-            I->m[i] = p;
-            idDegSortTest(I);
-            //I = idMinBase(I);
+            I->m[i+1] = p;
             return(I);
         }
         i--;
@@ -427,18 +376,14 @@ static ideal SortByDeg(ideal I)
         res = SortByDeg_p(res, I->m[i]);
     }
     idSkipZeroes(res);
-    idDegSortTest(res);
+    //idDegSortTest(res);
     return(res);
 }
-#if 0
+
 //idQuot(I,p) for I monomial ideal, p a ideal with a single monomial.
 ideal idQuotMon(ideal Iorig, ideal p)
 {
-    ideal I;
-    I = idCopy(Iorig);
-    //printf("\nOriginal:\n");idPrint(I);idPrint(p);
-    #if 1
-    if(idIs0(I))
+    if(idIs0(Iorig))
     {
         ideal res = idInit(1,1);
         res->m[0] = poly(0);
@@ -450,6 +395,7 @@ ideal idQuotMon(ideal Iorig, ideal p)
         res->m[0] = pOne();
         return(res);
     }
+    ideal I = idCopy(Iorig);
     ideal res = idInit(IDELEMS(I),1);
     int i,j;
     int dummy;
@@ -472,118 +418,43 @@ ideal idQuotMon(ideal Iorig, ideal p)
             }
         }
         p_Setm(res->m[i], currRing);
-        /*if(DegMon(res->m[i]) == DegMon(I->m[i]))
+        if(DegMon(res->m[i]) == DegMon(I->m[i]))
         {
             res->m[i] = NULL;
         }
         else
         {
             I->m[i] = NULL;
-        }*/
+        }
     }
     idSkipZeroes(res);
     idSkipZeroes(I);
-    //res = idMinBase(res);
-    //printf("res");
-    //idPrint(res);
-    //printf("I");
-    //idPrint(I);
-    /*if(!idIs0(res))
+    if(!idIs0(res))
     {
-        for(i = 0; i<IDELEMS(res); i++)
-        {
-            //printf("i = %i",i);
-            //printf("Go in SortByDeg_p\n");
-            I = SortByDeg_p(I,res->m[i]);
-        }
-    }*/
-    res = SortByDeg(res);
-    return(res);
-    //idPrint(I);
+    for(i = 0; i<=IDELEMS(res)-1; i++)
+    {
+        I = SortByDeg_p(I,res->m[i]);
+    }
+    }
+    //idDegSortTest(I);
     return(I);
-    #else
-    ideal res;
-    res = idQuot(I,p,TRUE,TRUE);
-    res = SortByDeg(res);
-    return(res);
-    #endif
 }
-#else
-ideal idQuotMon(ideal I, ideal p)
-{
-    //printf("\nOriginal:\n");idPrint(idQuot(I,p,TRUE,TRUE));
-    #if 1
-    if(idIs0(I))
-    {
-        ideal res = idInit(1,1);
-        res->m[0] = poly(0);
-        return(res);
-    }
-    if(idIs0(p))
-    {
-        ideal res = idInit(1,1);
-        res->m[0] = pOne();
-        return(res);
-    }
-    ideal res = idInit(IDELEMS(I),1);
-    int i,j;
-    int dummy;
-    for(i = 0; i<IDELEMS(I); i++)
-    {
-        res->m[i] = p_Copy(I->m[i], currRing);
-        for(j = 1; (j<=currRing->N) ; j++)
-        {
-            dummy = p_GetExp(p->m[0], j, currRing);
-            if(dummy > 0)
-            {
-                if(p_GetExp(I->m[i], j, currRing) < dummy)
-                {
-                    p_SetExp(res->m[i], j, 0, currRing);
-                }
-                else
-                {
-                    p_SetExp(res->m[i], j, p_GetExp(I->m[i], j, currRing) - dummy, currRing);
-                }
-            }
-        }
-        p_Setm(res->m[i], currRing);
-    }
-    res = idMinBase(res);
-    //Here is the PROBLEM!!! IT SEEMS WHAT I HAVE DONE IN SORTBYDEG_P ABOUT SIMPLIFING THE IDEAL DOESN'T WORK PROPERLY: THEREFORE I STILL NEED TO USE IDMINBASE WHICH IS TIME CONSUMING.
-    //ALSO MAKE THE IDQUOT TO SORT PARTIALLY, NOT ALL FROM BEGINNING
-    idSkipZeroes(res);
-    //res = SortByDeg(res);
-    //idPrint(res);
-    return(res);
-    #else
-    ideal res;
-    res = idQuot(I,p,TRUE,TRUE);
-    return(res);
-    #endif
-}
-#endif
-//id_Add for monomials (hoping it is faster)
+
+//id_Add for monomials
 static ideal idAddMon(ideal I, ideal p)
 {
-    //printf("\nI and p\n");idPrint(I);pWrite(p->m[0]);
     #if 1
-    //idInsertPoly(I,p->m[0]);
     I = SortByDeg_p(I,p->m[0]);
     #else
     I = id_Add(I,p,currRing);
     #endif
-    idSkipZeroes(I);
-    //I = idSimplify(I);
-    //printf("\nBLA in idAddMon\n");idPrint(I);
-    //I = SortByDeg(I);
+    //idSkipZeroes(I);
     return(I);
 }
 
 //searches for a variable that is not yet used (assumes that the ideal is sqrfree)
 static poly ChoosePVar (ideal I)
 {
-    //idPrint(I);
-    //printf("\nThere is a variable which is not yet used... ChangePVar\n");getchar();
     bool flag=TRUE;
     int i,j;
     poly res;
@@ -854,7 +725,6 @@ static poly ChoosePJF(ideal I)
 //chooses 1 \neq p \not\in S. This choice should be made optimal
 static poly ChooseP(ideal I)
 {
-    //idPrint(I);
     poly m;
     //  TEST TO SEE WHICH ONE IS BETTER
     //m = ChoosePXL(I);
@@ -865,7 +735,6 @@ static poly ChooseP(ideal I)
     //m = ChoosePVF(I);
     m = ChoosePJL(I);
     //m = ChoosePJF(I);
-    //printf("\nMy choice was \n");pWrite(m);getchar();
     return(m);
 }
 
@@ -1069,8 +938,6 @@ void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, in
     int i,j;
     int dummy;
     poly m;
-    clock_t t;
-    t=clock();
     ideal p, koszsimp;
     //----------- PRUNING OF S ---------------
     //S SHOULD IN THIS POINT BE ORDERED BY DEGREE
@@ -1083,13 +950,7 @@ void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, in
         }
     }
     idSkipZeroes(S);
-    /*if(((float)(clock()-t)/CLOCKS_PER_SEC)!=0)
-    {
-        printf("\nPruning S took %f\n",(float)(clock()-t)/CLOCKS_PER_SEC);
-        //idPrint(I);idPrint(S);getchar();
-    }*/
     //----------------------------------------
-    t = clock();
     for(i=IDELEMS(I)-1;i>=0;i--)
     {
         m = p_Copy(I->m[i],currRing);
@@ -1109,12 +970,7 @@ void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, in
         }
     }
     idSkipZeroes(I);
-    /*if(((float)(clock()-t)/CLOCKS_PER_SEC)!=0)
-    {
-        printf("\nConstructing I' took %f\n",(float)(clock()-t)/CLOCKS_PER_SEC);
-    }*/
     //----------- MORE PRUNING OF S ------------
-    t = clock();
     m = LCMmon(I); 
     if(m != NULL)
     {
@@ -1137,12 +993,6 @@ void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, in
         }
     idSkipZeroes(S);
     }
-    /*if(((float)(clock()-t)/CLOCKS_PER_SEC)!=0)
-    {
-        printf("\nMore Pruning S took %f\n",(float)(clock()-t)/CLOCKS_PER_SEC);
-    }*/
-    //------------------------------------------
-    //I = SortByDeg(I);
     /*printf("\n---------------------------\n");
     printf("\n      I\n");idPrint(I);
     printf("\n      S\n");idPrint(S);
@@ -1156,7 +1006,6 @@ void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, in
         p_Delete(&m, currRing);
         break;
     }
-    //S = SortByDeg(S);
     m = LCMmon(I);
     if(!p_DivisibleBy(x,m, currRing))
     {
@@ -1165,30 +1014,19 @@ void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, in
         id_Delete(&I, currRing);
         id_Delete(&S, currRing);
         p_Delete(&m, currRing);
-        //return;
         break;
     }
     m = SqFree(I);
-    koszsimp = idInit(IDELEMS(I),1);
     if(m==NULL)
     {
         //printf("\n      Corner: ");
         //pWrite(q);
         //printf("\n      With the facets of the dual simplex:\n");
-        for(i=IDELEMS(I)-1;i>=0;i--)
-        {
-            koszsimp->m[i] = I->m[i];
-        }
-        //idPrint(koszsimp);
-        //getchar();
-        //printf("\n Euler Characteristic = ");
-        t = clock();
-        //idPrint(koszsimp);
-        //getchar();
+        //idPrint(I);
         mpz_t ec;
         mpz_init(ec);
         mpz_ptr ec_ptr = ec;
-        eulerchar(koszsimp, currRing->N, ec_ptr);
+        eulerchar(I, currRing->N, ec_ptr);
         bool flag = FALSE;
         if(NNN==0)
             {
@@ -1227,23 +1065,13 @@ void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, in
                 NNN++;
             }
         }
-        #if 0
-        for(i = 0; i<NNN; i++)
-        {
-            gmp_printf("\n//  %8Zd t^%d",&hilbertcoef[i],hilbpower[i]);
-        }
-        printf("\n");
-        //getchar();
-        #endif
         break;
     }
     m = ChooseP(I);
     p = idInit(1,1);
     p->m[0] = m;
     ideal Ip = idQuotMon(I,p);
-    //Ip = SortByDeg(Ip);
     ideal Sp = idQuotMon(S,p);
-    //Sp = SortByDeg(Sp);
     poly pq = pp_Mult_mm(q,m,currRing);
     rouneslice(Ip, Sp, pq, x, prune, moreprune, steps, NNN, hilbertcoef,hilbpower);
     //id_Delete(&Ip, currRing);
@@ -1258,7 +1086,7 @@ void rouneslice(ideal I, ideal S, poly q, poly x, int &prune, int &moreprune, in
 //it computes the first hilbert series by means of Roune Slice Algorithm
 void slicehilb(ideal I)
 {
-    printf("Adi changes are here: \n");
+    //printf("Adi changes are here: \n");
     int i, NNN = 0;
     int steps = 0, prune = 0, moreprune = 0;
     mpz_ptr hilbertcoef;
@@ -1274,11 +1102,11 @@ void slicehilb(ideal I)
     p_Setm(X->m[0],currRing);
     I = id_Mult(I,X,currRing);
     I = SortByDeg(I);
-    printf("\n-------------RouneSlice--------------\n");
+    //printf("\n-------------RouneSlice--------------\n");
     rouneslice(I,S,q,X->m[0],prune, moreprune, steps, NNN, hilbertcoef, hilbpower);
-    printf("\nIn total Prune got rid of %i elements\n",prune);
-    printf("\nIn total More Prune got rid of %i elements\n",moreprune);
-    printf("\nSteps of rouneslice: %i\n\n", steps);
+    //printf("\nIn total Prune got rid of %i elements\n",prune);
+    //printf("\nIn total More Prune got rid of %i elements\n",moreprune);
+    //printf("\nSteps of rouneslice: %i\n\n", steps);
     mpz_t coefhilb;
     mpz_t dummy;
     mpz_init(coefhilb);
@@ -1293,7 +1121,7 @@ void slicehilb(ideal I)
     }
     omFreeSize(hilbertcoef, (NNN)*sizeof(mpz_t));
     omFreeSize(hilbpower, (NNN)*sizeof(int));
-    printf("\n-------------------------------------\n");
+    //printf("\n-------------------------------------\n");
 }
 
 // -------------------------------- END OF CHANGES -------------------------------------------
@@ -1534,14 +1362,10 @@ static void hPrintHilb(intvec *hseries)
 */
 void hLookSeries(ideal S, intvec *modulweight, ideal Q)
 {
-  clock_t t;    // ADICHANGES
-  t = clock(); // ADICHANGES
   int co, mu, l;
   intvec *hseries2;
   intvec *hseries1 = hFirstSeries(S, modulweight, Q);
   hPrintHilb(hseries1);
-  printf("\nTime for Original: %f\n",((float)(clock()-t))/CLOCKS_PER_SEC); getchar(); // ADICHANGES
-  #if 0
   l = hseries1->length()-1;
   if (l > 1)
     hseries2 = hSecondSeries(hseries1);
@@ -1557,12 +1381,6 @@ void hLookSeries(ideal S, intvec *modulweight, ideal Q)
   if (l>1)
     delete hseries1;
   delete hseries2;
-  #endif
-  clock_t now;    // ADICHANGES
-  now = clock(); // ADICHANGES
-  slicehilb(S); // ADICHANGES
-  printf("\nTime for Slice Algorithm: %f \n\n", ((float)(clock()-now))/CLOCKS_PER_SEC);    // ADICHANGES
-  
 }
 
 
