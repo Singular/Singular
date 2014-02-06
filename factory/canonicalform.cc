@@ -26,19 +26,11 @@ CanonicalForm readCF( ISTREAM& );
 //{{{ initialization
 int initializeCharacteristic();
 
-#ifdef SINGULAR
-extern int mmInit(void);
-#endif
-
 int
 initCanonicalForm( void )
 {
     static bool initialized = false;
     if ( ! initialized ) {
-#if defined (SINGULAR)
-        (void)mmInit();
-#endif
-
         (void)initializeCharacteristic();
         initialized = true;
     }

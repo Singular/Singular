@@ -70,7 +70,7 @@ int main(          /* main entry to Singular */
     int argc,      /* number of parameter */
     char** argv)   /* parameter array */
 {
-  //mmInit();
+  mmInit();
   // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
   omInitRet_2_Info(argv[0]);
   omInitGetBackTrace();
