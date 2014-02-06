@@ -1,3 +1,5 @@
+_config.h
+_config.h.in
 .deps
 .dirstamp
 .DS_Store
