@@ -1,4 +1,3 @@
-!configure.ac
 .deps
 .dirstamp
 .DS_Store
@@ -62,7 +61,6 @@
 /modules/include/config.h
 /MP/*
 /ntl/*
-/ntl/*
 /omalloc/Makefile.in
 /omalloc/omalloc.h
 /omalloc/omConfig.h
@@ -73,12 +71,10 @@
 /omalloc/omTables.dSYM/*
 /omalloc/omTables.h
 /omalloc/omTables.inc
-/omalloc/stamp-h3
 /redhat/singular.spec
 /resources/resourcesconfig.h
 /resources/resourcesconfig.h.in
 /Singular/all.lib
-/Singular/confdefs.h
 /Singular/ESingular
 /Singular/feOptGen
 /Singular/gftables
@@ -86,10 +82,7 @@
 /Singular/ndbm.dl_og
 /Singular/sing_dbm.dl_og
 /Singular/Singular
-/Singular/Singular
 /Singular/Singular.rc
-/Singular/svnver
-/Singular/test
 /Singular/TSingular
 /x86_64-Linux/*
 aclocal.m4
@@ -99,7 +92,6 @@ compile
 confdefs.h
 config.cache
 config.guess
-config.h
 config.h
 config.h.in*
 config.log
@@ -121,10 +113,6 @@ MOD
 singular.png
 singularconfig.h
 singularconfig.h.in
-stamp-h
-stamp-h1
-stamp-h2
-tags
+stamp-h*
 tags
 test-driver
-ylwrap
