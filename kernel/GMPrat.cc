@@ -30,27 +30,19 @@
 #include <kernel/GMPrat.h>
 
 // ----------------------------------------------------------------------------
-//  Miscellaneous
-// ----------------------------------------------------------------------------
-
-Rational Rational::save;    // dummy variable
-
-// ----------------------------------------------------------------------------
 //  disconnect a rational from its reference
 // ----------------------------------------------------------------------------
 
-void    Rational::disconnect( )
+void    Rational::disconnect()
 {
     if( p->n>1)
     {
+        rep *old_p = p;
         p->n--;
         p = new rep;
+        mpq_init(p->rat);
+        mpq_set(p->rat, old_p->rat);
     }
-    else
-    {
-        mpq_clear(p->rat);
-    }
-    mpq_init(p->rat);
 }
 
 // ----------------------------------------------------------------------------
@@ -115,7 +107,12 @@ Rational::~Rational()
 
 Rational& Rational::operator=(int a)
 {
-  disconnect();
+  if( p->n>1)
+  {
+    p->n--;
+    p = new rep;
+    mpq_init(p->rat);
+  }
   mpq_set_si(p->rat,(long) a,1);
   return *this;
 }
@@ -222,36 +219,32 @@ Rational::operator~()
 Rational&
 Rational::operator+=(const Rational &a)
 {
-  mpq_set(save.p->rat,p->rat);
   disconnect();
-  mpq_add(p->rat,save.p->rat,a.p->rat);
+  mpq_add(p->rat,p->rat,a.p->rat);
   return *this;
 }
 
 Rational&
 Rational::operator-=(const Rational &a)
 {
-  mpq_set(save.p->rat,p->rat);
   disconnect();
-  mpq_sub(p->rat,save.p->rat,a.p->rat);
+  mpq_sub(p->rat,p->rat,a.p->rat);
   return *this;
 }
 
 Rational&
 Rational::operator*=(const Rational &a)
 {
-  mpq_set(save.p->rat,p->rat);
   disconnect();
-  mpq_mul(p->rat,save.p->rat,a.p->rat);
+  mpq_mul(p->rat,p->rat,a.p->rat);
   return *this;
 }
 
 Rational&
 Rational::operator/=(const Rational &a)
 {
-  mpq_set(save.p->rat,p->rat);
   disconnect();
-  mpq_div(p->rat,save.p->rat,a.p->rat);
+  mpq_div(p->rat,p->rat,a.p->rat);
   return *this;
 }
 
@@ -262,9 +255,8 @@ Rational::operator/=(const Rational &a)
 Rational&
 Rational::operator++()
 {
-  mpq_set(save.p->rat,p->rat);
-  *this=1;
-  mpq_add(p->rat,p->rat,save.p->rat);
+  disconnect();
+  mpz_add(mpq_numref(p->rat), mpq_numref(p->rat), mpq_denref(p->rat));
   return *this;
 }
 
@@ -273,18 +265,16 @@ Rational::operator++(int)
 {
   Rational erg(*this);
 
-  mpq_set(save.p->rat,p->rat);
-  *this=1;
-  mpq_add(p->rat,p->rat,save.p->rat);
+  disconnect();
+  mpz_add(mpq_numref(p->rat), mpq_numref(p->rat), mpq_denref(p->rat));
   return erg;
 }
 
 Rational&
 Rational::operator--()
 {
-  mpq_set(save.p->rat,p->rat);
-  *this=1;
-  mpq_sub(p->rat,save.p->rat,p->rat);
+  disconnect();
+  mpz_sub(mpq_numref(p->rat), mpq_numref(p->rat), mpq_denref(p->rat));
   return *this;
 }
 
@@ -293,9 +283,8 @@ Rational::operator--(int)
 {
   Rational erg(*this);
 
-  mpq_set(save.p->rat,p->rat);
-  *this=1;
-  mpq_sub(p->rat,save.p->rat,p->rat);
+  disconnect();
+  mpz_sub(mpq_numref(p->rat), mpq_numref(p->rat), mpq_denref(p->rat));
   return erg;
 }
 

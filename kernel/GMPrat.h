@@ -21,7 +21,6 @@ class Rational
     };
 
     rep             *p;
-    static Rational save;
 
     void disconnect();
 
