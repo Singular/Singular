@@ -23,21 +23,6 @@
 CanonicalForm readCF( ISTREAM& );
 #endif /* NOSTREAMIO */
 
-//{{{ initialization
-int initializeCharacteristic();
-
-int
-initCanonicalForm( void )
-{
-    static bool initialized = false;
-    if ( ! initialized ) {
-        (void)initializeCharacteristic();
-        initialized = true;
-    }
-    return 1;
-}
-//}}}
-
 //{{{ constructors, destructors, selectors
 CanonicalForm::CanonicalForm( const char * str, const int base ) : value( CFFactory::basic( str, base ) )
 {
