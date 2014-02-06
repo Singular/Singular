@@ -14,8 +14,6 @@
 
 #include <misc/auxiliary.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
-
 #include <misc/auxiliary.h>
 #include "clapsing.h"
 

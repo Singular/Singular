@@ -16,7 +16,6 @@
 #include <misc/auxiliary.h>
 #include <misc/options.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 
 #include <kernel/febase.h>

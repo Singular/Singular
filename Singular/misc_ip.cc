@@ -19,7 +19,6 @@
 #include <kernel/mod2.h>
 #include <Singular/si_signals.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 
 #ifdef HAVE_SIMPLEIPC
@@ -401,8 +400,6 @@ lists primeFactorisation(const number n, const int pBound)
 #ifdef HAVE_STATIC
 #undef HAVE_DYN_RL
 #endif
-
-#define SI_DONT_HAVE_GLOBAL_VARS
 
 //#ifdef HAVE_LIBPARSER
 //#  include "libparse.h"
