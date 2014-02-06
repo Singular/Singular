@@ -52,8 +52,6 @@
 
 extern int siInit(char *);
 
-// int initializeGMP(){ return 1; }
-
 int mmInit( void )
 {
 #if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)

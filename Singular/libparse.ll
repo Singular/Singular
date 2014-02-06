@@ -10,7 +10,6 @@
 #ifdef STANDALONE_PARSER
   #include <Singular/utils.h>
 
-//   int initializeGMP(){ return 1; } // NEEDED FOR MAIN APP. LINKING!!!
   int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 
   #define HAVE_LIBPARSER

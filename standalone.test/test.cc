@@ -7,7 +7,6 @@
 #include <reporter/reporter.h>
 #include <resources/feResource.h>
 
-// int initializeGMP(){ return 1; }
 int mmInit(void) {return 1; }
 
 #include <polys/monomials/ring.h>
