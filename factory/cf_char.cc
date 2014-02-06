@@ -64,12 +64,6 @@ int getCharacteristic()
     return theCharacteristic;
 }
 
-int getExp()
-{
-  return InternalPrimePower::getk();
-}
-
-
 int getGFDegree()
 {
     //ASSERT( theDegree > 0, "not in GF(q)" );

@@ -40,8 +40,6 @@
 #include "FLINTconvert.h"
 #endif
 
-int getExp(); /* cf_char.cc */
-
 //static bool isUnivariateBaseDomain( const CanonicalForm & f )
 //{
 //    CFIterator i = f;

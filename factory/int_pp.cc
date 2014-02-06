@@ -97,18 +97,6 @@ InternalPrimePower::setPrimePower( int p, int k )
     }
 }
 
-int
-InternalPrimePower::getp()
-{
-    return prime;
-}
-
-int
-InternalPrimePower::getk()
-{
-    return exp;
-}
-
 #ifndef NOSTREAMIO
 void InternalPrimePower::print( OSTREAM & os, char * c )
 {

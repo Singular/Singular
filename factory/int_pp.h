@@ -55,8 +55,6 @@ public:
     InternalCF* normalize_myself();
 
     static void setPrimePower( int p, int k );
-    static int getp();
-    static int getk();
 
     bool is_imm() const;
 
