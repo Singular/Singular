@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I ../m4
 
 GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-version)
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/numeric -I${top_builddir}/numeric -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS)   -DGIT_VERSION='"$(GIT_VERSION)"'
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS)   -DGIT_VERSION='"$(GIT_VERSION)"'
 
 if HAVE_GFANLIB
   USE_GFANLIB = ${top_builddir}/dyn_modules/callgfanlib/gfanlib.la ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
@@ -10,7 +10,7 @@ else
   USE_GFANLIB = 
 endif
 
-# AM_LDFLAGS = libSingular.la ${top_builddir}/numeric/libnumeric.la ${top_builddir}/kernel/libkernel.la
+# AM_LDFLAGS = libSingular.la ${top_builddir}/kernel/libkernel.la
 
 ########################### Dynamic Modules... #########################
 if ENABLE_P_PROCS_DYNAMIC
@@ -173,10 +173,7 @@ SingularHEADERS =    Cache.h \
 nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc 
 
 libSingular_la_LDFLAGS    = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION}
-
-libSingular_la_LIBADD      = ${EMBED_PYOBJECT} ${top_builddir}/numeric/libnumeric.la ${top_builddir}/kernel/libkernel.la \
-${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-
+libSingular_la_LIBADD      = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT} ${top_builddir}/kernel/libkernel.la
 
 libSingular_includedir = ${includedir}/singular/Singular
 nobase_libSingular_include_HEADERS = $(SingularHEADERS)

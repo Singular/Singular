@@ -1,6 +1,8 @@
 ACLOCAL_AMFLAGS = -I ../m4
 # TODO: use ${top_srcdir} instead of .. in the above?
 
+SUBDIRS=numeric
+
 noinst_LTLIBRARIES = libkernel.la 
 ###### libkerneldir = $(libdir)/singular
 
@@ -57,7 +59,7 @@ else
   USE_FACTORY =
 endif
 
-libkernel_la_LIBADD   =  ${top_builddir}/libpolys/polys/libpolys.la $(USE_FACTORY) 
+libkernel_la_LIBADD   =  ${builddir}/numeric/libnumeric.la ${top_builddir}/libpolys/polys/libpolys.la $(USE_FACTORY) 
 ### libkernel_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 ### TODO: the following has to be addapted...
@@ -81,3 +83,4 @@ test_LDADD = libkernel.la ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
 
 CLEANFILES = $(TESTS)
 # $(BUILT_SOURCES)
+

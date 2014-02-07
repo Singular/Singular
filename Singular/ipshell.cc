@@ -57,8 +57,8 @@
 #include <coeffs/longrat.h>
 #include <coeffs/rmodulon.h>
 
-#include <numeric/mpr_base.h>
-#include <numeric/mpr_numeric.h>
+#include <kernel/numeric/mpr_base.h>
+#include <kernel/numeric/mpr_numeric.h>
 
 #include <math.h>
 #include <ctype.h>

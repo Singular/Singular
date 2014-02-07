@@ -5,7 +5,7 @@ if ENABLE_FACTORY
 endif
 
 SUBDIRS = resources omalloc xalloc $(USE_FACTORY) \
-libpolys kernel numeric gfanlib dyn_modules \
+libpolys kernel gfanlib dyn_modules \
 IntegerProgramming Singular dox \
 emacs debian redhat desktop
 
