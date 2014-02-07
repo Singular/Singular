@@ -2053,7 +2053,7 @@ static void rRenameVars(ring R)
     {
       if (strcmp(R->names[i],R->names[j])==0)
       {
-        Warn("name conflict var(%d) and var(%d): `%s`, rename to `@(%d)`",i+1,j+1,R->names[i],j+1);
+        Werror("error: same name `%s` for ring variables  var(%d) and var(%d): ; ",R->names[i], i+1, j+1);
         omFree(R->names[j]);
         R->names[j]=(char *)omAlloc(10);
         sprintf(R->names[j],"@(%d)",j+1);
@@ -2066,7 +2066,7 @@ static void rRenameVars(ring R)
     {
       if (strcmp(rParameter(R)[i],R->names[j])==0)
       {
-        Warn("name conflict par(%d) and var(%d): `%s`, renaming the VARIABLE to `@@(%d)`",i+1,j+1,R->names[j],i+1);
+        Werror("error: same name `%s` for  par(%d) and var(%d): ", R->names[j], i+1, j+1 );
 //        omFree(rParameter(R)[i]);
 //        rParameter(R)[i]=(char *)omAlloc(10);
 //        sprintf(rParameter(R)[i],"@@(%d)",i+1);
