@@ -712,6 +712,7 @@ static proc splitCharp(list l)
   def P=basering;
   int i,j,k,m,q,d,o;
   int n = nvars(basering);
+  ASSUME(1, nvars(basering) >= 2); //otherwise code while(va[j]!=","){j--;} will fail!
   ideal s,t,u,sact;
   poly ni;
   string minp,gnir,va;
@@ -738,8 +739,10 @@ static proc splitCharp(list l)
       {
         va=varstr(P);
         j=size(va);
+
         while(va[j]!=","){j--;}
         va=va[1..j-1];
+        // ugly, but no variable conflicts. jk
         gnir="ring RL=("+string(char(P))+","+string(var(n))+"),("+va+"),lp;";
         execute(gnir);
         minpoly=leadcoef(imap(P,ni));
@@ -816,7 +819,6 @@ static proc splitCharp(list l)
   option(set,op);
   return(l);
 }
-
 ///////////////////////////////////////////////////////////////////////////////
 
 proc zero_decomp (ideal j,ideal ser,int @wr,list #)
@@ -1316,13 +1318,15 @@ proc extF(list l,list #)
   }
   if(size(peek)==0){return(peek1);}
 
+  // get the minpoly
   string gnir="ring RH=("+string(p)+"^"+string(ex)+",a),("+varstr(R)+"),lp;";
   execute(gnir);
   string mp="minpoly="+string(minpoly)+";";
-  gnir="ring RL=("+string(p)+",a),("+varstr(R)+"),lp;";
+  // construct the ring of interest:
+  gnir="ring RL=("+string(p)+",a),(X(1.."+string(nvars(R))+")),lp;";
   execute(gnir);
   execute(mp);
-  list L=imap(R,peek);
+  list L= fetch(R,peek);
   list pr, keep;
   int i;
   for(i=1;i<=size(L);i++)
@@ -1337,7 +1341,7 @@ proc extF(list l,list #)
   }
   mp="poly pp="+string(minpoly)+";";
 
-  string gnir1="ring RS="+string(p)+",("+varstr(R)+",a),lp;";
+  string gnir1="ring RS="+string(p)+",(X(1.."+string(nvars(R))+"),a),lp;";
   execute(gnir1);
   execute(mp);
   list L=imap(RL,keep);
@@ -1364,7 +1368,7 @@ proc extF(list l,list #)
     }
   }
   setring R;
-  list re=imap(RS,L);
+  list re=fetch(RS,L);
   re=re+peek1;
 
   return(extF(re,ex+1));
@@ -3755,7 +3759,7 @@ example
 "USAGE:  zeroRad(I) , I a zero-dimensional ideal
  RETURN: the radical of I
  NOTE:  Algorithm of Kemper
- EXAMPLE: example zeroRad; shows an example
+ EXAMPLE: example zeroRad; shows an example"
 {
    if(homog(I)==1){return(maxideal(1));}
    //I needs to be a reduced standard basis
@@ -3796,7 +3800,7 @@ example
     intvec save=option(get);option(redSB);
     I=interred(I+F);option(set,save);return(I);
    }
-   //I=simplify(I,1);
+   //I=simplify(I,1);// considered harmful.
 
    for(i=1;i<=n;i++)             //consider all polynomials over
    {                             //Fp(t(1)^(p^-k),...,t(m)^(p^-k))
@@ -3806,18 +3810,36 @@ example
    string cR="ring @R="+string(p)+",("+parstr(R)+","+varstr(R)+"),dp;";
    execute(cR);
    ideal F=imap(R,F);
+   ideal I=imap(R,I);
+   dbprint(printlevel-voice, "in @R, I=",I);
+   dbprint(printlevel-voice, "in @R, F=",F);
 
-   string nR1="ring @S1="+string(p)+",("+varstr(R)+","+parstr(R)+",@y(1..m)),dp;";
-   execute(nR1);
-   list lR=ringlist(@S1)[2];
-   lR=lR[(size(lR)-m+1)..(size(lR))];
 
-   string nR="ring @S="+string(p)+",("+string(lR)+","+varstr(R)+","+parstr(R)+"),dp;";
+   // 1. renaming: parstr->ppar, varstr->vvar   
+   //string nR1="ring @S1="+string(p)+",( ppar(1.."+string(m)+"),vvar(1.."+string(n)+") ),dp;";
+   //execute(nR1);
+    
+   //ideal I = fetch(@R,I);
+   //dbprint(printlevel-voice, "in @S1, I=",I);
+
+   // 2. introducing nev variables y(1..npars(R)). Due to renaming we control all variable names and there can be no conflicts.
+   string nR="ring @S="+string(p)+",(y(1.."+string(m)+"),vvar(1.."+string(n)+"),ppar(1.."+string(m)+") ),dp;";
    execute(nR);
 
    ideal G=fetch(@R,F);    //G[i](t(1)^(p^-k),...,t(m)^(p^-k),x(i))=sep(F[i])
+   //ideal I= imap(@S1,I);
 
-   ideal I=imap(R,I);
+   ideal  map@R@SIdeal ;
+   int mpos;
+   for (mpos  =    1; mpos <= m;    mpos++)   {    map@R@SIdeal[mpos]=var(m+n+mpos);  } // map parstr y to ppar
+   for (mpos = m  +1; mpos <= m+n;  mpos++)   {    map@R@SIdeal[mpos]=var(mpos);    } // map varstr to vvar
+
+   map map@R@S= @R,map@R@SIdeal;
+   ideal I= map@R@S(I);
+
+   dbprint(printlevel-voice, "in @S, I=",I);
+   dbprint(printlevel-voice, "in @S, G=",G);
+
    ideal J=I+G;
    poly el=1;
    k=p^k;
@@ -3828,8 +3850,26 @@ example
    }
 
    J=eliminate(J,el);
+   dbprint(printlevel-voice, "in @S, J=",J);
+
+   //setring @S1;
+   //ideal J=imap(@S,J);
+   //dbprint(printlevel-voice, "in @S1, J=",J);
+   //setring @R;
+   //ideal J=fetch(@S1,J);
+   //dbprint(printlevel-voice, "in @R, J=",J);
    setring R;
-   ideal J=imap(@S,J);
+   ideal  mapIdeal ;
+ 
+   for (mpos  =    1; mpos <= m;    mpos++)   {    mapIdeal[mpos]=0;              } // map y to 0
+   for (mpos = m  +1; mpos <= m+n;  mpos++)   {    mapIdeal[mpos]=var(mpos-m);    } // map vvar to vars
+   for (mpos = m+n+1; mpos <= m+n+m;mpos++)   {    mapIdeal[mpos]=par(mpos-m-n);  } // map ppar to pars
+
+   map backmap= @S,mapIdeal;
+   ideal J=backmap(J);
+   //ideal J=imap(@R,J);
+
+   dbprint(printlevel-voice, "in R, J=",J);
    return(J);
 }
 example
@@ -3838,6 +3878,7 @@ example
    ideal I=x^5-t,y^5-t;
    zeroRad(I);
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -6556,6 +6597,7 @@ example
    testPrimary(pr,i);
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 proc zerodec(ideal I)
 "USAGE:   zerodec(I); I ideal
@@ -6634,19 +6676,25 @@ EXAMPLE: example zerodec; shows an example
 //f_i may result in a huge object although the final result may be small.
 //Hence it is better to simultaneously reduce with I. For this we need a new
 //ring.
-    execute("ring P=("+charstr(R)+"),(T,"+varstr(R)+"),(dp(1),dp);");
-    list rfac=imap(P1,fac);
+    execute("ring P=("+charstr(R)+"),(X(1.."+string(nvars(R))+"),T),(dp,dp(1));");
     intvec ov=option(get);;
     option(redSB);
+    ideal p = fetch(R,p);
+    ideal J = fetch(R,J);
+    execute("ring PP=("+charstr(R)+"),(T,X(1.."+string(nvars(R))+")),(dp(1),dp);");
+    option(redSB);
     list re1;
-    ideal new = T-imap(R,p),imap(R,J);
+    list rfac = imap(P1,fac);
+    ideal new = T-imap(P,p),imap(P,J); 
     attrib(new, "isSB",1);    //we know that new is a standard basis
     for(j=1;j<=f;j++)
     {
       re1[j]=reduce(rfac[1][j]^rfac[2][j],new);
     }
+    setring P;
+    def re1 = imap(PP,re1);
     setring R;
-    re = imap(P,re1);
+    re = fetch(P,re1);
     for(j=1;j<=f;j++)
     {
       J=I,re[j];
