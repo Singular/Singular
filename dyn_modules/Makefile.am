@@ -1,7 +1,5 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
-PACKAGES=bigintm syzextra callgfanlib callpolymake
-SUBDIRS=$(PACKAGES)
+SUBDIRS=bigintm syzextra callgfanlib callpolymake
 
-TESTDIRS=$(PACKAGES)
 

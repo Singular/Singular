@@ -305,7 +305,7 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
   &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
   {
     res->rtyp=INT_CMD;
-    res->data=(void *)(rField_is_Ring((ring)v->Data()));
+    res->data=(void *)(long)(rField_is_Ring((ring)v->Data()));
   }
   else if (strcmp(name,"qringNF")==0)
   {
