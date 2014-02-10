@@ -167,7 +167,7 @@ parameterSubstitute(f,3);
 parameterSubstitute(f,-1);
 f=t2x+1/t*y-1;
 tropicalSubst(f,2,x,x+t,y,tx+y+t2);
-randomPoly(3,-2,5);
-randomPoly(3,-2,5,1);
+randomPolyInT(3,-2,5);
+randomPolyInT(3,-2,5,1);
 //////////////////////////////
 tst_status(1);$

@@ -132,7 +132,7 @@ AUXILARY PROCEDURES:
   dualConic()             computes the dual of an affine plane conic
   parameterSubstitute()   substitutes in the polynomial the parameter t by t^N
   tropicalSubst()         makes certain substitutions in a tropical polynomial
-  randomPoly()            computes a polynomial with random coefficients
+  randomPolyInT()         computes a polynomial with random coefficients
   cleanTmp()              clears /tmp from files created by other procedures
 
 KEYWORDS:        tropical curves; tropical polynomials
@@ -3817,16 +3817,17 @@ example
 
 /////////////////////////////////////////////////////////////////////////
 
-proc randomPoly (int d,int ug, int og, list #)
-"USAGE:      randomPoly(d,ug,og[,#]);   d, ug, og int, # list
+proc randomPolyInT (int d,int ug, int og, list #)
+"USAGE:      randomPolyInT(d,ug,og[,#]);   d, ug, og int, # list
 ASSUME:      the basering has a parameter t
 RETURN:      poly, a polynomial of degree d where the coefficients are
                    of the form t^j with j a random integer between ug and og
 NOTE:        if an optional argument # is given, then the coefficients are
              instead either of the form t^j as above or they are zero,
              and this is chosen randomly
-EXAMPLE:     example randomPoly;   shows an example"
+EXAMPLE:     example randomPolyInT;   shows an example"
 {
+  if (defined(t)!=-1) { ERROR("basering has no paramter t");}
   int i,j,k;
   def BASERING=basering;
   ring RANDOMRING=(0,t),(x,y,z),dp;
@@ -3853,7 +3854,7 @@ EXAMPLE:     example randomPoly;   shows an example"
   poly randomPolynomial=imap(RANDOMRING,randomPolynomial);
   if ((size(randomPolynomial)<3) and (nnn>=3))
   {
-    randomPolynomial=randomPoly(d,ug,og,#);
+    randomPolynomial=randomPolyInT(d,ug,og,#);
   }
   return(randomPolynomial);
 }
@@ -3862,8 +3863,8 @@ example
    "EXAMPLE:";
    echo=2;
    ring r=(0,t),(x,y),dp;
-   randomPoly(3,-2,5);
-   randomPoly(3,-2,5,1);
+   randomPolyInT(3,-2,5);
+   randomPolyInT(3,-2,5,1);
 }
 
 /////////////////////////////////////////////////////////////////////////
