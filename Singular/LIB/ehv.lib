@@ -1036,7 +1036,7 @@ EXAMPLE: example AssEHV; shows an example"
               //...homogenize K w.r.t. t,...
               if(printlevel > 2){"Input not homogeneous; must homogenize.";}
               def homoR=changeord(list(list("dp",1:nvars(basering))));
-	      setring homoR;
+              setring homoR;
               ideal homoJ = fetch(base,K);
               homoJ = groebner(homoJ);
               execute("ring newR = (" + charstr(base) + "),(x(1..n),t),dp;");
@@ -1408,8 +1408,8 @@ EXAMPLE: example primDecsAreEquivalent; shows an example"
             }
         }
     }
-  if ( size(N) != s1 ) 
-  { 
+  if ( size(N) != s1 )
+  {
      return(0);
   }
   return(1);
@@ -1425,25 +1425,3 @@ example
   list L2 = primdecEHV(i);
   primDecsAreEquivalent(L1,L2);
 }
-
-static proc testPrimDecsAreEquivalent()
-{
-    ring rng = 0 ,x,dp;
-    list L1, L2;
-
-    // test1. different sizes
-    L1[1] = list( ideal(0), ideal(0)  );
-    ASSUME(0, 0 == primDecsAreEquivalent(L1,L2) );
-    // test2. same size, but different content
-    L2[1] = list( ideal(1), ideal(1)  );
-
-    ASSUME(0, 0 == primDecsAreEquivalent(L1,L2) );
-
-    // test3. equivalent content
-    L1[1] = list( ideal(0), ideal(0)  );
-    L1[2] = list( ideal(x), ideal(x)  );
-    L2[1] = list( ideal(x), ideal(x)  );
-    L2[2] = list( ideal(0), ideal(0)  );
-    ASSUME(0, 1 == primDecsAreEquivalent(L1,L2) );
-}
-
