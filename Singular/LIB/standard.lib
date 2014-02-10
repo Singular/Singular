@@ -710,6 +710,7 @@ EXAMPLE: example hilbRing; shows an example
     }
   }
   list Lhilb = Philb,w;
+  setring(P);
   return(Lhilb);
 }
 example
