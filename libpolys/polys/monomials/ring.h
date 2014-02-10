@@ -562,7 +562,7 @@ static inline int rPar(const ring r)
 
 
 /// (r->cf->parameter)
-static inline char const * const * rParameter(const ring r)
+static inline char const ** rParameter(const ring r)
 {
   assume(r != NULL);
   const coeffs C = r->cf;

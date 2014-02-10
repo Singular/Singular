@@ -1484,7 +1484,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfParDeg = naParDeg;
 
   cf->iNumberOfParameters = rVar(R);
-  cf->pParameterNames = R->names;
+  cf->pParameterNames = (const char**)R->names;
   cf->cfParameter = naParameter;
   cf->has_simple_Inverse= R->cf->has_simple_Inverse;
   /* cf->has_simple_Alloc= FALSE; */

@@ -904,7 +904,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   assume( pParameterNames != NULL );
   assume( pParameterNames[0] != NULL );
 
-  r->pParameterNames = pParameterNames;
+  r->pParameterNames = (const char**)pParameterNames;
   // NOTE: r->m_nfParameter was replaced by n_ParameterNames(r)[0]
 
   // TODO: nfKillChar MUST destroy r->pParameterNames[0] (0-term. string) && r->pParameterNames (array of size 1)

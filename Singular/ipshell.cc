@@ -1939,14 +1939,14 @@ void rComposeC(lists L, ring R)
   // 2: list (par)
   if (L->nr==2)
   {
-    R->cf->extRing->N=1;
+    //R->cf->extRing->N=1;
     if (L->m[2].rtyp!=STRING_CMD)
     {
       Werror("invald coeff. field description, expecting parameter name");
       return;
     }
-    R->cf->extRing->names=(char**)omAlloc0(rPar(R)*sizeof(char_ptr));
-    R->cf->extRing->names[0]=omStrDup((char *)L->m[2].data);
+    //(rParameter(R))=(char**)omAlloc0(rPar(R)*sizeof(char_ptr));
+    rParameter(R)[0]=omStrDup((char *)L->m[2].data);
   }
   // ----------------------------------------
 }

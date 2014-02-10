@@ -229,7 +229,7 @@ struct n_Procs_s
    int iNumberOfParameters;
 
    /// array containing the names of Parameters (default NULL)
-   char const * const * pParameterNames;
+   char const **  pParameterNames;
    // NOTE that it replaces the following:
 // char* complex_parameter; //< the name of sqrt(-1) in n_long_C , i.e. 'i' or 'j' etc...?
 // char * m_nfParameter; //< the name of parameter in n_GF
@@ -679,7 +679,7 @@ static inline int n_ParDeg(number n, const coeffs r)
 static inline int n_NumberOfParameters(const coeffs r){ return r->iNumberOfParameters; }
 
 /// Returns a (const!) pointer to (const char*) names of parameters
-static inline char const * const * n_ParameterNames(const coeffs r){ return r->pParameterNames; }
+static inline char const * * n_ParameterNames(const coeffs r){ return r->pParameterNames; }
 
 
 /// return the (iParameter^th) parameter as a NEW number
