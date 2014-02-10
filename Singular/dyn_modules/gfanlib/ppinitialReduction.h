@@ -12,6 +12,7 @@ BOOLEAN ppreduceInitially3(leftv res, leftv args);
 BOOLEAN ppreduceInitially4(leftv res, leftv args);
 #endif
 
+bool ppreduceInitially(ideal I, ring r);
 BOOLEAN ppreduceInitially(leftv res, leftv args);
 
 #endif

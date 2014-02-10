@@ -5,55 +5,10 @@
 #include <ppinitialReduction.h>
 #include <ttinitialReduction.h>
 #include <containsMonomial.h>
-
-poly initial(poly p)
-{
-  poly g = p;
-  poly h = p_Head(g,currRing);
-  poly f = h;
-  long d = p_Deg(g,currRing);
-  pIter(g);
-  while ((g != NULL) && (p_Deg(g,currRing) == d))
-  {
-    pNext(h) = p_Head(g,currRing);
-    pIter(h);
-    pIter(g);
-  }
-  return(f);
-}
-
-
-BOOLEAN initial(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == POLY_CMD))
-  {
-    leftv v = u->next;
-    if (v == NULL)
-    {
-      poly p = (poly) u->Data();
-      res->rtyp = POLY_CMD;
-      res->data = (void*) initial(p);
-      return FALSE;
-    }
-  }
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if (v == NULL)
-    {
-      ideal I = (ideal) u->Data();
-      ideal inI = idInit(IDELEMS(I));
-      for (int i=0; i<IDELEMS(I); i++)
-        inI->m[i]=initial(I->m[i]);
-      res->rtyp = IDEAL_CMD;
-      res->data = (void*) inI;
-      return FALSE;
-    }
-  }
-  WerrorS("initial: unexpected parameters");
-  return TRUE;
-}
+#include <initial.h>
+#include <witness.h>
+#include <tropicalCurves.h>
+#include <neighbours.h>
 
 
 BOOLEAN homogeneitySpace(leftv res, leftv args)
@@ -222,7 +177,9 @@ void tropical_setup(SModulFunctions* p)
   p->iiAddCproc("","groebnerCone",FALSE,groebnerCone);
   p->iiAddCproc("","maximalGroebnerCone",FALSE,maximalGroebnerCone);
   p->iiAddCproc("","initial",FALSE,initial);
+  p->iiAddCproc("","tropicalNeighbours",FALSE,tropicalNeighbours);
 #ifndef NDEBUG
+  p->iiAddCproc("","initial0",FALSE,initial0);
   p->iiAddCproc("","pppReduce",FALSE,pppReduce);
   p->iiAddCproc("","ppreduceInitially0",FALSE,ppreduceInitially0);
   p->iiAddCproc("","ppreduceInitially1",FALSE,ppreduceInitially1);
@@ -235,9 +192,14 @@ void tropical_setup(SModulFunctions* p)
   p->iiAddCproc("","ttreduceInitially2",FALSE,ttreduceInitially2);
   p->iiAddCproc("","ttreduceInitially3",FALSE,ttreduceInitially3);
   p->iiAddCproc("","ttreduceInitially4",FALSE,ttreduceInitially4);
+  p->iiAddCproc("","checkForMonomial",FALSE,checkForMonomial);
+  p->iiAddCproc("","dwr0",FALSE,dwr0);
+  p->iiAddCproc("","witness0",FALSE,witness0);
+  p->iiAddCproc("","tropicalCurve0",FALSE,tropicalCurve0);
+  p->iiAddCproc("","tropicalCurve1",FALSE,tropicalCurve1);
+  p->iiAddCproc("","tropicalCurve2",FALSE,tropicalCurve2);
 #endif //NDEBUG
   p->iiAddCproc("","ppreduceInitially",FALSE,ppreduceInitially);
   p->iiAddCproc("","ttreduceInitially",FALSE,ttreduceInitially);
   p->iiAddCproc("","homogeneitySpace",FALSE,homogeneitySpace);
-  p->iiAddCproc("","containsMonomial",FALSE,containsMonomial);
 }

@@ -4,7 +4,7 @@
 #include <libpolys/polys/simpleideals.h>
 #include <gfanlib/gfanlib_vector.h>
 
-poly containsMonomial(const ideal &I, const gfan::ZVector &w);
-BOOLEAN containsMonomial(leftv res, leftv args);
+poly checkForMonomialViaSuddenSaturation(const ideal I, const ring r);
+BOOLEAN checkForMonomial(leftv res, leftv args);
 
 #endif

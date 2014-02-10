@@ -15,7 +15,7 @@
  * by reading the coefficients and that g is initially reduced
  * with respect to p-t
  **/
-static bool pReduce(poly g, const number p)
+static bool pReduce(poly g, const number p, const ring r)
 {
   poly toBeChecked = pNext(g);
   pNext(g) = NULL; poly gEnd = g;
@@ -25,24 +25,24 @@ static bool pReduce(poly g, const number p)
   while(toBeChecked)
   {
     for (gCache = g; gCache; pIter(gCache))
-      if (p_LeadmonomDivisibleBy(gCache,toBeChecked,currRing)) break;
+      if (p_LeadmonomDivisibleBy(gCache,toBeChecked,r)) break;
     if (gCache)
     {
-      n_Power(p,p_GetExp(toBeChecked,1,currRing)-p_GetExp(gCache,1,currRing),&pPower,currRing->cf);
-      coeff = n_Mult(p_GetCoeff(toBeChecked,currRing),pPower,currRing->cf);
-      p_SetCoeff(gCache,n_Add(p_GetCoeff(gCache,currRing),coeff,currRing->cf),currRing);
-      n_Delete(&pPower,currRing->cf); n_Delete(&coeff,currRing->cf);
-      toBeChecked=p_LmDeleteAndNext(toBeChecked,currRing);
+      n_Power(p,p_GetExp(toBeChecked,1,r)-p_GetExp(gCache,1,r),&pPower,r->cf);
+      coeff = n_Mult(p_GetCoeff(toBeChecked,r),pPower,r->cf);
+      p_SetCoeff(gCache,n_Add(p_GetCoeff(gCache,r),coeff,r->cf),r);
+      n_Delete(&pPower,r->cf); n_Delete(&coeff,r->cf);
+      toBeChecked=p_LmDeleteAndNext(toBeChecked,r);
     }
     else
     {
-      if (n_DivBy(p_GetCoeff(toBeChecked,currRing),p,currRing->cf))
+      if (n_DivBy(p_GetCoeff(toBeChecked,r),p,r->cf))
       {
-        coeff=n_Div(p_GetCoeff(toBeChecked,currRing),p,currRing->cf);
+        coeff=n_Div(p_GetCoeff(toBeChecked,r),p,r->cf);
         power=1;
-        while (n_DivBy(coeff,p,currRing->cf))
+        while (n_DivBy(coeff,p,r->cf))
         {
-          coeff=n_Div(p_GetCoeff(pNext(g),currRing),p,currRing->cf);
+          coeff=n_Div(p_GetCoeff(pNext(g),r),p,r->cf);
           power++;
           if (power<1)
           {
@@ -50,12 +50,12 @@ static bool pReduce(poly g, const number p)
             return true;
           }
         }
-        subst=p_LmInit(toBeChecked,currRing);
-        p_AddExp(subst,1,power,currRing);
-        p_SetCoeff(subst,coeff,currRing);
-        p_Setm(subst,currRing); pTest(subst);
-        toBeChecked=p_LmDeleteAndNext(toBeChecked,currRing);
-        toBeChecked=p_Add_q(toBeChecked,subst,currRing);
+        subst=p_LmInit(toBeChecked,r);
+        p_AddExp(subst,1,power,r);
+        p_SetCoeff(subst,coeff,r);
+        p_Setm(subst,r); pTest(subst);
+        toBeChecked=p_LmDeleteAndNext(toBeChecked,r);
+        toBeChecked=p_Add_q(toBeChecked,subst,r);
         pTest(toBeChecked);
       }
       else
@@ -80,12 +80,12 @@ BOOLEAN pppReduce(leftv res, leftv args)
     omUpdateInfo();
     Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
     g = (poly) u->CopyD();
-    (void) pReduce(g,p);
+    (void) pReduce(g,p,currRing);
     p_Delete(&g,currRing);
     omUpdateInfo();
     Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
     g = (poly) u->CopyD();
-    (void) pReduce(g,p);
+    (void) pReduce(g,p,currRing);
     n_Delete(&p,currRing->cf);
     res->rtyp = POLY_CMD;
     res->data = (char*) g;
@@ -102,24 +102,24 @@ BOOLEAN pppReduce(leftv res, leftv args)
  * returns true if reductions have taken place.
  * assumes that h and g are in pReduced form and homogeneous in x of the same degree
  **/
-bool ppreduceInitially(poly &h, const poly g)
+bool ppreduceInitially(poly &h, const poly g, const ring r)
 {
   pTest(h); pTest(g); poly hCache;
   for (hCache=h; hCache; pIter(hCache))
-    if (p_LeadmonomDivisibleBy(g,hCache,currRing)) break;
+    if (p_LeadmonomDivisibleBy(g,hCache,r)) break;
   if (hCache)
   {
-    number gAlpha = p_GetCoeff(g,currRing);
-    poly hAlphaT = p_Init(currRing);
-    p_SetCoeff(hAlphaT,n_Copy(p_GetCoeff(hCache,currRing),currRing->cf),currRing);
-    p_SetExp(hAlphaT,1,p_GetExp(hCache,1,currRing)-p_GetExp(g,1,currRing),currRing);
-    for (int i=2; i<=currRing->N; i++)
-      p_SetExp(hAlphaT,i,0,currRing);
-    p_Setm(hAlphaT,currRing); pTest(hAlphaT);
-    poly q1 = p_Mult_nn(h,gAlpha,currRing); pTest(q1);
-    poly q2 = p_Mult_q(p_Copy(g,currRing),hAlphaT,currRing); pTest(q2);
-    q2 = p_Neg(q2,currRing); pTest(q2);
-    h = p_Add_q(q1,q2,currRing);
+    number gAlpha = p_GetCoeff(g,r);
+    poly hAlphaT = p_Init(r);
+    p_SetCoeff(hAlphaT,n_Copy(p_GetCoeff(hCache,r),r->cf),r);
+    p_SetExp(hAlphaT,1,p_GetExp(hCache,1,r)-p_GetExp(g,1,r),r);
+    for (int i=2; i<=r->N; i++)
+      p_SetExp(hAlphaT,i,0,r);
+    p_Setm(hAlphaT,r); pTest(hAlphaT);
+    poly q1 = p_Mult_nn(h,gAlpha,r); pTest(q1);
+    poly q2 = p_Mult_q(p_Copy(g,r),hAlphaT,r); pTest(q2);
+    q2 = p_Neg(q2,r); pTest(q2);
+    h = p_Add_q(q1,q2,r);
     pTest(h);
     return true;
   }
@@ -141,14 +141,14 @@ BOOLEAN ppreduceInitially0(leftv res, leftv args)
       Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
       h = (poly) u->CopyD();
       g = (poly) v->CopyD();
-      (void)ppreduceInitially(h,g);
+      (void)ppreduceInitially(h,g,currRing);
       p_Delete(&h,currRing);
       p_Delete(&g,currRing);
       omUpdateInfo();
       Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
       h = (poly) u->CopyD();
       g = (poly) v->CopyD();
-      (void)ppreduceInitially(h,g);
+      (void)ppreduceInitially(h,g,currRing);
       p_Delete(&g,currRing);
       res->rtyp = POLY_CMD;
       res->data = (char*) h;
@@ -165,7 +165,7 @@ BOOLEAN ppreduceInitially0(leftv res, leftv args)
  * also sorts the generators of I with respect to the leading monomials in descending order.
  * assumes that I is generated by elements which are homogeneous in x of the same degree.
  **/
-bool ppreduceInitially(ideal I, const number p)
+bool ppreduceInitially(ideal I, const number p, const ring r)
 {
   int m=idSize(I),n=m; poly cache;
   do
@@ -173,7 +173,7 @@ bool ppreduceInitially(ideal I, const number p)
     int j=0;
     for (int i=1; i<n; i++)
     {
-      if (p_LmCmp(I->m[i-1],I->m[i],currRing)<0)
+      if (p_LmCmp(I->m[i-1],I->m[i],r)<0)
       {
         cache=I->m[i-1];
         I->m[i-1]=I->m[i];
@@ -184,21 +184,21 @@ bool ppreduceInitially(ideal I, const number p)
     n=j;
   } while(n);
   for (int i=1; i<m; i++)
-    if (pReduce(I->m[i],p)) return true;
+    if (pReduce(I->m[i],p,r)) return true;
 
   /***
    * the first pass. removing terms with the same monomials in x as lt(g_i) out of g_j for i<j
    **/
   for (int i=0; i<m-1; i++)
     for (int j=i+1; j<m; j++)
-      if (ppreduceInitially(I->m[j], I->m[i]) && pReduce(I->m[j],p)) return true;
+      if (ppreduceInitially(I->m[j], I->m[i], r) && pReduce(I->m[j],p,r)) return true;
 
   /***
    * the second pass. removing terms divisible by lt(g_j) out of g_i for i<j
    **/
   for (int i=0; i<m-1; i++)
     for (int j=i+1; j<m; j++)
-      if (ppreduceInitially(I->m[i], I->m[j]) && pReduce(I->m[i],p)) return true;
+      if (ppreduceInitially(I->m[i], I->m[j],r) && pReduce(I->m[i],p,r)) return true;
   return false;
 }
 
@@ -217,14 +217,14 @@ BOOLEAN ppreduceInitially1(leftv res, leftv args)
       Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
       I = (ideal) u->CopyD();
       p = (number) v->CopyD();
-      (void) ppreduceInitially(I,p);
+      (void) ppreduceInitially(I,p,currRing);
       id_Delete(&I,currRing);
       n_Delete(&p,currRing->cf);
       omUpdateInfo();
       Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
       I = (ideal) u->CopyD();
       p = (number) v->CopyD();
-      (void) ppreduceInitially(I,p);
+      (void) ppreduceInitially(I,p,currRing);
       n_Delete(&p,currRing->cf);
       res->rtyp = IDEAL_CMD;
       res->data = (char*) I;
@@ -240,14 +240,14 @@ BOOLEAN ppreduceInitially1(leftv res, leftv args)
  * inserts g into I and reduces I with respect to itself and p-t
  * assumes that I was already sorted and initially reduced in the first place
  **/
-bool ppreduceInitially(ideal I, const number p, const poly g)
+bool ppreduceInitially(ideal I, const number p, const poly g, const ring r)
 {
   int n=idSize(I);
   idInsertPoly(I,g);
   poly cache; n++; int j;
   for (j=n-1; j>0; j--)
   {
-    if (p_LmCmp(I->m[j], I->m[j-1],currRing)>0)
+    if (p_LmCmp(I->m[j], I->m[j-1],r)>0)
     {
       cache = I->m[j];
       I->m[j] = I->m[j-1];
@@ -262,9 +262,9 @@ bool ppreduceInitially(ideal I, const number p, const poly g)
    * removing terms with the same monomials in x as lt(g_j) out of g_k for j<k
    **/
   for (int i=0; i<j; i++)
-    if (ppreduceInitially(I->m[j], I->m[i]) && pReduce(I->m[j],p)) return true;
+    if (ppreduceInitially(I->m[j], I->m[i], r) && pReduce(I->m[j],p,r)) return true;
   for (int k=j+1; k<n; k++)
-    if (ppreduceInitially(I->m[k], I->m[j]) && pReduce(I->m[k],p)) return true;
+    if (ppreduceInitially(I->m[k], I->m[j], r) && pReduce(I->m[k],p,r)) return true;
 
   /***
    * the second pass. removing terms divisible by lt(g_j) and lt(g_k) out of g_i for i<j<k
@@ -272,9 +272,9 @@ bool ppreduceInitially(ideal I, const number p, const poly g)
    **/
   for (int i=0; i<j; i++)
     for (int k=j; k<n; k++)
-      if (ppreduceInitially(I->m[i], I->m[k]) && pReduce(I->m[i],p)) return true;
+      if (ppreduceInitially(I->m[i], I->m[k], r) && pReduce(I->m[i],p,r)) return true;
   for (int k=j+1; k<n; k++)
-    if (ppreduceInitially(I->m[j],I->m[k]) && pReduce(I->m[j],p)) return true;
+    if (ppreduceInitially(I->m[j], I->m[k], r) && pReduce(I->m[j],p,r)) return true;
 
   return false;
 }
@@ -298,7 +298,7 @@ BOOLEAN ppreduceInitially2(leftv res, leftv args)
         I = (ideal) u->CopyD();
         p = (number) v->CopyD();
         g = (poly) w->CopyD();
-        (void) ppreduceInitially(I,p,g);
+        (void) ppreduceInitially(I,p,g,currRing);
         id_Delete(&I,currRing);
         n_Delete(&p,currRing->cf);
         omUpdateInfo();
@@ -306,7 +306,7 @@ BOOLEAN ppreduceInitially2(leftv res, leftv args)
         I = (ideal) u->CopyD();
         p = (number) v->CopyD();
         g = (poly) w->CopyD();
-        (void) ppreduceInitially(I,p,g);
+        (void) ppreduceInitially(I,p,g,currRing);
         n_Delete(&p,currRing->cf);
         res->rtyp = IDEAL_CMD;
         res->data = (char*) I;
@@ -325,12 +325,12 @@ BOOLEAN ppreduceInitially2(leftv res, leftv args)
  * assumes that the generators of H are homogeneous in x of the same degree,
  * assumes that the generators of G are homogeneous in x of lesser degree.
  **/
-bool ppreduceInitially(ideal H, const number p, const ideal G)
+bool ppreduceInitially(ideal H, const number p, const ideal G, const ring r)
 {
   /***
    * Step 1: reduce H initially with respect to itself and with respect to p-t
    **/
-  if (ppreduceInitially(H,p)) return true;
+  if (ppreduceInitially(H,p,r)) return true;
 
   /***
    * Step 2: initialize a working list T and an ideal I in which the reductions will take place
@@ -348,7 +348,7 @@ bool ppreduceInitially(ideal H, const number p, const ideal G)
     int j=0;
     for (int i=1; i<k; i++)
     {
-      if (p_LmCmp(pNext(T->m[i-1]),pNext(T->m[i]),currRing)<0)
+      if (p_LmCmp(pNext(T->m[i-1]),pNext(T->m[i]),r)<0)
       {
         g=T->m[i-1];
         T->m[i-1]=I->m[i];
@@ -367,15 +367,15 @@ bool ppreduceInitially(ideal H, const number p, const ideal G)
   while (n)
   {
     int i=0; for (; i<k; i++)
-      if (p_LeadmonomDivisibleBy(G->m[i],pNext(T->m[0]),currRing)) break;
+      if (p_LeadmonomDivisibleBy(G->m[i],pNext(T->m[0]),r)) break;
     if (i<k)
     {
-      g = p_Init(currRing);
-      for (int j=2; j<=currRing->N; j++)
-        p_SetExp(g,j,p_GetExp(pNext(T->m[0]),j,currRing)-p_GetExp(G->m[i],j,currRing),currRing);
-      p_SetCoeff(g,n_Init(1,currRing->cf),currRing); p_Setm(g,currRing);
-      g = p_Mult_q(g,p_Copy(G->m[i],currRing),currRing);
-      ppreduceInitially(I,p,g);
+      g = p_Init(r);
+      for (int j=2; j<=r->N; j++)
+        p_SetExp(g,j,p_GetExp(pNext(T->m[0]),j,r)-p_GetExp(G->m[i],j,r),r);
+      p_SetCoeff(g,n_Init(1,r->cf),r); p_Setm(g,r);
+      g = p_Mult_q(g,p_Copy(G->m[i],r),r);
+      ppreduceInitially(I,p,g,r);
     }
     else
       pIter(T->m[0]);
@@ -396,7 +396,7 @@ bool ppreduceInitially(ideal H, const number p, const ideal G)
       int j=0;
       for (int i=1; i<l; i++)
       {
-        if (p_LmCmp(pNext(T->m[i-1]),pNext(T->m[i]),currRing)<0)
+        if (p_LmCmp(pNext(T->m[i-1]),pNext(T->m[i]),r)<0)
         {
           g=T->m[i-1];
           T->m[i-1]=I->m[i];
@@ -416,15 +416,15 @@ bool ppreduceInitially(ideal H, const number p, const ideal G)
   {
     for (int j=0; j<m; j++)
     {
-      if (p_LeadmonomDivisibleBy(H->m[j],I->m[i],currRing))
+      if (p_LeadmonomDivisibleBy(H->m[j],I->m[i],r))
       {
         I->m[i]=NULL;
         break;
       }
     }
   }
-  id_Delete(&I,currRing);
-  id_Delete(&T,currRing);
+  id_Delete(&I,r);
+  id_Delete(&T,r);
   return false;
 }
 
@@ -447,7 +447,7 @@ BOOLEAN ppreduceInitially3(leftv res, leftv args)
         H = (ideal) u->CopyD();
         p = (number) v->CopyD();
         G = (ideal) w->CopyD();
-        (void) ppreduceInitially(H,p,G);
+        (void) ppreduceInitially(H,p,G,currRing);
         id_Delete(&H,currRing);
         id_Delete(&G,currRing);
         n_Delete(&p,currRing->cf);
@@ -456,7 +456,7 @@ BOOLEAN ppreduceInitially3(leftv res, leftv args)
         H = (ideal) u->CopyD();
         p = (number) v->CopyD();
         G = (ideal) w->CopyD();
-        (void) ppreduceInitially(H,p,G);
+        (void) ppreduceInitially(H,p,G,currRing);
         n_Delete(&p,currRing->cf);
         id_Delete(&G,currRing);
         res->rtyp = IDEAL_CMD;
@@ -474,7 +474,7 @@ BOOLEAN ppreduceInitially3(leftv res, leftv args)
  * reduces I initially with respect to itself.
  * assumes that the generators of I are homogeneous in x and that p-t is in I.
  **/
-bool ppreduceInitially(ideal I)
+bool ppreduceInitially(ideal I, ring r)
 {
   /***
    * Step 1: split up I into components of same degree in x
@@ -484,8 +484,8 @@ bool ppreduceInitially(ideal I)
   for (int i=0; i<n; i++)
   {
     long d = 0;
-    for (int j=2; j<=currRing->N; j++)
-      d += p_GetExp(I->m[i],j,currRing);
+    for (int j=2; j<=r->N; j++)
+      d += p_GetExp(I->m[i],j,r);
     std::map<long,ideal>::iterator it = H.find(d);
     if (it != H.end())
       idInsertPoly(it->second,I->m[i]);
@@ -500,10 +500,10 @@ bool ppreduceInitially(ideal I)
   std::map<long,ideal>::iterator it=H.begin();
   ideal Hi = it->second;
   assume(idSize(Hi)==1);
-  assume(pLength(Hi->m[0])==2 && p_GetExp(Hi->m[0],1,currRing)==0
-           && p_GetExp(Hi->m[0]->next,1,currRing)==1);
-  number p = p_GetCoeff(Hi->m[0],currRing);
-  assume(!n_IsUnit(p,currRing->cf));
+  assume(pLength(Hi->m[0])==2 && p_GetExp(Hi->m[0],1,r)==0
+           && p_GetExp(Hi->m[0]->next,1,r)==1);
+  number p = p_GetCoeff(Hi->m[0],r);
+  assume(!n_IsUnit(p,r->cf));
   idShallowDelete(&it->second);
 
   /***
@@ -511,7 +511,7 @@ bool ppreduceInitially(ideal I)
    *  and all lower components
    **/
   it++; Hi = it->second; n--;
-  if (ppreduceInitially(Hi,p)) return true;
+  if (ppreduceInitially(Hi,p,r)) return true;
 
   ideal G = idInit(n); int m=0;
   ideal GG = (ideal) omAllocBin(sip_sideal_bin);
@@ -525,7 +525,7 @@ bool ppreduceInitially(ideal I)
       int j=0;
       for (int i=1; i<k; i++)
       {
-        if (p_GetExp(Hi->m[i-1],1,currRing)<p_GetExp(Hi->m[i],1,currRing))
+        if (p_GetExp(Hi->m[i-1],1,r)<p_GetExp(Hi->m[i],1,r))
         {
           cache=Hi->m[i-1];
           Hi->m[i-1]=Hi->m[i];
@@ -543,13 +543,13 @@ bool ppreduceInitially(ideal I)
         memcpy(&(G->m[i]),&(Hi->m[kH]),(n-i)*sizeof(poly));
         break;
       }
-      if (p_GetExp(G->m[kG],1,currRing)>p_GetExp(Hi->m[kH],1,currRing))
+      if (p_GetExp(G->m[kG],1,r)>p_GetExp(Hi->m[kH],1,r))
         G->m[i] = G->m[kG++];
       else
         G->m[i] = Hi->m[kH++];
     }
     m += l; IDELEMS(GG) = m; GG->m = &G->m[n-m];
-    if (ppreduceInitially(it->second,p,GG)) return true;
+    if (ppreduceInitially(it->second,p,GG,r)) return true;
     idShallowDelete(&Hi); Hi = it->second;
   }
   idShallowDelete(&Hi);
@@ -569,12 +569,12 @@ BOOLEAN ppreduceInitially4(leftv res, leftv args)
     omUpdateInfo();
     Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
     I = (ideal) u->CopyD();
-    (void) ppreduceInitially(I);
+    (void) ppreduceInitially(I,currRing);
     id_Delete(&I,currRing);
     omUpdateInfo();
     Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
     I = (ideal) u->CopyD();
-    (void) ppreduceInitially(I);
+    (void) ppreduceInitially(I,currRing);
     res->rtyp = IDEAL_CMD;
     res->data = (char*) I;
     return FALSE;
@@ -590,7 +590,7 @@ BOOLEAN ppreduceInitially(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
   {
     ideal I = (ideal) u->CopyD();
-    (void) ppreduceInitially(I);
+    (void) ppreduceInitially(I,currRing);
     res->rtyp = IDEAL_CMD;
     res->data = (char*) I;
     return FALSE;

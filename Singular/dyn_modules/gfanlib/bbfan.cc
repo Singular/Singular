@@ -530,10 +530,10 @@ BOOLEAN getCone(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == fanID))
   {
     leftv v=u->next;
-    if ((v != NULL) && (v->Typ() == INT_CMD))
+    // if ((v != NULL) && (v->Typ() == INT_CMD))
     {
       leftv w=v->next;
-      if ((w != NULL) && (w->Typ() == INT_CMD))
+      // if ((w != NULL) && (w->Typ() == INT_CMD))
       {
         gfan::ZFan* zf = (gfan::ZFan*) u->Data();
         int d = (int)(long)v->Data();
@@ -558,10 +558,10 @@ BOOLEAN getCone(leftv res, leftv args)
           bool mm = (bool) m;
           if (0<=d && d<=zf->getAmbientDimension())
           {
-            if (0<i && i<=zf->numberOfConesOfDimension(d,oo,mm))
+            int ld = zf->getLinealityDimension();
+            if (0<i && i<=zf->numberOfConesOfDimension(d-ld,oo,mm))
             {
               i=i-1;
-              int ld = zf->getLinealityDimension();
               if (d-ld>=0)
               {
                 gfan::ZCone zc = zf->getCone(d-ld,i,oo,mm);
@@ -914,40 +914,28 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
   return TRUE;
 }
 
-gfan::ZFan* commonRefinement(gfan::ZFan* zf, gfan::ZFan* zg)
+gfan::ZFan commonRefinement(gfan::ZFan zf, gfan::ZFan zg)
 {
-  assume(zf->getAmbientDimension() == zg->getAmbientDimension());
+  assume(zf.getAmbientDimension() == zg.getAmbientDimension());
 
   // gather all maximal cones of f and g
   std::list<gfan::ZCone> maximalConesOfF;
-  for (int d=0; d<=zf->getAmbientDimension(); d++)
-  {
-    for (int i=0; i<zf->numberOfConesOfDimension(d,0,1); i++)
-    {
-      maximalConesOfF.push_back(zf->getCone(d,i,0,1));
-    }
-  }
+  for (int d=0; d<=zf.getAmbientDimension(); d++)
+    for (int i=0; i<zf.numberOfConesOfDimension(d,0,1); i++)
+      maximalConesOfF.push_back(zf.getCone(d,i,0,1));
 
   std::list<gfan::ZCone> maximalConesOfG;
-  for (int d=0; d<=zg->getAmbientDimension(); d++)
-  {
-    for (int i=0; i<zg->numberOfConesOfDimension(d,0,1); i++)
-    {
-      maximalConesOfG.push_back(zg->getCone(d,i,0,1));
-    }
-  }
+  for (int d=0; d<=zg.getAmbientDimension(); d++)
+    for (int i=0; i<zg.numberOfConesOfDimension(d,0,1); i++)
+      maximalConesOfG.push_back(zg.getCone(d,i,0,1));
 
   // construct a new fan out of their intersections
-  gfan::ZFan* zr = new gfan::ZFan(zf->getAmbientDimension());
+  gfan::ZFan zr = gfan::ZFan(zf.getAmbientDimension());
   for (std::list<gfan::ZCone>::iterator itf=maximalConesOfF.begin();
        itf != maximalConesOfF.end(); itf++)
-  {
     for (std::list<gfan::ZCone>::iterator itg=maximalConesOfG.begin();
          itg != maximalConesOfG.end(); itg++)
-    {
-      zr->insert(intersection(*itf,*itg));
-    }
-  }
+      zr.insert(intersection(*itf,*itg));
 
   return zr;
 }
@@ -962,7 +950,7 @@ BOOLEAN commonRefinement(leftv res, leftv args)
     {
       gfan::ZFan* zf = (gfan::ZFan*) u->Data();
       gfan::ZFan* zg = (gfan::ZFan*) v->Data();
-      gfan::ZFan* zr = commonRefinement(zf,zg);
+      gfan::ZFan* zr = new gfan::ZFan(commonRefinement(*zf,*zg));
       res->rtyp = fanID;
       res->data = (void*) zr;
       return FALSE;
@@ -1065,3 +1053,18 @@ void bbfan_setup(SModulFunctions* p)
 }
 
 #endif
+// gfan::ZFan commonRefinementCompleteFans(const gfan::ZFan &zf, const gfan::ZFan &zg)
+// {
+//   assume(zf->getAmbientDimension() == zg->getAmbientDimension());
+
+//   gfan::ZFan zfg = gfan::ZFan(zf->getAmbientDimension());
+//   int d = zf->getAmbientDimension();
+//   for (int i=0; i<zf->numberOfConesOfDimension(d,0,1); i++)
+//     for (int j=0; j<zg->numberOfConesOfDimension(d,0,1); j++)
+//     {
+//       gfan::ZCone zc = intersection(zf->getCone(d,i,0,1),zg->getCone(d,j,0,1));
+//       if (zc.dimension()==d) zgf.insert(zc);
+//     }
+
+//   return zfg;
+// }

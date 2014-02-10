@@ -20,5 +20,6 @@ int getLinealityDimension(gfan::ZFan* zf);
 int isSimplicial(gfan::ZFan* zf);
 gfan::Matrix<gfan::Integer> rays(const gfan::ZFan* const zf);
 
+gfan::ZFan commonRefinement(gfan::ZFan zf, gfan::ZFan zg);
 #endif
 #endif

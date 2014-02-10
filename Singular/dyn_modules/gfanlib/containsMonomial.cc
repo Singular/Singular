@@ -1,53 +1,9 @@
 #include <bbcone.h>
 #include <kernel/polys.h>
 #include <kernel/kstd1.h>
+#include <libpolys/polys/prCopy.h>
 
-/***
- * Given a general ring r with any ordering,
- * changes the ordering to a(v),ws(-w)
- **/
-bool changetoAWSRing(ring r, gfan::ZVector v, gfan::ZVector w)
-{
-  omFree(r->order);
-  r->order  = (int*) omAlloc0(4*sizeof(int));
-  omFree(r->block0);
-  r->block0 = (int*) omAlloc0(4*sizeof(int));
-  omFree(r->block1);
-  r->block1 = (int*) omAlloc0(4*sizeof(int));
-  for (int i=0; r->wvhdl[i]; i++)
-  { omFree(r->wvhdl[i]); }
-  omFree(r->wvhdl);
-  r->wvhdl  = (int**) omAlloc0(4*sizeof(int*));
-
-  bool ok = false;
-  r->order[0]  = ringorder_a;
-  r->block0[0] = 1;
-  r->block1[0] = r->N;
-  r->wvhdl[0]  = ZVectorToIntStar(v,ok);
-  r->order[1]  = ringorder_ws;
-  r->block0[1] = 1;
-  r->block1[1] = r->N;
-  r->wvhdl[1]  = ZVectorToIntStar(w,ok);
-  r->order[2]=ringorder_C;
-  return ok;
-}
-
-
-/***
- * Given a ring with ordering a(v'),ws(w'),
- * changes the weights to v,w
- **/
-bool changeAWSWeights(ring r, gfan::ZVector v, gfan::ZVector w)
-{
-  omFree(r->wvhdl[0]);
-  omFree(r->wvhdl[1]);
-  bool ok = false;
-  r->wvhdl[0]  = ZVectorToIntStar(v,ok);
-  r->wvhdl[1]  = ZVectorToIntStar(w,ok);
-  return ok;
-}
-
-
+#if 0
 // /***
 //  * Creates an int* representing the transposition of the last two variables
 //  **/
@@ -170,9 +126,9 @@ static long deriveStandardBasisOfSaturation(ideal &I, ring &r)
  * returns NULL if I does not contain a monomial
  * otherwise returns the monomial contained in I
  **/
-poly containsMonomial(const ideal &I, const gfan::ZVector &w)
+poly checkForMonomialsViaStepwiseSaturation(const ideal &I, const gfan::ZVector &w)
 {
-  assume(rField_is_Ring_Z(currRing));
+  // assume(rField_is_Ring_Z(currRing));
 
   // first we switch to the ground field currRing->cf / I->m[0]
   ring r = rCopy0(currRing);
@@ -203,4 +159,81 @@ poly containsMonomial(const ideal &I, const gfan::ZVector &w)
   }
 
   return NULL;
+}
+#endif
+
+
+poly checkForMonomialViaSuddenSaturation(const ideal I, const ring r)
+{
+  // assume(rField_is_Ring_Z(currRing));
+
+  // ring s = rCopy0(r);
+  // nKillChar(s->cf);
+  // s->cf = nInitChar(n_Zp,(void*)(long)n_Int(p_GetCoeff(I->m[0],currRing),currRing->cf));
+  // rComplete(s); rChangeCurrRing(s);
+  // int k = idSize(I);
+  // ideal J = idInit(k-1);
+  // nMapFunc nMap = n_SetMap(r->cf,r->cf);
+  // for (int i=1; i<k; i++)
+  // {
+  //   J->m[i-1] = p_PermPoly(I->m[i],NULL,r,r,nMap,NULL,0);
+  //   p_Test(J->m[i-1],currRing);
+  // }
+  ring origin = currRing;
+  ideal M = idInit(1);
+  M->m[0] = p_Init(r);
+  for (int i=1; i<=rVar(r); i++)
+    p_SetExp(M->m[0],i,1,r);
+  p_SetCoeff(M->m[0],n_Init(1,r->cf),r);
+  p_Setm(M->m[0],r); p_Test(M->m[0],r);
+
+  ideal J = id_Copy(I,r); bool b; int k = 0;
+  rChangeCurrRing(r);
+  intvec* nullVector = NULL;
+  do
+  {
+    ideal Jstd = kStd(J,currQuotient,testHomog,&nullVector);
+    ideal JquotM = idQuot(Jstd,M,true,true); k++;
+    ideal JquotMredJ = kNF(JquotM,currQuotient,Jstd);
+    b = idIs0(JquotMredJ);
+    id_Delete(&Jstd,r); id_Delete(&J,r); J = JquotM;
+    id_Delete(&JquotMredJ,r);
+  } while (!b);
+
+  rChangeCurrRing(origin);
+  poly monom = NULL;
+  if (id_IsConstant(J,r))
+  {
+    monom = p_Init(origin);
+    for (int i=1; i<=rVar(r); i++)
+      p_SetExp(monom,i,k,origin);
+    p_SetCoeff(monom,n_Init(1,origin->cf),origin);
+    p_Setm(monom,origin);
+  }
+  id_Delete(&M,r);
+  id_Delete(&J,r);
+  return monom;
+}
+
+
+BOOLEAN checkForMonomial(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
+  {
+    ideal I; poly monom;
+    omUpdateInfo();
+    Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+    I = (ideal) u->CopyD();
+    monom = checkForMonomialViaSuddenSaturation(I,currRing);
+    id_Delete(&I,currRing);
+    p_Delete(&monom,currRing);
+    omUpdateInfo();
+    Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
+    I = (ideal) u->Data();
+    res->rtyp = POLY_CMD;
+    res->data = (char*) checkForMonomialViaSuddenSaturation(I,currRing);
+    return FALSE;
+  }
+  return TRUE;
 }
