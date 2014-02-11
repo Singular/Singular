@@ -4960,6 +4960,7 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D)
 // The new ring is 1/c * U.
 // The original test ideal is origJ.
 // The original ring is R / I, where R is the basering.
+  intvec save_opt=option(get);
   int i;                                // counter
   int dbg = printlevel - voice + 2;     // dbg = printlevel (default: dbg = 0)
   def R = basering;                      // We dont work in the quo
@@ -5000,7 +5001,7 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D)
 
 
   // ----- computation of the test ideal using the ring structure of Ai -----
-  intvec save_opt=option(get);
+ 
   option(redSB);
   option(returnSB);
 
