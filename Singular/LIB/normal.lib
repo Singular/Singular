@@ -3877,8 +3877,8 @@ static proc normalityTest(list mstdid)
          //if ( y >= 1)
          //{ "module generators are U[i]/U[1], with U:"; U;
          //  ""; pause(); }
-         option(set,op);
          setring R;
+         option(set,op);
          ideal U = imap(Q,U);
          return(U);
       }
