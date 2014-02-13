@@ -222,12 +222,11 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
 //  assume (currRing->idroot==NULL);
 
   number p = (number)a->CopyD(NUMBER_CMD);
+  n_Normalize(p, currRing->cf);
 
   if (n_IsZero(p, currRing->cf))
   {
     n_Delete(&p, currRing);
-
-
     if( nCoeff_is_transExt(currRing->cf) )
     {
 #ifndef SING_NDEBUG
@@ -235,10 +234,8 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
 #endif
       return FALSE;
     }
-
     WarnS("cannot set minpoly to 0 / alg. extension?");
-
-//    return TRUE;
+    return TRUE;
   }
 
   // remove all object currently in the ring
@@ -249,8 +246,6 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
 #endif
     killhdl2(currRing->idroot,&(currRing->idroot),currRing);
   }
-
-  n_Normalize(p, currRing->cf);
 
   assume( currRing->cf->extRing->qideal == NULL );
 
