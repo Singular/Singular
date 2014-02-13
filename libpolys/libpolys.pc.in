@@ -12,6 +12,6 @@ Requires: factory omalloc resources
 # Conflicts: 
 
 Cflags: -I${includedir} -I${includedir}/singular @SINGULAR_CFLAGS@ @FACTORY_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@
-Libs: -L${libdir} -lpolys @FACTORY_LIBS@ @NTL_LIBS@ @GMP_LIBS@
+Libs: -L${libdir} -lpolys @FACTORY_LIBS@ @NTL_LIBS@ @GMP_LIBS@ @USEPPROCSDYNAMICLD@
 # Libs.private: 
 

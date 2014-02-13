@@ -92,9 +92,8 @@ libpolys_la_SOURCES = ${SOURCES}
 
 EXTRA_libpolys_la_SOURCES = templates/p_Procs_Static.cc templates/p_Procs_Dynamic.cc
 
-
-libpolys_la_LDFLAGS    = -release ${PACKAGE_VERSION}
-libpolys_la_LIBADD = ${top_builddir}/coeffs/libcoeffs.la
+libpolys_la_LDFLAGS= ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION}
+libpolys_la_LIBADD = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${top_builddir}/coeffs/libcoeffs.la
 
 
 #################################################
