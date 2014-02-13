@@ -710,8 +710,7 @@ EXAMPLE: example hilbRing; shows an example
     }
   }
   list Lhilb = Philb,w;
-  setring(P);
-  return(Lhilb);
+  setring(P); return(Lhilb);
 }
 example
 { "EXAMPLE:"; echo = 2;
