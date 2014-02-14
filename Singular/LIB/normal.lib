@@ -6629,7 +6629,6 @@ EXAMPLE: example norTest; shows an example
     //norid und normap werden innnerhalb von proc computeRing ueberschrieben
     //Die Kopie newR scheint das Problem zu loesen
 
-    printlevel=prl;
 
     d = testnor[3][2];             //d = delta
     kill testnor;                              //### sollte ueberfluessig sein
