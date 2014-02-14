@@ -537,7 +537,7 @@ EXAMPLE: example radEHV; shows an example"
     {
       ERROR("// Not implemented for this ordering, please change to global ordering.");
     }
-
+  if (size(I) == 0)  { return( ideal(0) ); }
   //Compute the equidimensional radical J of I.
   ideal J = equiRadEHV(I,#);
 
