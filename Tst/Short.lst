@@ -269,6 +269,8 @@ Short/std_s.tst
 ;MP Short/stratify.tst
 Short/string.tst
 Short/test_c_dp.tst
+Short/test_unit_ideal_decomposition.tst
+Short/test_zero_ideal_decomposition.tst
 Short/triang_s.tst
 ; Short/tropical.tst ;; too long ?
 Short/tst_s.tst
