@@ -640,6 +640,7 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
           n->P.Init(strat->tailRing);
         }
 
+        n->P.pLength=0;
         n->P.p=fac->m[i];
         n->initEcart(&n->P);
         assume(kTest_TS(n));
