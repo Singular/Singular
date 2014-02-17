@@ -41,7 +41,7 @@ RETURN:  a list pr of primary ideals and their associated primes:
 EXAMPLE: example primdecZ; shows an example
 "
 {
-   if(size(I)==0){return(list(ideal(0),ideal(0)));}
+   if(size(I)==0){return(list(list(ideal(0),ideal(0))));}
 
 //--------------------  Initialize optional parameters  ------------------------
    if(size(#) > 0)
@@ -96,6 +96,7 @@ EXAMPLE: example primdecZ; shows an example
       list L = primefactors(q);
 
       list A;
+      A[1]= ideal(0);
       ideal J = imap(R,J);
 
       for(j=1;j<=size(L[2]);j++)
@@ -183,7 +184,7 @@ EXAMPLE: example primdecZ; shows an example
       {
          "A is computed in "+string(rtimer - RT)+" seconds.";
       }
-      for(i=1;i<=size(A);i++)
+      for(i=2;i<=size(A);i++)
       {
       //=== computes for all p in L the minimal associated primes of
       //=== IZ/p[variables]
@@ -943,21 +944,21 @@ static proc modp(ideal J, int p, int nu)
    def Rp = ring(rp);
    setring Rp;
    ideal J = imap(R,J);
+   int sizeA;
    if(nu > 1)
    {
       //=== p is of multiplicity > 1 in q
-      list A = minAssGTZ(J);
-      setring R;
-      list A = imap(Rp,A);
-      return(list(A,p,nu));
+      list A = minAssGTZ(J);   
    }
    else
    {
       list A = primdecGTZ(J);
-      setring R;
-      list A = imap(Rp,A);
-      return(list(A,p,nu));
    }
+   sizeA = size(A);     
+   setring R;
+   list A;
+   if (sizeA>0)   {  A = imap(Rp,A);    }
+   return(list(A,p,nu));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1099,10 +1100,11 @@ static proc extractZ(ideal J, int j, list L, list B)
          if(L[1][3]==nvars(basering))
          {
             list C;
+            C[1]= ideal(0); //add dummy entry to tie C to current ring
             int i;
             for(i=1;i<=size(I);i++)
             {
-               C[i]=I[i];
+               C[i+1]=I[i];
             }
          }
          else
@@ -1113,10 +1115,11 @@ static proc extractZ(ideal J, int j, list L, list B)
             execute(quotring);
             ideal I=imap(Shelp,I);
             list C;
+            C[1]= ideal(0); //add dummy entry to tie C to current ring
             int i;
             for(i=1;i<=size(I);i++)
             {
-               C[i]=leadcoef(I[i]);
+               C[i+1]=leadcoef(I[i]);
             }
             setring Shelp;
             list C=imap(quring,C);
@@ -1128,17 +1131,18 @@ static proc extractZ(ideal J, int j, list L, list B)
       {
          I=stdZ(I);
          list C;
+         C[1]= ideal(0); //add dummy entry to tie C to current ring
          int i;
          for(i=1;i<=size(I);i++)
          {
-            C[i]=I[i];
+            C[i+1]=I[i];
          }
          list rl=ringlist(R);
          rl[1]=0;
          def Shelp =ring(rl);
       }
       poly h=1;
-      for(i=1;i<=size(C);i++)
+      for(i=2;i<=size(C);i++) // leave out first dummy entry in C.
       {
          if(deg(C[i])>0){h=h*C[i];}  // das muss noch besser gemacht werden,
                                      // nicht ausmultiplizieren!
