@@ -9,7 +9,7 @@
 #include <witness.h>
 #include <tropicalCurves.h>
 #include <neighbours.h>
-
+#include <tropicalStrategy.h>
 
 BOOLEAN homogeneitySpace(leftv res, leftv args)
 {
@@ -174,6 +174,8 @@ BOOLEAN maximalGroebnerCone(leftv res, leftv args)
 
 void tropical_setup(SModulFunctions* p)
 {
+  valuedCase = initializeValuedCase();
+  nonValuedCase = initializeNonValuedCase();
   p->iiAddCproc("","groebnerCone",FALSE,groebnerCone);
   p->iiAddCproc("","maximalGroebnerCone",FALSE,maximalGroebnerCone);
   p->iiAddCproc("","initial",FALSE,initial);
