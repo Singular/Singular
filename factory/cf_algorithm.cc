@@ -347,7 +347,7 @@ fdivides ( const CanonicalForm & f, const CanonicalForm & g )
 
     if ( (f.inCoeffDomain() || g.inCoeffDomain())
          && ((getCharacteristic() == 0 && isOn( SW_RATIONAL ))
-             || (getCharacteristic() > 0 && CFFactory::gettype() != PrimePowerDomain)) )
+             || (getCharacteristic() > 0) ))
     {
         // if we are in a field all elements not equal to zero are units
         if ( f.inCoeffDomain() )
@@ -399,7 +399,7 @@ fdivides ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm& quot
 
     if ( (f.inCoeffDomain() || g.inCoeffDomain())
          && ((getCharacteristic() == 0 && isOn( SW_RATIONAL ))
-             || (getCharacteristic() > 0 && CFFactory::gettype() != PrimePowerDomain)) )
+             || (getCharacteristic() > 0) ))
     {
         // if we are in a field all elements not equal to zero are units
         if ( f.inCoeffDomain() )

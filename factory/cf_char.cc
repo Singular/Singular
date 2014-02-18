@@ -9,7 +9,6 @@
 #include "cf_defs.h"
 #include "canonicalform.h"
 #include "imm.h"
-#include "int_pp.h"
 #include "cf_primes.h"
 #include "cf_util.h"
 
@@ -33,14 +32,6 @@ void setCharacteristic( int c )
         if (c > 536870909) factoryError("characteristic is too large(max is 2^29)");
         ff_setprime( c );
     }
-}
-
-void setCharacteristic( int c, int n )
-{
-    ASSERT( c > 1 && n > 0, "illegal characteristic" );
-    setCharacteristic( c );
-    InternalPrimePower::setPrimePower( c, n );
-    CFFactory::settype( PrimePowerDomain );
 }
 
 void setCharacteristic( int c, int n, char name )

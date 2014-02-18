@@ -99,12 +99,6 @@ CanonicalForm::inGF() const
 }
 
 bool
-CanonicalForm::inPP() const
-{
-    return ! is_imm( value ) && ( value->levelcoeff() == PrimePowerDomain );
-}
-
-bool
 CanonicalForm::inBaseDomain() const
 {
     if ( is_imm( value ) )
@@ -221,26 +215,13 @@ CanonicalForm::mapinto () const
                 return CanonicalForm( int2imm( ff_symmetric( gf_gf2ff( imm2int( value ) ) ) ) );
             else
                 return *this;
-        else  if ( CFFactory::gettype() == PrimePowerDomain )
-            return CanonicalForm( CFFactory::basic( imm2int( value ) ) );
         else  if ( getGFDegree() == 1 )
             return CanonicalForm( int2imm_p( ff_norm( imm2int( value ) ) ) );
         else
             return CanonicalForm( int2imm_gf( gf_int2gf( imm2int( value ) ) ) );
     else  if ( value->inBaseDomain() )
         if ( getCharacteristic() == 0 )
-            if ( value->levelcoeff() == PrimePowerDomain )
-                return CFFactory::basic( getmpi( value, true ) );
-            else
-                return *this;
-        else  if ( CFFactory::gettype() == PrimePowerDomain )
-        {
-            ASSERT( value->levelcoeff() == PrimePowerDomain || value->levelcoeff() == IntegerDomain, "no proper map defined" );
-            if ( value->levelcoeff() == PrimePowerDomain )
-                return *this;
-            else
-                return CFFactory::basic( getmpi( value ) );
-        }
+             return *this;
         else
         {
             int val;

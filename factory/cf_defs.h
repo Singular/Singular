@@ -13,7 +13,6 @@
 #define LEVELEXPR 1000001
 
 #define UndefinedDomain 32000
-#define PrimePowerDomain 5
 #define GaloisFieldDomain 4
 #define FiniteFieldDomain 3
 #define RationalDomain 2

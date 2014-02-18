@@ -88,7 +88,6 @@ public:
     bool inQ() const;
     bool inFF() const;
     bool inGF() const;
-    bool inPP() const;
     bool inBaseDomain() const;
     bool inExtension() const;
     bool inCoeffDomain() const;

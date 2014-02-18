@@ -74,7 +74,6 @@ SOURCES = \
 		int_int.cc \
 		int_intdiv.cc \
 		int_poly.cc \
-		int_pp.cc \
 		int_rat.cc \
 		variable.cc \
 		NTLconvert.cc \
@@ -144,7 +143,6 @@ factory_headers = \
 		int_cf.h \
 		int_int.h \
 		int_poly.h \
-		int_pp.h \
 		int_rat.h \
 		timing.h \
 		variable.h \
