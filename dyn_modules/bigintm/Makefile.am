@@ -3,8 +3,8 @@ ACLOCAL_AMFLAGS = -I ../../m4
 # moduledir = $(libexecdir)/singular/MOD
 
 if ENABLE_P_PROCS_DYNAMIC
-#  noinst_LTLIBRARIES=bigintm.la 
-  check_LTLIBRARIES=bigintm.la 
+  noinst_LTLIBRARIES=bigintm.la 
+#  check_LTLIBRARIES=bigintm.la 
   
 endif
 
