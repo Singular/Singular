@@ -9,8 +9,6 @@ endif
 endif
 
 # forcefully enable exceptions for polymake
-POLYMAKE_CFLAGS = -fexceptions -frtti
-
 AM_LDFLAGS	= ${PM_LDFLAGS}
 # -release ${PACKAGE_VERSION}
   
@@ -23,13 +21,13 @@ polymake_la_SOURCES = $(SOURCES)
 MYINCLUDES = -I${top_srcdir} -I${top_builddir} -I${srcdir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys  \
 -I${top_builddir}/factory/include $(GMP_CFLAGS) $(PM_INC) $(PM_CFLAGS) \
-$(POLYMAKE_CFLAGS) $(FACTORY_CFLAGS)
+$(POLYMAKE_CXXFLAGS) $(FACTORY_CFLAGS)
 
 P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
 
-polymake_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON} ${POLYMAKE_CFLAGS}
-polymake_la_CXXFLAGS = ${POLYMAKE_CFLAGS}
-polymake_la_CFLAGS = ${POLYMAKE_CFLAGS}
+polymake_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON} ${POLYMAKE_CXXFLAGS}
+polymake_la_CXXFLAGS = ${POLYMAKE_CXXFLAGS}
+polymake_la_CFLAGS = ${POLYMAKE_CXXFLAGS}
 
 if ENABLE_P_PROCS_DYNAMIC
   P_PROCS_MODULE_LDFLAGS = ${AM_LDFLAGS} -shared -module
