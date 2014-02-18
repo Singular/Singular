@@ -275,6 +275,7 @@ mpz_ptr getmpi ( InternalCF * value, bool symmetric )
         mpz_init_set( dummy, InternalInteger::MPI( value ) );
     else  if ( symmetric ) {
         mpz_init( dummy );
+        InternalPrimePower::initialize();
         if ( mpz_cmp( InternalPrimePower::primepowhalf, InternalPrimePower::MPI( value ) ) < 0 )
             mpz_sub( dummy, InternalPrimePower::MPI( value ), InternalPrimePower::primepow );
         else

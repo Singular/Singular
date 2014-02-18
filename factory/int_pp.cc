@@ -16,7 +16,7 @@ mpz_t InternalPrimePower::primepow;
 mpz_t InternalPrimePower::primepowhalf;
 int InternalPrimePower::prime;
 int InternalPrimePower::exp;
-int InternalPrimePower::initialized = InternalPrimePower::initialize();
+bool InternalPrimePower::initialized = false;
 
 
 InternalPrimePower::InternalPrimePower()
@@ -26,6 +26,7 @@ InternalPrimePower::InternalPrimePower()
 
 InternalPrimePower::InternalPrimePower( const int i )
 {
+    initialize();
     mpz_init_set_si( thempi, i );
     if ( mpz_cmp_si( thempi, 0 ) < 0 ) {
         mpz_neg( thempi, thempi );
@@ -40,6 +41,7 @@ InternalPrimePower::InternalPrimePower( const mpz_ptr mpi) { thempi[0]=*mpi;}
 
 InternalPrimePower::InternalPrimePower( const char * str, const int base )
 {
+    initialize();
     mpz_init_set_str( thempi, str, base );
     if ( mpz_cmp_si( thempi, 0 ) < 0 ) {
         mpz_neg( thempi, thempi );
@@ -75,19 +77,21 @@ InternalCF * InternalPrimePower::normalize_myself()
     return this;
 }
 
-int InternalPrimePower::initialize()
+void InternalPrimePower::initialize()
 {
+    if (initialized) return;
     mpz_init_set_si( primepow, 3 );
     mpz_init_set_si( primepowhalf, 1 );
     prime = 3;
     exp = 1;
-    return 1;
+    initialized = true;
 }
 
 void
 InternalPrimePower::setPrimePower( int p, int k )
 {
     ASSERT( p > 1 && k > 0, "illegal prime power" );
+    initialize();
     if ( p != prime || k != exp ) {
         mpz_set_si( primepow, p );
         mpz_pow_ui( primepow, primepow, (unsigned int)k );
@@ -95,18 +99,6 @@ InternalPrimePower::setPrimePower( int p, int k )
         prime = p;
         exp = k;
     }
-}
-
-int
-InternalPrimePower::getp()
-{
-    return prime;
-}
-
-int
-InternalPrimePower::getk()
-{
-    return exp;
 }
 
 #ifndef NOSTREAMIO

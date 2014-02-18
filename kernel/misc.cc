@@ -10,8 +10,7 @@
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
-#  include <factory/factory.h>
+#include <factory/factory.h>
 /* libfac version strings */
 
 #include <coeffs/si_gmp.h>

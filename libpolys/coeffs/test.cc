@@ -24,9 +24,6 @@
 #include <coeffs/rintegers.h>
 
 
-// int initializeGMP(void){ return 1; }
-int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
-
 #include <iostream>
 
 using namespace std;

@@ -13,7 +13,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 
 #define FE_OPT_STRUCTURE

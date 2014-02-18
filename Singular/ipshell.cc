@@ -14,7 +14,6 @@
 #include <misc/options.h>
 #include <misc/mylimits.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 
 #include <Singular/maps_ip.h>

@@ -16,13 +16,6 @@
 static int theCharacteristic = 0;
 static int theDegree = 1;
 
-int initializeCharacteristic ()
-{
-    theCharacteristic = 0;
-    theDegree = 1;
-    return 1;
-}
-
 void setCharacteristic( int c )
 {
     if ( c == 0 )
@@ -63,12 +56,6 @@ int getCharacteristic()
 {
     return theCharacteristic;
 }
-
-int getExp()
-{
-  return InternalPrimePower::getk();
-}
-
 
 int getGFDegree()
 {

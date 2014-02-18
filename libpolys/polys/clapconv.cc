@@ -12,7 +12,6 @@
 #endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 
 #include <omalloc/omalloc.h>

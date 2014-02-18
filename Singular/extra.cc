@@ -13,7 +13,6 @@
 #include <kernel/mod2.h>
 #include <misc/auxiliary.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 
 
