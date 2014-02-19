@@ -252,14 +252,6 @@ CFFactory::poly ( const Variable & v, int exp )
         return new InternalPoly( v, exp, 1 );
 }
 
-mpz_ptr getmpi ( InternalCF * value, bool symmetric )
-{
-    ASSERT( ! is_imm( value ) && (value->levelcoeff() == IntegerDomain ), "illegal operation" );
-    mpz_ptr dummy= new mpz_t;
-    mpz_init_set( dummy, InternalInteger::MPI( value ) );
-    return dummy;
-}
-
 void getmpi ( InternalCF * value, mpz_t mpi)
 {
     ASSERT( ! is_imm( value ) && (value->levelcoeff() == IntegerDomain ), "illegal operation" );

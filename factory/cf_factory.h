@@ -33,7 +33,6 @@ public:
     static InternalCF * poly ( const Variable & v, int exp = 1 );
 };
 
-mpz_ptr getmpi ( InternalCF * value, bool symmetric = true );
 void getmpi ( InternalCF * value, mpz_t mpi);
 
 #endif /* ! INCL_CF_FACTORY_H */
