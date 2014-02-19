@@ -924,6 +924,7 @@ EXAMPLE: example HomJJ;  shows an example
    L = lastRing;
    L = insert(L,0,1);
    L[3] = delt;
+   setring(P);
    return(L);
 }
 example
