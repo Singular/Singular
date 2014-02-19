@@ -2678,19 +2678,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 //            WerrorS("ideal expected");
 //       }
 //       else
-  /*==================== isSqrFree =============================*/
-      if(strcmp(sys_cmd,"isSqrFree")==0)
-      {
-        if ((h!=NULL) &&(h->Typ()==POLY_CMD))
-        {
-          res->rtyp=INT_CMD;
-          res->data=(void *)(long) singclap_isSqrFree((poly)h->Data(), currRing);
-          return FALSE;
-        }
-        else
-          WerrorS("poly expected");
-      }
-      else
   /*==================== pDivStat =============================*/
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if(strcmp(sys_cmd,"pDivStat")==0)

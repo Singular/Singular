@@ -779,12 +779,3 @@ CFFList sqrFree ( const CanonicalForm & f, bool sort )
     return result;
 }
 
-bool isSqrFree ( const CanonicalForm & f )
-{
-//    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
-    if ( getCharacteristic() == 0 )
-        return isSqrFreeZ( f );
-    else
-        return isSqrFreeFp( f );
-}
-

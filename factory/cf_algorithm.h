@@ -70,8 +70,6 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha );
 
 CFFList sqrFree ( const CanonicalForm & f, bool sort= false );
 
-bool isSqrFree ( const CanonicalForm & f );
-
 CanonicalForm homogenize( const CanonicalForm & f, const Variable & x);
 CanonicalForm homogenize( const CanonicalForm & f, const Variable & x,
                                 const Variable & v1, const Variable & v2);

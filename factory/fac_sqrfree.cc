@@ -11,13 +11,6 @@
 #include "cf_map.h"
 #include "cf_algorithm.h"
 
-static int divexp = 1;
-
-static void divexpfunc ( CanonicalForm &, int & e )
-{
-    e /= divexp;
-}
-
 static int
 compareFactors( const CFFactor & f, const CFFactor & g )
 {
@@ -48,94 +41,6 @@ sortCFFList( CFFList & F )
 
     return result;
 }
-
-CFFList sqrFreeFp ( const CanonicalForm & f )
-{
-    CanonicalForm t0 = f, t, v, w, h;
-    CanonicalForm leadcf = t0.lc();
-    Variable x = f.mvar();
-    CFFList F;
-    int p = getCharacteristic();
-    int k, e = 1;
-
-    if ( ! leadcf.isOne() )
-        t0 /= leadcf;
-
-    divexp = p;
-    while ( t0.degree(x) > 0 )
-    {
-        t = gcd( t0, t0.deriv() );
-        v = t0 / t;
-        k = 0;
-        while ( v.degree(x) > 0 )
-        {
-            k = k+1;
-            if ( k % p == 0 )
-            {
-                t /= v;
-                k = k+1;
-            }
-            w = gcd( t, v );
-            h = v / w;
-            v = w;
-            t /= v;
-            if ( h.degree(x) > 0 )
-                F.append( CFFactor( h/h.lc(), e*k ) );
-        }
-        t0 = apply( t, divexpfunc );
-        e = p * e;
-    }
-    if ( ! leadcf.isOne() )
-    {
-        if ( !F.isEmpty() && (F.getFirst().exp() == 1) )
-        {
-            leadcf = F.getFirst().factor() * leadcf;
-            F.removeFirst();
-        }
-        F.insert( CFFactor( leadcf, 1 ) );
-    }
-    return F;
-}
-
-bool isSqrFreeFp( const CanonicalForm & f )
-{
-  CFFList F = sqrFreeFp( f );
-  return ( F.length() == 1 && F.getFirst().exp() == 1 );
-}
-
-bool isSqrFreeZ ( const CanonicalForm & f )
-{
-    return gcd( f, f.deriv() ).degree() == 0;
-}
-
-/*
-
-CFFList sqrFreeZ ( const CanonicalForm & a )
-{
-    CanonicalForm b = a.deriv(), c = gcd( a, b );
-    CanonicalForm y, z, w = a / c;
-    int i = 1;
-    CFFList F;
-
-    while ( ! c.degree() == 0 )
-    {
-        y = gcd( w, c ); z = w / y;
-        if ( degree( z ) > 0 )
-            if ( lc( z ).sign() < 0 )
-                F.append( CFFactor( -z, i ) );
-            else
-                F.append( CFFactor( z, i ) );
-        i++;
-        w = y; c = c / y;
-    }
-    if ( degree( w ) > 0 )
-        if ( lc( w ).sign() < 0 )
-            F.append( CFFactor( -w, i ) );
-        else
-            F.append( CFFactor( w, i ) );
-    return F;
-}
-*/
 
 CFFList sqrFreeZ ( const CanonicalForm & a )
 {
