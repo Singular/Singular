@@ -847,7 +847,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   }
   if(rt==NONE)
   {
-    WarnS("right side is not a datum, assignment ignored");
+    Werror("assignment: right side is not a datum or index out of bounds!");
     // if (!errorreported)
     //   WerrorS("right side is not a datum");
     //return TRUE;
