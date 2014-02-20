@@ -7912,9 +7912,12 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
       {
         for(q=IDELEMS(Q)-1; q>=0;q--)
         {
-          if ((Q->m[q]!=NULL)
-          &&(pLmEqual(r->m[l],Q->m[q])))
+          if ((Q->m[q]!=NULL)&&(pLmEqual(Q->m[q],r->m[l])))
           {
+            #ifdef HAVE_RINGS
+            //Also need divisibility of the leading coefficients
+            if((!rField_is_Ring(currRing)) || (pDivisibleBy(Q->m[q],r->m[l])))
+            #endif
             if (TEST_OPT_REDSB)
             {
               p=r->m[l];

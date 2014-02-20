@@ -754,14 +754,88 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
+// computing over Rings: handle constant generators of id properly
     if (idPosConstant(id) != -1)
     {
-      WerrorS("constant in q-ideal; please modify ground field/ring instead");
-      return TRUE;
+      mpz_t gcd;
+      if(nCoeff_is_Ring_ModN(currRing->cf) || 
+         nCoeff_is_Ring_PtoM(currRing->cf) || 
+         nCoeff_is_Ring_2toM(currRing->cf))
+      {
+      // already computing mod modNumber: use gcd(modNumber,constant entry of id)
+        mpz_t newConst;
+        mpz_init(newConst);
+        mpz_set_ui(newConst, currRing->cf->cfInt(p_GetCoeff(id->m[idPosConstant(id)], currRing),currRing->cf));
+        mpz_init(gcd);
+        mpz_gcd(gcd, currRing->cf->modNumber, newConst);
+        if(mpz_cmp_ui(gcd, 1) == 0)
+        {
+            WerrorS("constant in q-ideal is coprime to modulus in ground ring");
+            WerrorS("Unable to create qring!");
+            return TRUE;
+        }
+        if(nCoeff_is_Ring_PtoM(currRing->cf) || 
+           nCoeff_is_Ring_2toM(currRing->cf))
+        {
+        // modNumber is prime power: set modExponent appropriately
+          int kNew = 1;
+          mpz_t baseTokNew;
+          mpz_init(baseTokNew);
+          mpz_set(baseTokNew, currRing->cf->modBase);
+          while(mpz_cmp(gcd, baseTokNew) > 0)
+          {
+            kNew++;
+            mpz_mul(baseTokNew, baseTokNew, currRing->cf->modBase);
+          }
+          currRing->cf->modExponent = kNew;
+          mpz_set(currRing->cf->modNumber, gcd);
+          mpz_sub_ui(baseTokNew, baseTokNew, 1);
+          mpz_t dummy;
+          mpz_init(dummy);
+          mpz_set_si(dummy, sizeof(unsigned long));
+          printf("\nmod2mMask = %i \n", currRing->cf->mod2mMask);
+          #if 0
+          if(nCoeff_is_Ring_2toM(currRing->cf))
+          {
+          // handle shortcut for 2^m appropriately
+            if(mpz_cmp(dummy, baseTokNew) > 0)
+            {
+              idPrint(id);
+              currRing->cf->mod2mMask = mpz_get_ui(baseTokNew);
+              idPrint(id);
+            }
+          }
+          #endif
+          mpz_clear(dummy);
+          mpz_clear(baseTokNew);
+        }
+        else
+        {
+        // previously over modNumber, now over new modNumber
+          mpz_set(currRing->cf->modBase, gcd);
+          mpz_set(currRing->cf->modNumber, gcd);
+        }
+        currRing->cf->ch = mpz_get_ui(gcd);
+        mpz_clear(gcd);
+        mpz_clear(newConst);
+      }
+      else
+      {
+      // previously over Z, now over Z/m
+        mpz_t newConst;
+        mpz_init(newConst);
+        mpz_set_ui(newConst, currRing->cf->cfInt(p_GetCoeff(id->m[idPosConstant(id)], currRing), currRing->cf));
+        currRing->cf->modExponent = 1;
+        mpz_set(currRing->cf->modBase, newConst);
+        mpz_set(currRing->cf->modNumber, newConst);
+        currRing->cf->ch = mpz_get_ui(newConst);
+        mpz_clear(newConst);
+        currRing->cf->type = n_Zn;
+      }
     }
   }
 #endif
-
+  
   if (currRing->qideal!=NULL) /* we are already in a qring! */
   {
     ideal tmp=idSimpleAdd(id,currRing->qideal);

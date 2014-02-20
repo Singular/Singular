@@ -1361,7 +1361,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (!TEST_OPT_NOT_BUCKETS)
     strat->use_buckets = 1;
 #endif
-
   // redtailBBa against T for inhomogenous input
   if (!TEST_OPT_OLDSTD)
     withT = ! strat->homog;
