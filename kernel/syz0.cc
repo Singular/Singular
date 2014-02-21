@@ -771,6 +771,7 @@ void syReOrderResolventFB(resolvente res,int length, int initial)
   }
 }
 
+#if 0
 static void syMergeSortResolventFB(resolvente res,int length, int initial=1)
 {
   int syzIndex=length-1,i,j;
@@ -825,6 +826,7 @@ static void syMergeSortResolventFB(resolvente res,int length, int initial=1)
     syzIndex--;
   }
 }
+#endif
 
 BOOLEAN syTestOrder(ideal M)
 {

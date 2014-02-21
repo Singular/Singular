@@ -792,6 +792,7 @@ void DestroyFreeNodes()
   }
 }
 
+#if 0
 static void go_right(NodeM *current,poly_function disp)
 {
   if (current)
@@ -802,7 +803,6 @@ static void go_right(NodeM *current,poly_function disp)
   }
 }
 
-#if 0
 void ForEach(TreeM *t,poly_function disp)
 {
   go_right(t->root,disp);

@@ -1161,6 +1161,10 @@ number kBucketPolyRed(kBucket_pt bucket,
   kbTest(bucket);
   return rn;
 }
+
+#ifndef USE_COEF_BUCKETS
+void kBucketSimpleContent(kBucket_pt) {}
+#else
 static BOOLEAN nIsPseudoUnit(number n, ring r)
 {
   if (rField_is_Zp(r))
@@ -1174,9 +1178,6 @@ static BOOLEAN nIsPseudoUnit(number n, ring r)
   return (n_IsOne(n,r->cf) || n_IsMOne(n,r->cf));
 }
 
-#ifndef USE_COEF_BUCKETS
-void kBucketSimpleContent(kBucket_pt) {}
-#else
 void kBucketSimpleContent(kBucket_pt bucket)
 {
   ring r=bucket->bucket_ring;

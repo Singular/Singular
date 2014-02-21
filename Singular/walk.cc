@@ -436,6 +436,7 @@ static void TimeStringFractal(clock_t tinput, clock_t tostd, clock_t tif,clock_t
 }
 #endif
 
+#ifdef CHECK_IDEAL_MWALK
 static void idString(ideal L, const char* st)
 {
   int i, nL = IDELEMS(L);
@@ -447,9 +448,9 @@ static void idString(ideal L, const char* st)
   }
   Print(" %s;", pString(L->m[nL-1]));
 }
+#endif
 
-//unused
-//#if 0
+#if defined(CHECK_IDEAL_MWALK) || defined(ENDWALKS)
 static void headidString(ideal L, char* st)
 {
   int i, nL = IDELEMS(L);
@@ -461,10 +462,9 @@ static void headidString(ideal L, char* st)
   }
   Print(" %s;", pString(pHead(L->m[nL-1])));
 }
-//#endif
+#endif
 
-//unused
-//#if 0
+#if defined(CHECK_IDEAL_MWALK) || defined(ENDWALKS)
 static void idElements(ideal L, char* st)
 {
   int i, nL = IDELEMS(L);
@@ -502,7 +502,7 @@ static void idElements(ideal L, char* st)
   }
   omFree(K);
 }
-//#endif
+#endif
 
 
 static void ivString(intvec* iv, const char* ch)
@@ -4776,7 +4776,7 @@ nwalk = 0;
       tred = tred + clock() - to;
     }
 
-  NEXT_VECTOR:
+  //NEXT_VECTOR:
     to = clock();
     //intvec* next_weight = MkInterRedNextWeight(curr_weight,target_weight,G);
    intvec* next_weight = MWalkRandomNextWeight(G, curr_weight, target_weight, weight_rad, pert_deg);

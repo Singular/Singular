@@ -33,7 +33,7 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
 
 static void convRecTrP ( const CanonicalForm & f, int * exp, poly & result, int offs, const ring r );
 
-static void convRecGFGF ( const CanonicalForm & f, int * exp, poly & result );
+//static void convRecGFGF ( const CanonicalForm & f, int * exp, poly & result );
 
 static number convFactoryNSingAN( const CanonicalForm &f, const ring r);
 
