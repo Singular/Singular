@@ -298,7 +298,7 @@ char*    nAEpName       (number, const coeffs)
 void    nAEpInpMult       (number &a, number b, const coeffs)
 {
     p_poly* f=reinterpret_cast<p_poly*> (a);
-    p_poly* g=reinterpret_cast<p_poly*> (g);
+    p_poly* g=reinterpret_cast<p_poly*> (b);
     f->p_poly_mult_n_to(*g);
     a=(number) f;
     return ;
