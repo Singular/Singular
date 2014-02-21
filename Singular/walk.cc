@@ -4610,7 +4610,7 @@ ideal Mrwalk(ideal Go, intvec* curr_weight, intvec* target_weight, int weight_ra
   tinput = clock();
   clock_t tim;
   nstep=0;
-  int i,k,nwalk,endwalks = 0;
+  int i,nwalk,endwalks = 0;
   int nV = currRing->N;
 
   ideal Gomega, M, F, Gomega1, Gomega2, M1, F1, G;
@@ -4695,7 +4695,6 @@ nwalk = 0;
     }
     else
     {
-    NORMAL_GW:
 #ifndef  BUCHBERGER_ALG
       if(isNolVector(curr_weight) == 0)
       {
@@ -6789,7 +6788,7 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
 #ifdef TIME_TEST
   clock_t tinput = clock();
 #endif
-  int nsteppert=0, i, k, nV = currRing->N, nwalk=0, npert_tmp=0;
+  int nsteppert=0, i, nV = currRing->N, nwalk=0, npert_tmp=0;
   int *npert=(int*)omAlloc(2*nV*sizeof(int));
   ideal Gomega, M,F,  G1, Gomega1, Gomega2, M1, F1;
   //ring endRing;

@@ -2813,9 +2813,7 @@ void p_ProjectiveUnique(poly ph, const ring r)
 
   assume( r != NULL ); assume( r->cf != NULL ); const coeffs C = r->cf;
 
-  poly start=ph;
-
-  number d, h;
+  number h;
   poly p;
 
 #ifdef HAVE_RINGS

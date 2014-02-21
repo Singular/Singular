@@ -1463,7 +1463,6 @@ char* singclap_neworder ( ideal I, const ring r)
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
   CFList L;
-  poly p;
   if (rField_is_Q(r) || rField_is_Zp(r))
   {
     setCharacteristic( rChar(r) );

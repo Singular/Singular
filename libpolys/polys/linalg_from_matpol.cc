@@ -6,7 +6,6 @@ static poly minuscopy (poly p, const ring);
 static poly p_Insert(poly p1, poly p2, const ring);
 
 static void mp_PartClean(matrix, int, int, const ring);
-static void mp_FinalClean(matrix, const ring);
 static int mp_PrepareRow (matrix, int, int, const ring);
 static int mp_PreparePiv (matrix, int, int, const ring);
 static int mp_PivBar(matrix, int, int, const ring);
@@ -229,6 +228,17 @@ class mp_permmatrix
     void mpColReorder();
 };
 
+
+static poly minuscopy (poly p, const ring R)
+{
+  poly w;
+  number  e;
+  e = n_Init(-1, R);
+  w = p_Copy(p, R);
+  p_Mult_nn(w, e, R);
+  n_Delete(&e, R);
+  return w;
+}
 
 
 /*2

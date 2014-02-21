@@ -609,17 +609,6 @@ BOOLEAN mp_Equal(matrix a, matrix b, const ring R)
   return TRUE;
 }
 
-static poly minuscopy (poly p, const ring R)
-{
-  poly w;
-  number  e;
-  e = n_Init(-1, R);
-  w = p_Copy(p, R);
-  p_Mult_nn(w, e, R);
-  n_Delete(&e, R);
-  return w;
-}
-
 /*2
 * insert a monomial into a list, avoid duplicates
 * arguments are destroyed
@@ -726,12 +715,6 @@ static void mp_PartClean(matrix a, int lr, int lc, const ring R)
     q1 = &(a->m)[i*a->ncols];
     for (j=lc-1;j>=0;j--) if(q1[j]) p_Delete(&q1[j], R);
   }
-}
-
-static void mp_FinalClean(matrix a, const ring)
-{
-  omFreeSize((ADDRESS)a->m,a->nrows*a->ncols*sizeof(poly));
-  omFreeBin((ADDRESS)a, sip_sideal_bin);
 }
 
 BOOLEAN mp_IsDiagUnit(matrix U, const ring R)
@@ -1365,42 +1348,6 @@ static int mp_PreparePiv (matrix a, int lr, int lc,const ring r)
   if(c==0) return 0;
   if(c<lc) mpSwapCol(a, c, lr, lc);
   return 1;
-}
-
-static inline BOOLEAN smSmaller(poly a, poly b)
-{
-  loop
-  {
-    pIter(b);
-    if (b == NULL) return TRUE;
-    pIter(a);
-    if (a == NULL) return FALSE;
-  }
-}
-
-static BOOLEAN sm_IsNegQuot(poly a, const poly b, const poly c, const ring R)
-{
-  if (p_LmDivisibleByNoComp(c, b, R))
-  {
-    p_ExpVectorDiff(a, b, c, R);
-    // Hmm: here used to be a pSetm(a): but it is unnecessary,
-    // if b and c are correct
-    return FALSE;
-  }
-  else
-  {
-    int i;
-    for (i=rVar(R); i>0; i--)
-    {
-      if(p_GetExp(c,i,R) > p_GetExp(b,i,R))
-        p_SetExp(a,i,p_GetExp(c,i,R)-p_GetExp(b,i,R),R);
-      else
-        p_SetExp(a,i,0,R);
-    }
-    // here we actually might need a pSetm, if a is to be used in
-    // comparisons
-    return TRUE;
-  }
 }
 
 static void mp_ElimBar(matrix a0, matrix re, poly div, int lr, int lc, const ring R)
