@@ -342,7 +342,7 @@ static const char* npEati(const char *s, int *i, const coeffs r)
       if (ii >= (MAX_INT_VAL / 10)) ii = ii % r->ch;
     }
     while (((*s) >= '0') && ((*s) <= '9'));
-    if (ii >= r->ch) ii = ii % r->ch;
+    if (ii >= (unsigned long)r->ch) ii = ii % r->ch;
     *i=(int)ii;
   }
   else (*i) = 1;
