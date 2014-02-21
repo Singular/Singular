@@ -100,7 +100,7 @@ number  nAEExactDiv(number a, number b, const coeffs)
 number nAEInit(long i, const coeffs)
 {
     mpz_t m;
-    mpz_init_set_ui(m,i);
+    mpz_init_set_ui(m, i);
     int_poly* res=new int_poly;
     res->poly_set(m);
     number res1=reinterpret_cast<number>(res);
@@ -224,7 +224,7 @@ BOOLEAN nAEIsMOne      (number a, const coeffs)
 
 BOOLEAN nAEGreaterZero     (number a, const coeffs r)
 {
-        if (nAEIsZero(a,r) == FALSE) { return TRUE; }
+        if (nAEIsZero(a, r) == FALSE) { return TRUE; }
         else { return FALSE; }
 }
 

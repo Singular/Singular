@@ -104,9 +104,9 @@ number nAEpInit(long i, const coeffs)
 {
     int j=7;
     mpz_t m;
-    mpz_init_set_ui(m,i);
+    mpz_init_set_ui(m, i);
     p_poly* res=new p_poly;
-    res->p_poly_set(m,j);
+    res->p_poly_set(m, j);
     number res1=reinterpret_cast<number>(res);
     return  res1;
 }
@@ -115,7 +115,7 @@ number nAEpInitMPZ(mpz_t m, const coeffs)
 {
     int j=7;
     p_poly* res=new p_poly;
-    res->p_poly_set(m,j);
+    res->p_poly_set(m, j);
     number res1=reinterpret_cast<number>(res);
     return  res1;
 
@@ -227,7 +227,7 @@ BOOLEAN nAEpIsOne      (number a, const coeffs)
 
 BOOLEAN nAEpIsMOne      (number a, const coeffs r)
 {
-    number b=nAEpNeg(a,r);
+    number b=nAEpNeg(a, r);
     p_poly* f=reinterpret_cast<p_poly*> (b);
     if (f->is_one() == 1) {return FALSE;}
     else {return TRUE;}
@@ -235,7 +235,7 @@ BOOLEAN nAEpIsMOne      (number a, const coeffs r)
 
 BOOLEAN nAEpGreaterZero     (number a, const coeffs r)
 {
-    if (nAEpIsZero(a,r) == FALSE) { return TRUE; }
+    if (nAEpIsZero(a, r) == FALSE) { return TRUE; }
     else { return FALSE; }
 }
 

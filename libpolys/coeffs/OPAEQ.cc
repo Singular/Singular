@@ -214,7 +214,7 @@ BOOLEAN nAEQIsMOne      (number a, const coeffs)
 
 BOOLEAN nAEQGreaterZero     (number a, const coeffs r)
 {
-    if (nAEQIsZero(a,r) == FALSE) { return TRUE; }
+    if (nAEQIsZero(a, r) == FALSE) { return TRUE; }
     else { return FALSE; }
 }
 
