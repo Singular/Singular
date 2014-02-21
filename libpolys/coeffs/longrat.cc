@@ -2826,7 +2826,7 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
 
 }
 
-static char* nlCoeffString(const coeffs r)
+static char* nlCoeffString(const coeffs)
 {
   return omStrDup("0");
 }
