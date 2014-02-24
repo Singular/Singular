@@ -724,8 +724,8 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
     pFalseReturn(p_Test(T->p, currRing));
   }
 
-  if (i >= 0 && T->pLength != 0
-  && ! rIsSyzIndexRing(currRing) && T->pLength != pLength(p))
+  if ((i >= 0) && (T->pLength != 0)
+  && (! rIsSyzIndexRing(currRing)) && (T->pLength != pLength(p)))
   {
     int l=T->pLength;
     T->pLength=pLength(p);
@@ -5509,6 +5509,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
   if (strat->redTailChange)
   {
     L->length = 0;
+    L->pLength = 0;
   }
 
   //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }

@@ -2197,6 +2197,11 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
   {
     lists v=(lists)L->m[1].Data();
     R->N = v->nr+1;
+    if (R->N<=0) 
+    {
+      WerrorS("no ring variables");
+      goto rCompose_err;
+    }
     R->names   = (char **)omAlloc0(R->N * sizeof(char_ptr));
     int i;
     for(i=0;i<R->N;i++)
