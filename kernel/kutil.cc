@@ -395,7 +395,8 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       i++;
       if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ; // does not divide
       #ifdef HAVE_RINGS
-      ///should check also if the lc is a zero divisor, if it divides all the others
+      // Note: As long as qring j forbidden if j contains integer (i.e. ground rings are 
+      //       domains), no zerodivisor test needed  CAUTION
       if (rField_is_Ring(currRing) && currRing->OrdSgn == -1)
               if(n_DivBy(p_GetCoeff(h,r->cf),lc,r->cf) == 0)
                       return;

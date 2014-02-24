@@ -72,6 +72,7 @@
 #include <kernel/kstd1.h>
 #include <kernel/syz.h>
 #include <kernel/kutil.h>
+#include <kernel/hilb.cc>
 
 #include <kernel/shiftgb.h>
 #include <kernel/linearAlgebra.h>
@@ -3151,6 +3152,18 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
+  /*==================== Roune Hilb  =================*/
+       if (strcmp(sys_cmd, "hilbroune") == 0)
+       {
+         ideal I;
+         if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
+         {
+           I=(ideal)h->CopyD();
+           slicehilb(I);
+         }
+         else return TRUE;
+         return FALSE;
+       }
   /*==================== minor =================*/
       if (strcmp(sys_cmd, "minor")==0)
       {
