@@ -953,8 +953,10 @@ int  sleftv::Typ()
       case VSHORTOUT:
         return INT_CMD;
       case VMINPOLY:
+        data=NULL;
         return NUMBER_CMD;
       case VNOETHER:
+        data=NULL;
         return POLY_CMD;
       //case COMMAND:
       //  return COMMAND;
