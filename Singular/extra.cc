@@ -72,10 +72,11 @@
 #include <kernel/kstd1.h>
 #include <kernel/syz.h>
 #include <kernel/kutil.h>
-#include <kernel/hilb.cc>
 
 #include <kernel/shiftgb.h>
 #include <kernel/linearAlgebra.h>
+
+#include <kernel/hutil.h>
 
 // for tests of t-rep-GB
 #include <kernel/tgb.h>

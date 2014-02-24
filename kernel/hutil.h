@@ -73,4 +73,5 @@ void hIndAllMult(scmon pure, int Npure, scfmon rad, int Nrad,
  varset var, int Nvar);
 void hDegreeSeries(intvec *s1, intvec *s2, int *co, int *mu);
 
+void slicehilb(ideal I);
 #endif
