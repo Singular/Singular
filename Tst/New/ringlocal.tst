@@ -54,6 +54,25 @@ i=std(i);
 poly f = f1+4*f2+13*f3;
 lift(i,f);
 
+//New tests
+
+ring R = (integer,6),(x,y),ds;
+ideal i = 2x2-xy, 2xy-y2;
+std(i);
+
+ideal i = 2x2-xy, 3xy-y2;
+std(i);
+
+ideal i = 2x, 3y, xy;
+std(i);
+
+ideal i = 2x, 3y;
+std(i);
+
+ring R = (integer,44),(x,y),ds;
+ideal i = 2x, 4y, 11xy;
+std(i);
+
 
 tst_status(1);
 $

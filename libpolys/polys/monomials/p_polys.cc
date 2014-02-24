@@ -1227,12 +1227,27 @@ BOOLEAN p_OneComp(poly p, const ring r)
   return TRUE;
 }
 
+#ifdef HAVE_RINGS
+// check whether leading coefficient is invertible, i.e. p can be made monic
+bool p_IsPureMonomial(const poly p, const ring r)
+{
+    if(rField_is_Ring(r))
+    {
+        if (p == NULL) return FALSE;
+        if (!n_IsUnit(pGetCoeff(p), r->cf)) return FALSE;
+        if  (pNext(p) == NULL) return TRUE;
+        else return FALSE;
+    }
+}
+#endif
+
 /*2
 *test if a monomial /head term is a pure power
 */
 int p_IsPurePower(const poly p, const ring r)
 {
 #ifdef HAVE_RINGS 
+// p not pure power if lc is not invertible
   if (rField_is_Ring(r))
           {
           if (p == NULL) return 0;

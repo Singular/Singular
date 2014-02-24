@@ -1401,7 +1401,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
   poly m1, m2, gcd;
 
   d = n_ExtGcd(pGetCoeff(p), pGetCoeff(strat->S[i]), &s, &t, currRing->cf);
-
+  
   if (nIsZero(s) || nIsZero(t))  // evtl. durch divBy tests ersetzen
   {
     nDelete(&d);
@@ -3593,6 +3593,7 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
   #if ADIDEBUG
   PrintLn();
+  //getchar();
   PrintS("Enter superenterpairs");
   PrintLn();
   int iii = strat->Ll;
@@ -5794,13 +5795,6 @@ void initS (ideal F, ideal Q, kStrategy strat)
       h.p = pCopy(F->m[i]);
       if (currRing->OrdSgn==-1)
       {
-                    /*#ifdef HAVE_RINGS
-                          if (rField_is_Ring(currRing))
-                            {
-                            h.pCleardenom();
-                            }
-                          else
-                                #endif*/
         cancelunit(&h);  /*- tries to cancel a unit -*/
         deleteHC(&h, strat);
       }
@@ -8097,9 +8091,6 @@ BOOLEAN newHEdge(kStrategy strat)
   /* compare old and new noether*/
   newNoether = pLmInit(strat->kHEdge);
   j = p_FDeg(newNoether,currRing);
-/*  #ifdef HAVE_RINGS
-  if (!rField_is_Ring(currRing))
-  #endif */
   for (i=1; i<=(currRing->N); i++)
   {
     if (pGetExp(newNoether, i) > 0) pDecrExp(newNoether,i);
