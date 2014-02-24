@@ -2494,7 +2494,6 @@ static BOOLEAN jjINDEPSET2(leftv res, leftv u, leftv v)
 static BOOLEAN jjINTERSECT(leftv res, leftv u, leftv v)
 {
   res->data=(char *)idSect((ideal)u->Data(),(ideal)v->Data());
-  setFlag(res,FLAG_STD);
   return FALSE;
 }
 static BOOLEAN jjJanetBasis2(leftv res, leftv u, leftv v)

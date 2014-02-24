@@ -3060,7 +3060,7 @@ ideal, resp.@: module
 @item @strong{Purpose:}
 computes the intersection of ideals, resp.@: modules.
 @item @strong{Note:}
-If the option @code{returnSB} is enabled then the result is a standard basis.
+If the option @code{prot} is enabled then the result the used method (elimination/syzygies) is displayed.
 @item @strong{Example:}
 @smallexample
 @c example
