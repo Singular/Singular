@@ -154,7 +154,7 @@ newhilb =hHstdSeries(Lm,w,strat->kHomW,Q,currRing);
 
 #if ADIDEBUG
 PrintS("\nOriginal\n");
-int   j, l, k;
+int   i, j, l, k;
   if (hilb == NULL)
     return;
   l = hilb->length()-1;

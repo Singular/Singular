@@ -27,7 +27,7 @@
 
 // DEFINITION DER FUNKTIONEN
 
-number  nAEAdd(number a, number b,const coeffs r)
+number  nAEAdd(number a, number b, const coeffs)
 {
     int_poly* f=reinterpret_cast<int_poly*> (a);
     int_poly* g=reinterpret_cast<int_poly*> (b);
@@ -37,7 +37,7 @@ number  nAEAdd(number a, number b,const coeffs r)
     return (number) res;
 }
 
-number  nAEMult(number a, number b,const coeffs r)
+number  nAEMult(number a, number b, const coeffs)
 {
     int_poly* f=reinterpret_cast<int_poly*> (a);
     int_poly* g=reinterpret_cast<int_poly*> (b);
@@ -47,7 +47,7 @@ number  nAEMult(number a, number b,const coeffs r)
     return (number) res;
 }
 
-number  nAESub(number a, number b,const coeffs r)
+number  nAESub(number a, number b, const coeffs)
 {
     int_poly* f=reinterpret_cast<int_poly*> (a);
     int_poly* g=reinterpret_cast<int_poly*> (b);
@@ -58,7 +58,7 @@ number  nAESub(number a, number b,const coeffs r)
 }
 
 
-number  nAEDiv(number a, number b,const coeffs r)
+number  nAEDiv(number a, number b, const coeffs)
 {
     int_poly* f=reinterpret_cast<int_poly*> (a);
     int_poly* g=reinterpret_cast<int_poly*> (b);
@@ -69,7 +69,7 @@ number  nAEDiv(number a, number b,const coeffs r)
 }
 
 
-number  nAEIntDiv(number a, number b,const coeffs r)
+number  nAEIntDiv(number a, number b, const coeffs)
 {
 
     int_poly* f=reinterpret_cast<int_poly*> (a);
@@ -80,12 +80,12 @@ number  nAEIntDiv(number a, number b,const coeffs r)
     return (number) res;
 }
 
-number  nAEIntMod(number a, number b,const coeffs r)
+number  nAEIntMod(number a, number, const coeffs)
 {
     return a;
 }
 
-number  nAEExactDiv(number a, number b,const coeffs r)
+number  nAEExactDiv(number a, number b, const coeffs)
 {
     int_poly* f=reinterpret_cast<int_poly*> (a);
     int_poly* g=reinterpret_cast<int_poly*> (b);
@@ -97,17 +97,17 @@ number  nAEExactDiv(number a, number b,const coeffs r)
 
 
 
-number nAEInit(long i, const coeffs r)
+number nAEInit(long i, const coeffs)
 {
     mpz_t m;
-    mpz_init_set_ui(m,i);
+    mpz_init_set_ui(m, i);
     int_poly* res=new int_poly;
     res->poly_set(m);
     number res1=reinterpret_cast<number>(res);
     return  res1;
 }
 
-number nAEInitMPZ(mpz_t m, const coeffs r)
+number nAEInitMPZ(mpz_t m, const coeffs)
 {
     int_poly* res=new int_poly;
     res->poly_set(m);
@@ -116,25 +116,25 @@ number nAEInitMPZ(mpz_t m, const coeffs r)
 }
 
 
-int nAESize (number a,const coeffs r)
+int nAESize (number a, const coeffs)
 {
     int_poly* f=reinterpret_cast<int_poly*> (a);
     return f->deg;
 }
 
-int nAEInt(number &a,const coeffs r)
+int nAEInt(number &, const coeffs)
 {
     return 1;
 }
 
 
-number nAEMPZ(number a,const coeffs r)
+number nAEMPZ(number a, const coeffs)
 {
     return a;
 }
 
 
-number nAENeg(number c, const coeffs r)
+number nAENeg(number c, const coeffs)
 {
     int_poly* f=reinterpret_cast<int_poly*> (c);
     int_poly *res=new int_poly;
@@ -143,29 +143,29 @@ number nAENeg(number c, const coeffs r)
     return (number) res;
 }
 
-number nAECopy(number c, const coeffs r)
+number nAECopy(number c, const coeffs)
 {
     return (number) c;
 }
 
-number nAERePart(number c, const coeffs r)
+number nAERePart(number c, const coeffs)
 {
     return (number) c;
 }
 
-number nAEImPart(number c, const coeffs r)
+number nAEImPart(number c, const coeffs)
 {
     return (number) c;
 }
 
-void    nAEWriteLong   (number &a, const coeffs r)
+void    nAEWriteLong   (number &a, const coeffs)
 {
     int_poly* f=reinterpret_cast <int_poly*>(a);
     f->poly_print();
     return ;
 }
 
-void    nAEWriteShort  (number &a, const coeffs r)
+void    nAEWriteShort  (number &a, const coeffs)
 {
     int_poly* f=reinterpret_cast <int_poly*>(a);
     f->poly_print();
@@ -173,19 +173,19 @@ void    nAEWriteShort  (number &a, const coeffs r)
 }
 
 
-const char *  nAERead  (const char *s, number *a,const coeffs r)
+const char *  nAERead  (const char *, number *, const coeffs)
 {
     char* c=new char;
     *c='c';
     return c;
 }
 
-number nAENormalize    (number a,number b,const coeffs r) // ?
+number nAENormalize    (number a, number, const coeffs) // ?
 {
         return a;
 }
 
-BOOLEAN nAEGreater     (number a, number b,const coeffs r)
+BOOLEAN nAEGreater     (number a, number b, const coeffs)
 {
         int_poly* f=reinterpret_cast<int_poly*> (a);
         int_poly* g=reinterpret_cast<int_poly*> (b);
@@ -193,7 +193,7 @@ BOOLEAN nAEGreater     (number a, number b,const coeffs r)
         else {return TRUE;}
 }
 
-BOOLEAN nAEEqual     (number a, number b,const coeffs r)
+BOOLEAN nAEEqual     (number a, number b, const coeffs)
 {
         int_poly* f=reinterpret_cast<int_poly*> (a);
         int_poly* g=reinterpret_cast<int_poly*> (b);
@@ -201,21 +201,21 @@ BOOLEAN nAEEqual     (number a, number b,const coeffs r)
         else {return TRUE;}
 }
 
-BOOLEAN nAEIsZero      (number a,const coeffs r)
+BOOLEAN nAEIsZero      (number a, const coeffs)
 {
         int_poly* f=reinterpret_cast<int_poly*> (a);
         if (f->is_zero() == 1) {return FALSE;}
         else {return TRUE;}
 }
 
-BOOLEAN nAEIsOne      (number a,const coeffs r)
+BOOLEAN nAEIsOne      (number a, const coeffs)
 {
         int_poly* f=reinterpret_cast<int_poly*> (a);
         if (f->is_one() == 1) {return FALSE;}
         else {return TRUE;}
 }
 
-BOOLEAN nAEIsMOne      (number a,const coeffs r)
+BOOLEAN nAEIsMOne      (number a, const coeffs)
 {
         int_poly* f=reinterpret_cast<int_poly*> (a);
         if (f->is_one() == 1) {return FALSE;}
@@ -224,26 +224,26 @@ BOOLEAN nAEIsMOne      (number a,const coeffs r)
 
 BOOLEAN nAEGreaterZero     (number a, const coeffs r)
 {
-        if (nAEIsZero(a,r) == FALSE) { return TRUE; }
+        if (nAEIsZero(a, r) == FALSE) { return TRUE; }
         else { return FALSE; }
 }
 
-void    nAEPower       (number a, int i, number * result,const coeffs r)
+void    nAEPower       (number, int, number *, const coeffs)
 {
         return;
 }
 
-number nAEGetDenom      (number &a, const coeffs r)
+number nAEGetDenom      (number &, const coeffs)
 {
         return (number) 1;
 }
 
-number nAEGetNumerator      (number &a, const coeffs r)
+number nAEGetNumerator      (number &a, const coeffs)
 {
         return a;
 }
 
-number nAEGcd           (number a,number b,const coeffs r)
+number nAEGcd           (number a, number b, const coeffs)
 {
         int_poly* f=reinterpret_cast<int_poly*> (a);
         int_poly* g=reinterpret_cast<int_poly*> (b);
@@ -252,7 +252,7 @@ number nAEGcd           (number a,number b,const coeffs r)
         return (number) res;
 }
 
-number nAELcm          (number a,number b,const coeffs r)
+number nAELcm          (number a, number b, const coeffs)
 {
         int_poly* f=reinterpret_cast<int_poly*> (a);
         int_poly* g=reinterpret_cast<int_poly*> (b);
@@ -264,39 +264,39 @@ number nAELcm          (number a,number b,const coeffs r)
         return (number) res;
 }
 
-void    nAEDelete       (number *a, const coeffs r)
+void    nAEDelete       (number *, const coeffs)
 {
         return;
 }
 
 /*
-number    nAESetMap        (number a, const coeffs r)
+number    nAESetMap        (number a, const coeffs)
 {
         return a;
 }
 */
-char*    nAEName       (number a, const coeffs r)
+char*    nAEName       (number, const coeffs)
 {       char *c=new char;
         *c='c';
         return c;
 }
 
-void    nAEInpMult       (number &a, number b,const coeffs r)
+void    nAEInpMult       (number &, number, const coeffs)
 {
         return ;
 }
 
-void    nAECoeffWrite   (const coeffs r, BOOLEAN details)
+void    nAECoeffWrite   (const coeffs, BOOLEAN)
 {
         return;
 }
 
-BOOLEAN nAEClearContent  (number a,const coeffs r)
+BOOLEAN nAEClearContent  (number, const coeffs)
 {
         return FALSE;
 }
 
-BOOLEAN nAEClearDenominators  (number a,const coeffs r)
+BOOLEAN nAEClearDenominators  (number, const coeffs)
 {
         return FALSE;
 }
@@ -306,9 +306,8 @@ BOOLEAN nAEClearDenominators  (number a,const coeffs r)
 //INITIALISIERUNG FÜR SINGULAR
 
 
-BOOLEAN n_AEInitChar(coeffs r,void * p) // vlt noch void* p hin
+BOOLEAN n_AEInitChar(coeffs r, void *)
 {
-
     r->ch = 0;
     r->cfKillChar=NULL;
     r->nCoeffIsEqual=ndCoeffIsEqual;

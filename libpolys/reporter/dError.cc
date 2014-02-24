@@ -49,9 +49,11 @@ extern "C"
 
 int dReportError(const char* fmt, ...)
 {
+#if 0
 #ifdef HAVE_EXECINFO_H
 #define SIZE 50
   void *buffer[SIZE+1]; int ret; 
+#endif
 #endif
 
   va_list ap;

@@ -19,11 +19,12 @@
 #include <math.h>
 #include <string.h>
 
+#if 0
 // Ungetestet
 static void bimRowContent(bigintmat *bimat, int rowpos, int colpos);
 static void bimReduce(bigintmat *bimat, int rpiv, int colpos,
                       int ready, int all);
-
+#endif
 
 
 //#define BIMATELEM(M,I,J) (M)[ (M).index(I,J) ]
@@ -687,6 +688,7 @@ void bigintmat::pprint(int maxwid)
   }
 }
 
+#if 0
 // Ungetestet
 // (According to C. Fieker) Seems to have a lot of memory leaks (pure adaptation of the
 // corresponding method for intmat) due to return statements
@@ -771,6 +773,7 @@ static void bimReduce(bigintmat *bimat, int rpiv, int colpos,
     n_Delete(&ce, basecoeffs);
   }
 }
+#endif
 
 // columnwise concatination of two bigintmats
 bigintmat * bimConcat(bigintmat * a, bigintmat * b, const coeffs cf)

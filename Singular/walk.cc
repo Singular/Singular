@@ -436,6 +436,7 @@ static void TimeStringFractal(clock_t tinput, clock_t tostd, clock_t tif,clock_t
 }
 #endif
 
+#ifdef CHECK_IDEAL_MWALK
 static void idString(ideal L, const char* st)
 {
   int i, nL = IDELEMS(L);
@@ -447,9 +448,9 @@ static void idString(ideal L, const char* st)
   }
   Print(" %s;", pString(L->m[nL-1]));
 }
+#endif
 
-//unused
-//#if 0
+#if defined(CHECK_IDEAL_MWALK) || defined(ENDWALKS)
 static void headidString(ideal L, char* st)
 {
   int i, nL = IDELEMS(L);
@@ -461,10 +462,9 @@ static void headidString(ideal L, char* st)
   }
   Print(" %s;", pString(pHead(L->m[nL-1])));
 }
-//#endif
+#endif
 
-//unused
-//#if 0
+#if defined(CHECK_IDEAL_MWALK) || defined(ENDWALKS)
 static void idElements(ideal L, char* st)
 {
   int i, nL = IDELEMS(L);
@@ -502,7 +502,7 @@ static void idElements(ideal L, char* st)
   }
   omFree(K);
 }
-//#endif
+#endif
 
 
 static void ivString(intvec* iv, const char* ch)
@@ -4610,7 +4610,7 @@ ideal Mrwalk(ideal Go, intvec* curr_weight, intvec* target_weight, int weight_ra
   tinput = clock();
   clock_t tim;
   nstep=0;
-  int i,k,nwalk,endwalks = 0;
+  int i,nwalk,endwalks = 0;
   int nV = currRing->N;
 
   ideal Gomega, M, F, Gomega1, Gomega2, M1, F1, G;
@@ -4695,7 +4695,6 @@ nwalk = 0;
     }
     else
     {
-    NORMAL_GW:
 #ifndef  BUCHBERGER_ALG
       if(isNolVector(curr_weight) == 0)
       {
@@ -4777,7 +4776,7 @@ nwalk = 0;
       tred = tred + clock() - to;
     }
 
-  NEXT_VECTOR:
+  //NEXT_VECTOR:
     to = clock();
     //intvec* next_weight = MkInterRedNextWeight(curr_weight,target_weight,G);
    intvec* next_weight = MWalkRandomNextWeight(G, curr_weight, target_weight, weight_rad, pert_deg);
@@ -6789,7 +6788,7 @@ ideal TranMrImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP, i
 #ifdef TIME_TEST
   clock_t tinput = clock();
 #endif
-  int nsteppert=0, i, k, nV = currRing->N, nwalk=0, npert_tmp=0;
+  int nsteppert=0, i, nV = currRing->N, nwalk=0, npert_tmp=0;
   int *npert=(int*)omAlloc(2*nV*sizeof(int));
   ideal Gomega, M,F,  G1, Gomega1, Gomega2, M1, F1;
   //ring endRing;

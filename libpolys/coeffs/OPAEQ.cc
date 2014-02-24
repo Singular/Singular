@@ -28,7 +28,7 @@
 
 // DEFINITION DER FUNKTIONEN
 
-number  nAEQAdd(number a, number b,const coeffs r)
+number  nAEQAdd(number a, number b, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
     Q_poly* g=reinterpret_cast<Q_poly*> (b);
@@ -38,7 +38,7 @@ number  nAEQAdd(number a, number b,const coeffs r)
     return (number) res;
 }
 
-number  nAEQMult(number a, number b,const coeffs r)
+number  nAEQMult(number a, number b, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
     Q_poly* g=reinterpret_cast<Q_poly*> (b);
@@ -48,7 +48,7 @@ number  nAEQMult(number a, number b,const coeffs r)
     return (number) res;
 }
 
-number  nAEQSub(number a, number b,const coeffs r)
+number  nAEQSub(number a, number b, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
     Q_poly* g=reinterpret_cast<Q_poly*> (b);
@@ -59,7 +59,7 @@ number  nAEQSub(number a, number b,const coeffs r)
 }
 
 
-number  nAEQDiv(number a, number b,const coeffs r)
+number  nAEQDiv(number a, number b, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
     Q_poly* g=reinterpret_cast<Q_poly*> (b);
@@ -71,7 +71,7 @@ number  nAEQDiv(number a, number b,const coeffs r)
 }
 
 
-number  nAEQIntDiv(number a, number b,const coeffs r)
+number  nAEQIntDiv(number a, number b, const coeffs)
 {
 
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
@@ -82,12 +82,12 @@ number  nAEQIntDiv(number a, number b,const coeffs r)
     return (number) res;
 }
 
-number  nAEQIntMod(number a, number b,const coeffs r)
+number  nAEQIntMod(number a, number, const coeffs)
 {
     return a;
 }
 
-number  nAEQExactDiv(number a, number b,const coeffs r)
+number  nAEQExactDiv(number a, number b, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
     Q_poly* g=reinterpret_cast<Q_poly*> (b);
@@ -100,37 +100,37 @@ number  nAEQExactDiv(number a, number b,const coeffs r)
 
 
 
-number nAEQInit(long i, const coeffs r)
+number nAEQInit(long i, const coeffs)
 {
     number res = (number) i;
     return res;
 }
 
-number nAEQInitMPZ(mpz_t m, const coeffs r)
+number nAEQInitMPZ(mpz_t m, const coeffs)
 {
     number res= (number) m;
     return res;
 }
 
-int nAEQSize (number a,const coeffs r)
+int nAEQSize (number a, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
     return f->deg;
 }
 
-int nAEQInt(number &a,const coeffs r)
+int nAEQInt(number &, const coeffs)
 {
     return 1;
 }
 
 
-number nAEQMPZ(number a,const coeffs r)
+number nAEQMPZ(number a, const coeffs)
 {
     return a;
 }
 
 
-number nAEQNeg(number c, const coeffs r)
+number nAEQNeg(number c, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (c);
     Q_poly *res=new Q_poly;
@@ -139,43 +139,43 @@ number nAEQNeg(number c, const coeffs r)
     return (number) res;
 }
 
-number nAEQCopy(number c, const coeffs r)
+number nAEQCopy(number c, const coeffs)
 {
     return (number) c;
 }
 
-number nAEQRePart(number c, const coeffs r)
+number nAEQRePart(number c, const coeffs)
 {
     return (number) c;
 }
 
-number nAEQImPart(number c, const coeffs r)
+number nAEQImPart(number c, const coeffs)
 {
     return (number) c;
 }
 
-void    nAEQWriteLong   (number &a, const coeffs r)
+void    nAEQWriteLong   (number &, const coeffs)
 {
     return;
 }
 
-void    nAEQWriteShort  (number &a, const coeffs r)
+void    nAEQWriteShort  (number &, const coeffs)
 {
     return ;
 }
 
 
-const char *  nAEQRead  (const char *s, number *a,const coeffs r)
+const char *  nAEQRead  (const char *, number *, const coeffs)
 {
     return "";
 }
 
-number nAEQNormalize    (number a,number b,const coeffs r) // ?
+number nAEQNormalize    (number a, number , const coeffs) // ?
 {
     return a;
 }
 
-BOOLEAN nAEQGreater     (number a, number b,const coeffs r)
+BOOLEAN nAEQGreater     (number a, number b, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
     Q_poly* g=reinterpret_cast<Q_poly*> (b);
@@ -183,7 +183,7 @@ BOOLEAN nAEQGreater     (number a, number b,const coeffs r)
     else {return TRUE;}
 }
 
-BOOLEAN nAEQEqual     (number a, number b,const coeffs r)
+BOOLEAN nAEQEqual     (number a, number b, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
     Q_poly* g=reinterpret_cast<Q_poly*> (b);
@@ -191,21 +191,21 @@ BOOLEAN nAEQEqual     (number a, number b,const coeffs r)
     else {return TRUE;}
 }
 
-BOOLEAN nAEQIsZero      (number a,const coeffs r)
+BOOLEAN nAEQIsZero      (number a, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
     if (f->is_zero() == 1) {return FALSE;}
     else {return TRUE;}
 }
 
-BOOLEAN nAEQIsOne      (number a,const coeffs r)
+BOOLEAN nAEQIsOne      (number a, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
     if (f->is_one() == 1) {return FALSE;}
     else {return TRUE;}
 }
 
-BOOLEAN nAEQIsMOne      (number a,const coeffs r)
+BOOLEAN nAEQIsMOne      (number a, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
     if (f->is_one() == 1) {return FALSE;}
@@ -214,26 +214,26 @@ BOOLEAN nAEQIsMOne      (number a,const coeffs r)
 
 BOOLEAN nAEQGreaterZero     (number a, const coeffs r)
 {
-    if (nAEQIsZero(a,r) == FALSE) { return TRUE; }
+    if (nAEQIsZero(a, r) == FALSE) { return TRUE; }
     else { return FALSE; }
 }
 
-void    nAEQPower       (number a, int i, number * result,const coeffs r)
+void    nAEQPower       (number, int, number *, const coeffs)
 {
     return;
 }
 
-number nAEQGetDenom      (number &a, const coeffs r)
+number nAEQGetDenom      (number &, const coeffs)
 {
     return (number) 1;
 }
 
-number nAEQGetNumerator      (number &a, const coeffs r)
+number nAEQGetNumerator      (number &a, const coeffs)
 {
     return a;
 }
 
-number nAEQGcd           (number a,number b,const coeffs r)
+number nAEQGcd           (number a, number b, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
     Q_poly* g=reinterpret_cast<Q_poly*> (b);
@@ -242,7 +242,7 @@ number nAEQGcd           (number a,number b,const coeffs r)
     return (number) res;
 }
 
-number nAEQLcm          (number a,number b,const coeffs r)
+number nAEQLcm          (number a, number b, const coeffs)
 {
     Q_poly* f=reinterpret_cast<Q_poly*> (a);
     Q_poly* g=reinterpret_cast<Q_poly*> (b);
@@ -255,18 +255,18 @@ number nAEQLcm          (number a,number b,const coeffs r)
     return (number) res;
 }
 
-void    nAEQDelete       (number *a, const coeffs r)
+void    nAEQDelete       (number *, const coeffs)
 {
     return;
 }
 
 /*
-number    nAEQSetMap        (number a, const coeffs r)
+number    nAEQSetMap        (number a, const coeffs)
 {
         return a;
 }
 */
-char*    nAEQName       (number a, const coeffs r)
+char*    nAEQName       (number, const coeffs)
 {
     char* c=new char;
     *c='c';
@@ -274,22 +274,22 @@ char*    nAEQName       (number a, const coeffs r)
     return c;
 }
 
-void    nAEQInpMult       (number &a, number b,const coeffs r)
+void    nAEQInpMult       (number &, number, const coeffs)
 {
     return ;
 }
 
-void    nAEQCoeffWrite   (const coeffs r, BOOLEAN details)
+void    nAEQCoeffWrite   (const coeffs, BOOLEAN)
 {
     return;
 }
 
-BOOLEAN nAEQClearContent  (number a,const coeffs r)
+BOOLEAN nAEQClearContent  (number, const coeffs)
 {
     return FALSE;
 }
 
-BOOLEAN nAEQClearDenominators  (number a,const coeffs r)
+BOOLEAN nAEQClearDenominators  (number, const coeffs)
 {
     return FALSE;
 }
@@ -299,11 +299,8 @@ BOOLEAN nAEQClearDenominators  (number a,const coeffs r)
 //INITIALISIERUNG FÜR SINGULAR
 
 
-BOOLEAN n_QAEInitChar(coeffs r,void *p) // vlt noch void* p hin
+BOOLEAN n_QAEInitChar(coeffs r, void *)
 {
-
-
-
     r->ch=0;
     r->cfKillChar=NULL;
     r->nCoeffIsEqual=ndCoeffIsEqual;
