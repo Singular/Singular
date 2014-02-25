@@ -1154,16 +1154,26 @@ BOOLEAN iiParameter(leftv p)
     return TRUE;
   }
   leftv h=iiCurrArgs;
+  leftv rest=h->next; /*iiCurrArgs is not NULLi here*/
+  BOOLEAN is_default_list=FALSE;
   if (strcmp(p->name,"#")==0)
+  {
+    is_default_list=TRUE;
+    rest=NULL;
+  }
+  else
+  {
+    h->next=NULL;
+  }
+  BOOLEAN res=iiAssign(p,h);
+  if (is_default_list)
   {
     iiCurrArgs=NULL;
   }
   else
   {
-    iiCurrArgs=h->next;
-    h->next=NULL;
+    iiCurrArgs=rest;
   }
-  BOOLEAN res=iiAssign(p,h);
   h->CleanUp();
   omFreeBin((ADDRESS)h, sleftv_bin);
   return res;
@@ -2197,7 +2207,7 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
   {
     lists v=(lists)L->m[1].Data();
     R->N = v->nr+1;
-    if (R->N<=0) 
+    if (R->N<=0)
     {
       WerrorS("no ring variables");
       goto rCompose_err;
@@ -5056,11 +5066,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       }
       else // (0/p, a, b, ..., z)
       {
-	if ((ch!=0) && (ch!=IsPrime(ch)))
-	{
-	  WerrorS("too many parameters");
-	  goto rInitError;
-	}
+        if ((ch!=0) && (ch!=IsPrime(ch)))
+        {
+          WerrorS("too many parameters");
+          goto rInitError;
+        }
 
         char ** names = (char**)omAlloc0(pars * sizeof(char_ptr));
 
@@ -5073,11 +5083,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
         TransExtInfo extParam;
 
         extParam.r = rDefault( ch, pars, names); // Q/Zp [ p_1, ... p_pars ]
-	for(int i=pars-1; i>=0;i--)
-	{
-	  omFree(names[i]);
-	}
-	omFree(names);
+        for(int i=pars-1; i>=0;i--)
+        {
+          omFree(names[i]);
+        }
+        omFree(names);
 
         cf = nInitChar(n_transExt, &extParam);
       }
@@ -5157,7 +5167,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       {
         number p=(number)pn->next->CopyD();
         nlGMP(p,(number)modBase,coeffs_BIGINT);
-	nlDelete(&p,coeffs_BIGINT);
+        nlDelete(&p,coeffs_BIGINT);
       }
     }
     else
