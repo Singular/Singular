@@ -765,6 +765,16 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
 
   if (lt==DEF_CMD)
   {
+    if (TEST_V_ALLWARN
+    && (rt!=RING_CMD)
+    && (rt!=QRING_CMD)
+    && (l->name!=NULL)
+    && (l->e==NULL)
+    && (iiCurrArgs==NULL) /* not in proc header */
+    )
+    {
+      Warn("use `%s` instead of `def`",Tok2Cmdname(rt));
+    }
     if (l->rtyp==IDHDL)
     {
       IDTYP((idhdl)l->data)=rt;

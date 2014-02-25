@@ -1162,16 +1162,26 @@ BOOLEAN iiParameter(leftv p)
     return TRUE;
   }
   leftv h=iiCurrArgs;
+  leftv rest=h->next; /*iiCurrArgs is not NULLi here*/
+  BOOLEAN is_default_list=FALSE;
   if (strcmp(p->name,"#")==0)
+  {
+    is_default_list=TRUE;
+    rest=NULL;
+  }
+  else
+  {
+    h->next=NULL;
+  }
+  BOOLEAN res=iiAssign(p,h);
+  if (is_default_list)
   {
     iiCurrArgs=NULL;
   }
   else
   {
-    iiCurrArgs=h->next;
-    h->next=NULL;
+    iiCurrArgs=rest;
   }
-  BOOLEAN res=iiAssign(p,h);
   h->CleanUp();
   omFreeBin((ADDRESS)h, sleftv_bin);
   return res;
@@ -2085,6 +2095,11 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
   {
     lists v=(lists)L->m[1].Data();
     R->N = v->nr+1;
+    if (R->N<=0)
+    {
+      WerrorS("no ring variables");
+      goto rCompose_err;
+    }
     R->names   = (char **)omAlloc0(R->N * sizeof(char_ptr));
     int i;
     for(i=0;i<R->N;i++)
