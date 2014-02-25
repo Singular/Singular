@@ -605,7 +605,16 @@ EXAMPLE:  example morsesplit; shows an example"
     f = jet(f, k);
     h = f-jet(f, 2)-corank_part(f);
   }
-  poly g = cleardenom(f-jet(f, 2));
+  poly g = f-jet(f, 2);
+  poly lead_g = leadcoef(g);
+  if(lead_g > 0)
+  {
+    g = g/lead_g;
+  }
+  if(lead_g < 0)
+  {
+    g = -g/lead_g;
+  }
 
   return(list(c, lambda, k, g));
 }
