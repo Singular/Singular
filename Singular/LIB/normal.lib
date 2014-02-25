@@ -2806,7 +2806,8 @@ EXAMPLE: example deltaLoc;  shows an example
          return(list(d*(mu+nb-1) div 2,d*tau,d*nb));
       }
       list HNEXP=hnexpansion(f);
-      if (typeof(HNEXP[1])=="ring") {
+      if (typeof(HNEXP[1])=="ring")
+      {
         def altring = basering;
         def HNEring = HNEXP[1]; setring HNEring;
         nb=size(hne);
@@ -6616,10 +6617,11 @@ EXAMPLE: example norTest; shows an example
 //"injective:";
     a = is_injective(Qnormap,QAS);          //a. Test for injectivity of Qnormap
     dbprint ( prl, "injective: "+string(a) );
-    if ( n==1 ) { 
-     def result = intvec(a);
+    if ( n==1 )
+    {
+     intvec result = intvec(a);
      setring BAS;
-     return (result); 
+     return (result);
    }
    a;
 
@@ -6627,10 +6629,11 @@ EXAMPLE: example norTest; shows an example
     setring newR;
     b = mapIsFinite(normap,BAS,lnorid[2]);  //b. Test for finiteness of normap
     dbprint ( prl, "finite: "+string(b) );
-    if ( n==2 ) { 
-       def result = intvec(a,b);
+    if ( n==2 )
+    {
+       intvec result = intvec(a,b);
        setring BAS;
-       return (result); 
+       return (result);
     }
    b;
 
@@ -6648,7 +6651,7 @@ EXAMPLE: example norTest; shows an example
     kill testnor;                              //### sollte ueberfluessig sein
     int d1 = (d==0);                           //d1=1 if delta=0
     dbprint ( prl, "delta: "+string(d) );
-    def result = intvec(a,b,d1);
+    intvec result = intvec(a,b,d1);
     setring BAS;
     return(result);
 }
