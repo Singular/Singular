@@ -247,12 +247,19 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
     killhdl2(currRing->idroot,&(currRing->idroot),currRing);
   }
 
-  assume( currRing->cf->extRing->qideal == NULL );
-
   AlgExtInfo A;
 
   A.r = rCopy(currRing->cf->extRing); // Copy  ground field!
+  // if minpoly was already set:
+  if( currRing->cf->extRing->qideal != NULL ) id_Delete(&(A.r->qideal),A.r);
   ideal q = idInit(1,1);
+  if ((p==NULL) ||(DEN((fraction)(p)) != NULL) ||(NUM((fraction)p)==NULL))
+  {
+    Werror("Could not construct the alg. extension: minpoly==0");
+    // cleanup A: TODO
+    rDelete( A.r );
+    return TRUE;
+  }
 
   assume( DEN((fraction)(p)) == NULL ); // minpoly must be a fraction with poly numerator...!!
 

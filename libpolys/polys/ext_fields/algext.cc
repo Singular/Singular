@@ -652,7 +652,7 @@ const char * naRead(const char *s, number *a, const coeffs cf)
 {
   poly aAsPoly;
   const char * result = p_Read(s, aAsPoly, naRing);
-  definiteReduce(aAsPoly, naMinpoly, cf);
+  if (aAsPoly!=NULL) definiteReduce(aAsPoly, naMinpoly, cf);
   *a = (number)aAsPoly;
   return result;
 }
