@@ -674,7 +674,10 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec *
 
       // enter into S, L, and T
       //if(withT)
+      {
+        strat->P.SetpFDeg();
         enterT(strat->P, strat);
+      }
 
       // L
       enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
