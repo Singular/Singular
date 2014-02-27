@@ -409,9 +409,11 @@ fi
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl debug and inline
 dnl
+save_cflags="$CFLAGS"
 AC_MSG_CHECKING(whether to disable debugging)
 if test "$with_debug" != no; then
 AC_MSG_RESULT(no)
+CFLAGS="$CFLAGS -g"
 else
 AC_MSG_RESULT(yes)
 AC_DEFINE(OM_NDEBUG,1,"Disable debug")
@@ -513,10 +515,10 @@ AC_MSG_CHECKING(whether addr2line works)
 AC_CACHE_VAL(ac_cv_prog_addr2line_works,
 AC_TRY_RUN([
 #include <stdlib.h>
-#undef OM_GET_BACKTRACE_WORKS
 #include "omReturn.h"
 #include "omStructs.h"
 #include "omGetBackTrace.h"
+#include "omGetBackTrace.c"
 #include "omRet2Info.c"
 
 int test_Ret_2_Info()
@@ -542,6 +544,8 @@ int main(int argc, char** argv)
    ac_cv_prog_addr2line_works=no,
    ac_cv_prog_addr2line_works=no))
 AC_MSG_RESULT($ac_cv_prog_addr2line_works)
+
+CFLAGS="$save_cflags"
 
 AC_MSG_CHECKING(whether to track return addresses)
 if test "$with_track_return" = no || test "$ac_cv_get_return_addr_works" = no || test "$ac_cv_prog_addr2line_works" != yes; then
