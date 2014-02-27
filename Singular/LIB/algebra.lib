@@ -218,7 +218,7 @@ EXAMPLE: example module_containment; shows an example
     }
   }
   else
-  { 
+  {
       setring br;
     "ERROR: the first ideal must have nvars(basering) entries";
     return();
@@ -1039,7 +1039,7 @@ EXAMPLE: example mapIsFinite; shows an example
   M = std(M+J);
   // ----------------------- test for finiteness ---------------------------
   list l = finitenessTest(M,1..m);
-  def result = l[1]; // an integer.
+  int result = l[1];
   setring bsr;
   return( result );
 }
