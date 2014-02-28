@@ -3751,9 +3751,10 @@ NOT READY [much more to come.  See shell.el.]!"
   ;; first as the filters are accessed in the following initialization
   ;; functions.  NOT READY [should be moved to the respective foldings]
   (make-local-variable 'singular-pre-input-filter-functions)
-  (make-local-hook 'singular-post-input-filter-functions)
+  ;;make-local-hook is obsolete in emcas >=21.1
+  ;;(make-local-hook 'singular-post-input-filter-functions)
   (make-local-variable 'singular-pre-output-filter-functions)
-  (make-local-hook 'singular-post-output-filter-functions)
+  ;;(make-local-hook 'singular-post-output-filter-functions)
 
   (singular-interactive-mode-map-init)
   (singular-mode-syntax-table-init)
