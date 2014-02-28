@@ -8,15 +8,8 @@
 #include <misc/intvec.h>
 #include <coeffs/bigintmat.h>
 
-#include <bbcone.h>
+#include <callgfanlib_conversion.h>
 #include <sstream>
-
-// #include <omalloc/omalloc.h>
-// #include <kernel/longrat.h>
-// #include <Singular/subexpr.h>
-// #include <gfanlib/gfanlib.h>
-// #include <kernel/ring.h>
-// #include <kernel/polys.h>
 
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>

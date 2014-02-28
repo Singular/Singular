@@ -188,7 +188,7 @@ poly checkForMonomialViaSuddenSaturation(const ideal I, const ring r)
   p_Setm(M->m[0],r); p_Test(M->m[0],r);
 
   ideal J = id_Copy(I,r); bool b; int k = 0;
-  rChangeCurrRing(r);
+  if (currRing != r) rChangeCurrRing(r);
   intvec* nullVector = NULL;
   do
   {
@@ -200,15 +200,15 @@ poly checkForMonomialViaSuddenSaturation(const ideal I, const ring r)
     id_Delete(&JquotMredJ,r);
   } while (!b);
 
-  rChangeCurrRing(origin);
+  if (currRing != origin) rChangeCurrRing(origin);
   poly monom = NULL;
   if (id_IsConstant(J,r))
   {
-    monom = p_Init(origin);
+    monom = p_Init(r);
     for (int i=1; i<=rVar(r); i++)
-      p_SetExp(monom,i,k,origin);
-    p_SetCoeff(monom,n_Init(1,origin->cf),origin);
-    p_Setm(monom,origin);
+      p_SetExp(monom,i,k,r);
+    p_SetCoeff(monom,n_Init(1,r->cf),r);
+    p_Setm(monom,r);
   }
   id_Delete(&M,r);
   id_Delete(&J,r);

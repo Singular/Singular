@@ -1,6 +1,7 @@
 #include <libpolys/polys/monomials/p_polys.h>
 #include <libpolys/coeffs/coeffs.h>
 
+#include <callgfanlib_conversion.h>
 #include <bbcone.h>
 #include <ppinitialReduction.h>
 #include <ttinitialReduction.h>
@@ -9,7 +10,9 @@
 #include <witness.h>
 #include <tropicalCurves.h>
 #include <neighbours.h>
+#include <tropicalVarietyOfPolynomials.h>
 #include <tropicalStrategy.h>
+#include <startingCone.h>
 
 BOOLEAN homogeneitySpace(leftv res, leftv args)
 {
@@ -179,7 +182,7 @@ void tropical_setup(SModulFunctions* p)
   p->iiAddCproc("","groebnerCone",FALSE,groebnerCone);
   p->iiAddCproc("","maximalGroebnerCone",FALSE,maximalGroebnerCone);
   p->iiAddCproc("","initial",FALSE,initial);
-  p->iiAddCproc("","tropicalNeighbours",FALSE,tropicalNeighbours);
+  // p->iiAddCproc("","tropicalNeighbours",FALSE,tropicalNeighbours);
 #ifndef NDEBUG
   p->iiAddCproc("","initial0",FALSE,initial0);
   p->iiAddCproc("","pppReduce",FALSE,pppReduce);
@@ -197,9 +200,12 @@ void tropical_setup(SModulFunctions* p)
   p->iiAddCproc("","checkForMonomial",FALSE,checkForMonomial);
   p->iiAddCproc("","dwr0",FALSE,dwr0);
   p->iiAddCproc("","witness0",FALSE,witness0);
+  p->iiAddCproc("","tropicalVariety00",FALSE,tropicalVariety00);
+  p->iiAddCproc("","tropicalVariety01",FALSE,tropicalVariety01);
   p->iiAddCproc("","tropicalCurve0",FALSE,tropicalCurve0);
   p->iiAddCproc("","tropicalCurve1",FALSE,tropicalCurve1);
-  p->iiAddCproc("","tropicalCurve2",FALSE,tropicalCurve2);
+  p->iiAddCproc("","tropicalStartingPoint0",FALSE,tropicalStartingPoint0);
+  p->iiAddCproc("","tropicalStartingPoint1",FALSE,tropicalStartingPoint1);
 #endif //NDEBUG
   p->iiAddCproc("","ppreduceInitially",FALSE,ppreduceInitially);
   p->iiAddCproc("","ttreduceInitially",FALSE,ttreduceInitially);

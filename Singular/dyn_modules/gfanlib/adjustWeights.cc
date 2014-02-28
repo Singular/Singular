@@ -52,7 +52,7 @@ gfan::ZVector nonvalued_adjustWeightUnderHomogeneity(const gfan::ZVector e, cons
 
 gfan::ZVector valued_adjustWeightUnderHomogeneity(const gfan::ZVector e, const gfan::ZVector w)
 {
-  gfan::ZVector v=e-(e[1]/w[1]+1)*w;
+  gfan::ZVector v=e-(e[0]/w[0]+1)*w;
   gfan::Integer min=1;
   for (unsigned i=1; i<v.size(); i++)
     if (v[i]<min) min=v[i];

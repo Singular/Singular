@@ -53,9 +53,8 @@ struct groebnerConeData_compare
   }
 };
 
-typedef std::set<groebnerConeData, groebnerConeData_compare> groebnerConesData;
+groebnerConeData maximalGroebnerConeData(ideal I, const ring r);
 
-groebnerConesData groebnerNeighbors(const groebnerConeData sigma);
-groebnerConesData tropicalNeighbors(const groebnerConeData sigma);
+typedef std::set<groebnerConeData,groebnerConeData_compare> setOfGroebnerConeData;
 
 #endif

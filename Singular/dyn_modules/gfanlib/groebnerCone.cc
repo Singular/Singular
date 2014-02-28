@@ -3,10 +3,9 @@
 
 #include <libpolys/polys/monomials/ring.h>
 #include <kernel/ideals.h>
-#include <gfanlib/gfanlib_vector.h>
-#include <gfanlib/gfanlib_zcone.h>
+#include <gfanlib/gfanlib.h>
 
-#include <bbcone.h>
+#include <callgfanlib_conversion.h>
 #include <groebnerCone.h>
 #include <initial.h>
 
@@ -129,4 +128,34 @@ groebnerConeData::~groebnerConeData()
 {
   id_Delete(&I,r);
   rDelete(r);
+}
+
+
+groebnerConeData maximalGroebnerConeData(ideal I, const ring r)
+{
+  int n = rVar(r);
+  poly g = NULL;
+  int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
+  int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
+  gfan::ZVector leadexpw = gfan::ZVector(n);
+  gfan::ZVector tailexpw = gfan::ZVector(n);
+  gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
+  for (int i=0; i<IDELEMS(I); i++)
+  {
+    g = (poly) I->m[i]; pGetExpV(g,leadexpv);
+    leadexpw = intStar2ZVector(n, leadexpv);
+    pIter(g);
+    while (g != NULL)
+    {
+      pGetExpV(g,tailexpv);
+      tailexpw = intStar2ZVector(n, tailexpv);
+      inequalities.appendRow(leadexpw-tailexpw);
+      pIter(g);
+    }
+  }
+  omFreeSize(leadexpv,(n+1)*sizeof(int));
+  omFreeSize(tailexpv,(n+1)*sizeof(int));
+  gfan::ZCone zc = gfan::ZCone(inequalities,gfan::ZMatrix(0, inequalities.getWidth()));
+  gfan::ZVector p = zc.getRelativeInteriorPoint();
+  return groebnerConeData(I,r,zc,p);
 }

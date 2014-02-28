@@ -1,8 +1,13 @@
-#include <bbcone.h>
-#include <gfanlib/gfanlib_vector.h>
+#include <gfanlib/gfanlib.h>
+
+#include <kernel/ideals.h>
+#include <Singular/subexpr.h>
 #include <libpolys/polys/monomials/p_polys.h>
-#include <Singular/ipid.h>
+#include <libpolys/polys/simpleideals.h>
+
+#include <callgfanlib_conversion.h>
 #include <gfanlib_exceptions.h>
+
 #include <exception>
 
 /***

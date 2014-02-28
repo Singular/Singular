@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-SOURCES = gfanlib_exceptions.h bbcone.cc bbcone.h bbfan.cc bbfan.h bbpolytope.cc bbpolytope.h gfan.h gitfan.cc gitfan.h ppinitialReduction.cc ppinitialReduction.h ttinitialReduction.cc ttinitialReduction.h containsMonomial.cc containsMonomial.h adjustWeights.cc adjustWeights.h tropicalStrategy.cc tropicalStrategy.h initial.cc initial.h witness.cc witness.h tropicalCurves.cc tropicalCurves.h groebnerCone.cc groebnerCone.h neighbours.cc neighbours.h tropical.cc tropical.h gfanlib.cc
+SOURCES = gfanlib_exceptions.h callgfanlib_conversion.cc callgfanlib_conversion.h bbcone.cc bbcone.h bbfan.cc bbfan.h bbpolytope.cc bbpolytope.h gfan.h gitfan.cc gitfan.h tropicalVarietyOfPolynomials.h tropicalVarietyOfPolynomials.cc ppinitialReduction.cc ppinitialReduction.h ttinitialReduction.cc ttinitialReduction.h containsMonomial.cc containsMonomial.h adjustWeights.cc adjustWeights.h tropicalStrategy.cc tropicalStrategy.h initial.cc initial.h witness.cc witness.h tropicalCurves.cc tropicalCurves.h groebnerCone.cc groebnerCone.h neighbours.cc neighbours.h startingCone.cc startingCone.h tropical.cc tropical.h gfanlib.cc
 
 MY_CPPFLAGS =  -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \

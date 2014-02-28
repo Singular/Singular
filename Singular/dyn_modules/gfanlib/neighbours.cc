@@ -1,7 +1,7 @@
 #include <utility>
 #include <gfanlib/gfanlib_zfan.h>
 #include <Singular/lists.h>
-#include <bbcone.h>
+#include <callgfanlib_conversion.h>
 #include <bbfan.h>
 #include <ttinitialReduction.h>
 #include <ppinitialReduction.h>
@@ -86,39 +86,45 @@ static std::pair<gfan::ZMatrix,gfan::ZMatrix> interiorPointsAndFacetNormals(cons
   // this is the i=r-1 case
   newInequalities = inequalities.submatrix(0,0,r-1,c);
   newEquations = equations;
-  newEquations.appendRow(inequalities[r]);
+  newEquations.appendRow(inequalities[r-1]);
   facet = gfan::ZCone(newInequalities,newEquations);
   relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
-  outerFacetNormals.appendRow(-inequalities[r]);
+  outerFacetNormals.appendRow(-inequalities[r-1]);
 
   return std::make_pair(relativeInteriorPoints,outerFacetNormals);
 }
 
-groebnerConesData groebnerNeighbors(const groebnerConeData sigma)
+setOfGroebnerConeData groebnerNeighbours(const groebnerConeData sigma, const tropicalStrategy currentCase)
 {
+  bool (*red)(ideal I, ring r);
+  red = currentCase.reduce;
+
   gfan::ZCone zc = sigma.getCone();
   std::pair<gfan::ZMatrix, gfan::ZMatrix> facets = interiorPointsAndFacetNormals(zc);
   gfan::ZMatrix interiorPoints = facets.first;
   gfan::ZMatrix facetNormals = facets.second;
-  groebnerConesData neighbours;
+  setOfGroebnerConeData neighbours;
 
   for (int i=0; i<interiorPoints.getHeight(); i++)
   {
     std::pair<ideal,ring> flipped = flip(sigma.getIdeal(),sigma.getRing(),interiorPoints[i],facetNormals[i]);
     ideal I = flipped.first;
     ring r = flipped.second;
-    ppreduceInitially(I,r);
+    red(I,r);
     neighbours.insert(groebnerConeData(I,r));
   }
 
   return neighbours;
 }
 
-groebnerConesData tropicalNeighbors(const groebnerConeData sigma)
+setOfGroebnerConeData tropicalNeighbors(const groebnerConeData sigma, const tropicalStrategy currentCase)
 {
   gfan::ZCone zc = sigma.getCone();
+  int d = zc.dimension();
   gfan::ZMatrix interiorPoints = facetInteriorPoints(zc);
-  groebnerConesData neighbours;
+  setOfGroebnerConeData neighbours;
+  bool (*red)(ideal I, ring r);
+  red = currentCase.reduce;
 
   for (int i=0; i<interiorPoints.getHeight(); i++)
   {
@@ -126,43 +132,20 @@ groebnerConesData tropicalNeighbors(const groebnerConeData sigma)
     ideal I = sigma.getIdeal();
     ring r = sigma.getRing();
     ideal inI = initial(I,r,w);
-    gfan::ZFan zf = tropicalCurve(inI,w,r);
-    gfan::ZMatrix u = rays(&zf);
+    std::set<gfan::ZCone> C = tropicalCurve(inI,r,d-1,currentCase);
+    std::set<gfan::ZVector> setOfRays = rays(C);
 
-    for (int j=0; j<u.getHeight(); j++)
+    for (std::set<gfan::ZVector>::iterator ray = setOfRays.begin(); ray!=setOfRays.end(); ray++)
     {
-      std::pair<ideal,ring> flipped = flip(I,r,w,u[j]);
+      std::pair<ideal,ring> flipped = flip(I,r,w,*ray);
       ideal I = flipped.first;
       ring r = flipped.second;
-      ppreduceInitially(I,r);
+      red(I,r);
       neighbours.insert(groebnerConeData(I,r));
     }
   }
 
   return neighbours;
-}
-
-// std::set<gfan::ZCone> tropicalNeighbours(const ideal I, const ring r, const gfan::ZVector w)
-void tropicalNeighbours(const ideal I, const ring r, const gfan::ZVector w)
-{
-  ideal inI = initial(I,r,w);
-  gfan::ZFan zf = tropicalCurve(inI,w,r);
-  gfan::ZMatrix u = rays(&zf);
-
-  // std::set<gfan::ZCone> neighbours;
-  for (int j=0; j<u.getHeight(); j++)
-  {
-    std::pair<ideal,ring> flipped = flip(I,r,w,u[j]);
-    ideal I = flipped.first;
-    ring r = flipped.second;
-    // ppreduceInitially(I,r);
-    gfan::ZCone zc = groebnerCone(I,r,1024*w+u[j]);
-    zc.canonicalize();
-    std::cout << "extreme rays: " << zc.extremeRays() << std::endl;
-    // neighbours.insert(zc);
-  }
-
-  // return neighbours;
 }
 
 BOOLEAN tropicalNeighbours(leftv res, leftv args)
@@ -172,7 +155,7 @@ BOOLEAN tropicalNeighbours(leftv res, leftv args)
   leftv v = u->next;
   bigintmat* wbim = (bigintmat*) v->Data();
   gfan::ZVector* w = bigintmatToZVector(wbim);
-  (void) tropicalNeighbours(I,currRing,*w);
+  // (void) tropicalNeighbours(I,currRing,*w);
   // std::set<gfan::ZCone> neighbours = tropicalNeighbours(I,currRing,*w);
   // lists L =  (lists)omAllocBin(slists_bin);
   // L->Init(neighbours.size()); int i=-1;

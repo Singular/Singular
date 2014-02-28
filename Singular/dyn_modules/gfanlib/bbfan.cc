@@ -10,18 +10,10 @@
 #include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
 
-#include "bbfan.h"
-#include "bbcone.h"
-#include "gfan.h"
+#include <callgfanlib_conversion.h>
+#include <bbfan.h>
+#include <gfan.h>
 #include <sstream>
-
-// #include <kernel/bigintmat.h>
-// #include <omalloc/omalloc.h>
-// #include <kernel/longrat.h>
-// #include <Singular/subexpr.h>
-// #include <Singular/lists.h>
-// #include <gfanlib/gfanlib.h>
-// #include <gfanlib/gfanlib_zfan.h>
 
 int fanID;
 
