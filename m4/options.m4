@@ -51,20 +51,33 @@ AC_DEFUN([SING_CHECK_PLURAL],
 AC_MSG_CHECKING(whether non-commutative subsystem should be enabled)
 
 AC_ARG_ENABLE(plural, AS_HELP_STRING([--disable-plural], [Disable non-commutative subsystem]),
-[if test $enableval = yes; then
+[if test "x$enableval" = xyes; then
      ENABLE_PLURAL="yes"
  else
      ENABLE_PLURAL="no"
  fi
 ],[ENABLE_PLURAL="yes"])
 
-if test x$ENABLE_PLURAL = xyes; then
+if test "x$ENABLE_PLURAL" = xyes; then
   AC_DEFINE(HAVE_PLURAL,1,Enable non-commutative subsystem)
   #TODO make a seperate switch
-  AC_DEFINE(HAVE_SHIFTBBA,1,Enable letterplace)
+  AC_DEFINE(HAVE_SHIFTBBA,1, [Enable letterplace])
 fi
 
 AM_CONDITIONAL([ENABLE_PLURAL],[test x$ENABLE_PLURAL = xyes])
 
 AC_MSG_RESULT($ENABLE_PLURAL)
+
+
+AC_ARG_WITH(RatGB, AS_HELP_STRING([--with-ratGB], [do compile with ratGB support (experimental)]))
+
+AC_MSG_CHECKING(whether to have ratGB)
+if test "x$with_ratGB" != xyes && test "x$enable_ratGB" != xyes; then
+  AC_MSG_RESULT(no)
+else
+  AC_DEFINE(HAVE_RATGRING, 1, [Enable RatGB support])
+  AC_MSG_RESULT(yes)
+fi
+
+
 ])
