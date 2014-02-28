@@ -1,0 +1,6 @@
+/*! \page kernel_numeric_page "Numeric Kernel Sub-Package"
+ *
+ * Sub-package of kernel (\ref kernel_page) with numerical algorithms
+ * 
+ * <A HREF="https://github.com/Singular/Sources/wiki/Todo">TODOs</A>
+ */

@@ -1,0 +1,98 @@
+digraph IncludesInSingular4
+{
+  compound=true;
+  edge [ arrowhead=open ];
+  graph [ 
+//    rankdir=TB; 
+  ];
+  pack = 0 ;
+  packMode = "graph" ;
+  subgraph "clusterlibpolys"
+  {
+      label="libpolys:";
+      color = lightgray;
+      style = filled;
+      node [ fillcolor = white, style = filled, color = black, fontcolor=black];
+      { rank=same;  misc ; reporter ; };
+      { rank=same; coeffs ; polys };
+  } ;
+  subgraph "clusterlibSingular"
+  {
+        rank="max" ;
+        label="libSingular:";
+        color = lightgray;
+        style = filled;
+        node [ fillcolor = white, style = filled, color = black, fontcolor=black];
+        interpreter [] ;
+	"dyn_modules:..." [shape=box] ;
+	  subgraph "clusterMath"
+	  {
+	          rank="min" ;
+		  label="kernel:";
+		  color = gray;
+//        	  style = filled;
+  		  node [ fillcolor = white, style = filled, color = black, fontcolor=black];
+                  kernelUtils;
+		  { rank=same; "..."; numeric; } ;
+	  }
+  } ;
+  subgraph "clusterinternals"
+  {
+    label="Supporting libraries:";
+    { rank=same; 
+      omalloc [ fillcolor=lightgrey, fontcolor=darkgreen, style=filled, color = black, shape=box ] ;
+      libresources [ fillcolor=lightgrey, style=filled, color = black, shape=box ]  ;
+    } ;
+    { rank=same; 
+      gfanlib [ fillcolor=lightgrey, fontcolor=blue, style=filled, color = black, shape=box ] ;
+      factory [ fillcolor=lightgrey, fontcolor=blue, style=filled, color = black, shape=box ] ;
+    } ;
+   subgraph "clusterexternals"
+   {
+    rank="min" ;
+    node [ color=blue, fillcolor=lightgrey, fontcolor=blue, style=filled, shape=box ];
+    label="Externals:";
+    color=blue;
+    { rank=same; GMP_OR_MPIR []; MPFR [] ; } ;
+    { rank=same; NTL ; FLINT ; cddlib ;   };
+   } ;
+  } ;  
+  NTL -> GMP_OR_MPIR [style = "dotted"];
+  FLINT -> GMP_OR_MPIR [style = "dotted"];
+  cddlib -> GMP_OR_MPIR [style = "dotted"];
+  FLINT -> MPFR [style = "dotted"];
+MPFR -> GMP_OR_MPIR [style = "dotted"];
+factory -> FLINT [];
+  factory -> GMP_OR_MPIR [];
+  factory -> NTL [];
+  factory -> omalloc;
+  factory -> libresources;
+  Singular -> interpreter [];
+  interpreter -> numeric [lhead="clusterMath"];
+//  interpreter -> "..." [lhead="clusterMath"];
+  interpreter -> "dyn_modules:..." [dir=both, arrowtail="open", arrowhead="open"];
+  "dyn_modules:..." -> kernelUtils [lhead="clusterMath"];
+  "dyn_modules:..." -> gfanlib [];
+  "dyn_modules:..." -> cddlib [];
+  gfanlib -> cddlib [];
+  kernelUtils -> polys [ltail="clusterlibSingular", lhead="clusterlibpolys"];
+  kernelUtils -> factory [ltail="clusterlibSingular"];
+  numeric -> kernelUtils [];
+  "..." -> kernelUtils [];
+  polys -> coeffs [dir=both, arrowtail="open", arrowhead="open"] ;
+  polys -> misc;
+  polys -> reporter;
+  polys -> factory [];
+  reporter -> misc [dir=both, arrowtail="open", arrowhead="open"] ;
+  coeffs -> NTL [];
+  coeffs -> factory [];
+  coeffs -> misc;
+  coeffs -> reporter;
+  misc -> libresources [ltail="clusterlibpolys"];
+  misc -> omalloc [ltail="clusterlibpolys"];
+  misc -> GMP_OR_MPIR [ltail="clusterlibpolys"];
+}
+// dot -Tpng -o singular.png singular.dot
+// boxed = third party
+// filled = external
+// blue = math
