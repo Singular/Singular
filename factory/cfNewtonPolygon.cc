@@ -726,6 +726,8 @@ compress (const CanonicalForm& F, mpz_t*& M, mpz_t*& A, bool computeMA)
 
   int k= 0;
   Variable alpha;
+  mpz_t * exps= new mpz_t [2*size (F)];
+  int count= 0;
   for (CFIterator i= F; i.hasTerms(); i++)
   {
     if (i.coeff().inCoeffDomain() && hasFirstAlgVar (i.coeff(), alpha))
@@ -748,8 +750,10 @@ compress (const CanonicalForm& F, mpz_t*& M, mpz_t*& A, bool computeMA)
         if (mpz_cmp (minExpX, expX) > 0)
           mpz_set (minExpX, expX);
       }
-      result += i.coeff()*power (x, mpz_get_si (expX))*
-                power (y, mpz_get_si (expY));
+      mpz_init_set (exps[count], expX);
+      count++;
+      mpz_init_set (exps[count], expY);
+      count++;
       continue;
     }
     CFIterator j= i.coeff();
@@ -765,8 +769,10 @@ compress (const CanonicalForm& F, mpz_t*& M, mpz_t*& A, bool computeMA)
 
       mpz_set (minExpX, expX);
       mpz_set (minExpY, expY);
-      result += j.coeff()*power (x, mpz_get_si (expX))*
-                power (y, mpz_get_si (expY));
+      mpz_init_set (exps[count], expX);
+      count++;
+      mpz_init_set (exps[count], expY);
+      count++;
       j++;
       k= 1;
     }
@@ -781,8 +787,10 @@ compress (const CanonicalForm& F, mpz_t*& M, mpz_t*& A, bool computeMA)
       mpz_addmul_ui (expY, M[3], i.exp());
       mpz_addmul_ui (expY, M[2], j.exp());
 
-      result += j.coeff()*power (x, mpz_get_si (expX))*
-                power (y, mpz_get_si (expY));
+      mpz_init_set (exps[count], expX);
+      count++;
+      mpz_init_set (exps[count], expY);
+      count++;
       if (mpz_cmp (minExpY, expY) > 0)
         mpz_set (minExpY, expY);
       if (mpz_cmp (minExpX, expX) > 0)
@@ -790,21 +798,26 @@ compress (const CanonicalForm& F, mpz_t*& M, mpz_t*& A, bool computeMA)
     }
   }
 
-  if (mpz_sgn (minExpX) < 0)
+  count= 0;
+  int mExpX= mpz_get_si (minExpX);
+  int mExpY= mpz_get_si (minExpY);
+  for (CFIterator i= F; i.hasTerms(); i++)
   {
-    result *= power (x,-mpz_get_si(minExpX));
-    result /= CanonicalForm (x, 0);
+    if (i.coeff().inCoeffDomain() && hasFirstAlgVar (i.coeff(), alpha))
+    {
+      result += i.coeff()*power (x, mpz_get_si (exps[count])-mExpX)*
+                power (y, mpz_get_si (exps[count+1])-mExpY);
+      count += 2;
+      continue;
+    }
+    CFIterator j= i.coeff();
+    for (; j.hasTerms(); j++)
+    {
+      result += j.coeff()*power (x, mpz_get_si (exps[count])-mExpX)*
+                power (y, mpz_get_si (exps[count+1])-mExpY);
+      count += 2;
+    }
   }
-  else
-    result /= power (x,mpz_get_si(minExpX));
-
-  if (mpz_sgn (minExpY) < 0)
-  {
-    result *= power (y,-mpz_get_si(minExpY));
-    result /= CanonicalForm (y, 0);
-  }
-  else
-    result /= power (y,mpz_get_si(minExpY));
 
   CanonicalForm tmp= LC (result);
   if (tmp.inPolyDomain() && degree (tmp) <= 0)
@@ -823,6 +836,7 @@ compress (const CanonicalForm& F, mpz_t*& M, mpz_t*& A, bool computeMA)
     mpz_mat_inv (M);
   }
 
+  delete [] exps;
   mpz_clear (expX);
   mpz_clear (expY);
   mpz_clear (minExpX);
@@ -844,6 +858,8 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
   mpz_init (minExpX);
   mpz_init (minExpY);
 
+  mpz_t * exps= new mpz_t [2*size(F)];
+  int count= 0;
   if (F.isUnivariate() && F.level() == 1)
   {
     CFIterator i= F;
@@ -860,8 +876,11 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
 
     mpz_set (minExpX, expX);
     mpz_set (minExpY, expY);
-    result += i.coeff()*power (x, mpz_get_si (expX))*
-              power (y, mpz_get_si (expY));
+
+    mpz_init_set (exps[count], expX);
+    mpz_init_set (exps[count+1], expY);
+    count += 2;
+
     i++;
     for (; i.hasTerms(); i++)
     {
@@ -875,35 +894,32 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
       mpz_mul (expY, expY, inverseM[2]);
       mpz_submul (expY, inverseM[3], A[1]);
 
-      result += i.coeff()*power (x, mpz_get_si (expX))*
-                power (y, mpz_get_si (expY));
+      mpz_init_set (exps[count], expX);
+      mpz_init_set (exps[count+1], expY);
+      count += 2;
+
       if (mpz_cmp (minExpY, expY) > 0)
         mpz_set (minExpY, expY);
       if (mpz_cmp (minExpX, expX) > 0)
         mpz_set (minExpX, expX);
     }
 
-    if (mpz_sgn (minExpX) < 0)
+    int mExpX= mpz_get_si (minExpX);
+    int mExpY= mpz_get_si (minExpY);
+    count= 0;
+    for (i= F; i.hasTerms(); i++)
     {
-      result *= power (x,-mpz_get_si(minExpX));
-      result /= CanonicalForm (x, 0);
+      result += i.coeff()*power (x, mpz_get_si (exps[count])-mExpX)*
+                power (y, mpz_get_si (exps[count+1])-mExpY);
+      count += 2;
     }
-    else
-      result /= power (x,mpz_get_si(minExpX));
-
-    if (mpz_sgn (minExpY) < 0)
-    {
-      result *= power (y,-mpz_get_si(minExpY));
-      result /= CanonicalForm (y, 0);
-    }
-    else
-      result /= power (y,mpz_get_si(minExpY));
 
     mpz_clear (expX);
     mpz_clear (expY);
     mpz_clear (minExpX);
     mpz_clear (minExpY);
 
+    delete [] exps;
     return result/ Lc (result); //normalize
   }
 
@@ -938,8 +954,9 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
         if (mpz_cmp (minExpX, expX) > 0)
           mpz_set (minExpX, expX);
       }
-      result += i.coeff()*power (x, mpz_get_si (expX))*
-                power (y, mpz_get_si (expY));
+      mpz_init_set (exps[count], expX);
+      mpz_init_set (exps[count+1], expY);
+      count += 2;
       continue;
     }
     CFIterator j= i.coeff();
@@ -961,8 +978,11 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
 
       mpz_set (minExpX, expX);
       mpz_set (minExpY, expY);
-      result += j.coeff()*power (x, mpz_get_si (expX))*
-                power (y, mpz_get_si (expY));
+
+      mpz_init_set (exps[count], expX);
+      mpz_init_set (exps[count+1], expY);
+      count += 2;
+
       j++;
       k= 1;
     }
@@ -983,8 +1003,10 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
       mpz_sub (tmp, tmp, A[1]);
       mpz_addmul (expY, tmp, inverseM[3]);
 
-      result += j.coeff()*power (x, mpz_get_si (expX))*
-                power (y, mpz_get_si (expY));
+      mpz_init_set (exps[count], expX);
+      mpz_init_set (exps[count+1], expY);
+      count += 2;
+
       if (mpz_cmp (minExpY, expY) > 0)
         mpz_set (minExpY, expY);
       if (mpz_cmp (minExpX, expX) > 0)
@@ -992,27 +1014,33 @@ decompress (const CanonicalForm& F, const mpz_t* inverseM, const mpz_t * A)
     }
   }
 
-  if (mpz_sgn (minExpX) < 0)
+  int mExpX= mpz_get_si (minExpX);
+  int mExpY= mpz_get_si (minExpY);
+  count= 0;
+  for (CFIterator i= F; i.hasTerms(); i++)
   {
-    result *= power (x,-mpz_get_si(minExpX));
-    result /= CanonicalForm (x, 0);
+    if (i.coeff().inCoeffDomain() && hasFirstAlgVar (i.coeff(), alpha))
+    {
+      result += i.coeff()*power (x, mpz_get_si (exps[count])-mExpX)*
+                power (y, mpz_get_si (exps[count+1])-mExpY);
+      count += 2;
+      continue;
+    }
+    for (CFIterator j= i.coeff(); j.hasTerms(); j++)
+    {
+      result += j.coeff()*power (x, mpz_get_si (exps[count])-mExpX)*
+                power (y, mpz_get_si (exps[count+1])-mExpY);
+      count += 2;
+    }
   }
-  else
-    result /= power (x,mpz_get_si(minExpX));
-
-  if (mpz_sgn (minExpY) < 0)
-  {
-    result *= power (y,-mpz_get_si(minExpY));
-    result /= CanonicalForm (y, 0);
-  }
-  else
-    result /= power (y,mpz_get_si(minExpY));
 
   mpz_clear (expX);
   mpz_clear (expY);
   mpz_clear (minExpX);
   mpz_clear (minExpY);
   mpz_clear (tmp);
+
+  delete [] exps;
 
   return result/Lc (result); //normalize
 }
