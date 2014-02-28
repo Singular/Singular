@@ -80,7 +80,7 @@
 
 /* Singular\'s own uname\ */
 #ifndef S_UNAME
-#undef S_UNAME ""
+#define S_UNAME ""
 #endif
 // ----------------- end of configure stuff
 
