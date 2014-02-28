@@ -15,6 +15,7 @@
 #include "cf_algorithm.h"
 #include "imm.h"
 #include "gfops.h"
+#include "facMul.h"
 
 #include <factory/cf_gmp.h>
 
@@ -674,7 +675,14 @@ CanonicalForm::operator *= ( const CanonicalForm & cf )
     else  if ( is_imm( cf.value ) )
         value = value->mulcoeff( cf.value );
     else  if ( value->level() == cf.value->level() ) {
-        if ( value->levelcoeff() == cf.value->levelcoeff() )
+        if (value->levelcoeff() == cf.value->levelcoeff() && cf.isUnivariate() && (*this).isUnivariate())
+        {
+          if (value->level() < 0 || CFFactory::gettype() == GaloisFieldDomain || (size (cf) <= 10 || size (*this) <= 10) )
+            value = value->mulsame( cf.value );
+          else
+            *this= mulNTL (*this, cf);
+        }
+        else if (value->levelcoeff() == cf.value->levelcoeff() && (!cf.isUnivariate() || !(*this).isUnivariate()))
             value = value->mulsame( cf.value );
         else  if ( value->levelcoeff() > cf.value->levelcoeff() )
             value = value->mulcoeff( cf.value );
