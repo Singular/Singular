@@ -28,9 +28,7 @@
 #define nGreater(a, b)    n_Greater (a,b,currRing->cf)
 #define nWrite(n)         n_Write(n, currRing->cf, rShortOut(currRing))
 #define nNormalize(n)     n_Normalize(n,currRing->cf)
-
-inline number nGcd(number a, number b, const coeffs cf) { return n_Gcd(a, b, cf); }
-
+#define nGcd(a,b)         n_Gcd(a,b,currRing->cf)
 #define nIntDiv(a, b)     n_IntDiv(a,b,currRing->cf)
 #define nDiv(a, b)        n_Div(a,b,currRing->cf)
 #define nInvers(a)        n_Invers(a,currRing->cf)

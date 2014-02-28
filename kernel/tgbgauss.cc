@@ -879,7 +879,7 @@ void tgb_sparse_matrix::row_content(int row)
     while (p!=NULL)
     {
       nNormalize(p->coef);
-      d=nGcd(h,p->coef,currRing);
+      d=n_Gcd(h,p->coef,currRing->cf);
       nDelete(&h);
       h = d;
       if(nIsOne(h))

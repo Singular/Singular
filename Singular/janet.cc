@@ -86,7 +86,7 @@ int ReducePolyLead(Poly *x,Poly *y)
 
 /*  poly b1=pDivide(x->root,y->root);
 
-  number gcd=nGcd(pGetCoeff(x->root),pGetCoeff(y->root),currRing);
+  number gcd=n_Gcd(pGetCoeff(x->root),pGetCoeff(y->root),currRing->cf);
 
   number a1=nDiv(pGetCoeff(y->root),gcd);
   pGetCoeff(b1)=nDiv(pGetCoeff(x->root),gcd);
@@ -132,7 +132,7 @@ int ReducePoly(Poly *x,poly from,Poly *y)
 
 /*  poly b1=pDivide(from,y->root);
 
-  number gcd=nGcd(pGetCoeff(from),pGetCoeff(y->root),currRing);
+  number gcd=n_Gcd(pGetCoeff(from),pGetCoeff(y->root),currRing->cf);
 
   number a1=nDiv(pGetCoeff(y->root),gcd);
   pGetCoeff(b1)=nDiv(pGetCoeff(from),gcd);

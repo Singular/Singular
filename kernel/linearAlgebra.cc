@@ -1382,7 +1382,7 @@ void lduDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &dMat,
         if (MATELEM(uMat, r, col) != NULL)
         {
           t = gg;
-          gg = nGcd(t, pGetCoeff(MATELEM(uMat, r, col)));
+          gg = n_Gcd(t, pGetCoeff(MATELEM(uMat, r, col)),currRing->cf);
           nDelete(&t);
         }
       }
@@ -1401,8 +1401,9 @@ void lduDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &dMat,
       {
         if (MATELEM(uMat, r, col) != NULL)
         {
-          number g = nGcd(pGetCoeff(MATELEM(uMat, row, col)),
-                          pGetCoeff(MATELEM(uMat, r, col)));
+          number g = n_Gcd(pGetCoeff(MATELEM(uMat, row, col)),
+                          pGetCoeff(MATELEM(uMat, r, col)),
+                          currRing->cf);
           number f1 = nDiv(pGetCoeff(MATELEM(uMat, r, col)), g);
           nNormalize(f1);   /* this division works without remainder */
           number f2 = nDiv(pGetCoeff(MATELEM(uMat, row, col)), g);

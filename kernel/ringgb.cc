@@ -190,7 +190,7 @@ poly plain_spoly(poly f, poly g)
 poly plain_zero_spoly(poly h)
 {
   poly p = NULL;
-  number gcd = nGcd((number) 0, pGetCoeff(h), currRing);
+  number gcd = n_Gcd((number) 0, pGetCoeff(h), currRing->cf);
   if ((NATNUMBER) gcd > 1)
   {
     p = p_Copy(h->next, currRing);

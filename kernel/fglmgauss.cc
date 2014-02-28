@@ -130,7 +130,8 @@ gaussReducer::reduce( fglmVector thev )
             nDelete( & fac1 );
             nDelete( & fac2 );
             number gcd = v.gcd();
-            if ( ! nIsOne( gcd ) && ! nIsZero( gcd ) ) {
+            if ( ! nIsOne( gcd ) && ! nIsZero( gcd ) )
+            {
                 v/= gcd;
                 number temp = nMult( pdenom, gcd );
                 nDelete( & pdenom );
@@ -138,10 +139,11 @@ gaussReducer::reduce( fglmVector thev )
             }
             nDelete( & gcd );
             gcd= p.gcd();
-            temp= nGcd( pdenom, gcd, currRing );
+            temp= n_Gcd( pdenom, gcd, currRing->cf );
             nDelete( & gcd );
             gcd= temp;
-            if ( ! nIsZero( gcd ) && ! nIsOne( gcd ) ) {
+            if ( ! nIsZero( gcd ) && ! nIsOne( gcd ) )
+            {
                 p/= gcd;
                 temp= nDiv( pdenom, gcd );
                 nDelete( & pdenom );

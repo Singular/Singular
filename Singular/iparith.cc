@@ -2353,7 +2353,7 @@ static BOOLEAN jjGCD_N(leftv res, leftv u, leftv v)
   else
   {
     if (nIsZero(b))  res->data=(char *)nCopy(a);
-    else res->data=(char *)nGcd(a, b, currRing);
+    else res->data=(char *)n_Gcd(a, b, currRing->cf);
   }
   return FALSE;
 }

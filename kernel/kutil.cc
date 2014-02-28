@@ -3484,7 +3484,7 @@ void enterExtendedSpoly(poly h,kStrategy strat)
     go = true;
   }
   else
-    gcd = nGcd((number) 0, pGetCoeff(h), strat->tailRing);
+    gcd = n_Gcd((number) 0, pGetCoeff(h), strat->tailRing->cf);
   if (go || !nIsOne(gcd))
   {
     poly p = h->next;

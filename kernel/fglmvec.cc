@@ -482,7 +482,7 @@ number fglmVector::gcd () const
       current = rep->getconstelem (i);
       if(!nIsZero (current))
       {
-        number temp = nGcd (theGcd, current, currRing);
+        number temp = n_Gcd (theGcd, current, currRing->cf);
         nDelete (&theGcd);
         theGcd = temp;
         if(nIsOne (theGcd))

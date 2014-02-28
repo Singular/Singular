@@ -14,7 +14,6 @@ extern ring currRing;
 void rChangeCurrRing(ring r);
 
 #include <coeffs/numbers.h>
-inline number nGcd(number a, number b, const ring r = currRing) { return n_Gcd(a, b, r->cf); }
 
 /***************************************************************
  *

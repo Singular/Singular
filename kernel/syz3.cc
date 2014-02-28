@@ -736,7 +736,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
 /*--- the product criterion does not apply --------------------*/
     {
       tso.p = ksOldCreateSpoly(tso.p2,tso.p1);
-      number coefgcd = nGcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2),currRing);
+      number coefgcd = n_Gcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2),currRing->cf);
       assume (old_repr->m[tso.ind1]!=NULL);
       tso.syz = pCopy(old_repr->m[tso.ind1]);
       poly tt = pDivide(tso.lcm,tso.p1);
@@ -1259,7 +1259,7 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
 #endif
     {
       tso.p = ksOldCreateSpoly(tso.p2,tso.p1);
-      number coefgcd = nGcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2),currRing);
+      number coefgcd = n_Gcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2),currRing->cf);
       assume (add_repr->m[tso.ind1]!=NULL);
       tso.syz = pCopy(add_repr->m[tso.ind1]);
       poly tt = pDivide(tso.lcm,tso.p1);

@@ -236,7 +236,7 @@ Print("gefunden in Mod %d: ",index); poly_write((syzstr->resPairs[index])[ti].lc
           tso.p = NULL;
           tso.length = -1;
           number coefgcd =
-            nGcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2),currRing);
+            n_Gcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2),currRing->cf);
           tso.syz = pCopy((syzstr->resPairs[index])[i].syz);
           poly tt = pDivide(tso.lcm,tso.p1);
           pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
