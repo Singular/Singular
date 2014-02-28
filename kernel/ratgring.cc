@@ -40,33 +40,6 @@ void pLcmRat(poly a, poly b, poly m, int rat_shift)
   /* Don't do a pSetm here, otherwise hres/lres chockes */
 }
 
-/*2
-* returns the rational LCM of the head terms of a and b
-* without coefficient!!!
-*/
-poly p_LcmRat(const poly a, const poly b, const long lCompM, const ring r)
-{
-  poly m = // p_One( r);
-          p_Init(r);
-
-  const int (currRing->N) = r->N;
-
-  //  for (int i = (currRing->N); i>=r->real_var_start; i--)
-  for (int i = r->real_var_end; i>=r->real_var_start; i--)
-  {
-    const int lExpA = p_GetExp (a, i, r);
-    const int lExpB = p_GetExp (b, i, r);
-
-    p_SetExp (m, i, si_max(lExpA, lExpB), r);
-  }
-
-  p_SetComp (m, lCompM, r);
-  p_Setm(m,r);
-  n_New(&(p_GetCoeff(m, r)), r);
-
-  return(m);
-};
-
 // void pLcmRat(poly a, poly b, poly m, poly pshift)
 // {
 //   /* shift is the exp of rational elements */
@@ -102,48 +75,6 @@ poly p_HeadRat(poly p, int ishift, ring r)
   }
   p_SetCompP(res,cmp,r);
   return res;
-}
-
-/* returns x-coeff of p, i.e. a poly in x, s.t. corresponding xd-monomials
-have the same D-part and the component 0
-does not destroy p
-*/
-
-poly p_GetCoeffRat(poly p, int ishift, ring r)
-{
-  poly q   = pNext(p);
-  poly res; // = p_Head(p,r);
-  res = p_GetExp_k_n(p, ishift+1, r->N, r); // does pSetm internally
-  p_SetCoeff(res,n_Copy(p_GetCoeff(p,r),r),r);
-  poly s;
-  long cmp = p_GetComp(p, r);
-  while ( (q!= NULL) && (p_Comp_k_n(p, q, ishift+1, r)) && (p_GetComp(q, r) == cmp) )
-  {
-    s   = p_GetExp_k_n(q, ishift+1, r->N, r);
-    p_SetCoeff(s,n_Copy(p_GetCoeff(q,r),r),r);
-    res = p_Add_q(res,s,r);
-    q   = pNext(q);
-  }
-  cmp = 0;
-  p_SetCompP(res,cmp,r);
-  return res;
-}
-
-void p_LmDeleteAndNextRat(poly *p, int ishift, ring r)
-{
-  /* modifies p*/
-  //  Print("start: "); Print(" "); p_wrp(*p,r);
-  p_LmCheckPolyRing2(*p, r);
-  poly q = p_Head(*p,r);
-  const long cmp = p_GetComp(*p, r);
-  while ( ( (*p)!=NULL ) && ( p_Comp_k_n(*p, q, ishift+1, r) ) && (p_GetComp(*p, r) == cmp) )
-  {
-    p_LmDelete(p,r);
-    //    Print("while: ");p_wrp(*p,r);Print(" ");
-  }
-  //  p_wrp(*p,r);Print(" ");
-  //  PrintS("end\n");
-  p_LmDelete(&q,r);
 }
 
 /* to test!!! */
@@ -235,13 +166,13 @@ ideal ncGCD(poly p, poly q, const ring r)
 #ifdef PDEBUG
   PrintS(" GCD_start:");
 #endif
-  poly g = singclap_gcd(p_Copy(p,r),p_Copy(q,r));
+  poly g = singclap_gcd(p_Copy(p,r),p_Copy(q,r), r);
 #ifdef PDEBUG
   p_wrp(g,r);
   PrintS(" GCD_end;\n");
 #endif
-  poly u = singclap_pdivide(q,g); //q/g
-  poly v = singclap_pdivide(p,g); //p/g
+  poly u = singclap_pdivide(q, g, r); //q/g
+  poly v = singclap_pdivide(p, g, r); //p/g
   v = p_Neg(v,r);
   p_Delete(&p,r);
   p_Delete(&q,r);
@@ -402,6 +333,7 @@ ideal ncGCD(poly p, poly q, const ring r)
 //   return(P1);
 // }
 
+#undef CC
 
 /*4 - follow the numbering of gring.cc
 * creates the S-polynomial of p1 and p2
@@ -705,116 +637,6 @@ int redRat (poly* h, poly *reducer, int *red_length, int rl, int ishift, ring r)
       return 0;
     }
   }
-}
-
-void pContentRat(poly &ph)
-// changes ph
-// for rat coefficients in K(x1,..xN)
-{
-
-  // init array of RatLeadCoeffs
-  //  poly p_GetCoeffRat(poly p, int ishift, ring r);
-
-  int len=pLength(ph);
-  poly *C = (poly *)omAlloc0((len+1)*sizeof(poly));  //rat coeffs
-  poly *LM = (poly *)omAlloc0((len+1)*sizeof(poly));  // rat lead terms
-  int *D = (int *)omAlloc0((len+1)*sizeof(int));  //degrees of coeffs
-  int *L = (int *)omAlloc0((len+1)*sizeof(int));  //lengths of coeffs
-  int k = 0;
-  poly p = pCopy(ph); // ph will be needed below
-  int mintdeg = pTotaldegree(p);
-  int minlen = len;
-  int dd = 0; int i;
-  int HasConstantCoef = 0;
-  int is = currRing->real_var_start - 1;
-  while (p!=NULL)
-  {
-    LM[k] = p_GetExp_k_n(p,1,is,currRing); // need LmRat istead of  p_HeadRat(p, is, currRing); !
-    C[k] = p_GetCoeffRat(p, is, currRing);
-    D[k] =  pTotaldegree(C[k]);
-    mintdeg = si_min(mintdeg,D[k]);
-    L[k] = pLength(C[k]);
-    minlen = si_min(minlen,L[k]);
-    if (pIsConstant(C[k]))
-    {
-      // C[k] = const, so the content will be numerical
-      HasConstantCoef = 1;
-      // smth like goto cleanup and return(pContent(p));
-    }
-    p_LmDeleteAndNextRat(&p, is, currRing);
-    k++;
-  }
-
-  // look for 1 element of minimal degree and of minimal length
-  k--;
-  poly d;
-  int mindeglen = len;
-  if (k<=0) // this poly is not a ratgring poly -> pContent
-  {
-    pDelete(&C[0]);
-    pDelete(&LM[0]);
-    p_Content(ph,currRing);
-    goto cleanup;
-  }
-
-  int pmindeglen;
-  for(i=0; i<=k; i++)
-  {
-    if (D[i] == mintdeg)
-    {
-      if (L[i] < mindeglen)
-      {
-        mindeglen=L[i];
-        pmindeglen = i;
-      }
-    }
-  }
-  d = pCopy(C[pmindeglen]);
-  // there are dd>=1 mindeg elements
-  // and pmideglen is the coordinate of one of the smallest among them
-
-  //  poly g = singclap_gcd(p_Copy(p,r),p_Copy(q,r));
-  //  return naGcd(d,d2,currRing);
-
-  // adjoin pContentRat here?
-  for(i=0; i<=k; i++)
-  {
-    d=singclap_gcd(d,pCopy(C[i]));
-    if (pTotaldegree(d)==0)
-    {
-      // cleanup, pContent, return
-      pDelete(&d);
-      for(;k>=0;k--)
-      {
-        pDelete(&C[k]);
-        pDelete(&LM[k]);
-      }
-      p_Content(ph,currRing);
-      goto cleanup;
-    }
-  }
-  for(i=0; i<=k; i++)
-  {
-   poly h=singclap_pdivide(C[i],d);
-   pDelete(&C[i]);
-   C[i]=h;
-  }
-
-  // zusammensetzen,
-  p=NULL; // just to be sure
-  for(i=0; i<=k; i++)
-  {
-   p = pAdd(p, pMult(C[i],LM[i]) );
-   C[i]=NULL; LM[i]=NULL;
-  }
-  pDelete(&ph); // do not need it anymore
-  ph = p;
-  // aufraeumen, return
-cleanup:
-  omFree(C);
-  omFree(LM);
-  omFree(D);
-  omFree(L);
 }
 
 // test if monomial is a constant, i.e. if all exponents and the component

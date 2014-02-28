@@ -551,14 +551,17 @@ BOOLEAN arriRewCriterion(poly sig, unsigned long not_sevSig, poly lm, kStrategy 
 BOOLEAN arriRewCriterionPre(poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start);
 BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly lm, kStrategy strat, int start);
 BOOLEAN findMinLMPair(poly sig, unsigned long not_sevSig, kStrategy strat, int start);
-// returns index of p in TSet, or -1 if not found
+
+/// returns index of p in TSet, or -1 if not found
 int kFindInT(poly p, TSet T, int tlength);
 
-// return -1 if no divisor is found
-//        number of first divisor, otherwise
+/// return -1 if no divisor is found
+///        number of first divisor in T, otherwise
 int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
                         const int tl, const LObject* L, const int start=0);
-// same with S
+
+/// return -1 if no divisor is found
+///        number of first divisor in S, otherwise
 int kFindDivisibleByInS(const kStrategy strat, int *max_ind, LObject* L);
 
 int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObject* L);

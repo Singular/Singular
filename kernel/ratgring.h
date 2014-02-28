@@ -11,6 +11,7 @@
 #ifdef HAVE_RATGRING
 #include <kernel/structs.h>
 #include <polys/nc/nc.h>
+#include <polys/monomials/p_polys.h>
 
 /* MACROS */
 
@@ -20,13 +21,7 @@
 
 void pLcmRat(poly a, poly b, poly m, int rat_shift);
 
-poly p_LcmRat(const poly a, const poly b, const long lCompM, const ring r);
-
-poly p_GetCoeffRat(poly p, int ishift, ring r);
-
 poly p_HeadRat(poly p, int ishift, ring r);
-
-void p_LmDeleteAndNextRat(poly *p, int ishift, ring r);
 
 void p_ExpVectorDiffRat(poly pr, poly p1, poly p2, int ishift, ring r);
 
@@ -112,14 +107,11 @@ BOOLEAN p_DivisibleByRat(poly a, poly b, int ishift, const ring r);
 int redRat (poly* h,poly *reducer, int *red_length,int rl, int ishift, ring r);
 
 // Content stuff
-
-void pContentRat(poly &ph);
+static inline void pContentRat(poly &ph, const ring r = currRing){ p_ContentRat(ph, r); } ;
 
 BOOLEAN p_LmIsConstantRat(const poly p, const ring r);
 
 BOOLEAN p_LmIsConstantCompRat(const poly p, const ring r);
-
-BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm);
 
 #endif /* HAVE_PLURAL */
 #endif

@@ -1589,6 +1589,193 @@ void p_Lcm(const poly a, const poly b, poly m, const ring r)
   /* Don't do a pSetm here, otherwise hres/lres chockes */
 }
 
+
+
+#ifdef HAVE_RATGRING
+/*2
+* returns the rational LCM of the head terms of a and b
+* without coefficient!!!
+*/
+poly p_LcmRat(const poly a, const poly b, const long lCompM, const ring r)
+{
+  poly m = // p_One( r);
+          p_Init(r);
+
+//  const int (currRing->N) = r->N;
+
+  //  for (int i = (currRing->N); i>=r->real_var_start; i--)
+  for (int i = r->real_var_end; i>=r->real_var_start; i--)
+  {
+    const int lExpA = p_GetExp (a, i, r);
+    const int lExpB = p_GetExp (b, i, r);
+
+    p_SetExp (m, i, si_max(lExpA, lExpB), r);
+  }
+
+  p_SetComp (m, lCompM, r);
+  p_Setm(m,r);
+  n_New(&(p_GetCoeff(m, r)), r);
+
+  return(m);
+};
+
+void p_LmDeleteAndNextRat(poly *p, int ishift, ring r)
+{
+  /* modifies p*/
+  //  Print("start: "); Print(" "); p_wrp(*p,r);
+  p_LmCheckPolyRing2(*p, r);
+  poly q = p_Head(*p,r);
+  const long cmp = p_GetComp(*p, r);
+  while ( ( (*p)!=NULL ) && ( p_Comp_k_n(*p, q, ishift+1, r) ) && (p_GetComp(*p, r) == cmp) )
+  {
+    p_LmDelete(p,r);
+    //    Print("while: ");p_wrp(*p,r);Print(" ");
+  }
+  //  p_wrp(*p,r);Print(" ");
+  //  PrintS("end\n");
+  p_LmDelete(&q,r);
+}
+
+
+/* returns x-coeff of p, i.e. a poly in x, s.t. corresponding xd-monomials
+have the same D-part and the component 0
+does not destroy p
+*/
+poly p_GetCoeffRat(poly p, int ishift, ring r)
+{
+  poly q   = pNext(p);
+  poly res; // = p_Head(p,r);
+  res = p_GetExp_k_n(p, ishift+1, r->N, r); // does pSetm internally
+  p_SetCoeff(res,n_Copy(p_GetCoeff(p,r),r),r);
+  poly s;
+  long cmp = p_GetComp(p, r);
+  while ( (q!= NULL) && (p_Comp_k_n(p, q, ishift+1, r)) && (p_GetComp(q, r) == cmp) )
+  {
+    s   = p_GetExp_k_n(q, ishift+1, r->N, r);
+    p_SetCoeff(s,n_Copy(p_GetCoeff(q,r),r),r);
+    res = p_Add_q(res,s,r);
+    q   = pNext(q);
+  }
+  cmp = 0;
+  p_SetCompP(res,cmp,r);
+  return res;
+}
+
+
+
+void p_ContentRat(poly &ph, const ring r)
+// changes ph
+// for rat coefficients in K(x1,..xN)
+{
+  // init array of RatLeadCoeffs
+  //  poly p_GetCoeffRat(poly p, int ishift, ring r);
+
+  int len=pLength(ph);
+  poly *C = (poly *)omAlloc0((len+1)*sizeof(poly));  //rat coeffs
+  poly *LM = (poly *)omAlloc0((len+1)*sizeof(poly));  // rat lead terms
+  int *D = (int *)omAlloc0((len+1)*sizeof(int));  //degrees of coeffs
+  int *L = (int *)omAlloc0((len+1)*sizeof(int));  //lengths of coeffs
+  int k = 0;
+  poly p = p_Copy(ph, r); // ph will be needed below
+  int mintdeg = p_Totaldegree(p, r);
+  int minlen = len;
+  int dd = 0; int i;
+  int HasConstantCoef = 0;
+  int is = r->real_var_start - 1;
+  while (p!=NULL)
+  {
+    LM[k] = p_GetExp_k_n(p,1,is, r); // need LmRat istead of  p_HeadRat(p, is, currRing); !
+    C[k] = p_GetCoeffRat(p, is, r);
+    D[k] =  p_Totaldegree(C[k], r);
+    mintdeg = si_min(mintdeg,D[k]);
+    L[k] = pLength(C[k]);
+    minlen = si_min(minlen,L[k]);
+    if (p_IsConstant(C[k], r))
+    {
+      // C[k] = const, so the content will be numerical
+      HasConstantCoef = 1;
+      // smth like goto cleanup and return(pContent(p));
+    }
+    p_LmDeleteAndNextRat(&p, is, r);
+    k++;
+  }
+
+  // look for 1 element of minimal degree and of minimal length
+  k--;
+  poly d;
+  int mindeglen = len;
+  if (k<=0) // this poly is not a ratgring poly -> pContent
+  {
+    p_Delete(&C[0], r);
+    p_Delete(&LM[0], r);
+    p_Content(ph, r);
+    goto cleanup;
+  }
+
+  int pmindeglen;
+  for(i=0; i<=k; i++)
+  {
+    if (D[i] == mintdeg)
+    {
+      if (L[i] < mindeglen)
+      {
+        mindeglen=L[i];
+        pmindeglen = i;
+      }
+    }
+  }
+  d = p_Copy(C[pmindeglen], r);
+  // there are dd>=1 mindeg elements
+  // and pmideglen is the coordinate of one of the smallest among them
+
+  //  poly g = singclap_gcd(p_Copy(p,r),p_Copy(q,r));
+  //  return naGcd(d,d2,currRing);
+
+  // adjoin pContentRat here?
+  for(i=0; i<=k; i++)
+  {
+    d=singclap_gcd(d,p_Copy(C[i], r), r);
+    if (p_Totaldegree(d, r)==0)
+    {
+      // cleanup, pContent, return
+      p_Delete(&d, r);
+      for(;k>=0;k--)
+      {
+        p_Delete(&C[k], r);
+        p_Delete(&LM[k], r);
+      }
+      p_Content(ph, r);
+      goto cleanup;
+    }
+  }
+  for(i=0; i<=k; i++)
+  {
+    poly h=singclap_pdivide(C[i],d, r);
+    p_Delete(&C[i], r);
+    C[i]=h;
+  }
+
+  // zusammensetzen,
+  p=NULL; // just to be sure
+  for(i=0; i<=k; i++)
+  {
+    p = p_Add_q(p, p_Mult_q(C[i],LM[i], r), r);
+    C[i]=NULL; LM[i]=NULL;
+  }
+  p_Delete(&ph, r); // do not need it anymore
+  ph = p;
+  // aufraeumen, return
+cleanup:
+  omFree(C);
+  omFree(LM);
+  omFree(D);
+  omFree(L);
+}
+
+
+#endif
+
+
 /* assumes that p and divisor are univariate polynomials in r,
    mentioning the same variable;
    assumes divisor != NULL;
@@ -2613,7 +2800,7 @@ poly p_Cleardenom(poly p, const ring r)
     if (rIsRatGRing(r))
     {
       /* quick unit detection in the rational case is done in gr_nc_bba */
-      pContentRat(p);
+      p_ContentRat(p, r);
       start=p;
     }
 #endif

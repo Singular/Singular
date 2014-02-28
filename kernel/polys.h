@@ -360,6 +360,11 @@ inline void pNorm(poly p, const ring R = currRing){ p_Norm(p, R); }
 ///          * LE(p2, j) != LE(lcm, j)   ==> LCM(p2, p) != lcm
 BOOLEAN pCompareChain (poly p, poly p1, poly p2, poly lcm, const ring R = currRing);
 
+#ifdef HAVE_RATGRING
+BOOLEAN pCompareChainPart (poly p, poly p1, poly p2, poly lcm, const ring R = currRing);
+#endif
+
+
 #define  pEqualPolys(p1,p2) p_EqualPolys(p1,p2,currRing)
 
 
