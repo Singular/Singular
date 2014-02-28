@@ -148,7 +148,7 @@ convertnmod_poly_t2FacCF (const nmod_poly_t poly, const Variable& x)
 
 void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
 {
-  ASSERT (isOn (SW_RATIONAL), "expected rational");
+  //ASSERT (isOn (SW_RATIONAL), "expected rational");
   fmpz_t tmp1, tmp2;
   fmpz_init (tmp1);
   fmpz_init (tmp2);
@@ -176,7 +176,7 @@ void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
 
 CanonicalForm convertFmpq_t2CF (const fmpq_t q)
 {
-  ASSERT (isOn (SW_RATIONAL), "expected rational");
+  //ASSERT (isOn (SW_RATIONAL), "expected rational");
 
   CanonicalForm num, den;
   mpz_t nnum, nden;
@@ -226,7 +226,7 @@ void convertFacCF2Fmpz_array (fmpz* result, const CanonicalForm& f)
 
 void convertFacCF2Fmpq_poly_t (fmpq_poly_t result, const CanonicalForm& f)
 {
-  ASSERT (isOn (SW_RATIONAL), "expected poly over Q");
+  //ASSERT (isOn (SW_RATIONAL), "expected poly over Q");
 
   fmpq_poly_init2 (result, degree (f)+1);
   _fmpq_poly_set_length (result, degree (f) + 1);
