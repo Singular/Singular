@@ -66,129 +66,121 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 
 // HEADERS:
-#include "hutil.h"
-//#include "idrec.h" // moved to Singular
-#include "stairc.h"
-#include "ideals.h"
-#include "syz.h"
-#include "fast_maps.h"
-#include "febase.h"
-#include "walkProc.h"
-#include "walkMain.h"
-#include "walkSupport.h"
-#include "khstd.h"
-/// #include "sparsmat.h" // TODO: install polys/this!
+#include <kernel/hutil.h>
+#include <kernel/stairc.h>
+#include <kernel/ideals.h>
+#include <kernel/syz.h>
+#include <kernel/fast_maps.h>
+#include <kernel/febase.h>
+#include <kernel/walkProc.h>
+#include <kernel/walkMain.h>
+#include <kernel/walkSupport.h>
+#include <kernel/khstd.h>
+/// #include <kernel/sparsmat.h> // TODO: install polys/this!
 //+
 
-#include "fglm.h"
-#include "kstd1.h"
-#include "fglmgauss.h"
-#include "fglmvec.h"
-#include "kstdfac.h"
-#include "kmatrix.h"
-#include "GMPrat.h"
-#include "multicnt.h"
-#include "npolygon.h"
-#include "semic.h"
-#include "spectrum.h"
-#include "splist.h"
-#include "multicnt.h"
-#include "eigenval.h"
-#include "units.h"
-#include "ratgring.h"
-#include "shiftgb.h"
-// #include "mmalloc.h" // move to Singular!?
+#include <kernel/fglm.h>
+#include <kernel/kstd1.h>
+#include <kernel/fglmgauss.h>
+#include <kernel/fglmvec.h>
+#include <kernel/kstdfac.h>
+#include <kernel/kmatrix.h>
+#include <kernel/GMPrat.h>
+#include <kernel/multicnt.h>
+#include <kernel/npolygon.h>
+#include <kernel/semic.h>
+#include <kernel/spectrum.h>
+#include <kernel/splist.h>
+#include <kernel/multicnt.h>
+#include <kernel/eigenval.h>
+#include <kernel/units.h>
+#include <kernel/ratgring.h>
+#include <kernel/shiftgb.h>
 
-#include "kutil.h"
 
-// #include "dbm_sl.h" // TODO: needs si_link// already moved to Singular/!
+#include <kernel/kutil.h>
 
 // #include "CCRing.h" // Too old!
-#include "digitech.h"
-#include "eigenval.h"
-#include "fast_maps.h"
-#include "fast_mult.h"
-#include "febase.h"
+#include <kernel/digitech.h>
+#include <kernel/eigenval.h>
+#include <kernel/fast_maps.h>
+#include <kernel/fast_mult.h>
+#include <kernel/febase.h>
 
-#include "fglmgauss.h"
-#include "fglm.h"
-#include "fglmvec.h"
+#include <kernel/fglmgauss.h>
+#include <kernel/fglm.h>
+#include <kernel/fglmvec.h>
 
-////////#include "F5cData.h"
-#include "f5c.h"
-#include "f5data.h"
-#include "f5gb.h"
-#include "f5lists.h"
-////////#include "F5cLists.h"
+////////#include <kernel/F5cData.h>
+#include <kernel/f5c.h>
+#include <kernel/f5data.h>
+#include <kernel/f5gb.h>
+#include <kernel/f5lists.h>
+////////#include <kernel/F5cLists.h>
 
 
-#include "GMPrat.h"
-
-// #include "htmlhelp.h" // For Windows //
-#include "hutil.h"
 // #include "Ideal.h" // Too old?
 
 
-#include "ideals.h"
+#include <kernel/ideals.h>
 
-#include "kmatrix.h"
-#include "kstd1.h"
-#include "kstdfac.h"
-#include "khstd.h"
+#include <kernel/kmatrix.h>
+#include <kernel/kstd1.h>
+#include <kernel/kstdfac.h>
+#include <kernel/khstd.h>
 
-#include "linearAlgebra.h"
+#include <kernel/linearAlgebra.h>
 
 
 
-// #include "lplist.h" // Too old!
-#include "multicnt.h"
-#include "npolygon.h"
+// #include <kernel/lplist.h> // Too old!
+#include <kernel/multicnt.h>
+#include <kernel/npolygon.h>
 // #include "Number.h" // Too old?
 // #include "Poly.h" // Too old?
 // #include "PowerSeries.h" // Too old?
 
-#include "preimage.h"
+#include <kernel/preimage.h>
 
-#include "nc.h"
+#include <kernel/nc.h>
 
-#include "ratgring.h"
-#include "ringgb.h"
-// #include "run.h" // moved to Singular
-#include "semic.h"
-#include "shiftgb.h"
-// #include "si_gmp.h" // remove it...
-#include "spectrum.h"
-#include "splist.h"
-#include "stairc.h"
-#include "structs.h"
-#include "syz.h"
-// #include "testpoly.h" // Too old?
+#include <kernel/ratgring.h>
+#include <kernel/ringgb.h>
+#include <kernel/semic.h>
+#include <kernel/shiftgb.h>
+#include <kernel/spectrum.h>
+#include <kernel/splist.h>
+#include <kernel/stairc.h>
+#include <kernel/structs.h>
+#include <kernel/syz.h>
+// #include <kernel/testpoly.h> // Too old?
 
-#include "tgbgauss.h"
-#include "tgb.h"
+#include <kernel/tgbgauss.h>
+#include <kernel/tgb.h>
 
-#include "timer.h"
+#include <kernel/timer.h>
 
-#include "units.h"
-#include "walkMain.h"
-#include "walkProc.h"
-#include "walkSupport.h"
+#include <kernel/units.h>
+#include <kernel/walkMain.h>
+#include <kernel/walkProc.h>
+#include <kernel/walkSupport.h>
 
+#include <kernel/janet.h>
 
 // #include <polys/clapconv.h> // due to factory? :(
-// #include "tgb_internal.h" // :(
-// #include "F4.h" // uses tgb_internal // :(
-// #include "IIntvec.h" // :(
+// #include <kernel/tgb_internal.h> // :(
+// #include <kernel/F4.h> // uses tgb_internal // :(
+// #include <kernel/IIntvec.h> // :(
 
 
 
 
-// #include "fglmzero.cc" // looks like <factory/templates/ftmpl_list.h> must be installed!
+// #include <kernel/fglmzero.cc> // looks like <factory/templates/ftmpl_list.h> must be installed!
 // TODO: looks like <coeffs/mpr_complex.h> must be installed!
 
 
 
-#include "polys.h"
+#include <kernel/polys.h>
 
 void TestGBEngine()
 {

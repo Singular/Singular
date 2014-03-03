@@ -173,7 +173,6 @@
 // #include <kernel/IIntvec.h> // :(
 
 
-#include <Singular/janet.h>
 // headers in Singular/
 #include <Singular/mmalloc.h>
 //#include <Singular/idrec.h> // moved to Singular
