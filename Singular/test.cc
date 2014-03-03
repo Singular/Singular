@@ -192,7 +192,6 @@
 #include <Singular/lists.h>
 #include <Singular/locals.h>
 #include <Singular/maps_ip.h>
-#include <Singular/minpoly.h>
 #include <Singular/misc_ip.h>
 #include <Singular/links/ndbm.h>
 #include <Singular/newstruct.h>

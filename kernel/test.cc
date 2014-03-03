@@ -167,6 +167,8 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 #include <kernel/janet.h>
 #include <kernel/interpolation.h>
+#include <kernel/minpoly.h>
+
 #include <kernel/Minor.h>
 #include <kernel/MinorInterface.h>
 #include <kernel/MinorProcessor.h>

@@ -29,7 +29,7 @@ SOURCES = polys.cc febase.cc feread.cc \
     ratgring.cc shiftgb.cc \
     linearAlgebra.cc preimage.cc \
     mod2.h \
-    janet.cc interpolation.cc \
+    janet.cc interpolation.cc minpoly.cc \
     Minor.cc MinorInterface.cc MinorProcessor.cc
  
 
@@ -53,7 +53,7 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	digitech.h tgb.h ringgb.h tgbgauss.h tgb_internal.h \
 	linearAlgebra.h \
 	f5c.h f5data.h f5gb.h f5lists.h \
-	janet.h interpolation.h \
+	janet.h interpolation.h minpoly.h \
 	Minor.h MinorInterface.h MinorProcessor.h Cache.h CacheImplementation.h
 
 libkernel_la_includedir  =${includedir}/singular/kernel

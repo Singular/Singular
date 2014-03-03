@@ -81,6 +81,7 @@
 // for tests of t-rep-GB
 #include <kernel/tgb.h>
 
+#include <kernel/minpoly.h>
 
 #include "tok.h"
 #include "ipid.h"
@@ -92,7 +93,6 @@
 #include "fehelp.h"
 #include "distrib.h"
 
-#include "minpoly.h"
 #include "misc_ip.h"
 
 #include "attrib.h"

@@ -77,7 +77,6 @@ SOURCES = \
    linearAlgebra_ip.cc\
    lists.cc\
    maps_ip.cc\
-   minpoly.cc\
    misc_ip.cc\
    mod_lib.cc\
    links/ndbm.cc\
@@ -129,7 +128,6 @@ SingularHEADERS = \
    lists.h \
    locals.h \
    maps_ip.h \
-   minpoly.h \
    misc_ip.h \
    mmalloc.h \
    mod_lib.h \
