@@ -28,7 +28,9 @@ SOURCES = polys.cc febase.cc feread.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc f5c.cc \
     ratgring.cc shiftgb.cc \
     linearAlgebra.cc preimage.cc \
-    mod2.h
+    mod2.h \
+    janet.cc
+ 
 
 libkernel_la_SOURCES   = $(SOURCES)
 
@@ -49,7 +51,8 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	preimage.h timer.h kInline.h fast_mult.h \
 	digitech.h tgb.h ringgb.h tgbgauss.h tgb_internal.h \
 	linearAlgebra.h \
-	f5c.h f5data.h f5gb.h f5lists.h
+	f5c.h f5data.h f5gb.h f5lists.h \
+	janet.h
 
 libkernel_la_includedir  =${includedir}/singular/kernel
 libkernel_la_include_HEADERS   = $(KERNELHEADERS)

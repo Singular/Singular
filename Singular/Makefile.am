@@ -76,7 +76,6 @@ SOURCES =    Minor.cc\
    iplib.cc\
    ipprint.cc\
    ipshell.cc\
-   janet.cc\
    libparse.cc\
    linearAlgebra_ip.cc\
    lists.cc\
@@ -132,7 +131,6 @@ SingularHEADERS =    Cache.h \
    ipid.h \
    ipprint.h \
    ipshell.h \
-   janet.h \
    libparse.h \
    libsingular.h \
    linearAlgebra_ip.h\

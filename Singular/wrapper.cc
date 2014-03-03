@@ -10,7 +10,8 @@
 #include <kernel/kstd1.h>
 #include <kernel/ideals.h>
 
-#include <Singular/janet.h>
+#include <kernel/janet.h>
+
 #include <Singular/subexpr.h>
 
 //extern int (*ListGreatMove)(jList *,jList *,poly);
