@@ -5259,7 +5259,6 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
 #define jjstrlen       (proc1)1
 #define jjpLength      (proc1)2
 #define jjidElem       (proc1)3
-#define jjmpDetBareiss (proc1)4
 #define jjidFreeModule (proc1)5
 #define jjidVec2Ideal  (proc1)6
 #define jjrCharStr     (proc1)7
@@ -5292,7 +5291,6 @@ void jjInitTab1()
         case (int)jjpLength:      dArith1[i].p=(proc1)pLength; break;
         case (int)jjidElem:       dArith1[i].p=(proc1)idElem; break;
         case (int)jjidVec2Ideal:  dArith1[i].p=(proc1)idVec2Ideal; break;
-        case (int)jjmpDetBareiss: dArith1[i].p=(proc1)mpDetBareiss; break;
         case (int)jjidFreeModule: dArith1[i].p=(proc1)idFreeModule; break;
         case (int)jjrCharStr:     dArith1[i].p=(proc1)rCharStr; break;
 #ifndef MDEBUG
@@ -5330,11 +5328,6 @@ static BOOLEAN jjpLength(leftv res, leftv v)
 static BOOLEAN jjidElem(leftv res, leftv v)
 {
   res->data = (char *)(long)idElem((ideal)v->Data());
-  return FALSE;
-}
-static BOOLEAN jjmpDetBareiss(leftv res, leftv v)
-{
-  res->data = (char *)mp_DetBareiss((matrix)v->Data(),currRing);
   return FALSE;
 }
 static BOOLEAN jjidFreeModule(leftv res, leftv v)
@@ -5424,7 +5417,6 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 #define jjstrlen       (proc1)strlen
 #define jjpLength      (proc1)pLength
 #define jjidElem       (proc1)idElem
-#define jjmpDetBareiss (proc1)mpDetBareiss
 #define jjidFreeModule (proc1)idFreeModule
 #define jjidVec2Ideal  (proc1)idVec2Ideal
 #define jjrCharStr     (proc1)rCharStr

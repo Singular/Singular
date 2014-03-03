@@ -165,7 +165,7 @@ BOOLEAN evRowElim(leftv res,leftv h)
             res->rtyp=MATRIX_CMD;
             res->data=(void *)evRowElim(mpCopy(M),i,j,k);
             return FALSE;
-	  }
+          }
         }
       }
     }
@@ -224,7 +224,7 @@ BOOLEAN evColElim(leftv res,leftv h)
             res->rtyp=MATRIX_CMD;
             res->data=(void *)evColElim(mpCopy(M),i,j,k);
             return FALSE;
-	  }
+          }
         }
       }
     }
@@ -321,37 +321,37 @@ lists evEigenvals(matrix M)
         MATELEM(M0,i,i)=pSub(MATELEM(M0,i,i),pCopy(t));
 
       intvec *m0;
-      ideal e0=singclap_factorize(mpDetBareiss(M0),&m0,2);
+      ideal e0=singclap_factorize(mp_DetBareiss(M0,currRing),&m0,2);
 
       for(int i=0;i<IDELEMS(e0);i++)
       {
         if(pNext(e0->m[i])==NULL)
-	{
+        {
           (*m)[k]=(*m0)[i];
           k++;
         }
         else
         if(pGetExp(e0->m[i],1)<2&&pGetExp(pNext(e0->m[i]),1)<2&&
            pNext(pNext(e0->m[i]))==NULL)
-	{
+        {
           number e1=nNeg(nCopy(pGetCoeff(e0->m[i])));
           if(pGetExp(pNext(e0->m[i]),1)==0)
             e->m[k]=pNSet(nDiv(pGetCoeff(pNext(e0->m[i])),e1));
           else
-	    e->m[k]=pNSet(nDiv(e1,pGetCoeff(pNext(e0->m[i]))));
+            e->m[k]=pNSet(nDiv(e1,pGetCoeff(pNext(e0->m[i]))));
           nDelete(&e1);
           pNormalize(e->m[k]);
           (*m)[k]=(*m0)[i];
           k++;
         }
         else
-	{
+        {
           e->m[k]=e0->m[i];
           pNormalize(e->m[k]);
           e0->m[i]=NULL;
           (*m)[k]=(*m0)[i];
           k++;
-	}
+        }
       }
 
       delete(m0);
@@ -375,7 +375,7 @@ lists evEigenvals(matrix M)
       {
         if(e->m[i0]==NULL&&!nGreaterZero(pGetCoeff(e->m[i1]))||
            e->m[i1]==NULL&&
-	  (nGreaterZero(pGetCoeff(e->m[i0]))||pNext(e->m[i0])!=NULL)||
+          (nGreaterZero(pGetCoeff(e->m[i0]))||pNext(e->m[i0])!=NULL)||
            e->m[i0]!=NULL&&e->m[i1]!=NULL&&
           (pNext(e->m[i0])!=NULL&&pNext(e->m[i1])==NULL||
            pNext(e->m[i0])==NULL&&pNext(e->m[i1])==NULL&&
