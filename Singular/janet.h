@@ -95,7 +95,7 @@ ListNode* CreateListNode(Poly *x);
 void DestroyListNode(ListNode *x);
 void DestroyFreeNodes();
 
-BOOLEAN jjJanetBasis(leftv res, leftv v);
-BOOLEAN jjStdJanetBasis(leftv res, leftv v,int flag); // 0: JB, 1: SB
+int ComputeBasis(jList *,jList *);
+void Initialization(char *);
 
 #endif //JANET_INTERFACE

@@ -62,7 +62,6 @@
 
 // HEADERS:
 #include <kernel/hutil.h>
-//#include "idrec.h" // moved to Singular
 #include <kernel/stairc.h>
 #include <kernel/ideals.h>
 #include <kernel/syz.h>
@@ -92,7 +91,6 @@
 #include <kernel/units.h>
 #include <kernel/ratgring.h>
 #include <kernel/shiftgb.h>
-#include "mmalloc.h"
 
 #include <kernel/kutil.h>
 
@@ -136,7 +134,6 @@
 
 
 // #include "lplist.h" // Too old!
-#include "mmalloc.h"
 #include <kernel/multicnt.h>
 #include <kernel/npolygon.h>
 // #include <kernel/Number.h> // Too old?
@@ -176,53 +173,53 @@
 // #include <kernel/IIntvec.h> // :(
 
 
-
+#include <Singular/janet.h>
 // headers in Singular/
-#include "attrib.h"
-#include "blackbox.h"
-#include "Cache.h"
-#include "CacheImplementation.h"
-#include "cntrlc.h"
-#include "links/dbm_sl.h"
-#include "distrib.h"
-#include "eigenval_ip.h"
-#include "gms.h"
-#include "grammar.h"
-#include "interpolation.h"
-#include "ipconv.h"
-#include "ipid.h"
-#include "ipprint.h"
-#include "ipshell.h"
-#include "janet.h"
-#include "libparse.h"
-#include "lists.h"
-#include "locals.h"
-#include "maps_ip.h"
-#include "Minor.h"
-#include "MinorInterface.h"
-#include "MinorProcessor.h"
-#include "minpoly.h"
-#include "misc_ip.h"
-#include "links/ndbm.h"
-#include "newstruct.h"
-#include "omSingularConfig.h"
-#include "pcv.h"
-#include "links/pipeLink.h"
-#include "run.h"
-#include "sdb.h"
-#include "links/silink.h"
-#include "links/sing_dbm.h"
-#include "sing_win.h"
-#include "links/slInit.h"
-#include "links/ssiLink.h"
-#include "stype.h"
-#include "subexpr.h"
-//#include "table.h" // dummy
-#include "tok.h"
-#include "utils.h"
-#include "walk.h"
+#include <Singular/mmalloc.h>
+//#include <Singular/idrec.h> // moved to Singular
+#include <Singular/attrib.h>
+#include <Singular/blackbox.h>
+#include <Singular/Cache.h>
+#include <Singular/CacheImplementation.h>
+#include <Singular/cntrlc.h>
+#include <Singular/links/dbm_sl.h>
+#include <Singular/distrib.h>
+#include <Singular/eigenval_ip.h>
+#include <Singular/gms.h>
+#include <Singular/grammar.h>
+#include <Singular/interpolation.h>
+#include <Singular/ipconv.h>
+#include <Singular/ipid.h>
+#include <Singular/ipprint.h>
+#include <Singular/ipshell.h>
+#include <Singular/libparse.h>
+#include <Singular/lists.h>
+#include <Singular/locals.h>
+#include <Singular/maps_ip.h>
+#include <Singular/Minor.h>
+#include <Singular/MinorInterface.h>
+#include <Singular/MinorProcessor.h>
+#include <Singular/minpoly.h>
+#include <Singular/misc_ip.h>
+#include <Singular/links/ndbm.h>
+#include <Singular/newstruct.h>
+#include <Singular/omSingularConfig.h>
+#include <Singular/pcv.h>
+#include <Singular/links/pipeLink.h>
+#include <Singular/run.h>
+#include <Singular/sdb.h>
+#include <Singular/links/silink.h>
+#include <Singular/links/sing_dbm.h>
+#include <Singular/sing_win.h>
+#include <Singular/links/slInit.h>
+#include <Singular/links/ssiLink.h>
+#include <Singular/stype.h>
+#include <Singular/subexpr.h>
+#include <Singular/tok.h>
+#include <Singular/utils.h>
+#include <Singular/walk.h>
 
-#include "fegetopt.h"
+#include <Singular/fegetopt.h>
 
 void siInit(char *);
 

@@ -186,8 +186,6 @@
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h);
 #endif
 
-extern BOOLEAN jjJanetBasis(leftv res, leftv v);
-
 #ifdef ix86_Win  /* PySingular initialized? */
 static int PyInitialized = 0;
 #endif

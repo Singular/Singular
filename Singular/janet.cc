@@ -1,36 +1,36 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-
 #ifdef HAVE_CONFIG_H
 #include "singularconfig.h"
 #endif /* HAVE_CONFIG_H */
+
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 
 #include <coeffs/numbers.h>
+// #include <coeffs/longrat.h>
 
-#include <kernel/polys.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/kbuckets.h>
 
 #include <kernel/ideals.h>
-#include <libpolys/coeffs/longrat.h>
+#include <kernel/polys.h>
 #include <kernel/febase.h>
 #include <kernel/kutil.h>
 
-#include "subexpr.h"
-
+// #include "subexpr.h"
 
 #include "janet.h"
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+#include <time.h>
 
 #if (defined(__CYGWIN__))
 #include <ctype.h>
 #endif
-
-#include <stdarg.h>
 
 
 //------GLOBALS-------

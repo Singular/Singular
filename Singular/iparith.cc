@@ -62,7 +62,6 @@
 #include <Singular/ipprint.h>
 #include <Singular/attrib.h>
 #include <Singular/links/silink.h>
-#include <Singular/janet.h>
 #include <Singular/MinorInterface.h>
 #include <Singular/misc_ip.h>
 #include <Singular/linearAlgebra_ip.h>
@@ -2498,7 +2497,14 @@ static BOOLEAN jjINTERSECT(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjJanetBasis2(leftv res, leftv u, leftv v)
 {
+  extern BOOLEAN jjStdJanetBasis(leftv res, leftv v,int flag);
   return jjStdJanetBasis(res,u,(int)(long)v->Data());
+}
+
+static BOOLEAN jjJanetBasis(leftv res, leftv v)
+{
+  extern BOOLEAN jjStdJanetBasis(leftv res, leftv v,int flag);
+  return jjStdJanetBasis(res,v,0);
 }
 static BOOLEAN jjJET_P(leftv res, leftv u, leftv v)
 {
