@@ -6,21 +6,21 @@
 #include "singularconfig.h"
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
-#include <misc/options.h>
+
 #include <factory/factory.h>
 
+#include <misc/options.h>
 #include <misc/intvec.h>
-
-#include <polys/monomials/ring.h>
-#include <kernel/polys.h>
 
 #include <coeffs/longrat.h>
 
+#include <polys/monomials/ring.h>
+
+#include <kernel/polys.h>
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
 
-#include "lists.h"
-#include "ipid.h"
+#include <Singular/interpolation.h>
 
 // parameters to debug
 //#define shmat
@@ -1484,7 +1484,7 @@ static void ResolveCoeff (mpq_t c, number m)
   }
 }
 
-ideal interpolation(lists L, intvec *v)
+ideal interpolation(const std::vector<ideal>& L, intvec *v)
 {
   protocol=TEST_OPT_PROT;  // should be set if option(prot) is enabled
 
@@ -1507,18 +1507,19 @@ ideal interpolation(lists L, intvec *v)
      return NULL;
   }
   n_points=v->length ();
-  if (n_points!=(L->nr+1))
+  if (n_points!=L.size())
   {
      WerrorS("list and intvec must have the same length!");
      return NULL;
   }
+  assume( n_points > 0 ); 
   variables=currRing->N;
   only_modp=rField_is_Zp(currRing);
   if (only_modp) myp=rChar(currRing);
   // ring data read **********************************************************
 
 
-  multiplicity=(int*)malloc(sizeof(int)*n_points);
+  multiplicity=(int*)malloc(sizeof(int)*n_points); // TODO: use omalloc!
   int i;
   for (i=0;i<n_points;i++) multiplicity[i]=(*v)[i];
 
@@ -1539,9 +1540,9 @@ ideal interpolation(lists L, intvec *v)
   mpq_t divisor;
   if (!only_modp) mpq_init(divisor);
   int j;
-  for(i=0; i<=L->nr;i++)
+  for(i=0; i<L.size();i++)
   {
-    ideal I=(ideal)L->m[i].Data();
+    ideal I = L[i];
     for(j=0;j<IDELEMS(I);j++)
     {
       poly p=I->m[j];
@@ -1773,9 +1774,3 @@ ideal interpolation(lists L, intvec *v)
 }
 
 
-BOOLEAN jjINTERPOLATION (leftv res, leftv l, leftv v)
-{
-  res->data=interpolation((lists)l->Data(),(intvec*)v->Data());
-  setFlag(res,FLAG_STD);
-  return errorreported;
-}

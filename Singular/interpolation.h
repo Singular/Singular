@@ -8,9 +8,13 @@
 #ifndef INTERPOLATION_H
 #define INTERPOLATION_H
 
-#include <kernel/structs.h>
+#include <vector>
 
-BOOLEAN jjINTERPOLATION(leftv res, leftv l, leftv v);
+class intvec;
+struct sip_sideal; typedef struct sip_sideal * ideal;
+
+ideal interpolation(const std::vector<ideal>& L, intvec *v);
+
 
 #endif
 

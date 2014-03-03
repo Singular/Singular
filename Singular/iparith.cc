@@ -88,7 +88,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
-
+#include <vector>
 
 lists rDecompose(const ring r);
 ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
@@ -2494,6 +2494,18 @@ static BOOLEAN jjINTERSECT(leftv res, leftv u, leftv v)
 {
   res->data=(char *)idSect((ideal)u->Data(),(ideal)v->Data());
   return FALSE;
+}
+static BOOLEAN jjINTERPOLATION (leftv res, leftv l, leftv v)
+{
+  const lists L = (lists)l->Data();
+  const int n = L->nr; assume (n >= 0);
+  std::vector<ideal> V(n + 1);
+ 
+  for(int i = n; i >= 0; i--) V[i] = (ideal)(L->m[i].Data());
+   
+  res->data=interpolation(V, (intvec*)v->Data());
+  setFlag(res,FLAG_STD);
+  return errorreported;
 }
 static BOOLEAN jjJanetBasis2(leftv res, leftv u, leftv v)
 {
