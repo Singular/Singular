@@ -185,8 +185,8 @@ fi
     echo /'*' >>$tmp/pconfig.h
     echo "@%:@ifndef HAVE_CONFIG_H"      >>$tmp/pconfig.h
     echo "@%:@error Please include this config header only if HAVE_CONFIG_H was defined!" >>$tmp/pconfig.h
-    echo '*'/ >>$tmp/pconfig.h
     echo "@%:@endif"                     >>$tmp/pconfig.h
+    echo '*'/ >>$tmp/pconfig.h
     echo ' ' >>$tmp/pconfig.h
     
     sed -f _script $_INP >>$tmp/pconfig.h
