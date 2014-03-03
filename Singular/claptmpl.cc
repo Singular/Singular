@@ -116,8 +116,8 @@ template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 
 /* next lines are templates used in new minor code */
 #include <list>
-#include <Singular/Minor.h>
-#include <Singular/Cache.h>
+#include <kernel/Minor.h>
+#include <kernel/Cache.h>
 
 template class std::list<int>;
 template class std::list<MinorKey>;

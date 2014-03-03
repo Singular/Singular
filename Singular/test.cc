@@ -178,8 +178,6 @@
 //#include <Singular/idrec.h> // moved to Singular
 #include <Singular/attrib.h>
 #include <Singular/blackbox.h>
-#include <Singular/Cache.h>
-#include <Singular/CacheImplementation.h>
 #include <Singular/cntrlc.h>
 #include <Singular/links/dbm_sl.h>
 #include <Singular/distrib.h>
@@ -194,9 +192,6 @@
 #include <Singular/lists.h>
 #include <Singular/locals.h>
 #include <Singular/maps_ip.h>
-#include <Singular/Minor.h>
-#include <Singular/MinorInterface.h>
-#include <Singular/MinorProcessor.h>
 #include <Singular/minpoly.h>
 #include <Singular/misc_ip.h>
 #include <Singular/links/ndbm.h>

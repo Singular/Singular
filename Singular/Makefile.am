@@ -50,9 +50,7 @@ libSingulardir = $(libdir)
 
 libSingular_la_CPPFLAGS = ${AM_CPPFLAGS} -DLIBSINGULAR
 
-SOURCES =    Minor.cc\
-   MinorInterface.cc\
-   MinorProcessor.cc\
+SOURCES = \
    links/asciiLink.cc\
    attrib.cc\
    blackbox.cc\
@@ -108,11 +106,7 @@ SOURCES =    Minor.cc\
 
 libSingular_la_SOURCES   = $(SOURCES)
 
-SingularHEADERS =    Cache.h \
-   CacheImplementation.h \
-   Minor.h \
-   MinorInterface.h \
-   MinorProcessor.h \
+SingularHEADERS = \
    attrib.h \
    blackbox.h \
    cntrlc.h \
