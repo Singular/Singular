@@ -492,7 +492,6 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
   DEBOUTLN( cerr, "GG = " << GG );
   TIMING_START (ez_content)
   f = content( F, x ); g = content( G, x ); d = gcd( f, g );
-  d /= icontent (d);
   DEBOUTLN( cerr, "f = " << f );
   DEBOUTLN( cerr, "g = " << g );
   F /= f; G /= g;
