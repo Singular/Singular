@@ -20,7 +20,7 @@
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
 
-#include <Singular/interpolation.h>
+#include <kernel/interpolation.h>
 
 // parameters to debug
 //#define shmat

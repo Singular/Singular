@@ -68,7 +68,6 @@ SOURCES =    Minor.cc\
    fglm.cc\
    gms.cc\
    grammar.cc\
-   interpolation.cc\
    iparith.cc\
    ipassign.cc\
    ipconv.cc\
@@ -125,7 +124,6 @@ SingularHEADERS =    Cache.h \
    fglm.h \
    gms.h \
    grammar.h \
-   interpolation.h \
    idrec.h \
    ipconv.h \
    ipid.h \

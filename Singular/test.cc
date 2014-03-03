@@ -186,7 +186,6 @@
 #include <Singular/eigenval_ip.h>
 #include <Singular/gms.h>
 #include <Singular/grammar.h>
-#include <Singular/interpolation.h>
 #include <Singular/ipconv.h>
 #include <Singular/ipid.h>
 #include <Singular/ipprint.h>

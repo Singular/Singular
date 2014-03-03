@@ -12,6 +12,8 @@
 
 #include <omalloc/omalloc.h>
 
+#  include <factory/factory.h>
+
 #include <coeffs/bigintmat.h>
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
@@ -33,6 +35,7 @@
 #include <Singular/mod_lib.h>
 #include <polys/weight.h>
 #include <polys/ext_fields/transext.h>
+#  include <polys/clapsing.h>
 
 #include <kernel/stairc.h>
 #include <kernel/mod2.h>
@@ -50,6 +53,9 @@
 #include <kernel/syz.h>
 #include <kernel/timer.h>
 
+#include <kernel/interpolation.h>
+#  include <kernel/kstdfac.h>
+#  include <kernel/fglm.h>
 
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
@@ -66,13 +72,7 @@
 #include <Singular/misc_ip.h>
 #include <Singular/linearAlgebra_ip.h>
 
-#  include <factory/factory.h>
-#  include <polys/clapsing.h>
-#  include <kernel/kstdfac.h>
-#  include <kernel/fglm.h>
 #  include <Singular/fglm.h>
-
-#include <Singular/interpolation.h>
 
 #include <Singular/blackbox.h>
 #include <Singular/newstruct.h>

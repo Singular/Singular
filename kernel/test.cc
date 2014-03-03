@@ -166,6 +166,7 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/walkSupport.h>
 
 #include <kernel/janet.h>
+#include <kernel/interpolation.h>
 
 // #include <polys/clapconv.h> // due to factory? :(
 // #include <kernel/tgb_internal.h> // :(
