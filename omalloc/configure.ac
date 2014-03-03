@@ -178,7 +178,7 @@ AC_TRY_RUN([#include <stdio.h>
 #include <stdlib.h>
 #include "omGetPageSize.h"
 
-main()
+int main()
 {
   FILE *f=fopen("conftestval", "w");
   if (!f) exit(1);
@@ -208,7 +208,7 @@ AC_CACHE_VAL(ac_cv_working_mmap,
 AC_TRY_RUN([
 #include <stdlib.h>
 #include "omMmap.c"
-main()
+int main()
 {
   void* addr = omVallocMmap(128*${ac_cv_pagesize});
   if (addr == 0 || ((unsigned long) addr % ${ac_cv_pagesize}))
@@ -227,7 +227,7 @@ dnl
 AC_CACHE_CHECK(whether alignment needs to be strict, ac_cv_align_need_strict,
 AC_TRY_RUN([
 #include <stdlib.h>
-main()
+int main()
 {
   void* ptr = (void*) malloc(12);
   volatile double* d_ptr;
@@ -303,7 +303,7 @@ AC_TRY_RUN([
 #include "$OM_MALLOC_SOURCE"
 #endif
 
-main()
+int main()
 {
   void* addr = OM_MALLOC_MALLOC(512);
 #ifdef OM_MALLOC_SIZEOF_ADDR 
@@ -341,7 +341,7 @@ AC_TRY_RUN([
 #include "$OM_MALLOC_SOURCE"
 #endif
 
-main()
+int main()
 {
   void* addr = OM_MALLOC_VALLOC(128*${ac_cv_pagesize});
   if (addr == 0 || ((unsigned long) addr % ${ac_cv_pagesize}))
