@@ -138,7 +138,7 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
       }
     }
 
-    int m= tmax (F.level(), G.level());
+    int m= n;
     int min_max_deg;
     k= both_non_zero;
     l= 0;
@@ -149,7 +149,7 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
         min_max_deg= degsgx*degsf[i] + degsfx*degsg[i];
       else
         min_max_deg= 0;
-      while (min_max_deg == 0)
+      while (min_max_deg == 0 && i < m + 1)
       {
         i++;
         if (degsf [i] != 0 && degsg [i] != 0)
@@ -157,7 +157,7 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
         else
           min_max_deg= 0;
       }
-      for (int j= i + 1; j <=  m; j++)
+      for (int j= i + 1; j <= m; j++)
       {
         if (degsgx*degsf[j] + degsfx*degsg[j] <= min_max_deg &&
             degsf[j] != 0 && degsg [j] != 0)
@@ -176,7 +176,7 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
           degsg[l]= 0;
           l= 0;
         }
-        else
+        else if (l < m + 1)
         {
           degsf[l]= 0;
           degsg[l]= 0;
@@ -192,7 +192,7 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
           degsf[i]= 0;
           degsg[i]= 0;
         }
-        else
+        else if (i < m + 1)
         {
           degsf[i]= 0;
           degsg[i]= 0;
