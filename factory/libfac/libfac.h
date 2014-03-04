@@ -9,11 +9,10 @@
 // Set this to a nonzero value to interrupt the computation
 extern "C" int libfac_interruptflag;
 
-// some values you can ask for:
-extern const char * libfac_name;
-extern const char * libfac_version;
-extern const char * libfac_date;
-extern const char * libfac_author;
+// some values you can ask for:libfac_name, libfac_date, libfac_version, libfac_author
+// (libfac_date, libfac_version defined by configure)
+#define libfac_name  "Factorization and characteristic sets library"
+#define libfac_author "M. Messollen"
 
 //// Note: second argument for Factorize is for internal use only.
 CFFList Factorize( const CanonicalForm & F, int is_SqrFree=0 ) ;
