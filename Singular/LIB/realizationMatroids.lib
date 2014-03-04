@@ -45,7 +45,7 @@ static proc balanced(list lInput)
   int j;
   if(size(lInput)>0)
   {
-    for(i=1;i<=size(lInput[1]);i++) 
+    for(i=1;i<=size(lInput[1]);i++)
     {
       ba[i] = 0;
       for(j=1;j<=size(lInput);j++)
@@ -159,7 +159,7 @@ static proc ismultiple(intvec v, intvec w)
     {
       return(1);
     }
-    else 
+    else
     {
       return(0);
     }
@@ -172,7 +172,7 @@ static proc ismultiple(intvec v, intvec w)
       {
         return(1);
       }
-      else 
+      else
       {
         return(0);
       }
@@ -249,7 +249,7 @@ static proc realizationDimIdeal(ideal iInput, list lInput)
   def save = basering;
   int n = size(lInput[1]);
   int N = (d+2)*(d+1) div 2;
-  ring r1;     
+  ring r1;
   ring r = 0,(x(1..n),a(1..N),t),dp;
   setring r;
   ideal I = fetch(save,iInput);
@@ -412,7 +412,7 @@ static proc realizationDimIdeal(ideal iInput, list lInput)
               G = coef(F[i3,1],prodvar(n));
               for(i4=1;i4<=ncols(G);i4++)
               {
- 	              E = E + ideal(G[2,i4]);
+                E = E + ideal(G[2,i4]);
               }
             }
           }
@@ -440,7 +440,7 @@ static proc realizationDimIdeal(ideal iInput, list lInput)
               G = coef(F[i3,1],prodvar(n));
               for(i4=1;i4<=ncols(G);i4++)
               {
- 	              E = E + ideal(G[2,i4]);
+                E = E + ideal(G[2,i4]);
               }
             }
           }
@@ -468,7 +468,7 @@ static proc realizationDimIdeal(ideal iInput, list lInput)
               G = coef(F[i3,1],prodvar(n));
               for(i4=1;i4<=ncols(G);i4++)
               {
- 	              E = E + ideal(G[2,i4]);
+                E = E + ideal(G[2,i4]);
               }
             }
           }
@@ -483,7 +483,7 @@ static proc realizationDimIdeal(ideal iInput, list lInput)
   E = std(E);
   int i_dim = dim(E)-n-2;
   for(i=1;i<=size(NE);i++)
-  { 
+  {
     if(reduce(NE[i],E) == 0)
     {
       isRealizable = 0;
@@ -506,7 +506,7 @@ proc realizationDim(ideal iInput, list lInput)
 RETURNS:  the dimension of the relative realization space of the tropical curve C with respect to Y, and -1 if the relative realization space is empty.
 EXAMPLE:  realizationDim; shows an example"
 {
-  int ret = realizationDimIdeal(iInput,lInput)[1];
+  int ret = list(realizationDimIdeal(iInput,lInput))[1];
   if(ret[1] == -2)
   {
     printf("WARNING: no computation possible, return value is not meaningful!");
@@ -524,7 +524,7 @@ example
   ideal I = x(1)+x(2)+x(3)+x(4);
   list C = list(intvec(2,2,0,0),intvec(0,0,2,1),intvec(0,0,0,1));
   //C represents the tropical fan curve which consists of the cones
-  //cone([(1,1,0,0)]) (with weight 2), cone([(0,0,2,1)]) (with weight 1) 
+  //cone([(1,1,0,0)]) (with weight 2), cone([(0,0,2,1)]) (with weight 1)
   //and cone([(0,0,0,1)]) (with weight 1)
   realizationDim(I,C);
 }
@@ -624,7 +624,7 @@ example
   ring r = 0,(x(1..4)),dp;
   ideal I = x(1)+x(2)+x(3)+x(4);
   list C = list(intvec(2,2,0,0),intvec(0,0,2,2));
-  //C represents the tropical fan curve which consists of the cones 
+  //C represents the tropical fan curve which consists of the cones
   //cone([(1,1,0,0)]) and cone([(1,1,0,0)]), both with weight 2
   realizationDim(I,C);
   irrRealizationDim(I,C);
@@ -638,8 +638,8 @@ EXAMPLE:  realizationDimPoly; shows an example"
   def save = basering;
   int d = balanced(lInput);
   int n = size(lInput[1]);
-  int N = (d+2)*(d+1) div 2;  
-  int i; 
+  int N = (d+2)*(d+1) div 2;
+  int i;
   ring r = 0,(x(1..n),a(1..N)),dp;
   list ret = realizationDimIdeal(fetch(save,iInput),lInput);
   int realdim = ret[1];
@@ -742,7 +742,7 @@ EXAMPLE:  realizationDimPoly; shows an example"
     }
     g = genPoly(d,ret[4][1],ret[4][2],ret[4][3]);
     for(j=1;j<=N;j++)
-    { 
+    {
       g = subst(g,lValues[j][1],lValues[j][2]);
     }
     setring save;
@@ -759,7 +759,7 @@ example
   ring r = 0,(x(1..4)),dp;
   ideal I = x(1)+x(2)+x(3)+x(4);
   list C = list(intvec(2,2,0,0),intvec(0,0,2,2));
-  //C represents the tropical fan curve which consists of the cones 
+  //C represents the tropical fan curve which consists of the cones
   //cone([(1,1,0,0)]) and cone([(1,1,0,0)]), both with weight 2
   realizationDimPoly(I,C);
   C = list(intvec(0,0,0,4),intvec(0,1,3,0),intvec(1,0,1,0),intvec(0,2,0,0),intvec(3,1,0,0));

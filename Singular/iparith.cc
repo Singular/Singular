@@ -1367,6 +1367,13 @@ static BOOLEAN jjINDEX_I(leftv res, leftv u, leftv v)
     while (sh->next != NULL) sh=sh->next;
     sh->next=jjMakeSub(v);
   }
+  if (u->next!=NULL)
+  {
+    leftv rn=(leftv)omAlloc0Bin(sleftv_bin);
+    BOOLEAN bo=iiExprArith2(rn,u->next,iiOp,v);
+    res->next=rn;
+    return bo;
+  }
   return FALSE;
 }
 static BOOLEAN jjINDEX_IV(leftv res, leftv u, leftv v)
