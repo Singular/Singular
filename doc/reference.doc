@@ -1831,6 +1831,7 @@ See
 @node factmodd, factorize, facstd, Functions
 @subsection factmodd
 @cindex factmodd
+@cindex Hensel
 
 @table @code
 @item @strong{Syntax:}
