@@ -1741,11 +1741,12 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   int return_type=c->m[0].Typ();
   if ((return_type!=IDEAL_CMD)
   && (return_type!=MODUL_CMD)
-  && (return_type!=MATRIX_CMD))
+  && (return_type!=MATRIX_CMD)
+  && (return_type!=POLY_CMD))
   {
     if((return_type!=BIGINT_CMD)&&(return_type!=INT_CMD))
     {
-      WerrorS("ideal/module/matrix expected");
+      WerrorS("poly/ideal/module/matrix expected");
       omFree(x); // delete c
       return TRUE;
     }
@@ -1762,7 +1763,16 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
         omFree(x); // delete c
         return TRUE;
       }
-      x[i]=((ideal)c->m[i].Data());
+      if (return_type==POLY_CMD)
+      {
+        x[i]=idInit(1,1);
+        x[i]->m[0]=(poly)c->m[i].CopyD();
+      }
+      else
+      {
+        x[i]=(ideal)c->m[i].CopyD();
+      }
+      //c->m[i].Init();
     }
   }
   else
@@ -1830,7 +1840,15 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   {
     result=id_ChineseRemainder(x,q,rl,currRing);
     // deletes also x
-    res->data=(char *)result;
+    c->Clean();
+    if (return_type==POLY_CMD)
+    {
+      res->data=(char *)result->m[0];
+      result->m[0]=NULL;
+      idDelete(&result);
+    }
+    else
+      res->data=(char *)result;
   }
   for(i=rl-1;i>=0;i--)
   {
