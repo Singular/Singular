@@ -675,6 +675,7 @@ CanonicalForm::operator *= ( const CanonicalForm & cf )
     else  if ( is_imm( cf.value ) )
         value = value->mulcoeff( cf.value );
     else  if ( value->level() == cf.value->level() ) {
+#if (HAVE_NTL && HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
         if (value->levelcoeff() == cf.value->levelcoeff() && cf.isUnivariate() && (*this).isUnivariate())
         {
           if (value->level() < 0 || CFFactory::gettype() == GaloisFieldDomain || (size (cf) <= 10 || size (*this) <= 10) )
@@ -684,6 +685,10 @@ CanonicalForm::operator *= ( const CanonicalForm & cf )
         }
         else if (value->levelcoeff() == cf.value->levelcoeff() && (!cf.isUnivariate() || !(*this).isUnivariate()))
             value = value->mulsame( cf.value );
+#else
+        if ( value->levelcoeff() == cf.value->levelcoeff() )
+            value = value->mulsame( cf.value );
+#endif
         else  if ( value->levelcoeff() > cf.value->levelcoeff() )
             value = value->mulcoeff( cf.value );
         else {
@@ -724,8 +729,20 @@ CanonicalForm::operator /= ( const CanonicalForm & cf )
     else  if ( is_imm( cf.value ) )
         value = value->dividecoeff( cf.value, false );
     else  if ( value->level() == cf.value->level() ) {
-        if ( value->levelcoeff() == cf.value->levelcoeff() )
+#if (HAVE_NTL && HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+        if ( value->levelcoeff() == cf.value->levelcoeff() && (*this).isUnivariate() && cf.isUnivariate())
+        {
+            if (value->level() < 0 || CFFactory::gettype() == GaloisFieldDomain)
+              value = value->dividesame( cf.value );
+            else
+              *this= divNTL (*this, cf);
+        }
+        else if (value->levelcoeff() == cf.value->levelcoeff() && (!cf.isUnivariate() || !(*this).isUnivariate()))
             value = value->dividesame( cf.value );
+#else
+        if (value->levelcoeff() == cf.value->levelcoeff() )
+            value = value->dividesame( cf.value );
+#endif
         else  if ( value->levelcoeff() > cf.value->levelcoeff() )
             value = value->dividecoeff( cf.value, false );
         else {
