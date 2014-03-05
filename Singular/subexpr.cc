@@ -1601,8 +1601,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     {
       if (strcmp(id,IDID(currRingHdl))==0)
       {
-        if (IDID(currRingHdl)!=id) omFreeBinAddr((ADDRESS)id); /*assume strlen
-(id) <1000 */
+        if (IDID(currRingHdl)!=id) omFreeBinAddr((ADDRESS)id); /*assume strlen (id) <1000 */
         h=currRingHdl;
         goto id_found;
       }
