@@ -486,7 +486,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       else
 #endif //HAVE_NTL
       {  // Use Factory without NTL
-        factoryError ("uniivariate factorization not implemented");
+        factoryError ("uniivariate factorization depends on NTL(missing)");
         return CFFList (CFFactor (f, 1));
       }
     }
@@ -517,8 +517,8 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
           F= FpFactorize (f);
       }
       #else
-      ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
-      factoryError ("multivariate factorization not implemented");
+      ASSERT( f.isUnivariate(), "multivariate factorization depends on NTL(missing)" );
+      factoryError ("multivariate factorization depends on NTL(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
     }
@@ -567,7 +567,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       }
       #else
       {
-        factoryError ("univariate factorization over Z not implemented"); 
+        factoryError ("univariate factorization over Z depends on NTL(missing)"); 
         return CFFList (CFFactor (f, 1));
       }
       #endif
@@ -587,7 +587,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         F = ratFactorize (fz);
       Off (SW_RATIONAL);
       #else
-      factoryError ("multivariate factorization not implemented");
+      factoryError ("multivariate factorization  depends on NTL(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
     }
@@ -721,7 +721,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     else
     #endif
     {
-      factoryError ("univariate factorization not implemented");
+      factoryError ("univariate factorization  depends on NTL(missing)");
       return CFFList (CFFactor (f, 1));
     }
   }
@@ -730,8 +730,8 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     #ifdef HAVE_NTL
     F= FqFactorize (f, alpha);
     #else
-    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
-    factoryError ("multivariate factorization not implemented");
+    ASSERT( f.isUnivariate(), "multivariate factorization depends on NTL(missing)" );
+    factoryError ("multivariate factorization  depends on NTL(missing)");
     return CFFList (CFFactor (f, 1));
     #endif
 
@@ -745,8 +745,8 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 #ifdef HAVE_NTL
     F= ratFactorize (f, alpha);
 #else
-    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
-    factoryError ("multivariate factorization not implemented");
+    ASSERT( f.isUnivariate(), "multivariate factorization  depends on NTL(missing)" );
+    factoryError ("multivariate factorization  depends on NTL(missing)");
     return CFFList (CFFactor (f, 1));
 #endif
   }
