@@ -8448,6 +8448,7 @@ int IsCmd(const char *n, int & tok)
     sArithBase.sCmds[i].name);
     sArithBase.sCmds[i].alias=1;
   }
+  #if 0
   if (currRingHdl==NULL)
   {
     #ifdef SIQ
@@ -8463,6 +8464,7 @@ int IsCmd(const char *n, int & tok)
     }
     #endif
   }
+  #endif
   if (!expected_parms)
   {
     switch (tok)
