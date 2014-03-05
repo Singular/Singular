@@ -486,7 +486,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       else
 #endif //HAVE_NTL
       {  // Use Factory without NTL
-        factoryError ("uniivariate factorization depends on NTL(missing)");
+        factoryError ("univariate factorization depends on NTL(missing)");
         return CFFList (CFFactor (f, 1));
       }
     }
