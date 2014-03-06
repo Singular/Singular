@@ -777,7 +777,7 @@ InternalPoly::divremsame( InternalCF* acoeff, InternalCF*& quot, InternalCF*& re
         coeff = aPoly->firstTerm->coeff;
         exp = aPoly->firstTerm->exp;
         while (first && ( first->exp >= exp ) )
-               {
+        {
             newcoeff = first->coeff / coeff;
             newexp = first->exp - exp;
             dummy = first;

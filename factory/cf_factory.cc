@@ -13,7 +13,6 @@
 #include "int_int.h"
 #include "int_rat.h"
 #include "int_poly.h"
-#include "int_pp.h"
 #include "imm.h"
 
 int CFFactory::currenttype = IntegerDomain;
@@ -21,7 +20,7 @@ int CFFactory::currenttype = IntegerDomain;
 void
 CFFactory::settype ( int type )
 {
-    ASSERT( type==FiniteFieldDomain || type==GaloisFieldDomain || type==IntegerDomain || type==RationalDomain || type==PrimePowerDomain, "illegal basic domain!" );
+    ASSERT( type==FiniteFieldDomain || type==GaloisFieldDomain || type==IntegerDomain || type==RationalDomain, "illegal basic domain!" );
     currenttype = type;
 }
 
@@ -42,8 +41,6 @@ CFFactory::basic ( long value )
         return int2imm_p( ff_norm( value ) );
     else  if ( currenttype == GaloisFieldDomain )
         return int2imm_gf( gf_int2gf( value ) );
-    else  if ( currenttype == PrimePowerDomain )
-        return new InternalPrimePower( value );
     else {
         ASSERT( 0, "illegal basic domain!" );
         return 0;
@@ -67,8 +64,6 @@ CFFactory::basic ( int type, long value )
         return int2imm_p( ff_norm( value ) );
     else  if ( type == GaloisFieldDomain )
         return int2imm_gf( gf_int2gf( value ) );
-    else  if ( type == PrimePowerDomain )
-        return new InternalPrimePower( value );
     else {
         ASSERT1( 0, "illegal basic domain (type = %d)!", type );
         return 0;
@@ -110,8 +105,6 @@ CFFactory::basic ( const char * str )
         delete dummy;
         return res;
     }
-    else  if ( currenttype == PrimePowerDomain )
-        return new InternalPrimePower( str );
     else {
         ASSERT( 0, "illegal basic domain!" );
         return 0;
@@ -153,8 +146,6 @@ CFFactory::basic ( const char * str, int base )
         delete dummy;
         return res;
     }
-    else  if ( currenttype == PrimePowerDomain )
-        return new InternalPrimePower( str, base );
     else {
         ASSERT( 0, "illegal basic domain!" );
         return 0;
@@ -196,8 +187,6 @@ CFFactory::basic ( int type, const char * const str )
         delete dummy;
         return res;
     }
-    else  if ( type == PrimePowerDomain )
-        return new InternalPrimePower( str );
     else {
         ASSERT( 0, "illegal basic domain!" );
         return 0;
@@ -223,12 +212,8 @@ CFFactory::basic ( int type, long value, bool nonimm )
 InternalCF *
 CFFactory::basic ( const mpz_ptr num )
 {
-    if ( currenttype != IntegerDomain ) {
-        InternalPrimePower * dummy = new InternalPrimePower( num );
-        return (InternalCF*)(dummy->normalize_myself());
-    }
-    else
-        return new InternalInteger( num );
+  ASSERT (currenttype == IntegerDomain, "Integer domain expected");
+  return new InternalInteger( num );
 }
 
 InternalCF *
@@ -265,25 +250,6 @@ CFFactory::poly ( const Variable & v, int exp )
         return CFFactory::basic( 1L );
     else
         return new InternalPoly( v, exp, 1 );
-}
-
-mpz_ptr getmpi ( InternalCF * value, bool symmetric )
-{
-    ASSERT( ! is_imm( value ) && ( value->levelcoeff() == PrimePowerDomain || value->levelcoeff() == IntegerDomain ), "illegal operation" );
-    mpz_ptr dummy= new mpz_t;
-    if ( value->levelcoeff() == IntegerDomain )
-        mpz_init_set( dummy, InternalInteger::MPI( value ) );
-    else  if ( symmetric ) {
-        mpz_init( dummy );
-        InternalPrimePower::initialize();
-        if ( mpz_cmp( InternalPrimePower::primepowhalf, InternalPrimePower::MPI( value ) ) < 0 )
-            mpz_sub( dummy, InternalPrimePower::MPI( value ), InternalPrimePower::primepow );
-        else
-            mpz_set( dummy, InternalPrimePower::MPI( value ) );
-    }
-    else
-        mpz_init_set( dummy, InternalPrimePower::MPI( value ) );
-    return dummy;
 }
 
 void getmpi ( InternalCF * value, mpz_t mpi)

@@ -1549,20 +1549,6 @@ char* singclap_neworder ( ideal I, const ring r)
   return s;
 }
 
-BOOLEAN singclap_isSqrFree(poly f, const ring r)
-{
-  BOOLEAN b=FALSE;
-  CanonicalForm F( convSingPFactoryP( f,r ) );
-  if((r->cf->type==n_Zp)&&(!F.isUnivariate()))
-      goto err;
-  b=(BOOLEAN)isSqrFree(F);
-  Off(SW_RATIONAL);
-  return b;
-err:
-  WerrorS( feNotImplemented );
-  return 0;
-}
-
 poly singclap_det( const matrix m, const ring s )
 {
   int r=m->rows();

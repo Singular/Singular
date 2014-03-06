@@ -1,5 +1,4 @@
 #include <factory/factory.h>
-#include <resources/feFopen.h>
 #include "cf_assert.h"
 
 int test2 (int p)
@@ -76,8 +75,6 @@ int test2 (int p)
   return 1;
 }*/
 
-extern void feInitResources(const char* argv0 = NULL);
-
 int main( int, char *argv[] )
 {
   int ret = 0;
@@ -90,8 +87,6 @@ int main( int, char *argv[] )
 
     return(1);
   }
-   
-  feInitResources(argv[0]);
 
 //  On (SW_USE_EZGCD); On (SW_USE_EZGCD_P); // TODO&NOTE: these switches lead to failed tests (with nonzero p)!
 

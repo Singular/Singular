@@ -15,6 +15,7 @@
 #include "cf_algorithm.h"
 #include "imm.h"
 #include "gfops.h"
+#include "facMul.h"
 
 #include <factory/cf_gmp.h>
 
@@ -96,12 +97,6 @@ bool
 CanonicalForm::inGF() const
 {
     return is_imm( value ) == GFMARK;
-}
-
-bool
-CanonicalForm::inPP() const
-{
-    return ! is_imm( value ) && ( value->levelcoeff() == PrimePowerDomain );
 }
 
 bool
@@ -221,26 +216,13 @@ CanonicalForm::mapinto () const
                 return CanonicalForm( int2imm( ff_symmetric( gf_gf2ff( imm2int( value ) ) ) ) );
             else
                 return *this;
-        else  if ( CFFactory::gettype() == PrimePowerDomain )
-            return CanonicalForm( CFFactory::basic( imm2int( value ) ) );
         else  if ( getGFDegree() == 1 )
             return CanonicalForm( int2imm_p( ff_norm( imm2int( value ) ) ) );
         else
             return CanonicalForm( int2imm_gf( gf_int2gf( imm2int( value ) ) ) );
     else  if ( value->inBaseDomain() )
         if ( getCharacteristic() == 0 )
-            if ( value->levelcoeff() == PrimePowerDomain )
-                return CFFactory::basic( getmpi( value, true ) );
-            else
-                return *this;
-        else  if ( CFFactory::gettype() == PrimePowerDomain )
-        {
-            ASSERT( value->levelcoeff() == PrimePowerDomain || value->levelcoeff() == IntegerDomain, "no proper map defined" );
-            if ( value->levelcoeff() == PrimePowerDomain )
-                return *this;
-            else
-                return CFFactory::basic( getmpi( value ) );
-        }
+             return *this;
         else
         {
             int val;
@@ -693,8 +675,20 @@ CanonicalForm::operator *= ( const CanonicalForm & cf )
     else  if ( is_imm( cf.value ) )
         value = value->mulcoeff( cf.value );
     else  if ( value->level() == cf.value->level() ) {
+#if (HAVE_NTL && HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+        if (value->levelcoeff() == cf.value->levelcoeff() && cf.isUnivariate() && (*this).isUnivariate())
+        {
+          if (value->level() < 0 || CFFactory::gettype() == GaloisFieldDomain || (size (cf) <= 10 || size (*this) <= 10) )
+            value = value->mulsame( cf.value );
+          else
+            *this= mulNTL (*this, cf);
+        }
+        else if (value->levelcoeff() == cf.value->levelcoeff() && (!cf.isUnivariate() || !(*this).isUnivariate()))
+            value = value->mulsame( cf.value );
+#else
         if ( value->levelcoeff() == cf.value->levelcoeff() )
             value = value->mulsame( cf.value );
+#endif
         else  if ( value->levelcoeff() > cf.value->levelcoeff() )
             value = value->mulcoeff( cf.value );
         else {
@@ -735,8 +729,20 @@ CanonicalForm::operator /= ( const CanonicalForm & cf )
     else  if ( is_imm( cf.value ) )
         value = value->dividecoeff( cf.value, false );
     else  if ( value->level() == cf.value->level() ) {
-        if ( value->levelcoeff() == cf.value->levelcoeff() )
+#if (HAVE_NTL && HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+        if ( value->levelcoeff() == cf.value->levelcoeff() && (*this).isUnivariate() && cf.isUnivariate())
+        {
+            if (value->level() < 0 || CFFactory::gettype() == GaloisFieldDomain)
+              value = value->dividesame( cf.value );
+            else
+              *this= divNTL (*this, cf);
+        }
+        else if (value->levelcoeff() == cf.value->levelcoeff() && (!cf.isUnivariate() || !(*this).isUnivariate()))
             value = value->dividesame( cf.value );
+#else
+        if (value->levelcoeff() == cf.value->levelcoeff() )
+            value = value->dividesame( cf.value );
+#endif
         else  if ( value->levelcoeff() > cf.value->levelcoeff() )
             value = value->dividecoeff( cf.value, false );
         else {

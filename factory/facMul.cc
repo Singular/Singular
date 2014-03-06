@@ -601,6 +601,13 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G, const modpk& b)
   CanonicalForm result;
   if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
   {
+    if (!getReduce (alpha))
+    {
+      result= 0;
+      for (CFIterator i= F; i.hasTerms(); i++)
+        result += i.coeff()*G*power (F.mvar(),i.exp());
+      return result;
+    }
 #if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
     nmod_poly_t FLINTmipo;
     fq_nmod_ctx_t fq_con;

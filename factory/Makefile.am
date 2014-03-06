@@ -2,13 +2,12 @@ ACLOCAL_AMFLAGS = -I ../m4
 
 SUBDIRS=include/factory libfac
 
-AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include $(FLINT_CFLAGS) ${GMP_CFLAGS} ${NTL_CFLAGS} ${OMALLOC_CFLAGS} 
+AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include $(FLINT_CFLAGS) $(GMP_CFLAGS) $(NTL_CFLAGS) $(OMALLOC_CFLAGS) 
 
 lib_LTLIBRARIES = libfactory.la
 
 libfactory_la_LIBADD     = ${builddir}/libfac/libfac.la \
-${builddir}/../omalloc/libomalloc.la ${builddir}/../resources/libresources.la \
-$(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
+$(OMALLOC_LDFLAGS) $(OMALLOC_R_LDADD) $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
 
 libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
@@ -74,7 +73,6 @@ SOURCES = \
 		int_int.cc \
 		int_intdiv.cc \
 		int_poly.cc \
-		int_pp.cc \
 		int_rat.cc \
 		variable.cc \
 		NTLconvert.cc \
@@ -144,7 +142,6 @@ factory_headers = \
 		int_cf.h \
 		int_int.h \
 		int_poly.h \
-		int_pp.h \
 		int_rat.h \
 		timing.h \
 		variable.h \
