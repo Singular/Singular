@@ -7,7 +7,7 @@ AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include $(FLINT_CFLAGS) $(GMP_CF
 lib_LTLIBRARIES = libfactory.la
 
 libfactory_la_LIBADD     = ${builddir}/libfac/libfac.la \
-$(OMALLOC_LDFLAGS) $(OMALLOC_R_LDADD) $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
+$(RESOURCES_LDFLAGS) $(OMALLOC_LDFLAGS) $(OMALLOC_R_LDADD) $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
 
 libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
