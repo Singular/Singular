@@ -802,7 +802,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef HAVE_FLINT
               StringAppend("FLINT(%s),",version);
 #endif
-
+              StringAppend("factory(%s),\n\t", factoryVersion);
 #if defined(HAVE_DYN_RL)
               if (fe_fgets_stdin==fe_fgets_dummy)
                 StringAppendS("no input,");
