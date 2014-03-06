@@ -635,6 +635,11 @@ libfactory
 factory_version
 templatedir
 gftabledir
+SING_HAVE_FLINT_FALSE
+SING_HAVE_FLINT_TRUE
+FLINT_HOME
+FLINT_LIBS
+FLINT_CFLAGS
 FACTORY_MAKEHEADER
 FACTORY_MKINSTALLDIRS
 EGREP
@@ -714,6 +719,7 @@ enable_assertions
 enable_timing
 enable_debugoutput
 enable_gmp
+with_flint
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1358,6 +1364,13 @@ Optional Packages:
                           specify where to find gmp library.
   --with-Singular         build for use with computer algebra system Singular.
   --with-NTL              build for use with NTL.
+  --with-flint=<path>|yes|no  Use FLINT library. If argument is no, you do not have
+                            the library installed on your machine (set as
+			    default). If argument is yes or <empty> that means
+			    the library is reachable with the standard search
+			    path (/usr or /usr/local). Otherwise you give the
+			    <path> to the directory which contain the library.
+
 
 Some influential environment variables:
   CC          C compiler command
@@ -4830,8 +4843,164 @@ done
 
 fi
 
-LB_CHECK_FLINT(2.3,,{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)" >&5
-$as_echo "$as_me: WARNING: Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)" >&2;})
+
+DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
+
+
+# Check whether --with-flint was given.
+if test "${with_flint+set}" = set; then :
+  withval=$with_flint; if test "$withval" = yes ; then
+			FLINT_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+	      elif test "$withval" != no ; then
+			FLINT_HOME_PATH="$withval"
+	     fi
+else
+  FLINT_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+fi
+
+
+min_flint_version=2.3
+
+
+BACKUP_CFLAGS=${CFLAGS}
+BACKUP_LIBS=${LIBS}
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+if test -n "$FLINT_HOME_PATH"; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for FLINT >= $min_flint_version" >&5
+$as_echo_n "checking for FLINT >= $min_flint_version... " >&6; }
+fi
+
+for FLINT_HOME in ${FLINT_HOME_PATH}
+ do
+if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
+
+	#if test "x$FLINT_HOME" != "x/usr"; then
+		FLINT_CFLAGS="-I${FLINT_HOME}/include"
+		FLINT_LIBS="-L${FLINT_HOME}/lib -lflint -lmpfr -lmpir"
+	#else
+	#	FLINT_CFLAGS=
+	#	FLINT_LIBS="-lflint"
+	#fi
+	CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS}"
+	LIBS="${BACKUP_LIBS} ${FLINT_LIBS}"
+
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <flint/fmpz.h>
+int
+main ()
+{
+fmpz_t a; fmpz_init (a);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+	if test "$cross_compiling" = yes; then :
+
+	flint_found="yes"
+	flint_cross="yes"
+	break
+
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <flint/flint.h>
+	int main () { if ((int) version[0] < 2) return -1; else return 0; }
+
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+
+	flint_found="yes"
+	break
+
+else
+
+	flint_problem="$problem $FLINT_HOME"
+	unset FLINT_CFLAGS
+	unset FLINT_LIBS
+
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+
+else
+
+	flint_found="no"
+	flint_checked="$checked $FLINT_HOME"
+	unset FLINT_CFLAGS
+	unset FLINT_LIBS
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+else
+	flint_found="no"
+fi
+done
+
+if test "x$flint_found" = "xyes" ; then
+
+
+
+
+$as_echo "#define HAVE_FLINT 1" >>confdefs.h
+
+	HAVE_FLINT=yes
+	if test "x$flint_cross" != "xyes"; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: found" >&5
+$as_echo "found" >&6; }
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: unknown" >&5
+$as_echo "unknown" >&6; }
+		echo "WARNING: You appear to be cross compiling, so there is no way to determine"
+		echo "whether your FLINT version is new enough. I am assuming it is."
+	fi
+	:
+elif test -n "$flint_problem"; then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: problem" >&5
+$as_echo "problem" >&6; }
+	echo "Sorry, your FLINT version is too old. Disabling."
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)" >&5
+$as_echo "$as_me: WARNING: Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)" >&2;}
+elif test   "x$flint_found" = "xno";  then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: not found" >&5
+$as_echo "not found" >&6; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)" >&5
+$as_echo "$as_me: WARNING: Unable to find FLINT (which is strongly recommended) on your machine: please use --with-flint=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)" >&2;}
+fi
+
+ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+ if test "x$HAVE_FLINT" = "xyes"; then
+  SING_HAVE_FLINT_TRUE=
+  SING_HAVE_FLINT_FALSE='#'
+else
+  SING_HAVE_FLINT_TRUE='#'
+  SING_HAVE_FLINT_FALSE=
+fi
+
+
+CFLAGS=${BACKUP_CFLAGS}
+LIBS=${BACKUP_LIBS}
+#unset LD_LIBRARY_PATH
+
+
 
 for ac_header in stdio.h stdlib.h string.h time.h math.h
 do :
@@ -5431,6 +5600,10 @@ LIBOBJS=$ac_libobjs
 LTLIBOBJS=$ac_ltlibobjs
 
 
+if test -z "${SING_HAVE_FLINT_TRUE}" && test -z "${SING_HAVE_FLINT_FALSE}"; then
+  as_fn_error $? "conditional \"SING_HAVE_FLINT\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 
 : "${CONFIG_STATUS=./config.status}"
 ac_write_fail=0
