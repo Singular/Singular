@@ -15,6 +15,9 @@ extern const char * libfac_version;
 extern const char * libfac_date;
 extern const char * libfac_author;
 
+CFFList newfactoras( const CanonicalForm & f, const CFList & as, int &success);
+CFFList newcfactor( const CanonicalForm & f, const CFList & as, int &success);
+
 //// Note: second argument for Factorize is for internal use only.
 CFFList Factorize( const CanonicalForm & F, int is_SqrFree=0 ) ;
 CFFList Factorize( const CanonicalForm & F, const CanonicalForm & mi, int is_SqrFree=0 ) ;
