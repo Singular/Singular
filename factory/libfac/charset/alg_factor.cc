@@ -77,7 +77,6 @@ void IntGenerator::next()
     current++;
 }
 
-// replacement for factory's broken resultant
 static CanonicalForm
 resultante( const CanonicalForm & f, const CanonicalForm& g, const Variable & v )
 {
@@ -88,8 +87,13 @@ resultante( const CanonicalForm & f, const CanonicalForm& g, const Variable & v 
   cd = bCommonDen( g );
   CanonicalForm gz = g * cd;
   if (!on_rational)  Off(SW_RATIONAL);
+  CanonicalForm result;
+  if (getCharacteristic() == 0)
+    result= resultantZ (fz, gz,v);
+  else
+    result= resultant (fz,gz,v);
 
-  return resultant(fz,gz,v);
+  return result;
 }
 
 // sqr-free routine for algebraic extensions
