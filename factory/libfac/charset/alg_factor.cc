@@ -633,6 +633,35 @@ endler( const CanonicalForm & f, const CFList & AS, const Varlist & uord )
   return Output;
 }
 
+void
+multiplicity (CFFList& factors, const CanonicalForm& F, const CFList& as)
+{
+  CanonicalForm G= F;
+  Variable x= F.mvar();
+  CanonicalForm q, r;
+  int count= -1;
+  On (SW_RATIONAL);
+  for (CFFListIterator iter=factors; iter.hasItem(); iter++)
+  {
+    count= -1;
+    if (iter.getItem().factor().inCoeffDomain())
+      continue;
+    while (1)
+    {
+      psqr (G, iter.getItem().factor(), q, r, x);
+
+      q= Prem (q, as);
+      r= Prem (r, as);
+      if (!r.isZero())
+        break;
+      On (SW_RATIONAL);
+      count++;
+      G= q;
+    }
+    iter.getItem()= CFFactor (iter.getItem().factor(), iter.getItem().exp()+count);
+  }
+}
+
 
 // 1) prepares data
 // 2) for char=p we distinguish 3 cases:
