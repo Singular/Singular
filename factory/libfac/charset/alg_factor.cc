@@ -518,6 +518,65 @@ QuasiInverse (const CanonicalForm& f, const CanonicalForm& g,
   return pi;
 }
 
+CanonicalForm
+evaluate (const CanonicalForm& f, const CanonicalForm& g, const CanonicalForm& h, const CanonicalForm& powH)
+{
+  if (f.inCoeffDomain())
+    return f;
+  CFIterator i= f;
+  int lastExp = i.exp();
+  CanonicalForm result = i.coeff()*powH;
+  i++;
+  while (i.hasTerms())
+  {
+    int i_exp= i.exp();
+    if ((lastExp - i_exp) == 1)
+    {
+      result *= g;
+      result /= h;
+    }
+    else
+    {
+      result *= power (g, lastExp - i_exp);
+      result /= power (h, lastExp - i_exp);
+    }
+    result += i.coeff()*powH;
+    lastExp = i_exp;
+    i++;
+  }
+  if (lastExp != 0)
+  {
+    result *= power (g, lastExp);
+    result /= power (h, lastExp);
+  }
+  return result;
+}
+
+
+/// evaluate f at g/h at v such that powH*f is integral i.e. powH is assumed to be h^degree(f,v)
+CanonicalForm
+evaluate (const CanonicalForm& f, const CanonicalForm& g,
+          const CanonicalForm& h, const CanonicalForm& powH,
+          const Variable& v)
+{
+  if (f.inCoeffDomain())
+  {
+    return f*powH;
+  }
+
+  Variable x = f.mvar();
+  if ( v > x )
+    return f*powH;
+  else  if ( v == x )
+    return evaluate (f, g, h, powH);
+
+  // v is less than main variable of f
+  CanonicalForm result= 0;
+  for (CFIterator i= f; i.hasTerms(); i++)
+    result += evaluate (i.coeff(), g, h, powH, v)*power (x, i.exp());
+  return result;
+}
+
 // calculate a "primitive element"
 // K must have more than S elements (->thesis, -> getextension)
 static CFList
