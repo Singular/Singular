@@ -376,6 +376,95 @@ getextension( IntList & degreelist, int n)
   while ( 1 );
 }
 
+
+/// pseudo division of f and g wrt. x s.t. multiplier*f=q*g+r
+/// but only if the leading coefficient of g is of level lower than coeffLevel
+void
+psqr (const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q,
+      CanonicalForm & r, CanonicalForm& multiplier, const Variable& x,
+      int coeffLevel)
+{
+  ASSERT( x.level() > 0, "type error: polynomial variable expected" );
+  ASSERT( ! g.isZero(), "math error: division by zero" );
+
+  // swap variables such that x's level is larger or equal
+  // than both f's and g's levels.
+  Variable X;
+  if (f.level() > g.level())
+    X= f.mvar();
+  else
+    X= g.mvar();
+  if (X.level() < x.level())
+    X= x;
+  CanonicalForm F= swapvar (f, x, X);
+  CanonicalForm G= swapvar (g, x, X);
+
+  // now, we have to calculate the pseudo remainder of F and G
+  // w.r.t. X
+  int fDegree= degree (F, X);
+  int gDegree= degree (G, X);
+  if (fDegree < 0 || fDegree < gDegree)
+  {
+    q= 0;
+    r= f;
+  }
+  else
+  {
+    CanonicalForm LCG= LC (G, X);
+    if (LCG.level() < coeffLevel)
+    {
+      multiplier= power (LCG, fDegree - gDegree + 1);
+      divrem (multiplier*F, G, q, r);
+      q= swapvar (q, x, X);
+      r= swapvar (r, x, X);
+    }
+    else
+    {
+      q= 0;
+      r= f;
+    }
+  }
+}
+
+/// pseudo division of f and g wrt. x s.t. multiplier*f=q*g+r
+void
+psqr (const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, 
+      CanonicalForm & r, CanonicalForm& multiplier, const Variable& x)
+{
+    ASSERT( x.level() > 0, "type error: polynomial variable expected" );
+    ASSERT( ! g.isZero(), "math error: division by zero" );
+
+    // swap variables such that x's level is larger or equal
+    // than both f's and g's levels.
+    Variable X;
+    if (f.level() > g.level())
+      X= f.mvar();
+    else
+      X= g.mvar();
+    if (X.level() < x.level())
+      X= x;
+    CanonicalForm F= swapvar (f, x, X);
+    CanonicalForm G= swapvar (g, x, X);
+
+    // now, we have to calculate the pseudo remainder of F and G
+    // w.r.t. X
+    int fDegree= degree (F, X);
+    int gDegree= degree (G, X);
+    if (fDegree < 0 || fDegree < gDegree)
+    {
+      q= 0;
+      r= f;
+    }
+    else
+    {
+      CanonicalForm LCG= LC (G, X);
+      multiplier= power (LCG, fDegree - gDegree + 1);
+      divrem (multiplier*F, G, q, r);
+      q= swapvar (q, x, X);
+      r= swapvar (r, x, X);
+    }
+}
+
 // calculate a "primitive element"
 // K must have more than S elements (->thesis, -> getextension)
 static CFList
