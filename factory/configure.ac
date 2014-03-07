@@ -438,7 +438,7 @@ AC_SUBST(MAKEHEADERFLAGS)
 #AC_SUBST(installtargets)
 #AC_SUBST(uninstalltargets)
 
-factory_version="3.1.3"
+factory_version="4.0.0"
 factory_configuration="'$ac_configure_args' in `pwd`"
 AC_SUBST(factory_version)
 
