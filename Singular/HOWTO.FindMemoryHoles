@@ -1,5 +1,14 @@
-Here is a first short HowTo on how to locate memory holes in Singular:
-1.) Make sure you build with -DOM_TRACK=5 (e.g. use Singulart, Singularg).
+Here is a HowTo for locating memory holes in Singular:
+
+0.) disable optimization and define flag OM_TRACK=5 :
+     set  
+       CXXFLAGS=" -O0 -DOM_TRACK=5 " 
+         CFLAGS=" -O0 -DOM_TRACK=5 " 
+     explicitly, since configure option '--disable-optimizationflags' does not enable -O0
+
+1.) configure Singular with options 
+     " --enable-debug --with-track-fl --with-track-backtrace " 
+     or similar (see available options from 'cd omalloc/ && ./configure --help )
 2.) Use system("mtrack", [<level>, [<filename>]]) to get a report about
     unused memory, where
  * 0 <= level <= 5 determines how many stackframes per not freed
