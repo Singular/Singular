@@ -465,6 +465,59 @@ psqr (const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q,
     }
 }
 
+CanonicalForm
+QuasiInverse (const CanonicalForm& f, const CanonicalForm& g,
+      CanonicalForm& numt, const Variable& x)
+{
+  CanonicalForm pi, pi1, q, t0, t1, Hi, bi, pi2;
+  bool isRat= isOn (SW_RATIONAL);
+  CanonicalForm m,tmp;
+  if (isRat)
+    Off (SW_RATIONAL);
+  pi= f/content (f,x);
+  pi1= g/content (g,x);
+
+  t0= 0;
+  t1= 1;
+  bi= 1;
+
+  On (SW_RATIONAL);
+
+  int delta= degree (f, x) - degree (g, x);
+  Hi= power (LC (pi1, x), delta);
+  if ( (delta+1) % 2 )
+      bi = 1;
+  else
+      bi = -1;
+
+  while (degree (pi1,x) > 0)
+  {
+    On (SW_RATIONAL);
+    psqr( pi, pi1, q, pi2, m, x);
+    pi2 /= bi;
+
+    tmp= t1;
+    t1= t0*m - t1*q;
+    t0= tmp;
+    t1 /= bi;
+    pi = pi1; pi1 = pi2;
+    if ( degree ( pi1, x ) > 0 )
+    {
+      delta = degree( pi, x ) - degree( pi1, x );
+      if ( (delta+1) % 2 )
+        bi = LC( pi, x ) * power( Hi, delta );
+      else
+        bi = -LC( pi, x ) * power( Hi, delta );
+      Hi = power( LC( pi1, x ), delta ) / power( Hi, delta-1 );
+    }
+  }
+  t1 /= gcd (pi1, t1);
+  if (!isRat)
+    Off (SW_RATIONAL);
+  numt= t1;
+  return pi;
+}
+
 // calculate a "primitive element"
 // K must have more than S elements (->thesis, -> getextension)
 static CFList
