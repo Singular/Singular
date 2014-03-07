@@ -106,4 +106,7 @@
 /*MAKEHEADER PUBLIC ONLY*/
 #include "facAbsFact.h"
 
+/*MAKEHEADER PUBLIC ONLY*/
+#include "cfModResultant.h"
+
 #endif /* ! INCL_FACTORY_H */
