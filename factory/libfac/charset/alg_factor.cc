@@ -580,29 +580,109 @@ evaluate (const CanonicalForm& f, const CanonicalForm& g,
 // calculate a "primitive element"
 // K must have more than S elements (->thesis, -> getextension)
 static CFList
-simpleextension(const CFList & Astar, const Variable & Extension,
-                CanonicalForm & R){
+simpleextension(const CFList & Astar, const Variable & Extension, bool& isFunctionField,
+                CanonicalForm & R)
+{
   CFList Returnlist, Bstar=Astar;
-  CanonicalForm s, g;
+  CanonicalForm s, g, ra, rb, oldR, h, denra, denrb=1;
+  Variable alpha;
+  CFList tmp;
+
+  bool isRat= isOn (SW_RATIONAL);
 
   DEBOUTLN(CERR, "simpleextension: Astar= ", Astar);
   DEBOUTLN(CERR, "simpleextension:     R= ", R);
   DEBOUTLN(CERR, "simpleextension: Extension= ", Extension);
-  if ( Astar.length() == 1 ){ R= Astar.getFirst();}
-  else{
-    R=Bstar.getFirst(); Bstar.removeFirst();
-    for ( CFListIterator i=Bstar; i.hasItem(); i++){
-      DEBOUTLN(CERR, "simpleextension: f(x)= ", i.getItem());
-      DEBOUTLN(CERR, "simpleextension: P(x)= ", R);
-      sqrf_norm(i.getItem(), R, Extension, s, g, R);
-      // spielt die Repraesentation eine Rolle?
-      // muessen wir die Nachfolger aendern, wenn s != 0 ?
+  CFListIterator j;
+  if (Astar.length() == 1)
+  {
+    R= Astar.getFirst();
+    rb= R.mvar();
+  }
+  else
+  {
+    R=Bstar.getFirst();
+    Bstar.removeFirst();
+    for (CFListIterator i=Bstar; i.hasItem(); i++)
+    {
+      j= i;
+      j++;
+      Off (SW_RATIONAL);
+      R /= icontent (R);
+      On (SW_RATIONAL);
+      oldR= R;
+      sqrf_norm (i.getItem(), R, Extension, s, g, R);
+
+      Off (SW_RATIONAL);
+      R /= icontent (R);
+
+      On (SW_RATIONAL);
+
+      if (!isFunctionField)
+      {
+        alpha= rootOf (R);
+        h= replacevar (g, g.mvar(), alpha);
+        On (SW_RATIONAL); //needed for GCD
+        h= gcd (h, oldR);
+        h /= Lc (h);
+        ra= -h[0];
+        ra= replacevar(ra, alpha, g.mvar());
+        rb= R.mvar()-s*ra;
+        for (; j.hasItem(); j++)
+        {
+          j.getItem()= j.getItem() (ra, oldR.mvar());
+          j.getItem()= j.getItem() (rb, i.getItem().mvar());
+        }
+      }
+      else
+      {
+        On (SW_RATIONAL);
+        h= swapvar (g, g.mvar(), oldR.mvar());
+        tmp= CFList (swapvar (R, g.mvar(), oldR.mvar()));
+        h= alg_gcd (h, swapvar (oldR, g.mvar(), oldR.mvar()), tmp);
+        CanonicalForm hh= replacevar (h, oldR.mvar(), alpha);
+
+        CanonicalForm numt, dent;
+        QuasiInverse (tmp.getFirst(), LC (h), numt, tmp.getFirst().mvar());
+
+        Off (SW_RATIONAL);
+        h *= numt;
+        h= reduce (h, tmp.getFirst());
+        dent= LC(h);
+
+        ra= -h[0];
+        denra= gcd (ra, dent);
+        ra /= denra;
+        denra= dent/denra;
+        denra= replacevar (denra, ra.mvar(), g.mvar());
+        ra= replacevar(ra, ra.mvar(), g.mvar());
+        rb= R.mvar()*denra-s*ra;
+        denrb= denra;
+        for (; j.hasItem(); j++)
+        {
+          CanonicalForm powdenra= power (denra, degree (j.getItem(), oldR.mvar()));
+          j.getItem()= evaluate (j.getItem(),ra, denra, powdenra, oldR.mvar());
+          powdenra= power (denra, degree (j.getItem(), i.getItem().mvar()));
+          j.getItem()= evaluate (j.getItem(), rb, denrb, powdenra, i.getItem().mvar());
+        }
+      }
+
       DEBOUTLN(CERR, "simpleextension: g= ", g);
       DEBOUTLN(CERR, "simpleextension: s= ", s);
       DEBOUTLN(CERR, "simpleextension: R= ", R);
-      Returnlist.insert(s);
+      Returnlist.append (ra);
+      if (isFunctionField)
+        Returnlist.append (denra);
     }
   }
+  Returnlist.append (rb);
+  if (isFunctionField)
+    Returnlist.append (denrb);
+
+  if (isRat)
+    On (SW_RATIONAL);
+  else
+    Off (SW_RATIONAL);
 
   return Returnlist;
 }
