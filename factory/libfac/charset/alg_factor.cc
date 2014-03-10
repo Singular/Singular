@@ -732,24 +732,48 @@ subst (const CanonicalForm& f, const CFList& a, const CFList& b,
 // the heart of the algorithm: the one from Trager
 #ifndef DEBUGOUTPUT
 static CFFList
-alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vminpoly, const Varlist /*& oldord*/, const CFList & as)
+alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vminpoly, const Varlist /*& oldord*/, const CFList & as, bool isFunctionField)
 #else
 static CFFList
-alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vminpoly, const Varlist & oldord, const CFList & as)
+alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vminpoly, const Varlist & oldord, const CFList & as, bool isFunctionField)
 #endif
 {
   CFFList L, Factorlist;
-  CanonicalForm R, Rstar, s, g, h;
+  CanonicalForm R, Rstar, s, g, h, f= F;
   CFList substlist;
 
   DEBINCLEVEL(CERR,"alg_factor");
   DEBOUTLN(CERR, "alg_factor: f= ", f);
 
   //out_cf("start alg_factor:",f,"\n");
-  substlist= simpleextension(Astar, vminpoly, Rstar);
+  substlist= simpleextension(Astar, vminpoly, isFunctionField, Rstar);
   DEBOUTLN(CERR, "alg_factor: substlist= ", substlist);
   DEBOUTLN(CERR, "alg_factor: minpoly Rstar= ", Rstar);
   DEBOUTLN(CERR, "alg_factor: vminpoly= ", vminpoly);
+
+  f= subst (f, Astar, substlist, Rstar, isFunctionField);
+
+  Variable alpha;
+  if (!isFunctionField)
+  {
+    alpha= rootOf (Rstar);
+    g= replacevar (f, Rstar.mvar(), alpha);
+
+    Factorlist= factorize (g, alpha);
+
+    for (CFFListIterator i= Factorlist; i.hasItem(); i++)
+    {
+      h= i.getItem().factor();
+      if (!h.inCoeffDomain())
+      {
+        h= replacevar (h, alpha, Rstar.mvar());
+        h *= bCommonDen(h);
+        h= Prem (h, as);
+        L.append (CFFactor (h, i.getItem().exp()));
+      }
+    }
+    return L;
+  }
 
   sqrf_norm(f, Rstar, vminpoly, s, g, R );
   //out_cf("sqrf_norm R:",R,"\n");
@@ -1046,21 +1070,32 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
 
   CFFList Factorlist;
   Varlist gcdord= Union(ord,newuord); gcdord.append(f.mvar());
+  bool isFunctionField= (newuord.length() > 0);
+
   // This is for now. we need alg_sqrfree implemented!
-  CanonicalForm Fgcd;
-          Fgcd= alg_gcd(f,f.deriv(),Astar);
+  CanonicalForm Fgcd= 0;
+  if (isFunctionField)
+    Fgcd= alg_gcd(f,f.deriv(),Astar);
+
   if ( Fgcd == 0 ) {DEBOUTMSG(CERR, "WARNING: p'th root ?");}
-  if (( degree(Fgcd, f.mvar()) > 0) && (!(f.deriv().isZero())) ){
+  if (isFunctionField && ( degree(Fgcd, f.mvar()) > 0) && (!(f.deriv().isZero())) )
+  {
     DEBOUTLN(CERR, "Nontrivial GCD found of ", f);
     CanonicalForm Ggcd= divide(f, Fgcd,Astar);
+    if (getCharacteristic() == 0)
+    {
+      CFFList result= newfactoras (Ggcd,as,success); //Ggcd is the squarefree part of f
+      multiplicity (result, f, Astar);
+      return result;
+    }
     DEBOUTLN(CERR, "  split into ", Fgcd);
     DEBOUTLN(CERR, "         and ", Ggcd);
     Fgcd= pp(Fgcd); Ggcd= pp(Ggcd);
     DEBDECLEVEL(CERR,"newfactoras");
     return myUnion(newfactoras(Fgcd,as,success) , newfactoras(Ggcd,as,success));
   }
-  if ( getCharacteristic() > 0 ){
-
+  if ( getCharacteristic() > 0 )
+  {
     // First look for extension!
     IntList degreelist;
     Variable vminpoly;
@@ -1076,7 +1111,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
         DEBOUTLN(CERR, "Minpoly produced ", MIPO);
         vminpoly= rootOf(MIPO);
       }
-      Factorlist= alg_factor(f, Astar, vminpoly, oldord, as);
+      Factorlist= alg_factor(f, Astar, vminpoly, oldord, as, isFunctionField);
       DEBDECLEVEL(CERR,"newfactoras");
       return Factorlist;
     }
@@ -1096,7 +1131,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
         DEBOUTLN(CERR, "vminpoly= ", vminpoly);
         DEBOUTLN(CERR, "degree(vminpoly)= ", degree(vminpoly));
       }
-      Factorlist= alg_factor(f, Astar, vminpoly, oldord, as);
+      Factorlist= alg_factor(f, Astar, vminpoly, oldord, as, isFunctionField);
       DEBDECLEVEL(CERR,"newfactoras");
       return Factorlist;
     }
@@ -1104,7 +1139,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
   else{ // char=0 apply trager directly
     DEBOUTMSG(CERR, "Char=0! Apply Trager!");
     Variable vminpoly;
-    Factorlist= alg_factor(f, Astar, vminpoly, oldord, as);
+    Factorlist= alg_factor(f, Astar, vminpoly, oldord, as, isFunctionField);
       DEBDECLEVEL(CERR,"newfactoras");
       return Factorlist;
   }
@@ -1116,13 +1151,21 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
 CFFList
 newcfactor(const CanonicalForm & f, const CFList & as, int & success )
 {
-  Off(SW_RATIONAL);
-  CFFList Output, output, Factors=Factorize(f);
-  On(SW_RATIONAL);
-  Factors.removeFirst();
+  On (SW_RATIONAL);
+  CFFList Output, output, Factors= factorize(f);
+  if (Factors.getFirst().factor().inCoeffDomain())
+    Factors.removeFirst();
 
-  if ( as.length() == 0 ){ success=1; return Factors;}
-  if ( cls(f) <= cls(as.getLast()) ) { success=1; return Factors;}
+  if ( as.length() == 0 )
+  {
+    success=1;
+    return Factors;
+  }
+  if ( cls(f) <= cls(as.getLast()) )
+  {
+    success=1;
+    return Factors;
+  }
 
   success=1;
   for ( CFFListIterator i=Factors; i.hasItem(); i++ )
