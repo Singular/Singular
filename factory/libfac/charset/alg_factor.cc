@@ -697,6 +697,38 @@ CanonicalForm alg_lc(const CanonicalForm &f)
   return f;
 }
 
+CanonicalForm
+subst (const CanonicalForm& f, const CFList& a, const CFList& b,
+       const CanonicalForm& Rstar, bool isFunctionField)
+{
+  if (isFunctionField)
+    ASSERT (2*a.length() == b.length(), "wrong length of lists");
+  else
+    ASSERT (a.length() == b.length(), "lists of equal length expected");
+  CFListIterator j= b;
+  CanonicalForm result= f, tmp, powj;
+  for (CFListIterator i= a; i.hasItem() && j.hasItem(); i++, j++)
+  {
+    if (!isFunctionField)
+      result= result (j.getItem(), i.getItem().mvar());
+    else
+    {
+      tmp= j.getItem();
+      j++;
+      powj= power (j.getItem(), degree (result, i.getItem().mvar()));
+      result= evaluate (result, tmp, j.getItem(), powj, i.getItem().mvar());
+
+      if (fdivides (powj, result, tmp))
+        result= tmp;
+
+      result /= vcontent (result, Variable (i.getItem().level() + 1));
+    }
+  }
+  result= reduce (result, Rstar);
+  result /= vcontent (result, Variable (Rstar.level() + 1));
+  return result;
+}
+
 // the heart of the algorithm: the one from Trager
 #ifndef DEBUGOUTPUT
 static CFFList
