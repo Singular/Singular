@@ -254,7 +254,9 @@ myfitting( const CanonicalForm &f, const CFList &as )
      return num((rem/lc(rem)));
    else
    {
-     On(SW_RATIONAL);
+     bool isRat= isOn (SW_RATIONAL);
+     if (!isRat)
+       On(SW_RATIONAL);
      CanonicalForm temp= mapinto(rem);
 //      CERR << "temp= " << temp << "\n";
 //      CERR << "lc(temp)= " << lc(temp) << "\n";
@@ -289,7 +291,8 @@ myfitting( const CanonicalForm &f, const CFList &as )
      }
 
      temp= bCommonDen(temp/lc(temp))*(temp/lc(temp));
-     Off(SW_RATIONAL);
+     if (!isRat)
+       Off(SW_RATIONAL);
      rem= mapinto(temp);
      return rem;
    }
