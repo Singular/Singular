@@ -1296,7 +1296,9 @@ attr * sleftv::Attribute()
 {
   if (e==NULL) return &attribute;
   if ((rtyp==LIST_CMD)
-  ||((rtyp==IDHDL)&&(IDTYP((idhdl)data)==LIST_CMD)))
+  ||((rtyp==IDHDL)&&(IDTYP((idhdl)data)==LIST_CMD))
+  || (rtyp>MAX_TOK)
+  || ((rtyp==IDHDL)&&(IDTYP((idhdl)data)>MAX_TOK)))
   {
     leftv v=LData();
     return &(v->attribute);
@@ -1309,11 +1311,18 @@ leftv sleftv::LData()
   if (e!=NULL)
   {
     lists l=NULL;
+    blackbox *b=getBlackboxStuff(rtyp);
 
-    if (rtyp==LIST_CMD)
+    if ((rtyp==LIST_CMD)
+    || ((b!=NULL)&&(BB_LIKE_LIST(b))))
       l=(lists)data;
     else if ((rtyp==IDHDL)&& (IDTYP((idhdl)data)==LIST_CMD))
       l=IDLIST((idhdl)data);
+    else if ((rtyp==IDHDL)&& (IDTYP((idhdl)data)>MAX_TOK))
+    {
+      b=getBlackboxStuff(IDTYP((idhdl)data));
+      if (BB_LIKE_LIST(b)) l=IDLIST((idhdl)data);
+    }
     else if (rtyp==ALIAS_CMD)
     {
       idhdl h=(idhdl)data;
