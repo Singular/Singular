@@ -17,7 +17,7 @@
 // const CFSwitchesMax - maximum number of switches.
 //
 //}}}
-const int CFSwitchesMax = 13;
+const int CFSwitchesMax = 12;
 //}}}
 
 //{{{ class CFSwitches

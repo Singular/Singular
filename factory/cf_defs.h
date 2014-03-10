@@ -30,13 +30,12 @@ const int SW_BERLEKAMP = 2;
 const int SW_FAC_QUADRATICLIFT = 3;
 const int SW_USE_EZGCD = 4;
 const int SW_USE_EZGCD_P = 5;
-const int SW_USE_NTL=6;
-const int SW_USE_NTL_GCD_0=7;
-const int SW_USE_NTL_GCD_P=8;
-const int SW_USE_NTL_SORT=9;
-const int SW_USE_CHINREM_GCD=10;
-const int SW_USE_QGCD=11;
-const int SW_USE_FF_MOD_GCD=12;
+const int SW_USE_NTL_GCD_0=6;
+const int SW_USE_NTL_GCD_P=7;
+const int SW_USE_NTL_SORT=8;
+const int SW_USE_CHINREM_GCD=9;
+const int SW_USE_QGCD=10;
+const int SW_USE_FF_MOD_GCD=11;
 //}}}
 
 /*ENDPUBLIC*/
