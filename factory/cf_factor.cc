@@ -482,15 +482,15 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
           // convert back to factory again using the faster conversion routine for vectors over GF2X
           F=convertNTLvec_pair_GF2X_long2FacCFFList(factors,LeadCoeff(f1),f.mvar());
         }
-      }
-      else
+      } 
+      else // not (isOn(SW_USE_NTL) && (isPurePoly(f)) ) && not  HAVE_FLINT && degree(f)>300 
 #endif //HAVE_NTL
-      {  // Use Factory without NTL
-        factoryError ("uniivariate factorization not implemented");
+      {  // NO NTL || [ not (isOn(SW_USE_NTL) && (isPurePoly(f)) ) && not  HAVE_FLINT && degree(f)>300      ]
+        factoryError (" f is not pure poly or NTL is missing or NTL is disabled.");
         return CFFList (CFFactor (f, 1));
       }
     }
-    else
+    else // f is not univariate
     {
       #ifdef HAVE_NTL
       if (issqrfree)
@@ -517,8 +517,8 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
           F= FpFactorize (f);
       }
       #else
-      ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
-      factoryError ("multivariate factorization not implemented");
+      ASSERT( f.isUnivariate(), "multivariate factorization depends on NTL(missing)" );
+      factoryError ("multivariate factorization depends on NTL(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
     }
@@ -564,10 +564,11 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
             F.insert( new_first );
           }
         }
-      }
+      } 
+      // jk: what happens here if we have NTL, f isPurePoly, but not isOn(SW_USE_NTL). nothing??
       #else
       {
-        factoryError ("univariate factorization over Z not implemented"); 
+        factoryError ("univariate factorization over Z depends on NTL(missing)"); 
         return CFFList (CFFactor (f, 1));
       }
       #endif
@@ -587,7 +588,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         F = ratFactorize (fz);
       Off (SW_RATIONAL);
       #else
-      factoryError ("multivariate factorization not implemented");
+      factoryError ("multivariate factorization  depends on NTL(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
     }
@@ -680,7 +681,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
         // return converted result
         F=convertNTLvec_pair_zzpEX_long2FacCFFList(factors,leadcoeff,f.mvar(),alpha);
 #endif
-      }
+      } //fi ch>=2
       else if (/*getCharacteristic()*/ch==2)
       {
         // special case : GF2
@@ -714,14 +715,14 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
         // return converted result
         F=convertNTLvec_pair_GF2EX_long2FacCFFList(factors,f1_coef,f.mvar(),alpha);
       }
-      else
+      else // ch < 2 
       {
       }
-    }
+    } //fi (isOn(SW_USE_NTL)) && HAVE_NTL
     else
     #endif
-    {
-      factoryError ("univariate factorization not implemented");
+    { // no NTL or NTL disabled:
+      factoryError ("univariate factorization:  NTL(missing or disabled)");
       return CFFList (CFFactor (f, 1));
     }
   }
@@ -730,8 +731,8 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     #ifdef HAVE_NTL
     F= FqFactorize (f, alpha);
     #else
-    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
-    factoryError ("multivariate factorization not implemented");
+    ASSERT( f.isUnivariate(), "multivariate factorization depends on NTL(missing)" );
+    factoryError ("multivariate factorization  depends on NTL(missing)");
     return CFFList (CFFactor (f, 1));
     #endif
 
@@ -745,8 +746,8 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 #ifdef HAVE_NTL
     F= ratFactorize (f, alpha);
 #else
-    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
-    factoryError ("multivariate factorization not implemented");
+    ASSERT( f.isUnivariate(), "multivariate factorization  depends on NTL(missing)" );
+    factoryError ("multivariate factorization  depends on NTL(missing)");
     return CFFList (CFFactor (f, 1));
 #endif
   }
