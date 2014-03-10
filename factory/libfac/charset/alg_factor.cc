@@ -123,7 +123,7 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
 
   DEBOUTLN(CERR, "sqrf_norm_sub:      f= ", f);
   DEBOUTLN(CERR, "sqrf_norm_sub: Palpha= ", Palpha);
-  myrandom.reset();   s=f.mvar()-myrandom.item()*Palpha.mvar();   g=f;
+  myrandom.reset();   s=myrandom.item();   g=f;
   R= CanonicalForm(0);
   DEBOUTLN(CERR, "sqrf_norm_sub: myrandom s= ", s);
 
@@ -138,8 +138,10 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     {
       temp= gcd(R, R.deriv(vf));
       DEBOUTLN(CERR, "sqrf_norm_sub: temp= ", temp);
-      if (degree(temp,vf) != 0 || temp == temp.genZero() ){ sqfreetest= 0; }
-      else { sqfreetest= 1; }
+      if (degree(temp,vf) != 0 || temp == temp.genZero() )
+        sqfreetest= 0;
+      else
+        sqfreetest= 1;
       DEBOUTLN(CERR, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
     else
@@ -151,25 +153,31 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       // ...but it should go away soon!!!!
       Variable X;
       if (getAlgVar(R,X))
-      {
-          testlist=factorize( R, X );
-      }
+        testlist=factorize( R, X );
       else
-        testlist= Factorize(R);
+        testlist= factorize(R);
       DEBOUTLN(CERR, "testlist= ", testlist);
       testlist.removeFirst();
       sqfreetest=1;
       for ( i=testlist; i.hasItem(); i++)
-        if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0) { sqfreetest=0; break; }
+      {
+        if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0)
+        {
+          sqfreetest=0;
+          break;
+        }
+      }
       DEBOUTLN(CERR, "SqrFreeTest(R)= ", sqfreetest);
     }
     if ( ! sqfreetest )
     {
       myrandom.next();
       DEBOUTLN(CERR, "sqrf_norm_sub generated new myrandom item: ", myrandom.item());
-      if ( getCharacteristic() == 0 ) t= CanonicalForm(mapinto(myrandom.item()));
-      else t= CanonicalForm(myrandom.item());
-      s= f.mvar()+t*Palpha.mvar(); // s defines backsubstitution
+      if ( getCharacteristic() == 0 )
+        t= CanonicalForm(mapinto(myrandom.item()));
+      else
+        t= CanonicalForm(myrandom.item());
+      s= t;
       DEBOUTLN(CERR, "sqrf_norm_sub: testing s= ", s);
       g= f(f.mvar()-t*Palpha.mvar(), f.mvar());
       DEBOUTLN(CERR, "             gives g= ", g);
@@ -189,7 +197,7 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
 
   DEBOUTLN(CERR, "sqrf_norm_sub:      f= ", f);
   DEBOUTLN(CERR, "sqrf_norm_sub: Palpha= ", Palpha);
-  myrandom.reset();   s=f.mvar()-myrandom.item()*Palpha.mvar();   g=f;
+  myrandom.reset();   s=myrandom.item();   g=f;
   R= CanonicalForm(0);
   DEBOUTLN(CERR, "sqrf_norm_sub: myrandom s= ", s);
 
@@ -204,8 +212,10 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     {
       temp= gcd(R, R.deriv(vf));
       DEBOUTLN(CERR, "sqrf_norm_sub: temp= ", temp);
-      if (degree(temp,vf) != 0 || temp == temp.genZero() ){ sqfreetest= 0; }
-      else { sqfreetest= 1; }
+      if (degree(temp,vf) != 0 || temp == temp.genZero() )
+        sqfreetest= 0;
+      else
+        sqfreetest= 1;
       DEBOUTLN(CERR, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
     else
@@ -217,25 +227,31 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       // ...but it should go away soon!!!!
       Variable X;
       if (getAlgVar(R,X))
-      {
-          testlist=factorize( R, X );
-      }
+        testlist= factorize( R, X );
       else
-        testlist= Factorize(R);
+        testlist= factorize(R);
       DEBOUTLN(CERR, "testlist= ", testlist);
       testlist.removeFirst();
       sqfreetest=1;
       for ( i=testlist; i.hasItem(); i++)
-        if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0) { sqfreetest=0; break; }
+      {
+        if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0)
+        {
+          sqfreetest=0;
+          break;
+        }
+      }
       DEBOUTLN(CERR, "SqrFreeTest(R)= ", sqfreetest);
     }
     if ( ! sqfreetest )
     {
       myrandom.next();
       DEBOUTLN(CERR, "sqrf_norm_sub generated new myrandom item: ", myrandom.item());
-      if ( getCharacteristic() == 0 ) t= CanonicalForm(mapinto(myrandom.item()));
-      else t= CanonicalForm(myrandom.item());
-      s= f.mvar()+t*Palpha.mvar(); // s defines backsubstitution
+      if ( getCharacteristic() == 0 )
+        t= CanonicalForm(mapinto(myrandom.item()));
+      else
+        t= CanonicalForm(myrandom.item());
+      s= t;
       DEBOUTLN(CERR, "sqrf_norm_sub: testing s= ", s);
       g= f(f.mvar()-t*Palpha.mvar(), f.mvar());
       DEBOUTLN(CERR, "             gives g= ", g);
