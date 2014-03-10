@@ -345,6 +345,7 @@ ring   rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *bl
 int    r_IsRingVar(const char *n, char**names, int N);
 void   rWrite(ring r, BOOLEAN details = FALSE);
 ring   rCopy(ring r);
+ring   rCopyNewCoeff(ring r, mpz_t Base, int Exp, n_coeffType typ);
 ring   rCopy0(const ring r, BOOLEAN copy_qideal = TRUE, BOOLEAN copy_ordering = TRUE);
 ring rCopy0AndAddA(ring r, int64vec *wv64, BOOLEAN copy_qideal = TRUE,
                    BOOLEAN copy_ordering = TRUE);

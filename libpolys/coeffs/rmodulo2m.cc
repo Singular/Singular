@@ -562,6 +562,12 @@ number nr2mMapMachineInt(number from, const coeffs /*src*/, const coeffs dst)
   return (number)i;
 }
 
+number nr2mMapProject(number from, const coeffs /*src*/, const coeffs dst)
+{
+  NATNUMBER i = ((NATNUMBER)from) % (dst->mod2mMask + 1);
+  return (number)i;
+}
+
 number nr2mMapZp(number from, const coeffs /*src*/, const coeffs dst)
 {
   NATNUMBER j = (NATNUMBER)1;
@@ -622,6 +628,7 @@ nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
      && (src->mod2mMask > dst->mod2mMask))
   { /* i.e. map an integer mod 2^s into Z mod 2^t, where t > s */
     // to be done
+    return nr2mMapProject;
   }
   if (nCoeff_is_Ring_Z(src))
   {

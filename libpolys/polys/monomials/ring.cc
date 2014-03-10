@@ -21,6 +21,7 @@
 
 #include <coeffs/numbers.h>
 #include <coeffs/coeffs.h>
+#include <coeffs/rmodulon.h>
 
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>
@@ -1599,6 +1600,48 @@ ring rCopy(ring r)
     if( nc_rCopy(res, r, true) ) {}
 #endif
 
+  return res;
+}
+
+/*
+ * create a copy of the ring r, which must be equivalent to currRing
+ * used for qring definition, but allows change of coefficients to
+ * new modulus, e.g. Z to Z/m or Z/n to Z/gcd(m,n)
+ * otherwise identical to rCopy
+ */
+ring rCopyNewCoeff(ring r, mpz_t Base, int Exp, n_coeffType typ)
+{
+  if (r == NULL) return NULL;
+  ring res=rCopy0(r,FALSE,TRUE);
+  int_number dummy;
+  dummy = (int_number) omAlloc(sizeof(mpz_t));
+  mpz_init_set(dummy, Base);
+  ZnmInfo info;
+  info.base = dummy;
+  info.exp = (unsigned long) Exp;
+  nKillChar(res->cf);
+  coeffs cf;
+  if(typ == n_Zn)
+  {
+    cf = nInitChar(n_Zn,(void*) &info);
+  }
+  if(typ == n_Znm)
+  {
+    cf = nInitChar(n_Znm,(void*) &info);
+  }
+  if(typ == n_Z2m)
+  {
+    cf = nInitChar(n_Z2m,(void*)(long)Exp);
+  }
+  res->cf = cf;
+  rComplete(res, 1); // res is purely commutative so far
+  if (r->qideal!=NULL) res->qideal=idrCopyR_NoSort(r->qideal, r, res);
+
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+    if( nc_rCopy(res, r, true) ) {}
+#endif
+  //omFreeSize(dummy, sizeof(mpz_t));
   return res;
 }
 

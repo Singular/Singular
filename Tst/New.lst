@@ -43,3 +43,10 @@ New/bug_std.tst
 New/hdepth.tst
 New/bug_541_interred.tst
 New/mstd_integer.tst
+New/bug_std_qring_559.tst
+New/qring_with_constant.tst
+New/qring_2tom.tst
+New/qring_ntom.tst
+New/qring_ZmtoZmn.tst
+New/qring_ZmtoZmn_errorCoprime.tst
+New/qring_ZtoZm.tst
