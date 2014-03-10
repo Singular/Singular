@@ -2525,9 +2525,9 @@ static BOOLEAN jjINTERPOLATION (leftv res, leftv l, leftv v)
   const lists L = (lists)l->Data();
   const int n = L->nr; assume (n >= 0);
   std::vector<ideal> V(n + 1);
- 
+
   for(int i = n; i >= 0; i--) V[i] = (ideal)(L->m[i].Data());
-   
+
   res->data=interpolation(V, (intvec*)v->Data());
   setFlag(res,FLAG_STD);
   return errorreported;
@@ -5113,26 +5113,27 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
   int t=(int)(long)v->data;
   switch (t)
   {
-    case INT_CMD:        res->data=omStrDup("int"); break;
-    case POLY_CMD:       res->data=omStrDup("poly"); break;
-    case VECTOR_CMD:     res->data=omStrDup("vector"); break;
-    case STRING_CMD:     res->data=omStrDup("string"); break;
-    case INTVEC_CMD:     res->data=omStrDup("intvec"); break;
-    case IDEAL_CMD:      res->data=omStrDup("ideal"); break;
-    case MATRIX_CMD:     res->data=omStrDup("matrix"); break;
-    case MODUL_CMD:      res->data=omStrDup("module"); break;
-    case MAP_CMD:        res->data=omStrDup("map"); break;
-    case PROC_CMD:       res->data=omStrDup("proc"); break;
-    case RING_CMD:       res->data=omStrDup("ring"); break;
-    case QRING_CMD:      res->data=omStrDup("qring"); break;
-    case INTMAT_CMD:     res->data=omStrDup("intmat"); break;
-    case BIGINTMAT_CMD:  res->data=omStrDup("bigintmat"); break;
-    case NUMBER_CMD:     res->data=omStrDup("number"); break;
-    case BIGINT_CMD:     res->data=omStrDup("bigint"); break;
-    case LIST_CMD:       res->data=omStrDup("list"); break;
-    case PACKAGE_CMD:    res->data=omStrDup("package"); break;
-    case LINK_CMD:       res->data=omStrDup("link"); break;
-    case RESOLUTION_CMD: res->data=omStrDup("resolution");break;
+    case INT_CMD:
+    case POLY_CMD:
+    case VECTOR_CMD:
+    case STRING_CMD:
+    case INTVEC_CMD:
+    case IDEAL_CMD:
+    case MATRIX_CMD:
+    case MODUL_CMD:
+    case MAP_CMD:
+    case PROC_CMD:
+    case RING_CMD:
+    case QRING_CMD:
+    case INTMAT_CMD:
+    case BIGINTMAT_CMD:
+    case NUMBER_CMD:
+    case BIGINT_CMD:
+    case LIST_CMD:
+    case PACKAGE_CMD:
+    case LINK_CMD:
+    case RESOLUTION_CMD:
+         res->data=omStrDup(Tok2Cmdname(t)); break;
     case DEF_CMD:
     case NONE:           res->data=omStrDup("none"); break;
     default:
