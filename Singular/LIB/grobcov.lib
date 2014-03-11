@@ -195,7 +195,7 @@ EXAMPLE:  setglobalrings; shows an example"
   }
   def RR=basering;
   def @R=basering;  // must be of the form K[a][x], a=parameters, x=variables
-  def Rx=ringlist(RR);
+  list Rx=ringlist(RR);
   def @P=ring(Rx[1]);
   list Lx;
   Lx[1]=0;
@@ -209,7 +209,7 @@ EXAMPLE:  setglobalrings; shows an example"
   exportto(Top,@P);      // global ring K[a]
   exportto(Top,@RP);     // global ring K[x,a] with product order
   setring(RR);
-};
+}
 example
 { "EXAMPLE:"; echo = 2;
   ring R=(0,a,b),(x,y,z),dp;
@@ -252,7 +252,7 @@ proc cld(ideal J)
   def Jc=imap(@RP,Jb);
   if(te){kill @R; kill @RP; kill @P;}
   return(Jc);
-};
+}
 
 proc memberpos(f,J)
 //"USAGE:  memberpos(f,J);
@@ -704,7 +704,7 @@ EXAMPLE:  pnormalf; shows an example"
     def f2=imap(@RP,f1);
     if(te==0){kill @R; kill @RP; kill @P;}
     return(f2)
-};
+}
 example
 { "EXAMPLE:"; echo = 2;
   ring R=(0,a,b,c),(x,y),dp;
@@ -751,7 +751,7 @@ proc lesspol(poly f, poly g)
       else {return(0);}
     }
   }
-};
+}
 
 // delfromideal: deletes the i-th polynomial from the ideal F
 proc delfromideal(ideal F, int i)
@@ -856,7 +856,7 @@ proc redgbn(ideal F, ideal E, ideal N)
   }
   if(te==1){setglobalrings();}
   return(G);
-};
+}
 
 // eliminates repeated elements form an ideal or matrix or module or intmat or bigintmat
 proc elimrepeated(F)
@@ -2498,7 +2498,7 @@ proc deltai(int i, list LPr)
   setring(@P);
   def LP=imap(RR,LPr);
   int j; poly p;
-  def F=ideal(1);
+  ideal F=ideal(1);
   poly f;
   poly fn;
   ideal LPi;
@@ -2564,7 +2564,7 @@ proc elimconstfac(poly f)
   def RR=basering;
   setring(@R);
   def ff=imap(RR,f);
-  def l=factorize(ff,0);
+  list l=factorize(ff,0);
   poly f1=1;
   for(i=2;i<=size(l[1]);i++)
   {
@@ -2573,7 +2573,7 @@ proc elimconstfac(poly f)
   setring(RR);
   def f2=imap(@R,f1);
   return(f2);
-};
+}
 
 //Auxiliary routine
 // nullin
