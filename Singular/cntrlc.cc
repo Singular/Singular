@@ -147,6 +147,7 @@ si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler)
    */
 #else
   struct sigaction new_action,old_action;
+  memset(&new_action, 0, sizeof(struct sigaction));
 
   /* Set up the structure to specify the new action. */
   new_action.sa_handler = signal_handler;
