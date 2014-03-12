@@ -483,8 +483,6 @@ QuasiInverse (const CanonicalForm& f, const CanonicalForm& g,
   t1= 1;
   bi= 1;
 
-  On (SW_RATIONAL);
-
   int delta= degree (f, x) - degree (g, x);
   Hi= power (LC (pi1, x), delta);
   if ( (delta+1) % 2 )
@@ -494,7 +492,6 @@ QuasiInverse (const CanonicalForm& f, const CanonicalForm& g,
 
   while (degree (pi1,x) > 0)
   {
-    On (SW_RATIONAL);
     psqr( pi, pi1, q, pi2, m, x);
     pi2 /= bi;
 
