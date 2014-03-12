@@ -157,7 +157,8 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       else
         testlist= factorize(R);
       DEBOUTLN(CERR, "testlist= ", testlist);
-      testlist.removeFirst();
+      if (testlist.getFirst().factor().inCoeffDomain())
+        testlist.removeFirst();
       sqfreetest=1;
       for ( i=testlist; i.hasItem(); i++)
       {
@@ -231,7 +232,8 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       else
         testlist= factorize(R);
       DEBOUTLN(CERR, "testlist= ", testlist);
-      testlist.removeFirst();
+      if (testlist.getFirst().factor().inCoeffDomain())
+        testlist.removeFirst();
       sqfreetest=1;
       for ( i=testlist; i.hasItem(); i++)
       {
