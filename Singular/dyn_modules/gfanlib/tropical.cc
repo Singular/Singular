@@ -13,6 +13,7 @@
 #include <tropicalVarietyOfPolynomials.h>
 #include <tropicalStrategy.h>
 #include <startingCone.h>
+#include <tropicalVariety.h>
 
 BOOLEAN homogeneitySpace(leftv res, leftv args)
 {
@@ -206,6 +207,9 @@ void tropical_setup(SModulFunctions* p)
   p->iiAddCproc("","tropicalCurve1",FALSE,tropicalCurve1);
   p->iiAddCproc("","tropicalStartingPoint0",FALSE,tropicalStartingPoint0);
   p->iiAddCproc("","tropicalStartingPoint1",FALSE,tropicalStartingPoint1);
+  p->iiAddCproc("","tropicalStartingCone0",FALSE,tropicalStartingCone0);
+  p->iiAddCproc("","tropicalStartingCone1",FALSE,tropicalStartingCone1);
+  p->iiAddCproc("","tropicalVariety",FALSE,tropicalVariety);
 #endif //NDEBUG
   p->iiAddCproc("","ppreduceInitially",FALSE,ppreduceInitially);
   p->iiAddCproc("","ttreduceInitially",FALSE,ttreduceInitially);

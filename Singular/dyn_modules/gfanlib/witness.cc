@@ -3,6 +3,7 @@
 #include <libpolys/polys/monomials/p_polys.h>
 #include <callgfanlib_conversion.h>
 #include <initial.h>
+#include <tropicalStrategy.h>
 #include <utility>
 
 /***
@@ -133,8 +134,16 @@ void deleteOrdering(ring r)
   return;
 }
 
-std::pair<ideal,ring> flip(const ideal I, const ring r, const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal)
+std::pair<ideal,ring> flip(const ideal I, const ring r, const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal, const tropicalStrategy currentCase)
 {
+  gfan::ZVector (*adjustWeight0)(gfan::ZVector w);
+  adjustWeight0 = currentCase.adjustWeightForHomogeneity;
+  gfan::ZVector (*adjustWeight1)(gfan::ZVector v, gfan::ZVector w);
+  adjustWeight1 = currentCase.adjustWeightUnderHomogeneity;
+
+  gfan::ZVector adjustedInteriorPoint = adjustWeight0(interiorPoint);
+  gfan::ZVector adjustedFacetNormal = adjustWeight1(facetNormal,adjustedInteriorPoint);
+
   ring origin = currRing;
   ideal inIr = initial(I,r,interiorPoint);
 
@@ -142,12 +151,6 @@ std::pair<ideal,ring> flip(const ideal I, const ring r, const gfan::ZVector inte
   ring s = rCopy0(r);
   int n = rVar(s);
   deleteOrdering(s);
-  // for (i=0; s->order[i]; i++)
-  //   omFree(s->wvhdl[i]);
-  // i++; omFreeSize(s->order, i*sizeof(int));
-  // omFreeSize(s->block0, i*sizeof(int));
-  // omFreeSize(s->block1, i*sizeof(int));
-  // omFreeSize(s->wvhdl, i*sizeof(int));
   s->order = (int*) omAlloc0(4*sizeof(int));
   s->block0 = (int*) omAlloc0(4*sizeof(int));
   s->block1 = (int*) omAlloc0(4*sizeof(int));
@@ -155,11 +158,11 @@ std::pair<ideal,ring> flip(const ideal I, const ring r, const gfan::ZVector inte
   s->order[0] = ringorder_a;
   s->block0[0] = 1;
   s->block1[0] = n;
-  s->wvhdl[0] = ZVectorToIntStar(interiorPoint,ok);
+  s->wvhdl[0] = ZVectorToIntStar(adjustedInteriorPoint,ok);
   s->order[1] = ringorder_wp;
   s->block0[1] = 1;
   s->block1[1] = n;
-  s->wvhdl[1] = ZVectorToIntStar(facetNormal,ok);
+  s->wvhdl[1] = ZVectorToIntStar(adjustedFacetNormal,ok);
   s->order[2] = ringorder_C;
   rComplete(s,1);
   rChangeCurrRing(s);

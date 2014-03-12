@@ -7,13 +7,14 @@
 #include <libpolys/polys/monomials/ring.h>
 #include <libpolys/polys/simpleideals.h>
 #include <kernel/ideals.h>
-#include <gfanlib/gfanlib_vector.h>
-#include <gfanlib/gfanlib_zcone.h>
+#include <gfanlib/gfanlib.h>
 #include <set>
 
+gfan::ZCone sloppyGroebnerCone(const poly g, const ring r, const gfan::ZVector w);
+gfan::ZCone sloppyGroebnerCone(const ideal I, const ring r, const gfan::ZVector w);
 gfan::ZCone groebnerCone(const poly g, const ring r, const gfan::ZVector w);
 gfan::ZCone groebnerCone(const ideal I, const ring r, const gfan::ZVector w);
-
+gfan::ZCone fullGroebnerCone(const ideal &I, const ring &r);
 
 class groebnerConeData
 {
@@ -30,7 +31,8 @@ public:
   groebnerConeData();
   groebnerConeData(const groebnerConeData &sigma);
   groebnerConeData(const ideal &J, const ring &s, const gfan::ZCone &d, const gfan::ZVector &q);
-  groebnerConeData(const ideal &J, const ring &s);
+  groebnerConeData(const ideal J, const ring s, const gfan::ZVector w);
+  groebnerConeData(const ideal J, const ring s, const gfan::ZCone d);
   ~groebnerConeData();
 
   friend struct groebnerConeData_compare;
@@ -56,5 +58,7 @@ struct groebnerConeData_compare
 groebnerConeData maximalGroebnerConeData(ideal I, const ring r);
 
 typedef std::set<groebnerConeData,groebnerConeData_compare> setOfGroebnerConeData;
+
+gfan::ZFan* toFanStar(setOfGroebnerConeData setOfCones);
 
 #endif

@@ -88,8 +88,7 @@ static ring ringWithGenericlyWeightedOrdering(const ring r,
 
 
 /***
- * Computes the tropical curve of an x-homogeneous ideal I
- * which is weighted homogeneous with respect to weight w in ring r
+ * Computes the tropical curve of an x-homogeneous ideal I in ring r
  **/
 std::set<gfan::ZCone> tropicalCurve(const ideal I, const ring r, const int d,
                          const tropicalStrategy currentCase)

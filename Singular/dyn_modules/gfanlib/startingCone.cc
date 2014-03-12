@@ -5,51 +5,24 @@
 #include <groebnerCone.h>
 #include <neighbours.h>
 #include <tropicalStrategy.h>
-
-/***
- * Given a general ring r with any ordering,
- * changes the ordering to a(v),ws(-w)
- **/
-bool changetoAWSRing(ring r, gfan::ZVector v, gfan::ZVector w)
-{
-  omFree(r->order);
-  r->order  = (int*) omAlloc0(4*sizeof(int));
-  omFree(r->block0);
-  r->block0 = (int*) omAlloc0(4*sizeof(int));
-  omFree(r->block1);
-  r->block1 = (int*) omAlloc0(4*sizeof(int));
-  for (int i=0; r->wvhdl[i]; i++)
-  { omFree(r->wvhdl[i]); }
-  omFree(r->wvhdl);
-  r->wvhdl  = (int**) omAlloc0(4*sizeof(int*));
-
-  bool ok = false;
-  r->order[0]  = ringorder_a;
-  r->block0[0] = 1;
-  r->block1[0] = r->N;
-  r->wvhdl[0]  = ZVectorToIntStar(v,ok);
-  r->order[1]  = ringorder_ws;
-  r->block0[1] = 1;
-  r->block1[1] = r->N;
-  r->wvhdl[1]  = ZVectorToIntStar(w,ok);
-  r->order[2]  = ringorder_C;
-  return ok;
-}
+#include <tropicalCurves.h>
+#include <bbcone.h>
+#include <tropicalVariety.h>
 
 
-/***
- * Given a ring with ordering a(v'),ws(w'),
- * changes the weights to v,w
- **/
-bool changeAWSWeights(ring r, gfan::ZVector v, gfan::ZVector w)
-{
-  omFree(r->wvhdl[0]);
-  omFree(r->wvhdl[1]);
-  bool ok = false;
-  r->wvhdl[0]  = ZVectorToIntStar(v,ok);
-  r->wvhdl[1]  = ZVectorToIntStar(w,ok);
-  return ok;
-}
+// /***
+//  * Given a ring with ordering a(v'),ws(w'),
+//  * changes the weights to v,w
+//  **/
+// bool changeAWSWeights(ring r, gfan::ZVector v, gfan::ZVector w)
+// {
+//   omFree(r->wvhdl[0]);
+//   omFree(r->wvhdl[1]);
+//   bool ok = false;
+//   r->wvhdl[0]  = ZVectorToIntStar(v,ok);
+//   r->wvhdl[1]  = ZVectorToIntStar(w,ok);
+//   return ok;
+// }
 
 
 gfan::ZVector findTropicalPoint(const groebnerConeData sigma)
@@ -66,23 +39,8 @@ gfan::ZVector findTropicalPoint(const groebnerConeData sigma)
     id_Delete(&inI,r);
     if (s == NULL)
     {
-      // std::cout << "found no monomial in initial ideal!" << std::endl;
       p_Delete(&s,r);
       return R[i];
-    }
-    p_Delete(&s,r);
-  }
-  gfan::ZMatrix L = zc.generatorsOfLinealitySpace();
-  for (int i=0; i<L.getHeight(); i++)
-  {
-    ideal inI = initial(I,r,L[i]);
-    poly s = checkForMonomialViaSuddenSaturation(inI,r);
-    id_Delete(&inI,r);
-    if (s == NULL)
-    {
-      // std::cout << "found no monomial in initial ideal!" << std::endl;
-      p_Delete(&s,r);
-      return L[i];
     }
     p_Delete(&s,r);
   }
@@ -92,23 +50,39 @@ gfan::ZVector findTropicalPoint(const groebnerConeData sigma)
 
 gfan::ZVector tropicalStartingPoint(const ideal I, const ring r, const tropicalStrategy currentCase)
 {
+  bool (*red)(ideal I, ring r);
+  red = currentCase.reduce; red(I,r);
+
   groebnerConeData sigma = maximalGroebnerConeData(id_Copy(I,r),rCopy(r));
   gfan::ZVector startingPoint = findTropicalPoint(sigma);
-  while (startingPoint.size()==0)
+  if (startingPoint.size() > 0)
+    return startingPoint;
+  setOfGroebnerConeData groebnerFan;
+  setOfGroebnerConeData workingList;
+  workingList.insert(sigma);
+
+  while (!workingList.empty())
   {
+    sigma = *(workingList.begin());
     setOfGroebnerConeData neighbours = groebnerNeighbours(sigma,currentCase);
-    setOfGroebnerConeData::iterator tau = neighbours.begin();
-    for (; tau!=neighbours.end(); tau++)
+    for (setOfGroebnerConeData::iterator tau = neighbours.begin(); tau!=neighbours.end(); tau++)
     {
-      startingPoint = findTropicalPoint(*tau);
-      if (startingPoint.size() > 0) break;
+      if (groebnerFan.count(*tau) == 0)
+      {
+        if (workingList.count(*tau) == 0)
+        {
+          startingPoint = findTropicalPoint(*tau);
+          if (startingPoint.size() > 0)
+            return startingPoint;
+        }
+        workingList.insert(*tau);
+      }
     }
-    tau = neighbours.begin();
-    sigma = *tau;
+    groebnerFan.insert(groebnerConeData(sigma));
+    workingList.erase(sigma);
   }
   return startingPoint;
 }
-
 
 BOOLEAN tropicalStartingPoint0(leftv res, leftv args)
 {
@@ -132,9 +106,45 @@ BOOLEAN tropicalStartingPoint1(leftv res, leftv args)
   return FALSE;
 }
 
+gfan::ZCone tropicalStartingCone(const ideal I, const ring r, const tropicalStrategy currentCase)
+{
+  // groebnerConeData sigma = maximalGroebnerConeData(I,r);
+  // gfan::ZCone zc = sigma.getCone();
+  // if (zc.dimensionOfLinealitySpace == d)
+  //   return zc.linealitySpace();
+  // gfan::ZVector w = tropicalStartingPoint(I,r,currentCase);
+  // ideal inI = initial(I,w,r);
+  // gfan::ZCone zd =
 
-// gfan::ZCone* tropicalStartingCone(const ideal &I, ring r)
-// {
-//   gfan::ZVector* w = tropicalStartingPoint(I,r);
-//   return groebnerCone(I,r,w);
-// }
+  gfan::ZVector w = tropicalStartingPoint(I,r,currentCase);
+  if (w.size() == 0)
+  {
+    gfan::ZCone zc = fullGroebnerCone(I,r);
+    return zc.linealitySpace();
+  }
+  ideal inI = initial(I,r,w);
+  std::set<gfan::ZCone> T = tropicalCurve(inI,r,0,currentCase);
+  return *T.begin();
+}
+
+BOOLEAN tropicalStartingCone0(leftv res, leftv args)
+{
+  leftv u = args;
+  ideal I = (ideal) u->CopyD();
+  gfan::ZCone startingCone = tropicalStartingCone(I,currRing,nonValuedCase);
+  id_Delete(&I, currRing);
+  res->rtyp = coneID;
+  res->data = (char*) new gfan::ZCone(startingCone);
+  return FALSE;
+}
+
+BOOLEAN tropicalStartingCone1(leftv res, leftv args)
+{
+  leftv u = args;
+  ideal I = (ideal) u->CopyD();
+  gfan::ZCone startingCone = tropicalStartingCone(I,currRing,valuedCase);
+  id_Delete(&I, currRing);
+  res->rtyp = coneID;
+  res->data = (char*) new gfan::ZCone(startingCone);
+  return FALSE;
+}

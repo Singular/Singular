@@ -39,6 +39,22 @@ char* bbfan_String(blackbox* /*b*/, void *d)
     gfan::ZFan* zf = (gfan::ZFan*)d;
     std::string s = zf->toString(2+4+8+128);
     return omStrDup(s.c_str());
+// =======
+//     std::stringstream s;
+//     std::string raysAndCones = zf->toStringJustRaysAndMaximalCones();
+//     s << raysAndCones;
+//     if (zf->getDimension() >= 0) // <=> zf is not empty
+//     {
+//       assert(zf->numberOfConesOfDimension(zf->getDimension()-zf->getLinealityDimension(),0,0));
+//       gfan::ZCone zc = zf->getCone(zf->getDimension()-zf->getLinealityDimension(),0,0,0);
+//       gfan::ZMatrix genLinSpace = zc.generatorsOfLinealitySpace();
+//       char* gens = toString(genLinSpace);
+//       s << std::endl << "GENERATORS_LINEALITY_SPACE:" << std::endl;
+//       s << gens;
+//     }
+//     std::string sstring = s.str();
+//     return omStrDup(sstring.c_str());
+// >>>>>>> status updated 11.03.
   }
 }
 
@@ -857,54 +873,54 @@ BOOLEAN fanViaCones(leftv res, leftv args)
 }
 
 
-BOOLEAN tropicalVariety(leftv res, leftv args)
-{
-  leftv u=args;
-  if ((u != NULL) && (u->Typ() == POLY_CMD))
-  {
-    int n = rVar(currRing);
-    gfan::ZFan* zf = new gfan::ZFan(n);
-    int* expv1 = (int*)omAlloc((n+1)*sizeof(int));
-    int* expv2 = (int*)omAlloc((n+1)*sizeof(int));
-    int* expvr = (int*)omAlloc((n+1)*sizeof(int));
-    gfan::ZVector expw1 = gfan::ZVector(n);
-    gfan::ZVector expw2 = gfan::ZVector(n);
-    gfan::ZVector expwr = gfan::ZVector(n);
-    gfan::ZMatrix eq, ineq;
-    for (poly s1=(poly)u->Data(); s1!=NULL; pIter(s1))
-    {
-      pGetExpV(s1,expv1);
-      expw1 = intStar2ZVector(n,expv1);
-      for (poly s2=pNext(s1); s2!=NULL; pIter(s2))
-      {
-        pGetExpV(s2,expv2);
-        expw2 = intStar2ZVector(n,expv2);
-        eq = gfan::ZMatrix(0,n);
-        eq.appendRow(expw1-expw2);
-        ineq = gfan::ZMatrix(0,n);
-        for (poly r=(poly)u->Data(); r!=NULL; pIter(r))
-        {
-          pGetExpV(r,expvr);
-          expwr = intStar2ZVector(n,expvr);
-          if ((r!=s1) && (r!=s2))
-          {
-            ineq.appendRow(expw1-expwr);
-          }
-        }
-        gfan::ZCone zc = gfan::ZCone(ineq,eq);
-        zf->insert(zc);
-      }
-    }
-    omFreeSize(expv1,(n+1)*sizeof(int));
-    omFreeSize(expv2,(n+1)*sizeof(int));
-    omFreeSize(expvr,(n+1)*sizeof(int));
-    res->rtyp = fanID;
-    res->data = (void*) zf;
-    return FALSE;
-  }
-  WerrorS("tropicalVariety: unexpected parameters");
-  return TRUE;
-}
+// BOOLEAN tropicalVariety(leftv res, leftv args)
+// {
+//   leftv u=args;
+//   if ((u != NULL) && (u->Typ() == POLY_CMD))
+//   {
+//     int n = rVar(currRing);
+//     gfan::ZFan* zf = new gfan::ZFan(n);
+//     int* expv1 = (int*)omAlloc((n+1)*sizeof(int));
+//     int* expv2 = (int*)omAlloc((n+1)*sizeof(int));
+//     int* expvr = (int*)omAlloc((n+1)*sizeof(int));
+//     gfan::ZVector expw1 = gfan::ZVector(n);
+//     gfan::ZVector expw2 = gfan::ZVector(n);
+//     gfan::ZVector expwr = gfan::ZVector(n);
+//     gfan::ZMatrix eq, ineq;
+//     for (poly s1=(poly)u->Data(); s1!=NULL; pIter(s1))
+//     {
+//       pGetExpV(s1,expv1);
+//       expw1 = intStar2ZVector(n,expv1);
+//       for (poly s2=pNext(s1); s2!=NULL; pIter(s2))
+//       {
+//         pGetExpV(s2,expv2);
+//         expw2 = intStar2ZVector(n,expv2);
+//         eq = gfan::ZMatrix(0,n);
+//         eq.appendRow(expw1-expw2);
+//         ineq = gfan::ZMatrix(0,n);
+//         for (poly r=(poly)u->Data(); r!=NULL; pIter(r))
+//         {
+//           pGetExpV(r,expvr);
+//           expwr = intStar2ZVector(n,expvr);
+//           if ((r!=s1) && (r!=s2))
+//           {
+//             ineq.appendRow(expw1-expwr);
+//           }
+//         }
+//         gfan::ZCone zc = gfan::ZCone(ineq,eq);
+//         zf->insert(zc);
+//       }
+//     }
+//     omFreeSize(expv1,(n+1)*sizeof(int));
+//     omFreeSize(expv2,(n+1)*sizeof(int));
+//     omFreeSize(expvr,(n+1)*sizeof(int));
+//     res->rtyp = fanID;
+//     res->data = (void*) zf;
+//     return FALSE;
+//   }
+//   WerrorS("tropicalVariety: unexpected parameters");
+//   return TRUE;
+// }
 
 gfan::ZFan commonRefinement(gfan::ZFan zf, gfan::ZFan zg)
 {
@@ -1037,7 +1053,7 @@ void bbfan_setup(SModulFunctions* p)
   // iiAddCproc("","isComplete",FALSE,isComplete);  not working as expected, should leave this to polymake
   p->iiAddCproc("","fVector",FALSE,fVector);
   p->iiAddCproc("","containsInCollection",FALSE,containsInCollection);
-  p->iiAddCproc("","tropicalVariety",FALSE,tropicalVariety);
+  // p->iiAddCproc("","tropicalVariety",FALSE,tropicalVariety);
   p->iiAddCproc("","commonRefinement",FALSE,commonRefinement);
   // iiAddCproc("","grFan",FALSE,grFan);
   fanID=setBlackboxStuff(b,"fan");
