@@ -773,6 +773,19 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
     }
     return L;
   }
+  // after here we are over an extension of a function field
+
+
+  // make quasi monic
+  CFList Rstarlist= CFList (Rstar);
+  CanonicalForm numt, dent;
+  On (SW_RATIONAL);
+  QuasiInverse (Rstar, LC(f), numt, Rstar.mvar());
+
+  f *= numt;
+  f= Prem (f, Rstarlist);
+  f /= vcontent (f, Rstar.mvar());
+  // end quasi monic
 
   sqrf_norm(f, Rstar, vminpoly, s, g, R );
   //out_cf("sqrf_norm R:",R,"\n");
