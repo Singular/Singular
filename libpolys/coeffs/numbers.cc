@@ -507,15 +507,15 @@ n_coeffType nRegister(n_coeffType n, cfInitCharProc p)
     if (nInitCharTable==nInitCharTableDefault)
     {
       nInitCharTable=(cfInitCharProc*)omAlloc0(
-                                          nLastCoeffs*sizeof(cfInitCharProc));
+                                          ((int)nLastCoeffs+1)*sizeof(cfInitCharProc));
       memcpy(nInitCharTable,nInitCharTableDefault,
-              (nLastCoeffs-1)*sizeof(cfInitCharProc));
+              ((int)nLastCoeffs)*sizeof(cfInitCharProc));
     }
     else
     {
       nInitCharTable=(cfInitCharProc*)omReallocSize(nInitCharTable,
-                                          (((int)nLastCoeffs)-1)*sizeof(cfInitCharProc),
-                                          ((int)nLastCoeffs)*sizeof(cfInitCharProc));
+                                          ((int)nLastCoeffs)*sizeof(cfInitCharProc),
+                                          (((int)nLastCoeffs)+1)*sizeof(cfInitCharProc));
     }
 
     nInitCharTable[nLastCoeffs]=p;
