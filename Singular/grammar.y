@@ -170,7 +170,7 @@ void yyerror(const char * fmt)
 #endif
   )
   {
-    Werror("leaving %s",VoiceName());
+    Werror("leaving %s (line %d)",VoiceName(), currentVoice->curr_lineno);
   }
   // libfac:
   extern int libfac_interruptflag;

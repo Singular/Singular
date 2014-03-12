@@ -453,7 +453,7 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
   start=h;
   while (h!=NULL)
   {
-    if ((all && (IDTYP(h)!=PROC_CMD) &&(IDTYP(h)!=PACKAGE_CMD))
+    if ((all && (IDTYP(h)!=PROC_CMD) &&(IDTYP(h)!=PACKAGE_CMD) &&(IDTYP(h)!=CRING_CMD))
     || (typ == IDTYP(h))
     || ((IDTYP(h)==QRING_CMD) && (typ==RING_CMD)))
     {
@@ -1204,6 +1204,9 @@ BOOLEAN iiAlias(leftv p)
   idhdl pp=(idhdl)p->data;
   switch(pp->typ)
   {
+      case CRING_CMD:
+        nKillChar((coeffs)pp);
+	break;
       case INT_CMD:
         break;
       case INTVEC_CMD:
@@ -1655,11 +1658,11 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   }
   // ----------------------------------------
 }
-void rDecomposeC(leftv h,const ring R)
+void rDecomposeC(leftv h,const coeffs C)
 /* field is R or C */
 {
   lists L=(lists)omAlloc0Bin(slists_bin);
-  if (rField_is_long_C(R)) L->Init(3);
+  if (nCoeff_is_long_C(C)) L->Init(3);
   else                     L->Init(2);
   h->rtyp=LIST_CMD;
   h->data=(void *)L;
@@ -1675,28 +1678,28 @@ void rDecomposeC(leftv h,const ring R)
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
     LL->m[0].rtyp=INT_CMD;
-    LL->m[0].data=(void *)(long)si_max(R->cf->float_len,SHORT_REAL_LENGTH/2);
+    LL->m[0].data=(void *)(long)si_max(C->float_len,SHORT_REAL_LENGTH/2);
     LL->m[1].rtyp=INT_CMD;
-    LL->m[1].data=(void *)(long)si_max(R->cf->float_len2,SHORT_REAL_LENGTH);
+    LL->m[1].data=(void *)(long)si_max(C->float_len2,SHORT_REAL_LENGTH);
   L->m[1].rtyp=LIST_CMD;
   L->m[1].data=(void *)LL;
   // ----------------------------------------
   // 2: list (par)
-  if (rField_is_long_C(R))
+  if (nCoeff_is_long_C(C))
   {
     L->m[2].rtyp=STRING_CMD;
-    L->m[2].data=(void *)omStrDup(*rParameter(R));
+    L->m[2].data=(void *)omStrDup(*n_ParameterNames(C));
   }
   // ----------------------------------------
 }
 
 #ifdef HAVE_RINGS
-void rDecomposeRing(leftv h,const ring R)
+void rDecomposeRing(leftv h,const coeffs C)
 /* field is R or C */
 {
   lists L=(lists)omAlloc0Bin(slists_bin);
-  if (rField_is_Ring_Z(R)) L->Init(1);
-  else                     L->Init(2);
+  if (nCoeff_is_Ring(C)) L->Init(1);
+  else                   L->Init(2);
   h->rtyp=LIST_CMD;
   h->data=(void *)L;
   // 0: char/ cf - ring
@@ -1706,20 +1709,90 @@ void rDecomposeRing(leftv h,const ring R)
   L->m[0].rtyp=STRING_CMD;
   L->m[0].data=(void *)omStrDup("integer");
   // ----------------------------------------
-  // 1: module
-  if (rField_is_Ring_Z(R)) return;
+  // 1: modulo
+  if (nCoeff_is_Ring_Z(C)) return;
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
   LL->m[0].rtyp=BIGINT_CMD;
-  LL->m[0].data=nlMapGMP((number) R->cf->modBase, R->cf, R->cf);
+  LL->m[0].data=nlMapGMP((number) C->modBase, C, coeffs_BIGINT);
   LL->m[1].rtyp=INT_CMD;
-  LL->m[1].data=(void *) R->cf->modExponent;
+  LL->m[1].data=(void *) C->modExponent;
   L->m[1].rtyp=LIST_CMD;
   L->m[1].data=(void *)LL;
 }
 #endif
 
 
+BOOLEAN rDecompose_CF(leftv res,const coeffs C)
+{
+  assume( C != NULL );
+
+  // sanity check: require currRing==r for rings with polynomial data
+  if ( nCoeff_is_algExt(C) && (C != currRing->cf))
+  {
+    WerrorS("ring with polynomial data must be the base ring or compatible");
+    return TRUE;
+  }
+  if (nCoeff_is_numeric(C))
+  {
+    rDecomposeC(res,C);
+  }
+#ifdef HAVE_RINGS
+  else if (nCoeff_is_Ring(C))
+  {
+    rDecomposeRing(res,C);
+  }
+#endif
+  else if ( C->extRing!=NULL )// nCoeff_is_algExt(r->cf))
+  {
+    rDecomposeCF(res, C->extRing, currRing);
+  }
+  else if(nCoeff_is_GF(C))
+  {
+    lists Lc=(lists)omAlloc0Bin(slists_bin);
+    Lc->Init(4);
+    // char:
+    Lc->m[0].rtyp=INT_CMD;
+    Lc->m[0].data=(void*)(long)C->m_nfCharQ;
+    // var:
+    lists Lv=(lists)omAlloc0Bin(slists_bin);
+    Lv->Init(1);
+    Lv->m[0].rtyp=STRING_CMD;
+    Lv->m[0].data=(void *)omStrDup(*n_ParameterNames(C));
+    Lc->m[1].rtyp=LIST_CMD;
+    Lc->m[1].data=(void*)Lv;
+    // ord:
+    lists Lo=(lists)omAlloc0Bin(slists_bin);
+    Lo->Init(1);
+    lists Loo=(lists)omAlloc0Bin(slists_bin);
+    Loo->Init(2);
+    Loo->m[0].rtyp=STRING_CMD;
+    Loo->m[0].data=(void *)omStrDup(rSimpleOrdStr(ringorder_lp));
+
+    intvec *iv=new intvec(1); (*iv)[0]=1;
+    Loo->m[1].rtyp=INTVEC_CMD;
+    Loo->m[1].data=(void *)iv;
+
+    Lo->m[0].rtyp=LIST_CMD;
+    Lo->m[0].data=(void*)Loo;
+
+    Lc->m[2].rtyp=LIST_CMD;
+    Lc->m[2].data=(void*)Lo;
+    // q-ideal:
+    Lc->m[3].rtyp=IDEAL_CMD;
+    Lc->m[3].data=(void *)idInit(1,1);
+    // ----------------------
+    res->rtyp=LIST_CMD;
+    res->data=(void*)Lc;
+  }
+  else
+  {
+    res->rtyp=INT_CMD;
+    res->data=(void *)(long)C->ch;
+  }
+  // ----------------------------------------
+  return FALSE;
+}
 lists rDecompose(const ring r)
 {
   assume( r != NULL );
@@ -1753,63 +1826,8 @@ lists rDecompose(const ring r)
     L->Init(4);
   // ----------------------------------------
   // 0: char/ cf - ring
-  if (rField_is_numeric(r))
-  {
-    rDecomposeC(&(L->m[0]),r);
-  }
-#ifdef HAVE_RINGS
-  else if (rField_is_Ring(r))
-  {
-    rDecomposeRing(&(L->m[0]),r);
-  }
-#endif
-  else if ( r->cf->extRing!=NULL )// nCoeff_is_algExt(r->cf))
-  {
-    rDecomposeCF(&(L->m[0]), r->cf->extRing, r);
-  }
-  else if(rField_is_GF(r))
-  {
-    lists Lc=(lists)omAlloc0Bin(slists_bin);
-    Lc->Init(4);
-    // char:
-    Lc->m[0].rtyp=INT_CMD;
-    Lc->m[0].data=(void*)(long)r->cf->m_nfCharQ;
-    // var:
-    lists Lv=(lists)omAlloc0Bin(slists_bin);
-    Lv->Init(1);
-    Lv->m[0].rtyp=STRING_CMD;
-    Lv->m[0].data=(void *)omStrDup(*rParameter(r));
-    Lc->m[1].rtyp=LIST_CMD;
-    Lc->m[1].data=(void*)Lv;
-    // ord:
-    lists Lo=(lists)omAlloc0Bin(slists_bin);
-    Lo->Init(1);
-    lists Loo=(lists)omAlloc0Bin(slists_bin);
-    Loo->Init(2);
-    Loo->m[0].rtyp=STRING_CMD;
-    Loo->m[0].data=(void *)omStrDup(rSimpleOrdStr(ringorder_lp));
-
-    intvec *iv=new intvec(1); (*iv)[0]=1;
-    Loo->m[1].rtyp=INTVEC_CMD;
-    Loo->m[1].data=(void *)iv;
-
-    Lo->m[0].rtyp=LIST_CMD;
-    Lo->m[0].data=(void*)Loo;
-
-    Lc->m[2].rtyp=LIST_CMD;
-    Lc->m[2].data=(void*)Lo;
-    // q-ideal:
-    Lc->m[3].rtyp=IDEAL_CMD;
-    Lc->m[3].data=(void *)idInit(1,1);
-    // ----------------------
-    L->m[0].rtyp=LIST_CMD;
-    L->m[0].data=(void*)Lc;
-  }
-  else
-  {
-    L->m[0].rtyp=INT_CMD;
-    L->m[0].data=(void *)(long)r->cf->ch;
-  }
+  L->m[0].rtyp=CRING_CMD;
+  L->m[0].data=(char*)r->cf; r->cf->ref++;
   // ----------------------------------------
   // 1: list (var)
   lists LL=(lists)omAlloc0Bin(slists_bin);
@@ -2189,6 +2207,11 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
         }
       }
     }
+  }
+  else if (L->m[0].Typ()==CRING_CMD)
+  {
+    R->cf=(coeffs)L->m[0].Data();
+    R->cf->ref++;
   }
   else
   {
@@ -5025,7 +5048,36 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   assume( pn != NULL );
   const int P = pn->listLength();
 
-  if (pn->Typ()==INT_CMD)
+  if (pn->Typ()==CRING_CMD)
+  {
+    cf=(coeffs)pn->CopyD();
+    if(P>1) /*parameter*/
+    {
+      pn = pn->next;
+      const int pars = pn->listLength();
+      assume( pars > 0 );
+      char ** names = (char**)omAlloc0(pars * sizeof(char_ptr));
+
+      if (rSleftvList2StringArray(pn, names))
+      {
+        WerrorS("parameter expected");
+        goto rInitError;
+      }
+
+      TransExtInfo extParam;
+
+      extParam.r = rDefault( cf, pars, names); // Q/Zp [ p_1, ... p_pars ]
+      for(int i=pars-1; i>=0;i--)
+      {
+        omFree(names[i]);
+      }
+      omFree(names);
+
+      cf = nInitChar(n_transExt, &extParam);
+    }
+    assume( cf != NULL );
+  }
+  else if (pn->Typ()==INT_CMD)
   {
     int ch = (int)(long)pn->Data();
 

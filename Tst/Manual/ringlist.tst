@@ -15,6 +15,7 @@ LIB "tst.lib"; tst_init();
  def ra = ring(l);     //creates the newring
  ra; setring ra;
  list lra = ringlist(ra);
+ lra[1]=ringlist(lra[1]);
  lra[1][4]=ideal(a2+1);
  def Ra = ring(lra);
  setring Ra; Ra;

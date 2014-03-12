@@ -211,6 +211,7 @@ RETURN:  1 if assumptions are satisfied, 0 otherwise.@*
 {
   def Roriginal = basering;
   list rl = ringlist(Roriginal);
+  rl[1]=ringlist(rl[1]);
   rl[3] = list(list("dp",1:3),list("C",0));
   if(size(rl[1])>1){ERROR("ground field is not Q");}
   if(rl[1]!=0){ERROR("ground field is not Q");}
@@ -2366,6 +2367,7 @@ RETURN:  builds an appropriate quadratic field extension Q(a) in which a
     L[1] = list(0, list("a"), list(list("lp", 1)), ideal(0));
     def RTemp = ring(L);
     setring RTemp; list L = ringlist(RTemp);
+    L[1]=ringlist(L[1]);
     L[1][4] = ideal(a^2 + br);
     def R = ring(L);
     setring R; kill RTemp;

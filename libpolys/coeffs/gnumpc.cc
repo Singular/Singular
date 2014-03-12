@@ -466,8 +466,8 @@ static void ngcKillChar(coeffs r)
 static char* ngcCoeffString(const coeffs r)
 {
   const char *p=n_ParameterNames(r)[0];
-  char *s=(char*)omAlloc(31+strlen(p));
-  sprintf(s,"complex,%d,%d,%s",r->float_len,r->float_len2,p);
+  char *s=(char*)omAlloc(35+strlen(p));
+  sprintf(s,"CC(%d,%d,%s)",r->float_len,r->float_len2,p);
   return s;
 }
 

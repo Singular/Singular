@@ -821,8 +821,8 @@ static void nfKillChar(coeffs r)
 static char* nfCoeffString(const coeffs r)
 {
   const char *p=n_ParameterNames(r)[0];
-  char *s=(char*)omAlloc(11+1+strlen(p));
-  sprintf(s,"%d,%s",r->m_nfCharQ,p);
+  char *s=(char*)omAlloc(11+6+strlen(p));
+  sprintf(s,"GF(%d,%s)",r->m_nfCharQ,p);
   return s;
 }
 

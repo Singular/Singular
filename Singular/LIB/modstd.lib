@@ -802,7 +802,7 @@ EXAMPLE: example modStd; shows an example
       }
    }
 
-   if((npars(R0) > 0) || (rl[1][1] > 0))
+   if((npars(R0) > 0) || (ringlist(rl[1])[1] > 0))
    {
       if(npars(R0)==1)
       {
@@ -1400,7 +1400,7 @@ EXAMPLE: example modS; shows an example
    def R0 = basering;
    ideal J;
    list T;
-   list rl = ringlist(R0);
+   list rl = ringlist(R0);rl[1]=ringlist(rl[1]);
    if((npars(R0)>0) || (rl[1]>0))
    {
       ERROR("Characteristic of basering should be zero.");

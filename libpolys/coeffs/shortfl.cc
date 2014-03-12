@@ -631,7 +631,7 @@ nMapFunc nrSetMap(const coeffs src, const coeffs dst)
 
 static char* nrCoeffString(const coeffs r)
 {
-  return omStrDup("real");
+  return omStrDup("RR");
 }
 
 BOOLEAN nrInitChar(coeffs n, void* p)

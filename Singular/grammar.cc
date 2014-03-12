@@ -234,6 +234,7 @@ void yyerror(const char * fmt)
 #endif
   )
   {
+    //Werror("leaving %s (line %d)",VoiceName(), currentVoice->curr_lineno);
     Werror("leaving %s",VoiceName());
   }
   // libfac:

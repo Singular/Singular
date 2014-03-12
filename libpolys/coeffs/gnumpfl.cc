@@ -403,8 +403,8 @@ void ngfSetChar(const coeffs r)
 
 static char* ngfCoeffString(const coeffs r)
 {
-  char *s=(char*)omAlloc(27);
-  snprintf(s,27,"real,%d,%d",r->float_len,r->float_len2);
+  char *s=(char*)omAlloc(31);
+  snprintf(s,27,"RR(%d,%d)",r->float_len,r->float_len2);
   return s;
 }
 

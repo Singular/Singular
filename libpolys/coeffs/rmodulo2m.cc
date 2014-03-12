@@ -48,8 +48,8 @@ BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
 
 static char* nr2mCoeffString(const coeffs r)
 {
-  char* s = (char*) omAlloc(11+11);
-  sprintf(s,"integer,2,%lu",r->modExponent);
+  char* s = (char*) omAlloc(21+7);
+  sprintf(s,"ZZ/(2^%lu)",r->modExponent);
   return s;
 }
 

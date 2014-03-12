@@ -426,8 +426,8 @@ number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 
 static char* npCoeffString(const coeffs r)
 {
-  char *s=(char*)omAlloc(11);
-  snprintf(s,11,"%d",r->ch);
+  char *s=(char*)omAlloc(14);
+  snprintf(s,14,"ZZ/%d",r->ch);
   return s;
 }
 

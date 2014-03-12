@@ -332,7 +332,7 @@ EXAMPLE: example npar; shows examples
   // and returns its number
   int i,j=0,0;
   list L = ringlist(basering);
-  list M = L[1][2]; // pars
+  list M = ringlist(L[1])[2]; // pars
   string sn = string(n);
   sn = sn[2..size(sn)-1];
   for (i=1; i<=size(M);i++)
@@ -382,7 +382,7 @@ EXAMPLE: example decoef; shows examples
   con = numerator(con);
   P = cleardenom(P); //destroys content!
   P = con*P; // restore the numerator part of the content
-  list M = ringlist(basering);
+  list M = ringlist(basering);M[1]=ringlist(M[1]);
   list L = M[1..4];
   list Pars = L[1][2];
   list Vars = L[2] + Pars;
@@ -570,7 +570,7 @@ EXAMPLE: example difpoly2tex; shows examples
   }
   def br = basering;
 // map all pars except to vars, provided no things are in denominator
-  list M = ringlist(basering);
+  list M = ringlist(basering);M[1]=ringlist(M[1]);
   list L = M[1..4]; // erase nc part
   list Pars = L[1][2];
   list Vars = L[2] + Pars;

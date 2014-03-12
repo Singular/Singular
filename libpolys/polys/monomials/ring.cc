@@ -261,7 +261,7 @@ void   rWrite(ring r, BOOLEAN details)
     // NOTE: the following (non-thread-safe!) UGLYNESS
     // (changing naRing->ShortOut for a while) is due to Hans!
     // Just think of other ring using the VERY SAME naRing and possible
-    // side-effects...
+    // side-effects...which cannot happen due to the nature of this routine (rWrite)
     ring R = C->extRing;
     const BOOLEAN bSaveShortOut = rShortOut(R); R->ShortOut = rShortOut(r) & rCanShortOut(R);
 
