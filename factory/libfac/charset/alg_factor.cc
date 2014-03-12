@@ -820,36 +820,35 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   }
   else
   {
+    g= f;
     DEBOUTLN(CERR, "alg_factor: g= ", g);
-    CanonicalForm gnew= g(s,s.mvar());
-    DEBOUTLN(CERR, "alg_factor: gnew= ", gnew);
-    g=gnew;
     for ( CFFListIterator i=Factorlist; i.hasItem(); i++)
     {
       CanonicalForm fnew=i.getItem().factor();
-      fnew= fnew(s,s.mvar());
-      DEBOUTLN(CERR, "alg_factor: fnew= ", fnew);
-      DEBOUTLN(CERR, "alg_factor: substlist= ", substlist);
-      for ( CFListIterator ii=substlist; ii.hasItem(); ii++){
-        DEBOUTLN(CERR, "alg_factor: item= ", ii.getItem());
-        fnew= fnew(ii.getItem(), ii.getItem().mvar());
-        DEBOUTLN(CERR, "alg_factor: fnew= ", fnew);
-      }
-      if (degree(i.getItem().factor()) > 0 )
+      if (fnew.level() < Rstar.level()) //factor is a constant from the function field
+        continue;
+      else
       {
-          h=alg_gcd(g,fnew,as);
-        DEBOUTLN(CERR, "  alg_factor: h= ", h);
-        DEBOUTLN(CERR, "  alg_factor: oldord= ", oldord);
-        if ( degree(h) > 0 )
-        { //otherwise it's a constant
-          g= divide(g, h,as);
-          DEBOUTLN(CERR, "alg_factor: g/h= ", g);
-          DEBOUTLN(CERR, "alg_factor: s= ", s);
-          DEBOUTLN(CERR, "alg_factor: substlist= ", substlist);
-          //out_cf("new g:",g,"\n");
-          L.append(CFFactor(h,1));
-        }
-        //else printf("degree <=1\n");
+        fnew= fnew (g.mvar()+s*Rstar.mvar(), g.mvar());
+        fnew= reduce (fnew, Rstar);
+      }
+
+      DEBOUTLN(CERR, "alg_factor: fnew= ", fnew);
+
+      h= alg_gcd (g, fnew, Rstarlist);
+      QuasiInverse(Rstar, LC(h), numt, Rstar.mvar());
+      dent= 1;
+      h *= numt;
+      h= Prem (h, Rstarlist);
+      h /= vcontent (h, Rstar.mvar());
+
+      if (h.level() >= Rstar.level())
+      {
+        g= divide (g, h, Rstarlist);
+        h= Prem (h, as);
+        h *= bCommonDen (h);
+        h /= vcontent (h, as.getFirst().mvar());
+        L.append (CFFactor (h, 1));
       }
     }
     // we are not interested in a
