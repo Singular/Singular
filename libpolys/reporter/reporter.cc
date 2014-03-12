@@ -134,6 +134,7 @@ void StringSetS(const char *st)
   feBufferStart_save[feBuffer_cnt]=feBufferStart;
   feBufferStart=feBuffer;
   feBuffer_cnt++;
+  assume(feBuffer_cnt<8);
   int l;
   long more;
   if ((l=strlen(st))>feBufferLength)
@@ -151,6 +152,7 @@ char * StringEndS()
 {
   char *r=feBuffer;
   feBuffer_cnt--;
+  assume(feBuffer_cnt >=0);
   feBuffer=feBuffer_save[feBuffer_cnt];
   feBufferLength=feBufferLength_save[feBuffer_cnt];
   feBufferStart=feBufferStart_save[feBuffer_cnt];
