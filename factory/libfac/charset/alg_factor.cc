@@ -799,34 +799,17 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   if (getAlgVar(R,X))
   {
     // factorize R over alg.extension with X
-//CERR << "alg: "<< X << " mipo=" << getMipo(X,Variable('X')) <<"\n";
-    if (R.isUnivariate())
-    {
-      DEBOUTLN(CERR, "alg_factor: factorize( ", R);
-      Factorlist =  factorize( R, X );
-    }
-    else
-    {
-      #if 1
-      Variable XX;
-      CanonicalForm mipo=getMipo(X,XX);
-      CFList as(mipo);
-      DEBOUTLN(CERR, "alg_factor: newfactoras( ", R);
-      int success=1;
-      Factorlist = newfactoras(R, as , success);
-      #else
-      // factor R over k
-      DEBOUTLN(CERR, "alg_factor: Factorize( ", R);
-      Factorlist = Factorize(R);
-      #endif
-    }
+    //CERR << "alg: "<< X << " mipo=" << getMipo(X,Variable('X')) <<"\n";
+    DEBOUTLN(CERR, "alg_factor: factorize( ", R);
+    Factorlist =  factorize( R, X );
   }
   else
   {
     // factor R over k
     DEBOUTLN(CERR, "alg_factor: Factorize( ", R);
-    Factorlist = Factorize(R);
+    Factorlist = factorize(R);
   }
+
   On(SW_RATIONAL);
   DEBOUTLN(CERR, "alg_factor: Factorize(R)= ", Factorlist);
   if ( !Factorlist.getFirst().factor().inCoeffDomain() )
