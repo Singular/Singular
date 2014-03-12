@@ -579,7 +579,8 @@ evaluate (const CanonicalForm& f, const CanonicalForm& g,
 // calculate a "primitive element"
 // K must have more than S elements (->thesis, -> getextension)
 static CFList
-simpleextension(const CFList & Astar, const Variable & Extension, bool& isFunctionField,
+simpleextension(CFList& backSubst, const CFList & Astar,
+                const Variable & Extension, bool& isFunctionField,
                 CanonicalForm & R)
 {
   CFList Returnlist, Bstar=Astar;
@@ -611,6 +612,8 @@ simpleextension(const CFList & Astar, const Variable & Extension, bool& isFuncti
       On (SW_RATIONAL);
       oldR= R;
       sqrf_norm (i.getItem(), R, Extension, s, g, R);
+
+      backSubst.insert (s);
 
       Off (SW_RATIONAL);
       R /= icontent (R);
@@ -728,6 +731,24 @@ subst (const CanonicalForm& f, const CFList& a, const CFList& b,
   return result;
 }
 
+CanonicalForm
+backSubst (const CanonicalForm& F, const CFList& a, const CFList& b)
+{
+  ASSERT (a.length() == b.length() - 1, "wrong length of lists in backSubst");
+  CanonicalForm result= F;
+  Variable tmp;
+  CFList tmp2= b;
+  tmp= tmp2.getLast().mvar();
+  tmp2.removeLast();
+  for (CFListIterator iter= a; iter.hasItem(); iter++)
+  {
+    result= result (tmp+iter.getItem()*tmp2.getLast().mvar(), tmp);
+    tmp= tmp2.getLast().mvar();
+    tmp2.removeLast();
+  }
+  return result;
+}
+
 // the heart of the algorithm: the one from Trager
 #ifndef DEBUGOUTPUT
 static CFFList
@@ -739,13 +760,12 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
 {
   CFFList L, Factorlist;
   CanonicalForm R, Rstar, s, g, h, f= F;
-  CFList substlist;
+  CFList substlist, backSubsts;
 
   DEBINCLEVEL(CERR,"alg_factor");
   DEBOUTLN(CERR, "alg_factor: f= ", f);
 
-  //out_cf("start alg_factor:",f,"\n");
-  substlist= simpleextension(Astar, vminpoly, isFunctionField, Rstar);
+  substlist= simpleextension (backSubsts, Astar, vminpoly, isFunctionField, Rstar);
   DEBOUTLN(CERR, "alg_factor: substlist= ", substlist);
   DEBOUTLN(CERR, "alg_factor: minpoly Rstar= ", Rstar);
   DEBOUTLN(CERR, "alg_factor: vminpoly= ", vminpoly);
@@ -767,6 +787,7 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
       {
         h= replacevar (h, alpha, Rstar.mvar());
         h *= bCommonDen(h);
+        h= backSubst (h, backSubsts, Astar);
         h= Prem (h, as);
         L.append (CFFactor (h, i.getItem().exp()));
       }
@@ -845,6 +866,7 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
       if (h.level() >= Rstar.level())
       {
         g= divide (g, h, Rstarlist);
+        h= backSubst (h, backSubsts, Astar);
         h= Prem (h, as);
         h *= bCommonDen (h);
         h /= vcontent (h, as.getFirst().mvar());
