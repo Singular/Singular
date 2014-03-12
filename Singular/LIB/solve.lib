@@ -97,9 +97,9 @@ EXAMPLE: example laguerre_solve; shows an example
     else
     {
       tt=charstr(basering);
-      if(size(tt)>7)
+      if(size(tt)>2)
       {
-        if(string(tt[1..7])=="complex")
+        if(string(tt[1..2])=="CC")
         {
           ss=tt;
           ringprec=system("getPrecDigits");
@@ -200,7 +200,7 @@ EXAMPLE: example laguerre_solve; shows an example
       }
       else
       {
-        if(charstr(rn)=="0"){dbprint(prot,"// polynomial is squarefree");}
+        if(charstr(rn)=="QQ"){dbprint(prot,"// polynomial is squarefree");}
         else{dbprint(prot,"//split without result");}
       }
     }
@@ -627,7 +627,7 @@ EXAMPLE: example solve; shows an example
     {
       if (typeof(`LL[ii]`)=="ring")
       {
-        if (find(charstr(`LL[ii]`),"complex,"+string(outprec)))
+        if (find(charstr(`LL[ii]`),"CC("+string(outprec)))
         {
           jj++;
           Out[jj]=LL[ii];

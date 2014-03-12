@@ -852,7 +852,7 @@ kill i,j,E3,R;
 ring R = (0,a), (x(1..3),y(1..2),z(1..2)), (dp(3),wp(2,5),lp);
 minpoly = a^2+1;
 qring Q = std(y(1)^2-x(1));
-list L = ringlist(Q);
+list L = ringlist(Q); L[1]=ringlist(L[1]);
 size(L);
 //->   4
 L[1];

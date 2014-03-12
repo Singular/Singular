@@ -6237,7 +6237,7 @@ EXAMPLE: example bernsteinLift; shows examples
   list L = 0;
   list Lord, tmp;
   intvec iv; int i;
-  list RL = ringlist(basering);
+  list RL = ringlist(basering);RL[1]=ringlist(RL[1]);
   // if we work over alg. extension => problem!
   if (size(RL[1]) > 1)
   {

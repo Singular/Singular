@@ -81,6 +81,7 @@ SOURCES = \
    mod_lib.cc\
    links/ndbm.cc\
    newstruct.cc\
+   number2.cc\
    pcv.cc\
    links/pipeLink.cc\
    scanner.cc\
@@ -134,6 +135,7 @@ SingularHEADERS = \
    omSingularConfig.h \
    links/ndbm.h \
    newstruct.h \
+   number2.h\
    pcv.h \
    links/pipeLink.h \
    pyobject_setup.h \

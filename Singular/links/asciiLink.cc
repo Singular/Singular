@@ -263,7 +263,10 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   const char *type_str = GetIdString(h);
   int type_id = IDTYP(h);
 
+  // omit system defaulkt ids:
   if ((type_id == PACKAGE_CMD) &&(strcmp(IDID(h), "Top") == 0))
+    return FALSE;
+  if (type_id == CRING_CMD)
     return FALSE;
 
   // we do not throw an error if a wrong type was attempted to be dumped
@@ -324,6 +327,7 @@ static const char* GetIdString(idhdl h)
         for (i=0; i<nl; i++)
           if (GetIdString((idhdl) &(l->m[i])) == NULL) return NULL;
       }
+      case CRING_CMD:
       case PACKAGE_CMD:
       case INT_CMD:
       case INTVEC_CMD:

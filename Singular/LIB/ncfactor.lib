@@ -1146,7 +1146,7 @@ Performing commutative factorization.");
   {
     dbprint(p,dbprintWhitespace +" positions of the variables have to be switched");
     def r = basering;
-    ring tempRing = ringlist(r)[1][1],(x,y),Ws(-1,1); // very strange:
+    ring tempRing = ringlist(ringlist(r)[1])[1],(x,y),Ws(-1,1); // very strange:
     // setting Wp(-1,1) leads to SegFault; to clarify why!!!
     def NTR = nc_algebra(1,1);
     setring NTR ;
@@ -3288,6 +3288,7 @@ SEE ALSO: testNCfac, facFirstWeyl, facSubWeyl
   def r = basering;
   setring r;
   list LR = ringlist(r);
+  LR[1]=ringlist(LR[1]);
   number @n = leadcoef(LR[5][1,2]);
   poly @p = LR[6][1,2];
   if  ( @n!=number(1) )

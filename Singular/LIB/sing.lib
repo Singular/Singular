@@ -370,7 +370,7 @@ EXAMPLE: example slocus; shows an example
   // quotient rings currently not supported
   ASSUME( 0, 0==isQuotientRing(basering) ); 
   // integer coefficient rings currently not supported
-  ASSUME( 0, 0==hasIntegerCoefficientRing(basering) ); 
+  ASSUME( 0, 0==hasRingCoefficientRing(basering) ); 
 
 
   def R=basering;

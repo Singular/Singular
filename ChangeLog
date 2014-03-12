@@ -1,0 +1,13 @@
+News for 4-1-0:
+- new types: cring, Number (internal: CRING_CMD, NUMBER2_CMD)
+  (Number: planned)
+- new default cring objects: ZZ, QQ, CC, RR
+- operations for cring: ZZ/<int>, ZZ/<bigint>
+- ringlist changed: rl[1] is of type cring
+   (rl[1]=ringlist(rl[1]) gives the old representation
+- ring construction extended:
+  + ring r= <cring>,(<vars>),(<ord>);
+  + ring r=(<cring,<vars>),...
+  + def r=ringlist(<list with cring as first member>)
+- charstr returns ZZ, ZZ/.., QQ, CC(...)  
+  

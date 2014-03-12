@@ -52,8 +52,8 @@ static char* nrnCoeffString(const coeffs r)
   char* b = (char*) omAlloc(l);
   b= mpz_get_str (b, 10, r->modBase);
   char* s = (char*) omAlloc(7+2+10+l);
-  if (nCoeff_is_Ring_ModN(r)) sprintf(s,"integer,%s",b);
-  else /*if (nCoeff_is_Ring_PtoM(r))*/ sprintf(s,"integer,%s^%lu",b,r->modExponent);
+  if (nCoeff_is_Ring_ModN(r)) sprintf(s,"ZZ/%s",b);
+  else /*if (nCoeff_is_Ring_PtoM(r))*/ sprintf(s,"ZZ/(%s^%lu)",b,r->modExponent);
   omFreeSize(b,l);
   return s;
 }

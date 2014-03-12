@@ -384,7 +384,7 @@ void    nrzCoeffWrite  (const coeffs, BOOLEAN /*details*/)
 
 static char* nrzCoeffString(const coeffs)
 {
-  return omStrDup("integer");
+  return omStrDup("ZZ");
 }
 
 BOOLEAN nrzInitChar(coeffs r,  void *)

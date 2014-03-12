@@ -489,7 +489,8 @@ EXAMPLE: example par2varRing; shows an example"
   }
 
   list rlist = ringlist(P);
-  list parlist = rlist[1];
+  if (typeof(rlist[1])=="cring") { list parlist = ringlist(rlist[1]);}
+  else                           { list parlist = rlist[1];}
   rlist[1] = parlist[1];
 
   string @Minpoly = string(minpoly);     //check for minpoly:

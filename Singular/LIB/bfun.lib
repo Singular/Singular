@@ -678,7 +678,7 @@ EXAMPLE: example linSyzSolve; shows examples
     {
       Lvar[i] = safeVarName("@a(" + string(i) + ")");
     }
-    list L@A = RL[1..4];
+    list L@A = RL[1..4];L@A[1]=ringlist(L@A[1]);
     L@A[2] = Lvar;
     L@A[3] = list(list("lp",intvec(1:sI)),list("C",intvec(0)));
     def @A = ring(L@A);
@@ -985,7 +985,7 @@ EXAMPLE: example pIntersectSyz; shows examples
   ideal NI = 1;
   newNF = NF(s,I);
   NI[2] = newNF;
-  list RL = ringlist(save);
+  list RL = ringlist(save);RL[1]=ringlist(RL[1]);
   if (solveincharp)
   {
     int psolveincharp = prime(solveincharp);
@@ -1401,6 +1401,7 @@ static proc bfctengine (poly f, int inorann, int whichengine, int addPD, int std
         {
           usedprimes = usedprimes,q;
           dbprint(ppl,"// using prime: "+string(q));
+          L[1]=ringlist(L[1]);
           if (typeof(L[1]) == "int") { L[1] = q; }
           else { L[1][1] = q; } // parameters
           def @Rq = ring(L); setring @Rq;

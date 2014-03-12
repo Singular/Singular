@@ -214,6 +214,7 @@ struct sValCmd1 dArith1[]=
 ,{D(jjDUMMY),      RESOLUTION_CMD,  RESOLUTION_CMD, RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRINGLIST),   RINGLIST_CMD,    LIST_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRINGLIST),   RINGLIST_CMD,    LIST_CMD,       QRING_CMD     , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjRINGLIST_C), RINGLIST_CMD,    LIST_CMD,       CRING_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDUMMY),      RING_CMD,        RING_CMD,       RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLISTRING),   RING_CMD,        RING_CMD,       LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
 //,{  jjWRONG ,      ROWS_CMD,        0,              POLY_CMD    , ALLOW_PLURAL |ALLOW_RING}
@@ -366,6 +367,8 @@ struct sValCmd2 dArith2[]=
 ,{D(jjDIV_BI),    '/',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjOP_IV_I),   '/',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjOP_IV_I),   '/',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjCRING_Zp),  '/',            CRING_CMD,      CRING_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjCRING_Zm),  '/',            CRING_CMD,      CRING_CMD,  BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjDIVMOD_I),  INTDIV_CMD,     INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjDIV_BI),    INTDIV_CMD,     BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjOP_IV_I),   INTDIV_CMD,     INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -824,6 +827,7 @@ cmdnames cmds[] =
   { "continue",    0, CONTINUE_CMD ,      CONTINUE_CMD},
   { "contract",    0, CONTRACT_CMD ,      CMD_2},
   { "convhull",    0, NEWTONPOLY_CMD,     CMD_1},
+  { "cring",       0, CRING_CMD,          ROOT_DECL},
   { "dbprint",     0, DBPRINT_CMD ,       CMD_M},
   { "def",         0, DEF_CMD ,           ROOT_DECL},
   { "defined",     0, DEFINED_CMD ,       CMD_1},
@@ -944,6 +948,7 @@ cmdnames cmds[] =
   #endif
   { "nrows",       0, ROWS_CMD ,          CMD_1},
   { "number",      0, NUMBER_CMD ,        RING_DECL},
+  { "Number",      0, NUMBER2_CMD ,       ROOT_DECL},
   { "numerator",   0, NUMERATOR_CMD ,     CMD_1},
   { "nvars",       0, NVARS_CMD ,         CMD_1},
   { "open",        0, OPEN_CMD ,          CMD_1},
@@ -1171,6 +1176,7 @@ struct sValAssign dAssign[]=
 ,{D(jiA_LINK),     LINK_CMD,       LINK_CMD }
 ,{D(jiA_PACKAGE),  PACKAGE_CMD,    PACKAGE_CMD }
 ,{D(jiA_DEF),      DEF_CMD,        DEF_CMD }
+,{D(jiA_CRING),    CRING_CMD,      CRING_CMD }
 ,{NULL_VAL,        0,              0 }
 };
 struct sValAssign_sys dAssign_sys[]=

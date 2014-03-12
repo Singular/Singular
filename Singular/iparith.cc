@@ -80,6 +80,7 @@
 //#include <kernel/mpr_inout.h>
 
 #include <Singular/si_signals.h>
+#include <Singular/number2.h>
 
 
 #include <stdlib.h>
@@ -91,6 +92,7 @@
 #include <vector>
 
 lists rDecompose(const ring r);
+BOOLEAN rDecompose_CF(leftv res,const coeffs C);
 ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
 
 
@@ -4816,6 +4818,13 @@ static BOOLEAN jjRINGLIST(leftv res, leftv v)
     res->data = (char *)rDecompose((ring)v->Data());
   return (r==NULL)||(res->data==NULL);
 }
+static BOOLEAN jjRINGLIST_C(leftv res, leftv v)
+{
+  coeffs r=(coeffs)v->Data();
+  if (r!=NULL)
+    return rDecompose_CF(res,r);
+  return TRUE;
+}
 static BOOLEAN jjROWS(leftv res, leftv v)
 {
   ideal i = (ideal)v->Data();
@@ -5113,6 +5122,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
   int t=(int)(long)v->data;
   switch (t)
   {
+    case CRING_CMD:
     case INT_CMD:
     case POLY_CMD:
     case VECTOR_CMD:
@@ -5135,7 +5145,8 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case RESOLUTION_CMD:
          res->data=omStrDup(Tok2Cmdname(t)); break;
     case DEF_CMD:
-    case NONE:           res->data=omStrDup("none"); break;
+    case NONE:
+         res->data=omStrDup("none"); break;
     default:
     {
       if (t>MAX_TOK)

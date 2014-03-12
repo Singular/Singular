@@ -246,6 +246,7 @@ NOTE:   the return value is the Rothstein-Trager partial fraction
       // Go into the quotient by q(z)=0
       ring MP_z = (0,var(n+1)), (x(1..n)), dp;
       list lMP_z = ringlist(MP_z);
+      lMP_z[1]=ringlist(lMP_z[1]);
       lMP_z[1][4] = ideal(imap(MPz,q));
       list tmp = ringlist(MPz)[2];
       lMP_z[2] = list(tmp[1..n]);
@@ -302,6 +303,7 @@ RETURN:  list L of two polynomials: q=L[1] is an irreducible polynomial of
   // Go into the quotient by q(z)=0
   ring MP_z = (0,var(n+1)), (x(1..n)), dp;
   list lMP_z = ringlist(MP_z);
+  lMP_z[1]=ringlist(lMP_z[1]);
   lMP_z[1][4] = ideal(imap(MPz,q));
   lMP_z[2] = list(tmp[1..n]);
   def MPq = ring(lMP_z);
@@ -586,7 +588,7 @@ EXAMPLE: example absFactorize; shows an example
   }
   else
   {
-    list Lpar=Lout[1];
+    list Lpar=ringlist(Lout[1]);
     Lpar[2][size(Lpar[2])+1]=newvar;
     vv=Lpar[3][1][2];
     vv=vv,1;
@@ -740,7 +742,7 @@ EXAMPLE: example absFactorizeBCG; shows an example
   }
   else
   {
-    list Lpar=Lout[1];
+    list Lpar=ringlist(Lout[1]);
     Lpar[2][size(Lpar[2])+1]=newvar;
     vv=Lpar[3][1][2];
     vv=vv,1;

@@ -688,7 +688,7 @@ EXAMPLE:  example sysQE; shows an example
  }
 
  def br=basering;
- list rl=ringlist(br);
+ list rl=ringlist(br);rl[1]=ringlist(rl[1]);
 
  int red=nrows(check);
  int n=ncols(check);
@@ -1059,7 +1059,7 @@ EXAMPLE: example mindist; shows an example
  int n=ncols(check); int redun=nrows(check); int t=redun+1;
 
  def br=basering;
- list rl=ringlist(br);
+ list rl=ringlist(br);rl[1]=ringlist(rl[1]);
  int q=rl[1][1];
 
  ring work=(q,a),(V(1..t),U(1..n)),dp;
@@ -1552,7 +1552,7 @@ proc pointsGen (int m, int e)
      list result;
      int count=1;
      int i,j;
-     list l=ringlist(basering);
+     list l=ringlist(basering);l[1]=ringlist(l[1]);
      int charac=l[1][1];
      number a=par(1);
      list tmp;
@@ -1592,7 +1592,7 @@ proc pointsGen (int m, int e)
      list result;
      int count=1;
      int i,j;
-     list l=ringlist(basering);
+     list l=ringlist(basering);l[1]=ringlist(l[1]);
      int charac=l[1][1];
      list tmp;
      for (i=1; i<=charac^m; i++)
@@ -1665,7 +1665,7 @@ proc graspList (list l, int m, int n)
 static proc xi_gen (matrix p, int e, int s)
 {
      poly prod=1;
-     list rl=ringlist(basering);
+     list rl=ringlist(basering);rl[1]=ringlist(rl[1]);
      int charac=rl[1][1];
      int l;
      for (l=1; l<=s; l++)
@@ -1721,7 +1721,7 @@ SEE ALSO: sysQE
 EXAMPLE:   example sysFL; shows an example
 "
 {
-     list rl=ringlist(basering);
+     list rl=ringlist(basering);rl[1]=ringlist(rl[1]);
      int charac=rl[1][1];
      int n=ncols(check);
      int m=nrows(check);
@@ -1890,7 +1890,7 @@ proc FLpreprocess (int p, int e, int n, int t, string minp)
 
      def r2=ring(rl);
      setring r2;
-     list l=ringlist(r2);
+     list l=ringlist(r2);l[1]=ringlist(l[1]);
      if (e>1)
      {
           execute(string("poly f="+minp));
@@ -1944,7 +1944,7 @@ static proc asElement(list l)
 // random vector of length n with entries from p, p the characteristic
 static proc random_prime_vector (int n)
 {
-  list rl=ringlist(basering);
+  list rl=ringlist(basering); rl[1]=ringlist(rl[1]);
   int i, charac;
   for (i=2; i<=rl[1][1]; i++)
   {

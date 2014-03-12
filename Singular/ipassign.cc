@@ -835,6 +835,12 @@ static BOOLEAN jiA_DEF(leftv res, leftv a, Subexpr e)
   res->data=(void *)0;
   return FALSE;
 }
+static BOOLEAN jiA_CRING(leftv res, leftv a, Subexpr e)
+{
+  res->data=(void *)a->CopyD(CRING_CMD);
+  jiAssignAttr(res,a);
+  return FALSE;
+}
 /*=================== table =================*/
 #define IPASSIGN
 #define D(A)     A

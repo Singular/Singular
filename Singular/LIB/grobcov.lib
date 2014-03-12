@@ -195,7 +195,7 @@ EXAMPLE:  setglobalrings; shows an example"
   }
   def RR=basering;
   def @R=basering;  // must be of the form K[a][x], a=parameters, x=variables
-  list Rx=ringlist(RR);
+  list Rx=ringlist(RR);Rx[1]=ringlist(Rx[1]);
   def @P=ring(Rx[1]);
   list Lx;
   Lx[1]=0;
