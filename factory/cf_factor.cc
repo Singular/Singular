@@ -502,8 +502,6 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         Variable alpha;
         if (CFFactory::gettype() == GaloisFieldDomain)
           factors= GFSqrfFactorize (f);
-        else if (hasFirstAlgVar (f, alpha))
-          factors= FqSqrfFactorize (f, alpha);
         else
           factors= FpSqrfFactorize (f);
         for (CFListIterator i= factors; i.hasItem(); i++)
@@ -514,8 +512,6 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         Variable alpha;
         if (CFFactory::gettype() == GaloisFieldDomain)
           F= GFFactorize (f);
-        else if (hasFirstAlgVar (f, alpha))
-          F= FqFactorize (f, alpha);
         else
           F= FpFactorize (f);
       }
@@ -624,8 +620,8 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 #ifndef NOASSERT
   Variable beta;
   if (hasFirstAlgVar(f, beta))
-    ASSERT (hasFirstAlgVar (f, beta) != alpha, "f has an algebraic variable that \
-    does not coincide with alpha");
+    ASSERT (beta == alpha, "f has an algebraic variable that \
+                            does not coincide with alpha");
 #endif
   int ch=getCharacteristic();
   if (f.isUnivariate()&& (ch>0))
