@@ -4131,6 +4131,8 @@ the same as the type of the argument
 returns a minimal set of generators of an ideal, resp.@: module, if the
 input is
 either homogeneous or if the ordering is local.
+@item @strong{Note:}
+this command is not available over coefficient rings.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -4548,8 +4550,8 @@ list
 returns a list whose first entry is a standard basis for the ideal, resp.@:
 module, whose second entry is a generating set for the
 ideal, resp.@: module.
-If the ideal/module is homogeneous or the ordering is local,
-this second entry is a minimal generating set.
+If the coefficient ring is a field and  either the ideal/module is homogeneous or 
+the ordering is local, this second entry is a minimal generating set.
 @item @strong{Example:}
 @smallexample
 @c example

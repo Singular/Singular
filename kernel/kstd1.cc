@@ -2505,7 +2505,26 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     M=idInit(1,F->rank);
     return idInit(1,F->rank);
   }
-
+  #ifdef HAVE_RINGS
+  if(rField_is_Ring(currRing))
+  {
+    ideal sb;
+    sb = kStd(F, Q, h, w, hilb);
+    idSkipZeroes(sb);
+    if(IDELEMS(sb) <= IDELEMS(F))
+    {
+        M = idCopy(sb);
+        idSkipZeroes(M);
+        return(sb);
+    }
+    else
+    {
+        M = idCopy(F);
+        idSkipZeroes(M);
+        return(sb);
+    }
+  }
+  #endif
   ideal r=NULL;
   int Kstd1_OldDeg = Kstd1_deg,i;
   intvec* temp_w=NULL;
@@ -2567,6 +2586,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     strat->LazyPass*=2;
   }
   strat->homog=h;
+  idPrint(strat->M);
   if (currRing->OrdSgn==-1)
   {
     if (w!=NULL)
@@ -2581,6 +2601,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     else
       r=bba(F,Q,NULL,hilb,strat);
   }
+  idPrint(strat->M);
 #ifdef KDEBUG
   {
     int i;
@@ -2622,7 +2643,9 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
   }
   else
   {
-    if (IDELEMS(M)>IDELEMS(r)) { idDelete(&M); M=idCopy(r); }
+    if (IDELEMS(M)>IDELEMS(r)) { 
+       idDelete(&M); 
+       M=idCopy(r); }
   }
   return r;
 }
