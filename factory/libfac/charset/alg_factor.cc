@@ -469,7 +469,7 @@ psqr (const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q,
 
 CanonicalForm
 QuasiInverse (const CanonicalForm& f, const CanonicalForm& g,
-      CanonicalForm& numt, const Variable& x)
+              const Variable& x)
 {
   CanonicalForm pi, pi1, q, t0, t1, Hi, bi, pi2;
   bool isRat= isOn (SW_RATIONAL);
@@ -513,8 +513,7 @@ QuasiInverse (const CanonicalForm& f, const CanonicalForm& g,
   t1 /= gcd (pi1, t1);
   if (!isRat)
     Off (SW_RATIONAL);
-  numt= t1;
-  return pi;
+  return t1;
 }
 
 CanonicalForm
@@ -644,18 +643,18 @@ simpleextension(CFList& backSubst, const CFList & Astar,
         h= alg_gcd (h, swapvar (oldR, g.mvar(), oldR.mvar()), tmp);
         CanonicalForm hh= replacevar (h, oldR.mvar(), alpha);
 
-        CanonicalForm numt, dent;
-        QuasiInverse (tmp.getFirst(), LC (h), numt, tmp.getFirst().mvar());
+        CanonicalForm numinv, deninv;
+        numinv= QuasiInverse (tmp.getFirst(), LC (h), tmp.getFirst().mvar());
 
         Off (SW_RATIONAL);
-        h *= numt;
+        h *= numinv;
         h= reduce (h, tmp.getFirst());
-        dent= LC(h);
+        deninv= LC(h);
 
         ra= -h[0];
-        denra= gcd (ra, dent);
+        denra= gcd (ra, deninv);
         ra /= denra;
-        denra= dent/denra;
+        denra= deninv/denra;
         denra= replacevar (denra, ra.mvar(), g.mvar());
         ra= replacevar(ra, ra.mvar(), g.mvar());
         rb= R.mvar()*denra-s*ra;
@@ -799,11 +798,11 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
 
   // make quasi monic
   CFList Rstarlist= CFList (Rstar);
-  CanonicalForm numt, dent;
+  CanonicalForm numinv;
   On (SW_RATIONAL);
-  QuasiInverse (Rstar, LC(f), numt, Rstar.mvar());
+  numinv= QuasiInverse (Rstar, LC(f), Rstar.mvar());
 
-  f *= numt;
+  f *= numinv;
   f= Prem (f, Rstarlist);
   f /= vcontent (f, Rstar.mvar());
   // end quasi monic
@@ -857,9 +856,8 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
       DEBOUTLN(CERR, "alg_factor: fnew= ", fnew);
 
       h= alg_gcd (g, fnew, Rstarlist);
-      QuasiInverse(Rstar, LC(h), numt, Rstar.mvar());
-      dent= 1;
-      h *= numt;
+      numinv= QuasiInverse(Rstar, LC(h), Rstar.mvar());
+      h *= numinv;
       h= Prem (h, Rstarlist);
       h /= vcontent (h, Rstar.mvar());
 
