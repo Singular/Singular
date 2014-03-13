@@ -624,7 +624,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 #ifndef NOASSERT
   Variable beta;
   if (hasFirstAlgVar(f, beta))
-    ASSERT (!hasFirstAlgVar (f, beta == alpha), "f has an algebraic variable that \
+    ASSERT (hasFirstAlgVar (f, beta) != alpha, "f has an algebraic variable that \
     does not coincide with alpha");
 #endif
   int ch=getCharacteristic();
