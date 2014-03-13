@@ -698,6 +698,14 @@ CanonicalForm alg_lc(const CanonicalForm &f)
   return f;
 }
 
+CanonicalForm alg_LC (const CanonicalForm& f, int lev)
+{
+  CanonicalForm result= f;
+  while (result.level() > lev)
+    result= LC (result);
+  return result;
+}
+
 CanonicalForm
 subst (const CanonicalForm& f, const CFList& a, const CFList& b,
        const CanonicalForm& Rstar, bool isFunctionField)
@@ -798,9 +806,10 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
 
   // make quasi monic
   CFList Rstarlist= CFList (Rstar);
+  int algExtLevel= Astar.getLast().level(); //highest level of algebraic variables
   CanonicalForm numinv;
   On (SW_RATIONAL);
-  numinv= QuasiInverse (Rstar, LC(f), Rstar.mvar());
+  numinv= QuasiInverse (Rstar, alg_LC(f, algExtLevel), Rstar.mvar());
 
   f *= numinv;
   f= Prem (f, Rstarlist);
@@ -856,7 +865,7 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
       DEBOUTLN(CERR, "alg_factor: fnew= ", fnew);
 
       h= alg_gcd (g, fnew, Rstarlist);
-      numinv= QuasiInverse(Rstar, LC(h), Rstar.mvar());
+      numinv= QuasiInverse(Rstar, alg_LC(h, algExtLevel), Rstar.mvar());
       h *= numinv;
       h= Prem (h, Rstarlist);
       h /= vcontent (h, Rstar.mvar());
