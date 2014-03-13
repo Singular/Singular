@@ -779,6 +779,9 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
             kNew++;
             mpz_mul(baseTokNew, baseTokNew, currRing->cf->modBase);
           }
+          //To Do: currently we stay in case Z/p^n even for n=1
+          //       for performance reasons passing to groundfield Z/p 
+          //       would be more suitable
           qr = rCopyNewCoeff(currRing, currRing->cf->modBase, kNew, currRing->cf->type);
           mpz_clear(baseTokNew);
         }
