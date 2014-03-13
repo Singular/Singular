@@ -61,11 +61,15 @@ ideal idMinBase (ideal h1)
   BOOLEAN homog;
 
   homog = idHomModule(h1,currQuotient,&wth);
-  if (rHasGlobalOrdering(currRing))
+  if (rHasGlobalOrdering(currRing)
+       #ifdef HAVE_RINGS
+        ||(rField_is_Ring(currRing))
+       #endif
+      )
   {
     if(!homog)
     {
-      WarnS("minbase applies only to the local or homogeneous case");
+      WarnS("minbase applies only to the local or homogeneous case over coefficient fields");
       e=idCopy(h1);
       return e;
     }
