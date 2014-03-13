@@ -2577,7 +2577,6 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     strat->LazyPass*=2;
   }
   strat->homog=h;
-  idPrint(strat->M);
   if (currRing->OrdSgn==-1)
   {
     if (w!=NULL)
@@ -2592,7 +2591,6 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     else
       r=bba(F,Q,NULL,hilb,strat);
   }
-  idPrint(strat->M);
 #ifdef KDEBUG
   {
     int i;
