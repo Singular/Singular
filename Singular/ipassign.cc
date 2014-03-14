@@ -836,7 +836,6 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
       }
       nMapFunc nMap = NULL;
       nMap = n_SetMap(origr->cf, qr->cf);
-      
       qid = idInit(IDELEMS(id),1);
       for(i = 0; i<IDELEMS(id); i++)
       {
