@@ -335,7 +335,7 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     return r;
   }
 #else
-  if (isOn(SW_USE_NTL_GCD_P) && ( getCharacteristic() > 0 ) && (CFFactory::gettype() != GaloisFieldDomain)
+  if (( getCharacteristic() > 0 ) && (CFFactory::gettype() != GaloisFieldDomain)
   &&  (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
   {
     if (fac_NTL_char!=getCharacteristic())
@@ -376,7 +376,7 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     return r;
   }
 #else
-  if (isOn(SW_USE_NTL_GCD_0) && ( getCharacteristic() ==0)
+  if (( getCharacteristic() ==0)
   && (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
   {
     CanonicalForm fc=bCommonDen(f);
@@ -399,15 +399,12 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
       }
       else
       {
-        Off(SW_USE_NTL_GCD_0);
-        r=extgcd(f,g,a,b);
-        if (isOn(SW_RATIONAL))
-        {
-          a/=r.lc();
-          b/=r.lc();
-          r/=r.lc();
-        }
-        On(SW_USE_NTL_GCD_0);
+        F1 /= R;
+        G1 /= R;
+        XGCD (RR, A,B,F1,G1,1);
+        rr=convertZZ2CF(RR);
+        a=convertNTLZZX2CF(A,f.mvar())*(fc/rr);
+        b=convertNTLZZX2CF(B,f.mvar())*(gc/rr);
       }
     }
     else
@@ -421,15 +418,12 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
       }
       else
       {
-        Off(SW_USE_NTL_GCD_0);
-        r=extgcd(f,g,a,b);
-        if (isOn(SW_RATIONAL))
-        {
-          a/=r.lc();
-          b/=r.lc();
-          r/=r.lc();
-        }
-        On(SW_USE_NTL_GCD_0);
+        F1 /= R;
+        G1 /= R;
+        XGCD (RR, A,B,F1,G1,1);
+        rr=convertZZ2CF(RR);
+        a=convertNTLZZX2CF(A,f.mvar())*(fc/rr);
+        b=convertNTLZZX2CF(B,f.mvar())*(gc/rr);
       }
       return r;
     }
@@ -674,7 +668,7 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
           return gcd_univar_flintp(pi,pi1)*C;
 #else
 #ifdef HAVE_NTL
-        if ( isOn(SW_USE_NTL_GCD_P) && bpure && (CFFactory::gettype() != GaloisFieldDomain))
+        if (bpure && (CFFactory::gettype() != GaloisFieldDomain))
             return gcd_univar_ntlp(pi, pi1 ) * C;
 #endif
 #endif
@@ -793,7 +787,7 @@ gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
             return gcd_univar_flint0(pi, pi1 ) * C;
 #else
 #ifdef HAVE_NTL
-        if ( isOn(SW_USE_NTL_GCD_0) && isPurePoly(pi) && isPurePoly(pi1) )
+        if (isPurePoly(pi) && isPurePoly(pi1) )
             return gcd_univar_ntl0(pi, pi1 ) * C;
 #endif
 #endif

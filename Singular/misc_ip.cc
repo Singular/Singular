@@ -1167,9 +1167,6 @@ extern "C"
 void siInit(char *name)
 {
 // factory default settings: -----------------------------------------------
-  On(SW_USE_NTL);
-  On(SW_USE_NTL_GCD_0); // On -> seg11 in Old/algnorm, Old/factor...
-  On(SW_USE_NTL_GCD_P); // On -> cyle in Short/brnoeth_s: fixed
   On(SW_USE_EZGCD);
   On(SW_USE_CHINREM_GCD);
   //On(SW_USE_FF_MOD_GCD);

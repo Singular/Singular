@@ -3587,8 +3587,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         if (h==NULL)
         {
 #ifdef HAVE_PLURAL
-          Print("NTL_0:%d (use NTL for gcd of polynomials in char 0)\n",isOn(SW_USE_NTL_GCD_0));
-          Print("NTL_p:%d (use NTL for gcd of polynomials in char p)\n",isOn(SW_USE_NTL_GCD_P));
           Print("EZGCD:%d (use EZGCD for gcd of polynomials in char 0)\n",isOn(SW_USE_EZGCD));
           Print("EZGCD_P:%d (use EZGCD_P for gcd of polynomials in char p)\n",isOn(SW_USE_EZGCD_P));
           Print("CRGCD:%d (use chinese Remainder for gcd of polynomials in char 0)\n",isOn(SW_USE_CHINREM_GCD));
@@ -3604,8 +3602,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           int d=(int)(long)h->next->Data();
           char *s=(char *)h->Data();
 #ifdef HAVE_PLURAL
-          if (strcmp(s,"NTL_0")==0) { if (d) On(SW_USE_NTL_GCD_0); else Off(SW_USE_NTL_GCD_0); } else
-          if (strcmp(s,"NTL_p")==0) { if (d) On(SW_USE_NTL_GCD_P); else Off(SW_USE_NTL_GCD_P); } else
           if (strcmp(s,"EZGCD")==0) { if (d) On(SW_USE_EZGCD); else Off(SW_USE_EZGCD); } else
           if (strcmp(s,"EZGCD_P")==0) { if (d) On(SW_USE_EZGCD_P); else Off(SW_USE_EZGCD_P); } else
           if (strcmp(s,"CRGCD")==0) { if (d) On(SW_USE_CHINREM_GCD); else Off(SW_USE_CHINREM_GCD); } else
