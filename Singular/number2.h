@@ -18,4 +18,20 @@ void crPrint(coeffs cf);
 
 BOOLEAN jjCRING_Zp(leftv res, leftv a, leftv b);
 BOOLEAN jjCRING_Zm(leftv res, leftv a, leftv b);
+
+BOOLEAN jjEQUAL_CR(leftv res, leftv a, leftv b); // compare cring
+
+// type conversion:
+BOOLEAN jjNUMBER2CR(leftv res, leftv a, leftv b); // <any>,cring ->number2
+BOOLEAN jjN2_CR(leftv res, leftv a);              // number2 ->cring
+BOOLEAN jjN2_N(leftv res, leftv a);             // number2 ->number
+
+// operations:
+BOOLEAN jjNUMBER2_OP1(leftv res, leftv a);
+BOOLEAN jjNUMBER2_OP2(leftv res, leftv a, leftv b);
+
+number2 n2Copy(const number2 d);
+void n2Delete(number2 &d);
+char *n2String(number2 d, BOOLEAN typed);
+void n2Print(number2 d);
 #endif

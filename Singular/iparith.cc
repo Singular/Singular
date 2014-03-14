@@ -5138,6 +5138,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case INTMAT_CMD:
     case BIGINTMAT_CMD:
     case NUMBER_CMD:
+    case NUMBER2_CMD:
     case BIGINT_CMD:
     case LIST_CMD:
     case PACKAGE_CMD:

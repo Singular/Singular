@@ -33,6 +33,7 @@
 #include <Singular/attrib.h>
 #include <polys/monomials/ring.h>
 #include <Singular/ipshell.h>
+#include <Singular/number2.h>
 #include <Singular/ipconv.h>
 
 typedef void *   (*iiConvertProc)(void * data);
@@ -162,14 +163,32 @@ static void * iiI2BI(void *data)
   return (void *)n;
 }
 
+static void * iiI2NN(void *data)
+{
+  number n=nInit((int)(long)data);
+  number2 nn=(number2)omAlloc(sizeof*nn);
+  nn->cf=currRing->cf;
+  nn->n=n;
+  return (void *)nn;
+}
+
 static void * iiBI2N(void *data)
+{
+  number n = n_Init_bigint((number)data, coeffs_BIGINT, currRing->cf);
+  n_Delete((number *)&data, coeffs_BIGINT);
+  return (void*)n;
+}
+
+static void * iiBI2NN(void *data)
 {
   if (currRing==NULL) return NULL;
   // a bigint is really a number from char 0, with diffrent
   // operations...
   number n = n_Init_bigint((number)data, coeffs_BIGINT, currRing->cf);
   n_Delete((number *)&data, coeffs_BIGINT);
-  return (void*)n;
+  number2 nn=(number2)omAlloc(sizeof*nn);
+  nn->cf=currRing->cf;
+  return (void*)nn;
 }
 
 static void * iiIm2Ma(void *data)
@@ -409,6 +428,8 @@ int iiTestConvert (int inputType, int outputType)
   }
 
   if ((currRing==NULL) && (outputType>BEGIN_RING) && (outputType<END_RING))
+    return 0;
+  if ((currRing==NULL) && (outputType==NUMBER2_CMD))
     return 0;
 
   // search the list
