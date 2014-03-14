@@ -372,10 +372,10 @@ void ttGen1()
         fprintf(outfile,"// convert %s -> %s\n",
           Tok2Cmdname(i), Tok2Cmdname(j));
   #ifdef CONVERT_TABLE
-	fprintf(doctable,
-	"@item\n@   %d. @tab @code{%s}  @tab @expansion{} @code{%s}\n",
+        fprintf(doctable,
+        "@item\n@   %d. @tab @code{%s}  @tab @expansion{} @code{%s}\n",
         doc_nr,Tok2Cmdname(i),Tok2Cmdname(j));
-	doc_nr++;
+        doc_nr++;
   #endif
         if (j==ANY_TYPE) break;
       }
