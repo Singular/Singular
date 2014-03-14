@@ -58,7 +58,7 @@ map (const CanonicalForm& primElem,///< [in] primitive element of
      const CanonicalForm& F,       ///< [in] an element of \f$ F_p (\alpha) \f$,
                                    ///< whose minimal polynomial defines a field
                                    ///< extension of \f$ F_p \f$ of degree
-                                   ///< \f$ \[F_p (\alpha):F_p\] \f$
+                                   ///< \f$ F_p (\alpha):F_p \f$
      const Variable& beta          ///< [in] algebraic variable, root of \a F's
                                    ///< minimal polynomial
     );
