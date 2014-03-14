@@ -59,13 +59,16 @@ ideal idMinBase (ideal h1)
   int i,l,ll;
   intvec * wth;
   BOOLEAN homog;
-
+  #ifdef HAVE_RINGS
+  if(rField_is_Ring(currRing))
+  {
+      WarnS("minbase applies only to the local or homogeneous case over coefficient fields");
+      e=idCopy(h1);
+      return e;
+  }
+  #endif
   homog = idHomModule(h1,currQuotient,&wth);
-  if (rHasGlobalOrdering(currRing)
-       #ifdef HAVE_RINGS
-        ||(rField_is_Ring(currRing))
-       #endif
-      )
+  if (rHasGlobalOrdering(currRing))
   {
     if(!homog)
     {
