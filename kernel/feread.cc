@@ -207,6 +207,9 @@ char * fe_fgets_stdin_rl(const char *pr,char *s, int size)
   char *line;
   line = readline (pr);
 
+  int i;
+  for (i=strlen(line)-1;i>=0;i--) line[i]=line[i]&127;
+
   if (line==NULL)
     return NULL;
 
@@ -269,6 +272,9 @@ char * fe_fgets_stdin_drl(const char *pr,char *s, int size)
   if (line==NULL)
     return NULL;
 
+  int i;
+  for (i=strlen(line)-1;i>=0;i--) line[i]=line[i]&127;
+
   if (*line!='\0')
   {
     (*fe_add_history) (line);
@@ -300,7 +306,10 @@ char * fe_fgets(const char *pr,char *s, int size)
     fprintf(stdout,"%s",pr);
   }
   mflush();
-  return fgets(s,size,stdin);
+  char *line=fgets(s,size,stdin);
+  int i;
+  for (i=strlen(line)-1;i>=0;i--) line[i]=line[i]&127;
+  return line;
 }
 
 /* ===================================================================*/
