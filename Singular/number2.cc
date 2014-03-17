@@ -124,6 +124,7 @@ BOOLEAN jjNUMBER2_OP2(leftv res, leftv a, leftv b)
              return TRUE;
   }
   res->data=(void*)r;
+  r->cf->ref++;
   return FALSE;
 }
 BOOLEAN jjNUMBER2_OP1(leftv res, leftv a)
@@ -142,13 +143,14 @@ BOOLEAN jjNUMBER2_OP1(leftv res, leftv a)
              return TRUE;
   }
   res->data=(void*)r;
+  r->cf->ref++;
   return FALSE;
 }
 
 BOOLEAN jjNUMBER2CR(leftv res, leftv a, leftv b)
 {
   number2 r=(number2)omAlloc(sizeof(*r));
-  r->cf=(coeffs)b->Data();
+  r->cf=(coeffs)b->CopyD();
   BOOLEAN bo=FALSE;
   switch(a->Typ())
   {
@@ -194,6 +196,7 @@ BOOLEAN jjNUMBER2CR(leftv res, leftv a, leftv b)
 BOOLEAN jjN2_CR(leftv res, leftv a)              // number2 ->cring
 {
   number2 n=(number2)a->Data();
+  n->cf->ref++;
   res->data=(void*)n->cf;
   return FALSE;
 }
@@ -227,6 +230,7 @@ BOOLEAN jjEQUAL_CR(leftv res, leftv a, leftv b)
 number2 n2Copy(const number2 d)
 {
   number2 r=(number2)omAlloc(sizeof(*r));
+  d->cf->ref++;
   r->cf=d->cf;
   if (d->cf!=NULL)
     r->n=n_Copy(d->n,d->cf);
@@ -240,6 +244,7 @@ void n2Delete(number2 &d)
   {
     n_Delete(&d->n,d->cf);
   }
+  nKillChar(d->cf);
   omFreeSize(d,sizeof(*d));
   d=NULL;
 }
