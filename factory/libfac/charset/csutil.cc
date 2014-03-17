@@ -11,7 +11,7 @@
 #include <homogfactor.h>
 // Charset - Includes
 #include "csutil.h"
-extern void out_cf(char *s1,const CanonicalForm &f,char *s2);
+extern void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 extern CanonicalForm alg_lc(const CanonicalForm &f);
 extern int hasAlgVar(const CanonicalForm &f);
 
@@ -254,7 +254,9 @@ myfitting( const CanonicalForm &f, const CFList &as )
      return num((rem/lc(rem)));
    else
    {
-     On(SW_RATIONAL);
+     bool isRat= isOn (SW_RATIONAL);
+     if (!isRat)
+       On(SW_RATIONAL);
      CanonicalForm temp= mapinto(rem);
 //      CERR << "temp= " << temp << "\n";
 //      CERR << "lc(temp)= " << lc(temp) << "\n";
@@ -289,7 +291,8 @@ myfitting( const CanonicalForm &f, const CFList &as )
      }
 
      temp= bCommonDen(temp/lc(temp))*(temp/lc(temp));
-     Off(SW_RATIONAL);
+     if (!isRat)
+       Off(SW_RATIONAL);
      rem= mapinto(temp);
      return rem;
    }
@@ -793,9 +796,31 @@ static CanonicalForm alg_lc(const CanonicalForm &f, const CFList as)
 }
 #endif
 
+CanonicalForm
+alg_content (const CanonicalForm& f, const CFList& as)
+{
+  if (!f.inCoeffDomain())
+  {
+    CFIterator i= f;
+    CanonicalForm result= abs (i.coeff());
+    i++;
+    while (i.hasTerms() && !result.isOne())
+    {
+      result= alg_gcd (i.coeff(), result, as);
+      i++;
+    }
+    return result;
+  }
+
+  return abs (f);
+}
+
 CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
                       const CFList &as)
 {
+  if (fff.inCoeffDomain() || ggg.inCoeffDomain())
+    return 1;
+  bool isRat= isOn (SW_RATIONAL);
   CanonicalForm f=fff;
   CanonicalForm g=ggg;
   f=Prem(f,as);
@@ -810,8 +835,12 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
     if ( f.lc().sign() < 0 ) return -f;
     else                     return f;
   }
-  //out_cf("alg_gcd(",fff," , ");
-  //out_cf("",ggg,")\n");
+  //out_cf("alg_gcd fff(",fff," \n ");
+  //out_cf("ggg",ggg,")\n");
+  int v= as.getLast().level();
+  if (f.level() <= v || g.level() <= v)
+    return 1;
+
   CanonicalForm res;
   // does as appear in f and g ?
   bool has_alg_var=false;
@@ -857,129 +886,63 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
   }
 
   // gcd of all coefficients:
-  CFIterator i=f;
-  CanonicalForm c_gcd=i.coeff(); i++;
-  while( i.hasTerms())
-  {
-    c_gcd=alg_gcd(i.coeff(),c_gcd,as);
-    if (c_gcd.inBaseDomain()) break;
-    i++;
-  }
+  CanonicalForm c_f= alg_content (f, as);
+
   //printf("f.mvar=%d (%d), g.mvar=%d (%d)\n",f.level(),mvf,g.level(),mvg);
-  if (mvf!=mvg) // => mvf > mvg
+  if (mvf != mvg) // => mvf > mvg
   {
-    res=alg_gcd(g,c_gcd,as);
-    //out_cf("alg_gcd1=",res,"\n");
-    //out_cf("of f=",fff," , ");
-    //out_cf("and g=",ggg,"\n");
+    res= alg_gcd (g, c_f, as);
     return res;
   }
+  Variable x= f.mvar();
   // now: mvf==mvg, f.level()==g.level()
-  if (!c_gcd.inBaseDomain())
-  {
-    i=g;
-    while( i.hasTerms())
-    {
-      c_gcd=alg_gcd(i.coeff(),c_gcd,as);
-      if (c_gcd.inBaseDomain()) break;
-      i++;
-    }
-  }
+  // content of g
+  CanonicalForm c_g= alg_content (g, as);
+
+  int delta= degree (f) - degree (g);
 
   //f/=c_gcd;
   //g/=c_gcd;
-  if (!c_gcd.isOne())
+  f= divide (f, c_f, as);
+  g= divide (g, c_g, as);
+
+  // gcd of contents
+  CanonicalForm c_gcd= alg_gcd (c_f, c_g, as);
+  CanonicalForm tmp;
+
+  if (delta < 0)
   {
-    f=divide(f,c_gcd,as);
-    g=divide(g,c_gcd,as);
+    tmp= f;
+    f= g;
+    g= tmp;
+    delta= -delta;
   }
 
-  CFList gg;
   CanonicalForm r=1;
-  while (1)
+
+  while (degree (g, x) > 0)
   {
-    //printf("f.mvar=%d, g.mvar=%d\n",f.level(),g.level());
-    gg=as;
-    if (!g.inCoeffDomain()) gg.append(g);
-    //out_cf("Prem(",f," , ");
-    //out_cf("",g,")\n");
-    if (g.inCoeffDomain()|| g.isZero())
+    r= Prem (f, g, as);
+    r= Prem (r, as);
+    if (!r.isZero())
     {
-      //printf("in coeff domain:");
-      if (g.isZero()) { //printf("0\n");
-        i=f;
-        CanonicalForm f_gcd=i.coeff(); i++;
-        while( i.hasTerms())
-        {
-          f_gcd=alg_gcd(i.coeff(),f_gcd,as);
-          if (f_gcd.inBaseDomain()) break;
-          i++;
-        }
-        //out_cf("g=0 -> f:",f,"\n");
-        //out_cf("f_gcd:",f_gcd,"\n");
-        //out_cf("c_gcd:",c_gcd,"\n");
-        //f/=f_gcd;
-        f=divide(f,f_gcd,as);
-        //out_cf("f/f_gcd:",f,"\n");
-        f*=c_gcd;
-        //out_cf("f*c_gcd:",f,"\n");
-        CanonicalForm r_lc=alg_lc(f);
-        //out_cf("r_lc:",r_lc,"\n");
-        //f/=r_lc;
-        f=divide(f,r_lc,as);
-        //out_cf(" -> gcd:",f,"\n");
-        return f;
-      }
-      else { //printf("c\n");
-        return c_gcd;}
+      r= divide (r, alg_content (r,as), as);
+      r /= vcontent (r,Variable (v+1));
     }
-    else if (g.level()==f.level()) r=Prem(f,gg,as);
-    else
-    {
-      //printf("diff. level: %d, %d\n", f.level(), g.level());
-      // g and f have different levels
-      //out_cf("c_gcd=",c_gcd,"\n");
-    //out_cf("of f=",fff," , ");
-    //out_cf("and g=",ggg,"\n");
-      return c_gcd;
-    }
-    //out_cf("->",r,"\n");
-    f=g;
-    g=r;
+    f= g;
+    g= r;
   }
-  if (degree(f,Variable(mvg))==0)
-  {
-  // remark: mvf == mvg == f.level() ==g.level()
-    //out_cf("c_gcd=",c_gcd,"\n");
-    //out_cf("of f=",fff," , ");
-    //out_cf("and g=",ggg,"\n");
+
+  if (degree (g, x) == 0)
     return c_gcd;
-  }
-  //out_cf("f=",f,"\n");
-  i=f;
-  CanonicalForm k=i.coeff(); i++;
-  //out_cf("k=",k,"\n");
-  while( i.hasTerms())
-  {
-    if (k.inCoeffDomain()) break;
-    k=alg_gcd(i.coeff(),k,as);
-    //out_cf("k=",k,"\n");
-    i++;
-  }
-  //out_cf("end-k=",k,"\n");
-  f/=k;
-  //out_cf("f/k=",f,"\n");
-  res=c_gcd*f;
-  CanonicalForm r_lc=alg_lc(res);
-  res/=r_lc;
-  //CanonicalForm r_lc=alg_lc(res,as);
-  //res/=r_lc;
-  //out_cf("alg_gcd2=",res,"\n");
-  //  out_cf("of f=",fff," , ");
-  //  out_cf("and g=",ggg,"\n");
-  //return res;
-  //if (res.level()<fff.level() && res.level() < ggg.level())
-  //  return alg_gcd(alg_gcd(fff,res,as),ggg,as);
-  //else
-    return res;
+
+  c_f= alg_content (f, as);
+
+  f= divide (f, c_f, as);
+
+  f *= c_gcd;
+  f /= vcontent (f, Variable (v+1));
+
+  return f;
 }
+
