@@ -403,8 +403,8 @@ void ngfSetChar(const coeffs r)
 
 static char* ngfCoeffString(const coeffs r)
 {
-  char *s=(char*)omAlloc(31);
-  snprintf(s,27,"RR(%d,%d)",r->float_len,r->float_len2);
+  char *s=(char*)omAlloc(27);
+  snprintf(s,27,"real,%d,%d",r->float_len,r->float_len2);
   return s;
 }
 
@@ -534,6 +534,9 @@ nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
 
 void    ngfCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
+  //Print("//  RR(%d digits, additional %d digits)\n",
+  //             r->float_len,r->float_len2);  /* long R */
   Print("//   characteristic : 0 (real:%d digits, additional %d digits)\n",
                r->float_len,r->float_len2);  /* long R */
+
 }

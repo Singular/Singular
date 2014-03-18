@@ -35,8 +35,12 @@ void    nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
   long l = (long)mpz_sizeinbase(r->modBase, 10) + 2;
   char* s = (char*) omAlloc(l);
   s= mpz_get_str (s, 10, r->modBase);
+
+  //if (nCoeff_is_Ring_ModN(r)) Print("//  ZZ/%s\n", s);
+  //else if (nCoeff_is_Ring_PtoM(r)) Print("//  ZZ/%s^%lu\n", s, r->modExponent);
   if (nCoeff_is_Ring_ModN(r)) Print("//   coeff. ring is : Z/%s\n", s);
   else if (nCoeff_is_Ring_PtoM(r)) Print("//   coeff. ring is : Z/%s^%lu\n", s, r->modExponent);
+
   omFreeSize((ADDRESS)s, l);
 }
 
@@ -52,8 +56,8 @@ static char* nrnCoeffString(const coeffs r)
   char* b = (char*) omAlloc(l);
   b= mpz_get_str (b, 10, r->modBase);
   char* s = (char*) omAlloc(7+2+10+l);
-  if (nCoeff_is_Ring_ModN(r)) sprintf(s,"ZZ/%s",b);
-  else /*if (nCoeff_is_Ring_PtoM(r))*/ sprintf(s,"ZZ/(%s^%lu)",b,r->modExponent);
+  if (nCoeff_is_Ring_ModN(r)) sprintf(s,"integer,%s",b);
+  else /*if (nCoeff_is_Ring_PtoM(r))*/ sprintf(s,"integer,%s^%lu",b,r->modExponent);
   omFreeSize(b,l);
   return s;
 }

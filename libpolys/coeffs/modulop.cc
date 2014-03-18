@@ -426,8 +426,8 @@ number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 
 static char* npCoeffString(const coeffs r)
 {
-  char *s=(char*)omAlloc(14);
-  snprintf(s,14,"ZZ/%d",r->ch);
+  char *s=(char*)omAlloc(11);
+  snprintf(s,11,"%d",r->ch);
   return s;
 }
 
@@ -839,5 +839,6 @@ void nvPower (number a, int i, number * result, const coeffs r)
 void    npCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
   Print("//   characteristic : %d\n",r->ch);
+  //Print("// ZZ/%d\n",r->ch);
 }
 

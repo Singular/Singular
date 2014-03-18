@@ -379,12 +379,13 @@ const char * nrzRead (const char *s, number *a, const coeffs)
 
 void    nrzCoeffWrite  (const coeffs, BOOLEAN /*details*/)
 {
+  //PrintS("// ZZ\n");
   PrintS("//   coeff. ring is : Integers\n");
 }
 
 static char* nrzCoeffString(const coeffs)
 {
-  return omStrDup("ZZ");
+  return omStrDup("integer");
 }
 
 BOOLEAN nrzInitChar(coeffs r,  void *)

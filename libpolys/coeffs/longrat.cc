@@ -2600,6 +2600,7 @@ number nlExtGcd(number a, number b, number *s, number *t, const coeffs)
 void    nlCoeffWrite  (const coeffs, BOOLEAN /*details*/)
 {
   PrintS("//   characteristic : 0\n");
+  //PrintS("//  QQ\n");
 }
 
 number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, const coeffs CF)
@@ -2828,7 +2829,7 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
 
 static char* nlCoeffString(const coeffs)
 {
-  return omStrDup("QQ");
+  return omStrDup("0");
 }
 
 BOOLEAN nlInitChar(coeffs r, void*)

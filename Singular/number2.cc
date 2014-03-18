@@ -11,10 +11,14 @@
 
 char *crString(coeffs c)
 {
-  StringSetS("");
-  if (c==NULL) StringAppendS("oo");
-  else StringAppend("Coeff(%d):%s",c->type,c->cfCoeffString(c));
-  return omStrDup(StringEndS());
+  if (c==NULL)
+  {
+    StringSetS("oo");
+    return StringEndS();
+  }
+  SPrintStart();
+  c->cfCoeffWrite(c,0);
+  return SPrintEnd();
 }
 void crPrint(coeffs c)
 {

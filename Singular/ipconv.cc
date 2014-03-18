@@ -167,7 +167,7 @@ static void * iiI2NN(void *data)
 {
   number n=nInit((int)(long)data);
   number2 nn=(number2)omAlloc(sizeof*nn);
-  nn->cf=currRing->cf;
+  nn->cf=currRing->cf; nn->cf->ref++;
   nn->n=n;
   return (void *)nn;
 }
@@ -182,13 +182,27 @@ static void * iiBI2N(void *data)
 static void * iiBI2NN(void *data)
 {
   if (currRing==NULL) return NULL;
-  // a bigint is really a number from char 0, with diffrent
+  // a bigint is really a number from char 0, with different
   // operations...
   number n = n_Init_bigint((number)data, coeffs_BIGINT, currRing->cf);
   n_Delete((number *)&data, coeffs_BIGINT);
   number2 nn=(number2)omAlloc(sizeof*nn);
-  nn->cf=currRing->cf;
+  nn->cf=currRing->cf; nn->cf->ref++;
   return (void*)nn;
+}
+
+static void * iiNN2N(void *data)
+{
+  number2 d=(number2)data;
+  if ((currRing==NULL)
+  || (currRing->cf!=d->cf))
+  {
+    WerrorS("cannot convert: incompatible");
+    return NULL;
+  }
+  number n = n_Copy(d->n, d->cf);
+  n2Delete(d);
+  return (void*)n;
 }
 
 static void * iiIm2Ma(void *data)
@@ -429,8 +443,8 @@ int iiTestConvert (int inputType, int outputType)
 
   if ((currRing==NULL) && (outputType>BEGIN_RING) && (outputType<END_RING))
     return 0;
-  if ((currRing==NULL) && (outputType==NUMBER2_CMD))
-    return 0;
+  //if ((currRing==NULL) && (outputType==NUMBER2_CMD))
+  //  return 0;
 
   // search the list
   int i=0;
@@ -445,7 +459,7 @@ int iiTestConvert (int inputType, int outputType)
     }
     i++;
   }
-  //Print("test convert %d to %d (%s -> %s):0\n",inputType,outputType,
-  // Tok2Cmdname(inputType), Tok2Cmdname(outputType));
+  //Print("test convert %d to %d (%s -> %s):0, tested:%d\n",inputType,outputType,
+  // Tok2Cmdname(inputType), Tok2Cmdname(outputType),i);
   return 0;
 }

@@ -180,7 +180,6 @@ struct sValCmd1 dArith1[]=
 ,{D(jjNOT),        NOT,             INT_CMD,        INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDUMMY),      NUMBER_CMD,      NUMBER_CMD,     NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjN2_N),       NUMBER_CMD,      NUMBER_CMD,     NUMBER2_CMD   , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDUMMY),      NUMBER2_CMD,     NUMBER2_CMD,    NUMBER2_CMD   , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjP2N),        NUMBER_CMD,      NUMBER_CMD,     POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBI2N),       NUMBER_CMD,      NUMBER_CMD,     BIGINT_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDUMMY),      NUMBER2_CMD,     NUMBER2_CMD,    NUMBER2_CMD   , ALLOW_PLURAL |ALLOW_RING}
@@ -1118,6 +1117,7 @@ struct sConvertTypes dConvertTypes[] =
    { BIGINT_CMD,      NUMBER_CMD,     D(iiBI2N) , NULL_VAL },
    { INT_CMD,         NUMBER2_CMD,    D(iiI2NN) , NULL_VAL },
    { BIGINT_CMD,      NUMBER2_CMD,    D(iiBI2NN) , NULL_VAL },
+//   { NUMBER2_CMD,     NUMBER_CMD,     D(iiNN2N) , NULL_VAL },
 //  int -> poly
    { INT_CMD,         POLY_CMD,       D(iiI2P) , NULL_VAL },
    { BIGINT_CMD,      POLY_CMD,       D(iiBI2P) , NULL_VAL },

@@ -31,8 +31,7 @@ extern omBin gmp_nrz_bin; /* init in rintegers*/
 
 void    nr2mCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
-  PrintS("//   coeff. ring is : ");
-  Print("Z/2^%lu\n", r->modExponent);
+  Print("//  ZZ/2^%lu\n", r->modExponent);
 }
 
 BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
@@ -48,8 +47,8 @@ BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
 
 static char* nr2mCoeffString(const coeffs r)
 {
-  char* s = (char*) omAlloc(21+7);
-  sprintf(s,"ZZ/(2^%lu)",r->modExponent);
+  char* s = (char*) omAlloc(11+11);
+  sprintf(s,"integer,2,%lu",r->modExponent);
   return s;
 }
 
