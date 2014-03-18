@@ -50,11 +50,13 @@ extern char *iiArithGetCmd(int);
 *   to start from scratch; without any state (i.e. STATE == 0), then we
 *   start at the top of the list.
 */
+#include <Singular/ipid.h>
 extern "C"
 char *command_generator (char *text, int state)
 {
   static int list_index, len;
-  char *name;
+  static idhdl h;
+  const char *name;
 
   /* If this is a new word to complete, initialize now.  This includes
      saving the length of TEXT for efficiency, and initializing the index
@@ -63,6 +65,7 @@ char *command_generator (char *text, int state)
   {
     list_index = 1;
     len = strlen (text);
+    h=basePack->idroot;
   }
 
   /* Return the next name which partially matches from the command list. */
@@ -73,7 +76,16 @@ char *command_generator (char *text, int state)
     if (strncmp (name, text, len) == 0)
       return (strdup(name));
   }
-
+  if (len>1)
+  {
+    while (h!=NULL)
+    {
+      name=h->id;
+      h=h->next;
+      if (strncmp (name, text, len) == 0)
+        return (strdup(name));
+    }
+  }
   /* If no names matched, then return NULL. */
   return ((char *)NULL);
 }
