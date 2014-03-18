@@ -16,9 +16,9 @@
 #include "imm.h"
 #include "gfops.h"
 #include "facMul.h"
+#include "FLINTconvert.h"
 
 #include <factory/cf_gmp.h>
-
 
 #ifndef NOSTREAMIO
 CanonicalForm readCF( ISTREAM& );
