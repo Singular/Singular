@@ -1029,6 +1029,9 @@ multiplicity (CFFList& factors, const CanonicalForm& F, const CFList& as)
 CFFList
 newfactoras( const CanonicalForm & f, const CFList & as, int &success)
 {
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
   Variable vf=f.mvar();
   CFListIterator i;
   CFFListIterator jj;
@@ -1049,6 +1052,8 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
   if ( (cls(vf) <= cls(as.getLast())) ||  degree(f,vf)<=1 ){
 // ||( (as.length()==1) && (degree(f,vf)==3) && (degree(as.getFirst()==2)) )
     DEBDECLEVEL(CERR,"newfactoras");
+    if (!isRat)
+      Off (SW_RATIONAL);
     return CFFList(CFFactor(f,1));
   }
 
@@ -1078,6 +1083,8 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
 // 3) second trivial cases: we already prooved irr. of f over no extensions
   if ( Astar.length() == 0 ){
     DEBDECLEVEL(CERR,"newfactoras");
+    if (!isRat)
+      Off (SW_RATIONAL);
     return CFFList(CFFactor(f,1));
   }
 
@@ -1109,16 +1116,22 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
     {
       CFFList result= newfactoras (Ggcd,as,success); //Ggcd is the squarefree part of f
       multiplicity (result, f, Astar);
+      if (!isRat)
+        Off (SW_RATIONAL);
       return result;
     }
     DEBOUTLN(CERR, "  split into ", Fgcd);
     DEBOUTLN(CERR, "         and ", Ggcd);
     Fgcd= pp(Fgcd); Ggcd= pp(Ggcd);
     DEBDECLEVEL(CERR,"newfactoras");
+    if (!isRat)
+      Off (SW_RATIONAL);
     return myUnion(newfactoras(Fgcd,as,success) , newfactoras(Ggcd,as,success));
   }
   if ( getCharacteristic() > 0 )
   {
+    if (!isRat)
+      Off (SW_RATIONAL);
     // First look for extension!
     IntList degreelist;
     Variable vminpoly;
@@ -1163,8 +1176,10 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
     DEBOUTMSG(CERR, "Char=0! Apply Trager!");
     Variable vminpoly;
     Factorlist= alg_factor(f, Astar, vminpoly, oldord, as, isFunctionField);
-      DEBDECLEVEL(CERR,"newfactoras");
-      return Factorlist;
+    DEBDECLEVEL(CERR,"newfactoras");
+    if (!isRat)
+      Off (SW_RATIONAL);
+    return Factorlist;
   }
 
   DEBDECLEVEL(CERR,"newfactoras");
@@ -1174,18 +1189,24 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
 CFFList
 newcfactor(const CanonicalForm & f, const CFList & as, int & success )
 {
-  On (SW_RATIONAL);
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
   CFFList Output, output, Factors= factorize(f);
   if (Factors.getFirst().factor().inCoeffDomain())
     Factors.removeFirst();
 
   if ( as.length() == 0 )
   {
+    if (!isRat)
+      Off (SW_RATIONAL);
     success=1;
     return Factors;
   }
   if ( cls(f) <= cls(as.getLast()) )
   {
+    if (!isRat)
+      Off (SW_RATIONAL);
     success=1;
     return Factors;
   }
@@ -1197,5 +1218,8 @@ newcfactor(const CanonicalForm & f, const CFList & as, int & success )
     for ( CFFListIterator j=output; j.hasItem(); j++)
       Output = myappend(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
   }
+
+  if (!isRat)
+    Off (SW_RATIONAL);
   return Output;
 }
