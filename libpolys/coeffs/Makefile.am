@@ -1,6 +1,8 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS}  
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${srcdir} \
+$(FACTORY_INCLUDES) $(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
+${NTL_CFLAGS} $(FLINT_CFLAGS) ${GMP_CFLAGS}
 
 # noinst???
 noinst_LTLIBRARIES = libcoeffs.la 
@@ -24,15 +26,9 @@ libcoeffs_la_include_HEADERS = \
   shortfl.h mpr_complex.h mpr_global.h \
   bigintmat.h Enumerator.h AE.h OPAE.h AEp.h OPAEp.h AEQ.h OPAEQ.h
 
-if ENABLE_FACTORY
-  USE_FACTORY = ${top_builddir}/../factory/libfactory.la
-else
-  USE_FACTORY =
-endif
-
 libcoeffs_la_LIBADD = ${top_builddir}/reporter/libreporter.la ${top_builddir}/misc/libmisc.la \
-${USE_FACTORY} ${NTL_LIBS} ${GMP_LIBS}
-
+$(FACTORY_LIBS) $(RESOURCES_LIBS) $(OMALLOC_LIBS) \
+$(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
 
 TESTS_ENVIRONMENT = SINGULARPATH='${top_srcdir}/../factory:${top_builddir}/../factory'
 TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='$(top_builddir)' 

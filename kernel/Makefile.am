@@ -7,7 +7,9 @@ SUBDIRS=sample numeric
 noinst_LTLIBRARIES = libkernel.la 
 ###### libkerneldir = $(libdir)/singular
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS)  
+AM_CPPFLAGS = \
+-I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
+$(FACTORY_INCLUDES) $(NTL_CFLAGS) $(FLINT_CFLAGS) $(GMP_CFLAGS)
 
 SOURCES = polys.cc febase.cc feread.cc \
     hdegree.cc hilb.cc hutil.cc \
@@ -59,15 +61,10 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 libkernel_la_includedir  =${includedir}/singular/kernel
 libkernel_la_include_HEADERS   = $(KERNELHEADERS)
 
-if ENABLE_FACTORY
-  USE_FACTORY = ${top_builddir}/factory/libfactory.la
-else
-  USE_FACTORY =
-endif
-
-libkernel_la_LIBADD   = ${builddir}/sample/libsample.la ${builddir}/numeric/libnumeric.la \
-${top_builddir}/libpolys/polys/libpolys.la $(USE_FACTORY) 
-### libkernel_la_LDFLAGS    = -release ${PACKAGE_VERSION}
+libkernel_la_LIBADD   = \
+${builddir}/sample/libsample.la ${builddir}/numeric/libnumeric.la \
+${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
+${abs_top_builddir}/libpolys/polys/libpolys.la
 
 ### TODO: the following has to be addapted...
 TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables'
@@ -78,8 +75,7 @@ TESTS = test
 check_PROGRAMS = $(TESTS)
 
 test_SOURCES = test.cc
-test_LDADD = libkernel.la ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD}
-
+test_LDADD   = libkernel.la
 
 # These files are built first
 # BUILT_SOURCES = MOD

@@ -1,6 +1,8 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-AM_CPPFLAGS	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${GMP_CFLAGS}  
+AM_CPPFLAGS	= -I${top_srcdir} -I${top_builddir} -I${srcdir} \
+${FACTORY_INCLUDES} ${RESOURCES_INCLUDES} ${OMALLOC_INCLUDES} \
+${FLINT_CFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS} 
 
 
 if ENABLE_P_PROCS_STATIC

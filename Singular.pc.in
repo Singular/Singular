@@ -8,10 +8,10 @@ Description: The Singular high level functionality
 Version: @PACKAGE_VERSION@
 URL: https://github.com/Singular/Sources/
 
-Requires: omalloc resources factory libpolys
-# Conflicts: 
+Requires: @PKG_REQUIRE@ libpolys
+Conflicts: 
 
-Cflags: -I${includedir} -I${includedir}/singular @SINGULAR_CFLAGS@ @FACTORY_CFLAGS@ @FLINT_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@
-Libs: -L${libdir} -lSingular  @USEPPROCSDYNAMICLD@
-# Libs.private: 
+Cflags: -I${includedir} -I${includedir}/singular @SINGULAR_CFLAGS@
+Libs: -L${libdir} -lSingular @USEPPROCSDYNAMICLD@
+Libs.private: 
 
