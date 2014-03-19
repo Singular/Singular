@@ -104,7 +104,8 @@ BUILT_SOURCES = prCopy.inc templates/p_Procs.inc
 noinst_PROGRAMS = templates/p_Procs_Generate
 templates_p_Procs_Generate_SOURCES = templates/p_Procs_Generate.cc
 templates_p_Procs_Generate_CPPFLAGS = ${USE_P_PROCS_STATIC} ${AM_CPPFLAGS}
-templates_p_Procs_Generate_LDADD    = ${top_builddir}/reporter/libreporter.la ${top_builddir}/misc/libmisc.la
+templates_p_Procs_Generate_LDADD    = \
+${top_builddir}/reporter/libreporter.la ${top_builddir}/misc/libmisc.la 
 
 templates/p_Procs.inc: templates/p_Procs_Generate$(EXEEXT)
 	${builddir}/templates/p_Procs_Generate$(EXEEXT) > ${builddir}/templates/p_Procs.inc

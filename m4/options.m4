@@ -59,9 +59,9 @@ AC_ARG_ENABLE(plural, AS_HELP_STRING([--disable-plural], [Disable non-commutativ
 ],[ENABLE_PLURAL="yes"])
 
 if test "x$ENABLE_PLURAL" = xyes; then
-  AC_DEFINE(HAVE_PLURAL,1,Enable non-commutative subsystem)
+  AC_DEFINE(HAVE_PLURAL,[1],[Enable non-commutative subsystem])
   #TODO make a seperate switch
-  AC_DEFINE(HAVE_SHIFTBBA,1, [Enable letterplace])
+  AC_DEFINE(HAVE_SHIFTBBA,[1],[Enable letterplace])
 fi
 
 AM_CONDITIONAL([ENABLE_PLURAL],[test x$ENABLE_PLURAL = xyes])

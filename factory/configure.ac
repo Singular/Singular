@@ -251,29 +251,6 @@ fi
 #templatedir='${includedir}/templates'
 
 #
-# - the name of the game and the targets to create.
-#
-#if test "x$with_Singular" = xyes; then
-#  libfactory=libfactory.a
-#
-#  factorysrc='$(basefactorysrc) $(singfactorysrc)'
-#  factoryincl='$(basefactoryincl) $(singfactoryincl)'
-#
-#  alltargets=cf
-#  installtargets=installcf
-#  uninstalltargets=uninstallcf
-#else
-#  libfactory=libcf.a
-#
-#  factorysrc='$(basefactorysrc)'
-#  factoryincl='$(basefactoryincl)'
-#
-#  alltargets=cf
-#  installtargets=installcf
-#  uninstalltargets=uninstallcf
-#fi
-
-#
 # - set defines and variables according to our tests.
 #
 
