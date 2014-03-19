@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${srcdir} \
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} \
 $(FACTORY_INCLUDES) $(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
 ${NTL_CFLAGS} $(FLINT_CFLAGS) ${GMP_CFLAGS}
 

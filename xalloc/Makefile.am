@@ -12,8 +12,6 @@ noinst_LTLIBRARIES=libomalloc.la
 
 SOURCES = dummy.c omalloc.h
 
-AM_CPPFLAGS = -I${srcdir}  
-
 libomalloc_la_SOURCES  =$(SOURCES)
 
 libomalloc_la_LDFLAGS  = -release ${PACKAGE_VERSION}

@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I ../../m4
 
 SOURCES = bbcone.cc bbcone.h bbfan.cc bbfan.h bbpolytope.cc bbpolytope.h gfan.h gitfan.cc gitfan.h gfanlib.cc
 
-MYINCLUDES =  -I${top_srcdir} -I${top_builddir} -I${srcdir} \
+MYINCLUDES =  -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
 ${FACTORY_INCLUDES} ${RESOURCES_INCLUDES} ${OMALLOC_INCLUDES} \
 ${FLINT_CFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS} 

@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I ../../m4
 
 SOURCES = mod_main.cc DebugPrint.cc DebugPrint.h myNF.cc myNF.h singularxx_defs.h
 
-MYINCLUDES =  -I${top_srcdir} -I${top_builddir} -I${srcdir} \
+MYINCLUDES =  -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
 $(FACTORY_INCLUDES) $(RESOURCES_INCLUDES) $(OMALLOC_INCLUDES) \
 $(FLINT_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) $(GOOGLE_PERFTOOLS_CFLAGS)

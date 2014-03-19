@@ -18,7 +18,7 @@ CXXFLAGS += $(POLYMAKE_CXXFLAGS)
 
 polymake_la_SOURCES = $(SOURCES)
 
-MYINCLUDES = -I${top_srcdir} -I${top_builddir} -I${srcdir} \
+MYINCLUDES = -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys  \
 $(PM_INC) $(PM_CFLAGS) $(POLYMAKE_CXXFLAGS) \
 $(FACTORY_INCLUDES) $(RESOURCES_INCLUDES) $(OMALLOC_INCLUDES) \
