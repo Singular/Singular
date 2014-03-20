@@ -57,36 +57,11 @@ AC_C_INLINE
 #
 # - check withs and enables.
 #
-AC_ARG_WITH(
-  Singular,
-  [AS_HELP_STRING([--without-Singular],[build NOT for the use with CAS Singular.])],
-  ,
-  [with_Singular=yes])
-
-AC_ARG_ENABLE(omalloc, AS_HELP_STRING([--enable-omalloc],[build for use with omalloc]),
-[if test "x$enableval" = "xyes"; then
-  ENABLE_OMALLOC=yes
-fi], ENABLE_OMALLOC=no)
-
-AC_ARG_ENABLE(omalloc_trust, AS_HELP_STRING([--enable-omalloc-trust],[do not check the omalloc header]),
-[if test "x$enableval" = "xyes"; then
-  omalloc_trust=yes
-fi], omalloc_trust=no)
-
-AC_ARG_WITH(omalloc_dir,[AS_HELP_STRING([--with-omalloc-dir=PTH],[location of omalloc])], with_omalloc_dir="$withval", with_omalloc_dir="")
-AC_ARG_WITH(omalloc_extra_dir,[AS_HELP_STRING([--with-omalloc-extra-dir=PTH],[optional extra location of omalloc])], with_omalloc_extra_dir="$withval", with_omalloc_extra_dir="")
-
 AC_ARG_ENABLE(
   cf-inline,
   [AS_HELP_STRING([--enable-cf-inline],[build Factory with \"configurable inline methods\" enabled.])],
   [enable_cf_inline=$enableval],
   [enable_cf_inline=no])
-
-AC_ARG_ENABLE(
-  streamio,
-  [AS_HELP_STRING([--enable-streamio],[build Factory with stream IO])],
-  ,
-  [enable_streamio=no])
 
 AC_ARG_ENABLE(
   assertions,
@@ -105,6 +80,77 @@ AC_ARG_ENABLE(
   [AS_HELP_STRING([--enable-debugoutput],[build Factory so it will print debugging information])],
   ,
   enable_debugoutput=no)
+
+AC_ARG_ENABLE(
+  streamio,
+  [AS_HELP_STRING([--enable-streamio],[build Factory with stream IO])],
+  ,
+  [enable_streamio=no])
+
+AH_TEMPLATE([NOSTREAMIO], [define to build factory without stream IO])
+
+AC_ARG_WITH(
+  Singular,
+  [AS_HELP_STRING([--without-Singular],[(obsolete) build NOT for the use with CAS Singular.])],
+  ,
+  [with_Singular=yes])
+
+PKG_REQUIRE="$PKG_REQUIRE"
+AC_SUBST(PKG_REQUIRE)
+
+SING_CHECK_OMALLOC()
+
+AH_TEMPLATE([SINGULAR], [define if linked to Singular])
+AH_TEMPLATE([DISABLE_GMP_CPP],[DISABLE_GMP_CPP])
+
+# Singular
+if test "x$with_Singular" = xyes; then
+  AC_DEFINE([SINGULAR],[1])  
+  AC_DEFINE([DISABLE_GMP_CPP],[1])
+  AC_DEFINE([NOSTREAMIO],[1])
+fi
+
+# Use no streamio (C++) if SINGULAR or explicitely disabled
+if test "x$enable_streamio" = xno || test "x$with_Singular" = xyes;  then
+  AC_DEFINE([NOSTREAMIO],[1])
+else
+  AC_CHECK_HEADERS(iostream.h strstream.h fstream.h iostream string fstream)
+  AC_CHECK_HEADERS(ctype.h, , [ AC_MSG_ERROR(standard C header files not found) ])
+
+  # since the FTE will compile only with stream IO enabled we will not
+  # check for the necessary header files if stream IO is disabled
+  AC_CHECK_HEADERS(stdarg.h signal.h errno.h unistd.h, ,
+    [ AC_MSG_WARN(C/C++ header files not found.
+                    You will not be able to build the Factory Test Environment
+                    (though Factory itself should compile)) ])
+fi
+
+AM_CONDITIONAL(
+    [WITH_PARSER_FOR_CANONICAL_FORM], 
+    [test x$with_Singular != xyes && test x$enable_streamio != xno])
+
+AC_ARG_VAR( [RESOURCES_INCLUDES], [INCLUDES for libresources] )
+AC_ARG_VAR( [RESOURCES_LIBS], [LIBS for libresources] )
+
+AC_MSG_CHECKING(whether libresources should be used)
+if test "x$with_Singular" = xyes;
+then 
+  AC_MSG_RESULT(yes)
+
+  AC_MSG_CHECKING([  RESOURCES_INCLUDES?..])
+  AC_MSG_RESULT(${RESOURCES_INCLUDES:-unset})
+
+  AC_MSG_CHECKING([  RESOURCES_LIBS?..])
+  AC_MSG_RESULT(${RESOURCES_LIBS:-unset})
+
+  PKG_REQUIRE="$PKG_REQUIRE resources"
+  AC_SUBST(PKG_REQUIRE)
+else
+  AC_MSG_RESULT(no)
+fi 
+
+AM_CONDITIONAL([ENABLE_RESOURCES],[test "x$with_Singular" = xyes])
+
 
 AH_TEMPLATE([FACTORY_INT64], [Defenition for FACTORY_INT64])
 # Always long long int???!
@@ -198,18 +244,6 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h time.h math.h, ,
   [ AC_MSG_ERROR(C header files not found) ])
 AC_CHECK_HEADERS(cstdio)
 
-if test "x$enable_streamio" != xno; then
-  AC_CHECK_HEADERS(iostream.h strstream.h fstream.h iostream string fstream)
-  AC_CHECK_HEADERS(ctype.h, , [ AC_MSG_ERROR(standard C header files not found) ])
-
-  # since the FTE will compile only with stream IO enabled we will not
-  # check for the necessary header files if stream IO is disabled
-  AC_CHECK_HEADERS(stdarg.h signal.h errno.h unistd.h, ,
-    [ AC_MSG_WARN(C/C++ header files not found.
-                    You will not be able to build the Factory Test Environment
-                    (though Factory itself should compile)) ])
-fi
-
 if test "x$enable_timing" != xno; then
   AC_CHECK_HEADERS(sys/param.h sys/times.h, ,
     [ AC_MSG_ERROR(\`sys/times.h' or \`sys/param.h' not found.  Try
@@ -249,29 +283,6 @@ fi
 
 # for installation of the templates
 #templatedir='${includedir}/templates'
-
-#
-# - the name of the game and the targets to create.
-#
-#if test "x$with_Singular" = xyes; then
-#  libfactory=libfactory.a
-#
-#  factorysrc='$(basefactorysrc) $(singfactorysrc)'
-#  factoryincl='$(basefactoryincl) $(singfactoryincl)'
-#
-#  alltargets=cf
-#  installtargets=installcf
-#  uninstalltargets=uninstallcf
-#else
-#  libfactory=libcf.a
-#
-#  factorysrc='$(basefactorysrc)'
-#  factoryincl='$(basefactoryincl)'
-#
-#  alltargets=cf
-#  installtargets=installcf
-#  uninstalltargets=uninstallcf
-#fi
 
 #
 # - set defines and variables according to our tests.
@@ -321,81 +332,15 @@ fi
 # M4FLAGS
 #test "${M4FLAGS+set}" = set || M4FLAGS=
 
-AH_TEMPLATE([SINGULAR], [define if linked to Singular])
-AH_TEMPLATE([DISABLE_GMP_CPP],[DISABLE_GMP_CPP])
-AH_TEMPLATE([NOSTREAMIO],[DISABLE_GMP_CPP])
-
-# Singular
-if test "x$with_Singular" = xyes; then
-  AC_DEFINE([SINGULAR],[1])  
-  AC_DEFINE([DISABLE_GMP_CPP],[1])
-  AC_DEFINE([NOSTREAMIO],[1])
-fi
-
 # arithmetic shift
 #if test "x$ac_cv_shift" = xyes; then   
 #  AC_DEFINE([HAS_ARITHMETIC_SHIFT],[1],[HAS_ARITHMETIC_SHIFT])
 #fi
 
-AH_TEMPLATE([HAVE_OMALLOC], [define if build with OMALLOC])
-
-AC_MSG_CHECKING([whether to use omalloc/omalloc.h])
-if test "x$ENABLE_OMALLOC" = xyes; then
-  AC_MSG_RESULT(yes)
-  
-  if test "x$with_omalloc_dir" != "x"; then
-    OMALLOC_CFLAGS="-I${with_omalloc_dir}"
-  fi
-  if test "x$with_omalloc_extra_dir" != "x"; then
-    OMALLOC_CFLAGS="$OMALLOC_CFLAGS -I${with_omalloc_extra_dir}"
-    OMALLOC_LDFLAGS="$OMALLOC_LDFLAGS -L${with_omalloc_extra_dir}/omalloc"
-  fi
-  
-  CPPFLAGS_save="$CPPFLAGS"
-  # adding $with_omalloc_dir and $with_omalloc_extra_dir to header search path
-  CPPFLAGS="$CPPFLAGS ${OMALLOC_CFLAGS}"
-  if test "x$omalloc_trust" = xno; then
-    AC_CHECK_HEADERS([omalloc/omalloc.h],,AC_MSG_ERROR([You asked for omalloc but it cannot be found with your default header search path]))
-  else
-    AC_CHECK_HEADERS([omalloc/omalloc.h],,AC_MSG_WARN([trusting the omalloc locations given: ${OMALLOC_CFLAGS}]))
-  fi
-  CPPFLAGS="$CPPFLAGS_save"
-
-#  OMALLOC_G_LDADD="-lresources_g -lomalloc_g"
-  OMALLOC_R_LDADD="-lomalloc"
-
-  AC_DEFINE(HAVE_OMALLOC, 1, [omalloc support])
- 
-  AC_SUBST(OMALLOC_CFLAGS)
-  AC_SUBST(OMALLOC_LDFLAGS)
-
-#  AC_SUBST(OMALLOC_G_LDADD)
-  AC_SUBST(OMALLOC_R_LDADD)
-else
-  AC_MSG_RESULT(no)
-fi
-
-if test "x$ENABLE_OMALLOC" = xyes && test "x$with_Singular" = xyes; then
-  RESOURCES_LDFLAGS="$RESOURCES_LDFLAGS -L${with_omalloc_dir}/resources -L${with_omalloc_extra_dir}/resources -lresources "
-  AC_SUBST(RESOURCES_LDFLAGS)
-fi 
-
-AM_CONDITIONAL([ENABLE_OMALLOC],[test "x$ENABLE_OMALLOC" = xyes])
-
-
 AH_TEMPLATE([CF_USE_INLINE], [define to use "configurable inline methods" (see cf_inline.cc)])
 # "configurable inline methods"
 if test "x$enable_cf_inline" != xno; then
   AC_DEFINE([CF_USE_INLINE],[1])
-fi
-
-AH_TEMPLATE([NOSTREAMIO], [define to build factory without stream IO])
-# iostream
-if test "x$enable_streamio" = xno; then
-  AC_DEFINE([NOSTREAMIO],[1])
-#else
-#  factorysrc="$factorysrc \$(useiofactorysrc)"
-#  factoryincl="$factoryincl \$(useiofactoryincl)"
 fi
 
 AH_TEMPLATE([NOASSERT], [define if you do not want to activate assertions])
@@ -455,10 +400,6 @@ AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION], "$factory_configuration")
 #AC_DEFINE_UNQUOTED([GFTABLEDIR], "$explicit_gftabledir")
 
 
-
-AM_CONDITIONAL(
-    [WITH_PARSER_FOR_CANONICAL_FORM], 
-    [test x$with_Singular != xyes && test x$enable_streamio != xno])
 
 AC_CONFIG_FILES([Makefile include/factory/Makefile libfac/Makefile factory.pc]) #  ftest/GNUmakefile
 AC_OUTPUT

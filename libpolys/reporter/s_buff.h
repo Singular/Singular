@@ -2,6 +2,7 @@
 #define S_BUFFIO_H
 
 #include<signal.h>
+#include<gmp.h>
 
 struct s_buff_s
 {

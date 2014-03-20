@@ -2,12 +2,15 @@ ACLOCAL_AMFLAGS = -I ../m4
 
 SUBDIRS=include/factory libfac
 
-AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include $(FLINT_CFLAGS) $(GMP_CFLAGS) $(NTL_CFLAGS) $(OMALLOC_CFLAGS) 
+AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include \
+$(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
+$(FLINT_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS)
 
 lib_LTLIBRARIES = libfactory.la
 
 libfactory_la_LIBADD     = ${builddir}/libfac/libfac.la \
-$(RESOURCES_LDFLAGS) $(OMALLOC_LDFLAGS) $(OMALLOC_R_LDADD) $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
+$(RESOURCES_LIBS) $(OMALLOC_LIBS) \
+$(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS)
 
 libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
@@ -264,23 +267,21 @@ cplusplus.h: cplusplus$(EXEEXT)
 all-local:
 	[ -d ${builddir}/gftables ] || ln -s ${srcdir}/gftables ${builddir}
 
+
 ####################################################
 ## Test program
 ##
+
 TESTS = test
 
 check_PROGRAMS = $(TESTS)
 
-TESTSSOURCES = test.cc
+test_SOURCES = test.cc
+test_LDADD   = libfactory.la
 
-# The following ('..') is a hack for a while... 
-TESTADDLIBDIRS = ${OMALLOC_LDFLAGS}
-TESTADDLIB = $(TESTADDLIBDIRS) $(OMALLOC_R_LDADD)
-TESTADDLIBDEBUG = $(TESTADDLIBDIRS) $(OMALLOC_G_LDADD)
-
-test_SOURCES = $(TESTSSOURCES)
-test_LDADD = libfactory.la $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIB)
-
+####################################################
+## PKG config 
+##
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = factory.pc

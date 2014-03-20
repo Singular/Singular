@@ -18,10 +18,11 @@ CXXFLAGS += $(POLYMAKE_CXXFLAGS)
 
 polymake_la_SOURCES = $(SOURCES)
 
-MYINCLUDES = -I${top_srcdir} -I${top_builddir} -I${srcdir} \
+MYINCLUDES = -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys  \
--I${top_builddir}/factory/include $(GMP_CFLAGS) $(PM_INC) $(PM_CFLAGS) \
-$(POLYMAKE_CXXFLAGS) $(FACTORY_CFLAGS)
+$(PM_INC) $(PM_CFLAGS) $(POLYMAKE_CXXFLAGS) \
+$(FACTORY_INCLUDES) $(RESOURCES_INCLUDES) $(OMALLOC_INCLUDES) \
+$(FLINT_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS)
 
 P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
 

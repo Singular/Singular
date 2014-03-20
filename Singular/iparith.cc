@@ -78,8 +78,8 @@
 #include <Singular/newstruct.h>
 #include <Singular/ipshell.h>
 //#include <kernel/mpr_inout.h>
+#include <reporter/si_signals.h>
 
-#include <Singular/si_signals.h>
 #include <Singular/number2.h>
 
 

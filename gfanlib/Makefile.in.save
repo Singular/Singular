@@ -35,7 +35,7 @@ PIPE		= -pipe
 CFLAGS		= -fpic @CFLAGS@ ${PIPE}
 CXXFLAGS	= -fpic @CXXFLAGS@ ${PIPE}
 #CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
-CPPFLAGS	= -I${srcdir} -I${includedir}
+CPPFLAGS	= -I${includedir}
 DEFS		= -DGMPRATIONAL
 
 ## End configuration dependend stuff

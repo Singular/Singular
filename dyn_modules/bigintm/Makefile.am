@@ -8,10 +8,10 @@ if ENABLE_P_PROCS_DYNAMIC
   
 endif
 
-MYINCLUDES =  -I${top_srcdir} -I${top_builddir} -I${srcdir} \
+MYINCLUDES =  -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
--I${top_srcdir}/factory/include -I${top_builddir}/factory/include \
-$(FACTORY_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) 
+$(FACTORY_INCLUDES) $(RESOURCES_INCLUDES) $(OMALLOC_INCLUDES) \
+$(FLINT_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) 
 
 bigintm_la_SOURCES   = mod_main.cc bigintm.cc bigintm.h
 

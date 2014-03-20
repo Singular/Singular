@@ -33,7 +33,7 @@
 #include <Singular/cntrlc.h>
 #include <Singular/links/ssiLink.h>
 #include <Singular/links/pipeLink.h>
-#include <Singular/si_signals.h>
+#include <reporter/si_signals.h>
 #include "feOpt.h"
 
 // #ifdef HAVE_DBM

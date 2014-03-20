@@ -28,7 +28,7 @@
 #include "links/silink.h"
 #include "lists.h"
 #include "pipeLink.h"
-#include <Singular/si_signals.h>
+#include <reporter/si_signals.h>
 
 typedef struct
 {

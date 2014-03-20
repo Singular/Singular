@@ -10,6 +10,7 @@
 #include <misc/auxiliary.h>
 /* for assume: */
 #include <reporter/reporter.h>
+#include <reporter/s_buff.h>
 
 #include <coeffs/si_gmp.h>
 
@@ -178,6 +179,10 @@ struct n_Procs_s
    number  (*cfLcm)(number a, number b, const coeffs r);
    void    (*cfDelete)(number * a, const coeffs r);
    nMapFunc (*cfSetMap)(const coeffs src, const coeffs dst);
+
+   /// io via ssi:
+   void    (*cfWriteFd)(number a, FILE *f, const coeffs r);
+   number  (*cfReadFd)( s_buff f, const coeffs r);
 
    /// For extensions (writes into global string buffer)
    char *  (*cfName)(number n, const coeffs r);

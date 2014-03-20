@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I ../m4
 
 GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-version)
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS)   -DGIT_VERSION='"$(GIT_VERSION)"'
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES)  $(GMP_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DGIT_VERSION='"$(GIT_VERSION)"'
 
 if HAVE_GFANLIB
   USE_GFANLIB = ${top_builddir}/dyn_modules/callgfanlib/gfanlib.la ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
@@ -86,7 +86,6 @@ SOURCES = \
    links/pipeLink.cc\
    scanner.cc\
    sdb.cc\
-   links/s_buff.cc\
    links/silink.cc\
    links/sing_dbm.cc\
    sing_win.cc\
@@ -142,13 +141,11 @@ SingularHEADERS = \
    run.h \
    sdb.h \
    links/silink.h \
-   links/s_buff.h \
    links/sing_dbm.h \
    sing_win.h \
    links/slInit.h \
    links/ssiLink.h \
    links/simpleipc.h \
-   si_signals.h \
    stype.h \
    subexpr.h \
    table.h \

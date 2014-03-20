@@ -1,6 +1,8 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS} 
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} \
+${FACTORY_INCLUDES} ${RESOURCES_INCLUDES} ${OMALLOC_INCLUDES} \
+${FLINT_CFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS} 
 
 TESTS = simple_test \
     coeffs_test \
@@ -15,21 +17,9 @@ nodist_coeffs_test_SOURCES = coeffs_test_runner.cpp
 nodist_polys_test_SOURCES = polys_test_runner.cpp
 nodist_rings_test_SOURCES = rings_test_runner.cpp
 
-if ENABLE_FACTORY
-  USE_FACTORY = -L${top_builddir}/../factory
-else
-  USE_FACTORY =
-endif
-
-AM_LDFLAGS = -L${top_builddir}/polys -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc -L${top_builddir}/../resources
-
-polys_test_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS}
-rings_test_LDFLAGS = $(polys_test_LDFLAGS)
-
-coeffs_test_LDADD = -lcoeffs -lreporter -lmisc ${FACTORY_LIBS} -lomalloc -lresources ${NTL_LIBS} ${GMP_LIBS}
-polys_test_LDADD = -lpolys ${USEPPROCSDYNAMICLD} $(coeffs_test_LDADD)
+coeffs_test_LDADD = ${top_builddir}/coeffs/libcoeffs.la
+polys_test_LDADD = ${top_builddir}/polys/libpolys.la
 rings_test_LDADD = $(polys_test_LDADD)
-
 
 BUILT_SOURCES = gftables MOD \
         simple_test_runner.cpp coeffs_test_runner.cpp polys_test_runner.cpp rings_test_runner.cpp

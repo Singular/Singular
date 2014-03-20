@@ -84,9 +84,14 @@ case $host_os in
   *cygwin* ) AX_APPEND_LINK_FLAGS([-Wl,-Bdynamic]);;
 esac
 
+PKG_REQUIRE="$PKG_REQUIRE"
+AC_SUBST(PKG_REQUIRE)
+
+SING_USE_OMALLOC()
+SING_USE_RESOURCES()
+SING_USE_FACTORY()
 
 SING_CHECK_P_PROCS
-SING_CHECK_FACTORY
 SING_CHECK_READLINE
 SING_CHECK_DBM
 
@@ -97,29 +102,6 @@ SING_CHECK_PLURAL
 
 ### the following is needed due to the use of om_sing_opt_show_mem in misc_ip.cc...
 #ac_configure_args="$ac_configure_args --with-external-config_h=../Singular/omSingularConfig.h"
-
-
-AC_ARG_ENABLE(omalloc, AS_HELP_STRING([--disable-omalloc], [do NOT use omalloc within the factory]),
- [if test "x$enableval"  = "xyes"; then
-   ENABLE_OMALLOC=yes
- fi], ENABLE_OMALLOC=add)
-
-ENABLE_OMALLOC_ARG="--with-omalloc-dir=$ac_abs_top_srcdir --with-omalloc-extra-dir=$ac_abs_top_builddir --enable-omalloc-trust"
-
-if test "x$ENABLE_OMALLOC" = xadd; then
-   ENABLE_OMALLOC=yes
-   ENABLE_OMALLOC_ARG="--enable-omalloc $ENABLE_OMALLOC_ARG"
-fi
-
-if test "x$ENABLE_FACTORY" = xyes; then
- AC_MSG_CHECKING(whether to use omalloc in factory)
- if test "x$ENABLE_OMALLOC" = xyes; then
-  AC_MSG_RESULT(yes)
-  ac_configure_args="$ac_configure_args $ENABLE_OMALLOC_ARG"
- else
-  AC_MSG_RESULT(no)
- fi
-fi
 
 AC_ARG_ENABLE(countedref, AS_HELP_STRING([--enable-countedref], [Enable autoloading of reference counted types]),
 [if test "x$enableval" = "xyes"; then
@@ -157,9 +139,6 @@ AC_DEFINE_UNQUOTED([LDFLAGS],"$LDFLAGS",[LDFLAGS])
 AC_DEFINE_UNQUOTED([LIBS],"$LIBS",[LIBS])
 AC_DEFINE_UNQUOTED([AC_CONFIGURE_ARGS],"$ac_configure_args",[ac_configure_args])
 # AC_DEFINE_UNQUOTED([AC_CT_CC], "$ac_ct_CC",[ac_ct_CC])
-
-AC_DEFINE_UNQUOTED([FACTORY_CFLAGS],"$FACTORY_CFLAGS",[FACTORY_CFLAGS])
-AC_DEFINE_UNQUOTED([FACTORY_LIBS],"$FACTORY_LIBS",[FACTORY_LIBS])
 
 AC_DEFINE_UNQUOTED([NTL_CFLAGS],"$NTL_CFLAGS",[NTL_CFLAGS])
 AC_DEFINE_UNQUOTED([NTL_LIBS],"$NTL_LIBS",[NTL_LIBS])

@@ -9,7 +9,7 @@
 # include "simpleipc.h"
 
 #include <Singular/cntrlc.h>
-#include <Singular/si_signals.h>
+#include <reporter/si_signals.h>
 
 #include <semaphore.h>
 #include <fcntl.h>

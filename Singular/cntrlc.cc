@@ -30,7 +30,7 @@ void sig_chld_hdl(int sig); /*#include <Singular/links/ssiLink.h>*/
 #include <Singular/cntrlc.h>
 #include <Singular/feOpt.h>
 #include <Singular/misc_ip.h>
-#include <Singular/si_signals.h>
+#include <reporter/si_signals.h>
 #include <Singular/links/silink.h>
 #include <Singular/links/ssiLink.h>
 
