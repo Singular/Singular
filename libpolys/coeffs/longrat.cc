@@ -2650,7 +2650,7 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
     c = n_Init(1, cf);
     return;
   }
-  
+
   // all coeffs are given by integers!!!
 
   // part 1, find a small candidate for gcd
@@ -2666,9 +2666,9 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
     number& n = numberCollectionEnumerator.Current();
     nlNormalize(n, cf); ++normalcount;
     cand1 = n;
-    
+
     if (SR_HDL(cand1)&SR_INT) { cand=cand1; break; }
-    assume(cand1->s==3); // all coeffs should be integers // ==0?!! after printing 
+    assume(cand1->s==3); // all coeffs should be integers // ==0?!! after printing
     s1=mpz_size1(cand1->z);
     if (s>s1)
     {
@@ -2683,7 +2683,7 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
   // part 2: compute gcd(cand,all coeffs)
 
   numberCollectionEnumerator.Reset();
-  
+
   while (numberCollectionEnumerator.MoveNext() )
   {
     number& n = numberCollectionEnumerator.Current();
@@ -2694,7 +2694,7 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
     nlInpGcd(cand, n, cf);
 
     assume( nlGreaterZero(cand,cf) );
-    
+
     if(nlIsOne(cand,cf))
     {
       c = cand;
@@ -2704,7 +2704,7 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
         // make the leading coeff positive
         c = nlNeg(c, cf);
         numberCollectionEnumerator.Reset();
-        
+
         while (numberCollectionEnumerator.MoveNext() )
         {
           number& nn = numberCollectionEnumerator.Current();
@@ -2713,12 +2713,12 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
       }
       return;
     }
-  } 
+  }
 
   // part3: all coeffs = all coeffs / cand
   if (!lc_is_pos)
     cand = nlNeg(cand,cf);
-  
+
   c = cand;
   numberCollectionEnumerator.Reset();
 
@@ -2737,7 +2737,7 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   assume(getCoeffType(cf) == ID);
 
   numberCollectionEnumerator.Reset();
-  
+
   if( !numberCollectionEnumerator.MoveNext() ) // empty zero polynomial?
   {
     c = n_Init(1, cf);
@@ -2756,7 +2756,7 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   cand->s=3;
 
   int s=0;
-  
+
   const BOOLEAN lc_is_pos=nlGreaterZero(numberCollectionEnumerator.Current(),cf);
 
   do
@@ -2782,7 +2782,7 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
     }
   }
   while (numberCollectionEnumerator.MoveNext() );
-  
+
 
   if (s==0) // nothing to do, all coeffs are already integers
   {
@@ -2801,7 +2801,7 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
       {
         number& n = numberCollectionEnumerator.Current();
         n = nlNeg(n, cf);
-      } 
+      }
     }
 //    assume( n_GreaterZero(c, cf) );
     return;
@@ -2812,12 +2812,12 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   // part2: all coeffs = all coeffs * cand
   // make the lead coeff positive
   numberCollectionEnumerator.Reset();
-  
+
   if (!lc_is_pos)
     cand = nlNeg(cand, cf);
-  
+
   c = cand;
-  
+
   while (numberCollectionEnumerator.MoveNext() )
   {
     number &n = numberCollectionEnumerator.Current();
@@ -2829,6 +2829,108 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
 static char* nlCoeffString(const coeffs)
 {
   return omStrDup("0");
+}
+
+#define SSI_BASE 16
+
+static void nlWriteFd(number n,FILE* f, const coeffs)
+{
+  if(SR_HDL(n) & SR_INT)
+  {
+    #if SIZEOF_LONG == 4
+    fprintf(f,"4 %ld ",SR_TO_INT(n));
+    #else
+    long nn=SR_TO_INT(n);
+    if ((nn<POW_2_28)||(nn>= -POW_2_28))
+      fprintf(f,"4 %ld ",nn);
+    else
+    {
+      mpz_t tmp;
+      mpz_init_set_si(tmp,nn);
+      fputs("8 ",f);
+      mpz_out_str (f,SSI_BASE, tmp);
+      fputc(' ',f);
+      mpz_clear(tmp);
+    }
+    #endif
+  }
+  else if (n->s<2)
+  {
+    //gmp_fprintf(f,"%d %Zd %Zd ",n->s,n->z,n->n);
+    fprintf(f,"%d ",n->s+5);
+    mpz_out_str (f,SSI_BASE, n->z);
+    fputc(' ',f);
+    mpz_out_str (f,SSI_BASE, n->n);
+    fputc(' ',f);
+
+    //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: s=%d gmp/gmp \"%Zd %Zd\" ",n->s,n->z,n->n);
+  }
+  else /*n->s==3*/
+  {
+    //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
+    fputs("8 ",f);
+    mpz_out_str (f,SSI_BASE, n->z);
+    fputc(' ',f);
+
+    //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: gmp \"%Zd\" ",n->z);
+  }
+}
+
+static number nlReadFd(s_buff f, const coeffs)
+{
+  int sub_type=-1;
+  sub_type=s_readint(f);
+  switch(sub_type)
+  {
+     case 0:
+     case 1:
+       {// read mpz_t, mpz_t
+         number n=nlRInit(0);
+         mpz_init(n->n);
+         s_readmpz(f,n->z);
+         s_readmpz(f,n->n);
+         n->s=sub_type;
+         return n;
+       }
+
+     case 3:
+       {// read mpz_t
+         number n=nlRInit(0);
+         s_readmpz(f,n->z);
+         n->s=3; /*sub_type*/
+         return n;
+       }
+     case 4:
+       {
+         LONG dd=s_readlong(f);
+         //#if SIZEOF_LONG == 8
+         return INT_TO_SR(dd);
+         //#else
+         //return nlInit(dd,NULL);
+         //#endif
+       }
+     case 5:
+     case 6:
+       {// read raw mpz_t, mpz_t
+         number n=nlRInit(0);
+         mpz_init(n->n);
+         s_readmpz_base (f,n->z, SSI_BASE);
+         s_readmpz_base (f,n->n, SSI_BASE);
+         n->s=sub_type-5;
+         return n;
+       }
+     case 8:
+       {// read raw mpz_t
+         number n=nlRInit(0);
+         s_readmpz_base (f,n->z, SSI_BASE);
+         n->s=sub_type=3; /*subtype-5*/
+         return n;
+       }
+
+     default: Werror("error in reading number: invalid subtype %d",sub_type);
+              return NULL;
+  }
+  return NULL;
 }
 
 BOOLEAN nlInitChar(coeffs r, void*)
@@ -2899,6 +3001,10 @@ BOOLEAN nlInitChar(coeffs r, void*)
 #endif
   r->convSingNFactoryN=nlConvSingNFactoryN;
   r->convFactoryNSingN=nlConvFactoryNSingN;
+
+  // io via ssi
+  r->cfWriteFd=nlWriteFd;
+  r->cfReadFd=nlReadFd;
 
   // the variables: general stuff (required)
   r->nNULL = INT_TO_SR(0);

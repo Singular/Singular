@@ -7,11 +7,11 @@
 #include <signal.h>
 
 #include <kernel/mod2.h>
-#include <coeffs/si_gmp.h>
+#include <gmp.h>
 
 #include <omalloc/omalloc.h>
-#include <Singular/links/s_buff.h>
-#include <Singular/si_signals.h>
+#include <reporter/s_buff.h>
+#include <reporter/si_signals.h>
 
 //struct s_buff_s
 //{

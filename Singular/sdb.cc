@@ -18,7 +18,7 @@
 #include <Singular/ipshell.h>
 #include <Singular/ipid.h>
 #include <Singular/sdb.h>
-#include <Singular/si_signals.h>
+#include <reporter/si_signals.h>
 
 #ifdef HAVE_SDB
 // We use 8 breakpoints - corresponding to a bit in a char variable in procinfo

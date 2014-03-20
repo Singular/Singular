@@ -79,7 +79,7 @@
 #include <Singular/ipshell.h>
 //#include <kernel/mpr_inout.h>
 
-#include <Singular/si_signals.h>
+#include <reporter/si_signals.h>
 
 
 #include <stdlib.h>

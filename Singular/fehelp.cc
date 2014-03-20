@@ -25,7 +25,7 @@
 
 #include <resources/omFindExec.h>
 
-#include <Singular/si_signals.h>
+#include <reporter/si_signals.h>
 
 #include "ipid.h"
 #include "ipshell.h"

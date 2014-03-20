@@ -431,6 +431,19 @@ static char* npCoeffString(const coeffs r)
   return s;
 }
 
+static void npWriteFd(number n, FILE* f, const coeffs r)
+{
+  fprintf(f,"%d ",(int)(long)n);
+}
+
+static number npReadFd(s_buff f, const coeffs r)
+{
+  // read int
+  int dd;
+  dd=s_readint(f);
+  return (number)(long)dd;
+}
+
 BOOLEAN npInitChar(coeffs r, void* p)
 {
   assume( getCoeffType(r) == ID );
@@ -507,6 +520,10 @@ BOOLEAN npInitChar(coeffs r, void* p)
 
   r->convSingNFactoryN=npConvSingNFactoryN;
   r->convFactoryNSingN=npConvFactoryNSingN;
+
+  // io via ssi
+  r->cfWriteFd=npWriteFd;
+  r->cfReadFd=npReadFd;
 
   // the variables:
   r->nNULL = (number)0;

@@ -21,7 +21,7 @@
 #include <time.h>
 
 #include <kernel/mod2.h>
-#include <Singular/si_signals.h>
+#include <reporter/si_signals.h>
 // #include "mod2.h"
 
 #include <Singular/tok.h>
@@ -45,14 +45,12 @@
 #include <Singular/cntrlc.h>
 #include <Singular/lists.h>
 #include <Singular/blackbox.h>
-#include <Singular/links/s_buff.h>
+#include <libpolys/reporter/s_buff.h>
 #include <Singular/links/ssiLink.h>
 
 #ifdef HAVE_SIMPLEIPC
 #include <Singular/links/simpleipc.h>
 #endif
-
-#include <Singular/si_signals.h>
 
 #define SSI_VERSION 6
 // 5->6: changed newstruct representation
@@ -150,55 +148,7 @@ void ssiWriteNumber_CF(const ssiInfo *d, const number n, const coeffs cf)
   //        or     3 5 <mpz_t raw nom.> <mpz_t raw denom.>
   //        or     3 6 <mpz_t raw nom.> <mpz_t raw denom.>
   //        or     3 7 <mpz_t raw nom.>
-  if(getCoeffType(cf)==n_Zp)
-  {
-    fprintf(d->f_write,"%d ",(int)(long)n);
-    //if (d->f_debug!=NULL) fprintf(d->f_debug,"number: \"%ld\" ",(int)(long)n);
-  }
-  else if (getCoeffType(cf)==n_Q)
-  {
-    if(SR_HDL(n) & SR_INT)
-    {
-      #if SIZEOF_LONG == 4
-      fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
-      #else
-      long nn=SR_TO_INT(n);
-      if ((nn<POW_2_28)||(nn>= -POW_2_28))
-        fprintf(d->f_write,"4 %ld ",nn);
-      else
-      {
-        mpz_t tmp;
-        mpz_init_set_si(tmp,nn);
-        fputs("8 ",d->f_write);
-        mpz_out_str (d->f_write,SSI_BASE, tmp);
-        fputc(' ',d->f_write);
-        mpz_clear(tmp);
-      }
-      #endif
-      //if (d->f_debug!=NULL) fprintf(d->f_debug,"number: short \"%ld\" ",SR_TO_INT(n));
-    }
-    else if (n->s<2)
-    {
-      //gmp_fprintf(d->f_write,"%d %Zd %Zd ",n->s,n->z,n->n);
-      fprintf(d->f_write,"%d ",n->s+5);
-      mpz_out_str (d->f_write,SSI_BASE, n->z);
-      fputc(' ',d->f_write);
-      mpz_out_str (d->f_write,SSI_BASE, n->n);
-      fputc(' ',d->f_write);
-
-      //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: s=%d gmp/gmp \"%Zd %Zd\" ",n->s,n->z,n->n);
-    }
-    else /*n->s==3*/
-    {
-      //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
-      fputs("8 ",d->f_write);
-      mpz_out_str (d->f_write,SSI_BASE, n->z);
-      fputc(' ',d->f_write);
-
-      //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: gmp \"%Zd\" ",n->z);
-    }
-  }
-  else if (getCoeffType(cf)==n_transExt)
+  if (getCoeffType(cf)==n_transExt)
   {
     fraction f=(fraction)n;
     ssiWritePoly_R(d,POLY_CMD,NUM(f),cf->extRing);
@@ -208,69 +158,16 @@ void ssiWriteNumber_CF(const ssiInfo *d, const number n, const coeffs cf)
   {
     ssiWritePoly_R(d,POLY_CMD,(poly)n,cf->extRing);
   }
+  else if (cf->cfWriteFd!=NULL)
+  {
+    cf->cfWriteFd(n,d->f_write,cf);
+  }
   else WerrorS("coeff field not implemented");
 }
 
 void ssiWriteNumber(const ssiInfo *d, const number n)
 {
-  // syntax is as follows:
-  // case 1 Z/p:   3 <int>
-  // case 2 Q:     3 4 <int>
-  //        or     3 0 <mpz_t nominator> <mpz_t denominator>
-  //        or     3 1  dto.
-  //        or     3 3 <mpz_t nominator>
-  //        or     3 5 <mpz_t raw nom.> <mpz_t raw denom.>
-  //        or     3 6 <mpz_t raw nom.> <mpz_t raw denom.>
-  //        or     3 7 <mpz_t raw nom.>
-  if(rField_is_Zp(d->r))
-  {
-    fprintf(d->f_write,"%d ",(int)(long)n);
-    //if (d->f_debug!=NULL) fprintf(d->f_debug,"number: \"%ld\" ",(int)(long)n);
-  }
-  else if (rField_is_Q(d->r))
-  {
-    if(SR_HDL(n) & SR_INT)
-    {
-      #if SIZEOF_LONG == 4
-      fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
-      #else
-      long nn=SR_TO_INT(n);
-      if ((nn<POW_2_28)||(nn>= -POW_2_28))
-        fprintf(d->f_write,"4 %ld ",nn);
-      else
-      {
-        mpz_t tmp;
-        mpz_init_set_si(tmp,nn);
-        fputs("8 ",d->f_write);
-        mpz_out_str (d->f_write,SSI_BASE, tmp);
-        fputc(' ',d->f_write);
-        mpz_clear(tmp);
-      }
-      #endif
-      //if (d->f_debug!=NULL) fprintf(d->f_debug,"number: short \"%ld\" ",SR_TO_INT(n));
-    }
-    else if (n->s<2)
-    {
-      //gmp_fprintf(d->f_write,"%d %Zd %Zd ",n->s,n->z,n->n);
-      fprintf(d->f_write,"%d ",n->s+5);
-      mpz_out_str (d->f_write,SSI_BASE, n->z);
-      fputc(' ',d->f_write);
-      mpz_out_str (d->f_write,SSI_BASE, n->n);
-      fputc(' ',d->f_write);
-
-      //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: s=%d gmp/gmp \"%Zd %Zd\" ",n->s,n->z,n->n);
-    }
-    else /*n->s==3*/
-    {
-      //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
-      fputs("8 ",d->f_write);
-      mpz_out_str (d->f_write,SSI_BASE, n->z);
-      fputc(' ',d->f_write);
-
-      //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: gmp \"%Zd\" ",n->z);
-    }
-  }
-  else WerrorS("coeff field not implemented");
+  ssiWriteNumber_CF(d,n,d->r->cf);
 }
 
 void ssiWriteRing(ssiInfo *d,const ring r)
@@ -570,16 +467,9 @@ static number ssiReadQNumber(ssiInfo *d)
 poly ssiReadPoly_R(ssiInfo *D, const ring r);
 number ssiReadNumber_CF(ssiInfo *d, const coeffs cf)
 {
-  if (getCoeffType(cf) == n_Q)
+  if (cf->cfReadFd!=NULL)
   {
-     return ssiReadQNumber(d);
-  }
-  else if (getCoeffType(cf) == n_Zp)
-  {
-    // read int
-    int dd;
-    dd=s_readint(d->f_read);
-    return (number)(long)dd;
+     return cf->cfReadFd(d->f_read,cf);
   }
   else if (getCoeffType(cf) == n_transExt)
   {
@@ -601,19 +491,7 @@ number ssiReadNumber_CF(ssiInfo *d, const coeffs cf)
 
 number ssiReadNumber(ssiInfo *d)
 {
-  if (rField_is_Q(d->r))
-  {
-     return ssiReadQNumber(d);
-  }
-  else if (rField_is_Zp(d->r))
-  {
-    // read int
-    int dd;
-    dd=s_readint(d->f_read);
-    return (number)(long)dd;
-  }
-  else Werror("coeffs not implemented");
-  return NULL;
+  return ssiReadNumber_CF(d,d->r->cf);
 }
 
 ring ssiReadRing(ssiInfo *d)

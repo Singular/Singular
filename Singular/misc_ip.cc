@@ -17,7 +17,7 @@
 
 #include <misc/auxiliary.h>
 #include <kernel/mod2.h>
-#include <Singular/si_signals.h>
+#include <reporter/si_signals.h>
 
 #include <factory/factory.h>
 
