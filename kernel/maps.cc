@@ -166,6 +166,7 @@ poly maEval(map theMap, poly p,ring preimage_r,nMapFunc nMap,matrix s)
   {
     int l = pLength(p);
     poly* monoms;
+    if (l>0)
     {
       monoms = (poly*) omAlloc(l*sizeof(poly));
 
