@@ -2983,6 +2983,7 @@ static BOOLEAN jjQUOT(leftv res, leftv u, leftv v)
   res->data = (char *)idQuot((ideal)u->Data(),(ideal)v->Data(),
     hasFlag(u,FLAG_STD),u->Typ()==v->Typ());
   idDelMultiples((ideal)(res->data));
+  if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
 }
 static BOOLEAN jjRANDOM(leftv res, leftv u, leftv v)
