@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I ../m4
 # TODO: use ${top_srcdir} instead of .. in the above?
 
-SUBDIRS=sample numeric
+SUBDIRS=sample numeric fglm
 # kernelsample   
 
 noinst_LTLIBRARIES = libkernel.la 
@@ -19,7 +19,6 @@ SOURCES = polys.cc febase.cc feread.cc \
     nc.cc sca.cc gr_kstd2.cc \
     misc.cc \
     fast_maps.cc \
-    fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     kspoly.cc kpolys.cc \
     syz.cc syz0.cc syz1.cc syz2.cc syz3.cc \
     timer.cc \
@@ -62,7 +61,9 @@ libkernel_la_includedir  =${includedir}/singular/kernel
 libkernel_la_include_HEADERS   = $(KERNELHEADERS)
 
 libkernel_la_LIBADD   = \
-${builddir}/sample/libsample.la ${builddir}/numeric/libnumeric.la \
+${builddir}/sample/libsample.la \
+${builddir}/numeric/libnumeric.la \
+${builddir}/fglm/libfglm.la \
 ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
 ${abs_top_builddir}/libpolys/polys/libpolys.la
 
