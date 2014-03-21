@@ -79,10 +79,10 @@ char *iiArithGetCmd(int nPos){return NULL; }
 /// #include <kernel/sparsmat.h> // TODO: install polys/this!
 //+
 
-#include <kernel/fglm.h>
+#include <kernel/fglm/fglm.h>
 #include <kernel/kstd1.h>
-#include <kernel/fglmgauss.h>
-#include <kernel/fglmvec.h>
+#include <kernel/fglm/fglmgauss.h>
+#include <kernel/fglm/fglmvec.h>
 #include <kernel/kstdfac.h>
 #include <kernel/kmatrix.h>
 #include <kernel/GMPrat.h>
@@ -107,9 +107,9 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/fast_mult.h>
 #include <kernel/febase.h>
 
-#include <kernel/fglmgauss.h>
-#include <kernel/fglm.h>
-#include <kernel/fglmvec.h>
+#include <kernel/fglm/fglmgauss.h>
+#include <kernel/fglm/fglm.h>
+#include <kernel/fglm/fglmvec.h>
 
 ////////#include <kernel/F5cData.h>
 #include <kernel/f5c.h>
@@ -183,7 +183,7 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 
 
-// #include <kernel/fglmzero.cc> // looks like <factory/templates/ftmpl_list.h> must be installed!
+// #include <kernel/fglm/fglmzero.cc> // looks like <factory/templates/ftmpl_list.h> must be installed!
 // TODO: looks like <coeffs/mpr_complex.h> must be installed!
 
 

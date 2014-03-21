@@ -15,7 +15,7 @@
   #define SINGULAR 1
   #include <factory/factory.h>
   #include <factory/templates/ftmpl_list.cc>
-  #include <kernel/fglm.h>
+  #include <kernel/fglm/fglm.h>
 
 // templates for fglm:
   template class List<fglmSelem>;

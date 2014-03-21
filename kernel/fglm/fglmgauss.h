@@ -11,7 +11,7 @@
 #define FGLMGAUSS_H
 
 #include <kernel/structs.h>
-#include <kernel/fglmvec.h>
+#include <kernel/fglm/fglmvec.h>
 
 class gaussElem;
 

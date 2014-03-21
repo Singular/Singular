@@ -31,7 +31,7 @@
 #include <kernel/ideals.h>
 
 #include <kernel/kstd1.h>
-#include <kernel/fglm.h>
+#include <kernel/fglm/fglm.h>
 
 #include <Singular/fglm.h>
 #include <Singular/ipid.h>

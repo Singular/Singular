@@ -2313,8 +2313,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
 #ifdef HAVE_EXTENDED_SYSTEM
   // You can put your own system calls here
-#  include <kernel/fglmcomb.cc>
-#  include <kernel/fglm.h>
+#  include <kernel/fglm/fglmcomb.cc>
+#  include <kernel/fglm/fglm.h>
 #  ifdef HAVE_NEWTON
 #    include <hc_newton.h>
 #  endif

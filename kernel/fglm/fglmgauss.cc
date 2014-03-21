@@ -18,8 +18,8 @@
 #include <polys/monomials/ring.h>
 #include <omalloc/omalloc.h>
 
-#include <kernel/fglmvec.h>
-#include <kernel/fglmgauss.h>
+#include "fglmvec.h"
+#include "fglmgauss.h"
 
 class gaussElem
 {

@@ -20,11 +20,11 @@
 #include <kernel/febase.h>
 #include <polys/monomials/maps.h>
 #include <omalloc/omalloc.h>
-#include <kernel/fglmvec.h>
-#include <kernel/fglmgauss.h>
+#include "fglmvec.h"
+#include "fglmgauss.h"
 #include <kernel/kstd1.h>
 
-#include <kernel/fglm.h>
+#include "fglm.h"
 
 #ifndef NOSTREAMIO
 #  ifdef HAVE_IOSTREAM

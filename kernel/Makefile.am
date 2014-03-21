@@ -36,7 +36,6 @@ SOURCES = polys.cc febase.cc feread.cc \
 
 libkernel_la_SOURCES   = $(SOURCES)
 
-
 KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	structs.h \
 	syz.h \
@@ -46,7 +45,6 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	kstdfac.h kmatrix.h\
 	kutil.h \
 	khstd.h kstd1.h \
-	fglm.h fglmgauss.h fglmvec.h \
 	GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h \
 	eigenval.h units.h \
 	ratgring.h shiftgb.h nc.h \
