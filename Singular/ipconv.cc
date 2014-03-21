@@ -205,6 +205,20 @@ static void * iiNN2N(void *data)
   return (void*)n;
 }
 
+static void * iiNN2P(void *data)
+{
+  number2 d=(number2)data;
+  if ((currRing==NULL)
+  || (currRing->cf!=d->cf))
+  {
+    WerrorS("cannot convert: incompatible");
+    return NULL;
+  }
+  number n = n_Copy(d->n, d->cf);
+  n2Delete(d);
+  return (void*)p_NSet(n,currRing);
+}
+
 static void * iiIm2Ma(void *data)
 {
   int i, j;
@@ -385,7 +399,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
     }
     output->next=input->next;
     input->next=NULL;
-    return FALSE;
+    return errorreported;
   }
   if (index!=0) /* iiTestConvert does not returned 'failure' */
   {
@@ -418,6 +432,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
       {
         return TRUE;
       }
+      if (errorreported) return TRUE;
       output->next=input->next;
       input->next=NULL;
   //if (outputType==MATRIX_CMD) Print("convert %d -> matrix\n",inputType);

@@ -1117,7 +1117,8 @@ struct sConvertTypes dConvertTypes[] =
    { BIGINT_CMD,      NUMBER_CMD,     D(iiBI2N) , NULL_VAL },
    { INT_CMD,         NUMBER2_CMD,    D(iiI2NN) , NULL_VAL },
    { BIGINT_CMD,      NUMBER2_CMD,    D(iiBI2NN) , NULL_VAL },
-//   { NUMBER2_CMD,     NUMBER_CMD,     D(iiNN2N) , NULL_VAL },
+   { NUMBER2_CMD,     NUMBER_CMD,     D(iiNN2N) , NULL_VAL },
+   { NUMBER2_CMD,     POLY_CMD,       D(iiNN2P) , NULL_VAL },
 //  int -> poly
    { INT_CMD,         POLY_CMD,       D(iiI2P) , NULL_VAL },
    { BIGINT_CMD,      POLY_CMD,       D(iiBI2P) , NULL_VAL },
