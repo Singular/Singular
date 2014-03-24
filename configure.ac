@@ -201,6 +201,7 @@ AC_CONFIG_FILES([xalloc/Makefile])
 AC_CONFIG_FILES([kernel/Makefile])
 AC_CONFIG_FILES([kernel/sample/Makefile]) # kernelsample
 AC_CONFIG_FILES([kernel/numeric/Makefile])
+AC_CONFIG_FILES([kernel/fglm/Makefile])
 
 AC_CONFIG_SUBDIRS([gfanlib])
 

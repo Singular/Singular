@@ -14,7 +14,7 @@
 
 #include <kernel/polys.h>
 #include <kernel/structs.h>
-#include <kernel/fglmvec.h>
+#include <kernel/fglm/fglmvec.h>
 
 #define PROT(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)

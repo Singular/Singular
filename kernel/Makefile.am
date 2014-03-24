@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I ../m4
 # TODO: use ${top_srcdir} instead of .. in the above?
 
-SUBDIRS=sample numeric
+SUBDIRS=sample numeric fglm
 # kernelsample   
 
 noinst_LTLIBRARIES = libkernel.la 
@@ -19,7 +19,6 @@ SOURCES = polys.cc febase.cc feread.cc \
     nc.cc sca.cc gr_kstd2.cc \
     misc.cc \
     fast_maps.cc \
-    fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     kspoly.cc kpolys.cc \
     syz.cc syz0.cc syz1.cc syz2.cc syz3.cc \
     timer.cc \
@@ -37,7 +36,6 @@ SOURCES = polys.cc febase.cc feread.cc \
 
 libkernel_la_SOURCES   = $(SOURCES)
 
-
 KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	structs.h \
 	syz.h \
@@ -47,7 +45,6 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	kstdfac.h kmatrix.h\
 	kutil.h \
 	khstd.h kstd1.h \
-	fglm.h fglmgauss.h fglmvec.h \
 	GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h \
 	eigenval.h units.h \
 	ratgring.h shiftgb.h nc.h \
@@ -62,7 +59,9 @@ libkernel_la_includedir  =${includedir}/singular/kernel
 libkernel_la_include_HEADERS   = $(KERNELHEADERS)
 
 libkernel_la_LIBADD   = \
-${builddir}/sample/libsample.la ${builddir}/numeric/libnumeric.la \
+${builddir}/sample/libsample.la \
+${builddir}/numeric/libnumeric.la \
+${builddir}/fglm/libfglm.la \
 ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
 ${abs_top_builddir}/libpolys/polys/libpolys.la
 

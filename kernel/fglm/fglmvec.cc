@@ -19,8 +19,8 @@
 #include <omalloc/omalloc.h>
 #include <kernel/structs.h>
 #include <coeffs/numbers.h>
-#include <kernel/fglm.h>
-#include <kernel/fglmvec.h>
+#include "fglm.h"
+#include "fglmvec.h"
 
 #define PROT(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)

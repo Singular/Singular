@@ -55,7 +55,7 @@
 
 #include <kernel/interpolation.h>
 #  include <kernel/kstdfac.h>
-#  include <kernel/fglm.h>
+#  include <kernel/fglm/fglm.h>
 
 #include <Singular/tok.h>
 #include <Singular/ipid.h>

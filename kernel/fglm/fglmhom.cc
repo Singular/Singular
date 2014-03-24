@@ -29,16 +29,16 @@
 #include <kernel/febase.h>
 #include <polys/monomials/maps.h>
 #include <omalloc/omalloc.h>
-#include <kernel/fglm.h>
-#include <kernel/fglmvec.h>
-#include <kernel/fglmgauss.h>
+#include "fglm.h"
+#include "fglmvec.h"
+#include "fglmgauss.h"
 #include <misc/intvec.h>
 #include <kernel/kstd1.h>
 #include <kernel/stairc.h>
 #include <factory/templates/ftmpl_list.h>
 
 // obachman: Got rid off those "redefiende messages by includeing fglm.h
-#include <kernel/fglm.h>
+#include "fglm.h"
 #if 0
 #define PROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)

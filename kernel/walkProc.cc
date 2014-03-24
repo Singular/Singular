@@ -15,7 +15,7 @@
 #include <polys/monomials/maps.h>
 #include <omalloc/omalloc.h>
 #include <kernel/kstd1.h>
-#include <kernel/fglm.h>
+#include <kernel/fglm/fglm.h>
 #include <kernel/walkMain.h>
 #include <kernel/walkSupport.h>
 #include <kernel/walkProc.h>
