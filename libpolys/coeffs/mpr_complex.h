@@ -21,7 +21,6 @@
 #define CTOF 4
 
 void setGMPFloatDigits( size_t digits, size_t rest );
-size_t getGMPFloatDigits();
 
 //-> class gmp_float
 /**

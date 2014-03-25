@@ -84,6 +84,8 @@
 
 #include <kernel/minpoly.h>
 
+#include <numeric/mpr_base.h>
+
 #include "tok.h"
 #include "ipid.h"
 #include "lists.h"
@@ -676,7 +678,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           return TRUE;
         }
         res->rtyp=INT_CMD;
-        res->data=(void*)getGMPFloatDigits();
+        res->data=(void*)(long)gmp_output_digits;
+	//if (gmp_output_digits!=getGMPFloatDigits())
+	//{ Print("%d, %d\n",getGMPFloatDigits(),gmp_output_digits);}
         return FALSE;
       }
   /*==================== mpz_t loader ======================*/
