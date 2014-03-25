@@ -21,6 +21,7 @@
 #if !defined(GENERATE_OPTION_INDEX) && !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <misc/options.h>
 #endif
+#include <misc/sirandom.h>
 
 #include "fehelp.h"
 

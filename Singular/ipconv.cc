@@ -165,6 +165,11 @@ static void * iiI2BI(void *data)
 
 static void * iiI2NN(void *data)
 {
+  if (currRing==NULL)
+  {
+    WerrorS("missing basering");
+    return NULL;
+  }
   number n=nInit((int)(long)data);
   number2 nn=(number2)omAlloc(sizeof*nn);
   nn->cf=currRing->cf; nn->cf->ref++;
@@ -181,7 +186,11 @@ static void * iiBI2N(void *data)
 
 static void * iiBI2NN(void *data)
 {
-  if (currRing==NULL) return NULL;
+  if (currRing==NULL)
+  {
+    WerrorS("missing basering");
+    return NULL;
+  }
   // a bigint is really a number from char 0, with different
   // operations...
   number n = n_Init_bigint((number)data, coeffs_BIGINT, currRing->cf);

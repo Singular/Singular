@@ -25,6 +25,7 @@
 #endif
 
 #include <misc/options.h>
+#include <misc/sirandom.h>
 #include <misc/intvec.h>
 
 #include <polys/prCopy.h>
@@ -6325,6 +6326,23 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
   res->data=(char *)maGetPreimage(rr,mapping,image,currRing);
   if (kernel_cmd) idDelete(&image);
   return (res->data==NULL/* is of type ideal, should not be NULL*/);
+}
+static BOOLEAN jjRANDOM_CR(leftv res, leftv u, leftv v, leftv w)
+{
+  coeffs cf=(coeffs)w->Data();
+  if ((cf==NULL) ||(cf->cfRandom==NULL))
+  {
+    Werror("no random function defined for coeff %d",cf->type);
+    return TRUE;
+  }
+  else
+  {
+    number2 n=(number2)omAlloc(sizeof(*n));
+    n->n=cf->cfRandom((number)u->Data(),(number)v->Data(),cf);
+    n->cf=cf; cf->ref++;
+    res->data=(void*)n;
+    return FALSE;
+  }
 }
 static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
 {

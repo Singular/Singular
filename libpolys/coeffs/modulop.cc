@@ -20,6 +20,7 @@
 #include <coeffs/longrat.h>
 #include <coeffs/mpr_complex.h>
 #include <misc/mylimits.h>
+#include <misc/sirandom.h>
 #include <coeffs/modulop.h>
 
 // int npGen=0;
@@ -444,6 +445,11 @@ static number npReadFd(s_buff f, const coeffs r)
   return (number)(long)dd;
 }
 
+static number npRandom(number,number,const coeffs cf)
+{
+  return npInit(siRand(),cf);
+}
+
 BOOLEAN npInitChar(coeffs r, void* p)
 {
   assume( getCoeffType(r) == ID );
@@ -511,6 +517,8 @@ BOOLEAN npInitChar(coeffs r, void* p)
     r->cfInvers= nvInvers;
     r->cfPower= nvPower;
   }
+
+  r->cfRandom = npRandom;
 #endif
   r->cfCoeffWrite=npCoeffWrite;
 #ifdef LDEBUG
