@@ -40,7 +40,6 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	syz.h \
 	fast_maps.h \
 	febase.h \
-	walkProc.h walkMain.h walkSupport.h\
 	kstdfac.h kmatrix.h\
 	kutil.h \
 	khstd.h kstd1.h \
