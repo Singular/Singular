@@ -8,7 +8,7 @@
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
-#include <kernel/walkSupport.h>
+#include <kernel/groebner_walk/walkSupport.h>
 #include <polys/prCopy.h>
 #include <kernel/kstd1.h>
 #include <polys/matpol.h>

@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I ../m4
 # TODO: use ${top_srcdir} instead of .. in the above?
 
-SUBDIRS=sample numeric fglm
+SUBDIRS=sample numeric fglm groebner_walk
 # kernelsample   
 
 noinst_LTLIBRARIES = libkernel.la 
@@ -23,7 +23,6 @@ SOURCES = polys.cc febase.cc feread.cc \
     syz.cc syz0.cc syz1.cc syz2.cc syz3.cc \
     timer.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
-    walkProc.cc walkMain.cc walkSupport.cc \
     eigenval.cc units.cc \
     fast_mult.cc digitech.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc f5c.cc \
@@ -41,7 +40,6 @@ KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
 	syz.h \
 	fast_maps.h \
 	febase.h \
-	walkProc.h walkMain.h walkSupport.h\
 	kstdfac.h kmatrix.h\
 	kutil.h \
 	khstd.h kstd1.h \
@@ -62,6 +60,7 @@ libkernel_la_LIBADD   = \
 ${builddir}/sample/libsample.la \
 ${builddir}/numeric/libnumeric.la \
 ${builddir}/fglm/libfglm.la \
+${builddir}/groebner_walk/libgroebner_walk.la \
 ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
 ${abs_top_builddir}/libpolys/polys/libpolys.la
 

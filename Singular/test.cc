@@ -67,9 +67,9 @@
 #include <kernel/syz.h>
 #include <kernel/fast_maps.h>
 #include <kernel/febase.h>
-#include <kernel/walkProc.h>
-#include <kernel/walkMain.h>
-#include <kernel/walkSupport.h>
+#include <kernel/groebner_walk/walkProc.h>
+#include <kernel/groebner_walk/walkMain.h>
+#include <kernel/groebner_walk/walkSupport.h>
 #include <kernel/khstd.h>
 /// #include <kernel/sparsmat.h> // TODO: install polys/this!
 //+
@@ -162,9 +162,9 @@
 #include <kernel/timer.h>
 
 #include <kernel/units.h>
-#include <kernel/walkMain.h>
-#include <kernel/walkProc.h>
-#include <kernel/walkSupport.h>
+#include <kernel/groebner_walk/walkMain.h>
+#include <kernel/groebner_walk/walkProc.h>
+#include <kernel/groebner_walk/walkSupport.h>
 
 
 // #include <polys/clapconv.h> // due to factory? :(
