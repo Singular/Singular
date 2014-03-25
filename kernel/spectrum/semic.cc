@@ -10,7 +10,7 @@
 #ifdef HAVE_CONFIG_H
 #include "singularconfig.h"
 #endif /* HAVE_CONFIG_H */
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_SPECTRUM
 
@@ -30,8 +30,8 @@
 
 #include <misc/intvec.h>
 #include <misc/mylimits.h>
-#include "GMPrat.h"
-#include "semic.h"
+#include <kernel/GMPrat.h>
+#include <kernel/semic.h>
 
 // ----------------------------------------------------------------------------
 //  Copy constructor for  spectrum
