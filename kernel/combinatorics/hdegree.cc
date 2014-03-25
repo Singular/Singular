@@ -18,7 +18,7 @@
 #include <kernel/polys.h>
 #include <misc/intvec.h>
 #include <coeffs/numbers.h>
-#include <kernel/hutil.h>
+#include <kernel/combinatorics/hutil.h>
 #include <kernel/stairc.h>
 
 int  hCo, hMu, hMu2;

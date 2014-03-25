@@ -66,7 +66,7 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 
 // HEADERS:
-#include <kernel/hutil.h>
+#include <kernel/combinatorics/hutil.h>
 #include <kernel/stairc.h>
 #include <kernel/ideals.h>
 #include <kernel/syz.h>

@@ -77,7 +77,7 @@
 #include <kernel/shiftgb.h>
 #include <kernel/linearAlgebra.h>
 
-#include <kernel/hutil.h>
+#include <kernel/combinatorics/hutil.h>
 
 // for tests of t-rep-GB
 #include <kernel/tgb.h>

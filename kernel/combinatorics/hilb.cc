@@ -14,7 +14,7 @@
 #include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <misc/intvec.h>
-#include <kernel/hutil.h>
+#include <kernel/combinatorics/hutil.h>
 #include <kernel/stairc.h>
 //ADICHANGES:
 #include <kernel/ideals.h>

@@ -34,7 +34,7 @@ SOURCES = polys.cc febase.cc feread.cc \
 
 libkernel_la_SOURCES   = $(SOURCES)
 
-KERNELHEADERS = mod2.h polys.h hutil.h stairc.h ideals.h \
+KERNELHEADERS = mod2.h polys.h stairc.h ideals.h \
 	structs.h \
 	syz.h \
 	fast_maps.h \
