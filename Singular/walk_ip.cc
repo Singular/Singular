@@ -43,7 +43,7 @@
 //#include <kernel/mpr_base.h>
 //#include <kernel/ffields.h>
 #include <polys/clapsing.h>
-#include <kernel/hutil.h>
+#include <kernel/combinatorics/hutil.h>
 #include <Singular/ipshell.h>
 #include <kernel/groebner_walk/walkMain.h>
 #include <kernel/groebner_walk/walkProc.h>

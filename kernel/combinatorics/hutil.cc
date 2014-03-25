@@ -14,7 +14,7 @@
 #include <omalloc/omalloc.h>
 #include <kernel/ideals.h>
 #include <kernel/polys.h>
-#include <kernel/hutil.h>
+#include <kernel/combinatorics/hutil.h>
 
 scfmon hexist, hstc, hrad, hwork;
 scmon hpure, hpur0;
