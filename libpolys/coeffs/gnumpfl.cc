@@ -21,7 +21,6 @@
 #include <coeffs/gnumpfl.h>
 #include <coeffs/mpr_complex.h>
 
-extern size_t gmp_output_digits;
 //ring ngfMapRing; // to be used also in gnumpc.cc
 
 /// Our Type!
@@ -371,11 +370,10 @@ void ngfWrite (number &a, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
   
-  extern size_t gmp_output_digits;
   char *out;
   if ( a != NULL )
   {
-    out= floatToStr(*(gmp_float*)a, gmp_output_digits);
+    out= floatToStr(*(gmp_float*)a, r->float_len);
     StringAppendS(out);
     //omFreeSize((void *)out, (strlen(out)+1)* sizeof(char) );
     omFree( (void *)out );
