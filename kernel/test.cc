@@ -134,8 +134,8 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 
 // #include <kernel/lplist.h> // Too old!
-#include <kernel/multicnt.h>
-#include <kernel/npolygon.h>
+#include <kernel/spectrum/multicnt.h>
+#include <kernel/spectrum/npolygon.h>
 // #include "Number.h" // Too old?
 // #include "Poly.h" // Too old?
 // #include "PowerSeries.h" // Too old?
@@ -146,10 +146,10 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 #include <kernel/ratgring.h>
 #include <kernel/ringgb.h>
-#include <kernel/semic.h>
+#include <kernel/spectrum/semic.h>
 #include <kernel/shiftgb.h>
-#include <kernel/spectrum.h>
-#include <kernel/splist.h>
+#include <kernel/spectrum/spectrum.h>
+#include <kernel/spectrum/splist.h>
 #include <kernel/stairc.h>
 #include <kernel/structs.h>
 #include <kernel/syz.h>
