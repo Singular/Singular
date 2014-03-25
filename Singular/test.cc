@@ -61,7 +61,7 @@
 
 
 // HEADERS:
-#include <kernel/hutil.h>
+#include <kernel/combinatorics/hutil.h>
 #include <kernel/stairc.h>
 #include <kernel/ideals.h>
 #include <kernel/syz.h>
@@ -118,7 +118,7 @@
 #include <kernel/GMPrat.h>
 
 // #include "htmlhelp.h" // For Windows //
-#include <kernel/hutil.h>
+#include <kernel/combinatorics/hutil.h>
 // #include <kernel/Ideal.h> // Too old?
 
 

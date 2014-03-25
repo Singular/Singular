@@ -48,7 +48,7 @@
 //#include <kernel/mpr_base.h>
 ////// #include <coeffs/ffields.h>
 #include <polys/clapsing.h>
-#include <kernel/hutil.h>
+#include <kernel/combinatorics/hutil.h>
 #include <polys/monomials/ring.h>
 #include <Singular/ipshell.h>
 #include <polys/ext_fields/algext.h>
