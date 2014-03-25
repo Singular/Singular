@@ -124,7 +124,7 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 #include <kernel/ideals.h>
 
-#include <kernel/kmatrix.h>
+#include <kernel/spectrum/kmatrix.h>
 #include <kernel/kstd1.h>
 #include <kernel/kstdfac.h>
 #include <kernel/khstd.h>
