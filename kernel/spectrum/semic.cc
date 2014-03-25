@@ -30,8 +30,8 @@
 
 #include <misc/intvec.h>
 #include <misc/mylimits.h>
-#include <kernel/GMPrat.h>
-#include <kernel/semic.h>
+#include <kernel/spectrum/GMPrat.h>
+#include <kernel/spectrum/semic.h>
 
 // ----------------------------------------------------------------------------
 //  Copy constructor for  spectrum

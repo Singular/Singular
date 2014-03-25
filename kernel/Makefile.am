@@ -38,10 +38,9 @@ KERNELHEADERS = mod2.h polys.h stairc.h ideals.h \
 	syz.h \
 	fast_maps.h \
 	febase.h \
-	kstdfac.h kmatrix.h\
+	kstdfac.h \
 	kutil.h \
 	khstd.h kstd1.h \
-	GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h \
 	eigenval.h units.h \
 	ratgring.h shiftgb.h nc.h \
 	preimage.h timer.h kInline.h fast_mult.h \

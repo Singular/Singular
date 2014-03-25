@@ -46,7 +46,7 @@
 #include <kernel/timer.h>
 #include <kernel/preimage.h>
 #include <kernel/units.h>
-#include <kernel/GMPrat.h>
+#include <kernel/spectrum/GMPrat.h>
 #include <kernel/tgb.h>
 #include <kernel/groebner_walk/walkProc.h>
 #include <kernel/linearAlgebra.h>
