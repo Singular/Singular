@@ -579,7 +579,7 @@ void rootContainer::laguer(gmp_complex ** a, int m, gmp_complex *x, int *its, bo
   gmp_float frac_g[MR+1] = { 0.0, 0.5, 0.25, 0.75, 0.125, 0.375, 0.625, 0.875, 1.0 };
 
   gmp_float epss(0.1);
-  mpf_pow_ui(*epss._mpfp(),*epss.mpfp(),getGMPFloatDigits());
+  mpf_pow_ui(*epss._mpfp(),*epss.mpfp(),gmp_output_digits);
 
   for ( iter= 1; iter <= MAXIT; iter++ )
   {

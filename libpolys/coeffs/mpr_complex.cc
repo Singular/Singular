@@ -71,11 +71,6 @@ void setGMPFloatDigits( size_t digits, size_t rest )
   mpf_pow_ui(*gmpRel->_mpfp(),*gmpRel->_mpfp(),digits);
 }
 
-size_t getGMPFloatDigits()
-{
-  return gmp_output_digits;
-}
-
 #if 1
 void gmp_float::setFromStr(const char * in )
 {
