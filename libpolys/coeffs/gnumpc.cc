@@ -414,14 +414,12 @@ void ngcWrite (number &a, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 
-  extern size_t gmp_output_digits; /// comes from mpr_complex.cc
-
   if (a==NULL)
     StringAppendS("0");
   else
   {
     char *out;
-    out= complexToStr(*(gmp_complex*)a, gmp_output_digits, r);
+    out= complexToStr(*(gmp_complex*)a, r->float_len, r);
     StringAppendS(out);
     //    omFreeSize((void *)out, (strlen(out)+1)* sizeof(char) );
     omFree( (void *)out );
