@@ -202,6 +202,7 @@ AC_CONFIG_FILES([kernel/Makefile])
 AC_CONFIG_FILES([kernel/sample/Makefile]) # kernelsample
 AC_CONFIG_FILES([kernel/numeric/Makefile])
 AC_CONFIG_FILES([kernel/fglm/Makefile])
+AC_CONFIG_FILES([kernel/groebner_walk/Makefile])
 
 AC_CONFIG_SUBDIRS([gfanlib])
 
