@@ -45,9 +45,9 @@
 #include <polys/clapsing.h>
 #include <kernel/hutil.h>
 #include <Singular/ipshell.h>
-#include <kernel/walkMain.h>
-#include <kernel/walkProc.h>
-#include <kernel/walkSupport.h>
+#include <kernel/groebner_walk/walkMain.h>
+#include <kernel/groebner_walk/walkProc.h>
+#include <kernel/groebner_walk/walkSupport.h>
 #include <polys/prCopy.h>
 
 ///////////////////////////////////////////////////////////////////

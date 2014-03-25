@@ -16,9 +16,9 @@
 #include <omalloc/omalloc.h>
 #include <kernel/kstd1.h>
 #include <kernel/fglm/fglm.h>
-#include <kernel/walkMain.h>
-#include <kernel/walkSupport.h>
-#include <kernel/walkProc.h>
+#include <kernel/groebner_walk/walkMain.h>
+#include <kernel/groebner_walk/walkSupport.h>
+#include <kernel/groebner_walk/walkProc.h>
 #include <polys/prCopy.h>
 
 ///////////////////////////////////////////////////////////////////
