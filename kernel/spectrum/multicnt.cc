@@ -23,7 +23,7 @@
 #endif
 #endif
 
-#include <kernel/multicnt.h>
+#include <kernel/spectrum/multicnt.h>
 
 // ----------------------------------------------------------------------------
 //  allocate counter memory

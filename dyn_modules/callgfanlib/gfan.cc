@@ -11,8 +11,8 @@ Date: 2009/11/03 06:57:32
 #include <kernel/kutil.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/kmatrix.h>
-#include <kernel/GMPrat.h>
+#include <kernel/spectrum/kmatrix.h>
+#include <kernel/spectrum/GMPrat.h>
 #include <libpolys/misc/intvec.h>
 
 //#include "ring.h"        //apparently not needed
