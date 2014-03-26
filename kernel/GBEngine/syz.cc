@@ -15,15 +15,15 @@
 #include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/febase.h>
-#include <kernel/kstd1.h>
-#include <kernel/kutil.h>
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/kutil.h>
+#include <kernel/GBEngine/stairc.h>
 #include <misc/intvec.h>
 #include <coeffs/numbers.h>
 #include <kernel/ideals.h>
 #include <misc/intvec.h>
 #include <polys/monomials/ring.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 #include <polys/prCopy.h>
 
 #include <polys/nc/sca.h>

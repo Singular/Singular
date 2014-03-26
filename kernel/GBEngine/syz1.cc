@@ -24,12 +24,12 @@
 #include <kernel/polys.h>
 
 #include <kernel/febase.h>
-#include <kernel/kstd1.h>
-#include <kernel/kutil.h>
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/kutil.h>
+#include <kernel/GBEngine/stairc.h>
 //#include "cntrlc.h"
 #include <kernel/ideals.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 // #include <kernel/idrec.h>
 
 extern void p_Setm_Syz(poly p, ring r,

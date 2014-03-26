@@ -14,9 +14,9 @@
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/febase.h>
-#include <kernel/kutil.h>
-#include <kernel/kstd1.h>
-#include <kernel/khstd.h>
+#include <kernel/GBEngine/kutil.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/khstd.h>
 //#include "cntrlc.h"
 #include <polys/weight.h>
 //#include "ipshell.h"
@@ -24,7 +24,7 @@
 #include <polys/clapsing.h>
 #include <kernel/ideals.h>
 #include <kernel/timer.h>
-#include <kernel/kstdfac.h>
+#include <kernel/GBEngine/kstdfac.h>
 
 #ifndef SING_NDEBUG
 int strat_nr=0;

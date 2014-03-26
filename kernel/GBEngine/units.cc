@@ -16,8 +16,8 @@
 #include <kernel/ideals.h>
 #include <misc/intvec.h>
 #include <polys/matpol.h>
-#include <kernel/kstd1.h>
-#include <kernel/units.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/units.h>
 
 ideal redNF(ideal N,ideal M,matrix U,int d,intvec *w)
 {

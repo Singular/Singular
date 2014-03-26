@@ -10,7 +10,7 @@
 #include <kernel/structs.h>
 #include <kernel/polys.h>
 #include <kernel/febase.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 
 #include <kernel/ideals.h>
 

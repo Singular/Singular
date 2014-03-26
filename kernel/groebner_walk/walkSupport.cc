@@ -10,7 +10,7 @@
 #include <polys/monomials/ring.h>
 #include <kernel/groebner_walk/walkSupport.h>
 #include <polys/prCopy.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <polys/matpol.h>
 #include <math.h>
 

@@ -51,7 +51,7 @@
 // system memmove -- it does not seem to pay off, though
 // #define ENTER_USE_MYMEMMOVE
 
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kutil.h>
 #include <polys/kbuckets.h>
 #include <kernel/febase.h>
 #include <omalloc/omalloc.h>
@@ -61,16 +61,16 @@
 #include <kernel/ideals.h>
 #include <kernel/timer.h>
 //#include "cntrlc.h"
-#include <kernel/stairc.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/stairc.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <polys/operations/pShallowCopyDelete.h>
 
 /* shiftgb stuff */
-#include <kernel/shiftgb.h>
+#include <kernel/GBEngine/shiftgb.h>
 #include <polys/prCopy.h>
 
 #ifdef HAVE_RATGRING
-#include <kernel/ratgring.h>
+#include <kernel/GBEngine/ratgring.h>
 #endif
 
 #ifdef KDEBUG

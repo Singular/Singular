@@ -41,10 +41,10 @@
 #include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <kernel/timer.h>
-#include <kernel/stairc.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/stairc.h>
+#include <kernel/GBEngine/syz.h>
 
 //#include "weight.h"
 #include "tok.h"

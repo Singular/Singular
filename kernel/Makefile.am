@@ -22,19 +22,12 @@ SOURCES = polys.cc febase.cc feread.cc \
  
 libkernel_la_SOURCES   = $(SOURCES)
 
-KERNELHEADERS = mod2.h polys.h stairc.h ideals.h \
+KERNELHEADERS = mod2.h polys.h ideals.h \
 	structs.h \
-	syz.h \
 	febase.h \
-	kstdfac.h \
-	kutil.h \
-	khstd.h kstd1.h \
-	units.h \
-	ratgring.h shiftgb.h nc.h \
-	preimage.h timer.h kInline.h fast_mult.h \
-	digitech.h tgb.h ringgb.h tgbgauss.h tgb_internal.h \
-	f5c.h f5data.h f5gb.h f5lists.h \
-	janet.h interpolation.h minpoly.h \
+	preimage.h timer.h fast_mult.h \
+	digitech.h \
+	interpolation.h minpoly.h \
 	Cache.h CacheImplementation.h
 
 libkernel_la_includedir  =${includedir}/singular/kernel

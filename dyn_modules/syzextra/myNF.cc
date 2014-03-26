@@ -39,10 +39,10 @@
 
 #include <kernel/ideals.h>
 
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 // #include <kernel/longrat.h>
-#include <kernel/kutil.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kutil.h>
+#include <kernel/GBEngine/kstd1.h>
 
 
 
@@ -58,7 +58,7 @@
 
 #include <polys/nc/sca.h>
 #include <polys/nc/nc.h>
-#include <kernel/nc.h>
+#include <kernel/GBEngine/nc.h>
 
 
 

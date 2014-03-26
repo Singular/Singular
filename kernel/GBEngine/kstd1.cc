@@ -39,11 +39,11 @@
 #include <polys/weight.h>
 #include <kernel/polys.h>
 
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kutil.h>
 #include <kernel/febase.h>
-#include <kernel/kstd1.h>
-#include <kernel/khstd.h>
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/khstd.h>
+#include <kernel/GBEngine/stairc.h>
 //#include "cntrlc.h"
 #include <kernel/ideals.h>
 //#include "../Singular/ipid.h"
@@ -54,10 +54,10 @@
 #ifdef HAVE_PLURAL
 #include <polys/nc/nc.h>
 #include <polys/nc/sca.h>
-#include <kernel/nc.h>
+#include <kernel/GBEngine/nc.h>
 #endif
 
-#include <kernel/kInline.h>
+#include <kernel/GBEngine/kInline.h>
 
 
 /* the list of all options which give a warning by test */

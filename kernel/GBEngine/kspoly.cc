@@ -11,7 +11,7 @@
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #include <misc/options.h>
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kutil.h>
 #include <coeffs/numbers.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/templates/p_Procs.h>

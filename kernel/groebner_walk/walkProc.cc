@@ -14,7 +14,7 @@
 #include <kernel/febase.h>
 #include <polys/monomials/maps.h>
 #include <omalloc/omalloc.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <kernel/fglm/fglm.h>
 #include <kernel/groebner_walk/walkMain.h>
 #include <kernel/groebner_walk/walkSupport.h>

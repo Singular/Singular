@@ -27,7 +27,7 @@
 #include <libpolys/coeffs/longrat.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 
 #include <Singular/tok.h>
 #include <Singular/ipshell.h>

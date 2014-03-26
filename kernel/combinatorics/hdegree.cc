@@ -19,7 +19,7 @@
 #include <misc/intvec.h>
 #include <coeffs/numbers.h>
 #include <kernel/combinatorics/hutil.h>
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/stairc.h>
 
 int  hCo, hMu, hMu2;
 omBin indlist_bin = omGetSpecBin(sizeof(indlist));

@@ -19,7 +19,7 @@
 #include <kernel/groebner_walk/walkMain.h>
 #include <kernel/groebner_walk/walkSupport.h>
 #include <polys/prCopy.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <polys/matpol.h>
 #include <polys/monomials/ring.h>
 

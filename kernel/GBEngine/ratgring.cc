@@ -11,7 +11,7 @@
 #include "singularconfig.h"
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
-#include <kernel/ratgring.h>
+#include <kernel/GBEngine/ratgring.h>
 #ifdef HAVE_RATGRING
 #include <polys/nc/nc.h>
 #include <kernel/febase.h>
@@ -21,7 +21,7 @@
 #include <kernel/ideals.h>
 #include <polys/matpol.h>
 #include <polys/kbuckets.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <polys/sbuckets.h>
 #include <polys/prCopy.h>
 #include <polys/operations/p_Mult_q.h>

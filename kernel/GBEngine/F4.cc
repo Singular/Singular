@@ -2,9 +2,9 @@
 #include "singularconfig.h"
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
-#include <kernel/F4.h>
-#include <kernel/tgb_internal.h>
-#include <kernel/tgbgauss.h>
+#include <kernel/GBEngine/F4.h>
+#include <kernel/GBEngine/tgb_internal.h>
+#include <kernel/GBEngine/tgbgauss.h>
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/

@@ -72,14 +72,14 @@ long sba_interreduction_operations;
  * SBA stuff -- done
 ***********************************************/
 
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kutil.h>
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/febase.h>
-#include <kernel/kstd1.h>
-#include <kernel/khstd.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/khstd.h>
 #include <polys/kbuckets.h>
 #include <polys/prCopy.h>
 //#include "cntrlc.h"
@@ -91,7 +91,7 @@ long sba_interreduction_operations;
 // #include "timer.h"
 
 /* shiftgb stuff */
-#include <kernel/shiftgb.h>
+#include <kernel/GBEngine/shiftgb.h>
 
   int (*test_PosInT)(const TSet T,const int tl,LObject &h);
   int (*test_PosInL)(const LSet set, const int length,

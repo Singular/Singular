@@ -59,9 +59,9 @@ using std::vector;
 #include <kernel/febase.h>
 #include <misc/options.h>
 #include <kernel/polys.h>
-#include <kernel/kutil.h>
-#include <kernel/kInline.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kutil.h>
+#include <kernel/GBEngine/kInline.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <polys/kbuckets.h>
 #include <libpolys/coeffs/modulop.h>
 

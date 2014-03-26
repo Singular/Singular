@@ -5,20 +5,20 @@
 #ifdef HAVE_F5
 #include <unistd.h>
 #include <kernel/structs.h>
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kutil.h>
 #include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/templates/p_Procs.h>
 #include <kernel/ideals.h>
 #include <kernel/febase.h>
-#include <kernel/kstd1.h>
-#include <kernel/khstd.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/khstd.h>
 #include <polys/kbuckets.h>
 #include <polys/weight.h>
 #include <misc/intvec.h>
 #include <kernel/polys.h>
-#include <kernel/f5c.h>
+#include <kernel/GBEngine/f5c.h>
 #include <kernel/timer.h>
 /*
 ==========================================================================
