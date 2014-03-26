@@ -206,6 +206,7 @@ AC_CONFIG_FILES([kernel/groebner_walk/Makefile])
 AC_CONFIG_FILES([kernel/combinatorics/Makefile])
 AC_CONFIG_FILES([kernel/spectrum/Makefile])
 AC_CONFIG_FILES([kernel/linear_algebra/Makefile])
+AC_CONFIG_FILES([kernel/maps/Makefile])
 
 AC_CONFIG_SUBDIRS([gfanlib])
 
