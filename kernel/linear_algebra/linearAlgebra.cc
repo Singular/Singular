@@ -32,7 +32,7 @@
 
 #include <kernel/structs.h>
 #include <kernel/ideals.h>
-#include <kernel/linearAlgebra.h>
+#include <kernel/linear_algebra/linearAlgebra.h>
 
 /**
  * The returned score is based on the implementation of 'nSize' for

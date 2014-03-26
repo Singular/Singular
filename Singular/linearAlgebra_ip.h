@@ -1,7 +1,7 @@
 #ifndef LINEARALGEBRA_H
 #define LINEARALGEBRA_H
 #include <Singular/lists.h>
-#include <kernel/linearAlgebra.h>
+#include <kernel/linear_algebra/linearAlgebra.h>
 
 /**
  * Computes all eigenvalues of a given real quadratic matrix with

@@ -92,7 +92,7 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/spectrum/spectrum.h>
 #include <kernel/spectrum/splist.h>
 #include <kernel/spectrum/multicnt.h>
-#include <kernel/eigenval.h>
+#include <kernel/linear_algebra/eigenval.h>
 #include <kernel/units.h>
 #include <kernel/ratgring.h>
 #include <kernel/shiftgb.h>
@@ -102,7 +102,7 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 // #include "CCRing.h" // Too old!
 #include <kernel/digitech.h>
-#include <kernel/eigenval.h>
+#include <kernel/linear_algebra/eigenval.h>
 #include <kernel/fast_maps.h>
 #include <kernel/fast_mult.h>
 #include <kernel/febase.h>
@@ -129,7 +129,7 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/kstdfac.h>
 #include <kernel/khstd.h>
 
-#include <kernel/linearAlgebra.h>
+#include <kernel/linear_algebra/linearAlgebra.h>
 
 
 
@@ -169,9 +169,9 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/interpolation.h>
 #include <kernel/minpoly.h>
 
-#include <kernel/Minor.h>
-#include <kernel/MinorInterface.h>
-#include <kernel/MinorProcessor.h>
+#include <kernel/linear_algebra/Minor.h>
+#include <kernel/linear_algebra/MinorInterface.h>
+#include <kernel/linear_algebra/MinorProcessor.h>
 #include <kernel/Cache.h>
 #include <kernel/CacheImplementation.h>
 
