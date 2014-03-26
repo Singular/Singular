@@ -6,8 +6,8 @@
 // include before anything to avoid clashes with stdio.h included elsewhere
 // #include <cstdio>
 
-#include "MinorInterface.h"
-#include "MinorProcessor.h"
+#include <kernel/MinorInterface.h>
+#include <kernel/MinorProcessor.h>
 
 #include <polys/simpleideals.h>
 

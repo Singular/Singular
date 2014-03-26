@@ -3,7 +3,7 @@
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
-#include "MinorProcessor.h"
+#include <kernel/MinorProcessor.h>
 
 #include <polys/kbuckets.h>
 
