@@ -42,11 +42,10 @@
 
 //#include "longrat.h"
 
+#include "mpr_base.h"
 #include "mpr_numeric.h"
 
 #include <math.h>
-
-extern size_t gmp_output_digits;
 //<-
 
 extern void nPrint(number n);  // for debugging output
