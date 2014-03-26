@@ -9,10 +9,10 @@
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #include <misc/options.h>
-#include <kernel/tgbgauss.h>
+#include <kernel/GBEngine/tgbgauss.h>
 #include <omalloc/omalloc.h>
 #include <stdlib.h>
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kutil.h>
 #include <kernel/febase.h>
 #include <kernel/polys.h>
 static const int bundle_size=100;
@@ -726,7 +726,7 @@ void tgb_sparse_matrix::set(int i, int j, number n)
   assume(i<rows);
   assume(j<columns);
   mac_poly* set_this=&mp[i];
-  //  while(((*set_this)!=NULL)&&((*set_this)­>exp<j))
+  //  while(((*set_this)!=NULL)&&((*set_this)\AD>exp<j))
   while(((*set_this)!=NULL) && ((*set_this)->exp<j))
     set_this=&((*set_this)->next);
 

@@ -18,23 +18,23 @@
 #include <kernel/ideals.h>
 #include <polys/matpol.h>
 #include <polys/kbuckets.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <polys/sbuckets.h>
 #include <polys/operations/p_Mult_q.h>
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kutil.h>
 #include <kernel/structs.h>
 #include <omalloc/omalloc.h>
-#include <kernel/khstd.h>
+#include <kernel/GBEngine/khstd.h>
 #include <polys/kbuckets.h>
 #include <polys/weight.h>
 #include <misc/intvec.h>
 #include <kernel/structs.h>
-#include <kernel/kInline.h>
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/kInline.h>
+#include <kernel/GBEngine/stairc.h>
 #include <polys/weight.h>
 #include <misc/intvec.h>
 #include <kernel/timer.h>
-#include <kernel/shiftgb.h>
+#include <kernel/GBEngine/shiftgb.h>
 #include <polys/nc/sca.h>
 
 

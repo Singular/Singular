@@ -37,24 +37,24 @@
 #include <polys/ext_fields/transext.h>
 #  include <polys/clapsing.h>
 
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/stairc.h>
 #include <kernel/mod2.h>
 #include <kernel/polys.h>
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <kernel/timer.h>
 #include <kernel/preimage.h>
-#include <kernel/units.h>
+#include <kernel/GBEngine/units.h>
 #include <kernel/spectrum/GMPrat.h>
-#include <kernel/tgb.h>
+#include <kernel/GBEngine/tgb.h>
 #include <kernel/groebner_walk/walkProc.h>
 #include <kernel/linear_algebra/linearAlgebra.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 #include <kernel/timer.h>
 
 #include <kernel/interpolation.h>
-#  include <kernel/kstdfac.h>
+#  include <kernel/GBEngine/kstdfac.h>
 #  include <kernel/fglm/fglm.h>
 
 #include <Singular/tok.h>
@@ -97,8 +97,8 @@ ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
 // defaults for all commands: NO_PLURAL | NO_RING | ALLOW_ZERODIVISOR
 
 #ifdef HAVE_PLURAL
-  #include <kernel/ratgring.h>
-  #include <kernel/nc.h>
+  #include <kernel/GBEngine/ratgring.h>
+  #include <kernel/GBEngine/nc.h>
   #include <polys/nc/nc.h>
   #include <polys/nc/sca.h>
   #define ALLOW_PLURAL     1

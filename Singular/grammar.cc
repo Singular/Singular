@@ -93,7 +93,7 @@
 #include <kernel/febase.h>
 #include <polys/matpol.h>
 #include <polys/monomials/ring.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipshell.h>
 #include <Singular/ipconv.h>
@@ -101,11 +101,11 @@
 #include <kernel/ideals.h>
 #include <coeffs/numbers.h>
 #include <kernel/polys.h>
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/stairc.h>
 #include <kernel/timer.h>
 #include <Singular/cntrlc.h>
 #include <polys/monomials/maps.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 #include <Singular/lists.h>
 #include <libpolys/coeffs/longrat.h>
 #include <Singular/libparse.h>

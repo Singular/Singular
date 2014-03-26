@@ -15,10 +15,10 @@
 #include <polys/simpleideals.h>
 #include <kernel/febase.h>
 #include <kernel/polys.h>
-#include <kernel/kutil.h>
-#include <kernel/stairc.h>
-#include <kernel/kstd1.h>
-#include <kernel/khstd.h>
+#include <kernel/GBEngine/kutil.h>
+#include <kernel/GBEngine/stairc.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/khstd.h>
 
 #define ADIDEBUG 0
 

@@ -20,9 +20,9 @@
 #include "singularconfig.h"
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
-#include <kernel/tgb.h>
-#include <kernel/tgb_internal.h>
-#include <kernel/tgbgauss.h>
+#include <kernel/GBEngine/tgb.h>
+#include <kernel/GBEngine/tgb_internal.h>
+#include <kernel/GBEngine/tgbgauss.h>
 
 #include <misc/options.h>
 #include <kernel/digitech.h>

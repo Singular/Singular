@@ -13,7 +13,7 @@
 
 #include <kernel/polys.h>
 #include <kernel/structs.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <kernel/ideals.h>
 
 using namespace std;

@@ -7,8 +7,8 @@ Date: 2009/11/03 06:57:32
 #include <kernel/mod2.h>
 
 #include <libpolys/misc/options.h>
-#include <kernel/kstd1.h>
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/kutil.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/spectrum/kmatrix.h>
@@ -18,7 +18,7 @@ Date: 2009/11/03 06:57:32
 //#include "ring.h"        //apparently not needed
 #include <Singular/lists.h>
 #include <libpolys/polys/prCopy.h>
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/stairc.h>
 #include <fstream>        //read-write cones to files
 #include <string>
 #include <sstream>

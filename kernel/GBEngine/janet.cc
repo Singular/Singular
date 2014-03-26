@@ -15,11 +15,11 @@
 #include <kernel/ideals.h>
 #include <kernel/polys.h>
 #include <kernel/febase.h>
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kutil.h>
 
 // #include "subexpr.h"
 
-#include <kernel/janet.h>
+#include <kernel/GBEngine/janet.h>
 
 
 #include <stdio.h>

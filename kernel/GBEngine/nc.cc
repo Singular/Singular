@@ -15,9 +15,9 @@
 #include <kernel/polys.h>
 
 #include <kernel/ideals.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 
-#include <kernel/nc.h>
+#include <kernel/GBEngine/nc.h>
 
 ideal twostd(ideal I) // works in currRing only!
 {

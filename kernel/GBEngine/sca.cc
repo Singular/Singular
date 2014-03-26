@@ -16,10 +16,10 @@
 
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/kstd1.h>
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/kutil.h>
 
-#include <kernel/nc.h>
+#include <kernel/GBEngine/nc.h>
 
 /// nc_gr_initBba is needed for sca_gr_bba and gr_bba.
 void nc_gr_initBba(ideal F, kStrategy strat); // from gr_kstd2.cc!

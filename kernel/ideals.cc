@@ -39,8 +39,8 @@
 #include <kernel/ideals.h>
 
 #include <kernel/febase.h>
-#include <kernel/kstd1.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/syz.h>
 
 #include <libpolys/coeffs/longrat.h>
 

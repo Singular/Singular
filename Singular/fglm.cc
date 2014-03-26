@@ -30,7 +30,7 @@
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <kernel/fglm/fglm.h>
 
 #include <Singular/fglm.h>

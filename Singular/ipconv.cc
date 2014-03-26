@@ -29,7 +29,7 @@
 #endif
 #include <polys/matpol.h>
 #include <Singular/links/silink.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 #include <Singular/attrib.h>
 #include <polys/monomials/ring.h>
 #include <Singular/ipshell.h>

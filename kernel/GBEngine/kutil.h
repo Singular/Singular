@@ -756,10 +756,10 @@ ring sbaRing(kStrategy strat, const ring r=currRing, BOOLEAN complete=TRUE, int 
 KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
   kStrategy strat);
 
-#include <kernel/kInline.h>
+#include <kernel/GBEngine/kInline.h>
 
 /* shiftgb stuff */
-#include <kernel/shiftgb.h>
+#include <kernel/GBEngine/shiftgb.h>
 
 poly pMove2CurrTail(poly p, kStrategy strat);
 

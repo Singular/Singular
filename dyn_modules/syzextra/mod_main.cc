@@ -15,11 +15,11 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 // #include <kernel/longrat.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 
 #include <kernel/polys.h>
 
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 
 #include <Singular/tok.h>
 #include <Singular/ipid.h>

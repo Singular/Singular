@@ -42,7 +42,7 @@
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/febase.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 
 #include "fglm.h"
 #include "fglmvec.h"

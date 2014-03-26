@@ -29,14 +29,14 @@
 
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
-#include <kernel/kstd1.h>
-#include <kernel/khstd.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/khstd.h>
 //#include "spolys.h"
 //#include "cntrlc.h"
-#include <kernel/ratgring.h>
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/ratgring.h>
+#include <kernel/GBEngine/kutil.h>
 
-#include <kernel/nc.h>
+#include <kernel/GBEngine/nc.h>
 
 #if 0
 /*3

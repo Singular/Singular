@@ -71,7 +71,7 @@ template class CMultiplier<CPower>;
 
 #endif
 
-#include <kernel/tgb_internal.h>
+#include <kernel/GBEngine/tgb_internal.h>
 #ifdef HAVE_BOOST
 #include <boost/dynamic_bitset.hpp>
 #include <vector>
