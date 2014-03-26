@@ -1,7 +1,7 @@
 #ifndef MINOR_PROCESSOR_H
 #define MINOR_PROCESSOR_H
 
-#include "Cache.h"
+#include <kernel/Cache.h>
 #include "Minor.h"
 
 struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;

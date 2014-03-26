@@ -87,7 +87,7 @@
 #include <kernel/spectrum/spectrum.h>
 #include <kernel/spectrum/splist.h>
 #include <kernel/spectrum/multicnt.h>
-#include <kernel/eigenval.h>
+#include <kernel/linear_algebra/eigenval.h>
 #include <kernel/units.h>
 #include <kernel/ratgring.h>
 #include <kernel/shiftgb.h>
@@ -98,7 +98,7 @@
 
 // #include "CCRing.h" // Too old!
 #include <kernel/digitech.h>
-#include <kernel/eigenval.h>
+#include <kernel/linear_algebra/eigenval.h>
 #include <kernel/fast_maps.h>
 #include <kernel/fast_mult.h>
 #include <kernel/febase.h>
@@ -129,7 +129,7 @@
 #include <kernel/kstdfac.h>
 #include <kernel/khstd.h>
 
-#include <kernel/linearAlgebra.h>
+#include <kernel/linear_algebra/linearAlgebra.h>
 
 
 

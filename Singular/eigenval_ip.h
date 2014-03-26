@@ -8,7 +8,7 @@
 #ifndef EIGENVAL_IP_H
 #define EIGENVAL_IP_H
 #ifdef HAVE_EIGENVAL
-#include <kernel/eigenval.h>
+#include <kernel/linear_algebra/eigenval.h>
 
 BOOLEAN evSwap(leftv res,leftv h);
 BOOLEAN evRowElim(leftv res,leftv h);

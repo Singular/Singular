@@ -3,7 +3,7 @@
 #endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
-#include <kernel/Minor.h>
+#include <kernel/linear_algebra/Minor.h>
 
 #include <kernel/structs.h>
 #include <kernel/polys.h>

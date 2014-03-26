@@ -39,14 +39,13 @@ KERNELHEADERS = mod2.h polys.h stairc.h ideals.h \
 	kstdfac.h \
 	kutil.h \
 	khstd.h kstd1.h \
-	eigenval.h units.h \
+	units.h \
 	ratgring.h shiftgb.h nc.h \
 	preimage.h timer.h kInline.h fast_mult.h \
 	digitech.h tgb.h ringgb.h tgbgauss.h tgb_internal.h \
-	linearAlgebra.h \
 	f5c.h f5data.h f5gb.h f5lists.h \
 	janet.h interpolation.h minpoly.h \
-	Minor.h MinorInterface.h MinorProcessor.h Cache.h CacheImplementation.h
+	Cache.h CacheImplementation.h
 
 libkernel_la_includedir  =${includedir}/singular/kernel
 libkernel_la_include_HEADERS   = $(KERNELHEADERS)
