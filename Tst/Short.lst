@@ -169,6 +169,7 @@ Short/hilb_weights.tst
 Short/hnoether_s.tst
 Short/homolog_s.tst
 Short/hres_s.tst
+Short/ideal_s.tst
 Short/imap.tst
 Short/intdet_s.tst
 Short/intersect_s.tst
