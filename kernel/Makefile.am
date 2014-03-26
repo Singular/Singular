@@ -33,7 +33,6 @@ libkernel_la_SOURCES   = $(SOURCES)
 KERNELHEADERS = mod2.h polys.h stairc.h ideals.h \
 	structs.h \
 	syz.h \
-	fast_maps.h \
 	febase.h \
 	kstdfac.h \
 	kutil.h \

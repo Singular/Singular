@@ -65,7 +65,7 @@
 #include <kernel/stairc.h>
 #include <kernel/ideals.h>
 #include <kernel/syz.h>
-#include <kernel/fast_maps.h>
+#include <kernel/maps/fast_maps.h>
 #include <kernel/febase.h>
 #include <kernel/groebner_walk/walkProc.h>
 #include <kernel/groebner_walk/walkMain.h>
@@ -99,7 +99,7 @@
 // #include "CCRing.h" // Too old!
 #include <kernel/digitech.h>
 #include <kernel/linear_algebra/eigenval.h>
-#include <kernel/fast_maps.h>
+#include <kernel/maps/fast_maps.h>
 #include <kernel/fast_mult.h>
 #include <kernel/febase.h>
 
