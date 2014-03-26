@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I ../m4
 # TODO: use ${top_srcdir} instead of .. in the above?
 
-SUBDIRS=sample numeric fglm groebner_walk combinatorics
+SUBDIRS=sample numeric fglm groebner_walk combinatorics spectrum
 # kernelsample   
 
 noinst_LTLIBRARIES = libkernel.la 
@@ -21,7 +21,6 @@ SOURCES = polys.cc febase.cc feread.cc \
     kspoly.cc kpolys.cc \
     syz.cc syz0.cc syz1.cc syz2.cc syz3.cc \
     timer.cc \
-    GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
     eigenval.cc units.cc \
     fast_mult.cc digitech.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc f5c.cc \
@@ -39,10 +38,9 @@ KERNELHEADERS = mod2.h polys.h stairc.h ideals.h \
 	syz.h \
 	fast_maps.h \
 	febase.h \
-	kstdfac.h kmatrix.h\
+	kstdfac.h \
 	kutil.h \
 	khstd.h kstd1.h \
-	GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h \
 	eigenval.h units.h \
 	ratgring.h shiftgb.h nc.h \
 	preimage.h timer.h kInline.h fast_mult.h \
@@ -61,6 +59,7 @@ ${builddir}/numeric/libnumeric.la \
 ${builddir}/fglm/libfglm.la \
 ${builddir}/groebner_walk/libgroebner_walk.la \
 ${builddir}/combinatorics/libcombinatorics.la \
+${builddir}/spectrum/libspectrum.la \
 ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
 ${abs_top_builddir}/libpolys/polys/libpolys.la
 

@@ -84,14 +84,14 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/fglm/fglmgauss.h>
 #include <kernel/fglm/fglmvec.h>
 #include <kernel/kstdfac.h>
-#include <kernel/kmatrix.h>
-#include <kernel/GMPrat.h>
-#include <kernel/multicnt.h>
-#include <kernel/npolygon.h>
-#include <kernel/semic.h>
-#include <kernel/spectrum.h>
-#include <kernel/splist.h>
-#include <kernel/multicnt.h>
+#include <kernel/spectrum/kmatrix.h>
+#include <kernel/spectrum/GMPrat.h>
+#include <kernel/spectrum/multicnt.h>
+#include <kernel/spectrum/npolygon.h>
+#include <kernel/spectrum/semic.h>
+#include <kernel/spectrum/spectrum.h>
+#include <kernel/spectrum/splist.h>
+#include <kernel/spectrum/multicnt.h>
 #include <kernel/eigenval.h>
 #include <kernel/units.h>
 #include <kernel/ratgring.h>
@@ -124,7 +124,7 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 #include <kernel/ideals.h>
 
-#include <kernel/kmatrix.h>
+#include <kernel/spectrum/kmatrix.h>
 #include <kernel/kstd1.h>
 #include <kernel/kstdfac.h>
 #include <kernel/khstd.h>
@@ -134,8 +134,8 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 
 // #include <kernel/lplist.h> // Too old!
-#include <kernel/multicnt.h>
-#include <kernel/npolygon.h>
+#include <kernel/spectrum/multicnt.h>
+#include <kernel/spectrum/npolygon.h>
 // #include "Number.h" // Too old?
 // #include "Poly.h" // Too old?
 // #include "PowerSeries.h" // Too old?
@@ -146,10 +146,10 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 #include <kernel/ratgring.h>
 #include <kernel/ringgb.h>
-#include <kernel/semic.h>
+#include <kernel/spectrum/semic.h>
 #include <kernel/shiftgb.h>
-#include <kernel/spectrum.h>
-#include <kernel/splist.h>
+#include <kernel/spectrum/spectrum.h>
+#include <kernel/spectrum/splist.h>
 #include <kernel/stairc.h>
 #include <kernel/structs.h>
 #include <kernel/syz.h>
