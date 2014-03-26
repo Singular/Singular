@@ -22,11 +22,11 @@
 #endif
 
 #include <kernel/structs.h>
-#include <kernel/GMPrat.h>
+#include <kernel/spectrum/GMPrat.h>
 #include <coeffs/numbers.h>
 #include <polys/monomials/p_polys.h>
-#include <kernel/npolygon.h>
-#include <kernel/splist.h>
+#include <kernel/spectrum/npolygon.h>
+#include <kernel/spectrum/splist.h>
 #include <misc/intvec.h>
 
 // ------------------------

@@ -55,7 +55,6 @@ TIMING_DEFINE_PRINT(mpr_solver)
 
 #define TIMING_EPR(t,msg) TIMING_END_AND_PRINT(t,msg);TIMING_RESET(t);
 
-extern size_t gmp_output_digits;
 //<-
 
 //-> nPrint(number n)

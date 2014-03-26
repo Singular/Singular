@@ -45,7 +45,7 @@ SLIB1 = classifyceq.lib classifyci.lib classify_aeq.lib \
         ffsolve.lib decomp.lib template.lib \
         findifs.lib finitediff.lib \
         gitfan.lib \
-        locnormal.lib modnormal.lib \
+        locnormal.lib modnormal.lib modular.lib \
 	JMBTest.lib JMSConst.lib multigrading.lib\
 	numerAlg.lib numerDecom.lib \
         orbitparam.lib parallel.lib polymake.lib\

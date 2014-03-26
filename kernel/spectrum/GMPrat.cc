@@ -27,7 +27,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#include <kernel/GMPrat.h>
+#include <kernel/spectrum/GMPrat.h>
 
 // ----------------------------------------------------------------------------
 //  disconnect a rational from its reference

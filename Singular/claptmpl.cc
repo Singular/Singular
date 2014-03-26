@@ -41,8 +41,8 @@
 #endif
 #endif
 
-#include <kernel/GMPrat.h>
-#include <kernel/kmatrix.h>
+#include <kernel/spectrum/GMPrat.h>
+#include <kernel/spectrum/kmatrix.h>
 
 template class KMatrix<Rational>;
 

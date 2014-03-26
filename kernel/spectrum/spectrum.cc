@@ -32,12 +32,12 @@
 
 #include <kernel/kstd1.h>
 #include <kernel/stairc.h>
-#include <kernel/multicnt.h>
-#include <kernel/GMPrat.h>
-#include <kernel/kmatrix.h>
-#include <kernel/npolygon.h>
-#include <kernel/splist.h>
-#include <kernel/semic.h>
+#include <kernel/spectrum/multicnt.h>
+#include <kernel/spectrum/GMPrat.h>
+#include <kernel/spectrum/kmatrix.h>
+#include <kernel/spectrum/npolygon.h>
+#include <kernel/spectrum/splist.h>
+#include <kernel/spectrum/semic.h>
 
 // ----------------------------------------------------------------------------
 //  test if the polynomial  h  has a term of total degree d

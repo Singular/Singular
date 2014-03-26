@@ -121,7 +121,7 @@
 
 
 #ifdef HAVE_SPECTRUM
-#include <kernel/spectrum.h>
+#include <kernel/spectrum/spectrum.h>
 #endif
 
 #ifdef HAVE_PLURAL
