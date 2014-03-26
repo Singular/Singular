@@ -3,7 +3,7 @@
 #ifdef HAVE_CONFIG_H
 #include "singularconfig.h"
 #endif /* HAVE_CONFIG_H */
-#include "mod2.h"
+#include <kernel/mod2.h>
 #include <misc/auxiliary.h>
 
 #include <misc/options.h>
@@ -14,12 +14,12 @@
 #include <polys/nc/sca.h>
 #include <polys/nc/gb_hack.h>
 
-#include "polys.h"
-#include "ideals.h"
-#include "kstd1.h"
-#include "kutil.h"
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/kstd1.h>
+#include <kernel/kutil.h>
 
-#include "nc.h"
+#include <kernel/nc.h>
 
 /// nc_gr_initBba is needed for sca_gr_bba and gr_bba.
 void nc_gr_initBba(ideal F, kStrategy strat); // from gr_kstd2.cc!
