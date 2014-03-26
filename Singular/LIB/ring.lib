@@ -23,6 +23,10 @@ PROCEDURES:
              (parameters in square brackets [] are optional)
  optionIsSet(opt)         check if as a string given option is set or not.
  hasRingCoefficientRing   check if the coefficient ring is not a field
+ hasNumericCoeffs(rng)    check for use of floating point numbers
+ hasCommutativeVars(rng)  non-commutive or commnuative polynomial ring
+ hasGlobalOrdering(rng)   global versus mixed/local monomial ordering
+ isSubModule(I,J)         check if I is in J as submodule
 ";
 
 LIB "inout.lib";
@@ -57,6 +61,15 @@ example
     option("nowarn");
     // now the option is unset
     optionIsSet("warn");
+}
+
+
+static proc testOptionIsSet()
+{
+     option("warn");
+     ASSUME(0, optionIsSet("warn") );
+     option("nowarn");
+     ASSUME(0, 0 == optionIsSet("warn") );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -907,11 +920,32 @@ example
   isQuotientRing(q);  // yes
 }
 
+static proc testIsQuotientRing()
+{
+   ring rng = real,x,dp;
+   ASSUME(0, 0== isQuotientRing(rng) ) ;
+
+   qring qrng = 1;
+   ASSUME(0, isQuotientRing(qrng) ) ;
+
+   ring rng2 = integer,x,dp;
+   ASSUME(0, 0 == isQuotientRing(rng2) ) ;
+
+   qring qrng2=0;
+   ASSUME(0, not isQuotientRing(qrng2) ) ;
+
+   ring rng3 = 0,x,dp;
+   ASSUME(0, 0 == isQuotientRing(rng3) ) ;
+
+   qring qrng3=1;
+   ASSUME(0, isQuotientRing(qrng3) ) ;
+}
+
 proc hasRingCoefficientRing( rng )
 "USAGE: hasRingCoefficientRing ( rng );
 RETURN:  1 if rng is has ring coefficients, 0 otherwise.
-KEYWORDS: integer ring coefficients
-EXAMPLE: example hasRingCoefficientRing ; shows an example
+KEYWORDS: ring coefficients
+EXAMPLE: example hasRingCoefficientRing; shows an example
 "
 {
   return (attrib(rng,"ring_cf")==1);
@@ -922,9 +956,57 @@ example
   hasRingCoefficientRing(rng); //yes
   // if a certain method supports only rings with integer coefficients,
   // then a parameter test could be performed:
-   ASSUME( 0, hasRingCoefficientRing(basering)); //ok
-
   ring rng2 = 0, x, dp;
   hasRingCoefficientRing(rng2);  // no
 }
+
+proc hasGlobalOrdering (rng)
+"USAGE: hasGlobalOrdering ( rng );
+RETURN:  1 if rng has a global monomial ordering, 0 otherwise.
+KEYWORDS: monomial ordering
+EXAMPLE: example hasGlobalOrdering; shows an example
+"
+{
+  return (attrib(rng,"global")==1);
+}
+example
+{
+  ring rng = integer,x,dp;
+  hasGlobalOrdering(rng); //yes
+  ring rng2 = 0, x, ds;
+  hasGlobalOrdering(rng2);  // no
+}
+
+proc hasCommutativeVars (rng)
+"USAGE: hasCommutativeVars ( rng );
+RETURN:  1 if rng is a commutative polynomial ring, 0 otherwise.
+KEYWORDS: plural
+EXAMPLE: example hasCommutativeVars; shows an example
+"
+{
+  list rl=ringlist(rng);
+  return (size(rl)==4);
+}
+
+proc hasNumericCoeffs(rng)
+"USAGE: hasNumericCoeffs ( rng );
+RETURN:  1 if rng has inexact coeffcients, 0 otherwise.
+KEYWORDS: floating point
+EXAMPLE: example hasNumericCoeffs; shows an example
+"
+{
+  ERROR("not yet implemented");
+}
+
+proc isSubModule(I,J)
+"USAGE: isSubModule(I,J): I, J: ideal or module
+RETURN: 1 if module(I) is in module(J), 0 otherwise
+EXAMPLE: isSubModule; shows an example
+{
+  if (attrib(J,"isSB")==1)
+  { return(size(reduce(I,J,1)==0)); }
+  else
+  { return(size(reduce(I,groebner(J),1)==0)); }
+}
+
 
