@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I ../m4
 # TODO: use ${top_srcdir} instead of .. in the above?
 
-SUBDIRS=sample numeric fglm groebner_walk combinatorics spectrum linear_algebra maps
+SUBDIRS=sample numeric fglm groebner_walk combinatorics spectrum linear_algebra maps GBEngine
 # kernelsample   
 
 noinst_LTLIBRARIES = libkernel.la 
@@ -13,20 +13,12 @@ $(FACTORY_INCLUDES) $(NTL_CFLAGS) $(FLINT_CFLAGS) $(GMP_CFLAGS)
 
 SOURCES = polys.cc febase.cc feread.cc \
     ideals.cc \
-    khstd.cc kstdfac.cc \
-    kstd1.cc kstd2.cc kutil.cc \
-    nc.cc sca.cc gr_kstd2.cc \
     misc.cc \
-    kspoly.cc kpolys.cc \
-    syz.cc syz0.cc syz1.cc syz2.cc syz3.cc \
     timer.cc \
-    units.cc \
     fast_mult.cc digitech.cc \
-    tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc f5c.cc \
-    ratgring.cc shiftgb.cc \
     preimage.cc \
     mod2.h \
-    janet.cc interpolation.cc minpoly.cc
+    interpolation.cc minpoly.cc
  
 libkernel_la_SOURCES   = $(SOURCES)
 
@@ -57,6 +49,7 @@ ${builddir}/combinatorics/libcombinatorics.la \
 ${builddir}/spectrum/libspectrum.la \
 ${builddir}/linear_algebra/liblinear_algebra.la \
 ${builddir}/maps/libmaps.la \
+${builddir}/GBEngine/libGBEngine.la \
 ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
 ${abs_top_builddir}/libpolys/polys/libpolys.la
 

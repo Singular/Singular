@@ -19,7 +19,7 @@
 
 // #include "subexpr.h"
 
-#include "janet.h"
+#include <kernel/janet.h>
 
 
 #include <stdio.h>
