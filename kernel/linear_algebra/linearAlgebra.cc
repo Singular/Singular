@@ -18,7 +18,7 @@
 #ifdef HAVE_CONFIG_H
 #include "singularconfig.h"
 #endif /* HAVE_CONFIG_H */
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
