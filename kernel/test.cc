@@ -70,7 +70,7 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/stairc.h>
 #include <kernel/ideals.h>
 #include <kernel/syz.h>
-#include <kernel/fast_maps.h>
+#include <kernel/maps/fast_maps.h>
 #include <kernel/febase.h>
 #include <kernel/groebner_walk/walkProc.h>
 #include <kernel/groebner_walk/walkMain.h>
@@ -84,15 +84,15 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/fglm/fglmgauss.h>
 #include <kernel/fglm/fglmvec.h>
 #include <kernel/kstdfac.h>
-#include <kernel/kmatrix.h>
-#include <kernel/GMPrat.h>
-#include <kernel/multicnt.h>
-#include <kernel/npolygon.h>
-#include <kernel/semic.h>
-#include <kernel/spectrum.h>
-#include <kernel/splist.h>
-#include <kernel/multicnt.h>
-#include <kernel/eigenval.h>
+#include <kernel/spectrum/kmatrix.h>
+#include <kernel/spectrum/GMPrat.h>
+#include <kernel/spectrum/multicnt.h>
+#include <kernel/spectrum/npolygon.h>
+#include <kernel/spectrum/semic.h>
+#include <kernel/spectrum/spectrum.h>
+#include <kernel/spectrum/splist.h>
+#include <kernel/spectrum/multicnt.h>
+#include <kernel/linear_algebra/eigenval.h>
 #include <kernel/units.h>
 #include <kernel/ratgring.h>
 #include <kernel/shiftgb.h>
@@ -102,8 +102,8 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 // #include "CCRing.h" // Too old!
 #include <kernel/digitech.h>
-#include <kernel/eigenval.h>
-#include <kernel/fast_maps.h>
+#include <kernel/linear_algebra/eigenval.h>
+#include <kernel/maps/fast_maps.h>
 #include <kernel/fast_mult.h>
 #include <kernel/febase.h>
 
@@ -124,18 +124,18 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 #include <kernel/ideals.h>
 
-#include <kernel/kmatrix.h>
+#include <kernel/spectrum/kmatrix.h>
 #include <kernel/kstd1.h>
 #include <kernel/kstdfac.h>
 #include <kernel/khstd.h>
 
-#include <kernel/linearAlgebra.h>
+#include <kernel/linear_algebra/linearAlgebra.h>
 
 
 
 // #include <kernel/lplist.h> // Too old!
-#include <kernel/multicnt.h>
-#include <kernel/npolygon.h>
+#include <kernel/spectrum/multicnt.h>
+#include <kernel/spectrum/npolygon.h>
 // #include "Number.h" // Too old?
 // #include "Poly.h" // Too old?
 // #include "PowerSeries.h" // Too old?
@@ -146,10 +146,10 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 #include <kernel/ratgring.h>
 #include <kernel/ringgb.h>
-#include <kernel/semic.h>
+#include <kernel/spectrum/semic.h>
 #include <kernel/shiftgb.h>
-#include <kernel/spectrum.h>
-#include <kernel/splist.h>
+#include <kernel/spectrum/spectrum.h>
+#include <kernel/spectrum/splist.h>
 #include <kernel/stairc.h>
 #include <kernel/structs.h>
 #include <kernel/syz.h>
@@ -169,9 +169,9 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/interpolation.h>
 #include <kernel/minpoly.h>
 
-#include <kernel/Minor.h>
-#include <kernel/MinorInterface.h>
-#include <kernel/MinorProcessor.h>
+#include <kernel/linear_algebra/Minor.h>
+#include <kernel/linear_algebra/MinorInterface.h>
+#include <kernel/linear_algebra/MinorProcessor.h>
 #include <kernel/Cache.h>
 #include <kernel/CacheImplementation.h>
 

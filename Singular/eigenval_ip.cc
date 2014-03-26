@@ -22,7 +22,7 @@
 #include <Singular/lists.h>
 #include <polys/matpol.h>
 #include <polys/clapsing.h>
-#include <kernel/eigenval.h>
+#include <kernel/linear_algebra/eigenval.h>
 #include <Singular/eigenval_ip.h>
 
 

@@ -46,10 +46,10 @@
 #include <kernel/timer.h>
 #include <kernel/preimage.h>
 #include <kernel/units.h>
-#include <kernel/GMPrat.h>
+#include <kernel/spectrum/GMPrat.h>
 #include <kernel/tgb.h>
 #include <kernel/groebner_walk/walkProc.h>
-#include <kernel/linearAlgebra.h>
+#include <kernel/linear_algebra/linearAlgebra.h>
 #include <kernel/syz.h>
 #include <kernel/timer.h>
 
@@ -68,7 +68,7 @@
 #include <Singular/ipprint.h>
 #include <Singular/attrib.h>
 #include <Singular/links/silink.h>
-#include <kernel/MinorInterface.h>
+#include <kernel/linear_algebra/MinorInterface.h>
 #include <Singular/misc_ip.h>
 #include <Singular/linearAlgebra_ip.h>
 
@@ -7497,7 +7497,7 @@ extern "C"
 static BOOLEAN jjFactModD_M(leftv res, leftv v)
 {
   /* compute two factors of h(x,y) modulo x^(d+1) in K[[x]][y],
-     see a detailed documentation in /kernel/linearAlgebra.h
+     see a detailed documentation in /kernel/linear_algebra/linearAlgebra.h
 
      valid argument lists:
      - (poly h, int d),

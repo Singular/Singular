@@ -41,9 +41,9 @@
 #include <Singular/links/silink.h>
 #include <kernel/stairc.h>
 #include <polys/weight.h>
-#include <kernel/semic.h>
-#include <kernel/splist.h>
-#include <kernel/spectrum.h>
+#include <kernel/spectrum/semic.h>
+#include <kernel/spectrum/splist.h>
+#include <kernel/spectrum/spectrum.h>
 ////// #include <coeffs/gnumpfl.h>
 //#include <kernel/mpr_base.h>
 ////// #include <coeffs/ffields.h>
@@ -69,7 +69,7 @@
 #define FAST_MAP
 
 #ifdef FAST_MAP
-#include <kernel/fast_maps.h>
+#include <kernel/maps/fast_maps.h>
 #endif
 
 leftv iiCurrArgs=NULL;

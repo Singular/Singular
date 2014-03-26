@@ -74,7 +74,7 @@
 #include <kernel/kutil.h>
 
 #include <kernel/shiftgb.h>
-#include <kernel/linearAlgebra.h>
+#include <kernel/linear_algebra/linearAlgebra.h>
 
 #include <kernel/combinatorics/hutil.h>
 
@@ -120,7 +120,7 @@
 
 
 #ifdef HAVE_SPECTRUM
-#include <kernel/spectrum.h>
+#include <kernel/spectrum/spectrum.h>
 #endif
 
 #ifdef HAVE_PLURAL

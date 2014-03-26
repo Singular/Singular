@@ -25,9 +25,9 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 
-#include <kernel/GMPrat.h>
-#include <kernel/kmatrix.h>
-#include <kernel/npolygon.h>
+#include <kernel/spectrum/GMPrat.h>
+#include <kernel/spectrum/kmatrix.h>
+#include <kernel/spectrum/npolygon.h>
 #include <kernel/structs.h>
 
 // ----------------------------------------------------------------------------
