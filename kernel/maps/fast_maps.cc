@@ -19,7 +19,7 @@
 #include <polys/monomials/ring.h>
 #include <kernel/febase.h>
 #include <polys/sbuckets.h>
-#include <kernel/fast_maps.h>
+#include <kernel/maps/fast_maps.h>
 
 // define if you want to use special dest_ring
 #define HAVE_DEST_R 1
