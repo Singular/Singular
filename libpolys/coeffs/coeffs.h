@@ -284,7 +284,6 @@ struct n_Procs_s
 
    /// the 0 as constant, NULL by default
    number nNULL;
-   int     char_flag;
    int     ref;
    /// how many variables of factort are already used by this coeff
    int     factoryVarOffset;
