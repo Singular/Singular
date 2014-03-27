@@ -98,7 +98,7 @@ LINLINE number   nlMult(number a, number b, const coeffs r);
 BOOLEAN nlInitChar(coeffs r, void*);
 
 number   nlInit2 (int i, int j, const coeffs r);
-number   nlInit2gmp (mpz_t i, mpz_t j);
+number   nlInit2gmp (mpz_t i, mpz_t j, const coeffs r);
 
 // number nlInitMPZ(mpz_t m, const coeffs r);
 // void nlMPZ(mpz_t m, number &n, const coeffs r);
