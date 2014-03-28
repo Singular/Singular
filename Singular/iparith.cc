@@ -53,7 +53,7 @@
 #include <kernel/GBEngine/syz.h>
 #include <kernel/timer.h>
 
-#include <kernel/interpolation.h>
+#include <kernel/linear_algebra/interpolation.h>
 #  include <kernel/GBEngine/kstdfac.h>
 #  include <kernel/fglm/fglm.h>
 

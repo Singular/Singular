@@ -16,8 +16,7 @@ SOURCES = polys.cc febase.cc feread.cc \
     timer.cc \
     fast_mult.cc digitech.cc \
     preimage.cc \
-    mod2.h \
-    interpolation.cc minpoly.cc
+    mod2.h
  
 libkernel_la_SOURCES   = $(SOURCES)
 
@@ -25,9 +24,7 @@ KERNELHEADERS = mod2.h polys.h ideals.h \
 	structs.h \
 	febase.h \
 	preimage.h timer.h fast_mult.h \
-	digitech.h \
-	interpolation.h minpoly.h \
-	Cache.h CacheImplementation.h
+	digitech.h
 
 libkernel_la_includedir  =${includedir}/singular/kernel
 libkernel_la_include_HEADERS   = $(KERNELHEADERS)

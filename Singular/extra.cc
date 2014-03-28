@@ -81,7 +81,7 @@
 // for tests of t-rep-GB
 #include <kernel/GBEngine/tgb.h>
 
-#include <kernel/minpoly.h>
+#include <kernel/linear_algebra/minpoly.h>
 
 #include <numeric/mpr_base.h>
 
