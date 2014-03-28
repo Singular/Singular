@@ -1,8 +1,7 @@
 ACLOCAL_AMFLAGS = -I ../m4
 # TODO: use ${top_srcdir} instead of .. in the above?
 
-SUBDIRS=sample numeric fglm groebner_walk combinatorics spectrum linear_algebra maps GBEngine
-# kernelsample   
+SUBDIRS=numeric fglm groebner_walk combinatorics spectrum linear_algebra maps GBEngine   
 
 noinst_LTLIBRARIES = libkernel.la 
 ###### libkerneldir = $(libdir)/singular
@@ -34,7 +33,6 @@ libkernel_la_includedir  =${includedir}/singular/kernel
 libkernel_la_include_HEADERS   = $(KERNELHEADERS)
 
 libkernel_la_LIBADD   = \
-${builddir}/sample/libsample.la \
 ${builddir}/numeric/libnumeric.la \
 ${builddir}/fglm/libfglm.la \
 ${builddir}/groebner_walk/libgroebner_walk.la \
