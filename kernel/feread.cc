@@ -112,7 +112,7 @@ extern "C" {
     #define rl_filename_completion_function filename_completion_function
     #define rl_completion_matches           completion_matches
   #endif
-  #ifndef READLINE_READLINE_H_OK  
+  #ifndef READLINE_READLINE_H_OK
     /* declare everything we need explicitely and do not rely on includes */
     extern char * rl_readline_name;
     extern char *rl_line_buffer;
@@ -147,7 +147,7 @@ char * fe_fgets_stdin_rl(const char *pr,char *s, int size);
 *   array of matches, or NULL if there aren't any.
 */
 #if defined(HAVE_DYN_RL)
-extern "C" 
+extern "C"
 {
   int fe_init_dyn_rl();
   char *(*fe_filename_completion_function)(); /* 3 */
@@ -179,7 +179,7 @@ char ** singular_completion (char *text, int start, int end)
   #define x_rl_completion_matches rl_completion_matches
   #define x_rl_filename_completion_function rl_filename_completion_function
 #endif
-  if (x_rl_line_buffer[start-1]=='"')
+  if ((start>0) && (x_rl_line_buffer[start-1]=='"'))
     return x_rl_completion_matches (text, (RL_PROC)x_rl_filename_completion_function);
   char **m=x_rl_completion_matches (text, (RL_PROC)command_generator);
 #undef x_rl_line_buffer
@@ -209,11 +209,13 @@ char * fe_fgets_stdin_rl(const char *pr,char *s, int size)
   if (line==NULL)
     return NULL;
 
+  int l=strlen(line);
+  for (int i=l-1;i>=0;i--) line[i]=line[i]&127;
+
   if (*line!='\0')
   {
     add_history (line);
   }
-  int l=strlen(line);
   if (l>=size-1)
   {
     strncpy(s,line,size);
@@ -268,11 +270,13 @@ char * fe_fgets_stdin_drl(const char *pr,char *s, int size)
   if (line==NULL)
     return NULL;
 
+  int l=strlen(line);
+  for (int i=l-1;i>=0;i--) line[i]=line[i]&127;
+
   if (*line!='\0')
   {
     (*fe_add_history) (line);
   }
-  int l=strlen(line);
   if (l>=size-1)
   {
     strncpy(s,line,size);
@@ -299,7 +303,10 @@ char * fe_fgets(const char *pr,char *s, int size)
     fprintf(stdout,"%s",pr);
   }
   mflush();
-  return fgets(s,size,stdin);
+  char *line=fgets(s,size,stdin);
+  if (line!=NULL)
+    for (int i=strlen(line)-1;i>=0;i--) line[i]=line[i]&127;
+  return line;
 }
 
 /* ===================================================================*/
