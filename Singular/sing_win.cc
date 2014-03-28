@@ -13,7 +13,7 @@
 #ifdef ix86_Win
 #include <windows.h>
 #include <winuser.h>
-#include <kernel/htmlhelp.h>
+#include <Singular/htmlhelp.h>
 #include <sys/cygwin.h>
 #include <stdio.h>
 #ifndef MAXPATHLEN
