@@ -591,7 +591,7 @@ void  ipMoveId(idhdl tomove)
 
 const char * piProcinfo(procinfov pi, const char *request)
 {
-  if(pi == NULL) return "empty proc";
+  if((pi == NULL)||(pi->language==LANG_NONE)) return "empty proc";
   else if (strcmp(request, "libname")  == 0) return pi->libname;
   else if (strcmp(request, "procname") == 0) return pi->procname;
   else if (strcmp(request, "type")     == 0)
