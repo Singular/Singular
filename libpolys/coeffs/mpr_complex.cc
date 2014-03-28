@@ -10,9 +10,9 @@
 
 // WARNING! ALWAYS use omAlloc and FreeL when alloc. memory for some char* !!
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+#include <misc/auxiliary.h>
+
 //#ifdef HAVE_MPR
 #include <coeffs/coeffs.h>
 #include <reporter/reporter.h>

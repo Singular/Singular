@@ -10,9 +10,9 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 

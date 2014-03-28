@@ -16,10 +16,8 @@
 #ifndef MISC_AUXILIARY_H
 #define MISC_AUXILIARY_H
 
-#ifdef HAVE_CONFIG_H
+/* please include libpolysconfig.h exclusively via <misc/auxiliary.h> and before any other header */
 #include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
-
 
 // ----------------- which parts/extensions of Singular to build
 #ifndef HAVE_RINGS
@@ -203,7 +201,7 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
        including mod2.h, provided ! PDEBUG is defined in mod2.h E.g.:
 
        #define PDEBUG 2
-       #include <kernel/mod2.h>
+
        ...
 
        makes sure that all poly operations in your file are done with
@@ -248,7 +246,7 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
      #define OM_CHECK 3
      #define OM_TRACK 5
      #define OM_KEEP  1
-     #include <kernel/mod2.h>
+
      #include <omalloc/omalloc.h>
    ensures that all memory allocs/free in this file are done with
    OM_CHECK==3 and OM_TRACK==5, and that all addresses allocated/freed

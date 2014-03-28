@@ -7,9 +7,9 @@
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
  *******************************************************************/
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <misc/auxiliary.h>
 
 #include <factory/factory.h>

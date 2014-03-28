@@ -9,9 +9,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <misc/auxiliary.h>
 
 #include <factory/factory.h>

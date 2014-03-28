@@ -5,9 +5,9 @@
 * ABSTRACT: class int64vec: lists/vectors of int64
 */
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+#include <misc/auxiliary.h>
+
 
 
 #include <misc/int64vec.h>

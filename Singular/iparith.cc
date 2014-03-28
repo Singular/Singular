@@ -6,9 +6,9 @@
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 
 #include <omalloc/omalloc.h>
 

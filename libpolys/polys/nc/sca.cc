@@ -18,9 +18,9 @@
 #endif
 
 // #define PDEBUG 2
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <misc/auxiliary.h>
 
 #ifdef HAVE_PLURAL

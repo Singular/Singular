@@ -5,9 +5,9 @@
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 #include <misc/options.h>

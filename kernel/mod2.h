@@ -9,14 +9,10 @@
 #ifndef MOD2_H
 #define MOD2_H
 
+/* please include singularconfig.h exclusively via <kernel/mod2.h> and before any other header */
+# include <singularconfig.h>
 
-#ifdef HAVE_CONFIG_H
-/* config.h is a private header that will not be installed and thus cannot be unconditionally included */
-# include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
-
-
-#include <misc/auxiliary.h>
+# include <misc/auxiliary.h>
 
 #define SINGULAR_MAJOR_VERSION 4
 #define SINGULAR_MINOR_VERSION 0

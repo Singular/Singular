@@ -5,9 +5,9 @@
 * ABSTRACT: numbers modulo p (<=32003)
 */
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <misc/auxiliary.h>
 
 #include <factory/factory.h>

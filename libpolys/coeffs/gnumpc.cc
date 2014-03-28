@@ -7,9 +7,9 @@
 * ngc == number gnu complex
 */
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 
 #include <omalloc/omalloc.h>
 

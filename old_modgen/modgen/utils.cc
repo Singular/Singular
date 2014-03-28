@@ -10,9 +10,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#ifdef HAVE_CONFIG_H
+
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
+
 #include "crctab.h"
 
 int modlineno;    /* lineno within module */

@@ -5,7 +5,7 @@
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
  *******************************************************************/
-#include <omalloc/omConfig.h>
+#include "omConfig.h"
 
 #if OM_PROVIDE_MALLOC > 0
 #if OM_PROVIDE_MALLOC > 1

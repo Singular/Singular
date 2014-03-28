@@ -10,9 +10,9 @@
 #include <vector>
 #include <set>
 
-#ifdef HAVE_CONFIG_H
+
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
+
 #ifdef HAVE_CDD_SETOPER_H
 #include "cdd/setoper.h"
 #include "cdd/cdd.h"

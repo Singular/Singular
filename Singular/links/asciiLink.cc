@@ -12,9 +12,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <misc/options.h>

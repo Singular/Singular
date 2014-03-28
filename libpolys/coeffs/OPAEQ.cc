@@ -5,7 +5,7 @@
 *Dense Integer Polynomials
 */
 //Schauen was hier überhaupt sinn macht
-#include "libpolysconfig.h"
+
 #include <misc/auxiliary.h>
 
 #include <factory/factory.h>

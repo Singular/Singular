@@ -7,9 +7,6 @@
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
  *******************************************************************/
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <misc/auxiliary.h>
 
 #include <factory/factory.h>
@@ -205,7 +202,7 @@ static void* GetDynamicProc(const char* proc_s, p_Proc proc,
   if (get_name)
   {
     char* name = omStrDup(proc_name);
-#if (!defined(SING_NDEBUG)) && (!defined(OM_NDEBUG)) && defined(HAVE_CONFIG_H)
+#if (!defined(SING_NDEBUG)) && (!defined(OM_NDEBUG))
     omMarkAsStaticAddr(name);
 #endif
     return (void*) name;

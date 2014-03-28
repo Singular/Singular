@@ -12,9 +12,9 @@
 **/
 //*****************************************************************************
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 
 #ifdef HAVE_PYTHON
 

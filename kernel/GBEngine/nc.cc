@@ -1,8 +1,8 @@
 #define PLURAL_INTERNAL_DECLARATIONS
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 #include <misc/auxiliary.h>
 

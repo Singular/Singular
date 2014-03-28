@@ -8,9 +8,9 @@
 //
 //}}}
 
-#ifdef HAVE_CONFIG_H
+
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
+
 
 #include "cf_switches.h"
 #include "cf_defs.h"

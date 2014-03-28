@@ -6,9 +6,9 @@
 #include <unistd.h>
 #include <errno.h>
 
-#ifdef HAVE_CONFIG_H
+
 #include "resourcesconfig.h"
-#endif /* HAVE_CONFIG_H */
+
 
 #if defined(HAVE_PWD_H) && defined(HAVE_GETPWNAM)
 #include <pwd.h>

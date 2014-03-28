@@ -7,9 +7,9 @@
 */
 
 /* includes */
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+#include <misc/auxiliary.h>
+
 // #include <polys/structs.h>
 #include <coeffs/numbers.h>
 #include <polys/monomials/ring.h>

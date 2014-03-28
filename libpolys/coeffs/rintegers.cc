@@ -4,9 +4,9 @@
 /*
 * ABSTRACT: numbers modulo n
 */
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <misc/auxiliary.h>
 
 #ifdef HAVE_RINGS

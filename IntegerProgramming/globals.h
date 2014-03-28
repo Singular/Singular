@@ -13,9 +13,9 @@
 // Include facilities needed by several files:
 
 // the following is not good! TODO: move to all including sources...
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+#include <singularconfig.h>
+
 
 #include <stdio.h>
 #ifndef HAVE_IOSTREAM_H

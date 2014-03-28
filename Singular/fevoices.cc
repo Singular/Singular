@@ -7,9 +7,9 @@
 
 /* I need myfread in standalone_parser */
 #ifndef STANDALONE_PARSER
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 
 #include <stdlib.h>
