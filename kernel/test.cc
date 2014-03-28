@@ -178,7 +178,6 @@ char *iiArithGetCmd(int nPos){return NULL; }
 // #include <polys/clapconv.h> // due to factory? :(
 // #include <kernel/tgb_internal.h> // :(
 // #include <kernel/F4.h> // uses tgb_internal // :(
-// #include <kernel/IIntvec.h> // :(
 
 
 
