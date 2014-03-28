@@ -748,7 +748,7 @@ sub tst_check
         $exit_status = Diff($root);
         if ($exit_status)
         {
-	  unless ($verbosity == 0)
+	  unless ($verbosity < 2)
 	  {
 	    print "\n";
 	    mysystem("$cat \"$root.diff\"");
@@ -1218,7 +1218,7 @@ foreach (@ARGV)
     close (LST_FILE);
       
     printf("$base Summary: Checks:$lst_checks Failed:%d Time:%.2f\n", $lst_checks - $lst_checks_pass, $lst_used_time)
-      unless ($verbosity < 2);
+      unless ($verbosity < 1);
       
     tcLog( sprintf("list '$base' Summary: Checks:$lst_checks Failed:%d Time:%.2f", $lst_checks - $lst_checks_pass, $lst_used_time) );
     blockClosed ($b);
@@ -1235,7 +1235,7 @@ foreach (@ARGV)
   }
 }
 
-unless ($verbosity < 2 || $lst_checks == $total_checks)
+unless ($verbosity < 1 || $lst_checks == $total_checks)
 {
   printf("Summary: Checks:$total_checks Failed:%d Time:%.2f\n", $total_checks - $total_checks_pass, $total_used_time);
 }
