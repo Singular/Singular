@@ -22,7 +22,7 @@
 //#include "lists.h"
 #include <polys/matpol.h>
 #include <polys/clapsing.h>
-#include <kernel/eigenval.h>
+#include <kernel/linear_algebra/eigenval.h>
 
 
 matrix evSwap(matrix M,int i,int j)
