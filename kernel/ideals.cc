@@ -3700,9 +3700,9 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
   ring syz_ring=rCurrRingAssure_SyzComp();
   rSetSyzComp(length);
   if (TEST_OPT_RETURN_SB)
-    rSetSyzComp(id_RankFreeModule(temp,orig_ring), syz_ring);
+    rSetSyzComp(idRankFreeModule(temp));
   else
-    rSetSyzComp(length, syz_ring);
+    rSetSyzComp(length);
   ideal s_temp;
 
   if (syz_ring != orig_ring)
