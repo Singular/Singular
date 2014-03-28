@@ -2518,6 +2518,7 @@ static BOOLEAN jjINDEPSET2(leftv res, leftv u, leftv v)
 static BOOLEAN jjINTERSECT(leftv res, leftv u, leftv v)
 {
   res->data=(char *)idSect((ideal)u->Data(),(ideal)v->Data());
+  if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
 }
 static BOOLEAN jjINTERPOLATION (leftv res, leftv l, leftv v)
@@ -2661,6 +2662,7 @@ static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
     atSet(res,omStrDup("isHomog"),w_u,INTVEC_CMD);
   }
   delete w_v;
+  if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
 }
 static BOOLEAN jjMOD_BI(leftv res, leftv u, leftv v)
@@ -5013,6 +5015,7 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
   intvec *w=NULL;
   res->data = (char *)idSyzygies((ideal)v->Data(),testHomog,&w);
   if (w!=NULL) delete w;
+  if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
 }
 #else

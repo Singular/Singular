@@ -4998,7 +4998,7 @@ be aware of pitfalls.
 @c ---------
 @item @code{returnSB}
 @cindex returnSB, option
-the functions @code{syz}, @code{intersect}, @code{quotient},
+the functions @code{syz}, @code{intersect} (2 arguments), @code{quotient},
 @code{modulo} return a standard base instead of a generating set if
 @code{returnSB} is set. This option should not be used for @code{lift}.
 @c ---------
