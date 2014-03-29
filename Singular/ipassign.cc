@@ -585,7 +585,7 @@ static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr)
   extern void piCleanUp(procinfov pi);
 
   if(res->data!=NULL) piCleanUp((procinfo *)res->data);
-  if(a->rtyp==STRING_CMD)
+  if(a->Typ()==STRING_CMD)
   {
     res->data = (void *)omAlloc0Bin(procinfo_bin);
     ((procinfo *)(res->data))->language=LANG_NONE;
