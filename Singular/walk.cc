@@ -65,11 +65,11 @@
 #include <polys/monomials/maps.h>
 
 /* include Hilbert-function */
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/stairc.h>
 
 /** kstd2.cc */
-#include <kernel/kutil.h>
-#include <kernel/khstd.h>
+#include <kernel/GBEngine/kutil.h>
+#include <kernel/GBEngine/khstd.h>
 
 #include <Singular/walk.h>
 #include <kernel/polys.h>
@@ -80,11 +80,11 @@
 #include <coeffs/numbers.h>
 #include <Singular/ipid.h>
 #include <polys/monomials/ring.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <polys/matpol.h>
 #include <polys/weight.h>
 #include <misc/intvec.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 #include <Singular/lists.h>
 #include <polys/prCopy.h>
 #include <polys/monomials/ring.h>

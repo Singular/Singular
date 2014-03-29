@@ -15,10 +15,10 @@
 #include <kernel/polys.h>
 #include <misc/intvec.h>
 #include <kernel/combinatorics/hutil.h>
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/stairc.h>
 //ADICHANGES:
 #include <kernel/ideals.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include<gmp.h>
 #include<vector>
 

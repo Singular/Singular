@@ -41,10 +41,10 @@
 #include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <kernel/timer.h>
-#include <kernel/stairc.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/stairc.h>
+#include <kernel/GBEngine/syz.h>
 
 //#include "weight.h"
 #include "tok.h"
@@ -598,7 +598,7 @@ static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr)
   extern void piCleanUp(procinfov pi);
 
   if(res->data!=NULL) piCleanUp((procinfo *)res->data);
-  if(a->rtyp==STRING_CMD)
+  if(a->Typ()==STRING_CMD)
   {
     res->data = (void *)omAlloc0Bin(procinfo_bin);
     ((procinfo *)(res->data))->language=LANG_NONE;

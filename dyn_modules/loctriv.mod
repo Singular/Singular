@@ -8,7 +8,7 @@
  */
 #include <kernel/ideals.h>
 #include <kernel/ring.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <kernel/prCopy.h>
 %}
 

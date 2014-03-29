@@ -36,9 +36,9 @@
 
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <kernel/timer.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 
 #include <Singular/tok.h>
 #include <Singular/ipid.h>

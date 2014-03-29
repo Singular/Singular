@@ -13,9 +13,9 @@
 #include <omalloc/omalloc.h>
 #include <polys/clapsing.h>
 #include <polys/monomials/maps.h>
-#include <kernel/kutil.h>
-#include <kernel/kstd1.h>
-#include <kernel/tgb.h>
+#include <kernel/GBEngine/kutil.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/tgb.h>
 #include <polys/sparsmat.h>
 
 #include <Singular/subexpr.h>

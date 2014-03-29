@@ -71,7 +71,7 @@ template class CMultiplier<CPower>;
 
 #endif
 
-#include <kernel/tgb_internal.h>
+#include <kernel/GBEngine/tgb_internal.h>
 #ifdef HAVE_BOOST
 #include <boost/dynamic_bitset.hpp>
 #include <vector>
@@ -116,7 +116,7 @@ template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 
 /* next lines are templates used in new minor code */
 #include <list>
-#include <kernel/Minor.h>
+#include <kernel/linear_algebra/Minor.h>
 #include <kernel/Cache.h>
 
 template class std::list<int>;

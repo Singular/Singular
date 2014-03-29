@@ -39,8 +39,8 @@
 #include <kernel/ideals.h>
 
 #include <kernel/febase.h>
-#include <kernel/kstd1.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/syz.h>
 
 #include <libpolys/coeffs/longrat.h>
 
@@ -2098,7 +2098,10 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
 
   ring orig_ring=currRing;
   ring syz_ring=rAssure_SyzComp(orig_ring, TRUE); rChangeCurrRing(syz_ring);
-  rSetSyzComp(length, syz_ring);
+  if (TEST_OPT_RETURN_SB)
+    rSetSyzComp(id_RankFreeModule(temp,orig_ring), syz_ring);
+  else
+    rSetSyzComp(length, syz_ring);
   ideal s_temp;
 
   if (syz_ring != orig_ring)

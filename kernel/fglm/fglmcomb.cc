@@ -22,7 +22,7 @@
 #include <omalloc/omalloc.h>
 #include "fglmvec.h"
 #include "fglmgauss.h"
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 
 #include "fglm.h"
 

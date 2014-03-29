@@ -30,8 +30,8 @@
 #include <polys/monomials/ring.h>
 //extern ring currRing;
 
-#include <kernel/kstd1.h>
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/stairc.h>
 #include <kernel/spectrum/multicnt.h>
 #include <kernel/spectrum/GMPrat.h>
 #include <kernel/spectrum/kmatrix.h>

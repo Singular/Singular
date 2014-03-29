@@ -14,10 +14,10 @@
 
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
-#include <kernel/kstd1.h>
-#include <kernel/khstd.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/khstd.h>
 
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kutil.h>
 
 
 #ifdef HAVE_PLURAL
