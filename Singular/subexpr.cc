@@ -1011,7 +1011,7 @@ int  sleftv::Typ()
         else
         {
           //Warn("out of range: %d not in 1..%d",e->start,l->nr+1);
-          r=NONE;
+          r=DEF_CMD;
         }
       }
       else
