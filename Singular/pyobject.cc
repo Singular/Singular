@@ -12,37 +12,23 @@
 **/
 //*****************************************************************************
 
-
-
-
+#include <singularconfig.h>
 
 #ifdef HAVE_PYTHON
-
 #include <kernel/mod2.h>
 
-//#include <misc/auxiliary.h>
-//#include "newstruct.h"
-
-#include <misc/auxiliary.h>
-
 #include <omalloc/omalloc.h>
-
-#include <kernel/febase.h>
 #include <misc/intvec.h>
 
+#include <kernel/febase.h>
+
+#include <Singular/subexpr.h>
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
 #include <Singular/lists.h>
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
 #include <Singular/newstruct.h>
-
-#include "subexpr.h"
-#include "lists.h"
-#include "ipid.h"
-#include "blackbox.h"
-#include "ipshell.h"
-#include "newstruct.h"
 
 #include <Singular/mod_lib.h>
 
