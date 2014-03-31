@@ -12,24 +12,22 @@
 
 // include header files
 
-
-
-
-#include <misc/auxiliary.h>
 #include <kernel/mod2.h>
+#include <misc/auxiliary.h>
+
 #include <reporter/si_signals.h>
 
 #include <factory/factory.h>
-
-#ifdef HAVE_SIMPLEIPC
-#include <Singular/links/simpleipc.h>
-#endif
 
 #include <coeffs/si_gmp.h>
 #include <coeffs/coeffs.h>
 
 #include <polys/ext_fields/algext.h>
 #include <polys/ext_fields/transext.h>
+
+#ifdef HAVE_SIMPLEIPC
+#include <Singular/links/simpleipc.h>
+#endif
 
 #include "misc_ip.h"
 #include "ipid.h"

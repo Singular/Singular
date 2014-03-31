@@ -11,22 +11,15 @@
 // define if buckets should be used
 #define MORA_USE_BUCKETS
 
-#ifndef SING_NDEBUG
-# define MYTEST 0
-#else /* ifndef SING_NDEBUG */
-# define MYTEST 0
-#endif /* ifndef SING_NDEBUG */
+#define MYTEST 0
 
 #define ADIDEBUG 0
 #define ADIDEBUG_NF 0
 
-
-
-
-
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
+
 #include <misc/options.h>
 #include <misc/intvec.h>
 

@@ -14,6 +14,7 @@
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 
+struct sip_link;
 typedef struct sip_link    ip_link;
 typedef ip_link *          si_link;
 

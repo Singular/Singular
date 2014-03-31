@@ -76,12 +76,9 @@
 #include <stdarg.h>
 #include <string.h>
 
-
-
-
+#include <kernel/mod2.h>
 #include <misc/auxiliary.h>
 
-#include <kernel/mod2.h>
 #include <misc/mylimits.h>
 #include <omalloc/omalloc.h>
 #include <Singular/tok.h>

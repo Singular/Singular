@@ -19,12 +19,13 @@
 
 #include "summator.h"
 
+#include <misc/auxiliary.h>
+
 #ifdef HAVE_SUMMATOR
 
 
 
 
-#include <misc/auxiliary.h>
 #include <misc/options.h>
 
 #include <polys/monomials/ring.h>

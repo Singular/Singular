@@ -8,20 +8,17 @@
 //
 //**************************************************************************/
 
+#include <kernel/mod2.h>
+
 #  include <stdio.h>
 #  include <fcntl.h>
 #  include <errno.h>
 
-
-
-
-#include <kernel/mod2.h>
-
 #ifdef HAVE_DBM
 
-#  include <Singular/tok.h>
+#  include <omalloc/omalloc.h>
 #  include <kernel/febase.h>
-#include <omalloc/omalloc.h>
+#  include <Singular/tok.h>
 #  include <Singular/ipid.h>
 #  include <Singular/links/silink.h>
 #  include <Singular/links/sing_dbm.h>

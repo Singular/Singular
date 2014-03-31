@@ -5,19 +5,16 @@
 * ABSTRACT: management of resources
 */
 
+#include "resourcesconfig.h"
+#include "feResource.h"
+#include "omFindExec.h"
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
 #include <sys/param.h>
 
-
-#include "resourcesconfig.h"
-
-
-#include "omFindExec.h"
-
-#include "feResource.h"
 
 char* feArgv0 = NULL;
 
@@ -34,7 +31,6 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #endif
 
 
-//#include <reporter/reporter.h>
 //char* feResource(const char id, int warn = -1);
 //char* feResource(const char* key, int warn = -1);
 

@@ -12,10 +12,8 @@
 **/
 //*****************************************************************************
 
-#include <singularconfig.h>
-
-#ifdef HAVE_PYTHON
 #include <kernel/mod2.h>
+#ifdef HAVE_PYTHON
 
 #include <omalloc/omalloc.h>
 #include <misc/intvec.h>

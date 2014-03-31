@@ -8,11 +8,6 @@
 *            ( root finder, vandermonde system solver, simplex )
 */
 
-#include <math.h>
-
-
-
-
 #include <kernel/mod2.h>
 
 #include <misc/auxiliary.h>

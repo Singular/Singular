@@ -10,7 +10,6 @@
 #include <polys/monomials/ring.h>
 //#include <kernel/ideals.h>
 
-typedef number (*nMapFunc)(number a, coeffs src, coeffs dst);
 struct sip_smap;
 typedef struct sip_smap *         map;
 

@@ -1,17 +1,15 @@
+#include <kernel/mod2.h>
+
 #ifdef STANDALONE_PARSER
 
-
-
-#include <kernel/mod2.h>
+#include <Singular/fegetopt.h>
+#include <Singular/utils.h>
+#include <Singular/libparse.h>
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-
-#include <Singular/fegetopt.h>
-#include <Singular/utils.h>
-#include <Singular/libparse.h>
 
 extern FILE *yylpin;
 extern char *optarg;

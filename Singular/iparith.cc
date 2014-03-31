@@ -7,12 +7,11 @@
 */
 
 
-
-
+#include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
 
-#  include <factory/factory.h>
+#include <factory/factory.h>
 
 #include <coeffs/bigintmat.h>
 #include <coeffs/coeffs.h>
@@ -38,7 +37,6 @@
 #  include <polys/clapsing.h>
 
 #include <kernel/GBEngine/stairc.h>
-#include <kernel/mod2.h>
 #include <kernel/polys.h>
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
