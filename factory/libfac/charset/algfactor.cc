@@ -6,8 +6,6 @@
 #include <factory.h>
 // Factor - Includes
 #include <tmpl_inst.h>
-#include <Factor.h>
-#include <helpstuff.h>
 // Charset - Includes
 #include "csutil.h"
 #include "charset.h"

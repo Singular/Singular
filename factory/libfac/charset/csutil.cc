@@ -5,10 +5,7 @@
 #include <factory.h>
 // Factor - Includes
 #include <tmpl_inst.h>
-#include <Factor.h>
-#include <SqrFree.h>
 #include <helpstuff.h>
-#include <homogfactor.h>
 // Charset - Includes
 #include "csutil.h"
 extern void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
@@ -396,7 +393,7 @@ nopower( const CanonicalForm & init )
   if ( count > 1 ) sqrfreelist = CFFList( CFFactor(init,1));
   else
   {
-    sqrfreelist = Factorize(init);
+    sqrfreelist = factorize(init);
     //sqrfreelist.removeFirst();
   }
   for ( CFFListIterator i=sqrfreelist; i.hasItem(); i++ )
@@ -499,7 +496,7 @@ factorps( const CFList &ps )
 
   for ( CFListIterator i=ps; i. hasItem(); i++ )
   {
-    q=Factorize(i.getItem());
+    q=factorize(i.getItem());
     q.removeFirst();
     // Next can be simplified ( first (already removed) elem in q is the only constant
     for ( CFFListIterator j=q; j.hasItem(); j++ )

@@ -6,8 +6,6 @@
 #include <factory.h>
 // Factor - Includes
 #include <tmpl_inst.h>
-#include <Factor.h>
-#include <SqrFree.h>
 #include <helpstuff.h>
 // Charset - Includes
 #include "csutil.h"
@@ -26,6 +24,19 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 #endif
 
 #include <libfac/factor/debug.h>
+
+///////////////////////////////////////////////////////////////
+// generate a minpoly of degree degree_of_Extension in the   //
+// field getCharacteristik()^Extension.                      //
+///////////////////////////////////////////////////////////////
+CanonicalForm
+generate_mipo( int degree_of_Extension , const Variable & Extension )
+{
+  FFRandom gen;
+  if (degree (Extension) < 0)
+    factoryError("libfac: evaluate: Extension not inFF() or inGF() !");
+  return find_irreducible( degree_of_Extension, gen, Variable(1) );
+}
 
 static Varlist
 Var_is_in_AS(const Varlist & uord, const CFList & Astar);

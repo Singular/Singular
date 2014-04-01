@@ -15,7 +15,6 @@
 #include <factory.h>
 // Factor - Includes
 #include <tmpl_inst.h>
-#include "homogfactor.h"
 // Charset - Includes
 
 // some CC's need this:
