@@ -14,10 +14,6 @@ extern const char * libfac_version;
 extern const char * libfac_date;
 extern const char * libfac_author;
 
-//// Note: InternalSqrFree does only the work needed for factorization.
-.INCLUDE factor/Truefactor.h
-.INCLUDE factor/class.h
-
 .INCLUDE factor/helpstuff.h
 .INCLUDE factor/tmpl_inst.h
 .INCLUDE factor/debug.h

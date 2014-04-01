@@ -4,7 +4,6 @@
 #ifndef TMPL_INST_H
 #define TMPL_INST_H
 
-#include <libfac/factor/class.h>
 //typedef CanonicalForm CF;
 //typedef List<CanonicalForm> CFList;
 //typedef ListIterator<CanonicalForm> CFListIterator;
@@ -23,10 +22,6 @@ typedef ListIterator<int> IntListIterator ;
 /*ENDPUBLIC*/
 typedef List<IntList> ListIntList;
 typedef ListIterator<IntList> ListIntListIterator ;
-
-typedef Substitution<CanonicalForm> SForm ;
-typedef List<SForm> SFormList;
-typedef ListIterator<SForm> SFormListIterator;
 
 /*BEGINPUBLIC*/
 typedef List<Variable> Varlist;
