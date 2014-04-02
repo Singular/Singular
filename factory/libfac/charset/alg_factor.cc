@@ -323,20 +323,6 @@ inseperable(const CFList & Astar)
   return 0;
 }
 
-// calculate gcd of f and g in char=0
-static CanonicalForm
-gcd0( CanonicalForm f, CanonicalForm g )
-{
-  int charac= getCharacteristic();
-  int save=isOn(SW_RATIONAL);
-  setCharacteristic(0); Off(SW_RATIONAL);
-  CanonicalForm ff= mapinto(f), gg= mapinto(g);
-  CanonicalForm result= gcd(ff,gg);
-  setCharacteristic(charac);
-  if (save) On(SW_RATIONAL);
-  return mapinto(result);
-}
-
 // calculate big enough extension for finite fields
 // Idea: first calculate k, such that q^k > S (->thesis, -> getextension)
 // Second, search k with gcd(k,m_i)=1, where m_i is the degree of the i'th
@@ -357,7 +343,7 @@ getextension( IntList & degreelist, int n)
   do {
     for (i=degreelist; i.hasItem(); i++){
       l= l+1;
-      if ( gcd0(k,i.getItem()) == 1){
+      if ( igcd(k,i.getItem()) == 1){
         DEBOUTLN(CERR, "getextension: gcd == 1, l=",l);
         if ( l==length ){ setCharacteristic(charac);  return k; }
       }
