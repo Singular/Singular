@@ -41,29 +41,6 @@ generate_mipo( int degree_of_Extension , const Variable & Extension )
 static Varlist
 Var_is_in_AS(const Varlist & uord, const CFList & Astar);
 
-int getAlgVar(const CanonicalForm &f, Variable &X)
-{
-  if (f.inBaseDomain()) return 0;
-  if (f.inCoeffDomain())
-  {
-    if (f.level()!=0)
-    {
-      X= f.mvar();
-      return 1;
-    }
-    return getAlgVar(f.LC(),X);
-  }
-  if (f.inPolyDomain())
-  {
-    if (getAlgVar(f.LC(),X)) return 1;
-    for( CFIterator i=f; i.hasTerms(); i++)
-    {
-      if (getAlgVar(i.coeff(),X)) return 1;
-    }
-  }
-  return 0;
-}
-
 ////////////////////////////////////////////////////////////////////////
 // This implements the algorithm of Trager for factorization of
 // (multivariate) polynomials over algebraic extensions and so called
@@ -165,7 +142,7 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       // for now we use this workaround with Factorize...
       // ...but it should go away soon!!!!
       Variable X;
-      if (getAlgVar(R,X))
+      if (hasFirstAlgVar(R,X))
         testlist=factorize( R, X );
       else
         testlist= factorize(R);
@@ -240,7 +217,7 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       // for now we use this workaround with Factorize...
       // ...but it should go away soon!!!!
       Variable X;
-      if (getAlgVar(R,X))
+      if (hasFirstAlgVar(R,X))
         testlist= factorize( R, X );
       else
         testlist= factorize(R);
@@ -850,7 +827,7 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   DEBOUTLN(CERR, "alg_factor: s= ", s);
   DEBOUTLN(CERR, "alg_factor: R= ", R);
   Variable X;
-  if (getAlgVar(R,X))
+  if (hasFirstAlgVar(R,X))
   {
     // factorize R over alg.extension with X
     //CERR << "alg: "<< X << " mipo=" << getMipo(X,Variable('X')) <<"\n";
