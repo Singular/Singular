@@ -286,10 +286,12 @@ divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as)
   //out_cf("divide g=",f,"\n");
   if (f.inCoeffDomain())
   {
-    bool b=!isOn(SW_RATIONAL);
-    On(SW_RATIONAL);
+    bool isRat=isOn(SW_RATIONAL);
+    if (getCharacteristic() == 0)
+      On(SW_RATIONAL);
     q=ff/f;
-    if (b) Off(SW_RATIONAL);
+    if (!isRat && getCharacteristic() == 0)
+      Off(SW_RATIONAL);
   }
   else
     r= Sprem(ff,f,m,q); //result in q, ignore r,m
@@ -456,12 +458,12 @@ nopower( const CanonicalForm & init )
   else
   {
     bool isRat= isOn (SW_RATIONAL);
-    if (!isRat)
+    if (!isRat && getCharacteristic() == 0)
       On (SW_RATIONAL);
     sqrfreelist = factorize(init);
     if (sqrfreelist.getFirst().factor().inCoeffDomain())
       sqrfreelist.removeFirst();
-    if (!isRat)
+    if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
   }
   for ( CFFListIterator i=sqrfreelist; i.hasItem(); i++ )
@@ -563,7 +565,7 @@ factorps( const CFList &ps )
   CanonicalForm elem;
 
   bool isRat= isOn (SW_RATIONAL);
-  if (!isRat)
+  if (!isRat && getCharacteristic() == 0)
     On (SW_RATIONAL);
   for ( CFListIterator i=ps; i. hasItem(); i++ )
   {
@@ -578,7 +580,7 @@ factorps( const CFList &ps )
         qs= Union(qs, CFList(myfitting(elem, CFList())));
     }
   }
-  if (!isRat)
+  if (!isRat && getCharacteristic() == 0)
     Off (SW_RATIONAL);
   return qs;
 }
@@ -891,7 +893,6 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 {
   if (fff.inCoeffDomain() || ggg.inCoeffDomain())
     return 1;
-  bool isRat= isOn (SW_RATIONAL);
   CanonicalForm f=fff;
   CanonicalForm g=ggg;
   f=Prem(f,as);
