@@ -987,5 +987,16 @@ static proc testHasIntegerCoefficientRing()
 }
 
 
+proc baseringHasGlobalMonomialOrdering()
+{
+    return ( ord_test(basering)==1 );
+}
+
+
+proc hasGlobalMonomialOrdering( rng )
+{
+    return ( ord_test(rng)==1 );
+}
+
 
 
