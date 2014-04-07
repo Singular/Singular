@@ -13,13 +13,8 @@
 ///@TODO: delay nur auf Sugarvergr?erung
 ///@TODO: grade aus ecartS, setze dazu strat->honey; und nutze p.ecart
 ///@TODO: no tail reductions in syz comp
-#include <stdlib.h>
-#include <stdio.h>
-#include <queue>
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
+
 #include <kernel/GBEngine/tgb.h>
 #include <kernel/GBEngine/tgb_internal.h>
 #include <kernel/GBEngine/tgbgauss.h>
@@ -31,6 +26,11 @@
 #include <polys/prCopy.h>
 #include <libpolys/coeffs/longrat.h>
 #include <coeffs/modulop.h>
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <queue>
+
 #define BUCKETS_FOR_NORO_RED 1
 #define SR_HDL(A) ((long)(A))
 static const int bundle_size = 100;

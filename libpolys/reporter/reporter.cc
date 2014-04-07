@@ -5,9 +5,14 @@
 * ABSTRACT: output system
 */
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+#include <misc/auxiliary.h>
+
+#include <omalloc/omalloc.h>
+
+#include <reporter/reporter.h>
+#include <resources/feResource.h>
+#include <resources/feFopen.h>
+//#include "options.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -21,11 +26,6 @@
 #include <pwd.h>
 #endif
 
-#include <reporter/reporter.h>
-#include <resources/feResource.h>
-#include <resources/feFopen.h>
-#include <omalloc/omalloc.h>
-//#include "options.h"
 
 #define fePutChar(c) fputc((unsigned char)(c),stdout)
 /*0 implementation */
@@ -71,7 +71,7 @@ void StringAppend(const char *fmt, ...)
     int l=s-feBuffer;
     feBuffer=(char *)omReallocSize((void *)feBuffer,feBufferLength,
                                                      more);
-#if (!defined(SING_NDEBUG)) && (!defined(OM_NDEBUG)) && defined(HAVE_CONFIG_H)
+#if (!defined(SING_NDEBUG)) && (!defined(OM_NDEBUG))
     omMarkAsStaticAddr(feBuffer);
 #endif
     feBufferLength=more;

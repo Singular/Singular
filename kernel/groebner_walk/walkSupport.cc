@@ -1,17 +1,18 @@
-#include <string.h>
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
+
 #include <misc/intvec.h>
 #include <misc/int64vec.h>
+
+#include <polys/monomials/ring.h>
+#include <polys/prCopy.h>
+#include <polys/matpol.h>
+
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <polys/monomials/ring.h>
 #include <kernel/groebner_walk/walkSupport.h>
-#include <polys/prCopy.h>
 #include <kernel/GBEngine/kstd1.h>
-#include <polys/matpol.h>
+
+#include <string.h>
 #include <math.h>
 
 extern BOOLEAN overflow_error;

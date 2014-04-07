@@ -5,6 +5,19 @@
  * File:    pipeLink.h
  *  Purpose: declaration of sl_link routines for pipe
  ***************************************************************/
+
+#include <kernel/mod2.h>
+
+#include <omalloc/omalloc.h>
+#include <reporter/si_signals.h>
+
+#include "tok.h"
+#include "ipid.h"
+#include "subexpr.h"
+#include "links/silink.h"
+#include "lists.h"
+#include "pipeLink.h"
+
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -14,21 +27,6 @@
 #include <sys/types.h>          /* for portability */
 #include <sys/select.h>
 #include <sys/socket.h>
-
-
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
-#include <kernel/mod2.h>
-
-#include "tok.h"
-#include "ipid.h"
-#include <omalloc/omalloc.h>
-#include "subexpr.h"
-#include "links/silink.h"
-#include "lists.h"
-#include "pipeLink.h"
-#include <reporter/si_signals.h>
 
 typedef struct
 {

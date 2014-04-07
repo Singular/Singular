@@ -4,11 +4,27 @@
 /*
 * ABSTRACT - interupt handling
 */
+#include <kernel/mod2.h>
 
 /* includes */
 #ifdef DecAlpha_OSF1
 #define _XOPEN_SOURCE_EXTENDED
 #endif /* MP3-Y2 0.022UF */
+
+#include <omalloc/omalloc.h>
+
+#include <reporter/si_signals.h>
+#include <kernel/febase.h>
+
+#include <Singular/tok.h>
+#include <Singular/ipshell.h>
+void sig_chld_hdl(int sig); /*#include <Singular/links/ssiLink.h>*/
+#include <Singular/cntrlc.h>
+#include <Singular/feOpt.h>
+#include <Singular/misc_ip.h>
+#include <Singular/links/silink.h>
+#include <Singular/links/ssiLink.h>
+
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -16,23 +32,6 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
-
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
-#include <Singular/tok.h>
-#include <Singular/ipshell.h>
-#include <kernel/febase.h>
-void sig_chld_hdl(int sig); /*#include <Singular/links/ssiLink.h>*/
-#include <Singular/cntrlc.h>
-#include <Singular/feOpt.h>
-#include <Singular/misc_ip.h>
-#include <reporter/si_signals.h>
-#include <Singular/links/silink.h>
-#include <Singular/links/ssiLink.h>
 
 /* undef, if you don't want GDB to come up on error */
 

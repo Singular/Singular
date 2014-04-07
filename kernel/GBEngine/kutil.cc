@@ -8,25 +8,20 @@
 // #define PDEBUG 2
 // #define PDIV_DEBUG
 #define KUTIL_CC
-#include <stdlib.h>
-#include <string.h>
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+#define MYTEST 0
+
 #include <kernel/mod2.h>
-
-#ifndef SING_NDEBUG
-# define MYTEST 0
-#else /* ifndef SING_NDEBUG */
-# define MYTEST 0
-#endif /* ifndef SING_NDEBUG */
-
 
 #include <misc/mylimits.h>
 #include <misc/options.h>
 #include <polys/nc/nc.h>
 #include <polys/nc/sca.h>
 #include <polys/weight.h> /* for kDebugPrint: maxdegreeWecart*/
+
+#include <stdlib.h>
+#include <string.h>
+
 #ifdef KDEBUG
 #undef KDEBUG
 #define KDEBUG 2

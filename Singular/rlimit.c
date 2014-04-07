@@ -6,10 +6,10 @@
  * Purpose: set resource limits
  ***************************************************************/
 
+#include "rlimit.h"
+
 #include <stdint.h>
 #include <sys/resource.h>
-
-#include "rlimit.h"
 
 /* raise the maximum number of processes (or threads),
  * return  0 on success,

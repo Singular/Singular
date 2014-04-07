@@ -5,24 +5,23 @@
  * ABSTRACT: fractal walk stuff
  *
 */
-#include <string.h>
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
+
 #include <misc/options.h>
 #include <misc/intvec.h>
 #include <misc/int64vec.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <polys/monomials/ring.h>
-#include <kernel/groebner_walk/walkMain.h>
-#include <kernel/groebner_walk/walkSupport.h>
+
 #include <polys/prCopy.h>
-#include <kernel/GBEngine/kstd1.h>
 #include <polys/matpol.h>
 #include <polys/monomials/ring.h>
 
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/groebner_walk/walkMain.h>
+#include <kernel/groebner_walk/walkSupport.h>
+#include <kernel/GBEngine/kstd1.h>
+
+#include <string.h>
 
 ///////////////////////////////////////////////////////////////////
 //Groebner Walk and Fractal Walk

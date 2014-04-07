@@ -7,15 +7,13 @@
 * ABSTRACT - multipolynomial resultant
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
 #include <kernel/mod2.h>
+#include <misc/auxiliary.h>
 
 //#ifdef HAVE_MPR
 
 //-> includes
-#include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 
 #include <misc/mylimits.h>

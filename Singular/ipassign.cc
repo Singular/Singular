@@ -10,13 +10,11 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
-#include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
 
 #include <kernel/mod2.h>
+
+#include <misc/auxiliary.h>
+#include <omalloc/omalloc.h>
 
 #define TRANSEXT_PRIVATES
 #include <polys/ext_fields/transext.h>

@@ -34,21 +34,6 @@
 
 /* includes */
 
-#include <stdio.h>
-// === Zeit & System (Holger Croeni ===
-#include <time.h>
-#include <sys/time.h>
-#include <math.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <float.h>
-#include <misc/mylimits.h>
-#include <sys/types.h>
-
-
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #include <misc/intvec.h>
 #include <Singular/cntrlc.h>
@@ -92,6 +77,17 @@
 #include <polys/clapsing.h>
 
 #include <coeffs/mpr_complex.h>
+
+#include <stdio.h>
+// === Zeit & System (Holger Croeni ===
+#include <time.h>
+#include <sys/time.h>
+#include <math.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <float.h>
+#include <misc/mylimits.h>
+#include <sys/types.h>
 
 int nstep;
 

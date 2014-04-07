@@ -6,9 +6,9 @@
 * ABSTRACT - instantiation of all templates
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 //#include <vector>
 //using namespace std;
@@ -117,7 +117,7 @@ template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 /* next lines are templates used in new minor code */
 #include <list>
 #include <kernel/linear_algebra/Minor.h>
-#include <kernel/Cache.h>
+#include <kernel/linear_algebra/Cache.h>
 
 template class std::list<int>;
 template class std::list<MinorKey>;

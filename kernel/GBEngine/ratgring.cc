@@ -7,9 +7,9 @@
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
  *******************************************************************/
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 #include <kernel/GBEngine/ratgring.h>
 #ifdef HAVE_RATGRING

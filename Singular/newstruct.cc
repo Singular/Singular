@@ -1,15 +1,13 @@
-#include <ctype.h>
-
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
+
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
 #include <Singular/lists.h>
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
 #include <Singular/newstruct.h>
+
+#include <ctype.h>
 
 struct newstruct_member_s;
 typedef struct newstruct_member_s *newstruct_member;

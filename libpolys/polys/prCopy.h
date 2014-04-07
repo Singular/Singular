@@ -11,6 +11,11 @@ struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
 struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
 struct sip_sideal; typedef struct sip_sideal *ideal;
 
+struct snumber; typedef struct snumber *   number;
+struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
+
+typedef number (*nMapFunc)(number a, const coeffs src, const coeffs dst);
+
 /*************************************************************************
  *
  * MoveR, CopyR, ShallowCopyR: operations to get ideals/polys

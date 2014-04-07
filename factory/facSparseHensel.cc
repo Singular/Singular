@@ -13,9 +13,9 @@
  **/
 /*****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
+
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
+
 #include "cf_assert.h"
 #include "facSparseHensel.h"
 #include "cf_algorithm.h"

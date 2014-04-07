@@ -6,13 +6,12 @@
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+#include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
 
-#  include <factory/factory.h>
+#include <factory/factory.h>
 
 #include <coeffs/bigintmat.h>
 #include <coeffs/coeffs.h>
@@ -39,7 +38,6 @@
 #  include <polys/clapsing.h>
 
 #include <kernel/GBEngine/stairc.h>
-#include <kernel/mod2.h>
 #include <kernel/polys.h>
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
@@ -54,7 +52,7 @@
 #include <kernel/GBEngine/syz.h>
 #include <kernel/timer.h>
 
-#include <kernel/interpolation.h>
+#include <kernel/linear_algebra/interpolation.h>
 #  include <kernel/GBEngine/kstdfac.h>
 #  include <kernel/fglm/fglm.h>
 

@@ -1,6 +1,6 @@
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+#include <kernel/mod2.h>
+
 #include "mod2.h"
 
 #include <omalloc/omalloc.h>
@@ -166,19 +166,18 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/groebner_walk/walkSupport.h>
 
 #include <kernel/GBEngine/janet.h>
-#include <kernel/interpolation.h>
-#include <kernel/minpoly.h>
+#include <kernel/linear_algebra/interpolation.h>
+#include <kernel/linear_algebra/minpoly.h>
 
 #include <kernel/linear_algebra/Minor.h>
 #include <kernel/linear_algebra/MinorInterface.h>
 #include <kernel/linear_algebra/MinorProcessor.h>
-#include <kernel/Cache.h>
-#include <kernel/CacheImplementation.h>
+#include <kernel/linear_algebra/Cache.h>
+#include <kernel/linear_algebra/CacheImplementation.h>
 
 // #include <polys/clapconv.h> // due to factory? :(
 // #include <kernel/tgb_internal.h> // :(
 // #include <kernel/F4.h> // uses tgb_internal // :(
-// #include <kernel/IIntvec.h> // :(
 
 
 

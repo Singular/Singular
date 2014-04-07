@@ -32,9 +32,9 @@ digraph IncludesInSingular4
 		  color = gray;
 //        	  style = filled;
   		  node [ fillcolor = white, style = filled, color = black, fontcolor=black];
-                  kernelUtils;
-		  { rank=same; "..."; numeric; } ;
-	  }
+		  { rank=same; fglm; numeric; maps; kernelUtils; combinatorics; };
+		  { rank=same; linear_algebra; spectrum; groebner_walk; GBEngine;};
+         }
   } ;
   subgraph "clusterinternals"
   {
@@ -43,7 +43,7 @@ digraph IncludesInSingular4
       omalloc [ fillcolor=lightgrey, fontcolor=darkgreen, style=filled, color = black, shape=box ] ;
       libresources [ fillcolor=lightgrey, style=filled, color = black, shape=box ]  ;
     } ;
-    { rank=same; 
+    { rank=same;
       gfanlib [ fillcolor=lightgrey, fontcolor=blue, style=filled, color = black, shape=box ] ;
       factory [ fillcolor=lightgrey, fontcolor=blue, style=filled, color = black, shape=box ] ;
     } ;
@@ -77,8 +77,14 @@ factory -> FLINT [];
   gfanlib -> cddlib [];
   kernelUtils -> polys [ltail="clusterlibSingular", lhead="clusterlibpolys"];
   kernelUtils -> factory [ltail="clusterlibSingular"];
+  combinatorics -> kernelUtils [];
+  fglm -> kernelUtils [];
+  GBEngine -> kernelUtils [];
+  groebner_walk -> kernelUtils [];
+  linear_algebra -> kernelUtils [];
+  maps -> kernelUtils [];
   numeric -> kernelUtils [];
-  "..." -> kernelUtils [];
+  spectrum -> kernelUtils [];
   polys -> coeffs [dir=both, arrowtail="open", arrowhead="open"] ;
   polys -> misc;
   polys -> reporter;

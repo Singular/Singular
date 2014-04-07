@@ -5,7 +5,7 @@
  *  Created: 11/99
  *******************************************************************/
 #include <unistd.h>
-#include <omalloc/omConfig.h>
+#include "omConfig.h"
 #include <omalloc/omDefaultConfig.h>
 #include <omalloc/omMalloc.h>
 #include <omalloc/omalloc.h>

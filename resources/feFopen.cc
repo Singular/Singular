@@ -1,3 +1,7 @@
+#include "resourcesconfig.h"
+#include "feResource.h"
+#include "feFopen.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,18 +10,10 @@
 #include <unistd.h>
 #include <errno.h>
 
-#ifdef HAVE_CONFIG_H
-#include "resourcesconfig.h"
-#endif /* HAVE_CONFIG_H */
-
 #if defined(HAVE_PWD_H) && defined(HAVE_GETPWNAM)
 #include <pwd.h>
 #endif
 
-//#include <reporter/reporter.h>
-
-#include "feFopen.h"
-#include "feResource.h"
 
 
 

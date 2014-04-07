@@ -4,13 +4,15 @@
 /*
 * ABSTRACT: i/o system
 */
+#include <kernel/mod2.h>
 
 /* I need myfread in standalone_parser */
 #ifndef STANDALONE_PARSER
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
-#include <kernel/mod2.h>
+
+#include <kernel/febase.h>
+#include <omalloc/omalloc.h>
+#include <reporter/reporter.h>
+#include <misc/options.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -23,11 +25,6 @@
 #ifdef HAVE_PWD_H
 #include <pwd.h>
 #endif
-
-#include <kernel/febase.h>
-#include <omalloc/omalloc.h>
-#include <reporter/reporter.h>
-#include <misc/options.h>
 
 #define fePutChar(c) fputc((unsigned char)(c),stdout)
 /*0 implementation */

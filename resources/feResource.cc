@@ -5,19 +5,16 @@
 * ABSTRACT: management of resources
 */
 
+#include "resourcesconfig.h"
+#include "feResource.h"
+#include "omFindExec.h"
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
 #include <sys/param.h>
 
-#ifdef HAVE_CONFIG_H
-#include "resourcesconfig.h"
-#endif /* HAVE_CONFIG_H */
-
-#include "omFindExec.h"
-
-#include "feResource.h"
 
 char* feArgv0 = NULL;
 
@@ -34,7 +31,6 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #endif
 
 
-//#include <reporter/reporter.h>
 //char* feResource(const char id, int warn = -1);
 //char* feResource(const char* key, int warn = -1);
 
@@ -172,6 +168,7 @@ void feInitResources(const char* argv0)
 #endif
   if (argv0==NULL)
   {
+    //WarnS("illegal argv[0]==NULL");
     feArgv0 = (char*)malloc(MAXPATHLEN+strlen("/Singular"));
     getcwd(feArgv0, MAXPATHLEN);
     strcpy(feArgv0+strlen(feArgv0),"/Singular");

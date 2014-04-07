@@ -80,9 +80,9 @@ but users of versions 4.0 or later should adhere to the terms of the GNU GPL.
 **/
 
 
-#ifdef HAVE_CONFIG_H
+
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
+
 
 #include "facNTLzzpEXGCD.h"
 

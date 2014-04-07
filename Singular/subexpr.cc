@@ -5,15 +5,6 @@
 * ABSTRACT: handling of leftv
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <unistd.h>
-
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
@@ -51,7 +42,11 @@
 #include <Singular/blackbox.h>
 #include <Singular/number2.h>
 
-
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <unistd.h>
 
 omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
 omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));
@@ -1043,7 +1038,7 @@ int  sleftv::Typ()
         else
         {
           //Warn("out of range: %d not in 1..%d",e->start,l->nr+1);
-          r=NONE;
+          r=DEF_CMD;
         }
       }
       else

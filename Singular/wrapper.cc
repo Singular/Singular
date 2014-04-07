@@ -1,7 +1,3 @@
-#include <string.h>
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #include <polys/monomials/ring.h>
 
@@ -9,10 +5,11 @@
 #include <kernel/polys.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/ideals.h>
-
 #include <kernel/GBEngine/janet.h>
 
 #include <Singular/subexpr.h>
+
+#include <string.h>
 
 //extern int (*ListGreatMove)(jList *,jList *,poly);
 

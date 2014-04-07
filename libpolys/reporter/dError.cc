@@ -10,14 +10,16 @@
 #ifndef DERROR_C
 #define DERROR_C
 
+#include <misc/auxiliary.h>
+
+#include <omalloc/omalloc.h>
+
+#include <reporter/reporter.h>
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
-
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
 
 static inline void malloc_free( void * ptr )
 {
@@ -34,13 +36,6 @@ static inline void malloc_free( void * ptr )
 
 #ifdef HAVE_GCC_ABI_DEMANGLE
 #include <cxxabi.h>
-#endif
-
-
-#include <reporter/reporter.h>
-
-#ifdef HAVE_CONFIG_H
-#include <omalloc/omalloc.h>
 #endif
 
 
@@ -61,7 +56,7 @@ int dReportError(const char* fmt, ...)
 #ifndef MAKE_DISTRIBUTION
   fprintf(stderr, "\n// ***dError: ");
   vfprintf(stderr, fmt, ap);
-#if  defined(HAVE_CONFIG_H) && !defined(OM_NDEBUG)
+#if !defined(OM_NDEBUG)
   #ifdef omPrintCurrentBackTraceMax
   fprintf(stderr, " occured at: \n");
   omPrintCurrentBackTraceMax(stderr, 8);

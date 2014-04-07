@@ -119,7 +119,7 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  ## for clang: -Wunneeded-internal-declaration 
 
  if test "x${ENABLE_OPTIMIZATION}" != xno; then
-  OPTFLAGS="-DHAVE_CONFIG_H -O3 -Wno-unused-function -Wno-trigraphs -Wno-unused-parameter -Wno-unused-variable -fomit-frame-pointer -fwrapv -fvisibility=default -finline-functions -fno-exceptions -fno-rtti -fno-threadsafe-statics -fno-enforce-eh-specs -fconserve-space -funroll-loops"
+  OPTFLAGS="-O3 -Wno-unused-function -Wno-trigraphs -Wno-unused-parameter -Wno-unused-variable -fomit-frame-pointer -fwrapv -fvisibility=default -finline-functions -fno-exceptions -fno-rtti -fno-threadsafe-statics -fno-enforce-eh-specs -fconserve-space -funroll-loops"
   #  -O3 - crashes gcc???!!!  
   # -fpermissive  
   AC_LANG_PUSH([C])

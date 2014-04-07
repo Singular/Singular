@@ -4,15 +4,12 @@
 /*
 * ABSTRACT: standard version of C++-memory management alloc func
 */
-#include <stdlib.h>
-
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
+
 #include <new>
+#include <stdlib.h>
 
 /* We define those, so that our values of
    OM_TRACK and OM_CHECK are used  */

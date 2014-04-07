@@ -4,7 +4,7 @@
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
  *******************************************************************/
-#include <omalloc/omConfig.h>
+#include "omConfig.h"
 
 #ifndef NULL
 #define NULL ((void*) 0)

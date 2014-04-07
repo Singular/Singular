@@ -6,11 +6,10 @@
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
-#include "countedref.h"
 #include <omalloc/omalloc.h>
 
 #include <misc/auxiliary.h>
@@ -39,7 +38,8 @@
 #include "tok.h"
 #include "fegetopt.h"
 
-#include "pyobject_setup.h"
+#include <Singular/countedref.h>
+#include <Singular/pyobject_setup.h>
 
 #include <unistd.h>
 #include <string.h>

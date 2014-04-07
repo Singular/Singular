@@ -79,7 +79,7 @@ int test2 (int p)
 }*/
 
 #ifdef SINGULAR
-extern void feInitResources(const char* argv0 = NULL);
+extern void feInitResources(const char* argv0);
 #endif
 
 int main( int, char *argv[] )

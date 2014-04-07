@@ -6,26 +6,28 @@
 * ABSTRACT: attributes to leftv and idhdl
 */
 
+#include <kernel/mod2.h>
+
+#include <omalloc/omalloc.h>
+
+#include <misc/options.h>
+#include <misc/intvec.h>
+
+#include <polys/matpol.h>
+
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
+#include <Singular/ipshell.h>
+#include <Singular/attrib.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
-
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
-#include <misc/options.h>
-#include <Singular/tok.h>
-#include <Singular/ipid.h>
-#include <misc/intvec.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <polys/matpol.h>
-#include <Singular/ipshell.h>
-#include <Singular/attrib.h>
 
 static omBin sattr_bin = omGetSpecBin(sizeof(sattr));
 

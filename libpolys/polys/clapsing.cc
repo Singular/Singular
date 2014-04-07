@@ -8,11 +8,11 @@
 
 //#define FACTORIZE2_DEBUG
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
 
-#include <misc/auxiliary.h>
+
+
+
+
 
 #include <misc/auxiliary.h>
 #include "clapsing.h"

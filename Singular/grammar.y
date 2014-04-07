@@ -12,12 +12,9 @@
 #include <stdarg.h>
 #include <string.h>
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+#include <kernel/mod2.h>
 #include <misc/auxiliary.h>
 
-#include <kernel/mod2.h>
 #include <misc/mylimits.h>
 #include <omalloc/omalloc.h>
 #include <Singular/tok.h>
