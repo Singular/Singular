@@ -4016,7 +4016,6 @@ NOTE:    The output is the ideal of all elements a of the basering R such that
 EXAMPLE: example Ann; shows an example
 "
 {
-  ASSUME(0, not isQuotientRing(basering) ) ;
 
   M=prune(M);  //to obtain a small embedding
   ideal ann=quotient1(M,freemodule(nrows(M)));
@@ -4062,7 +4061,6 @@ static proc int_ass_primary_e(ideal i, int e)
 //n is not necessarily the number of variables
 static proc AnnExt_R(int n,list re)
 {
-  ASSUME(0, not isQuotientRing(basering) ) ;
 
   if(n<nvars(basering))
   {
