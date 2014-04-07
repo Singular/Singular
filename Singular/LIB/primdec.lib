@@ -4017,7 +4017,6 @@ EXAMPLE: example Ann; shows an example
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
 
   M=prune(M);  //to obtain a small embedding
   ideal ann=quotient1(M,freemodule(nrows(M)));
@@ -4064,7 +4063,6 @@ static proc int_ass_primary_e(ideal i, int e)
 static proc AnnExt_R(int n,list re)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
 
   if(n<nvars(basering))
   {
