@@ -3850,6 +3850,8 @@ EXAMPLE: example radicalEHV; shows an example
    {
       "WARNING: The characteristic is too small, the result may be wrong";
    }
+   if ( size(i)==0 ) { return(ideal(0)); }
+
    ideal J,I,I0,radI0,L,radI1,I2,radI2;
    int l,n;
    intvec op=option(get);
@@ -3859,6 +3861,8 @@ EXAMPLE: example radicalEHV; shows an example
    list m=mstd(i);
         I=m[2];
    option(set,op);
+
+   if ( dim(m[1])<0 ) { return(ideal(1)); }
 
    int cod=nvars(basering)-dim(m[1]);
    //-------------------complete intersection case:----------------------
