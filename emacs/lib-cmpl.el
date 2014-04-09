@@ -121,12 +121,10 @@
      ("Factorization"
        ("absfact.lib")
      )
-     ("Commutative algebra"
+     ("Commutative Algebra"
        ("pointid.lib")
        ("normaliz.lib")
        ("monomialideal.lib")
-     )
-     ("Commutative Algebra"
        ("toric.lib")
        ("symodstd.lib")
        ("sing4ti2.lib")
