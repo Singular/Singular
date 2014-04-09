@@ -51,7 +51,7 @@ SLIB1 = classifyceq.lib classifyci.lib classify_aeq.lib \
         orbitparam.lib parallel.lib polymake.lib\
 	realizationMatroids.lib resources.lib ringgb.lib \
 	schreyer.lib symodstd.lib derham.lib polybori.lib ellipticcovers.lib \
-	schubert.lib tasks.lib tropical.lib
+	schubert.lib tasks.lib tropical.lib hdepth.lib
 
 PLIBS = bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib fpadim.lib \
 	freegb.lib gkdim.lib involut.lib ncalg.lib ncdecomp.lib \
