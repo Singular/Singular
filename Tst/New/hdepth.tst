@@ -1,3 +1,4 @@
+LIB "tst.lib"; tst_init();
 LIB "hdepth.lib";
 
 ring R = 0,t,ds;
@@ -20,3 +21,5 @@ ring R = 0,(x,y,z),dp;
 ideal i = x2,xy,xz,y2,z2;
 module m = i;
 hdepth(m,0);
+
+tst_status(1);$
