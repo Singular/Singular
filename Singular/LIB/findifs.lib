@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 version="version findifs.lib 4.0.0.0 Jun_2013 "; // $Id$
-category="System and Control theory";
+category="System and Control Theory";
 info="
 LIBRARY: findifs.lib  Tools for the finite difference schemes
 AUTHORS: Viktor Levandovskyy,     levandov@math.rwth-aachen.de
