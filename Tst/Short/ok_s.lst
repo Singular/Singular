@@ -73,7 +73,7 @@ bug_hilbstd
 bug_homog
 bug_idlen
 bug_interpol
-bug_misc
+; bug_misc
 bug_mres
 bug_napMultT
 bug_newstruct
@@ -125,6 +125,8 @@ bug_tr501
 bug_532_s
 bug_538_s
 bug_tr587
+bug_tr599
+bug_x_i_j
 brnoeth_s
 countedref_s
 cyc5_lp
