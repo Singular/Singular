@@ -1,0 +1,3024 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+version="$Id$";
+category="Test utilities";
+info="
+LIBRARY:  randomIdeal.lib      construction of 'random' generators, e.g. for variables, coefficients, ideals.
+AUTHORS:  J. Kroeker, kroeker@math.uni-hannover.de
+
+PROCEDURES:
+
+    // main randomIdeal-routines:
+    defaultRandomGenerators()            get random generators (of type TRandomGenerators) with default settings
+    createRandomGeneratorsByParams(..)   create user-adjusted random generator functions only from custom options
+    createRandomGenerators(..)           create random generator functions using customized options and factories
+    defaultRandomConstructionParams()    get default options for construction of random functions
+    defaultRandomFactories()             return a struct with default construction methods for random generators
+
+    // a byproduct: randomIdeal-utility functions
+    hasCertainlyCoeffOrdering()          returns 1 if the elements of the coefficient ring certainly have an ordering
+    baseringHasComplexCoeffRing()        detects if for the current ring the coefficients are complex numbers
+    coeffRingIsTrivial()                 tries to detect if the coefficient ring consists only of one element
+    hasOrdinaryParameters()              check if the ring has parameters which are not involved in a minimal polynomial
+    getParIdx(..)                        get the index of the passed parameter variable
+    isParameterVariable(..)              check if the passed object is a parameter of the current ring
+    isVariable(..)                       check if the passed object is a variable in the current ring
+    hasWeightedVariables()               detect if there are weighted variables in the current ring
+
+    baseringHasMinpoly()                 checks if the basering as a minimal polynomial (which is not zero)
+    getPrimitiveRootOrd()                compute the order of the minimal polynomial root, that is of par(1)
+    minpolyProbablyConsistant()          try to detect if minpoly is consistant. 
+
+    getRandomName()                      returns a random string with at least 30 characters.
+    getRandomNameWithPrefix(..)          returns a random string with given prefix. the postfix is a number sequence.
+
+    hasProbablyMemleak(..)               test command 'cmd' (which has a return value) for memleaks
+    hasProbablyMemleakNoDef(..)          test command 'cmd' (which returns nothing)    for memleaks
+";
+
+
+/*
+   internal functions, maybe of some value for later development:
+   
+    monomialExistsInPoly(...)                 test if monomial appears in a reference polynomial.
+
+    randomVariable()                          returns a random ring variable
+    randomParameter()                         returns a random ring parameter (except ve are in a ring with a minpoly)
+    randomVariableOrParameter()               returns a random ring variable or parameter 
+
+random generator factory functions:
+
+    createRandomExCoeffGenerator()            factory for random coefficient generators  in extension fields 
+    createRandomComplexCoeffGenerator(..)     factory for random complex coefficient generators
+    createRandomZCoeffGenerator(..)           factory for random integer coefficient generators
+    createRandomQCoeffGenerator(..)           factory for random rational coefficient generators
+    createPureRandomCoeffGenerator(..)        factory for random pure coefficient generators (complex, integer or rational)
+    createPureRandomCoeffMatrixGenerator(..)  factory for random pure coefficient matrix generators (complex, integer or rational)
+    createRandomParameterCoeffGenerator(..)   factory for random parameter coefficient generators 
+    createFullRandomCoeffGenerator(.. )       factory for random full coefficient generators (parameter+coefficient)
+    createRandomMonomialGenerator(.. )        factory for random monomial generators 
+    createRandomMonomialMatrixGenerator(..)   factory for random monomial matrix generators 
+    createRandomTermGenerator( ..)            factory for random term generators (fullCoeff*monomial)
+    createRandomPolyGenerator(.. )            factory for random polynomial generators 
+    createRandomIdealGenerator( ..)           factory for random ideal generators 
+
+same random generator factory functions as above but with standartized interface (taking options and a table with factory routines; see 'createRandomGenerators' )
+
+    randomComplexCoeffGeneratorFactory(..)
+    randomQCoeffGeneratorFactory(..)
+    randomZCoeffGeneratorFactory(..)
+    pureRandomCoeffGeneratorFactory( ..)
+    randomParameterCoeffGeneratorFactory( .. )
+    randomCoeffGeneratorFactory(.. )
+    randomMonomialGeneratorFactory( .. )
+    randomTermGeneratorFactory( ..)
+    randomPolyGeneratorFactory(..)
+    randomIdealGeneratorFactory(..)
+
+*/
+
+LIB "random.lib";
+LIB "ring.lib";
+
+// define struct TIdealGeneratingParameters, used by the 'randomIdeal' library later on
+proc mod_init()
+{
+    // RandomIdeal::testMemoryLeaks: a flag to enable/disable memory leak related test in the unit tests of this library.
+    def RandomIdeal::testMemoryLeaks = 1; 
+    export(RandomIdeal::testMemoryLeaks);
+
+    // TIdealGeneratingParameters: data type for holding options for random ideal generation. 
+    // options:
+    // absMaxCoeff : the maximal value for a coefficient in Z/Q/R/C, if appliable; ignored otherwise.
+    // bFractionsOn: enable/disable generation of fraction coefficients; ignored if not possible in current domain
+    // minVarFactorsPerMonomial: minimal number of random ring variable factors for a monomial; if there are no variable weights, it is the same as the monomial degree
+    // maxVarFactorsPerMonomial: maximal number of random ring variable factors for a monomial; if there are no variable weights, it is the same as the monomial degree
+    // minParamFactorsPerCoeff: minimal number of random ring parameter factors for a coefficient; usually ignored if there are no parameters or we are in an extension field.
+    // maxParamFactorsPerCoeff: maximal number of random ring parameter factors for a coefficient; usually ignored if there are no parameters or we are in an extension field.
+    // maxTermsPerGen: maximal number of terms for a random polynomial or ideal generator
+    // maxGens: maximal number of generators for a random ideal 
+    if (not defined(TIdealGeneratingParameters_def) )
+    {
+      int TIdealGeneratingParameters_def=0;
+      newstruct("TIdealGeneratingParameters", 
+                "int absMaxCoeff, 
+                 int bFractionsOn, 
+                 int minParamFactorsPerCoeff, 
+                 int maxParamFactorsPerCoeff, 
+                 int minVarFactorsPerMonomial, 
+                 int maxVarFactorsPerMonomial, 
+                 int maxTermsPerGen, 
+                 int bExcludeZeroCoeff,
+                 int maxGens ");
+    }
+ // TRandomGenerators: a struct to hold random generating functions for variables, coefficients, monomials, terms, polynomials and ideals.
+    if (not defined(TRandomGenerators_def) )
+    {
+      int TRandomGenerators_def=0;
+      newstruct("TRandomGenerators", 
+                "
+                 def varG,
+                 def parG,
+                 def coeffG, 
+                 def monomG,
+                 def termG,
+                 def polyG,
+                 def idealG ");
+    }
+
+    // TRandomFactories: a struct to hold factories for random generating functions for coefficients, monomials, terms, polynomials and ideals.
+    if (not defined(TRandomFactories_def) )
+    {
+      int TRandomFactories_def=0;
+      newstruct("TRandomFactories", 
+                "def coeffFactory, 
+                 def monomFactory,
+                 def termFactory,
+                 def polyFactory,
+                 def idealFactory,
+                 def checkParamConsistancy ");
+
+
+    }
+}
+
+
+proc checkTIdealGeneratingParametersConsistency(TIdealGeneratingParameters params)
+{
+    if ( 0 > params.minParamFactorsPerCoeff ) { ERROR("expecting params.minParamFactorsPerCoeff >= 0"); }
+    if ( 0 > params.maxParamFactorsPerCoeff ) { ERROR("expecting params.maxParamFactorsPerCoeff >= 0"); }
+    if ( 0 > params.minVarFactorsPerMonomial ) { ERROR("expecting params.minVarFactorsPerMonomial >= 0"); }
+    if ( 0 > params.maxVarFactorsPerMonomial ) { ERROR("expecting params.maxVarFactorsPerMonomial >= 0"); }
+    if ( params.maxParamFactorsPerCoeff < params.minParamFactorsPerCoeff ) { ERROR("expecting params.maxParamFactorsPerCoeff >= params.minParamFactorsPerCoeff"); }
+    if ( params.maxVarFactorsPerMonomial < params.minVarFactorsPerMonomial ) { ERROR("expecting params.maxVarFactorsPerMonomial >= params.minVarFactorsPerMonomial"); }
+//    if ( (0 != params.minVarFactorsPerMonomial) && (1==params.bExcludeZeroCoeff)
+}
+
+// checks if in the current basering a minimal polynomial is defined 
+proc baseringHasMinpoly()
+"USAGE:    baseringHasMinpoly( );
+RETURN:   1, if in the current basering a minimal polynomial is defined , otherwise returns 0.
+EXAMPLE: example baseringHasMinpoly; shows an example
+"
+{ 
+   return( string(minpoly) !=  string(number(0)) );
+}
+example
+{
+   echo = 2;
+   ring r1 = 0, x, dp;
+   baseringHasMinpoly(); // =0
+
+   ring r2 = (0, a), x, dp;
+   minpoly = a^2+1;
+   baseringHasMinpoly(); // =1
+}
+
+// check command 'cmd' for memory leaks
+// passed command cmd will be executed twice
+// the returned value will be assigned to a local variable
+// the measuring happens between the first and the second run
+// if the size of the used memory increases, the test fails.
+proc hasProbablyMemleak(string cmd)
+"USAGE:    hasProbablyMemleak( commandString );
+RETURN:   1, if cmd possibly causes a memory leak , otherwise returns 0.
+NOTE:     hasProbablyMemleak is usable only  for commands which return a result. 
+          If that is not the case, use 'hasProbablyMemleakNoDef()'.
+EXAMPLE:  example hasProbablyMemleak; shows an example
+"
+{
+
+    intvec op = option(get);
+    option(mem);
+    bigint newMemoryLine;
+    bigint memoryLine;
+    def obj; 
+    int i = 1;
+    for (i=1; i<10; i++)
+    {
+        execute("obj = "+cmd);
+        memoryLine = memory(0);
+        execute("obj = "+cmd);
+        newMemoryLine = memory(0);
+        if ( memoryLine< newMemoryLine)
+        { 
+           option(set,op);
+           return(1);
+        }
+    }
+   option(set,op);
+   return(0);
+}
+example
+{
+   echo = 2;
+    //a memory leak test for a simple function.
+    proc returnOne() { return(1); };
+    export(returnOne);
+    hasProbablyMemleak(" returnOne();"); //=0
+
+    //map causes a memory leak, see trac ticket 183.
+    ring r = 0, (x,y,z),dp;
+    ideal i = 0; 
+    map m = r,i;
+    export(m);
+    ideal J = x^2*z, x*y*z, x*y^2 ;
+    export(J);
+    hasProbablyMemleak(" m(J);"); //=1
+}
+
+
+
+
+// check command 'cmd' for memory leaks.
+// The measuring of used memory is performend between the first and the second command call.
+// if the size of the used memory appears to increase, the test fails.
+proc hasProbablyMemleakNoDef(string cmd)
+"USAGE:    hasProbablyMemleakNoDef( commandString );
+RETURN:   1, if cmd possibly causes a memory leak , otherwise returns 0.
+NOTE:     hasProbablyMemleakNoDef is usable only  for commands which do not return a result. 
+          In other cases please use 'hasProbablyMemleak'.
+EXAMPLE:  example hasProbablyMemleakNoDef; shows an example
+"
+{   
+    intvec op = option(get);
+    option(mem);
+    bigint newMemoryLine, memoryLine;
+    int i = 1;
+    for (i=1; i<10; i++)
+    {
+        execute(cmd);
+        memoryLine = memory(0);
+        execute(cmd);
+        newMemoryLine = memory(0);
+        if( memoryLine < newMemoryLine)         
+        { 
+           option(set,op);
+           return(1);
+        }
+    }
+    option(set,op);
+    return(0);
+}
+example
+{
+   echo = 2;
+    //a memory leak test for a simple function.
+    proc doNothing() {  }; 
+    export(doNothing);
+    hasProbablyMemleakNoDef(" doNothing();"); //=0
+}
+
+
+// disable memleak test if RandomIdeal::testMemoryLeaks=0 
+// and parforms the memleak test if  RandomIdeal::testMemoryLeaks<>0 
+static proc hasProbablyMemleak_check(def cmd)
+{
+    if (not (RandomIdeal::testMemoryLeaks) ) 
+    {
+       return(0);
+    }
+    return(hasProbablyMemleak( cmd));
+}
+
+// disable memleak test if RandomIdeal::testMemoryLeaks=0 
+// and parforms the memleak test if  RandomIdeal::testMemoryLeaks<>0 
+static proc hasProbablyMemleakNoDef_check(def cmd)
+{
+    if (not (RandomIdeal::testMemoryLeaks)) 
+    {
+       return(0);
+    }
+    return(hasProbablyMemleakNoDef( cmd) );
+}
+
+
+
+static proc testBaseringHasMinpoly()
+{
+     ring r0 = (0),(x,y,z),dp;
+     ASSUME(0, not hasProbablyMemleak_check("baseringHasMinpoly();"));
+     ASSUME(0, not baseringHasMinpoly());
+
+     ring r1 = (0,a),(x,y,z),dp;
+     ASSUME(0, not hasProbablyMemleak_check("baseringHasMinpoly();"));
+     ASSUME(0, not baseringHasMinpoly());
+     minpoly = a^2-1;
+     ASSUME(0, not hasProbablyMemleak_check("baseringHasMinpoly();"));
+     ASSUME(0, baseringHasMinpoly());
+     ASSUME (0, not hasProbablyMemleakNoDef_check("ASSUME(0, baseringHasMinpoly());"));
+
+     ring r2 = (0,a),(x,y,z),dp;
+     ASSUME(0, not hasProbablyMemleak_check("baseringHasMinpoly();"));
+     ASSUME(0, not baseringHasMinpoly());
+     minpoly = -1;
+     ASSUME(0, baseringHasMinpoly() );
+     ASSUME(0, not hasProbablyMemleak_check("baseringHasMinpoly();"));
+
+    ring r3 = (real),(x,y,z),dp;
+    ASSUME(0, not hasProbablyMemleak_check("baseringHasMinpoly();"));
+    ASSUME(0, not baseringHasMinpoly() );
+    
+    ASSUME(0, not hasProbablyMemleak_check(" baseringHasMinpoly();"));
+}
+
+
+// check if we have a complex coefficient ring.
+// will break in Singular version >= 4.1
+
+proc baseringHasComplexCoeffRing()
+"USAGE:    baseringHasComplexCoeffRing();
+RETURN:   1, if coefficient ring is the ring of complex numbers, otherwise returns 0.
+EXAMPLE:  example baseringHasComplexCoeffRing; shows an example
+"
+{
+   list rl = ringlist(basering);
+
+   if ( typeof(rl[1])=="list" )
+   {
+      if ( size(rl[1])==3 )
+      {
+          if ( typeof(rl[1][3])=="string" )
+          {
+              return(1);
+          }
+      }      
+   }
+   return(0);
+}
+example
+{
+   echo = 2;
+    // check if we have a complex coefficient ring:
+    ring r1 = (complex),x,dp;
+    baseringHasComplexCoeffRing(); //=1
+
+    ring r2 = 0,x,dp;
+    baseringHasComplexCoeffRing(); //=0
+}
+
+
+static proc testBaseringHasComplexCoeffRing()
+{
+    ring r1 = 0,x,dp;
+    ASSUME(0, not hasProbablyMemleak_check(" baseringHasComplexCoeffRing();"));
+    ASSUME(0, not baseringHasComplexCoeffRing() );
+
+    ring r2 = (0,a),x,dp;
+    ASSUME(0, not hasProbablyMemleak_check(" baseringHasComplexCoeffRing();"));
+    ASSUME(0, not baseringHasComplexCoeffRing() );
+
+    ring r3 = (0,a),x,dp;
+    minpoly = a^ 2+1;
+    ASSUME(0, not hasProbablyMemleak_check(" baseringHasComplexCoeffRing();"));
+    ASSUME(0, not baseringHasComplexCoeffRing() );
+
+    ring r4 = 7,x,dp;
+    ASSUME(0, not hasProbablyMemleak_check(" baseringHasComplexCoeffRing();"));
+    ASSUME(0, not baseringHasComplexCoeffRing() );
+
+
+    ring r5 = (7,a),x,dp;
+    ASSUME(0, not hasProbablyMemleak_check(" baseringHasComplexCoeffRing();"));
+    ASSUME(0, not baseringHasComplexCoeffRing() );
+
+    ring r6 = (7,a),x,dp;
+    minpoly = a^ 2+1;
+    ASSUME(0, not hasProbablyMemleak_check(" baseringHasComplexCoeffRing();"));
+    ASSUME(0, not baseringHasComplexCoeffRing() );
+
+    ring r7 = (real,a,50),x,dp;
+    ASSUME(0, not hasProbablyMemleak_check(" baseringHasComplexCoeffRing();"));
+    ASSUME(0,   baseringHasComplexCoeffRing() );
+
+    ring r8 = (complex),x,dp;
+    ASSUME(0, not hasProbablyMemleak_check(" baseringHasComplexCoeffRing();"));
+    ASSUME(0,   baseringHasComplexCoeffRing() );
+
+    ring r9 = (complex,a,50),x,dp;
+    ASSUME(0, not hasProbablyMemleak_check(" baseringHasComplexCoeffRing();"));
+    ASSUME(0,   baseringHasComplexCoeffRing() );    
+
+
+}
+
+
+// in case we have a minpoly, 
+// test if par(1) is not different from number( par(1) ) - minpoly is then probably consistant
+// if par(1) is different from number( par(1) ), then certainly minpoly is not consistant.
+proc minpolyProbablyConsistant()
+"USAGE:    minpolyProbablyConsistant();
+RETURN:   1, if minimal polynomial is probably consistant. 
+          If minpoly is certainly consistant, return value is 0.
+NOTE:     asserts, that a minpoly is defined and is not 0.
+EXAMPLE:  example minpolyProbablyConsistant; shows an example
+"
+{
+   ASSUME(0, baseringHasMinpoly() );
+   number tmp =  par(1);
+   return(  tmp == par(1)  );
+}
+example
+{
+   echo = 2;
+   ring r1 = (0,a),(x,y,z),dp;
+   minpoly = 1;
+   minpolyProbablyConsistant(); //=0
+
+   ring r2 = (0,a),(x,y,z),dp;
+   minpoly = a^2+1;
+   minpolyProbablyConsistant(); //=1
+}
+
+static proc testMinpolyProbablyConsistant()
+{
+   int i;
+
+   ring r1 = (0,a),(x,y,z),dp;
+   minpoly = 1;
+   ASSUME(0, not minpolyProbablyConsistant() );
+   ASSUME(0, not hasProbablyMemleak_check("not minpolyProbablyConsistant();"));   
+
+   ring r2 = (0,a),(x,y,z),dp;
+   minpoly = a^2+1;
+   ASSUME(0,   minpolyProbablyConsistant() );
+   ASSUME(0, not hasProbablyMemleak_check(" minpolyProbablyConsistant();"));
+
+   ring r3 = (2,a),(x,y,z),dp;
+   minpoly = a^2+1;
+   ASSUME(0,   minpolyProbablyConsistant() );
+   ASSUME(0, not hasProbablyMemleak_check(" minpolyProbablyConsistant();"));
+
+   ring r4 = (2,a),(x,y,z),dp;
+   minpoly = a^2-1;
+   ASSUME(0,   minpolyProbablyConsistant() );
+
+   ring r5 = (2,a),(x,y,z),dp;
+   minpoly= a;
+   ASSUME(0, not minpolyProbablyConsistant() );
+
+   ring r6 = (2,a),(x,y,z),dp;
+   minpoly= 1;
+   ASSUME(0, not minpolyProbablyConsistant() );
+
+   ASSUME(0, not hasProbablyMemleak_check(" not minpolyProbablyConsistant();"));
+}
+
+// test if the coefficient ring has only '0' as element.
+proc coeffRingIsTrivial()
+"USAGE:    coeffRingIsTrivial();
+RETURN:   1, if the coefficient ring has only zero as element, 
+          otherwiese returns 0
+EXAMPLE:  example coeffRingIsTrivial; shows an example
+"
+{
+    if (baseringHasMinpoly() )
+    {
+       number tmp = par(1);
+       return(    number(0)== tmp );
+    }
+    return( char(basering)==1 );
+}
+example
+{
+   echo = 2;
+   // test if the coefficient ring has only '0' as element.
+   ring r1 = (0,a),(x,y,z),dp;
+   coeffRingIsTrivial();  // = 0
+   minpoly = 1;
+   coeffRingIsTrivial();  // = 1
+}
+
+static proc testCoeffRingIsTrivial()
+{
+   ring r1 = (0,a),(x,y,z),dp;
+   ASSUME(0, not coeffRingIsTrivial() );
+   ASSUME(0, not hasProbablyMemleak_check("not coeffRingIsTrivial();"));   
+
+   minpoly = 1;
+   ASSUME(0, coeffRingIsTrivial() );
+   ASSUME(0, not hasProbablyMemleak_check("coeffRingIsTrivial();"));   
+
+   ring r2 = (2,a),(x,y,z),dp;
+   ASSUME(0, not hasProbablyMemleak_check("coeffRingIsTrivial();"));   
+   ASSUME(0, not coeffRingIsTrivial() );
+   minpoly = 1;
+   ASSUME(0, not hasProbablyMemleak_check("coeffRingIsTrivial();"));   
+   ASSUME(0, coeffRingIsTrivial() );
+
+   ring r3 = (integer,1),x,dp;
+   ASSUME(0, not hasProbablyMemleak_check("coeffRingIsTrivial();"));   
+   ASSUME(0, coeffRingIsTrivial() );
+   ASSUME(0, not hasProbablyMemleakNoDef_check("   ASSUME(0, coeffRingIsTrivial() ); "));
+
+   ring r4 = (integer,2),x,dp;
+   ASSUME(0, not hasProbablyMemleak_check("coeffRingIsTrivial();"));   
+   ASSUME(0, not coeffRingIsTrivial() );
+
+   ring r5 = (2),x,dp;
+   ASSUME(0, not hasProbablyMemleak_check("coeffRingIsTrivial();"));   
+   ASSUME(0, not coeffRingIsTrivial() );
+}
+
+
+proc randomVariable()
+"USAGE:    randomVariable( );
+RETURN:   'random' basering  varible
+EXAMPLE:  example randomVariable; shows an example
+"
+{
+    int pos =  random(1,  nvars(basering) );
+    return ( var(  pos  ) );
+}
+example
+{
+   echo = 2;
+   system("random",23232323);
+   ring rng = (0,a),(x,y,z),dp;
+   // get a random variable (here \in (x,y,z))
+   randomVariable();
+   randomVariable();
+}
+
+// check if the ring has ordinary parameters 
+// that means we count only parameters which are not involved in a extension with a minimal polynomial.
+proc hasOrdinaryParameters()
+"USAGE:    hasOrdinaryParameters( );
+RETURN:   1, if the ring has parameters which are not involved in a extension with a minimal polynomial, otherwise returns 0.
+EXAMPLE:  example hasOrdinaryParameters; shows an example
+"
+{
+    if  ( npars(basering)>0 ) 
+    {
+        if ( baseringHasMinpoly() )    {    return(npars(basering)>1 );   }
+        return(1);
+    }
+    return(0);
+}
+example
+{
+   echo = 2;
+   ring r1 = (0,a,b),x,dp;
+   hasOrdinaryParameters(); //=1;
+
+   ring r2 = (0,a),x,dp;
+   hasOrdinaryParameters(); //=1;
+   minpoly = a^2+1;
+   hasOrdinaryParameters(); //=0;
+}
+
+
+proc randomParameter()
+"USAGE:    randomParameter( );
+RETURN:   'random' parameter ,  except first parameter if we have a minimal polynomial.
+EXAMPLE:  example randomParameter; shows an example
+"
+{
+    ASSUME(0,  npars(basering)>0 ); 
+    int startRandom = 1;
+ 
+    ASSUME(0, not baseringHasMinpoly() );    
+    if ( baseringHasMinpoly() )
+    {
+        // should never happen.
+        startRandom = 2;
+    }
+ 
+    int pos =  random(startRandom, npars(basering)  );
+    return ( par(pos) );
+}
+example
+{
+   echo = 2;
+   system("random",42424242);
+   ring r1 = (0,a,b),x,dp;
+   randomParameter();  
+
+   ring r2 = (0,a),x,dp;
+   minpoly = a^2+1
+   randomParameter();  // will fail, there are no ordinary random parameters.
+}
+
+
+proc randomVariableOrParameter()
+"USAGE:    randomVariableOrParameter();
+RETURN:   random basering parameter or varible, except first parameter if we have a minimal polynomial.
+EXAMPLE:  example randomVariableOrParameter; shows an example
+"
+{
+    int startRandom = 1;
+    if ( npars(basering)>0 )
+    {
+        if ( baseringHasMinpoly() )
+        {
+            startRandom = 2;
+        }
+    }
+    int pos =  random(startRandom, npars(basering)+ nvars(basering) );
+    if (pos>npars(basering))
+    {
+        return ( var(  pos-npars(basering) ) );
+    }
+    else
+    {
+        return ( par(pos) );
+    }
+}
+example
+{
+   echo = 2;
+   system("random",42424242);
+   ring r1 = (0,a,b),x,dp;
+   randomVariableOrParameter();  
+   randomVariableOrParameter();  
+
+   ring r2 = (0,a),x,dp;
+   minpoly = a^2+1
+   randomVariableOrParameter();   
+}
+
+// TODO : getParIdx dangerous as it is - getParIdx could be used in a sum without checking if 'variable' is indeed a variable!
+//        Design issue was introduced by copying the behaviour of rvar.
+
+// return   index i such that par(i)==variable or 0 if variable is not a basering parameter
+proc getParIdx(def variable)
+"USAGE:    getParIdx( variable);
+RETURN:   index i such that par(i)==variable or 
+          0 if variable is not a basering parameter
+NOTE:     this may fail in cases where e.g. par(i)==number(0); see  also 'minpolyProbablyConsistant()'
+EXAMPLE:  example randomVariableOrParameter; shows an example
+"
+{
+   int numPars = npars(basering);
+   int i;
+   for ( i=1; i<=numPars; i++ )
+   {
+       if ( variable==par(i) ) 
+       { 
+            return(i); 
+       }       
+   }
+   return (0);
+}
+example
+{
+   echo = 2;
+   ring r1 = (7,a,b,d,e),x,dp;
+   getParIdx( d );      // is 3
+   getParIdx( par(2) ); // is 2
+   getParIdx( x );      // 0
+}
+
+static proc testGetParIdx()
+{
+   ring r1 = (7,a,b,d,e),x,dp;
+   ASSUME(0, 3== getParIdx( d ));
+  ASSUME(0, 2== getParIdx( par(2) ));
+  ASSUME(0, 0== getParIdx( x ));
+
+}
+
+
+// check if passed object is a basering parameter variable
+
+proc isParameterVariable(def variable)
+"USAGE:    isParameterVariable( obj);
+RETURN:   1, if obj is  is a basering parameter variable, otherwise 0
+EXAMPLE:  example isParameterVariable; shows an example
+"
+{
+   if ( (not  (typeof(variable)=="number"))  && 
+        (not  (typeof(variable)=="poly")) 
+      )
+   { 
+      return(0);   
+   }
+   return ( getParIdx(variable)>0);
+}
+example
+{
+   echo = 2;
+   ring r1 = (7,a,b,d,e),x,dp;
+   isParameterVariable( d );      // = 1
+   isParameterVariable( x );      // = 0
+   isParameterVariable( "bar")  ; // = 0
+}
+
+static proc testIsParameterVariable()
+{
+   ring r1 = (7,a,b,d,e),x,dp;
+   ASSUME(0, isParameterVariable( d )); 
+   ASSUME(0, isParameterVariable( poly(d) )); 
+   ASSUME(0, not isParameterVariable( 2)  ); 
+   ASSUME(0, not isParameterVariable( "sf")  ); 
+   ASSUME(0, not isParameterVariable( r1)  );
+   ASSUME(0, not  isParameterVariable( x ) );
+}
+
+// check if passed variable is a basering variable
+
+proc isVariable(variable)
+"USAGE:    isVariable( obj);
+RETURN:   1, if obj is  is a basering variable, otherwise 0
+EXAMPLE:  example isVariable; shows an example
+"
+{
+   if ( not  ( typeof(variable)=="poly" ) )
+   { 
+      return(0);   
+   }
+   return ( rvar(variable)>0);
+}
+example
+{
+   echo = 2;
+   ring r1 = (7,a,b,d,e),x,dp;
+   isVariable( x );     // = 1
+   isVariable( d );     // = 0
+   isVariable("bar")  ; // = 0
+}
+
+static  proc testRandomVariableHelper()
+{
+
+    int numPars = npars(basering);
+    int numVars = nvars(basering);
+    intmat mp [1][numPars];
+    intmat mv [1][numVars];
+    int i,j,k;
+    for ( i=1; i<1000; i++ )
+    {
+        if (defined(unknown)) {kill unknown;}
+        poly unknown = randomVariableOrParameter();
+
+        if ( isParameterVariable(unknown) )  
+        {
+               if ( baseringHasMinpoly() )  { ASSUME(0, (getParIdx(unknown)>1)  ); }
+               ASSUME(0, (getParIdx(unknown)>0) and (getParIdx(unknown)<=numPars));
+               mp[1, getParIdx(unknown) ] = int(1) ;
+        }
+        else
+        {
+           if ( isVariable(unknown)  )  
+           { 
+             ASSUME(0, (rvar(unknown)>0) and (rvar(unknown)<=numVars));
+             mv[1, rvar(unknown) ] = int(1);
+           }
+           else
+           {
+                ERROR("unknown is neither variable nor parameter");
+           }           
+        }        
+    }
+    i=1; 
+    if ( baseringHasMinpoly() )  { i = 2;}
+    for ( ;  i<=numPars; i++ )
+    {
+        ASSUME(0,  mp[1,i] == int(1) );
+    }
+    for ( i=1; i<=numVars; i++ )
+    {
+        ASSUME(0,  mv[1,i] == int(1) );
+    }
+}
+
+
+static proc testRandomVariable()
+{
+   ring rng1 = (0,a,b,c),(x,y),dp;
+   testRandomVariableHelper();
+
+   ring rng2 = (49,a),(x,y),dp;
+   testRandomVariableHelper();
+
+   ring rng3 = (integer),(x),dp;
+   testRandomVariableHelper();
+
+   ASSUME(0, not hasProbablyMemleak_check("randomVariableOrParameter();") );
+
+}
+
+proc getRandomNameWithPrefix(string prefix)
+"USAGE:    getRandomNameWithPrefix( prefix);
+@*
+RETURN:   random non defined procedure name with given prefix
+EXAMPLE:  example isVariable; shows an example
+"
+{
+   ASSUME(0, size(prefix) > 0 );
+   if ( size(prefix)==1 ) { prefix = prefix+"@"; }
+   string name = prefix + string(random(1,1000000000));
+   //dbprint(1, "name",name);
+   while (  defined(`name`) ) 
+   {
+       name = prefix  + string(random(1,1000000000));
+   }
+  
+   return( name );
+}
+example
+{
+    echo = 2;
+    system("random",6832989);
+    // get a random variable name with prefix "T_"
+    getRandomNameWithPrefix("T_");
+}
+
+
+
+proc getPrimitiveRootOrd()
+"USAGE:    getPrimitiveRootOrd();
+RETURN:   root order of 
+EXAMPLE:  example getPrimitiveRootOrd; shows an example
+"
+{
+   ASSUME(0,  baseringHasMinpoly() );
+   ASSUME(0, not coeffRingIsTrivial() );
+
+   if (par(1)==1) {return(int(1));}
+
+   int countPrimitiveElementOrd = 1;
+   number pfsdf = par(1);
+
+   while (pfsdf != 1)
+   {
+      pfsdf = pfsdf*par(1);
+      countPrimitiveElementOrd++;
+   }
+   return (countPrimitiveElementOrd);
+}
+example
+{
+   echo = 2;
+    // create polynomail ring with GF(2,4) coefficients;
+    // parmeter 'a' will be the primitive element of the corresponding minimal polynomial.
+    ring rng = (16,a),x,dp;
+    minpoly; 
+    // get the element order of a = par(1) ;  expected value: 15.
+    getPrimitiveRootOrd(); // = 15
+}
+
+
+
+static proc testGetPrimitiveElementOrd()
+{
+    ring rng = (16,a),x,dp;
+    int countOrd=getPrimitiveRootOrd();
+    ASSUME(0, countOrd==15);
+    ASSUME(0, not hasProbablyMemleak_check("getPrimitiveRootOrd()") );
+} 
+
+
+proc getRandomName()
+"USAGE:    getRandomName();
+RETURN:   random string with at least 30 characters
+EXAMPLE:  example getRandomName; shows an example
+"
+{
+  string rname="";
+  list alphabet = "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z";
+  int i;
+  for (i=1; i<30; i++)
+  {
+      rname = rname  + alphabet[random(1,size(alphabet))] ;
+  }
+   while (  defined(`rname`) ||  defined(`"RandomIdeal::"+rname`)  ) 
+   {
+         rname = rname  + alphabet[random(1,size(alphabet))] ;
+   }
+
+  return(rname);
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    getRandomName();
+}
+
+
+static proc testGetRandomName()
+{
+   string rname = getRandomName();
+   ASSUME(0, not hasProbablyMemleak_check("getRandomName()"));
+}
+
+
+
+proc createRandomExCoeffGenerator()
+"USAGE:    createRandomExCoeffGenerator();
+RETURN:   a generator for coefficients in Singular's extension rings.
+NOTE:     currently the maximal supported exponent for the 
+          primitive root (first ring parameter variable) is 1073741824.
+EXAMPLE:  example createRandomExCoeffGenerator; shows an example
+"
+{
+
+
+   string cmd= "proc rCoeff(    )
+   {  
+      ASSUME(0, defined(basering) );
+      ASSUME(0, not (1==char(basering)) );
+      ASSUME(0, not coeffRingIsTrivial() );
+      ASSUME(0, baseringHasMinpoly() );
+      ASSUME(0, minpolyProbablyConsistant() ); 
+      return( par(1)^random(1, 1073741824) );
+   }
+   ";
+
+   execute(cmd);
+   return (rCoeff);
+}
+example
+{
+   echo = 2;
+   system("random",6832989);
+   ring r1 = (49,a),x,dp; short = 0;
+   //create a random coefficient generator. 
+   proc cExtGen = createRandomExCoeffGenerator();
+   cExtGen();
+   cExtGen();
+   // works without modifications for different coefficient fields
+   ring r2 = (16,a),x,dp; short = 0;
+   cExtGen();
+   cExtGen();
+}
+
+static proc testCreateRandomExCoeffGenerator()
+{
+   //ASSUME(0, not hasProbablyMemleak_check("createRandomExCoeffGenerator( )")); //TODO:FAILS!!!
+   proc cExtGen = createRandomExCoeffGenerator();
+   ring r5 = (0,a),x,dp; 
+   minpoly=a^2+1;
+
+   // test Memleak:
+   def num;
+   bigint newMemoryLine, memoryLine;
+ 
+   num = cExtGen();
+   memoryLine = memory(0);
+   num = cExtGen(); 
+   newMemoryLine = memory(0);
+   ASSUME(0, memoryLine>=newMemoryLine);
+
+   ring r8 = (121,a),x,dp; 
+   def num = cExtGen();
+
+
+   // following examples should fail. Needs try/catch to test appropriately.
+   /*
+
+    proc cExtGen = createRandomExCoeffGenerator();
+   cExtGen(); 
+
+   ring r1 = 0,x,dp;
+   proc cExtGen = createRandomExCoeffGenerator();
+   cExtGen(); 
+
+   ring r2 = (0,a),x,dp;
+   minpoly=1;
+   cExtGen(); 
+
+   ring r3 = (1,a),x,dp;
+   cExtGen(); 
+
+   ring r4 = (1,a),x,dp; 
+   minpoly=a^2-1;
+   cExtGen();  
+
+   ring r6 = (1,a),x,dp; 
+   minpoly=a;
+   cExtGen(); 
+
+   ring r7 = (2,a),x,dp; 
+   minpoly=a;
+   cExtGen();  
+
+   ring r7b = (2,a),x,dp; 
+   minpoly=1;
+   cExtGen();  
+
+
+   ring r9a = (integer),x,dp; 
+   cExtGen();
+
+   ring r9b = (integer,2,3),x,dp; 
+   cExtGen();
+
+   ring r9c = (integer,2,3),x,dp; 
+   cExtGen();
+
+   ring r10 = (real,a),x,dp; 
+   cExtGen();
+
+   ring r11 = (complex),x,dp; 
+   cExtGen();
+   */
+}
+
+/*
+ // LIB("randomIdeal.lib");
+
+link l1 = "ssi:fork"; open(l1);
+
+write( l1, quote(testCreateRandomExCoeffGenerator()) );
+waitfirst( list(l1), 5000); // waits 1 second.
+
+if (not (status(l1,"read")=="ready")) { ERROR("testCreateRandomExCoeffGenerator failed!"); }
+close(l1);
+kill l1;
+
+
+*/
+
+proc createRandomComplexCoeffGenerator(pAbsMaxCoeff, bExcludeZero)
+"USAGE:   createRandomComplexCoeffGenerator( absMaxCoeff, bExcludeZero);
+@*        absMaxCoeff: int
+RETURN:   a random complex coefficient 'generator' with coefficients in {-absMaxCoeff.. absMaxCoeff} + i*{-absMaxCoeff..absMaxCoeff}
+EXAMPLE:  example createRandomExCoeffGenerator; shows an example
+"
+{
+     if (bExcludeZero)  
+     {
+         ASSUME(0, pAbsMaxCoeff>0); 
+     }
+     string cmd= "proc rCoeff(    )
+     {
+        ASSUME(0, defined(basering) );
+        ASSUME(0, not (1==char(basering)) );
+        ASSUME(0, not coeffRingIsTrivial() );
+        ASSUME(0, baseringHasComplexCoeffRing() );
+        number a,b,c,d, result;
+        a = random( -" + string(pAbsMaxCoeff) + "," + string(pAbsMaxCoeff) + " );
+        b = random( 1," + string(pAbsMaxCoeff) + " );
+        c = random( -" + string(pAbsMaxCoeff) + "," + string(pAbsMaxCoeff) + " );
+        d = random( 1," + string(pAbsMaxCoeff) + " );    
+
+        result = a/b+par(1)*c/d;
+        int maxTrials = 1000;
+        int trialCount=0;
+
+        if (" + string(bExcludeZero) + ")  
+        {
+            while (0==result && trialCount<maxTrials)  
+            {
+                 a = random( -" + string(pAbsMaxCoeff) + "," + string(pAbsMaxCoeff) + " );
+                 b = random( 1," + string(pAbsMaxCoeff) + " );
+                 c = random( -" + string(pAbsMaxCoeff) + "," + string(pAbsMaxCoeff) + " );
+                 d = random( 1," + string(pAbsMaxCoeff) + " );    
+                 result = a/b+par(1)*c/d;
+                 trialCount = trialCount+1;
+            } 
+            if (0==result)  {   ERROR(\"failed to get nonzero element as requested by 'bExcludeZero' setting \");  }
+        }
+        return(result);
+     }";
+
+    execute(cmd);
+    return (rCoeff);
+}
+example
+{
+   echo = 2;
+   system("random",6832989);
+   ring r1 = (complex),x,dp;  short = 0;
+   //create a 'random' complex coefficient generator. 
+   int pAbsMaxCoeff = 100;
+   int bExcludeZero = 0;
+   proc complexG = createRandomComplexCoeffGenerator(pAbsMaxCoeff, bExcludeZero);
+   complexG();
+   complexG();
+   // works without modifications for different 'compatible' coefficient fields
+   ring r2 = (complex,50),x,dp;   short = 0;
+   complexG();
+   complexG();
+}
+
+
+proc randomComplexCoeffGeneratorFactory(def params, def factory)
+"USAGE:   randomComplexCoeffGeneratorFactory(options,   factoryTable);
+@*   options       : a type compatible to TIdealGeneratingParameters, containing construction parameters
+@*   factoryTable : a lookup table of type compatible to TRandomFactories, 
+                    containing methods for construction used random generator functions, e.g for coefficients.
+@
+RETURN:   a random complex coefficient generator  (excluding parameters)
+EXAMPLE:  example randomComplexCoeffGeneratorFactory; shows an example
+"
+{
+    return( createRandomComplexCoeffGenerator(params.absMaxCoeff) )
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    def defaultFactoryTable = defaultRandomFactories();
+    defaultFactoryTable;
+
+    def constructionParams = defaultRandomConstructionParams();
+    constructionParams;
+
+    constructionParams.absMaxCoeff = 121;
+
+    // construct a complex coefficient generator 
+    proc complexCoeffG = randomComplexCoeffGeneratorFactory( constructionParams, defaultFactoryTable );
+    ring rng = (complex),(x,y),dp;
+    complexCoeffG();
+}
+
+// todo: how to get the real and imaginary part?
+static proc testCreateRandomComplexCoeffGeneratorHelper(absMaxCoeff, bExcludeZero)
+{
+   //ASSUME(0, not hasProbablyMemleak_check("createRandomComplexCoeffGenerator(10,1)"));
+   proc cCoeff = createRandomComplexCoeffGenerator(absMaxCoeff,bExcludeZero);
+   int i;
+   number m;
+    m = cCoeff(); 
+
+   if (bExcludeZero &&  RandomIdeal::testMemoryLeaks)
+   {
+       bigint newMemoryLine, memoryLine;
+       m = cCoeff(); 
+       memoryLine = memory(0);
+       m = cCoeff(); 
+       newMemoryLine = memory(0);
+       ASSUME(0, memoryLine>=newMemoryLine);
+   }
+   for (i=1;i<100;i++)
+   {
+      m = cCoeff();
+      if (bExcludeZero) 
+      {
+          ASSUME(0, not (m==number(0) ) );
+      }
+
+   }
+}
+
+static proc testCreateRandomComplexCoeffGenerator()
+{
+    system("random",6832989);
+    ring     r1 = complex,(x,y),dp;
+    testCreateRandomComplexCoeffGeneratorHelper(1000,0);
+    
+    ring     r2 = (complex,a),(x,y),dp;
+    testCreateRandomComplexCoeffGeneratorHelper(1,0);
+    
+    /*
+    ring  r3 = (real,i),(x,y),dp;
+    minpoly = par(1)^2+1;
+    testCreateRandomComplexCoeffGeneratorHelper(14,1);
+
+    ring  r4 = (real,i,50),(x,y),dp;
+    minpoly =  par(1)^2+1;
+    testCreateRandomComplexCoeffGeneratorHelper(1,0);
+      should fail
+      ring  r4 = (integer,50),(x,y),dp;
+      testCreateRandomComplexCoeffGeneratorHelper(1,0);
+    */
+}
+
+/**
+
+
+//   LIB("randomIdeal.lib");
+
+ring rng = complex,(x,y),dp;
+
+proc cCoeff = createRandomComplexCoeffGenerator(1,0);
+cCoeff();
+
+*/
+
+proc createRandomZCoeffGenerator(pAbsMaxCoeff, bExcludeZero)
+"USAGE:   createRandomZCoeffGenerator( absMaxCoeff, bExcludeZero);
+@*        absMaxCoeff: int
+RETURN:   a random integer coefficient 'generator' with coefficients in {-absMaxCoeff, absMaxCoeff}
+EXAMPLE:  example createRandomZCoeffGenerator; shows an example
+"
+{
+     if (bExcludeZero)  
+     {
+         ASSUME(0, pAbsMaxCoeff>0); 
+     }
+     string cmd= "proc rCoeff(    )
+     {
+        ASSUME(0, not (1==char(basering)) );
+        ASSUME(0, not coeffRingIsTrivial() );
+        ASSUME(0, 0== coeffRingIsTrivial() );
+        if ( baseringHasMinpoly() )   {     ASSUME(0, minpolyProbablyConsistant() ); }   
+        int maxTrials = 1000;
+        int trialCount=0;
+        number c = random( -" + string(pAbsMaxCoeff) + "," + string(pAbsMaxCoeff) + " ); 
+        if (" + string(bExcludeZero) + ")  
+        {
+            while (c==0 && trialCount< maxTrials )  
+            {
+                  c = random( -" + string(pAbsMaxCoeff) + "," + string(pAbsMaxCoeff) + " ); 
+                  trialCount= trialCount+1;
+            } 
+            if (c==0)  {   ERROR(\"failed to get nonzero element as requested by 'bExcludeZero' setting \");  }
+        }
+        return(c);
+     }";
+
+    execute(cmd);
+    return (rCoeff);
+}
+example
+{
+   echo = 2;
+   system("random",6832989);
+   ring r1 = (integer),x,dp;  short = 0;
+   //create a 'random' integer coefficient generator. 
+   int pAbsMaxCoeff = 100;
+   int bExcludeZero = 0;
+   proc coeffZ = createRandomZCoeffGenerator(pAbsMaxCoeff, bExcludeZero);
+   coeffZ();
+   coeffZ();
+   // works without modifications for different 'compatible' coefficient fields
+   ring r2 = (7),x,dp;        short = 0;
+   coeffZ();
+   coeffZ();
+}
+
+
+/*  manual memleak test input
+LIB("randomIdeal.lib");    
+ring rng = 0,x,dp;    
+int absMaxCoeff = 10;    
+int bExcludeZero=0;    
+int bFractionsOn = 0; 
+number foo;  
+proc coeffG = createRandomZCoeffGenerator( absMaxCoeff, bExcludeZero ); 
+while(1) { foo=coeffG(); }
+*/
+
+proc randomZCoeffGeneratorFactory(def params, def factory)
+"USAGE:   randomZCoeffGeneratorFactory(options,   factoryTable);
+@*   options       : a type compatible to TIdealGeneratingParameters, containing construction parameters
+@*   factoryTable : a lookup table of type compatible to TRandomFactories, 
+                    containing methods for construction used random generator functions, e.g for coefficients.
+@
+RETURN:   a random integer coefficient generator  (excluding parameters)
+EXAMPLE:  example randomZCoeffGeneratorFactory; shows an example
+"
+{
+    return( createRandomZCoeffGenerator( params.absMaxCoeff, params.bExcludeZeroCoeff) );
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    def defaultFactoryTable = defaultRandomFactories();
+    defaultFactoryTable;
+
+    def constructionParams = defaultRandomConstructionParams();
+    constructionParams;
+
+    constructionParams.absMaxCoeff = 121;
+
+    // construct an integer coefficient generator 
+    proc integerCoeffG = randomZCoeffGeneratorFactory( constructionParams, defaultFactoryTable );
+    ring rng = (integer),(x,y),dp;
+    integerCoeffG();
+    ring rng = (7),(x,y),dp;
+    integerCoeffG();
+}
+
+static proc testCreateRandomZCoeffGeneratorHelper(absMaxCoeff, bExcludeZero)
+{
+   //ASSUME(0, not hasProbablyMemleak_check("createRandomZCoeffGenerator(10,1)"));
+   proc cCoeff = createRandomZCoeffGenerator(absMaxCoeff,bExcludeZero);
+   int i;
+   number m;
+
+   if (bExcludeZero &&  RandomIdeal::testMemoryLeaks)
+   {
+       bigint newMemoryLine, memoryLine;
+       m = cCoeff(); 
+       memoryLine = memory(0);
+       m = cCoeff(); 
+       newMemoryLine = memory(0);
+       ASSUME(0, memoryLine>=newMemoryLine);
+   }
+
+   for (i=1;i<100;i++)
+   {
+      m = cCoeff();
+
+      if (char(basering)==0)
+      {
+         ASSUME(0, absMaxCoeff >= absValue(m) );
+      }
+      if (bExcludeZero) 
+      {
+          ASSUME(0, not (m==number(0) ) );
+      }
+
+   }
+}
+
+static proc testCreateRandomZCoeffGenerator()
+{
+    system("random",42424242);
+
+    // LIB("randomIdeal.lib");
+    ring     r1 = integer,(x,y),dp;
+    testCreateRandomZCoeffGeneratorHelper(1000,1);
+    
+    ring     r2 = (integer,5),(x,y),dp;
+    testCreateRandomZCoeffGeneratorHelper(10,0);
+
+    ring     r3 = (integer,5,3),(x,y),dp;
+    testCreateRandomZCoeffGeneratorHelper(10,1);
+
+    ring     r4 = (49,a),(x,y),dp;
+    testCreateRandomZCoeffGeneratorHelper(10,0);
+
+    ring     r5 = (7),(x,y),dp;
+    testCreateRandomZCoeffGeneratorHelper(10,0);
+    
+    ring  r6 = (real),(x,y),dp;
+    testCreateRandomZCoeffGeneratorHelper(14,1);
+
+    ring  r7 = (real,i),(x,y),dp;
+    testCreateRandomZCoeffGeneratorHelper(140,1); 
+
+  /* should fail: 
+   proc  cCoeff = createRandomZCoeffGenerator(140,1); 
+   cCoeff(); 
+
+   ring r2 = (0,a),x,dp;
+   minpoly=1;
+   cCoeff(); 
+
+   ring r3 = (1,a),x,dp;
+   cCoeff(); 
+
+   ring r4 = (1,a),x,dp; 
+   minpoly=a^2-1;
+   cCoeff();  
+
+   ring r6 = (1,a),x,dp; 
+   minpoly=a;
+   cCoeff(); 
+
+   ring r7 = (2,a),x,dp; 
+   minpoly=a;
+   cCoeff();  
+
+   ring r7b = (2,a),x,dp; 
+   minpoly=1;
+   cCoeff();  
+
+
+   */
+
+}
+
+
+
+proc createRandomQCoeffGenerator(pAbsMaxCoeff, bExcludeZero, bFractionsOn)
+"USAGE:   createRandomQCoeffGenerator( pAbsMaxCoeff, bExcludeZero, bFractionsOn);
+@*        absMaxCoeff: int
+RETURN:   a 'random' rational coefficient 'generator' with coefficients in {-absMaxCoeff, absMaxCoeff}
+EXAMPLE:  example createRandomQCoeffGenerator; shows an example
+"
+{
+
+     if (bExcludeZero)  
+     {
+         ASSUME(0, pAbsMaxCoeff>0); 
+     }
+     string cmd = "proc rCoeff(    )
+     {
+        ASSUME(0, defined(basering) );
+        ASSUME(0, not (1==char(basering)) );
+        ASSUME(0, not coeffRingIsTrivial() );
+        int pAbsMaxCoeff=" + string(pAbsMaxCoeff) + ";
+        int  bFractionsOn = " + string(bFractionsOn) + ";
+        if (char(basering)>0) 
+        {
+            pAbsMaxCoeff = min(char(basering)-1, pAbsMaxCoeff);
+            if (not hasFieldCoefficient(basering) )
+            {
+                   ASSUME(0, not bFractionsOn );   
+            }
+        }
+        if ( baseringHasMinpoly() )   {     ASSUME(0, minpolyProbablyConsistant() ); }   
+        int maxTrials = 1000;
+        int trialCount=0;
+        number c = random( -" + string(pAbsMaxCoeff) + "," + string(pAbsMaxCoeff) + " ); 
+        if (" + string(bExcludeZero) + ")  
+        {
+            while (c==0 && trialCount< maxTrials )  
+            {
+                  c = random( -" + string(pAbsMaxCoeff) + "," + string(pAbsMaxCoeff) + " ); 
+                  trialCount= trialCount+1;
+            } 
+            if (c==0)  {   ERROR(\"failed to get nonzero element as requested by 'bExcludeZero' setting \");  }
+        }
+        if ( hasFieldCoefficient(basering) )
+        {
+            number d = random( 1, pAbsMaxCoeff );  
+            if (" + string(bFractionsOn) + ") {        c = c/d; }
+            kill d; 
+        }
+        kill pAbsMaxCoeff,bFractionsOn;
+        return(c);
+     }";
+
+    execute(cmd);
+    return (rCoeff);
+}
+example
+{
+   echo = 2;
+   system("random",6832989);
+   ring r1 = (0),x,dp;         short = 0;
+   //create a 'random' rational coefficient generator. 
+   int pAbsMaxCoeff = 100;
+   int bExcludeZero = 0;
+   int bFractionsOn = 1;
+   proc coeffQ = createRandomQCoeffGenerator(pAbsMaxCoeff, bExcludeZero,bFractionsOn);
+   coeffQ();
+   coeffQ();
+   // works without modifications for different 'compatible' coefficient fields
+   ring r2 = (7),x,dp;         short = 0;
+   coeffQ();
+   coeffQ();
+   ring r3 = (complex),x,dp;   short = 0;
+   coeffQ();
+   coeffQ();
+}
+
+/*  manual memleak test:
+ LIB("randomIdeal.lib");     
+ ring rng = 0,x,dp;    
+ int absMaxCoeff = 10;    
+ int bExcludeZero=0;    
+ int bFractionsOn = 0;    
+ proc coeffG = createRandomQCoeffGenerator( absMaxCoeff, bExcludeZero,bFractionsOn );
+ while(1) {coeffG();}
+*/
+
+
+proc randomQCoeffGeneratorFactory(def params, def factory)
+"USAGE:   pureRandomCoeffGeneratorFactory(options,   factoryTable);
+@*   options       : a type compatible to TIdealGeneratingParameters, containing construction parameters
+@*   factoryTable : a lookup table of type compatible to TRandomFactories, 
+                    containing methods for construction used random generator functions, e.g for coefficients.
+@
+RETURN:   a random rational coefficient generator  (excluding parameters)
+EXAMPLE:  example randomQCoeffGeneratorFactory; shows an example
+"
+{
+    return( createRandomQCoeffGenerator( params.absMaxCoeff, params.bExcludeZeroCoeff, params.bFactionsOn) );
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    def defaultFactoryTable = defaultRandomFactories();
+    defaultFactoryTable;
+    def constructionParams = defaultRandomConstructionParams();
+    constructionParams;
+
+    constructionParams.absMaxCoeff = 11;
+
+    constructionParams.bFractionsOn = 1;
+
+    // construct a  rational coefficient generator
+    proc rationalCoeffG = randomQCoeffGeneratorFactory( constructionParams, defaultFactoryTable );
+    ring rng = (0,a,b,c),(x,y),dp;
+    rationalCoeffG();
+    ring rng = (complex),(x,y),dp;
+    rationalCoeffG();
+}
+
+static proc testCreateRandomQCoeffGeneratorHelper(absMaxCoeff, bExcludeZero,bFractionsOn)
+{
+   // int absMaxCoeff,bExcludeZero,bFractionsOn;absMaxCoeff=7;bExcludeZero=0;bFractionsOn=0;
+   proc cCoeff = createRandomQCoeffGenerator(absMaxCoeff,bExcludeZero,bFractionsOn);
+   //ASSUME(0, not hasProbablyMemleak_check("createRandomQCoeffGenerator(10,1,1)"));
+   int i;
+   number m;
+
+   if (bExcludeZero &&  RandomIdeal::testMemoryLeaks)
+   {
+       bigint newMemoryLine, memoryLine;
+       m = cCoeff(); 
+       memoryLine = memory(0);
+       m = cCoeff(); 
+       newMemoryLine = memory(0);
+       ASSUME(0, memoryLine>=newMemoryLine);
+   }
+
+   for (i=1;i<100;i++)
+   {
+      m = cCoeff();
+
+      if (char(basering)==0)
+      {
+         ASSUME(0, absMaxCoeff >= absValue(m) );
+      }
+      if (bExcludeZero) 
+      {
+          ASSUME(0, not ( m==number(0) ) );
+      }
+
+   }
+}
+
+static proc testCreateRandomQCoeffGenerator()
+{
+    system("random",23232323);
+
+    // LIB("randomIdeal.lib");
+    ring     r1 = integer,(x,y),dp;
+    testCreateRandomQCoeffGeneratorHelper(1000,1,1);
+    
+    ring     r2 = (integer,5),(x,y),dp;
+    testCreateRandomQCoeffGeneratorHelper(10,0,0);
+
+    ring     r3 = (integer,5,3),(x,y),dp;
+    testCreateRandomQCoeffGeneratorHelper(10,1,0);
+
+    ring     r4 = (49,a),(x,y),dp;
+    testCreateRandomQCoeffGeneratorHelper(10,0,0);
+
+    ring     r5 = (7),(x,y),dp;
+    testCreateRandomQCoeffGeneratorHelper(10,0,1);
+    
+    ring  r6 = (real),(x,y),dp;
+    testCreateRandomQCoeffGeneratorHelper(14,1,1);
+
+    ring  r7 = (real,i),(x,y),dp;
+    testCreateRandomQCoeffGeneratorHelper(140,1,1); 
+
+  /* should fail: 
+   proc  cCoeff = createRandomQCoeffGenerator(140,10,1); 
+   cCoeff(); 
+
+   ring r2 = (0,a),x,dp;
+   minpoly=1;
+   cCoeff(); 
+
+   ring r3 = (1,a),x,dp;
+   cCoeff(); 
+
+   ring r4 = (1,a),x,dp; 
+   minpoly=a^2-1;
+   cCoeff();  
+
+   ring r6 = (1,a),x,dp; 
+   minpoly=a;
+   cCoeff(); 
+
+   ring r7 = (2,a),x,dp; 
+   minpoly=a;
+   cCoeff();  
+
+   ring r7b = (2,a),x,dp; 
+   minpoly=1;
+   cCoeff();  
+
+
+   */
+
+}
+
+
+
+proc createPureRandomCoeffGenerator(pAbsMaxCoeff, bExcludeZero, bFractionsOn)
+"USAGE:   createPureRandomCoeffGenerator( absMaxCoeff, bExcludeZero,bFractionsOn);
+@*        absMaxCoeff: int
+RETURN:   a random coefficient 'generator' with coefficients in {-absMaxCoeff, absMaxCoeff}
+NOTE:     the resulting generator switches between generators created by 
+          createRandomComplexCoeffGenerator,createRandomQCoeffGenerator and createRandomZCoeffGenerator,
+          depending on currently active ring.
+EXAMPLE:  example createPureRandomCoeffGenerator; shows an example
+"
+{
+     // int pAbsMaxCoeff, bExcludeZero, bFractionsOn; pAbsMaxCoeff=10; bExcludeZero=1; bFractionsOn=0;
+     string randomComplexCoeffGeneratorName = getRandomName();  
+     //dbprint(1, "randomComplexCoeffGeneratorName",randomComplexCoeffGeneratorName);
+     string cmd = "def RandomIdeal::"+randomComplexCoeffGeneratorName+";";
+     execute(cmd);
+     cmd = "RandomIdeal::"+randomComplexCoeffGeneratorName+" = createRandomComplexCoeffGenerator(pAbsMaxCoeff, bExcludeZero  );";
+     execute(cmd);
+     //dbprint(1, "preExport");
+     execute("export(RandomIdeal::"+randomComplexCoeffGeneratorName+");");
+     //execute("dbprint(1, \"randomComplexCoeffGeneratorName\",  RandomIdeal::"+randomComplexCoeffGeneratorName+");");
+
+     string RandomQCoeffGeneratorName = getRandomName();
+     cmd = "def RandomIdeal::"+RandomQCoeffGeneratorName+";";
+     execute(cmd);
+     cmd = "RandomIdeal::"+RandomQCoeffGeneratorName+" = createRandomQCoeffGenerator(pAbsMaxCoeff, bExcludeZero ,bFractionsOn);";
+     execute(cmd);
+     execute("export(RandomIdeal::"+RandomQCoeffGeneratorName+");");
+
+
+     string RandomZCoeffGeneratorName = getRandomName();  
+     cmd = "def RandomIdeal::"+RandomZCoeffGeneratorName+";";
+     execute(cmd);
+     cmd = "RandomIdeal::"+RandomZCoeffGeneratorName+" = createRandomZCoeffGenerator(pAbsMaxCoeff, bExcludeZero );";
+     execute(cmd);
+     execute("export(RandomIdeal::"+RandomZCoeffGeneratorName+");");
+
+     string RandomExCoeffGeneratorName = getRandomName();
+     cmd = "def RandomIdeal::"+RandomExCoeffGeneratorName+";";
+     execute(cmd);
+     cmd = "RandomIdeal::"+RandomExCoeffGeneratorName+" = createRandomExCoeffGenerator(  );";
+     execute(cmd);
+     execute("export(RandomIdeal::"+RandomExCoeffGeneratorName+");");
+
+     cmd = "proc rCoeff(    )
+     {
+        ASSUME(0, defined(basering) );
+        proc rCoefGen;
+        if (char(basering)==0)
+        {
+            if ( baseringHasComplexCoeffRing() )
+            {
+                  rCoefGen = RandomIdeal::" + randomComplexCoeffGeneratorName + ";
+            }
+            else 
+            {
+                if ( hasFieldCoefficient(basering) )
+                {
+                    rCoefGen =  RandomIdeal::" + RandomQCoeffGeneratorName + ";
+                }
+                else
+                {
+                    rCoefGen = RandomIdeal::" + RandomZCoeffGeneratorName + ";
+                }
+           }
+        }
+        else
+        {
+            rCoefGen = RandomIdeal::" + RandomZCoeffGeneratorName + ";
+        }
+        if ( baseringHasMinpoly() )
+        {
+           proc rExCoefGen = RandomIdeal::" + RandomExCoeffGeneratorName + ";
+           if (char(basering)>0)
+           {
+              return( rExCoefGen() );
+           }
+           return( rCoefGen()*rExCoefGen() );
+        }
+        return( rCoefGen() );
+     }";
+     execute(cmd);
+     return (rCoeff);
+}
+example
+{
+   echo = 2;
+   system("random",6832989);
+   ring r1 = (0),x,dp;        short = 0;
+   //create a 'random' coefficient generator. 
+   int pAbsMaxCoeff = 100;
+   int bExcludeZero = 0;
+   int bFractionsOn = 1;
+   proc coeffG = createPureRandomCoeffGenerator(pAbsMaxCoeff, bExcludeZero,bFractionsOn);
+   coeffG();
+   coeffG();
+   ring r2 = (7),x,dp;        short = 0;
+   coeffG();
+   coeffG();
+   ring r3 = (complex),x,dp;  short = 0;
+   coeffG();
+   coeffG();
+}
+
+
+proc pureRandomCoeffGeneratorFactory( def params, def factoryTable )
+"USAGE:   pureRandomCoeffGeneratorFactory(options,   factoryTable);
+@*   options       : a type compatible to TIdealGeneratingParameters, containing construction parameters
+@*   factoryTable : a lookup table of type compatible to TRandomFactories, 
+                    containing methods for construction used random generator functions, e.g for coefficients.
+@
+RETURN:   a random coefficient generator  (excluding parameters)
+EXAMPLE:  example pureRandomCoeffGeneratorFactory; shows an example
+"
+{
+    return ( createPureRandomCoeffGenerator(params.absMaxCoeff, params.bExcludeZeroCoeff, params.bFractionsOn));
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    def defaultFactoryTable = defaultRandomFactories();
+    defaultFactoryTable;
+    ring rng = (0,a,b,c),(x,y),dp;
+    def constructionParams = defaultRandomConstructionParams();
+    constructionParams;
+
+    constructionParams.absMaxCoeff = 50;
+
+    constructionParams.bFractionsOn = 1;
+
+    // construct a  coefficient generator (including parameter variables) 
+    proc pureCoeffG = pureRandomCoeffGeneratorFactory( constructionParams, defaultFactoryTable );
+    pureCoeffG();
+}
+
+
+proc createPureRandomCoeffMatrixGenerator(rows,cols, pAbsMaxCoeff)
+"USAGE:    createRandomCoeffMatrixGenerator(cols,rows, absMaxCoeff);
+@*        rows: int, matrix rows
+@*        cols: int, matrix cols
+@*        absMaxCoeff: int
+RETURN:   a random matrix 'generator' with entries in {-absMaxCoeff, absMaxCoeff}
+EXAMPLE:  example createPureRandomCoeffMatrixGenerator; shows an example
+"
+{
+     ASSUME(0, cols>0);
+     ASSUME(0, rows>0);
+     string cmd = "proc rCoeffMat(    )
+     {
+        ASSUME(0, defined(basering) );
+        intmat mat = sparsemat("+string(rows)+","+string(cols)+",random(0,100),"+string(pAbsMaxCoeff)+");
+        return(mat);
+     }";
+
+    execute(cmd);
+    return (rCoeffMat);
+}
+example
+{
+   echo = 2;
+    system("random",123123);
+    int rows = 10;
+    int cols = 21;
+    int pAbsMaxCoeff = 5;
+    proc coeffMatrixG = createPureRandomCoeffMatrixGenerator(rows,cols,pAbsMaxCoeff);
+    coeffMatrixG();
+    coeffMatrixG();
+}
+ 
+
+// not safe against new ring types
+// should check for integers, for rationals and for real numbers instead.
+// returns 1 if coefficient ring elements are certainly ordered. 0 if unknown or if not.
+proc hasCertainlyCoeffOrdering()
+"USAGE:    hasCertainlyCoeffOrdering();
+RETURN:    1, if there is certainly an ordering for the coefficient elements; 
+           returns 0 if the question cannot answered by the routine or there is no ordering for the coefficients.
+EXAMPLE:  example hasCertainlyCoeffOrdering; shows an example
+"
+{
+  if ( 0 != char(basering) )
+  {
+     return (0);
+  }
+
+  if ( baseringHasComplexCoeffRing() )
+  {
+     return (0); 
+  }
+  if ( baseringHasMinpoly() )
+  {
+     return (0); 
+  }
+
+  if ( npars(basering)>0 )
+  {
+     return (0); 
+  }
+  return(1);
+}
+example
+{
+   echo = 2;
+   ring r1 = 7,x,dp;
+   hasCertainlyCoeffOrdering(); // 0
+   ring r2 = integer,x,dp;
+   hasCertainlyCoeffOrdering(); // 1
+}
+
+
+
+static proc testHasCertainlyCoeffOrdering()
+{
+   ring r1 = complex,x,dp;
+   ASSUME(0, not hasCertainlyCoeffOrdering() );
+
+   ring r2 = (0,a),x,dp;
+   ASSUME(0, not hasCertainlyCoeffOrdering() );
+
+   ring r3 = 7,x,dp;
+   ASSUME(0, not hasCertainlyCoeffOrdering() );
+
+   ring r4 = (7,a),x,dp;
+   ASSUME(0, not hasCertainlyCoeffOrdering() );
+
+
+   ring r5 = (49,a),x,dp;
+   ASSUME(0, not hasCertainlyCoeffOrdering() );
+
+   ring r6 = integer,x,dp;
+   ASSUME(0, hasCertainlyCoeffOrdering() );
+
+   ring r7 = 0,x,dp;
+   ASSUME(0, hasCertainlyCoeffOrdering() );
+
+   ring r8 = 0,x,dp;
+   ASSUME(0, hasCertainlyCoeffOrdering() );
+
+}
+
+
+static proc testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn )
+{
+    number coeff ;
+    proc coeffG = createPureRandomCoeffGenerator( absMaxCoeff, bExcludeZero,bFractionsOn );
+    
+    if (bExcludeZero &&  RandomIdeal::testMemoryLeaks)
+    {
+        bigint newMemoryLine, memoryLine;
+        coeff = coeffG(); 
+        memoryLine = memory(0);
+        coeff = coeffG(); 
+        newMemoryLine = memory(0);
+        ASSUME(0, memoryLine>=newMemoryLine);
+    }
+
+    int i;
+    intmat m [1][2*absMaxCoeff+1];
+
+    system("random",777777777);
+    if ( hasCertainlyCoeffOrdering() )
+    {
+        //for ( i=1; i<2000; i++ )
+        for ( i=1; i<200; i++ )
+        {
+            coeff =  coeffG();
+            ASSUME(0, coeff <=absMaxCoeff and coeff >=- absMaxCoeff );
+            m[1,int(coeff)+absMaxCoeff+1]=int(1);
+        }
+        for ( i=1; i<=2*absMaxCoeff+1; i++ )
+        {
+            ASSUME(0,  m[1,int(coeff)+absMaxCoeff+1] == int(1) );
+        }
+        
+    }
+    kill coeff,m,coeffG;
+}
+
+
+static proc testPureRandomCoeffGenerator(  )
+{
+    // LIB("randomIdeal.lib");
+    ring rng = 0,x,dp;
+    int absMaxCoeff = 10;
+    int bExcludeZero = 0;
+    int bFractionsOn = 1;
+
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn );
+
+    ring rng1 = (0,a),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn );
+
+
+
+    ring rng2 = (real),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn );
+
+    ring rng3 = (complex),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn );
+
+    ring rng4 = (7),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn );
+
+    ring rng5 = (49,a),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn );
+
+
+    bFractionsOn = 0;
+    ring rng6 = (integer),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn );
+
+    ring rng7 = (integer,2,3),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn );
+
+}
+
+
+proc createRandomParameterCoeffGenerator(pMinParamFactorsPerCoeff,  pMaxParamFactorsPerCoeff )
+"USAGE:    createRandomParameterCoeffGenerator( pMinParamFactorsPerCoeff, pMaxParamFactorsPerCoeff );
+@*        pMinParamFactorsPerCoeff: int (expected >=0)
+@*        pMaxParamFactorsPerCoeff: int (expected >=0)
+RETURN:   a random monomial generator, with monomials not exceeding pMaxParamFactorsPerCoeff
+EXAMPLE:  example createRandomParameterCoeffGenerator; shows an example
+"
+{
+     ASSUME(0, pMaxParamFactorsPerCoeff>=0 );
+     ASSUME(0, pMinParamFactorsPerCoeff>=0 );
+     ASSUME(0, pMinParamFactorsPerCoeff <=pMaxParamFactorsPerCoeff);
+     string cmd = "proc rParMon(    )
+     {
+        ASSUME(0, defined(basering) );
+        if (" + string(pMaxParamFactorsPerCoeff) + "==-1) {return(number(0)); }
+        number tmpParMonomial = 1; 
+        if ( not hasOrdinaryParameters() ) {        return(tmpParMonomial);  }
+
+        int paramFactorsPerCoeff = random( "+ string(pMinParamFactorsPerCoeff) +", " + string(pMaxParamFactorsPerCoeff) + ") ;
+
+        int factorNr;
+        for ( factorNr = 1; factorNr <= paramFactorsPerCoeff ; factorNr++)
+        {
+             tmpParMonomial = tmpParMonomial* randomParameter() ;
+        }
+        return(tmpParMonomial);
+    }";
+
+    execute(cmd);
+    return (rParMon);
+}
+example
+{
+   echo = 2;
+   system("random",6832989);
+   ring r1 = (0,a,b,c),x,dp; 
+   short = 0;
+   //create a 'random' parameter coefficient generator. 
+   int minParamFactorsPerCoeff = 2;
+   int maxParamFactorsPerCoeff = 3;
+   proc paramG = createRandomParameterCoeffGenerator(minParamFactorsPerCoeff, maxParamFactorsPerCoeff);
+   paramG();
+   paramG();
+   ring r2 = (7,d,e,f),x,dp; 
+   short = 0;
+   paramG();
+   paramG();
+}
+
+proc randomParameterCoeffGeneratorFactory( def params, def factoryTable )
+"USAGE:   randomParameterCoeffGeneratorFactory(options,   factoryTable);
+@*   options       : a type compatible to TIdealGeneratingParameters, containing construction parameters
+@*   factoryTable : a lookup table of type compatible to TRandomFactories, 
+                    containing methods for construction used random generator functions, e.g for coefficients.
+@
+RETURN:   a random parameter coefficient generator  
+EXAMPLE:  example randomParameterCoeffGeneratorFactory; shows an example
+"
+{
+    return ( createRandomParameterCoeffGenerator( params.minParamFactorsPerCoeff, params.maxParamFactorsPerCoeff) );
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    def defaultFactoryTable = defaultRandomFactories();
+    defaultFactoryTable;
+    ring rng = (0,a,b,c),(x,y),dp;
+    def constructionParams = defaultRandomConstructionParams();
+    constructionParams;
+
+    constructionParams.minParamFactorsPerCoeff = 2;
+    constructionParams.maxParamFactorsPerCoeff = 2;
+
+    // construct a  parameter coefficient generator 
+    proc paramCoeffG = randomParameterCoeffGeneratorFactory( constructionParams, defaultFactoryTable );
+    paramCoeffG();
+}
+
+
+
+proc createFullRandomCoeffGenerator( pureCoefG, parCoefG )
+"USAGE:   createFullRandomCoeffGenerator(  pureCoefG, parCoefG );
+@*        absMaxCoeff: int
+RETURN:   a random coefficient 'generator' composed by pureCoefG()*parCoefG()
+EXAMPLE:  example createFullRandomCoeffGenerator; shows an example
+"
+{
+     string randomPureCoeffGenName = getRandomNameWithPrefix("coeffGen");
+     string randomParamCoeffGenName = getRandomNameWithPrefix("paramGen");
+
+     string cmd = "    
+     proc "+randomPureCoeffGenName+"=pureCoefG;   
+     export("+randomPureCoeffGenName+");
+     proc "+randomParamCoeffGenName+"=parCoefG;
+     export("+randomParamCoeffGenName+");
+     proc randomTerm(    )
+     {
+        ASSUME(0, defined(basering) );
+        number fullCoeff = RandomIdeal::"+randomPureCoeffGenName+"(  )* RandomIdeal::"+randomParamCoeffGenName+"(  );
+        return(fullCoeff);
+    }";
+
+    execute(cmd);
+    return (randomTerm);
+}
+example
+{
+   echo = 2;
+   system("random",6832989);
+   //create a 'random' coefficient generator. 
+   int pAbsMaxCoeff = 100;
+   int bExcludeZero = 0;
+   int bFractionsOn = 1;
+   int minParamFactorsPerCoeff = 2;
+   int maxParamFactorsPerCoeff = 3;
+   proc pureCoeffG = createPureRandomCoeffGenerator(pAbsMaxCoeff, bExcludeZero,bFractionsOn);
+   proc paramG = createRandomParameterCoeffGenerator(minParamFactorsPerCoeff, maxParamFactorsPerCoeff);
+   proc fullCoeffG = createFullRandomCoeffGenerator(pureCoeffG, paramG);
+   ring r1 = (0,d,e,f),x,dp;     short = 0;
+   fullCoeffG();
+   fullCoeffG();
+}
+
+
+proc randomCoeffGeneratorFactory( def params, def factoryTable )
+"USAGE:   randomCoeffGeneratorFactory(options,   factoryTable);
+@*   options       : a type compatible to TIdealGeneratingParameters, containing construction parameters
+@*   factoryTable : a lookup table of type compatible to TRandomFactories, 
+                    containing methods for construction used random generator functions, e.g for coefficients.
+@
+RETURN:   a random coefficient generator (including parameter variables)
+EXAMPLE:  example randomCoeffGeneratorFactory; shows an example
+"
+{
+    proc pureCoefG  = randomParameterCoeffGeneratorFactory(params,factoryTable); // should use default table here?
+    proc paramCoefG = pureRandomCoeffGeneratorFactory(params,factoryTable);
+    return ( createFullRandomCoeffGenerator(pureCoefG, paramCoefG) ); //but what is with this one? S
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    def defaultFactoryTable = defaultRandomFactories();
+    defaultFactoryTable;
+    ring rng = 0,(x,y),dp;
+    def constructionParams = defaultRandomConstructionParams();
+    constructionParams;
+
+    constructionParams.absMaxCoeff = 50;
+
+    constructionParams.bFractionsOn = 0;
+
+    // construct a  coefficient generator (including parameter variables)  
+    proc fullCoeffG = randomCoeffGeneratorFactory( constructionParams, defaultFactoryTable );
+    fullCoeffG();
+}
+
+
+static proc testFullRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn, minParamFactors,maxParamFactors )
+{
+    number coeff ;
+    proc pureCoeffG = createPureRandomCoeffGenerator( absMaxCoeff, bExcludeZero,bFractionsOn );
+    proc paramG = createRandomParameterCoeffGenerator(  minParamFactors,maxParamFactors );
+
+    proc coeffG = createFullRandomCoeffGenerator(pureCoeffG, paramG );
+    
+    if (bExcludeZero &&  RandomIdeal::testMemoryLeaks)
+    {
+        bigint newMemoryLine, memoryLine;
+        coeff = coeffG(); 
+        memoryLine = memory(0);
+        coeff = coeffG(); 
+        newMemoryLine = memory(0);
+        ASSUME(0, memoryLine>=newMemoryLine);
+    }
+
+    int i;
+    intmat m [1][2*absMaxCoeff+1];
+
+
+    if ( hasCertainlyCoeffOrdering() )
+    {
+        //for ( i=1; i<2000; i++ )
+        for ( i=1; i<200; i++ )
+        {
+            coeff =  coeffG();
+            ASSUME(0, coeff <=absMaxCoeff and coeff >=- absMaxCoeff );
+            m[1,int(coeff)+absMaxCoeff+1]=int(1);
+        }
+        for ( i=1; i<=2*absMaxCoeff+1; i++ )
+        {
+            ASSUME(0,  m[1,int(coeff)+absMaxCoeff+1] == int(1) );
+        }
+        
+    }
+    kill coeff,m,coeffG;
+}
+
+static proc testFullRandomCoeffGenerator(  )
+{
+    // LIB("randomIdeal.lib");
+    ring rng = 0,x,dp;
+    int absMaxCoeff = 10;
+    int bExcludeZero = 0;
+    int bFractionsOn = 1;
+    int minParamFactors = 0;
+    int maxParamFactors = 3;
+    system("random",42422323);
+
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn , minParamFactors, maxParamFactors);
+
+    ring rng1 = (0,a),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn , minParamFactors, maxParamFactors);
+
+    ring rng2 = (real),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn , minParamFactors, maxParamFactors);
+
+    ring rng3 = (complex),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn, minParamFactors, maxParamFactors );
+
+    ring rng4 = (7),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn, minParamFactors, maxParamFactors );
+
+    ring rng5 = (49,a),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn, minParamFactors, maxParamFactors );
+
+
+    bFractionsOn = 0;
+    ring rng6 = (integer),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn , minParamFactors, maxParamFactors);
+
+    ring rng7 = (integer,2,3),x,dp;
+    testPureRandomCoeffGeneratorHelper( absMaxCoeff, bExcludeZero,bFractionsOn , minParamFactors, maxParamFactors);
+
+}
+
+
+proc hasWeightedVariables()
+"USAGE:    hasWeightedVariables(  );
+RETURN:   1 if the current basering has weighted variables, returns 0 otherwise
+EXAMPLE:  example hasWeightedVariables; shows an example
+"
+{
+   ASSUME(0, defined(basering) ) ;
+   list rl = ringlist(basering);
+
+   list ordlist = rl[3];  
+   int i;
+   for (i=1;i<=size(ordlist);i++)
+   {
+      if ( ordlist[i][1]=="wp" || ordlist[i][1]=="Wp")
+      {
+          if ( ordlist[i][2] != int(1) )
+          { 
+              return(1);
+          }
+      }
+   }
+   return(0);
+}
+example
+{
+   echo = 2;
+     ring r1 = 0,x,wp(2);
+     hasWeightedVariables(); // = 1
+
+     ring r2 = 0,(x,y), dp ;
+     hasWeightedVariables();// = 0
+
+     ring r3 = 0,(x,y), (dp, wp(1)) ;
+     hasWeightedVariables(); // = 0  (weight is 1)
+}
+
+
+static proc testHasWeightedVariables()
+{
+    ring r1 = 0,(x,y), (dp, wp(1)) ;
+    ASSUME(0, not hasWeightedVariables() );
+
+    ring r2 = 0,x,wp(2);
+    ASSUME(0, hasWeightedVariables() );
+
+    ring r3 = 0,x,Wp(3);
+    ASSUME(0, hasWeightedVariables() );
+
+    ring r4 = 0,(x,y,z),(Wp(3),dp(2));
+    ASSUME(0, hasWeightedVariables() );
+
+    ring r5 = 0,(x,y,z),(dp(2), Wp(3) );
+    ASSUME(0, hasWeightedVariables() );
+
+    ring r6 = 0,(x,y,z),(dp(2), Wp(1) );
+    ASSUME(0, not hasWeightedVariables() );
+
+    
+}
+
+// issue: will have problems for weighted degree orderings.
+// note: if the ring has not weighted variables , pMinNumVariableFactors corresponds to minVarFactorsPerMonomial and pMaxNumVariableFactors to maxVarFactorsPerMonomial
+proc createRandomMonomialGenerator(pMinNumVariableFactors,  pMaxNumVariableFactors )
+"USAGE:    createRandomMonomialGenerator( pMinNumVariableFactors, pMaxNumVariableFactors );
+@*        pMinNumVariableFactors: int (expected >=0)
+@*        pMaxNumVariableFactors: int (expected >=0)
+RETURN:   a random monomial generator, with monomials not exceeding pMaxNumVariableFactors
+EXAMPLE:  example createRandomMonomialGenerator; shows an example
+"
+{
+     ASSUME(0, pMaxNumVariableFactors>=0 );
+     ASSUME(0, pMinNumVariableFactors>=0 );
+     ASSUME(0, pMinNumVariableFactors <=pMaxNumVariableFactors);
+
+
+     string cmd = "proc rMon(    )
+     {
+        ASSUME(0, defined(basering) );
+        if (" + string(pMaxNumVariableFactors) + "==-1) {return(poly(0)); }
+        poly tmpMonomial = 1; 
+
+        int numVariableFactors = random( "+ string(pMinNumVariableFactors) +", " + string(pMaxNumVariableFactors) + ") ;
+
+        int factorNr;
+        for ( factorNr = 1; factorNr <= numVariableFactors ; factorNr++)
+        {
+             tmpMonomial = tmpMonomial* randomVariable() ;
+        }
+        return(tmpMonomial);
+    }";
+
+    execute(cmd);
+    return (rMon);
+}
+example
+{
+   echo = 2;
+   system("random",6832989);
+   //create a 'random' monomial generator. 
+   int pAbsMaxCoeff = 100;
+   int bExcludeZero = 0;
+   int bFractionsOn = 1;
+   int minNumVariableFactors = 2;
+   int maxNumVariableFactors = 3;
+   proc monomG = createRandomMonomialGenerator(minNumVariableFactors, maxNumVariableFactors);
+
+   ring r1 = (0,d,e,f),(x,y,z),dp;     short = 0;
+   monomG();
+   monomG();
+}
+
+
+proc randomMonomialGeneratorFactory( def params, def factoryTable )
+"USAGE:   randomMonomialGeneratorFactory(options,   factoryTable);
+@*   options       : a type compatible to TIdealGeneratingParameters, containing construction parameters
+@*   factoryTable : a lookup table of type compatible to TRandomFactories, 
+                    containing methods for construction used random generator functions, e.g for coefficients.
+@
+RETURN:   a random monomial generator (without coefficients)
+EXAMPLE:  example randomMonomialGeneratorFactory; shows an example
+"
+{
+    return (  createRandomMonomialGenerator( params.minVarFactorsPerMonomial, params.maxVarFactorsPerMonomial )  ); // use table for createRandomMonomialGeneratorG ?
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    def defaultFactoryTable = defaultRandomFactories();
+    defaultFactoryTable;
+    ring rng = 0,(x,y),dp;
+    def constructionParams = defaultRandomConstructionParams();
+    constructionParams;
+
+    constructionParams.maxParamFactorsPerCoeff=5;
+
+    // construct a monomial (without coefficient) 
+    proc monomG = randomMonomialGeneratorFactory( constructionParams, defaultFactoryTable );
+    monomG();
+}
+
+proc createRandomMonomialMatrixGenerator(rows,cols, pMinNumVariableFactors, pMaxNumVariableFactors)
+"USAGE:    createRandomCoeffMatrixGenerator(cols,rows, pMinNumVariableFactors, pMaxNumVariableFactors);
+@*        rows: int, matrix rows
+@*        cols: int, matrix cols
+@*        absMaxCoeff: int
+RETURN:   a random matrix 'generator' with entries in {-absMaxCoeff, absMaxCoeff}
+EXAMPLE:  example createRandomMonomialMatrixGenerator; shows an example
+"
+{
+     ASSUME(0, pMaxNumVariableFactors>=0 );
+     ASSUME(0, pMinNumVariableFactors>=0 );
+     ASSUME(0, pMinNumVariableFactors <=pMaxNumVariableFactors);
+     ASSUME(0, cols>0);
+     ASSUME(0, rows>0);
+
+     string randomMonGeneratorName = getRandomName();  
+     //dbprint(1, "randomComplexCoeffGeneratorName",randomComplexCoeffGeneratorName);
+     string cmd = "def RandomIdeal::"+randomMonGeneratorName+";";
+     execute(cmd);
+     cmd = "RandomIdeal::"+randomMonGeneratorName+" = createRandomMonomialGenerator(pMinNumVariableFactors, pMaxNumVariableFactors  );";
+     execute(cmd);
+     execute("export(RandomIdeal::"+randomMonGeneratorName+");");
+
+     string cmd = "proc rMonomialMat(    )
+     {
+        ASSUME(0, defined(basering) );
+        matrix mat42349523463454534553267404["+string(rows)+"]["+string(cols)+"] ;
+        int i,j;
+        for (i=1;i<="+string(rows)+";i++)
+        {
+            for (j=1;j<="+string(cols)+";j++)
+            {
+               mat42349523463454534553267404[i,j] = RandomIdeal::"+randomMonGeneratorName+";
+            }
+        }
+        return(mat42349523463454534553267404);
+     }";
+
+    execute(cmd);
+    return (rMonomialMat);
+}
+
+
+static proc testRandomMonomialGenerator()
+{
+    ring rng = 0,x,dp;
+    int maxDegree = 10;
+    int minDegree = 1; 
+    proc monomialG = createRandomMonomialGenerator(1, maxDegree);
+    int i;
+    intmat m[1][maxDegree+1];
+    poly rndMonomial;
+    int monDegree;
+    for ( i=1; i<1000; i++ )
+    {
+        rndMonomial =  monomialG();
+        monDegree = deg(rndMonomial); // TODO: that is probably incorrect...
+        if (not hasWeightedVariables() )
+        {
+            ASSUME(0, monDegree >=minDegree );
+            ASSUME(0, monDegree <=maxDegree );
+        }
+        m[1,monDegree+1]=int(1);
+    }
+    int one = 1;
+    ///*
+    for ( i=2; i<=maxDegree+1; i++ )
+    {
+        ASSUME(0,  m[1,i] ==one );
+        ASSUME(0,  m[1,i] ==int(1) );
+    }
+   //*/
+}
+
+
+
+proc createRandomTermGenerator(  pCoeffGen, pMonomialGen )
+"USAGE:   createRandomTermGenerator( coeffGenerator, monomialGenerator );
+@*        coeffGenerator   : a random coefficient generator function
+@*        monomialGenerator: a random monomial generator function
+RETURN:   a random Term generator, ( randomCoefficient*randomMonomial )
+EXAMPLE:  example createRandomTermGenerator; shows an example
+"
+{
+     string randomCoeffGenName = getRandomNameWithPrefix("coeffGen");
+     string randomMonomialGenName = getRandomNameWithPrefix("monomialGen");
+
+     string cmd = "    
+     proc "+randomCoeffGenName+"=pCoeffGen;   
+     proc "+randomMonomialGenName+"=pMonomialGen;
+     export("+randomCoeffGenName+");
+     export("+randomMonomialGenName+");
+     proc randomTerm(    )
+     {
+        ASSUME(0, defined(basering) );
+        number coeff = RandomIdeal::"+randomCoeffGenName+"(  );       
+        poly tmpMonomial = coeff*RandomIdeal::"+randomMonomialGenName+"(  );
+        return(tmpMonomial);
+    }";
+
+    execute(cmd);
+    return (randomTerm);
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    //create a 'random' polynomial term generator. 
+    int maxNumVariableFactors = 10;
+    int minNumVariableFactors = 1;
+    int minNumParameterFactors = 0;
+    int maxNumParameterFactors = 1;
+
+    int absMaxCoeff = 15;
+    int bExcludeZero = 1;
+    int bFractionsOn = 1;
+    proc paramG    = createRandomParameterCoeffGenerator( minNumParameterFactors, maxNumParameterFactors );
+    proc pureCoeffG = createPureRandomCoeffGenerator(absMaxCoeff, bExcludeZero,bFractionsOn);
+    proc fullCoeffG = createFullRandomCoeffGenerator(pureCoeffG, paramG);
+    proc monomialG = createRandomMonomialGenerator(minNumVariableFactors, maxNumVariableFactors);
+    proc termG = createRandomTermGenerator(fullCoeffG, monomialG);
+
+    ring r1 = (0,d,e,f),(x,y,z),dp;     short = 0;
+    termG();
+    termG();
+}
+
+// standartized interface to createRandomTermGenerator
+proc randomTermGeneratorFactory( def params , def factoryTable)
+"USAGE:   randomTermGeneratorFactory(options,   factoryTable);
+@*   options      : a type compatible to TIdealGeneratingParameters, containing construction parameters
+@*   factoryTable : a lookup table of type compatible to TRandomFactories, 
+                    containing methods for construction used random generator functions, e.g for coefficients.
+@
+RETURN:   a random (polynomial) term generator
+EXAMPLE:  example randomTermGeneratorFactory; shows an example
+"
+{
+    proc coeffG = factoryTable.coeffFactory(params,factoryTable);
+    proc   monG = factoryTable.monomFactory(params,factoryTable);
+    return ( createRandomTermGenerator( coeffG, monG ) ); 
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    def defaultFactoryTable = defaultRandomFactories();
+    defaultFactoryTable;
+    ring rng = 0,(x,y),dp;
+    def constructionParams = defaultRandomConstructionParams();
+    constructionParams;
+
+    // construct an (polynomial) term 
+    proc termG = randomTermGeneratorFactory( constructionParams, defaultFactoryTable );
+    termG();
+}
+
+
+static proc testRandomTermGenerator()
+{
+    ring rng = 0,x,dp;
+    int maxDegree = 10;
+    int minDegree = 1;
+    int maxParDegree = 1;
+    int minParDegree = 0;
+
+    int absMaxCoeff = 15;
+    int bExcludeZero = minDegree>0;
+    int bFractionsOn = 1;
+    poly result;
+    proc paramG    = createRandomParameterCoeffGenerator( minParDegree, maxParDegree );
+    result = paramG();
+    proc pureCoeffG = createPureRandomCoeffGenerator(absMaxCoeff, bExcludeZero,bFractionsOn);
+    result =pureCoeffG();
+    proc fullCoeffG = createFullRandomCoeffGenerator(pureCoeffG, paramG);
+    result =fullCoeffG();
+    proc monomialG = createRandomMonomialGenerator(minDegree, maxDegree);
+    result =monomialG();
+
+    proc termG = createRandomTermGenerator(fullCoeffG,monomialG);
+    result =termG();
+    int i;
+ 
+    poly rndTerm;
+ 
+    for ( i=1; i<1000; i++ )
+    {
+        rndTerm =  termG();
+        if ( hasCertainlyCoeffOrdering() )
+        {
+            ASSUME(0, (leadcoef(rndTerm)>= -absMaxCoeff) and  (leadcoef(rndTerm)<= absMaxCoeff) );
+        }
+        ASSUME(0,  (deg(rndTerm)<= maxDegree) );
+    }
+}
+
+proc monomialExistsInPoly(poly pol, poly term)
+"USAGE:    monomialExistsInPoly( poly, mon );
+@*        poly   : a reference polynomial
+@*        mon: monomial of interest
+RETURN:   1 if exacly the same monomial is part of the polynomial mon
+EXAMPLE:  example monomialExistsInPoly; shows an example
+"
+{
+   ASSUME(0, size(term)<=1);
+   int i;
+   for (i = 1; i<=size(pol); i++)
+   {
+       if ( leadexp(pol[i])==leadexp(term) )
+       {
+            return(1);
+       }
+   }
+   return(0);
+}
+example
+{
+   echo = 2;
+    ring rng = 0,x,y,dp;
+
+    poly refpoly = 3*x^3 + 3*x*y +z;
+    monomialExistsInPoly(refpoly, x*y);
+    monomialExistsInPoly(refpoly, x*y^2);
+}
+
+static proc testMonomialExistsInPoly()
+{
+
+    ring rng = 0,(x,y,z),dp;
+
+    poly refpoly = 3*x^3 + 3*x*y +z;
+    ASSUME(0, monomialExistsInPoly(refpoly, x*y) );
+    ASSUME(0, monomialExistsInPoly(refpoly, x*x*x) );
+    ASSUME(0, monomialExistsInPoly(refpoly, z) );
+    ASSUME(0, not monomialExistsInPoly(refpoly, x*y^2) );
+    ASSUME(0, not monomialExistsInPoly(refpoly, x^2 ) );
+
+}
+
+
+proc createRandomPolyGenerator( randomTermGenerator, maxTerms )
+"USAGE:   createRandomPolyGenerator( randomTermGenerator, minDegree, maxDegree, maxTerms );
+@*        termGenerator   : a random term generator function
+@*        maxTerms: int, max number of polynomial summands
+RETURN:   a random polynomial generator
+EXAMPLE:  example createRandomPolyGenerator; shows an example
+"
+{
+    //dbprint(1, " char(basering) " ,char(basering) );
+ 
+    ASSUME(0, maxTerms >= 0 );
+   
+    string randomTermGeneratorName = getRandomNameWithPrefix("termG");
+
+    string cmd = "
+    proc "+randomTermGeneratorName+"=randomTermGenerator;
+    export("+randomTermGeneratorName+");
+    proc randomPolyGenerator( ) 
+    {
+        ASSUME(0, defined(basering) );
+        ASSUME(0, not (1==char(basering)) );
+        ASSUME(0, not coeffRingIsTrivial() );
+        if ( baseringHasMinpoly() )   {     ASSUME(0, minpolyProbablyConsistant() ); }   
+
+        poly term,pol;    
+        int termMonomials = random( 1 , "+string(maxTerms)+" );
+        int monomialcount = 0;
+        // cannot check size(term)>=termMonomials, since it may be impossible to reach that number.
+        //dbprint(1, \" deg(term) \" ,deg(term) );
+
+        while ( monomialcount <= termMonomials  )
+        {
+            term = RandomIdeal::"+randomTermGeneratorName+"( );
+            if (not (monomialExistsInPoly(pol,term))) // ensure that we not eliminate existing terms.
+            {
+                pol = pol + term;
+            }
+            monomialcount = monomialcount+1;
+        }
+        return(pol);
+    }";
+
+    execute(cmd);
+    return (randomPolyGenerator);
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    //create a 'random' polynomial term generator. 
+    int maxNumVariableFactors = 10;
+    int minNumVariableFactors = 1;
+    int minNumParameterFactors = 0;
+    int maxNumParameterFactors = 1;
+
+    int absMaxCoeff = 15;
+    int bExcludeZero = 1;
+    int bFractionsOn = 1;
+    int maxTerms = 2;
+    proc paramG    = createRandomParameterCoeffGenerator( minNumParameterFactors, maxNumParameterFactors );
+    proc pureCoeffG = createPureRandomCoeffGenerator(absMaxCoeff, bExcludeZero,bFractionsOn);
+    proc fullCoeffG = createFullRandomCoeffGenerator(pureCoeffG, paramG);
+    proc monomialG = createRandomMonomialGenerator(minNumVariableFactors, maxNumVariableFactors);
+    proc termG = createRandomTermGenerator(fullCoeffG, monomialG);
+    proc polyG  = createRandomPolyGenerator(fullCoeffG, maxTerms);
+
+    ring r1 = (0,d,e,f),(x,y,z),dp;     short = 0;
+    polyG();
+    polyG();
+    //alternative using default settings:
+    def generatorTable = defaultRandomGenerators( );
+    generatorTable.polyG();
+    generatorTable.polyG();
+}
+
+// standartized interface to createRandomPolyGenerator
+proc randomPolyGeneratorFactory( def params , def factoryTable)
+"USAGE:   randomPolyGeneratorFactory(options,   factoryTable);
+@*   options      : a type compatible to TIdealGeneratingParameters, containing construction parameters
+@*   factoryTable : a lookup table of type compatible to TRandomFactories, 
+                    containing methods for construction used random generator functions, e.g for coefficients.
+@
+RETURN:   a random polynomial generator
+EXAMPLE:  example randomPolyGeneratorFactory; shows an example
+"
+{
+    proc termG = factoryTable.termFactory(params,factoryTable);
+    return ( createRandomPolyGenerator( termG, params.maxTermsPerGen  ) ); //but what is with this one?
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    def defaultFactoryTable = defaultRandomFactories();
+    defaultFactoryTable;
+    ring rng = 0,(x,y),dp;
+    def constructionParams = defaultRandomConstructionParams();
+    constructionParams;
+
+    constructionParams.maxTermsPerGen = 5;
+
+    // construct a polynomial generator
+    proc polyG = randomPolyGeneratorFactory( constructionParams, defaultFactoryTable );
+    polyG();
+}
+
+
+static proc testRandomPolyGenerator()
+{
+    ring rng = 0,x,dp;
+    int maxDegree = 3;
+    int minDegree = 3;
+    int minParDegree = 2;
+    int maxParDegree = 2;
+
+    int absMaxCoeff = 15;
+    int maxTerms = 5;
+    int bExcludeZero = minDegree>0;
+    int bFractionsOn = 1;
+    //dbprint(1,"bExcludeZero",bExcludeZero);
+    proc pureCoeffG = createPureRandomCoeffGenerator(absMaxCoeff, bExcludeZero, bFractionsOn);
+    proc paramG    = createRandomParameterCoeffGenerator( minParDegree, maxParDegree );
+    proc fullCoeffG = createFullRandomCoeffGenerator(pureCoeffG, paramG );
+
+    proc monomialG = createRandomMonomialGenerator(minDegree, maxDegree);
+    proc termG = createRandomTermGenerator(fullCoeffG, monomialG);
+    proc polyG = createRandomPolyGenerator(termG, maxTerms);
+   // proc polyG2 = createRandomPolyGenerator2( absMaxCoeff, minDegree, maxDegree, maxTerms );
+    int i;
+ 
+    poly rndPoly;
+    int degree1 ;
+    for ( i=1; i<500; i++ )
+    {
+        rndPoly =  polyG();   
+        degree1 =  deg(rndPoly);
+        /*
+            dbprint(1,"rndPoly=",rndPoly);
+            dbprint(1,"voice=",voice);
+            dbprint(1,"size(rndPoly)=",size(rndPoly));
+            dbprint(1,"deg(rndPoly)=",deg(rndPoly));
+
+            dbprint(1,"degree1=",rndPoly);
+            dbprint(1,"minDegree=",minDegree);
+        */
+        //ASSUME(0,  (minDegree <= (deg(rndPoly))) ); // enabling this line causes an different error!!     
+        ASSUME(0,  (deg(rndPoly)== degree1) );
+        ASSUME(0,  (deg(rndPoly)== minDegree) );
+        ASSUME(0,  degree1 >= minDegree );  // ok 
+        ASSUME(0,  (deg(rndPoly)>= minDegree) ); // equivalent statement as above, but fails sometime.
+        
+        ASSUME(0,  (deg(rndPoly)<= maxDegree) );
+
+        ASSUME(0,  (size(rndPoly)<= maxTerms) );
+        ASSUME(0,  leadcoef(rndPoly) >= (-absMaxCoeff) );
+        ASSUME(0,  leadcoef(rndPoly)<= ( absMaxCoeff) ) ;
+
+        /*rndPoly =  polyG2() ;     
+        ASSUME(0,  (deg(rndPoly)>= minDegree) );
+        ASSUME(0,  (deg(rndPoly)<= maxDegree) );
+        ASSUME(0,  (size(rndPoly)<= maxTerms) );
+        ASSUME(0,  leadcoef(rndPoly) >= (-maxTerms*absMaxCoeff) );
+        ASSUME(0,  leadcoef(rndPoly)<= ( maxTerms*absMaxCoeff) ) ;*/
+    }
+}
+
+
+
+proc createRandomIdealGenerator(  polyGen, maxGens )
+"USAGE:   createRandomIdealGenerator( randomPolyGenerator, maxGens );
+@*        randomPolyGenerator   : a random polynomial generator function
+@*        maxGens: int, max number of ideal generators
+RETURN:   a random ideal generating function
+EXAMPLE:  example createRandomIdealGenerator; shows an example
+"
+{
+
+     string randomPolyGeneratorName = getRandomNameWithPrefix("polyGen");
+
+     string cmd = "
+     proc "+randomPolyGeneratorName+"=polyGen;
+     export("+randomPolyGeneratorName+");
+
+     proc randomIdealGenerator( ) 
+     {
+         ASSUME(0, defined(basering) );
+         ASSUME(0, not (1==char(basering)) );
+         int numGens= random(1, "+string(maxGens)+");
+
+         ideal rndIdeal;
+         int generatorId;
+
+         for (generatorId = numGens; generatorId >= 1; generatorId--)
+         {
+            rndIdeal[generatorId] =RandomIdeal::"+randomPolyGeneratorName+"(); ;
+         }  
+         return (rndIdeal);
+     }
+    ";
+
+    execute(cmd);
+    return (randomIdealGenerator);
+}
+example
+{
+   echo = 2;        
+    system("random",6832989);
+    //  generate a random ideal with maximal 2 generators 
+    //  reusing existing 'randomIdeal' infrastructure
+
+    TIdealGeneratingParameters    genParams = defaultRandomConstructionParams();
+    TRandomFactories           factoryTable = defaultRandomFactories();
+
+    // create the random generators with given settinngs
+    def generatorTable = createRandomGenerators(genParams, factoryTable);    
+
+    // adjust random ideal generator params:
+    genParams.maxGens = 2;
+
+    // create ideal generator using polynomial generator generatorTable.polyG:
+    def idealG = createRandomIdealGenerator(generatorTable.polyG, genParams.maxGens);
+
+    ring rng = integer,(x,y),dp;
+    idealG();
+    idealG();
+}
+
+// standartized interface to createRandomPolyGenerator
+proc randomIdealGeneratorFactory(def params, def factoryTable)
+"USAGE:   randomIdealGeneratorFactory(options,   factoryTable);
+@*   options      : a type compatible to TIdealGeneratingParameters, containing construction parameters
+@*   factoryTable : a lookup table of type compatible to TRandomFactories, 
+                    containing methods for construction used random generator functions, e.g for coefficients.
+@
+RETURN:   a random ideal generator
+EXAMPLE:  example randomIdealGeneratorFactory; shows an example
+"
+{
+    proc polyG = factoryTable.polyFactory(params,factoryTable);
+    return ( createRandomIdealGenerator( polyG, params.maxGens  ) ); 
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    def defaultFactoryTable = defaultRandomFactories();
+    defaultFactoryTable;
+    ring rng = 0,(x,y),dp;
+    def constructionParams = defaultRandomConstructionParams();
+    constructionParams;
+
+    // construct an ideal generator
+    proc idealG = randomIdealGeneratorFactory( constructionParams, defaultFactoryTable );
+    idealG();
+}
+
+
+static proc testRandomIdealGenerator()
+{
+
+    ring r = (0,a),(x,y,z),dp;
+    minpoly=1;
+
+    ring rng = 0,x,dp;
+    int maxParDegree = 10;
+    int minParDegree = 1;
+
+    int maxNumVarFactorsPerMonomial = 10;
+    int minNumVarFactorsPerMonomial = 1;
+    int absMaxCoeff = 15;
+    int maxTerms = 5;
+    int maxNumGens=4;
+    int bExcludeZero = 1;
+    int bFractionsOn =1;
+
+    proc pureCoeffG = createPureRandomCoeffGenerator(absMaxCoeff,bExcludeZero,bFractionsOn);
+    proc paramG    = createRandomParameterCoeffGenerator( minParDegree, maxParDegree );
+    proc fullCoeffG = createFullRandomCoeffGenerator(pureCoeffG, paramG );
+
+    proc monomialG = createRandomMonomialGenerator( minNumVarFactorsPerMonomial, maxNumVarFactorsPerMonomial );
+    proc termG = createRandomTermGenerator(fullCoeffG, monomialG);
+    proc polyG = createRandomPolyGenerator(termG, maxTerms);
+
+    def idealG = createRandomIdealGenerator( polyG, maxNumGens );
+
+    int i;
+ 
+    ideal rndideal;
+ 
+    for ( i=1; i<30; i++ )
+    {
+        rndideal =  idealG();
+        ASSUME(0,  size(rndideal) <=maxNumGens );
+    }
+}
+
+
+
+
+proc defaultRandomConstructionParams()
+"USAGE:   defaultRandomConstructionParams(   );
+
+RETURN:   default params(TIdealGeneratingParameters) for constructing an ideal generating function,
+@*   params.absMaxCoeff = 15;
+@*   params.bFractionsOn = 1;
+@*   params.minParamFactorsPerCoeff = 0;
+@*   params.maxParamFactorsPerCoeff = 1;
+@*   params.minVarFactorsPerMonomial = 0;
+@*   params.maxVarFactorsPerMonomial = 3;
+@*   params.maxTermsPerGen = 4;
+@*   params.maxGens = 4;
+"
+{
+   TIdealGeneratingParameters params;
+   params.absMaxCoeff = 15;
+   params.bFractionsOn = 1;
+   
+   params.minParamFactorsPerCoeff = 0;
+   params.maxParamFactorsPerCoeff = 1;
+
+   params.minVarFactorsPerMonomial = 0;
+   params.maxVarFactorsPerMonomial = 3;
+   params.maxTermsPerGen = 4;
+   params.maxGens = 4;
+   return(params);
+}
+
+
+
+
+proc defaultRandomFactories()
+"USAGE:   defaultRandomFactories( );
+
+RETURN:   a struct compatible to TRandomFactories consisting of default factory methods
+           for constructing random generator functions, e.g 'coeffFactory' for coefficients.
+EXAMPLE:  example defaultRandomFactories; shows an example
+"
+{
+   TRandomFactories factoryTable;
+   factoryTable.coeffFactory = RandomIdeal::randomCoeffGeneratorFactory;
+   factoryTable.monomFactory = RandomIdeal::randomMonomialGeneratorFactory;
+   factoryTable.termFactory  = RandomIdeal::randomTermGeneratorFactory;
+   factoryTable.polyFactory  = RandomIdeal::randomPolyGeneratorFactory;
+   factoryTable.idealFactory = RandomIdeal::randomIdealGeneratorFactory;
+   factoryTable.checkParamConsistancy = RandomIdeal::checkTIdealGeneratingParametersConsistency;
+   return(factoryTable);
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    def defaultFactoryTable = defaultRandomFactories();
+    defaultFactoryTable;
+    ring rng = 0,(x,y),dp;
+    def constructionParams = defaultRandomConstructionParams();
+    constructionParams;
+
+    // construct an ideal using the idealFactory
+    proc idealG = defaultFactoryTable.idealFactory( constructionParams, defaultFactoryTable );
+    idealG();
+}
+
+
+proc createRandomGenerators(def params, def factoryTable)
+"USAGE:   createRandomGenerators(params,   factoryTable);
+@*   params       : a type compatible to TIdealGeneratingParameters, containing construction parameters
+@*   factoryTable : a lookup table of type compatible to TRandomFactories, 
+                    containing methods for construction used random generator functions, e.g for coefficients.
+@
+RETURN:   a struct TRandomGenerators consisting of generating random functions 
+          e.g. for creating ring ideals.
+EXAMPLE:  example createRandomGenerators; shows an example
+"
+{
+   factoryTable.checkParamConsistancy(params);
+
+   TRandomGenerators genTable;
+   genTable.coeffG = factoryTable.coeffFactory( params, factoryTable );
+   genTable.monomG = factoryTable.monomFactory( params, factoryTable );
+   genTable.termG  = factoryTable.termFactory ( params, factoryTable );
+   genTable.polyG  = factoryTable.polyFactory ( params, factoryTable );
+   genTable.idealG = factoryTable.idealFactory( params, factoryTable );
+   
+   return(genTable);
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    // LIB ("randomIdeal.lib");
+    ring rng = integer,(x,y),dp;
+          
+    TIdealGeneratingParameters genParams = defaultRandomConstructionParams();
+    // adjust random ideal generator params:
+    genParams.absMaxCoeff = 15;
+    genParams.minVarFactorsPerMonomial = 2;
+    genParams.bExcludeZeroCoeff = 1;
+    genParams.maxVarFactorsPerMonomial = 3;
+    genParams.maxTermsPerGen = 4;
+    genParams.maxGens = 2;
+
+    // adjust generator Factories
+    TRandomFactories factoryTable = defaultRandomFactories();
+    // replace coefficient generator factory function:
+    proc adjustedCoeffFactory(def params, def factoryTable)
+    {
+        // returns a coefficient generator which always says 23.
+        proc coeffG()     {    return (23);      }
+        return (coeffG);
+    }
+    factoryTable.coeffFactory = adjustedCoeffFactory;
+
+    // create the random generators with given settinngs
+    def generatorTable = createRandomGenerators(genParams, factoryTable);
+    generatorTable;
+
+    //  generate a random ideal with parameters as above:
+    generatorTable.idealG();
+}
+
+
+proc createRandomGeneratorsByParams(def params)
+{
+   TRandomGenerators genTable;
+   TRandomFactories factoryTable = defaultRandomFactories();
+   genTable.varG = RandomIdeal::randomVariable;
+   genTable.parG = RandomIdeal::randomParameter;
+   genTable.coeffG = factoryTable.coeffFactory( params, factoryTable );
+   genTable.monomG = factoryTable.monomFactory( params, factoryTable );
+   genTable.termG  = factoryTable.termFactory ( params, factoryTable );
+   genTable.polyG  = factoryTable.polyFactory ( params, factoryTable );
+   genTable.idealG = factoryTable.idealFactory( params, factoryTable );
+   
+   return(genTable);
+}
+example
+{
+    echo = 2;
+    system("random",6832989);
+    ring rng = integer,(x,y),dp;
+          
+    TIdealGeneratingParameters genParams = defaultRandomConstructionParams();
+   
+    // adjust random ideal generator params:
+    genParams.maxGens=1; 
+    genParams.absMaxCoeff = 15;
+    genParams.minVarFactorsPerMonomial = 2;
+    genParams.maxVarFactorsPerMonomial = 3;
+    genParams.maxTermsPerGen = 4;
+    genParams.maxGens = 1;
+
+    // create the random generators with given parameter settinngs
+    def generatorTable = createRandomGeneratorsByParams( genParams );
+    //generatorTable;
+
+    //  generate a random ideal with parameters as above:
+    generatorTable.idealG();
+}
+
+
+// TODO: check if an infinite trap example may be constructed  (in a quotient ring) in case 'bExcludeZeroCoeff = 1'
+proc defaultRandomGenerators()
+"USAGE:   defaultRandomGenerators(  );
+RETURN:   a struct TRandomGenerators consisting of generating random functions 
+          e.g. for creating ring ideals.
+EXAMPLE:  example createRandomIdealGenerator; shows an example
+"
+{
+   TIdealGeneratingParameters       params = defaultRandomConstructionParams();
+
+   TRandomFactories           factoryTable = defaultRandomFactories();
+
+
+   return (  createRandomGenerators( params, factoryTable )  );
+}
+example
+{
+   echo = 2;
+    system("random",6832989);
+    ring rng = integer,(x,y),dp;
+    
+    // get a random ideal generator using default settings:
+    // 
+    def generatorTable = defaultRandomGenerators( );
+    generatorTable;
+
+    // generate a random ideal:
+    generatorTable.idealG();
+
+    // generate a random coefficient:
+    generatorTable.coeffG();
+}
+
+
+
+

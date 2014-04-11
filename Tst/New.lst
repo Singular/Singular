@@ -35,6 +35,8 @@ New/std_prot_l.tst
 New/std_prot_error.tst
 New/std_prot.tst
 New/interred_prot.tst
+New/randomIdeal.tst
+New/randomIdeal_examples.tst
 New/ringlocal.tst
 New/hilblocinhom.tst
 New/trans_ext_denominator.tst
