@@ -26,7 +26,7 @@ S = multiDegGroebner(S); S;
 "Module Units Multigrading: "; print( getModuleGrading(S) );
 "Multidegrees: "; print(multiDeg(S));
 /////////////////////////////////////////////////////////////////////////////
-def L = multiDegResolution(m, 0, 1);
+list L = multiDegResolution(m, 0, 1);
 for( j =1; j<=size(L); j++)
 {
 "----------------------------------- ", j, " -----------------------------";

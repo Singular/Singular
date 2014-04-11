@@ -20,7 +20,7 @@ intmat g[2][4]=
 setBaseMultigrading(g);
 ideal I = x^2, y, z^3;
 I = std(I);
-def L = multiDegResolution(I, 0, 1);
+list L = multiDegResolution(I, 0, 1);
 for( int j = 1; j<=size(L); j++)
 {
 "----------------------------------- ", j, " -----------------------------";
