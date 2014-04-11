@@ -1876,7 +1876,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
     case STRING_CMD:
       nok=jjA_L_STRING(l,r);
       break;
-    case DEF_CMD:
+    //case DEF_CMD:
     case LIST_CMD:
       nok=jjA_L_LIST(l,r);
       break;
