@@ -8,11 +8,14 @@
 
 .INCLUDE factor/interrupt.h
 
+
 // some values you can ask for:
+/*
 extern const char * libfac_name;
 extern const char * libfac_version;
 extern const char * libfac_date;
 extern const char * libfac_author;
+*/
 
 //// Note: second argument for Factorize is for internal use only.
 .INCLUDE factor/Factor.h
