@@ -69,21 +69,6 @@ static proc getParIdx(variable)
    return (0);
 }
 
-// return   index i such that var(i)==variable or 0 if variable is not a basering variable
-static proc getVarIdx(variable)
-{
-   def numVars = nvars(basering);
-   int i;
-   for ( i=1; i<=numVars; i++ )
-   {
-       if (variable==var(i)) 
-       {
-           return(i); 
-       }
-       
-   }
-   return (0);
-}
 
 // check if passed variable is a basering parameter
 static proc isParameter(variable)
@@ -94,7 +79,7 @@ static proc isParameter(variable)
 // check if passed variable is a basering variable
 static proc isVariable(variable)
 {
-   return ( getVarIdx(variable)>0);
+   return ( rvar(variable)>0);
 }
 
 
@@ -117,11 +102,18 @@ static proc testRandomVariable()
                ASSUME(0, (getParIdx(unknown)>0) and (getParIdx(unknown)<=numPars));
                mp[1, getParIdx(unknown) ] = int(1) ;
         }
-        if ( isVariable(unknown)  )  
-        { 
-           ASSUME(0, (getVarIdx(unknown)>0) and (getVarIdx(unknown)<=numVars));
-            mv[1, getVarIdx(unknown) ] = int(1);
-        }
+        else
+        {
+           if ( isVariable(unknown)  )  
+           { 
+             ASSUME(0, (rvar(unknown)>0) and (rvar(unknown)<=numVars));
+             mv[1, rvar(unknown) ] = int(1);
+           }
+           else
+           {
+                ERROR("unknown is neither variable nor parameter");
+           }           
+        }        
     }
     for ( i=1; i<=numPars; i++ )
     {
@@ -142,14 +134,14 @@ RETURN:   random non defined procedure name with given prefix
 "
 {
 
-   string name = prefix+ string(random(1,1000000000));
+   string name = prefix + string(random(1,1000000000));
 
-   string cmd = "while (  defined("+name+") ) 
+   while (  defined(`name`) ) 
    {
-     name = " + prefix + " + string(random(1,1000000000));
-   }";
-   execute(cmd);
-   return( name);
+       name = prefix  + string(random(1,1000000000));
+   }
+  
+   return( name );
 }
 
 
