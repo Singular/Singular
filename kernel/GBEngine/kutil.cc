@@ -6715,6 +6715,10 @@ void updateS(BOOLEAN toT,kStrategy strat)
       while (i<=strat->sl)
       {
         change=FALSE;
+        #ifdef HAVE_RINGS
+        if(rField_is_Ring(currRing))
+            any_change = FALSE;
+        #endif
         if (((strat->fromQ==NULL) || (strat->fromQ[i]==0)) && (i>0))
         {
           redSi = pHead(strat->S[i]);
