@@ -389,7 +389,7 @@ void killlocals(int v)
     currRingHdl=rFindHdl(cr,NULL,NULL);
     if (currRingHdl==NULL)
       currRing=NULL;
-    else
+    else if(cr!=currRing)
       rChangeCurrRing(cr);
   }
 
