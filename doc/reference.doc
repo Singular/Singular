@@ -1948,7 +1948,14 @@ See
 @item @strong{Type:}
 type of the first argument
 @item @strong{Purpose:}
-lift the first argument modulo the second to the rationals
+lift the first argument modulo the second to the rationals.
+The (coeffients of the) result a/b is the best approximation under the condition
+@ifinfo
+|a|,|b|<=sqrt((N-1)/2)
+@end ifinfo
+@tex
+$|a|,|b|<=\sqrt((N-1)/2)$
+@end tex
 @item @strong{Note:}
 The current coefficient field must be the rationals.
 @item @strong{Example:}
