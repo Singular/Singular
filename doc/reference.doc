@@ -7620,6 +7620,7 @@ See
 @ref{int};
 @ref{univariate};
 @ref{nvars};
+@ref{rvar};
 @ref{varstr}.
 @c ref
 @c ---------------------------------------
