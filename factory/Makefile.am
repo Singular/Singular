@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I ../m4
 
 SUBDIRS=include/factory libfac
 
-AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include \
+AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include -I${srcdir} \
 $(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
 $(FLINT_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS)
 
