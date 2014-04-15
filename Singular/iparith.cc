@@ -8568,7 +8568,8 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
   while ( a <= e);
 
   // catch missing a cmd:
-  assume(0);
+  // may be missing as a op for blackbox, if the first operand is "undef" instead of bb
+  // Print("op %d (%c) unknown",op,op);
   return 0;
 }
 
