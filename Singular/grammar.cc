@@ -3970,7 +3970,7 @@ yyreduce:
             && ((yyvsp[(2) - (2)].lv).rtyp==IDHDL))
             {
               idhdl h=(idhdl)(yyvsp[(2) - (2)].lv).data;
-              if ((yyvsp[(2) - (2)].lv).e!=NULL) h=rFindHdl((ring)(yyvsp[(2) - (2)].lv).Data(),NULL, NULL);
+              if ((yyvsp[(2) - (2)].lv).e!=NULL) h=rFindHdl((ring)(yyvsp[(2) - (2)].lv).Data(),NULL);
               //Print("setring %s lev %d (ptr:%x)\n",IDID(h),IDLEV(h),IDRING(h));
               if ((yyvsp[(1) - (2)].i)==KEEPRING_CMD)
               {

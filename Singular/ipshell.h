@@ -218,7 +218,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord);
 idhdl  rDefault(const char *s);
 
 idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n=NULL);
-idhdl rFindHdl(ring r, idhdl n, idhdl w);
+idhdl rFindHdl(ring r, idhdl n);
 void   rKill(idhdl h);
 void   rKill(ring r);
 lists scIndIndset(ideal S, BOOLEAN all, ideal Q);
