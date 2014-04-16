@@ -913,6 +913,9 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   f /= vcontent (f, Rstar.mvar());
   // end quasi monic
 
+  if (degree (f) == 1)
+    return CFFList (CFFactor (f, 1));
+
   sqrf_norm(f, Rstar, vminpoly, s, g, R );
   //out_cf("sqrf_norm R:",R,"\n");
   //out_cf("sqrf_norm s:",s,"\n");
@@ -1145,7 +1148,8 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
 
 // F1: [Test trivial cases]
 // 1) first trivial cases:
-  if ( (cls(vf) <= cls(as.getLast())) ||  degree(f,vf)<=1 ){
+  if (cls(vf) <= cls(as.getLast()))
+  {
 // ||( (as.length()==1) && (degree(f,vf)==3) && (degree(as.getFirst()==2)) )
     DEBDECLEVEL(CERR,"newfactoras");
     if (!isRat && getCharacteristic() == 0)
