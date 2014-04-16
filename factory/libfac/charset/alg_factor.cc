@@ -739,6 +739,114 @@ backSubst (const CanonicalForm& F, const CFList& a, const CFList& b)
   return result;
 }
 
+void deflateDegree (const CanonicalForm & F, int & pExp, int n)
+{
+  if (n == 0 || n > F.level())
+  {
+    pExp= -1;
+    return;
+  }
+  if (F.level() == n)
+  {
+    ASSERT (F.deriv().isZero(), "derivative of F is not zero");
+    int termCount=0;
+    CFIterator i= F;
+    for (; i.hasTerms(); i++)
+    {
+      if (i.exp() != 0)
+        termCount++;
+    }
+
+    int j= 1;
+    i= F;
+    for (;j < termCount; j++, i++)
+      ;
+
+    int exp= i.exp();
+    int count= 0;
+    int p= getCharacteristic();
+    while ((exp >= p) && (exp != 0) && (exp % p == 0))
+    {
+      exp /= p;
+      count++;
+    }
+    pExp= count;
+  }
+  else
+  {
+    CFIterator i= F;
+    deflateDegree (i.coeff(), pExp, n);
+    i++;
+    int tmp= pExp;
+    for (; i.hasTerms(); i++)
+    {
+      deflateDegree (i.coeff(), pExp, n);
+      if (tmp == -1)
+        tmp= pExp;
+      else if (tmp != -1 && pExp != -1)
+        pExp= (pExp < tmp) ? pExp : tmp;
+      else
+        pExp= tmp;
+    }
+  }
+}
+
+CanonicalForm deflatePoly (const CanonicalForm & F, int exp)
+{
+  if (exp == 0)
+    return F;
+  int p= getCharacteristic();
+  int pToExp= ipower (p, exp);
+  Variable x=F.mvar();
+  CanonicalForm result= 0;
+  for (CFIterator i= F; i.hasTerms(); i++)
+    result += i.coeff()*power (x, i.exp()/pToExp);
+  return result;
+}
+
+CanonicalForm deflatePoly (const CanonicalForm & F, int exps, int n)
+{
+  if (n == 0 || exps <= 0 || F.level() < n)
+    return F;
+  if (F.level() == n)
+    return deflatePoly (F, exps);
+  else
+  {
+    CanonicalForm result= 0;
+    for (CFIterator i= F; i.hasTerms(); i++)
+      result += deflatePoly (i.coeff(), exps, n)*power(F.mvar(), i.exp());
+    return result;
+  }
+}
+
+CanonicalForm inflatePoly (const CanonicalForm & F, int exp)
+{
+  if (exp == 0)
+    return F;
+  int p= getCharacteristic();
+  int pToExp= ipower (p, exp);
+  Variable x=F.mvar();
+  CanonicalForm result= 0;
+  for (CFIterator i= F; i.hasTerms(); i++)
+    result += i.coeff()*power (x, i.exp()*pToExp);
+  return result;
+}
+
+CanonicalForm inflatePoly (const CanonicalForm & F, int exps, int n)
+{
+  if (n == 0 || exps <= 0 || F.level() < n)
+    return F;
+  if (F.level() == n)
+    return inflatePoly (F, exps);
+  else
+  {
+    CanonicalForm result= 0;
+    for (CFIterator i= F; i.hasTerms(); i++)
+      result += inflatePoly (i.coeff(), exps, n)*power(F.mvar(), i.exp());
+    return result;
+  }
+}
+
 // the heart of the algorithm: the one from Trager
 #ifndef DEBUGOUTPUT
 static CFFList
