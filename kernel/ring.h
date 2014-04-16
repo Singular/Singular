@@ -119,7 +119,7 @@ void rDBGetSComps(int** currComponents,
 void rNChangeSComps(int* currComponents, long* currShiftedComponents, ring r = currRing);
 void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r = currRing);
 
-idhdl  rFindHdl(ring r, idhdl n, idhdl w);
+idhdl  rFindHdl(ring r, idhdl n);
 idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n);
 const char * rSimpleOrdStr(int ord);
 int rOrderName(char * ordername);

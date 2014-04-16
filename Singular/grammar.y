@@ -1386,7 +1386,7 @@ setringcmd:
             && ($2.rtyp==IDHDL))
             {
               idhdl h=(idhdl)$2.data;
-              if ($2.e!=NULL) h=rFindHdl((ring)$2.Data(),NULL, NULL);
+              if ($2.e!=NULL) h=rFindHdl((ring)$2.Data(),NULL);
               //Print("setring %s lev %d (ptr:%x)\n",IDID(h),IDLEV(h),IDRING(h));
               if ($1==KEEPRING_CMD)
               {

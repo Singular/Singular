@@ -694,7 +694,7 @@ void proclevel::pop()
   //if (r==NULL) Print("set ring to NULL at lev %d(%s)\n",myynest,name);
   //::currRingHdl=this->currRingHdl;
   //if((::currRingHdl==NULL)||(IDRING(::currRingHdl)!=(::currRing)))
-  //  ::currRingHdl=rFindHdl(::currRing,NULL,NULL);
+  //  ::currRingHdl=rFindHdl(::currRing,NULL);
   //Print("restore pack=%s,1.obj=%s\n",IDID(currPackHdl),IDID(currPack->idroot));
   currPackHdl=this->cPackHdl;
   currPack=this->cPack;

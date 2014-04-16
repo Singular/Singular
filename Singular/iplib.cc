@@ -432,11 +432,11 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
         const char *o;
         idhdl nh=NULL, oh=NULL;
         if (iiLocalRing[myynest-1]!=NULL)
-          oh=rFindHdl(iiLocalRing[myynest-1],NULL, NULL);
+          oh=rFindHdl(iiLocalRing[myynest-1],NULL);
         if (oh!=NULL)          o=oh->id;
         else                   o="none";
         if (currRing!=NULL)
-          nh=rFindHdl(currRing,NULL, NULL);
+          nh=rFindHdl(currRing,NULL);
         if (nh!=NULL)          n=nh->id;
         else                   n="none";
         Werror("ring change during procedure call: %s -> %s (level %d)",o,n,myynest);
@@ -453,7 +453,7 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
       ((currRingHdl==NULL)||(IDRING(currRingHdl)!=currRing)
        ||(IDLEV(currRingHdl)>=myynest-1)))
     {
-      rSetHdl(rFindHdl(currRing,NULL, NULL));
+      rSetHdl(rFindHdl(currRing,NULL));
       iiLocalRing[myynest-1]=NULL;
     }
 #else /* USE_IILOCALRING */
@@ -472,13 +472,7 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
         if (procstack->cRing!=NULL)
         {
           //PrintS("reset ring\n");
-          procstack->cRingHdl=rFindHdl(procstack->cRing,NULL, NULL);
-          if (procstack->cRingHdl==NULL)
-            procstack->cRingHdl=
-              rFindHdl(procstack->cRing,NULL,procstack->currPack->idroot);
-          if (procstack->cRingHdl==NULL)
-            procstack->cRingHdl=
-              rFindHdl(procstack->cRing,NULL,basePack->idroot);
+          procstack->cRingHdl=rFindHdl(procstack->cRing,NULL);
           o=IDID(procstack->cRingHdl);
           currRing=procstack->cRing;
           currRingHdl=procstack->cRingHdl;
@@ -690,7 +684,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   {
     if (iiLocalRing[myynest]!=NULL)
     {
-      rSetHdl(rFindHdl(iiLocalRing[myynest],NULL, NULL));
+      rSetHdl(rFindHdl(iiLocalRing[myynest],NULL));
       iiLocalRing[myynest]=NULL;
     }
     else
@@ -707,7 +701,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
     {
       idhdl rh=procstack->cRingHdl;
       if ((rh==NULL)||(IDRING(rh)!=NS_LRING))
-        rh=rFindHdl(NS_LRING,NULL, NULL);
+        rh=rFindHdl(NS_LRING,NULL);
       rSetHdl(rh);
     }
     else
