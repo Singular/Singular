@@ -123,6 +123,7 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     DEBOUTLN(CERR, "sqrf_norm_sub: Palpha= ", Palpha);
     R = resultante(Palpha, g, y); R= R* bCommonDen(R);
     DEBOUTLN(CERR, "sqrf_norm_sub: R= ", R);
+    R /= content (R);
     // sqfree check ; R is a polynomial in K[x]
     if ( getCharacteristic() == 0 )
     {
@@ -198,6 +199,7 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     DEBOUTLN(CERR, "sqrf_norm_sub: Palpha= ", Palpha);
     R = resultante(Palpha, g, y); R= R* bCommonDen(R);
     DEBOUTLN(CERR, "sqrf_norm_sub: R= ", R);
+    R /= content (R);
     // sqfree check ; R is a polynomial in K[x]
     if ( getCharacteristic() == 0 )
     {
