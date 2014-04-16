@@ -5432,7 +5432,13 @@ void rKill(idhdl h)
     if (ref<=0) { currRing=NULL; currRingHdl=NULL;}
     else
     {
-      currRingHdl=rFindHdl(r,currRingHdl,NULL);
+      currRingHdl=rFindHdl(r,currRingHdl);
+      if ((currRingHdl==NULL)&&(currRing->idroot==NULL))
+      {
+        for (int i=myynest;i>=0;i--)
+	  if (iiLocalRing[i]==currRing) return;
+        currRing=NULL;
+      }
     }
   }
 }
