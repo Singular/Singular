@@ -254,7 +254,7 @@ proc cld(ideal J)
   return(Jc);
 }
 
-proc memberpos(f,J)
+proc memberpos(def f,def J)
 //"USAGE:  memberpos(f,J);
 //         (f,J) expected (polynomial,ideal)
 //               or       (int,list(int))
@@ -378,7 +378,7 @@ proc memberpos(f,J)
 //  memberpos(1,L);
 //}
 
-proc subset(J,K)
+proc subset(def J,def K)
 //"USAGE:   subset(J,K);
 //          (J,K)  expected (ideal,ideal)
 //                  or     (list, list)
@@ -859,7 +859,7 @@ proc redgbn(ideal F, ideal E, ideal N)
 }
 
 // eliminates repeated elements form an ideal or matrix or module or intmat or bigintmat
-proc elimrepeated(F)
+proc elimrepeated(def F)
 {
   int i;
   int nt;
@@ -878,7 +878,7 @@ proc elimrepeated(F)
   return(FF);
 }
 
-proc elimrepeatedvl(F)
+proc elimrepeatedvl(def F)
 {
   int i;
   def FF=F;
@@ -930,7 +930,7 @@ proc delintvec(intvec V, int i)
 // Purpose: test if a polynomial is homogeneous in the variables or not
 // input:  poly f
 // output  1 if f is homogeneous, 0 if not
-proc ishomog(f)
+proc ishomog(poly f)
 {
   int i; poly r; int d; int dr;
   if (f==0){return(1);}
@@ -1486,7 +1486,10 @@ EXAMPLE:  cgsdr; shows an example"
         if(GS[i][2]==1)
         {
           GS[i][3]=postredgb(mingb(GS[i][3]));
-          GS[i][7]=postredgb(mingb(GS[i][7]));
+          if (typeof(GS[i][7])=="ideal")
+          {
+            GS[i][7]=postredgb(mingb(GS[i][7]));
+          }
         }
       }
     }
@@ -4008,10 +4011,10 @@ example
 
 // Takes a list of intvec and sorts it and eliminates repeated elements.
 // Auxiliary routine used in addcons
-proc sortpairs(L)
+proc sortpairs(list L)
 {
-  def L1=sort(L);
-  def L2=elimrepeated(L1[1]);
+  list L1=sort(L);
+  list L2=elimrepeated(L1[1]);
   return(L2);
 }
 
