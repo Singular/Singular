@@ -747,66 +747,11 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 #ifdef HAVE_RINGS
   ideal id=(ideal)a->CopyD(IDEAL_CMD);
   if((rField_is_Ring(currRing)) && (idPosConstant(id) != -1))
-  {
-// computing over Rings: handle constant generators of id properly
-      if(nCoeff_is_Ring_ModN(currRing->cf) || 
-         nCoeff_is_Ring_PtoM(currRing->cf) || 
-         nCoeff_is_Ring_2toM(currRing->cf))
-      {
-      // already computing mod modNumber: use gcd(modNumber,constant entry of id)
-        mpz_t gcd;
-        mpz_t newConst;
-        mpz_init(newConst);
-        mpz_set_ui(newConst, currRing->cf->cfInt(p_GetCoeff(id->m[idPosConstant(id)], currRing),currRing->cf));
-        mpz_init(gcd);
-        mpz_gcd(gcd, currRing->cf->modNumber, newConst);
-        if(mpz_cmp_ui(gcd, 1) == 0)
-        {
-            WerrorS("constant in q-ideal is coprime to modulus in ground ring");
-            WerrorS("Unable to create qring!");
+    {
+        qr = updateQring(currRing, id, idPosConstant(id));
+        if(qr == NULL)
             return TRUE;
-        }
-        if(nCoeff_is_Ring_PtoM(currRing->cf) || 
-           nCoeff_is_Ring_2toM(currRing->cf))
-        {
-        // modNumber is prime power: set modExponent appropriately
-          int kNew = 1;
-          mpz_t baseTokNew;
-          mpz_init(baseTokNew);
-          mpz_set(baseTokNew, currRing->cf->modBase);
-          while(mpz_cmp(gcd, baseTokNew) > 0)
-          {
-            kNew++;
-            mpz_mul(baseTokNew, baseTokNew, currRing->cf->modBase);
-          }
-          //To Do: currently we stay in case Z/p^n even for n=1
-          //       for performance reasons passing to groundfield Z/p 
-          //       would be more suitable
-          qr = rCopyNewCoeff(currRing, currRing->cf->modBase, kNew, currRing->cf->type);
-          mpz_clear(baseTokNew);
-        }
-        else
-        {
-        // previously over modNumber, now over new modNumber
-          qr = rCopyNewCoeff(currRing, gcd, 1, currRing->cf->type);
-          //printf("\nAfter rCopyNewCoeff: \n");
-          //rWrite(qr);
-        }
-        mpz_clear(gcd);
-        //printf("\nAfter mpz_clear: \n");
-        //rWrite(qr);
-        mpz_clear(newConst);
-      }
-      else
-      {
-      // previously over Z, now over Z/m
-        mpz_t newConst;
-        mpz_init(newConst);
-        mpz_set_ui(newConst, currRing->cf->cfInt(p_GetCoeff(id->m[idPosConstant(id)], currRing),currRing->cf));
-        qr= rCopyNewCoeff( currRing, newConst, 1, n_Zn);
-        mpz_clear(newConst);
-      }
-  }    
+    }
   else
 #endif
     qr=rCopy(currRing);

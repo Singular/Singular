@@ -1645,6 +1645,70 @@ ring rCopyNewCoeff(ring r, mpz_t Base, int Exp, n_coeffType typ)
   return res;
 }
 
+ring updateQring(ring r, ideal id, int pos)
+{
+    ring qr;
+    // computing over Rings: handle constant generators of id properly
+      if(nCoeff_is_Ring_ModN(r->cf) || 
+         nCoeff_is_Ring_PtoM(r->cf) || 
+         nCoeff_is_Ring_2toM(r->cf))
+      {
+      // already computing mod modNumber: use gcd(modNumber,constant entry of id)
+        mpz_t gcd;
+        mpz_t newConst;
+        mpz_init(newConst);
+        mpz_set_ui(newConst, r->cf->cfInt(p_GetCoeff(id->m[pos], r),r->cf));
+        mpz_init(gcd);
+        mpz_gcd(gcd, r->cf->modNumber, newConst);
+        if(mpz_cmp_ui(gcd, 1) == 0)
+        {
+            WerrorS("constant in q-ideal is coprime to modulus in ground ring");
+            WerrorS("Unable to create qring!");
+            return NULL;
+        }
+        if(nCoeff_is_Ring_PtoM(r->cf) || 
+           nCoeff_is_Ring_2toM(r->cf))
+        {
+        // modNumber is prime power: set modExponent appropriately
+          int kNew = 1;
+          mpz_t baseTokNew;
+          mpz_init(baseTokNew);
+          mpz_set(baseTokNew, r->cf->modBase);
+          while(mpz_cmp(gcd, baseTokNew) > 0)
+          {
+            kNew++;
+            mpz_mul(baseTokNew, baseTokNew, r->cf->modBase);
+          }
+          //To Do: currently we stay in case Z/p^n even for n=1
+          //       for performance reasons passing to groundfield Z/p 
+          //       would be more suitable
+          qr = rCopyNewCoeff(r, r->cf->modBase, kNew, r->cf->type);
+          mpz_clear(baseTokNew);
+        }
+        else
+        {
+        // previously over modNumber, now over new modNumber
+          qr = rCopyNewCoeff(r, gcd, 1, r->cf->type);
+          //printf("\nAfter rCopyNewCoeff: \n");
+          //rWrite(qr);
+        }
+        mpz_clear(gcd);
+        //printf("\nAfter mpz_clear: \n");
+        //rWrite(qr);
+        mpz_clear(newConst);
+      }
+      else
+      {
+      // previously over Z, now over Z/m
+        mpz_t newConst;
+        mpz_init(newConst);
+        mpz_set_ui(newConst, r->cf->cfInt(p_GetCoeff(id->m[pos], r),r->cf));
+        qr= rCopyNewCoeff( r, newConst, 1, n_Zn);
+        mpz_clear(newConst);
+      }
+      return(qr);  
+}
+
 BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
 {
   if( !rSamePolyRep(r1, r2) )
