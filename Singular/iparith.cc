@@ -4313,6 +4313,10 @@ static BOOLEAN jjINDEPSET(leftv res, leftv v)
 static BOOLEAN jjINTERRED(leftv res, leftv v)
 {
   ideal result=kInterRed((ideal)(v->Data()), currQuotient);
+  #ifdef HAVE_RINGS
+  if(rField_is_Ring(currRing))
+    Warn("interred: this command is experimental over the integers");
+  #endif
   if (TEST_OPT_PROT) { PrintLn(); mflush(); }
   res->data = result;
   return FALSE;
@@ -8594,7 +8598,8 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
   while ( a <= e);
 
   // catch missing a cmd:
-  assume(0);
+  // may be missing as a op for blackbox, if the first operand is "undef" instead of bb
+  // Print("op %d (%c) unknown",op,op);
   return 0;
 }
 

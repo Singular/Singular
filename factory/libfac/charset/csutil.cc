@@ -5,15 +5,74 @@
 #include <factory.h>
 // Factor - Includes
 #include <tmpl_inst.h>
-#include <Factor.h>
-#include <SqrFree.h>
 #include <helpstuff.h>
-#include <homogfactor.h>
 // Charset - Includes
 #include "csutil.h"
 extern void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 extern CanonicalForm alg_lc(const CanonicalForm &f);
-extern int hasAlgVar(const CanonicalForm &f);
+
+int hasAlgVar(const CanonicalForm &f, const Variable &v)
+{
+  if (f.inBaseDomain()) return 0;
+  if (f.inCoeffDomain())
+  {
+    if (f.mvar()==v) return 1;
+    return hasAlgVar(f.LC(),v);
+  }
+  if (f.inPolyDomain())
+  {
+    if (hasAlgVar(f.LC(),v)) return 1;
+    for( CFIterator i=f; i.hasTerms(); i++)
+    {
+      if (hasAlgVar(i.coeff(),v)) return 1;
+    }
+  }
+  return 0;
+}
+
+int hasVar(const CanonicalForm &f, const Variable &v)
+{
+  if (f.inBaseDomain()) return 0;
+  if (f.inCoeffDomain())
+  {
+    if (f.mvar()==v) return 1;
+    return hasAlgVar(f.LC(),v);
+  }
+  if (f.inPolyDomain())
+  {
+    if (f.mvar()==v) return 1;
+    if (hasVar(f.LC(),v)) return 1;
+    for( CFIterator i=f; i.hasTerms(); i++)
+    {
+      if (hasVar(i.coeff(),v)) return 1;
+    }
+  }
+  return 0;
+}
+
+int hasAlgVar(const CanonicalForm &f)
+{
+  if (f.inBaseDomain()) return 0;
+  if (f.inCoeffDomain())
+  {
+    if (f.level()!=0)
+    {
+      //CERR << "hasAlgVar:" << f.mvar() <<"\n";
+      return 1;
+    }
+    return hasAlgVar(f.LC());
+  }
+  if (f.inPolyDomain())
+  {
+    if (hasAlgVar(f.LC())) return 1;
+    for( CFIterator i=f; i.hasTerms(); i++)
+    {
+      if (hasAlgVar(i.coeff())) return 1;
+    }
+  }
+  return 0;
+}
+
 
 static bool
 lowerRank ( const CanonicalForm & f, const CanonicalForm & g, int & ind )
@@ -227,10 +286,12 @@ divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as)
   //out_cf("divide g=",f,"\n");
   if (f.inCoeffDomain())
   {
-    bool b=!isOn(SW_RATIONAL);
-    On(SW_RATIONAL);
+    bool isRat=isOn(SW_RATIONAL);
+    if (getCharacteristic() == 0)
+      On(SW_RATIONAL);
     q=ff/f;
-    if (b) Off(SW_RATIONAL);
+    if (!isRat && getCharacteristic() == 0)
+      Off(SW_RATIONAL);
   }
   else
     r= Sprem(ff,f,m,q); //result in q, ignore r,m
@@ -396,13 +457,19 @@ nopower( const CanonicalForm & init )
   if ( count > 1 ) sqrfreelist = CFFList( CFFactor(init,1));
   else
   {
-    sqrfreelist = Factorize(init);
-    //sqrfreelist.removeFirst();
+    bool isRat= isOn (SW_RATIONAL);
+    if (!isRat && getCharacteristic() == 0)
+      On (SW_RATIONAL);
+    sqrfreelist = factorize(init);
+    if (sqrfreelist.getFirst().factor().inCoeffDomain())
+      sqrfreelist.removeFirst();
+    if (!isRat && getCharacteristic() == 0)
+      Off (SW_RATIONAL);
   }
   for ( CFFListIterator i=sqrfreelist; i.hasItem(); i++ )
   {
     elem=i.getItem().factor();
-    if ( cls(elem) > 0 ) output.append(elem);
+    if ( cls(elem) > 0 ) output.append(myfitting (elem, CFList()));
   }
   return output;
 }
@@ -497,10 +564,14 @@ factorps( const CFList &ps )
   CFFList q;
   CanonicalForm elem;
 
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat && getCharacteristic() == 0)
+    On (SW_RATIONAL);
   for ( CFListIterator i=ps; i. hasItem(); i++ )
   {
-    q=Factorize(i.getItem());
-    q.removeFirst();
+    q=factorize(i.getItem());
+    if (q.getFirst().factor().inCoeffDomain())
+      q.removeFirst();
     // Next can be simplified ( first (already removed) elem in q is the only constant
     for ( CFFListIterator j=q; j.hasItem(); j++ )
     {
@@ -509,6 +580,8 @@ factorps( const CFList &ps )
         qs= Union(qs, CFList(myfitting(elem, CFList())));
     }
   }
+  if (!isRat && getCharacteristic() == 0)
+    Off (SW_RATIONAL);
   return qs;
 }
 
@@ -820,7 +893,6 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 {
   if (fff.inCoeffDomain() || ggg.inCoeffDomain())
     return 1;
-  bool isRat= isOn (SW_RATIONAL);
   CanonicalForm f=fff;
   CanonicalForm g=ggg;
   f=Prem(f,as);

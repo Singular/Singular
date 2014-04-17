@@ -6,8 +6,6 @@
 #include <factory.h>
 // Factor - Includes
 #include <tmpl_inst.h>
-#include <Factor.h>
-#include <SqrFree.h>
 #include <helpstuff.h>
 // Charset - Includes
 #include "csutil.h"
@@ -27,31 +25,21 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 #include <libfac/factor/debug.h>
 
+///////////////////////////////////////////////////////////////
+// generate a minpoly of degree degree_of_Extension in the   //
+// field getCharacteristik()^Extension.                      //
+///////////////////////////////////////////////////////////////
+CanonicalForm
+generate_mipo( int degree_of_Extension , const Variable & Extension )
+{
+  FFRandom gen;
+  if (degree (Extension) < 0)
+    factoryError("libfac: evaluate: Extension not inFF() or inGF() !");
+  return find_irreducible( degree_of_Extension, gen, Variable(1) );
+}
+
 static Varlist
 Var_is_in_AS(const Varlist & uord, const CFList & Astar);
-
-int getAlgVar(const CanonicalForm &f, Variable &X)
-{
-  if (f.inBaseDomain()) return 0;
-  if (f.inCoeffDomain())
-  {
-    if (f.level()!=0)
-    {
-      X= f.mvar();
-      return 1;
-    }
-    return getAlgVar(f.LC(),X);
-  }
-  if (f.inPolyDomain())
-  {
-    if (getAlgVar(f.LC(),X)) return 1;
-    for( CFIterator i=f; i.hasTerms(); i++)
-    {
-      if (getAlgVar(i.coeff(),X)) return 1;
-    }
-  }
-  return 0;
-}
 
 ////////////////////////////////////////////////////////////////////////
 // This implements the algorithm of Trager for factorization of
@@ -81,12 +69,14 @@ static CanonicalForm
 resultante( const CanonicalForm & f, const CanonicalForm& g, const Variable & v )
 {
   bool on_rational = isOn(SW_RATIONAL);
-  On(SW_RATIONAL);
+  if (!on_rational && getCharacteristic() == 0)
+    On(SW_RATIONAL);
   CanonicalForm cd = bCommonDen( f );
   CanonicalForm fz = f * cd;
   cd = bCommonDen( g );
   CanonicalForm gz = g * cd;
-  if (!on_rational)  Off(SW_RATIONAL);
+  if (!on_rational && getCharacteristic() == 0)
+    Off(SW_RATIONAL);
   CanonicalForm result;
   if (getCharacteristic() == 0)
     result= resultantZ (fz, gz,v);
@@ -152,7 +142,7 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       // for now we use this workaround with Factorize...
       // ...but it should go away soon!!!!
       Variable X;
-      if (getAlgVar(R,X))
+      if (hasFirstAlgVar(R,X))
         testlist=factorize( R, X );
       else
         testlist= factorize(R);
@@ -227,7 +217,7 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       // for now we use this workaround with Factorize...
       // ...but it should go away soon!!!!
       Variable X;
-      if (getAlgVar(R,X))
+      if (hasFirstAlgVar(R,X))
         testlist= factorize( R, X );
       else
         testlist= factorize(R);
@@ -333,20 +323,6 @@ inseperable(const CFList & Astar)
   return 0;
 }
 
-// calculate gcd of f and g in char=0
-static CanonicalForm
-gcd0( CanonicalForm f, CanonicalForm g )
-{
-  int charac= getCharacteristic();
-  int save=isOn(SW_RATIONAL);
-  setCharacteristic(0); Off(SW_RATIONAL);
-  CanonicalForm ff= mapinto(f), gg= mapinto(g);
-  CanonicalForm result= gcd(ff,gg);
-  setCharacteristic(charac);
-  if (save) On(SW_RATIONAL);
-  return mapinto(result);
-}
-
 // calculate big enough extension for finite fields
 // Idea: first calculate k, such that q^k > S (->thesis, -> getextension)
 // Second, search k with gcd(k,m_i)=1, where m_i is the degree of the i'th
@@ -367,7 +343,7 @@ getextension( IntList & degreelist, int n)
   do {
     for (i=degreelist; i.hasItem(); i++){
       l= l+1;
-      if ( gcd0(k,i.getItem()) == 1){
+      if ( igcd(k,i.getItem()) == 1){
         DEBOUTLN(CERR, "getextension: gcd == 1, l=",l);
         if ( l==length ){ setCharacteristic(charac);  return k; }
       }
@@ -474,7 +450,7 @@ QuasiInverse (const CanonicalForm& f, const CanonicalForm& g,
   CanonicalForm pi, pi1, q, t0, t1, Hi, bi, pi2;
   bool isRat= isOn (SW_RATIONAL);
   CanonicalForm m,tmp;
-  if (isRat)
+  if (isRat && getCharacteristic() == 0)
     Off (SW_RATIONAL);
   pi= f/content (f,x);
   pi1= g/content (g,x);
@@ -511,7 +487,7 @@ QuasiInverse (const CanonicalForm& f, const CanonicalForm& g,
     }
   }
   t1 /= gcd (pi1, t1);
-  if (!isRat)
+  if (!isRat && getCharacteristic() == 0)
     Off (SW_RATIONAL);
   return t1;
 }
@@ -606,24 +582,29 @@ simpleextension(CFList& backSubst, const CFList & Astar,
     {
       j= i;
       j++;
-      Off (SW_RATIONAL);
+      if (getCharacteristic() == 0)
+        Off (SW_RATIONAL);
       R /= icontent (R);
-      On (SW_RATIONAL);
+      if (getCharacteristic() == 0)
+        On (SW_RATIONAL);
       oldR= R;
       sqrf_norm (i.getItem(), R, Extension, s, g, R);
 
       backSubst.insert (s);
 
-      Off (SW_RATIONAL);
+      if (getCharacteristic() == 0)
+        Off (SW_RATIONAL);
       R /= icontent (R);
 
-      On (SW_RATIONAL);
+      if (getCharacteristic() == 0)
+        On (SW_RATIONAL);
 
       if (!isFunctionField)
       {
         alpha= rootOf (R);
         h= replacevar (g, g.mvar(), alpha);
-        On (SW_RATIONAL); //needed for GCD
+        if (getCharacteristic() == 0)
+          On (SW_RATIONAL); //needed for GCD
         h= gcd (h, oldR);
         h /= Lc (h);
         ra= -h[0];
@@ -637,7 +618,8 @@ simpleextension(CFList& backSubst, const CFList & Astar,
       }
       else
       {
-        On (SW_RATIONAL);
+        if (getCharacteristic() == 0)
+          On (SW_RATIONAL);
         h= swapvar (g, g.mvar(), oldR.mvar());
         tmp= CFList (swapvar (R, g.mvar(), oldR.mvar()));
         h= alg_gcd (h, swapvar (oldR, g.mvar(), oldR.mvar()), tmp);
@@ -646,7 +628,8 @@ simpleextension(CFList& backSubst, const CFList & Astar,
         CanonicalForm numinv, deninv;
         numinv= QuasiInverse (tmp.getFirst(), LC (h), tmp.getFirst().mvar());
 
-        Off (SW_RATIONAL);
+        if (getCharacteristic() == 0)
+          Off (SW_RATIONAL);
         h *= numinv;
         h= reduce (h, tmp.getFirst());
         deninv= LC(h);
@@ -680,9 +663,9 @@ simpleextension(CFList& backSubst, const CFList & Astar,
   if (isFunctionField)
     Returnlist.append (denrb);
 
-  if (isRat)
+  if (isRat && getCharacteristic() == 0)
     On (SW_RATIONAL);
-  else
+  else if (!isRat && getCharacteristic() == 0)
     Off (SW_RATIONAL);
 
   return Returnlist;
@@ -765,6 +748,7 @@ static CFFList
 alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vminpoly, const Varlist & oldord, const CFList & as, bool isFunctionField)
 #endif
 {
+  bool isRat= isOn (SW_RATIONAL);
   CFFList L, Factorlist;
   CanonicalForm R, Rstar, s, g, h, f= F;
   CFList substlist, backSubsts;
@@ -785,6 +769,8 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
     alpha= rootOf (Rstar);
     g= replacevar (f, Rstar.mvar(), alpha);
 
+    if (!isRat && getCharacteristic() == 0)
+      On (SW_RATIONAL);
     Factorlist= factorize (g, alpha);
 
     for (CFFListIterator i= Factorlist; i.hasItem(); i++)
@@ -799,6 +785,8 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
         L.append (CFFactor (h, i.getItem().exp()));
       }
     }
+    if (!isRat && getCharacteristic() == 0)
+      Off (SW_RATIONAL);
     return L;
   }
   // after here we are over an extension of a function field
@@ -808,7 +796,8 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   CFList Rstarlist= CFList (Rstar);
   int algExtLevel= Astar.getLast().level(); //highest level of algebraic variables
   CanonicalForm numinv;
-  On (SW_RATIONAL);
+  if (!isRat && getCharacteristic() == 0)
+    On (SW_RATIONAL);
   numinv= QuasiInverse (Rstar, alg_LC(f, algExtLevel), Rstar.mvar());
 
   f *= numinv;
@@ -823,9 +812,8 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   DEBOUTLN(CERR, "alg_factor: g= ", g);
   DEBOUTLN(CERR, "alg_factor: s= ", s);
   DEBOUTLN(CERR, "alg_factor: R= ", R);
-  Off(SW_RATIONAL);
   Variable X;
-  if (getAlgVar(R,X))
+  if (hasFirstAlgVar(R,X))
   {
     // factorize R over alg.extension with X
     //CERR << "alg: "<< X << " mipo=" << getMipo(X,Variable('X')) <<"\n";
@@ -839,7 +827,6 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
     Factorlist = factorize(R);
   }
 
-  On(SW_RATIONAL);
   DEBOUTLN(CERR, "alg_factor: Factorize(R)= ", Factorlist);
   if ( !Factorlist.getFirst().factor().inCoeffDomain() )
     Factorlist.insert(CFFactor(1,1));
@@ -911,6 +898,9 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   //printf("end alg_factor\n");
   DEBOUTLN(CERR, "alg_factor: L= ", LL);
   DEBDECLEVEL(CERR,"alg_factor");
+  if (!isRat && getCharacteristic() == 0)
+    Off (SW_RATIONAL);
+
   return LL;
 }
 
@@ -1000,7 +990,6 @@ multiplicity (CFFList& factors, const CanonicalForm& F, const CFList& as)
   Variable x= F.mvar();
   CanonicalForm q, r;
   int count= -1;
-  On (SW_RATIONAL);
   for (CFFListIterator iter=factors; iter.hasItem(); iter++)
   {
     count= -1;
@@ -1014,7 +1003,6 @@ multiplicity (CFFList& factors, const CanonicalForm& F, const CFList& as)
       r= Prem (r, as);
       if (!r.isZero())
         break;
-      On (SW_RATIONAL);
       count++;
       G= q;
     }
@@ -1030,7 +1018,7 @@ CFFList
 newfactoras( const CanonicalForm & f, const CFList & as, int &success)
 {
   bool isRat= isOn (SW_RATIONAL);
-  if (!isRat)
+  if (!isRat && getCharacteristic() == 0)
     On (SW_RATIONAL);
   Variable vf=f.mvar();
   CFListIterator i;
@@ -1052,7 +1040,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
   if ( (cls(vf) <= cls(as.getLast())) ||  degree(f,vf)<=1 ){
 // ||( (as.length()==1) && (degree(f,vf)==3) && (degree(as.getFirst()==2)) )
     DEBDECLEVEL(CERR,"newfactoras");
-    if (!isRat)
+    if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     return CFFList(CFFactor(f,1));
   }
@@ -1083,7 +1071,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
 // 3) second trivial cases: we already prooved irr. of f over no extensions
   if ( Astar.length() == 0 ){
     DEBDECLEVEL(CERR,"newfactoras");
-    if (!isRat)
+    if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     return CFFList(CFFactor(f,1));
   }
@@ -1116,7 +1104,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
     {
       CFFList result= newfactoras (Ggcd,as,success); //Ggcd is the squarefree part of f
       multiplicity (result, f, Astar);
-      if (!isRat)
+      if (!isRat && getCharacteristic() == 0)
         Off (SW_RATIONAL);
       return result;
     }
@@ -1124,14 +1112,12 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
     DEBOUTLN(CERR, "         and ", Ggcd);
     Fgcd= pp(Fgcd); Ggcd= pp(Ggcd);
     DEBDECLEVEL(CERR,"newfactoras");
-    if (!isRat)
+    if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     return myUnion(newfactoras(Fgcd,as,success) , newfactoras(Ggcd,as,success));
   }
   if ( getCharacteristic() > 0 )
   {
-    if (!isRat)
-      Off (SW_RATIONAL);
     // First look for extension!
     IntList degreelist;
     Variable vminpoly;
@@ -1177,7 +1163,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
     Variable vminpoly;
     Factorlist= alg_factor(f, Astar, vminpoly, oldord, as, isFunctionField);
     DEBDECLEVEL(CERR,"newfactoras");
-    if (!isRat)
+    if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     return Factorlist;
   }
@@ -1190,7 +1176,7 @@ CFFList
 newcfactor(const CanonicalForm & f, const CFList & as, int & success )
 {
   bool isRat= isOn (SW_RATIONAL);
-  if (!isRat)
+  if (!isRat && getCharacteristic() == 0)
     On (SW_RATIONAL);
   CFFList Output, output, Factors= factorize(f);
   if (Factors.getFirst().factor().inCoeffDomain())
@@ -1198,14 +1184,14 @@ newcfactor(const CanonicalForm & f, const CFList & as, int & success )
 
   if ( as.length() == 0 )
   {
-    if (!isRat)
+    if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     success=1;
     return Factors;
   }
   if ( cls(f) <= cls(as.getLast()) )
   {
-    if (!isRat)
+    if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     success=1;
     return Factors;
@@ -1219,7 +1205,7 @@ newcfactor(const CanonicalForm & f, const CFList & as, int & success )
       Output = myappend(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
   }
 
-  if (!isRat)
+  if (!isRat && getCharacteristic() == 0)
     Off (SW_RATIONAL);
   return Output;
 }

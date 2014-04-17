@@ -40,3 +40,5 @@ New/hilblocinhom.tst
 New/trans_ext_denominator.tst
 New/ntDiff.tst
 New/bug_std.tst
+New/hdepth.tst
+New/bug_541_interred.tst

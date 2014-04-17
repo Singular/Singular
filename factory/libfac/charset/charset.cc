@@ -9,8 +9,6 @@
 #define CIN cin
 #endif
 // Factor - Includes
-#include <SqrFree.h>
-#include <Factor.h>
 #include <interrupt.h>
 // Charset - Includes
 #include "csutil.h"

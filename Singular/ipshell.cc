@@ -386,10 +386,10 @@ void killlocals(int v)
   }
   if (changed)
   {
-    currRingHdl=rFindHdl(cr,NULL,NULL);
+    currRingHdl=rFindHdl(cr,NULL);
     if (currRingHdl==NULL)
       currRing=NULL;
-    else
+    else if(cr!=currRing)
       rChangeCurrRing(cr);
   }
 
@@ -1544,7 +1544,7 @@ idhdl rDefault(const char *s)
   return currRingHdl;
 }
 
-idhdl rFindHdl(ring r, idhdl n, idhdl)
+idhdl rFindHdl(ring r, idhdl n)
 {
   idhdl h=rSimpleFindHdl(r,IDROOT,n);
   if (h!=NULL)  return h;
@@ -5644,7 +5644,13 @@ void rKill(idhdl h)
     if (ref<=0) { currRing=NULL; currRingHdl=NULL;}
     else
     {
-      currRingHdl=rFindHdl(r,currRingHdl,NULL);
+      currRingHdl=rFindHdl(r,currRingHdl);
+      if ((currRingHdl==NULL)&&(currRing->idroot==NULL))
+      {
+        for (int i=myynest;i>=0;i--)
+	  if (iiLocalRing[i]==currRing) return;
+        currRing=NULL;
+      }
     }
   }
 }
