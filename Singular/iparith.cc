@@ -38,10 +38,10 @@
 
 #include <kernel/GBEngine/stairc.h>
 #include <kernel/polys.h>
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/kstd1.h>
-#include <kernel/timer.h>
+#include <Singular/timer.h>
 #include <kernel/preimage.h>
 #include <kernel/GBEngine/units.h>
 #include <kernel/spectrum/GMPrat.h>
@@ -49,7 +49,7 @@
 #include <kernel/groebner_walk/walkProc.h>
 #include <kernel/linear_algebra/linearAlgebra.h>
 #include <kernel/GBEngine/syz.h>
-#include <kernel/timer.h>
+#include <Singular/timer.h>
 
 #include <kernel/linear_algebra/interpolation.h>
 #  include <kernel/GBEngine/kstdfac.h>

@@ -17,8 +17,8 @@
 
 #include <factory/factory.h>
 
-#include <kernel/febase.h>
-#include <kernel/timer.h>
+#include <Singular/febase.h>
+#include <Singular/timer.h>
 
 // #ifdef HAVE_FANS
 // #include <callgfanlib/bbcone.h>

@@ -14,7 +14,6 @@
 #include <kernel/GBEngine/ratgring.h>
 #ifdef HAVE_RATGRING
 #include <polys/nc/nc.h>
-#include <kernel/febase.h>
 #include <polys/monomials/ring.h>
 #include <kernel/polys.h>
 #include <coeffs/numbers.h>

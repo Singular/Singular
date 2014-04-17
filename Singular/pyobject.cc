@@ -18,7 +18,7 @@
 #include <omalloc/omalloc.h>
 #include <misc/intvec.h>
 
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 
 #include <Singular/subexpr.h>
 #include <Singular/ipid.h>

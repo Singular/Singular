@@ -13,7 +13,6 @@
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <kernel/polys.h>
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/kutil.h>
 #include <kernel/GBEngine/stairc.h>
@@ -26,7 +25,6 @@
 #include <kernel/GBEngine/syz.h>
 #include <polys/kbuckets.h>
 #include <polys/prCopy.h>
-#include <kernel/timer.h>
 #include <polys/matpol.h>
 
 //#define SHOW_PROT

@@ -17,7 +17,7 @@
 #ifdef HAVE_DBM
 
 #  include <omalloc/omalloc.h>
-#  include <kernel/febase.h>
+#  include <Singular/febase.h>
 #  include <Singular/tok.h>
 #  include <Singular/ipid.h>
 #  include <Singular/links/silink.h>

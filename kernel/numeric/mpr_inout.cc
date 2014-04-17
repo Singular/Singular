@@ -26,7 +26,6 @@
 #include <polys/matpol.h>
 
 
-#include <kernel/febase.h>
 #include <kernel/structs.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>

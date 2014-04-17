@@ -51,8 +51,8 @@ void SetMinDisplayTime(double mtime)
 #endif
 
 
-#include <kernel/timer.h>
-#include <kernel/febase.h>
+#include <Singular/timer.h>
+#include <Singular/febase.h>
 
 /*3
 * the start time of the timer

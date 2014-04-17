@@ -17,7 +17,6 @@
 #include "Singular/ipid.h"
 
 // #include <omalloc/omalloc.h>
-// #include <kernel/febase.h>
 // #include <kernel/intvec.h>
 // #include <kernel/longrat.h>
 // #include <Singular/lists.h>

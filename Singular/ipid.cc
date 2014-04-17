@@ -23,7 +23,7 @@
 #include <polys/matpol.h>
 #include <polys/monomials/ring.h>
 
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 #include <libpolys/coeffs/longrat.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>

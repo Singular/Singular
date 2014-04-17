@@ -12,7 +12,7 @@
 
 #ifdef HAVE_EIGENVAL
 
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <misc/intvec.h>

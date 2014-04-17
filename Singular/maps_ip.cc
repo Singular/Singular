@@ -24,7 +24,7 @@
 //#include <libpolys/polys/ext_fields/longtrans.h>
 // #include <kernel/longalg.h>
 
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 #include <kernel/GBEngine/kstd1.h>
 
 #include "maps_ip.h"

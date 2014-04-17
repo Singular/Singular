@@ -10,7 +10,6 @@
 #include <misc/auxiliary.h>
 
 #include <polys/monomials/p_polys.h>
-//#include <kernel/febase.h>
 //#include <kernel/pShallowCopyDelete.h>
 #include <coeffs/coeffs.h>
 #include <polys/monomials/ring.h>

@@ -39,7 +39,7 @@
 #include <Singular/cntrlc.h>
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 #include <Singular/ipshell.h>
 #include <Singular/ipconv.h>
 #include <coeffs/ffields.h>
@@ -61,7 +61,7 @@
 #include <kernel/ideals.h>
 #include <Singular/ipid.h>
 #include <Singular/tok.h>
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 #include <coeffs/numbers.h>
 #include <Singular/ipid.h>
 #include <polys/monomials/ring.h>

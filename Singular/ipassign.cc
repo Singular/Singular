@@ -36,11 +36,11 @@
 #include <polys/nc/nc.h>
 #include <polys/nc/sca.h>
 
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/kstd1.h>
-#include <kernel/timer.h>
+#include <Singular/timer.h>
 #include <kernel/GBEngine/stairc.h>
 #include <kernel/GBEngine/syz.h>
 

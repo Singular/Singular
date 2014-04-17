@@ -10,7 +10,7 @@
 #define HAVE_SDB
 
 #ifdef HAVE_SDB
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 #include <kernel/structs.h>
 
 extern int    sdb_lines[];

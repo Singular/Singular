@@ -11,7 +11,7 @@
 
 #include <polys/monomials/ring.h>
 
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 //#include <kernel/structs.h>
 
 #include <Singular/grammar.h>

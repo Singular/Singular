@@ -13,7 +13,6 @@
 #include <omalloc/omalloc.h>
 #include <stdlib.h>
 #include <kernel/GBEngine/kutil.h>
-#include <kernel/febase.h>
 #include <kernel/polys.h>
 static const int bundle_size=100;
 

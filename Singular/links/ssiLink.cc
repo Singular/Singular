@@ -23,7 +23,7 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/ext_fields/transext.h>
 
-#include <kernel/timer.h>
+#include <Singular/timer.h>
 
 #include <Singular/tok.h>
 #include <Singular/ipid.h>

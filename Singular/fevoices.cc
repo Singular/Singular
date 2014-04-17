@@ -12,7 +12,7 @@
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
 #include <reporter/reporter.h>
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 
 #include <stdlib.h>
 #include <stdio.h>

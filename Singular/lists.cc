@@ -12,7 +12,7 @@
 
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 //#include "ipid.h"
 #include <kernel/polys.h>
 #include <kernel/ideals.h>

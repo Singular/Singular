@@ -15,7 +15,7 @@
 #include <misc/options.h>
 #include <Singular/ipid.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 #include <polys/monomials/ring.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipshell.h>

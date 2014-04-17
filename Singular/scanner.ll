@@ -12,7 +12,7 @@
 #include <Singular/tok.h>
 #include <Singular/stype.h>
 #include <Singular/ipshell.h>
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 
 int feReadLine(char* b, int l);
 #define ALLOC(a) omAlloc((a))

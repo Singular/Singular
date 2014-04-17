@@ -25,10 +25,10 @@
 #include <libpolys/coeffs/longrat.h>
 // #include <coeffs/longrat.h>
 
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/kstd1.h>
-#include <kernel/timer.h>
+#include <Singular/timer.h>
 #include <kernel/GBEngine/syz.h>
 
 #include <Singular/tok.h>

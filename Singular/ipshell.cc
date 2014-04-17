@@ -22,7 +22,7 @@
 #include <Singular/ipid.h>
 #include <misc/intvec.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 #include <kernel/polys.h>
 #include <coeffs/numbers.h>
 #include <polys/prCopy.h>

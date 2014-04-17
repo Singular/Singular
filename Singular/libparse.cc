@@ -1072,7 +1072,7 @@ char *yytext;
   #include <Singular/ipid.h>
   #include <Singular/tok.h>
   #include <misc/options.h>
-  #include <kernel/febase.h>
+  #include <Singular/febase.h>
   #include <omalloc/omalloc.h>
 #endif
 #include <Singular/libparse.h>

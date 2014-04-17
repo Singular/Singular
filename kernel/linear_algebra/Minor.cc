@@ -7,7 +7,6 @@
 
 #include <kernel/structs.h>
 #include <kernel/polys.h>
-#include <kernel/febase.h>
 
 using namespace std;
 

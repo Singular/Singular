@@ -20,7 +20,7 @@
 #include <kernel/ideals.h>
 #include <Singular/lists.h>
 #include <polys/matpol.h>
-#include <kernel/febase.h>
+#include <Singular/febase.h>
 #include <Singular/pcv.h>
 
 static int pcvMaxDegree;

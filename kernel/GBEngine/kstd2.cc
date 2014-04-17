@@ -77,7 +77,6 @@ long sba_interreduction_operations;
 #include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/khstd.h>
 #include <polys/kbuckets.h>
