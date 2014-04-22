@@ -911,11 +911,11 @@ void MinorValue::print() const
 void MinorValue::SetRankingStrategy (const int rankingStrategy)
 {
   g_rankingStrategy = rankingStrategy;
-  if (g_rankingStrategy == 6)
-  {
-    /* initialize the random generator with system time */
-    srand ( time(NULL) );
-  }
+  //if (g_rankingStrategy == 6) : rand() is never used
+  //{
+  //  /* initialize the random generator with system time */
+  //  srand ( time(NULL) );
+  //}
 }
 
 int MinorValue::GetRankingStrategy()
