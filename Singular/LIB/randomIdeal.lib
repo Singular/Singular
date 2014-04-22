@@ -31,7 +31,7 @@ proc init_randomIdeal()
 {
     if (not defined(TIdealGeneratingParameters_def) )
     {
-      def TIdealGeneratingParameters_def=0;
+      int TIdealGeneratingParameters_def=0;
       newstruct("TIdealGeneratingParameters","int absMaxCoeff,int maxMonomialDegree, int maxTermsPerGen, int maxGens ");
     }
 }
@@ -57,7 +57,7 @@ RETURN:   random basering parameter or varible
 // return   index i such that par(i)==variable or 0 if variable is not a basering parameter
 static proc getParIdx(variable)
 {
-   def numPars = npars(basering);
+   int numPars = npars(basering);
    int i;
    for ( i=1; i<=numPars; i++ )
    {
@@ -86,16 +86,15 @@ static proc isVariable(variable)
 static proc testRandomVariable()
 {
     ring rng = (0,a,b,c),(x,y),dp;
-    def coeff ;
-    def numPars = npars(basering);
-    def numVars = nvars(basering);
+    int numPars = npars(basering);
+    int numVars = nvars(basering);
     intmat mp [1][numPars];
     intmat mv [1][numVars];
     int i,j,k;
     for ( i=1; i<1000; i++ )
     {
         if (defined(unknown)) {kill unknown;}
-        def unknown = randomVariable();
+        poly unknown = randomVariable();
 
         if ( isParameter(unknown) )  
         {
@@ -175,7 +174,7 @@ RETURN:   a random matrix 'generator' with entries in {-absMaxCoeff, absMaxCoeff
      string cmd = "proc rCoeffMat(    )
      {
         ASSUME(0, defined(basering) );
-        def mat = sparsemat("+string(rows)+","+string(cols)+",random(0,100),"+string(pAbsMaxCoeff)+");
+        intmat mat = sparsemat("+string(rows)+","+string(cols)+",random(0,100),"+string(pAbsMaxCoeff)+");
         return(mat);
      }";
 
@@ -189,14 +188,13 @@ static proc testRandomCoeffGenerator()
 {
     ring rng = 0,x,dp;
     int absMaxCoeff = 10;
-    def coeffG = createRandomCoeffGenerator(absMaxCoeff);
+    proc coeffG = createRandomCoeffGenerator(absMaxCoeff);
     int i;
     intmat m [1][2*absMaxCoeff+1];
-    def coeff ;
+    number coeff ;
     for ( i=1; i<10000; i++ )
     {
         coeff =  coeffG();
-
         ASSUME(0, coeff <=absMaxCoeff and coeff >=- absMaxCoeff );
         m[1,int(coeff)+absMaxCoeff+1]=int(1);
     }
@@ -220,7 +218,7 @@ RETURN:   a random monomial generator, with monomials not exceeding pMaxMonomial
         ASSUME(0, defined(basering) );
         poly tmpMonomial = 1; 
 
-        def monomialDegree = random( 0, " + string(pMaxMonomialDegree) + ") ;
+        int monomialDegree = random( 0, " + string(pMaxMonomialDegree) + ") ;
 
         int factorNr;
         for ( factorNr = 1; factorNr <= monomialDegree ; factorNr++)
@@ -249,7 +247,7 @@ RETURN:   a random matrix 'generator' with entries in {-absMaxCoeff, absMaxCoeff
      string cmd = "proc rMonomialMat(    )
      {
         ASSUME(0, defined(basering) );
-        def monGvys345g = createRandomMonomialGenerator("+string(pMaxMonomialDegree)+");
+        proc monGvys345g = createRandomMonomialGenerator("+string(pMaxMonomialDegree)+");
         matrix mat42349523463454534553267404["+string(rows)+"]["+string(cols)+"] ;
         int i,j;
         for (i=1;i<="+string(rows)+";i++)
@@ -271,11 +269,11 @@ static proc testRandomMonomialGenerator()
 {
     ring rng = 0,x,dp;
     int maxDegree = 10;
-    def monomialG = createRandomMonomialGenerator(maxDegree);
+    proc monomialG = createRandomMonomialGenerator(maxDegree);
     int i;
     intmat m[1][maxDegree+1];
-    def rndMonomial;
-    def monDegree;
+    poly rndMonomial;
+    int monDegree;
     for ( i=1; i<1000; i++ )
     {
         rndMonomial =  monomialG();
@@ -324,12 +322,12 @@ static proc testRandomTermGenerator()
     ring rng = 0,x,dp;
     int maxDegree = 10;
     int absMaxCoeff = 15;
-    def coeffG = createRandomCoeffGenerator(absMaxCoeff);
-    def monomialG = createRandomMonomialGenerator(maxDegree);
-    def termG = createRandomTermGenerator(coeffG,monomialG);
+    proc coeffG = createRandomCoeffGenerator(absMaxCoeff);
+    proc monomialG = createRandomMonomialGenerator(maxDegree);
+    proc termG = createRandomTermGenerator(coeffG,monomialG);
     int i;
  
-    def rndTerm;
+    poly rndTerm;
  
     for ( i=1; i<1000; i++ )
     {
@@ -386,9 +384,9 @@ RETURN:   a random polynomial generator
     proc randomPolyGenerator( ) 
     {
         ASSUME(0, defined(basering) );
-        def mc52345529345805 = createRandomCoeffMatrixGenerator(1,"+string(maxTerms)+","+string(absMaxCoeff)+");
-        def mm52345529345805 = createRandomMonomialMatrixGenerator("+string(maxTerms)+",1,"+string(maxDegree)+");
-        def prod = mc52345529345805()*mm52345529345805();
+        proc mc52345529345805 = createRandomCoeffMatrixGenerator(1,"+string(maxTerms)+","+string(absMaxCoeff)+");
+        proc mm52345529345805 = createRandomMonomialMatrixGenerator("+string(maxTerms)+",1,"+string(maxDegree)+");
+        matrix prod = mc52345529345805()*mm52345529345805();
         poly term =prod[1,1];
         return(term);
     }";
@@ -404,14 +402,14 @@ static proc testRandomPolyGenerator()
     int maxDegree = 3;
     int absMaxCoeff = 15;
     int maxTerms = 5;
-    def coeffG = createRandomCoeffGenerator(absMaxCoeff);
-    def monomialG = createRandomMonomialGenerator(maxDegree);
-    def termG = createRandomTermGenerator(coeffG,monomialG);
-    def polyG = createRandomPolyGenerator(termG,maxTerms);
-    def polyG2 = createRandomPolyGenerator2( absMaxCoeff, maxDegree, maxTerms );
+    proc coeffG = createRandomCoeffGenerator(absMaxCoeff);
+    proc monomialG = createRandomMonomialGenerator(maxDegree);
+    proc termG = createRandomTermGenerator(coeffG,monomialG);
+    proc polyG = createRandomPolyGenerator(termG,maxTerms);
+    proc polyG2 = createRandomPolyGenerator2( absMaxCoeff, maxDegree, maxTerms );
     int i;
  
-    def rndPoly;
+    poly rndPoly;
 
     for ( i=1; i<500; i++ )
     {
@@ -473,16 +471,16 @@ static proc testRandomIdealGenerator()
     int absMaxCoeff = 15;
     int maxTerms = 5;
     int maxNumGens=4;
-    def coeffG = createRandomCoeffGenerator(absMaxCoeff);
-    def monomialG = createRandomMonomialGenerator(maxDegree);
-    def termG = createRandomTermGenerator(coeffG,monomialG);
-    def polyG = createRandomPolyGenerator(termG,maxTerms);
+    proc coeffG = createRandomCoeffGenerator(absMaxCoeff);
+    proc monomialG = createRandomMonomialGenerator(maxDegree);
+    proc termG = createRandomTermGenerator(coeffG,monomialG);
+    proc polyG = createRandomPolyGenerator(termG,maxTerms);
 
-    def idealG = createRandomIdealGenerator( polyG, maxNumGens );
+    proc idealG = createRandomIdealGenerator( polyG, maxNumGens );
 
     int i;
  
-    def rndideal;
+    ideal rndideal;
  
     for ( i=1; i<1000; i++ )
     {
@@ -520,11 +518,11 @@ proc idealGeneratorFromParams(TIdealGeneratingParameters params)
 RETURN:   a random ideal generating function 
 "
 {
-       def coeffG    = createRandomCoeffGenerator   ( params.absMaxCoeff );
-       def monomialG = createRandomMonomialGenerator( params.maxMonomialDegree );
-       def termG     = createRandomTermGenerator    ( coeffG, monomialG );
-       def polyG     = createRandomPolyGenerator    ( termG, params.maxTermsPerGen );
-       def idealG    = createRandomIdealGenerator   ( polyG, params.maxGens );
+       proc coeffG    = createRandomCoeffGenerator   ( params.absMaxCoeff );
+       proc monomialG = createRandomMonomialGenerator( params.maxMonomialDegree );
+       proc termG     = createRandomTermGenerator    ( coeffG, monomialG );
+       proc polyG     = createRandomPolyGenerator    ( termG, params.maxTermsPerGen );
+       proc idealG    = createRandomIdealGenerator   ( polyG, params.maxGens );
 
       return (idealG);
 }
@@ -533,10 +531,10 @@ example
     init_randomIdeal();
     ring rng = integer,(x,y),dp;
           
-    def genParams= defaultIdealGeneratorParams();
+    TIdealGeneratingParameters genParams= defaultIdealGeneratorParams();
     // adjust random ideal generator params:
     genParams.maxGens=1; 
-    def idealG = idealGeneratorFromParams( genParams  );
+    proc idealG = idealGeneratorFromParams( genParams  );
 
     //  generate a random ideal with at most one generator:
     idealG();
@@ -548,7 +546,7 @@ RETURN:   get a random ideal generating function with default settings (see defa
 "
 proc defaultIdealGenerator()
 {
-       def params= defaultIdealGeneratorParams();
+       TIdealGeneratingParameters params= defaultIdealGeneratorParams();
        return( idealGeneratorFromParams(params) ) ;
      
 }
@@ -558,7 +556,7 @@ example
     ring rng = integer,(x,y),dp;
     
     // get a default random ideal generator:
-    def idealG = defaultIdealGenerator( );
+    proc idealG = defaultIdealGenerator( );
 
     // generate a random ideal:
     idealG();
