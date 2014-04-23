@@ -4,10 +4,10 @@ ${FACTORY_INCLUDES} $(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
 ${NTL_CFLAGS} $(FLINT_CFLAGS) ${GMP_CFLAGS}
 
 noinst_LTLIBRARIES=liboswrapper.la
-liboswrapper_la_SOURCES=feread.cc fereadl.c timer.cc
+liboswrapper_la_SOURCES=feread.cc fereadl.c timer.cc rlimit.c
 
 liboswrapper_la_includedir=$(includedir)/singular/owrapper
-liboswrapper_la_include_HEADERS=feread.h timer.h
+liboswrapper_la_include_HEADERS=feread.h timer.h rlimit.h
 
 
 

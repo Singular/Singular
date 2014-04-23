@@ -28,7 +28,7 @@
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
-#include <Singular/rlimit.h>
+#include <kernel/oswrapper/rlimit.h>
 #include <Singular/subexpr.h>
 #include <Singular/links/silink.h>
 #include <Singular/cntrlc.h>

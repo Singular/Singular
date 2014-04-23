@@ -98,7 +98,7 @@ SOURCES = \
    walk_ip.cc\
    wrapper.cc\
    mmstd.c claptmpl.cc\
-   rlimit.c febase.cc
+   febase.cc
 
 #   links/slInit_Dynamic.cc
 
@@ -149,7 +149,7 @@ SingularHEADERS = \
    table.h \
    tok.h \
    walk.h \
-   rlimit.h fevoices.h
+   fevoices.h
 
 
 # -DMAKE_DISTRIBUTION 
