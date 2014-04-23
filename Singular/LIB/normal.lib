@@ -4081,7 +4081,6 @@ static proc computeRing(ideal J, ideal I, list #)
       ideal norid = I;
       ideal normap =  maxid;  */
 
-    list gnirlist = ringlist(R);
     def R1 = ring(gnirlist);
     setring R1;
     ideal norid = imap(R, I);
