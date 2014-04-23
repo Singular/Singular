@@ -22,7 +22,6 @@
 #include <misc/options.h>
 #include <misc/sirandom.h>
 #endif
-#include <misc/sirandom.h>
 
 #include "fehelp.h"
 
