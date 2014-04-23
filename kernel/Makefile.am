@@ -37,6 +37,7 @@ ${builddir}/spectrum/libspectrum.la \
 ${builddir}/linear_algebra/liblinear_algebra.la \
 ${builddir}/maps/libmaps.la \
 ${builddir}/GBEngine/libGBEngine.la \
+${builddir}/oswrapper/liboswrapper.la \
 ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
 ${abs_top_builddir}/libpolys/polys/libpolys.la
 

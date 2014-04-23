@@ -19,7 +19,7 @@
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
 
-#include <Singular/febase.h>
+#include <kernel/oswrapper/feread.h>
 
 #ifdef HAVE_STATIC
 #undef HAVE_DYN_RL

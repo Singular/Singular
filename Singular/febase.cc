@@ -13,7 +13,7 @@
 #include <reporter/reporter.h>
 #include <misc/options.h>
 
-#include <Singular/febase.h>
+//#include <Singular/febase.h>
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -87,7 +87,7 @@
 #include <Singular/fehelp.h>
 #include <Singular/ipid.h>
 #include <misc/intvec.h>
-#include <Singular/febase.h>
+#include <kernel/oswrapper/feread.h>
 #include <Singular/fevoices.h>
 #include <polys/matpol.h>
 #include <polys/monomials/ring.h>

@@ -14,7 +14,7 @@ extern char    prompt_char; /*1 either '>' or '.'*/
 #ifdef __cplusplus
 
 /* the interface for reading: */
-extern  char * (*fe_fgets_stdin)(const char *pr,char *s, int size);
+extern "C"  char * (*fe_fgets_stdin)(const char *pr,char *s, int size);
 
 #ifdef HAVE_DYN_RL
 char * fe_fgets_stdin_drl(const char *pr,char *s, int size);

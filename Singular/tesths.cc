@@ -17,7 +17,7 @@
 
 #include <factory/factory.h>
 
-#include <Singular/febase.h>
+#include <kernel/oswrapper/feread.h>
 #include <Singular/fevoices.h>
 #include <Singular/timer.h>
 

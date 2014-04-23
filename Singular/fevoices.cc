@@ -12,7 +12,7 @@
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
 #include <reporter/reporter.h>
-#include <Singular/febase.h>
+#include <kernel/oswrapper/feread.h>
 #include <Singular/fevoices.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipshell.h>
