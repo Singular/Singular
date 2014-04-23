@@ -36,7 +36,7 @@
 #include <coeffs/numbers.h>
 #include <kernel/polys.h>
 #include <kernel/GBEngine/stairc.h>
-#include <Singular/timer.h>
+#include <kernel/oswrapper/timer.h>
 #include <Singular/cntrlc.h>
 #include <polys/monomials/maps.h>
 #include <kernel/GBEngine/syz.h>

@@ -140,7 +140,7 @@ feOptIndex feGetOptIndex(int optc)
 #include <omalloc/omalloc.h>
 #include <resources/feResource.h>
 #include <kernel/oswrapper/feread.h>
-#include <Singular/timer.h>
+#include <kernel/oswrapper/timer.h>
 
 #include "ipshell.h"
 #include "tok.h"

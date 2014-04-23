@@ -39,7 +39,7 @@
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/kstd1.h>
-#include <Singular/timer.h>
+#include <kernel/oswrapper/timer.h>
 #include <kernel/GBEngine/stairc.h>
 #include <kernel/GBEngine/syz.h>
 

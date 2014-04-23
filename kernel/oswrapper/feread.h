@@ -1,5 +1,5 @@
-#ifndef FEBASE_H
-#define FEBASE_H
+#ifndef FEREAD_H
+#define FEREAD_H
 /****************************************
  * *  Computer Algebra System SINGULAR     *
  * ****************************************/
