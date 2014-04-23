@@ -38,7 +38,6 @@
 
 #include <kernel/ideals.h>
 
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/syz.h>
 

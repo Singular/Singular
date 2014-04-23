@@ -17,7 +17,6 @@
 #include <polys/prCopy.h>
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
-#include <kernel/febase.h>
 #include <polys/sbuckets.h>
 #include <kernel/maps/fast_maps.h>
 

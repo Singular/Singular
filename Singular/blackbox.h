@@ -5,7 +5,6 @@
 #include <omalloc/omalloc.h>
 
 #include <kernel/structs.h>
-#include <kernel/febase.h>
 
 #include <Singular/lists.h>
 #include <Singular/links/silink.h>

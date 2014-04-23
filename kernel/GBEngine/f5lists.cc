@@ -10,7 +10,6 @@
 #include <kernel/polys.h>
 #include <polys/monomials/p_polys.h>
 #include <kernel/ideals.h>
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/khstd.h>
 #include <polys/kbuckets.h>

@@ -19,7 +19,6 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/templates/p_Procs.h>
 #include <kernel/ideals.h>
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/khstd.h>
 #include <polys/kbuckets.h>
@@ -29,7 +28,6 @@
 #include <kernel/GBEngine/f5gb.h>
 #include <kernel/GBEngine/f5data.h>
 #include <kernel/GBEngine/f5lists.h>
-#include <kernel/timer.h>
 int notInG              =   0;
 int numberOfRules       =   0;
 int reductionsToZero    =   0;

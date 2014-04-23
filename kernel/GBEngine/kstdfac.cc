@@ -13,7 +13,6 @@
 #include <misc/options.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kutil.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/khstd.h>
@@ -23,7 +22,6 @@
 #include <misc/intvec.h>
 #include <polys/clapsing.h>
 #include <kernel/ideals.h>
-#include <kernel/timer.h>
 #include <kernel/GBEngine/kstdfac.h>
 
 #ifndef SING_NDEBUG
@@ -306,7 +304,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
   if (TEST_OPT_PROT)
   {
     PrintLn();
-    if (timerv) writeTime("standard base computed:");
+//    if (timerv) writeTime("standard base computed:");
   }
   if (TEST_OPT_PROT)
   {

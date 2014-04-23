@@ -384,9 +384,10 @@ lists primeFactorisation(const number n, const int pBound)
 #include <polys/monomials/ring.h>
 #include <polys/templates/p_Procs.h>
 
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kstd1.h>
-#include <kernel/timer.h>
+#include <Singular/timer.h>
+#include <resources/feResource.h>
+#include <Singular/febase.h>
 
 
 #include "subexpr.h"

@@ -33,14 +33,12 @@
 #include <kernel/polys.h>
 
 #include <kernel/GBEngine/kutil.h>
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/khstd.h>
 #include <kernel/GBEngine/stairc.h>
 //#include "cntrlc.h"
 #include <kernel/ideals.h>
 //#include "../Singular/ipid.h"
-#include <kernel/timer.h>
 
 //#include "ipprint.h"
 

@@ -26,7 +26,6 @@
 #include <polys/monomials/ring.h>
 #include <polys/monomials/maps.h>
 
-#include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 

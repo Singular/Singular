@@ -1,7 +1,6 @@
 #include <kernel/mod2.h>
 #include <polys/monomials/ring.h>
 
-#include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/ideals.h>

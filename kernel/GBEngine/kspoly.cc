@@ -17,7 +17,6 @@
 #include <polys/templates/p_Procs.h>
 #include <polys/nc/nc.h>
 #ifdef KDEBUG
-#include <kernel/febase.h>
 #endif
 #ifdef HAVE_RINGS
 #include <kernel/polys.h>

@@ -9,10 +9,11 @@
 /* I need myfread in standalone_parser */
 #ifndef STANDALONE_PARSER
 
-#include <kernel/febase.h>
 #include <omalloc/omalloc.h>
 #include <reporter/reporter.h>
 #include <misc/options.h>
+
+#include <Singular/febase.h>
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -56,7 +56,6 @@ using std::vector;
 
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
-#include <kernel/febase.h>
 #include <misc/options.h>
 #include <kernel/polys.h>
 #include <kernel/GBEngine/kutil.h>

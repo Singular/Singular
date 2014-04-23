@@ -18,7 +18,7 @@
 #ifndef NOSTREAMIO
 #include <iostream.h>
 #endif
-#include <Singular/tok.h>
+// #include <Singular/tok.h>
 #include <kernel/structs.h>
 #include <kernel/subexpr.h>
 #include <kernel/polys.h>
@@ -26,7 +26,6 @@
 #include <polys/monomials/ring.h>
 #include <kernel/ipid.h>
 #include <kernel/ipshell.h>
-#include <kernel/febase.h>
 #include <polys/monomials/maps.h>
 #include <omalloc/omalloc.h>
 #include "fglm.h"

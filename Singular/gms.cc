@@ -16,7 +16,6 @@
 
 #include <coeffs/numbers.h>
 #include <kernel/polys.h>
-#include <kernel/febase.h>
 
 #include "ipid.h"
 

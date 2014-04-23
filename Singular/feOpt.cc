@@ -138,8 +138,9 @@ feOptIndex feGetOptIndex(int optc)
 //         "error-string" on error
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <kernel/timer.h>
+#include <resources/feResource.h>
+#include <Singular/febase.h>
+#include <Singular/timer.h>
 
 #include "ipshell.h"
 #include "tok.h"

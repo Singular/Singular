@@ -48,13 +48,11 @@
 
 #include <kernel/GBEngine/kutil.h>
 #include <polys/kbuckets.h>
-#include <kernel/febase.h>
 #include <omalloc/omalloc.h>
 #include <coeffs/numbers.h>
 #include <kernel/polys.h>
 #include <polys/monomials/ring.h>
 #include <kernel/ideals.h>
-#include <kernel/timer.h>
 //#include "cntrlc.h"
 #include <kernel/GBEngine/stairc.h>
 #include <kernel/GBEngine/kstd1.h>
@@ -7971,7 +7969,7 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
   if (TEST_OPT_PROT)
   {
     PrintLn();
-    if (timerv) writeTime("standard base computed:");
+//    if (timerv) writeTime("standard base computed:");
   }
   if (TEST_OPT_PROT)
   {

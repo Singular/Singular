@@ -14,7 +14,6 @@
 
 // #include <kernel/bigintmat.h>
 // #include <omalloc/omalloc.h>
-// #include <kernel/febase.h>
 // #include <kernel/longrat.h>
 // #include <Singular/subexpr.h>
 // #include <Singular/lists.h>

@@ -8,8 +8,6 @@
 #include <coeffs/coeffs.h>
 #include <coeffs/longrat.h>
 
-#include <kernel/febase.h>
-
 #include <Singular/ipid.h>
 #include <Singular/subexpr.h>
 #include <Singular/tok.h>

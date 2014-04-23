@@ -26,7 +26,6 @@
 #include <omalloc/omalloc.h>
 #include <polys/monomials/p_polys.h>
 
-#include <kernel/febase.h>
 #include <kernel/ideals.h>
 
 

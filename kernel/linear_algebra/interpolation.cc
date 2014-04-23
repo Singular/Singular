@@ -17,7 +17,6 @@
 #include <polys/monomials/ring.h>
 
 #include <kernel/polys.h>
-#include <kernel/febase.h>
 #include <kernel/ideals.h>
 
 #include "interpolation.h"
