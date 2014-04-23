@@ -5,7 +5,6 @@
 
 #include <misc/options.h>
 
-#include <Singular/febase.h>
 #include <kernel/ideals.h>
 #include <kernel/polys.h>
 

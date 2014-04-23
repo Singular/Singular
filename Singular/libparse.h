@@ -70,8 +70,6 @@ public:
   char          trace_flag;
   procinfodata  data;
 };
-#else
-#include <Singular/febase.h>
 #endif
 
 procinfo *iiInitSingularProcinfo(procinfo* pi, const char *libname,

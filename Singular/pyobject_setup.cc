@@ -17,7 +17,6 @@
 
 
 #include <kernel/mod2.h>
-#include <Singular/febase.h>
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
 

@@ -28,6 +28,7 @@
 #include <kernel/polys.h>
 #include <polys/coeffrings.h>
 
+class Voice;
 class sleftv;
 class procinfo;
 class skStrategy;
@@ -43,6 +44,18 @@ enum tHomog
   isNotHomog = FALSE,
   isHomog    = TRUE,
   testHomog
+};
+
+enum   feBufferTypes
+{
+  BT_none  = 0,  // entry level
+  BT_break = 1,  // while, for
+  BT_proc,       // proc
+  BT_example,    // example
+  BT_file,       // <"file"
+  BT_execute,    // execute
+  BT_if,         // if
+  BT_else        // else
 };
 
 

@@ -36,7 +36,6 @@
 #include <polys/nc/nc.h>
 #include <polys/nc/sca.h>
 
-#include <Singular/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/kstd1.h>

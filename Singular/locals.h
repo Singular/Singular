@@ -6,7 +6,6 @@
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 //#include <mmemory.h>
-#include <Singular/febase.h>
 #include <Singular/subexpr.h>
 //#include <utils.h>
 

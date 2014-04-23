@@ -17,7 +17,6 @@
 #include <polys/matpol.h>
 #include <polys/monomials/ring.h>
 
-#include <Singular/febase.h>
 #include <kernel/ideals.h>
 
 #include <Singular/lists.h>

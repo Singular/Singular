@@ -22,7 +22,6 @@
 
 #include <omalloc/omalloc.h>
 #include <kernel/structs.h>
-#include <Singular/febase.h>
 #include "subexpr.h"
 #include "idrec.h"
 #include "ipid.h"

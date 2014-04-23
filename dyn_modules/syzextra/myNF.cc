@@ -33,7 +33,6 @@
 
 
 #include <kernel/structs.h>
-#include <Singular/febase.h>
 
 
 

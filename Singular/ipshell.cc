@@ -22,7 +22,6 @@
 #include <Singular/ipid.h>
 #include <misc/intvec.h>
 #include <omalloc/omalloc.h>
-#include <Singular/febase.h>
 #include <kernel/polys.h>
 #include <coeffs/numbers.h>
 #include <polys/prCopy.h>
@@ -31,6 +30,7 @@
 #include <kernel/GBEngine/kstd1.h>
 #include <polys/monomials/ring.h>
 #include <Singular/subexpr.h>
+#include <Singular/febase.h>
 #include <polys/monomials/maps.h>
 #include <kernel/GBEngine/syz.h>
 #include <coeffs/numbers.h>

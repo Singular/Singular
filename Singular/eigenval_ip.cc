@@ -12,7 +12,6 @@
 
 #ifdef HAVE_EIGENVAL
 
-#include <Singular/febase.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <misc/intvec.h>

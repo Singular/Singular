@@ -10,11 +10,10 @@
 #include <misc/options.h>
 #include <reporter/si_signals.h>
 
-#include <Singular/febase.h>
-
 #include <Singular/tok.h>
 #include <Singular/ipshell.h>
 #include <Singular/ipid.h>
+#include <Singular/febase.h>
 #include <Singular/sdb.h>
 
 #include <unistd.h>   // for unlink,fork,execlp,getpid

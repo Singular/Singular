@@ -13,18 +13,6 @@
 
 #include <kernel/structs.h>
 
-enum   feBufferTypes
-{
-  BT_none  = 0,  // entry level
-  BT_break = 1,  // while, for
-  BT_proc,       // proc
-  BT_example,    // example
-  BT_file,       // <"file"
-  BT_execute,    // execute
-  BT_if,         // if
-  BT_else        // else
-};
-
 enum   feBufferInputs
 {
   BI_stdin = 1,
@@ -42,70 +30,18 @@ enum noeof_t
   noeof_string
 };  /* for scanner.l */
 
-extern int myynest;
 extern int yylineno;
 extern char     my_yylinebuf[80];
 extern char    prompt_char; /*1 either '>' or '.'*/
-extern int    si_echo;
-extern int    printlevel;
 
 #ifdef __cplusplus
 
 /* the C++-part: */
 
-typedef enum { LANG_NONE, LANG_TOP, LANG_SINGULAR, LANG_C, LANG_MAX} language_defs;
 // LANG_TOP     : Toplevel package only
 // LANG_SINGULAR:
 // LANG_C       :
 //
-
-class proc_singular
-{
-public:
-  long   proc_start;       // position where proc is starting
-  long   def_end;          // position where proc header is ending
-  long   help_start;       // position where help is starting
-  long   help_end;         // position where help is starting
-  long   body_start;       // position where proc-body is starting
-  long   body_end;         // position where proc-body is ending
-  long   example_start;    // position where example is starting
-  long   proc_end;         // position where proc is ending
-  int    proc_lineno;
-  int    body_lineno;
-  int    example_lineno;
-  char   *body;
-  long help_chksum;
-};
-
-struct proc_object
-{
-//public:
-  BOOLEAN (*function)(leftv res, leftv v);
-};
-union uprocinfodata
-{
-public:
-  proc_singular  s;        // data of Singular-procedure
-  struct proc_object    o; // pointer to binary-function
-};
-
-typedef union uprocinfodata procinfodata;
-
-class procinfo;
-typedef procinfo *         procinfov;
-
-class procinfo
-{
-public:
-  char          *libname;
-  char          *procname;
-  package       pack;
-  language_defs language;
-  short         ref;
-  char          is_static;        // if set, proc not accessible for user
-  char          trace_flag;
-  procinfodata  data;
-};
 
 class Voice
 {

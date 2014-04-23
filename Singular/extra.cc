@@ -53,6 +53,7 @@
 #include "coeffs/OPAEQ.h"
 
 
+#include <resources/feResource.h>
 #include <polys/monomials/ring.h>
 #include <kernel/polys.h>
 
@@ -67,7 +68,6 @@
 #include <kernel/fast_mult.h>
 #include <kernel/digitech.h>
 #include <kernel/GBEngine/stairc.h>
-#include <Singular/febase.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/syz.h>

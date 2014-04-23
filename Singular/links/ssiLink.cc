@@ -34,6 +34,7 @@
 #include <Singular/cntrlc.h>
 #include <Singular/lists.h>
 #include <Singular/blackbox.h>
+#include <Singular/febase.h>
 #include <Singular/links/ssiLink.h>
 
 #ifdef HAVE_SIMPLEIPC
