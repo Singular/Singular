@@ -4,8 +4,8 @@
  * *  Computer Algebra System SINGULAR     *
  * ****************************************/
 /*
- * * ABSTRACT: basic i/o
- * */
+ * ABSTRACT: terminal input
+ */
 
 #include <kernel/structs.h>
 

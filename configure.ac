@@ -207,6 +207,7 @@ AC_CONFIG_FILES([kernel/spectrum/Makefile])
 AC_CONFIG_FILES([kernel/linear_algebra/Makefile])
 AC_CONFIG_FILES([kernel/maps/Makefile])
 AC_CONFIG_FILES([kernel/GBEngine/Makefile])
+AC_CONFIG_FILES([kernel/oswrapper/Makefile])
 
 AC_CONFIG_SUBDIRS([gfanlib])
 
