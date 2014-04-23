@@ -568,6 +568,7 @@ char *yytext;
 #include <Singular/tok.h>
 #include <Singular/stype.h>
 #include <Singular/ipshell.h>
+#include <Singular/fevoices.h>
 #include <Singular/febase.h>
 
 int feReadLine(char* b, int l);

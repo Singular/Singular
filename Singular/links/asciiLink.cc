@@ -14,6 +14,7 @@
 #include <Singular/subexpr.h>
 #include <Singular/ipshell.h>
 #include <Singular/ipid.h>
+#include <Singular/fevoices.h>
 #include <Singular/febase.h>
 #include <Singular/ipshell.h>
 #include <Singular/links/silink.h>

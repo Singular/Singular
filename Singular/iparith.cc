@@ -38,7 +38,7 @@
 
 #include <kernel/GBEngine/stairc.h>
 #include <kernel/polys.h>
-#include <Singular/febase.h>
+#include <Singular/fevoices.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <Singular/timer.h>

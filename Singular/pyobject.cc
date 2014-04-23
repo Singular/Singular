@@ -25,7 +25,7 @@
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
 #include <Singular/newstruct.h>
-#include <Singular/febase.h>
+#include <resources/feResource.h>
 
 #include <Singular/mod_lib.h>
 

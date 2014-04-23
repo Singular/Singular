@@ -66,7 +66,7 @@
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/maps/fast_maps.h>
-#include <Singular/febase.h>
+#include <Singular/fevoices.h>
 #include <kernel/groebner_walk/walkProc.h>
 #include <kernel/groebner_walk/walkMain.h>
 #include <kernel/groebner_walk/walkSupport.h>

@@ -30,7 +30,7 @@
 
 #include <Singular/tok.h>
 #include <Singular/ipshell.h>
-#include <Singular/febase.h>
+#include <Singular/fevoices.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 #include <Singular/links/silink.h>

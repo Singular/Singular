@@ -149,7 +149,7 @@ SingularHEADERS = \
    table.h \
    tok.h \
    walk.h \
-   rlimit.h timer.h febase.h
+   rlimit.h timer.h febase.h fevoices.h
 
 
 # -DMAKE_DISTRIBUTION 

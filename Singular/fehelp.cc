@@ -20,7 +20,7 @@
 #include <omalloc/omalloc.h>
 #include <misc/mylimits.h>
 
-#include <Singular/febase.h>
+#include <resources/feResource.h>
 #include <reporter/reporter.h>
 
 #include <resources/omFindExec.h>

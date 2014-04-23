@@ -385,6 +385,7 @@ lists primeFactorisation(const number n, const int pBound)
 
 #include <kernel/GBEngine/kstd1.h>
 #include <Singular/timer.h>
+#include <resources/feResource.h>
 #include <Singular/febase.h>
 
 

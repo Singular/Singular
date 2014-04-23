@@ -14,7 +14,7 @@
 #include <omalloc/omalloc.h>
 
 #include <reporter/si_signals.h>
-#include <Singular/febase.h>
+#include <Singular/fevoices.h>
 
 #include <Singular/tok.h>
 #include <Singular/ipshell.h>

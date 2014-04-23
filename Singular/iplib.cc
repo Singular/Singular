@@ -18,7 +18,7 @@
 #include <polys/monomials/ring.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipshell.h>
-#include <Singular/febase.h>
+#include <Singular/fevoices.h>
 #include <Singular/lists.h>
 
 //#include <stdlib.h>

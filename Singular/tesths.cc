@@ -18,6 +18,7 @@
 #include <factory/factory.h>
 
 #include <Singular/febase.h>
+#include <Singular/fevoices.h>
 #include <Singular/timer.h>
 
 // #ifdef HAVE_FANS
