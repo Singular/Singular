@@ -569,7 +569,7 @@ char *yytext;
 #include <Singular/stype.h>
 #include <Singular/ipshell.h>
 #include <Singular/fevoices.h>
-#include <Singular/febase.h>
+#include <kernel/oswrapper/feread.h>
 
 int feReadLine(char* b, int l);
 #define ALLOC(a) omAlloc((a))

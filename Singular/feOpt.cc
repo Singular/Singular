@@ -139,8 +139,8 @@ feOptIndex feGetOptIndex(int optc)
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <omalloc/omalloc.h>
 #include <resources/feResource.h>
-#include <Singular/febase.h>
-#include <Singular/timer.h>
+#include <kernel/oswrapper/feread.h>
+#include <kernel/oswrapper/timer.h>
 
 #include "ipshell.h"
 #include "tok.h"

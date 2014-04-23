@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I ../m4
 # TODO: use ${top_srcdir} instead of .. in the above?
 
-SUBDIRS=numeric fglm groebner_walk combinatorics spectrum linear_algebra maps GBEngine   
+SUBDIRS=numeric fglm groebner_walk combinatorics spectrum linear_algebra maps GBEngine oswrapper  
 
 noinst_LTLIBRARIES = libkernel.la 
 ###### libkerneldir = $(libdir)/singular
@@ -37,6 +37,7 @@ ${builddir}/spectrum/libspectrum.la \
 ${builddir}/linear_algebra/liblinear_algebra.la \
 ${builddir}/maps/libmaps.la \
 ${builddir}/GBEngine/libGBEngine.la \
+${builddir}/oswrapper/liboswrapper.la \
 ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
 ${abs_top_builddir}/libpolys/polys/libpolys.la
 

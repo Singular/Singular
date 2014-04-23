@@ -31,7 +31,7 @@
 #include <polys/monomials/ring.h>
 #include <Singular/subexpr.h>
 #include <Singular/fevoices.h>
-#include <Singular/febase.h>
+#include <kernel/oswrapper/feread.h>
 #include <polys/monomials/maps.h>
 #include <kernel/GBEngine/syz.h>
 #include <coeffs/numbers.h>

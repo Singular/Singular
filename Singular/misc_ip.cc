@@ -385,10 +385,9 @@ lists primeFactorisation(const number n, const int pBound)
 #include <polys/templates/p_Procs.h>
 
 #include <kernel/GBEngine/kstd1.h>
-#include <Singular/timer.h>
+#include <kernel/oswrapper/timer.h>
 #include <resources/feResource.h>
-#include <Singular/febase.h>
-
+#include <kernel/oswrapper/feread.h>
 
 #include "subexpr.h"
 #include "cntrlc.h"
