@@ -56,7 +56,28 @@ link_all_deplibs=yes
 link_all_deplibs_CXX=yes
 
 # Checks for libraries.
-AC_CHECK_LIB(pthread,pthread_create)
+#AC_CHECK_LIB(pthread,pthread_create)
+AX_PTHREAD([], [
+  AC_MSG_ERROR([Pthread library not found. Please set PTHREAD_CFLAGS and PTHREAD_LIBS correctly for your setup])
+])
+
+AC_MSG_CHECKING([Found Pthread, PTHREAD_CC:])
+AC_MSG_RESULT(${PTHREAD_CC:-unset})
+AC_MSG_CHECKING([               PTHREAD_CFLAGS:])
+AC_MSG_RESULT(${PTHREAD_CFLAGS:-unset})
+AC_MSG_CHECKING([               PTHREAD_LIBS:])
+AC_MSG_RESULT(${PTHREAD_LIBS:-unset})
+
+# Set the correct PTHREAD flags and, if needed, change the compiler to one that is pthread-enabled.
+CC="$PTHREAD_CC"
+PTHREAD_LDFLAGS="$PTHREAD_CFLAGS"
+
+AC_SUBST(PTHREAD_CFLAGS)
+AC_SUBST(PTHREAD_LDFLAGS)
+AC_SUBST(PTHREAD_LIBS)
+AC_SUBST(CC)
+
+
 AC_CHECK_LIB(rt,clock_gettime)
 
 LB_CHECK_GMP(4.0,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))

@@ -48,7 +48,7 @@ endif !SI_EMBED_PYTHON
 libSingular_LTLIBRARIES = libSingular.la 
 libSingulardir = $(libdir)
 
-libSingular_la_CPPFLAGS = ${AM_CPPFLAGS} -DLIBSINGULAR
+libSingular_la_CPPFLAGS = ${AM_CPPFLAGS} -DLIBSINGULAR ${PTHREAD_CFLAGS}
 
 SOURCES = \
    links/asciiLink.cc\
@@ -157,8 +157,8 @@ SingularHEADERS = \
 # plural_cmd.inc
 nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc 
 
-libSingular_la_LDFLAGS    = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION}
-libSingular_la_LIBADD      = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT} ${top_builddir}/kernel/libkernel.la
+libSingular_la_LDFLAGS    =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION} ${PTHREAD_LDFLAGS}
+libSingular_la_LIBADD     =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT} ${top_builddir}/kernel/libkernel.la ${PTHREAD_LIBS}
 
 libSingular_includedir = ${includedir}/singular/Singular
 nobase_libSingular_include_HEADERS = $(SingularHEADERS)
