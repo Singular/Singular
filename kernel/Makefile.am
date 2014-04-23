@@ -12,7 +12,6 @@ $(FACTORY_INCLUDES) $(NTL_CFLAGS) $(FLINT_CFLAGS) $(GMP_CFLAGS)
 
 SOURCES = polys.cc \
     ideals.cc \
-    misc.cc \
     fast_mult.cc digitech.cc \
     preimage.cc \
     mod2.h 
