@@ -1,5 +1,5 @@
 #include "kernel/mod2.h" // general settings/macros
-#include"kernel/febase.h"  // for Print, WerrorS
+#include"reporter/reporter.h"  // for Print, WerrorS
 #include"Singular/ipid.h" // for SModulFunctions, leftv
 #include"coeffs/numbers.h" // nRegister, coeffs.h
 #include"coeffs/rmodulon.h" // ZnmInfo
