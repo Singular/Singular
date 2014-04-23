@@ -13,6 +13,7 @@
 
 #include <misc/auxiliary.h>
 #include <misc/mylimits.h>
+#include <misc/sirandom.h>
 
 #include <reporter/reporter.h>
 

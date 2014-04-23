@@ -12,6 +12,7 @@
 
 #include <kernel/mod2.h>
 #include <misc/auxiliary.h>
+#include <misc/sirandom.h>
 
 #include <factory/factory.h>
 

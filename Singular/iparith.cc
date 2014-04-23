@@ -25,6 +25,7 @@
 
 #include <misc/options.h>
 #include <misc/intvec.h>
+#include <misc/sirandom.h>
 
 #include <polys/prCopy.h>
 #include <polys/matpol.h>

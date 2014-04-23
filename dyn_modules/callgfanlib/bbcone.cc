@@ -7,6 +7,7 @@
 #include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
 #include <libpolys/misc/intvec.h>
+#include <libpolys/misc/sirandom.h>
 #include <libpolys/coeffs/longrat.h>
 #include <libpolys/coeffs/bigintmat.h>
 

@@ -106,15 +106,6 @@ void  m2_end(int i);
 }
 #endif
 
-/* 7.2 C++-routines : */
-
-#ifdef __cplusplus
-int   inits(void);
-//int   IsPrime(int i);
-extern int siSeed;
-int siRand();
-#endif
-
 #define loop for(;;)
 
 #ifndef ABS

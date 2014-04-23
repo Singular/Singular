@@ -20,6 +20,7 @@
 #include <coeffs/longrat.h>
 #include <coeffs/mpr_complex.h>
 #include <misc/mylimits.h>
+#include <misc/sirandom.h>
 #include <coeffs/modulop.h>
 
 // int npGen=0;

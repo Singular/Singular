@@ -19,6 +19,7 @@
 #include <misc/mylimits.h>
 #include <misc/options.h>
 #include <misc/intvec.h>
+#include <misc/sirandom.h>
 
 #include <coeffs/numbers.h>
 #include <coeffs/mpr_global.h>
