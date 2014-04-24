@@ -22,6 +22,11 @@ PROCEDURES:
  rootofUnity(n);          the minimal polynomial for the n-th primitive root of unity
              (parameters in square brackets [] are optional)
  optionIsSet(opt)         check if as a string given option is set or not.
+ hasRingCoefficientRing   check if the coefficient ring is not a field
+ hasNumericCoeffs(rng)    check for use of floating point numbers
+ hasCommutativeVars(rng)  non-commutive or commnuative polynomial ring
+ hasGlobalOrdering(rng)   global versus mixed/local monomial ordering
+ isSubModule(I,J)         check if I is in J as submodule
 ";
 
 LIB "inout.lib";
@@ -46,7 +51,7 @@ EXAMPLE:     example optionIsSet;
    return(pos>0);
 }
 example
-{ 
+{
     // check if the option "warn" is set.
     optionIsSet("warn");
     option("warn");
@@ -907,11 +912,11 @@ example
 {
   ring rng = 0,x,dp;
   isQuotientRing(rng); //no
-  // if a certain method does not support quotient rings, 
+  // if a certain method does not support quotient rings,
   // then a parameter test could be performed:
    ASSUME( 0, 0==isQuotientRing(basering));
 
-  qring q= ideal(x);  // constructs rng/ideal(x) 
+  qring q= ideal(x);  // constructs rng/ideal(x)
   isQuotientRing(q);  // yes
 }
 
@@ -936,56 +941,72 @@ static proc testIsQuotientRing()
    ASSUME(0, isQuotientRing(qrng3) ) ;
 }
 
-
-
-
-
-proc hasIntegerCoefficientRing( rng )
-"USAGE: hasIntegerCoefficientRing ( rng );
-RETURN:  1 if rng is has integer ring coefficients, 0 otherwise.
-KEYWORDS: integer ring coefficients 
-EXAMPLE: example hasIntegerCoefficientRing ; shows an example
+proc hasRingCoefficientRing( rng )
+"USAGE: hasRingCoefficientRing ( rng );
+RETURN:  1 if rng is has ring coefficients, 0 otherwise.
+KEYWORDS: ring coefficients
+EXAMPLE: example hasRingCoefficientRing; shows an example
 "
-proc hasIntegerCoefficientRing(rng)
 {
-  def rl = ringlist(rng);
-  if ( not (typeof(rl[1][1])=="string")    ) { return (0); }
-  return ( rl[1][1]=="integer" );
+  return (attrib(rng,"ring_cf")==1);
 }
 example
 {
   ring rng = integer,x,dp;
-  hasIntegerCoefficientRing(rng); //yes
-  // if a certain method supports only rings with integer coefficients, 
+  hasRingCoefficientRing(rng); //yes
+  // if a certain method supports only rings with integer coefficients,
   // then a parameter test could be performed:
-   ASSUME( 0, hasIntegerCoefficientRing(basering)); //ok
-
-  ring rng2 = 0, x, dp; 
-  hasIntegerCoefficientRing(rng2);  // no
+  ring rng2 = 0, x, dp;
+  hasRingCoefficientRing(rng2);  // no
 }
 
-
-static proc testHasIntegerCoefficientRing()
+proc hasGlobalOrdering (rng)
+"USAGE: hasGlobalOrdering ( rng );
+RETURN:  1 if rng has a global monomial ordering, 0 otherwise.
+KEYWORDS: monomial ordering
+EXAMPLE: example hasGlobalOrdering; shows an example
+"
 {
-   ring rng = integer,x,dp;
-   ASSUME(0, hasIntegerCoefficientRing( rng ) );
-
-   qring q = ideal(x);
-   ASSUME(0, hasIntegerCoefficientRing( q ) );
-
-   ring rng2 = 0,x,dp;
-   ASSUME(0, 0==hasIntegerCoefficientRing( rng2 ) );
-
-   ring rng3 = (0,a),x,dp;
-   ASSUME(0, 0==hasIntegerCoefficientRing( rng3 ) );
-
-   ring rng4 = (real,a),x,dp;
-   ASSUME(0, 0==hasIntegerCoefficientRing( rng4 ) );
-
-   ring rng5 = (real),x,dp;
-   ASSUME(0, 0==hasIntegerCoefficientRing( rng5 ) );
+  return (attrib(rng,"global")==1);
+}
+example
+{
+  ring rng = integer,x,dp;
+  hasGlobalOrdering(rng); //yes
+  ring rng2 = 0, x, ds;
+  hasGlobalOrdering(rng2);  // no
 }
 
+proc hasCommutativeVars (rng)
+"USAGE: hasCommutativeVars ( rng );
+RETURN:  1 if rng is a commutative polynomial ring, 0 otherwise.
+KEYWORDS: plural
+EXAMPLE: example hasCommutativeVars; shows an example
+"
+{
+  list rl=ringlist(rng);
+  return (size(rl)==4);
+}
 
+proc hasNumericCoeffs(rng)
+"USAGE: hasNumericCoeffs ( rng );
+RETURN:  1 if rng has inexact coeffcients, 0 otherwise.
+KEYWORDS: floating point
+EXAMPLE: example hasNumericCoeffs; shows an example
+"
+{
+  ERROR("not yet implemented");
+}
+
+proc isSubModule(I,J)
+"USAGE: isSubModule(I,J): I, J: ideal or module
+RETURN: 1 if module(I) is in module(J), 0 otherwise
+EXAMPLE: isSubModule; shows an example
+{
+  if (attrib(J,"isSB")==1)
+  { return(size(reduce(I,J,1)==0)); }
+  else
+  { return(size(reduce(I,groebner(J),1)==0)); }
+}
 
 
