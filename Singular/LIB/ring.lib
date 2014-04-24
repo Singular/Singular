@@ -943,7 +943,7 @@ static proc testIsQuotientRing()
 
 proc hasRingCoefficientRing( rng )
 "USAGE: hasRingCoefficientRing ( rng );
-RETURN:  1 if rng is has ring coefficients, 0 otherwise.
+RETURN:  0 if the coeffcients form a field, 1 otherwise.
 KEYWORDS: ring coefficients
 EXAMPLE: example hasRingCoefficientRing; shows an example
 "
