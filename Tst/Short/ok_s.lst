@@ -76,6 +76,7 @@ bug_homog
 bug_idlen
 bug_interpol
 bug_misc
+bug_minpoly
 bug_mres
 bug_napMultT
 bug_newstruct
@@ -134,6 +135,7 @@ bug_540
 bug_tr549
 bug_tr587
 bug_tr599
+bug_tr604
 bug_x_i_j
 brnoeth_s
 charseries

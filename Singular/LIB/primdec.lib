@@ -758,8 +758,16 @@ static proc splitCharp(list l)
         {
           sa=sat1(l[2*i-1],sact[1]);
           keep[size(keep)+1]=std(l[2*i-1],sa[2]);
-          l[2*i-1]=std(sa[1]);
-          l[2*i]=primaryTest(sa[1],sa[1][1]);
+          if(sa[1][1]==l[2*i-1][1])
+          {
+             l[2*i-1]=std(sa[1]);
+             l[2*i]=primaryTest(sa[1],s[1]);
+          }
+          else
+          {
+             l[2*i-1]=std(sa[1]);
+             l[2*i]=primaryTest(sa[1],factorize(sa[1][1],1)[1]);
+          }
         }
         if((size(sact)==1)&&(m==2))
         {
@@ -800,7 +808,7 @@ static proc splitCharp(list l)
       if(deg(keep[i][1])>0)
       {
         l[size(l)+1]=keep[i];
-        l[size(l)+1]=primaryTest(keep[i],keep[i][1]);
+        l[size(l)+1]=primaryTest(keep[i],factorize(keep[i][1],1)[1]);
       }
     }
   }
@@ -2101,11 +2109,11 @@ EXAMPLE: example minAssPrimes; shows an example
     }
   }
 
-  if( dim(i) == -1 ) 
-  {  
+  if( dim(i) == -1 )
+  {
     option( set,op );
-    setring P0; 
-    return( ideal(1) ); 
+    setring P0;
+    return( ideal(1) );
   }
   if( (dim(i) == 0 ) && ( npars(P) == 0) )
   {
@@ -2556,7 +2564,7 @@ proc algeDeco(ideal i, int w)
    def R=basering;
    int n=nvars(R);
 
-   def op = option(get); 
+   def op = option(get);
 
 //---Anfang Provisorium
    if((size(i)==2) && (w==2))

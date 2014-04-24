@@ -195,10 +195,12 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
 
   if ( !nCoeff_is_transExt(currRing->cf) )
   {
-//    return TRUE;
-#ifndef SING_NDEBUG
     WarnS("Trying to set minpoly over non-transcendental ground field...");
-#endif
+    if(!nCoeff_is_algExt(currRing->cf) )
+    {
+      WerrorS("cannot set minpoly for these coeffients");
+      return TRUE;
+    }
   }
 
   if ( currRing->idroot != NULL )
