@@ -76,6 +76,7 @@ bug_homog
 bug_idlen
 bug_interpol
 bug_misc
+bug_minpoly
 bug_mres
 bug_napMultT
 bug_newstruct
