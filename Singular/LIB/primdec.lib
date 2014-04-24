@@ -808,7 +808,7 @@ static proc splitCharp(list l)
       if(deg(keep[i][1])>0)
       {
         l[size(l)+1]=keep[i];
-        l[size(l)+1]=primaryTest(keep[i],keep[i][1]);
+        l[size(l)+1]=primaryTest(keep[i],factorize(keep[i][1],1)[1]);
       }
     }
   }
