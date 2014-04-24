@@ -896,24 +896,29 @@ example
 proc intersectZ(ideal I, ideal J)
 "USAGE:  intersectZ(I,J); I,J ideals
 RETURN:  the intersection of the input ideals
-NOTE:    this is needed because intersect(I,J) does not work, should be replaced
-         by intersect later
+NOTE:    this is an alternative to intersect(I,J) over integers,
+         is faster for some examples and should be kept for debug purposes.
 EXAMPLE: example intersectZ; shows an example
 {
    def R = basering;
-   execute("ring S=integer,(t,"+varstr(R)+"),(dp(1),dp(nvars(R)));");
-   ideal I=imap(R,I);
-   ideal J=imap(R,J);
-   ideal K=addIdealZ(t*I,(1-t)*J);
-   K=stdZ(K);
+   execute("ring S=integer,( X(1..nvars(R)) ), ( dp(nvars(R)) );");
+   ideal I = fetch(R,I);
+   ideal J = fetch(R,J);
+   execute("ring St=integer, ( t, X(1..nvars(R))  ), ( dp(1), dp(nvars(R)) );");
+   ideal I = imap(S,I);
+   ideal J = imap(S,J);
+   ideal K = addIdealZ( var(1)*I,(1-var(1))*J);
+   K = stdZ(K);
    int i;
    ideal L;
-   for(i=1;i<=size(K);i++)
+   for(i=1; i<=size(K); i++)
    {
-      if(lead(K[i])/t==0){L[size(L)+1]=K[i];}
+      if ( lead(K[i])/var(1)==0 ) { L[size(L)+1] = K[i]; }
    }
+   setring S;
+   ideal L = imap(St, L);
    setring R;
-   ideal L=imap(S,L);
+   ideal L = fetch(S, L);
    return(L);
 }
 example
