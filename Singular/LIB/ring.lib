@@ -906,7 +906,15 @@ KEYWORDS: qring ring ideal 'factor ring'
 EXAMPLE: example isQuotientRing ; shows an example
 "
 {
-    return ( size(ideal(rng)) != 0 );
+    if ( defined(basering) )  {   def BAS=basering;  }
+
+    //access to quotient ideal will fail, if basering and rng differs.
+    setring rng;
+    int result =  ( size(ideal(rng)) != 0);
+
+    if ( defined(BAS) )   {    setring BAS;   }
+
+    return (result);
 }
 example
 {
@@ -922,8 +930,12 @@ example
 
 static proc testIsQuotientRing()
 {
+   ring rng7 = 7, x, dp;
+ 
    ring rng = real,x,dp;
    ASSUME(0, 0== isQuotientRing(rng) ) ;
+   ASSUME(0, 0== isQuotientRing(rng7) ) ;
+   ASSUME(0, char(basering)==0); // check that basering was not changed
 
    qring qrng = 1;
    ASSUME(0, isQuotientRing(qrng) ) ;
