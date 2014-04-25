@@ -743,13 +743,20 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   //if (qr!=NULL) omFreeBin((ADDRESS)qr, ip_sring_bin);
   assume(res->Data()==NULL);
   origr = rCopy(currRing);
+  qr = rCopy(currRing);
 
 #ifdef HAVE_RINGS
   ideal id=(ideal)a->CopyD(IDEAL_CMD);
   if((rField_is_Ring(currRing)) && (idPosConstant(id) != -1))
     {
-        qr = updateQring(currRing, id, idPosConstant(id));
-        if(qr == NULL)
+        //qr = updateQring(currRing, id, idPosConstant(id));
+        //rWrite(currRing);
+        number c;
+        //printf("\n");
+        c = p_GetCoeff(id->m[idPosConstant(id)], currRing);
+        qr->cf = currRing->cf->cfQuot1(c, currRing->cf);
+        //rWrite(qr);
+        if(qr->cf == NULL)
             return TRUE;
     }
   else

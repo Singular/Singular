@@ -20,6 +20,7 @@
 #include <coeffs/longrat.h>
 #include <coeffs/mpr_complex.h>
 #include <coeffs/rmodulo2m.h>
+#include <coeffs/rmodulon.h>
 #include "si_gmp.h"
 
 #include <string.h>
@@ -41,7 +42,7 @@ BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
   {
     int m=(int)(long)(p);
     unsigned long mm=r->mod2mMask;
-    if ((mm>>m)==1L) return TRUE;
+    if (((mm+1)>>m)==1L) return TRUE;
   }
   return FALSE;
 }
@@ -51,6 +52,47 @@ static char* nr2mCoeffString(const coeffs r)
   char* s = (char*) omAlloc(11+11);
   sprintf(s,"integer,2,%lu",r->modExponent);
   return s;
+}
+
+coeffs nr2mcfQuot1(number c, const coeffs r)
+{
+    coeffs rr;
+    int ch = r->cfInt(c, r);
+    mpz_t a,b;
+    mpz_init_set(a, r->modNumber);
+    mpz_init_set_ui(b, ch);
+    int_number gcd;
+    gcd = (int_number) omAlloc(sizeof(mpz_t));
+    mpz_init(gcd);
+    mpz_gcd(gcd, a,b);
+    if(mpz_cmp_ui(gcd, 1) == 0)
+        {
+            WerrorS("constant in q-ideal is coprime to modulus in ground ring");
+            WerrorS("Unable to create qring!");
+            return NULL;
+        }
+    if(mpz_cmp_ui(gcd, 2) == 0)
+    {
+        rr = nInitChar(n_Zp, (void*)2);
+    }
+    else
+    {
+        ZnmInfo info;
+        info.base = r->modBase;
+        int kNew = 1;
+        mpz_t baseTokNew;
+        mpz_init(baseTokNew);
+        mpz_set(baseTokNew, r->modBase);
+        while(mpz_cmp(gcd, baseTokNew) > 0)
+        {
+          kNew++;
+          mpz_mul(baseTokNew, baseTokNew, r->modBase);
+        }
+        info.exp = kNew;
+        mpz_clear(baseTokNew);
+        rr = nInitChar(n_Z2m, (void*)(long)kNew);
+    }
+    return(rr);
 }
 
 /* for initializing function pointers */
@@ -104,6 +146,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfName        = ndName;
   r->cfCoeffWrite  = nr2mCoeffWrite;
   r->cfInit_bigint = nr2mMapQ;
+  r->cfQuot1       = nr2mcfQuot1;
 #ifdef LDEBUG
   r->cfDBTest      = nr2mDBTest;
 #endif

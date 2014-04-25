@@ -554,8 +554,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
         loop
         {
           i++;
-          r->npExpTable[i] =(int)(((long)w * (long)r->npExpTable[i-1])
-                               % r->ch);
+          r->npExpTable[i] =(int)(((long)w * (long)r->npExpTable[i-1]) % r->ch);
           r->npLogTable[r->npExpTable[i]] = i;
           if /*(i == r->ch - 1 ) ||*/ (/*(*/ r->npExpTable[i] == 1 /*)*/)
             break;
