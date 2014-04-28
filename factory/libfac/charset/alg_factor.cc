@@ -1225,13 +1225,13 @@ SteelTrager (const CanonicalForm & f, const CFList & AS, const Varlist & uord)
 
   // factor F with minimal polys given in asnew
   asnew.append (F);
-  asnew= CharSet (asnew);
+  asnew= CharSet (asnew); // TODO use modCharSet
 
   F= asnew.getLast();
-  F /= content (F);
+  F /= content (F); // should be obsolete if we use modCharSet
 
   asnew.removeLast();
-  for (CFListIterator i= asnew; i.hasItem(); i++)
+  for (CFListIterator i= asnew; i.hasItem(); i++) // should be obsolete if we use modCharSet
     i.getItem() /= content (i.getItem());
 
   j= 0;
@@ -1271,7 +1271,7 @@ SteelTrager (const CanonicalForm & f, const CFList & AS, const Varlist & uord)
     CanonicalForm factor= k.getItem().factor();
     factor= M (factor);
     transform.append (factor);
-    transform= CharSet (transform);
+    transform= CharSet (transform); //TODO use modCharSet
     for (i= transform; i.hasItem(); i++)
     {
       if (degree (i.getItem(), f.mvar()) > 0)
