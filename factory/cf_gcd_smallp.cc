@@ -358,8 +358,8 @@ CanonicalForm uni_lcoeff (const CanonicalForm& F)
 /// the polynomial interpolating in all the points.
 /// newtonPoly must be equal to (x - alpha_1) * ... * (x - alpha_{n-1})
 static inline CanonicalForm
-newtonInterp(const CanonicalForm alpha, const CanonicalForm u,
-             const CanonicalForm newtonPoly, const CanonicalForm oldInterPoly,
+newtonInterp(const CanonicalForm & alpha, const CanonicalForm & u,
+             const CanonicalForm & newtonPoly, const CanonicalForm & oldInterPoly,
              const Variable & x)
 {
   CanonicalForm interPoly;

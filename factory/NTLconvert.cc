@@ -58,7 +58,7 @@ NTL_CLIENT
 // OUTPUT: The converted NTL-polynomial over F_p of type ZZpX                 //
 ////////////////////////////////////////////////////////////////////////////////
 
-ZZ_pX convertFacCF2NTLZZpX(CanonicalForm f)
+ZZ_pX convertFacCF2NTLZZpX(const CanonicalForm & f)
 {
   ZZ_pX ntl_poly;
 
@@ -99,7 +99,7 @@ ZZ_pX convertFacCF2NTLZZpX(CanonicalForm f)
 
   return ntl_poly;
 }
-zz_pX convertFacCF2NTLzzpX(CanonicalForm f)
+zz_pX convertFacCF2NTLzzpX(const CanonicalForm & f)
 {
   zz_pX ntl_poly;
 
@@ -176,7 +176,7 @@ zz_pX convertFacCF2NTLzzpX(CanonicalForm f)
 // OUTPUT: The converted NTL-polynomial over F_2 of type GF2X                 //
 ////////////////////////////////////////////////////////////////////////////////
 
-GF2X convertFacCF2NTLGF2X(CanonicalForm f)
+GF2X convertFacCF2NTLGF2X(const CanonicalForm & f)
 {
   //printf("convertFacCF2NTLGF2X\n");
   GF2X ntl_poly;
@@ -242,12 +242,12 @@ GF2X convertFacCF2NTLGF2X(CanonicalForm f)
 //         built by the main variable x                                       //
 ////////////////////////////////////////////////////////////////////////////////
 
-CanonicalForm convertNTLZZpX2CF(ZZ_pX poly,Variable x)
+CanonicalForm convertNTLZZpX2CF(const ZZ_pX & poly,const Variable & x)
 {
   return convertNTLZZX2CF (to_ZZX (poly), x);
 }
 
-CanonicalForm convertNTLzzpX2CF(zz_pX poly,Variable x)
+CanonicalForm convertNTLzzpX2CF(const zz_pX & poly,const Variable & x)
 {
   //printf("convertNTLzzpX2CF\n");
   CanonicalForm bigone;
@@ -277,7 +277,7 @@ CanonicalForm convertNTLzzpX2CF(zz_pX poly,Variable x)
   return bigone;
 }
 
-CanonicalForm convertNTLZZX2CF(ZZX polynom,Variable x)
+CanonicalForm convertNTLZZX2CF(const ZZX & polynom,const Variable & x)
 {
   //printf("convertNTLZZX2CF\n");
   CanonicalForm bigone;
@@ -314,7 +314,7 @@ CanonicalForm convertNTLZZX2CF(ZZX polynom,Variable x)
 //         built by the main variable x                                       //
 ////////////////////////////////////////////////////////////////////////////////
 
-CanonicalForm convertNTLGF2X2CF(GF2X poly,Variable x)
+CanonicalForm convertNTLGF2X2CF(const GF2X & poly,const Variable & x)
 {
   //printf("convertNTLGF2X2CF\n");
   CanonicalForm bigone;
@@ -366,7 +366,7 @@ CanonicalForm convertNTLGF2X2CF(GF2X poly,Variable x)
 ////////////////////////////////////////////////////////////////////////////////
 
 CFFList convertNTLvec_pair_ZZpX_long2FacCFFList
-                                  (vec_pair_ZZ_pX_long e,ZZ_p multi,Variable x)
+                                  (const vec_pair_ZZ_pX_long & e,const ZZ_p & multi,const Variable & x)
 {
   //printf("convertNTLvec_pair_ZZpX_long2FacCFFList\n");
   CFFList result;
@@ -391,7 +391,7 @@ CFFList convertNTLvec_pair_ZZpX_long2FacCFFList
   return result;
 }
 CFFList convertNTLvec_pair_zzpX_long2FacCFFList
-                                  (vec_pair_zz_pX_long e,zz_p multi,Variable x)
+                                  (const vec_pair_zz_pX_long & e,const zz_p multi,const Variable & x)
 {
   //printf("convertNTLvec_pair_zzpX_long2FacCFFList\n");
   CFFList result;
@@ -438,7 +438,7 @@ CFFList convertNTLvec_pair_zzpX_long2FacCFFList
 ////////////////////////////////////////////////////////////////////////////////
 
 CFFList convertNTLvec_pair_GF2X_long2FacCFFList
-    (vec_pair_GF2X_long e, GF2 /*multi*/, Variable x)
+    (const vec_pair_GF2X_long& e, GF2 /*multi*/, const Variable & x)
 {
   //printf("convertNTLvec_pair_GF2X_long2FacCFFList\n");
   CFFList result;
@@ -489,7 +489,7 @@ CFFList convertNTLvec_pair_GF2X_long2FacCFFList
 static unsigned char *cf_stringtemp;
 static unsigned long cf_stringtemp_l=0L;
 CanonicalForm
-convertZZ2CF (ZZ a)
+convertZZ2CF (const ZZ & a)
 {
   long coeff_long=to_long(a);
 
@@ -549,7 +549,7 @@ convertZZ2CF (ZZ a)
 /*static char *cf_stringtemp;
 static char *cf_stringtemp2;
 static int cf_stringtemp_l=0;
-CanonicalForm convertZZ2CF(ZZ coefficient)
+CanonicalForm convertZZ2CF(const ZZ & coefficient)
 {
   long coeff_long;
   //CanonicalForm tmp=0;
@@ -657,7 +657,7 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
 // OUTPUT: The converted NTL-polynom of type ZZX                              //
 ////////////////////////////////////////////////////////////////////////////////
 
-ZZ convertFacCF2NTLZZ(const CanonicalForm f)
+ZZ convertFacCF2NTLZZ(const CanonicalForm & f)
 {
   ZZ temp;
   if (f.isImm()) temp=f.intval();
@@ -678,7 +678,7 @@ ZZ convertFacCF2NTLZZ(const CanonicalForm f)
   return temp;
 }
 
-ZZX convertFacCF2NTLZZX(CanonicalForm f)
+ZZX convertFacCF2NTLZZX(const CanonicalForm & f)
 {
     ZZX ntl_poly;
 
@@ -739,7 +739,8 @@ ZZX convertFacCF2NTLZZX(CanonicalForm f)
 //         have x as their main variable                                      //
 ////////////////////////////////////////////////////////////////////////////////
 
-CFFList convertNTLvec_pair_ZZX_long2FacCFFList(vec_pair_ZZX_long e,ZZ multi,Variable x)
+CFFList
+convertNTLvec_pair_ZZX_long2FacCFFList (const vec_pair_ZZX_long & e,const ZZ & multi,const Variable & x)
 {
   CFFList result;
   ZZX polynom;
@@ -782,11 +783,11 @@ CFFList convertNTLvec_pair_ZZX_long2FacCFFList(vec_pair_ZZX_long e,ZZ multi,Vari
 // OUTPUT: The converted value of coefficient as type canonicalform           //
 ////////////////////////////////////////////////////////////////////////////////
 
-CanonicalForm convertNTLZZpE2CF(ZZ_pE coefficient,Variable x)
+CanonicalForm convertNTLZZpE2CF(const ZZ_pE & coefficient,const Variable & x)
 {
   return convertNTLZZpX2CF(rep(coefficient),x);
 }
-CanonicalForm convertNTLzzpE2CF(zz_pE coefficient,Variable x)
+CanonicalForm convertNTLzzpE2CF(const zz_pE & coefficient,const Variable & x)
 {
   return convertNTLzzpX2CF(rep(coefficient),x);
 }
@@ -811,7 +812,8 @@ CanonicalForm convertNTLzzpE2CF(zz_pE coefficient,Variable x)
 //         have x as their main variable                                      //
 ////////////////////////////////////////////////////////////////////////////////
 
-CFFList convertNTLvec_pair_ZZpEX_long2FacCFFList(vec_pair_ZZ_pEX_long e,ZZ_pE multi,Variable x,Variable alpha)
+CFFList
+convertNTLvec_pair_ZZpEX_long2FacCFFList(const vec_pair_ZZ_pEX_long & e,const ZZ_pE & multi,const Variable & x,const Variable & alpha)
 {
   CFFList result;
   ZZ_pEX polynom;
@@ -855,7 +857,8 @@ CFFList convertNTLvec_pair_ZZpEX_long2FacCFFList(vec_pair_ZZ_pEX_long e,ZZ_pE mu
   //return the computed CFFList
   return result;
 }
-CFFList convertNTLvec_pair_zzpEX_long2FacCFFList(vec_pair_zz_pEX_long e,zz_pE multi,Variable x,Variable alpha)
+CFFList
+convertNTLvec_pair_zzpEX_long2FacCFFList(const vec_pair_zz_pEX_long & e,const zz_pE & multi,const Variable & x,const Variable & alpha)
 {
   CFFList result;
   zz_pEX polynom;
@@ -917,7 +920,7 @@ CFFList convertNTLvec_pair_zzpEX_long2FacCFFList(vec_pair_zz_pEX_long e,zz_pE mu
 // OUTPUT: The converted value of coefficient as type canonicalform           //
 ////////////////////////////////////////////////////////////////////////////////
 
-CanonicalForm convertNTLGF2E2CF(GF2E coefficient,Variable x)
+CanonicalForm convertNTLGF2E2CF(const GF2E & coefficient,const Variable & x)
 {
   return convertNTLGF2X2CF(rep(coefficient),x);
 }
@@ -944,7 +947,7 @@ CanonicalForm convertNTLGF2E2CF(GF2E coefficient,Variable x)
 ////////////////////////////////////////////////////////////////////////////////
 
 CFFList convertNTLvec_pair_GF2EX_long2FacCFFList
-    (vec_pair_GF2EX_long e, GF2E /*multi*/, Variable x, Variable alpha)
+    (const vec_pair_GF2EX_long & e, const GF2E & multi, const Variable & x, const Variable & alpha)
 {
   CFFList result;
   GF2EX polynom;
@@ -985,6 +988,10 @@ CFFList convertNTLvec_pair_GF2EX_long2FacCFFList
     result.append(CFFactor(bigone,exponent));
 
   }
+
+  if (!IsOne(multi))
+    result.insert(CFFactor(convertNTLGF2E2CF(multi,alpha),1));
+
   // return the computed CFFList
   return result;
 }
@@ -992,7 +999,7 @@ CFFList convertNTLvec_pair_GF2EX_long2FacCFFList
 ////////////////////////////////////////////////////
 // CanonicalForm in Z_2(a)[X] to NTL GF2EX        //
 ////////////////////////////////////////////////////
-GF2EX convertFacCF2NTLGF2EX(CanonicalForm f,GF2X mipo)
+GF2EX convertFacCF2NTLGF2EX(const CanonicalForm & f,const GF2X & mipo)
 {
   GF2E::init(mipo);
   GF2EX result;
@@ -1022,7 +1029,7 @@ GF2EX convertFacCF2NTLGF2EX(CanonicalForm f,GF2X mipo)
 ////////////////////////////////////////////////////
 // CanonicalForm in Z_p(a)[X] to NTL ZZ_pEX       //
 ////////////////////////////////////////////////////
-ZZ_pEX convertFacCF2NTLZZ_pEX(CanonicalForm f, ZZ_pX mipo)
+ZZ_pEX convertFacCF2NTLZZ_pEX(const CanonicalForm & f, const ZZ_pX & mipo)
 {
   ZZ_pE::init(mipo);
   ZZ_pEX result;
@@ -1049,7 +1056,7 @@ ZZ_pEX convertFacCF2NTLZZ_pEX(CanonicalForm f, ZZ_pX mipo)
   result.normalize();
   return result;
 }
-zz_pEX convertFacCF2NTLzz_pEX(CanonicalForm f, zz_pX mipo)
+zz_pEX convertFacCF2NTLzz_pEX(const CanonicalForm & f, const zz_pX & mipo)
 {
   zz_pE::init(mipo);
   zz_pEX result;
@@ -1077,7 +1084,7 @@ zz_pEX convertFacCF2NTLzz_pEX(CanonicalForm f, zz_pX mipo)
   return result;
 }
 
-CanonicalForm convertNTLzz_pEX2CF (zz_pEX f, Variable x, Variable alpha)
+CanonicalForm convertNTLzz_pEX2CF (const zz_pEX& f, const Variable & x, const Variable & alpha)
 {
   CanonicalForm bigone;
   if (deg (f) > 0)
@@ -1100,7 +1107,7 @@ CanonicalForm convertNTLzz_pEX2CF (zz_pEX f, Variable x, Variable alpha)
   return bigone;
 }
 
-CanonicalForm convertNTLZZ_pEX2CF (ZZ_pEX f, Variable x, Variable alpha)
+CanonicalForm convertNTLZZ_pEX2CF (const ZZ_pEX& f, const Variable & x, const Variable & alpha)
 {
   CanonicalForm bigone;
   if (deg (f) > 0)
@@ -1123,7 +1130,7 @@ CanonicalForm convertNTLZZ_pEX2CF (ZZ_pEX f, Variable x, Variable alpha)
   return bigone;
 }
 //----------------------------------------------------------------------
-mat_ZZ* convertFacCFMatrix2NTLmat_ZZ(CFMatrix &m)
+mat_ZZ* convertFacCFMatrix2NTLmat_ZZ(const CFMatrix &m)
 {
   mat_ZZ *res=new mat_ZZ;
   res->SetDims(m.rows(),m.columns());
@@ -1138,7 +1145,7 @@ mat_ZZ* convertFacCFMatrix2NTLmat_ZZ(CFMatrix &m)
   }
   return res;
 }
-CFMatrix* convertNTLmat_ZZ2FacCFMatrix(mat_ZZ &m)
+CFMatrix* convertNTLmat_ZZ2FacCFMatrix(const mat_ZZ &m)
 {
   CFMatrix *res=new CFMatrix(m.NumRows(),m.NumCols());
   int i,j;
@@ -1152,7 +1159,7 @@ CFMatrix* convertNTLmat_ZZ2FacCFMatrix(mat_ZZ &m)
   return res;
 }
 
-mat_zz_p* convertFacCFMatrix2NTLmat_zz_p(CFMatrix &m)
+mat_zz_p* convertFacCFMatrix2NTLmat_zz_p(const CFMatrix &m)
 {
   mat_zz_p *res=new mat_zz_p;
   res->SetDims(m.rows(),m.columns());
@@ -1168,7 +1175,7 @@ mat_zz_p* convertFacCFMatrix2NTLmat_zz_p(CFMatrix &m)
   }
   return res;
 }
-CFMatrix* convertNTLmat_zz_p2FacCFMatrix(mat_zz_p &m)
+CFMatrix* convertNTLmat_zz_p2FacCFMatrix(const mat_zz_p &m)
 {
   CFMatrix *res=new CFMatrix(m.NumRows(),m.NumCols());
   int i,j;
@@ -1181,7 +1188,7 @@ CFMatrix* convertNTLmat_zz_p2FacCFMatrix(mat_zz_p &m)
   }
   return res;
 }
-mat_zz_pE* convertFacCFMatrix2NTLmat_zz_pE(CFMatrix &m)
+mat_zz_pE* convertFacCFMatrix2NTLmat_zz_pE(const CFMatrix &m)
 {
   mat_zz_pE *res=new mat_zz_pE;
   res->SetDims(m.rows(),m.columns());
@@ -1197,7 +1204,7 @@ mat_zz_pE* convertFacCFMatrix2NTLmat_zz_pE(CFMatrix &m)
   }
   return res;
 }
-CFMatrix* convertNTLmat_zz_pE2FacCFMatrix(mat_zz_pE &m, Variable alpha)
+CFMatrix* convertNTLmat_zz_pE2FacCFMatrix(const mat_zz_pE &m, const Variable & alpha)
 {
   CFMatrix *res=new CFMatrix(m.NumRows(),m.NumCols());
   int i,j;

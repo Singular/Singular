@@ -372,8 +372,8 @@ static CanonicalForm tryvcontent ( const CanonicalForm & f, const Variable & x, 
 static CanonicalForm trycf_content ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & M, bool & fail );
 
 static inline CanonicalForm
-tryNewtonInterp (const CanonicalForm alpha, const CanonicalForm u,
-              const CanonicalForm newtonPoly, const CanonicalForm oldInterPoly,
+tryNewtonInterp (const CanonicalForm & alpha, const CanonicalForm & u,
+              const CanonicalForm & newtonPoly, const CanonicalForm & oldInterPoly,
               const Variable & x, const CanonicalForm& M, bool& fail)
 {
   CanonicalForm interPoly;
