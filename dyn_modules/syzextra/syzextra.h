@@ -149,6 +149,8 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
 
     bool IsNonempty() const { return !m_hash.empty(); }
 
+    poly FindReducer(const poly multiplier, const poly monom, const poly syzterm, const CReducerFinder& checker) const;
+    
 #ifndef NDEBUG
     void DebugPrint() const;
 #endif
@@ -218,14 +220,19 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /// The result is stored into m_syzLeads
     void ComputeLeadingSyzygyTerms(bool bComputeSecondTerms = true);
 
-    poly SchreyerSyzygyNF(poly syz_lead, poly syz_2) const;
+    poly SchreyerSyzygyNF(const poly syz_lead, poly syz_2 = NULL) const;
 
-    // TODO: store m * @tail -.-^-.-^-.--> ?
+    poly TraverseTail(poly multiplier, const int tail) const;
+
+    // called only from above and from outside (for testing)
     poly TraverseTail(poly multiplier, poly tail) const;
 
     // TODO: save shortcut (syz: |-.->) LM(m) * "t" -> ?
     poly ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck) const;
 
+    // 
+    poly TraverseNF(const poly syz_lead, const poly syz_2 = NULL) const;
+    
   public:
     /// just for testing via the wrapper below
     inline poly _FindReducer(const poly product, const poly syzterm) const

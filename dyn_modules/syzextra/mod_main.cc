@@ -848,10 +848,11 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
     {
       PrintS("LS: "); dPrint(LS, r, r, 0);
     }
-  }
+  }  
   
   res->rtyp = VECTOR_CMD;
-  res->data = SchreyerSyzygyNF(syz_lead, syz_2, L, T, LS, attributes);
+  res->data = SchreyerSyzygyNF(syz_lead,
+                               (syz_2!=NULL)? p_Copy(syz_2, r): syz_2, L, T, LS, attributes);
 
   if( __DEBUG__ )
   {

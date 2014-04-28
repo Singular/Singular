@@ -2373,9 +2373,13 @@ proc TestSSresAttribs(def M)
 
 proc TestSSresAttribs2tr(def M)
 {
+  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
+
   attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
   attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
 
+  
   Testlres(M);  
   Testnres(M);  
 //  Testsres(M);  
@@ -2589,10 +2593,10 @@ a*c^2*d^2*e^2, b^2*c*d^2*e^2, a*b*c*d^2*e^2;
   M;
   TestSSresAttribs2tr(M);
 /*
-options:  1 1 0 :  Time:  34/73/92 (316 without LCM)
-options:  1 1 1 :  Time:  35/43/202
-lres  Time:  25
-nres  Time:  20
+options:  1 1 0 :  Time:  29/32/73/92 (316 without LCM)
+options:  1 1 1 :  Time:  32/34/43/202
+lres  Time:  24
+nres  Time:  19
 sres  Time:  71
 */
   kill M;
