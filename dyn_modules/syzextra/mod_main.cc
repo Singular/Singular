@@ -1923,54 +1923,61 @@ END_NAMESPACE
 
 int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions) 
 {
-#define ADD0(A,B,C,D,E) A(B, (char*)C, D, E)
+
+#define ADD(C,D,E) \
+  psModulFunctions->iiAddCproc((currPack->libname? currPack->libname: ""), (char*)C, D, E);
+
+
 // #define ADD(A,B,C,D,E) ADD0(iiAddCproc, "", C, D, E)
-  #define ADD(A,B,C,D,E) ADD0(A->iiAddCproc, B, C, D, E)
-  ADD(psModulFunctions, currPack->libname, "ClearContent", FALSE, _ClearContent);
-  ADD(psModulFunctions, currPack->libname, "ClearDenominators", FALSE, _ClearDenominators);
 
-  ADD(psModulFunctions, currPack->libname, "m2_end", FALSE, _m2_end);
+//#define ADD0(A,B,C,D,E) A(B, (char*)C, D, E)
+// #define ADD(A,B,C,D,E) ADD0(A->iiAddCproc, B, C, D, E)
+  ADD("ClearContent", FALSE, _ClearContent);
+  ADD("ClearDenominators", FALSE, _ClearDenominators);
 
-  ADD(psModulFunctions, currPack->libname, "DetailedPrint", FALSE, DetailedPrint);
-  ADD(psModulFunctions, currPack->libname, "leadmonomial", FALSE, _leadmonom);
-  ADD(psModulFunctions, currPack->libname, "leadcomp", FALSE, leadcomp);
-  ADD(psModulFunctions, currPack->libname, "leadrawexp", FALSE, leadrawexp);
+  ADD("m2_end", FALSE, _m2_end);
 
-  ADD(psModulFunctions, currPack->libname, "ISUpdateComponents", FALSE, ISUpdateComponents);
-  ADD(psModulFunctions, currPack->libname, "SetInducedReferrence", FALSE, SetInducedReferrence);
-  ADD(psModulFunctions, currPack->libname, "GetInducedData", FALSE, GetInducedData);
-  ADD(psModulFunctions, currPack->libname, "SetSyzComp", FALSE, SetSyzComp);
-  ADD(psModulFunctions, currPack->libname, "MakeInducedSchreyerOrdering", FALSE, MakeInducedSchreyerOrdering);
-  ADD(psModulFunctions, currPack->libname, "MakeSyzCompOrdering", FALSE, MakeSyzCompOrdering);
+  ADD("DetailedPrint", FALSE, DetailedPrint);
+  ADD("leadmonomial", FALSE, _leadmonom);
+  ADD("leadcomp", FALSE, leadcomp);
+  ADD("leadrawexp", FALSE, leadrawexp);
 
-  ADD(psModulFunctions, currPack->libname, "ProfilerStart", FALSE, _ProfilerStart); ADD(psModulFunctions, currPack->libname, "ProfilerStop",  FALSE, _ProfilerStop );
-  
-  ADD(psModulFunctions, currPack->libname, "noop", FALSE, noop);
-  ADD(psModulFunctions, currPack->libname, "idPrepare", FALSE, idPrepare);
-  ADD(psModulFunctions, currPack->libname, "reduce_syz", FALSE, reduce_syz);
+  ADD("ISUpdateComponents", FALSE, ISUpdateComponents);
+  ADD("SetInducedReferrence", FALSE, SetInducedReferrence);
+  ADD("GetInducedData", FALSE, GetInducedData);
+  ADD("SetSyzComp", FALSE, SetSyzComp);
+  ADD("MakeInducedSchreyerOrdering", FALSE, MakeInducedSchreyerOrdering);
+  ADD("MakeSyzCompOrdering", FALSE, MakeSyzCompOrdering);
 
-  ADD(psModulFunctions, currPack->libname, "p_Content", FALSE, _p_Content);
+  ADD("ProfilerStart", FALSE, _ProfilerStart);
+  ADD("ProfilerStop",  FALSE, _ProfilerStop );
 
-  ADD(psModulFunctions, currPack->libname, "Tail", FALSE, Tail);
-  
-  ADD(psModulFunctions, currPack->libname, "ComputeLeadingSyzygyTerms", FALSE, _ComputeLeadingSyzygyTerms);
-  ADD(psModulFunctions, currPack->libname, "Compute2LeadingSyzygyTerms", FALSE, _Compute2LeadingSyzygyTerms);
-  
-  ADD(psModulFunctions, currPack->libname, "Sort_c_ds", FALSE, _Sort_c_ds);
-  ADD(psModulFunctions, currPack->libname, "FindReducer", FALSE, _FindReducer);
+  ADD("noop", FALSE, noop);
+  ADD("idPrepare", FALSE, idPrepare);
+  ADD("reduce_syz", FALSE, reduce_syz);
+
+  ADD("p_Content", FALSE, _p_Content);
+
+  ADD("Tail", FALSE, Tail);
+
+  ADD("ComputeLeadingSyzygyTerms", FALSE, _ComputeLeadingSyzygyTerms);
+  ADD("Compute2LeadingSyzygyTerms", FALSE, _Compute2LeadingSyzygyTerms);
+
+  ADD("Sort_c_ds", FALSE, _Sort_c_ds);
+  ADD("FindReducer", FALSE, _FindReducer);
 
 
-  ADD(psModulFunctions, currPack->libname, "ReduceTerm", FALSE, _ReduceTerm);
-  ADD(psModulFunctions, currPack->libname, "TraverseTail", FALSE, _TraverseTail);
+  ADD("ReduceTerm", FALSE, _ReduceTerm);
+  ADD("TraverseTail", FALSE, _TraverseTail);
 
-    
-  ADD(psModulFunctions, currPack->libname, "SchreyerSyzygyNF", FALSE, _SchreyerSyzygyNF);
-  ADD(psModulFunctions, currPack->libname, "ComputeSyzygy", FALSE, _ComputeSyzygy);
 
-  ADD(psModulFunctions, currPack->libname, "ComputeResolution", FALSE, _ComputeResolution);
-//  ADD(psModulFunctions, currPack->libname, "GetAMData", FALSE, GetAMData);
+  ADD("SchreyerSyzygyNF", FALSE, _SchreyerSyzygyNF);
+  ADD("ComputeSyzygy", FALSE, _ComputeSyzygy);
 
-  //  ADD(psModulFunctions, currPack->libname, "", FALSE, );
+  ADD("ComputeResolution", FALSE, _ComputeResolution);
+//  ADD("GetAMData", FALSE, GetAMData);
+
+  //  ADD("", FALSE, );
 
 #undef ADD  
   return 0;
