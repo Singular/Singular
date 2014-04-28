@@ -29,6 +29,8 @@ typedef struct ip_sring *         ring;
 struct sip_sideal;
 typedef struct sip_sideal *       ideal;
 
+class idrec;
+typedef idrec *   idhdl;
 
 BEGIN_NAMESPACE_SINGULARXX    BEGIN_NAMESPACE(SYZEXTRA)
 
@@ -50,6 +52,33 @@ ideal id_Tail(const ideal id, const ring r);
 void Sort_c_ds(const ideal id, const ring r);
 
 
+
+
+
+/// Computation attribute storage
+struct SchreyerSyzygyComputationFlags
+{
+  SchreyerSyzygyComputationFlags(idhdl rootRingHdl);
+  
+  /// output all the intermediate states
+  const bool __DEBUG__; // DebugOutput;
+
+  /// ?
+  const bool __SYZCHECK__; // CheckSyzygyProperty;
+
+  /// ?
+  const bool __LEAD2SYZ__; // TwoLeadingSyzygyTerms;
+
+  /// Reduce syzygy tails wrt the leading syzygy terms
+  const bool __TAILREDSYZ__; // TailReducedSyzygies;
+
+  /// Use the usual NF's S-poly reduction while dropping lower order terms
+  const bool __HYBRIDNF__; // UseHybridNF
+
+};
+
+
+
 /** @class SchreyerSyzygyComputation syzextra.h
  * 
  * Computing syzygies after Schreyer
@@ -64,15 +93,17 @@ class SchreyerSyzygyComputation
 {
   public:
     /// Construct a global object for given input data (separated into leads & tails)
-    SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const ring rBaseRing):
-        m_idLeads(idLeads), m_idTails(idTails), m_rBaseRing(rBaseRing),
-        m_syzLeads(NULL), m_syzTails(NULL), m_LS(NULL) {}
+    SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const ring rBaseRing, const SchreyerSyzygyComputationFlags attribues):
+        m_rBaseRing(rBaseRing),
+        m_idLeads(idLeads), m_idTails(idTails), 
+        m_syzLeads(NULL), m_syzTails(NULL), m_LS(NULL), m_atttributes(attribues) {}
 
 
     /// Construct a global object for given input data (separated into leads & tails)
-    SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const ideal syzLeads, const ring rBaseRing):
-        m_idLeads(idLeads), m_idTails(idTails), m_rBaseRing(rBaseRing),
-        m_syzLeads(NULL), m_syzTails(NULL), m_LS(syzLeads) {}
+    SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const ideal syzLeads, const ring rBaseRing, const SchreyerSyzygyComputationFlags attribues):
+        m_rBaseRing(rBaseRing),
+        m_idLeads(idLeads), m_idTails(idTails), 
+        m_syzLeads(NULL), m_syzTails(NULL), m_LS(syzLeads), m_atttributes(attribues) {}
 
     
     /// Destructor should not destruct the resulting m_syzLeads, m_syzTails. 
@@ -95,17 +126,16 @@ class SchreyerSyzygyComputation
     void ComputeLeadingSyzygyTerms(bool bComputeSecondTerms = true);
 
     // TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?
-    poly FindReducer(poly product, poly syzterm);
+    poly FindReducer(poly product, poly syzterm) const;
     
-    poly SchreyerSyzygyNF(poly syz_lead, poly syz_2);
+    poly SchreyerSyzygyNF(poly syz_lead, poly syz_2) const;
 
     // TODO: store m * @tail -.-^-.-^-.--> ?
-    poly TraverseTail(poly multiplier, poly tail);
+    poly TraverseTail(poly multiplier, poly tail) const;
 
     // TODO: save shortcut (syz: |-.->) LM(m) * "t" -> ?
-    poly ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck);
+    poly ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck) const;
 
-    
   protected:
     
     /// Clean up all the accumulated data
@@ -128,30 +158,32 @@ class SchreyerSyzygyComputation
     ideal m_syzTails;
 
     /*mutable?*/ ideal m_LS; ///< leading syzygy terms used for reducing syzygy tails
+
+    const SchreyerSyzygyComputationFlags m_atttributes;
 };
 
 
 // The following wrappers are just for testing separate functions on highest level (within schreyer.lib)
 
-static inline void ComputeSyzygy(const ideal L, const ideal T, ideal& LL, ideal& TT, const ring R)
+static inline void ComputeSyzygy(const ideal L, const ideal T, ideal& LL, ideal& TT, const ring R, const SchreyerSyzygyComputationFlags A)
 {
-  SchreyerSyzygyComputation syz(L, T, R);
+  SchreyerSyzygyComputation syz(L, T, R, A);
   syz.ComputeSyzygy();
   syz.ReadOffResult(LL, TT);
 }
 
-static inline ideal ComputeLeadingSyzygyTerms(const ideal& L, const ring R)
+static inline ideal ComputeLeadingSyzygyTerms(const ideal& L, const ring R, const SchreyerSyzygyComputationFlags A)
 {
-  SchreyerSyzygyComputation syz(L, NULL, R);
+  SchreyerSyzygyComputation syz(L, NULL, R, A);
   syz.ComputeLeadingSyzygyTerms(false);
   ideal LL, TT;
   syz.ReadOffResult(LL, TT);
   return LL; // assume TT is NULL!
 }
 
-static inline ideal Compute2LeadingSyzygyTerms(const ideal& L, const ring R)
+static inline ideal Compute2LeadingSyzygyTerms(const ideal& L, const ring R, const SchreyerSyzygyComputationFlags A)
 {
-  SchreyerSyzygyComputation syz(L, NULL, R);
+  SchreyerSyzygyComputation syz(L, NULL, R, A);
   syz.ComputeLeadingSyzygyTerms(true);
   ideal LL, TT;
   syz.ReadOffResult(LL, TT);
@@ -159,35 +191,33 @@ static inline ideal Compute2LeadingSyzygyTerms(const ideal& L, const ring R)
 }
 
 static inline poly FindReducer(poly product, poly syzterm,
-                               ideal L, ideal LS, const ring R)
+                               ideal L, ideal LS, const ring R, const SchreyerSyzygyComputationFlags A)
 {
-  SchreyerSyzygyComputation syz(L, NULL, LS, R);
+  SchreyerSyzygyComputation syz(L, NULL, LS, R, A);
   return syz.FindReducer(product, syzterm);
 }
 
 static inline poly TraverseTail(poly multiplier, poly tail, 
-                                ideal L, ideal T, ideal LS, const ring R)
+                                ideal L, ideal T, ideal LS, const ring R, const SchreyerSyzygyComputationFlags A)
 {
-  SchreyerSyzygyComputation syz(L, T, LS, R);
+  SchreyerSyzygyComputation syz(L, T, LS, R, A);
   return syz.TraverseTail(multiplier, tail);
 }
 
 static inline poly ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck,
-                              ideal L, ideal T, ideal LS, const ring R)
+                              ideal L, ideal T, ideal LS, const ring R, const SchreyerSyzygyComputationFlags A)
 {
-  SchreyerSyzygyComputation syz(L, T, LS, R);
+  SchreyerSyzygyComputation syz(L, T, LS, R, A);
   return syz.ReduceTerm(multiplier, term4reduction, syztermCheck);
 }
 
 
 static inline poly SchreyerSyzygyNF(poly syz_lead, poly syz_2,
-                                    ideal L, ideal T, ideal LS, const ring R)
+                                    ideal L, ideal T, ideal LS, const ring R, const SchreyerSyzygyComputationFlags A)
 {
-  SchreyerSyzygyComputation syz(L, T, LS, R);
+  SchreyerSyzygyComputation syz(L, T, LS, R, A);
   return syz.SchreyerSyzygyNF(syz_lead, syz_2);
 }
-
-
 
 END_NAMESPACE
    

@@ -2226,7 +2226,7 @@ proc TestSSres(def M)
   TRES;
 */  
   kill S;
-  "\ ----------------------------------- / ", "options: ", attrib(SSinit, "LEAD2SYZ"), attrib(SSinit, "TAILREDSYZ"), attrib(SSinit, "HYBRIDNF"), ": ", "Time: ", tt - t;
+  "\\ ----------------------------------- / ", "options: ", attrib(SSinit, "LEAD2SYZ"), attrib(SSinit, "TAILREDSYZ"), attrib(SSinit, "HYBRIDNF"), ": ", "Time: ", tt - t;
 }
 
 

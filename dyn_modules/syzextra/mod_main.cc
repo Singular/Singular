@@ -505,8 +505,17 @@ static BOOLEAN Tail(leftv res, leftv h)
 }
 
 
+
 static BOOLEAN _ComputeLeadingSyzygyTerms(leftv res, leftv h)
 {
+  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
+      
+  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+//  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
+  const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
+//  const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
+//  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+
   const ring r = currRing;
   NoReturn(res);
 
@@ -518,12 +527,6 @@ static BOOLEAN _ComputeLeadingSyzygyTerms(leftv res, leftv h)
 
   assume( h != NULL );  
 
-#ifndef NDEBUG
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
-#else
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
-#endif
-
   if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
   {
     const ideal id = (const ideal)h->Data();
@@ -532,26 +535,15 @@ static BOOLEAN _ComputeLeadingSyzygyTerms(leftv res, leftv h)
 
     if( __DEBUG__ )
     {
-      PrintS("ComputeLeadingSyzygyTerms::Input: \n");
-      
-      const BOOLEAN __LEAD2SYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"LEAD2SYZ",INT_CMD, (void*)0)));
-      const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)0)));
-      const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)0)));
-
-
-      Print("\nSYZCHECK: \t%d", __SYZCHECK__);
-      Print(", DEBUG: \t%d", __DEBUG__);
-      Print(", LEAD2SYZ: \t%d", __LEAD2SYZ__);
-      Print(", TAILREDSYZ: \t%d\n", __TAILREDSYZ__);
-
+      PrintS("ComputeLeadingSyzygyTerms::Input: \n");     
       dPrint(id, r, r, 1);
-
-      assume( !__LEAD2SYZ__ );
     }
+    
+    assume( !__LEAD2SYZ__ );
 
     h = h->Next(); assume (h == NULL);
 
-    const ideal newid = ComputeLeadingSyzygyTerms(id, r);
+    const ideal newid = ComputeLeadingSyzygyTerms(id, r, attributes);
     
     res->data = newid; res->rtyp = MODUL_CMD;
     return FALSE;
@@ -566,6 +558,14 @@ static BOOLEAN _ComputeLeadingSyzygyTerms(leftv res, leftv h)
 // TODO: use a ring with >_{c, ds}!???
 static BOOLEAN _Sort_c_ds(leftv res, leftv h)
 {
+  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
+
+  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+//  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
+//  const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
+//  const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
+//  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+
   NoReturn(res);
 
   const ring r = currRing;
@@ -579,12 +579,6 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
 
   assume( h != NULL );  
 
-#ifndef NDEBUG
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
-#else
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
-#endif
-
   if(    (h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
       && (h->rtyp  == IDHDL) // must be a variable!
       && (h->e == NULL) // not a list element
@@ -597,16 +591,6 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
     if( __DEBUG__ )
     {
       PrintS("Sort_c_ds::Input: \n");
-
-      const BOOLEAN __LEAD2SYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"LEAD2SYZ",INT_CMD, (void*)0)));
-      const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)0)));
-      const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)0)));   
-
-      Print("\nSYZCHECK: \t%d", __SYZCHECK__);
-      Print(", DEBUG: \t%d", __DEBUG__);
-      Print(", LEAD2SYZ: \t%d", __LEAD2SYZ__);
-      Print(", TAILREDSYZ: \t%d\n", __TAILREDSYZ__);
-
       dPrint(id, r, r, 1);      
     }
 
@@ -636,6 +620,14 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
 
 static BOOLEAN _Compute2LeadingSyzygyTerms(leftv res, leftv h)
 {
+  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
+
+  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+//  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
+  const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
+//  const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
+//  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+
   const ring r = currRing;
   NoReturn(res);
 
@@ -647,15 +639,7 @@ static BOOLEAN _Compute2LeadingSyzygyTerms(leftv res, leftv h)
 
   assume( h != NULL );  
 
-#ifndef NDEBUG
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
-#else
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
-#endif
-
-  const BOOLEAN __LEAD2SYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"LEAD2SYZ",INT_CMD, (void*)0)));
-  
-  assume( __LEAD2SYZ__ );
+  assume( __LEAD2SYZ__ ); // ???
   
   if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
   {
@@ -671,7 +655,7 @@ static BOOLEAN _Compute2LeadingSyzygyTerms(leftv res, leftv h)
 
     h = h->Next(); assume (h == NULL);
 
-    res->data = Compute2LeadingSyzygyTerms(id, r);
+    res->data = Compute2LeadingSyzygyTerms(id, r, attributes);
     res->rtyp = MODUL_CMD;
 
     return FALSE;
@@ -686,19 +670,19 @@ static BOOLEAN _Compute2LeadingSyzygyTerms(leftv res, leftv h)
 /// proc SSFindReducer(def product, def syzterm, def L, def T, list #)
 static BOOLEAN _FindReducer(leftv res, leftv h)
 {
+  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
+
+  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+//   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
+//   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
+//   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
+  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+
   const char* usage = "`FindReducer(<poly/vector>, <vector/0>, <ideal/module>[,<module>])` expected";
   const ring r = currRing;
 
   NoReturn(res);
 
-
-#ifndef NDEBUG
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
-#else
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
-#endif
-
-  const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)0)));
 
   if ((h==NULL) || (h->Typ()!=VECTOR_CMD && h->Typ() !=POLY_CMD) || (h->Data() == NULL))
   {
@@ -765,7 +749,7 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
   }
 
   res->rtyp = VECTOR_CMD;
-  res->data = FindReducer(product, syzterm, L, LS, r);
+  res->data = FindReducer(product, syzterm, L, LS, r, attributes);
 
   if( __DEBUG__ )
   {
@@ -780,24 +764,20 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
 // proc SchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
 static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
 {
+  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
+
+  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+//   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
+//   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
+  const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
+  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+
   const char* usage = "`SchreyerSyzygyNF(<vector>, <vector>, <ideal/module>, <ideal/module>[,<module>])` expected";
   const ring r = currRing;
 
   NoReturn(res);
 
-#ifndef NDEBUG
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
-#else
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
-#endif
-
-  const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)0)));
-//  const BOOLEAN __LEAD2SYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"LEAD2SYZ",INT_CMD, (void*)0)));
-  const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)0)));   
-
-  const BOOLEAN __HYBRIDNF__ = (BOOLEAN)((long)(atGet(currRingHdl,"HYBRIDNF",INT_CMD, (void*)0)));
-
-  assume( __HYBRIDNF__ );
+  assume( __HYBRIDNF__ ); // ???
   
   if ((h==NULL) || (h->Typ() != VECTOR_CMD) || (h->Data() == NULL))
   {
@@ -871,7 +851,7 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
   }
   
   res->rtyp = VECTOR_CMD;
-  res->data = SchreyerSyzygyNF(syz_lead, syz_2, L, T, LS, r);
+  res->data = SchreyerSyzygyNF(syz_lead, syz_2, L, T, LS, r, attributes);
 
   if( __DEBUG__ )
   {
@@ -889,20 +869,18 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
 /// proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
 static BOOLEAN _ReduceTerm(leftv res, leftv h)
 {
+  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
+
+  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
+//   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
+//   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
+  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+
   const char* usage = "`ReduceTerm(<poly>, <poly/vector>, <vector/0>, <ideal/module>, <ideal/module>[,<module>])` expected";
   const ring r = currRing;
 
   NoReturn(res);
-
-#ifndef NDEBUG
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
-#else
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
-#endif
-
-  const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)0)));
-//  const BOOLEAN __LEAD2SYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"LEAD2SYZ",INT_CMD, (void*)0)));
-  const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)0)));   
 
   if ((h==NULL) || (h->Typ() !=POLY_CMD) || (h->Data() == NULL))
   {
@@ -1013,7 +991,7 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
   }
 
   res->rtyp = VECTOR_CMD;
-  res->data = ReduceTerm(multiplier, term4reduction, syztermCheck, L, T, LS, r);
+  res->data = ReduceTerm(multiplier, term4reduction, syztermCheck, L, T, LS, r, attributes);
 
 
   if( __DEBUG__ )
@@ -1033,18 +1011,18 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
 // proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
 static BOOLEAN _TraverseTail(leftv res, leftv h)
 {
+  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
+
+  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+//   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
+//   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
+//   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
+  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+
   const char* usage = "`TraverseTail(<poly>, <poly/vector>, <ideal/module>, <ideal/module>[,<module>])` expected";
   const ring r = currRing;
 
   NoReturn(res);
-
-#ifndef NDEBUG
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
-#else
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
-#endif
-
-  const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)1)));
 
   if ((h==NULL) || (h->Typ() !=POLY_CMD) || (h->Data() == NULL))
   {
@@ -1120,7 +1098,7 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
   }
 
   res->rtyp = VECTOR_CMD;
-  res->data = TraverseTail(multiplier, tail, L, T, LS, r);
+  res->data = TraverseTail(multiplier, tail, L, T, LS, r, attributes);
 
 
   if( __DEBUG__ )
@@ -1138,16 +1116,18 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
 // proc SSComputeSyzygy(def L, def T)
 static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
 {
+  const SchreyerSyzygyComputationFlags attributes(currRingHdl);
+
+  const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
+//   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
+//   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
+//   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
+//   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
+
   const char* usage = "`ComputeSyzygy(<ideal/module>, <ideal/module>])` expected";
   const ring r = currRing;
 
   NoReturn(res);
-
-#ifndef NDEBUG
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)TRUE)));
-#else
-  const BOOLEAN __DEBUG__ = (BOOLEAN)((long)(atGet(currRingHdl,"DEBUG",INT_CMD, (void*)FALSE)));
-#endif
 
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
@@ -1182,7 +1162,7 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
 
   ideal LL, TT;
 
-  ComputeSyzygy(L, T, LL, TT, r);
+  ComputeSyzygy(L, T, LL, TT, r, attributes);
 
   lists l = (lists)omAllocBin(slists_bin); l->Init(2);
 
