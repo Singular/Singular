@@ -148,9 +148,12 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
 {
   friend class CDivisorEnumerator;
   friend class CDivisorEnumerator2;
-  private:
+
+  public:
     typedef long TComponentKey;
     typedef std::vector<const CLeadingTerm*> TReducers;
+
+  private:
     typedef std::map< TComponentKey, TReducers> CReducersHash;
 
   public:
@@ -196,9 +199,16 @@ typedef poly TCacheValue;
 
 struct CCacheCompare
 {
-    const ring & m_ring; 
-    CCacheCompare(const ring& r): m_ring(r) {}   
-    inline bool operator() (const TCacheKey& l, const TCacheKey& r) { return my_p_LmCmp(l, r, m_ring); }
+  const ring & m_ring;
+
+  CCacheCompare(); 
+  
+  CCacheCompare(const ring& r): m_ring(r) { assume(r != NULL); }
+
+  CCacheCompare(const CCacheCompare& lhs): m_ring(lhs.m_ring) { assume(m_ring != NULL); }
+  CCacheCompare& operator=(const CCacheCompare& lhs) { assume(lhs.m_ring != NULL); return (const_cast<CCacheCompare&>(lhs)); }
+    
+  inline bool operator() (const TCacheKey& l, const TCacheKey& r) const { assume(m_ring != NULL); return my_p_LmCmp(l, r, m_ring); }
 };
    
 typedef std::map<TCacheKey, TCacheValue, CCacheCompare> TP2PCache; // deallocation??? !!!

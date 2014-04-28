@@ -2399,6 +2399,15 @@ bool CLCM::Check(const poly m) const
   } else return true;
 }
 
+CCacheCompare::CCacheCompare(): m_ring(currRing) {} 
+
+
+template class std::vector<bool>;
+template class std::vector<CLeadingTerm const*>;
+template class std::map< CReducerFinder::TComponentKey, CReducerFinder::TReducers >;
+
+template class std::map<TCacheKey, TCacheValue, struct CCacheCompare>;
+template class std::map<int, TP2PCache>;
 
 
 
