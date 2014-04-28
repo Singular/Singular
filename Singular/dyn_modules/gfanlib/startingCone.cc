@@ -48,7 +48,11 @@ gfan::ZVector findTropicalPoint(const groebnerConeData sigma)
 }
 
 
-gfan::ZVector tropicalStartingPoint(const ideal I, const ring r, const tropicalStrategy currentCase)
+/***
+ * Computes a starting point by computing the Groebner fan,
+ * checking each new cone whether its contains a ray in the tropical variety.
+ **/
+gfan::ZVector tropicalStartingPointViaGroebnerFan(const ideal I, const ring r, const tropicalStrategy currentCase)
 {
   bool (*red)(ideal I, ring r);
   red = currentCase.reduce; red(I,r);

@@ -124,7 +124,7 @@ gfan::ZCone fullGroebnerCone(const ideal &I, const ring &r)
   return gfan::ZCone(inequalities,gfan::ZMatrix(0, inequalities.getWidth()));
 }
 
-groebnerConeData::groebnerConeData():
+groebnerCone::groebnerCone():
   I(NULL),
   r(NULL),
   c(gfan::ZCone(0)),
@@ -132,7 +132,7 @@ groebnerConeData::groebnerConeData():
 {
 }
 
-groebnerConeData::groebnerConeData(const groebnerConeData &sigma):
+groebnerCone::groebnerCone(const groebnerCone &sigma):
   I(id_Copy(sigma.getIdeal(),sigma.getRing())),
   r(rCopy(sigma.getRing())),
   c(gfan::ZCone(sigma.getCone())),
@@ -140,7 +140,7 @@ groebnerConeData::groebnerConeData(const groebnerConeData &sigma):
 {
 }
 
-groebnerConeData::groebnerConeData(const ideal &J, const ring &s, const gfan::ZCone &d, const gfan::ZVector &q):
+groebnerCone::groebnerCone(const ideal &J, const ring &s, const gfan::ZCone &d, const gfan::ZVector &q):
   I(J),
   r(s),
   c(d),
@@ -148,14 +148,14 @@ groebnerConeData::groebnerConeData(const ideal &J, const ring &s, const gfan::ZC
 {
 }
 
-groebnerConeData::~groebnerConeData()
+groebnerCone::~groebnerCone()
 {
-  // if (I!=NULL) id_Delete(&I,r);
-  // if (r!=NULL) rDelete(r);
+  if (I) id_Delete(&I,r);
+  if (r) rDelete(r);
 }
 
 
-groebnerConeData maximalGroebnerConeData(ideal I, const ring r)
+groebnerCone maximalGroebnerConeData(ideal I, const ring r)
 {
   int n = rVar(r);
   poly g = NULL;
@@ -181,7 +181,7 @@ groebnerConeData maximalGroebnerConeData(ideal I, const ring r)
   omFreeSize(tailexpv,(n+1)*sizeof(int));
   gfan::ZCone zc = gfan::ZCone(inequalities,gfan::ZMatrix(0, inequalities.getWidth()));
   gfan::ZVector p = zc.getRelativeInteriorPoint();
-  return groebnerConeData(I,r,zc,p);
+  return groebnerCone(I,r,zc,p);
 }
 
 /***
@@ -208,7 +208,7 @@ void changeOrderingTo_wp(ring r, const gfan::ZVector w)
   rComplete(r,1);
 }
 
-groebnerConeData::groebnerConeData(const ideal J, const ring s, const gfan::ZVector w)
+groebnerCone::groebnerCone(const ideal J, const ring s, const gfan::ZVector w)
 {
   r = rCopy(s);
   changeOrderingTo_wp(r,w);
@@ -225,7 +225,7 @@ groebnerConeData::groebnerConeData(const ideal J, const ring s, const gfan::ZVec
   p = c.getRelativeInteriorPoint();
 }
 
-groebnerConeData::groebnerConeData(const ideal J, const ring s, const gfan::ZCone d)
+groebnerCone::groebnerCone(const ideal J, const ring s, const gfan::ZCone d)
 {
   c = d;
   p = d.getRelativeInteriorPoint();
@@ -271,7 +271,7 @@ groebnerConeData::groebnerConeData(const ideal J, const ring s, const gfan::ZCon
 //   return ok;
 // }
 
-// groebnerConeData::groebnerConeData(const ideal J, const ring s, const gfan::ZVector w)
+// groebnerCone::groebnerCone(const ideal J, const ring s, const gfan::ZVector w)
 // {
 //   r = rCopy(s);
 //   changeOrderingTo_wp(r,w);
@@ -288,7 +288,7 @@ groebnerConeData::groebnerConeData(const ideal J, const ring s, const gfan::ZCon
 //   p = c.getRelativeInteriorPoint();
 // }
 
-gfan::ZFan* toFanStar(setOfGroebnerConeData setOfCones)
+gfan::ZFan* toFanStar(groebnerCones setOfCones)
 {
   if (setOfCones.size() > 0)
   {
