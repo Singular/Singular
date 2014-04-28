@@ -916,7 +916,14 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   // end quasi monic
 
   if (degree (f) == 1)
+  {
+    f= backSubst (f, backSubsts, Astar);
+    f *= bCommonDen (f);
+    f= Prem (f, as);
+    f /= vcontent (f, as.getFirst().mvar());
+
     return CFFList (CFFactor (f, 1));
+  }
 
   sqrf_norm(f, Rstar, vminpoly, s, g, R );
   //out_cf("sqrf_norm R:",R,"\n");
@@ -945,6 +952,11 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
     Factorlist.insert(CFFactor(1,1));
   if ( Factorlist.length() == 2 && Factorlist.getLast().exp()== 1)
   { // irreduzibel (first entry is a constant)
+    f= backSubst (f, backSubsts, Astar);
+    f *= bCommonDen (f);
+    f= Prem (f, as);
+    f /= vcontent (f, as.getFirst().mvar());
+
     L.append(CFFactor(f,1));
   }
   else
