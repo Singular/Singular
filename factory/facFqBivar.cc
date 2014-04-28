@@ -4175,6 +4175,7 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
         delete [] bounds;
         return Union (result, factors);
       }
+      delete [] zeroOne;
     }
     oldL= l;
     l += stepSize;

@@ -300,8 +300,8 @@ void evalPoint (const CanonicalForm& F, const CanonicalForm& G,
 }
 
 static inline CanonicalForm
-newtonInterp (const CanonicalForm alpha, const CanonicalForm u,
-              const CanonicalForm newtonPoly, const CanonicalForm oldInterPoly,
+newtonInterp (const CanonicalForm & alpha, const CanonicalForm & u,
+              const CanonicalForm & newtonPoly, const CanonicalForm & oldInterPoly,
               const Variable & x)
 {
   CanonicalForm interPoly;

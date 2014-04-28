@@ -125,6 +125,7 @@ void DegreePattern::refine ()
   count++;
   if (count == getLength())
   {
+    delete [] buf;
     return;
   }
   int length= getLength();

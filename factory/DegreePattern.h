@@ -39,7 +39,7 @@ private:
 
     /// construct a Pattern from an int
     Pattern(int n): m_refCounter(1), m_length(n), m_pattern( new int[n]) {};
-    /// default contructor
+    /// default constructor
     Pattern(): m_refCounter(1), m_length(0), m_pattern(NULL) {};
 
   }* m_data;
