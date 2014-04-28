@@ -571,7 +571,6 @@ gmsnf.tst
 gmsring.tst
 goodBasis.tst
 gradiator.tst
-graver4ti2.tst
 grobcov.tst
 grobcovold.tst
 groebner.tst
@@ -585,7 +584,6 @@ hessenberg.tst
 highcorner.tst
 hilb.tst
 hilbPoly.tst
-hilbert4ti2.tst
 hilbertSeries.tst
 hilbvec.tst
 hnexpansion.tst
@@ -881,7 +879,6 @@ map_declarations.tst
 map_declarations_BR_PLURAL_BR.tst
 map_operations.tst
 mapall.tst
-markov4ti2.tst
 mat_rk.tst
 matbil.tst
 matmult.tst
@@ -954,7 +951,7 @@ multBound.tst
 multcol.tst
 multi.tst
 multiDeg.tst
-multiDegBasis.tst
+;;multiDegBasis.tst
 multiDegGroebner.tst
 multiDegModulo.tst
 multiDegPartition.tst

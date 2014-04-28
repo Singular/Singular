@@ -621,7 +621,6 @@ Manual/fwalk.tst
 Manual/group_reynolds.tst
 Manual/Gweights.tst
 Manual/Hcode.tst
-Manual/hilbert4ti2.tst
 Manual/hilbPoly.tst
 Manual/internalfunctions.tst
 Manual/intersectZ.tst
@@ -795,7 +794,6 @@ Manual/getLattice.tst
 Manual/getVariableWeights.tst
 Manual/Graded_commutative_algebras__SCA_.tst
 Manual/gradiator.tst
-Manual/graver4ti2.tst
 Manual/HomJJ.tst
 Manual/ideal_expressions.tst
 Manual/ideal_expressions_BR_PLURAL_BR.tst
@@ -1418,13 +1416,11 @@ Manual/assPrimes.tst
 Manual/facFirstShift.tst
 Manual/spectralNeg.tst
 Manual/SannfsBFCT.tst
-
-
-; Manual/startNmz.tst ; needs normaliz!
+Manual/startNmz.tst ; needs normaliz!
 ; Manual/memory.tst ; HW-dependent: contains memory output!
 ; Manual/LLL.tst
 ; Manual/system.tst ;; outputs build-dependent info!
-; Manual/solve_IP.tst ; needs solve_IP!
+Manual/solve_IP.tst ; needs solve_IP!
 ; Manual/datetime.tst
 ;;;; Manual/dump.tst ; missing!!??
 ;;; Manual/minMult.tst ; missing?!?
@@ -1432,16 +1428,18 @@ Manual/SannfsBFCT.tst
 ; Manual/kmemory.tst ; HW-dependent: output is system-dependent!
 ; Manual/watchdog.tst ; needs MP!
 ; the following contains timings
-Manual/markov4ti2.tst
 ; ; Manual/tex.tst ; Latex!
 ; Manual/timer.tst ; HW-dependent!
 ; ; Manual/rmx.tst ; depends on LaTeX
 ; ; Manual/xdvi.tst ; Latex!
-; following contains a 4ti2 timings!
-Manual/multiDegBasis.tst
 ; output is system HW -dependent!
 ;;; Manual/timeStd.tst ; doesn't seem to work :(((((((
 ; the following example outputs timings :(((
 ; Manual/grobcovold.tst
-
 Manual/ellipticcovers.tst
+Manual/multiDegBasis.tst
+Manual/graver4ti2.tst
+Manual/hilbert4ti2.tst
+Manual/isPositive.tst
+Manual/markov4ti2.tst
+
