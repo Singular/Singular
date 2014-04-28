@@ -4619,6 +4619,62 @@ unsigned long p_GetShortExpVector(poly p, const ring r)
   return ev;
 }
 
+
+unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r)
+{
+  assume(p != NULL);
+  assume(pp != NULL);
+  if (p == NULL || pp == NULL) return 0;
+  
+  unsigned long ev = 0; // short exponent vector
+  unsigned int n = BIT_SIZEOF_LONG / r->N; // number of bits per exp
+  unsigned int m1; // highest bit which is filled with (n+1)
+  unsigned int i = 0, j=1;
+
+  if (n == 0)
+  {
+    if (r->N <2*BIT_SIZEOF_LONG)
+    {
+      n=1;
+      m1=0;
+    }
+    else
+    {
+      for (; j<=(unsigned long) r->N; j++)
+      {
+        if (p_GetExp(p,j,r) > 0 || p_GetExp(pp,j,r) > 0) i++;
+        if (i == BIT_SIZEOF_LONG) break;
+      }
+      if (i>0)
+        ev = ~((unsigned long)0) >> ((unsigned long) (BIT_SIZEOF_LONG - i));
+      return ev;
+    }
+  }
+  else
+  {
+    m1 = (n+1)*(BIT_SIZEOF_LONG - n*r->N);
+  }
+
+  n++;
+  while (i<m1)
+  {
+    ev |= GetBitFields(p_GetExp(p, j,r) + p_GetExp(pp, j,r), i, n);
+    i += n;
+    j++;
+  }
+
+  n--;
+  while (i<BIT_SIZEOF_LONG)
+  {
+    ev |= GetBitFields(p_GetExp(p, j,r) + p_GetExp(pp, j,r), i, n);
+    i += n;
+    j++;
+  }
+  return ev;
+}
+
+
+
 /***************************************************************
  *
  * p_ShallowDelete
