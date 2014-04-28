@@ -3,7 +3,7 @@
 // $Id$
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
-#include <factory.h>
+#include <factory/factory.h>
 // Factor - Includes
 #include "tmpl_inst.h"
 // some CC's need this:

@@ -3,7 +3,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
-#include <factory.h>
+#include <factory/factory.h>
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>

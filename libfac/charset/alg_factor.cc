@@ -2,7 +2,7 @@
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
-#include <factory.h>
+#include <factory/factory.h>
 // Factor - Includes
 #include <tmpl_inst.h>
 #include <Factor.h>

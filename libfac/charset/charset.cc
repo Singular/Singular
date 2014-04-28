@@ -2,7 +2,7 @@
 // emacs edit mode for this file is -*- C++ -*-
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
-#include <factory.h>
+#include <factory/factory.h>
 #ifdef HAVE_IOSTREAM
 #define CIN std::cin
 #else

@@ -6,7 +6,7 @@
 #ifndef INCL_CSUTIL_H
 #define INCL_CSUTIL_H
 
-#include <factory.h>
+#include <factory/factory.h>
 #include "algfactor.h"
 #include <tmpl_inst.h>
 

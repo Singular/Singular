@@ -36,7 +36,7 @@ MKINSTALLDIRS	= ./mkinstalldirs
 ##
 CXXFLAGS	= @CXXFLAGS@
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
-CPPFLAGS	= -I${srcdir}/factor -I${srcdir}/charset -I${srcdir} -I.. -I${prefix} @CPPFLAGS@ 
+CPPFLAGS	= -I${srcdir}/factor -I${srcdir}/charset -I${srcdir} -I.. -I${prefix} -I${prefix}/include @CPPFLAGS@ 
 DEFS		= @DEFS@ 
 LDFLAGS		= @LDFLAGS@
 LIBS		= -lfac -lcf -lcfmem -lgmp @LIBS@

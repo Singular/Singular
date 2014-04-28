@@ -33,7 +33,6 @@ libdir =	@libdir@
 datadir =	@datadir@
 gftabledir =	@gftabledir@
 includedir =	@includedir@
-templatedir =	@templatedir@
 
 srcdir =	@srcdir@
 VPATH =		@srcdir@
@@ -543,14 +542,15 @@ install-nolns: install
 installcf:	cf
 		$(MKINSTALLDIRS) $(libdir)
 		$(MKINSTALLDIRS) $(includedir)
+		$(MKINSTALLDIRS) $(includedir)/factory
 		$(INSTALL_DATA) $(libfactory) $(libdir)/$(libfactory)
 		-$(INSTALL_DATA) libsingcf_g.a $(libdir)/libsingcf_g.a
 		-$(INSTALL_DATA) libsingcf_p.a $(libdir)/libsingcf_p.a
-		$(INSTALL_DATA) factory.h $(includedir)/factory.h
-		$(INSTALL_DATA) cf_gmp.h $(includedir)/cf_gmp.h
-		$(INSTALL_DATA) factoryconf.h $(includedir)/factoryconf.h
-		for file in $(templateincl); do \
-		  $(INSTALL_DATA) $(srcdir)/templates/$$file $(templatedir)/$$file; \
+		$(INSTALL_DATA) factory.h $(includedir)/factory/factory.h
+		$(INSTALL_DATA) cf_gmp.h $(includedir)/factory/cf_gmp.h
+		$(INSTALL_DATA) factoryconf.h $(includedir)/factory/factoryconf.h
+		for file in $(templateincl) ${templatesrc}; do \
+		  $(INSTALL_DATA) $(srcdir)/templates/$$file $(includedir)/factory/templates/$$file; \
 		done
 # we run `ranlib' another time for SUN machines
 		$(RANLIB) $(libdir)/$(libfactory)
@@ -586,14 +586,14 @@ uninstall:	$(uninstalltargets)
 
 uninstallcf:
 		-for file in $(templateincl); do \
-		   rm -f $(templatedir)/$$file; \
+		   rm -f $(includedir)/factory/templates/$$file; \
 		done
-		-rm -f $(includedir)/factoryconf.h
-		-rm -f $(includedir)/factory.h
+		-rm -f $(includedir)/factory/factoryconf.h
+		-rm -f $(includedir)/factory/factory.h
 		-rm -f $(libdir)/$(libfactory)
 		-rm -f $(libdir)/libsingcf_g.a
 		-rm -f $(libdir)/libsingcf_p.a
-		-rmdir $(includedir)
+		-rmdir $(includedir)/factory
 		-rmdir $(libdir)
 
 uninstallmem:

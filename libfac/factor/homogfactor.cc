@@ -2,7 +2,7 @@
 // $Id$ 
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
-#include <factory.h>
+#include <factory/factory.h>
 #ifdef HAVE_IOSTREAM
 #include <iostream>
 #define OSTREAM std::ostream

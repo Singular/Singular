@@ -6,7 +6,7 @@
 #ifndef INCL_CHARSET_H
 #define INCL_CHARSET_H
 
-#include <factory.h>
+#include <factory/factory.h>
 #include <tmpl_inst.h>  // for typedef's
 
 CFList     BasicSet( const CFList &PS );

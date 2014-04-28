@@ -4,7 +4,7 @@
 #ifndef INTERRUPT_H
 #define INTERRUPT_H
 // FACTORY - Includes
-#include <factory.h>
+#include <factory/factory.h>
 // Factor - Includes
 #include "tmpl_inst.h"
 

@@ -5,7 +5,7 @@
 #ifndef INCL_REORDER_H
 #define INCL_REORDER_H
 
-#include <factory.h>
+#include <factory/factory.h>
 #include <tmpl_inst.h>  // for typedef's
 
 /*BEGINPUBLIC*/

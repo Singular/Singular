@@ -7,7 +7,7 @@
 #ifndef INCL_NEW_ALGFACTOR_H
 #define INCL_NEW_ALGFACTOR_H
 
-#include <factory.h>
+#include <factory/factory.h>
 #include <tmpl_inst.h>  // for typedef's
 
 // missing class: IntGenerator:
