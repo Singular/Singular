@@ -51,9 +51,7 @@ public:
 CanonicalForm  Prem( const CanonicalForm &f, const CanonicalForm &g );
 CanonicalForm  Prem( const CanonicalForm &f, const CFList &L );
 CFList         Prem( const CFList &AS, const CFList &L );
-CanonicalForm alg_gcd(const CanonicalForm &, const CanonicalForm &, const CFList &);
 /*ENDPUBLIC*/
-CanonicalForm  divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as);
 CFList         remsetb( const CFList & ps, const CFList & as);
 CanonicalForm  lowestRank( const CFList & F );
 

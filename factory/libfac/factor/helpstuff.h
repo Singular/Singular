@@ -8,8 +8,6 @@ bool mydivremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, Can
 ///////////////////////////////////////////////////////////////
 // Now some procedures used in SqrFree and in Factor
 ///////////////////////////////////////////////////////////////
-CFFList myappend( const CFFList & Inputlist, const CFFactor & TheFactor) ;
-CFFList myUnion(const CFFList & Inputlist1,const CFFList & Inputlist2);
 inline int min ( const int a, const int b ){
   return (a<=b ? a:b);
 }

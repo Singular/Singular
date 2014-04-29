@@ -2,28 +2,144 @@
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
 
-// FACTORY - Includes
-#include <factory.h>
-// Factor - Includes
-#include <tmpl_inst.h>
-#include <helpstuff.h>
-// Charset - Includes
-#include "csutil.h"
-#include "charset.h"
-#include "reorder.h"
-#include "algfactor.h"
-// some CC's need this:
-#include "alg_factor.h"
+#include "config.h"
+
+#include "cf_assert.h"
+#include "debug.h"
+
+#include "algext.h"
+#include "cf_random.h"
+#include "cf_generator.h"
+#include "cf_irred.h"
+#include "cf_iter.h"
+#include "cf_util.h"
+#include "cf_algorithm.h"
+#include "cf_map.h"
+#include "cfModResultant.h"
+#include "cfCharSets.h"
+#include "facAlgFunc.h"
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
-#ifdef ALGFACTORDEBUG
-#  define DEBUGOUTPUT
-#else
-#  undef DEBUGOUTPUT
-#endif
+static
+CanonicalForm
+Prem (const CanonicalForm& F, const CanonicalForm& G)
+{
+  CanonicalForm f, g, l, test, lu, lv, t, retvalue;
+  int degF, degG, levelF, levelG;
+  bool reord;
+  Variable v, vg= G.mvar();
 
-#include <libfac/factor/debug.h>
+  if ( (levelF= F.level()) < (levelG= G.level()))
+    return F;
+  else
+  {
+    if ( levelF == levelG )
+    {
+      f= F;
+      g= G;
+      reord= false;
+      v= F.mvar();
+    }
+    else
+    {
+      v= Variable (levelF + 1);
+      f= swapvar (F, vg, v);
+      g= swapvar (G, vg, v);
+      reord= true;
+    }
+    degG= degree (g, v );
+    degF= degree (f, v );
+    if (degG <= degF)
+    {
+      l= LC (g);
+      g= g - l*power (v, degG);
+    }
+    else
+      l= 1;
+    while ((degG <= degF) && (!f.isZero()))
+    {
+      test= gcd (l, LC(f));
+      lu= l / test;
+      lv= LC(f) / test;
+
+      t= power (v, degF - degG)*g*lv;
+
+      if (degF == 0)
+        f= 0;
+      else
+        f= f - LC (f)*power (v, degF);
+
+      f= lu*f - t;
+      degF= degree (f, v);
+    }
+
+    if (reord)
+      retvalue= swapvar (f, vg, v);
+    else
+      retvalue= f;
+
+    return retvalue;
+  }
+}
+
+static
+CanonicalForm
+Prem( const CanonicalForm &f, const CFList &L)
+{
+  CanonicalForm rem= f;
+  CFListIterator i= L;
+
+  for (i.lastItem(); i.hasItem(); i--)
+    rem= normalize (Prem (rem, i.getItem()));
+
+  return rem;
+}
+
+static
+CanonicalForm
+Prem (const CanonicalForm &f, const CFList &L, const CFList &as)
+{
+  CanonicalForm rem = f;
+  CFListIterator i = L;
+  for ( i.lastItem(); i.hasItem(); i-- )
+    rem = Prem( rem, i.getItem() );
+  return normalize (rem); //TODO better normalize in case as.length() == 1 && as.getFirst().level() == 1 ???
+}
+
+CFFList
+myappend( const CFFList & Inputlist, const CFFactor & TheFactor)
+{
+  CFFList Outputlist ;
+  CFFactor copy;
+  CFFListIterator i;
+  int exp=0;
+
+  for ( i=Inputlist ; i.hasItem() ; i++ )
+  {
+    copy = i.getItem();
+    if ( copy.factor() == TheFactor.factor() )
+      exp += copy.exp();
+    else
+      Outputlist.append(copy);
+  }
+  Outputlist.append( CFFactor(TheFactor.factor(), exp + TheFactor.exp()));
+  return Outputlist;
+}
+
+CFFList
+myUnion(const CFFList & Inputlist1,const CFFList & Inputlist2)
+{
+  CFFList Outputlist;
+  CFFListIterator i;
+
+  for ( i=Inputlist1 ; i.hasItem() ; i++ )
+    Outputlist = myappend(Outputlist, i.getItem() );
+  for ( i=Inputlist2 ; i.hasItem() ; i++ )
+    Outputlist = myappend(Outputlist, i.getItem() );
+
+  return Outputlist;
+}
 
 ///////////////////////////////////////////////////////////////
 // generate a minpoly of degree degree_of_Extension in the   //
@@ -33,8 +149,8 @@ CanonicalForm
 generate_mipo( int degree_of_Extension , const Variable & Extension )
 {
   FFRandom gen;
-  if (degree (Extension) < 0)
-    factoryError("libfac: evaluate: Extension not inFF() or inGF() !");
+  /*if (degree (Extension) < 0)
+    factoryError("libfac: evaluate: Extension not inFF() or inGF() !");*/
   return find_irreducible( degree_of_Extension, gen, Variable(1) );
 }
 
@@ -63,6 +179,323 @@ CanonicalForm IntGenerator::item() const
 void IntGenerator::next()
 {
     current++;
+}
+
+int hasAlgVar(const CanonicalForm &f, const Variable &v)
+{
+  if (f.inBaseDomain()) return 0;
+  if (f.inCoeffDomain())
+  {
+    if (f.mvar()==v) return 1;
+    return hasAlgVar(f.LC(),v);
+  }
+  if (f.inPolyDomain())
+  {
+    if (hasAlgVar(f.LC(),v)) return 1;
+    for( CFIterator i=f; i.hasTerms(); i++)
+    {
+      if (hasAlgVar(i.coeff(),v)) return 1;
+    }
+  }
+  return 0;
+}
+
+int hasVar(const CanonicalForm &f, const Variable &v)
+{
+  if (f.inBaseDomain()) return 0;
+  if (f.inCoeffDomain())
+  {
+    if (f.mvar()==v) return 1;
+    return hasAlgVar(f.LC(),v);
+  }
+  if (f.inPolyDomain())
+  {
+    if (f.mvar()==v) return 1;
+    if (hasVar(f.LC(),v)) return 1;
+    for( CFIterator i=f; i.hasTerms(); i++)
+    {
+      if (hasVar(i.coeff(),v)) return 1;
+    }
+  }
+  return 0;
+}
+
+int hasAlgVar(const CanonicalForm &f)
+{
+  if (f.inBaseDomain()) return 0;
+  if (f.inCoeffDomain())
+  {
+    if (f.level()!=0)
+      return 1;
+    return hasAlgVar(f.LC());
+  }
+  if (f.inPolyDomain())
+  {
+    if (hasAlgVar(f.LC())) return 1;
+    for( CFIterator i=f; i.hasTerms(); i++)
+    {
+      if (hasAlgVar(i.coeff())) return 1;
+    }
+  }
+  return 0;
+}
+
+/// pseudo division of f and g wrt. x s.t. multiplier*f=q*g+r
+void
+psqr (const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, 
+      CanonicalForm & r, CanonicalForm& multiplier, const Variable& x)
+{
+    ASSERT( x.level() > 0, "type error: polynomial variable expected" );
+    ASSERT( ! g.isZero(), "math error: division by zero" );
+
+    // swap variables such that x's level is larger or equal
+    // than both f's and g's levels.
+    Variable X;
+    if (f.level() > g.level())
+      X= f.mvar();
+    else
+      X= g.mvar();
+    if (X.level() < x.level())
+      X= x;
+    CanonicalForm F= swapvar (f, x, X);
+    CanonicalForm G= swapvar (g, x, X);
+
+    // now, we have to calculate the pseudo remainder of F and G
+    // w.r.t. X
+    int fDegree= degree (F, X);
+    int gDegree= degree (G, X);
+    if (fDegree < 0 || fDegree < gDegree)
+    {
+      q= 0;
+      r= f;
+    }
+    else
+    {
+      CanonicalForm LCG= LC (G, X);
+      multiplier= power (LCG, fDegree - gDegree + 1);
+      divrem (multiplier*F, G, q, r);
+      q= swapvar (q, x, X);
+      r= swapvar (r, x, X);
+    }
+}
+
+static CanonicalForm
+Sprem ( const CanonicalForm &f, const CanonicalForm &g, CanonicalForm & m, CanonicalForm & q )
+{
+  CanonicalForm ff, gg, l, test, retvalue;
+  int df, dg,n;
+  bool reord;
+  Variable vf, vg, v;
+
+  if ( (vf = f.mvar()) < (vg = g.mvar()) )
+  {
+    m=CanonicalForm(0); q=CanonicalForm(0);
+    return f;
+  }
+  else
+  {
+    if ( vf == vg )
+    {
+      ff = f; gg = g;
+      reord = false;
+      v = vg; // == x
+    }
+    else
+    {
+      v = Variable(level(f.mvar()) + 1);
+      ff = swapvar(f,vg,v); // == r
+      gg = swapvar(g,vg,v); // == v
+      reord=true;
+    }
+    dg = degree( gg, v ); // == dv
+    df = degree( ff, v ); // == dr
+    if (dg <= df) {l=LC(gg); gg = gg -LC(gg)*power(v,dg);}
+    else { l = 1; }
+    n= 0;
+    while ( ( dg <= df  ) && ( !ff.isZero()) )
+    {
+      test= power(v,df-dg) * gg * LC(ff);
+      if ( df == 0 ){ff= ff.genZero();}
+      else {ff= ff - LC(ff)*power(v,df);}
+      ff = l*ff-test;
+      df= degree(ff,v);
+      n++;
+    }
+    if ( reord )
+    {
+      retvalue= swapvar( ff, vg, v );
+    }
+    else
+    {
+      retvalue= ff;
+    }
+    m= power(l,n);
+    if ( fdivides(g,m*f-retvalue) )
+      q= (m*f-retvalue)/g;
+    else
+      q= CanonicalForm(0);
+    return retvalue;
+  }
+}
+
+CanonicalForm
+divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as)
+{
+  CanonicalForm r,m,q;
+
+  if (f.inCoeffDomain())
+  {
+    bool isRat=isOn(SW_RATIONAL);
+    if (getCharacteristic() == 0)
+      On(SW_RATIONAL);
+    q=ff/f;
+    if (!isRat && getCharacteristic() == 0)
+      Off(SW_RATIONAL);
+  }
+  else
+    r= Sprem(ff,f,m,q);
+
+  r= Prem(q,as);
+  return r;
+}
+
+CanonicalForm
+alg_content (const CanonicalForm& f, const CFList& as)
+{
+  if (!f.inCoeffDomain())
+  {
+    CFIterator i= f;
+    CanonicalForm result= abs (i.coeff());
+    i++;
+    while (i.hasTerms() && !result.isOne())
+    {
+      result= alg_gcd (i.coeff(), result, as);
+      i++;
+    }
+    return result;
+  }
+
+  return abs (f);
+}
+
+CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
+                      const CFList &as)
+{
+  if (fff.inCoeffDomain() || ggg.inCoeffDomain())
+    return 1;
+  CanonicalForm f=fff;
+  CanonicalForm g=ggg;
+  f=Prem(f,as);
+  g=Prem(g,as);
+  if ( f.isZero() )
+  {
+    if ( g.lc().sign() < 0 ) return -g;
+    else                     return g;
+  }
+  else  if ( g.isZero() )
+  {
+    if ( f.lc().sign() < 0 ) return -f;
+    else                     return f;
+  }
+
+  int v= as.getLast().level();
+  if (f.level() <= v || g.level() <= v)
+    return 1;
+
+  CanonicalForm res;
+
+  // does as appear in f and g ?
+  bool has_alg_var=false;
+  for ( CFListIterator j=as;j.hasItem(); j++ )
+  {
+    Variable v=j.getItem().mvar();
+    if (hasVar (f, v))
+      has_alg_var=true;
+    if (hasVar (g, v))
+      has_alg_var=true;
+  }
+  if (!has_alg_var)
+  {
+    /*if ((hasAlgVar(f))
+    || (hasAlgVar(g)))
+    {
+      Varlist ord;
+      for ( CFListIterator j=as;j.hasItem(); j++ )
+        ord.append(j.getItem().mvar());
+      res=algcd(f,g,as,ord);
+    }
+    else*/
+    if (!hasAlgVar (f) && !hasAlgVar (g))
+      res=gcd(f,g);
+
+    return res;
+  }
+
+  int mvf=f.level();
+  int mvg=g.level();
+  if (mvg > mvf)
+  {
+    CanonicalForm tmp=f; f=g; g=tmp;
+    int tmp2=mvf; mvf=mvg; mvg=tmp2;
+  }
+  if (g.inBaseDomain() || f.inBaseDomain())
+    return CanonicalForm(1);
+
+  CanonicalForm c_f= alg_content (f, as);
+
+  if (mvf != mvg)
+  {
+    res= alg_gcd (g, c_f, as);
+    return res;
+  }
+  Variable x= f.mvar();
+
+  // now: mvf==mvg, f.level()==g.level()
+  CanonicalForm c_g= alg_content (g, as);
+
+  int delta= degree (f) - degree (g);
+
+  f= divide (f, c_f, as);
+  g= divide (g, c_g, as);
+
+  // gcd of contents
+  CanonicalForm c_gcd= alg_gcd (c_f, c_g, as);
+  CanonicalForm tmp;
+
+  if (delta < 0)
+  {
+    tmp= f;
+    f= g;
+    g= tmp;
+    delta= -delta;
+  }
+
+  CanonicalForm r= 1;
+
+  while (degree (g, x) > 0)
+  {
+    r= Prem (f, g, as);
+    r= Prem (r, as);
+    if (!r.isZero())
+    {
+      r= divide (r, alg_content (r,as), as);
+      r /= vcontent (r,Variable (v+1));
+    }
+    f= g;
+    g= r;
+  }
+
+  if (degree (g, x) == 0)
+    return c_gcd;
+
+  c_f= alg_content (f, as);
+
+  f= divide (f, c_f, as);
+
+  f *= c_gcd;
+  f /= vcontent (f, Variable (v+1));
+
+  return f;
 }
 
 static CanonicalForm
@@ -111,43 +544,31 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
   CFFList testlist;
   CFFListIterator i;
 
-  DEBOUTLN(CERR, "sqrf_norm_sub:      f= ", f);
-  DEBOUTLN(CERR, "sqrf_norm_sub: Palpha= ", Palpha);
   myrandom.reset();   s=myrandom.item();   g=f;
   R= CanonicalForm(0);
-  DEBOUTLN(CERR, "sqrf_norm_sub: myrandom s= ", s);
 
   // Norm, resultante taken with respect to y
   while ( !sqfreetest )
   {
-    DEBOUTLN(CERR, "sqrf_norm_sub: Palpha= ", Palpha);
     R = resultante(Palpha, g, y); R= R* bCommonDen(R);
-    DEBOUTLN(CERR, "sqrf_norm_sub: R= ", R);
     R /= content (R);
     // sqfree check ; R is a polynomial in K[x]
     if ( getCharacteristic() == 0 )
     {
       temp= gcd(R, R.deriv(vf));
-      DEBOUTLN(CERR, "sqrf_norm_sub: temp= ", temp);
       if (degree(temp,vf) != 0 || temp == temp.genZero() )
         sqfreetest= 0;
       else
         sqfreetest= 1;
-      DEBOUTLN(CERR, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
     else
     {
-      DEBOUTMSG(CERR, "Starting SqrFreeTest(R)!");
-      // Look at SqrFreeTest!
-      // (z+a^5+w)^4 with z<w<a should not give sqfreetest=1 !
-      // for now we use this workaround with Factorize...
-      // ...but it should go away soon!!!!
       Variable X;
       if (hasFirstAlgVar(R,X))
         testlist=factorize( R, X );
       else
         testlist= factorize(R);
-      DEBOUTLN(CERR, "testlist= ", testlist);
+
       if (testlist.getFirst().factor().inCoeffDomain())
         testlist.removeFirst();
       sqfreetest=1;
@@ -159,20 +580,16 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
           break;
         }
       }
-      DEBOUTLN(CERR, "SqrFreeTest(R)= ", sqfreetest);
     }
     if ( ! sqfreetest )
     {
       myrandom.next();
-      DEBOUTLN(CERR, "sqrf_norm_sub generated new myrandom item: ", myrandom.item());
       if ( getCharacteristic() == 0 )
         t= CanonicalForm(mapinto(myrandom.item()));
       else
         t= CanonicalForm(myrandom.item());
       s= t;
-      DEBOUTLN(CERR, "sqrf_norm_sub: testing s= ", s);
       g= f(f.mvar()-t*Palpha.mvar(), f.mvar());
-      DEBOUTLN(CERR, "             gives g= ", g);
     }
   }
 }
@@ -187,43 +604,30 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
   CFFList testlist;
   CFFListIterator i;
 
-  DEBOUTLN(CERR, "sqrf_norm_sub:      f= ", f);
-  DEBOUTLN(CERR, "sqrf_norm_sub: Palpha= ", Palpha);
   myrandom.reset();   s=myrandom.item();   g=f;
   R= CanonicalForm(0);
-  DEBOUTLN(CERR, "sqrf_norm_sub: myrandom s= ", s);
 
   // Norm, resultante taken with respect to y
   while ( !sqfreetest )
   {
-    DEBOUTLN(CERR, "sqrf_norm_sub: Palpha= ", Palpha);
     R = resultante(Palpha, g, y); R= R* bCommonDen(R);
-    DEBOUTLN(CERR, "sqrf_norm_sub: R= ", R);
     R /= content (R);
     // sqfree check ; R is a polynomial in K[x]
     if ( getCharacteristic() == 0 )
     {
       temp= gcd(R, R.deriv(vf));
-      DEBOUTLN(CERR, "sqrf_norm_sub: temp= ", temp);
       if (degree(temp,vf) != 0 || temp == temp.genZero() )
         sqfreetest= 0;
       else
         sqfreetest= 1;
-      DEBOUTLN(CERR, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
     else
     {
-      DEBOUTMSG(CERR, "Starting SqrFreeTest(R)!");
-      // Look at SqrFreeTest!
-      // (z+a^5+w)^4 with z<w<a should not give sqfreetest=1 !
-      // for now we use this workaround with Factorize...
-      // ...but it should go away soon!!!!
       Variable X;
       if (hasFirstAlgVar(R,X))
         testlist= factorize( R, X );
       else
         testlist= factorize(R);
-      DEBOUTLN(CERR, "testlist= ", testlist);
       if (testlist.getFirst().factor().inCoeffDomain())
         testlist.removeFirst();
       sqfreetest=1;
@@ -235,20 +639,16 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
           break;
         }
       }
-      DEBOUTLN(CERR, "SqrFreeTest(R)= ", sqfreetest);
     }
     if ( ! sqfreetest )
     {
       myrandom.next();
-      DEBOUTLN(CERR, "sqrf_norm_sub generated new myrandom item: ", myrandom.item());
       if ( getCharacteristic() == 0 )
         t= CanonicalForm(mapinto(myrandom.item()));
       else
         t= CanonicalForm(myrandom.item());
       s= t;
-      DEBOUTLN(CERR, "sqrf_norm_sub: testing s= ", s);
       g= f(f.mvar()-t*Palpha.mvar(), f.mvar());
-      DEBOUTLN(CERR, "             gives g= ", g);
     }
   }
 }
@@ -258,29 +658,19 @@ sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
            const Variable & Extension, CanonicalForm & s,  CanonicalForm & g,
            CanonicalForm & R)
 {
-  DEBOUTLN(CERR, "sqrf_norm:      f= ", f);
-  DEBOUTLN(CERR, "sqrf_norm: Palpha= ", PPalpha);
   if ( getCharacteristic() == 0 )
   {
     IntGenerator myrandom;
-    DEBOUTMSG(CERR, "sqrf_norm: no extension, char=0");
     sqrf_norm_sub(f,PPalpha, myrandom, s,g,R);
-    DEBOUTLN(CERR, "sqrf_norm:      f= ", f);
-    DEBOUTLN(CERR, "sqrf_norm: Palpha= ", PPalpha);
-    DEBOUTLN(CERR, "sqrf_norm:      s= ", s);
-    DEBOUTLN(CERR, "sqrf_norm:      g= ", g);
-    DEBOUTLN(CERR, "sqrf_norm:      R= ", R);
   }
   else if ( degree(Extension) > 0 ) // working over Extensions
   {
-    DEBOUTLN(CERR, "sqrf_norm: degree of extension is ", degree(Extension));
     AlgExtGenerator myrandom(Extension);
     sqrf_agnorm_sub(f,PPalpha, myrandom, s,g,R);
   }
   else
   {
     FFGenerator myrandom;
-    DEBOUTMSG(CERR, "sqrf_norm: degree of extension is 0");
     sqrf_norm_sub(f,PPalpha, myrandom, s,g,R);
   }
 }
@@ -346,103 +736,13 @@ getextension( IntList & degreelist, int n)
     for (i=degreelist; i.hasItem(); i++){
       l= l+1;
       if ( igcd(k,i.getItem()) == 1){
-        DEBOUTLN(CERR, "getextension: gcd == 1, l=",l);
         if ( l==length ){ setCharacteristic(charac);  return k; }
       }
-      else { DEBOUTMSG(CERR, "getextension: Next iteration"); break; }
+      else { break; }
     }
     k= k+1; l=0;
   }
   while ( 1 );
-}
-
-
-/// pseudo division of f and g wrt. x s.t. multiplier*f=q*g+r
-/// but only if the leading coefficient of g is of level lower than coeffLevel
-void
-psqr (const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q,
-      CanonicalForm & r, CanonicalForm& multiplier, const Variable& x,
-      int coeffLevel)
-{
-  ASSERT( x.level() > 0, "type error: polynomial variable expected" );
-  ASSERT( ! g.isZero(), "math error: division by zero" );
-
-  // swap variables such that x's level is larger or equal
-  // than both f's and g's levels.
-  Variable X;
-  if (f.level() > g.level())
-    X= f.mvar();
-  else
-    X= g.mvar();
-  if (X.level() < x.level())
-    X= x;
-  CanonicalForm F= swapvar (f, x, X);
-  CanonicalForm G= swapvar (g, x, X);
-
-  // now, we have to calculate the pseudo remainder of F and G
-  // w.r.t. X
-  int fDegree= degree (F, X);
-  int gDegree= degree (G, X);
-  if (fDegree < 0 || fDegree < gDegree)
-  {
-    q= 0;
-    r= f;
-  }
-  else
-  {
-    CanonicalForm LCG= LC (G, X);
-    if (LCG.level() < coeffLevel)
-    {
-      multiplier= power (LCG, fDegree - gDegree + 1);
-      divrem (multiplier*F, G, q, r);
-      q= swapvar (q, x, X);
-      r= swapvar (r, x, X);
-    }
-    else
-    {
-      q= 0;
-      r= f;
-    }
-  }
-}
-
-/// pseudo division of f and g wrt. x s.t. multiplier*f=q*g+r
-void
-psqr (const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, 
-      CanonicalForm & r, CanonicalForm& multiplier, const Variable& x)
-{
-    ASSERT( x.level() > 0, "type error: polynomial variable expected" );
-    ASSERT( ! g.isZero(), "math error: division by zero" );
-
-    // swap variables such that x's level is larger or equal
-    // than both f's and g's levels.
-    Variable X;
-    if (f.level() > g.level())
-      X= f.mvar();
-    else
-      X= g.mvar();
-    if (X.level() < x.level())
-      X= x;
-    CanonicalForm F= swapvar (f, x, X);
-    CanonicalForm G= swapvar (g, x, X);
-
-    // now, we have to calculate the pseudo remainder of F and G
-    // w.r.t. X
-    int fDegree= degree (F, X);
-    int gDegree= degree (G, X);
-    if (fDegree < 0 || fDegree < gDegree)
-    {
-      q= 0;
-      r= f;
-    }
-    else
-    {
-      CanonicalForm LCG= LC (G, X);
-      multiplier= power (LCG, fDegree - gDegree + 1);
-      divrem (multiplier*F, G, q, r);
-      q= swapvar (q, x, X);
-      r= swapvar (r, x, X);
-    }
 }
 
 CanonicalForm
@@ -567,9 +867,6 @@ simpleextension(CFList& backSubst, const CFList & Astar,
 
   bool isRat= isOn (SW_RATIONAL);
 
-  DEBOUTLN(CERR, "simpleextension: Astar= ", Astar);
-  DEBOUTLN(CERR, "simpleextension:     R= ", R);
-  DEBOUTLN(CERR, "simpleextension: Extension= ", Extension);
   CFListIterator j;
   if (Astar.length() == 1)
   {
@@ -653,9 +950,6 @@ simpleextension(CFList& backSubst, const CFList & Astar,
         }
       }
 
-      DEBOUTLN(CERR, "simpleextension: g= ", g);
-      DEBOUTLN(CERR, "simpleextension: s= ", s);
-      DEBOUTLN(CERR, "simpleextension: R= ", R);
       Returnlist.append (ra);
       if (isFunctionField)
         Returnlist.append (denra);
@@ -679,7 +973,7 @@ CanonicalForm alg_lc(const CanonicalForm &f)
   {
     return alg_lc(f.LC());
   }
-  //assert(f.inCoeffDomain());
+
   return f;
 }
 
@@ -850,26 +1144,15 @@ CanonicalForm inflatePoly (const CanonicalForm & F, int exps, int n)
 }
 
 // the heart of the algorithm: the one from Trager
-#ifndef DEBUGOUTPUT
-static CFFList
-alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vminpoly, const Varlist /*& oldord*/, const CFList & as, bool isFunctionField)
-#else
 static CFFList
 alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vminpoly, const Varlist & oldord, const CFList & as, bool isFunctionField)
-#endif
 {
   bool isRat= isOn (SW_RATIONAL);
   CFFList L, Factorlist;
   CanonicalForm R, Rstar, s, g, h, f= F;
   CFList substlist, backSubsts;
 
-  DEBINCLEVEL(CERR,"alg_factor");
-  DEBOUTLN(CERR, "alg_factor: f= ", f);
-
   substlist= simpleextension (backSubsts, Astar, vminpoly, isFunctionField, Rstar);
-  DEBOUTLN(CERR, "alg_factor: substlist= ", substlist);
-  DEBOUTLN(CERR, "alg_factor: minpoly Rstar= ", Rstar);
-  DEBOUTLN(CERR, "alg_factor: vminpoly= ", vminpoly);
 
   f= subst (f, Astar, substlist, Rstar, isFunctionField);
 
@@ -901,7 +1184,6 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   }
   // after here we are over an extension of a function field
 
-
   // make quasi monic
   CFList Rstarlist= CFList (Rstar);
   int algExtLevel= Astar.getLast().level(); //highest level of algebraic variables
@@ -926,28 +1208,19 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   }
 
   sqrf_norm(f, Rstar, vminpoly, s, g, R );
-  //out_cf("sqrf_norm R:",R,"\n");
-  //out_cf("sqrf_norm s:",s,"\n");
-  //out_cf("sqrf_norm g:",g,"\n");
-  DEBOUTLN(CERR, "alg_factor: g= ", g);
-  DEBOUTLN(CERR, "alg_factor: s= ", s);
-  DEBOUTLN(CERR, "alg_factor: R= ", R);
+
   Variable X;
   if (hasFirstAlgVar(R,X))
   {
     // factorize R over alg.extension with X
-    //CERR << "alg: "<< X << " mipo=" << getMipo(X,Variable('X')) <<"\n";
-    DEBOUTLN(CERR, "alg_factor: factorize( ", R);
     Factorlist =  factorize( R, X );
   }
   else
   {
     // factor R over k
-    DEBOUTLN(CERR, "alg_factor: Factorize( ", R);
     Factorlist = factorize(R);
   }
 
-  DEBOUTLN(CERR, "alg_factor: Factorize(R)= ", Factorlist);
   if ( !Factorlist.getFirst().factor().inCoeffDomain() )
     Factorlist.insert(CFFactor(1,1));
   if ( Factorlist.length() == 2 && Factorlist.getLast().exp()== 1)
@@ -962,7 +1235,6 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   else
   {
     g= f;
-    DEBOUTLN(CERR, "alg_factor: g= ", g);
     for ( CFFListIterator i=Factorlist; i.hasItem(); i++)
     {
       CanonicalForm fnew=i.getItem().factor();
@@ -973,8 +1245,6 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
         fnew= fnew (g.mvar()+s*Rstar.mvar(), g.mvar());
         fnew= reduce (fnew, Rstar);
       }
-
-      DEBOUTLN(CERR, "alg_factor: fnew= ", fnew);
 
       h= alg_gcd (g, fnew, Rstarlist);
       numinv= QuasiInverse(Rstar, alg_LC(h, algExtLevel), Rstar.mvar());
@@ -1017,12 +1287,7 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   {
     LL=L;
   }
-  //CFFListIterator i=LL;
-  //for(;i.hasItem(); i++ )
-  //  out_cf("end alg_f:",i.getItem().factor(),"\n");
-  //printf("end alg_factor\n");
-  DEBOUTLN(CERR, "alg_factor: L= ", LL);
-  DEBDECLEVEL(CERR,"alg_factor");
+
   if (!isRat && getCharacteristic() == 0)
     Off (SW_RATIONAL);
 
@@ -1224,9 +1489,8 @@ SteelTrager (const CanonicalForm & f, const CFList & AS, const Varlist & uord)
   }
 
   // factor F with minimal polys given in asnew
-  PremForm rem;
   asnew.append (F);
-  asnew= mcharset (asnew, rem); // TODO use modCharSet
+  asnew= charSetViaModCharSet (asnew); // TODO use modCharSet
 
   F= asnew.getLast();
   F /= content (F); // should be obsolete if we use modCharSet
@@ -1268,12 +1532,11 @@ SteelTrager (const CanonicalForm & f, const CFList & AS, const Varlist & uord)
 
   for (CFFListIterator k= tmp; k.hasItem(); k++)
   {
-    rem= PremForm();
     transform= transBack;
     CanonicalForm factor= k.getItem().factor();
     factor= M (factor);
     transform.append (factor);
-    transform= mcharset (transform, rem); //TODO use modCharSet
+    transform= charSetViaModCharSet (transform); //TODO use modCharSet
     for (i= transform; i.hasItem(); i++)
     {
       if (degree (i.getItem(), f.mvar()) > 0)
@@ -1340,20 +1603,12 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
   CFFList result;
 
   success=1;
-  DEBINCLEVEL(CERR, "newfactoras");
-  DEBOUTLN(CERR, "newfactoras called with f= ", f);
-  DEBOUTLN(CERR, "               content(f)= ", content(f));
-  DEBOUTLN(CERR, "                       as= ", as);
-  DEBOUTLN(CERR, "newfactoras: cls(vf)= ", cls(vf));
-  DEBOUTLN(CERR, "newfactoras: cls(as.getLast())= ", cls(as.getLast()));
-  DEBOUTLN(CERR, "newfactoras: degree(f,vf)= ", degree(f,vf));
 
 // F1: [Test trivial cases]
 // 1) first trivial cases:
-  if (cls(vf) <= cls(as.getLast()))
+  if (vf.level() <= as.getLast().level())
   {
 // ||( (as.length()==1) && (degree(f,vf)==3) && (degree(as.getFirst()==2)) )
-    DEBDECLEVEL(CERR,"newfactoras");
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     return CFFList(CFFactor(f,1));
@@ -1378,13 +1633,9 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
     }
   }
   uord= Difference(uord,ord);
-  DEBOUTLN(CERR, "Astar is: ", Astar);
-  DEBOUTLN(CERR, "ord is: ", ord);
-  DEBOUTLN(CERR, "uord is: ", uord);
 
 // 3) second trivial cases: we already proved irr. of f over no extensions
   if ( Astar.length() == 0 ){
-    DEBDECLEVEL(CERR,"newfactoras");
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     return CFFList(CFFactor(f,1));
@@ -1398,7 +1649,6 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
 //    polynomials. If no element of uord occures in any of the minimal
 //   polynomials, we don't have transzendentals.
   Varlist newuord=Var_is_in_AS(uord,Astar);
-  DEBOUTLN(CERR, "newuord is: ", newuord);
 
   CFFList Factorlist;
   Varlist gcdord= Union(ord,newuord); gcdord.append(f.mvar());
@@ -1409,12 +1659,9 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
   if (isFunctionField)
     Fgcd= alg_gcd(f,f.deriv(),Astar);
 
-  if ( Fgcd == 0 ) {DEBOUTMSG(CERR, "WARNING: p'th root ?");}
-
   bool derivZero= f.deriv().isZero();
   if (isFunctionField && (degree (Fgcd, f.mvar()) > 0) && !derivZero)
   {
-    DEBOUTLN(CERR, "Nontrivial GCD found of ", f);
     CanonicalForm Ggcd= divide(f, Fgcd,Astar);
     if (getCharacteristic() == 0)
     {
@@ -1424,10 +1671,8 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
         Off (SW_RATIONAL);
       return result;
     }
-    DEBOUTLN(CERR, "  split into ", Fgcd);
-    DEBOUTLN(CERR, "         and ", Ggcd);
+
     Fgcd= pp(Fgcd); Ggcd= pp(Ggcd);
-    DEBDECLEVEL(CERR,"newfactoras");
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     return myUnion(newfactoras(Fgcd,as,success) , newfactoras(Ggcd,as,success));
@@ -1440,53 +1685,39 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
     Variable vminpoly;
     for (i=Astar; i.hasItem(); i++){degreelist.append(degree(i.getItem()));}
     int extdeg= getextension(degreelist, degree(f));
-    DEBOUTLN(CERR, "Extension needed of degree ", extdeg);
 
     // Now the real stuff!
     if ( newuord.length() == 0 ) // no transzendentals
     {
-      DEBOUTMSG(CERR, "No transzendentals!");
       if ( extdeg > 1 ){
         CanonicalForm MIPO= generate_mipo( extdeg, vminpoly);
-        DEBOUTLN(CERR, "Minpoly produced ", MIPO);
         vminpoly= rootOf(MIPO);
       }
       Factorlist= alg_factor(f, Astar, vminpoly, oldord, as, isFunctionField);
-      DEBDECLEVEL(CERR,"newfactoras");
       return Factorlist;
     }
     else if ( inseperable(Astar) > 0 || derivZero) // Look if extensions are seperable
     {
-      DEBOUTMSG(CERR, "Inseperable extensions! Using Endler!");
       Factorlist= SteelTrager(f, Astar, newuord);
-      DEBOUTLN(CERR, "Endler gives: ", Factorlist);
       return Factorlist;
     }
     else{ // we are on the save side: Use trager
-      DEBOUTMSG(CERR, "Only seperable extensions!");
       if (extdeg > 1 ){
         CanonicalForm MIPO=generate_mipo(extdeg, vminpoly );
         vminpoly= rootOf(MIPO);
-        DEBOUTLN(CERR, "Minpoly generated: ", MIPO);
-        DEBOUTLN(CERR, "vminpoly= ", vminpoly);
-        DEBOUTLN(CERR, "degree(vminpoly)= ", degree(vminpoly));
       }
       Factorlist= alg_factor(f, Astar, vminpoly, oldord, as, isFunctionField);
-      DEBDECLEVEL(CERR,"newfactoras");
       return Factorlist;
     }
   }
   else{ // char=0 apply trager directly
-    DEBOUTMSG(CERR, "Char=0! Apply Trager!");
     Variable vminpoly;
     Factorlist= alg_factor(f, Astar, vminpoly, oldord, as, isFunctionField);
-    DEBDECLEVEL(CERR,"newfactoras");
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     return Factorlist;
   }
 
-  DEBDECLEVEL(CERR,"newfactoras");
   return CFFList(CFFactor(f,1));
 }
 
@@ -1507,7 +1738,7 @@ newcfactor(const CanonicalForm & f, const CFList & as, int & success )
     success=1;
     return Factors;
   }
-  if ( cls(f) <= cls(as.getLast()) )
+  if (f.level() <= as.getLast().level())
   {
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);

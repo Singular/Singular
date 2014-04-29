@@ -3,11 +3,10 @@
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-#ifndef INCL_NEW_ALGFACTOR_H
-#define INCL_NEW_ALGFACTOR_H
+#ifndef FAC_ALG_FUNC_H
+#define FAC_ALG_FUNC_H
 
-#include <factory.h>
-#include <tmpl_inst.h>  // for typedef's
+#include "canonicalform.h"
 
 // missing class: IntGenerator:
 class IntGenerator : public CFGenerator
@@ -25,8 +24,9 @@ public:
     void operator++ ( int ) { next(); }
 };
 
-CFFList newfactoras( const CanonicalForm & f, const CFList & as, int &success);
+CanonicalForm alg_gcd(const CanonicalForm &, const CanonicalForm &, const CFList &);
 /*BEGINPUBLIC*/
+CFFList newfactoras( const CanonicalForm & f, const CFList & as, int &success);
 CFFList newcfactor(const CanonicalForm & f, const CFList & as, int & success );
 /*ENDPUBLIC*/
 
