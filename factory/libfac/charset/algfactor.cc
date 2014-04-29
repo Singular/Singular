@@ -10,7 +10,6 @@
 #include "csutil.h"
 #include "charset.h"
 #include "reorder.h"
-#include "alg_factor.h"
 // some CC's need this:
 #include "algfactor.h"
 

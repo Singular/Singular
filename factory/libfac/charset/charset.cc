@@ -13,7 +13,6 @@
 // Charset - Includes
 #include "csutil.h"
 #include "algfactor.h"
-#include "alg_factor.h"
 // Some CC's need this:
 #include "charset.h"
 
