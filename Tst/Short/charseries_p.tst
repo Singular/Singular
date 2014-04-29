@@ -25,14 +25,13 @@ char_series (I);
 
 kill r;
 
-// still hangs because of CharSet when transforming back
-//ring r=2,(t,a,b,c,y),dp;
-//ideal i=a2+tb,c2+c+b,b4+b2+t;
-//poly f=(y2+a)^8*(y2+b3+c+b)*(y+c+t)*(y2+tb+t2);
-//ideal I=i,f;
-//char_series (I);
+ring r=2,(t,a,b,c,y),dp;
+ideal i=a2+tb,c2+c+b,b4+b2+t;
+poly f=(y2+a)^8*(y2+b3+c+b)*(y+c+t)*(y2+tb+t2);
+ideal I=i,f;
+char_series (I);
 
-//kill r;
+kill r;
 
 ring r=2,(t,a,b,c,y),dp;
 ideal i=a2+tb,c2+c+b,b4+b2+t;
