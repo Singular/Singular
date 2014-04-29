@@ -112,4 +112,7 @@
 /*MAKEHEADER PUBLIC ONLY*/
 #include "algext.h"
 
+/*MAKEHEADER PUBLIC ONLY*/
+#include "facAlgFunc.h"
+
 #endif /* ! INCL_FACTORY_H */
