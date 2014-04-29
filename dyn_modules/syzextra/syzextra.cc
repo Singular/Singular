@@ -36,12 +36,12 @@
 //#include <polys/nc/summator.h> // for CPolynomialSummator
 #include <polys/operations/p_Mult_q.h> // for MIN_LENGTH_BUCKET
 
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <kernel/polys.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 #include <kernel/ideals.h>
 
-#include <kernel/timer.h>
+#include <kernel/oswrapper/timer.h>
 
 
 #include <Singular/tok.h>
