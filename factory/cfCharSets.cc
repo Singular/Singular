@@ -552,12 +552,7 @@ removeContent (CanonicalForm& F, CanonicalForm& cF)
   if (cF.inCoeffDomain())
     cF= 0;
   else
-  {
     cF= normalize (cF);
-    F= F/cF;
-  }
-
-  F= normalize (F);
 }
 
 CFList
@@ -898,7 +893,7 @@ modCharSet (const CFList& L, StoreFactors& StoredFactors)
           removeContent (r, cF);
 
           if (!cF.isZero())
-            contents= Union (contents, CFList(cF));
+            contents= Union (contents, factorPSet (CFList(cF))); //factorPSet maybe too much it should suffice to do a squarefree factorization instead
 
           removeFactors (r, StoredFactors2, removedFactors);
           StoredFactors2.FS1= Union (StoredFactors2.FS1, removedFactors);

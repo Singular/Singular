@@ -440,9 +440,7 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
     }
     else*/
     if (!hasAlgVar (f) && !hasAlgVar (g))
-      res=gcd(f,g);
-
-    return res;
+      return res=gcd(f,g);
   }
 
   int mvf=f.level();
