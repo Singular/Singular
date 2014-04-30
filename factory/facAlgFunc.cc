@@ -1,6 +1,20 @@
-////////////////////////////////////////////////////////////
-// emacs edit mode for this file is -*- C++ -*-
-////////////////////////////////////////////////////////////
+/*****************************************************************************\
+ * Computer Algebra System SINGULAR
+\*****************************************************************************/
+/** @file facAlgFunc.cc
+ *
+ * This file provides functions to factorize polynomials over alg. function
+ * fields
+ * 
+ * ABSTRACT: Descriptions can be found in B. Trager "Algebraic Factoring and
+ * Rational Function Integration" and A. Steel "Conquering Inseparability:
+ * Primary decomposition and multivariate factorization over algebraic function
+ * fields of positive characteristic"
+ *
+ * @authors Martin Lee, Michael Messollen
+ *
+ **/
+/*****************************************************************************/
 
 #include "config.h"
 
