@@ -7,7 +7,7 @@
 #include <misc/intvec.h>
 #include <coeffs/bigintmat.h>
 
-#include "Singular/ipid.h"
+#include <Singular/ipid.h>
 
 extern int coneID;
 

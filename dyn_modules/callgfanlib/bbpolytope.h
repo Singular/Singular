@@ -4,7 +4,7 @@
 #include <kernel/mod2.h>
 
 #include <gfanlib/gfanlib.h>
-#include "Singular/ipid.h"
+#include <Singular/ipid.h>
 
 extern int polytopeID;
 
