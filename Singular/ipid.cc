@@ -19,11 +19,11 @@
 
 #include <coeffs/numbers.h>
 #include <coeffs/bigintmat.h>
+#include <coeffs/longrat.h>
 
 #include <polys/matpol.h>
 #include <polys/monomials/ring.h>
 
-#include <libpolys/coeffs/longrat.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/syz.h>

@@ -16,9 +16,9 @@
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>
 
-#include <libpolys/coeffs/numbers.h>
-#include <libpolys/coeffs/bigintmat.h>
-#include <libpolys/misc/intvec.h>
+#include <coeffs/numbers.h>
+#include <coeffs/bigintmat.h>
+#include <misc/intvec.h>
 #include <Singular/lists.h>
 
 /* Functions for converting Integers, Rationals and their Matrices

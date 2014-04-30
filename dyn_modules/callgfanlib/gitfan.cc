@@ -14,7 +14,7 @@
 #include <Singular/ipid.h>
 #include <Singular/lists.h>
 #include <Singular/ipshell.h>
-#include <libpolys/coeffs/bigintmat.h>
+#include <coeffs/bigintmat.h>
 
 #include <bbcone.h>
 #include <bbfan.h>

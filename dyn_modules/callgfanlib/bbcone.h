@@ -4,8 +4,8 @@
 #include <kernel/mod2.h>
 
 #include <gfanlib/gfanlib.h>
-#include <libpolys/misc/intvec.h>
-#include <libpolys/coeffs/bigintmat.h>
+#include <misc/intvec.h>
+#include <coeffs/bigintmat.h>
 
 #include "Singular/ipid.h"
 

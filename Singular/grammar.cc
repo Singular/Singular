@@ -105,7 +105,7 @@
 #include <polys/monomials/maps.h>
 #include <kernel/GBEngine/syz.h>
 #include <Singular/lists.h>
-#include <libpolys/coeffs/longrat.h>
+#include <coeffs/longrat.h>
 #include <Singular/libparse.h>
 #include <coeffs/bigintmat.h>
 

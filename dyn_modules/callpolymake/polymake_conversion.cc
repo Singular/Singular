@@ -12,9 +12,9 @@
 #include <gfanlib/gfanlib_q.h>
 
 #include <kernel/mod2.h>
-#include <libpolys/misc/intvec.h>
-#include <libpolys/coeffs/numbers.h>
-#include <libpolys/coeffs/bigintmat.h>
+#include <misc/intvec.h>
+#include <coeffs/numbers.h>
+#include <coeffs/bigintmat.h>
 #include <Singular/lists.h>
 #include <Singular/ipid.h> // for bigints,
 // is there really nothing better than this?

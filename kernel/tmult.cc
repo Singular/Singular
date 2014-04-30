@@ -11,7 +11,7 @@
 #include <kernel/structs.h>
 #include <kernel/numbers.h>
 #include <kernel/polys.h>
-#include <libpolys/coeffs/longrat.h>
+#include <coeffs/longrat.h>
 #ifdef SI_THREADS
 #include <pthread.h>
 #include <stdlib.h>
