@@ -11,7 +11,7 @@ FACTORSRC2 =	factor/tmpl_inst.cc
 FACTORSRC = 	$(FACTORSRC1) $(FACTORSRC2) 
 
 
-CHARSETSRC1 =	charset/csutil.cc charset/charset.cc charset/reorder.cc charset/algfactor.cc
+CHARSETSRC1 =	charset/csutil.cc charset/charset.cc charset/algfactor.cc
 
 CHARSETSRC = 	$(CHARSETSRC1)
 
@@ -20,7 +20,7 @@ SOURCES  = $(FACTORSRC) $(CHARSETSRC)
 
 noinst_HEADERS = factor/helpstuff.h factor/debug.h factor/interrupt.h factor/timing.h \
     factor/tmpl_inst.h \
-    charset/csutil.h charset/charset.h charset/reorder.h charset/algfactor.h 
+    charset/csutil.h charset/charset.h charset/algfactor.h 
 
 libfac_la_SOURCES   = $(SOURCES)
 

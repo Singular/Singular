@@ -372,6 +372,7 @@ typedef List<int> IntList;
 typedef ListIterator<int> IntListIterator;
 typedef List<Variable> Varlist;
 typedef ListIterator<Variable> VarlistIterator;
+typedef Array<int> Intarray;
 //}}}
 
 /*ENDPUBLIC*/
