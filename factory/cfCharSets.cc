@@ -14,14 +14,13 @@
  **/
 /*****************************************************************************/
 
-#include <ctime>
+#include "timing.h"
 
 #include "cfCharSets.h"
 #include "canonicalform.h"
 #include "cf_algorithm.h"
 #include "facAlgFunc.h"
 
-#include "timing.h"
 TIMING_DEFINE_PRINT(neworder_time)
 
 #define __ARRAY_INIT__ -1
@@ -1229,52 +1228,6 @@ charSetViaCharSetN (const CFList& PS)
     return result;
   return charSetViaCharSetN (Union (PS,Union (RS, result)));
 }
-
-/*CFList
-pruneList (const CFList& L)
-{
-  printf ("L.length()= %d\n", L.length());
-  if (L.length() <= 1)
-    return L;
-  CanonicalForm f, h, g;
-  CFList gcds, result;
-  CFListIterator i= L, j;
-
-  int l= L.length();
-  int n= 0;
-  int m= 0;
-  for (; (i.hasItem() && n < l); i++, n++)
-  {
-    f= i.getItem();
-    for (j= L; (j.hasItem() && m < l); j++, m++)
-    {
-      h= j.getItem();
-      g= gcd (f, h);
-      if (!g.inCoeffDomain())
-      {
-        g= normalize (g);
-        gcds= Union (gcds, CFList (g));
-        f /= g;
-        h /= g;
-        out_cf ("g= ", g, "\n");
-        out_cf ("h= ", h, "\n");
-        out_cf ("f= ", f, "\n");
-        if (!f.inCoeffDomain())
-          result= Union (result, CFList (f));
-        if (!h.inCoeffDomain())
-          result= Union (result, CFList (h));
-      }
-    }
-  }
-  printf ("gcds= ");
-  out_cflist (gcds);
-  printf ("\n");
-  printf ("result= ");
-  out_cflist (result);
-  printf ("\n");
-  result= Union (result, gcds);
-  return result;
-}*/
 
 /// modified medial set
 CFList
