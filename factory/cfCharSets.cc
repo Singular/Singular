@@ -1498,8 +1498,6 @@ irrCharSeries (const CFList & PS)
   CFList qs, cs, factorset, is, ts;
   ListCFList pi, ppi, qqi, qsi, iss, qhi= ListCFList(PS);
 
-  StoreFactors StoredFactors;
-
   int nr_of_iteration= 0, indexRed, highestlevel= 0;
 
   for (CFListIterator iter= PS; iter.hasItem(); iter++)
@@ -1530,10 +1528,11 @@ irrCharSeries (const CFList & PS)
       ppi= MyUnion (ListCFList(qs), ppi1);
     }
 
+    StoreFactors StoredFactors;
     cs= charSetViaModCharSet (qs, StoredFactors);
 
     //cs = removeContent (cs, StoredFactors); //do I really need it
-    factorset= StoredFactors.FS2;
+    factorset= StoredFactors.FS1;
 
     if (cs.getFirst().level() > 0)
     {
@@ -1578,7 +1577,7 @@ irrCharSeries (const CFList & PS)
             if (i.getItem() == reducible)
               break;
             else 
-              cst.append(i.getItem());
+              cst.append (i.getItem());
           }
           is= Union (factorsOfInitials (cst), is);
           iss= MyUnion (adjoin (is, qs, qqi), adjoinb (ts, qs, qqi, cst));
