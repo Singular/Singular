@@ -67,6 +67,11 @@ charSetViaModCharSet (const CFList& PS);
 /// characteristic series
 ListCFList
 charSeries (const CFList& L);
+
+/// irreducible characteristic series
+ListCFList
+irrCharSeries (const CFList & PS);
+
 /*ENDPUBLIC*/
 
 #endif

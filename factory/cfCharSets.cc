@@ -19,6 +19,7 @@
 #include "cfCharSets.h"
 #include "canonicalform.h"
 #include "cf_algorithm.h"
+#include "facAlgFunc.h"
 
 static bool
 lowerRank (const CanonicalForm & F, const CanonicalForm & G, int & ind)
@@ -1102,7 +1103,7 @@ irredAS (CFList & AS, int & indexRed, CanonicalForm & reducible)
         i++;
         if (degree (i.getItem()) > 1)
         {  // search for a non linear elem
-          //qs= newfactoras (i.getItem(), as, success);
+          qs= newfactoras (i.getItem(), as, success);
           if (qs.length() > 1 || qs.getFirst().exp() > 1)
           { //found elem is reducible
             reducible= i.getItem();

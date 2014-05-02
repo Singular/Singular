@@ -115,4 +115,7 @@
 /*MAKEHEADER PUBLIC ONLY*/
 #include "facAlgFunc.h"
 
+/*MAKEHEADER PUBLIC ONLY*/
+#include "cfCharSets.h"
+
 #endif /* ! INCL_FACTORY_H */

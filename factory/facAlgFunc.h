@@ -14,6 +14,7 @@
 #define FAC_ALG_FUNC_H
 
 #include "canonicalform.h"
+#include "cf_generator.h"
 
 // missing class: IntGenerator:
 class IntGenerator : public CFGenerator
