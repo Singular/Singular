@@ -5,13 +5,17 @@
  *
  * This file provides functions to factorize polynomials over alg. function
  * fields
+ *
+ * @note some of the code is code from libfac or derived from code from libfac.
+ * Libfac is written by M. Messollen. See also COPYING for license information
+ * and README for general information on characteristic sets.
  * 
  * ABSTRACT: Descriptions can be found in B. Trager "Algebraic Factoring and
  * Rational Function Integration" and A. Steel "Conquering Inseparability:
  * Primary decomposition and multivariate factorization over algebraic function
  * fields of positive characteristic"
  *
- * @authors Martin Lee, Michael Messollen
+ * @author Martin Lee
  *
  **/
 /*****************************************************************************/
@@ -1505,10 +1509,10 @@ SteelTrager (const CanonicalForm & f, const CFList & AS, const Varlist & uord)
   asnew= charSetViaModCharSet (asnew, false);
 
   F= asnew.getLast();
-  F /= content (F); // should be obsolete if we use modCharSet
+  F /= content (F);
 
   asnew.removeLast();
-  for (CFListIterator i= asnew; i.hasItem(); i++) // should be obsolete if we use modCharSet
+  for (CFListIterator i= asnew; i.hasItem(); i++)
     i.getItem() /= content (i.getItem());
 
   j= 0;
@@ -1558,7 +1562,7 @@ SteelTrager (const CanonicalForm & f, const CFList & AS, const Varlist & uord)
       }
     }
 
-    factor /= content (factor); // should be superflous if we use modCharSet instead of CharSet
+    factor /= content (factor);
 
     if (expF > 0)
     {

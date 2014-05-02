@@ -5,7 +5,11 @@
  *
  * Factorization over algebraic function fields
  *
- * @author Michael Messollen
+ * @note some of the code is code from libfac or derived from code from libfac.
+ * Libfac is written by M. Messollen. See also COPYING for license information
+ * and README for general information on characteristic sets.
+ *
+ * @author Martin Lee
  *
  **/
 /*****************************************************************************/
