@@ -9,7 +9,6 @@
 // Charset - Includes
 #include "csutil.h"
 #include "charset.h"
-#include "reorder.h"
 // some CC's need this:
 #include "algfactor.h"
 
