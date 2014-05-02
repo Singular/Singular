@@ -79,12 +79,14 @@ irrCharSeries (const CFList & PS);
 // 
 // this gives you a heuristically optimal ordering for the ring variables
 // if you use the irreducible characteristic series.
-Varlist  neworder( const CFList & PolyList );
+Varlist neworder (const CFList & PolyList);
+
 // the same as neworder(...) only returning a list of CanonicalForm 's
 // (i.e. the variables as CanonicalForms)
-CFList   newordercf(const CFList & PolyList );
+CFList newordercf (const CFList & PolyList);
+
 // the same as neworder(...) only returning a list of int 's (i.e. the levels)
-IntList  neworderint(const CFList & PolyList );
+IntList neworderint (const CFList & PolyList);
 
 // for library internal use only:
 // next function reorders the variables in PS:
@@ -98,9 +100,9 @@ IntList  neworderint(const CFList & PolyList );
 // ListCFList Q= IrrCharSeries( PS );
 // Q= reorder(betterorder,Q);   // revert ordering to oldorder
 // 
-CFList reorder( const Varlist & betterorder, const CFList & PS);
-CFFList reorder( const Varlist & betterorder, const CFFList & PS);
-ListCFList reorder(const Varlist & betterorder, const ListCFList & Q);
+CFList reorder (const Varlist & betterorder, const CFList & PS);
+CFFList reorder (const Varlist & betterorder, const CFFList & PS);
+ListCFList reorder (const Varlist & betterorder, const ListCFList & Q);
 /*ENDPUBLIC*/
 
 #endif
