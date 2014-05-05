@@ -73,7 +73,7 @@ void hDimSolve(scmon pure, int Npure, scfmon rad, int Nrad,
 int  scDimInt(ideal S, ideal Q)
 {
   int  mc;
-  hexist = hInit(S, Q, &hNexist);
+  hexist = hInit(S, Q, &hNexist, currRing);
   if (!hNexist)
     return (currRing->N);
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
@@ -211,7 +211,7 @@ intvec * scIndIntvec(ideal S, ideal Q)
 {
   intvec *Set=new intvec((currRing->N));
   int  mc,i;
-  hexist = hInit(S, Q, &hNexist);
+  hexist = hInit(S, Q, &hNexist, currRing);
   if (hNexist==0)
   {
     for(i=0; i<(currRing->N); i++)
@@ -694,7 +694,7 @@ static void hDegree(ideal S, ideal Q)
 {
   int  di;
   int  mc;
-  hexist = hInit(S, Q, &hNexist);
+  hexist = hInit(S, Q, &hNexist, currRing);
   if (!hNexist)
   {
     hCo = 0;
@@ -831,7 +831,7 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
 static void hDegree0(ideal S, ideal Q)
 {
   int  mc;
-  hexist = hInit(S, Q, &hNexist);
+  hexist = hInit(S, Q, &hNexist, currRing);
   if (!hNexist)
   {
     hMu = -1;
@@ -1327,7 +1327,7 @@ ideal scKBase(int deg, ideal s, ideal Q, intvec * mv)
     }
   }
   stcmem = hCreate((currRing->N) - 1);
-  hexist = hInit(s, Q, &hNexist);
+  hexist = hInit(s, Q, &hNexist, currRing);
   p = last = pInit();
   /*pNext(p) = NULL;*/
   act = (scmon)omAlloc(((currRing->N) + 1) * sizeof(int));
@@ -1396,7 +1396,7 @@ void scComputeHCw(ideal ss, ideal Q, int ak, poly &hEdge, ring tailRing)
   }
   di = scDimInt(s, Q);
   stcmem = hCreate((currRing->N) - 1);
-  hexist = hInit(s, Q, &hNexist);
+  hexist = hInit(s, Q, &hNexist, currRing);
   p = last = pInit();
   /*pNext(p) = NULL;*/
   act = (scmon)omAlloc(((currRing->N) + 1) * sizeof(int));
