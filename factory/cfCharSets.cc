@@ -1049,6 +1049,30 @@ removeFactors (CanonicalForm& r, StoreFactors& StoredFactors,
   }
 }
 
+CFList
+removeContent (const CFList & PS, StoreFactors & StoredFactors)
+{
+  CFListIterator i= PS;
+  if ((!i.hasItem()) || (PS.getFirst().level() == 0 ))
+    return PS;
+
+  CFList output;
+  CanonicalForm cc,elem;
+
+  for (; i.hasItem(); i++)
+  {
+    elem= i.getItem();
+    cc= content (elem, elem.mvar());
+    if (cc.level() > 0 )
+    {
+      output.append (elem / cc);
+      StoredFactors.FS1 = Union (CFList (cc), StoredFactors.FS1);
+    }
+    else
+      output.append(elem);
+  }
+  return output;
+}
 
 static bool
 contractsub (const CFList& cs1, const CFList& cs2)
@@ -1444,14 +1468,14 @@ irredAS (CFList & AS, int & indexRed, CanonicalForm & reducible)
   for (i= AS; i.hasItem(); i++ )
   {
     nr += 1;
-    if (degree(i.getItem()) > 1)
+    if (degree (i.getItem()) > 1)
     {
       qs= factorize (i.getItem());
       if (qs.getFirst().factor().inCoeffDomain())
         qs.removeFirst();
     }
     else
-      qs= CFFList (CFFactor(i.getItem(),1));
+      qs= CFFList (CFFactor (i.getItem(), 1));
 
     if ((qs.length() >= 2 ) || (qs.getFirst().exp() > 1))
     {
@@ -1476,6 +1500,8 @@ irredAS (CFList & AS, int & indexRed, CanonicalForm & reducible)
         if (degree (i.getItem()) > 1)
         {  // search for a non linear elem
           qs= newfactoras (i.getItem(), as, success);
+          if (qs.getFirst().factor().inCoeffDomain())
+            qs.removeFirst();
           if (qs.length() > 1 || qs.getFirst().exp() > 1)
           { //found elem is reducible
             reducible= i.getItem();
@@ -1530,8 +1556,8 @@ irrCharSeries (const CFList & PS)
 
     StoreFactors StoredFactors;
     cs= charSetViaModCharSet (qs, StoredFactors);
+    cs= removeContent (cs, StoredFactors);
 
-    //cs = removeContent (cs, StoredFactors); //do I really need it
     factorset= StoredFactors.FS1;
 
     if (cs.getFirst().level() > 0)
