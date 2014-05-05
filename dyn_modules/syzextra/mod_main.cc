@@ -911,22 +911,21 @@ static BOOLEAN idPrepare(leftv res, leftv h)
   assume(iComp >= 0);
 
 
-  tHomog hom=testHomog;
-  intvec *w; //  = reinterpret_cast<intvec *>(atGet(h, "isHomog", INTVEC_CMD));
+  intvec* w = reinterpret_cast<intvec *>(atGet(h, "isHomog", INTVEC_CMD));
+  tHomog hom = testHomog;
 
   //           int add_row_shift = 0;
   // 
-  //           if (w!=NULL)
-  //           {
-  //             intvec * ww = ivCopy(w);
-  // 
+  if (w!=NULL)
+  {
+    w = ivCopy(w);
   //             add_row_shift = ww->min_in();
   // 
   //             (*ww) -= add_row_shift;
   //             
   //             if (idTestHomModule(I, currQuotient, ww))
   //             {
-  //               hom = isHomog;
+    hom = isHomog;
   //               w = ww;
   //             }
   //             else
@@ -936,7 +935,7 @@ static BOOLEAN idPrepare(leftv res, leftv h)
   //               w = NULL;
   //               hom=testHomog;
   //             }
-  //           }
+  }
 
 
   // computes syzygies of h1,
@@ -949,9 +948,9 @@ static BOOLEAN idPrepare(leftv res, leftv h)
 
   idTest(J);
 
-  if (w!=NULL) delete w;
-  //          if (w!=NULL)
-  //            atSet(res, omStrDup("isHomog"), w, INTVEC_CMD);
+  if (w!=NULL)
+    atSet(res, omStrDup("isHomog"), w, INTVEC_CMD);
+  //             if (w!=NULL) delete w;
 
   res->rtyp = MODUL_CMD;
   res->data = reinterpret_cast<void *>(J);

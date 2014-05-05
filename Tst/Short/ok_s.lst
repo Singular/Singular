@@ -126,6 +126,7 @@ bug_tr380
 bug_tr387
 bug_tr404
 bug_tr485
+bug_tr489
 bug_tr501
 bug_526
 bug_532_s
@@ -139,6 +140,7 @@ bug_tr604
 bug_x_i_j
 brnoeth_s
 charseries
+charseries_p
 countedref_s
 classify_s
 cyc5_lp

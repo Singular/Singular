@@ -41,7 +41,7 @@
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/syz.h>
 
-#include <libpolys/coeffs/longrat.h>
+#include <coeffs/longrat.h>
 
 
 /* #define WITH_OLD_MINOR */

@@ -151,7 +151,7 @@ OSTREAM & operator << ( OSTREAM & os, const Variable & v )
 }
 #endif /* NOSTREAMIO */
 
-static CanonicalForm conv2mipo ( const CanonicalForm & mipo, const Variable alpha )
+static CanonicalForm conv2mipo ( const CanonicalForm & mipo, const Variable & alpha )
 {
     CanonicalForm result;
     for ( CFIterator i = mipo; i.hasTerms(); i++ )

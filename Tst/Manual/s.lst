@@ -632,7 +632,6 @@ fwalk.tst
 group_reynolds.tst
 Gweights.tst
 Hcode.tst
-hilbert4ti2.tst
 hilbPoly.tst
 internalfunctions.tst
 intersectZ.tst
@@ -807,7 +806,6 @@ getLattice.tst
 getVariableWeights.tst
 Graded_commutative_algebras__SCA_.tst
 gradiator.tst
-graver4ti2.tst
 HomJJ.tst
 ideal_expressions.tst
 ideal_expressions_BR_PLURAL_BR.tst
@@ -1234,7 +1232,6 @@ linReduce.tst
 makeQso3.tst
 makeUso10.tst
 makeUso12.tst
-markov4ti2.tst
 minIntRoot.tst
 number_e.tst
 operatorModulo.tst
@@ -1375,7 +1372,7 @@ buildtreetoMaple.tst
 cgsdr.tst
 decode.tst
 Eresol.tst
-multiDegBasis.tst
+;;multiDegBasis.tst
 norTest.tst
 Weierstrass.tst
 ellipticAllPoints.tst

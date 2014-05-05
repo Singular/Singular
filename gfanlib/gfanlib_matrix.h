@@ -324,7 +324,7 @@ public:
               }
             if(makePivotsOne)
               {//THE PIVOT SHOULD BE SET TO ONE IF INTEGRAL IS FALSE
-                if(rows[currentRow][i].sign>=0)
+                if(rows[currentRow][i].sign()>=0)
                   retSwaps++;
                 typ inverse=typ(1)/rows[currentRow][i];
                 //                if(!rows[currentRow][i].isOne())

@@ -52,6 +52,7 @@ Short/bug_51.tst
 Short/bug_52.tst
 Short/bug_526.tst
 Short/bug_527_s.tst
+Short/bug_597.tst
 Short/bug_53.tst
 Short/bug_54.tst
 Short/bug_55.tst
@@ -123,9 +124,11 @@ Short/bug_tr380.tst
 Short/bug_tr387.tst
 Short/bug_tr404.tst
 Short/bug_tr485.tst
+Short/bug_tr489.tst
 Short/bug_tr549.tst
 Short/bug_x_i_j.tst
 Short/charseries.tst
+Short/charseries_p.tst
 Short/classify_s.tst
 Short/cyc5_lp.tst
 Short/dbm_s.tst

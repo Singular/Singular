@@ -3,9 +3,9 @@
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
-#include <libpolys/misc/intvec.h>
-#include <libpolys/coeffs/longrat.h>
-#include <libpolys/coeffs/bigintmat.h>
+#include <misc/intvec.h>
+#include <coeffs/longrat.h>
+#include <coeffs/bigintmat.h>
 
 #include <bbfan.h>
 #include <bbcone.h>

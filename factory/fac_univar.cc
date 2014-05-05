@@ -316,6 +316,7 @@ UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, cons
         gk = pk(g); hk = pk(h);
     }
     setCharacteristic( save );
+    delete [] kvals;
     return e.isZero();
 }
 
@@ -535,6 +536,7 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
         ZF.insert( CFFactor( cont, 1 ) );
     delete [] D;
     delete [] Dh;
+    delete [] p;
     if ( ! symmsave )
         Off( SW_SYMMETRIC_FF );
 

@@ -6,18 +6,18 @@ Date: 2009/11/03 06:57:32
 
 #include <kernel/mod2.h>
 
-#include <libpolys/misc/options.h>
+#include <misc/options.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/kutil.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/spectrum/kmatrix.h>
 #include <kernel/spectrum/GMPrat.h>
-#include <libpolys/misc/intvec.h>
+#include <misc/intvec.h>
 
 //#include "ring.h"        //apparently not needed
 #include <Singular/lists.h>
-#include <libpolys/polys/prCopy.h>
+#include <polys/prCopy.h>
 #include <kernel/GBEngine/stairc.h>
 #include <fstream>        //read-write cones to files
 #include <string>
@@ -303,7 +303,7 @@ static bool areEqual(facet *f, facet *s)
         const int64vec* sNormal;
         fNormal = f->getRef2FacetNormal();
         sNormal = s->getRef2FacetNormal();
-#include <libpolys/misc/intvec.h>
+#include <misc/intvec.h>
         //Do not need parallelity. Too time consuming
 //          if(!isParallel(*fNormal,*sNormal))
 //         if(fNormal->compare(ivNeg(sNormal))!=0)//This results in a Mandelbug

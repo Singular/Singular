@@ -323,7 +323,7 @@ template<class KeyClass, class ValueClass> class Cache
      void print () const;
 };
 
-#include "CacheImplementation.h"
+#include <kernel/linear_algebra/CacheImplementation.h>
 
 #endif
 /* CACHE_H */

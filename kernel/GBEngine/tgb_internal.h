@@ -62,7 +62,7 @@ using std::vector;
 #include <kernel/GBEngine/kInline.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <polys/kbuckets.h>
-#include <libpolys/coeffs/modulop.h>
+#include <coeffs/modulop.h>
 
 class PolySimple
 {

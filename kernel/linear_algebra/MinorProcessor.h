@@ -2,7 +2,7 @@
 #define MINOR_PROCESSOR_H
 
 #include <kernel/linear_algebra/Cache.h>
-#include "Minor.h"
+#include <kernel/linear_algebra/Minor.h>
 
 struct spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
 struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;

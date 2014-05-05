@@ -6,7 +6,7 @@ Author: monerjan
 #ifndef GFAN_H
 #define GFAN_H
 
-#include <libpolys/misc/int64vec.h>
+#include <misc/int64vec.h>
 
 #include <gfanlib/config.h>
 #ifdef HAVE_CDD_SETOPER_H

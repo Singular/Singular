@@ -123,6 +123,7 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     DEBOUTLN(CERR, "sqrf_norm_sub: Palpha= ", Palpha);
     R = resultante(Palpha, g, y); R= R* bCommonDen(R);
     DEBOUTLN(CERR, "sqrf_norm_sub: R= ", R);
+    R /= content (R);
     // sqfree check ; R is a polynomial in K[x]
     if ( getCharacteristic() == 0 )
     {
@@ -198,6 +199,7 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     DEBOUTLN(CERR, "sqrf_norm_sub: Palpha= ", Palpha);
     R = resultante(Palpha, g, y); R= R* bCommonDen(R);
     DEBOUTLN(CERR, "sqrf_norm_sub: R= ", R);
+    R /= content (R);
     // sqfree check ; R is a polynomial in K[x]
     if ( getCharacteristic() == 0 )
     {
@@ -739,6 +741,114 @@ backSubst (const CanonicalForm& F, const CFList& a, const CFList& b)
   return result;
 }
 
+void deflateDegree (const CanonicalForm & F, int & pExp, int n)
+{
+  if (n == 0 || n > F.level())
+  {
+    pExp= -1;
+    return;
+  }
+  if (F.level() == n)
+  {
+    ASSERT (F.deriv().isZero(), "derivative of F is not zero");
+    int termCount=0;
+    CFIterator i= F;
+    for (; i.hasTerms(); i++)
+    {
+      if (i.exp() != 0)
+        termCount++;
+    }
+
+    int j= 1;
+    i= F;
+    for (;j < termCount; j++, i++)
+      ;
+
+    int exp= i.exp();
+    int count= 0;
+    int p= getCharacteristic();
+    while ((exp >= p) && (exp != 0) && (exp % p == 0))
+    {
+      exp /= p;
+      count++;
+    }
+    pExp= count;
+  }
+  else
+  {
+    CFIterator i= F;
+    deflateDegree (i.coeff(), pExp, n);
+    i++;
+    int tmp= pExp;
+    for (; i.hasTerms(); i++)
+    {
+      deflateDegree (i.coeff(), pExp, n);
+      if (tmp == -1)
+        tmp= pExp;
+      else if (tmp != -1 && pExp != -1)
+        pExp= (pExp < tmp) ? pExp : tmp;
+      else
+        pExp= tmp;
+    }
+  }
+}
+
+CanonicalForm deflatePoly (const CanonicalForm & F, int exp)
+{
+  if (exp == 0)
+    return F;
+  int p= getCharacteristic();
+  int pToExp= ipower (p, exp);
+  Variable x=F.mvar();
+  CanonicalForm result= 0;
+  for (CFIterator i= F; i.hasTerms(); i++)
+    result += i.coeff()*power (x, i.exp()/pToExp);
+  return result;
+}
+
+CanonicalForm deflatePoly (const CanonicalForm & F, int exps, int n)
+{
+  if (n == 0 || exps <= 0 || F.level() < n)
+    return F;
+  if (F.level() == n)
+    return deflatePoly (F, exps);
+  else
+  {
+    CanonicalForm result= 0;
+    for (CFIterator i= F; i.hasTerms(); i++)
+      result += deflatePoly (i.coeff(), exps, n)*power(F.mvar(), i.exp());
+    return result;
+  }
+}
+
+CanonicalForm inflatePoly (const CanonicalForm & F, int exp)
+{
+  if (exp == 0)
+    return F;
+  int p= getCharacteristic();
+  int pToExp= ipower (p, exp);
+  Variable x=F.mvar();
+  CanonicalForm result= 0;
+  for (CFIterator i= F; i.hasTerms(); i++)
+    result += i.coeff()*power (x, i.exp()*pToExp);
+  return result;
+}
+
+CanonicalForm inflatePoly (const CanonicalForm & F, int exps, int n)
+{
+  if (n == 0 || exps <= 0 || F.level() < n)
+    return F;
+  if (F.level() == n)
+    return inflatePoly (F, exps);
+  else
+  {
+    CanonicalForm result= 0;
+    for (CFIterator i= F; i.hasTerms(); i++)
+      result += inflatePoly (i.coeff(), exps, n)*power(F.mvar(), i.exp());
+    return result;
+  }
+}
+
 // the heart of the algorithm: the one from Trager
 #ifndef DEBUGOUTPUT
 static CFFList
@@ -805,6 +915,16 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   f /= vcontent (f, Rstar.mvar());
   // end quasi monic
 
+  if (degree (f) == 1)
+  {
+    f= backSubst (f, backSubsts, Astar);
+    f *= bCommonDen (f);
+    f= Prem (f, as);
+    f /= vcontent (f, as.getFirst().mvar());
+
+    return CFFList (CFFactor (f, 1));
+  }
+
   sqrf_norm(f, Rstar, vminpoly, s, g, R );
   //out_cf("sqrf_norm R:",R,"\n");
   //out_cf("sqrf_norm s:",s,"\n");
@@ -832,6 +952,11 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
     Factorlist.insert(CFFactor(1,1));
   if ( Factorlist.length() == 2 && Factorlist.getLast().exp()== 1)
   { // irreduzibel (first entry is a constant)
+    f= backSubst (f, backSubsts, Astar);
+    f *= bCommonDen (f);
+    f= Prem (f, as);
+    f /= vcontent (f, as.getFirst().mvar());
+
     L.append(CFFactor(f,1));
   }
   else
@@ -904,83 +1029,272 @@ alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vmin
   return LL;
 }
 
-static CFFList
-endler( const CanonicalForm & f, const CFList & AS, const Varlist & uord )
+/// algorithm of A. Steel described in "Conquering Inseparability: Primary
+/// decomposition and multivariate factorization over algebraic function fields
+/// of positive characteristic" with the following modifications: we use
+/// characteristic sets in IdealOverSubfield and Trager's primitive element
+/// algorithm instead of FGLM
+CFFList
+SteelTrager (const CanonicalForm & f, const CFList & AS, const Varlist & uord)
 {
-  CanonicalForm F=f, g, q,r;
-  CFFList Output;
-  CFList One, Two, asnew, as=AS;
-  CFListIterator i,ii;
-  VarlistIterator j;
-  Variable vg;
+  CanonicalForm F= f, lcmVars= 1;
+  CFList asnew, as= AS;
+  CFListIterator i, ii;
 
-  for (i=as; i.hasItem(); i++)
+  bool derivZeroF= false, derivZero= false;
+  int j, exp=0, expF= 0, tmpExp;
+  CFFList varsMapLevel;
+  CFFListIterator iter;
+
+  // check if F is separable
+  if (F.deriv().isZero())
   {
-    g= i.getItem();
-    if (g.deriv() == 0 )
+    derivZeroF= true;
+    deflateDegree (F, expF, F.level());
+  }
+
+  CanonicalForm varsF= getVars (F);
+  varsF /= F.mvar();
+
+  lcmVars= lcm (varsF, lcmVars);
+
+  if (derivZeroF)
+    as.append (F);
+
+  CFFList varsGMapLevel;
+  CFFList tmp;
+  CFFList * varsGMap= new CFFList [as.length()];
+  for (j= 0; j < as.length(); j++)
+    varsGMap[j]= CFFList();
+
+  CanonicalForm varsG;
+  j= 0;
+  bool recurse= false;
+  i= as;
+  // make minimal polys and F separable
+  while (i.hasItem())
+  {
+    derivZero= false;
+
+    if (i.getItem().deriv() == 0)
     {
-      DEBOUTLN(CERR, "Inseperable extension detected: ", g);
-      for (j=uord; j.hasItem(); j++)
+      deflateDegree (i.getItem(), exp, i.getItem().level());
+      i.getItem()= deflatePoly (i.getItem(), exp, i.getItem().level());
+     
+      varsG= getVars (i.getItem());
+      varsG /= i.getItem().mvar();
+
+      lcmVars= lcm (varsG, lcmVars);
+
+      while (!varsG.isOne())
       {
-        if ( degree(g,j.getItem()) > 0 ) vg= j.getItem();
-      }
-      // Now we have the highest transzendental in vg;
-      DEBOUTLN(CERR, "Transzendental is ", vg);
-      CanonicalForm gg=-1*g[0];
-      divrem(gg,vg,q,r); r= gg-q*vg;   gg= gg-r;
-      //DEBOUTLN(CERR, "q= ", q); DEBOUTLN(CERR, "r= ", r);
-      DEBOUTLN(CERR, "  that is ", gg);
-      DEBOUTLN(CERR, "  maps to ", g+gg);
-      One.insert(gg); Two.insert(g+gg);
-      // Now transform all remaining polys in as:
-      int x=0;
-      for (ii=i; ii.hasItem(); ii++)
-      {
-        if ( x != 0 )
-	{
-          divrem(ii.getItem(), gg, q,r);
-//          CERR << ii.getItem() << " divided by " << gg << "\n";
-          DEBOUTLN(CERR, "q= ", q); DEBOUTLN(CERR, "r= ", r);
-          ii.append(ii.getItem()+q*g); ii.remove(1);
-          DEBOUTLN(CERR, "as= ", as);
+        if (i.getItem().deriv (varsG.level()).isZero())
+        {
+          deflateDegree (i.getItem(), tmpExp, varsG.level());
+          if (exp >= tmpExp)
+          {
+            if (exp == tmpExp)
+              i.getItem()= deflatePoly (i.getItem(), exp, varsG.level());
+            else
+            {
+              if (j != 0)
+                recurse= true;
+              i.getItem()= deflatePoly (i.getItem(), tmpExp, varsG.level());
+            }
+            varsGMapLevel.insert (CFFactor (varsG.mvar(), exp - tmpExp));
+          }
+          else
+          {
+            i.getItem()= deflatePoly (i.getItem(), exp, varsG.level());
+            varsGMapLevel.insert (CFFactor (varsG.mvar(), 0));
+          }
         }
-        x+= 1;
+        else
+        {
+          if (j != 0)
+            recurse= true;
+          varsGMapLevel.insert (CFFactor (varsG.mvar(),exp));
+        }
+        varsG /= varsG.mvar();
       }
-      // Now transform F:
-      divrem(F, gg, q,r);
-      F= F+q*g;
-      DEBOUTLN(CERR, "new F= ", F);
-    }
-    else{ asnew.append(i.getItem());  }// just the identity
-  }
-  // factor F with minimal polys given in asnew:
-  DEBOUTLN(CERR, "Factor F=  ", F);
-  DEBOUTLN(CERR, "  with as= ", asnew);
-  int success=0;
-  CFFList factorlist= newcfactor(F,asnew, success);
-  DEBOUTLN(CERR, "  gives =  ", factorlist);
-  DEBOUTLN(CERR, "One= ", One);
-  DEBOUTLN(CERR, "Two= ", Two);
 
-  // Transform back:
-  for ( CFFListIterator k=factorlist; k.hasItem(); k++)
-  {
-    CanonicalForm factor= k.getItem().factor();
-    ii=One;
-    for (i=Two; i.hasItem(); i++)
+      if (recurse)
+      {
+        ii=as;
+        for (; ii.hasItem(); ii++)
+        {
+          if (ii.getItem() == i.getItem())
+            continue;
+          for (iter= varsGMapLevel; iter.hasItem(); iter++)
+            ii.getItem()= inflatePoly (ii.getItem(), iter.getItem().exp(),
+                                       iter.getItem().factor().level());
+        }
+      }
+      else
+      {
+        ii= i;
+        ii++;
+        for (; ii.hasItem(); ii++)
+        {
+          for (iter= varsGMapLevel; iter.hasItem(); iter++)
+          {
+            ii.getItem()= inflatePoly (ii.getItem(), iter.getItem().exp(),
+                                       iter.getItem().factor().level());
+          }
+        }
+      }
+      if (varsGMap[j].isEmpty())
+        varsGMap[j]= varsGMapLevel;
+      else
+      {
+        if (!varsGMapLevel.isEmpty())
+        {
+          tmp= varsGMap[j];
+          CFFListIterator iter2= varsGMapLevel;
+          ASSERT (tmp.length() == varsGMapLevel.length(), "wrong length of lists");
+          for (iter=tmp; iter.hasItem(); iter++, iter2++)
+            iter.getItem()= CFFactor (iter.getItem().factor(),
+                                  iter.getItem().exp() + iter2.getItem().exp());
+          varsGMap[j]= tmp;
+        }
+      }
+      varsGMapLevel= CFFList();
+    }
+    asnew.append (i.getItem());
+    if (!recurse)
     {
-      DEBOUTLN(CERR, "Mapping ", i.getItem());
-      DEBOUTLN(CERR, "     to ", ii.getItem());
-      DEBOUTLN(CERR, "     in ", factor);
-      divrem(factor,i.getItem(),q,r); r=factor -q*i.getItem();
-      DEBOUTLN(CERR, "q= ", q); DEBOUTLN(CERR, "r= ", r);
-      factor= ii.getItem()*q +r; //
-      ii++;
+      i++;
+      j++;
     }
-    Output.append(CFFactor(factor,k.getItem().exp()));
+    else
+    {
+      i= as;
+      j= 0;
+      recurse= false;
+      asnew= CFList();
+    }
   }
 
-  return Output;
+  while (!lcmVars.isOne())
+  {
+    varsMapLevel.insert (CFFactor (lcmVars.mvar(), 0));
+    lcmVars /= lcmVars.mvar();
+  }
+
+  // compute how to map variables in F
+  for (j= 0; j < as.length(); j++)
+  {
+    if (varsGMap[j].isEmpty())
+      continue;
+
+    for (CFFListIterator iter2= varsGMap[j]; iter2.hasItem(); iter2++)
+    {
+      for (iter= varsMapLevel; iter.hasItem(); iter++)
+      {
+        if (iter.getItem().factor() == iter2.getItem().factor())
+        {
+          iter.getItem()= CFFactor (iter.getItem().factor(),
+                                  iter.getItem().exp() + iter2.getItem().exp());
+        }
+      }
+    }
+  }
+
+  delete [] varsGMap;
+
+  if (derivZeroF)
+  {
+    as.removeLast();
+    asnew.removeLast();
+    F= deflatePoly (F, expF, F.level());
+  }
+
+  // map variables in F
+  for (iter= varsMapLevel; iter.hasItem(); iter++)
+  {
+    if (expF > 0)
+      tmpExp= iter.getItem().exp() - expF;
+    else
+      tmpExp= iter.getItem().exp();
+
+    if (tmpExp > 0)
+      F= inflatePoly (F, tmpExp, iter.getItem().factor().level());
+    else if (tmpExp < 0)
+      F= deflatePoly (F, -tmpExp, iter.getItem().factor().level());
+  }
+
+  // factor F with minimal polys given in asnew
+  PremForm rem;
+  asnew.append (F);
+  asnew= mcharset (asnew, rem); // TODO use modCharSet
+
+  F= asnew.getLast();
+  F /= content (F); // should be obsolete if we use modCharSet
+
+  asnew.removeLast();
+  for (CFListIterator i= asnew; i.hasItem(); i++) // should be obsolete if we use modCharSet
+    i.getItem() /= content (i.getItem());
+
+  j= 0;
+  tmp= newcfactor (F, asnew, j);
+
+  // transform back
+  j= 0;
+  int p= getCharacteristic();
+  CFList transBack;
+  CFMap M;
+  CanonicalForm g;
+
+  for (iter= varsMapLevel; iter.hasItem(); iter++)
+  {
+    if (iter.getItem().exp() > 0)
+    {
+      j++;
+      g= power (Variable (f.level() + j), ipower (p, iter.getItem().exp())) -
+         iter.getItem().factor().mvar();
+      transBack.append (g);
+      M.newpair (iter.getItem().factor().mvar(), Variable (f.level() + j));
+    }
+  }
+
+  for (i= asnew; i.hasItem(); i++)
+    transBack.insert (M (i.getItem()));
+
+  if (expF > 0)
+    tmpExp= ipower (p, expF);
+
+  CFFList result;
+  CFList transform;
+
+  for (CFFListIterator k= tmp; k.hasItem(); k++)
+  {
+    rem= PremForm();
+    transform= transBack;
+    CanonicalForm factor= k.getItem().factor();
+    factor= M (factor);
+    transform.append (factor);
+    transform= mcharset (transform, rem); //TODO use modCharSet
+    for (i= transform; i.hasItem(); i++)
+    {
+      if (degree (i.getItem(), f.mvar()) > 0)
+      {
+        factor= i.getItem();
+        break;
+      }
+    }
+
+    factor /= content (factor); // should be superflous if we use modCharSet instead of CharSet
+
+    if (expF > 0)
+    {
+      int mult= tmpExp/(degree (factor)/degree (k.getItem().factor()));
+      result.append (CFFactor (factor, k.getItem().exp()*mult));
+    }
+    else
+      result.append (CFFactor (factor, k.getItem().exp()));
+  }
+
+  return result;
 }
 
 void
@@ -1010,7 +1324,6 @@ multiplicity (CFFList& factors, const CanonicalForm& F, const CFList& as)
   }
 }
 
-
 // 1) prepares data
 // 2) for char=p we distinguish 3 cases:
 //           no transcendentals, seperable and inseperable extensions
@@ -1037,7 +1350,8 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
 
 // F1: [Test trivial cases]
 // 1) first trivial cases:
-  if ( (cls(vf) <= cls(as.getLast())) ||  degree(f,vf)<=1 ){
+  if (cls(vf) <= cls(as.getLast()))
+  {
 // ||( (as.length()==1) && (degree(f,vf)==3) && (degree(as.getFirst()==2)) )
     DEBDECLEVEL(CERR,"newfactoras");
     if (!isRat && getCharacteristic() == 0)
@@ -1068,7 +1382,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
   DEBOUTLN(CERR, "ord is: ", ord);
   DEBOUTLN(CERR, "uord is: ", uord);
 
-// 3) second trivial cases: we already prooved irr. of f over no extensions
+// 3) second trivial cases: we already proved irr. of f over no extensions
   if ( Astar.length() == 0 ){
     DEBDECLEVEL(CERR,"newfactoras");
     if (!isRat && getCharacteristic() == 0)
@@ -1096,7 +1410,9 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
     Fgcd= alg_gcd(f,f.deriv(),Astar);
 
   if ( Fgcd == 0 ) {DEBOUTMSG(CERR, "WARNING: p'th root ?");}
-  if (isFunctionField && ( degree(Fgcd, f.mvar()) > 0) && (!(f.deriv().isZero())) )
+
+  bool derivZero= f.deriv().isZero();
+  if (isFunctionField && (degree (Fgcd, f.mvar()) > 0) && !derivZero)
   {
     DEBOUTLN(CERR, "Nontrivial GCD found of ", f);
     CanonicalForm Ggcd= divide(f, Fgcd,Astar);
@@ -1116,6 +1432,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
       Off (SW_RATIONAL);
     return myUnion(newfactoras(Fgcd,as,success) , newfactoras(Ggcd,as,success));
   }
+
   if ( getCharacteristic() > 0 )
   {
     // First look for extension!
@@ -1126,7 +1443,8 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
     DEBOUTLN(CERR, "Extension needed of degree ", extdeg);
 
     // Now the real stuff!
-    if ( newuord.length() == 0 ){ // no transzendentals
+    if ( newuord.length() == 0 ) // no transzendentals
+    {
       DEBOUTMSG(CERR, "No transzendentals!");
       if ( extdeg > 1 ){
         CanonicalForm MIPO= generate_mipo( extdeg, vminpoly);
@@ -1137,12 +1455,12 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
       DEBDECLEVEL(CERR,"newfactoras");
       return Factorlist;
     }
-    else if ( inseperable(Astar) > 0 ){ // Look if extensions are seperable
-      // a) Use Endler
+    else if ( inseperable(Astar) > 0 || derivZero) // Look if extensions are seperable
+    {
       DEBOUTMSG(CERR, "Inseperable extensions! Using Endler!");
-      CFFList templist= endler(f,Astar, newuord);
-      DEBOUTLN(CERR, "Endler gives: ", templist);
-      return templist;
+      Factorlist= SteelTrager(f, Astar, newuord);
+      DEBOUTLN(CERR, "Endler gives: ", Factorlist);
+      return Factorlist;
     }
     else{ // we are on the save side: Use trager
       DEBOUTMSG(CERR, "Only seperable extensions!");
@@ -1200,9 +1518,12 @@ newcfactor(const CanonicalForm & f, const CFList & as, int & success )
   success=1;
   for ( CFFListIterator i=Factors; i.hasItem(); i++ )
   {
-    output=newfactoras(i.getItem().factor(),as, success);
-    for ( CFFListIterator j=output; j.hasItem(); j++)
-      Output = myappend(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
+    if (i.getItem().factor().level() > as.getLast().level())
+    {
+      output=newfactoras(i.getItem().factor(),as, success);
+      for ( CFFListIterator j=output; j.hasItem(); j++)
+        Output = myappend(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
+    }
   }
 
   if (!isRat && getCharacteristic() == 0)

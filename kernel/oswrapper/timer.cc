@@ -51,7 +51,7 @@ void SetMinDisplayTime(double mtime)
 #endif
 
 
-#include <libpolys/reporter/reporter.h>
+#include <reporter/reporter.h>
 #include <kernel/oswrapper/timer.h>
 
 /*3
