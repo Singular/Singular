@@ -913,10 +913,6 @@ void ssiReadBlackbox(leftv res, si_link l)
 void ssiReadAttrib(leftv res, si_link l)
 {
   ssiInfo *d=(ssiInfo*)l->data;
-  leftv tmp=ssiRead1(l);
-  memcpy(res,tmp,sizeof(sleftv));
-  memset(tmp,0,sizeof(sleftv));
-  omFreeSize(tmp,sizeof(sleftv));
   BITSET fl=(BITSET)s_readint(d->f_read);
   int nr_of_attr=s_readint(d->f_read);
   if (nr_of_attr>0)
@@ -925,7 +921,14 @@ void ssiReadAttrib(leftv res, si_link l)
     {
     }
   }
+  leftv tmp=ssiRead1(l);
+  memcpy(res,tmp,sizeof(sleftv));
+  memset(tmp,0,sizeof(sleftv));
+  omFreeSize(tmp,sizeof(sleftv));
   res->flag=fl;
+  if (nr_of_attr>0)
+  {
+  }
 }
 //**************************************************************************/
 
@@ -1559,7 +1562,11 @@ BOOLEAN ssiWrite(si_link l, leftv data)
     attr *aa=data->Attribute();
     if (((*aa)!=NULL)||(data->flag!=0))
     {
-      fprintf(d->f_write,"21 %d ",data->flag);
+      attr a=*aa;
+      int n=0;
+      while(a!=NULL) { n++; a=a->next;}
+      fprintf(d->f_write,"21 %d %d ",data->flag,n);
+      a=*aa;
     }
     if ((dd==NULL) && (data->name!=NULL) && (tt==0)) tt=DEF_CMD;
       // return pure undefined names as def
@@ -1658,14 +1665,6 @@ BOOLEAN ssiWrite(si_link l, leftv data)
               return TRUE;
             }
             break;
-    }
-    if (((*aa)!=NULL)||(data->flag!=0))
-    {
-      attr a=*aa;
-      int n=0;
-      while(a!=NULL) { n++; a=a->next;}
-      fprintf(d->f_write,"%d ",n);
-      a=*aa;
     }
     if (d->level<=1) { fputc('\n',d->f_write); fflush(d->f_write); }
     data=data->next;
@@ -2263,7 +2262,7 @@ BOOLEAN ssiGetDump(si_link l)
 // 18 intmat
 // 19 bigintmat <r> <c> ...
 // 20 blackbox <name> 1 <len> ...
-// 21 attrib <bit-attribs> <data> <len> <a-name1> <val1>...
+// 21 attrib <bit-attrib> <len> <a-name1> <val1>... <data>
 //
 // 98: verify version: <ssi-version> <MAX_TOK> <OPT1> <OPT2>
 // 99: quit Singular
