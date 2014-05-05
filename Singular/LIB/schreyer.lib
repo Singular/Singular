@@ -485,6 +485,10 @@ LIB "general.lib"; // for sort
 
 /* static */
 proc MySort(def M)
+"
+   Sorts the given ideal or module wrt >_{(c, ds)}  (.<.<.<.<)
+   NOTE: inplace??
+"
 {
   if( typeof( attrib(basering, "DEBUG") ) == "int" )
   {
@@ -499,7 +503,7 @@ proc MySort(def M)
     int @KERCHECK = attrib(basering, "KERCHECK");
   } else
   {
-    int @KERCHECK = @DEBUG; // TODO: @SYZCHECK:(
+    int @KERCHECK = @DEBUG; 
   }
 
 
@@ -549,7 +553,7 @@ proc MySort(def M)
 }
 
 
-/* static */ proc SSinit(def M)
+static proc SSinit(def M)
 {
   if( (typeof(M) != "module") && (typeof(M) != "ideal") )
   {
@@ -573,7 +577,7 @@ proc MySort(def M)
     @SYZCHECK = attrib(SSinit, "SYZCHECK");
   }
 
-  int @KERCHECK = @SYZCHECK;
+  int @KERCHECK = @DEBUG;
 
   if( typeof( attrib(SSinit, "KERCHECK") ) == "int" )
   {
@@ -607,7 +611,7 @@ proc MySort(def M)
   def @N = MySort(M); // TODO: replace with inplace sorting!!!
   def LEAD = lead(@N);
 
-  if( @SYZCHECK )
+  if( @KERCHECK )
   {
     def @LEAD = lead(M);
 
@@ -617,7 +621,6 @@ proc MySort(def M)
     M = M[iv_ds]; // sort M wrt ds on current leading terms
     @LEAD = @LEAD[iv_ds];
 
-    // 0^th syz. property
     if( size(module( matrix(@N) - matrix(M) )) > 0 )
     {
       "M:"; M;
@@ -630,7 +633,6 @@ proc MySort(def M)
       $
     }
 
-    // 0^th syz. property
     if( size(module( matrix(@LEAD) - matrix(LEAD) )) > 0 )
     {
       "LEAD:"; LEAD;
@@ -646,9 +648,6 @@ proc MySort(def M)
   }
 
   M = @N;
-  
-  
- 
   
   def TAIL = Tail(M);
   
@@ -828,7 +827,7 @@ proc SSComputeLeadingSyzygyTerms(def L)
     int @KERCHECK = attrib(basering, "KERCHECK");
   } else
   {
-    int @KERCHECK = @SYZCHECK;
+    int @KERCHECK = @DEBUG;
   }
 
   if( @DEBUG )
@@ -891,17 +890,18 @@ proc SSComputeLeadingSyzygyTerms(def L)
     {
         "ERROR: SSComputeLeadingSyzygyTerms: S != SS ";
 
-        "basering: ";
-        DetailedPrint(basering);
+        "basering: "; basering;
+//        DetailedPrint(basering);
 
         "S: ";  S;
-        DetailedPrint(S, 1);
+//        DetailedPrint(_, 1);
         "SS: "; SS;
-        DetailedPrint(SS, 1);
+//        DetailedPrint(_, 1);
 
         "DIFF: ";
+        module(matrix(S) - matrix(SS));
+//        DetailedPrint(_, 2);      
         print(matrix(S) - matrix(SS));
-        DetailedPrint(module(matrix(S) - matrix(SS)), 2);      
         $
     }
     }
@@ -947,16 +947,9 @@ proc SSCompute2LeadingSyzygyTerms(def L)
     int @KERCHECK = attrib(basering, "KERCHECK");
   } else
   {
-    int @KERCHECK = @SYZCHECK;
+    int @KERCHECK = @DEBUG;
   }
 
-  int @TAILREDSYZ = 1;
-  if( typeof( attrib(basering, "TAILREDSYZ") ) == "int" )
-  {
-    @TAILREDSYZ = attrib(basering, "TAILREDSYZ");
-  }
-  
-  
   if( @DEBUG )
   {
     "SSCompute2LeadingSyzygyTerms::Input: ";
@@ -985,6 +978,11 @@ proc SSCompute2LeadingSyzygyTerms(def L)
     
   if( @KERCHECK )
   {
+    int @TAILREDSYZ = 1;
+    if( typeof( attrib(basering, "TAILREDSYZ") ) == "int" )
+    {
+      @TAILREDSYZ = attrib(basering, "TAILREDSYZ");
+    }
 
     int i, j, r; 
     int N = ncols(L);
@@ -1084,7 +1082,7 @@ proc SSCompute2LeadingSyzygyTerms(def L)
 // -------------------------------------------------------- //
 
 /// TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?
-proc SSFindReducer(def product, def syzterm, def L/*, def T*/, list #)
+proc SSFindReducer(def product, def syzterm, def L, list #)
 {
   if( typeof( attrib(basering, "DEBUG") ) == "int" )
   {
@@ -1092,6 +1090,22 @@ proc SSFindReducer(def product, def syzterm, def L/*, def T*/, list #)
   } else
   {
     int @DEBUG = !system("with", "ndebug");
+  }
+
+  if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
+  {
+    int @SYZCHECK = attrib(basering, "SYZCHECK");
+  } else
+  {
+    int @SYZCHECK = @DEBUG;
+  }
+
+  if( typeof( attrib(basering, "KERCHECK") ) == "int" )
+  {
+    int @KERCHECK = attrib(basering, "KERCHECK");
+  } else
+  {
+    int @KERCHECK = @DEBUG;
   }
 
 
@@ -1110,15 +1124,7 @@ proc SSFindReducer(def product, def syzterm, def L/*, def T*/, list #)
   }
 
 
-  if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
-  {
-    int @SYZCHECK = attrib(basering, "SYZCHECK");
-  } else
-  {
-    int @SYZCHECK = @DEBUG;
-  }
-  
-  if( @SYZCHECK && (syzterm != 0) )
+  if( @DEBUG && (syzterm != 0) )
   {
     def @@c = leadcomp(syzterm); int @@r = int(@@c);
     def @@product = leadmonomial(syzterm) * L[@@r];
@@ -1140,7 +1146,7 @@ proc SSFindReducer(def product, def syzterm, def L/*, def T*/, list #)
   }
   
 
-  if( @SYZCHECK )
+  if( @KERCHECK )
   {
     bigint c = leadcomp(product); int r = int(c);
 
@@ -1206,10 +1212,6 @@ proc SSFindReducer(def product, def syzterm, def L/*, def T*/, list #)
   return (my);
 }
 
-
-
-
-
 /// TODO: save shortcut (syz: |-.->) LM(m) * "t" -> ?
 proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
 {
@@ -1238,7 +1240,14 @@ proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
 //    "attrib(LS, 'isSB')", attrib(LS, "isSB");
   }
 
-
+  if( typeof( attrib(basering, "KERCHECK") ) == "int" )
+  {
+    int @KERCHECK = attrib(basering, "KERCHECK");
+  } else
+  {
+    int @KERCHECK = @DEBUG;
+  }
+  
   if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
   {
     int @SYZCHECK = attrib(basering, "SYZCHECK");
@@ -1298,6 +1307,15 @@ proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
   {
     int @DEBUG = !system("with", "ndebug");
   }
+
+  if( typeof( attrib(basering, "KERCHECK") ) == "int" )
+  {
+    int @KERCHECK = attrib(basering, "KERCHECK");
+  } else
+  {
+    int @KERCHECK = @DEBUG;
+  }
+  
 
   if( @DEBUG )
   {
@@ -1450,7 +1468,7 @@ proc SSComputeSyzygy(def L, def T)
           a2 = LL2[k];
         } else
         {
-          a2 = SSFindReducer( aa * L[r], a, L/*, T*/, LS);
+          a2 = SSFindReducer( aa * L[r], a, L, LS);
         }
 
         if ( (@SYZCHECK || @DEBUG) )
@@ -1948,8 +1966,7 @@ example
 
 proc TestSSres(def M)
 {
-  "-------------------------------------";
-  "options: ", attrib(SSinit, "LEAD2SYZ"), attrib(SSinit, "TAILREDSYZ"), attrib(SSinit, "HYBRIDNF"), ": ";
+  "/ ----------------------------------- : ", "options: ", attrib(SSinit, "LEAD2SYZ"), attrib(SSinit, "TAILREDSYZ"), attrib(SSinit, "HYBRIDNF"), "...";
   int t = timer;
   def S = SSres(M, 0);
   int tt = timer;
@@ -1970,10 +1987,13 @@ proc TestSSres(def M)
 
 proc TestSSresAttribs(def M)
 {
+//  M = groebner(M);  "groebner: "; M;  "";
+
 
   // the following 2 setups are bad for AGR@101n3d002s004%1:(((
-//  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M); 
-//  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
+
+  //////////  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
+  //////////  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
 
   attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
   attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
@@ -1991,7 +2011,7 @@ proc testALLA()
   // TODO: only for now!!
   attrib(SSinit, "DEBUG", 0); 
   attrib(SSinit, "SYZCHECK", 1); 
-  attrib(SSinit, "KERCHECK", 0); 
+  attrib(SSinit, "KERCHECK", 1); 
 
   ring r; r; ideal M = maxideal(1); M;
   TestSSresAttribs(M);  
@@ -2010,7 +2030,6 @@ proc testALLA()
   ring r = 0, (a, b, c, d, e, f), dp; r; ideal M = maxideal(1); M;
   TestSSresAttribs(M);  
   kill r;  
-
   
   ring AGR = (101), (a, b, c, d), dp; AGR;
   // simple: AGR@101n3d002s004%1:
@@ -2018,9 +2037,8 @@ proc testALLA()
   M;
   TestSSresAttribs(M);
 
-
   // medium: AGR@101n3d004s009%1;
-  ideal M = a*b+7*a*c-16*b*c-27*a*d+37*b*d-2*c*d, d^3, c*d^2, b*d^2, a*d^2, c^2*d, b*c*d, a*c*d, b^2*d, a^2*d, c^3, b*c^2, a*c^2, b^2*c, a^2*c, b^3, a^3;
+  M = a*b+7*a*c-16*b*c-27*a*d+37*b*d-2*c*d, d^3, c*d^2, b*d^2, a*d^2, c^2*d, b*c*d, a*c*d, b^2*d, a^2*d, c^3, b*c^2, a*c^2, b^2*c, a^2*c, b^3, a^3;
   M;
   TestSSresAttribs(M);
 

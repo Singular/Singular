@@ -1100,6 +1100,7 @@ static inline poly leadmonom(const poly p, const ring r)
 /// proc SSFindReducer(def product, def syzterm, def L, def T, list #)
 static BOOLEAN FindReducer(leftv res, leftv h)
 {
+  const char* usage = "`FindReducer(<poly/vector>, <vector/0>, <ideal/module>[,<module>])` expected";
   const ring r = currRing;
 
   NoReturn(res);
@@ -1112,23 +1113,20 @@ static BOOLEAN FindReducer(leftv res, leftv h)
 #endif
 
   const BOOLEAN __TAILREDSYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"TAILREDSYZ",INT_CMD, (void*)0)));
-  const BOOLEAN __LEAD2SYZ__ = (BOOLEAN)((long)(atGet(currRingHdl,"LEAD2SYZ",INT_CMD, (void*)0)));
-  const BOOLEAN __SYZCHECK__ = (BOOLEAN)((long)(atGet(currRingHdl,"SYZCHECK",INT_CMD, (void*)0)));   
 
   if ((h==NULL) || (h->Typ()!=VECTOR_CMD && h->Typ() !=POLY_CMD) || (h->Data() == NULL))
   {
-    WerrorS("`FindReducer(<poly/vector>, <vector>, <ideal/module>[,<module>])` expected");
+    WerrorS(usage);
     return TRUE;    
   }
     
-  const poly product = (poly) h->Data(); h = h->Next();
+  const poly product = (poly) h->Data(); assume (product != NULL);
 
-  assume (product != NULL);
 
-    
-  if ((h==NULL) || (h->Typ()!=VECTOR_CMD))
+  h = h->Next();
+  if ((h==NULL) || !((h->Typ()==VECTOR_CMD) || (h->Data() == NULL)) )
   {
-    WerrorS("`FindReducer(<poly/vector>, <vector>, <ideal/module>[,<module>])` expected");
+    WerrorS(usage);
     return TRUE;    
   }
 
@@ -1142,7 +1140,7 @@ static BOOLEAN FindReducer(leftv res, leftv h)
   
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
-    WerrorS("`FindReducer(<poly/vector>, <vector>, <ideal/module>[,<module>])` expected");
+    WerrorS(usage);
     return TRUE;    
   }
   
@@ -1155,7 +1153,7 @@ static BOOLEAN FindReducer(leftv res, leftv h)
 /*
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
-    WerrorS("`FindReducer(<poly/vector>, <vector>, <ideal/module>[,<module>])` expected");
+    WerrorS(usage);
     return TRUE;    
   }
 
@@ -1742,7 +1740,7 @@ static BOOLEAN reduce_syz(leftv res, leftv h)
   if ( ( (h!=NULL) && (h->Typ()== INT_CMD)  ) )
     iLazyReduce = (int)((long)(h->Data())); 
 
-  res->data = (void *)kNFLength(M, currQuotient, v, iSyzComp, iLazyReduce);
+  res->data = (void *)kNFLength(M, currQuotient, v, iSyzComp, iLazyReduce); // NOTE: currRing :(
   return FALSE;
 }
 
@@ -1860,7 +1858,7 @@ static BOOLEAN _p_Content(leftv res, leftv h)
   pWrite(p); PrintLn();
   
   NoReturn(res);
-  return false;
+  return FALSE;
 }
 
 static BOOLEAN _m2_end(leftv res, leftv h)
