@@ -54,7 +54,7 @@ static char* nr2mCoeffString(const coeffs r)
   return s;
 }
 
-coeffs nr2mcfQuot1(number c, const coeffs r)
+coeffs nr2mQuot1(number c, const coeffs r)
 {
     coeffs rr;
     int ch = r->cfInt(c, r);
@@ -146,7 +146,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfName        = ndName;
   r->cfCoeffWrite  = nr2mCoeffWrite;
   r->cfInit_bigint = nr2mMapQ;
-  r->cfQuot1       = nr2mcfQuot1;
+  r->cfQuot1       = nr2mQuot1;
 #ifdef LDEBUG
   r->cfDBTest      = nr2mDBTest;
 #endif

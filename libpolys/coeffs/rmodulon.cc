@@ -58,7 +58,7 @@ static char* nrnCoeffString(const coeffs r)
   return s;
 }
 
-coeffs nrncfQuot1(number c, const coeffs r)
+coeffs nrnQuot1(number c, const coeffs r)
 {
     coeffs rr;
     int ch = r->cfInt(c, r);
@@ -155,7 +155,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->nCoeffIsEqual = nrnCoeffsEqual;
   r->cfInit_bigint = nrnMapQ;
   r->cfKillChar    = ndKillChar;
-  r->cfQuot1       = nrncfQuot1;
+  r->cfQuot1       = nrnQuot1;
 #ifdef LDEBUG
   r->cfDBTest      = nrnDBTest;
 #endif

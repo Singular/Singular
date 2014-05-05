@@ -375,10 +375,9 @@ struct n_Procs_s
   unsigned long modExponent;
   int_number    modNumber;
   unsigned long mod2mMask;
-  
+  //returns coeffs with updated ch, modNumber and modExp
+  coeffs (*cfQuot1)(number c, const coeffs r);
 #endif
-    //change basering r to r/c
-    coeffs (*cfQuot1)(number c, const coeffs r);
 
   /*CF: for blackbox rings */
   void * data;
@@ -953,8 +952,8 @@ static inline void n_ClearDenominators(ICoeffsEnumerator& numberCollectionEnumer
   n_Delete(&d, r);
 }
 
-static inline coeffs cfQuot1(number c, const coeffs r)
-{ assume(r != NULL); return r->cfQuot1(c, r); }
+static inline coeffs n_CoeffRingQuot1(number c, const coeffs r)
+{ assume(r != NULL); assume(r->cfQuot1 != NULL); return r->cfQuot1(c, r); }
 
 /// print a number (BEWARE of string buffers!)
 /// mostly for debugging

@@ -388,7 +388,7 @@ static char* nrzCoeffString(const coeffs)
   return omStrDup("integer");
 }
 
-coeffs nrzcfQuot1(number c, const coeffs r)
+coeffs nrzQuot1(number c, const coeffs r)
 {
     int ch = r->cfInt(c, r);
     int_number dummy;
@@ -442,7 +442,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfDelete= nrzDelete;
   r->cfSetMap = nrzSetMap;
   r->cfCoeffWrite = nrzCoeffWrite;
-  r->cfQuot1 = nrzcfQuot1;
+  r->cfQuot1 = nrzQuot1;
   // debug stuff
 
 #ifdef LDEBUG
