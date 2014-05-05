@@ -699,9 +699,9 @@ static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
   loop
   {
     // read type:
-    while (*p==' ') p++;
+    while ((*p!='\0') && (*p<=' ')) p++;
     start=p;
-    while (isalpha(*p)) p++;
+    while (isalnum(*p)) p++;
     *p='\0';
     IsCmd(start,t);
     if (t==0)
@@ -718,16 +718,16 @@ static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
     elem=(newstruct_member)omAlloc0(sizeof(*elem));
     // read name:
     p++;
-    while (*p==' ') p++;
+    while ((*p!='\0') && (*p<=' ')) p++;
     start=p;
-    while (isalpha(*p)) p++;
+    while (isalnum(*p)) p++;
     c=*p;
     *p='\0';
     elem->typ=t;
     elem->pos=res->size;
-    if (*start=='\0') /*empty name*/
+    if ((*start=='\0') /*empty name*/||(isdigit(*start)))
     {
-      WerrorS("empty name for element");
+      WerrorS("illegal/empty name for element");
       goto error_in_newstruct_def;
     }
     elem->name=omStrDup(start);
@@ -738,7 +738,7 @@ static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
 
     // next ?
     *p=c;
-    while (*p==' ') p++;
+    while ((*p!='\0') && (*p<=' ')) p++;
     if (*p!=',')
     {
       if (*p!='\0')
