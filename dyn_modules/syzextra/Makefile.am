@@ -31,6 +31,7 @@ TESTS_ENVIRONMENT += SINGULAR_BIN_DIR='${abs_top_builddir}/Singular'
 
 TESTS=test_release.sh
 
-EXTRA_DIST = syzextra.tst ederc.tst test_clear_enum.tst test.sh $(TESTS)
+EXTRA_DIST = test.sh $(TESTS) 
+# syzextra.tst ederc.tst test_clear_enum.tst 
 
 CLEANFILES = SimpleTests.json
