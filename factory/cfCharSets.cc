@@ -1255,13 +1255,13 @@ charSetViaCharSetN (const CFList& PS)
 
 /// modified medial set
 CFList
-modCharSet (const CFList& L, StoreFactors& StoredFactors)
+modCharSet (const CFList& L, StoreFactors& StoredFactors, bool removeContents)
 {
   CFList QS= L, RS= L, CSet, tmp, contents, initial, removedFactors;
   CFListIterator i;
   CanonicalForm r, cF;
   bool noRemainder= true;
-  StoreFactors StoredFactors2, StoredFactors3;
+  StoreFactors StoredFactors2;
 
   QS= uniGcd (L);
 
@@ -1287,10 +1287,13 @@ modCharSet (const CFList& L, StoreFactors& StoredFactors)
         if (!r.isZero())
         {
           noRemainder= false;
-          removeContent (r, cF);
+          if (removeContents)
+          {
+            removeContent (r, cF);
 
-          if (!cF.isZero())
-            contents= Union (contents, factorPSet (CFList(cF))); //factorPSet maybe too much it should suffice to do a squarefree factorization instead
+            if (!cF.isZero())
+              contents= Union (contents, factorPSet (CFList(cF))); //factorPSet maybe too much it should suffice to do a squarefree factorization instead
+          }
 
           removeFactors (r, StoredFactors2, removedFactors);
           StoredFactors2.FS1= Union (StoredFactors2.FS1, removedFactors);
@@ -1302,7 +1305,7 @@ modCharSet (const CFList& L, StoreFactors& StoredFactors)
         }
       }
 
-      if (!noRemainder)
+      if (removeContents && !noRemainder)
       {
         StoredFactors.FS1= Union (StoredFactors2.FS1, contents);
         StoredFactors.FS2= StoredFactors2.FS2;
@@ -1324,9 +1327,9 @@ modCharSet (const CFList& L, StoreFactors& StoredFactors)
 
 /// characteristic set via modified medial set
 CFList
-charSetViaModCharSet (const CFList& PS, StoreFactors& StoredFactors)
+charSetViaModCharSet (const CFList& PS, StoreFactors& StoredFactors, bool removeContents)
 {
-  CFList result= modCharSet (PS, StoredFactors);
+  CFList result= modCharSet (PS, StoredFactors, removeContents);
   if (result.isEmpty() || result.getFirst().inCoeffDomain())
     return CFList(1);
   CanonicalForm r;
@@ -1341,21 +1344,14 @@ charSetViaModCharSet (const CFList& PS, StoreFactors& StoredFactors)
   if (RS.isEmpty())
     return result;
 
-  return charSetViaModCharSet (Union (PS, Union (RS, result)), StoredFactors);
+  return charSetViaModCharSet (Union (PS, Union (RS, result)), StoredFactors, removeContents);
 }
 
 CFList
-charSetViaModCharSet (const CFList& PS)
+charSetViaModCharSet (const CFList& PS, bool removeContents)
 {
   StoreFactors tmp;
-  return charSetViaModCharSet (PS, tmp);
-}
-
-CFList
-modCharSet (const CFList& PS)
-{
-  StoreFactors tmp;
-  return modCharSet (PS, tmp);
+  return charSetViaModCharSet (PS, tmp, removeContents);
 }
 
 ListCFList

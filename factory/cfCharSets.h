@@ -53,16 +53,17 @@ charSet (const CFList& PS);
 
 /// modified medial set
 CFList
-modCharSet (const CFList& PS, StoreFactors& StoredFactors);
-
-/// wrapper for modCharSet
-CFList
-modCharSet (const CFList& PS);
+modCharSet (const CFList& PS, StoreFactors& StoredFactors, bool removeContents= true);
 
 /// modified characteristic set, i.e. a characteristic set with certain
 /// factors removed
 CFList
-charSetViaModCharSet (const CFList& PS);
+charSetViaModCharSet (const CFList& PS, StoreFactors& StoredFactors, bool removeContents= true);
+
+/// modified characteristic set, i.e. a characteristic set with certain
+/// factors removed
+CFList
+charSetViaModCharSet (const CFList& PS, bool removeContents= true);
 
 /// characteristic series
 ListCFList
