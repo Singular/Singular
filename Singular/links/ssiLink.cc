@@ -56,8 +56,9 @@
 #include <sys/wait.h>
 #include <time.h>
 
-#define SSI_VERSION 6
+#define SSI_VERSION 7
 // 5->6: changed newstruct representation
+// 6->7: attributes
 
 // 64 bit version:
 //#if SIZEOF_LONG == 8
