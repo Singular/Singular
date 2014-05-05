@@ -737,67 +737,55 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     WerrorS("qring_id expected");
     return TRUE;
   }
+  assume(res->Data()==NULL);
 
-  ring qr,origr;
+  coeffs newcf = currRing->cf;
+#ifdef HAVE_RINGS
+  ideal id = (ideal)a->Data(); //?
+  const int cpos = idPosConstant(id);  
+  if(rField_is_Ring(currRing))
+    if (cpos >= 0)
+    {
+        newcf = n_CoeffRingQuot1(p_GetCoeff(id->m[cpos], currRing), currRing->cf);
+        if(newcf == NULL)
+          return TRUE;
+    }
+#endif
   //qr=(ring)res->Data();
   //if (qr!=NULL) omFreeBin((ADDRESS)qr, ip_sring_bin);
-  assume(res->Data()==NULL);
-  origr = rCopy(currRing);
-  qr = rCopy(currRing);
-
-#ifdef HAVE_RINGS
-  ideal id=(ideal)a->CopyD(IDEAL_CMD);
-  if((rField_is_Ring(currRing)) && (idPosConstant(id) != -1))
-    {
-        //qr = updateQring(currRing, id, idPosConstant(id));
-        //rWrite(currRing);
-        number c;
-        //printf("\n");
-        c = p_GetCoeff(id->m[idPosConstant(id)], currRing);
-        qr->cf = currRing->cf->cfQuot1(c, currRing->cf);
-        //rWrite(qr);
-        if(qr->cf == NULL)
-            return TRUE;
-    }
-  else
-#endif
-    qr=rCopy(currRing);
-    
+  ring qr = rCopy(currRing);
+  assume(qr->cf == currRing->cf);
+  
+  if ( qr->cf != newcf )
+  {
+    nKillChar ( qr->cf ); // ???
+    qr->cf = newcf;
+  }  
                  // we have to fill it, but the copy also allocates space
   idhdl h=(idhdl)res->data; // we have res->rtyp==IDHDL
   IDRING(h)=qr;
+  
   ideal qid;
-  //rWrite(qr);
-  //printf("\norigr\n");
-  //rWrite(origr);
-  //  printf("\nqr\n");
-  //rWrite(qr);
-  //  printf("\ncurrRing\n");
-  //rWrite(currRing);
+
 #ifdef HAVE_RINGS
-  if((rField_is_Ring(currRing)) && (idPosConstant(id) != -1))
+  if((rField_is_Ring(currRing)) && (cpos != -1))
     {
-      //rChangeCurrRing(qr);
-      //rWrite(qr);
-      int *perm=NULL;
-      int i;
-      perm=(int *)omAlloc0((qr->N+1)*sizeof(int));
+      int i, j;
+      int *perm = (int *)omAlloc0((qr->N+1)*sizeof(int));
+      
       for(i=qr->N;i>0;i--) 
-      {
         perm[i]=i;
-      }
-      nMapFunc nMap = NULL;
-      nMap = n_SetMap(origr->cf, qr->cf);
-      qid = idInit(IDELEMS(id),1);
-      for(i = 0; i<IDELEMS(id); i++)
-      {
-        qid->m[i] = p_PermPoly(id->m[i], perm, origr, qr, nMap, NULL, 0);
-        
-      }
+
+      nMapFunc nMap = n_SetMap(currRing->cf, newcf);
+      qid = idInit(IDELEMS(id)-1,1);
+      for(i = 0, j = 0; i<IDELEMS(id); i++)
+        if( i != cpos )
+          qid->m[j++] = p_PermPoly(id->m[i], perm, currRing, qr, nMap, NULL, 0);
     }
     else
 #endif
       qid = idrCopyR(id,currRing,qr);
+      
   idSkipZeroes(qid);
   //idPrint(qid);
   if ((idElem(qid)>1) || rIsSCA(currRing) || (currRing->qideal!=NULL))

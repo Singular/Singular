@@ -507,6 +507,9 @@ static inline BOOLEAN n_IsUnit(number n, const coeffs r)
 //   it would make more sense to return the inverse...
 static inline number n_GetUnit(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfGetUnit!=NULL); return r->cfGetUnit(n,r); }
+
+static inline coeffs n_CoeffRingQuot1(number c, const coeffs r)
+{ assume(r != NULL); assume(r->cfQuot1 != NULL); return r->cfQuot1(c, r); }
 #endif
 
 /// a number representing i in the given coeff field/ring r
@@ -952,12 +955,12 @@ static inline void n_ClearDenominators(ICoeffsEnumerator& numberCollectionEnumer
   n_Delete(&d, r);
 }
 
-static inline coeffs n_CoeffRingQuot1(number c, const coeffs r)
-{ assume(r != NULL); assume(r->cfQuot1 != NULL); return r->cfQuot1(c, r); }
 
 /// print a number (BEWARE of string buffers!)
 /// mostly for debugging
 void   n_Print(number& a,  const coeffs r);
 
 #endif
+
+
 
