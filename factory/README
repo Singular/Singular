@@ -20,9 +20,10 @@ Overview
 7.  Diagnostic Messages
 8.  GF(q) Tables
 9.  A Note on Singular
-11. Factory Template Instantiation
-12. Documentation
-13. Examples and Tests
+10. Factory Template Instantiation
+11. Documentation
+12. Examples and Tests
+13. Remark on Characteristic Sets
 
 1. What is Factory?
 ===================
@@ -195,4 +196,18 @@ unpack into a directory `factory-doc-prelim/'.
 example applications for Factory.
 
   'make check' will run some simple test as well.
+
+13. Remark on Characteristic Sets
+=================================
+Algorithms for manipulation of polynomial ideals via the characteristic set
+methods (e.g., calculating the characteristic set and the irreducible
+characteristic series) are now incorpareted into factory.
+If you want to learn about characteristic sets, the next is a good point
+to start with:
+    Dongming Wang:
+    An Implementation of the Characteristic Set Method in Maple.
+    In: Automated Practical Reasoning: Algebraic Approaches
+    (J. Pfalzgraf and D. Wang, eds.), Springer-Verlag,
+    Wien-New York, 1995, pp. 187-201.
+
 
