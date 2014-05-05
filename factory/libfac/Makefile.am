@@ -28,5 +28,4 @@ libfac_includedir=$(includedir)/factory/libfac
 libfac_include_HEADERS   = libfac.h 
 
 EXTRA_DIST = test.cc testcs.cc header.tpl \
-      charset/tests bin \
-      ChangeLog 00README 
+      charset/tests
