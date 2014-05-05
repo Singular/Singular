@@ -1,10 +1,6 @@
 ACLOCAL_AMFLAGS = -I ../m4
-# TODO: use ${top_srcdir} instead of .. in the above?
 
-SUBDIRS=numeric fglm groebner_walk combinatorics spectrum linear_algebra maps GBEngine oswrapper  
-
-noinst_LTLIBRARIES = libkernel.la 
-###### libkerneldir = $(libdir)/singular
+noinst_LTLIBRARIES = libkernelCommon.la libkernel.la
 
 AM_CPPFLAGS = \
 -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
@@ -16,17 +12,21 @@ SOURCES = polys.cc \
     preimage.cc \
     mod2.h 
 
- 
-libkernel_la_SOURCES   = $(SOURCES)
+libkernelCommon_la_SOURCES  = $(SOURCES)
+libkernelCommon_la_LIBADD   = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
+${abs_top_builddir}/libpolys/polys/libpolys.la
 
-KERNELHEADERS = mod2.h polys.h ideals.h \
-	structs.h \
-	preimage.h fast_mult.h \
-	digitech.h 
-	
+###### libkerneldir = $(libdir)/singular
 
-libkernel_la_includedir  =${includedir}/singular/kernel
-libkernel_la_include_HEADERS   = $(KERNELHEADERS)
+KERNELHEADERS = mod2.h structs.h polys.h ideals.h \
+	preimage.h fast_mult.h digitech.h 
+
+libkernel_la_SOURCES=$(KERNELHEADERS)
+
+libkernel_la_includedir=${includedir}/singular/kernel
+libkernel_la_include_HEADERS=$(KERNELHEADERS)
+
+SUBDIRS=numeric fglm groebner_walk combinatorics spectrum linear_algebra maps GBEngine oswrapper  
 
 libkernel_la_LIBADD   = \
 ${builddir}/numeric/libnumeric.la \
@@ -38,8 +38,7 @@ ${builddir}/linear_algebra/liblinear_algebra.la \
 ${builddir}/maps/libmaps.la \
 ${builddir}/GBEngine/libGBEngine.la \
 ${builddir}/oswrapper/liboswrapper.la \
-${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
-${abs_top_builddir}/libpolys/polys/libpolys.la
+${builddir}/libkernelCommon.la
 
 ### TODO: the following has to be addapted...
 TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables'
@@ -61,4 +60,5 @@ test_LDADD   = libkernel.la
 
 CLEANFILES = $(TESTS)
 # $(BUILT_SOURCES)
+
 
