@@ -2932,13 +2932,26 @@ static number nlReadFd(s_buff f, const coeffs)
   }
   return NULL;
 }
+BOOLEAN nlCoeffIsEqual(const coeffs r, n_coeffType n, void *p)
+{
+  /* test, if r is an instance of nInitCoeffs(n,parameter) */
+  /* if paramater is not needed */
+  if (n==r->type)
+  {
+    if ((p==NULL)&&(r->cfDiv==nlDiv)) return TRUE;
+    if ((p!=NULL)&&(r->cfDiv!=nlDiv)) return TRUE;
+  }
+  return FALSE;
+}
 
-BOOLEAN nlInitChar(coeffs r, void*)
+
+
+BOOLEAN nlInitChar(coeffs r, void*p)
 {
   assume( getCoeffType(r) == ID );
   //const int ch = (int)(long)(p);
 
-  r->nCoeffIsEqual=ndCoeffIsEqual;
+  r->nCoeffIsEqual=nlCoeffIsEqual;
   r->cfKillChar = ndKillChar; /* dummy */
   r->cfCoeffString=nlCoeffString;
 
@@ -2948,7 +2961,8 @@ BOOLEAN nlInitChar(coeffs r, void*)
   r->cfMult  = nlMult;
   r->cfSub   = nlSub;
   r->cfAdd   = nlAdd;
-  r->cfDiv   = nlDiv;
+  if (p==NULL) r->cfDiv   = nlDiv;
+  else         r->cfDiv   = nlIntDiv;
   r->cfIntDiv= nlIntDiv;
   r->cfIntMod= nlIntMod;
   r->cfExactDiv= nlExactDiv;

@@ -1205,7 +1205,7 @@ void siInit(char *name)
   currPackHdl=h;
   basePackHdl=h;
 
-  coeffs_BIGINT = nInitChar(n_Q,NULL);
+  coeffs_BIGINT = nInitChar(n_Q,(void*)1);
 
 #if 1
    // def HAVE_POLYEXTENSIONS

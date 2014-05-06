@@ -1176,7 +1176,7 @@ static BOOLEAN jjDIV_BI(leftv res, leftv u, leftv v)
     WerrorS(ii_div_by_0);
     return TRUE;
   }
-  q = n_IntDiv((number)u->Data(),q,coeffs_BIGINT);
+  q = n_Div((number)u->Data(),q,coeffs_BIGINT);
   n_Normalize(q,coeffs_BIGINT);
   res->data = (char *)q;
   return FALSE;
