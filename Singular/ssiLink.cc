@@ -27,6 +27,7 @@
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
+#include <Singular/attrib.h>
 #include <omalloc/omalloc.h>
 #include <kernel/ring.h>
 #include <kernel/matpol.h>
