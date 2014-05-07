@@ -19,9 +19,6 @@
 
 #include <factory/factory.h>
 
-#    include <factory/libfac/libfac.h>
-
-
 #include <omalloc/omalloc.h>
 #include <coeffs/numbers.h>
 #include <coeffs/coeffs.h>
