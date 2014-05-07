@@ -121,6 +121,8 @@ SING_CHECK_POLYMAKE
 
 SING_CHECK_PLURAL
 
+SING_BUILTIN_MODULES
+
 ### the following is needed due to the use of om_sing_opt_show_mem in misc_ip.cc...
 #ac_configure_args="$ac_configure_args --with-external-config_h=../Singular/omSingularConfig.h"
 

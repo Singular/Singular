@@ -288,3 +288,53 @@ AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
   AC_MSG_RESULT($ENABLE_FACTORY)
 
 ])
+
+
+
+AC_DEFUN([SING_BUILTIN_MODULES],
+[
+ AC_MSG_CHECKING([whether for builtin modules])
+
+ AC_ARG_VAR( [BUILTIN_LIBS], [LIBS for building-in] )
+ AC_ARG_WITH(builtinmodules, AS_HELP_STRING([--with-builtinmodules], [list? of builtin modules (experimental)]))
+
+ if test "x$with_builtinmodules" == xno; then
+  AC_MSG_RESULT(no)
+ else
+  AC_DEFINE_UNQUOTED([SI_BUILTINMODULES],"$with_builtinmodules",[List? of Builtin modules])
+  AC_MSG_RESULT(yes)
+  
+  if test "x$with_builtinmodules" == xyes; then
+    with_builtinmodules=pyobject,syzextra,callgfanlib,callpolymake
+  fi
+
+  L=""
+  for a in ${with_builtinmodules//,/ }; do
+    echo "Will build-in '$a'..."
+    case "$a" in
+      pyobject ) BUILTIN_PYOBJECT=yes;;
+      syzextra ) BUILTIN_SYZEXTRA=yes;;
+      callgfanlib ) BUILTIN_GFAN=yes;;
+      callpolymake ) BUILTIN_PM=yes;;
+    esac
+     L+="add($a)"
+  done # for
+  echo "L=$L"
+  
+ fi # else
+ 
+ AC_SUBST(BUILTIN_LIBS)
+
+ AM_CONDITIONAL([SI_BUILTIN_PYOBJECT],[test "x$BUILTIN_PYOBJECT" == xyes])
+ AM_CONDITIONAL([SI_BUILTIN_SYZEXTRA],[test "x$BUILTIN_SYZEXTRA" == xyes])
+ AM_CONDITIONAL([SI_BUILTIN_GFANLIB],[test "x$BUILTIN_GFAN" == xyes])
+ AM_CONDITIONAL([SI_BUILTIN_PM],[test "x$BUILTIN_PM" == xyes])
+
+ AC_MSG_CHECKING([BUILTIN_LIBS?..])
+ AC_MSG_RESULT(${BUILTIN_LIBS:-unset})
+
+ AC_MSG_CHECKING([builtinmodules?..])
+ AC_MSG_RESULT(${with_builtinmodules:-unset})
+
+
+])

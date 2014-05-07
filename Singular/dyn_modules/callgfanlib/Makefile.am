@@ -27,6 +27,7 @@ gfanlib_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
 gfanlib_la_LDFLAGS  = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS}
 
 gfanlib_la_LIBADD   = ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
+#  ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
 
 
 #AM_COLOR_TESTS=always

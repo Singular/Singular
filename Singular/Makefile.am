@@ -4,26 +4,44 @@ GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES)  $(GMP_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DGIT_VERSION='"$(GIT_VERSION)"'
 
-########################### Dynamic Modules... #########################
 SUBDIRS = dyn_modules
 
-if HAVE_GFANLIB
-  USE_GFANLIB = ${builddir}/dyn_modules/callgfanlib/gfanlib.la ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
-else
-  USE_GFANLIB = 
+########################### Possible builtin modules... #########################
+BUILTIN_FLAGS = ${BUILTIN_LIBS}
+## ${EMBED_SYZEXTRA} ${EMBED_PYOBJECT} ${EMBED_GFANLIB} ${EMBED_PM}
+
+## EMBED_SYZEXTRA = 
+if SI_BUILTIN_SYZEXTRA
+  BUILTIN_FLAGS += ${builddir}/dyn_modules/syzextra/syzextra.la
 endif
 
-if PYTHON_USE
-  PY=${builddir}/dyn_modules/pyobject/pyobject.la
-else !PYTHON_USE
-  PY=
-endif !PYTHON_USE
+## EMBED_GFANLIB = 
+if HAVE_GFANLIB
+  GF = ${builddir}/dyn_modules/callgfanlib/gfanlib.la
+endif
 
-if SI_EMBED_PYTHON
- EMBED_PYOBJECT   = ${PY} ${builddir}/dyn_modules/syzextra/syzextra.la ${USE_GFANLIB}
-else !SI_EMBED_PYTHON
-  EMBED_PYOBJECT = 
-endif !SI_EMBED_PYTHON
+if SI_BUILTIN_GFANLIB
+  BUILTIN_FLAGS += ${GF}
+endif
+
+
+## EMBED_PM 
+if SI_BUILTIN_PM 
+  PM=${builddir}/dyn_modules/callpolymake/polymake.la
+endif
+
+if SING_HAVE_POLYMAKE
+  BUILTIN_FLAGS += ${PM}
+endif
+
+## EMBED_PYOBJECT = 
+if SI_BUILTIN_PYOBJECT 
+if SI_EMBED_PYTHON 
+if PYTHON_USE
+  BUILTIN_FLAGS += ${builddir}/dyn_modules/pyobject/pyobject.la    
+endif
+endif
+endif
 
 ########################### libSingular* #########################
 
@@ -140,7 +158,7 @@ SingularHEADERS = \
 nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc 
 
 libSingular_la_LDFLAGS    =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION} ${PTHREAD_LDFLAGS}
-libSingular_la_LIBADD     =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT} ${top_builddir}/kernel/libkernel.la ${PTHREAD_LIBS}
+libSingular_la_LIBADD     =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${BUILTIN_FLAGS} ${top_builddir}/kernel/libkernel.la ${PTHREAD_LIBS}
 
 libSingular_includedir = ${includedir}/singular/Singular
 nobase_libSingular_include_HEADERS = $(SingularHEADERS)
@@ -176,16 +194,15 @@ Singular ESingular TSingular $(optional_Singular_programs): ${abs_builddir}/LIB
 
 Singular_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
-Singular_LDADD = libSingular.la ${EMBED_PYOBJECT}
+Singular_LDADD = libSingular.la ${BUILTIN_FLAGS}
 
-Singular_LDFLAGS = -static ${EMBED_PYOBJECT}
+Singular_LDFLAGS = -static ${BUILTIN_FLAGS}
 
 Singulars_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
-#  ${EMBED_PYOBJECT_LDFLAGS}  ${EMBED_PYOBJECT_LDFLAGS}
-Singulars_LDADD = libSingular.la ${EMBED_PYOBJECT}
+Singulars_LDADD = libSingular.la ${BUILTIN_FLAGS}
 
-Singulars_LDFLAGS = -static ${AM_LDFLAGS} ${EMBED_PYOBJECT}
+Singulars_LDFLAGS = -static ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
 scriptdir = $(libexecdir)/singular/MOD
 dist_script_SCRIPTS = singularsurf
@@ -246,7 +263,6 @@ TESTS=test
 check_PROGRAMS=$(TESTS)
 
 test_SOURCES = test.cc
-# ${EMBED_PYOBJECT_LDFLAGS}
 test_LDADD = libSingular.la 
 
 #########################################################
