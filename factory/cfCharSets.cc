@@ -1277,12 +1277,29 @@ charSetN (const CFList &PS)
 CFList
 charSetViaCharSetN (const CFList& PS)
 {
-  CFList result= charSetN (PS);
+  CFList L;
+  CFFList sqrfFactors;
+  CanonicalForm sqrf;
+  CFFListIterator iter2;
+  for (CFListIterator iter= PS; iter.hasItem(); iter++)
+  {
+    sqrf= 1;
+    sqrfFactors= sqrFree (iter.getItem());
+    for (iter2= sqrfFactors; iter2.hasItem(); iter2++)
+      sqrf *= iter2.getItem().factor();
+    L= Union (L, CFList (normalize (sqrf)));
+  }
+
+  CFList result= charSetN (L);
+
   if (result.isEmpty() || result.getFirst().inCoeffDomain())
     return CFList(1);
+
   CanonicalForm r;
   CFList RS;
-  for (CFListIterator i= PS; i.hasItem(); i++)
+  CFList tmp= Difference (L, result);
+
+  for (CFListIterator i= tmp; i.hasItem(); i++)
   {
     r= Premb (i.getItem(), result);
     if (!r.isZero())
@@ -1290,7 +1307,8 @@ charSetViaCharSetN (const CFList& PS)
   }
   if (RS.isEmpty())
     return result;
-  return charSetViaCharSetN (Union (PS, Union (RS, result)));
+
+  return charSetViaCharSetN (Union (L, Union (RS, result)));
 }
 
 /// modified medial set
@@ -1369,12 +1387,30 @@ modCharSet (const CFList& L, StoreFactors& StoredFactors, bool removeContents)
 CFList
 charSetViaModCharSet (const CFList& PS, StoreFactors& StoredFactors, bool removeContents)
 {
-  CFList result= modCharSet (PS, StoredFactors, removeContents);
+  CFList L;
+  CFFList sqrfFactors;
+  CanonicalForm sqrf;
+  CFFListIterator iter2;
+  for (CFListIterator iter= PS; iter.hasItem(); iter++)
+  {
+    sqrf= 1;
+    sqrfFactors= sqrFree (iter.getItem());
+    for (iter2= sqrfFactors; iter2.hasItem(); iter2++)
+      sqrf *= iter2.getItem().factor();
+    L= Union (L, CFList (normalize (sqrf)));
+  }
+
+  L= uniGcd (L);
+
+  CFList result= modCharSet (L, StoredFactors, removeContents);
+
   if (result.isEmpty() || result.getFirst().inCoeffDomain())
     return CFList(1);
+
   CanonicalForm r;
   CFList RS;
-  CFList tmp= Difference (PS, result);
+  CFList tmp= Difference (L, result);
+
   for (CFListIterator i= tmp; i.hasItem(); i++)
   {
     r= Premb (i.getItem(), result);
@@ -1384,7 +1420,7 @@ charSetViaModCharSet (const CFList& PS, StoreFactors& StoredFactors, bool remove
   if (RS.isEmpty())
     return result;
 
-  return charSetViaModCharSet (Union (PS, Union (RS, result)), StoredFactors, removeContents);
+  return charSetViaModCharSet (Union (L, Union (RS, result)), StoredFactors, removeContents);
 }
 
 CFList
@@ -1557,8 +1593,23 @@ ListCFList
 irrCharSeries (const CFList & PS)
 {
   CanonicalForm reducible, reducible2;
-  CFList qs, cs, factorset, is, ts;
-  ListCFList pi, ppi, qqi, qsi, iss, qhi= ListCFList(PS);
+  CFList qs, cs, factorset, is, ts, L;
+  CanonicalForm sqrf;
+  CFFList sqrfFactors;
+  CFFListIterator iter2;
+  for (CFListIterator iter= PS; iter.hasItem(); iter++)
+  {
+    sqrf= 1;
+    sqrfFactors= sqrFree (iter.getItem());
+    if (sqrfFactors.getFirst().factor().inCoeffDomain())
+      sqrfFactors.removeFirst();
+    for (iter2= sqrfFactors; iter2.hasItem(); iter2++)
+      sqrf *= iter2.getItem().factor();
+    sqrf= normalize (sqrf);
+    L= Union (L, CFList (sqrf));
+  }
+
+  ListCFList pi, ppi, qqi, qsi, iss, qhi= ListCFList(L);
 
   int nr_of_iteration= 0, indexRed, highestlevel= 0;
 
