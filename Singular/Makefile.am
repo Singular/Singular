@@ -4,37 +4,17 @@ GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES)  $(GMP_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DGIT_VERSION='"$(GIT_VERSION)"'
 
+########################### Dynamic Modules... #########################
+SUBDIRS = dyn_modules
+
 if HAVE_GFANLIB
   USE_GFANLIB = ${builddir}/dyn_modules/callgfanlib/gfanlib.la ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
 else
   USE_GFANLIB = 
 endif
 
-# AM_LDFLAGS = libSingular.la ${top_builddir}/kernel/libkernel.la
-
-########################### Dynamic Modules... #########################
-SUBDIRS = dyn_modules
-
-if ENABLE_P_PROCS_DYNAMIC
-  moduledir = $(libexecdir)/singular/MOD
-else !ENABLE_P_PROCS_DYNAMIC
-  moduledir = $(libdir)/singular
-endif !ENABLE_P_PROCS_DYNAMIC
-
-##########################################################################
-module_LTLIBRARIES = pyobject.la
-
-pyobject_la_SOURCES = pyobject.cc
-
-pyobject_la_CXXFLAGS = $(PYTHON_CSPEC)
-pyobject_la_CPPFLAGS = $(PYTHON_CPPFLAGS)  ${AM_CPPFLAGS}
-
-pyobject_la_LDFLAGS = $(PYTHON_EXTRA_LIBS)  $(PYTHON_LSPEC) ${AM_LDFLAGS} $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
-###  -export-dynamic -shared -module -avoid-version (add to all DMs?)
-
-##########################################################################
 if PYTHON_USE
-  PY=pyobject.la  $(PYTHON_EXTRA_LIBS)  $(PYTHON_LSPEC) $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) 
+  PY=${builddir}/dyn_modules/pyobject/pyobject.la
 else !PYTHON_USE
   PY=
 endif !PYTHON_USE

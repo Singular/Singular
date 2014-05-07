@@ -237,6 +237,7 @@ AC_CONFIG_FILES([Singular/dyn_modules/bigintm/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/syzextra/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/callgfanlib/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/callpolymake/Makefile])
+AC_CONFIG_FILES([Singular/dyn_modules/pyobject/Makefile])
 
 AC_CONFIG_FILES([Singular/Makefile])
 
