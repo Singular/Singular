@@ -1711,6 +1711,6 @@ irrCharSeries (const CFList & PS)
   }
   if (!qsi.isEmpty())
     return contract (qsi);
-  return ListCFList() ;
+  return ListCFList(CFList (1)) ;
 }
 
