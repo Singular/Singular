@@ -1422,7 +1422,7 @@ matrix singclap_irrCharSeries ( ideal I, const ring r)
   ListIterator<CFList> LLi;
   loop
   {
-    LL=IrrCharSeries(L);
+    LL=irrCharSeries(L);
     m= LL.length(); // Anzahl Zeilen
     n=0;
     for ( LLi = LL; LLi.hasItem(); LLi++ )
