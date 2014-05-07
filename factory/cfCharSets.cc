@@ -971,7 +971,11 @@ removeContent (CanonicalForm& F, CanonicalForm& cF)
   if (cF.inCoeffDomain())
     cF= 0;
   else
+  {
     cF= normalize (cF);
+    F /= cF;
+    F= normalize (F);
+  }
 }
 
 CFList
