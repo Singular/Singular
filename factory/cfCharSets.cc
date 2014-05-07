@@ -820,10 +820,15 @@ CanonicalForm normalize (const CanonicalForm& F)
     bool isRat= isOn (SW_RATIONAL);
     if (!isRat)
       On (SW_RATIONAL);
-    G= F/lc(F);
+    G= F;
     G *= bCommonDen (G);
     if (!isRat)
       Off (SW_RATIONAL);
+    if (isRat)
+      Off (SW_RATIONAL);
+    G= F/icontent (F);
+    if (isRat)
+      On (SW_RATIONAL);
     return G;
   }
 
@@ -894,7 +899,39 @@ Prem (const CanonicalForm& F, const CanonicalForm& G)
 
 static
 CanonicalForm
-Prem( const CanonicalForm &f, const CFList &L)
+Premb (const CanonicalForm &f, const CFList &L)
+{
+  CanonicalForm rem= f;
+  CFList l= L;
+  l.removeFirst();
+  CFListIterator i= l;
+
+  for (i.lastItem(); i.hasItem(); i--)
+    rem= normalize (Prem (rem, i.getItem()));
+
+  CanonicalForm tmp= L.getFirst()/content (L.getFirst());
+
+  bool isRat= isOn (SW_RATIONAL);
+  if (getCharacteristic() == 0 && !isRat)
+    On (SW_RATIONAL);
+  if (fdivides (tmp, rem))
+  {
+    if (getCharacteristic() == 0 && !isRat)
+      Off (SW_RATIONAL);
+    return 0;
+  }
+
+  if (getCharacteristic() == 0 && !isRat)
+    Off (SW_RATIONAL);
+
+  rem= normalize (Prem (rem, L.getFirst()));
+
+  return rem;
+}
+
+static
+CanonicalForm
+Prem (const CanonicalForm &f, const CFList &L)
 {
   CanonicalForm rem= f;
   CFListIterator i= L;
@@ -904,7 +941,6 @@ Prem( const CanonicalForm &f, const CFList &L)
 
   return rem;
 }
-
 
 CFList uniGcd (const CFList& L)
 {
@@ -938,7 +974,7 @@ factorsOfInitials(const CFList & L)
 
   for (CFListIterator i= L; i.hasItem(); i++)
   {
-    factors= factorize (LC(i.getItem()));
+    factors= factorize (LC (i.getItem()));
     for (CFFListIterator j= factors; j.hasItem(); j++)
     {
       tmp= j.getItem().factor();
@@ -1248,13 +1284,13 @@ charSetViaCharSetN (const CFList& PS)
   CFList RS;
   for (CFListIterator i= PS; i.hasItem(); i++)
   {
-    r= Prem (i.getItem(), result);
+    r= Premb (i.getItem(), result);
     if (!r.isZero())
       RS= Union (RS, CFList (r));
   }
   if (RS.isEmpty())
     return result;
-  return charSetViaCharSetN (Union (PS,Union (RS, result)));
+  return charSetViaCharSetN (Union (PS, Union (RS, result)));
 }
 
 /// modified medial set
@@ -1341,7 +1377,7 @@ charSetViaModCharSet (const CFList& PS, StoreFactors& StoredFactors, bool remove
   CFList tmp= Difference (PS, result);
   for (CFListIterator i= tmp; i.hasItem(); i++)
   {
-    r= Prem (i.getItem(), result);
+    r= Premb (i.getItem(), result);
     if (!r.isZero())
       RS= Union (RS, CFList (r));
   }
@@ -1598,7 +1634,7 @@ irrCharSeries (const CFList & PS)
         if (indexRed > 1)
         {
           CFList cst;
-          for (CFListIterator i=cs ; i.hasItem(); i++)
+          for (CFListIterator i= cs ; i.hasItem(); i++)
           {
             if (i.getItem() == reducible)
               break;
