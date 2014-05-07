@@ -5,7 +5,7 @@ GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES)  $(GMP_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DGIT_VERSION='"$(GIT_VERSION)"'
 
 if HAVE_GFANLIB
-  USE_GFANLIB = ${top_builddir}/dyn_modules/callgfanlib/gfanlib.la ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
+  USE_GFANLIB = ${builddir}/dyn_modules/callgfanlib/gfanlib.la ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
 else
   USE_GFANLIB = 
 endif
@@ -13,6 +13,8 @@ endif
 # AM_LDFLAGS = libSingular.la ${top_builddir}/kernel/libkernel.la
 
 ########################### Dynamic Modules... #########################
+SUBDIRS = dyn_modules
+
 if ENABLE_P_PROCS_DYNAMIC
   moduledir = $(libexecdir)/singular/MOD
 else !ENABLE_P_PROCS_DYNAMIC
@@ -38,7 +40,7 @@ else !PYTHON_USE
 endif !PYTHON_USE
 
 if SI_EMBED_PYTHON
- EMBED_PYOBJECT   = ${PY} ${top_builddir}/dyn_modules/syzextra/syzextra.la ${USE_GFANLIB}
+ EMBED_PYOBJECT   = ${PY} ${builddir}/dyn_modules/syzextra/syzextra.la ${USE_GFANLIB}
 else !SI_EMBED_PYTHON
   EMBED_PYOBJECT = 
 endif !SI_EMBED_PYTHON

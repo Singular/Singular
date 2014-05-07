@@ -2,9 +2,9 @@
 #include <polymake_documentation.h>
 #include <polymake/Graph.h>
 
-#include <dyn_modules/callgfanlib/bbcone.h>
-#include <dyn_modules/callgfanlib/bbfan.h>
-#include <dyn_modules/callgfanlib/bbpolytope.h>
+#include <Singular/dyn_modules/callgfanlib/bbcone.h>
+#include <Singular/dyn_modules/callgfanlib/bbfan.h>
+#include <Singular/dyn_modules/callgfanlib/bbpolytope.h>
 
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
