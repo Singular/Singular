@@ -876,15 +876,14 @@ Prem (const CanonicalForm& F, const CanonicalForm& G)
       test= gcd (l, LC(f));
       lu= l / test;
       lv= LC(f) / test;
-
-      t= power (v, degF - degG)*g*lv;
+      t= g*lv*power (v, degF - degG);
 
       if (degF == 0)
         f= 0;
       else
         f= f - LC (f)*power (v, degF);
 
-      f= lu*f - t;
+      f= f*lu - t;
       degF= degree (f, v);
     }
 
