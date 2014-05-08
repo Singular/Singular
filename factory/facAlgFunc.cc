@@ -26,9 +26,7 @@
 #include "debug.h"
 
 #include "algext.h"
-#include "cf_random.h"
 #include "cf_generator.h"
-#include "cf_irred.h"
 #include "cf_iter.h"
 #include "cf_util.h"
 #include "cf_algorithm.h"
@@ -36,346 +34,9 @@
 #include "cfModResultant.h"
 #include "cfCharSets.h"
 #include "facAlgFunc.h"
+#include "facAlgFuncUtil.h"
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
-
-static
-CanonicalForm
-Prem (const CanonicalForm& F, const CanonicalForm& G)
-{
-  CanonicalForm f, g, l, test, lu, lv, t, retvalue;
-  int degF, degG, levelF, levelG;
-  bool reord;
-  Variable v, vg= G.mvar();
-
-  if ( (levelF= F.level()) < (levelG= G.level()))
-    return F;
-  else
-  {
-    if ( levelF == levelG )
-    {
-      f= F;
-      g= G;
-      reord= false;
-      v= F.mvar();
-    }
-    else
-    {
-      v= Variable (levelF + 1);
-      f= swapvar (F, vg, v);
-      g= swapvar (G, vg, v);
-      reord= true;
-    }
-    degG= degree (g, v );
-    degF= degree (f, v );
-    if (degG <= degF)
-    {
-      l= LC (g);
-      g= g - l*power (v, degG);
-    }
-    else
-      l= 1;
-    while ((degG <= degF) && (!f.isZero()))
-    {
-      test= gcd (l, LC(f));
-      lu= l / test;
-      lv= LC(f) / test;
-
-      t= power (v, degF - degG)*g*lv;
-
-      if (degF == 0)
-        f= 0;
-      else
-        f= f - LC (f)*power (v, degF);
-
-      f= lu*f - t;
-      degF= degree (f, v);
-    }
-
-    if (reord)
-      retvalue= swapvar (f, vg, v);
-    else
-      retvalue= f;
-
-    return retvalue;
-  }
-}
-
-static
-CanonicalForm
-Prem( const CanonicalForm &f, const CFList &L)
-{
-  CanonicalForm rem= f;
-  CFListIterator i= L;
-
-  for (i.lastItem(); i.hasItem(); i--)
-    rem= normalize (Prem (rem, i.getItem()));
-
-  return rem;
-}
-
-static
-CanonicalForm
-Prem (const CanonicalForm &f, const CFList &L, const CFList &as)
-{
-  CanonicalForm rem = f;
-  CFListIterator i = L;
-  for ( i.lastItem(); i.hasItem(); i-- )
-    rem = Prem( rem, i.getItem() );
-  return normalize (rem); //TODO better normalize in case as.length() == 1 && as.getFirst().level() == 1 ???
-}
-
-CFFList
-myappend( const CFFList & Inputlist, const CFFactor & TheFactor)
-{
-  CFFList Outputlist ;
-  CFFactor copy;
-  CFFListIterator i;
-  int exp=0;
-
-  for ( i=Inputlist ; i.hasItem() ; i++ )
-  {
-    copy = i.getItem();
-    if ( copy.factor() == TheFactor.factor() )
-      exp += copy.exp();
-    else
-      Outputlist.append(copy);
-  }
-  Outputlist.append( CFFactor(TheFactor.factor(), exp + TheFactor.exp()));
-  return Outputlist;
-}
-
-CFFList
-myUnion(const CFFList & Inputlist1,const CFFList & Inputlist2)
-{
-  CFFList Outputlist;
-  CFFListIterator i;
-
-  for ( i=Inputlist1 ; i.hasItem() ; i++ )
-    Outputlist = myappend(Outputlist, i.getItem() );
-  for ( i=Inputlist2 ; i.hasItem() ; i++ )
-    Outputlist = myappend(Outputlist, i.getItem() );
-
-  return Outputlist;
-}
-
-///////////////////////////////////////////////////////////////
-// generate a minpoly of degree degree_of_Extension in the   //
-// field getCharacteristik()^Extension.                      //
-///////////////////////////////////////////////////////////////
-CanonicalForm
-generate_mipo( int degree_of_Extension , const Variable & Extension )
-{
-  FFRandom gen;
-  /*if (degree (Extension) < 0)
-    factoryError("libfac: evaluate: Extension not inFF() or inGF() !");*/
-  return find_irreducible( degree_of_Extension, gen, Variable(1) );
-}
-
-static Varlist
-Var_is_in_AS(const Varlist & uord, const CFList & Astar);
-
-////////////////////////////////////////////////////////////////////////
-// This implements the algorithm of Trager for factorization of
-// (multivariate) polynomials over algebraic extensions and so called
-// function field extensions.
-////////////////////////////////////////////////////////////////////////
-
-// // missing class: IntGenerator:
-bool IntGenerator::hasItems() const
-{
-    return 1;
-}
-
-CanonicalForm IntGenerator::item() const
-//int IntGenerator::item() const
-{
-  //return current; //CanonicalForm( current );
-  return mapinto(CanonicalForm( current ));
-}
-
-void IntGenerator::next()
-{
-    current++;
-}
-
-int hasAlgVar(const CanonicalForm &f, const Variable &v)
-{
-  if (f.inBaseDomain()) return 0;
-  if (f.inCoeffDomain())
-  {
-    if (f.mvar()==v) return 1;
-    return hasAlgVar(f.LC(),v);
-  }
-  if (f.inPolyDomain())
-  {
-    if (hasAlgVar(f.LC(),v)) return 1;
-    for( CFIterator i=f; i.hasTerms(); i++)
-    {
-      if (hasAlgVar(i.coeff(),v)) return 1;
-    }
-  }
-  return 0;
-}
-
-int hasVar(const CanonicalForm &f, const Variable &v)
-{
-  if (f.inBaseDomain()) return 0;
-  if (f.inCoeffDomain())
-  {
-    if (f.mvar()==v) return 1;
-    return hasAlgVar(f.LC(),v);
-  }
-  if (f.inPolyDomain())
-  {
-    if (f.mvar()==v) return 1;
-    if (hasVar(f.LC(),v)) return 1;
-    for( CFIterator i=f; i.hasTerms(); i++)
-    {
-      if (hasVar(i.coeff(),v)) return 1;
-    }
-  }
-  return 0;
-}
-
-int hasAlgVar(const CanonicalForm &f)
-{
-  if (f.inBaseDomain()) return 0;
-  if (f.inCoeffDomain())
-  {
-    if (f.level()!=0)
-      return 1;
-    return hasAlgVar(f.LC());
-  }
-  if (f.inPolyDomain())
-  {
-    if (hasAlgVar(f.LC())) return 1;
-    for( CFIterator i=f; i.hasTerms(); i++)
-    {
-      if (hasAlgVar(i.coeff())) return 1;
-    }
-  }
-  return 0;
-}
-
-/// pseudo division of f and g wrt. x s.t. multiplier*f=q*g+r
-void
-psqr (const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, 
-      CanonicalForm & r, CanonicalForm& multiplier, const Variable& x)
-{
-    ASSERT( x.level() > 0, "type error: polynomial variable expected" );
-    ASSERT( ! g.isZero(), "math error: division by zero" );
-
-    // swap variables such that x's level is larger or equal
-    // than both f's and g's levels.
-    Variable X;
-    if (f.level() > g.level())
-      X= f.mvar();
-    else
-      X= g.mvar();
-    if (X.level() < x.level())
-      X= x;
-    CanonicalForm F= swapvar (f, x, X);
-    CanonicalForm G= swapvar (g, x, X);
-
-    // now, we have to calculate the pseudo remainder of F and G
-    // w.r.t. X
-    int fDegree= degree (F, X);
-    int gDegree= degree (G, X);
-    if (fDegree < 0 || fDegree < gDegree)
-    {
-      q= 0;
-      r= f;
-    }
-    else
-    {
-      CanonicalForm LCG= LC (G, X);
-      multiplier= power (LCG, fDegree - gDegree + 1);
-      divrem (multiplier*F, G, q, r);
-      q= swapvar (q, x, X);
-      r= swapvar (r, x, X);
-    }
-}
-
-static CanonicalForm
-Sprem ( const CanonicalForm &f, const CanonicalForm &g, CanonicalForm & m, CanonicalForm & q )
-{
-  CanonicalForm ff, gg, l, test, retvalue;
-  int df, dg,n;
-  bool reord;
-  Variable vf, vg, v;
-
-  if ( (vf = f.mvar()) < (vg = g.mvar()) )
-  {
-    m=CanonicalForm(0); q=CanonicalForm(0);
-    return f;
-  }
-  else
-  {
-    if ( vf == vg )
-    {
-      ff = f; gg = g;
-      reord = false;
-      v = vg; // == x
-    }
-    else
-    {
-      v = Variable(level(f.mvar()) + 1);
-      ff = swapvar(f,vg,v); // == r
-      gg = swapvar(g,vg,v); // == v
-      reord=true;
-    }
-    dg = degree( gg, v ); // == dv
-    df = degree( ff, v ); // == dr
-    if (dg <= df) {l=LC(gg); gg = gg -LC(gg)*power(v,dg);}
-    else { l = 1; }
-    n= 0;
-    while ( ( dg <= df  ) && ( !ff.isZero()) )
-    {
-      test= power(v,df-dg) * gg * LC(ff);
-      if ( df == 0 ){ff= ff.genZero();}
-      else {ff= ff - LC(ff)*power(v,df);}
-      ff = l*ff-test;
-      df= degree(ff,v);
-      n++;
-    }
-    if ( reord )
-    {
-      retvalue= swapvar( ff, vg, v );
-    }
-    else
-    {
-      retvalue= ff;
-    }
-    m= power(l,n);
-    if ( fdivides(g,m*f-retvalue) )
-      q= (m*f-retvalue)/g;
-    else
-      q= CanonicalForm(0);
-    return retvalue;
-  }
-}
-
-CanonicalForm
-divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as)
-{
-  CanonicalForm r,m,q;
-
-  if (f.inCoeffDomain())
-  {
-    bool isRat=isOn(SW_RATIONAL);
-    if (getCharacteristic() == 0)
-      On(SW_RATIONAL);
-    q=ff/f;
-    if (!isRat && getCharacteristic() == 0)
-      Off(SW_RATIONAL);
-  }
-  else
-    r= Sprem(ff,f,m,q);
-
-  r= Prem(q,as);
-  return r;
-}
 
 CanonicalForm
 alg_content (const CanonicalForm& f, const CFList& as)
@@ -490,7 +151,7 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 
   while (degree (g, x) > 0)
   {
-    r= Prem (f, g, as);
+    r= Prem (f, g);
     r= Prem (r, as);
     if (!r.isZero())
     {
@@ -548,7 +209,7 @@ resultante( const CanonicalForm & f, const CanonicalForm& g, const Variable & v 
 // Calculates a square free norm
 // Input: f(x, alpha) a square free polynomial over K(alpha),
 // alpha is defined by the minimal polynomial Palpha
-// K has more than S elements (S is defined in thesis; look getextension)
+// K has more than S elements (S is defined in thesis; look getDegOfExt)
 static void
 sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
            CFGenerator & myrandom, CanonicalForm & s,  CanonicalForm & g,
@@ -691,188 +352,10 @@ sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
   }
 }
 
-static Varlist
-Var_is_in_AS(const Varlist & uord, const CFList & Astar){
-  Varlist output;
-  CanonicalForm elem;
-  Variable x;
-
-  for ( VarlistIterator i=uord; i.hasItem(); i++)
-  {
-    x=i.getItem();
-    for ( CFListIterator j=Astar; j.hasItem(); j++ )
-    {
-      elem= j.getItem();
-      if ( degree(elem,x) > 0 ) // x actually occures in Astar
-      {
-        output.append(x);
-        break;
-      }
-    }
-  }
-  return output;
-}
-
-// Look if Minimalpolynomials in Astar define seperable Extensions
-// Must be a power of p: i.e. y^{p^e}-x
-static int
-inseperable(const CFList & Astar)
-{
-  CanonicalForm elem;
-  int Counter= 1;
-
-  if ( Astar.length() == 0 ) return 0;
-  for ( CFListIterator i=Astar; i.hasItem(); i++)
-  {
-    elem= i.getItem();
-    if ( elem.deriv() == elem.genZero() ) return Counter;
-    else Counter += 1;
-  }
-  return 0;
-}
-
-// calculate big enough extension for finite fields
-// Idea: first calculate k, such that q^k > S (->thesis, -> getextension)
-// Second, search k with gcd(k,m_i)=1, where m_i is the degree of the i'th
-// minimal polynomial. Then the minpoly f_i remains irrd. over q^k and we
-// have enough elements to plug in.
-static int
-getextension( IntList & degreelist, int n)
-{
-  int charac= getCharacteristic();
-  setCharacteristic(0); // need it for k !
-  int k=1, m=1, length=degreelist.length();
-  IntListIterator i;
-
-  for (i=degreelist; i.hasItem(); i++) m= m*i.getItem();
-  int q=charac;
-  while (q <= ((n*m)*(n*m)/2)) { k= k+1; q= q*charac;}
-  int l=0;
-  do {
-    for (i=degreelist; i.hasItem(); i++){
-      l= l+1;
-      if ( igcd(k,i.getItem()) == 1){
-        if ( l==length ){ setCharacteristic(charac);  return k; }
-      }
-      else { break; }
-    }
-    k= k+1; l=0;
-  }
-  while ( 1 );
-}
-
-CanonicalForm
-QuasiInverse (const CanonicalForm& f, const CanonicalForm& g,
-              const Variable& x)
-{
-  CanonicalForm pi, pi1, q, t0, t1, Hi, bi, pi2;
-  bool isRat= isOn (SW_RATIONAL);
-  CanonicalForm m,tmp;
-  if (isRat && getCharacteristic() == 0)
-    Off (SW_RATIONAL);
-  pi= f/content (f,x);
-  pi1= g/content (g,x);
-
-  t0= 0;
-  t1= 1;
-  bi= 1;
-
-  int delta= degree (f, x) - degree (g, x);
-  Hi= power (LC (pi1, x), delta);
-  if ( (delta+1) % 2 )
-      bi = 1;
-  else
-      bi = -1;
-
-  while (degree (pi1,x) > 0)
-  {
-    psqr( pi, pi1, q, pi2, m, x);
-    pi2 /= bi;
-
-    tmp= t1;
-    t1= t0*m - t1*q;
-    t0= tmp;
-    t1 /= bi;
-    pi = pi1; pi1 = pi2;
-    if ( degree ( pi1, x ) > 0 )
-    {
-      delta = degree( pi, x ) - degree( pi1, x );
-      if ( (delta+1) % 2 )
-        bi = LC( pi, x ) * power( Hi, delta );
-      else
-        bi = -LC( pi, x ) * power( Hi, delta );
-      Hi = power( LC( pi1, x ), delta ) / power( Hi, delta-1 );
-    }
-  }
-  t1 /= gcd (pi1, t1);
-  if (!isRat && getCharacteristic() == 0)
-    Off (SW_RATIONAL);
-  return t1;
-}
-
-CanonicalForm
-evaluate (const CanonicalForm& f, const CanonicalForm& g, const CanonicalForm& h, const CanonicalForm& powH)
-{
-  if (f.inCoeffDomain())
-    return f;
-  CFIterator i= f;
-  int lastExp = i.exp();
-  CanonicalForm result = i.coeff()*powH;
-  i++;
-  while (i.hasTerms())
-  {
-    int i_exp= i.exp();
-    if ((lastExp - i_exp) == 1)
-    {
-      result *= g;
-      result /= h;
-    }
-    else
-    {
-      result *= power (g, lastExp - i_exp);
-      result /= power (h, lastExp - i_exp);
-    }
-    result += i.coeff()*powH;
-    lastExp = i_exp;
-    i++;
-  }
-  if (lastExp != 0)
-  {
-    result *= power (g, lastExp);
-    result /= power (h, lastExp);
-  }
-  return result;
-}
-
-
-/// evaluate f at g/h at v such that powH*f is integral i.e. powH is assumed to be h^degree(f,v)
-CanonicalForm
-evaluate (const CanonicalForm& f, const CanonicalForm& g,
-          const CanonicalForm& h, const CanonicalForm& powH,
-          const Variable& v)
-{
-  if (f.inCoeffDomain())
-  {
-    return f*powH;
-  }
-
-  Variable x = f.mvar();
-  if ( v > x )
-    return f*powH;
-  else  if ( v == x )
-    return evaluate (f, g, h, powH);
-
-  // v is less than main variable of f
-  CanonicalForm result= 0;
-  for (CFIterator i= f; i.hasTerms(); i++)
-    result += evaluate (i.coeff(), g, h, powH, v)*power (x, i.exp());
-  return result;
-}
-
 // calculate a "primitive element"
-// K must have more than S elements (->thesis, -> getextension)
+// K must have more than S elements (->thesis, -> getDegOfExt)
 static CFList
-simpleextension(CFList& backSubst, const CFList & Astar,
+simpleExtension(CFList& backSubst, const CFList & Astar,
                 const Variable & Extension, bool& isFunctionField,
                 CanonicalForm & R)
 {
@@ -983,192 +466,19 @@ simpleextension(CFList& backSubst, const CFList & Astar,
   return Returnlist;
 }
 
-CanonicalForm alg_lc(const CanonicalForm &f)
-{
-  if (f.level()>0)
-  {
-    return alg_lc(f.LC());
-  }
-
-  return f;
-}
-
-CanonicalForm alg_LC (const CanonicalForm& f, int lev)
-{
-  CanonicalForm result= f;
-  while (result.level() > lev)
-    result= LC (result);
-  return result;
-}
-
-CanonicalForm
-subst (const CanonicalForm& f, const CFList& a, const CFList& b,
-       const CanonicalForm& Rstar, bool isFunctionField)
-{
-  if (isFunctionField)
-    ASSERT (2*a.length() == b.length(), "wrong length of lists");
-  else
-    ASSERT (a.length() == b.length(), "lists of equal length expected");
-  CFListIterator j= b;
-  CanonicalForm result= f, tmp, powj;
-  for (CFListIterator i= a; i.hasItem() && j.hasItem(); i++, j++)
-  {
-    if (!isFunctionField)
-      result= result (j.getItem(), i.getItem().mvar());
-    else
-    {
-      tmp= j.getItem();
-      j++;
-      powj= power (j.getItem(), degree (result, i.getItem().mvar()));
-      result= evaluate (result, tmp, j.getItem(), powj, i.getItem().mvar());
-
-      if (fdivides (powj, result, tmp))
-        result= tmp;
-
-      result /= vcontent (result, Variable (i.getItem().level() + 1));
-    }
-  }
-  result= reduce (result, Rstar);
-  result /= vcontent (result, Variable (Rstar.level() + 1));
-  return result;
-}
-
-CanonicalForm
-backSubst (const CanonicalForm& F, const CFList& a, const CFList& b)
-{
-  ASSERT (a.length() == b.length() - 1, "wrong length of lists in backSubst");
-  CanonicalForm result= F;
-  Variable tmp;
-  CFList tmp2= b;
-  tmp= tmp2.getLast().mvar();
-  tmp2.removeLast();
-  for (CFListIterator iter= a; iter.hasItem(); iter++)
-  {
-    result= result (tmp+iter.getItem()*tmp2.getLast().mvar(), tmp);
-    tmp= tmp2.getLast().mvar();
-    tmp2.removeLast();
-  }
-  return result;
-}
-
-void deflateDegree (const CanonicalForm & F, int & pExp, int n)
-{
-  if (n == 0 || n > F.level())
-  {
-    pExp= -1;
-    return;
-  }
-  if (F.level() == n)
-  {
-    ASSERT (F.deriv().isZero(), "derivative of F is not zero");
-    int termCount=0;
-    CFIterator i= F;
-    for (; i.hasTerms(); i++)
-    {
-      if (i.exp() != 0)
-        termCount++;
-    }
-
-    int j= 1;
-    i= F;
-    for (;j < termCount; j++, i++)
-      ;
-
-    int exp= i.exp();
-    int count= 0;
-    int p= getCharacteristic();
-    while ((exp >= p) && (exp != 0) && (exp % p == 0))
-    {
-      exp /= p;
-      count++;
-    }
-    pExp= count;
-  }
-  else
-  {
-    CFIterator i= F;
-    deflateDegree (i.coeff(), pExp, n);
-    i++;
-    int tmp= pExp;
-    for (; i.hasTerms(); i++)
-    {
-      deflateDegree (i.coeff(), pExp, n);
-      if (tmp == -1)
-        tmp= pExp;
-      else if (tmp != -1 && pExp != -1)
-        pExp= (pExp < tmp) ? pExp : tmp;
-      else
-        pExp= tmp;
-    }
-  }
-}
-
-CanonicalForm deflatePoly (const CanonicalForm & F, int exp)
-{
-  if (exp == 0)
-    return F;
-  int p= getCharacteristic();
-  int pToExp= ipower (p, exp);
-  Variable x=F.mvar();
-  CanonicalForm result= 0;
-  for (CFIterator i= F; i.hasTerms(); i++)
-    result += i.coeff()*power (x, i.exp()/pToExp);
-  return result;
-}
-
-CanonicalForm deflatePoly (const CanonicalForm & F, int exps, int n)
-{
-  if (n == 0 || exps <= 0 || F.level() < n)
-    return F;
-  if (F.level() == n)
-    return deflatePoly (F, exps);
-  else
-  {
-    CanonicalForm result= 0;
-    for (CFIterator i= F; i.hasTerms(); i++)
-      result += deflatePoly (i.coeff(), exps, n)*power(F.mvar(), i.exp());
-    return result;
-  }
-}
-
-CanonicalForm inflatePoly (const CanonicalForm & F, int exp)
-{
-  if (exp == 0)
-    return F;
-  int p= getCharacteristic();
-  int pToExp= ipower (p, exp);
-  Variable x=F.mvar();
-  CanonicalForm result= 0;
-  for (CFIterator i= F; i.hasTerms(); i++)
-    result += i.coeff()*power (x, i.exp()*pToExp);
-  return result;
-}
-
-CanonicalForm inflatePoly (const CanonicalForm & F, int exps, int n)
-{
-  if (n == 0 || exps <= 0 || F.level() < n)
-    return F;
-  if (F.level() == n)
-    return inflatePoly (F, exps);
-  else
-  {
-    CanonicalForm result= 0;
-    for (CFIterator i= F; i.hasTerms(); i++)
-      result += inflatePoly (i.coeff(), exps, n)*power(F.mvar(), i.exp());
-    return result;
-  }
-}
-
-// the heart of the algorithm: the one from Trager
+/// Trager's algorithm, i.e. convert to one field extension and
+/// factorize over this field extension
 static CFFList
-alg_factor( const CanonicalForm & F, const CFList & Astar, const Variable & vminpoly, const Varlist & oldord, const CFList & as, bool isFunctionField)
+Trager (const CanonicalForm & F, const CFList & Astar,
+            const Variable & vminpoly, const Varlist & oldord,
+            const CFList & as, bool isFunctionField)
 {
   bool isRat= isOn (SW_RATIONAL);
   CFFList L, Factorlist;
   CanonicalForm R, Rstar, s, g, h, f= F;
   CFList substlist, backSubsts;
 
-  substlist= simpleextension (backSubsts, Astar, vminpoly, isFunctionField, Rstar);
+  substlist= simpleExtension (backSubsts, Astar, vminpoly, isFunctionField, Rstar);
 
   f= subst (f, Astar, substlist, Rstar, isFunctionField);
 
@@ -1515,8 +825,7 @@ SteelTrager (const CanonicalForm & f, const CFList & AS, const Varlist & uord)
   for (CFListIterator i= asnew; i.hasItem(); i++)
     i.getItem() /= content (i.getItem());
 
-  j= 0;
-  tmp= newcfactor (F, asnew, j);
+  tmp= facAlgFunc (F, asnew);
 
   // transform back
   j= 0;
@@ -1576,38 +885,14 @@ SteelTrager (const CanonicalForm & f, const CFList & AS, const Varlist & uord)
   return result;
 }
 
-void
-multiplicity (CFFList& factors, const CanonicalForm& F, const CFList& as)
-{
-  CanonicalForm G= F;
-  Variable x= F.mvar();
-  CanonicalForm q, r;
-  int count= -1;
-  for (CFFListIterator iter=factors; iter.hasItem(); iter++)
-  {
-    count= -1;
-    if (iter.getItem().factor().inCoeffDomain())
-      continue;
-    while (1)
-    {
-      psqr (G, iter.getItem().factor(), q, r, x);
-
-      q= Prem (q, as);
-      r= Prem (r, as);
-      if (!r.isZero())
-        break;
-      count++;
-      G= q;
-    }
-    iter.getItem()= CFFactor (iter.getItem().factor(), iter.getItem().exp()+count);
-  }
-}
+/// factorize a polynomial that is irreducible over the ground field modulo an
+/// extension given by an irreducible characteristic set
 
 // 1) prepares data
 // 2) for char=p we distinguish 3 cases:
-//           no transcendentals, seperable and inseperable extensions
+//           no transcendentals, separable and inseparable extensions
 CFFList
-newfactoras( const CanonicalForm & f, const CFList & as, int &success)
+facAlgFunc2 (const CanonicalForm & f, const CFList & as)
 {
   bool isRat= isOn (SW_RATIONAL);
   if (!isRat && getCharacteristic() == 0)
@@ -1617,8 +902,6 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
   CFFListIterator jj;
   CFList reduceresult;
   CFFList result;
-
-  success=1;
 
 // F1: [Test trivial cases]
 // 1) first trivial cases:
@@ -1664,16 +947,17 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
 // 5) Look if elements in uord actually occure in any of the minimal
 //    polynomials. If no element of uord occures in any of the minimal
 //   polynomials, we don't have transzendentals.
-  Varlist newuord=Var_is_in_AS(uord,Astar);
+  Varlist newuord= varsInAs (uord, Astar);
 
   CFFList Factorlist;
-  Varlist gcdord= Union(ord,newuord); gcdord.append(f.mvar());
+  Varlist gcdord= Union(ord,newuord);
+  gcdord.append(f.mvar());
   bool isFunctionField= (newuord.length() > 0);
 
   // This is for now. we need alg_sqrfree implemented!
   CanonicalForm Fgcd= 0;
   if (isFunctionField)
-    Fgcd= alg_gcd(f,f.deriv(),Astar);
+    Fgcd= alg_gcd (f, f.deriv(), Astar);
 
   bool derivZero= f.deriv().isZero();
   if (isFunctionField && (degree (Fgcd, f.mvar()) > 0) && !derivZero)
@@ -1681,7 +965,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
     CanonicalForm Ggcd= divide(f, Fgcd,Astar);
     if (getCharacteristic() == 0)
     {
-      CFFList result= newfactoras (Ggcd,as,success); //Ggcd is the squarefree part of f
+      CFFList result= facAlgFunc2 (Ggcd, as); //Ggcd is the squarefree part of f
       multiplicity (result, f, Astar);
       if (!isRat && getCharacteristic() == 0)
         Off (SW_RATIONAL);
@@ -1691,7 +975,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
     Fgcd= pp(Fgcd); Ggcd= pp(Ggcd);
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
-    return myUnion(newfactoras(Fgcd,as,success) , newfactoras(Ggcd,as,success));
+    return merge (facAlgFunc2 (Fgcd, as), facAlgFunc2 (Ggcd, as));
   }
 
   if ( getCharacteristic() > 0 )
@@ -1700,45 +984,48 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success)
     IntList degreelist;
     Variable vminpoly;
     for (i=Astar; i.hasItem(); i++){degreelist.append(degree(i.getItem()));}
-    int extdeg= getextension(degreelist, degree(f));
+    int extdeg= getDegOfExt (degreelist, degree(f));
 
     // Now the real stuff!
     if ( newuord.length() == 0 ) // no transzendentals
     {
       if ( extdeg > 1 ){
-        CanonicalForm MIPO= generate_mipo( extdeg, vminpoly);
+        CanonicalForm MIPO= generateMipo (extdeg);
         vminpoly= rootOf(MIPO);
       }
-      Factorlist= alg_factor(f, Astar, vminpoly, oldord, as, isFunctionField);
+      Factorlist= Trager(f, Astar, vminpoly, oldord, as, isFunctionField);
       return Factorlist;
     }
-    else if ( inseperable(Astar) > 0 || derivZero) // Look if extensions are seperable
+    else if (isInseparable(Astar) || derivZero) // Look if extensions are separable
     {
       Factorlist= SteelTrager(f, Astar, newuord);
       return Factorlist;
     }
     else{ // we are on the save side: Use trager
       if (extdeg > 1 ){
-        CanonicalForm MIPO=generate_mipo(extdeg, vminpoly );
+        CanonicalForm MIPO=generateMipo (extdeg);
         vminpoly= rootOf(MIPO);
       }
-      Factorlist= alg_factor(f, Astar, vminpoly, oldord, as, isFunctionField);
+      Factorlist= Trager(f, Astar, vminpoly, oldord, as, isFunctionField);
       return Factorlist;
     }
   }
   else{ // char=0 apply trager directly
     Variable vminpoly;
-    Factorlist= alg_factor(f, Astar, vminpoly, oldord, as, isFunctionField);
+    Factorlist= Trager(f, Astar, vminpoly, oldord, as, isFunctionField);
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     return Factorlist;
   }
 
-  return CFFList(CFFactor(f,1));
+  return CFFList (CFFactor(f,1));
 }
 
+
+/// factorize a polynomial modulo an extension given by an irreducible
+/// characteristic set
 CFFList
-newcfactor(const CanonicalForm & f, const CFList & as, int & success )
+facAlgFunc (const CanonicalForm & f, const CFList & as)
 {
   bool isRat= isOn (SW_RATIONAL);
   if (!isRat && getCharacteristic() == 0)
@@ -1751,25 +1038,22 @@ newcfactor(const CanonicalForm & f, const CFList & as, int & success )
   {
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
-    success=1;
     return Factors;
   }
   if (f.level() <= as.getLast().level())
   {
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
-    success=1;
     return Factors;
   }
 
-  success=1;
   for ( CFFListIterator i=Factors; i.hasItem(); i++ )
   {
     if (i.getItem().factor().level() > as.getLast().level())
     {
-      output=newfactoras(i.getItem().factor(),as, success);
+      output=facAlgFunc2(i.getItem().factor(), as);
       for ( CFFListIterator j=output; j.hasItem(); j++)
-        Output = myappend(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
+        Output = append(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
     }
   }
 

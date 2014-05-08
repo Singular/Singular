@@ -21,30 +21,9 @@
 #ifndef CF_CHARSETS
 #define CF_CHARSETS
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif /* HAVE_CONFIG_H */
-
-#include "canonicalform.h"
-
-CanonicalForm normalize (const CanonicalForm& F);
+#include "cfCharSetsUtil.h"
 
 /*BEGINPUBLIC*/
-class StoreFactors
-{
-  public:
-    CFList FS1;
-    CFList FS2;
-    inline StoreFactors& operator= (const StoreFactors& value)
-    {
-      if ( this != &value )
-      {
-        FS1 = value.FS1;
-        FS2 = value.FS2;
-      }
-      return *this;
-    }
-};
 
 /// basic set in the sense of Wang a.k.a. minimal ascending set in the sense of
 /// Greuel/Pfister

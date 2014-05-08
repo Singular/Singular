@@ -20,6 +20,7 @@ SOURCES = \
 		cf_algorithm.cc \
 		cf_char.cc \
 		cfCharSets.cc \
+		cfCharSetsUtil.cc \
 		cf_chinese.cc \
 		cf_cyclo.cc \
 		cf_eval.cc \
@@ -53,6 +54,7 @@ SOURCES = \
 		facAbsFact.cc \
 		facAlgExt.cc \
 		facAlgFunc.cc \
+		facAlgFuncUtil.cc \
 		facBivar.cc \
 		fac_ezgcd.cc \
 		facFactorize.cc \
@@ -98,6 +100,7 @@ factory_headers = \
 		canonicalform.h \
 		cf_algorithm.h \
 		cfCharSets.h \
+		cfCharSetsUtil.h \
 		cf_cyclo.h \
 		cf_defs.h \
 		cf_eval.h \
@@ -125,6 +128,7 @@ factory_headers = \
 		facAbsFact.h \
 		facAlgExt.h \
 		facAlgFunc.h \
+		facAlgFuncUtil.h \
 		facBivar.h \
 		facFactorize.h \
 		fac_sqrfree.h \
