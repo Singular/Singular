@@ -447,7 +447,7 @@ sortCFListByLevel (CFList& list)
 /* basic operations on lists */
 
 bool
-member (const CanonicalForm& f, const CFList& F)
+isMember (const CanonicalForm& f, const CFList& F)
 {
   for (CFListIterator i= F; i.hasItem(); i++)
   {
@@ -459,7 +459,7 @@ member (const CanonicalForm& f, const CFList& F)
 
 /// are list A and B the same?
 bool
-same (const CFList& A, const CFList& B)
+isSame (const CFList& A, const CFList& B)
 {
   if (A.length() != B.length())
     return 0;
@@ -468,12 +468,12 @@ same (const CFList& A, const CFList& B)
 
   for (i= A; i.hasItem(); i++)
   {
-    if (!member (i.getItem(), B))
+    if (!isMember (i.getItem(), B))
       return 0;
   }
   for (i= B; i.hasItem(); i++)
   {
-    if (!member (i.getItem(), A))
+    if (!isMember (i.getItem(), A))
       return 0;
   }
   return 1;
@@ -482,7 +482,7 @@ same (const CFList& A, const CFList& B)
 
 /// is List cs contained in List of lists pi?
 bool
-member (const CFList& cs, const ListCFList& pi)
+isMember (const CFList& cs, const ListCFList& pi)
 {
   if (pi.isEmpty())
     return 0;
@@ -493,7 +493,7 @@ member (const CFList& cs, const ListCFList& pi)
   {
     if (i.getItem().length() != cs.length())
       continue;
-    if (same (cs, i.getItem()))
+    if (isSame (cs, i.getItem()))
       return 1;
   }
   return 0;
@@ -501,11 +501,11 @@ member (const CFList& cs, const ListCFList& pi)
 
 /// is PS a subset of Cset ?
 bool
-subset (const CFList &PS, const CFList& Cset)
+isSubset (const CFList &PS, const CFList& Cset)
 {
   for (CFListIterator i= PS; i.hasItem(); i++)
   {
-    if (!member (i.getItem(), Cset))
+    if (!isMember (i.getItem(), Cset))
       return 0;
   }
   return 1;
@@ -527,14 +527,14 @@ MyUnion (const ListCFList& a, const ListCFList& b)
   for (i= a; i.hasItem(); i++)
   {
     elem= i.getItem();
-    if ((!elem.isEmpty()) && (!member (elem, output)))
+    if ((!elem.isEmpty()) && (!isMember (elem, output)))
       output.append(elem);
   }
 
   for (i= b; i.hasItem(); i++)
   {
     elem= i.getItem();
-    if ((!elem.isEmpty()) && (!member (elem, output)))
+    if ((!elem.isEmpty()) && (!isMember (elem, output)))
       output.append(elem);
   }
   return output;
@@ -542,7 +542,7 @@ MyUnion (const ListCFList& a, const ListCFList& b)
 
 /// Union of a and b stored in b
 void
-MyUnion2 (const ListCFList& a, ListCFList& b)
+inplaceUnion (const ListCFList& a, ListCFList& b)
 {
   if (a.isEmpty())
     return;
@@ -558,14 +558,14 @@ MyUnion2 (const ListCFList& a, ListCFList& b)
   for (i= a; i.hasItem(); i++)
   {
     elem= i.getItem();
-    if ((!elem.isEmpty()) && (!member (elem, b)))
+    if ((!elem.isEmpty()) && (!isMember (elem, b)))
       b.insert(elem);
   }
 }
 
 ///if list b is member of the list of lists a remove b and return the rest
 ListCFList
-MyDifference (const ListCFList& a, const CFList& b)
+minus (const ListCFList& a, const CFList& b)
 {
   ListCFList output;
   ListCFListIterator i;
@@ -574,7 +574,7 @@ MyDifference (const ListCFList& a, const CFList& b)
   for (i= a; i.hasItem(); i++)
   {
     elem= i.getItem();
-    if ((!elem.isEmpty()) && (!same (elem, b)))
+    if ((!elem.isEmpty()) && (!isSame (elem, b)))
       output.append (elem);
   }
   return output;
@@ -582,12 +582,12 @@ MyDifference (const ListCFList& a, const CFList& b)
 
 /// remove all elements of b from list of lists a and return the rest
 ListCFList
-Minus( const ListCFList& a, const ListCFList& b)
+minus (const ListCFList& a, const ListCFList& b)
 {
   ListCFList output= a;
 
-  for (ListCFListIterator i=b; i.hasItem(); i++)
-    output = MyDifference (output, i.getItem());
+  for (ListCFListIterator i= b; i.hasItem(); i++)
+    output = minus (output, i.getItem());
 
   return output;
 }
@@ -609,7 +609,7 @@ adjoin (const CFList& is, const CFList& qs, const ListCFList& qh)
   if (iscopy.isEmpty())
     return iss;
 
-  qhi= MyDifference (qh, qs);
+  qhi= minus (qh, qs);
   length= qhi.length();
 
   for (i= iscopy; i.hasItem(); i++)
@@ -620,7 +620,7 @@ adjoin (const CFList& is, const CFList& qs, const ListCFList& qh)
     {
       for (j= qhi; j.hasItem(); j++)
       {
-        if (subset (j.getItem(), itt))
+        if (isSubset (j.getItem(), itt))
           ind= 1;
       }
     }
@@ -647,7 +647,7 @@ adjoinb (const CFList & is, const CFList & qs, const ListCFList & qh,
   }
   if (iscopy.isEmpty())
     return iss;
-  qhi= MyDifference (qh, qs);
+  qhi= minus (qh, qs);
   length= qhi.length();
   for (i= iscopy; i.hasItem(); i++)
   {
@@ -657,7 +657,7 @@ adjoinb (const CFList & is, const CFList & qs, const ListCFList & qh,
     {
       for (j= qhi; j.hasItem(); j++)
       {
-        if (subset (j.getItem(), itt))
+        if (isSubset (j.getItem(), itt))
           ind= 1;
       }
     }
@@ -1038,14 +1038,14 @@ contract (const ListCFList& cs)
   for (ListCFListIterator i= cs; i.hasItem() && ii < l; i++, ii++)
   {
     iitem= i.getItem();
-    if (!member (iitem, mem))
+    if (!isMember (iitem, mem))
     {
       j= i;
       j++;
       for (; j.hasItem(); j++)
       {
         jitem= j.getItem();
-        if (!member (jitem, mem))
+        if (!isMember (jitem, mem))
         {
           if (contractsub (iitem, jitem))
           {
@@ -1061,6 +1061,6 @@ contract (const ListCFList& cs)
       }
     }
   }
-  return Minus (cs,ts);
+  return minus (cs,ts);
 }
 

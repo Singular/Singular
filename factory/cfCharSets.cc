@@ -427,11 +427,11 @@ charSeries (const CFList& L)
 
     l= tmp.getFirst();
 
-    tmp= MyDifference (tmp, l);
+    tmp= minus (tmp, l);
 
     select (ppi, l.length(), ppi1, ppi2);
 
-    MyUnion2 (ppi2, qqi);
+    inplaceUnion (ppi2, qqi);
 
     if (count > 0)
       ppi= MyUnion (ListCFList (l), ppi1);
@@ -596,7 +596,7 @@ irrCharSeries (const CFList & PS)
     ListCFList ppi1,ppi2;
     select (ppi, qs.length(), ppi1, ppi2);
 
-    MyUnion2 (ppi2, qqi);
+    inplaceUnion (ppi2, qqi);
 
     if (nr_of_iteration == 0)
     {
@@ -621,9 +621,9 @@ irrCharSeries (const CFList & PS)
 
       if (indexRed <= 0) // irreducible
       {
-        if (!subset (cs,qs))
+        if (!isSubset (cs,qs))
           cs= charSetViaCharSetN (Union (qs,cs));
-        if (!member (cs, pi))
+        if (!isMember (cs, pi))
         {
           pi= MyUnion (pi, ListCFList (cs));
           if (cs.getFirst().level() > 0)
