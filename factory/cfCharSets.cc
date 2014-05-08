@@ -283,7 +283,7 @@ charSetViaCharSetN (const CFList& PS)
 CFList
 modCharSet (const CFList& L, StoreFactors& StoredFactors, bool removeContents)
 {
-  CFList QS= L, RS= L, CSet, tmp, contents, initial, removedFactors;
+  CFList QS, RS= L, CSet, tmp, contents, initial, removedFactors;
   CFListIterator i;
   CanonicalForm r, cF;
   bool noRemainder= true;
@@ -501,7 +501,7 @@ irredAS (CFList & AS, int & indexRed, CanonicalForm & reducible)
   CFList ts, as;
   CanonicalForm elem;
   bool ind= true;
-  int nr= 0, success= -1;
+  int nr= 0;
   CFListIterator i;
 
   indexRed= 0;

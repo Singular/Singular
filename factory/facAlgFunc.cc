@@ -470,8 +470,7 @@ simpleExtension(CFList& backSubst, const CFList & Astar,
 /// factorize over this field extension
 static CFFList
 Trager (const CanonicalForm & F, const CFList & Astar,
-            const Variable & vminpoly, const Varlist & oldord,
-            const CFList & as, bool isFunctionField)
+        const Variable & vminpoly, const CFList & as, bool isFunctionField)
 {
   bool isRat= isOn (SW_RATIONAL);
   CFFList L, Factorlist;
@@ -626,13 +625,13 @@ Trager (const CanonicalForm & F, const CFList & Astar,
 /// characteristic sets in IdealOverSubfield and Trager's primitive element
 /// algorithm instead of FGLM
 CFFList
-SteelTrager (const CanonicalForm & f, const CFList & AS, const Varlist & uord)
+SteelTrager (const CanonicalForm & f, const CFList & AS)
 {
   CanonicalForm F= f, lcmVars= 1;
   CFList asnew, as= AS;
   CFListIterator i, ii;
 
-  bool derivZeroF= false, derivZero= false;
+  bool derivZeroF= false;
   int j, exp=0, expF= 0, tmpExp;
   CFFList varsMapLevel;
   CFFListIterator iter;
@@ -665,8 +664,6 @@ SteelTrager (const CanonicalForm & f, const CFList & AS, const Varlist & uord)
   // make minimal polys and F separable
   while (i.hasItem())
   {
-    derivZero= false;
-
     if (i.getItem().deriv() == 0)
     {
       deflateDegree (i.getItem(), exp, i.getItem().level());
@@ -919,9 +916,8 @@ facAlgFunc2 (const CanonicalForm & f, const CFList & as)
   CFList Astar;
   Variable x;
   CanonicalForm elem;
-  Varlist ord, uord,oldord;
+  Varlist ord, uord;
   for ( int ii=1; ii< level(vf) ; ii++ ) { uord.append(Variable(ii));  }
-  oldord= uord; oldord.append(vf);
 
   for ( i=as; i.hasItem(); i++ ){
     elem= i.getItem();
@@ -993,12 +989,12 @@ facAlgFunc2 (const CanonicalForm & f, const CFList & as)
         CanonicalForm MIPO= generateMipo (extdeg);
         vminpoly= rootOf(MIPO);
       }
-      Factorlist= Trager(f, Astar, vminpoly, oldord, as, isFunctionField);
+      Factorlist= Trager(f, Astar, vminpoly, as, isFunctionField);
       return Factorlist;
     }
     else if (isInseparable(Astar) || derivZero) // Look if extensions are separable
     {
-      Factorlist= SteelTrager(f, Astar, newuord);
+      Factorlist= SteelTrager(f, Astar);
       return Factorlist;
     }
     else{ // we are on the save side: Use trager
@@ -1006,13 +1002,13 @@ facAlgFunc2 (const CanonicalForm & f, const CFList & as)
         CanonicalForm MIPO=generateMipo (extdeg);
         vminpoly= rootOf(MIPO);
       }
-      Factorlist= Trager(f, Astar, vminpoly, oldord, as, isFunctionField);
+      Factorlist= Trager(f, Astar, vminpoly, as, isFunctionField);
       return Factorlist;
     }
   }
   else{ // char=0 apply trager directly
     Variable vminpoly;
-    Factorlist= Trager(f, Astar, vminpoly, oldord, as, isFunctionField);
+    Factorlist= Trager(f, Astar, vminpoly, as, isFunctionField);
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     return Factorlist;
