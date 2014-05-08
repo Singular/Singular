@@ -1,8 +1,6 @@
-
-
-
-
 #include <kernel/mod2.h>
+
+#if HAVE_GFANLIB
 
 #include <bbcone.h>
 #include <bbfan.h>
@@ -11,6 +9,7 @@
 
 #include <Singular/ipid.h>
 #include <Singular/mod_lib.h>
+
 
 template class gfan::Vector<gfan::Integer>;
 template class gfan::Vector<gfan::Rational>;
@@ -26,6 +25,8 @@ int SI_MOD_INIT(gfanlib)(SModulFunctions* p)
   return 0;
 }
 
+
+###### TODO!!!!!
 #ifndef EMBED_PYTHON
 extern "C"
 { 
@@ -34,4 +35,5 @@ int mod_init(SModulFunctions* psModulFunctions)
   return SI_MOD_INIT(gfanlib)(psModulFunctions); 
 }
 }
+#endif
 #endif

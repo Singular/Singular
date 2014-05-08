@@ -1,3 +1,7 @@
+#include <kernel/mod2.h>
+
+#ifdef HAVE_POLYMAKE
+
 #include <gmpxx.h>
 
 #include <polymake/Main.h>
@@ -11,7 +15,6 @@
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>
 
-#include <kernel/mod2.h>
 #include <misc/intvec.h>
 #include <coeffs/numbers.h>
 #include <coeffs/bigintmat.h>
@@ -517,3 +520,5 @@ polymake::perl::Object* ZFan2PmFan (gfan::ZFan* zf)
 
   return pf;
 }
+
+#endif

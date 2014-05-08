@@ -6,6 +6,8 @@ Date: 2009/11/03 06:57:32
 
 #include <kernel/mod2.h>
 
+#if HAVE_GFANLIB
+
 #include <misc/options.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/kutil.h>
@@ -4525,3 +4527,5 @@ pointOfNoReturn:
 //   else
 //     WerrorS("Need wp ordering");
 // }
+
+#endif

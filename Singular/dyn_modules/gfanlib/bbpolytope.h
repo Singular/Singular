@@ -3,8 +3,10 @@
 
 #include <kernel/mod2.h>
 
-#include <gfanlib/gfanlib.h>
+#if HAVE_GFANLIB
+
 #include <Singular/ipid.h>
+#include <gfanlib/gfanlib.h>
 
 extern int polytopeID;
 
@@ -16,4 +18,5 @@ int getAmbientDimension(gfan::ZCone* zc);
 int getCodimension(gfan::ZCone *zc);
 int getDimension(gfan::ZCone* zc);
 
+#endif
 #endif

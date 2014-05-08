@@ -27,14 +27,19 @@ else
   P_PROCS_MODULE_LDFLAGS = -module -static
 endif
 
+if SING_HAVE_POLYMAKE
 # forcefully enable exceptions for polymake
-CXXFLAGS += $(POLYMAKE_CXXFLAGS)
+ CXXFLAGS+= $(POLYMAKE_CXXFLAGS)
+ PM_CXXFLAGS= ${POLYMAKE_CXXFLAGS}
+ P_PROCS_MODULE_LDFLAGS+= ${PM_LDFLAGS} 
+ polymake_la_LIBADD= ${PM_LIBS}
+endif
+
+polymake_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
 
 polymake_la_SOURCES = $(SOURCES)
 
-polymake_la_CPPFLAGS = ${AM_CPPFLAGS} ${P_PROCS_CPPFLAGS_COMMON} ${POLYMAKE_CXXFLAGS}
-polymake_la_CXXFLAGS = ${POLYMAKE_CXXFLAGS}
-polymake_la_CFLAGS   = ${POLYMAKE_CXXFLAGS}
+polymake_la_CPPFLAGS = ${AM_CPPFLAGS} ${P_PROCS_CPPFLAGS_COMMON} ${PM_CXXFLAGS}
+polymake_la_CXXFLAGS = ${PM_CXXFLAGS}
+polymake_la_CFLAGS   = ${PM_CXXFLAGS}
 
-polymake_la_LDFLAGS = ${PM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS}
-polymake_la_LIBADD  = ${PM_LIBS}

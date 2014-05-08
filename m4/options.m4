@@ -293,48 +293,57 @@ AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
 
 AC_DEFUN([SING_BUILTIN_MODULES],
 [
- AC_MSG_CHECKING([whether for builtin modules])
+## m4_pushdef([_symbol],[m4_cr_Letters[]m4_cr_digits[]_])dnl
+ AC_MSG_CHECKING([built-in modules])
 
- AC_ARG_VAR( [BUILTIN_LIBS], [LIBS for building-in] )
- AC_ARG_WITH(builtinmodules, AS_HELP_STRING([--with-builtinmodules], [list? of builtin modules (experimental)]))
+ AC_ARG_VAR( [BUILTIN_LIBS], [LIB FLAGS for buildins] )
+ AC_ARG_WITH(builtinmodules, AS_HELP_STRING([--with-builtinmodules], [List of builtin modules (experimental)]))
+ 
+ AH_TEMPLATE([SI_BUILTINMODULES_ADD],[Add(list) for Builtin modules])
 
+ #### TODO Dynamic Modules???
+ L=""
+  
  if test "x$with_builtinmodules" == xno; then
   AC_MSG_RESULT(no)
  else
-  AC_DEFINE_UNQUOTED([SI_BUILTINMODULES],"$with_builtinmodules",[List? of Builtin modules])
   AC_MSG_RESULT(yes)
   
-  if test "x$with_builtinmodules" == xyes; then
-    with_builtinmodules=pyobject,syzextra,callgfanlib,callpolymake
+  if test "x$with_builtinmodules" == xall; then
+    with_builtinmodules=staticdemo,syzextra,pyobject,gfanlib,polymake,singmathic
   fi
-
-  L=""
-  for a in ${with_builtinmodules//,/ }; do
-    echo "Will build-in '$a'..."
-    case "$a" in
-      pyobject ) BUILTIN_PYOBJECT=yes;;
-      syzextra ) BUILTIN_SYZEXTRA=yes;;
-      callgfanlib ) BUILTIN_GFAN=yes;;
-      callpolymake ) BUILTIN_PM=yes;;
-    esac
-     L+="add($a)"
-  done # for
-  echo "L=$L"
   
- fi # else
+  LL=""
+  for a in ${with_builtinmodules//,/ }; 
+  do
+    AC_MSG_CHECKING([Will build-in '$a'?])
+    
+    if test -d "Singular/dyn_modules/$a"; then
+      L+=" add($a)"
+      LL+=" $a"
+      BUILTIN_LIBS+=" dyn_modules/$a/$a.la"
+      AC_MSG_RESULT(yes)
+    else
+      AC_MSG_RESULT(no)
+    fi
+    
+    A=`echo "$a" | sed -e "y:m4_cr_letters-:m4_cr_LETTERS[]_:"  -e "/^@<:@m4_cr_digits@:>@/s/^/_/"`      
+    AM_CONDITIONAL([SI_BUILTIN_$A],[test -d "Singular/dyn_modules/$a"]a)    
+  done # for
+
+  AC_DEFINE_UNQUOTED([SI_BUILTINMODULES],"$LL",[Refined list of builtin modules])
+
+ fi # else ("x$with_builtinmodules" != xno)
+ 
+ AC_MSG_CHECKING([SI_BUILTINMODULES_ADD(add)...])
+ AC_MSG_RESULT(${L:-unset})
+ 
+ AC_DEFINE_UNQUOTED([SI_BUILTINMODULES_ADD(add)],[$L],[Add(list) for Builtin modules])
  
  AC_SUBST(BUILTIN_LIBS)
 
- AM_CONDITIONAL([SI_BUILTIN_PYOBJECT],[test "x$BUILTIN_PYOBJECT" == xyes])
- AM_CONDITIONAL([SI_BUILTIN_SYZEXTRA],[test "x$BUILTIN_SYZEXTRA" == xyes])
- AM_CONDITIONAL([SI_BUILTIN_GFANLIB],[test "x$BUILTIN_GFAN" == xyes])
- AM_CONDITIONAL([SI_BUILTIN_PM],[test "x$BUILTIN_PM" == xyes])
-
- AC_MSG_CHECKING([BUILTIN_LIBS?..])
+ AC_MSG_CHECKING([BUILTIN_LIBS...])
  AC_MSG_RESULT(${BUILTIN_LIBS:-unset})
-
- AC_MSG_CHECKING([builtinmodules?..])
- AC_MSG_RESULT(${with_builtinmodules:-unset})
-
-
 ])
+
+

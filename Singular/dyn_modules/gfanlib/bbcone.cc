@@ -1,27 +1,31 @@
 #include <kernel/mod2.h>
 
-#include <gfanlib/gfanlib.h>
-#include <gfanlib/gfanlib_q.h>
+#if HAVE_GFANLIB
 
-#include <Singular/ipid.h>
-#include <Singular/ipshell.h>
-#include <Singular/blackbox.h>
+#include <bbfan.h>
+#include <bbpolytope.h>
+
 #include <misc/intvec.h>
 #include <misc/sirandom.h>
 #include <coeffs/longrat.h>
 #include <coeffs/bigintmat.h>
 
-#include <bbfan.h>
-#include <bbpolytope.h>
-#include <sstream>
+#include <Singular/ipid.h>
+#include <Singular/ipid.h>
+#include <Singular/ipshell.h>
+#include <Singular/blackbox.h>
 
-#include "Singular/ipid.h"
+#include <sstream>
 
 // #include <omalloc/omalloc.h>
 // #include <kernel/intvec.h>
 // #include <kernel/longrat.h>
 // #include <Singular/lists.h>
 // #include <Singular/subexpr.h>
+
+#include <gfanlib/gfanlib.h>
+#include <gfanlib/gfanlib_q.h>
+
 
 int coneID;
 
@@ -1960,3 +1964,5 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("","facetContaining",FALSE,facetContaining);
   coneID=setBlackboxStuff(b,"cone");
 }
+
+#endif
