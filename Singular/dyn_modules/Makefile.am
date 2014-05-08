@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
-SUBDIRS=bigintm syzextra callgfanlib callpolymake pyobject
+SUBDIRS=bigintm syzextra gfanlib polymake pyobject
 
 
