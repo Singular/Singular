@@ -49,6 +49,7 @@ n_Procs_s *cf_root=NULL;
 
 void   nNew(number* d) { *d=NULL; }
 void   ndDelete(number* d, const coeffs) { *d=NULL; }
+number ndAnn(number, const coeffs) { return NULL;}
 char* ndCoeffString(const coeffs r)
 {
   char *s=(char *)omAlloc(11);snprintf(s,11,"Coeffs(%d)",r->type);
@@ -327,6 +328,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfName =  ndName;
     n->cfImPart=ndReturn0;
     n->cfDelete= ndDelete;
+    n->cfAnn = ndAnn;
     n->cfCoeffString = ndCoeffString; // should alway be changed!
     n->cfInpMult=ndInpMult;
     n->cfInpAdd=ndInpAdd;
@@ -380,6 +382,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     // post init settings:
     if (n->cfRePart==NULL) n->cfRePart=n->cfCopy;
     if (n->cfIntDiv==NULL) n->cfIntDiv=n->cfDiv;
+    if (n->cfExactDiv==NULL) n->cfExactDiv=n->cfDiv;
     
 #ifdef HAVE_RINGS
     if (n->cfGetUnit==NULL) n->cfGetUnit=n->cfCopy;

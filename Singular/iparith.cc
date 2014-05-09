@@ -1178,7 +1178,7 @@ static BOOLEAN jjDIV_BI(leftv res, leftv u, leftv v)
     WerrorS(ii_div_by_0);
     return TRUE;
   }
-  q = n_IntDiv((number)u->Data(),q,coeffs_BIGINT);
+  q = n_Div((number)u->Data(),q,coeffs_BIGINT);
   n_Normalize(q,coeffs_BIGINT);
   res->data = (char *)q;
   return FALSE;
@@ -7862,16 +7862,27 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 #endif
     int at=a->Typ();
     int bt=b->Typ();
+    // handling bb-objects ----------------------------------------------------
     if (at>MAX_TOK)
     {
       blackbox *bb=getBlackboxStuff(at);
-      if (bb!=NULL) return bb->blackbox_Op2(op,res,a,b);
+      if (bb!=NULL)
+      {
+        if (!bb->blackbox_Op2(op,res,a,b)) return FALSE;
+        if (errorreported) return TRUE;
+        // else: no op defined
+      }
       else          return TRUE;
     }
     else if ((bt>MAX_TOK)&&(op!='('))
     {
       blackbox *bb=getBlackboxStuff(bt);
-      if (bb!=NULL) return bb->blackbox_Op2(op,res,a,b);
+      if (bb!=NULL)
+      {
+        if(!bb->blackbox_Op2(op,res,a,b)) return FALSE;
+        if (errorreported) return TRUE;
+        // else: no op defined
+      }
       else          return TRUE;
     }
     int i=iiTabIndex(dArithTab2,JJTAB2LEN,op);
@@ -8035,10 +8046,16 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     }
 #endif
     int at=a->Typ();
+    // handling bb-objects ----------------------------------------------------
     if (at>MAX_TOK)
     {
       blackbox *bb=getBlackboxStuff(at);
-      if (bb!=NULL) return bb->blackbox_Op1(op,res,a);
+      if (bb!=NULL)
+      {
+        if(!bb->blackbox_Op1(op,res,a)) return FALSE;
+        if (errorreported) return TRUE;
+        // else: no op defined
+      }
       else          return TRUE;
     }
 
@@ -8204,11 +8221,18 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
     }
 #endif
     int at=a->Typ();
+    // handling bb-objects ----------------------------------------------
     if (at>MAX_TOK)
     {
       blackbox *bb=getBlackboxStuff(at);
-      if (bb!=NULL) return bb->blackbox_Op3(op,res,a,b,c);
+      if (bb!=NULL)
+      {
+        if(!bb->blackbox_Op3(op,res,a,b,c)) return FALSE;
+        if (errorreported) return TRUE;
+        // else: no op defined
+      }
       else          return TRUE;
+      if (errorreported) return TRUE;
     }
     int bt=b->Typ();
     int ct=c->Typ();
@@ -8426,7 +8450,12 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
     if ((a!=NULL) && (a->Typ()>MAX_TOK))
     {
       blackbox *bb=getBlackboxStuff(a->Typ());
-      if (bb!=NULL) return bb->blackbox_OpM(op,res,a);
+      if (bb!=NULL)
+      {
+        if(!bb->blackbox_OpM(op,res,a)) return FALSE;
+        if (errorreported) return TRUE;
+        // else: no op defined
+      }
       else          return TRUE;
     }
     BOOLEAN failed=FALSE;

@@ -11,3 +11,12 @@ libgroebner_walk_la_include_HEADERS=walkProc.h walkMain.h walkSupport.h
 
 
 
+TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables'
+TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}'
+
+TESTS = test
+check_PROGRAMS = $(TESTS)
+test_SOURCES = test.cc
+test_LDADD   = libgroebner_walk.la ${builddir}/../libkernelCommon.la 
+
+CLEANFILES = $(TESTS)

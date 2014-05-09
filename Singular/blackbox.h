@@ -30,6 +30,10 @@ struct  blackbox_struct
   /// interpreter assign: l:=r
   BOOLEAN (*blackbox_Assign)(leftv l, leftv r);
   /// interpreter: unary operations op(r), r(), ...
+  // convention for blackbox_Op1..blackbox_OpM:
+  //             return FALSE, if op was successfully performed
+  //             return TRUE (and an error message) for failure
+  //             return TRUE (and no error message) if not defined
   BOOLEAN (*blackbox_Op1)(int op,leftv l, leftv r);
   /// interpreter: binary operations: op(r1,r2), r1 op r2,...
   BOOLEAN (*blackbox_Op2)(int op,leftv l, leftv r1,leftv r2);
@@ -76,8 +80,5 @@ int setBlackboxStuff(blackbox *bb,const char *name);
 
 /// list all defined type (for debugging)
 void printBlackboxTypes();
-
-/// Emit an "op not implemented" error message and return TRUE
-BOOLEAN WrongOp(const char* cmd, int op, leftv bb);
 
 #endif

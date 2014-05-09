@@ -47,6 +47,7 @@ void    nr2mWrite       (number &a, const coeffs r);
 const char *  nr2mRead  (const char *s, number *a, const coeffs r);
 char *  nr2mName        (number n, const coeffs r);
 void    nr2mCoeffWrite  (const coeffs r, BOOLEAN details);
+coeffs  nr2mQuot1(number c, const coeffs r);
 #ifdef LDEBUG
 BOOLEAN nr2mDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif

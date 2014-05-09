@@ -61,25 +61,6 @@ BOOLEAN blackbox_default_deserialize(blackbox **/*b*/, void **/*d*/, si_link /*f
   return TRUE;
 }
 
-// Tok2Cmdname -> iiTwoOps
-BOOLEAN WrongOp(const char* cmd, int op, leftv bb)
-{
-  assume( bb->Typ() > MAX_TOK ); // it IS a blackbox type, right?!
-
-  if( op > 127 )
-    Werror("'%s' of type %s(%d) for op %s(%d) not implemented",
-           cmd,
-           getBlackboxName(bb->Typ()),bb->Typ(),
-           iiTwoOps(op), op);
-  else
-    Werror("'%s' of type %s(%d) for op '%c' not implemented",
-           cmd,
-           getBlackboxName(bb->Typ()), bb->Typ(),
-           op);
-
-  return TRUE;
-}
-
 BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r)
 {
   if (op==TYPEOF_CMD)
@@ -96,17 +77,17 @@ BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r)
     return FALSE;
   }
 
-  return WrongOp("blackbox_Op1", op, r);
+  return TRUE;
 }
 
 BOOLEAN blackboxDefaultOp2(int op,leftv /*l*/, leftv r1, leftv /*r2*/)
 {
-  return WrongOp("blackbox_Op2", op, r1);
+  return TRUE;
 }
 
 BOOLEAN blackbox_default_Op3(int op,leftv /*l*/, leftv r1,leftv /*r2*/, leftv /*r3*/)
 {
-  return WrongOp("blackbox_Op3", op, r1);
+  return TRUE;
 }
 
 BOOLEAN blackbox_default_OpM(int op,leftv res, leftv args)
@@ -135,7 +116,7 @@ BOOLEAN blackbox_default_OpM(int op,leftv res, leftv args)
     }
     return FALSE;
   }
-  return WrongOp("blackbox_OpM", op, args);
+  return TRUE;
 }
 
 BOOLEAN blackbox_default_Check(blackbox *,leftv,leftv)

@@ -839,8 +839,8 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
 
       if (!(n_IsOne(gcd,r)))
       {
-        number orig_coef2=n_IntDiv(orig_coef,gcd,r);
-        number add_coef2=n_IntDiv(add_coef, gcd,r);
+        number orig_coef2=n_ExactDiv(orig_coef,gcd,r);
+        number add_coef2=n_ExactDiv(add_coef, gcd,r);
         n_Delete(&orig_coef,r);
         n_Delete(&add_coef,r);
         orig_coef=orig_coef2;
@@ -916,8 +916,8 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
 
       if (!(n_IsOne(gcd,r)))
       {
-        number orig_coef2=n_IntDiv(orig_coef,gcd,r);
-        number add_coef2=n_IntDiv(add_coef, gcd,r);
+        number orig_coef2=n_ExactDiv(orig_coef,gcd,r);
+        number add_coef2=n_ExactDiv(add_coef, gcd,r);
         n_Delete(&orig_coef,r);
         n_Delete(&n,r);
         n_Delete(&add_coef,r);
@@ -1248,7 +1248,7 @@ void kBucketSimpleContent(kBucket_pt bucket)
       assume(!(n_IsZero(coef,r)));
       assume(bucket->coef[i]!=NULL);
       number lc=p_GetCoeff(bucket->coef[i],r);
-      p_SetCoeff(bucket->coef[i], n_IntDiv(lc,coef,r),r);
+      p_SetCoeff(bucket->coef[i], n_ExactDiv(lc,coef,r),r);
       assume(!(n_IsZero(p_GetCoeff(bucket->coef[i],r),r)));
     }
   }
@@ -1322,8 +1322,8 @@ int ksCheckCoeff(number *a, number *b, const coeffs r)
   }
   else
   {
-    an = n_IntDiv(an, cn, r);
-    bn = n_IntDiv(bn, cn, r);
+    an = n_Div(an, cn, r); n_Normalize(an,r);
+    bn = n_Div(bn, cn, r); n_Normalize(bn,r);
   }
   n_Delete(&cn, r);
   if (n_IsOne(an, r))

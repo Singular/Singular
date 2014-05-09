@@ -232,11 +232,11 @@ AC_CONFIG_FILES([kernel/oswrapper/Makefile])
 
 AC_CONFIG_SUBDIRS([gfanlib])
 
-AC_CONFIG_FILES([dyn_modules/Makefile])
-AC_CONFIG_FILES([dyn_modules/bigintm/Makefile])
-AC_CONFIG_FILES([dyn_modules/syzextra/Makefile])
-AC_CONFIG_FILES([dyn_modules/callgfanlib/Makefile])
-AC_CONFIG_FILES([dyn_modules/callpolymake/Makefile])
+AC_CONFIG_FILES([Singular/dyn_modules/Makefile])
+AC_CONFIG_FILES([Singular/dyn_modules/bigintm/Makefile])
+AC_CONFIG_FILES([Singular/dyn_modules/syzextra/Makefile])
+AC_CONFIG_FILES([Singular/dyn_modules/callgfanlib/Makefile])
+AC_CONFIG_FILES([Singular/dyn_modules/callpolymake/Makefile])
 
 AC_CONFIG_FILES([Singular/Makefile])
 

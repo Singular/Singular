@@ -20,6 +20,7 @@
 #include <coeffs/longrat.h>
 #include <coeffs/mpr_complex.h>
 #include <coeffs/rmodulo2m.h>
+#include <coeffs/rmodulon.h>
 #include "si_gmp.h"
 
 #include <string.h>
@@ -40,7 +41,7 @@ BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
   {
     int m=(int)(long)(p);
     unsigned long mm=r->mod2mMask;
-    if ((mm>>m)==1L) return TRUE;
+    if (((mm+1)>>m)==1L) return TRUE;
   }
   return FALSE;
 }
@@ -52,6 +53,48 @@ static char* nr2mCoeffString(const coeffs r)
   return s;
 }
 
+coeffs nr2mQuot1(number c, const coeffs r)
+{
+    coeffs rr;
+    int ch = r->cfInt(c, r);
+    mpz_t a,b;
+    mpz_init_set(a, r->modNumber);
+    mpz_init_set_ui(b, ch);
+    int_number gcd;
+    gcd = (int_number) omAlloc(sizeof(mpz_t));
+    mpz_init(gcd);
+    mpz_gcd(gcd, a,b);
+    if(mpz_cmp_ui(gcd, 1) == 0)
+        {
+            WerrorS("constant in q-ideal is coprime to modulus in ground ring");
+            WerrorS("Unable to create qring!");
+            return NULL;
+        }
+    if(mpz_cmp_ui(gcd, 2) == 0)
+    {
+        rr = nInitChar(n_Zp, (void*)2);
+    }
+    else
+    {
+        ZnmInfo info;
+        info.base = r->modBase;
+        int kNew = 1;
+        mpz_t baseTokNew;
+        mpz_init(baseTokNew);
+        mpz_set(baseTokNew, r->modBase);
+        while(mpz_cmp(gcd, baseTokNew) > 0)
+        {
+          kNew++;
+          mpz_mul(baseTokNew, baseTokNew, r->modBase);
+        }
+        info.exp = kNew;
+        mpz_clear(baseTokNew);
+        rr = nInitChar(n_Z2m, (void*)(long)kNew);
+    }
+    return(rr);
+}
+
+static number nr2mAnn(number b, const coeffs r);
 /* for initializing function pointers */
 BOOLEAN nr2mInitChar (coeffs r, void* p)
 {
@@ -78,6 +121,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfMult        = nr2mMult;
   r->cfDiv         = nr2mDiv;
   r->cfIntDiv      = nr2mIntDiv;
+  r->cfAnn         = nr2mAnn;
   r->cfIntMod      = nr2mMod;
   r->cfExactDiv    = nr2mDiv;
   r->cfNeg         = nr2mNeg;
@@ -103,6 +147,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfName        = ndName;
   r->cfCoeffWrite  = nr2mCoeffWrite;
   r->cfInit_bigint = nr2mMapQ;
+  r->cfQuot1       = nr2mQuot1;
 #ifdef LDEBUG
   r->cfDBTest      = nr2mDBTest;
 #endif
@@ -539,6 +584,27 @@ number nr2mIntDiv(number a, number b, const coeffs r)
   }
 }
 
+static number nr2mAnn(number b, const coeffs r)
+{
+  if ((NATNUMBER)b == 0)
+    return NULL;
+  if ((NATNUMBER)b == 1)
+    return NULL;
+  NATNUMBER c = r->mod2mMask + 1;
+  if (c != 0) /* i.e., if no overflow */
+    return (number)(c / (NATNUMBER)b);
+  else
+  {
+    /* overflow: c = 2^32 resp. 2^64, depending on platform */
+    int_number cc = (int_number)omAlloc(sizeof(mpz_t));
+    mpz_init_set_ui(cc, r->mod2mMask); mpz_add_ui(cc, cc, 1);
+    mpz_div_ui(cc, cc, (unsigned long)(NATNUMBER)b);
+    unsigned long s = mpz_get_ui(cc);
+    mpz_clear(cc); omFree((ADDRESS)cc);
+    return (number)(NATNUMBER)s;
+  }
+}
+
 number nr2mInvers(number c, const coeffs r)
 {
   if ((NATNUMBER)c % 2 == 0)
@@ -558,6 +624,12 @@ number nr2mNeg(number c, const coeffs r)
 number nr2mMapMachineInt(number from, const coeffs /*src*/, const coeffs dst)
 {
   NATNUMBER i = ((NATNUMBER)from) % dst->mod2mMask ;
+  return (number)i;
+}
+
+number nr2mMapProject(number from, const coeffs /*src*/, const coeffs dst)
+{
+  NATNUMBER i = ((NATNUMBER)from) % (dst->mod2mMask + 1);
   return (number)i;
 }
 
@@ -621,6 +693,7 @@ nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
      && (src->mod2mMask > dst->mod2mMask))
   { /* i.e. map an integer mod 2^s into Z mod 2^t, where t > s */
     // to be done
+    return nr2mMapProject;
   }
   if (nCoeff_is_Ring_Z(src))
   {

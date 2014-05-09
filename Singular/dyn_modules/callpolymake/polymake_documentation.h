@@ -5,9 +5,9 @@
 
 #include <polymake_conversion.h>
 
-#include <dyn_modules/callgfanlib/bbcone.h>
-#include <dyn_modules/callgfanlib/bbfan.h>
-#include <dyn_modules/callgfanlib/bbpolytope.h>
+#include <Singular/dyn_modules/callgfanlib/bbcone.h>
+#include <Singular/dyn_modules/callgfanlib/bbfan.h>
+#include <Singular/dyn_modules/callgfanlib/bbpolytope.h>
 
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>

@@ -14,7 +14,7 @@
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
 
-#include <Singular/ipid.h> 
+#include <Singular/ipid.h>
 // extern coeffs coeffs_BIGINT
 
 
@@ -46,15 +46,15 @@ static void * bigintm_Copy(blackbox*/*b*/, void *d)
 static BOOLEAN bigintm_Assign(leftv l, leftv r)
 {
   assume( l->Typ() == bigintm_type_id );
-  
+
   // blackbox *ll=getBlackboxStuff(l->Typ());
-  
+
   if (r->Typ()>MAX_TOK)
   {
     if (bigintm_type_id == r->Typ())
     {
       // blackbox *rr=getBlackboxStuff(r->Typ());
-      
+
       if (l->Data()!=NULL) { number n1=(number)l->Data(); n_Delete(&n1,coeffs_BIGINT); }
       number n2=(number)r->CopyD();
       if (l->rtyp==IDHDL)
@@ -91,7 +91,7 @@ static BOOLEAN bigintm_Assign(leftv l, leftv r)
   }
   else
     Werror("assign %d = %d",l->Typ(),r->Typ());
-  
+
   return TRUE;
 }
 
@@ -108,12 +108,6 @@ BOOLEAN bigintm_Op1(int op,leftv l, leftv r)
     return FALSE;
   }
 */
-  
-  if( op=='(' ) // <bigintm>  VAR();
-  {
-    Werror("bigintm_Op1: What do you mean by '<bigintm>()'?!");
-    return TRUE;  
-  }
 
   return blackboxDefaultOp1(op, l, r);
 }
@@ -126,9 +120,9 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
 {
   // interpreter: a1 is ist bigintm
   assume( a1->Typ() == bigintm_type_id );
-  
+
   // blackbox *a=getBlackboxStuff(a1->Typ());
-  number n1=(number)a1->Data(); 
+  number n1=(number)a1->Data();
   switch(op)
   {
     case '+':
@@ -143,7 +137,7 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
       }
       else if (a2->Typ()==a1->Typ())
       {
-        number n2=(number)a2->Data(); 
+        number n2=(number)a2->Data();
         number n=n_Add(n1,n2, coeffs_BIGINT);
         res->data=(void *)n;
         res->rtyp=a1->Typ();
@@ -151,7 +145,7 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
       }
 
       Werror("bigintm_Op2: Op: '+': Sorry unsupported 2nd argument-type: %s in", Tok2Cmdname(a2->Typ()));
-      return WrongOp("bigintm_Op2", op, a1);
+      return TRUE;
     }
 
     case '-':
@@ -166,15 +160,14 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
       }
       else if (a2->Typ()==a1->Typ())
       {
-        number n2=(number)a2->Data(); 
+        number n2=(number)a2->Data();
         number n=n_Sub(n1,n2, coeffs_BIGINT);
         res->data=(void *)n;
         res->rtyp=a1->Typ();
         return FALSE;
       }
-      
+
       Werror("bigintm_Op2: Op: '-': Sorry unsupported 2nd argument-type: %s in", Tok2Cmdname(a2->Typ()));
-      WrongOp("bigintm_Op2", op, a1);
       return TRUE;
     }
 
@@ -191,24 +184,16 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
       }
       else if (a2->Typ()==a1->Typ())
       {
-        number n2=(number)a2->Data(); 
+        number n2=(number)a2->Data();
         number n=n_Mult(n1,n2, coeffs_BIGINT);
         res->data=(void *)n;
         res->rtyp=a1->Typ();
         return FALSE;
       }
       Werror("bigintm_Op2: Op: '*': Sorry unsupported 2nd argument-type: '%s' in", Tok2Cmdname(a2->Typ()));
-      WrongOp("bigintm_Op2", op, a1);
       return TRUE;
     }
-/*
-    /// TODO: Why is this ignored???!
-    case '(' : // <bigintm>  VAR(b);
-    {
-      Werror("bigintm_Op2: What du you mean by '<bigintm>(...%s...)'?!", Tok2Cmdname(a2->Typ()));
-      return TRUE;  
-    }
-*/
+
     case EQUAL_EQUAL:
     {
       if( a1 == a2)
@@ -222,18 +207,18 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
         number n2=n_Init((int)(long)a2->Data(), coeffs_BIGINT);
         res->data=(void *) (long) n_Equal(n1,n2, coeffs_BIGINT);
         res->rtyp= INT_CMD;
+        n_Delete(&n2,coeffs_BIGINT);
         return FALSE;
       }
       else if (a2->Typ()==a1->Typ())
       {
-        number n2=(number)a2->Data(); 
+        number n2=(number)a2->Data();
         res->data=(void *) (long) n_Equal(n1,n2, coeffs_BIGINT);
         res->rtyp= INT_CMD;
         return FALSE;
       }
 
       Werror("bigintm_Op2: Op: '==': Sorry unsupported 2nd argument-type: '%s' in", Tok2Cmdname(a2->Typ()));
-      WrongOp("bigintm_Op2", op, a1);
       return TRUE;
     }
 
@@ -242,21 +227,16 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
 
       if (a2->name==NULL)
       {
-        Werror("bigintm_Op2: Op: '.': 2nd argument-type: '%s'(%d) should be a NAME", Tok2Cmdname(a2->Typ()), a2->Typ());      
+        Werror("bigintm_Op2: Op: '.': 2nd argument-type: '%s'(%d) should be a NAME", Tok2Cmdname(a2->Typ()), a2->Typ());
         return TRUE;
       }
-      
-      Werror("bigintm_Op2: Op: '.': 2nd argument-type: '%s'(%d) is called '%s' in ", Tok2Cmdname(a2->Typ()), a2->Typ(), a2->name);      
-      return blackboxDefaultOp2(op,res,a1,a2);
+
+      Werror("bigintm_Op2: Op: '.': 2nd argument-type: '%s'(%d) is called '%s' in ", Tok2Cmdname(a2->Typ()), a2->Typ(), a2->name);
       return TRUE;
     }
 
     default:
-    {
-      WrongOp("bigintm_Op2", op, a1);
       return blackboxDefaultOp2(op,res,a1,a2);
-      break;
-    }
   }
 }
 // BOOLEAN opM(int op, leftv res, leftv args)
@@ -274,16 +254,8 @@ static BOOLEAN bigintm_OpM(int op, leftv res, leftv args)
       return FALSE;
     }
 
-    /// TODO: Why is this used for ALL the cases: even for "a(1)"  ???!
-    case '(' : // <bigintm>  VAR(b,...);
-    {
-      Werror("bigintm_OpM: What do you mean by '<bigintm>(...)'?!");
-      return TRUE;  
-    }
-    
     default:
-      WrongOp("bigintm_OpM", op, args);
-      break;
+      return blackbox_default_OpM(op, res, args);
   }
   return blackbox_default_OpM(op, res, args);
 }
@@ -332,7 +304,8 @@ BOOLEAN bigintm_setup()
     PrintLn();
 
     return FALSE; // ok, TRUE = error!
-  } else
+  }
+  else
   {
     Werror("bigintm_setup: Sorry should NOT be run twice!");
     return TRUE; // ok, TRUE = error!

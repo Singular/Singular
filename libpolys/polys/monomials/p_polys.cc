@@ -2001,7 +2001,7 @@ static number* pnBin(int exp, const ring r)
       y = n_Mult(x,bin[e-1],r->cf);
       n_Delete(&x,r->cf);
       x = n_Init(e,r->cf);
-      bin[e] = n_IntDiv(y,x,r->cf);
+      bin[e] = n_ExactDiv(y,x,r->cf);
       n_Delete(&x,r->cf);
       n_Delete(&y,r->cf);
   }
@@ -2301,7 +2301,7 @@ void p_Content(poly ph, const ring r)
       while (p!=NULL)
       {
         //d = nDiv(pGetCoeff(p),h);
-        //tmp = nIntDiv(pGetCoeff(p),h);
+        //tmp = nExactDiv(pGetCoeff(p),h);
         //if (!nEqual(d,tmp))
         //{
         //  StringSetS("** div0:");nWrite(pGetCoeff(p));StringAppendS("/");
@@ -2309,7 +2309,7 @@ void p_Content(poly ph, const ring r)
         //  nWrite(tmp);Print(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s);
         //}
         //nDelete(&tmp);
-        d = n_IntDiv(pGetCoeff(p),h,r->cf);
+        d = n_ExactDiv(pGetCoeff(p),h,r->cf);
         p_SetCoeff(p,d,r);
         pIter(p);
       }
@@ -2450,10 +2450,10 @@ void p_SimpleContent(poly ph, int smax, const ring r)
   while (p!=NULL)
   {
 #if 1
-    d = nlIntDiv(pGetCoeff(p),h,r->cf);
+    d = nlExactDiv(pGetCoeff(p),h,r->cf);
     p_SetCoeff(p,d,r);
 #else
-    nlInpIntDiv(pGetCoeff(p),h,r->cf);
+    nlInpExactDiv(pGetCoeff(p),h,r->cf);
 #endif
     pIter(p);
   }
@@ -2594,7 +2594,7 @@ static number p_InitContent(poly ph, const ring r)
 //    {
 //      while (p!=NULL)
 //      {
-//        d = nIntDiv(pGetCoeff(p),h);
+//        d = nExactDiv(pGetCoeff(p),h);
 //        pSetCoeff(p,d);
 //        pIter(p);
 //      }
@@ -2643,7 +2643,7 @@ void p_Content(poly ph, const ring r)
       while (p!=NULL)
       {
         //d = nDiv(pGetCoeff(p),h);
-        //tmp = nIntDiv(pGetCoeff(p),h);
+        //tmp = nExactDiv(pGetCoeff(p),h);
         //if (!nEqual(d,tmp))
         //{
         //  StringSetS("** div0:");nWrite(pGetCoeff(p));StringAppendS("/");
@@ -2651,7 +2651,7 @@ void p_Content(poly ph, const ring r)
         //  nWrite(tmp);Print(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s);
         //}
         //nDelete(&tmp);
-        d = n_IntDiv(pGetCoeff(p),h,r->cf);
+        d = n_ExactDiv(pGetCoeff(p),h,r->cf);
         p_SetCoeff(p,d,r->cf);
         pIter(p);
       }

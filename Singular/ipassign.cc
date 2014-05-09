@@ -35,6 +35,7 @@
 #include <polys/monomials/maps.h>
 #include <polys/nc/nc.h>
 #include <polys/nc/sca.h>
+#include <polys/prCopy.h>
 
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
@@ -749,49 +750,77 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     WerrorS("qring_id expected");
     return TRUE;
   }
+  assume(res->Data()==NULL);
 
-  ring qr;
+  coeffs newcf = currRing->cf;
+#ifdef HAVE_RINGS
+  ideal id = (ideal)a->Data(); //?
+  const int cpos = idPosConstant(id);  
+  if(rField_is_Ring(currRing))
+    if (cpos >= 0)
+    {
+        newcf = n_CoeffRingQuot1(p_GetCoeff(id->m[cpos], currRing), currRing->cf);
+        if(newcf == NULL)
+          return TRUE;
+    }
+#endif
   //qr=(ring)res->Data();
   //if (qr!=NULL) omFreeBin((ADDRESS)qr, ip_sring_bin);
-  assume(res->Data()==NULL);
-  qr=rCopy(currRing);
+  ring qr = rCopy(currRing);
+  assume(qr->cf == currRing->cf);
+  
+  if ( qr->cf != newcf )
+  {
+    nKillChar ( qr->cf ); // ???
+    qr->cf = newcf;
+  }  
                  // we have to fill it, but the copy also allocates space
   idhdl h=(idhdl)res->data; // we have res->rtyp==IDHDL
   IDRING(h)=qr;
-
-  ideal id=(ideal)a->CopyD(IDEAL_CMD);
-
-  if ((idElem(id)>1) || rIsSCA(currRing) || (currRing->qideal!=NULL))
-    assumeStdFlag(a);
+  
+  ideal qid;
 
 #ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing))
-  {
-    if (idPosConstant(id) != -1)
+  if((rField_is_Ring(currRing)) && (cpos != -1))
     {
-      WerrorS("constant in q-ideal; please modify ground field/ring instead");
-      return TRUE;
+      int i, j;
+      int *perm = (int *)omAlloc0((qr->N+1)*sizeof(int));
+      
+      for(i=qr->N;i>0;i--) 
+        perm[i]=i;
+
+      nMapFunc nMap = n_SetMap(currRing->cf, newcf);
+      qid = idInit(IDELEMS(id)-1,1);
+      for(i = 0, j = 0; i<IDELEMS(id); i++)
+        if( i != cpos )
+          qid->m[j++] = p_PermPoly(id->m[i], perm, currRing, qr, nMap, NULL, 0);
     }
-  }
+    else
 #endif
+      qid = idrCopyR(id,currRing,qr);
+      
+  idSkipZeroes(qid);
+  //idPrint(qid);
+  if ((idElem(qid)>1) || rIsSCA(currRing) || (currRing->qideal!=NULL))
+    assumeStdFlag(a);
 
   if (currRing->qideal!=NULL) /* we are already in a qring! */
   {
-    ideal tmp=idSimpleAdd(id,currRing->qideal);
+    ideal tmp=idSimpleAdd(qid,currRing->qideal);
     // both ideals should be GB, so dSimpleAdd is sufficient
-    idDelete(&id);
-    id=tmp;
+    idDelete(&qid);
+    qid=tmp;
     // delete the qr copy of quotient ideal!!!
     idDelete(&qr->qideal);
   }
-  if (idElem(id)==0)
+  if (idElem(qid)==0)
   {
     qr->qideal = NULL;
-    id_Delete(&id,currRing);
+    id_Delete(&qid,currRing);
     IDTYP(h)=RING_CMD;
   }
   else
-    qr->qideal = id;
+    qr->qideal = qid;
 
   // qr is a copy of currRing with the new qideal!
   #ifdef HAVE_PLURAL
@@ -808,6 +837,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     }
   }
   #endif
+  //rWrite(qr);
   rSetHdl((idhdl)res->data);
   return FALSE;
 }

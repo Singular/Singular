@@ -190,10 +190,12 @@ poly plain_zero_spoly(poly h)
 {
   poly p = NULL;
   number gcd = n_Gcd((number) 0, pGetCoeff(h), currRing->cf);
-  if ((NATNUMBER) gcd > 1)
+  if (!n_IsOne( gcd,  currRing->cf ))
   {
+    number tmp=n_Ann(gcd,currRing->cf);
     p = p_Copy(h->next, currRing);
-    p = p_Mult_nn(p, nIntDiv(0, gcd), currRing);
+    p = p_Mult_nn(p, tmp, currRing);
+    n_Delete(&tmp,currRing->cf);
   }
   return p;
 }
