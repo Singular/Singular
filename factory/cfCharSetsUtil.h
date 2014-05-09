@@ -21,6 +21,7 @@
 #ifndef CF_CHARSETS_UTIL
 #define CF_CHARSETS_UTIL
 
+/*BEGINPUBLIC*/
 class StoreFactors
 {
   public:
@@ -36,6 +37,7 @@ class StoreFactors
       return *this;
     }
 };
+/*ENDPUBLIC*/
 
 Variable
 get_max_var (const CFList & PS);
