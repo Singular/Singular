@@ -7,21 +7,17 @@ MY_CPPFLAGS =  -I${top_srcdir} -I${top_builddir} \
 ${FACTORY_INCLUDES} ${RESOURCES_INCLUDES} ${OMALLOC_INCLUDES} \
 ${FLINT_CFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS} 
 
-module_LTLIBRARIES=gfanlib.la
-
-#if HAVE_GFANLIB
-#### should be disabled in the source code
-#endif
-
-if ENABLE_P_PROCS_DYNAMIC
+if SI_BUILTIN_GFANLIB
+  noinst_LTLIBRARIES=gfanlib.la
+##  moduledir = $(libdir)/singular
+  P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION
+  P_PROCS_MODULE_LDFLAGS =
+else
+  module_LTLIBRARIES=gfanlib.la
   moduledir = $(libexecdir)/singular/MOD
   P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION 
 # Add under Mac OS X: -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
   P_PROCS_MODULE_LDFLAGS =  -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
-else
-  moduledir = $(libdir)/singular
-  P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION
-  P_PROCS_MODULE_LDFLAGS = -module -static
 endif
 
 gfanlib_la_SOURCES  = $(SOURCES)

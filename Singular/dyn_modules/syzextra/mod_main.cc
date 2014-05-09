@@ -1,7 +1,3 @@
-
-
-
-
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
@@ -1925,8 +1921,7 @@ static BOOLEAN _m2_end(leftv res, leftv h)
 
 END_NAMESPACE
 
-
-int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
+extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions) 
 {
 
 #define ADD(C,D,E) \
@@ -1987,12 +1982,3 @@ int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
 #undef ADD
   return 0;
 }
-
-#ifndef EMBED_PYTHON
-extern "C" {
-int mod_init(SModulFunctions* psModulFunctions)
-{
-  return SI_MOD_INIT(syzextra)(psModulFunctions);
-}
-}
-#endif

@@ -9,32 +9,6 @@ SUBDIRS = dyn_modules
 ########################### Possible builtin modules... #########################
 BUILTIN_FLAGS = ${BUILTIN_LIBS}
 
-# if SI_BUILTIN_SYZEXTRA
-#   BUILTIN_FLAGS += ${builddir}/dyn_modules/syzextra/syzextra.la
-# endif
-
-# if HAVE_GFANLIB
-#   GF = ${builddir}/dyn_modules/callgfanlib/gfanlib.la
-# endif
-# if SI_BUILTIN_GFANLIB
-#   BUILTIN_FLAGS += ${GF}
-# endif
-
-# if SI_BUILTIN_PM
-#   PM=${builddir}/dyn_modules/callpolymake/polymake.la
-# endif
-# if SING_HAVE_POLYMAKE
-#   BUILTIN_FLAGS += ${PM}
-# endif
-
-# if SI_BUILTIN_PYOBJECT
-# if SI_EMBED_PYTHON
-# if PYTHON_USE
-#   BUILTIN_FLAGS += ${builddir}/dyn_modules/pyobject/pyobject.la
-# endif
-# endif
-# endif
-
 ########################### libSingular* #########################
 
 libSingular_LTLIBRARIES = libSingular.la 

@@ -16,7 +16,7 @@ template class gfan::Vector<gfan::Rational>;
 template class gfan::Matrix<gfan::Integer>;
 template class gfan::Matrix<gfan::Rational>;
 
-int SI_MOD_INIT(gfanlib)(SModulFunctions* p)
+extern "C" int SI_MOD_INIT(gfanlib)(SModulFunctions* p)
 {
   bbcone_setup(p);
   bbfan_setup(p);
@@ -25,15 +25,4 @@ int SI_MOD_INIT(gfanlib)(SModulFunctions* p)
   return 0;
 }
 
-
-###### TODO!!!!!
-#ifndef EMBED_PYTHON
-extern "C"
-{ 
-int mod_init(SModulFunctions* psModulFunctions)
-{ 
-  return SI_MOD_INIT(gfanlib)(psModulFunctions); 
-}
-}
-#endif
 #endif

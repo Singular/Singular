@@ -1756,8 +1756,7 @@ BOOLEAN PMvertexEdgeGraph(leftv res, leftv args)
   return TRUE;
 }
 
-
-extern "C" int mod_init(SModulFunctions* p)
+extern "C" int SI_MOD_INIT(polymake)(SModulFunctions* p)
 {
   if (init_polymake==NULL)
     {init_polymake = new polymake::Main();}
