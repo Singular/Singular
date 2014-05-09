@@ -1,6 +1,7 @@
-// include header files
-
 #include <kernel/mod2.h>
+
+#ifdef HAVE_MATHICGB
+
 #include <misc/auxiliary.h>
 
 #include <misc/options.h>
@@ -10,8 +11,6 @@
 
 #include <Singular/ipid.h>
 #include <Singular/mod_lib.h>
-
-#ifdef HAVE_MATHICGB
 
 #include <mathicgb.h>
 
@@ -549,7 +548,7 @@ int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
   return 0;
 }
 
-#else /* HAVE_MATHICGB */
+/* #else
 
 int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
 {
@@ -560,5 +559,6 @@ int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
   );
   return 1;
 }
+*/
 
 #endif /* HAVE_MATHICGB */
