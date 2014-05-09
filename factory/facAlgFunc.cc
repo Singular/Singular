@@ -196,20 +196,11 @@ resultante( const CanonicalForm & f, const CanonicalForm& g, const Variable & v 
   return result;
 }
 
-// sqr-free routine for algebraic extensions
-// we need it! Ex.: f=c^2+2*a*c-1; as=[a^2+1]; f=(c+a)^2
-//static CFFList alg_sqrfree( const CanonicalForm & f )
-//{
-//  CFFList L;
-//
-//  L.append(CFFactor(f,1));
-//  return L;
-//}
-
-// Calculates a square free norm
-// Input: f(x, alpha) a square free polynomial over K(alpha),
+// Trager's square free norm algorithm:
+// f a separable polynomial over K (alpha),
 // alpha is defined by the minimal polynomial Palpha
-// K has more than S elements (S is defined in thesis; look getDegOfExt)
+// K need to contain more than S elements (S is defined in Messollen's thesis;
+// see also getDegOfExt)
 static CFFList
 sqrf_norm_sub (const CanonicalForm & f, const CanonicalForm & PPalpha,
                CFGenerator & myrandom, CanonicalForm & s,  CanonicalForm & g,
@@ -278,12 +269,12 @@ sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
            CanonicalForm & R)
 {
   CFFList result;
-  if ( getCharacteristic() == 0 )
+  if (getCharacteristic() == 0)
   {
     IntGenerator myrandom;
     result= sqrf_norm_sub (f, PPalpha, myrandom, s, g, R);
   }
-  else if ( degree (Extension) > 0 ) // working over Extensions
+  else if (degree (Extension) > 0)
   {
     AlgExtGenerator myrandom (Extension);
     result= sqrf_norm_sub (f, PPalpha, myrandom, s, g, R);
@@ -297,7 +288,7 @@ sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
 }
 
 // calculate a "primitive element"
-// K must have more than S elements (->thesis, -> getDegOfExt)
+// K must have more than S elements (-> getDegOfExt)
 static CFList
 simpleExtension(CFList& backSubst, const CFList & Astar,
                 const Variable & Extension, bool& isFunctionField,
@@ -320,7 +311,7 @@ simpleExtension(CFList& backSubst, const CFList & Astar,
   {
     R=Bstar.getFirst();
     Bstar.removeFirst();
-    for (CFListIterator i=Bstar; i.hasItem(); i++)
+    for (CFListIterator i= Bstar; i.hasItem(); i++)
     {
       j= i;
       j++;
