@@ -359,8 +359,8 @@ simpleExtension(CFList& backSubst, const CFList & Astar,
                 const Variable & Extension, bool& isFunctionField,
                 CanonicalForm & R)
 {
-  CFList Returnlist, Bstar=Astar;
-  CanonicalForm s, g, ra, rb, oldR, h, denra, denrb=1;
+  CFList Returnlist, Bstar= Astar;
+  CanonicalForm s, g, ra, rb, oldR, h, denra, denrb= 1;
   Variable alpha;
   CFList tmp;
 
@@ -515,7 +515,7 @@ Trager (const CanonicalForm & F, const CFList & Astar,
   CanonicalForm numinv;
   if (!isRat && getCharacteristic() == 0)
     On (SW_RATIONAL);
-  numinv= QuasiInverse (Rstar, alg_LC(f, algExtLevel), Rstar.mvar());
+  numinv= QuasiInverse (Rstar, alg_LC (f, algExtLevel), Rstar.mvar());
 
   f *= numinv;
   f= Prem (f, Rstarlist);
@@ -532,24 +532,24 @@ Trager (const CanonicalForm & F, const CFList & Astar,
     return CFFList (CFFactor (f, 1));
   }
 
-  sqrf_norm(f, Rstar, vminpoly, s, g, R );
+  sqrf_norm (f, Rstar, vminpoly, s, g, R);
 
   Variable X;
-  if (hasFirstAlgVar(R,X))
+  if (hasFirstAlgVar (R, X))
   {
     // factorize R over alg.extension with X
-    Factorlist =  factorize( R, X );
+    Factorlist=  factorize (R, X);
   }
   else
   {
     // factor R over k
-    Factorlist = factorize(R);
+    Factorlist = factorize (R);
   }
 
-  if ( !Factorlist.getFirst().factor().inCoeffDomain() )
-    Factorlist.insert(CFFactor(1,1));
-  if ( Factorlist.length() == 2 && Factorlist.getLast().exp()== 1)
-  { // irreduzibel (first entry is a constant)
+  if (!Factorlist.getFirst().factor().inCoeffDomain())
+    Factorlist.insert (CFFactor (1, 1));
+  if (Factorlist.length() == 2 && Factorlist.getLast().exp()== 1)
+  {
     f= backSubst (f, backSubsts, Astar);
     f *= bCommonDen (f);
     f= Prem (f, as);
@@ -589,10 +589,11 @@ Trager (const CanonicalForm & F, const CFList & Astar,
     }
     // we are not interested in a
     // constant (over K_r, which can be a polynomial!)
-    if (degree(g, f.mvar())>0){ L.append(CFFactor(g,1)); }
+    if (degree (g, f.mvar()) > 0)
+      L.append (CFFactor (g, 1));
   }
   CFFList LL;
-  if (getCharacteristic()>0)
+  if (getCharacteristic() > 0) //do I really need this part?
   {
     CFFListIterator i=L;
     CanonicalForm c_fac=1;
@@ -904,53 +905,50 @@ facAlgFunc2 (const CanonicalForm & f, const CFList & as)
 // 1) first trivial cases:
   if (vf.level() <= as.getLast().level())
   {
-// ||( (as.length()==1) && (degree(f,vf)==3) && (degree(as.getFirst()==2)) )
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     return CFFList(CFFactor(f,1));
   }
 
-// 2) List of variables:
-// 2a) Setup list of those polys in AS having degree(AS[i], AS[i].mvar()) > 1
-// 2b) Setup variableordering
+// 2) Setup list of those polys in AS having degree > 1
   CFList Astar;
   Variable x;
   CanonicalForm elem;
   Varlist ord, uord;
-  for ( int ii=1; ii< level(vf) ; ii++ ) { uord.append(Variable(ii));  }
+  for (int ii= 1; ii < level (vf); ii++)
+    uord.append (Variable (ii));
 
-  for ( i=as; i.hasItem(); i++ ){
+  for (i= as; i.hasItem(); i++)
+  {
     elem= i.getItem();
     x= elem.mvar();
-    if ( degree(elem,x) > 1){ // otherwise it's not an extension
-      Astar.append(elem);
-      ord.append(x);
+    if (degree (elem, x) > 1)  // otherwise it's not an extension
+    {
+      Astar.append (elem);
+      ord.append (x);
     }
   }
-  uord= Difference(uord,ord);
+  uord= Difference (uord, ord);
 
 // 3) second trivial cases: we already proved irr. of f over no extensions
-  if ( Astar.length() == 0 ){
+  if (Astar.length() == 0)
+  {
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
-    return CFFList(CFFactor(f,1));
+    return CFFList (CFFactor (f, 1));
   }
 
-// 4) Try to obtain a partial factorization using prop2 and prop3
-//    Use with caution! We have to proof these propositions first!
-  // Not yet implemented
-
-// 5) Look if elements in uord actually occure in any of the minimal
+// 4) Look if elements in uord actually occur in any of the minimal
 //    polynomials. If no element of uord occures in any of the minimal
-//   polynomials, we don't have transzendentals.
+//    polynomials the field is an alg. number field not an alg. function field
   Varlist newuord= varsInAs (uord, Astar);
 
   CFFList Factorlist;
-  Varlist gcdord= Union(ord,newuord);
-  gcdord.append(f.mvar());
+  Varlist gcdord= Union (ord, newuord);
+  gcdord.append (f.mvar());
   bool isFunctionField= (newuord.length() > 0);
 
-  // This is for now. we need alg_sqrfree implemented!
+  // TODO alg_sqrfree?
   CanonicalForm Fgcd= 0;
   if (isFunctionField)
     Fgcd= alg_gcd (f, f.deriv(), Astar);
@@ -968,47 +966,52 @@ facAlgFunc2 (const CanonicalForm & f, const CFList & as)
       return result;
     }
 
-    Fgcd= pp(Fgcd); Ggcd= pp(Ggcd);
+    Fgcd= pp (Fgcd);
+    Ggcd= pp (Ggcd);
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     return merge (facAlgFunc2 (Fgcd, as), facAlgFunc2 (Ggcd, as));
   }
 
-  if ( getCharacteristic() > 0 )
+  if (getCharacteristic() > 0)
   {
-    // First look for extension!
     IntList degreelist;
     Variable vminpoly;
-    for (i=Astar; i.hasItem(); i++){degreelist.append(degree(i.getItem()));}
-    int extdeg= getDegOfExt (degreelist, degree(f));
+    for (i= Astar; i.hasItem(); i++)
+      degreelist.append (degree (i.getItem()));
 
-    // Now the real stuff!
-    if ( newuord.length() == 0 ) // no transzendentals
+    int extdeg= getDegOfExt (degreelist, degree (f));
+
+    if (newuord.length() == 0) // no parameters
     {
-      if ( extdeg > 1 ){
+      if (extdeg > 1)
+      {
         CanonicalForm MIPO= generateMipo (extdeg);
         vminpoly= rootOf(MIPO);
       }
       Factorlist= Trager(f, Astar, vminpoly, as, isFunctionField);
       return Factorlist;
     }
-    else if (isInseparable(Astar) || derivZero) // Look if extensions are separable
+    else if (isInseparable(Astar) || derivZero) // inseparable case
     {
-      Factorlist= SteelTrager(f, Astar);
+      Factorlist= SteelTrager (f, Astar);
       return Factorlist;
     }
-    else{ // we are on the save side: Use trager
-      if (extdeg > 1 ){
+    else // separable case
+    {
+      if (extdeg > 1)
+      {
         CanonicalForm MIPO=generateMipo (extdeg);
-        vminpoly= rootOf(MIPO);
+        vminpoly= rootOf (MIPO);
       }
-      Factorlist= Trager(f, Astar, vminpoly, as, isFunctionField);
+      Factorlist= Trager (f, Astar, vminpoly, as, isFunctionField);
       return Factorlist;
     }
   }
-  else{ // char=0 apply trager directly
+  else // char 0
+  {
     Variable vminpoly;
-    Factorlist= Trager(f, Astar, vminpoly, as, isFunctionField);
+    Factorlist= Trager (f, Astar, vminpoly, as, isFunctionField);
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
     return Factorlist;
@@ -1030,7 +1033,7 @@ facAlgFunc (const CanonicalForm & f, const CFList & as)
   if (Factors.getFirst().factor().inCoeffDomain())
     Factors.removeFirst();
 
-  if ( as.length() == 0 )
+  if (as.length() == 0)
   {
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
@@ -1043,13 +1046,14 @@ facAlgFunc (const CanonicalForm & f, const CFList & as)
     return Factors;
   }
 
-  for ( CFFListIterator i=Factors; i.hasItem(); i++ )
+  for (CFFListIterator i=Factors; i.hasItem(); i++)
   {
     if (i.getItem().factor().level() > as.getLast().level())
     {
-      output=facAlgFunc2(i.getItem().factor(), as);
-      for ( CFFListIterator j=output; j.hasItem(); j++)
-        Output = append(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
+      output= facAlgFunc2 (i.getItem().factor(), as);
+      for (CFFListIterator j= output; j.hasItem(); j++)
+        Output= append (Output, CFFactor (j.getItem().factor(),
+                                          j.getItem().exp()*i.getItem().exp()));
     }
   }
 
