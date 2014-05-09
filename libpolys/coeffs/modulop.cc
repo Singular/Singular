@@ -466,9 +466,6 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfSub   = npSub;
   r->cfAdd   = npAdd;
   r->cfDiv   = npDiv;
-  r->cfIntDiv= npDiv;
-  //r->cfIntMod= ndIntMod;
-  r->cfExactDiv= npDiv;
   r->cfInit = npInit;
   //r->cfSize  = ndSize;
   r->cfInt  = npInt;

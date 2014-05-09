@@ -3473,7 +3473,7 @@ void enterExtendedSpoly(poly h,kStrategy strat)
   bool go = false;
   if (n_DivBy((number) 0, pGetCoeff(h), currRing->cf))
   {
-    gcd = nIntDiv((number) 0, pGetCoeff(h));
+    gcd = n_Ann(pGetCoeff(h),currRing->cf);
     go = true;
   }
   else
@@ -3484,7 +3484,7 @@ void enterExtendedSpoly(poly h,kStrategy strat)
     if (!go)
     {
       number tmp = gcd;
-      gcd = nIntDiv(0, gcd);
+      gcd = n_Ann(gcd,currRing->cf);
       nDelete(&tmp);
     }
     p_Test(p,strat->tailRing);

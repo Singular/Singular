@@ -29,7 +29,6 @@
 #define nWrite(n)         n_Write(n, currRing->cf, rShortOut(currRing))
 #define nNormalize(n)     n_Normalize(n,currRing->cf)
 #define nGcd(a,b)         n_Gcd(a,b,currRing->cf)
-#define nIntDiv(a, b)     n_IntDiv(a,b,currRing->cf)
 #define nDiv(a, b)        n_Div(a,b,currRing->cf)
 #define nInvers(a)        n_Invers(a,currRing->cf)
 #define nExactDiv(a, b)   n_ExactDiv(a,b,currRing->cf)
