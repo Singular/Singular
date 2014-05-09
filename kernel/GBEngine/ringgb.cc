@@ -190,7 +190,7 @@ poly plain_zero_spoly(poly h)
 {
   poly p = NULL;
   number gcd = n_Gcd((number) 0, pGetCoeff(h), currRing->cf);
-  if (!n_InsOne( gcd ))
+  if (!n_IsOne( gcd,  currRing->cf ))
   {
     number tmp=n_Ann(gcd,currRing->cf);
     p = p_Copy(h->next, currRing);
