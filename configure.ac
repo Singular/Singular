@@ -241,6 +241,7 @@ AC_CONFIG_FILES([Singular/dyn_modules/gfanlib/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/polymake/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/pyobject/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/singmathic/Makefile])
+AC_CONFIG_FILES([Singular/dyn_modules/staticdemo/Makefile])
 
 AC_CONFIG_FILES([Singular/Makefile])
 

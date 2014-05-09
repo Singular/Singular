@@ -1,19 +1,6 @@
 #ifndef MOD_LIB_H
 #define MOD_LIB_H
 
-// Note that STATIC_VERSION and DYNAMIC_VERSION should not be defined in the following config header mod2.h!
-#include <kernel/mod2.h> /* for SI_BUILTINMODULES_ADD */
-
-#include <polys/mod_raw.h>  /* for lib_types */
-
-lib_types type_of_LIB(const char *newlib, char *fullname);
-
-/// Data for @c type_of_LIB to determine built-in modules,
-/// use @c add(name) to add built-in library to macro
-#define SI_FOREACH_BUILTIN(add) \
-    add(staticdemo)\
-    SI_BUILTINMODULES_ADD(add)
-
 #ifdef STATIC_VERSION
 #  define SI_MOD_INIT(name) name##_mod_init
 #elif defined(DYNAMIC_VERSION)
@@ -21,6 +8,16 @@ lib_types type_of_LIB(const char *newlib, char *fullname);
 #else
 #  error Please use SI_MOD_INIT inside a Singular (dynamic/shared/static/builtin) module only!
 #endif
+
+// Note that STATIC_VERSION and DYNAMIC_VERSION should not be defined in the following config header mod2.h!
+#include <kernel/mod2.h> /* for SI_BUILTINMODULES_ADD */
+
+/// Data for @c type_of_LIB to determine built-in modules,
+/// use @c add(name) to add built-in library to macro
+#define SI_FOREACH_BUILTIN(add) SI_BUILTINMODULES_ADD(add)
+
+#include <polys/mod_raw.h>  /* for lib_types */
+lib_types type_of_LIB(const char *newlib, char *fullname);
 
 #endif
 
