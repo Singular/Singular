@@ -319,7 +319,8 @@ multiplicity (CFFList& factors, const CanonicalForm& F, const CFList& as)
       count++;
       G= q;
     }
-    iter.getItem()= CFFactor (iter.getItem().factor(), iter.getItem().exp()+count);
+    iter.getItem()= CFFactor (iter.getItem().factor(),
+                              iter.getItem().exp() + count);
   }
 }
 
@@ -434,60 +435,68 @@ psqr (const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q,
 }
 
 CanonicalForm
-Sprem ( const CanonicalForm &f, const CanonicalForm &g, CanonicalForm & m, CanonicalForm & q )
+Sprem (const CanonicalForm &f, const CanonicalForm &g, CanonicalForm & m,
+       CanonicalForm & q )
 {
   CanonicalForm ff, gg, l, test, retvalue;
   int df, dg,n;
   bool reord;
   Variable vf, vg, v;
 
-  if ( (vf = f.mvar()) < (vg = g.mvar()) )
+  if ((vf = f.mvar()) < (vg = g.mvar()))
   {
-    m=CanonicalForm(0); q=CanonicalForm(0);
+    m= 0;
+    q= 0;
     return f;
   }
   else
   {
     if ( vf == vg )
     {
-      ff = f; gg = g;
-      reord = false;
-      v = vg; // == x
+      ff= f;
+      gg= g;
+      reord= false;
+      v= vg; // == x
     }
     else
     {
-      v = Variable(level(f.mvar()) + 1);
-      ff = swapvar(f,vg,v); // == r
-      gg = swapvar(g,vg,v); // == v
+      v= Variable (f.level() + 1);
+      ff= swapvar (f, vg, v); // == r
+      gg= swapvar (g, vg, v); // == v
       reord=true;
     }
-    dg = degree( gg, v ); // == dv
-    df = degree( ff, v ); // == dr
-    if (dg <= df) {l=LC(gg); gg = gg -LC(gg)*power(v,dg);}
-    else { l = 1; }
-    n= 0;
-    while ( ( dg <= df  ) && ( !ff.isZero()) )
+    dg= degree (gg, v); // == dv
+    df= degree (ff, v); // == dr
+    if (dg <= df)
     {
-      test= power(v,df-dg) * gg * LC(ff);
-      if ( df == 0 ){ff= ff.genZero();}
-      else {ff= ff - LC(ff)*power(v,df);}
-      ff = l*ff-test;
-      df= degree(ff,v);
+      l= LC (gg);
+      gg= gg - LC(gg)*power(v,dg);
+    }
+    else
+      l = 1;
+    n= 0;
+    while ((dg <= df) && (!ff.isZero()))
+    {
+      test= gg*LC (ff)*power (v, df - dg);
+      if (df == 0)
+        ff= 0;
+      else
+        ff= ff - LC(ff)*power(v,df);
+      ff= l*ff - test;
+      df= degree (ff, v);
       n++;
     }
-    if ( reord )
-    {
-      retvalue= swapvar( ff, vg, v );
-    }
+
+    if (reord)
+      retvalue= swapvar (ff, vg, v);
     else
-    {
       retvalue= ff;
-    }
-    m= power(l,n);
-    if ( fdivides(g,m*f-retvalue) )
-      q= (m*f-retvalue)/g;
+
+    m= power (l, n);
+    if (fdivides (g, m*f - retvalue))
+      q= (m*f - retvalue)/g;
     else
-      q= CanonicalForm(0);
+      q= 0;
     return retvalue;
   }
 }
@@ -541,24 +550,38 @@ getDegOfExt (IntList & degreelist, int n)
 {
   int charac= getCharacteristic();
   setCharacteristic(0); // need it for k !
-  int k=1, m=1, length=degreelist.length();
+  int k= 1, m= 1, length= degreelist.length();
   IntListIterator i;
 
-  for (i=degreelist; i.hasItem(); i++) m= m*i.getItem();
-  int q=charac;
-  while (q <= ((n*m)*(n*m)/2)) { k= k+1; q= q*charac;}
-  int l=0;
-  do {
-    for (i=degreelist; i.hasItem(); i++){
-      l= l+1;
-      if ( igcd(k,i.getItem()) == 1){
-        if ( l==length ){ setCharacteristic(charac);  return k; }
-      }
-      else { break; }
-    }
-    k= k+1; l=0;
+  for (i= degreelist; i.hasItem(); i++)
+     m= m*i.getItem();
+  int q= charac;
+  while (q <= ((n*m)*(n*m)/2))
+  {
+    k= k+1;
+    q= q*charac;
   }
-  while ( 1 );
+  int l= 0;
+  do
+  {
+    for (i= degreelist; i.hasItem(); i++)
+    {
+      l= l + 1;
+      if (igcd (k, i.getItem()) == 1)
+      {
+        if (l == length)
+        {
+          setCharacteristic (charac);
+          return k;
+        }
+      }
+      else
+        break;
+    }
+    k= k + 1;
+    l= 0;
+  }
+  while (1);
 }
 
 CanonicalForm
@@ -586,22 +609,23 @@ QuasiInverse (const CanonicalForm& f, const CanonicalForm& g,
 
   while (degree (pi1,x) > 0)
   {
-    psqr( pi, pi1, q, pi2, m, x);
+    psqr (pi, pi1, q, pi2, m, x);
     pi2 /= bi;
 
     tmp= t1;
     t1= t0*m - t1*q;
     t0= tmp;
     t1 /= bi;
-    pi = pi1; pi1 = pi2;
-    if ( degree ( pi1, x ) > 0 )
+    pi= pi1;
+    pi1= pi2;
+    if (degree (pi1, x) > 0)
     {
-      delta = degree( pi, x ) - degree( pi1, x );
-      if ( (delta+1) % 2 )
-        bi = LC( pi, x ) * power( Hi, delta );
+      delta= degree (pi, x) - degree (pi1, x);
+      if ((delta + 1) % 2)
+        bi= LC (pi, x)*power (Hi, delta);
       else
-        bi = -LC( pi, x ) * power( Hi, delta );
-      Hi = power( LC( pi1, x ), delta ) / power( Hi, delta-1 );
+        bi= -LC (pi, x)*power (Hi, delta);
+      Hi= power (LC (pi1, x), delta)/power (Hi, delta - 1);
     }
   }
   t1 /= gcd (pi1, t1);

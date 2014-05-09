@@ -316,7 +316,8 @@ swapvar (const CFFList & PS, const Variable & x, const Variable & y)
   CFFList ps;
 
   for (CFFListIterator i= PS; i.hasItem(); i++)
-    ps.append (CFFactor (swapvar (i.getItem().factor(), x, y), i.getItem().exp()));
+    ps.append (CFFactor (swapvar (i.getItem().factor(), x, y),
+                         i.getItem().exp()));
   return ps;
 }
 

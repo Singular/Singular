@@ -353,7 +353,8 @@ modCharSet (const CFList& L, StoreFactors& StoredFactors, bool removeContents)
 
 /// characteristic set via modified medial set
 CFList
-charSetViaModCharSet (const CFList& PS, StoreFactors& StoredFactors, bool removeContents)
+charSetViaModCharSet (const CFList& PS, StoreFactors& StoredFactors,
+                      bool removeContents)
 {
   CFList L;
   CFFList sqrfFactors;
@@ -388,7 +389,8 @@ charSetViaModCharSet (const CFList& PS, StoreFactors& StoredFactors, bool remove
   if (RS.isEmpty())
     return result;
 
-  return charSetViaModCharSet (Union (L, Union (RS, result)), StoredFactors, removeContents);
+  return charSetViaModCharSet (Union (L, Union (RS, result)), StoredFactors,
+                               removeContents);
 }
 
 CFList

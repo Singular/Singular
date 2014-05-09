@@ -57,8 +57,8 @@ alg_content (const CanonicalForm& f, const CFList& as)
   return abs (f);
 }
 
-CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
-                      const CFList &as)
+CanonicalForm
+alg_gcd (const CanonicalForm & fff, const CanonicalForm &ggg, const CFList &as)
 {
   if (fff.inCoeffDomain() || ggg.inCoeffDomain())
     return 1;
