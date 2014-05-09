@@ -22,7 +22,7 @@ PROCEDURES:
  rootofUnity(n);          the minimal polynomial for the n-th primitive root of unity
              (parameters in square brackets [] are optional)
  optionIsSet(opt)         check if as a string given option is set or not.
- hasRingCoefficientRing   check if the coefficient ring is not a field
+ hasFieldCoefficient      check if the coefficient ring is considered a field
  hasNumericCoeffs(rng)    check for use of floating point numbers
  hasCommutativeVars(rng)  non-commutive or commnuative polynomial ring
  hasGlobalOrdering(rng)   global versus mixed/local monomial ordering
@@ -941,23 +941,23 @@ static proc testIsQuotientRing()
    ASSUME(0, isQuotientRing(qrng3) ) ;
 }
 
-proc hasRingCoefficientRing( rng )
-"USAGE: hasRingCoefficientRing ( rng );
-RETURN:  0 if the coeffcients form a field, 1 otherwise.
+proc hasFieldCoefficient( rng )
+"USAGE: hasFieldCoefficient ( rng );
+RETURN:  1 if the coeffcients form a field, 0 otherwise.
 KEYWORDS: ring coefficients
-EXAMPLE: example hasRingCoefficientRing; shows an example
+EXAMPLE: example hasFieldCoefficient; shows an example
 "
 {
-  return (attrib(rng,"ring_cf")==1);
+  return (attrib(rng,"ring_cf")==0);
 }
 example
 {
   ring rng = integer,x,dp;
-  hasRingCoefficientRing(rng); //yes
+  hasFieldCoefficientRing(rng); //no
   // if a certain method supports only rings with integer coefficients,
   // then a parameter test could be performed:
   ring rng2 = 0, x, dp;
-  hasRingCoefficientRing(rng2);  // no
+  hasFieldCoefficient(rng2);  // yes
 }
 
 proc hasGlobalOrdering (rng)

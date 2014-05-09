@@ -28,22 +28,22 @@ qring qrng3=1;
 ASSUME(0, isQuotientRing(qrng3) ) ;
 //--------------------------
 ring rng = integer,x,dp;
-ASSUME(0, hasRingCoefficientRing( rng ) );
+ASSUME(0, !hasFieldCoefficient( rng ) );
 
 qring q = ideal(x);
-ASSUME(0, hasRingCoefficientRing( q ) );
+ASSUME(0, !hasFieldCoefficient( q ) );
 
 ring rng2 = 0,x,dp;
-ASSUME(0, 0==hasRingCoefficientRing( rng2 ) );
+ASSUME(0, 0==!hasFieldCoefficient( rng2 ) );
 
 ring rng3 = (0,a),x,dp;
-ASSUME(0, 0==hasRingCoefficientRing( rng3 ) );
+ASSUME(0, 0==!hasFieldCoefficient( rng3 ) );
 
 ring rng4 = (real,a),x,dp;
-ASSUME(0, 0==hasRingCoefficientRing( rng4 ) );
+ASSUME(0, 0==!hasFieldCoefficient( rng4 ) );
 
 ring rng5 = (real),x,dp;
-ASSUME(0, 0==hasRingCoefficientRing( rng5 ) );
+ASSUME(0, 0==!hasFieldCoefficient( rng5 ) );
 
 
 tst_status(1); $;
