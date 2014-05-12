@@ -1525,6 +1525,14 @@ leftv ssiRead1(si_link l)
              res=NULL;
              break;
   }
+  // if currRing is required for the result, but lost
+  // define "ssiRing%d" as currRing:
+  if ((d->r!=NULL)
+  && (currRing!=d->r)
+  && (res->RingDependend()))
+  {
+    ssiSetCurrRing(d->r);
+  }
   return res;
 no_ring: WerrorS("no ring");
   omFreeSize(res,sizeof(sleftv));
