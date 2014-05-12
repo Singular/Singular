@@ -431,11 +431,25 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
   assume( getCoeffType(r) == ID );
   assume( getCoeffType(aRing) == n_Q );
 
+  mpz_ptr z;
+  mpz_ptr zz=NULL;
+  #if SIZEOF_LONG == 8
   if (IS_IMM(from))
-    return nf((float)nlInt(from,NULL /* dummy for nlInt*/)).N();
+  {
+    int ui=SR_TO_INT(from);
+     if ((long)ui==SR_TO_INT(from))
+       return nf((float)ui).N();
+     zz=(mpz_ptr)omAlloc(sizeof(mpz_t));
+     mpz_init_set_si(zz,ui);
+     z=zz;
+  }
+  #else
+  if (IS_IMM(from))
+    return nf((float)nlInt(from,aRing)).N();
+  #endif
 
   /* read out the enumerator */
-  mpz_ptr z=GET_NOM(from);
+  z=GET_NOM(from);
   int i = mpz_size1(z);
   mpf_t e;
   mpf_init(e);
@@ -443,8 +457,15 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
   int sign= mpf_sgn(e);
   mpf_abs (e, e);
 
+  #if SIZEOF_LONG == 8
+  if (zz!=NULL)
+  {
+    mpz_clear(zz);
+    omFreeSize(zz,sizeof(mpz_t));
+  }
+  #endif
   /* if number was an integer, we are done*/
-  if(IS_INT(from))
+  if(IS_IMM(from)|| IS_INT(from))
   {
     if(i>4)
     {
