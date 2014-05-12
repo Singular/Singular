@@ -84,22 +84,13 @@ varsInAs (const Varlist & uord, const CFList & Astar)
   return output;
 }
 
-///////////////////////////////////////////////////////////////
-// generate a minpoly of degree degree_of_Extension in the   //
-// field getCharacteristik()^Extension.                      //
-///////////////////////////////////////////////////////////////
+// generate an irreducible poly of degree degOfExt over F_p
 CanonicalForm
 generateMipo (int degOfExt)
 {
   FFRandom gen;
   return find_irreducible (degOfExt, gen, Variable (1));
 }
-
-////////////////////////////////////////////////////////////////////////
-// This implements the algorithm of Trager for factorization of
-// (multivariate) polynomials over algebraic extensions and so called
-// function field extensions.
-////////////////////////////////////////////////////////////////////////
 
 // // missing class: IntGenerator:
 bool IntGenerator::hasItems() const
@@ -522,10 +513,9 @@ divide (const CanonicalForm & ff, const CanonicalForm & f, const CFList & as)
   return r;
 }
 
-// Look if Minimalpolynomials in Astar define seperable Extensions
-// Must be a power of p: i.e. y^{p^e}-x
+// check if polynomials in Astar define a separable extension
 bool
-isInseparable(const CFList & Astar)
+isInseparable (const CFList & Astar)
 {
   CanonicalForm elem;
 
@@ -541,7 +531,7 @@ isInseparable(const CFList & Astar)
 }
 
 // calculate big enough extension for finite fields
-// Idea: first calculate k, such that q^k > S (->thesis, -> getextension)
+// Idea: first calculate k, such that q^k > S (->thesis)
 // Second, search k with gcd(k,m_i)=1, where m_i is the degree of the i'th
 // minimal polynomial. Then the minpoly f_i remains irrd. over q^k and we
 // have enough elements to plug in.
@@ -635,8 +625,8 @@ QuasiInverse (const CanonicalForm& f, const CanonicalForm& g,
 }
 
 CanonicalForm
-evaluate (const CanonicalForm& f, const CanonicalForm& g, const CanonicalForm& h,
-          const CanonicalForm& powH)
+evaluate (const CanonicalForm& f, const CanonicalForm& g,
+          const CanonicalForm& h, const CanonicalForm& powH)
 {
   if (f.inCoeffDomain())
     return f;

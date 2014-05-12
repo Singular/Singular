@@ -608,7 +608,7 @@ irrCharSeries (const CFList & PS)
     else
     {
       nr_of_iteration += 1;
-      ppi= MyUnion (ListCFList(qs), ppi1);
+      ppi= MyUnion (ListCFList (qs), ppi1);
     }
 
     StoreFactors StoredFactors;

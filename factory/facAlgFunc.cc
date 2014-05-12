@@ -176,7 +176,7 @@ alg_gcd (const CanonicalForm & fff, const CanonicalForm &ggg, const CFList &as)
 }
 
 static CanonicalForm
-resultante( const CanonicalForm & f, const CanonicalForm& g, const Variable & v )
+resultante (const CanonicalForm & f, const CanonicalForm& g, const Variable & v)
 {
   bool on_rational = isOn(SW_RATIONAL);
   if (!on_rational && getCharacteristic() == 0)
@@ -242,7 +242,7 @@ sqrf_norm_sub (const CanonicalForm & f, const CanonicalForm & PPalpha,
       sqfreetest= 1;
       for (i= testlist; i.hasItem(); i++)
       {
-        if (i.getItem().exp() > 1 && degree (i.getItem().factor(), R.mvar()) > 0)
+        if (i.getItem().exp() > 1 && degree (i.getItem().factor(),R.mvar()) > 0)
         {
           sqfreetest= 0;
           break;
@@ -290,9 +290,9 @@ sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
 // calculate a "primitive element"
 // K must have more than S elements (-> getDegOfExt)
 static CFList
-simpleExtension(CFList& backSubst, const CFList & Astar,
-                const Variable & Extension, bool& isFunctionField,
-                CanonicalForm & R)
+simpleExtension (CFList& backSubst, const CFList & Astar,
+                 const Variable & Extension, bool& isFunctionField,
+                 CanonicalForm & R)
 {
   CFList Returnlist, Bstar= Astar;
   CanonicalForm s, g, ra, rb, oldR, h, denra, denrb= 1;
@@ -378,10 +378,12 @@ simpleExtension(CFList& backSubst, const CFList & Astar,
         denrb= denra;
         for (; j.hasItem(); j++)
         {
-          CanonicalForm powdenra= power (denra, degree (j.getItem(), oldR.mvar()));
+          CanonicalForm powdenra= power (denra, degree (j.getItem(),
+                                                        oldR.mvar()));
           j.getItem()= evaluate (j.getItem(),ra, denra, powdenra, oldR.mvar());
           powdenra= power (denra, degree (j.getItem(), i.getItem().mvar()));
-          j.getItem()= evaluate (j.getItem(), rb, denrb, powdenra, i.getItem().mvar());
+          j.getItem()= evaluate (j.getItem(), rb, denrb, powdenra,
+                                 i.getItem().mvar());
         }
       }
 
@@ -414,7 +416,8 @@ Trager (const CanonicalForm & F, const CFList & Astar,
   CanonicalForm R, Rstar, s, g, h, f= F;
   CFList substlist, backSubsts;
 
-  substlist= simpleExtension (backSubsts, Astar, vminpoly, isFunctionField, Rstar);
+  substlist= simpleExtension (backSubsts, Astar, vminpoly, isFunctionField,
+                              Rstar);
 
   f= subst (f, Astar, substlist, Rstar, isFunctionField);
 
@@ -692,7 +695,8 @@ SteelTrager (const CanonicalForm & f, const CFList & AS)
         {
           tmp= varsGMap[j];
           CFFListIterator iter2= varsGMapLevel;
-          ASSERT (tmp.length() == varsGMapLevel.length(), "wrong length of lists");
+          ASSERT (tmp.length() == varsGMapLevel.length(),
+                  "wrong length of lists");
           for (iter=tmp; iter.hasItem(); iter++, iter2++)
             iter.getItem()= CFFactor (iter.getItem().factor(),
                                   iter.getItem().exp() + iter2.getItem().exp());
