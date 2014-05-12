@@ -9,7 +9,8 @@
            G. Pfister, H. Schoenemann
                         Copyright (C) 1991-2013
 
-  Characteristic sets by: Michael Messollen <mmessollen@web.de>
+  Characteristic sets and factorization over algebraic function fields:
+                   Michael Messollen <mmessollen@web.de>
                         Copyright (C) 1996-2010
 
 
@@ -26,6 +27,9 @@ this package, other packages may have other copyrights.
 
 Their copyrights and licences can be found in the accompanying files
 which are distributed along with these packages.
+
+Files which contain code written by M. Messollen or contain code derived from
+code written by M. Messollen contain respective details.
 
 This program is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of

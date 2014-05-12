@@ -632,9 +632,6 @@ WARN_LOGFILE           =
 INPUT                  = @abs_top_srcdir@/omalloc/ \
 @abs_top_srcdir@/resources/ \
 @abs_top_srcdir@/factory/ \
-@abs_top_srcdir@/factory/libfac/ \
-@abs_top_srcdir@/factory/libfac/charset/ \
-@abs_top_srcdir@/factory/libfac/factor/ \
 @abs_top_srcdir@/factory/templates/ \
 @abs_top_srcdir@/factory/include/factory/ \
 @abs_top_srcdir@/factory/include/factory/templates/ \
