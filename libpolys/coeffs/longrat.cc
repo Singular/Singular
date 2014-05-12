@@ -16,8 +16,8 @@
 
 
 // 64 bit version:
-//#if SIZEOF_LONG == 8
-#if 0
+#if SIZEOF_LONG == 8
+//#if 0
 #define MAX_NUM_SIZE 60
 #define POW_2_28 (1L<<60)
 #define LONG long
