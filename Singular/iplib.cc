@@ -715,8 +715,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   return err;
 }
 
-#define SI_GET_BUILTIN_MOD_INIT(name) \
- if (strcmp(libname, #name ".so") == 0){ int SI_MOD_INIT(name)(SModulFunctions*); return SI_MOD_INIT(name); }
+#define SI_GET_BUILTIN_MOD_INIT(name) if (strcmp(libname, #name ".so") == 0){ extern "C" int SI_MOD_INIT0(name)(SModulFunctions*); return SI_MOD_INIT0(name); }
 
 SModulFunc_t
 iiGetBuiltinModInit(const char* libname)

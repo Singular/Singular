@@ -1,5 +1,7 @@
 #include <kernel/mod2.h>
 
+#include <Singular/mod_lib.h>
+
 #include <Singular/blackbox.h>
 
 #include <Singular/tok.h>

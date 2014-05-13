@@ -1,7 +1,3 @@
-
-
-
-
 #include <kernel/mod2.h>
 
 #include <resources/feFopen.h>

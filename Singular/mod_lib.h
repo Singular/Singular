@@ -1,12 +1,12 @@
 #ifndef MOD_LIB_H
 #define MOD_LIB_H
 
+#define SI_MOD_INIT0(name) name##_mod_init
+
 #ifdef STATIC_VERSION
-#  define SI_MOD_INIT(name) name##_mod_init
+#  define SI_MOD_INIT(name) SI_MOD_INIT0(name)
 #elif defined(DYNAMIC_VERSION)
 #  define SI_MOD_INIT(name) mod_init
-#else
-#  error Please use SI_MOD_INIT inside a Singular (dynamic/shared/static/builtin) module only!
 #endif
 
 // Note that STATIC_VERSION and DYNAMIC_VERSION should not be defined in the following config header mod2.h!
