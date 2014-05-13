@@ -3313,6 +3313,8 @@ See
 @node kill, killattrib, kernel, Functions
 @subsection kill
 @cindex kill
+@cindex delete
+@cindex unset
 @table @code
 @item @strong{Syntax:}
 @code{kill } name @code{}
