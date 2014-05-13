@@ -1605,13 +1605,13 @@ ring rCopy(ring r)
 
 BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
 {
+  if (r1 == r2) return TRUE;
+  if (r1 == NULL || r2 == NULL) return FALSE;
+
   if( !rSamePolyRep(r1, r2) )
     return FALSE;
 
   int i/*, j*/;
-
-  if (r1 == r2) return TRUE;
-  if (r1 == NULL || r2 == NULL) return FALSE;
 
   assume( r1->cf == r2->cf );
   assume( rVar(r1) == rVar(r2) );
