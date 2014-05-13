@@ -34,6 +34,7 @@ PROCEDURES:
 LIB "brnoeth.lib";
 LIB "modstd.lib";
 LIB "parallel.lib";
+LIB "ring.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1116,7 +1117,7 @@ EXAMPLE: example syModStd; shows an example
    tt = timer;
    rt = rtimer;
 
-   if(!mixedTest())
+   if(!hasMixedOrdering())
    {
       if(h)
       {

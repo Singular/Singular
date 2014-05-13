@@ -21,6 +21,7 @@ PROCEDURES:
  preimageLoc(R,phi,Q)     computes preimage for non-global orderings
  rootofUnity(n);          the minimal polynomial for the n-th primitive root of unity
              (parameters in square brackets [] are optional)
+  hasMixedOrder()         mixed versus global/local ordering
 ";
 
 LIB "inout.lib";
@@ -848,3 +849,35 @@ example
   minpoly = rootofUnity(8);
   r;
 }
+
+proc hasMixedOrdering()
+"USAGE:  hasMixedOrdering();
+RETURN:  1 if ordering of basering is mixed, 0 else
+EXAMPLE: example hasMixedOrdering(); shows an example
+"
+{
+   int i,p,m;
+   for(i = 1; i <= nvars(basering); i++)
+   {
+      if(var(i) > 1)
+      {
+         p++;
+      }
+      else
+      {
+         m++;
+      }
+   }
+   if((p > 0) && (m > 0)) { return(1); }
+   return(0);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R1 = 0,(x,y,z),dp;
+   hasMixedOrdering();
+   ring R2 = 31,(x(1..4),y(1..3)),(ds(4),lp(3));
+   hasMixedOrdering();
+   ring R3 = 181,x(1..9),(dp(5),lp(4));
+   hasMixedOrdering();
+}
+
