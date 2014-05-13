@@ -204,61 +204,78 @@ resultante (const CanonicalForm & f, const CanonicalForm& g, const Variable & v)
 static CFFList
 sqrf_norm_sub (const CanonicalForm & f, const CanonicalForm & PPalpha,
                CFGenerator & myrandom, CanonicalForm & s,  CanonicalForm & g,
-               CanonicalForm & R)
+               CanonicalForm & R, bool proof)
 {
-  Variable y= PPalpha.mvar(),vf= f.mvar();
+  Variable y= PPalpha.mvar(), vf= f.mvar();
   CanonicalForm temp, Palpha= PPalpha, t;
   int sqfreetest= 0;
   CFFList testlist;
   CFFListIterator i;
 
-  myrandom.reset();
-  s= myrandom.item();
-  g= f;
-  R= CanonicalForm(0);
+  if (proof)
+  {
+    myrandom.reset();
+    s= myrandom.item();
+    g= f;
+    R= CanonicalForm(0);
+  }
+  else
+  {
+    if (getCharacteristic() == 0)
+      t= CanonicalForm (mapinto (myrandom.item()));
+    else
+      t= CanonicalForm (myrandom.item());
+    s= t;
+    g= f (vf - t*Palpha.mvar(), vf);
+  }
 
   // Norm, resultante taken with respect to y
   while (!sqfreetest)
   {
-    R= resultante(Palpha, g, y);
+    R= resultante (Palpha, g, y);
     R= R* bCommonDen(R);
     R /= content (R);
-    // sqfree check ; R is a polynomial in K[x]
-    if (getCharacteristic() == 0)
+    if (proof)
     {
-      temp= gcd (R, R.deriv(vf));
-      if (degree(temp,vf) != 0 || temp == temp.genZero() )
-        sqfreetest= 0;
-      else
-        sqfreetest= 1;
-    }
-    else
-    {
-      Variable X;
-      testlist= sqrFree (R);
-
-      if (testlist.getFirst().factor().inCoeffDomain())
-        testlist.removeFirst();
-      sqfreetest= 1;
-      for (i= testlist; i.hasItem(); i++)
+      // sqfree check ; R is a polynomial in K[x]
+      if (getCharacteristic() == 0)
       {
-        if (i.getItem().exp() > 1 && degree (i.getItem().factor(),R.mvar()) > 0)
-        {
+        temp= gcd (R, R.deriv (vf));
+        if (degree(temp,vf) != 0 || temp == temp.genZero())
           sqfreetest= 0;
-          break;
+        else
+          sqfreetest= 1;
+      }
+      else
+      {
+        Variable X;
+        testlist= sqrFree (R);
+
+        if (testlist.getFirst().factor().inCoeffDomain())
+          testlist.removeFirst();
+        sqfreetest= 1;
+        for (i= testlist; i.hasItem(); i++)
+        {
+          if (i.getItem().exp() > 1 && degree (i.getItem().factor(),R.mvar()) > 0)
+          {
+            sqfreetest= 0;
+            break;
+          }
         }
       }
+      if (!sqfreetest)
+      {
+        myrandom.next();
+        if (getCharacteristic() == 0)
+          t= CanonicalForm (mapinto (myrandom.item()));
+        else
+          t= CanonicalForm (myrandom.item());
+        s= t;
+        g= f (vf - t*Palpha.mvar(), vf);
+      }
     }
-    if (!sqfreetest)
-    {
-      myrandom.next();
-      if (getCharacteristic() == 0)
-        t= CanonicalForm (mapinto (myrandom.item()));
-      else
-        t= CanonicalForm (myrandom.item());
-      s= t;
-      g= f (f.mvar() - t*Palpha.mvar(), f.mvar());
-    }
+    else
+      break;
   }
   return testlist;
 }
@@ -272,17 +289,17 @@ sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
   if (getCharacteristic() == 0)
   {
     IntGenerator myrandom;
-    result= sqrf_norm_sub (f, PPalpha, myrandom, s, g, R);
+    result= sqrf_norm_sub (f, PPalpha, myrandom, s, g, R, true);
   }
   else if (degree (Extension) > 0)
   {
     AlgExtGenerator myrandom (Extension);
-    result= sqrf_norm_sub (f, PPalpha, myrandom, s, g, R);
+    result= sqrf_norm_sub (f, PPalpha, myrandom, s, g, R, true);
   }
   else
   {
     FFGenerator myrandom;
-    result= sqrf_norm_sub (f, PPalpha, myrandom, s, g, R);
+    result= sqrf_norm_sub (f, PPalpha, myrandom, s, g, R, true);
   }
   return result;
 }
