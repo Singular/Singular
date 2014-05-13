@@ -19,6 +19,7 @@
 
 #include "cf_assert.h"
 
+#include "canonicalform.h"
 #include "facAlgFuncUtil.h"
 #include "cfCharSetsUtil.h"
 #include "cf_random.h"
@@ -90,24 +91,6 @@ generateMipo (int degOfExt)
 {
   FFRandom gen;
   return find_irreducible (degOfExt, gen, Variable (1));
-}
-
-// // missing class: IntGenerator:
-bool IntGenerator::hasItems() const
-{
-    return 1;
-}
-
-CanonicalForm IntGenerator::item() const
-//int IntGenerator::item() const
-{
-  //return current; //CanonicalForm( current );
-  return mapinto (CanonicalForm (current));
-}
-
-void IntGenerator::next()
-{
-    current++;
 }
 
 CanonicalForm alg_lc (const CanonicalForm & f)

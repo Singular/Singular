@@ -492,11 +492,11 @@ Trager (const CanonicalForm & F, const CFList & Astar,
 
   CFGenerator * Gen;
   if (getCharacteristic() == 0)
-    Gen= new IntGenerator();
+    Gen= CFGenFactory::generate();
   else if (degree (vminpoly) > 0)
     Gen= AlgExtGenerator (vminpoly).clone();
   else
-    Gen= new FFGenerator();
+    Gen= CFGenFactory::generate();
 
   CFFList LL= CFFList (CFFactor (f, 1));
 

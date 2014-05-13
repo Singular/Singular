@@ -21,6 +21,22 @@ public:
     virtual CFGenerator * clone() const { return new CFGenerator();}
 };
 
+class IntGenerator : public CFGenerator
+{
+private:
+    int current;
+public:
+    IntGenerator() : current(0) {}
+    ~IntGenerator() {}
+    bool hasItems() const;
+    void reset() { current = 0; }
+    CanonicalForm item() const;
+    void next();
+    void operator++ () { next(); }
+    void operator++ ( int ) { next(); }
+    CFGenerator * clone() const;
+};
+
 class FFGenerator : public CFGenerator
 {
 private:
