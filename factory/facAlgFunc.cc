@@ -196,15 +196,14 @@ resultante (const CanonicalForm & f, const CanonicalForm& g, const Variable & v)
   return result;
 }
 
-// Trager's square free norm algorithm:
-// f a separable polynomial over K (alpha),
-// alpha is defined by the minimal polynomial Palpha
-// K need to contain more than S elements (S is defined in Messollen's thesis;
-// see also getDegOfExt)
+/// compute the norm R of f over PPalpha, g= f (x-s*alpha)
+/// if proof==true, R is squarefree and if in addition getCharacteristic() > 0
+/// the squarefree factors of R are returned.
+/// Based on Trager's sqrf_norm algorithm.
 static CFFList
-sqrf_norm_sub (const CanonicalForm & f, const CanonicalForm & PPalpha,
-               CFGenerator & myrandom, CanonicalForm & s,  CanonicalForm & g,
-               CanonicalForm & R, bool proof)
+norm (const CanonicalForm & f, const CanonicalForm & PPalpha,
+      CFGenerator & myrandom, CanonicalForm & s, CanonicalForm & g,
+      CanonicalForm & R, bool proof)
 {
   Variable y= PPalpha.mvar(), vf= f.mvar();
   CanonicalForm temp, Palpha= PPalpha, t;
@@ -280,26 +279,28 @@ sqrf_norm_sub (const CanonicalForm & f, const CanonicalForm & PPalpha,
   return testlist;
 }
 
+/// see @a norm, R is guaranteed to be squarefree
+/// Based on Trager's sqrf_norm algorithm.
 static CFFList
-sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
-           const Variable & Extension, CanonicalForm & s,  CanonicalForm & g,
-           CanonicalForm & R)
+sqrfNorm (const CanonicalForm & f, const CanonicalForm & PPalpha,
+          const Variable & Extension, CanonicalForm & s,  CanonicalForm & g,
+          CanonicalForm & R)
 {
   CFFList result;
   if (getCharacteristic() == 0)
   {
     IntGenerator myrandom;
-    result= sqrf_norm_sub (f, PPalpha, myrandom, s, g, R, true);
+    result= norm (f, PPalpha, myrandom, s, g, R, true);
   }
   else if (degree (Extension) > 0)
   {
     AlgExtGenerator myrandom (Extension);
-    result= sqrf_norm_sub (f, PPalpha, myrandom, s, g, R, true);
+    result= norm (f, PPalpha, myrandom, s, g, R, true);
   }
   else
   {
     FFGenerator myrandom;
-    result= sqrf_norm_sub (f, PPalpha, myrandom, s, g, R, true);
+    result= norm (f, PPalpha, myrandom, s, g, R, true);
   }
   return result;
 }
@@ -339,7 +340,7 @@ simpleExtension (CFList& backSubst, const CFList & Astar,
         On (SW_RATIONAL);
       oldR= R;
       //TODO normalize i.getItem over K(R)?
-      (void) sqrf_norm (i.getItem(), R, Extension, s, g, R);
+      (void) sqrfNorm (i.getItem(), R, Extension, s, g, R);
 
       backSubst.insert (s);
 
@@ -506,7 +507,7 @@ Trager (const CanonicalForm & F, const CFList & Astar,
     for (iter= LL; iter.hasItem(); iter++)
     {
       f= iter.getItem().factor();
-      sqrfFactors= sqrf_norm_sub (f, Rstar, *Gen, s, g, R, false);
+      sqrfFactors= norm (f, Rstar, *Gen, s, g, R, false);
 
       if (hasFirstAlgVar (R, X))
         Factorlist= factorize (R, X);
