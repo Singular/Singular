@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS = -I ../../m4
 if SI_BUILTIN_SINGMATHIC
   noinst_LTLIBRARIES=singmathic.la 
   P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION
-  P_PROCS_MODULE_LDFLAGS = 
+  P_PROCS_MODULE_LDFLAGS  = -module
 else
   module_LTLIBRARIES=singmathic.la 
   moduledir = $(libexecdir)/singular/MOD

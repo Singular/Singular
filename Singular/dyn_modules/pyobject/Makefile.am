@@ -4,7 +4,7 @@ if SI_BUILTIN_PYOBJECT
   noinst_LTLIBRARIES = pyobject.la
 ##  moduledir = $(libdir)/singular
   P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION
-  P_PROCS_MODULE_LDFLAGS = 
+  P_PROCS_MODULE_LDFLAGS  = -module
 else !SI_BUILTIN_PYOBJECT
   module_LTLIBRARIES = pyobject.la
   moduledir = $(libexecdir)/singular/MOD

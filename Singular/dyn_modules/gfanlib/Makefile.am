@@ -11,7 +11,7 @@ if SI_BUILTIN_GFANLIB
   noinst_LTLIBRARIES=gfanlib.la
 ##  moduledir = $(libdir)/singular
   P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION
-  P_PROCS_MODULE_LDFLAGS =
+  P_PROCS_MODULE_LDFLAGS  = -module
 else
   module_LTLIBRARIES=gfanlib.la
   moduledir = $(libexecdir)/singular/MOD

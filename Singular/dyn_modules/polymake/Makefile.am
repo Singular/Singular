@@ -10,7 +10,7 @@ if SI_BUILTIN_POLYMAKE
   noinst_LTLIBRARIES=polymake.la
 ##  moduledir = $(libdir)/singular
   P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION
-  P_PROCS_MODULE_LDFLAGS = 
+  P_PROCS_MODULE_LDFLAGS  = -module
 else
   module_LTLIBRARIES=polymake.la
   moduledir = $(libexecdir)/singular/MOD

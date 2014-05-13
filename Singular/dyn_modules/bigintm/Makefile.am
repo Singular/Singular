@@ -4,7 +4,7 @@ if SI_BUILTIN_BIGINTM
   noinst_LTLIBRARIES=bigintm.la 
 #  check_LTLIBRARIES=bigintm.la 
   P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION
-  P_PROCS_MODULE_LDFLAGS = 
+  P_PROCS_MODULE_LDFLAGS  = -module
 else
   module_LTLIBRARIES=bigintm.la 
   moduledir = $(libexecdir)/singular/MOD
