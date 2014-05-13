@@ -715,18 +715,26 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   return err;
 }
 
-#define SI_GET_BUILTIN_MOD_INIT(name) if (strcmp(libname, #name ".so") == 0){ extern "C" int SI_MOD_INIT0(name)(SModulFunctions*); return SI_MOD_INIT0(name); }
+
+extern "C" 
+{
+#  define SI_GET_BUILTIN_MOD_INIT0(name) int SI_MOD_INIT0(name)(SModulFunctions*);
+          SI_FOREACH_BUILTIN(SI_GET_BUILTIN_MOD_INIT0)
+#  undef  SI_GET_BUILTIN_MOD_INIT0
+};
+
 
 SModulFunc_t
 iiGetBuiltinModInit(const char* libname)
 {
-  SI_FOREACH_BUILTIN(SI_GET_BUILTIN_MOD_INIT)
+#  define SI_GET_BUILTIN_MOD_INIT(name) if (strcmp(libname, #name ".so") == 0){ return SI_MOD_INIT0(name); }
+          SI_FOREACH_BUILTIN(SI_GET_BUILTIN_MOD_INIT)
+#  undef  SI_GET_BUILTIN_MOD_INIT
 
   return NULL;
 }
 
 
-#undef SI_GET_BUILTIN_MOD_INIT
 
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
