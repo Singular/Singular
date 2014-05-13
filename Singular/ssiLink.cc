@@ -343,7 +343,7 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
     }
     if (rField_is_Zp_a(r) || rField_is_Q_a(r))
     {
-      ssiWriteRing(d,r->algring);
+      ssiWriteRing_R(d,r->algring);
       if (r->minpoly!=NULL)
       {
         lnumber ln=(lnumber)r->minpoly;
