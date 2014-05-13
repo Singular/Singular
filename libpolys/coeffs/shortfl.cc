@@ -440,16 +440,19 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
      if ((long)ui==SR_TO_INT(from))
        return nf((float)ui).N();
      zz=(mpz_ptr)omAlloc(sizeof(mpz_t));
-     mpz_init_set_si(zz,ui);
+     mpz_init_set_si(zz,SR_TO_INT(from));
      z=zz;
   }
   #else
   if (IS_IMM(from))
     return nf((float)nlInt(from,aRing)).N();
   #endif
+  else
+  {
+    /* read out the enumerator */
+    z=GET_NOM(from);
+  }
 
-  /* read out the enumerator */
-  z=GET_NOM(from);
   int i = mpz_size1(z);
   mpf_t e;
   mpf_init(e);
