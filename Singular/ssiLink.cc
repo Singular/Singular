@@ -281,20 +281,14 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
   else WerrorS("coeff field not implemented");
 }
 
-void ssiWriteRing(ssiInfo *d,const ring r)
+void ssiWriteRing_R(ssiInfo *d,const ring r)
 {
-  /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <Q-ideal> */
+  /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> */
   /* ch=-1: transext, coeff ring follows */
   /* ch=-2: algext, coeff ring and minpoly follows */
 
-  if (r==currRing)
-  {
-    if (d->r!=NULL) rKill(d->r);
-    d->r=r;
-  }
   if (r!=NULL)
   {
-    /*d->*/r->ref++;
     if (rField_is_Zp(r) || rField_is_Q(r))
       fprintf(d->f_write,"%d %d ",r->ch,r->N);
     else if (rField_is_Zp_a(r) || rField_is_Q_a(r))
@@ -347,15 +341,6 @@ void ssiWriteRing(ssiInfo *d,const ring r)
       }
       i++;
     }
-    /* Q-ideal :*/
-    if (r->qideal!=NULL)
-    {
-      ssiWriteIdeal(d,IDEAL_CMD,r->qideal);
-    }
-    else
-    {
-      fprintf(d->f_write,"0 "/*ideal with 0 entries */);
-    }
     if (rField_is_Zp_a(r) || rField_is_Q_a(r))
     {
       ssiWriteRing(d,r->algring);
@@ -365,11 +350,38 @@ void ssiWriteRing(ssiInfo *d,const ring r)
         ssiWritePoly_R(d,POLY_CMD,ln->z,r->algring);
       }
     }
+    /* Q-ideal :*/
+    if (r->qideal!=NULL)
+    {
+      ssiWriteIdeal(d,IDEAL_CMD,r->qideal);
+    }
+    else
+    {
+      fprintf(d->f_write,"0 "/*ideal with 0 entries */);
+    }
   }
   else /* dummy ring r==NULL*/
   {
-    fprintf(d->f_write,"0 0 0 "/*,r->ch,r->N, blocks*/);
+    fprintf(d->f_write,"0 0 0 0 "/*,r->ch,r->N, blocksi, q-ideal*/);
   }
+}
+
+void ssiWriteRing(ssiInfo *d,const ring r)
+{
+  /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> */
+  /* ch=-1: transext, coeff ring follows */
+  /* ch=-2: algext, coeff ring and minpoly follows */
+
+  if (r==currRing)
+  {
+    if (d->r!=NULL) rKill(d->r);
+    d->r=r;
+  }
+  if (r!=NULL)
+  {
+    /*d->*/r->ref++;
+  }
+  ssiWriteRing_R(d,r);
 }
 
 void ssiWritePoly_R(const ssiInfo *d, int typ, poly p, const ring r)
