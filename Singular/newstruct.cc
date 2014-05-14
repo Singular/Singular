@@ -387,6 +387,14 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
               {
                 Werror("different ring %lx(data) - %lx(basering)",
                   (long unsigned)(al->m[nm->pos-1].data),(long unsigned)currRing);
+                Werror("name of basering: %s",IDID(currRingHdl));
+                rWrite(currRing,TRUE);PrintLn();
+                idhdl hh=rFindHdl((ring)(al->m[nm->pos-1].data),NULL);
+                const char *nn="??";
+                if (hh!=NULL) nn=IDID(hh);
+                Werror("(possible) name of ring of data: %s",nn);
+                rWrite((ring)(al->m[nm->pos-1].data),TRUE);PrintLn();
+
                 return TRUE;
               }
             }
