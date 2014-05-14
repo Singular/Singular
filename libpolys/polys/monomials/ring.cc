@@ -4648,7 +4648,6 @@ ring rAssure_SyzComp_CompLastBlock(const ring r, BOOLEAN)
    if (old_r->qideal != NULL)
    {
       new_r->qideal = idrCopyR(old_r->qideal, old_r, new_r);
-      //currQuotient = new_r->qideal;
    }
 
 #ifdef HAVE_PLURAL

@@ -33,7 +33,7 @@ ideal redNF(ideal N,ideal M,matrix U,int d,intvec *w)
     }
   }
   ideal M0=idInit(IDELEMS(M),M->rank);
-  ideal M1=kNF(N,currQuotient,M,0,KSTD_NF_ECART);
+  ideal M1=kNF(N,currRing->qideal,M,0,KSTD_NF_ECART);
   while(idElem(M1)>0&&(d==-1||id_MinDegW(M1,w,currRing)<=d))
   {
     for(int i=IDELEMS(M)-1;i>=0;i--)
@@ -46,7 +46,7 @@ ideal redNF(ideal N,ideal M,matrix U,int d,intvec *w)
         M->m[i]=pSub(M->m[i],pHead(pCopy(M1->m[i])));
     }
     idDelete(&M1);
-    M1=kNF(N,currQuotient,M,0,KSTD_NF_ECART);
+    M1=kNF(N,currRing->qideal,M,0,KSTD_NF_ECART);
   }
   idDelete(&M1);
   idDelete(&N);

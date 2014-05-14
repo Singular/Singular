@@ -138,7 +138,7 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case MODUL_CMD:
         case IDEAL_CMD:
-          if ((TEST_V_QRING)  &&(currQuotient!=NULL)
+          if ((TEST_V_QRING)  &&(currRing->qideal!=NULL)
           &&(!hasFlag(this,FLAG_QRING)))
           {
             jjNormalizeQRingId(this);
@@ -150,7 +150,7 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case POLY_CMD:
         case VECTOR_CMD:
-          if ((TEST_V_QRING)  &&(currQuotient!=NULL)
+          if ((TEST_V_QRING)  &&(currRing->qideal!=NULL)
           &&(!hasFlag(this,FLAG_QRING)))
           {
             jjNormalizeQRingP(this);

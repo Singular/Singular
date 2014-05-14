@@ -2653,7 +2653,7 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
     pp = p_KillSquares(pp, m_iFirstAltVar, m_iLastAltVar, currRing);
 
-    if(Q == currQuotient)
+    if(Q == currRing->qideal)
       Q = SCAQuotient(currRing);
   }
 #endif
@@ -2703,7 +2703,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
     pp = id_KillSquares(pp, m_iFirstAltVar, m_iLastAltVar, currRing, false);
 
-    if(Q == currQuotient)
+    if(Q == currRing->qideal)
       Q = SCAQuotient(currRing);
   }
 #endif
@@ -2769,7 +2769,7 @@ ideal kInterRedOld (ideal F, ideal Q)
     // this should be done on the upper level!!! :
     //    tempQ = SCAQuotient(currRing);
 
-    if(Q == currQuotient)
+    if(Q == currRing->qideal)
       tempQ = SCAQuotient(currRing);
   }
 #endif

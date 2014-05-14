@@ -78,12 +78,12 @@ static void syCreatePairs(polyset F,int lini,int wend,int k,int j,int i,
   poly p,q;
 
   while (((k<wend) && (pGetComp(F[k]) == i)) ||
-         ((currQuotient!=NULL) && (k<regularPairs+IDELEMS(currQuotient))))
+         ((currRing->qideal!=NULL) && (k<regularPairs+IDELEMS(currRing->qideal))))
   {
     p = pOne();
     if ((k<wend) && (pGetComp(F[k]) == i) && (k!=j))
       pLcm(F[j],F[k],p);
-    else if (ii<IDELEMS(currQuotient))
+    else if (ii<IDELEMS(currRing->qideal))
     {
       q = pHead(F[j]);
       if (mW!=NULL)
@@ -92,7 +92,7 @@ static void syCreatePairs(polyset F,int lini,int wend,int k,int j,int i,
           pSetExp(q,jj,pGetExp(q,jj) -pGetExp(mW->m[pGetComp(q)-1],jj));
         pSetm(q);
       }
-      pLcm(q,currQuotient->m[ii],p);
+      pLcm(q,currRing->qideal->m[ii],p);
       if (mW!=NULL)
       {
         for(jj=1;jj<=(currRing->N);jj++)
@@ -471,12 +471,12 @@ poly sySpecNormalize(poly toNorm,ideal mW=NULL)
     for(j=1;j<=(currRing->N);j++)
       pSetExp(p,j,pGetExp(p,j) -pGetExp(mW->m[pGetComp(p)-1],j));
   }
-  while ((p!=NULL) && (i<IDELEMS(currQuotient)))
+  while ((p!=NULL) && (i<IDELEMS(currRing->qideal)))
   {
-    if (pDivisibleBy(currQuotient->m[i],p))
+    if (pDivisibleBy(currRing->qideal->m[i],p))
     {
       //pNorm(toNorm);
-      toNorm = ksOldSpolyRed(currQuotient->m[i],toNorm);
+      toNorm = ksOldSpolyRed(currRing->qideal->m[i],toNorm);
       pDelete(&p);
       if (toNorm==NULL) return NULL;
       p = pHead(toNorm);
@@ -529,11 +529,11 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
   newmodcomp = new intvec(Fl+2);
   //for (j=0;j<Fl;j++) pWrite(F[j]);
   //PrintLn();
-  if (currQuotient==NULL)
+  if (currRing->qideal==NULL)
     pairs=(polyset)omAlloc0(Fl*sizeof(poly));
   else
   {
-    gencQ = IDELEMS(currQuotient);
+    gencQ = IDELEMS(currRing->qideal);
     pairs=(polyset)omAlloc0((Fl+gencQ)*sizeof(poly));
   }
   // rkF=id_RankFreeModule(arg,currRing);
@@ -563,7 +563,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
       wend=j;
     }
     syCreatePairs(F,lini,wend,k,j,i,pairs,Fl,mW);
-    if (currQuotient!=NULL) wend = Fl+gencQ;
+    if (currRing->qideal!=NULL) wend = Fl+gencQ;
     for (k=lini;k<wend;k++)
     {
       if (pairs[k]!=NULL)
@@ -592,11 +592,11 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
         else
         {
           syz = pairs[k];
-          syz->coef = nCopy(currQuotient->m[k-Fl]->coef);
+          syz->coef = nCopy(currRing->qideal->m[k-Fl]->coef);
           syz->coef = nNeg(syz->coef);
           lastmonom = syz;
           multWith = pDivide(syz,F[j]);
-          multWith->coef = nCopy(currQuotient->m[k-Fl]->coef);
+          multWith->coef = nCopy(currRing->qideal->m[k-Fl]->coef);
         }
         pSetComp(syz,j+1);
         pairs[k] = NULL;
@@ -610,7 +610,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
           }
           else
           {
-            PrintS("pair: ");pWrite0(F[j]);PrintS("  ");pWrite(currQuotient->m[k-Fl]);
+            PrintS("pair: ");pWrite0(F[j]);PrintS("  ");pWrite(currRing->qideal->m[k-Fl]);
           }
         }
         if (k<Fl)
@@ -645,7 +645,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
 
           if (l<kkk)
           {
-            if ((currQuotient!=NULL) && (isNotReduced))
+            if ((currRing->qideal!=NULL) && (isNotReduced))
             {
               kBucketClear(sy0buck,&toRed,&ltR);
               toRed = sySpecNormalize(toRed,mW);
@@ -726,10 +726,10 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
 //    for(k=j;k<Fl;k++) pDelete(&(pairs[k]));
   }
   (*newmodcomp)[Fl+1] = Sl;
-  if (currQuotient==NULL)
+  if (currRing->qideal==NULL)
     omFreeSize((ADDRESS)pairs,Fl*sizeof(poly));
   else
-    omFreeSize((ADDRESS)pairs,(Fl+IDELEMS(currQuotient))*sizeof(poly));
+    omFreeSize((ADDRESS)pairs,(Fl+IDELEMS(currRing->qideal))*sizeof(poly));
   omFreeSize((ADDRESS)Flength,Fl*sizeof(int));
   delete *modcomp;
   *modcomp = newmodcomp;
@@ -1029,13 +1029,13 @@ syStrategy sySchreyer(ideal arg, int maxlength)
       result->fullres[i] = fr[i];
       fr[i] = NULL;
   }
-  if (currQuotient!=NULL)
+  if (currRing->qideal!=NULL)
   {
     for (int i=0; i<rl; i++)
     {
       if (result->fullres[i]!=NULL)
       {
-        ideal t=kNF(currQuotient,NULL,result->fullres[i]);
+        ideal t=kNF(currRing->qideal,NULL,result->fullres[i]);
         idDelete(&result->fullres[i]);
         result->fullres[i]=t;
         if (i<rl-1)

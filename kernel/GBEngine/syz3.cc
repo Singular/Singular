@@ -1851,7 +1851,7 @@ syStrategy syKosz(ideal arg,int * length)
   {
     if (temp->m[i]!=NULL)
     {
-      new_generators->m[0] = kNF(syzstr->res[0],currQuotient,temp->m[i]);
+      new_generators->m[0] = kNF(syzstr->res[0],currRing->qideal,temp->m[i]);
       if (!nIsOne(pGetCoeff(new_generators->m[0])))
         pNorm(new_generators->m[0]);
       next_deg = p_FDeg(new_generators->m[0],currRing);

@@ -470,7 +470,7 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
     if (res->data!=NULL) pDelete((poly*)&res->data);
     res->data=(void*)p;
     jiAssignAttr(res,a);
-    if (TEST_V_QRING && (currQuotient!=NULL) && (!hasFlag(res,FLAG_QRING))) jjNormalizeQRingP(res);
+    if (TEST_V_QRING && (currRing->qideal!=NULL) && (!hasFlag(res,FLAG_QRING))) jjNormalizeQRingP(res);
   }
   else
   {
@@ -642,7 +642,7 @@ static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr)
   {
     setFlag(res,FLAG_STD);
   }
-  if (TEST_V_QRING && (currQuotient!=NULL)&& (!hasFlag(res,FLAG_QRING))) jjNormalizeQRingId(res);
+  if (TEST_V_QRING && (currRing->qideal!=NULL)&& (!hasFlag(res,FLAG_QRING))) jjNormalizeQRingId(res);
   return FALSE;
 }
 static BOOLEAN jiA_RESOLUTION(leftv res, leftv a, Subexpr)
@@ -660,7 +660,7 @@ static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr)
   if (I->m[0]!=NULL) pSetCompP(I->m[0],1);
   pNormalize(I->m[0]);
   res->data=(void *)I;
-  if (TEST_V_QRING && (currQuotient!=NULL))
+  if (TEST_V_QRING && (currRing->qideal!=NULL))
   {
     if (hasFlag(a,FLAG_QRING)) setFlag(res,FLAG_QRING);
     else                       jjNormalizeQRingId(res);
@@ -676,7 +676,7 @@ static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr)
   MATROWS(m)=1;
   id_Normalize((ideal)m, currRing);
   res->data=(void *)m;
-  if (TEST_V_QRING && (currQuotient!=NULL)) jjNormalizeQRingId(res);
+  if (TEST_V_QRING && (currRing->qideal!=NULL)) jjNormalizeQRingId(res);
   return FALSE;
 }
 static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr)
@@ -1171,7 +1171,7 @@ static BOOLEAN jiA_VECTOR_L(leftv l,leftv r)
   idDelete(&I);
   l1->CleanUp();
   r->CleanUp();
-  //if (TEST_V_QRING && (currQuotient!=NULL)) jjNormalizeQRingP(l);
+  //if (TEST_V_QRING && (currRing->qideal!=NULL)) jjNormalizeQRingP(l);
   return FALSE;
 }
 static BOOLEAN jjA_L_LIST(leftv l, leftv r)
@@ -1908,7 +1908,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
 }
 void jjNormalizeQRingId(leftv I)
 {
-  if ((currQuotient!=NULL) && (!hasFlag(I,FLAG_QRING)))
+  if ((currRing->qideal!=NULL) && (!hasFlag(I,FLAG_QRING)))
   {
     if (I->e==NULL)
     {
@@ -1919,7 +1919,7 @@ void jjNormalizeQRingId(leftv I)
         case MODUL_CMD:
         {
           ideal F=idInit(1,1);
-          ideal II=kNF(F,currQuotient,I0);
+          ideal II=kNF(F,currRing->qideal,I0);
           idDelete(&F);
           if (I->rtyp!=IDHDL)
           {
@@ -1943,13 +1943,13 @@ void jjNormalizeQRingId(leftv I)
 }
 void jjNormalizeQRingP(leftv I)
 {
-  if ((currQuotient!=NULL) && (!hasFlag(I,FLAG_QRING)))
+  if ((currRing->qideal!=NULL) && (!hasFlag(I,FLAG_QRING)))
   {
     poly p=(poly)I->Data();
     if ((I->e==NULL) && (p!=NULL))
     {
       ideal F=idInit(1,1);
-      poly II=kNF(F,currQuotient,p);
+      poly II=kNF(F,currRing->qideal,p);
       idDelete(&F);
       if ((I->rtyp==POLY_CMD)
       || (I->rtyp==VECTOR_CMD))

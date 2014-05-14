@@ -266,7 +266,7 @@ void TestGBEngine()
   rChangeCurrRing(R);
 
   {
-    ideal G = kStd(I, currQuotient, testHomog, NULL);
+    ideal G = kStd(I, currRing->qideal, testHomog, NULL);
 
 #ifdef PDEBUG
     PrintS("GB: ");

@@ -1462,7 +1462,7 @@ poly    iiHighCorner(ideal I, int ak)
   poly po=NULL;
   if (rHasLocalOrMixedOrdering_currRing())
   {
-    scComputeHC(I,currQuotient,ak,po);
+    scComputeHC(I,currRing->qideal,ak,po);
     if (po!=NULL)
     {
       pGetCoeff(po)=nInit(1);
@@ -3443,7 +3443,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #endif
   #endif
 
-  ideal stdJ = kStd(J,currQuotient,isNotHomog,NULL);
+  ideal stdJ = kStd(J,currRing->qideal,isNotHomog,NULL);
   idSkipZeroes( stdJ );
 
   #ifdef SPECTRUM_DEBUG
@@ -3510,7 +3510,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
 
   poly hc = (poly)NULL;
 
-  scComputeHC( stdJ,currQuotient, 0,hc );
+  scComputeHC( stdJ,currRing->qideal, 0,hc );
 
   if( hc!=(poly)NULL )
   {
@@ -5554,10 +5554,6 @@ void rKill(ring r)
     if (r==currRing)
     {
       // all dependend stuff is done, clean global vars:
-      if (r->qideal!=NULL)
-      {
-        currQuotient=NULL;
-      }
       if ((currRing->ppNoether)!=NULL) pDelete(&(currRing->ppNoether));
       if (sLastPrinted.RingDependend())
       {
