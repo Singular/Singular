@@ -180,19 +180,13 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
   ssiWriteNumber_CF(d,n,d->r->cf);
 }
 
-void ssiWriteRing(ssiInfo *d,const ring r)
+void ssiWriteRing_R(ssiInfo *d,const ring r)
 {
-  /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <Q-ideal> */
+  /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> */
   /* ch=-1: transext, coeff ring follows */
   /* ch=-2: algext, coeff ring and minpoly follows */
-  if (r==currRing) // see recursive calls for transExt/algExt
-  {
-    if (d->r!=NULL) rKill(d->r);
-    d->r=r;
-  }
   if (r!=NULL)
   {
-    /*d->*/r->ref++;
     if (rField_is_Q(r) || rField_is_Zp(r))
       fprintf(d->f_write,"%d %d ",n_GetChar(r->cf),r->N);
     else if (rFieldType(r)==n_transExt)
@@ -243,6 +237,15 @@ void ssiWriteRing(ssiInfo *d,const ring r)
       }
       i++;
     }
+    if ((rFieldType(r)==n_transExt)
+    || (rFieldType(r)==n_algExt))
+    {
+      ssiWriteRing_R(d,r->cf->extRing);
+      if  (rFieldType(r)==n_algExt)
+      {
+        ssiWritePoly_R(d,POLY_CMD,r->cf->extRing->qideal->m[0],r->cf->extRing);
+      }
+    }
     /* Q-ideal :*/
     if (r->qideal!=NULL)
     {
@@ -252,22 +255,29 @@ void ssiWriteRing(ssiInfo *d,const ring r)
     {
       fprintf(d->f_write,"0 "/*ideal with 0 entries */);
     }
-    if ((rFieldType(r)==n_transExt)
-    || (rFieldType(r)==n_algExt))
-    {
-      ssiWriteRing(d,r->cf->extRing);
-      if  (rFieldType(r)==n_algExt)
-      {
-        ssiWritePoly_R(d,POLY_CMD,r->cf->extRing->qideal->m[0],r->cf->extRing);
-      }
-    }
   }
   else /* dummy ring r==NULL*/
   {
-    fprintf(d->f_write,"0 0 0 "/*,r->ch,r->N, blocks*/);
+    fprintf(d->f_write,"0 0 0 0 "/*,r->ch,r->N, blocks, q-ideal*/);
   }
 }
 
+void ssiWriteRing(ssiInfo *d,const ring r)
+{
+  /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> */
+  /* ch=-1: transext, coeff ring follows */
+  /* ch=-2: algext, coeff ring and minpoly follows */
+  if (r==currRing) // see recursive calls for transExt/algExt
+  {
+    if (d->r!=NULL) rKill(d->r);
+    d->r=r;
+  }
+  if (r!=NULL)
+  {
+    /*d->*/r->ref++;
+  }
+  ssiWriteRing_R(d,r);
+}
 void ssiWritePoly_R(const ssiInfo *d, int typ, poly p, const ring r)
 {
   fprintf(d->f_write,"%d ",pLength(p));//number of terms
