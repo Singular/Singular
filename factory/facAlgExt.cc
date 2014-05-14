@@ -143,6 +143,141 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
   bool save_rat=!isOn (SW_RATIONAL);
   On (SW_RATIONAL);
   CanonicalForm f= F*bCommonDen (F);
+  Variable y= f.mvar();
+  int shift= 0, k= 0, count= 0;
+  CanonicalForm norm, buf, factor, oldF;
+  CFFList normFactors;
+  bool save_sort= !isOn (SW_USE_NTL_SORT);
+  CFList factors, tmp, tmp2;
+  CFFListIterator i;
+  CFListIterator iter;
+  bool shiftBuf= false;
+
+  tmp.append (f);
+  do
+  {
+    tmp2= CFList();
+    for (iter= tmp; iter.hasItem(); iter++)
+    {
+      oldF= iter.getItem()*bCommonDen (iter.getItem());
+      if (shift == 0)
+        f= oldF;
+      else
+        f= oldF (y - shift*alpha, y);
+      TIMING_START (fac_alg_norm);
+      norm= Norm (f, alpha);
+      TIMING_END_AND_PRINT (fac_alg_norm, "time to compute sqrf norm: ");
+      ASSERT (degree (norm, alpha) <= 0, "wrong norm computed");
+
+      TIMING_START (fac_alg_factor_norm);
+      On (SW_USE_NTL_SORT);
+      normFactors= factorize (norm);
+      if (save_sort)
+        Off (SW_USE_NTL_SORT);
+      TIMING_END_AND_PRINT (fac_alg_factor_norm, "time to factor norm: ");
+
+      if (normFactors.getFirst().factor().inCoeffDomain())
+        normFactors.removeFirst();
+      if (normFactors.length() < 2 && normFactors.getLast().exp() == 1)
+      {
+        factors.append (oldF);
+        continue;
+      }
+
+      i= normFactors;
+      shiftBuf= false;
+      if (!(normFactors.length() == 2 &&
+            degree (i.getItem().factor()) <= degree (f)))
+      {
+        TIMING_START (fac_alg_time_shift);
+        if (shift != 0)
+          buf= f;
+        else
+          buf= oldF;
+        shiftBuf= true;
+        TIMING_END_AND_PRINT (fac_alg_time_shift, "time to shift: ");
+      }
+      else
+        buf= oldF;
+
+      count= 0;
+      for (; i.hasItem(); i++)
+      {
+        TIMING_START (fac_alg_gcd);
+        if (shiftBuf)
+          factor= gcd (buf, i.getItem().factor());
+        else
+        {
+          if (shift == 0)
+            factor= gcd (buf, i.getItem().factor());
+          else
+            factor= gcd (buf, i.getItem().factor() (y + shift*alpha, y));
+        }
+        buf /= factor;
+        if (shiftBuf)
+        {
+          if (shift != 0)
+            factor= factor (y + shift*alpha, y);
+        }
+        TIMING_END_AND_PRINT (fac_alg_gcd, "time to recover factors: ");
+        if (i.getItem().exp() == 1 || degree (factor) == 1)
+          factors.append (factor);
+        else
+          tmp2.append (factor);
+        count++;
+        if (normFactors.length() - 1 == count)
+        {
+          if (shiftBuf)
+          {
+            if (normFactors.getLast().exp() == 1)
+              factors.append (buf (y + shift*alpha, y));
+            else
+              tmp2.append (buf (y + shift*alpha, y));
+          }
+          else
+          {
+            if (normFactors.getLast().exp() == 1)
+              factors.append (buf);
+            else
+              tmp2.append (buf);
+          }
+          buf= 1;
+          break;
+        }
+      }
+    }
+    k++;
+    if (shift == 0)
+    {
+      shift++;
+      k= 1;
+    }
+    if (k == 2)
+      shift= -shift;
+    if (k == 3)
+    {
+      shift= -shift;
+      shift++;
+      k= 1;
+    }
+    tmp= tmp2;
+  }
+  while (!tmp.isEmpty());
+
+  if (save_rat) Off(SW_RATIONAL);
+  return factors;
+}
+
+
+/*CFList
+AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
+{
+  ASSERT (F.isUnivariate(), "univariate input expected");
+  ASSERT (getCharacteristic() == 0, "characteristic 0 expected");
+
+  bool save_rat=!isOn (SW_RATIONAL);
+  On (SW_RATIONAL);
+  CanonicalForm f= F*bCommonDen (F);
   int shift;
   TIMING_START (fac_alg_norm);
   CanonicalForm norm= sqrfNorm (f, alpha, shift);
@@ -215,7 +350,7 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
   ASSERT (degree (buf) <= 0, "incomplete factorization");
   if (save_rat) Off(SW_RATIONAL);
   return factors;
-}
+}*/
 
 CFFList
 AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
