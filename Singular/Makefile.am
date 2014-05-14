@@ -147,7 +147,7 @@ feOptTS_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR
 
 ########################### Singular* #########################
 
-EXTRA_PROGRAMS =  libparse Singulars
+EXTRA_PROGRAMS =  libparse Singulard
 
 # the "optional_programs" variable should be defined in the configure
 # script, and listed in an AC_SUBST macro
@@ -161,13 +161,13 @@ Singular_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 Singular_LDADD = libSingular.la ${BUILTIN_FLAGS}
 
-Singular_LDFLAGS = -static ${BUILTIN_FLAGS}
+Singular_LDFLAGS = -static ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
-Singulars_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
+Singulard_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
-Singulars_LDADD = libSingular.la ${BUILTIN_FLAGS}
+Singulard_LDADD = libSingular.la ${BUILTIN_FLAGS}
 
-Singulars_LDFLAGS = -static ${AM_LDFLAGS} ${BUILTIN_FLAGS}
+Singulard_LDFLAGS = -shared ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
 scriptdir = $(libexecdir)/singular/MOD
 dist_script_SCRIPTS = singularsurf
