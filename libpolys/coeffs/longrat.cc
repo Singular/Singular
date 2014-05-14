@@ -533,7 +533,7 @@ int nlInt(number &i, const coeffs r)
 {
   nlTest(i, r);
   nlNormalize(i,r);
-  if (SR_HDL(i) &SR_INT) return SR_TO_INT(i);
+  if (SR_HDL(i) & SR_INT) return SR_TO_INT(i);
   if (i->s==3)
   {
     if(mpz_size1(i->z)>MP_SMALL) return 0;
