@@ -49,6 +49,27 @@ uniSqrfPart (const CanonicalForm& F)
   return F/G;
 }
 
+CanonicalForm Norm (const CanonicalForm& F, const Variable& alpha)
+{
+  Variable x= Variable (F.level() + 1);
+  Variable y= F.mvar();
+  CanonicalForm g= F (x, alpha);
+  CanonicalForm mipo= getMipo (alpha);
+  mipo= mipo (x, alpha);
+  mipo *= bCommonDen (mipo);
+
+  int degg= degree (g);
+  int degmipo= degree (mipo);
+  CanonicalForm norm;
+  TIMING_START (fac_alg_resultant);
+  if (degg >= 8 || degmipo >= 8)
+    norm= resultantZ (g, mipo, x);
+  else
+    norm= resultant (g, mipo, x);
+  TIMING_END_AND_PRINT (fac_alg_resultant, "time to compute resultant0: ");
+  return norm;
+}
+
 // i is an integer such that Norm (F (x-i*alpha)) is squarefree
 CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
 {
