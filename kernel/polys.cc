@@ -25,7 +25,6 @@ void rChangeCurrRing(ring r)
 
     //------------ set global ring vars --------------------------------
     currRing = r;
-    currRing->qideal = r->qideal;
     //------------ global variables related to coefficients ------------
     assume( r->cf!= NULL );
     nSetChar(r->cf);
@@ -36,7 +35,6 @@ void rChangeCurrRing(ring r)
   else
   {
     currRing = NULL;
-    currRing->qideal = NULL;
   }
 }
 /*
