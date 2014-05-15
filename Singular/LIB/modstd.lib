@@ -322,6 +322,385 @@ static proc reduce_task(intvec range)
     return(result);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/*
+ * The following procedures are kept for backward compatibility with the old
+ * version of modstd.lib. As of now (May 2014), they are still needed in
+ * assprimeszerodim.lib, modnormal.lib, modwalk.lib, and symodstd.lib. They can
+ * be removed here as soon as they are not longer needed in these libraries.
+ */
+
+LIB "parallel.lib";
+
+static proc mod_init()
+{
+   newstruct("idealPrimeTest", "ideal Ideal");
+}
+
+static proc redFork(ideal I, ideal J, int n)
+{
+   attrib(J,"isSB",1);
+   return(reduce(I,J,1));
+}
+
+proc isIncluded(ideal I, ideal J, list #)
+"USAGE:  isIncluded(I,J); I,J ideals
+RETURN:  1 if J includes I,
+@*       0 if there is an element f in I which does not reduce to 0 w.r.t. J.
+EXAMPLE: example isIncluded; shows an example
+"
+{
+   def R = basering;
+   setring R;
+
+   attrib(J,"isSB",1);
+   int i,j,k;
+
+   if(size(#) > 0)
+   {
+      int n = #[1];
+      if(n >= ncols(I)) { n = ncols(I); }
+      if(n > 1)
+      {
+         for(i = 1; i <= n - 1; i++)
+         {
+            //link l(i) = "MPtcp:fork";
+            link l(i) = "ssi:fork";
+            open(l(i));
+
+            write(l(i), quote(redFork(eval(I[ncols(I)-i]), eval(J), 1)));
+         }
+
+         int t = timer;
+         if(reduce(I[ncols(I)], J, 1) != 0)
+         {
+            for(i = 1; i <= n - 1; i++)
+            {
+               close(l(i));
+            }
+            return(0);
+         }
+         t = timer - t;
+         if(t > 60) { t = 60; }
+         int i_sleep = system("sh", "sleep "+string(t));
+
+         j = ncols(I) - n;
+
+         while(j >= 0)
+         {
+            for(i = 1; i <= n - 1; i++)
+            {
+               if(status(l(i), "read", "ready"))
+               {
+                  if(read(l(i)) != 0)
+                  {
+                     for(i = 1; i <= n - 1; i++)
+                     {
+                        close(l(i));
+                     }
+                     return(0);
+                  }
+                  else
+                  {
+                     if(j >= 1)
+                     {
+                        write(l(i), quote(redFork(eval(I[j]), eval(J), 1)));
+                        j--;
+                     }
+                     else
+                     {
+                        k++;
+                        close(l(i));
+                     }
+                  }
+               }
+            }
+            if(k == n - 1)
+            {
+               j--;
+            }
+            i_sleep = system("sh", "sleep "+string(t));
+         }
+         return(1);
+      }
+   }
+
+   for(i = ncols(I); i >= 1; i--)
+   {
+      if(reduce(I[i],J,1) != 0){ return(0); }
+   }
+   return(1);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   ideal I = x+1,x+y+1;
+   ideal J = x+1,y;
+   isIncluded(I,J);
+   isIncluded(J,I);
+   isIncluded(I,J,4);
+
+   ring R = 0, x(1..5), dp;
+   ideal I1 = cyclic(4);
+   ideal I2 = I1,x(5)^2;
+   isIncluded(I1,I2,4);
+}
+
+proc deleteUnluckyPrimes(list T, list L, int ho, list #)
+"USAGE:  deleteUnluckyPrimes(T,L,ho,#); T/L list of polys/primes, ho integer
+RETURN:  lists T,L(,M),lT with T/L(/M) list of polys/primes(/type of #),
+         lT ideal
+NOTE:    - if ho = 1, the polynomials in T are homogeneous, else ho = 0,
+@*       - lT is prevalent, i.e. the most appearing leading ideal in T
+EXAMPLE: example deleteUnluckyPrimes; shows an example
+"
+{
+   ho = ((ho)||(ord_test(basering) == -1));
+   int j,k,c;
+   intvec hl,hc;
+   ideal cT,lT,cK;
+   lT = lead(T[size(T)]);
+   attrib(lT,"isSB",1);
+   if(!ho)
+   {
+      for(j = 1; j < size(T); j++)
+      {
+         cT = lead(T[j]);
+         attrib(cT,"isSB",1);
+         if((size(reduce(cT,lT))!=0)||(size(reduce(lT,cT))!=0))
+         {
+            cK = cT;
+            c++;
+         }
+      }
+      if(c > size(T) div 2){ lT = cK; }
+   }
+   else
+   {
+      hl = hilb(lT,1);
+      for(j = 1; j < size(T); j++)
+      {
+         cT = lead(T[j]);
+         attrib(cT,"isSB",1);
+         hc = hilb(cT,1);
+         if(hl == hc)
+         {
+            for(k = 1; k <= size(lT); k++)
+            {
+               if(lT[k] < cT[k]) { lT = cT; c++; break; }
+               if(lT[k] > cT[k]) { c++; break; }
+            }
+         }
+         else
+         {
+            if(hc < hl){ lT = cT; hl = hilb(lT,1); c++; }
+         }
+      }
+   }
+
+   int addList;
+   if(size(#) > 0) { list M = #; addList = 1; }
+   j = 1;
+   attrib(lT,"isSB",1);
+   while((j <= size(T))&&(c > 0))
+   {
+      cT = lead(T[j]);
+      attrib(cT,"isSB",1);
+      if((size(reduce(cT,lT)) != 0)||(size(reduce(lT,cT)) != 0))
+      {
+         T = delete(T,j);
+         if(j == 1)
+         {
+            L = L[2..size(L)];
+            if(addList == 1) { M = M[2..size(M)]; }
+         }
+         else
+         {
+            if(j == size(L))
+            {
+               L = L[1..size(L)-1];
+               if(addList == 1) { M = M[1..size(M)-1]; }
+            }
+            else
+            {
+               L = L[1..j-1],L[j+1..size(L)];
+               if(addList == 1) { M = M[1..j-1],M[j+1..size(M)]; }
+            }
+         }
+         j--;
+      }
+      j++;
+   }
+
+   for(j = 1; j <= size(L); j++)
+   {
+      L[j] = bigint(L[j]);
+   }
+
+   if(addList == 0) { return(list(T,L,lT)); }
+   if(addList == 1) { return(list(T,L,M,lT)); }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   list L = 2,3,5,7,11;
+   ring r = 0,(y,x),Dp;
+   ideal I1 = 2y2x,y6;
+   ideal I2 = yx2,y3x,x5,y6;
+   ideal I3 = y2x,x3y,x5,y6;
+   ideal I4 = y2x,11x3y,x5;
+   ideal I5 = y2x,yx3,x5,7y6;
+   list T = I1,I2,I3,I4,I5;
+   deleteUnluckyPrimes(T,L,1);
+   list P = poly(x),poly(x2),poly(x3),poly(x4),poly(x5);
+   deleteUnluckyPrimes(T,L,1,P);
+}
+
+proc primeTest(def II, bigint p)
+{
+   if(typeof(II) == "string")
+   {
+      ideal I = `II`.Ideal;
+   }
+   else
+   {
+      ideal I = II;
+   }
+
+   I = simplify(I, 2);   // erase zero generators
+
+   int i,j;
+   poly f;
+   number cnt;
+   for(i = 1; i <= size(I); i++)
+   {
+      f = cleardenom(I[i]);
+      if(f == 0) { return(0); }
+      cnt = leadcoef(I[i])/leadcoef(f);
+      if((numerator(cnt) mod p) == 0) { return(0); }
+      if((denominator(cnt) mod p) == 0) { return(0); }
+      for(j = size(f); j > 0; j--)
+      {
+         if((leadcoef(f[j]) mod p) == 0) { return(0); }
+      }
+   }
+   return(1);
+}
+
+proc primeList(ideal I, int n, list #)
+"USAGE:  primeList(I,n[,ncores]); ( resp. primeList(I,n[,L,ncores]); ) I ideal,
+         n integer
+RETURN:  the intvec of n greatest primes <= 2147483647 (resp. n greatest primes
+         < L[size(L)] union with L) such that none of these primes divides any
+         coefficient occuring in I
+NOTE:    The number of cores to use can be defined by ncores, default is 1.
+EXAMPLE: example primeList; shows an example
+"
+{
+   intvec L;
+   int i,p;
+   int ncores = 1;
+
+//-----------------  Initialize optional parameter ncores  ---------------------
+   if(size(#) > 0)
+   {
+      if(size(#) == 1)
+      {
+         if(typeof(#[1]) == "int")
+         {
+            ncores = #[1];
+            # = list();
+         }
+      }
+      else
+      {
+         ncores = #[2];
+      }
+   }
+
+   if(size(#) == 0)
+   {
+      p = 2147483647;
+      while(!primeTest(I,p))
+      {
+         p = prime(p-1);
+         if(p == 2) { ERROR("no more primes"); }
+      }
+      L[1] = p;
+   }
+   else
+   {
+      L = #[1];
+      p = prime(L[size(L)]-1);
+      while(!primeTest(I,p))
+      {
+         p = prime(p-1);
+         if(p == 2) { ERROR("no more primes"); }
+      }
+      L[size(L)+1] = p;
+   }
+   if(p == 2) { ERROR("no more primes"); }
+   if(ncores == 1)
+   {
+      for(i = 2; i <= n; i++)
+      {
+         p = prime(p-1);
+         while(!primeTest(I,p))
+         {
+            p = prime(p-1);
+            if(p == 2) { ERROR("no more primes"); }
+         }
+         L[size(L)+1] = p;
+      }
+   }
+   else
+   {
+      int neededSize = size(L)+n-1;;
+      list parallelResults;
+      list arguments;
+      int neededPrimes = neededSize-size(L);
+      idealPrimeTest Id;
+      Id.Ideal = I;
+      export(Id);
+      while(neededPrimes > 0)
+      {
+         arguments = list();
+         for(i = ((neededPrimes div ncores)+1-(neededPrimes%ncores == 0))
+            *ncores; i > 0; i--)
+         {
+            p = prime(p-1);
+            if(p == 2) { ERROR("no more primes"); }
+            arguments[i] = list("Id", p);
+         }
+         parallelResults = parallelWaitAll("primeTest", arguments, 0, ncores);
+         for(i = size(arguments); i > 0; i--)
+         {
+            if(parallelResults[i])
+            {
+               L[size(L)+1] = arguments[i][2];
+            }
+         }
+         neededPrimes = neededSize-size(L);
+      }
+      kill Id;
+      if(size(L) > neededSize)
+      {
+         L = L[1..neededSize];
+      }
+   }
+   return(L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),dp;
+   ideal I = 2147483647x+y, z-181;
+   intvec L = primeList(I,10);
+   size(L);
+   L[1];
+   L[size(L)];
+   L = primeList(I,5,L);
+   size(L);
+   L[size(L)];
+}
 
 ////////////////////////////// further examples ////////////////////////////////
 
