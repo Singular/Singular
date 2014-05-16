@@ -46,29 +46,14 @@ enum tHomog
   testHomog
 };
 
-enum   feBufferTypes
-{
-  BT_none  = 0,  // entry level
-  BT_break = 1,  // while, for
-  BT_proc,       // proc
-  BT_example,    // example
-  BT_file,       // <"file"
-  BT_execute,    // execute
-  BT_if,         // if
-  BT_else        // else
-};
-
-
 struct sip_package;
 typedef struct sip_package ip_package;
 typedef ip_package *       package;
 
 typedef struct  n_Procs_s  n_Procs_s;
 
-// #ifdef HAVE_PLURAL
 struct nc_struct;
 typedef struct nc_struct   nc_struct;
-// #endif
 
 typedef struct sip_link    ip_link;
 
@@ -77,10 +62,7 @@ typedef char *             char_ptr;
 typedef int  *             int_ptr;
 
 #ifdef __cplusplus
-//typedef ip_link *          si_link;
 typedef sleftv *           leftv;
-//typedef slists *           lists;
-//typedef sattr *            attr;
 typedef skStrategy *       kStrategy;
 typedef ssyStrategy *      syStrategy;
 typedef procinfo *         procinfov;

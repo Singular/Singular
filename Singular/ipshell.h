@@ -10,6 +10,7 @@
 //#include <kernel/structs.h>
 #include <kernel/ideals.h>
 #include <Singular/lists.h>
+#include <Singular/fevoices.h>
 
 struct _ssubexpr;
 typedef struct _ssubexpr *Subexpr;

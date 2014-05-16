@@ -13,6 +13,18 @@
 
 #include <kernel/structs.h>
 
+enum   feBufferTypes
+{
+  BT_none  = 0,  // entry level
+  BT_break = 1,  // while, for
+  BT_proc,       // proc
+  BT_example,    // example
+  BT_file,       // <"file"
+  BT_execute,    // execute
+  BT_if,         // if
+  BT_else        // else
+};
+
 enum   feBufferInputs
 {
   BI_stdin = 1,
