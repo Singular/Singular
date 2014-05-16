@@ -37,39 +37,6 @@ static proc mod_init()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-proc mixedTest()
-"USAGE:  mixedTest();
-RETURN:  1 if ordering of basering is mixed, 0 else
-EXAMPLE: example mixedTest(); shows an example
-"
-{
-   int i,p,m;
-   for(i = 1; i <= nvars(basering); i++)
-   {
-      if(var(i) > 1)
-      {
-         p++;
-      }
-      else
-      {
-         m++;
-      }
-   }
-   if((p > 0) && (m > 0)) { return(1); }
-   return(0);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring R1 = 0,(x,y,z),dp;
-   mixedTest();
-   ring R2 = 31,(x(1..4),y(1..3)),(ds(4),lp(3));
-   mixedTest();
-   ring R3 = 181,x(1..9),(dp(5),lp(4));
-   mixedTest();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 static proc redFork(ideal I, ideal J, int n)
 {
    attrib(J,"isSB",1);
@@ -919,7 +886,7 @@ EXAMPLE: example modStd; shows an example
    tt = timer;
    rt = rtimer;
 
-   if(!mixedTest())
+   if(!hasMixedOrdering())
    {
       if(h)
       {

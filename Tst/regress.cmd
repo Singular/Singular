@@ -385,46 +385,6 @@ sub GetSingularVersionDate
   # mysystem("free -h >> SingularVersionDate"); # nobody supports free -h
 }
 
-sub Set_withMP
-{
-  if (! $withMP)
-  {
-    $withMP = "no";
-    open(MP_TEST, ">MPTest");
-    print(MP_TEST "system(\"with\", \"MP\"); \$");
-    close(MP_TEST);
-    mysystem("$singular -qt MPTest > withMPtest");
-    if (open(MP_TEST, "<withMPtest"))
-    {
-      $_ = <MP_TEST>;
-      $withMP = "yes" if (/^1/);
-      close(MP_TEST);
-    }
-    mysystem("$rm -f withMPtest MPTest");
-  }
-}
-
-
-sub MPok
-{
-  local($root) = $_[0];
-
-  if (! open(TST_FILE, "<$root.tst"))
-  {
-    print (STDERR "Can not open $root.tst for reading\n");
-    return (0);
-  }
-  while (<TST_FILE>)
-  {
-    if (/\"MP.+:.*\"/)
-    {
-      &Set_withMP;
-      return (0) if ($withMP eq "no");
-    }
-  }
-  return (1);
-}
-
 sub Diff
 {
   local($root) = $_[0];
@@ -635,16 +595,6 @@ sub tst_check
     testIgnored($test_file, "Can not read $root.tst");
     $test_files{$test_file} = 1;
     return (1);
-  }
-
-  # ignore MP stuff, if this singular does not have MP
-  if (! MPok($root))
-  {
-    print "--- $root " unless ($verbosity == 0);
-    print "Warning: $root not tested: needs MP\n";
-    testIgnored($test_file, "Warning: $root not tested: needs MP");
-    $test_files{$test_file} = 0;
-    return (0);
   }
 
   # generate $root.res

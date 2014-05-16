@@ -171,9 +171,6 @@ void yyerror(const char * fmt)
     //Werror("leaving %s (line %d)",VoiceName(), currentVoice->curr_lineno);
     Werror("leaving %s",VoiceName());
   }
-  // libfac:
-  extern int libfac_interruptflag;
-  libfac_interruptflag=0;
 }
 
 %}

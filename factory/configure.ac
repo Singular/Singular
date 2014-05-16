@@ -390,9 +390,6 @@ AC_SUBST(factory_version)
 AH_TEMPLATE([FACTORYVERSION], [factory version])
 AC_DEFINE_UNQUOTED([FACTORYVERSION], "$factory_version")
 
-AH_TEMPLATE([HAVE_LIBFAC], [have libfac])
-AC_DEFINE_UNQUOTED([HAVE_LIBFAC], 1)
-
 AH_TEMPLATE([FACTORYCONFIGURATION], [factory configuration])
 AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION], "$factory_configuration")
 
@@ -401,6 +398,6 @@ AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION], "$factory_configuration")
 
 
 
-AC_CONFIG_FILES([Makefile include/factory/Makefile libfac/Makefile factory.pc]) #  ftest/GNUmakefile
+AC_CONFIG_FILES([Makefile include/factory/Makefile factory.pc]) #  ftest/GNUmakefile
 AC_OUTPUT
 

@@ -2964,8 +2964,8 @@ numbers, but reducible over the complex numbers.
   // Let us now look for the branches using the primdec library.
   LIB "primdec.lib";
   primdecSY(i);
-  def li=_[2];
-  ideal i2=li[2];       // call the second ideal i2
+  def li=_[1];
+  ideal i2=li[2];       // call the first ideal i1
   // The curve seems to have 2 branches by what we computed using the
   // algorithm of Shimoyama-Yokoyama.
   // Now the same computation by the Gianni-Trager-Zacharias algorithm:
@@ -2991,10 +2991,10 @@ numbers, but reducible over the complex numbers.
   // Hence tau is 13 and therefore mu is 12. But then it is impossible that
   // the singularity has two branches, since mu is even and delta is an
   // integer!
-  // So obviously, we did not decompose completely. Because the first branch
-  // is smooth, only the second ideal can be the one which can be decomposed
+  // So obviously, we did not decompose completely. Because the second branch
+  // is smooth, only the first ideal can be the one which can be decomposed
   // further.
-  // Let us now consider the normalization of this second ideal i2.
+  // Let us now consider the normalization of this first ideal i1.
   LIB "normal.lib";
   normal(i2);
   def rno=_[1][1];

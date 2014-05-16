@@ -108,7 +108,7 @@ int
 hfglmNextdegree( intvec * source, ideal current, int & deg )
 {
     int numelems;
-    intvec * newhilb = hHstdSeries( current, NULL, currQuotient );
+    intvec * newhilb = hHstdSeries( current, NULL, currRing->qideal );
 
     loop
     {
@@ -350,7 +350,7 @@ fglmhomog( ring sourceRing, ideal sourceIdeal, ring destRing, ideal & destIdeal 
     // get the hilbert series and the leading monomials of the sourceIdeal:
     rChangeCurrRing( sourceRing );
 
-    intvec * hilb = hHstdSeries( sourceIdeal, NULL, currQuotient );
+    intvec * hilb = hHstdSeries( sourceIdeal, NULL, currRing->qideal );
     int s;
     dat.sourceIdeal= sourceIdeal;
     dat.sourceHeads= (doublepoly *)omAlloc( IDELEMS( sourceIdeal ) * sizeof( doublepoly ) );

@@ -1,9 +1,9 @@
 // -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file DebugPrint.cc
- * 
+ *
  * Here we implement dPrint-s.
  *
  * ABSTRACT: debug-detailed-printing
@@ -302,7 +302,7 @@ poly kNFLength(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
     pp = p_KillSquares(pp, m_iFirstAltVar, m_iLastAltVar, currRing);
 
-    if(Q == currQuotient)
+    if(Q == currRing->qideal)
       Q = SCAQuotient(currRing);
   }
 #endif

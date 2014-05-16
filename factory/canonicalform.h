@@ -366,6 +366,13 @@ typedef List<CanonicalForm> CFList;
 typedef ListIterator<CanonicalForm> CFListIterator;
 typedef Array<CanonicalForm> CFArray;
 typedef Matrix<CanonicalForm> CFMatrix;
+typedef List<CFList> ListCFList;
+typedef ListIterator<CFList> ListCFListIterator ;
+typedef List<int> IntList;
+typedef ListIterator<int> IntListIterator;
+typedef List<Variable> Varlist;
+typedef ListIterator<Variable> VarlistIterator;
+typedef Array<int> Intarray;
 //}}}
 
 /*ENDPUBLIC*/

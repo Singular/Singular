@@ -56,9 +56,10 @@
 #include <sys/wait.h>
 #include <time.h>
 
-#define SSI_VERSION 7
+#define SSI_VERSION 8
 // 5->6: changed newstruct representation
 // 6->7: attributes
+// 7->8: qring
 
 // 64 bit version:
 //#if SIZEOF_LONG == 8
@@ -90,6 +91,12 @@ typedef struct
 link_list ssiToBeClosed=NULL;
 volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
 
+// forward declarations:
+void ssiWritePoly_R(const ssiInfo *d, int typ, poly p, const ring r);
+void ssiWriteIdeal(const ssiInfo *d, int typ,ideal I);
+poly ssiReadPoly_R(const ssiInfo *D, const ring r);
+ideal ssiReadIdeal_R(const ssiInfo *d,const ring r);
+
 // the helper functions:
 void ssiSetCurrRing(const ring r)
 {
@@ -107,18 +114,17 @@ void ssiSetCurrRing(const ring r)
   }
 }
 // the implementation of the functions:
-void ssiWriteInt(ssiInfo *d,const int i)
+void ssiWriteInt(const ssiInfo *d,const int i)
 {
   fprintf(d->f_write,"%d ",i);
   //if (d->f_debug!=NULL) fprintf(d->f_debug,"int: %d ",i);
 }
 
-void ssiWriteString(ssiInfo *d,const char *s)
+void ssiWriteString(const ssiInfo *d,const char *s)
 {
   fprintf(d->f_write,"%d %s ",(int)strlen(s),s);
   //if (d->f_debug!=NULL) fprintf(d->f_debug,"stringi: %d \"%s\" ",strlen(s),s);
 }
-
 
 void ssiWriteBigInt(const ssiInfo *d, const number n)
 {
@@ -141,7 +147,6 @@ void ssiWriteBigInt(const ssiInfo *d, const number n)
   else WerrorS("illiegal bigint");
 }
 
-void ssiWritePoly_R(const ssiInfo *d, int typ, poly p, const ring r);
 void ssiWriteNumber_CF(const ssiInfo *d, const number n, const coeffs cf)
 {
   // syntax is as follows:
@@ -175,19 +180,13 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
   ssiWriteNumber_CF(d,n,d->r->cf);
 }
 
-void ssiWriteRing(ssiInfo *d,const ring r)
+void ssiWriteRing_R(ssiInfo *d,const ring r)
 {
-  /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... */
+  /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> */
   /* ch=-1: transext, coeff ring follows */
   /* ch=-2: algext, coeff ring and minpoly follows */
-  if (r==currRing) // see recursive calls for transExt/algExt
-  {
-    if (d->r!=NULL) rKill(d->r);
-    d->r=r;
-  }
   if (r!=NULL)
   {
-    /*d->*/r->ref++;
     if (rField_is_Q(r) || rField_is_Zp(r))
       fprintf(d->f_write,"%d %d ",n_GetChar(r->cf),r->N);
     else if (rFieldType(r)==n_transExt)
@@ -241,23 +240,47 @@ void ssiWriteRing(ssiInfo *d,const ring r)
     if ((rFieldType(r)==n_transExt)
     || (rFieldType(r)==n_algExt))
     {
-      ssiWriteRing(d,r->cf->extRing);
+      ssiWriteRing_R(d,r->cf->extRing);
       if  (rFieldType(r)==n_algExt)
       {
         ssiWritePoly_R(d,POLY_CMD,r->cf->extRing->qideal->m[0],r->cf->extRing);
       }
     }
+    /* Q-ideal :*/
+    if (r->qideal!=NULL)
+    {
+      ssiWriteIdeal(d,IDEAL_CMD,r->qideal);
+    }
+    else
+    {
+      fprintf(d->f_write,"0 "/*ideal with 0 entries */);
+    }
   }
   else /* dummy ring r==NULL*/
   {
-    fprintf(d->f_write,"0 0 0 "/*,r->ch,r->N, blocks*/);
+    fprintf(d->f_write,"0 0 0 0 "/*,r->ch,r->N, blocks, q-ideal*/);
   }
 }
 
+void ssiWriteRing(ssiInfo *d,const ring r)
+{
+  /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> */
+  /* ch=-1: transext, coeff ring follows */
+  /* ch=-2: algext, coeff ring and minpoly follows */
+  if (r==currRing) // see recursive calls for transExt/algExt
+  {
+    if (d->r!=NULL) rKill(d->r);
+    d->r=r;
+  }
+  if (r!=NULL)
+  {
+    /*d->*/r->ref++;
+  }
+  ssiWriteRing_R(d,r);
+}
 void ssiWritePoly_R(const ssiInfo *d, int typ, poly p, const ring r)
 {
   fprintf(d->f_write,"%d ",pLength(p));//number of terms
-  int i;
 
   while(p!=NULL)
   {
@@ -278,7 +301,7 @@ void ssiWritePoly(const ssiInfo *d, int typ, poly p)
   ssiWritePoly_R(d,typ,p,d->r);
 }
 
-void ssiWriteIdeal(ssiInfo *d, int typ,ideal I)
+void ssiWriteIdeal(const ssiInfo *d, int typ,ideal I)
 {
    // syntax: 7 # of elements <poly 1> <poly2>.....
    // syntax: 8 <rows> <cols> <poly 1> <poly2>.....
@@ -319,7 +342,7 @@ void ssiWriteCommand(si_link l, command D)
   }
 }
 
-void ssiWriteProc(ssiInfo *d,procinfov p)
+void ssiWriteProc(const ssiInfo *d,procinfov p)
 {
   if (p->data.s.body==NULL)
     iiGetLibProcBuffer(p);
@@ -340,7 +363,7 @@ void ssiWriteList(si_link l,lists dd)
     ssiWrite(l,&(dd->m[i]));
   }
 }
-void ssiWriteIntvec(ssiInfo *d,intvec * v)
+void ssiWriteIntvec(const ssiInfo *d,intvec * v)
 {
   fprintf(d->f_write,"%d ",v->length());
   int i;
@@ -349,7 +372,7 @@ void ssiWriteIntvec(ssiInfo *d,intvec * v)
     fprintf(d->f_write,"%d ",(*v)[i]);
   }
 }
-void ssiWriteIntmat(ssiInfo *d,intvec * v)
+void ssiWriteIntmat(const ssiInfo *d,intvec * v)
 {
   fprintf(d->f_write,"%d %d ",v->rows(),v->cols());
   int i;
@@ -359,7 +382,7 @@ void ssiWriteIntmat(ssiInfo *d,intvec * v)
   }
 }
 
-void ssiWriteBigintmat(ssiInfo *d,bigintmat * v)
+void ssiWriteBigintmat(const ssiInfo *d,bigintmat * v)
 {
   fprintf(d->f_write,"%d %d ",v->rows(),v->cols());
   int i;
@@ -369,7 +392,7 @@ void ssiWriteBigintmat(ssiInfo *d,bigintmat * v)
   }
 }
 
-char *ssiReadString(ssiInfo *d)
+char *ssiReadString(const ssiInfo *d)
 {
   char *buf;
   int l;
@@ -387,7 +410,7 @@ int ssiReadInt(s_buff fich)
   return s_readint(fich);
 }
 
-number ssiReadBigInt(ssiInfo *d)
+number ssiReadBigInt(const ssiInfo *d)
 {
   int sub_type=-1;
   sub_type=s_readint(d->f_read);
@@ -412,65 +435,7 @@ number ssiReadBigInt(ssiInfo *d)
    }
 }
 
-static number ssiReadQNumber(ssiInfo *d)
-{
-  int sub_type=-1;
-  sub_type=s_readint(d->f_read);
-  switch(sub_type)
-  {
-     case 0:
-     case 1:
-       {// read mpz_t, mpz_t
-         number n=nlRInit(0);
-         mpz_init(n->n);
-         s_readmpz(d->f_read,n->z);
-         s_readmpz(d->f_read,n->n);
-         n->s=sub_type;
-         return n;
-       }
-
-     case 3:
-       {// read mpz_t
-         number n=nlRInit(0);
-         s_readmpz(d->f_read,n->z);
-         n->s=3; /*sub_type*/
-         return n;
-       }
-     case 4:
-       {
-         LONG dd=s_readlong(d->f_read);
-         //#if SIZEOF_LONG == 8
-         return INT_TO_SR(dd);
-         //#else
-         //return nlInit(dd,NULL);
-         //#endif
-       }
-     case 5:
-     case 6:
-       {// read raw mpz_t, mpz_t
-         number n=nlRInit(0);
-         mpz_init(n->n);
-         s_readmpz_base (d->f_read,n->z, SSI_BASE);
-         s_readmpz_base (d->f_read,n->n, SSI_BASE);
-         n->s=sub_type-5;
-         return n;
-       }
-     case 8:
-       {// read raw mpz_t
-         number n=nlRInit(0);
-         s_readmpz_base (d->f_read,n->z, SSI_BASE);
-         n->s=sub_type=3; /*subtype-5*/
-         return n;
-       }
-
-     default: Werror("error in reading number: invalid subtype %d",sub_type);
-              return NULL;
-  }
-  return NULL;
-}
-
-poly ssiReadPoly_R(ssiInfo *D, const ring r);
-number ssiReadNumber_CF(ssiInfo *d, const coeffs cf)
+number ssiReadNumber_CF(const ssiInfo *d, const coeffs cf)
 {
   if (cf->cfReadFd!=NULL)
   {
@@ -494,15 +459,15 @@ number ssiReadNumber_CF(ssiInfo *d, const coeffs cf)
   return NULL;
 }
 
-number ssiReadNumber(ssiInfo *d)
+number ssiReadNumber(const ssiInfo *d)
 {
   return ssiReadNumber_CF(d,d->r->cf);
 }
 
-ring ssiReadRing(ssiInfo *d)
+ring ssiReadRing(const ssiInfo *d)
 {
-/* syntax is <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... */
-  int ch, N,i,l;
+/* syntax is <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <Q-ideal> */
+  int ch, N,i;
   char **names;
   ch=s_readint(d->f_read);
   N=s_readint(d->f_read);
@@ -560,40 +525,46 @@ ring ssiReadRing(ssiInfo *d)
     omFree(wvhdl);
     return NULL;
   }
-  else if (ch>=0) /* Q, Z/p */
-    return rDefault(ch,N,names,num_ord,ord,block0,block1,wvhdl);
-  else if (ch==-1) /* trans ext. */
-  {
-    TransExtInfo T;
-    T.r=ssiReadRing(d);
-    coeffs cf=nInitChar(n_transExt,&T);
-    return rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
-  }
-  else if (ch==-2) /* alg ext. */
-  {
-    TransExtInfo T;
-    T.r=ssiReadRing(d);
-    T.r->qideal=idInit(1,1);
-    T.r->qideal->m[0]=ssiReadPoly_R(d,T.r);
-    coeffs cf=nInitChar(n_algExt,&T);
-    return rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
-  }
   else
   {
-    Werror("ssi: read unknown coeffs type (%d)",ch);
-    return NULL;
+    ring r=NULL;
+    if (ch>=0) /* Q, Z/p */
+      r=rDefault(ch,N,names,num_ord,ord,block0,block1,wvhdl);
+    else if (ch==-1) /* trans ext. */
+    {
+      TransExtInfo T;
+      T.r=ssiReadRing(d);
+      coeffs cf=nInitChar(n_transExt,&T);
+      r=rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
+    }
+    else if (ch==-2) /* alg ext. */
+    {
+      TransExtInfo T;
+      T.r=ssiReadRing(d);
+      T.r->qideal=idInit(1,1);
+      T.r->qideal->m[0]=ssiReadPoly_R(d,T.r);
+      coeffs cf=nInitChar(n_algExt,&T);
+      r=rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
+    }
+    else
+    {
+      Werror("ssi: read unknown coeffs type (%d)",ch);
+      return NULL;
+    }
+    ideal q=ssiReadIdeal_R(d,r);
+    if (IDELEMS(q)==0) omFreeBin(q,sip_sideal_bin);
+    else r->qideal=q;
+    return r;
   }
 }
 
-poly ssiReadPoly_R(ssiInfo *D, const ring r)
+poly ssiReadPoly_R(const ssiInfo *D, const ring r)
 {
 // < # of terms> < term1> < .....
   int n,i,l;
   n=ssiReadInt(D->f_read);
   //Print("poly: terms:%d\n",n);
   poly p;
-  int j;
-  j=0;
   poly ret=NULL;
   poly prev=NULL;
   for(l=0;l<n;l++) // read n terms
@@ -618,13 +589,13 @@ poly ssiReadPoly_R(ssiInfo *D, const ring r)
  return ret;
 }
 
-poly ssiReadPoly(ssiInfo *D)
+poly ssiReadPoly(const ssiInfo *D)
 {
 // < # of terms> < term1> < .....
   return ssiReadPoly_R(D,D->r);
 }
 
-ideal ssiReadIdeal(ssiInfo *d)
+ideal ssiReadIdeal_R(const ssiInfo *d,const ring r)
 {
   int n,i;
   ideal I;
@@ -632,14 +603,19 @@ ideal ssiReadIdeal(ssiInfo *d)
   I=idInit(n,1);
   for(i=0;i<IDELEMS(I);i++) // read n terms
   {
-    I->m [i]=ssiReadPoly(d);
+    I->m [i]=ssiReadPoly_R(d,r);
   }
   return I;
 }
 
-matrix ssiReadMatrix(ssiInfo *d)
+ideal ssiReadIdeal(const ssiInfo *d)
 {
-  int n,m,i,j;
+  return ssiReadIdeal_R(d,d->r);
+}
+
+matrix ssiReadMatrix(const ssiInfo *d)
+{
+  int n,m;
   m=s_readint(d->f_read);
   n=s_readint(d->f_read);
   matrix M=mpNew(m,n);
@@ -699,7 +675,7 @@ command ssiReadCommand(si_link l)
   return D;
 }
 
-procinfov ssiReadProc(ssiInfo *d)
+procinfov ssiReadProc(const ssiInfo *d)
 {
   char *s=ssiReadString(d);
   procinfov p=(procinfov)omAlloc0Bin(procinfo_bin);
@@ -727,7 +703,7 @@ lists ssiReadList(si_link l)
   }
   return L;
 }
-intvec* ssiReadIntvec(ssiInfo *d)
+intvec* ssiReadIntvec(const ssiInfo *d)
 {
   int nr;
   nr=s_readint(d->f_read);
@@ -738,7 +714,7 @@ intvec* ssiReadIntvec(ssiInfo *d)
   }
   return v;
 }
-intvec* ssiReadIntmat(ssiInfo *d)
+intvec* ssiReadIntmat(const ssiInfo *d)
 {
   int r,c;
   r=s_readint(d->f_read);
@@ -750,7 +726,7 @@ intvec* ssiReadIntmat(ssiInfo *d)
   }
   return v;
 }
-bigintmat* ssiReadBigintmat(ssiInfo *d)
+bigintmat* ssiReadBigintmat(const ssiInfo *d)
 {
   int r,c;
   r=s_readint(d->f_read);
@@ -888,8 +864,8 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           d->f_read=s_open(pc[0]);
           d->fd_read=pc[0];
           d->fd_write=cp[1];
-	  //d->r=currRing;
-	  //if (d->r!=NULL) d->r->ref++;
+          //d->r=currRing;
+          //if (d->r!=NULL) d->r->ref++;
           l->data=d;
           omFree(l->mode);
           l->mode = omStrDup(mode);
@@ -927,8 +903,8 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           d->fd_write=pc[1];
           SI_LINK_SET_RW_OPEN_P(l);
           d->send_quit_at_exit=1;
-	  //d->r=currRing;
-	  //if (d->r!=NULL) d->r->ref++;
+          //d->r=currRing;
+          //if (d->r!=NULL) d->r->ref++;
         }
         else
         {
@@ -943,7 +919,6 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       {
         int sockfd, newsockfd, portno, clilen;
         struct sockaddr_in serv_addr, cli_addr;
-        int n;
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
         if(sockfd < 0)
         {
@@ -1004,7 +979,6 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       {
         int sockfd, newsockfd, portno, clilen;
         struct sockaddr_in serv_addr, cli_addr;
-        int n;
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
         if(sockfd < 0)
         {
@@ -1087,7 +1061,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       else if(strcmp(mode,"connect")==0)
       {
         char* host = (char*)omAlloc(256);
-        int sockfd, portno, n;
+        int sockfd, portno;
         struct sockaddr_in serv_addr;
         struct hostent *server;
 
@@ -1295,8 +1269,11 @@ leftv ssiRead1(si_link l)
     case 15:
     case 5:{
              d->r=ssiReadRing(d);
-             res->rtyp=RING_CMD;
              res->data=(char*)d->r;
+             if (d->r->qideal==NULL)
+               res->rtyp=RING_CMD;
+             else
+               res->rtyp=QRING_CMD;
              // we are in the top-level, so set the basering to d->r:
              if (d->r!=NULL)
              {
@@ -1469,6 +1446,7 @@ BOOLEAN ssiWrite(si_link l, leftv data)
                           fputs("3 ",d->f_write);
                           ssiWriteNumber(d,(number)dd);
                         break;
+          case QRING_CMD:
           case RING_CMD:fputs("5 ",d->f_write);
                         ssiWriteRing(d,(ring)dd);
                         break;
@@ -1577,7 +1555,7 @@ const char* slStatusSsi(si_link l, const char* request)
   ||(strcmp(l->mode,"connect")==0))
   && (strcmp(request, "read") == 0))
   {
-    fd_set  mask, fdmask;
+    fd_set  mask;
     struct timeval wt;
     if (s_isready(d->f_read)) return "ready";
     loop
@@ -1837,7 +1815,6 @@ int ssiReservePort(int clients)
     return 0;
   }
   int portno;
-  int n;
   ssiReserved_sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if(ssiReserved_sockfd < 0)
   {

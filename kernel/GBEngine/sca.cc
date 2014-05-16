@@ -138,7 +138,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   ideal tempF = id_KillSquares(F, m_iFirstAltVar, m_iLastAltVar, currRing);
   ideal tempQ = Q;
 
-  if(Q == currQuotient)
+  if(Q == currRing->qideal)
     tempQ = SCAQuotient(currRing);
 
   strat->z2homog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
@@ -412,7 +412,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec *
 
   ideal tempQ = Q;
 
-  if(Q == currQuotient)
+  if(Q == currRing->qideal)
     tempQ = SCAQuotient(currRing);
 
   // Q or tempQ will not be used below :(((
@@ -911,7 +911,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec *
 
   ideal tempQ = Q;
 
-  if(Q == currQuotient)
+  if(Q == currRing->qideal)
     tempQ = SCAQuotient(currRing);
 
   bool bIdHomog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!

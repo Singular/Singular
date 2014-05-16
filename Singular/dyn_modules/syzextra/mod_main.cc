@@ -29,7 +29,7 @@
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 
-#include <Singular/ipid.h> 
+#include <Singular/ipid.h>
 #include <Singular/ipshell.h> // For iiAddCproc
 
 // extern coeffs coeffs_BIGINT
@@ -44,9 +44,9 @@
 #include <Singular/mod_lib.h>
 
 
-#if GOOGLE_PROFILE_ENABLED 
+#if GOOGLE_PROFILE_ENABLED
 #include <google/profiler.h>
-#endif // #if GOOGLE_PROFILE_ENABLED 
+#endif // #if GOOGLE_PROFILE_ENABLED
 
 
 #include <stdio.h>
@@ -83,7 +83,7 @@ static BOOLEAN _ClearContent(leftv res, leftv h)
   NoReturn(res);
 
   const char *usage = "'ClearContent' needs a (non-zero!) poly or vector argument...";
-  
+
   if( h == NULL )
   {
     WarnS(usage);
@@ -99,15 +99,15 @@ static BOOLEAN _ClearContent(leftv res, leftv h)
   }
 
   assume (h->Next() == NULL);
-  
+
   poly ph = reinterpret_cast<poly>(h->Data());
-  
+
   if( ph == NULL )
   {
     WarnS(usage);
     return TRUE;
   }
-  
+
   const ring r =  currRing;
   assume( r != NULL ); assume( r->cf != NULL ); const coeffs C = r->cf;
 
@@ -184,7 +184,7 @@ static int getOptionalInteger(const leftv& h, const int _n)
     return (n);
   }
 
-  return (_n);  
+  return (_n);
 }
 
 static BOOLEAN noop(leftv __res, leftv /*__v*/)
@@ -200,10 +200,10 @@ static BOOLEAN _ProfilerStart(leftv __res, leftv h)
   if( h!= NULL && h->Typ() == STRING_CMD )
   {
     const char* name = (char*)(h->Data());
-    assume( name != NULL );   
+    assume( name != NULL );
     ProfilerStart(name);
   } else
-    WerrorS("ProfilerStart requires a string [name] argument"); 
+    WerrorS("ProfilerStart requires a string [name] argument");
 #else
   WarnS("Sorry no google profiler support (GOOGLE_PROFILE_ENABLE!=1)...");
 //  return TRUE; // ?
@@ -248,7 +248,7 @@ static inline void view(const intvec* v)
 
 }
 
-                   
+
 
 static BOOLEAN DetailedPrint(leftv __res, leftv h)
 {
@@ -262,7 +262,7 @@ static BOOLEAN DetailedPrint(leftv __res, leftv h)
 
   if( h->Typ() == NUMBER_CMD)
   {
-    number n = (number)h->Data(); 
+    number n = (number)h->Data();
 
     const ring r = currRing;
 
@@ -277,7 +277,7 @@ static BOOLEAN DetailedPrint(leftv __res, leftv h)
 
     return FALSE;
   }
-  
+
   if( h->Typ() == RING_CMD)
   {
     const ring r = (const ring)h->Data();
@@ -300,11 +300,11 @@ static BOOLEAN DetailedPrint(leftv __res, leftv h)
 
   if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
   {
-    const ideal id = (const ideal)h->Data(); h = h->Next(); 
+    const ideal id = (const ideal)h->Data(); h = h->Next();
 
     dPrint(id, currRing, currRing, getOptionalInteger(h, 3));
-    
-    return FALSE;            
+
+    return FALSE;
   }
 
   if( h->Typ() == RESOLUTION_CMD )
@@ -343,7 +343,7 @@ PrintLn();
 
     if (r == NULL)
       Print("ring '%10s': NULL", "syRing");
-    else 
+    else
       if (r == currRing)
         Print("ring '%10s': currRing", "syRing");
       else
@@ -355,7 +355,7 @@ PrintLn();
           //              rDebugPrint(r);
 #endif
           // rChangeCurrRing(r);
-        }            
+        }
     PrintLn();
 
     const SRes rP = syzstr->resPairs;
@@ -488,17 +488,17 @@ static BOOLEAN Tail(leftv res, leftv h)
     res->rtyp = h->Typ();
 
     h = h->Next(); assume (h == NULL);
-    
+
     return FALSE;
   }
 
   if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
   {
-    res->data = id_Tail( (const ideal)h->Data(), r );      
+    res->data = id_Tail( (const ideal)h->Data(), r );
     res->rtyp = h->Typ();
-    
+
     h = h->Next(); assume (h == NULL);
-    
+
     return FALSE;
   }
 
@@ -511,7 +511,7 @@ static BOOLEAN Tail(leftv res, leftv h)
 static BOOLEAN _ComputeLeadingSyzygyTerms(leftv res, leftv h)
 {
   const SchreyerSyzygyComputationFlags attributes(currRingHdl);
-      
+
   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
 //  const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
@@ -527,7 +527,7 @@ static BOOLEAN _ComputeLeadingSyzygyTerms(leftv res, leftv h)
     return TRUE;
   }
 
-  assume( h != NULL );  
+  assume( h != NULL );
 
   if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
   {
@@ -537,16 +537,16 @@ static BOOLEAN _ComputeLeadingSyzygyTerms(leftv res, leftv h)
 
     if( __DEBUG__ )
     {
-      PrintS("ComputeLeadingSyzygyTerms::Input: \n");     
+      PrintS("ComputeLeadingSyzygyTerms::Input: \n");
       dPrint(id, r, r, 1);
     }
-    
+
     assume( !__LEAD2SYZ__ );
 
     h = h->Next(); assume (h == NULL);
 
     const ideal newid = ComputeLeadingSyzygyTerms(id,  attributes);
-    
+
     res->data = newid; res->rtyp = MODUL_CMD;
     return FALSE;
   }
@@ -579,12 +579,12 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
     return TRUE;
   }
 
-  assume( h != NULL );  
+  assume( h != NULL );
 
   if(    (h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
       && (h->rtyp  == IDHDL) // must be a variable!
       && (h->e == NULL) // not a list element
-      ) 
+      )
   {
     const ideal id = (const ideal)h->Data();
 
@@ -593,7 +593,7 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
     if( __DEBUG__ )
     {
       PrintS("Sort_c_ds::Input: \n");
-      dPrint(id, r, r, 1);      
+      dPrint(id, r, r, 1);
     }
 
     assume (h->Next() == NULL);
@@ -604,7 +604,7 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
 
 //    res->data = id;
 //    res->rtyp = h->Typ();
-    
+
     if( __DEBUG__ )
     {
       PrintS("Sort_c_ds::Output: \n");
@@ -616,7 +616,7 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
   }
 
   WarnS("ComputeLeadingSyzygyTerms needs a single ideal/module argument (must be a variable!)...");
-  return TRUE;  
+  return TRUE;
 }
 
 
@@ -639,10 +639,10 @@ static BOOLEAN _Compute2LeadingSyzygyTerms(leftv res, leftv h)
     return TRUE;
   }
 
-  assume( h != NULL );  
+  assume( h != NULL );
 
   assume( __LEAD2SYZ__ ); // ???
-  
+
   if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
   {
     const ideal id = (const ideal)h->Data();
@@ -689,9 +689,9 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
   if ((h==NULL) || (h->Typ()!=VECTOR_CMD && h->Typ() !=POLY_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
-    
+
   const poly product = (poly) h->Data(); assume (product != NULL);
 
 
@@ -699,12 +699,12 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
   if ((h==NULL) || !((h->Typ()==VECTOR_CMD) || (h->Data() == NULL)) )
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   poly syzterm = NULL;
 
-  if(h->Typ()==VECTOR_CMD) 
+  if(h->Typ()==VECTOR_CMD)
     syzterm = (poly) h->Data();
 
 
@@ -713,9 +713,9 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
-  
+
   const ideal L = (ideal) h->Data(); h = h->Next();
 
   assume( IDELEMS(L) > 0 );
@@ -757,10 +757,10 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
   {
     PrintS("FindReducer::Output: \n");
     dPrint((poly)res->data, r, r, 2);
-  }    
-  
-  return FALSE;   
-  
+  }
+
+  return FALSE;
+
 }
 
 // proc SchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
@@ -780,11 +780,11 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
   NoReturn(res);
 
   assume( __HYBRIDNF__ ); // ???
-  
+
   if ((h==NULL) || (h->Typ() != VECTOR_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   const poly syz_lead = (poly) h->Data(); assume (syz_lead != NULL);
@@ -794,7 +794,7 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
   if ((h==NULL) || (h->Typ() != VECTOR_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   const poly syz_2 = (poly) h->Data(); assume (syz_2 != NULL);
@@ -803,7 +803,7 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   const ideal L = (ideal) h->Data(); assume( IDELEMS(L) > 0 );
@@ -813,7 +813,7 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   const ideal T = (ideal) h->Data();
@@ -850,8 +850,8 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
     {
       PrintS("LS: "); dPrint(LS, r, r, 0);
     }
-  }  
-  
+  }
+
   res->rtyp = VECTOR_CMD;
   res->data = SchreyerSyzygyNF(syz_lead,
                                (syz_2!=NULL)? p_Copy(syz_2, r): syz_2, L, T, LS, attributes);
@@ -888,50 +888,50 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
   if ((h==NULL) || (h->Typ() !=POLY_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   const poly multiplier = (poly) h->Data(); assume (multiplier != NULL);
 
-  
+
   h = h->Next();
   if ((h==NULL) || (h->Typ()!=VECTOR_CMD && h->Typ() !=POLY_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   const poly term4reduction = (poly) h->Data(); assume( term4reduction != NULL );
 
-  
+
   poly syztermCheck = NULL;
-  
+
   h = h->Next();
   if ((h==NULL) || !((h->Typ()==VECTOR_CMD) || (h->Data() == NULL)) )
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
-  if(h->Typ()==VECTOR_CMD) 
+  if(h->Typ()==VECTOR_CMD)
     syztermCheck = (poly) h->Data();
 
-  
+
   h = h->Next();
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   const ideal L = (ideal) h->Data(); assume( IDELEMS(L) > 0 );
 
-  
+
   h = h->Next();
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   const ideal T = (ideal) h->Data();
@@ -959,7 +959,7 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
     PrintS("m: "); dPrint(multiplier, r, r, 2);
     PrintS("t: "); dPrint(term4reduction, r, r, 2);
     PrintS("syzterm: "); dPrint(syztermCheck, r, r, 2);
-    
+
     PrintS("L: "); dPrint(L, r, r, 0);
     PrintS("T: "); dPrint(T, r, r, 0);
 
@@ -976,9 +976,9 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
   {
     const int c = p_GetComp(syztermCheck, r) - 1;
     assume( c >= 0 && c < IDELEMS(L) );
-    
+
     const poly p = L->m[c];
-    assume( p != NULL ); assume( pNext(p) == NULL );    
+    assume( p != NULL ); assume( pNext(p) == NULL );
 
     assume( p_EqualPolys(term4reduction, p, r) ); // assume? TODO
 
@@ -988,8 +988,8 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
 
     assume( p_EqualPolys(multiplier, m, r) ); // assume? TODO
 
-    p_Delete(&m, r);    
-    
+    p_Delete(&m, r);
+
 // NOTE:   leadmonomial(syzterm) == m &&  L[leadcomp(syzterm)] == t
   }
 
@@ -1003,8 +1003,8 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
 
     dPrint((poly)res->data, r, r, 2);
   }
-  
-  
+
+
   return FALSE;
 }
 
@@ -1030,7 +1030,7 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
   if ((h==NULL) || (h->Typ() !=POLY_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   const poly multiplier = (poly) h->Data(); assume (multiplier != NULL);
@@ -1039,17 +1039,17 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
   if ((h==NULL) || (h->Typ()!=VECTOR_CMD && h->Typ() !=POLY_CMD))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
-  const poly tail = (poly) h->Data(); 
+  const poly tail = (poly) h->Data();
 
   h = h->Next();
 
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   const ideal L = (ideal) h->Data();
@@ -1060,7 +1060,7 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   const ideal T = (ideal) h->Data();
@@ -1068,7 +1068,7 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
   assume( IDELEMS(L) == IDELEMS(T) );
 
   h = h->Next();
-  
+
   ideal LS = NULL;
 
   if ((h != NULL) && (h->Typ() ==MODUL_CMD) && (h->Data() != NULL))
@@ -1117,9 +1117,9 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
 static BOOLEAN _ComputeResolution(leftv res, leftv h)
 {
   const SchreyerSyzygyComputationFlags attributes(currRingHdl);
-   
+
   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
-   
+
   const char* usage = "`ComputeResolution(<ideal/module>[,int])` expected";
   const ring r = attributes.m_rBaseRing;
 
@@ -1129,7 +1129,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   ideal M = (ideal)(h->CopyD()); // copy for resolution...!???
@@ -1143,37 +1143,37 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
-  
+
   ideal L = (ideal)(h->CopyD()); // no copy!
   assume( IDELEMS(L) == size );
-  
+
   h = h->Next();
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   ideal T = (ideal)(h->CopyD()); // no copy!
   assume( IDELEMS(T) == size );
-  
+
   h = h->Next();
 
   // length..?
   long length = 0;
-  
+
   if ((h!=NULL) && (h->Typ()==INT_CMD))
   {
     length = (long)(h->Data());
     h = h->Next();
   }
-  
+
   assume( h == NULL );
 
   if( length <= 0 )
-    length = 1 + rVar(r);  
+    length = 1 + rVar(r);
 
   if( __DEBUG__ )
   {
@@ -1186,7 +1186,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
 
 
   syStrategy _res=(syStrategy)omAlloc0(sizeof(ssyStrategy));
-  
+
 //  class ssyStrategy; typedef ssyStrategy * syStrategy;
 //  typedef ideal *            resolvente;
 
@@ -1197,12 +1197,12 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
 
 //  if (attributes.__TREEOUTPUT__)
 //    Print("{ \"RESOLUTION: HYBRIDNF:%d, TAILREDSYZ: %d, LEAD2SYZ: %d, IGNORETAILS: %d\": [\n", attributes.__HYBRIDNF__, attributes.__TAILREDSYZ__, attributes.__LEAD2SYZ__, attributes.__IGNORETAILS__);
-   
+
   while( (!idIs0(L)) && (index < length))
   {
     attributes.nextSyzygyLayer();
-    ideal LL, TT;  
-     
+    ideal LL, TT;
+
     ComputeSyzygy(L, T, LL, TT, attributes);
 
     if( __DEBUG__ )
@@ -1214,11 +1214,11 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
     size = IDELEMS(LL);
 
     assume( size == IDELEMS(TT) );
-    
+
     id_Delete(&L, r); id_Delete(&T, r);
 
     L = LL; T = TT;
-    
+
     // id_Add(T, L, r);
     M = idInit(size, 0);
     for( int i = size-1; i >= 0; i-- )
@@ -1226,20 +1226,20 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
       M->m[i] = p_Add_q(p_Copy(T->m[i], r), p_Copy(L->m[i], r), r); // TODO: :(((
     }
     M->rank = id_RankFreeModule(M, r);
-    
+
     if( __DEBUG__ )
     {
       Print("ComputeResolution()::Restored Syzygy[%d]: \n", index);
       PrintS("M = LL + TT: \n"); dPrint(M, r, r, 0);
     }
-  
+
     _res->fullres[index++] = M; // ???
   }
 //  if (attributes.__TREEOUTPUT__)
 //    PrintS("] }\n");
 
   id_Delete(&L, r); id_Delete(&T, r);
-  
+
   res->data = _res;
   res->rtyp = RESOLUTION_CMD;
 
@@ -1252,7 +1252,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
   }
 
 //  omFreeSize(_res, sizeof(ssyStrategy));
-  
+
   return FALSE;
 
 }
@@ -1279,7 +1279,7 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   const ideal L = (ideal) h->Data();
@@ -1290,14 +1290,14 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
   if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
   {
     WerrorS(usage);
-    return TRUE;    
+    return TRUE;
   }
 
   const ideal T = (ideal) h->Data();
   assume( IDELEMS(L) == IDELEMS(T) );
 
 
-  h = h->Next(); assume( h == NULL );  
+  h = h->Next(); assume( h == NULL );
 
   if( __DEBUG__ )
   {
@@ -1316,9 +1316,9 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
   l->m[0].rtyp = MODUL_CMD; l->m[0].data = reinterpret_cast<void *>(LL);
 
   l->m[1].rtyp = MODUL_CMD; l->m[1].data = reinterpret_cast<void *>(TT);
-  
+
   res->data = l; res->rtyp = LIST_CMD;
-  
+
   if( __DEBUG__ )
   {
     PrintS("ComputeSyzygy::Output: ");
@@ -1373,7 +1373,7 @@ static BOOLEAN leadcomp(leftv res, leftv h)
       res->data = reinterpret_cast<void *>(jjLONG2N(iComp));
     } else
       res->data = reinterpret_cast<void *>(jjLONG2N(0));
-      
+
 
     res->rtyp = BIGINT_CMD;
     return FALSE;
@@ -1431,7 +1431,7 @@ static BOOLEAN MakeSyzCompOrdering(leftv res, leftv /*h*/)
   //    res->data = rCurrRingAssure_SyzComp(); // changes current ring! :(
   res->data = reinterpret_cast<void *>(rAssure_SyzComp(currRing, TRUE));
   res->rtyp = RING_CMD; // return new ring!
-  // QRING_CMD? 
+  // QRING_CMD?
 
   return FALSE;
 }
@@ -1454,13 +1454,13 @@ static BOOLEAN MakeInducedSchreyerOrdering(leftv res, leftv h)
       return TRUE;
     }
 
-    sign = s;            
+    sign = s;
   }
 
   assume( sign == 1 || sign == -1 );
   res->data = reinterpret_cast<void *>(rAssure_InducedSchreyerOrdering(currRing, TRUE, sign));
   res->rtyp = RING_CMD; // return new ring!
-  // QRING_CMD? 
+  // QRING_CMD?
   return FALSE;
 }
 
@@ -1520,7 +1520,7 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
   ideal FF = id_Copy(F, r);
 
 
-  
+
   lists l=(lists)omAllocBin(slists_bin);
   l->Init(2);
 
@@ -1551,7 +1551,7 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
 }
 
 
-/* // the following turned out to be unnecessary...   
+/* // the following turned out to be unnecessary...
 /// Finds p^th AM ordering, and returns its position in r->typ[] AND
 /// corresponding &r->wvhdl[]
 /// returns FALSE if something went wrong!
@@ -1604,62 +1604,62 @@ BOOLEAN rGetAMPos(const ring r, const int p, int &typ_pos, int &wvhdl_pos, const
 // static BOOLEAN GetAMData(leftv res, leftv h)
 // {
 //   NoReturn(res);
-// 
+//
 //   const ring r = currRing;
-// 
+//
 //   int p = 0; // which IS-block? p^th!
-// 
+//
 //   if ((h!=NULL) && (h->Typ()==INT_CMD))
 //     p = (int)((long)(h->Data())); h=h->next;
-// 
+//
 //   assume(p >= 0);
-// 
+//
 //   int d, w;
-//   
+//
 //   if( !rGetAMPos(r, p, d, w, TRUE) )
 //   {
 //     Werror("`GetAMData([int])`: no %d^th _am block-ordering!", p);
 //     return TRUE;
 //   }
-// 
+//
 //   assume( r->typ[d].ord_typ == ro_am );
 //   assume( r->order[w] == ringorder_am );
-// 
-// 
+//
+//
 //   const short start = r->typ[d].data.am.start;  // bounds of ordering (in E)
 //   const short end = r->typ[d].data.am.end;
 //   const short len_gen = r->typ[d].data.am.len_gen; // i>len_gen: weight(gen(i)):=0
 //   const int *weights = r->typ[d].data.am.weights; // pointers into wvhdl field of length (end-start+1) + len_gen
 //   // contents w_1,... w_n, len, mod_w_1, .. mod_w_len, 0
-// 
+//
 //   assume( weights == r->wvhdl[w] );
-// 
-//   
+//
+//
 //   lists l=(lists)omAllocBin(slists_bin);
 //   l->Init(2);
-// 
+//
 //   const short V = end-start+1;
 //   intvec* ww_vars = new intvec(V);
 //   intvec* ww_gens = new intvec(len_gen);
-// 
+//
 //   for (int i = 0; i < V; i++ )
 //     (*ww_vars)[i] = weights[i];
-// 
+//
 //   assume( weights[V] == len_gen );
-// 
+//
 //   for (int i = 0; i < len_gen; i++ )
 //     (*ww_gens)[i] = weights[i - V - 1];
-//   
-// 
+//
+//
 //   l->m[0].rtyp = INTVEC_CMD;
 //   l->m[0].data = reinterpret_cast<void *>(ww_vars);
-// 
+//
 //   l->m[1].rtyp = INTVEC_CMD;
 //   l->m[1].data = reinterpret_cast<void *>(ww_gens);
-// 
-// 
+//
+//
 //   return FALSE;
-// 
+//
 // }
 */
 
@@ -1781,9 +1781,9 @@ static BOOLEAN reduce_syz(leftv res, leftv h)
   int iLazyReduce = 0;
 
   if ( ( (h!=NULL) && (h->Typ()== INT_CMD)  ) )
-    iLazyReduce = (int)((long)(h->Data())); 
+    iLazyReduce = (int)((long)(h->Data()));
 
-  res->data = (void *)kNFLength(M, currQuotient, v, iSyzComp, iLazyReduce); // NOTE: currRing :(
+  res->data = (void *)kNFLength(M, currRing->qideal, v, iSyzComp, iLazyReduce); // NOTE: currRing :(
   return FALSE;
 }
 
@@ -1829,7 +1829,7 @@ static BOOLEAN idPrepare(leftv res, leftv h)
     else
       iComp = id_RankFreeModule(r->typ[posIS].data.is.F, r); // ;
   }
-  
+
   assume(iComp >= 0);
 
 
@@ -1837,15 +1837,15 @@ static BOOLEAN idPrepare(leftv res, leftv h)
   tHomog hom = testHomog;
 
   //           int add_row_shift = 0;
-  // 
+  //
   if (w!=NULL)
   {
     w = ivCopy(w);
   //             add_row_shift = ww->min_in();
-  // 
+  //
   //             (*ww) -= add_row_shift;
-  //             
-  //             if (idTestHomModule(I, currQuotient, ww))
+  //
+  //             if (idTestHomModule(I, currRing->qideal, ww))
   //             {
     hom = isHomog;
   //               w = ww;
@@ -1866,7 +1866,7 @@ static BOOLEAN idPrepare(leftv res, leftv h)
   //        ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w);
 
   ideal J = // idPrepare( I, hom, iComp, &w);
-           kStd(I, currQuotient, hom, &w, NULL, iComp);
+           kStd(I, currRing->qideal, hom, &w, NULL, iComp);
 
   idTest(J);
 
@@ -1891,15 +1891,15 @@ static BOOLEAN _p_Content(leftv res, leftv h)
 
   const poly p = reinterpret_cast<poly>(h->Data());
 
-  
+
   pTest(p);  pWrite(p); PrintLn();
 
-  
-  p_Content( p, currRing);      
+
+  p_Content( p, currRing);
 
   pTest(p);
   pWrite(p); PrintLn();
-  
+
   NoReturn(res);
   return FALSE;
 }
@@ -1907,7 +1907,7 @@ static BOOLEAN _p_Content(leftv res, leftv h)
 static BOOLEAN _m2_end(leftv res, leftv h)
 {
   int ret = 0;
-  
+
   if ( (h!=NULL) && (h->Typ()!=INT_CMD) )
   {
     WerrorS("`m2_end([<int>])` expected");
@@ -1921,12 +1921,12 @@ static BOOLEAN _m2_end(leftv res, leftv h)
   return FALSE;
 }
 
-   
+
 
 END_NAMESPACE
 
 
-int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions) 
+int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
 {
 
 #define ADD(C,D,E) \
@@ -1984,15 +1984,15 @@ int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
 
   //  ADD("", FALSE, );
 
-#undef ADD  
+#undef ADD
   return 0;
 }
 
 #ifndef EMBED_PYTHON
-extern "C" { 
+extern "C" {
 int mod_init(SModulFunctions* psModulFunctions)
-{ 
-  return SI_MOD_INIT(syzextra)(psModulFunctions); 
+{
+  return SI_MOD_INIT(syzextra)(psModulFunctions);
 }
 }
 #endif
