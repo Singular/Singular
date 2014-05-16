@@ -708,6 +708,8 @@ CanonicalForm normalize (const CanonicalForm& F)
     G= F/icontent (F);
     if (isRat)
       On (SW_RATIONAL);
+    if (lc(G) < 0)
+      G= -G;
     return G;
   }
 
@@ -933,48 +935,47 @@ removeFactors (CanonicalForm& r, StoreFactors& StoredFactors,
   for (int i=1; i<= n; i++)
     testlist.append (CanonicalForm (Variable (i)));
 
+  // remove already removed factors
   for (j= StoredFactors.FS1; j.hasItem(); j++)
   {
     while (fdivides (j.getItem(), r, quot))
     {
-      if (!quot.inCoeffDomain())
-        r= quot;
-      else
-        break;
+      r= quot;
     }
   }
 
-  // remove already removed factors
   for (j= StoredFactors.FS2; j.hasItem(); j++)
   {
     divides= false;
-    while (fdivides (j.getItem(), r, quot))
+    if (j.getItem() != r)
     {
-      if (!quot.inCoeffDomain())
+      while (fdivides (j.getItem(), r, quot))
       {
         divides= true;
         r= quot;
       }
-      else
-        break;
+      if (divides)
+        removedFactors= Union (removedFactors, CFList (j.getItem()));
     }
-    if (divides)
-      removedFactors= Union (removedFactors, CFList (j.getItem()));
   }
   r= normalize (r);
 
   // remove variables
   for (j= testlist; j.hasItem() && !r.isOne(); j++)
   {
-    while (fdivides (j.getItem(), r, quot))
+    divides= false;
+    if (j.getItem() != r)
     {
-      if (!quot.inCoeffDomain())
+      while (fdivides (j.getItem(), r, quot))
+      {
+        divides= true;
         r= quot;
-      else
-        break;
-      removedFactors= Union (removedFactors, CFList (j.getItem()));
-    }
+      }
+      if (divides)
+        removedFactors= Union (removedFactors, CFList (j.getItem()));
+     }
   }
+  r= normalize (r);
 }
 
 CFList
