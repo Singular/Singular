@@ -2841,7 +2841,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
     if(!n_GreaterZero(pGetCoeff(ph),C))
     {
       ph = p_Neg(ph,r);
-      c = n_Neg(c, C);
+      c = n_InpNeg(c, C);
     }
 */
     return;
@@ -2858,7 +2858,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
     if(!n_GreaterZero(pGetCoeff(ph),C))
     {
       ph = p_Neg(ph,r);
-      c = n_Neg(c, C);
+      c = n_InpNeg(c, C);
     }
 
     return;
@@ -2887,7 +2887,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
     if(!n_GreaterZero(pGetCoeff(ph),C))
     {
       ph = p_Neg(ph,r);
-      c = n_Neg(c, C);
+      c = n_InpNeg(c, C);
     }
 */
     return;
@@ -2983,7 +2983,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
   if(!n_GreaterZero(pGetCoeff(ph),C))
   {
     ph = p_Neg(ph,r);
-    c = n_Neg(c, C);
+    c = n_InpNeg(c, C);
   }
 
 }

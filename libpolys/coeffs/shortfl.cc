@@ -675,7 +675,7 @@ BOOLEAN nrInitChar(coeffs n, void* p)
   n->cfMult  = nrMult;
   n->cfDiv   = nrDiv;
   n->cfExactDiv= nrDiv;
-  n->cfNeg   = nrNeg;
+  n->cfInpNeg   = nrNeg;
   n->cfInvers= nrInvers;
   n->cfCopy  = ndCopy;
   n->cfGreater = nrGreater;

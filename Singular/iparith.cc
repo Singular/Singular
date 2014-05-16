@@ -3647,7 +3647,7 @@ static BOOLEAN jjPLUSPLUS(leftv, leftv u)
 static BOOLEAN jjUMINUS_BI(leftv res, leftv u)
 {
   number n=(number)u->CopyD(BIGINT_CMD);
-  n=n_Neg(n,coeffs_BIGINT);
+  n=n_InpNeg(n,coeffs_BIGINT);
   res->data = (char *)n;
   return FALSE;
 }
@@ -3659,7 +3659,7 @@ static BOOLEAN jjUMINUS_I(leftv res, leftv u)
 static BOOLEAN jjUMINUS_N(leftv res, leftv u)
 {
   number n=(number)u->CopyD(NUMBER_CMD);
-  n=nNeg(n);
+  n=nInpNeg(n);
   res->data = (char *)n;
   return FALSE;
 }

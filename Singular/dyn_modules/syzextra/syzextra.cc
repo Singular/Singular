@@ -825,7 +825,7 @@ ideal SchreyerSyzygyComputation::Compute2LeadingSyzygyTerms()
       number g = n_Lcm( lc1, lc2, r );
 
       p_SetCoeff0(m ,       n_Div(g, lc1, r), r);
-      p_SetCoeff0(mm, n_Neg(n_Div(g, lc2, r), r), r);
+      p_SetCoeff0(mm, n_InpNeg(n_Div(g, lc2, r), r), r);
 
       n_Delete(&g, r);
 
@@ -2072,7 +2072,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
     }
 
     number n = n_Mult( p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
-    p_SetCoeff0(q, n_Neg( n_Div(n, p_GetCoeff(p, r), r), r), r);
+    p_SetCoeff0(q, n_InpNeg( n_Div(n, p_GetCoeff(p, r), r), r), r);
     n_Delete(&n, r);
 
     return q;
@@ -2156,7 +2156,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
     }
 
     number n = n_Mult( p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
-    p_SetCoeff0(q, n_Neg( n_Div(n, p_GetCoeff(p, r), r), r), r);
+    p_SetCoeff0(q, n_InpNeg( n_Div(n, p_GetCoeff(p, r), r), r), r);
     n_Delete(&n, r);
 
     return q;
@@ -2248,7 +2248,7 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
       continue;
     }
 
-    p_SetCoeff0(q, n_Neg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
+    p_SetCoeff0(q, n_InpNeg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
 
     return q;
   }
@@ -2336,7 +2336,7 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
       continue;
     }
 
-    p_SetCoeff0(q, n_Neg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
+    p_SetCoeff0(q, n_InpNeg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
     return q;
   }
 */

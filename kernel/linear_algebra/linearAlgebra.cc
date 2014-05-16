@@ -169,7 +169,7 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat,
 
           /* adjusting uMat: */
           MATELEM(uMat, rGauss, r + cOffset) = NULL; p_Delete(&p,R);
-          n = n_Neg(n,R->cf);
+          n = n_InpNeg(n,R->cf);
           for (int cGauss = r + cOffset + 1; cGauss <= cc; cGauss++)
           {
             MATELEM(uMat, rGauss, cGauss)
@@ -606,7 +606,7 @@ bool realSqrt(const number n, const number tolerance, number &root)
     root = nAdd(nMult(oneHalf, nOld), nDiv(nHalf, nOld));
     nDelete(&nDiff);
     nDiff = nSub(nOld, root);
-    if (!nGreaterZero(nDiff)) nDiff = nNeg(nDiff);
+    if (!nGreaterZero(nDiff)) nDiff = nInpNeg(nDiff);
   }
 
   nDelete(&nOld); nDelete(&nDiff); nDelete(&oneHalf); nDelete(&nHalf);
@@ -638,7 +638,7 @@ int quadraticSolve(const poly p, number &s1, number &s2,
 
       if (degree == 1)
       {
-        c0 = nNeg(c0);
+        c0 = nInpNeg(c0);
         s1 = nDiv(c0, c1);
         result = 1;
       }
@@ -652,7 +652,7 @@ int quadraticSolve(const poly p, number &s1, number &s2,
         {
           tmp = nAdd(c2, c2);
           s1 = nDiv(c1, tmp); nDelete(&tmp);
-          s1 = nNeg(s1);
+          s1 = nInpNeg(s1);
           result = 2;
         }
         else if (nGreaterZero(discr))
@@ -661,22 +661,22 @@ int quadraticSolve(const poly p, number &s1, number &s2,
           tmp2 = nSub(tmp, c1);
           tmp4 = nAdd(c2, c2);
           s1 = nDiv(tmp2, tmp4); nDelete(&tmp2);
-          tmp = nNeg(tmp);
+          tmp = nInpNeg(tmp);
           tmp2 = nSub(tmp, c1); nDelete(&tmp);
           s2 = nDiv(tmp2, tmp4); nDelete(&tmp2); nDelete(&tmp4);
           result = 3;
         }
         else
         {
-          discr = nNeg(discr);
+          discr = nInpNeg(discr);
           realSqrt(discr, tolerance, tmp);   /* sqrt of |discriminant| */
           tmp2 = nAdd(c2, c2);
           tmp4 = nDiv(tmp, tmp2); nDelete(&tmp);
           tmp = nDiv(c1, tmp2); nDelete(&tmp2);
-          tmp = nNeg(tmp);
+          tmp = nInpNeg(tmp);
           s1 = (number)new gmp_complex(((gmp_complex*)tmp)->real(),
                                        ((gmp_complex*)tmp4)->real());
-          tmp4 = nNeg(tmp4);
+          tmp4 = nInpNeg(tmp4);
           s2 = (number)new gmp_complex(((gmp_complex*)tmp)->real(),
                                        ((gmp_complex*)tmp4)->real());
           nDelete(&tmp); nDelete(&tmp4);
@@ -716,7 +716,7 @@ number absValue(poly p)
 {
   if (p == NULL) return nInit(0);
   number result = nCopy(pGetCoeff(p));
-  if (!nGreaterZero(result)) result = nNeg(result);
+  if (!nGreaterZero(result)) result = nInpNeg(result);
   return result;
 }
 
@@ -744,7 +744,7 @@ bool charPoly(const matrix aMat, poly &charPoly)
   { t = nAdd(b, pGetCoeff(MATELEM(aMat, 1, 1))); nDelete(&b); b = t;}
   if (MATELEM(aMat, 2, 2) != NULL)
   { t = nAdd(b, pGetCoeff(MATELEM(aMat, 2, 2))); nDelete(&b); b = t;}
-  b = nNeg(b);
+  b = nInpNeg(b);
   number t1;
   if ((MATELEM(aMat, 1, 1) != NULL) && (MATELEM(aMat, 2, 2) != NULL))
     t1 = nMult(pGetCoeff(MATELEM(aMat, 1, 1)),
@@ -838,7 +838,7 @@ number hessenbergStep(
   number v1 = pGetCoeff(MATELEM(vVec, 1, 1));
   bool v1Sign = true; if (nGreaterZero(v1)) v1Sign = false;
 
-  number v1Abs = nCopy(v1); if (v1Sign) v1Abs = nNeg(v1Abs);
+  number v1Abs = nCopy(v1); if (v1Sign) v1Abs = nInpNeg(v1Abs);
   number t1 = nDiv(v1Abs, vNorm);
   number one = nInit(1);
   number t2 = nAdd(t1, one); nDelete(&t1);
@@ -854,7 +854,7 @@ number hessenbergStep(
     if (MATELEM(vVec, r, 1) != NULL)
       t1 = nCopy(pGetCoeff(MATELEM(vVec, r, 1)));
     else t1 = nInit(0);
-    if (v1Sign) t1 = nNeg(t1);
+    if (v1Sign) t1 = nInpNeg(t1);
     t2 = nDiv(t1, vNorm); nDelete(&t1);
     t1 = nDiv(t2, denominator); nDelete(&t2);
     if (!nIsZero(t1))
@@ -877,7 +877,7 @@ number hessenbergStep(
                    pGetCoeff(MATELEM(uVec, c, 1)));
       else t1 = nInit(0);
       if (r == c) { t2 = nSub(one, t1); nDelete(&t1); }
-      else          t2 = nNeg(t1);
+      else          t2 = nInpNeg(t1);
       if (!nIsZero(t2))
       {
         MATELEM(pMat, r, c) = pOne();
@@ -887,12 +887,12 @@ number hessenbergStep(
     }
   nDelete(&one);
   /* finished building pMat; now compute the return value */
-  t1 = vNormSquared; if (v1Sign) t1 = nNeg(t1);
+  t1 = vNormSquared; if (v1Sign) t1 = nInpNeg(t1);
   t2 = nMult(v1, vNorm);
   number t3 = nAdd(t1, t2); nDelete(&t1); nDelete(&t2);
   t1 = nAdd(v1Abs, vNorm); nDelete(&v1Abs); nDelete(&vNorm);
   t2 = nDiv(t3, t1); nDelete(&t1); nDelete(&t3);
-  t2 = nNeg(t2);
+  t2 = nInpNeg(t2);
   return t2;
 }
 
@@ -1020,11 +1020,11 @@ void mpTrafo(
     tmp1 = nInit(0);
     if (MATELEM(H, n, n - 1) != NULL)
     { nDelete(&tmp1); tmp1 = nCopy(pGetCoeff(MATELEM(H, n, n - 1))); }
-    if (!nGreaterZero(tmp1)) tmp1 = nNeg(tmp1);
+    if (!nGreaterZero(tmp1)) tmp1 = nInpNeg(tmp1);
     tmp2 = nInit(0);
     if (MATELEM(H, n - 1, n - 2) != NULL)
     { nDelete(&tmp2); tmp2 = nCopy(pGetCoeff(MATELEM(H, n - 1, n - 2))); }
-    if (!nGreaterZero(tmp2)) tmp2 = nNeg(tmp2);
+    if (!nGreaterZero(tmp2)) tmp2 = nInpNeg(tmp2);
     tmp3 = nAdd(tmp1, tmp2); nDelete(&tmp1); nDelete(&tmp2);
     tmp1 = nInit(3); tmp2 = nInit(2);
     trace = nDiv(tmp1, tmp2); nDelete(&tmp1); nDelete(&tmp2);
@@ -1034,7 +1034,7 @@ void mpTrafo(
     det = nMult(tmp3, tmp3); nDelete(&tmp3);
   }
   matrix c = mpNew(n, 1);
-  trace = nNeg(trace);
+  trace = nInpNeg(trace);
   MATELEM(c,1,1) = pAdd(pAdd(pAdd(ppMult_qq(MATELEM(H,1,1), MATELEM(H,1,1)),
                                   ppMult_qq(MATELEM(H,1,2), MATELEM(H,2,1))),
                              ppMult_nn(MATELEM(H,1,1), trace)),

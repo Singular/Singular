@@ -132,7 +132,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfAnn         = nrnAnn;
   r->cfIntMod      = nrnMod;
   r->cfExactDiv    = nrnDiv;
-  r->cfNeg         = nrnNeg;
+  r->cfInpNeg         = nrnNeg;
   r->cfInvers      = nrnInvers;
   r->cfDivBy       = nrnDivBy;
   r->cfDivComp     = nrnDivComp;

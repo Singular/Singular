@@ -350,7 +350,7 @@ BOOLEAN n_pAEInitChar(coeffs r, void *p)
     //r->cfExtGcd = NULL; // only for ring stuff
     // r->cfDivBy = NULL; // only for ring stuff
 #endif
-    r->cfNeg   = nAEpNeg;
+    r->cfInpNeg   = nAEpNeg;
     r->cfInvers= NULL;
     //r->cfCopy  = ndCopy;
     //r->cfRePart = ndCopy;

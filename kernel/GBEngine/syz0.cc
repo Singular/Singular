@@ -581,19 +581,19 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
           syz = pCopy(pairs[k]);
           //syz->coef = nCopy(F[k]->coef);
           syz->coef = an;
-          //syz->coef = nNeg(syz->coef);
+          //syz->coef = nInpNeg(syz->coef);
           pNext(syz) = pairs[k];
           lastmonom = pNext(syz);
           //lastmonom->coef = nCopy(F[j]->coef);
           lastmonom->coef = bn;
-          lastmonom->coef = nNeg(lastmonom->coef);
+          lastmonom->coef = nInpNeg(lastmonom->coef);
           pSetComp(lastmonom,k+1);
         }
         else
         {
           syz = pairs[k];
           syz->coef = nCopy(currRing->qideal->m[k-Fl]->coef);
-          syz->coef = nNeg(syz->coef);
+          syz->coef = nInpNeg(syz->coef);
           lastmonom = syz;
           multWith = pDivide(syz,F[j]);
           multWith->coef = nCopy(currRing->qideal->m[k-Fl]->coef);
@@ -682,7 +682,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
             pNext(lastmonom) = pHead(toRed);
             pIter(lastmonom);
             lastmonom->coef = nDiv(lastmonom->coef,F[l]->coef);
-            //lastmonom->coef = nNeg(lastmonom->coef);
+            //lastmonom->coef = nInpNeg(lastmonom->coef);
             pSetComp(lastmonom,l+1);
             //computes the new toRed
             number up = kBucketPolyRed(sy0buck,F[l],Flength[l],NULL);

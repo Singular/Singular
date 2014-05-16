@@ -5,7 +5,7 @@
 #define n_Sub	n_Sub_FieldGeneral
 #define n_IsZero	n_IsZero_FieldGeneral
 #define n_Equal	n_Equal_FieldGeneral
-#define n_Neg	n_Neg_FieldGeneral
+#define n_InpNeg	n_Neg_FieldGeneral
 #define n_InpMult	n_InpMult_FieldGeneral
 #define n_InpAdd	n_InpAdd_FieldGeneral
 

@@ -1815,14 +1815,14 @@ private:
       i = n_Init(k, r);
       ndInpAdd(s, i, r); // s += i
 
-      i = n_Neg(i, r);
+      i = n_InpNeg(i, r);
       ndInpAdd(ss, i, r); // ss -= i
 
       n_Delete(&i, r);
     }
     clog<< "ss: "; PrintSized(ss, r);
 
-    ss = n_Neg(ss, r); // ss = -ss
+    ss = n_InpNeg(ss, r); // ss = -ss
 
     clog<< "real sum    : "; PrintSized(s, r);
     clog<< "real sum(--): "; PrintSized(ss, r);

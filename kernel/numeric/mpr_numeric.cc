@@ -186,12 +186,12 @@ number * vandermonde::interpolateDense( const number * q )
   {
     nDelete( &c[cn-1] );
     c[cn-1]= nCopy(x[0]);
-    c[cn-1]= nNeg(c[cn-1]);              // c[cn]= -x[1]
+    c[cn-1]= nInpNeg(c[cn-1]);              // c[cn]= -x[1]
 
     for ( i= 1; i < cn; i++ ) {              // i=2; i <= cn
       nDelete( &xx );
       xx= nCopy(x[i]);
-      xx= nNeg(xx);               // xx= -x[i]
+      xx= nInpNeg(xx);               // xx= -x[i]
 
       for ( j= (cn-i-1); j <= (cn-2); j++) { // j=(cn+1-i); j <= (cn-1)
         nDelete( &tmp1 );

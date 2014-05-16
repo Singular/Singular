@@ -743,7 +743,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
       tso.syz = pMult_mm(tso.syz,tt);
       pDelete(&tt);
-      coefgcd = nNeg(coefgcd);
+      coefgcd = nInpNeg(coefgcd);
       assume (old_repr->m[tso.ind2]!=NULL);
       p = pCopy(old_repr->m[tso.ind2]);
       tt = pDivide(tso.lcm,tso.p2);
@@ -1266,7 +1266,7 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
       pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
       tso.syz = pMult_mm(tso.syz,tt);
       pDelete(&tt);
-      coefgcd = nNeg(coefgcd);
+      coefgcd = nInpNeg(coefgcd);
       assume (add_repr->m[tso.ind2]!=NULL);
       p = pCopy(add_repr->m[tso.ind2]);
       tt = pDivide(tso.lcm,tso.p2);

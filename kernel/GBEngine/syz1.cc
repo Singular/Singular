@@ -807,7 +807,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
       tso.syz = pHead(tso.lcm);
       p = tso.syz;
       pSetCoeff(p,nDiv(pGetCoeff(tso.p1),coefgcd));
-      pGetCoeff(p) = nNeg(pGetCoeff(p));
+      pGetCoeff(p) = nInpNeg(pGetCoeff(p));
       pSetComp(p,tso.ind2+1);
       p_Setm_Syz(p, currRing, Components, ShiftedComponents); // actueller index
       pNext(p) = pHead(tso.lcm);
@@ -835,7 +835,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
 //Print("Halt");
 //if (pLength(redset[j])!=syzstr->elemLength[index][bin[j]])
 //Print("Halt");
-            pGetCoeff(p) = nNeg(pGetCoeff(p));
+            pGetCoeff(p) = nInpNeg(pGetCoeff(p));
             number up = kBucketPolyRed(syzstr->bucket,redset[j],elL[bin[j]],
                                        NULL);
             // Thomas: Check whether you need number here
@@ -877,7 +877,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
         need_reset = syOrder(syzstr->res[index]->m[k-1],syzstr,index,k);
         pSetComp(p,k); // actueller index
         p_Setm_Syz(p, currRing, Components, ShiftedComponents);
-        pGetCoeff(p) = nNeg(pGetCoeff(p));
+        pGetCoeff(p) = nInpNeg(pGetCoeff(p));
 
         tso.isNotMinimal = p;
         tso.p = NULL;
@@ -2134,7 +2134,7 @@ static poly syMinimizeP(int toMin,syStrategy syzstr,intvec * ordn,int index,
             pSetExp(tq,j, pGetExp(p,j)-pGetExp(pisN,j));
           pSetComp(tq, 0);
           pSetCoeff0(tq,nDiv(pGetCoeff(p),pGetCoeff(pisN)));
-          pGetCoeff(tq) = nNeg(pGetCoeff(tq));
+          pGetCoeff(tq) = nInpNeg(pGetCoeff(tq));
           pSetm(tq);
           q = pAdd(q,pMult_mm(pCopy(tempStripped),tq));
           pDelete(&tq);

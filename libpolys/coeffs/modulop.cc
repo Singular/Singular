@@ -476,7 +476,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   //r->cfExtGcd = NULL; // only for ring stuff
   // r->cfDivBy = NULL; // only for ring stuff
   #endif
-  r->cfNeg   = npNeg;
+  r->cfInpNeg   = npNeg;
   r->cfInvers= npInvers;
   //r->cfCopy  = ndCopy;
   //r->cfRePart = ndCopy;

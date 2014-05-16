@@ -425,7 +425,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfDivBy = nrzDivBy; // only for ring stuff
   r->cfInit_bigint = nrzMapQ;
   //#endif
-  r->cfNeg   = nrzNeg;
+  r->cfInpNeg   = nrzNeg;
   r->cfInvers= nrzInvers;
   r->cfCopy  = nrzCopy;
   r->cfWriteLong = nrzWrite;

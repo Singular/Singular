@@ -705,7 +705,7 @@ static void bimRowContent(bigintmat *bimat, int rowpos, int colpos)
     if (! n_IsZero(tgcd, basecoeffs)) break;
     if (i<colpos) return;
   }
-  if ((! n_GreaterZero(tgcd, basecoeffs)) && (! n_IsZero(tgcd, basecoeffs))) tgcd = n_Neg(tgcd, basecoeffs);
+  if ((! n_GreaterZero(tgcd, basecoeffs)) && (! n_IsZero(tgcd, basecoeffs))) tgcd = n_InpNeg(tgcd, basecoeffs);
   if ( n_IsOne(tgcd,basecoeffs)) return;
   loop
   {

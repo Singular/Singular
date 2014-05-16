@@ -2978,7 +2978,7 @@ BOOLEAN nlInitChar(coeffs r, void*p)
   //r->cfGetUnit = NULL; // only for ring stuff
   //r->cfDivBy = NULL; // only for ring stuff
   #endif
-  r->cfNeg   = nlNeg;
+  r->cfInpNeg   = nlNeg;
   r->cfInvers= nlInvers;
   r->cfCopy  = nlCopy;
   r->cfRePart = nlCopy;
