@@ -42,6 +42,9 @@ PROCEDURES:
  sep(f,k);         the separabel part of f as polynomial in Fp(t1,...,tm)
 ";
 
+//not fixed for unit ideal input: equiRadical equidim equidimMax equidimMaxEHV zerodec absPrimdecGTZ
+
+
 LIB "general.lib";
 LIB "elim.lib";
 LIB "poly.lib";
@@ -1884,7 +1887,7 @@ EXAMPLE: example minAssPrimes; shows an example
 "
 {
    def @P=basering;
-   if(size(i)==0){return(list(ideal(0)));}
+   if(size(i)==0) { return(list(ideal(0))); }
    list qr=simplifyIdeal(i);
    map phi=@P,qr[2];
    i=qr[1];
@@ -2036,7 +2039,8 @@ RETURN:  list = the minimal associated prime ideals of i
 EXAMPLE: example minAssPrimes; shows an example
 "
 {
-  if(size(i) == 0){return(list(ideal(0)));}
+  if (size(i) == 0)  {  return(list(ideal(0)));  }
+
   string algorithm;    // Algorithm to be used
   string facstdOption;    // To uses proc facstd
   int j;          // Counter
@@ -2091,9 +2095,9 @@ EXAMPLE: example minAssPrimes; shows an example
 
   list result;
 
-  if(npars(P) == 0){option(redSB);}
+  if(npars(P) == 0)  { option(redSB); }
 
-  if(attrib(i,"isSB")!=1)
+  if (attrib(i,"isSB")!=1)
   {
     i=groebner(q[1]);
   }
@@ -2101,12 +2105,19 @@ EXAMPLE: example minAssPrimes; shows an example
   {
     for(j=1;j<=nvars(basering);j++)
     {
-      if(q[2][j]!=var(j)){k=1;break;}
+      if (q[2][j]!=var(j)) {k=1;break;}
     }
     if(k)
     {
       i=groebner(q[1]);
     }
+  }
+  if(size(i)>0)
+  {
+      if ( i[1]==1 ) // we have the unit ideal.
+      { 
+          return( list() ); 
+      }
   }
 
   if( dim(i) == -1 )
@@ -2332,6 +2343,7 @@ EXAMPLE:example equidim; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
   }
+ 
   intvec op ;
   def  P = basering;
   list eq;
@@ -2567,11 +2579,18 @@ proc algeDeco(ideal i, int w)
    def op = option(get);
 
 //---Anfang Provisorium
-   if((size(i)==2) && (w==2))
+   if((size(i)==2) && (w==2))  // what is this? why the hell size(i) will be = 2?
    {
       option( redSB );
       ideal J = std(i);
       option( noredSB );
+      if(size(J)>0)
+      {
+         if ( J[1]==1 ) // how to check for unit ideal?
+         { 
+             return( list() ); 
+         }
+      }
       if ((size(J)==2)&&(deg(J[1])==1))
       {
          ideal keep;
@@ -2643,26 +2662,34 @@ proc algeDeco(ideal i, int w)
    {
       pr=minAssPrimes(i);
    }
+   int sizepr = size(pr);
    if(n<nvars(basering))
    {
       gnir="ring RS="+string(char(R))+",("+varstr(RH)
                 +"),(dp("+string(n)+"),lp);";
       execute(gnir);
-      list pr=imap(RH,pr);
+      if (sizepr>0) {    list  pr=imap(RH,pr); }
       ideal K;
       for(j=1;j<=size(pr);j++)
       {
          K=groebner(pr[j]);
-         K=K[2..size(K)];
+         if (ncols(K)>1)
+         {
+           K=K[2..ncols(K)];
+         }
+         else
+         {
+           K=0;
+         }
          pr[j]=K;
       }
       setring R;
-      list pr=imap(RS,pr);
+      if (sizepr>0) {  list pr=imap(RS,pr); }
    }
    else
    {
       setring R;
-      list pr=imap(RH,pr);
+      if (sizepr>0)  { list pr=imap(RH,pr); }
    }
    list re;
    if(w==2)
@@ -2712,7 +2739,6 @@ EXAMPLE: example decomp; shows an example
   ideal ser,tras;
   int isS=(attrib(i,"isSB")==1);
 
-
   if(size(#)>0)
   {
     if((#[1]==1)||(#[1]==2)||(#[1]==3))
@@ -2751,6 +2777,13 @@ EXAMPLE: example decomp; shows an example
     {
       ltras=i,i;
       attrib(ltras[1],"isSB",1);
+    }
+    if(size(tras)>0)
+    {
+        if ( tras[1]==1 ) // we have the unit ideal.
+        { 
+            return( list() ); 
+        }
     }
     tras=ltras[1];
     attrib(tras,"isSB",1);
@@ -2820,6 +2853,14 @@ EXAMPLE: example decomp; shows an example
     else
     {
       ideal @j=groebner(fetch(@P,i));
+    }
+    if(size(@j)>0)
+    {
+        if ( @j[1]==1 ) // we have the unit ideal.
+        { 
+            setring @P;
+            return( list() ); 
+        }
     }
   }
   option(set,op);
@@ -4115,7 +4156,7 @@ static proc ini_mod(poly p)
 
 static proc min_ass_prim_charsets (ideal PS, int cho)
 {
-  if((cho<0) and (cho>1))
+  if((cho<0) or (cho>1))
   {
     ERROR("<int> must be 0 or 1");
   }
@@ -4145,6 +4186,7 @@ static proc min_ass_prim_charsets (ideal PS, int cho)
 static proc min_ass_prim_charsets0 (ideal PS)
 {
   intvec op;
+  if (size(PS)==0) { return( list(ideal(0))); }
   matrix m=char_series(PS);  // We compute an irreducible
                              // characteristic series
   int i,j,k;
@@ -4241,6 +4283,7 @@ static proc min_ass_prim_charsets1 (ideal PS)
 {
   intvec op;
   def oldring=basering;
+  if (size(PS)==0) { return( list(ideal(0))); }
   string n=system("neworder",PS);
   execute("ring r=("+charstr(oldring)+"),("+n+"),dp;");
   ideal PS=imap(oldring,PS);
@@ -4259,7 +4302,10 @@ static proc min_ass_prim_charsets1 (ideal PS)
     {
       I=I,ini_mod(PHI[i][j]);
     }
-    I=I[2..ncols(I)];
+    if (ncols(I)>1)
+    {
+      I=I[2..ncols(I)];
+    }
     ITPHI[i]=I;
   }
   setring oldring;
@@ -5150,7 +5196,9 @@ EXAMPLE: example primdecGTZ; shows an example
       ideal i=imap(r,i);
 // decompose and go back
       list li=primdecGTZ(i);
+      int sizeli = size(li);
       setring r;
+      if (sizeli==0)  { return ( list() ); }
       def li=imap(s,li);
 // clean up
       if(!defined(keep_comp))
@@ -5394,7 +5442,9 @@ EXAMPLE: example primdecSY; shows an example
       ideal i=imap(r,i);
 // decompose and go back
       list li=primdecSY(i);
+      int sizeli = size(li);
       setring r;
+      if (sizeli==0)  { return ( list() ); }
       def li=imap(s,li);
 // clean up
       if(!defined(keep_comp))
@@ -5411,9 +5461,13 @@ EXAMPLE: example primdecSY; shows an example
       return(li);
    }
    i=simplify(i,2);
-   if ((i[1]==0)||(i[1]==1))
+
+   //if ((i[1]==0)||(i[1]==1)) // would not work anyway, since i cannot be assumed to be in standard basis form; 
+   //                          // but why return list(1,1) in case i=1 ??
+   if ( (i[1]==0) )
+
    {
-     list L=list(ideal(i[1]),ideal(i[1]));
+     list L = list(ideal(i[1]), ideal(i[1]) );
      return(list(L));
    }
 
@@ -5470,7 +5524,9 @@ EXAMPLE: example minAssGTZ; shows an example
       ideal i=imap(r,i);
 // decompose and go back
       list li=minAssGTZ(i);
+      int sizeli = size(li);
       setring r;
+      if (sizeli==0) { return(list()); }
       def li=imap(s,li);
 // clean up
       if(!defined(keep_comp))
@@ -5573,7 +5629,9 @@ EXAMPLE: example minAssChar; shows an example
       ideal i=imap(r,i);
 // decompose and go back
       list li=minAssChar(i);
+      int sizeli = size(li);
       setring r;
+      if (sizeli==0) { return(list()); }
       def li=imap(s,li);
 // clean up
       if(!defined(keep_comp))
