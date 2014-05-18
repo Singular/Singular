@@ -576,7 +576,7 @@ irrCharSeries (const CFList & PS)
     for (iter2= sqrfFactors; iter2.hasItem(); iter2++)
       sqrf *= iter2.getItem().factor();
     sqrf= normalize (sqrf);
-    L= Union (L, CFList (sqrf));
+    L= Union (CFList (sqrf), L);
   }
 
   ListCFList pi, ppi, qqi, qsi, iss, qhi= ListCFList(L);
@@ -612,12 +612,12 @@ irrCharSeries (const CFList & PS)
     }
 
     StoreFactors StoredFactors;
-    cs= charSetViaModCharSet (qs, StoredFactors);
+    cs= modCharSet (qs, StoredFactors, false);
     cs= removeContent (cs, StoredFactors);
 
     factorset= StoredFactors.FS1;
 
-    if (cs.getFirst().level() > 0)
+    if (!cs.isEmpty() && cs.getFirst().level() > 0)
     {
       ts= irredAS (cs, indexRed, reducible);
 
