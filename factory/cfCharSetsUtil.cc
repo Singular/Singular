@@ -383,6 +383,14 @@ lowestRank (const CFList & L)
   return f;
 }
 
+int minLevel (const CFList& L)
+{
+  if (L.isEmpty())
+    return 0;
+  int min= size (L.getFirst());
+  return min;
+}
+
 /// sort in descending order of length of elements
 void
 sortListCFList (ListCFList& list)
@@ -397,7 +405,9 @@ sortListCFList (ListCFList& list)
     {
       m= j;
       m++;
-      if (j.getItem().length() < m.getItem().length())
+      if ((j.getItem().length() < m.getItem().length()) ||
+          (j.getItem().length() == m.getItem().length() &&
+           minLevel (j.getItem()) > minLevel (m.getItem())))
       {
         buf= m.getItem();
         m.getItem()= j.getItem();
