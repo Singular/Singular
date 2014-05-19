@@ -517,7 +517,7 @@ irredAS (CFList & AS, int & indexRed, CanonicalForm & reducible)
         qs.removeFirst();
     }
     else
-      qs= CFFList (CFFactor (i.getItem(), 1));
+      qs= CFFList (CFFactor (normalize (i.getItem()), 1));
 
     if ((qs.length() >= 2 ) || (qs.getFirst().exp() > 1))
     {
@@ -555,7 +555,7 @@ irredAS (CFList & AS, int & indexRed, CanonicalForm & reducible)
     }
   }
   for (CFFListIterator k= qs; k.hasItem(); k++)
-    ts.append (k.getItem().factor());
+    ts.append (normalize (k.getItem().factor()));
   return ts;
 }
 

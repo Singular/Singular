@@ -898,6 +898,7 @@ removeContent (CanonicalForm& F, CanonicalForm& cF)
       cF= normalize (cF);
     else
       cF= 0;
+    F= normalize (F);
 
     return;
   }
@@ -1004,11 +1005,11 @@ removeContent (const CFList & PS, StoreFactors & StoredFactors)
     cc= content (elem, elem.mvar());
     if (cc.level() > 0 )
     {
-      output.append (elem / cc);
-      StoredFactors.FS1 = Union (CFList (cc), StoredFactors.FS1);
+      output.append (normalize (elem / cc));
+      StoredFactors.FS1 = Union (CFList (normalize (cc)), StoredFactors.FS1);
     }
     else
-      output.append(elem);
+      output.append(normalize (elem));
   }
   return output;
 }
