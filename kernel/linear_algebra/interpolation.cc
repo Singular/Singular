@@ -1565,7 +1565,7 @@ ideal interpolation(const std::vector<ideal>& L, intvec *v)
           else n=nInit(0);
           if (only_modp)
           {
-            n=nNeg(n);
+            n=nInpNeg(n);
             n=nDiv(n,m);
             modp_points[i][pcvar]=(int)((long)n);
           }

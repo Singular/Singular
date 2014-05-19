@@ -33,7 +33,7 @@ static inline BOOLEAN n_Equal_FieldGeneral(number n1, number n2, const ring r)
 { return r->cf->cfEqual(n1, n2, r->cf); }
 
 static inline number n_Neg_FieldGeneral(number n,     const ring r)
-{ return r->cf->cfNeg(n, r->cf); }
+{ return r->cf->cfInpNeg(n, r->cf); }
 
 static inline number n_Sub_FieldGeneral(number n1, number n2, const ring r)
 { return r->cf->cfSub(n1, n2, r->cf); }
@@ -51,7 +51,7 @@ static inline void n_InpAdd_FieldGeneral(number &n1, number n2, const ring r)
 #define n_Add_RingGeneral(n1, n2, r)       r->cf->cfAdd(n1, n2, r->cf)
 #define n_IsZero_RingGeneral(n, r)         r->cf->cfIsZero(n, r->cf)
 #define n_Equal_RingGeneral(n1, n2, r)     r->cf->cfEqual(n1, n2, r->cf)
-#define n_Neg_RingGeneral(n, r)            r->cf->cfNeg(n, r->cf)
+#define n_Neg_RingGeneral(n, r)            r->cf->cfInpNeg(n, r->cf)
 #define n_Sub_RingGeneral(n1, n2, r)       r->cf->cfSub(n1, n2, r->cf)
 //#define n_InpMult_RingGeneral(n1, n2, r)   r->cf->nInpMult(n1, n2, r->cf)
 #define n_InpMult_RingGeneral(n1, n2, r)   ndInpMult(n1, n2, r->cf)

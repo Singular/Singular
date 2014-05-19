@@ -18,7 +18,7 @@
 #define nAdd(n1, n2)      n_Add(n1, n2, currRing->cf)
 #define nIsZero(n)        n_IsZero(n, currRing->cf)
 #define nEqual(n1, n2)    n_Equal(n1, n2, currRing->cf)
-#define nNeg(n)           n_Neg(n, currRing->cf)
+#define nInpNeg(n)        n_InpNeg(n, currRing->cf)
 #define nSub(n1, n2)      n_Sub(n1, n2, currRing->cf)
 #define nGetChar()        n_GetChar(currRing->cf)
 #define nInit(i)          n_Init(i, currRing->cf)

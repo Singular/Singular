@@ -66,7 +66,7 @@ class Number{
   Number operator-(){
     Number t(*this);
     //t.n=n_Copy(n,r);
-    t.n=n_Neg(t.n,r.get());
+    t.n=n_InpNeg(t.n,r.get());
     return t;
   }
   Number& operator+=(const Number & n2){

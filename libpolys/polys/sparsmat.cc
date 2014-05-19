@@ -1643,7 +1643,7 @@ void sm_PolyDiv(poly a, poly b, const ring R)
     y = n_Div(pGetCoeff(a),x,R->cf);
     n_Normalize(y,R->cf);
     p_SetCoeff(a,y,R);
-    yn = n_Neg(n_Copy(y,R->cf),R->cf);
+    yn = n_InpNeg(n_Copy(y,R->cf),R->cf);
     t = pNext(b);
     h = dummy;
     do
@@ -1919,7 +1919,7 @@ static void sm_ExactPolyDiv(poly a, poly b, const ring R)
       y = n_Div(pGetCoeff(a), x, R->cf);
       n_Normalize(y, R->cf);
       p_SetCoeff(a,y, R);
-      yn = n_Neg(n_Copy(y, R->cf), R->cf);
+      yn = n_InpNeg(n_Copy(y, R->cf), R->cf);
       pSetCoeff0(e,yn);
       lh = lt;
       if (sm_IsNegQuot(e, a, b, R))
@@ -1942,7 +1942,7 @@ static void sm_ExactPolyDiv(poly a, poly b, const ring R)
       y = n_Div(pGetCoeff(a), x, R->cf);
       n_Normalize(y, R->cf);
       p_SetCoeff(a,y, R);
-      yn = n_Neg(n_Copy(y, R->cf), R->cf);
+      yn = n_InpNeg(n_Copy(y, R->cf), R->cf);
       pSetCoeff0(e,yn);
       if (sm_IsNegQuot(e, a, b, R))
         h = sm_SelectCopy_ExpMultDiv(tail, e, a, b, R);
@@ -2521,7 +2521,7 @@ void sparse_number_mat::smSolv()
           n_Delete(&z,_R->cf);
         }
         else
-          x = n_Neg(z,_R->cf);
+          x = n_InpNeg(z,_R->cf);
       }
       s = s->n;
     }
@@ -2600,7 +2600,7 @@ void sparse_number_mat::smRealPivot()
       }
       else
       {
-        xo = n_Neg(xo,_R->cf);
+        xo = n_InpNeg(xo,_R->cf);
         if (n_Greater(xo,x,_R->cf))
         {
           n_Delete(&xo,_R->cf);
@@ -2608,7 +2608,7 @@ void sparse_number_mat::smRealPivot()
           copt = i;
           ropt = a->pos;
         }
-        xo = n_Neg(xo,_R->cf);
+        xo = n_InpNeg(xo,_R->cf);
       }
       a = a->n;
     }
@@ -2747,7 +2747,7 @@ void sparse_number_mat::smSelectPR()
         if (a->pos == rpiv)
         {
           ap->n = a->n;
-          a->m = n_Neg(a->m,_R);
+          a->m = n_InpNeg(a->m,_R);
           b = b->n = a;
           b->pos = i;
           break;
@@ -2757,7 +2757,7 @@ void sparse_number_mat::smSelectPR()
     else if (a->pos == rpiv)
     {
       m_act[i] = a->n;
-      a->m = n_Neg(a->m,_R);
+      a->m = n_InpNeg(a->m,_R);
       b = b->n = a;
       b->pos = i;
     }

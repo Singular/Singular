@@ -321,7 +321,7 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
     //r->cfExtGcd = NULL; // only for ring stuff
     // r->cfDivBy = NULL; // only for ring stuff
 #endif
-    r->cfNeg   = nAEQNeg;
+    r->cfInpNeg   = nAEQNeg;
     r->cfInvers= NULL;
     //r->cfCopy  = ndCopy;
     //r->cfRePart = ndCopy;

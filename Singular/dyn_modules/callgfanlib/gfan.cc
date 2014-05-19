@@ -4083,12 +4083,12 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
                                         {
                                                 case TRUE:
                                                         if(hasNegCoeff)
-                                                                nCoeffNom=nNeg(nCoeffNom);
+                                                                nCoeffNom=nInpNeg(nCoeffNom);
                                                         pSetCoeff(strPoly, nDiv(nCoeffNom, nCoeffDenom));
                                                         break;
                                                 case FALSE:
                                                         if(hasNegCoeff)
-                                                                nCoeff=nNeg(nCoeff);
+                                                                nCoeff=nInpNeg(nCoeff);
                                                         if(!nIsOne(nCoeff))
                                                         {
                                                                 pSetCoeff(strPoly, nCoeff );

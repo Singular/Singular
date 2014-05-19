@@ -198,7 +198,7 @@ lists evEigenvals(matrix M)
         if(pGetExp(e0->m[i],1)<2&&pGetExp(pNext(e0->m[i]),1)<2&&
            pNext(pNext(e0->m[i]))==NULL)
 	{
-          number e1=nNeg(nCopy(pGetCoeff(e0->m[i])));
+          number e1=nInpNeg(nCopy(pGetCoeff(e0->m[i])));
           if(pGetExp(pNext(e0->m[i]),1)==0)
             e->m[k]=pNSet(nDiv(pGetCoeff(pNext(e0->m[i])),e1));
           else
