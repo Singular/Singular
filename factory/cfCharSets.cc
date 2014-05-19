@@ -612,7 +612,10 @@ irrCharSeries (const CFList & PS)
     }
 
     StoreFactors StoredFactors;
-    cs= modCharSet (qs, StoredFactors, false);
+    if (qs.length() - 3 < highestlevel)
+      cs= modCharSet (qs, StoredFactors, false);
+    else
+      cs= charSetN (qs);
     cs= removeContent (cs, StoredFactors);
 
     factorset= StoredFactors.FS1;
