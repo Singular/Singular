@@ -3974,21 +3974,39 @@ BOOLEAN rComplete(ring r, int force)
 
 static void rCheckOrdSgn(ring r,int i/*current block*/)
 { // set r->OrdSgn
-  if ( r->OrdSgn==1)
+  int jj;
+  int oo=-1;
+  int notfound=1;
+  for(jj=i-1;jj>=0;jj--)
   {
-    int oo=-1;
-    int jj;
-    for(jj=i-1;jj>=0;jj--)
+    if(((r->order[jj]==ringorder_a)
+      ||(r->order[jj]==ringorder_aa)
+      ||(r->order[jj]==ringorder_a64))
+    &&(r->block0[jj]<=r->block0[i])
+    &&(r->block1[jj]>=r->block1[i]))
     {
-      if(((r->order[jj]==ringorder_a)
-        ||(r->order[jj]==ringorder_aa)
-        ||(r->order[jj]==ringorder_a64))
-      &&(r->block0[jj]<=r->block0[i])
-      &&(r->block1[jj]>=r->block1[i]))
-      { oo=1; break;}
+      int res=1;
+      if (r->order[jj]!=ringorder_a64)
+      {
+        for(int j=r->block1[jj]-r->block0[jj]; j>=0;j--)
+        {
+          if(r->wvhdl[jj][j]<=0) { res=-1; break;}
+        }
+      }
+      oo=res;
+      notfound=0;
     }
     r->OrdSgn=oo;
   }
+  if (notfound
+  && (r->order[i]==ringorder_ls)
+     || (r->order[i]==ringorder_ds)
+     || (r->order[i]==ringorder_Ds)
+     || (r->order[i]==ringorder_ws)
+     || (r->order[i]==ringorder_Ws)
+     || (r->order[i]==ringorder_rs)
+  )
+    r->OrdSgn=-1;
 }
 
 
