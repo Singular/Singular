@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////
-version="version modular.lib 3-1-7-0 Dec_2013 ";
+version="version modular.lib 4.0.0.0 May_2014 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:   modular.lib  An abstraction layer for modular techniques
@@ -125,7 +125,6 @@ EXAMPLE:  example modular; shows an example"
         }
         else {
             ncores_available = system("semaphore", "get_value", sem_cores)+1;
-            nNewPrimes = nAllPrimes div ncores_available;
             if (nAllPrimes < ncores_available) {
                 nNewPrimes = nAllPrimes;
             }
@@ -154,6 +153,7 @@ EXAMPLE:  example modular; shows an example"
         indices = deleteUnluckyPrimes(modresults);
         for (i = size(indices); i > 0; i--) {
             modresults = delete(modresults, indices[i]);
+            primes = delete(primes, indices[i]);
         }
 
         // lift result
@@ -164,6 +164,7 @@ EXAMPLE:  example modular; shows an example"
             result_lift = chinrem(list(result_lift)+modresults,
                 list(N)+primes);
         }
+        modresults = list();
         for (i = size(primes); i > 0; i--) {
             N = N*primes[i];
         }
