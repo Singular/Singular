@@ -400,6 +400,13 @@ charSetViaModCharSet (const CFList& PS, bool removeContents)
   return charSetViaModCharSet (PS, tmp, removeContents);
 }
 
+CFList
+modCharSet (const CFList& PS, bool removeContents)
+{
+  StoreFactors tmp;
+  return modCharSet (PS, tmp, removeContents);
+}
+
 ListCFList
 charSeries (const CFList& L)
 {

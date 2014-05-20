@@ -816,7 +816,7 @@ SteelTrager (const CanonicalForm & f, const CFList & AS)
     CanonicalForm factor= iter.getItem().factor();
     factor= M (factor);
     transform.append (factor);
-    transform= charSetViaModCharSet (transform, false);
+    transform= modCharSet (transform, false);
     for (i= transform; i.hasItem(); i++)
     {
       if (degree (i.getItem(), f.mvar()) > 0)
