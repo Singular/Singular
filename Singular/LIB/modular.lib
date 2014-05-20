@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////
-version="version modular.lib 3-1-7-0 Dec_2013 ";
+version="version modular.lib 4.0.0.0 May_2014 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:   modular.lib  An abstraction layer for modular techniques
