@@ -1025,7 +1025,6 @@ makeUsp2.tst
 makeUsp4.tst
 Maxord.tst
 minpoly.tst
-modHenselStd.tst
 module_containment.tst
 modulo_BR_PLURAL_BR.tst
 moduloSlim.tst
@@ -1156,7 +1155,6 @@ makeQsl3.tst
 makeUso7.tst
 minAssGTZ.tst
 mindist.tst
-modS.tst
 multiplylist.tst
 nonMonomials.tst
 nt_solve.tst
