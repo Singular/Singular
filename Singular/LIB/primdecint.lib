@@ -15,6 +15,8 @@ OVERVIEW:
   polynomial ring over the integers, Z[x_1,...,x_n].
   The first procedure 'primdecZ' can be used in parallel.
 
+  Reference: Pfister,   Sadiq, Steidel , \"An Algorithm for primary decomposition in polynomial rings over the integers\" , arXiv:1008.2074 
+
 PROCEDURES:
  primdecZ(I);       compute the primary decomposition of ideal I
  primdecZM(I);      compute the primary decomposition of module I
