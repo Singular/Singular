@@ -589,7 +589,7 @@ BOOLEAN pyobject_Op3(int op, leftv res, leftv arg1, leftv arg2, leftv arg3)
   if (!lhs(op, rhs1, rhs2).assign_to(res))
     return FALSE;
 
-  return blackbox_default_Op3(op, res, arg1, arg2, arg3);
+  return blackboxDefaultOp3(op, res, arg1, arg2, arg3);
 }
 
 

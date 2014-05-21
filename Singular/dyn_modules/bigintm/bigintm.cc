@@ -255,9 +255,9 @@ static BOOLEAN bigintm_OpM(int op, leftv res, leftv args)
     }
 
     default:
-      return blackbox_default_OpM(op, res, args);
+      return blackboxDefaultOpM(op, res, args);
   }
-  return blackbox_default_OpM(op, res, args);
+  return blackboxDefaultOpM(op, res, args);
 }
 
 static void bigintm_destroy(blackbox */*b*/, void *d)
@@ -295,7 +295,7 @@ BOOLEAN bigintm_setup()
     b->blackbox_Assign=bigintm_Assign; // TO ASK: no default?!
     b->blackbox_Op1=bigintm_Op1;
     b->blackbox_Op2=bigintm_Op2;
-    //b->blackbox_Op3=blackbox_default_Op3;
+    //b->blackbox_Op3=blackboxDefaultOp3;
     b->blackbox_OpM=bigintm_OpM;
 
     bigintm_type_id = setBlackboxStuff(b,"bigintm");
