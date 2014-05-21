@@ -5006,6 +5006,7 @@ turns off all options (including the @code{prompt} option).
 @c ---------
 @cindex warn, option
 be aware of pitfalls.
+See @ref{option(warn)}.
 @c ---------
 @item @code{returnSB}
 @cindex returnSB, option

@@ -4063,6 +4063,7 @@ and then @key{RETURN} .
 * Break points::
 * Printing of data::
 * libparse::
+* option(warn)::
 @end menu
 
 @c ---------------------------------------
@@ -4227,7 +4228,7 @@ See @ref{dbprint}; @ref{voice}.
 @end ifnothtml
 
 @c ---------------------------------------
-@node libparse,,Printing of data,Debugging tools
+@node libparse,option(warn),Printing of data,Debugging tools
 @subsection libparse
 @cindex libparse
 
@@ -4311,6 +4312,31 @@ LIB "sample.lib";
 @expansion{}    ? Cannot load library,... aborting.
 @expansion{}    ? error occurred in STDIN line 1: `LIB "sample.lib";`
 @end smallexample
+@c ---------------------------------------
+@node option(warn),,libparse,Debugging tools
+@subsection option(warn)
+@cindex  option(warn)
+@cindex  warn, option
+
+
+If this option is set some constructs which @strong{may} lead to bug
+will result in a warning. While there are legitimate uses for them and they
+are @strong{not errors} is is worth thinking about it.
+
+@itemize
+@item
+change of options during a procedure call: is this side effect intended?
+@item
+use of @code{def}: avoids type checking, but usefull if a procedure handles
+several types at once
+@item
+@code{ASSUME} outside of procedures: while a failed @code{ASSUME} aborts
+the current procedures and return to the top level - what should it do at top level?
+@end itemize
+@c ref
+See
+@ref{option}.
+@c ref
 @c ---------------------------------------
 @node Dynamic loading, , Debugging tools, General concepts
 @section Dynamic loading
