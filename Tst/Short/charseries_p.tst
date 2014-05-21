@@ -143,6 +143,14 @@ poly f=x8+(t+u)*x4+tu;
 ideal J= i,f;
 char_series (J);
 
+kill r;
+
+ring r=3,(x1,x2,x3,x4,x5,y),lp;
+poly f6= ((y+x1*x3+x2+1)*(y+x3*x4+x1*x3)*(y^3+x3*x4+x1*x3));
+ideal I=x1^2+1, x2^2+x1+1, x3^2+x2+1, x4^2+x3+x2+2;
+ideal K=I,f6;
+char_series (K);
+
 
 
 tst_status(1); $
