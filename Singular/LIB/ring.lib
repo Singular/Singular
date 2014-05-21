@@ -3,6 +3,7 @@ version="version ring.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
+AUTHORS: Singular team
 
 PROCEDURES:
  changechar(c[,r]); make a copy of basering [ring r] with new char c
@@ -27,6 +28,8 @@ PROCEDURES:
  hasCommutativeVars(rng)  non-commutive or commnuative polynomial ring
  hasGlobalOrdering(rng)   global versus mixed/local monomial ordering
  hasMixedOrdering()       mixed versus global/local ordering
+ hasFieldCoefficient(rng) coefficients are a field
+ isQuotientRing(rng)      ring is a qotient ring
  isSubModule(I,J)         check if I is in J as submodule
 ";
 
@@ -988,6 +991,11 @@ EXAMPLE: example hasCommutativeVars; shows an example
   list rl=ringlist(rng);
   return (size(rl)==4);
 }
+example
+{
+ ring r=0,(x,y,z),dp;
+ hasCommutativeVars(r);
+}
 
 proc hasNumericCoeffs(rng)
 "USAGE: hasNumericCoeffs ( rng );
@@ -1008,6 +1016,14 @@ EXAMPLE: isSubModule; shows an example
   { return(size(reduce(I,J,1)==0)); }
   else
   { return(size(reduce(I,groebner(J),1)==0)); }
+}
+example
+{
+  ring r=0,x,dp;
+  ideal I1=x2;
+  ideal I2=x3;
+  isSubModule(I1,I2);
+  isSubModule(I2,I1);
 }
 
 proc hasMixedOrdering()
