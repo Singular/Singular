@@ -13,7 +13,7 @@ OVERVIEW:  Routines for bounding and counting the number of real roots of a
            polynomial. There are several wrapper functions, to simplify the
            application of the aforesaid theorems and some functions
            to determine whether a given polynomial is univariate.
-           References: Basu, Pollack, Roy, \"Algorithms in Real Algebraic
+REFERENCES: Basu, Pollack, Roy, \"Algorithms in Real Algebraic
            Geometry\", Springer, 2003.
 
 

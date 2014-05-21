@@ -7,7 +7,7 @@ AUTHOR:               Enrique A. Tobis, etobis@dc.uba.ar
 
 OVERVIEW:  Routines to determine the number of solutions of a multivariate
            polynomial system which satisfy a given sign configuration.
-           References: Basu, Pollack, Roy, \"Algorithms in Real Algebraic
+REFERENCES: Basu, Pollack, Roy, \"Algorithms in Real Algebraic
            Geometry\", Springer, 2003.
 
 PROCEDURES:

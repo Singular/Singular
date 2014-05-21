@@ -95,8 +95,7 @@ REMARKS: We use the local-to-global algorithm given in [1] to compute the normal
          where U is an ideal of A and d is an element of A such that U/d is the normalization of A.
          In fact, U and d are returned as an ideal and a polynomial of the base ring R.
 
-         References:
-
+REFERENCES:
          [1] Janko Boehm, Wolfram Decker, Santiago Laplagne, Gerhard Pfister, Stefan Steidel,
              Andreas Steenpass: Parallel algorithms for normalization, http://arxiv.org/abs/1110.4299, 2011.@*
          [2] Gert-Martin Greuel, Santiago Laplagne, Frank Seelisch: Normalization of Rings,

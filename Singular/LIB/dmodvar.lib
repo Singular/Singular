@@ -25,7 +25,7 @@ tensored with S over K, where
 @* - an r-tuple of operators in D<S>, denoted by PS, such that the functional equality
      sum(k=1 to k=r) P_k*f_k*F^s = bs*F^s holds in R[1/F]*F^s.
 
-References:
+REFERENCES:
    (BMS06) Budur, Mustata, Saito: Bernstein-Sato polynomials of arbitrary varieties (2006).
 @* (ALM09) Andres, Levandovskyy, Martin-Morales: Principal Intersection and Bernstein-Sato
 Polynomial of an Affine Variety (2009).
