@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1340804707:3144- exported :3-1-4:x86_64-Linux:lts035:227368
-1 >> tst_memory_1 :: 1340804707:3144- exported :3-1-4:x86_64-Linux:lts035:3239936
-1 >> tst_memory_2 :: 1340804707:3144- exported :3-1-4:x86_64-Linux:lts035:3239936
-1 >> tst_timer_1 :: 1340804707:3144- exported :3-1-4:x86_64-Linux:lts035:9
+1 >> tst_memory_0 :: 1400685929:4.0.0, 64 bit:4.0.0:x86_64-Linux:dilbert:196488
+1 >> tst_memory_1 :: 1400685929:4.0.0, 64 bit:4.0.0:x86_64-Linux:dilbert:3203072
+1 >> tst_memory_2 :: 1400685929:4.0.0, 64 bit:4.0.0:x86_64-Linux:dilbert:3203072
+1 >> tst_timer_1 :: 1400685929:4.0.0, 64 bit:4.0.0:x86_64-Linux:dilbert:3
