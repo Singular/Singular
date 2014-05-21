@@ -948,6 +948,7 @@ Comments should be send to the author of the library directly.
 * JMSConst_lib::  constructing J-Marked Schemes
 * orbitparam_lib:: Parametrizing unipotent orbits
 * modnormal_lib:: Normalization of affine domains using modular methods
+* modular_lib::abstraction layer for modular techniques
 * multigrading_lib:: Multigradings and related computations
 * numerAlg_lib::  Numerical Algebraic Algorithms
 * numerDecom_lib:: Bertini interface
@@ -1025,11 +1026,15 @@ Issues:
 @subsection JMSConst_lib
 @c lib JMSConst.lib
 @c ----------------------------------------------------------
-@node orbitparam_lib, modnormal_lib, JMSConst_lib, Experimental libraries
+@node orbitparam_lib, modular_lib, JMSConst_lib, Experimental libraries
 @subsection orbitparam_lib
 @c lib orbitparam.lib
 @c ----------------------------------------------------------
-@node modnormal_lib, multigrading_lib, orbitparam_lib, Experimental libraries
+@node modular_lib, modnormal_lib, orbitparam_lib, Experimental libraries
+@subsection modular_lib
+@c lib modular.lib
+@c ----------------------------------------------------------
+@node modnormal_lib, multigrading_lib, modular_lib, Experimental libraries
 @subsection modnormal_lib
 @c lib modnormal.lib
 @c ----------------------------------------------------------
