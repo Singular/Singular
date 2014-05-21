@@ -19,6 +19,7 @@
 
 #include "cf_assert.h"
 
+#include "canonicalform.h"
 #include "facAlgFuncUtil.h"
 #include "cfCharSetsUtil.h"
 #include "cf_random.h"
@@ -92,24 +93,6 @@ generateMipo (int degOfExt)
   return find_irreducible (degOfExt, gen, Variable (1));
 }
 
-// // missing class: IntGenerator:
-bool IntGenerator::hasItems() const
-{
-    return 1;
-}
-
-CanonicalForm IntGenerator::item() const
-//int IntGenerator::item() const
-{
-  //return current; //CanonicalForm( current );
-  return mapinto (CanonicalForm (current));
-}
-
-void IntGenerator::next()
-{
-    current++;
-}
-
 CanonicalForm alg_lc (const CanonicalForm & f)
 {
   if (f.level()>0)
@@ -139,21 +122,61 @@ subst (const CanonicalForm& f, const CFList& a, const CFList& b,
     ASSERT (a.length() == b.length(), "lists of equal length expected");
   CFListIterator j= b;
   CanonicalForm result= f, tmp, powj;
-  for (CFListIterator i= a; i.hasItem() && j.hasItem(); i++, j++)
+  CFListIterator i= a;
+  int length= a.length();
+  int count= 0;
+  for (; i.hasItem() && j.hasItem(); i++, j++, count++)
   {
-    if (!isFunctionField)
-      result= result (j.getItem(), i.getItem().mvar());
+    if (length - count == 2)
+    {
+      if (!isFunctionField)
+      {
+        result= result (b.getLast(), a.getLast().mvar());
+        result= result (j.getItem(), i.getItem().mvar());
+        break;
+      }
+      else
+      {
+        tmp= b.getLast();
+        j++;
+        j++;
+        powj= power (tmp, degree (result, a.getLast().mvar()));
+        result= evaluate (result, j.getItem(), tmp, powj, a.getLast().mvar());
+
+        if (fdivides (powj, result, tmp))
+          result= tmp;
+
+        result /= vcontent (result, Variable (a.getLast().level() + 1));
+        j--;
+        j--;
+        tmp= j.getItem();
+        j++;
+        powj= power (j.getItem(), degree (result, i.getItem().mvar()));
+        result= evaluate (result, tmp, j.getItem(), powj, i.getItem().mvar());
+
+        if (fdivides (powj, result, tmp))
+          result= tmp;
+
+        result /= vcontent (result, Variable (i.getItem().level() + 1));
+        break;
+      }
+    }
     else
     {
-      tmp= j.getItem();
-      j++;
-      powj= power (j.getItem(), degree (result, i.getItem().mvar()));
-      result= evaluate (result, tmp, j.getItem(), powj, i.getItem().mvar());
+      if (!isFunctionField)
+        result= result (j.getItem(), i.getItem().mvar());
+      else
+      {
+        tmp= j.getItem();
+        j++;
+        powj= power (j.getItem(), degree (result, i.getItem().mvar()));
+        result= evaluate (result, tmp, j.getItem(), powj, i.getItem().mvar());
 
-      if (fdivides (powj, result, tmp))
-        result= tmp;
+        if (fdivides (powj, result, tmp))
+          result= tmp;
 
-      result /= vcontent (result, Variable (i.getItem().level() + 1));
+        result /= vcontent (result, Variable (i.getItem().level() + 1));
+      }
     }
   }
   result= reduce (result, Rstar);

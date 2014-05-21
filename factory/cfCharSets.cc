@@ -400,6 +400,13 @@ charSetViaModCharSet (const CFList& PS, bool removeContents)
   return charSetViaModCharSet (PS, tmp, removeContents);
 }
 
+CFList
+modCharSet (const CFList& PS, bool removeContents)
+{
+  StoreFactors tmp;
+  return modCharSet (PS, tmp, removeContents);
+}
+
 ListCFList
 charSeries (const CFList& L)
 {
@@ -517,7 +524,7 @@ irredAS (CFList & AS, int & indexRed, CanonicalForm & reducible)
         qs.removeFirst();
     }
     else
-      qs= CFFList (CFFactor (i.getItem(), 1));
+      qs= CFFList (CFFactor (normalize (i.getItem()), 1));
 
     if ((qs.length() >= 2 ) || (qs.getFirst().exp() > 1))
     {
@@ -555,7 +562,7 @@ irredAS (CFList & AS, int & indexRed, CanonicalForm & reducible)
     }
   }
   for (CFFListIterator k= qs; k.hasItem(); k++)
-    ts.append (k.getItem().factor());
+    ts.append (normalize (k.getItem().factor()));
   return ts;
 }
 
@@ -576,7 +583,7 @@ irrCharSeries (const CFList & PS)
     for (iter2= sqrfFactors; iter2.hasItem(); iter2++)
       sqrf *= iter2.getItem().factor();
     sqrf= normalize (sqrf);
-    L= Union (L, CFList (sqrf));
+    L= Union (CFList (sqrf), L);
   }
 
   ListCFList pi, ppi, qqi, qsi, iss, qhi= ListCFList(L);
@@ -612,12 +619,15 @@ irrCharSeries (const CFList & PS)
     }
 
     StoreFactors StoredFactors;
-    cs= charSetViaModCharSet (qs, StoredFactors);
+    if (qs.length() - 3 < highestlevel)
+      cs= modCharSet (qs, StoredFactors, false);
+    else
+      cs= charSetN (qs);
     cs= removeContent (cs, StoredFactors);
 
     factorset= StoredFactors.FS1;
 
-    if (cs.getFirst().level() > 0)
+    if (!cs.isEmpty() && cs.getFirst().level() > 0)
     {
       ts= irredAS (cs, indexRed, reducible);
 

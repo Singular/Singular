@@ -383,6 +383,14 @@ lowestRank (const CFList & L)
   return f;
 }
 
+int minLevel (const CFList& L)
+{
+  if (L.isEmpty())
+    return 0;
+  int min= size (L.getFirst());
+  return min;
+}
+
 /// sort in descending order of length of elements
 void
 sortListCFList (ListCFList& list)
@@ -397,7 +405,9 @@ sortListCFList (ListCFList& list)
     {
       m= j;
       m++;
-      if (j.getItem().length() < m.getItem().length())
+      if ((j.getItem().length() < m.getItem().length()) ||
+          (j.getItem().length() == m.getItem().length() &&
+           minLevel (j.getItem()) > minLevel (m.getItem())))
       {
         buf= m.getItem();
         m.getItem()= j.getItem();
@@ -708,6 +718,8 @@ CanonicalForm normalize (const CanonicalForm& F)
     G= F/icontent (F);
     if (isRat)
       On (SW_RATIONAL);
+    if (lc(G) < 0)
+      G= -G;
     return G;
   }
 
@@ -886,6 +898,7 @@ removeContent (CanonicalForm& F, CanonicalForm& cF)
       cF= normalize (cF);
     else
       cF= 0;
+    F= normalize (F);
 
     return;
   }
@@ -933,48 +946,47 @@ removeFactors (CanonicalForm& r, StoreFactors& StoredFactors,
   for (int i=1; i<= n; i++)
     testlist.append (CanonicalForm (Variable (i)));
 
+  // remove already removed factors
   for (j= StoredFactors.FS1; j.hasItem(); j++)
   {
     while (fdivides (j.getItem(), r, quot))
     {
-      if (!quot.inCoeffDomain())
-        r= quot;
-      else
-        break;
+      r= quot;
     }
   }
 
-  // remove already removed factors
   for (j= StoredFactors.FS2; j.hasItem(); j++)
   {
     divides= false;
-    while (fdivides (j.getItem(), r, quot))
+    if (j.getItem() != r)
     {
-      if (!quot.inCoeffDomain())
+      while (fdivides (j.getItem(), r, quot))
       {
         divides= true;
         r= quot;
       }
-      else
-        break;
+      if (divides)
+        removedFactors= Union (removedFactors, CFList (j.getItem()));
     }
-    if (divides)
-      removedFactors= Union (removedFactors, CFList (j.getItem()));
   }
   r= normalize (r);
 
   // remove variables
   for (j= testlist; j.hasItem() && !r.isOne(); j++)
   {
-    while (fdivides (j.getItem(), r, quot))
+    divides= false;
+    if (j.getItem() != r)
     {
-      if (!quot.inCoeffDomain())
+      while (fdivides (j.getItem(), r, quot))
+      {
+        divides= true;
         r= quot;
-      else
-        break;
-      removedFactors= Union (removedFactors, CFList (j.getItem()));
-    }
+      }
+      if (divides)
+        removedFactors= Union (removedFactors, CFList (j.getItem()));
+     }
   }
+  r= normalize (r);
 }
 
 CFList
@@ -993,11 +1005,11 @@ removeContent (const CFList & PS, StoreFactors & StoredFactors)
     cc= content (elem, elem.mvar());
     if (cc.level() > 0 )
     {
-      output.append (elem / cc);
-      StoredFactors.FS1 = Union (CFList (cc), StoredFactors.FS1);
+      output.append (normalize (elem / cc));
+      StoredFactors.FS1 = Union (CFList (normalize (cc)), StoredFactors.FS1);
     }
     else
-      output.append(elem);
+      output.append(normalize (elem));
   }
   return output;
 }
