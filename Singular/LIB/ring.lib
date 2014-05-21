@@ -954,7 +954,7 @@ EXAMPLE: example hasFieldCoefficient; shows an example
 example
 {
   ring rng = integer,x,dp;
-  hasFieldCoefficientRing(rng); //no
+  hasFieldCoefficient(rng); //no
   // if a certain method supports only rings with integer coefficients,
   // then a parameter test could be performed:
   ring rng2 = 0, x, dp;
