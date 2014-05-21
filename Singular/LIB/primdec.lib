@@ -4257,11 +4257,13 @@ static proc min_ass_prim_charsets1 (ideal PS)
   matrix m=char_series(PS);  // We compute an irreducible
                              // characteristic series
                              // this series may be empty (1x1: 1)
-  int i,j,k;
-  while ((nrows(m)==1)
+  int i,j,k,cnt;
+  while ((cnt<nvars(oldring))
+  && (nrows(m)==1)
   && (ncols(m)==1)
   && (m[1,1]==1)) // in case of an empty series: permute the variables
   {
+    cnt++;
     n=string(var(nvars(oldring)));
     for(i=1;i<nvars(oldring);i++) { n=n+","+string(var(i)); }
     kill r;
