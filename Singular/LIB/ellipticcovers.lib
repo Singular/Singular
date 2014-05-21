@@ -31,7 +31,7 @@ of degree d stable maps from a genus g curve to the elliptic curve.
 
 The key function computing the numbers N_(G,b) and N_(G,d) is gromovWitten.
 
-References:
+REFERENCES:
 
 [BBM] J. Boehm, A. Buchholz, H. Markwig: Tropical mirror symmetry for elliptic curves, arXiv:1309.5893 (2013).
 

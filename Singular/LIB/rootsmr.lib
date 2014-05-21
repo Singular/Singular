@@ -11,7 +11,7 @@ OVERVIEW:  Routines for counting the number of real roots of a multivariate
            bilinear form (nrRootsDeterm); and a rational univariate projection,
            using a pseudorandom polynomial (nrRootsProbab). It also includes a
            command to verify the correctness of the pseudorandom answer.
-           References: Basu, Pollack, Roy, \"Algorithms in Real Algebraic
+REFERENCES: Basu, Pollack, Roy, \"Algorithms in Real Algebraic
            Geometry\", Springer, 2003.
 
 PROCEDURES:

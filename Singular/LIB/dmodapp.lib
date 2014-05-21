@@ -46,7 +46,7 @@ In this library there are the following procedures for algebraic D-modules:
  which annihilate corresponding Appel hypergeometric functions.
 
 
-References:
+REFERENCES:
 @* (SST) Saito, Sturmfels, Takayama 'Groebner Deformations of Hypergeometric
          Differential Equations', Springer, 2000
 @* (OTW) Oaku, Takayama, Walther 'A Localization Algorithm for D-modules',
