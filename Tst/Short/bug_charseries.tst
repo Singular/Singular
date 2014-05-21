@@ -3,7 +3,6 @@ tst_init();
 // an error about side effects of WerrorS in libfac routines:
 
 LIB "primdec.lib";
-LIB("ehv.lib");
 ring r = 0,(x,y,z),lp;
 def p=z^2 + 1;
 def q=z^3 + 2;
@@ -26,13 +25,5 @@ def sage29=y-z^2;
 ideal sage30=sage28,sage29;
 def sage31=primdecSY(sage30);
 sage31;
-
-// empty char series
-
-ideal I = -3*y^2-3, -3*x^2+1, -x*y+2*z^2;
-def L1 = primdecGTZ(I);
-def L2 = primdecSY(I);
-ASSUME(0, primDecsAreEquivalent(L1, L2) );
-L2;
 
 tst_status(1);$
