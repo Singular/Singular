@@ -14,7 +14,7 @@ chinese remaindering. It is thus possible to overcome the often problematic
 coefficient swell and to run the modular computations in parallel.
 @* In Singular, modular techniques have been quite successfully employed for
 several applications. A first implementation was done for Groebner bases in
-Singular's @ref{modstd.lib}, a pioneering work by Stefan Steidel. Since the
+Singular's @ref{modstd_lib}, a pioneering work by Stefan Steidel. Since the
 algorithm is basically the same for all applications, this library aims at
 preventing library authors from writing the same code over and over again by
 providing an appropriate abstraction layer. It also offers one-line commands
@@ -22,7 +22,7 @@ for ordinary Singular users who want to take advantage of modular techniques
 for their own calculations. Thus modular techniques can be regarded as
 a parallel skeleton of their own.
 @* The terminology (such as 'pTest' and 'finalTest') follows Singular's
-@ref{modstd.lib} and [1].
+@ref{modstd_lib} and [1].
 
 REFERENCES:
 [1] Nazeran Idrees, Gerhard Pfister, Stefan Steidel: Parallelization of

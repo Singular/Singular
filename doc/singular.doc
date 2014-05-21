@@ -364,7 +364,6 @@ LIB "all.lib";
 * algebra_lib:: procedures for computing with algebras and maps
 * assprimeszerodim_lib:: associated primes of a zero-dimensional ideal
 * cisimplicial_lib:: is the toric ideal of a simplicial toric variety a complete intersection?
-* ehv_lib:: alternative primary decomposition of ideals
 * elim_lib:: procedures for elimination, saturation and blowing up
 * grwalk_lib:: Groebner walk and Fraktal walk
 * homolog_lib:: procedures for homological algebra
@@ -405,15 +404,11 @@ LIB "all.lib";
 @subsection assprimeszerodim_lib
 @c lib assprimeszerodim.lib
 @c ---------------------------------------------------------
-@node cisimplicial_lib, ehv_lib, assprimeszerodim_lib, Commutative algebra
+@node cisimplicial_lib, elim_lib, assprimeszerodim_lib, Commutative algebra
 @subsection cisimplicial_lib
 @c lib cisimplicial.lib
 @c ----------------------------------------------------------
-@node ehv_lib, elim_lib, cisimplicial_lib, Commutative algebra
-@subsection ehv_lib
-@c lib ehv.lib
-@c ----------------------------------------------------------
-@node elim_lib, grwalk_lib, ehv_lib, Commutative algebra
+@node elim_lib, grwalk_lib, cisimplicial_lib, Commutative algebra
 @subsection elim_lib
 @c lib elim.lib
 @c ----------------------------------------------------------
@@ -981,6 +976,7 @@ Comments should be send to the author of the library directly.
 * finitediff_lib:: finite difference schemes for linear differential equations
 * gitfan_lib:: Compute GIT-fans
 * orbitparam_lib:: Parametrizing unipotent orbits
+* modular_lib::abstraction layer for modular techniques
 * multigrading_lib:: Multigradings and related computations
 * numerAlg_lib::  Numerical Algebraic Algorithms
 * numerDecom_lib:: Bertini interface
@@ -1034,11 +1030,15 @@ Issues:
 @subsection gitfan_lib
 @c lib gitfan.lib
 @c ----------------------------------------------------------
-@node orbitparam_lib, multigrading_lib, gitfan_lib, Experimental libraries
+@node orbitparam_lib, modular_lib, gitfan_lib, Experimental libraries
 @subsection orbitparam_lib
 @c lib orbitparam.lib
 @c ----------------------------------------------------------
-@node multigrading_lib,numerAlg_lib,orbitparam_lib, Experimental libraries
+@node modular_lib, multigrading_lib, orbitparam_lib, Experimental libraries
+@subsection modular_lib
+@c lib modular.lib
+@c ----------------------------------------------------------
+@node multigrading_lib,numerAlg_lib,modular_lib, Experimental libraries
 @subsection multigrading_lib
 
 Todos/Issues:
