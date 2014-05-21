@@ -384,7 +384,7 @@ static BOOLEAN jiA_INT(leftv res, leftv a, Subexpr e)
       int c=e->next->start;
       if ((i>=iv->rows())||(c<1)||(c>iv->cols()))
       {
-        Werror("wrong range [%d,%d] in intmat (%d,%d)",i+1,c,iv->rows(),iv->cols());
+        Werror("wrong range [%d,%d] in intmat %s(%d,%d)",i+1,c,res->Name(),iv->rows(),iv->cols());
         return TRUE;
       }
       else
@@ -429,7 +429,7 @@ static BOOLEAN jiA_BIGINT(leftv res, leftv a, Subexpr e)
       int c=e->next->start;
       if ((i>=iv->rows())||(c<1)||(c>iv->cols()))
       {
-        Werror("wrong range [%d,%d] in bigintmat (%d,%d)",i+1,c,iv->rows(),iv->cols());
+        Werror("wrong range [%d,%d] in bigintmat %s(%d,%d)",i+1,c,res->Name(),iv->rows(),iv->cols());
         return TRUE;
       }
       else

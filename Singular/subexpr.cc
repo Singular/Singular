@@ -1127,7 +1127,7 @@ void * sleftv::Data()
       if ((index<1)||(index>iv->length()))
       {
         if (!errorreported)
-          Werror("wrong range[%d] in intvec(%d)",index,iv->length());
+          Werror("wrong range[%d] in intvec %s(%d)",index,this->Name(),iv->length());
       }
       else
         r=(char *)(long)((*iv)[index-1]);
@@ -1142,8 +1142,8 @@ void * sleftv::Data()
          ||(e->next->start>iv->cols()))
       {
         if (!errorreported)
-        Werror("wrong range[%d,%d] in intmat(%dx%d)",index,e->next->start,
-                                                     iv->rows(),iv->cols());
+        Werror("wrong range[%d,%d] in intmat %s(%dx%d)",index,e->next->start,
+                                           this->Name(),iv->rows(),iv->cols());
       }
       else
         r=(char *)(long)(IMATELEM((*iv),index,e->next->start));
@@ -1158,8 +1158,8 @@ void * sleftv::Data()
          ||(e->next->start>m->cols()))
       {
         if (!errorreported)
-        Werror("wrong range[%d,%d] in bigintmat(%dx%d)",index,e->next->start,
-                                                     m->rows(),m->cols());
+        Werror("wrong range[%d,%d] in bigintmat %s(%dx%d)",index,e->next->start,
+                                                     this->Name(),m->rows(),m->cols());
       }
       else
         r=(char *)(BIMATELEM((*m),index,e->next->start));
@@ -1173,7 +1173,7 @@ void * sleftv::Data()
       if ((index<1)||(index>IDELEMS(I)))
       {
         if (!errorreported)
-          Werror("wrong range[%d] in ideal/module(%d)",index,IDELEMS(I));
+          Werror("wrong range[%d] in ideal/module %s(%d)",index,this->Name(),IDELEMS(I));
       }
       else
         r=(char *)I->m[index-1];
@@ -1229,8 +1229,9 @@ void * sleftv::Data()
          ||(e->next->start>MATCOLS((matrix)d)))
       {
         if (!errorreported)
-          Werror("wrong range[%d,%d] in intmat(%dx%d)",
+          Werror("wrong range[%d,%d] in matrix %s(%dx%d)",
                   index,e->next->start,
+		  this->Name(),
                   MATROWS((matrix)d),MATCOLS((matrix)d));
       }
       else
@@ -1276,10 +1277,10 @@ void * sleftv::Data()
           }
         }
         else //if (!errorreported)
-          Werror("wrong range[%d] in list(%d)",index,l->nr+1);
+          Werror("wrong range[%d] in list %s(%d)",index,this->Name(),l->nr+1);
       }
       else
-        Werror("cannot index type %s(%d)",Tok2Cmdname(t),t);
+        Werror("cannot index %s of type %s(%d)",this->Name(),Tok2Cmdname(t),t);
       break;
     }
   }
