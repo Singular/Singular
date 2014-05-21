@@ -24,9 +24,18 @@ digraph IncludesInSingular4
         style = filled;
         node [ fillcolor = white, style = filled, color = black, fontcolor=black];
         interpreter [] ;
-	"dyn_modules:..." [shape=box] ;
-	  subgraph "clusterMath"
-	  {
+        subgraph "clusterMOD"
+        {
+	          rank="min" ;
+		  label="Modules: dynamic and built-ins";
+		  color = gray;
+//        	  style = filled;
+  		  node [ fillcolor = white, style = filled, color = black, fontcolor=black];
+		  { rank=same; pyobject [color = gray]; gfanlib [color = gray]; polymake [color = gray]; singmathic [color = gray]; };
+		  { rank=same; syzextra; bigintm; staticdemo; };
+        }
+        subgraph "clusterMath"
+        {
 	          rank="min" ;
 		  label="kernel: math. high level algorithms";
 		  color = gray;
@@ -45,7 +54,7 @@ digraph IncludesInSingular4
       libresources [ fillcolor=lightgrey, style=filled, color = black, shape=box ]  ;
     } ;
     { rank=same;
-      gfanlib [ fillcolor=lightgrey, fontcolor=blue, style=filled, color = black, shape=box ] ;
+      Gfanlib [ fillcolor=lightgrey, fontcolor=blue, style=filled, color = black, shape=box ] ;
       factory [ fillcolor=lightgrey, fontcolor=blue, style=filled, color = black, shape=box ] ;
     } ;
    subgraph "clusterexternals"
@@ -55,7 +64,8 @@ digraph IncludesInSingular4
     label="Externals:";
     color=blue;
     { rank=same; GMP_OR_MPIR []; MPFR [] ; } ;
-    { rank=same; NTL ; FLINT ; cddlib ;   };
+    { rank=same; NTL ; FLINT ;  PolyMakeRTL; };
+    { rank=same; mathicgb; cddlib; Python2RTL; };
    } ;
   } ;  
   NTL -> GMP_OR_MPIR [style = "dotted"];
@@ -71,11 +81,14 @@ factory -> FLINT [];
   Singular -> interpreter [];
   interpreter -> numeric [lhead="clusterMath"];
 //  interpreter -> "..." [lhead="clusterMath"];
-  interpreter -> "dyn_modules:..." [dir=both, arrowtail="open", arrowhead="open"];
-  "dyn_modules:..." -> kernelCommon [lhead="clusterMath"];
-  "dyn_modules:..." -> gfanlib [];
-  "dyn_modules:..." -> cddlib [];
-  gfanlib -> cddlib [];
+  interpreter -> "syzextra" [dir=both, arrowtail="open", arrowhead="open", lhead="clusterMOD"];
+  syzextra -> kernelCommon [lhead="clusterMath", ltail="clusterMOD"];
+  polymake -> gfanlib [];
+  gfanlib -> Gfanlib [];
+  Gfanlib -> cddlib [];
+  singmathic -> mathicgb [];
+  pyobject -> Python2RTL [];
+  polymake -> PolyMakeRTL [];
   kernelCommon -> polys [ltail="clusterlibSingular", lhead="clusterlibpolys"];
   kernelCommon -> factory [ltail="clusterlibSingular"];
   combinatorics -> kernelCommon [];
