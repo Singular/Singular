@@ -298,12 +298,14 @@ AC_DEFUN([SING_BUILTIN_MODULES],
 
  AC_ARG_VAR( [BUILTIN_LIBS], [LIB FLAGS for buildins] )
  AC_ARG_WITH(builtinmodules, 
-   AS_HELP_STRING([--with-builtinmodules], [List of builtin modules (experimental), default: all of internal]),
+   AS_HELP_STRING([--with-builtinmodules], [List of builtin modules (experimental), default: staticdemo,bigintm,syzextra]),
    [if test "x$with_builtinmodules" == xyes; then
-    with_builtinmodules=staticdemo,bigintm,syzextra,pyobject,gfanlib,polymake,singmathic
+    with_builtinmodules=syzextra
    fi], 
    [with_builtinmodules=""]
  )
+ # staticdemo,bigintm,
+ # ,pyobject,gfanlib,polymake,singmathic
 
  AH_TEMPLATE([SI_BUILTINMODULES_ADD],[Add(list) for Builtin modules])
 
@@ -318,7 +320,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   bi_bigintm=false
   
   
- if test "x$with_builtinmodules" == xno; then
+ if test -z "$with_builtinmodules"; then
   AC_MSG_RESULT(no)
  else
   AC_MSG_RESULT(yes)
@@ -351,9 +353,9 @@ AC_DEFUN([SING_BUILTIN_MODULES],
       AC_MSG_RESULT(no)
     fi
     
-    A=`echo "SI_BUILTIN_$a" | sed -e "y:m4_cr_letters-:m4_cr_LETTERS[]_:"  -e "/^@<:@m4_cr_digits@:>@/s/^/_/"`      
-    echo "A:: $A"
-#    AM_CONDITIONAL(m4_unquote([A]),[test -d "Singular/dyn_modules/$a"])    
+#    A=`echo "SI_BUILTIN_$a" | sed -e "y:m4_cr_letters-:m4_cr_LETTERS[]_:"  -e "/^@<:@m4_cr_digits@:>@/s/^/_/"`      
+#    echo "A:: $A"
+#    AM_CONDITIONAL(m4_unquote([A]),[test -d "Singular/dyn_modules/$a"]) ## :(((
   done # for
 
   AC_DEFINE_UNQUOTED([SI_BUILTINMODULES],"$LL",[Refined list of builtin modules])

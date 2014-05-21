@@ -7,7 +7,6 @@ $(FLINT_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) $(GOOGLE_PERFTOOLS_CFLAGS)
 
 if SI_BUILTIN_SYZEXTRA
   noinst_LTLIBRARIES=syzextra.la
-##  moduledir = $(libdir)/singular
   P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION 
   P_PROCS_MODULE_LDFLAGS = -module
 else
