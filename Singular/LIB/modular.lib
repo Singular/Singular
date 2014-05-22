@@ -31,7 +31,7 @@ REFERENCES:
 
 SEE ALSO:  link, tasks_lib, parallel_lib, modstd_lib, assprimeszerodim_lib
 
-KEYWORDS:  modular.lib; Modular techniques; Parallelization;
+KEYWORDS:  modular_lib; Modular techniques; Parallelization;
            Skeletons for parallelization; Distributed computing
 
 PROCEDURES:
@@ -60,7 +60,7 @@ RETURN:   the result of @code{command} applied to @code{arguments},
           computed using modular methods.
 NOTE:     For the general algorithm and the role of the optional arguments
           primeTest, deleteUnluckyPrimes, pTest, and finalTest, see
-          @ref{modStd} and the reference given in @ref{modular.lib}. The
+          @ref{modStd} and the reference given in @ref{modular_lib}. The
           default for these arguments is that all tests succeed and that all
           primes are assumed to be lucky.
        @* The optional argument pmax is an upper bound for the prime numbers
