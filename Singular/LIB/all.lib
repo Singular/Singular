@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="version all.lib 3-1-7-0 May_2014 ";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -63,7 +63,6 @@ LIB "paraplanecurves.lib";
 LIB "phindex.lib";
 LIB "pointid.lib";
 LIB "poly.lib";
-LIB "oldpolymake.lib";
 LIB "presolve.lib";
 LIB "primdec.lib";
 LIB "primdecint.lib";
