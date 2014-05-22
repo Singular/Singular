@@ -224,6 +224,8 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
           factors.append (factor);
         else
           tmp2.append (factor);
+        if (buf.inCoeffDomain())
+          break;
         count++;
         if (normFactors.length() - 1 == count)
         {

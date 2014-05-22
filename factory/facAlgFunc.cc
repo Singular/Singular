@@ -429,7 +429,7 @@ Trager (const CanonicalForm & F, const CFList & Astar,
         const Variable & vminpoly, const CFList & as, bool isFunctionField)
 {
   bool isRat= isOn (SW_RATIONAL);
-  CFFList L, sqrfFactors, Factorlist, tmp;
+  CFFList L, normFactors, tmp;
   CFFListIterator iter, iter2;
   CanonicalForm R, Rstar, s, g, h, f= F;
   CFList substlist, backSubsts;
@@ -447,9 +447,9 @@ Trager (const CanonicalForm & F, const CFList & Astar,
 
     if (!isRat && getCharacteristic() == 0)
       On (SW_RATIONAL);
-    Factorlist= factorize (g, alpha);
+    tmp= factorize (g, alpha); // factorization over number field
 
-    for (iter= Factorlist; iter.hasItem(); iter++)
+    for (iter= tmp; iter.hasItem(); iter++)
     {
       h= iter.getItem().factor();
       if (!h.inCoeffDomain())
@@ -507,16 +507,16 @@ Trager (const CanonicalForm & F, const CFList & Astar,
     for (iter= LL; iter.hasItem(); iter++)
     {
       f= iter.getItem().factor();
-      sqrfFactors= norm (f, Rstar, *Gen, s, g, R, false);
+      (void) norm (f, Rstar, *Gen, s, g, R, false);
 
       if (hasFirstAlgVar (R, X))
-        Factorlist= factorize (R, X);
+        normFactors= factorize (R, X);
       else
-        Factorlist= factorize (R);
+        normFactors= factorize (R);
 
-      if (!Factorlist.getFirst().factor().inCoeffDomain())
-        Factorlist.insert (CFFactor (1, 1));
-      if (Factorlist.length() == 2 && Factorlist.getLast().exp() == 1)
+      if (normFactors.getFirst().factor().inCoeffDomain())
+        normFactors.removeFirst();
+      if (normFactors.length() == 1 && normFactors.getLast().exp() == 1)
       {
         f= backSubst (f, backSubsts, Astar);
         f *= bCommonDen (f);
@@ -529,10 +529,11 @@ Trager (const CanonicalForm & F, const CFList & Astar,
       else
       {
         g= f;
-        for (iter2= Factorlist; iter2.hasItem(); iter2++)
+        int count= 0;
+        for (iter2= normFactors; iter2.hasItem(); iter2++)
         {
           CanonicalForm fnew= iter2.getItem().factor();
-          if (fnew.level() < Rstar.level()) //factor is a constant from the function field
+          if (fnew.level() <= Rstar.level()) //factor is a constant from the function field
             continue;
           else
           {
@@ -546,7 +547,7 @@ Trager (const CanonicalForm & F, const CFList & Astar,
           h= Prem (h, Rstarlist);
           h /= vcontent (h, Rstar.mvar());
 
-          if (h.level() >= Rstar.level())
+          if (h.level() > Rstar.level())
           {
             g= divide (g, h, Rstarlist);
             if (degree (h) == 1 || iter2.getItem().exp() == 1)
@@ -559,6 +560,27 @@ Trager (const CanonicalForm & F, const CFList & Astar,
             }
             else
               tmp.append (CFFactor (h, iter2.getItem().exp()));
+          }
+          count++;
+          if (g.level() <= Rstar.level())
+            break;
+          if (count == normFactors.length() - 1)
+          {
+            if (normFactors.getLast().exp() == 1 && g.level() > Rstar.level())
+            {
+              g= backSubst (g, backSubsts, Astar);
+              g= Prem (g, as);
+              g *= bCommonDen (g);
+              g /= vcontent (g, as.getFirst().mvar());
+              L.append (CFFactor (g, 1));
+            }
+            else if (normFactors.getLast().exp() > 1 &&
+                     g.level() > Rstar.level())
+            {
+              g /= vcontent (g, Rstar.mvar());
+              tmp.append (CFFactor (g, normFactors.getLast().exp()));
+            }
+            break;
           }
         }
       }
