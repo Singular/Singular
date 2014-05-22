@@ -11,7 +11,7 @@ SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 	arcpoint.lib  assprimeszerodim.lib atkins.lib  brnoeth.lib \
 	cisimplicial.lib  classify.lib \
 	compregb.lib  control.lib  crypto.lib  curvepar.lib  decodegb.lib \
-	deform.lib ehv.lib elim.lib  equising.lib  finvar.lib  general.lib gmspoly.lib \
+	deform.lib elim.lib  equising.lib  finvar.lib  general.lib gmspoly.lib \
 	gmssing.lib  graphics.lib  grobcov.lib groups.lib  grwalk.lib \
 	hnoether.lib \
 	homolog.lib  hyperel.lib  integralbasis.lib inout.lib  intprog.lib\
@@ -41,7 +41,7 @@ SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 # for new libs
 
 SLIB1 = classifyci.lib classifyceq.lib divisors.lib decomp.lib ffsolve.lib\
-        findifs.lib finitediff.lib locnormal.lib \
+        ehv.lib findifs.lib finitediff.lib locnormal.lib \
         JMBTest.lib JMSConst.lib modnormal.lib modular.lib multigrading.lib\
 	numerAlg.lib numerDecom.lib\
 	orbitparam.lib parallel.lib realizationMatroids.lib resources.lib \
