@@ -58,6 +58,12 @@ char_series (K);
 
 kill r;
 
+ring r=0,(a,b,c,d,e,f,g,h,j),dp;
+ideal i= d*b-e*a, c*e-f*b, g*e-h*d, h*f-j*e;
+char_series (i);
+
+kill r;
+
 // examples from J. Kroeker
 ring r=0,(x,y,z),dp;
 ideal I = -3*y^2-3, -3*x^2+1, -x*y+2*z^2;
