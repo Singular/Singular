@@ -65,4 +65,9 @@ poly f= 8730/37*a*x^5*y^14*z^5*s^5+17460/37*a*x^8*y^11*z^5*s^5+8730/37*a*x^11*y^
 f= f*f;
 factorize (f);
 
+kill r;
+ring r=(0,a),x,dp;
+minpoly= 439239619*a^8-5632;
+factorize (169*a^2*x^2+52*a*x+8);
+
 tst_status(1); $
