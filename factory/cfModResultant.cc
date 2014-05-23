@@ -421,6 +421,14 @@ resultantZ (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
             bool prob)
 {
   ASSERT (getCharacteristic() == 0, "characteristic > 0 expected");
+#ifndef NOASSERT
+  bool isRat= isOn (SW_RATIONAL);
+  On (SW_RATIONAL);
+  ASSERT (bCommonDen (A).isOne(), "input A is rational");
+  ASSERT (bCommonDen (B).isOne(), "input B is rational");
+  if (!isRat)
+    Off (SW_RATIONAL);
+#endif
 
   int degAx= degree (A, x);
   int degBx= degree (B, x);
