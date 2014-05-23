@@ -163,7 +163,10 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
       if (shift == 0)
         f= oldF;
       else
+      {
         f= oldF (y - shift*alpha, y);
+        f *= bCommonDen (f);
+      }
       TIMING_START (fac_alg_norm);
       norm= Norm (f, alpha);
       TIMING_END_AND_PRINT (fac_alg_norm, "time to compute sqrf norm: ");
