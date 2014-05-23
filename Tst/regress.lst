@@ -1033,7 +1033,6 @@ Manual/makeUsp2.tst
 Manual/makeUsp4.tst
 Manual/Maxord.tst
 Manual/minpoly.tst
-Manual/modHenselStd.tst
 Manual/module_containment.tst
 Manual/modulo_BR_PLURAL_BR.tst
 Manual/moduloSlim.tst
@@ -1164,7 +1163,6 @@ Manual/makeQsl3.tst
 Manual/makeUso7.tst
 Manual/minAssGTZ.tst
 Manual/mindist.tst
-Manual/modS.tst
 Manual/multiplylist.tst
 Manual/nonMonomials.tst
 Manual/nt_solve.tst

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////
-version="version modular.lib 3-1-7-0 Dec_2013 ";
+version="version modular.lib 4.0.0.0 May_2014 "; // $Id$
 category="General purpose";
 info="
 LIBRARY:   modular.lib  An abstraction layer for modular techniques
@@ -14,7 +14,7 @@ chinese remaindering. It is thus possible to overcome the often problematic
 coefficient swell and to run the modular computations in parallel.
 @* In Singular, modular techniques have been quite successfully employed for
 several applications. A first implementation was done for Groebner bases in
-Singular's @ref{modstd.lib}, a pioneering work by Stefan Steidel. Since the
+Singular's @ref{modstd_lib}, a pioneering work by Stefan Steidel. Since the
 algorithm is basically the same for all applications, this library aims at
 preventing library authors from writing the same code over and over again by
 providing an appropriate abstraction layer. It also offers one-line commands
@@ -22,7 +22,7 @@ for ordinary Singular users who want to take advantage of modular techniques
 for their own calculations. Thus modular techniques can be regarded as
 a parallel skeleton of their own.
 @* The terminology (such as 'pTest' and 'finalTest') follows Singular's
-@ref{modstd.lib} and [1].
+@ref{modstd_lib} and [1].
 
 REFERENCES:
 [1] Nazeran Idrees, Gerhard Pfister, Stefan Steidel: Parallelization of
@@ -31,7 +31,7 @@ REFERENCES:
 
 SEE ALSO:  link, tasks_lib, parallel_lib, modstd_lib, assprimeszerodim_lib
 
-KEYWORDS:  modular.lib; Modular techniques; Parallelization;
+KEYWORDS:  modular_lib; Modular techniques; Parallelization;
            Skeletons for parallelization; Distributed computing
 
 PROCEDURES:
@@ -60,7 +60,7 @@ RETURN:   the result of @code{command} applied to @code{arguments},
           computed using modular methods.
 NOTE:     For the general algorithm and the role of the optional arguments
           primeTest, deleteUnluckyPrimes, pTest, and finalTest, see
-          @ref{modStd} and the reference given in @ref{modular.lib}. The
+          @ref{modStd} and the reference given in @ref{modular_lib}. The
           default for these arguments is that all tests succeed and that all
           primes are assumed to be lucky.
        @* The optional argument pmax is an upper bound for the prime numbers
@@ -125,7 +125,6 @@ EXAMPLE:  example modular; shows an example"
         }
         else {
             ncores_available = system("semaphore", "get_value", sem_cores)+1;
-            nNewPrimes = nAllPrimes div ncores_available;
             if (nAllPrimes < ncores_available) {
                 nNewPrimes = nAllPrimes;
             }
@@ -154,6 +153,7 @@ EXAMPLE:  example modular; shows an example"
         indices = deleteUnluckyPrimes(modresults);
         for (i = size(indices); i > 0; i--) {
             modresults = delete(modresults, indices[i]);
+            primes = delete(primes, indices[i]);
         }
 
         // lift result
@@ -164,6 +164,7 @@ EXAMPLE:  example modular; shows an example"
             result_lift = chinrem(list(result_lift)+modresults,
                 list(N)+primes);
         }
+        modresults = list();
         for (i = size(primes); i > 0; i--) {
             N = N*primes[i];
         }

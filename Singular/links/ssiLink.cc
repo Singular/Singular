@@ -100,6 +100,10 @@ ideal ssiReadIdeal_R(const ssiInfo *d,const ring r);
 // the helper functions:
 void ssiSetCurrRing(const ring r)
 {
+  //  if (currRing!=NULL)
+  //  Print("need to change the ring, currRing:%s, switch to: ssiRing%d\n",IDID(currRingHdl,nr);
+  //  else
+  //  Print("no ring, switch to ssiRing%d\n",nr);
   if (!rEqual(r,currRing,1))
   {
     char name[20];
@@ -1373,6 +1377,14 @@ leftv ssiRead1(si_link l)
              omFreeSize(res,sizeof(sleftv));
              res=NULL;
              break;
+  }
+  // if currRing is required for the result, but lost
+  // define "ssiRing%d" as currRing:
+  if ((d->r!=NULL)
+  && (currRing!=d->r)
+  && (res->RingDependend()))
+  {
+    ssiSetCurrRing(d->r);
   }
   return res;
 no_ring: WerrorS("no ring");

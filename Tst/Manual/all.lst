@@ -920,8 +920,6 @@ minres_BR_PLURAL_BR.tst
 mod2id.tst
 mod2str.tst
 modDec.tst
-modHenselStd.tst
-modS.tst
 modStd.tst
 mod_versal.tst
 module_containment.tst

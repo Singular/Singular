@@ -39,6 +39,9 @@ CFList
 modCharSet (const CFList& PS, StoreFactors& StoredFactors,
             bool removeContents= true);
 
+CFList
+modCharSet (const CFList& PS, bool removeContents);
+
 /// modified characteristic set, i.e. a characteristic set with certain
 /// factors removed
 CFList

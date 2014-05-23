@@ -957,6 +957,7 @@ content ( const CanonicalForm & f )
 CanonicalForm
 content ( const CanonicalForm & f, const Variable & x )
 {
+    if (f.inBaseDomain()) return f;
     ASSERT( x.level() > 0, "cannot calculate content with respect to algebraic variable" );
     Variable y = f.mvar();
 

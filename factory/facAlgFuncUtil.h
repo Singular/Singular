@@ -18,25 +18,6 @@
 #ifndef FAC_ALG_FUNC_UTIL_H
 #define FAC_ALG_FUNC_UTIL_H
 
-#include "cf_generator.h"
-
-
-// missing class: IntGenerator:
-class IntGenerator : public CFGenerator
-{
-private:
-    int current;
-public:
-    IntGenerator() : current(0) {}
-    ~IntGenerator() {}
-    bool hasItems() const;
-    void reset() { current = 0; }
-    CanonicalForm item() const;
-    void next();
-    void operator++ () { next(); }
-    void operator++ ( int ) { next(); }
-};
-
 CFFList
 append (const CFFList & Inputlist, const CFFactor & TheFactor);
 

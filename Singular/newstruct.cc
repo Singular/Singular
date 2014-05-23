@@ -509,7 +509,7 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
       return FALSE;
     }
   }
-  return blackbox_default_OpM(op,res,args);
+  return blackboxDefaultOpM(op,res,args);
 }
 
 void newstruct_destroy(blackbox */*b*/, void *d)
@@ -681,7 +681,7 @@ void newstruct_setup(const char *n, newstruct_desc d )
   b->blackbox_Assign=newstruct_Assign;
   b->blackbox_Op1=newstruct_Op1;
   b->blackbox_Op2=newstruct_Op2;
-  //b->blackbox_Op3=blackbox_default_Op3;
+  //b->blackbox_Op3=blackboxDefaultOp3;
   b->blackbox_OpM=newstruct_OpM;
   b->blackbox_CheckAssign=newstruct_CheckAssign;
   b->blackbox_serialize=newstruct_serialize;
