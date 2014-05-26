@@ -329,9 +329,8 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   
   for a in ${with_builtinmodules//,/ }; 
   do
-    AC_MSG_CHECKING([Will build-in '$a'?])
+    AC_MSG_CHECKING([whether to build-in '$a'?])
     
-    if test -d "Singular/dyn_modules/$a"; then
       L+=" add($a)"
       LL+=" $a"
       BUILTIN_LIBS+=" dyn_modules/$a/$a.la"
@@ -349,8 +348,11 @@ AC_DEFUN([SING_BUILTIN_MODULES],
        bigintm ) bi_bigintm=true ;;       
       esac
 
-    else
-      AC_MSG_RESULT(no)
+###### In case of out-of tree building: the build dir is empty in configure time!!!
+    if test ! -d "Singular/dyn_modules/$a"; then
+        AC_MSG_WARN([The directory 'Singular/dyn_modules/$a' is missing :(])
+##    else
+##      AC_MSG_RESULT(no)
     fi
     
 #    A=`echo "SI_BUILTIN_$a" | sed -e "y:m4_cr_letters-:m4_cr_LETTERS[]_:"  -e "/^@<:@m4_cr_digits@:>@/s/^/_/"`      
