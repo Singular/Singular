@@ -832,20 +832,40 @@ SteelTrager (const CanonicalForm & f, const CFList & AS)
   CFFList result;
   CFList transform;
 
+  bool found;
   for (iter= tmp; iter.hasItem(); iter++)
   {
+    found= false;
     transform= transBack;
     CanonicalForm factor= iter.getItem().factor();
     factor= M (factor);
     transform.append (factor);
     transform= modCharSet (transform, false);
+
+retry:
+    if (transform.isEmpty())
+    {
+      transform= transBack;
+      transform.append (factor);
+      transform= charSetViaCharSetN (transform);
+    }
     for (i= transform; i.hasItem(); i++)
     {
       if (degree (i.getItem(), f.mvar()) > 0)
       {
+        if (i.getItem().level() > f.level())
+          break;
+        found= true;
         factor= i.getItem();
         break;
       }
+    }
+
+    if (!found)
+    {
+      found= false;
+      transform= CFList();
+      goto retry;
     }
 
     factor /= content (factor);
