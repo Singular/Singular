@@ -88,7 +88,8 @@ while test $# -gt 0; do
 	;;
 
     --cflags)
-	${ECHOn} " -I${includedir} -I${includedir}/singular @SINGULAR_CFLAGS@ @FACTORY_INCLUDES@ @FLINT_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@ "
+    #### @FACTORY_INCLUDES@ 
+	${ECHOn} " -I${includedir} -I${includedir}/singular @SINGULAR_CFLAGS@ @FLINT_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@ "
 	;;
 
     --libs)
