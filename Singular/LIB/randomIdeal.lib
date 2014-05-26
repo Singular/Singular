@@ -15,6 +15,7 @@ PROCEDURES:
    defaultIdealGenerator()            create a random ideal generator with default settings
    defaultIdealGeneratorParams()      get  default settings for ideal generator construction
    idealGeneratorFromParams(params)   create a random ideal generator with custom settings
+   polyGeneratorFromParams(params)    create a random polynomial generator with custom settings
    randomVariable()                   get random ring parameter or varible
    createRandomCoeffGenerator(..)     create a generator for random coefficients
    createRandomMonomialGenerator(..)  create a generator for random monomials
@@ -539,6 +540,34 @@ example
     //  generate a random ideal with at most one generator:
     idealG();
 }
+
+proc polyGeneratorFromParams(TIdealGeneratingParameters params)
+"USAGE:   polyGeneratorFromParams( params );
+@*        params   : TIdealGeneratingParameters , construction parameters
+RETURN:   a random poly generating function 
+"
+{
+       proc coeffG    = createRandomCoeffGenerator   ( params.absMaxCoeff );
+       proc monomialG = createRandomMonomialGenerator( params.maxMonomialDegree );
+       proc termG     = createRandomTermGenerator    ( coeffG, monomialG );
+       proc polyG     = createRandomPolyGenerator    ( termG, params.maxTermsPerGen );
+      return (polyG);
+}
+example
+{
+    init_randomIdeal();
+    ring rng = integer,(x,y),dp;
+          
+    TIdealGeneratingParameters genParams= defaultIdealGeneratorParams();
+    // adjust random ideal generator params:
+    proc polyG = polyGeneratorFromParams( genParams  );
+
+    //  generate a random poly:
+    polyG();
+}
+ 
+
+
 
 proc defaultIdealGenerator( )
 "USAGE:   defaultIdealGenerator(   );
