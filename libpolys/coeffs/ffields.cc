@@ -5,14 +5,15 @@
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 
 #include <omalloc/omalloc.h>
 
 #include <misc/auxiliary.h>
 #include <misc/mylimits.h>
+#include <misc/sirandom.h>
 
 #include <reporter/reporter.h>
 
@@ -850,7 +851,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   //r->cfExtGcd = NULL; // only for ring stuff
   // r->cfDivBy = NULL; // only for ring stuff
   #endif
-  r->cfNeg   = nfNeg;
+  r->cfInpNeg   = nfNeg;
   r->cfInvers= nfInvers;
   //r->cfCopy  = ndCopy;
   //r->cfRePart = ndCopy;

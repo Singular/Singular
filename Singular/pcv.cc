@@ -5,9 +5,9 @@
 * ABSTRACT: conversion between polys and coef vectors
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 
 #ifdef HAVE_PCV
@@ -20,7 +20,6 @@
 #include <kernel/ideals.h>
 #include <Singular/lists.h>
 #include <polys/matpol.h>
-#include <kernel/febase.h>
 #include <Singular/pcv.h>
 
 static int pcvMaxDegree;

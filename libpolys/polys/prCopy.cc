@@ -5,9 +5,9 @@
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+#include <misc/auxiliary.h>
+
 #include <omalloc/omalloc.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>

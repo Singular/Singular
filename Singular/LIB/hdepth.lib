@@ -1,0 +1,195 @@
+//////////////////////////////////////////////////////////////////////////////
+version="version hdepth.lib 4.0.0.0 Jun_2013"; // 
+category="Commutative Algebra";
+info="
+LIBRARY: hdepth.lib     Procedures for computing hdepth_1
+AUTHORS: Popescu, A.,     popescu@mathematik.uni-kl.de
+
+SEE ALSO: 'An algorithm to compute the Hilbert depth', Adrian Popescu, arxiv/AC/1307.6084
+
+KEYWORDS: hdepth, library
+
+
+PROCEDURES:
+  hdepth(M [,debug]);        hdepth_1 computation of a module M (wrt Z-grading)
+  hdepth_p(g, d, debug) the minimum number t <= d s.t. 1/g^t is positive 
+";
+
+///////////////////////////////////////////////////////////////////////////////////
+static proc myinverse(poly p, int bound)
+"USAGE:   myinverse(p,bound), p polynomial in one variable with p(0) nonzero, bound a nonnegative integer
+RETURN:  poly, the inverse of the poly p in the power series ring till order bound
+"
+{
+    if(bound<=1)
+        {
+            ERROR("My inverse : negative bound in the inverse");
+        } 
+    if(p == 0)
+	    {
+	        ERROR("My inverse : p is 0");
+	    }
+	poly original;
+    original = p;
+    if(leadcoef(p) == 0)
+        {
+            ERROR("My inverse : the power series is not a unit.");  
+        }
+    poly q = 1/p[1];
+    poly res = q;
+    p = q * (p[1] - jet(p,bound));
+    poly s = p;
+    while(p != 0)
+    {
+        res = res + q * p;
+        p = jet(p*s,bound);
+    }
+    //TEST
+    if(jet(original*res,bound) != poly(1))
+        {
+            ERROR("Myinverse does not work properly.");
+        }
+    return(res);
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+static proc hilbconstruct(intvec v)
+"USAGE:   hilbconstruct(v), v is the result of hilb(M,2)
+RETURN:  poly, the Hilbert Series of M
+AASUME: the ring when called is R = 0,t,ds;
+"
+{
+    poly f;
+	int i;
+	for(i=0;i<size(v)-1;i++)
+	{
+		f=f+v[i+1]*t^i;
+	}
+	return(f);
+}
+///////////////////////////////////////////////////////////////////////////////////
+static proc positiv(poly f)
+"USAGE:   positiv(f), f is a polynomial
+RETURN:  int, 1 if all the coefficients of f are positive, 0 else
+"
+{
+    int pos=1;
+	while( (f!=0) && (pos==1) )
+	{
+		if(leadcoef(f)<0)
+		{
+			pos=0;
+		}
+		f=f-lead(f);
+	}
+	return(pos);
+}
+///////////////////////////////////////////////////////////////////////////////////
+static proc sumcoef(poly f)
+"USAGE:   sumcoef(f), f is a polynomial
+RETURN:  number, the sum of the coefficients
+"
+{
+    number c;
+	while(f!=0)
+	    {
+    		c = c+leadcoef(f);  
+	    	f=f-lead(f);
+    	}
+	return(int(c));
+}
+///////////////////////////////////////////////////////////////////////////////////
+proc hdepth_p(poly g, int d, int debug)
+"USAGE:   hdepth_p(g,d,debug), g is the Hilbert Series of a module M and d is the dimension of M, for debug = 0 the steps will be printed.
+RETURN:  int, the minimum number t <= d s.t. 1/g^t is positive
+"
+{
+    int dd = d;
+	if(debug == 0)
+	    {"G(t)=",g;}
+	if(positiv(g)==1)
+		{
+		    if(debug == 0)
+		        {return("hdepth =",dd);}
+		    else
+		        {return(dd);}
+		}
+	poly f=g;
+	number ag;
+	int c1;
+	int bound;
+	bound = deg(g);
+	while(dd >= 0)
+	{
+	   dd = dd-1;
+	   f = jet( g*myinverse( (1-t)^(d-dd),2*bound ) , bound );
+       if(positiv(f) == 1)
+       {
+		    if(debug == 0)
+		        {
+		            "G(t)/(1-t)^",d-dd,"=",f,"+...";
+    		        return("hdepth =",dd);
+		        }
+		    else
+            	{return(d);}
+       }
+    c1=sumcoef(f);
+	if(c1<0)
+       {
+      		while(c1<0)
+                {
+                    bound=bound+1;
+                    f=jet( g*myinverse( (1-t)^(d-dd),2*bound ) , bound );
+                    c1=sumcoef(f);
+                }
+        }
+        if(debug == 0)
+            {"G(t)/(1-t)^",d-dd,"=",f,"+...";}
+    }
+    ERROR("g was not a Hilbert Series since the coefficient sum is not > 0");
+}
+
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = 0,t,ds;
+  poly f = 2-3t-2t2+2t3+4t4;
+  hdepth_p(f,5,0);
+  hdepth_p(f,5,1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc hdepth(module M, list #)
+"USAGE:   hdepth(M [,debug]);   M is a module, if one want to print the steps debug = 0
+RETURN:  int
+PURPOSE: compute the hdepth_1 of a module M
+EXAMPLE: example hdepth; shows examples
+"
+{   
+    int debug;
+    if(size(#)>0)
+        {
+            if(typeof(#[1])=="int")
+                {debug = #[1];}
+        }
+    else 
+        {debug = 1;}
+    M = std(M);
+    int d=nvars(basering)-dim(M);
+    intvec v=hilb(M,2);
+    ring R = 0,t,ds;
+    poly hp=hilbconstruct(v);
+    if(debug == 0)
+        {"dim =",d;}
+    return(hdepth_p(hp,d,debug));
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = 0,(x(1..10)),dp;
+  ideal i=maxideal(1);
+  module M=i;
+  hdepth(M);
+  hdepth(M,0);
+  hdepth(M,1);
+}

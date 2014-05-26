@@ -6,7 +6,7 @@
  *******************************************************************/
 #include <mylimits.h>
 #include <string.h>
-#include <omalloc/omConfig.h>
+#include "omConfig.h"
 #include <omalloc/omDerivedConfig.h>
 
 #ifdef OM_HAVE_TRACK

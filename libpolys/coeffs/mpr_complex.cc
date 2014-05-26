@@ -10,9 +10,9 @@
 
 // WARNING! ALWAYS use omAlloc and FreeL when alloc. memory for some char* !!
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+#include <misc/auxiliary.h>
+
 //#ifdef HAVE_MPR
 #include <coeffs/coeffs.h>
 #include <reporter/reporter.h>
@@ -69,11 +69,6 @@ void setGMPFloatDigits( size_t digits, size_t rest )
   mpf_set_prec(*gmpRel->_mpfp(),32);
   mpf_set_d(*gmpRel->_mpfp(),0.1);
   mpf_pow_ui(*gmpRel->_mpfp(),*gmpRel->_mpfp(),digits);
-}
-
-size_t getGMPFloatDigits()
-{
-  return gmp_output_digits;
 }
 
 #if 1

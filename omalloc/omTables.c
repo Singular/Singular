@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include <omalloc/omConfig.h>
+#include "omConfig.h"
 #include <omalloc/omDerivedConfig.h>
 #include <omalloc/omStructs.h>
 #include <omalloc/omAllocPrivate.h>

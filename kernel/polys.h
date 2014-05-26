@@ -14,7 +14,6 @@ extern ring currRing;
 void rChangeCurrRing(ring r);
 
 #include <coeffs/numbers.h>
-inline number nGcd(number a, number b, const ring r = currRing) { return n_Gcd(a, b, r->cf); }
 
 /***************************************************************
  *
@@ -223,8 +222,6 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
  ***************************************************************/
 
 typedef poly*   polyset;
-// // // extern poly     ppNoether; // use currRing -> ppNoether!!!
-extern BOOLEAN  pVectorOut;
 
 /*-------------predicate on polys ----------------------*/
 #define  pHasNotCF(p1,p2)   p_HasNotCF(p1,p2,currRing)
@@ -360,6 +357,11 @@ inline void pNorm(poly p, const ring R = currRing){ p_Norm(p, R); }
 ///          * LE(p, j)  != LE(lcm, j)
 ///          * LE(p2, j) != LE(lcm, j)   ==> LCM(p2, p) != lcm
 BOOLEAN pCompareChain (poly p, poly p1, poly p2, poly lcm, const ring R = currRing);
+
+#ifdef HAVE_RATGRING
+BOOLEAN pCompareChainPart (poly p, poly p1, poly p2, poly lcm, const ring R = currRing);
+#endif
+
 
 #define  pEqualPolys(p1,p2) p_EqualPolys(p1,p2,currRing)
 

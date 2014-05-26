@@ -124,7 +124,6 @@ public:
     friend class InternalRational;
     friend void gmp_numerator ( const CanonicalForm & f, mpz_ptr result);
     friend void gmp_denominator ( const CanonicalForm & f, mpz_ptr result );
-    friend mpz_ptr getmpi ( InternalCF * value, bool symmetric );
     friend void getmpi ( InternalCF * value, mpz_t mpi);
 };
 

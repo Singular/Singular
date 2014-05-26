@@ -12,20 +12,20 @@
 #include <stdlib.h>
 #include <time.h>
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
 #include <misc/mylimits.h>
 
-#include <kernel/febase.h>
+#include <resources/feResource.h>
 #include <reporter/reporter.h>
 
 #include <resources/omFindExec.h>
 
-#include <Singular/si_signals.h>
+#include <reporter/si_signals.h>
 
 #include "ipid.h"
 #include "ipshell.h"

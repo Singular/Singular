@@ -1,8 +1,8 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-#ifdef HAVE_CONFIG_H
+
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
+
 
 #include "cf_assert.h"
 
@@ -11,6 +11,26 @@
 #include "imm.h"
 #include "gfops.h"
 #include "ffops.h"
+
+bool IntGenerator::hasItems() const
+{
+    return 1;
+}
+
+CanonicalForm IntGenerator::item() const
+{
+  return mapinto (CanonicalForm (current));
+}
+
+void IntGenerator::next()
+{
+    current++;
+}
+
+CFGenerator * IntGenerator::clone () const
+{
+    return new IntGenerator();
+}
 
 bool FFGenerator::hasItems() const
 {
@@ -200,8 +220,9 @@ CFGenerator * AlgExtGenerator::clone () const
 
 CFGenerator * CFGenFactory::generate()
 {
-    ASSERT( getCharacteristic() > 0, "not a finite field" );
-    if ( getGFDegree() > 1 )
+    if (getCharacteristic() == 0)
+        return new IntGenerator();
+    else if ( getGFDegree() > 1 )
         return new GFGenerator();
     else
         return new FFGenerator();

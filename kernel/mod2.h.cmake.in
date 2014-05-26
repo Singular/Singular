@@ -345,7 +345,7 @@
        including mod2.h, provided ! PDEBUG is defined in mod2.h E.g.:
 
        #define PDEBUG 2
-       #include <kernel/mod2.h>
+
        ...
 
        makes sure that all poly operations in your file are done with 
@@ -390,7 +390,7 @@
      #define OM_CHECK 3
      #define OM_TRACK 5
      #define OM_KEEP  1
-     #include <kernel/mod2.h>
+
      #include <omalloc/omalloc.h>
    ensures that all memory allocs/free in this file are done with 
    OM_CHECK==3 and OM_TRACK==5, and that all addresses allocated/freed 
@@ -418,7 +418,7 @@
        #define OM_CHECK 3
        #define OM_TRACK 5
        #define OM_KEEP  1
-       #include <kernel/mod2.h>
+
        #include <omalloc/omalloc.h>
      Under dynamic scope, do (e.g., from within the debugger):
        om_Opts.MinCheck = 3; om_Opts.MinTrack = 5; omOpts.Keep = LONG_MAX;
@@ -986,7 +986,7 @@ int hpux9_system(const char* system);
        including mod2.h, provided ! PDEBUG is defined in mod2.h E.g.:
 
        #define PDEBUG 2
-       #include <kernel/mod2.h>
+
        ...
 
        makes sure that all poly operations in your file are done with 
@@ -1031,7 +1031,7 @@ int hpux9_system(const char* system);
      #define OM_CHECK 3
      #define OM_TRACK 5
      #define OM_KEEP  1
-     #include <kernel/mod2.h>
+
      #include <omalloc/omalloc.h>
    ensures that all memory allocs/free in this file are done with 
    OM_CHECK==3 and OM_TRACK==5, and that all addresses allocated/freed 

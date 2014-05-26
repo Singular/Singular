@@ -8,21 +8,16 @@
 
 //#define FACTORIZE2_DEBUG
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
 
-#include <misc/auxiliary.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
+
+
+
 
 #include <misc/auxiliary.h>
 #include "clapsing.h"
 
 #include <factory/factory.h>
-
-#    include <factory/libfac/libfac.h>
-
 
 #include <omalloc/omalloc.h>
 #include <coeffs/numbers.h>
@@ -1424,7 +1419,7 @@ matrix singclap_irrCharSeries ( ideal I, const ring r)
   ListIterator<CFList> LLi;
   loop
   {
-    LL=IrrCharSeries(L);
+    LL=irrCharSeries(L);
     m= LL.length(); // Anzahl Zeilen
     n=0;
     for ( LLi = LL; LLi.hasItem(); LLi++ )
@@ -1465,7 +1460,6 @@ char* singclap_neworder ( ideal I, const ring r)
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
   CFList L;
-  poly p;
   if (rField_is_Q(r) || rField_is_Zp(r))
   {
     setCharacteristic( rChar(r) );
@@ -1550,20 +1544,6 @@ char* singclap_neworder ( ideal I, const ring r)
   char * s=StringEndS();
   if (s[strlen(s)-1]==',') s[strlen(s)-1]='\0';
   return s;
-}
-
-BOOLEAN singclap_isSqrFree(poly f, const ring r)
-{
-  BOOLEAN b=FALSE;
-  CanonicalForm F( convSingPFactoryP( f,r ) );
-  if((r->cf->type==n_Zp)&&(!F.isUnivariate()))
-      goto err;
-  b=(BOOLEAN)isSqrFree(F);
-  Off(SW_RATIONAL);
-  return b;
-err:
-  WerrorS( feNotImplemented );
-  return 0;
 }
 
 poly singclap_det( const matrix m, const ring s )

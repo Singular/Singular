@@ -5,15 +5,14 @@
 * ABSTRACT: Implementation of option buisness
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 
 #include <string.h>
 #include <stdlib.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 
 #define FE_OPT_STRUCTURE
@@ -21,6 +20,7 @@
 
 #if !defined(GENERATE_OPTION_INDEX) && !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <misc/options.h>
+#include <misc/sirandom.h>
 #endif
 
 #include "fehelp.h"
@@ -138,8 +138,9 @@ feOptIndex feGetOptIndex(int optc)
 //         "error-string" on error
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <kernel/timer.h>
+#include <resources/feResource.h>
+#include <kernel/oswrapper/feread.h>
+#include <kernel/oswrapper/timer.h>
 
 #include "ipshell.h"
 #include "tok.h"

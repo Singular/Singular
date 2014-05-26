@@ -7,9 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef HAVE_CONFIG_H
 #include "omConfig.h"
-#endif
 
 #ifndef OM_NDEBUG
 

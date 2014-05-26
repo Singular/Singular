@@ -5,15 +5,6 @@
 * ABSTRACT: handling of leftv
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <unistd.h>
-
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
@@ -31,14 +22,13 @@
 #include <polys/monomials/ring.h>
 #include <kernel/polys.h>
 
-#include <libpolys/coeffs/longrat.h>
+#include <coeffs/longrat.h>
 // #include <coeffs/longrat.h>
 
-#include <kernel/febase.h>
 #include <kernel/ideals.h>
-#include <kernel/kstd1.h>
-#include <kernel/timer.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/oswrapper/timer.h>
+#include <kernel/GBEngine/syz.h>
 
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
@@ -50,7 +40,11 @@
 #include <Singular/subexpr.h>
 #include <Singular/blackbox.h>
 
-
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <unistd.h>
 
 omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
 omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));
@@ -144,7 +138,7 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case MODUL_CMD:
         case IDEAL_CMD:
-          if ((TEST_V_QRING)  &&(currQuotient!=NULL)
+          if ((TEST_V_QRING)  &&(currRing->qideal!=NULL)
           &&(!hasFlag(this,FLAG_QRING)))
           {
             jjNormalizeQRingId(this);
@@ -156,7 +150,7 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case POLY_CMD:
         case VECTOR_CMD:
-          if ((TEST_V_QRING)  &&(currQuotient!=NULL)
+          if ((TEST_V_QRING)  &&(currRing->qideal!=NULL)
           &&(!hasFlag(this,FLAG_QRING)))
           {
             jjNormalizeQRingP(this);
@@ -535,7 +529,7 @@ void s_internalDelete(const int t,  void *d, const ring r)
       if ((R!=currRing)||(R->ref>=0))
         rKill(R);
       #ifdef TEST
-      else	
+      else
         Print("currRing? ref=%d\n",R->ref);
       #endif
       break;
@@ -953,8 +947,10 @@ int  sleftv::Typ()
       case VSHORTOUT:
         return INT_CMD;
       case VMINPOLY:
+        data=NULL;
         return NUMBER_CMD;
       case VNOETHER:
+        data=NULL;
         return POLY_CMD;
       //case COMMAND:
       //  return COMMAND;
@@ -1014,7 +1010,7 @@ int  sleftv::Typ()
         else
         {
           //Warn("out of range: %d not in 1..%d",e->start,l->nr+1);
-          r=NONE;
+          r=DEF_CMD;
         }
       }
       else
@@ -1131,7 +1127,7 @@ void * sleftv::Data()
       if ((index<1)||(index>iv->length()))
       {
         if (!errorreported)
-          Werror("wrong range[%d] in intvec(%d)",index,iv->length());
+          Werror("wrong range[%d] in intvec %s(%d)",index,this->Name(),iv->length());
       }
       else
         r=(char *)(long)((*iv)[index-1]);
@@ -1146,8 +1142,8 @@ void * sleftv::Data()
          ||(e->next->start>iv->cols()))
       {
         if (!errorreported)
-        Werror("wrong range[%d,%d] in intmat(%dx%d)",index,e->next->start,
-                                                     iv->rows(),iv->cols());
+        Werror("wrong range[%d,%d] in intmat %s(%dx%d)",index,e->next->start,
+                                           this->Name(),iv->rows(),iv->cols());
       }
       else
         r=(char *)(long)(IMATELEM((*iv),index,e->next->start));
@@ -1162,8 +1158,8 @@ void * sleftv::Data()
          ||(e->next->start>m->cols()))
       {
         if (!errorreported)
-        Werror("wrong range[%d,%d] in bigintmat(%dx%d)",index,e->next->start,
-                                                     m->rows(),m->cols());
+        Werror("wrong range[%d,%d] in bigintmat %s(%dx%d)",index,e->next->start,
+                                                     this->Name(),m->rows(),m->cols());
       }
       else
         r=(char *)(BIMATELEM((*m),index,e->next->start));
@@ -1177,7 +1173,7 @@ void * sleftv::Data()
       if ((index<1)||(index>IDELEMS(I)))
       {
         if (!errorreported)
-          Werror("wrong range[%d] in ideal/module(%d)",index,IDELEMS(I));
+          Werror("wrong range[%d] in ideal/module %s(%d)",index,this->Name(),IDELEMS(I));
       }
       else
         r=(char *)I->m[index-1];
@@ -1233,8 +1229,9 @@ void * sleftv::Data()
          ||(e->next->start>MATCOLS((matrix)d)))
       {
         if (!errorreported)
-          Werror("wrong range[%d,%d] in intmat(%dx%d)",
+          Werror("wrong range[%d,%d] in matrix %s(%dx%d)",
                   index,e->next->start,
+		  this->Name(),
                   MATROWS((matrix)d),MATCOLS((matrix)d));
       }
       else
@@ -1280,10 +1277,10 @@ void * sleftv::Data()
           }
         }
         else //if (!errorreported)
-          Werror("wrong range[%d] in list(%d)",index,l->nr+1);
+          Werror("wrong range[%d] in list %s(%d)",index,this->Name(),l->nr+1);
       }
       else
-        Werror("cannot index type %s(%d)",Tok2Cmdname(t),t);
+        Werror("cannot index %s of type %s(%d)",this->Name(),Tok2Cmdname(t),t);
       break;
     }
   }
@@ -1294,7 +1291,9 @@ attr * sleftv::Attribute()
 {
   if (e==NULL) return &attribute;
   if ((rtyp==LIST_CMD)
-  ||((rtyp==IDHDL)&&(IDTYP((idhdl)data)==LIST_CMD)))
+  ||((rtyp==IDHDL)&&(IDTYP((idhdl)data)==LIST_CMD))
+  || (rtyp>MAX_TOK)
+  || ((rtyp==IDHDL)&&(IDTYP((idhdl)data)>MAX_TOK)))
   {
     leftv v=LData();
     return &(v->attribute);
@@ -1307,11 +1306,18 @@ leftv sleftv::LData()
   if (e!=NULL)
   {
     lists l=NULL;
+    blackbox *b=getBlackboxStuff(rtyp);
 
-    if (rtyp==LIST_CMD)
+    if ((rtyp==LIST_CMD)
+    || ((b!=NULL)&&(BB_LIKE_LIST(b))))
       l=(lists)data;
     else if ((rtyp==IDHDL)&& (IDTYP((idhdl)data)==LIST_CMD))
       l=IDLIST((idhdl)data);
+    else if ((rtyp==IDHDL)&& (IDTYP((idhdl)data)>MAX_TOK))
+    {
+      b=getBlackboxStuff(IDTYP((idhdl)data));
+      if (BB_LIKE_LIST(b)) l=IDLIST((idhdl)data);
+    }
     else if (rtyp==ALIAS_CMD)
     {
       idhdl h=(idhdl)data;
@@ -1586,7 +1592,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
         && ((r_IsRingVar(id, currRing->names,currRing->N)>=0)
           || ((n_NumberOfParameters(currRing->cf)>0)
              &&(r_IsRingVar(id, (char**)n_ParameterNames(currRing->cf),
-	                        n_NumberOfParameters(currRing->cf))>=0))))
+                                n_NumberOfParameters(currRing->cf))>=0))))
         {
         // WARNING: do not use ring variable names in procedures
           Warn("use of variable >>%s<< in a procedure in line %s",id,my_yylinebuf);
@@ -1599,8 +1605,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     {
       if (strcmp(id,IDID(currRingHdl))==0)
       {
-        if (IDID(currRingHdl)!=id) omFreeBinAddr((ADDRESS)id); /*assume strlen
-(id) <1000 */
+        if (IDID(currRingHdl)!=id) omFreeBinAddr((ADDRESS)id); /*assume strlen (id) <1000 */
         h=currRingHdl;
         goto id_found;
       }
@@ -1744,16 +1749,23 @@ int sleftv::Eval()
         {
           if (d->argc>=1) nok=d->arg1.Eval();
           if ((!nok) && (d->argc>=2))
-          { nok=d->arg2.Eval(); d->arg1.next=&d->arg2; }
+          {
+            nok=d->arg2.Eval();
+            d->arg1.next=(leftv)omAllocBin(sleftv_bin);
+            memcpy(d->arg1.next,&d->arg2,sizeof(sleftv));
+            d->arg2.Init();
+          }
           if ((!nok) && (d->argc==3))
-          { nok=d->arg3.Eval(); d->arg2.next=&d->arg3; }
+          {
+            nok=d->arg3.Eval();
+            d->arg1.next->next=(leftv)omAllocBin(sleftv_bin);
+            memcpy(d->arg1.next->next,&d->arg3,sizeof(sleftv));
+            d->arg3.Init();
+          }
           if (d->argc==0)
             nok=nok||iiExprArithM(this,NULL,d->op);
           else
             nok=nok||iiExprArithM(this,&d->arg1,d->op);
-          d->arg1.next=NULL;
-          d->arg2.next=NULL;
-          d->arg3.next=NULL;
         }
         else
         {

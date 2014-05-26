@@ -5,9 +5,9 @@
 * ABSTRACT: numbers modulo p (<=32003)
 */
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <misc/auxiliary.h>
 
 #include <factory/factory.h>
@@ -20,6 +20,7 @@
 #include <coeffs/longrat.h>
 #include <coeffs/mpr_complex.h>
 #include <misc/mylimits.h>
+#include <misc/sirandom.h>
 #include <coeffs/modulop.h>
 
 // int npGen=0;
@@ -342,7 +343,7 @@ static const char* npEati(const char *s, int *i, const coeffs r)
       if (ii >= (MAX_INT_VAL / 10)) ii = ii % r->ch;
     }
     while (((*s) >= '0') && ((*s) <= '9'));
-    if (ii >= r->ch) ii = ii % r->ch;
+    if (ii >= (unsigned long)r->ch) ii = ii % r->ch;
     *i=(int)ii;
   }
   else (*i) = 1;
@@ -431,6 +432,19 @@ static char* npCoeffString(const coeffs r)
   return s;
 }
 
+static void npWriteFd(number n, FILE* f, const coeffs r)
+{
+  fprintf(f,"%d ",(int)(long)n);
+}
+
+static number npReadFd(s_buff f, const coeffs r)
+{
+  // read int
+  int dd;
+  dd=s_readint(f);
+  return (number)(long)dd;
+}
+
 BOOLEAN npInitChar(coeffs r, void* p)
 {
   assume( getCoeffType(r) == ID );
@@ -452,9 +466,6 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfSub   = npSub;
   r->cfAdd   = npAdd;
   r->cfDiv   = npDiv;
-  r->cfIntDiv= npDiv;
-  //r->cfIntMod= ndIntMod;
-  r->cfExactDiv= npDiv;
   r->cfInit = npInit;
   //r->cfSize  = ndSize;
   r->cfInt  = npInt;
@@ -465,7 +476,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   //r->cfExtGcd = NULL; // only for ring stuff
   // r->cfDivBy = NULL; // only for ring stuff
   #endif
-  r->cfNeg   = npNeg;
+  r->cfInpNeg   = npNeg;
   r->cfInvers= npInvers;
   //r->cfCopy  = ndCopy;
   //r->cfRePart = ndCopy;
@@ -508,6 +519,10 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->convSingNFactoryN=npConvSingNFactoryN;
   r->convFactoryNSingN=npConvFactoryNSingN;
 
+  // io via ssi
+  r->cfWriteFd=npWriteFd;
+  r->cfReadFd=npReadFd;
+
   // the variables:
   r->nNULL = (number)0;
   r->type = n_Zp;
@@ -536,8 +551,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
         loop
         {
           i++;
-          r->npExpTable[i] =(int)(((long)w * (long)r->npExpTable[i-1])
-                               % r->ch);
+          r->npExpTable[i] =(int)(((long)w * (long)r->npExpTable[i-1]) % r->ch);
           r->npLogTable[r->npExpTable[i]] = i;
           if /*(i == r->ch - 1 ) ||*/ (/*(*/ r->npExpTable[i] == 1 /*)*/)
             break;

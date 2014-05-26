@@ -560,15 +560,16 @@ char *yytext;
 #include <stdlib.h>
 #include <ctype.h>
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 #include <Singular/tok.h>
 #include <Singular/stype.h>
 #include <Singular/ipshell.h>
-#include <kernel/febase.h>
+#include <Singular/fevoices.h>
+#include <kernel/oswrapper/feread.h>
 
 int feReadLine(char* b, int l);
 #define ALLOC(a) omAlloc((a))

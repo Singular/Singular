@@ -26,6 +26,7 @@ resultantFp (const CanonicalForm& A,///<[in] some poly
              bool prob= true        ///<[in] if true use probabilistic algorithm
             );
 
+/*BEGINPUBLIC*/
 /// modular resultant algorihtm over Z
 ///
 /// @return @a resultantZ returns the resultant of A and B wrt. x
@@ -35,6 +36,7 @@ resultantZ (const CanonicalForm& A, ///<[in] some poly
             const Variable& x,      ///<[in] some polynomial variable
             bool prob= true         ///<[in] if true use probabilistic algorithm
            );
+/*ENDPUBLIC*/
 
 #endif
 

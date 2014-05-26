@@ -17,7 +17,7 @@ under the terms of the GNU General Public License as published by the
 Free Software Foundation ( version 2 or version 3 of the License ).
 
 Some single files have a copyright given within the file:
-Singular/ndbm.* (BSD), kernel/htmlhelp.h (LGPL 2.1+)
+Singular/ndbm.* (BSD), Singular/htmlhelp.h (LGPL 2.1+)
 
 The following software used with SINGULAR have their own copyright: the
 omalloc library, the readline library, the Gnu Multiple Precision

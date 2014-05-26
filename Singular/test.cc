@@ -1,6 +1,6 @@
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 
 #include <kernel/mod2.h>
 
@@ -53,10 +53,6 @@
 #include <polys/clapsing.h>
 
 
-// int initializeGMP(){ return 1; } // NEEDED FOR MAIN APP. LINKING!!!
-int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
-
-
 #include <coeffs/numbers.h>
 #include <kernel/polys.h>
 
@@ -65,113 +61,110 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 
 
 // HEADERS:
-#include <kernel/hutil.h>
-//#include "idrec.h" // moved to Singular
-#include <kernel/stairc.h>
+#include <kernel/combinatorics/hutil.h>
+#include <kernel/GBEngine/stairc.h>
 #include <kernel/ideals.h>
-#include <kernel/syz.h>
-#include <kernel/fast_maps.h>
-#include <kernel/febase.h>
-#include <kernel/walkProc.h>
-#include <kernel/walkMain.h>
-#include <kernel/walkSupport.h>
-#include <kernel/khstd.h>
+#include <kernel/GBEngine/syz.h>
+#include <kernel/maps/fast_maps.h>
+#include <Singular/fevoices.h>
+#include <kernel/groebner_walk/walkProc.h>
+#include <kernel/groebner_walk/walkMain.h>
+#include <kernel/groebner_walk/walkSupport.h>
+#include <kernel/GBEngine/khstd.h>
 /// #include <kernel/sparsmat.h> // TODO: install polys/this!
 //+
 
-#include <kernel/fglm.h>
-#include <kernel/kstd1.h>
-#include <kernel/fglmgauss.h>
-#include <kernel/fglmvec.h>
-#include <kernel/kstdfac.h>
-#include <kernel/kmatrix.h>
-#include <kernel/GMPrat.h>
-#include <kernel/multicnt.h>
-#include <kernel/npolygon.h>
-#include <kernel/semic.h>
-#include <kernel/spectrum.h>
-#include <kernel/splist.h>
-#include <kernel/multicnt.h>
-#include <kernel/eigenval.h>
-#include <kernel/units.h>
-#include <kernel/ratgring.h>
-#include <kernel/shiftgb.h>
-#include "mmalloc.h"
+#include <kernel/fglm/fglm.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/fglm/fglmgauss.h>
+#include <kernel/fglm/fglmvec.h>
+#include <kernel/GBEngine/kstdfac.h>
+#include <kernel/spectrum/kmatrix.h>
+#include <kernel/spectrum/GMPrat.h>
+#include <kernel/spectrum/multicnt.h>
+#include <kernel/spectrum/npolygon.h>
+#include <kernel/spectrum/semic.h>
+#include <kernel/spectrum/spectrum.h>
+#include <kernel/spectrum/splist.h>
+#include <kernel/spectrum/multicnt.h>
+#include <kernel/linear_algebra/eigenval.h>
+#include <kernel/GBEngine/units.h>
+#include <kernel/GBEngine/ratgring.h>
+#include <kernel/GBEngine/shiftgb.h>
 
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kutil.h>
 
 // #include <kernel/dbm_sl.h> // TODO: needs si_link// already moved to Singular/!
 
 // #include "CCRing.h" // Too old!
 #include <kernel/digitech.h>
-#include <kernel/eigenval.h>
-#include <kernel/fast_maps.h>
+#include <kernel/linear_algebra/eigenval.h>
+#include <kernel/maps/fast_maps.h>
 #include <kernel/fast_mult.h>
-#include <kernel/febase.h>
+#include <kernel/oswrapper/feread.h>
 
-#include <kernel/fglmgauss.h>
-#include <kernel/fglm.h>
-#include <kernel/fglmvec.h>
+#include <kernel/fglm/fglmgauss.h>
+#include <kernel/fglm/fglm.h>
+#include <kernel/fglm/fglmvec.h>
 
 ////////#include "F5cData.h"
-#include <kernel/f5c.h>
-#include <kernel/f5data.h>
-#include <kernel/f5gb.h>
-#include <kernel/f5lists.h>
+#include <kernel/GBEngine/f5c.h>
+#include <kernel/GBEngine/f5data.h>
+#include <kernel/GBEngine/f5gb.h>
+#include <kernel/GBEngine/f5lists.h>
 ////////#include <kernel/F5cLists.h>
 
 
-#include <kernel/GMPrat.h>
+#include <kernel/spectrum/GMPrat.h>
 
 // #include "htmlhelp.h" // For Windows //
-#include <kernel/hutil.h>
+#include <kernel/combinatorics/hutil.h>
 // #include <kernel/Ideal.h> // Too old?
 
 
 #include <kernel/ideals.h>
 
-#include <kernel/kmatrix.h>
-#include <kernel/kstd1.h>
-#include <kernel/kstdfac.h>
-#include <kernel/khstd.h>
+#include <kernel/spectrum/kmatrix.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/kstdfac.h>
+#include <kernel/GBEngine/khstd.h>
 
-#include <kernel/linearAlgebra.h>
+#include <kernel/linear_algebra/linearAlgebra.h>
 
 
 
 // #include "lplist.h" // Too old!
-#include "mmalloc.h"
-#include <kernel/multicnt.h>
-#include <kernel/npolygon.h>
+#include <kernel/spectrum/multicnt.h>
+#include <kernel/spectrum/npolygon.h>
 // #include <kernel/Number.h> // Too old?
 // #include <kernel/Poly.h> // Too old?
 // #include <kernel/PowerSeries.h> // Too old?
 
 #include <kernel/preimage.h>
 
-#include <kernel/nc.h>
+#include <kernel/GBEngine/nc.h>
 
-#include <kernel/ratgring.h>
-#include <kernel/ringgb.h>
-#include <kernel/semic.h>
-#include <kernel/shiftgb.h>
+#include <kernel/GBEngine/ratgring.h>
+#include <kernel/GBEngine/ringgb.h>
+#include <kernel/spectrum/semic.h>
+#include <kernel/GBEngine/shiftgb.h>
 
-#include <kernel/spectrum.h>
-#include <kernel/splist.h>
-#include <kernel/stairc.h>
+#include <kernel/spectrum/spectrum.h>
+#include <kernel/spectrum/splist.h>
+#include <kernel/GBEngine/stairc.h>
 #include <kernel/structs.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 // #include <kernel/testpoly.h> // Too old?
 
-#include <kernel/tgbgauss.h>
-#include <kernel/tgb.h>
+#include <kernel/GBEngine/tgbgauss.h>
+#include <kernel/GBEngine/tgb.h>
 
-#include <kernel/timer.h>
+#include <kernel/oswrapper/timer.h>
 
-#include <kernel/units.h>
-#include <kernel/walkMain.h>
-#include <kernel/walkProc.h>
-#include <kernel/walkSupport.h>
+#include <kernel/GBEngine/units.h>
+#include <kernel/groebner_walk/walkMain.h>
+#include <kernel/groebner_walk/walkProc.h>
+#include <kernel/groebner_walk/walkSupport.h>
 
 
 // #include <polys/clapconv.h> // due to factory? :(
@@ -180,53 +173,45 @@ int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 // #include <kernel/IIntvec.h> // :(
 
 
-
 // headers in Singular/
-#include "attrib.h"
-#include "blackbox.h"
-#include "Cache.h"
-#include "CacheImplementation.h"
-#include "cntrlc.h"
-#include "links/dbm_sl.h"
-#include "distrib.h"
-#include "eigenval_ip.h"
-#include "gms.h"
-#include "grammar.h"
-#include "interpolation.h"
-#include "ipconv.h"
-#include "ipid.h"
-#include "ipprint.h"
-#include "ipshell.h"
-#include "janet.h"
-#include "libparse.h"
-#include "lists.h"
-#include "locals.h"
-#include "maps_ip.h"
-#include "Minor.h"
-#include "MinorInterface.h"
-#include "MinorProcessor.h"
-#include "minpoly.h"
-#include "misc_ip.h"
-#include "links/ndbm.h"
-#include "newstruct.h"
-#include "omSingularConfig.h"
-#include "pcv.h"
-#include "links/pipeLink.h"
-#include "run.h"
-#include "sdb.h"
-#include "links/silink.h"
-#include "links/sing_dbm.h"
-#include "sing_win.h"
-#include "links/slInit.h"
-#include "links/ssiLink.h"
-#include "stype.h"
-#include "subexpr.h"
-//#include "table.h" // dummy
-#include "tok.h"
-#include "utils.h"
-#include "walk.h"
+#include <Singular/mmalloc.h>
+//#include <Singular/idrec.h> // moved to Singular
+#include <Singular/attrib.h>
+#include <Singular/blackbox.h>
+#include <Singular/cntrlc.h>
+#include <Singular/links/dbm_sl.h>
+#include <Singular/distrib.h>
+#include <Singular/eigenval_ip.h>
+#include <Singular/gms.h>
+#include <Singular/grammar.h>
+#include <Singular/ipconv.h>
+#include <Singular/ipid.h>
+#include <Singular/ipprint.h>
+#include <Singular/ipshell.h>
+#include <Singular/libparse.h>
+#include <Singular/lists.h>
+#include <Singular/locals.h>
+#include <Singular/maps_ip.h>
+#include <Singular/misc_ip.h>
+#include <Singular/links/ndbm.h>
+#include <Singular/newstruct.h>
+#include <Singular/omSingularConfig.h>
+#include <Singular/pcv.h>
+#include <Singular/links/pipeLink.h>
+#include <Singular/run.h>
+#include <Singular/sdb.h>
+#include <Singular/links/silink.h>
+#include <Singular/links/sing_dbm.h>
+#include <Singular/sing_win.h>
+#include <Singular/links/slInit.h>
+#include <Singular/links/ssiLink.h>
+#include <Singular/stype.h>
+#include <Singular/subexpr.h>
+#include <Singular/tok.h>
+#include <Singular/utils.h>
+#include <Singular/walk.h>
 
-#include "fegetopt.h"
+#include <Singular/fegetopt.h>
 
 void siInit(char *);
 

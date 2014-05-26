@@ -9,13 +9,7 @@
 
 CFFList sortCFFList ( CFFList & F );
 
-CFFList sqrFreeFp ( const CanonicalForm & f );
-
-bool isSqrFreeFp ( const CanonicalForm & f );
-
 CFFList sqrFreeZ ( const CanonicalForm & f );
-
-bool isSqrFreeZ ( const CanonicalForm & f );
 
 /// squarefree part of a poly
 CanonicalForm sqrfPart (const CanonicalForm& F ///<[in] some poly

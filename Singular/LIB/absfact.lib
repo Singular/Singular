@@ -543,7 +543,9 @@ EXAMPLE: example absFactorize; shows an example
         if (size(tmpf)<2){ list abs_fac = list(var(n+1),poly(1)); }
         else { list abs_fac=tmpf[2..size(tmpf)]; }
         abs_fac=abs_fac,newvar;
-        return(string(abs_fac));
+        string result = string(abs_fac);
+        setring(MP);
+        return(result);
       }
     }
   }
@@ -813,7 +815,9 @@ EXAMPLE: example absFactorizeBCG; shows an example
           }
         }
         abs_fac=abs_fac,newvar;
-        return(string(abs_fac));
+        string result = string(abs_fac);
+        setring(MP);
+        return(result);
       }
     }
   }

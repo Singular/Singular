@@ -5,7 +5,6 @@
 #include <omalloc/omalloc.h>
 
 #include <kernel/structs.h>
-#include <kernel/febase.h>
 
 #include <Singular/lists.h>
 #include <Singular/links/silink.h>
@@ -31,6 +30,10 @@ struct  blackbox_struct
   /// interpreter assign: l:=r
   BOOLEAN (*blackbox_Assign)(leftv l, leftv r);
   /// interpreter: unary operations op(r), r(), ...
+  // convention for blackbox_Op1..blackbox_OpM:
+  //             return FALSE, if op was successfully performed
+  //             return TRUE (and an error message) for failure
+  //             return TRUE (and no error message) if not defined
   BOOLEAN (*blackbox_Op1)(int op,leftv l, leftv r);
   /// interpreter: binary operations: op(r1,r2), r1 op r2,...
   BOOLEAN (*blackbox_Op2)(int op,leftv l, leftv r1,leftv r2);
@@ -57,10 +60,10 @@ BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r);
 BOOLEAN blackboxDefaultOp2(int op,leftv l, leftv r1, leftv r2);
 
 /// default procedure blackboxDefaultOp3, to be called as "default:" branch
-BOOLEAN blackbox_default_Op3(int op,leftv l, leftv r1,leftv r2, leftv r3);
+BOOLEAN blackboxDefaultOp3(int op,leftv l, leftv r1,leftv r2, leftv r3);
 
 /// default procedure blackboxDefaultOpM, to be called as "default:" branch
-BOOLEAN blackbox_default_OpM(int op,leftv l, leftv r);
+BOOLEAN blackboxDefaultOpM(int op,leftv l, leftv r);
 
 /// default procedure blackbox_default_Print: print the string
 void blackbox_default_Print(blackbox *b,void *d);
@@ -77,8 +80,5 @@ int setBlackboxStuff(blackbox *bb,const char *name);
 
 /// list all defined type (for debugging)
 void printBlackboxTypes();
-
-/// Emit an "op not implemented" error message and return TRUE
-BOOLEAN WrongOp(const char* cmd, int op, leftv bb);
 
 #endif

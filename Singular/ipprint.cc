@@ -5,9 +5,9 @@
 * ABSTRACT: interpreter: printing
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 
@@ -15,7 +15,6 @@
 
 #include <polys/matpol.h>
 
-#include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 

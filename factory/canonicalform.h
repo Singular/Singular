@@ -56,11 +56,6 @@ inline int is_imm ( const InternalCF * const ptr )
 }
 
 
-int initCanonicalForm( void );
-#ifndef SI_DONT_HAVE_GLOBAL_VARS
-static int cf_is_initialized_now = initCanonicalForm();
-#endif
-
 //{{{ class CanonicalForm
 class CanonicalForm
 {
@@ -93,7 +88,6 @@ public:
     bool inQ() const;
     bool inFF() const;
     bool inGF() const;
-    bool inPP() const;
     bool inBaseDomain() const;
     bool inExtension() const;
     bool inCoeffDomain() const;
@@ -372,6 +366,13 @@ typedef List<CanonicalForm> CFList;
 typedef ListIterator<CanonicalForm> CFListIterator;
 typedef Array<CanonicalForm> CFArray;
 typedef Matrix<CanonicalForm> CFMatrix;
+typedef List<CFList> ListCFList;
+typedef ListIterator<CFList> ListCFListIterator ;
+typedef List<int> IntList;
+typedef ListIterator<int> IntListIterator;
+typedef List<Variable> Varlist;
+typedef ListIterator<Variable> VarlistIterator;
+typedef Array<int> Intarray;
 //}}}
 
 /*ENDPUBLIC*/

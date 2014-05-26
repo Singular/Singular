@@ -1,0 +1,6 @@
+/*! \page kernel_sample_page Sample Kernel Sub-Package
+ *
+ * Serves as an example/template for separation of further sub-packages from within kerrnel (\ref kernel_page)
+ * 
+ * <A HREF="https://github.com/Singular/Sources/wiki/Todo">TODOs</A>
+ */

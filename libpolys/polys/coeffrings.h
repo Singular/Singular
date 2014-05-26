@@ -22,7 +22,7 @@ static inline BOOLEAN n_IsOne(number n,  const ring r){ return n_IsOne(n,r->cf);
 static inline BOOLEAN n_IsMOne(number n, const ring r){ return n_IsMOne(n,r->cf); }
 static inline BOOLEAN n_GreaterZero(number n, const ring r){ return n_GreaterZero(n,r->cf); }
 static inline number n_Init(int i,       const ring r){ return n_Init(i,r->cf); }
-static inline number n_Neg(number n,     const ring r){ return n_Neg(n,r->cf); }
+static inline number n_InpNeg(number n,     const ring r){ return n_InpNeg(n,r->cf); }
 static inline number n_Invers(number a,  const ring r){ return n_Invers(a,r->cf); }
 static inline int    n_Size(number n,    const ring r){ return n_Size(n,r->cf); }
 static inline void   n_Normalize(number& n, const ring r){ return n_Normalize(n,r->cf); }

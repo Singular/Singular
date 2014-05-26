@@ -2,9 +2,9 @@
 
 %{
 
-#ifdef HAVE_CONFIG_H
+
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
+
 #include <factory/factoryconf.h>
 
 #if defined(WINNT) && ! defined(__GNUC__)
@@ -14,9 +14,9 @@
 #endif
 
 #include <cstring> // we need this for gcc 4.3
-#ifdef HAVE_CONFIG_H
+
 #include <config.h>
-#endif /* HAVE_CONFIG_H */
+
 
 #include <ctype.h>
 

@@ -661,11 +661,11 @@ See
 @*@code{chinrem (} list, list @code{)}
 @*@code{chinrem (} intvec, intvec @code{)}
 @item @strong{Type:}
-ideal resp. bigint
+the same type as the elements of the first argument
 @item @strong{Purpose:}
 applies chinese remainder theorem to the first argument w.r.t. the moduli given in the second.
-The elements in the first list must be of same type which can be @code{bigint}/@code{int}, @code{ideal},
-@code{module} or @code{matrix}.
+The elements in the first list must be of same type which can be @code{bigint}/@code{int},
+@code{poly}, @code{ideal}, @code{module} or @code{matrix}.
 The moduli, if given by a list, must be of type @code{bigint} or @code{int}.
 @*If data depending on a ring are involved, the coeffcient field must be @code{Q}.
 @item @strong{Example:}
@@ -1831,6 +1831,7 @@ See
 @node factmodd, factorize, facstd, Functions
 @subsection factmodd
 @cindex factmodd
+@cindex Hensel
 
 @table @code
 @item @strong{Syntax:}
@@ -1947,7 +1948,14 @@ See
 @item @strong{Type:}
 type of the first argument
 @item @strong{Purpose:}
-lift the first argument modulo the second to the rationals
+lift the first argument modulo the second to the rationals.@*
+The (coeffients of the) result a/b is the best approximation under the condition
+@ifinfo
+|a|,|b|<=sqrt((N-1)/2)
+@end ifinfo
+@tex
+$|a|,|b|<=\sqrt((N-1)/2)$
+@end tex
 @item @strong{Note:}
 The current coefficient field must be the rationals.
 @item @strong{Example:}
@@ -3060,7 +3068,7 @@ ideal, resp.@: module
 @item @strong{Purpose:}
 computes the intersection of ideals, resp.@: modules.
 @item @strong{Note:}
-If the option @code{returnSB} is enabled then the result is a standard basis.
+If the option @code{prot} is enabled then the result the used method (elimination/syzygies) is displayed.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3305,6 +3313,8 @@ See
 @node kill, killattrib, kernel, Functions
 @subsection kill
 @cindex kill
+@cindex delete
+@cindex unset
 @table @code
 @item @strong{Syntax:}
 @code{kill } name @code{}
@@ -4130,6 +4140,8 @@ the same as the type of the argument
 returns a minimal set of generators of an ideal, resp.@: module, if the
 input is
 either homogeneous or if the ordering is local.
+@item @strong{Note:}
+this command is not available over coefficient rings.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -4547,8 +4559,8 @@ list
 returns a list whose first entry is a standard basis for the ideal, resp.@:
 module, whose second entry is a generating set for the
 ideal, resp.@: module.
-If the ideal/module is homogeneous or the ordering is local,
-this second entry is a minimal generating set.
+If the coefficient ring is a field and  either the ideal/module is homogeneous or 
+the ordering is local, this second entry is a minimal generating set.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -4994,10 +5006,11 @@ turns off all options (including the @code{prompt} option).
 @c ---------
 @cindex warn, option
 be aware of pitfalls.
+See @ref{option(warn)}.
 @c ---------
 @item @code{returnSB}
 @cindex returnSB, option
-the functions @code{syz}, @code{intersect}, @code{quotient},
+the functions @code{syz}, @code{intersect} (2 arguments), @code{quotient},
 @code{modulo} return a standard base instead of a generating set if
 @code{returnSB} is set. This option should not be used for @code{lift}.
 @c ---------
@@ -7619,6 +7632,7 @@ See
 @ref{int};
 @ref{univariate};
 @ref{nvars};
+@ref{rvar};
 @ref{varstr}.
 @c ref
 @c ---------------------------------------

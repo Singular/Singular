@@ -5,16 +5,15 @@
 * ABSTRACT: automatic type conversions
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <misc/intvec.h>
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <Singular/subexpr.h>
@@ -29,7 +28,7 @@
 #endif
 #include <polys/matpol.h>
 #include <Singular/links/silink.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 #include <Singular/attrib.h>
 #include <polys/monomials/ring.h>
 #include <Singular/ipshell.h>

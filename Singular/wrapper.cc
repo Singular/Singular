@@ -1,21 +1,18 @@
-#include <string.h>
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
-#include <kernel/febase.h>
-#include <kernel/polys.h>
-#include <kernel/kstd1.h>
-#include <Singular/subexpr.h>
-#include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
-#include <Singular/janet.h>
+
+#include <kernel/polys.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/ideals.h>
+#include <kernel/GBEngine/janet.h>
+
+#include <Singular/subexpr.h>
+
+#include <string.h>
 
 //extern int (*ListGreatMove)(jList *,jList *,poly);
-extern int ComputeBasis(jList *,jList *);
-extern void Initialization(char *);
 
-BOOLEAN jInitBasis(ideal v, jList **TT,jList **QQ)
+static BOOLEAN jInitBasis(ideal v, jList **TT,jList **QQ)
 {
   if (rHasLocalOrMixedOrdering_currRing())
   {
@@ -51,6 +48,7 @@ BOOLEAN jInitBasis(ideal v, jList **TT,jList **QQ)
   return r;
 }
 
+/// flag: 0: JB, 1: SB
 BOOLEAN jjStdJanetBasis(leftv res, leftv v, int flag)
 {
   ideal result;
@@ -134,9 +132,4 @@ zero:
   res->data = (char *)result;
   res->rtyp = IDEAL_CMD;
   return FALSE;
-}
-
-BOOLEAN jjJanetBasis(leftv res, leftv v)
-{
-  return jjStdJanetBasis(res,v,0);
 }

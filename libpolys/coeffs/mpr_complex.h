@@ -12,7 +12,7 @@
 
 //-> include & define stuff
 // must have gmp version >= 2
-#include "si_gmp.h"
+#include <coeffs/si_gmp.h>
 #include <coeffs/mpr_global.h>
 
 #define ZTOF 1
@@ -21,7 +21,6 @@
 #define CTOF 4
 
 void setGMPFloatDigits( size_t digits, size_t rest );
-size_t getGMPFloatDigits();
 
 //-> class gmp_float
 /**

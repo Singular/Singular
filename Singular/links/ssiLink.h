@@ -7,6 +7,9 @@
  ***************************************************************/
 #ifndef SSILINK_H
 #define SSILINK_H
+
+#include <Singular/links/silink.h>
+
 BOOLEAN ssiOpen(si_link l, short flag, leftv u);
 BOOLEAN ssiWrite(si_link l, leftv v);
 leftv ssiRead1(si_link l);

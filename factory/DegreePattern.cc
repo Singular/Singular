@@ -10,9 +10,9 @@
  **/
 /*****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
+
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
+
 
 #include "DegreePattern.h"
 #include "cf_iter.h"
@@ -125,6 +125,7 @@ void DegreePattern::refine ()
   count++;
   if (count == getLength())
   {
+    delete [] buf;
     return;
   }
   int length= getLength();

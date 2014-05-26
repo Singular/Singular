@@ -5,9 +5,9 @@
 * ABSTRACT: Gauss-Manin system normal form
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 
 #ifdef HAVE_GMS
@@ -16,7 +16,6 @@
 
 #include <coeffs/numbers.h>
 #include <kernel/polys.h>
-#include <kernel/febase.h>
 
 #include "ipid.h"
 

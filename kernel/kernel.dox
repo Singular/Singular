@@ -1,0 +1,6 @@
+/*! \page kernel_page Kernel
+ * Algorithms using libpolys (\ref libpolys_page) and other mathematics
+ *
+ * \subpage kernel_sample_page
+ * \subpage kernel_numeric_page
+ */

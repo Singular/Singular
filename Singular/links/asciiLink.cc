@@ -6,24 +6,24 @@
  * ABSTRACT: ascii links (standard)
  */
 
+#include <kernel/mod2.h>
+#include <misc/options.h>
+#include <omalloc/omalloc.h>
+
+#include <Singular/tok.h>
+#include <Singular/subexpr.h>
+#include <Singular/ipshell.h>
+#include <Singular/ipid.h>
+#include <Singular/fevoices.h>
+#include <kernel/oswrapper/feread.h>
+#include <Singular/ipshell.h>
+#include <Singular/links/silink.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
-#include <kernel/mod2.h>
-#include <Singular/tok.h>
-#include <misc/options.h>
-#include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <Singular/subexpr.h>
-#include <Singular/ipshell.h>
-#include <Singular/ipid.h>
-#include <Singular/links/silink.h>
 
 /* declarations */
 static BOOLEAN DumpAscii(FILE *fd, idhdl h);

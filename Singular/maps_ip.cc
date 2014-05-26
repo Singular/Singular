@@ -6,9 +6,9 @@
 */
 #define TRANSEXT_PRIVATES
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
 
@@ -24,8 +24,7 @@
 //#include <libpolys/polys/ext_fields/longtrans.h>
 // #include <kernel/longalg.h>
 
-#include <kernel/febase.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 
 #include "maps_ip.h"
 #include "ipid.h"

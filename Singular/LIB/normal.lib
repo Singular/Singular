@@ -924,6 +924,7 @@ EXAMPLE: example HomJJ;  shows an example
    L = lastRing;
    L = insert(L,0,1);
    L[3] = delt;
+   setring(P);
    return(L);
 }
 example
@@ -2750,6 +2751,7 @@ EXAMPLE: example deltaLoc;  shows an example
           nb=nb+gcd(NP[i][2]-NP[i+1][2],NP[i][1]-NP[i+1][1]);
         }
         if(w>=1){"Newton-Polygon is non-degenerated";"";}
+        setring R;
         option(set,save_opt);
         return(list(d*(mu+nb-1) div 2,d*tau,d*nb));
       }
@@ -2804,7 +2806,8 @@ EXAMPLE: example deltaLoc;  shows an example
          return(list(d*(mu+nb-1) div 2,d*tau,d*nb));
       }
       list HNEXP=hnexpansion(f);
-      if (typeof(HNEXP[1])=="ring") {
+      if (typeof(HNEXP[1])=="ring")
+      {
         def altring = basering;
         def HNEring = HNEXP[1]; setring HNEring;
         nb=size(hne);
@@ -2815,6 +2818,7 @@ EXAMPLE: example deltaLoc;  shows an example
       {
         nb=size(HNEXP);
       }
+      setring R;
       option(set,save_opt);
       return(list(d*(mu+nb-1) div 2,d*tau,d*nb));
    }
@@ -2823,6 +2827,7 @@ EXAMPLE: example deltaLoc;  shows an example
       f=jet(f,deg(hc)+2);
       if(w>=1){"now we have to use Hamburger-Noether (Puiseux) expansion";}
       delt=delta(f);
+      setring R;
       option(set,save_opt);
       return(list(d*delt,d*tau,d));
    }
@@ -3877,8 +3882,8 @@ static proc normalityTest(list mstdid)
          //if ( y >= 1)
          //{ "module generators are U[i]/U[1], with U:"; U;
          //  ""; pause(); }
-         option(set,op);
          setring R;
+         option(set,op);
          ideal U = imap(Q,U);
          return(U);
       }
@@ -4076,7 +4081,6 @@ static proc computeRing(ideal J, ideal I, list #)
       ideal norid = I;
       ideal normap =  maxid;  */
 
-    list gnirlist = ringlist(R);
     def R1 = ring(gnirlist);
     setring R1;
     ideal norid = imap(R, I);
@@ -4242,6 +4246,7 @@ static proc computeRing(ideal J, ideal I, list #)
       "//   number of substituted variables:", nvars(newR)-nvars(lastRing);
       pause();"";
     }
+    setring R;
     return(lastRing);
   }
   else
@@ -6611,14 +6616,24 @@ EXAMPLE: example norTest; shows an example
 //"injective:";
     a = is_injective(Qnormap,QAS);          //a. Test for injectivity of Qnormap
     dbprint ( prl, "injective: "+string(a) );
-    if ( n==1 ) { return (a); }
+    if ( n==1 )
+    {
+     intvec result = intvec(a);
+     setring BAS;
+     return (result);
+   }
    a;
 
     //------------------------ check finiteness ---------------------------
     setring newR;
     b = mapIsFinite(normap,BAS,lnorid[2]);  //b. Test for finiteness of normap
     dbprint ( prl, "finite: "+string(b) );
-    if ( n==2 ) { return (intvec(a,b)); }
+    if ( n==2 )
+    {
+       intvec result = intvec(a,b);
+       setring BAS;
+       return (result);
+    }
    b;
 
     //------------------------ check normality ---------------------------
@@ -6629,13 +6644,14 @@ EXAMPLE: example norTest; shows an example
     //norid und normap werden innnerhalb von proc computeRing ueberschrieben
     //Die Kopie newR scheint das Problem zu loesen
 
-    printlevel=prl;
 
     d = testnor[3][2];             //d = delta
     kill testnor;                              //### sollte ueberfluessig sein
     int d1 = (d==0);                           //d1=1 if delta=0
     dbprint ( prl, "delta: "+string(d) );
-    return(intvec(a,b,d1));
+    intvec result = intvec(a,b,d1);
+    setring BAS;
+    return(result);
 }
 example
 { "EXAMPLE:"; echo = 2;

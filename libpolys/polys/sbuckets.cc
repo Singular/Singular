@@ -12,9 +12,9 @@
 
 #include <omalloc/omalloc.h>
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <misc/auxiliary.h>
 
 #include <polys/sbuckets.h>

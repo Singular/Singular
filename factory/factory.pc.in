@@ -8,10 +8,10 @@ Description: The Singular factorization library
 Version: @PACKAGE_VERSION@
 URL: https://github.com/Singular/Sources/tree/spielwiese/@PACKAGE@
 
-Requires: omalloc resources
-# Conflicts: 
+Requires: @PKG_REQUIRE@
+Conflicts: 
 
 Cflags: -I${includedir} @SINGULAR_CFLAGS@ @FLINT_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@
 Libs: -L${libdir} -l@PACKAGE@ @FLINT_LIBS@ @NTL_LIBS@ @GMP_LIBS@
-# Libs.private: 
+Libs.private: 
 

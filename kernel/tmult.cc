@@ -4,14 +4,14 @@
  *  tmult.cc: p_Mult_nn with pthreads - experimental
  *
  *******************************************************************/
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
 #include <kernel/numbers.h>
 #include <kernel/polys.h>
-#include <libpolys/coeffs/longrat.h>
+#include <coeffs/longrat.h>
 #ifdef SI_THREADS
 #include <pthread.h>
 #include <stdlib.h>

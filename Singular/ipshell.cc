@@ -4,9 +4,9 @@
 /*
 * ABSTRACT:
 */
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 #include <misc/auxiliary.h>
 
@@ -14,7 +14,6 @@
 #include <misc/options.h>
 #include <misc/mylimits.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 
 #include <Singular/maps_ip.h>
@@ -23,33 +22,34 @@
 #include <Singular/ipid.h>
 #include <misc/intvec.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <coeffs/numbers.h>
 #include <polys/prCopy.h>
 #include <kernel/ideals.h>
 #include <polys/matpol.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <polys/monomials/ring.h>
 #include <Singular/subexpr.h>
+#include <Singular/fevoices.h>
+#include <kernel/oswrapper/feread.h>
 #include <polys/monomials/maps.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 #include <coeffs/numbers.h>
 //#include <polys/ext_fields/longalg.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 #include <Singular/ipconv.h>
 #include <Singular/links/silink.h>
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/stairc.h>
 #include <polys/weight.h>
-#include <kernel/semic.h>
-#include <kernel/splist.h>
-#include <kernel/spectrum.h>
+#include <kernel/spectrum/semic.h>
+#include <kernel/spectrum/splist.h>
+#include <kernel/spectrum/spectrum.h>
 ////// #include <coeffs/gnumpfl.h>
 //#include <kernel/mpr_base.h>
 ////// #include <coeffs/ffields.h>
 #include <polys/clapsing.h>
-#include <kernel/hutil.h>
+#include <kernel/combinatorics/hutil.h>
 #include <polys/monomials/ring.h>
 #include <Singular/ipshell.h>
 #include <polys/ext_fields/algext.h>
@@ -70,7 +70,7 @@
 #define FAST_MAP
 
 #ifdef FAST_MAP
-#include <kernel/fast_maps.h>
+#include <kernel/maps/fast_maps.h>
 #endif
 
 leftv iiCurrArgs=NULL;
@@ -387,10 +387,10 @@ void killlocals(int v)
   }
   if (changed)
   {
-    currRingHdl=rFindHdl(cr,NULL,NULL);
+    currRingHdl=rFindHdl(cr,NULL);
     if (currRingHdl==NULL)
       currRing=NULL;
-    else
+    else if(cr!=currRing)
       rChangeCurrRing(cr);
   }
 
@@ -999,7 +999,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
   indset save;
   lists res=(lists)omAlloc0Bin(slists_bin);
 
-  hexist = hInit(S, Q, &hNexist);
+  hexist = hInit(S, Q, &hNexist, currRing);
   if (hNexist == 0)
   {
     intvec *iv=new intvec(rVar(currRing));
@@ -1155,16 +1155,26 @@ BOOLEAN iiParameter(leftv p)
     return TRUE;
   }
   leftv h=iiCurrArgs;
+  leftv rest=h->next; /*iiCurrArgs is not NULLi here*/
+  BOOLEAN is_default_list=FALSE;
   if (strcmp(p->name,"#")==0)
+  {
+    is_default_list=TRUE;
+    rest=NULL;
+  }
+  else
+  {
+    h->next=NULL;
+  }
+  BOOLEAN res=iiAssign(p,h);
+  if (is_default_list)
   {
     iiCurrArgs=NULL;
   }
   else
   {
-    iiCurrArgs=h->next;
-    h->next=NULL;
+    iiCurrArgs=rest;
   }
-  BOOLEAN res=iiAssign(p,h);
   h->CleanUp();
   omFreeBin((ADDRESS)h, sleftv_bin);
   return res;
@@ -1452,7 +1462,7 @@ poly    iiHighCorner(ideal I, int ak)
   poly po=NULL;
   if (rHasLocalOrMixedOrdering_currRing())
   {
-    scComputeHC(I,currQuotient,ak,po);
+    scComputeHC(I,currRing->qideal,ak,po);
     if (po!=NULL)
     {
       pGetCoeff(po)=nInit(1);
@@ -1532,7 +1542,7 @@ idhdl rDefault(const char *s)
   return currRingHdl;
 }
 
-idhdl rFindHdl(ring r, idhdl n, idhdl)
+idhdl rFindHdl(ring r, idhdl n)
 {
   idhdl h=rSimpleFindHdl(r,IDROOT,n);
   if (h!=NULL)  return h;
@@ -2198,6 +2208,11 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
   {
     lists v=(lists)L->m[1].Data();
     R->N = v->nr+1;
+    if (R->N<=0)
+    {
+      WerrorS("no ring variables");
+      goto rCompose_err;
+    }
     R->names   = (char **)omAlloc0(R->N * sizeof(char_ptr));
     int i;
     for(i=0;i<R->N;i++)
@@ -3428,7 +3443,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
   #endif
   #endif
 
-  ideal stdJ = kStd(J,currQuotient,isNotHomog,NULL);
+  ideal stdJ = kStd(J,currRing->qideal,isNotHomog,NULL);
   idSkipZeroes( stdJ );
 
   #ifdef SPECTRUM_DEBUG
@@ -3495,7 +3510,7 @@ spectrumState   spectrumCompute( poly h,lists *L,int fast )
 
   poly hc = (poly)NULL;
 
-  scComputeHC( stdJ,currQuotient, 0,hc );
+  scComputeHC( stdJ,currRing->qideal, 0,hc );
 
   if( hc!=(poly)NULL )
   {
@@ -5052,11 +5067,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       }
       else // (0/p, a, b, ..., z)
       {
-	if ((ch!=0) && (ch!=IsPrime(ch)))
-	{
-	  WerrorS("too many parameters");
-	  goto rInitError;
-	}
+        if ((ch!=0) && (ch!=IsPrime(ch)))
+        {
+          WerrorS("too many parameters");
+          goto rInitError;
+        }
 
         char ** names = (char**)omAlloc0(pars * sizeof(char_ptr));
 
@@ -5069,11 +5084,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
         TransExtInfo extParam;
 
         extParam.r = rDefault( ch, pars, names); // Q/Zp [ p_1, ... p_pars ]
-	for(int i=pars-1; i>=0;i--)
-	{
-	  omFree(names[i]);
-	}
-	omFree(names);
+        for(int i=pars-1; i>=0;i--)
+        {
+          omFree(names[i]);
+        }
+        omFree(names);
 
         cf = nInitChar(n_transExt, &extParam);
       }
@@ -5153,7 +5168,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       {
         number p=(number)pn->next->CopyD();
         nlGMP(p,(number)modBase,coeffs_BIGINT);
-	nlDelete(&p,coeffs_BIGINT);
+        nlDelete(&p,coeffs_BIGINT);
       }
     }
     else
@@ -5539,10 +5554,6 @@ void rKill(ring r)
     if (r==currRing)
     {
       // all dependend stuff is done, clean global vars:
-      if (r->qideal!=NULL)
-      {
-        currQuotient=NULL;
-      }
       if ((currRing->ppNoether)!=NULL) pDelete(&(currRing->ppNoether));
       if (sLastPrinted.RingDependend())
       {
@@ -5578,7 +5589,13 @@ void rKill(idhdl h)
     if (ref<=0) { currRing=NULL; currRingHdl=NULL;}
     else
     {
-      currRingHdl=rFindHdl(r,currRingHdl,NULL);
+      currRingHdl=rFindHdl(r,currRingHdl);
+      if ((currRingHdl==NULL)&&(currRing->idroot==NULL))
+      {
+        for (int i=myynest;i>=0;i--)
+	  if (iiLocalRing[i]==currRing) return;
+        currRing=NULL;
+      }
     }
   }
 }
@@ -5806,6 +5823,7 @@ BOOLEAN iiTestAssume(leftv a, leftv b)
   // assume a: level
   if ((a->Typ()==INT_CMD)&&((long)a->Data()>=0))
   {
+    if ((TEST_V_ALLWARN) && (myynest==0)) WarnS("ASSUME at top level");
     char       assume_yylinebuf[80];
     strncpy(assume_yylinebuf,my_yylinebuf,79);
     int lev=(long)a->Data();

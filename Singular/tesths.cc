@@ -6,21 +6,20 @@
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
-#include "countedref.h"
 #include <omalloc/omalloc.h>
 
 #include <misc/auxiliary.h>
 #include <misc/options.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 
-#include <kernel/febase.h>
-#include <kernel/timer.h>
+#include <kernel/oswrapper/feread.h>
+#include <Singular/fevoices.h>
+#include <kernel/oswrapper/timer.h>
 
 // #ifdef HAVE_FANS
 // #include <callgfanlib/bbcone.h>
@@ -40,7 +39,8 @@
 #include "tok.h"
 #include "fegetopt.h"
 
-#include "pyobject_setup.h"
+#include <Singular/countedref.h>
+#include <Singular/pyobject_setup.h>
 
 #include <unistd.h>
 #include <string.h>
@@ -51,8 +51,6 @@
 
 
 extern int siInit(char *);
-
-// int initializeGMP(){ return 1; }
 
 int mmInit( void )
 {
@@ -72,7 +70,7 @@ int main(          /* main entry to Singular */
     int argc,      /* number of parameter */
     char** argv)   /* parameter array */
 {
-  //mmInit();
+  mmInit();
   // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
   omInitRet_2_Info(argv[0]);
   omInitGetBackTrace();

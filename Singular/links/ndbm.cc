@@ -13,11 +13,11 @@
 //
 //**************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
-#include <Singular/si_signals.h>
+
 #include <kernel/mod2.h>
+
+#include <reporter/si_signals.h>
+
 #ifdef HAVE_DBM
 #ifndef HPUX_9
 #include <strings.h>

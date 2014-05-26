@@ -6,16 +6,16 @@
 * ABSTRACT - instantiation of all templates
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 //#include <vector>
 //using namespace std;
   #define SINGULAR 1
   #include <factory/factory.h>
   #include <factory/templates/ftmpl_list.cc>
-  #include <kernel/fglm.h>
+  #include <kernel/fglm/fglm.h>
 
 // templates for fglm:
   template class List<fglmSelem>;
@@ -41,8 +41,8 @@
 #endif
 #endif
 
-#include <kernel/GMPrat.h>
-#include <kernel/kmatrix.h>
+#include <kernel/spectrum/GMPrat.h>
+#include <kernel/spectrum/kmatrix.h>
 
 template class KMatrix<Rational>;
 
@@ -71,7 +71,7 @@ template class CMultiplier<CPower>;
 
 #endif
 
-#include <kernel/tgb_internal.h>
+#include <kernel/GBEngine/tgb_internal.h>
 #ifdef HAVE_BOOST
 #include <boost/dynamic_bitset.hpp>
 #include <vector>
@@ -116,8 +116,8 @@ template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 
 /* next lines are templates used in new minor code */
 #include <list>
-#include <Singular/Minor.h>
-#include <Singular/Cache.h>
+#include <kernel/linear_algebra/Minor.h>
+#include <kernel/linear_algebra/Cache.h>
 
 template class std::list<int>;
 template class std::list<MinorKey>;

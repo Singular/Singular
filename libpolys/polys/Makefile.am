@@ -1,6 +1,8 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-AM_CPPFLAGS	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} -I${top_srcdir}/../factory/include -I${top_builddir}/../factory/include ${GMP_CFLAGS}  
+AM_CPPFLAGS	= -I${top_srcdir} -I${top_builddir} \
+${FACTORY_INCLUDES} ${RESOURCES_INCLUDES} ${OMALLOC_INCLUDES} \
+${FLINT_CFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS} 
 
 
 if ENABLE_P_PROCS_STATIC
@@ -104,7 +106,8 @@ BUILT_SOURCES = prCopy.inc templates/p_Procs.inc
 noinst_PROGRAMS = templates/p_Procs_Generate
 templates_p_Procs_Generate_SOURCES = templates/p_Procs_Generate.cc
 templates_p_Procs_Generate_CPPFLAGS = ${USE_P_PROCS_STATIC} ${AM_CPPFLAGS}
-templates_p_Procs_Generate_LDADD    = ${top_builddir}/reporter/libreporter.la ${top_builddir}/misc/libmisc.la
+templates_p_Procs_Generate_LDADD    = \
+${top_builddir}/reporter/libreporter.la ${top_builddir}/misc/libmisc.la 
 
 templates/p_Procs.inc: templates/p_Procs_Generate$(EXEEXT)
 	${builddir}/templates/p_Procs_Generate$(EXEEXT) > ${builddir}/templates/p_Procs.inc

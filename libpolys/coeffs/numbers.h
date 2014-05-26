@@ -18,7 +18,7 @@
 #define nAdd(n1, n2)      n_Add(n1, n2, currRing->cf)
 #define nIsZero(n)        n_IsZero(n, currRing->cf)
 #define nEqual(n1, n2)    n_Equal(n1, n2, currRing->cf)
-#define nNeg(n)           n_Neg(n, currRing->cf)
+#define nInpNeg(n)        n_InpNeg(n, currRing->cf)
 #define nSub(n1, n2)      n_Sub(n1, n2, currRing->cf)
 #define nGetChar()        n_GetChar(currRing->cf)
 #define nInit(i)          n_Init(i, currRing->cf)
@@ -28,10 +28,7 @@
 #define nGreater(a, b)    n_Greater (a,b,currRing->cf)
 #define nWrite(n)         n_Write(n, currRing->cf, rShortOut(currRing))
 #define nNormalize(n)     n_Normalize(n,currRing->cf)
-
-inline number nGcd(number a, number b, const coeffs cf) { return n_Gcd(a, b, cf); }
-
-#define nIntDiv(a, b)     n_IntDiv(a,b,currRing->cf)
+#define nGcd(a,b)         n_Gcd(a,b,currRing->cf)
 #define nDiv(a, b)        n_Div(a,b,currRing->cf)
 #define nInvers(a)        n_Invers(a,currRing->cf)
 #define nExactDiv(a, b)   n_ExactDiv(a,b,currRing->cf)

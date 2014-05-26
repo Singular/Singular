@@ -1,0 +1,13 @@
+/*! \mainpage Singular 
+ *
+ * <A HREF="http://www.singular.uni-kl.de">CAS Singular</A>
+ *
+ * \dotfile Includes.dot "Package diagram"
+ *
+ * \tableofcontents
+ * 
+ * \subpage libpolys_page
+ * \subpage kernel_page
+ * \subpage singular_page
+ *
+ */

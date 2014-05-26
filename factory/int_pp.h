@@ -26,12 +26,12 @@ class InternalPrimePower : public InternalCF
 {
 private:
     mpz_t thempi;
-    static int initialized;
+    static bool initialized;
     static int prime;
     static int exp;
     static mpz_t primepow;
     static mpz_t primepowhalf;
-    static int initialize();
+    static void initialize();
     static mpz_ptr MPI( const InternalCF * const c );
 public:
     InternalPrimePower();
@@ -55,8 +55,6 @@ public:
     InternalCF* normalize_myself();
 
     static void setPrimePower( int p, int k );
-    static int getp();
-    static int getk();
 
     bool is_imm() const;
 

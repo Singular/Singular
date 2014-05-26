@@ -1,6 +1,6 @@
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <misc/auxiliary.h>
 
 #include <factory/factory.h>
@@ -23,9 +23,6 @@
 #include <coeffs/rmodulo2m.h>
 #include <coeffs/rintegers.h>
 
-
-// int initializeGMP(void){ return 1; }
-int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
 
 #include <iostream>
 

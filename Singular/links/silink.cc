@@ -6,35 +6,35 @@
 * ABSTRACT: general interface to links
 */
 
+#include <kernel/mod2.h>
+
+#include <omalloc/omalloc.h>
+#include <misc/options.h>
+#include <misc/intvec.h>
+#include <reporter/si_signals.h>
+#include <coeffs/numbers.h>
+
+#include <polys/matpol.h>
+#include <polys/monomials/ring.h>
+
+#include <kernel/ideals.h>
+
+#include <Singular/lists.h>
+#include <Singular/cntrlc.h>
+#include <Singular/links/ssiLink.h>
+#include <Singular/links/pipeLink.h>
+#include <Singular/tok.h>
+#include <Singular/subexpr.h>
+#include <Singular/ipid.h>
+#include <Singular/links/silink.h>
+#include <Singular/ipshell.h>
+#include "feOpt.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
-#include <kernel/mod2.h>
-#include <Singular/tok.h>
-#include <misc/options.h>
-#include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <Singular/subexpr.h>
-#include <Singular/ipid.h>
-#include <Singular/links/silink.h>
-#include <Singular/ipshell.h>
-#include <polys/matpol.h>
-#include <polys/monomials/ring.h>
-#include <Singular/lists.h>
-#include <kernel/ideals.h>
-#include <coeffs/numbers.h>
-#include <misc/intvec.h>
-#include <Singular/cntrlc.h>
-#include <Singular/links/ssiLink.h>
-#include <Singular/links/pipeLink.h>
-#include <Singular/si_signals.h>
-#include "feOpt.h"
 
 // #ifdef HAVE_DBM
 // #ifdef ix86_Win

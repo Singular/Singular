@@ -12,9 +12,9 @@
 #include <time.h>
 #include <unistd.h>
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 #include "tok.h"
 #include "grammar.h"
@@ -372,10 +372,10 @@ void ttGen1()
         fprintf(outfile,"// convert %s -> %s\n",
           Tok2Cmdname(i), Tok2Cmdname(j));
   #ifdef CONVERT_TABLE
-	fprintf(doctable,
-	"@item\n@   %d. @tab @code{%s}  @tab @expansion{} @code{%s}\n",
+        fprintf(doctable,
+        "@item\n@   %d. @tab @code{%s}  @tab @expansion{} @code{%s}\n",
         doc_nr,Tok2Cmdname(i),Tok2Cmdname(j));
-	doc_nr++;
+        doc_nr++;
   #endif
         if (j==ANY_TYPE) break;
       }

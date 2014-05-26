@@ -3,8 +3,6 @@
 #include <Singular/libsingular.h>
 #include <unistd.h>
 
-int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
-
 
 int main( int, char *argv[] ) 
 {

@@ -28,9 +28,9 @@
   *               computing in K[a_1, ..., a_s] / I.
   **/
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <misc/auxiliary.h>
 
 #include <omalloc/omalloc.h>
@@ -652,7 +652,7 @@ const char * naRead(const char *s, number *a, const coeffs cf)
 {
   poly aAsPoly;
   const char * result = p_Read(s, aAsPoly, naRing);
-  definiteReduce(aAsPoly, naMinpoly, cf);
+  if (aAsPoly!=NULL) definiteReduce(aAsPoly, naMinpoly, cf);
   *a = (number)aAsPoly;
   return result;
 }
@@ -1444,7 +1444,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfFarey        = naFarey;
   cf->cfChineseRemainder= naChineseRemainder;
   cf->cfInt          = naInt;
-  cf->cfNeg          = naNeg;
+  cf->cfInpNeg          = naNeg;
   cf->cfAdd          = naAdd;
   cf->cfSub          = naSub;
   cf->cfMult         = naMult;

@@ -5,50 +5,46 @@
 * ABSTRACT: frwalk: interpreter link
 */
 
-//#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <misc/options.h>
 #include <Singular/ipid.h>
 #include <misc/intvec.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <polys/matpol.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <polys/monomials/ring.h>
 #include <Singular/subexpr.h>
 #include <polys/monomials/maps.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 #include <coeffs/numbers.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 #include <Singular/ipconv.h>
 #include <Singular/links/silink.h>
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/stairc.h>
 #include <polys/weight.h>
-#include <kernel/semic.h>
-#include <kernel/splist.h>
-#include <kernel/spectrum.h>
+#include <kernel/spectrum/semic.h>
+#include <kernel/spectrum/splist.h>
+#include <kernel/spectrum/spectrum.h>
 //#include <kernel/gnumpfl.h>
 //#include <kernel/mpr_base.h>
 //#include <kernel/ffields.h>
 #include <polys/clapsing.h>
-#include <kernel/hutil.h>
+#include <kernel/combinatorics/hutil.h>
 #include <Singular/ipshell.h>
-#include <kernel/walkMain.h>
-#include <kernel/walkProc.h>
-#include <kernel/walkSupport.h>
+#include <kernel/groebner_walk/walkMain.h>
+#include <kernel/groebner_walk/walkProc.h>
+#include <kernel/groebner_walk/walkSupport.h>
 #include <polys/prCopy.h>
+
+//#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <math.h>
 
 ///////////////////////////////////////////////////////////////////
 //walkProc

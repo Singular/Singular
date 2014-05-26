@@ -1,0 +1,347 @@
+////////////////////////////////////////////////////////////////////
+version="version modular.lib 4.0.0.0 May_2014 "; // $Id$
+category="General purpose";
+info="
+LIBRARY:   modular.lib  An abstraction layer for modular techniques
+AUTHOR:    Andreas Steenpass, e-mail: steenpass@mathematik.uni-kl.de
+
+OVERVIEW:
+This library is an abstraction layer for modular techniques which are
+well-known to speed up many computations and to be easy parallelizable.
+@* The basic idea is to execute some computation modulo several primes and then
+to lift the result back to characteristic zero via the farey rational map and
+chinese remaindering. It is thus possible to overcome the often problematic
+coefficient swell and to run the modular computations in parallel.
+@* In Singular, modular techniques have been quite successfully employed for
+several applications. A first implementation was done for Groebner bases in
+Singular's @ref{modstd_lib}, a pioneering work by Stefan Steidel. Since the
+algorithm is basically the same for all applications, this library aims at
+preventing library authors from writing the same code over and over again by
+providing an appropriate abstraction layer. It also offers one-line commands
+for ordinary Singular users who want to take advantage of modular techniques
+for their own calculations. Thus modular techniques can be regarded as
+a parallel skeleton of their own.
+@* The terminology (such as 'pTest' and 'finalTest') follows Singular's
+@ref{modstd_lib} and [1].
+
+REFERENCES:
+[1] Nazeran Idrees, Gerhard Pfister, Stefan Steidel: Parallelization of
+    Modular Algorithms. Journal of Symbolic Computation 46, 672-684 (2011).
+    http://arxiv.org/abs/1005.5663
+
+SEE ALSO:  link, tasks_lib, parallel_lib, modstd_lib, assprimeszerodim_lib
+
+KEYWORDS:  modular_lib; Modular techniques; Parallelization;
+           Skeletons for parallelization; Distributed computing
+
+PROCEDURES:
+  modular(...)  execute a command modulo several primes and lift the result
+                back to characteristic zero
+";
+
+LIB "resources.lib";
+LIB "tasks.lib";
+LIB "parallel.lib";
+
+static proc mod_init()
+{
+    if (!defined(Resources)) {
+        LIB "resources.lib";
+    }
+    int sem_cores = Resources::sem_cores;   // the number of processor cores
+    exportto(Modular, sem_cores);
+}
+
+proc modular(string Command, alias list Arguments, list #)
+"USAGE:   modular(command, arguments[, primeTest, deleteUnluckyPrimes, pTest,
+          finalTest, pmax), command string, arguments list, primeTest proc,
+          deleteUnluckyPrimes proc, pTest proc, finalTest proc, pmax int
+RETURN:   the result of @code{command} applied to @code{arguments},
+          computed using modular methods.
+NOTE:     For the general algorithm and the role of the optional arguments
+          primeTest, deleteUnluckyPrimes, pTest, and finalTest, see
+          @ref{modStd} and the reference given in @ref{modular_lib}. The
+          default for these arguments is that all tests succeed and that all
+          primes are assumed to be lucky.
+       @* The optional argument pmax is an upper bound for the prime numbers
+          to be used for the modular computations. The default is 2147483647
+          (largest prime which can be represented as an @code{int} in
+          Singular), or 536870909 (largest prime below 2^29} for baserings with
+          parameters.
+SEE ALSO: modStd
+EXAMPLE:  example modular; shows an example"
+{
+    /* check for errors */
+    if (char(basering) != 0) {
+        ERROR("The characteristic must be zero.");
+    }
+
+    /* auxiliary variables */
+    int i;
+
+    /* set maximal prime number */
+    int pmax = 2147483647;
+    if (npars(basering) > 0) {
+        pmax = 536870909;   // prime(2^29)
+    }
+
+    /* read optional parameters */
+    list defaults = list(primeTest_default, deleteUnluckyPrimes_default,
+        pTest_default, finalTest_default, pmax);
+    for (i = 1; i <= size(defaults); i++) {
+        if (typeof(#[i]) != typeof(defaults[i])) {
+            # = insert(#, defaults[i], i-1);
+        }
+    }
+    if (size(#) != size(defaults)) {
+        ERROR("wrong optional parameters");
+    }
+    proc primeTest = #[1];
+    proc deleteUnluckyPrimes = #[2];
+    proc pTest = #[3];
+    proc finalTest = #[4];
+    pmax = #[5];
+    exportto(Modular, primeTest);
+
+    /* export command and arguments */
+    exportto(Modular, Command);
+    exportto(Modular, Arguments);
+
+    /* modular computations */
+    def result;
+    def result_lift;
+    bigint N = 1;
+    list modresults;
+    list primes;
+    int nAllPrimes;
+    int nNewPrimes;
+    int p;
+    list indices;
+    int ncores_available;
+    while (1) {
+        // compute list of primes
+        if (nAllPrimes == 0) {
+            nNewPrimes = NbModProcs();
+        }
+        else {
+            ncores_available = system("semaphore", "get_value", sem_cores)+1;
+            if (nAllPrimes < ncores_available) {
+                nNewPrimes = nAllPrimes;
+            }
+            else {
+                nNewPrimes = (nAllPrimes div ncores_available)
+                    *ncores_available;
+            }
+        }
+        primes = primeList(nNewPrimes, pmax);
+        pmax = primes[size(primes)]-1;
+        nAllPrimes = nAllPrimes+nNewPrimes;
+
+        // do computation modulo several primes
+        for (i = size(primes); i > 0; i--) {
+            task t(i) = "Modular::modp", primes[i];
+        }
+        startTasks(t(1..size(primes)));
+        waitAllTasks(t(1..size(primes)));
+        for (i = size(primes); i > 0; i--) {
+            modresults[i] = getResult(t(i));
+            killTask(t(i));
+            kill t(i);
+        }
+
+        // delete unlucky primes
+        indices = deleteUnluckyPrimes(modresults);
+        for (i = size(indices); i > 0; i--) {
+            modresults = delete(modresults, indices[i]);
+            primes = delete(primes, indices[i]);
+        }
+
+        // lift result
+        if (N == 1) {
+            result_lift = chinrem(modresults, primes);
+        }
+        else {
+            result_lift = chinrem(list(result_lift)+modresults,
+                list(N)+primes);
+        }
+        modresults = list();
+        for (i = size(primes); i > 0; i--) {
+            N = N*primes[i];
+        }
+
+        // apply farey
+        result = farey_parallel(result_lift, N);
+
+        // pTest
+        p = prime(random(pmax div 2, pmax-1));
+        while (!Modular::primeTest(p, Arguments)) {
+            if (p <= 2) {
+                ERROR("no more primes");
+            }
+            p = prime(random(p div 2, p-1));
+        }
+        if (!pTest(Command, Arguments, result, p)) {
+            continue;
+        }
+
+        // finalTest
+        if (finalTest(Command, Arguments, result)) {
+            break;
+        }
+    }
+
+    /* kill exported data */
+    kill Command;
+    kill Arguments;
+    kill primeTest;
+
+    /* return of result */
+    return(result);
+}
+example
+{
+    "EXAMPLE:";
+    echo = 2;
+    ring R = 0, (x,y), dp;
+    ideal I = x9y2+x10, x2y7-y8;
+    modular("std", list(I));
+}
+
+static proc primeList(int n, int pmax)
+{
+    list primes;
+    int p = pmax;
+    int i;
+    for (i = 1; i <= n; i++) {
+        if (p < 2) {
+            ERROR("no more primes");
+        }
+        p = prime(p);
+        task t(i) = "Modular::primeList_task", list(p);
+        p--;
+    }
+    startTasks(t(1..n));
+    waitAllTasks(t(1..n));
+    int j;
+    for (i = 1; i <= n; i++) {
+        if (getResult(t(i))) {
+            j++;
+            primes[j] = getArguments(t(i))[1];
+        }
+        killTask(t(i));
+    }
+    if (j < n) {
+        primes = primes+primeList(n-j, p);
+    }
+    return(primes);
+}
+
+static proc primeList_task(int p)
+{
+    return(Modular::primeTest(p, Arguments));
+}
+
+static proc modp(int p)
+{
+    def br = basering;
+    list lbr = ringlist(br);
+    if (typeof(lbr[1]) == "int") {
+        lbr[1] = p;
+    }
+    else {
+        lbr[1][1] = p;
+    }
+    def rp = ring(lbr);
+    setring(rp);
+    list args = fetch(br, Arguments);
+    execute("def result = "+Command+"("+Tasks::argsToString("args", size(args))
+        +");");
+    setring(br);
+    def result = fetch(rp, result);
+    return(result);
+}
+
+static proc primeTest_default(int p, alias list args)
+{
+    return(1);
+}
+
+static proc deleteUnluckyPrimes_default(alias list modresults)
+{
+    return(list());
+}
+
+static proc pTest_default(string command, alias list args, def result, int p)
+{
+    return(1);
+}
+
+static proc finalTest_default(string command, alias list args, def result)
+{
+    return(1);
+}
+
+static proc farey_parallel(ideal farey_arg, bigint farey_N)
+{
+    exportto(Modular, farey_arg);
+    exportto(Modular, farey_N);
+    int size_arg = ncols(farey_arg);
+    int chunks = par_range(size_arg);
+    intvec range;
+    int i;
+    for (i = chunks; i > 0; i--) {
+        range = par_range(size_arg, i);
+        task t(i) = "Modular::farey_task", list(range);
+    }
+    startTasks(t(1..chunks));
+    waitAllTasks(t(1..chunks));
+    ideal result = getResult(t(chunks));
+    for (i = chunks-1; i > 0; i--) {
+        result = getResult(t(i)), result;
+        killTask(t(i));
+    }
+    kill farey_arg;
+    kill farey_N;
+    return(result);
+}
+
+static proc farey_task(intvec range)
+{
+    ideal result = farey(ideal(farey_arg[range[1]..range[2]]), farey_N);
+    return(result);
+}
+
+static proc par_range(int N, list #)
+{
+    int nchunks = 2*getcores();
+    if (nchunks > N) {
+        nchunks = N;
+    }
+    if (size(#)) {
+        int index = #[1];
+        intvec range = ((N*(index-1)) div nchunks)+1, (N*index) div nchunks;
+        return(range);
+    }
+    else {
+        return(nchunks);
+    }
+}
+
+static proc NbModProcs()
+{
+    int available = system("semaphore", "get_value", sem_cores)+1;
+    int nb;
+    if (available < 16) {
+        nb = ((10 div available)+1-(10%available == 0))*available;
+    }
+    else {   // gives approx. (log_2(available))^2
+        int tmp = available;
+        while (tmp > 1) {
+            tmp = tmp div 2;
+            nb++;
+        }   // nb = log_2(available)
+        nb = ((2*nb+1)*available) div (2^nb) + (nb-1)^2 - 2;
+    }
+    return(nb);
+}
+

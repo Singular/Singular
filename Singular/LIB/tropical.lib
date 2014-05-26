@@ -530,6 +530,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
   // proper solution is found when dd>0; in that case we have
   // to start all over again;
   // this is controlled by the while-loop
+  intvec ordnungskontrollvektor=N,-w[2]; // used with the option puiseux
   while (size(liftrings)==0)
   {
     // compute lifting for the zero-dimensional ideal via tropicalparametrise
@@ -539,7 +540,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
     }
     else // use absolute primary decomposition
     {
-      list TP=tropicalparametrise(i,w,ordnung,gfanold,findall,nogfan,puiseux,ini);
+      list TP=tropicalparametrise(i,w,ordnung,ordnungskontrollvektor,gfanold,findall,nogfan,puiseux,ini);
     }
     // compute the liftrings by resubstitution
     kk=1;  // counts the liftrings
@@ -730,7 +731,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
       ini=tInitialIdeal(i,precutdownw,1);
       w=precutdownw;
 */
-      ~
+
     }
   }
   // if internally the option findall was set, then return
@@ -740,7 +741,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
     liftrings=liftrings[1];
   }
   ///////////////////////////////////////////////////////////
-  if (voice+printlevel>=2)
+  if (printlevel-voice+2>=0)
   {
 
       "The procedure has created a list of lists. The jth entry of this list
@@ -776,6 +777,8 @@ Suppose your list has the name L, then you can access the 1st ring via:
 example
 {
    "EXAMPLE:";
+   int oldprintlevel=printlevel;
+   printlevel=1;
    echo=2;
    ////////////////////////////////////////////////////////
    // 1st EXAMPLE:
@@ -822,6 +825,7 @@ example
    // An easier way to display this is via displayTropicalLifting.
    setring R;
    displayTropicalLifting(LIST,"subst");
+   printlevel=oldprintlevel;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -965,7 +969,7 @@ ASSUME:  f is a non-constant polynomial in two variables which is not
          the optional parameter # can be the string 'subst'
 RETURN:  list, where each entry of the list l describes the Newton-Puiseux
 @*             parametrisations of one branch of the plane curve singularity
-@*             at the origin defined by f; only the first n terms of each
+@*             at the origin defined by f; only the terms up to order n of each
 @*             parametetrisation are computed
 @*             l[i][1] = is a ring
 @*             l[i][2] = int
@@ -978,6 +982,9 @@ RETURN:  list, where each entry of the list l describes the Newton-Puiseux
 @*       - if the base field had a parameter and a minimal polynomial, then
            the new base field will have a parameter and a new minimal polynomial,
            and LIFT[2] describes how the old parameter can be computed from the new one
+@*       - if a field extension with minimal polynomial of degree k was necessary,
+           then to the one extension produced acutally k extensions correspond by replacing
+           the parameter a successively by all zeros of the minimal polynomial
 @*       - if the option subst was set l[i][3] contains the polynomial where
            y has been substituted by y(t^{1/N}) as a string
 REMARK:  - it is best to use the procedure displayPuiseuxExpansion to
@@ -1154,6 +1161,7 @@ example
 {
    "EXAMPLE:";
    echo=2;
+   printlevel=1;
    ring r=0,(x,y),ds;
    poly f=x2-y4+x5y7;
    puiseuxExpansion(f,3,"subst");
@@ -4677,7 +4685,7 @@ NOTE:    - the procedure is also called recursively by itself, and
         "THEN TYPE THE FOLLOWING COMMAND IN SINGULAR:   wneu=-3,-4,-1,-5,0,0;";
         "AND HIT THE RETURN BUTTON TWICE (!!!) - NOTE, THE LAST 0 IS OMITTED";
         "IF YOU WANT wneu TO BE TESTED, THEN SET goon=0;";
-        ~
+
         // THIS IS NOT NECESSARY !!!! IF WE COMPUTE NOT ONLY THE
         // TROPICAL PREVARIETY
         // test, if wneu really is in the tropical variety
@@ -4686,7 +4694,7 @@ NOTE:    - the procedure is also called recursively by itself, and
           if (testw(reduce(i,std(gesamt_m)),wneu,anzahlvariablen)==1)
           {
             "CHOOSE A DIFFERENT RAY";
-            ~
+
           }
           else
           {
@@ -4723,7 +4731,7 @@ NOTE:    - the procedure is also called recursively by itself, and
       else // set wneu by hand
       {
         "Set intvec wneu!";
-        ~
+
       }
     }
   }
@@ -5547,7 +5555,7 @@ NOTE:     the procedure is called from tropicalLifting"
 /// - ordermaximalideals
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc tropicalparametrise (ideal i,intvec ww,int ordnung,int gfanold,int findall,int nogfan,int puiseux,list #)
+static proc tropicalparametrise (ideal i,intvec ww,int ordnung,intvec ordnungskontrollvektor,int gfanold,int findall,int nogfan,int puiseux,list #)
 "USAGE:  tropicalparametrise(i,tw,ord,gf,fa,ng,pu[,#]); i ideal, tw intvec, ord int, gf,fa,ng,pu int, # opt. list
 ASSUME:  - i is an ideal in Q[t,x_1,...,x_n,@a], tw=(w_0,w_1,...,w_n,0)
            and (w_0,...,w_n,0) is in the tropical variety of i,
@@ -5619,6 +5627,7 @@ NOTE:    - the procedure is also called recursively by itself, and
   }
   list wneulist; // carries all newly computed weight vector
   intvec wneu;   // carries the newly computed weight vector
+  intvec okvneu; // carries the newly computed ordnungskontrollvektor
   int tweight;   // carries the weight of t
   list PARALIST; // carries the result when tropicalparametrise
                  // is recursively called
@@ -5721,7 +5730,7 @@ NOTE:    - the procedure is also called recursively by itself, and
             "THEN TYPE THE FOLLOWING COMMAND IN SINGULAR:   wneu=-3,-4,-1,-5,0,0;";
             "AND HIT THE RETURN BUTTON - NOTE, THE LAST 0 IS OMITTED";
             "IF YOU WANT wneu TO BE TESTED, THEN SET goon=0;";
-            ~
+
             // THIS IS NOT NECESSARY !!!! IF WE COMPUTE NOT ONLY
             // THE TROPICAL PREVARIETY
             // test, if wneu really is in the tropical variety
@@ -5730,7 +5739,7 @@ NOTE:    - the procedure is also called recursively by itself, and
               if (testw(reduce(i,std(gesamt_m)),wneu,anzahlvariablen)==1)
               {
                 "CHOOSE A DIFFERENT RAY";
-                ~
+
               }
               else
               {
@@ -5792,12 +5801,12 @@ NOTE:    - the procedure is also called recursively by itself, and
             if (findall==1)
             {
               "Set wneulist!";
-              ~
+
             }
             else
             {
               "Set intvec wneu!";
-              ~
+
               wneulist[1]=wneu;
             }
           }
@@ -5809,7 +5818,7 @@ NOTE:    - the procedure is also called recursively by itself, and
       // by calling the procedure recursively;
       // if all variables were deleted, then i=0 and thus anzahlvariablen==0
       lll=0;
-      if ((ordnung>1) and (anzahlvariablen>1))
+      if (((puiseux==0) and (ordnung>1)) or ((puiseux==1) and (ordnungskontrollvektor[2]<ordnungskontrollvektor[1]*ordnung)) and (anzahlvariablen>1))
       {
         partliftings=list(); // initialise partliftings
         // we call the procedure with the transformed
@@ -5821,7 +5830,15 @@ NOTE:    - the procedure is also called recursively by itself, and
         for (kk=1;kk<=size(wneulist);kk++)
         {
           wneu=wneulist[kk];
-          PARALIST=tropicalparametrise(i,wneu,ordnung-1,gfanold,findall,nogfan,puiseux,anzahlvariablen,zero);
+          okvneu=-ordnungskontrollvektor[1]*wneu[1],-ordnungskontrollvektor[2]*wneu[1]-wneu[2];
+          if (puiseux==0)
+          {
+            PARALIST=tropicalparametrise(i,wneu,ordnung-1,okvneu,gfanold,findall,nogfan,puiseux,anzahlvariablen,zero);
+          }
+          else
+          {
+            PARALIST=tropicalparametrise(i,wneu,ordnung,okvneu,gfanold,findall,nogfan,puiseux,anzahlvariablen,zero);
+          }
           // the output will be a ring, in which the
           // parametrisation lives, and a string, which contains
           // the maximal ideal that describes the necessary field extension

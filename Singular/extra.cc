@@ -7,13 +7,13 @@
 
 #define HAVE_WALK 1
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 #include <misc/auxiliary.h>
+#include <misc/sirandom.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 
 
@@ -54,6 +54,7 @@
 #include "coeffs/OPAEQ.h"
 
 
+#include <resources/feResource.h>
 #include <polys/monomials/ring.h>
 #include <kernel/polys.h>
 
@@ -67,19 +68,23 @@
 
 #include <kernel/fast_mult.h>
 #include <kernel/digitech.h>
-#include <kernel/stairc.h>
-#include <kernel/febase.h>
+#include <kernel/GBEngine/stairc.h>
 #include <kernel/ideals.h>
-#include <kernel/kstd1.h>
-#include <kernel/syz.h>
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/syz.h>
+#include <kernel/GBEngine/kutil.h>
 
-#include <kernel/shiftgb.h>
-#include <kernel/linearAlgebra.h>
+#include <kernel/GBEngine/shiftgb.h>
+#include <kernel/linear_algebra/linearAlgebra.h>
+
+#include <kernel/combinatorics/hutil.h>
 
 // for tests of t-rep-GB
-#include <kernel/tgb.h>
+#include <kernel/GBEngine/tgb.h>
 
+#include <kernel/linear_algebra/minpoly.h>
+
+#include <numeric/mpr_base.h>
 
 #include "tok.h"
 #include "ipid.h"
@@ -91,7 +96,6 @@
 #include "fehelp.h"
 #include "distrib.h"
 
-#include "minpoly.h"
 #include "misc_ip.h"
 
 #include "attrib.h"
@@ -104,11 +108,11 @@
 
 
 #ifdef HAVE_RINGS
-#include <kernel/ringgb.h>
+#include <kernel/GBEngine/ringgb.h>
 #endif
 
 #ifdef HAVE_F5
-#include <kernel/f5gb.h>
+#include <kernel/GBEngine/f5gb.h>
 #endif
 
 #ifdef HAVE_WALK
@@ -117,17 +121,17 @@
 
 
 #ifdef HAVE_SPECTRUM
-#include <kernel/spectrum.h>
+#include <kernel/spectrum/spectrum.h>
 #endif
 
 #ifdef HAVE_PLURAL
 #include <polys/nc/nc.h>
 #include <polys/nc/ncSAMult.h> // for CMultiplier etc classes
 #include <polys/nc/sca.h>
-#include <kernel/nc.h>
+#include <kernel/GBEngine/nc.h>
 #include "ipconv.h"
 #ifdef HAVE_RATGRING
-#include <kernel/ratgring.h>
+#include <kernel/GBEngine/ratgring.h>
 #endif
 #endif
 
@@ -146,7 +150,7 @@
 #endif
 
 #include <polys/clapconv.h>
-#include <kernel/kstdfac.h>
+#include <kernel/GBEngine/kstdfac.h>
 
 #include <polys/clapsing.h>
 
@@ -184,8 +188,6 @@
 #ifndef MAKE_DISTRIBUTION
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h);
 #endif
-
-extern BOOLEAN jjJanetBasis(leftv res, leftv v);
 
 #ifdef ix86_Win  /* PySingular initialized? */
 static int PyInitialized = 0;
@@ -676,7 +678,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           return TRUE;
         }
         res->rtyp=INT_CMD;
-        res->data=(void*)getGMPFloatDigits();
+        res->data=(void*)(long)gmp_output_digits;
+	//if (gmp_output_digits!=getGMPFloatDigits())
+	//{ Print("%d, %d\n",getGMPFloatDigits(),gmp_output_digits);}
         return FALSE;
       }
   /*==================== mpz_t loader ======================*/
@@ -2314,14 +2318,14 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
 #ifdef HAVE_EXTENDED_SYSTEM
   // You can put your own system calls here
-#  include <kernel/fglmcomb.cc>
-#  include <kernel/fglm.h>
+#  include <kernel/fglm/fglmcomb.cc>
+#  include <kernel/fglm/fglm.h>
 #  ifdef HAVE_NEWTON
 #    include <hc_newton.h>
 #  endif
 #  include <polys/mod_raw.h>
 #  include <polys/monomials/ring.h>
-#  include <kernel/shiftgb.h>
+#  include <kernel/GBEngine/shiftgb.h>
 
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
@@ -2679,19 +2683,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 //            WerrorS("ideal expected");
 //       }
 //       else
-  /*==================== isSqrFree =============================*/
-      if(strcmp(sys_cmd,"isSqrFree")==0)
-      {
-        if ((h!=NULL) &&(h->Typ()==POLY_CMD))
-        {
-          res->rtyp=INT_CMD;
-          res->data=(void *)(long) singclap_isSqrFree((poly)h->Data(), currRing);
-          return FALSE;
-        }
-        else
-          WerrorS("poly expected");
-      }
-      else
   /*==================== pDivStat =============================*/
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if(strcmp(sys_cmd,"pDivStat")==0)
@@ -3152,6 +3143,18 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
+  /*==================== Roune Hilb  =================*/
+       if (strcmp(sys_cmd, "hilbroune") == 0)
+       {
+         ideal I;
+         if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
+         {
+           I=(ideal)h->CopyD();
+           slicehilb(I);
+         }
+         else return TRUE;
+         return FALSE;
+       }
   /*==================== minor =================*/
       if (strcmp(sys_cmd, "minor")==0)
       {
@@ -3589,8 +3592,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         if (h==NULL)
         {
 #ifdef HAVE_PLURAL
-          Print("NTL_0:%d (use NTL for gcd of polynomials in char 0)\n",isOn(SW_USE_NTL_GCD_0));
-          Print("NTL_p:%d (use NTL for gcd of polynomials in char p)\n",isOn(SW_USE_NTL_GCD_P));
           Print("EZGCD:%d (use EZGCD for gcd of polynomials in char 0)\n",isOn(SW_USE_EZGCD));
           Print("EZGCD_P:%d (use EZGCD_P for gcd of polynomials in char p)\n",isOn(SW_USE_EZGCD_P));
           Print("CRGCD:%d (use chinese Remainder for gcd of polynomials in char 0)\n",isOn(SW_USE_CHINREM_GCD));
@@ -3606,8 +3607,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           int d=(int)(long)h->next->Data();
           char *s=(char *)h->Data();
 #ifdef HAVE_PLURAL
-          if (strcmp(s,"NTL_0")==0) { if (d) On(SW_USE_NTL_GCD_0); else Off(SW_USE_NTL_GCD_0); } else
-          if (strcmp(s,"NTL_p")==0) { if (d) On(SW_USE_NTL_GCD_P); else Off(SW_USE_NTL_GCD_P); } else
           if (strcmp(s,"EZGCD")==0) { if (d) On(SW_USE_EZGCD); else Off(SW_USE_EZGCD); } else
           if (strcmp(s,"EZGCD_P")==0) { if (d) On(SW_USE_EZGCD_P); else Off(SW_USE_EZGCD_P); } else
           if (strcmp(s,"CRGCD")==0) { if (d) On(SW_USE_CHINREM_GCD); else Off(SW_USE_CHINREM_GCD); } else

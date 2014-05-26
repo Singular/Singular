@@ -10,9 +10,6 @@
 #ifdef STANDALONE_PARSER
   #include <Singular/utils.h>
 
-//   int initializeGMP(){ return 1; } // NEEDED FOR MAIN APP. LINKING!!!
-  int mmInit(void) {return 1; } // ? due to SINGULAR!!!...???
-
   #define HAVE_LIBPARSER
   #define YYLPDEBUG 1
   #define myfread fread
@@ -23,7 +20,6 @@
   #include <Singular/ipid.h>
   #include <Singular/tok.h>
   #include <misc/options.h>
-  #include <kernel/febase.h>
   #include <omalloc/omalloc.h>
 #endif
 #include <Singular/libparse.h>

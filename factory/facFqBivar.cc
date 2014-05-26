@@ -16,9 +16,9 @@
  **/
 /*****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
+
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
+
 
 #include "cf_assert.h"
 #include "debug.h"
@@ -4175,6 +4175,7 @@ increasePrecision2 (const CanonicalForm& F, CFList& factors,
         delete [] bounds;
         return Union (result, factors);
       }
+      delete [] zeroOne;
     }
     oldL= l;
     l += stepSize;

@@ -1,34 +1,23 @@
-export CC="gcc -fpic -DPIC -DLIBSINGULAR"
-export CXX="g++ -fpic -DPIC -DLIBSINGULAR"
+The following is valid for Singular 4-x-x:
 
-./configure
-or
-./configure --without-dynamic-kernel
+./configure --disable-static ....
 
-make install-libsingular
+make install
 
 ---------------------------------------
 how to compile and run the the example:
-g++ -I......include -o tt tt.cc -L..../Singular -lsingular
-export SINGULAR="..../Singular-3-1-3/"
-export SINGULAR_SYSTEM_TYPE="ix86Mac-darwin/lib"
-if [ "${SINGULAR_SYSTEM_TYPE}" = "ix86Mac-darwin/lib" ]; then
-  export
-DYLD_LIBRARY_PATH="${SINGULAR}/${SINGULAR_SYSTEM_TYPE}:${DYLD_LIBRARY_PATH}"
-else
-  export
-LD_LIBRARY_PATH="${SINGULAR}/${SINGULAR_SYSTEM_TYPE}:${LD_LIBRARY_PATH}"
-fi
-unset SINGULAR_SYSTEM_TYPE
+libsingular-config --libs: gives the correct arguments for linking
+libsingular-config --cflags: gives the correct arguments for compiling
+g++ ...... -o tt tt.cc ....
 
 ./tt
 --------------------------------------
 the example:
-#include <libsingular.h>
+#include <Singular/libsingular.h>
 main()
 {
   // init path names etc.
-  siInit((char *)"/...Singular-3-1-3/Singular/libsingular.so");
+  siInit((char *)"/...lib/libSingular.so");
 
   // construct the ring Z/32003[x,y,z]
   // the variable names

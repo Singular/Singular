@@ -5,20 +5,21 @@
 * ABSTRACT: Singular debugger
 */
 
-#include <unistd.h>   // for unlink,fork,execlp,getpid
-#include <sys/wait.h> // for wait
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
 #include <kernel/mod2.h>
-#include <Singular/tok.h>
-#include <misc/options.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
+#include <misc/options.h>
+#include <reporter/si_signals.h>
+
+#include <Singular/tok.h>
 #include <Singular/ipshell.h>
 #include <Singular/ipid.h>
+#include <Singular/fevoices.h>
+#include <kernel/oswrapper/feread.h>
 #include <Singular/sdb.h>
-#include <Singular/si_signals.h>
+
+#include <unistd.h>   // for unlink,fork,execlp,getpid
+#include <sys/wait.h> // for wait
+
 
 #ifdef HAVE_SDB
 // We use 8 breakpoints - corresponding to a bit in a char variable in procinfo

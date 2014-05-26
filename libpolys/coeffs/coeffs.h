@@ -10,6 +10,7 @@
 #include <misc/auxiliary.h>
 /* for assume: */
 #include <reporter/reporter.h>
+#include <reporter/s_buff.h>
 
 #include <coeffs/si_gmp.h>
 
@@ -122,6 +123,17 @@ struct n_Procs_s
    void (*cfSetChar)(const coeffs r); // initialisations after each ring change
                                 // or NULL
    // general stuff
+   //   if the ring has a meaningful Euclidean structure, hopefully
+   //   supported by cfQuotRem, then
+   //     IntMod, Div should give the same result
+   //     Div(a,b) = QuotRem(a,b, &IntMod(a,b))
+   //   if the ring is not Euclidean or a field, then IntMod should return 0
+   //   and Div the exact quotient. It is assumed that the function is
+   //   ONLY called on Euclidean rings or in the case of an exact division.
+   //
+   //   cfDiv does an exact division, but has to handle illegal input
+   //   cfExactDiv does an exact division, but no error checking
+   //   (I'm not sure I understant and even less that this makes sense)
    numberfunc cfMult, cfSub ,cfAdd ,cfDiv, cfIntDiv, cfIntMod, cfExactDiv;
 
    /// init with an integer
@@ -141,8 +153,8 @@ struct n_Procs_s
 
    /// changes argument  inline: a:= -a
    /// return -a! (no copy is returned)
-   /// the result should be assigned to the original argument: e.g. a = n_Neg(a,r)
-   number  (*cfNeg)(number a, const coeffs r);
+   /// the result should be assigned to the original argument: e.g. a = n_InpNeg(a,r)
+   number  (*cfInpNeg)(number a, const coeffs r);
    /// return 1/a
    number  (*cfInvers)(number a, const coeffs r);
    /// return a copy of a
@@ -157,10 +169,20 @@ struct n_Procs_s
    /// e.g. in K(a): a2 instead of a^2
    void    (*cfWriteShort)(number &a, const coeffs r);
 
+   // it is legal, but not always useful to have cfRead(s, a, r)
+   //   just return s again.
+   // Useful application (read constants which are not an projection
+   // from int/bigint:
+   // Let ring r = R,x,dp;
+   // where R is a coeffs having "special" "named" elements (ie.
+   // the primitive element in some algebraic extension).
+   // If there is no interpreter variable of the same name, it is
+   // difficult to create non-trivial elements in R.
+   // Hence one can use the string to allow creation of R-elts using the
+   // unbound name of the special element.
    const char *  (*cfRead)(const char * s, number * a, const coeffs r);
+
    void    (*cfNormalize)(number &a, const coeffs r);
-
-
 
    BOOLEAN (*cfGreater)(number a,number b, const coeffs r),
             /// tests
@@ -168,16 +190,51 @@ struct n_Procs_s
            (*cfIsZero)(number a, const coeffs r),
            (*cfIsOne)(number a, const coeffs r),
            (*cfIsMOne)(number a, const coeffs r),
+       //GreaterZero is used for printing of polynomials:
+       //  a "+" is only printed in front of a coefficient
+       //  if the element is >0. It is assumed that any element
+       //  failing this will start printing with a leading "-"
            (*cfGreaterZero)(number a, const coeffs r);
 
    void    (*cfPower)(number a, int i, number * result, const coeffs r);
    number  (*cfGetDenom)(number &n, const coeffs r);
    number  (*cfGetNumerator)(number &n, const coeffs r);
+   //CF: a Euclidean ring is a commutative, unitary ring with an Euclidean
+   //  function f s.th. for all a,b in R, b ne 0, we can find q, r s.th.
+   //  a = qb+r and either r=0 or f(r) < f(b)
+   //  Note that neither q nor r nor f(r) are unique.
    number  (*cfGcd)(number a, number b, const coeffs r);
    number  (*cfExtGcd)(number a, number b, number *s, number *t,const coeffs r);
+   //given a and b in a Euclidean setting, return s,t,u,v sth.
+   //  sa + tb = gcd
+   //  ua + vb = 0
+   //  sv + tu = 1
+   //  ie. the 2x2 matrix (s t | u v) is unimodular and maps (a,b) to (g, 0)
+   //CF: note, in general, this cannot be derived from ExtGcd due to
+   //    zero divisors
+   number  (*cfXExtGcd)(number a, number b, number *s, number *t, number *u, number *v, const coeffs r);
+   //in a Euclidean ring, return the Euclidean norm as a bigint (of type number)
+   number  (*cfEucNorm)(number a, const coeffs r);
+   //in a principal ideal ring (with zero divisors): the annihilator
+   // NULL otherwise
+   number  (*cfAnn)(number a, const coeffs r);
+   //find a "canonical representative of a modulo the units of r
+   //return NULL if a is already normalized
+   //otherwise, the factor.
+   //(for Z: make positive, for z/nZ make the gcd with n
+   //aparently it is GetUnit!
+   //in a Euclidean ring, return the quotient and compute the remainder
+   //rem can be NULL
+   number  (*cfQuotRem)(number a, number b, number *rem, const coeffs r);
    number  (*cfLcm)(number a, number b, const coeffs r);
    void    (*cfDelete)(number * a, const coeffs r);
+
+   //CF: tries to find a canonical map from src -> dst
    nMapFunc (*cfSetMap)(const coeffs src, const coeffs dst);
+
+   /// io via ssi:
+   void    (*cfWriteFd)(number a, FILE *f, const coeffs r);
+   number  (*cfReadFd)( s_buff f, const coeffs r);
 
    /// For extensions (writes into global string buffer)
    char *  (*cfName)(number n, const coeffs r);
@@ -193,11 +250,17 @@ struct n_Procs_s
    /// TODO: to be exchanged with a map!!!
    number  (*cfInit_bigint)(number i, const coeffs dummy, const coeffs dst);
 
-   /// rational reconstruction: best rational with mod p=n
+   /// rational reconstruction: "best" rational a/b with a/b = p mod n
+   //  or a = bp mod n
+   //  CF: no idea what this would be in general
+   //     it seems to be extended to operate coefficient wise in extensions.
+   //     I presume then n in coeffs_BIGINT while p in coeffs
    number  (*cfFarey)(number p, number n, const coeffs);
 
    /// chinese remainder
    /// returns X with X mod q[i]=x[i], i=0..rl-1
+   //CF: by the looks of it: q[i] in Z (coeffs_BIGINT)
+   //    strange things happen in naChineseRemainder for example.
    number  (*cfChineseRemainder)(number *x, number *q,int rl, BOOLEAN sym,const coeffs);
 
    /// degree for coeffcients: -1 for 0, 0 for "constants", ...
@@ -212,13 +275,13 @@ struct n_Procs_s
    /// function pointer behind n_ClearDenominators
    nCoeffsEnumeratorFunc cfClearDenominators;
 
+   /// conversion to CanonicalForm(factory) to number
    number (*convFactoryNSingN)( const CanonicalForm n, const coeffs r);
    CanonicalForm (*convSingNFactoryN)( number n, BOOLEAN setChar, const coeffs r );
 
 
    /// the 0 as constant, NULL by default
    number nNULL;
-   int     char_flag;
    int     ref;
    /// how many variables of factort are already used by this coeff
    int     factoryVarOffset;
@@ -288,6 +351,7 @@ struct n_Procs_s
    int     (*cfDivComp)(number a,number b,const coeffs r);
    BOOLEAN (*cfIsUnit)(number a,const coeffs r);
    number  (*cfGetUnit)(number a,const coeffs r);
+   //CF: test if b divides a
    BOOLEAN (*cfDivBy)(number a, number b, const coeffs r);
   /* The following members are for representing the ring Z/n,
      where n is not a prime. We distinguish four cases:
@@ -312,7 +376,12 @@ struct n_Procs_s
   unsigned long modExponent;
   int_number    modNumber;
   unsigned long mod2mMask;
+  //returns coeffs with updated ch, modNumber and modExp
+  coeffs (*cfQuot1)(number c, const coeffs r);
 #endif
+
+  /*CF: for blackbox rings */
+  void * data;
 #ifdef LDEBUG
    // must be last entry:
    /// Test: is "a" a correct number?
@@ -435,8 +504,13 @@ static inline BOOLEAN n_IsUnit(number n, const coeffs r)
 ///                                   is co-prime with k
 /// in Z/2^kZ: largest odd divisor of n (taken in Z)
 /// other cases: not implemented
+// CF: shold imply that n/GetUnit(n) is normalized in Z/kZ
+//   it would make more sense to return the inverse...
 static inline number n_GetUnit(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfGetUnit!=NULL); return r->cfGetUnit(n,r); }
+
+static inline coeffs n_CoeffRingQuot1(number c, const coeffs r)
+{ assume(r != NULL); assume(r->cfQuot1 != NULL); return r->cfQuot1(c, r); }
 #endif
 
 /// a number representing i in the given coeff field/ring r
@@ -458,9 +532,9 @@ static inline void n_MPZ(mpz_t result, number &n,       const coeffs r)
 
 
 /// in-place negation of n
-/// MUST BE USED: n = n_Neg(n) (no copy is returned)
-static inline number n_Neg(number n,     const coeffs r)
-{ assume(r != NULL); assume(r->cfNeg!=NULL); return r->cfNeg(n,r); }
+/// MUST BE USED: n = n_InpNeg(n) (no copy is returned)
+static inline number n_InpNeg(number n,     const coeffs r)
+{ assume(r != NULL); assume(r->cfInpNeg!=NULL); return r->cfInpNeg(n,r); }
 
 /// return the multiplicative inverse of 'a';
 /// raise an error if 'a' is not invertible
@@ -484,6 +558,7 @@ static inline void   n_Normalize(number& n, const coeffs r)
 { assume(r != NULL); assume(r->cfNormalize!=NULL); r->cfNormalize(n,r); }
 
 /// write to the output buffer of the currently used reporter
+//CF: the "&" should be removed, as one wants to write constants as well
 static inline void   n_WriteLong(number& n,  const coeffs r)
 { assume(r != NULL); assume(r->cfWriteLong!=NULL); r->cfWriteLong(n,r); }
 
@@ -545,23 +620,18 @@ static inline number n_Add(number a, number b, const coeffs r)
 static inline number n_Div(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfDiv!=NULL); return r->cfDiv(a,b,r); }
 
-/// in Z: largest c such that c*b <= a
-/// in Z/nZ, Z/2^kZ: computed as in the case Z (from integers representing
-///                  'a' and 'b')
-/// in Z/pZ: return a/b
-/// in K(a)/<p(a)>: return a/b
-/// in K(t_1, ..., t_n): return a/b
-/// other fields: not implemented
 static inline number n_IntDiv(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfIntDiv!=NULL); return r->cfIntDiv(a,b,r); }
 
+/// for r a field, return n_Init(0,r)
+/// otherwise: n_Div(a,b,r)*b+n_IntMod(a,b,r)==a
 static inline number n_IntMod(number a, number b, const coeffs r)
-{ assume(r != NULL); assume(r->cfIntMod!=NULL); return r->cfIntMod(a,b,r); }
-/// @todo: Describe me!!!
-///
-/// What is the purpose of this method, especially in comparison with
-/// n_Div?
-/// !!! Recommendation: remove this method from the user-interface.
+{ assume(r != NULL); return r->cfIntMod(a,b,r); }
+
+/// assume that there is a canonical subring in cf and we know
+/// that division is possible for these a and b in the subring,
+/// n_ExactDiv performs it, may skip additional tests.
+/// Can always be substituted by n_Div at the cost of larger  computing time.
 static inline number n_ExactDiv(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfExactDiv!=NULL); return r->cfExactDiv(a,b,r); }
 
@@ -578,6 +648,17 @@ static inline number n_Gcd(number a, number b, const coeffs r)
 /// and may perform something unexpected in some cases...
 static inline number n_ExtGcd(number a, number b, number *s, number *t, const coeffs r)
 { assume(r != NULL); assume(r->cfExtGcd!=NULL); return r->cfExtGcd (a,b,s,t,r); }
+static inline number n_XExtGcd(number a, number b, number *s, number *t, number *u, number *v, const coeffs r)
+{ assume(r != NULL); assume(r->cfXExtGcd!=NULL); return r->cfXExtGcd (a,b,s,t,u,v,r); }
+static inline number  n_EucNorm(number a, const coeffs r)
+{ assume(r != NULL); assume(r->cfEucNorm!=NULL); return r->cfEucNorm (a,r); }
+/// if r is a ring with zero divisors, return an annihilator!=0 of b
+/// otherwise return NULL
+static inline number  n_Ann(number a, const coeffs r)
+{ assume(r != NULL); return r->cfAnn (a,r); }
+static inline number  n_QuotRem(number a, number b, number *q, const coeffs r)
+{ assume(r != NULL); assume(r->cfQuotRem!=NULL); return r->cfQuotRem (a,b,q,r); }
+
 
 /// in Z: return the lcm of 'a' and 'b'
 /// in Z/nZ, Z/2^kZ: computed as in the case Z
@@ -869,9 +950,12 @@ static inline void n_ClearDenominators(ICoeffsEnumerator& numberCollectionEnumer
   n_Delete(&d, r);
 }
 
+
 /// print a number (BEWARE of string buffers!)
 /// mostly for debugging
 void   n_Print(number& a,  const coeffs r);
 
 #endif
+
+
 

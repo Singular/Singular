@@ -2,10 +2,10 @@ ACLOCAL_AMFLAGS = -I ../m4
 
 GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-version)
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(GMP_CFLAGS) -I${top_srcdir}/factory/include -I${top_builddir}/factory/include $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS)   -DGIT_VERSION='"$(GIT_VERSION)"'
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES)  $(GMP_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DGIT_VERSION='"$(GIT_VERSION)"'
 
 if HAVE_GFANLIB
-  USE_GFANLIB = ${top_builddir}/dyn_modules/callgfanlib/gfanlib.la ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
+  USE_GFANLIB = ${builddir}/dyn_modules/callgfanlib/gfanlib.la ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
 else
   USE_GFANLIB = 
 endif
@@ -13,6 +13,8 @@ endif
 # AM_LDFLAGS = libSingular.la ${top_builddir}/kernel/libkernel.la
 
 ########################### Dynamic Modules... #########################
+SUBDIRS = dyn_modules
+
 if ENABLE_P_PROCS_DYNAMIC
   moduledir = $(libexecdir)/singular/MOD
 else !ENABLE_P_PROCS_DYNAMIC
@@ -38,7 +40,7 @@ else !PYTHON_USE
 endif !PYTHON_USE
 
 if SI_EMBED_PYTHON
- EMBED_PYOBJECT   = ${PY} ${top_builddir}/dyn_modules/syzextra/syzextra.la ${USE_GFANLIB}
+ EMBED_PYOBJECT   = ${PY} ${builddir}/dyn_modules/syzextra/syzextra.la ${USE_GFANLIB}
 else !SI_EMBED_PYTHON
   EMBED_PYOBJECT = 
 endif !SI_EMBED_PYTHON
@@ -48,11 +50,9 @@ endif !SI_EMBED_PYTHON
 libSingular_LTLIBRARIES = libSingular.la 
 libSingulardir = $(libdir)
 
-libSingular_la_CPPFLAGS = ${AM_CPPFLAGS} -DLIBSINGULAR
+libSingular_la_CPPFLAGS = ${AM_CPPFLAGS} -DLIBSINGULAR ${PTHREAD_CFLAGS}
 
-SOURCES =    Minor.cc\
-   MinorInterface.cc\
-   MinorProcessor.cc\
+SOURCES = \
    links/asciiLink.cc\
    attrib.cc\
    blackbox.cc\
@@ -68,7 +68,6 @@ SOURCES =    Minor.cc\
    fglm.cc\
    gms.cc\
    grammar.cc\
-   interpolation.cc\
    iparith.cc\
    ipassign.cc\
    ipconv.cc\
@@ -76,12 +75,10 @@ SOURCES =    Minor.cc\
    iplib.cc\
    ipprint.cc\
    ipshell.cc\
-   janet.cc\
    libparse.cc\
    linearAlgebra_ip.cc\
    lists.cc\
    maps_ip.cc\
-   minpoly.cc\
    misc_ip.cc\
    mod_lib.cc\
    links/ndbm.cc\
@@ -90,7 +87,6 @@ SOURCES =    Minor.cc\
    links/pipeLink.cc\
    scanner.cc\
    sdb.cc\
-   links/s_buff.cc\
    links/silink.cc\
    links/sing_dbm.cc\
    sing_win.cc\
@@ -103,18 +99,14 @@ SOURCES =    Minor.cc\
    walk.cc\
    walk_ip.cc\
    wrapper.cc\
-   fereadl.c mmstd.c claptmpl.cc\
-   rlimit.c
+   mmstd.c claptmpl.cc\
+   febase.cc
 
 #   links/slInit_Dynamic.cc
 
 libSingular_la_SOURCES   = $(SOURCES)
 
-SingularHEADERS =    Cache.h \
-   CacheImplementation.h \
-   Minor.h \
-   MinorInterface.h \
-   MinorProcessor.h \
+SingularHEADERS = \
    attrib.h \
    blackbox.h \
    cntrlc.h \
@@ -126,20 +118,17 @@ SingularHEADERS =    Cache.h \
    fglm.h \
    gms.h \
    grammar.h \
-   interpolation.h \
    idrec.h \
    ipconv.h \
    ipid.h \
    ipprint.h \
    ipshell.h \
-   janet.h \
    libparse.h \
    libsingular.h \
    linearAlgebra_ip.h\
    lists.h \
    locals.h \
    maps_ip.h \
-   minpoly.h \
    misc_ip.h \
    mmalloc.h \
    mod_lib.h \
@@ -152,19 +141,17 @@ SingularHEADERS =    Cache.h \
    run.h \
    sdb.h \
    links/silink.h \
-   links/s_buff.h \
    links/sing_dbm.h \
    sing_win.h \
    links/slInit.h \
    links/ssiLink.h \
    links/simpleipc.h \
-   si_signals.h \
    stype.h \
    subexpr.h \
    table.h \
    tok.h \
    walk.h \
-   rlimit.h
+   fevoices.h
 
 
 # -DMAKE_DISTRIBUTION 
@@ -172,8 +159,8 @@ SingularHEADERS =    Cache.h \
 # plural_cmd.inc
 nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc 
 
-libSingular_la_LDFLAGS    = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION}
-libSingular_la_LIBADD      = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT} ${top_builddir}/kernel/libkernel.la
+libSingular_la_LDFLAGS    =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION} ${PTHREAD_LDFLAGS}
+libSingular_la_LIBADD     =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT} ${top_builddir}/kernel/libkernel.la ${PTHREAD_LIBS}
 
 libSingular_includedir = ${includedir}/singular/Singular
 nobase_libSingular_include_HEADERS = $(SingularHEADERS)

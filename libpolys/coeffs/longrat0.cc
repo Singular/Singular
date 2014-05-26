@@ -9,9 +9,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <misc/auxiliary.h>
 
 #include <omalloc/omalloc.h>

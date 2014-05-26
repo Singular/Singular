@@ -2,20 +2,19 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 //#include <kernel/mod2.h>
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 
 #include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
 
 #include <polys/monomials/p_polys.h>
-//#include <kernel/febase.h>
 //#include <kernel/pShallowCopyDelete.h>
 #include <coeffs/coeffs.h>
 #include <polys/monomials/ring.h>
 //#include <kernel/p_Procs.h>
-//#include <kernel/kutil.h>
+//#include <kernel/GBEngine/kutil.h>
 #include <polys/kbuckets.h>
 
 // #include <polys/operations/pShallowCopyDelete.h>
@@ -724,9 +723,9 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   if ((rField_is_Ring(r) && !(rField_is_Domain(r)))
   ||(rIsPluralRing(r)))
   {
-    pSetCoeff0(m, n_Neg(pGetCoeff(m),r->cf));
+    pSetCoeff0(m, n_InpNeg(pGetCoeff(m),r->cf));
     p1=pp_Mult_mm(p,m,r);
-    pSetCoeff0(m, n_Neg(pGetCoeff(m),r->cf));
+    pSetCoeff0(m, n_InpNeg(pGetCoeff(m),r->cf));
     l1=pLength(p1);
     i = pLogLength(l1);
   }
@@ -758,7 +757,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     }
     else
     {
-      pSetCoeff0(m, n_Neg(pGetCoeff(m),r->cf));
+      pSetCoeff0(m, n_InpNeg(pGetCoeff(m),r->cf));
       if (spNoether != NULL)
       {
         l1 = -1;
@@ -769,7 +768,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
       {
         p1 = r->p_Procs->pp_Mult_mm(p1, m, r);
       }
-      pSetCoeff0(m, n_Neg(pGetCoeff(m),r->cf));
+      pSetCoeff0(m, n_InpNeg(pGetCoeff(m),r->cf));
     }
   }
 
@@ -840,8 +839,8 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
 
       if (!(n_IsOne(gcd,r)))
       {
-        number orig_coef2=n_IntDiv(orig_coef,gcd,r);
-        number add_coef2=n_IntDiv(add_coef, gcd,r);
+        number orig_coef2=n_ExactDiv(orig_coef,gcd,r);
+        number add_coef2=n_ExactDiv(add_coef, gcd,r);
         n_Delete(&orig_coef,r);
         n_Delete(&add_coef,r);
         orig_coef=orig_coef2;
@@ -917,8 +916,8 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
 
       if (!(n_IsOne(gcd,r)))
       {
-        number orig_coef2=n_IntDiv(orig_coef,gcd,r);
-        number add_coef2=n_IntDiv(add_coef, gcd,r);
+        number orig_coef2=n_ExactDiv(orig_coef,gcd,r);
+        number add_coef2=n_ExactDiv(add_coef, gcd,r);
         n_Delete(&orig_coef,r);
         n_Delete(&n,r);
         n_Delete(&add_coef,r);
@@ -1161,6 +1160,10 @@ number kBucketPolyRed(kBucket_pt bucket,
   kbTest(bucket);
   return rn;
 }
+
+#ifndef USE_COEF_BUCKETS
+void kBucketSimpleContent(kBucket_pt) {}
+#else
 static BOOLEAN nIsPseudoUnit(number n, ring r)
 {
   if (rField_is_Zp(r))
@@ -1174,9 +1177,6 @@ static BOOLEAN nIsPseudoUnit(number n, ring r)
   return (n_IsOne(n,r->cf) || n_IsMOne(n,r->cf));
 }
 
-#ifndef USE_COEF_BUCKETS
-void kBucketSimpleContent(kBucket_pt) {}
-#else
 void kBucketSimpleContent(kBucket_pt bucket)
 {
   ring r=bucket->bucket_ring;
@@ -1248,7 +1248,7 @@ void kBucketSimpleContent(kBucket_pt bucket)
       assume(!(n_IsZero(coef,r)));
       assume(bucket->coef[i]!=NULL);
       number lc=p_GetCoeff(bucket->coef[i],r);
-      p_SetCoeff(bucket->coef[i], n_IntDiv(lc,coef,r),r);
+      p_SetCoeff(bucket->coef[i], n_ExactDiv(lc,coef,r),r);
       assume(!(n_IsZero(p_GetCoeff(bucket->coef[i],r),r)));
     }
   }
@@ -1322,8 +1322,8 @@ int ksCheckCoeff(number *a, number *b, const coeffs r)
   }
   else
   {
-    an = n_IntDiv(an, cn, r);
-    bn = n_IntDiv(bn, cn, r);
+    an = n_Div(an, cn, r); n_Normalize(an,r);
+    bn = n_Div(bn, cn, r); n_Normalize(bn,r);
   }
   n_Delete(&cn, r);
   if (n_IsOne(an, r))

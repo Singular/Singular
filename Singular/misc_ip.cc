@@ -11,26 +11,24 @@
 /*****************************************************************************/
 
 // include header files
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
 
-#include <misc/auxiliary.h>
 #include <kernel/mod2.h>
-#include <Singular/si_signals.h>
+#include <misc/auxiliary.h>
+#include <misc/sirandom.h>
 
-#define SI_DONT_HAVE_GLOBAL_VARS
+#include <reporter/si_signals.h>
+
 #include <factory/factory.h>
-
-#ifdef HAVE_SIMPLEIPC
-#include <Singular/links/simpleipc.h>
-#endif
 
 #include <coeffs/si_gmp.h>
 #include <coeffs/coeffs.h>
 
 #include <polys/ext_fields/algext.h>
 #include <polys/ext_fields/transext.h>
+
+#ifdef HAVE_SIMPLEIPC
+#include <Singular/links/simpleipc.h>
+#endif
 
 #include "misc_ip.h"
 #include "ipid.h"
@@ -386,10 +384,10 @@ lists primeFactorisation(const number n, const int pBound)
 #include <polys/monomials/ring.h>
 #include <polys/templates/p_Procs.h>
 
-#include <kernel/febase.h>
-#include <kernel/kstd1.h>
-#include <kernel/timer.h>
-
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/oswrapper/timer.h>
+#include <resources/feResource.h>
+#include <kernel/oswrapper/feread.h>
 
 #include "subexpr.h"
 #include "cntrlc.h"
@@ -401,8 +399,6 @@ lists primeFactorisation(const number n, const int pBound)
 #ifdef HAVE_STATIC
 #undef HAVE_DYN_RL
 #endif
-
-#define SI_DONT_HAVE_GLOBAL_VARS
 
 //#ifdef HAVE_LIBPARSER
 //#  include "libparse.h"
@@ -805,7 +801,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #ifdef HAVE_FLINT
               StringAppend("FLINT(%s),",version);
 #endif
-
+              StringAppend("factory(%s),\n\t", factoryVersion);
 #if defined(HAVE_DYN_RL)
               if (fe_fgets_stdin==fe_fgets_dummy)
                 StringAppendS("no input,");
@@ -1170,9 +1166,6 @@ extern "C"
 void siInit(char *name)
 {
 // factory default settings: -----------------------------------------------
-  On(SW_USE_NTL);
-  On(SW_USE_NTL_GCD_0); // On -> seg11 in Old/algnorm, Old/factor...
-  On(SW_USE_NTL_GCD_P); // On -> cyle in Short/brnoeth_s: fixed
   On(SW_USE_EZGCD);
   On(SW_USE_CHINREM_GCD);
   //On(SW_USE_FF_MOD_GCD);
@@ -1212,7 +1205,7 @@ void siInit(char *name)
   currPackHdl=h;
   basePackHdl=h;
 
-  coeffs_BIGINT = nInitChar(n_Q,NULL);
+  coeffs_BIGINT = nInitChar(n_Q,(void*)1);
 
 #if 1
    // def HAVE_POLYEXTENSIONS
@@ -1266,13 +1259,3 @@ void siInit(char *name)
   }
   errorreported = 0;
 }
-
-/*
-#ifdef LIBSINGULAR
-// the init routines of factory need mmInit
-int mmInit( void )
-{
-  return 1;
-}
-#endif
-*/

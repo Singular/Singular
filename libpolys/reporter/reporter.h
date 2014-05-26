@@ -59,6 +59,12 @@ void    PrintS(const char* s);
 }
 /* the C++-part: */
 
+// a new output buffer will be allocated by StringSetS,
+// used by several calls to StringAppend/StringAppendS
+// and closed by StringEndS:
+// StringEndS() returns this buffer which must be freed by omFree
+// several buffer may be active at the same time
+// (for example in subroutines)
 void  StringAppend(const char *fmt, ...);
 void  StringAppendS(const char *s);
 void  StringSetS(const char* s);
@@ -76,6 +82,9 @@ void feStringAppendResources(int warn = -1);
  * Shall ONLY be used for a temporary redirection of the standard output
  * (i.e. if Singular runs as a server)
  */
+// unlike the StringSet/StringEndS stuff: 
+// only one SPrintStart/SPrintEnd buffer may be active
+// the returned string must be free via omFree
 void SPrintStart();
 char* SPrintEnd();
 

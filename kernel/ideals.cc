@@ -6,9 +6,9 @@
 */
 
 /* includes */
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+#include <kernel/mod2.h>
+
 #include "mod2.h"
 
 #include <omalloc/omalloc.h>
@@ -38,11 +38,10 @@
 
 #include <kernel/ideals.h>
 
-#include <kernel/febase.h>
-#include <kernel/kstd1.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/syz.h>
 
-#include <libpolys/coeffs/longrat.h>
+#include <coeffs/longrat.h>
 
 
 /* #define WITH_OLD_MINOR */
@@ -60,19 +59,26 @@ ideal idMinBase (ideal h1)
   int i,l,ll;
   intvec * wth;
   BOOLEAN homog;
-
-  homog = idHomModule(h1,currQuotient,&wth);
+  #ifdef HAVE_RINGS
+  if(rField_is_Ring(currRing))
+  {
+      WarnS("minbase applies only to the local or homogeneous case over coefficient fields");
+      e=idCopy(h1);
+      return e;
+  }
+  #endif
+  homog = idHomModule(h1,currRing->qideal,&wth);
   if (rHasGlobalOrdering(currRing))
   {
     if(!homog)
     {
-      WarnS("minbase applies only to the local or homogeneous case");
+      WarnS("minbase applies only to the local or homogeneous case over coefficient fields");
       e=idCopy(h1);
       return e;
     }
     else
     {
-      ideal re=kMin_std(h1,currQuotient,(tHomog)homog,&wth,h2,NULL,0,3);
+      ideal re=kMin_std(h1,currRing->qideal,(tHomog)homog,&wth,h2,NULL,0,3);
       idDelete(&re);
       return h2;
     }
@@ -84,11 +90,11 @@ ideal idMinBase (ideal h1)
   }
   pEnlargeSet(&(e->m),IDELEMS(e),15);
   IDELEMS(e) = 16;
-  h2 = kStd(h1,currQuotient,isNotHomog,NULL);
+  h2 = kStd(h1,currRing->qideal,isNotHomog,NULL);
   h3 = idMaxIdeal(1);
   h4=idMult(h2,h3);
   idDelete(&h3);
-  h3=kStd(h4,currQuotient,isNotHomog,NULL);
+  h3=kStd(h4,currRing->qideal,isNotHomog,NULL);
   k = IDELEMS(h3);
   while ((k > 0) && (h3->m[k-1] == NULL)) k--;
   j = -1;
@@ -117,10 +123,10 @@ ideal idMinBase (ideal h1)
   idDelete(&h2);
   idDelete(&h3);
   idDelete(&h4);
-  if (currQuotient!=NULL)
+  if (currRing->qideal!=NULL)
   {
     h3=idInit(1,e->rank);
-    h2=kNF(h3,currQuotient,e);
+    h2=kNF(h3,currRing->qideal,e);
     idDelete(&h3);
     idDelete(&e);
     e=h2;
@@ -229,7 +235,7 @@ ideal idSect (ideal h1,ideal h2)
   length  = si_max(flength,slength);
   if (length==0)
   {
-    if ((currQuotient==NULL)
+    if ((currRing->qideal==NULL)
     && (currRing->OrdSgn==1)
     && (!rIsPluralRing(currRing))
     && ((TEST_V_INTERSECT_ELIM) || (!TEST_V_INTERSECT_SYZ)))
@@ -277,7 +283,7 @@ ideal idSect (ideal h1,ideal h2)
     }
   }
   intvec *w=NULL;
-  temp1 = kStd(temp,currQuotient,testHomog,&w,NULL,length);
+  temp1 = kStd(temp,currRing->qideal,testHomog,&w,NULL,length);
   if (w!=NULL) delete w;
   idDelete(&temp);
   if(syz_ring!=orig_ring)
@@ -329,13 +335,13 @@ ideal idSect (ideal h1,ideal h2)
   if (TEST_OPT_RETURN_SB)
   {
      w=NULL;
-     temp1=kStd(result,currQuotient,testHomog,&w);
+     temp1=kStd(result,currRing->qideal,testHomog,&w);
      if (w!=NULL) delete w;
      idDelete(&result);
      idSkipZeroes(temp1);
      return temp1;
   }
-  else //temp1=kInterRed(result,currQuotient);
+  else //temp1=kInterRed(result,currRing->qideal);
     return result;
 }
 
@@ -417,7 +423,7 @@ ideal idMultSect(resolvente arg, int length)
     }
   }
   /* std computation --------------------------------------------*/
-  tempstd = kStd(bigmat,currQuotient,testHomog,&w,NULL,syzComp);
+  tempstd = kStd(bigmat,currRing->qideal,testHomog,&w,NULL,syzComp);
   if (w!=NULL) delete w;
   idDelete(&bigmat);
 
@@ -484,7 +490,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
 
   //if (hom==testHomog)
   //{
-  //  if(idHomIdeal(h1,currQuotient))
+  //  if(idHomIdeal(h1,currRing->qideal))
   //  {
   //    hom=TRUE;
   //  }
@@ -524,7 +530,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
   idPrint(h2);
 
   Print("Prepare::currQuotient: ");
-  idPrint(currQuotient);
+  idPrint(currRing->qideal);
 #endif
 #endif
 
@@ -532,7 +538,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
 
   idTest(h2);
 
-  h3 = kStd(h2,currQuotient,hom,w,NULL,syzcomp);
+  h3 = kStd(h2,currRing->qideal,hom,w,NULL,syzcomp);
 
 #if MYTEST
 #ifdef RDEBUG
@@ -693,9 +699,9 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     idDelete(&e);
   }
   idTest(s_h3);
-  if (currQuotient != NULL)
+  if (currRing->qideal != NULL)
   {
-    ideal ts_h3=kStd(s_h3,currQuotient,h,w);
+    ideal ts_h3=kStd(s_h3,currRing->qideal,h,w);
     idDelete(&s_h3);
     s_h3 = ts_h3;
   }
@@ -926,7 +932,7 @@ static void idPrepareStd(ideal s_temp, int k)
     {
       p = s_temp->m[j];
       q = pOne();
-      //pGetCoeff(q)=nNeg(pGetCoeff(q));   //set q to -1
+      //pGetCoeff(q)=nInpNeg(pGetCoeff(q));   //set q to -1
       pSetComp(q,k+1+j);
       pSetmComp(q);
       while (pNext(p)) pIter(p);
@@ -1034,7 +1040,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
       }
     }
   }
-  ideal s_result = kNF(s_h3,currQuotient,s_temp,k);
+  ideal s_result = kNF(s_h3,currRing->qideal,s_temp,k);
   s_result->rank = s_h3->rank;
   ideal s_rest = idInit(IDELEMS(s_result),k);
   idDelete(&s_h3);
@@ -1218,9 +1224,9 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
     k = 1;
   if ((k2==0) && (k>1)) *addOnlyOne = FALSE;
   intvec * weights;
-  hom = (tHomog)idHomModule(h1,currQuotient,&weights);
+  hom = (tHomog)idHomModule(h1,currRing->qideal,&weights);
   if /**addOnlyOne &&*/ (/*(*/ !h1IsStb /*)*/)
-    temph1 = kStd(h1,currQuotient,hom,&weights,NULL);
+    temph1 = kStd(h1,currRing->qideal,hom,&weights,NULL);
   else
     temph1 = idCopy(h1);
   if (weights!=NULL) delete weights;
@@ -1336,7 +1342,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
 
   ideal s_h4 = idInitializeQuot (h1,h2,h1IsStb,&addOnlyOne,&kmax);
 
-  hom = (tHomog)idHomModule(s_h4,currQuotient,&weights1);
+  hom = (tHomog)idHomModule(s_h4,currRing->qideal,&weights1);
 
   ring orig_ring=currRing;
   ring syz_ring=rAssure_SyzComp(orig_ring,TRUE);  rChangeCurrRing(syz_ring);
@@ -1356,11 +1362,11 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   ideal s_h3;
   if (addOnlyOne)
   {
-    s_h3 = kStd(s_h4,currQuotient,hom,&weights1,NULL,0/*kmax-1*/,IDELEMS(s_h4)-1);
+    s_h3 = kStd(s_h4,currRing->qideal,hom,&weights1,NULL,0/*kmax-1*/,IDELEMS(s_h4)-1);
   }
   else
   {
-    s_h3 = kStd(s_h4,currQuotient,hom,&weights1,NULL,kmax-1);
+    s_h3 = kStd(s_h4,currRing->qideal,hom,&weights1,NULL,kmax-1);
   }
   SI_RESTORE_OPT1(old_test1);
   #if 0
@@ -1421,7 +1427,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   {
     return idCopy(h1);
   }
-  if ((currQuotient!=NULL) && rIsPluralRing(origR))
+  if ((currRing->qideal!=NULL) && rIsPluralRing(origR))
   {
     WerrorS("cannot eliminate in a qring");
     return NULL;
@@ -1691,7 +1697,7 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
           if (R!=NULL)
           {
             q = p;
-            p = kNF(R,currQuotient,q);
+            p = kNF(R,currRing->qideal,q);
             p_Delete(&q,currRing);
           }
           /*delete the matrix tmp*/
@@ -1755,7 +1761,7 @@ ideal idMinors(matrix a, int ar, ideal R)
         if (R!=NULL)
         {
           q = p;
-          p = kNF(R,currQuotient,q);
+          p = kNF(R,currRing->qideal,q);
           p_Delete(&q,currRing);
         }
         if (p!=NULL)
@@ -1827,7 +1833,7 @@ ideal idMinors(matrix a, int ar, ideal R)
     R = idrCopyR(R,origR,tmpR);
     //if (ar>1) // otherwise done in mpMinorToResult
     //{
-    //  matrix bb=(matrix)kNF(R,currQuotient,(ideal)b);
+    //  matrix bb=(matrix)kNF(R,currRing->qideal,(ideal)b);
     //  bb->rank=b->rank; bb->nrows=b->nrows; bb->ncols=b->ncols;
     //  idDelete((ideal*)&b); b=bb;
     //}
@@ -1859,7 +1865,7 @@ BOOLEAN idIsSubModule(ideal id1,ideal id2)
   {
     if (id1->m[i] != NULL)
     {
-      p = kNF(id2,currQuotient,id1->m[i]);
+      p = kNF(id2,currRing->qideal,id1->m[i]);
       if (p != NULL)
       {
         p_Delete(&p,currRing);
@@ -1982,7 +1988,7 @@ static ideal idHandleIdealOp(ideal arg,int syzcomp,int isIdeal=FALSE)
   else
     s_temp=arg;
 
-  ideal s_temp1 = kStd(s_temp,currQuotient,testHomog,&w,NULL,length);
+  ideal s_temp1 = kStd(s_temp,currRing->qideal,testHomog,&w,NULL,length);
   if (w!=NULL) delete w;
 
   if (syz_ring!=orig_ring)
@@ -2098,7 +2104,10 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
 
   ring orig_ring=currRing;
   ring syz_ring=rAssure_SyzComp(orig_ring, TRUE); rChangeCurrRing(syz_ring);
-  rSetSyzComp(length, syz_ring);
+  if (TEST_OPT_RETURN_SB)
+    rSetSyzComp(id_RankFreeModule(temp,orig_ring), syz_ring);
+  else
+    rSetSyzComp(length, syz_ring);
   ideal s_temp;
 
   if (syz_ring != orig_ring)
@@ -2111,7 +2120,7 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
   }
 
   idTest(s_temp);
-  ideal s_temp1 = kStd(s_temp,currQuotient,hom,&wtmp,NULL,length);
+  ideal s_temp1 = kStd(s_temp,currRing->qideal,hom,&wtmp,NULL,length);
 
   //if (wtmp!=NULL)  Print("output weights:");wtmp->show(1);PrintLn();
   if ((w!=NULL) && (*w !=NULL) && (wtmp!=NULL))

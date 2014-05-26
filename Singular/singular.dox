@@ -1,0 +1,6 @@
+/*! \page singular_page Interpreter(Singular)
+ *
+ * Iterpreter and wrappers over kernel (\ref kernel_page)
+ * 
+ * \subpage dynmodules_page
+ */

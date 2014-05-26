@@ -1,6 +1,6 @@
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+#include <kernel/mod2.h>
+
 #include "mod2.h"
 
 #include <omalloc/omalloc.h>
@@ -12,12 +12,11 @@
 #include <polys/monomials/ring.h>
 
 
-#include <kernel/febase.h>
 #include <kernel/ideals.h>
-#include <kernel/kstd1.h>
-#include <kernel/khstd.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/khstd.h>
 
-#include <kernel/kutil.h>
+#include <kernel/GBEngine/kutil.h>
 
 
 #ifdef HAVE_PLURAL

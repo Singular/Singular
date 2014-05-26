@@ -12,9 +12,9 @@
  **/
 /*****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
+
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
+
 
 #include "timing.h"
 #include "cf_assert.h"
@@ -492,7 +492,6 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
   DEBOUTLN( cerr, "GG = " << GG );
   TIMING_START (ez_content)
   f = content( F, x ); g = content( G, x ); d = gcd( f, g );
-  d /= icontent (d);
   DEBOUTLN( cerr, "f = " << f );
   DEBOUTLN( cerr, "g = " << g );
   F /= f; G /= g;

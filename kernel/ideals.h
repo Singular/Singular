@@ -15,9 +15,6 @@
 //typedef struct sip_smap *          map;
 typedef ideal *            resolvente;
 
-extern ideal currQuotient;
-
-
 inline ideal idCopyFirstK (const ideal ide, const int k, ring R = currRing)
 {
   return id_CopyFirstK(ide, k, R);

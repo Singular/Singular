@@ -52,6 +52,9 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R);
  ***************************************************************/
 unsigned long p_GetShortExpVector(poly a, const ring r);
 
+/// p_GetShortExpVector of p * pp
+unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r);
+
 #ifdef HAVE_RINGS
 /*! divisibility check over ground ring (which may contain zero divisors);
    TRUE iff LT(f) divides LT(g), i.e., LT(f)*c*m = LT(g), for some
@@ -1114,7 +1117,7 @@ static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
   int shorter;
   number n_old = pGetCoeff(m);
   number n_neg = n_Copy(n_old, r->cf);
-  n_neg = n_Neg(n_neg, r->cf);
+  n_neg = n_InpNeg(n_neg, r->cf);
   pSetCoeff0(m, n_neg);
   res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r);
   lp = (lp + lq) - shorter;
@@ -1576,7 +1579,7 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, const ring r)
     while (i>=0);
   }
 #ifdef HAVE_RINGS
-  pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == nDivBy(p_GetCoeff(b, r), p_GetCoeff(a, r)));
+  pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == n_DivBy(p_GetCoeff(b, r), p_GetCoeff(a, r), r->cf));
   return (!rField_is_Ring(r)) || n_DivBy(p_GetCoeff(b, r), p_GetCoeff(a, r), r->cf);
 #else
   pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == TRUE);
@@ -1617,7 +1620,7 @@ static inline BOOLEAN _p_LmDivisibleByNoCompPart(poly a, const ring r_a, poly b,
   }
   while (i>=start);
 #ifdef HAVE_RINGS
-  return nDivBy(p_GetCoeff(b, r), p_GetCoeff(a, r));
+  return n_DivBy(p_GetCoeff(b, r_b), p_GetCoeff(a, r_a), r_a->cf);
 #else
   return TRUE;
 #endif
@@ -1836,6 +1839,14 @@ poly      p_Div_nn(poly p, const number n, const ring r);
 
 // returns the LCM of the head terms of a and b in *m
 void p_Lcm(const poly a, const poly b, poly m, const ring r);
+
+#ifdef HAVE_RATGRING
+poly p_LcmRat(const poly a, const poly b, const long lCompM, const ring r);
+poly p_GetCoeffRat(poly p, int ishift, ring r);
+void p_LmDeleteAndNextRat(poly *p, int ishift, ring r);
+void p_ContentRat(poly &ph, const ring r);
+#endif /* ifdef HAVE_RATGRING */
+
 
 poly      p_Diff(poly a, int k, const ring r);
 poly      p_DiffOp(poly a, poly b,BOOLEAN multiply, const ring r);

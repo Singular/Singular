@@ -7,15 +7,13 @@
 * ABSTRACT - multipolynomial resultant
 */
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
 #include <kernel/mod2.h>
+#include <misc/auxiliary.h>
 
 //#ifdef HAVE_MPR
 
 //-> includes
-#include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 
 #include <misc/mylimits.h>
@@ -28,7 +26,6 @@
 #include <polys/matpol.h>
 
 
-#include <kernel/febase.h>
 #include <kernel/structs.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
@@ -55,7 +52,6 @@ TIMING_DEFINE_PRINT(mpr_solver)
 
 #define TIMING_EPR(t,msg) TIMING_END_AND_PRINT(t,msg);TIMING_RESET(t);
 
-extern size_t gmp_output_digits;
 //<-
 
 //-> nPrint(number n)

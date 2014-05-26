@@ -8,9 +8,9 @@
 /* includes */
 #include <math.h>
 
-#ifdef HAVE_CONFIG_H
-#include "libpolysconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 
 #include <omalloc/omalloc.h>
 
@@ -21,6 +21,7 @@
 
 #include <coeffs/numbers.h>
 #include <coeffs/coeffs.h>
+#include <coeffs/rmodulon.h>
 
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>
@@ -1604,20 +1605,19 @@ ring rCopy(ring r)
 
 BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
 {
+  if (r1 == r2) return TRUE;
+  if (r1 == NULL || r2 == NULL) return FALSE;
+  if (r1->cf!=r2->cf) return FALSE;
+  if (rVar(r1)!=rVar(r2)) return FALSE;
+
   if( !rSamePolyRep(r1, r2) )
     return FALSE;
 
   int i/*, j*/;
 
-  if (r1 == r2) return TRUE;
-  if (r1 == NULL || r2 == NULL) return FALSE;
-
-  assume( r1->cf == r2->cf );
-  assume( rVar(r1) == rVar(r2) );
-
   for (i=0; i<rVar(r1); i++)
   {
-    if (r1->names[i] != NULL && r2->names[i] != NULL)
+    if ((r1->names[i] != NULL) && (r2->names[i] != NULL))
     {
       if (strcmp(r1->names[i], r2->names[i])) return FALSE;
     }
@@ -3763,21 +3763,39 @@ BOOLEAN rComplete(ring r, int force)
 
 static void rCheckOrdSgn(ring r,int i/*current block*/)
 { // set r->OrdSgn
-  if ( r->OrdSgn==1)
+  int jj;
+  int oo=-1;
+  int notfound=1;
+  for(jj=i-1;jj>=0;jj--)
   {
-    int oo=-1;
-    int jj;
-    for(jj=i-1;jj>=0;jj--)
+    if(((r->order[jj]==ringorder_a)
+      ||(r->order[jj]==ringorder_aa)
+      ||(r->order[jj]==ringorder_a64))
+    &&(r->block0[jj]<=r->block0[i])
+    &&(r->block1[jj]>=r->block1[i]))
     {
-      if(((r->order[jj]==ringorder_a)
-        ||(r->order[jj]==ringorder_aa)
-        ||(r->order[jj]==ringorder_a64))
-      &&(r->block0[jj]<=r->block0[i])
-      &&(r->block1[jj]>=r->block1[i]))
-      { oo=1; break;}
+      int res=1;
+      if (r->order[jj]!=ringorder_a64)
+      {
+        for(int j=r->block1[jj]-r->block0[jj]; j>=0;j--)
+        {
+          if(r->wvhdl[jj][j]<=0) { res=-1; break;}
+        }
+      }
+      oo=res;
+      notfound=0;
     }
     r->OrdSgn=oo;
   }
+  if (notfound
+  && (r->order[i]==ringorder_ls)
+     || (r->order[i]==ringorder_ds)
+     || (r->order[i]==ringorder_Ds)
+     || (r->order[i]==ringorder_ws)
+     || (r->order[i]==ringorder_Ws)
+     || (r->order[i]==ringorder_rs)
+  )
+    r->OrdSgn=-1;
 }
 
 
@@ -4640,7 +4658,6 @@ ring rAssure_SyzComp_CompLastBlock(const ring r, BOOLEAN)
    if (old_r->qideal != NULL)
    {
       new_r->qideal = idrCopyR(old_r->qideal, old_r, new_r);
-      //currQuotient = new_r->qideal;
    }
 
 #ifdef HAVE_PLURAL

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////
 version="version binresol.lib 4.0.0.0 Jun_2013 "; // $Id$
-category="Commutative algebra";
+category="Commutative Algebra";
 info="
 LIBRARY: binresol.lib    Combinatorial algorithm of resolution of singularities
                         of binomial ideals in arbitrary characteristic.

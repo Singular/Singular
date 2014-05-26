@@ -1,27 +1,19 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-#ifdef HAVE_CONFIG_H
+
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
+
 
 #include "cf_assert.h"
 
 #include "cf_defs.h"
 #include "canonicalform.h"
 #include "imm.h"
-#include "int_pp.h"
 #include "cf_primes.h"
 #include "cf_util.h"
 
 static int theCharacteristic = 0;
 static int theDegree = 1;
-
-int initializeCharacteristic ()
-{
-    theCharacteristic = 0;
-    theDegree = 1;
-    return 1;
-}
 
 void setCharacteristic( int c )
 {
@@ -42,14 +34,6 @@ void setCharacteristic( int c )
     }
 }
 
-void setCharacteristic( int c, int n )
-{
-    ASSERT( c > 1 && n > 0, "illegal characteristic" );
-    setCharacteristic( c );
-    InternalPrimePower::setPrimePower( c, n );
-    CFFactory::settype( PrimePowerDomain );
-}
-
 void setCharacteristic( int c, int n, char name )
 {
     ASSERT( c != 0 && n > 1, "illegal GF(q)" );
@@ -63,12 +47,6 @@ int getCharacteristic()
 {
     return theCharacteristic;
 }
-
-int getExp()
-{
-  return InternalPrimePower::getk();
-}
-
 
 int getGFDegree()
 {

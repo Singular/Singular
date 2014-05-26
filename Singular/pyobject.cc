@@ -12,37 +12,20 @@
 **/
 //*****************************************************************************
 
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
-
+#include <kernel/mod2.h>
 #ifdef HAVE_PYTHON
 
-#include <kernel/mod2.h>
-
-//#include <misc/auxiliary.h>
-//#include "newstruct.h"
-
-#include <misc/auxiliary.h>
-
 #include <omalloc/omalloc.h>
-
-#include <kernel/febase.h>
 #include <misc/intvec.h>
 
+#include <Singular/subexpr.h>
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
 #include <Singular/lists.h>
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
 #include <Singular/newstruct.h>
-
-#include "subexpr.h"
-#include "lists.h"
-#include "ipid.h"
-#include "blackbox.h"
-#include "ipshell.h"
-#include "newstruct.h"
+#include <resources/feResource.h>
 
 #include <Singular/mod_lib.h>
 
@@ -606,7 +589,7 @@ BOOLEAN pyobject_Op3(int op, leftv res, leftv arg1, leftv arg2, leftv arg3)
   if (!lhs(op, rhs1, rhs2).assign_to(res))
     return FALSE;
 
-  return blackbox_default_Op3(op, res, arg1, arg2, arg3);
+  return blackboxDefaultOp3(op, res, arg1, arg2, arg3);
 }
 
 

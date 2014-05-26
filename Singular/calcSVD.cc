@@ -1,7 +1,7 @@
 #include <stdio.h>
-#ifdef HAVE_CONFIG_H
-#include "singularconfig.h"
-#endif /* HAVE_CONFIG_H */
+
+
+
 #include <kernel/mod2.h>
 
 #ifdef HAVE_SVD
@@ -11,7 +11,6 @@
 #include <kernel/polys.h>
 #include <polys/matpol.h>
 #include <Singular/lists.h>
-#include <kernel/febase.h>
 
 template class std::vector< amp::mpfr_record* >;
 

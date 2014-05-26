@@ -605,7 +605,16 @@ EXAMPLE:  example morsesplit; shows an example"
     f = jet(f, k);
     h = f-jet(f, 2)-corank_part(f);
   }
-  poly g = cleardenom(f-jet(f, 2));
+  poly g = f-jet(f, 2);
+  poly lead_g = leadcoef(g);
+  if(lead_g > 0)
+  {
+    g = g/lead_g;
+  }
+  if(lead_g < 0)
+  {
+    g = -g/lead_g;
+  }
 
   return(list(c, lambda, k, g));
 }
@@ -718,13 +727,14 @@ EXAMPLE:  example determinacy; shows an example"
 {
   /* auxiliary variables */
   int i;
+  def br = basering;
 
   /* error check */
-  if(char(basering) != 0)
+  if(char(br) != 0)
   {
     ERROR("The characteristic must be zero.");
   }
-  int n = nvars(basering);
+  int n = nvars(br);
   for(i = 1; i <= n; i++)
   {
     if(var(i) > 1)
@@ -771,15 +781,27 @@ EXAMPLE:  example determinacy; shows an example"
 
   /* highest corner */
   int hc;
+  if(ordstr(br) != "ds")
+  {
+    list lbr = ringlist(br);
+    lbr[3] = list(list("ds", 1:nvars(br)), list("C", 0));
+    def br_ds = ring(lbr);
+    setring(br_ds);
+    poly f = fetch(br, f);
+  }
   for(i = 0; i < 3; i++)
   {
-    f = jet(f, k);
     hc = deg(highcorner(std(maxideal(i)*jacob(f))));
     hc = hc+2-i;
     if(hc < k)
     {
       k = hc;
+      f = jet(f, k);
     }
+  }
+  if(ordstr(br) != "ds")
+  {
+    setring(br);
   }
 
   return(k);

@@ -1,14 +1,15 @@
 ACLOCAL_AMFLAGS = -I ../m4
 
-SUBDIRS=include/factory libfac
+SUBDIRS=include/factory
 
-AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include $(FLINT_CFLAGS) ${GMP_CFLAGS} ${NTL_CFLAGS} ${OMALLOC_CFLAGS} 
+AM_CPPFLAGS = -I${builddir}/include -I${srcdir}/include -I${srcdir} \
+$(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
+$(FLINT_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS)
 
 lib_LTLIBRARIES = libfactory.la
 
-libfactory_la_LIBADD     = ${builddir}/libfac/libfac.la \
-${builddir}/../omalloc/libomalloc.la ${builddir}/../resources/libresources.la \
-$(FLINT_LIBS) ${GMP_LIBS} ${NTL_LIBS}
+libfactory_la_LIBADD     =$(RESOURCES_LIBS) $(OMALLOC_LIBS) \
+$(FLINT_LIBS) $(NTL_LIBS) $(GMP_LIBS)
 
 libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
@@ -18,6 +19,8 @@ SOURCES = \
 		canonicalform.cc \
 		cf_algorithm.cc \
 		cf_char.cc \
+		cfCharSets.cc \
+		cfCharSetsUtil.cc \
 		cf_chinese.cc \
 		cf_cyclo.cc \
 		cf_eval.cc \
@@ -50,6 +53,8 @@ SOURCES = \
 		facAbsBiFact.cc \
 		facAbsFact.cc \
 		facAlgExt.cc \
+		facAlgFunc.cc \
+		facAlgFuncUtil.cc \
 		facBivar.cc \
 		fac_ezgcd.cc \
 		facFactorize.cc \
@@ -74,7 +79,6 @@ SOURCES = \
 		int_int.cc \
 		int_intdiv.cc \
 		int_poly.cc \
-		int_pp.cc \
 		int_rat.cc \
 		variable.cc \
 		NTLconvert.cc \
@@ -95,6 +99,8 @@ factory_headers = \
 		cf_assert.h \
 		canonicalform.h \
 		cf_algorithm.h \
+		cfCharSets.h \
+		cfCharSetsUtil.h \
 		cf_cyclo.h \
 		cf_defs.h \
 		cf_eval.h \
@@ -121,6 +127,8 @@ factory_headers = \
 		facAbsBiFact.h \
 		facAbsFact.h \
 		facAlgExt.h \
+		facAlgFunc.h \
+		facAlgFuncUtil.h \
 		facBivar.h \
 		facFactorize.h \
 		fac_sqrfree.h \
@@ -144,7 +152,6 @@ factory_headers = \
 		int_cf.h \
 		int_int.h \
 		int_poly.h \
-		int_pp.h \
 		int_rat.h \
 		timing.h \
 		variable.h \
@@ -267,23 +274,21 @@ cplusplus.h: cplusplus$(EXEEXT)
 all-local:
 	[ -d ${builddir}/gftables ] || ln -s ${srcdir}/gftables ${builddir}
 
+
 ####################################################
 ## Test program
 ##
+
 TESTS = test
 
 check_PROGRAMS = $(TESTS)
 
-TESTSSOURCES = test.cc
+test_SOURCES = test.cc
+test_LDADD   = libfactory.la
 
-# The following ('..') is a hack for a while... 
-TESTADDLIBDIRS = ${OMALLOC_LDFLAGS}
-TESTADDLIB = $(TESTADDLIBDIRS) $(OMALLOC_R_LDADD)
-TESTADDLIBDEBUG = $(TESTADDLIBDIRS) $(OMALLOC_G_LDADD)
-
-test_SOURCES = $(TESTSSOURCES)
-test_LDADD = libfactory.la $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS) $(TESTADDLIB)
-
+####################################################
+## PKG config 
+##
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = factory.pc

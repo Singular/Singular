@@ -9,7 +9,6 @@
 
 #include <stdlib.h>
 
-int mmInit(void);
 #undef reallocSize
 #undef freeSize
 
