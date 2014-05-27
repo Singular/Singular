@@ -65,7 +65,7 @@ NOTE:    result is a std basis in the basering
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   int @k;
   ideal inew=std(id);
@@ -93,7 +93,7 @@ NOTE:    result is a std basis in the basering
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   int @k,@i;
   def @P= basering;
   if(ordstr(basering)[1,2]!="dp")
@@ -160,7 +160,7 @@ NOTE:    result is a std basis in the basering
 proc minSat(ideal inew, ideal h)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   int i,k;
   poly f=1;
   ideal iold,fac;
@@ -208,7 +208,7 @@ proc minSat(ideal inew, ideal h)
 static proc quotMin(list tsil)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   int i,j,k,action;
   ideal verg;
   list l;
@@ -270,7 +270,7 @@ static proc quotMin(list tsil)
 static proc testFactor(list act,poly p)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   poly keep=p;
 
   int i;
@@ -296,7 +296,7 @@ EXAMPLE: example factor; shows an example
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   ideal @i;
   list @l;
   intvec @v,@w;
@@ -416,7 +416,7 @@ static proc stdIdealsEqual( ideal k1, ideal k2)
 proc primaryTest (ideal i, poly p)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   int m=1;
   int n=nvars(basering);
   int e,f;
@@ -511,7 +511,7 @@ proc primaryTest (ideal i, poly p)
 proc gcdTest(ideal act)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   int i,j;
   if(size(act)<=1)
   {
@@ -534,7 +534,7 @@ proc gcdTest(ideal act)
 static proc splitPrimary(list l,ideal ser,int @wr,list sact)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   int i,j,k,s,r,w;
   list keepresult,act,keepprime;
   poly @f;
@@ -725,7 +725,7 @@ example
 static proc splitCharp(list l)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   if((char(basering)==0)||(npars(basering)>0))
   {
     return(l);
@@ -855,7 +855,7 @@ EXAMPLE: example zero_decomp; shows an example
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   def   @P = basering;
   int uytrewq;
@@ -1315,7 +1315,7 @@ example
 proc extF(list l,list #)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 //zero_dimensional primary decomposition after finite field extension
   def R=basering;
   int p=char(R);
@@ -1408,10 +1408,11 @@ proc zeroSp(ideal i)
 //the radical of the intersection of the pe[l] is equal to the radical of i
 
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   def R=basering;
 
   //i has to be a reduced groebner basis
+  ASSUME(1, dim(i)==0);
   ideal F=finduni(i);
 
   int j,k,l,ready;
@@ -1499,7 +1500,7 @@ proc zeroSepClos(ideal I,ideal F)
 //i.e. var(i)----->var(i)^(p^v[i])
 
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   if(homog(I)==1){return(maxideal(1));}
 
   //assume F[i] irreducible in I and depending only on var(i)
@@ -1540,7 +1541,7 @@ proc insepDecomp(ideal i)
 //and transforms it back to a decomposition of i
  
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   def R=basering;
   list pr=zeroSp(i);
   int l,k;
@@ -1586,7 +1587,7 @@ EXAMPLE: example clearSB; shows an example
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   int k,j;
   poly m;
   int c=size(i);
@@ -1665,7 +1666,7 @@ EXAMPLE: example clearSB; shows an example
 "
 {
  ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
  int k,j;
  intvec m,n,v,w;
  int c=size(i);
@@ -1791,7 +1792,7 @@ EXAMPLE: example maxIndependentSet; shows an example
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   int n,k,di;
   list resu,hilf;
   string var1,var2;
@@ -1859,7 +1860,7 @@ EXAMPLE: example independentSet; shows an example
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
   ideal @ih,@jh;
   int npar=npars(basering);
   int @n;
@@ -1925,7 +1926,7 @@ EXAMPLE: example minAssPrimes; shows an example
 "
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
    def @P=basering;
    if(size(i)==0){return(list(ideal(0)));}
    list qr=simplifyIdeal(i);
@@ -2053,7 +2054,7 @@ example
 static proc primT(ideal i)
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    //assumes that all generators of i are irreducible
    //i is standard basis
@@ -2083,7 +2084,7 @@ EXAMPLE: example minAssPrimes; shows an example
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   if(size(i) == 0){return(list(ideal(0)));}
   string algorithm;    // Algorithm to be used
@@ -2383,7 +2384,7 @@ EXAMPLE:example equidim; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
   }
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   intvec op ;
   def  P = basering;
@@ -2492,7 +2493,7 @@ EXAMPLE: example equidimMax; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
   }
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   def  P = basering;
   ideal eq;
@@ -2616,7 +2617,7 @@ static proc islp()
 proc algeDeco(ideal i, int w)
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
 //reduces primery decomposition over algebraic extensions to
 //the other cases
@@ -2739,7 +2740,7 @@ proc algeDeco(ideal i, int w)
 static proc prepare_absprimdec(list primary)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   list resu,tempo;
   string absotto;
@@ -2766,7 +2767,7 @@ EXAMPLE: example decomp; shows an example
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   intvec op,@vv;
   def  @P = basering;
@@ -3749,7 +3750,7 @@ static proc powerCoeffs(poly f,int e)
 //the p^e th power of the coefficients of f
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    int i;
    poly g;
@@ -3772,7 +3773,7 @@ proc sep(poly f,int i, list #)
  EXAMPLE: example sep; shows an example
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    def R=basering;
    int k;
@@ -3825,7 +3826,7 @@ example
  EXAMPLE: example zeroRad; shows an example
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    if(homog(I)==1){return(maxideal(1));}
    //I needs to be a reduced standard basis
@@ -3849,6 +3850,7 @@ example
    intvec op=option(get);
 
    option(redSB);
+   ASSUME(1, dim(I)==0);
    ideal F=finduni(I);//F[i] generates I intersected with K[var(i)]
 
    option(set,op);
@@ -3929,7 +3931,7 @@ EXAMPLE: example radicalEHV; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
    }
-   ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    if((char(basering)<100)&&(char(basering)!=0))
    {
@@ -4051,7 +4053,7 @@ example
 static proc int_ass_primary_e(ideal i, int e)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   if(homog(i)!=1)
   {
@@ -4097,7 +4099,7 @@ static proc AnnExt_R(int n,list re)
 static proc analyze(list pr)
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    int ii,jj;
    for(ii=1;ii<=size(pr) div 2;ii++)
@@ -4130,7 +4132,7 @@ static proc analyze(list pr)
 static proc simplifyIdeal(ideal i)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   def r=basering;
 
@@ -4237,7 +4239,7 @@ static proc min_ass_prim_charsets (ideal PS, int cho)
 static proc min_ass_prim_charsets0 (ideal PS)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   intvec op;
   matrix m=char_series(PS);  // We compute an irreducible
@@ -4341,7 +4343,7 @@ static proc min_ass_prim_charsets0 (ideal PS)
 static proc min_ass_prim_charsets1 (ideal PS)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   intvec op;
   def oldring=basering;
@@ -4483,7 +4485,7 @@ static proc min_ass_prim_charsets1 (ideal PS)
 static proc prim_dec(ideal I, int choose)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   if((choose<0) or (choose>3))
   {
@@ -4709,7 +4711,7 @@ static proc prim_dec(ideal I, int choose)
 static proc pseudo_prim_dec_charsets (ideal I, ideal SI, int choo)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   list L;          // The list of minimal associated primes,
                    // each one given by a standard basis
@@ -4762,7 +4764,7 @@ static proc pseudo_prim_dec_charsets (ideal I, ideal SI, int choo)
 static proc pseudo_prim_dec_special_charsets (ideal SI,list V6, int choo)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   int i,j,l;
   list m;
@@ -4863,7 +4865,7 @@ static proc pseudo_prim_dec_special_charsets (ideal SI,list V6, int choo)
 static proc pseudo_prim_dec_i (ideal SI, list L)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   list Q;
   if (size(L)==1)               // one minimal associated prime only
@@ -4935,7 +4937,7 @@ static proc pseudo_prim_dec_i (ideal SI, list L)
 static proc extraction (ideal SI, ideal SP)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   list indsets=indepSet(SP,0);
   poly f;
@@ -5043,7 +5045,7 @@ static proc extraction (ideal SI, ideal SP)
 static proc minsat(ideal SI, poly p)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   ideal fac=factorize(p,1);       //the irreducible factors of p
   fac=sort(fac)[1];
@@ -5092,7 +5094,7 @@ static proc minsat(ideal SI, poly p)
 static proc minsat_ppd(ideal SI, ideal fac)
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   fac=sort(fac)[1];
   int i,k;
@@ -5139,7 +5141,7 @@ static proc minsat_ppd(ideal SI, ideal fac)
 static proc minquot(list tsil)
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    intvec op;
    int i,j,k,action;
@@ -5212,7 +5214,7 @@ static proc minquot(list tsil)
 static proc special_ideals_equal( ideal k1, ideal k2)
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    int j;
    if(size(k1)==size(k2))
@@ -5769,7 +5771,7 @@ EXAMPLE: example equiRadical; shows an example
      "// Not implemented for this ordering, please change to global ordering."
      );
   }
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   return(radical(i, 1));
 }
@@ -5984,7 +5986,7 @@ example
 static proc radicalKL(ideal I, ideal ser, list #)
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
 // ideal I     The ideal for which the radical is computed
 // ideal ser   Used to reduce components already obtained
@@ -6024,7 +6026,7 @@ static proc radicalSL(ideal I, list #)
 // obtained in intermediate steps.
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   ideal rad = 1;
   ideal equiRad = 1;
@@ -6109,7 +6111,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
 //                    only equiradical is required.
 //                    It is used to set the value of done.)
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   attrib(I, "isSB", 1);   // I needs to be a reduced standard basis
   list indep, fett;
@@ -6384,7 +6386,7 @@ static proc radicalSLIteration (ideal I, ideal P);
 // Output: ideal. Intersection of some primes of I different from the ones in P.
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   int k = 1;                     // Counter
   int good  = 0;                 // Checks if an element of P is in rad(I)
@@ -6454,7 +6456,7 @@ EXAMPLE: example newMaxIndependentSetDp; shows an example
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   int n, k, di;
   list resu, hilf;
@@ -6548,7 +6550,7 @@ EXAMPLE: example prepareQuotientRingDp; shows an example
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   ideal @ih,@jh;
   int npar=npars(basering);
@@ -6603,7 +6605,7 @@ EXAMPLE: example prepareAss; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
   }
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   ideal j=std(i);
   int cod=nvars(basering)-dim(j);
@@ -6654,7 +6656,7 @@ EXAMPLE: example equidimMaxEHV; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
   }
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   ideal j=groebner(i);
   int cod=nvars(basering)-dim(j);
@@ -6687,7 +6689,7 @@ EXAMPLE: example testPrimary; shows an example
 "
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    int i;
    pr=reconvList(pr);
@@ -6728,7 +6730,7 @@ EXAMPLE: example zerodec; shows an example
     "// Not implemented for this ordering, please change to global ordering."
     );
   }
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   def R=basering;
   poly q;
@@ -6842,7 +6844,7 @@ EXAMPLE: example newDecompStep; shows an example
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   intvec op,@vv;
   def  @P = basering;
@@ -7747,7 +7749,7 @@ example
 static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim, int abspri, int @wr, list data)
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
 
    string @va;
@@ -8048,7 +8050,7 @@ static proc minAssSL(ideal I)
 // associated primes and the primary components corresponding to these primes.
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   ideal P = 1;
   list pd = list();
@@ -8091,7 +8093,7 @@ static proc minAssSL(ideal I)
 static proc minAssSLIteration(ideal I, ideal P);
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   int k = 1;
   int good  = 0;
@@ -8146,7 +8148,7 @@ EXAMPLE: example newMaxIndependentSetLp; shows an example
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   int n, k, di;
   list resu, hilf;
@@ -8249,7 +8251,7 @@ EXAMPLE: example newZero_decomp; shows an example
 "
 {
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalMonomialOrdering(basering) ) ;
+  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   def   @P = basering;
   int uytrewq;
