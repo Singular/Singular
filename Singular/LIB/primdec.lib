@@ -780,8 +780,16 @@ static proc splitCharp(list l)
         {
           sa=sat1(l[2*i-1],sact[1]);
           keep[size(keep)+1]=std(l[2*i-1],sa[2]);
-          l[2*i-1]=std(sa[1]);
-          l[2*i]=primaryTest(sa[1],sa[1][1]);
+          if(sa[1][1]==l[2*i-1][1])
+          {
+             l[2*i-1]=std(sa[1]);
+             l[2*i]=primaryTest(sa[1],s[1]);
+          }
+          else
+          {
+             l[2*i-1]=std(sa[1]);
+             l[2*i]=primaryTest(sa[1],factorize(sa[1][1],1)[1]);
+          }
         }
         if((size(sact)==1)&&(m==2))
         {
@@ -822,7 +830,7 @@ static proc splitCharp(list l)
       if(deg(keep[i][1])>0)
       {
         l[size(l)+1]=keep[i];
-        l[size(l)+1]=primaryTest(keep[i],keep[i][1]);
+        l[size(l)+1]=primaryTest(keep[i],factorize(keep[i][1],1)[1]);
       }
     }
   }
@@ -2150,11 +2158,11 @@ EXAMPLE: example minAssPrimes; shows an example
     }
   }
 
-  if( dim(i) == -1 ) 
-  {  
+  if( dim(i) == -1 )
+  {
     option( set,op );
-    setring P0; 
-    return( ideal(1) ); 
+    setring P0;
+    return( ideal(1) );
   }
   if( (dim(i) == 0 ) && ( npars(P) == 0) )
   {
@@ -2615,7 +2623,7 @@ proc algeDeco(ideal i, int w)
    def R=basering;
    int n=nvars(R);
 
-   def op = option(get); 
+   def op = option(get);
 
 //---Anfang Provisorium
    if((size(i)==2) && (w==2))
@@ -3927,6 +3935,8 @@ EXAMPLE: example radicalEHV; shows an example
    {
       "WARNING: The characteristic is too small, the result may be wrong";
    }
+   if ( size(i)==0 ) { return(ideal(0)); }
+
    ideal J,I,I0,radI0,L,radI1,I2,radI2;
    int l,n;
    intvec op=option(get);
@@ -3936,6 +3946,8 @@ EXAMPLE: example radicalEHV; shows an example
    list m=mstd(i);
         I=m[2];
    option(set,op);
+
+   if ( dim(m[1])<0 ) { return(ideal(1)); }
 
    int cod=nvars(basering)-dim(m[1]);
    //-------------------complete intersection case:----------------------
@@ -4064,16 +4076,20 @@ static proc AnnExt_R(int n,list re)
 
   if(n<nvars(basering))
   {
-     matrix f=transpose(re[n+1]);      //Hom(_,R)
-     module k=nres(f,2)[2];            //the kernel
-     matrix g=transpose(re[n]);        //the image of Hom(_,R)
+    if(size(re[n+1])>0)
+    {
+        matrix f=transpose(re[n+1]);      //Hom(_,R)
+        module k=nres(f,2)[2];            //the kernel
+        matrix g=transpose(re[n]);        //the image of Hom(_,R)
 
-     ideal ann=quotient1(g,k);           //the anihilator
+        ideal ann=quotient1(g,k);         //the anihilator
+        return(ann);
+    }
   }
-  else
-  {
-     ideal ann=Ann(transpose(re[n]));
-  }
+  // remaining case: re[n+1] is trivial
+  // either n is at least number of variables or
+  // resolution happens to be shorter
+  ideal ann=Ann(transpose(re[n]));
   return(ann);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -4226,6 +4242,12 @@ static proc min_ass_prim_charsets0 (ideal PS)
   intvec op;
   matrix m=char_series(PS);  // We compute an irreducible
                              // characteristic series
+  if ((nrows(m)==1)
+  && (ncols(m)==1)
+  && (m[1,1]==1)) // in case of an empty series: min_ass_prim_charsets1
+  {
+    return min_ass_prim_charsets1(PS);
+  }
   int i,j,k;
   list PSI;
   list PHI;  // the ideals given by the characteristic series
@@ -4328,7 +4350,21 @@ static proc min_ass_prim_charsets1 (ideal PS)
   ideal PS=imap(oldring,PS);
   matrix m=char_series(PS);  // We compute an irreducible
                              // characteristic series
-  int i,j,k;
+                             // this series may be empty (1x1: 1)
+  int i,j,k,cnt;
+  while ((cnt<nvars(oldring))
+  && (nrows(m)==1)
+  && (ncols(m)==1)
+  && (m[1,1]==1)) // in case of an empty series: permute the variables
+  {
+    cnt++;
+    n=string(var(nvars(oldring)));
+    for(i=1;i<nvars(oldring);i++) { n=n+","+string(var(i)); }
+    kill r;
+    execute("ring r=("+charstr(oldring)+"),("+n+"),dp;");
+    ideal PS=imap(oldring,PS);
+    matrix m=char_series(PS);
+  }
   ideal I;
   list PSI;
   list PHI;    // the ideals given by the characteristic series

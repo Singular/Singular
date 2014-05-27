@@ -14,6 +14,7 @@
 
 #include <kernel/mod2.h>
 #include <misc/auxiliary.h>
+#include <misc/sirandom.h>
 
 #include <reporter/si_signals.h>
 
@@ -383,10 +384,10 @@ lists primeFactorisation(const number n, const int pBound)
 #include <polys/monomials/ring.h>
 #include <polys/templates/p_Procs.h>
 
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kstd1.h>
-#include <kernel/timer.h>
-
+#include <kernel/oswrapper/timer.h>
+#include <resources/feResource.h>
+#include <kernel/oswrapper/feread.h>
 
 #include "subexpr.h"
 #include "cntrlc.h"
@@ -1204,7 +1205,7 @@ void siInit(char *name)
   currPackHdl=h;
   basePackHdl=h;
 
-  coeffs_BIGINT = nInitChar(n_Q,NULL);
+  coeffs_BIGINT = nInitChar(n_Q,(void*)1);
 
 #if 1
    // def HAVE_POLYEXTENSIONS

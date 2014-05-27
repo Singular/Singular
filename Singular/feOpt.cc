@@ -20,6 +20,7 @@
 
 #if !defined(GENERATE_OPTION_INDEX) && !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <misc/options.h>
+#include <misc/sirandom.h>
 #endif
 
 #include "fehelp.h"
@@ -137,8 +138,9 @@ feOptIndex feGetOptIndex(int optc)
 //         "error-string" on error
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <kernel/timer.h>
+#include <resources/feResource.h>
+#include <kernel/oswrapper/feread.h>
+#include <kernel/oswrapper/timer.h>
 
 #include "ipshell.h"
 #include "tok.h"

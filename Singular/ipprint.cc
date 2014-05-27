@@ -15,7 +15,6 @@
 
 #include <polys/matpol.h>
 
-#include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 

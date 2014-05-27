@@ -27,7 +27,6 @@
 #include <polys/nc/sca.h>
 
 
-#include <kernel/febase.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/khstd.h>

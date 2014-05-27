@@ -1422,7 +1422,7 @@ void mp_MinorToResult(ideal result, int &elems, matrix a, int r, int c,
       q1 = &(a->m)[i*a->ncols];
       //for (j=c-1;j>=0;j--)
       //{
-      //  if (q1[j]!=NULL) q1[j] = kNF(R,currQuotient,q1[j]);
+      //  if (q1[j]!=NULL) q1[j] = kNF(R,currRing->qideal,q1[j]);
       //}
     }
   }
@@ -1462,7 +1462,7 @@ void mp_MinorToResult(ideal result, int &elems, matrix a, int r, int c,
       q1 = &(a->m)[i*a->ncols];
       for (j=c-1;j>=0;j--)
       {
-        if (q1[j]!=NULL) q1[j] = kNF(R,currQuotient,q1[j]);
+        if (q1[j]!=NULL) q1[j] = kNF(R,currRing->qideal,q1[j]);
       }
     }
   }

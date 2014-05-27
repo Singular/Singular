@@ -9,7 +9,7 @@ digraph IncludesInSingular4
   packMode = "graph" ;
   subgraph "clusterlibpolys"
   {
-      label="libpolys:";
+      label="libpolys: math. data structures";
       color = lightgray;
       style = filled;
       node [ fillcolor = white, style = filled, color = black, fontcolor=black];
@@ -28,12 +28,13 @@ digraph IncludesInSingular4
 	  subgraph "clusterMath"
 	  {
 	          rank="min" ;
-		  label="kernel:";
+		  label="kernel: math. high level algorithms";
 		  color = gray;
 //        	  style = filled;
   		  node [ fillcolor = white, style = filled, color = black, fontcolor=black];
-		  { rank=same; fglm; numeric; maps; kernelUtils; combinatorics; };
+		  { rank=same; fglm; numeric; maps; kernelCommon; combinatorics; };
 		  { rank=same; linear_algebra; spectrum; groebner_walk; GBEngine;};
+		  oswrapper [color = gray];
          }
   } ;
   subgraph "clusterinternals"
@@ -71,20 +72,22 @@ factory -> FLINT [];
   interpreter -> numeric [lhead="clusterMath"];
 //  interpreter -> "..." [lhead="clusterMath"];
   interpreter -> "dyn_modules:..." [dir=both, arrowtail="open", arrowhead="open"];
-  "dyn_modules:..." -> kernelUtils [lhead="clusterMath"];
+  "dyn_modules:..." -> kernelCommon [lhead="clusterMath"];
   "dyn_modules:..." -> gfanlib [];
   "dyn_modules:..." -> cddlib [];
   gfanlib -> cddlib [];
-  kernelUtils -> polys [ltail="clusterlibSingular", lhead="clusterlibpolys"];
-  kernelUtils -> factory [ltail="clusterlibSingular"];
-  combinatorics -> kernelUtils [];
-  fglm -> kernelUtils [];
-  GBEngine -> kernelUtils [];
-  groebner_walk -> kernelUtils [];
-  linear_algebra -> kernelUtils [];
-  maps -> kernelUtils [];
-  numeric -> kernelUtils [];
-  spectrum -> kernelUtils [];
+  kernelCommon -> polys [ltail="clusterlibSingular", lhead="clusterlibpolys"];
+  kernelCommon -> factory [ltail="clusterlibSingular"];
+  combinatorics -> kernelCommon [];
+  GBEngine -> combinatorics [];
+  fglm -> kernelCommon [];
+  GBEngine -> kernelCommon [];
+  groebner_walk -> kernelCommon [];
+  linear_algebra -> kernelCommon [];
+  maps -> kernelCommon [];
+  numeric -> kernelCommon [];
+  spectrum -> kernelCommon [];
+  oswrapper -> kernelCommon [];
   polys -> coeffs [dir=both, arrowtail="open", arrowhead="open"] ;
   polys -> misc;
   polys -> reporter;
@@ -98,7 +101,7 @@ factory -> FLINT [];
   misc -> omalloc [ltail="clusterlibpolys"];
   misc -> GMP_OR_MPIR [ltail="clusterlibpolys"];
 }
-// dot -Tpng -o singular.png singular.dot
+// dot -Tpng -o D.png Includes.dot
 // boxed = third party
 // filled = external
 // blue = math

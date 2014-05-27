@@ -48,13 +48,11 @@
 
 #include <kernel/GBEngine/kutil.h>
 #include <polys/kbuckets.h>
-#include <kernel/febase.h>
 #include <omalloc/omalloc.h>
 #include <coeffs/numbers.h>
 #include <kernel/polys.h>
 #include <polys/monomials/ring.h>
 #include <kernel/ideals.h>
-#include <kernel/timer.h>
 //#include "cntrlc.h"
 #include <kernel/GBEngine/stairc.h>
 #include <kernel/GBEngine/kstd1.h>
@@ -3475,7 +3473,7 @@ void enterExtendedSpoly(poly h,kStrategy strat)
   bool go = false;
   if (n_DivBy((number) 0, pGetCoeff(h), currRing->cf))
   {
-    gcd = nIntDiv((number) 0, pGetCoeff(h));
+    gcd = n_Ann(pGetCoeff(h),currRing->cf);
     go = true;
   }
   else
@@ -3486,7 +3484,7 @@ void enterExtendedSpoly(poly h,kStrategy strat)
     if (!go)
     {
       number tmp = gcd;
-      gcd = nIntDiv(0, gcd);
+      gcd = n_Ann(gcd,currRing->cf);
       nDelete(&tmp);
     }
     p_Test(p,strat->tailRing);
@@ -6715,6 +6713,10 @@ void updateS(BOOLEAN toT,kStrategy strat)
       while (i<=strat->sl)
       {
         change=FALSE;
+        #ifdef HAVE_RINGS
+        if(rField_is_Ring(currRing))
+            any_change = FALSE;
+        #endif
         if (((strat->fromQ==NULL) || (strat->fromQ[i]==0)) && (i>0))
         {
           redSi = pHead(strat->S[i]);
@@ -7910,9 +7912,12 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
       {
         for(q=IDELEMS(Q)-1; q>=0;q--)
         {
-          if ((Q->m[q]!=NULL)
-          &&(pLmEqual(r->m[l],Q->m[q])))
+          if ((Q->m[q]!=NULL)&&(pLmEqual(Q->m[q],r->m[l])))
           {
+            #ifdef HAVE_RINGS
+            //Also need divisibility of the leading coefficients
+            if((!rField_is_Ring(currRing)) || (pDivisibleBy(Q->m[q],r->m[l])))
+            #endif
             if (TEST_OPT_REDSB)
             {
               p=r->m[l];
@@ -7967,7 +7972,7 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
   if (TEST_OPT_PROT)
   {
     PrintLn();
-    if (timerv) writeTime("standard base computed:");
+//    if (timerv) writeTime("standard base computed:");
   }
   if (TEST_OPT_PROT)
   {

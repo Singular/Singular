@@ -27,7 +27,6 @@
 
 #include <kernel/polys.h>
 
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/kutil.h>
 #include <kernel/GBEngine/stairc.h>
@@ -242,7 +241,7 @@ Print("gefunden in Mod %d: ",index); poly_write((syzstr->resPairs[index])[ti].lc
           pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
           tso.syz = pMult_mm(tso.syz,tt);
           pLmDelete(&tt);
-          coefgcd = nNeg(coefgcd);
+          coefgcd = nInpNeg(coefgcd);
           pp = pCopy((syzstr->resPairs[index])[r1].syz);
           tt = pDivide(tso.lcm,tso.p2);
           pSetCoeff(tt,nDiv(pGetCoeff(tso.p2),coefgcd));

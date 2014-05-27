@@ -10,7 +10,6 @@
 
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
-#include <kernel/febase.h>
 #include <omalloc/omalloc.h>
 #include <kernel/ideals.h>
 #include <kernel/polys.h>

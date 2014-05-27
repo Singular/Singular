@@ -56,14 +56,13 @@ using std::vector;
 
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
-#include <kernel/febase.h>
 #include <misc/options.h>
 #include <kernel/polys.h>
 #include <kernel/GBEngine/kutil.h>
 #include <kernel/GBEngine/kInline.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <polys/kbuckets.h>
-#include <libpolys/coeffs/modulop.h>
+#include <coeffs/modulop.h>
 
 class PolySimple
 {

@@ -89,7 +89,6 @@ void module_help_proc(const char *newlib,const char *p, const char *help);
 /* ================================================================== */
 
 /*extern ring     currRing;  in ring.h */
-/*extern ideal      currQuotient; in structs.h */
 
 idhdl enterid(const char * a, int lev, int t, idhdl* root, BOOLEAN init=TRUE, BOOLEAN serach=TRUE);
 idhdl ggetid(const char *n);

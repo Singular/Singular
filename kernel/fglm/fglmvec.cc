@@ -400,7 +400,7 @@ fglmVector operator - (const fglmVector & v)
   for(i = v.size (); i > 0; i--)
   {
     n = nCopy (v.getconstelem (i));
-    n = nNeg (n);
+    n = nInpNeg (n);
     temp.setelem (i, n);
   }
   return temp;
@@ -468,7 +468,7 @@ number fglmVector::gcd () const
       found = TRUE;
       if(!nGreaterZero (theGcd))
       {
-        theGcd = nNeg (theGcd);
+        theGcd = nInpNeg (theGcd);
       }
       if(nIsOne (theGcd))
         gcdIsOne = TRUE;

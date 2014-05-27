@@ -387,6 +387,14 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
               {
                 Werror("different ring %lx(data) - %lx(basering)",
                   (long unsigned)(al->m[nm->pos-1].data),(long unsigned)currRing);
+                Werror("name of basering: %s",IDID(currRingHdl));
+                rWrite(currRing,TRUE);PrintLn();
+                idhdl hh=rFindHdl((ring)(al->m[nm->pos-1].data),NULL);
+                const char *nn="??";
+                if (hh!=NULL) nn=IDID(hh);
+                Werror("(possible) name of ring of data: %s",nn);
+                rWrite((ring)(al->m[nm->pos-1].data),TRUE);PrintLn();
+
                 return TRUE;
               }
             }
@@ -501,7 +509,7 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
       return FALSE;
     }
   }
-  return blackbox_default_OpM(op,res,args);
+  return blackboxDefaultOpM(op,res,args);
 }
 
 void newstruct_destroy(blackbox */*b*/, void *d)
@@ -673,7 +681,7 @@ void newstruct_setup(const char *n, newstruct_desc d )
   b->blackbox_Assign=newstruct_Assign;
   b->blackbox_Op1=newstruct_Op1;
   b->blackbox_Op2=newstruct_Op2;
-  //b->blackbox_Op3=blackbox_default_Op3;
+  //b->blackbox_Op3=blackboxDefaultOp3;
   b->blackbox_OpM=newstruct_OpM;
   b->blackbox_CheckAssign=newstruct_CheckAssign;
   b->blackbox_serialize=newstruct_serialize;
@@ -699,9 +707,9 @@ static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
   loop
   {
     // read type:
-    while (*p==' ') p++;
+    while ((*p!='\0') && (*p<=' ')) p++;
     start=p;
-    while (isalpha(*p)) p++;
+    while (isalnum(*p)) p++;
     *p='\0';
     IsCmd(start,t);
     if (t==0)
@@ -718,16 +726,16 @@ static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
     elem=(newstruct_member)omAlloc0(sizeof(*elem));
     // read name:
     p++;
-    while (*p==' ') p++;
+    while ((*p!='\0') && (*p<=' ')) p++;
     start=p;
-    while (isalpha(*p)) p++;
+    while (isalnum(*p)) p++;
     c=*p;
     *p='\0';
     elem->typ=t;
     elem->pos=res->size;
-    if (*start=='\0') /*empty name*/
+    if ((*start=='\0') /*empty name*/||(isdigit(*start)))
     {
-      WerrorS("empty name for element");
+      WerrorS("illegal/empty name for element");
       goto error_in_newstruct_def;
     }
     elem->name=omStrDup(start);
@@ -738,7 +746,7 @@ static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
 
     // next ?
     *p=c;
-    while (*p==' ') p++;
+    while ((*p!='\0') && (*p<=' ')) p++;
     if (*p!=',')
     {
       if (*p!='\0')

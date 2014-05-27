@@ -82,7 +82,7 @@ EXAMPLE: example modpWalk; shows an example
 
 //-------------------------  make i homogeneous  -----------------------------
 
-  if(!mixedTest() && !h)
+  if(!hasMixedOrdering() && !h)
   {
     if(!((find(ordstr_R0, "M") > 0) || (find(ordstr_R0, "a") > 0) || neg))
     {
@@ -153,7 +153,7 @@ EXAMPLE: example modpWalk; shows an example
       trwalk(i,radius,pert_deg);
     }
   }
-  if(!mixedTest() && !h)
+  if(!hasMixedOrdering() && !h)
   {
     if(!((find(ordstr_R0, "M") > 0) || (find(ordstr_R0, "a") > 0) || neg))
     {

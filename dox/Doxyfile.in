@@ -632,9 +632,6 @@ WARN_LOGFILE           =
 INPUT                  = @abs_top_srcdir@/omalloc/ \
 @abs_top_srcdir@/resources/ \
 @abs_top_srcdir@/factory/ \
-@abs_top_srcdir@/factory/libfac/ \
-@abs_top_srcdir@/factory/libfac/charset/ \
-@abs_top_srcdir@/factory/libfac/factor/ \
 @abs_top_srcdir@/factory/templates/ \
 @abs_top_srcdir@/factory/include/factory/ \
 @abs_top_srcdir@/factory/include/factory/templates/ \
@@ -651,14 +648,14 @@ INPUT                  = @abs_top_srcdir@/omalloc/ \
 @abs_top_srcdir@/libpolys/polys/templates/ \
 @abs_top_srcdir@/libpolys/tests/ \
 @abs_top_srcdir@/libpolys/tests/cxxtest/ \
-@abs_top_srcdir@/dyn_modules/bigintm/ \
-@abs_top_srcdir@/dyn_modules/syzextra/ \
+@abs_top_srcdir@/Singular/dyn_modules/bigintm/ \
+@abs_top_srcdir@/Singular/dyn_modules/syzextra/ \
 @abs_top_srcdir@/Singular/ \
 @abs_top_srcdir@/Singular/links/ \
 @abs_top_srcdir@/IntegerProgramming/ \
 @abs_top_srcdir@/gfanlib/ \
-@abs_top_srcdir@/dyn_modules/callgfanlib/ \
-@abs_top_srcdir@/dyn_modules/callpolymake/ 
+@abs_top_srcdir@/Singular/dyn_modules/callgfanlib/ \
+@abs_top_srcdir@/Singular/dyn_modules/callpolymake/ 
 
 
 

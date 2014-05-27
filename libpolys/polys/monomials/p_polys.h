@@ -52,6 +52,9 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R);
  ***************************************************************/
 unsigned long p_GetShortExpVector(poly a, const ring r);
 
+/// p_GetShortExpVector of p * pp
+unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r);
+
 #ifdef HAVE_RINGS
 /*! divisibility check over ground ring (which may contain zero divisors);
    TRUE iff LT(f) divides LT(g), i.e., LT(f)*c*m = LT(g), for some
@@ -1114,7 +1117,7 @@ static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
   int shorter;
   number n_old = pGetCoeff(m);
   number n_neg = n_Copy(n_old, r->cf);
-  n_neg = n_Neg(n_neg, r->cf);
+  n_neg = n_InpNeg(n_neg, r->cf);
   pSetCoeff0(m, n_neg);
   res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r);
   lp = (lp + lq) - shorter;

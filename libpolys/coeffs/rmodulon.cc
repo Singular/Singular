@@ -58,6 +58,52 @@ static char* nrnCoeffString(const coeffs r)
   return s;
 }
 
+coeffs nrnQuot1(number c, const coeffs r)
+{
+    coeffs rr;
+    int ch = r->cfInt(c, r);
+    mpz_t a,b;
+    mpz_init_set(a, r->modNumber);
+    mpz_init_set_ui(b, ch);
+    int_number gcd;
+    gcd = (int_number) omAlloc(sizeof(mpz_t));
+    mpz_init(gcd);
+    mpz_gcd(gcd, a,b);
+    if(mpz_cmp_ui(gcd, 1) == 0)
+        {
+            WerrorS("constant in q-ideal is coprime to modulus in ground ring");
+            WerrorS("Unable to create qring!");
+            return NULL;
+        }
+    if(r->modExponent == 1)
+    {
+        ZnmInfo info;
+        info.base = gcd;
+        info.exp = (unsigned long) 1;
+        rr = nInitChar(n_Zn, (void*)&info);
+    }
+    else
+    {
+        ZnmInfo info;
+        info.base = r->modBase;
+        int kNew = 1;
+        mpz_t baseTokNew;
+        mpz_init(baseTokNew);
+        mpz_set(baseTokNew, r->modBase);
+        while(mpz_cmp(gcd, baseTokNew) > 0)
+        {
+          kNew++;
+          mpz_mul(baseTokNew, baseTokNew, r->modBase);
+        }
+        //printf("\nkNew = %i\n",kNew);
+        info.exp = kNew;
+        mpz_clear(baseTokNew);
+        rr = nInitChar(n_Znm, (void*)&info);
+    }
+    return(rr);
+}
+
+static number nrnAnn(number b, const coeffs r);
 /* for initializing function pointers */
 BOOLEAN nrnInitChar (coeffs r, void* p)
 {
@@ -83,9 +129,10 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfMult        = nrnMult;
   r->cfDiv         = nrnDiv;
   r->cfIntDiv      = nrnIntDiv;
+  r->cfAnn         = nrnAnn;
   r->cfIntMod      = nrnMod;
   r->cfExactDiv    = nrnDiv;
-  r->cfNeg         = nrnNeg;
+  r->cfInpNeg         = nrnNeg;
   r->cfInvers      = nrnInvers;
   r->cfDivBy       = nrnDivBy;
   r->cfDivComp     = nrnDivComp;
@@ -110,6 +157,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->nCoeffIsEqual = nrnCoeffsEqual;
   r->cfInit_bigint = nrnMapQ;
   r->cfKillChar    = ndKillChar;
+  r->cfQuot1       = nrnQuot1;
 #ifdef LDEBUG
   r->cfDBTest      = nrnDBTest;
 #endif
@@ -453,6 +501,14 @@ number nrnIntDiv(number a, number b, const coeffs r)
   mpz_init(erg);
   if (a == NULL) a = (number)r->modNumber;
   mpz_tdiv_q(erg, (int_number)a, (int_number)b);
+  return (number)erg;
+}
+
+static number nrnAnn(number b, const coeffs r)
+{
+  int_number erg = (int_number)omAllocBin(gmp_nrz_bin);
+  mpz_init(erg);
+  mpz_tdiv_q(erg, (int_number)r->modNumber, (int_number)b);
   return (number)erg;
 }
 

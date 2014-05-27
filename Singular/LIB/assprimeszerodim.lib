@@ -293,7 +293,7 @@ EXAMPLE: example assPrimes; shows an example
    poly F1;
 
    if(printlevel >= 10) { "========== Start modStd =========="; }
-   I = modStd(I,n1);
+   I = modStd(I);
    if(printlevel >= 10) { "=========== End modStd ==========="; }
    if(printlevel >= 9) { "modStd takes "+string(rtimer-RT)+" seconds."; }
    int d = vdim(I);
@@ -324,10 +324,10 @@ EXAMPLE: example assPrimes; shows an example
                   "zeroR(I,n1) takes "+string(timer-TT)+" seconds.";
                }
                TT = timer;
-               I = std(I);
+               I = modStd(I);
                if(printlevel >= 9)
                {
-                  "std(I) takes "+string(timer-TT)+" seconds.";
+                  "modStd(I) takes "+string(timer-TT)+" seconds.";
                }
                d = vdim(I);
                f = findGen(I);
@@ -342,10 +342,10 @@ EXAMPLE: example assPrimes; shows an example
                "zeroR(I,n1) takes "+string(timer-TT)+" seconds.";
             }
             TT = timer;
-            I = std(I);
+            I = modStd(I);
             if(printlevel >= 9)
             {
-               "std(I) takes "+string(timer-TT)+" seconds.";
+               "modStd(I) takes "+string(timer-TT)+" seconds.";
             }
             d = vdim(I);
             f = findGen(I);

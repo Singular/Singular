@@ -76,6 +76,7 @@ bug_homog
 bug_idlen
 bug_interpol
 bug_misc
+bug_minpoly
 bug_mres
 bug_napMultT
 bug_newstruct
@@ -125,6 +126,7 @@ bug_tr380
 bug_tr387
 bug_tr404
 bug_tr485
+bug_tr489
 bug_tr501
 bug_526
 bug_532_s
@@ -132,10 +134,14 @@ bug_538_s
 bug_554
 bug_540
 bug_tr549
+bug_tr559
 bug_tr587
+bug_tr599
+bug_tr604
 bug_x_i_j
 brnoeth_s
 charseries
+charseries_p
 countedref_s
 classify_s
 cyc5_lp
@@ -211,7 +217,7 @@ Katsura_5_32003_lp_slimgb
 Katsura_6_32003_lp_slimgb
 minor_s
 modular_s
-modstd
+modstd_s
 modulo_s
 monodromy_s
 monomial_s

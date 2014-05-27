@@ -1,7 +1,4 @@
-
 #include <kernel/mod2.h>
-
-#include "mod2.h"
 
 #include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
@@ -71,7 +68,6 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/maps/fast_maps.h>
-#include <kernel/febase.h>
 #include <kernel/groebner_walk/walkProc.h>
 #include <kernel/groebner_walk/walkMain.h>
 #include <kernel/groebner_walk/walkSupport.h>
@@ -105,7 +101,6 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/linear_algebra/eigenval.h>
 #include <kernel/maps/fast_maps.h>
 #include <kernel/fast_mult.h>
-#include <kernel/febase.h>
 
 #include <kernel/fglm/fglmgauss.h>
 #include <kernel/fglm/fglm.h>
@@ -158,7 +153,6 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/GBEngine/tgbgauss.h>
 #include <kernel/GBEngine/tgb.h>
 
-#include <kernel/timer.h>
 
 #include <kernel/GBEngine/units.h>
 #include <kernel/groebner_walk/walkMain.h>
@@ -383,7 +377,7 @@ void TestGBEngine()
   rChangeCurrRing(R);
 
   {
-    ideal G = kStd(I, currQuotient, testHomog, NULL);
+    ideal G = kStd(I, currRing->qideal, testHomog, NULL);
 
 #ifdef PDEBUG
     PrintS("GB: ");

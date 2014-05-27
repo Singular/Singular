@@ -13,7 +13,6 @@
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <kernel/polys.h>
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/kutil.h>
 #include <kernel/GBEngine/stairc.h>
@@ -26,7 +25,6 @@
 #include <kernel/GBEngine/syz.h>
 #include <polys/kbuckets.h>
 #include <polys/prCopy.h>
-#include <kernel/timer.h>
 #include <polys/matpol.h>
 
 //#define SHOW_PROT
@@ -745,7 +743,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
       tso.syz = pMult_mm(tso.syz,tt);
       pDelete(&tt);
-      coefgcd = nNeg(coefgcd);
+      coefgcd = nInpNeg(coefgcd);
       assume (old_repr->m[tso.ind2]!=NULL);
       p = pCopy(old_repr->m[tso.ind2]);
       tt = pDivide(tso.lcm,tso.p2);
@@ -1268,7 +1266,7 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
       pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
       tso.syz = pMult_mm(tso.syz,tt);
       pDelete(&tt);
-      coefgcd = nNeg(coefgcd);
+      coefgcd = nInpNeg(coefgcd);
       assume (add_repr->m[tso.ind2]!=NULL);
       p = pCopy(add_repr->m[tso.ind2]);
       tt = pDivide(tso.lcm,tso.p2);
@@ -1853,7 +1851,7 @@ syStrategy syKosz(ideal arg,int * length)
   {
     if (temp->m[i]!=NULL)
     {
-      new_generators->m[0] = kNF(syzstr->res[0],currQuotient,temp->m[i]);
+      new_generators->m[0] = kNF(syzstr->res[0],currRing->qideal,temp->m[i]);
       if (!nIsOne(pGetCoeff(new_generators->m[0])))
         pNorm(new_generators->m[0]);
       next_deg = p_FDeg(new_generators->m[0],currRing);

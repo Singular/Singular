@@ -10,6 +10,7 @@
 //#include <kernel/structs.h>
 #include <kernel/ideals.h>
 #include <Singular/lists.h>
+#include <Singular/fevoices.h>
 
 struct _ssubexpr;
 typedef struct _ssubexpr *Subexpr;
@@ -33,6 +34,10 @@ extern ring   *iiLocalRing;
 //extern cmdnames cmds[];
 extern const char *lastreserved;
 extern const char *singular_date; /* tesths.cc, set by final compile */
+extern int myynest;
+extern int printlevel;
+extern int si_echo;
+
 
 extern BOOLEAN yyInRingConstruction; /* 1: during ring construction */
 
@@ -218,7 +223,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord);
 idhdl  rDefault(const char *s);
 
 idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n=NULL);
-idhdl rFindHdl(ring r, idhdl n, idhdl w);
+idhdl rFindHdl(ring r, idhdl n);
 void   rKill(idhdl h);
 void   rKill(ring r);
 lists scIndIndset(ideal S, BOOLEAN all, ideal Q);

@@ -26,7 +26,6 @@
 #include <polys/monomials/ring.h>
 #include <polys/monomials/maps.h>
 
-#include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 
@@ -53,9 +52,9 @@ enum FglmState{
     FglmPolyIsZero
 };
 
-// Has to be called, if currQuotient != NULL. ( i.e. qring-case )
+// Has to be called, if currRing->qideal != NULL. ( i.e. qring-case )
 // Then a new ideal is build, consisting of the generators of sourceIdeal
-// and the generators of currQuotient, which are completely reduced by
+// and the generators of currRing->qideal, which are completely reduced by
 // the sourceIdeal. This means: If sourceIdeal is reduced, then the new
 // ideal will be reduced as well.
 // Assumes that currRing == sourceRing
@@ -63,21 +62,21 @@ ideal fglmUpdatesource( const ideal sourceIdeal )
 {
     int k, l, offset;
     BOOLEAN found;
-    ideal newSource= idInit( IDELEMS( sourceIdeal ) + IDELEMS( currQuotient ), 1 );
+    ideal newSource= idInit( IDELEMS( sourceIdeal ) + IDELEMS( currRing->qideal ), 1 );
     for ( k= IDELEMS( sourceIdeal )-1; k >=0; k-- )
         (newSource->m)[k]= pCopy( (sourceIdeal->m)[k] );
     offset= IDELEMS( sourceIdeal );
-    for ( l= IDELEMS( currQuotient )-1; l >= 0; l-- )
+    for ( l= IDELEMS( currRing->qideal )-1; l >= 0; l-- )
     {
-        if ( (currQuotient->m)[l] != NULL )
+        if ( (currRing->qideal->m)[l] != NULL )
         {
             found= FALSE;
             for ( k= IDELEMS( sourceIdeal )-1; (k >= 0) && (found == FALSE); k-- )
-                if ( pDivisibleBy( (sourceIdeal->m)[k], (currQuotient->m)[l] ) )
+                if ( pDivisibleBy( (sourceIdeal->m)[k], (currRing->qideal->m)[l] ) )
                     found= TRUE;
             if ( ! found )
             {
-                (newSource->m)[offset]= pCopy( (currQuotient->m)[l] );
+                (newSource->m)[offset]= pCopy( (currRing->qideal->m)[l] );
                 offset++;
             }
         }
@@ -86,9 +85,9 @@ ideal fglmUpdatesource( const ideal sourceIdeal )
     return newSource;
 }
 
-// Has to be called, if currQuotient != NULL, i.e. in qring-case.
+// Has to be called, if currRing->qideal != NULL, i.e. in qring-case.
 // Gets rid of the elements of result which are contained in
-// currQuotient and skips Zeroes.
+// currRing->qideal and skips Zeroes.
 // Assumes that currRing == destRing
 void
 fglmUpdateresult( ideal & result )
@@ -100,8 +99,8 @@ fglmUpdateresult( ideal & result )
         if ( (result->m)[k] != NULL )
         {
             found= FALSE;
-            for ( l= IDELEMS( currQuotient )-1; (l >= 0) && ( found == FALSE ); l-- )
-                if ( pDivisibleBy( (currQuotient->m)[l], (result->m)[k] ) )
+            for ( l= IDELEMS( currRing->qideal )-1; (l >= 0) && ( found == FALSE ); l-- )
+                if ( pDivisibleBy( (currRing->qideal->m)[l], (result->m)[k] ) )
                     found= TRUE;
             if ( found ) pDelete( & ((result->m)[k]) );
         }
@@ -302,7 +301,7 @@ fglmProc( leftv result, leftv first, leftv second )
         if ( (ih != NULL) && (IDTYP(ih)==IDEAL_CMD) )
         {
             ideal sourceIdeal;
-            if ( currQuotient != NULL )
+            if ( currRing->qideal != NULL )
                 sourceIdeal= fglmUpdatesource( IDIDEAL( ih ) );
             else
                 sourceIdeal = IDIDEAL( ih );
@@ -311,7 +310,7 @@ fglmProc( leftv result, leftv first, leftv second )
             {
                 // Now the settings are compatible with FGLM
                 assumeStdFlag( (leftv)ih );
-                if ( fglmzero( IDRING(sourceRingHdl), sourceIdeal, IDRING(destRingHdl), destIdeal, FALSE, (currQuotient != NULL) ) == FALSE )
+                if ( fglmzero( IDRING(sourceRingHdl), sourceIdeal, IDRING(destRingHdl), destIdeal, FALSE, (currRing->qideal != NULL) ) == FALSE )
                     state= FglmNotReduced;
             }
         } else state= FglmNoIdeal;
@@ -321,7 +320,7 @@ fglmProc( leftv result, leftv first, leftv second )
     switch (state)
     {
         case FglmOk:
-            if ( currQuotient != NULL ) fglmUpdateresult( destIdeal );
+            if ( currRing->qideal != NULL ) fglmUpdateresult( destIdeal );
             break;
         case FglmHasOne:
             destIdeal= idInit(1,1);

@@ -3,7 +3,6 @@
 #include <boost/intrusive_ptr.hpp>
 #include <kernel/mod2.h>
 #include <coeffs/numbers.h>
-#include <kernel/febase.h>
 #include <polys/monomials/ring.h>
 using namespace boost;
 inline void intrusive_ptr_add_ref(ring r){
@@ -67,7 +66,7 @@ class Number{
   Number operator-(){
     Number t(*this);
     //t.n=n_Copy(n,r);
-    t.n=n_Neg(t.n,r.get());
+    t.n=n_InpNeg(t.n,r.get());
     return t;
   }
   Number& operator+=(const Number & n2){

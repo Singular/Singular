@@ -66,7 +66,7 @@
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/maps/fast_maps.h>
-#include <kernel/febase.h>
+#include <Singular/fevoices.h>
 #include <kernel/groebner_walk/walkProc.h>
 #include <kernel/groebner_walk/walkMain.h>
 #include <kernel/groebner_walk/walkSupport.h>
@@ -101,7 +101,7 @@
 #include <kernel/linear_algebra/eigenval.h>
 #include <kernel/maps/fast_maps.h>
 #include <kernel/fast_mult.h>
-#include <kernel/febase.h>
+#include <kernel/oswrapper/feread.h>
 
 #include <kernel/fglm/fglmgauss.h>
 #include <kernel/fglm/fglm.h>
@@ -159,7 +159,7 @@
 #include <kernel/GBEngine/tgbgauss.h>
 #include <kernel/GBEngine/tgb.h>
 
-#include <kernel/timer.h>
+#include <kernel/oswrapper/timer.h>
 
 #include <kernel/GBEngine/units.h>
 #include <kernel/groebner_walk/walkMain.h>

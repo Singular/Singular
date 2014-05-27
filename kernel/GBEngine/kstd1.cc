@@ -33,14 +33,12 @@
 #include <kernel/polys.h>
 
 #include <kernel/GBEngine/kutil.h>
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/khstd.h>
 #include <kernel/GBEngine/stairc.h>
 //#include "cntrlc.h"
 #include <kernel/ideals.h>
 //#include "../Singular/ipid.h"
-#include <kernel/timer.h>
 
 //#include "ipprint.h"
 
@@ -2498,7 +2496,26 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     M=idInit(1,F->rank);
     return idInit(1,F->rank);
   }
-
+  #ifdef HAVE_RINGS
+  if(rField_is_Ring(currRing))
+  {
+    ideal sb;
+    sb = kStd(F, Q, h, w, hilb);
+    idSkipZeroes(sb);
+    if(IDELEMS(sb) <= IDELEMS(F))
+    {
+        M = idCopy(sb);
+        idSkipZeroes(M);
+        return(sb);
+    }
+    else
+    {
+        M = idCopy(F);
+        idSkipZeroes(M);
+        return(sb);
+    }
+  }
+  #endif
   ideal r=NULL;
   int Kstd1_OldDeg = Kstd1_deg,i;
   intvec* temp_w=NULL;
@@ -2615,7 +2632,9 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
   }
   else
   {
-    if (IDELEMS(M)>IDELEMS(r)) { idDelete(&M); M=idCopy(r); }
+    if (IDELEMS(M)>IDELEMS(r)) { 
+       idDelete(&M); 
+       M=idCopy(r); }
   }
   return r;
 }
@@ -2634,7 +2653,7 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
     pp = p_KillSquares(pp, m_iFirstAltVar, m_iLastAltVar, currRing);
 
-    if(Q == currQuotient)
+    if(Q == currRing->qideal)
       Q = SCAQuotient(currRing);
   }
 #endif
@@ -2684,7 +2703,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
     pp = id_KillSquares(pp, m_iFirstAltVar, m_iLastAltVar, currRing, false);
 
-    if(Q == currQuotient)
+    if(Q == currRing->qideal)
       Q = SCAQuotient(currRing);
   }
 #endif
@@ -2750,7 +2769,7 @@ ideal kInterRedOld (ideal F, ideal Q)
     // this should be done on the upper level!!! :
     //    tempQ = SCAQuotient(currRing);
 
-    if(Q == currQuotient)
+    if(Q == currRing->qideal)
       tempQ = SCAQuotient(currRing);
   }
 #endif
@@ -3086,8 +3105,11 @@ ideal kInterRed (ideal F, ideal Q)
 #ifdef HAVE_PLURAL
   if(rIsPluralRing(currRing)) return kInterRedOld(F,Q);
 #endif
-  if ((currRing->OrdSgn==-1)
-  || (rField_is_numeric(currRing)))
+  if ((currRing->OrdSgn==-1)|| (rField_is_numeric(currRing))
+  #ifdef HAVE_RINGS
+  ||(rField_is_Ring(currRing))
+  #endif
+  )
     return kInterRedOld(F,Q);
 
     //return kInterRedOld(F,Q);

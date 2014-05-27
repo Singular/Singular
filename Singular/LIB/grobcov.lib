@@ -1486,7 +1486,10 @@ EXAMPLE:  cgsdr; shows an example"
         if(GS[i][2]==1)
         {
           GS[i][3]=postredgb(mingb(GS[i][3]));
-          GS[i][7]=postredgb(mingb(GS[i][7]));
+          if (typeof(GS[i][7])=="ideal")
+          {
+            GS[i][7]=postredgb(mingb(GS[i][7]));
+          }
         }
       }
     }

@@ -20,6 +20,7 @@
 #include <coeffs/longrat.h>
 #include <coeffs/mpr_complex.h>
 #include <misc/mylimits.h>
+#include <misc/sirandom.h>
 #include <coeffs/modulop.h>
 
 // int npGen=0;
@@ -465,9 +466,6 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfSub   = npSub;
   r->cfAdd   = npAdd;
   r->cfDiv   = npDiv;
-  r->cfIntDiv= npDiv;
-  //r->cfIntMod= ndIntMod;
-  r->cfExactDiv= npDiv;
   r->cfInit = npInit;
   //r->cfSize  = ndSize;
   r->cfInt  = npInt;
@@ -478,7 +476,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   //r->cfExtGcd = NULL; // only for ring stuff
   // r->cfDivBy = NULL; // only for ring stuff
   #endif
-  r->cfNeg   = npNeg;
+  r->cfInpNeg   = npNeg;
   r->cfInvers= npInvers;
   //r->cfCopy  = ndCopy;
   //r->cfRePart = ndCopy;
@@ -553,8 +551,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
         loop
         {
           i++;
-          r->npExpTable[i] =(int)(((long)w * (long)r->npExpTable[i-1])
-                               % r->ch);
+          r->npExpTable[i] =(int)(((long)w * (long)r->npExpTable[i-1]) % r->ch);
           r->npLogTable[r->npExpTable[i]] = i;
           if /*(i == r->ch - 1 ) ||*/ (/*(*/ r->npExpTable[i] == 1 /*)*/)
             break;

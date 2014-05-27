@@ -10,10 +10,10 @@ libmisc_la_LIBADD = libintvec.la
 
 ## libmisc_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
-libmisc_la_SOURCES   = int64vec.cc options.c
+libmisc_la_SOURCES   = int64vec.cc options.c sirandom.c
 
 libmisc_la_includedir = $(includedir)/singular/misc
-libmisc_la_include_HEADERS = mylimits.h options.h intvec.h int64vec.h
+libmisc_la_include_HEADERS = mylimits.h options.h intvec.h int64vec.h sirandom.h
 
 nodist_libmisc_la_include_HEADERS = auxiliary.h 
 nodist_libmisc_la_SOURCES   = auxiliary.h 

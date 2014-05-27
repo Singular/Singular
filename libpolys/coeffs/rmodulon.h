@@ -53,6 +53,7 @@ BOOLEAN nrnDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif
 void    nrnSetExp(unsigned long c, const coeffs r);
 void    nrnInitExp(unsigned long c, const coeffs r);
+coeffs  nrnQuot1(number c, const coeffs r);
 
 number nrnMapQ(number from, const coeffs src, const coeffs dst);
 #endif

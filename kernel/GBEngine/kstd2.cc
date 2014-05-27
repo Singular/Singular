@@ -77,7 +77,6 @@ long sba_interreduction_operations;
 #include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/khstd.h>
 #include <polys/kbuckets.h>
@@ -1362,7 +1361,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (!TEST_OPT_NOT_BUCKETS)
     strat->use_buckets = 1;
 #endif
-
   // redtailBBa against T for inhomogenous input
   if (!TEST_OPT_OLDSTD)
     withT = ! strat->homog;

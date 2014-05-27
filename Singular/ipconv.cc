@@ -14,7 +14,6 @@
 #include <misc/intvec.h>
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <Singular/subexpr.h>

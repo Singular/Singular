@@ -185,7 +185,7 @@ static inline poly sca_m_Mult_mm( poly pMonomM, const poly pMonomMM, const ring 
     number nCoeffM = p_GetCoeff(pMonomM, rRing); // no new copy! should be deleted!
 
     if( (tpower) != 0 ) // degree is odd => negate coeff.
-      nCoeffM = n_Neg(nCoeffM, rRing); // negate nCoeff (will destroy the original number)
+      nCoeffM = n_InpNeg(nCoeffM, rRing); // negate nCoeff (will destroy the original number)
 
     const number nCoeffMM = p_GetCoeff(pMonomMM, rRing); // no new copy!
 
@@ -249,7 +249,7 @@ static inline poly sca_mm_Mult_m( const poly pMonomMM, poly pMonomM, const ring 
     number nCoeffM = p_GetCoeff(pMonomM, rRing); // no new copy! should be deleted!
 
     if( (tpower) != 0 ) // degree is odd => negate coeff.
-      nCoeffM = n_Neg(nCoeffM, rRing); // negate nCoeff (will destroy the original number), creates new number!
+      nCoeffM = n_InpNeg(nCoeffM, rRing); // negate nCoeff (will destroy the original number), creates new number!
 
     const number nCoeffMM = p_GetCoeff(pMonomMM, rRing); // no new copy!
 
@@ -320,7 +320,7 @@ static inline poly sca_mm_Mult_mm( poly pMonom1, const poly pMonom2, const ring 
     number nCoeff = n_Mult(nCoeff1, nCoeff2, rRing); // new number!
 
     if( (tpower) != 0 ) // degree is odd => negate coeff.
-      nCoeff = n_Neg(nCoeff, rRing); // negate nCoeff (will destroy the original number)
+      nCoeff = n_InpNeg(nCoeff, rRing); // negate nCoeff (will destroy the original number)
 
     p_SetCoeff0(pResult, nCoeff, rRing); // set lc(pResult) = nCoeff, no destruction!
 
@@ -365,7 +365,7 @@ static inline poly sca_xi_Mult_mm(short i, const poly pMonom, const ring rRing)
     number nCoeff = n_Copy(p_GetCoeff(pMonom, rRing), rRing); // new number!
 
     if( cpower != 0 ) // degree is odd => negate coeff.
-      nCoeff = n_Neg(nCoeff, rRing); // negate nCoeff (will destroy the original number)
+      nCoeff = n_InpNeg(nCoeff, rRing); // negate nCoeff (will destroy the original number)
 
     p_SetCoeff0(pResult, nCoeff, rRing); // set lc(pResult) = nCoeff, no destruction!
 
@@ -809,7 +809,7 @@ poly sca_SPoly( const poly p1, const poly p2, const ring r )
   assume( (iSignSum*iSignSum == 0) || (iSignSum*iSignSum == 4) );
 
   if( iSignSum != 0 ) // the same sign!
-    C2=n_Neg (C2, r);
+    C2=n_InpNeg (C2, r);
 
   p_SetCoeff(m1, C2, r);                           // lc(m1) = C2!!!
   p_SetCoeff(m2, C1, r);                           // lc(m2) = C1!!!
@@ -880,7 +880,7 @@ poly sca_ReduceSpoly(const poly p1, poly p2, const ring r)
   const int iSign = sca_Sign_mm_Mult_mm( m, p1, r );
 
   if(iSign == 1)
-    C2 = n_Neg(C2,r);
+    C2 = n_InpNeg(C2,r);
 
   p_SetCoeff(m, C2, r);
 

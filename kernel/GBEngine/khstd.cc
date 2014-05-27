@@ -13,7 +13,6 @@
 #include <misc/options.h>
 #include <misc/intvec.h>
 #include <polys/simpleideals.h>
-#include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/GBEngine/kutil.h>
 #include <kernel/GBEngine/stairc.h>

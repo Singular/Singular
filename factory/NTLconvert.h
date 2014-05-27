@@ -50,39 +50,39 @@ NTL_CLIENT
 #include "cf_assert.h"
 
 
-ZZ_pX convertFacCF2NTLZZpX(CanonicalForm f);
-zz_pX convertFacCF2NTLzzpX(CanonicalForm f);
-GF2X convertFacCF2NTLGF2X(CanonicalForm f);
-CanonicalForm convertNTLZZpX2CF(ZZ_pX poly,Variable x);
-CanonicalForm convertNTLzzpX2CF(zz_pX poly,Variable x);
-CanonicalForm convertNTLGF2X2CF(GF2X poly,Variable x);
-CanonicalForm convertNTLZZX2CF(ZZX polynom,Variable x);
-CFFList convertNTLvec_pair_ZZpX_long2FacCFFList(vec_pair_ZZ_pX_long e,ZZ_p multi,Variable x);
-CFFList convertNTLvec_pair_zzpX_long2FacCFFList(vec_pair_zz_pX_long e,zz_p multi,Variable x);
+ZZ_pX convertFacCF2NTLZZpX(const CanonicalForm & f);
+zz_pX convertFacCF2NTLzzpX(const CanonicalForm & f);
+GF2X convertFacCF2NTLGF2X(const CanonicalForm & f);
+CanonicalForm convertNTLZZpX2CF(const ZZ_pX & poly,const Variable & x);
+CanonicalForm convertNTLzzpX2CF(const zz_pX & poly,const Variable & x);
+CanonicalForm convertNTLGF2X2CF(const GF2X & poly,const Variable & x);
+CanonicalForm convertNTLZZX2CF(const ZZX & polynom,const Variable & x);
+CFFList convertNTLvec_pair_ZZpX_long2FacCFFList(const vec_pair_ZZ_pX_long& e,const ZZ_p & multi,const Variable & x);
+CFFList convertNTLvec_pair_zzpX_long2FacCFFList(const vec_pair_zz_pX_long& e,const zz_p multi,const Variable & x);
 
-CFFList convertNTLvec_pair_GF2X_long2FacCFFList(vec_pair_GF2X_long e,GF2 multi,Variable x);
-CanonicalForm convertZZ2CF(ZZ coefficient);
-ZZ convertFacCF2NTLZZ(const CanonicalForm f);
-ZZX convertFacCF2NTLZZX(CanonicalForm f);
-CFFList convertNTLvec_pair_ZZX_long2FacCFFList(vec_pair_ZZX_long e,ZZ multi,Variable x);
-CanonicalForm convertNTLZZpE2CF(ZZ_pE coefficient,Variable x);
-CFFList convertNTLvec_pair_ZZpEX_long2FacCFFList(vec_pair_ZZ_pEX_long e,ZZ_pE multi,Variable x,Variable alpha);
-CanonicalForm convertNTLGF2E2CF(GF2E coefficient,Variable x);
-CFFList convertNTLvec_pair_GF2EX_long2FacCFFList(vec_pair_GF2EX_long e,GF2E multi,Variable x,Variable alpha);
-GF2EX convertFacCF2NTLGF2EX(CanonicalForm f,GF2X mipo);
-ZZ_pEX convertFacCF2NTLZZ_pEX(CanonicalForm f,ZZ_pX mipo);
-zz_pEX convertFacCF2NTLzz_pEX(CanonicalForm f,zz_pX mipo);
-CanonicalForm convertNTLzzpE2CF(zz_pE f, Variable x);
-CFFList convertNTLvec_pair_zzpEX_long2FacCFFList(vec_pair_zz_pEX_long e,zz_pE multi,Variable x,Variable alpha);
-CanonicalForm convertNTLzz_pEX2CF(zz_pEX f, Variable x, Variable alpha);
-CanonicalForm convertNTLZZ_pEX2CF(ZZ_pEX f, Variable x, Variable alpha);
+CFFList convertNTLvec_pair_GF2X_long2FacCFFList(const vec_pair_GF2X_long& e,const GF2 multi,const Variable & x);
+CanonicalForm convertZZ2CF(const ZZ & coefficient);
+ZZ convertFacCF2NTLZZ(const CanonicalForm & f);
+ZZX convertFacCF2NTLZZX(const CanonicalForm & f);
+CFFList convertNTLvec_pair_ZZX_long2FacCFFList(const vec_pair_ZZX_long& e,const ZZ & multi,const Variable & x);
+CanonicalForm convertNTLZZpE2CF(const ZZ_pE & coefficient,const Variable & x);
+CFFList convertNTLvec_pair_ZZpEX_long2FacCFFList(const vec_pair_ZZ_pEX_long & e,const ZZ_pE & multi,const Variable & x,const Variable & alpha);
+CanonicalForm convertNTLGF2E2CF(const GF2E & coefficient,const Variable & x);
+CFFList convertNTLvec_pair_GF2EX_long2FacCFFList(const vec_pair_GF2EX_long& e,const GF2E & multi,const Variable & x,const Variable & alpha);
+GF2EX convertFacCF2NTLGF2EX(const CanonicalForm & f,const GF2X & mipo);
+ZZ_pEX convertFacCF2NTLZZ_pEX(const CanonicalForm & f,const ZZ_pX & mipo);
+zz_pEX convertFacCF2NTLzz_pEX(const CanonicalForm & f,const zz_pX & mipo);
+CanonicalForm convertNTLzzpE2CF(const zz_pE & f, const Variable & x);
+CFFList convertNTLvec_pair_zzpEX_long2FacCFFList(const vec_pair_zz_pEX_long & e,const zz_pE & multi,const Variable & x,const Variable & alpha);
+CanonicalForm convertNTLzz_pEX2CF(const zz_pEX & f, const Variable & x, const Variable & alpha);
+CanonicalForm convertNTLZZ_pEX2CF(const ZZ_pEX & f, const Variable & x, const Variable & alpha);
 
-mat_ZZ* convertFacCFMatrix2NTLmat_ZZ(CFMatrix &m);
-CFMatrix* convertNTLmat_ZZ2FacCFMatrix(mat_ZZ &m);
-mat_zz_p* convertFacCFMatrix2NTLmat_zz_p(CFMatrix &m);
-CFMatrix* convertNTLmat_zz_p2FacCFMatrix(mat_zz_p &m);
-mat_zz_pE* convertFacCFMatrix2NTLmat_zz_pE(CFMatrix &m);
-CFMatrix* convertNTLmat_zz_pE2FacCFMatrix(mat_zz_pE &m, Variable alpha);
+mat_ZZ* convertFacCFMatrix2NTLmat_ZZ(const CFMatrix &m);
+CFMatrix* convertNTLmat_ZZ2FacCFMatrix(const mat_ZZ &m);
+mat_zz_p* convertFacCFMatrix2NTLmat_zz_p(const CFMatrix &m);
+CFMatrix* convertNTLmat_zz_p2FacCFMatrix(const mat_zz_p &m);
+mat_zz_pE* convertFacCFMatrix2NTLmat_zz_pE(const CFMatrix &m);
+CFMatrix* convertNTLmat_zz_pE2FacCFMatrix(const mat_zz_pE &m, const Variable & alpha);
 
 extern long fac_NTL_char;
 #endif

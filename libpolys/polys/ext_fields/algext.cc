@@ -1444,7 +1444,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfFarey        = naFarey;
   cf->cfChineseRemainder= naChineseRemainder;
   cf->cfInt          = naInt;
-  cf->cfNeg          = naNeg;
+  cf->cfInpNeg          = naNeg;
   cf->cfAdd          = naAdd;
   cf->cfSub          = naSub;
   cf->cfMult         = naMult;

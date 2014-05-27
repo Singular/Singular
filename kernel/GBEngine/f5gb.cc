@@ -19,7 +19,6 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/templates/p_Procs.h>
 #include <kernel/ideals.h>
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/khstd.h>
 #include <polys/kbuckets.h>
@@ -29,7 +28,6 @@
 #include <kernel/GBEngine/f5gb.h>
 #include <kernel/GBEngine/f5data.h>
 #include <kernel/GBEngine/f5lists.h>
-#include <kernel/timer.h>
 int notInG              =   0;
 int numberOfRules       =   0;
 int reductionsToZero    =   0;
@@ -129,7 +127,7 @@ LList* F5inc(int i, poly f_i, LList* gPrev, LList* reducers, ideal gbPrev, poly 
     int j;
     //Print("%p\n",gPrev->getFirst());
     //pWrite(gPrev->getFirst()->getPoly());
-    poly tempNF =   kNF(gbPrev,currQuotient,f_i);
+    poly tempNF =   kNF(gbPrev,currRing->qideal,f_i);
     f_i         =   tempNF;
     //gPrev->insert(ONE,i,f_i);
     gPrev->insert(ONE,gPrev->getLength()+1,f_i);
@@ -643,7 +641,7 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag) {
             testId->m[i]  =   pHead(testNode->getPoly());
             testNode        =   testNode->getNext();
         }
-        poly temp   =   kNF(testId,currQuotient,u1);
+        poly temp   =   kNF(testId,currRing->qideal,u1);
         //pWrite(temp);
         for(i=0;i<IDELEMS(testId);i++) {
             testId->m[i]    =   NULL;
@@ -1097,7 +1095,7 @@ void reduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RList* rules
         //Print("LIST OF SPOLYNOMIALS!\n");
         //sPolyList->print();
         sPolyList->setFirst(temp->getNext());
-        poly tempNF = kNF(gbPrev,currQuotient,temp->getPoly());
+        poly tempNF = kNF(gbPrev,currRing->qideal,temp->getPoly());
         if(NULL != tempNF) {
             pNorm(tempNF);
             temp->setPoly(tempNF);
@@ -1150,7 +1148,7 @@ void newReduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, LList* re
         //  Print("YES!!!!!!!!!!!!!!!!\n");
         //}
         //pWrite(temp->getPoly());
-        //poly tempNF = kNF(gbPrev,currQuotient,temp->getPoly());
+        //poly tempNF = kNF(gbPrev,currRing->qideal,temp->getPoly());
         //Print("!!!\n");
         //if(NULL != tempNF) {
             //pNorm(tempNF);
@@ -1759,7 +1757,7 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CListOld* critPairs,
                 if(NULL != temp) {
                     pNorm(temp);
                     //pWrite(temp);
-                    poly tempNF =   kNF(gbPrev,currQuotient,temp);
+                    poly tempNF =   kNF(gbPrev,currRing->qideal,temp);
                     pNorm(tempNF);
                     if(NULL == tempNF) {
                         reductionsToZero++;
@@ -1963,7 +1961,7 @@ ideal F5main(ideal id, ring r, int opt, int plus, int termination) {
     // initializing the groebner basis of elements of index < actual index
     gbPrev->m[0]    =   gPrev->getFirst()->getPoly();
     //idShow(gbPrev);
-    //idShow(currQuotient);
+    //idShow(currRing->qideal);
     for(i=2; i<=IDELEMS(id); i++) {
         LNode* gPrevTag =   gPrev->getLast();
         //Print("Last POlynomial in GPREV: ");

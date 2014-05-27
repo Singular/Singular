@@ -11,7 +11,6 @@
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
-#include <kernel/febase.h>
 #include <polys/monomials/maps.h>
 #include <omalloc/omalloc.h>
 #include <kernel/GBEngine/kstd1.h>

@@ -21,7 +21,7 @@
 
 ideal twostd(ideal I) // works in currRing only!
 {
-  ideal J = kStd(I, currQuotient, testHomog, NULL, NULL, 0, 0, NULL); // in currRing!!!
+  ideal J = kStd(I, currRing->qideal, testHomog, NULL, NULL, 0, 0, NULL); // in currRing!!!
   idSkipZeroes(J); // ring independent!
 
   const int rN = currRing->N;
@@ -94,12 +94,12 @@ ideal twostd(ideal I) // works in currRing only!
 #endif
 
 //          if( q != NULL)
-          q = kNF(J, currQuotient, q, 0, KSTD_NF_NONORM); // in currRing!!!
+          q = kNF(J, currRing->qideal, q, 0, KSTD_NF_NONORM); // in currRing!!!
 
 #ifdef PDEBUG
           p_Test(q, currRing);
 #if 0
-          Print("NF(J/currQuotient)=> q: "); // !
+          Print("NF(J/currRing->qideal)=> q: "); // !
           p_Write(q, currRing);
 #endif
 #endif
@@ -178,10 +178,10 @@ ideal twostd(ideal I) // works in currRing only!
     BITSET save1;
     SI_SAVE_OPT1(save1);
     si_opt_1|=Sy_bit(OPT_SB_1); // ring independent
-    J = kStd(id_tmp, currQuotient, testHomog, NULL, NULL, 0, iSize); // J = J + K, J - std // in currRing!
+    J = kStd(id_tmp, currRing->qideal, testHomog, NULL, NULL, 0, iSize); // J = J + K, J - std // in currRing!
     SI_RESTORE_OPT1(save1);
 #else
-    J=kStd(id_tmp, currQuotient,testHomog,NULL,NULL,0,0,NULL);
+    J=kStd(id_tmp, currRing->qideal,testHomog,NULL,NULL,0,0,NULL);
 #endif
 
     id_Delete(&id_tmp, currRing);
@@ -257,14 +257,14 @@ ideal Approx_Step(ideal L)
   int i,j; // k=syzcomp
   int flag, flagcnt=0, syzcnt=0;
   int syzcomp = 0;
-  ideal I = kStd(L, currQuotient,testHomog,NULL,NULL,0,0,NULL);
+  ideal I = kStd(L, currRing->qideal,testHomog,NULL,NULL,0,0,NULL);
   idSkipZeroes(I);
   ideal s_I;
   int idI = idElem(I);
   ideal trickyQuotient;
-  if (currQuotient !=NULL)
+  if (currRing->qideal !=NULL)
   {
-    trickyQuotient = idSimpleAdd(currQuotient,I);
+    trickyQuotient = idSimpleAdd(currRing->qideal,I);
   }
   else
     trickyQuotient = I;
@@ -294,7 +294,7 @@ ideal Approx_Step(ideal L)
     for (j=0; j< idI; j++ )
     {
       q = pp_Mult_mm(I->m[j],var[i],currRing);
-      q = kNF(I,currQuotient,q,0,0);
+      q = kNF(I,currRing->qideal,q,0,0);
       if (q!=0)
       {
     h2->m[j]=pCopy(q);
@@ -344,7 +344,7 @@ ideal Approx_Step(ideal L)
       s_h2=idCopy(s_h3);
       idDelete(&s_h3);
       Print("...computing Syz");
-      s_h3 = kStd(s_h2, currQuotient,(tHomog)FALSE,NULL,NULL,syzcomp,idI);
+      s_h3 = kStd(s_h2, currRing->qideal,(tHomog)FALSE,NULL,NULL,syzcomp,idI);
       SI_RESTORE_OPT1(save1);
       //idShow(s_h3);
       if (orig_ring != syz_ring)
@@ -368,7 +368,7 @@ ideal Approx_Step(ideal L)
         rDelete(syz_ring);
       }
       idTest(s_h3);
-      S[syzcnt]=kStd(s_h3,currQuotient,(tHomog)FALSE,NULL,NULL);
+      S[syzcnt]=kStd(s_h3,currRing->qideal,(tHomog)FALSE,NULL,NULL);
       syzcnt++;
       idDelete(&s_h3);
     } // end if flag >0
@@ -407,7 +407,7 @@ ideal Approx_Step(ideal L)
       res->m[i-1]=p;
     }
     Print("final std");
-    res = kStd(res, currQuotient,testHomog,NULL,NULL,0,0,NULL);
+    res = kStd(res, currRing->qideal,testHomog,NULL,NULL,0,0,NULL);
     idSkipZeroes(res);
     return(res);
   }

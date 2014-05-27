@@ -209,6 +209,23 @@ libraries are stored on your disk.
 when writing a procedure, for instance, to have a look at intermediate
 results (see @ref{Debugging tools}).
 
+If such a libarary should be contributed to @sc{Singular} some formal
+requirements are needed:
+@itemize
+@item
+the library header must explain the purpose of the library and
+(for non-trivial algorithm) a pointer to the algorithm (text book, article, etc.)
+@item
+all global procedures must have a help string and an example which shows its usage.
+@item
+it is strongly recommend also to provide test scripts which test the functionality: one should test the essential functionality of the
+  library/command in a relatively short time (say, in no more than 30s),
+  other tests  should check the functionality of the
+  library/command in detail so that, if possible, all relevant
+  cases/results are tested. Nevertheless, such a test should not run
+  longer than, say, 10 minutes.
+@end itemize
+
 We give short examples of procedures to demonstrate the following:
 
 @itemize @bullet
@@ -2964,8 +2981,8 @@ numbers, but reducible over the complex numbers.
   // Let us now look for the branches using the primdec library.
   LIB "primdec.lib";
   primdecSY(i);
-  def li=_[2];
-  ideal i2=li[2];       // call the second ideal i2
+  def li=_[1];
+  ideal i2=li[2];       // call the first ideal i1
   // The curve seems to have 2 branches by what we computed using the
   // algorithm of Shimoyama-Yokoyama.
   // Now the same computation by the Gianni-Trager-Zacharias algorithm:
@@ -2991,10 +3008,10 @@ numbers, but reducible over the complex numbers.
   // Hence tau is 13 and therefore mu is 12. But then it is impossible that
   // the singularity has two branches, since mu is even and delta is an
   // integer!
-  // So obviously, we did not decompose completely. Because the first branch
-  // is smooth, only the second ideal can be the one which can be decomposed
+  // So obviously, we did not decompose completely. Because the second branch
+  // is smooth, only the first ideal can be the one which can be decomposed
   // further.
-  // Let us now consider the normalization of this second ideal i2.
+  // Let us now consider the normalization of this first ideal i1.
   LIB "normal.lib";
   normal(i2);
   def rno=_[1][1];

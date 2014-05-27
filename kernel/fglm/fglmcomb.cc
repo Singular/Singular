@@ -17,7 +17,6 @@
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <polys/monomials/ring.h>
-#include <kernel/febase.h>
 #include <polys/monomials/maps.h>
 #include <omalloc/omalloc.h>
 #include "fglmvec.h"
@@ -57,7 +56,7 @@ fglmEliminateMonomials( poly * pptr, fglmVector & v, polyset monomials, int numM
                 pIter( temp );
                 pretemp->next= temp;
             }
-            pGetCoeff( todelete )= nNeg( pGetCoeff( todelete ) );
+            pGetCoeff( todelete )= nInpNeg( pGetCoeff( todelete ) );
             number newelem = nAdd( pGetCoeff( todelete ), v.getconstelem( point+1 ) );
             v.setelem( point+1, newelem );
             nDelete( & pGetCoeff( todelete ) );
@@ -116,7 +115,7 @@ fglmReductionStep( poly * pptr, ideal source, int * w )
         n_Normalize( temp, currRing );
         nDelete( & n1 );
         n1= temp;
-        n1= nNeg( n1 );
+        n1= nInpNeg( n1 );
         pMult_nn( p2, n1 );
 //         pNormalize( p2 );
         nDelete( & n1 );

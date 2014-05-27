@@ -14,7 +14,6 @@
 
 #include <kernel/ideals.h>
 #include <kernel/polys.h>
-#include <kernel/febase.h>
 #include <kernel/GBEngine/kutil.h>
 
 // #include "subexpr.h"

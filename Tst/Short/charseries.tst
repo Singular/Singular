@@ -76,10 +76,16 @@ char_series (K);
 
 kill r;
 
-ring r=3,(x1,x2,x3,x4,x5,y),lp;
-poly f6= ((y+x1*x3+x2+1)*(y+x3*x4+x1*x3)*(y^3+x3*x4+x1*x3));
-ideal I=x1^2+1, x2^2+x1+1, x3^2+x2+1, x4^2+x3+x2+2;
-ideal K=I,f6;
-char_series (K);
+// examples from J. Kroeker
+ring r=0,(x,y,z),dp;
+ideal I = -3*y^2-3, -3*x^2+1, -x*y+2*z^2;
+char_series (I);
+
+kill r;
+
+ring r=0,(z,y,x),dp;
+ideal I = -3*y^2-3, -3*x^2+1, -x*y+2*z^2;
+char_series (I);
+
 
 tst_status(1);$

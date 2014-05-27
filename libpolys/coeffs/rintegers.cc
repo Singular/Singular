@@ -20,6 +20,7 @@
 #include <coeffs/longrat.h>
 #include <coeffs/mpr_complex.h>
 #include <coeffs/rintegers.h>
+#include <coeffs/rmodulon.h>
 #include "si_gmp.h"
 
 /// Our Type!
@@ -387,6 +388,19 @@ static char* nrzCoeffString(const coeffs)
   return omStrDup("integer");
 }
 
+coeffs nrzQuot1(number c, const coeffs r)
+{
+    int ch = r->cfInt(c, r);
+    int_number dummy;
+    dummy = (int_number) omAlloc(sizeof(mpz_t));
+    mpz_init_set_ui(dummy, ch);
+    ZnmInfo info;
+    info.base = dummy;
+    info.exp = (unsigned long) 1;
+    coeffs rr = nInitChar(n_Zn, (void*)&info);
+    return(rr);
+}
+
 BOOLEAN nrzInitChar(coeffs r,  void *)
 {
   assume( getCoeffType(r) == ID );
@@ -411,7 +425,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfDivBy = nrzDivBy; // only for ring stuff
   r->cfInit_bigint = nrzMapQ;
   //#endif
-  r->cfNeg   = nrzNeg;
+  r->cfInpNeg   = nrzNeg;
   r->cfInvers= nrzInvers;
   r->cfCopy  = nrzCopy;
   r->cfWriteLong = nrzWrite;
@@ -428,6 +442,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfDelete= nrzDelete;
   r->cfSetMap = nrzSetMap;
   r->cfCoeffWrite = nrzCoeffWrite;
+  r->cfQuot1 = nrzQuot1;
   // debug stuff
 
 #ifdef LDEBUG

@@ -12,7 +12,6 @@
 
 #ifdef HAVE_EIGENVAL
 
-#include <kernel/febase.h>
 #include <kernel/structs.h>
 //#include "ipid.h"
 #include <misc/intvec.h>

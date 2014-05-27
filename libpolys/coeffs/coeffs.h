@@ -125,10 +125,10 @@ struct n_Procs_s
    // general stuff
    //   if the ring has a meaningful Euclidean structure, hopefully
    //   supported by cfQuotRem, then
-   //     IntMod, IntDiv should give the same result
-   //     IntDiv(a,b) = QuotRem(a,b, &IntMod(a,b))
-   //   if the ring is not Euclidean, then IntMod should return 0
-   //   and IntDiv the exact quotient. It is assumed that the function is
+   //     IntMod, Div should give the same result
+   //     Div(a,b) = QuotRem(a,b, &IntMod(a,b))
+   //   if the ring is not Euclidean or a field, then IntMod should return 0
+   //   and Div the exact quotient. It is assumed that the function is
    //   ONLY called on Euclidean rings or in the case of an exact division.
    //
    //   cfDiv does an exact division, but has to handle illegal input
@@ -153,8 +153,8 @@ struct n_Procs_s
 
    /// changes argument  inline: a:= -a
    /// return -a! (no copy is returned)
-   /// the result should be assigned to the original argument: e.g. a = n_Neg(a,r)
-   number  (*cfNeg)(number a, const coeffs r);
+   /// the result should be assigned to the original argument: e.g. a = n_InpNeg(a,r)
+   number  (*cfInpNeg)(number a, const coeffs r);
    /// return 1/a
    number  (*cfInvers)(number a, const coeffs r);
    /// return a copy of a
@@ -216,6 +216,7 @@ struct n_Procs_s
    //in a Euclidean ring, return the Euclidean norm as a bigint (of type number)
    number  (*cfEucNorm)(number a, const coeffs r);
    //in a principal ideal ring (with zero divisors): the annihilator
+   // NULL otherwise
    number  (*cfAnn)(number a, const coeffs r);
    //find a "canonical representative of a modulo the units of r
    //return NULL if a is already normalized
@@ -375,7 +376,10 @@ struct n_Procs_s
   unsigned long modExponent;
   int_number    modNumber;
   unsigned long mod2mMask;
+  //returns coeffs with updated ch, modNumber and modExp
+  coeffs (*cfQuot1)(number c, const coeffs r);
 #endif
+
   /*CF: for blackbox rings */
   void * data;
 #ifdef LDEBUG
@@ -504,6 +508,9 @@ static inline BOOLEAN n_IsUnit(number n, const coeffs r)
 //   it would make more sense to return the inverse...
 static inline number n_GetUnit(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfGetUnit!=NULL); return r->cfGetUnit(n,r); }
+
+static inline coeffs n_CoeffRingQuot1(number c, const coeffs r)
+{ assume(r != NULL); assume(r->cfQuot1 != NULL); return r->cfQuot1(c, r); }
 #endif
 
 /// a number representing i in the given coeff field/ring r
@@ -525,9 +532,9 @@ static inline void n_MPZ(mpz_t result, number &n,       const coeffs r)
 
 
 /// in-place negation of n
-/// MUST BE USED: n = n_Neg(n) (no copy is returned)
-static inline number n_Neg(number n,     const coeffs r)
-{ assume(r != NULL); assume(r->cfNeg!=NULL); return r->cfNeg(n,r); }
+/// MUST BE USED: n = n_InpNeg(n) (no copy is returned)
+static inline number n_InpNeg(number n,     const coeffs r)
+{ assume(r != NULL); assume(r->cfInpNeg!=NULL); return r->cfInpNeg(n,r); }
 
 /// return the multiplicative inverse of 'a';
 /// raise an error if 'a' is not invertible
@@ -613,26 +620,18 @@ static inline number n_Add(number a, number b, const coeffs r)
 static inline number n_Div(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfDiv!=NULL); return r->cfDiv(a,b,r); }
 
-/// in Z: largest c such that c*b <= a
-/// in Z/nZ, Z/2^kZ: computed as in the case Z (from integers representing
-///                  'a' and 'b')
-/// in Z/pZ: return a/b
-/// in K(a)/<p(a)>: return a/b
-/// in K(t_1, ..., t_n): return a/b
-/// other fields: not implemented
-// CF: see above: should be part of euclidean structure.
-//   Needs to be implemented as pnBin relies on it.
-//   Probably should default to Div.
 static inline number n_IntDiv(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfIntDiv!=NULL); return r->cfIntDiv(a,b,r); }
 
+/// for r a field, return n_Init(0,r)
+/// otherwise: n_Div(a,b,r)*b+n_IntMod(a,b,r)==a
 static inline number n_IntMod(number a, number b, const coeffs r)
-{ assume(r != NULL); assume(r->cfIntMod!=NULL); return r->cfIntMod(a,b,r); }
-/// @todo: Describe me!!!
-///
-/// What is the purpose of this method, especially in comparison with
-/// n_Div?
-/// !!! Recommendation: remove this method from the user-interface.
+{ assume(r != NULL); return r->cfIntMod(a,b,r); }
+
+/// assume that there is a canonical subring in cf and we know
+/// that division is possible for these a and b in the subring,
+/// n_ExactDiv performs it, may skip additional tests.
+/// Can always be substituted by n_Div at the cost of larger  computing time.
 static inline number n_ExactDiv(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfExactDiv!=NULL); return r->cfExactDiv(a,b,r); }
 
@@ -653,8 +652,10 @@ static inline number n_XExtGcd(number a, number b, number *s, number *t, number 
 { assume(r != NULL); assume(r->cfXExtGcd!=NULL); return r->cfXExtGcd (a,b,s,t,u,v,r); }
 static inline number  n_EucNorm(number a, const coeffs r)
 { assume(r != NULL); assume(r->cfEucNorm!=NULL); return r->cfEucNorm (a,r); }
+/// if r is a ring with zero divisors, return an annihilator!=0 of b
+/// otherwise return NULL
 static inline number  n_Ann(number a, const coeffs r)
-{ assume(r != NULL); assume(r->cfAnn!=NULL); return r->cfAnn (a,r); }
+{ assume(r != NULL); return r->cfAnn (a,r); }
 static inline number  n_QuotRem(number a, number b, number *q, const coeffs r)
 { assume(r != NULL); assume(r->cfQuotRem!=NULL); return r->cfQuotRem (a,b,q,r); }
 
@@ -949,9 +950,12 @@ static inline void n_ClearDenominators(ICoeffsEnumerator& numberCollectionEnumer
   n_Delete(&d, r);
 }
 
+
 /// print a number (BEWARE of string buffers!)
 /// mostly for debugging
 void   n_Print(number& a,  const coeffs r);
 
 #endif
+
+
 

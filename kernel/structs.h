@@ -28,6 +28,7 @@
 #include <kernel/polys.h>
 #include <polys/coeffrings.h>
 
+class Voice;
 class sleftv;
 class procinfo;
 class skStrategy;
@@ -45,17 +46,14 @@ enum tHomog
   testHomog
 };
 
-
 struct sip_package;
 typedef struct sip_package ip_package;
 typedef ip_package *       package;
 
 typedef struct  n_Procs_s  n_Procs_s;
 
-// #ifdef HAVE_PLURAL
 struct nc_struct;
 typedef struct nc_struct   nc_struct;
-// #endif
 
 typedef struct sip_link    ip_link;
 
@@ -64,10 +62,7 @@ typedef char *             char_ptr;
 typedef int  *             int_ptr;
 
 #ifdef __cplusplus
-//typedef ip_link *          si_link;
 typedef sleftv *           leftv;
-//typedef slists *           lists;
-//typedef sattr *            attr;
 typedef skStrategy *       kStrategy;
 typedef ssyStrategy *      syStrategy;
 typedef procinfo *         procinfov;
@@ -91,15 +86,6 @@ extern "C" {
 void  m2_end(int i);
 #ifdef __cplusplus
 }
-#endif
-
-/* 7.2 C++-routines : */
-
-#ifdef __cplusplus
-int   inits(void);
-//int   IsPrime(int i);
-extern int siSeed;
-int siRand();
 #endif
 
 #define loop for(;;)

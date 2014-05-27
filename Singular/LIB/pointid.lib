@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 version="version pointid.lib 4.0.0.0 Jun_2013 "; // $Id$
-category="Commutative algebra";
+category="Commutative Algebra";
 info="
 LIBRARY:  pointid.lib     Procedures for computing a factorized lex GB of
                           the vanishing ideal of a set of points via the

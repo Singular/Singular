@@ -2001,7 +2001,7 @@ static number* pnBin(int exp, const ring r)
       y = n_Mult(x,bin[e-1],r->cf);
       n_Delete(&x,r->cf);
       x = n_Init(e,r->cf);
-      bin[e] = n_IntDiv(y,x,r->cf);
+      bin[e] = n_ExactDiv(y,x,r->cf);
       n_Delete(&x,r->cf);
       n_Delete(&y,r->cf);
   }
@@ -2301,7 +2301,7 @@ void p_Content(poly ph, const ring r)
       while (p!=NULL)
       {
         //d = nDiv(pGetCoeff(p),h);
-        //tmp = nIntDiv(pGetCoeff(p),h);
+        //tmp = nExactDiv(pGetCoeff(p),h);
         //if (!nEqual(d,tmp))
         //{
         //  StringSetS("** div0:");nWrite(pGetCoeff(p));StringAppendS("/");
@@ -2309,7 +2309,7 @@ void p_Content(poly ph, const ring r)
         //  nWrite(tmp);Print(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s);
         //}
         //nDelete(&tmp);
-        d = n_IntDiv(pGetCoeff(p),h,r->cf);
+        d = n_ExactDiv(pGetCoeff(p),h,r->cf);
         p_SetCoeff(p,d,r);
         pIter(p);
       }
@@ -2450,10 +2450,10 @@ void p_SimpleContent(poly ph, int smax, const ring r)
   while (p!=NULL)
   {
 #if 1
-    d = nlIntDiv(pGetCoeff(p),h,r->cf);
+    d = nlExactDiv(pGetCoeff(p),h,r->cf);
     p_SetCoeff(p,d,r);
 #else
-    nlInpIntDiv(pGetCoeff(p),h,r->cf);
+    nlInpExactDiv(pGetCoeff(p),h,r->cf);
 #endif
     pIter(p);
   }
@@ -2594,7 +2594,7 @@ static number p_InitContent(poly ph, const ring r)
 //    {
 //      while (p!=NULL)
 //      {
-//        d = nIntDiv(pGetCoeff(p),h);
+//        d = nExactDiv(pGetCoeff(p),h);
 //        pSetCoeff(p,d);
 //        pIter(p);
 //      }
@@ -2643,7 +2643,7 @@ void p_Content(poly ph, const ring r)
       while (p!=NULL)
       {
         //d = nDiv(pGetCoeff(p),h);
-        //tmp = nIntDiv(pGetCoeff(p),h);
+        //tmp = nExactDiv(pGetCoeff(p),h);
         //if (!nEqual(d,tmp))
         //{
         //  StringSetS("** div0:");nWrite(pGetCoeff(p));StringAppendS("/");
@@ -2651,7 +2651,7 @@ void p_Content(poly ph, const ring r)
         //  nWrite(tmp);Print(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s);
         //}
         //nDelete(&tmp);
-        d = n_IntDiv(pGetCoeff(p),h,r->cf);
+        d = n_ExactDiv(pGetCoeff(p),h,r->cf);
         p_SetCoeff(p,d,r->cf);
         pIter(p);
       }
@@ -2841,7 +2841,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
     if(!n_GreaterZero(pGetCoeff(ph),C))
     {
       ph = p_Neg(ph,r);
-      c = n_Neg(c, C);
+      c = n_InpNeg(c, C);
     }
 */
     return;
@@ -2858,7 +2858,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
     if(!n_GreaterZero(pGetCoeff(ph),C))
     {
       ph = p_Neg(ph,r);
-      c = n_Neg(c, C);
+      c = n_InpNeg(c, C);
     }
 
     return;
@@ -2887,7 +2887,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
     if(!n_GreaterZero(pGetCoeff(ph),C))
     {
       ph = p_Neg(ph,r);
-      c = n_Neg(c, C);
+      c = n_InpNeg(c, C);
     }
 */
     return;
@@ -2983,7 +2983,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
   if(!n_GreaterZero(pGetCoeff(ph),C))
   {
     ph = p_Neg(ph,r);
-    c = n_Neg(c, C);
+    c = n_InpNeg(c, C);
   }
 
 }
@@ -4618,6 +4618,62 @@ unsigned long p_GetShortExpVector(poly p, const ring r)
   }
   return ev;
 }
+
+
+unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r)
+{
+  assume(p != NULL);
+  assume(pp != NULL);
+  if (p == NULL || pp == NULL) return 0;
+  
+  unsigned long ev = 0; // short exponent vector
+  unsigned int n = BIT_SIZEOF_LONG / r->N; // number of bits per exp
+  unsigned int m1; // highest bit which is filled with (n+1)
+  unsigned int i = 0, j=1;
+
+  if (n == 0)
+  {
+    if (r->N <2*BIT_SIZEOF_LONG)
+    {
+      n=1;
+      m1=0;
+    }
+    else
+    {
+      for (; j<=(unsigned long) r->N; j++)
+      {
+        if (p_GetExp(p,j,r) > 0 || p_GetExp(pp,j,r) > 0) i++;
+        if (i == BIT_SIZEOF_LONG) break;
+      }
+      if (i>0)
+        ev = ~((unsigned long)0) >> ((unsigned long) (BIT_SIZEOF_LONG - i));
+      return ev;
+    }
+  }
+  else
+  {
+    m1 = (n+1)*(BIT_SIZEOF_LONG - n*r->N);
+  }
+
+  n++;
+  while (i<m1)
+  {
+    ev |= GetBitFields(p_GetExp(p, j,r) + p_GetExp(pp, j,r), i, n);
+    i += n;
+    j++;
+  }
+
+  n--;
+  while (i<BIT_SIZEOF_LONG)
+  {
+    ev |= GetBitFields(p_GetExp(p, j,r) + p_GetExp(pp, j,r), i, n);
+    i += n;
+    j++;
+  }
+  return ev;
+}
+
+
 
 /***************************************************************
  *

@@ -15,7 +15,9 @@ void tryEuclid( const CanonicalForm &, const CanonicalForm &, const CanonicalFor
 void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm& M, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail );
 #endif
 void tryInvert( const CanonicalForm &, const CanonicalForm &, CanonicalForm &, bool & );
+/*BEGINPUBLIC*/
 bool hasFirstAlgVar( const CanonicalForm &, Variable & );
+/*ENDPUBLIC*/
 void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, bool & fail, bool topLevel= true );
 int * leadDeg(const CanonicalForm & f, int *degs);
 bool isLess(int *a, int *b, int lower, int upper);

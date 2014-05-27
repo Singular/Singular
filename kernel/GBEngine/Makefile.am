@@ -11,3 +11,13 @@ libGBEngine_la_include_HEADERS=stairc.h syz.h kstdfac.h kutil.h khstd.h kstd1.h 
 
 
 
+TESTS_ENVIRONMENT = SINGULARPATH='${abs_top_builddir}/libpolys/polys/.libs:${abs_top_builddir}/factory/gftables'
+TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}'
+
+TESTS = test
+check_PROGRAMS = $(TESTS)
+test_SOURCES = test.cc
+test_LDADD   = libGBEngine.la ${builddir}/../libkernelCommon.la ${builddir}/../combinatorics/libcombinatorics.la
+
+CLEANFILES = $(TESTS)
+

@@ -8,7 +8,7 @@
 #include <kernel/polys.h>
 #include <coeffs/numbers.h>
 #include <coeffs/longrat.h>
-#include <kernel/febase.h>
+#include <kernel/oswrapper/feread.h>
 #include <polys/monomials/ring.h>
 #include <omalloc/omalloc.h>
 #include <polys/clapsing.h>

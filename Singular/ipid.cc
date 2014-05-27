@@ -19,18 +19,18 @@
 
 #include <coeffs/numbers.h>
 #include <coeffs/bigintmat.h>
+#include <coeffs/longrat.h>
 
 #include <polys/matpol.h>
 #include <polys/monomials/ring.h>
 
-#include <kernel/febase.h>
-#include <libpolys/coeffs/longrat.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/syz.h>
 
 #include <Singular/tok.h>
 #include <Singular/ipshell.h>
+#include <Singular/fevoices.h>
 #include <Singular/lists.h>
 #include <Singular/attrib.h>
 #include <Singular/links/silink.h>

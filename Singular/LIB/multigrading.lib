@@ -14,7 +14,7 @@ AUTHORS:  Benjamin Bechtold, benjamin.bechtold@googlemail.com
 @*        Anna-Lena Winz, anna-lena.winz@math.fu-berlin.de
 
 OVERVIEW: This library allows one to virtually add multigradings to Singular:
-grade multivariate polynomial rings with arbitrary (fin. gen. Abelian) groups. 
+grade multivariate polynomial rings with arbitrary (fin. gen. Abelian) groups.
 For more see http://code.google.com/p/convex-singular/wiki/Multigrading
 For theoretical references see:
 @* E. Miller, B. Sturmfels: 'Combinatorial Commutative Algebra'
@@ -424,9 +424,9 @@ EXAMPLE: example createGroup; shows an example
   G[2] = L;
   // And now a quick-and-dirty fix of Singular inability to handle attribs of attribs:
   // For the use of a group as an attribute for multigraded rings
-  G[3] = attrib(L, attrGroupHNF); 
+  G[3] = attrib(L, attrGroupHNF);
   G[4] = attrib(L, attrGroupSNF);
-  
+
 
   attrib(G, isGroup, (1==1)); // mark it "a group"
 
@@ -583,7 +583,7 @@ example
   def G = createGroup(S, L); // (S+L)/L
 
   isGroup(G);
-  
+
   printGroup(G);
 
 }
@@ -959,7 +959,7 @@ EXAMPLE: example getLattice; shows an example
 
 
 
-  def T = G[2]; 
+  def T = G[2];
 
   if( size(#) >= i )
   {
@@ -969,7 +969,7 @@ EXAMPLE: example getLattice; shows an example
     {
       ERROR("Sorry wrong arguments!");
     }
-    
+
     if( a == "hermite" )
     {
       def M = attrib(T, attrGradingGroupHNF);
@@ -1106,7 +1106,7 @@ example
                   1,1,1,1,
                   0,1,3,4;
   setBaseMultigrading(MM);
-  
+
   module M = ideal(  xw-yz, x2z-y3, xz2-y2w, yw2-z3);
 
 
@@ -1130,7 +1130,7 @@ example
   def v = getGradedGenerator(S, 1);
   print(v);
   print(setModuleGrading(v));
-  
+
   isHomogeneous(v);
 
   isHomogeneous(S[1]);
@@ -1663,7 +1663,7 @@ example
                   43,2,88,91,100,
                   -46,32,37,42,15;
   lll(m);
-  
+
   list l =
       intvec(13,25,37, 83, 294),
       intvec(12, -33, 9,0,64),
@@ -1929,14 +1929,14 @@ example
 
   ideal I = a, b;
   print(multiDeg(I));
-  
+
   intmat m[5][2]=multiDeg(a),multiDeg(b); m=transpose(m);
 
   print(multiDeg(a));
   print(multiDeg(b));
 
   print(m);
- 
+
   areZeroElements(m);
 
   intmat LL[2][1]=
@@ -1973,7 +1973,7 @@ EXAMPLE: example isZeroElement; shows an example
     }
     kill a;
   }
-  
+
   if( i == 1 )
   {
     intmat H = getLattice("hermite");
@@ -2197,7 +2197,7 @@ EXAMPLE: example pushForward; shows an example
 
   intmat newgrad[pp][np];
 
-  //This will set the finest grading on the image ring. We will proceed by coarsening this grading until f becomes homogeneous. 
+  //This will set the finest grading on the image ring. We will proceed by coarsening this grading until f becomes homogeneous.
   for(i=1;i<=np;i++){ newgrad[p+i,i]=1;}
 
   //newgrad;
@@ -2215,7 +2215,7 @@ EXAMPLE: example pushForward; shows an example
   for(i=1;i<=p;i++){
     for(j=1;j<=n;j++){ toadd1[i,j]=oldgrad[i,j];}
   }
-  
+
   // This will make the images of homogeneous elements homogeneous, namely the variables of the preimage ring.
   for(i=1;i<=n;i++){
     im=f[i];
@@ -2262,7 +2262,7 @@ EXAMPLE: example pushForward; shows an example
     }
     columns=columns+ncols(newlat[k]);
   }
-  
+
   //The following is just for reducing the size of the matrices.
   gragr=hermiteNormalForm(gragr);
   intmat result[pp][pp];
@@ -3716,7 +3716,7 @@ example
 
   /////////////////////////////////////////////////////////////////////////////
 
-  def L = multiDegResolution(m, 0, 1);
+  list L = multiDegResolution(m, 0, 1);
 
   for( j =1; j<=size(L); j++)
   {
@@ -3953,7 +3953,7 @@ example
 
   ideal I = x^2, y, z^3;
   I = std(I);
-  def L = multiDegResolution(I, 0, 1);
+  list L = multiDegResolution(I, 0, 1);
 
   for( int j = 1; j<=size(L); j++)
   {
@@ -4761,7 +4761,7 @@ example
     2,5,10,
     3,6,12;
 
-  intmat B = latticeBasis(L); 
+  intmat B = latticeBasis(L);
   print(B); // should result in a matrix whose columns generate the same lattice as  [1,2,3] and [0,3,6]:
 
    // another example
@@ -4842,7 +4842,7 @@ example
   // should be a 4x2 matrix whose columns
   // generate the same lattice as [-1,2,-1,0],[2,-3,0,1]
   intmat B = kernelLattice(LL);
-  
+
   print(B);
 
   // another example
@@ -5070,10 +5070,10 @@ EXAMPLE: example projectLattice; shows an example
     {
       // we want a matrix with column operations so we transpose
       intmat BB = transpose(B);
-      list L = hermiteNormalForm(BB, "transform"); 
+      list L = hermiteNormalForm(BB, "transform");
       intmat U = transpose(L[2]);
 
- 
+
       // delete rows 1 to r
       intmat Udel[nrows(U) - r][ncols(U)];
       int k;
@@ -5297,7 +5297,7 @@ example
   intmat C[2][2] =
     2,1,
     3,2;
-  
+
   intmat D  = intInverse(C);
 
   // should be the unit matrix
@@ -5600,7 +5600,7 @@ example
     3,6;
 
   // should return a (3x2)-matrix whose columns
-  // generate the same lattice as [1, 2, 3] and [0, 1, 2] 
+  // generate the same lattice as [1, 2, 3] and [0, 1, 2]
   intmat R = primitiveSpan(V);
   print(R);
 
@@ -5610,7 +5610,7 @@ example
     0,1;
 
   // should return a (2x2)-matrix whose columns
-  // generate the same lattice as [1, 0] and [0, 1] 
+  // generate the same lattice as [1, 0] and [0, 1]
   intmat S = primitiveSpan(W);
   print(S);
 

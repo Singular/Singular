@@ -15,8 +15,7 @@
 //
 
 /* forward declaration of types */
-class idrec;
-typedef idrec *   idhdl; // _only_ for idhdl ip_sring::idroot
+class idrec; typedef idrec *   idhdl; // _only_ for idhdl ip_sring::idroot
 struct  spolyrec;
 typedef struct spolyrec    polyrec;
 typedef struct spolyrec *         poly;
