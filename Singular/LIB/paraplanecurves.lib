@@ -1972,7 +1972,7 @@ return(q);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-static proc polyModP(poly q, bigint p)
+proc polyModP(poly q, bigint p)
 "USAGE:  polyModP(q, p); q poly, p bigint
 RETURN:  takes each coefficient of q modulo p and returns the resulting poly
 "
@@ -2063,9 +2063,6 @@ RETURN:  returns the inverse of r in Z/p represented by an element in
 THEORY:  This uses Euclid's extended gcd algorithm.
 "
 {
-  r;
-  p;
-  gcd(r,p);
   list L = extgcd(r, p);
   if (L[1] != 1) { ERROR("GCD of", r, "and", p, "should be 1."); }
   L[2] = aMod(L[2],p);

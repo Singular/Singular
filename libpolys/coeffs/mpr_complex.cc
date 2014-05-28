@@ -457,7 +457,11 @@ gmp_float numberFieldToFloat( number num, int k, const coeffs src)
         }
         if (SR_HDL(num) & SR_INT)
         {
-          r= SR_TO_INT(num);
+          int nn = SR_TO_INT(num);
+          if((long)nn == SR_TO_INT(num))
+            r = SR_TO_INT(num);
+          else
+            r = gmp_float(SR_TO_INT(num));
         }
         else
         {

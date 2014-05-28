@@ -264,7 +264,15 @@ CanonicalForm nlConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs /*r*/
   CanonicalForm term;
   if ( SR_HDL(n) & SR_INT )
   {
-    term = SR_TO_INT(n);
+    int nn=SR_TO_INT(n);
+    if ((long)nn==SR_TO_INT(n))
+       term = nn;
+    else
+    {
+        mpz_t dummy;
+        mpz_init_set_si(dummy, SR_TO_INT(n)); 
+        term = make_cf(dummy);   
+    }
   }
   else
   {
@@ -533,7 +541,14 @@ int nlInt(number &i, const coeffs r)
 {
   nlTest(i, r);
   nlNormalize(i,r);
-  if (SR_HDL(i) & SR_INT) return SR_TO_INT(i);
+  if (SR_HDL(i) & SR_INT) 
+  {
+    int dummy = SR_TO_INT(i);
+    if((long)dummy == SR_TO_INT(i))
+        return SR_TO_INT(i);
+    else
+        return 0;
+  }
   if (i->s==3)
   {
     if(mpz_size1(i->z)>MP_SMALL) return 0;
@@ -562,7 +577,7 @@ number nlBigInt(number &i, const coeffs r)
 {
   nlTest(i, r);
   nlNormalize(i,r);
-  if (SR_HDL(i) &SR_INT) return (i);
+  if (SR_HDL(i) & SR_INT) return (i);
   if (i->s==3)
   {
     return nlCopy(i,r);
@@ -785,13 +800,62 @@ number nlIntMod (number a, number b, const coeffs r)
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
     LONG bb=SR_TO_INT(b);
-    LONG c=SR_TO_INT(a)%bb;
+    LONG c=SR_TO_INT(a) % bb;
+    if(c < 0)
+    {    
+        if(bb < 0)
+            c = c - bb;
+        else
+            c = c + bb;
+    }
+    //printf("\nnlIntMod SR_TO_INT\n");
+    //n_Print(a,r);
+    //printf("\na =  %ld\n",SR_TO_INT(a));
+    //n_Print(b, r);
+    //printf("\nb =  %ld\n",bb);
+    //printf("\nc =  %ld\n",c);
     return INT_TO_SR(c);
   }
   if (SR_HDL(a) & SR_INT)
   {
-    /* a is a small and b is a large int: -> a */
-    return a;
+    // a is a small and b is a large int: -> a 
+    //  INCORRECT, IT COULD HAPPEN THAT B IS A SMALL NUMBER
+    number aa;
+    //mpz_ptr aa=NULL;
+    //aa=(mpz_ptr)omAlloc(sizeof(mpz_t));
+    aa=ALLOC_RNUMBER();
+    mpz_init(aa->z);
+    mpz_set_si(aa->z, SR_TO_INT(a));
+    //mpz_init_set_si(aa,SR_TO_INT(a));
+    u=ALLOC_RNUMBER();
+#if defined(LDEBUG)
+    u->debug=123456;
+#endif
+    u->s = 3;
+    mpz_init(u->z); 
+    mpz_mod(u->z,aa->z,b->z);
+    if (mpz_isNeg(u->z))
+    {
+        if (mpz_isNeg(b->z))
+          mpz_sub(u->z,aa->z,b->z);
+        else
+          mpz_add(u->z,aa->z,b->z);
+    }
+    /*if( !n_GreaterZero(a,r) )
+    {
+        if( !n_GreaterZero(b,r) )
+            a = r->cfSub(a,b,r);
+        else
+            a = r->cfAdd(a,b,r);
+    }*/
+    //printf("\nnlIntMod a\n");
+    //printf("\na =  ");n_Print(a,r);printf("\n");
+    //gmp_printf("\nb =  %Zd",b);n_Print(b,r);printf("\n");
+    //printf("\nc =  ");n_Print(a,r);printf("\n");
+    //gmp_printf("\nc =  %Zd",u->z);
+    u=nlShort3(u);
+    nlTest(u,r);
+    return u;
   }
   number bb=NULL;
   if (SR_HDL(b) & SR_INT)
@@ -806,6 +870,11 @@ number nlIntMod (number a, number b, const coeffs r)
   mpz_init(u->z);
   u->s = 3;
   mpz_mod(u->z,a->z,b->z);
+  //printf("\nnlIntMod mpz_t\n");
+  //gmp_printf("\na =  %Zd\n",a);
+  //n_Print(b, r);
+  //gmp_printf("\nb =  %Zd\n",b);
+  //gmp_printf("\nc =  %Zd\n",u);
   if (bb!=NULL)
   {
     mpz_clear(bb->z);
@@ -2091,7 +2160,6 @@ number nlCopyMap(number a, const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
   assume( getCoeffType(src) == ID );
-
   if ((SR_HDL(a) & SR_INT)||(a==NULL))
   {
     return a;
@@ -2692,7 +2760,6 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
       nlNormalize(n, cf);
 
     nlInpGcd(cand, n, cf);
-
     assume( nlGreaterZero(cand,cf) );
 
     if(nlIsOne(cand,cf))
