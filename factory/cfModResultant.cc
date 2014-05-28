@@ -84,7 +84,10 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
     degsgx= degsg [xlevel];
     degsf [xlevel]= 0;
     degsg [xlevel]= 0;
-    if (getNumVars (F) == 2 || getNumVars (G) == 2)
+    if ((getNumVars (F) == 2 && getNumVars (G) == 1) ||
+        (getNumVars (G) == 2 && getNumVars (F) == 1) ||
+        (getNumVars (F) == 2 && getNumVars (F) == getNumVars (G)
+         && getVars (F) == getVars (G)))
     {
       int pos= 2;
       for (int i= 1; i <= n; i++)
