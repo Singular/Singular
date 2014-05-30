@@ -579,7 +579,7 @@ static proc SSinit(def M)
     @SYZCHECK = attrib(SSinit, "SYZCHECK");
   }
 
-  int @KERCHECK = 1; // @DEBUG;
+  int @KERCHECK = 0; // @DEBUG;
 
   if( typeof( attrib(SSinit, "KERCHECK") ) == "int" )
   {
@@ -2384,7 +2384,7 @@ example
     "<<<<<<<<< }}}}}}}}}  STOP TESTING (", @save_res_desc,  ") !!!!!!!!!!!! ";
     
     "ERROR: There were some wrong betti numbers... ";
-    m2_end(666);    
+//    m2_end(666);    
   } else
   {
     if( !@treeout )
@@ -2633,11 +2633,11 @@ proc TestSSresAttribs(def M, list #)
 
  if( !@treeout )
  {
-   Testlres(M);  
+//   Testlres(M);  
    Testnres(M);
+   Testsres(M);
+//   TestSres(M); // too long for the last medium test :(
  }
-//  Testsres(M);  
-//  TestSres(M); // too long for the last medium test :(
 
 
 //  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M); // TODO: FIX ERROR!!!!
@@ -2676,7 +2676,7 @@ proc TestSSresAttribs2tr(def M, list #)
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
 
   
-  Testlres(M);  
+//  Testlres(M);  
   Testnres(M);  
 //  Testsres(M);  
 //  TestSres(M); // too long for the last medium test :(
@@ -2689,7 +2689,7 @@ proc testSimple(list #)
 {
   mod_assure_load();
 
-  def DEBUG = 1;
+  def DEBUG = 0;
   if(size(#) > 0) { DEBUG = #[1]; }
 
   system("--min-time", "0.01");
@@ -2701,7 +2701,7 @@ proc testSimple(list #)
   attrib(SSinit, "DEBUG", (DEBUG > 0) );
   attrib(SSinit, "SYZCHECK", 0);
   attrib(SSinit, "KERCHECK",  (DEBUG > 0) ); 
-  attrib(SSinit, "TREEOUTPUT", 1); 
+  attrib(SSinit, "TREEOUTPUT", 0); 
   attrib(SSinit, "PROFILE", 0);
 
   int @treeout = attrib(SSinit, "TREEOUTPUT");
@@ -2775,7 +2775,7 @@ proc testAGR(list #)
   attrib(SSinit, "SYZCHECK", (DEBUG > 0)); 
   attrib(SSinit, "KERCHECK", 0); 
   attrib(SSinit, "TREEOUTPUT", 0); 
-  attrib(SSinit, "PROFILE", 0); 
+  attrib(SSinit, "PROFILE", 0);
  
 //  option(prot);
 
@@ -2968,7 +2968,7 @@ proc testAGRhard(list #)
   attrib(SSinit, "SYZCHECK", (DEBUG > 0)); 
   attrib(SSinit, "KERCHECK", 0); 
   attrib(SSinit, "TREEOUTPUT", 0);
-  attrib(SSinit, "PROFILE", 1); 
+  attrib(SSinit, "PROFILE", 0);
  
 //  option(prot);
   ring AGR = (101), (a,b,c,d,e,f), dp; AGR;
@@ -2994,7 +2994,7 @@ proc testAGRFrame()
 
   attrib(SSinit, "DEBUG", 0); 
   attrib(SSinit, "SYZCHECK", 0); // no such tests anymore with IGNORETAILS == 1!
-  attrib(SSinit, "KERCHECK", 1); 
+  attrib(SSinit, "KERCHECK", 0); 
   attrib(SSinit, "IGNORETAILS", 1);
   
 //  option(prot);
