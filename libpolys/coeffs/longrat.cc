@@ -2923,7 +2923,7 @@ static void nlWriteFd(number n,FILE* f, const coeffs)
     fprintf(f,"4 %ld ",SR_TO_INT(n));
     #else
     long nn=SR_TO_INT(n);
-    if ((nn<POW_2_28)||(nn>= -POW_2_28))
+    if ((nn<POW_2_28)&&(nn>= -POW_2_28))
       fprintf(f,"4 %ld ",nn);
     else
     {
