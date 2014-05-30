@@ -41,7 +41,7 @@ CanonicalForm convSingNFactoryN( number n, const ring r )
   {
     if ( SR_HDL(n) & SR_INT )
     {
-      #ifdef SIZEOF_LONG == 8
+      #if SIZEOF_LONG == 8
       int nn=SR_TO_INT(n);
       if (((long)nn)==SR_TO_INT(n))
       {
