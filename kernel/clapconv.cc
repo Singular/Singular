@@ -41,7 +41,21 @@ CanonicalForm convSingNFactoryN( number n, const ring r )
   {
     if ( SR_HDL(n) & SR_INT )
     {
+      #ifdef SIZEOF_LONG == 8
+      int nn=SR_TO_INT(n);
+      if (((long)nn)==SR_TO_INT(n))
+      {
+        term = SR_TO_INT(n);
+      }
+      else
+      {
+        mpz_t dummy;
+        mpz_init_set_si(dummy, SR_TO_INT(n));
+        term = make_cf(dummy);
+      }
+      #else
       term = SR_TO_INT(n);
+      #endif
     }
     else
     {
@@ -148,15 +162,17 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
       p_SetExp( term, i, exp[i], r);
     //if (rRing_has_Comp(r)) p_SetComp(term, 0, r); // done by p_Init
     if ( f.isImm() )
-    	{long longf=f.intval();
-    	int intf=(int) longf;
-    	if((long)intf==longf)
-    		{if(r==NULL) pGetCoeff( term ) = nlInit(f.intval(),NULL);
-    			else pGetCoeff( term ) = n_Init(f.intval(),r);
-    		}
-    	else      
-      	pGetCoeff( term ) = nlRInit( longf );
-      	}
+    {
+      long longf=f.intval();
+      int intf=(int) longf;
+      if((long)intf==longf)
+      {
+        if(r==NULL) pGetCoeff( term ) = nlInit(f.intval(),NULL);
+        else pGetCoeff( term ) = n_Init(f.intval(),r);
+      }
+      else
+        pGetCoeff( term ) = nlRInit( longf );
+    }
     else
     {
       number z=ALLOC_RNUMBER();
@@ -371,15 +387,17 @@ CanonicalForm convSingAFactoryA ( napoly p , const Variable & a, const ring r )
 static number convFactoryNSingAN( const CanonicalForm &f, const ring r)
 {
   if ( f.isImm() )
-    {long longf=f.intval();
-    	int intf=(int) longf;
-    	if((long)intf==longf)
-    		{if(r->algring==NULL) return nlInit(f.intval(),NULL);
-    			else return n_Init(f.intval(),r->algring);
-    		}
-    	else      
-      	return nlRInit( longf );
-      	}
+  {
+    long longf=f.intval();
+    int intf=(int) longf;
+    if((long)intf==longf)
+    {
+      if(r->algring==NULL) return nlInit(f.intval(),NULL);
+      else return n_Init(f.intval(),r->algring);
+    }
+    else
+      return nlRInit( longf );
+  }
   else
   {
     number z=ALLOC_RNUMBER();

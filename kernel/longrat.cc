@@ -9,9 +9,8 @@
 #include <kernel/structs.h>
 #include <kernel/longrat.h>
 
+#if SIZEOF_LONG == 8
 // 64 bit version:
-//#if SIZEOF_LONG == 8
-#if 0
 #define MAX_NUM_SIZE 60
 #define POW_2_28 (1L<<60)
 #define LONG long
@@ -500,7 +499,18 @@ int nlInt(number &i, const ring r)
 {
   nlTest(i);
   nlNormalize(i);
-  if (SR_HDL(i) &SR_INT) return SR_TO_INT(i);
+  if (SR_HDL(i) &SR_INT)
+  {
+    #if SIZEOF_LONG == 8
+    int dummy = SR_TO_INT(i);
+    if((long)dummy == SR_TO_INT(i))
+      return dummy /*SR_TO_INT(i)*/;
+    else
+      return 0;
+    #else
+    return SR_TO_INT(i);
+    #endif
+  }
   if (i->s==3)
   {
     if(mpz_size1(i->z)>MP_SMALL) return 0;
@@ -757,8 +767,31 @@ number nlIntMod (number a, number b)
   }
   if (SR_HDL(a) & SR_INT)
   {
-    /* a is a small and b is a large int: -> a */
-    return a;
+    number aa=ALLOC_RNUMBER();
+    mpz_init(aa->z);
+    mpz_set_si(aa->z, SR_TO_INT(a));
+    u=ALLOC_RNUMBER();
+#if defined(LDEBUG)
+    u->debug=123456;
+#endif
+    u->s = 3;
+    mpz_init(u->z);
+    mpz_mod(u->z,aa->z,b->z);
+    if (mpz_isNeg(u->z))
+    {
+      if (mpz_isNeg(b->z))
+        mpz_sub(u->z,aa->z,b->z);
+      else
+        mpz_add(u->z,aa->z,b->z);
+    }
+    mpz_clear(aa->z);
+#if defined(LDEBUG)
+    aa->debug=654324;
+#endif
+    FREE_RNUMBER(aa);
+    u=nlShort3(u);
+    nlTest(u);
+    return u;
   }
   number bb=NULL;
   if (SR_HDL(b) & SR_INT)
@@ -773,6 +806,13 @@ number nlIntMod (number a, number b)
   mpz_init(u->z);
   u->s = 3;
   mpz_mod(u->z,a->z,b->z);
+  if (mpz_isNeg(u->z))
+  {
+    if (mpz_isNeg(b->z))
+      mpz_sub(u->z,u->z,b->z);
+    else
+      mpz_add(u->z,u->z,b->z);
+  }
   if (bb!=NULL)
   {
     mpz_clear(bb->z);
@@ -780,13 +820,6 @@ number nlIntMod (number a, number b)
     bb->debug=654324;
 #endif
     FREE_RNUMBER(bb);
-  }
-  if (mpz_isNeg(u->z))
-  {
-    if (mpz_isNeg(b->z))
-      mpz_sub(u->z,u->z,b->z);
-    else
-      mpz_add(u->z,u->z,b->z);
   }
   u=nlShort3(u);
   nlTest(u);
