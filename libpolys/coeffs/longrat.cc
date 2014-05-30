@@ -270,8 +270,8 @@ CanonicalForm nlConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs /*r*/
     else
     {
         mpz_t dummy;
-        mpz_init_set_si(dummy, SR_TO_INT(n)); 
-        term = make_cf(dummy);   
+        mpz_init_set_si(dummy, SR_TO_INT(n));
+        term = make_cf(dummy);
     }
   }
   else
@@ -541,7 +541,7 @@ int nlInt(number &i, const coeffs r)
 {
   nlTest(i, r);
   nlNormalize(i,r);
-  if (SR_HDL(i) & SR_INT) 
+  if (SR_HDL(i) & SR_INT)
   {
     int dummy = SR_TO_INT(i);
     if((long)dummy == SR_TO_INT(i))
@@ -802,7 +802,7 @@ number nlIntMod (number a, number b, const coeffs r)
     LONG bb=SR_TO_INT(b);
     LONG c=SR_TO_INT(a) % bb;
     /*if(c < 0)
-    {    
+    {
         if(bb < 0)
             c = c - bb;
         else
@@ -819,10 +819,9 @@ number nlIntMod (number a, number b, const coeffs r)
   }
   if (SR_HDL(a) & SR_INT)
   {
-    // a is a small and b is a large int: -> a 
+    // a is a small and b is a large int: -> a
     //  INCORRECT, IT COULD HAPPEN THAT b IS A SMALL NUMBER
-    number aa;
-    aa=ALLOC_RNUMBER();
+    number aa=ALLOC_RNUMBER();
     mpz_init(aa->z);
     mpz_set_si(aa->z, SR_TO_INT(a));
     u=ALLOC_RNUMBER();
@@ -830,14 +829,14 @@ number nlIntMod (number a, number b, const coeffs r)
     u->debug=123456;
 #endif
     u->s = 3;
-    mpz_init(u->z); 
+    mpz_init(u->z);
     mpz_mod(u->z,aa->z,b->z);
     if (mpz_isNeg(u->z))
     {
-        if (mpz_isNeg(b->z))
-          mpz_sub(u->z,aa->z,b->z);
-        else
-          mpz_add(u->z,aa->z,b->z);
+      if (mpz_isNeg(b->z))
+        mpz_sub(u->z,aa->z,b->z);
+      else
+        mpz_add(u->z,aa->z,b->z);
     }
     /*mpz_t dummy;
     mpz_init(dummy);
@@ -854,14 +853,11 @@ number nlIntMod (number a, number b, const coeffs r)
         n_Print(u,r);
     }
     mpz_clear(dummy);*/
-    if (aa!=NULL)
-    {
-      mpz_clear(aa->z);
+    mpz_clear(aa->z);
     #if defined(LDEBUG)
-      aa->debug=654324;
+    aa->debug=654324;
     #endif
-      FREE_RNUMBER(aa);
-    }
+    FREE_RNUMBER(aa);
     u=nlShort3(u);
     nlTest(u,r);
     return u;
@@ -2984,6 +2980,9 @@ static number nlReadFd(s_buff f, const coeffs)
          number n=nlRInit(0);
          s_readmpz(f,n->z);
          n->s=3; /*sub_type*/
+         #if SIZEOF_LONG == 8
+         n=nlShort3(n);
+         #endif
          return n;
        }
      case 4:
@@ -3010,6 +3009,9 @@ static number nlReadFd(s_buff f, const coeffs)
          number n=nlRInit(0);
          s_readmpz_base (f,n->z, SSI_BASE);
          n->s=sub_type=3; /*subtype-5*/
+         #if SIZEOF_LONG == 8
+         n=nlShort3(n);
+         #endif
          return n;
        }
 
