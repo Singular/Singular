@@ -1972,7 +1972,7 @@ return(q);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-static proc polyModP(poly q, bigint p)
+proc polyModP(poly q, bigint p)
 "USAGE:  polyModP(q, p); q poly, p bigint
 RETURN:  takes each coefficient of q modulo p and returns the resulting poly
 "
@@ -2014,7 +2014,6 @@ KEYWORDS: Cantor-Zassenhaus algorithm.
     /* should never be reached: */
     return (-1);
   }
-
   /* For p > 32003, we use Cantor-Zassenhaus' algorithm: */
   def br = basering;
   ring rTemp = 0, x, dp;
@@ -2109,7 +2108,6 @@ THEORY:  This algorithm checks solvability by computing the Legendre symbols
     //    2.2) lift yi to an xi such that xi^2 = r mod (pi^ei),
     // 3) lift (x1, x2, ..., xk) in Z/p1^e1 * ... * Z/pk^ek
     //    to x in Z/m via Chinese remainder theorem
-
     list roots;
     // 2.1):
     for (i = 1; i <= size(L[1]); i++)

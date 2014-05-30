@@ -424,7 +424,7 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
 */
 #define SR_HDL(A) ((long)(A))
 #define IS_INT(A) ((A)->s==3)
-#define IS_IMM(A) (SR_HDL(A)&SR_INT)
+#define IS_IMM(A) (SR_HDL(A) & SR_INT)
 #define GET_NOM(A) ((A)->z)
 #define GET_DENOM(A) ((A)->n)
 
