@@ -9,7 +9,7 @@ Minor.cc MinorInterface.cc MinorProcessor.cc \
 linearAlgebra.cc eigenval.cc interpolation.cc minpoly.cc
 
 
-liblinear_algebra_la_includedir=$(includedir)/kernel/linear_algebra
+liblinear_algebra_la_includedir=$(includedir)/singular/kernel/linear_algebra
 liblinear_algebra_la_include_HEADERS= \
   Minor.h MinorInterface.h MinorProcessor.h \
   linearAlgebra.h eigenval.h interpolation.h minpoly.h \
