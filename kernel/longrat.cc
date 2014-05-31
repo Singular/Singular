@@ -9,7 +9,8 @@
 #include <kernel/structs.h>
 #include <kernel/longrat.h>
 
-#if SIZEOF_LONG == 8
+//#if SIZEOF_LONG == 8
+#if 0
 // 64 bit version:
 #define MAX_NUM_SIZE 60
 #define POW_2_28 (1L<<60)

@@ -174,7 +174,7 @@ void ssiWriteNumber_R(const ssiInfo *d, const number n, const ring r)
       fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
       #else
       long nn=SR_TO_INT(n);
-      if ((nn<POW_2_28)||(nn>= -POW_2_28))
+      if ((nn<POW_2_28)&&(nn>= -POW_2_28))
         fprintf(d->f_write,"4 %d ",((LONG)nn));
       else
       {
@@ -1640,7 +1640,7 @@ BOOLEAN ssiWrite(si_link l, leftv data)
                           fputs("3 ",d->f_write);
                           ssiWriteNumber(d,(number)dd);
                         break;
-	  case QRING_CMD:
+          case QRING_CMD:
           case RING_CMD:fputs("5 ",d->f_write);
                         ssiWriteRing(d,(ring)dd);
                         break;
