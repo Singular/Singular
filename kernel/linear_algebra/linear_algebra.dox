@@ -1,9 +1,10 @@
-/*! \page kernel_combinatorics_page "Combinatorical algorithms"
+/*! \page kernel_linear_algebra_page "Linar algebra related algorithms"
  *
  * This sub-package of kernel (\ref kernel_page) contains
- * combinatorical algorithms. 
+ * Linar algebra related algorithms. 
  *
  * TODO: list those algorithms... and corresponding interpreter functions...?
+ * Minor? eigenval? interpolation?
  * 
  */
 

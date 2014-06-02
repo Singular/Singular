@@ -3,8 +3,9 @@
  * Algorithms using libpolys (\ref libpolys_page) and other mathematical features.
  * 
  * The files in kernel/ directory are combined into a internal library
- * kernelCommon, which contains the functions and data that are shared
-among the following sub-packages:
+ * kernelCommon, which contains the functions (e.g. \ref rChangeCurrRing)
+ * and data members (e.g. \ref currRing) 
+ * that can be shared among the following sub-packages:
  *
  * \subpage kernel_numeric_page
  * \subpage kernel_combinatorics_page

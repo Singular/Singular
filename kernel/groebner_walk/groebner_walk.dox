@@ -1,9 +1,8 @@
-/*! \page kernel_combinatorics_page "Combinatorical algorithms"
+/*! \page kernel_groebner_walk_page "Groebner Walk algorithms"
  *
  * This sub-package of kernel (\ref kernel_page) contains
- * combinatorical algorithms. 
+ * Groebner Walk algorithms. 
  *
  * TODO: list those algorithms... and corresponding interpreter functions...?
  * 
  */
-
