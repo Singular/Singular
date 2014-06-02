@@ -16,8 +16,8 @@
 
 
 // 64 bit version:
-//#if SIZEOF_LONG == 8
-#if 0
+#if SIZEOF_LONG == 8
+//#if 0
 #define MAX_NUM_SIZE 60
 #define POW_2_28 (1L<<60)
 #define LONG long
@@ -264,7 +264,15 @@ CanonicalForm nlConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs /*r*/
   CanonicalForm term;
   if ( SR_HDL(n) & SR_INT )
   {
-    term = SR_TO_INT(n);
+    int nn=SR_TO_INT(n);
+    if ((long)nn==SR_TO_INT(n))
+       term = nn;
+    else
+    {
+        mpz_t dummy;
+        mpz_init_set_si(dummy, SR_TO_INT(n));
+        term = make_cf(dummy);
+    }
   }
   else
   {
@@ -533,7 +541,14 @@ int nlInt(number &i, const coeffs r)
 {
   nlTest(i, r);
   nlNormalize(i,r);
-  if (SR_HDL(i) &SR_INT) return SR_TO_INT(i);
+  if (SR_HDL(i) & SR_INT)
+  {
+    int dummy = SR_TO_INT(i);
+    if((long)dummy == SR_TO_INT(i))
+        return SR_TO_INT(i);
+    else
+        return 0;
+  }
   if (i->s==3)
   {
     if(mpz_size1(i->z)>MP_SMALL) return 0;
@@ -562,7 +577,7 @@ number nlBigInt(number &i, const coeffs r)
 {
   nlTest(i, r);
   nlNormalize(i,r);
-  if (SR_HDL(i) &SR_INT) return (i);
+  if (SR_HDL(i) & SR_INT) return (i);
   if (i->s==3)
   {
     return nlCopy(i,r);
@@ -785,13 +800,67 @@ number nlIntMod (number a, number b, const coeffs r)
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
     LONG bb=SR_TO_INT(b);
-    LONG c=SR_TO_INT(a)%bb;
+    LONG c=SR_TO_INT(a) % bb;
+    /*if(c < 0)
+    {
+        if(bb < 0)
+            c = c - bb;
+        else
+            c = c + bb;
+    }*/
+    /*if((((SR_TO_INT(a)) / (bb))*bb+c) != SR_TO_INT(a))
+    {
+        printf("\nERROR longrat:819\n");
+        printf("\na = %ld\n",SR_TO_INT(a));
+        printf("\nb = %ld\n",bb);
+        printf("\nc = %ld\n",c);
+    }*/
     return INT_TO_SR(c);
   }
   if (SR_HDL(a) & SR_INT)
   {
-    /* a is a small and b is a large int: -> a */
-    return a;
+    // a is a small and b is a large int: -> a
+    //  INCORRECT, IT COULD HAPPEN THAT b IS A SMALL NUMBER
+    number aa=ALLOC_RNUMBER();
+    mpz_init(aa->z);
+    mpz_set_si(aa->z, SR_TO_INT(a));
+    u=ALLOC_RNUMBER();
+#if defined(LDEBUG)
+    u->debug=123456;
+#endif
+    u->s = 3;
+    mpz_init(u->z);
+    mpz_mod(u->z,aa->z,b->z);
+    if (mpz_isNeg(u->z))
+    {
+      if (mpz_isNeg(b->z))
+        mpz_sub(u->z,aa->z,b->z);
+      else
+        mpz_add(u->z,aa->z,b->z);
+    }
+    /*mpz_t dummy;
+    mpz_init(dummy);
+    mpz_fdiv_q(dummy, aa->z, b->z);
+    mpz_mul(dummy, dummy, b->z);
+    mpz_add(dummy, dummy, u->z);
+    if(mpz_cmp(dummy,aa->z) != 0)
+    {
+        printf("\nERROR longrat:911\n");
+        printf("\na = ");n_Print(aa,r);
+        gmp_printf("\ndummy = %Zd",dummy);
+        mpz_clear(dummy);mpz_init(dummy);mpz_tdiv_q(dummy, a->z, b->z);
+        gmp_printf("\na div b = %Zd\n u = ", dummy);
+        n_Print(u,r);
+    }
+    mpz_clear(dummy);*/
+    mpz_clear(aa->z);
+    #if defined(LDEBUG)
+    aa->debug=654324;
+    #endif
+    FREE_RNUMBER(aa);
+    u=nlShort3(u);
+    nlTest(u,r);
+    return u;
   }
   number bb=NULL;
   if (SR_HDL(b) & SR_INT)
@@ -806,6 +875,13 @@ number nlIntMod (number a, number b, const coeffs r)
   mpz_init(u->z);
   u->s = 3;
   mpz_mod(u->z,a->z,b->z);
+  if (mpz_isNeg(u->z))
+  {
+    if (mpz_isNeg(b->z))
+      mpz_sub(u->z,u->z,b->z);
+    else
+      mpz_add(u->z,u->z,b->z);
+  }
   if (bb!=NULL)
   {
     mpz_clear(bb->z);
@@ -814,13 +890,21 @@ number nlIntMod (number a, number b, const coeffs r)
 #endif
     FREE_RNUMBER(bb);
   }
-  if (mpz_isNeg(u->z))
-  {
-    if (mpz_isNeg(b->z))
-      mpz_sub(u->z,u->z,b->z);
-    else
-      mpz_add(u->z,u->z,b->z);
-  }
+  /*mpz_t dummy;
+  mpz_init(dummy);
+    mpz_fdiv_q(dummy, a->z, b->z);
+    mpz_mul(dummy, dummy, b->z);
+    mpz_add(dummy, dummy, u->z);
+    if(mpz_cmp(dummy,a->z) != 0)
+    {
+        printf("\nERROR longrat:911\n");
+        printf("\na = ");n_Print(a,r);
+        gmp_printf("\ndummy = %Zd",dummy);
+        mpz_clear(dummy);mpz_init(dummy);mpz_tdiv_q(dummy, a->z, b->z);
+        gmp_printf("\na div b = %Zd\n u = ", dummy);
+        n_Print(u,r);
+    }
+    mpz_clear(dummy);*/
   u=nlShort3(u);
   nlTest(u,r);
   return u;
@@ -2091,7 +2175,6 @@ number nlCopyMap(number a, const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
   assume( getCoeffType(src) == ID );
-
   if ((SR_HDL(a) & SR_INT)||(a==NULL))
   {
     return a;
@@ -2692,7 +2775,6 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
       nlNormalize(n, cf);
 
     nlInpGcd(cand, n, cf);
-
     assume( nlGreaterZero(cand,cf) );
 
     if(nlIsOne(cand,cf))
@@ -2841,7 +2923,7 @@ static void nlWriteFd(number n,FILE* f, const coeffs)
     fprintf(f,"4 %ld ",SR_TO_INT(n));
     #else
     long nn=SR_TO_INT(n);
-    if ((nn<POW_2_28)||(nn>= -POW_2_28))
+    if ((nn<POW_2_28)&&(nn>= -POW_2_28))
       fprintf(f,"4 %ld ",nn);
     else
     {
@@ -2898,6 +2980,9 @@ static number nlReadFd(s_buff f, const coeffs)
          number n=nlRInit(0);
          s_readmpz(f,n->z);
          n->s=3; /*sub_type*/
+         #if SIZEOF_LONG == 8
+         n=nlShort3(n);
+         #endif
          return n;
        }
      case 4:
@@ -2924,6 +3009,9 @@ static number nlReadFd(s_buff f, const coeffs)
          number n=nlRInit(0);
          s_readmpz_base (f,n->z, SSI_BASE);
          n->s=sub_type=3; /*subtype-5*/
+         #if SIZEOF_LONG == 8
+         n=nlShort3(n);
+         #endif
          return n;
        }
 

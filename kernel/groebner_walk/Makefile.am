@@ -6,7 +6,7 @@ ${NTL_CFLAGS} $(FLINT_CFLAGS) ${GMP_CFLAGS}
 noinst_LTLIBRARIES=libgroebner_walk.la
 libgroebner_walk_la_SOURCES=walkProc.cc walkMain.cc walkSupport.cc
 
-libgroebner_walk_la_includedir=$(includedir)/kernel/groebner_walk
+libgroebner_walk_la_includedir=$(includedir)/singular/kernel/groebner_walk
 libgroebner_walk_la_include_HEADERS=walkProc.h walkMain.h walkSupport.h
 
 

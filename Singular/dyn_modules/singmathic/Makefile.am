@@ -1,12 +1,11 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-if SI_BUILTIN_BIGINTM
-  noinst_LTLIBRARIES=bigintm.la 
-#  check_LTLIBRARIES=bigintm.la 
+if SI_BUILTIN_SINGMATHIC
+  noinst_LTLIBRARIES=singmathic.la 
   P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION
   P_PROCS_MODULE_LDFLAGS  = -module
 else
-  module_LTLIBRARIES=bigintm.la 
+  module_LTLIBRARIES=singmathic.la 
   moduledir = $(libexecdir)/singular/MOD
   P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION 
   P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
@@ -18,9 +17,9 @@ MYINCLUDES =  -I${top_srcdir} -I${top_builddir} \
 $(FACTORY_INCLUDES) $(RESOURCES_INCLUDES) $(OMALLOC_INCLUDES) \
 $(FLINT_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) 
 
-bigintm_la_SOURCES  = mod_main.cc bigintm.cc bigintm.h
-bigintm_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
-bigintm_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS}
+singmathic_la_SOURCES  = singmathic.cc
+singmathic_la_CPPFLAGS = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
+singmathic_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS}
 
 # AM_COLOR_TESTS=always
 #

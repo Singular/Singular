@@ -5823,7 +5823,7 @@ BOOLEAN iiTestAssume(leftv a, leftv b)
   // assume a: level
   if ((a->Typ()==INT_CMD)&&((long)a->Data()>=0))
   {
-    if ((TEST_V_ALLWARN) && (myynest==0)) WarnS("ASSUME at top level");
+    if ((TEST_V_ALLWARN) && (myynest==0)) WarnS("ASSUME at top level is of no use: see documentation");
     char       assume_yylinebuf[80];
     strncpy(assume_yylinebuf,my_yylinebuf,79);
     int lev=(long)a->Data();

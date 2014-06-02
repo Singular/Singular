@@ -1,4 +1,23 @@
+#include <kernel/mod2.h>
+
+#ifdef HAVE_POLYMAKE
+
+/*
+#include <polymake_conversion.h>
+
+#include <Singular/dyn_modules/gfanlib/bbcone.h>
+#include <Singular/dyn_modules/gfanlib/bbfan.h>
+#include <Singular/dyn_modules/gfanlib/bbpolytope.h>
+
+#include <Singular/blackbox.h>
+#include <Singular/ipshell.h>
+#include <Singular/subexpr.h>
+
+#include <string>
+*/
+
 #include <Singular/ipid.h>
+
 
 void init_polymake_help()
 {
@@ -205,3 +224,4 @@ void init_polymake_help()
     module_help_proc("polymake.so","vertexEdgeGraph", normalFan_help);
 
 }
+#endif

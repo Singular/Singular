@@ -6,6 +6,10 @@ Author: monerjan
 #ifndef GFAN_H
 #define GFAN_H
 
+#include <kernel/mod2.h>
+
+#if HAVE_GFANLIB
+
 #include <misc/int64vec.h>
 
 #include <gfanlib/config.h>
@@ -276,4 +280,5 @@ lists lprepareResult(gcone *gc, const int n);
 /* static bool areEqual2(facet *f, facet *g); */
 /* static bool areEqual( facet *f, facet *g); */
 // bool iv64isStrictlyPositive(int64vec *);
+#endif
 #endif

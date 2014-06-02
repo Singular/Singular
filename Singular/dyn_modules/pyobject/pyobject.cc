@@ -706,7 +706,7 @@ blackbox* pyobject_blackbox(int& tok) {
   psModulFunctions->iiAddCproc((currPack->libname? currPack->libname: ""),\
      (char*)#name, FALSE, name);
 
-int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
+extern "C" int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
 {
   int tok = -1;
   blackbox* bbx = pyobject_blackbox(tok);
@@ -732,14 +732,5 @@ int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
   return 0;
 }
 #undef PYOBJECT_ADD_C_PROC
-
-#ifndef EMBED_PYTHON
-extern "C" {
-  int mod_init(SModulFunctions* psModulFunctions)
-  {
-    return SI_MOD_INIT(pyobject)(psModulFunctions);
-  }
-}
-#endif
 
 #endif /* HAVE_PYTHON */

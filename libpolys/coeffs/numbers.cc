@@ -412,8 +412,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     //assume(n->cfExtGcd!=NULL);
     assume(n->cfInpNeg!=NULL);
     assume(n->cfCopy!=NULL);
-    assume(n->cfRePart!=NULL);
-    assume(n->cfImPart!=NULL);
 
     assume(n->cfWriteLong!=NULL);
     assume(n->cfWriteShort!=NULL);

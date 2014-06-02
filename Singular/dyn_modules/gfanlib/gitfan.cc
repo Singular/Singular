@@ -11,14 +11,18 @@
 
 #include <kernel/mod2.h>
 
-#include <Singular/ipid.h>
-#include <Singular/lists.h>
-#include <Singular/ipshell.h>
-#include <coeffs/bigintmat.h>
+#if HAVE_GFANLIB
 
 #include <bbcone.h>
 #include <bbfan.h>
 #include <gitfan.h>
+
+#include <Singular/ipid.h>
+#include <Singular/lists.h>
+#include <Singular/ipshell.h>
+
+#include <coeffs/bigintmat.h>
+
 
 namespace gitfan
 {
@@ -369,3 +373,5 @@ void gitfan_setup(SModulFunctions* p)
   p->iiAddCproc("","listOfAfacesToCheck",FALSE,listOfAfacesToCheck);
   p->iiAddCproc("","nextAfaceToCheck",FALSE,nextAfaceToCheck);
 }
+
+#endif

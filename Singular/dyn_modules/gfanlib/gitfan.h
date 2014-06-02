@@ -3,9 +3,13 @@
 
 #include <kernel/mod2.h>
 
+#if HAVE_GFANLIB
+
 #include <bbcone.h>
 #include <bbfan.h>
+
 #include <Singular/ipid.h>
+
 
 namespace gitfan
 {
@@ -50,5 +54,6 @@ namespace gitfan
 }
 
 void gitfan_setup(SModulFunctions* p);
+#endif
 
 #endif

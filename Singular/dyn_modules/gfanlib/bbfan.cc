@@ -1,5 +1,7 @@
 #include <kernel/mod2.h>
 
+#if HAVE_GFANLIB
+
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
@@ -19,7 +21,6 @@
 // #include <Singular/lists.h>
 // #include <gfanlib/gfanlib.h>
 // #include <gfanlib/gfanlib_zfan.h>
-
 
 int fanID;
 
@@ -1061,3 +1062,5 @@ void bbfan_setup(SModulFunctions* p)
   fanID=setBlackboxStuff(b,"fan");
   //Print("created type %d (fan)\n",fanID);
 }
+
+#endif

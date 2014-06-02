@@ -3,11 +3,13 @@
 
 #include <kernel/mod2.h>
 
-#include <gfanlib/gfanlib.h>
+#if HAVE_GFANLIB
+
 #include <misc/intvec.h>
 #include <coeffs/bigintmat.h>
-
 #include <Singular/ipid.h>
+
+#include <gfanlib/gfanlib.h>
 
 extern int coneID;
 
@@ -36,4 +38,5 @@ int getLinealityDimension(gfan::ZCone* zc);
 gfan::ZVector randomPoint(const gfan::ZCone* zc);
 gfan::ZCone liftUp(const gfan::ZCone &zc);
 
+#endif
 #endif

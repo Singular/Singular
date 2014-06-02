@@ -1,7 +1,6 @@
 #include <kernel/mod2.h>
 
-#include <gfanlib/gfanlib.h>
-#include <gfanlib/gfanlib_q.h>
+#if HAVE_GFANLIB
 
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
@@ -19,6 +18,9 @@
 // #include <gfanlib/gfanlib.h>
 // #include <kernel/ring.h>
 // #include <kernel/polys.h>
+
+#include <gfanlib/gfanlib.h>
+#include <gfanlib/gfanlib_q.h>
 
 int polytopeID;
 
@@ -488,3 +490,5 @@ void bbpolytope_setup(SModulFunctions* p)
   polytopeID=setBlackboxStuff(b,"polytope");
   //Print("created type %d (polytope)\n",polytopeID);
 }
+
+#endif

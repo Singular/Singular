@@ -1,14 +1,18 @@
-#include <polymake_conversion.h>
-#include <polymake_documentation.h>
-#include <polymake/Graph.h>
+#include <kernel/mod2.h>
 
-#include <Singular/dyn_modules/callgfanlib/bbcone.h>
-#include <Singular/dyn_modules/callgfanlib/bbfan.h>
-#include <Singular/dyn_modules/callgfanlib/bbpolytope.h>
+#ifdef HAVE_POLYMAKE
+
+#include <Singular/dyn_modules/gfanlib/bbcone.h>
+#include <Singular/dyn_modules/gfanlib/bbfan.h>
+#include <Singular/dyn_modules/gfanlib/bbpolytope.h>
 
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
 #include <Singular/subexpr.h>
+
+#include <polymake_conversion.h>
+#include <polymake_documentation.h>
+#include <polymake/Graph.h>
 
 polymake::Main* init_polymake=NULL;
 
@@ -1752,8 +1756,7 @@ BOOLEAN PMvertexEdgeGraph(leftv res, leftv args)
   return TRUE;
 }
 
-
-extern "C" int mod_init(SModulFunctions* p)
+extern "C" int SI_MOD_INIT(polymake)(SModulFunctions* p)
 {
   if (init_polymake==NULL)
     {init_polymake = new polymake::Main();}
@@ -1807,3 +1810,5 @@ extern "C" int mod_init(SModulFunctions* p)
   init_polymake_help();
   return 0;
 }
+
+#endif /* HAVE_POLYMAKE */

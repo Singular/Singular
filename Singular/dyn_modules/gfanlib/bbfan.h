@@ -3,8 +3,11 @@
 
 #include <kernel/mod2.h>
 
-#include <gfanlib/gfanlib.h>
+#if HAVE_GFANLIB
+
 #include <Singular/ipid.h>
+
+#include <gfanlib/gfanlib.h>
 
 extern int fanID;
 
@@ -17,4 +20,5 @@ int getLinealityDimension(gfan::ZFan* zf);
 int isSimplicial(gfan::ZFan* zf);
 gfan::Matrix<gfan::Integer> rays(const gfan::ZFan* const zf);
 
+#endif
 #endif
