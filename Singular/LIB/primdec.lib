@@ -5141,7 +5141,7 @@ static proc minsat_ppd(ideal SI, ideal fac)
 static proc minquot(list tsil)
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
+   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    intvec op;
    int i,j,k,action;
@@ -5214,7 +5214,7 @@ static proc minquot(list tsil)
 static proc special_ideals_equal( ideal k1, ideal k2)
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
+   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    int j;
    if(size(k1)==size(k2))
@@ -5985,7 +5985,7 @@ example
 //
 static proc radicalKL(ideal I, ideal ser, list #)
 {
-   ASSUME(0, not isQuotientRing(basering) ) ;
+  ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
 // ideal I     The ideal for which the radical is computed
@@ -6689,7 +6689,7 @@ EXAMPLE: example testPrimary; shows an example
 "
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
+   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    int i;
    pr=reconvList(pr);
@@ -7749,7 +7749,7 @@ example
 static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim, int abspri, int @wr, list data)
 {
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
+   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
 
    string @va;
