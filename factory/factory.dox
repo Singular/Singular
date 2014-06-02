@@ -1,0 +1,14 @@
+/*! \page factory_page Factory
+ *
+ * A library for univ.-poly. factorization over several simple fields(?)
+ * (this is a part of Singular which may also be used standalone e.g. by M2 with some restrictions).
+ *
+ * ?extensions? parameters??
+ *
+ * TODO: here should be a high level description for factory + references to
+ * its main structures (\ref CanonicalForm) and maybe some important functions (e.g. factorization)?
+ * 
+ * 
+ * NOTE: it now also contains the functionality from the obsolete package libfac.
+ *
+ */

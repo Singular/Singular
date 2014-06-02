@@ -2,10 +2,19 @@
  *
  * <A HREF="http://www.singular.uni-kl.de">CAS Singular</A>
  *
+ * Main source repository is on github. 
+ * For more manuals see <A HREF="https://github.com/Singular/Sources/wiki/">WIKI</A>.
+ *
+ * Singular package diagram with dependencies is as follows:
  * \dotfile Includes.dot "Package diagram"
+ *
+ * Introductory description of separate packages follows:
  *
  * \tableofcontents
  * 
+ * \subpage omalloc_page 
+ * \subpage resources_page
+ * \subpage factory_page
  * \subpage libpolys_page
  * \subpage kernel_page
  * \subpage singular_page
