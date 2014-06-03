@@ -9,8 +9,7 @@
 #include <kernel/structs.h>
 #include <kernel/longrat.h>
 
-//#if SIZEOF_LONG == 8
-#if 0
+#if SIZEOF_LONG == 8
 // 64 bit version:
 #define MAX_NUM_SIZE 60
 #define POW_2_28 (1L<<60)
@@ -635,46 +634,38 @@ number nlInvers(number a)
 */
 number   nlExactDiv(number a, number b)
 {
-  if (b==INT_TO_SR(0))
+  mpz_t a_r;
+  mpz_t b_r;
+  mpz_ptr aa=a_r;
+  mpz_ptr bb=b_r;
+  if (SR_HDL(a) & SR_INT)
   {
-    WerrorS(nDivBy0);
-    return INT_TO_SR(0);
+    mpz_init_set_si(a_r,SR_TO_INT(a));
   }
-  if (a==INT_TO_SR(0))
-    return INT_TO_SR(0);
-  number u;
-  if (SR_HDL(a) & SR_HDL(b) & SR_INT)
-  {
-    /* the small int -(1<<28) divided by -1 is the large int (1<<28)   */
-    if ((a==INT_TO_SR(-(POW_2_28)))&&(b==INT_TO_SR(-1L)))
-    {
-      return nlRInit(POW_2_28);
-    }
-    long aa=SR_TO_INT(a);
-    long bb=SR_TO_INT(b);
-    return INT_TO_SR(aa/bb);
-  }
-  number bb=NULL;
+  else
+    aa=a->z;
   if (SR_HDL(b) & SR_INT)
   {
-    bb=nlRInit(SR_TO_INT(b));
-    b=bb;
+    mpz_init_set_si(b_r,SR_TO_INT(b));
   }
-  u=ALLOC_RNUMBER();
+  else
+    bb=b->z;
+  number u=ALLOC_RNUMBER();
 #if defined(LDEBUG)
   u->debug=123456;
 #endif
-  mpz_init(u->z);
-  /* u=a/b */
   u->s = 3;
-  MPZ_EXACTDIV(u->z,a->z,b->z);
-  if (bb!=NULL)
+  assume(a->s==3);
+  assume(b->s==3);
+  mpz_init(u->z);
+  MPZ_EXACTDIV(u->z,aa,bb);
+  if (SR_HDL(a) & SR_INT)
   {
-    mpz_clear(bb->z);
-#if defined(LDEBUG)
-    bb->debug=654324;
-#endif
-    FREE_RNUMBER(bb);
+    mpz_clear(aa);
+  }
+  if (SR_HDL(b) & SR_INT)
+  {
+    mpz_clear(bb);
   }
   u=nlShort3(u);
   nlTest(u);
@@ -693,54 +684,39 @@ number nlIntDiv (number a, number b)
   }
   if (a==INT_TO_SR(0))
     return INT_TO_SR(0);
-  number u;
-  if (SR_HDL(a) & SR_HDL(b) & SR_INT)
-  {
-    /* the small int -(1<<28) divided by -1 is the large int (1<<28)   */
-    if ((a==INT_TO_SR(-(POW_2_28)))&&(b==INT_TO_SR(-1L)))
-    {
-      return nlRInit(POW_2_28);
-    }
-    long aa=SR_TO_INT(a);
-    long bb=SR_TO_INT(b);
-    return INT_TO_SR(aa/bb);
-  }
+  mpz_t a_r;
+  mpz_t b_r;
+  mpz_ptr aa=a_r;
+  mpz_ptr bb=b_r;
   if (SR_HDL(a) & SR_INT)
   {
-    /* the small int -(1<<28) divided by 2^28 is 1   */
-    if (a==INT_TO_SR(-(POW_2_28)))
-    {
-      if(mpz_cmp_si(b->z,(POW_2_28))==0)
-      {
-        return INT_TO_SR(-1);
-      }
-    }
-    /* a is a small and b is a large int: -> 0 */
-    return INT_TO_SR(0);
+    mpz_init_set_si(a_r,SR_TO_INT(a));
   }
-  number bb=NULL;
+  else
+    aa=a->z;
   if (SR_HDL(b) & SR_INT)
   {
-    bb=nlRInit(SR_TO_INT(b));
-    b=bb;
+    mpz_init_set_si(b_r,SR_TO_INT(b));
   }
-  u=ALLOC_RNUMBER();
+  else
+    bb=b->z;
+  number u=ALLOC_RNUMBER();
 #if defined(LDEBUG)
   u->debug=123456;
 #endif
   assume(a->s==3);
   assume(b->s==3);
-  mpz_init_set(u->z,a->z);
+  mpz_init_set(u->z,aa);
   /* u=u/b */
   u->s = 3;
-  MPZ_DIV(u->z,u->z,b->z);
-  if (bb!=NULL)
+  MPZ_DIV(u->z,u->z,bb);
+  if (SR_HDL(a) & SR_INT)
   {
-    mpz_clear(bb->z);
-#if defined(LDEBUG)
-    bb->debug=654324;
-#endif
-    FREE_RNUMBER(bb);
+    mpz_clear(aa);
+  }
+  if (SR_HDL(b) & SR_INT)
+  {
+    mpz_clear(bb);
   }
   u=nlShort3(u);
   nlTest(u);
@@ -759,68 +735,38 @@ number nlIntMod (number a, number b)
   }
   if (a==INT_TO_SR(0))
     return INT_TO_SR(0);
-  number u;
-  if (SR_HDL(a) & SR_HDL(b) & SR_INT)
-  {
-    LONG bb=SR_TO_INT(b);
-    LONG c=SR_TO_INT(a)%bb;
-    return INT_TO_SR(c);
-  }
+  mpz_t a_r;
+  mpz_t b_r;
+  mpz_ptr aa=a_r;
+  mpz_ptr bb=b_r;
   if (SR_HDL(a) & SR_INT)
   {
-    number aa=ALLOC_RNUMBER();
-    mpz_init(aa->z);
-    mpz_set_si(aa->z, SR_TO_INT(a));
-    u=ALLOC_RNUMBER();
-#if defined(LDEBUG)
-    u->debug=123456;
-#endif
-    u->s = 3;
-    mpz_init(u->z);
-    mpz_mod(u->z,aa->z,b->z);
-    if (mpz_isNeg(u->z))
-    {
-      if (mpz_isNeg(b->z))
-        mpz_sub(u->z,aa->z,b->z);
-      else
-        mpz_add(u->z,aa->z,b->z);
-    }
-    mpz_clear(aa->z);
-#if defined(LDEBUG)
-    aa->debug=654324;
-#endif
-    FREE_RNUMBER(aa);
-    u=nlShort3(u);
-    nlTest(u);
-    return u;
+    mpz_init_set_si(a_r,SR_TO_INT(a));
   }
-  number bb=NULL;
+  else
+    aa=a->z;
   if (SR_HDL(b) & SR_INT)
   {
-    bb=nlRInit(SR_TO_INT(b));
-    b=bb;
+    mpz_init_set_si(b_r,SR_TO_INT(b));
   }
-  u=ALLOC_RNUMBER();
+  else
+    bb=b->z;
+  number u=ALLOC_RNUMBER();
 #if defined(LDEBUG)
   u->debug=123456;
 #endif
-  mpz_init(u->z);
   u->s = 3;
-  mpz_mod(u->z,a->z,b->z);
-  if (mpz_isNeg(u->z))
+  assume(a->s==3);
+  assume(b->s==3);
+  mpz_init(u->z);
+  mpz_mod(u->z,aa,bb);
+  if (SR_HDL(a) & SR_INT)
   {
-    if (mpz_isNeg(b->z))
-      mpz_sub(u->z,u->z,b->z);
-    else
-      mpz_add(u->z,u->z,b->z);
+    mpz_clear(aa);
   }
-  if (bb!=NULL)
+  if (SR_HDL(b) & SR_INT)
   {
-    mpz_clear(bb->z);
-#if defined(LDEBUG)
-    bb->debug=654324;
-#endif
-    FREE_RNUMBER(bb);
+    mpz_clear(bb);
   }
   u=nlShort3(u);
   nlTest(u);

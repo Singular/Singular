@@ -65,15 +65,16 @@
 // 8->8: qring
 
 // 64 bit version:
-//#if SIZEOF_LONG == 8
-#if 0
+#if SIZEOF_LONG == 8
 #define MAX_NUM_SIZE 60
 #define POW_2_28 (1L<<60)
+#define POW_2_28_32 (1L<<28)
 #define LONG long
 #else
 // 32 bit version:
 #define MAX_NUM_SIZE 28
 #define POW_2_28 (1L<<28)
+#define POW_2_28_32 (1L<<28)
 #define LONG int
 #endif
 
@@ -105,11 +106,23 @@ void ssiSetCurrRing(const ring r)
 {
   if (!rEqual(r,currRing,1))
   {
+    //if (currRing!=NULL)
+    //{
+    //  Print("curr:%d\n",currRing->OrdSgn);// rWrite(currRing);
+    //}
+    //if (r!=NULL)
+    //{
+    //  Print("new:%d\n",r->OrdSgn);// rWrite(r);
+    //}
     char name[20];
     int nr=0;
     do
     { sprintf(name,"ssiRing%d",nr); nr++; }
     while(IDROOT->get(name, 0)!=NULL);
+    if (currRing!=NULL)
+      Print("need to change the ring, currRing:%s, switch to: ssiRing%d\n",IDID(currRingHdl),nr);
+    else
+      Print("no ring, switch to ssiRing%d\n",nr);
     idhdl h=enterid(omStrDup(name),0,RING_CMD,&IDROOT,FALSE);
     IDRING(h)=r;
     r->ref++;
@@ -136,8 +149,25 @@ void ssiWriteBigInt(const ssiInfo *d, const number n)
   //        or     3 3 <mpz_t nominator>
   if(SR_HDL(n) & SR_INT)
   {
+    #if SIZEOF_LONG == 4
     fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
-    //if (d->f_debug!=NULL) fprintf(d->f_debug,"bigint: short \"%ld\" ",SR_TO_INT(n));
+    #else
+    long nn=SR_TO_INT(n);
+    if ((nn<POW_2_28_32)&&(nn>= -POW_2_28_32))
+    {
+      int nnn=(int)nn;
+      fprintf(d->f_write,"4 %d ",nnn);
+    }
+    else
+    {
+      mpz_t tmp;
+      mpz_init_set_si(tmp,nn);
+      fputs("8 ",d->f_write);
+      mpz_out_str (d->f_write,SSI_BASE, tmp);
+      fputc(' ',d->f_write);
+      mpz_clear(tmp);
+    }
+    #endif
   }
   else if (n->s==3)
   {
@@ -160,7 +190,7 @@ void ssiWriteNumber_R(const ssiInfo *d, const number n, const ring r)
   //        or     3 3 <mpz_t nominator>
   //        or     3 5 <mpz_t raw nom.> <mpz_t raw denom.>
   //        or     3 6 <mpz_t raw nom.> <mpz_t raw denom.>
-  //        or     3 7 <mpz_t raw nom.>
+  //        or     3 8 <mpz_t raw nom.>
   if(rField_is_Zp(r))
   {
     fprintf(d->f_write,"%d ",(int)(long)n);
@@ -174,8 +204,11 @@ void ssiWriteNumber_R(const ssiInfo *d, const number n, const ring r)
       fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
       #else
       long nn=SR_TO_INT(n);
-      if ((nn<POW_2_28)&&(nn>= -POW_2_28))
-        fprintf(d->f_write,"4 %d ",((LONG)nn));
+      if ((nn<POW_2_28_32)&&(nn>= -POW_2_28_32))
+      {
+        int nnn=(int)nn;
+        fprintf(d->f_write,"4 %d ",nnn);
+      }
       else
       {
         mpz_t tmp;
@@ -229,7 +262,7 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
   //        or     3 3 <mpz_t nominator>
   //        or     3 5 <mpz_t raw nom.> <mpz_t raw denom.>
   //        or     3 6 <mpz_t raw nom.> <mpz_t raw denom.>
-  //        or     3 7 <mpz_t raw nom.>
+  //        or     3 8 <mpz_t raw nom.>
   if(rField_is_Zp(d->r))
   {
     fprintf(d->f_write,"%d ",(int)(long)n);
@@ -243,8 +276,11 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
       fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
       #else
       long nn=SR_TO_INT(n);
-      if ((nn<POW_2_28)||(nn>= -POW_2_28))
-        fprintf(d->f_write,"4 %ld ",((LONG)nn));
+      if ((nn<POW_2_28_32)||(nn>= -POW_2_28_32))
+      {
+        int nnn=(int)nn;
+        fprintf(d->f_write,"4 %d ",nnn);
+      }
       else
       {
         mpz_t tmp;
@@ -516,6 +552,29 @@ int ssiReadInt(s_buff fich)
   return s_readint(fich);
 }
 
+static inline number nlShort3(number x) // assume x->s==3
+{
+  assume(x->s==3);
+  if (mpz_cmp_ui(x->z,(long)0)==0)
+  {
+    mpz_clear(x->z);
+    FREE_RNUMBER(x);
+    return INT_TO_SR(0);
+  }
+  if(mpz_size1(x->z)<=MP_SMALL)
+  {
+    LONG ui=mpz_get_si(x->z);
+    if ((((ui<<3)>>3)==ui)
+    && (mpz_cmp_si(x->z,(long)ui)==0))
+    {
+      mpz_clear(x->z);
+      FREE_RNUMBER(x);
+      return INT_TO_SR(ui);
+    }
+  }
+  return x;
+}
+
 number ssiReadBigInt(const ssiInfo *d)
 {
   int sub_type=-1;
@@ -527,6 +586,9 @@ number ssiReadBigInt(const ssiInfo *d)
        number n=nlRInit(0);
        s_readmpz(d->f_read,n->z);
        n->s=sub_type;
+       #if SIZEOF_LONG == 8
+       n=nlShort3(n);
+       #endif
        return n;
      }
    case 4:
@@ -563,16 +625,15 @@ static number ssiReadQNumber(const ssiInfo *d)
          number n=nlRInit(0);
          s_readmpz(d->f_read,n->z);
          n->s=3; /*sub_type*/
+         #if SIZEOF_LONG == 8
+         n=nlShort3(n);
+         #endif
          return n;
        }
      case 4:
        {
-         LONG dd=s_readlong(d->f_read);
-         //#if SIZEOF_LONG == 8
+         long dd=s_readlong(d->f_read);
          return INT_TO_SR(dd);
-         //#else
-         //return nlInit(dd,NULL);
-         //#endif
        }
      case 5:
      case 6:
@@ -589,6 +650,9 @@ static number ssiReadQNumber(const ssiInfo *d)
          number n=nlRInit(0);
          s_readmpz_base (d->f_read,n->z, SSI_BASE);
          n->s=sub_type=3; /*subtype-5*/
+         #if SIZEOF_LONG == 8
+         n=nlShort3(n);
+         #endif
          return n;
        }
 
