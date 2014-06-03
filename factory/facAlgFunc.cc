@@ -599,10 +599,10 @@ Trager (const CanonicalForm & F, const CFList & Astar,
 }
 
 
-/// map elements in AS into a PIE L and record where the variables are mapped to
-/// in varsMapLevel, i.e varsMapLevel contains a list of pairs of variables
-/// $v_i$ and integers $e_i$ such that
-/// $L=K(\sqrt[p^{e_1}]{v_1}, \ldots, \sqrt[p^{e_n}]{v_n})$
+/// map elements in @a AS into a PIE \f$ L \f$ and record where the variables
+/// are mapped to in @a varsMapLevel, i.e @a varsMapLevel contains a list of
+/// pairs of variables \f$ v_i \f$ and integers \f$ e_i \f$ such that
+/// \f$ L=K(\sqrt[p^{e_1}]{v_1}, \ldots, \sqrt[p^{e_n}]{v_n}) \f$
 CFList
 mapIntoPIE (CFFList& varsMapLevel, CanonicalForm& lcmVars, const CFList & AS)
 {

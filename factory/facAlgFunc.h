@@ -21,8 +21,31 @@
 
 CanonicalForm alg_gcd(const CanonicalForm &, const CanonicalForm &, const CFList &);
 /*BEGINPUBLIC*/
-CFFList facAlgFunc2 (const CanonicalForm & f, const CFList & as);
-CFFList facAlgFunc (const CanonicalForm & f, const CFList & as);
+
+/// factorize a polynomial @a f that is irreducible over the ground field modulo
+/// an extension given by an irreducible characteristic set @a as, @a f is
+/// assumed to be integral, i.e. \f$ f\in K[x_1,\ldots,x_n]/(as) \f$, and each
+/// element of @a as is assumed to be integral as well. \f$ K \f$ must be either
+/// \f$ F_p \f$ or \f$ Q \f$.
+///
+/// @return the returned factors are not necessarily monic but only primitive
+/// and the product of the factors equals @a f up to a unit.
+CFFList facAlgFunc2 (const CanonicalForm & f,///<[in] univariate poly
+                     const CFList & as       ///<[in] irreducible characteristic
+                                             ///< set
+                    );
+
+/// factorize a polynomial @a f modulo an extension given by an irreducible
+/// characteristic set as, @a f is assumed to be integral, i.e.
+/// \f$ f\in K[x_1,\ldots,x_n]/(as) \f$, and each element of @a as is assumed to
+/// be integral as well. \f$ K \f$ must be either \f$ F_p \f$ or \f$ Q \f$.
+///
+/// @return the returned factors are not necessarily monic but only primitive
+/// and the product of the factors equals @a f up to a unit.
+CFFList facAlgFunc (const CanonicalForm & f, ///<[in] univariate poly
+                    const CFList & as        ///<[in] irreducible characteristic
+                                             ///< set
+                   );
 /*ENDPUBLIC*/
 
 #endif /* INCL_ALGFACTOR_H */
