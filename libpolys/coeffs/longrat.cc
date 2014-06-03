@@ -16,14 +16,16 @@
 
 
 // 64 bit version:
-#if SIZEOF_LONG == 8
-//#if 0
+//#if SIZEOF_LONG == 8
+#if 0
 #define MAX_NUM_SIZE 60
 #define POW_2_28 (1L<<60)
+#define POW_2_28_32 (1L<<28)
 #define LONG long
 #else
 #define MAX_NUM_SIZE 28
 #define POW_2_28 (1L<<28)
+#define POW_2_28_32 (1L<<28)
 #define LONG int
 #endif
 
@@ -801,63 +803,21 @@ number nlIntMod (number a, number b, const coeffs r)
   {
     LONG bb=SR_TO_INT(b);
     LONG c=SR_TO_INT(a) % bb;
-    /*if(c < 0)
-    {
-        if(bb < 0)
-            c = c - bb;
-        else
-            c = c + bb;
-    }*/
-    /*if((((SR_TO_INT(a)) / (bb))*bb+c) != SR_TO_INT(a))
-    {
-        printf("\nERROR longrat:819\n");
-        printf("\na = %ld\n",SR_TO_INT(a));
-        printf("\nb = %ld\n",bb);
-        printf("\nc = %ld\n",c);
-    }*/
     return INT_TO_SR(c);
   }
   if (SR_HDL(a) & SR_INT)
   {
-    // a is a small and b is a large int: -> a
-    //  INCORRECT, IT COULD HAPPEN THAT b IS A SMALL NUMBER
-    number aa=ALLOC_RNUMBER();
-    mpz_init(aa->z);
-    mpz_set_si(aa->z, SR_TO_INT(a));
+    mpz_t aa;
+    mpz_init(aa);
+    mpz_set_si(aa, SR_TO_INT(a));
     u=ALLOC_RNUMBER();
 #if defined(LDEBUG)
     u->debug=123456;
 #endif
     u->s = 3;
     mpz_init(u->z);
-    mpz_mod(u->z,aa->z,b->z);
-    if (mpz_isNeg(u->z))
-    {
-      if (mpz_isNeg(b->z))
-        mpz_sub(u->z,aa->z,b->z);
-      else
-        mpz_add(u->z,aa->z,b->z);
-    }
-    /*mpz_t dummy;
-    mpz_init(dummy);
-    mpz_fdiv_q(dummy, aa->z, b->z);
-    mpz_mul(dummy, dummy, b->z);
-    mpz_add(dummy, dummy, u->z);
-    if(mpz_cmp(dummy,aa->z) != 0)
-    {
-        printf("\nERROR longrat:911\n");
-        printf("\na = ");n_Print(aa,r);
-        gmp_printf("\ndummy = %Zd",dummy);
-        mpz_clear(dummy);mpz_init(dummy);mpz_tdiv_q(dummy, a->z, b->z);
-        gmp_printf("\na div b = %Zd\n u = ", dummy);
-        n_Print(u,r);
-    }
-    mpz_clear(dummy);*/
-    mpz_clear(aa->z);
-    #if defined(LDEBUG)
-    aa->debug=654324;
-    #endif
-    FREE_RNUMBER(aa);
+    mpz_mod(u->z,aa,b->z);
+    mpz_clear(aa);
     u=nlShort3(u);
     nlTest(u,r);
     return u;
@@ -875,13 +835,6 @@ number nlIntMod (number a, number b, const coeffs r)
   mpz_init(u->z);
   u->s = 3;
   mpz_mod(u->z,a->z,b->z);
-  if (mpz_isNeg(u->z))
-  {
-    if (mpz_isNeg(b->z))
-      mpz_sub(u->z,u->z,b->z);
-    else
-      mpz_add(u->z,u->z,b->z);
-  }
   if (bb!=NULL)
   {
     mpz_clear(bb->z);
@@ -890,21 +843,6 @@ number nlIntMod (number a, number b, const coeffs r)
 #endif
     FREE_RNUMBER(bb);
   }
-  /*mpz_t dummy;
-  mpz_init(dummy);
-    mpz_fdiv_q(dummy, a->z, b->z);
-    mpz_mul(dummy, dummy, b->z);
-    mpz_add(dummy, dummy, u->z);
-    if(mpz_cmp(dummy,a->z) != 0)
-    {
-        printf("\nERROR longrat:911\n");
-        printf("\na = ");n_Print(a,r);
-        gmp_printf("\ndummy = %Zd",dummy);
-        mpz_clear(dummy);mpz_init(dummy);mpz_tdiv_q(dummy, a->z, b->z);
-        gmp_printf("\na div b = %Zd\n u = ", dummy);
-        n_Print(u,r);
-    }
-    mpz_clear(dummy);*/
   u=nlShort3(u);
   nlTest(u,r);
   return u;
@@ -1107,8 +1045,6 @@ BOOLEAN nlIsMOne (number a, const coeffs r)
   if (a==NULL) return FALSE;
   nlTest(a, r);
 #endif
-  //if (SR_HDL(a) & SR_INT) return (a==INT_TO_SR(-1L));
-  //return FALSE;
   return  (a==INT_TO_SR(-1L));
 }
 
@@ -2923,8 +2859,11 @@ static void nlWriteFd(number n,FILE* f, const coeffs)
     fprintf(f,"4 %ld ",SR_TO_INT(n));
     #else
     long nn=SR_TO_INT(n);
-    if ((nn<POW_2_28)&&(nn>= -POW_2_28))
-      fprintf(f,"4 %ld ",nn);
+    if ((nn<POW_2_28_32)&&(nn>= -POW_2_28_32))
+    {
+      int nnn=(int)nn;
+      fprintf(f,"4 %d ",nnn);
+    }
     else
     {
       mpz_t tmp;

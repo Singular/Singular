@@ -61,18 +61,6 @@
 // 6->7: attributes
 // 7->8: qring
 
-// 64 bit version:
-#if SIZEOF_LONG == 8
-#define MAX_NUM_SIZE 60
-#define POW_2_28 (1L<<60)
-#define LONG long
-#else
-// 32 bit version:
-#define MAX_NUM_SIZE 28
-#define POW_2_28 (1L<<28)
-#define LONG int
-#endif
-
 #define SSI_BASE 16
 typedef struct
 {
@@ -100,7 +88,7 @@ ideal ssiReadIdeal_R(const ssiInfo *d,const ring r);
 void ssiSetCurrRing(const ring r)
 {
   //  if (currRing!=NULL)
-  //  Print("need to change the ring, currRing:%s, switch to: ssiRing%d\n",IDID(currRingHdl,nr);
+  //  Print("need to change the ring, currRing:%s, switch to: ssiRing%d\n",IDID(currRingHdl),nr);
   //  else
   //  Print("no ring, switch to ssiRing%d\n",nr);
   if (!rEqual(r,currRing,1))
@@ -131,23 +119,7 @@ void ssiWriteString(const ssiInfo *d,const char *s)
 
 void ssiWriteBigInt(const ssiInfo *d, const number n)
 {
-  // syntax is as follows:
-  // case 2 Q:     3 4 <int>
-  //        or     3 3 <mpz_t nominator>
-  if(SR_HDL(n) & SR_INT)
-  {
-    fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
-    //if (d->f_debug!=NULL) fprintf(d->f_debug,"bigint: short \"%ld\" ",SR_TO_INT(n));
-  }
-  else if (n->s==3)
-  {
-    fputs("3 ",d->f_write);
-    mpz_out_str(d->f_write,10,n->z);
-    fputc(' ',d->f_write);
-    //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
-    //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"bigint: gmp \"%Zd\" ",n->z);
-  }
-  else WerrorS("illiegal bigint");
+ coeffs_BIGINT->cfWriteFd(n,d->f_write,coeffs_BIGINT);
 }
 
 void ssiWriteNumber_CF(const ssiInfo *d, const number n, const coeffs cf)
@@ -160,7 +132,7 @@ void ssiWriteNumber_CF(const ssiInfo *d, const number n, const coeffs cf)
   //        or     3 3 <mpz_t nominator>
   //        or     3 5 <mpz_t raw nom.> <mpz_t raw denom.>
   //        or     3 6 <mpz_t raw nom.> <mpz_t raw denom.>
-  //        or     3 7 <mpz_t raw nom.>
+  //        or     3 8 <mpz_t raw nom.>
   if (getCoeffType(cf)==n_transExt)
   {
     fraction f=(fraction)n;
@@ -413,31 +385,6 @@ int ssiReadInt(s_buff fich)
   return s_readint(fich);
 }
 
-number ssiReadBigInt(const ssiInfo *d)
-{
-  int sub_type=-1;
-  sub_type=s_readint(d->f_read);
-  switch(sub_type)
-  {
-   case 3:
-     {// read int or mpz_t or mpz_t, mpz_t
-       number n=nlRInit(0);
-       s_readmpz(d->f_read,n->z);
-       n->s=sub_type;
-       return n;
-     }
-   case 4:
-     {
-       int dd;
-       dd=s_readint(d->f_read);
-       return INT_TO_SR(dd);
-     }
-   default:
-       Werror("error in reading bigint: invalid subtype %d",sub_type);
-       return NULL;
-   }
-}
-
 number ssiReadNumber_CF(const ssiInfo *d, const coeffs cf)
 {
   if (cf->cfReadFd!=NULL)
@@ -460,6 +407,16 @@ number ssiReadNumber_CF(const ssiInfo *d, const coeffs cf)
   }
   else Werror("coeffs not implemented in ssiReadNumber");
   return NULL;
+}
+
+number ssiReadBigInt(const ssiInfo *d)
+{
+  number n=ssiReadNumber_CF(d,coeffs_BIGINT);
+  if ((SR_HDL(n) & SR_INT)==0)
+  {
+    if (n->s!=3) Werror("invalid sub type in bigint:%d",n->s);
+  }
+  return n;
 }
 
 number ssiReadNumber(const ssiInfo *d)
