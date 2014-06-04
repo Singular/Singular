@@ -84,7 +84,10 @@ void myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
     degsgx= degsg [xlevel];
     degsf [xlevel]= 0;
     degsg [xlevel]= 0;
-    if (getNumVars (F) == 2 || getNumVars (G) == 2)
+    if ((getNumVars (F) == 2 && getNumVars (G) == 1) ||
+        (getNumVars (G) == 2 && getNumVars (F) == 1) ||
+        (getNumVars (F) == 2 && getNumVars (F) == getNumVars (G)
+         && getVars (F) == getVars (G)))
     {
       int pos= 2;
       for (int i= 1; i <= n; i++)
@@ -421,6 +424,14 @@ resultantZ (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
             bool prob)
 {
   ASSERT (getCharacteristic() == 0, "characteristic > 0 expected");
+#ifndef NOASSERT
+  bool isRat= isOn (SW_RATIONAL);
+  On (SW_RATIONAL);
+  ASSERT (bCommonDen (A).isOne(), "input A is rational");
+  ASSERT (bCommonDen (B).isOne(), "input B is rational");
+  if (!isRat)
+    Off (SW_RATIONAL);
+#endif
 
   int degAx= degree (A, x);
   int degBx= degree (B, x);
