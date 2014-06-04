@@ -74,6 +74,8 @@ struct sValCmd1 dArith1[]=
 ,{D(jjCOUNT_L),    COUNT_CMD,       INT_CMD,        LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCOUNT_RG),   COUNT_CMD,       INT_CMD,        RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjN2_CR),      CRING_CMD,       CRING_CMD,      NUMBER2_CMD   , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjBIM2_CR),    CRING_CMD,       CRING_CMD,      BIGINTMAT_CMD , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjR2_CR),      CRING_CMD,       CRING_CMD,      RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjNULL),       DEF_CMD,         DEF_CMD,        INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
 ,{  jjWRONG ,      DEF_CMD,         0,              ANY_TYPE      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDEG),        DEG_CMD,         INT_CMD,        POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}

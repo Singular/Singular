@@ -24,6 +24,8 @@ BOOLEAN jjEQUAL_CR(leftv res, leftv a, leftv b); // compare cring
 // type conversion:
 BOOLEAN jjNUMBER2CR(leftv res, leftv a, leftv b); // <any>,cring ->number2
 BOOLEAN jjN2_CR(leftv res, leftv a);              // number2 ->cring
+BOOLEAN jjBIM2_CR(leftv res, leftv a);              // bigint ->cring
+BOOLEAN jjR2_CR(leftv res, leftv a);              // ring ->cring
 BOOLEAN jjN2_N(leftv res, leftv a);             // number2 ->number
 
 // operations:

@@ -141,7 +141,7 @@ BOOLEAN jjNUMBER2_OP1(leftv res, leftv a)
   if (a2->cf==NULL) op=0; // force error
   switch(op)
   {
-    case '-': r->n=n_Copy(a2->n,a2->cf);r->n=n_Neg(r->n,a2->cf);break;
+    case '-': r->n=n_Copy(a2->n,a2->cf);r->n=n_InpNeg(r->n,a2->cf);break;
     default: Werror("unknown unary operation %s(%d)",Tok2Cmdname(op),op);
              omFree(r);
              return TRUE;
@@ -271,3 +271,23 @@ void n2Print(number2 d)
   PrintS(s);
   omFree(s);
 }
+
+#include <coeffs/bigintmat.h>
+BOOLEAN jjBIM2_CR(leftv res, leftv a)              // bigintmat ->cring
+{
+  bigintmat *b=(bigintmat*)a->Data();
+  coeffs cf=b->basecoeffs();
+  cf->ref++;
+  res->data=(void*)cf;
+  return FALSE;
+}
+
+BOOLEAN jjR2_CR(leftv res, leftv a)              // ring ->cring
+{
+  ring r=(ring)a->Data();
+  coeffs cf=r->cf;
+  cf->ref++;
+  res->data=(void*)cf;
+  return FALSE;
+}
+
