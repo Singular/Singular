@@ -6,7 +6,7 @@ ${NTL_CFLAGS} $(FLINT_CFLAGS) ${GMP_CFLAGS}
 noinst_LTLIBRARIES=libfglm.la
 libfglm_la_SOURCES=fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc
 
-libfglm_la_includedir=$(includedir)/singular/fglm
+libfglm_la_includedir=$(includedir)/singular/kernel/fglm
 libfglm_la_include_HEADERS=fglm.h fglmgauss.h fglmvec.h
 
 

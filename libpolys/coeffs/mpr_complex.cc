@@ -376,7 +376,15 @@ gmp_float numberToFloat( number num, const coeffs src)
     {
       if (SR_HDL(num) & SR_INT)
       {
-        r= SR_TO_INT(num);
+        //n_Print(num, src);printf("\n");
+        int nn = SR_TO_INT(num);
+        if((long)nn == SR_TO_INT(num))
+            r = SR_TO_INT(num);
+        else
+            r = gmp_float(SR_TO_INT(num));
+        //int dd = 20;
+        //gmp_printf("\nr = %.*Ff\n",dd,*r.mpfp());
+        //getchar();
       }
       else
       {
@@ -435,7 +443,11 @@ gmp_float numberFieldToFloat( number num, int k, const coeffs src)
     {
       if (SR_HDL(num) & SR_INT)
       {
-        r= SR_TO_INT(num);
+        int nn = SR_TO_INT(num);
+        if((long)nn == SR_TO_INT(num))
+            r = SR_TO_INT(num);
+        else
+            r = gmp_float(SR_TO_INT(num));
       }
       else
       {
@@ -445,7 +457,11 @@ gmp_float numberFieldToFloat( number num, int k, const coeffs src)
         }
         if (SR_HDL(num) & SR_INT)
         {
-          r= SR_TO_INT(num);
+          int nn = SR_TO_INT(num);
+          if((long)nn == SR_TO_INT(num))
+            r = SR_TO_INT(num);
+          else
+            r = gmp_float(SR_TO_INT(num));
         }
         else
         {

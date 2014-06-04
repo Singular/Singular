@@ -326,8 +326,8 @@ static proc reduce_task(intvec range)
 /*
  * The following procedures are kept for backward compatibility with the old
  * version of modstd.lib. As of now (May 2014), they are still needed in
- * assprimeszerodim.lib, modnormal.lib, modwalk.lib, and symodstd.lib. They can
- * be removed here as soon as they are not longer needed in these libraries.
+ * modnormal.lib, modwalk.lib, and symodstd.lib. They can be removed here as
+ * soon as they are not longer needed in these libraries.
  */
 
 LIB "parallel.lib";

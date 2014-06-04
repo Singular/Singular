@@ -715,21 +715,26 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   return err;
 }
 
-int SI_MOD_INIT(staticdemo)(SModulFunctions*){ PrintS("init of staticdemo\n"); return (0); }
 
-#define SI_GET_BUILTIN_MOD_INIT(name) \
- if (strcmp(libname, #name ".so") == 0){ int SI_MOD_INIT(name)(SModulFunctions*); return SI_MOD_INIT(name); }
+extern "C"
+{
+#  define SI_GET_BUILTIN_MOD_INIT0(name) int SI_MOD_INIT0(name)(SModulFunctions*);
+          SI_FOREACH_BUILTIN(SI_GET_BUILTIN_MOD_INIT0)
+#  undef  SI_GET_BUILTIN_MOD_INIT0
+};
+
 
 SModulFunc_t
 iiGetBuiltinModInit(const char* libname)
 {
-  SI_FOREACH_BUILTIN(SI_GET_BUILTIN_MOD_INIT)
+#  define SI_GET_BUILTIN_MOD_INIT(name) if (strcmp(libname, #name ".so") == 0){ return SI_MOD_INIT0(name); }
+          SI_FOREACH_BUILTIN(SI_GET_BUILTIN_MOD_INIT)
+#  undef  SI_GET_BUILTIN_MOD_INIT
 
   return NULL;
 }
 
 
-#undef SI_GET_BUILTIN_MOD_INIT
 
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
@@ -1099,13 +1104,13 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
       if (autoexport) sModulFunctions.iiAddCproc = iiAddCprocTop;
       else            sModulFunctions.iiAddCproc = iiAddCproc;
       (*fktn)(&sModulFunctions);
+      if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", fullname);
+      currPack->loaded=1;
+      currPack=s;
+      RET=FALSE;
     }
-    else Werror("mod_init: %s\n", dynl_error());
-    if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", fullname);
-    currPack->loaded=1;
-    currPack=s;
+    else Werror("mod_init not found:: %s\nThis is probably not a dynamic module for Singular!\n", dynl_error());
   }
-  RET=FALSE;
 
   load_modules_end:
   return RET;

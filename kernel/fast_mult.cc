@@ -4,7 +4,6 @@
 
 #include <kernel/mod2.h>
 
-#include "mod2.h"
 #include <polys/monomials/ring.h>
 #include <kernel/fast_mult.h>
 #include <polys/kbuckets.h>
