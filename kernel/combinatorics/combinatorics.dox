@@ -1,4 +1,4 @@
-/*! \page kernel_combinatorics_page "Combinatorical algorithms"
+/*! \page kernel_combinatorics_page Combinatorical algorithms
  *
  * This sub-package of kernel (\ref kernel_page) contains
  * combinatorical algorithms. 

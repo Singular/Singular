@@ -1,4 +1,4 @@
-/*! \page kernel_spectrum_page "Spectrum-related algorithms"
+/*! \page kernel_spectrum_page Spectrum-related algorithms
  *
  * This sub-package of kernel (\ref kernel_page) contains
  * Spectrum-related algorithms. 

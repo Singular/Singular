@@ -1,4 +1,4 @@
-/*! \page libpolys_polys_page "Polynomials and polynomial rings over coeff. domains"
+/*! \page libpolys_polys_page Multivariate polynomial rings and algebras
  *
  * Here is the declaration and impelemntaion of a polynomial ring over a coeff. domain (\ref ring), 
  * its ements polynomials (\ref poly) and related structures (\ref ideal) 

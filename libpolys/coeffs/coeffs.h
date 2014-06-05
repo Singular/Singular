@@ -571,9 +571,7 @@ static inline void   n_Write(number& n,  const coeffs r, const BOOLEAN bShortOut
 { if (bShortOut) n_WriteShort(n, r); else n_WriteLong(n, r); }
 
 
-/// @todo: Describe me!!! --> Hans
-///
-/// !!! Recommendation: This method is to cryptic to be part of the user-
+/// !!! Recommendation: This method is too cryptic to be part of the user-
 /// !!!                 interface. As defined here, it is merely a helper
 /// !!!                 method for parsing number input strings.
 static inline const char *n_Read(const char * s, number * a, const coeffs r)

@@ -1,4 +1,4 @@
-/*! \page kernel_oswrapper_page "Wrappers over host OS functions"
+/*! \page kernel_oswrapper_page Wrappers over host OS functions
  *
  * This sub-package of kernel (\ref kernel_page) contains
  * wrappers over host OS functions.
