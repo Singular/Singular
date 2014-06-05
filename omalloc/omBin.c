@@ -5,7 +5,7 @@
  *  Created: 11/99
  *******************************************************************/
 
-#include <omalloc/omalloc.h>
+#include "omalloc.h"
 /* this should go away */
 
 #ifdef OM_INTERNAL_DEBUG

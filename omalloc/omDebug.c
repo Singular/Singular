@@ -7,9 +7,9 @@
 #include <mylimits.h>
 #include <string.h>
 #include "omConfig.h"
-#include <omalloc/omalloc.h>
-#include <omalloc/omDebug.h>
-#include <omalloc/omReturn.h>
+#include "omalloc.h"
+#include "omDebug.h"
+#include "omReturn.h"
 
 #ifndef OM_NDEBUG
 /*******************************************************************

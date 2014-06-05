@@ -1,4 +1,4 @@
-/*! \page factory_page Factory
+/*! \page factory_page Multivariate polynomial factorization (factory)
  *
  * Factory is a C++ class library that implements a recursive representation
  * of multivariate polynomial data.
@@ -12,7 +12,7 @@
  * absolute factorization of multivariate polynomials with integer coefficients.
  *
  * The interface to the polynomial system of Factory is provided by a single
- * class `CanonicalForm' which can deal with elements of the coefficient
+ * class `\ref CanonicalForm' which can deal with elements of the coefficient
  * domain as well as polynomials.
  *
  * \note For more information on how to configure, install and add new code to

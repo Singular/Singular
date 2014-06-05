@@ -1,18 +1,22 @@
-/*! \page omalloc_page omalloc 
+/*! \page omalloc_page Singular memory manager for small chunks (omalloc)
  *
  * This is the Singular-specific memory manager which is tunned to
  * handle the allocation and de-allocation of memory blocks of small
  * size as efficient as it is possible (a few machine instructions in most cases).
  * 
- * As described in my short intro to omalloc <A HREF="https://MY_OMALLOC_TALK?">short talk</A>
+ * As described in my short intro to omalloc <A HREF="https://OLEKSANDR_OMALLOC_TALK?">short talk</A>
  * there are several usage possibilities (levels) of omalloc:
- * 1. low-level - very performant (with Bins)
- * 1. high-level - link against libomalloc and use the usual malloc and free
+ * - low-level - very performant (with omalloc_Bin's)
+ * - high-level - link against libomalloc and use the usual malloc and free
  *
  * For more details see
  * <A HREF="https://OMALLOC_MANUAL_URL?">Detailed manual?</A>
  *
  * Note that this package has no further dependencies, 
- * while it is used by the rest of Singular packages (\ref factory_page, \ref libpolys_page, \ref kernel_page, \ref singular_page)
+ * while it is used by the rest of Singular packages 
+ * - \ref factory_page 
+ * - \ref libpolys_page
+ * - \ref kernel_page
+ * - \ref singular_page
  * 
  */

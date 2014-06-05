@@ -1,22 +1,20 @@
-/*! \mainpage Singular 
- *
- * <A HREF="http://www.singular.uni-kl.de">CAS Singular</A>
- *
- * Main source repository is on github. 
- * For more manuals see <A HREF="https://github.com/Singular/Sources/wiki/">WIKI</A>.
- *
- * Singular package diagram with dependencies is as follows:
- * \dotfile Includes.dot "Package diagram"
- *
- * Introductory description of separate packages follows:
- *
- * \tableofcontents
- * 
- * \subpage omalloc_page 
- * \subpage resources_page
- * \subpage factory_page
- * \subpage libpolys_page
- * \subpage kernel_page
- * \subpage singular_page
- *
+/*! \mainpage Singular kernel developers manual
+
+This is a developers manual for the internals of <A
+HREF="http://www.singular.uni-kl.de">Compute Algebra System
+Singular</A>, with main <A
+HREF="https://github.com/Singular/Sources/">source repository</A>.
+For more manuals see <A HREF="https://github.com/Singular/Sources/wiki/">WIKI</A>.
+
+Separate top-level packages are as follows (also see the diagram below):
+- \subpage omalloc_page 
+- \subpage resources_page 
+- \subpage factory_page 
+- \subpage libpolys_page 
+- \subpage kernel_page 
+- \subpage singular_page
+
+Dependencies between Singular packages are as follows:
+\dotfile Includes.dot Package dependency diagram
+
  */
