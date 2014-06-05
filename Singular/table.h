@@ -1155,6 +1155,7 @@ struct sValAssign dAssign[]=
 ,{D(jiA_QRING),    QRING_CMD,      IDEAL_CMD }
 ,{D(jiA_RING),     RING_CMD,       RING_CMD }
 ,{D(jiA_RING),     QRING_CMD,      QRING_CMD }
+,{D(jiA_RING),     QRING_CMD,      RING_CMD }
 ,{D(jiA_STRING),   STRING_CMD,     STRING_CMD }
 ,{D(jiA_PROC),     PROC_CMD,       STRING_CMD }
 ,{D(jiA_PROC),     PROC_CMD,       PROC_CMD }
