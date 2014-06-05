@@ -5143,12 +5143,13 @@ static proc reconvList(list l)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc primdecGTZ(ideal i, list #)
-"USAGE:   primdecGTZ(i); i ideal
+"USAGE:   primdecGTZ(I); I ideal
 RETURN:  a list pr of primary ideals and their associated primes:
 @format
    pr[i][1]   the i-th primary component,
    pr[i][2]   the i-th prime component.
 @end format
+The primary ideals form a (not necessarily irredundant) primary decomposition of I.
 NOTE:    - Algorithm of Gianni/Trager/Zacharias.
          - Designed for characteristic 0, works also in char k > 0, if it
            terminates (may result in an infinite loop in small characteristic!)
@@ -5389,6 +5390,7 @@ RETURN:  a list pr of primary ideals and their associated primes:
    pr[i][1]   the i-th primary component,
    pr[i][2]   the i-th prime component.
 @end format
+The primary ideals form a (not necessarily irredundant) primary decomposition of I.
 NOTE:    Algorithm of Shimoyama/Yokoyama.
 @format
    if c=0,  the given ordering of the variables is used,
