@@ -111,8 +111,6 @@ struct sConvertTypes
 #define jjWRONG   1
 #define jjWRONG2  1
 #define jjWRONG3  1
-#define XS(A) A
-
 
 #define D(A)     2
 #define NULL_VAL 0

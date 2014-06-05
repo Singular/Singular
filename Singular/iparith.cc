@@ -5304,67 +5304,6 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
   return TRUE;
 }
 
-#ifdef INIT_BUG
-#define XS(A) -((short)A)
-#define jjstrlen       (proc1)1
-#define jjpLength      (proc1)2
-#define jjidElem       (proc1)3
-#define jjidFreeModule (proc1)5
-#define jjidVec2Ideal  (proc1)6
-#define jjrCharStr     (proc1)7
-#ifndef MDEBUG
-#define jjpHead        (proc1)8
-#endif
-#define jjidMinBase    (proc1)11
-#define jjsyMinBase    (proc1)12
-#define jjpMaxComp     (proc1)13
-#define jjmpTrace      (proc1)14
-#define jjmpTransp     (proc1)15
-#define jjrOrdStr      (proc1)16
-#define jjrVarStr      (proc1)18
-#define jjrParStr      (proc1)19
-#define jjCOUNT_RES    (proc1)22
-#define jjDIM_R        (proc1)23
-#define jjidTransp     (proc1)24
-
-extern struct sValCmd1 dArith1[];
-void jjInitTab1()
-{
-  int i=0;
-  for (;dArith1[i].cmd!=0;i++)
-  {
-    if (dArith1[i].res<0)
-    {
-      switch ((int)dArith1[i].p)
-      {
-        case (int)jjstrlen:       dArith1[i].p=(proc1)strlen; break;
-        case (int)jjpLength:      dArith1[i].p=(proc1)pLength; break;
-        case (int)jjidElem:       dArith1[i].p=(proc1)idElem; break;
-        case (int)jjidVec2Ideal:  dArith1[i].p=(proc1)idVec2Ideal; break;
-        case (int)jjidFreeModule: dArith1[i].p=(proc1)idFreeModule; break;
-        case (int)jjrCharStr:     dArith1[i].p=(proc1)rCharStr; break;
-#ifndef MDEBUG
-        case (int)jjpHead:        dArith1[i].p=(proc1)pHeadProc; break;
-#endif
-        case (int)jjidMinBase:    dArith1[i].p=(proc1)idMinBase; break;
-        case (int)jjsyMinBase:    dArith1[i].p=(proc1)syMinBase; break;
-        case (int)jjpMaxComp:     dArith1[i].p=(proc1)pMaxCompProc; break;
-        case (int)jjmpTrace:      dArith1[i].p=(proc1)mpTrace; break;
-        case (int)jjmpTransp:     dArith1[i].p=(proc1)mpTransp; break;
-        case (int)jjrOrdStr:      dArith1[i].p=(proc1)rOrdStr; break;
-        case (int)jjrVarStr:      dArith1[i].p=(proc1)rVarStr; break;
-        case (int)jjrParStr:      dArith1[i].p=(proc1)rParStr; break;
-        case (int)jjCOUNT_RES:    dArith1[i].p=(proc1)sySize; break;
-        case (int)jjDIM_R:        dArith1[i].p=(proc1)syDim; break;
-        case (int)jjidTransp:     dArith1[i].p=(proc1)idTransp; break;
-        default: Werror("missing proc1-definition for %d",(int)(long)dArith1[i].p);
-      }
-    }
-  }
-}
-#else
-#if defined(PROC_BUG)
-#define XS(A) A
 static BOOLEAN jjstrlen(leftv res, leftv v)
 {
   res->data = (char *)strlen((char *)v->Data());
@@ -5462,29 +5401,6 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
   res->data = (char *)idTransp((ideal)v->Data());
   return FALSE;
 }
-#else
-#define XS(A)          -((short)A)
-#define jjstrlen       (proc1)strlen
-#define jjpLength      (proc1)pLength
-#define jjidElem       (proc1)idElem
-#define jjidFreeModule (proc1)idFreeModule
-#define jjidVec2Ideal  (proc1)idVec2Ideal
-#define jjrCharStr     (proc1)rCharStr
-#ifndef MDEBUG
-#define jjpHead        (proc1)pHeadProc
-#endif
-#define jjidHead       (proc1)idHead
-#define jjidMinBase    (proc1)idMinBase
-#define jjsyMinBase    (proc1)syMinBase
-#define jjpMaxComp     (proc1)pMaxCompProc
-#define jjrOrdStr      (proc1)rOrdStr
-#define jjrVarStr      (proc1)rVarStr
-#define jjrParStr      (proc1)rParStr
-#define jjCOUNT_RES    (proc1)sySize
-#define jjDIM_R        (proc1)syDim
-#define jjidTransp     (proc1)idTransp
-#endif
-#endif
 static BOOLEAN jjnInt(leftv res, leftv u)
 {
   number n=(number)u->CopyD(); // n_Int may call n_Normalize
@@ -8045,16 +7961,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         }
         if (traceit&TRACE_CALL)
           Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(at));
-        if (r<0)
-        {
-          res->rtyp=-r;
-          #ifdef PROC_BUG
-          dArith1[i].p(res,a);
-          #else
-          res->data=(char *)((Proc1)dArith1[i].p)((char *)a->Data());
-          #endif
-        }
-        else if ((call_failed=dArith1[i].p(res,a)))
+        if ((call_failed=dArith1[i].p(res,a)))
         {
           break;// leave loop, goto error handling
         }
@@ -8085,26 +7992,10 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
           {
             if (check_valid(dArith1[i].valid_for,op)) break;
           }
-          if (r<0)
-          {
-            res->rtyp=-r;
-            failed= iiConvert(at,dArith1[i].arg,ai,a,an);
-            if (!failed)
-            {
-              if (traceit&TRACE_CALL)
-                Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(dArith1[i].arg));
-              #ifdef PROC_BUG
-              dArith1[i].p(res,a);
-              #else
-              res->data=(char *)((Proc1)dArith1[i].p)((char *)an->Data());
-              #endif
-            }
-          }
-          else
-          {
-            failed= ((iiConvert(at,dArith1[i].arg,ai,a,an))
-            || (call_failed=dArith1[i].p(res,an)));
-          }
+          if (traceit&TRACE_CALL)
+            Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(dArith1[i].arg));
+          failed= ((iiConvert(at,dArith1[i].arg,ai,a,an))
+          || (call_failed=dArith1[i].p(res,an)));
           // everything done, clean up temp. variables
           if (failed)
           {
