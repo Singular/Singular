@@ -133,6 +133,15 @@ CFList evalPoints (const CanonicalForm& F, CFList& eval, Evaluation& E)
       E.nextpoint();
       continue;
     }
+    contentx= content (iter.getItem());
+    if (degree (contentx) > 0)
+    {
+      result= CFList();
+      eval= CFList();
+      LCFeval= CFList();
+      E.nextpoint();
+      continue;
+    }
     found= true;
   }
   while (!found);
