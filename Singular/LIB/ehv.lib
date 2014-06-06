@@ -1414,7 +1414,7 @@ example
 /////////////////////////////////////////////////////////////////////
 proc primDecsAreEquivalent(list L, list K)
 "USAGE:   primDecsAreEquivalent(L,K); L,K list of ideals
-RETURN:  integer, 1 if the lists are the same up to ordering and 0 otherwise
+RETURN:  integer, 1 if the lists are the same up to ordering and redundant components; 0 otherwise
 EXAMPLE: example primDecsAreEquivalent; shows an example"
 {
   L = removeRedundantComponents(L);
