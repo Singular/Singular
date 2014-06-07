@@ -14,6 +14,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+// need global defines:
+#include "kernel/mod2.h"
 // need to include all tokens: *_CMD:
 #include "grammar.h"
 #include "tok.h"
@@ -34,7 +36,7 @@
 // bit 3 for zerodivisors
 #define NO_ZERODIVISOR   8
 #define ALLOW_ZERODIVISOR  0
- #define ZERODIVISOR_MASK 8
+#define ZERODIVISOR_MASK 8
 
 // bit 4 for warning, if used at toplevel
 #define WARN_RING        16
