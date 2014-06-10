@@ -208,6 +208,8 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
   CanonicalForm result = 0;
   int e, n = rVar(r);
 
+  p=pReverse(p);
+  poly op=p;
   while ( p!=NULL)
   {
     CanonicalForm term;
@@ -242,6 +244,7 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
     else
     {
       WerrorS("conversion error");
+      op=pReverse(op);
       return result;
     }
     for ( int i = n; i >0; i-- )
@@ -252,6 +255,7 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
     result += term;
     pIter( p );
   }
+  op=pReverse(op);
   return result;
 }
 
