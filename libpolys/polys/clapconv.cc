@@ -91,6 +91,7 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
   BOOLEAN setChar=TRUE;
 
   p=pReverse(p);
+  poly op=p;
   while ( p!=NULL )
   {
     CanonicalForm term;
@@ -105,6 +106,7 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
     result += term;
     pIter( p );
  }
+ op=pReversee(op);
  return result;
 }
 
