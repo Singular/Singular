@@ -1,0 +1,78 @@
+The structure pointed to by "coeffs" describes a commutative ring with 1
+which could be used as coeffcients for polynomials.
+
+To create a new representant of coeffs, implement all of the following
+properties/functions and register it via nRegister(n_unknown,<InitCharFunc>)
+
+properties(mandatory):
+-has_simple_Alloc (i.e. number is not a pointer)
+-has_simple_Inverse
+-is_field
+-is_domain
+
+mandatory:
+-cfCoeffWrite
+-cfCoeffString
+-cfMult, cfSub ,cfAdd ,cfDiv
+-cfInit
+-cfInt
+-cfMPZ
+-cfInpNeg
+-cfInvers
+-cfWriteLong
+-cfRead
+-cfGreater
+-cfEqual
+-cfIsZero
+-cfIsOne
+-cfIsMOne
+-cfGreaterZero
+-cfPower
+-cfSetMap
+-cfQuot1
+-ch
+
+mandatory for certain types of coeffs:
+-nCoeffIsEqual: if cfInitChar really uses its additional parameter
+-cfKillChar: if additional initializations have to be undone (data, etc)
+-cfSetChar: if additional initializations to use numbers from this coeffs is needed (should not be needed)
+-cfIntDiv, cfIntMod: if the ring has a meaningful Euclidean structure
+-cfGcd, cfExtGcd,cfXExtGcd,cfEucNorm: if the ring (or a subring)  has a meaningful Euclidean structure
+-cfAnn: in a principal ideal ring (with zero divisors)
+-cfWriteFd,cfReadFd: for use of ssi
+-cfDelete: if has_simple_Alloc==0, otherwise noop
+-cfCopy: if has_simple_Alloc==0, otherwise trivial
+-iNumberOfParameters (otherwise 0)
+-pParameterNames (otherwise NULL)
+-if cf is not a field: cfDivComp, cfIsUnit, cfGetUnit, cfDivBy
+-cfDBTest: for debugging, noop otherwise
+-cfInitMPZ: otherwise via cfInit
+
+optional:
+-cfExactDiv (otherwise: it is cfDiv): for optimization
+-cfSize (otherwise: !cfIsZero(..))
+-cfRePart (otherwise: cfCopy)
+-cfImPart (otherwise returns cfInit(0))
+-cfWriteShort (otherwise: cfWriteLong)
+-cfNormalize (otherwise: noop)
+-cfGetDenom (otherwise cfInit(1))
+-cfGetNumerator (otherwiser cfCopy)
+-cfName (otherwise return NULL)
+-cfInpMult (otherwise via cfMult/cfDelet): for optimization
+-cfInpAdd (otherwise via cfAdd/cfDelet): for optimization
+-cfFarey,cfChineseRemainder (otherwise: error)
+-cfParDeg (otherwise: -1 for 0, 0 for non-zero)
+-cfParameter (otherwise: error)
+-cfInit_bigint (otherwise: error)
+
+automatic:
+-nNULL (by nInitChar)
+-ref (by nInitChar,nKillChar)
+-type (by nInitChar)
+to describe:
+-cfLcm
+-cfQuotRem
+-cfRandom
+-cfClearContent
+-cfClearDenominators
+
