@@ -327,13 +327,6 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
           {
             output->name=nName(pGetCoeff((poly)input->data));
           }
-#ifdef TEST
-          else
-          {
-            WerrorS("wrong name, should not happen");
-            output->name=omStrDup("?");
-          }
-#endif
         }
       }
       else if ((input->rtyp==NUMBER_CMD) && (input->name==NULL))
