@@ -563,6 +563,20 @@ void ttGen2b()
   ,id_nr);
   fclose(outfile);
 }
+int is_ref_cmd(cmdnames *c)
+{
+  if( c->tokval==0) return 0;
+  if (c->alias > 0) return 0;
+  if  ((c->toktype==CMD_1)
+        || (c->toktype==CMD_2)
+        || (c->toktype==CMD_3)
+        || (c->toktype==CMD_M)
+        || (c->toktype==CMD_12)
+        || (c->toktype==CMD_13)
+        || (c->toktype==CMD_23)
+        || (c->toktype==CMD_123)) return 1;
+  return 0;
+}
 void ttGen2c()
 {
   int cmd_size = (sizeof(cmds)/sizeof(cmdnames))-1;
@@ -576,7 +590,7 @@ void ttGen2c()
   for(m=0; m<cmd_size; m++)
   {
     // assume that cmds[0].tokval== -1 and all others with tokval -1 at the end
-    if(cmds[m].tokval>0)
+    if(is_ref_cmd(&(cmds[m])))
     {
       fprintf(outfile,"* %s::\n",cmds[m].name);
     }
@@ -585,16 +599,20 @@ void ttGen2c()
   for(m=0; m<cmd_size; m++)
   {
     // assume that cmds[0].tokval== -1 and all others with tokval -1 at the end
-    if(cmds[m].tokval>0)
+    if(is_ref_cmd(&(cmds[m])))
     {
       fprintf(outfile,"@node %s,",cmds[m].name);
       // next:
-      if (cmds[m+1].tokval>0)
-        fprintf(outfile,"%s,",cmds[m+1].name);
+      int mm=m-1;
+      while((mm>0)&& (is_ref_cmd(&cmds[mm]))) mm--;
+      if((mm>0)&& (is_ref_cmd(&cmds[mm])))
+        fprintf(outfile,"%s,",cmds[mm].name);
       else
         fprintf(outfile,",");
       // prev:
-      if (cmds[m-1].tokval>0)
+      mm=m+1;
+      while((mm>0)&& (is_ref_cmd(&cmds[mm]))) mm++;
+      if((mm>0)&& (is_ref_cmd(&cmds[mm])))
         fprintf(outfile,"%s,",cmds[m-1].name);
       else
         fprintf(outfile,",");
@@ -870,12 +888,18 @@ void ttGen4()
 }
 /*-------------------------------------------------------------------*/
 
-int main()
+int main(int argc, char** argv)
 {
-  //ttGen4();
-  ttGen1();
-  ttGen2b();
-  //ttGen2c();
-  rename(iparith_inc,"iparith.inc");
+  if (argc>1)
+  {
+    ttGen4();
+    ttGen2c();
+  }
+  else
+  {
+    ttGen1();
+    ttGen2b();
+    rename(iparith_inc,"iparith.inc");
+  }
   return 0;
 }
