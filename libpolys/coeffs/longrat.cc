@@ -2975,6 +2975,9 @@ BOOLEAN nlCoeffIsEqual(const coeffs r, n_coeffType n, void *p)
 
 BOOLEAN nlInitChar(coeffs r, void*p)
 {
+  r->is_field=TRUE;
+  r->is_domain=TRUE;
+
   assume( getCoeffType(r) == ID );
   //const int ch = (int)(long)(p);
 

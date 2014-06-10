@@ -117,6 +117,10 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
      is a GMP number */
   r->ch = mpz_get_ui(r->modNumber);
 
+  r->is_field=FALSE;
+  r->is_domain=FALSE;
+
+
   r->cfCoeffString = nrnCoeffString;
 
   r->cfInit        = nrnInit;

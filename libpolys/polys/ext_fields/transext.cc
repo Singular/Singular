@@ -2422,6 +2422,10 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   /* propagate characteristic up so that it becomes
      directly accessible in cf: */
   cf->ch = R->cf->ch;
+
+  cf->is_field=TRUE;
+  cf->is_domain=TRUE;
+
   cf->factoryVarOffset = R->cf->factoryVarOffset + rVar(R);
   extern char* naCoeffString(const coeffs r);
   cf->cfCoeffString = naCoeffString;

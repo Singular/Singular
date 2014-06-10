@@ -301,6 +301,7 @@ BOOLEAN nAEQClearDenominators  (number, const coeffs)
 
 BOOLEAN n_QAEInitChar(coeffs r, void *)
 {
+    // r->is_field,is_domain?
     r->ch=0;
     r->cfKillChar=NULL;
     r->nCoeffIsEqual=ndCoeffIsEqual;

@@ -91,13 +91,12 @@ typedef struct
 
 struct n_Procs_s
 {
+   // administration of coeffs:
    coeffs next;
-   /*unsigned int ringtype;   =0 => coefficient field,
-                             !=0 => coeffs from one of the rings:
-                              =1 => Z/2^mZ
-                              =2 => Z/nZ, n not a prime
-                              =3 => Z/p^mZ
-                              =4 => Z */
+   int     ref;
+   n_coeffType type;
+   /// how many variables of factory are already used by this coeff
+   int     factoryVarOffset;
 
    // general properties:
    /// TRUE, if nNew/nDelete/nCopy are dummies
@@ -105,6 +104,11 @@ struct n_Procs_s
    /// TRUE, if std should make polynomials monic (if nInvers is cheap)
    /// if false, then a gcd routine is used for a content computation
    BOOLEAN has_simple_Inverse;
+
+   /// TRUE, if cf is a field
+   BOOLEAN is_field;
+   /// TRUE, if cf is a domain
+   BOOLEAN is_domain;
 
    // tests for numbers.cc:
    BOOLEAN (*nCoeffIsEqual)(const coeffs r, n_coeffType n, void * parameter);
@@ -282,11 +286,6 @@ struct n_Procs_s
 
    /// the 0 as constant, NULL by default
    number nNULL;
-   int     ref;
-   /// how many variables of factort are already used by this coeff
-   int     factoryVarOffset;
-   n_coeffType type;
-
 
    /// Number of Parameters in the coeffs (default 0)
    int iNumberOfParameters;
@@ -706,17 +705,13 @@ static inline BOOLEAN nCoeff_is_Ring_Z(const coeffs r)
 { assume(r != NULL); return (getCoeffType(r)==n_Z); }
 
 static inline BOOLEAN nCoeff_is_Ring(const coeffs r)
-{ assume(r != NULL); return ((getCoeffType(r)==n_Z) || (getCoeffType(r)==n_Z2m) || (getCoeffType(r)==n_Zn) || (getCoeffType(r)==n_Znm)); }
+{ assume(r != NULL); return (r->is_field==0); }
 
-/// returns TRUE, if r is not a field and r has no zero divisors (i.e is a domain)
+/// returns TRUE, if r is a field or r has no zero divisors (i.e is a domain)
 static inline BOOLEAN nCoeff_is_Domain(const coeffs r)
 {
   assume(r != NULL);
-#ifdef HAVE_RINGS
-  return (getCoeffType(r)==n_Z || ((getCoeffType(r)!=n_Z2m) && (getCoeffType(r)!=n_Zn) && (getCoeffType(r)!=n_Znm)));
-#else
-  return TRUE;
-#endif
+  return (r->is_domain);
 }
 
 /// test whether 'a' is divisible 'b';

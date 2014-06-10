@@ -404,6 +404,10 @@ coeffs nrzQuot1(number c, const coeffs r)
 BOOLEAN nrzInitChar(coeffs r,  void *)
 {
   assume( getCoeffType(r) == ID );
+
+  r->is_field=FALSE;
+  r->is_domain=TRUE;
+
   r->nCoeffIsEqual = ndCoeffIsEqual;
   r->cfCoeffString = nrzCoeffString;
   r->cfKillChar = ndKillChar;
