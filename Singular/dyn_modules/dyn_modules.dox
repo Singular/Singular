@@ -1,8 +1,13 @@
 /*! \page dynmodules_page Dynamic modules
- * 
- * Dynamic interpretor (\ref singular_page) extensions which may contain mathematical algorithms (like \ref kernel_page) and also define new data structures (like \ref libpolys_page)
- * 
- * \subpage bigintm
- * \subpage syzextra
- * \subpage call
- */
+ 
+ Dynamic interpretor (\ref singular_page) extensions which may contain
+ mathematical algorithms (like \ref kernel_page) 
+ and also define new data structures (like \ref libpolys_page).
+ 
+ - \subpage bigintm
+ - \subpage syzextra
+ - \subpage pyobject
+ - \subpage callgfanlib
+ - \subpage callpolymake
+ - \subpage singmathic
+*/
