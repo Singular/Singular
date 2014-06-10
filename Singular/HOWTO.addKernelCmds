@@ -78,3 +78,22 @@ Remark: valid types for return type/arguments type are:
     ANY_TYPE: the jjBLA* routine decides about the return type
       (including NONE)
 
+Remark: the order of these lines is important:
+  first the interpreter tries a perfect match of the data types,
+  but, if none is found, the second pass tries automatic type conversion
+  starting with the first line:
+  for example: bla(<matrix>,<module>)
+  ,{D(jjBLAH21),   BLA_CMD,   <return type>,  MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
+  ,{D(jjBLAH22),   BLA_CMD,   <return type>,  MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
+  would call jjBLAH21, while
+  ,{D(jjBLAH22),   BLA_CMD,   <return type>,  MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
+  ,{D(jjBLAH21),   BLA_CMD,   <return type>,  MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
+  would call jjBLAH22.
+  If certain conversions should not be allowed, add a line/several lines like:
+  ,{jjWRONG,   BLA_CMD,   NONE,  MATRIX_CMD, MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
+  at the end of the block with operations for "bla".
+
+Remark: alias: 0: normal reserved word
+               1: alias for an reserver word: allowed as input, never as output
+	       2: outdated alias: allowed as input, never as output,
+	          output a warning at first use
