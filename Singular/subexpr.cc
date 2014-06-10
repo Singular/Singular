@@ -129,6 +129,7 @@ void sleftv::Print(leftv store, int spaces)
         case INTMAT_CMD:
           ((intvec *)d)->show(t,spaces);
           break;
+        case CMATRIX_CMD:
         case BIGINTMAT_CMD:
           ((bigintmat *)d)->pprint(80);
           break;
@@ -402,6 +403,7 @@ static inline void * s_internalCopy(const int t,  void *d)
     case INTVEC_CMD:
     case INTMAT_CMD:
       return (void *)ivCopy((intvec *)d);
+    case CMATRIX_CMD:
     case BIGINTMAT_CMD:
       return (void*)bimCopy((bigintmat *)d);
     case MATRIX_CMD:
@@ -987,8 +989,11 @@ int  sleftv::Typ()
   }
   int r=0;
   int t=rtyp;
-  if (t==IDHDL) t=IDTYP((idhdl)data);
-  else if (t==ALIAS_CMD) { idhdl h=(idhdl)IDDATA((idhdl)data); t=IDTYP(h); }
+  void *d=data;
+  if (t==IDHDL)
+  { t=IDTYP((idhdl)data);d=IDDATA((idhdl)data); }
+  else if (t==ALIAS_CMD)
+  { idhdl h=(idhdl)IDDATA((idhdl)data); t=IDTYP(h); d=IDDATA(h);}
   switch (t)
   {
     case INTVEC_CMD:
@@ -998,6 +1003,14 @@ int  sleftv::Typ()
     case BIGINTMAT_CMD:
       r=BIGINT_CMD;
       break;
+    case CMATRIX_CMD:
+    {
+      bigintmat *b=(bigintmat*)d;
+      if ((currRing!=NULL)&&(currRing->cf==b->basecoeffs()))
+        return NUMBER_CMD;
+      else
+        return NUMBER2_CMD;
+    }
     case IDEAL_CMD:
     case MATRIX_CMD:
     case MAP_CMD:
@@ -1258,7 +1271,7 @@ void * sleftv::Data()
         if (!errorreported)
           Werror("wrong range[%d,%d] in matrix %s(%dx%d)",
                   index,e->next->start,
-		  this->Name(),
+                  this->Name(),
                   MATROWS((matrix)d),MATCOLS((matrix)d));
       }
       else

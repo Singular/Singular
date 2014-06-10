@@ -862,6 +862,7 @@ cmdnames cmds[] =
   { "chinrem",     0, CHINREM_CMD ,       CMD_2},
   { "cleardenom",  0, CONTENT_CMD ,       CMD_1},
   { "close",       0, CLOSE_CMD ,         CMD_1},
+  { "cmatrix",     0, CMATRIX_CMD ,       ROOT_DECL_LIST},
   { "coef",        0, COEF_CMD ,          CMD_M},
   { "coeffs",      0, COEFFS_CMD ,        CMD_23},
   { "continue",    0, CONTINUE_CMD ,      CONTINUE_CMD},
