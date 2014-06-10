@@ -326,6 +326,7 @@ BOOLEAN nAEpClearDenominators  (number, const coeffs)
 
 BOOLEAN n_pAEInitChar(coeffs r, void *p)
 {
+    // r->is_field, is_domain
     //Charakteristik abgreifen!
     const int c = (int) (long) p;
 

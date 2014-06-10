@@ -834,6 +834,8 @@ static number nfRandom(number ,number, const coeffs cf)
 
 BOOLEAN nfInitChar(coeffs r,  void * parameter)
 {
+  r->is_field=TRUE;
+  r->is_domain=TRUE;
   //r->cfInitChar=npInitChar;
   r->cfKillChar=nfKillChar;
   r->nCoeffIsEqual=nfCoeffIsEqual;

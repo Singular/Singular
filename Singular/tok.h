@@ -7,9 +7,6 @@
 * ABSTRACT: tokens, types for interpreter; general macros
 */
 
-#ifndef MYYSTYPE
-#include <kernel/structs.h>
-#endif
 #ifndef UMINUS
 #include <Singular/grammar.h>
 #endif
@@ -36,7 +33,6 @@ extern int  yyparse(void);
 #define COMMAND           UMINUS+2 /* in tok.h */
 #define ANY_TYPE          UMINUS+3
 #define IDHDL             UMINUS+4
-#define NSHDL             UMINUS+5
 
 enum {
   ALIAS_CMD     = UMINUS + 15,

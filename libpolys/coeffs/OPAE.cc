@@ -308,6 +308,7 @@ BOOLEAN nAEClearDenominators  (number, const coeffs)
 
 BOOLEAN n_AEInitChar(coeffs r, void *)
 {
+    // r->is_field, r->is_domain?
     r->ch = 0;
     r->cfKillChar=NULL;
     r->nCoeffIsEqual=ndCoeffIsEqual;
