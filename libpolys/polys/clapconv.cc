@@ -106,7 +106,7 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
     result += term;
     pIter( p );
  }
- op=pReversee(op);
+ op=pReverse(op);
  return result;
 }
 
