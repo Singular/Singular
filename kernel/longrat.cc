@@ -756,17 +756,15 @@ number nlIntMod (number a, number b)
   u->debug=123456;
 #endif
   u->s = 3;
-  assume(a->s==3);
-  assume(b->s==3);
   mpz_init(u->z);
   mpz_mod(u->z,aa,bb);
   if (SR_HDL(a) & SR_INT)
   {
-    mpz_clear(aa);
+    mpz_clear(a_r);
   }
   if (SR_HDL(b) & SR_INT)
   {
-    mpz_clear(bb);
+    mpz_clear(b_r);
   }
   u=nlShort3(u);
   nlTest(u);
