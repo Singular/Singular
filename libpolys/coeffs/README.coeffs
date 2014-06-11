@@ -36,7 +36,7 @@ mandatory for certain types of coeffs:
 -nCoeffIsEqual: if cfInitChar really uses its additional parameter
 -cfKillChar: if additional initializations have to be undone (data, etc)
 -cfSetChar: if additional initializations to use numbers from this coeffs is needed (should not be needed)
--cfIntDiv, cfIntMod: if the ring has a meaningful Euclidean structure
+-cfIntMod: if the ring has a meaningful Euclidean structure
 -cfGcd, cfExtGcd,cfXExtGcd,cfEucNorm: if the ring (or a subring)  has a meaningful Euclidean structure
 -cfAnn: in a principal ideal ring (with zero divisors)
 -cfWriteFd,cfReadFd: for use of ssi

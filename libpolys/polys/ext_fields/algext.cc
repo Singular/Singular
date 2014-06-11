@@ -1473,7 +1473,6 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfSize         = naSize;
   cf->nCoeffIsEqual  = naCoeffIsEqual;
   cf->cfInvers       = naInvers;
-  cf->cfIntDiv       = naDiv; // ???
   cf->convFactoryNSingN=naConvFactoryNSingN;
   cf->convSingNFactoryN=naConvSingNFactoryN;
   cf->cfParDeg = naParDeg;
@@ -1519,6 +1518,63 @@ number npolyMult(number a, number b, const coeffs cf)
   return (number)aTimesB;
 }
 
+void npolyPower(number a, int exp, number *b, const coeffs cf)
+{
+  naTest(a);
+
+  /* special cases first */
+  if (a == NULL)
+  {
+    if (exp >= 0) *b = NULL;
+    else          WerrorS(nDivBy0);
+    return;
+  }
+  else if (exp ==  0) { *b = naInit(1, cf); return; }
+  else if (exp ==  1) { *b = naCopy(a, cf); return; }
+  else if (exp == -1) { *b = naInvers(a, cf); return; }
+
+  int expAbs = exp; if (expAbs < 0) expAbs = -expAbs;
+
+  /* now compute a^expAbs */
+  poly pow; poly aAsPoly = (poly)a;
+  if (expAbs <= 7)
+  {
+    pow = p_Copy(aAsPoly, naRing);
+    for (int i = 2; i <= expAbs; i++)
+    {
+      pow = p_Mult_q(pow, p_Copy(aAsPoly, naRing), naRing);
+    }
+  }
+  else
+  {
+    pow = p_ISet(1, naRing);
+    poly factor = p_Copy(aAsPoly, naRing);
+    while (expAbs != 0)
+    {
+      if (expAbs & 1)
+      {
+        pow = p_Mult_q(pow, p_Copy(factor, naRing), naRing);
+      }
+      expAbs = expAbs / 2;
+      if (expAbs != 0)
+      {
+        factor = p_Mult_q(factor, p_Copy(factor, naRing), naRing);
+      }
+    }
+    p_Delete(&factor, naRing);
+  }
+
+  /* invert if original exponent was negative */
+  number n = (number)pow;
+  if (exp < 0)
+  {
+    number m = npolyInvers(n, cf);
+    naDelete(&n, cf);
+    n = m;
+  }
+  *b = n;
+}
+
 number npolyDiv(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
@@ -1548,6 +1604,8 @@ BOOLEAN npolyInitChar(coeffs cf, void * infoStruct)
   /* propagate characteristic up so that it becomes
      directly accessible in cf: */
   cf->ch = R->cf->ch;
+  cf->is_field=FALSE;
+  cf->is_domain=TRUE;
 
   cf->cfCoeffString = naCoeffString;
 
@@ -1594,7 +1652,6 @@ BOOLEAN npolyInitChar(coeffs cf, void * infoStruct)
   cf->cfSize         = naSize;
   cf->nCoeffIsEqual  = naCoeffIsEqual;
   cf->cfInvers       = npolyInvers;
-  cf->cfIntDiv       = npolyDiv;
   cf->convFactoryNSingN=naConvFactoryNSingN;
   cf->convSingNFactoryN=naConvSingNFactoryN;
   cf->cfParDeg = naParDeg;

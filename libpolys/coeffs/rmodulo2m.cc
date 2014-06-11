@@ -125,7 +125,6 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfSub         = nr2mSub;
   r->cfMult        = nr2mMult;
   r->cfDiv         = nr2mDiv;
-  r->cfIntDiv      = nr2mIntDiv;
   r->cfAnn         = nr2mAnn;
   r->cfIntMod      = nr2mMod;
   r->cfExactDiv    = nr2mDiv;

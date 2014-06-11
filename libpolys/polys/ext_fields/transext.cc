@@ -129,7 +129,6 @@ number   ntLcm(number a, number b, const coeffs cf);
 int      ntSize(number a, const coeffs cf);
 void     ntDelete(number * a, const coeffs cf);
 void     ntCoeffWrite(const coeffs cf, BOOLEAN details);
-number   ntIntDiv(number a, number b, const coeffs cf);
 const char * ntRead(const char *s, number *a, const coeffs cf);
 static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 
@@ -1196,7 +1195,7 @@ void handleNestedFractionsOverQ(fraction f, const coeffs cf)
       while ((p != NULL) && (!n_IsOne(gcdOfCoefficients, ntCoeffs)))
       {
         c = p_GetCoeff(p, ntRing);
-        tmp = n_Gcd(c, gcdOfCoefficients, ntCoeffs);
+        tmp = nlGcd(c, gcdOfCoefficients, ntCoeffs);
         n_Delete(&gcdOfCoefficients, ntCoeffs);
         gcdOfCoefficients = tmp;
         pIter(p);
@@ -1205,7 +1204,7 @@ void handleNestedFractionsOverQ(fraction f, const coeffs cf)
       while ((p != NULL) && (!n_IsOne(gcdOfCoefficients, ntCoeffs)))
       {
         c = p_GetCoeff(p, ntRing);
-        tmp = n_Gcd(c, gcdOfCoefficients, ntCoeffs);
+        tmp = nlGcd(c, gcdOfCoefficients, ntCoeffs);
         n_Delete(&gcdOfCoefficients, ntCoeffs);
         gcdOfCoefficients = tmp;
         pIter(p);
@@ -2467,7 +2466,6 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfSize         = ntSize;
   cf->nCoeffIsEqual  = ntCoeffIsEqual;
   cf->cfInvers       = ntInvers;
-  cf->cfIntDiv       = ntDiv;
   cf->cfKillChar     = ntKillChar;
 
   if( rCanShortOut(ntRing) )

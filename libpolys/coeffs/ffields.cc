@@ -840,7 +840,6 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->cfSub   = nfSub;
   r->cfAdd   = nfAdd;
   r->cfDiv   = nfDiv;
-  r->cfIntDiv= nfDiv;
   //r->cfIntMod= ndIntMod;
   r->cfExactDiv= nfDiv;
   r->cfInit = nfInit;

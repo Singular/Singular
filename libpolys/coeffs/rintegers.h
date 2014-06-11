@@ -29,7 +29,7 @@ BOOLEAN nrzIsMOne      (number a, const coeffs r);
 BOOLEAN nrzIsUnit      (number a, const coeffs r);
 number  nrzGetUnit     (number a, const coeffs r);
 number  nrzDiv         (number a, number b, const coeffs r);
-number  nrzIntDiv      (number a, number b, const coeffs r);
+number  nrzExactDiv    (number a, number b, const coeffs r);
 number  nrzIntMod      (number a, number b, const coeffs r);
 number  nrzNeg         (number c, const coeffs r);
 number  nrzInvers      (number c, const coeffs r);

@@ -529,7 +529,6 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   r->cfSub   = nlSub;
   r->cfAdd   = nlAdd;
   r->cfDiv   = nlDiv;
-  r->cfIntDiv= nlIntDiv;
   r->cfIntMod= nlIntMod;
   r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;
