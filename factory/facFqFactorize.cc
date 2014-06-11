@@ -2989,11 +2989,6 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     }
     else
     {
-      if (swapLevel == 1)
-      {
-        swapLevel= i;
-        bufA= swapvar (A, x, z);
-      }
       gcdDerivZ= gcd (bufA, derivZ);
       if (degree (gcdDerivZ) > 0 && !derivZ.isZero())
       {
@@ -3008,6 +3003,11 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
       else
       {
+        if (swapLevel == 1)
+        {
+          swapLevel= i;
+          bufA= swapvar (A, x, z);
+        }
         A= bufA;
         break;
       }
