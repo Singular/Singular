@@ -1,11 +1,12 @@
-#ifndef COEFFS_H
-#define COEFFS_H
+/*!
+ \file coeffs/coeffs.h Coeff. Rings and Fields (interface)
+*/
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
-* ABSTRACT
-*/
+
+#ifndef COEFFS_H
+#define COEFFS_H
 
 #include <misc/auxiliary.h>
 /* for assume: */
