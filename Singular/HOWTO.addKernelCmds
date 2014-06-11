@@ -19,7 +19,7 @@ Example: bla
 - add a line describing the name, the token and the tok_type
   to array cmds in Singular/table.h:
   { "bla", 0, BLA_CMD, CMD_1},
-  (the arry is sorted by the name).
+  (the array is sorted by the name).
 
 - choose the requirements: one from each group, combined by |
   ALLOW_PLURAL: non-commutative rings allowed

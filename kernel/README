@@ -1,12 +1,3 @@
-			 Singular version 3.1
-		     University of Kaiserslautern
-     Department of Mathematics        Centre for Computer Algebra
-	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
-		  (C) 1986-2005 All Rights Reserved
-
-		   README FILE FOR SINGULAR KERNEL
-		   ===============================
-
 This directory contains the source files for the Singular kernel.
 (i.e. all algorithms which still require currRing
 and needs to rewritten)
