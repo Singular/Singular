@@ -11,22 +11,23 @@
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
-
-
-
-#include <kernel/mod2.h>
-#include "tok.h"
+// need global defines:
+#include "kernel/mod2.h"
+// need to include all tokens: *_CMD:
 #include "grammar.h"
+#include "tok.h"
 
 // to produce convert_table.texi for doc:
-//#define CONVERT_TABLE 1
+#define CONVERT_TABLE 1
 
 // bits 0,1 for PLURAL
 #define NO_PLURAL        0
 #define ALLOW_PLURAL     1
 #define COMM_PLURAL      2
-#define  PLURAL_MASK     3
+#define PLURAL_MASK      3
 
 // bit 2 for RING-CF
 #define ALLOW_RING       4
@@ -35,6 +36,7 @@
 // bit 3 for zerodivisors
 #define NO_ZERODIVISOR   8
 #define ALLOW_ZERODIVISOR  0
+#define ZERODIVISOR_MASK 8
 
 // bit 4 for warning, if used at toplevel
 #define WARN_RING        16
@@ -111,8 +113,6 @@ struct sConvertTypes
 #define jjWRONG   1
 #define jjWRONG2  1
 #define jjWRONG3  1
-#define XS(A) A
-
 
 #define D(A)     2
 #define NULL_VAL 0
@@ -189,6 +189,43 @@ static int _gentable_sort_cmds( const void *a, const void *b )
   if(pCmdR->tokval==-1) return -1;
 
   return strcmp(pCmdL->name, pCmdR->name);
+}
+
+static int _texi_sort_cmds( const void *a, const void *b )
+{
+  cmdnames *pCmdL = (cmdnames*)a;
+  cmdnames *pCmdR = (cmdnames*)b;
+
+  if(a==NULL || b==NULL)             return 0;
+
+  /* empty entries goes to the end of the list for later reuse */
+  if(pCmdL->name==NULL) return 1;
+  if(pCmdR->name==NULL) return -1;
+
+  /* $INVALID$ must come first */
+  if(strcmp(pCmdL->name, "$INVALID$")==0) return -1;
+  if(strcmp(pCmdR->name, "$INVALID$")==0) return  1;
+  char *ls=strdup(pCmdL->name);
+  char *rs=strdup(pCmdR->name);
+  char *s=ls;
+  while (*s) { *s=tolower(*s); s++; }
+  s=rs;
+  while (*s) { *s=tolower(*s); s++; }
+
+  /* tokval=-1 are reserved names at the end */
+  if (pCmdL->tokval==-1)
+  {
+    if (pCmdR->tokval==-1)
+       { int r=strcmp(ls,rs); free(ls); free(rs); return r; }
+    /* pCmdL->tokval==-1, pCmdL goes at the end */
+    free(ls);free(rs);
+    return 1;
+  }
+  /* pCmdR->tokval==-1, pCmdR goes at the end */
+  if(pCmdR->tokval==-1) 
+  { free(ls);free(rs);return -1;}
+
+  { int r=strcmp(ls,rs); free(ls); free(rs); return r; }
 }
 
 /*generic*/
@@ -292,7 +329,7 @@ void ttGen1()
     fprintf(outfile,"// operation: %s (%s)  ->  %s\n",
           s,
           Tok2Cmdname(dArith1[i].arg),
-          Tok2Cmdname(ABS(dArith1[i].res)));
+          Tok2Cmdname(dArith1[i].res));
     i++;
   }
   fprintf(outfile,"/*---------------------------------------------*/\n");
@@ -438,130 +475,6 @@ void ttGen1()
   fprintf(outfile,"#define JJTAB2LEN %d\n",l2);
   fclose(outfile);
 }
-/*-------------------------------------------------------------------*/
-#if 0
-void ttGen2()
-{
-  FILE *outfile = fopen(iparith_inc,"a");
-  fprintf(outfile,
-  "/****************************************\n"
-  "*  Computer Algebra System SINGULAR     *\n"
-  "****************************************/\n\n");
-/*-------------------------------------------------------------------*/
-  fprintf(outfile,"// identifier table for Singular\n//\n");
-
-  fprintf(outfile,
-  "cmdnames OLDcmds[] =\n"
-  "{  // name-string     alias  tokval toktype\n"
-  "{ \"$INVALID$\",            0,  -1, 0},\n");
-  int i=1;
-  int m=-1;
-  int id_nr=0;
-  BOOLEAN f=FALSE;
-  loop
-  {
-    while (cmds[i].tokval!=0)
-    {
-      if ((cmds[i].tokval!=-1)&&(cmds[i].name!=NULL))
-      {
-        if(m==-1)
-        {
-          m=i;
-          f=TRUE;
-        }
-        else if(strcmp(cmds[m].name,cmds[i].name)>0)
-        {
-          m=i;
-          f=TRUE;
-        }
-      }
-      i++;
-    }
-    if(f)
-    {
-      id_nr++;
-      fprintf(outfile,"  {\"%s\", %*d, %3d, ",cmds[m].name,
-                                             20-strlen(cmds[m].name),
-                                             cmds[m].alias,
-                                             cmds[m].tokval);
-      switch(cmds[m].toktype)
-      {
-        case CMD_1:            fprintf(outfile,"CMD_1 },\n"); break;
-        case CMD_2:            fprintf(outfile,"CMD_2 },\n"); break;
-        case CMD_3:            fprintf(outfile,"CMD_3 },\n"); break;
-        case CMD_12:           fprintf(outfile,"CMD_12 },\n"); break;
-        case CMD_123 :         fprintf(outfile,"CMD_123 },\n"); break;
-        case CMD_23:           fprintf(outfile,"CMD_23 },\n"); break;
-        case CMD_M:            fprintf(outfile,"CMD_M },\n"); break;
-        case SYSVAR:           fprintf(outfile,"SYSVAR },\n"); break;
-        case ROOT_DECL:        fprintf(outfile,"ROOT_DECL },\n"); break;
-        case ROOT_DECL_LIST:   fprintf(outfile,"ROOT_DECL_LIST },\n"); break;
-        case RING_DECL:        fprintf(outfile,"RING_DECL },\n"); break;
-        case NONE:             fprintf(outfile,"NONE },\n"); break;
-        default:               if((cmds[m].toktype>' ')
-                               &&(cmds[m].toktype<127))
-                               {
-                                 fprintf(outfile,"'%c' },\n",cmds[m].toktype);
-                               }
-                               else
-                               {
-                                 fprintf(outfile,"%d },\n",cmds[m].toktype);
-                               }
-                               break;
-      }
-      cmds[m].name=NULL;
-      m=-1;
-      i=1;
-      f=FALSE;
-    }
-    else break;
-  }
-  fprintf(outfile,
-"/* list of scanner identifiers/only for feread/reservedName */\n");
-  f=FALSE;
-  i=1;m=-1;
-  loop
-  {
-    while (cmds[i].tokval!=0)
-    {
-      if (cmds[i].name!=NULL)
-      {
-        if(m==-1)
-        {
-          m=i;
-          f=TRUE;
-        }
-        else if(strcmp(cmds[m].name,cmds[i].name)>0)
-        {
-          m=i;
-          f=TRUE;
-        }
-      }
-      i++;
-    }
-    if(f)
-    {
-      fprintf(outfile,"  {\"%s\", %*d,  -1, 0 },\n",cmds[m].name,
-                                             20-strlen(cmds[m].name),
-                                             0/*cmds[m].alias*/
-                                             /*-1 cmds[m].tokval*/
-                                             /*0 cmds[m].toktype*/);
-      cmds[m].name=NULL;
-      m=-1;
-      i=1;
-      f=FALSE;
-    }
-    else break;
-  }
-  fprintf(outfile,
-"/* end of list marker */\n"
-"  { NULL, 0, 0, 0}\n"
-"};\n"
-"#define LAST_IDENTIFIER %d\n"
-  ,id_nr);
-  fclose(outfile);
-}
-#endif
 /*---------------------------------------------------------------------*/
 /**
  * @brief generate cmds initialisation
@@ -650,72 +563,196 @@ void ttGen2b()
   ,id_nr);
   fclose(outfile);
 }
-/*-------------------------------------------------------------------*/
-#if 0
-void ttGen3()
+int is_ref_cmd(cmdnames *c)
 {
-  FILE *outfile = fopen("mpsr_tok.inc","w");
-  fprintf(outfile,
-  "/****************************************\n"
-  "*  Computer Algebra System SINGULAR     *\n"
-  "****************************************/\n\n");
-/*-------------------------------------------------------------------*/
-  fprintf(outfile,"// token table for Singular\n//\n");
+  if( c->tokval==0) return 0;
+  if (c->alias > 0) return 0;
+  if  ((c->toktype==CMD_1)
+        || (c->toktype==CMD_2)
+        || (c->toktype==CMD_3)
+        || (c->toktype==CMD_M)
+        || (c->toktype==CMD_12)
+        || (c->toktype==CMD_13)
+        || (c->toktype==CMD_23)
+        || (c->toktype==CMD_123)) return 1;
+  return 0;
+}
+void ttGen2c()
+{
+  int cmd_size = (sizeof(cmds)/sizeof(cmdnames))-1;
 
-  fprintf(outfile,
-  "short vtok[] =\n"
-  "{\n");
-  // operations with 1 arg: ===========================================
-  int i=0;
-  while (dArith1[i].cmd!=0)
+  FILE *outfile = fopen("reference_table.texi","w");
+  fprintf(outfile, "@menu\n");
+/*-------------------------------------------------------------------*/
+  qsort(&cmds, cmd_size, sizeof(cmdnames), (&_texi_sort_cmds));
+
+  int m;
+  for(m=0; m<cmd_size; m++)
   {
-    if ((dArith1[i].p!=jjWRONG)
-    &&((i==0)||(dArith1[i].cmd!=dArith1[i-1].cmd)))
+    // assume that cmds[0].tokval== -1 and all others with tokval -1 at the end
+    if(is_ref_cmd(&(cmds[m])))
     {
-      fprintf(outfile,"  %d,\n",dArith1[i].cmd);
+      fprintf(outfile,"* %s::\n",cmds[m].name);
     }
-    i++;
   }
-  // operations with 2 args: ===========================================
-  i=0;
-  while (dArith2[i].cmd!=0)
+  fprintf(outfile, "@end menu\n@c ---------------------------\n");
+  for(m=0; m<cmd_size; m++)
   {
-    if ((dArith2[i].p!=jjWRONG2)
-    &&((i==0)||(dArith2[i].cmd!=dArith2[i-1].cmd)))
+    // assume that cmds[0].tokval== -1 and all others with tokval -1 at the end
+    if(is_ref_cmd(&(cmds[m])))
     {
-      fprintf(outfile,"  %d,\n",dArith2[i].cmd);
+      fprintf(outfile,"@node %s,",cmds[m].name);
+      // next:
+      int mm=m-1;
+      while((mm>0)&& (is_ref_cmd(&cmds[mm]))) mm--;
+      if((mm>0)&& (is_ref_cmd(&cmds[mm])))
+        fprintf(outfile,"%s,",cmds[mm].name);
+      else
+        fprintf(outfile,",");
+      // prev:
+      mm=m+1;
+      while((mm>0)&& (is_ref_cmd(&cmds[mm]))) mm++;
+      if((mm>0)&& (is_ref_cmd(&cmds[mm])))
+        fprintf(outfile,"%s,",cmds[m-1].name);
+      else
+        fprintf(outfile,",");
+      // up:, and header
+      fprintf(outfile,"Functions\n"
+      "@subsection %s\n"
+      "@cindex %s\n",cmds[m].name,cmds[m].name);
+      fprintf(outfile,"@include %s.part\n",cmds[m].name);
+      char partName[50];
+      sprintf(partName,"%s.part",cmds[m].name);
+      struct stat buf;
+      if (lstat(partName,&buf)!=0)
+      {
+        int op,i;
+        int only_field=0,only_comm=0,no_zerodiv=0;
+        FILE *part=fopen(partName,"w");
+        fprintf(part,"@table @code\n@item @strong{Syntax:}\n");
+        if ((cmds[m].toktype==CMD_1)
+        || (cmds[m].toktype==CMD_12)
+        || (cmds[m].toktype==CMD_13)
+        || (cmds[m].toktype==CMD_123))
+        {
+          op= cmds[m].tokval;
+          i=0;
+          while ((dArith1[i].cmd!=op) && (dArith1[i].cmd!=0)) i++;
+          while (dArith1[i].cmd==op)
+          {
+            if (dArith1[i].p!=jjWRONG)
+            {
+              fprintf(part,"@code{%s (} %s @code{)}\n",cmds[m].name,Tok2Cmdname(dArith1[i].arg));
+              fprintf(part,"@item @strong{Type:}\n%s\n",Tok2Cmdname(dArith1[i].res));
+              if ((dArith1[i].valid_for & ALLOW_PLURAL)==0)
+                only_comm=1;
+              if ((dArith1[i].valid_for & ALLOW_RING)==0)
+                only_field=1;
+              if ((dArith1[i].valid_for & ZERODIVISOR_MASK)==NO_ZERODIVISOR)
+                no_zerodiv=1;
+            }
+            i++;
+          }
+        }
+        if ((cmds[m].toktype==CMD_23)
+        || (cmds[m].toktype==CMD_12)
+        || (cmds[m].toktype==CMD_2)
+        || (cmds[m].toktype==CMD_123))
+        {
+          op= cmds[m].tokval;
+          i=0;
+          while ((dArith2[i].cmd!=op) && (dArith2[i].cmd!=0)) i++;
+          while (dArith2[i].cmd==op)
+          {
+            if (dArith2[i].p!=jjWRONG)
+            {
+              fprintf(part,"@code{%s (} %s, %s @code{)}\n",cmds[m].name,Tok2Cmdname(dArith2[i].arg1),Tok2Cmdname(dArith2[i].arg2));
+              fprintf(part,"@item @strong{Type:}\n%s\n",Tok2Cmdname(dArith2[i].res));
+              if ((dArith2[i].valid_for & ALLOW_PLURAL)==0)
+                 only_comm=1;
+              if ((dArith2[i].valid_for & ALLOW_RING)==0)
+                 only_field=1;
+              if ((dArith2[i].valid_for & ZERODIVISOR_MASK)==NO_ZERODIVISOR)
+                no_zerodiv=1;
+            }
+            i++;
+          }
+        }
+        if ((cmds[m].toktype==CMD_23)
+        || (cmds[m].toktype==CMD_13)
+        || (cmds[m].toktype==CMD_3)
+        || (cmds[m].toktype==CMD_123))
+        {
+          op= cmds[m].tokval;
+          i=0;
+          while ((dArith3[i].cmd!=op) && (dArith3[i].cmd!=0)) i++;
+          while (dArith3[i].cmd==op)
+          {
+            if (dArith3[i].p!=jjWRONG)
+            {
+              fprintf(part,"@code{%s (} %s, %s, %s @code{)}\n",cmds[m].name,
+                Tok2Cmdname(dArith3[i].arg1),
+                Tok2Cmdname(dArith3[i].arg2),
+                Tok2Cmdname(dArith3[i].arg3));
+              fprintf(part,"@item @strong{Type:}\n%s\n",Tok2Cmdname(dArith3[i].res));
+              if ((dArith3[i].valid_for & ALLOW_PLURAL)==0)
+                only_comm=1;
+              if ((dArith3[i].valid_for & ALLOW_RING)==0)
+                only_field=1;
+              if ((dArith3[i].valid_for & ZERODIVISOR_MASK)==NO_ZERODIVISOR)
+                no_zerodiv=1;
+            }
+            i++;
+          }
+        }
+        if (cmds[m].toktype==CMD_M)
+        {
+          op= cmds[m].tokval;
+          i=0;
+          while ((dArithM[i].cmd!=op) && (dArithM[i].cmd!=0)) i++;
+          while (dArithM[i].cmd==op)
+          {
+            if (dArithM[i].p!=jjWRONG)
+            {
+              fprintf(part,"@code{%s (} ... @code{)}\n",cmds[m].name);
+              fprintf(part,"@item @strong{Type:}\n%s\n",Tok2Cmdname(dArithM[i].res));
+              if ((dArithM[i].valid_for & ALLOW_PLURAL)==0)
+                only_comm=1;
+              if ((dArithM[i].valid_for & ALLOW_RING)==0)
+                only_field=1;
+              if ((dArithM[i].valid_for & ZERODIVISOR_MASK)==NO_ZERODIVISOR)
+                no_zerodiv=1;
+            }
+            i++;
+          }
+        }
+        if (only_comm)
+              fprintf(part,"@item @strong{Remark:}\n"
+                           "only for commutive polynomial rings\n");
+        if (only_field)
+              fprintf(part,"@item @strong{Remark:}\n"
+                           "only for polynomial rings over fields\n");
+        if (no_zerodiv)
+              fprintf(part,"@item @strong{Remark:}\n"
+                           "only for polynomial rings over domains\n");
+        fprintf(part,"@item @strong{Purpose:}\n"
+                     "@item @strong{Example:}\n"
+                     "@smallexample\n"
+                     "@c example\n"
+                     "@c example\n"
+                     "@end smallexample\n"
+                     "@c ref\n"
+                     "@c See\n"
+                     "@c ref{....};\n"
+                     "@c ref{....}.\n"
+                     "@c ref\n");
+        fclose(part);
+      }
     }
-    i++;
   }
-  // operations with 3 args: ===========================================
-  i=0;
-  while (dArith3[i].cmd!=0)
-  {
-    if (
-    ((i==0)||(dArith3[i].cmd!=dArith3[i-1].cmd)))
-    {
-      fprintf(outfile,"  %d,\n",dArith3[i].cmd);
-    }
-    i++;
-  }
-  // operations with many args: ===========================================
-  i=0;
-  while (dArithM[i].cmd!=0)
-  {
-    if (
-    ((i==0)||(dArithM[i].cmd!=dArithM[i-1].cmd)))
-    {
-      fprintf(outfile,"  %d,\n",dArithM[i].cmd);
-    }
-    i++;
-  }
-  // ====================================================================
-  fprintf(outfile,
-  "/* end of list marker */\n"
-  " %d };\n",MAX_TOK);
   fclose(outfile);
 }
-#endif
+/*-------------------------------------------------------------------*/
 void ttGen4()
 {
   FILE *outfile = fopen("plural_cmd.xx","w");
@@ -847,66 +884,22 @@ void ttGen4()
   fprintf(outfile,"@c ---------------------------------------------\n");
   fprintf(outfile,"@end table\n");
   fclose(outfile);
+  rename("plural_cmd.xx","plural_cmd.inc");
 }
 /*-------------------------------------------------------------------*/
 
-  // some special cmds which do not fit in with the others, and
-  // nevertheless need to be transmitted
-short ExtraCmds[] =
+int main(int argc, char** argv)
 {
-  OPTION_CMD,
-  NAMES_CMD,
-//  RESERVEDNAME_CMD,
-  PROC_CMD,
-  MAP_CMD,
-  PACKAGE_CMD,
-  '=',
-  0
-};
-
-// This returns 1 if tok is a token which can appear in a Singular
-// (quoted) command, and 0 otherwise
-short IsCmdToken(short tok)
-{
-  int i = 0;
-  // cmds with one arg
-  while (dArith1[i].cmd != 0)
-    if (dArith1[i].cmd == tok) return 1;
-    else i++;
-
-  // cmds with two args
-  i=0;
-  while (dArith2[i].cmd != 0)
-    if (dArith2[i].cmd == tok) return 1;
-    else i++;
-
-  // cmds with three args
-  i=0;
-  while (dArith3[i].cmd != 0)
-    if (dArith3[i].cmd == tok) return 1;
-    else i++;
-
-  // cmds with many args
-  i=0;
-  while (dArithM[i].cmd != 0)
-    if (dArithM[i].cmd == tok) return 1;
-    else i++;
-
-  // cmds which are somewhat special (like those having 0 args)
-  i=0;
-  while (ExtraCmds[i] != 0)
-    if (ExtraCmds[i] == tok) return 1;
-    else i++;
-
-  return 0;
-}
-
-int main()
-{
-  ttGen4();
-  ttGen1();
-  ttGen2b();
-  rename(iparith_inc,"iparith.inc");
-  rename("plural_cmd.xx","plural_cmd.inc");
+  if (argc>1)
+  {
+    ttGen4();
+    ttGen2c();
+  }
+  else
+  {
+    ttGen1();
+    ttGen2b();
+    rename(iparith_inc,"iparith.inc");
+  }
   return 0;
 }

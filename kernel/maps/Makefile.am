@@ -6,7 +6,7 @@ ${NTL_CFLAGS} $(FLINT_CFLAGS) ${GMP_CFLAGS}
 noinst_LTLIBRARIES=libmaps.la
 libmaps_la_SOURCES=fast_maps.cc
 
-libmaps_la_includedir=$(includedir)/kernel/maps
+libmaps_la_includedir=$(includedir)/singular/kernel/maps
 libmaps_la_include_HEADERS=fast_maps.h
 
 

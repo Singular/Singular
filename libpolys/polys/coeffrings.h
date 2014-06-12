@@ -35,7 +35,6 @@ static inline void n_InpMult(number &a, number b, const ring r){ n_InpMult(a,b,r
 static inline number n_Sub(number a, number b, const ring r){ return n_Sub(a, b, r->cf);}
 static inline number n_Add(number a, number b, const ring r){ return n_Add(a, b, r->cf);}
 static inline number n_Div(number a, number b, const ring r){ return n_Div(a,b, r->cf);}
-static inline number n_IntDiv(number a, number b, const ring r){ return n_IntDiv(a,b, r->cf);}
 static inline number n_ExactDiv(number a, number b, const ring r){ return n_ExactDiv(a,b, r->cf);}
 static inline number n_Gcd(number a, number b, const ring r){ return n_Gcd(a,b, r->cf);}
 static inline number n_Lcm(number a, number b, const ring r){ return n_Lcm(a,b, r->cf);}

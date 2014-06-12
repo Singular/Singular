@@ -5,7 +5,7 @@
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
  *******************************************************************/
-#include <omalloc/omDefaultConfig.h>
+#include "omDefaultConfig.h"
 
 #define OM_TRACK OM_DEFAULT_MIN_TRACK
 #define OM_CHECK OM_DEFAULT_MIN_CHECK

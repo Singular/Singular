@@ -1,6 +1,8 @@
-/*! \page kernel_numeric_page "Numeric Kernel Sub-Package"
- *
- * Sub-package of kernel (\ref kernel_page) with numerical algorithms
- * 
- * <A HREF="https://github.com/Singular/Sources/wiki/Todo">TODOs</A>
- */
+/*! \page kernel_numeric_page Numerical algorithms for Singular
+
+ This sub-package of kernel (\ref kernel_page) contains
+ numerical algorithms. 
+
+ TODO: list those algorithms... and corresponding interpreter functions...?
+ 
+*/

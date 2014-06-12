@@ -24,6 +24,9 @@ Overview
 11. Documentation
 12. Examples and Tests
 13. Remark on Characteristic Sets
+14. Adding new code
+15. Nomenclature
+16. Limitations
 
 1. What is Factory?
 ===================
@@ -210,4 +213,29 @@ to start with:
     (J. Pfalzgraf and D. Wang, eds.), Springer-Verlag,
     Wien-New York, 1995, pp. 187-201.
 
+14. Adding new code
+===================
+  If you like to add new code 'foo.cc/foo.h' add 'foo.cc' to 'Makefile.am' under
+'SOURCES' and 'foo.h' under 'factory_headers'. If your new functions should be
+available via factory's global interface 'factory.h' add
+
+/*MAKEHEADER PUBLIC ONLY*/
+foo.h
+
+to 'factory.template' and enclose the functions in 'foo.h', that you like to
+add, by '/*BEGINPUBLIC*/' and '/*ENDPUBLIC*/'.
+
+15. Nomenclature
+================
+  Factorization related functions are contained in files with the prefix 'fac'.
+Functions operating on CanonicalForm's are contained in files with the prefix
+'cf'. Functions operating on the internal structures of a CanonicalForm are
+contained in files with the prefix 'int'. Exceptions are gfops.cc/.h,
+ffops.cc/.h, imm.cc/.h as they use intrinsic data types.
+
+16. Limitations
+===============
+  The largest characteristic of a finite field is limited to 536870909. The
+number of elements of a finite fields represented by Conway polynomials has to
+be < 2^16 (see gfops.cc).
 

@@ -27,25 +27,25 @@ extern "C" {
 #endif
 #endif
 
-#include <omalloc/omDerivedConfig.h>
-#include <omalloc/omError.h>
-#include <omalloc/omStructs.h>
-#include <omalloc/omAllocDecl.h>
-#include <omalloc/omInlineDecl.h>
-#include <omalloc/omBin.h>
-#include <omalloc/omMemOps.h>
-#include <omalloc/omList.h>
-#include <omalloc/omGetBackTrace.h>
-#include <omalloc/omRet2Info.h>
-#include <omalloc/omStats.h>
-#include <omalloc/omOpts.h>
-#include <omalloc/omBinPage.h>
-#include <omalloc/omAllocSystem.h>
+#include "omDerivedConfig.h"
+#include "omError.h"
+#include "omStructs.h"
+#include "omAllocDecl.h"
+#include "omInlineDecl.h"
+#include "omBin.h"
+#include "omMemOps.h"
+#include "omList.h"
+#include "omGetBackTrace.h"
+#include "omRet2Info.h"
+#include "omStats.h"
+#include "omOpts.h"
+#include "omBinPage.h"
+#include "omAllocSystem.h"
 #include <omalloc/omTables.h>
-#include <omalloc/omAllocPrivate.h>
-#include <omalloc/omDebug.h>
-#include <omalloc/omInline.h>
-#include <omalloc/omAllocFunc.h>
+#include "omAllocPrivate.h"
+#include "omDebug.h"
+#include "omInline.h"
+#include "omAllocFunc.h"
 
 #ifdef __cplusplus
 }

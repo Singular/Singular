@@ -4,46 +4,10 @@ GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES)  $(GMP_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DGIT_VERSION='"$(GIT_VERSION)"'
 
-if HAVE_GFANLIB
-  USE_GFANLIB = ${builddir}/dyn_modules/callgfanlib/gfanlib.la ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
-else
-  USE_GFANLIB = 
-endif
-
-# AM_LDFLAGS = libSingular.la ${top_builddir}/kernel/libkernel.la
-
-########################### Dynamic Modules... #########################
 SUBDIRS = dyn_modules
 
-if ENABLE_P_PROCS_DYNAMIC
-  moduledir = $(libexecdir)/singular/MOD
-else !ENABLE_P_PROCS_DYNAMIC
-  moduledir = $(libdir)/singular
-endif !ENABLE_P_PROCS_DYNAMIC
-
-##########################################################################
-module_LTLIBRARIES = pyobject.la
-
-pyobject_la_SOURCES = pyobject.cc
-
-pyobject_la_CXXFLAGS = $(PYTHON_CSPEC)
-pyobject_la_CPPFLAGS = $(PYTHON_CPPFLAGS)  ${AM_CPPFLAGS}
-
-pyobject_la_LDFLAGS = $(PYTHON_EXTRA_LIBS)  $(PYTHON_LSPEC) ${AM_LDFLAGS} $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
-###  -export-dynamic -shared -module -avoid-version (add to all DMs?)
-
-##########################################################################
-if PYTHON_USE
-  PY=pyobject.la  $(PYTHON_EXTRA_LIBS)  $(PYTHON_LSPEC) $(PYTHON_EXTRA_LDFLAGS) $(PYTHON_LDFLAGS) 
-else !PYTHON_USE
-  PY=
-endif !PYTHON_USE
-
-if SI_EMBED_PYTHON
- EMBED_PYOBJECT   = ${PY} ${builddir}/dyn_modules/syzextra/syzextra.la ${USE_GFANLIB}
-else !SI_EMBED_PYTHON
-  EMBED_PYOBJECT = 
-endif !SI_EMBED_PYTHON
+########################### Possible builtin modules... #########################
+BUILTIN_FLAGS = ${BUILTIN_LIBS}
 
 ########################### libSingular* #########################
 
@@ -95,7 +59,6 @@ SOURCES = \
    links/semaphore.c\
    subexpr.cc\
    pyobject_setup.cc\
-   singmathic.cc\
    walk.cc\
    walk_ip.cc\
    wrapper.cc\
@@ -160,7 +123,7 @@ SingularHEADERS = \
 nodist_libSingular_la_SOURCES = feOpt.inc iparith.inc 
 
 libSingular_la_LDFLAGS    =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} -release ${PACKAGE_VERSION} ${PTHREAD_LDFLAGS}
-libSingular_la_LIBADD     =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${EMBED_PYOBJECT} ${top_builddir}/kernel/libkernel.la ${PTHREAD_LIBS}
+libSingular_la_LIBADD     =${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} ${BUILTIN_FLAGS} ${top_builddir}/kernel/libkernel.la ${PTHREAD_LIBS}
 
 libSingular_includedir = ${includedir}/singular/Singular
 nobase_libSingular_include_HEADERS = $(SingularHEADERS)
@@ -184,7 +147,7 @@ feOptTS_CPPFLAGS = ${AM_CPPFLAGS} -DTSINGULAR
 
 ########################### Singular* #########################
 
-EXTRA_PROGRAMS =  libparse Singulars
+EXTRA_PROGRAMS =  libparse Singulard
 
 # the "optional_programs" variable should be defined in the configure
 # script, and listed in an AC_SUBST macro
@@ -196,16 +159,15 @@ Singular ESingular TSingular $(optional_Singular_programs): ${abs_builddir}/LIB
 
 Singular_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
-Singular_LDADD = libSingular.la ${EMBED_PYOBJECT}
+Singular_LDADD = libSingular.la ${BUILTIN_FLAGS}
 
-Singular_LDFLAGS = -static ${EMBED_PYOBJECT}
+Singular_LDFLAGS = -static ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
-Singulars_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
+Singulard_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
-#  ${EMBED_PYOBJECT_LDFLAGS}  ${EMBED_PYOBJECT_LDFLAGS}
-Singulars_LDADD = libSingular.la ${EMBED_PYOBJECT}
+Singulard_LDADD = libSingular.la ${BUILTIN_FLAGS}
 
-Singulars_LDFLAGS = -static ${AM_LDFLAGS} ${EMBED_PYOBJECT}
+Singulard_LDFLAGS = -shared ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
 scriptdir = $(libexecdir)/singular/MOD
 dist_script_SCRIPTS = singularsurf
@@ -266,7 +228,6 @@ TESTS=test
 check_PROGRAMS=$(TESTS)
 
 test_SOURCES = test.cc
-# ${EMBED_PYOBJECT_LDFLAGS}
 test_LDADD = libSingular.la 
 
 #########################################################

@@ -235,7 +235,7 @@ AC_DEFUN([AX_PYTHON_CSPEC],
 #            ax_python_execspec="-I${ax_python_execprefix}/include/python${ax_python_version}"
 #            ax_python_includespec="${ax_python_includespec} $ax_python_execspec"
 #        fi
-        ax_python_cspec=`${PYTHON}-config --cflags | sed -e "s@ -arch i386@@" -e "s@ -arch x86_64@@" -e 's@ -g@@g' -e 's@ -mno-fused-madd@@g'`
+        ax_python_cspec=`${PYTHON}-config --cflags | sed -e 's@ -mno-fused-madd @ @g'`
         #   or -Qunused-arguments / clang :(
 #        ax_python_cspec="${ax_python_ccshared} ${ax_python_includespec}"
         AC_SUBST([PYTHON_CSPEC], [${ax_python_cspec}])
@@ -314,7 +314,7 @@ print strLinkSpec
 #        AC_SUBST([PYTHON_LSPEC], [${ax_python_output}])
 #        AC_MSG_NOTICE([PYTHON_LSPEC=${ax_python_output}])
 
-        ax_python_lspec=`${PYTHON}-config --ldflags | sed -e "s@ -arch i386@@" -e "s@ -arch x86_64@@" -e 's@ -g@@g'`
+        ax_python_lspec=`${PYTHON}-config --ldflags`
         AC_SUBST([PYTHON_LSPEC], [${ax_python_lspec}])
         AC_MSG_NOTICE([PYTHON_LSPEC=${ax_python_lspec}])
 

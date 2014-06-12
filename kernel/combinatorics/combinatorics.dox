@@ -1,0 +1,9 @@
+/*! \page kernel_combinatorics_page Combinatorical algorithms
+
+ This sub-package of kernel (\ref kernel_page) contains
+ combinatorical algorithms. 
+
+ TODO: list those algorithms... and corresponding interpreter functions...?
+ 
+*/
+

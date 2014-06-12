@@ -30,7 +30,7 @@
 #include "variable.h"
 #include "cf_iter.h"
 #include "templates/ftmpl_functions.h"
-#include "algext.h"
+#include "cfGcdAlgExt.h"
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 

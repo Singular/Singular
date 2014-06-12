@@ -1,0 +1,26 @@
+/*! \page factory_page Multivariate polynomial factorization (factory)
+
+ Factory is a C++ class library that implements a recursive representation
+ of multivariate polynomial data.
+
+ Factory handles sparse multivariate polynomials over different
+ coefficient domains, such as Z, Q and GF(q), as well as algebraic
+ extensions over Q and GF(q) in an efficient way.  Factory includes
+ algorithms for computing univariate and multivariate gcds, resultants,
+ chinese remainders, algorithms to factorize multivariate polynomials,
+ univariate polynomials over alg. function fields, and to compute the
+ absolute factorization of multivariate polynomials with integer coefficients.
+
+ The interface to the polynomial system of Factory is provided by a single
+ class `\ref CanonicalForm' which can deal with elements of the coefficient
+ domain as well as polynomials.
+
+ For details see:
+ <A HREF="ftp://www.mathematik.uni-kl.de/pub/Math/Singular/doc/factory.ps.gz">Factory Developer's manual</A>
+
+ \note For more information on how to configure, install and add new code to
+ factory, see README. 
+ 
+ \verbinclude factory/README
+ 
+*/

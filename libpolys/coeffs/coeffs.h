@@ -1,11 +1,12 @@
-#ifndef COEFFS_H
-#define COEFFS_H
+/*!
+ \file coeffs/coeffs.h Coeff. Rings and Fields (interface)
+*/
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
-* ABSTRACT
-*/
+
+#ifndef COEFFS_H
+#define COEFFS_H
 
 #include <misc/auxiliary.h>
 /* for assume: */
@@ -21,18 +22,18 @@ class CanonicalForm;
 enum n_coeffType
 {
   n_unknown=0,
-  n_Zp, /**< \F{p < ?} */
+  n_Zp, /**< \F{p < 2^31} */
   n_Q,  /**< rational (GMP) numbers */
   n_R,  /**< single prescision (6,6) real numbers */
-  n_GF, /**< \GF{p^n < 32001?} */
-  n_long_R, /**< real (GMP) numbers */
+  n_GF, /**< \GF{p^n < 2^16} */
+  n_long_R, /**< real floating point (GMP) numbers */
   n_algExt,  /**< used for all algebraic extensions, i.e.,
                 the top-most extension in an extension tower
                 is algebraic */
   n_transExt,  /**< used for all transcendental extensions, i.e.,
                   the top-most extension in an extension tower
                   is transcendental */
-  n_long_C, /**< complex (GMP) numbers */
+  n_long_C, /**< complex floating point (GMP) numbers */
   n_Z, /**< only used if HAVE_RINGS is defined: ? */
   n_Zn, /**< only used if HAVE_RINGS is defined: ? */
   n_Znm, /**< only used if HAVE_RINGS is defined: ? */
@@ -91,13 +92,12 @@ typedef struct
 
 struct n_Procs_s
 {
+   // administration of coeffs:
    coeffs next;
-   /*unsigned int ringtype;   =0 => coefficient field,
-                             !=0 => coeffs from one of the rings:
-                              =1 => Z/2^mZ
-                              =2 => Z/nZ, n not a prime
-                              =3 => Z/p^mZ
-                              =4 => Z */
+   int     ref;
+   n_coeffType type;
+   /// how many variables of factory are already used by this coeff
+   int     factoryVarOffset;
 
    // general properties:
    /// TRUE, if nNew/nDelete/nCopy are dummies
@@ -105,6 +105,11 @@ struct n_Procs_s
    /// TRUE, if std should make polynomials monic (if nInvers is cheap)
    /// if false, then a gcd routine is used for a content computation
    BOOLEAN has_simple_Inverse;
+
+   /// TRUE, if cf is a field
+   BOOLEAN is_field;
+   /// TRUE, if cf is a domain
+   BOOLEAN is_domain;
 
    // tests for numbers.cc:
    BOOLEAN (*nCoeffIsEqual)(const coeffs r, n_coeffType n, void * parameter);
@@ -134,7 +139,7 @@ struct n_Procs_s
    //   cfDiv does an exact division, but has to handle illegal input
    //   cfExactDiv does an exact division, but no error checking
    //   (I'm not sure I understant and even less that this makes sense)
-   numberfunc cfMult, cfSub ,cfAdd ,cfDiv, cfIntDiv, cfIntMod, cfExactDiv;
+   numberfunc cfMult, cfSub ,cfAdd ,cfDiv, cfIntMod, cfExactDiv;
 
    /// init with an integer
    number  (*cfInit)(long i,const coeffs r);
@@ -282,11 +287,6 @@ struct n_Procs_s
 
    /// the 0 as constant, NULL by default
    number nNULL;
-   int     ref;
-   /// how many variables of factort are already used by this coeff
-   int     factoryVarOffset;
-   n_coeffType type;
-
 
    /// Number of Parameters in the coeffs (default 0)
    int iNumberOfParameters;
@@ -571,9 +571,7 @@ static inline void   n_Write(number& n,  const coeffs r, const BOOLEAN bShortOut
 { if (bShortOut) n_WriteShort(n, r); else n_WriteLong(n, r); }
 
 
-/// @todo: Describe me!!! --> Hans
-///
-/// !!! Recommendation: This method is to cryptic to be part of the user-
+/// !!! Recommendation: This method is too cryptic to be part of the user-
 /// !!!                 interface. As defined here, it is merely a helper
 /// !!!                 method for parsing number input strings.
 static inline const char *n_Read(const char * s, number * a, const coeffs r)
@@ -619,9 +617,6 @@ static inline number n_Add(number a, number b, const coeffs r)
 /// raise an error if 'b' is not invertible in r
 static inline number n_Div(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfDiv!=NULL); return r->cfDiv(a,b,r); }
-
-static inline number n_IntDiv(number a, number b, const coeffs r)
-{ assume(r != NULL); assume(r->cfIntDiv!=NULL); return r->cfIntDiv(a,b,r); }
 
 /// for r a field, return n_Init(0,r)
 /// otherwise: n_Div(a,b,r)*b+n_IntMod(a,b,r)==a
@@ -708,17 +703,13 @@ static inline BOOLEAN nCoeff_is_Ring_Z(const coeffs r)
 { assume(r != NULL); return (getCoeffType(r)==n_Z); }
 
 static inline BOOLEAN nCoeff_is_Ring(const coeffs r)
-{ assume(r != NULL); return ((getCoeffType(r)==n_Z) || (getCoeffType(r)==n_Z2m) || (getCoeffType(r)==n_Zn) || (getCoeffType(r)==n_Znm)); }
+{ assume(r != NULL); return (r->is_field==0); }
 
-/// returns TRUE, if r is not a field and r has no zero divisors (i.e is a domain)
+/// returns TRUE, if r is a field or r has no zero divisors (i.e is a domain)
 static inline BOOLEAN nCoeff_is_Domain(const coeffs r)
 {
   assume(r != NULL);
-#ifdef HAVE_RINGS
-  return (getCoeffType(r)==n_Z || ((getCoeffType(r)!=n_Z2m) && (getCoeffType(r)!=n_Zn) && (getCoeffType(r)!=n_Znm)));
-#else
-  return TRUE;
-#endif
+  return (r->is_domain);
 }
 
 /// test whether 'a' is divisible 'b';

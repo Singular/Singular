@@ -5,9 +5,9 @@ if ENABLE_FACTORY
 endif
 
 SUBDIRS = resources omalloc xalloc $(USE_FACTORY) \
-libpolys kernel gfanlib \
-IntegerProgramming Singular dox \
-emacs debian redhat desktop
+libpolys gfanlib IntegerProgramming \
+kernel Singular \
+dox emacs debian redhat desktop
 
 EXTRA_DIST = README autogen.sh git-version-gen
 

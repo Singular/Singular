@@ -35,7 +35,7 @@
 #include "facFqBivarUtil.h"
 #include "facFqBivar.h"
 #include "cfNewtonPolygon.h"
-#include "algext.h"
+#include "cfGcdAlgExt.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
@@ -2014,7 +2014,7 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
     iter= factors;
     buf= 1;
     factorsConsidered= CFList();
-    for (long j= 0; j < nmod_mat_ncols(N); j++, iter++)
+    for (long j= 0; j < nmod_mat_nrows(N); j++, iter++)
     {
       if (!(nmod_mat_entry (N, j, i) == 0))
       {

@@ -1188,9 +1188,6 @@ void siInit(char *name)
     omInitInfo();
 
 // interpreter tables etc.: -----------------------------------------------
-#ifdef INIT_BUG
-  jjInitTab1();
-#endif
   memset(&sLastPrinted,0,sizeof(sleftv));
   sLastPrinted.rtyp=NONE;
 

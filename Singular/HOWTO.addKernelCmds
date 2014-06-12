@@ -1,0 +1,99 @@
+How to add new kernel commands
+
+Example: bla
+
+- add a new CMD token to tok.h (in alphabetic order):
+  ....
+  BLA_CMD,
+  ...
+- decide, how many argument bla should have and find the tok_type:
+  1: CMD_1
+  2: CMD_2
+  3: CMD_3
+  1 or 2: CMD_12
+  1 or 3: CMD_13
+  2 or 3: CMD_23
+  1, 2 or 3: CMD_123
+  not covered above: CMD_M
+
+- add a line describing the name, the token and the tok_type
+  to array cmds in Singular/table.h:
+  { "bla", 0, BLA_CMD, CMD_1},
+  (the array is sorted by the name).
+
+- choose the requirements: one from each group, combined by |
+  ALLOW_PLURAL: non-commutative rings allowed
+  NO_PLURAL: non-commutative rings not allowed
+
+  ALLOW_RING: coefficients/cring elements may be a ring
+  NO_RING: coefficients/cring elements must be a field
+
+  ALLOW_ZERODIVISOR: coefficients/cring elements may be zero divisors
+  NO_ZERODIVISOR: coefficients/cring elements must be a domain
+
+  if a requirement from a group is ommited,
+  the defaults are:  NO_PLURAL | NO_RING | ALLOW_ZERODIVISOR
+
+- add one (or more) lines for the procedures to call:
+  if there is more than one line, all lines for the same operation
+  must directly following each other within dArith*
+
+  if tok_type is CMD_1, CND_12, CMD_13, CMD_123,
+  to dArith1:
+  ,{D(jjBLAH1),   BLA_CMD,   <return type>,  <argument type>  , ALLOW_PLURAL |ALLOW_RING}
+
+  analog for CMD_12, CMD_2, CMD_23, CMD_123
+  to dArith2:
+  ,{D(jjBLAH2),   BLA_CMD,   <return type>,  <arg1 type>, <arg2 type>, ALLOW_PLURAL |ALLOW_RING}
+
+  analog for CMD_13, CMD_23, CMD_123, CMD_3
+  to dArith3:
+  ,{D(jjBLAH3),   BLA_CMD,   <return type>,  <arg1 type>, <arg2 type>, <arg3 type>, ALLOW_PLURAL |ALLOW_RING}
+
+  CMD_M is different:
+  ,{D(jjBLA_M),   BLA_CMD,  <return type>,  <number of arguments>, ALLOW_PLURAL |ALLOW_RING}
+
+
+  where a negative "number of arguments" represents:
+    -1: any number of arguments
+    -2: any number of arguments >0
+
+Remark: the wrapper routines jjBLA* should be implemented as
+    static routines in Singular/iparith.cc
+
+Remark: valid types for return type/arguments type are:
+  - types from table.h: cmds with tok_type ROOT_DECL
+  - types from table.h: cmds with tok_type ROOT_DECL_LIST
+  - types from table.h: cmds with tok_type RING_DECL
+    (require a base ring/currRing!=NULL)
+  - types from table.h: cmds with tok_type RING_DECL_LIST
+    (require a base ring/currRing!=NULL)
+  - matrix types: INTMAT_CMD, BIGINTMAT_CMD, MATRIX_CMD
+    (MATRIX_CMD requires a base ring/currRing!=NULL)
+  - pseudo types for arguments:
+    IDHDL: argument must be an interpreter variable
+    ANY_TYPE: changes to pseudo data (for "defined", "typeof", etc.)
+  - pseudo types for results:
+    NONE: void
+    ANY_TYPE: the jjBLA* routine decides about the return type
+      (including NONE)
+
+Remark: the order of these lines is important:
+  first the interpreter tries a perfect match of the data types,
+  but, if none is found, the second pass tries automatic type conversion
+  starting with the first line:
+  for example: bla(<matrix>,<module>)
+  ,{D(jjBLAH21),   BLA_CMD,   <return type>,  MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
+  ,{D(jjBLAH22),   BLA_CMD,   <return type>,  MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
+  would call jjBLAH21, while
+  ,{D(jjBLAH22),   BLA_CMD,   <return type>,  MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
+  ,{D(jjBLAH21),   BLA_CMD,   <return type>,  MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
+  would call jjBLAH22.
+  If certain conversions should not be allowed, add a line/several lines like:
+  ,{jjWRONG,   BLA_CMD,   NONE,  MATRIX_CMD, MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
+  at the end of the block with operations for "bla".
+
+Remark: alias: 0: normal reserved word
+               1: alias for an reserver word: allowed as input, never as output
+	       2: outdated alias: allowed as input, never as output,
+	          output a warning at first use

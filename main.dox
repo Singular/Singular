@@ -1,13 +1,38 @@
-/*! \mainpage Singular 
- *
- * <A HREF="http://www.singular.uni-kl.de">CAS Singular</A>
- *
- * \dotfile Includes.dot "Package diagram"
- *
- * \tableofcontents
- * 
- * \subpage libpolys_page
- * \subpage kernel_page
- * \subpage singular_page
- *
- */
+/*! \mainpage Singular kernel developers manual
+
+This is a developers manual for the internals of <A
+HREF="http://www.singular.uni-kl.de">Compute Algebra System
+Singular</A>, with main <A
+HREF="https://github.com/Singular/Sources/">source repository</A>.
+For more manuals see 
+<A HREF="https://github.com/Singular/Sources/wiki/">WIKI</A>. 
+Somewhat older kernel documentation can be found at
+<A HREF="ftp://www.mathematik.uni-kl.de/pub/Math/Singular/doc/singular-anatomy.tgz">singular-anatomy.tgz</A>
+
+
+Separate top-level packages are as follows (also see the diagram below):
+- \subpage omalloc_page 
+- \subpage resources_page 
+- \subpage factory_page 
+- \subpage libpolys_page 
+- \subpage kernel_page 
+  - \subpage kernel_numeric_page
+  - \subpage kernel_combinatorics_page
+  - \subpage kernel_GBEngine_page
+  - \subpage kernel_groebner_walk_page
+  - \subpage kernel_fglm_page
+  - \subpage kernel_maps_page
+  - \subpage kernel_spectrum_page
+  - \subpage kernel_linear_algebra_page
+  - \subpage kernel_oswrapper_page
+- \subpage singular_page
+  - \subpage dynmodules_page
+  
+Here is a short description of the Singular restructurization:
+<A HREF="http://www.singular.uni-kl.de/gap-meeting-2012/SW.Aug.12.motsak.2.pdf">Singular Modularization</A>
+
+
+Dependencies between Singular packages are as follows:
+\dotfile Includes.dot Package dependency diagram
+
+*/
