@@ -439,20 +439,25 @@ static proc testRandomPolyGenerator()
     for ( i=1; i<500; i++ )
     {
         rndPoly =  polyG();   
-        //  dbprint(1,"i=",i);
-        // dbprint(1,"rndPoly=",rndPoly);
-        // dbprint(1,"deg(ndPoly)=",deg(rndPoly));
-        // dbprint(1,"minDegree=",minDegree);
         degree1 =  deg(rndPoly);
-        //dbprint(1,"(deg(rndPoly)>= minDegree)",(deg(rndPoly)>= minDegree));
-        ASSUME(0,  degree1>= minDegree );
-        if ( degree1 >= minDegree)
-        {
-            ASSUME(0,  (deg(rndPoly)>= minDegree) );
-        }
+        /*
+            dbprint(1,"rndPoly=",rndPoly);
+            dbprint(1,"voice=",voice);
+            dbprint(1,"size(rndPoly)=",size(rndPoly));
+            dbprint(1,"deg(rndPoly)=",deg(rndPoly));
+
+            dbprint(1,"degree1=",rndPoly);
+            dbprint(1,"minDegree=",minDegree);
+        */
+        //ASSUME(0,  (minDegree <= (deg(rndPoly))) ); // enabling this line causes an different error!!     
+        ASSUME(0,  (deg(rndPoly)== degree1) );
+        ASSUME(0,  (deg(rndPoly)== minDegree) );
+        ASSUME(0,  degree1 >= minDegree );  // ok 
+        ASSUME(0,  (deg(rndPoly)>= minDegree) ); // equivalent statement as above, but fails sometime.
+        
         ASSUME(0,  (deg(rndPoly)<= maxDegree) );
 
-        //ASSUME(0,  (size(rndPoly)<= maxTerms) );
+        ASSUME(0,  (size(rndPoly)<= maxTerms) );
         ASSUME(0,  leadcoef(rndPoly) >= (-maxTerms*absMaxCoeff) );
         ASSUME(0,  leadcoef(rndPoly)<= ( maxTerms*absMaxCoeff) ) ;
 
