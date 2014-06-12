@@ -28,7 +28,7 @@ PROCEDURES:
 LIB "random.lib";
 
 // define struct TIdealGeneratingParameters, used by the 'randomIdeal' library later on
-proc init_randomIdeal()
+proc mod_init()
 {
     if (not defined(TIdealGeneratingParameters_def) )
     {
@@ -529,7 +529,6 @@ RETURN:   a random ideal generating function
 }
 example
 {
-    init_randomIdeal();
     ring rng = integer,(x,y),dp;
           
     TIdealGeneratingParameters genParams= defaultIdealGeneratorParams();
@@ -555,7 +554,6 @@ RETURN:   a random poly generating function
 }
 example
 {
-    init_randomIdeal();
     ring rng = integer,(x,y),dp;
           
     TIdealGeneratingParameters genParams= defaultIdealGeneratorParams();
@@ -581,7 +579,6 @@ proc defaultIdealGenerator()
 }
 example
 {
-    init_randomIdeal();
     ring rng = integer,(x,y),dp;
     
     // get a default random ideal generator:
