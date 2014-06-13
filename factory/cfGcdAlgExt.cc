@@ -978,7 +978,7 @@ void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, const Canonica
 { // F, G are univariate polynomials (i.e. they have exactly one polynomial variable)
   // F and G must have the same level AND level > 0
   // we try to calculate gcd(F,G) = s*F + t*G
-  // if a zero divisor is encontered, 'fail' is set to one
+  // if a zero divisor is encountered, 'fail' is set to one
   // M is assumed to be monic
   CanonicalForm P;
   if(F.inCoeffDomain())

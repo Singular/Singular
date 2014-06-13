@@ -22,6 +22,15 @@
 #include "imm.h"
 // #include <factory/cf_gmp.h>
 
+/**
+ * factory's class for rationals
+ *
+ * a rational is represented as two mpz_t's _num, _den
+ *
+ * Note: If you want to compute over Q make sure that SW_RATIONAL is set to 1!
+ *
+ * @sa InternalInteger
+**/
 class InternalRational : public InternalCF
 {
 private:
