@@ -2396,13 +2396,9 @@ static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
 
 static BOOLEAN jjGCD_BI(leftv res, leftv u, leftv v)
 {
-  number n1 = (number) u->CopyD();
-  number n2 = (number) v->CopyD();
-  CanonicalForm C1 = convSingNFactoryN (n1,NULL);
-  CanonicalForm C2 = convSingNFactoryN (n2,NULL);
-  CanonicalForm G = gcd (C1,C2);
-  number g = convFactoryNSingN (G,NULL);
-  res->data = g;
+  number n1 = (number) u->Data();
+  number n2 = (number) v->Data();
+  res->data = (char*)nlGcdi(a,b,NULL);
   return FALSE;
 }
 static BOOLEAN jjGCD_N(leftv res, leftv u, leftv v)
