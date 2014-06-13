@@ -217,7 +217,7 @@ EXAMPLE:example Jacobi; shows an example
    bigint t=1;
    bigint k;
 
-   if((((n-1)/2) mod 2)!=0){z=-1;}
+   if((((n-1) div 2) mod 2)!=0){z=-1;}
    if(a<0){return(z*Jacobi(-a,n));}
    a=a mod n;
    if(n==1){return(1);}

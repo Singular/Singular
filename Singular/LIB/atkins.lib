@@ -98,7 +98,7 @@ example
 }
 
 
-proc disc(number N, int k)
+proc disc(bigint N, int k)
 "USAGE: disc(N,k);
 RETURN: list L of negative discriminants D, sorted in decreasing order
 ASSUME: D<0, D kongruent 0 or 1 modulo 4 and |D|<4N
@@ -107,13 +107,13 @@ EXAMPLE:example disc; shows an example
 "
 {
   list L=-3,-4,-7;
-  number D;
-  number B;
+  bigint D;
+  bigint B;
   int a,b;
   for(b=0;b<=k;b++)
   {
     B=b^2;
-    for(a=int(intPart(B/4))+1;a<=k;a++)
+    for(a=int(B div 4)+1;a<=k;a++)
     {
       D=-4*a+B;
       if((D<0)&&((D mod 4)!=-2)&&((D mod 4)!=-1)&&(absValue(D)<4*N)&&(newTest(L,D)==1))
@@ -127,10 +127,8 @@ EXAMPLE:example disc; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-    ring R = 0,x,dp;
     disc(2003,50);
 }
-
 
 proc Cornacchia(bigint d, bigint p)
 "USAGE: Cornacchia(d,p);
@@ -743,7 +741,7 @@ example
 }
 
 
-proc wUnit(number D)
+proc wUnit(bigint D)
 "USAGE: wUnit(D);
 RETURN: the number of roots of unity in the quadratic order of discriminant D
 ASSUME: D<0 a discriminant kongruent to 0 or 1 modulo 4
@@ -763,8 +761,7 @@ EXAMPLE:example w; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-    ring r = 0,x,dp;
-    number D=-3;
+    bigint D=-3;
     wUnit(D);
 }
 
@@ -817,7 +814,7 @@ EXAMPLE:example Atkin; shows an example
     matrix M;                          // M contains the coefficients of T
 
     if(printlevel>=1) {"List H of possibly suitable discriminants will be calculated.";}
-    H=disc(N,K div 2);
+    H=disc(bigint(N),K div 2);
     if(printlevel>=1) {"H = "+string(H);pause();"";}
 
     int step=2;
@@ -1087,7 +1084,7 @@ EXAMPLE:example Atkin; shows an example
       if(step==10)                 // (10)[Change coefficients]
       {
         k=k+1;
-        if(k>=wUnit(D))
+        if(k>=wUnit(bigint(D)))
         {
           if(printlevel>=1) {"Since k = wUnit(D) = "+string(k)+", it holds that N("+string(i)+") = "+string(N(i))+" is not prime.";pause();"";}
           step=14;
