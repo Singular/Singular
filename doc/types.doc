@@ -4711,6 +4711,8 @@ In order to apply kernel commands to these types (like @code{string}, @code{+}),
 provide a usual procedure (say @code{proc p}..) for that task and 
 install it via @code{system("install",} user_type @code{,} kernel_command @code{,p,} number_of_args @code{);}.
 The user_type and kernel_command have to be given as strings.
+For kernel_command having a variable number of arguments (internal @code{CMD_M})
+use 4 independ of the number of really supplied arguments.
 
 @*@strong{Example:}
 @smallexample
