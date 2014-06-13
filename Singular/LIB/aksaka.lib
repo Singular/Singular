@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version aksaka.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version aksaka.lib 4.0.0.0 Jun_2014 "; // $Id$
 category="Teaching";
 info="
 LIBRARY: aksaka.lib     Procedures for primality testing after Agrawal, Saxena, Kayal
@@ -211,9 +211,9 @@ example
    wurzel(7629412809180100);
 }
 //////////////////////////////////////////////////////////////////////////
-proc euler(number r)
+proc euler(bigint r)
 "USAGE: euler(r);
-RETURN: number phi(r), where phi is Eulers phi-function
+RETURN: bigint phi(r), where phi is Eulers phi-function
 NOTE:   first r is factorized with proc PollardRho, then phi(r) is
         calculated with the help of phi(p) of every factor p;
 EXAMPLE:example euler; shows an example
@@ -221,16 +221,15 @@ EXAMPLE:example euler; shows an example
 {
   list l=PollardRho(r,5000,1);           //bestimmen der Primfaktoren von r
   int k;
-  number phi=r;
+  bigint phi=r;
   for(k=1;k<=size(l);k++)
   {
-    phi=phi-phi/l[k];       //berechnen phi(r) mit Hilfe der
+    phi=phi-phi div l[k];       //berechnen phi(r) mit Hilfe der
   }                         //Primfaktoren und Eigenschaften der phi-Fktn
   return(phi);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
    euler(99991);
 }
 ///////////////////////////////////////////////////////////////
