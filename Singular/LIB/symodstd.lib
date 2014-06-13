@@ -789,7 +789,7 @@ EXAMPLE: example spTestSB; shows an example
          {
             for(k = 2; k <= size(I[i]); k++)
             {
-               if((denominator(leadcoef(I[i][k])) mod p) == 0){ j = 0; break; }
+               if((bigint(denominator(leadcoef(I[i][k]))) mod p) == 0){ j = 0; break; }
             }
             if(!j){ break; }
          }

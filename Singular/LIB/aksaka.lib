@@ -64,7 +64,7 @@ example
    fastExpt(2,10,1022);
 }
 ////////////////////////////////////////////////////////////////////////////
-proc coeffmod(poly f,number n)
+proc coeffmod(poly f,bigint n)
 "USAGE: coeffmod(f,n);
 ASSUME: poly f depends on at most var(1) of the basering
 RETURN: poly f modulo number n
@@ -81,9 +81,9 @@ EXAMPLE:example coeffmod; shows an example
 
   while(i<=o)
   {
-    g=g+(leadcoef(M[i,1]) mod n)*var(1)^(i-1) ;
-                   // umwandeln der Koeffizienten in numbers,
-                   // Berechnung der Reste dieser numbers modulo n,
+    g=g+(bigint(leadcoef(M[i,1])) mod n)*var(1)^(i-1) ;
+                   // umwandeln der Koeffizienten in bigint,
+                   // Berechnung der Reste dieser bigint modulo n,
                    // Polynom mit neuen Koeffizienten wieder zusammensetzen
     i++;
   }
@@ -93,11 +93,11 @@ example
 { "EXAMPLE:"; echo = 2;
    ring R = 0,x,dp;
    poly f=2457*x4+52345*x3-98*x2+5;
-   number n=3;
+   bigint n=3;
    coeffmod(f,n);
 }
 //////////////////////////////////////////////////////////////////////////
-proc powerpolyX(number q,number n,poly a,poly r)
+proc powerpolyX(bigint q,bigint n,poly a,poly r)
 "USAGE: powerpolyX(q,n,a,r);
 RETURN: the q-th power of poly a modulo poly r and number n
 EXAMPLE:example powerpolyX; shows an example
@@ -106,10 +106,10 @@ EXAMPLE:example powerpolyX; shows an example
   ideal I=r;
 
   if(q==1){return(coeffmod(reduce(a,I),n));}
-  if((q mod 5)==0){return(coeffmod(reduce(powerpolyX(q/5,n,a,r)^5,I),n));}
-  if((q mod 4)==0){return(coeffmod(reduce(powerpolyX(q/4,n,a,r)^4,I),n));}
-  if((q mod 3)==0){return(coeffmod(reduce(powerpolyX(q/3,n,a,r)^3,I),n));}
-  if((q mod 2)==0){return(coeffmod(reduce(powerpolyX(q/2,n,a,r)^2,I),n));}
+  if((q mod 5)==0){return(coeffmod(reduce(powerpolyX(q div 5,n,a,r)^5,I),n));}
+  if((q mod 4)==0){return(coeffmod(reduce(powerpolyX(q div 4,n,a,r)^4,I),n));}
+  if((q mod 3)==0){return(coeffmod(reduce(powerpolyX(q div 3,n,a,r)^3,I),n));}
+  if((q mod 2)==0){return(coeffmod(reduce(powerpolyX(q div 2,n,a,r)^2,I),n));}
 
   return(coeffmod(reduce(a*powerpolyX(q-1,n,a,r),I),n));
 }
@@ -118,8 +118,8 @@ example
    ring R=0,x,dp;
    poly a=3*x3-x2+5;
    poly r=x7-1;
-   number q=123;
-   number n=5;
+   bigint q=123;
+   bigint n=5;
    powerpolyX(q,n,a,r);
 }
 ///////////////////////////////////////////////////////////////
@@ -394,7 +394,7 @@ EXAMPLE:example ask; shows an example
   {
     if(printlevel>=1){"a=";l;}
     f=var(1)+l;
-    if(powerpolyX(n,n,f,g)!=(var(1)^(int((n mod r)))+l))
+    if(powerpolyX(bigint(n),bigint(n),f,g)!=(var(1)^(int((n mod r)))+l))
     {
       if(printlevel>=1)
       {"Fuer a=";l;"ist (x+a)^n nicht kongruent x^n+a mod (x^r-1,n)";
