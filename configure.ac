@@ -207,7 +207,8 @@ AC_SUBST(DOC_DIR)
 SING_SHOW_FLAGS([Compiler/linker flags: ])
 
 
-AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([dox/Doxyfile])])
+## AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([dox/Doxyfile])])
+
 AC_CONFIG_FILES([dox/Makefile])
 
 AC_CONFIG_SUBDIRS([resources])
