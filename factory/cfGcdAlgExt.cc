@@ -28,7 +28,7 @@
 #include "cf_map.h"
 #include "cf_generator.h"
 #include "facMul.h"
-#include "facNTLzzpEXGCD.h"
+#include "cfNTLzzpEXGCD.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"

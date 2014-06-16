@@ -7,7 +7,7 @@
  * see M.J. Encarnacion "Computing GCDs of polynomials over number fields",
  * extended to the multivariate case.
  *
- * @sa facNTLzzpEXGCD.h
+ * @sa cfNTLzzpEXGCD.h
 **/
 
 #ifndef CF_GCD_ALGEXT_H

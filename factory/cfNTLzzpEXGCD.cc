@@ -1,6 +1,6 @@
 // -*- c++ -*-
 //*****************************************************************************
-/** @file facNTLzzpEXGCD.cc
+/** @file cfNTLzzpEXGCD.cc
  *
  * @author Martin Lee
  *
@@ -84,7 +84,7 @@ but users of versions 4.0 or later should adhere to the terms of the GNU GPL.
 #include "config.h"
 
 
-#include "facNTLzzpEXGCD.h"
+#include "cfNTLzzpEXGCD.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"

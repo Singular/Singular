@@ -29,7 +29,7 @@
 #include "cf_algorithm.h"
 #include "cf_primes.h"
 #include "facBivar.h"
-#include "facNTLzzpEXGCD.h"
+#include "cfNTLzzpEXGCD.h"
 
 #ifdef HAVE_NTL
 #include <NTL/lzz_pEX.h>
