@@ -1560,7 +1560,7 @@ number ntLcm(number a, number b, const coeffs cf)
     if (p_IsConstant(pa,ntRing) && p_IsConstant(pb,ntRing))
     {
       pGcd = pa;
-      p_SetCoeff (pGcd, n_Gcd (pGetCoeff(pGcd), pGetCoeff(pb), ntCoeffs), ntRing);
+      p_SetCoeff (pGcd, nlGcd (pGetCoeff(pGcd), pGetCoeff(pb), ntCoeffs), ntRing);
     }
     else
     {
@@ -1570,7 +1570,7 @@ number ntLcm(number a, number b, const coeffs cf)
       pIter(pb);
       while (pb != NULL)
       {
-        tmp = n_Gcd(contentpb, p_GetCoeff(pb, ntRing) , ntCoeffs);
+        tmp = n_SubringGcd(contentpb, p_GetCoeff(pb, ntRing) , ntCoeffs);
         n_Delete(&contentpb, ntCoeffs);
         contentpb = tmp;
         pIter(pb);
@@ -1580,13 +1580,13 @@ number ntLcm(number a, number b, const coeffs cf)
       pIter(pa);
       while (pa != NULL)
       {
-        tmp = n_Gcd(contentpa, p_GetCoeff(pa, ntRing), ntCoeffs);
+        tmp = n_SubringGcd(contentpa, p_GetCoeff(pa, ntRing), ntCoeffs);
         n_Delete(&contentpa, ntCoeffs);
         contentpa = tmp;
         pIter(pa);
       }
 
-      tmp= n_Gcd (contentpb, contentpa, ntCoeffs);
+      tmp= n_SubringGcd (contentpb, contentpa, ntCoeffs);
       n_Delete(&contentpa, ntCoeffs);
       n_Delete(&contentpb, ntCoeffs);
       contentpa= tmp;
@@ -1649,7 +1649,7 @@ number ntGcd(number a, number b, const coeffs cf)
     if (p_IsConstant(pa,ntRing) && p_IsConstant(pb,ntRing))
     {
       pGcd = pa;
-      p_SetCoeff (pGcd, n_Gcd (pGetCoeff(pGcd), pGetCoeff(pb), ntCoeffs), ntRing);
+      p_SetCoeff (pGcd, n_SubringGcd (pGetCoeff(pGcd), pGetCoeff(pb), ntCoeffs), ntRing);
     }
     else
     {
@@ -1659,7 +1659,7 @@ number ntGcd(number a, number b, const coeffs cf)
       pIter(pb);
       while (pb != NULL)
       {
-        tmp = n_Gcd(contentpb, p_GetCoeff(pb, ntRing) , ntCoeffs);
+        tmp = n_SubringGcd(contentpb, p_GetCoeff(pb, ntRing) , ntCoeffs);
         n_Delete(&contentpb, ntCoeffs);
         contentpb = tmp;
         pIter(pb);
@@ -1669,13 +1669,13 @@ number ntGcd(number a, number b, const coeffs cf)
       pIter(pa);
       while (pa != NULL)
       {
-        tmp = n_Gcd(contentpa, p_GetCoeff(pa, ntRing), ntCoeffs);
+        tmp = n_SubringGcd(contentpa, p_GetCoeff(pa, ntRing), ntCoeffs);
         n_Delete(&contentpa, ntCoeffs);
         contentpa = tmp;
         pIter(pa);
       }
 
-      tmp= n_Gcd (contentpb, contentpa, ntCoeffs);
+      tmp= n_SubringGcd (contentpb, contentpa, ntCoeffs);
       n_Delete(&contentpa, ntCoeffs);
       n_Delete(&contentpb, ntCoeffs);
       contentpa= tmp;
@@ -1700,6 +1700,12 @@ number ntGcd(number a, number b, const coeffs cf)
   ntTest((number)result); // !!!!
   return (number)result;
 }
+//number ntGcd_dummy(number a, number b, const coeffs cf)
+//{
+//  extern char my_yylinebuf[80];
+//  Print("ntGcd in >>%s<<\n",my_yylinebuf);
+//  return ntGcd(a,b,cf);
+//}
 
 int ntSize(number a, const coeffs cf)
 {
@@ -2268,7 +2274,7 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
       poly gcd = singclap_gcd(p_Copy(cand, R), p_Copy(den, R), R); // gcd(cand, den) is monic no mater leading coeffs! :((((
       if (nCoeff_is_Q (Q))
       {
-        number LcGcd= n_Gcd (p_GetCoeff (cand, R), p_GetCoeff(den, R), Q);
+        number LcGcd= n_SubringGcd (p_GetCoeff (cand, R), p_GetCoeff(den, R), Q);
         gcd = p_Mult_nn(gcd, LcGcd, R);
         n_Delete(&LcGcd,Q);
       }
@@ -2461,7 +2467,8 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 #ifdef LDEBUG
   cf->cfDBTest       = ntDBTest;
 #endif
-  cf->cfGcd          = ntGcd;
+  //cf->cfGcd          = ntGcd_dummy;
+  cf->cfSubringGcd   = ntGcd;
   cf->cfLcm          = ntLcm;
   cf->cfSize         = ntSize;
   cf->nCoeffIsEqual  = ntCoeffIsEqual;

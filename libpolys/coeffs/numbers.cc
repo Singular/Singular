@@ -382,6 +382,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     // post init settings:
     if (n->cfRePart==NULL) n->cfRePart=n->cfCopy;
     if (n->cfExactDiv==NULL) n->cfExactDiv=n->cfDiv;
+    if (n->cfSubringGcd==NULL) n->cfSubringGcd=n->cfGcd;
     
 #ifdef HAVE_RINGS
     if (n->cfGetUnit==NULL) n->cfGetUnit=n->cfCopy;

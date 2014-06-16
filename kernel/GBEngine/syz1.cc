@@ -803,7 +803,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
       nNormalize(pGetCoeff(tso.p1));
       nNormalize(pGetCoeff(tso.p2));
       coefgcd =
-        n_Gcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2),currRing->cf);
+        n_SubringGcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2),currRing->cf);
       tso.syz = pHead(tso.lcm);
       p = tso.syz;
       pSetCoeff(p,nDiv(pGetCoeff(tso.p1),coefgcd));
