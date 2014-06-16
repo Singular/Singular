@@ -424,9 +424,9 @@ proc elimintfromideal(ideal J)
 // output: the two coeficients reduced without common factors
 proc simpqcoeffs(poly n,poly m)
 {
-  def nc=content(n);
-  def mc=content(m);
-  def gc=gcd(nc,mc);
+  number nc=content(n);
+  number mc=content(m);
+  number gc=gcd(nc,mc);
   ideal s=n/gc,m/gc;
   return (s);
 }

@@ -633,11 +633,11 @@ proc divPrimeTest(def II, bigint p, int k)
       f = cleardenom(I[i]);
       if(f == 0) { return(0); }
       cnt = leadcoef(I[i])/leadcoef(f);
-      if((numerator(cnt) mod p) == 0) { return(0); }
-      if((denominator(cnt) mod p) == 0) { return(0); }
+      if((bigint(numerator(cnt)) mod p) == 0) { return(0); }
+      if((bigint(denominator(cnt)) mod p) == 0) { return(0); }
       for(j = size(f); j > 0; j--)
       {
-         if((leadcoef(f[j]) mod p) == 0) { return(0); }
+         if((bigint(leadcoef(f[j])) mod p) == 0) { return(0); }
       }
    }
    return(1);
@@ -789,7 +789,7 @@ EXAMPLE: example spTestSB; shows an example
          {
             for(k = 2; k <= size(I[i]); k++)
             {
-               if((denominator(leadcoef(I[i][k])) mod p) == 0){ j = 0; break; }
+               if((bigint(denominator(leadcoef(I[i][k]))) mod p) == 0){ j = 0; break; }
             }
             if(!j){ break; }
          }

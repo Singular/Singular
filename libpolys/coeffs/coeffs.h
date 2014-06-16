@@ -1,11 +1,12 @@
-#ifndef COEFFS_H
-#define COEFFS_H
+/*!
+ \file coeffs/coeffs.h Coeff. Rings and Fields (interface)
+*/
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/*
-* ABSTRACT
-*/
+
+#ifndef COEFFS_H
+#define COEFFS_H
 
 #include <misc/auxiliary.h>
 /* for assume: */
@@ -21,18 +22,18 @@ class CanonicalForm;
 enum n_coeffType
 {
   n_unknown=0,
-  n_Zp, /**< \F{p < ?} */
+  n_Zp, /**< \F{p < 2^31} */
   n_Q,  /**< rational (GMP) numbers */
   n_R,  /**< single prescision (6,6) real numbers */
-  n_GF, /**< \GF{p^n < 32001?} */
-  n_long_R, /**< real (GMP) numbers */
+  n_GF, /**< \GF{p^n < 2^16} */
+  n_long_R, /**< real floating point (GMP) numbers */
   n_algExt,  /**< used for all algebraic extensions, i.e.,
                 the top-most extension in an extension tower
                 is algebraic */
   n_transExt,  /**< used for all transcendental extensions, i.e.,
                   the top-most extension in an extension tower
                   is transcendental */
-  n_long_C, /**< complex (GMP) numbers */
+  n_long_C, /**< complex floating point (GMP) numbers */
   n_Z, /**< only used if HAVE_RINGS is defined: ? */
   n_Zn, /**< only used if HAVE_RINGS is defined: ? */
   n_Znm, /**< only used if HAVE_RINGS is defined: ? */
@@ -138,7 +139,7 @@ struct n_Procs_s
    //   cfDiv does an exact division, but has to handle illegal input
    //   cfExactDiv does an exact division, but no error checking
    //   (I'm not sure I understant and even less that this makes sense)
-   numberfunc cfMult, cfSub ,cfAdd ,cfDiv, cfIntDiv, cfIntMod, cfExactDiv;
+   numberfunc cfMult, cfSub ,cfAdd ,cfDiv, cfIntMod, cfExactDiv;
 
    /// init with an integer
    number  (*cfInit)(long i,const coeffs r);
@@ -208,6 +209,7 @@ struct n_Procs_s
    //  a = qb+r and either r=0 or f(r) < f(b)
    //  Note that neither q nor r nor f(r) are unique.
    number  (*cfGcd)(number a, number b, const coeffs r);
+   number  (*cfSubringGcd)(number a, number b, const coeffs r);
    number  (*cfExtGcd)(number a, number b, number *s, number *t,const coeffs r);
    //given a and b in a Euclidean setting, return s,t,u,v sth.
    //  sa + tb = gcd
@@ -620,9 +622,6 @@ static inline number n_Add(number a, number b, const coeffs r)
 static inline number n_Div(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfDiv!=NULL); return r->cfDiv(a,b,r); }
 
-static inline number n_IntDiv(number a, number b, const coeffs r)
-{ assume(r != NULL); assume(r->cfIntDiv!=NULL); return r->cfIntDiv(a,b,r); }
-
 /// for r a field, return n_Init(0,r)
 /// otherwise: n_Div(a,b,r)*b+n_IntMod(a,b,r)==a
 static inline number n_IntMod(number a, number b, const coeffs r)
@@ -643,6 +642,8 @@ static inline number n_ExactDiv(number a, number b, const coeffs r)
 /// in K(t_1, ..., t_n): not implemented
 static inline number n_Gcd(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfGcd!=NULL); return r->cfGcd(a,b,r); }
+static inline number n_SubringGcd(number a, number b, const coeffs r)
+{ assume(r != NULL); assume(r->cfSubringGcd!=NULL); return r->cfSubringGcd(a,b,r); }
 
 /// beware that ExtGCD is only relevant for a few chosen coeff. domains
 /// and may perform something unexpected in some cases...

@@ -731,7 +731,7 @@ EXAMPLE: example equidimZ; shows an example
    int he=heightZ(J);
    ideal K,N;
    def R=basering;
-   number s;
+   bigint s;
    list rl=ringlist(R);
    int i,j,p,m,ex;
    list P,IS,B;
@@ -747,7 +747,6 @@ EXAMPLE: example equidimZ; shows an example
       def Rhelp=ring(rp);
       setring Rhelp;
       number q=imap(R,q);
-      number s;
       //=== computes the primes occuring in a generator of I intersect Z
       //list L=PollardRho(q,5000,1);
       list L=primefactors(q)[1];
@@ -757,11 +756,11 @@ EXAMPLE: example equidimZ; shows an example
          L[i]=int(L[i]);
          p=int(L[i]);
          j=0;
-         s=q;
+         s=bigint(q);
          while((s mod p)==0)
          {
             j++;
-            s=s/p;
+            s=s div p;
          }
          Le[i]=j;
       }

@@ -69,17 +69,6 @@ number  nAEDiv(number a, number b, const coeffs)
 }
 
 
-number  nAEIntDiv(number a, number b, const coeffs)
-{
-
-    int_poly* f=reinterpret_cast<int_poly*> (a);
-    mpz_t* i= reinterpret_cast<mpz_t*> (b);
-    int_poly *res=new int_poly;
-    res->poly_set(*f);
-    res->poly_scalar_div_to(*i);
-    return (number) res;
-}
-
 number  nAEIntMod(number a, number, const coeffs)
 {
     return a;
@@ -316,7 +305,6 @@ BOOLEAN n_AEInitChar(coeffs r, void *)
     r->cfSub   = nAESub;
     r->cfAdd   = nAEAdd;
     r->cfDiv   = nAEDiv;
-    r->cfIntDiv= nAEIntDiv;
     r->cfIntMod= nAEIntMod;
     r->cfExactDiv= nAEExactDiv;
     r->cfInit = nAEInit;

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version crypto.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version crypto.lib 4.0.0.0 Jun_2014 "; // $Id$
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
@@ -15,9 +15,7 @@ OVERVIEW:
 
 PROCEDURES:
  decimal(s);                number corresponding to the hexadecimal number s
- exgcdN(a,n)                compute s,t,d such that d=gcd(a,n)=s*a+t*n
  eexgcdN(L)                 T with sum_i L[i]*T[i]=T[n+1]=gcd(L[1],...,L[n])
- gcdN(a,b)                  compute gcd(a,b)
  lcmN(a,b)                  compute lcm(a,b)
  powerN(m,d,n)              compute m^d mod n
  chineseRem(T,L)            compute x such that x = T[i] mod L[i]
@@ -100,96 +98,61 @@ example
    decimal(s);
 }
 
-proc exgcdN(number a, number n)
-"USAGE:  exgcdN(a,n);
-RETURN: a list s,t,d of numbers satisfying d=gcd(a,n)=s*a+t*n
-EXAMPLE:example exgcdN; shows an example
-"
-{
-  number x=a mod n;
-  if(x==0){return(list(0,1,n))}
-  if (x<0) { x=x+n;}
-  list l=exgcdN(n,x);
-  return(list(l[2],l[1]-(a-x)*l[2]/n,l[3]))
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
-   exgcdN(24,15);
-}
-
 proc eexgcdN(list L)
 "USAGE:  eexgcdN(L);
 RETURN: list T such that sum_i L[i]*T[i]=T[n+1]=gcd(L[1],...,L[n])
 EXAMPLE:example eexgcdN; shows an example
 "
 {
-   if(size(L)==2){return(exgcdN(L[1],L[2]));}
-   number p=L[size(L)];
+   if(size(L)==2)
+   {
+     list LL=extgcd(L[1],L[2]);return(list(LL[2],LL[3],LL[1]));
+   }
+   bigint p=L[size(L)];
    L=delete(L,size(L));
    list T=eexgcdN(L);
-   list S=exgcdN(T[size(T)],p);
+   list S=extgcd(T[size(T)],p);
    int i;
    for(i=1;i<=size(T)-1;i++)
    {
-      T[i]=T[i]*S[1];
+      T[i]=T[i]*S[2];
    }
    p=T[size(T)];
-   T[size(T)]=S[2];
-   T[size(T)+1]=S[3];
+   T[size(T)]=S[3];
+   T[size(T)+1]=S[1];
    return(T);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
    eexgcdN(list(24,15,21));
 }
 
-proc gcdN(number a, number b)
-"USAGE:  gcdN(a,b);
-RETURN: gcd(a,b)
-EXAMPLE:example gcdN; shows an example
-"
-{
-   //if((a mod b)==0){return(b)}
-   //return(gcdN(b,a mod b));
-   return(gcd(a,b));
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
-   gcdN(24,15);
-}
-
-proc lcmN(number a, number b)
+proc lcmN(bigint a, bigint b)
 "USAGE:  lcmN(a,b);
 RETURN: lcm(a,b);
 EXAMPLE:example lcmN; shows an example
 "
 {
-   //number d=gcdN(a,b);
-   //return(a*b/d);
    return (a*b/gcd(a,b));
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
    lcmN(24,15);
 }
 
-proc powerN(number m, number d, number n)
+proc powerN(bigint m, bigint d, bigint n)
 "USAGE:  powerN(m,d,n);
 RETURN: m^d mod n
 EXAMPLE:example powerN; shows an example
 "
 {
-   if(d==0){return(1);}
+   if(d==0){return(bigint(1));}
    int i;
    if(n==0)
    {
       for(i=12;i>=2;i--)
       {
-         if((d mod i)==0){return(powerN(m,d/i,n)^i);}
+         if((d mod i)==0){return(powerN(m,d div i,n)^i);}
       }
       return(m*powerN(m,d-1,n));
    }
@@ -197,7 +160,7 @@ EXAMPLE:example powerN; shows an example
    {
       if((d mod i)==0)
       {
-        number rr=powerN(m,d/i,n)^i mod n;
+        bigint rr=powerN(m,d div i,n)^i mod n;
         if (rr<0) { rr=rr+n;}
         return(rr);
       }
@@ -206,7 +169,6 @@ EXAMPLE:example powerN; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
    powerN(24,15,7);
 }
 
@@ -219,7 +181,7 @@ EXAMPLE:example chineseRem; shows an example
 {
    int i;
    int n=size(L);
-   number N=1;
+   bigint N=1;
    for(i=1;i<=n;i++)
    {
       N=N*L[i];
@@ -227,10 +189,10 @@ EXAMPLE:example chineseRem; shows an example
    list M;
    for(i=1;i<=n;i++)
    {
-      M[i]=N/L[i];
+      M[i]=N div L[i];
    }
    list S=eexgcdN(M);
-   number x;
+   bigint x;
    for(i=1;i<=n;i++)
    {
       x=x+S[i]*M[i]*T[i];
@@ -240,11 +202,10 @@ EXAMPLE:example chineseRem; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
    chineseRem(list(24,15,7),list(2,3,5));
 }
 
-proc Jacobi(number a, number n)
+proc Jacobi(bigint a, bigint n)
 "USAGE:  Jacobi(a,n);
 RETURN: the generalized Legendre symbol
 NOTE: if n is an odd prime then Jacobi(a,n)=0,1,-1 if n|a, a=x^2 mod n,else
@@ -253,10 +214,10 @@ EXAMPLE:example Jacobi; shows an example
 {
    int i;
    int z=1;
-   number t=1;
-   number k;
+   bigint t=1;
+   bigint k;
 
-   if((((n-1)/2) mod 2)!=0){z=-1;}
+   if((((n-1) div 2) mod 2)!=0){z=-1;}
    if(a<0){return(z*Jacobi(-a,n));}
    a=a mod n;
    if(n==1){return(1);}
@@ -266,7 +227,7 @@ EXAMPLE:example Jacobi; shows an example
    {
       while((a mod 2)==0)
       {
-         a=a/2;
+         a=a div 2;
          if(((n mod 8)==3)||((n mod 8)==5)){t=-t;}
       }
       k=a;a=n;n=k;
@@ -278,7 +239,6 @@ EXAMPLE:example Jacobi; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
    Jacobi(13580555397810650806,5792543);
 }
 
@@ -311,7 +271,7 @@ example
    L[size(L)];
 }
 
-proc primL(number q)
+proc primL(bigint q)
 "USAGE:  primL(q);
 RETURN: list of the first primes p_1,...,p_r such that q>p_1*...*p_(r-1)
         and q<p_1*...*p_r
@@ -322,7 +282,7 @@ EXAMPLE:example primL; shows an example
    list re;
    re[1]=2;
    re[2]=3;
-   number s=6;
+   bigint s=6;
    i=3;
    while(s<=q)
    {
@@ -343,7 +303,6 @@ EXAMPLE:example primL; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
    primL(20);
 }
 
@@ -355,25 +314,29 @@ EXAMPLE:example intPart; shows an example
 {
   if (x>=0)
   {
-    return((numerator(x)-(numerator(x) mod denominator(x)))/denominator(x));
+    return(bigint((numerator(x)-(bigint(numerator(x)) mod bigint(denominator(x)))))
+         div bigint(denominator(x)));
   }
   else
   {
-    return((numerator(x)-(numerator(x) mod denominator(x)+denominator(x)))/denominator(x));
+    return(bigint((numerator(x)-(bigint(numerator(x)) mod bigint(denominator(x)+denominator(x)))))
+         div bigint(denominator(x)));
   }
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
+   ring r=0,x,dp;
    intPart(7/3);
 }
 
-proc intRoot(number m)
+proc intRoot(bigint mm)
 "USAGE:  intRoot(m);
 RETURN: the integral part of the square root of m
 EXAMPLE:example intRoot; shows an example
 "
 {
+   ring R = 0,@x,dp;
+   number m=mm;
    number x=1;
    number t=x^2;
    number s=(x+1)^2;
@@ -394,17 +357,16 @@ EXAMPLE:example intRoot; shows an example
          s=(x+1)^2;
       }
    }
-   if(t>m){return(x-1);}
-   if(s==m){return(x+1);}
-   return(x);
+   if(t>m){return(bigint(x-1));}
+   if(s==m){return(bigint(x+1));}
+   return(bigint(x));
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
    intRoot(20);
 }
 
-proc squareRoot(number a, number p)
+proc squareRoot(bigint a, bigint p)
 "USAGE:  squareRoot(a,p);
 RETURN: the square root of a in Z/p, p prime
 NOTE:   assumes the Jacobi symbol is 1 or p=2.
@@ -417,33 +379,33 @@ EXAMPLE:example squareRoot; shows an example
    if(powerN(a,p-1,p)!=1)
    {
       "p is not prime";
-      return(number(-5));
+      return(bigint(-5));
    }
-   number n=random(1,2147483647) mod p;
+   bigint n=random(1,2147483647) mod p;
    if(n==0){n=n+1;}
-   number j=Jacobi(n,p);
+   bigint j=Jacobi(n,p);
    if(j==0)
    {
       "p is not prime";
-      return(number(-5));
+      return(bigint(-5));
    }
    if(j==1)
    {
       return(squareRoot(a,p));
    }
-   number q=p-1;
-   number e=0;
-   number two=2;
-   number z,m,t;
+   bigint q=p-1;
+   bigint e=0;
+   bigint two=2;
+   bigint z,m,t;
    while((q mod 2)==0)
    {
       e=e+1;
-      q=q/2;
+      q=q div 2;
    }
-   number y=powerN(n,q,p);
-   number r=e;
-   number x=powerN(a,(q-1)/2,p);
-   number b=a*x^2 mod p;
+   bigint y=powerN(n,q,p);
+   bigint r=e;
+   bigint x=powerN(a,(q-1) div 2,p);
+   bigint b=a*x^2 mod p;
    x=a*x mod p;
 
    while(((b-1) mod p)!=0)
@@ -464,12 +426,11 @@ EXAMPLE:example squareRoot; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
    squareRoot(8315890421938608,32003);
 }
 
 
-proc solutionsMod2(matrix M)
+proc solutionsMod2(bigintmat MM)
 "USAGE:  solutionsMod2(M);
 RETURN: an intmat containing a basis of the vector space of solutions of the
         linear system of equations defined by M over the prime field of
@@ -477,13 +438,17 @@ RETURN: an intmat containing a basis of the vector space of solutions of the
 EXAMPLE:example solutionsMod2; shows an example
 "
 {
-   def R=basering;
    ring Rhelp=2,z,(c,dp);
-   matrix M=imap(R,M);
-   matrix S=syz(M);
-   setring(R);
-   matrix S=imap(Rhelp,S);
    int i,j;
+   matrix M[nrows(MM)][ncols(MM)];
+   for(i=1;i<=nrows(MM);i++)
+   {
+      for(j=1;j<=ncols(MM);j++)
+      {
+         M[i,j]=MM[i,j];
+      }
+   }
+   matrix S=syz(M);
    intmat v[nrows(S)][ncols(S)];
    for(i=1;i<=nrows(S);i++)
    {
@@ -496,8 +461,7 @@ EXAMPLE:example solutionsMod2; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
-   matrix M[3][3]=1,2,3,4,5,6,7,6,5;
+   bigintmat M[3][3]=1,2,3,4,5,6,7,6,5;
    solutionsMod2(M);
 }
 
@@ -527,7 +491,7 @@ example
 
 //============== Shank's baby step - giant step ========================
 
-proc babyGiant(number b, number y, number p)
+proc babyGiant(bigint b, bigint y, bigint p)
 "USAGE:  babyGiant(b,y,p);
 RETURN: the discrete logarithm x: b^x=y mod p
 NOTE:   This procedure works based on Shank's baby step - giant step method.
@@ -536,8 +500,8 @@ EXAMPLE:example babyGiant; shows an example
 {
    int i,j,m;
    list l;
-   number h=1;
-   number x;
+   bigint h=1;
+   bigint x;
 
 //choose m minimal such that m^2>p
    for(i=1;i<=p;i++){if(i^2>p) break;}
@@ -548,7 +512,7 @@ EXAMPLE:example babyGiant; shows an example
 
 //giant-step: compute b^(m+j), 1<=j<=m and search in the baby-step table
 //for an i with y*b^i=b^(m*j). If found then x=m*j-i
-   number g=b^m mod p;
+   bigint g=b^m mod p;
    while(j<m)
    {
       j++;
@@ -567,16 +531,15 @@ EXAMPLE:example babyGiant; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
-   number b=2;
-   number y=10;
-   number p=101;
+   bigint b=2;
+   bigint y=10;
+   bigint p=101;
    babyGiant(b,y,p);
 }
 
 //==============  Pollards rho  =================================
 
-proc rho(number b, number y, number p)
+proc rho(bigint b, bigint y, bigint p)
 "USAGE:  rho(b,y,p);
 RETURN: the discrete logarithm x=log_b(y): b^x=y mod p
 NOTE: Pollard's rho:
@@ -590,7 +553,7 @@ EXAMPLE:example rho; shows an example
 {
    int i=1;
    int j;
-   number s,t;
+   bigint s,t;
    list e,f,x;
 
    e[1]=0;
@@ -639,27 +602,26 @@ EXAMPLE:example rho; shows an example
       }
    }
 
-   list w=exgcdN(s,p-1);
-   number u=w[1];
-   number d=w[3];
+   list w=extgcd(s,p-1);
+   bigint u=w[2];
+   bigint d=w[1];
 
-   number a=(t*u/d) mod (p-1);
+   bigint a=(t*u div d) mod (p-1);
 
-   number pn=powerN(b,a,p);
+   bigint pn=powerN(b,a,p);
    if (pn<0) { pn=pn+p;}
    while(powerN(b,a,p)!=y)
    {
-      a=(a+(p-1)/d) mod (p-1);
+      a=(a+(p-1) div d) mod (p-1);
       if (a<0) { a=a+p-1; }
    }
    return(a);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
-   number b=2;
-   number y=10;
-   number p=101;
+   bigint b=2;
+   bigint y=10;
+   bigint p=101;
    rho(b,y,p);
 }
 //====================================================================
@@ -668,7 +630,7 @@ example
 
 //================================= Miller-Rabin =====================
 
-proc MillerRabin(number n, int k)
+proc MillerRabin(bigint n, int k)
 "USAGE:  MillerRabin(n,k);
 RETURN: 1 if n is prime, 0 else
 NOTE: probabilistic test of Miller-Rabin with k loops to test if n is prime.
@@ -682,19 +644,19 @@ EXAMPLE:example MillerRabin; shows an example
    if((n mod 2)==0){return(0);}
 
    int i;
-   number a,b,j,r,s;
+   bigint a,b,j,r,s;
    r=n-1;
    s=0;
    while((r mod 2)==0)
    {
       s=s+1;
-      r=r/2;
+      r=r div 2;
    }
    while(i<k)
    {
       i++;
       a=random(2,2147483629) mod n; if(a==0){a=3;}
-      if(exgcdN(a,n)[3]!=1){return(0);}
+      if(gcd(a,n)!=1){return(0);}
       b=powerN(a,r,n);
       if(b!=1)
       {
@@ -712,15 +674,14 @@ EXAMPLE:example MillerRabin; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
-   number x=2;
+   bigint x=2;
    x=x^787-1;
    MillerRabin(x,3);
 }
 
 //======================= Soloway-Strassen  ==========================
 
-proc SolowayStrassen(number n, int k)
+proc SolowayStrassen(bigint n, int k)
 "USAGE:  SolowayStrassen(n,k);
 RETURN: 1 if n is prime, 0 else
 NOTE: probabilistic test of Soloway-Strassen with k loops to test if n is
@@ -733,14 +694,14 @@ EXAMPLE:example SolowayStrassen; shows an example
    if((n==2)||(n==3)){return(1);}
    if((n mod 2)==0){return(0);}
 
-   number a,pn,jn;
+   bigint a,pn,jn;
    int i;
    while(i<k)
    {
       i++;
       a=random(2,2147483629) mod n; if(a==0){a=3;}
       if(gcd(a,n)!=1){return(0);}
-      pn=powerN(a,(n-1)/2,n);
+      pn=powerN(a,(n-1) div 2,n);
       if (pn<0) { pn=pn+n;}
       jn=Jacobi(a,n) mod n;
       if (jn<0) { jn=jn+n;}
@@ -750,9 +711,8 @@ EXAMPLE:example SolowayStrassen; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
-   number h=10;
-   number p=h^100+267;
+   bigint h=10;
+   bigint p=h^100+267;
    //p=h^100+43723;
    //p=h^200+632347;
    SolowayStrassen(h,3);
@@ -769,7 +729,7 @@ SolowayStrassen(n,3);
 
 //===================== Pocklington-Lehmer ==============================
 
-proc PocklingtonLehmer(number N, list #)
+proc PocklingtonLehmer(bigint N, list #)
 "USAGE: PocklingtonLehmer(N); optional: PocklingtonLehmer(N,L);
         L a list of the first k primes
 RETURN:message N is not prime or {A,{p},{a_p}} as certificate for N being prime
@@ -780,7 +740,7 @@ NOTE:assumes that it is possible to factorize N-1=A*B such that gcd(A,B)=1,
 EXAMPLE:example PocklingtonLehmer; shows an example
 "
 {
-   number m=intRoot(N);
+   bigint m=intRoot(N);
    if(size(#)>0)
    {
       list S=PollardRho(N-1,10000,1,#);
@@ -790,8 +750,8 @@ EXAMPLE:example PocklingtonLehmer; shows an example
       list S=PollardRho(N-1,10000,1);
    }
    int i,j;
-   number A=1;
-   number p,a,g;
+   bigint A=1;
+   bigint p,a,g;
    list PA;
    list re;
 
@@ -818,7 +778,7 @@ EXAMPLE:example PocklingtonLehmer; shows an example
    }
    if(A<=m)
    {
-     A=N/A;
+     A=N div A;
      PA=list(S[size(S)]);
    }
    for(i=1;i<=size(PA);i++)
@@ -828,7 +788,7 @@ EXAMPLE:example PocklingtonLehmer; shows an example
       {
          a=a+1;
          if(powerN(a,N-1,N)!=1){return("not prime");}
-         g=gcd(powerN(a,(N-1)/PA[i],N),N);
+         g=gcd(powerN(a,(N-1) div PA[i],N),N);
          if(g==1)
          {
            re[size(re)+1]=list(PA[i],a);
@@ -841,8 +801,7 @@ EXAMPLE:example PocklingtonLehmer; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
-   number N=105554676553297;
+   bigint N=105554676553297;
    PocklingtonLehmer(N);
    list L=primList(1000);
    PocklingtonLehmer(N,L);
@@ -854,7 +813,7 @@ example
 
 //======================= Pollards rho  =================================
 
-proc PollardRho(number n, int k, int allFactors, list #)
+proc PollardRho(bigint n, int k, int allFactors, list #)
 "USAGE:  PollardRho(n,k,allFactors); optional: PollardRho(n,k,allFactors,L);
          L a list of the first k primes
 RETURN: a list of factors of n (which could be just n),if allFactors=0@*
@@ -887,14 +846,14 @@ EXAMPLE:example PollardRho; shows an example
           re[size(re)+1]=L[i];
           while((n mod L[i])==0)
           {
-             n=n/L[i];
+             n=n div L[i];
           }
        }
        if(n==1){return(re);}
     }
     int e=size(re);
 //here the rho-algorithm starts
-    number a,d,x,y;
+    bigint a,d,x,y;
     while(n>1)
     {
        a=random(2,2147483629);
@@ -914,7 +873,7 @@ EXAMPLE:example PollardRho; shows an example
              re[size(re)+1]=d;
              while((n mod d)==0)
              {
-               n=n/d;
+               n=n div d;
              }
              break;
           }
@@ -948,14 +907,13 @@ EXAMPLE:example PollardRho; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
-   number h=10;
-   number p=h^30+4;
+   bigint h=10;
+   bigint p=h^30+4;
    PollardRho(p,5000,0);
 }
 
 //======================== Pollards p-factorization ================
-proc pFactor(number n,int B, list P)
+proc pFactor(bigint n,int B, list P)
 "USAGE:  pFactor(n,B,P); n to be factorized, B a bound , P a list of primes
 RETURN: a list of factors of n or n if no factor found
 NOTE: Pollard's p-factorization
@@ -966,8 +924,8 @@ EXAMPLE:example pFactor; shows an example
 "
 {
    int i;
-   number k=1;
-   number w;
+   bigint k=1;
+   bigint w;
    while(i<size(P))
    {
       i++;
@@ -979,24 +937,23 @@ EXAMPLE:example pFactor; shows an example
       }
       k=k*w;
    }
-   number a=random(2,2147483629);
-   number d=gcd(powerN(a,k,n)-1,n);
+   bigint a=random(2,2147483629);
+   bigint d=gcd(powerN(a,k,n)-1,n);
    if((d>1)&&(d<n)){return(d);}
    return(n);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
    list L=primList(1000);
    pFactor(1241143,13,L);
-   number h=10;
+   bigint h=10;
    h=h^30+25;
    pFactor(h,20,L);
 }
 
 //==================== quadratic sieve ==============================
 
-proc quadraticSieve(number n, int c, list B, int k)
+proc quadraticSieve(bigint n, int c, list B, int k)
 "USAGE:  quadraticSieve(n,c,B,k); n to be factorized, [-c,c] the
          sieve-intervall, B a list of primes,
          k for using the first k elements in B
@@ -1006,14 +963,14 @@ NOTE: The idea being used is to find x,y such that x^2=y^2 mod n then
 EXAMPLE:example quadraticSieve; shows an example
 "
 {
-   number f,d;
+   bigint f,d;
    int i,j,l,s,p;
    list S,tmp;
    intvec v;
    v[k]=0;
 
 //compute the integral part of the square root of n
-   number m=intRoot(n);
+   bigint m=intRoot(n);
 
 //consider the function f(X)=(X+m)^2-n and compute for s in [-c,c] the values
    while(i<=2*c)
@@ -1045,7 +1002,7 @@ EXAMPLE:example quadraticSieve; shows an example
          while((f mod p)==0)
          {
             s++;
-            f=f/p;
+            f=f div p;
          }
          if(s)
          {
@@ -1062,7 +1019,7 @@ EXAMPLE:example quadraticSieve; shows an example
               while((f mod p)==0)
               {
                 s++;
-                f=f/p;
+                f=f div p;
               }
               S[l][2]=f;
               v[i]=s;
@@ -1083,7 +1040,7 @@ EXAMPLE:example quadraticSieve; shows an example
 
 //the system of equations for the exponents {l_s} for the f(s) such
 //product f(s)^l_s is a square (l_s are 1 or 0)
-   matrix M[k+1][size(T)];
+   bigintmat M[k+1][size(T)];
    for(j=1;j<=size(T);j++)
    {
       if(T[j][2]==-1){M[1,j]=1;}
@@ -1097,8 +1054,8 @@ EXAMPLE:example quadraticSieve; shows an example
 //construction of x and y such that x^2=y^2 mod n and d=gcd(x-y,n)
 //y=square root of product f(s)^l_s
 //x=product s+m
-   number x=1;
-   number y=1;
+   bigint x=1;
+   bigint y=1;
 
    for(i=1;i<=ncols(G);i++)
    {
@@ -1123,7 +1080,6 @@ EXAMPLE:example quadraticSieve; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
    list L=primList(5000);
    quadraticSieve(7429,3,L,4);
    quadraticSieve(1241143,100,L,50);
@@ -1135,7 +1091,7 @@ example
 
 //================= elementary operations ==============================
 
-proc isOnCurve(number N, number a, number b, list P)
+proc isOnCurve(bigint N, bigint a, bigint b, list P)
 "USAGE:  isOnCurve(N,a,b,P);
 RETURN: 1 or 0 (depending on whether P is on the curve or not)
 NOTE: checks whether P=(P[1]:P[2]:P[3]) is a point on the elliptic
@@ -1148,11 +1104,10 @@ EXAMPLE:example isOnCurve; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
    isOnCurve(32003,5,7,list(10,16,1));
 }
 
-proc ellipticAdd(number N, number a, number b, list P, list Q)
+proc ellipticAdd(bigint N, bigint a, bigint b, list P, list Q)
 "USAGE:  ellipticAdd(N,a,b,P,Q);
 RETURN: list L, representing the point P+Q
 NOTE: P=(P[1]:P[2]:P[3]), Q=(Q[1]:Q[2]:Q[3]) points on the elliptic curve
@@ -1168,14 +1123,14 @@ EXAMPLE:example ellipticAdd; shows an example
       Q[i]=Q[i] mod N; if (Q[i]<0) { Q[i]=Q[i]+N;}
    }
    list Resu;
-   Resu[1]=number(0);
-   Resu[2]=number(1);
-   Resu[3]=number(0);
+   Resu[1]=bigint(0);
+   Resu[2]=bigint(1);
+   Resu[3]=bigint(0);
    list Error;
    Error[1]=0;
    //test for ellictic curve
-   number D=4*a^3+27*b^2;
-   number g=gcd(D,N);
+   bigint D=4*a^3+27*b^2;
+   bigint g=gcd(D,N);
    if(g==N){return(Error);}
    if(g!=1)
    {
@@ -1194,57 +1149,56 @@ EXAMPLE:example ellipticAdd; shows an example
    }
    if(P[3]==0){return(Q);}
    if(Q[3]==0){return(P);}
-   list I=exgcdN(P[3],N);
-   if(I[3]!=1)
+   list I=extgcd(P[3],N);
+   if(I[1]!=1)
    {
-      P[4]=I[3];
+      P[4]=I[1];
       return(P);
    }
-   P[1]=P[1]*I[1] mod N;
-   P[2]=P[2]*I[1] mod N;
-   I=exgcdN(Q[3],N);
-   if(I[3]!=1)
+   P[1]=P[1]*I[2] mod N;
+   P[2]=P[2]*I[2] mod N;
+   I=extgcd(Q[3],N);
+   if(I[1]!=1)
    {
-      P[4]=I[3];
+      P[4]=I[1];
       return(P);
    }
-   Q[1]=Q[1]*I[1] mod N;
-   Q[2]=Q[2]*I[1] mod N;
+   Q[1]=Q[1]*I[2] mod N;
+   Q[2]=Q[2]*I[2] mod N;
    if((P[1]==Q[1])&&(((P[2]+Q[2]) mod N)==0)){return(Resu);}
-   number L;
+   bigint L;
    if((P[1]==Q[1])&&(P[2]==Q[2]))
    {
-      I=exgcdN(2*Q[2],N);
-      if(I[3]!=1)
+      I=extgcd(2*Q[2],N);
+      if(I[1]!=1)
       {
-         P[4]=I[3];
+         P[4]=I[1];
          return(P);
       }
-      L=I[1]*(3*Q[1]^2+a) mod N;
+      L=I[2]*(3*Q[1]^2+a) mod N;
    }
    else
    {
-      I=exgcdN(Q[1]-P[1],N);
-      if(I[3]!=1)
+      I=extgcd(Q[1]-P[1],N);
+      if(I[1]!=1)
       {
-         P[4]=I[3];
+         P[4]=I[1];
          return(P);
       }
-      L=(Q[2]-P[2])*I[1] mod N;
+      L=(Q[2]-P[2])*I[2] mod N;
    }
    Resu[1]=(L^2-P[1]-Q[1]) mod N;
    if (Resu[1]<0) { Resu[1]=Resu[1]+N; }
    Resu[2]=(L*(P[1]-Resu[1])-P[2]) mod N;
    if (Resu[2]<0) { Resu[2]=Resu[2]+N; }
-   Resu[3]=number(1);
+   Resu[3]=bigint(1);
    return(Resu);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
-   number N=11;
-   number a=1;
-   number b=6;
+   bigint N=11;
+   bigint a=1;
+   bigint b=6;
    list P,Q;
    P[1]=2;
    P[2]=4;
@@ -1255,7 +1209,7 @@ example
    ellipticAdd(N,a,b,P,Q);
 }
 
-proc ellipticMult(number N, number a, number b, list P, number k)
+proc ellipticMult(bigint N, bigint a, bigint b, list P, bigint k)
 "USAGE:  ellipticMult(N,a,b,P,k);
 RETURN: a list L representing the point k*P
 NOTE:  P=(P[1]:P[2]:P[3]) a point on the elliptic curve defined by
@@ -1265,9 +1219,9 @@ EXAMPLE:example ellipticMult; shows an example
 {
    if(P[3]==0){return(P);}
    list resu;
-   resu[1]=number(0);
-   resu[2]=number(1);
-   resu[3]=number(0);
+   resu[1]=bigint(0);
+   resu[2]=bigint(1);
+   resu[3]=bigint(0);
 
    if(k==0){return(resu);}
    if(k==1){return(P);}
@@ -1293,10 +1247,9 @@ EXAMPLE:example ellipticMult; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
-   number N=11;
-   number a=1;
-   number b=6;
+   bigint N=11;
+   bigint a=1;
+   bigint b=6;
    list P;
    P[1]=2;
    P[2]=4;
@@ -1306,7 +1259,7 @@ example
 
 //================== Random for elliptic curves =====================
 
-proc ellipticRandomCurve(number N)
+proc ellipticRandomCurve(bigint N)
 "USAGE:  ellipticRandomCurve(N);
 RETURN: a list of two random numbers a,b and 4a^3+27b^2 mod N
 NOTE:   y^2z=x^3+a*xz^2+b^2*z^3 defines an elliptic curve over Z/N
@@ -1317,30 +1270,29 @@ EXAMPLE:example ellipticRandomCurve; shows an example
    while(k<=10)
    {
      k++;
-     number a=random(1,2147483647) mod N;
-     number b=random(1,2147483647) mod N;
+     bigint a=random(1,2147483647) mod N;
+     bigint b=random(1,2147483647) mod N;
      //test for ellictic curve
-     number D=4*a^3+27*b^4; //the constant term is b^2
-     number g=gcd(D,N);
+     bigint D=4*a^3+27*b^4; //the constant term is b^2
+     bigint g=gcd(D,N);
      if(g<N){return(list(a,b,g));}
    }
    ERROR("no random curve found");
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
    ellipticRandomCurve(32003);
 }
 
-proc ellipticRandomPoint(number N, number a, number b)
+proc ellipticRandomPoint(bigint N, bigint a, bigint b)
 "USAGE:  ellipticRandomPoint(N,a,b);
 RETURN: a list representing  a random point (x:y:z) of the elliptic curve
         defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
 EXAMPLE:example ellipticRandomPoint; shows an example
 "
 {
-   number x=random(1,2147483647) mod N;
-   number h=x^3+a*x+b;
+   bigint x=random(1,2147483647) mod N;
+   bigint h=x^3+a*x+b;
    h=h mod N;
    list resu;
    resu[1]=x;
@@ -1348,7 +1300,7 @@ EXAMPLE:example ellipticRandomPoint; shows an example
    resu[3]=1;
    if(h==0){return(resu);}
 
-   number n=Jacobi(h,N);
+   bigint n=Jacobi(h,N);
    if(n==0)
    {
       resu=-5;
@@ -1364,7 +1316,6 @@ EXAMPLE:example ellipticRandomPoint; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
    ellipticRandomPoint(32003,3,181);
 }
 
@@ -1375,7 +1326,7 @@ example
 //====================================================================
 
 //==================   the trivial approaches  =======================
-proc countPoints(number N, number a, number b)
+proc countPoints(bigint N, bigint a, bigint b)
 "USAGE:  countPoints(N,a,b);
 RETURN: the number of points of the elliptic curve defined by
         y^2=x^3+a*x+b  over Z/N
@@ -1383,8 +1334,8 @@ NOTE: trivial approach
 EXAMPLE:example countPoints; shows an example
 "
 {
-  number x;
-  number r=N+1;
+  bigint x;
+  bigint r=N+1;
   while(x<N)
   {
      r=r+Jacobi((x^3+a*x+b) mod N,N);
@@ -1394,11 +1345,10 @@ EXAMPLE:example countPoints; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
    countPoints(181,71,150);
 }
 
-proc ellipticAllPoints(number N, number a, number b)
+proc ellipticAllPoints(bigint N, bigint a, bigint b)
 "USAGE:  ellipticAllPoints(N,a,b);
 RETURN: list of points (x:y:z) of the elliptic curve defined by
         y^2z=x^3+a*xz^2+b*z^3  over Z/N
@@ -1411,7 +1361,7 @@ EXAMPLE:example ellipticAllPoints; shows an example
    point[3]=0;
    resu[1]=point;
    point[3]=1;
-   number x,h,n;
+   bigint x,h,n;
    while(x<N)
    {
       h=(x^3+a*x+b) mod N;
@@ -1440,7 +1390,6 @@ EXAMPLE:example ellipticAllPoints; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
    list L=ellipticAllPoints(181,71,150);
    size(L);
    L[size(L)];
@@ -1448,7 +1397,7 @@ example
 
 //================ the algorithm of Shanks and Mestre =================
 
-proc ShanksMestre(number q, number a, number b, list #)
+proc ShanksMestre(bigint q, bigint a, bigint b, list #)
 "USAGE:  ShanksMestre(q,a,b); optional: ShanksMestre(q,a,b,s); s the number
          of loops in the algorithm (default s=1)
 RETURN: the number of points of the elliptic curve defined by
@@ -1457,9 +1406,9 @@ NOTE: algorithm of Shanks and Mestre (baby-step-giant-step)
 EXAMPLE:example ShanksMestre; shows an example
 "
 {
-   number n=intRoot(4*q);
-   number m=intRoot(intRoot(16*q))+1;
-   number d;
+   bigint n=intRoot(4*q);
+   bigint m=intRoot(intRoot(16*q))+1;
+   bigint d;
    int i,j,k,s;
    list B,K,T,P,Q,R,mP;
    B[1]=list(0,1,0);
@@ -1491,7 +1440,6 @@ EXAMPLE:example ShanksMestre; shows an example
             j++;
             if((Q[1]==B[j][1])&&(Q[2]==B[j][2])&&(Q[3]==B[j][3]))
             {
-
                T[1]=P;
                T[2]=q+1+n-(i*m+j-1);
                K[size(K)+1]=T;
@@ -1538,13 +1486,12 @@ EXAMPLE:example ShanksMestre; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
    ShanksMestre(32003,71,602);
 }
 
 //==================== Schoof's algorithm =============================
 
-proc Schoof(number N,number a, number b)
+proc Schoof(bigint N,bigint a, bigint b)
 "USAGE:  Schoof(N,a,b);
 RETURN: the number of points of the elliptic curve defined by
         y^2=x^3+a*x+b  over Z/N
@@ -1554,8 +1501,8 @@ EXAMPLE:example Schoof; shows an example
 {
    int pr=printlevel;
 //test for ellictic curve
-   number D=4*a^3+27*b^2;
-   number G=gcd(D,N);
+   bigint D=4*a^3+27*b^2;
+   bigint G=gcd(D,N);
    if(G==N){ERROR("not an elliptic curve");}
    if(G!=1){ERROR("not a prime");}
 
@@ -1563,7 +1510,7 @@ EXAMPLE:example Schoof; shows an example
   // if((N<=500)&&(pr<5)){return(countPoints(int(N),a,b));}
 
 //=== the general case
-   number q=intRoot(4*N);
+   bigint q=intRoot(4*N);
    list L=primL(2*q);
    int r=size(L);
    list T;
@@ -1585,12 +1532,11 @@ EXAMPLE:example Schoof; shows an example
       "we obtain t = ",chineseRem(T,L)-q;
       "===================================================================";
    }
-   number t=chineseRem(T,L)-q;
+   bigint t=chineseRem(T,L)-q;
    return(N+1-t);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
    Schoof(32003,71,602);
 }
 
@@ -1637,7 +1583,7 @@ example
 }
 
 
-proc testElliptic(int q,number a,number b,int l)
+static proc testElliptic(int q,bigint aa,bigint bb,int l)
 "USAGE:  testElliptic(q,a,b,l);
 RETURN: an integer t, the trace of the Frobenius
 NOTE: the kernel for the Schoof algorithm: looks for the t such that for all
@@ -1649,10 +1595,9 @@ EXAMPLE:example testElliptic; shows an example
 "
 {
    int pr=printlevel;
-   def R=basering;
    ring S=q,(y,x),(L(100000),lp);
-   number a=imap(R,a);
-   number b=imap(R,b);
+   number a=aa;
+   number b=bb;
    poly F=y2-x3-a*x-b;       // the curve C
    poly G=generateG(a,b,l);
    ideal I=std(ideal(F,G));  // the points C[l]
@@ -1692,7 +1637,6 @@ EXAMPLE:example testElliptic; shows an example
          "the gcd(x^q-x,x^3+ax+b)=",J[1];
          pause();
       }
-      setring R;
       return(t);
    }
    //=== (F1/G1,F2/G2)=[ql](x,y) ==========================================
@@ -1734,7 +1678,7 @@ EXAMPLE:example testElliptic; shows an example
    }
    //=== test if all points of C[l] satisfy  (x,y)^(q^2)=-[ql](x,y)
    //=== if so: t mod l =0 is returned
-   if(size(reduce(J,I))==0){setring R;return(0);}
+   if(size(reduce(J,I))==0){return(0);}
 
    //==== test for (x,y)^(q^2)=[ql](x,y) for some point
 
@@ -1757,9 +1701,7 @@ EXAMPLE:example testElliptic; shows an example
    }
    if(deg(J[1])>0)
    {
-      setring R;
       int w=int(squareRoot(q,l));
-      setring S;
       //=== +/-2w mod l zurueckgeben, wenn (x,y)^q=+/-[w](x,y)
       //==== the case t>0 :  (Q1/P1,Q2/P2)=[w](x,y) ==============
       if(w==1)
@@ -1849,15 +1791,14 @@ EXAMPLE:example testElliptic; shows an example
        reduce(ideal(Q1*L1-P1*H1,Q2*L2+P2*H2),I);
          pause();
       }
-      if(size(reduce(J,I))==0){setring R;return(t);}
+      if(size(reduce(J,I))==0){return(t);}
       J=Q1*L1-P1*H1,Q2*L2+P2*H2;
-      if(size(reduce(J,I))==0){setring R;return(l-t);}
+      if(size(reduce(J,I))==0){return(l-t);}
    }
    ERROR("something is wrong in testElliptic");
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
    testElliptic(1267985441,338474977,64740730,3);
 }
 
@@ -1867,7 +1808,7 @@ example
 
 //============= Lenstra's ECM Factorization ==================================
 
-proc factorLenstraECM(number N, list S, int B, list #)
+proc factorLenstraECM(bigint N, list S, int B, list #)
 "USAGE:  factorLenstraECM(N,S,B); optional: factorLenstraECM(N,S,B,d);
          d+1 the number of loops in the algorithm (default d=0)
 RETURN: a factor of N or the message no factor found
@@ -1879,7 +1820,7 @@ EXAMPLE:example factorLenstraECM; shows an example
 "
 {
    list L,P;
-   number g,M,w;
+   bigint g,M,w;
    int i,j,k,d;
    int l=size(S);
    if(size(#)>0)
@@ -1914,17 +1855,16 @@ EXAMPLE:example factorLenstraECM; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
    list L=primList(1000);
    factorLenstraECM(181*32003,L,10,5);
-   number h=10;
+   bigint h=10;
    h=h^30+25;
    factorLenstraECM(h,L,4,3);
 }
 
 //================= ECPP (Goldwasser-Kilian) a primaly-test =============
 
-proc ECPP(number N)
+proc ECPP(bigint N)
 "USAGE:  ECPP(N);
 RETURN: message:N is not prime or {L,P,m,q} as certificate for N being prime@*
          L a list (y^2=x^3+L[1]*x+L[2] defines an elliptic curve C)@*
@@ -1943,10 +1883,10 @@ EXAMPLE:example ECPP; shows an example
 "
 {
    list L,S,P;
-   number m,q;
+   bigint m,q;
    int i;
 
-   number n=intRoot(intRoot(N));
+   bigint n=intRoot(intRoot(N));
    n=(n+1)^2;                         //lower bound for q
    while(1)
    {
@@ -1960,7 +1900,7 @@ EXAMPLE:example ECPP; shows an example
       }
       if(n<q){break;}
    }
-   number u=m/q;
+   bigint u=m/q;
    while(1)
    {
       P=ellipticRandomPoint(N,L[1],L[2]);  //a random point on C
@@ -1975,8 +1915,7 @@ EXAMPLE:example ECPP; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,z,dp;
-   number N=1267985441;
+   bigint N=1267985441;
    ECPP(N);
 }
 
@@ -1984,8 +1923,8 @@ static proc wordToNumber(string s)
 {
    int i;
    intvec v;
-   number n;
-   number t=27;
+   bigint n;
+   bigint t=27;
    for(i=size(s);i>0;i--)
    {
       if(s[i]=="a"){v[i]=0;}
@@ -2023,20 +1962,20 @@ static proc wordToNumber(string s)
    return(n);
 }
 
-static proc numberToWord(number n)
+static proc numberToWord(bigint n)
 {
    int i,j;
    string v;
    list s;
-   number t=27;
-   number mm;
-   number nn=n;
+   bigint t=27;
+   bigint mm;
+   bigint nn=n;
    while(nn>t)
    {
       j++;
       mm=nn mod t;
       s[j]=mm;
-      nn=(nn-mm)/t;
+      nn=(nn-mm) div t;
    }
    j++;
    s[j]=nn;
@@ -2076,23 +2015,22 @@ static proc numberToWord(number n)
 proc code(string s)
 "USAGE:  code(s); s a string
 ASSUME:  s contains only small letters and space
-COMPUTE: a number, RSA-coding of the string s
+COMPUTE: a bigint, RSA-coding of the string s
 RETURN:  return RSA-coding of the string s as string
 EXAMPLE: code;  shows an example
 "
 {
    ring r=0,x,dp;
-   number
+   bigint
 p=398075086424064937397125500550386491199064362342526708406385189575946388957261768583317;
-   number
+   bigint
 q=472772146107435302536223071973048224632914695302097116459852171130520711256363590397527;
-   number n=p*q;
-   number phi=(p-1)*(q-1);
-   number e=1234567891;
-   list L=exgcdN(e,phi);
-   number d=L[1];
-   number m=wordToNumber(s);
-   number c=powerN(m,e,n);
+   bigint n=p*q;
+   bigint phi=(p-1)*(q-1);
+   bigint e=1234567891;
+   //bigint d=extgcd(e,phi)[2];
+   bigint m=wordToNumber(s);
+   bigint c=powerN(m,e,n);
    string cc=string(c);
    return(cc);
 }
@@ -2104,24 +2042,22 @@ example
 
 proc decodeString(string g)
 "USAGE:  decodeString(s); s a string
-ASSUME:  s is a string of a number, the output of code
+ASSUME:  s is a string of a bigint, the output of code
 COMPUTE: a string, RSA-decoding of the string s
 RETURN:  return RSA-decoding of the string s as string
 EXAMPLE: decodeString;  shows an example
 "
 {
-   ring r=0,x,dp;
-   number
+   bigint
 p=398075086424064937397125500550386491199064362342526708406385189575946388957261768583317;
-   number
+   bigint
 q=472772146107435302536223071973048224632914695302097116459852171130520711256363590397527;
-   number n=p*q;
-   number phi=(p-1)*(q-1);
-   number e=1234567891;
-   list L=exgcdN(e,phi);
-   number d=L[1];
-   execute("number c="+g+";");
-   number f=powerN(c,d,n);
+   bigint n=p*q;
+   bigint phi=(p-1)*(q-1);
+   bigint e=1234567891;
+   bigint d=extgcd(e,phi)[2];
+   execute("bigint c="+g+";");
+   bigint f=powerN(c,d,n);
    string s=numberToWord(f);
    return(s);
 }
