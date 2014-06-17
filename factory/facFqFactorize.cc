@@ -2088,7 +2088,8 @@ checkOneToOne (const CFList& factors1, const CFList& factors2, CFList& factors3,
     result2.append (g2);
   }
 
-  factors3= result2;
+  if (factors3.length() != result2.length())
+    factors3= result2;
   return result;
 }
 
