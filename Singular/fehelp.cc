@@ -1010,7 +1010,7 @@ static void heGenHelp(heEntry hentry, int br)
                                  (SINGULAR_VERSION % 100)/10,
                      hentry->url);
                    else
-                     snprintf(temp,256,"%s/%d-%d-%d/index.htm", htmldir
+                     snprintf(temp,256,"%s/%d-%d-%d/index.htm", htmldir,
                                   SINGULAR_VERSION/1000,
                                  (SINGULAR_VERSION % 1000)/100,
                                  (SINGULAR_VERSION % 100)/10
@@ -1022,7 +1022,7 @@ static void heGenHelp(heEntry hentry, int br)
                                  (SINGULAR_VERSION % 100)/10,
                      hentry->url);
                    else
-                     sprintf(temp,"%s/%d-%d-%d/index.htm", htmldir
+                     sprintf(temp,"%s/%d-%d-%d/index.htm", htmldir,
                                   SINGULAR_VERSION/1000,
                                  (SINGULAR_VERSION % 1000)/100,
                                  (SINGULAR_VERSION % 100)/10
