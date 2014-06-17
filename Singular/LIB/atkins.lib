@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version atkins.lib 4.0.0.0 Jun_2014 ";
+version="version atkins.lib 4.0.0.1 Jun_2014 ";
 category="Teaching";
 info="
 LIBRARY:  atkins.lib     Procedures for teaching cryptography
@@ -37,14 +37,14 @@ LIB "inout.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc newTest(list L, number D)
+proc newTest(list L, def D)
 "USAGE: newTest(L,D);
 RETURN:  1, if D does not already exist in L,
         -1, if D does already exist in L
 EXAMPLE:example new; shows an example
 "
 {
-  number a=1;                // a=1 means: D does not already exist in L
+  int a=1;                // a=1 means: D does not already exist in L
   int i;
   for(i=1;i<=size(L);i++)
   {
@@ -71,7 +71,7 @@ RETURN: list L, sort in decreasing order
 EXAMPLE:example bubblesort; shows an example
 "
 {
-  number b;
+  def b;
   int n,i,j;
   while(j==0)
   {
