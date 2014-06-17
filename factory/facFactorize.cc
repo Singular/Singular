@@ -393,6 +393,22 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
     refineBiFactors (A, biFactors, Aeval2, evaluation, minFactorsLength);
   minFactorsLength= tmin (minFactorsLength, biFactors.length());
 
+  CFList uniFactors= buildUniFactors (biFactors, evaluation.getLast(), y);
+
+  sortByUniFactors (Aeval2, lengthAeval2, uniFactors, biFactors, evaluation);
+
+  minFactorsLength= tmin (minFactorsLength, biFactors.length());
+
+  if (minFactorsLength == 1)
+  {
+    factors.append (A);
+    appendSwapDecompress (factors, contentAFactors, N, 0, 0, x);
+    if (isOn (SW_RATIONAL))
+      normalize (factors);
+    delete [] Aeval2;
+    return factors;
+  }
+
   if (differentSecondVar == lengthAeval2)
   {
     bool zeroOccured= false;
@@ -420,10 +436,6 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
       //TODO case where factors.length() > 0
     }
   }
-
-  CFList uniFactors= buildUniFactors (biFactors, evaluation.getLast(), y);
-
-  sortByUniFactors (Aeval2, lengthAeval2, uniFactors, evaluation);
 
   CFList * oldAeval= new CFList [lengthAeval2];
   for (int i= 0; i < lengthAeval2; i++)

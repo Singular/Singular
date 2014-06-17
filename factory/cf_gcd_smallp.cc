@@ -675,6 +675,12 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
 
     if (d0 == 0)
     {
+      if (inextension)
+      {
+        CFList u, v;
+        ppA= mapDown (ppA, prim_elem, im_prim_elem, alpha, u, v);
+        ppB= mapDown (ppB, prim_elem, im_prim_elem, alpha, u, v);
+      }
       coF= N (ppA*(cA/gcdcAcB));
       coG= N (ppB*(cB/gcdcAcB));
       return N(gcdcAcB);

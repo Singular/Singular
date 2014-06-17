@@ -397,7 +397,11 @@ simplify (const CanonicalForm& A, int level)
     {
       CanonicalForm B= LC (A);
       if (B.level() < level)
-        F= -tailcoeff (A/B);
+      {
+        CanonicalForm quot;
+        if (fdivides (B, A, quot))
+          F= -tailcoeff (quot);
+      }
     }
   }
   return F;
