@@ -3,7 +3,7 @@ Short/alexpoly.tst
 Short/algebralib.tst
 Short/allres_s.tst
 Short/arcAtPoint.tst
-;;;; Short/assprimeszerodim.tst
+Short/assprimeszerodim_s.tst
 Short/barei_s.tst
 Short/betti_s.tst
 Short/brnoeth_s.tst

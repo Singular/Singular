@@ -22,7 +22,7 @@
 #include "debug.h"
 #include "timing.h"
 
-#include "algext.h"
+#include "cfGcdAlgExt.h"
 #include "facHensel.h"
 #include "facMul.h"
 #include "fac_util.h"

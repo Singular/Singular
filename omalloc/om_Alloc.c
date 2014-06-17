@@ -7,7 +7,7 @@
 #ifndef OM_ALLOC_C
 #define OM_ALLOC_C
 
-#include <omalloc/omalloc.h>
+#include "omalloc.h"
 /*******************************************************************
  *
  *  global variables

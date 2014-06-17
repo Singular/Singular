@@ -1,0 +1,8 @@
+/*! \page kernel_groebner_walk_page Groebner-Walk algorithms
+
+ This sub-package of kernel (\ref kernel_page) contains
+ Groebner Walk algorithms. 
+
+ TODO: list those algorithms... and corresponding interpreter functions...?
+ 
+*/

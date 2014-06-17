@@ -17,7 +17,7 @@
 #include "cf_factory.h"
 #include "fac_util.h"
 #include "templates/ftmpl_functions.h"
-#include "algext.h"
+#include "cfGcdAlgExt.h"
 #include "cf_gcd_smallp.h"
 #include "cf_map_ext.h"
 #include "cf_util.h"

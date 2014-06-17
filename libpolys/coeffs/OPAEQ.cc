@@ -71,17 +71,6 @@ number  nAEQDiv(number a, number b, const coeffs)
 }
 
 
-number  nAEQIntDiv(number a, number b, const coeffs)
-{
-
-    Q_poly* f=reinterpret_cast<Q_poly*> (a);
-    mpz_t* i= reinterpret_cast<mpz_t*> (b);
-    Q_poly *res=new Q_poly;
-    res->Q_poly_set(*f);
-    res->Q_poly_scalar_div_to(*i);
-    return (number) res;
-}
-
 number  nAEQIntMod(number a, number, const coeffs)
 {
     return a;
@@ -301,6 +290,7 @@ BOOLEAN nAEQClearDenominators  (number, const coeffs)
 
 BOOLEAN n_QAEInitChar(coeffs r, void *)
 {
+    // r->is_field,is_domain?
     r->ch=0;
     r->cfKillChar=NULL;
     r->nCoeffIsEqual=ndCoeffIsEqual;
@@ -308,7 +298,6 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
     r->cfSub   = nAEQSub;
     r->cfAdd   = nAEQAdd;
     r->cfDiv   = nAEQDiv;
-    r->cfIntDiv= nAEQIntDiv;
     r->cfIntMod= nAEQIntMod;
     r->cfExactDiv= nAEQExactDiv;
     r->cfInit = nAEQInit;

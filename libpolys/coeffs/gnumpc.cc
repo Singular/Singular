@@ -472,6 +472,8 @@ static char* ngcCoeffString(const coeffs r)
 BOOLEAN ngcInitChar(coeffs n, void* parameter)
 {
   assume( getCoeffType(n) == ID );
+  n->is_field=TRUE;
+  n->is_domain=TRUE;
 
   n->cfKillChar = ngcKillChar;
   n->ch = 0;
@@ -527,7 +529,6 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   r->cfSub   = nlSub;
   r->cfAdd   = nlAdd;
   r->cfDiv   = nlDiv;
-  r->cfIntDiv= nlIntDiv;
   r->cfIntMod= nlIntMod;
   r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;

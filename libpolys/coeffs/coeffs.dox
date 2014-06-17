@@ -1,0 +1,11 @@
+/*! \page libpolys_coeffs_page Coefficients for Singular rings and algebras
+
+ Here we implement number arithmetic for some rings/fields (coeff. or number domains): \ref coeffs (Q, ZZ, etc?)
+ 
+ Generic number is just a void (\ref number). 
+ Coefficient domains are to be defined by specifying a set of function pointers 
+ in form of a structure: (\ref coeffs).
+ 
+ \verbinclude libpolys/coeffs/README.coeffs
+*/
+

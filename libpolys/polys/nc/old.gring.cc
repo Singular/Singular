@@ -1409,7 +1409,7 @@ poly gnc_ReduceSpolyOld(const poly p1, poly p2/*,poly spNoether*/, const ring r)
   number C  =  p_GetCoeff(N,  r);
   number cF =  p_GetCoeff(p2, r);
   /* GCD stuff */
-  number cG = n_Gcd(C, cF, r);
+  number cG = n_SubringGcd(C, cF, r->cf);
   if ( !n_IsOne(cG,r) )
   {
     cF = n_Div(cF, cG, r); n_Normalize(cF, r);
@@ -1470,7 +1470,7 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
   number cF = p_GetCoeff(p2, r);
 
   /* GCD stuff */
-  number cG = n_Gcd(C, cF, r);
+  number cG = n_SubringGcd(C, cF, r->cf);
 
   if (!n_IsOne(cG, r))
   {
@@ -1556,7 +1556,7 @@ poly gnc_CreateSpolyOld(poly p1, poly p2/*,poly spNoether*/, const ring r)
   poly M2    = nc_mm_Mult_p(m2,p_Head(p2,r),r);
   number C2  = p_GetCoeff(M2,r);
   /* GCD stuff */
-  number C = n_Gcd(C1,C2,r);
+  number C = n_SubringGcd(C1,C2,r->cf);
   if (!n_IsOne(C,r))
   {
     C1=n_Div(C1,C, r);n_Normalize(C1,r);
@@ -1746,7 +1746,7 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   number C2  = p_GetCoeff(M2,r);      // C2 = lc(M2)
 
   /* GCD stuff */
-  number C = n_Gcd(C1, C2, r);                     // C = gcd(C1, C2)
+  number C = n_SubringGcd(C1, C2, r->cf);           // C = gcd(C1, C2)
 
   if (!n_IsOne(C, r))                              // if C != 1
   {

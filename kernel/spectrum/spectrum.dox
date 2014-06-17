@@ -1,0 +1,9 @@
+/*! \page kernel_spectrum_page Spectrum-related algorithms
+
+ This sub-package of kernel (\ref kernel_page) contains
+ Spectrum-related algorithms. 
+
+ TODO: list those algorithms... and corresponding interpreter functions...?
+ 
+*/
+

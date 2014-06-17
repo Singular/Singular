@@ -1,9 +1,8 @@
 LIB "tst.lib"; tst_init();
 LIB "crypto.lib";
-ring R = 0,z,dp;
-number N=11;
-number a=1;
-number b=6;
+bigint N=11;
+bigint a=1;
+bigint b=6;
 list P,Q;
 P[1]=2;
 P[2]=4;

@@ -1,0 +1,10 @@
+/*! \page kernel_GBEngine_page GB-based and related algorithms
+
+ This sub-package of kernel (\ref kernel_page) contains
+ Groebner and Standard basis as well as syzygy and resolution algorithms.
+
+ Main internal structure: kStruct? LObject, TObject?
+ 
+ TODO: list those algorithms... and corresponding interpreter functions...?
+
+*/

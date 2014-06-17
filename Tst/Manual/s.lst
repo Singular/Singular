@@ -411,7 +411,6 @@ elimrep.tst
 engine.tst
 ERROR.tst
 exteriorBasis.tst
-gcdN.tst
 genericmat.tst
 getdump.tst
 GKdim.tst
@@ -622,7 +621,6 @@ ellipticAdd.tst
 envelope.tst
 equidimMax.tst
 execute.tst
-exgcdN.tst
 extendring.tst
 farey.tst
 findTorsion.tst

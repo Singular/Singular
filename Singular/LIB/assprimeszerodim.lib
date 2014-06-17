@@ -1,12 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version assprimeszerodim.lib 4.0.0.0 Jun_2013 "; // $Id$
-category = "Commutative Algebra";
+version="version assprimeszerodim.lib 4.0.0.0 Jun_2014 "; // $Id$
+category="Commutative Algebra";
 info="
 LIBRARY:  assprimeszerodim.lib   associated primes of a zero-dimensional ideal
 
 AUTHORS:  N. Idrees       nazeranjawwad@gmail.com
-@*        G. Pfister      pfister@mathematik.uni-kl.de
-@*        S. Steidel      steidel@mathematik.uni-kl.de
+          G. Pfister      pfister@mathematik.uni-kl.de
+          A. Steenpass    steenpass@mathematik.uni-kl.de
+          S. Steidel      steidel@mathematik.uni-kl.de
 
 OVERVIEW:
 
@@ -27,14 +28,66 @@ LIB "modstd.lib";
 ////////////////////////////////////////////////////////////////////////////////
 
 proc zeroRadical(ideal I, list #)
-"USAGE:  zeroRadical(I,[n]); I ideal, optional: n number of processors (for
-         parallel computing)
+"USAGE:  zeroRadical(I[, exactness]); I ideal, exactness int
 ASSUME:  I is zero-dimensional in Q[variables]
 RETURN:  the radical of I
+NOTE:    A final test is applied to the result if exactness != 0 (default),
+         otherwise no final test is done.
 EXAMPLE: example zeroRadical; shows an example
 "
 {
-   return(zeroR(modStd(I,#),#));
+   /* read optional parameter */
+   int exactness = 1;
+   if(size(#) > 0)
+   {
+      if(size(#) > 1 || typeof(#[1]) != "int")
+      {
+         ERROR("wrong optional parameter");
+      }
+      exactness = #[1];
+   }
+
+   /* compute a standard basis if necessary */
+   if (!attrib(I, "isSB"))
+   {
+      I = modStd(I, exactness);
+   }
+
+   /* call modular() */
+   // TODO: write deleteUnluckyPrimes_zeroRadical()
+   if(exactness)
+   {
+      ideal F = modular("Assprimeszerodim::zeroRadP", list(I),
+         Modstd::primeTest_std, Modular::deleteUnluckyPrimes_default,
+         pTest_zeroRadical, finalTest_zeroRadical);
+   }
+   else
+   {
+      ideal F = modular("Assprimeszerodim::zeroRadP", list(I),
+         Modstd::primeTest_std, Modular::deleteUnluckyPrimes_default,
+         pTest_zeroRadical);
+   }
+
+   /* compute the squarefree parts */
+   poly f;
+   int k;
+   int i;
+   for(i = nvars(basering); i > 0; i--)
+   {
+      f = gcd(F[i], diff(F[i], var(i)));
+      k = k + deg(f);
+      F[i] = F[i]/f;
+   }
+
+   /* return the result */
+   if(k == 0)
+   {
+      return(I);
+   }
+   else
+   {
+      return(modStd(I + F, exactness));
+   }
 }
 example
 { "EXAMPLE:";  echo = 2;
@@ -45,564 +98,166 @@ example
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc zeroR(ideal I, list #)
-// compute the radical of I provided that I is zero-dimensional in Q[variables]
-// and a standard basis
+/* The pTest for zeroRadical(), to be used in modular(). */
+static proc pTest_zeroRadical(string command, list args, ideal result, int p)
 {
-   attrib(I,"isSB",1);
-   int i, k;
-   int j = 1;
-   int index = 1;
-   int crit;
-
-   list CO1, CO2, P;
-   ideal G, F;
-   bigint N;
-   poly f;
-
-//---------------------  Initialize optional parameter  ------------------------
-   if(size(#) > 0)
+   /* change to characteristic p */
+   def br = basering;
+   list lbr = ringlist(br);
+   if(typeof(lbr[1]) == "int")
    {
-      int n1 = #[1];
-      if(n1 >= 10)
-      {
-         int n2 = n1 + 1;
-         int n3 = n1;
-      }
-      else
-      {
-         int n2 = 10;
-         int n3 = 10;
-      }
+      lbr[1] = p;
    }
    else
    {
-      int n1 = 1;
-      int n2 = 10;
-      int n3 = 10;
+      lbr[1][1] = p;
    }
+   def rp = ring(lbr);
+   setring(rp);
+   ideal Ip = fetch(br, args)[1];
+   ideal Fp_result = fetch(br, result);
 
-//--------------------  Initialize the list of primes  -------------------------
-   intvec L = primeList(I,n2);
-   L[5] = prime(random(100000000,536870912));
-
-   if(n1 > 1)
+   /* run the command and compare with given result */
+   execute("ideal Fp = "+command+"(Ip);");
+   int i;
+   for(i = nvars(br); i > 0; i--)
    {
-
-//-----  Create n links l(1),...,l(n1), open all of them and compute  ----------
-//-----  polynomial F for the primes L[2],...,L[n1 + 1].              ----------
-
-      for(i = 1; i <= n1; i++)
+      if(Fp[i] != Fp_result[i])
       {
-         //link l(i) = "MPtcp:fork";
-         link l(i) = "ssi:fork";
-         open(l(i));
-         write(l(i), quote(zeroRadP(eval(I), eval(L[i + 1]))));
-      }
-
-      int t = timer;
-      P = zeroRadP(I, L[1]);
-      t = timer - t;
-      if(t > 60) { t = 60; }
-      int i_sleep = system("sh", "sleep "+string(t));
-      CO1[index] = P[1];
-      CO2[index] = bigint(P[2]);
-      index++;
-
-      j = j + n1 + 1;
-   }
-
-//---------  Main computations in positive characteristic start here  ----------
-
-   while(!crit)
-   {
-      if(n1 > 1)
-      {
-         while(j <= size(L) + 1)
-         {
-            for(i = 1; i <= n1; i++)
-            {
-               if(status(l(i), "read", "ready"))
-               {
-                  //--- read the result from l(i) ---
-                  P = read(l(i));
-                  CO1[index] = P[1];
-                  CO2[index] = bigint(P[2]);
-                  index++;
-
-                  if(j <= size(L))
-                  {
-                     write(l(i), quote(zeroRadP(eval(I), eval(L[j]))));
-                     j++;
-                  }
-                  else
-                  {
-                     k++;
-                     close(l(i));
-                  }
-               }
-            }
-            //--- k describes the number of closed links ---
-            if(k == n1)
-            {
-               j++;
-            }
-            //--- sleep for t seconds ---
-            i_sleep = system("sh", "sleep "+string(t));
-         }
-      }
-      else
-      {
-         while(j <= size(L))
-         {
-            P = zeroRadP(I, L[j]);
-            CO1[index] = P[1];
-            CO2[index] = bigint(P[2]);
-            index++;
-            j++;
-         }
-      }
-
-      // insert deleteUnluckyPrimes
-      G = chinrem(CO1,CO2);
-      N = CO2[1];
-      for(i = 2; i <= size(CO2); i++){ N = N*CO2[i]; }
-      F = farey(G,N);
-
-      crit = 1;
-      for(i = 1; i <= nvars(basering); i++)
-      {
-         if(reduce(F[i],I) != 0) { crit = 0; break; }
-      }
-
-      if(!crit)
-      {
-         CO1 = G;
-         CO2 = N;
-         index = 2;
-
-         j = size(L) + 1;
-         L = primeList(I,n3,L);
-
-         if(n1 > 1)
-         {
-            for(i = 1; i <= n1; i++)
-            {
-               open(l(i));
-               write(l(i), quote(zeroRadP(eval(I), eval(L[j+i-1]))));
-            }
-            j = j + n1;
-            k = 0;
-         }
+         setring(br);
+         return(0);
       }
    }
-
-   k = 0;
-   for(i = 1; i <= nvars(basering); i++)
-   {
-      f = gcd(F[i],diff(F[i],var(i)));
-      k = k + deg(f);
-      F[i] = F[i]/f;
-   }
-
-   if(k == 0) { return(I); }
-   else { return(modStd(I + F, n1)); }
+   setring(br);
+   return(1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-proc assPrimes(list #)
-"USAGE:  assPrimes(I,[n],[a]); I ideal or module,
-         optional: int n: number of processors (for parallel computing), int a:
-         - a = 1: method of Eisenbud/Hunecke/Vasconcelos
-         - a = 2: method of Gianni/Trager/Zacharias
-         - a = 3: method of Monico
-         assPrimes(I) chooses n = a = 1
+/* The finalTest for zeroRadical, to be used in modular(). */
+static proc finalTest_zeroRadical(string command, list args, ideal F)
+{
+   int i;
+   for(i = nvars(basering); i > 0; i--)
+   {
+      if(reduce(F[i], args[1]) != 0) { return(0); }
+   }
+   return(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc assPrimes(def I, list #)
+"USAGE:  assPrimes(I[, alg, exactness]); I ideal or module,
+         alg string (optional), exactness int (optional)
+         - alg = "GTZ":    method of Gianni/Trager/Zacharias (default)
+         - alg = "EHV":    method of Eisenbud/Hunecke/Vasconcelos
+         - alg = "Monico": method of Monico
 ASSUME:  I is zero-dimensional over Q[variables]
-RETURN:  a list Re of associated primes of I:
+RETURN:  a list of the associated primes of I
+NOTE:    A final test is applied to the result if exactness != 0 (default),
+         otherwise no final test is done.
 EXAMPLE: example assPrimes; shows an example
 "
 {
-   ideal I;
-   if(typeof(#[1]) == "ideal")
+   /* read input */
+   if(typeof(I) != "ideal")
    {
-      I = #[1];
-   }
-   else
-   {
-      module M = #[1];
-      I = Ann(M);
+      if(typeof(I) != "module")
+      {
+         ERROR("The first argument must be of type 'ideal' or 'module'.");
+      }
+      module M = I;
+      kill I;
+      ideal I = Ann(M);
+      kill M;
    }
 
-//---------------------  Initialize optional parameter  ------------------------
-   if(size(#) > 1)
+   /* read optional parameters */
+   list defaults = list("GTZ", 1);
+   int i;
+   for(i = 1; i <= size(defaults); i++)
    {
-      if(size(#) == 2)
+      if(typeof(#[i]) != typeof(defaults[i]))
       {
-         int n1 = #[2];
-         int alg = 1;
-         if(n1 >= 10)
-         {
-            int n2 = n1 + 1;
-            int n3 = n1;
-         }
-         else
-         {
-            int n2 = 10;
-            int n3 = 10;
-         }
-      }
-      if(size(#) == 3)
-      {
-         int n1 = #[2];
-         int alg = #[3];
-         if(n1 >= 10)
-         {
-            int n2 = n1 + 1;
-            int n3 = n1;
-         }
-         else
-         {
-            int n2 = 10;
-            int n3 = 10;
-         }
+         # = insert(#, defaults[i], i-1);
       }
    }
-   else
+   if(size(#) != size(defaults))
    {
-      int n1 = 1;
-      int alg = 1;
-      int n2 = 10;
-      int n3 = 10;
+      ERROR("wrong optional parameters");
+   }
+   string alg = #[1];
+   int exactness = #[2];
+   int a;
+   if(alg == "GTZ")
+   {
+      a = 1;
+   }
+   if(alg == "EHV")
+   {
+      a = 2;
+   }
+   if(alg == "Monico")
+   {
+      a = 3;
+   }
+   if(a == 0)   // alg != "GTZ" && alg != "EHV" && alg != "Monico"
+   {
+      ERROR("unknown method");
    }
 
-   if(printlevel >= 10)
-   {
-      "n1 = "+string(n1)+", n2 = "+string(n2)+", n3 = "+string(n3);
-   }
-
-   int T = timer;
-   int RT = rtimer;
-   int TT;
-   int t_sleep;
-
-   def SPR = basering;
-   map phi;
-   list H = ideal(0);
-   ideal F;
-   poly F1;
-
+   /* compute a standard basis if necessary */
    if(printlevel >= 10) { "========== Start modStd =========="; }
-   I = modStd(I);
+   if (!attrib(I, "isSB")) {
+       I = modStd(I, exactness);
+   }
    if(printlevel >= 10) { "=========== End modStd ==========="; }
-   if(printlevel >= 9) { "modStd takes "+string(rtimer-RT)+" seconds."; }
    int d = vdim(I);
    if(d == -1) { ERROR("Ideal is not zero-dimensional."); }
    if(homog(I) == 1) { return(list(maxideal(1))); }
-   poly f = findGen(I);
-   if(printlevel >= 9) { "Coordinate change: "+string(f); }
 
-   if(size(f) == nvars(SPR))
+   /* compute the radical if necessary */
+   ideal J = I;
+   int isRad;
+   poly f;
+   isRad, f = pTestRad(I, d);
+   while(!isRad)
    {
-      TT = timer;
-      int spT = pTestRad(d,f,I);
-      if(printlevel >= 9)
-      {
-         "pTestRad(d,f,I) = "+string(spT)+" and takes "
-         +string(timer-TT)+" seconds.";
-      }
-      if(!spT)
-      {
-         if(typeof(attrib(#[1],"isRad")) == "int")
-         {
-            if(attrib(#[1],"isRad") == 0)
-            {
-               TT = timer;
-               I = zeroR(I,n1);
-               if(printlevel >= 9)
-               {
-                  "zeroR(I,n1) takes "+string(timer-TT)+" seconds.";
-               }
-               TT = timer;
-               I = modStd(I);
-               if(printlevel >= 9)
-               {
-                  "modStd(I) takes "+string(timer-TT)+" seconds.";
-               }
-               d = vdim(I);
-               f = findGen(I);
-            }
-         }
-         else
-         {
-            TT = timer;
-            I = zeroR(I,n1);
-            if(printlevel >= 9)
-            {
-               "zeroR(I,n1) takes "+string(timer-TT)+" seconds.";
-            }
-            TT = timer;
-            I = modStd(I);
-            if(printlevel >= 9)
-            {
-               "modStd(I) takes "+string(timer-TT)+" seconds.";
-            }
-            d = vdim(I);
-            f = findGen(I);
-         }
-      }
+      J = zeroRadical(I, exactness);
+      J = modStd(J, exactness);
+      d = vdim(J);
+      isRad, f = pTestRad(J, d);
    }
-   if(printlevel >= 9)
+   I = J;
+   kill J;
+
+   /* call modular() */
+   if(exactness)
    {
-      "Real-time for radical-check is "+string(rtimer - RT)+" seconds.";
-      "CPU-time for radical-check is "+string(timer - T)+" seconds.";
+      ideal F = modular("Assprimeszerodim::modpSpecialAlgDep",
+         list(I, f, d, a),
+         Modstd::primeTest_std, Modular::deleteUnluckyPrimes_default,
+         pTest_assPrimes, finalTest_assPrimes);
+   }
+   else
+   {
+      ideal F = modular("Assprimeszerodim::modpSpecialAlgDep",
+         list(I, f, d, a),
+         Modstd::primeTest_std, Modular::deleteUnluckyPrimes_default,
+         pTest_assPrimes);
    }
 
-   export(SPR);
-   poly f_for_fork = f;
-   export(f_for_fork);           // f available for each link
-   ideal I_for_fork = I;
-   export(I_for_fork);           // I available for each link
-
-//--------------------  Initialize the list of primes  -------------------------
-   intvec L = primeList(I,n2);
-   L[5] = prime(random(1000000000,2134567879));
-
-   list Re;
-
-   ring rHelp = 0,T,dp;
-   list CO1,CO2,P,H;
-   ideal F,G,testF;
-   bigint N;
-
-   list ringL = ringlist(SPR);
-   int i,k,e,int_break,s;
-   int j = 1;
-   int index = 1;
-
-//-----  If there is more than one processor available, we parallelize the  ----
-//-----  main standard basis computations in positive characteristic        ----
-
-   if(n1 > 1)
+   /* compute the components */
+   list result;
+   list H = factorize(F[1]);
+   for(i = size(H[1])-1; i > 0; i--)
    {
-
-//-----  Create n1 links l(1),...,l(n1), open all of them and compute  ---------
-//-----  standard basis for the primes L[2],...,L[n1 + 1].             ---------
-
-      for(i = 1; i <= n1; i++)
-      {
-         //link l(i) = "MPtcp:fork";
-         link l(i) = "ssi:fork";
-         open(l(i));
-         write(l(i), quote(modpSpecialAlgDep(eval(ringL), eval(L[i + 1]),
-                                                          eval(alg))));
-      }
-
-      int t = timer;
-      P = modpSpecialAlgDep(ringL, L[1], alg);
-      t = timer - t;
-      if(t > 60) { t = 60; }
-      int i_sleep = system("sh", "sleep "+string(t));
-      CO1[index] = P[1];
-      CO2[index] = bigint(P[2]);
-      index++;
-
-      j = j + n1 + 1;
+      result[i] = I + ideal(quickSubst(H[1][i+1], f, I));
    }
 
-//---------  Main computations in positive characteristic start here  ----------
-
-   int tt = timer;
-   int rt = rtimer;
-
-   while(1)
-   {
-      tt = timer;
-      rt = rtimer;
-
-      if(printlevel >= 9) { "size(L) = "+string(size(L)); }
-
-      if(n1 > 1)
-      {
-         while(j <= size(L) + 1)
-         {
-            for(i = 1; i <= n1; i++)
-            {
-               //--- ask if link l(i) is ready otherwise sleep for t seconds ---
-               if(status(l(i), "read", "ready"))
-               {
-                  //--- read the result from l(i) ---
-                  P = read(l(i));
-                  CO1[index] = P[1];
-                  CO2[index] = bigint(P[2]);
-                  index++;
-
-                  if(j <= size(L))
-                  {
-                     write(l(i), quote(modpSpecialAlgDep(eval(ringL),
-                                                         eval(L[j]),
-                                                         eval(alg))));
-                     j++;
-                  }
-                  else
-                  {
-                     k++;
-                     close(l(i));
-                  }
-               }
-            }
-            //--- k describes the number of closed links ---
-            if(k == n1)
-            {
-               j++;
-            }
-            i_sleep = system("sh", "sleep "+string(t));
-         }
-      }
-      else
-      {
-         while(j <= size(L))
-         {
-            P = modpSpecialAlgDep(ringL, L[j], alg);
-            CO1[index] = P[1];
-            CO2[index] = bigint(P[2]);
-            index++;
-            j++;
-         }
-      }
-
-      if(printlevel >= 9)
-      {
-         "Real-time for computing list in assPrimes is "+string(rtimer - rt)+
-         " seconds.";
-         "CPU-time for computing list in assPrimes is "+string(timer - tt)+
-         " seconds.";
-      }
-
-//-------------------  Lift results to basering via farey ----------------------
-
-      tt = timer;
-      G = chinrem(CO1,CO2);
-      N = CO2[1];
-      for(j = 2; j <= size(CO2); j++){ N = N*CO2[j]; }
-      F = farey(G,N);
-      if(printlevel >= 10) { "Lifting-process takes "+string(timer - tt)
-                             +" seconds"; }
-
-      if(pTestPoly(F[1], ringL, alg, L))
-      {
-         F = cleardenom(F[1]);
-
-         e = deg(F[1]);
-         if(e == d)
-         {
-            H = factorize(F[1]);
-
-            s = size(H[1]);
-            for(i = 1; i <= s; i++)
-            {
-               if(H[2][i] != 1)
-               {
-                  int_break = 1;
-               }
-            }
-
-            if(int_break == 0)
-            {
-               setring SPR;
-               phi = rHelp,var(nvars(SPR));
-               H = phi(H);
-
-               if(printlevel >= 9)
-               {
-                  "Real-time without test is "+string(rtimer - RT)+" seconds.";
-                  "CPU-time without test is "+string(timer - T)+" seconds.";
-               }
-
-               T = timer;
-               RT = rtimer;
-
-               F = phi(F);
-
-               if(n1 > 1)
-               {
-                  open(l(1));
-                  write(l(1), quote(quickSubst(eval(F[1]), eval(f), eval(I))));
-                  t_sleep = timer;
-               }
-               else
-               {
-                  F1 = quickSubst(F[1],f,I);
-                  if(F1 != 0) { int_break = 1; }
-               }
-
-               if(int_break == 0)
-               {
-                  for(i = 2; i <= s; i++)
-                  {
-                     H[1][i] = quickSubst(H[1][i],f,I);
-                     Re[i-1] = I + ideal(H[1][i]);
-                  }
-
-                  if(n1 > 1)
-                  {
-                     t_sleep = timer - t_sleep;
-                     if(t_sleep > 5) { t_sleep = 5; }
-
-                     while(1)
-                     {
-                        if(status(l(1), "read", "ready"))
-                        {
-                           F1 = read(l(1));
-                           close(l(1));
-                           break;
-                        }
-                        i_sleep = system("sh", "sleep "+string(t_sleep));
-                     }
-                     if(F1 != 0) { int_break = 1; }
-                  }
-                  if(printlevel >= 9)
-                  {
-                     "Real-time for test is "+string(rtimer - RT)+" seconds.";
-                     "CPU-time for test is "+string(timer - T)+" seconds.";
-                  }
-                  if(int_break == 0)
-                  {
-                     kill f_for_fork;
-                     kill I_for_fork;
-                     kill SPR;
-                     return(Re);
-                  }
-               }
-            }
-         }
-      }
-
-      int_break = 0;
-      setring rHelp;
-      testF = F;
-      CO1 = G;
-      CO2 = N;
-      index = 2;
-
-      j = size(L) + 1;
-
-      setring SPR;
-      L = primeList(I,n3,L);
-      setring rHelp;
-
-      if(n1 > 1)
-      {
-         for(i = 1; i <= n1; i++)
-         {
-            open(l(i));
-            write(l(i), quote(modpSpecialAlgDep(eval(ringL), eval(L[j+i-1]),
-                                                             eval(alg))));
-         }
-         j = j + n1;
-         k = 0;
-      }
-   }
+   /* return the result */
+   return(result);
 }
 example
 { "EXAMPLE:";  echo = 2;
@@ -619,88 +274,84 @@ example
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc specialAlgDepEHV(poly p, ideal I)
+/* Computes a poly F in Q[T] such that
+ * <F> = kernel(Q[T] --> basering, T |-> f),
+ * T := last variable in the basering.
+ */
+static proc specialAlgDepEHV(ideal I, poly f)
 {
-//=== computes a poly F in Q[T] such that <F>=kernel(Q[T]--->basering)
-//=== mapping T to p
    def R = basering;
-   execute("ring Rhelp="+charstr(R)+",T,dp;");
-   setring R;
-   map phi = Rhelp,p;
-   setring Rhelp;
-   ideal F = preimage(R,phi,I); //corresponds to std(I,p-T) in dp(n),dp(1)
-   export(F);
-   setring R;
-   list L = Rhelp;
-   return(L);
+   execute("ring QT = ("+charstr(R)+"), "+varstr(R, nvars(R))+", dp;");
+   setring(R);
+   map phi = QT, f;
+   setring QT;
+   ideal F = preimage(R, phi, I); // corresponds to std(I, f-T) in dp(n),dp(1)
+   setring(R);
+   ideal F = imap(QT, F);
+   return(F);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc specialAlgDepGTZ(poly p, ideal I)
+/* Assume I is zero-dimensional.
+ * Computes a poly F in Q[T] such that
+ * <F> = kernel(Q[T] --> basering, T |-> f),
+ * T := last variable in the basering.
+ */
+static proc specialAlgDepGTZ(ideal I, poly f)
 {
-//=== assume I is zero-dimensional
-//=== computes a poly F in Q[T] such that <F>=kernel(Q[T]--->basering)
-//=== mapping T to p
    def R = basering;
-   execute("ring Rhelp = "+charstr(R)+",T,dp;");
-   setring R;
-   map phi = Rhelp,p;
-   def Rlp = changeord(list(list("dp",1:(nvars(R)-1)),list("dp",1:1)));
-   setring Rlp;
-   poly p = imap(R,p);
-   ideal K = maxideal(1);
-   K[nvars(R)] = 2*var(nvars(R))-p;
-   map phi = R,K;
-   ideal I = phi(I);
-   I = std(I);
-   poly q = subst(I[1],var(nvars(R)),var(1));
-   setring Rhelp;
-   map psi=Rlp,T;
-   ideal F=psi(q);
-   export(F);
-   setring R;
-   list L=Rhelp;
-   return(L);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-static proc specialAlgDepMonico(poly p, ideal I)
-{
-//=== assume I is zero-dimensional
-//=== computes a poly F in Q[T], the characteristic polynomial of the map
-//=== basering/I ---> baserng/I  defined by the multiplication with p
-//=== in case I is radical it is the same poly as in specialAlgDepEHV
-   def R = basering;
-   execute("ring Rhelp = "+charstr(R)+",T,dp;");
-   setring R;
-   map phi = Rhelp,p;
-   poly q;
-   int j;
-   matrix m ;
-   poly va = var(1);
-   ideal J = std(I);
-   ideal ba = kbase(J);
-   int d = vdim(J);
-   matrix n[d][d];
-   for(j = 2; j <= nvars(R); j++)
+   if(nvars(R) > 1)
    {
-     va = va*var(j);
+      def Rlp = changeord(list(list("dp", 1:(nvars(R)-1)), list("dp", 1:1)));
+      setring(Rlp);
+      poly f = imap(R, f);
+      ideal I;
+   }
+   ideal K = maxideal(1);
+   K[nvars(R)] = 2*var(nvars(R))-f;
+   map phi = R, K;
+   I = phi(I);
+   I = std(I);
+   ideal F = I[1];
+   if(nvars(R) > 1)
+   {
+      setring(R);
+      ideal F = imap(Rlp, F);
+   }
+   return(F);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+/* Assume I is zero-dimensional.
+ * Computes a poly F in Q[T], the characteristic polynomial of the map
+ * basering/I ---> basering/I  defined by the multiplication with f,
+ * T := last variable in the basering.
+ * In case I is radical, it is the same polynomial as in specialAlgDepEHV.
+ */
+static proc specialAlgDepMonico(ideal I, poly f, int d)
+{
+   def R = basering;
+   int j;
+   matrix M[d][d];
+   ideal J = std(I);
+   ideal basis = kbase(J);
+   poly vars = var(nvars(R));
+   for(j = nvars(R)-1; j > 0; j--)
+   {
+     vars = var(j)*vars;
    }
    for(j = 1; j <= d; j++)
    {
-     q = reduce(p*ba[j],J);
-     m = coeffs(q,ba,va);
-     n[j,1..d] = m[1..d,1];
+     M[1..d, j] = coeffs(reduce(f*basis[j], J), basis, vars);
    }
-   setring Rhelp;
-   matrix n = imap(R,n);
-   ideal F = det(n-T*freemodule(d));
-   export(F);
-   setring R;
-   list L = Rhelp;
-   return(L);
+   execute("ring QT = ("+charstr(R)+"), "+varstr(R, nvars(R))+", dp;");
+   matrix M = imap(R, M);
+   ideal F = det(M-var(1)*freemodule(d));
+   setring(R);
+   ideal F = imap(QT, F);
+   return(F);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -710,142 +361,145 @@ static proc specialTest(int d, poly p, ideal I)
 //=== computes a poly F in Q[T] such that <F>=kernel(Q[T]--->basering)
 //=== mapping T to p and test if d=deg(F)
    def R = basering;
-   execute("ring Rhelp="+charstr(R)+",T,dp;");
+   execute("ring Rhelp = ("+charstr(R)+"), T, dp;");
    setring R;
    map phi = Rhelp,p;
    setring Rhelp;
    ideal F = preimage(R,phi,I);
    int e=deg(F[1]);
    setring R;
-   return((e==d));
+   return((e==d), fetch(Rhelp, F)[1]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc findGen(ideal J, list #)
+/* Assume d = vector space dim(basering/J).
+ * Tries to find a (sparse) linear form r such that d = deg(F), where
+ * F is a poly in Q[T] such that <F> = kernel(Q[T]-->basering) mapping T to r.
+ * If found, returns (1, r, F). If not found, returns (0, 0, 0).
+ */
+static proc findGen(ideal J, int d)
 {
-//=== try to find a sparse linear form r such that
-//=== vector space dim(basering/J)=deg(F),
-//=== F a poly in Q[T] such that <F>=kernel(Q[T]--->basering) mapping T to r
-//=== if not found returns a generic (randomly chosen) r
-   int d = vdim(J);
    def R = basering;
    int n = nvars(R);
-   list rl = ringlist(R);
-   if(size(#) > 0) { int p = #[1]; }
-   else { int p = prime(random(1000000000,2134567879)); }
-   rl[1] = p;
-   def @R = ring(rl);
-   setring @R;
-   ideal J = imap(R,J);
+   int okay;
+   poly F;
+
+   /* try trivial transformation */
    poly r = var(n);
-   int i,k;
-   k = specialTest(d,r,J);
-   if(!k)
+   okay, F = specialTest(d, r, J);
+   if(okay)
    {
-      for(i = 1; i < n; i++)
+      return(1, r, F);
+   }
+
+   /* try transformations of the form var(n) + var(i) */
+   int i;
+   for(i = 1; i < n; i++)
+   {
+      okay, F = specialTest(d, r+var(i), J);
+      if(okay)
       {
-         k = specialTest(d,r+var(i),J);
-         if(k){ r = r + var(i); break; }
+         return(1, r+var(i), F);
       }
    }
-   if((!k) && (n > 2))
+
+   /* try transformations of the form var(n) + \sum var(i) */
+   if(n > 2)
    {
       for(i = 1; i < n; i++)
       {
          r = r + var(i);
-         k = specialTest(d,r,J);
-         if(k){ break; }
+         okay, F = specialTest(d, r, J);
+         if(okay)
+         {
+            return(1, r, F);
+         }
       }
    }
-   setring R;
-   poly r = randomLast(100)[nvars(R)];
-   if(k){ r = imap(@R,r); }
-   return(r);
+
+   /* try random transformations */
+   int N = 2;   // arbitrarily chosen
+   for(i = N; i > 0; i--)
+   {
+      r = randomLast(100)[n];
+      okay, F = specialTest(d, r, J);
+      if(okay)
+      {
+         return(1, r, F);
+      }
+   }
+
+   /* not found */
+   return(0, 0, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc pTestRad(int d, poly p1, ideal I)
+/* Assume d = vector space dim(basering/I).
+ * Tests if I is radical over F_p, where p is some randomly chosen prime.
+ * If yes, chooses a linear form r such that d = deg(squarefreepart(F)), where
+ * F is a poly in Z/p[T] such that <F> = kernel(Z/p[T]-->Z/p[vars(basering)])
+ * mapping T to r.
+ * Returns (1, r), if I is radical over F_p, and (0, 0) otherwise.
+ */
+static proc pTestRad(ideal I, int d)
 {
-//=== computes a poly F in Z/q1[T] such that
-//===                    <F> = kernel(Z/q1[T]--->Z/q1[vars(basering)])
-//=== mapping T to p1 and test if d=deg(squarefreepart(F)), q1 a prime randomly
-//=== chosen
-//=== If not choose randomly another prime q2 and another linear form p2 and
-//=== computes a poly F in Z/q2[T] such that
-//===                    <F> = kernel(Z/q2[T]--->Z/q2[vars(basering)])
-//=== mapping T to p2 and test if d=deg(squarefreepart(F))
-//=== if the test is positive then I is radical
+   int N = 2;   // Try N random primes. Value of N can be chosen arbitrarily.
    def R = basering;
    list rl = ringlist(R);
-   int q1 = prime(random(100000000,536870912));
-   rl[1] = q1;
-   ring Shelp1 = q1,T,dp;
-   setring R;
-   def Rhelp1 = ring(rl);
-   setring Rhelp1;
-   poly p1 = imap(R,p1);
-   ideal I = imap(R,I);
-   map phi = Shelp1,p1;
-   setring Shelp1;
-   ideal F = preimage(Rhelp1,phi,I);
-   poly f = gcd(F[1],diff(F[1],var(1)));
-   int e = deg(F[1]/f);
-   setring R;
-   if(e != d)
+   int p;
+   int okay;
+   int i;
+   for(i = N; i > 0; i--)
    {
-      poly p2 = findGen(I,q1);
-      setring Rhelp1;
-      poly p2 = imap(R,p2);
-      phi = Shelp1,p2;
-      setring Shelp1;
-      F = preimage(Rhelp1,phi,I);
-      f = gcd(F[1],diff(F[1],var(1)));
-      e = deg(F[1]/f);
-      setring R;
-      if(e == d){ return(1); }
-      if(e != d)
+      p = prime(random(100000000,536870912));
+
+      // change to characteristic p
+      if(typeof(rl[1]) == "int")
       {
-         int q2 = prime(random(100000000,536870912));
-         rl[1] = q2;
-         ring Shelp2 = q2,T,dp;
-         setring R;
-         def Rhelp2 = ring(rl);
-         setring Rhelp2;
-         poly p1 = imap(R,p1);
-         ideal I = imap(R,I);
-         map phi = Shelp2,p1;
-         setring Shelp2;
-         ideal F = preimage(Rhelp2,phi,I);
-         poly f = gcd(F[1],diff(F[1],var(1)));
-         e = deg(F[1]/f);
-         setring R;
-         if(e == d){ return(1); }
+         rl[1] = p;
       }
+      else
+      {
+         rl[1][1] = p;
+      }
+      def Rp(i) = ring(rl);
+      setring Rp(i);
+      ideal I = imap(R, I);
+
+      // find and test transformation
+      poly r;
+      poly F;
+      okay, r, F = findGen(I, d);
+      if(okay)
+      {
+         poly f = gcd(F, diff(F, var(1)));
+         if(d == deg(F/f))   // F squarefree?
+         {
+            setring(R);
+            return(1, imap(Rp(i), r));
+         }
+      }
+      setring(R);
    }
-   return((e==d));
+   return(0, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc zeroRadP(ideal I, int p)
+/* Computes an ideal F such that ncols(F) = nvars(basering),
+ * < F[i] > = (I intersected with K[var(i)]), and F[i] is monic.
+ */
+static proc zeroRadP(ideal I)
 {
-//=== computes F=(F_1,...,F_n) such that <F_i>=IZ/p[x_1,...,x_n] intersected
-//=== with Z/p[x_i], F_i monic
-   def R0 = basering;
-   list ringL = ringlist(R0);
-   ringL[1] = p;
-   def @r = ring(ringL);
-   setring @r;
-   ideal I = fetch(R0,I);
+   intvec opt = option(get);
    option(redSB);
    I = std(I);
-   ideal F = finduni(I); //F[i] generates I intersected with K[var(i)]
-   int i;
-   for(i = 1; i <= size(F); i++){ F[i] = simplify(F[i],1); }
-   setring R0;
-   return(list(fetch(@r,F),p));
+   ideal F = finduni(I);   // F[i] generates I intersected with K[var(i)]
+   F = simplify(F, 1);
+   option(set, opt);
+   return(F);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -882,68 +536,55 @@ static proc quickSubst(poly h, poly r, ideal I)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc modpSpecialAlgDep(list ringL, int p, list #)
+/* Simple switch for specialAlgDepEHV, specialAlgDepGTZ, and
+ * specialAlgDepMonico.
+ */
+static proc modpSpecialAlgDep(ideal I, poly f, int d, int alg)
 {
-//=== prepare parallel computing
-//===  #=1: method of Eisenbud/Hunecke/Vasconcelos
-//===  #=2: method of Gianni/Trager/Zacharias
-//===  #=3: method of Monico
-
-   def R0 = basering;
-
-   ringL[1] = p;
-   def @r = ring(ringL);
-   setring @r;
-   poly f = fetch(SPR,f_for_fork);
-   ideal I = fetch(SPR,I_for_fork);
-   if(size(#) > 0)
-   {
-      if(#[1] == 1) { list M = specialAlgDepEHV(f,I); }
-      if(#[1] == 2) { list M = specialAlgDepGTZ(f,I); }
-      if(#[1] == 3) { list M = specialAlgDepMonico(f,I); }
-   }
-   else
-   {
-      list M = specialAlgDepEHV(f,I);
-   }
-   def @S = M[1];
-
-   setring R0;
-   return(list(imap(@S,F),p));
+   ideal F;
+   if(alg == 1) { F = specialAlgDepEHV(I, f); }
+   if(alg == 2) { F = specialAlgDepGTZ(I, f); }
+   if(alg == 3) { F = specialAlgDepMonico(I, f, d); }
+   F = simplify(F, 1);
+   return(F);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc pTestPoly(poly testF, list ringL, int alg, list L)
+/* The pTest for assPrimes(), to be used in modular(). */
+static proc pTest_assPrimes(string command, list args, ideal F, int p)
 {
-   int i,j,p;
-   def R0 = basering;
-
-   while(!i)
+   def br = basering;
+   list lbr = ringlist(br);
+   if(typeof(lbr[1]) == "int")
    {
-      i = 1;
-      p = prime(random(1000000000,2134567879));
-      for(j = 1; j <= size(L); j++)
-      {
-         if(p == L[j]) { i = 0; break; }
-      }
+      lbr[1] = p;
    }
-
-   ringL[1] = p;
-   def @R = ring(ringL);
-   setring @R;
-   poly f = fetch(SPR,f_for_fork);
-   ideal I = fetch(SPR,I_for_fork);
-   if(alg == 1) { list M = specialAlgDepEHV(f,I); }
-   if(alg == 2) { list M = specialAlgDepGTZ(f,I); }
-   if(alg == 3) { list M = specialAlgDepMonico(f,I); }
-   def @S = M[1];
-   setring @S;
-   poly testF = fetch(R0,testF);
-   int k = (testF == F);
-
-   setring R0;
+   else
+   {
+      lbr[1][1] = p;
+   }
+   def rp = ring(lbr);
+   setring(rp);
+   list args_p = fetch(br, args);
+   ideal F = fetch(br, F);
+   execute("ideal Fp = "+command+"("
+      +Tasks::argsToString("args_p", size(args_p))+");");
+   int k = (Fp[1] == F[1]);
+   setring br;
    return(k);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+/* The finalTest for assPrimes(), to be used in modular(). */
+static proc finalTest_assPrimes(string command, alias list args, ideal F)
+{
+   F = cleardenom(F[1]);
+   if(deg(F[1]) != args[3]) { return(0); }
+   if(gcd(F[1], diff(F[1], var(nvars(basering)))) != 1) { return(0); };
+   if(quickSubst(F[1], args[2], args[1]) != 0) { return(0); }
+   return(1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

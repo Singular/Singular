@@ -15,7 +15,6 @@ libfactory_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 
 # factory source files
 SOURCES = \
-		algext.cc \
 		canonicalform.cc \
 		cf_algorithm.cc \
 		cf_char.cc \
@@ -27,6 +26,7 @@ SOURCES = \
 		cf_factor.cc \
 		cf_factory.cc \
 		cf_gcd.cc \
+		cfGcdAlgExt.cc \
 		cf_gcd_smallp.cc \
 		cf_generator.cc \
 		cf_globals.cc \
@@ -107,6 +107,7 @@ factory_headers = \
 		cf_factory.h \
 		cf_generator.h \
 		cf_globals.h \
+		cfGcdAlgExt.h \
 		cf_gcd_smallp.h \
 		cf_hnf.h \
 		cf_irred.h \
@@ -156,7 +157,6 @@ factory_headers = \
 		timing.h \
 		variable.h \
 		NTLconvert.h \
-		algext.h \
 		singext.h \
 		parseutil.h
 

@@ -5,8 +5,8 @@
  *  Created: 11/99
  *******************************************************************/
 
-#include <omalloc/omalloc.h>
-#include <omalloc/omDefaultConfig.h>
+#include "omalloc.h"
+#include "omDefaultConfig.h"
 
 omOpts_t om_Opts =
 {
