@@ -10,6 +10,11 @@
 
 /*BEGINPUBLIC*/
 
+/** generate a random irreducible polynomial in x of degree deg
+ *
+ * @warning this is done in the most naive way, i.e. a random is generated and
+ * then factorized
+**/
 CanonicalForm find_irreducible ( int deg, CFRandom & gen, const Variable & x );
 
 /*ENDPUBLIC*/

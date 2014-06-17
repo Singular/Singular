@@ -10,6 +10,9 @@
 
 /*BEGINPUBLIC*/
 
+/**
+ * class to do operations mod p^k for int's p and k
+**/
 class modpk
 {
 private:

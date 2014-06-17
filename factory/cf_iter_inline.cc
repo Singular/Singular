@@ -1,18 +1,20 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-//{{{ docu
-//
-// cf_iter_inline.cc - definition of configurable inline
-//   `CFIterator' methods.
-//
-// Hierarchy: canonicalform, utility class
-//
-// Header file: cf_iter.h
-//
-// See `cf_inline.cc' for a description of "configurable inline
-// methods".
-//
-//}}}
+/**
+ *
+ * @file cf_iter_inline.cc
+ *
+ * definition of configurable inline
+ * `CFIterator' methods.
+ *
+ * Hierarchy: canonicalform, utility class
+ *
+ * Header file: cf_iter.h
+ *
+ * See `cf_inline.cc' for a description of "configurable inline
+ * methods".
+ *
+**/
 
 // check whether we are included or translated and
 // define `INCL_CF_ITER_INLINE_CC' if we are included
@@ -61,30 +63,27 @@
 
 #ifndef INCL_CF_ITER_INLINE_CC
 // selectors
-//{{{ CF_INLINE int CFIterator::hasTerms () const
-//{{{ docu
-//
-// hasTerm() - check whether CO points to a valid term.
-//
-// Return true if CO points to a valid term, false if CO points
-// to the end of the sequence of terms.
-//
-//}}}
+/** CF_INLINE int CFIterator::hasTerms () const
+ *
+ * hasTerm() - check whether CO points to a valid term.
+ *
+ * Return true if CO points to a valid term, false if CO points
+ * to the end of the sequence of terms.
+ *
+**/
 CF_INLINE int
 CFIterator::hasTerms () const
 {
     return hasterms;
 }
-//}}}
 
-//{{{ CF_INLINE CanonicalForm CFIterator::coeff () const
-//{{{ docu
-//
-// coeff() - return coefficient of current term of CO.
-//
-// CO has to point to a valid term.
-//
-//}}}
+/** CF_INLINE CanonicalForm CFIterator::coeff () const
+ *
+ * coeff() - return coefficient of current term of CO.
+ *
+ * CO has to point to a valid term.
+ *
+**/
 CF_INLINE CanonicalForm
 CFIterator::coeff () const
 {
@@ -94,16 +93,14 @@ CFIterator::coeff () const
     else
         return data;
 }
-//}}}
 
-//{{{ CF_INLINE int CFIterator::exp () const
-//{{{ docu
-//
-// exp() - return exponent of current term of CO.
-//
-// CO has to point to a valid term.
-//
-//}}}
+/** CF_INLINE int CFIterator::exp () const
+ *
+ * exp() - return exponent of current term of CO.
+ *
+ * CO has to point to a valid term.
+ *
+**/
 CF_INLINE int
 CFIterator::exp () const
 {
@@ -113,20 +110,18 @@ CFIterator::exp () const
     else
         return 0;
 }
-//}}}
 
 // implementor methods
-//{{{ CFIterator::operator ++ (), operator ++ ( int )
-//{{{ docu
-//
-// operator ++() - advance CO to next term.
-//
-// Advance current term to next term in the sequence of terms or
-// to end of sequence.  CO has to point to a valid term.
-//
-// The postfix and prefix operator are identical.
-//
-//}}}
+/** CFIterator::operator ++ (), operator ++ ( int )
+ *
+ * operator ++() - advance CO to next term.
+ *
+ * Advance current term to next term in the sequence of terms or
+ * to end of sequence.  CO has to point to a valid term.
+ *
+ * The postfix and prefix operator are identical.
+ *
+**/
 CF_INLINE CFIterator &
 CFIterator::operator ++ ()
 {
@@ -140,6 +135,9 @@ CFIterator::operator ++ ()
     return *this;
 }
 
+/**
+ * @sa CFIterator::operator
+**/
 CF_INLINE CFIterator &
 CFIterator::operator ++ ( int )
 {
@@ -152,5 +150,4 @@ CFIterator::operator ++ ( int )
 
     return *this;
 }
-//}}}
 #endif

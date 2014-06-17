@@ -9,6 +9,9 @@
 
 /*BEGINPUBLIC*/
 
+/**
+ * virtual class for generators
+**/
 class CFGenerator
 {
 public:
@@ -21,6 +24,9 @@ public:
     virtual CFGenerator * clone() const { return new CFGenerator();}
 };
 
+/**
+ * generate integers starting from 0
+**/
 class IntGenerator : public CFGenerator
 {
 private:
@@ -37,6 +43,9 @@ public:
     CFGenerator * clone() const;
 };
 
+/**
+ * generate all elements in F_p starting from 0
+**/
 class FFGenerator : public CFGenerator
 {
 private:
@@ -53,6 +62,9 @@ public:
     CFGenerator * clone() const;
 };
 
+/**
+ * generate all elements in GF starting from 0
+**/
 class GFGenerator : public CFGenerator
 {
 private:
@@ -69,6 +81,9 @@ public:
     CFGenerator * clone() const;
 };
 
+/**
+ * generate all elements in F_p(alpha) starting from 0
+**/
 class AlgExtGenerator: public CFGenerator
 {
 private:

@@ -39,6 +39,7 @@ SOURCES = \
 		cf_map.cc \
 		cf_map_ext.cc \
 		cfNewtonPolygon.cc \
+		cfNTLzzpEXGCD.cc \
 		cfModResultant.cc \
 		cf_ops.cc \
 		cf_primes.cc \
@@ -68,7 +69,6 @@ SOURCES = \
 		facHensel.cc \
 		facIrredTest.cc \
 		facMul.cc \
-		facNTLzzpEXGCD.cc \
 		facSparseHensel.cc \
 		ffops.cc \
 		FLINTconvert.cc \
@@ -115,6 +115,7 @@ factory_headers = \
 		cf_map.h \
 		cf_map_ext.h \
 		cfNewtonPolygon.h \
+		cfNTLzzpEXGCD.h \
 		cfModResultant.h \
 		cf_primes.h \
 		cf_primetab.h \
@@ -142,7 +143,6 @@ factory_headers = \
 		facHensel.h \
 		facIrredTest.h \
 		facMul.h \
-		facNTLzzpEXGCD.h \
 		facSparseHensel.h \
 		ffops.h \
 		FLINTconvert.h \

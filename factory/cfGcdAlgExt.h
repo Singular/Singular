@@ -1,3 +1,15 @@
+/**
+ * @file cfGcdAlgExt.h
+ *
+ * GCD over Q(a)
+ *
+ * ABSTRACT: Implementation of Encarnacion's GCD algorithm over number fields,
+ * see M.J. Encarnacion "Computing GCDs of polynomials over number fields",
+ * extended to the multivariate case.
+ *
+ * @sa cfNTLzzpEXGCD.h
+**/
+
 #ifndef CF_GCD_ALGEXT_H
 #define CF_GCD_ALGEXT_H
 
@@ -6,7 +18,9 @@
 #include "canonicalform.h"
 #include "variable.h"
 
+/// gcd over Q(a)
 CanonicalForm QGCD( const CanonicalForm &, const CanonicalForm & );
+
 #ifndef HAVE_NTL
 void tryDivrem (const CanonicalForm&, const CanonicalForm&, CanonicalForm&,
                 CanonicalForm&, CanonicalForm&, const CanonicalForm&,
@@ -18,7 +32,11 @@ void tryInvert( const CanonicalForm &, const CanonicalForm &, CanonicalForm &, b
 /*BEGINPUBLIC*/
 bool hasFirstAlgVar( const CanonicalForm &, Variable & );
 /*ENDPUBLIC*/
+
+/// modular gcd over F_p[x]/(M) for not necessarily irreducible M.
+/// If a zero divisor is encountered fail is set to true.
 void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, bool & fail, bool topLevel= true );
+
 int * leadDeg(const CanonicalForm & f, int *degs);
 bool isLess(int *a, int *b, int lower, int upper);
 bool isEqual(int *a, int *b, int lower, int upper);

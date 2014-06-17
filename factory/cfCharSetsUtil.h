@@ -22,11 +22,14 @@
 #define CF_CHARSETS_UTIL
 
 /*BEGINPUBLIC*/
+/**
+ * class to store factors that get removed during char set computation
+**/
 class StoreFactors
 {
   public:
-    CFList FS1;
-    CFList FS2;
+    CFList FS1; ///< factors that were removed
+    CFList FS2; ///< candidate factors that might get removed
     inline StoreFactors& operator= (const StoreFactors& value)
     {
       if ( this != &value )

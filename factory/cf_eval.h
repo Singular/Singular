@@ -19,6 +19,9 @@
 
 /*BEGINPUBLIC*/
 
+/**
+ * class to evaluate a polynomial at points
+**/
 class Evaluation
 {
 protected:

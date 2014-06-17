@@ -11,6 +11,9 @@
 
 /*BEGINPUBLIC*/
 
+/**
+ * class to generate random points
+**/
 class REvaluation : public Evaluation
 {
 protected: // neeeded in FFREvaluation
