@@ -1,6 +1,6 @@
 /*! \mainpage Singular developers manual
 
-\verbinclude README
+\include README.md
 
 Somewhat older kernel documentation can be found at ftp://www.mathematik.uni-kl.de/pub/Math/Singular/doc/singular-anatomy.tgz
 
