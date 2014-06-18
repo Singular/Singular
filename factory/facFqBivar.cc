@@ -35,7 +35,6 @@
 #include "facFqBivarUtil.h"
 #include "facFqBivar.h"
 #include "cfNewtonPolygon.h"
-#include "cfGcdAlgExt.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"

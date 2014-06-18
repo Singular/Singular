@@ -112,9 +112,6 @@
 #include "cfModResultant.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
-#include "cfGcdAlgExt.h"
-
-/*MAKEHEADER PUBLIC ONLY*/
 #include "facAlgFunc.h"
 
 /*MAKEHEADER PUBLIC ONLY*/

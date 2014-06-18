@@ -270,6 +270,8 @@ int size ( const CanonicalForm & f, const Variable & v );
 int size ( const CanonicalForm & f );
 
 CanonicalForm reduce ( const CanonicalForm& f, const CanonicalForm & M);
+
+bool hasFirstAlgVar( const CanonicalForm & f, Variable & a);
 //}}}
 
 //{{{ inline functions corresponding to CanonicalForm methods

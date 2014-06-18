@@ -24,7 +24,6 @@
 #include "timing.h"
 
 #include "canonicalform.h"
-#include "cfGcdAlgExt.h"
 #include "cf_map.h"
 #include "cf_util.h"
 #include "templates/ftmpl_functions.h"

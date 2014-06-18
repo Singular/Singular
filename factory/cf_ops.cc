@@ -660,3 +660,19 @@ CanonicalForm reduce(const CanonicalForm & f, const CanonicalForm & M)
     result += reduce(i.coeff(),M) * power(f.mvar(),i.exp());
   return result;
 }
+
+/** check if poly f contains an algebraic variable a **/
+bool hasFirstAlgVar( const CanonicalForm & f, Variable & a )
+{
+  if( f.inBaseDomain() ) // f has NO alg. variable
+    return false;
+  if( f.level()<0 ) // f has only alg. vars, so take the first one
+  {
+    a = f.mvar();
+    return true;
+  }
+  for(CFIterator i=f; i.hasTerms(); i++)
+    if( hasFirstAlgVar( i.coeff(), a ))
+      return true; // 'a' is already set
+  return false;
+}
