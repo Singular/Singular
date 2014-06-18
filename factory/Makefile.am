@@ -23,6 +23,7 @@ SOURCES = \
 		cf_chinese.cc \
 		cf_cyclo.cc \
 		cf_eval.cc \
+		cfEzgcd.cc \
 		cf_factor.cc \
 		cf_factory.cc \
 		cf_gcd.cc \
@@ -57,7 +58,6 @@ SOURCES = \
 		facAlgFunc.cc \
 		facAlgFuncUtil.cc \
 		facBivar.cc \
-		fac_ezgcd.cc \
 		facFactorize.cc \
 		fac_sqrfree.cc \
 		fac_util.cc \
