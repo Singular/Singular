@@ -1,5 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file cf_reval.h
+ *
+ * generate random evaluation points
+**/
+
 #ifndef INCL_CF_REVAL_H
 #define INCL_CF_REVAL_H
 
@@ -12,7 +18,9 @@
 /*BEGINPUBLIC*/
 
 /**
- * class to generate random points
+ * class to generate random evaluation points
+ *
+ * @sa cf_eval.h
 **/
 class REvaluation : public Evaluation
 {

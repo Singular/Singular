@@ -1,5 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file cf_irred.h
+ *
+ * generate random irreducible univariate polynomials
+**/
+
 #ifndef INCL_CF_IRRED_H
 #define INCL_CF_IRRED_H
 

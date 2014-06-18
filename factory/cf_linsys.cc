@@ -1,5 +1,10 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file cf_linsys.cc
+ *
+ * solve linear systems and compute determinants of matrices
+**/
 
 #include "config.h"
 

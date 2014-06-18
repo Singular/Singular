@@ -1,5 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file cf_generator.h
+ *
+ * generate integers, elements of finite fields
+**/
+
 #ifndef INCL_CF_GENERATOR_H
 #define INCL_CF_GENERATOR_H
 

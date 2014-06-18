@@ -3,6 +3,12 @@
 #ifndef INCL_INT_INT_H
 #define INCL_INT_INT_H
 
+/**
+ * @file int_int.h
+ *
+ * Factory's internal integers
+**/
+
 // #include "config.h"
 
 #ifndef NOSTREAMIO

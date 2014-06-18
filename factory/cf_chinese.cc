@@ -2,7 +2,8 @@
 
 /**
  * @file cf_chinese.cc
- * algorithms for chinese remaindering.
+ *
+ * algorithms for chinese remaindering and rational reconstruction
  *
  * Used by: cf_gcd.cc, cf_linsys.cc
  *

@@ -1,5 +1,10 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file cf_gcd.cc
+ *
+ * content/gcd/extgcd of polynomials
+**/
 
 #include "config.h"
 

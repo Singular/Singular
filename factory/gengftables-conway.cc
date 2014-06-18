@@ -2,9 +2,9 @@
 
 /**
  *
- * @file gengftables.cc
+ * @file gengftables-conway.cc
  *
- - generate addition tables used by Factory
+ * generate addition tables used by Factory
  *   to calculate in GF(q).
  *
  * @note This may take quite a while ...

@@ -4,14 +4,14 @@
 //*****************************************************************************
 /** @file cf_gcd_smallp.h
  *
- * @author Martin Lee
- * @date   22.10.2009
- *
  * This file defines the functions GCD_Fp_extension which computes the GCD of
  * two polynomials over \f$ F_{p}(\alpha ) \f$ , GCD_small_p which computes the
  * GCD of two polynomials over  \f$ F_{p} \f$ , and GCD_GF which computes the
  * GCD of two polynomials over GF. Algorithms are based on "On the Genericity of
  * the Modular Polynomial GCD Algorithm" by E. Kaltofen & M. Monagan
+ *
+ * @author Martin Lee
+ * @date   22.10.2009
  *
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file

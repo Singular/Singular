@@ -3,6 +3,11 @@
 #ifndef INCL_INT_RAT_H
 #define INCL_INT_RAT_H
 
+/**
+ * @file int_rat.h
+ *
+ * Factory's internal rationals
+**/
 // #include "config.h"
 
 #ifndef NOSTREAMIO
