@@ -1,5 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file fac_util.h
+ *
+ * operations mod p^k and some other useful functions for factorization
+**/
+
 #ifndef INCL_FAC_UTIL_H
 #define INCL_FAC_UTIL_H
 

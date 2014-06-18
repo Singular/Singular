@@ -6,7 +6,7 @@
 /**
  * @file cf_map.h
  *
- * header to cf_map.cc.
+ * map polynomials
  *
 **/
 

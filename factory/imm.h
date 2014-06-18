@@ -3,7 +3,7 @@
 /**
  * @file imm.h
  *
- * operations on immediates, i.e. elements of F_p, GF, Z, Q
+ * operations on immediates, that is elements of F_p, GF, Z, Q
  * that fit into intrinsic int, long
 **/
 

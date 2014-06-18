@@ -1,5 +1,10 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file int_cf.h
+ *
+ * Factory's internal CanonicalForm's
+**/
 #ifndef INCL_INT_CF_H
 #define INCL_INT_CF_H
 
@@ -22,6 +27,11 @@
 
 class CanonicalForm;
 
+/**
+ * virtual class for internal CanonicalForm's
+ *
+ * InternalCF will become an InternalPoly, InternalInteger, InternalRational
+**/
 class InternalCF {
 private:
     int refCount;

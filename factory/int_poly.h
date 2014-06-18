@@ -3,6 +3,12 @@
 #ifndef INCL_INT_POLY_H
 #define INCL_INT_POLY_H
 
+/**
+ * @file int_poly.h
+ *
+ * Factory's internal polynomials
+**/
+
 // #include "config.h"
 
 #ifndef NOSTREAMIO

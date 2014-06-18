@@ -3,6 +3,12 @@
 #ifndef INCL_GMPEXT_H
 #define INCL_GMPEXT_H
 
+/**
+ * @file gmpext.h
+ *
+ * utility functions for gmp
+**/
+
 // #include "config.h"
 // #include <factory/cf_gmp.h>
 

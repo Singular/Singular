@@ -1,12 +1,12 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-/** docu
+/**
  *
  * @file cf_factor.cc
  *
- * factorization and square free algorithms.
+ * Interface to factorization and square free factorization algorithms.
  *
- * Used by: fac_multivar.cc, fac_univar.cc, cf_irred.cc
+ * Used by: cf_irred.cc
  *
  * Header file: cf_algorithm.h
  *

@@ -1,6 +1,6 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-/** docu
+/**
  *
  * @file int_intdiv.cc
  *
@@ -358,7 +358,7 @@ InternalInteger::divremcoeff ( InternalCF * c, InternalCF * & quot, InternalCF *
 }
 
 /**
- * docu: see CanonicalForm::divremt(), InternalInteger::divremcoefft()
+ * @sa CanonicalForm::divremt(), InternalInteger::divremcoefft()
 **/
 bool
 InternalInteger::divremsamet ( InternalCF * c, InternalCF * & quot, InternalCF * & rem )
@@ -368,7 +368,7 @@ InternalInteger::divremsamet ( InternalCF * c, InternalCF * & quot, InternalCF *
 }
 
 /**
- * docu: see CanonicalForm::divremt(), InternalInteger::divremsamet()
+ * @sa CanonicalForm::divremt(), InternalInteger::divremsamet()
 **/
 bool
 InternalInteger::divremcoefft ( InternalCF * c, InternalCF * & quot, InternalCF * & rem, bool invert )

@@ -2,7 +2,9 @@
 
 /**
  *
- * @file cf_inline.cc - definition of configurable inline
+ * @file cf_inline.cc
+ *
+ * definition of configurable inline
  *   `CanonicalForm' methods.
  *
  * Hierarchy: canonicalform

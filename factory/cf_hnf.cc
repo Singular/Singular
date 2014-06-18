@@ -1,6 +1,6 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-/** docu
+/**
  *
  * @file cf_hnf.cc
  *

@@ -1,7 +1,7 @@
 /*****************************************************************************\
  * Computer Algebra System SINGULAR
 \*****************************************************************************/
-/** @file facFqFactorize.h
+/** @file facSparseHensel.h
  *
  * This file provides functions for sparse heuristic Hensel lifting
  *

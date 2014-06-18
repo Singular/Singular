@@ -1,5 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file cf_random.h
+ *
+ * generate random integers, random elements of finite fields
+**/
+
 #ifndef INCL_CF_RANDOM_H
 #define INCL_CF_RANDOM_H
 

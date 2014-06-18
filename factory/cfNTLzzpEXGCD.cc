@@ -4,10 +4,10 @@
  *
  * @author Martin Lee
  *
+ * Univariate GCD and extended GCD over Z/p[t]/(f)[x] for reducible f
+ *
  * @note the following code is slightly modified code out of
  * lzz_pEX.c from Victor Shoup's NTL. Below is NTL's copyright notice.
- *
- * Univariate GCD and extended GCD over Z/p[t]/(f)[x] for reducible f
  *
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
