@@ -3,11 +3,11 @@
 \*****************************************************************************/
 /** @file cfNTLzzpEXGCD.h
  *
- * @note the following code is slightly modified code out of
- * lzz_pEX.h from Victor Shoup's NTL. Below is NTL's copyright notice.
- *
  * This file defines functions for univariate GCD and extended GCD
  * over Z/p[t]/(f)[x] for reducible f
+ *
+ * @note the following code is slightly modified code out of
+ * lzz_pEX.h from Victor Shoup's NTL. Below is NTL's copyright notice.
  *
  * ABSTRACT: Langemyr, McCallum "The Computation of Polynomial Greatest Common
  * Divisors over an algebraic number fields"
