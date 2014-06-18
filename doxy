@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #!/bin/sh
-if [ "$#" -le 1 ]; then
+if [ "$#" -le 0 ]; then
   echo "Usage: $0 input_file(s)" >&2
   exit 1
 fi
