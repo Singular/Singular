@@ -760,6 +760,7 @@ INPUT                  = $(abs_top_srcdir)/omalloc/ \
                          $(abs_top_srcdir)/kernel/ \
                          $(abs_top_srcdir)/libpolys/ \
                          $(abs_top_srcdir)/Singular/ \
+                         $(abs_top_srcdir)/templates/ \
                          $(abs_top_srcdir)/main.dox
 
 # This tag can be used to specify the character encoding of the source files
