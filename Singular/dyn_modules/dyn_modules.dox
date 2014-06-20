@@ -11,3 +11,35 @@
  - \subpage dynmodules_callpolymake_page
  - \subpage dynmodules_singmathic_page
 */
+
+/*!
+\dir bigintm
+\ref dynmodules_bigintm_page
+*/
+
+/*! 
+\dir syzextra
+\ref dynmodules_syzextra_page
+*/
+
+/*! 
+\dir pyobject
+\ref dynmodules_pyobject_page
+*/
+
+/*! 
+\dir callgfanlib
+\ref dynmodules_callgfanlib_page
+*/
+
+/*! 
+\dir callpolymake
+\ref dynmodules_callpolymake_page
+*/
+
+/*! 
+\dir singmathic
+\ref dynmodules_singmathic_page
+*/
+
+

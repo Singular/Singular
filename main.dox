@@ -1,4 +1,5 @@
 /*! 
+\dir
 \page main_page Introductory developers manual
 
 The Singular kernel development introduction contains:
@@ -15,7 +16,9 @@ The Singular kernel development introduction contains:
   - \subpage libpolys_page "Singular most basic data structures"
   - \subpage kernel_page "Mathematical Algorithms"
   - \subpage singular_page "Singular Interpreter and related"
-  
+
+\dir 
+\ref main_page
 */
 
 /*!
@@ -96,3 +99,34 @@ in case of a build system chenges.
 
 See also \ref styleguide
 */
+
+/*!
+\dir omalloc
+\ref omalloc_page 
+*/
+/*!
+\dir resources
+\ref resources_page
+*/  
+/*! 
+\dir libpolys
+\ref libpolys_page
+*/
+/*! 
+\dir kernel
+\ref kernel_page
+*/
+/*! 
+\dir Singular
+\ref singular_page
+*/
+/*!
+\dir factory
+\ref factory_page
+*/
+/*!
+\dir templates
+Templates for new sources and headers
+*/
+
+ 

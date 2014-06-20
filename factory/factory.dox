@@ -1,5 +1,5 @@
 /*! 
- \dir factory
+
  \page factory_page Multivariate polynomial factorization (factory)
 
  Factory is a C++ class library that implements a recursive representation
