@@ -4389,13 +4389,6 @@ static BOOLEAN jjKBASE(leftv res, leftv v)
   res->data = (char *)scKBase(-1,(ideal)(v->Data()),currRing->qideal);
   return FALSE;
 }
-#ifdef MDEBUG
-static BOOLEAN jjpHead(leftv res, leftv v)
-{
-  res->data=(char *)pHead((poly)v->Data());
-  return FALSE;
-}
-#endif
 static BOOLEAN jjL2R(leftv res, leftv v)
 {
   res->data=(char *)syConvList((lists)v->Data(),FALSE);
@@ -4462,39 +4455,6 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
   res->data=(char *)r;
   return FALSE;
 }
-#if SIZEOF_LONG == 8
-static number jjLONG2N(long d)
-{
-  int i=(int)d;
-  if ((long)i == d)
-  {
-    return n_Init(i, coeffs_BIGINT);
-  }
-  else
-  {
-     struct snumber_dummy
-     {
-      mpz_t z;
-      mpz_t n;
-      #if defined(LDEBUG)
-      int debug;
-      #endif
-      BOOLEAN s;
-    };
-    typedef struct snumber_dummy  *number_dummy;
-
-    number_dummy z=(number_dummy)omAlloc(sizeof(snumber_dummy));
-    #if defined(LDEBUG)
-    z->debug=123456;
-    #endif
-    z->s=3;
-    mpz_init_set_si(z->z,d);
-    return (number)z;
-  }
-}
-#else
-#define jjLONG2N(D) n_Init((int)D, coeffs_BIGINT)
-#endif
 static BOOLEAN jjPFAC1(leftv res, leftv v)
 {
   /* call method jjPFAC2 with second argument = 0 (meaning that no
@@ -4540,13 +4500,13 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
   switch(((int)(long)v->Data()))
   {
   case 0:
-    res->data=(char *)jjLONG2N(om_Info.UsedBytes);
+    res->data=(char *)n_Init(om_Info.UsedBytes,coeffs_BIGINT);
     break;
   case 1:
-    res->data = (char *)jjLONG2N(om_Info.CurrentBytesSystem);
+    res->data = (char *)n_Init(om_Info.CurrentBytesSystem,coeffs_BIGINT);
     break;
   case 2:
-    res->data = (char *)jjLONG2N(om_Info.MaxBytesSystem);
+    res->data = (char *)n_Init(om_Info.MaxBytesSystem,coeffs_BIGINT);
     break;
   default:
     omPrintStats(stdout);
@@ -5330,13 +5290,11 @@ static BOOLEAN jjrCharStr(leftv res, leftv v)
   res->data = rCharStr((ring)v->Data());
   return FALSE;
 }
-#ifndef MDEBUG
 static BOOLEAN jjpHead(leftv res, leftv v)
 {
   res->data = (char *)pHead((poly)v->Data());
   return FALSE;
 }
-#endif
 static BOOLEAN jjidHead(leftv res, leftv v)
 {
   res->data = (char *)id_Head((ideal)v->Data(),currRing);
@@ -7950,13 +7908,13 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     {
       if (at==dArith1[i].arg)
       {
-        int r=res->rtyp=dArith1[i].res;
         if (currRing!=NULL)
         {
           if (check_valid(dArith1[i].valid_for,op)) break;
         }
         if (traceit&TRACE_CALL)
           Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(at));
+        res->rtyp=dArith1[i].res;
         if ((call_failed=dArith1[i].p(res,a)))
         {
           break;// leave loop, goto error handling
@@ -7983,13 +7941,13 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         //Print("test %s\n",Tok2Cmdname(dArith1[i].arg));
         if ((ai=iiTestConvert(at,dArith1[i].arg))!=0)
         {
-          int r=res->rtyp=dArith1[i].res;
           if (currRing!=NULL)
           {
             if (check_valid(dArith1[i].valid_for,op)) break;
           }
           if (traceit&TRACE_CALL)
             Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(dArith1[i].arg));
+          res->rtyp=dArith1[i].res;
           failed= ((iiConvert(at,dArith1[i].arg,ai,a,an))
           || (call_failed=dArith1[i].p(res,an)));
           // everything done, clean up temp. variables
