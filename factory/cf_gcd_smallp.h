@@ -99,10 +99,6 @@ CanonicalForm sparseGCDFq (const CanonicalForm& A, const CanonicalForm& B,
   return sparseGCDFq (A, B, alpha, list, topLevel);
 }
 
-/// extended Zassenhaus GCD
-CanonicalForm
-EZGCD_P (const CanonicalForm& A, const CanonicalForm& B);
-
 CanonicalForm
 randomIrredpoly (int i, const Variable & x) ;
 
