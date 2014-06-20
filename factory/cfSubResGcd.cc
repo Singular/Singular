@@ -9,7 +9,7 @@
 #include "cfUnivarGcd.h"
 
 CanonicalForm
-gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
+subResGCD_p( const CanonicalForm & f, const CanonicalForm & g )
 {
     if (f.inCoeffDomain() || g.inCoeffDomain()) //zero case should be caught by gcd
       return 1;
@@ -162,7 +162,7 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
 }
 
 CanonicalForm
-gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
+subResGCD_0( const CanonicalForm & f, const CanonicalForm & g )
 {
     CanonicalForm pi, pi1;
     CanonicalForm C, Ci, Ci1, Hi, bi, pi2;

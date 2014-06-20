@@ -118,7 +118,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     }
     else
     #endif
-    fc = gcd_poly_p( fc, gc );
+    fc = subResGCD_p( fc, gc );
   }
   else if (!fc_and_gc_Univariate)
   {
@@ -128,12 +128,12 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
       fc = chinrem_gcd( fc, gc);
     else
     {
-       fc = gcd_poly_0( fc, gc );
+       fc = subResGCD_0( fc, gc );
     }
   }
   else
   {
-    fc = gcd_poly_0( fc, gc );
+    fc = subResGCD_0( fc, gc );
   }
   if ( d1.degree() > 0 )
     fc *= d1;
