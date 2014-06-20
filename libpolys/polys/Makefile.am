@@ -126,8 +126,7 @@ test_LDADD=libpolys.la
 test_SOURCES=test.cc
 
 gftables: ${top_srcdir}/../factory/gftables
-	ln -snf ${top_srcdir}/../factory/gftables ${builddir}
+	ln -snf ${top_srcdir}/../factory/gftables ${builddir}/gftables
 
-MOD: .libs
-	ln -snf ${builddir}/.libs/ ${builddir}/MOD
-
+MOD: ${top_builddir}/polys/.libs
+	ln -snf ${top_builddir}/polys/.libs/ ${builddir}/MOD
