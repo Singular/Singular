@@ -1258,7 +1258,10 @@ static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
       m->m[i]=NULL;
       h=l->next;
       l->next=NULL;
+      idhdl hh=NULL;
+      if ((l->rtyp==IDHDL)&&(l->Typ()==DEF_CMD)) hh=(idhdl)l->data;
       nok=jiAssign_1(l,&t);
+      if (hh!=NULL) { ipMoveId(hh);hh=NULL;}
       l->next=h;
       if (nok)
       {
