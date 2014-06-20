@@ -1,40 +1,49 @@
-/*! \page main_page Developer and Reference Manual
+/*! \page main_page Introductory developers manual
 
-Somewhat older kernel documentation can be found at
-<ftp://www.mathematik.uni-kl.de/pub/Math/Singular/doc/singular-anatomy.tgz>
+The Singular kernel development introduction contains:
 
-Please also read 
-- \subpage bs_page and 
-- \ref styleguide
+- \subpage styleguide "the C/C++ programming Style Guide",
+- \subpage bs_page "the Singular build system",
+- somewhat outdated Singular kernel documentation: <ftp://www.mathematik.uni-kl.de/pub/Math/Singular/doc/singular-anatomy.tgz>,
+- a short description of the Singular restructurization: <http://www.singular.uni-kl.de/gap-meeting-2012/SW.Aug.12.motsak.2.pdf> and
+- the current internal structure and dependencies can be seen at \subpage deps_page. 
+  Top-level packages are:
+  - \subpage omalloc_page "Singular Memory Manager"
+  - \subpage resources_page "Resource Handling Helpers"
+  - \subpage factory_page "Factorization lib." 
+  - \subpage libpolys_page "Singular most basic data structures"
+  - \subpage kernel_page "Mathematical Algorithms"
+  - \subpage singular_page "Singular Interpreter and related"
+  
+*/
 
-Separate top-level packages are as follows (also see the diagram below):
-- \subpage omalloc_page 
-- \subpage resources_page 
-- \subpage factory_page 
-- \subpage libpolys_page 
-  - \subpage libpolys_misc_page
-  - \subpage libpolys_reporter_page
-  - \subpage libpolys_coeffs_page
-  - \subpage libpolys_polys_page
-- \subpage kernel_page 
-  - \subpage kernel_numeric_page
-  - \subpage kernel_combinatorics_page
-  - \subpage kernel_GBEngine_page
-  - \subpage kernel_groebner_walk_page
-  - \subpage kernel_fglm_page
-  - \subpage kernel_maps_page
-  - \subpage kernel_spectrum_page
-  - \subpage kernel_linear_algebra_page
-  - \subpage kernel_oswrapper_page
-- \subpage singular_page
-  - \subpage dynmodules_page
+/*!
+\page deps_page Dependencies between Singular packages
 
-Here is a short description of the Singular restructurization:
-<http://www.singular.uni-kl.de/gap-meeting-2012/SW.Aug.12.motsak.2.pdf>
+- \ref omalloc_page 
+- \ref resources_page 
+- \ref factory_page 
+- \ref libpolys_page 
+  - \ref libpolys_misc_page
+  - \ref libpolys_reporter_page
+  - \ref libpolys_coeffs_page
+  - \ref libpolys_polys_page
+- \ref kernel_page 
+  - \ref kernel_numeric_page
+  - \ref kernel_combinatorics_page
+  - \ref kernel_GBEngine_page
+  - \ref kernel_groebner_walk_page
+  - \ref kernel_fglm_page
+  - \ref kernel_maps_page
+  - \ref kernel_spectrum_page
+  - \ref kernel_linear_algebra_page
+  - \ref kernel_oswrapper_page
+- \ref singular_page
+  - \ref dynmodules_page
 
-Dependencies between Singular packages are as follows:
+
+Dependencies between Singular packages (and sub-grouppings) are shown as arrows on the following diagramm:
 \dotfile Includes.dot Package dependency diagram
-
 */
 
 
@@ -45,22 +54,22 @@ We use autotools. Here is a good autotools (mythbuster) manual: https://www.flam
 Singular consists of several packages (that is, libraries with own
 configure scripts): 
 
-- \subpage omalloc_page 
-- \subpage resources_page
-- \subpage factory_page 
-- \subpage libpolys_page 
-- \subpage singular_page
+- \ref omalloc_page 
+- \ref resources_page
+- \ref factory_page 
+- \ref libpolys_page 
+- \ref singular_page
 
 Moreover some of these (top-level) libraries combine smaller ones into
 itself. 
-- \subpage libpolys_page 
-  - \subpage libpolys_misc_page
-  - \subpage libpolys_reporter_page
-  - \subpage libpolys_coeffs_page
-  - \subpage libpolys_polys_page
-- \subpage singular_page
-  - \subpage kernel_page 
-  - \subpage dynmodules_page
+- \ref libpolys_page 
+  - \ref libpolys_misc_page
+  - \ref libpolys_reporter_page
+  - \ref libpolys_coeffs_page
+  - \ref libpolys_polys_page
+- \ref singular_page
+  - \ref kernel_page 
+  - \ref dynmodules_page
 
 
 One can easily exted any existing library by adding new sources to the
