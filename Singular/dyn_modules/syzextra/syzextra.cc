@@ -387,13 +387,18 @@ ideal id_Tail(const ideal id, const ring r)
 void Sort_c_ds(const ideal id, const ring r)
 {
   const int sizeNew = IDELEMS(id);
+  typedef int(*cmp_fct)(const void *, const void *);
 
+#ifdef HAVE_QSORT_R
 #if (defined __APPLE__ || defined __MACH__ || defined __DARWIN__ || defined __FREEBSD__ || defined __BSD__ || defined OpenBSD3_1 || defined OpenBSD3_9)
 #define qsort_my(m, s, ss, r, cmp) qsort_r(m, s, ss, r, cmp)
 #elif (defined _GNU_SOURCE || defined __GNU__ || defined __linux__)
 #define qsort_my(m, s, ss, r, cmp) qsort_r(m, s, ss, cmp, r)
 #else
-#define qsort_my(m, s, ss, r, cmp) qsort(m, s, ss, cmp)
+#define qsort_my(m, s, ss, r, cmp) qsort(m, s, ss, (cmp_fct)(cmp))
+#endif
+#else
+#define qsort_my(m, s, ss, r, cmp) qsort(m, s, ss, (cmp_fct)(cmp))
 #endif
 
   if( sizeNew >= 2 )

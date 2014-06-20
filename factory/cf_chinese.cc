@@ -1,14 +1,15 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-//{{{ docu
-//
-// cf_chinese.cc - algorithms for chinese remaindering.
-//
-// Used by: cf_gcd.cc, cf_linsys.cc
-//
-// Header file: cf_algorithm.h
-//
-//}}}
+/**
+ * @file cf_chinese.cc
+ *
+ * algorithms for chinese remaindering and rational reconstruction
+ *
+ * Used by: cf_gcd.cc, cf_linsys.cc
+ *
+ * Header file: cf_algorithm.h
+ *
+**/
 
 
 #include "config.h"
@@ -25,29 +26,28 @@
 #include "cf_iter.h"
 
 
-//{{{ void chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew )
-//{{{ docu
-//
-// chineseRemainder - integer chinese remaindering.
-//
-// Calculate xnew such that xnew=x1 (mod q1) and xnew=x2 (mod q2)
-// and qnew = q1*q2.  q1 and q2 should be positive integers,
-// pairwise prime, x1 and x2 should be polynomials with integer
-// coefficients.  If x1 and x2 are polynomials with positive
-// coefficients, the result is guaranteed to have positive
-// coefficients, too.
-//
-// Note: This algorithm is optimized for the case q1>>q2.
-//
-// This is a standard algorithm.  See, for example,
-// Geddes/Czapor/Labahn - 'Algorithms for Computer Algebra',
-// par. 5.6 and 5.8, or the article of M. Lauer - 'Computing by
-// Homomorphic Images' in B. Buchberger - 'Computer Algebra -
-// Symbolic and Algebraic Computation'.
-//
-// Note: Be sure you are calculating in Z, and not in Q!
-//
-//}}}
+/** void chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew )
+ *
+ * chineseRemainder - integer chinese remaindering.
+ *
+ * Calculate xnew such that xnew=x1 (mod q1) and xnew=x2 (mod q2)
+ * and qnew = q1*q2.  q1 and q2 should be positive integers,
+ * pairwise prime, x1 and x2 should be polynomials with integer
+ * coefficients.  If x1 and x2 are polynomials with positive
+ * coefficients, the result is guaranteed to have positive
+ * coefficients, too.
+ *
+ * Note: This algorithm is optimized for the case q1>>q2.
+ *
+ * This is a standard algorithm.  See, for example,
+ * Geddes/Czapor/Labahn - 'Algorithms for Computer Algebra',
+ * par. 5.6 and 5.8, or the article of M. Lauer - 'Computing by
+ * Homomorphic Images' in B. Buchberger - 'Computer Algebra -
+ * Symbolic and Algebraic Computation'.
+ *
+ * Note: Be sure you are calculating in Z, and not in Q!
+ *
+**/
 void
 chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew )
 {
@@ -97,25 +97,24 @@ chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const Can
 }
 //}}}
 
-//{{{ void chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, CanonicalForm & qnew )
-//{{{ docu
-//
-// chineseRemainder - integer chinese remaindering.
-//
-// Calculate xnew such that xnew=x[i] (mod q[i]) and qnew is the
-// product of all q[i].  q[i] should be positive integers,
-// pairwise prime.  x[i] should be polynomials with integer
-// coefficients.  If all coefficients of all x[i] are positive
-// integers, the result is guaranteed to have positive
-// coefficients, too.
-//
-// This is a standard algorithm, too, except for the fact that we
-// use a divide-and-conquer method instead of a linear approach
-// to calculate the remainder.
-//
-// Note: Be sure you are calculating in Z, and not in Q!
-//
-//}}}
+/** void chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, CanonicalForm & qnew )
+ *
+ * chineseRemainder - integer chinese remaindering.
+ *
+ * Calculate xnew such that xnew=x[i] (mod q[i]) and qnew is the
+ * product of all q[i].  q[i] should be positive integers,
+ * pairwise prime.  x[i] should be polynomials with integer
+ * coefficients.  If all coefficients of all x[i] are positive
+ * integers, the result is guaranteed to have positive
+ * coefficients, too.
+ *
+ * This is a standard algorithm, too, except for the fact that we
+ * use a divide-and-conquer method instead of a linear approach
+ * to calculate the remainder.
+ *
+ * Note: Be sure you are calculating in Z, and not in Q!
+ *
+**/
 void
 chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, CanonicalForm & qnew )
 {
@@ -158,7 +157,6 @@ chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, C
 
     DEBDECLEVEL( cerr, "chineseRemainder( ... CFArray ... )" );
 }
-//}}}
 
 #ifndef HAVE_NTL
 CanonicalForm Farey_n (CanonicalForm N, const CanonicalForm P)
@@ -192,6 +190,10 @@ CanonicalForm Farey_n (CanonicalForm N, const CanonicalForm P)
 }
 #endif
 
+/**
+ * Farey rational reconstruction. If NTL is available it uses the fast algorithm
+ * from NTL, i.e. Encarnacion, Collins.
+**/
 CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
 {
     int is_rat=isOn(SW_RATIONAL);

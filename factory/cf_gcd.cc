@@ -1,5 +1,10 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file cf_gcd.cc
+ *
+ * content/gcd/extgcd of polynomials
+**/
 
 #include "config.h"
 
@@ -45,6 +50,7 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 CanonicalForm chinrem_gcd(const CanonicalForm & FF,const CanonicalForm & GG);
 
+/// coprimality check
 bool
 gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int & d )
 {
@@ -241,15 +247,14 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
     return result;
 }
 
-//{{{ static CanonicalForm icontent ( const CanonicalForm & f, const CanonicalForm & c )
-//{{{ docu
-//
-// icontent() - return gcd of c and all coefficients of f which
-//   are in a coefficient domain.
-//
-// Used by icontent().
-//
-//}}}
+/** static CanonicalForm icontent ( const CanonicalForm & f, const CanonicalForm & c )
+ *
+ * icontent() - return gcd of c and all coefficients of f which
+ *   are in a coefficient domain.
+ *
+ * @sa icontent().
+ *
+**/
 static CanonicalForm
 icontent ( const CanonicalForm & f, const CanonicalForm & c )
 {
@@ -268,35 +273,31 @@ icontent ( const CanonicalForm & f, const CanonicalForm & c )
         return g;
     }
 }
-//}}}
 
-//{{{ CanonicalForm icontent ( const CanonicalForm & f )
-//{{{ docu
-//
-// icontent() - return gcd over all coefficients of f which are
-//   in a coefficient domain.
-//
-//}}}
+/** CanonicalForm icontent ( const CanonicalForm & f )
+ *
+ * icontent() - return gcd over all coefficients of f which are
+ *   in a coefficient domain.
+ *
+**/
 CanonicalForm
 icontent ( const CanonicalForm & f )
 {
     return icontent( f, 0 );
 }
-//}}}
 
-//{{{ CanonicalForm extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
-//{{{ docu
-//
-// extgcd() - returns polynomial extended gcd of f and g.
-//
-// Returns gcd(f, g) and a and b sucht that f*a+g*b=gcd(f, g).
-// The gcd is calculated using an extended euclidean polynomial
-// remainder sequence, so f and g should be polynomials over an
-// euclidean domain.  Normalizes result.
-//
-// Note: be sure that f and g have the same level!
-//
-//}}}
+/** CanonicalForm extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
+ *
+ * extgcd() - returns polynomial extended gcd of f and g.
+ *
+ * Returns gcd(f, g) and a and b sucht that f*a+g*b=gcd(f, g).
+ * The gcd is calculated using an extended euclidean polynomial
+ * remainder sequence, so f and g should be polynomials over an
+ * euclidean domain.  Normalizes result.
+ *
+ * Note: be sure that f and g have the same level!
+ *
+**/
 CanonicalForm
 extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
 {
@@ -458,20 +459,16 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
   }
   return p0;
 }
-//}}}
 
-//{{{ static CanonicalForm balance_p ( const CanonicalForm & f, const CanonicalForm & q )
-//{{{ docu
-//
-// balance_p() - map f from positive to symmetric representation
-//   mod q.
-//
-// This makes sense for univariate polynomials over Z only.
-// q should be an integer.
-//
-// Used by gcd_poly_univar0().
-//
-//}}}
+/** static CanonicalForm balance_p ( const CanonicalForm & f, const CanonicalForm & q )
+ *
+ * balance_p() - map f from positive to symmetric representation
+ *   mod q.
+ *
+ * This makes sense for univariate polynomials over Z only.
+ * q should be an integer.
+ *
+**/
 
 static CanonicalForm
 balance_p ( const CanonicalForm & f, const CanonicalForm & q, const CanonicalForm & qh )
@@ -519,7 +516,6 @@ balance ( const CanonicalForm & f, const CanonicalForm & q )
     }
     return result;
 }*/
-//}}}
 
 #ifndef HAVE_NTL
 static CanonicalForm gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primitive )
@@ -824,18 +820,17 @@ gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
         return C * pp( pi );
 }
 
-//{{{ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
-//{{{ docu
-//
-// gcd_poly() - calculate polynomial gcd.
-//
-// This is the dispatcher for polynomial gcd calculation.  We call either
-// ezgcd(), sparsemod() or gcd_poly1() in dependecy on the current
-// characteristic and settings of SW_USE_EZGCD.
-//
-// Used by gcd() and gcd_poly_univar0().
-//
-//}}}
+/** CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
+ *
+ * gcd_poly() - calculate polynomial gcd.
+ *
+ * This is the dispatcher for polynomial gcd calculation.
+ * Different gcd variants get called depending the input, characteristic, and
+ * on switches (cf_defs.h)
+ *
+ * @sa gcd(), cf_defs.h
+ *
+**/
 #if 0
 int si_factor_reminder=1;
 #endif
@@ -887,18 +882,16 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     fc *= d1;
   return fc;
 }
-//}}}
 
-//{{{ static CanonicalForm cf_content ( const CanonicalForm & f, const CanonicalForm & g )
-//{{{ docu
-//
-// cf_content() - return gcd(g, content(f)).
-//
-// content(f) is calculated with respect to f's main variable.
-//
-// Used by gcd(), content(), content( CF, Variable ).
-//
-//}}}
+/** static CanonicalForm cf_content ( const CanonicalForm & f, const CanonicalForm & g )
+ *
+ * cf_content() - return gcd(g, content(f)).
+ *
+ * content(f) is calculated with respect to f's main variable.
+ *
+ * @sa gcd(), content(), content( CF, Variable ).
+ *
+**/
 static CanonicalForm
 cf_content ( const CanonicalForm & f, const CanonicalForm & g )
 {
@@ -916,16 +909,14 @@ cf_content ( const CanonicalForm & f, const CanonicalForm & g )
     else
         return abs( f );
 }
-//}}}
 
-//{{{ CanonicalForm content ( const CanonicalForm & f )
-//{{{ docu
-//
-// content() - return content(f) with respect to main variable.
-//
-// Normalizes result.
-//
-//}}}
+/** CanonicalForm content ( const CanonicalForm & f )
+ *
+ * content() - return content(f) with respect to main variable.
+ *
+ * Normalizes result.
+ *
+**/
 CanonicalForm
 content ( const CanonicalForm & f )
 {
@@ -944,16 +935,14 @@ content ( const CanonicalForm & f )
     else
         return abs( f );
 }
-//}}}
 
-//{{{ CanonicalForm content ( const CanonicalForm & f, const Variable & x )
-//{{{ docu
-//
-// content() - return content(f) with respect to x.
-//
-// x should be a polynomial variable.
-//
-//}}}
+/** CanonicalForm content ( const CanonicalForm & f, const Variable & x )
+ *
+ * content() - return content(f) with respect to x.
+ *
+ * x should be a polynomial variable.
+ *
+**/
 CanonicalForm
 content ( const CanonicalForm & f, const Variable & x )
 {
@@ -968,18 +957,16 @@ content ( const CanonicalForm & f, const Variable & x )
     else
         return swapvar( content( swapvar( f, y, x ), y ), y, x );
 }
-//}}}
 
-//{{{ CanonicalForm vcontent ( const CanonicalForm & f, const Variable & x )
-//{{{ docu
-//
-// vcontent() - return content of f with repect to variables >= x.
-//
-// The content is recursively calculated over all coefficients in
-// f having level less than x.  x should be a polynomial
-// variable.
-//
-//}}}
+/** CanonicalForm vcontent ( const CanonicalForm & f, const Variable & x )
+ *
+ * vcontent() - return content of f with repect to variables >= x.
+ *
+ * The content is recursively calculated over all coefficients in
+ * f having level less than x.  x should be a polynomial
+ * variable.
+ *
+**/
 CanonicalForm
 vcontent ( const CanonicalForm & f, const Variable & x )
 {
@@ -995,16 +982,14 @@ vcontent ( const CanonicalForm & f, const Variable & x )
         return d;
     }
 }
-//}}}
 
-//{{{ CanonicalForm pp ( const CanonicalForm & f )
-//{{{ docu
-//
-// pp() - return primitive part of f.
-//
-// Returns zero if f equals zero, otherwise f / content(f).
-//
-//}}}
+/** CanonicalForm pp ( const CanonicalForm & f )
+ *
+ * pp() - return primitive part of f.
+ *
+ * Returns zero if f equals zero, otherwise f / content(f).
+ *
+**/
 CanonicalForm
 pp ( const CanonicalForm & f )
 {
@@ -1013,7 +998,6 @@ pp ( const CanonicalForm & f )
     else
         return f / content( f );
 }
-//}}}
 
 CanonicalForm
 gcd ( const CanonicalForm & f, const CanonicalForm & g )
@@ -1068,7 +1052,6 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             }
             else
             {
-                //printf ("here\n");
                 CanonicalForm cdF = bCommonDen( f );
                 CanonicalForm cdG = bCommonDen( g );
                 Off( SW_RATIONAL );
@@ -1088,16 +1071,15 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
         return 1;
 }
 
-//{{{ CanonicalForm lcm ( const CanonicalForm & f, const CanonicalForm & g )
-//{{{ docu
-//
-// lcm() - return least common multiple of f and g.
-//
-// The lcm is calculated using the formula lcm(f, g) = f * g / gcd(f, g).
-//
-// Returns zero if one of f or g equals zero.
-//
-//}}}
+/** CanonicalForm lcm ( const CanonicalForm & f, const CanonicalForm & g )
+ *
+ * lcm() - return least common multiple of f and g.
+ *
+ * The lcm is calculated using the formula lcm(f, g) = f * g / gcd(f, g).
+ *
+ * Returns zero if one of f or g equals zero.
+ *
+**/
 CanonicalForm
 lcm ( const CanonicalForm & f, const CanonicalForm & g )
 {
@@ -1106,7 +1088,6 @@ lcm ( const CanonicalForm & f, const CanonicalForm & g )
     else
         return ( f / gcd( f, g ) ) * g;
 }
-//}}}
 
 #ifdef HAVE_NTL
 #ifndef HAVE_FLINT
@@ -1256,6 +1237,8 @@ cf_prepgcd( const CanonicalForm & f, const CanonicalForm & g, int & cc, int & p1
 TIMING_DEFINE_PRINT(chinrem_termination)
 TIMING_DEFINE_PRINT(chinrem_recursion)
 
+/// modular gcd algorithm, see Keith, Czapor, Geddes "Algorithms for Computer
+/// Algebra", Algorithm 7.1
 CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 {
   CanonicalForm f, g, cl, q(0), Dp, newD, D, newq, newqh;

@@ -156,7 +156,7 @@ AH_TEMPLATE([FACTORY_INT64], [Defenition for FACTORY_INT64])
 # Always long long int???!
 AC_DEFINE([FACTORY_INT64], [long long int]) 
 
-DX_INIT_DOXYGEN($PACKAGE_NAME, MYDOXYGENCONFIG)
+DX_INIT_DOXYGEN($PACKAGE_NAME, doxygen.cfg, $srcdir/docu)
 
 # do not use `MKINSTALLDIRS' and `MAKEHEADER' since there may be
 # name clashes with other peoples configure scripts via

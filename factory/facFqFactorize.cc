@@ -2003,6 +2003,96 @@ CanonicalForm prodEval (const CFList& l, const CanonicalForm& evalPoint,
   return result;
 }
 
+void
+checkHelper (const CanonicalForm& f1, CFList& factors1, CFList& factors2,
+             CFList& l1, CFList& l2)
+{
+  CanonicalForm g1= f1, g2;
+  CFListIterator iter1= factors1, iter2= factors2;
+  for (; iter1.hasItem(); iter1++, iter2++)
+  {
+    g2= gcd (g1, iter1.getItem());
+    if (!g2.inCoeffDomain())
+    {
+      l1.append (iter1.getItem());
+      l2.append (iter2.getItem());
+      g1 /= g2;
+    }
+  }
+  factors1= Difference (factors1, l1);
+  factors2= Difference (factors2, l2);
+}
+
+/// check if univariate factors @a factors2 of @a factors3 coincide with
+/// univariate factors of @a factors1 and recombine if necessary.
+/// The recombined factors of @a factors1 are returned and @a factors3 is
+/// recombined accordingly.
+CFList
+checkOneToOne (const CFList& factors1, const CFList& factors2, CFList& factors3,
+               const CanonicalForm& evalPoint, const Variable& x)
+{
+  CFList uniFactorsOfFactors1;
+  CFList result, result2;
+  CFList bad1= factors2;
+  CFListIterator iter, iter2, iter3;
+  CanonicalForm tmp;
+  int pos;
+
+  for (iter= factors1; iter.hasItem(); iter++)
+  {
+    tmp= iter.getItem() (evalPoint, x);
+    tmp /= Lc (tmp);
+    if (pos= findItem (factors2, tmp))
+    {
+      result2.append (getItem (factors3, pos));
+      result.append (iter.getItem());
+      bad1= Difference (bad1, CFList (tmp));
+    }
+    else
+      uniFactorsOfFactors1.append (tmp);
+  }
+
+  CFList bad2, bad3;
+  bad2= Difference (factors1, result);
+  bad3= Difference (factors3, result2);
+  CFList tmp2, tmp3;
+  CanonicalForm g1, g2, g3, g4;
+
+  while (!uniFactorsOfFactors1.isEmpty())
+  {
+    tmp= uniFactorsOfFactors1.getFirst();
+    checkHelper (tmp, bad1, bad3, tmp2, tmp3);
+    g1= prod (tmp2);
+    g2= prod (tmp3);
+    tmp2= CFList();
+    tmp3= CFList();
+    checkHelper (g1, uniFactorsOfFactors1, bad2, tmp2, tmp3);
+    g3= prod (tmp2);
+    g4= prod (tmp3);
+    tmp2= CFList();
+    tmp3= CFList();
+    do
+    {
+      checkHelper (g3, bad1, bad3, tmp2, tmp3);
+      g1 *= prod (tmp2);
+      g2 *= prod (tmp3);
+      tmp2= CFList();
+      tmp3= CFList();
+      checkHelper (g1, uniFactorsOfFactors1, bad2, tmp2, tmp3);
+      g3 *= prod (tmp2);
+      g4 *= prod (tmp3);
+      tmp2= CFList();
+      tmp3= CFList();
+    } while (!bad2.isEmpty() && !bad3.isEmpty());
+    result.append (g4);
+    result2.append (g2);
+  }
+
+  if (factors3.length() != result2.length())
+    factors3= result2;
+  return result;
+}
+
 //recombine bivariate factors in case one bivariate factorization yields less
 // factors than the other
 CFList
@@ -2020,6 +2110,7 @@ recombination (const CFList& factors1, const CFList& factors2, int s, int thres,
   bool nosubset= false;
   CFArray TT;
   TT= copy (factors1);
+  int recombinations= 0;
   while (T.length() >= 2*s && s <= thres)
   {
     while (nosubset == false)
@@ -2027,7 +2118,10 @@ recombination (const CFList& factors1, const CFList& factors2, int s, int thres,
       if (T.length() == s)
       {
         delete [] v;
-        result.append (prod (T));
+        if (recombinations == factors2.length() - 1)
+          result.append (prod (T));
+        else
+          result= Union (result, T);
         return result;
       }
       S= subset (v, s, TT, nosubset);
@@ -2036,6 +2130,7 @@ recombination (const CFList& factors1, const CFList& factors2, int s, int thres,
       buf /= Lc (buf);
       if (find (factors2, buf))
       {
+        recombinations++;
         T= Difference (T, S);
         result.append (prod (S));
         TT= copy (T);
@@ -2046,8 +2141,11 @@ recombination (const CFList& factors1, const CFList& factors2, int s, int thres,
     s++;
     if (T.length() < 2*s || T.length() == s)
     {
+      if (recombinations == factors2.length() - 1)
+        result.append (prod (T));
+      else
+        result= Union (result, T);
       delete [] v;
-      result.append (prod (T));
       return result;
     }
     for (int i= 0; i < T.length(); i++)
@@ -2058,7 +2156,7 @@ recombination (const CFList& factors1, const CFList& factors2, int s, int thres,
   delete [] v;
   if (T.length() < 2*s)
   {
-    result.append (prod (T));
+    result= Union (result, T);
     return result;
   }
 
@@ -2133,7 +2231,8 @@ void getLeadingCoeffs (const CanonicalForm& A, CFList*& Aeval
 }
 
 void sortByUniFactors (CFList*& Aeval, int AevalLength,
-                       const CFList& uniFactors, const CFList& evaluation
+                       CFList& uniFactors, CFList& biFactors,
+                       const CFList& evaluation
                       )
 {
   CanonicalForm evalPoint;
@@ -2142,8 +2241,9 @@ void sortByUniFactors (CFList*& Aeval, int AevalLength,
   Variable v;
   CFList LCs, buf;
   CFArray l;
-  int pos, index;
+  int pos, index, checklength;
   bool leaveLoop=false;
+recurse:
   for (int j= 0; j < AevalLength; j++)
   {
     if (!Aeval[j].isEmpty())
@@ -2172,6 +2272,15 @@ void sortByUniFactors (CFList*& Aeval, int AevalLength,
         Aeval[j]= recombination (Aeval[j], uniFactors, 1,
                                  Aeval[j].length() - uniFactors.length() + 1,
                                  evalPoint, v);
+
+      checklength= biFactors.length();
+      Aeval[j]= checkOneToOne (Aeval[j], uniFactors, biFactors, evalPoint, v);
+      if (checklength > biFactors.length())
+      {
+        uniFactors= buildUniFactors (biFactors, evaluation.getLast(),
+                                     Variable (2));
+        goto recurse;
+      }
 
       buf= buildUniFactors (Aeval[j], evalPoint, v);
       l= CFArray (uniFactors.length());
@@ -2775,7 +2884,6 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info);
 CFList
 multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 {
-
   if (F.inCoeffDomain())
     return CFList (F);
 
@@ -2882,11 +2990,6 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     }
     else
     {
-      if (swapLevel == 1)
-      {
-        swapLevel= i;
-        bufA= swapvar (A, x, z);
-      }
       gcdDerivZ= gcd (bufA, derivZ);
       if (degree (gcdDerivZ) > 0 && !derivZ.isZero())
       {
@@ -2901,6 +3004,11 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
       else
       {
+        if (swapLevel == 1)
+        {
+          swapLevel= i;
+          bufA= swapvar (A, x, z);
+        }
         A= bufA;
         break;
       }
@@ -3090,6 +3198,28 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     refineBiFactors (A, biFactors, Aeval2, evaluation, minFactorsLength);
   minFactorsLength= tmin (minFactorsLength, biFactors.length());
 
+  CFList uniFactors= buildUniFactors (biFactors, evaluation.getLast(), y);
+
+  sortByUniFactors (Aeval2, lengthAeval2, uniFactors, biFactors, evaluation);
+
+  minFactorsLength= tmin (minFactorsLength, biFactors.length());
+
+  if (minFactorsLength == 1)
+  {
+    if (extension)
+    {
+      CFList source, dest;
+      A= mapDown (A, info, source, dest);
+    }
+    factors.append (A);
+    appendSwapDecompress (factors, contentAFactors, N, swapLevel,
+                          swapLevel2, x);
+    if (!extension)
+      normalize (factors);
+    delete [] Aeval2;
+    return factors;
+  }
+
   if (differentSecondVar == lengthAeval2)
   {
     bool zeroOccured= false;
@@ -3122,10 +3252,6 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       //TODO case where factors.length() > 0
     }
   }
-
-  CFList uniFactors= buildUniFactors (biFactors, evaluation.getLast(), y);
-
-  sortByUniFactors (Aeval2, lengthAeval2, uniFactors, evaluation);
 
   CFList * oldAeval= new CFList [lengthAeval2]; //TODO use bufAeval2 for this
   for (int i= 0; i < lengthAeval2; i++)

@@ -1,5 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file cf_primes.h
+ *
+ * access to prime tables
+**/
+
 #ifndef INCL_CF_PRIMES_H
 #define INCL_CF_PRIMES_H
 

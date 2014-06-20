@@ -2562,7 +2562,7 @@ static unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
  * DOES CALL rComplete
  */
 ring rModifyRing(ring r, BOOLEAN omit_degree,
-                         BOOLEAN omit_comp,
+                         BOOLEAN try_omit_comp,
                          unsigned long exp_limit)
 {
   assume (r != NULL );
@@ -2621,7 +2621,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
       }
       case ringorder_C:
       case ringorder_c:
-        if (!omit_comp)
+        if (!try_omit_comp)
         {
           order[j]=r_ord; /*r->order[i]*/;
         }
@@ -2629,7 +2629,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
         {
           j--;
           need_other_ring=TRUE;
-          omit_comp=FALSE;
+          try_omit_comp=FALSE;
           copy_block_index=FALSE;
         }
         break;
@@ -2667,12 +2667,10 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
         break;
       case ringorder_IS:
       {
-        if (omit_comp)
+        if (try_omit_comp)
         {
-#ifndef SING_NDEBUG
-          Warn("Error: WRONG USAGE of rModifyRing: cannot omit component due to the ordering block [%d]: %d (ringorder_IS)", i, r_ord);
-#endif
-          omit_comp = FALSE;
+          // tried, but cannot omit component due to the ordering block [%d]: %d (ringorder_IS)", i, r_ord
+          try_omit_comp = FALSE;
         }
         order[j]=r_ord; /*r->order[i];*/
         iNeedInducedOrderingSetup++;
@@ -2681,12 +2679,12 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
       case ringorder_s:
       {
         assume((i == 0) && (j == 0));
-        if (omit_comp)
+        if (try_omit_comp)
         {
 #ifndef SING_NDEBUG
           Warn("WRONG USAGE? of rModifyRing: omitting component due to the ordering block [%d]: %d (ringorder_s)", i, r_ord);
 #endif
-          omit_comp = FALSE;
+          try_omit_comp = FALSE;
         }
         order[j]=r_ord; /*r->order[i];*/
         break;

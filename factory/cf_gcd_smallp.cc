@@ -2,12 +2,12 @@
 //*****************************************************************************
 /** @file cf_gcd_smallp.cc
  *
- * @author Martin Lee
- * @date 22.10.2009
- *
  * This file implements the GCD of two polynomials over \f$ F_{p} \f$ ,
  * \f$ F_{p}(\alpha ) \f$ or GF based on Alg. 7.2. as described in "Algorithms
  * for Computer Algebra" by Geddes, Czapor, Labahn
+ *
+ * @author Martin Lee
+ * @date 22.10.2009
  *
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
@@ -330,8 +330,8 @@ extractContents (const CanonicalForm& F, const CanonicalForm& G,
 }
 
 /// compute the leading coefficient of F, where F is considered as an element
-/// of \f$ R[x_{1}][x_{2},\ldots ,x_{n}] \f$, order on Mon (x_{2},\ldots ,x_{n})
-/// is dp.
+/// of \f$ R[x_{1}][x_{2},\ldots ,x_{n}] \f$, order on
+/// \f$ Mon (x_{2},\ldots ,x_{n}) \f$ is dp.
 static inline
 CanonicalForm uni_lcoeff (const CanonicalForm& F)
 {
@@ -675,6 +675,12 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
 
     if (d0 == 0)
     {
+      if (inextension)
+      {
+        CFList u, v;
+        ppA= mapDown (ppA, prim_elem, im_prim_elem, alpha, u, v);
+        ppB= mapDown (ppB, prim_elem, im_prim_elem, alpha, u, v);
+      }
       coF= N (ppA*(cA/gcdcAcB));
       coG= N (ppB*(cB/gcdcAcB));
       return N(gcdcAcB);

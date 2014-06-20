@@ -1,7 +1,26 @@
+doxyrun:
+	if [ -z "$(DOXYGEN)" ]; then \
+		which -s doxygen || (echo Please add 'doxygen' to your PATH; exit 1;); \
+		export DOXYGEN=`which -s doxygen`; \
+	fi
+	if [ -z "$(DOXYGEN_CONFIG)" ]; then \
+		echo Please set 'DOXYGEN_CONFIG' env. var!; \
+		exit 1; \
+	fi
+	if [ ! -r "$(DOXYGEN_CONFIG)" ]; then \
+		echo Please make the doxygen configuration readable: "$(DOXYGEN_CONFIG)"!; \
+		exit 1; \
+	fi
+	export abs_top_srcdir="$(abs_top_srcdir)"; \
+	export abs_top_builddir="$(abs_top_builddir)"; \
+ 	echo Running "$(DOXYGEN)" "$(DOXYGEN_CONFIG)" with abs_top_srcdir: "$(abs_top_srcdir)", abs_top_builddir: "$(abs_top_builddir)"...; \
+	$(DOXYGEN) $(DOXYGEN_CONFIG) ;
+
 if HAVE_DOXYGEN
 
-doxyfile.stamp:
-	$(DOXYGEN) Doxyfile
+doxyfile.stamp: 
+	$(MAKE) doxyrun abs_top_srcdir="$(abs_top_srcdir)" abs_top_builddir="$(abs_top_builddir)" \
+	DOXYGEN_CONFIG="$(abs_srcdir)/Doxyfile.in" DOXYGEN="$(DOXYGEN)" 
 	echo Timestamp > doxyfile.stamp
 
 CLEANFILES = doxyfile.stamp
@@ -14,4 +33,4 @@ clean-local:
 	rm -rf html
 endif 
 
-EXTRA_DIST = Doxyfile.in
+EXTRA_DIST = Doxyfile.in1 Doxyfile.in

@@ -1,14 +1,16 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-//{{{ docu
-//
-// cf_factor.cc - factorization and square free algorithms.
-//
-// Used by: fac_multivar.cc, fac_univar.cc, cf_irred.cc
-//
-// Header file: cf_algorithm.h
-//
-//}}}
+/**
+ *
+ * @file cf_factor.cc
+ *
+ * Interface to factorization and square free factorization algorithms.
+ *
+ * Used by: cf_irred.cc
+ *
+ * Header file: cf_algorithm.h
+ *
+**/
 
 
 #include "config.h"
@@ -236,10 +238,10 @@ bool isPurePoly(const CanonicalForm & f)
 }
 
 
-///////////////////////////////////////////////////////////////
-// get_max_degree_Variable returns Variable with             //
-// highest degree. We assume f is *not* a constant!          //
-///////////////////////////////////////////////////////////////
+/**
+ * get_max_degree_Variable returns Variable with
+ * highest degree. We assume f is *not* a constant!
+**/
 Variable
 get_max_degree_Variable(const CanonicalForm & f)
 {
@@ -255,10 +257,10 @@ get_max_degree_Variable(const CanonicalForm & f)
   return Variable(maxlevel);
 }
 
-///////////////////////////////////////////////////////////////
-// get_Terms: Split the polynomial in the containing terms.  //
-// getTerms: the real work is done here.                     //
-///////////////////////////////////////////////////////////////
+/**
+ * get_Terms: Split the polynomial in the containing terms.
+ * getTerms: the real work is done here.
+**/
 void
 getTerms( const CanonicalForm & f, const CanonicalForm & t, CFList & result )
 {
@@ -290,10 +292,9 @@ get_Terms( const CanonicalForm & f ){
 }
 
 
-///////////////////////////////////////////////////////////////
-// homogenize homogenizes f with Variable x                  //
-///////////////////////////////////////////////////////////////
-
+/**
+ * homogenize homogenizes f with Variable x
+**/
 CanonicalForm
 homogenize( const CanonicalForm & f, const Variable & x)
 {
@@ -384,6 +385,9 @@ int cmpCF( const CFFactor & f, const CFFactor & g )
   return 0;
 }
 
+/**
+ * factorization over \f$ F_p \f$ or \f$ Q \f$
+**/
 CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 {
   if ( f.inCoeffDomain() )
@@ -608,6 +612,9 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
   return F;
 }
 
+/**
+ * factorization over \f$ F_p(\alpha) \f$ or \f$ Q(\alpha) \f$
+**/
 CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 {
   if ( f.inCoeffDomain() )
@@ -745,6 +752,9 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
   return F;
 }
 
+/**
+ * squarefree factorization
+**/
 CFFList sqrFree ( const CanonicalForm & f, bool sort )
 {
 //    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );

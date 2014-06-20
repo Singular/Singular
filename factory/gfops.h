@@ -1,5 +1,13 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file gfops.h
+ *
+ * Operations in GF, where GF is a finite field of size less than 2^16
+ * represented by a root of Conway polynomial. Uses look up tables for addition.
+ *
+ * @sa gf_tabutil.h
+**/
 #ifndef INCL_GFOPS_H
 #define INCL_GFOPS_H
 

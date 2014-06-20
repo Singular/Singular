@@ -3,9 +3,11 @@
 #ifndef INCL_FACTORYCONF_H
 #define INCL_FACTORYCONF_H
 
-/* {{{ docu
+/* template to generate `factoryconf.h'. */
+
+/**
  *
- * factoryconf.template - template to generate `factoryconf.h'.
+ * @file factoryconf.h
  * 
  * `factoryconf.h' serves as a configuration file for the
  * installed source files (templates and `factory.h') the same
@@ -14,8 +16,7 @@
  * we paste a copy of our `cf_assert.h' into this file which is
  * necessary for the templates to translate.
  *
- */
-/* }}} */
+**/
 
 /*MAKEHEADER*/
 #include "config.h"

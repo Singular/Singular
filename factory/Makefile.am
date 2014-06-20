@@ -39,6 +39,7 @@ SOURCES = \
 		cf_map.cc \
 		cf_map_ext.cc \
 		cfNewtonPolygon.cc \
+		cfNTLzzpEXGCD.cc \
 		cfModResultant.cc \
 		cf_ops.cc \
 		cf_primes.cc \
@@ -68,7 +69,6 @@ SOURCES = \
 		facHensel.cc \
 		facIrredTest.cc \
 		facMul.cc \
-		facNTLzzpEXGCD.cc \
 		facSparseHensel.cc \
 		ffops.cc \
 		FLINTconvert.cc \
@@ -115,6 +115,7 @@ factory_headers = \
 		cf_map.h \
 		cf_map_ext.h \
 		cfNewtonPolygon.h \
+		cfNTLzzpEXGCD.h \
 		cfModResultant.h \
 		cf_primes.h \
 		cf_primetab.h \
@@ -142,7 +143,6 @@ factory_headers = \
 		facHensel.h \
 		facIrredTest.h \
 		facMul.h \
-		facNTLzzpEXGCD.h \
 		facSparseHensel.h \
 		ffops.h \
 		FLINTconvert.h \
@@ -170,16 +170,6 @@ nodist_libfactory_include_HEADERS = cplusplus.h factory.h factoryconf.h
 ####################################################
 # Documentation
 include $(srcdir)/aminclude.am
-
-doxysrc = $(SOURCES) parseutil.cc
-doxyincl = $(factory_headers) parseutil.h
-
-# doxygen targets
-doxy:		factory.cfg $(doxysrc) $(doxyincl)
-		doxygen $<
-
-doxyclean:
-		rm -rf doxygen
 
 ####################################################
 # the precomputed GF(q)-tables
@@ -237,7 +227,7 @@ hdrtemplsrc = 	factoryconf.template \
 
 EXTRA_DIST =	test_install.cc \
 		$(templatesrc) $(hdrtemplsrc) \
-		doxygen.cfg factory.cfg \
+		doxygen.cfg \
 		examples/application.cc \
 		examples/factorize.cc examples/gcd.cc \
 		bin/folding.el bin/fold-docu.el \
