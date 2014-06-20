@@ -107,6 +107,7 @@ factory_headers = \
 		cf_cyclo.h \
 		cf_defs.h \
 		cf_eval.h \
+		cfEzgcd.h \
 		cf_factory.h \
 		cf_generator.h \
 		cf_globals.h \
