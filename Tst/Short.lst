@@ -324,7 +324,3 @@ Short/ncfactor_tsai_s.tst
 ; Short/polybori_s.tst
 Short/realizationMatroids.tst
 ;
-Short/ncfactor_example2_7FromMaster_s.tst
-Short/ncfactor_koepf_s.tst
-Short/ncfactor_koepfShift_s.tst
-Short/ncfactor_tsai_s.tst
