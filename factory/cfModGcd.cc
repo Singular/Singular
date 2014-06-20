@@ -1,6 +1,6 @@
 // -*- c++ -*-
 //*****************************************************************************
-/** @file cf_gcd_smallp.cc
+/** @file cfModGcd.cc
  *
  * This file implements the GCD of two polynomials over \f$ F_{p} \f$ ,
  * \f$ F_{p}(\alpha ) \f$, GF or Z based on Alg. 7.1. and 7.2. as described in
@@ -40,7 +40,7 @@
 #include "cf_algorithm.h"
 #include "cf_primes.h"
 
-// iinline helper functions:
+// inline helper functions:
 #include "cf_map_ext.h"
 
 #ifdef HAVE_NTL
@@ -51,7 +51,7 @@
 #include "FLINTconvert.h"
 #endif
 
-#include "cf_gcd_smallp.h"
+#include "cfModGcd.h"
 
 TIMING_DEFINE_PRINT(gcd_recursion)
 TIMING_DEFINE_PRINT(newton_interpolation)

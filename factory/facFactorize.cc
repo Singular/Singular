@@ -24,7 +24,6 @@
 #include "facFqFactorize.h"
 #include "cf_random.h"
 #include "facHensel.h"
-#include "cf_gcd_smallp.h"
 #include "cf_map_ext.h"
 #include "cf_reval.h"
 #include "facSparseHensel.h"

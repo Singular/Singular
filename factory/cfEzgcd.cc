@@ -23,7 +23,7 @@
 #include "cf_defs.h"
 #include "canonicalform.h"
 #include "cfEzgcd.h"
-#include "cf_gcd_smallp.h"
+#include "cfModGcd.h"
 #include "cf_util.h"
 #include "cf_map_ext.h"
 #include "cf_algorithm.h"

@@ -24,7 +24,7 @@
 #include "cfEzgcd.h"
 #include "cfGcdAlgExt.h"
 #include "cfSubResGcd.h"
-#include "cf_gcd_smallp.h"
+#include "cfModGcd.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZX.h>

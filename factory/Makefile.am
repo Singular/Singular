@@ -28,7 +28,6 @@ SOURCES = \
 		cf_factory.cc \
 		cf_gcd.cc \
 		cfGcdAlgExt.cc \
-		cf_gcd_smallp.cc \
 		cfGcdUtil.cc \
 		cf_generator.cc \
 		cf_globals.cc \
@@ -40,6 +39,7 @@ SOURCES = \
 		cf_linsys.cc \
 		cf_map.cc \
 		cf_map_ext.cc \
+		cfModGcd.cc \
 		cfNewtonPolygon.cc \
 		cfNTLzzpEXGCD.cc \
 		cfModResultant.cc \
@@ -111,13 +111,13 @@ factory_headers = \
 		cf_generator.h \
 		cf_globals.h \
 		cfGcdAlgExt.h \
-		cf_gcd_smallp.h \
 		cfGcdUtil.h \
 		cf_hnf.h \
 		cf_irred.h \
 		cf_iter.h \
 		cf_map.h \
 		cf_map_ext.h \
+		cfModGcd.h \
 		cfNewtonPolygon.h \
 		cfNTLzzpEXGCD.h \
 		cfModResultant.h \

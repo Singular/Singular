@@ -1,8 +1,8 @@
-#ifndef CF_GCD_SMALL_H
-#define CF_GCD_SMALL_H
+#ifndef CF_MOD_GCD_H
+#define CF_MOD_GCD_H
 // -*- c++ -*-
 //*****************************************************************************
-/** @file cf_gcd_smallp.h
+/** @file cfModGcd.h
  *
  * modular and sparse modular GCD algorithms over finite fields and Z.
  *
