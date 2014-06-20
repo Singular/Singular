@@ -1,3 +1,12 @@
+/**
+ * @file cfUnivarGcd.h
+ *
+ * univariate Gcd over finite fields and Z, extended GCD over finite fields
+ * and Q
+ *
+ * @note if NTL or FLINT are available they are used to compute the (ext)Gcd
+**/
+
 #ifndef CF_UNIVAR_GCD_H
 #define CF_UNIVAR_GCD_H
 

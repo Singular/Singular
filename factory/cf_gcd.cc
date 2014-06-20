@@ -81,6 +81,10 @@ icontent ( const CanonicalForm & f )
  * Different gcd variants get called depending the input, characteristic, and
  * on switches (cf_defs.h)
  *
+ * With the current settings from Singular (i.e. SW_USE_EZGCD= on,
+ * SW_USE_EZGCD_P= on, SW_USE_CHINREM_GCD= on, the EZ GCD variants are the
+ * default algorithms for multivariate polynomial GCD computations)
+ *
  * @sa gcd(), cf_defs.h
  *
 **/

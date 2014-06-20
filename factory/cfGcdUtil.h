@@ -1,3 +1,9 @@
+/**
+ * @file cfGcdUtil.h
+ *
+ * coprimality check and change of representation mod n
+**/
+
 #ifndef CF_GCD_UTIL_H
 #define CF_GCD_UTIL_H
 bool

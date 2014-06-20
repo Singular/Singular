@@ -935,7 +935,8 @@ bool findeval_P (const CanonicalForm & F, const CanonicalForm & G,
 static int maxNumEval= 200;
 static int sizePerVars1= 500; //try dense gcd if size/#variables is bigger
 
-/// Extended Zassenhaus GCD for finite fields
+/// Extended Zassenhaus GCD for finite fields.
+/// In case things become too dense we switch to a modular algorithm
 CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
 {
   if (FF.isZero() && degree(GG) > 0) return GG/Lc(GG);
