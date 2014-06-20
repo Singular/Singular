@@ -2398,7 +2398,7 @@ static BOOLEAN jjGCD_BI(leftv res, leftv u, leftv v)
 {
   number n1 = (number) u->Data();
   number n2 = (number) v->Data();
-  res->data = (char*)nlGcdi(a,b,NULL);
+  res->data = (char*)nlGcd(n1,n2,NULL);
   return FALSE;
 }
 static BOOLEAN jjGCD_N(leftv res, leftv u, leftv v)
