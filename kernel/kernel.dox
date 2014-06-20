@@ -1,4 +1,6 @@
-/*! \page kernel_page More involved mathematical algorithms (kernel)
+/*!
+ \dir kernel
+ \page kernel_page More involved mathematical algorithms (kernel)
 
  Algorithms using \ref libpolys_page and other mathematical features for Singular.
  
