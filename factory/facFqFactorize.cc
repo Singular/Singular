@@ -31,6 +31,7 @@
 #include "cf_map_ext.h"
 #include "facSparseHensel.h"
 #include "facMul.h"
+#include "cfUnivarGcd.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"

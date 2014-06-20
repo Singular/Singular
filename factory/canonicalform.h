@@ -231,8 +231,6 @@ CanonicalForm gcd ( const CanonicalForm&, const CanonicalForm& );
 
 CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g );
 
-CanonicalForm extgcd ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
-
 CanonicalForm lcm ( const CanonicalForm&, const CanonicalForm& );
 
 CanonicalForm pp ( const CanonicalForm& );

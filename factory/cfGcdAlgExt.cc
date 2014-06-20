@@ -25,6 +25,7 @@
 #include "cf_primes.h"
 #include "cf_algorithm.h"
 #include "cfGcdAlgExt.h"
+#include "cfUnivarGcd.h"
 #include "cf_map.h"
 #include "cf_generator.h"
 #include "facMul.h"

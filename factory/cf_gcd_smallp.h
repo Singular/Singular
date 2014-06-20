@@ -109,4 +109,6 @@ bool
 terminationTest (const CanonicalForm& F, const CanonicalForm& G,
                  const CanonicalForm& coF, const CanonicalForm& coG,
                  const CanonicalForm& cand);
+
+CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG );
 #endif

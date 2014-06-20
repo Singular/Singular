@@ -24,6 +24,7 @@
 #include "timing.h"
 
 #include "canonicalform.h"
+#include "cfGcdUtil.h"
 #include "cf_map.h"
 #include "cf_util.h"
 #include "templates/ftmpl_functions.h"
@@ -3854,5 +3855,196 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
       return N(gcdcAcB*GCD_small_p (ppA, ppB));
   } while (1); //end of first do
 }
+
+TIMING_DEFINE_PRINT(chinrem_termination)
+TIMING_DEFINE_PRINT(chinrem_recursion)
+
+/// modular gcd algorithm, see Keith, Czapor, Geddes "Algorithms for Computer
+/// Algebra", Algorithm 7.1
+CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
+{
+  CanonicalForm f, g, cl, q(0), Dp, newD, D, newq, newqh;
+  int p, i, dp_deg, d_deg=-1;
+
+  CanonicalForm cd ( bCommonDen( FF ));
+  f=cd*FF;
+  Variable x= Variable (1);
+  CanonicalForm cf, cg;
+  cf= icontent (f);
+  f /= cf;
+  //cd = bCommonDen( f ); f *=cd;
+  //f /=vcontent(f,Variable(1));
+
+  cd = bCommonDen( GG );
+  g=cd*GG;
+  cg= icontent (g);
+  g /= cg;
+  //cd = bCommonDen( g ); g *=cd;
+  //g /=vcontent(g,Variable(1));
+
+  CanonicalForm Dn, test= 0;
+  CanonicalForm lcf, lcg;
+  lcf= f.lc();
+  lcg= g.lc();
+  cl =  gcd (f.lc(),g.lc());
+  CanonicalForm gcdcfcg= gcd (cf, cg);
+  CanonicalForm fp, gp;
+  CanonicalForm b= 1;
+  int minCommonDeg= 0;
+  for (i= tmax (f.level(), g.level()); i > 0; i--)
+  {
+    if (degree (f, i) <= 0 || degree (g, i) <= 0)
+      continue;
+    else
+    {
+      minCommonDeg= tmin (degree (g, i), degree (f, i));
+      break;
+    }
+  }
+  if (i == 0)
+    return gcdcfcg;
+  for (; i > 0; i--)
+  {
+    if (degree (f, i) <= 0 || degree (g, i) <= 0)
+      continue;
+    else
+      minCommonDeg= tmin (minCommonDeg, tmin (degree (g, i), degree (f, i)));
+  }
+  b= 2*tmin (maxNorm (f), maxNorm (g))*abs (cl)*
+     power (CanonicalForm (2), minCommonDeg);
+  bool equal= false;
+  i = cf_getNumBigPrimes() - 1;
+
+  CanonicalForm cof, cog, cofp, cogp, newCof, newCog, cofn, cogn, cDn;
+  int maxNumVars= tmax (getNumVars (f), getNumVars (g));
+  //Off (SW_RATIONAL);
+  while ( true )
+  {
+    p = cf_getBigPrime( i );
+    i--;
+    while ( i >= 0 && mod( cl*(lc(f)/cl)*(lc(g)/cl), p ) == 0 )
+    {
+      p = cf_getBigPrime( i );
+      i--;
+    }
+    //printf("try p=%d\n",p);
+    setCharacteristic( p );
+    fp= mapinto (f);
+    gp= mapinto (g);
+    TIMING_START (chinrem_recursion)
+#ifdef HAVE_NTL
+    if (size (fp)/maxNumVars > 500 && size (gp)/maxNumVars > 500)
+      Dp = GCD_small_p (fp, gp, cofp, cogp);
+    else
+    {
+      Dp= gcd_poly (fp, gp);
+      cofp= fp/Dp;
+      cogp= gp/Dp;
+    }
+#else
+    Dp= gcd_poly (fp, gp);
+    cofp= fp/Dp;
+    cogp= gp/Dp;
+#endif
+    TIMING_END_AND_PRINT (chinrem_recursion,
+                          "time for gcd mod p in modular gcd: ");
+    Dp /=Dp.lc();
+    Dp *= mapinto (cl);
+    cofp /= lc (cofp);
+    cofp *= mapinto (lcf);
+    cogp /= lc (cogp);
+    cogp *= mapinto (lcg);
+    setCharacteristic( 0 );
+    dp_deg=totaldegree(Dp);
+    if ( dp_deg == 0 )
+    {
+      //printf(" -> 1\n");
+      return CanonicalForm(gcdcfcg);
+    }
+    if ( q.isZero() )
+    {
+      D = mapinto( Dp );
+      cof= mapinto (cofp);
+      cog= mapinto (cogp);
+      d_deg=dp_deg;
+      q = p;
+      Dn= balance_p (D, p);
+      cofn= balance_p (cof, p);
+      cogn= balance_p (cog, p);
+    }
+    else
+    {
+      if ( dp_deg == d_deg )
+      {
+        chineseRemainder( D, q, mapinto( Dp ), p, newD, newq );
+        chineseRemainder( cof, q, mapinto (cofp), p, newCof, newq);
+        chineseRemainder( cog, q, mapinto (cogp), p, newCog, newq);
+        cof= newCof;
+        cog= newCog;
+        newqh= newq/2;
+        Dn= balance_p (newD, newq, newqh);
+        cofn= balance_p (newCof, newq, newqh);
+        cogn= balance_p (newCog, newq, newqh);
+        if (test != Dn) //balance_p (newD, newq))
+          test= balance_p (newD, newq);
+        else
+          equal= true;
+        q = newq;
+        D = newD;
+      }
+      else if ( dp_deg < d_deg )
+      {
+        //printf(" were all bad, try more\n");
+        // all previous p's are bad primes
+        q = p;
+        D = mapinto( Dp );
+        cof= mapinto (cof);
+        cog= mapinto (cog);
+        d_deg=dp_deg;
+        test= 0;
+        equal= false;
+        Dn= balance_p (D, p);
+        cofn= balance_p (cof, p);
+        cogn= balance_p (cog, p);
+      }
+      else
+      {
+        //printf(" was bad, try more\n");
+      }
+      //else dp_deg > d_deg: bad prime
+    }
+    if ( i >= 0 )
+    {
+      cDn= icontent (Dn);
+      Dn /= cDn;
+      cofn /= cl/cDn;
+      //cofn /= icontent (cofn);
+      cogn /= cl/cDn;
+      //cogn /= icontent (cogn);
+      TIMING_START (chinrem_termination);
+      if ((terminationTest (f,g, cofn, cogn, Dn)) ||
+          ((equal || q > b) && fdivides (Dn, f) && fdivides (Dn, g)))
+      {
+        TIMING_END_AND_PRINT (chinrem_termination,
+                            "time for successful termination in modular gcd: ");
+        //printf(" -> success\n");
+        return Dn*gcdcfcg;
+      }
+      TIMING_END_AND_PRINT (chinrem_termination,
+                          "time for unsuccessful termination in modular gcd: ");
+      equal= false;
+      //else: try more primes
+    }
+    else
+    { // try other method
+      //printf("try other gcd\n");
+      Off(SW_USE_CHINREM_GCD);
+      D=gcd_poly( f, g );
+      On(SW_USE_CHINREM_GCD);
+      return D*gcdcfcg;
+    }
+  }
+}
+
 
 #endif

@@ -29,6 +29,7 @@ SOURCES = \
 		cf_gcd.cc \
 		cfGcdAlgExt.cc \
 		cf_gcd_smallp.cc \
+		cfGcdUtil.cc \
 		cf_generator.cc \
 		cf_globals.cc \
 		cf_hnf.cc \
@@ -47,8 +48,10 @@ SOURCES = \
 		cf_random.cc \
 		cf_resultant.cc \
 		cf_reval.cc \
+		cfSubResGcd.cc \
 		cf_switches.cc \
 		cf_util.cc \
+		cfUnivarGcd.cc \
 		debug.cc \
 		DegreePattern.cc \
 		ExtensionInfo.cc \
@@ -109,6 +112,7 @@ factory_headers = \
 		cf_globals.h \
 		cfGcdAlgExt.h \
 		cf_gcd_smallp.h \
+		cfGcdUtil.h \
 		cf_hnf.h \
 		cf_irred.h \
 		cf_iter.h \
@@ -121,8 +125,10 @@ factory_headers = \
 		cf_primetab.h \
 		cf_random.h \
 		cf_reval.h \
+		cfSubResGcd.h \
 		cf_switches.h \
 		cf_util.h \
+		cfUnivarGcd.h \
 		debug.h \
 		DegreePattern.h \
 		ExtensionInfo.h \

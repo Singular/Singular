@@ -120,5 +120,8 @@
 /*MAKEHEADER PUBLIC ONLY*/
 #include "cfCharSets.h"
 
+/*MAKEHEADER PUBLIC ONLY*/
+#include "cfUnivarGcd.h"
+
 
 #endif /* ! INCL_FACTORY_H */
