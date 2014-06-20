@@ -955,11 +955,11 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   if (sizeF/maxNumVars > sizePerVars1 && sizeG/maxNumVars > sizePerVars1)
   {
     if (hasFirstAlgVar (FF, a) || hasFirstAlgVar (GG, a))
-      return GCD_Fp_extension (FF, GG, a);
+      return modGCDFq (FF, GG, a);
     else if (CFFactory::gettype() == GaloisFieldDomain)
-      return GCD_GF (FF, GG);
+      return modGCDGF (FF, GG);
     else
-      return GCD_small_p (FF, GG);
+      return modGCDFp (FF, GG);
   }
 
   CanonicalForm F, G, f, g, d, Fb, Gb, Db, Fbt, Gbt, Dbt, B0, B, D0, lcF, lcG,
@@ -1020,11 +1020,11 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   if (sizeF/maxNumVars > sizePerVars1 && sizeG/maxNumVars > sizePerVars1)
   {
     if (hasFirstAlgVar (F, a) || hasFirstAlgVar (G, a))
-      return N (d*GCD_Fp_extension (F, G, a));
+      return N (d*modGCDFq (F, G, a));
     else if (CFFactory::gettype() == GaloisFieldDomain)
-      return N (d*GCD_GF (F, G));
+      return N (d*modGCDGF (F, G));
     else
-      return N (d*GCD_small_p (F, G));
+      return N (d*modGCDFp (F, G));
   }
 
   int dummy= 0;
@@ -1392,14 +1392,14 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
       {
         if (algExtension)
         {
-          result= GCD_Fp_extension (F, G, a);
+          result= modGCDFq (F, G, a);
           if (extOfExt)
             result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
           return N (d*result);
         }
         if (CFFactory::gettype() == GaloisFieldDomain)
         {
-          result= GCD_GF (F, G);
+          result= modGCDGF (F, G);
           if (passToGF)
           {
             CanonicalForm mipo= gf_mipo;
@@ -1415,7 +1415,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           return N (d*result);
         }
         else
-          return N (d*GCD_small_p (F,G));
+          return N (d*modGCDFp (F,G));
       }
 
       TIMING_START (ez_p_hensel_lift);
@@ -1426,14 +1426,14 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
       {
         if (algExtension)
         {
-          result= GCD_Fp_extension (F, G, a);
+          result= modGCDFq (F, G, a);
           if (extOfExt)
             result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
           return N (d*result);
         }
         if (CFFactory::gettype() == GaloisFieldDomain)
         {
-          result= GCD_GF (F, G);
+          result= modGCDGF (F, G);
           if (passToGF)
           {
             CanonicalForm mipo= gf_mipo;
@@ -1453,7 +1453,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           if (p >= cf_getBigPrime(0))
             return N (d*sparseGCDFp (F,G));
           else
-            return N (d*GCD_small_p (F,G));
+            return N (d*modGCDFp (F,G));
         }
       }
 

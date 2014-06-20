@@ -110,11 +110,11 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     {
       Variable a;
       if (hasFirstAlgVar (fc, a) || hasFirstAlgVar (gc, a))
-        fc=GCD_Fp_extension (fc, gc, a);
+        fc=modGCDFq (fc, gc, a);
       else if (CFFactory::gettype() == GaloisFieldDomain)
-        fc=GCD_GF (fc, gc);
+        fc=modGCDGF (fc, gc);
       else
-        fc=GCD_small_p (fc, gc);
+        fc=modGCDFp (fc, gc);
     }
     else
     #endif
@@ -125,7 +125,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     if ( isOn( SW_USE_EZGCD ) )
       fc= ezgcd (fc, gc);
     else if (isOn(SW_USE_CHINREM_GCD))
-      fc = chinrem_gcd( fc, gc);
+      fc = modGCDZ( fc, gc);
     else
     {
        fc = subResGCD_0( fc, gc );

@@ -3,8 +3,12 @@
 /** @file cf_gcd_smallp.cc
  *
  * This file implements the GCD of two polynomials over \f$ F_{p} \f$ ,
- * \f$ F_{p}(\alpha ) \f$ or GF based on Alg. 7.2. as described in "Algorithms
- * for Computer Algebra" by Geddes, Czapor, Labahn
+ * \f$ F_{p}(\alpha ) \f$, GF or Z based on Alg. 7.1. and 7.2. as described in
+ * "Algorithms for Computer Algebra" by Geddes, Czapor, Labahn via modular
+ * computations. And sparse modular variants as described in Zippel
+ * "Effective Polynomial Computation", deKleine, Monagan, Wittkopf
+ * "Algorithms for the non-monic case of the sparse modular GCD algorithm" and
+ * Javadi "A new solution to the normalization problem"
  *
  * @author Martin Lee
  * @date 22.10.2009
@@ -440,16 +444,16 @@ Variable chooseExtension (const Variable & alpha)
 }
 
 CanonicalForm
-GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
+modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
                   CanonicalForm& coF, CanonicalForm& coG,
                   Variable & alpha, CFList& l, bool& topLevel);
 
 CanonicalForm
-GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
+modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
                   Variable & alpha, CFList& l, bool& topLevel)
 {
   CanonicalForm dummy1, dummy2;
-  CanonicalForm result= GCD_Fp_extension (F, G, dummy1, dummy2, alpha, l,
+  CanonicalForm result= modGCDFq (F, G, dummy1, dummy2, alpha, l,
                                           topLevel);
   return result;
 }
@@ -459,7 +463,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
 /// based on Alg. 7.2. as described in "Algorithms for
 /// Computer Algebra" by Geddes, Czapor, Labahn
 CanonicalForm
-GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
+modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
                   CanonicalForm& coF, CanonicalForm& coG,
                   Variable & alpha, CFList& l, bool& topLevel)
 {
@@ -647,7 +651,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element=
-      GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x),
+      modGCDFq (ppA (random_element, x), ppB (random_element, x),
                         coF_random_element, coG_random_element, V_buf,
                         list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
@@ -659,7 +663,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element=
-      GCD_Fp_extension (ppA(random_element, x), ppB(random_element, x),
+      modGCDFq (ppA(random_element, x), ppB(random_element, x),
                         coF_random_element, coG_random_element, V_buf,
                         list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
@@ -822,26 +826,26 @@ GFRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
 }
 
 CanonicalForm
-GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
+modGCDGF (const CanonicalForm& F, const CanonicalForm& G,
         CanonicalForm& coF, CanonicalForm& coG,
         CFList& l, bool& topLevel);
 
 CanonicalForm
-GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
+modGCDGF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
         bool& topLevel)
 {
   CanonicalForm dummy1, dummy2;
-  CanonicalForm result= GCD_GF (F, G, dummy1, dummy2, l, topLevel);
+  CanonicalForm result= modGCDGF (F, G, dummy1, dummy2, l, topLevel);
   return result;
 }
 
 /// GCD of F and G over GF, based on Alg. 7.2. as described in "Algorithms for
 /// Computer Algebra" by Geddes, Czapor, Labahn
-/// Usually this algorithm will be faster than GCD_Fp_extension since GF has
+/// Usually this algorithm will be faster than modGCDFq since GF has
 /// faster field arithmetics, however it might fail if the input is large since
 /// the size of the base field is bounded by 2^16, output is monic
 CanonicalForm
-GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
+modGCDGF (const CanonicalForm& F, const CanonicalForm& G,
         CanonicalForm& coF, CanonicalForm& coG,
         CFList& l, bool& topLevel)
 {
@@ -978,7 +982,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       else
       {
         expon= (int) floor((log ((double)((1<<16) - 1)))/(log((double)p)*kk));
-        ASSERT (expon >= 2, "not enough points in GCD_GF");
+        ASSERT (expon >= 2, "not enough points in modGCDGF");
         setCharacteristic (p, (int)(kk*expon), 'b');
       }
       inextension= true;
@@ -999,7 +1003,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       DEBOUTLN (cerr, "fail= " << fail);
       CFList list;
       TIMING_START (gcd_recursion);
-      G_random_element= GCD_GF (ppA(random_element, x), ppB(random_element, x),
+      G_random_element= modGCDGF (ppA(random_element, x), ppB(random_element, x),
                                 coF_random_element, coG_random_element,
                                 list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
@@ -1010,7 +1014,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     {
       CFList list;
       TIMING_START (gcd_recursion);
-      G_random_element= GCD_GF (ppA(random_element, x), ppB(random_element, x),
+      G_random_element= modGCDGF (ppA(random_element, x), ppB(random_element, x),
                                 coF_random_element, coG_random_element,
                                 list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
@@ -1191,21 +1195,21 @@ FpRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
 }
 
 CanonicalForm
-GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
+modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
              CanonicalForm& coF, CanonicalForm& coG,
              bool& topLevel, CFList& l);
 
 CanonicalForm
-GCD_small_p (const CanonicalForm& F, const CanonicalForm& G,
+modGCDFp (const CanonicalForm& F, const CanonicalForm& G,
              bool& topLevel, CFList& l)
 {
   CanonicalForm dummy1, dummy2;
-  CanonicalForm result= GCD_small_p (F, G, dummy1, dummy2, topLevel, l);
+  CanonicalForm result= modGCDFp (F, G, dummy1, dummy2, topLevel, l);
   return result;
 }
 
 CanonicalForm
-GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
+modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
              CanonicalForm& coF, CanonicalForm& coG,
              bool& topLevel, CFList& l)
 {
@@ -1341,7 +1345,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element=
-      GCD_small_p (ppA (random_element,x), ppB (random_element,x),
+      modGCDFp (ppA (random_element,x), ppB (random_element,x),
                    coF_random_element, coG_random_element, topLevel,
                    list);
       TIMING_END_AND_PRINT (gcd_recursion,
@@ -1353,7 +1357,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element=
-      GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x),
+      modGCDFq (ppA (random_element, x), ppB (random_element, x),
                         coF_random_element, coG_random_element, V_buf,
                         list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
@@ -1379,7 +1383,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       V_buf= alpha;
       TIMING_START (gcd_recursion);
       G_random_element=
-      GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x),
+      modGCDFq (ppA (random_element, x), ppB (random_element, x),
                         coF_random_element, coG_random_element, alpha,
                         list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
@@ -1447,7 +1451,7 @@ GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element=
-      GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x),
+      modGCDFq (ppA (random_element, x), ppB (random_element, x),
                         coF_random_element, coG_random_element, V_buf,
                         list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion,
@@ -3852,16 +3856,16 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
       } while (1); //end of second do
     }
     else
-      return N(gcdcAcB*GCD_small_p (ppA, ppB));
+      return N(gcdcAcB*modGCDFp (ppA, ppB));
   } while (1); //end of first do
 }
 
-TIMING_DEFINE_PRINT(chinrem_termination)
-TIMING_DEFINE_PRINT(chinrem_recursion)
+TIMING_DEFINE_PRINT(modZ_termination)
+TIMING_DEFINE_PRINT(modZ_recursion)
 
 /// modular gcd algorithm, see Keith, Czapor, Geddes "Algorithms for Computer
 /// Algebra", Algorithm 7.1
-CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
+CanonicalForm modGCDZ ( const CanonicalForm & FF, const CanonicalForm & GG )
 {
   CanonicalForm f, g, cl, q(0), Dp, newD, D, newq, newqh;
   int p, i, dp_deg, d_deg=-1;
@@ -3931,10 +3935,10 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     setCharacteristic( p );
     fp= mapinto (f);
     gp= mapinto (g);
-    TIMING_START (chinrem_recursion)
+    TIMING_START (modZ_recursion)
 #ifdef HAVE_NTL
     if (size (fp)/maxNumVars > 500 && size (gp)/maxNumVars > 500)
-      Dp = GCD_small_p (fp, gp, cofp, cogp);
+      Dp = modGCDFp (fp, gp, cofp, cogp);
     else
     {
       Dp= gcd_poly (fp, gp);
@@ -3946,7 +3950,7 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     cofp= fp/Dp;
     cogp= gp/Dp;
 #endif
-    TIMING_END_AND_PRINT (chinrem_recursion,
+    TIMING_END_AND_PRINT (modZ_recursion,
                           "time for gcd mod p in modular gcd: ");
     Dp /=Dp.lc();
     Dp *= mapinto (cl);
@@ -4021,16 +4025,16 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       //cofn /= icontent (cofn);
       cogn /= cl/cDn;
       //cogn /= icontent (cogn);
-      TIMING_START (chinrem_termination);
+      TIMING_START (modZ_termination);
       if ((terminationTest (f,g, cofn, cogn, Dn)) ||
           ((equal || q > b) && fdivides (Dn, f) && fdivides (Dn, g)))
       {
-        TIMING_END_AND_PRINT (chinrem_termination,
+        TIMING_END_AND_PRINT (modZ_termination,
                             "time for successful termination in modular gcd: ");
         //printf(" -> success\n");
         return Dn*gcdcfcg;
       }
-      TIMING_END_AND_PRINT (chinrem_termination,
+      TIMING_END_AND_PRINT (modZ_termination,
                           "time for unsuccessful termination in modular gcd: ");
       equal= false;
       //else: try more primes
