@@ -128,5 +128,7 @@ test_SOURCES=test.cc
 gftables: ${top_srcdir}/../factory/gftables
 	ln -snf ${top_srcdir}/../factory/gftables ${builddir}/gftables
 
-MOD: ${top_builddir}/polys/.libs
-	ln -snf ${top_builddir}/polys/.libs/ ${builddir}/MOD
+MOD:
+	if [ -d "${top_builddir}/libpolys/polys/.libs" ]; then \
+	  ln -snf ${top_builddir}/libpolys/polys/.libs/ ${abs_builddir}/MOD; \
+	fi
