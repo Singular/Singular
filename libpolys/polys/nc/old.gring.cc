@@ -1625,14 +1625,6 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
     return(NULL);
   }
 
-#ifdef PDEBUG
-  if (lCompP1!=lCompP2)
-  {
-    WarnS("gnc_CreateSpolyNew: vector & poly in SPoly!");
-  }
-#endif
-
-
 //   if ((r->GetNC()->type==nc_lie) && pHasNotCF(p1,p2)) /* prod crit */
 //   {
 //     return(nc_p_Bracket_qq(pCopy(p2),p1));
