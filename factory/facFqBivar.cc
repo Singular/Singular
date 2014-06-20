@@ -31,7 +31,7 @@
 #include "facHensel.h"
 #include "facMul.h"
 #include "cf_map.h"
-#include "cf_gcd_smallp.h"
+#include "cf_irred.h"
 #include "facFqBivarUtil.h"
 #include "facFqBivar.h"
 #include "cfNewtonPolygon.h"
@@ -8839,7 +8839,7 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     {
       int extDeg= degree (getMipo (alpha));
       extDeg++;
-      CanonicalForm mipo= randomIrredpoly (extDeg + 1, x);
+      CanonicalForm mipo= randomIrredpoly (extDeg, x);
       Variable v= rootOf (mipo);
       ExtensionInfo info2= ExtensionInfo (v);
       factors= biFactorize (A, info2);

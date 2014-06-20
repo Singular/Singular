@@ -27,7 +27,7 @@
 #include "facFqFactorize.h"
 #include "cf_random.h"
 #include "facHensel.h"
-#include "cf_gcd_smallp.h"
+#include "cf_irred.h"
 #include "cf_map_ext.h"
 #include "facSparseHensel.h"
 #include "facMul.h"
@@ -3675,7 +3675,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     {
       int extDeg= degree (getMipo (alpha));
       extDeg++;
-      CanonicalForm mipo= randomIrredpoly (extDeg + 1, w);
+      CanonicalForm mipo= randomIrredpoly (extDeg, w);
       Variable v= rootOf (mipo);
       ExtensionInfo info= ExtensionInfo (v);
       factors= multiFactorize (A, info);

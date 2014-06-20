@@ -76,9 +76,6 @@
 #include "cf_random.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
-#include "cf_irred.h"
-
-/*MAKEHEADER PUBLIC ONLY*/
 #include "fac_util.h"
 
 /*MAKEHEADER PUBLIC ONLY*/

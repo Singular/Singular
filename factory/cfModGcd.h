@@ -95,9 +95,6 @@ CanonicalForm sparseGCDFq (const CanonicalForm& A, const CanonicalForm& B,
   return sparseGCDFq (A, B, alpha, list, topLevel);
 }
 
-CanonicalForm
-randomIrredpoly (int i, const Variable & x) ;
-
 CFArray
 getMonoms (const CanonicalForm& F);
 

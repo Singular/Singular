@@ -31,6 +31,7 @@
 #include "cfGcdUtil.h"
 #include "cf_map.h"
 #include "cf_util.h"
+#include "cf_irred.h"
 #include "templates/ftmpl_functions.h"
 #include "cf_random.h"
 #include "cf_reval.h"
@@ -1140,24 +1141,6 @@ modGCDGF (const CanonicalForm& F, const CanonicalForm& G,
     if (!find (l, random_element))
       l.append (random_element);
   } while (1);
-}
-
-/// computes a random monic irreducible univariate polynomial in x of random
-/// degree < i
-CanonicalForm
-randomIrredpoly (int i, const Variable & x)
-{
-  int p= getCharacteristic();
-  if (fac_NTL_char != p)
-  {
-    fac_NTL_char= p;
-    zz_p::init (p);
-  }
-  zz_pX NTLirredpoly;
-  CanonicalForm CFirredpoly;
-  BuildIrred (NTLirredpoly, i + 1);
-  CFirredpoly= convertNTLzzpX2CF (NTLirredpoly, x);
-  return CFirredpoly;
 }
 
 static inline

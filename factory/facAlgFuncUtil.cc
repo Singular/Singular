@@ -89,8 +89,7 @@ varsInAs (const Varlist & uord, const CFList & Astar)
 CanonicalForm
 generateMipo (int degOfExt)
 {
-  FFRandom gen;
-  return find_irreducible (degOfExt, gen, Variable (1));
+  return randomIrredpoly (degOfExt, Variable (1));
 }
 
 CanonicalForm alg_lc (const CanonicalForm & f)
