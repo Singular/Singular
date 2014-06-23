@@ -349,7 +349,7 @@ void yyerror(const char * fmt)
 %left EQUAL_EQUAL NOTEQUAL
 %left '<'
 %left '+' '-' ':'
-%left '/' '*'
+%left '/'
 %left UMINUS NOT
 %left  '^'
 %left '[' ']'
