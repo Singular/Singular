@@ -788,6 +788,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 #endif
 }
 
+#ifdef HAVE_NTL
 static inline
 int Hensel_P (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
               const CFArray& LeadCoeffs )
@@ -1490,4 +1491,5 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   }
   return N (d*cand);
 }
+#endif
 

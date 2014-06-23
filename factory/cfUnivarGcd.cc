@@ -1,5 +1,12 @@
 #include "config.h"
 
+#include "debug.h"
+
+#include "cf_algorithm.h"
+#include "templates/ftmpl_functions.h"
+#include "cf_primes.h"
+#include "cfGcdUtil.h"
+
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
 #endif

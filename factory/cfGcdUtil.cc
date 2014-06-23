@@ -4,6 +4,7 @@
 #include "cf_factory.h"
 #include "cf_reval.h"
 #include "cf_util.h"
+#include "cf_iter.h"
 #include "gfops.h"
 #include "cf_map_ext.h"
 #include "templates/ftmpl_functions.h"

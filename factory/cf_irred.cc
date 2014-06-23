@@ -35,6 +35,7 @@ find_irreducible ( int deg, CFRandom & gen, const Variable & x )
     return result;
 }
 
+#ifdef HAVE_NTL
 /// computes a random monic irreducible univariate polynomial in x over Fp of
 /// degree i via NTL
 CanonicalForm
@@ -52,3 +53,4 @@ randomIrredpoly (int i, const Variable & x)
   CFirredpoly= convertNTLzzpX2CF (NTLirredpoly, x);
   return CFirredpoly;
 }
+#endif
