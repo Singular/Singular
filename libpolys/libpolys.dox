@@ -1,4 +1,6 @@
-/*! \page  libpolys_page Basic Data Structures for Singular (libpolys) 
+/*! 
+
+ \page libpolys_page Basic Data Structures for Singular (libpolys) 
 
  This is a (mostly) separate package containing the definition and implementaion for
  Singular data structures, such as, 
@@ -12,3 +14,22 @@
  - \subpage libpolys_polys_page
  
 */
+
+
+/*!
+\dir misc
+\ref libpolys_misc_page
+*/
+/*!
+\dir reporter
+\ref libpolys_reporter_page
+*/
+/*!
+\dir coeffs
+\ref libpolys_coeffs_page
+*/
+/*!
+\dir polys
+\ref libpolys_polys_page
+*/
+

@@ -188,6 +188,7 @@ void yyerror(const char * fmt)
 %token NOTEQUAL
 %token PLUSPLUS
 %token COLONCOLON
+%token ARROW
 
 /* types, part 1 (ring indep.)*/
 %token <i> GRING_CMD
@@ -350,7 +351,7 @@ void yyerror(const char * fmt)
 %left EQUAL_EQUAL NOTEQUAL
 %left '<'
 %left '+' '-' ':'
-%left '/' '*'
+%left '/'
 %left UMINUS NOT
 %left  '^'
 %left '[' ']'
@@ -358,6 +359,7 @@ void yyerror(const char * fmt)
 %left PLUSPLUS MINUSMINUS
 %left COLONCOLON
 %left '.'
+%left ARROW
 
 %%
 lines:
@@ -693,6 +695,10 @@ elemexpr:
           {
             if(iiExprArith1(&$$,&$3,RING_CMD)) YYERROR;
           }
+        | extendedid  ARROW BLOCKTOK
+          {
+            if (iiARROW(&$$,$1,$3)) YYERROR;
+          }
         ;
 
 exprlist:
@@ -773,12 +779,12 @@ expr:   expr_arithmetic
             siq--;
             #endif
           }
-	| assume_start expr ',' expr quote_end
-	  {
-	    iiTestAssume(&$2,&$4);
+        | assume_start expr ',' expr quote_end
+          {
+            iiTestAssume(&$2,&$4);
             memset(&$$,0,sizeof($$));
             $$.rtyp=NONE;
-	  }
+          }
         | EVAL  '('
           {
             #ifdef SIQ
@@ -874,13 +880,13 @@ expr_arithmetic:
           {
             if (siq>0)
             { if (iiExprArith1(&$$,&$2,NOT)) YYERROR; }
-	    else
-	    {
+            else
+            {
               memset(&$$,0,sizeof($$));
               int i; TESTSETINT($2,i);
               $$.rtyp  = INT_CMD;
               $$.data = (void *)(long)(i == 0 ? 1 : 0);
-	    }
+            }
           }
         | '-' expr %prec UMINUS
           {
