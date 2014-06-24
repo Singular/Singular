@@ -2053,6 +2053,7 @@ do_select:
         return -2;
       }
       /* else: next char */
+      goto do_select;
     }
   }
 }
