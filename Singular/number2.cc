@@ -3,6 +3,7 @@
 #include"Singular/ipid.h" // for SModulFunctions, leftv
 #include"coeffs/numbers.h" // nRegister, coeffs.h
 #include"coeffs/rmodulon.h" // ZnmInfo
+#include"coeffs/bigintmat.h" // bigintmat
 #include"coeffs/longrat.h" // nlGMP
 #include"Singular/blackbox.h" // blackbox type
 #include"Singular/ipshell.h" // IsPrime
@@ -202,6 +203,27 @@ BOOLEAN jjN2_CR(leftv res, leftv a)              // number2 ->cring
   number2 n=(number2)a->Data();
   n->cf->ref++;
   res->data=(void*)n->cf;
+  return FALSE;
+}
+
+BOOLEAN jjCM_CR(leftv res, leftv a)              // cmatrix ->cring
+{
+  bigintmat *b=(bigintmat*)a->Data();
+  coeffs cf=b->basecoeffs();
+  if (cf!=NULL)
+  {
+    cf->ref++;
+  }
+  res->data=(void*)cf;
+  return FALSE;
+}
+
+BOOLEAN jjCMATRIX_3(leftv res, leftv r, leftv c,leftv cf)
+{
+  bigintmat *b=new bigintmat((int)(long)r->Data(),
+                             (int)(long)c->Data(),
+                             (coeffs)cf->Data());
+  res->data=(char*)b;
   return FALSE;
 }
 

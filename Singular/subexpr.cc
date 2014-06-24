@@ -486,6 +486,7 @@ void s_internalDelete(const int t,  void *d, const ring r)
       delete v;
       break;
     }
+    case CMATRIX_CMD:
     case BIGINTMAT_CMD:
     {
       bigintmat *v=(bigintmat*)d;
@@ -1093,6 +1094,8 @@ int  sleftv::LTyp()
   return Typ();
 }
 
+static snumber2 iiNumber2Data[4];
+static int iiCmatrix_index=0;
 void * sleftv::Data()
 {
   if ((rtyp!=IDHDL) && iiCheckRing(rtyp))
@@ -1203,6 +1206,27 @@ void * sleftv::Data()
       }
       else
         r=(char *)(BIMATELEM((*m),index,e->next->start));
+      break;
+    }
+    case CMATRIX_CMD:
+    {
+      bigintmat *m=(bigintmat *)d;
+      if ((index<1)
+         ||(index>m->rows())
+         ||(e->next->start<1)
+         ||(e->next->start>m->cols()))
+      {
+        if (!errorreported)
+        Werror("wrong range[%d,%d] in bigintmat %s(%dx%d)",index,e->next->start,
+                                                     this->Name(),m->rows(),m->cols());
+      }
+      else
+      {
+        iiNumber2Data[iiCmatrix_index].cf=m->basecoeffs();
+        iiNumber2Data[iiCmatrix_index].n=BIMATELEM((*m),index,e->next->start);
+        r=(char*)&iiNumber2Data[iiCmatrix_index];
+        iiCmatrix_index=(iiCmatrix_index+1) % 4;
+      }
       break;
     }
     case IDEAL_CMD:

@@ -166,7 +166,7 @@ static void * iiI2NN(void *data)
 {
   if (currRing==NULL)
   {
-    WerrorS("missing basering");
+    WerrorS("missing basering while converting int to Number");
     return NULL;
   }
   number n=nInit((int)(long)data);
@@ -187,7 +187,7 @@ static void * iiBI2NN(void *data)
 {
   if (currRing==NULL)
   {
-    WerrorS("missing basering");
+    WerrorS("missing basering while converting bigint to Number");
     return NULL;
   }
   // a bigint is really a number from char 0, with different

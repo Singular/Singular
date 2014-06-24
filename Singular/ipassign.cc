@@ -403,15 +403,53 @@ static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr)
   jiAssignAttr(res,a);
   return FALSE;
 }
-static BOOLEAN jiA_NUMBER2(leftv res, leftv a, Subexpr)
+static BOOLEAN jiA_NUMBER2(leftv res, leftv a, Subexpr e)
 {
   number2 n=(number2)a->CopyD(NUMBER2_CMD);
-  if (res->data!=NULL)
+  if (e==NULL)
   {
-    number2 nn=(number2)res->data;
-    n2Delete(nn);
+    if (res->data!=NULL)
+    {
+      number2 nn=(number2)res->data;
+      n2Delete(nn);
+    }
+    res->data=(void *)n;
+    jiAssignAttr(res,a);
   }
-  res->data=(void *)n;
+  else
+  {
+    int i=e->start-1;
+    if (i<0)
+    {
+      Werror("index[%d] must be positive",i+1);
+      return TRUE;
+    }
+    bigintmat *iv=(bigintmat *)res->data;
+    if (e->next==NULL)
+    {
+      WerrorS("only one index given");
+      return TRUE;
+    }
+    else
+    {
+      int c=e->next->start;
+      if ((i>=iv->rows())||(c<1)||(c>iv->cols()))
+      {
+        Werror("wrong range [%d,%d] in cmatrix %s(%d,%d)",i+1,c,res->Name(),iv->rows(),iv->cols());
+        return TRUE;
+      }
+      else if (iv->basecoeffs()==n->cf)
+      {
+        n_Delete((number *)&BIMATELEM(*iv,i+1,c),iv->basecoeffs());
+        BIMATELEM(*iv,i+1,c) = n->n;
+      }
+      else
+      {
+        WerrorS("different base");
+	return TRUE;
+      }
+    }
+  }
   jiAssignAttr(res,a);
   return FALSE;
 }
@@ -636,7 +674,7 @@ static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr)
 static BOOLEAN jiA_BIGINTMAT(leftv res, leftv a, Subexpr)
 {
   if (res->data!=NULL) delete ((bigintmat *)res->data);
-  res->data=(void *)a->CopyD(BIGINTMAT_CMD);
+  res->data=(void *)a->CopyD();
   jiAssignAttr(res,a);
   return FALSE;
 }
