@@ -5113,6 +5113,7 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
   CFList result;
   bool irreducible= false;
   CFList bufFactors= factors;
+  CFList bufBufFactors;
   CFArray *A = new CFArray [bufFactors.length()];
   bool useOldQs= false;
   bool hitBound= false;
@@ -5146,8 +5147,6 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
   {
     bufFactors.insert (LCF);
     henselLiftResume12 (F, bufFactors, oldL, l, Pi, diophant, M);
-    bufFactors.insert (LCF);
-    bufFactors.removeFirst();
     j= bufFactors;
     truncF= mod (F, power (y, l));
     if (useOldQs)
@@ -5232,6 +5231,7 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
     int * zeroOneVecs= extractZeroOneVecs (NTLN);
 #endif
     bufF= F;
+    bufBufFactors= bufFactors;
 #ifdef HAVE_FLINT
     result= reconstruction (bufF, bufFactors, zeroOneVecs, l, FLINTN, eval);
 #else
@@ -5244,6 +5244,11 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
       factors= bufFactors;
       delete [] A;
       return result;
+    }
+    else
+    {
+      bufF= F;
+      bufFactors= bufBufFactors;
     }
 
 #ifdef HAVE_FLINT
@@ -5332,6 +5337,7 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
   CFList result;
   bool irreducible= false;
   CFList bufFactors= factors;
+  CFList bufBufFactors;
   CFArray *A = new CFArray [bufFactors.length()];
   bool useOldQs= false;
   bool hitBound= false;
@@ -5398,6 +5404,7 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
 
     int * zeroOneVecs= extractZeroOneVecs (NTLN);
     bufF= F;
+    bufBufFactors= bufFactors;
     result= reconstruction (bufF, bufFactors, zeroOneVecs, l, NTLN, eval);
     delete [] zeroOneVecs;
     if (result.length() > 0 && degree (bufF) + 1 + degree (LC (bufF, 1)) <= l)
@@ -5406,6 +5413,11 @@ furtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList&
       factors= bufFactors;
       delete [] A;
       return result;
+    }
+    else
+    {
+      bufF= F;
+      bufFactors= bufBufFactors;
     }
 
     if (isReduced (NTLN))
@@ -5484,6 +5496,7 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
   CFList result;
   bool irreducible= false;
   CFList bufFactors= factors;
+  CFList bufBufFactors;
   CFArray *A = new CFArray [bufFactors.length()];
   bool useOldQs= false;
   bool hitBound= false;
@@ -5670,6 +5683,7 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
     }
 
     bufF= F;
+    bufBufFactors= bufFactors;
 #ifdef HAVE_FLINT
     int * zeroOneVecs= extractZeroOneVecs (FLINTN);
     result= extReconstruction (bufF, bufFactors, zeroOneVecs, l, FLINTN, info,
@@ -5688,6 +5702,11 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
       factors= bufFactors;
       delete [] A;
       return result;
+    }
+    else
+    {
+      bufF= F;
+      bufFactors= bufBufFactors;
     }
 
 #ifdef HAVE_FLINT
@@ -5789,6 +5808,7 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
   CFList result;
   bool irreducible= false;
   CFList bufFactors= factors;
+  CFList bufBufFactors;
   CFArray *A = new CFArray [bufFactors.length()];
   bool useOldQs= false;
   int extensionDeg= degree (getMipo (alpha));
@@ -5906,6 +5926,7 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
     int * zeroOneVecs= extractZeroOneVecs (NTLN);
 #endif
     CanonicalForm bufF= F;
+    bufBufFactors= bufFactors;
 #ifdef HAVE_FLINT
     result= reconstruction (bufF, bufFactors, zeroOneVecs, l, FLINTN, eval);
 #else
@@ -5918,6 +5939,11 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
       factors= bufFactors;
       delete [] A;
       return result;
+    }
+    else
+    {
+      bufF= F;
+      bufFactors= bufBufFactors;
     }
 
 #ifdef HAVE_FLINT
