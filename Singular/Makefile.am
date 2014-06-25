@@ -236,7 +236,7 @@ test_LDADD = libSingular.la
 BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc iparith.inc all.lib plural_cmd.inc \
                 gftables MOD
 
-CLEANFILES = $(BUILT_SOURCES) $(EXTRA_PROGRAMS)
+CLEANFILES = $(BUILT_SOURCES) $(EXTRA_PROGRAMS) convert_table.texi
 
 clean-local:
 	if [ "${abs_builddir}" != "${abs_srcdir}" ]; then \
