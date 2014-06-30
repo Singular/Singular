@@ -26,6 +26,7 @@
 #include "cf_primes.h"
 #include "cf_algorithm.h"
 #include "cfModResultant.h"
+#include "cfUnivarGcd.h"
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"
 #endif

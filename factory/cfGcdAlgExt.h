@@ -29,9 +29,6 @@ void tryEuclid( const CanonicalForm &, const CanonicalForm &, const CanonicalFor
 void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm& M, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail );
 #endif
 void tryInvert( const CanonicalForm &, const CanonicalForm &, CanonicalForm &, bool & );
-/*BEGINPUBLIC*/
-bool hasFirstAlgVar( const CanonicalForm &, Variable & );
-/*ENDPUBLIC*/
 
 /// modular gcd over F_p[x]/(M) for not necessarily irreducible M.
 /// If a zero divisor is encountered fail is set to true.

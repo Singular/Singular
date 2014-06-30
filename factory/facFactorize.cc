@@ -24,10 +24,10 @@
 #include "facFqFactorize.h"
 #include "cf_random.h"
 #include "facHensel.h"
-#include "cf_gcd_smallp.h"
 #include "cf_map_ext.h"
 #include "cf_reval.h"
 #include "facSparseHensel.h"
+#include "cfUnivarGcd.h"
 
 TIMING_DEFINE_PRINT(fac_bi_factorizer)
 TIMING_DEFINE_PRINT(fac_hensel_lift)

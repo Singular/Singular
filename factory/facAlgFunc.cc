@@ -25,7 +25,6 @@
 #include "cf_assert.h"
 #include "debug.h"
 
-#include "cfGcdAlgExt.h"
 #include "cf_generator.h"
 #include "cf_iter.h"
 #include "cf_util.h"

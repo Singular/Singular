@@ -30,6 +30,7 @@
 #include "cf_primes.h"
 #include "facBivar.h"
 #include "cfNTLzzpEXGCD.h"
+#include "cfUnivarGcd.h"
 
 #ifdef HAVE_NTL
 #include <NTL/lzz_pEX.h>

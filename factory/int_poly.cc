@@ -22,6 +22,7 @@ using namespace std;
 
 #include "cf_defs.h"
 #include "cf_factory.h"
+#include "cfUnivarGcd.h"
 #include "int_cf.h"
 #include "int_int.h"
 #include "int_poly.h"
