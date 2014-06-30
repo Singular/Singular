@@ -1133,7 +1133,7 @@ EXAMPLE: example zero_decomp; shows an example
       {
         helpprim=@lh[2];
         lres0[1]=primary[2*@k-1];
-	attrib(lres0[1],"isSB",1);
+        attrib(lres0[1],"isSB",1);
         ser1=psi(helpprim);
         lres0[2]=psi1(ser1);
         if(size(reduce(lres0[2],lres0[1],1))==0)
@@ -3662,8 +3662,11 @@ EXAMPLE: example decomp; shows an example
   {
     primary=cleanPrimary(primary);
   }
-  if (abspri && (typeof(primary[1][1])=="poly"))
-  { return(prepare_absprimdec(primary));}
+  if (size(primary)>0)
+  {
+    if (abspri && (typeof(primary[1][1])=="poly"))
+    { return(prepare_absprimdec(primary));}
+  }
   return(primary);
 }
 
