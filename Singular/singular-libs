@@ -42,7 +42,7 @@ SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
 
 SLIB1 = classifyceq.lib classifyci.lib classify_aeq.lib \
         dmodloc.lib divisors.lib \
-        ehv.lib ffsolve.lib decomp.lib template.lib \
+        ffsolve.lib decomp.lib template.lib \
         findifs.lib finitediff.lib \
         gitfan.lib \
         locnormal.lib modnormal.lib modular.lib \
