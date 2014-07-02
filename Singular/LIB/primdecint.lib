@@ -330,6 +330,11 @@ EXAMPLE: example primdecZ; shows an example
    int h=H[2];
    J=J,h;
    //=== call primary decomposition over Z for <I,h>
+   ideal testid = 1;
+   for(i = 1; i<=size(pr); i++)
+   {
+      testid = intersect(testid, pr[i][1]);
+   }
    list M;
    if(h!=1)
    {
@@ -340,6 +345,15 @@ EXAMPLE: example primdecZ; shows an example
        {
           j++;
           M[j][1]=stdZ(M[j][1]);
+          testid = intersect(testid, M[j][1]);
+          if((reduce(testid, std(I))+0 == 0) && (reduce(I, std(testid))+0 == 0))
+          {
+            for(i=1;i<=j;i++)
+            {
+              pr[size(pr)+1]=M[i];
+            }
+            return(pr);
+          }
           for(i=1;i<=size(pr);i++)
           {
              if(size(reduce(pr[i][1],M[j][1]))==0)
@@ -354,6 +368,7 @@ EXAMPLE: example primdecZ; shows an example
       {
          pr[size(pr)+1]=M[i];
       }
+      
    }
    return(pr);
 }
