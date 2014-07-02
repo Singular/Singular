@@ -583,8 +583,9 @@ modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
   bool fail= false;
   topLevel= false;
   bool inextension= false;
-  Variable V_buf= alpha;
+  Variable V_buf= alpha, V_buf4= alpha;
   CanonicalForm prim_elem, im_prim_elem;
+  CanonicalForm prim_elem_alpha, im_prim_elem_alpha;
   CFList source, dest;
   int bound1= degree (ppA, 1);
   int bound2= degree (ppB, 1);
@@ -600,24 +601,26 @@ modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
       V_buf= chooseExtension (V_buf);
       bool prim_fail= false;
       Variable V_buf2;
-      prim_elem= primitiveElement (alpha, V_buf2, prim_fail);
+      prim_elem= primitiveElement (V_buf4, V_buf2, prim_fail);
+      if (V_buf4 == alpha)
+        prim_elem_alpha= prim_elem;
 
-      if (V_buf3 != alpha)
+      if (V_buf3 != V_buf4)
       {
-        m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
-        G_m= mapDown (G_m, prim_elem, im_prim_elem, alpha, source, dest);
-        coF_m= mapDown (coF_m, prim_elem, im_prim_elem, alpha, source, dest);
-        coG_m= mapDown (coG_m, prim_elem, im_prim_elem, alpha, source, dest);
-        newtonPoly= mapDown (newtonPoly, prim_elem, im_prim_elem, alpha,
+        m= mapDown (m, prim_elem, im_prim_elem, V_buf4, source, dest);
+        G_m= mapDown (G_m, prim_elem, im_prim_elem, V_buf4, source, dest);
+        coF_m= mapDown (coF_m, prim_elem, im_prim_elem, V_buf4, source, dest);
+        coG_m= mapDown (coG_m, prim_elem, im_prim_elem, V_buf4, source, dest);
+        newtonPoly= mapDown (newtonPoly, prim_elem, im_prim_elem, V_buf4,
                              source, dest);
-        ppA= mapDown (ppA, prim_elem, im_prim_elem, alpha, source, dest);
-        ppB= mapDown (ppB, prim_elem, im_prim_elem, alpha, source, dest);
-        gcdlcAlcB= mapDown (gcdlcAlcB, prim_elem, im_prim_elem, alpha,
+        ppA= mapDown (ppA, prim_elem, im_prim_elem, V_buf4, source, dest);
+        ppB= mapDown (ppB, prim_elem, im_prim_elem, V_buf4, source, dest);
+        gcdlcAlcB= mapDown (gcdlcAlcB, prim_elem, im_prim_elem, V_buf4,
                             source, dest);
-        lcA= mapDown (lcA, prim_elem, im_prim_elem, alpha, source, dest);
-        lcB= mapDown (lcB, prim_elem, im_prim_elem, alpha, source, dest);
+        lcA= mapDown (lcA, prim_elem, im_prim_elem, V_buf4, source, dest);
+        lcB= mapDown (lcB, prim_elem, im_prim_elem, V_buf4, source, dest);
         for (CFListIterator i= l; i.hasItem(); i++)
-          i.getItem()= mapDown (i.getItem(), prim_elem, im_prim_elem, alpha,
+          i.getItem()= mapDown (i.getItem(), prim_elem, im_prim_elem, V_buf4,
                                 source, dest);
       }
 
@@ -625,26 +628,31 @@ modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
       if (prim_fail)
         ; //ERROR
       else
-        im_prim_elem= mapPrimElem (prim_elem, alpha, V_buf);
+        im_prim_elem= mapPrimElem (prim_elem, V_buf4, V_buf);
 
-      DEBOUTLN (cerr, "getMipo (alpha)= " << getMipo (alpha));
+      if (V_buf4 == alpha)
+        im_prim_elem_alpha= im_prim_elem;
+      else
+        im_prim_elem_alpha= mapUp (im_prim_elem_alpha, V_buf4, V_buf, prim_elem,
+                                   im_prim_elem, source, dest);
+      DEBOUTLN (cerr, "getMipo (V_buf4)= " << getMipo (V_buf4));
       DEBOUTLN (cerr, "getMipo (V_buf2)= " << getMipo (V_buf2));
       inextension= true;
       for (CFListIterator i= l; i.hasItem(); i++)
-        i.getItem()= mapUp (i.getItem(), alpha, V_buf, prim_elem,
+        i.getItem()= mapUp (i.getItem(), V_buf4, V_buf, prim_elem,
                              im_prim_elem, source, dest);
-      m= mapUp (m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
-      G_m= mapUp (G_m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
-      coF_m= mapUp (coF_m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
-      coG_m= mapUp (coG_m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
-      newtonPoly= mapUp (newtonPoly, alpha, V_buf, prim_elem, im_prim_elem,
+      m= mapUp (m, V_buf4, V_buf, prim_elem, im_prim_elem, source, dest);
+      G_m= mapUp (G_m, V_buf4, V_buf, prim_elem, im_prim_elem, source, dest);
+      coF_m= mapUp (coF_m, V_buf4, V_buf, prim_elem, im_prim_elem, source, dest);
+      coG_m= mapUp (coG_m, V_buf4, V_buf, prim_elem, im_prim_elem, source, dest);
+      newtonPoly= mapUp (newtonPoly, V_buf4, V_buf, prim_elem, im_prim_elem,
                           source, dest);
-      ppA= mapUp (ppA, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
-      ppB= mapUp (ppB, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
-      gcdlcAlcB= mapUp (gcdlcAlcB, alpha, V_buf, prim_elem, im_prim_elem,
+      ppA= mapUp (ppA, V_buf4, V_buf, prim_elem, im_prim_elem, source, dest);
+      ppB= mapUp (ppB, V_buf4, V_buf, prim_elem, im_prim_elem, source, dest);
+      gcdlcAlcB= mapUp (gcdlcAlcB, V_buf4, V_buf, prim_elem, im_prim_elem,
                          source, dest);
-      lcA= mapUp (lcA, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
-      lcB= mapUp (lcB, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
+      lcA= mapUp (lcA, V_buf4, V_buf, prim_elem, im_prim_elem, source, dest);
+      lcB= mapUp (lcB, V_buf4, V_buf, prim_elem, im_prim_elem, source, dest);
 
       fail= false;
       random_element= randomElement (m*lcA*lcB, V_buf, l, fail );
@@ -658,6 +666,7 @@ modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
+      V_buf4= V_buf;
     }
     else
     {
@@ -683,8 +692,8 @@ modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
       if (inextension)
       {
         CFList u, v;
-        ppA= mapDown (ppA, prim_elem, im_prim_elem, alpha, u, v);
-        ppB= mapDown (ppB, prim_elem, im_prim_elem, alpha, u, v);
+        ppA= mapDown (ppA, prim_elem_alpha, im_prim_elem_alpha, alpha, u, v);
+        ppB= mapDown (ppB, prim_elem_alpha, im_prim_elem_alpha, alpha, u, v);
       }
       coF= N (ppA*(cA/gcdcAcB));
       coG= N (ppB*(cB/gcdcAcB));
@@ -752,9 +761,9 @@ modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
         {
           CFList u, v;
           DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
-          ppH= mapDown (ppH, prim_elem, im_prim_elem, alpha, u, v);
-          ppCoF= mapDown (ppCoF, prim_elem, im_prim_elem, alpha, u, v);
-          ppCoG= mapDown (ppCoG, prim_elem, im_prim_elem, alpha, u, v);
+          ppH= mapDown (ppH, prim_elem_alpha, im_prim_elem_alpha, alpha, u, v);
+          ppCoF= mapDown (ppCoF, prim_elem_alpha, im_prim_elem_alpha, alpha, u, v);
+          ppCoG= mapDown (ppCoG, prim_elem_alpha, im_prim_elem_alpha, alpha, u, v);
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
           coF= N ((cA/gcdcAcB)*ppCoF);
           coG= N ((cB/gcdcAcB)*ppCoG);
@@ -1440,6 +1449,7 @@ modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
+      alpha= V_buf;
     }
 
     if (!G_random_element.inCoeffDomain())
