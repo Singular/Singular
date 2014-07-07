@@ -18,14 +18,15 @@
 
 #ifdef HAVE_NTL
 /// main absolute factorization routine, expects bivariate poly which is
-/// primitive wrt. any of its variables and irreducible over Q
+/// irreducible over Q
 ///
 /// @return absBiFactorizeMain returns a list whose entries contain three
 ///         entities:
 ///         an absolute irreducible factor, an irreducible univariate polynomial
 ///         that defines the minimal field extension over which the irreducible
-///         factor is defined, and the multiplicity of the absolute irreducible
-///         factor
+///         factor is defined (note: in case the factor is already defined over
+///         Q[t]/(t), 1 is returned as defining poly), and the
+///         multiplicity of the absolute irreducible factor
 CFAFList absBiFactorizeMain (const CanonicalForm& F, ///<[in] s.a.
                              bool full= false        ///<[in] true if all
                                                      ///< factors should be
@@ -47,8 +48,9 @@ void normalize (CFAFList & L)
 /// @return uniAbsFactorize returns a list whose entries contain three entities:
 ///         an absolute irreducible factor, an irreducible univariate polynomial
 ///         that defines the minimal field extension over which the irreducible
-///         factor is defined, and the multiplicity of the absolute irreducible
-///         factor
+///         factor is defined (note: in case the factor is already defined over
+///         Q[t]/(t), 1 is returned as defining poly), and the multiplicity of
+///         the absolute irreducible factor
 CFAFList uniAbsFactorize (const CanonicalForm& F, ///<[in] univariate poly
                                                   ///< irreducible over Q
                           bool full= false        ///<[in] true if all factors

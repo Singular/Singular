@@ -454,6 +454,9 @@ BOOLEAN npInitChar(coeffs r, void* p)
 
   int i, w;
 
+  r->is_field=TRUE;
+  r->is_domain=TRUE;
+
   r->ch = c;
   r->npPminus1M = c /*r->ch*/ - 1;
 

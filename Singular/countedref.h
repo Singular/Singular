@@ -1,15 +1,15 @@
-/// -*- c++ -*-
+// -*- c++ -*-
 //*****************************************************************************
 /** @file countedref.h
- *
- * @author Alexander Dreyer
- * @date 2012-08-15
  *
  * This file defines reusable classes supporting reference counted interpreter
  * objects and initiates the @c blackbox operations for high-level types
  * 'reference' and 'shared'.
  *
  * @note This works was supported by the "Industrial Algebra" project.
+ *
+ * @author Alexander Dreyer
+ * @date 2012-08-15
  *
  * @par Copyright:
  *   (c) 2012 by The Singular Team, see LICENSE file

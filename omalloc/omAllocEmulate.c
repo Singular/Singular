@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <omalloc/omMalloc.h>
+#include "omMalloc.h"
 
 #ifdef OM_EMULATE_OMALLOC
 

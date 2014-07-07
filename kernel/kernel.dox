@@ -1,6 +1,73 @@
-/*! \page kernel_page Kernel
- * Algorithms using libpolys (\ref libpolys_page) and other mathematics
- *
- * \subpage kernel_sample_page
- * \subpage kernel_numeric_page
- */
+/*!
+
+ \page kernel_page More involved mathematical algorithms (kernel)
+
+ Algorithms using \ref libpolys_page and other mathematical features for Singular.
+ 
+ The files in kernel/ directory are combined into a internal library
+ kernelCommon, which contains the functions (e.g. \ref rChangeCurrRing in \ref kernel/polys.h)
+ and data members (e.g. \ref currRing in \ref kernel/polys.h) 
+ that can be shared among the following sub-packages:
+
+ - \subpage kernel_numeric_page
+ - \subpage kernel_combinatorics_page
+ - \subpage kernel_GBEngine_page
+ - \subpage kernel_groebner_walk_page
+ - \subpage kernel_fglm_page
+ - \subpage kernel_maps_page
+ - \subpage kernel_spectrum_page
+ - \subpage kernel_linear_algebra_page
+ - \subpage kernel_oswrapper_page
+ 
+ Basic Singular mathematical algorithms are described in 
+ <A HREF="ftp://www.mathematik.uni-kl.de/pub/Math/Singular/doc/singular_algorithms.tex.gz">singular_algorithms.tex.gz</A>
+
+ \verbinclude kernel/README
+ 
+*/
+
+
+/*!
+\dir numeric
+\ref kernel_numeric_page
+*/
+
+/*!
+\dir combinatorics
+\ref kernel_combinatorics_page
+*/
+
+/*!
+\dir GBEngine
+\ref kernel_GBEngine_page
+*/
+
+/*!
+\dir groebner_walk
+\ref kernel_groebner_walk_page
+*/
+
+/*!
+\dir fglm
+\ref kernel_fglm_page
+*/
+
+/*!
+\dir maps
+\ref kernel_maps_page
+*/
+
+/*!
+\dir spectrum
+\ref kernel_spectrum_page
+*/
+
+/*!
+\dir linear_algebra
+\ref kernel_linear_algebra_page
+*/
+
+/*!
+\dir oswrapper
+\ref kernel_oswrapper_page
+*/

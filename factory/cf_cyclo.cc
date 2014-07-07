@@ -2,14 +2,13 @@
 //*****************************************************************************
 /** @file cf_cyclo.cc
  *
- * @author Martin Lee
- * @date 29.01.2010
- *
  * Compute cyclotomic polynomials and factorize integers by brute force
  *
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
  *
+ * @author Martin Lee
+ * @date 29.01.2010
 **/
 //*****************************************************************************
 

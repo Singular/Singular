@@ -3,6 +3,12 @@
 #ifndef INCL_INT_INT_H
 #define INCL_INT_INT_H
 
+/**
+ * @file int_int.h
+ *
+ * Factory's internal integers
+**/
+
 // #include "config.h"
 
 #ifndef NOSTREAMIO
@@ -28,6 +34,13 @@
 #  include <omalloc/omalloc.h>
 #endif
 
+/**
+ * factory's class for integers
+ *
+ * an integer is represented as an mpz_t thempi
+ *
+ * @sa InternalRational
+**/
 class InternalInteger : public InternalCF
 {
 private:
@@ -127,23 +140,17 @@ public:
     friend void getmpi ( InternalCF * value, mpz_t mpi);
 };
 
-//{{{ inline InternalCF * InternalInteger::normalizeMyself, uiNormalizeMyself ()
-//{{{ docu
-//
-// normalizeMyself(), uiNormalizeMyself() - normalize CO.
-//
-// If CO fits into an immediate integer, delete CO and return the
-// immediate.  Otherwise, return a pointer to CO.
-//
-// `uiNormalizeMyself()' is the same as `normalizeMyself()'
-// except that CO is expected to be non-begative.  In this case,
-// we may use `mpz_get_ui()' to convert the underlying mpi into
-// an immediate which is slightly faster than the signed variant.
-//
-// Note: We do not mind reference counting at this point!  CO is
-// deleted unconditionally!
-//
-//}}}
+/**
+ *
+ * normalizeMyself(), uiNormalizeMyself() - normalize CO.
+ *
+ * If CO fits into an immediate integer, delete CO and return the
+ * immediate.  Otherwise, return a pointer to CO.
+ *
+ * Note: We do not mind reference counting at this point!  CO is
+ * deleted unconditionally!
+ *
+**/
 inline InternalCF *
 InternalInteger::normalizeMyself ()
 {
@@ -157,6 +164,15 @@ InternalInteger::normalizeMyself ()
         return this;
 }
 
+/**
+ * `uiNormalizeMyself()' is the same as `normalizeMyself()'
+ * except that CO is expected to be non-negative.  In this case,
+ * we may use `mpz_get_ui()' to convert the underlying mpi into
+ * an immediate which is slightly faster than the signed variant.
+ *
+ * Note: We do not mind reference counting at this point!  CO is
+ * deleted unconditionally!
+**/
 inline InternalCF *
 InternalInteger::uiNormalizeMyself ()
 {
@@ -169,23 +185,16 @@ InternalInteger::uiNormalizeMyself ()
     } else
         return this;
 }
-//}}}
 
-//{{{ static inline InternalCF * InternalInteger::normalizeMPI, uiNormalizeMPI ( mpz_ptr aMpi )
-//{{{ docu
-//
-// normalizeMPI(), uiNormalizeMPI() - normalize a mpi.
-//
-// If `aMpi' fits into an immediate integer, clear `aMpi' and
-// return the immediate.  Otherwise, return a new
-// `InternalInteger' with `aMpi' as underlying mpi.
-//
-// `uiNormalizeMPI()' is the same as `normalizeMPI()' except that
-// `aMpi' is expected to be non-begative.  In this case, we may
-// use `mpz_get_ui()' to convert `aMpi' into an immediate which
-// is slightly faster than the signed variant.
-//
-//}}}
+/**
+ *
+ * normalizeMPI(), uiNormalizeMPI() - normalize a mpi.
+ *
+ * If `aMpi' fits into an immediate integer, clear `aMpi' and
+ * return the immediate.  Otherwise, return a new
+ * `InternalInteger' with `aMpi' as underlying mpi.
+ *
+**/
 inline InternalCF *
 InternalInteger::normalizeMPI ( mpz_ptr aMpi )
 {
@@ -197,6 +206,12 @@ InternalInteger::normalizeMPI ( mpz_ptr aMpi )
         return new InternalInteger( aMpi );
 }
 
+/**
+ * `uiNormalizeMPI()' is the same as `normalizeMPI()' except that
+ * `aMpi' is expected to be non-begative.  In this case, we may
+ * use `mpz_get_ui()' to convert `aMpi' into an immediate which
+ * is slightly faster than the signed variant.
+**/
 inline InternalCF *
 InternalInteger::uiNormalizeMPI ( mpz_ptr aMpi )
 {
@@ -207,22 +222,19 @@ InternalInteger::uiNormalizeMPI ( mpz_ptr aMpi )
     } else
         return new InternalInteger( aMpi );
 }
-//}}}
 
-//{{{ inline mpz_ptr InternalInteger::MPI ( const InternalCF * const c )
-//{{{ docu
-//
-// MPI() - return underlying mpi of `c'.
-//
-// `c' is expected to be an `InternalInteger *'.  `c's underlying
-// mpi is returned.
-//
-//}}}
+/**
+ *
+ * MPI() - return underlying mpz_t of `c'.
+ *
+ * `c' is expected to be an `InternalInteger *'.  `c's underlying
+ * mpz_t is returned.
+ *
+**/
 inline mpz_ptr
 InternalInteger::MPI ( const InternalCF * const c )
 {
     return (((InternalInteger*)c)->thempi);
 }
-//}}}
 
 #endif /* ! INCL_INT_INT_H */

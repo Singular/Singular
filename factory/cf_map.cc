@@ -1,12 +1,14 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-//{{{ docu
-//
-// cf_map.cc - definition of class CFMap.
-//
-// Used by: cf_gcd.cc, fac_multivar.cc
-//
-//}}}
+/**
+ *
+ * @file cf_map.cc
+ *
+ * definition of class CFMap.
+ *
+ * Used by: cf_gcd.cc, fac_multivar.cc
+ *
+**/
 
 
 #include "config.h"
@@ -17,12 +19,11 @@
 #include "cf_iter.h"
 #include "templates/ftmpl_functions.h"
 
-//{{{ MapPair & MapPair::operator = ( const MapPair & p )
-//{{{ docu
-//
-// MapPair::operator = - assignment operator.
-//
-//}}}
+/** MapPair & MapPair::operator = ( const MapPair & p )
+ *
+ * MapPair::operator = - assignment operator.
+ *
+**/
 MapPair &
 MapPair::operator = ( const MapPair & p )
 {
@@ -32,37 +33,33 @@ MapPair::operator = ( const MapPair & p )
     }
     return *this;
 }
-//}}}
 
 #ifndef NOSTREAMIO
-//{{{ OSTREAM & operator << ( OSTREAM & s, const MapPair & p )
-//{{{ docu
-//
-// operator << - print a map pair ("V -> S").
-//
-//}}}
+/** OSTREAM & operator << ( OSTREAM & s, const MapPair & p )
+ *
+ * operator << - print a map pair ("V -> S").
+ *
+**/
 OSTREAM &
 operator << ( OSTREAM & s, const MapPair & p )
 {
     s << p.var() << " -> " << p.subst();
     return s;
 }
-//}}}
 
 void MapPair::print( OSTREAM&) const
 {
 }
 #endif /* NOSTREAMIO */
 
-//{{{ CFMap::CFMap ( const CFList & L )
-//{{{ docu
-//
-// CFMap::CFMap() - construct a CFMap from a CFList.
-//
-// Variable[i] will be mapped to CFList[i] under the resulting
-// map.
-//
-//}}}
+/** CFMap::CFMap ( const CFList & L )
+ *
+ * CFMap::CFMap() - construct a CFMap from a CFList.
+ *
+ * Variable[i] will be mapped to CFList[i] under the resulting
+ * map.
+ *
+**/
 CFMap::CFMap ( const CFList & L )
 {
     CFListIterator i;
@@ -70,14 +67,12 @@ CFMap::CFMap ( const CFList & L )
     for ( i = L, j = 1; i.hasItem(); i++, j++ )
         P.insert( MapPair( Variable(j), i.getItem() ) );
 }
-//}}}
 
-//{{{ CFMap & CFMap::operator = ( const CFMap & m )
-//{{{ docu
-//
-// CFMap::operator = - assignment operator.
-//
-//}}}
+/** CFMap & CFMap::operator = ( const CFMap & m )
+ *
+ * CFMap::operator = - assignment operator.
+ *
+**/
 CFMap &
 CFMap::operator = ( const CFMap & m )
 {
@@ -85,17 +80,15 @@ CFMap::operator = ( const CFMap & m )
         P = m.P;
     return *this;
 }
-//}}}
 
-//{{{ static int cmpfunc ( const MapPair & p1, const MapPair & p2 )
-//{{{ docu
-//
-// cmpfunc() - compare two map pairs.
-//
-// Return -1 if p2's variable is less than p1's, 0 if they are
-// equal, 1 if p2's level is greater than p1's.
-//
-//}}}
+/** static int cmpfunc ( const MapPair & p1, const MapPair & p2 )
+ *
+ * cmpfunc() - compare two map pairs.
+ *
+ * Return -1 if p2's variable is less than p1's, 0 if they are
+ * equal, 1 if p2's level is greater than p1's.
+ *
+**/
 static int
 cmpfunc ( const MapPair & p1, const MapPair & p2 )
 {
@@ -103,48 +96,42 @@ cmpfunc ( const MapPair & p1, const MapPair & p2 )
     else if ( p1.var() == p2.var() ) return 0;
     else return 1;
 }
-//}}}
 
-//{{{ static void insfunc ( MapPair & orgp, const MapPair & newp )
-//{{{ docu
-//
-// insfunc() - assign newp to orgp.
-//
-// cmpfunc() and insfunc() are used as functions for inserting a
-// map pair into a map by CFMap::newpair().
-//
-//}}}
+/** static void insfunc ( MapPair & orgp, const MapPair & newp )
+ *
+ * insfunc() - assign newp to orgp.
+ *
+ * cmpfunc() and insfunc() are used as functions for inserting a
+ * map pair into a map by CFMap::newpair().
+ *
+**/
 static void
 insfunc ( MapPair & orgp, const MapPair & newp )
 {
     orgp = newp;
 }
-//}}}
 
-//{{{ void CFMap::newpair ( const Variable & v, const CanonicalForm & s )
-//{{{ docu
-//
-// CFMap::newpair() - insert a MapPair into a CFMap.
-//
-//}}}
+/** void CFMap::newpair ( const Variable & v, const CanonicalForm & s )
+ *
+ * CFMap::newpair() - insert a MapPair into a CFMap.
+ *
+**/
 void
 CFMap::newpair ( const Variable & v, const CanonicalForm & s )
 {
     P.insert( MapPair( v, s ), cmpfunc, insfunc );
 }
-//}}}
 
-//{{{ static CanonicalForm subsrec ( const CanonicalForm & f, const MPListIterator & i )
-//{{{ docu
-//
-// subsrec() - recursively apply the substitutions in i to f.
-//
-// Substitutes algebraic variables, too.  The substituted
-// expression are not subject to further substitutions.
-//
-// Used by: CFMap::operator ()().
-//
-//}}}
+/** static CanonicalForm subsrec ( const CanonicalForm & f, const MPListIterator & i )
+ *
+ * subsrec() - recursively apply the substitutions in i to f.
+ *
+ * Substitutes algebraic variables, too.  The substituted
+ * expression are not subject to further substitutions.
+ *
+ * Used by: CFMap::operator ()().
+ *
+**/
 static CanonicalForm
 subsrec ( const CanonicalForm & f, const MPListIterator & i )
 {
@@ -179,52 +166,46 @@ subsrec ( const CanonicalForm & f, const MPListIterator & i )
     else
         return f;
 }
-//}}}
 
-//{{{ CanonicalForm CFMap::operator () ( const CanonicalForm & f ) const
-//{{{ docu
-//
-// CFMap::operator () - apply CO to f.
-//
-// See subsrec() for more detailed information.
-//
-//}}}
+/** CanonicalForm CFMap::operator () ( const CanonicalForm & f ) const
+ *
+ * CFMap::operator () - apply CO to f.
+ *
+ * See subsrec() for more detailed information.
+ *
+**/
 CanonicalForm
 CFMap::operator () ( const CanonicalForm & f ) const
 {
     MPListIterator i = P;
     return subsrec( f, i );
 }
-//}}}
 
 #ifndef NOSTREAMIO
-//{{{ OSTREAM & operator << ( OSTREAM & s, const CFMap & m )
-//{{{ docu
-//
-// operator << - print a CFMap ("( V[1] -> S[1], ..., V[n] -> // S[n] )".
-//
-//}}}
+/** OSTREAM & operator << ( OSTREAM & s, const CFMap & m )
+ *
+ * operator << - print a CFMap ("( V[1] -> S[1], ..., V[n] ->  * S[n] )".
+ *
+**/
 OSTREAM &
 operator << ( OSTREAM & s, const CFMap & m )
 {
     m.P.print(s);
     return s;
 }
-//}}}
 #endif /* NOSTREAMIO */
 
-//{{{ CanonicalForm compress ( const CanonicalForm & f, CFMap & m )
-//{{{ docu
-//
-// compress() - compress the canonical form f.
-//
-// Compress the polynomial f such that the levels of its
-// polynomial variables are ordered without any gaps starting
-// from level 1.  Return the compressed polynomial and a map m to
-// undo the compression.  That is, if f' = compress(f, m), than f
-// = m(f').
-//
-//}}}
+/** CanonicalForm compress ( const CanonicalForm & f, CFMap & m )
+ *
+ * compress() - compress the canonical form f.
+ *
+ * Compress the polynomial f such that the levels of its
+ * polynomial variables are ordered without any gaps starting
+ * from level 1.  Return the compressed polynomial and a map m to
+ * undo the compression.  That is, if f' = compress(f, m), than f
+ * = m(f').
+ *
+**/
 CanonicalForm
 compress ( const CanonicalForm & f, CFMap & m )
 {
@@ -246,22 +227,20 @@ compress ( const CanonicalForm & f, CFMap & m )
     delete [] degs;
     return result;
 }
-//}}}
 
-//{{{ void compress ( const CFArray & a, CFMap & M, CFMap & N )
-//{{{ docu
-//
-// compress() - compress the variables occuring in an a.
-//
-// Compress the polynomial variables occuring in a so that their
-// levels are ordered without any gaps starting from level 1.
-// Return the CFMap M to realize the compression and its inverse,
-// the CFMap N.  Note that if you compress a member of a using M
-// the result of the compression is not necessarily compressed,
-// since the map is constructed using all variables occuring in
-// a.
-//
-//}}}
+/** void compress ( const CFArray & a, CFMap & M, CFMap & N )
+ *
+ * compress() - compress the variables occuring in an a.
+ *
+ * Compress the polynomial variables occuring in a so that their
+ * levels are ordered without any gaps starting from level 1.
+ * Return the CFMap M to realize the compression and its inverse,
+ * the CFMap N.  Note that if you compress a member of a using M
+ * the result of the compression is not necessarily compressed,
+ * since the map is constructed using all variables occuring in
+ * a.
+ *
+**/
 void
 compress ( const CFArray & a, CFMap & M, CFMap & N )
 {
@@ -304,7 +283,6 @@ compress ( const CFArray & a, CFMap & M, CFMap & N )
     delete [] tmp;
     delete [] degs;
 }
-//}}}
 
 /*
 *  compute positions p1 and pe of optimal variables:
@@ -350,21 +328,20 @@ void optvalues ( const int * df, const int * dg, const int n, int & p1, int &pe 
 }
 
 
-//{{{ void compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & N )
-//{{{ docu
-//
-// compress() - compress the variables occurring in f and g with respect
-// to optimal variables
-//
-// Compress the polynomial variables occurring in f and g so that
-// the levels of variables common to f and g are ordered without
-// any gaps starting from level 1, whereas the variables occuring
-// in only one of f or g are moved to levels higher than the
-// levels of the common variables.  Return the CFMap M to realize
-// the compression and its inverse, the CFMap N.
-// N needs only variables common to f and g.
-//
-//}}}
+/** void compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & N )
+ *
+ * compress() - compress the variables occurring in f and g with respect
+ * to optimal variables
+ *
+ * Compress the polynomial variables occurring in f and g so that
+ * the levels of variables common to f and g are ordered without
+ * any gaps starting from level 1, whereas the variables occuring
+ * in only one of f or g are moved to levels higher than the
+ * levels of the common variables.  Return the CFMap M to realize
+ * the compression and its inverse, the CFMap N.
+ * N needs only variables common to f and g.
+ *
+**/
 void
 compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & N )
 {
@@ -432,4 +409,3 @@ compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & 
     delete [] degsf;
     delete [] degsg;
 }
-//}}}

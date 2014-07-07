@@ -18,7 +18,6 @@
 
 #include "canonicalform.h"
 #include "facMul.h"
-#include "algext.h"
 #include "cf_util.h"
 #include "templates/ftmpl_functions.h"
 

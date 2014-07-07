@@ -24,7 +24,6 @@
 #include "facFqSquarefree.h"
 #include "cf_map.h"
 #include "cfNewtonPolygon.h"
-#include "algext.h"
 #include "fac_util.h"
 
 TIMING_DEFINE_PRINT(fac_bi_sqrf)

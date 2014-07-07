@@ -1,5 +1,10 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file variable.h
+ *
+ * operations on variables
+**/
 #ifndef INCL_VARIABLE_H
 #define INCL_VARIABLE_H
 
@@ -21,6 +26,9 @@
 
 class CanonicalForm;
 
+/**
+ * factory's class for variables
+**/
 class Variable
 {
 private:
@@ -70,8 +78,17 @@ public:
    friend OSTREAM & operator << ( OSTREAM & os, const Variable & v );
 #endif /* NOSTREAMIO */
     friend void swap_levels();
+    /** returns a symbolic root of polynomial with name @a name.
+     *  Use it to define algebraic variables
+     *  @note: algebraic variables have a level < 0
+    **/
     friend Variable rootOf( const CanonicalForm &, char name );
 };
+
+/** returns a symbolic root of polynomial with name @a name
+ *  Use it to define algebraic variables
+ *  @note: algebraic variables have a level < 0
+**/
 Variable rootOf( const CanonicalForm &, char name = '@' );
 
 inline int level( const Variable & v ) { return v.level(); }

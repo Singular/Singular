@@ -1,5 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file cf_random.h
+ *
+ * generate random integers, random elements of finite fields
+**/
+
 #ifndef INCL_CF_RANDOM_H
 #define INCL_CF_RANDOM_H
 
@@ -9,6 +15,9 @@
 
 /*BEGINPUBLIC*/
 
+/**
+ * virtual class for random element generation
+**/
 class CFRandom {
 public:
     virtual ~CFRandom() {}
@@ -16,6 +25,9 @@ public:
     virtual CFRandom * clone() const { return new CFRandom(); }
 };
 
+/**
+ * generate random elements in GF
+**/
 class GFRandom : public CFRandom
 {
 public:
@@ -25,6 +37,9 @@ public:
     CFRandom * clone() const;
 };
 
+/**
+ * generate random elements in F_p
+**/
 class FFRandom : public CFRandom
 {
 public:
@@ -34,6 +49,9 @@ public:
     CFRandom * clone() const;
 };
 
+/**
+ * generate random integers
+**/
 class IntRandom : public CFRandom
 {
 private:
@@ -46,6 +64,9 @@ public:
     CFRandom * clone() const;
 };
 
+/**
+ * generate random elements in F_p(alpha)
+**/
 class AlgExtRandomF : public CFRandom {
 private:
     Variable algext;
@@ -68,8 +89,10 @@ public:
     static CFRandom * generate();
 };
 
+/// random integers with abs less than n
 int factoryrandom( int n );
 
+/// random seed initializer
 void factoryseed( int s );
 
 /*ENDPUBLIC*/

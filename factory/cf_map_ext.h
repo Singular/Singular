@@ -1,19 +1,19 @@
-#ifndef CF_MAP_EXT_H
-#define CF_MAP_EXT_H
 // -*- c++ -*-
 //*****************************************************************************
 /** @file cf_map_ext.h
- *
- * @author Martin Lee
- * @date   16.11.2009
  *
  * This file implements functions to map between extensions of finite fields
  *
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
  *
+ * @author Martin Lee
+ * @date   16.11.2009
 **/
 //*****************************************************************************
+
+#ifndef CF_MAP_EXT_H
+#define CF_MAP_EXT_H
 
 // #include "config.h"
 

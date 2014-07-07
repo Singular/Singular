@@ -4,5 +4,6 @@ LIB "tst.lib"; tst_init();
   typeof(_);
   ring r=0,(x,y,z),lp;
   gcd(3x2*(x+y),9x*(y2-x2));
+  ring rr=integer,x,dp;
   gcd(number(6472674604870),number(878646537247372));
 tst_status(1);$

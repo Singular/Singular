@@ -1,0 +1,9 @@
+/*! \page kernel_fglm_page FGLM algorithms
+
+ This sub-package of kernel (\ref kernel_page) contains
+ FGLM algorithms. 
+
+ TODO: list those algorithms... and corresponding interpreter functions...?
+ 
+*/
+

@@ -1,17 +1,19 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-//{{{ docu
-//
-// cf_primetab.cc - tables of prime numbers.
-//
-// The interface to these tables is the `CFPrimeGenerator' class
-// in `cf_primes.cc'.
-//
-// Used by: cf_primes.cc
-//
-// Header file: cf_primes.h
-//
-//}}}
+/**
+ *
+ * @file cf_primetab.cc
+ *
+ * tables of prime numbers.
+ *
+ * The interface to these tables is the `CFPrimeGenerator' class
+ * in `cf_primes.cc'.
+ *
+ * Used by: cf_primes.cc
+ *
+ * Header file: cf_primes.h
+ *
+**/
 
 
 #include "config.h"
@@ -19,27 +21,24 @@
 
 #include "cf_primes.h"
 
-//{{{ constants
-//{{{ docu
-//
-// - first and last indices of small and large primes.
-//
-//}}}
+/** constants
+ *
+ * - first and last indices of small and large primes.
+ *
+**/
 const int CFPrimeGenerator::firstSmallIndex = 0;
 const int CFPrimeGenerator::lastSmallIndex = 3510;
 const int CFPrimeGenerator::firstLargeIndex = 3511;
 const int CFPrimeGenerator::lastLargeIndex = CFPrimeGenerator::firstLargeIndex+28426;
-//}}}
 
-//{{{ const int CFPrimeGenerator::smallPrimes []
-//{{{ docu
-//
-// smallPrimes - list of small prime numbers.
-//
-// There are 3511 small prime numbers, all fitting into signed 16
-// bits.
-//
-//}}}
+/** const int CFPrimeGenerator::smallPrimes []
+ *
+ * smallPrimes - list of small prime numbers.
+ *
+ * There are 3511 small prime numbers, all fitting into signed 16
+ * bits.
+ *
+**/
 const int CFPrimeGenerator::smallPrimes [] = {
     3, 5, 7, 11, 13, 17,
     19, 23, 29, 31, 37, 41,
@@ -628,17 +627,15 @@ const int CFPrimeGenerator::smallPrimes [] = {
     32687, 32693, 32707, 32713, 32717, 32719,
     32749, 0
 };
-//}}}
 
-//{{{ const int CFPrimeGenerator::largePrimes []
-//{{{ docu
-//
-// largePrimes - list of large prime numbers.
-//
-// There are 28427 large prime numbers, all of them fitting into
-// 29 signed bits.
-//
-//}}}
+/** const int CFPrimeGenerator::largePrimes []
+ *
+ * largePrimes - list of large prime numbers.
+ *
+ * There are 28427 large prime numbers, all of them fitting into
+ * 29 signed bits.
+ *
+**/
 const int CFPrimeGenerator::largePrimes [] = {
     536300041, 536300047, 536300053, 536300069, 536300081, 536300117,
     536300119, 536300129, 536300143, 536300153, 536300159, 536300179,
@@ -5379,4 +5376,3 @@ const int CFPrimeGenerator::largePrimes [] = {
     536870767, 536870779, 536870791, 536870813, 536870819, 536870837,
     536870839, 536870849, 536870869, 536870879, 536870909, 0
 };
-//}}}

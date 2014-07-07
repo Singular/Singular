@@ -170,8 +170,8 @@ void* _omInsertInSortedList(void* list, int next, int long_field, void* addr)
 
 
 #ifndef OM_NDEBUG
-#include <omalloc/omalloc.h>
-#include <omalloc/omDebug.h>
+#include "omalloc.h"
+#include "omDebug.h"
 
 omError_t _omCheckList(void* list, int next, int level, omError_t report, OM_FLR_DECL)
 {

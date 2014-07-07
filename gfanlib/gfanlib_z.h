@@ -16,9 +16,9 @@
 #include "gmp.h"
 
 #if (__GNU_MP_VERSION == 4) && (__GNU_MP_VERSION_MINOR<2)
-extern void *  (*__gmp_allocate_func) _PROTO ((size_t));
-extern void *  (*__gmp_reallocate_func) _PROTO ((void *, size_t, size_t));
-extern void    (*__gmp_free_func) _PROTO ((void *, size_t));
+extern void *  (*__gmp_allocate_func) __GMP_PROTO ((size_t));
+extern void *  (*__gmp_reallocate_func) __GMP_PROTO ((void *, size_t, size_t));
+extern void    (*__gmp_free_func) __GMP_PROTO ((void *, size_t));
 
 static inline void
 mp_get_memory_functions (void *(**alloc_func) (size_t),

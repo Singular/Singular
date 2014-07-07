@@ -12,27 +12,6 @@
 #include <ostream>
 #include "gmp.h"
 
-#if (__GNU_MP_VERSION == 4) && (__GNU_MP_VERSION_MINOR<2)
-extern void *  (*__gmp_allocate_func) _PROTO ((size_t));
-extern void *  (*__gmp_reallocate_func) _PROTO ((void *, size_t, size_t));
-extern void    (*__gmp_free_func) _PROTO ((void *, size_t));
-
-static inline void
-mp_get_memory_functions (void *(**alloc_func) (size_t),
-                         void *(**realloc_func) (void *, size_t, size_t),
-                         void (**free_func) (void *, size_t))
-{
-  if (alloc_func != NULL)
-    *alloc_func = __gmp_allocate_func;
-
-  if (realloc_func != NULL)
-    *realloc_func = __gmp_reallocate_func;
-
-  if (free_func != NULL)
-    *free_func = __gmp_free_func;
-}
-#endif
-
 #include "gfanlib_z.h"
 
 namespace gfan{

@@ -1,3 +1,9 @@
+/**
+ * @file NTLconvert.h
+ *
+ * Conversion to and from NTL
+**/
+
 #ifndef INCL_NTLCONVERT_H
 #define INCL_NTLCONVERT_H
 

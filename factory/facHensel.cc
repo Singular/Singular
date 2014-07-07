@@ -22,14 +22,15 @@
 #include "debug.h"
 #include "timing.h"
 
-#include "algext.h"
+#include "cfGcdAlgExt.h"
 #include "facHensel.h"
 #include "facMul.h"
 #include "fac_util.h"
 #include "cf_algorithm.h"
 #include "cf_primes.h"
 #include "facBivar.h"
-#include "facNTLzzpEXGCD.h"
+#include "cfNTLzzpEXGCD.h"
+#include "cfUnivarGcd.h"
 
 #ifdef HAVE_NTL
 #include <NTL/lzz_pEX.h>
@@ -558,7 +559,7 @@ diophantineHensel (const CanonicalForm & F, const CFList& factors,
 }
 
 /// solve \f$ 1=\sum_{i=1}^n{\delta_{i} \prod_{j\neq i}{f_j}} \f$ mod \f$p^k\f$
-/// over Q(alpha) by p-adic lifting
+/// over \f$ Q(\alpha) \f$ by p-adic lifting
 CFList
 diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
                      const CFList& factors, modpk& b, const Variable& alpha)
@@ -769,8 +770,8 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
 
 
 /// solve \f$ 1=\sum_{i=1}^n{\delta_{i} \prod_{j\neq i}{f_j}} \f$ mod \f$p^k\f$
-/// over Q(alpha) by first computing mod \f$p\f$ and if no zero divisor occured
-/// compute it mod \f$p^k\f$
+/// over \f$ Q(\alpha) \f$ by first computing mod \f$p\f$ and if no zero divisor
+/// occured compute it mod \f$p^k\f$
 CFList
 diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
                const CFList& factors, modpk& b, const Variable& alpha)
@@ -2091,7 +2092,7 @@ nonMonicHenselLift12 (const CanonicalForm& F, CFList& factors, int l,
 }
 
 
-/// solve \f$ E=\sum_{i= 1}^r{\sigma_{i}\prod_{j=1, j\neq i}^{r}{f_{i}}}\f$
+/// solve \f$ E=\sum_{i= 1}^r{\sigma_{i}\prod_{j=1, j\neq i}^{r}{f_{j}}} \f$
 /// mod M, @a products contains \f$ \prod_{j=1, j\neq i}^{r}{f_{j}} \f$
 CFList
 diophantine (const CFList& recResult, const CFList& factors,

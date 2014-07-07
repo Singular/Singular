@@ -6,6 +6,7 @@ algebralib
 alias
 allres_s
 arcAtPoint
+assprimeszerodim_s
 barei_s
 betti_s
 bug_1
@@ -138,6 +139,7 @@ bug_tr559
 bug_tr587
 bug_tr599
 bug_tr604
+bug_genus_etc
 bug_x_i_j
 brnoeth_s
 charseries
@@ -229,9 +231,13 @@ mora_9
 mres_s
 ncfactor_example2_7FromMaster_s
 ncfactor_example_all_procedures_s
+ncfactor_facNthShift1_s
 ncfactor_inhomog_s
 ncfactor_koepf_s
 ncfactor_koepfShift_s
+ncfactor_landau_ex_s
+ncfactor_multipleFacsSameTopAndBottom_s
+ncfactor_nthweylringalt_s
 ncfactor_tsai_s
 normal
 parallel_s

@@ -3,6 +3,12 @@
 #ifndef INCL_GF_TABUTIL_H
 #define INCL_GF_TABUTIL_H
 
+/**
+ * @file gf_tabutil.h
+ *
+ * utility functions to access GF Tables
+**/
+
 // #include "config.h"
 
 int gf_tab_numdigits62 ( int q );

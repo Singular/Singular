@@ -1,7 +1,7 @@
 /*****************************************************************************\
  * Computer Algebra System SINGULAR
 \*****************************************************************************/
-/** @file facFqFactorize.h
+/** @file facSparseHensel.h
  *
  * This file provides functions for sparse heuristic Hensel lifting
  *
@@ -397,7 +397,11 @@ simplify (const CanonicalForm& A, int level)
     {
       CanonicalForm B= LC (A);
       if (B.level() < level)
-        F= -tailcoeff (A/B);
+      {
+        CanonicalForm quot;
+        if (fdivides (B, A, quot))
+          F= -tailcoeff (quot);
+      }
     }
   }
   return F;

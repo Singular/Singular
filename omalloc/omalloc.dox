@@ -1,0 +1,20 @@
+/*!
+
+ \page omalloc_page Singular memory manager for small chunks (omalloc)
+
+ This is the Singular-specific memory manager which is tunned to
+ handle the allocation and de-allocation of memory blocks of small
+ size as efficient as it is possible (a few machine instructions in most cases).
+ 
+ Short introduction to omalloc 
+ <A HREF="http://www.mathematik.uni-kl.de/~motsak/talks/SICSA2011_Motsak_omalloc.pdf">short talk</A>.
+ For more details see
+ <A HREF="ftp://www.mathematik.uni-kl.de/pub/Math/Singular/doc/OMALLOC.ps.gz">Detailed manual (OMALLOC.ps.gz)</A>.
+
+ Note that this package has no further dependencies,  while it is used by the rest of Singular packages 
+ - \ref factory_page 
+ - \ref libpolys_page
+ - \ref kernel_page
+ - \ref singular_page
+ 
+*/

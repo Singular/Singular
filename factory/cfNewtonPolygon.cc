@@ -28,7 +28,6 @@
 #include "gfops.h"
 #include "cfNewtonPolygon.h"
 #include "templates/ftmpl_functions.h"
-#include "algext.h"
 
 static
 void translate (int** points, int* point, int sizePoints) //make point to 0

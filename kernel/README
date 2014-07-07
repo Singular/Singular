@@ -1,36 +1,16 @@
-			 Singular version 3.1
-		     University of Kaiserslautern
-     Department of Mathematics        Centre for Computer Algebra
-	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
-		  (C) 1986-2005 All Rights Reserved
-
-		   README FILE FOR SINGULAR KERNEL
-		   ===============================
-
 This directory contains the source files for the Singular kernel.
+(i.e. all algorithms which still require currRing
+and needs to rewritten)
  
-See the following files in this directory
-  'INSTALL' -- for information on how to install Singular
-  'COPYING' -- for copying and license information
-
-See below for an overview of Singular, and for distribution and
-support information.
-
-If you receive this file as part of a complete Singular distribution,
-see also the files contained in the top
-directory of the full Singular distribution.
-
-More information about Singular: Comments, Questions, Bug Reports
-=================================================================
-
-More and up-to-date information about Singular is always available
-from 
-	   http://www.singular.uni-kl.de/
-We very much welcome any comments, questions, and bug reports. Please
-contact us at  
-		    singular@mathematik.uni-kl.de
-
-
-GOOD LUCK and ENJOY!                         Your Singular team.
+Subdirectories:
+- combinatorics: hilbert function and related
+- fglm: FGLM algorithm
+- GBEngine: Buchbergers/Moras algorithm and related
+- groebner_walk: Groebner walk
+- linear_algebra: minor, LU decomposition
+- maps: polynomial maps between commutative polynomial rings
+- numeric: find zeroes of (univariate) polynomials
+- spectrum: spectrum of isolated curve singularities and related
+- oswrapper: terminal input, os limits, timer
 
 

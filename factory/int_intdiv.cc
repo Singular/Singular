@@ -1,10 +1,12 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-//{{{ docu
-//
-// int_intdiv.cc - `InternalInteger' division algorithms.
-//
-//}}}
+/**
+ *
+ * @file int_intdiv.cc
+ *
+ * 'InternalInteger' division algorithms.
+ *
+**/
 
 
 #include "config.h"
@@ -19,8 +21,9 @@
 #include "gmpext.h"
 #include "templates/ftmpl_functions.h"
 
-//{{{ InternalCF * InternalInteger::dividesame, dividecoeff ( InternalCF * c )
-// docu: see CanonicalForm::operator /()
+/**
+ * @sa CanonicalForm::operator /(), InternalInteger::dividecoeff()
+**/
 InternalCF *
 InternalInteger::dividesame ( InternalCF * c )
 {
@@ -59,6 +62,9 @@ InternalInteger::dividesame ( InternalCF * c )
     }
 }
 
+/**
+ * @sa CanonicalForm::operator /(), InternalInteger::dividesame()
+**/
 InternalCF *
 InternalInteger::dividecoeff ( InternalCF * c, bool invert )
 {
@@ -111,10 +117,10 @@ InternalInteger::dividecoeff ( InternalCF * c, bool invert )
         return normalizeMyself();
     }
 }
-//}}}
 
-//{{{ InternalCF * InternalInteger::divsame, divcoeff ( InternalCF * c )
-// docu: see CanonicalForm::div()
+/**
+ * @sa CanonicalForm::div(), InternalInteger::divcoeff()
+**/
 InternalCF *
 InternalInteger::divsame ( InternalCF * c )
 {
@@ -138,6 +144,9 @@ InternalInteger::divsame ( InternalCF * c )
     }
 }
 
+/**
+ * @sa CanonicalForm::div(), InternalInteger::divsame()
+**/
 InternalCF *
 InternalInteger::divcoeff ( InternalCF * c, bool invert )
 {
@@ -169,10 +178,10 @@ InternalInteger::divcoeff ( InternalCF * c, bool invert )
         return normalizeMyself();
     }
 }
-//}}}
 
-//{{{ InternalCF * InternalInteger::modulosame, modulocoeff ( InternalCF * c )
-// docu: see CanonicalForm::operator %()
+/**
+ * @sa CanonicalForm::operator %(), InternalInteger::modulocoeff()
+**/
 InternalCF *
 InternalInteger::modulosame ( InternalCF * c )
 {
@@ -196,6 +205,9 @@ InternalInteger::modulosame ( InternalCF * c )
     }
 }
 
+/**
+ * @sa CanonicalForm::operator %(), InternalInteger::modulosame()
+**/
 InternalCF *
 InternalInteger::modulocoeff ( InternalCF * c, bool invert )
 {
@@ -233,25 +245,28 @@ InternalInteger::modulocoeff ( InternalCF * c, bool invert )
         return result;
     }
 }
-//}}}
 
-//{{{ InternalCF * InternalInteger::modsame, modcoeff ( InternalCF * c )
-// docu: see CanonicalForm::mod()
+/**
+ * @sa see CanonicalForm::mod(), InternalInteger::modcoeff()
+**/
 InternalCF *
 InternalInteger::modsame ( InternalCF * c )
 {
     return modulosame( c );
 }
 
+/**
+ * @sa see CanonicalForm::mod(), InternalInteger::modsame()
+**/
 InternalCF *
 InternalInteger::modcoeff ( InternalCF * c, bool invert )
 {
     return modulocoeff( c, invert );
 }
-//}}}
 
-//{{{ void InternalInteger::divremsame, divremcoeff ( InternalCF * c, InternalCF * & quot, InternalCF * & rem )
-// docu: see CanonicalForm::divrem()
+/**
+ * @sa CanonicalForm::divrem(), InternalInteger::divremcoeff()
+**/
 void
 InternalInteger::divremsame ( InternalCF * c, InternalCF * & quot, InternalCF * & rem )
 {
@@ -286,6 +301,9 @@ InternalInteger::divremsame ( InternalCF * c, InternalCF * & quot, InternalCF * 
     rem = uiNormalizeMPI( r );
 }
 
+/**
+ * @sa CanonicalForm::divrem(), InternalInteger::divremsame()
+**/
 void
 InternalInteger::divremcoeff ( InternalCF * c, InternalCF * & quot, InternalCF * & rem, bool invert )
 {
@@ -338,10 +356,10 @@ InternalInteger::divremcoeff ( InternalCF * c, InternalCF * & quot, InternalCF *
         mpz_clear( dummy );
     }
 }
-//}}}
 
-//{{{ bool InternalInteger::divremsamet, divremcoefft ( InternalCF * c, InternalCF * & quot, InternalCF * & rem )
-// docu: see CanonicalForm::divremt()
+/**
+ * @sa CanonicalForm::divremt(), InternalInteger::divremcoefft()
+**/
 bool
 InternalInteger::divremsamet ( InternalCF * c, InternalCF * & quot, InternalCF * & rem )
 {
@@ -349,10 +367,12 @@ InternalInteger::divremsamet ( InternalCF * c, InternalCF * & quot, InternalCF *
     return true;
 }
 
+/**
+ * @sa CanonicalForm::divremt(), InternalInteger::divremsamet()
+**/
 bool
 InternalInteger::divremcoefft ( InternalCF * c, InternalCF * & quot, InternalCF * & rem, bool invert )
 {
     divremcoeff( c, quot, rem, invert );
     return true;
 }
-//}}}

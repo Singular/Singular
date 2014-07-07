@@ -326,8 +326,8 @@ static proc reduce_task(intvec range)
 /*
  * The following procedures are kept for backward compatibility with the old
  * version of modstd.lib. As of now (May 2014), they are still needed in
- * assprimeszerodim.lib, modnormal.lib, modwalk.lib, and symodstd.lib. They can
- * be removed here as soon as they are not longer needed in these libraries.
+ * modnormal.lib, modwalk.lib, and symodstd.lib. They can be removed here as
+ * soon as they are not longer needed in these libraries.
  */
 
 LIB "parallel.lib";
@@ -576,11 +576,11 @@ proc primeTest(def II, bigint p)
       f = cleardenom(I[i]);
       if(f == 0) { return(0); }
       cnt = leadcoef(I[i])/leadcoef(f);
-      if((numerator(cnt) mod p) == 0) { return(0); }
-      if((denominator(cnt) mod p) == 0) { return(0); }
+      if((bigint(numerator(cnt)) mod p) == 0) { return(0); }
+      if((bigint(denominator(cnt)) mod p) == 0) { return(0); }
       for(j = size(f); j > 0; j--)
       {
-         if((leadcoef(f[j]) mod p) == 0) { return(0); }
+         if((bigint(leadcoef(f[j])) mod p) == 0) { return(0); }
       }
    }
    return(1);
