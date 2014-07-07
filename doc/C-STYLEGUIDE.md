@@ -1,6 +1,13 @@
-C/C++-Style guide for Singular
------------------------------
-- C/C++ files - names (applies to headers as well)
+Legacy C/C++-Style guide for Singular {#legacystyleguide}
+=====================================
+
+Please also note the [newer C/C++ programming style guide](@ref styleguide) 
+and the [Singular build system description](@ref bs_page).
+
+[TOC]
+
+
+## C/C++ files - names (applies to headers as well)
   - each C++ file should have the extension .cc
   - each C file should have the extension .c
   - each header file should have the extension .h
@@ -8,8 +15,8 @@ C/C++-Style guide for Singular
   - converted to lower case, each file name must be unique in the 
     first 8 characters
   - it is recommended to use only lower case file names
-
-- C/C++ files - structure
+  
+## C/C++ files - structure
   - TODO: What about Copyright note?
     (Contained in COPYING unless otherwise specified).
   - each C/C++ file (abc.c/abc.cc/abc.h) should start with a short comment
@@ -25,8 +32,8 @@ C/C++-Style guide for Singular
         #include "poly.h" etc.
   - paths in "#include" statements should be avoided (should be specified by 
     build system level instead)
-
-- Header files
+    
+## Header files
   - see C/C++ files - structure!
   - each header file abc.h should contain a multiple inclusions preventing 
     mechanism as follows:
@@ -49,7 +56,7 @@ C/C++-Style guide for Singular
   - further (non doxygen) comments can be used to separate the file into easily
     visible sections
 
-- format
+## format
   - general screen width: 80 columns
   - each procedure declarations should be in one line, if possible
   - the number of required function parameters should be as small as possible
@@ -80,7 +87,7 @@ C/C++-Style guide for Singular
       in non-optimzed code these functions are NOT inlined.
     -/+ inline functions are not generic (requires the defined types)
 
-- Naming conventions:
+## Naming conventions:
   - All code and global variables must conform to this naming convention,
     it does not apply to local variables.
   - the names consists of a short (small letter) prefix, 
@@ -97,7 +104,7 @@ C/C++-Style guide for Singular
 
   
 
-- Comments
+## Comments
   - class-/function-/member variable-/... comments should be written in the 
     doxygen format (see Doxygen quick reference card)
   - documentation should explain the purpose of each type/function/parameter/.,
@@ -109,7 +116,7 @@ C/C++-Style guide for Singular
     code. 
   - document difficult algorithms by a reference to an article/book/etc.
 
-- Checks / Debugging aids
+## Checks / Debugging aids
   - interpreter routines have to check their input
   - use const wherever possible/suitable (especially in declarations of input 
     parameters to functions/methods provided as pointers or references or for 
@@ -129,7 +136,7 @@ C/C++-Style guide for Singular
     should always have an default entry
     (maybe an error message)
 
-- C++ features
+## C++ features
   - to avoid confusion: "struct" should be a C object,
     if you really need C++ extensions, use "class".
   - "and"/"or"/"not" are not recognized by all compilers, use &&, &, ||, |, !
