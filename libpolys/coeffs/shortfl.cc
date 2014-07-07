@@ -664,6 +664,9 @@ BOOLEAN nrInitChar(coeffs n, void* p)
 
   assume( p == NULL );
 
+  n->is_field=TRUE;
+  n->is_domain=TRUE;
+
   n->cfKillChar = ndKillChar; /* dummy */
   n->ch = 0;
   n->cfCoeffString = nrCoeffString;

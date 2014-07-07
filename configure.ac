@@ -41,8 +41,7 @@ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 AC_HEADER_STDC
 AC_CHECK_HEADERS(unistd.h iostream.h sys/time.h sys/times.h asm/sigcontext.h)
 
-AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv)
-
+AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv qsort_r)
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 if test -z "$DOXYGEN";
@@ -207,7 +206,8 @@ AC_SUBST(DOC_DIR)
 SING_SHOW_FLAGS([Compiler/linker flags: ])
 
 
-AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([dox/Doxyfile])])
+## AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([dox/Doxyfile])])
+
 AC_CONFIG_FILES([dox/Makefile])
 
 AC_CONFIG_SUBDIRS([resources])

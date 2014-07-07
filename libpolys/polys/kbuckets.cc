@@ -1313,7 +1313,7 @@ int ksCheckCoeff(number *a, number *b, const coeffs r)
   n_Test(an,r);
   n_Test(bn,r);
 
-  number cn = n_Gcd(an, bn, r);
+  number cn = n_SubringGcd(an, bn, r);
 
   if(n_IsOne(cn, r))
   {

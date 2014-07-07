@@ -1,22 +1,23 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-//{{{ docu
-//
-// cf_ops.cc - simple structural algorithms.
-//
-// A 'structural' algorithm is an algorithm which gives
-// structural information on polynomials in contrast to a
-// 'mathematical' algorithm which calculates some mathematical
-// function.
-//
-// Compare these functions with the functions in cf_algorithm.cc,
-// which are mathematical algorithms.
-//
-// Used by: allmost everywhere
-//
-// Header file: canonicalform.h
-//
-//}}}
+/**
+ *
+ * @file cf_ops.cc
+ *
+ * simple structural algorithms.
+ *
+ * A 'structural' algorithm is an algorithm which gives
+ * structural information on polynomials in contrast to a
+ * 'mathematical' algorithm which calculates some mathematical
+ * function.
+ *
+ * Compare these functions with the functions in cf_algorithm.cc,
+ * which are mathematical algorithms.
+ *
+ *
+ * Header file: canonicalform.h
+ *
+**/
 
 
 #include "config.h"
@@ -28,34 +29,31 @@
 #include "variable.h"
 #include "cf_iter.h"
 
-//{{{ static Variable sv_x1, sv_x2;
-//{{{ docu
-//
-// sv_x1, sv_x2 - variables to swap by swapvar() and replacevar.
-//
-// These variables are initialized by swapvar() such that sv_x1 <
-// sv_x2.  They are used by swapvar_between() and swapvar_rec()
-// to swap variables efficiently.
-// Furthermore, sv_x1 and sv_x2 are used by replacevar() and
-// replacevar_between().
-//
-//}}}
+/** static Variable sv_x1, sv_x2;
+ *
+ * sv_x1, sv_x2 - variables to swap by swapvar() and replacevar.
+ *
+ * These variables are initialized by swapvar() such that sv_x1 <
+ * sv_x2.  They are used by swapvar_between() and swapvar_rec()
+ * to swap variables efficiently.
+ * Furthermore, sv_x1 and sv_x2 are used by replacevar() and
+ * replacevar_between().
+ *
+**/
 static Variable sv_x1, sv_x2;
-//}}}
 
-//{{{ static void swapvar_between ( const CanonicalForm & f, CanonicalForm & result, const CanonicalForm & term, int expx2 )
-//{{{ docu
-//
-// swapvar_between() - replace occurences of sv_x1 in f with sv_x2.
-//
-// If Psi denotes the map which maps sv_x1 to sv_x2, this
-// function returns
-//
-//   result + Psi(f) * term * sv_x1^expx2
-//
-// Used by: swapvar()
-//
-//}}}
+/** static void swapvar_between ( const CanonicalForm & f, CanonicalForm & result, const CanonicalForm & term, int expx2 )
+ *
+ * swapvar_between() - replace occurences of sv_x1 in f with sv_x2.
+ *
+ * If Psi denotes the map which maps sv_x1 to sv_x2, this
+ * function returns
+ *
+ *   result + Psi(f) * term * sv_x1^expx2
+ *
+ * Used by: swapvar()
+ *
+**/
 static void
 swapvar_between ( const CanonicalForm & f, CanonicalForm & result, const CanonicalForm & term, int expx2 )
 {
@@ -98,21 +96,19 @@ swapvar_between1 ( const CanonicalForm & f )
     }
 }
 #endif
-//}}}
 
-//{{{ static void swapvar_rec ( const CanonicalForm & f, CanonicalForm & result, const CanonicalForm & term )
-//{{{ docu
-//
-// swapvar_between() - swap occurences of sv_x1 and sv_x2 in f.
-//
-// If Psi denotes the map which swaps sv_x1 and sv_x2, this
-// function returns
-//
-//   result + Psi(f) * term
-//
-// Used by: swapvar()
-//
-//}}}
+/**
+ *
+ * swapvar_between() - swap occurences of sv_x1 and sv_x2 in f.
+ *
+ * If Psi denotes the map which swaps sv_x1 and sv_x2, this
+ * function returns
+ *
+ *   result + Psi(f) * term
+ *
+ * Used by: swapvar()
+ *
+**/
 static void
 swapvar_rec ( const CanonicalForm & f, CanonicalForm & result, const CanonicalForm & term )
 {
@@ -158,18 +154,16 @@ swapvar_rec1 ( const CanonicalForm & f )
     }
 }
 #endif
-//}}}
 
-//{{{ CanonicalForm swapvar ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
-//{{{ docu
-//
-// swapvar() - swap variables x1 and x2 in f.
-//
-// Returns the image of f under the map which maps x1 to x2 and
-// x2 to x1.  This is done quite efficiently because it is used
-// really often.  x1 and x2 should be polynomial variables.
-//
-//}}}
+/**
+ *
+ * swapvar() - swap variables x1 and x2 in f.
+ *
+ * Returns the image of f under the map which maps x1 to x2 and
+ * x2 to x1.  This is done quite efficiently because it is used
+ * really often.  x1 and x2 should be polynomial variables.
+ *
+**/
 CanonicalForm
 swapvar ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
 {
@@ -222,21 +216,19 @@ swapvar1 ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
     }
 }
 #endif
-//}}}
 
-//{{{ static CanonicalForm replacevar_between ( const CanonicalForm & f )
-//{{{ docu
-//
-// replacevar_between() - replace occurences of sv_x1 in f with sv_x2.
-//
-// This is allmost the same as swapvar_between() except that
-// sv_x1 may be an algebraic variable, so we have to test on
-// 'f.inBaseDomain()' instead of 'f.inCoeffDomain()' in the
-// beginning.
-//
-// Used by: replacevar()
-//
-//}}}
+/**
+ *
+ * replacevar_between() - replace occurences of sv_x1 in f with sv_x2.
+ *
+ * This is allmost the same as swapvar_between() except that
+ * sv_x1 may be an algebraic variable, so we have to test on
+ * 'f.inBaseDomain()' instead of 'f.inCoeffDomain()' in the
+ * beginning.
+ *
+ * Used by: replacevar()
+ *
+**/
 static CanonicalForm
 replacevar_between ( const CanonicalForm & f )
 {
@@ -266,17 +258,15 @@ replacevar_between ( const CanonicalForm & f )
         return result;
     }
 }
-//}}}
 
-//{{{ CanonicalForm replacevar ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
-//{{{ docu
-//
-// replacevar() - replace all occurences of x1 in f by x2.
-//
-// In contrast to swapvar(), x1 may be an algebraic variable, but
-// x2 must be a polynomial variable.
-//
-//}}}
+/** CanonicalForm replacevar ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
+ *
+ * replacevar() - replace all occurences of x1 in f by x2.
+ *
+ * In contrast to swapvar(), x1 may be an algebraic variable, but
+ * x2 must be a polynomial variable.
+ *
+**/
 CanonicalForm
 replacevar ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
 {
@@ -290,20 +280,18 @@ replacevar ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
         return replacevar_between( f );
     }
 }
-//}}}
 
-//{{{ static void fillVarsRec ( const CanonicalForm & f, int * vars )
-//{{{ docu
-//
-// fillVarsRec - fill array describing occurences of variables in f.
-//
-// Only polynomial variables are looked up.  The information is
-// stored in the arrary vars.  vars should be large enough to
-// hold all information, i.e. larger than the level of f.
-//
-// Used by getVars() and getNumVars().
-//
-//}}}
+/** static void fillVarsRec ( const CanonicalForm & f, int * vars )
+ *
+ * fillVarsRec - fill array describing occurences of variables in f.
+ *
+ * Only polynomial variables are looked up.  The information is
+ * stored in the arrary vars.  vars should be large enough to
+ * hold all information, i.e. larger than the level of f.
+ *
+ * Used by getVars() and getNumVars().
+ *
+**/
 static void
 fillVarsRec ( const CanonicalForm & f, int * vars )
 {
@@ -316,14 +304,12 @@ fillVarsRec ( const CanonicalForm & f, int * vars )
             fillVarsRec( i.coeff(), vars );
     }
 }
-//}}}
 
-//{{{ int getNumVars ( const CanonicalForm & f )
-//{{{ docu
-//
-// getNumVars() - get number of polynomial variables in f.
-//
-//}}}
+/** int getNumVars ( const CanonicalForm & f )
+ *
+ * getNumVars() - get number of polynomial variables in f.
+ *
+**/
 int
 getNumVars ( const CanonicalForm & f )
 {
@@ -352,16 +338,14 @@ getNumVars ( const CanonicalForm & f )
         return m+1;
     }
 }
-//}}}
 
-//{{{ CanonicalForm getVars ( const CanonicalForm & f )
-//{{{ docu
-//
-// getVars() - get polynomial variables of f.
-//
-// Return the product of all of them, 1 if there are not any.
-//
-//}}}
+/** CanonicalForm getVars ( const CanonicalForm & f )
+ *
+ * getVars() - get polynomial variables of f.
+ *
+ * Return the product of all of them, 1 if there are not any.
+ *
+**/
 CanonicalForm
 getVars ( const CanonicalForm & f )
 {
@@ -390,31 +374,30 @@ getVars ( const CanonicalForm & f )
         return f.mvar() * result;
     }
 }
-//}}}
 
-//{{{ CanonicalForm apply ( const CanonicalForm & f, void (*mf)( CanonicalForm &, int & ) )
-//{{{ docu
-//
-// apply() - apply mf to terms of f.
-//
-// Calls mf( f[i], i ) for each term f[i]*x^i of f and builds a
-// new term from the result.  If f is in a coefficient domain,
-// mf( f, i ) should result in an i == 0, since otherwise it is
-// not clear which variable to use for the resulting term.
-//
-// An example:
-//
-// void
-// diff( CanonicalForm & f, int & i )
-// {
-//     f = f * i;
-//     if ( i > 0 ) i--;
-// }
-//
-// Then apply( f, diff ) is differentation of f with respect to the
-// main variable of f.
-//
-//}}}
+/** CanonicalForm apply ( const CanonicalForm & f, void (*mf)( CanonicalForm &, int & ) )
+ *
+ * apply() - apply mf to terms of f.
+ *
+ * Calls mf( f[i], i ) for each term f[i]*x^i of f and builds a
+ * new term from the result.  If f is in a coefficient domain,
+ * mf( f, i ) should result in an i == 0, since otherwise it is
+ * not clear which variable to use for the resulting term.
+ *
+ * An example:
+ *
+~~~~~~~~~~~~~~~~~~~~~{.c}
+   void
+   diff( CanonicalForm & f, int & i )
+   {
+      f = f * i;
+      if ( i > 0 ) i--;
+   }
+~~~~~~~~~~~~~~~~~~~~~
+ * Then apply( f, diff ) is differentation of f with respect to the
+ * main variable of f.
+ *
+**/
 CanonicalForm
 apply ( const CanonicalForm & f, void (*mf)( CanonicalForm &, int & ) )
 {
@@ -443,18 +426,16 @@ apply ( const CanonicalForm & f, void (*mf)( CanonicalForm &, int & ) )
         return result;
     }
 }
-//}}}
 
-//{{{ CanonicalForm mapdomain ( const CanonicalForm & f, CanonicalForm (*mf)( const CanonicalForm & ) )
-//{{{ docu
-//
-// mapdomain() - map all coefficients of f through mf.
-//
-// Recursively descends down through f to the coefficients which
-// are in a coefficient domain mapping each such coefficient
-// through mf and returns the result.
-//
-//}}}
+/** CanonicalForm mapdomain ( const CanonicalForm & f, CanonicalForm (*mf)( const CanonicalForm & ) )
+ *
+ * mapdomain() - map all coefficients of f through mf.
+ *
+ * Recursively descends down through f to the coefficients which
+ * are in a coefficient domain mapping each such coefficient
+ * through mf and returns the result.
+ *
+**/
 CanonicalForm
 mapdomain ( const CanonicalForm & f, CanonicalForm (*mf)( const CanonicalForm & ) )
 {
@@ -470,16 +451,14 @@ mapdomain ( const CanonicalForm & f, CanonicalForm (*mf)( const CanonicalForm & 
         return result;
     }
 }
-//}}}
 
-//{{{ static void degreesRec ( const CanonicalForm & f, int * degs )
-//{{{ docu
-//
-// degreesRec() - recursively get degrees of f.
-//
-// Used by degrees().
-//
-//}}}
+/** static void degreesRec ( const CanonicalForm & f, int * degs )
+ *
+ * degreesRec() - recursively get degrees of f.
+ *
+ * Used by degrees().
+ *
+**/
 static void
 degreesRec ( const CanonicalForm & f, int * degs )
 {
@@ -495,24 +474,22 @@ degreesRec ( const CanonicalForm & f, int * degs )
             degreesRec( i.coeff(), degs );
     }
 }
-//}}}
 
-//{{{ int * degrees ( const CanonicalForm & f, int * degs )
-//{{{ docu
-//
-// degress() - return the degrees of all polynomial variables in f.
-//
-// Returns 0 if f is in a coefficient domain, the degrees of f in
-// all its polynomial variables in an array of int otherwise:
-//
-//   degrees( f, 0 )[i] = degree( f, Variable(i) )
-//
-// If degs is not the zero pointer the degrees are stored in this
-// array.  In this case degs should be larger than the level of
-// f.  If degs is the zero pointer, an array of sufficient size
-// is allocated automatically.
-//
-//}}}
+/** int * degrees ( const CanonicalForm & f, int * degs )
+ *
+ * degress() - return the degrees of all polynomial variables in f.
+ *
+ * Returns 0 if f is in a coefficient domain, the degrees of f in
+ * all its polynomial variables in an array of int otherwise:
+ *
+ *   degrees( f, 0 )[i] = degree( f, Variable(i) )
+ *
+ * If degs is not the zero pointer the degrees are stored in this
+ * array.  In this case degs should be larger than the level of
+ * f.  If degs is the zero pointer, an array of sufficient size
+ * is allocated automatically.
+ *
+**/
 int * degrees ( const CanonicalForm & f, int * degs )
 {
     if ( f.inCoeffDomain() )
@@ -533,18 +510,16 @@ int * degrees ( const CanonicalForm & f, int * degs )
         return degs;
     }
 }
-//}}}
 
-//{{{ int totaldegree ( const CanonicalForm & f )
-//{{{ docu
-//
-// totaldegree() - return the total degree of f.
-//
-// If f is zero, return -1.  If f is in a coefficient domain,
-// return 0.  Otherwise return the total degree of f in all
-// polynomial variables.
-//
-//}}}
+/** int totaldegree ( const CanonicalForm & f )
+ *
+ * totaldegree() - return the total degree of f.
+ *
+ * If f is zero, return -1.  If f is in a coefficient domain,
+ * return 0.  Otherwise return the total degree of f in all
+ * polynomial variables.
+ *
+**/
 int totaldegree ( const CanonicalForm & f )
 {
     if ( f.isZero() )
@@ -563,20 +538,18 @@ int totaldegree ( const CanonicalForm & f )
         return cdeg;
     }
 }
-//}}}
 
-//{{{ int totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable & v2 )
-//{{{ docu
-//
-// totaldegree() - return the total degree of f as a polynomial
-//   in the polynomial variables between v1 and v2 (inclusively).
-//
-// If f is zero, return -1.  If f is in a coefficient domain,
-// return 0.  Also, return 0 if v1 > v2.  Otherwise, take f to be
-// a polynomial in the polynomial variables between v1 and v2 and
-// return its total degree.
-//
-//}}}
+/** int totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable & v2 )
+ *
+ * totaldegree() - return the total degree of f as a polynomial
+ *   in the polynomial variables between v1 and v2 (inclusively).
+ *
+ * If f is zero, return -1.  If f is in a coefficient domain,
+ * return 0.  Also, return 0 if v1 > v2.  Otherwise, take f to be
+ * a polynomial in the polynomial variables between v1 and v2 and
+ * return its total degree.
+ *
+**/
 int
 totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable & v2 )
 {
@@ -614,17 +587,15 @@ totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable & v2 
         return cdeg;
     }
 }
-//}}}
 
-//{{{ int size ( const CanonicalForm & f, const Variable & v )
-//{{{ docu
-//
-// size() - count number of monomials of f with level higher
-//   or equal than level of v.
-//
-// Returns one if f is in an base domain.
-//
-//}}}
+/** int size ( const CanonicalForm & f, const Variable & v )
+ *
+ * size() - count number of monomials of f with level higher
+ *   or equal than level of v.
+ *
+ * Returns one if f is in an base domain.
+ *
+**/
 int
 size ( const CanonicalForm & f, const Variable & v )
 {
@@ -644,17 +615,15 @@ size ( const CanonicalForm & f, const Variable & v )
         return result;
     }
 }
-//}}}
 
-//{{{ int size ( const CanonicalForm & f )
-//{{{ docu
-//
-// size() - return number of monomials in f which are in an
-//   coefficient domain.
-//
-// Returns one if f is in an coefficient domain.
-//
-//}}}
+/** int size ( const CanonicalForm & f )
+ *
+ * size() - return number of monomials in f which are in an
+ *   coefficient domain.
+ *
+ * Returns one if f is in an coefficient domain.
+ *
+**/
 int
 size ( const CanonicalForm & f )
 {
@@ -669,12 +638,13 @@ size ( const CanonicalForm & f )
         return result;
     }
 }
-//}}}
 
+/** polynomials in M.mvar() are considered coefficients
+ *  M univariate monic polynomial
+ *  the coefficients of f are reduced modulo M
+**/
 CanonicalForm reduce(const CanonicalForm & f, const CanonicalForm & M)
-{ // polynomials in M.mvar() are considered coefficients
-  // M univariate monic polynomial
-  // the coefficients of f are reduced modulo M
+{
   if(f.inBaseDomain() || f.level() < M.level())
     return f;
   if(f.level() == M.level())
@@ -689,4 +659,20 @@ CanonicalForm reduce(const CanonicalForm & f, const CanonicalForm & M)
   for(CFIterator i=f; i.hasTerms(); i++)
     result += reduce(i.coeff(),M) * power(f.mvar(),i.exp());
   return result;
+}
+
+/** check if poly f contains an algebraic variable a **/
+bool hasFirstAlgVar( const CanonicalForm & f, Variable & a )
+{
+  if( f.inBaseDomain() ) // f has NO alg. variable
+    return false;
+  if( f.level()<0 ) // f has only alg. vars, so take the first one
+  {
+    a = f.mvar();
+    return true;
+  }
+  for(CFIterator i=f; i.hasTerms(); i++)
+    if( hasFirstAlgVar( i.coeff(), a ))
+      return true; // 'a' is already set
+  return false;
 }

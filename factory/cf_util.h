@@ -3,12 +3,6 @@
 #ifndef INCL_CF_UTIL_H
 #define INCL_CF_UTIL_H
 
-//{{{ docu
-//
-// cf_util.h - header to cf_util.cc.
-//
-//}}}
-
 // #include "config.h"
 
 int ilog2 (int a);

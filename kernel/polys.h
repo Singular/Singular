@@ -1,11 +1,9 @@
+/*! \file kernel/polys.h KernelCommon: compatiblity layer for all operations with polys
+ 
+*/
+
 #ifndef POLYS_H
 #define POLYS_H
-/****************************************
-*  Computer Algebra System SINGULAR     *
-****************************************/
-/*
-* ABSTRACT - compatiblity layer for all operations with polys
-*/
 
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>

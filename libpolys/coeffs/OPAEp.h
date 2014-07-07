@@ -13,7 +13,6 @@ number  nAEpMult        (number a, number b, const coeffs r);
 number  nAEpSub         (number a, number b, const coeffs r);
 number  nAEpAdd         (number a, number b, const coeffs r);
 number  nAEpDiv         (number a, number b, const coeffs r);
-number  nAEpIntDiv      (number a, number b, const coeffs r); //Hir wollte wir was gucken
 number  nAEpIntMod      (number a, number b, const coeffs r);// Hir wollte wir was gucken
 number  nAEpExactDiv    (number a, number b, const coeffs r);
 number  nAEpInit        (long i, const coeffs r);

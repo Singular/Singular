@@ -1,7 +1,11 @@
-/*! \page libpolys_misc_page "Misc. things"
- *
- * intvec, intvec64?, option, test, global vars?
- * Common auxiliary.h is supposed to contain some generally useful macro
- * 
- */
+/*! \page libpolys_misc_page Miscellaneous things
+
+ - \ref intvec, 
+ - \ref intvec64, 
+ - \ref option, \ref test, 
+ - and global vars...
+
+ Common auxiliary.h is supposed to contain some generally useful macro
+ 
+*/
 

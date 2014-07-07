@@ -1,5 +1,10 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file cf_char.cc
+ *
+ * getting and setting the characteristic of a finite field
+**/
 
 #include "config.h"
 

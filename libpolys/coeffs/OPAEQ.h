@@ -13,7 +13,6 @@ number  nAEQMult        (number a, number b, const coeffs r);
 number  nAEQSub         (number a, number b, const coeffs r);
 number  nAEQAdd         (number a, number b, const coeffs r);
 number  nAEQDiv         (number a, number b, const coeffs r);
-number  nAEQIntDiv      (number a, number b, const coeffs r); //Hir wollte wir was gucken
 number  nAEQIntMod      (number a, number b, const coeffs r);// Hir wollte wir was gucken
 number  nAEQExactDiv    (number a, number b, const coeffs r);
 number  nAEQInit        (long i, const coeffs r);

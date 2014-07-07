@@ -265,7 +265,7 @@ AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
     CPPFLAGS="$CPPFLAGS ${FACTORY_INCLUDES}"
     CFLAGS="$CFLAGS ${FACTORY_INCLUDES}"
     CXXFLAGS="$CXXFLAGS ${FACTORY_INCLUDES}"
-    LIBS="$LIBS ${FACTORY_LIBS}"
+    LIBS="${FACTORY_LIBS} $LIBS"
  
     AC_CHECK_HEADERS([factory/factory.h],,AC_MSG_WARN([trusting the factory locations given: ${FACTORY_INCLUDES}]))
 

@@ -4,7 +4,7 @@
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
  *******************************************************************/
-#include <omalloc/omtTest.h>
+#include "omtTest.h"
 
 #ifdef TEST_CHECK
 #define OM_CHECK CHECK_LEVEL
@@ -23,7 +23,7 @@
 #define omtTestDup     omtTestDupKeep
 #endif
 
-#include <omalloc/omalloc.h>
+#include "omalloc.h"
 
 #ifndef OM_ALIGNMENT_NEEDS_WORK
 #define omSmallSize2AlignedBin omSmallSize2Bin

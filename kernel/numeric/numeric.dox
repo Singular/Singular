@@ -1,8 +1,8 @@
-/*! \page kernel_numeric_page "Numeric algorithms"
- *
- * This sub-package of kernel (\ref kernel_page) contains
- * numerical algorithms. 
- *
- * TODO: list those algorithms... and corresponding interpreter functions...?
- * 
- */
+/*! \page kernel_numeric_page Numerical algorithms for Singular
+
+ This sub-package of kernel (\ref kernel_page) contains
+ numerical algorithms. 
+
+ TODO: list those algorithms... and corresponding interpreter functions...?
+ 
+*/

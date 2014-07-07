@@ -3,6 +3,12 @@
 #ifndef INCL_INT_POLY_H
 #define INCL_INT_POLY_H
 
+/**
+ * @file int_poly.h
+ *
+ * Factory's internal polynomials
+**/
+
 // #include "config.h"
 
 #ifndef NOSTREAMIO
@@ -57,6 +63,14 @@ public:
 typedef term * termList;
 
 
+/**
+ * factory's class for polynomials
+ *
+ * polynomials are represented as a linked list termList, factory
+ * uses a sparse distributive representation of polynomials, i.e. each poly
+ * is viewed as a univariate poly in its main variable CanonicalForm::mvar()
+ * over a (polynomial) ring
+**/
 class InternalPoly : public InternalCF {
 private:
     termList firstTerm, lastTerm;

@@ -1,0 +1,9 @@
+This directory contains the data structures and basic algorithms for polynomials
+in Singular
+
+Subdirectories:
+ coeffs: interface to coefficients (cring elemeents) ans basic representants
+ polys: polynomial ring and (basic) polynomial operations
+ misc: misc. stuff: randaom generation, global options, 64bit intvec
+ reporter: error reporting, basic output routines, input buffering
+

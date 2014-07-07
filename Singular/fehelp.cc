@@ -1004,13 +1004,29 @@ static void heGenHelp(heEntry hentry, int br)
                      /* always defined */
                    if (hentry != NULL && *(hentry->url) != '\0')
                    #ifdef HAVE_VSNPRINTF
-                     snprintf(temp,256,"%s/%s", htmldir, hentry->url);
+                     snprintf(temp,256,"%s/%d-%d-%d/%s", htmldir,
+                                  SINGULAR_VERSION/1000,
+                                 (SINGULAR_VERSION % 1000)/100,
+                                 (SINGULAR_VERSION % 100)/10,
+                     hentry->url);
                    else
-                     snprintf(temp,256,"%s/index.htm", htmldir);
+                     snprintf(temp,256,"%s/%d-%d-%d/index.htm", htmldir,
+                                  SINGULAR_VERSION/1000,
+                                 (SINGULAR_VERSION % 1000)/100,
+                                 (SINGULAR_VERSION % 100)/10
+                     );
                    #else
-                     sprintf(temp,"%s/%s", htmldir, hentry->url);
+                     sprintf(temp,"%s/%d-%d-%d/%s", htmldir,
+                                  SINGULAR_VERSION/1000,
+                                 (SINGULAR_VERSION % 1000)/100,
+                                 (SINGULAR_VERSION % 100)/10,
+                     hentry->url);
                    else
-                     sprintf(temp,"%s/index.htm", htmldir);
+                     sprintf(temp,"%s/%d-%d-%d/index.htm", htmldir,
+                                  SINGULAR_VERSION/1000,
+                                 (SINGULAR_VERSION % 1000)/100,
+                                 (SINGULAR_VERSION % 100)/10
+                     );
                    #endif
                    strcat(sys,temp);
                    if ((*p)=='f')
@@ -1051,12 +1067,12 @@ static void heGenHelp(heEntry hentry, int br)
                    i=strlen(sys);
                    break;
                  }
-	case 'v': /* version number*/
+        case 'v': /* version number*/
                  {
                    char temp[256];
                    sprintf(temp,"%d-%d-%d",SINGULAR_VERSION/1000,
-		                 (SINGULAR_VERSION % 1000)/100,
-		                 (SINGULAR_VERSION % 100)/10);
+                                 (SINGULAR_VERSION % 1000)/100,
+                                 (SINGULAR_VERSION % 100)/10);
                    strcat(sys,temp);
                    i=strlen(sys);
                    break;

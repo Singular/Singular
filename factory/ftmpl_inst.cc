@@ -1,14 +1,16 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-//{{{ docu
-//
-// ftmpl_inst.cc - Factory's template instantiations.
-//
-// For a detailed description how to instantiate Factory's
-// template classes and functions and how to add new
-// instantiations see the `README' file.
-//
-//}}}
+/**
+ *
+ * @file ftmpl_inst.cc
+ *
+ * Factory's template instantiations.
+ *
+ * For a detailed description how to instantiate Factory's
+ * template classes and functions and how to add new
+ * instantiations see the `README' file.
+ *
+**/
 
 
 #include "config.h"
@@ -31,7 +33,7 @@
 #include "templates/ftmpl_matrix.cc"
 
 
-//{{{ explicit template class instantiations
+/** explicit template class instantiations **/
 template class Factor<CanonicalForm>;
 template class List<CFFactor>;
 template class ListItem<CFFactor>;
@@ -116,9 +118,8 @@ template long operator==<zz_p>(Vec<zz_p> const&, Vec<zz_p> const&);
 #endif
 #endif
 
-//}}}
 
-//{{{ explicit template function instantiations
+/** explicit template function instantiations **/
 #ifndef NOSTREAMIO
 template OSTREAM & operator << ( OSTREAM &, const List<CanonicalForm> & );
 template OSTREAM & operator << ( OSTREAM &, const List<CFFactor> & );
@@ -147,7 +148,6 @@ template int tmax ( const int &, const int & );
 template int tmin ( const int &, const int & );
 template int tabs ( const int & );
 #endif
-//}}}
 
 //
 template List<CanonicalForm> Union ( const List<CanonicalForm> &, const List<CanonicalForm> & );

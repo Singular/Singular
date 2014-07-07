@@ -1,5 +1,12 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file imm.h
+ *
+ * operations on immediates, that is elements of F_p, GF, Z, Q
+ * that fit into intrinsic int, long
+**/
+
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
 
@@ -169,20 +176,19 @@ inline long imm_intval ( const InternalCF* const op )
 }
 //}}}
 
-//{{{ inline int imm_sign ( const InternalCF * const op )
-//{{{ docu
-//
-// imm_sign() - return sign of immediate object.
-//
-// If CO is an immediate integer, the sign is defined as usual.
-// If CO is an element of FF(p) and SW_SYMMETRIC_FF is on the
-// sign of CO is the sign of the symmetric representation of CO.
-// If CO is in GF(q) or in FF(p) and SW_SYMMETRIC_FF is off, the
-// sign of CO is zero iff CO is zero, otherwise the sign is one.
-//
-// See also: CanonicalForm::sign(), gf_sign()
-//
-//}}}
+/**
+ *
+ * imm_sign() - return sign of immediate object.
+ *
+ * If CO is an immediate integer, the sign is defined as usual.
+ * If CO is an element of FF(p) and SW_SYMMETRIC_FF is on the
+ * sign of CO is the sign of the symmetric representation of CO.
+ * If CO is in GF(q) or in FF(p) and SW_SYMMETRIC_FF is off, the
+ * sign of CO is zero iff CO is zero, otherwise the sign is one.
+ *
+ * @sa CanonicalForm::sign(), gf_sign()
+ *
+**/
 inline int
 imm_sign ( const InternalCF * const op )
 {
@@ -205,23 +211,21 @@ imm_sign ( const InternalCF * const op )
     else
         return -1;
 }
-//}}}
 
-//{{{ inline int imm_cmp, imm_cmp_p, imm_cmp_gf ( const InternalCF * const lhs, const InternalCF * const rhs )
-//{{{ docu
-//
-// imm_cmp(), imm_cmp_p(), imm_cmp_gf() - compare immediate objects.
-//
-// For immediate integers, it is clear how this should be done.
-// For objects from finite fields, it is not clear since they
-// are not ordered fields.  However, since we want to have a
-// total well order on polynomials we have to define a total well
-// order on all coefficients, too.  I decided to use simply the
-// order on the representation as `int's of such objects.
-//
-// See also: CanonicalForm::operator <(), CanonicalForm::operator ==()
-//
-//}}}
+/**
+ *
+ * imm_cmp(), imm_cmp_p(), imm_cmp_gf() - compare immediate objects.
+ *
+ * For immediate integers, it is clear how this should be done.
+ * For objects from finite fields, it is not clear since they
+ * are not ordered fields.  However, since we want to have a
+ * total well order on polynomials we have to define a total well
+ * order on all coefficients, too. We decided to use simply the
+ * order on the representation as `int's of such objects.
+ *
+ * @sa CanonicalForm::operator <(), CanonicalForm::operator ==()
+ *
+**/
 inline int
 imm_cmp ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
