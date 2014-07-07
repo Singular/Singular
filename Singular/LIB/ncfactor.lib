@@ -2467,11 +2467,12 @@ ASSUMPTIONS:
 - All factors are irreducible
 - Our basering is the Nth Weyl algebra; the xs are the first n variables,
   the differential operators are the last n.
+- No entry in the list factors is 0.
 "
 {//checkForHomogInhomogInterchangabilityNthWeyl
   int p = printlevel-voice+2;
   string dbprintWhitespace = "";
-  int i; int j; int k;
+  int i; int j; int k; int l;
   for (i = 1; i<=voice;i++)
   {dbprintWhitespace = dbprintWhitespace + " ";}
   if (size(factors) <= 2 || posLeft >= posRight - 1)
@@ -2483,66 +2484,116 @@ ASSUMPTIONS:
   list tempSwaps;
   list tempSwapsTempEntry;
   list attemptToSwap;
+  int posHomogBegin;
+  int posHomogEnd;
+  poly leftHomogFactorProduct;
+  poly rightHomogFactorProduct;
   dbprint(p, dbprintWhitespace+"We try to swap elements in the following list:");
   dbprint(p, factors);
+  dbprint(p, "The left border is at position: "+string(posLeft));
+  dbprint(p, "The right border is at position: " + string(posRight));
   for (i = posLeft; i < posRight; i++)
   {//checking within the window posLeft <--> posRight, if there are interchanges possible
-    if (homogwithorderNthWeyl(factors[i]) && !homogwithorderNthWeyl(factors[i+1]))
-    {//position i is homogeneous, position i+1 is not ==> trying to swap
-      attemptToSwap = extractHomogeneousDivisorsRightNthWeyl(factors[i]*factors[i+1]);
-      if (size(attemptToSwap[1])>1)
-      {//Bingo, we were able to swap this one element
-        dbprint(p,dbprintWhitespace+"We can swap entry "+string(i)+" and "+ string(i+1));
-        dbprint(p,dbprintWhitespace+"The elements look like the following after the swap:");
-        dbprint(p,attemptToSwap);
-        tempSwapsTempEntry = list();
-        for (j = size(factors); j >=1; j--)
-        {//creating a new entry for the resulting list, replacing the swap in factors
-          if (j==i+1)
-          {
-            for (k = size(attemptToSwap[1]); k >=1 ; k--)
-            {
-              tempSwapsTempEntry = insert(tempSwapsTempEntry, attemptToSwap[1][k]);
-            }
-            j--; //Because we changed entry i+1 and i
-          }
-          else
-          {
-            tempSwapsTempEntry = insert(tempSwapsTempEntry,factors[j]);
-          }
-        }//creating a new entry for the resulting list, replacing the swap in factors
-        tempSwaps = insert(tempSwaps,list(list(i+1,posRight),tempSwapsTempEntry));
-      }//Bingo, we were able to swap this one element
-    }//position i is homogeneous, position i+1 is not ==> trying to swap
-    else
-    {
-      if(!homogwithorderNthWeyl(factors[i]) && homogwithorderNthWeyl(factors[i+1]))
-      {//position i+1 is homogeneous, position i is not ==> trying to swap
-        attemptToSwap = extractHomogeneousDivisorsLeftNthWeyl(factors[i]*factors[i+1]);
-        if (size(attemptToSwap[1])>1)
+    leftHomogFactorProduct = 1;
+    while (homogwithorderNthWeyl(factors[i]))
+    {//We have a homogeneous polynomial somewhere on the left
+      if (leftHomogFactorProduct == 1)
+      {posHomogBegin = i;}
+      leftHomogFactorProduct = leftHomogFactorProduct * factors[i];
+      i = i+1;
+      if (i>=posRight)
+      {break;}
+    }//We have a homogeneous polynomial somewhere on the left
+    if ((leftHomogFactorProduct !=1) && (!homogwithorderNthWeyl(factors[i])))
+    {//We have a group of homogeneous polynomials and an inhomogeneous one that we can try to swap.
+      attemptToSwap = extractHomogeneousDivisorsRightNthWeyl(leftHomogFactorProduct*factors[i]);
+      for (l = 1; l<=size(attemptToSwap); l++)
+      {
+        if (size(attemptToSwap[l])>1)
         {//Bingo, we were able to swap this one element
-          dbprint(p,dbprintWhitespace+"We can swap entry "+string(i)+" and "+ string(i+1));
+          dbprint(p,dbprintWhitespace+"We can swap entry "+string(i)+" with its predecessors");
           dbprint(p,dbprintWhitespace+"The elements look like the following after the swap:");
           dbprint(p,attemptToSwap);
           tempSwapsTempEntry = list();
           for (j = size(factors); j >=1; j--)
           {//creating a new entry for the resulting list, replacing the swap in factors
-            if (j==i+1)
+            if (j==i)
             {
-              for (k = size(attemptToSwap[1]); k >=1 ; k--)
+              for (k = size(attemptToSwap[l]); k >=1 ; k--)
               {
-                tempSwapsTempEntry = insert(tempSwapsTempEntry, attemptToSwap[1][k]);
+                tempSwapsTempEntry = insert(tempSwapsTempEntry, attemptToSwap[l][k]);
               }
-              j--; //Because we changed entry i+1 and i
+              j=posHomogBegin;//Because of the change
             }
             else
             {
               tempSwapsTempEntry = insert(tempSwapsTempEntry,factors[j]);
             }
           }//creating a new entry for the resulting list, replacing the swap in factors
-          tempSwaps = insert(tempSwaps,list(list(posLeft,i),tempSwapsTempEntry));
+          if (posRight <= size(tempSwapsTempEntry))
+          {
+            tempSwaps = insert(tempSwaps,list(list(posHomogBegin+1,posRight),tempSwapsTempEntry));
+          }
+          else
+          {
+            tempSwaps =
+              insert(tempSwaps,list(list(posHomogBegin+1,size(tempSwapsTempEntry)),
+                                         tempSwapsTempEntry));
+          }
         }//Bingo, we were able to swap this one element
-      }//position i+1 is homogeneous, position i is not ==> trying to swap
+      }
+    }//We have a group of homogeneous polynomials and an inhomogeneous one that we can try to swap.
+    else
+    {
+      if (i<posRight)
+      {
+        rightHomogFactorProduct =1;
+        if(!homogwithorderNthWeyl(factors[i]) && homogwithorderNthWeyl(factors[i+1]))
+        {//position i+1 is homogeneous, position i is not ==> trying to swap
+          j = i+1;
+          // print(j);
+          // print(size(factors));
+          // print(posRight);
+          // print("===");
+          while (homogwithorderNthWeyl(factors[j]))
+          {
+            rightHomogFactorProduct = rightHomogFactorProduct * factors[j];
+            posHomogEnd = j;
+            j = j+1;
+            if (j > posRight)
+            {break;}
+          }
+          attemptToSwap =
+            extractHomogeneousDivisorsLeftNthWeyl(factors[i]*rightHomogFactorProduct);
+          for (l =1; l<=size(attemptToSwap);l++)
+          {
+            if (size(attemptToSwap[l])>1)
+            {//Bingo, we were able to swap this one element
+              dbprint(p,dbprintWhitespace+"We can swap entry "+string(i)+" and its successors");
+              dbprint(p,dbprintWhitespace+"The elements look like the following after the swap:");
+              dbprint(p,attemptToSwap);
+              tempSwapsTempEntry = list();
+              for (j = size(factors); j >=1; j--)
+              {//creating a new entry for the resulting list, replacing the swap in factors
+                if (j==posHomogEnd)
+                {
+                  for (k = size(attemptToSwap[l]); k >=1 ; k--)
+                  {
+                    tempSwapsTempEntry = insert(tempSwapsTempEntry, attemptToSwap[l][k]);
+                  }
+                  j = i; //Because we changed entry i+1 and i
+                }
+                else
+                {
+                  tempSwapsTempEntry = insert(tempSwapsTempEntry,factors[j]);
+                }
+              }//creating a new entry for the resulting list, replacing the swap in factors
+              tempSwaps=insert(tempSwaps,
+                               list(list(posLeft,i+size(attemptToSwap[l])-1),tempSwapsTempEntry));
+            }//Bingo, we were able to swap this one element
+          }
+        }//position i+1 is homogeneous, position i is not ==> trying to swap
+      }
     }
   }//checking within the window posLeft <--> posRight, if there are - interchanges possible
   //Now we will recursively call the function for all swapped entries.
@@ -2550,6 +2601,8 @@ ASSUMPTIONS:
   dbprint(p,tempSwaps);
   for (i = 1; i<=size(tempSwaps);i++)
   {//recursive call to all formerly attempted swaps.
+    dbprint(p, "Calling checkForHomogInterchangabilityNthWeyl recursively with values:");
+    dbprint(p, tempSwaps);
     tempResultEntries=checkForHomogInhomogInterchangabilityNthWeyl(tempSwaps[i][2],
                                                             tempSwaps[i][1][1],tempSwaps[i][1][2]);
     result = result + tempResultEntries;
@@ -5351,7 +5404,6 @@ Output: Combinations of the form (p_max + p_min)(q_max + q_min), such that p_max
       }
     }
   }//the minimal homogeneous factor is not a constant
-
   //and now we combine them together to obtain all possibilities.
   for (i = 1; i<=size(pqmax); i++)
   {//iterate over the maximal homogeneous combination possibilities
@@ -5362,7 +5414,6 @@ Output: Combinations of the form (p_max + p_min)(q_max + q_min), such that p_max
       {
         if (pqmax[i][1]+pqmin[j][1]!=0 and pqmax[i][2]+pqmin[j][2]!=0)
         {
-
           if (deg(h,ivm11)<=deg(h-(pqmax[i][1]+pqmin[j][1])*(pqmax[i][2]+pqmin[j][2]),ivm11))
           {
             j++;
@@ -5531,15 +5582,25 @@ minimal homogeneous part");
       {
         if (pqmax[i][1]+pqmin[j][1]!=0 and pqmax[i][2]+pqmin[j][2]!=0)
         {
-
+          if (h-(pqmax[i][1]+pqmin[j][1])*(pqmax[i][2]+pqmin[j][2])==0)
+          {
+            /*REMARK:
+              This part here is different from factoring the first Weyl algebra. As the output of
+              degreeOfNthWeylPoly is in general an intvec instead of an int, we cannot say
+              deg(0)=-1; Therefore, we need to catch the 0-case at this point, i.e.
+              min and max homog are combined equal to h.
+             */
+            result = result +list(list(pqmax[i][1]+pqmin[j][1],pqmax[i][2]+pqmin[j][2]));
+            j++;continue;
+          }
           if (degreeOfNthWeylPoly(h)<=
               degreeOfNthWeylPoly(h-(pqmax[i][1]+pqmin[j][1])*(pqmax[i][2]+pqmin[j][2])))
           {
             j++;
             continue;
           }
-          if (degreeOfNthWeylPoly(h)<=
-              degreeOfNthWeylPoly(h-(pqmax[i][1]+pqmin[j][1])*(pqmax[i][2]+pqmin[j][2])))
+          if (degreeOfNthWeylPolyInverted(h)<=
+              degreeOfNthWeylPolyInverted(h-(pqmax[i][1]+pqmin[j][1])*(pqmax[i][2]+pqmin[j][2])))
           {
             j++;
             continue;
@@ -8846,7 +8907,7 @@ print(lsng);
 ring R = 0,(x,d),dp;
 def r = nc_algebra(1,1);
 setring(r);
-LIB "ncfactor.lib";
+LIB "/Users/albertheinle/Studium/forschung/ncfactor/versionen/ncfactor.lib";
 poly h =(x^3+x+1)*(x^4+d*x+2);//Example for finitely many, but more than one solution in between.
 list lsng = facFirstWeyl(h);
 print(lsng);
