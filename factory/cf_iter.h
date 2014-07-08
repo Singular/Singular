@@ -1,5 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file cf_iter.h
+ *
+ * Iterators for CanonicalForm's
+**/
+
 #ifndef INCL_CF_ITER_H
 #define INCL_CF_ITER_H
 
@@ -29,6 +35,12 @@
 class term;
 typedef term * termList;
 
+/**
+ * class to iterate through CanonicalForm's
+ *
+ * @note a (multivariate) polynomial is viewed as a univariate poly in its main
+ *       variable
+**/
 class CFIterator {
 private:
     CanonicalForm data;
@@ -47,9 +59,10 @@ public:
 
     CF_NO_INLINE CFIterator& operator++ ();
     CF_NO_INLINE CFIterator& operator++ ( int );
-    CF_NO_INLINE int hasTerms () const;
-    CF_NO_INLINE CanonicalForm coeff () const;
-    CF_NO_INLINE int exp () const;
+    CF_NO_INLINE int hasTerms () const;       ///< check if iterator has reached
+                                              ///< the end of CanonicalForm
+    CF_NO_INLINE CanonicalForm coeff () const;///< get the current coefficient
+    CF_NO_INLINE int exp () const;            ///< get the current exponent
 };
 
 /*ENDPUBLIC*/

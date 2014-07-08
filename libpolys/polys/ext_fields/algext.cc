@@ -698,7 +698,7 @@ number naLcmContent(number a, number b, const coeffs cf)
       poly xx=(poly)a;
       while (xx!=NULL)
       {
-        bt = n_Gcd(t, pGetCoeff(xx), naRing->cf);
+        bt = n_SubringGcd(t, pGetCoeff(xx), naRing->cf);
         rr = n_Mult(t, pGetCoeff(xx), naRing->cf);
         n_Delete(&pGetCoeff(xx),naRing->cf);
         pGetCoeff(xx) = n_Div(rr, bt, naRing->cf);
@@ -832,7 +832,7 @@ number naGcd(number a, number b, const coeffs cf)
       while (pNext(ax)!=NULL)
       {
         pIter(ax);
-        number y = n_Gcd(x, pGetCoeff(ax), naRing->cf);
+        number y = n_SubringGcd(x, pGetCoeff(ax), naRing->cf);
         n_Delete(&x,naRing->cf);
         x = y;
         if (n_IsOne(x,naRing->cf))
@@ -840,7 +840,7 @@ number naGcd(number a, number b, const coeffs cf)
       }
       do
       {
-        number y = n_Gcd(x, pGetCoeff(bx), naRing->cf);
+        number y = n_SubringGcd(x, pGetCoeff(bx), naRing->cf);
         n_Delete(&x,naRing->cf);
         x = y;
         if (n_IsOne(x,naRing->cf))

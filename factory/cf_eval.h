@@ -1,5 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file cf_eval.h
+ *
+ * evaluate polynomials at points
+**/
+
 #ifndef INCL_CF_EVAL_H
 #define INCL_CF_EVAL_H
 
@@ -19,6 +25,9 @@
 
 /*BEGINPUBLIC*/
 
+/**
+ * class to evaluate a polynomial at points
+**/
 class Evaluation
 {
 protected:

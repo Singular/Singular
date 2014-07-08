@@ -1,5 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file fac_util.h
+ *
+ * operations mod p^k and some other useful functions for factorization
+**/
+
 #ifndef INCL_FAC_UTIL_H
 #define INCL_FAC_UTIL_H
 
@@ -10,6 +16,9 @@
 
 /*BEGINPUBLIC*/
 
+/**
+ * class to do operations mod p^k for int's p and k
+**/
 class modpk
 {
 private:
@@ -36,8 +45,6 @@ CanonicalForm replaceLc( const CanonicalForm & f, const CanonicalForm & c );
 /*ENDPUBLIC*/
 
 bool gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int & d );
-
-CanonicalForm ezgcd ( const CanonicalForm & f, const CanonicalForm & g );
 
 void extgcd ( const CanonicalForm & a, const CanonicalForm & b, CanonicalForm & S, CanonicalForm & T, const modpk & pk );
 

@@ -149,7 +149,6 @@ See
 @cindex +
 @cindex -
 @cindex *
-@cindex /
 @cindex ^
 @cindex %
 
@@ -856,7 +855,6 @@ See
 @cindex +
 @cindex -
 @cindex *
-@cindex /
 @cindex %
 
 @c remark: the following table should have style @asis, since the
@@ -872,7 +870,7 @@ addition
 negation or subtraction
 @item @code{*}
 multiplication
-@item @code{div}, @code{/}
+@item @code{div}
 integer division (omitting the remainder), rounding toward 0
 @item @code{%}, @code{mod}
 integer modulo (the remainder of the division
@@ -886,8 +884,6 @@ comparators
 in particular it does not change
 the value of @code{j}, see @ref{Limitations}.
 
-@c @strong{Note:} @code{/} might no longer be available in the future.
-
 @*@strong{Example:}
 @smallexample
 @c example error
@@ -900,7 +896,7 @@ the value of @code{j}, see @ref{Limitations}.
   j; i;
   i+2, 2-i, 5^2;
   5 div 2, 8%3;
-  -5 div 2, -5 / 2, -5 mod 2, -5 % 2;
+  -5 div 2, -5 mod 2, -5 % 2;
   1<2, 2<=2;
 @c example
 @end smallexample
@@ -3092,6 +3088,8 @@ negation or subtraction
 multiplication
 @item @code{/}
 division
+@item @code{%}, @code{mod}
+modulo
 @item @code{^}, @code{**}
 power, exponentiation (by an integer)
 @item @code{<=, >=, ==, <>}
@@ -4445,6 +4443,8 @@ In order to apply kernel commands to these types (like @code{string}, @code{+}),
 provide a usual procedure (say @code{proc p}..) for that task and 
 install it via @code{system("install",} user_type @code{,} kernel_command @code{,p,} number_of_args @code{);}.
 The user_type and kernel_command have to be given as strings.
+For kernel_command having a variable number of arguments (internal @code{CMD_M})
+use 4 independ of the number of really supplied arguments.
 
 @*@strong{Example:}
 @smallexample

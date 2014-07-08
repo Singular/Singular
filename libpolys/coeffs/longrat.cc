@@ -1116,6 +1116,12 @@ number nlGcd(number a, number b, const coeffs r)
   nlTest(result, r);
   return result;
 }
+//number nlGcd_dummy(number a, number b, const coeffs r)
+//{
+//  extern char my_yylinebuf[80];
+//  Print("nlGcd in >>%s<<\n",my_yylinebuf);
+//  return nlGcd(a,b,r);;
+//}
 
 number nlShort1(number x) // assume x->s==0/1
 {
@@ -2955,7 +2961,6 @@ BOOLEAN nlCoeffIsEqual(const coeffs r, n_coeffType n, void *p)
 
 BOOLEAN nlInitChar(coeffs r, void*p)
 {
-  r->is_field=TRUE;
   r->is_domain=TRUE;
 
   //const int ch = (int)(long)(p);
@@ -2970,9 +2975,20 @@ BOOLEAN nlInitChar(coeffs r, void*p)
   r->cfMult  = nlMult;
   r->cfSub   = nlSub;
   r->cfAdd   = nlAdd;
-  if (p==NULL) r->cfDiv   = nlDiv;
-  else         r->cfDiv   = nlIntDiv;
-  r->cfIntMod= nlIntMod;
+  if (p==NULL) /* Q */
+  {
+    r->is_field=TRUE;
+    r->cfDiv   = nlDiv;
+    //r->cfGcd  = ndGcd_dummy;
+    r->cfSubringGcd  = nlGcd;
+  }
+  else /* Z: coeffs_BIGINT */
+  {
+    r->is_field=FALSE;
+    r->cfDiv   = nlIntDiv;
+    r->cfIntMod= nlIntMod;
+    r->cfGcd  = nlGcd;
+  }
   r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;
   r->cfSize  = nlSize;
@@ -3003,7 +3019,6 @@ BOOLEAN nlInitChar(coeffs r, void*p)
   r->cfPower = nlPower;
   r->cfGetDenom = nlGetDenom;
   r->cfGetNumerator = nlGetNumerator;
-  r->cfGcd  = nlGcd;
   r->cfExtGcd = nlExtGcd; // only for ring stuff and Z
   r->cfLcm  = nlLcm;
   r->cfDelete= nlDelete;

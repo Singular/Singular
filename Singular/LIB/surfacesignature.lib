@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version surfacesignature.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version surfacesignature.lib 4.0.0.0 Jun_2014 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  surfacesignature.lib        signature of surface singularity
@@ -192,8 +192,8 @@ static proc dedekindSum(number b, number c, int a)
    int k;
    for(k=1;k<=a-1;k++)
    {
-      d=k*b mod a;
-      e=k*c mod a;
+      d=bigint(k*b) mod a;
+      e=bigint(k*c) mod a;
       if(d*e!=0)
       {
          s=s+(d/a-1/2)*(e/a-1/2);

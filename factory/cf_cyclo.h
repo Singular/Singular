@@ -1,19 +1,18 @@
-#ifndef CF_CYCLO_H
-#define CF_CYCLO_H
 // -*- c++ -*-
 //*****************************************************************************
 /** @file cf_cyclo.h
- *
- * @author Martin Lee
- * @date 29.01.2010
  *
  * Compute cyclotomic polynomials and factorize integers by brute force
  *
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
  *
+ * @author Martin Lee
 **/
 //*****************************************************************************
+
+#ifndef CF_CYCLO_H
+#define CF_CYCLO_H
 
 // #include "config.h"
 

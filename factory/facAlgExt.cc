@@ -2,15 +2,13 @@
 //*****************************************************************************
 /** @file facAlgExt.cc
  *
- * @author Martin Lee
- * @date
- *
  * Univariate factorization over algebraic extension of Q using Trager's
  * algorithm
  *
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
  *
+ * @author Martin Lee
 **/
 //*****************************************************************************
 

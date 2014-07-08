@@ -1,5 +1,5 @@
-//////////////////////////////////////////////////////////////////////////////
-version="version atkins.lib 4.0.0.0 Jun_2013 "; // $Id$
+///////////////////////////////////////////////////////////////////////////////
+version="version atkins.lib 4.0.0.1 Jun_2014 ";
 category="Teaching";
 info="
 LIBRARY:  atkins.lib     Procedures for teaching cryptography
@@ -37,14 +37,14 @@ LIB "inout.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc newTest(list L, number D)
+proc newTest(list L, def D)
 "USAGE: newTest(L,D);
 RETURN:  1, if D does not already exist in L,
         -1, if D does already exist in L
 EXAMPLE:example new; shows an example
 "
 {
-  number a=1;                // a=1 means: D does not already exist in L
+  int a=1;                // a=1 means: D does not already exist in L
   int i;
   for(i=1;i<=size(L);i++)
   {
@@ -71,7 +71,7 @@ RETURN: list L, sort in decreasing order
 EXAMPLE:example bubblesort; shows an example
 "
 {
-  number b;
+  def b;
   int n,i,j;
   while(j==0)
   {
@@ -98,7 +98,7 @@ example
 }
 
 
-proc disc(number N, int k)
+proc disc(bigint N, int k)
 "USAGE: disc(N,k);
 RETURN: list L of negative discriminants D, sorted in decreasing order
 ASSUME: D<0, D kongruent 0 or 1 modulo 4 and |D|<4N
@@ -107,13 +107,13 @@ EXAMPLE:example disc; shows an example
 "
 {
   list L=-3,-4,-7;
-  number D;
-  number B;
+  bigint D;
+  bigint B;
   int a,b;
   for(b=0;b<=k;b++)
   {
     B=b^2;
-    for(a=int(intPart(B/4))+1;a<=k;a++)
+    for(a=int(B div 4)+1;a<=k;a++)
     {
       D=-4*a+B;
       if((D<0)&&((D mod 4)!=-2)&&((D mod 4)!=-1)&&(absValue(D)<4*N)&&(newTest(L,D)==1))
@@ -127,12 +127,10 @@ EXAMPLE:example disc; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-    ring R = 0,x,dp;
     disc(2003,50);
 }
 
-
-proc Cornacchia(number d, number p)
+proc Cornacchia(bigint d, bigint p)
 "USAGE: Cornacchia(d,p);
 RETURN: x,y such that x^2+d*y^2=p with p prime,
         -1, if the Diophantine equation has no solution,
@@ -148,7 +146,7 @@ EXAMPLE:example Cornacchia; shows an example
   }
   else
   {
-    number k,x(0),a,b,l,r,c,i;
+    bigint k,x(0),a,b,l,r,c,i;
 
     k=Jacobi(-d,p);             // (1)[Test if residue]
     if(k==-1)
@@ -159,7 +157,7 @@ EXAMPLE:example Cornacchia; shows an example
     else
     {
        x(0)=squareRoot(-d,p);   // (2)[Compute square root]
-       if((p/2>=x(0))||(p<=x(0)))
+       if((p div 2>=x(0))||(p<=x(0)))
        {
            x(0)=-x(0) mod p+p;
        }
@@ -172,7 +170,7 @@ EXAMPLE:example Cornacchia; shows an example
           a=b;
           b=r;
        }
-       c=(p-b^2)/d;             // (4)[Test solution]
+       c=(p-b^2) div d;             // (4)[Test solution]
        i=intRoot(c);
        if((((p-b^2) mod d)!=0)||(c!=i^2))
        {
@@ -188,12 +186,11 @@ EXAMPLE:example Cornacchia; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-    ring R = 0,x,dp;
     Cornacchia(55,9551);
 }
 
 
-proc CornacchiaModified(number D, number p)
+proc CornacchiaModified(bigint D, bigint p)
 "USAGE: CornacchiaModified(D,p);
 RETURN: x,y such that x^2+|D|*y^2=p with p prime,
         -1, if the Diophantine equation has no solution,
@@ -223,7 +220,7 @@ EXAMPLE:example CornacchiaModified; shows an example
     }
     else
     {
-      number k,x(0),a,b,l,r,c;
+      bigint k,x(0),a,b,l,r,c;
       k=Jacobi(D,p);                 // (2)[Test if residue]
       if(k==-1)
       {
@@ -246,8 +243,8 @@ EXAMPLE:example CornacchiaModified; shows an example
           a=b;
           b=r;
         }
-        c=(4*p-b^2)/absValue(D);     // (5)[Test solution]
-        number root_c=intRoot(c);
+        c=(4*p-b^2) div absValue(D);     // (5)[Test solution]
+        bigint root_c=intRoot(c);
         if((((4*p-b^2) mod absValue(D))!=0)||(c!=root_c^2))
         {
           return(-1);
@@ -264,12 +261,11 @@ EXAMPLE:example CornacchiaModified; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-    ring R = 0,x,dp;
     CornacchiaModified(-107,1319);
 }
 
 
-proc pFactor1(number n,int B, list P)
+static proc pFactor1(number n,int B, list P)
 "USAGE: pFactor1(n,B,P); n to be factorized, B a bound , P a list of primes
 RETURN: a list of factors of n or the message: no factor found
 NOTE:   Pollard's p-factorization
@@ -516,7 +512,7 @@ example
 }
 
 
-proc HilbertClassPoly(number D, int k)
+proc HilbertClassPoly(bigint D, int k)
 "USAGE: HilbertClassPoly(D,k);
 RETURN: the monic polynomial of degree h(D) in Z[X] of which jOft((D+sqr(D))/2) is a root
 ASSUME: D is a negative discriminant
@@ -533,29 +529,26 @@ EXAMPLE:example HilbertClassPoly; shows an example
   else
   {
     def S=basering;
-    ring R=0,x,dp;
 
     string s1,s2,s3;
-    number a1,b1,t1,g1;
-    number D=imap(S,D);
-    number B=intRoot(absValue(D)/3);
+    bigint B=intRoot(absValue(D) div 3);
 
     ring C=(complex,10*k,i),x,dp;
-    number D=imap(S,D);
+    number DD=D;
 
     poly P=1;                  // (1)[Initialize]
-    number b=cmod(D,2);
-    number B=imap(R,B);
+    number b=cmod(DD,2);
 
     number t,a,g,tau,j;
     list L;
 
+    bigint a1,b1,t1,g1;
     int step=2;
     while(1)
     {
       if(step==2)              // (2)[Initialize a]
       {
-        t=(b^2-D)/4;
+        t=(b^2-DD)/4;
         L=b,1;
         a=maximum(L);
         step=3;
@@ -573,13 +566,12 @@ EXAMPLE:example HilbertClassPoly; shows an example
           s2=string(b);
           s3=string(t);
 
-          setring R;
           execute("a1="+s1+";");
           execute("b1="+s2+";");
           execute("t1="+s3+";");
-          g1=gcd(gcd(a1,b1),t1/a1);
+          g1=gcd(gcd(a1,b1),t1 div a1);
           setring C;
-          g=imap(R,g1);
+          g=g1;
 
           if(g!=1)
           {
@@ -587,7 +579,7 @@ EXAMPLE:example HilbertClassPoly; shows an example
           }
           else
           {
-            tau=(-b+i*sqr(absValue(D),5*k))/(2*a);
+            tau=(-b+i*sqr(absValue(DD),5*k))/(2*a);
             j=jOft(tau,k);
             if((a==b)||(a^2==t)||(b==0))
             {
@@ -656,7 +648,7 @@ EXAMPLE:example HilbertClassPoly; shows an example
 example
 { "EXAMPLE:"; echo = 2;
     ring r = 0,x,dp;
-    number D=-23;
+    bigint D=-23;
     HilbertClassPoly(D,50);
 }
 
@@ -712,7 +704,7 @@ EXAMPLE:example rootsModp; shows an example
 
       ring T=0,var(1),dp;
       number d=imap(R,d);
-      number e=squareRoot(d,p);
+      number e=squareRoot(bigint(d),bigint(p));
       setring R;
       number e=imap(T,e);
 
@@ -749,7 +741,7 @@ example
 }
 
 
-proc wUnit(number D)
+proc wUnit(bigint D)
 "USAGE: wUnit(D);
 RETURN: the number of roots of unity in the quadratic order of discriminant D
 ASSUME: D<0 a discriminant kongruent to 0 or 1 modulo 4
@@ -769,8 +761,7 @@ EXAMPLE:example w; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-    ring r = 0,x,dp;
-    number D=-3;
+    bigint D=-3;
     wUnit(D);
 }
 
@@ -823,7 +814,7 @@ EXAMPLE:example Atkin; shows an example
     matrix M;                          // M contains the coefficients of T
 
     if(printlevel>=1) {"List H of possibly suitable discriminants will be calculated.";}
-    H=disc(N,K div 2);
+    H=disc(bigint(N),K div 2);
     if(printlevel>=1) {"H = "+string(H);pause();"";}
 
     int step=2;
@@ -1093,7 +1084,7 @@ EXAMPLE:example Atkin; shows an example
       if(step==10)                 // (10)[Change coefficients]
       {
         k=k+1;
-        if(k>=wUnit(D))
+        if(k>=wUnit(bigint(D)))
         {
           if(printlevel>=1) {"Since k = wUnit(D) = "+string(k)+", it holds that N("+string(i)+") = "+string(N(i))+" is not prime.";pause();"";}
           step=14;

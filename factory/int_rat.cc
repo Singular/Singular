@@ -172,8 +172,9 @@ InternalCF* InternalRational::genOne()
         return new InternalRational( 1 );
 }
 
-//{{{ InternalCF * InternalRational::num (), den ()
-// docu: see CanonicalForm::num(), den()
+/**
+ * @sa CanonicalForm::num(), CanonicalForm::den(), InternalRational::den()
+**/
 InternalCF * InternalRational::num ()
 {
     if ( mpz_is_imm( _num ) )
@@ -189,6 +190,9 @@ InternalCF * InternalRational::num ()
     }
 }
 
+/**
+ * @sa CanonicalForm::num(), CanonicalForm::den(), InternalRational::num()
+**/
 InternalCF * InternalRational::den ()
 {
     if ( mpz_is_imm( _den ) )
@@ -203,10 +207,10 @@ InternalCF * InternalRational::den ()
         return new InternalInteger( dummy );
     }
 }
-//}}}
 
-//{{{ InternalCF * InternalRational::neg ()
-// docu: see CanonicalForm::operator -()
+/** InternalCF * InternalRational::neg ()
+ * @sa CanonicalForm::operator -()
+**/
 InternalCF *
 InternalRational::neg ()
 {
@@ -226,7 +230,6 @@ InternalRational::neg ()
         return this;
     }
 }
-//}}}
 
 InternalCF* InternalRational::addsame( InternalCF * c )
 {
@@ -496,24 +499,19 @@ bool InternalRational::divremsamet( InternalCF* c, InternalCF*& quot, InternalCF
     return true;
 }
 
-//{{{ int InternalRational::comparesame, comparecoeff ( InternalCF * c )
-//{{{ docu
-//
-// comparesame(), comparecoeff() - compare with an
-//   InternalRational.
-//
-// comparesame() compares the CO=a/b and c=p/q using the
-// equivalence a/b < p/q iff a*q < p*b.
-//
-// comparecoeff() compares the CO=a/b and the integer c using the
-// equivalence a/b < c iff a < c*b.
-//
-// Note: Both operations may be relatively expensive due to the
-// multiplications.
-//
-// See also: CanonicalForm::operator <(), CanonicalForm::operator ==()
-//
-//}}}
+/**
+ * comparesame(), comparecoeff() - compare with an
+ *   InternalRational.
+ *
+ * comparesame() compares the CO=a/b and c=p/q using the
+ * equivalence a/b < p/q iff a*q < p*b.
+ *
+ * Note: May be relatively expensive due to the
+ * multiplications.
+ *
+ * See also: CanonicalForm::operator <(), CanonicalForm::operator ==()
+ *
+**/
 int
 InternalRational::comparesame ( InternalCF * c )
 {
@@ -527,6 +525,13 @@ InternalRational::comparesame ( InternalCF * c )
     return result;
 }
 
+/**
+ * comparecoeff() compares the CO=a/b and the integer c using the
+ * equivalence a/b < c iff a < c*b.
+ *
+ * Note: May be relatively expensive due to the
+ * multiplications.
+**/
 int
 InternalRational::comparecoeff ( InternalCF* c )
 {
@@ -551,7 +556,6 @@ InternalRational::comparecoeff ( InternalCF* c )
         return result;
     }
 }
-//}}}
 
 InternalCF* InternalRational::addcoeff( InternalCF* c )
 {
@@ -811,23 +815,27 @@ bool InternalRational::divremcoefft( InternalCF* c, InternalCF*& quot, InternalC
     return true;
 }
 
-//{{{ InternalCF * InternalRational::bgcdsame, bgcdcoeff ( const InternalCF * const )
-// docu: see CanonicalForm::bgcd()
+/**
+ * @sa CanonicalForm::bgcd(), InternalRational::bgcdcoeff()
+**/
 InternalCF *
 InternalRational::bgcdsame ( const InternalCF * const ) const
 {
     return int2imm( 1 );
 }
 
+/**
+ * @sa CanonicalForm::bgcd(), InternalRational::bgcdsame()
+**/
 InternalCF *
 InternalRational::bgcdcoeff ( const InternalCF * const )
 {
     return int2imm( 1 );
 }
-//}}}
 
-//{{{ InternalCF * InternalRational::bextgcdsame ( InternalCF * c, CanonicalForm & a, CanonicalForm & b )
-// docu: see CanonicalForm::bextgcd()
+/**
+ * @sa CanonicalForm::bextgcd(), InternalRational::bextgcdcoeff()
+**/
 InternalCF *
 InternalRational::bextgcdsame ( InternalCF *, CanonicalForm & a, CanonicalForm & b )
 {
@@ -835,14 +843,19 @@ InternalRational::bextgcdsame ( InternalCF *, CanonicalForm & a, CanonicalForm &
     return int2imm( 1 );
 }
 
+/**
+ * @sa CanonicalForm::bextgcd(), InternalRational::bextgcdsame()
+**/
 InternalCF *
 InternalRational::bextgcdcoeff ( InternalCF *, CanonicalForm & a, CanonicalForm & b )
 {
     a = 1/CanonicalForm( copyObject() ); b = 0;
     return int2imm( 1 );
 }
-//}}}
 
+/**
+ * reduce InternalRational to lowest terms
+**/
 InternalCF * InternalRational::normalize_myself()
 {
     ASSERT( getRefCount() == 1, "illegal operation" );
@@ -854,7 +867,6 @@ InternalCF * InternalRational::normalize_myself()
         mpz_divexact( _num, _num, g );
         mpz_divexact( _den, _den, g );
     }
-    // Hier brauchen wir ein mpz_clear, J.M.
     mpz_clear( g );
     if ( mpz_cmp_si( _den, 0 ) < 0 )
     {
@@ -890,11 +902,11 @@ long InternalRational::intval() const
 
 }
 
-//{{{ int InternalRational::sign () const
-// docu: see CanonicalForm::sign()
+/**
+ * @sa CanonicalForm::sign()
+**/
 int
 InternalRational::sign () const
 {
     return mpz_sgn( _num );
 }
-//}}}
