@@ -1,26 +1,26 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file cf_algorithm.h
+ * declarations of higher level algorithms.
+ *
+ * Header file corresponds to: cf_algorithm.cc, cf_chinese.cc,
+ *   cf_factor.cc, cf_linsys.cc, cf_resultant.cc
+ *
+ * Hierarchy: mathematical algorithms on canonical forms
+ *
+ * Developers note:
+ * ----------------
+ * This header file collects declarations of most of the
+ * functions in Factory which implement higher level algorithms
+ * on canonical forms (factorization, gcd, etc.) and declarations
+ * of some low level mathematical functions, too (absolute value,
+ * euclidean norm, etc.).
+ *
+**/
+
 #ifndef INCL_CF_ALGORITHM_H
 #define INCL_CF_ALGORITHM_H
-
-//{{{ docu
-//
-// cf_algorithm.h - declarations of higher level algorithms.
-//
-// Header file corresponds to: cf_algorithms.cc, cf_chinese.cc,
-//   cf_factor.cc, cf_linsys.cc, cf_resultant.cc
-//
-// Hierarchy: mathematical algorithms on canonical forms
-//
-// Developers note:
-// ----------------
-// This header file collects declarations of most of the
-// functions in Factory which implement higher level algorithms
-// on canonical forms (factorization, gcd, etc.) and declarations
-// of some low level mathematical functions, too (absolute value,
-// euclidean norm, etc.).
-//
-//}}}
 
 // #include "config.h"
 
@@ -92,24 +92,23 @@ CFArray subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Va
 CanonicalForm resultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x );
 //}}}
 
-//{{{ inline CanonicalForm abs ( const CanonicalForm & f )
-//{{{ docu
-//
-// abs() - return absolute value of `f'.
-//
-// The absolute value is defined in terms of the function
-// `sign()'.  If it reports negative sign for `f' than -`f' is
-// returned, otherwise `f'.
-//
-// This behaviour is most useful for integers and rationals.  But
-// it may be used to sign-normalize the leading coefficient of
-// arbitrary polynomials, too.
-//
-// Type info:
-// ----------
-// f: CurrentPP
-//
-//}}}
+/** inline CanonicalForm abs ( const CanonicalForm & f )
+ *
+ * abs() - return absolute value of `f'.
+ *
+ * The absolute value is defined in terms of the function
+ * `sign()'.  If it reports negative sign for `f' than -`f' is
+ * returned, otherwise `f'.
+ *
+ * This behaviour is most useful for integers and rationals.  But
+ * it may be used to sign-normalize the leading coefficient of
+ * arbitrary polynomials, too.
+ *
+ * Type info:
+ * ----------
+ * f: CurrentPP
+ *
+**/
 inline CanonicalForm
 abs ( const CanonicalForm & f )
 {

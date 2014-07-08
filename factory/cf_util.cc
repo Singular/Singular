@@ -1,26 +1,27 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-//{{{ docu
-//
-// cf_util.cc - miscellaneous functions, not necessarily related
-//   to canonical forms.
-//
-// Used by: fac_cantzass.cc, gfops.cc
-//
-//}}}
+/**
+ *
+ * @file cf_util.cc
+ *
+ * miscellaneous functions, not necessarily related
+ *   to canonical forms.
+ *
+ * Used by: fac_cantzass.cc, gfops.cc
+ *
+**/
 
 
 #include "config.h"
 
 
-//{{{ int ipower ( int b, int m )
-//{{{ docu
-//
-// ipower() - calculate b^m in standard integer arithmetic.
-//
-// Note: Beware of overflows.
-//
-//}}}
+/** int ipower ( int b, int m )
+ *
+ * ipower() - calculate b^m in standard integer arithmetic.
+ *
+ * Note: Beware of overflows.
+ *
+**/
 int ipower ( int b, int m )
 {
     int prod = 1;
@@ -35,7 +36,6 @@ int ipower ( int b, int m )
     }
     return prod;
 }
-//}}}
 
 int ilog2 (int a)
 {

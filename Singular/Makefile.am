@@ -266,6 +266,8 @@ ${abs_builddir}/LIB: ${srcdir}/LIB
 	  ln -snf ${abs_srcdir}/LIB ${abs_builddir}/; \
 	fi
 
-MOD: ${top_builddir}/libpolys/polys/.libs
-	ln -snf ${top_builddir}/libpolys/polys/.libs/ ${builddir}/MOD
+MOD: 
+	if [ -d "${top_builddir}/libpolys/polys/.libs" ]; then \
+	  ln -snf ${top_builddir}/libpolys/polys/.libs/ ${abs_builddir}/MOD; \
+	fi 	  
 

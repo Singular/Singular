@@ -23,11 +23,12 @@ SOURCES = \
 		cf_chinese.cc \
 		cf_cyclo.cc \
 		cf_eval.cc \
+		cfEzgcd.cc \
 		cf_factor.cc \
 		cf_factory.cc \
 		cf_gcd.cc \
 		cfGcdAlgExt.cc \
-		cf_gcd_smallp.cc \
+		cfGcdUtil.cc \
 		cf_generator.cc \
 		cf_globals.cc \
 		cf_hnf.cc \
@@ -38,15 +39,19 @@ SOURCES = \
 		cf_linsys.cc \
 		cf_map.cc \
 		cf_map_ext.cc \
+		cfModGcd.cc \
 		cfNewtonPolygon.cc \
+		cfNTLzzpEXGCD.cc \
 		cfModResultant.cc \
 		cf_ops.cc \
 		cf_primes.cc \
 		cf_random.cc \
 		cf_resultant.cc \
 		cf_reval.cc \
+		cfSubResGcd.cc \
 		cf_switches.cc \
 		cf_util.cc \
+		cfUnivarGcd.cc \
 		debug.cc \
 		DegreePattern.cc \
 		ExtensionInfo.cc \
@@ -56,7 +61,6 @@ SOURCES = \
 		facAlgFunc.cc \
 		facAlgFuncUtil.cc \
 		facBivar.cc \
-		fac_ezgcd.cc \
 		facFactorize.cc \
 		fac_sqrfree.cc \
 		fac_util.cc \
@@ -68,7 +72,6 @@ SOURCES = \
 		facHensel.cc \
 		facIrredTest.cc \
 		facMul.cc \
-		facNTLzzpEXGCD.cc \
 		facSparseHensel.cc \
 		ffops.cc \
 		FLINTconvert.cc \
@@ -104,24 +107,29 @@ factory_headers = \
 		cf_cyclo.h \
 		cf_defs.h \
 		cf_eval.h \
+		cfEzgcd.h \
 		cf_factory.h \
 		cf_generator.h \
 		cf_globals.h \
 		cfGcdAlgExt.h \
-		cf_gcd_smallp.h \
+		cfGcdUtil.h \
 		cf_hnf.h \
 		cf_irred.h \
 		cf_iter.h \
 		cf_map.h \
 		cf_map_ext.h \
+		cfModGcd.h \
 		cfNewtonPolygon.h \
+		cfNTLzzpEXGCD.h \
 		cfModResultant.h \
 		cf_primes.h \
 		cf_primetab.h \
 		cf_random.h \
 		cf_reval.h \
+		cfSubResGcd.h \
 		cf_switches.h \
 		cf_util.h \
+		cfUnivarGcd.h \
 		debug.h \
 		DegreePattern.h \
 		ExtensionInfo.h \
@@ -142,7 +150,6 @@ factory_headers = \
 		facHensel.h \
 		facIrredTest.h \
 		facMul.h \
-		facNTLzzpEXGCD.h \
 		facSparseHensel.h \
 		ffops.h \
 		FLINTconvert.h \
@@ -170,16 +177,6 @@ nodist_libfactory_include_HEADERS = cplusplus.h factory.h factoryconf.h
 ####################################################
 # Documentation
 include $(srcdir)/aminclude.am
-
-doxysrc = $(SOURCES) parseutil.cc
-doxyincl = $(factory_headers) parseutil.h
-
-# doxygen targets
-doxy:		factory.cfg $(doxysrc) $(doxyincl)
-		doxygen $<
-
-doxyclean:
-		rm -rf doxygen
 
 ####################################################
 # the precomputed GF(q)-tables
@@ -237,7 +234,7 @@ hdrtemplsrc = 	factoryconf.template \
 
 EXTRA_DIST =	test_install.cc \
 		$(templatesrc) $(hdrtemplsrc) \
-		doxygen.cfg factory.cfg \
+		doxygen.cfg \
 		examples/application.cc \
 		examples/factorize.cc examples/gcd.cc \
 		bin/folding.el bin/fold-docu.el \

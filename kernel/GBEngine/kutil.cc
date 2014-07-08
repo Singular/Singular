@@ -388,7 +388,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       i++;
       if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ; // does not divide
       #ifdef HAVE_RINGS
-      // Note: As long as qring j forbidden if j contains integer (i.e. ground rings are 
+      // Note: As long as qring j forbidden if j contains integer (i.e. ground rings are
       //       domains), no zerodivisor test needed  CAUTION
       if (rField_is_Ring(currRing) && currRing->OrdSgn == -1)
               if(n_DivBy(p_GetCoeff(h,r->cf),lc,r->cf) == 0)
@@ -7611,7 +7611,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
         }
         idDelete(&P);
     }
-  
+
     else
     {
       /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
@@ -8755,7 +8755,6 @@ void kDebugPrint(kStrategy strat)
     else  Print("%p\n",(void*)strat->red);
   PrintS("posInT: ");
     if (strat->posInT==posInT0) PrintS("posInT0\n");
-    else if (strat->posInT==posInT0) PrintS("posInT0\n");
     else if (strat->posInT==posInT1) PrintS("posInT1\n");
     else if (strat->posInT==posInT11) PrintS("posInT11\n");
     else if (strat->posInT==posInT110) PrintS("posInT110\n");

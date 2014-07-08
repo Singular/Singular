@@ -1,12 +1,14 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-//{{{ docu
-//
-// cf_hnf.cc - HNF of NTL
-//
-// Header file: cf_hnf.h
-//
-//}}}
+/**
+ *
+ * @file cf_hnf.cc
+ *
+ * HNF/LLL of NTL
+ *
+ * Header file: cf_hnf.h
+ *
+**/
 
 
 #include "config.h"
@@ -21,17 +23,18 @@
 #include <NTL/HNF.h>
 #include <NTL/LLL.h>
 
-// The input matrix A is an n x m matrix of rank m (so n >= m), and D
-// is a multiple of the determinant of the lattice L spanned by the
-// rows of A.  W is computed as the Hermite Normal Form of A; that is,
-// W is the unique m x m matrix whose rows span L, such that
-//
-// - W is lower triangular,
-// - the diagonal entries are positive,
-// - any entry below the diagonal is a non-negative number
-//   strictly less than the diagonal entry in its column.
-//
-// via ntl
+/**
+ * The input matrix A is an n x m matrix of rank m (so n >= m), and D
+ * is a multiple of the determinant of the lattice L spanned by the
+ * rows of A.  W is computed as the Hermite Normal Form of A; that is,
+ * W is the unique m x m matrix whose rows span L, such that
+ *
+ * - W is lower triangular,
+ * - the diagonal entries are positive,
+ * - any entry below the diagonal is a non-negative number
+ *   strictly less than the diagonal entry in its column.
+ *
+**/
 CFMatrix* cf_HNF(CFMatrix& A)
 {
   mat_ZZ *AA=convertFacCFMatrix2NTLmat_ZZ(A);
@@ -41,6 +44,7 @@ CFMatrix* cf_HNF(CFMatrix& A)
   delete AA;
   return convertNTLmat_ZZ2FacCFMatrix(WW);
 }
+
 CFMatrix* cf_LLL(CFMatrix& A)
 {
   mat_ZZ *AA=convertFacCFMatrix2NTLmat_ZZ(A);

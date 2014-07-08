@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version crypto.lib 4.0.0.0 Jun_2014 "; // $Id$
+version="version crypto.lib 4.0.0.1 Jun_2014 "; // $Id$
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography

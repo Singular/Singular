@@ -2,14 +2,13 @@
 //*****************************************************************************
 /** @file cf_map_ext.cc
  *
- * @author Martin Lee
- * @date   16.11.2009
- *
  * This file implements functions to map between extensions of finite fields
  *
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
  *
+ * @author Martin Lee
+ * @date   16.11.2009
 **/
 //*****************************************************************************
 

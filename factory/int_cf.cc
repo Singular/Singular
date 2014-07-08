@@ -11,8 +11,9 @@
 #include "canonicalform.h"
 #include "cf_factory.h"
 
-//{{{ bool InternalCF::isOne, isZero () const
-// docu: see CanonicalForm::isOne(), CanonicalForm::isZero()
+/** bool InternalCF::isOne, isZero () const
+ * @sa CanonicalForm::isOne(), CanonicalForm::isZero()
+**/
 bool
 InternalCF::isOne () const
 {
@@ -24,10 +25,11 @@ InternalCF::isZero () const
 {
     return false;
 }
-//}}}
 
-//{{{ CanonicalForm InternalCF::lc (), Lc (), LC ()
-// docu: see CanonicalForm::lc(), Lc(), LC()
+
+/** CanonicalForm InternalCF::lc (), Lc (), LC ()
+ *  @sa CanonicalForm::lc(), Lc(), LC()
+**/
 CanonicalForm
 InternalCF::lc ()
 {
@@ -45,10 +47,10 @@ InternalCF::LC ()
 {
     return CanonicalForm( copyObject() );
 }
-//}}}
 
-//{{{ int InternalCF::degree ()
-// docu: see CanonicalForm::degree()
+/** int InternalCF::degree ()
+ * @sa CanonicalForm::degree()
+**/
 int
 InternalCF::degree ()
 {
@@ -57,10 +59,10 @@ InternalCF::degree ()
     else
         return 0;
 }
-//}}}
 
-//{{{ CanonicalForm InternalCF::tailcoeff (), int InternalCF::taildegree ()
-// docu: see CanonicalForm::tailcoeff(), taildegree()
+/** CanonicalForm InternalCF::tailcoeff (), int InternalCF::taildegree ()
+ * @sa CanonicalForm::tailcoeff(), taildegree()
+**/
 CanonicalForm
 InternalCF::tailcoeff ()
 {
@@ -75,10 +77,10 @@ InternalCF::taildegree ()
     else
         return 0;
 }
-//}}}
 
-//{{{ InternalCF * InternalCF::num (), den ()
-// docu: see CanonicalForm::num(), den()
+/** InternalCF * InternalCF::num (), den ()
+ * @sa CanonicalForm::num(), den()
+**/
 InternalCF *
 InternalCF::num ()
 {
@@ -90,30 +92,30 @@ InternalCF::den ()
 {
     return CFFactory::basic( 1L );
 }
-//}}}
 
-//{{{ InternalCF * InternalCF::sqrt ()
-// docu: see CanonicalForm::sqrt()
+/** InternalCF * InternalCF::sqrt ()
+ * @sa CanonicalForm::sqrt()
+**/
 InternalCF *
 InternalCF::sqrt ()
 {
     ASSERT1( 0, "sqrt() not implemented for class %s", this->classname() );
     return 0;
 }
-//}}}
 
-//{{{ int InternalCF::ilog2 ()
-// docu: see CanonicalForm::ilog2()
+/** int InternalCF::ilog2 ()
+ * @sa CanonicalForm::ilog2()
+**/
 int
 InternalCF::ilog2 ()
 {
     ASSERT1( 0, "ilog2() not implemented for class %s", this->classname() );
     return 0;
 }
-//}}}
 
-//{{{ CanonicalForm InternalCF::coeff ( int i )
-// docu: see CanonicalForm::operator []()
+/** CanonicalForm InternalCF::coeff ( int i )
+ * @sa CanonicalForm::operator []()
+**/
 CanonicalForm
 InternalCF::coeff ( int i )
 {
@@ -122,10 +124,10 @@ InternalCF::coeff ( int i )
     else
         return CanonicalForm( 0 );
 }
-//}}}
 
-//{{{ InternalCF * InternalCF::bgcdsame, bgcdcoeff ( const InternalCF * const )
-// docu: see CanonicalForm::bgcd()
+/** InternalCF * InternalCF::bgcdsame, bgcdcoeff ( const InternalCF * const )
+ * @sa CanonicalForm::bgcd()
+**/
 InternalCF *
 InternalCF::bgcdsame ( const InternalCF * const ) const
 {
@@ -139,10 +141,10 @@ InternalCF::bgcdcoeff ( const InternalCF * const )
     ASSERT1( 0, "bgcd() not implemented for class %s", this->classname() );
     return CFFactory::basic( 0L );
 }
-//}}}
 
-//{{{ InternalCF * InternalCF::bextgcdsame ( InternalCF *, CanonicalForm & a, CanonicalForm & b )
-// docu: see CanonicalForm::bextgcd()
+/** InternalCF * InternalCF::bextgcdsame ( InternalCF *, CanonicalForm & a, CanonicalForm & b )
+ * @sa CanonicalForm::bextgcd()
+**/
 InternalCF *
 InternalCF::bextgcdsame ( InternalCF *, CanonicalForm & a, CanonicalForm & b )
 {
@@ -158,7 +160,6 @@ InternalCF::bextgcdcoeff ( InternalCF *, CanonicalForm & a, CanonicalForm & b )
     a = 0; b = 0;
     return CFFactory::basic( 0L );
 }
-//}}}
 
 long
 InternalCF::intval() const

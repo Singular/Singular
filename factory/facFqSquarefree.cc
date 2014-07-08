@@ -18,7 +18,6 @@
 
 #include "canonicalform.h"
 
-#include "cf_gcd_smallp.h"
 #include "cf_iter.h"
 #include "cf_map.h"
 #include "cf_util.h"

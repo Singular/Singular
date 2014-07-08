@@ -1,5 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file fac_sqrfree.h
+ *
+ * squarefree part and factorization over Q, Q(a)
+**/
+
 #ifndef INCL_FAC_SQRFREE_H
 #define INCL_FAC_SQRFREE_H
 

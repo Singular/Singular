@@ -589,6 +589,8 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   {
     LongComplexInfo* p = (LongComplexInfo*)parameter;
     pParameterNames[0] = omStrDup(p->par_name);
+    // fix wrong parameters:
+    if (p->float_len<SHORT_REAL_LENGTH) p->float_len=SHORT_REAL_LENGTH;
     n->float_len = p->float_len;
     n->float_len2 = p->float_len2;
 
@@ -600,7 +602,6 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   }
 
   assume( n->float_len <= n->float_len2 );
-  assume( n->float_len2 >= SHORT_REAL_LENGTH );
   assume( pParameterNames != NULL );
   assume( pParameterNames[0] != NULL );
 

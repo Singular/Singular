@@ -1,12 +1,14 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-//{{{ docu
-//
-// cf_switches.cc - definition of class CFSwitches.
-//
-// Used by: cf_globals.cc, ftest/ftest_util.cc
-//
-//}}}
+/**
+ *
+ * @file cf_switches.cc
+ *
+ * definition of class CFSwitches.
+ *
+ * Used by: cf_globals.cc
+ *
+**/
 
 
 #include "config.h"
@@ -15,14 +17,13 @@
 #include "cf_switches.h"
 #include "cf_defs.h"
 
-//{{{ CFSwitches::CFSwitches ()
-//{{{ docu
-//
-// CFSwitches::CFSwitches() - default constructor.
-//
-// Turns all switches off.
-//
-//}}}
+/** CFSwitches::CFSwitches ()
+ *
+ * CFSwitches::CFSwitches() - default constructor.
+ *
+ * Turns all switches off.
+ *
+**/
 CFSwitches::CFSwitches ()
 {
     for ( int i = 0; i < CFSwitchesMax; i++ )
@@ -36,4 +37,3 @@ CFSwitches::CFSwitches ()
   //On(SW_USE_EZGCD_P); // still testing
   On(SW_USE_QGCD);
 }
-//}}}

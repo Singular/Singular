@@ -1,6 +1,3 @@
-
-
-
 #include <misc/auxiliary.h>
 
 #include <factory/factory.h>

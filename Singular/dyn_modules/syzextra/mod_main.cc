@@ -280,7 +280,7 @@ static BOOLEAN DetailedPrint(leftv __res, leftv h)
     rWrite(r, TRUE);
     PrintLn();
 #ifdef RDEBUG
-    rDebugPrint(r);
+    //rDebugPrint(r);
 #endif
     return FALSE;
   }

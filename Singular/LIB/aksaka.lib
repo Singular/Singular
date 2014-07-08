@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version aksaka.lib 4.0.0.0 Jun_2014 "; // $Id$
+version="version aksaka.lib 4.0.0.1 Jun_2014 "; // $Id$
 category="Teaching";
 info="
 LIBRARY: aksaka.lib     Procedures for primality testing after Agrawal, Saxena, Kayal
@@ -127,7 +127,7 @@ example
 //   GENERAL PROCEDURES                                      //
 //                                                           //
 ///////////////////////////////////////////////////////////////
-proc log2(number x)
+proc log2(bigint xx)
 "USAGE:  log2(x);
 RETURN:  logarithm to basis 2 of x
 NOTE:    calculates the natural logarithm of x with a power-series
@@ -135,7 +135,9 @@ NOTE:    calculates the natural logarithm of x with a power-series
 EXAMPLE: example log2; shows an example
 "
 {
-  number b,c,d,t,l;
+  ring r=0,@x,dp;
+  number b,c,d,t,l,x;
+  x=number(xx);
   int k;
                                          // log2=logarithmus zur basis 2,
                                          // log=natuerlicher logarithmus
@@ -183,7 +185,6 @@ EXAMPLE: example log2; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
    log2(1024);
 }
 //////////////////////////////////////////////////////////////////////////
@@ -291,7 +292,7 @@ example
 //   ASK PRIMALITY TEST                                      //
 //                                                           //
 ///////////////////////////////////////////////////////////////
-proc ask(number n)
+proc ask(bigint n)
 "USAGE: ask(n);
 ASSUME: n>1
 RETURN: 0 if n is composite;
@@ -302,7 +303,7 @@ NOTE:   ASK-algorithm; uses proc powerpolyX for step 5
 EXAMPLE:example ask; shows an example
 "
 {
-  number c,p;
+  bigint c,p;
   c=0;
   p=1;
 
@@ -315,10 +316,10 @@ EXAMPLE:example ask; shows an example
     "Beginn: Berechnung von r, so dass ord(n) in Z/rZ groesser log2(n)^2 ";
     pause();
   }
-  number k,M,M2,b;
+  bigint k,M,M2,b;
   int r;                          // Zeile 526-542: Schritt 2
   M=log2(n);                      // darin sind die Schritte
-  M2=intPart(M^2);                // 3 und 4 integriert
+  M2=M^2;                         // 3 und 4 integriert
   r=2;
 
   if(gcd(n,r)!=1)   //falls ggt ungleich eins, Teiler von n gefunden,
@@ -380,11 +381,12 @@ EXAMPLE:example ask; shows an example
     "Zahl r gefunden, so dass ord(n) in Z/rZ groesser log2(n)^2 ";
     "r=";r;pause();
   }
-  number l=1;                         // Zeile 603-628: Schritt 5
+  ring @R=0,@x,dp;
+  bigint l=1;                         // Zeile 603-628: Schritt 5
   poly f,g;                           // Zeile 618 ueberprueft Gleichungen fuer
                                       // das jeweilige a
   g=var(1)^r-1;
-  number grenze=intPart(wurzel(euler(r))*M);
+  bigint grenze=intPart(wurzel(euler(r))*M);
 
   if(printlevel>=1)
   {"Beginn: Ueberpruefung ob (x+a)^n kongruent x^n+a mod (x^r-1,n)
@@ -412,7 +414,6 @@ EXAMPLE:example ask; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
    //ask(100003);
    ask(32003);
 }

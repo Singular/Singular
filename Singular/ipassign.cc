@@ -742,7 +742,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   coeffs newcf = currRing->cf;
 #ifdef HAVE_RINGS
   ideal id = (ideal)a->Data(); //?
-  const int cpos = idPosConstant(id);  
+  const int cpos = idPosConstant(id);
   if(rField_is_Ring(currRing))
     if (cpos >= 0)
     {
@@ -755,16 +755,16 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   //if (qr!=NULL) omFreeBin((ADDRESS)qr, ip_sring_bin);
   ring qr = rCopy(currRing);
   assume(qr->cf == currRing->cf);
-  
+
   if ( qr->cf != newcf )
   {
     nKillChar ( qr->cf ); // ???
     qr->cf = newcf;
-  }  
+  }
                  // we have to fill it, but the copy also allocates space
   idhdl h=(idhdl)res->data; // we have res->rtyp==IDHDL
   IDRING(h)=qr;
-  
+
   ideal qid;
 
 #ifdef HAVE_RINGS
@@ -772,8 +772,8 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     {
       int i, j;
       int *perm = (int *)omAlloc0((qr->N+1)*sizeof(int));
-      
-      for(i=qr->N;i>0;i--) 
+
+      for(i=qr->N;i>0;i--)
         perm[i]=i;
 
       nMapFunc nMap = n_SetMap(currRing->cf, newcf);
@@ -785,7 +785,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     else
 #endif
       qid = idrCopyR(id,currRing,qr);
-      
+
   idSkipZeroes(qid);
   //idPrint(qid);
   if ((idElem(qid)>1) || rIsSCA(currRing) || (currRing->qideal!=NULL))
@@ -1227,7 +1227,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
   {
     IDLIST((idhdl)l->data)=L;
     IDTYP((idhdl)l->data)=LIST_CMD; // was possibly DEF_CMD
-    ipMoveId((idhdl)l->data);
+    if (lRingDependend(L)) ipMoveId((idhdl)l->data);
   }
   else
   {
@@ -1393,7 +1393,10 @@ static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
       m->m[i]=NULL;
       h=l->next;
       l->next=NULL;
+      idhdl hh=NULL;
+      if ((l->rtyp==IDHDL)&&(l->Typ()==DEF_CMD)) hh=(idhdl)l->data;
       nok=jiAssign_1(l,&t);
+      if (hh!=NULL) { ipMoveId(hh);hh=NULL;}
       l->next=h;
       if (nok)
       {

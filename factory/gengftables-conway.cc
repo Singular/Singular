@@ -1,13 +1,15 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-//{{{ docu
-//
-// gengftables.cc - generate addition tables used by Factory
-//   to calculate in GF(q).
-//
-// Note: This may take quite a while ...
-//
-//}}}
+/**
+ *
+ * @file gengftables-conway.cc
+ *
+ * generate addition tables used by Factory
+ *   to calculate in GF(q).
+ *
+ * @note This may take quite a while ...
+ *
+**/
 
 
 #include "config.h"
@@ -35,19 +37,25 @@
 
 using namespace std;
 
-//{{{ constants
-//{{{ docu
-//
-// - constants.
-//
-// maxtable: maximal size of a gf_table
-// primes, primes_len:
-//   used to step through possible extensions
-//
-//}}}
+/**
+ *
+ * constants.
+ *
+ * maxtable: maximal size of a gf_table
+ *
+**/
 const int maxtable = 65536;
 
+/**
+ * primes, primes_len:
+ *   used to step through possible extensions
+**/
 const int primes_len = 54;
+
+/**
+ * primes, primes_len:
+ *   used to step through possible extensions
+**/
 static unsigned short primes [] =
 {
       2,   3,   5,   7,  11,  13,  17,  19,
@@ -58,30 +66,28 @@ static unsigned short primes [] =
     179, 181, 191, 193, 197, 199, 211, 223,
         227, 229, 233, 239, 241, 251
 };
-//}}}
 
-//{{{ bool isIrreducible ( const CanonicalForm & f )
-//{{{ docu
-//
-// isIrreducible() - return true iff f is irreducible.
-//
-//}}}
+/** bool isIrreducible ( const CanonicalForm & f )
+ *
+ * isIrreducible() - return true iff f is irreducible.
+ *
+**/
 bool
 isIrreducible ( const CanonicalForm & f )
 {
     CFFList F = factorize( f );
+    if (F.getFirst().factor().inCoeffDomain())
+      F.removeFirst();
     return F.length() == 1 && F.getFirst().exp() == 1;
 }
-//}}}
 
-//{{{ int exponent ( const CanonicalForm & f, int q )
-//{{{ docu
-//
-// exponent() - return e > 0 such that x^e == 1 mod f.
-//
-// q: upper limit for e (?)
-//
-//}}}
+/** int exponent ( const CanonicalForm & f, int q )
+ *
+ * exponent() - return e > 0 such that x^e == 1 mod f.
+ *
+ * q: upper limit for e (?)
+ *
+**/
 int
 exponent ( const CanonicalForm & f, int q )
 {
@@ -94,28 +100,26 @@ exponent ( const CanonicalForm & f, int q )
     }
     return e;
 }
-//}}}
 
-//{{{ bool findGenRec ( int d, int n, int q, const CanonicalForm & m, const Variable & x, CanonicalForm & result )
-//{{{ docu
-//
-// findGenRec() - find a generator of GF(q).
-//
-// Returns true iff result is a valid generator.
-//
-// d: degree of extension
-// q: the q in GF(q) (q == p^d)
-// x: generator should be a poly in x
-// n, m: used to step recursively through all polys in FF(p)
-//   Initially, n == d and m == 0.  If 0 <= n <= d we are
-//   in the process of building m, if n < 0 we built m and
-//   may test whether it generates GF(q).
-// result: generator found
-//
-// i: used to step through GF(p)
-// p: current characteristic
-//
-//}}}
+/** bool findGenRec ( int d, int n, int q, const CanonicalForm & m, const Variable & x, CanonicalForm & result )
+ *
+ * findGenRec() - find a generator of GF(q).
+ *
+ * Returns true iff result is a valid generator.
+ *
+ * d: degree of extension
+ * q: the q in GF(q) (q == p^d)
+ * x: generator should be a poly in x
+ * n, m: used to step recursively through all polys in FF(p)
+ *   Initially, n == d and m == 0.  If 0 <= n <= d we are
+ *   in the process of building m, if n < 0 we built m and
+ *   may test whether it generates GF(q).
+ * result: generator found
+ *
+ * i: used to step through GF(p)
+ * p: current characteristic
+ *
+**/
 bool
 findGenRec ( int d, int n, int q,
              const CanonicalForm & m, const Variable & x,
@@ -153,17 +157,15 @@ findGenRec ( int d, int n, int q,
     }
     return false;
 }
-//}}}
 
-//{{{ CanonicalForm findGen ( int d, int q )
-//{{{ docu
-//
-// findGen() - find and return a generator of GF(q).
-//
-// d: degree of extension
-// q: the q in GF(q)
-//
-//}}}
+/** CanonicalForm findGen ( int d, int q )
+ *
+ * findGen() - find and return a generator of GF(q).
+ *
+ * d: degree of extension
+ * q: the q in GF(q)
+ *
+**/
 CanonicalForm
 findGen ( int d, int q )
 {
@@ -178,20 +180,18 @@ findGen ( int d, int q )
     else
         return result;
 }
-//}}}
 
-//{{{ void printTable ( int d, int q, CanonicalForm mipo )
-//{{{ docu
-//
-// printTable - print +1 table of field GF(q).
-//
-// d: degree of extension
-// q: the q in GF(q)
-// mipo: the minimal polynomial of the extension
-//
-// p: current characteristic
-//
-//}}}
+/** void printTable ( int d, int q, CanonicalForm mipo )
+ *
+ * printTable - print +1 table of field GF(q).
+ *
+ * d: degree of extension
+ * q: the q in GF(q)
+ * mipo: the minimal polynomial of the extension
+ *
+ * p: current characteristic
+ *
+**/
 void
 printTable ( int d, int q, CanonicalForm mipo )
 {
@@ -278,16 +278,17 @@ printTable ( int d, int q, CanonicalForm mipo )
 
     cerr << endl;
 }
-//}}}
 
-// The new function for getting the minimal polynomials.
-// It uses the Conway polynomials.
-// It reads the polynomials from a file.
-// The file contains all poynomials with p^k <= 2^16
-// but currently only polynomials with p^k <= 2^14 are used.
-static CanonicalForm findGenNew(int n, int q)
-// n is the exponent
-// parameter q is not used. It is added to respect the old version
+/**
+ * The new function for getting the minimal polynomials.
+ * It uses the Conway polynomials.
+ * It reads the polynomials from a file.
+ * The file contains all poynomials with p^k <= 2^16
+ * but currently only polynomials with p^k <= 2^14 are used.
+**/
+static CanonicalForm findGenNew(int n, ///< n is the exponent
+                                int q  ///< parameter q is not used. It is added to respect the old version
+                               )
 {
         CanonicalForm conway = 0;
         Variable x( 1 );

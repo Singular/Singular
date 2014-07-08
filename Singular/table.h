@@ -135,17 +135,9 @@ struct sValCmd1 dArith1[]=
 ,{D(jjPFAC1),      PFAC_CMD,        LIST_CMD,       BIGINT_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjPFAC1),      PFAC_CMD,        LIST_CMD,       NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(atKILLATTR1),  KILLATTR_CMD,    NONE,           IDHDL         , ALLOW_PLURAL |ALLOW_RING}
-#ifdef MDEBUG
 ,{D(jjpHead),      LEAD_CMD,        POLY_CMD,       POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-#else
-,{D(jjpHead),      LEAD_CMD,        POLY_CMD,       POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
-#endif
 ,{D(jjidHead),     LEAD_CMD,        IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
-#ifdef MDEBUG
 ,{D(jjpHead),      LEAD_CMD,        VECTOR_CMD,     VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-#else
-,{D(jjpHead),      LEAD_CMD,        VECTOR_CMD,     VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-#endif
 ,{D(jjidHead),     LEAD_CMD,        MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLEADCOEF),   LEADCOEF_CMD,    NUMBER_CMD,     POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLEADCOEF),   LEADCOEF_CMD,    NUMBER_CMD,     VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}

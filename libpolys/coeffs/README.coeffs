@@ -38,6 +38,8 @@ mandatory for certain types of coeffs:
 -cfSetChar: if additional initializations to use numbers from this coeffs is needed (should not be needed)
 -cfIntMod: if the ring has a meaningful Euclidean structure
 -cfGcd, cfExtGcd,cfXExtGcd,cfEucNorm: if the ring (or a subring)  has a meaningful Euclidean structure
+-cfSubringGcd: if cf is q quotient field of a ring: Gcd of that ring
+  (example: Q: Gcd for Z, Q(t): Gcd for Z[t], Z/p(t): Gcd for Z/p[t])
 -cfAnn: in a principal ideal ring (with zero divisors)
 -cfWriteFd,cfReadFd: for use of ssi
 -cfDelete: if has_simple_Alloc==0, otherwise noop

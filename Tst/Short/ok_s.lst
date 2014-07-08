@@ -231,9 +231,13 @@ mora_9
 mres_s
 ncfactor_example2_7FromMaster_s
 ncfactor_example_all_procedures_s
+ncfactor_facNthShift1_s
 ncfactor_inhomog_s
 ncfactor_koepf_s
 ncfactor_koepfShift_s
+ncfactor_landau_ex_s
+ncfactor_multipleFacsSameTopAndBottom_s
+ncfactor_nthweylringalt_s
 ncfactor_tsai_s
 normal
 parallel_s
