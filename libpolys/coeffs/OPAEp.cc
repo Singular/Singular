@@ -71,17 +71,6 @@ number  nAEpDiv(number a, number b, const coeffs)
 }
 
 
-number  nAEpIntDiv(number a, number b, const coeffs)
-{
-
-    p_poly* f=reinterpret_cast<p_poly*> (a);
-    mpz_t* i= reinterpret_cast<mpz_t*> (b);
-    p_poly *res=new p_poly;
-    res->p_poly_set(*f);
-    res->p_poly_scalar_div_to(*i);
-    return (number) res;
-}
-
 number  nAEpIntMod(number a, number, const coeffs)
 {
     return a;
@@ -326,6 +315,7 @@ BOOLEAN nAEpClearDenominators  (number, const coeffs)
 
 BOOLEAN n_pAEInitChar(coeffs r, void *p)
 {
+    // r->is_field, is_domain
     //Charakteristik abgreifen!
     const int c = (int) (long) p;
 
@@ -337,7 +327,6 @@ BOOLEAN n_pAEInitChar(coeffs r, void *p)
     r->cfSub   = nAEpSub;
     r->cfAdd   = nAEpAdd;
     r->cfDiv   = nAEpDiv;
-    r->cfIntDiv= nAEpIntDiv;
     r->cfIntMod= nAEpIntMod;
     r->cfExactDiv= nAEpExactDiv;
     r->cfInit = nAEpInit;

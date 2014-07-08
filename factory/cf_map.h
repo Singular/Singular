@@ -3,11 +3,12 @@
 #ifndef INCL_CF_MAP_H
 #define INCL_CF_MAP_H
 
-//{{{ docu
-//
-// cf_map.h - header to cf_map.cc.
-//
-//}}}
+/**
+ * @file cf_map.h
+ *
+ * map polynomials
+ *
+**/
 
 // #include "config.h"
 
@@ -27,25 +28,24 @@
 
 /*BEGINPUBLIC*/
 
-//{{{ class MapPair
-//{{{ docu
-//
-// class MapPair - stores one mapping pair (Variable -> CanonicalForm).
-//
-// This class is only used to store such pairs.  It has no
-// methods to transform a CanonicalForm as the class CFMap has.
-//
-// V, S: the pair (V -> S)
-//
-//}}}
-//{{{ inline method docu
-//
-// Variable var () const
-// CanonicalForm subst () const
-//
-// var(), subst() - selectors, return V and P, resp.
-//
-//}}}
+/** class MapPair
+ *
+ * class MapPair - stores one mapping pair (Variable -> CanonicalForm).
+ *
+ * This class is only used to store such pairs.  It has no
+ * methods to transform a CanonicalForm as the class CFMap has.
+ *
+ * V, S: the pair (V -> S)
+ *
+**/
+/** inline method
+ *
+ * Variable var () const
+ * CanonicalForm subst () const
+ *
+ * var(), subst() - selectors, return V and P, resp.
+ *
+**/
 class MapPair
 {
 private:
@@ -64,25 +64,23 @@ public:
     friend OSTREAM & operator << ( OSTREAM & s, const MapPair & p );
 #endif /* NOSTREAMIO */
 };
-//}}}
 
 typedef List<MapPair> MPList;
 typedef ListIterator<MapPair> MPListIterator;
 
-//{{{ class CFMap
-//{{{ docu
-//
-// class CFMap - class to map canonical forms.
-//
-// Use an object of class CFMap to insert 'values' into canonical
-// form.  Such a mapping is defined by a list of MapPairs (V -> S)
-// describing which canonical form S to insert for variable V.
-// Hereby, the substituted canonical forms are not subject to
-// further substitutions.
-//
-// P: list of MapPairs, sorted by level in descending order
-//
-//}}}
+/** class CFMap
+ *
+ * class CFMap - class to map canonical forms.
+ *
+ * Use an object of class CFMap to insert 'values' into canonical
+ * form.  Such a mapping is defined by a list of MapPairs (V -> S)
+ * describing which canonical form S to insert for variable V.
+ * Hereby, the substituted canonical forms are not subject to
+ * further substitutions.
+ *
+ * P: list of MapPairs, sorted by level in descending order
+ *
+**/
 class CFMap
 {
 private:
@@ -102,7 +100,6 @@ public:
   friend OSTREAM & operator << ( OSTREAM & s, const CFMap & m );
 #endif /* NOSTREAMIO */
 };
-//}}}
 
 CanonicalForm compress ( const CanonicalForm & f, CFMap & m );
 void compress ( const CFArray & a, CFMap & M, CFMap & N );

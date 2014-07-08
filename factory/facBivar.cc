@@ -24,7 +24,6 @@
 #include "facHensel.h"
 #include "facMul.h"
 #include "cf_primes.h"
-#include "cfGcdAlgExt.h"
 
 #ifdef HAVE_NTL
 TIMING_DEFINE_PRINT(fac_uni_factorizer)

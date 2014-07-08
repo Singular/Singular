@@ -1,12 +1,14 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
-//{{{ docu
-//
-// cf_resultant.cc - algorithms for calculating resultants.
-//
-// Header file: cf_algorithm.h
-//
-//}}}
+/**
+ *
+ * @file cf_resultant.cc
+ *
+ * algorithms for calculating resultants.
+ *
+ * Header file: cf_algorithm.h
+ *
+**/
 
 
 #include "config.h"
@@ -18,25 +20,24 @@
 #include "variable.h"
 #include "cf_algorithm.h"
 
-//{{{ CFArray subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
-//{{{ docu
-//
-// subResChain() - caculate extended subresultant chain.
-//
-// The chain is calculated from f and g with respect to variable
-// x which should not be an algebraic variable.  If f or q equals
-// zero, an array consisting of one zero entry is returned.
-//
-// Note: this is not the standard subresultant chain but the
-// *extended* chain!
-//
-// This algorithm is from the article of R. Loos - 'Generalized
-// Polynomial Remainder Sequences' in B. Buchberger - 'Computer
-// Algebra - Symbolic and Algebraic Computation' with some
-// necessary extensions concerning the calculation of the first
-// step.
-//
-//}}}
+/** CFArray subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
+ *
+ * subResChain() - caculate extended subresultant chain.
+ *
+ * The chain is calculated from f and g with respect to variable
+ * x which should not be an algebraic variable.  If f or q equals
+ * zero, an array consisting of one zero entry is returned.
+ *
+ * Note: this is not the standard subresultant chain but the
+ * *extended* chain!
+ *
+ * This algorithm is from the article of R. Loos - 'Generalized
+ * Polynomial Remainder Sequences' in B. Buchberger - 'Computer
+ * Algebra - Symbolic and Algebraic Computation' with some
+ * necessary extensions concerning the calculation of the first
+ * step.
+ *
+**/
 CFArray
 subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
@@ -130,19 +131,17 @@ subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Variable &
 
     return S;
 }
-//}}}
 
-//{{{ static CanonicalForm trivialResultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
-//{{{ docu
-//
-// trivialResultant - calculate trivial resultants.
-//
-// x's level should be larger than f's and g's levels.  Either f
-// or g should be constant or both linear.
-//
-// Used by resultant().
-//
-//}}}
+/** static CanonicalForm trivialResultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
+ *
+ * trivialResultant - calculate trivial resultants.
+ *
+ * x's level should be larger than f's and g's levels.  Either f
+ * or g should be constant or both linear.
+ *
+ * Used by resultant().
+ *
+**/
 static CanonicalForm
 trivialResultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
@@ -155,23 +154,21 @@ trivialResultant ( const CanonicalForm & f, const CanonicalForm & g, const Varia
     // f and g are linear polynomials
     return LC( f, x ) * g - LC( g, x ) * f;
 }
-//}}}
 
-//{{{ CanonicalForm resultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
-//{{{ docu
-//
-// resultant() - return resultant of f and g with respect to x.
-//
-// The chain is calculated from f and g with respect to variable
-// x which should not be an algebraic variable.  If f or q equals
-// zero, zero is returned.  If f is a coefficient with respect to
-// x, f^degree(g, x) is returned, analogously for g.
-//
-// This algorithm serves as a wrapper around other resultant
-// algorithms which do the real work.  Here we use standard
-// properties of resultants only.
-//
-//}}}
+/** CanonicalForm resultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
+ *
+ * resultant() - return resultant of f and g with respect to x.
+ *
+ * The chain is calculated from f and g with respect to variable
+ * x which should not be an algebraic variable.  If f or q equals
+ * zero, zero is returned.  If f is a coefficient with respect to
+ * x, f^degree(g, x) is returned, analogously for g.
+ *
+ * This algorithm serves as a wrapper around other resultant
+ * algorithms which do the real work.  Here we use standard
+ * properties of resultants only.
+ *
+**/
 CanonicalForm
 resultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
@@ -241,4 +238,3 @@ resultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x
 
     return swapvar( result, X, x ) * flipFactor;
 }
-//}}}

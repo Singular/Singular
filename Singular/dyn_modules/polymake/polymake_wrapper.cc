@@ -9,6 +9,7 @@
 #include <Singular/blackbox.h>
 #include <Singular/ipshell.h>
 #include <Singular/subexpr.h>
+#include <Singular/mod_lib.h>
 
 #include <polymake_conversion.h>
 #include <polymake_documentation.h>

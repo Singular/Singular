@@ -545,7 +545,8 @@ static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp
         n_Delete(&old,r->cf);
         number i_number=n_Init(i,r->cf);
         old=new_coef;
-        new_coef=n_IntDiv(new_coef,i_number,r->cf);
+        new_coef=n_Div(new_coef,i_number,r->cf);
+        n_Normalize(new_coef,r->cf);
         n_Delete(&old,r->cf);
         n_Delete(&i_number,r->cf);
       }

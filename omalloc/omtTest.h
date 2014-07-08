@@ -20,7 +20,7 @@
 #endif
 
 
-#include <omalloc/omStructs.h>
+#include "omStructs.h"
 
 struct omMemCell_s
 {

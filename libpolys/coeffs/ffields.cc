@@ -829,6 +829,8 @@ static char* nfCoeffString(const coeffs r)
 
 BOOLEAN nfInitChar(coeffs r,  void * parameter)
 {
+  r->is_field=TRUE;
+  r->is_domain=TRUE;
   //r->cfInitChar=npInitChar;
   r->cfKillChar=nfKillChar;
   r->nCoeffIsEqual=nfCoeffIsEqual;
@@ -838,7 +840,6 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->cfSub   = nfSub;
   r->cfAdd   = nfAdd;
   r->cfDiv   = nfDiv;
-  r->cfIntDiv= nfDiv;
   //r->cfIntMod= ndIntMod;
   r->cfExactDiv= nfDiv;
   r->cfInit = nfInit;

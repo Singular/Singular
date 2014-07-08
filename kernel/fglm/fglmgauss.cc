@@ -139,7 +139,7 @@ gaussReducer::reduce( fglmVector thev )
             }
             nDelete( & gcd );
             gcd= p.gcd();
-            temp= n_Gcd( pdenom, gcd, currRing->cf );
+            temp= n_SubringGcd( pdenom, gcd, currRing->cf );
             nDelete( & gcd );
             gcd= temp;
             if ( ! nIsZero( gcd ) && ! nIsOne( gcd ) )

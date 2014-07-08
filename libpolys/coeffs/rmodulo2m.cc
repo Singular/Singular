@@ -101,6 +101,10 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
 {
   assume( getCoeffType(r) == ID );
   nr2mInitExp((int)(long)(p), r);
+
+  r->is_field=FALSE;
+  r->is_domain=FALSE;
+
   r->cfKillChar    = ndKillChar; /* dummy*/
   r->nCoeffIsEqual = nr2mCoeffIsEqual;
   r->cfCoeffString = nr2mCoeffString;
@@ -121,7 +125,6 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfSub         = nr2mSub;
   r->cfMult        = nr2mMult;
   r->cfDiv         = nr2mDiv;
-  r->cfIntDiv      = nr2mIntDiv;
   r->cfAnn         = nr2mAnn;
   r->cfIntMod      = nr2mMod;
   r->cfExactDiv    = nr2mDiv;

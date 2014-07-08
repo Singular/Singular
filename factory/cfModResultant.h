@@ -3,7 +3,7 @@
 \*****************************************************************************/
 /** @file cfModResultant.h
  *
- * modular resultant algorithm as described by G.E. Collins in "The Calculation
+ * modular resultant algorithm as described by G. E. Collins in "The Calculation
  * of multivariate polynomial resultants"
  *
  * @author Martin Lee

@@ -8,7 +8,7 @@
 # * DX_ARG_ABLE : new variable 'DX_FLAG_DX_CURRENT_FEATURE'
 # * DX_CLEAR_DEPEND : use of explicit variable 'DX_FLAG_DX_CURRENT_FEATURE'
 #   in AC_SUBST instead of 'DX_FLAG[]DX_CURRENT_FEATURE' which is rejected by
-#   newer autotools  
+#   newer autotools
 
 # Generate automatic documentation using Doxygen. Works in concert with the
 # aminclude.m4 file and a compatible doxygen configuration file. Defines the
@@ -55,8 +55,8 @@ AC_DEFUN([DX_FEATURE_chm],  OFF)
 AC_DEFUN([DX_FEATURE_chi],  OFF)
 AC_DEFUN([DX_FEATURE_rtf],  OFF)
 AC_DEFUN([DX_FEATURE_xml],  OFF)
-AC_DEFUN([DX_FEATURE_pdf],  ON)
-AC_DEFUN([DX_FEATURE_ps],   ON)
+AC_DEFUN([DX_FEATURE_pdf],  OFF)
+AC_DEFUN([DX_FEATURE_ps],   OFF)
 
 ## --------------- ##
 ## Private macros. ##

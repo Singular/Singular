@@ -84,9 +84,6 @@ static inline number nlShort3(number x) // assume x->s==3
 #define MPZ_DIV(A,B,C) mpz_tdiv_q((A),(B),(C))
 #define MPZ_EXACTDIV(A,B,C) mpz_divexact((A),(B),(C))
 
-/// Our Type!
-static const n_coeffType ID = n_Q;
-
 void    _nlDelete_NoImm(number *a);
 
 /***************************************************************
@@ -119,7 +116,6 @@ void mpz_mul_si (mpz_ptr r, mpz_srcptr s, long int si)
 
 static number nlMapP(number from, const coeffs src, const coeffs dst)
 {
-  assume( getCoeffType(dst) == ID );
   assume( getCoeffType(src) == n_Zp );
 
   number to;
@@ -338,7 +334,6 @@ number nlRInit (long i);
 
 static number nlMapR(number from, const coeffs src, const coeffs dst)
 {
-  assume( getCoeffType(dst) == ID );
   assume( getCoeffType(src) == n_R );
 
   double f=nrFloat(from);
@@ -369,7 +364,6 @@ static number nlMapR(number from, const coeffs src, const coeffs dst)
 
 static number nlMapLongR(number from, const coeffs src, const coeffs dst)
 {
-  assume( getCoeffType(dst) == ID );
   assume( getCoeffType(src) == n_long_R );
 
   gmp_float *ff=(gmp_float*)from;
@@ -1122,6 +1116,12 @@ number nlGcd(number a, number b, const coeffs r)
   nlTest(result, r);
   return result;
 }
+//number nlGcd_dummy(number a, number b, const coeffs r)
+//{
+//  extern char my_yylinebuf[80];
+//  Print("nlGcd in >>%s<<\n",my_yylinebuf);
+//  return nlGcd(a,b,r);;
+//}
 
 number nlShort1(number x) // assume x->s==0/1
 {
@@ -1237,8 +1237,6 @@ number nlLcm(number a, number b, const coeffs r)
 // src = Q, dst = Zp (or an extension of Zp?)
 number nlModP(number q, const coeffs Q, const coeffs Zp)
 {
-  assume( getCoeffType(Q) == ID );
-
   const int p = n_GetChar(Zp);
   assume( p > 0 );
 
@@ -1250,22 +1248,19 @@ number nlModP(number q, const coeffs Q, const coeffs Zp)
   if (SR_HDL(q) & SR_INT)
   {
     long i = SR_TO_INT(q);
-    if (i<0L)
-      return n_Init( static_cast<int>( P - ((-i)%P) ), Zp);
-    else
-      return n_Init( static_cast<int>( i % P ), Zp );
+    return n_Init( i, Zp );
   }
 
   const unsigned long PP = p;
 
   // numerator modulo char. should fit into int
-  number z = n_Init( static_cast<int>(mpz_fdiv_ui(q->z, PP)), Zp );
+  number z = n_Init( static_cast<long>(mpz_fdiv_ui(q->z, PP)), Zp );
 
   // denominator != 1?
   if (q->s!=3)
   {
     // denominator modulo char. should fit into int
-    number n = n_Init( static_cast<int>(mpz_fdiv_ui(q->n, PP)), Zp );
+    number n = n_Init( static_cast<long>(mpz_fdiv_ui(q->n, PP)), Zp );
 
     number res = n_Div( z, n, Zp );
 
@@ -2109,8 +2104,6 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
 */
 number nlCopyMap(number a, const coeffs src, const coeffs dst)
 {
-  assume( getCoeffType(dst) == ID );
-  assume( getCoeffType(src) == ID );
   if ((SR_HDL(a) & SR_INT)||(a==NULL))
   {
     return a;
@@ -2120,9 +2113,6 @@ number nlCopyMap(number a, const coeffs src, const coeffs dst)
 
 nMapFunc nlSetMap(const coeffs src, const coeffs dst)
 {
-  assume( getCoeffType(dst) == ID );
-//  assume( getCoeffType(src) == ID );
-
   if (nCoeff_is_Q(src))
   {
     return ndCopyMap;
@@ -2440,8 +2430,6 @@ LINLINE void nlInpMult(number &a, number b, const coeffs r)
 
 static void nlMPZ(mpz_t m, number &n, const coeffs r)
 {
-  assume( getCoeffType(r) == ID );
-
   nlTest(n, r);
   nlNormalize(n, r);
   if (SR_HDL(n) & SR_INT) mpz_init_set_si(m, SR_TO_INT(n));     /* n fits in an int */
@@ -2660,13 +2648,12 @@ number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C)
 static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
 {
   assume(cf != NULL);
-  assume(getCoeffType(cf) == ID);
 
   numberCollectionEnumerator.Reset();
 
   if( !numberCollectionEnumerator.MoveNext() ) // empty zero polynomial?
   {
-    c = n_Init(1, cf);
+    c = nlInit(1, cf);
     return;
   }
 
@@ -2752,13 +2739,12 @@ static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
 static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)
 {
   assume(cf != NULL);
-  assume(getCoeffType(cf) == ID);
 
   numberCollectionEnumerator.Reset();
 
   if( !numberCollectionEnumerator.MoveNext() ) // empty zero polynomial?
   {
-    c = n_Init(1, cf);
+    c = nlInit(1, cf);
 //    assume( n_GreaterZero(c, cf) );
     return;
   }
@@ -2839,7 +2825,7 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
   while (numberCollectionEnumerator.MoveNext() )
   {
     number &n = numberCollectionEnumerator.Current();
-    n_InpMult(n, cand, cf);
+    nlInpMult(n, cand, cf);
   }
 
 }
@@ -2975,7 +2961,8 @@ BOOLEAN nlCoeffIsEqual(const coeffs r, n_coeffType n, void *p)
 
 BOOLEAN nlInitChar(coeffs r, void*p)
 {
-  assume( getCoeffType(r) == ID );
+  r->is_domain=TRUE;
+
   //const int ch = (int)(long)(p);
 
   r->nCoeffIsEqual=nlCoeffIsEqual;
@@ -2988,10 +2975,20 @@ BOOLEAN nlInitChar(coeffs r, void*p)
   r->cfMult  = nlMult;
   r->cfSub   = nlSub;
   r->cfAdd   = nlAdd;
-  if (p==NULL) r->cfDiv   = nlDiv;
-  else         r->cfDiv   = nlIntDiv;
-  r->cfIntDiv= nlIntDiv;
-  r->cfIntMod= nlIntMod;
+  if (p==NULL) /* Q */
+  {
+    r->is_field=TRUE;
+    r->cfDiv   = nlDiv;
+    //r->cfGcd  = ndGcd_dummy;
+    r->cfSubringGcd  = nlGcd;
+  }
+  else /* Z: coeffs_BIGINT */
+  {
+    r->is_field=FALSE;
+    r->cfDiv   = nlIntDiv;
+    r->cfIntMod= nlIntMod;
+    r->cfGcd  = nlGcd;
+  }
   r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;
   r->cfSize  = nlSize;
@@ -3022,7 +3019,6 @@ BOOLEAN nlInitChar(coeffs r, void*p)
   r->cfPower = nlPower;
   r->cfGetDenom = nlGetDenom;
   r->cfGetNumerator = nlGetNumerator;
-  r->cfGcd  = nlGcd;
   r->cfExtGcd = nlExtGcd; // only for ring stuff and Z
   r->cfLcm  = nlLcm;
   r->cfDelete= nlDelete;

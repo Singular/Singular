@@ -285,6 +285,7 @@ proc[ \t]+{name}[ \t]*\( {
 "!="                     { return NOTEQUAL; }
 "<>"                     { return NOTEQUAL; }
 "**"                     { return '^'; }
+"->"                     { return ARROW; }
 \\                       { return '\\'; }
 newline                  {
                            lvalp->name = omStrDup("\n");

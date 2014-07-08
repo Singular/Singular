@@ -1,5 +1,13 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file ffops.h
+ *
+ * operations in a finite prime field F_p.
+ * The largest supported p is 536870909, i.e. the largest prime less than 2^29.
+ *
+**/
+
 #ifndef INCL_FFOPS_H
 #define INCL_FFOPS_H
 

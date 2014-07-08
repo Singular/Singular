@@ -1,5 +1,10 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file singext.h
+ *
+ * helper functions for conversion to and from Singular
+**/
 #ifndef INCL_SINGEXT_H
 #define INCL_SINGEXT_H
 
@@ -12,6 +17,7 @@
 #include <resources/feFopen.h>
 #endif
 
+//TODO make these functions members of CanonicalForm?
 /*BEGINPUBLIC*/
 
 void gmp_numerator ( const CanonicalForm & f, mpz_ptr result );

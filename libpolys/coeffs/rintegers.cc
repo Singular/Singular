@@ -223,7 +223,7 @@ number nrzDiv (number a,number b, const coeffs R)
   return (number) erg;
 }
 
-number nrzIntDiv (number a,number b, const coeffs)
+number nrzExactDiv (number a,number b, const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -404,6 +404,10 @@ coeffs nrzQuot1(number c, const coeffs r)
 BOOLEAN nrzInitChar(coeffs r,  void *)
 {
   assume( getCoeffType(r) == ID );
+
+  r->is_field=FALSE;
+  r->is_domain=TRUE;
+
   r->nCoeffIsEqual = ndCoeffIsEqual;
   r->cfCoeffString = nrzCoeffString;
   r->cfKillChar = ndKillChar;
@@ -411,9 +415,8 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfSub   = nrzSub;
   r->cfAdd   = nrzAdd;
   r->cfDiv   = nrzDiv;
-  r->cfIntDiv= nrzDiv;
   r->cfIntMod= nrzIntMod;
-  r->cfExactDiv= nrzDiv;
+  r->cfExactDiv= nrzExactDiv;
   r->cfInit = nrzInit;
   r->cfSize  = nrzSize;
   r->cfInt  = nrzInt;
