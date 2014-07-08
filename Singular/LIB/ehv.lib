@@ -106,10 +106,10 @@ RETURN:  ideal, the annihilator of Ext^n(R/I,R) with given
 proc isSubset(ideal I,ideal J)
 "USAGE:   isSubset(I,J); I, J ideals
 RETURN:  integer, 1 if I is a subset of J and 0 otherwise
-NOTE:    if J is not a standard basis the result may be wrong
 "
 {
-  int s = size(I);
+  if ( attrib(J,"isSB") == 0) { J = groebner(J); } 
+  int s = ncols(I);
   for(int i=1; i<=s; i++)
     {
       if(reduce(I[i],J)!=0)
