@@ -3720,7 +3720,7 @@ static BOOLEAN jjBI2N(leftv res, leftv u)
     res->data=nMap(n,coeffs_BIGINT,currRing->cf);
   else
   {
-    WerrorS("cannot convert bigint to this field");
+    Werror("cannot convert bigint to cring %s",currRing->cf->cfCoeffString(currRing->cf));
     bo=TRUE;
   }
   n_Delete(&n,coeffs_BIGINT);

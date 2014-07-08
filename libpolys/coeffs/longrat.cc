@@ -12,6 +12,7 @@
 
 #include <factory/factory.h>
 
+#include <coeffs/rmodulon.h>
 #include <coeffs/longrat.h>
 
 
@@ -841,6 +842,59 @@ number nlIntMod (number a, number b, const coeffs r)
   nlTest(u,r);
   return u;
 }
+
+BOOLEAN nlDivBy (number a,number b, const coeffs)
+{
+  if (SR_HDL(a) & SR_HDL(b) & SR_INT)
+  {
+    return ((SR_TO_INT(a) % SR_TO_INT(b))==0);
+  }
+  if (SR_HDL(b) & SR_INT)
+  {
+    return (mpz_divisible_ui_p(a->z,SR_TO_INT(b))!=0);
+  }
+  if (SR_HDL(a) & SR_INT) return FALSE;
+  return mpz_divisible_p(a->z, b->z) != 0;
+}
+
+int nlDivComp(number a, number b, const coeffs r)
+{
+  if (nlDivBy(a, b, r))
+  {
+    if (nlDivBy(b, a, r)) return 2;
+    return -1;
+  }
+  if (nlDivBy(b, a, r)) return 1;
+  return 0;
+}
+
+number  nlGetUnit (number n, const coeffs r)
+{
+  if (nlGreaterZero(n, r))
+    return INT_TO_SR(1);
+  else
+    return INT_TO_SR(-1);
+}
+
+coeffs nlQuot1(number c, const coeffs r)
+{
+  int ch = r->cfInt(c, r);
+  mpz_ptr dummy;
+  dummy = (mpz_ptr) omAlloc(sizeof(mpz_t));
+  mpz_init_set_ui(dummy, ch);
+  ZnmInfo info;
+  info.base = dummy;
+  info.exp = (unsigned long) 1;
+  coeffs rr = nInitChar(n_Zn, (void*)&info);
+  return(rr);
+}
+
+
+BOOLEAN nlIsUnit (number a, const coeffs)
+{
+  return ((SR_HDL(a) & SR_INT) && (ABS(SR_TO_INT(a))==1));
+}
+
 
 /*2
 * u := a / b
@@ -2113,7 +2167,7 @@ number nlCopyMap(number a, const coeffs src, const coeffs dst)
 
 nMapFunc nlSetMap(const coeffs src, const coeffs dst)
 {
-  if (nCoeff_is_Q(src))
+  if (getCoeffType(src)==n_Q /*nCoeff_is_Q(src) or coeffs_BIGINT*/)
   {
     return ndCopyMap;
   }
@@ -2604,9 +2658,12 @@ number nlExtGcd(number a, number b, number *s, number *t, const coeffs)
   return g;
 }
 
-void    nlCoeffWrite  (const coeffs, BOOLEAN /*details*/)
+void    nlCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
+  if (r->is_field)
   PrintS("//   characteristic : 0\n");
+  else
+  PrintS("//   coeff. ring is : Integers\n");
 }
 
 number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, const coeffs CF)
@@ -2988,6 +3045,11 @@ BOOLEAN nlInitChar(coeffs r, void*p)
     r->cfDiv   = nlIntDiv;
     r->cfIntMod= nlIntMod;
     r->cfGcd  = nlGcd;
+    r->cfDivBy=nlDivBy;
+    r->cfDivComp = nlDivComp;
+    r->cfIsUnit = nlIsUnit;
+    r->cfGetUnit = nlGetUnit;
+    r->cfQuot1 = nlQuot1;
   }
   r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;
@@ -2996,12 +3058,6 @@ BOOLEAN nlInitChar(coeffs r, void*p)
 
   r->cfChineseRemainder=nlChineseRemainderSym;
   r->cfFarey=nlFarey;
-  #ifdef HAVE_RINGS
-  //r->cfDivComp = NULL; // only for ring stuff
-  //r->cfIsUnit = NULL; // only for ring stuff
-  //r->cfGetUnit = NULL; // only for ring stuff
-  //r->cfDivBy = NULL; // only for ring stuff
-  #endif
   r->cfInpNeg   = nlNeg;
   r->cfInvers= nlInvers;
   r->cfCopy  = nlCopy;

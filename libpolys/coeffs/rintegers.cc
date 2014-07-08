@@ -296,7 +296,7 @@ nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)
   {
     return nrzMapZp;
   }
-  if (nCoeff_is_Q(src))
+  if (getCoeffType(src)==n_Q /*nCoeff_is_Q(src) or coeffs_BIGINT*/)
   {
     return nrzMapQ;
   }
