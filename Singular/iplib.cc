@@ -1105,13 +1105,13 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
       if (autoexport) sModulFunctions.iiAddCproc = iiAddCprocTop;
       else            sModulFunctions.iiAddCproc = iiAddCproc;
       int ver=(*fktn)(&sModulFunctions);
-      if (ver==UMINUS)
+      if (ver==MAX_TOK)
       {
         if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s\n", fullname);
       }
       else
       {
-        Warn("// ** loaded %s for a different version of Singular(expected: %, got %d)",fullname,UMINUS,ver);
+        Warn("// ** loaded %s for a different version of Singular(expected: %d, got %d)",fullname,MAX_TOK,ver);
       }
       currPack->loaded=1;
       currPack=s;
