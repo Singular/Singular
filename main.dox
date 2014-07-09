@@ -127,7 +127,7 @@ See also \ref styleguide and \ref legacystyleguide .
 \ref singular_page
 */
 /*!
-\dir ./factory/
+\dir ./factory
 \ref factory_page
 */
 /*!
@@ -138,5 +138,7 @@ Templates for new sources and headers
  
 /*!
 \page copying_page COPYING
+This is the Singular copying agreement
+
 \verbinclude COPYING
 */
