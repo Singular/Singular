@@ -51,6 +51,8 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
     int p= getCharacteristic();
     bool passToGF= false;
     int k= 1;
+    bool extOfExt= false;
+    Variable v3;
     if (p > 0 && p < TEST_ONE_MAX && CFFactory::gettype() != GaloisFieldDomain && !algExtension)
     {
       if (p == 2)
@@ -77,7 +79,6 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
     }
     else if (p > 0 && p < TEST_ONE_MAX && algExtension)
     {
-      bool extOfExt= false;
 #ifdef HAVE_NTL
       int d= degree (getMipo (v));
       CFList source, dest;
@@ -131,6 +132,7 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
       }
       if (extOfExt)
       {
+        v3= v;
         F= mapUp (F, v, v2, primElem, imPrimElem, source, dest);
         G= mapUp (G, v, v2, primElem, imPrimElem, source, dest);
         lcf= mapUp (lcf, v, v2, primElem, imPrimElem, source, dest);
@@ -180,6 +182,8 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
           setCharacteristic (p);
         if (k > 1)
           setCharacteristic (p, k, gf_name);
+        if (extOfExt)
+          prune1 (v3);
         return false;
     }
 
@@ -207,6 +211,8 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int 
       setCharacteristic (p);
     if (k > 1)
       setCharacteristic (p, k, gf_name);
+    if (extOfExt)
+      prune1 (v3);
     return result;
 }
 

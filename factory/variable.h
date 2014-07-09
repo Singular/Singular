@@ -102,6 +102,8 @@ bool hasMipo( const Variable & alpha );
 char getDefaultVarName();
 char getDefaultExtName();
 
+void prune (Variable& alpha);
+void prune1 (const Variable& alpha);
 int ExtensionLevel();
 
 /*ENDPUBLIC*/

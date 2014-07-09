@@ -1134,7 +1134,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   delta = 0;
   degF = degree( F, x ); degG = degree( G, x );
 
-  if(hasFirstAlgVar(G,a))
+  if (algExtension)
     b = REvaluation( 2, tmax(F.level(), G.level()), AlgExtRandomF( a ) );
   else
   { // both not in extension given by algebraic variable
@@ -1165,6 +1165,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         setCharacteristic (p);
         Variable alpha= rootOf (mipo.mapinto());
         result= GF2FalphaRep (result, alpha);
+        prune (alpha);
       }
       if (k > 1)
       {
@@ -1172,7 +1173,10 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         setCharacteristic (p, k, gf_name);
       }
       if (extOfExt)
+      {
         result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
+        prune1 (oldA);
+      }
       return N (d*result);
     }
     TIMING_END_AND_PRINT (ez_p_eval, "time for eval point search in EZ_P1: ");
@@ -1187,6 +1191,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           setCharacteristic (p);
           Variable alpha= rootOf (mipo.mapinto());
           F= GF2FalphaRep (F, alpha);
+          prune (alpha);
         }
         if (k > 1)
         {
@@ -1194,7 +1199,10 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           setCharacteristic (p, k, gf_name);
         }
         if (extOfExt)
+        {
           F= mapDown (F, primElem, imPrimElem, oldA, dest, source);
+          prune1 (oldA);
+        }
         return N (d*F);
       }
       else
@@ -1210,6 +1218,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           setCharacteristic (p);
           Variable alpha= rootOf (mipo.mapinto());
           G= GF2FalphaRep (G, alpha);
+          prune (alpha);
         }
         if (k > 1)
         {
@@ -1217,7 +1226,10 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           setCharacteristic (p, k, gf_name);
         }
         if (extOfExt)
+        {
           G= mapDown (G, primElem, imPrimElem, oldA, dest, source);
+          prune1 (oldA);
+        }
         return N (d*G);
       }
       else
@@ -1247,6 +1259,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           setCharacteristic (p);
           Variable alpha= rootOf (mipo.mapinto());
           result= GF2FalphaRep (result, alpha);
+          prune (alpha);
         }
         if (k > 1)
         {
@@ -1254,7 +1267,10 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           setCharacteristic (p, k, gf_name);
         }
         if (extOfExt)
+        {
           result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
+          prune1 (oldA);
+        }
         return N (d*result);
       }
       TIMING_END_AND_PRINT (ez_p_eval, "time for eval point search in EZ_P2: ");
@@ -1290,6 +1306,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
             setCharacteristic (p);
             Variable alpha= rootOf (mipo.mapinto());
             F= GF2FalphaRep (F, alpha);
+            prune (alpha);
           }
           if (k > 1)
           {
@@ -1297,7 +1314,10 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
             setCharacteristic (p, k, gf_name);
           }
           if (extOfExt)
+          {
             F= mapDown (F, primElem, imPrimElem, oldA, dest, source);
+            prune1 (oldA);
+          }
           return N (d*F);
         }
         else
@@ -1313,6 +1333,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
             setCharacteristic (p);
             Variable alpha= rootOf (mipo.mapinto());
             G= GF2FalphaRep (G, alpha);
+            prune (alpha);
           }
           if (k > 1)
           {
@@ -1320,7 +1341,10 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
             setCharacteristic (p, k, gf_name);
           }
           if (extOfExt)
+          {
             G= mapDown (G, primElem, imPrimElem, oldA, dest, source);
+            prune1 (oldA);
+          }
           return N (d*G);
         }
         else
@@ -1376,6 +1400,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           setCharacteristic (p);
           Variable alpha= rootOf (mipo.mapinto());
           result= GF2FalphaRep (result, alpha);
+          prune (alpha);
         }
         if (k > 1)
         {
@@ -1383,7 +1408,10 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           setCharacteristic (p, k, gf_name);
         }
         if (extOfExt)
+        {
           result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
+          prune1 (oldA);
+        }
         return N (d*result);
       }
       DD[2] = DD[2] * ( b( lcDD[2] ) / lc( DD[2] ) );
@@ -1395,7 +1423,10 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         {
           result= modGCDFq (F, G, a);
           if (extOfExt)
+          {
             result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
+            prune1 (oldA);
+          }
           return N (d*result);
         }
         if (CFFactory::gettype() == GaloisFieldDomain)
@@ -1407,6 +1438,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
             setCharacteristic (p);
             Variable alpha= rootOf (mipo.mapinto());
             result= GF2FalphaRep (result, alpha);
+            prune (alpha);
           }
           if (k > 1)
           {
@@ -1429,7 +1461,10 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         {
           result= modGCDFq (F, G, a);
           if (extOfExt)
+          {
             result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
+            prune1 (oldA);
+          }
           return N (d*result);
         }
         if (CFFactory::gettype() == GaloisFieldDomain)
@@ -1441,6 +1476,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
             setCharacteristic (p);
             Variable alpha= rootOf (mipo.mapinto());
             result= GF2FalphaRep (result, alpha);
+            prune (alpha);
           }
           if (k > 1)
           {
@@ -1476,6 +1512,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           setCharacteristic (p);
           Variable alpha= rootOf (mipo.mapinto());
           cand= GF2FalphaRep (cand, alpha);
+          prune (alpha);
         }
         if (k > 1 && gcdfound)
         {
@@ -1483,7 +1520,10 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
           setCharacteristic (p, k, gf_name);
         }
         if (extOfExt && gcdfound)
+        {
           cand= mapDown (cand, primElem, imPrimElem, oldA, dest, source);
+          prune1 (oldA);
+        }
       }
     }
     delta--;

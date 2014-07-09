@@ -694,6 +694,7 @@ modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
         CFList u, v;
         ppA= mapDown (ppA, prim_elem_alpha, im_prim_elem_alpha, alpha, u, v);
         ppB= mapDown (ppB, prim_elem_alpha, im_prim_elem_alpha, alpha, u, v);
+        prune1 (alpha);
       }
       coF= N (ppA*(cA/gcdcAcB));
       coG= N (ppB*(cB/gcdcAcB));
@@ -769,6 +770,7 @@ modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
           coG= N ((cB/gcdcAcB)*ppCoG);
           TIMING_END_AND_PRINT (termination_test,
                                 "time for successful termination test Fq: ");
+          prune1 (alpha);
           return N(gcdcAcB*ppH);
         }
       }
@@ -1318,7 +1320,7 @@ modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
   coF= 0;
   coG= 0;
   G_m= 0;
-  Variable alpha, V_buf;
+  Variable alpha, V_buf, cleanUp;
   bool fail= false;
   bool inextension= false;
   topLevel= false;
@@ -1363,16 +1365,23 @@ modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
       CFList list;
       CanonicalForm mipo;
       int deg= 2;
-      do {
+      bool initialized= false;
+      do
+      {
         mipo= randomIrredpoly (deg, x);
-        alpha= rootOf (mipo);
+        if (initialized)
+          setMipo (alpha, mipo);
+        else
+          alpha= rootOf (mipo);
         inextension= true;
+        initialized= true;
         fail= false;
         random_element= randomElement (m*lcA*lcB, alpha, l, fail);
         deg++;
       } while (fail);
       list= CFList();
       V_buf= alpha;
+      cleanUp= alpha;
       TIMING_START (gcd_recursion);
       G_random_element=
       modGCDFq (ppA (random_element, x), ppB (random_element, x),
@@ -1460,6 +1469,8 @@ modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
 
     if (d0 == 0)
     {
+      if (inextension)
+        prune (cleanUp);
       coF= N (ppA*(cA/gcdcAcB));
       coG= N (ppB*(cB/gcdcAcB));
       return N(gcdcAcB);
@@ -1524,6 +1535,8 @@ modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
            terminationTest (ppA, ppB, ppCoF, ppCoG, ppH)) ||
            (fdivides (ppH, ppA, ppCoF) && fdivides (ppH, ppB, ppCoG)))
       {
+        if (inextension)
+          prune (cleanUp);
         coF= N ((cA/gcdcAcB)*ppCoF);
         coG= N ((cB/gcdcAcB)*ppCoG);
         TIMING_END_AND_PRINT (termination_test,
@@ -2276,10 +2289,16 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
       {
         CanonicalForm mipo;
         int deg= 2;
-        do {
+        bool initialized= false;
+        do
+        {
           mipo= randomIrredpoly (deg, x);
-          V_buf= rootOf (mipo);
+          if (initialized)
+            setMipo (V_buf, mipo);
+          else
+            V_buf= rootOf (mipo);
           evalFail= false;
+          initialized= true;
           evalPoints= evaluationPoints (A, B, Aeval, Beval, LCA, GF, V_buf,
                                         evalFail, list);
           deg++;
@@ -2295,6 +2314,8 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     {
       delete[] pEvalPoints;
       fail= true;
+      if (alpha.level() != 1 && V_buf != alpha)
+        prune1 (alpha);
       return 0;
     }
     CFIterator l= skel;
@@ -2304,6 +2325,8 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
       {
         delete[] pEvalPoints;
         fail= true;
+        if (alpha.level() != 1 && V_buf != alpha)
+          prune1 (alpha);
         return 0;
       }
     }
@@ -2366,6 +2389,8 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
       delete[] pL;
       delete[] coeffMonoms;
       fail= true;
+      if (alpha.level() != 1 && V_buf != alpha)
+        prune1 (alpha);
       return 0;
     }
     for (int l= 0; l < solution.size(); l++)
@@ -2382,6 +2407,7 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   {
     CFList u, v;
     result= mapDown (result, prim_elem_alpha, im_prim_elem_alpha, alpha, u, v);
+    prune1 (alpha);
   }
 
   result= N(result);
@@ -2550,10 +2576,16 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
         {
           CanonicalForm mipo;
           int deg= 2;
-          do {
+          bool initialized= false;
+          do
+          {
             mipo= randomIrredpoly (deg, x);
-            V_buf= rootOf (mipo);
+            if (initialized)
+              setMipo (V_buf, mipo);
+            else
+              V_buf= rootOf (mipo);
             evalFail= false;
+            initialized= true;
             evalPoints= evaluationPoints (A, B, Aeval, Beval, LCA, GF, V_buf,
                                           evalFail, list);
             deg++;
@@ -2575,6 +2607,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     {
       delete[] pEvalPoints;
       fail= true;
+      if (alpha.level() != 1 && V_buf != alpha)
+        prune1 (alpha);
       return 0;
     }
     CFIterator l= skel;
@@ -2584,6 +2618,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
       {
         delete[] pEvalPoints;
         fail= true;
+        if (alpha.level() != 1 && V_buf != alpha)
+          prune1 (alpha);
         return 0;
       }
     }
@@ -2744,6 +2780,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
           if (bufpEvalPoints != NULL)
             delete [] bufpEvalPoints;
           fail= true;
+          if (alpha.level() != 1 && V_buf != alpha)
+            prune1 (alpha);
           return 0;
         }
         CFIterator l= skel;
@@ -2759,6 +2797,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
             if (bufpEvalPoints != NULL)
               delete [] bufpEvalPoints;
             fail= true;
+            if (alpha.level() != 1 && V_buf != alpha)
+              prune1 (alpha);
             return 0;
           }
         }
@@ -2847,6 +2887,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
         if (bufpEvalPoints != NULL)
           delete [] bufpEvalPoints;
         fail= true;
+        if (alpha.level() != 1 && V_buf != alpha)
+          prune1 (alpha);
         return 0;
       }
       matRows += pMat[i].rows() - coeffMonoms[i].size();
@@ -2869,6 +2911,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
         if (bufpEvalPoints != NULL)
           delete [] bufpEvalPoints;
         fail= true;
+        if (alpha.level() != 1 && V_buf != alpha)
+          prune1 (alpha);
         return 0;
       }
       bufMat= pMat[i] (coeffMonoms[i].size() + 1, pMat[i].rows(),
@@ -2905,6 +2949,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
       if (bufpEvalPoints != NULL)
         delete [] bufpEvalPoints;
       fail= true;
+      if (alpha.level() != 1 && V_buf != alpha)
+        prune1 (alpha);
       return 0;
     }
 
@@ -2921,6 +2967,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     {
       CFList u, v;
       result= mapDown (result,prim_elem_alpha, im_prim_elem_alpha, alpha, u, v);
+      prune1 (alpha);
     }
     result= N(result);
     delete[] pEvalPoints;
@@ -2986,6 +3033,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
       delete[] coeffMonoms;
       delete[] pM;
       fail= true;
+      if (alpha.level() != 1 && V_buf != alpha)
+        prune1 (alpha);
       return 0;
     }
     if (k != minimalColumnsIndex)
@@ -3006,6 +3055,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   {
     CFList u, v;
     result= mapDown (result, prim_elem, im_prim_elem, alpha, u, v);
+    prune1 (alpha);
   }
   result= N(result);
 
@@ -3194,7 +3244,11 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
       d0= 0;
 
     if (d0 == 0)
+    {
+      if (inextension)
+        prune1 (alpha);
       return N(gcdcAcB);
+    }
     if (d0 >  d)
     {
       if (!find (l, random_element))
@@ -3237,6 +3291,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
           ppH= mapDown (ppH, prim_elem_alpha, im_prim_elem_alpha, alpha, u, v);
           ppH /= Lc(ppH);
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
+          prune1 (alpha);
           return N(gcdcAcB*ppH);
         }
       }
@@ -3373,7 +3428,11 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
           d0= 0;
 
         if (d0 == 0)
+        {
+          if (inextension)
+            prune1 (alpha);
           return N(gcdcAcB);
+        }
         if (d0 >  d)
         {
           if (!find (l, random_element))
@@ -3420,6 +3479,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
               ppH= mapDown (ppH, prim_elem_alpha, im_prim_elem_alpha, alpha, u, v);
               ppH /= Lc(ppH);
               DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
+              prune1 (alpha);
               return N(gcdcAcB*ppH);
             }
           }
@@ -3517,7 +3577,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
   bool fail= false;
   topLevel= false;
   bool inextension= false;
-  Variable V_buf, alpha;
+  Variable V_buf, alpha, cleanUp;
   CanonicalForm prim_elem, im_prim_elem;
   CFList source, dest;
   do //first do
@@ -3562,15 +3622,21 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
       CFList list;
       CanonicalForm mipo;
       int deg= 2;
+      bool initialized= false;
       do
       {
         mipo= randomIrredpoly (deg, x);
-        alpha= rootOf (mipo);
+        if (initialized)
+          setMipo (alpha, mipo);
+        else
+          alpha= rootOf (mipo);
         inextension= true;
         fail= false;
+        initialized= true;
         random_element= randomElement (m, alpha, l, fail);
         deg++;
       } while (fail);
+      cleanUp= alpha;
       V_buf= alpha;
       list= CFList();
       TIMING_START (gcd_recursion);
@@ -3649,7 +3715,11 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
       d0= 0;
 
     if (d0 == 0)
+    {
+      if (inextension)
+        prune (cleanUp);
       return N(gcdcAcB);
+    }
     if (d0 >  d)
     {
       if (!find (l, random_element))
@@ -3687,7 +3757,11 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
       DEBOUTLN (cerr, "ppH= " << ppH);
 
       if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
+      {
+        if (inextension)
+          prune (cleanUp);
         return N(gcdcAcB*ppH);
+      }
     }
     G_m= H;
     newtonPoly= newtonPoly*(x - random_element);
@@ -3757,15 +3831,21 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
           CFList list;
           CanonicalForm mipo;
           int deg= 2;
+          bool initialized= false;
           do
           {
             mipo= randomIrredpoly (deg, x);
-            alpha= rootOf (mipo);
+            if (initialized)
+              setMipo (alpha, mipo);
+            else
+              alpha= rootOf (mipo);
             inextension= true;
             fail= false;
+            initialized= true;
             random_element= randomElement (m, alpha, l, fail);
             deg++;
           } while (fail);
+          cleanUp= alpha;
           V_buf= alpha;
           list= CFList();
           TIMING_START (gcd_recursion);
@@ -3861,7 +3941,11 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
           d0= 0;
 
         if (d0 == 0)
+        {
+          if (inextension)
+            prune (cleanUp);
           return N(gcdcAcB);
+        }
         if (d0 >  d)
         {
           if (!find (l, random_element))
@@ -3900,7 +3984,11 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
           ppH /= Lc (ppH);
           DEBOUTLN (cerr, "ppH= " << ppH);
           if (fdivides (ppH, ppA) && fdivides (ppH, ppB))
+          {
+            if (inextension)
+              prune (cleanUp);
             return N(gcdcAcB*ppH);
+          }
         }
 
         G_m= H;
@@ -3912,7 +4000,11 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
       } while (1); //end of second do
     }
     else
+    {
+      if (inextension)
+        prune (cleanUp);
       return N(gcdcAcB*modGCDFp (ppA, ppB));
+    }
   } while (1); //end of first do
 }
 
