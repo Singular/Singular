@@ -6,8 +6,9 @@ ring R = 0,(x,d),dp;
 def r = nc_algebra(1,1);
 setring(r);
 poly L = (1+x^2*d)^4;
-def l=facFirstWeyl(L);
-testNCfac (l, L);
-l;
+list lsng = facWeyl(L);
+lsng;
+testNCfac(lsng, L);
 
+tst_status();
 tst_status(1); $

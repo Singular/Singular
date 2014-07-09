@@ -761,7 +761,8 @@ INPUT                  = $(abs_top_srcdir)/omalloc/ \
                          $(abs_top_srcdir)/libpolys/ \
                          $(abs_top_srcdir)/Singular/ \
                          $(abs_top_srcdir)/templates/ \
-			 $(abs_top_srcdir)/README.md $(abs_top_srcdir)/C_CPP_StyleGuide.md $(abs_top_srcdir)/main.dox
+                         $(abs_top_srcdir)/doc/ \
+			 $(abs_top_srcdir)/README.md $(abs_top_srcdir)/main.dox
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

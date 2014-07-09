@@ -14,8 +14,6 @@
 #include "canonicalform.h"
 #include "cf_random.h"
 
-/*BEGINPUBLIC*/
-
 /** generate a random irreducible polynomial in x of degree deg
  *
  * @warning this is done in the most naive way, i.e. a random is generated and
@@ -23,6 +21,7 @@
 **/
 CanonicalForm find_irreducible ( int deg, CFRandom & gen, const Variable & x );
 
-/*ENDPUBLIC*/
+CanonicalForm
+randomIrredpoly (int i, const Variable & x);
 
 #endif /* ! INCL_CF_IRRED_H */

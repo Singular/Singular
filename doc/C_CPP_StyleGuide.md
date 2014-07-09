@@ -20,8 +20,7 @@ In case of minor changes to this style guide, old code sources need _not_ be adj
 
 There may be collisions with other existing and widely-used style guides, e.g. when including `std` sources. Such code _may be used as it is_, i.e., it does _not_ need to be wrapped in code which conforms to the style guide at hand.
 
-See also the [Build System description](@ref bs_page).
-
+See also the [Build System description](@ref bs_page) and the [Legacy C programming style guide](@ref legacystyleguide).
 
 ## Naming Conventions
 

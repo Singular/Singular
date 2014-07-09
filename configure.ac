@@ -43,7 +43,6 @@ AC_CHECK_HEADERS(unistd.h iostream.h sys/time.h sys/times.h asm/sigcontext.h)
 
 AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv qsort_r)
 
-
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 if test -z "$DOXYGEN";
    then AC_MSG_WARN([Doxygen not found - continuing without Doxygen support])

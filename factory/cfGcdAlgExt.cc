@@ -25,6 +25,7 @@
 #include "cf_primes.h"
 #include "cf_algorithm.h"
 #include "cfGcdAlgExt.h"
+#include "cfUnivarGcd.h"
 #include "cf_map.h"
 #include "cf_generator.h"
 #include "facMul.h"
@@ -346,21 +347,6 @@ void tryEuclid( const CanonicalForm & A, const CanonicalForm & B, const Canonica
   }
 }
 #endif
-
-bool hasFirstAlgVar( const CanonicalForm & f, Variable & a )
-{
-  if( f.inBaseDomain() ) // f has NO alg. variable
-    return false;
-  if( f.level()<0 ) // f has only alg. vars, so take the first one
-  {
-    a = f.mvar();
-    return true;
-  }
-  for(CFIterator i=f; i.hasTerms(); i++)
-    if( hasFirstAlgVar( i.coeff(), a ))
-      return true; // 'a' is already set
-  return false;
-}
 
 CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G );
 int * leadDeg(const CanonicalForm & f, int *degs);

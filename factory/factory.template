@@ -76,9 +76,6 @@
 #include "cf_random.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
-#include "cf_irred.h"
-
-/*MAKEHEADER PUBLIC ONLY*/
 #include "fac_util.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
@@ -112,9 +109,6 @@
 #include "cfModResultant.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
-#include "cfGcdAlgExt.h"
-
-/*MAKEHEADER PUBLIC ONLY*/
 #include "facAlgFunc.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
@@ -122,6 +116,9 @@
 
 /*MAKEHEADER PUBLIC ONLY*/
 #include "cfCharSets.h"
+
+/*MAKEHEADER PUBLIC ONLY*/
+#include "cfUnivarGcd.h"
 
 
 #endif /* ! INCL_FACTORY_H */

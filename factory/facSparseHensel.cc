@@ -19,7 +19,7 @@
 #include "cf_assert.h"
 #include "facSparseHensel.h"
 #include "cf_algorithm.h"
-#include "cf_gcd_smallp.h"
+#include "cfModGcd.h"
 #include "facFqFactorize.h"
 
 int

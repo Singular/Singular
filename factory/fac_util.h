@@ -46,8 +46,6 @@ CanonicalForm replaceLc( const CanonicalForm & f, const CanonicalForm & c );
 
 bool gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap, int & d );
 
-CanonicalForm ezgcd ( const CanonicalForm & f, const CanonicalForm & g );
-
 void extgcd ( const CanonicalForm & a, const CanonicalForm & b, CanonicalForm & S, CanonicalForm & T, const modpk & pk );
 
 #endif /* ! INCL_FAC_UTIL_H */

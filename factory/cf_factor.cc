@@ -26,7 +26,6 @@
 #include "facFqFactorize.h"
 #include "facFqSquarefree.h"
 #include "cf_map.h"
-#include "cfGcdAlgExt.h"
 #include "facAlgExt.h"
 #include "facFactorize.h"
 #include "singext.h"
