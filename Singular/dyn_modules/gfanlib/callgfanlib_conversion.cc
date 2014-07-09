@@ -95,6 +95,14 @@ gfan::ZVector intStar2ZVector(const int d, const int* i)
   return zv;
 }
 
+gfan::ZVector wvhdlEntryToZVector(const int n, const int* wvhdl0)
+{
+  gfan::ZVector zv(n);
+  for(int j=0; j<n; j++)
+    zv[j]=wvhdl0[j];
+  return zv;
+}
+
 int* ZVectorToIntStar(const gfan::ZVector &v, bool &overflow)
 {
   int* w = (int*) omAlloc(v.size()*sizeof(int));

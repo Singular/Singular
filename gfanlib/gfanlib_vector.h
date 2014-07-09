@@ -310,6 +310,20 @@ public:
     assert(!typ::isField());
     return (*this)/gcd();
   }
+
+  void debugPrint()const
+  {
+    std::stringstream s;
+    s<<"(";
+    for(typename std::vector<typ>::const_iterator i=this->v.begin();i!=this->v.end();i++)
+    {
+      if(i!=this->v.begin()) s<<",";
+      s<<*i;
+    }
+    s<<")"<<std::endl;
+    std::cout << s.str();
+    return;
+  }
 };
 
 typedef Vector<Integer> ZVector;

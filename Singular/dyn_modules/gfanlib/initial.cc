@@ -26,20 +26,40 @@ long wDeg(const poly p, const ring r, const gfan::ZVector w)
 }
 
 /***
- * Returns the first terms of p of same weighted degree under w,
- * this is not necessarily the initial form of p with respect to w!
+ * Checks if p is sorted with respect to w.
+ **/
+static bool checkSloppyInput(const poly p, const ring r, const gfan::ZVector w)
+{
+  long d = wDeg(p,r,w);
+  for (poly currentTerm = p->next; currentTerm; pIter(currentTerm))
+  {
+    long e = wDeg(currentTerm,r,w);
+    if (e>d)
+      return false;
+  }
+  return true;
+}
+
+/***
+ * Returns the terms of p of same weighted degree under w as the leading term.
+ * Coincides with the initial form of p with respect to w if and only if p was already
+ * sorted with respect to w in the sense that the leading term is of highest w-degree.
  **/
 poly sloppyInitial(const poly p, const ring r, const gfan::ZVector w)
 {
-  int n = r->N;
+  assume(checkSloppyInput(p,r,w));
+  int n = rVar(r);
   int* expv = (int*) omAlloc(n*sizeof(int));
   poly q0 = p_Head(p,r);
   poly q1 = q0;
   long d = wDeg(p,r,w);
-  for (poly currentTerm = p->next; wDeg(currentTerm,r,w)==d; pIter(currentTerm))
+  for (poly currentTerm = p->next; currentTerm; pIter(currentTerm))
   {
-    pNext(q1) = p_Head(currentTerm,r);
-    pIter(q1);
+    if (wDeg(currentTerm,r,w) == d)
+    {
+      pNext(q1) = p_Head(currentTerm,r);
+      pIter(q1);
+    }
   }
   omFreeSize(expv,n*sizeof(int));
   return q0;
@@ -47,6 +67,9 @@ poly sloppyInitial(const poly p, const ring r, const gfan::ZVector w)
 
 /***
  * Runs the above procedure over all generators of an ideal.
+ * Coincides with the initial ideal of I with respect to w if and only if
+ * the elements of I were already sorted with respect to w and
+ * I is a standard basis form with respect to w.
  **/
 ideal sloppyInitial(const ideal I, const ring r, const gfan::ZVector w)
 {

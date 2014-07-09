@@ -4,8 +4,9 @@
 #include <groebnerCone.h>
 #include <tropicalStrategy.h>
 
-setOfGroebnerConeData groebnerNeighbours(const groebnerConeData sigma, const tropicalStrategy currentCase);
-setOfGroebnerConeData tropicalNeighbours(const groebnerConeData sigma, const tropicalStrategy currentCase);
+gfan::ZCone sloppyGroebnerCone(const ideal I, const ring r, const gfan::ZVector w);
+groebnerCones groebnerNeighbours(const groebnerCone sigma, const tropicalStrategy currentCase);
+groebnerCones tropicalNeighbours(const groebnerCone sigma, const tropicalStrategy currentCase);
 BOOLEAN tropicalNeighbours(leftv res, leftv args);
 
 #endif

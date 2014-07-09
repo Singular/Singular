@@ -16,16 +16,13 @@
 static matrix divisionDiscardingRemainder(const poly f, const ideal G, const ring r)
 {
   ring origin = currRing;
-  if (currRing != r) rChangeCurrRing(r);
+  rComplete(r);
+  if (origin != r) rChangeCurrRing(r);
   ideal F = idInit(1); F->m[0]=f;
-  ideal Rest; matrix U;
-  ideal m = idLift(G,F,&Rest,FALSE,TRUE,TRUE,&U);
-  id_Delete((ideal*)&U, r);
+  ideal m = idLift(G,F,NULL,FALSE,FALSE);
   F->m[0]=NULL; id_Delete(&F, currRing);
   matrix Q = id_Module2formatedMatrix(m,IDELEMS(G),1,currRing);
-  assume(Rest->m[0] == NULL);
-  id_Delete((ideal*) &Rest, r);
-  if (currRing != origin) rChangeCurrRing(origin);
+  if (origin != r) rChangeCurrRing(origin);
   return Q;
 }
 
@@ -48,8 +45,10 @@ BOOLEAN dwr0(leftv res, leftv args)
 #endif
 
 /***
- * Computes a witness g of the w-homogeneous m in ideal I in the ring r,
- * such that in_w(g)=m, where w is the uppermost weight vector of r.
+ * Let w be the uppermost weight vector in the matrix defining the ordering on r.
+ * Let I be a Groebner basis of an ideal in r, inI its initial form with respect w.
+ * Given an w-homogeneous element m of inI, computes a witness g of m in I,
+ * i.e. g in I such that in_w(g)=m.
  **/
 poly witness(const poly m, const ideal I, const ideal inI, const ring r)
 {
@@ -88,96 +87,3 @@ BOOLEAN witness0(leftv res, leftv args)
   return FALSE;
 }
 #endif
-
-
-/***
- * Suppose r and s the same ring but with two adjacent orderings,
- * w a weight vector in the relative interior of their common facet.
- * Given a standard basis of an ideal I with respect to the ordering of r,
- * a standard basis of its w-initial ideal inI with respect to
- * the ordering of s, computes a standard basis of I with respect to
- * the ordering of s.
- **/
-ideal lift(const ideal I, const ring r, const ideal inI, const ring s)
-{
-  nMapFunc identity = n_SetMap(r->cf,s->cf);
-  int k = idSize(I); ideal Is = idInit(k);
-  for (int i=0; i<k; i++)
-    Is->m[i] = p_PermPoly(I->m[i],NULL,r,s,identity,NULL,0);
-  ideal J = idInit(k);
-  for (int i=0; i<k; i++)
-    J->m[i] = witness(inI->m[i],Is,inI,s);
-  id_Delete(&Is,s);
-  return J;
-}
-
-void deleteOrdering(ring r)
-{
-  if (r->order != NULL)
-  {
-    int i=rBlocks(r);
-    assume(r->block0 != NULL && r->block1 != NULL && r->wvhdl != NULL);
-    // delete order
-    omFreeSize((ADDRESS)r->order,i*sizeof(int));
-    omFreeSize((ADDRESS)r->block0,i*sizeof(int));
-    omFreeSize((ADDRESS)r->block1,i*sizeof(int));
-    // delete weights
-    for (int j=0; j<i; j++)
-    {
-      if (r->wvhdl[j]!=NULL)
-        omFree(r->wvhdl[j]);
-    }
-    omFreeSize((ADDRESS)r->wvhdl,i*sizeof(int *));
-  }
-  else
-    assume(r->block0 == NULL && r->block1 == NULL && r->wvhdl == NULL);
-  return;
-}
-
-std::pair<ideal,ring> flip(const ideal I, const ring r, const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal, const tropicalStrategy currentCase)
-{
-  gfan::ZVector (*adjustWeight0)(gfan::ZVector w);
-  adjustWeight0 = currentCase.adjustWeightForHomogeneity;
-  gfan::ZVector (*adjustWeight1)(gfan::ZVector v, gfan::ZVector w);
-  adjustWeight1 = currentCase.adjustWeightUnderHomogeneity;
-
-  gfan::ZVector adjustedInteriorPoint = adjustWeight0(interiorPoint);
-  gfan::ZVector adjustedFacetNormal = adjustWeight1(facetNormal,adjustedInteriorPoint);
-
-  ring origin = currRing;
-  ideal inIr = initial(I,r,interiorPoint);
-
-  bool ok;
-  ring s = rCopy0(r);
-  int n = rVar(s);
-  deleteOrdering(s);
-  s->order = (int*) omAlloc0(4*sizeof(int));
-  s->block0 = (int*) omAlloc0(4*sizeof(int));
-  s->block1 = (int*) omAlloc0(4*sizeof(int));
-  s->wvhdl = (int**) omAlloc0(4*sizeof(int));
-  s->order[0] = ringorder_a;
-  s->block0[0] = 1;
-  s->block1[0] = n;
-  s->wvhdl[0] = ZVectorToIntStar(adjustedInteriorPoint,ok);
-  s->order[1] = ringorder_wp;
-  s->block0[1] = 1;
-  s->block1[1] = n;
-  s->wvhdl[1] = ZVectorToIntStar(adjustedFacetNormal,ok);
-  s->order[2] = ringorder_C;
-  rComplete(s,1);
-  rChangeCurrRing(s);
-  nMapFunc identity = n_SetMap(r->cf,currRing->cf);
-
-  int k = idSize(I); ideal inIs = idInit(k);
-  for (int i=0; i<k; i++)
-    inIs->m[i] = p_PermPoly(inIr->m[i],NULL,r,s,identity,NULL,0);
-  intvec* nullVector = NULL;
-  ideal inIsGB = kStd(inIs,currQuotient,testHomog,&nullVector);
-  ideal IsGB = lift(I,r,inIsGB,s);
-
-  rChangeCurrRing(origin);
-  id_Delete(&inIr,r);
-  id_Delete(&inIs,s);
-  id_Delete(&inIsGB,s);
-  return std::make_pair(IsGB,s);
-}

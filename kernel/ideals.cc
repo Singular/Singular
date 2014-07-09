@@ -2658,3 +2658,9 @@ void idDelEquals(ideal id)
   }
   omFreeSize((ADDRESS)(id_sort), idsize*sizeof(poly_sort));
 }
+
+void id_Write(ideal id, ring r)
+{
+  for (int i=0; i<idSize(id); i++)
+    p_Write(id->m[i], r, r);
+}

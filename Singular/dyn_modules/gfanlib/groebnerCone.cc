@@ -1,3 +1,5 @@
+#include <utility>
+
 #include <kernel/kstd1.h>
 #include <kernel/ideals.h>
 #include <Singular/ipid.h>
@@ -7,111 +9,80 @@
 #include <libpolys/polys/prCopy.h>
 
 #include <gfanlib/gfanlib.h>
+#include <gfanlib/gfanlib_matrix.h>
 
-#include <callgfanlib_conversion.h>
+#include <tropicalStrategy.h>
 #include <groebnerCone.h>
+#include <callgfanlib_conversion.h>
+#include <containsMonomial.h>
 #include <initial.h>
+#include <flip.h>
+#include <tropicalCurves.h>
+#include <bbcone.h>
 
-/***
- * Computes the Groebner cone of a polynomial g in ring r containing w relatively.
- * Assumes that r has a weighted ordering with weight in the said Groebner cone.
- **/
-gfan::ZCone sloppyGroebnerCone(const poly g, const ring r, const gfan::ZVector w)
+static bool checkPolynomialInput(const ideal I, const ring r)
 {
-  int n = r->N;
-  gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-  gfan::ZMatrix equations = gfan::ZMatrix(0,n);
+  if (r) rTest(r);
+  if (I && r) id_Test(I,r);
+  return ((!I) || (I && r));
+}
 
-  int* expv = (int*) omAlloc((n+1)*sizeof(int));
-  p_GetExpV(g,expv,r);
-  gfan::ZVector leadexp = intStar2ZVector(n,expv);
-  long d = wDeg(g,r,w);
-
-  poly h=g->next;
-  for (; h && wDeg(h,r,w)==d; pIter(h))
+static bool checkOrderingAndCone(const ring r, const gfan::ZCone zc)
+{
+  if (r)
   {
-    p_GetExpV(h,expv,r);
-    equations.appendRow(leadexp-intStar2ZVector(n,expv));
+    int n = rVar(r); int* w = r->wvhdl[0];
+    gfan::ZVector v = wvhdlEntryToZVector(n,w);
+    if (!zc.contains(v))
+    {
+      std::cout << "ERROR: weight of ordering not inside Groebner cone!" << std::endl
+                << "cone: " << std::endl
+                << toString(&zc)
+                << "weight: " << std::endl
+                << v << std::endl;
+    }
+    return zc.contains(v);
   }
-
-  for (; h; pIter(h))
-  {
-    p_GetExpV(h,expv,r);
-    inequalities.appendRow(leadexp-intStar2ZVector(n,expv));
-  }
-
-  omFreeSize(expv,(n+1)*sizeof(int));
-  return gfan::ZCone(inequalities,equations);
+  return (zc.dimension()==0);
 }
 
-/***
- * Computes the Groebner cone of an ideal I in ring r containing w relatively.
- * Assumes that r has a weighted ordering with weight in the said Groebner cone.
- **/
-gfan::ZCone sloppyGroebnerCone(const ideal I, const ring r, const gfan::ZVector w)
+static bool checkPolyhedralInput(const gfan::ZCone zc, const gfan::ZVector p)
 {
-  int k = idSize(I);
-  gfan::ZCone zc = gfan::ZCone(r->N);
-  for (int i=0; i<k; i++)
-    zc = intersection(zc,sloppyGroebnerCone(I->m[i],r,w));
-  return zc;
+  return zc.containsRelatively(p);
 }
 
-/***
- * Computes the Groebner cone of a polynomial g in ring r containing w relatively.
- **/
-gfan::ZCone groebnerCone(const poly g, const ring r, const gfan::ZVector w)
+groebnerCone::groebnerCone():
+  polynomialIdeal(NULL),
+  polynomialRing(NULL),
+  polyhedralCone(gfan::ZCone(0)),
+  interiorPoint(gfan::ZVector(0)),
+  currentStrategy(NULL)
 {
-  int n = r->N;
-  gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-  gfan::ZMatrix equations = gfan::ZMatrix(0,n);
-
-  int* expv = (int*) omAlloc((n+1)*sizeof(int));
-  p_GetExpV(g,expv,r);
-  gfan::ZVector leadexp = intStar2ZVector(n,expv);
-  long d = wDeg(g,r,w);
-
-  for (poly h=g->next; h; pIter(h))
-  {
-    p_GetExpV(h,expv,r);
-    if (wDeg(h,r,w)<d)
-      inequalities.appendRow(leadexp-intStar2ZVector(n,expv));
-    else
-      equations.appendRow(leadexp-intStar2ZVector(n,expv));
-  }
-
-  omFreeSize(expv,(n+1)*sizeof(int));
-  return gfan::ZCone(inequalities,equations);
 }
 
-/***
- * Computes the Groebner cone of an ideal I in ring r containing w relatively.
- * Assumes that r has a weighted ordering with weight in the said Groebner cone.
- **/
-gfan::ZCone groebnerCone(const ideal I, const ring r, const gfan::ZVector w)
+groebnerCone::groebnerCone(const ideal I, const ring r, const tropicalStrategy& currentCase):
+  polynomialIdeal(NULL),
+  polynomialRing(NULL),
+  currentStrategy(&currentCase)
 {
-  int k = idSize(I);
-  gfan::ZCone zc = gfan::ZCone(r->N);
-  for (int i=0; i<k; i++)
-    zc = intersection(zc,groebnerCone(I->m[i],r,w));
-  return zc;
-}
+  assume(checkPolynomialInput(I,r));
+  if (I) polynomialIdeal = id_Copy(I,r);
+  if (r) polynomialRing = rCopy(r);
 
-gfan::ZCone fullGroebnerCone(const ideal &I, const ring &r)
-{
-  int n = rVar(r);
+  int n = rVar(polynomialRing);
   poly g = NULL;
   int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
   int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
   gfan::ZVector leadexpw = gfan::ZVector(n);
   gfan::ZVector tailexpw = gfan::ZVector(n);
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-  for (int i=0; i<IDELEMS(I); i++)
+  for (int i=0; i<idSize(polynomialIdeal); i++)
   {
-    g = (poly) I->m[i]; pGetExpV(g,leadexpv);
+    g = polynomialIdeal->m[i];
+    pGetExpV(g,leadexpv);
     leadexpw = intStar2ZVector(n, leadexpv);
     pIter(g);
-    while (g != NULL)
+    while (g)
     {
       pGetExpV(g,tailexpv);
       tailexpw = intStar2ZVector(n, tailexpv);
@@ -121,181 +92,319 @@ gfan::ZCone fullGroebnerCone(const ideal &I, const ring &r)
   }
   omFreeSize(leadexpv,(n+1)*sizeof(int));
   omFreeSize(tailexpv,(n+1)*sizeof(int));
-  return gfan::ZCone(inequalities,gfan::ZMatrix(0, inequalities.getWidth()));
+  polyhedralCone = gfan::ZCone(inequalities,gfan::ZMatrix(0, inequalities.getWidth()));
+  interiorPoint = polyhedralCone.getRelativeInteriorPoint();
+  assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
 }
 
-groebnerCone::groebnerCone():
-  I(NULL),
-  r(NULL),
-  c(gfan::ZCone(0)),
-  p(gfan::ZVector(0))
+static bool checkOrderingAndWeight(const ideal I, const ring r, const gfan::ZVector w, const tropicalStrategy& currentCase)
 {
+  groebnerCone sigma(I,r,currentCase);
+  gfan::ZCone zc = sigma.getPolyhedralCone();
+  return zc.contains(w);
+}
+
+groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, const tropicalStrategy& currentCase):
+  polynomialIdeal(NULL),
+  polynomialRing(NULL),
+  currentStrategy(&currentCase)
+{
+  assume(checkPolynomialInput(I,r));
+  if (I) polynomialIdeal = id_Copy(I,r);
+  if (r) polynomialRing = rCopy(r);
+
+  int n = rVar(r);
+  gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
+  gfan::ZMatrix equations = gfan::ZMatrix(0,n);
+  int* expv = (int*) omAlloc((n+1)*sizeof(int));
+  for (int i=0; i<idSize(polynomialIdeal); i++)
+  {
+    poly g = polynomialIdeal->m[i];
+    pGetExpV(g,expv);
+    gfan::ZVector leadexpv = intStar2ZVector(n,expv);
+    long d = wDeg(g,polynomialRing,w);
+    for (pIter(g); g; pIter(g))
+    {
+      pGetExpV(g,expv); gfan::ZVector tailexpv = intStar2ZVector(n,expv);
+      if (wDeg(g,polynomialRing,w)==d)
+        equations.appendRow(leadexpv-tailexpv);
+      else
+      {
+        assume(wDeg(g,polynomialRing,w)<d);
+        inequalities.appendRow(leadexpv-tailexpv);
+      }
+    }
+  }
+  omFreeSize(expv,(n+1)*sizeof(int));
+
+  polyhedralCone = gfan::ZCone(inequalities,equations);
+  interiorPoint = polyhedralCone.getRelativeInteriorPoint();
+  assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
 }
 
 groebnerCone::groebnerCone(const groebnerCone &sigma):
-  I(id_Copy(sigma.getIdeal(),sigma.getRing())),
-  r(rCopy(sigma.getRing())),
-  c(gfan::ZCone(sigma.getCone())),
-  p(gfan::ZVector(sigma.getInteriorPoint()))
+  polynomialIdeal(NULL),
+  polynomialRing(NULL),
+  polyhedralCone(gfan::ZCone(sigma.getPolyhedralCone())),
+  interiorPoint(gfan::ZVector(sigma.getInteriorPoint())),
+  currentStrategy(sigma.getTropicalStrategy())
 {
-}
-
-groebnerCone::groebnerCone(const ideal &J, const ring &s, const gfan::ZCone &d, const gfan::ZVector &q):
-  I(J),
-  r(s),
-  c(d),
-  p(q)
-{
+  assume(checkPolynomialInput(sigma.getPolynomialIdeal(),sigma.getPolynomialRing()));
+  assume(checkOrderingAndCone(sigma.getPolynomialRing(),sigma.getPolyhedralCone()));
+  assume(checkPolyhedralInput(sigma.getPolyhedralCone(),sigma.getInteriorPoint()));
+  if (sigma.getPolynomialIdeal()) polynomialIdeal = id_Copy(sigma.getPolynomialIdeal(),sigma.getPolynomialRing());
+  if (sigma.getPolynomialRing()) polynomialRing = rCopy(sigma.getPolynomialRing());
 }
 
 groebnerCone::~groebnerCone()
 {
-  if (I) id_Delete(&I,r);
-  if (r) rDelete(r);
+  assume(checkPolynomialInput(polynomialIdeal,polynomialRing));
+  assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
+  assume(checkPolyhedralInput(polyhedralCone,interiorPoint));
+  if (polynomialIdeal) id_Delete(&polynomialIdeal,polynomialRing);
+  if (polynomialRing) rDelete(polynomialRing);
+}
+
+groebnerCone& groebnerCone::operator=(const groebnerCone& sigma)
+{
+  assume(checkPolynomialInput(sigma.getPolynomialIdeal(),sigma.getPolynomialRing()));
+  assume(checkOrderingAndCone(sigma.getPolynomialRing(),sigma.getPolyhedralCone()));
+  assume(checkPolyhedralInput(sigma.getPolyhedralCone(),sigma.getInteriorPoint()));
+  if (sigma.getPolynomialIdeal()) polynomialIdeal = id_Copy(sigma.getPolynomialIdeal(),sigma.getPolynomialRing());
+  if (sigma.getPolynomialRing()) polynomialRing = rCopy(sigma.getPolynomialRing());
+  polyhedralCone = sigma.getPolyhedralCone();
+  interiorPoint = sigma.getInteriorPoint();
+  currentStrategy = sigma.getTropicalStrategy();
+  return *this;
 }
 
 
-groebnerCone maximalGroebnerConeData(ideal I, const ring r)
+/***
+ * Returns a point in the tropical variety, if the groebnerCone contains one.
+ * Returns an empty vector otherwise.
+ **/
+gfan::ZVector groebnerCone::tropicalPoint() const
 {
-  int n = rVar(r);
-  poly g = NULL;
-  int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
-  int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
-  gfan::ZVector leadexpw = gfan::ZVector(n);
-  gfan::ZVector tailexpw = gfan::ZVector(n);
-  gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-  for (int i=0; i<IDELEMS(I); i++)
+  ideal I = polynomialIdeal;
+  ring r = polynomialRing;
+  gfan::ZCone zc = polyhedralCone;
+  gfan::ZMatrix R = zc.extremeRays();
+  assume(checkOrderingAndCone(r,zc));
+  for (int i=0; i<R.getHeight(); i++)
   {
-    g = (poly) I->m[i]; pGetExpV(g,leadexpv);
-    leadexpw = intStar2ZVector(n, leadexpv);
-    pIter(g);
-    while (g != NULL)
+    ideal inI = initial(I,r,R[i]);
+    poly s = checkForMonomialViaSuddenSaturation(inI,r);
+    id_Delete(&inI,r);
+    if (s == NULL)
     {
-      pGetExpV(g,tailexpv);
-      tailexpw = intStar2ZVector(n, tailexpv);
-      inequalities.appendRow(leadexpw-tailexpw);
-      pIter(g);
+      p_Delete(&s,r);
+      return R[i];
     }
+    p_Delete(&s,r);
   }
-  omFreeSize(leadexpv,(n+1)*sizeof(int));
-  omFreeSize(tailexpv,(n+1)*sizeof(int));
-  gfan::ZCone zc = gfan::ZCone(inequalities,gfan::ZMatrix(0, inequalities.getWidth()));
-  gfan::ZVector p = zc.getRelativeInteriorPoint();
-  return groebnerCone(I,r,zc,p);
+  return gfan::ZVector();
+}
+
+bool groebnerCone::checkFlipConeInput(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const
+{
+  /* check first whether interiorPoint lies on the boundary of the cone */
+  if (!polyhedralCone.contains(interiorPoint))
+  {
+    std::cout << "ERROR: interiorPoint is not contained in the Groebner cone!" << std::endl
+              << "cone: " << std::endl
+              << toString(&polyhedralCone)
+              << "interiorPoint:" << std::endl
+              << interiorPoint << std::endl;
+    return false;
+  }
+  gfan::ZCone hopefullyAFacet = polyhedralCone.faceContaining(interiorPoint);
+  if (hopefullyAFacet.dimension()!=(polyhedralCone.dimension()-1))
+  {
+    std::cout << "ERROR: interiorPoint is not contained in the interior of a facet!" << std::endl
+              << "cone: " << std::endl
+              << toString(&polyhedralCone)
+              << "interiorPoint:" << std::endl
+              << interiorPoint << std::endl;
+    return false;
+  }
+  /* check whether facet normal points outwards */
+  gfan::ZMatrix halfSpaceInequality(0,facetNormal.size());
+  halfSpaceInequality.appendRow(facetNormal);
+  gfan::ZCone halfSpace = gfan::ZCone(halfSpaceInequality,gfan::ZMatrix(0,facetNormal.size()));
+  hopefullyAFacet = intersection(polyhedralCone, halfSpace);
+  if (hopefullyAFacet.dimension()!=(polyhedralCone.dimension()-1))
+  {
+    std::cout << "ERROR: facetNormal is not pointing outwards!" << std::endl
+              << "cone: " << std::endl
+              << toString(&polyhedralCone)
+              << "facetNormal:" << std::endl
+              << facetNormal << std::endl;
+    return false;
+  }
+  return true;
 }
 
 /***
- * Given a general ring r with any ordering, changes the ordering to wp(-w)
+ * Given an interior point on the facet and the outer normal factor on the facet,
+ * returns the adjacent groebnerCone sharing that facet
  **/
-void changeOrderingTo_wp(ring r, const gfan::ZVector w)
+groebnerCone groebnerCone::flipCone(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const
 {
-  omFree(r->order);
-  r->order  = (int*) omAlloc0(3*sizeof(int));
-  omFree(r->block0);
-  r->block0 = (int*) omAlloc0(3*sizeof(int));
-  omFree(r->block1);
-  r->block1 = (int*) omAlloc0(3*sizeof(int));
-  for (int i=0; r->wvhdl[i]; i++) omFree(r->wvhdl[i]);
-  omFree(r->wvhdl);
-  r->wvhdl  = (int**) omAlloc0(3*sizeof(int*));
-
-  bool ok = false;
-  r->order[0]  = ringorder_wp;
-  r->block0[0] = 1;
-  r->block1[0] = r->N;
-  r->wvhdl[0]  = ZVectorToIntStar(w,ok);
-  r->order[1]  = ringorder_C;
-  rComplete(r,1);
+  assume(this->checkFlipConeInput(interiorPoint,facetNormal));
+  /* Note: the polynomial ring created will have a weighted ordering with respect to interiorPoint
+   *   and with a weighted ordering with respect to facetNormal as tiebreaker.
+   *   Hence it is sufficient to compute the initial form with respect to facetNormal,
+   *   to obtain an initial form with respect to interiorPoint+e*facetNormal,
+   *   for e>0 sufficiently small */
+  std::pair<ideal,ring> flipped = flip(polynomialIdeal,polynomialRing,interiorPoint,facetNormal,*currentStrategy);
+  assume(checkPolynomialInput(flipped.first,flipped.second));
+  groebnerCone flippedCone(flipped.first, flipped.second, facetNormal, *currentStrategy);
+  return flippedCone;
 }
 
-groebnerCone::groebnerCone(const ideal J, const ring s, const gfan::ZVector w)
+
+/***
+ * Computes a relative interior point and an outer normal vector for each facet of zc
+ **/
+static std::pair<gfan::ZMatrix,gfan::ZMatrix> interiorPointsAndNormalsOfFacets(const gfan::ZCone zc)
 {
-  r = rCopy(s);
-  changeOrderingTo_wp(r,w);
-  rChangeCurrRing(r);
+  gfan::ZMatrix inequalities = zc.getFacets();
+  gfan::ZMatrix equations = zc.getImpliedEquations();
+  int r = inequalities.getHeight();
+  int c = inequalities.getWidth();
 
-  int k = idSize(J); I = idInit(k);
-  nMapFunc identityMap = n_SetMap(s->cf,r->cf);
-  for (int i=0; i<k; i++)
-    I->m[i] = p_PermPoly(J->m[i],NULL,s,r,identityMap,NULL,0);
-  intvec* nullVector = NULL;
-  I = kStd(I,currQuotient,testHomog,&nullVector);
+  /* our cone has r facets, if r==0 return empty matrices */
+  gfan::ZMatrix relativeInteriorPoints = gfan::ZMatrix(0,c);
+  gfan::ZMatrix outerFacetNormals = gfan::ZMatrix(0,c);
+  if (r==0)
+    return std::make_pair(relativeInteriorPoints,outerFacetNormals);
 
-  c = sloppyGroebnerCone(I,r,w);
-  p = c.getRelativeInteriorPoint();
+  /* next we iterate over each of the r facets,
+   * build the respective cone and add it to the list
+   * this is the i=0 case */
+  gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
+  gfan::ZMatrix newEquations = equations;
+  newEquations.appendRow(inequalities[0]);
+  gfan::ZCone facet = gfan::ZCone(newInequalities,newEquations);
+  relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
+  assume(zc.contains(relativeInteriorPoints[0]) && !zc.containsRelatively(relativeInteriorPoints[0]));
+  outerFacetNormals.appendRow(-inequalities[0]);
+
+  /* these are the cases i=1,...,r-2 */
+  for (int i=1; i<r-1; i++)
+  {
+    newInequalities = inequalities.submatrix(0,0,i,c);
+    newInequalities.append(inequalities.submatrix(i+1,0,r,c));
+    newEquations = equations;
+    newEquations.appendRow(inequalities[i]);
+    facet = gfan::ZCone(newInequalities,newEquations);
+    relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
+    assume(zc.contains(relativeInteriorPoints[i]) && !zc.containsRelatively(relativeInteriorPoints[i]));
+    outerFacetNormals.appendRow(-inequalities[i]);
+  }
+
+  /* this is the i=r-1 case */
+  newInequalities = inequalities.submatrix(0,0,r-1,c);
+  newEquations = equations;
+  newEquations.appendRow(inequalities[r-1]);
+  facet = gfan::ZCone(newInequalities,newEquations);
+  relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
+  assume(zc.contains(relativeInteriorPoints[r-1]) && !zc.containsRelatively(relativeInteriorPoints[r-1]));
+  outerFacetNormals.appendRow(-inequalities[r-1]);
+
+  return std::make_pair(relativeInteriorPoints,outerFacetNormals);
 }
 
-groebnerCone::groebnerCone(const ideal J, const ring s, const gfan::ZCone d)
+
+/***
+ * Returns a complete list of neighboring Groebner cones.
+ **/
+groebnerCones groebnerCone::groebnerNeighbours() const
 {
-  c = d;
-  p = d.getRelativeInteriorPoint();
+  std::pair<gfan::ZMatrix, gfan::ZMatrix> facetsData = interiorPointsAndNormalsOfFacets(polyhedralCone);
+  gfan::ZMatrix interiorPoints = facetsData.first;
+  gfan::ZMatrix facetNormals = facetsData.second;
 
-  r = rCopy(s);
-  changeOrderingTo_wp(r,p);
-  rChangeCurrRing(r);
+  groebnerCones neighbours;
+  for (int i=0; i<interiorPoints.getHeight(); i++)
+    neighbours.insert(this->flipCone(interiorPoints[i],facetNormals[i]));
 
-  int k = idSize(J); I = idInit(k);
-  nMapFunc identityMap = n_SetMap(s->cf,r->cf);
-  for (int i=0; i<k; i++)
-    I->m[i] = p_PermPoly(J->m[i],NULL,s,r,identityMap,NULL,0);
-  intvec* nullVector = NULL;
-  I = kStd(I,currQuotient,testHomog,&nullVector);
+  return neighbours;
 }
 
-// /***
-//  * Given a general ring r with any ordering, changes the ordering to a(v),ws(-w)
-//  **/
-// bool changetoAWSRing(ring r, const gfan::ZVector v, const gfan::ZVector w)
-// {
-//   omFree(r->order);
-//   r->order  = (int*) omAlloc0(4*sizeof(int));
-//   omFree(r->block0);
-//   r->block0 = (int*) omAlloc0(4*sizeof(int));
-//   omFree(r->block1);
-//   r->block1 = (int*) omAlloc0(4*sizeof(int));
-//   for (int i=0; r->wvhdl[i]; i++)
-//   { omFree(r->wvhdl[i]); }
-//   omFree(r->wvhdl);
-//   r->wvhdl  = (int**) omAlloc0(4*sizeof(int*));
 
-//   bool ok = false;
-//   r->order[0]  = ringorder_a;
-//   r->block0[0] = 1;
-//   r->block1[0] = r->N;
-//   r->wvhdl[0]  = ZVectorToIntStar(v,ok);
-//   r->order[1]  = ringorder_ws;
-//   r->block0[1] = 1;
-//   r->block1[1] = r->N;
-//   r->wvhdl[1]  = ZVectorToIntStar(w,ok);
-//   r->order[2]  = ringorder_C;
-//   return ok;
-// }
+/***
+ * Computes a relative interior point for each facet of zc
+ **/
+static gfan::ZMatrix interiorPointsOfFacets(const gfan::ZCone zc)
+{
+  gfan::ZMatrix inequalities = zc.getFacets();
+  gfan::ZMatrix equations = zc.getImpliedEquations();
+  int r = inequalities.getHeight();
+  int c = inequalities.getWidth();
 
-// groebnerCone::groebnerCone(const ideal J, const ring s, const gfan::ZVector w)
-// {
-//   r = rCopy(s);
-//   changeOrderingTo_wp(r,w);
-//   rChangeCurrRing(r);
+  /* our cone has r facets, if r==0 return empty matrices */
+  gfan::ZMatrix relativeInteriorPoints = gfan::ZMatrix(0,c);
+  if (r==0) return relativeInteriorPoints;
 
-//   int k = idSize(J); I = idInit(k);
-//   nMapFunc identityMap = n_SetMap(s->cf,r->cf);
-//   for (int i=0; i<k; i++)
-//     I->m[i] = p_PermPoly(J->m[i],NULL,s,r,nMap,NULL,0);
-//   intvec* nullVector = NULL;
-//   I = kStd(I,currQuotient,testHomog,&nullVector);
+  /* next we iterate over each of the r facets,
+   * build the respective cone and add it to the list
+   * this is the i=0 case */
+  gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
+  gfan::ZMatrix newEquations = equations;
+  newEquations.appendRow(inequalities[0]);
+  gfan::ZCone facet = gfan::ZCone(newInequalities,newEquations);
+  relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
 
-//   c = sloppyGroebnerCone(I,r,w);
-//   p = c.getRelativeInteriorPoint();
-// }
+  /* these are the cases i=1,...,r-2 */
+  for (int i=1; i<r-1; i++)
+  {
+    newInequalities = inequalities.submatrix(0,0,i-1,c);
+    newInequalities.append(inequalities.submatrix(i+1,0,r,c));
+    newEquations = equations;
+    newEquations.appendRow(inequalities[i]);
+    facet = gfan::ZCone(newInequalities,newEquations);
+    relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
+  }
+
+  /* this is the i=r-1 case */
+  newInequalities = inequalities.submatrix(0,0,r-1,c);
+  newEquations = equations;
+  newEquations.appendRow(inequalities[r-1]);
+  facet = gfan::ZCone(newInequalities,newEquations);
+  relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
+
+  return relativeInteriorPoints;
+}
+
+
+/***
+ * Returns a complete list of neighboring Groebner cones in the tropical variety.
+ **/
+groebnerCones groebnerCone::tropicalNeighbours() const
+{
+  gfan::ZMatrix interiorPoints = interiorPointsOfFacets(polyhedralCone);
+  groebnerCones neighbours;
+  for (int i=0; i<interiorPoints.getHeight(); i++)
+  {
+    ideal initialIdeal = initial(polynomialIdeal,polynomialRing,interiorPoints[i]);
+    std::set<gfan::ZVector> rays = raysOfTropicalCurve(initialIdeal,polynomialRing,*currentStrategy);
+    groebnerCones neighbours;
+    for (std::set<gfan::ZVector>::iterator ray = rays.begin(); ray!=rays.end(); ray++)
+      neighbours.insert(this->flipCone(interiorPoints[i],*ray));
+  }
+  return neighbours;
+}
+
 
 gfan::ZFan* toFanStar(groebnerCones setOfCones)
 {
   if (setOfCones.size() > 0)
   {
-    setOfGroebnerConeData::iterator cone = setOfCones.begin();
-    gfan::ZFan* zf = new gfan::ZFan(cone->getCone().ambientDimension());
-    for (; cone!=setOfCones.end(); cone++)
-      zf->insert(cone->getCone());
+    groebnerCones::iterator sigma = setOfCones.begin();
+    gfan::ZFan* zf = new gfan::ZFan(sigma->getPolyhedralCone().ambientDimension());
+    for (; sigma!=setOfCones.end(); sigma++)
+      zf->insert(sigma->getPolyhedralCone());
     return zf;
   }
   else

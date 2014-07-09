@@ -10,35 +10,49 @@
 #include <gfanlib/gfanlib.h>
 #include <set>
 
-gfan::ZCone sloppyGroebnerCone(const poly g, const ring r, const gfan::ZVector w);
-gfan::ZCone sloppyGroebnerCone(const ideal I, const ring r, const gfan::ZVector w);
-gfan::ZCone groebnerCone(const poly g, const ring r, const gfan::ZVector w);
-gfan::ZCone groebnerCone(const ideal I, const ring r, const gfan::ZVector w);
-gfan::ZCone fullGroebnerCone(const ideal &I, const ring &r);
+#include <tropicalStrategy.h>
+
+class groebnerCone;
+struct groebnerCone_compare;
+typedef std::set<groebnerCone,groebnerCone_compare> groebnerCones;
+
 
 class groebnerCone
 {
 
 private:
-
   ideal polynomialIdeal;
   ring polynomialRing;
   gfan::ZCone polyhedralCone;
   gfan::ZVector interiorPoint;
+  const tropicalStrategy* currentStrategy;
 
 public:
-
   groebnerCone();
-  groebnerCone(const groebnerCone &sigma);
-  groebnerCone(const ideal I, const ring r, const gfan::ZCone c, const gfan::ZVector w);
-  groebnerCone(const ideal I, const ring r, const gfan::ZVector w);
-  groebnerCone(const ideal I, const ring r, const gfan::ZCone c);
+  groebnerCone(const ideal I, const ring r, const tropicalStrategy& currentCase);
+  groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, const tropicalStrategy& currentCase);
+  groebnerCone(const groebnerCone& sigma);
   ~groebnerCone();
+  groebnerCone& operator=(const groebnerCone& sigma);
 
-  ideal getPolynomialIdeal() const { return this->polynomialIdeal; };
-  ring getPolynomialRing() const { return this->poynomialRing; };
-  gfan::ZCone getPolyhedralCone() const { return this->polyhedralCone; };
-  gfan::ZVector getInteriorPoint() const { return this->interiorPoint; };
+  void deletePolynomialIdeal()
+  {
+    assume ((!polynomialIdeal) || (polynomialIdeal && polynomialRing));
+    if (polynomialIdeal) id_Delete(&polynomialIdeal,polynomialRing);
+  }
+
+  void deletePolynomialRing()
+  {
+    assume ((!polynomialIdeal) || (polynomialIdeal && polynomialRing));
+    if (polynomialRing) rDelete(polynomialRing);
+    polynomialRing = NULL;
+  }
+
+  ideal getPolynomialIdeal() const { return polynomialIdeal; };
+  ring getPolynomialRing() const { return polynomialRing; };
+  gfan::ZCone getPolyhedralCone() const { return polyhedralCone; };
+  gfan::ZVector getInteriorPoint() const { return interiorPoint; };
+  const tropicalStrategy* getTropicalStrategy() const {return currentStrategy; };
 
   friend struct groebnerCone_compare;
 
@@ -49,12 +63,21 @@ public:
   gfan::ZVector tropicalPoint() const;
 
   /***
-   * Given a point w in the relative interior of a facet
-   * and a direction u away from the groebnerCone,
-   * computes the adjacent neighbour in direction u
-   * sharing the facet that contains w.
+   * Given an interior point on the facet and the outer normal factor on the facet,
+   * returns the adjacent groebnerCone sharing that facet
    **/
-  groebnerCone adjacentCone(const gfan::ZVector w, const gfan::ZVector u) const;
+  bool checkFlipConeInput(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
+  groebnerCone flipCone(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
+
+  /***
+   * Returns a complete list of neighboring Groebner cones.
+   **/
+  groebnerCones groebnerNeighbours() const;
+
+  /***
+   * Returns a complete list of neighboring Groebner cones in the tropical variety.
+   **/
+  groebnerCones tropicalNeighbours() const;
 };
 
 struct groebnerCone_compare
@@ -67,10 +90,6 @@ struct groebnerCone_compare
     return p1 < p2;
   }
 };
-
-groebnerCone maximalGroebnerCone(ideal I, const ring r);
-
-typedef std::set<groebnerCone,groebnerCone_compare> groebnerCones;
 
 gfan::ZFan* toFanStar(groebnerCones setOfCones);
 

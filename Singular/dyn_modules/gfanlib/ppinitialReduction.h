@@ -2,6 +2,7 @@
 #define PPINITIALREDUCTION_H
 
 #include <kernel/structs.h>
+#include <tropicalStrategy.h>
 
 #ifndef NDEBUG
 BOOLEAN pppReduce(leftv res, leftv args);
@@ -12,7 +13,7 @@ BOOLEAN ppreduceInitially3(leftv res, leftv args);
 BOOLEAN ppreduceInitially4(leftv res, leftv args);
 #endif
 
-bool ppreduceInitially(ideal I, ring r);
+bool ppreduceInitially(ideal I, ring r, number p);
 BOOLEAN ppreduceInitially(leftv res, leftv args);
 
 #endif

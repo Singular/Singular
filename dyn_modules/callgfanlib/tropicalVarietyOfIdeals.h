@@ -1,9 +1,9 @@
 #ifndef CALLGfANLIB_TROPICALVARIETYOFIDEALS
 #define CALLGfANLIB_TROPICALVARIETYOFIDEALS
 
-#include <groebnerCone.h>
+#include <libpolys/polys/simpleideals.h>
+#include <tropicalStrategy.h>
 
-setOfGroebnerConeData fullTropicalVariety(const ideal I, const ring r);
-setOfGroebnerConeData lowerTropicalVariety(const ideal I, const ring r);
+gfan::ZFan* tropicalVariety(const ideal I, const ring r, const tropicalStrategy currentStrategy);
 
 #endif

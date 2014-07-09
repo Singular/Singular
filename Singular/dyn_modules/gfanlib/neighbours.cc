@@ -10,6 +10,7 @@
 #include <groebnerCone.h>
 #include <tropicalCurves.h>
 
+
 /***
  * Computes a relative interior point and outer normal vector for each facet of zc
  **/
@@ -50,6 +51,7 @@ static gfan::ZMatrix facetInteriorPoints(const gfan::ZCone zc)
 
   return relativeInteriorPoints;
 }
+
 
 /***
  * Computes a relative interior point and outer normal vector for each facet of zc
@@ -97,47 +99,95 @@ static std::pair<gfan::ZMatrix,gfan::ZMatrix> interiorPointsAndFacetNormals(cons
   return std::make_pair(relativeInteriorPoints,outerFacetNormals);
 }
 
-setOfGroebnerConeData groebnerNeighbours(const groebnerConeData sigma, const tropicalStrategy currentCase)
-{
-  bool (*reduce)(ideal I, ring r);
-  reduce = currentCase.reduce;
 
-  gfan::ZCone zc = sigma.getCone();
+/***
+ * Assuming that r has a ordering whose maximal Groebner cone contains w,
+ * i.e. assuming that terms of highest w-degree can be found at the beginning of g,
+ * computes the Groebner cone of an ideal I in r containing w relatively.
+ **/
+gfan::ZCone sloppyGroebnerCone(const poly g, const ring r, const gfan::ZVector w)
+{
+  int n = r->N;
+  gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
+  gfan::ZMatrix equations = gfan::ZMatrix(0,n);
+
+  /* read off the leading exponent of g and compute its weighted degree */
+  int* expv = (int*) omAlloc((n+1)*sizeof(int));
+  p_GetExpV(g,expv,r);
+  gfan::ZVector leadexp = intStar2ZVector(n,expv);
+  long d = wDeg(g,r,w);
+
+  /* run through the next terms of same weighted degree and construct the equations */
+  poly h=g->next;
+  for (; h && wDeg(h,r,w)==d; pIter(h))
+  {
+    p_GetExpV(h,expv,r);
+    equations.appendRow(leadexp-intStar2ZVector(n,expv));
+  }
+
+  /* run through the remaining terms and construct the inequalities */
+  for (; h; pIter(h))
+  {
+    p_GetExpV(h,expv,r);
+    inequalities.appendRow(leadexp-intStar2ZVector(n,expv));
+  }
+
+  omFreeSize(expv,(n+1)*sizeof(int));
+  return gfan::ZCone(inequalities,equations);
+}
+gfan::ZCone sloppyGroebnerCone(const ideal I, const ring r, const gfan::ZVector w)
+{
+  int k = idSize(I);
+  gfan::ZCone zc = gfan::ZCone(r->N);
+  for (int i=0; i<k; i++)
+    zc = intersection(zc,sloppyGroebnerCone(I->m[i],r,w));
+  return zc;
+}
+
+
+groebnerCones groebnerNeighbours(const groebnerCone sigma, const tropicalStrategy currentCase)
+{
+  bool (*reduce)(ideal I, ring r, number p);
+  reduce = currentCase.reduce;
+  number p = currentCase.uniformizingParameter;
+
+  gfan::ZCone zc = sigma.getPolyhedralCone();
   std::pair<gfan::ZMatrix, gfan::ZMatrix> facets = interiorPointsAndFacetNormals(zc);
   gfan::ZMatrix interiorPoints = facets.first;
   gfan::ZMatrix facetNormals = facets.second;
-  setOfGroebnerConeData neighbours;
 
+  groebnerCones neighbours;
   for (int i=0; i<interiorPoints.getHeight(); i++)
   {
-    std::pair<ideal,ring> flipped = flip(sigma.getIdeal(),sigma.getRing(),interiorPoints[i],facetNormals[i],currentCase);
+    std::pair<ideal,ring> flipped = flip(sigma.getPolynomialIdeal(),sigma.getPolynomialRing(),interiorPoints[i],facetNormals[i],currentCase);
     ideal I = flipped.first;
     ring r = flipped.second;
-    reduce(I,r);
-    gfan::ZCone c = sloppyGroebnerCone(I,r,facetNormals[i]);
-    gfan::ZVector p = c.getRelativeInteriorPoint();
-    neighbours.insert(groebnerConeData(I,r,c,p));
+    reduce(I,r,p);
+    gfan::ZCone zc = sloppyGroebnerCone(I,r,facetNormals[i]);
+    gfan::ZVector p = zc.getRelativeInteriorPoint();
+    neighbours.insert(groebnerCone(I,r,zc,p));
   }
 
   return neighbours;
 }
 
-setOfGroebnerConeData tropicalNeighbours(const groebnerConeData sigma, const tropicalStrategy currentCase)
+groebnerCones tropicalNeighbours(const groebnerCone sigma, const tropicalStrategy currentCase)
 {
-  gfan::ZCone zc = sigma.getCone();
+  gfan::ZCone zc = sigma.getPolyhedralCone();
   int d = zc.dimension();
   gfan::ZMatrix interiorPoints = facetInteriorPoints(zc);
-  setOfGroebnerConeData neighbours;
-  bool (*red)(ideal I, ring r);
+  groebnerCones neighbours;
+  bool (*red)(ideal I, ring r, number p);
   red = currentCase.reduce;
+  number p = currentCase.uniformizingParameter;
 
   for (int i=0; i<interiorPoints.getHeight(); i++)
   {
     gfan::ZVector w = interiorPoints[i];
-    ideal I = sigma.getIdeal();
-    ring r = sigma.getRing();
+    ideal I = sigma.getPolynomialIdeal();
+    ring r = sigma.getPolynomialRing();
     ideal inI = initial(I,r,w);
-    std::set<gfan::ZCone> C = tropicalCurve(inI,r,d-1,currentCase);
+    std::set<gfan::ZCone> C = tropicalCurve(inI,r,currentCase,d-1);
     std::set<gfan::ZVector> setOfRays = rays(C);
 
     for (std::set<gfan::ZVector>::iterator ray = setOfRays.begin(); ray!=setOfRays.end(); ray++)
@@ -145,10 +195,10 @@ setOfGroebnerConeData tropicalNeighbours(const groebnerConeData sigma, const tro
       std::pair<ideal,ring> flipped = flip(I,r,w,*ray,currentCase);
       ideal I = flipped.first;
       ring r = flipped.second;
-      red(I,r);
+      red(I,r,p);
       gfan::ZCone c = sloppyGroebnerCone(I,r,*ray);
       gfan::ZVector p = c.getRelativeInteriorPoint();
-      neighbours.insert(groebnerConeData(I,r,c,p));
+      neighbours.insert(groebnerCone(I,r,c,p));
     }
   }
 

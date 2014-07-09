@@ -1,4 +1,19 @@
 #include <gfanlib/gfanlib_vector.h>
+#include <kernel/mod2.h>
+
+static bool checkForNonPositiveEntries(const gfan::ZVector w)
+{
+  for (unsigned i=1; i<w.size(); i++)
+  {
+    if (w[i].sign()<=0)
+    {
+      std::cout << "ERROR: non-positive weight in weight vector" << std::endl
+                << "weight: " << w << std::endl;
+      return false;
+    }
+  }
+  return true;
+}
 
 /***
  * Returns a strictly positive weight vector v with respect to whom
@@ -7,27 +22,34 @@
  **/
 gfan::ZVector nonvalued_adjustWeightForHomogeneity(const gfan::ZVector w)
 {
-  gfan::ZVector v=gfan::ZVector(w.size());
-  gfan::Integer min=-1;
+  /* find the smallest entry min of w */
+  gfan::Integer min=w[0];
   for (unsigned i=1; i<w.size(); i++)
     if (w[i]<min) min=w[i];
+  /* compute w+(1-min)*(1,...,1) and return it */
+  gfan::ZVector v=gfan::ZVector(w.size());
   if (min<1)
   {
-    for (unsigned i=1; i<w.size(); i++)
+    for (unsigned i=0; i<w.size(); i++)
       v[i]=w[i]-min+1;
   }
+  assume(checkForNonPositiveEntries(v));
   return v;
 }
 
 gfan::ZVector valued_adjustWeightForHomogeneity(const gfan::ZVector w)
 {
+  /* find the biggest entry max of w
+   * amongst the later entries w[1],...,w[n] */
+  gfan::Integer max=w[1];
+  for (unsigned i=2; i<w.size(); i++)
+    if (max<w[i]) max=w[i];
+  /* compute -w+(1+max)*(0,1,...,1) and return it */
   gfan::ZVector v=gfan::ZVector(w.size());
   v[0]=-w[0];
-  gfan::Integer max=-1;
-  for (unsigned i=1; i<w.size(); i++)
-    if (max<w[i]) max=w[i];
   for (unsigned i=1; i<w.size(); i++)
     v[i]=-w[i]+max+1;
+  assume(checkForNonPositiveEntries(v));
   return v;
 }
 
@@ -38,25 +60,42 @@ gfan::ZVector valued_adjustWeightForHomogeneity(const gfan::ZVector w)
  **/
 gfan::ZVector nonvalued_adjustWeightUnderHomogeneity(const gfan::ZVector e, const gfan::ZVector w)
 {
-  gfan::ZVector v=gfan::ZVector(e.size());
-  gfan::Integer min=-1;
+  assume(checkForNonPositiveEntries(w));
+  /* find k such that e+k*w is strictly positive,
+   * i.e. k such that e[i]+k*w[i] is strictly positive
+   * for all i=0,...,n */
+  gfan::Integer k((long)0);
+  if (e[0].sign()<=0)
+    k = gfan::Integer((long)1)-(gfan::Integer((long)e[0].sign())*e[0])/w[0];
   for (unsigned i=1; i<e.size(); i++)
-    if (e[i]<min) min=w[i];
-  if (min<1)
   {
-    for (unsigned i=1; i<e.size(); i++)
-      v[i]=e[i]-min+1;
+    gfan::Integer kk = gfan::Integer((long)1)-(gfan::Integer((long)e[i].sign())*e[i])/w[i];
+    if (k<kk)
+      k = kk;
   }
+  /* compute e+k*w, check it for correctness and return it */
+  gfan::ZVector v = e+k*w;
+  assume(checkForNonPositiveEntries(v));
   return v;
 }
 
 gfan::ZVector valued_adjustWeightUnderHomogeneity(const gfan::ZVector e, const gfan::ZVector w)
 {
-  gfan::ZVector v=e-(e[0]/w[0]+1)*w;
-  gfan::Integer min=1;
-  for (unsigned i=1; i<v.size(); i++)
-    if (v[i]<min) min=v[i];
-  for (unsigned i=1; i<v.size(); i++)
-    v[i]=v[i]-min+1;
+  assume(checkForNonPositiveEntries(w));
+  /* find k such that e+k*w is strictly positive,
+   * i.e. k such that e[i]+k*w[i] is strictly positive
+   * for all i=0,...,n */
+  gfan::Integer k((long)0);
+  if (e[0].sign()<=0)
+    k = gfan::Integer((long)1)-(e[0]/w[0]);
+  for (unsigned i=1; i<e.size(); i++)
+  {
+    gfan::Integer kk = gfan::Integer((long)1)-(gfan::Integer((long)e[i].sign())*e[i])/w[i];
+    if (k<kk)
+      k = kk;
+  }
+  /* compute e+k*w, check it for correctness and return it */
+  gfan::ZVector v = e+k*w;
+  assume(checkForNonPositiveEntries(v));
   return v;
 }

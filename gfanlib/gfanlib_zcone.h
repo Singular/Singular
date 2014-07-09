@@ -9,6 +9,7 @@
 #define LIB_CONE_H_
 
 #include "gfanlib_matrix.h"
+#include <sstream>
 
 namespace gfan{
 
@@ -357,8 +358,6 @@ public:
 };
 
 };
-
-
 
 
 #endif /* LIB_CONE_H_ */

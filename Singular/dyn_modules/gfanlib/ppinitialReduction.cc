@@ -3,6 +3,7 @@
 
 #include <libpolys/polys/monomials/p_polys.h>
 #include <singularWishlist.h>
+#include <tropicalStrategy.h>
 
 #include <map>
 #include <set>
@@ -474,7 +475,7 @@ BOOLEAN ppreduceInitially3(leftv res, leftv args)
  * reduces I initially with respect to itself.
  * assumes that the generators of I are homogeneous in x and that p-t is in I.
  **/
-bool ppreduceInitially(ideal I, ring r)
+bool ppreduceInitially(ideal I, ring r, number p)
 {
   /***
    * Step 1: split up I into components of same degree in x
@@ -499,18 +500,18 @@ bool ppreduceInitially(ideal I, ring r)
 
   std::map<long,ideal>::iterator it=H.begin();
   ideal Hi = it->second;
-  assume(idSize(Hi)==1);
-  assume(pLength(Hi->m[0])==2 && p_GetExp(Hi->m[0],1,r)==0
-           && p_GetExp(Hi->m[0]->next,1,r)==1);
-  number p = p_GetCoeff(Hi->m[0],r);
+  // assume(idSize(Hi)==1);
+  // assume(pLength(Hi->m[0])==2 && p_GetExp(Hi->m[0],1,r)==0
+  //          && p_GetExp(Hi->m[0]->next,1,r)==1);
+  // number p = currentCase.uniformizingParameter;
   assume(!n_IsUnit(p,r->cf));
-  idShallowDelete(&it->second);
+  // idShallowDelete(&it->second);
 
   /***
    * Step 2: reduce each component initially with respect to itself
    *  and all lower components
    **/
-  it++; Hi = it->second; n--;
+  // it++; Hi = it->second; n--;
   if (ppreduceInitially(Hi,p,r)) return true;
 
   ideal G = idInit(n); int m=0;
@@ -559,41 +560,41 @@ bool ppreduceInitially(ideal I, ring r)
 }
 
 
-#ifndef NDEBUG
-BOOLEAN ppreduceInitially4(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-  {
-    ideal I;
-    omUpdateInfo();
-    Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-    I = (ideal) u->CopyD();
-    (void) ppreduceInitially(I,currRing);
-    id_Delete(&I,currRing);
-    omUpdateInfo();
-    Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
-    I = (ideal) u->CopyD();
-    (void) ppreduceInitially(I,currRing);
-    res->rtyp = IDEAL_CMD;
-    res->data = (char*) I;
-    return FALSE;
-  }
-  return TRUE;
-}
-#endif
+// #ifndef NDEBUG
+// BOOLEAN ppreduceInitially4(leftv res, leftv args)
+// {
+//   leftv u = args;
+//   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
+//   {
+//     ideal I;
+//     omUpdateInfo();
+//     Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+//     I = (ideal) u->CopyD();
+//     (void) ppreduceInitially(I,currRing);
+//     id_Delete(&I,currRing);
+//     omUpdateInfo();
+//     Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
+//     I = (ideal) u->CopyD();
+//     (void) ppreduceInitially(I,currRing);
+//     res->rtyp = IDEAL_CMD;
+//     res->data = (char*) I;
+//     return FALSE;
+//   }
+//   return TRUE;
+// }
+// #endif
 
 
-BOOLEAN ppreduceInitially(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-  {
-    ideal I = (ideal) u->CopyD();
-    (void) ppreduceInitially(I,currRing);
-    res->rtyp = IDEAL_CMD;
-    res->data = (char*) I;
-    return FALSE;
-  }
-  return TRUE;
-}
+// BOOLEAN ppreduceInitially(leftv res, leftv args)
+// {
+//   leftv u = args;
+//   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
+//   {
+//     ideal I = (ideal) u->CopyD();
+//     (void) ppreduceInitially(I,currRing);
+//     res->rtyp = IDEAL_CMD;
+//     res->data = (char*) I;
+//     return FALSE;
+//   }
+//   return TRUE;
+// }

@@ -208,5 +208,6 @@ ideal id_Farey(ideal x, number N, const ring r);
 
 ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing); // image of certain map for BGG
 
+void id_Write(ideal id, ring r);
 
 #endif
