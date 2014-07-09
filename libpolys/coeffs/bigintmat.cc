@@ -181,11 +181,9 @@ bigintmat * bimAdd(bigintmat * a, bigintmat * b)
 
   return bim;
 }
-bigintmat * bimAdd(bigintmat * a, int b) //WHY????
+bigintmat * bimAdd(bigintmat * a, int b)
 {
 
-  Werror("this does not make any sense bim + int called");
-  return 0;
   const int mn = a->rows()*a->cols();
 
   const coeffs basecoeffs = a->basecoeffs();
@@ -222,9 +220,6 @@ bigintmat * bimSub(bigintmat * a, bigintmat * b)
 
 bigintmat * bimSub(bigintmat * a, int b)
 {
-
-  Werror("this does not make any sense bim + int called");
-  return 0;
   const int mn = a->rows()*a->cols();
 
   const coeffs basecoeffs = a->basecoeffs();
