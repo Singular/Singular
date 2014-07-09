@@ -89,7 +89,7 @@ EXAMPLE: example markov4ti2; shows an example
 // Singular's string is too clumsy for this, hence we first prepare
 // using standard unix commands
 //----------------------------------------------------------------------
-   j=system("sh","markov sing4ti2");
+   j=system("sh","markov sing4ti2 >/dev/null 2>&1");
    j=system("sh","awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.mar | sed s/[\\\ \\\t\\\v\\\f]/,/g | sed s/,+/,/g|sed s/,,/,/g|sed s/,,/,/g > sing4ti2.converted");
    if(!defined(keepfiles))
    {
@@ -211,7 +211,7 @@ EXAMPLE: example graver4ti2; shows an example
 // Singular's string is too clumsy for this, hence we first prepare
 // using standard unix commands
 //----------------------------------------------------------------------
-   j=system("sh","graver sing4ti2");
+   j=system("sh","graver sing4ti2 >/dev/null 2>&1");
    j=system("sh","awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.gra | sed s/[\\\ \\\t\\\v\\\f]/,/g | sed s/,+/,/g |sed s/,,/,/g|sed s/,,/,/g > sing4ti2.converted");
    if(!defined(keepfiles))
    {
@@ -331,7 +331,7 @@ EXAMPLE: example graver4ti2; shows an example
 // Singular's string is too clumsy for this, hence we first prepare
 // using standard unix commands
 //----------------------------------------------------------------------
-   j=system("sh","hilbert sing4ti2");
+   j=system("sh","hilbert sing4ti2 >/dev/null 2>&1");
    j=system("sh","awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.hil | sed s/[\\\ \\\t\\\v\\\f]/,/g | sed s/,+/,/g |sed s/,,/,/g|sed s/,,/,/g > sing4ti2.converted");
    if(!defined(keepfiles))
    {

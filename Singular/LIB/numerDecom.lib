@@ -1639,7 +1639,7 @@ EXAMPLE: example ReWitZSR;shows an example
  execute("ring e=(complex,16,I),("+varstr(S)+"),dp;");
  list A=imap(S,A);
  list W=imap(S,W);
- list  D, B(1..size(A)),C(1..size(A)),D(1..size(A)),Z1(1..size(A)),Z(1..size(A)),Z,Y,ZY,ZZ;
+ list  D, B(1..size(A)),C(1..size(A)),D(1..size(A)),Z1(1..size(A)),Z(1..size(A)),Z,Y,ZY;
  int i,j,k,tw(di),tw1(di),tw2(di),tw3(di),tr,tc;
  list AA;
  list WW;

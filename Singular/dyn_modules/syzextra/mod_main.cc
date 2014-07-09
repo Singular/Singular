@@ -1980,5 +1980,5 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   //  ADD("", FALSE, );
 
 #undef ADD
-  return UMINUS;
+  return MAX_TOK;
 }
