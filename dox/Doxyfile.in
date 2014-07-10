@@ -38,13 +38,13 @@ PROJECT_NAME           =
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         =
+PROJECT_NUMBER         = " [$(git_version)] "
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          =
+PROJECT_BRIEF          = 
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is included in
 # the documentation. The maximum height of the logo should not exceed 55 pixels
@@ -161,7 +161,7 @@ STRIP_FROM_PATH        = $(abs_top_srcdir) $(abs_top_builddir)
 # specify the list of include paths that are normally passed to the compiler
 # using the -I flag.
 
-STRIP_FROM_INC_PATH    = libpolys
+STRIP_FROM_INC_PATH    = 
 
 # If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter (but
 # less readable) file names. This can be useful is your file systems doesn't
@@ -1137,7 +1137,7 @@ HTML_COLORSTYLE_SAT    = 0
 # Minimum value: 40, maximum value: 240, default value: 80.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_COLORSTYLE_GAMMA  = 210
+HTML_COLORSTYLE_GAMMA  = 190
 
 # If the HTML_TIMESTAMP tag is set to YES then the footer of each generated HTML
 # page will contain the date and time when the page was generated. Setting this
@@ -1953,9 +1953,13 @@ SEARCH_INCLUDES        = YES
 # preprocessor.
 # This tag requires that the tag SEARCH_INCLUDES is set to YES.
 
-INCLUDE_PATH           = $(abs_top_builddir)/ \
+INCLUDE_PATH           = \
+                         $(abs_top_builddir)/ \
                          $(abs_top_builddir)/factory \
-                         $(abs_top_builddir)/libpolys
+                         $(abs_top_builddir)/libpolys \
+                         $(abs_top_srcdir)/ \
+                         $(abs_top_srcdir)/factory \
+                         $(abs_top_srcdir)/libpolys
 
 # You can use the INCLUDE_FILE_PATTERNS tag to specify one or more wildcard
 # patterns (like *.h and *.hpp) to filter out the header-files in the
@@ -1963,7 +1967,7 @@ INCLUDE_PATH           = $(abs_top_builddir)/ \
 # used.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-INCLUDE_FILE_PATTERNS  =
+INCLUDE_FILE_PATTERNS  = *.h *.inc
 
 # The PREDEFINED tag can be used to specify one or more macro names that are
 # defined before the preprocessor is started (similar to the -D option of e.g.

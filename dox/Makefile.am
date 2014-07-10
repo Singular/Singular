@@ -1,3 +1,5 @@
+GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-version)
+
 doxyrun:
 	if [ -z "$(DOXYGEN)" ]; then \
 		which -s doxygen || (echo Please add 'doxygen' to your PATH; exit 1;); \
@@ -13,8 +15,10 @@ doxyrun:
 	fi
 	export abs_top_srcdir="$(abs_top_srcdir)"; \
 	export abs_top_builddir="$(abs_top_builddir)"; \
- 	echo Running "$(DOXYGEN)" "$(DOXYGEN_CONFIG)" with abs_top_srcdir: "$(abs_top_srcdir)", abs_top_builddir: "$(abs_top_builddir)"...; \
-	$(DOXYGEN) $(DOXYGEN_CONFIG) ;
+	export git_version="$(GIT_VERSION)"; \
+ 	echo Running "$(DOXYGEN)" "$(DOXYGEN_CONFIG)" with abs_top_srcdir: "$(abs_top_srcdir)", abs_top_builddir: "$(abs_top_builddir)", GIT_VERSION: "$(git_version)"...; \
+	$(DOXYGEN) $(DOXYGEN_CONFIG) ; \
+ 	echo Finished running "$(DOXYGEN)" "$(DOXYGEN_CONFIG)" with abs_top_srcdir: "$(abs_top_srcdir)", abs_top_builddir: "$(abs_top_builddir)", GIT_VERSION: "$(git_version)"...;
 
 if HAVE_DOXYGEN
 
