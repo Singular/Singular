@@ -7118,6 +7118,8 @@ poly, vector, ideal or module (corresponding to the first argument)
 substitutes one or more ring variable(s)/parameter variable(s) by (a) polynomial(s). Note that in the case of more than one substitution pair,
 the substitutions will be performed sequentially and not simultaneously. The below examples illustrate this behaviour.
 @*Note, that the coefficients must be polynomial when substituting a parameter.
+@*Caveat, an undetected exponent overflow may occur:  
+
 @item @strong{Example:}
 @smallexample
 @c example
@@ -7125,6 +7127,12 @@ the substitutions will be performed sequentially and not simultaneously. The bel
   poly f=x2+y2+z2+x+y+z;
   subst(f,x,y,y,z);   // first substitute x by y, then y by z
   subst(f,y,z,x,y);   // first substitute y by z, then x by y
+  // undetected overflow:
+  ring rng = 0,(x,y),dp;
+  ideal I = x;
+  I =  subst (I,x,x^ 1000000000);
+  I =  subst (I,x,x^ 1000000000); 
+  I;
 @c example
 @end smallexample
 @end table
