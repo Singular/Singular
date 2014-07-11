@@ -130,10 +130,10 @@ CanonicalForm cyclotomicPoly (int n, bool& fail)
   int prod= 1;
   for (int i= 0; i < distinct_factors_length; i++)
   {
-    result= result (power (x, distinct_factors[i]), x)/result;
+    result= leftShift (result, distinct_factors[i])/result;
     prod *= distinct_factors[i];
   }
-  return result (power (x, n/prod), x);
+  return leftShift (result, n/prod);
 }
 
 #ifdef HAVE_NTL

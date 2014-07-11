@@ -676,3 +676,20 @@ bool hasFirstAlgVar( const CanonicalForm & f, Variable & a )
       return true; // 'a' is already set
   return false;
 }
+
+/** left shift the main variable of F by n
+ *  @return if x is the main variable of F the result is F(x^n)
+ **/
+CanonicalForm leftShift (const CanonicalForm& F, int n)
+{
+  ASSERT (n >= 0, "cannot left shift by negative number");
+  if (F.inBaseDomain())
+    return F;
+  if (n == 0)
+    return F;
+  Variable x=F.mvar();
+  CanonicalForm result= 0;
+  for (CFIterator i= F; i.hasTerms(); i++)
+    result += i.coeff()*power (x, i.exp()*n);
+  return result;
+}
