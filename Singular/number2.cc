@@ -105,13 +105,23 @@ BOOLEAN jjNUMBER2_OP2(leftv res, leftv a, leftv b)
   if (a2==NULL)
   {
     if (a->Typ()==INT_CMD) aa=n_Init((long)a->Data(),r->cf);
-    else if (a->Typ()==BIGINT_CMD) aa=n_Init_bigint((number)a->Data(),coeffs_BIGINT,r->cf);
+    else if (a->Typ()==BIGINT_CMD)
+    {
+      //aa=n_Init_bigint((number)a->Data(),coeffs_BIGINT,r->cf);
+      nMapFunc nMap=n_SetMap(coeffs_BIGINT,r->cf);
+      aa=nMap((number)a->Data(),coeffs_BIGINT,r->cf);
+    }
     else op=0;
   }
   if ((b2==NULL) &&(op!='^') &&(op!=0))
   {
     if (b->Typ()==INT_CMD) bb=n_Init((long)b->Data(),r->cf);
-    else if (b->Typ()==BIGINT_CMD) bb=n_Init_bigint((number)b->Data(),coeffs_BIGINT,r->cf);
+    else if (b->Typ()==BIGINT_CMD)
+    {
+      //bb=n_Init_bigint((number)b->Data(),coeffs_BIGINT,r->cf);
+      nMapFunc nMap=n_SetMap(coeffs_BIGINT,r->cf);
+      bb=nMap((number)b->Data(),coeffs_BIGINT,r->cf);
+    }
     else op=0;
   }
   switch(op)
@@ -162,7 +172,10 @@ BOOLEAN jjNUMBER2CR(leftv res, leftv a, leftv b)
     case INT_CMD:
       r->n=n_Init((long)a->Data(),r->cf); break;
     case BIGINT_CMD:
-      r->n=n_Init_bigint((number)a->Data(),coeffs_BIGINT,r->cf); break;
+    {
+      nMapFunc nMap=n_SetMap(coeffs_BIGINT,r->cf);
+      r->n=nMap((number)a->Data(),coeffs_BIGINT,r->cf); break;
+    }
     case NUMBER_CMD:
     {
       nMapFunc nMap=n_SetMap(currRing->cf,r->cf);
