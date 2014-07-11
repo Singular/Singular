@@ -1017,7 +1017,9 @@ static BOOLEAN jjTIMES_BIM(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjTIMES_MA_BI1(leftv res, leftv u, leftv v)
 {
-  number n=n_Init_bigint((number)v->Data(),coeffs_BIGINT,currRing->cf);
+  nMapFunc nMap=n_SetMap(coeffs_BIGINT,currRing->cf);
+  if (nMap==NULL) return TRUE;
+  number n=nMap((number)v->Data(),coeffs_BIGINT,currRing->cf);
   poly p=pNSet(n);
   ideal I= (ideal)mp_MultP((matrix)u->CopyD(MATRIX_CMD),p,currRing);
   res->data = (char *)I;
@@ -1726,6 +1728,7 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 #endif
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
+  coeffs cf;
   lists c=(lists)u->CopyD(); // list of ideal or bigint/int
   lists pl=NULL;
   intvec *p=NULL;
@@ -1751,6 +1754,15 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     else
       return_type=BIGINT_CMD;
   }
+  if (return_type==BIGINT_CMD)
+    cf=coeffs_BIGINT;
+  else
+  {
+    cf=currRing->cf;
+    if (nCoeff_is_Extension(cf) && (cf->extRing!=NULL))
+      cf=cf->extRing->cf;
+  }
+  nMapFunc nMap=n_SetMap(coeffs_BIGINT,cf);
   if (return_type!=BIGINT_CMD)
   {
     for(i=rl-1;i>=0;i--)
@@ -1776,15 +1788,20 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   else
   {
     xx=(number *)omAlloc(rl*sizeof(number));
+    if (nMap==NULL)
+    {
+      Werror("not implemented: map bigint -> %s",cf->cfCoeffString(cf));
+      return TRUE;
+    }
     for(i=rl-1;i>=0;i--)
     {
       if (c->m[i].Typ()==INT_CMD)
       {
-        xx[i]=n_Init(((int)(long)c->m[i].Data()),coeffs_BIGINT);
+        xx[i]=n_Init(((int)(long)c->m[i].Data()),cf);
       }
       else if (c->m[i].Typ()==BIGINT_CMD)
       {
-        xx[i]=(number)c->m[i].Data();
+        xx[i]=nMap((number)c->m[i].Data(),coeffs_BIGINT,cf);
       }
       else
       {
@@ -1800,7 +1817,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   {
     for(i=rl-1;i>=0;i--)
     {
-      q[i]=n_Init((*p)[i], coeffs_BIGINT);
+      q[i]=n_Init((*p)[i], cf);
     }
   }
   else
@@ -1809,18 +1826,18 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     {
       if (pl->m[i].Typ()==INT_CMD)
       {
-        q[i]=n_Init((int)(long)pl->m[i].Data(),coeffs_BIGINT);
+        q[i]=n_Init((int)(long)pl->m[i].Data(),cf);
       }
       else if (pl->m[i].Typ()==BIGINT_CMD)
       {
-        q[i]=n_Copy((number)(pl->m[i].Data()),coeffs_BIGINT);
+        q[i]=nMap((number)(pl->m[i].Data()),coeffs_BIGINT,cf);
       }
       else
       {
         Werror("bigint expected at pos %d",i+1);
         for(i++;i<rl;i++)
         {
-          n_Delete(&(q[i]),coeffs_BIGINT);
+          n_Delete(&(q[i]),cf);
         }
         omFree(x); // delete c
         omFree(q); // delete pl
@@ -1850,7 +1867,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   for(i=rl-1;i>=0;i--)
   {
-    n_Delete(&(q[i]),coeffs_BIGINT);
+    n_Delete(&(q[i]),cf);
   }
   omFree(q);
   res->rtyp=return_type;
@@ -2224,7 +2241,6 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     int *par_perm=NULL;
     int par_perm_size=0;
     BOOLEAN bo;
-    //if (!nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly))
     if ((nMap=n_SetMap(r->cf,currRing->cf))==NULL)
     {
       // Allow imap/fetch to be make an exception only for:
@@ -2311,7 +2327,9 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
   }
   return TRUE;
 err_fetch:
-  Werror("no identity map from %s",u->Fullname());
+  Werror("no identity map from %s (%s -> %s)",u->Fullname(),
+    r->cf->cfCoeffString(r->cf),
+    currRing->cf->cfCoeffString(currRing->cf));
   return TRUE;
 }
 static BOOLEAN jjFIND2(leftv res, leftv u, leftv v)
@@ -6723,7 +6741,9 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
       case BIGINT_CMD:
       {
         number b=(number)h->Data();
-        number n=n_Init_bigint(b,coeffs_BIGINT,currRing->cf);
+        nMapFunc nMap=n_SetMap(coeffs_BIGINT,currRing->cf);
+        if (nMap==NULL) return TRUE;
+        number n=nMap(b,coeffs_BIGINT,currRing->cf);
         if (!nIsZero(n))
         {
           p=pNSet(n);

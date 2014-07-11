@@ -78,12 +78,12 @@ BOOLEAN ndDBTest(number, const char *, const int, const coeffs)
 
 number ndFarey(number,number,const coeffs r)
 {
-  Werror("farey not implemented for (c=%d)",getCoeffType(r));
+  Werror("farey not implemented for %s (c=%d)",r->cfCoeffString(r),getCoeffType(r));
   return NULL;
 }
 number ndChineseRemainder(number *,number *,int,BOOLEAN,const coeffs r)
 {
-  Werror("ChineseRemainder not implemented for (c=%d)",getCoeffType(r));
+  Werror("ChineseRemainder not implemented for %s (c=%d)",r->cfCoeffString(r),getCoeffType(r));
   return n_Init(0,r); 
 }
 
@@ -245,12 +245,6 @@ number ndConvFactoryNSingN( const CanonicalForm, const coeffs)
   return NULL;
 }
 
-number  ndInit_bigint(number, const coeffs, const coeffs)
-{
-  Werror("no conversion from bigint to this field");
-  return NULL;
-}
-
 /**< [in, out] a bigint number >= 0  */
 /**< [out] the GMP equivalent    */
 /// Converts a non-negative bigint number into a GMP number.
@@ -337,7 +331,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfNormalize=ndNormalize;
     n->cfGcd  = ndGcd;
     n->cfLcm  = ndGcd; /* tricky, isn't it ?*/
-    n->cfInit_bigint = ndInit_bigint;
     n->cfInitMPZ = ndInitMPZ;
     n->cfMPZ = ndMPZ;
 

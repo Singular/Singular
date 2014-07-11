@@ -119,6 +119,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
 
   r->is_field=FALSE;
   r->is_domain=FALSE;
+  r->rep=n_rep_gmp;
 
 
   r->cfCoeffString = nrnCoeffString;
@@ -158,7 +159,6 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfName        = ndName;
   r->cfCoeffWrite  = nrnCoeffWrite;
   r->nCoeffIsEqual = nrnCoeffsEqual;
-  r->cfInit_bigint = nrnMapQ;
   r->cfKillChar    = ndKillChar;
   r->cfQuot1       = nrnQuot1;
 #ifdef LDEBUG
@@ -553,6 +553,16 @@ number nrnMapGMP(number from, const coeffs /*src*/, const coeffs dst)
   return (number)erg;
 }
 
+number nrnMapZ(number from, const coeffs src, const coeffs dst)
+{
+  if (SR_HDL(from) & SR_INT)
+  {
+    long f_i=SR_TO_INT(from);
+    return nrnInit(f_i,dst);
+  }
+  return nrnMapGMP(from,src,dst);
+}
+
 number nrnMapQ(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number)omAllocBin(gmp_nrz_bin);
@@ -564,12 +574,16 @@ number nrnMapQ(number from, const coeffs src, const coeffs dst)
 
 nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
 {
-  /* dst = currRing->cf */
-  if (nCoeff_is_Ring_Z(src))
+  /* dst = nrn */
+  if ((src->rep==n_rep_gmp) && nCoeff_is_Ring_Z(src))
   {
     return nrnMapGMP;
   }
-  if (nCoeff_is_Q(src))
+  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Ring_Z(src)*/)
+  {
+    return nrnMapZ;
+  }
+  if ((src->rep==n_rep_gap_rat) && nCoeff_is_Q(src))
   {
     return nrnMapQ;
   }

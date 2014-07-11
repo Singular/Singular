@@ -564,54 +564,6 @@ number ntImPart(number a, const coeffs cf)
   return NULL;
 }
 
-number ntInit_bigint(number longratBigIntNumber, const coeffs src, const coeffs cf)
-{
-  assume( cf != NULL );
-
-  const ring A = cf->extRing;
-
-  assume( A != NULL );
-
-  const coeffs C = A->cf;
-
-  assume( C != NULL );
-
-  number n = n_Init_bigint(longratBigIntNumber, src, C);
-
-  if ( n_IsZero(n, C) )
-  {
-    n_Delete(&n, C);
-    return NULL;
-  }
-
-  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-
-  number den = n_GetDenom(n, C);
-
-  assume( n_GreaterZero(den, C) );
-
-  if( n_IsOne(den, C) )
-  {
-     NUM(result) = p_NSet(n, A);
-     //DEN(result) = NULL; // done by ..Alloc0..
-     n_Delete(&den, C);
-  }
-  else
-  {
-     DEN(result) = p_NSet(den, A);
-     NUM(result) = p_NSet(n_GetNumerator(n, C), A);
-     n_Delete(&n, C);
-  }
-
-  //COM(result) = 0; // done by ..Alloc0..
-
-  ntTest((number)result);
-  //check_N((number)result,cf);
-
-  return (number)result;
-}
-
-
 number ntInit(long i, const coeffs cf)
 {
   if (i != 0)
@@ -1803,12 +1755,12 @@ number ntInvers(number a, const coeffs cf)
   return (number)result;
 }
 
-/* assumes that src = Q, dst = Q(t_1, ..., t_s) */
+/* assumes that src = Q or Z, dst = Q(t_1, ..., t_s) */
 number ntMap00(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
   assume(n_Test(a, src));
-  assume(src == dst->extRing->cf);
+  assume(src->rep == dst->extRing->cf->rep);
   if ((SR_HDL(a) & SR_INT) || (a->s==3))
   {
     number res=ntInit(p_NSet(n_Copy(a, src), dst->extRing), dst);
@@ -1824,6 +1776,19 @@ number ntMap00(number a, const coeffs src, const coeffs dst)
   n_Test((number)ff,dst);
   //check_N((number)ff,dst);
   return (number)ff;
+}
+
+number ntMapZ0(number a, const coeffs src, const coeffs dst)
+{
+  if (n_IsZero(a, src)) return NULL;
+  assume(n_Test(a, src));
+  nMapFunc nMap=n_SetMap(src,dst->extRing->cf);
+  poly p=p_NSet(nMap(a, src,dst->extRing->cf), dst->extRing);
+  if (n_IsZero(pGetCoeff(p),dst->extRing->cf))
+    p_Delete(&p,dst->extRing);
+  number res=ntInit(p, dst);
+  n_Test(res,dst);
+  return res;
 }
 
 /* assumes that src = Z/p, dst = Q(t_1, ..., t_s) */
@@ -1991,8 +1956,10 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
      some field Z/pZ: */
   if (h==0)
   {
-    if (nCoeff_is_Q(src) && nCoeff_is_Q(bDst))
-      return ntMap00;                                 /// Q       -->  Q(T)
+    if ((src->rep==n_rep_gap_rat) && nCoeff_is_Q(bDst))
+      return ntMap00;                                 /// Q or Z   -->  Q(T)
+    if (src->rep==n_rep_gap_gmp)
+      return ntMapZ0;                                 /// Z   -->  K(T)
     if (nCoeff_is_Zp(src) && nCoeff_is_Q(bDst))
       return ntMapP0;                                 /// Z/p     -->  Q(T)
     if (nCoeff_is_Q(src) && nCoeff_is_Zp(bDst))
@@ -2430,6 +2397,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 
   cf->is_field=TRUE;
   cf->is_domain=TRUE;
+  cf->rep=n_rep_rat_fct;
 
   cf->factoryVarOffset = R->cf->factoryVarOffset + rVar(R);
   extern char* naCoeffString(const coeffs r);
@@ -2442,7 +2410,6 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->cfIsOne        = ntIsOne;
   cf->cfIsMOne       = ntIsMOne;
   cf->cfInit         = ntInit;
-  cf->cfInit_bigint  = ntInit_bigint;
   cf->cfFarey        = ntFarey;
   cf->cfChineseRemainder = ntChineseRemainder;
   cf->cfInt          = ntInt;

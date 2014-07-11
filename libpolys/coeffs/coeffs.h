@@ -90,11 +90,28 @@ typedef struct
   const char* par_name; /**< parameter name */
 } LongComplexInfo;
 
+
+enum n_coeffRep
+{
+  n_rep_unknown=0,
+  n_rep_int,      /**< (int), see modulop.h */
+  n_rep_gap_rat,  /**< (number), see longrat.h */
+  n_rep_gap_gmp,  /**< (), see rinteger.h, new impl. */
+  n_rep_poly,     /**< (poly), see algext.h */
+  n_rep_rat_fct,  /**< (fraction), see transext.h */
+  n_rep_gmp,      /**< (mpz_ptr), see rmodulon,h */
+  n_rep_float,    /**< (float), see shortfl.h */
+  n_rep_gmp_float,  /**< (gmp_float), see  */
+  n_rep_gmp_complex,/**< (gmp_complex), see gnumpc.h */
+  n_rep_gf        /**< (int), see ffields.h */
+};
+
 struct n_Procs_s
 {
    // administration of coeffs:
    coeffs next;
    int     ref;
+   n_coeffRep rep;
    n_coeffType type;
    /// how many variables of factory are already used by this coeff
    int     factoryVarOffset;
@@ -250,11 +267,6 @@ struct n_Procs_s
 
    /// Inplace: a += b
    void    (*cfInpAdd)(number &a, number b, const coeffs r);
-
-   /// maps the bigint i (from dummy == coeffs_BIGINT!!!) into the
-   /// coeffs dst
-   /// TODO: to be exchanged with a map!!!
-   number  (*cfInit_bigint)(number i, const coeffs dummy, const coeffs dst);
 
    /// rational reconstruction: "best" rational a/b with a/b = p mod n
    //  or a = bp mod n
@@ -765,13 +777,6 @@ static inline number n_Param(const int iParameter, const coeffs r)
   assume((iParameter >= 1) || (iParameter <= n_NumberOfParameters(r)));
   assume(r->cfParameter != NULL);
   return r->cfParameter(iParameter, r);
-}
-
-static inline number  n_Init_bigint(number i, const coeffs dummy,
-                const coeffs dst)
-{
-  assume(dummy != NULL && dst != NULL); assume(dst->cfInit_bigint!=NULL);
-  return dst->cfInit_bigint(i, dummy, dst);
 }
 
 static inline number  n_RePart(number i, const coeffs cf)
