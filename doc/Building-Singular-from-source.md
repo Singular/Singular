@@ -10,14 +10,14 @@ for step by step instructions.
 # Build the development branch of Singular as follows:
 
 1. as prerequisite autotools (>=2.62), [gmp](http://ftp.gnu.org/gnu/gmp/) (>= 4.2), are needed, furthermore we recommend to use [NTL](http://www.shoup.net/ntl/) (>= 5.0) configured with NTL_GMP_LIP=on (for further details see [NTL Documentation](http://www.shoup.net/ntl/doc/tour-gmp.html)), [FLINT](http://www.flintlib.org/) (>=2.4) which depends on [MPFR](http://www.mpfr.org/mpfr-current/) (>=3.0.0)  , and readline 
-1. get the sources with `git clone -b spielwiese git://github.com/Singular/Sources.git <directory_name>`
-1. run `<abs_directory_name_from_above>/autogen.sh` (formerly known as `for_Hans_with_love.sh`) from the root directory
-1. create and switch to your temporary build directory. Do not build Singular in the source folder itself!
-1. run `<abs_directory_name_from_above>/configure --prefix=<destination path>` (builds release version)
-1. `make` (or `make -jN` where N is the number of the your CPU cores + 1) 
-1. `make -jN check` (where N is as above) will build and run simple unit-tests for most units (optional but encouraged)
-1. `make install`
-1. developers are also encouraged to run `make distcheck`
+2. get the sources with `git clone -b spielwiese git://github.com/Singular/Sources.git <directory_name>`
+3. run `<abs_directory_name_from_above>/autogen.sh` (formerly known as `for_Hans_with_love.sh`) from the root directory
+4. create and switch to your temporary build directory. Do not build Singular in the source folder itself!
+5. run `<abs_directory_name_from_above>/configure --prefix=<destination path>` (builds release version)
+6. `make` (or `make -jN` where N is the number of the your CPU cores + 1) 
+7. `make -jN check` (where N is as above) will build and run simple unit-tests for most units (optional but encouraged)
+8. `make install`
+9. developers are also encouraged to run `make distcheck`
 
 ## Static variants of Singular may be built using the following configure flags:
 
@@ -46,31 +46,31 @@ Note: modules are not required to be static...
 
 * the test-suites from Tst/ can be run, for example, as follows:
   1. `cd Tst/`
-  1. `ln -s <abs_destination path>/bin/Singular`
-  1. after the above symbolic-linking one can simply run `./regress.cmd something.{lst,tst}`, where .lst files are just lists of tests, which are .tst files
+  2. `ln -s <abs_destination path>/bin/Singular`
+  3. after the above symbolic-linking one can simply run `./regress.cmd something.{lst,tst}`, where .lst files are just lists of tests, which are .tst files
 
 # Build the old ```master``` Singular as follows:
 
 1. get the sources with `git clone -b trunk git://github.com/Singular2/Sources.git <directory_name>`
-1. `cd <directory_name_from_above>`
-1. run `./configure` from the root directory
-1. `make install` (or `make -jN install`, where N as above), and _yes_ it should really be `install`!
-1. everything will be put to the newly created directory "$Architecture-$OS/" (e.g. x86_64-Linux, ix86-Linux etc.)
+2. `cd <directory_name_from_above>`
+3. run `./configure` from the root directory
+4. `make install` (or `make -jN install`, where N as above), and _yes_ it should really be `install`!
+5. everything will be put to the newly created directory "$Architecture-$OS/" (e.g. x86_64-Linux, ix86-Linux etc.)
 
 # Coverage testing with `lcov` (thanks to Jakob Kroeker)
 
 1. make sure that `gcov` is present and install a recent lcov (>= 1.10) 
-1. configure and build `Spielwiese` (IN SOURCE TREE!) together with the following FLAGS:
+2. configure and build `Spielwiese` (IN SOURCE TREE!) together with the following FLAGS:
 ```
 LDFLAGS+="-lgcov" 
 CFLAGS+="-fprofile-arcs -ftest-coverage -g"
 CXXFLAGS+="-fprofile-arcs -ftest-coverage -g"
 ```
-1. if necessary clean-up lcov-state-files with: `lcov -z -d . `
-1. run tests (e.g. `Tst/regress.cmd -s Singular/Singular Tst/Short.lst`)
-1. collect coverage data into `coverage.cov` with `lcov -c -d . -o coverage.cov`
-1. optionally remove unnecessary directories: `lcov -r coverage.cov '/usr/include/*' > coverage2.cov`
-1. generate HTML overview pages under `GenHtmlDir/` with `genhtml -o GenHtmlDir coverage.cov` 
+3. if necessary clean-up lcov-state-files with: `lcov -z -d . `
+4. run tests (e.g. `Tst/regress.cmd -s Singular/Singular Tst/Short.lst`)
+5. collect coverage data into `coverage.cov` with `lcov -c -d . -o coverage.cov`
+6. optionally remove unnecessary directories: `lcov -r coverage.cov '/usr/include/ *' > coverage2.cov`
+7. generate HTML overview pages under `GenHtmlDir/` with `genhtml -o GenHtmlDir coverage.cov` 
 
 For instance, a recent test coverage for Singular 
 (_static 64-bit build with optimization, gfanlib, pyobjects, countedref using NTL, MPIR (as GMP), FLINT, readline, git id: e86e21bd*, on Linux, with GCC 4.8.2_20131219) 

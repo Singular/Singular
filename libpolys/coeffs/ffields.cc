@@ -797,10 +797,12 @@ nMapFunc nfSetMap(const coeffs src, const coeffs dst)
         return NULL;
     }
   }
-  if (nCoeff_is_Zp(src,dst->m_nfCharP))
+  if ((src->rep==n_rep_int) && nCoeff_is_Zp(src,dst->m_nfCharP))
   {
     return nfMapP;    /* Z/p -> GF(p,n) */
   }
+  if (src->rep==n_rep_gap_rat) /*Q, Z */
+    return nlModP;
   return NULL;     /* default */
 }
 
@@ -836,6 +838,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 {
   r->is_field=TRUE;
   r->is_domain=TRUE;
+  r->rep=n_rep_gf;
   //r->cfInitChar=npInitChar;
   r->cfKillChar=nfKillChar;
   r->nCoeffIsEqual=nfCoeffIsEqual;
@@ -864,7 +867,6 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   //r->cfImPart = ndReturn0;
 
   r->cfWriteLong = nfWriteLong;
-  r->cfInit_bigint = nlModP;
   r->cfRead = nfRead;
   //r->cfNormalize=ndNormalize;
   r->cfGreater = nfGreater;
