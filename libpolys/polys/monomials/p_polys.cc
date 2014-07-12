@@ -2328,7 +2328,7 @@ void p_Content(poly ph, const ring r)
           poly c_n=c_n_n;
           while (c_n!=NULL)
           { // each monom: coeff in Q
-            d=n_Lcm(h,pGetCoeff(c_n),r->cf->extRing->cf);
+            d=n_NormalizeHelper(h,pGetCoeff(c_n),r->cf->extRing->cf);
             n_Delete(&h,r->cf->extRing->cf);
             h=d;
             pIter(c_n);
@@ -2763,7 +2763,7 @@ poly p_Cleardenom(poly p, const ring r)
     while (p!=NULL)
     {
       n_Normalize(pGetCoeff(p),r->cf);
-      d=n_Lcm(h,pGetCoeff(p),r->cf);
+      d=n_NormalizeHelper(h,pGetCoeff(p),r->cf);
       n_Delete(&h,r->cf);
       h=d;
       pIter(p);
@@ -2903,7 +2903,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
     while (p!=NULL)
     {
       n_Normalize(pGetCoeff(p),r->cf);
-      d=n_Lcm(h,pGetCoeff(p),r->cf);
+      d=n_NormalizeHelper(h,pGetCoeff(p),r->cf);
       n_Delete(&h,r->cf);
       h=d;
       pIter(p);
@@ -2939,7 +2939,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
           p=ph;
           while (p!=NULL)
           {
-            d=n_Lcm(h,pGetCoeff(p),r->cf);
+            d=n_NormalizeHelper(h,pGetCoeff(p),r->cf);
             n_Delete(&h,r->cf);
             h=d;
             pIter(p);

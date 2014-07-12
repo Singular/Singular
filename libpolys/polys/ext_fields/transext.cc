@@ -125,7 +125,7 @@ number   ntImPart(number a, const coeffs cf);
 number   ntGetDenom(number &a, const coeffs cf);
 number   ntGetNumerator(number &a, const coeffs cf);
 number   ntGcd(number a, number b, const coeffs cf);
-number   ntLcm(number a, number b, const coeffs cf);
+number   ntNormalizeHelper(number a, number b, const coeffs cf);
 int      ntSize(number a, const coeffs cf);
 void     ntDelete(number * a, const coeffs cf);
 void     ntCoeffWrite(const coeffs cf, BOOLEAN details);
@@ -1112,12 +1112,12 @@ void handleNestedFractionsOverQ(fraction f, const coeffs cf)
     number lcmOfDenominators = n_Init(1, ntCoeffs);
     number c; number tmp;
     poly p = NUM(f);
-    /* careful when using n_Lcm!!! It computes the lcm of the numerator
+    /* careful when using n_NormalizeHelper!!! It computes the lcm of the numerator
        of the 1st argument and the denominator of the 2nd!!! */
     while (p != NULL)
     {
       c = p_GetCoeff(p, ntRing);
-      tmp = n_Lcm(lcmOfDenominators, c, ntCoeffs);
+      tmp = n_NormalizeHelper(lcmOfDenominators, c, ntCoeffs);
       n_Delete(&lcmOfDenominators, ntCoeffs);
       lcmOfDenominators = tmp;
       pIter(p);
@@ -1126,7 +1126,7 @@ void handleNestedFractionsOverQ(fraction f, const coeffs cf)
     while (p != NULL)
     {
       c = p_GetCoeff(p, ntRing);
-      tmp = n_Lcm(lcmOfDenominators, c, ntCoeffs);
+      tmp = n_NormalizeHelper(lcmOfDenominators, c, ntCoeffs);
       n_Delete(&lcmOfDenominators, ntCoeffs);
       lcmOfDenominators = tmp;
       pIter(p);
@@ -1495,7 +1495,7 @@ static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
   return FALSE;
 }
 
-number ntLcm(number a, number b, const coeffs cf)
+number ntNormalizeHelper(number a, number b, const coeffs cf)
 {
   ntTest(a);
   ntTest(b);
@@ -2290,7 +2290,7 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
         d = n_Copy(pGetCoeff(den), Q);
       else
       {
-        number g = n_Lcm(d, pGetCoeff(den), Q);
+        number g = n_NormalizeHelper(d, pGetCoeff(den), Q);
         n_Delete(&d, Q); d = g;
       }
     }
@@ -2436,7 +2436,7 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
 #endif
   //cf->cfGcd          = ntGcd_dummy;
   cf->cfSubringGcd   = ntGcd;
-  cf->cfLcm          = ntLcm;
+  cf->cfNormalizeHelper = ntNormalizeHelper;
   cf->cfSize         = ntSize;
   cf->nCoeffIsEqual  = ntCoeffIsEqual;
   cf->cfInvers       = ntInvers;

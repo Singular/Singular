@@ -823,7 +823,7 @@ ideal SchreyerSyzygyComputation::Compute2LeadingSyzygyTerms()
       const number& lc1 = p_GetCoeff(p , r);
       const number& lc2 = p_GetCoeff(pp, r);
 
-      number g = n_Lcm( lc1, lc2, r );
+      number g = n_Lcm( lc1, lc2, r->cf );
 
       p_SetCoeff0(m ,       n_Div(g, lc1, r), r);
       p_SetCoeff0(mm, n_InpNeg(n_Div(g, lc2, r), r), r);
