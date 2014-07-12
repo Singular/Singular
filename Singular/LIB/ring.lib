@@ -935,7 +935,7 @@ example
 static proc testIsQuotientRing()
 {
    ring rng7 = 7, x, dp;
- 
+
    ring rng = real,x,dp;
    ASSUME(0, 0== isQuotientRing(rng) ) ;
    ASSUME(0, 0== isQuotientRing(rng7) ) ;
@@ -1030,7 +1030,7 @@ EXAMPLE: isSubModule; shows an example
   { return(size(reduce(I,groebner(J),1))==0); }
 }
 example
-{ 
+{
   "EXAMPLE:"; echo = 2;
   ring r=0,x,dp;
   ideal I1=x2;
