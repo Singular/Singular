@@ -6292,16 +6292,39 @@ static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
   poly monomexpr;
   BOOLEAN nok=jjSUBST_Test(v,w,ringvar,monomexpr);
   if (nok) return TRUE;
+  ideal id=(ideal)u->Data();
   if (ringvar>0)
   {
+    BOOLEAN overflow=FALSE;
+    //if (monomexpr!=NULL)
+    if (0)
+    {
+      long deg_monexp=pTotaldegree(monomexpr);
+      for(int i=IDELEMS(id)-1;i>=0;i--)
+      {
+        poly p=id->m[i];
+        if ((p!=NULL) && (pTotaldegree(p)!=0) &&
+        ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)pTotaldegree(p))))
+        {
+          overflow=TRUE;
+          break;
+        }
+      }
+    }
+    if (overflow)
+      Warn("possible OVERFLOW in subst, max exponent is %ld",currRing->bitmask);
     if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
-      res->data = id_Subst((ideal)u->CopyD(res->rtyp), ringvar, monomexpr, currRing);
+    {
+      if (res->rtyp==MATRIX_CMD) id=(ideal)mp_Copy((matrix)id,currRing);
+      else                       id=id_Copy(id,currRing);
+      res->data = id_Subst(id, ringvar, monomexpr, currRing);
+    }
     else
-      res->data = idSubstPoly((ideal)u->Data(),ringvar,monomexpr);
+      res->data = idSubstPoly(id,ringvar,monomexpr);
   }
   else
   {
-    res->data = idSubstPar((ideal)u->Data(),-ringvar,monomexpr);
+    res->data = idSubstPar(id,-ringvar,monomexpr);
   }
   return FALSE;
 }
