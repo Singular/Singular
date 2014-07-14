@@ -64,6 +64,7 @@ RETURN:  saturation of id with respect to j (= union_(k=1...) of id:j^k)
 NOTE:    result is a std basis in the basering
 "
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -92,6 +93,7 @@ RETURN:  saturation of id with respect to j (= union_(k=1...) of id:j^k)
 NOTE:    result is a std basis in the basering
 "
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
   int @k,@i;
@@ -159,6 +161,7 @@ NOTE:    result is a std basis in the basering
 
 proc minSat(ideal inew, ideal h)
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
   int i,k;
@@ -207,6 +210,7 @@ proc minSat(ideal inew, ideal h)
 
 static proc quotMin(list tsil)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
   int i,j,k,action;
@@ -269,6 +273,7 @@ static proc quotMin(list tsil)
 
 static proc testFactor(list act,poly p)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
   poly keep=p;
@@ -369,6 +374,7 @@ example
 
 proc idealsEqual( ideal k, ideal j)
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   return(stdIdealsEqual(std(k),std(j)));
 }
 
@@ -376,6 +382,7 @@ static proc specialIdealsEqual( ideal k1, ideal k2)
 {
   int j;
 
+  ASSUME(1, hasFieldCoefficient(basering) );
   if(size(k1)==size(k2))
   {
     for(j=1;j<=size(k1);j++)
@@ -393,7 +400,7 @@ static proc specialIdealsEqual( ideal k1, ideal k2)
 static proc stdIdealsEqual( ideal k1, ideal k2)
 {
   int j;
-
+  ASSUME(1, hasFieldCoefficient(basering) );
   if(size(k1)==size(k2))
   {
     for(j=1;j<=size(k1);j++)
@@ -415,6 +422,7 @@ static proc stdIdealsEqual( ideal k1, ideal k2)
 
 proc primaryTest (ideal i, poly p)
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
   int m=1;
@@ -533,6 +541,7 @@ proc gcdTest(ideal act)
 ///////////////////////////////////////////////////////////////////////////////
 static proc splitPrimary(list l,ideal ser,int @wr,list sact)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
   int i,j,k,s,r,w;
@@ -724,6 +733,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 static proc splitCharp(list l)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
   if((char(basering)==0)||(npars(basering)>0))
@@ -854,6 +864,7 @@ NOTE:    Algorithm of Gianni/Trager/Zacharias
 EXAMPLE: example zero_decomp; shows an example
 "
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
@@ -1315,6 +1326,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc extF(list l,list #)
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
 //zero_dimensional primary decomposition after finite field extension
@@ -1408,6 +1420,7 @@ proc zeroSp(ideal i)
 //pe[l] is a dp-Groebnerbasis
 //the radical of the intersection of the pe[l] is equal to the radical of i
 
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
   def R=basering;
@@ -1500,8 +1513,10 @@ proc zeroSepClos(ideal I,ideal F)
 //such that sc(I)=preimage(frobenius definde by v)
 //i.e. var(i)----->var(i)^(p^v[i])
 
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
+
   if(homog(I)==1){return(maxideal(1));}
 
   //assume F[i] irreducible in I and depending only on var(i)
@@ -1541,6 +1556,7 @@ proc insepDecomp(ideal i)
 //computes the prime decomposition of the special ideals
 //and transforms it back to a decomposition of i
  
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
   def R=basering;
@@ -1587,6 +1603,7 @@ NOTE:
 EXAMPLE: example clearSB; shows an example
 "
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
   int k,j;
@@ -1666,8 +1683,9 @@ NOTE:
 EXAMPLE: example clearSB; shows an example
 "
 {
+ ASSUME(1, hasFieldCoefficient(basering) );
  ASSUME(1, not isQuotientRing(basering) ) ;
-  ASSUME(1, hasGlobalOrdering(basering) ) ;
+ ASSUME(1, hasGlobalOrdering(basering) ) ;
  int k,j;
  intvec m,n,v,w;
  int c=size(i);
@@ -1792,6 +1810,7 @@ NOTE:
 EXAMPLE: example maxIndependentSet; shows an example
 "
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
   int n,k,di;
@@ -1860,6 +1879,7 @@ NOTE:
 EXAMPLE: example independentSet; shows an example
 "
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
   ideal @ih,@jh;
@@ -1926,8 +1946,9 @@ RETURN:  list = the minimal associated prime ideals of i
 EXAMPLE: example minAssPrimes; shows an example
 "
 {
+   ASSUME(1, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
+   ASSUME(0, hasGlobalOrdering(basering) ) ;
    def @P=basering;
    if(size(i)==0){return(list(ideal(0)));}
    list qr=simplifyIdeal(i);
@@ -2054,8 +2075,9 @@ example
 
 static proc primT(ideal i)
 {
+   ASSUME(1, hasFieldCoefficient(basering) );
    ASSUME(1, not isQuotientRing(basering) ) ;
-  ASSUME(1, hasGlobalOrdering(basering) ) ;
+   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
    //assumes that all generators of i are irreducible
    //i is standard basis
@@ -2084,6 +2106,7 @@ RETURN:  list = the minimal associated prime ideals of i
 EXAMPLE: example minAssPrimes; shows an example
 "
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -2377,7 +2400,7 @@ NOTE:    An embedded component q (primary ideal) of i can be replaced in the
 EXAMPLE:example equidim; shows an example
 "
 {
-
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   if(attrib(basering,"global")!=1)
   {
@@ -2487,6 +2510,7 @@ RETURN:  ideal of equidimensional locus (of maximal dimension) of i.
 EXAMPLE: example equidimMax; shows an example
 "
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   if(attrib(basering,"global")!=1)
   {
@@ -2617,8 +2641,9 @@ static proc islp()
 
 proc algeDeco(ideal i, int w)
 {
+   ASSUME(0, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
+   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
 //reduces primery decomposition over algebraic extensions to
 //the other cases
@@ -2767,6 +2792,7 @@ NOTE:    Algorithm of Gianni/Trager/Zacharias
 EXAMPLE: example decomp; shows an example
 "
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -3753,8 +3779,9 @@ static proc powerCoeffs(poly f,int e)
 //computes a polynomial with the same monomials as f but coefficients
 //the p^e th power of the coefficients of f
 {
+   ASSUME(1, hasFieldCoefficient(basering) );
    ASSUME(1, not isQuotientRing(basering) ) ;
-  ASSUME(1, hasGlobalOrdering(basering) ) ;
+   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
    int i;
    poly g;
@@ -3776,8 +3803,9 @@ proc sep(poly f,int i, list #)
         as polynomial over Fp(t(1)^(p^-k),...,t(m)^(p^-k))
  EXAMPLE: example sep; shows an example
 {
+   ASSUME(0, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
+   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    def R=basering;
    int k;
@@ -3829,8 +3857,9 @@ example
  NOTE:  Algorithm of Kemper
  EXAMPLE: example zeroRad; shows an example
 {
+   ASSUME(0, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
+   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    if(homog(I)==1){return(maxideal(1));}
    //I needs to be a reduced standard basis
@@ -3928,6 +3957,7 @@ NOTE:    Uses the algorithm of Eisenbud/Huneke/Vasconcelos, which
 EXAMPLE: example radicalEHV; shows an example
 "
 {
+   ASSUME(0, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
    if(attrib(basering,"global")!=1)
    {
@@ -4056,6 +4086,7 @@ example
 //computes the equidimensional part of the ideal i of codimension e
 static proc int_ass_primary_e(ideal i, int e)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -4102,8 +4133,9 @@ static proc AnnExt_R(int n,list re)
 
 static proc analyze(list pr)
 {
+   ASSUME(1, hasFieldCoefficient(basering) );
    ASSUME(1, not isQuotientRing(basering) ) ;
-  ASSUME(1, hasGlobalOrdering(basering) ) ;
+   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
    int ii,jj;
    for(ii=1;ii<=size(pr) div 2;ii++)
@@ -4135,6 +4167,7 @@ static proc analyze(list pr)
 
 static proc simplifyIdeal(ideal i)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -4242,6 +4275,7 @@ static proc min_ass_prim_charsets (ideal PS, int cho)
 
 static proc min_ass_prim_charsets0 (ideal PS)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -4346,6 +4380,7 @@ static proc min_ass_prim_charsets0 (ideal PS)
 
 static proc min_ass_prim_charsets1 (ideal PS)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -4488,6 +4523,7 @@ static proc min_ass_prim_charsets1 (ideal PS)
 
 static proc prim_dec(ideal I, int choose)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -4714,6 +4750,7 @@ static proc prim_dec(ideal I, int choose)
 
 static proc pseudo_prim_dec_charsets (ideal I, ideal SI, int choo)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -4767,6 +4804,7 @@ static proc pseudo_prim_dec_charsets (ideal I, ideal SI, int choo)
 
 static proc pseudo_prim_dec_special_charsets (ideal SI,list V6, int choo)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -4868,6 +4906,7 @@ static proc pseudo_prim_dec_special_charsets (ideal SI,list V6, int choo)
 
 static proc pseudo_prim_dec_i (ideal SI, list L)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -4940,6 +4979,7 @@ static proc pseudo_prim_dec_i (ideal SI, list L)
 
 static proc extraction (ideal SI, ideal SP)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -5048,6 +5088,7 @@ static proc extraction (ideal SI, ideal SP)
 
 static proc minsat(ideal SI, poly p)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -5097,6 +5138,7 @@ static proc minsat(ideal SI, poly p)
 
 static proc minsat_ppd(ideal SI, ideal fac)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -5144,6 +5186,7 @@ static proc minsat_ppd(ideal SI, ideal fac)
 
 static proc minquot(list tsil)
 {
+   ASSUME(1, hasFieldCoefficient(basering) );
    ASSUME(1, not isQuotientRing(basering) ) ;
    ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -5217,6 +5260,7 @@ static proc minquot(list tsil)
 
 static proc special_ideals_equal( ideal k1, ideal k2)
 {
+   ASSUME(1, hasFieldCoefficient(basering) );
    ASSUME(1, not isQuotientRing(basering) ) ;
    ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -5287,6 +5331,7 @@ NOTE:    - Algorithm of Gianni/Trager/Zacharias.
 EXAMPLE: example primdecGTZ; shows an example
 "
 {
+   ASSUME(0, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
    if(size(#)>0)
    {
@@ -5364,6 +5409,7 @@ SEE ALSO: primdecGTZ; absFactorize
 EXAMPLE: example absPrimdecGTZ; shows an example
 "
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   if (char(basering) != 0)
   {
@@ -5533,6 +5579,7 @@ NOTE:    Algorithm of Shimoyama/Yokoyama.
 EXAMPLE: example primdecSY; shows an example
 "
 {
+   ASSUME(0, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
    if(size(#)>1)
    {
@@ -5609,6 +5656,7 @@ NOTE:    - Designed for characteristic 0, works also in char k > 0 based
 EXAMPLE: example minAssGTZ; shows an example
 "
 {
+   ASSUME(0, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
    if(size(#)>0)
    {
@@ -5714,6 +5762,7 @@ NOTE:    If c=0, the given ordering of the variables is used. @*
 EXAMPLE: example minAssChar; shows an example
 "
 {
+   ASSUME(0, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
    if(size(#)>1)
    {
@@ -5768,6 +5817,7 @@ NOTE:    A combination of the algorithms of Krick/Logar (with modifications by L
 EXAMPLE: example equiRadical; shows an example
 "
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   if(attrib(basering,"global")!=1)
   {
@@ -5805,6 +5855,7 @@ NOTE:    A combination of the algorithms of Krick/Logar (with modifications by L
 EXAMPLE: example radical; shows an example
 "
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   dbprint(printlevel - voice, "Radical, version 2006.05.08");
   if(attrib(basering,"global")!=1)
@@ -5989,6 +6040,7 @@ example
 //
 static proc radicalKL(ideal I, ideal ser, list #)
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -6029,6 +6081,7 @@ static proc radicalSL(ideal I, list #)
 // Output = (P, primaryDec) where P = rad(I) and primaryDec is the list of the radicals
 // obtained in intermediate steps.
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -6114,6 +6167,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
 // list #          Only for radicalKL (If #[1] = 1,
 //                    only equiradical is required.
 //                    It is used to set the value of done.)
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -6389,6 +6443,7 @@ static proc radicalSLIteration (ideal I, ideal P);
 //        P, ideal. Intersection of some prime ideals of I.
 // Output: ideal. Intersection of some primes of I different from the ones in P.
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -6459,6 +6514,7 @@ NOTE:
 EXAMPLE: example newMaxIndependentSetDp; shows an example
 "
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
@@ -6553,6 +6609,7 @@ NOTE:
 EXAMPLE: example prepareQuotientRingDp; shows an example
 "
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -6602,6 +6659,7 @@ NOTE:    Uses algorithm of Eisenbud/Huneke/Vasconcelos.
 EXAMPLE: example prepareAss; shows an example
 "
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   if(attrib(basering,"global")!=1)
   {
@@ -6653,6 +6711,7 @@ NOTE:    Uses algorithm of Eisenbud, Huneke and Vasconcelos.
 EXAMPLE: example equidimMaxEHV; shows an example
 "
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   if(attrib(basering,"global")!=1)
   {
@@ -6692,6 +6751,7 @@ RETURN:  int, 1 if the intersection of the ideals in pr is k, 0 if not
 EXAMPLE: example testPrimary; shows an example
 "
 {
+   ASSUME(0, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
    ASSUME(0, hasGlobalOrdering(basering) ) ;
 
@@ -6727,6 +6787,7 @@ NOTE:    The algorithm (of Monico), works well only for a small total number
 EXAMPLE: example zerodec; shows an example
 "
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   if(attrib(basering,"global")!=1)
   {
@@ -6847,6 +6908,7 @@ NOTE:    Algorithm of Gianni/Trager/Zacharias
 EXAMPLE: example newDecompStep; shows an example
 "
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -7752,6 +7814,7 @@ example
 // This is not yet implemented, since the reduction is not exactly the same and some changes should be made.
 static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim, int abspri, int @wr, list data)
 {
+   ASSUME(1, hasFieldCoefficient(basering) );
    ASSUME(1, not isQuotientRing(basering) ) ;
    ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -8053,6 +8116,7 @@ static proc minAssSL(ideal I)
 // Output = primaryDec where primaryDec is the list of the minimal
 // associated primes and the primary components corresponding to these primes.
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -8096,6 +8160,7 @@ static proc minAssSL(ideal I)
 // This version uses Primary Decomposition in the zerodimensional case.
 static proc minAssSLIteration(ideal I, ideal P);
 {
+  ASSUME(1, hasFieldCoefficient(basering) );
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
@@ -8151,6 +8216,7 @@ NOTE:
 EXAMPLE: example newMaxIndependentSetLp; shows an example
 "
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
@@ -8254,6 +8320,7 @@ NOTE:    Algorithm of Gianni/Trager/Zacharias
 EXAMPLE: example newZero_decomp; shows an example
 "
 {
+  ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
