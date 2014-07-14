@@ -1035,12 +1035,8 @@ example
   ring r=0,x,dp;
   ideal I1=x2;
   ideal I2=x3;
-  ideal I3=x2,0;
   isSubModule(I1, I2);
   isSubModule(I2, I1);
-  isSubModule(I3, I1);
-  module M = x,0;
-  isSubModule(M,M);
 }
 
 proc hasMixedOrdering()
