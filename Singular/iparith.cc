@@ -2052,7 +2052,7 @@ static BOOLEAN jjELIMIN(leftv res, leftv u, leftv v)
 {
   res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data());
   //setFlag(res,FLAG_STD);
-  return FALSE;
+  return v->next!=NULL; //do not allow next like in eliminate(I,a(1..4))
 }
 static BOOLEAN jjELIMIN_IV(leftv res, leftv u, leftv v)
 {
