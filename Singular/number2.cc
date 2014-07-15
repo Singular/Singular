@@ -82,12 +82,12 @@ BOOLEAN jjNUMBER2_OP2(leftv res, leftv a, leftv b)
   number aa=NULL;
   number2 b2=NULL;
   number bb=NULL;
-  if (a->Typ()==NUMBER2_CMD)
+  if (a->Typ()==CNUMBER_CMD)
   {
     a2=(number2)a->Data();
     aa=a2->n;
   }
-  if (b->Typ()==NUMBER2_CMD)
+  if (b->Typ()==CNUMBER_CMD)
   {
     b2=(number2)b->Data();
     if ((a2!=NULL) && (a2->cf!=b2->cf))
@@ -185,7 +185,7 @@ BOOLEAN jjNUMBER2CR(leftv res, leftv a, leftv b)
         bo=TRUE;
       break;
     }
-    case NUMBER2_CMD:
+    case CNUMBER_CMD:
     {
       number2 a2=(number2)a->Data();
       if (a2->cf==NULL) bo=TRUE;

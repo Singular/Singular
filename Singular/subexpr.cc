@@ -122,7 +122,7 @@ void sleftv::Print(leftv store, int spaces)
         case CRING_CMD:
           crPrint((coeffs)d);
           break;
-        case NUMBER2_CMD:
+        case CNUMBER_CMD:
           n2Print((number2)d);
           break;
         case INTVEC_CMD:
@@ -398,7 +398,7 @@ static inline void * s_internalCopy(const int t,  void *d)
         cf->ref++;
         return (void*)d;
       }
-    case NUMBER2_CMD:
+    case CNUMBER_CMD:
       return (void*)n2Copy((number2)d);
     case INTVEC_CMD:
     case INTMAT_CMD:
@@ -473,7 +473,7 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case CRING_CMD:
       nKillChar((coeffs)d);
       break;
-    case NUMBER2_CMD:
+    case CNUMBER_CMD:
       {
         number2 n=(number2)d;
         n2Delete(n);
@@ -771,7 +771,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           else
             return pString((poly)d);
 
-        case NUMBER2_CMD:
+        case CNUMBER_CMD:
           return n2String((number2)d,typed);
 
         case NUMBER_CMD:
@@ -1010,7 +1010,7 @@ int  sleftv::Typ()
       if ((currRing!=NULL)&&(currRing->cf==b->basecoeffs()))
         return NUMBER_CMD;
       else
-        return NUMBER2_CMD;
+        return CNUMBER_CMD;
     }
     case IDEAL_CMD:
     case MATRIX_CMD:

@@ -488,7 +488,7 @@ int iiTestConvert (int inputType, int outputType)
 
   if ((currRing==NULL) && (outputType>BEGIN_RING) && (outputType<END_RING))
     return 0;
-  //if ((currRing==NULL) && (outputType==NUMBER2_CMD))
+  //if ((currRing==NULL) && (outputType==CNUMBER_CMD))
   //  return 0;
 
   // search the list

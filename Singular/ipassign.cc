@@ -405,7 +405,7 @@ static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr)
 }
 static BOOLEAN jiA_NUMBER2(leftv res, leftv a, Subexpr e)
 {
-  number2 n=(number2)a->CopyD(NUMBER2_CMD);
+  number2 n=(number2)a->CopyD(CNUMBER_CMD);
   if (e==NULL)
   {
     if (res->data!=NULL)
