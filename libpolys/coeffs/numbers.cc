@@ -330,6 +330,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfIntMod=ndIntMod; /* dummy !! */
     n->cfNormalize=ndNormalize;
     n->cfGcd  = ndGcd;
+    n->cfNormalizeHelper  = ndGcd; /* tricky, isn't it ?*/
     n->cfLcm  = ndGcd; /* tricky, isn't it ?*/
     n->cfInitMPZ = ndInitMPZ;
     n->cfMPZ = ndMPZ;
@@ -429,7 +430,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfGetDenom!=NULL);
     assume(n->cfGetNumerator!=NULL);
     assume(n->cfGcd!=NULL);
-    assume(n->cfLcm!=NULL);
+    assume(n->cfNormalizeHelper!=NULL);
     assume(n->cfDelete!=NULL);
     assume(n->cfSetMap!=NULL);
     assume(n->cfName!=NULL);

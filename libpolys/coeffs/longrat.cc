@@ -1251,7 +1251,7 @@ void nlNormalize (number &x, const coeffs r)
 /*2
 * returns in result->z the lcm(a->z,b->n)
 */
-number nlLcm(number a, number b, const coeffs r)
+number nlNormalizeHelper(number a, number b, const coeffs r)
 {
   number result;
   nlTest(a, r);
@@ -3090,7 +3090,7 @@ BOOLEAN nlInitChar(coeffs r, void*p)
   r->cfGetDenom = nlGetDenom;
   r->cfGetNumerator = nlGetNumerator;
   r->cfExtGcd = nlExtGcd; // only for ring stuff and Z
-  r->cfLcm  = nlLcm;
+  r->cfNormalizeHelper  = nlNormalizeHelper;
   r->cfDelete= nlDelete;
   r->cfSetMap = nlSetMap;
   //r->cfName = ndName;

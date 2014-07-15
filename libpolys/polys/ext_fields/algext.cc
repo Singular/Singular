@@ -100,7 +100,6 @@ void     naWriteShort(number &a, const coeffs cf);
 number   naGetDenom(number &a, const coeffs cf);
 number   naGetNumerator(number &a, const coeffs cf);
 number   naGcd(number a, number b, const coeffs cf);
-//number   naLcm(number a, number b, const coeffs cf);
 int      naSize(number a, const coeffs cf);
 void     naDelete(number *a, const coeffs cf);
 void     naCoeffWrite(const coeffs cf, BOOLEAN details);
@@ -641,14 +640,14 @@ number naLcm(number a, number b, const coeffs cf)
   return naDiv(theProduct, theGcd, cf);
 }
 #endif
-number napLcm(number b, const coeffs cf)
+number napNormalizeHelper(number b, const coeffs cf)
 {
   number h=n_Init(1,naRing->cf);
   poly bb=(poly)b;
   number d;
   while(bb!=NULL)
   {
-    d=n_Lcm(h,pGetCoeff(bb), naRing->cf);
+    d=n_NormalizeHelper(h,pGetCoeff(bb), naRing->cf);
     n_Delete(&h,naRing->cf);
     h=d;
     pIter(bb);
@@ -666,7 +665,7 @@ number naLcmContent(number a, number b, const coeffs cf)
 #else
   {
     a=(number)p_Copy((poly)a,naRing);
-    number t=napLcm(b,cf);
+    number t=napNormalizeHelper(b,cf);
     if(!n_IsOne(t,naRing->cf))
     {
       number bt, rr;
@@ -1283,7 +1282,7 @@ static void naClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
           poly c_n=c_n_n;
           while (c_n!=NULL)
           { // each monom: coeff in Q
-            d=n_Lcm(hzz,pGetCoeff(c_n),r->cf->extRing->cf);
+            d=n_NormalizeHelper(hzz,pGetCoeff(c_n),r->cf->extRing->cf);
             n_Delete(&hzz,r->cf->extRing->cf);
             hzz=d;
             pIter(c_n);
@@ -1460,7 +1459,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfDBTest       = naDBTest;
 #endif
   cf->cfGcd          = naGcd;
-  cf->cfLcm          = naLcmContent;
+  cf->cfNormalizeHelper          = naLcmContent;
   cf->cfSize         = naSize;
   cf->nCoeffIsEqual  = naCoeffIsEqual;
   cf->cfInvers       = naInvers;
@@ -1638,7 +1637,7 @@ BOOLEAN npolyInitChar(coeffs cf, void * infoStruct)
   cf->cfDBTest       = naDBTest;
 #endif
   cf->cfGcd          = naGcd;
-  cf->cfLcm          = naLcmContent;
+  cf->cfNormalizeHelper          = naLcmContent;
   cf->cfSize         = naSize;
   cf->nCoeffIsEqual  = naCoeffIsEqual;
   cf->cfInvers       = npolyInvers;

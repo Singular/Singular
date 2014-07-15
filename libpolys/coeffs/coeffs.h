@@ -250,6 +250,7 @@ struct n_Procs_s
    //rem can be NULL
    number  (*cfQuotRem)(number a, number b, number *rem, const coeffs r);
    number  (*cfLcm)(number a, number b, const coeffs r);
+   number  (*cfNormalizeHelper)(number a, number b, const coeffs r);
    void    (*cfDelete)(number * a, const coeffs r);
 
    //CF: tries to find a canonical map from src -> dst
@@ -676,11 +677,15 @@ static inline number  n_QuotRem(number a, number b, number *q, const coeffs r)
 /// in Z: return the lcm of 'a' and 'b'
 /// in Z/nZ, Z/2^kZ: computed as in the case Z
 /// in Z/pZ, C, R: not implemented
-/// in Q: return the lcm of the numerators of 'a' and the denominator of 'b'
 /// in K(a)/<p(a)>: not implemented
 /// in K(t_1, ..., t_n): not implemented
 static inline number n_Lcm(number a, number b, const coeffs r)
 { assume(r != NULL); assume(r->cfLcm!=NULL); return r->cfLcm(a,b,r); }
+
+/// assume that r is a quotient field (otherwise, return 1)
+/// for arguments (a1/a2,b1/b2) return (lcm(a1,b2)/1)
+static inline number n_NormalizeHelper(number a, number b, const coeffs r)
+{ assume(r != NULL); assume(r->cfNormalizeHelper!=NULL); return r->cfNormalizeHelper(a,b,r); }
 
 /// set the mapping function pointers for translating numbers from src to dst
 static inline nMapFunc n_SetMap(const coeffs src, const coeffs dst)

@@ -105,7 +105,7 @@ number   nlInit2gmp (mpz_t i, mpz_t j, const coeffs r);
 
 number   nlGcd(number a, number b, const coeffs r);
 number nlExtGcd(number a, number b, number *s, number *t, const coeffs);
-number   nlLcm(number a, number b, const coeffs r);   /*special routine !*/
+number   nlNormalizeHelper(number a, number b, const coeffs r);   /*special routine !*/
 BOOLEAN  nlGreater(number a, number b, const coeffs r);
 BOOLEAN  nlIsMOne(number a, const coeffs r);
 int      nlInt(number &n, const coeffs r);

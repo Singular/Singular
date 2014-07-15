@@ -37,7 +37,6 @@ static inline number n_Add(number a, number b, const ring r){ return n_Add(a, b,
 static inline number n_Div(number a, number b, const ring r){ return n_Div(a,b, r->cf);}
 static inline number n_ExactDiv(number a, number b, const ring r){ return n_ExactDiv(a,b, r->cf);}
 static inline number n_Gcd(number a, number b, const ring r){ return n_Gcd(a,b, r->cf);}
-static inline number n_Lcm(number a, number b, const ring r){ return n_Lcm(a,b, r->cf);}
 
 #ifdef HAVE_RINGS
 static inline BOOLEAN n_IsUnit(number n, const ring r){ return n_IsUnit(n, r->cf);}

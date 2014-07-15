@@ -506,7 +506,7 @@ number fglmVector::clearDenom ()
     if(!nIsZero (rep->getconstelem (i)))
     {
       isZero = FALSE;
-      number temp = n_Lcm (theLcm, rep->getconstelem (i), currRing->cf);
+      number temp = n_NormalizeHelper (theLcm, rep->getconstelem (i), currRing->cf);
       nDelete (&theLcm);
       theLcm = temp;
     }

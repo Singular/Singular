@@ -935,7 +935,7 @@ example
 static proc testIsQuotientRing()
 {
    ring rng7 = 7, x, dp;
- 
+
    ring rng = real,x,dp;
    ASSUME(0, 0== isQuotientRing(rng) ) ;
    ASSUME(0, 0== isQuotientRing(rng7) ) ;
@@ -1025,17 +1025,18 @@ RETURN: 1 if module(I) is in module(J), 0 otherwise
 EXAMPLE: isSubModule; shows an example
 {
   if (attrib(J,"isSB")==1)
-  { return(size(reduce(I,J,1)==0)); }
+  { return(size(reduce(I,J,1))==0); }
   else
-  { return(size(reduce(I,groebner(J),1)==0)); }
+  { return(size(reduce(I,groebner(J),1))==0); }
 }
 example
 {
+  "EXAMPLE:"; echo = 2;
   ring r=0,x,dp;
   ideal I1=x2;
   ideal I2=x3;
-  isSubModule(I1,I2);
-  isSubModule(I2,I1);
+  isSubModule(I1, I2);
+  isSubModule(I2, I1);
 }
 
 proc hasMixedOrdering()
