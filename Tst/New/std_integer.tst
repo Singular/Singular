@@ -29,7 +29,7 @@ stdIJ;
 ideal stdIJZ = stdZW(IJ);
 stdIJZ;
 int k;
- for(k=1; k <= nGens(stdIJ); k++)
+ for(k=1; k <= ncols(stdIJ); k++)
 {
  if(leadcoef(stdIJ[k]) < 0)
  {
