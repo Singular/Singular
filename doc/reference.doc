@@ -1954,7 +1954,7 @@ The (coeffients of the) result a/b is the best approximation under the condition
 |a|,|b|<=sqrt((N-1)/2)
 @end ifinfo
 @tex
-$|a|,|b|<=\sqrt((N-1)/2)$
+$|a|,|b|<=\sqrt{(N-1)/2}$
 @end tex
 @item @strong{Note:}
 The current coefficient field must be the rationals.
