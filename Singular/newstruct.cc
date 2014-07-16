@@ -858,6 +858,7 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
   }
   p->args=args;
   p->p=pr; pr->ref++;
+  pr->is_static=0;
   currRingHdl = save_ring;
   return FALSE;
 }
