@@ -3702,9 +3702,7 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
     return result;
   }
   CanonicalForm Q, R;
-  Variable x= Variable (1);
-  Variable y= Variable (2);
-  newtonDivrem (swapvar (B, y, x), swapvar (A, y, x), Q, R);
+  newtonDivrem (B, A, Q, R);
   if (!isRat)
     Off (SW_RATIONAL);
   return R.isZero();
