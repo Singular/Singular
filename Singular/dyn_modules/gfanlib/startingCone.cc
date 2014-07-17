@@ -39,7 +39,7 @@ static bool checkContainmentInTropicalVariety(const groebnerCone sigma)
  * Returns a point in the tropical variety and a maximal Groebner cone
  * containing the point.
  **/
-std::pair<gfan::ZVector,groebnerCone> tropicalStartingPointViaGroebnerFan(const ideal I, const ring r, const tropicalStrategy& currentStrategy)
+std::pair<gfan::ZVector,groebnerCone> tropicalStartingDataViaGroebnerFan(const ideal I, const ring r, const tropicalStrategy& currentStrategy)
 {
   currentStrategy.reduce(I,r);
 
@@ -83,7 +83,7 @@ BOOLEAN tropicalStartingPoint(leftv res, leftv args)
   {
     ideal I = (ideal) u->Data();
     tropicalStrategy currentStrategy(I,currRing);
-    std::pair<gfan::ZVector,groebnerCone> startingData = tropicalStartingPointViaGroebnerFan(I,currRing,currentStrategy);
+    std::pair<gfan::ZVector,groebnerCone> startingData = tropicalStartingDataViaGroebnerFan(I,currRing,currentStrategy);
     gfan::ZVector startingPoint = startingData.first;
     res->rtyp = BIGINTMAT_CMD;
     res->data = (void*) zVectorToBigintmat(startingPoint);
@@ -130,24 +130,24 @@ groebnerCone tropicalStartingCone(const ideal I, const ring r, const tropicalStr
     inI->m[i] = p_PermPoly(I->m[i],NULL,r,s,identityMap,NULL,0);
 
   gfan::ZCone zc = linealitySpaceOfGroebnerFan(inI,s);
-  gfan::ZVector potentialStartingPoint; groebnerCone ambientMaximalCone;
+  gfan::ZVector startingPoint; groebnerCone ambientMaximalCone;
   while (zc.dimension()<currentStrategy.getDimensionOfIdeal())
   {
-    std::pair<gfan::ZVector,groebnerCone> startingData = tropicalStartingPointViaGroebnerFan(inI,s,currentStrategy);
-    potentialStartingPoint = startingData.first;
+    std::pair<gfan::ZVector,groebnerCone> startingData = tropicalStartingDataViaGroebnerFan(inI,s,currentStrategy);
+    startingPoint = startingData.first;
     ambientMaximalCone = groebnerCone(startingData.second);
 
     id_Delete(&inI,s); rDelete(s);
     inI = ambientMaximalCone.getPolynomialIdeal();
     s = ambientMaximalCone.getPolynomialRing();
 
-    inI = sloppyInitial(inI,s,potentialStartingPoint);
+    inI = sloppyInitial(inI,s,startingPoint);
     zc = linealitySpaceOfGroebnerFan(inI,s);
   }
 
   ideal J = lift(I,r,inI,s);
+  groebnerCone tropicalStartingCone(J,inI,s,currentStrategy);
   id_Delete(&inI,s);
-  groebnerCone tropicalStartingCone(J,s,potentialStartingPoint,currentStrategy);
   id_Delete(&J,s);
 
   assume(checkContainmentInTropicalVariety(tropicalStartingCone));

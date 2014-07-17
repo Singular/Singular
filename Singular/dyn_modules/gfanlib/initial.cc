@@ -26,6 +26,19 @@ long wDeg(const poly p, const ring r, const gfan::ZVector w)
 }
 
 /***
+ * Computes the weighted multidegree of the leading term of p with respect to W.
+ * The weighted multidegree is a vector whose i-th entry is the weighted degree
+ * with respect to the i-th row vector of W.
+ **/
+gfan::ZVector WDeg(const poly p, const ring r, const gfan::ZMatrix W)
+{
+  gfan::ZVector d = gfan::ZVector(W.getHeight());
+  for (int i=0; i<W.getHeight(); i++)
+    d[i] = wDeg(p,r,W[i]);
+  return d;
+}
+
+/***
  * Checks if p is sorted with respect to w.
  **/
 static bool checkSloppyInput(const poly p, const ring r, const gfan::ZVector w)
@@ -80,30 +93,37 @@ ideal sloppyInitial(const ideal I, const ring r, const gfan::ZVector w)
 }
 
 /***
- * Returns the first terms of p of same weighted degree under w,
- * this is not necessarily the initial form of p with respect to w!
+ * Returns the initial form of p with respect to w
  **/
 poly initial(const poly p, const ring r, const gfan::ZVector w)
 {
-  int n = r->N;
-  int* expv = (int*) omAlloc(n*sizeof(int));
   poly q0 = p_Head(p,r);
   poly q1 = q0;
   long d = wDeg(p,r,w);
   for (poly currentTerm = p->next; currentTerm; pIter(currentTerm))
   {
-    if (wDeg(currentTerm,r,w)==d)
+    long e = wDeg(currentTerm,r,w);
+    if (e>d)
     {
-      pNext(q1) = p_Head(currentTerm,r);
-      pIter(q1);
+      p_Delete(&q0,r);
+      q0 = p_Head(p,r);
+      q1 = q0;
+      d = e;
     }
+    else
+      if (e==d)
+      {
+        pNext(q1) = p_Head(currentTerm,r);
+        pIter(q1);
+      }
   }
-  omFreeSize(expv,n*sizeof(int));
   return q0;
 }
 
 /***
  * Runs the above procedure over all generators of an ideal.
+ * Returns the initial ideal if and only if the weight is in the maximal Groebner cone
+ * of the current ordering.
  **/
 ideal initial(const ideal I, const ring r, const gfan::ZVector w)
 {
@@ -112,6 +132,51 @@ ideal initial(const ideal I, const ring r, const gfan::ZVector w)
     inI->m[i] = initial(I->m[i],r,w);
   return inI;
 }
+
+
+/***
+ * Returns the initial form of p with respect to W,
+ * i.e. the sum over all terms of p with highest multidegree with respect to W.
+ **/
+poly initial(const poly p, const ring r, const gfan::ZMatrix W)
+{
+  int n = rVar(r);
+  poly q0 = p_Head(p,r);
+  poly q1 = q0;
+  gfan::ZVector d = WDeg(p,r,W);
+  for (poly currentTerm = p->next; currentTerm; pIter(currentTerm))
+  {
+    gfan::ZVector e = WDeg(currentTerm,r,W);
+    if (d<e)
+    {
+      p_Delete(&q0,r);
+      q0 = p_Head(p,r);
+      q1 = q0;
+      d = e;
+    }
+    else
+      if (d==e)
+      {
+        pNext(q1) = p_Head(currentTerm,r);
+        pIter(q1);
+      }
+  }
+  return q0;
+}
+
+/***
+ * Runs the above procedure over all generators of an ideal.
+ * Returns the initial ideal if and only if the weight is in the maximal Groebner cone
+ * of the current ordering.
+ **/
+ideal initial(const ideal I, const ring r, const gfan::ZMatrix W)
+{
+  int k = idSize(I); ideal inI = idInit(k);
+  for (int i=0; i<k; i++)
+    inI->m[i] = initial(I->m[i],r,W);
+  return inI;
+}
+
 
 #ifndef NDEBUG
 BOOLEAN initial0(leftv res, leftv args)

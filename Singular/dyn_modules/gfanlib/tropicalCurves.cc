@@ -43,48 +43,56 @@ static std::set<gfan::ZCone> intersect(const std::set<gfan::ZCone> setA,
 }
 
 /***
- * Given a weight w and k more weights E[1], ..., E[h] stored as row vectors of a matrix E,
- + returns a ring whose ordering is weighted with respect to any
- * w+\varepsilon_1*E[1]+...+\varepsilon_k*E[h] for \varepsilon_i sufficiently small.
- * In particular, if E[1], ..., E[h] generate a vector space of dimension d,
- * this ordering can be used to compute a Groebner cone of dimension d containing w.
+ * Given a ring r, weights u, w, and a matrix E, returns a copy of r whose ordering is,
+ * for any ideal homogeneous with respect to u, weighted with respect to u and
+ * whose tiebreaker is genericly weighted with respect to v and E in the following sense:
+ * the ordering "lies" on the affine space A running through v and spanned by the row vectors of E,
+ * and it lies in a Groebner cone of dimension at least rank(E)=dim(A).
  **/
-static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector w, const gfan::ZMatrix E,
-                                      const tropicalStrategy& currentStrategy)
+static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector u, const gfan::ZVector w,
+                                      const gfan::ZMatrix W, const tropicalStrategy& currentStrategy)
 {
-  int n = r->N;
+  int n = rVar(r);
   int h = E.getHeight();
 
   /* create a copy s of r and delete its ordering */
   ring s = rCopy0(r);
   omFree(s->order);
-  s->order  = (int*) omAlloc0((h+3)*sizeof(int));
+  s->order  = (int*) omAlloc0((h+4)*sizeof(int));
   omFree(s->block0);
-  s->block0 = (int*) omAlloc0((h+3)*sizeof(int));
+  s->block0 = (int*) omAlloc0((h+4)*sizeof(int));
   omFree(s->block1);
-  s->block1 = (int*) omAlloc0((h+3)*sizeof(int));
+  s->block1 = (int*) omAlloc0((h+4)*sizeof(int));
   for (int j=0; s->wvhdl[j]; j++) omFree(s->wvhdl[j]);
   omFree(s->wvhdl);
-  s->wvhdl  = (int**) omAlloc0((h+3)*sizeof(int*));
+  s->wvhdl  = (int**) omAlloc0((h+4)*sizeof(int*));
 
-  /* construct a new ordering and keep an eye out for weight overflows */
+  /* construct a new ordering as describe above */
   bool overflow;
   s->order[0] = ringorder_a;
   s->block0[0] = 1;
   s->block1[0] = n;
-  s->wvhdl[0] = ZVectorToIntStar(w,overflow);
-  for (int j=1; j<h; j++)
+  gfan::ZVector uAdjusted = currentStrategy.adjustWeightForHomogeneity(u);
+  s->wvhdl[0] = ZVectorToIntStar(uAdjusted,overflow);
+  s->order[1] = ringorder_a;
+  s->block0[1] = 1;
+  s->block1[1] = n;
+  gfan::ZVector wAdjusted = currentStrategy.adjustWeightUnterHomogeneity(w,uAdjusted);
+  s->wvhdl[1] = ZVectorToIntStar(wAdjusted,overflow);
+  for (int j=0; j<h; j++)
   {
-    s->order[j] = ringorder_a;
-    s->block0[j] = 1;
-    s->block1[j] = n;
-    s->wvhdl[j] = ZVectorToIntStar(currentStrategy.adjustWeightUnderHomogeneity(E[j-1],w),overflow);
+    s->order[j+2] = ringorder_a;
+    s->block0[j+2] = 1;
+    s->block1[j+2] = n;
+    wAdjusted = currentStrategy.adjustWeightUnderHomogeneity(W[j],uAdjusted);
+    s->wvhdl[j+2] = ZVectorToIntStar(wAdjusted,overflow);
   }
-  s->order[h] = ringorder_wp;
-  s->block0[h] = 1;
-  s->block1[h] = n;
-  s->wvhdl[h] = ZVectorToIntStar(currentStrategy.adjustWeightUnderHomogeneity(E[h-1],w),overflow);
-  s->order[h+1] = ringorder_C;
+  s->order[h+2] = ringorder_wp;
+  s->block0[h+2] = 1;
+  s->block1[h+2] = n;
+  wAdjusted = currentStrategy.adjustWeightUnderHomogeneity(W[j],uAdjusted);
+  s->wvhdl[h+2] = ZVectorToIntStar(wAdjusted,overflow);
+  s->order[h+3] = ringorder_C;
 
   if (overflow)
     throw 0; //weightOverflow;
@@ -96,22 +104,21 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector w, const
 
 
 /***
- * Given an ideal I which is homogeneous in the later variables of r,
- * whose tropicalization is, modulo its lineality space, a tropical Curve,
- * computes the said tropicalization.
- * At the end of the computation, I will contain a tropical basis.
- * If the dimension of the tropical variety is known beforehand,
- * it can be provided in order to speed up the computation.
+ * Let I be an ideal. Given a weight vector u in the relative interior
+ * of a one-codimensional cone of the tropical variety of I and
+ * the initial ideal inI with respect to it, computes the star of the tropical variety in u.
  **/
-std::set<gfan::ZCone> tropicalCurve(ideal I, const ring r, const tropicalStrategy currentStrategy)
+std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector u,
+                                   const tropicalStrategy currentStrategy)
 {
-  int k = idSize(I);
+  int k = idSize(inI);
+  int d = currentStrategy.getDimensionOfIdeal();
 
   /* Compute the common refinement over all tropical varieties
    * of the polynomials in the generating set */
-  std::set<gfan::ZCone> C = tropicalVariety(I->m[0],r,currentStrategy);
+  std::set<gfan::ZCone> C = tropicalVariety(inI->m[0],r,currentStrategy);
   for (int i=1; i<k; i++)
-    C = intersect(C,tropicalVariety(I->m[i],r,currentStrategy),currentStrategy.getDimensionOfIdeal());
+    C = intersect(C,tropicalVariety(inI->m[i],r,currentStrategy),d);
 
   /* Cycle through all maximal cones of the refinement.
    * Pick a monomial ordering corresponding to a generic weight vector in it
@@ -123,20 +130,22 @@ std::set<gfan::ZCone> tropicalCurve(ideal I, const ring r, const tropicalStrateg
   for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end(); zc++)
   {
     gfan::ZVector v = zc->getRelativeInteriorPoint();
-    gfan::ZMatrix E = zc->generatorsOfSpan();
+    gfan::ZMatrix W = zc->generatorsOfSpan();
 
-    ring s = genericlyWeightedOrdering(r,v,E,currentStrategy);
-    nMapFunc nMap = n_SetMap(r->cf,s->cf);
-    ideal Is = idInit(k);
+    ring s = genericlyWeightedOrdering(r,v,W,currentStrategy);
+    nMapFunc identity = n_SetMap(r->cf,s->cf);
+    ideal inIs = idInit(k);
     for (int j=0; j<k; j++)
-      Is->m[j] = p_PermPoly(I->m[j],NULL,r,s,nMap,NULL,0);
-    ideal inIs = initial(Is,s,E[E.getHeight()-1]);
+      inIs->m[j] = p_PermPoly(inI->m[j],NULL,r,s,identity,NULL,0);
+
+    inIs = gfanlib_kStd_wrapper(inIs,s,isHomog);
+    ideal ininIs = initial(inIs,s,E[E.getHeight()-1]);
 
     poly mons = checkForMonomialViaSuddenSaturation(inIs,s);
     if (mons)
     {
-      poly gs = witness(mons,Is,inIs,s);
-      C = intersect(C,tropicalVariety(gs,s,currentStrategy),currentStrategy.getDimensionOfIdeal());
+      poly gs = witness(mons,inIs,ininIs,s);
+      C = intersect(C,tropicalVariety(gs,s,currentStrategy),d);
       nMapFunc mMap = n_SetMap(s->cf,r->cf);
       poly gr = p_PermPoly(gs,NULL,s,r,mMap,NULL,0);
       idInsertPoly(I,gr);

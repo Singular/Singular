@@ -147,7 +147,6 @@ poly checkForMonomialsViaStepwiseSaturation(const ideal &I, const gfan::ZVector 
     }
   }
 
-
   J = kStd(J,NULL,isHomog,NULL);
 
   bool b = false;
@@ -165,20 +164,6 @@ poly checkForMonomialsViaStepwiseSaturation(const ideal &I, const gfan::ZVector 
 
 poly checkForMonomialViaSuddenSaturation(const ideal I, const ring r)
 {
-  // assume(rField_is_Ring_Z(currRing));
-
-  // ring s = rCopy0(r);
-  // nKillChar(s->cf);
-  // s->cf = nInitChar(n_Zp,(void*)(long)n_Int(p_GetCoeff(I->m[0],currRing),currRing->cf));
-  // rComplete(s); rChangeCurrRing(s);
-  // int k = idSize(I);
-  // ideal J = idInit(k-1);
-  // nMapFunc nMap = n_SetMap(r->cf,r->cf);
-  // for (int i=1; i<k; i++)
-  // {
-  //   J->m[i-1] = p_PermPoly(I->m[i],NULL,r,r,nMap,NULL,0);
-  //   p_Test(J->m[i-1],currRing);
-  // }
   ring origin = currRing;
   ideal M = idInit(1);
   M->m[0] = p_Init(r);

@@ -120,12 +120,13 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, 
   for (int i=0; i<idSize(polynomialIdeal); i++)
   {
     poly g = polynomialIdeal->m[i];
-    pGetExpV(g,expv);
+    p_GetExpV(g,expv,polynomialRing);
     gfan::ZVector leadexpv = intStar2ZVector(n,expv);
     long d = wDeg(g,polynomialRing,w);
     for (pIter(g); g; pIter(g))
     {
-      pGetExpV(g,expv); gfan::ZVector tailexpv = intStar2ZVector(n,expv);
+      p_GetExpV(g,expv,polynomialRing);
+      gfan::ZVector tailexpv = intStar2ZVector(n,expv);
       if (wDeg(g,polynomialRing,w)==d)
         equations.appendRow(leadexpv-tailexpv);
       else
@@ -133,6 +134,48 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, 
         assume(wDeg(g,polynomialRing,w)<d);
         inequalities.appendRow(leadexpv-tailexpv);
       }
+    }
+  }
+  omFreeSize(expv,(n+1)*sizeof(int));
+
+  polyhedralCone = gfan::ZCone(inequalities,equations);
+  interiorPoint = polyhedralCone.getRelativeInteriorPoint();
+  assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
+}
+
+groebnerCone::groebnerCone(const ideal I, const ideal inI, const ring r, const tropicalStrategy& currentCase):
+  polynomialIdeal(id_Copy(I,r)),
+  polynomialRing(rCopy(r)),
+  currentStrategy(&currentCase)
+{
+  assume(checkPolynomialInput(I,r));
+  assume(checkPolynomialInput(inI,r));
+  int n = rVar(r);
+  gfan::ZMatrix equations = gfan::ZMatrix(0,n);
+  int* expv = (int*) omAlloc((n+1)*sizeof(int));
+  for (int i=0; i<idSize(inI); i++)
+  {
+    poly g = inI->m[i];
+    p_GetExpV(g,expv,r);
+    gfan::ZVector leadexpv = intStar2ZVector(n,expv);
+    for (pIter(g); g; pIter(g))
+    {
+      p_GetExpV(g,expv,r);
+      gfan::ZVector tailexpv = intStar2ZVector(n,expv);
+      equations.appendRow(leadexpv-tailexpv);
+    }
+  }
+  gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
+  for (int i=0; i<idSize(I); i++)
+  {
+    poly g = I->m[i];
+    p_GetExpV(g,expv,r);
+    gfan::ZVector leadexpv = intStar2ZVector(n,expv);
+    for (pIter(g); g; pIter(g))
+    {
+      p_GetExpV(g,expv,r);
+      gfan::ZVector tailexpv = intStar2ZVector(n,expv);
+      inequalities.appendRow(leadexpv-tailexpv);
     }
   }
   omFreeSize(expv,(n+1)*sizeof(int));
