@@ -2043,7 +2043,7 @@ checkOneToOne (const CFList& factors1, const CFList& factors2, CFList& factors3,
   {
     tmp= iter.getItem() (evalPoint, x);
     tmp /= Lc (tmp);
-    if (pos= findItem (factors2, tmp))
+    if ((pos= findItem (factors2, tmp)))
     {
       result2.append (getItem (factors3, pos));
       result.append (iter.getItem());
@@ -3646,6 +3646,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       Variable vBuf= rootOf (mipo.mapinto());
       for (CFListIterator j= factors; j.hasItem(); j++)
         j.getItem()= GF2FalphaRep (j.getItem(), vBuf);
+      prune (vBuf);
     }
     else if (p >= 7 && p*p < (1<<16)) // pass to GF if possible
     {
@@ -3659,6 +3660,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       Variable vBuf= rootOf (mipo.mapinto());
       for (CFListIterator j= factors; j.hasItem(); j++)
         j.getItem()= GF2FalphaRep (j.getItem(), vBuf);
+      prune (vBuf);
     }
     else  // not able to pass to GF, pass to F_p(\alpha)
     {
@@ -3666,6 +3668,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       Variable v= rootOf (mipo);
       ExtensionInfo info= ExtensionInfo (v);
       factors= multiFactorize (A, info);
+      prune (v);
     }
     return factors;
   }
@@ -3679,6 +3682,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       Variable v= rootOf (mipo);
       ExtensionInfo info= ExtensionInfo (v);
       factors= multiFactorize (A, info);
+      prune (v);
     }
     else
     {
@@ -3700,6 +3704,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
                                    source, dest);
         ExtensionInfo info= ExtensionInfo (v, alpha, imPrimElem, primElem);
         factors= multiFactorize (bufA, info);
+        prune (v);
       }
       else
       {
@@ -3720,6 +3725,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         bufA= mapUp (bufA, beta, v, delta, imPrimElem, source, dest);
         ExtensionInfo info= ExtensionInfo (v, beta, imPrimElem, delta);
         factors= multiFactorize (bufA, info);
+        prune (v);
       }
     }
     return factors;
@@ -3742,6 +3748,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         setCharacteristic (p, extensionDeg, 'Z');
         ExtensionInfo info= ExtensionInfo (extension);
         factors= multiFactorize (A.mapinto(), info);
+        prune (vBuf);
       }
       else // not able to pass to another GF, pass to F_p(\alpha)
       {
@@ -3752,6 +3759,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         Variable v= chooseExtension (vBuf, beta, k);
         ExtensionInfo info= ExtensionInfo (v, extension);
         factors= multiFactorize (A, info);
+        prune (vBuf);
       }
     }
     else // need factorization over GF (p^k)
@@ -3787,6 +3795,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         setCharacteristic (p, k, cGFName);
         for (CFListIterator i= factors; i.hasItem(); i++)
           i.getItem()= Falpha2GFRep (i.getItem());
+        prune (v1);
       }
     }
     return factors;

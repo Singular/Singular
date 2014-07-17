@@ -232,6 +232,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
       buf= Falpha2GFRep (buf);
       i.getItem()= CFFactor (buf, i.getItem().exp());
     }
+    prune (beta);
   }
   else if (alpha.level() != 1)
   {
@@ -8849,6 +8850,7 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       Variable vBuf= rootOf (mipo.mapinto());
       for (CFListIterator j= factors; j.hasItem(); j++)
         j.getItem()= GF2FalphaRep (j.getItem(), vBuf);
+      prune (vBuf);
     }
     else // not able to pass to GF, pass to F_p(\alpha)
     {
@@ -8856,6 +8858,7 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       Variable v= rootOf (mipo);
       ExtensionInfo info2= ExtensionInfo (v);
       factors= biFactorize (A, info2);
+      prune (v);
     }
     return factors;
   }
@@ -8869,6 +8872,7 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       Variable v= rootOf (mipo);
       ExtensionInfo info2= ExtensionInfo (v);
       factors= biFactorize (A, info2);
+      prune (v);
     }
     else
     {
@@ -8890,6 +8894,7 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
                                    source, dest);
         ExtensionInfo info2= ExtensionInfo (v, alpha, imPrimElem, primElem);
         factors= biFactorize (bufA, info2);
+        prune (v);
       }
       else
       {
@@ -8910,6 +8915,7 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         bufA= mapUp (bufA, beta, v, delta, imPrimElem, source, dest);
         ExtensionInfo info2= ExtensionInfo (v, beta, imPrimElem, delta);
         factors= biFactorize (bufA, info2);
+        prune (v);
       }
     }
     return factors;
@@ -8932,6 +8938,7 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         setCharacteristic (p, extensionDeg, 'Z');
         ExtensionInfo info2= ExtensionInfo (extension);
         factors= biFactorize (A.mapinto(), info2);
+        prune (vBuf);
       }
       else // not able to pass to another GF, pass to F_p(\alpha)
       {
@@ -8942,6 +8949,7 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         Variable v= chooseExtension (vBuf, beta, k);
         ExtensionInfo info2= ExtensionInfo (v, extension);
         factors= biFactorize (A, info2);
+        prune (vBuf);
       }
     }
     else // need factorization over GF (p^k)
@@ -8979,6 +8987,7 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         setCharacteristic (p, k, cGFName);
         for (CFListIterator i= factors; i.hasItem(); i++)
           i.getItem()= Falpha2GFRep (i.getItem());
+        prune (v1);
       }
     }
     return factors;

@@ -366,6 +366,7 @@ simpleExtension (CFList& backSubst, const CFList & Astar,
           j.getItem()= j.getItem() (ra, oldR.mvar());
           j.getItem()= j.getItem() (rb, i.getItem().mvar());
         }
+        prune (alpha);
       }
       else
       {
@@ -462,6 +463,7 @@ Trager (const CanonicalForm & F, const CFList & Astar,
     }
     if (!isRat && getCharacteristic() == 0)
       Off (SW_RATIONAL);
+    prune (alpha);
     return L;
   }
   // after here we are over an extension of a function field
@@ -999,6 +1001,8 @@ facAlgFunc2 (const CanonicalForm & f, const CFList & as)
         vminpoly= rootOf(MIPO);
       }
       Factorlist= Trager(f, Astar, vminpoly, as, isFunctionField);
+      if (extdeg > 1)
+        prune (vminpoly);
       return Factorlist;
     }
     else if (isInseparable(Astar) || derivZero) // inseparable case
@@ -1014,6 +1018,8 @@ facAlgFunc2 (const CanonicalForm & f, const CFList & as)
         vminpoly= rootOf (MIPO);
       }
       Factorlist= Trager (f, Astar, vminpoly, as, isFunctionField);
+      if (extdeg > 1)
+        prune (vminpoly);
       return Factorlist;
     }
   }

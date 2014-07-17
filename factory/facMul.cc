@@ -229,8 +229,12 @@ mulFLINTQaTrunc (const CanonicalForm& F, const CanonicalForm& G,
 CanonicalForm
 mulFLINTQTrunc (const CanonicalForm& F, const CanonicalForm& G, int m)
 {
-  if (F.inCoeffDomain() || G.inCoeffDomain())
-    return mod (F*G, power (Variable (1), m));
+  if (F.inCoeffDomain() && G.inCoeffDomain())
+    return F*G;
+  if (F.inCoeffDomain())
+    return mod (F*G, power (G.mvar(), m));
+  if (G.inCoeffDomain())
+    return mod (F*G, power (F.mvar(), m));
   Variable alpha;
   if (hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha))
     return mulFLINTQaTrunc (F, G, alpha, m);
@@ -256,13 +260,12 @@ mulFLINTQTrunc (const CanonicalForm& F, const CanonicalForm& G, int m)
   return A;
 }
 
-CanonicalForm uniReverse (const CanonicalForm& F, int d)
+CanonicalForm uniReverse (const CanonicalForm& F, int d, const Variable& x)
 {
   if (d == 0)
     return F;
   if (F.inCoeffDomain())
-    return F*power (Variable (1),d);
-  Variable x= Variable (1);
+    return F*power (x,d);
   CanonicalForm result= 0;
   CFIterator i= F;
   while (d - i.exp() < 0)
@@ -274,17 +277,22 @@ CanonicalForm uniReverse (const CanonicalForm& F, int d)
 }
 
 CanonicalForm
-newtonInverse (const CanonicalForm& F, const int n)
+newtonInverse (const CanonicalForm& F, const int n, const Variable& x)
 {
   int l= ilog2(n);
 
-  CanonicalForm g= F [0];
+  CanonicalForm g;
+  if (F.inCoeffDomain())
+    g= F;
+  else
+    g= F [0];
 
+  if (!F.inCoeffDomain())
+    ASSERT (F.mvar() == x, "main variable of F and x differ");
   ASSERT (!g.isZero(), "expected a unit");
 
   if (!g.isOne())
     g = 1/g;
-  Variable x= Variable (1);
   CanonicalForm result;
   int exp= 0;
   if (n & 1)
@@ -327,11 +335,12 @@ void
 newtonDivrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
               CanonicalForm& R)
 {
+  ASSERT (F.level() == G.level(), "F and G have different level");
   CanonicalForm A= F;
   CanonicalForm B= G;
-  Variable x= Variable (1);
-  int degA= degree (A, x);
-  int degB= degree (B, x);
+  Variable x= A.mvar();
+  int degA= degree (A);
+  int degB= degree (B);
   int m= degA - degB;
 
   if (m < 0)
@@ -345,13 +354,12 @@ newtonDivrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
     divrem (A, B, Q, R);
   else
   {
-    R= uniReverse (A, degA);
+    R= uniReverse (A, degA, x);
 
-    CanonicalForm revB= uniReverse (B, degB);
-    CanonicalForm buf= revB;
-    revB= newtonInverse (revB, m + 1);
+    CanonicalForm revB= uniReverse (B, degB, x);
+    revB= newtonInverse (revB, m + 1, x);
     Q= mulFLINTQTrunc (R, revB, m + 1);
-    Q= uniReverse (Q, m);
+    Q= uniReverse (Q, m, x);
 
     R= A - mulNTL (Q, B);
   }
@@ -360,11 +368,12 @@ newtonDivrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
 void
 newtonDiv (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q)
 {
+  ASSERT (F.level() == G.level(), "F and G have different level");
   CanonicalForm A= F;
   CanonicalForm B= G;
-  Variable x= Variable (1);
-  int degA= degree (A, x);
-  int degB= degree (B, x);
+  Variable x= A.mvar();
+  int degA= degree (A);
+  int degB= degree (B);
   int m= degA - degB;
 
   if (m < 0)
@@ -377,12 +386,11 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q)
     Q= div (A, B);
   else
   {
-    CanonicalForm R= uniReverse (A, degA);
-
-    CanonicalForm revB= uniReverse (B, degB);
-    revB= newtonInverse (revB, m + 1);
+    CanonicalForm R= uniReverse (A, degA, x);
+    CanonicalForm revB= uniReverse (B, degB, x);
+    revB= newtonInverse (revB, m + 1, x);
     Q= mulFLINTQTrunc (R, revB, m + 1);
-    Q= uniReverse (Q, m);
+    Q= uniReverse (Q, m, x);
   }
 }
 
@@ -3694,9 +3702,7 @@ uniFdivides (const CanonicalForm& A, const CanonicalForm& B)
     return result;
   }
   CanonicalForm Q, R;
-  Variable x= Variable (1);
-  Variable y= Variable (2);
-  newtonDivrem (swapvar (B, y, x), swapvar (A, y, x), Q, R);
+  newtonDivrem (B, A, Q, R);
   if (!isRat)
     Off (SW_RATIONAL);
   return R.isZero();
