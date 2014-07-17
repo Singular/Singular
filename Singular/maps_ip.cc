@@ -278,20 +278,32 @@ poly pSubstPar(poly p, int par, poly image)
     }
 
     number num = n_GetNumerator(p_GetCoeff(p, currRing), currRing);
-    assume( p_Test((poly)NUM(num), R) );
-
     memset(&tmpW,0,sizeof(sleftv));
     tmpW.rtyp = POLY_CMD;
-    tmpW.data = NUM (num); // a copy of this poly will be used
-
-    p_Normalize(NUM(num),R);
-    if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,R,NULL,NULL,0,nMap))
+    if (num==NULL) // minpoly
     {
-      WerrorS("map failed");
-      v->data=NULL;
+      num=(number)(currRing->cf->extRing->qideal->m[0]);
+      tmpW.data = num;
+      if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,R,NULL,NULL,0,nMap))
+      {
+        WerrorS("map failed");
+        v->data=NULL;
+      }
     }
-    n_Delete(&num, currRing);
+    else
+    {
+      assume( p_Test((poly)NUM(num), R) );
 
+      tmpW.data = NUM (num); // a copy of this poly will be used
+
+      p_Normalize(NUM(num),R);
+      if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,R,NULL,NULL,0,nMap))
+      {
+        WerrorS("map failed");
+        v->data=NULL;
+      }
+      n_Delete(&num, currRing);
+    }
     //TODO check for memory leaks
     poly pp = pHead(p);
     //PrintS("map:");pWrite(pp);
