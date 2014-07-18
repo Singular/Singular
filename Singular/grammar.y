@@ -1370,6 +1370,11 @@ ringcmd:
             yyInRingConstruction = FALSE;
             $2.CleanUp();
           }
+        | ringcmd1 elemexpr cmdeq elemexpr
+          {
+            yyInRingConstruction = FALSE;
+            if (iiAssignCR(&$2,&$4)) YYERROR;
+          }
         ;
 
 scriptcmd:

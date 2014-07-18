@@ -22,6 +22,8 @@ BOOLEAN    spmulProc    ( leftv,leftv,leftv );
 BOOLEAN    semicProc   ( leftv,leftv,leftv );
 BOOLEAN    semicProc3   ( leftv,leftv,leftv,leftv );
 
+BOOLEAN iiAssignCR(leftv, leftv);
+
 BOOLEAN iiARROW (leftv, char*,char *);
 
 extern leftv iiCurrArgs;

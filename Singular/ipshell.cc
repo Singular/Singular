@@ -5593,7 +5593,7 @@ void rKill(idhdl h)
       if ((currRingHdl==NULL)&&(currRing->idroot==NULL))
       {
         for (int i=myynest;i>=0;i--)
-	  if (iiLocalRing[i]==currRing) return;
+          if (iiLocalRing[i]==currRing) return;
         currRing=NULL;
       }
     }
@@ -5879,3 +5879,30 @@ BOOLEAN iiARROW(leftv r, char* a, char *s)
   //r->data=ss;
   return FALSE;
 }
+
+BOOLEAN iiAssignCR(leftv r, leftv arg)
+{
+  int t=arg->Typ();
+  if ((t==RING_CMD) ||(t==QRING_CMD))
+  {
+    char* ring_name=omStrDup(r->Name());
+    sleftv tmp;
+    memset(&tmp,0,sizeof(tmp));
+    tmp.rtyp=IDHDL;
+    tmp.data=(char*)rDefault(ring_name);
+    if (tmp.data!=NULL)
+    {
+      BOOLEAN b=iiAssign(&tmp,arg);
+      if (b) return TRUE;
+      rSetHdl(ggetid(ring_name));
+      omFree(ring_name);
+      return FALSE;
+    }
+    else
+      return TRUE;
+  }
+  //Print("create %s\n",r->Name());
+  //Print("from %s(%d)\n",Tok2Cmdname(arg->Typ()),arg->Typ());
+  return TRUE;// not handled -> error for now
+}
+
