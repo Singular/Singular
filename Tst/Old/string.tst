@@ -36,14 +36,6 @@ proc pos
   }
   return (0);
 }
-proc max
-{
-  if (#[1] < #[2])
-  {
-    return (#[2]);
-  }
-  return (#[1]);
-}
 "string sss = \"dum di dum\"";string sss = "dum di dum";
 "pos(sss,\"di d\")", pos(sss,"di d");
 "sss",sss;

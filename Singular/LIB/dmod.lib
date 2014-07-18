@@ -83,7 +83,6 @@ reiffen(p,q);         create a poly, describing a Reiffen curve
 isHolonomic(M);   check whether a module is holonomic
 convloc(L);         replace global orderings with local in the ringlist L
 minIntRoot(P,fact); minimal integer root among the roots of a maximal ideal P
-varNum(s);          the number of the variable with the name s
 isRational(n);  check whether n is a rational number
 
 SEE ALSO: bfun_lib, dmodapp_lib, dmodvar_lib, gmssing_lib
@@ -5303,7 +5302,7 @@ EXAMPLE: example annfspecial; shows examples
   }
   int ppl = printlevel-voice+2;
   //  int mir =  minIntRoot(L[1],0);
-  int ns   = varNum("s");
+  int ns   = rvar("s");
   if (!ns)
   {
     ERROR("Variable s expected in the ideal AnnFs");
@@ -6096,33 +6095,6 @@ example
   checkFactor(LD,F,20*s+31);     // -31/20 is not a root of bs
   checkFactor(LD,F,20*s+11);     // -11/20 is a root of bs
   checkFactor(LD,F,(20*s+11)^2); // the multiplicity of -11/20 is 1
-}
-
-proc varNum(string s)
-"USAGE:  varNum(s);  string s
-RETURN:  int
-PURPOSE: returns the number of the variable with the name s
-@*  among the variables of basering or 0 if there is no such variable
-EXAMPLE: example varNum; shows examples
-"
-{
-  int i;
-  for (i=1; i<= nvars(basering); i++)
-  {
-    if ( string(var(i)) == s )
-    {
-      return(i);
-    }
-  }
-  return(0);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring X = 0,(x,y1,t,z(0),z,tTa),dp;
-  varNum("z");
-  varNum("t");
-  varNum("xyz");
 }
 
 static proc indAR(list L, int n)

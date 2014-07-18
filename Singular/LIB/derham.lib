@@ -5492,14 +5492,6 @@ static proc nHomogenize (matrix M,list #)
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-static proc max(int i,int j)
-{
-  if(i>j){return(i);}
-  return(j);
-}
-
-////////////////////////////////////////////////////////////////////////////////////
-
 static proc nDeg (matrix M,intvec m)
 {/*we compute an intvec n such that n[i]=max(deg(M[i,j])+m[j]|M[i,j]!=0) (where deg
    stands for the total degree) if (M[i,j]!=0 for some j) and n[i]=0 else*/

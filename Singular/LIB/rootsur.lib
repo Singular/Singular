@@ -833,23 +833,6 @@ proc sign(number x)
   return (sgn);
 }
 ///////////////////////////////////////////////////////////////////////////////
-static proc max(number a,number b)
-{
-  number maximum;
-
-  if (isparam(a) || isparam(b)) {
-    ERROR("This procedure cannot operate with parameters");
-  }
-
-  if (a > b) {
-    maximum = a;
-  } else {
-    maximum = b;
-  }
-
-  return (maximum);
-}
-///////////////////////////////////////////////////////////////////////////////
 proc reverse(list l)
 "USAGE:     reverse(l); l list
 RETURN:    list: l reversed.
