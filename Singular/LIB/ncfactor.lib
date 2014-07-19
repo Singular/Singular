@@ -8336,7 +8336,7 @@ GENERAL ASSUMPTIONS:
    x1, ..., xn, and the second n variables do represent the d1, ..., dn.
  - We have n parameters q_1,..., q_n given.
 
-SEE ALSO: homogfacNthWeyl, homogfacFirstQWeyl, homogfacFirstQWeyl_all
+SEE ALSO: homogfacFirstQWeyl, homogfacFirstQWeyl_all
 "
 {//proc homogfacNthQWeyl_all
   int p=printlevel-voice+2;//for dbprint
