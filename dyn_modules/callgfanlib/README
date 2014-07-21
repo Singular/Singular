@@ -1,0 +1,20 @@
+Overview
+========
+
+
+This directory contains an interface to gfanlib, a C++ library by Anders Jensen derived off his stand-alone system Gfan.
+The interface allows the usage of some basic convex-geometrical structures inside of Singular, namely cones, fans and polytopes.
+Moreover, it contains features, which allows the computation of tropical varieties.
+
+
+
+Files and their content
+=======================
+
+
+gfanlib interface
+-----------------
+
+- bbcone.cc
+- bbfan.cc
+- bbpolytope.cc

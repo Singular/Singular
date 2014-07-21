@@ -477,6 +477,8 @@ BOOLEAN ppreduceInitially3(leftv res, leftv args)
  **/
 bool ppreduceInitially(ideal I, ring r, number p)
 {
+  assume(!n_IsUnit(p,r->cf));
+
   /***
    * Step 1: split up I into components of same degree in x
    *  the lowest component should only contain p-t
@@ -500,18 +502,11 @@ bool ppreduceInitially(ideal I, ring r, number p)
 
   std::map<long,ideal>::iterator it=H.begin();
   ideal Hi = it->second;
-  // assume(idSize(Hi)==1);
-  // assume(pLength(Hi->m[0])==2 && p_GetExp(Hi->m[0],1,r)==0
-  //          && p_GetExp(Hi->m[0]->next,1,r)==1);
-  // number p = currentCase.uniformizingParameter;
-  assume(!n_IsUnit(p,r->cf));
-  // idShallowDelete(&it->second);
 
   /***
    * Step 2: reduce each component initially with respect to itself
    *  and all lower components
    **/
-  // it++; Hi = it->second; n--;
   if (ppreduceInitially(Hi,p,r)) return true;
 
   ideal G = idInit(n); int m=0;
