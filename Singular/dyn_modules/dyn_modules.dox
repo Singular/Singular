@@ -7,8 +7,8 @@
  - \subpage dynmodules_bigintm_page
  - \subpage dynmodules_syzextra_page
  - \subpage dynmodules_pyobject_page
- - \subpage dynmodules_callgfanlib_page
- - \subpage dynmodules_callpolymake_page
+ - \subpage dynmodules_gfanlib_page
+ - \subpage dynmodules_polymake_page
  - \subpage dynmodules_singmathic_page
 */
 
@@ -28,13 +28,13 @@
 */
 
 /*! 
-\dir callgfanlib
-\ref dynmodules_callgfanlib_page
+\dir gfanlib
+\ref dynmodules_gfanlib_page
 */
 
 /*! 
-\dir callpolymake
-\ref dynmodules_callpolymake_page
+\dir polymake
+\ref dynmodules_polymake_page
 */
 
 /*! 
