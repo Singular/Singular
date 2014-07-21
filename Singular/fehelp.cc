@@ -500,9 +500,11 @@ static BOOLEAN heKey2Entry(char* filename, char* key, heEntry hentry)
           i++;
         }
         if (c == EOF) goto Failure;
+	if (hentry->node[0]=='\0')
+	  strcpy(hentry->node,hentry->key);
 
         // get url
-        hentry->node[i] = '\0';
+        //hentry->node[i] = '\0';
         i = 0;
         while ((c = getc(fd)) != '\t' && c != EOF)
         {
@@ -1144,12 +1146,12 @@ static void heEmacsHelp(heEntry hentry, int /*br*/)
   Warn("to enter the Singular online help. For general");
   Warn("information on Singular running under Emacs, type C-h m.");
 }
-static int singular_manual(char *str);
+static int singular_manual(char *str, BOOLEAN isIndexEntry);
 static void heBuiltinHelp(heEntry hentry, int /*br*/)
 {
-  char* node = omStrDup(hentry != NULL && *(hentry->node) != '\0' ?
-                       hentry->node : "Top");
-  singular_manual(node);
+  char* node = omStrDup(hentry != NULL && *(hentry->key) != '\0' ?
+                       hentry->key : "Top");
+  singular_manual(node,(hentry != NULL) && (hentry->url!=NULL));
   omFree(node);
 }
 
@@ -1213,7 +1215,7 @@ static int show(unsigned long offset, char *close)
 }
 
 /*************************************************/
-static int singular_manual(char *str)
+static int singular_manual(char *str, BOOLEAN isIndexEntry)
 { FILE *index=NULL;
   unsigned long offset;
   char *p,close=' ';
@@ -1228,15 +1230,22 @@ static int singular_manual(char *str)
     return HELP_NOT_OPEN;
   }
 
-  for(p=str; *p; p++) *p = tolow(*p);/* */
-  do
+  if (!isIndexEntry)
   {
-    p--;
+    for(p=str; *p; p++) *p = tolow(*p);/* */
+    do
+    {
+      p--;
+    }
+    while ((p != str) && (*p<=' '));
+    p++;
+    *p='\0';
+    (void)sprintf(String, " %s ", str);
   }
-  while ((p != str) && (*p<=' '));
-  p++;
-  *p='\0';
-  (void)sprintf(String, " %s ", str);
+  else
+  {
+    (void)sprintf(String, " %s", str);
+  }
 
   while(!feof(index)
         && (fgets(buffer, BUF_LEN, index) != (char *)0)
@@ -1244,20 +1253,29 @@ static int singular_manual(char *str)
 
   while(!feof(index))
   {
-    // char* dummy=fgets(buffer, BUF_LEN, index); /* */
-    (void)si_sscanf(buffer, "Node:%[^\177]\177%ld\n", Index, &offset);
-    for(p=Index; *p; p++) *p = tolow(*p);/* */
-    (void)strcat(Index, " ");
-    if( strstr(Index, String)!=NULL)
+    if (fgets(buffer, BUF_LEN, index)==NULL) break; /*fill buffer */
+    if (si_sscanf(buffer, "Node:%[^\177]\177%ld\n", Index, &offset)!=2)
+      continue;
+    if (!isIndexEntry)
+    {
+      for(p=Index; *p; p++) *p = tolow(*p);/* */
+      (void)strcat(Index, " ");
+      if( strstr(Index, String)!=NULL)
+      {
+        done++; (void)show(offset, &close);
+      }
+    }
+    else if( strcmp(Index, String)==0)
     {
       done++; (void)show(offset, &close);
+      break;
     }
     Index[0]='\0';
     if(close=='x')
     break;
   }
   if (index != NULL) (void)fclose(index);
-  if(! done)
+  if(done==0)
   {
     Warn("`%s` not found",String);
     return HELP_NOT_FOUND;
