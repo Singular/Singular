@@ -3,6 +3,7 @@
 #include <libpolys/polys/monomials/p_polys.h>
 #include <callgfanlib_conversion.h>
 #include <gfanlib_exceptions.h>
+#include <std_wrapper.h>
 #include <containsMonomial.h>
 #include <initial.h>
 #include <witness.h>
@@ -53,7 +54,7 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector u, const
                                       const gfan::ZMatrix W, const tropicalStrategy& currentStrategy)
 {
   int n = rVar(r);
-  int h = E.getHeight();
+  int h = W.getHeight();
 
   /* create a copy s of r and delete its ordering */
   ring s = rCopy0(r);
@@ -77,9 +78,9 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector u, const
   s->order[1] = ringorder_a;
   s->block0[1] = 1;
   s->block1[1] = n;
-  gfan::ZVector wAdjusted = currentStrategy.adjustWeightUnterHomogeneity(w,uAdjusted);
+  gfan::ZVector wAdjusted = currentStrategy.adjustWeightUnderHomogeneity(w,uAdjusted);
   s->wvhdl[1] = ZVectorToIntStar(wAdjusted,overflow);
-  for (int j=0; j<h; j++)
+  for (int j=0; j<h-1; j++)
   {
     s->order[j+2] = ringorder_a;
     s->block0[j+2] = 1;
@@ -87,12 +88,12 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector u, const
     wAdjusted = currentStrategy.adjustWeightUnderHomogeneity(W[j],uAdjusted);
     s->wvhdl[j+2] = ZVectorToIntStar(wAdjusted,overflow);
   }
-  s->order[h+2] = ringorder_wp;
-  s->block0[h+2] = 1;
-  s->block1[h+2] = n;
-  wAdjusted = currentStrategy.adjustWeightUnderHomogeneity(W[j],uAdjusted);
-  s->wvhdl[h+2] = ZVectorToIntStar(wAdjusted,overflow);
-  s->order[h+3] = ringorder_C;
+  s->order[h+1] = ringorder_wp;
+  s->block0[h+1] = 1;
+  s->block1[h+1] = n;
+  wAdjusted = currentStrategy.adjustWeightUnderHomogeneity(W[h-1],uAdjusted);
+  s->wvhdl[h+1] = ZVectorToIntStar(wAdjusted,overflow);
+  s->order[h+2] = ringorder_C;
 
   if (overflow)
     throw 0; //weightOverflow;
@@ -129,17 +130,17 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
    * If all initial ideals are monomial free, then we have our tropical curve */
   for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end(); zc++)
   {
-    gfan::ZVector v = zc->getRelativeInteriorPoint();
+    gfan::ZVector w = zc->getRelativeInteriorPoint();
     gfan::ZMatrix W = zc->generatorsOfSpan();
 
-    ring s = genericlyWeightedOrdering(r,v,W,currentStrategy);
+    ring s = genericlyWeightedOrdering(r,u,w,W,currentStrategy);
     nMapFunc identity = n_SetMap(r->cf,s->cf);
     ideal inIs = idInit(k);
     for (int j=0; j<k; j++)
       inIs->m[j] = p_PermPoly(inI->m[j],NULL,r,s,identity,NULL,0);
 
     inIs = gfanlib_kStd_wrapper(inIs,s,isHomog);
-    ideal ininIs = initial(inIs,s,E[E.getHeight()-1]);
+    ideal ininIs = initial(inIs,s,W[W.getHeight()-1]);
 
     poly mons = checkForMonomialViaSuddenSaturation(inIs,s);
     if (mons)
@@ -148,23 +149,23 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
       C = intersect(C,tropicalVariety(gs,s,currentStrategy),d);
       nMapFunc mMap = n_SetMap(s->cf,r->cf);
       poly gr = p_PermPoly(gs,NULL,s,r,mMap,NULL,0);
-      idInsertPoly(I,gr);
+      idInsertPoly(inI,gr);
       k++;
       p_Delete(&mons,s);
       p_Delete(&gs,s);
       zc = C.begin();
     }
-    id_Delete(&Is,s);
     id_Delete(&inIs,s);
+    id_Delete(&ininIs,s);
     rDelete(s);
   }
   return C;
 }
 
 
-std::set<gfan::ZVector> raysOfTropicalCurve(ideal I, const ring r, const tropicalStrategy& currentStrategy)
+std::set<gfan::ZVector> raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u, const tropicalStrategy& currentStrategy)
 {
-  std::set<gfan::ZCone> C = tropicalCurve(I,r,currentStrategy);
+  std::set<gfan::ZCone> C = tropicalStar(I,r,u,currentStrategy);
   std::set<gfan::ZVector> raysOfC;
   for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end(); zc++)
   {

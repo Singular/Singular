@@ -31,6 +31,7 @@ public:
   groebnerCone();
   groebnerCone(const ideal I, const ring r, const tropicalStrategy& currentCase);
   groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, const tropicalStrategy& currentCase);
+  groebnerCone(const ideal I, const ring r, const gfan::ZVector& u, const gfan::ZVector& w, const tropicalStrategy& currentCase);
   groebnerCone(const ideal I, const ideal inI, const ring r, const tropicalStrategy& currentCase);
   groebnerCone(const groebnerCone& sigma);
   ~groebnerCone();

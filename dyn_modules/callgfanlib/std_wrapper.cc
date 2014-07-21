@@ -1,5 +1,6 @@
 #include <kernel/kstd1.h>
 #include <kernel/polys.h>
+#include <kernel/ideals.h>
 
 ideal gfanlib_kStd_wrapper(ideal I, ring r, tHomog h=testHomog)
 {

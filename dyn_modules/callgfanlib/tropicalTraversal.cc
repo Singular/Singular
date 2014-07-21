@@ -9,9 +9,15 @@ groebnerCones tropicalTraversal(const groebnerCone startingCone)
   {
     const groebnerCone sigma=*(workingList.begin());
     const groebnerCones neighbours = sigma.tropicalNeighbours();
-    workingList.insert(neighbours.begin(),neighbours.end());
+    for (groebnerCones::iterator tau = neighbours.begin(); tau!=neighbours.end(); tau++)
+    {
+      if (tropicalVariety.count(*tau)==0)
+        workingList.insert(*tau);
+    }
     tropicalVariety.insert(sigma);
     workingList.erase(sigma);
+    std::cout << "tropicalVariety.size():" << tropicalVariety.size() << std::endl;
+    std::cout << "workingList.size():" << workingList.size() << std::endl;
   }
   return tropicalVariety;
 }

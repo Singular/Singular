@@ -40,8 +40,9 @@ static bool checkOrderingAndCone(const ring r, const gfan::ZCone zc)
                 << toString(&zc)
                 << "weight: " << std::endl
                 << v << std::endl;
+      return false;
     }
-    return zc.contains(v);
+    return true;
   }
   return (zc.dimension()==0);
 }
@@ -142,6 +143,51 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, 
   interiorPoint = polyhedralCone.getRelativeInteriorPoint();
   assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
 }
+
+/***
+ * Computes the groebner cone of I around u+e*w for e>0 sufficiently small.
+ * Assumes that this cone is a face of the maximal Groenbner cone given by the ordering of r.
+ **/
+groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& u, const gfan::ZVector& w, const tropicalStrategy& currentCase):
+  polynomialIdeal(NULL),
+  polynomialRing(NULL),
+  currentStrategy(&currentCase)
+{
+  assume(checkPolynomialInput(I,r));
+  if (I) polynomialIdeal = id_Copy(I,r);
+  if (r) polynomialRing = rCopy(r);
+
+  int n = rVar(r);
+  gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
+  gfan::ZMatrix equations = gfan::ZMatrix(0,n);
+  int* expv = (int*) omAlloc((n+1)*sizeof(int));
+  for (int i=0; i<idSize(polynomialIdeal); i++)
+  {
+    poly g = polynomialIdeal->m[i];
+    p_GetExpV(g,expv,polynomialRing);
+    gfan::ZVector leadexpv = intStar2ZVector(n,expv);
+    long d1 = wDeg(g,polynomialRing,u);
+    long d2 = wDeg(g,polynomialRing,w);
+    for (pIter(g); g; pIter(g))
+    {
+      p_GetExpV(g,expv,polynomialRing);
+      gfan::ZVector tailexpv = intStar2ZVector(n,expv);
+      if (wDeg(g,polynomialRing,u)==d1 && wDeg(g,polynomialRing,w)==d2)
+        equations.appendRow(leadexpv-tailexpv);
+      else
+      {
+        assume(wDeg(g,polynomialRing,u)<d1 || wDeg(g,polynomialRing,w)<d2);
+        inequalities.appendRow(leadexpv-tailexpv);
+      }
+    }
+  }
+  omFreeSize(expv,(n+1)*sizeof(int));
+
+  polyhedralCone = gfan::ZCone(inequalities,equations);
+  interiorPoint = polyhedralCone.getRelativeInteriorPoint();
+  assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
+}
+
 
 groebnerCone::groebnerCone(const ideal I, const ideal inI, const ring r, const tropicalStrategy& currentCase):
   polynomialIdeal(id_Copy(I,r)),
@@ -271,11 +317,8 @@ bool groebnerCone::checkFlipConeInput(const gfan::ZVector interiorPoint, const g
     return false;
   }
   /* check whether facet normal points outwards */
-  gfan::ZMatrix halfSpaceInequality(0,facetNormal.size());
-  halfSpaceInequality.appendRow(facetNormal);
-  gfan::ZCone halfSpace = gfan::ZCone(halfSpaceInequality,gfan::ZMatrix(0,facetNormal.size()));
-  hopefullyAFacet = intersection(polyhedralCone, halfSpace);
-  if (hopefullyAFacet.dimension()!=(polyhedralCone.dimension()-1))
+  gfan::ZCone dual = polyhedralCone.dualCone();
+  if(dual.contains(facetNormal))
   {
     std::cout << "ERROR: facetNormal is not pointing outwards!" << std::endl
               << "cone: " << std::endl
@@ -301,7 +344,7 @@ groebnerCone groebnerCone::flipCone(const gfan::ZVector interiorPoint, const gfa
    *   for e>0 sufficiently small */
   std::pair<ideal,ring> flipped = flip(polynomialIdeal,polynomialRing,interiorPoint,facetNormal,*currentStrategy);
   assume(checkPolynomialInput(flipped.first,flipped.second));
-  groebnerCone flippedCone(flipped.first, flipped.second, facetNormal, *currentStrategy);
+  groebnerCone flippedCone(flipped.first, flipped.second, interiorPoint, facetNormal, *currentStrategy);
   return flippedCone;
 }
 
@@ -431,8 +474,7 @@ groebnerCones groebnerCone::tropicalNeighbours() const
   for (int i=0; i<interiorPoints.getHeight(); i++)
   {
     ideal initialIdeal = initial(polynomialIdeal,polynomialRing,interiorPoints[i]);
-    std::set<gfan::ZVector> rays = raysOfTropicalCurve(initialIdeal,polynomialRing,*currentStrategy);
-    groebnerCones neighbours;
+    std::set<gfan::ZVector> rays = raysOfTropicalStar(initialIdeal,polynomialRing,interiorPoints[i],*currentStrategy);
     for (std::set<gfan::ZVector>::iterator ray = rays.begin(); ray!=rays.end(); ray++)
       neighbours.insert(this->flipCone(interiorPoints[i],*ray));
   }

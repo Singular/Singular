@@ -6,8 +6,10 @@
 #include <libpolys/polys/monomials/p_polys.h>
 #include <tropicalStrategy.h>
 
-std::set<gfan::ZCone> tropicalCurve(const ideal I, const ring r, const tropicalStrategy& currentStrategy);
-std::set<gfan::ZVector> raysOfTropicalCurve(ideal I, const ring r, const tropicalStrategy& currentStrategy);
+std::set<gfan::ZCone> tropicalStar(const ideal I, const ring r, const gfan::ZVector u,
+                                   const tropicalStrategy& currentStrategy);
+std::set<gfan::ZVector> raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u,
+                                           const tropicalStrategy& currentStrategy);
 
 #ifndef NDEBUG
 BOOLEAN tropicalCurve0(leftv res, leftv args);

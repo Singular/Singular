@@ -63,15 +63,20 @@ gfan::ZVector nonvalued_adjustWeightUnderHomogeneity(const gfan::ZVector e, cons
   assume(checkForNonPositiveEntries(w));
   /* find k such that e+k*w is strictly positive,
    * i.e. k such that e[i]+k*w[i] is strictly positive
-   * for all i=0,...,n */
+   * for all i=0,...,n
+   * note that the division is rounded towards zero,
+   * hence we increment the value by 1 */
   gfan::Integer k((long)0);
   if (e[0].sign()<=0)
-    k = gfan::Integer((long)1)-(gfan::Integer((long)e[0].sign())*e[0])/w[0];
+    k = gfan::Integer((long)1)-(e[0]/w[0]);
   for (unsigned i=1; i<e.size(); i++)
   {
-    gfan::Integer kk = gfan::Integer((long)1)-(gfan::Integer((long)e[i].sign())*e[i])/w[i];
-    if (k<kk)
-      k = kk;
+    if (e[i].sign()<=0)
+    {
+      gfan::Integer kk = gfan::Integer((long)1)-(e[i]/w[i]);
+      if (k<kk)
+        k = kk;
+    }
   }
   /* compute e+k*w, check it for correctness and return it */
   gfan::ZVector v = e+k*w;
