@@ -187,9 +187,11 @@ resultante (const CanonicalForm & f, const CanonicalForm& g, const Variable & v)
   if (!on_rational && getCharacteristic() == 0)
     Off(SW_RATIONAL);
   CanonicalForm result;
+#ifdef HAVE_NTL
   if (getCharacteristic() == 0)
     result= resultantZ (fz, gz,v);
   else
+#endif
     result= resultant (fz,gz,v);
 
   return result;
