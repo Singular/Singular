@@ -83,6 +83,15 @@ BOOLEAN tropicalStartingPoint(leftv res, leftv args)
   {
     ideal I = (ideal) u->Data();
     tropicalStrategy currentStrategy(I,currRing);
+    if (currentStrategy.getDimensionOfIdeal()==currentStrategy.getDimensionOfHomogeneitySpace())
+    {
+      gfan::ZCone homogSpace = currentStrategy.getHomogeneitySpace();
+      gfan::ZMatrix homogSpaceGenerators = homogSpace.generatorsOfLinealitySpace();
+      assume(homogSpaceGenerators.getHeight()>0);
+      res->rtyp = BIGINTMAT_CMD;
+      res->data = (void*) zVectorToBigintmat(homogSpaceGenerators[0]);
+      return FALSE;
+    }
     std::pair<gfan::ZVector,groebnerCone> startingData = tropicalStartingDataViaGroebnerFan(I,currRing,currentStrategy);
     gfan::ZVector startingPoint = startingData.first;
     res->rtyp = BIGINTMAT_CMD;

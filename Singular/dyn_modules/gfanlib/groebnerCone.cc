@@ -283,12 +283,13 @@ gfan::ZVector groebnerCone::tropicalPoint() const
   {
     ideal inI = initial(I,r,R[i]);
     poly s = checkForMonomialViaSuddenSaturation(inI,r);
-    id_Delete(&inI,r);
     if (s == NULL)
     {
+      id_Delete(&inI,r);
       p_Delete(&s,r);
       return R[i];
     }
+    id_Delete(&inI,r);
     p_Delete(&s,r);
   }
   return gfan::ZVector();

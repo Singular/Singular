@@ -14,15 +14,17 @@ class tropicalStrategy
 {
 private:
   ring originalRing;
-  ring startingRing;
-  number uniformizingParameter;
-  ideal startingIdeal;
+  ideal originalIdeal;
   int dimensionOfIdeal;
+  ring startingRing;
+  ideal startingIdeal;
+  number uniformizingParameter;
+  gfan::ZCone linealitySpace;
   bool onlyLowerHalfSpace;
 
   gfan::ZVector (*weightAdjustingAlgorithm1) (gfan::ZVector w);
   gfan::ZVector (*weightAdjustingAlgorithm2) (gfan::ZVector v, gfan::ZVector w);
-  bool (*reductionAlgorithm) (ideal I, ring r, number p);
+  bool (*extraReductionAlgorithm) (ideal I, ring r, number p);
 
 public:
 
@@ -61,6 +63,16 @@ public:
     return dimensionOfIdeal;
   }
 
+  gfan::ZCone getHomogeneitySpace() const
+  {
+    return linealitySpace;
+  }
+
+  int getDimensionOfHomogeneitySpace() const
+  {
+    return linealitySpace.dimension();
+  }
+
   bool restrictToLowerHalfSpace() const
   {
     return onlyLowerHalfSpace;
@@ -76,9 +88,9 @@ public:
     return weightAdjustingAlgorithm2;
   }
 
-  redAlg getReductionAlgorithm() const
+  redAlg getExtraReductionAlgorithm() const
   {
-    return reductionAlgorithm;
+    return extraReductionAlgorithm;
   }
 
   gfan::ZVector adjustWeightForHomogeneity(gfan::ZVector w) const
@@ -94,8 +106,10 @@ public:
   bool reduce(ideal I, ring r) const
   {
     rTest(r);  id_Test(I,r);
-    return this->reductionAlgorithm(I,r,uniformizingParameter);
+    return this->extraReductionAlgorithm(I,r,uniformizingParameter);
   }
 };
+
+int dim(ideal I, ring r);
 
 #endif

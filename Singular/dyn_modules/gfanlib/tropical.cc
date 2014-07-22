@@ -15,6 +15,34 @@
 #include <tropicalVariety.h>
 
 
+gfan::ZCone homogeneitySpace(ideal I, ring r)
+{
+  int n = rVar(r);
+  poly g;
+  int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
+  int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
+  gfan::ZVector leadexpw = gfan::ZVector(n);
+  gfan::ZVector tailexpw = gfan::ZVector(n);
+  gfan::ZMatrix equations = gfan::ZMatrix(0,n);
+  for (int i=0; i<IDELEMS(I); i++)
+  {
+    g = (poly) I->m[i]; pGetExpV(g,leadexpv);
+    leadexpw = intStar2ZVector(n, leadexpv);
+    pIter(g);
+    while (g != NULL)
+    {
+      pGetExpV(g,tailexpv);
+      tailexpw = intStar2ZVector(n, tailexpv);
+      equations.appendRow(leadexpw-tailexpw);
+      pIter(g);
+    }
+  }
+  omFreeSize(leadexpv,(n+1)*sizeof(int));
+  omFreeSize(tailexpv,(n+1)*sizeof(int));
+  return gfan::ZCone(gfan::ZMatrix(0, equations.getWidth()),equations);
+}
+
+
 BOOLEAN homogeneitySpace(leftv res, leftv args)
 {
   leftv u = args;
@@ -23,33 +51,9 @@ BOOLEAN homogeneitySpace(leftv res, leftv args)
     leftv v = u->next;
     if (v == NULL)
     {
-      int n = currRing->N;
       ideal I = (ideal) u->Data();
-      poly g;
-      int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
-      int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
-      gfan::ZVector leadexpw = gfan::ZVector(n);
-      gfan::ZVector tailexpw = gfan::ZVector(n);
-      gfan::ZMatrix equations = gfan::ZMatrix(0,n);
-      for (int i=0; i<IDELEMS(I); i++)
-      {
-        g = (poly) I->m[i]; pGetExpV(g,leadexpv);
-        leadexpw = intStar2ZVector(n, leadexpv);
-        pIter(g);
-        while (g != NULL)
-        {
-          pGetExpV(g,tailexpv);
-          tailexpw = intStar2ZVector(n, tailexpv);
-          equations.appendRow(leadexpw-tailexpw);
-          pIter(g);
-        }
-      }
-      gfan::ZCone* gCone = new gfan::ZCone(gfan::ZMatrix(0, equations.getWidth()),equations);
-      omFreeSize(leadexpv,(n+1)*sizeof(int));
-      omFreeSize(tailexpv,(n+1)*sizeof(int));
-
       res->rtyp = coneID;
-      res->data = (void*) gCone;
+      res->data = (void*) new gfan::ZCone(homogeneitySpace(I,currRing));
       return FALSE;
     }
   }

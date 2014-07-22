@@ -2,6 +2,7 @@
 #include <adjustWeights.h>
 #include <ppinitialReduction.h>
 #include <ttinitialReduction.h>
+#include <tropical.h>
 
 // for various commands in dim(ideal I, ring r):
 #include <kernel/ideals.h>
@@ -11,7 +12,7 @@
  * Computes the dimension of an ideal I in ring r
  * Copied from jjDim in iparith.cc
  **/
-static int dim(ideal I, ring r)
+int dim(ideal I, ring r)
 {
   ring origin = currRing;
   if (origin != r)
@@ -72,10 +73,10 @@ tropicalStrategy::tropicalStrategy(ideal J, number q, ring s)
   /* set the function pointers to the appropiate functions */
   weightAdjustingAlgorithm1 = valued_adjustWeightForHomogeneity;
   weightAdjustingAlgorithm2 = valued_adjustWeightUnderHomogeneity;
-  reductionAlgorithm = ppreduceInitially;
+  extraReductionAlgorithm = ppreduceInitially;
 }
 
-static bool doNothing(ideal /*I*/, ring /*r*/, number /*p*/)
+static bool nothing(ideal /*I*/, ring /*r*/, number /*p*/)
 {
   return false;
 }
@@ -88,27 +89,20 @@ tropicalStrategy::tropicalStrategy(ideal I, ring r)
 {
   /* assume that the ground field of the originalRing is Q */
   assume(rField_is_Q(r));
+
+  onlyLowerHalfSpace = false;                         // convex computations in the whole vector space
   originalRing = rCopy(r);
-
-  /* the starting ring is the originaRing */
-  startingRing = rCopy(originalRing);
-
-  /* the uniformizing parameter is non-existant*/
-  uniformizingParameter = NULL;
-
-  /* set the startingIdeal */
+  originalIdeal = id_Copy(I,r);
+  dimensionOfIdeal = dim(originalIdeal,originalRing); // compute dimension of ideal
+  startingRing = rCopy(originalRing);                 // starting ring is the original ring
   startingIdeal = id_Copy(I,startingRing);
+  uniformizingParameter = NULL;                       // no uniformizing parameter
+  linealitySpace = homogeneitySpace(I,startingRing);  // compute lineality space of tropical variety
 
-  /* compute the dimension of the ideal */
-  dimensionOfIdeal = dim(startingIdeal,startingRing);
-
-  /* set the flag that convex computations only occur in the lower half space to false */
-  onlyLowerHalfSpace = false;
-
-  /* set the function pointers to the appropiate functions */
+  /* set function pointers to the appropiate functions */
   weightAdjustingAlgorithm1 = nonvalued_adjustWeightForHomogeneity;
   weightAdjustingAlgorithm2 = nonvalued_adjustWeightUnderHomogeneity;
-  reductionAlgorithm = doNothing;
+  extraReductionAlgorithm = nothing;
 }
 
 tropicalStrategy::tropicalStrategy(const tropicalStrategy& currentStrategy):
@@ -120,7 +114,7 @@ tropicalStrategy::tropicalStrategy(const tropicalStrategy& currentStrategy):
   onlyLowerHalfSpace(currentStrategy.restrictToLowerHalfSpace()),
   weightAdjustingAlgorithm1(currentStrategy.getWeightAdjustingAlgorithm1()),
   weightAdjustingAlgorithm2(currentStrategy.getWeightAdjustingAlgorithm2()),
-  reductionAlgorithm(currentStrategy.getReductionAlgorithm())
+  extraReductionAlgorithm(currentStrategy.getExtraReductionAlgorithm())
 {
   if (startingRing) rTest(startingRing);
   if (startingIdeal) id_Test(startingIdeal,startingRing);
@@ -147,7 +141,7 @@ tropicalStrategy& tropicalStrategy::operator=(const tropicalStrategy& currentStr
   onlyLowerHalfSpace = currentStrategy.restrictToLowerHalfSpace();
   weightAdjustingAlgorithm1 = currentStrategy.getWeightAdjustingAlgorithm1();
   weightAdjustingAlgorithm2 = currentStrategy.getWeightAdjustingAlgorithm2();
-  reductionAlgorithm = currentStrategy.getReductionAlgorithm();
+  extraReductionAlgorithm = currentStrategy.getExtraReductionAlgorithm();
 
   if (startingRing) rTest(startingRing);
   if (startingIdeal) id_Test(startingIdeal,startingRing);
