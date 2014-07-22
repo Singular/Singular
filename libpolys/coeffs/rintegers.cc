@@ -1004,9 +1004,9 @@ number nrzAdd(number a, number b, const coeffs R)
   omFree(s);
   return c;
 }
-number _nrzAdd (number a, number b, const coeffs R)
+number _nrzAdd (number a, number b, const coeffs )
 #else
-number nrzAdd (number a, number b, const coeffs R)
+number nrzAdd (number a, number b, const coeffs )
 #endif
 {
   if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
@@ -1049,7 +1049,7 @@ number nrzAdd (number a, number b, const coeffs R)
   }
 }
 
-number nrzSub (number a, number b, const coeffs)
+number nrzSub (number a, number b,  const coeffs )
 {
   if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
   {
@@ -1079,7 +1079,7 @@ number nrzSub (number a, number b, const coeffs)
   {
     int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
     mpz_init(erg);
-    if (INT_TO_SR(b)>0)
+    if (SR_TO_INT(b)>0)
       mpz_sub_ui(erg, (int_number) a, (unsigned long)SR_TO_INT(b));
     else
       mpz_add_ui(erg, (int_number) a, (unsigned long)-SR_TO_INT(b));
@@ -1096,13 +1096,6 @@ number nrzSub (number a, number b, const coeffs)
 
 number  nrzGetUnit (number n, const coeffs r)
 {
-  //if (n_Z_IS_SMALL(n))
-  //{
-  //  if (SR_TO_INT(n)<0)
-  //    return INT_TO_SR(-1);
-  //  else
-  //    return INT_TO_SR(1);
-  //}
   if (nrzGreaterZero(n, r))
     return INT_TO_SR(1);
   else
@@ -1192,7 +1185,7 @@ BOOLEAN nrzDivBy (number a,number b, const coeffs)
     return mpz_divisible_p((int_number) a, (int_number) b) != 0;
 }
 
-number nrzDiv (number a,number b, const coeffs R)
+number nrzDiv (number a,number b, const coeffs)
 {
   assume(SR_TO_INT(b));
   if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
@@ -1407,14 +1400,14 @@ number nrzMapZp(number from, const coeffs /*src*/, const coeffs /*dst*/)
   return nrz_short((number) erg);
 }
 
-number nrzModNMap(number from, const coeffs src, const coeffs /*dst*/)
+number nrzModNMap(number from, const coeffs /* src */, const coeffs /*dst*/)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set(erg, (int_number) from);
   return nrz_short((number) erg);
 }
 
-number nrzMapQ(number from, const coeffs src, const coeffs dst)
+number nrzMapQ(number from, const coeffs /* src */, const coeffs dst)
 {
   if (SR_HDL(from) & SR_INT)
     return nrzInit(SR_TO_INT(from),dst);
@@ -1561,6 +1554,10 @@ static char* nrzCoeffString(const coeffs)
 {
   return omStrDup("integer");
 }
+
+#include "factory/canonicalform.h"
+#include <factory/cf_gmp.h>
+#include "factory/singext.h"
 
 static CanonicalForm nrzConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs /*r*/ )
 {
