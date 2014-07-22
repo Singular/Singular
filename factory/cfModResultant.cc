@@ -37,6 +37,7 @@
 #include "FLINTconvert.h"
 #endif
 
+#ifdef HAVE_NTL
 TIMING_DEFINE_PRINT(fac_resultant_p)
 
 //TODO arrange by bound= deg (F,xlevel)*deg (G,i)+deg (G,xlevel)*deg (F, i)
@@ -679,4 +680,5 @@ resultantZ (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
     On (SW_RATIONAL);
   return swapvar (result, X, x);
 }
+#endif
 
