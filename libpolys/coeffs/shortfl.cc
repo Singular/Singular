@@ -268,6 +268,7 @@ void nrWrite (number &a, const coeffs r)
     StringAppend("(%s)",ch);
 }
 
+#if 0
 void nrPower (number a, int i, number * result, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
@@ -285,6 +286,7 @@ void nrPower (number a, int i, number * result, const coeffs r)
   nrPower(a,i-1,result,r);
   *result = nf(nf(a).F() * nf(*result).F()).N();
 }
+#endif
 
 namespace {
   static const char* nrEatr(const char *s, float *r)
@@ -728,7 +730,7 @@ BOOLEAN nrInitChar(coeffs n, void* p)
   n->cfGreaterZero = nrGreaterZero;
   n->cfWriteLong = nrWrite;
   n->cfRead = nrRead;
-  n->cfPower = nrPower;
+  //n->cfPower = nrPower;
   n->cfSetMap = nrSetMap;
   n->cfCoeffWrite  = nrCoeffWrite;
 

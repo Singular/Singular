@@ -501,7 +501,6 @@ void nfPower (number a, int i, number * result, const coeffs r)
 #endif
   if (i==0)
   {
-    //*result=nfInit(1);
     *result = (number)0L;
   }
   else if (i==1)
@@ -510,8 +509,10 @@ void nfPower (number a, int i, number * result, const coeffs r)
   }
   else
   {
-    nfPower(a,i-1,result, r);
-    *result = nfMult(a,*result, r);
+    long rl;
+    if ((long)a == (long)r->m_nfCharQ) rl=(long)r->m_nfCharQ;
+    else rl=((long)a*(long)i) % (long)r->m_nfCharQ1;
+    *result = (number)rl;
   }
 #ifdef LDEBUG
   nfTest(*result, r);
@@ -686,7 +687,7 @@ void nfReadTable(const int c, const coeffs r)
     int k;
     while ( i < r->m_nfCharQ )
     {
-      fgets( buf, sizeof(buf), fp);
+      (void)fgets( buf, sizeof(buf), fp);
       //( strlen( buffer ) == (size_t)digs * 30, "illegal table" );
       bufptr = buf;
       k = 0;
