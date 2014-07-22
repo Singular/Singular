@@ -68,6 +68,26 @@ void ndInpAdd(number &a, number b, const coeffs r)
   a=n;
 }
 
+void ndPower(number a, int i, number * res, const coeffs r)
+{
+  if (i==0) {
+    *res = n_Init(1, r);
+  } else if (i==1) {
+    *res = n_Copy(a, r);
+  } else if (i==2) {
+    *res = n_Mult(a, a, r);
+  } else if (i<0) {
+    number b = n_Invers(a, r);
+    ndPower(b, -i, res, r);
+    n_Delete(&b, r);
+  } else {
+    ndPower(a, i/2, res, r);
+    n_InpMult(*res, *res, r);
+    if (i&1) {
+      n_InpMult(*res, a, r);
+    }
+  }
+}
 #ifdef LDEBUG
 void   nDBDummy1(number* d,char *, int) { *d=NULL; }
 BOOLEAN ndDBTest(number, const char *, const int, const coeffs)
@@ -84,7 +104,7 @@ number ndFarey(number,number,const coeffs r)
 number ndChineseRemainder(number *,number *,int,BOOLEAN,const coeffs r)
 {
   Werror("ChineseRemainder not implemented for %s (c=%d)",r->cfCoeffString(r),getCoeffType(r));
-  return n_Init(0,r); 
+  return n_Init(0,r);
 }
 
 static int ndParDeg(number n, const coeffs r)
@@ -104,13 +124,13 @@ BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
   BOOLEAN ret = n_IsZero(a, r);
   if( (c != 0) && !ret )
   {
-    number ch = n_Init( c, r ); 
+    number ch = n_Init( c, r );
     number g = n_Gcd( ch, a, r );
     ret = !n_IsOne (g, r);
     n_Delete(&ch, r);
     n_Delete(&g, r);
   }
-  return ret; 
+  return ret;
 }
 
 void   ndNormalize(number&, const coeffs) { }
@@ -142,24 +162,24 @@ void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
   {
     c = n_Init(1, r);
     return;
-  }  
+  }
 
   number &curr = numberCollectionEnumerator.Current();
-  
+
 #ifdef HAVE_RINGS
-  /// TODO: move to a separate implementation 
+  /// TODO: move to a separate implementation
   if (nCoeff_is_Ring(r))
   {
     if (nCoeff_has_Units(r))
     {
       c = n_GetUnit(curr, r);
-      
+
       if (!n_IsOne(c, r))
       {
         number inv = n_Invers(c, r);
 
         n_InpMult(curr, inv, r);
-        
+
         while( numberCollectionEnumerator.MoveNext() )
         {
           number &n = numberCollectionEnumerator.Current();
@@ -167,10 +187,10 @@ void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
           n_InpMult(n, inv, r); // TODO: either this or directly divide!!!?
         }
 
-        n_Delete(&inv, r);        
-      }      
+        n_Delete(&inv, r);
+      }
     } else c = n_Init(1, r);
-    
+
     return;
   }
 #endif
@@ -185,16 +205,16 @@ void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
     number t = curr; // takes over the curr! note: not a reference!!!
 
     curr = n_Init(1, r); // ???
-    
+
     number inv = n_Invers(t, r);
-    
+
     while( numberCollectionEnumerator.MoveNext() )
     {
       number &n = numberCollectionEnumerator.Current();
       n_InpMult(n, inv, r); // TODO: either this or directly divide!!!?
 //      n_Normalize(n, r); // ?
     }
-    
+
     n_Delete(&inv, r);
 
     c = t;
@@ -217,7 +237,7 @@ number ndCopyMap(number a, const coeffs aRing, const coeffs r)
   assume( getCoeffType(r) == getCoeffType(aRing) );
   if ( nCoeff_has_simple_Alloc(r) && nCoeff_has_simple_Alloc(aRing) )
     return a;
-	else
+  else
     return n_Copy(a, r);
 }
 void ndKillChar(coeffs) {}
@@ -254,7 +274,7 @@ void ndMPZ(mpz_t result, number &n, const coeffs r)
 }
 
 number ndInitMPZ(mpz_t m, const coeffs r)
-{ 
+{
   return n_Init( mpz_get_si(m), r);
 }
 
@@ -280,7 +300,7 @@ cfInitCharProc nInitCharTableDefault[]=
  #else
  NULL,        /* n_algExt */
  NULL,        /* n_transExt */
- #endif   
+ #endif
  ngcInitChar,  /* n_long_C */
  #ifdef HAVE_RINGS
  nrzInitChar,  /* n_Z */
@@ -293,7 +313,7 @@ cfInitCharProc nInitCharTableDefault[]=
  NULL,         /* n_Znm */
  NULL,         /* n_Z2m */
  #endif
- NULL	/* n_CF */
+ NULL         /* n_CF */
 };
 
 static cfInitCharProc *nInitCharTable=nInitCharTableDefault;
@@ -334,6 +354,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfLcm  = ndGcd; /* tricky, isn't it ?*/
     n->cfInitMPZ = ndInitMPZ;
     n->cfMPZ = ndMPZ;
+    n->cfPower = ndPower;
 
     // n->cfKillChar = ndKillChar; /* dummy */
     n->cfSetChar = ndSetChar; /* dummy */
@@ -342,7 +363,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfChineseRemainder = ndChineseRemainder;
     n->cfFarey = ndFarey;
     n->cfParDeg = ndParDeg;
-    
+
     n->cfParameter = ndParameter;
 
     n->cfClearContent = ndClearContent;
@@ -356,11 +377,9 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     //n->cfGetUnit = (nMapFunc)NULL;
 #endif
 
-#ifdef fACTORY
     n->convSingNFactoryN=ndConvSingNFactoryN;
     n->convFactoryNSingN=ndConvFactoryNSingN;
-#endif
-    
+
     BOOLEAN nOK=TRUE;
     // init
     if ((t<=nLastCoeffs) && (nInitCharTable[t]!=NULL))
@@ -377,7 +396,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     if (n->cfRePart==NULL) n->cfRePart=n->cfCopy;
     if (n->cfExactDiv==NULL) n->cfExactDiv=n->cfDiv;
     if (n->cfSubringGcd==NULL) n->cfSubringGcd=n->cfGcd;
-    
+
 #ifdef HAVE_RINGS
     if (n->cfGetUnit==NULL) n->cfGetUnit=n->cfCopy;
 #endif
@@ -412,11 +431,11 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->iNumberOfParameters>= 0);
 
     assume( (n->iNumberOfParameters == 0 && n->pParameterNames == NULL) ||
-            (n->iNumberOfParameters >  0 && n->pParameterNames != NULL) );           
+            (n->iNumberOfParameters >  0 && n->pParameterNames != NULL) );
 
     assume(n->cfParameter!=NULL);
     assume(n->cfParDeg!=NULL);
-     
+
     assume(n->cfRead!=NULL);
     assume(n->cfNormalize!=NULL);
     assume(n->cfGreater!=NULL);
@@ -426,7 +445,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfIsOne!=NULL);
     assume(n->cfIsMOne!=NULL);
     assume(n->cfGreaterZero!=NULL);
-    assume(n->cfPower!=NULL);
     assume(n->cfGetDenom!=NULL);
     assume(n->cfGetNumerator!=NULL);
     assume(n->cfGcd!=NULL);
@@ -440,20 +458,20 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 
     assume(n->cfClearContent != NULL);
     assume(n->cfClearDenominators != NULL);
-    
+
 #ifdef LDEBUG
     if(n->cfDBTest==NULL)
     { n->cfDBTest=ndDBTest;Warn("cfDBTest is NULL for coeff %d",t); }
 #endif
     assume(n->type==t);
-     
+
 #ifndef SING_NDEBUG
     if(n->cfKillChar==NULL) Warn("cfKillChar is NULL for coeff %d",t);
     if(n->cfWriteLong==NULL) Warn("cfWrite is NULL for coeff %d",t);
     if(n->cfWriteShort==NULL) Warn("cfWriteShort is NULL for coeff %d",t);
     if(n->cfCoeffString==ndCoeffString) Warn("cfCoeffString is undefined for coeff %d",t);
 #endif
-     
+
    if( n->nNULL == NULL )
      n->nNULL = n_Init(0, n); // may still remain NULL
   }
@@ -525,11 +543,11 @@ n_coeffType nRegister(n_coeffType n, cfInitCharProc p)
 
 
 void n_Print(number& a,  const coeffs r)
-{ 
-   assume(r != NULL); 
-   n_Test(a,r); 
-   
-   StringSetS("");  
-   n_Write(a, r); 
+{
+   assume(r != NULL);
+   n_Test(a,r);
+
+   StringSetS("");
+   n_Write(a, r);
    { char* s = StringEndS(); Print("%s", s); omFree(s); }
 }
