@@ -2282,7 +2282,10 @@ EXAMPLE: example genus; shows an example
    }
    else
    {
-      def R=basering;
+     def R=changeord(list(list("dp",1:nvars(basering))));
+     setring R;
+     ideal I=imap(R0,I);
+     I=std(I);
    }
    if(dim(I)==2)
    {
