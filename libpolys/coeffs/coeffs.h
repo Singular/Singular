@@ -137,6 +137,9 @@ struct n_Procs_s
    /// string output of coeff description
    char* (*cfCoeffString)(const coeffs r);
 
+   /// default name of cf, should substitue cfCoeffWrite, cfCoeffString
+   char* (*cfCoeffName)(const coeffs r);
+
    // ?
    // initialisation:
    //void (*cfInitChar)(coeffs r, int parameter); // do one-time initialisations

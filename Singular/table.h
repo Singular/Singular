@@ -789,6 +789,7 @@ struct sValCmdM dArithM[]=
 #ifdef GENTABLE
 // this table MUST be order alphabetically by its first entry:
 cmdnames cmds[] =
+// alias: 0: real name, 1: this is an alias, 2: this is an outdated alias
 {  // name-string alias tokval          toktype
   { "$INVALID$",   0, -1,                 0},
   { "ASSUME",      0, ASSUME_CMD,         ASSUME_CMD},
@@ -1165,6 +1166,9 @@ struct sValAssign dAssign[]=
 ,{D(jiA_LINK),     LINK_CMD,       LINK_CMD }
 ,{D(jiA_PACKAGE),  PACKAGE_CMD,    PACKAGE_CMD }
 ,{D(jiA_DEF),      DEF_CMD,        DEF_CMD }
+#ifdef SINGULAR_4_1
+,{D(jiA_CRING),    CRING_CMD,      CRING_CMD }
+#endif
 ,{NULL_VAL,        0,              0 }
 };
 struct sValAssign_sys dAssign_sys[]=

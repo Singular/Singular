@@ -171,6 +171,7 @@ void *idrecDataInit(int t)
     case RESOLUTION_CMD:
       return  (void *)omAlloc0(sizeof(ssyStrategy));
     //other types: without init (int,script,poly,def,package)
+    case CRING_CMD:
     case INT_CMD:
     case DEF_CMD:
     case POLY_CMD:

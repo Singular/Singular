@@ -47,6 +47,7 @@ SOURCES = \
    mod_lib.cc\
    links/ndbm.cc\
    newstruct.cc\
+   number2.cc\
    pcv.cc\
    links/pipeLink.cc\
    scanner.cc\
@@ -95,6 +96,7 @@ SingularHEADERS = \
    misc_ip.h \
    mmalloc.h \
    mod_lib.h \
+   number2.h \
    omSingularConfig.h \
    links/ndbm.h \
    newstruct.h \

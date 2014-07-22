@@ -148,6 +148,10 @@ number ndGetNumerator(number &a,const coeffs r) { return n_Copy(a,r); }
 
 int ndSize(number a, const coeffs r) { return (int)n_IsZero(a,r)==FALSE; }
 
+char * ndCoeffName(const coeffs r)
+{
+  return r->cfCoeffString(r);
+}
 void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs r)
 {
   assume(r != NULL);
@@ -355,6 +359,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfInitMPZ = ndInitMPZ;
     n->cfMPZ = ndMPZ;
     n->cfPower = ndPower;
+    n->cfCoeffName = ndCoeffName;
 
     // n->cfKillChar = ndKillChar; /* dummy */
     n->cfSetChar = ndSetChar; /* dummy */

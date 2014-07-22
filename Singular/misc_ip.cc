@@ -1254,6 +1254,20 @@ void siInit(char *name)
   #endif
   feSetOptValue(FE_OPT_CPUS, cpus);
 
+#ifdef SINGULAR_4_1
+// default coeffs
+  {
+  idhdl h;
+  h=enterid(omStrDup("QQ"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+  IDDATA(h)=(char*)nInitChar(n_Q,NULL);
+  h=enterid(omStrDup("ZZ"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+  IDDATA(h)=(char*)nInitChar(n_Z,NULL);
+  //h=enterid(omStrDup("RR"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+  //IDDATA(h)=(char*)nInitChar(n_R,NULL);
+  //h=enterid(omStrDup("CC"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+  //IDDATA(h)=(char*)nInitChar(n_long_C,NULL);
+  }
+#endif  
 // loading standard.lib -----------------------------------------------
   if (! feOptValue(FE_OPT_NO_STDLIB))
   {

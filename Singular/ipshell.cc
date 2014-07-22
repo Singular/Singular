@@ -454,8 +454,12 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
   start=h;
   while (h!=NULL)
   {
-    if ((all && (IDTYP(h)!=PROC_CMD) &&(IDTYP(h)!=PACKAGE_CMD))
+    if ((all
+      && (IDTYP(h)!=PROC_CMD)
+      &&(IDTYP(h)!=PACKAGE_CMD)
+      && (IDTYP(h)!=CRING_CMD))
     || (typ == IDTYP(h))
+    || ((typ==RING_CMD) &&(IDTYP(h)==CRING_CMD))
     || ((IDTYP(h)==QRING_CMD) && (typ==RING_CMD)))
     {
       list1(prefix,h,start==currRingHdl, fullname);
@@ -1205,6 +1209,11 @@ BOOLEAN iiAlias(leftv p)
   idhdl pp=(idhdl)p->data;
   switch(pp->typ)
   {
+#ifdef SINGULAR_4_1
+      case CRING_CMD:
+        nKillChar((coeffs)pp);
+        break;
+#endif
       case INT_CMD:
         break;
       case INTVEC_CMD:
@@ -1754,6 +1763,11 @@ lists rDecompose(const ring r)
     L->Init(4);
   // ----------------------------------------
   // 0: char/ cf - ring
+#ifdef SINGULAR_4_1
+  // 0: char/ cf - ring
+  L->m[0].rtyp=CRING_CMD;
+  L->m[0].data=(char*)r->cf; r->cf->ref++;
+#else
   if (rField_is_numeric(r))
   {
     rDecomposeC(&(L->m[0]),r);
@@ -1811,6 +1825,7 @@ lists rDecompose(const ring r)
     L->m[0].rtyp=INT_CMD;
     L->m[0].data=(void *)(long)r->cf->ch;
   }
+#endif
   // ----------------------------------------
   // 1: list (var)
   lists LL=(lists)omAlloc0Bin(slists_bin);
@@ -2110,6 +2125,14 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
 
   // ------------------------------------------------------------------
   // 0: char:
+#ifdef SINGULAR_4_1
+  if (L->m[0].Typ()==CRING_CMD)
+  {
+    R->cf=(coeffs)L->m[0].Data();
+    R->cf->ref++;
+  }
+  else
+#endif  
   if (L->m[0].Typ()==INT_CMD)
   {
     int ch = (int)(long)L->m[0].Data();
@@ -5026,7 +5049,12 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   assume( pn != NULL );
   const int P = pn->listLength();
 
-  if (pn->Typ()==INT_CMD)
+  if ((pn->Typ()==CRING_CMD)&&(P==1))
+  {
+    cf=(coeffs)pn->CopyD();
+    assume( cf != NULL );
+  }
+  else if (pn->Typ()==INT_CMD)
   {
     int ch = (int)(long)pn->Data();
 
@@ -5883,9 +5911,10 @@ BOOLEAN iiARROW(leftv r, char* a, char *s)
 BOOLEAN iiAssignCR(leftv r, leftv arg)
 {
   int t=arg->Typ();
+  char* ring_name=(char*)r->Name();
+  ring_name=omStrDup(ring_name);
   if ((t==RING_CMD) ||(t==QRING_CMD))
   {
-    char* ring_name=omStrDup(r->Name());
     sleftv tmp;
     memset(&tmp,0,sizeof(tmp));
     tmp.rtyp=IDHDL;
@@ -5901,8 +5930,18 @@ BOOLEAN iiAssignCR(leftv r, leftv arg)
     else
       return TRUE;
   }
-  //Print("create %s\n",r->Name());
-  //Print("from %s(%d)\n",Tok2Cmdname(arg->Typ()),arg->Typ());
+  else if (t==CRING_CMD)
+  {
+    sleftv tmp;
+    sleftv n;
+    memset(&n,0,sizeof(n));
+    n.name=ring_name;
+    if (iiDeclCommand(&tmp,&n,myynest,CRING_CMD,&IDROOT)) return TRUE;
+    if (iiAssign(&tmp,arg)) return TRUE;
+    //Print("create %s\n",r->Name());
+    //Print("from %s(%d)\n",Tok2Cmdname(arg->Typ()),arg->Typ());
+    return FALSE;
+  }
   return TRUE;// not handled -> error for now
 }
 

@@ -39,6 +39,7 @@
 #include <Singular/attrib.h>
 #include <Singular/subexpr.h>
 #include <Singular/blackbox.h>
+#include <Singular/number2.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -107,6 +108,11 @@ void sleftv::Print(leftv store, int spaces)
 
     switch (t /*=Typ()*/)
       {
+#ifdef SINGULAR_4_1
+        case CRING_CMD:
+          crPrint((coeffs)d);
+          break;
+#endif
         case UNKNOWN:
         case DEF_CMD:
           PrintNSpaces(spaces);
@@ -384,6 +390,14 @@ static inline void * s_internalCopy(const int t,  void *d)
 {
   switch (t)
   {
+#ifdef SINGULAR_4_1
+    case CRING_CMD:
+      {
+        coeffs cf=(coeffs)d;
+        cf->ref++;
+        return (void*)d;
+      }
+#endif
     case INTVEC_CMD:
     case INTMAT_CMD:
       return (void *)ivCopy((intvec *)d);
@@ -453,6 +467,11 @@ void s_internalDelete(const int t,  void *d, const ring r)
   assume(d!=NULL);
   switch (t)
   {
+#ifdef SINGULAR_4_1
+    case CRING_CMD:
+      nKillChar((coeffs)d);
+      break;
+#endif
     case INTVEC_CMD:
     case INTMAT_CMD:
     {
@@ -1231,7 +1250,7 @@ void * sleftv::Data()
         if (!errorreported)
           Werror("wrong range[%d,%d] in matrix %s(%dx%d)",
                   index,e->next->start,
-		  this->Name(),
+                  this->Name(),
                   MATROWS((matrix)d),MATCOLS((matrix)d));
       }
       else

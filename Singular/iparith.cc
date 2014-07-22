@@ -127,6 +127,16 @@ ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
 
 static BOOLEAN check_valid(const int p, const int op);
 
+#ifdef SINGULAR_4_1
+// helper routine to catch all library/test parts which need to be changed
+// shall go away after the transition
+static void iiReWrite(const char *s)
+{
+  Print("please rewrite the use of >>%s<< in >>%s<<\n"
+        "%s is depreciated or changed in Singular 4-1\n",s,my_yylinebuf,s);
+}
+#endif
+
 /*=============== types =====================*/
 struct sValCmdTab
 {
@@ -5093,6 +5103,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
   int t=(int)(long)v->data;
   switch (t)
   {
+    case CRING_CMD:
     case INT_CMD:
     case POLY_CMD:
     case VECTOR_CMD:
@@ -5305,6 +5316,9 @@ static BOOLEAN jjidVec2Ideal(leftv res, leftv v)
 }
 static BOOLEAN jjrCharStr(leftv res, leftv v)
 {
+#ifdef SINGULAR_4_1
+  iiReWrite("charstr");
+#endif
   res->data = rCharStr((ring)v->Data());
   return FALSE;
 }
@@ -5345,16 +5359,25 @@ static BOOLEAN jjmpTransp(leftv res, leftv v)
 }
 static BOOLEAN jjrOrdStr(leftv res, leftv v)
 {
+#ifdef SINGULAR_4_1
+  iiReWrite("ordstr");
+#endif
   res->data = rOrdStr((ring)v->Data());
   return FALSE;
 }
 static BOOLEAN jjrVarStr(leftv res, leftv v)
 {
+#ifdef SINGULAR_4_1
+  iiReWrite("varstr");
+#endif
   res->data = rVarStr((ring)v->Data());
   return FALSE;
 }
 static BOOLEAN jjrParStr(leftv res, leftv v)
 {
+#ifdef SINGULAR_4_1
+  iiReWrite("varstr");
+#endif
   res->data = rParStr((ring)v->Data());
   return FALSE;
 }
@@ -8507,6 +8530,7 @@ const char * Tok2Cmdname(int tok)
   //if (tok==OBJECT) return "object";
   //if (tok==PRINT_EXPR) return "print_expr";
   if (tok==IDHDL) return "identifier";
+  if (tok==CRING_CMD) return "ring(cf)";
   if (tok>MAX_TOK) return getBlackboxName(tok);
   for(i=0; i<sArithBase.nCmdUsed; i++)
     //while (sArithBase.sCmds[i].tokval!=0)
