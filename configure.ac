@@ -236,6 +236,7 @@ AC_CONFIG_SUBDIRS([gfanlib])
 
 AC_CONFIG_FILES([Singular/dyn_modules/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/bigintm/Makefile])
+AC_CONFIG_FILES([Singular/dyn_modules/Order/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/syzextra/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/gfanlib/Makefile])
 AC_CONFIG_FILES([Singular/dyn_modules/polymake/Makefile])
