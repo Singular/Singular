@@ -1,4 +1,4 @@
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 
@@ -9,7 +9,7 @@ ideal gfanlib_kStd_wrapper(ideal I, ring r, tHomog h=testHomog)
     rChangeCurrRing(r);
 
   intvec* nullVector = NULL;
-  ideal stdI = kStd(I,currQuotient,h,&nullVector);
+  ideal stdI = kStd(I,currRing->qideal,h,&nullVector);
 
   if (origin != r)
     rChangeCurrRing(origin);

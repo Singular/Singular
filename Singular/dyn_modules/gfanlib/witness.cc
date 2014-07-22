@@ -1,4 +1,4 @@
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <Singular/lists.h>
 #include <libpolys/polys/monomials/p_polys.h>
 #include <callgfanlib_conversion.h>

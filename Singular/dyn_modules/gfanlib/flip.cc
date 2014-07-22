@@ -1,5 +1,5 @@
 #include <utility>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <gfanlib/gfanlib_vector.h>
 #include <callgfanlib_conversion.h>
 #include <initial.h>
@@ -75,7 +75,7 @@ std::pair<ideal,ring> flip(const ideal I, const ring r, const gfan::ZVector inte
   intvec* nullVector = NULL;
   ring origin = currRing;
   rChangeCurrRing(sAdjusted);
-  ideal inIsAdjustedGB = kStd(inIsAdjusted,currQuotient,testHomog,&nullVector);
+  ideal inIsAdjustedGB = kStd(inIsAdjusted,currRing->qideal,testHomog,&nullVector);
   id_Delete(&inIsAdjusted,sAdjusted);
   ideal IsAdjustedGB = lift(I,r,inIsAdjustedGB,sAdjusted);
   id_Delete(&inIsAdjustedGB,sAdjusted);

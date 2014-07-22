@@ -5,7 +5,7 @@
 
 // for various commands in dim(ideal I, ring r):
 #include <kernel/ideals.h>
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/stairc.h>
 
 /***
  * Computes the dimension of an ideal I in ring r
@@ -24,13 +24,13 @@ static int dim(ideal I, ring r)
       return -1;
     ideal vv = id_Head(I,currRing);
     if (i != -1) pDelete(&vv->m[i]);
-    d = scDimInt(vv, currQuotient);
+    d = scDimInt(vv, currRing->qideal);
     if (rField_is_Ring_Z(currRing) && (i==-1)) d++;
     idDelete(&vv);
     return d;
   }
   else
-    d = scDimInt(I,currQuotient);
+    d = scDimInt(I,currRing->qideal);
   if (origin != r)
     rChangeCurrRing(origin);
   return d;

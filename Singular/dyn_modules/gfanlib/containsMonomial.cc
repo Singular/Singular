@@ -1,6 +1,6 @@
 #include <bbcone.h>
 #include <kernel/polys.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <libpolys/polys/prCopy.h>
 
 #if 0
@@ -177,9 +177,9 @@ poly checkForMonomialViaSuddenSaturation(const ideal I, const ring r)
   intvec* nullVector = NULL;
   do
   {
-    ideal Jstd = kStd(J,currQuotient,testHomog,&nullVector);
+    ideal Jstd = kStd(J,currRing->qideal,testHomog,&nullVector);
     ideal JquotM = idQuot(Jstd,M,true,true); k++;
-    ideal JquotMredJ = kNF(JquotM,currQuotient,Jstd);
+    ideal JquotMredJ = kNF(JquotM,currRing->qideal,Jstd);
     b = idIs0(JquotMredJ);
     id_Delete(&Jstd,r); id_Delete(&J,r); J = JquotM;
     id_Delete(&JquotMredJ,r);
