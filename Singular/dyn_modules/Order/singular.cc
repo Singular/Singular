@@ -11,6 +11,7 @@
 #include "nforder_ideal.h"
 #include "libpolys/coeffs/bigintmat.h"
 
+#ifdef SINGULAR_4_1
 static int nforder_type_id=0;
 n_coeffType nforder_type =n_unknown;
 
@@ -510,3 +511,4 @@ extern "C" int SI_MOD_INIT(Order)(SModulFunctions* psModulFunctions)
     "nforder: orders in number fields"); // the help string for the module
   return MAX_TOK;
 }
+#endif
