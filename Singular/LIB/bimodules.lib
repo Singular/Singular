@@ -42,10 +42,9 @@ CompDecomp(p); returns an ideal which contains the component decomposition of a 
 isPureTensor(p); checks whether an element p in A^{env} is a pure tensor
 isTwoSidedGB(I);   checks whether an ideal I is two-sided Groebner basis
 
-SEE ALSO: ncalg_lib, nctools_lib
+SEE ALSO: ncalg_lib; nctools_lib
 
-KEYWORDS: bimodules, bisyzygies, bitrinity, lift, enveloping algebra, pure tensor,
-total divisors, two-sided, two-sided Groebner basis, tensor
+KEYWORDS: bimodules; bisyzygies; lift; enveloping algebra; pure tensor; total divisors; two-sided; two-sided Groebner basis; tensor
 
 ";
 
@@ -514,7 +513,7 @@ EXAMPLE: example liftenvelope; shows examples
     int i;
     def R = makeModElimRing(A); setring R;
     module N = imap(A,N); N = std(N);
-    intvec Nrows = 2..(j+1);
+    //intvec Nrows = 2..(j+1);
     module g = imap(save,g);
     matrix G[nrows(N)][1];
     for (i=2;i<=m;i++)
