@@ -8,6 +8,7 @@
 #include <tropicalStrategy.h>
 #include <tropicalCurves.h>
 #include <bbcone.h>
+#include <tropicalVarietyOfPolynomials.h>
 #include <tropicalVariety.h>
 
 
@@ -83,13 +84,35 @@ BOOLEAN tropicalStartingPoint(leftv res, leftv args)
   {
     ideal I = (ideal) u->Data();
     tropicalStrategy currentStrategy(I,currRing);
-    if (currentStrategy.getDimensionOfIdeal()==currentStrategy.getDimensionOfHomogeneitySpace())
+    if (idSize(I)==1)
     {
-      gfan::ZCone homogSpace = currentStrategy.getHomogeneitySpace();
-      gfan::ZMatrix homogSpaceGenerators = homogSpace.generatorsOfLinealitySpace();
-      assume(homogSpaceGenerators.getHeight()>0);
+      poly g = I->m[0];
+      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,currentStrategy);
+      if (Tg.empty())
+      {
+        res->rtyp = BIGINTMAT_CMD;
+        res->data = (void*) zVectorToBigintmat(gfan::ZVector(0));
+        return FALSE;
+      }
+      gfan::ZCone C = *(Tg.begin());
+      gfan::ZMatrix rays = C.extremeRays();
+      if (rays.getHeight()==0)
+      {
+        gfan::ZMatrix lin = C.generatorsOfLinealitySpace();
+        res->rtyp = BIGINTMAT_CMD;
+        res->data = (void*) zVectorToBigintmat(lin[0]);
+        return FALSE;
+      }
       res->rtyp = BIGINTMAT_CMD;
-      res->data = (void*) zVectorToBigintmat(homogSpaceGenerators[0]);
+      res->data = (void*) zVectorToBigintmat(rays[0]);
+      return FALSE;
+    }
+    gfan::ZCone C0 = currentStrategy.getHomogeneitySpace();
+    if (C0.dimension()==currentStrategy.getDimensionOfIdeal())
+    {
+      gfan::ZMatrix lin = C0.generatorsOfLinealitySpace();
+      res->rtyp = BIGINTMAT_CMD;
+      res->data = (void*) zVectorToBigintmat(lin[0]);
       return FALSE;
     }
     std::pair<gfan::ZVector,groebnerCone> startingData = tropicalStartingDataViaGroebnerFan(I,currRing,currentStrategy);

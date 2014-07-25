@@ -20,6 +20,7 @@ private:
   ideal startingIdeal;
   number uniformizingParameter;
   gfan::ZCone linealitySpace;
+
   bool onlyLowerHalfSpace;
 
   gfan::ZVector (*weightAdjustingAlgorithm1) (gfan::ZVector w);
