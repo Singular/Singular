@@ -53,7 +53,8 @@ SLIB1 = classifyceq.lib classifyci.lib classify_aeq.lib \
 	schreyer.lib symodstd.lib derham.lib polybori.lib ellipticcovers.lib \
 	schubert.lib tasks.lib tropical.lib hdepth.lib
 
-PLIBS = bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib fpadim.lib \
+PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
+        fpadim.lib \
 	freegb.lib gkdim.lib involut.lib ncalg.lib ncdecomp.lib \
 	ncfactor.lib ncpreim.lib nctools.lib perron.lib qmatrix.lib \
         purityfiltration.lib nchomolog.lib ratgb.lib \
