@@ -489,7 +489,7 @@ resultantFp (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
       equalCount= 0;
 
     count++;
-    if (count > bound || (prob && equalCount == 2))
+    if (count > bound || (prob && equalCount == 2 && !H.isOne()))
     {
       if (!algExt && degree (H, alpha) <= 0)
         break;
