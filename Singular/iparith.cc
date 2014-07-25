@@ -6319,8 +6319,7 @@ static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
   if (ringvar>0)
   {
     BOOLEAN overflow=FALSE;
-    //if (monomexpr!=NULL)
-    if (0)
+    if (monomexpr!=NULL)
     {
       long deg_monexp=pTotaldegree(monomexpr);
       for(int i=IDELEMS(id)-1;i>=0;i--)
