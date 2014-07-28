@@ -4440,11 +4440,46 @@ even if they have ring dependent parts), so they can be passed as argument
 to procedures, and recieved as result from procedures.
 
 In order to apply kernel commands to these types (like @code{string}, @code{+}),
-provide a usual procedure (say @code{proc p}..) for that task and 
+provide a usual procedure (say @code{proc p}..) for that task and
 install it via @code{system("install",} user_type @code{,} kernel_command @code{,p,} number_of_args @code{);}.
 The user_type and kernel_command have to be given as strings.
 For kernel_command having a variable number of arguments (internal @code{CMD_M})
 use 4 independ of the number of really supplied arguments.
+
+List of available kernel commands and the required number_of_args,
+some accept several variants and appear therefor at several places:
+@itemize
+@item inplace binary operands: @code{+,-,*,/,div,%,&,|, [}, number_of_args:2
+@item unary functions:
+@code{attrib, bareiss, betti, char, char_series, charstr, cleardenom, close, convhull,
+defined, deg, degree, denominator, det, dim, dump, ERROR, envelope, execute, facstd,
+factorize, finduni, gen, getdump, hilb, impart, indepSet, interred, jacob, janet,
+kbase, killattrib, lead, leadcoef, leadexp, leadmonom, load, ludecomp, maxideal,
+memory, minbase, minres, monitor, monomial, mult, mstd, nameof, ncols, npars, nrows,
+numerator, nvars, open, opposite, ord, ordstr, par, pardeg, parstr, preimage, prime,
+primefactors, prune, qhweight, rank, read, regularity, repart, ringlist, rvar, sba,
+size, slimgb, sortvec, sqrfree, syz, trace, transpose, twostd, typeof, univariate,
+var, variables, varstr, vdim, waitfirst, waitall, weight}
+
+@item functions with 2 arguments:
+@code{attrib, betti, bracket, chinrem, coeffs, contract, deg, delete, diff, dim, extgcd,
+eliminate, exportto, facstd, factorize, farey, fetch, fglm, fglmquot, find, frwalk, gcd,
+hilb, homog, hres, imap, importfrom, indepSet, insert, interpolation, janet, kbase, kernel,
+killattrib, koszul, lift, liftstd, load, lres, modulo, mpresmat, mres, newstruct, nc_algebra,
+nres, oppose, parstr, primefactors, quotient, random, rank, read, sba, simplify, sqrfree,
+sres, varstr, waitfirst, waitall, wedge}
+
+@item functions with 3 arguments:
+@code{attrib, bareiss, coeffs, eliminate, find, frwalk, hilb, homog, insert, koszul,
+laguerre, lift, liftstd, newstruct, preimage, random, resultant, sba, vandermonde}
+
+@item functions with  variable number of arguments arguments (number_of_args:4):
+@code{breakpoint, coef, dbprint, division, factmodd, intersect, jet, luinverse, lusolve,
+minor, names, option, qrds, reduce, reservedName, simplex, status, std, subst, system,
+test, uressolve, write}
+
+@c @item type casts
+@end itemize
 
 @*@strong{Example:}
 @smallexample
