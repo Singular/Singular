@@ -29,6 +29,7 @@
 #include "cf_iter.h"
 #include "cf_util.h"
 #include "cf_algorithm.h"
+#include "templates/ftmpl_functions.h"
 #include "cf_map.h"
 #include "cfModResultant.h"
 #include "cfCharSets.h"
@@ -374,10 +375,10 @@ simpleExtension (CFList& backSubst, const CFList & Astar,
       {
         if (getCharacteristic() == 0)
           On (SW_RATIONAL);
-        h= swapvar (g, g.mvar(), oldR.mvar());
-        tmp= CFList (swapvar (R, g.mvar(), oldR.mvar()));
-        h= alg_gcd (h, swapvar (oldR, g.mvar(), oldR.mvar()), tmp);
-        CanonicalForm hh= replacevar (h, oldR.mvar(), alpha);
+        Variable v= Variable (tmax (g.level(), oldR.level()) + 1);
+        h= swapvar (g, oldR.mvar(), v);
+        tmp= CFList (R);
+        h= alg_gcd (h, swapvar (oldR, oldR.mvar(), v), tmp);
 
         CanonicalForm numinv, deninv;
         numinv= QuasiInverse (tmp.getFirst(), LC (h), tmp.getFirst().mvar());
@@ -392,8 +393,6 @@ simpleExtension (CFList& backSubst, const CFList & Astar,
         denra= gcd (ra, deninv);
         ra /= denra;
         denra= deninv/denra;
-        denra= replacevar (denra, ra.mvar(), g.mvar());
-        ra= replacevar(ra, ra.mvar(), g.mvar());
         rb= R.mvar()*denra-s*ra;
         denrb= denra;
         for (; j.hasItem(); j++)
