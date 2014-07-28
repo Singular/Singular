@@ -953,11 +953,8 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
       if ((a!=NULL) && (b!=NULL)
       && ((long)pTotaldegree(a)>si_max((long)rVar(currRing),(long)currRing->bitmask/2)-(long)pTotaldegree(b)))
       {
-        Werror("OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
+        Warn("possible OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
           pTotaldegree(a),pTotaldegree(b),currRing->bitmask/2);
-        pDelete(&a);
-        pDelete(&b);
-        return TRUE;
       }
       res->data = (char *)(pMult( a, b));
       pNormalize((poly)res->data);
@@ -968,11 +965,8 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
     if ((a!=NULL) && (b!=NULL)
     && (pTotaldegree(a)+pTotaldegree(b)>si_max((long)rVar(currRing),(long)currRing->bitmask/2)))
     {
-      Werror("OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
+      Warn("possible OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
           pTotaldegree(a),pTotaldegree(b),currRing->bitmask/2);
-      pDelete(&a);
-      pDelete(&b);
-      return TRUE;
     }
     res->data = (char *)(pMult( a, b));
     pNormalize((poly)res->data);
