@@ -17,7 +17,7 @@ TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}'
 TESTS = test
 check_PROGRAMS = $(TESTS)
 test_SOURCES = test.cc
-test_LDADD   = libGBEngine.la ${builddir}/../libkernelCommon.la ${builddir}/../combinatorics/libcombinatorics.la
+test_LDADD   = libGBEngine.la ${builddir}/../combinatorics/libcombinatorics.la ${builddir}/../libkernelCommon.la
 
 CLEANFILES = $(TESTS)
 
