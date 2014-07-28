@@ -193,4 +193,8 @@ All possible options for configure can be seen by running the configure script w
 option @code{--help}. On a multicore compute consider running make with the 
 option @code{-f [cores]}.
 
+@subsection Side-by-side installation
+
+Due to choosing paths according to FS standards it is no longer possible
+to have a side-by-side installation of different Singular versions or versions for different architectures.
 @c ---------------------------------------------------------------------------
