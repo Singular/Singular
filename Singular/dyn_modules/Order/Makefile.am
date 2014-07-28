@@ -10,18 +10,17 @@ MYINCLUDES =  -I${top_srcdir} -I${top_builddir} -I${srcdir} \
 -I${top_srcdir}/factory/include -I${top_builddir}/factory/include \
 $(FACTORY_CFLAGS) $(NTL_CFLAGS) $(GMP_CFLAGS) $(GOOGLE_PERFTOOLS_CFLAGS)
 
-module_LTLIBRARIES=Order.la 
-
-if ENABLE_P_PROCS_DYNAMIC
+if SI_BUILTIN_ORDER
+  noinst_LTLIBRARIES=Order.la
+  P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION 
+  P_PROCS_MODULE_LDFLAGS = -module
+else
+  module_LTLIBRARIES=Order.la
   moduledir = $(libexecdir)/singular/MOD
   P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION 
 # Add under Mac OS X: -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
-else
-  moduledir = $(libdir)/singular
-  P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION 
+  P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 endif
-
-P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 
 Order_la_SOURCES   = $(SOURCES)
 Order_la_CPPFLAGS  = ${MYINCLUDES} ${P_PROCS_CPPFLAGS_COMMON}
@@ -35,4 +34,4 @@ Order_la_LDFLAGS   = ${AM_LDFLAGS} ${P_PROCS_MODULE_LDFLAGS} ${GOOGLE_PERFTOOL_L
 #
 # TESTS=test_release.sh
 #
-# EXTRA_DIST = nforder.tst ederc.tst test_clear_enum.tst test.sh $(TESTS)
+# EXTRA_DIST = nforder.tst test.sh $(TESTS)
