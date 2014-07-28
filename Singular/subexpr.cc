@@ -112,7 +112,11 @@ void sleftv::Print(leftv store, int spaces)
         case CRING_CMD:
           crPrint((coeffs)d);
           break;
+        case CMATRIX_CMD: // like BIGINTMAT
 #endif
+        case BIGINTMAT_CMD:
+          ((bigintmat *)d)->pprint(80);
+          break;
         case UNKNOWN:
         case DEF_CMD:
           PrintNSpaces(spaces);
@@ -127,9 +131,6 @@ void sleftv::Print(leftv store, int spaces)
         case INTVEC_CMD:
         case INTMAT_CMD:
           ((intvec *)d)->show(t,spaces);
-          break;
-        case BIGINTMAT_CMD:
-          ((bigintmat *)d)->pprint(80);
           break;
         case RING_CMD:
         case QRING_CMD:
@@ -397,12 +398,13 @@ static inline void * s_internalCopy(const int t,  void *d)
         cf->ref++;
         return (void*)d;
       }
+    case CMATRIX_CMD: // like BIGINTMAT
 #endif
+    case BIGINTMAT_CMD:
+      return (void*)bimCopy((bigintmat *)d);
     case INTVEC_CMD:
     case INTMAT_CMD:
       return (void *)ivCopy((intvec *)d);
-    case BIGINTMAT_CMD:
-      return (void*)bimCopy((bigintmat *)d);
     case MATRIX_CMD:
       return (void *)mp_Copy((matrix)d, currRing);
     case IDEAL_CMD:
@@ -471,17 +473,18 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case CRING_CMD:
       nKillChar((coeffs)d);
       break;
+    case CMATRIX_CMD: //like BIGINTMAT
 #endif
+    case BIGINTMAT_CMD:
+    {
+      bigintmat *v=(bigintmat*)d;
+      delete v;
+      break;
+    }
     case INTVEC_CMD:
     case INTMAT_CMD:
     {
       intvec *v=(intvec*)d;
-      delete v;
-      break;
-    }
-    case BIGINTMAT_CMD:
-    {
-      bigintmat *v=(bigintmat*)d;
       delete v;
       break;
     }
@@ -979,10 +982,22 @@ int  sleftv::Typ()
   }
   int r=0;
   int t=rtyp;
+  void *d=data;
   if (t==IDHDL) t=IDTYP((idhdl)data);
-  else if (t==ALIAS_CMD) { idhdl h=(idhdl)IDDATA((idhdl)data); t=IDTYP(h); }
+  else if (t==ALIAS_CMD)
+  { idhdl h=(idhdl)IDDATA((idhdl)data); t=IDTYP(h);d==IDDATA(h); }
   switch (t)
   {
+#ifdef SINGULAR_4_1
+    case CMATRIX_CMD:
+    {
+      bigintmat *b=(bigintmat*)d;
+      if ((currRing!=NULL)&&(currRing->cf==b->basecoeffs()))
+        return NUMBER_CMD;
+      else
+        return CNUMBER_CMD;
+    }
+#endif
     case INTVEC_CMD:
     case INTMAT_CMD:
       r=INT_CMD;
@@ -1072,6 +1087,10 @@ int  sleftv::LTyp()
   return Typ();
 }
 
+#ifdef SINGULAR_4_1
+static snumber2 iiNumber2Data[4];
+static int iiCmatrix_index=0;
+#endif
 void * sleftv::Data()
 {
   if ((rtyp!=IDHDL) && iiCheckRing(rtyp))
@@ -1184,6 +1203,29 @@ void * sleftv::Data()
         r=(char *)(BIMATELEM((*m),index,e->next->start));
       break;
     }
+#ifdef SINGULAR_4_1
+    case CMATRIX_CMD:
+    {
+      bigintmat *m=(bigintmat *)d;
+      if ((index<1)
+         ||(index>m->rows())
+         ||(e->next->start<1)
+         ||(e->next->start>m->cols()))
+      {
+        if (!errorreported)
+        Werror("wrong range[%d,%d] in matrix %s(%dx%d)",index,e->next->start,
+                                                     this->Name(),m->rows(),m->cols());
+      }
+      else
+      {
+        iiNumber2Data[iiCmatrix_index].cf=m->basecoeffs();
+        iiNumber2Data[iiCmatrix_index].n=BIMATELEM((*m),index,e->next->start);
+        r=(char*)&iiNumber2Data[iiCmatrix_index];
+        iiCmatrix_index=(iiCmatrix_index+1) % 4;
+      }
+      break;
+    }
+#endif
     case IDEAL_CMD:
     case MODUL_CMD:
     case MAP_CMD:
