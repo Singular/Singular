@@ -1,9 +1,15 @@
 /*! \page kernel_maps_page Fast polynomial maps
 
- This sub-package of kernel (\ref kernel_page) contains
- implementation of fast maps (see \ref macoeff_s, \ref mapoly_s, \ref maideal_s)
+ \brief This sub-package of \ref kernel_page contains implementation of fast polynomial maps
+ 
+ Main data structures: 
+ - \ref macoeff_s
+ - \ref mapoly_s
+ - \ref maideal_s
 
- NOTE: seems quite obsolete: check!
+ Main header(s) in `/kernel/maps/`:
+ - \ref kernel/maps/fast_maps.h
 
 */
+//  NOTE: seems quite obsolete... TODO: check!
 

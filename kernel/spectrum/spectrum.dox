@@ -1,9 +1,16 @@
 /*! \page kernel_spectrum_page Spectrum-related algorithms
 
- This sub-package of kernel (\ref kernel_page) contains
- Spectrum-related algorithms. 
+ \brief This sub-package of \ref kernel_page contains Spectrum-related (?) algorithms.
 
- TODO: list those algorithms... and corresponding interpreter functions...?
- 
+ Main header(s) in `/kernel/spectrum/`:
+ - \ref kernel/spectrum/GMPrat.h
+ - \ref kernel/spectrum/kmatrix.h
+ - \ref kernel/spectrum/multicnt.h
+ - \ref kernel/spectrum/npolygon.h
+ - \ref kernel/spectrum/semic.h
+ - \ref kernel/spectrum/spectrum.h
+ - \ref kernel/spectrum/splist.h
 */
 
+//  TODO: list those algorithms... and corresponding interpreter functions...?
+ 

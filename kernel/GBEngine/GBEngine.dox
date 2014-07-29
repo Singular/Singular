@@ -1,10 +1,36 @@
 /*! \page kernel_GBEngine_page GB-based and related algorithms
 
- This sub-package of kernel (\ref kernel_page) contains
- Groebner and Standard basis as well as syzygy and resolution algorithms.
+ \brief This sub-package of \ref kernel_page contains Groebner and Standard basis as well as syzygy and resolution algorithms.
 
- Main internal structure: kStruct? LObject, TObject?
+ Main header(s) in `/kernel/GBEngine/`:
+ - \ref kernel/GBEngine/F4.h
+ - \ref kernel/GBEngine/f5c.h
+ - \ref kernel/GBEngine/f5data.h
+ - \ref kernel/GBEngine/f5gb.h
+ - \ref kernel/GBEngine/f5lists.h
+ - \ref kernel/GBEngine/janet.h
+ - \ref kernel/GBEngine/kInline.h
+ - \ref kernel/GBEngine/khstd.h
+ - \ref kernel/GBEngine/kstd1.h
+ - \ref kernel/GBEngine/kstdfac.h
+ - \ref kernel/GBEngine/kutil.h
+ - \ref kernel/GBEngine/nc.h
+ - \ref kernel/GBEngine/ratgring.h
+ - \ref kernel/GBEngine/ringgb.h
+ - \ref kernel/GBEngine/shiftgb.h
+ - \ref kernel/GBEngine/stairc.h
+ - \ref kernel/GBEngine/syz.h
+ - \ref kernel/GBEngine/tgb.h
+ - \ref kernel/GBEngine/tgb_internal.h
+ - \ref kernel/GBEngine/tgbgauss.h
+ - \ref kernel/GBEngine/units.h
+
+
+ Some importat data structures and classes: 
+ - \ref skStrategy 
+ - \ref sLObject 
+ - \ref sTObject
  
- TODO: list those algorithms... and corresponding interpreter functions...?
-
 */
+
+// TODO: list those algorithms... and corresponding interpreter functions...?
