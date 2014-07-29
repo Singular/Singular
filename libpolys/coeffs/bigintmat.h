@@ -196,11 +196,12 @@ class bigintmat
     int findnonzero(int i); // liefert Index des ersten nicht-Null Eintrages in Zeile i
     int findcolnonzero(int j); // ---"--- Spalte j
     void getcol(int j, bigintmat *a); // Schreibt j-te Spalte in Vektor (Matrix) a
+                                      // matrix needs to be pre-allocated
     void getColRange(int j, int no, bigintmat *a); // copies col j..j+no-1 into cols 1..no of a
     void getrow(int i, bigintmat *a); // Schreibt i-te Zeile in Vektor (Matrix) a
     void setcol(int j, bigintmat *m); // Setzt j-te Spalte gleich übergebenem Vektor (Matrix) m
     void setrow(int i, bigintmat *m); // Setzt i-te Zeile gleich übergebenem Vektor (Matrix) m
-    void appendCol (bigintmat *a);
+    void appendCol (bigintmat *a);  // horizontally joins the matrices. Old 1st
     void extendCols (int i);
     bool add(bigintmat *b); // Addiert zur Matrix die Matrix b dazu. Return false => an error occured
     bool sub(bigintmat *b); // Subtrahiert ...

@@ -397,11 +397,13 @@ struct n_Procs_s
   coeffs (*cfQuot1)(number c, const coeffs r);
 #endif
 
-  /*CF: for blackbox rings */
+  /*CF: for blackbox rings, contains data needed to define the ring.
+   * contents depends on the actual example.*/
   void * data;
 #ifdef LDEBUG
    // must be last entry:
    /// Test: is "a" a correct number?
+   // DB as in debug, not data base.
    BOOLEAN (*cfDBTest)(number a, const char *f, const int l, const coeffs r);
 #endif
 };
