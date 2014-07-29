@@ -4,10 +4,17 @@ echo = 1;
 
 LIB("primdecint.lib");
 
-proc addIdealZW (I,J)
+proc addIdealZ(ideal I,ideal J)
 {
-   return(Primdecint::addIdealZ(I,J));
+    int i;
+    for(i=1; i<=ncols(J); i++)
+    {
+        I[ncols(I)+1] = J[i];
+    }
+    return(I);
 }
+
+ 
 proc coefPrimeZW(ideal I)
 {
    return(Primdecint::coefPrimeZ(I));
@@ -28,9 +35,10 @@ proc reduceZW(poly f,ideal I)
 ring rng = integer,(x,y),dp;
 ideal I = 0,5*x-3;
 ideal J = 0,y-5;
-ideal sumIJ = addIdealZW(I,J);
+ideal sumIJ = addIdealZ(I,J);
+I+J;
 
-ASSUME(0, idealsEqual(I+J,sumIJ) );
+ASSUME(0, idealsEqual(I+J, sumIJ) );
 
 ideal P = 0,5;
 
