@@ -3027,6 +3027,11 @@ BOOLEAN nlCoeffIsEqual(const coeffs r, n_coeffType n, void *p)
   return FALSE;
 }
 
+char * nlCoeffName(const coeffs r)
+{
+  if (r->cfDiv==nlDiv) return (char*)"QQ";
+  else                 return (char*)"ZZ";
+}
 
 
 BOOLEAN nlInitChar(coeffs r, void*p)
@@ -3039,6 +3044,7 @@ BOOLEAN nlInitChar(coeffs r, void*p)
   r->nCoeffIsEqual=nlCoeffIsEqual;
   r->cfKillChar = ndKillChar; /* dummy */
   r->cfCoeffString=nlCoeffString;
+  r->cfCoeffName=nlCoeffName;
 
   r->cfInitMPZ = nlInitMPZ;
   r->cfMPZ  = nlMPZ;

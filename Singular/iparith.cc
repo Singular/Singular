@@ -70,6 +70,10 @@
 #include <Singular/misc_ip.h>
 #include <Singular/linearAlgebra_ip.h>
 
+#ifdef SINGULAR_4_1
+#include <Singular/number2.h>
+#endif
+
 #  include <Singular/fglm.h>
 
 #include <Singular/blackbox.h>
@@ -800,7 +804,7 @@ static BOOLEAN jjPLUS_BIM(leftv res, leftv u, leftv v)
   res->data = (char *)bimAdd((bigintmat*)(u->Data()), (bigintmat*)(v->Data()));
   if (res->data==NULL)
   {
-    WerrorS("bigintmat size not compatible");
+    WerrorS("bigintmat/cmatrix not compatible");
     return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
@@ -893,7 +897,7 @@ static BOOLEAN jjMINUS_BIM(leftv res, leftv u, leftv v)
   res->data = (char *)bimSub((bigintmat*)(u->Data()), (bigintmat*)(v->Data()));
   if (res->data==NULL)
   {
-    WerrorS("bigintmat size not compatible");
+    WerrorS("bigintmat/cmatrix not compatible");
     return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
@@ -1012,7 +1016,7 @@ static BOOLEAN jjTIMES_BIM(leftv res, leftv u, leftv v)
   res->data = (char *)bimMult((bigintmat*)(u->Data()), (bigintmat*)(v->Data()));
   if (res->data==NULL)
   {
-    WerrorS("bigintmat size not compatible");
+    WerrorS("bigintmat/cmatrix not compatible");
     return TRUE;
   }
   if ((v->next!=NULL) || (u->next!=NULL))
@@ -8508,7 +8512,6 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
 
 const char * Tok2Cmdname(int tok)
 {
-  int i = 0;
   if (tok <= 0)
   {
     return sArithBase.sCmds[0].name;
@@ -8523,13 +8526,22 @@ const char * Tok2Cmdname(int tok)
   //if (tok==OBJECT) return "object";
   //if (tok==PRINT_EXPR) return "print_expr";
   if (tok==IDHDL) return "identifier";
-  if (tok==CRING_CMD) return "ring(cf)";
+  if (tok==CRING_CMD) return "(c)ring";
   if (tok>MAX_TOK) return getBlackboxName(tok);
+  int i;
   for(i=0; i<sArithBase.nCmdUsed; i++)
     //while (sArithBase.sCmds[i].tokval!=0)
   {
     if ((sArithBase.sCmds[i].tokval == tok)&&
         (sArithBase.sCmds[i].alias==0))
+    {
+      return sArithBase.sCmds[i].name;
+    }
+  }
+  // try gain for alias/old names:
+  for(i=0; i<sArithBase.nCmdUsed; i++)
+  {
+    if (sArithBase.sCmds[i].tokval == tok)
     {
       return sArithBase.sCmds[i].name;
     }

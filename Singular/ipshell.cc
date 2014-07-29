@@ -73,6 +73,10 @@
 #include <kernel/maps/fast_maps.h>
 #endif
 
+#ifdef SINGULAR_4_1
+#include <Singular/number2.h>
+#include <libpolys/coeffs/bigintmat.h>
+#endif
 leftv iiCurrArgs=NULL;
 idhdl iiCurrProc=NULL;
 const char *lastreserved=NULL;
@@ -220,6 +224,20 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                      Print(" <%lx>",(long)(IDRING(h)));
 #endif
                    break;
+#ifdef SINGULAR_4_1
+    case CNUMBER_CMD: 
+                   {  number2 n=(number2)IDDATA(h);
+		      Print(" (%s)",n->cf->cfCoeffName(n->cf));
+		      break;
+		   }
+    case CMATRIX_CMD:
+                   {  bigintmat *b=(bigintmat*)IDDATA(h);
+		      Print(" %d x %d (%s)",
+		        b->rows(),b->cols(),
+		        b->basecoeffs()->cfCoeffName(b->basecoeffs()));
+		      break;
+		   }
+#endif
     /*default:     break;*/
   }
   PrintLn();
@@ -428,9 +446,9 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
         {
           h=IDRING(h)->idroot;
         }
-        else if((IDTYP(h)==PACKAGE_CMD) || (IDTYP(h)==POINTER_CMD))
+        else if(IDTYP(h)==PACKAGE_CMD)
         {
-          //Print("list_cmd:package or pointer\n");
+          //Print("list_cmd:package\n");
           all=TRUE;typ=PROC_CMD;fullname=TRUE;really_all=TRUE;
           h=IDPACKAGE(h)->idroot;
         }

@@ -112,6 +112,9 @@ void sleftv::Print(leftv store, int spaces)
         case CRING_CMD:
           crPrint((coeffs)d);
           break;
+        case CNUMBER_CMD:
+          n2Print((number2)d);
+          break;
         case CMATRIX_CMD: // like BIGINTMAT
 #endif
         case BIGINTMAT_CMD:
@@ -201,15 +204,6 @@ void sleftv::Print(leftv store, int spaces)
            //   piProcinfo(pi, "ref"));
            break;
          }
-       case POINTER_CMD:
-         { package pack = (package)d;
-         PrintNSpaces(spaces);
-         PrintS("// PointerTest\n");
-         PrintNSpaces(spaces);
-         ::Print("// %s\n",IDID(pack->idroot));
-         //::Print(((char *)(pack->idroot)->data), spaces);
-         break;
-         }
        case LINK_CMD:
           {
             si_link l=(si_link)d;
@@ -289,7 +283,6 @@ void sleftv::Print(leftv store, int spaces)
     && (store!=this))
     {
       if((t/*Typ()*/!=LINK_CMD)
-      && (t/*Typ()*/!=POINTER_CMD)
       && (t/*Typ()*/!=PACKAGE_CMD)
       && (t/*Typ()*/!=DEF_CMD)
       )
@@ -325,7 +318,6 @@ void sleftv::CleanUp(ring r)
   {
     switch (rtyp)
     {
-      case POINTER_CMD:
       case PACKAGE_CMD:
       case IDHDL:
       case ANY_TYPE:
@@ -398,6 +390,8 @@ static inline void * s_internalCopy(const int t,  void *d)
         cf->ref++;
         return (void*)d;
       }
+    case CNUMBER_CMD:
+      return (void*)n2Copy((number2)d);
     case CMATRIX_CMD: // like BIGINTMAT
 #endif
     case BIGINTMAT_CMD:
@@ -412,8 +406,6 @@ static inline void * s_internalCopy(const int t,  void *d)
       return  (void *)idCopy((ideal)d);
     case STRING_CMD:
         return (void *)omStrDup((char *)d);
-    case POINTER_CMD:
-      return d;
     case PACKAGE_CMD:
       return  (void *)paCopy((package) d);
     case PROC_CMD:
@@ -473,6 +465,12 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case CRING_CMD:
       nKillChar((coeffs)d);
       break;
+    case CNUMBER_CMD:
+      {
+        number2 n=(number2)d;
+        n2Delete(n);
+        break;
+      }
     case CMATRIX_CMD: //like BIGINTMAT
 #endif
     case BIGINTMAT_CMD:
@@ -506,8 +504,6 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case STRING_CMD:
       omFree(d);
       break;
-    //case POINTER_CMD:
-    //  return d;
     //case PACKAGE_CMD:
     //  return  (void *)paCopy((package) d);
     case PROC_CMD:
@@ -574,7 +570,6 @@ void s_internalDelete(const int t,  void *d, const ring r)
     case INT_CMD:
     case DEF_CMD:
     case ALIAS_CMD:
-    case POINTER_CMD:
     case PACKAGE_CMD:
     case IDHDL:
     case NONE:
@@ -1130,8 +1125,6 @@ void * sleftv::Data()
 
       case VNOETHER:   return (void *) (currRing->ppNoether);
       case IDHDL:
-        return IDDATA((idhdl)data);
-      case POINTER_CMD:
         return IDDATA((idhdl)data);
       case COMMAND:
         //return NULL;
