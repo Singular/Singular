@@ -486,6 +486,8 @@ static inline BOOLEAN n_IsMOne(number n, const coeffs r)
 /// !!!                 and raise errors instead, in these cases
 /// !!! Do not follow this recommendation: while writing polys,
 /// !!! between 2 monomials will be an additional + iff !n_GreaterZero(next coeff)
+///     Then change definition to include n_GreaterZero => printing does NOT
+///     start with -
 ///
 static inline BOOLEAN n_GreaterZero(number n, const coeffs r)
 {

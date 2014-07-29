@@ -2,7 +2,22 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT: class bigintmat: matrizes of big integers
+* ABSTRACT: class bigintmat: matrices of number
+*
+* Matrices are stored as 1-dim c-arrays but interpreted 2-dim as matrices.
+* Both modes of addressing are supported, note however, that the 1-dim
+* adressing starts at 0, the 2-dim at 1.
+*
+* Matrices are meant to represent column modules, thus the default
+* operations are always by column.
+*
+* While basic operations are supported over any ring (coeff), some more
+* advanced ones require more special rings: eg. echelon forms, solving
+* of linear equations is only effective over principal ideal or even
+* Euclidean rings.
+*
+* Be careful with the get/set/view/rawset functions to understand which
+* arguments are copied/ deleted or only assigned.
 */
 
 #ifndef BIGINTMAT_H
@@ -27,8 +42,13 @@ class bigintmat
     bigintmat(): m_coeffs(NULL), v(NULL), row(1), col(0){}
 
     bigintmat * transpose();
+
+    /// transpose in place
     void inpTranspose();
 
+
+    /// constructor: the r times c zero-matrix. Beware that the creation
+    /// of a large zero matrix is expensive in terms of time and memory.
     bigintmat(int r, int c, const coeffs n): m_coeffs(n), v(NULL), row(r), col(c)
     {
       assume (rows() >= 0);
@@ -48,6 +68,7 @@ class bigintmat
       }
     }
 
+    /// copy constructor
     bigintmat(const bigintmat *m): m_coeffs(m->basecoeffs()), v(NULL), row(m->rows()), col(m->cols())
     {
       const int l = row*col;
@@ -69,6 +90,7 @@ class bigintmat
         }
       }
     }
+    /// dubious: 1-dim access to 2-dim array. Entries are read row by row.
     inline number& operator[](int i)
     {
 #ifndef SING_NDEBUG
@@ -97,8 +119,10 @@ class bigintmat
 
     /// UEberladener *=-Operator (fuer int und bigint)
     /// Frage hier: *= verwenden oder lieber = und * einzeln?
+    /// problem: what about non-commuting rings. Is this from left or right?
     void operator*=(int intop);
 
+    /// inplace versio of skalar mult. CHANGES input.
     void inpMult(number bintop, const coeffs C = NULL);
 
     inline int length() { return col*row; }
@@ -106,6 +130,7 @@ class bigintmat
     inline int  rows() const { return row; }
     inline coeffs basecoeffs() const { return m_coeffs; }
 
+    /// canonical destructor.
     ~bigintmat()
     {
       if (v!=NULL)
@@ -116,6 +141,8 @@ class bigintmat
       }
     }
 
+    /// helper function to map from 2-dim coordinates, starting by 1 to 
+    /// 1-dim coordinate, starting by 0
     int index(int r, int c) const
     {
       assume (rows() >= 0 && cols() >= 0);
@@ -137,6 +164,7 @@ class bigintmat
 
     /// get a copy of an entry. NOTE: starts at [0]
     number get(int i) const;
+    /// view an entry. NOTE: starts at [0]
     number view(int i) const;
 
     /// replace an entry with a copy (delete old + copy new!).
@@ -149,7 +177,7 @@ class bigintmat
 
 
     /// replace an entry with the given number n (only delete old).
-    /// NOTE: starts at [0]
+    /// NOTE: starts at [0]. Should be named set_transfer
     inline void rawset(int i, number n, const coeffs C = NULL)
     {
       assume (C == NULL || C == basecoeffs());
@@ -169,13 +197,19 @@ class bigintmat
 #endif
     }
 
+    /// as above, but the 2-dim version
     inline void rawset(int i, int j, number n, const coeffs C = NULL)
     {
       rawset( index(i,j), n, C);
     }
 
+    ///IO: String returns a singular string containing the matrix, needs
+    /// freeing afterwards
     char * String();
+    ///IO: writes the matrix into the current internal string buffer which
+    /// must be started/ allocated before (e.g. @StringSetS)
     void Write();
+    ///IO: simply prints the matrix to the current output (screen?)
     void Print();
 /***
  * Returns a string as it would have been printed in the interpreter.
@@ -190,27 +224,42 @@ class bigintmat
     // Funktionen von Kira, Jan, Marco
     // !WICHTIG: Überall, wo eine number übergeben wird, und damit gearbeitet wird, die coeffs mitübergeben und erst
     // überprüfen, ob diese mit basecoeffs übereinstimmen. Falls nein: Breche ab!
-    // Genauere Beschreibung der Funktionen in der Funktionen.odt
-    void swap(int i, int j); // Vertauscht i-te und j-te Spalte
-    void swaprow(int i, int j); // Vertauscht i-te und j-te Zeile
-    int findnonzero(int i); // liefert Index des ersten nicht-Null Eintrages in Zeile i
-    int findcolnonzero(int j); // ---"--- Spalte j
-    void getcol(int j, bigintmat *a); // Schreibt j-te Spalte in Vektor (Matrix) a
-                                      // matrix needs to be pre-allocated
-    void getColRange(int j, int no, bigintmat *a); // copies col j..j+no-1 into cols 1..no of a
+    /// swap columns i and j
+    void swap(int i, int j);
+
+    /// swap rows i and j
+    void swaprow(int i, int j); 
+
+    ///find index of 1st non-zero entry in row i
+    int findnonzero(int i);
+
+    ///find index of 1st non-zero entry in column j
+    int findcolnonzero(int j); 
+
+    ///copies the j-th column into the matrix a - which needs to be pre-allocated with the correct size.
+    void getcol(int j, bigintmat *a); 
+                                    
+    ///copies the no-columns staring by j (so j...j+no-1) into the pre-allocated a
+    void getColRange(int j, int no, bigintmat *a); 
+
     void getrow(int i, bigintmat *a); // Schreibt i-te Zeile in Vektor (Matrix) a
     void setcol(int j, bigintmat *m); // Setzt j-te Spalte gleich übergebenem Vektor (Matrix) m
     void setrow(int i, bigintmat *m); // Setzt i-te Zeile gleich übergebenem Vektor (Matrix) m
-    void appendCol (bigintmat *a);  // horizontally joins the matrices. Old 1st
+
+    ///horizontally join the matrices, m <- m|a
+    void appendCol (bigintmat *a);  
+
+    ///append i zero-columns to the matrix
     void extendCols (int i);
+
     bool add(bigintmat *b); // Addiert zur Matrix die Matrix b dazu. Return false => an error occured
     bool sub(bigintmat *b); // Subtrahiert ...
     bool skalmult(number b, coeffs c); // Multipliziert zur Matrix den Skalar b hinzu
     bool addcol(int i, int j, number a, coeffs c); // addiert a-faches der j-ten Spalte zur i-ten dazu
     bool addrow(int i, int j, number a, coeffs c); // ... Zeile ...
     void colskalmult(int i, number a, coeffs c); // Multipliziert zur i-ten Spalte den Skalar a hinzu
-    void coltransform(int i, int j, number a, number b, number c, number d); //  transforms cols (i,j) using the 2x2 matrix ((a,b)(c,d)) (hopefully)
     void rowskalmult(int i, number a, coeffs c); // ... Zeile ...
+    void coltransform(int i, int j, number a, number b, number c, number d); //  transforms cols (i,j) using the 2x2 matrix ((a,b)(c,d)) (hopefully)
     void concatrow(bigintmat *a, bigintmat *b); // Fügt zwei Matrixen untereinander/nebeneinander in gegebene Matrix ein, bzw spaltet gegebenen Matrix auf
     void concatcol(bigintmat *a, bigintmat *b);
     void splitrow(bigintmat *a, bigintmat *b); // Speichert in Matrix a den oberen, in b den unteren Teil der Matrix, vorausgesetzt die Dimensionen stimmen überein
@@ -229,7 +278,7 @@ class bigintmat
     number trace(); // the trace ....
     number det(); // det (via LaPlace in general, hnf for euc. rings)
     number hnfdet(); // det via HNF
-    // Primzahlen als long long int, müssen noch in number umgewandelt werden?
+    /// Primzahlen als long long int, müssen noch in number umgewandelt werden?
     void hnf(); // transforms INPLACE to HNF
     void howell(); //dito, but Howell form (only different for zero-divsors)
     void swapMatrix(bigintmat * a);
@@ -239,7 +288,7 @@ class bigintmat
     void colskaldiv(int j, number b); // Macht Ganzzahldivision aller j-ten Spalteneinträge mit b
     void mod(number p, coeffs c); // Reduziert komplette Matrix modulo p
     bigintmat* inpmod(number p, coeffs c); // Liefert Kopie der Matrix zurück, allerdings im Ring Z modulo p
-    number content();  //the content
+    number content(); //the content, the gcd of all entries. Only makes sense for Euclidean rings (or possibly constructive PIR)
     void simplifyContentDen(number *den); // ensures that Gcd(den, content)=1
     // enden hier wieder
 };
@@ -256,6 +305,8 @@ bigintmat * bimSub(bigintmat * a, int b);
 bigintmat * bimMult(bigintmat * a, bigintmat * b);
 bigintmat * bimMult(bigintmat * a, int b);
 bigintmat * bimMult(bigintmat * a, number b, const coeffs cf);
+
+///same as copy constructor - apart from it being able to accept NULL as input
 bigintmat * bimCopy(const bigintmat * b);
 
 class intvec;
@@ -265,7 +316,14 @@ bigintmat * iv2bim(intvec * b, const coeffs C);
 // Wieder von Kira, Jan, Marco
 bigintmat * bimChangeCoeff(bigintmat *a, coeffs cnew); // Liefert Kopier von Matrix a zurück, mit coeffs cnew statt den ursprünglichen
 void bimMult(bigintmat *a, bigintmat *b, bigintmat *c); // Multipliziert Matrix a und b und speichert Ergebnis in c
+
+///solve Ax=b*d. x needs to be pre-allocated to the same number of columns as b.
+/// the minimal denominator d is returned. Currently available for Z, Q and Z/nZ (and possibly for all fields: d=1 there)
+///Beware that the internal functions can find the kernel as well - but the interface is lacking.
 number solveAx(bigintmat *A, bigintmat *b, bigintmat *x); // solves Ax=b*d for a minimal denominator d. if x needs to have as many cols as b
+
+///a basis for the nullspace of a mod p: only used internally in Round2.
+/// Don't use it.
 int kernbase (bigintmat *a, bigintmat *c, number p, coeffs q);
 coeffs numbercoeffs(number n, coeffs c);
 bool nCoeffs_are_equal(coeffs r, coeffs s);

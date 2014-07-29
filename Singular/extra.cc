@@ -679,8 +679,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         }
         res->rtyp=INT_CMD;
         res->data=(void*)(long)gmp_output_digits;
-	//if (gmp_output_digits!=getGMPFloatDigits())
-	//{ Print("%d, %d\n",getGMPFloatDigits(),gmp_output_digits);}
+        //if (gmp_output_digits!=getGMPFloatDigits())
+        //{ Print("%d, %d\n",getGMPFloatDigits(),gmp_output_digits);}
         return FALSE;
       }
   /*==================== mpz_t loader ======================*/
@@ -2500,16 +2500,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   /*==================== setsyzcomp ==================================*/
       if(strcmp(sys_cmd,"setsyzcomp")==0)
       {
-      
-      if ((h!=NULL) && (h->Typ()==INT_CMD))
-         {
-           int k = (int)(long)h->Data();
-           if ( currRing->order[0] == ringorder_s )
-           {
-                rSetSyzComp(k, currRing);
-           }
+        if ((h!=NULL) && (h->Typ()==INT_CMD))
+        {
+          int k = (int)(long)h->Data();
+          if ( currRing->order[0] == ringorder_s )
+          {
+            rSetSyzComp(k, currRing);
           }
-      
+        }
       }
   /*==================== ring debug ==================================*/
         if(strcmp(sys_cmd,"r")==0)
@@ -3832,12 +3830,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if (id>0)
       {
         blackbox *bb=getBlackboxStuff(id);
-	if (BB_LIKE_LIST(bb))
-	{
+        if (BB_LIKE_LIST(bb))
+        {
           newstruct_desc desc=(newstruct_desc)bb->data;
           newstructShow(desc);
           return FALSE;
-	}
+        }
       }
     }
     return TRUE;
