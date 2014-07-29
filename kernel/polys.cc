@@ -7,6 +7,8 @@
 
 #include "polys.h"
 
+/// Widely used global variable which specifies the current polynomial ring for Singular interpreter and legacy implementatins.
+/// @Note: one should avoid using it in newer designs, for example due to possible problems in parallelization with threads.
 ring  currRing = NULL;
 
 void rChangeCurrRing(ring r)

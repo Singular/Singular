@@ -1,5 +1,12 @@
-/*! \file kernel/polys.h KernelCommon: compatiblity layer for all operations with polys
- 
+/*! \file kernel/polys.h Compatiblity layer for legacy polynomial operations (over @ref currRing)
+  
+ Macro defines for legacy polynomial operations used in @ref kernel_page and @ref singular_page.  
+ They take no ring argument since they work with @ref currRing by default. 
+ Notice that they have different prefix: `p` instead of `p_`.
+
+ See also related global ring variable and the correct ring changeing routine: 
+ - \ref currRing
+ - \ref rChangeCurrRing
 */
 
 #ifndef POLYS_H
@@ -20,17 +27,17 @@ void rChangeCurrRing(ring r);
  *
  ***************************************************************/
 
-// deletes old coeff before setting the new one
+/// deletes old coeff before setting the new one
 #define pSetCoeff(p,n)      p_SetCoeff(p,n,currRing)
 
-// Order
+/// Order
 #define pGetOrder(p)        p_GetOrder(p, currRing)
 
-// Component
+/// Component
 #define pGetComp(p)         __p_GetComp(p, currRing)
 #define pSetComp(p,v)       p_SetComp(p,v, currRing)
 
-// Exponent
+/// Exponent
 #define pGetExp(p,i)        p_GetExp(p, i, currRing)
 #define pSetExp(p,i,v)      p_SetExp(p, i, v, currRing)
 #define pIncrExp(p,i)       p_IncrExp(p,i, currRing)
@@ -48,26 +55,26 @@ void rChangeCurrRing(ring r);
  * except for pHead, all polys must be != NULL
  *
  ***************************************************************/
-// allocates the space for a new monomial -- no initialization !!!
+/// allocates the space for a new monomial -- no initialization !!!
 #define pNew()          p_New(currRing)
-// allocates a new monomial and initializes everything to 0
+/// allocates a new monomial and initializes everything to 0
 #define pInit()         p_Init(currRing)
-// like pInit, except that expvector is initialized to that of p,
-// p must be != NULL
+/// like pInit, except that expvector is initialized to that of p,
+/// p must be != NULL
 #define pLmInit(p)  p_LmInit(p, currRing)
-// returns newly allocated copy of Lm(p), coef is copied, next=NULL,
-// p might be NULL
+/// returns newly allocated copy of Lm(p), coef is copied, next=NULL,
+/// p might be NULL
 #define pHead(p)        p_Head(p, currRing)
-// frees the space of the monomial m, assumes m != NULL
-// coef is not freed, m is not advanced
+/// frees the space of the monomial m, assumes m != NULL
+/// coef is not freed, m is not advanced
 static inline void pLmFree(poly p)    {p_LmFree(p, currRing);}
-// like pLmFree, but advances p
+/// like pLmFree, but advances p
 static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
-// assumes p != NULL, deletes p, returns pNext(p)
+/// assumes p != NULL, deletes p, returns pNext(p)
 #define pLmFreeAndNext(p) p_LmFreeAndNext(p, currRing)
-// assume p != NULL, deletes Lm(p)->coef and Lm(p)
+/// assume p != NULL, deletes Lm(p)->coef and Lm(p)
 #define pLmDelete(p)    p_LmDelete(p, currRing)
-// like pLmDelete, returns pNext(p)
+/// like pLmDelete, returns pNext(p)
 #define pLmDeleteAndNext(p) p_LmDeleteAndNext(p, currRing)
 
 /***************************************************************
@@ -83,9 +90,9 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
 #define pExpVectorSum(pr, p1, p2)     p_ExpVectorSum(pr, p1, p2, currRing)
 #define pExpVectorDiff(pr, p1, p2)    p_ExpVectorDiff(pr, p1, p2, currRing)
 
-// Gets a copy of (resp. set) the exponent vector, where e is assumed
-// to point to (r->N +1)*sizeof(long) memory. Exponents are
-// filled in as follows: comp, e_1, .., e_n
+/// Gets a copy of (resp. set) the exponent vector, where e is assumed
+/// to point to (r->N +1)*sizeof(long) memory. Exponents are
+/// filled in as follows: comp, e_1, .., e_n
 #define pGetExpV(p, e)      p_GetExpV(p, e, currRing)
 #define pSetExpV(p, e)      p_SetExpV(p, e, currRing)
 
@@ -94,17 +101,17 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
  * Comparisons: they are all done without regarding coeffs
  *
  ***************************************************************/
-// returns 0|1|-1 if p=q|p>q|p<q w.r.t monomial ordering
+/// returns 0|1|-1 if p=q|p>q|p<q w.r.t monomial ordering
 #define pLmCmp(p,q)         p_LmCmp(p,q,currRing)
-// executes axtionE|actionG|actionS if p=q|p>q|p<q w.r.t monomial ordering
-// action should be a "goto ..."
+/// executes axtionE|actionG|actionS if p=q|p>q|p<q w.r.t monomial ordering
+/// action should be a "goto ..."
 #define pLmCmpAction(p,q, actionE, actionG, actionS)  \
   _p_LmCmpAction(p,q,currRing, actionE, actionG,actionS)
 
 #define pLmEqual(p1, p2)     p_ExpVectorEqual(p1, p2, currRing)
 
-// pCmp: args may be NULL
-// returns: (p2==NULL ? 1 : (p1 == NULL ? -1 : p_LmCmp(p1, p2)))
+/// pCmp: args may be NULL
+/// returns: (p2==NULL ? 1 : (p1 == NULL ? -1 : p_LmCmp(p1, p2)))
 #define pCmp(p1, p2)    p_Cmp(p1, p2, currRing)
 
 
@@ -114,28 +121,29 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
  * pDivisbleBy
  *
  ***************************************************************/
-// returns TRUE, if leading monom of a divides leading monom of b
-// i.e., if there exists a expvector c > 0, s.t. b = a + c;
+/// returns TRUE, if leading monom of a divides leading monom of b
+/// i.e., if there exists a expvector c > 0, s.t. b = a + c;
 #define pDivisibleBy(a, b)  p_DivisibleBy(a,b,currRing)
-// like pDivisibleBy, except that it is assumed that a!=NULL, b!=NULL
+/// like pDivisibleBy, except that it is assumed that a!=NULL, b!=NULL
 #define pLmDivisibleBy(a,b)  p_LmDivisibleBy(a,b,currRing)
-// like pLmDivisibleBy, does not check components
+/// like pLmDivisibleBy, does not check components
 #define pLmDivisibleByNoComp(a, b) p_LmDivisibleByNoComp(a,b,currRing)
-// Divisibility tests based on Short Exponent vectors
-// sev_a     == pGetShortExpVector(a)
-// not_sev_b == ~ pGetShortExpVector(b)
+/// Divisibility tests based on Short Exponent vectors
+/// sev_a     == pGetShortExpVector(a)
+/// not_sev_b == ~ pGetShortExpVector(b)
 #define pLmShortDivisibleBy(a, sev_a, b, not_sev_b) \
   p_LmShortDivisibleBy(a, sev_a, b, not_sev_b, currRing)
 #define pLmRingShortDivisibleBy(a, sev_a, b, not_sev_b) \
   p_LmRingShortDivisibleBy(a, sev_a, b, not_sev_b, currRing)
-// returns the "Short Exponent Vector" -- used to speed up divisibility
-// tests (see polys-impl.cc )
+/// returns the "Short Exponent Vector" -- used to speed up divisibility
+/// tests (see polys-impl.cc )
 #define pGetShortExpVector(a)   p_GetShortExpVector(a, currRing)
+
 #ifdef HAVE_RINGS
-/* divisibility check over ground ring (which may contain zero divisors);
-   TRUE iff LT(f) divides LT(g), i.e., LT(f)*c*m = LT(g), for some
-   coefficient c and some monomial m;
-   does not take components into account */
+/// divisibility check over ground ring (which may contain zero divisors);
+/// TRUE iff LT(f) divides LT(g), i.e., LT(f)*c*m = LT(g), for some
+/// coefficient c and some monomial m;
+/// does not take components into account */
 #define  pDivisibleByRingCase(f,g) p_DivisibleByRingCase(f,g,currRing)
 #endif
 
@@ -144,7 +152,7 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
  * Copying/Deleteion of polys: args may be NULL
  *
  ***************************************************************/
-// return a copy of the poly
+/// return a copy of the poly
 #define pCopy(p) p_Copy(p, currRing)
 #define pDelete(p_ptr)  p_Delete(p_ptr, currRing)
 
@@ -176,17 +184,17 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
  * Sort routines
  *
  *************************************************************************/
-// sorts p, assumes all monomials in p are different
+/// sorts p, assumes all monomials in p are different
 #define pSortMerger(p)          p_SortMerge(p, currRing)
 #define pSort(p)                p_SortMerge(p, currRing)
 
-// sorts p, p may have equal monomials
+/// sorts p, p may have equal monomials
 #define pSortAdd(p)             p_SortAdd(p, currRing)
 
 
-// Assume: If considerd only as poly in any component of p
-// (say, monomials of other components of p are set to 0),
-// then p is already sorted correctly
+/// Assume: If considerd only as poly in any component of p
+/// (say, monomials of other components of p are set to 0),
+/// then p is already sorted correctly
 #define pSortCompCorrect(p) pSort(p)
 
 /***************************************************************
@@ -194,18 +202,18 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
  * Predicates on polys/Lm's
  *
  ***************************************************************/
-// return true if all p is eihter NULL, or if all exponents
-// of p are 0 and Comp of p is zero
+/// return true if all p is eihter NULL, or if all exponents
+/// of p are 0 and Comp of p is zero
 #define   pIsConstantComp(p)        p_IsConstantComp(p, currRing)
-// like above, except that Comp might be != 0
+/// like above, except that Comp might be != 0
 #define   pIsConstant(p)            p_IsConstant(p,currRing)
-// return true if the Lm is a constant <>0
+/// return true if the Lm is a constant <>0
 #define   pIsUnit(p)            p_IsUnit(p,currRing)
-// like above, except that p must be != NULL
+/// like above, except that p must be != NULL
 #define   pLmIsConstantComp(p)      p_LmIsConstantComp(p, currRing)
 #define   pLmIsConstant(p)          p_LmIsConstant(p,currRing)
 
-// return TRUE if all monomials of p are constant
+/// return TRUE if all monomials of p are constant
 #define   pIsConstantPoly(p)        p_IsConstantPoly(p, currRing)
 
 #define   pIsPurePower(p)   p_IsPurePower(p, currRing)
@@ -231,7 +239,7 @@ typedef poly*   polyset;
 
 /*-----------the ordering of monomials:-------------*/
 #define pSetm(p)    p_Setm(p, currRing)
-// TODO:
+/// TODO:
 #define pSetmComp(p)   p_Setm(p, currRing)
 
 /***************************************************************
@@ -251,7 +259,7 @@ static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 
 #define pmInit(a,b) p_mInit(a,b,currRing)
 
-// ----------------- define to enable new p_procs -----*/
+/* ----------------- define to enable new p_procs -----*/
 
 #define pDivide(a,b) p_Divide(a,b,currRing)
 #define pDivideM(a,b) p_DivideM(a,b,currRing)
@@ -281,7 +289,7 @@ inline void    wrp(poly p)        {p_wrp(p, currRing, currRing);}
 #define   pSize(p)      p_Size(p,currRing)
 
 
-// homogenizes p by multiplying certain powers of the varnum-th variable
+/// homogenizes p by multiplying certain powers of the varnum-th variable
 #define  pHomogen(p,varnum) p_Homogen(p,varnum,currRing)
 
 BOOLEAN   pIsHomogeneous (poly p);
@@ -296,16 +304,16 @@ BOOLEAN   pIsHomogeneous (poly p);
 #define   pVectorHasUnit(p,k,l) p_VectorHasUnit(p,k,l,currRing)
 #define   pTakeOutComp1(p,k)    p_TakeOutComp1(p,k,currRing)
 
-// Splits *p into two polys: *q which consists of all monoms with
-// component == comp and *p of all other monoms *lq == pLength(*q)
-// On return all components pf *q == 0
+/// Splits *p into two polys: *q which consists of all monoms with
+/// component == comp and *p of all other monoms *lq == pLength(*q)
+/// On return all components pf *q == 0
 inline void pTakeOutComp(poly *p, long comp, poly *q, int *lq, const ring R = currRing)
 {
   return p_TakeOutComp(p, comp, q, lq, R);
 }
 
 
-// This is something weird -- Don't use it, unless you know what you are doing
+/// This is something weird -- Don't use it, unless you know what you are doing
 inline poly      pTakeOutComp(poly * p, int k, const ring R = currRing)
 {
   return p_TakeOutComp(p, k, R);
@@ -365,8 +373,8 @@ BOOLEAN pCompareChainPart (poly p, poly p1, poly p2, poly lcm, const ring R = cu
 
 
 
-// returns the length of a polynomial (numbers of monomials)
-// respect syzComp
+/// returns the length of a polynomial (numbers of monomials)
+/// respect syzComp
 static inline poly pLast(poly a, int &length) { return p_Last (a, length, currRing); }
 static inline poly pLast(poly a) { int l; return pLast(a, l); }
 
