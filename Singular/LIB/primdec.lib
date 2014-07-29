@@ -374,7 +374,6 @@ example
 
 proc idealsEqual( ideal k, ideal j)
 {
-  ASSUME(0, hasFieldCoefficient(basering) );
   return(stdIdealsEqual(std(k),std(j)));
 }
 
@@ -382,7 +381,6 @@ static proc specialIdealsEqual( ideal k1, ideal k2)
 {
   int j;
 
-  ASSUME(1, hasFieldCoefficient(basering) );
   if(size(k1)==size(k2))
   {
     for(j=1;j<=size(k1);j++)
@@ -400,7 +398,6 @@ static proc specialIdealsEqual( ideal k1, ideal k2)
 static proc stdIdealsEqual( ideal k1, ideal k2)
 {
   int j;
-  ASSUME(1, hasFieldCoefficient(basering) );
   if(size(k1)==size(k2))
   {
     for(j=1;j<=size(k1);j++)
@@ -2408,7 +2405,6 @@ EXAMPLE:example equidim; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
   }
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   intvec op ;
   def  P = basering;
@@ -2518,7 +2514,6 @@ EXAMPLE: example equidimMax; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
   }
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   def  P = basering;
   ideal eq;
@@ -3965,7 +3960,6 @@ EXAMPLE: example radicalEHV; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
    }
-   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    if((char(basering)<100)&&(char(basering)!=0))
    {
@@ -5260,10 +5254,6 @@ static proc minquot(list tsil)
 
 static proc special_ideals_equal( ideal k1, ideal k2)
 {
-   ASSUME(1, hasFieldCoefficient(basering) );
-   ASSUME(1, not isQuotientRing(basering) ) ;
-   ASSUME(1, hasGlobalOrdering(basering) ) ;
-
    int j;
    if(size(k1)==size(k2))
    {
@@ -5825,7 +5815,6 @@ EXAMPLE: example equiRadical; shows an example
      "// Not implemented for this ordering, please change to global ordering."
      );
   }
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   return(radical(i, 1));
 }
@@ -6667,7 +6656,6 @@ EXAMPLE: example prepareAss; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
   }
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   ideal j=std(i);
   int cod=nvars(basering)-dim(j);
@@ -6719,7 +6707,6 @@ EXAMPLE: example equidimMaxEHV; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
   }
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   ideal j=groebner(i);
   int cod=nvars(basering)-dim(j);
@@ -6795,7 +6782,6 @@ EXAMPLE: example zerodec; shows an example
     "// Not implemented for this ordering, please change to global ordering."
     );
   }
-  ASSUME(0, hasGlobalOrdering(basering) ) ;
 
   def R=basering;
   poly q;
