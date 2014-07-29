@@ -1184,10 +1184,10 @@ bool bigintmat::copy(bigintmat *b)
   return true;
 }
 
-// copy the submatrix of b, staring at (a,b) having n rows, m cols into
-// the given matrix at pos. (c,d)
-// needs c+n, d+m <= rows, cols
-//       a+n, b+m <= b.rows(), b.cols()
+/// copy the submatrix of b, staring at (a,b) having n rows, m cols into
+/// the given matrix at pos. (c,d)
+/// needs c+n, d+m <= rows, cols
+///       a+n, b+m <= b.rows(), b.cols()
 void bigintmat::copySubmatInto(bigintmat *B, int a, int b, int n, int m, int c, int d)
 {
   number t1;
@@ -2435,7 +2435,7 @@ int kernbase (bigintmat *a, bigintmat *c, number p, coeffs q) {
 }
 
 
-//create Z/nA of type n_Zn
+///create Z/nA of type n_Zn
 coeffs numbercoeffs(number n, coeffs c) {
   mpz_t p;
   number2mpz(n, c, p);
