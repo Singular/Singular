@@ -1731,6 +1731,8 @@ BOOLEAN iiAssign(leftv l, leftv r)
       rt=r->Typ();
       /* a = ... */
       if ((lt!=MATRIX_CMD)
+      &&(lt!=BIGINTMAT_CMD)
+      &&(lt!=CMATRIX_CMD)
       &&(lt!=INTMAT_CMD)
       &&((lt==rt)||(lt!=LIST_CMD)))
       {
