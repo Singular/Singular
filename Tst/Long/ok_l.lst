@@ -45,11 +45,10 @@ mora_2
 mora_3
 mora_4
 mora_8
-; mpsr_l
 mre
 mre_nonhom
 ncfactor_lee_l
-ncfactor_counterExOld_l
+;;ncfactor_counterExOld_l ;; too long
 paraplan
 pAdd0L_l
 pAdd0_l
