@@ -1552,7 +1552,7 @@ proc insepDecomp(ideal i)
 //decomposes i into special ideals
 //computes the prime decomposition of the special ideals
 //and transforms it back to a decomposition of i
- 
+
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
