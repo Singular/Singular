@@ -217,6 +217,7 @@ Short/polylib_s.tst
 Short/primdec2.tst
 ; Short/primdec3.tst ; too long!
 Short/primdec_s.tst
+Short/primdecint_some_special_cases.tst
 Short/primefactors.tst
 Short/primitiv_s.tst
 ;;;;;;;;;;;;;;;;;;;; Short/pyobject.tst
