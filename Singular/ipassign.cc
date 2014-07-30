@@ -1752,6 +1752,8 @@ BOOLEAN iiAssign(leftv l, leftv r)
       }
       if (((lt!=LIST_CMD)
         &&((rt==MATRIX_CMD)
+          ||(rt==BIGINTMAT_CMD)
+          ||(rt==CMATRIX_CMD)
           ||(rt==INTMAT_CMD)
           ||(rt==INTVEC_CMD)
           ||(rt==MODUL_CMD)))
