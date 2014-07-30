@@ -382,9 +382,6 @@ simpleExtension (CFList& backSubst, const CFList & Astar,
 
         CanonicalForm numinv, deninv;
         numinv= QuasiInverse (tmp.getFirst(), LC (h), tmp.getFirst().mvar());
-
-        if (getCharacteristic() == 0)
-          Off (SW_RATIONAL);
         h *= numinv;
         h= reduce (h, tmp.getFirst());
         deninv= LC(h);
