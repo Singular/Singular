@@ -177,6 +177,10 @@ C& C::multiplyWith10Cs(C& c1, C& c2, ...
  * Difficult and more involved algorithmic parts of routines are documented directly  before or between the corresponding lines of code, even though these comments may not appear in the Doxygen-generated developer's manual.
  * Even harder algorithmic parts must come with a link to related literature which clarifies the respective passages of the algorithm.
 
+Some doxygen-related links: 
+ * Manual <http://www.stack.nl/~dimitri/doxygen/manual/> 
+ * QRC: <http://www.digilife.be/quickreferences/QRC/Doxygen%20Quick%20Reference.pdf>, <http://www.sztaki.hu/~szcsaba/software/DoxygenQuickReference.pdf>
+
 ## BNF Specification for Naming Conventions
 
 ~~~~~~~~~~~~~~~
