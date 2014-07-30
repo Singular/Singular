@@ -22,16 +22,17 @@ doxyrun:
 
 if HAVE_DOXYGEN
 
-doxyfile.stamp: 
+## doxyfile.stamp:
+html:
 	$(MAKE) doxyrun abs_top_srcdir="$(abs_top_srcdir)" abs_top_builddir="$(abs_top_builddir)" \
 	DOXYGEN_CONFIG="$(abs_srcdir)/Doxyfile.in" DOXYGEN="$(DOXYGEN)" 
-	echo Timestamp > doxyfile.stamp
+##	echo Timestamp > doxyfile.stamp
 
-CLEANFILES = doxyfile.stamp
+## CLEANFILES = doxyfile.stamp
 
 # all-local: doxyfile.stamp
 
-html: doxyfile.stamp
+## html: doxyfile.stamp
 
 clean-local:
 	rm -rf html
