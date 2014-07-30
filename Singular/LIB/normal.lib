@@ -964,7 +964,7 @@ THEORY:  If r=size(L)=2 then iMult(L) = vdim(std(L[1]+L[2])) and in general
          delta(I) = vdim (normalisation(R/I)/(R/I)), R the basering.
 EXAMPLE: example iMult; shows an example
 "
-{    
+{
      ASSUME(0, not isQuotientRing(basering) );
 
      int i,mul,mu;
@@ -3227,10 +3227,10 @@ EXAMPLE:  example closureFrac; shows an example
   int i,j,k,l,n2,n3;
   intvec V;
   string mapstr;
-  for (i=1; i<=n; i++) 
+  for (i=1; i<=n; i++)
   {
     ASSUME(0, not isQuotientRing( L[i] ) );
-    def R(i) = L[i]; 
+    def R(i) = L[i];
   }
 
 // The quotient representing f is computed as in 'closureGenerators' with
@@ -5055,7 +5055,7 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D)
 
 
   // ----- computation of the test ideal using the ring structure of Ai -----
- 
+
   option(redSB);
   option(returnSB);
 
