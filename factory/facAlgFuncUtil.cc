@@ -183,7 +183,7 @@ subst (const CanonicalForm& f, const CFList& a, const CFList& b,
       }
     }
   }
-  result= reduce (result, Rstar);
+  result= Prem (result, CFList (Rstar));
   result /= vcontent (result, Variable (Rstar.level() + 1));
   return result;
 }
