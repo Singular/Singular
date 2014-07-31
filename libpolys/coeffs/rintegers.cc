@@ -24,9 +24,7 @@
 #include "si_gmp.h"
 #include "factory/factory.h"
 
-#ifdef HAVE_FACTORY
 #include <factory/factory.h>
-#endif
 
 /// Our Type!
 static const n_coeffType ID = n_Z;
@@ -374,7 +372,6 @@ static const char * nlEatLongC(char *s, mpz_ptr i)
 }
 
 
-#ifdef HAVE_FACTORY
 CanonicalForm nrzConvSingNFactoryN(number n, BOOLEAN setChar, const coeffs /*r*/)
 {
   if (setChar) setCharacteristic( 0 );
@@ -397,7 +394,6 @@ number nrzConvFactoryNSingN(const CanonicalForm n, const coeffs r)
     return (number) m;
   }
 }
-#endif // HAVE_FACTORY
 
 const char * nrzRead (const char *s, number *a, const coeffs)
 {
@@ -477,11 +473,9 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfDelete= nrzDelete;
   r->cfSetMap = nrzSetMap;
   r->cfCoeffWrite = nrzCoeffWrite;
-  r->cfQuot1 = nrzQuot1;  
-#ifdef HAVE_FACTORY
+  r->cfQuot1 = nrzQuot1;
   r->convSingNFactoryN=nrzConvSingNFactoryN;
   r->convFactoryNSingN=nrzConvFactoryNSingN;
-#endif
   // debug stuff
 
 #ifdef LDEBUG
@@ -1327,7 +1321,7 @@ number nrzIntMod (number a,number b, const coeffs)
   mpz_clear(erg);
   mpz_clear(aa);
   mpz_clear(bb);
-  
+
   return nrz_short((number) r);
 }
 
