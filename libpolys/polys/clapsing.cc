@@ -56,16 +56,13 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   assume(f!=NULL);
   assume(g!=NULL);
 
-  if(pNext(f)==NULL) 
+  if(pNext(f)==NULL && pNext(g)==NULL)
   {
     poly p=p_One(r);
-    if (pNext(g)==NULL)
-    {
-      for(int i=rVar(r);i>0;i--)
-        p_SetExp(p,i,si_min(p_GetExp(f,i,r),p_GetExp(g,i,r)),r);
-      p_Setm(p,r);
-      return p;
-    }
+    for(int i=rVar(r);i>0;i--)
+      p_SetExp(p,i,si_min(p_GetExp(f,i,r),p_GetExp(g,i,r)),r);
+    p_Setm(p,r);
+    return p;
 #if 0
     else
     {
@@ -102,7 +99,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
 #endif
 
   Off(SW_RATIONAL);
-  if (rField_is_Q(r) || (rField_is_Zp(r)))
+  if (rField_is_Q(r) || rField_is_Zp(r) || rField_is_Ring_Z(r))
   {
     setCharacteristic( rChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g, r ) );
@@ -281,7 +278,7 @@ poly singclap_gcd ( poly f, poly g, const ring r)
 {
   poly res=NULL;
 
-  if (f!=NULL) p_Cleardenom(f, r);             
+  if (f!=NULL) p_Cleardenom(f, r);
   if (g!=NULL) p_Cleardenom(g, r);
   else         return f; // g==0 => gcd=f (but do a p_Cleardenom)
   if (f==NULL) return g; // f==0 => gcd=g (but do a p_Cleardenom)
@@ -547,6 +544,13 @@ poly singclap_pdivide ( poly f, poly g, const ring r )
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
     res = convFactoryPSingP( F / G,r );
   }
+  else if (rField_is_Ring_Z(r))
+  {
+    Off(SW_RATIONAL);
+    setCharacteristic( rChar(r) );
+    CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
+    res = convFactoryPSingP( F / G,r );
+  }
   else if (r->cf->extRing!=NULL)
   {
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
@@ -671,7 +675,7 @@ void singclap_divide_content ( poly f, const ring r )
         //#ifdef LDEBUG
         //number cn=(number)c;
         //StringSetS(""); nWrite(nt); StringAppend(" ==> ");
-        //nWrite(cn);PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s); 
+        //nWrite(cn);PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s);
         //#endif
       }
     }
@@ -1588,7 +1592,7 @@ poly singclap_det( const matrix m, const ring s )
 int singclap_det_i( intvec * m, const ring /*r*/)
 {
 //  assume( r == currRing ); // Anything else is not guaranted to work!
-   
+
   setCharacteristic( 0 ); // ?
   CFMatrix M(m->rows(),m->cols());
   int i,j;
@@ -1631,9 +1635,9 @@ matrix singntl_HNF(matrix  m, const ring s )
     Werror("HNF of %d x %d matrix",r,m->cols());
     return NULL;
   }
-   
+
   matrix res=mp_New(r,r);
-   
+
   if (rField_is_Q(s))
   {
 
