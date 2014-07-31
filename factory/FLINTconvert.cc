@@ -176,7 +176,9 @@ void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
 
 CanonicalForm convertFmpq_t2CF (const fmpq_t q)
 {
-  //ASSERT (isOn (SW_RATIONAL), "expected rational");
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
 
   CanonicalForm num, den;
   mpz_t nnum, nden;
@@ -185,16 +187,25 @@ CanonicalForm convertFmpq_t2CF (const fmpq_t q)
   fmpz_get_mpz (nnum, fmpq_numref (q));
   fmpz_get_mpz (nden, fmpq_denref (q));
 
+  CanonicalForm result;
   if (mpz_is_imm (nnum) && mpz_is_imm (nden))
   {
     num= CanonicalForm (mpz_get_si(nnum));
     den= CanonicalForm (mpz_get_si(nden));
     mpz_clear (nnum);
     mpz_clear (nden);
-    return num/den;
+    result= num/den;
+    if (!isRat)
+      Off (SW_RATIONAL);
+    return result;
   }
   else
-    return make_cf (nnum, nden, false);
+  {
+    result= make_cf (nnum, nden, false);
+    if (!isRat)
+      Off (SW_RATIONAL);
+    return result;
+  }
 }
 
 CanonicalForm
@@ -226,13 +237,18 @@ void convertFacCF2Fmpz_array (fmpz* result, const CanonicalForm& f)
 
 void convertFacCF2Fmpq_poly_t (fmpq_poly_t result, const CanonicalForm& f)
 {
-  //ASSERT (isOn (SW_RATIONAL), "expected poly over Q");
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
 
   fmpq_poly_init2 (result, degree (f)+1);
   _fmpq_poly_set_length (result, degree (f) + 1);
   CanonicalForm den= bCommonDen (f);
   convertFacCF2Fmpz_array (fmpq_poly_numref (result), f*den);
   convertCF2Fmpz (fmpq_poly_denref (result), den);
+
+  if (!isRat)
+    Off (SW_RATIONAL);
 }
 
 CFFList

@@ -382,11 +382,8 @@ simpleExtension (CFList& backSubst, const CFList & Astar,
 
         CanonicalForm numinv, deninv;
         numinv= QuasiInverse (tmp.getFirst(), LC (h), tmp.getFirst().mvar());
-
-        if (getCharacteristic() == 0)
-          Off (SW_RATIONAL);
         h *= numinv;
-        h= reduce (h, tmp.getFirst());
+        h= Prem (h, tmp);
         deninv= LC(h);
 
         ra= -h[0];
@@ -518,7 +515,7 @@ Trager (const CanonicalForm & F, const CFList & Astar,
 
       if (normFactors.getFirst().factor().inCoeffDomain())
         normFactors.removeFirst();
-      if (normFactors.length() == 1 && normFactors.getLast().exp() == 1)
+      if (normFactors.length() < 1 || (normFactors.length() == 1 && normFactors.getLast().exp() == 1))
       {
         f= backSubst (f, backSubsts, Astar);
         f *= bCommonDen (f);
@@ -540,7 +537,7 @@ Trager (const CanonicalForm & F, const CFList & Astar,
           else
           {
             fnew= fnew (g.mvar() + s*Rstar.mvar(), g.mvar());
-            fnew= reduce (fnew, Rstar);
+            fnew= Prem (fnew, CFList (Rstar));
           }
 
           h= alg_gcd (g, fnew, Rstarlist);
