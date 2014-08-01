@@ -835,10 +835,9 @@ EXAMPLE: example rootofUnity; shows examples
 {
   if ( npars(basering) !=1 )
   {
-    "the procedure works only with one parameter";
-    return(0);
+    ERROR(" the procedure works only with one ring parameter variable");
   }
-  if (n<1) { return(0); }
+  if (n<1) {  ERROR(" cannot compute ("+string(n)+")-th primitive root of unity"); }
   number mp = par(1);
   if (n==1) { return(mp-1); }
   if (n==2) { return(mp+1); }
@@ -868,24 +867,42 @@ EXAMPLE: example rootofUnity; shows examples
   {
     if ( deg(@l[j]) == d) { @d[cnt]=@l[j]; cnt++; }
   }
-  if ( size(@d)==1 )
+  
+  j=1;
+  int i;
+  number pw;
+
+  int @sized = size(@d);
+
+  if (@sized==1)
   {
-    res = poly(@d[1]);
+       setring OldRing;
+       list @rl = imap(@@rR,@d);
+       mp = number(@rl[1]);
+       kill @@rR;
+       return(mp);
   }
-  else
+  def @rng;
+
+  setring OldRing;
+
+  list rl = ringlist( OldRing); 
+  while ( j<=@sized )
   {
-    j=1;
-    while  ( j <= size(@d) )
-    {
-      res = @d[j]-lead(@d[j]);
-      if ( leadcoef(res) >=0 ) { j++; }
-      else { break; }
-    }
-    res = @d[j];
+     ASSUME(0, n%2 ==0);
+     setring OldRing;
+     @rng = ring(rl);    
+     setring @rng; 
+     list @rl = imap(@@rR,@d);
+     number mp = leadcoef( @rl[j] );
+     minpoly = mp;
+     number mp = minpoly;
+     number pw = a^(n div 2);
+     if ( (pw != 1) || n==1 )  {  break;  }
+     j = j+1;
   }
   setring OldRing;
-  poly I = imap(@@rR,res);
-  mp = leadcoef(I);
+  mp = imap(@rng,mp);
   kill @@rR;
   return(mp);
 }
