@@ -280,7 +280,7 @@ static BOOLEAN DetailedPrint(leftv __res, leftv h)
     rWrite(r, TRUE);
     PrintLn();
 #ifdef RDEBUG
-    rDebugPrint(r);
+    //rDebugPrint(r);
 #endif
     return FALSE;
   }
@@ -1980,5 +1980,5 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   //  ADD("", FALSE, );
 
 #undef ADD
-  return 0;
+  return MAX_TOK;
 }

@@ -219,6 +219,7 @@ CanonicalForm getMipo( const Variable & alpha )
 void setMipo ( const Variable & alpha, const CanonicalForm & mipo)
 {
     ASSERT( alpha.level() < 0 && alpha.level() != LEVELBASE, "illegal extension" );
+    algextensions[-alpha.level()]= ext_entry( 0, false );
     algextensions[-alpha.level()]= ext_entry((InternalPoly*)(conv2mipo( mipo, alpha ).getval()), true );
 }
 
@@ -255,6 +256,51 @@ int ExtensionLevel()
   if( var_names_ext == 0)
     return 0;
   return strlen( var_names_ext )-1;
+}
+
+void prune (Variable& alpha)
+{
+  int i, n = strlen( var_names_ext );
+  ASSERT (n+1 >= -alpha.level(), "wrong variable");
+  if (-alpha.level() == 1)
+  {
+    delete [] var_names_ext;
+    delete [] algextensions;
+    var_names_ext= 0;
+    algextensions= 0;
+    alpha= Variable();
+    return;
+  }
+  char * newvarnames = new char [-alpha.level() + 1];
+  for ( i = 0; i < -alpha.level(); i++ )
+    newvarnames[i] = var_names_ext[i];
+  newvarnames[-alpha.level()] = 0;
+  delete [] var_names_ext;
+  var_names_ext = newvarnames;
+  ext_entry * newalgext = new ext_entry [-alpha.level()];
+  for ( i = 0; i < -alpha.level(); i++ )
+    newalgext[i] = algextensions[i];
+  delete [] algextensions;
+  algextensions = newalgext;
+  alpha= Variable();
+}
+
+void prune1 (const Variable& alpha)
+{
+  int i, n = strlen( var_names_ext );
+  ASSERT (n+1 >= -alpha.level(), "wrong variable");
+
+  char * newvarnames = new char [-alpha.level() + 2];
+  for ( i = 0; i <= -alpha.level(); i++ )
+    newvarnames[i] = var_names_ext[i];
+  newvarnames[-alpha.level()+1] = 0;
+  delete [] var_names_ext;
+  var_names_ext = newvarnames;
+  ext_entry * newalgext = new ext_entry [-alpha.level()+1];
+  for ( i = 0; i <= -alpha.level(); i++ )
+    newalgext[i] = algextensions[i];
+  delete [] algextensions;
+  algextensions = newalgext;
 }
 
 void Reduce( bool on)

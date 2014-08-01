@@ -1,4 +1,6 @@
-/*! \page omalloc_page Singular memory manager for small chunks (omalloc)
+/*!
+
+ \page omalloc_page Singular memory manager for small chunks (omalloc)
 
  This is the Singular-specific memory manager which is tunned to
  handle the allocation and de-allocation of memory blocks of small

@@ -24,7 +24,7 @@
 CanonicalForm readCF( ISTREAM& );
 #endif /* NOSTREAMIO */
 
-//{{{ constructors, destructors, selectors
+/** constructors, destructors, selectors **/
 CanonicalForm::CanonicalForm( const char * str, const int base ) : value( CFFactory::basic( str, base ) )
 {
 }
@@ -53,9 +53,9 @@ CanonicalForm::mpzval(mpz_t val) const
     ASSERT (!is_imm (value) && value->levelcoeff() == IntegerDomain, "non-immediate integer expected");
     getmpi (value, val);
 }
-//}}}
 
-//{{{ predicates
+
+/** predicates **/
 #if 0
 bool
 CanonicalForm::isImm() const
@@ -192,9 +192,9 @@ CanonicalForm::isHomogeneous() const
   }
 }
 
-//}}}
 
-//{{{ conversion functions
+
+/** conversion functions **/
 long
 CanonicalForm::intval() const
 {
@@ -248,55 +248,60 @@ CanonicalForm::mapinto () const
         return result;
     }
 }
-//}}}
 
-//{{{ CanonicalForm CanonicalForm::lc (), Lc (), LC (), LC ( v ) const
-//{{{ docu
-//
-// lc(), Lc(), LC() - leading coefficient functions.
-//
-// All methods return CO if CO is in a base domain.
-//
-// lc() returns the leading coefficient of CO with respect to
-// lexicographic ordering.  Elements in an algebraic extension
-// are considered polynomials so lc() always returns a leading
-// coefficient in a base domain.  This method is useful to get
-// the base domain over which CO is defined.
-//
-// Lc() returns the leading coefficient of CO with respect to
-// lexicographic ordering.  In contrast to lc() elements in an
-// algebraic extension are considered coefficients so Lc() always
-// returns a leading coefficient in a coefficient domain.
-//
-// LC() returns the leading coefficient of CO where CO is
-// considered a univariate polynomial in its main variable.  An
-// element of an algebraic extension is considered an univariate
-// polynomial, too.
-//
-// LC( v ) returns the leading coefficient of CO where CO is
-// considered an univariate polynomial in the polynomial variable
-// v.
-// Note: If v is less than the main variable of CO we have to
-// swap variables which may be quite expensive.
-//
-// Examples:
-// Let x < y be polynomial variables, a an algebraic variable.
-//
-// (3*a*x*y^2+y+x).lc() = 3
-// (3*a*x*y^2+y+x).Lc() = 3*a
-// (3*a*x*y^2+y+x).LC() = 3*a*x
-// (3*a*x*y^2+y+x).LC( x ) = 3*a*y^2+1
-//
-// (3*a^2+4*a).lc() = 3
-// (3*a^2+4*a).Lc() = 3*a^2+4*a
-// (3*a^2+4*a).LC() = 3
-// (3*a^2+4*a).LC( x ) = 3*a^2+4*a
-//
-// See also: InternalCF::lc(), InternalCF::Lc(), InternalCF::LC(),
-// InternalPoly::lc(), InternalPoly::Lc(), InternalPoly::LC(),
-// ::lc(), ::Lc(), ::LC(), ::LC( v )
-//
-//}}}
+/** CanonicalForm CanonicalForm::lc (), Lc (), LC (), LC ( v ) const
+ *
+ * lc(), Lc(), LC() - leading coefficient functions.
+ *
+ * All methods return CO if CO is in a base domain.
+ *
+ * lc() returns the leading coefficient of CO with respect to
+ * lexicographic ordering.  Elements in an algebraic extension
+ * are considered polynomials so lc() always returns a leading
+ * coefficient in a base domain.  This method is useful to get
+ * the base domain over which CO is defined.
+ *
+ * Lc() returns the leading coefficient of CO with respect to
+ * lexicographic ordering.  In contrast to lc() elements in an
+ * algebraic extension are considered coefficients so Lc() always
+ * returns a leading coefficient in a coefficient domain.
+ *
+ * LC() returns the leading coefficient of CO where CO is
+ * considered a univariate polynomial in its main variable.  An
+ * element of an algebraic extension is considered an univariate
+ * polynomial, too.
+ *
+ * LC( v ) returns the leading coefficient of CO where CO is
+ * considered an univariate polynomial in the polynomial variable
+ * v.
+ * Note: If v is less than the main variable of CO we have to
+ * swap variables which may be quite expensive.
+ *
+ * Examples:
+ * > Let x < y be polynomial variables, a an algebraic variable.
+ *
+ * > (3*a*x*y^2+y+x).lc() = 3
+ *
+ * > (3*a*x*y^2+y+x).Lc() = 3*a
+ *
+ * > (3*a*x*y^2+y+x).LC() = 3*a*x
+ *
+ * > (3*a*x*y^2+y+x).LC( x ) = 3*a*y^2+1
+ *
+ *
+ * > (3*a^2+4*a).lc() = 3
+ *
+ * > (3*a^2+4*a).Lc() = 3*a^2+4*a
+ *
+ * > (3*a^2+4*a).LC() = 3
+ *
+ * > (3*a^2+4*a).LC( x ) = 3*a^2+4*a
+ *
+ * @sa InternalCF::lc(), InternalCF::Lc(), InternalCF::LC(),
+ * InternalPoly::lc(), InternalPoly::Lc(), InternalPoly::LC(),
+ * ::lc(), ::Lc(), ::LC(), ::LC( v )
+ *
+**/
 CanonicalForm
 CanonicalForm::lc () const
 {
@@ -306,6 +311,12 @@ CanonicalForm::lc () const
         return value->lc();
 }
 
+/**
+ * @sa CanonicalForm::lc(), CanonicalForm::LC(), InternalCF::lc(),
+ * InternalCF::Lc(), InternalCF::LC(),
+ * InternalPoly::lc(), InternalPoly::Lc(), InternalPoly::LC(),
+ * ::lc(), ::Lc(), ::LC(), ::LC( v )
+**/
 CanonicalForm
 CanonicalForm::Lc () const
 {
@@ -315,6 +326,12 @@ CanonicalForm::Lc () const
         return value->Lc();
 }
 
+/**
+ * @sa CanonicalForm::lc(), CanonicalForm::Lc(), InternalCF::lc(),
+ * InternalCF::Lc(), InternalCF::LC(),
+ * InternalPoly::lc(), InternalPoly::Lc(), InternalPoly::LC(),
+ * ::lc(), ::Lc(), ::LC(), ::LC( v )
+**/
 CanonicalForm
 CanonicalForm::LC () const
 {
@@ -324,6 +341,12 @@ CanonicalForm::LC () const
         return value->LC();
 }
 
+/**
+ * @sa CanonicalForm::lc(), CanonicalForm::Lc(), InternalCF::lc(),
+ * InternalCF::Lc(), InternalCF::LC(),
+ * InternalPoly::lc(), InternalPoly::Lc(), InternalPoly::LC(),
+ * ::lc(), ::Lc(), ::LC(), ::LC( v )
+**/
 CanonicalForm
 CanonicalForm::LC ( const Variable & v ) const
 {
@@ -344,27 +367,18 @@ CanonicalForm::LC ( const Variable & v ) const
             return *this;
     }
 }
-//}}}
 
-//{{{ int CanonicalForm::degree (), degree ( v ) const
-//{{{ docu
-//
-// degree() - degree methods.
-//
-// Both methods returns -1 for the zero polynomial and 0 if
-// CO is in a base domain.
-//
-// degree() returns the degree of CO in its main variable.
-// Elements in an algebraic extension are considered polynomials.
-//
-// degree( v ) returns the degree of CO with respect to v.
-// Elements in an algebraic extension are considered polynomials,
-// and v may be algebraic.
-//
-// See also: InternalCf::degree(), InternalPoly::degree(),
-// ::degree(), ::degree( v )
-//
-//}}}
+/**
+ * Returns -1 for the zero polynomial and 0 if
+ * CO is in a base domain.
+ *
+ * degree() returns the degree of CO in its main variable.
+ * Elements in an algebraic extension are considered polynomials.
+ *
+ * @sa InternalCF::degree(), InternalPoly::degree(),
+ * ::degree(), ::degree( v )
+ *
+**/
 int
 CanonicalForm::degree() const
 {
@@ -380,6 +394,17 @@ CanonicalForm::degree() const
         return value->degree();
 }
 
+/**
+ * returns -1 for the zero polynomial and 0 if
+ * CO is in a base domain.
+ *
+ * degree( v ) returns the degree of CO with respect to v.
+ * Elements in an algebraic extension are considered polynomials,
+ * and v may be algebraic.
+ *
+ * @sa InternalCF::degree(), InternalPoly::degree(),
+ * ::degree(), ::degree( v )
+**/
 int
 CanonicalForm::degree( const Variable & v ) const
 {
@@ -423,37 +448,21 @@ CanonicalForm::degree( const Variable & v ) const
         return result;
     }
 }
-//}}}
 
-//{{{ CanonicalForm CanonicalForm::tailcoeff (), int CanonicalForm::taildegree () const
-//{{{ docu
-//
-// tailcoeff(), taildegree() - return least coefficient and
-//   degree, resp.
-//
-// tailcoeff() returns the coefficient of the term with the least
-// degree in CO where CO is considered an univariate polynomial
-// in its main variable.  Elements in an algebraic extension are
-// considered coefficients.
-//
-// taildegree() returns -1 for the zero polynomial, 0 if CO is in
-// a base domain, otherwise the least degree of CO where CO is
-// considered a univariate polynomial in its main variable.  In
-// contrast to tailcoeff(), elements in an algebraic extension
-// are considered polynomials, not coefficients, and such may
-// have a taildegree larger than zero.
-//
-// tailcoeff( v ) returns the tail coefficient of CO where CO is
-// considered an univariate polynomial in the polynomial variable
-// v.
-// Note: If v is less than the main variable of CO we have to
-// swap variables which may be quite expensive.
-//
-// See also: InternalCF::tailcoeff(), InternalCF::tailcoeff(),
-// InternalPoly::tailcoeff(), InternalPoly::taildegree,
-// ::tailcoeff(), ::taildegree()
-//
-//}}}
+/**
+ *
+ * tailcoeff() - return least coefficient
+ *
+ * tailcoeff() returns the coefficient of the term with the least
+ * degree in CO where CO is considered an univariate polynomial
+ * in its main variable.  Elements in an algebraic extension are
+ * considered coefficients.
+ *
+ * @sa CanonicalForm::taildegree(), InternalCF::tailcoeff(), InternalCF::tailcoeff(),
+ * InternalPoly::tailcoeff(), InternalPoly::taildegree,
+ * ::tailcoeff(), ::taildegree()
+ *
+**/
 CanonicalForm
 CanonicalForm::tailcoeff () const
 {
@@ -463,6 +472,17 @@ CanonicalForm::tailcoeff () const
         return value->tailcoeff();
 }
 
+/**
+ * tailcoeff( v ) returns the tail coefficient of CO where CO is
+ * considered an univariate polynomial in the polynomial variable
+ * v.
+ * Note: If v is less than the main variable of CO we have to
+ * swap variables which may be quite expensive.
+ *
+ * @sa CanonicalForm::taildegree(), InternalCF::tailcoeff(), InternalCF::tailcoeff(),
+ * InternalPoly::tailcoeff(), InternalPoly::taildegree,
+ * ::tailcoeff(), ::taildegree()
+**/
 CanonicalForm
 CanonicalForm::tailcoeff (const Variable& v) const
 {
@@ -484,6 +504,19 @@ CanonicalForm::tailcoeff (const Variable& v) const
     }
 }
 
+
+/**
+ * taildegree() returns -1 for the zero polynomial, 0 if CO is in
+ * a base domain, otherwise the least degree of CO where CO is
+ * considered a univariate polynomial in its main variable.  In
+ * contrast to tailcoeff(), elements in an algebraic extension
+ * are considered polynomials, not coefficients, and such may
+ * have a taildegree larger than zero.
+ *
+ * @sa CanonicalForm::tailcoeff(), InternalCF::tailcoeff(), InternalCF::tailcoeff(),
+ * InternalPoly::tailcoeff(), InternalPoly::taildegree,
+ * ::tailcoeff(), ::taildegree()
+**/
 int
 CanonicalForm::taildegree () const
 {
@@ -498,24 +531,16 @@ CanonicalForm::taildegree () const
     else
         return value->taildegree();
 }
-//}}}
 
-//{{{ int CanonicalForm::level (), Variable CanonicalForm::mvar () const
-//{{{ docu
-//
-// level(), mvar() - return level and main variable of CO.
-//
-// level() returns the level of CO.  For a list of the levels and
-// their meanings, see cf_defs.h.
-//
-// mvar() returns the main variable of CO or Variable() if CO is
-// in a base domain.
-//
-// See also: InternalCF::level(), InternalCF::variable(),
-// InternalPoly::level(), InternalPoly::variable(), ::level(),
-// ::mvar()
-//
-//}}}
+/**
+ * level() returns the level of CO.  For a list of the levels and
+ * their meanings, see cf_defs.h.
+ *
+ * @sa InternalCF::level(), InternalCF::variable(),
+ * InternalPoly::level(), InternalPoly::variable(), ::level(),
+ * ::mvar()
+ *
+**/
 int
 CanonicalForm::level () const
 {
@@ -525,6 +550,14 @@ CanonicalForm::level () const
         return value->level();
 }
 
+/**
+ * mvar() returns the main variable of CO or Variable() if CO is
+ * in a base domain.
+ *
+ * @sa InternalCF::level(), InternalCF::variable(),
+ * InternalPoly::level(), InternalPoly::variable(), ::level(),
+ * ::mvar()
+**/
 Variable
 CanonicalForm::mvar () const
 {
@@ -533,24 +566,16 @@ CanonicalForm::mvar () const
     else
         return value->variable();
 }
-//}}}
 
-//{{{ CanonicalForm CanonicalForm::num (), den () const
-//{{{ docu
-//
-// num(), den() - return numinator and denominator of CO.
-//
-// num() returns the numinator of CO if CO is a rational number,
-// CO itself otherwise.
-//
-// den() returns the denominator of CO if CO is a rational
-// number, 1 (from the current domain!) otherwise.
-//
-// See also: InternalCF::num(), InternalCF::den(),
-// InternalRational::num(), InternalRational::den(), ::num(),
-// ::den()
-//
-//}}}
+/**
+ * num() returns the numerator of CO if CO is a rational number,
+ * CO itself otherwise.
+ *
+ * @sa InternalCF::num(), InternalCF::den(),
+ * InternalRational::num(), InternalRational::den(), ::num(),
+ * ::den()
+ *
+**/
 CanonicalForm
 CanonicalForm::num () const
 {
@@ -560,6 +585,14 @@ CanonicalForm::num () const
         return CanonicalForm( value->num() );
 }
 
+/**
+ * den() returns the denominator of CO if CO is a rational
+ * number, 1 (from the current domain!) otherwise.
+ *
+ * @sa InternalCF::num(), InternalCF::den(),
+ * InternalRational::num(), InternalRational::den(), ::num(),
+ * ::den()
+**/
 CanonicalForm
 CanonicalForm::den () const
 {
@@ -568,9 +601,8 @@ CanonicalForm::den () const
     else
         return CanonicalForm( value->den() );
 }
-//}}}
 
-//{{{ assignment operators
+/** assignment operators **/
 CanonicalForm &
 CanonicalForm::operator += ( const CanonicalForm & cf )
 {
@@ -805,7 +837,7 @@ CanonicalForm::div ( const CanonicalForm & cf )
     return *this;
 }
 
-//same as divremt but handles zero divisors in case we are in Z_p[x]/(f) where f is not irreducible
+///same as divremt but handles zero divisors in case we are in Z_p[x]/(f) where f is not irreducible
 CanonicalForm &
 CanonicalForm::tryDiv ( const CanonicalForm & cf, const CanonicalForm& M, bool& fail )
 {
@@ -1008,7 +1040,7 @@ divremt ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, C
     return result;
 }
 
-//same as divremt but handles zero divisors in case we are in Z_p[x]/(f) where f is not irreducible
+///same as divremt but handles zero divisors in case we are in Z_p[x]/(f) where f is not irreducible
 bool
 tryDivremt ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r, const CanonicalForm& M, bool& fail )
 {
@@ -1059,24 +1091,17 @@ tryDivremt ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q
     return result;
 }
 
-//}}}
-
-//{{{ CanonicalForm CanonicalForm::operator () ( f ), operator () ( f, v ) const
-//{{{ docu
-//
-// operator ()() - evaluation operator.
-//
-// Both operators return CO if CO is in a base domain.
-//
-// operator () ( f ) returns CO with f inserted for the main
-// variable.  Elements in an algebraic extension are considered
-// polynomials.
-//
-// operator () ( f, v ) returns CO with f inserted for v.
-// Elements in an algebraic extension are considered polynomials
-// and v may be an algebraic variable.
-//
-//}}}
+/**
+ *
+ * operator ()() - evaluation operator.
+ *
+ * Returns CO if CO is in a base domain.
+ *
+ * operator () ( f ) returns CO with f inserted for the main
+ * variable.  Elements in an algebraic extension are considered
+ * polynomials.
+ *
+**/
 CanonicalForm
 CanonicalForm::operator () ( const CanonicalForm & f ) const
 {
@@ -1122,6 +1147,13 @@ CanonicalForm::operator () ( const CanonicalForm & f ) const
     }
 }
 
+/**
+ * Returns CO if CO is in a base domain.
+ *
+ * operator () ( f, v ) returns CO with f inserted for v.
+ * Elements in an algebraic extension are considered polynomials
+ * and v may be an algebraic variable.
+**/
 CanonicalForm
 CanonicalForm::operator () ( const CanonicalForm & f, const Variable & v ) const
 {
@@ -1141,41 +1173,43 @@ CanonicalForm::operator () ( const CanonicalForm & f, const Variable & v ) const
         return result;
     }
 }
-//}}}
 
-//{{{ CanonicalForm CanonicalForm::operator [] ( int i ) const
-//{{{ docu
-//
-// operator []() - return i'th coefficient from CO.
-//
-// Returns CO if CO is in a base domain and i equals zero.
-// Returns zero (from the current domain) if CO is in a base
-// domain and i is larger than zero.  Otherwise, returns the
-// coefficient to x^i in CO (if x denotes the main variable of
-// CO) or zero if CO does not contain x^i.  Elements in an
-// algebraic extension are considered polynomials.  i should be
-// larger or equal zero.
-//
-// Note: Never use a loop like
-//
-// for ( int i = degree( f ); i >= 0; i-- )
-//     foo( i, f[ i ] );
-//
-// which is much slower than
-//
-// for ( int i = degree( f ), CFIterator I = f; I.hasTerms(); I++ ) {
-//     // fill gap with zeroes
-//     for ( ; i > I.exp(); i-- )
-//         foo( i, 0 );
-//     // at this point, i == I.exp()
-//     foo( i, i.coeff() );
-//     i--;
-// }
-// // work through trailing zeroes
-// for ( ; i >= 0; i-- )
-//     foo( i, 0 );
-//
-//}}}
+/**
+ *
+ * operator []() - return i'th coefficient from CO.
+ *
+ * Returns CO if CO is in a base domain and i equals zero.
+ * Returns zero (from the current domain) if CO is in a base
+ * domain and i is larger than zero.  Otherwise, returns the
+ * coefficient to x^i in CO (if x denotes the main variable of
+ * CO) or zero if CO does not contain x^i.  Elements in an
+ * algebraic extension are considered polynomials.  i should be
+ * larger or equal zero.
+ *
+ * Note: Never use a loop like
+ *
+~~~~~~~~~~~~~~~~~~~~~{.c}
+    for ( int i = degree( f ); i >= 0; i-- )
+         foo( i, f[ i ] );
+~~~~~~~~~~~~~~~~~~~~~
+ *
+ * which is much slower than
+ *
+~~~~~~~~~~~~~~~~~~~~~{.c}
+ * for ( int i = degree( f ), CFIterator I = f; I.hasTerms(); I++ ) {
+ *     // fill gap with zeroes
+ *     for ( ; i > I.exp(); i-- )
+ *         foo( i, 0 );
+ *     // at this point, i == I.exp()
+ *     foo( i, i.coeff() );
+ *     i--;
+ * }
+ * // work through trailing zeroes
+ * for ( ; i >= 0; i-- )
+ *     foo( i, 0 );
+~~~~~~~~~~~~~~~~~~~~~
+ *
+**/
 CanonicalForm
 CanonicalForm::operator [] ( int i ) const
 {
@@ -1188,23 +1222,17 @@ CanonicalForm::operator [] ( int i ) const
     else
         return value->coeff( i );
 }
-//}}}
 
-//{{{ CanonicalForm CanonicalForm::deriv (), deriv ( x )
-//{{{ docu
-//
-// deriv() - return the formal derivation of CO.
-//
-// deriv() derives CO with respect to its main variable.  Returns
-// zero from the current domain if f is in a coefficient domain.
-//
-// deriv( x ) derives CO with respect to x.  x should be a
-// polynomial variable.  Returns zero from the current domain if
-// f is in a coefficient domain.
-//
-// See also: ::deriv()
-//
-//}}}
+/**
+ *
+ * deriv() - return the formal derivation of CO.
+ *
+ * deriv() derives CO with respect to its main variable.  Returns
+ * zero from the current domain if f is in a coefficient domain.
+ *
+ * @sa  CanonicalForm::deriv ( const Variable & x )
+ *
+**/
 CanonicalForm
 CanonicalForm::deriv () const
 {
@@ -1220,6 +1248,11 @@ CanonicalForm::deriv () const
     }
 }
 
+/**
+ * deriv( x ) derives CO with respect to x.  x should be a
+ * polynomial variable.  Returns zero from the current domain if
+ * f is in a coefficient domain.
+**/
 CanonicalForm
 CanonicalForm::deriv ( const Variable & x ) const
 {
@@ -1239,29 +1272,27 @@ CanonicalForm::deriv ( const Variable & x ) const
         return result;
     }
 }
-//}}}
 
-//{{{ int CanonicalForm::sign () const
-//{{{ docu
-//
-// sign() - return sign of CO.
-//
-// If CO is an integer or a rational number, the sign is defined
-// as usual.  If CO is an element of a prime power domain or of
-// FF(p) and SW_SYMMETRIC_FF is on, the sign of CO is the sign of
-// the symmetric representation of CO.  If CO is in GF(q) or in
-// FF(p) and SW_SYMMETRIC_FF is off, the sign of CO is zero iff
-// CO is zero, otherwise the sign is one.
-//
-// If CO is a polynomial or in an extension of one of the base
-// domains, the sign of CO is the sign of its leading
-// coefficient.
-//
-// See also: InternalCF::sign(), InternalInteger::sign(),
-// InternalPrimePower::sign(), InternalRational::sign(),
-// InternalPoly::sign(), imm_sign(), gf_sign()
-//
-//}}}
+/** int CanonicalForm::sign () const
+ *
+ * sign() - return sign of CO.
+ *
+ * If CO is an integer or a rational number, the sign is defined
+ * as usual.  If CO is an element of a prime power domain or of
+ * FF(p) and SW_SYMMETRIC_FF is on, the sign of CO is the sign of
+ * the symmetric representation of CO.  If CO is in GF(q) or in
+ * FF(p) and SW_SYMMETRIC_FF is off, the sign of CO is zero iff
+ * CO is zero, otherwise the sign is one.
+ *
+ * If CO is a polynomial or in an extension of one of the base
+ * domains, the sign of CO is the sign of its leading
+ * coefficient.
+ *
+ * @sa InternalCF::sign(), InternalInteger::sign(),
+ * InternalRational::sign(),
+ * InternalPoly::sign(), imm_sign(), gf_sign()
+ *
+**/
 int
 CanonicalForm::sign () const
 {
@@ -1270,23 +1301,21 @@ CanonicalForm::sign () const
     else
         return value->sign();
 }
-//}}}
 
-//{{{ CanonicalForm CanonicalForm::sqrt () const
-//{{{ docu
-//
-// sqrt() - calculate integer square root.
-//
-// CO has to be an integer greater or equal zero.  Returns the
-// largest integer less or equal sqrt(CO).
-//
-// In the immediate case, we use the newton method to find the
-// root.  The algorithm is from H. Cohen - 'A Course in
-// Computational Algebraic Number Theory', ch. 1.7.1.
-//
-// See also: InternalCF::sqrt(), InternalInteger::sqrt(), ::sqrt()
-//
-//}}}
+/** CanonicalForm CanonicalForm::sqrt () const
+ *
+ * sqrt() - calculate integer square root.
+ *
+ * CO has to be an integer greater or equal zero.  Returns the
+ * largest integer less or equal sqrt(CO).
+ *
+ * In the immediate case, we use the newton method to find the
+ * root.  The algorithm is from H. Cohen - 'A Course in
+ * Computational Algebraic Number Theory', ch. 1.7.1.
+ *
+ * @sa InternalCF::sqrt(), InternalInteger::sqrt(), ::sqrt()
+ *
+**/
 CanonicalForm
 CanonicalForm::sqrt () const
 {
@@ -1310,19 +1339,17 @@ CanonicalForm::sqrt () const
     else
         return CanonicalForm( value->sqrt() );
 }
-//}}}
 
-//{{{ int CanonicalForm::ilog2 () const
-//{{{ docu
-//
-// ilog2() - integer logarithm to base 2.
-//
-// Returns the largest integer less or equal logarithm of CO to
-// base 2.  CO should be a positive integer.
-//
-// See also: InternalCF::ilog2(), InternalInteger::ilog2(), ::ilog2()
-//
-//}}}
+/** int CanonicalForm::ilog2 () const
+ *
+ * ilog2() - integer logarithm to base 2.
+ *
+ * Returns the largest integer less or equal logarithm of CO to
+ * base 2.  CO should be a positive integer.
+ *
+ * @sa InternalCF::ilog2(), InternalInteger::ilog2(), ::ilog2()
+ *
+**/
 int
 CanonicalForm::ilog2 () const
 {
@@ -1342,46 +1369,43 @@ CanonicalForm::ilog2 () const
     else
         return value->ilog2();
 }
-//}}}
 
-//{{{ bool operator ==, operator != ( const CanonicalForm & lhs, const CanonicalForm & rhs )
-//{{{ docu
-//
-// operator ==(), operator !=() - compare canonical forms on
-//   (in)equality.
-//
-// operator ==() returns true iff lhs equals rhs.
-// operator !=() returns true iff lhs does not equal rhs.
-//
-// This is the point in factory where we essentially use that
-// CanonicalForms in fact are canonical.  There must not be two
-// different representations of the same mathematical object,
-// otherwise, such (in)equality will not be recognized by these
-// operators.  In other word, we rely on the fact that structural
-// different factory objects in any case represent different
-// mathematical objects.
-//
-// So we use the following procedure to test on equality (and
-// analogously on inequality).  First, we check whether lhs.value
-// equals rhs.value.  If so we are ready and return true.
-// Second, if one of the operands is immediate, but the other one
-// not, we return false.  Third, if the operand's levels differ
-// we return false.  Fourth, if the operand's levelcoeffs differ
-// we return false.  At last, we call the corresponding internal
-// method to compare both operands.
-//
-// Both operands should have coefficients from the same base domain.
-//
-// Note: To compare with the zero or the unit of the current domain,
-// you better use the methods `CanonicalForm::isZero()' or
-// `CanonicalForm::isOne()', resp., than something like `f == 0',
-// since the latter is quite a lot slower.
-//
-// See also: InternalCF::comparesame(),
-// InternalInteger::comparesame(), InternalRational::comparesame(),
-// InternalPrimePower::comparesame(), InternalPoly::comparesame()
-//
-//}}}
+/**
+ *
+ * operator ==() - compare canonical forms on
+ *   (in)equality.
+ *
+ * operator ==() returns true iff lhs equals rhs.
+ *
+ * This is the point in factory where we essentially use that
+ * CanonicalForms in fact are canonical.  There must not be two
+ * different representations of the same mathematical object,
+ * otherwise, such (in)equality will not be recognized by these
+ * operators.  In other word, we rely on the fact that structural
+ * different factory objects in any case represent different
+ * mathematical objects.
+ *
+ * So we use the following procedure to test on equality (and
+ * analogously on inequality).  First, we check whether lhs.value
+ * equals rhs.value.  If so we are ready and return true.
+ * Second, if one of the operands is immediate, but the other one
+ * not, we return false.  Third, if the operand's levels differ
+ * we return false.  Fourth, if the operand's levelcoeffs differ
+ * we return false.  At last, we call the corresponding internal
+ * method to compare both operands.
+ *
+ * Both operands should have coefficients from the same base domain.
+ *
+ * Note: To compare with the zero or the unit of the current domain,
+ * you better use the methods `CanonicalForm::isZero()' or
+ * `CanonicalForm::isOne()', resp., than something like `f == 0',
+ * since the latter is quite a lot slower.
+ *
+ * @sa CanonicalForm::operator !=(), InternalCF::comparesame(),
+ * InternalInteger::comparesame(), InternalRational::comparesame(),
+ * InternalPoly::comparesame()
+ *
+**/
 bool
 operator == ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
@@ -1402,6 +1426,11 @@ operator == ( const CanonicalForm & lhs, const CanonicalForm & rhs )
         return rhs.value->comparesame( lhs.value ) == 0;
 }
 
+/**
+ * operator !=() returns true iff lhs does not equal rhs.
+ *
+ * @sa CanonicalForm::operator ==()
+**/
 bool
 operator != ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
@@ -1420,53 +1449,51 @@ operator != ( const CanonicalForm & lhs, const CanonicalForm & rhs )
         return true;
     else        return rhs.value->comparesame( lhs.value ) != 0;
 }
-//}}}
 
-//{{{ bool operator >, operator < ( const CanonicalForm & lhs, const CanonicalForm & rhs )
-//{{{ docu
-//
-// operator >(), operator <() - compare canonical forms. on size or
-//   level.
-//
-// The most common and most useful application of these operators
-// is to compare two integers or rationals, of course.  However,
-// these operators are defined on all other base domains and on
-// polynomials, too.  From a mathematical point of view this may
-// seem meaningless, since there is no ordering on finite fields
-// or on polynomials respecting the algebraic structure.
-// Nevertheless, from a programmer's point of view it may be
-// sensible to order these objects, e.g. to sort them.
-//
-// Therefore, the ordering defined by these operators in any case
-// is a total ordering which fulfills the law of trichotomy.
-//
-// It is clear how this is done in the case of the integers and
-// the rationals.  For finite fields, all you can say is that
-// zero is the minimal element w.r.t. the ordering, the other
-// elements are ordered in an arbitrary (but total!)  way.  For
-// polynomials, you have an ordering derived from the
-// lexicographical ordering of monomials.  E.g. if lm(f) < lm(g)
-// w.r.t. lexicographic ordering, then f < g.  For more details,
-// refer to the documentation of `InternalPoly::operator <()'.
-//
-// Both operands should have coefficients from the same base domain.
-//
-// The scheme how both operators are implemented is allmost the
-// same as for the assignment operators (check for immediates,
-// then check levels, then check levelcoeffs, then call the
-// appropriate internal comparesame()/comparecoeff() method).
-// For more information, confer to the overview for the
-// arithmetic operators.
-//
-// See also: InternalCF::comparesame(),
-// InternalInteger::comparesame(), InternalRational::comparesame(),
-// InternalPrimePower::comparesame(), InternalPoly::comparesame(),
-// InternalCF::comparecoeff(), InternalInteger::comparecoeff(),
-// InternalRational::comparecoeff(),
-// InternalPrimePower::comparecoeff(), InternalPoly::comparecoeff(),
-// imm_cmp(), imm_cmp_p(), imm_cmp_gf()
-//
-//}}}
+/**
+ *
+ * operator >() - compare canonical forms. on size or
+ *   level.
+ *
+ * The most common and most useful application of these operators
+ * is to compare two integers or rationals, of course.  However,
+ * these operators are defined on all other base domains and on
+ * polynomials, too.  From a mathematical point of view this may
+ * seem meaningless, since there is no ordering on finite fields
+ * or on polynomials respecting the algebraic structure.
+ * Nevertheless, from a programmer's point of view it may be
+ * sensible to order these objects, e.g. to sort them.
+ *
+ * Therefore, the ordering defined by these operators in any case
+ * is a total ordering which fulfills the law of trichotomy.
+ *
+ * It is clear how this is done in the case of the integers and
+ * the rationals.  For finite fields, all you can say is that
+ * zero is the minimal element w.r.t. the ordering, the other
+ * elements are ordered in an arbitrary (but total!)  way.  For
+ * polynomials, you have an ordering derived from the
+ * lexicographical ordering of monomials.  E.g. if lm(f) < lm(g)
+ * w.r.t. lexicographic ordering, then f < g.  For more details,
+ * refer to the documentation of `InternalPoly::operator <()'.
+ *
+ * Both operands should have coefficients from the same base domain.
+ *
+ * The scheme how both operators are implemented is allmost the
+ * same as for the assignment operators (check for immediates,
+ * then check levels, then check levelcoeffs, then call the
+ * appropriate internal comparesame()/comparecoeff() method).
+ * For more information, confer to the overview for the
+ * arithmetic operators.
+ *
+ * @sa CanonicalForm::operator <(), InternalCF::comparesame(),
+ * InternalInteger::comparesame(), InternalRational::comparesame(),
+ * InternalPoly::comparesame(),
+ * InternalCF::comparecoeff(), InternalInteger::comparecoeff(),
+ * InternalRational::comparecoeff(),
+ * InternalPoly::comparecoeff(),
+ * imm_cmp(), imm_cmp_p(), imm_cmp_gf()
+ *
+**/
 bool
 operator > ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
@@ -1495,6 +1522,9 @@ operator > ( const CanonicalForm & lhs, const CanonicalForm & rhs )
         return lhs.value->level() > rhs.value->level();
 }
 
+/**
+ * @sa CanonicalForm::operator >()
+**/
 bool
 operator < ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
@@ -1522,43 +1552,41 @@ operator < ( const CanonicalForm & lhs, const CanonicalForm & rhs )
     else
         return lhs.value->level() < rhs.value->level();
 }
-//}}}
 
-//{{{ CanonicalForm bgcd ( const CanonicalForm & f, const CanonicalForm & g )
-//{{{ docu
-//
-// bgcd() - return base coefficient gcd.
-//
-// If both f and g are integers and `SW_RATIONAL' is off the
-// positive greatest common divisor of f and g is returned.
-// Otherwise, if `SW_RATIONAL' is on or one of f and g is not an
-// integer, the greatest common divisor is trivial: either zero
-// if f and g equal zero or one (both from the current domain).
-//
-// f and g should come from one base domain which should be not
-// the prime power domain.
-//
-// Implementation:
-//
-// CanonicalForm::bgcd() handles the immediate case with a
-//   standard euclidean algorithm.  For the non-immediate cases
-//   `InternalCF::bgcdsame()' or `InternalCF::bgcdcoeff()', resp. are
-//   called following the usual level/levelcoeff approach.
-//
-// InternalCF::bgcdsame() and
-// InternalCF::bgcdcoeff() throw an assertion ("not implemented")
-//
-// InternalInteger::bgcdsame() is a wrapper around `mpz_gcd()'
-//   which takes some care about immediate results and the sign
-//   of the result
-// InternalInteger::bgcdcoeff() is a wrapper around
-//   `mpz_gcd_ui()' which takes some care about the sign
-//   of the result
-//
-// InternalRational::bgcdsame() and
-// InternalRational::bgcdcoeff() always return one
-//
-//}}}
+/** CanonicalForm bgcd ( const CanonicalForm & f, const CanonicalForm & g )
+ *
+ * bgcd() - return base coefficient gcd.
+ *
+ * If both f and g are integers and `SW_RATIONAL' is off the
+ * positive greatest common divisor of f and g is returned.
+ * Otherwise, if `SW_RATIONAL' is on or one of f and g is not an
+ * integer, the greatest common divisor is trivial: either zero
+ * if f and g equal zero or one (both from the current domain).
+ *
+ * f and g should come from one base domain which should be not
+ * the prime power domain.
+ *
+ * Implementation:
+ *
+ * CanonicalForm::bgcd() handles the immediate case with a
+ *   standard euclidean algorithm.  For the non-immediate cases
+ *   `InternalCF::bgcdsame()' or `InternalCF::bgcdcoeff()', resp. are
+ *   called following the usual level/levelcoeff approach.
+ *
+ * InternalCF::bgcdsame() and
+ * InternalCF::bgcdcoeff() throw an assertion ("not implemented")
+ *
+ * InternalInteger::bgcdsame() is a wrapper around `mpz_gcd()'
+ *   which takes some care about immediate results and the sign
+ *   of the result
+ * InternalInteger::bgcdcoeff() is a wrapper around
+ *   `mpz_gcd_ui()' which takes some care about the sign
+ *   of the result
+ *
+ * InternalRational::bgcdsame() and
+ * InternalRational::bgcdcoeff() always return one
+ *
+**/
 CanonicalForm
 bgcd ( const CanonicalForm & f, const CanonicalForm & g )
 {
@@ -1627,14 +1655,12 @@ bgcd ( const CanonicalForm & f, const CanonicalForm & g )
     else
         return f.value->bgcdcoeff( g.value );
 }
-//}}}
 
-//{{{ CanonicalForm bextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
-//{{{ docu
-//
-// bextgcd() - return base coefficient extended gcd.
-//
-//}}}
+/** CanonicalForm bextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
+ *
+ * bextgcd() - return base coefficient extended gcd.
+ *
+**/
 CanonicalForm
 bextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
 {
@@ -1728,7 +1754,6 @@ bextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, C
     else
         return f.value->bextgcdcoeff( g.value, a, b );
 }
-//}}}
 
 CanonicalForm
 blcm ( const CanonicalForm & f, const CanonicalForm & g )
@@ -1745,7 +1770,7 @@ blcm ( const CanonicalForm & f, const CanonicalForm & g )
         return (f / bgcd( f, g )) * g;
 }
 
-//{{{ input/output
+/** input/output **/
 #ifndef NOSTREAMIO
 void
 CanonicalForm::print( OSTREAM & os, char * str ) const
@@ -1779,9 +1804,8 @@ operator >> ( ISTREAM & is, CanonicalForm & cf )
     return is;
 }
 #endif /* NOSTREAMIO */
-//}}}
 
-//{{{ genOne(), genZero()
+/** genOne(), genZero() **/
 CanonicalForm
 CanonicalForm::genZero() const
 {
@@ -1809,9 +1833,8 @@ CanonicalForm::genOne() const
     else
         return CanonicalForm( value->genOne() );
 }
-//}}}
 
-//{{{ exponentiation
+/** exponentiation **/
 CanonicalForm
 power ( const CanonicalForm & f, int n )
 {
@@ -1854,6 +1877,7 @@ power ( const CanonicalForm & f, int n )
   }
 }
 
+/** exponentiation **/
 CanonicalForm
 power ( const Variable & v, int n )
 {
@@ -1870,24 +1894,24 @@ power ( const Variable & v, int n )
     else
         return CanonicalForm( v, n );
 }
-//}}}
 
-//{{{ switches
+/** switches **/
 void
 On( int sw )
 {
     cf_glob_switches.On( sw );
 }
 
+/** switches **/
 void
 Off( int sw )
 {
     cf_glob_switches.Off( sw );
 }
 
+/** switches **/
 bool
 isOn( int sw )
 {
     return cf_glob_switches.isOn( sw );
 }
-//}}}

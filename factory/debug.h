@@ -1,5 +1,13 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 
+/**
+ * @file debug.h
+ *
+ * functions to print debug output
+ *
+ * @note needs --enable-debugoutput --enable-streamio at configure
+**/
+
 /* It should be possible to include this file multiple times for different */
 /* settings of DEBUGOUTPUT */
 

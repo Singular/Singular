@@ -1,8 +1,8 @@
-1 >> tst_memory_0 :: 1378458546:3170:3-1-7:x86_64-Linux:fifi.mathematik.uni-kl.de:6583472
-1 >> tst_memory_1 :: 1378458546:3170:3-1-7:x86_64-Linux:fifi.mathematik.uni-kl.de:38285312
-1 >> tst_memory_2 :: 1378458546:3170:3-1-7:x86_64-Linux:fifi.mathematik.uni-kl.de:57585664
-1 >> tst_timer :: 1378458546:3170:3-1-7:x86_64-Linux:fifi.mathematik.uni-kl.de:137315
-2 >> tst_memory_0 :: 1378458546:3170:3-1-7:x86_64-Linux:fifi.mathematik.uni-kl.de:6564592
-2 >> tst_memory_1 :: 1378458546:3170:3-1-7:x86_64-Linux:fifi.mathematik.uni-kl.de:38285312
-2 >> tst_memory_2 :: 1378458546:3170:3-1-7:x86_64-Linux:fifi.mathematik.uni-kl.de:57585664
-2 >> tst_timer_1 :: 1378458546:3170:3-1-7:x86_64-Linux:fifi.mathematik.uni-kl.de:137316
+1 >> tst_memory_0 :: 1404479727:4.0.0, 64 bit:4.0.0:x86_64-Linux:nepomuck:7888040
+1 >> tst_memory_1 :: 1404479727:4.0.0, 64 bit:4.0.0:x86_64-Linux:nepomuck:34168832
+1 >> tst_memory_2 :: 1404479727:4.0.0, 64 bit:4.0.0:x86_64-Linux:nepomuck:57630720
+1 >> tst_timer :: 1404479727:4.0.0, 64 bit:4.0.0:x86_64-Linux:nepomuck:156560
+2 >> tst_memory_0 :: 1404479727:4.0.0, 64 bit:4.0.0:x86_64-Linux:nepomuck:7888768
+2 >> tst_memory_1 :: 1404479727:4.0.0, 64 bit:4.0.0:x86_64-Linux:nepomuck:34168832
+2 >> tst_memory_2 :: 1404479727:4.0.0, 64 bit:4.0.0:x86_64-Linux:nepomuck:57630720
+2 >> tst_timer_1 :: 1404479727:4.0.0, 64 bit:4.0.0:x86_64-Linux:nepomuck:156561

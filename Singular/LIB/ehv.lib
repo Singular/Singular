@@ -106,10 +106,10 @@ RETURN:  ideal, the annihilator of Ext^n(R/I,R) with given
 proc isSubset(ideal I,ideal J)
 "USAGE:   isSubset(I,J); I, J ideals
 RETURN:  integer, 1 if I is a subset of J and 0 otherwise
-NOTE:    if J is not a standard basis the result may be wrong
 "
 {
-  int s = size(I);
+  if ( attrib(J,"isSB") == 0) { J = groebner(J); } 
+  int s = ncols(I);
   for(int i=1; i<=s; i++)
     {
       if(reduce(I[i],J)!=0)
@@ -1365,14 +1365,60 @@ example
 //        A L G O R I T H M S   F O R   T E S T I N G              //
 //                                                                 //
 /////////////////////////////////////////////////////////////////////
+proc removeRedundantComponents(list primdecResult)
+"USAGE:   removeRedundantComponents(L); L a primary decomposition 
+RETURN:  an irredundant primary decomposition.
+EXAMPLE: example removeRedundantComponents; shows an example"
+proc removeRedundantComponents(list primdecResult)
+{
+   int i,j;
 
+   i = 1;
+   j = 1;
+   while  ( i<=size(primdecResult) ) 
+   {  
+     ASSUME(1, i>0 &&  i<=size(primdecResult) );
+     ASSUME(1, j>0 &&  j<=size(primdecResult) );
+
+      if (i!=j)
+      {
+          if ( isSubset( std(primdecResult[j][1]) , std(primdecResult[i][1]) ) )
+          { 
+              primdecResult[i] =  primdecResult[j];
+              primdecResult = delete(primdecResult,j);
+              j = j - 1; /*correct j due to deletion */
+              if ( j<i )  {    i = i -1;   } /*correct i */
+          }
+      } 
+      j = j + 1;
+      if ( j > size(primdecResult) )
+      {
+         i = i + 1;
+         j = 1;
+      }
+   }
+
+   return (primdecResult);
+}
+example
+{
+  "EXAMPLE:";
+  ring rng = 0,(x,y),dp;
+  def L1 = list(list(ideal(x-1),ideal(x-1)),list(ideal(x-1),ideal(x-1)),list(ideal(y-2),ideal(y-2)));
+  def L2 = list(list(ideal(x-1),ideal(x-1)),list(ideal(y-2),ideal(y-2)));
+  L1;
+  L2;
+  ASSUME(0, primDecsAreEquivalent( L1, L2 ) );
+}
 
 /////////////////////////////////////////////////////////////////////
 proc primDecsAreEquivalent(list L, list K)
 "USAGE:   primDecsAreEquivalent(L,K); L,K list of ideals
-RETURN:  integer, 1 if the lists are the same up to ordering and 0 otherwise
+RETURN:  integer, 1 if the lists are the same up to ordering and redundant components; 0 otherwise
 EXAMPLE: example primDecsAreEquivalent; shows an example"
 {
+  L = removeRedundantComponents(L);
+  K = removeRedundantComponents(K);
   int s1 = size(L);
   int s2 = size(K);
   if(s1!=s2)

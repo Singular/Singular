@@ -100,7 +100,6 @@ void     naWriteShort(number &a, const coeffs cf);
 number   naGetDenom(number &a, const coeffs cf);
 number   naGetNumerator(number &a, const coeffs cf);
 number   naGcd(number a, number b, const coeffs cf);
-//number   naLcm(number a, number b, const coeffs cf);
 int      naSize(number a, const coeffs cf);
 void     naDelete(number *a, const coeffs cf);
 void     naCoeffWrite(const coeffs cf, BOOLEAN details);
@@ -348,31 +347,6 @@ number naNeg(number a, const coeffs cf)
   if (a != NULL) a = (number)p_Neg((poly)a, naRing);
   return a;
 }
-
-number naInit_bigint(number longratBigIntNumber, const coeffs src, const coeffs cf)
-{
-  assume( cf != NULL );
-
-  const ring A = cf->extRing;
-
-  assume( A != NULL );
-
-  const coeffs C = A->cf;
-
-  assume( C != NULL );
-
-  number n = n_Init_bigint(longratBigIntNumber, src, C);
-
-  if ( n_IsZero(n, C) )
-  {
-    n_Delete(&n, C);
-    return NULL;
-  }
-
-  return (number)p_NSet(n, A);
-}
-
-
 
 number naInit(long i, const coeffs cf)
 {
@@ -666,14 +640,14 @@ number naLcm(number a, number b, const coeffs cf)
   return naDiv(theProduct, theGcd, cf);
 }
 #endif
-number napLcm(number b, const coeffs cf)
+number napNormalizeHelper(number b, const coeffs cf)
 {
   number h=n_Init(1,naRing->cf);
   poly bb=(poly)b;
   number d;
   while(bb!=NULL)
   {
-    d=n_Lcm(h,pGetCoeff(bb), naRing->cf);
+    d=n_NormalizeHelper(h,pGetCoeff(bb), naRing->cf);
     n_Delete(&h,naRing->cf);
     h=d;
     pIter(bb);
@@ -691,14 +665,14 @@ number naLcmContent(number a, number b, const coeffs cf)
 #else
   {
     a=(number)p_Copy((poly)a,naRing);
-    number t=napLcm(b,cf);
+    number t=napNormalizeHelper(b,cf);
     if(!n_IsOne(t,naRing->cf))
     {
       number bt, rr;
       poly xx=(poly)a;
       while (xx!=NULL)
       {
-        bt = n_Gcd(t, pGetCoeff(xx), naRing->cf);
+        bt = n_SubringGcd(t, pGetCoeff(xx), naRing->cf);
         rr = n_Mult(t, pGetCoeff(xx), naRing->cf);
         n_Delete(&pGetCoeff(xx),naRing->cf);
         pGetCoeff(xx) = n_Div(rr, bt, naRing->cf);
@@ -832,7 +806,7 @@ number naGcd(number a, number b, const coeffs cf)
       while (pNext(ax)!=NULL)
       {
         pIter(ax);
-        number y = n_Gcd(x, pGetCoeff(ax), naRing->cf);
+        number y = n_SubringGcd(x, pGetCoeff(ax), naRing->cf);
         n_Delete(&x,naRing->cf);
         x = y;
         if (n_IsOne(x,naRing->cf))
@@ -840,7 +814,7 @@ number naGcd(number a, number b, const coeffs cf)
       }
       do
       {
-        number y = n_Gcd(x, pGetCoeff(bx), naRing->cf);
+        number y = n_SubringGcd(x, pGetCoeff(bx), naRing->cf);
         n_Delete(&x,naRing->cf);
         x = y;
         if (n_IsOne(x,naRing->cf))
@@ -888,13 +862,25 @@ number naInvers(number a, const coeffs cf)
   return (number)(aFactor);
 }
 
-/* assumes that src = Q, dst = Q(a) */
+/* assumes that src = Q or Z, dst = Q(a) */
 number naMap00(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
-  assume(src == dst->extRing->cf);
+  assume(src->rep == dst->extRing->cf->rep);
   poly result = p_One(dst->extRing);
   p_SetCoeff(result, n_Copy(a, src), dst->extRing);
+  return (number)result;
+}
+
+/* assumes that src = Z, dst = K(a) */
+number naMapZ0(number a, const coeffs src, const coeffs dst)
+{
+  if (n_IsZero(a, src)) return NULL;
+  poly result = p_One(dst->extRing);
+  nMapFunc nMap=n_SetMap(src,dst->extRing->cf);
+  p_SetCoeff(result, nMap(a, src, dst->extRing->cf), dst->extRing);
+  if (n_IsZero(pGetCoeff(result),dst->extRing->cf))
+    p_Delete(&result,dst->extRing);
   return (number)result;
 }
 
@@ -1060,12 +1046,16 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
   /* for the time being, we only provide maps if h = 1 or 0 */
   if (h==0)
   {
-    if (nCoeff_is_Q(src) && nCoeff_is_Q(bDst))
-      return naMap00;                            /// Q     -->  Q(a)
+    if ((src->rep==n_rep_gap_rat) && nCoeff_is_Q(bDst))
+      return naMap00;                            /// Q or Z     -->  Q(a)
+    if ((src->rep==n_rep_gap_gmp) && nCoeff_is_Q(bDst))
+      return naMapZ0;                            /// Z     -->  Q(a)
     if (nCoeff_is_Zp(src) && nCoeff_is_Q(bDst))
       return naMapP0;                            /// Z/p   -->  Q(a)
     if (nCoeff_is_Q(src) && nCoeff_is_Zp(bDst))
       return naMap0P;                            /// Q      --> Z/p(a)
+    if ((src->rep==n_rep_gap_gmp) && nCoeff_is_Zp(bDst))
+      return naMapZ0;                            /// Z     -->  Z/p(a)
     if (nCoeff_is_Zp(src) && nCoeff_is_Zp(bDst))
     {
       if (src->ch == dst->ch) return naMapPP;    /// Z/p    --> Z/p(a)
@@ -1292,7 +1282,7 @@ static void naClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number
           poly c_n=c_n_n;
           while (c_n!=NULL)
           { // each monom: coeff in Q
-            d=n_Lcm(hzz,pGetCoeff(c_n),r->cf->extRing->cf);
+            d=n_NormalizeHelper(hzz,pGetCoeff(c_n),r->cf->extRing->cf);
             n_Delete(&hzz,r->cf->extRing->cf);
             hzz=d;
             pIter(c_n);
@@ -1422,6 +1412,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   
   cf->is_field=TRUE;
   cf->is_domain=TRUE;
+  cf->rep=n_rep_poly;
 
   #ifdef LDEBUG
   p_Test((poly)naMinpoly, naRing);
@@ -1436,7 +1427,6 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfIsOne        = naIsOne;
   cf->cfIsMOne       = naIsMOne;
   cf->cfInit         = naInit;
-  cf->cfInit_bigint  = naInit_bigint;
   cf->cfFarey        = naFarey;
   cf->cfChineseRemainder= naChineseRemainder;
   cf->cfInt          = naInt;
@@ -1469,7 +1459,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfDBTest       = naDBTest;
 #endif
   cf->cfGcd          = naGcd;
-  cf->cfLcm          = naLcmContent;
+  cf->cfNormalizeHelper          = naLcmContent;
   cf->cfSize         = naSize;
   cf->nCoeffIsEqual  = naCoeffIsEqual;
   cf->cfInvers       = naInvers;
@@ -1616,7 +1606,6 @@ BOOLEAN npolyInitChar(coeffs cf, void * infoStruct)
   cf->cfIsOne        = naIsOne;
   cf->cfIsMOne       = naIsMOne;
   cf->cfInit         = naInit;
-  cf->cfInit_bigint  = naInit_bigint;
   cf->cfFarey        = naFarey;
   cf->cfChineseRemainder= naChineseRemainder;
   cf->cfInt          = naInt;
@@ -1648,7 +1637,7 @@ BOOLEAN npolyInitChar(coeffs cf, void * infoStruct)
   cf->cfDBTest       = naDBTest;
 #endif
   cf->cfGcd          = naGcd;
-  cf->cfLcm          = naLcmContent;
+  cf->cfNormalizeHelper          = naLcmContent;
   cf->cfSize         = naSize;
   cf->nCoeffIsEqual  = naCoeffIsEqual;
   cf->cfInvers       = npolyInvers;

@@ -29,7 +29,6 @@
 #include "cfNewtonPolygon.h"
 #include "facHensel.h"
 #include "facMul.h"
-#include "cfGcdAlgExt.h"
 
 #ifdef HAVE_FLINT
 #include "FLINTconvert.h"

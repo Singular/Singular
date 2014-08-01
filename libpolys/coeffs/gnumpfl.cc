@@ -412,6 +412,7 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
 
   n->is_field=TRUE;
   n->is_domain=TRUE;
+  n->rep=n_rep_gmp_float;
 
   n->cfKillChar = ndKillChar; /* dummy */
 
@@ -442,7 +443,6 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
   n->cfPower   = ngfPower;
   n->cfSetMap = ngfSetMap;
   n->cfCoeffWrite = ngfCoeffWrite;
-  n->cfInit_bigint = ngfMapQ;
 #ifdef LDEBUG
   n->cfDBTest  = ndDBTest; // not yet implemented: ngfDBTest
 #endif
@@ -473,11 +473,32 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
 number ngfMapQ(number from, const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
-  assume( getCoeffType(src) == n_Q );
+  assume( src->rep == n_rep_gap_rat );
   
   gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF,dst));
   return (number)res;
 }
+number ngfMapZ(number from, const coeffs aRing, const coeffs r)
+{
+  assume( getCoeffType(r) == ID );
+  assume( aRing->rep == n_rep_gap_gmp);
+
+  if ( from != NULL )
+  {
+    if (SR_HDL(from) & SR_INT)
+    {
+      gmp_float f_i= gmp_float(SR_TO_INT(from));
+      gmp_float *res=new gmp_float(f_i);
+      return (number)res;
+    }
+    gmp_float f_i=(mpz_ptr)from;
+    gmp_float *res=new gmp_float(f_i);
+    return (number)res;
+  }
+  else
+    return NULL;
+}
+
 
 static number ngfMapR(number from, const coeffs src, const coeffs dst)
 {
@@ -509,29 +530,32 @@ nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
   
-  if (nCoeff_is_Q(src))
+  if (src->rep==n_rep_gap_rat) /*Q, Z*/
   {
     return ngfMapQ;
   }
-  if (nCoeff_is_long_R(src))
+  if (src->rep==n_rep_gap_gmp) /*Q, Z*/
+  {
+    return ngfMapZ;
+  }
+  if ((src->rep==n_rep_gmp_float) && nCoeff_is_long_R(src))
   {
     return ndCopyMap; //ngfCopyMap;
   }
-  if (nCoeff_is_R(src))
+  if ((src->rep==n_rep_float) && nCoeff_is_R(src))
   {
     return ngfMapR;
   }
-  if (nCoeff_is_long_C(src))
+  if ((src->rep==n_rep_gmp_complex) && nCoeff_is_long_C(src))
   {
     return ngfMapC;
   }
-  if (nCoeff_is_Zp(src))
+  if ((src->rep==n_rep_int) && nCoeff_is_Zp(src))
   {
     return ngfMapP;
   }
   return NULL;
 }
-
 
 void    ngfCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {

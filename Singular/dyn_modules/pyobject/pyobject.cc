@@ -729,7 +729,7 @@ extern "C" int SI_MOD_INIT(pyobject)(SModulFunctions* psModulFunctions)
     PYOBJECT_ADD_C_PROC(python_eval);
     PYOBJECT_ADD_C_PROC(python_run);
   }
-  return 0;
+  return MAX_TOK;
 }
 #undef PYOBJECT_ADD_C_PROC
 

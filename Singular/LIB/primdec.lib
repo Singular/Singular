@@ -1129,10 +1129,11 @@ EXAMPLE: example zero_decomp; shows an example
 
       kill lres0;
       list lres0;
-      if(size(@lh)==2)
+      if((size(@lh)==2)&&(@lh[1]!=1))
       {
         helpprim=@lh[2];
         lres0[1]=primary[2*@k-1];
+        attrib(lres0[1],"isSB",1);
         ser1=psi(helpprim);
         lres0[2]=psi1(ser1);
         if(size(reduce(lres0[2],lres0[1],1))==0)
@@ -3661,8 +3662,11 @@ EXAMPLE: example decomp; shows an example
   {
     primary=cleanPrimary(primary);
   }
-  if (abspri && (typeof(primary[1][1])=="poly"))
-  { return(prepare_absprimdec(primary));}
+  if (size(primary)>0)
+  {
+    if (abspri && (typeof(primary[1][1])=="poly"))
+    { return(prepare_absprimdec(primary));}
+  }
   return(primary);
 }
 
@@ -6514,7 +6518,7 @@ EXAMPLE: example equidimMaxEHV; shows an example
   }
   else
   {
-    list re=mres(i,0);
+    list re=mres(j,0);
   }
   ann=AnnExt_R(cod,re);
   return(ann);

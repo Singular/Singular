@@ -474,6 +474,7 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   assume( getCoeffType(n) == ID );
   n->is_field=TRUE;
   n->is_domain=TRUE;
+  n->rep=n_rep_gmp_complex;
 
   n->cfKillChar = ngcKillChar;
   n->ch = 0;
@@ -515,8 +516,6 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   n->nCoeffIsEqual = ngcCoeffIsEqual;
 
   n->cfSetChar=ngcSetChar;
-
-  n->cfInit_bigint=ngcMapQ;
 
 // we need to initialize n->nNULL at least for minpoly printing
   n->nNULL  = n->cfInit(0,n);
@@ -589,6 +588,8 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   {
     LongComplexInfo* p = (LongComplexInfo*)parameter;
     pParameterNames[0] = omStrDup(p->par_name);
+    // fix wrong parameters:
+    if (p->float_len<SHORT_REAL_LENGTH) p->float_len=SHORT_REAL_LENGTH;
     n->float_len = p->float_len;
     n->float_len2 = p->float_len2;
 
@@ -600,7 +601,6 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   }
 
   assume( n->float_len <= n->float_len2 );
-  assume( n->float_len2 >= SHORT_REAL_LENGTH );
   assume( pParameterNames != NULL );
   assume( pParameterNames[0] != NULL );
 
@@ -622,11 +622,32 @@ void ngcSetChar(const coeffs r)
 number ngcMapQ(number from, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
-  assume( getCoeffType(aRing) == n_Q );
+  assume( aRing->rep == n_rep_gap_rat);
 
   if ( from != NULL )
   {
     gmp_complex *res=new gmp_complex(numberFieldToFloat(from,QTOF,aRing));
+    return (number)res;
+  }
+  else
+    return NULL;
+}
+
+number ngcMapZ(number from, const coeffs aRing, const coeffs r)
+{
+  assume( getCoeffType(r) == ID );
+  assume( aRing->rep == n_rep_gap_gmp);
+
+  if ( from != NULL )
+  {
+    if (SR_HDL(from) & SR_INT)
+    {
+      gmp_float f_i= gmp_float(SR_TO_INT(from));
+      gmp_complex *res=new gmp_complex(f_i);
+      return (number)res;
+    }
+    gmp_float f_i=(mpz_ptr)from;
+    gmp_complex *res=new gmp_complex(f_i);
     return (number)res;
   }
   else
@@ -690,23 +711,27 @@ nMapFunc ngcSetMap(const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
 
-  if (nCoeff_is_Q(src))
+  if (src->rep==n_rep_gap_rat) /* Q, Z*/
   {
     return ngcMapQ;
   }
-  if (nCoeff_is_long_R(src))
+  if (src->rep==n_rep_gap_gmp) /* Z */
+  {
+    return ngcMapZ;
+  }
+  if ((src->rep==n_rep_gmp_float) && nCoeff_is_long_R(src))
   {
     return ngcMapLongR;
   }
-  if (nCoeff_is_long_C(src))
+  if ((src->rep==n_rep_gmp_complex) && nCoeff_is_long_C(src))
   {
     return ngcCopyMap;
   }
-  if (nCoeff_is_R(src))
+  if ((src->rep==n_rep_float) && nCoeff_is_R(src))
   {
     return ngcMapR;
   }
-  if (nCoeff_is_Zp(src))
+  if ((src->rep==n_rep_int) && nCoeff_is_Zp(src))
   {
     return ngcMapP;
   }

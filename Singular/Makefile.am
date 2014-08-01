@@ -47,6 +47,7 @@ SOURCES = \
    mod_lib.cc\
    links/ndbm.cc\
    newstruct.cc\
+   number2.cc\
    pcv.cc\
    links/pipeLink.cc\
    scanner.cc\
@@ -98,6 +99,7 @@ SingularHEADERS = \
    omSingularConfig.h \
    links/ndbm.h \
    newstruct.h \
+   number2.h \
    pcv.h \
    links/pipeLink.h \
    pyobject_setup.h \
@@ -231,10 +233,9 @@ test_SOURCES = test.cc
 test_LDADD = libSingular.la 
 
 #########################################################
-
+### plural_cmd.inc
 # These files are built first
-BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc iparith.inc all.lib plural_cmd.inc \
-                gftables MOD
+BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc iparith.inc all.lib gftables MOD
 
 CLEANFILES = $(BUILT_SOURCES) $(EXTRA_PROGRAMS)
 
@@ -252,11 +253,14 @@ feOptES.inc: feOptES$(EXEEXT)
 feOptTS.inc: feOptTS$(EXEEXT)
 	${builddir}/feOptTS$(EXEEXT)
 
-plural_cmd.inc iparith.inc: gentable1$(EXEEXT)
+# plural_cmd.inc is only necessary for documentation generation
+#plural_cmd.inc: gentable1$(EXEEXT)
+#	${builddir}/gentable1$(EXEEXT) argument
+
+iparith.inc: gentable1$(EXEEXT) table.h
 	${builddir}/gentable1$(EXEEXT)
 
 # # fake rule to fix parallel make http://www.gnu.org/s/hello/manual/automake/Multiple-Outputs.html
-# plural_cmd.inc: iparith.inc
 
 gftables: ${top_srcdir}/factory/gftables
 	ln -snf ${top_srcdir}/factory/gftables ${builddir}/gftables
@@ -266,6 +270,8 @@ ${abs_builddir}/LIB: ${srcdir}/LIB
 	  ln -snf ${abs_srcdir}/LIB ${abs_builddir}/; \
 	fi
 
-MOD: ${top_builddir}/libpolys/polys/.libs
-	ln -snf ${top_builddir}/libpolys/polys/.libs/ ${builddir}/MOD
+MOD: 
+	if [ -d "${top_builddir}/libpolys/polys/.libs" ]; then \
+	  ln -snf ${top_builddir}/libpolys/polys/.libs/ ${abs_builddir}/MOD; \
+	fi 	  
 

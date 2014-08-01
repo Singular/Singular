@@ -1,0 +1,34 @@
+//ring R = 0,x,dp;
+
+LIB".libs/nforder.so";
+cring a, aa;
+
+ring r=(ZZ),x,dp;
+poly f = x^3-13*x+27*169;
+
+proc EquationOrder(poly f)
+"returns the equation order defined by f which should be irreducible,
+hence ZZ[t]/(f)"
+{
+  list l, B;
+  ideal I = std(f);
+  poly g;
+  bigintmat b[deg(f)][deg(f)], c;
+  int i, j, k;
+  for(i=0; i<deg(f); i++) {
+    c = b;
+    for(j=0; j<deg(f); j++) {
+      g = reduce(x^i*x^j, I);
+      for (k=1; k<=size(g); k++) {
+        c[deg(g[k])+1, j+1] = bigint(leadcoef(g[k]));
+      }
+    }
+    l[i+1] = c;
+  }
+  return(nfOrder(l));
+}
+
+
+a = EquationOrder(f);
+pMaximalOrder(a, 5*13);
+

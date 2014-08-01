@@ -1081,7 +1081,8 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
       goto load_modules_end;
     }
   }
-  if (dynl_check_opened(FullName)) {
+  if (dynl_check_opened(FullName))
+  {
     if (BVERBOSE(V_LOAD_LIB)) Warn( "%s already loaded", fullname);
     return FALSE;
   }
@@ -1103,8 +1104,15 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
       sModulFunctions.iiArithAddCmd = iiArithAddCmd;
       if (autoexport) sModulFunctions.iiAddCproc = iiAddCprocTop;
       else            sModulFunctions.iiAddCproc = iiAddCproc;
-      (*fktn)(&sModulFunctions);
-      if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", fullname);
+      int ver=(*fktn)(&sModulFunctions);
+      if (ver==MAX_TOK)
+      {
+        if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s\n", fullname);
+      }
+      else
+      {
+        Warn("// ** loaded %s for a different version of Singular(expected: %d, got %d)",fullname,MAX_TOK,ver);
+      }
       currPack->loaded=1;
       currPack=s;
       RET=FALSE;

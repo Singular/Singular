@@ -23,6 +23,11 @@
 #include "cf_map.h"
 #include "cf_algorithm.h"
 #include "cf_iter.h"
+#include "cf_irred.h"
+#include "cf_generator.h"
+#include "cf_random.h"
+#include "cf_map_ext.h"
+#include "facFqBivarUtil.h"
 
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
@@ -32,6 +37,7 @@
 #include "FLINTconvert.h"
 #endif
 
+#ifdef HAVE_NTL
 TIMING_DEFINE_PRINT(fac_resultant_p)
 
 //TODO arrange by bound= deg (F,xlevel)*deg (G,i)+deg (G,xlevel)*deg (F, i)
@@ -252,28 +258,48 @@ CanonicalForm uniResultant (const CanonicalForm& F, const CanonicalForm& G)
     return 1;
   if (F.isZero() || G.isZero())
     return 0;
+  Variable alpha;
 
 #ifdef HAVE_FLINT
-  nmod_poly_t FLINTF, FLINTG;
-  convertFacCF2nmod_poly_t (FLINTF, F);
-  convertFacCF2nmod_poly_t (FLINTG, G);
-  mp_limb_t FLINTresult= nmod_poly_resultant (FLINTF, FLINTG);
-  nmod_poly_clear (FLINTF);
-  nmod_poly_clear (FLINTG);
-  return CanonicalForm ((long) FLINTresult);
+  if (!hasFirstAlgVar (F, alpha) && !hasFirstAlgVar (G,alpha))
+  {
+    nmod_poly_t FLINTF, FLINTG;
+    convertFacCF2nmod_poly_t (FLINTF, F);
+    convertFacCF2nmod_poly_t (FLINTG, G);
+    mp_limb_t FLINTresult= nmod_poly_resultant (FLINTF, FLINTG);
+    nmod_poly_clear (FLINTF);
+    nmod_poly_clear (FLINTG);
+    return CanonicalForm ((long) FLINTresult);
+  }
 #else
+  if (!hasFirstAlgVar (F, alpha) && !hasFirstAlgVar (G,alpha))
+  {
+    if (fac_NTL_char != getCharacteristic())
+    {
+      fac_NTL_char= getCharacteristic();
+      zz_p::init (getCharacteristic());
+    }
+    zz_pX NTLF= convertFacCF2NTLzzpX (F);
+    zz_pX NTLG= convertFacCF2NTLzzpX (G);
+
+    zz_p NTLResult= resultant (NTLF, NTLG);
+
+    return CanonicalForm (to_long (rep (NTLResult)));
+  }
+#endif
+  //at this point F or G has an algebraic var.
   if (fac_NTL_char != getCharacteristic())
   {
     fac_NTL_char= getCharacteristic();
     zz_p::init (getCharacteristic());
   }
-  zz_pX NTLF= convertFacCF2NTLzzpX (F);
-  zz_pX NTLG= convertFacCF2NTLzzpX (G);
+  zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+  zz_pE::init (NTLMipo);
+  zz_pEX NTLF= convertFacCF2NTLzz_pEX (F, NTLMipo);
+  zz_pEX NTLG= convertFacCF2NTLzz_pEX (G, NTLMipo);
+  zz_pE NTLResult= resultant (NTLF, NTLG);
 
-  zz_p NTLResult= resultant (NTLF, NTLG);
-
-  return CanonicalForm (to_long (rep (NTLResult)));
-#endif
+  return convertNTLzzpE2CF (NTLResult, alpha);
 #else
   return resultant (F, G, F.mvar());
 #endif
@@ -281,7 +307,8 @@ CanonicalForm uniResultant (const CanonicalForm& F, const CanonicalForm& G)
 
 static inline
 void evalPoint (const CanonicalForm& F, const CanonicalForm& G,
-                CanonicalForm& FEval, CanonicalForm& GEval, int& evalPoint)
+                CanonicalForm& FEval, CanonicalForm& GEval,
+                CFGenerator& evalPoint)
 {
   int degF, degG;
   Variable x= Variable (1);
@@ -289,17 +316,19 @@ void evalPoint (const CanonicalForm& F, const CanonicalForm& G,
   degG= degree (G, x);
   do
   {
-    evalPoint++;
-    if (evalPoint >= getCharacteristic())
+    if (!evalPoint.hasItems())
       break;
-    FEval= F (evalPoint, 2);
-    GEval= G (evalPoint, 2);
+    FEval= F (evalPoint.item(), 2);
+    GEval= G (evalPoint.item(), 2);
     if (degree (FEval, 1) < degF || degree (GEval, 1) < degG)
+    {
+      evalPoint.next();
       continue;
+    }
     else
       return;
   }
-  while (evalPoint < getCharacteristic());
+  while (evalPoint.hasItems());
 }
 
 static inline CanonicalForm
@@ -349,7 +378,6 @@ resultantFp (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
 
   Variable y= Variable (2);
 
-  int i= -1;
   CanonicalForm GEval, FEval, recResult, H;
   CanonicalForm newtonPoly= 1;
   CanonicalForm modResult= 0;
@@ -357,17 +385,103 @@ resultantFp (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
   Variable z= Variable (1);
   int bound= degAx*degree (G, 2) + degree (F, 2)*degBx;
 
+  int p= getCharacteristic();
+  CanonicalForm minpoly;
+  Variable alpha= Variable (tmax (F.level(), G.level()) + 1);
+  bool algExt= hasFirstAlgVar (F, alpha) || hasFirstAlgVar (G, alpha);
+  CFGenerator * gen;
+  bool extOfExt= false;
+  Variable v= alpha;
+  CanonicalForm primElemAlpha, imPrimElemAlpha;
+  CFList source,dest;
+  if (!algExt && (p < (1 << 28)))
+  {
+    // pass to an extension of size at least 2^29
+    // for very very large input that is maybe too small though
+    int deg= ceil (29.0*((double) log (2)/log (p)))+1;
+    minpoly= randomIrredpoly (deg, z);
+    alpha= rootOf (minpoly);
+    AlgExtGenerator AlgExtGen (alpha);
+    gen= AlgExtGen.clone();
+    for (int i= 0; i < p; i++) // skip values from the prime field
+      (*gen).next();
+  }
+  else if (!algExt)
+  {
+    FFGenerator FFGen;
+    gen= FFGen.clone();
+  }
+  else
+  {
+    int deg= ceil (29.0*((double) log (2)/log (p)));
+    if (degree (getMipo (alpha)) < deg)
+    {
+      mpz_t field_size;
+      mpz_init (field_size);
+      mpz_ui_pow_ui (field_size, p,
+                 deg + degree (getMipo (alpha)) - deg%degree (getMipo (alpha)));
+
+      // field_size needs to fit in an int because of mapUp, mapDown, length of lists etc.
+      if (mpz_fits_sint_p (field_size))
+      {
+        minpoly= randomIrredpoly (deg + degree (getMipo (alpha))
+                                  - deg%degree (getMipo (alpha)), z);
+        v= rootOf (minpoly);
+        Variable V_buf2;
+        bool primFail= false;
+        extOfExt= true;
+        primElemAlpha= primitiveElement (alpha, V_buf2, primFail);
+        ASSERT (!primFail, "failure in integer factorizer");
+        if (primFail)
+          ; //ERROR
+        else
+          imPrimElemAlpha= mapPrimElem (primElemAlpha, alpha, v);
+        F= mapUp (F, alpha, v, primElemAlpha, imPrimElemAlpha, source, dest);
+        G= mapUp (G, alpha, v, primElemAlpha, imPrimElemAlpha, source, dest);
+      }
+      else
+      {
+        deg= deg - deg % degree (getMipo (alpha));
+        mpz_ui_pow_ui (field_size, p, deg);
+        while (deg / degree (getMipo (alpha)) >= 2 && !mpz_fits_sint_p (field_size))
+        {
+          deg -= degree (getMipo (alpha));
+          mpz_ui_pow_ui (field_size, p, deg);
+        }
+        if (deg != degree (getMipo (alpha)))
+        {
+           minpoly= randomIrredpoly (deg, z);
+           v= rootOf (minpoly);
+           Variable V_buf2;
+           bool primFail= false;
+           extOfExt= true;
+           primElemAlpha= primitiveElement (alpha, V_buf2, primFail);
+           ASSERT (!primFail, "failure in integer factorizer");
+           if (primFail)
+             ; //ERROR
+           else
+             imPrimElemAlpha= mapPrimElem (primElemAlpha, alpha, v);
+           F= mapUp (F, alpha, v, primElemAlpha, imPrimElemAlpha, source, dest);
+           G= mapUp (G, alpha, v, primElemAlpha, imPrimElemAlpha, source, dest);
+        }
+      }
+      mpz_clear (field_size);
+    }
+    AlgExtGenerator AlgExtGen (v);
+    gen= AlgExtGen.clone();
+    for (int i= 0; i < p; i++)
+      (*gen).next();
+  }
   int count= 0;
   int equalCount= 0;
+  CanonicalForm point;
   do
   {
-    evalPoint (F, G, FEval, GEval, i);
+    evalPoint (F, G, FEval, GEval, *gen);
 
-    ASSERT (i < getCharacteristic(), "ran out of points");
+    recResult= resultantFp (FEval, GEval, z, prob);
 
-    recResult= resultantFp (FEval, GEval, z);
-
-    H= newtonInterp (i, recResult, newtonPoly, modResult, y);
+    H= newtonInterp ((*gen).item(), recResult, newtonPoly, modResult, y);
 
     if (H == modResult)
       equalCount++;
@@ -375,12 +489,33 @@ resultantFp (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
       equalCount= 0;
 
     count++;
-    if (count > bound || (prob && equalCount == 2))
-      break;
+    if (count > bound || (prob && equalCount == 2 && !H.isOne()))
+    {
+      if (!algExt && degree (H, alpha) <= 0)
+        break;
+      else if (algExt)
+      {
+        if (extOfExt && !isInExtension (H, imPrimElemAlpha, 1, primElemAlpha,
+                                        dest, source))
+        {
+          H= mapDown (H, primElemAlpha, imPrimElemAlpha, alpha, dest, source);
+          prune (v);
+          break;
+        }
+        else if (!extOfExt)
+          break;
+      }
+    }
 
     modResult= H;
-    newtonPoly *= (y - i);
+    newtonPoly *= (y - (*gen).item());
+    if ((*gen).hasItems())
+        (*gen).next();
+    else
+      STICKYASSERT (0, "out of evaluation points");
   } while (1);
+
+  delete gen;
 
   return N (H);
 }
@@ -545,4 +680,5 @@ resultantZ (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
     On (SW_RATIONAL);
   return swapvar (result, X, x);
 }
+#endif
 

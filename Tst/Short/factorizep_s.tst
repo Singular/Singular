@@ -541,4 +541,16 @@ poly h= 7*y^4-2*x*y^2*z-2*x^3*s+6*x^2*y*t-2*y*s^2*t+z*t^2*u-s^2*u^2+2*z*t*u*v+2*
 poly k=f*g*h;
 def l=factorize (k); testfactors (l,k);
 
+kill r;
+
+ring r=(2,a),(b,x,y,z,s,t,u,v),dp;
+minpoly=a4-a3+2a2+4a+3;
+poly f= x*y*z*s^2*t+x^2*y*z*t^2+s*t^5+y^2*z^3*u+y^2*s^3*u+z^2*s^3*u+s^2*u^4+z^2*t*u^2*v+y*z*t*u*v^2+y*z*v^4+(a^3)*x*z*s*t^2+(a^3)*y*z^2*s*u+(a^3)*s*t^3*u+(a^3)*t*u^4+x^2*y*z*v+(a^3)*y^3*t*v+(a^3)*y*s^2*t*v+(a^3)*z^2*u^2*v+y^2*s*v^2+(a^3)*z^2*s*v^2+z^3*t+y*s^2*u+(a^3+a^2+a+1)*s*t*u^2+(a^3+a^2+a+1)*u^4+(a^3)*x*z*s*v+(a^3)*y*s^2*v+y*s*t*v+(a^2+1)*x*z^2+(a^3)*s^3+(a^3)*y*v+(a^3)*t+1;
+poly g= z^3*s*t^2+x^3*y^2*u+x*y^3*z*u+x*y*s^2*t*u+y*t^4*u+y*z^2*u^3+x^2*z^3*v+x*y^2*s^2*v+x*y*t^3*v+x^2*s*u^2*v+s^4*v^2+y*z*t^2*v^2+(a^3)*z^3*s^2+y*z*s^3+x*y*s^2*t+x*z*s^2*u+x*s^3*u+y*z*s*t*u+(a^3)*y*s*t*u^2+(a^3)*z*t^2*u^2+(a^3)*x^2*z^2*v+x*y*z*t*v+y^3*u*v+(a^3)*x*z^2*u*v+(a^3)*x*u^3*v+s*u^2*v^2+(a^3+1)*y^2*v^3+(a^3)*t*v^4+(a^3+a^2+a+1)*x^2*z*s+(a^3+a^2+a+1)*y*s^3+(a^3)*s*t^3+y*z*t*u+(a^3+a^2+a+1)*y^2*u^2+(a^3)*x*t*u^2+(a^2+1)*z^3+y*s^2+(a^3+a^2+a+1)*z^2*t+y*s*v+(a^2+1)*x*t;
+poly h= y^4+y^2*z^2+z^2*u^2+(a^3)*z^2*s+(a^3)*x^2*u+x*z*v+y*z*v+(a^3)*x*t*v+s^2+x*t+(a^3)*s*t;
+poly k=f*g*h;
+system ("--random",12345674);
+def l= factorize (k);
+l= factorize (k); testfactors (l,k);
+
 tst_status(1);$

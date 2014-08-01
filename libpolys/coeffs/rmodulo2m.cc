@@ -104,6 +104,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
 
   r->is_field=FALSE;
   r->is_domain=FALSE;
+  r->rep=n_rep_int;
 
   r->cfKillChar    = ndKillChar; /* dummy*/
   r->nCoeffIsEqual = nr2mCoeffIsEqual;
@@ -150,7 +151,6 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfExtGcd      = nr2mExtGcd;
   r->cfName        = ndName;
   r->cfCoeffWrite  = nr2mCoeffWrite;
-  r->cfInit_bigint = nr2mMapQ;
   r->cfQuot1       = nr2mQuot1;
 #ifdef LDEBUG
   r->cfDBTest      = nr2mDBTest;
@@ -681,37 +681,52 @@ number nr2mMapGMP(number from, const coeffs /*src*/, const coeffs dst)
   return (number)res;
 }
 
+number nr2mMapZ(number from, const coeffs src, const coeffs dst)
+{
+  if (SR_HDL(from) & SR_INT)
+  {
+    long f_i=SR_TO_INT(from);
+    return nr2mInit(f_i,dst);
+  }
+  return nr2mMapGMP(from,src,dst);
+}
+
 nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
 {
-  if (nCoeff_is_Ring_2toM(src)
+  if ((src->rep==n_rep_int) && nCoeff_is_Ring_2toM(src)
      && (src->mod2mMask == dst->mod2mMask))
   {
     return ndCopyMap;
   }
-  if (nCoeff_is_Ring_2toM(src)
+  if ((src->rep==n_rep_int) && nCoeff_is_Ring_2toM(src)
      && (src->mod2mMask < dst->mod2mMask))
   { /* i.e. map an integer mod 2^s into Z mod 2^t, where t < s */
     return nr2mMapMachineInt;
   }
-  if (nCoeff_is_Ring_2toM(src)
+  if ((src->rep==n_rep_int) && nCoeff_is_Ring_2toM(src)
      && (src->mod2mMask > dst->mod2mMask))
   { /* i.e. map an integer mod 2^s into Z mod 2^t, where t > s */
     // to be done
     return nr2mMapProject;
   }
-  if (nCoeff_is_Ring_Z(src))
+  if ((src->rep==n_rep_gmp) && nCoeff_is_Ring_Z(src))
   {
     return nr2mMapGMP;
   }
-  if (nCoeff_is_Q(src))
+  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Ring_Z(src)*/)
+  {
+    return nr2mMapZ;
+  }
+  if ((src->rep==n_rep_gap_rat) && nCoeff_is_Q(src))
   {
     return nr2mMapQ;
   }
-  if (nCoeff_is_Zp(src) && (src->ch == 2))
+  if ((src->rep=n_rep_int) && nCoeff_is_Zp(src) && (src->ch == 2))
   {
     return nr2mMapZp;
   }
-  if (nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_ModN(src))
+  if ((src->rep=n_rep_gmp) &&
+  (nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_ModN(src)))
   {
     if (mpz_divisible_2exp_p(src->modNumber,dst->modExponent))
       return nr2mMapGMP;

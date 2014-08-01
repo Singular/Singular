@@ -70,6 +70,10 @@
 #include <Singular/misc_ip.h>
 #include <Singular/linearAlgebra_ip.h>
 
+#ifdef SINGULAR_4_1
+#include <Singular/number2.h>
+#endif
+
 #  include <Singular/fglm.h>
 
 #include <Singular/blackbox.h>
@@ -126,6 +130,16 @@ ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
 #define WARN_RING        16
 
 static BOOLEAN check_valid(const int p, const int op);
+
+#ifdef SINGULAR_4_1
+// helper routine to catch all library/test parts which need to be changed
+// shall go away after the transition
+static void iiReWrite(const char *s)
+{
+  Print("please rewrite the use of >>%s<< in >>%s<<\n"
+        "%s is depreciated or changed in Singular 4-1\n",s,my_yylinebuf,s);
+}
+#endif
 
 /*=============== types =====================*/
 struct sValCmdTab
@@ -614,10 +628,10 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
   poly u_p=(poly)u->CopyD(POLY_CMD);
   if ((u_p!=NULL)
   && ((v_i!=0) &&
-      ((long)pTotaldegree(u_p) > (signed long)currRing->bitmask / (signed long)v_i)))
+      ((long)pTotaldegree(u_p) > (signed long)currRing->bitmask / (signed long)v_i/2)))
   {
     Werror("OVERFLOW in power(d=%ld, e=%d, max=%ld)",
-                                    pTotaldegree(u_p),v_i,currRing->bitmask);
+                                    pTotaldegree(u_p),v_i,currRing->bitmask/2);
     pDelete(&u_p);
     return TRUE;
   }
@@ -790,7 +804,7 @@ static BOOLEAN jjPLUS_BIM(leftv res, leftv u, leftv v)
   res->data = (char *)bimAdd((bigintmat*)(u->Data()), (bigintmat*)(v->Data()));
   if (res->data==NULL)
   {
-    WerrorS("bigintmat size not compatible");
+    WerrorS("bigintmat/cmatrix not compatible");
     return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
@@ -883,7 +897,7 @@ static BOOLEAN jjMINUS_BIM(leftv res, leftv u, leftv v)
   res->data = (char *)bimSub((bigintmat*)(u->Data()), (bigintmat*)(v->Data()));
   if (res->data==NULL)
   {
-    WerrorS("bigintmat size not compatible");
+    WerrorS("bigintmat/cmatrix not compatible");
     return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
@@ -941,13 +955,10 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
     {
       b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
       if ((a!=NULL) && (b!=NULL)
-      && ((long)pTotaldegree(a)>si_max((long)rVar(currRing),(long)currRing->bitmask)-(long)pTotaldegree(b)))
+      && ((long)pTotaldegree(a)>si_max((long)rVar(currRing),(long)currRing->bitmask/2)-(long)pTotaldegree(b)))
       {
-        Werror("OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
-          pTotaldegree(a),pTotaldegree(b),currRing->bitmask);
-        pDelete(&a);
-        pDelete(&b);
-        return TRUE;
+        Warn("possible OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
+          pTotaldegree(a),pTotaldegree(b),currRing->bitmask/2);
       }
       res->data = (char *)(pMult( a, b));
       pNormalize((poly)res->data);
@@ -956,13 +967,10 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
     // u->next exists: copy v
     b=pCopy((poly)v->Data());
     if ((a!=NULL) && (b!=NULL)
-    && (pTotaldegree(a)+pTotaldegree(b)>si_max((long)rVar(currRing),(long)currRing->bitmask)))
+    && (pTotaldegree(a)+pTotaldegree(b)>si_max((long)rVar(currRing),(long)currRing->bitmask/2)))
     {
-      Werror("OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
-          pTotaldegree(a),pTotaldegree(b),currRing->bitmask);
-      pDelete(&a);
-      pDelete(&b);
-      return TRUE;
+      Warn("possible OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
+          pTotaldegree(a),pTotaldegree(b),currRing->bitmask/2);
     }
     res->data = (char *)(pMult( a, b));
     pNormalize((poly)res->data);
@@ -972,7 +980,7 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
   a=pCopy((poly)u->Data());
   b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
   if ((a!=NULL) && (b!=NULL)
-  && ((unsigned long)(pTotaldegree(a)+pTotaldegree(b))>=currRing->bitmask))
+  && ((unsigned long)(pTotaldegree(a)+pTotaldegree(b))>=currRing->bitmask/2))
   {
     pDelete(&a);
     pDelete(&b);
@@ -1008,7 +1016,7 @@ static BOOLEAN jjTIMES_BIM(leftv res, leftv u, leftv v)
   res->data = (char *)bimMult((bigintmat*)(u->Data()), (bigintmat*)(v->Data()));
   if (res->data==NULL)
   {
-    WerrorS("bigintmat size not compatible");
+    WerrorS("bigintmat/cmatrix not compatible");
     return TRUE;
   }
   if ((v->next!=NULL) || (u->next!=NULL))
@@ -1017,7 +1025,9 @@ static BOOLEAN jjTIMES_BIM(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjTIMES_MA_BI1(leftv res, leftv u, leftv v)
 {
-  number n=n_Init_bigint((number)v->Data(),coeffs_BIGINT,currRing->cf);
+  nMapFunc nMap=n_SetMap(coeffs_BIGINT,currRing->cf);
+  if (nMap==NULL) return TRUE;
+  number n=nMap((number)v->Data(),coeffs_BIGINT,currRing->cf);
   poly p=pNSet(n);
   ideal I= (ideal)mp_MultP((matrix)u->CopyD(MATRIX_CMD),p,currRing);
   res->data = (char *)I;
@@ -1726,6 +1736,7 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 #endif
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
+  coeffs cf;
   lists c=(lists)u->CopyD(); // list of ideal or bigint/int
   lists pl=NULL;
   intvec *p=NULL;
@@ -1751,6 +1762,15 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     else
       return_type=BIGINT_CMD;
   }
+  if (return_type==BIGINT_CMD)
+    cf=coeffs_BIGINT;
+  else
+  {
+    cf=currRing->cf;
+    if (nCoeff_is_Extension(cf) && (cf->extRing!=NULL))
+      cf=cf->extRing->cf;
+  }
+  nMapFunc nMap=n_SetMap(coeffs_BIGINT,cf);
   if (return_type!=BIGINT_CMD)
   {
     for(i=rl-1;i>=0;i--)
@@ -1776,15 +1796,20 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   else
   {
     xx=(number *)omAlloc(rl*sizeof(number));
+    if (nMap==NULL)
+    {
+      Werror("not implemented: map bigint -> %s",cf->cfCoeffString(cf));
+      return TRUE;
+    }
     for(i=rl-1;i>=0;i--)
     {
       if (c->m[i].Typ()==INT_CMD)
       {
-        xx[i]=n_Init(((int)(long)c->m[i].Data()),coeffs_BIGINT);
+        xx[i]=n_Init(((int)(long)c->m[i].Data()),cf);
       }
       else if (c->m[i].Typ()==BIGINT_CMD)
       {
-        xx[i]=(number)c->m[i].Data();
+        xx[i]=nMap((number)c->m[i].Data(),coeffs_BIGINT,cf);
       }
       else
       {
@@ -1800,7 +1825,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   {
     for(i=rl-1;i>=0;i--)
     {
-      q[i]=n_Init((*p)[i], coeffs_BIGINT);
+      q[i]=n_Init((*p)[i], cf);
     }
   }
   else
@@ -1809,18 +1834,18 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     {
       if (pl->m[i].Typ()==INT_CMD)
       {
-        q[i]=n_Init((int)(long)pl->m[i].Data(),coeffs_BIGINT);
+        q[i]=n_Init((int)(long)pl->m[i].Data(),cf);
       }
       else if (pl->m[i].Typ()==BIGINT_CMD)
       {
-        q[i]=n_Copy((number)(pl->m[i].Data()),coeffs_BIGINT);
+        q[i]=nMap((number)(pl->m[i].Data()),coeffs_BIGINT,cf);
       }
       else
       {
         Werror("bigint expected at pos %d",i+1);
         for(i++;i<rl;i++)
         {
-          n_Delete(&(q[i]),coeffs_BIGINT);
+          n_Delete(&(q[i]),cf);
         }
         omFree(x); // delete c
         omFree(q); // delete pl
@@ -1850,7 +1875,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   for(i=rl-1;i>=0;i--)
   {
-    n_Delete(&(q[i]),coeffs_BIGINT);
+    n_Delete(&(q[i]),cf);
   }
   omFree(q);
   res->rtyp=return_type;
@@ -2035,7 +2060,7 @@ static BOOLEAN jjELIMIN(leftv res, leftv u, leftv v)
 {
   res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data());
   //setFlag(res,FLAG_STD);
-  return FALSE;
+  return v->next!=NULL; //do not allow next like in eliminate(I,a(1..4))
 }
 static BOOLEAN jjELIMIN_IV(leftv res, leftv u, leftv v)
 {
@@ -2224,7 +2249,6 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     int *par_perm=NULL;
     int par_perm_size=0;
     BOOLEAN bo;
-    //if (!nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly))
     if ((nMap=n_SetMap(r->cf,currRing->cf))==NULL)
     {
       // Allow imap/fetch to be make an exception only for:
@@ -2311,7 +2335,9 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
   }
   return TRUE;
 err_fetch:
-  Werror("no identity map from %s",u->Fullname());
+  Werror("no identity map from %s (%s -> %s)",u->Fullname(),
+    r->cf->cfCoeffString(r->cf),
+    currRing->cf->cfCoeffString(currRing->cf));
   return TRUE;
 }
 static BOOLEAN jjFIND2(leftv res, leftv u, leftv v)
@@ -2353,14 +2379,9 @@ static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGCD_BI(leftv res, leftv u, leftv v)
 {
-  number n1 = (number) u->CopyD();
-  number n2 = (number) v->CopyD();
-  CanonicalForm C1, C2;
-  C1 = coeffs_BIGINT->convSingNFactoryN (n1,TRUE,coeffs_BIGINT);
-  C2 = coeffs_BIGINT->convSingNFactoryN (n2,TRUE,coeffs_BIGINT);
-  CanonicalForm G = gcd (C1,C2);
-  number g = coeffs_BIGINT->convFactoryNSingN (G,coeffs_BIGINT);
-  res->data = g;
+  number n1 = (number) u->Data();
+  number n2 = (number) v->Data();
+  res->data = n_Gcd(n1,n2,coeffs_BIGINT);
   return FALSE;
 }
 static BOOLEAN jjGCD_N(leftv res, leftv u, leftv v)
@@ -2375,7 +2396,8 @@ static BOOLEAN jjGCD_N(leftv res, leftv u, leftv v)
   else
   {
     if (nIsZero(b))  res->data=(char *)nCopy(a);
-    else res->data=(char *)n_Gcd(a, b, currRing->cf);
+    //else res->data=(char *)n_Gcd(a, b, currRing->cf);
+    else res->data=(char *)n_SubringGcd(a, b, currRing->cf);
   }
   return FALSE;
 }
@@ -3724,7 +3746,7 @@ static BOOLEAN jjBI2N(leftv res, leftv u)
     res->data=nMap(n,coeffs_BIGINT,currRing->cf);
   else
   {
-    WerrorS("cannot convert bigint to this field");
+    Werror("cannot convert bigint to cring %s",currRing->cf->cfCoeffString(currRing->cf));
     bo=TRUE;
   }
   n_Delete(&n,coeffs_BIGINT);
@@ -4393,13 +4415,6 @@ static BOOLEAN jjKBASE(leftv res, leftv v)
   res->data = (char *)scKBase(-1,(ideal)(v->Data()),currRing->qideal);
   return FALSE;
 }
-#ifdef MDEBUG
-static BOOLEAN jjpHead(leftv res, leftv v)
-{
-  res->data=(char *)pHead((poly)v->Data());
-  return FALSE;
-}
-#endif
 static BOOLEAN jjL2R(leftv res, leftv v)
 {
   res->data=(char *)syConvList((lists)v->Data(),FALSE);
@@ -4466,39 +4481,6 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
   res->data=(char *)r;
   return FALSE;
 }
-#if SIZEOF_LONG == 8
-static number jjLONG2N(long d)
-{
-  int i=(int)d;
-  if ((long)i == d)
-  {
-    return n_Init(i, coeffs_BIGINT);
-  }
-  else
-  {
-     struct snumber_dummy
-     {
-      mpz_t z;
-      mpz_t n;
-      #if defined(LDEBUG)
-      int debug;
-      #endif
-      BOOLEAN s;
-    };
-    typedef struct snumber_dummy  *number_dummy;
-
-    number_dummy z=(number_dummy)omAlloc(sizeof(snumber_dummy));
-    #if defined(LDEBUG)
-    z->debug=123456;
-    #endif
-    z->s=3;
-    mpz_init_set_si(z->z,d);
-    return (number)z;
-  }
-}
-#else
-#define jjLONG2N(D) n_Init((int)D, coeffs_BIGINT)
-#endif
 static BOOLEAN jjPFAC1(leftv res, leftv v)
 {
   /* call method jjPFAC2 with second argument = 0 (meaning that no
@@ -4544,13 +4526,13 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
   switch(((int)(long)v->Data()))
   {
   case 0:
-    res->data=(char *)jjLONG2N(om_Info.UsedBytes);
+    res->data=(char *)n_Init(om_Info.UsedBytes,coeffs_BIGINT);
     break;
   case 1:
-    res->data = (char *)jjLONG2N(om_Info.CurrentBytesSystem);
+    res->data = (char *)n_Init(om_Info.CurrentBytesSystem,coeffs_BIGINT);
     break;
   case 2:
-    res->data = (char *)jjLONG2N(om_Info.MaxBytesSystem);
+    res->data = (char *)n_Init(om_Info.MaxBytesSystem,coeffs_BIGINT);
     break;
   default:
     omPrintStats(stdout);
@@ -5119,6 +5101,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
   int t=(int)(long)v->data;
   switch (t)
   {
+    case CRING_CMD:
     case INT_CMD:
     case POLY_CMD:
     case VECTOR_CMD:
@@ -5331,16 +5314,17 @@ static BOOLEAN jjidVec2Ideal(leftv res, leftv v)
 }
 static BOOLEAN jjrCharStr(leftv res, leftv v)
 {
+#ifdef SINGULAR_4_1
+  iiReWrite("charstr");
+#endif
   res->data = rCharStr((ring)v->Data());
   return FALSE;
 }
-#ifndef MDEBUG
 static BOOLEAN jjpHead(leftv res, leftv v)
 {
   res->data = (char *)pHead((poly)v->Data());
   return FALSE;
 }
-#endif
 static BOOLEAN jjidHead(leftv res, leftv v)
 {
   res->data = (char *)id_Head((ideal)v->Data(),currRing);
@@ -5373,16 +5357,25 @@ static BOOLEAN jjmpTransp(leftv res, leftv v)
 }
 static BOOLEAN jjrOrdStr(leftv res, leftv v)
 {
+#ifdef SINGULAR_4_1
+  iiReWrite("ordstr");
+#endif
   res->data = rOrdStr((ring)v->Data());
   return FALSE;
 }
 static BOOLEAN jjrVarStr(leftv res, leftv v)
 {
+#ifdef SINGULAR_4_1
+  iiReWrite("varstr");
+#endif
   res->data = rVarStr((ring)v->Data());
   return FALSE;
 }
 static BOOLEAN jjrParStr(leftv res, leftv v)
 {
+#ifdef SINGULAR_4_1
+  iiReWrite("varstr");
+#endif
   res->data = rParStr((ring)v->Data());
   return FALSE;
 }
@@ -6298,9 +6291,9 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   if (ringvar>0)
   {
     if ((monomexpr!=NULL) && (p!=NULL) && (pTotaldegree(p)!=0) &&
-    ((unsigned long)pTotaldegree(monomexpr) > (currRing->bitmask / (unsigned long)pTotaldegree(p))))
+    ((unsigned long)pTotaldegree(monomexpr) > (currRing->bitmask / (unsigned long)pTotaldegree(p)/2)))
     {
-      Warn("possible OVERFLOW in subst, max exponent is %ld, subtituting deg %d by deg %d",currRing->bitmask, pTotaldegree(monomexpr), pTotaldegree(p));
+      Warn("possible OVERFLOW in subst, max exponent is %ld, subtituting deg %d by deg %d",currRing->bitmask/2, pTotaldegree(monomexpr), pTotaldegree(p));
       //return TRUE;
     }
     if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
@@ -6320,16 +6313,38 @@ static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
   poly monomexpr;
   BOOLEAN nok=jjSUBST_Test(v,w,ringvar,monomexpr);
   if (nok) return TRUE;
+  ideal id=(ideal)u->Data();
   if (ringvar>0)
   {
+    BOOLEAN overflow=FALSE;
+    if (monomexpr!=NULL)
+    {
+      long deg_monexp=pTotaldegree(monomexpr);
+      for(int i=IDELEMS(id)-1;i>=0;i--)
+      {
+        poly p=id->m[i];
+        if ((p!=NULL) && (pTotaldegree(p)!=0) &&
+        ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)pTotaldegree(p)/2)))
+        {
+          overflow=TRUE;
+          break;
+        }
+      }
+    }
+    if (overflow)
+      Warn("possible OVERFLOW in subst, max exponent is %ld",currRing->bitmask/2);
     if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
-      res->data = id_Subst((ideal)u->CopyD(res->rtyp), ringvar, monomexpr, currRing);
+    {
+      if (res->rtyp==MATRIX_CMD) id=(ideal)mp_Copy((matrix)id,currRing);
+      else                       id=id_Copy(id,currRing);
+      res->data = id_Subst(id, ringvar, monomexpr, currRing);
+    }
     else
-      res->data = idSubstPoly((ideal)u->Data(),ringvar,monomexpr);
+      res->data = idSubstPoly(id,ringvar,monomexpr);
   }
   else
   {
-    res->data = idSubstPar((ideal)u->Data(),-ringvar,monomexpr);
+    res->data = idSubstPar(id,-ringvar,monomexpr);
   }
   return FALSE;
 }
@@ -6769,7 +6784,9 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
       case BIGINT_CMD:
       {
         number b=(number)h->Data();
-        number n=n_Init_bigint(b,coeffs_BIGINT,currRing->cf);
+        nMapFunc nMap=n_SetMap(coeffs_BIGINT,currRing->cf);
+        if (nMap==NULL) return TRUE;
+        number n=nMap(b,coeffs_BIGINT,currRing->cf);
         if (!nIsZero(n))
         {
           p=pNSet(n);
@@ -7954,13 +7971,13 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     {
       if (at==dArith1[i].arg)
       {
-        int r=res->rtyp=dArith1[i].res;
         if (currRing!=NULL)
         {
           if (check_valid(dArith1[i].valid_for,op)) break;
         }
         if (traceit&TRACE_CALL)
           Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(at));
+        res->rtyp=dArith1[i].res;
         if ((call_failed=dArith1[i].p(res,a)))
         {
           break;// leave loop, goto error handling
@@ -7987,13 +8004,13 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         //Print("test %s\n",Tok2Cmdname(dArith1[i].arg));
         if ((ai=iiTestConvert(at,dArith1[i].arg))!=0)
         {
-          int r=res->rtyp=dArith1[i].res;
           if (currRing!=NULL)
           {
             if (check_valid(dArith1[i].valid_for,op)) break;
           }
           if (traceit&TRACE_CALL)
             Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(dArith1[i].arg));
+          res->rtyp=dArith1[i].res;
           failed= ((iiConvert(at,dArith1[i].arg,ai,a,an))
           || (call_failed=dArith1[i].p(res,an)));
           // everything done, clean up temp. variables
@@ -8495,7 +8512,6 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
 
 const char * Tok2Cmdname(int tok)
 {
-  int i = 0;
   if (tok <= 0)
   {
     return sArithBase.sCmds[0].name;
@@ -8510,12 +8526,22 @@ const char * Tok2Cmdname(int tok)
   //if (tok==OBJECT) return "object";
   //if (tok==PRINT_EXPR) return "print_expr";
   if (tok==IDHDL) return "identifier";
+  if (tok==CRING_CMD) return "(c)ring";
   if (tok>MAX_TOK) return getBlackboxName(tok);
+  int i;
   for(i=0; i<sArithBase.nCmdUsed; i++)
     //while (sArithBase.sCmds[i].tokval!=0)
   {
     if ((sArithBase.sCmds[i].tokval == tok)&&
         (sArithBase.sCmds[i].alias==0))
+    {
+      return sArithBase.sCmds[i].name;
+    }
+  }
+  // try gain for alias/old names:
+  for(i=0; i<sArithBase.nCmdUsed; i++)
+  {
+    if (sArithBase.sCmds[i].tokval == tok)
     {
       return sArithBase.sCmds[i].name;
     }

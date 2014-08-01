@@ -1,6 +1,7 @@
 #include <kernel/mod2.h>
 
 #include <Singular/mod_lib.h>
+#include <Singular/tok.h>
 
 class SModulFunctions;
 
@@ -10,5 +11,5 @@ class SModulFunctions;
 
 #include <reporter/reporter.h>
 
-extern "C" int SI_MOD_INIT(staticdemo)(SModulFunctions*){ PrintS("init of staticdemo\n"); return (0); }
+extern "C" int SI_MOD_INIT(staticdemo)(SModulFunctions*){ PrintS("init of staticdemo\n"); return (MAX_TOK); }
 

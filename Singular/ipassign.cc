@@ -56,6 +56,9 @@
 #include "ipshell.h"
 #include "blackbox.h"
 
+#ifdef SINGULAR_4_1
+#include <Singular/number2.h>
+#endif
 
 
 /*=================== proc =================*/
@@ -402,6 +405,58 @@ static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr)
   jiAssignAttr(res,a);
   return FALSE;
 }
+#ifdef SINGULAR_4_1
+static BOOLEAN jiA_NUMBER2(leftv res, leftv a, Subexpr e)
+{
+  number2 n=(number2)a->CopyD(CNUMBER_CMD);
+  if (e==NULL)
+  {
+    if (res->data!=NULL)
+    {
+      number2 nn=(number2)res->data;
+      n2Delete(nn);
+    }
+    res->data=(void *)n;
+    jiAssignAttr(res,a);
+  }
+  else
+  {
+    int i=e->start-1;
+    if (i<0)
+    {
+      Werror("index[%d] must be positive",i+1);
+      return TRUE;
+    }
+    bigintmat *iv=(bigintmat *)res->data;
+    if (e->next==NULL)
+    {
+      WerrorS("only one index given");
+      return TRUE;
+    }
+    else
+    {
+      int c=e->next->start;
+      if ((i>=iv->rows())||(c<1)||(c>iv->cols()))
+      {
+        Werror("wrong range [%d,%d] in cmatrix %s(%d,%d)",i+1,c,res->Name(),iv->rows(),iv->cols());
+        return TRUE;
+      }
+      else if (iv->basecoeffs()==n->cf)
+      {
+        n_Delete((number *)&BIMATELEM(*iv,i+1,c),iv->basecoeffs());
+        BIMATELEM(*iv,i+1,c) = n->n;
+      }
+      else
+      {
+        WerrorS("different base");
+        return TRUE;
+      }
+    }
+  }
+  jiAssignAttr(res,a);
+  return FALSE;
+}
+#endif
 static BOOLEAN jiA_BIGINT(leftv res, leftv a, Subexpr e)
 {
   number p=(number)a->CopyD(BIGINT_CMD);
@@ -742,7 +797,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   coeffs newcf = currRing->cf;
 #ifdef HAVE_RINGS
   ideal id = (ideal)a->Data(); //?
-  const int cpos = idPosConstant(id);  
+  const int cpos = idPosConstant(id);
   if(rField_is_Ring(currRing))
     if (cpos >= 0)
     {
@@ -755,16 +810,16 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   //if (qr!=NULL) omFreeBin((ADDRESS)qr, ip_sring_bin);
   ring qr = rCopy(currRing);
   assume(qr->cf == currRing->cf);
-  
+
   if ( qr->cf != newcf )
   {
     nKillChar ( qr->cf ); // ???
     qr->cf = newcf;
-  }  
+  }
                  // we have to fill it, but the copy also allocates space
   idhdl h=(idhdl)res->data; // we have res->rtyp==IDHDL
   IDRING(h)=qr;
-  
+
   ideal qid;
 
 #ifdef HAVE_RINGS
@@ -772,8 +827,8 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     {
       int i, j;
       int *perm = (int *)omAlloc0((qr->N+1)*sizeof(int));
-      
-      for(i=qr->N;i>0;i--) 
+
+      for(i=qr->N;i>0;i--)
         perm[i]=i;
 
       nMapFunc nMap = n_SetMap(currRing->cf, newcf);
@@ -785,7 +840,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     else
 #endif
       qid = idrCopyR(id,currRing,qr);
-      
+
   idSkipZeroes(qid);
   //idPrint(qid);
   if ((idElem(qid)>1) || rIsSCA(currRing) || (currRing->qideal!=NULL))
@@ -871,6 +926,15 @@ static BOOLEAN jiA_DEF(leftv res, leftv a, Subexpr e)
   res->data=(void *)0;
   return FALSE;
 }
+#ifdef SINGULAR_4_1
+static BOOLEAN jiA_CRING(leftv res, leftv a, Subexpr e)
+{
+  res->data=(void *)a->CopyD(CRING_CMD);
+  jiAssignAttr(res,a);
+  return FALSE;
+}
+#endif
+
 /*=================== table =================*/
 #define IPASSIGN
 #define D(A)     A
@@ -1227,7 +1291,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
   {
     IDLIST((idhdl)l->data)=L;
     IDTYP((idhdl)l->data)=LIST_CMD; // was possibly DEF_CMD
-    ipMoveId((idhdl)l->data);
+    if (lRingDependend(L)) ipMoveId((idhdl)l->data);
   }
   else
   {
@@ -1393,7 +1457,10 @@ static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
       m->m[i]=NULL;
       h=l->next;
       l->next=NULL;
+      idhdl hh=NULL;
+      if ((l->rtyp==IDHDL)&&(l->Typ()==DEF_CMD)) hh=(idhdl)l->data;
       nok=jiAssign_1(l,&t);
+      if (hh!=NULL) { ipMoveId(hh);hh=NULL;}
       l->next=h;
       if (nok)
       {

@@ -1809,7 +1809,7 @@ extern "C" int SI_MOD_INIT(polymake)(SModulFunctions* p)
   b->blackbox_Op2=bbpolytope_Op2;
 
   init_polymake_help();
-  return 0;
+  return MAX_TOK;
 }
 
 #endif /* HAVE_POLYMAKE */

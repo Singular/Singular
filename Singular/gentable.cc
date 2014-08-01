@@ -21,7 +21,7 @@
 #include "tok.h"
 
 // to produce convert_table.texi for doc:
-#define CONVERT_TABLE 1
+int produce_convert_table=0;
 
 // bits 0,1 for PLURAL
 #define NO_PLURAL        0
@@ -125,7 +125,6 @@ struct sConvertTypes
 
 const char * Tok2Cmdname(int tok)
 {
-  int i = 0;
   if (tok < 0)
   {
     return cmds[0].name;
@@ -140,8 +139,10 @@ const char * Tok2Cmdname(int tok)
   //if (tok==OBJECT) return "object";
   //if (tok==PRINT_EXPR) return "print_expr";
   if (tok==IDHDL) return "identifier";
+  if (tok==CRING_CMD) return "(c)ring";
   // we do not blackbox objects during table generation:
   //if (tok>MAX_TOK) return getBlackboxName(tok);
+  int i = 0;
   while (cmds[i].tokval!=0)
   {
     if ((cmds[i].tokval == tok)&&(cmds[i].alias==0))
@@ -150,7 +151,22 @@ const char * Tok2Cmdname(int tok)
     }
     i++;
   }
+  i=0;// try again for old/alias names:
+  while (cmds[i].tokval!=0)
+  {
+    if (cmds[i].tokval == tok)
+    {
+      return cmds[i].name;
+    }
+    i++;
+  }
+  #if 0
+  char *s=(char*)malloc(10);
+  sprintf(s,"(%d)",tok);
+  return s;
+  #else
   return cmds[0].name;
+  #endif
 }
 /*---------------------------------------------------------------------*/
 /**
@@ -222,7 +238,7 @@ static int _texi_sort_cmds( const void *a, const void *b )
     return 1;
   }
   /* pCmdR->tokval==-1, pCmdR goes at the end */
-  if(pCmdR->tokval==-1) 
+  if(pCmdR->tokval==-1)
   { free(ls);free(rs);return -1;}
 
   { int r=strcmp(ls,rs); free(ls); free(rs); return r; }
@@ -394,11 +410,13 @@ void ttGen1()
   }
 /*-------------------------------------------------------------------*/
   fprintf(outfile,"/*---------------------------------------------*/\n");
-  #ifdef CONVERT_TABLE
-  FILE *doctable=fopen("convert_table.texi","w");
-  fprintf(doctable,"@multitable @columnfractions .05 .18 .81\n");
+  FILE *doctable;
+  if (produce_convert_table)
+  {
+    doctable=fopen("convert_table.texi","w");
+    fprintf(doctable,"@multitable @columnfractions .05 .18 .81\n");
+  }
   int doc_nr=1;
-  #endif
   for (j=257;j<=MAX_TOK+1;j++)
   {
     for(i=257;i<=MAX_TOK+1;i++)
@@ -408,20 +426,22 @@ void ttGen1()
       {
         fprintf(outfile,"// convert %s -> %s\n",
           Tok2Cmdname(i), Tok2Cmdname(j));
-  #ifdef CONVERT_TABLE
-        fprintf(doctable,
-        "@item\n@   %d. @tab @code{%s}  @tab @expansion{} @code{%s}\n",
-        doc_nr,Tok2Cmdname(i),Tok2Cmdname(j));
-        doc_nr++;
-  #endif
+        if (produce_convert_table)
+        {
+          fprintf(doctable,
+          "@item\n@   %d. @tab @code{%s}  @tab @expansion{} @code{%s}\n",
+          doc_nr,Tok2Cmdname(i),Tok2Cmdname(j));
+          doc_nr++;
+        }
         if (j==ANY_TYPE) break;
       }
     }
   }
-  #ifdef CONVERT_TABLE
-  fprintf(doctable,"@end multitable\n");
-  fclose(doctable);
-  #endif
+  if (produce_convert_table)
+  {
+    fprintf(doctable,"@end multitable\n");
+    fclose(doctable);
+  }
   fprintf(outfile,"/*---------------------------------------------*/\n");
   char ops[]="=><+*/[.^,%(;";
   for(i=0;ops[i]!='\0';i++)
@@ -892,6 +912,9 @@ int main(int argc, char** argv)
 {
   if (argc>1)
   {
+    produce_convert_table=1; /* for ttGen1 */
+    ttGen1();
+    unlink(iparith_inc);
     ttGen4();
     ttGen2c();
   }

@@ -133,8 +133,10 @@ and @code{LIB} no brackets are allowed.
 * ludecomp::
 * luinverse::
 * lusolve::
+* max::
 * maxideal::
 * memory::
+* min::
 * minbase::
 * minor::
 * minres::
@@ -1954,7 +1956,7 @@ The (coeffients of the) result a/b is the best approximation under the condition
 |a|,|b|<=sqrt((N-1)/2)
 @end ifinfo
 @tex
-$|a|,|b|<=\sqrt((N-1)/2)$
+$|a|,|b|<=\sqrt{(N-1)/2}$
 @end tex
 @item @strong{Note:}
 The current coefficient field must be the rationals.
@@ -3985,7 +3987,7 @@ See
 @ref{ludecomp}.
 @c ref
 @c ---------------------------------------
-@node lusolve, maxideal, luinverse, Functions
+@node lusolve, max, luinverse, Functions
 @subsection lusolve
 @cindex lusolve
 @cindex solve a linear equation system A*x = b via the LU-decomposition of A
@@ -4053,7 +4055,12 @@ See
 @ref{ludecomp}.
 @c ref
 @c ---------------------------------------
-@node maxideal, memory, lusolve, Functions
+@node max, maxideal, lusolve, Functions
+@subsection max
+@cindex max
+@c lib standard.lib:max lib_fun lib_ex subsection
+@c ---------------------------------------
+@node maxideal, memory, max, Functions
 @subsection maxideal
 @cindex maxideal
 @table @code
@@ -4078,7 +4085,7 @@ See
 @ref{ring}.
 @c ref
 @c ---------------------------------------
-@node  memory, minbase, maxideal, Functions
+@node  memory, min, maxideal, Functions
 @subsection memory
 @cindex memory
 @cindex memory managment
@@ -4127,7 +4134,12 @@ See
 @ref{system}.
 @c ref
 @c ---------------------------------------
-@node minbase, minor, memory, Functions
+@node min, minbase, memory, Functions
+@subsection min
+@cindex min
+@c lib standard.lib:max lib_fun lib_ex subsection
+@c ---------------------------------------
+@node minbase, minor, min, Functions
 @subsection minbase
 @cindex minbase
 @table @code

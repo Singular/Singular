@@ -2,15 +2,13 @@
 //*****************************************************************************
 /** @file facAlgExt.cc
  *
- * @author Martin Lee
- * @date
- *
  * Univariate factorization over algebraic extension of Q using Trager's
  * algorithm
  *
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
  *
+ * @author Martin Lee
 **/
 //*****************************************************************************
 
@@ -62,9 +60,11 @@ CanonicalForm Norm (const CanonicalForm& F, const Variable& alpha)
   int degmipo= degree (mipo);
   CanonicalForm norm;
   TIMING_START (fac_alg_resultant);
+#ifdef HAVE_NTL
   if (degg >= 8 || degmipo >= 8)
     norm= resultantZ (g, mipo, x);
   else
+#endif
     norm= resultant (g, mipo, x);
   TIMING_END_AND_PRINT (fac_alg_resultant, "time to compute resultant0: ");
   return norm;
@@ -84,9 +84,11 @@ CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
   int degmipo= degree (mipo);
   CanonicalForm norm;
   TIMING_START (fac_alg_resultant);
+#ifdef HAVE_NTL
   if (degg >= 8 || degmipo >= 8)
     norm= resultantZ (g, mipo, x);
   else
+#endif
     norm= resultant (g, mipo, x);
   TIMING_END_AND_PRINT (fac_alg_resultant, "time to compute resultant0: ");
 
@@ -105,9 +107,11 @@ CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
         g= F (y - i*alpha, y);
         g *= bCommonDen (g);
         TIMING_START (fac_alg_resultant);
+#ifdef HAVE_NTL
         if (degg >= 8 || degmipo >= 8)
           norm= resultantZ (g (x, alpha), mipo, x);
         else
+#endif
           norm= resultant (g (x, alpha), mipo, x);
         TIMING_END_AND_PRINT (fac_alg_resultant,"time to compute resultant1: ");
       }
@@ -116,9 +120,11 @@ CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
         g= F (y + i*alpha, y);
         g *= bCommonDen (g);
         TIMING_START (fac_alg_resultant);
+#ifdef HAVE_NTL
         if (degg >= 8 || degmipo >= 8)
           norm= resultantZ (g (x, alpha), mipo, x);
         else
+#endif
           norm= resultant (g (x, alpha), mipo, x);
         TIMING_END_AND_PRINT (fac_alg_resultant,"time to compute resultant2: ");
       }

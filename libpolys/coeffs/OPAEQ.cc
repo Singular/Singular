@@ -333,7 +333,6 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
     r->cfSetMap = npSetMap;
     r->cfName = nAEQName;
     r->cfInpMult=nAEQInpMult; //????
-    r->cfInit_bigint= NULL; // nAEQMap0;
     r->cfCoeffWrite=nAEQCoeffWrite; //????
 
 

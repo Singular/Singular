@@ -3,22 +3,24 @@
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
 
-//{{{ docu
-//
-// factory.template - template to generate `factory.h'.
-//
-// `factory.h' is the user interface to Factory.  Created
-// automatically by `makeheader', it collects all important
-// declarations from all important Factory header files into one
-// overall header file leaving out all boring Factory internal
-// stuff.  See `./bin/makeheader' for an explanation of the syntax
-// of this file.
-//
-// Note: In this file the order of "includes" matters (since this
-// are not real includes)!  In general, files at the end depend
-// on files at the beginning.
-//
-//}}}
+/* factory.template is a template to generate `factory.h' */
+
+/**
+ *
+ * @file factory.h
+ *
+ * `factory.h' is the user interface to Factory.  Created
+ * automatically by `makeheader', it collects all important
+ * declarations from all important Factory header files into one
+ * overall header file leaving out all boring Factory internal
+ * stuff.  See `./bin/makeheader' for an explanation of the syntax
+ * of this file.
+ *
+ * Note: In this file the order of "includes" matters (since this
+ * are not real includes)!  In general, files at the end depend
+ * on files at the beginning.
+ *
+**/
 
 #include <factory/factoryconf.h>
 #include <stdint.h>
@@ -74,9 +76,6 @@
 #include "cf_random.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
-#include "cf_irred.h"
-
-/*MAKEHEADER PUBLIC ONLY*/
 #include "fac_util.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
@@ -110,9 +109,6 @@
 #include "cfModResultant.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
-#include "cfGcdAlgExt.h"
-
-/*MAKEHEADER PUBLIC ONLY*/
 #include "facAlgFunc.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
@@ -120,6 +116,9 @@
 
 /*MAKEHEADER PUBLIC ONLY*/
 #include "cfCharSets.h"
+
+/*MAKEHEADER PUBLIC ONLY*/
+#include "cfUnivarGcd.h"
 
 
 #endif /* ! INCL_FACTORY_H */

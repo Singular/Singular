@@ -1326,9 +1326,9 @@ leftv ssiRead1(si_link l)
     case 0: if (s_iseof(d->f_read))
             {
               ssiClose(l);
-              res->rtyp=DEF_CMD;
-              break;
             }
+            res->rtyp=DEF_CMD;
+            break;
     default: Werror("not implemented (t:%d)",t);
              omFreeSize(res,sizeof(sleftv));
              res=NULL;
@@ -1393,6 +1393,7 @@ BOOLEAN ssiWrite(si_link l, leftv data)
 
     switch(tt /*data->Typ()*/)
     {
+          case 0: /*error*/
           case NONE/* nothing*/:fputs("16 ",d->f_write);
                           break;
           case STRING_CMD: fputs("2 ",d->f_write);
@@ -1737,6 +1738,7 @@ do_select:
         return -2;
       }
       /* else: next char */
+      goto do_select;
     }
   }
 }

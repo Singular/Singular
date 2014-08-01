@@ -45,7 +45,7 @@ static inline number nvMultM(number a, number b, const coeffs r)
 number  nvMult        (number a, number b, const coeffs r);
 number  nvDiv         (number a, number b, const coeffs r);
 number  nvInvers      (number c, const coeffs r);
-void    nvPower       (number a, int i, number * result, const coeffs r);
+//void    nvPower       (number a, int i, number * result, const coeffs r);
 #endif
 
 
@@ -310,6 +310,7 @@ void npWrite (number &a, const coeffs r)
   else                             StringAppend("%d",(int)((long)a));
 }
 
+#if 0
 void npPower (number a, int i, number * result, const coeffs r)
 {
   assume( n_Test(a, r) );
@@ -329,6 +330,7 @@ void npPower (number a, int i, number * result, const coeffs r)
     *result = npMultM(a,*result,r);
   }
 }
+#endif
 
 static const char* npEati(const char *s, int *i, const coeffs r)
 {
@@ -456,6 +458,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
 
   r->is_field=TRUE;
   r->is_domain=TRUE;
+  r->rep=n_rep_int;
 
   r->ch = c;
   r->npPminus1M = c /*r->ch*/ - 1;
@@ -493,7 +496,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfIsOne = npIsOne;
   r->cfIsMOne = npIsMOne;
   r->cfGreaterZero = npGreaterZero;
-  r->cfPower = npPower;
+  //r->cfPower = npPower;
   r->cfGetDenom = ndGetDenom;
   r->cfGetNumerator = ndGetNumerator;
   //r->cfGcd  = ndGcd;
@@ -502,7 +505,6 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfSetMap = npSetMap;
   //r->cfName = ndName;
   r->cfInpMult=ndInpMult;
-  r->cfInit_bigint= nlModP; // npMap0;
 #ifdef NV_OPS
   if (c>NV_MAX_PRIME)
   {
@@ -510,7 +512,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
     r->cfDiv   = nvDiv;
     r->cfExactDiv= nvDiv;
     r->cfInvers= nvInvers;
-    r->cfPower= nvPower;
+    //r->cfPower= nvPower;
   }
 #endif
   r->cfCoeffWrite=npCoeffWrite;
@@ -689,6 +691,16 @@ number npMapGMP(number from, const coeffs /*src*/, const coeffs dst)
   return (number) r;
 }
 
+number npMapZ(number from, const coeffs src, const coeffs dst)
+{
+  if (SR_HDL(from) & SR_INT)
+  {
+    long f_i=SR_TO_INT(from);
+    return npInit(f_i,dst);
+  }
+  return npMapGMP(from,src,dst);
+}
+
 /*2
 * convert from an machine long
 */
@@ -709,20 +721,24 @@ number npMapCanonicalForm (number a, const coeffs /*src*/, const coeffs dst)
 nMapFunc npSetMap(const coeffs src, const coeffs dst)
 {
 #ifdef HAVE_RINGS
-  if (nCoeff_is_Ring_2toM(src))
+  if ((src->rep==n_rep_int) && nCoeff_is_Ring_2toM(src))
   {
     return npMapMachineInt;
   }
-  if (nCoeff_is_Ring_Z(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_ModN(src))
+  if (src->rep==n_rep_gmp) //nCoeff_is_Ring_Z(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_ModN(src))
   {
     return npMapGMP;
   }
+  if (src->rep==n_rep_gap_gmp) //nCoeff_is_Ring_Z(src)
+  {
+    return npMapZ;
+  }
 #endif
-  if (nCoeff_is_Q(src))
+  if (src->rep==n_rep_gap_rat)  /* Q, Z */
   {
     return nlModP; // npMap0;
   }
-  if ( nCoeff_is_Zp(src) )
+  if ((src->rep==n_rep_int) &&  nCoeff_is_Zp(src) )
   {
     if (n_GetChar(src) == n_GetChar(dst))
     {
@@ -733,7 +749,7 @@ nMapFunc npSetMap(const coeffs src, const coeffs dst)
       return npMapP;
     }
   }
-  if (nCoeff_is_long_R(src))
+  if ((src->rep==n_rep_gmp_float) && nCoeff_is_long_R(src))
   {
     return npMapLongR;
   }
@@ -834,6 +850,7 @@ number  nvInvers (number c, const coeffs r)
   }
   return nvInversM(c,r);
 }
+#if 0
 void nvPower (number a, int i, number * result, const coeffs r)
 {
   if (i==0)
@@ -851,6 +868,7 @@ void nvPower (number a, int i, number * result, const coeffs r)
     *result = nvMultM(a,*result,r);
   }
 }
+#endif
 #endif
 
 void    npCoeffWrite  (const coeffs r, BOOLEAN /*details*/)

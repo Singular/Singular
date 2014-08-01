@@ -580,10 +580,17 @@ example
           
     TIdealGeneratingParameters genParams= defaultIdealGeneratorParams();
     // adjust random ideal generator params:
+
     genParams.maxGens=1; 
+
+    genParams.absMaxCoeff = 15;
+    genParams.minMonomialDegree = 2;
+    genParams.maxMonomialDegree = 3;
+    genParams.maxTermsPerGen = 4;
+    genParams.maxGens = 1;
     proc idealG = idealGeneratorFromParams( genParams  );
 
-    //  generate a random ideal with at most one generator:
+    //  generate a random ideal with parameters as above:
     idealG();
 }
 

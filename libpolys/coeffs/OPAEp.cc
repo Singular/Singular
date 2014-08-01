@@ -362,7 +362,6 @@ BOOLEAN n_pAEInitChar(coeffs r, void *p)
     r->cfSetMap = npSetMap;
     r->cfName = nAEpName;
     r->cfInpMult=nAEpInpMult; //????
-    r->cfInit_bigint= NULL; // nAEpMap0;
     r->cfCoeffWrite=nAEpCoeffWrite; //????
 
 

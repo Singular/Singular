@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version paraplanecurves.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version paraplanecurves.lib 4.0.0.0 Jun_2014 "; // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:  paraplanecurves.lib Rational parametrization of rational plane curves
@@ -1981,7 +1981,7 @@ RETURN:  takes each coefficient of q modulo p and returns the resulting poly
   bigint c;
   while (qq != 0)
   {
-    c = bigint(leadcoef(qq) mod p);
+    c = bigint(leadcoef(qq)) mod p;
     res = res + c * leadmonom(qq);
     qq = qq - lead(qq);
   }

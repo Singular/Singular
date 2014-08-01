@@ -24,7 +24,6 @@
 #include "facHensel.h"
 #include "facMul.h"
 #include "cf_primes.h"
-#include "cfGcdAlgExt.h"
 
 #ifdef HAVE_NTL
 TIMING_DEFINE_PRINT(fac_uni_factorizer)
@@ -578,6 +577,7 @@ CFList biFactorize (const CanonicalForm& F, const Variable& v)
         break;
     for (CFListIterator iter= uniFactors; iter.hasItem(); iter++)
       iter.getItem()= replacevar (iter.getItem(), vv, v);
+    prune (vv);
   }
 
   On (SW_RATIONAL);

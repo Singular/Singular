@@ -22,6 +22,7 @@ using namespace std;
 
 #include "cf_defs.h"
 #include "cf_factory.h"
+#include "cfUnivarGcd.h"
 #include "int_cf.h"
 #include "int_int.h"
 #include "int_poly.h"
@@ -96,47 +97,56 @@ InternalPoly::isUnivariate() const
     return true;
 }
 
-//{{{ int InternalPoly::degree ()
-// docu: see CanonicalForm::sign ()
+/** int InternalPoly::degree ()
+ * @sa CanonicalForm::sign ()
+**/
 int
 InternalPoly::degree ()
 {
     return firstTerm->exp;
 }
-//}}}
 
-//{{{ int InternalPoly::sign () const
-// docu: see CanonicalForm::sign()
+
+/** int InternalPoly::sign () const
+ * @sa CanonicalForm::sign()
+**/
 int
 InternalPoly::sign () const
 {
     return firstTerm->coeff.sign();
 }
-//}}}
 
-//{{{ CanonicalForm InternalPoly::lc (), Lc (), LC ()
-// docu: see CanonicalForm::lc(), Lc(), LC()
+
+/**
+  * @sa CanonicalForm::lc(), CanonicalForm::Lc(), CanonicalForm::LC(), InternalPoly::Lc (), InternalPoly::LC ()
+**/
 CanonicalForm
 InternalPoly::lc ()
 {
     return firstTerm->coeff.lc();
 }
 
+/**
+  * @sa CanonicalForm::lc(), CanonicalForm::Lc(), CanonicalForm::LC(), InternalPoly::lc (), InternalPoly::LC ()
+**/
 CanonicalForm
 InternalPoly::Lc ()
 {
     return firstTerm->coeff.Lc();
 }
 
+/**
+  * @sa CanonicalForm::lc(), CanonicalForm::Lc(), CanonicalForm::LC(), InternalPoly::lc (), InternalPoly::Lc ()
+**/
 CanonicalForm
 InternalPoly::LC ()
 {
     return firstTerm->coeff;
 }
-//}}}
 
-//{{{ CanonicalForm InternalPoly::tailcoeff (), int InternalPoly::taildegree ()
-// docu: see CanonicalForm::tailcoeff(), taildegree()
+/** CanonicalForm InternalPoly::tailcoeff (), int InternalPoly::taildegree ()
+ * @sa CanonicalForm::tailcoeff(), taildegree()
+**/
 CanonicalForm
 InternalPoly::tailcoeff ()
 {
@@ -148,10 +158,10 @@ InternalPoly::taildegree ()
 {
     return lastTerm->exp;
 }
-//}}}
 
-//{{{ CanonicalForm InternalPoly::coeff ( int i )
-// docu: see CanonicalForm::operator []()
+/** CanonicalForm InternalPoly::coeff ( int i )
+ * @sa CanonicalForm::operator []()
+**/
 CanonicalForm
 InternalPoly::coeff ( int i )
 {
@@ -167,7 +177,6 @@ InternalPoly::coeff ( int i )
     }
     return CanonicalForm( 0 );
 }
-//}}}
 
 #ifndef NOSTREAMIO
 void
@@ -219,8 +228,9 @@ InternalPoly::print(OSTREAM &aStream, char * aString )
 }
 #endif /* NOSTREAMIO */
 
-//{{{ InternalCF * InternalPoly::neg ()
-// docu: see CanonicalForm::operator -()
+/** InternalCF * InternalPoly::neg ()
+ * @sa CanonicalForm::operator -()
+**/
 InternalCF *
 InternalPoly::neg ()
 {
@@ -236,7 +246,6 @@ InternalPoly::neg ()
         return new InternalPoly( first, last, var );
     }
 }
-//}}}
 
 InternalCF*
 InternalPoly::invert()
@@ -957,35 +966,30 @@ InternalPoly::tryDivremsamet( InternalCF* acoeff, InternalCF*& quot, InternalCF*
     return divideok;
 }
 
-//{{{ int InternalPoly::comparesame, comparecoeff ( InternalCF * acoeff )
-//{{{ docu
-//
-// comparesame(), comparecoeff() - compare with an
-//   InternalPoly.
-//
-// comparecoeff() always returns 1 since CO is defined to be
-// larger than anything which is a coefficient w.r.t. CO.
-//
-// comparesame() compares the coefficient vectors of f=CO and
-// g=acoeff w.r.t to a lexicographic order in the following way:
-// f < g iff there exists an 0 <= i <= max(deg(f),deg(g)) s.t.
-// i) f[j] = g[j] for all i < j <= max(deg(f),deg(g)) and
-// ii) g[i] occurs in g (i.e. is not equal to zero) and
-//     f[i] does not occur in f or f[i] < g[i] if f[i] occurs
-// where f[i] denotes the coefficient to the power x^i of f.
-//
-// As usual, comparesame() returns 1 if CO is larger than c, 0 if
-// CO equals c, and -1 if CO is less than c.  However, this
-// function is optimized to test on equality since this is its
-// most important and frequent usage.
-//
-// See the respective `CanonicalForm'-methods for an explanation
-// why we define such a strange (but total) ordering on
-// polynomials.
-//
-// See also: CanonicalForm::operator <(), CanonicalForm::operator ==()
-//
-//}}}
+/**
+ * comparesame(), comparecoeff() - compare with an
+ *   InternalPoly.
+ *
+ * comparesame() compares the coefficient vectors of f=CO and
+ * g=acoeff w.r.t to a lexicographic order in the following way:
+ * f < g iff there exists an 0 <= i <= max(deg(f),deg(g)) s.t.
+ * i) f[j] = g[j] for all i < j <= max(deg(f),deg(g)) and
+ * ii) g[i] occurs in g (i.e. is not equal to zero) and
+ *     f[i] does not occur in f or f[i] < g[i] if f[i] occurs
+ * where f[i] denotes the coefficient to the power x^i of f.
+ *
+ * As usual, comparesame() returns 1 if CO is larger than c, 0 if
+ * CO equals c, and -1 if CO is less than c.  However, this
+ * function is optimized to test on equality since this is its
+ * most important and frequent usage.
+ *
+ * See the respective `CanonicalForm'-methods for an explanation
+ * why we define such a strange (but total) ordering on
+ * polynomials.
+ *
+ * @sa CanonicalForm::operator <(), CanonicalForm::operator ==()
+ *
+**/
 int
 InternalPoly::comparesame ( InternalCF * acoeff )
 {
@@ -1024,12 +1028,15 @@ InternalPoly::comparesame ( InternalCF * acoeff )
     }
 }
 
+/**
+ * comparecoeff() always returns 1 since CO is defined to be
+ * larger than anything which is a coefficient w.r.t. CO.
+**/
 int
 InternalPoly::comparecoeff ( InternalCF * )
 {
     return 1;
 }
-//}}}
 
 InternalCF*
 InternalPoly::addcoeff( InternalCF* cc )

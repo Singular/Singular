@@ -9,7 +9,7 @@ ideal Z = center(3);
 Z;
 inCenter(Z); // check the result
 // find at least one generator of the center:
-ideal ZZ = center(-1, 1);
-ZZ;
-inCenter(ZZ); // check the result
+ideal Z2 = center(-1, 1);
+Z2;
+inCenter(Z2); // check the result
 tst_status(1);$

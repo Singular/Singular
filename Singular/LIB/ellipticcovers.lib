@@ -78,11 +78,6 @@ system("install","Net","+",catNet,2);
 }
 
 
-static proc max(int n, int m){
-if (n>m){return(n);}
-return(m);}
-
-
 static proc catNet(Net N, Net M)
 {
 list L;

@@ -265,7 +265,7 @@ AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
     CPPFLAGS="$CPPFLAGS ${FACTORY_INCLUDES}"
     CFLAGS="$CFLAGS ${FACTORY_INCLUDES}"
     CXXFLAGS="$CXXFLAGS ${FACTORY_INCLUDES}"
-    LIBS="$LIBS ${FACTORY_LIBS}"
+    LIBS="${FACTORY_LIBS} $LIBS"
  
     AC_CHECK_HEADERS([factory/factory.h],,AC_MSG_WARN([trusting the factory locations given: ${FACTORY_INCLUDES}]))
 
@@ -318,6 +318,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   bi_polymake=false
   bi_singmathic=false
   bi_bigintm=false
+  bi_Order=false
   
   
  if test -z "$with_builtinmodules"; then
@@ -346,6 +347,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
        polymake ) bi_polymake=true ;;
        singmathic ) bi_singmathic=true ;;
        bigintm ) bi_bigintm=true ;;       
+       Order ) bi_Order=true ;;       
       esac
 
 ###### In case of out-of tree building: the build dir is empty in configure time!!!
@@ -377,6 +379,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AM_CONDITIONAL([SI_BUILTIN_POLYMAKE], [test x$bi_polymake = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_SINGMATHIC], [test x$bi_singmathic = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_BIGINTM], [test x$bi_bigintm = xtrue])
+ AM_CONDITIONAL([SI_BUILTIN_ORDER], [test x$bi_Order = xtrue])
  
  AC_MSG_CHECKING([BUILTIN_LIBS...])
  AC_MSG_RESULT(${BUILTIN_LIBS:-unset})

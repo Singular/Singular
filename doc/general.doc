@@ -2004,7 +2004,9 @@ coefficient rings were implemented in @sc{Singular} 3.0.5 and at the moment
 only limited functionality is available.
 
 @subheading p-adic numbers
-@cindex p-adic numbers, l-adic numbers, projective limes
+@cindex p-adic numbers
+@cindex l-adic numbers
+@cindex projective limes
 
 The p-adic integers @math{Z_p} are the projective limit of the finite
 rings @math{Z/p^n} for @code{n} to infinity. Therefore, computations in this ring

@@ -20,6 +20,7 @@ Use the @code{LIB} command for loading of single libraries.
 See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclidean domains.
 
 @menu
+* bimodules_lib:: Tools for handling bimodules
 * bfun_lib::  Algorithms for b-functions and Bernstein-Sato polynomial
 * central_lib:: Computation of centralizer and center in GR-algebras
 * dmod_lib:: Fundamental algorithms for algebraic D-modules
@@ -46,7 +47,11 @@ See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclide
 @lowersections
 
 @c ----------------------------------------------------------
-@node bfun_lib, central_lib, , Non-commutative libraries
+@node bimodules_lib, bfun_lib, , Non-commutative libraries
+@section bimodules_lib
+@c lib bimodules.lib
+@c ----------------------------------------------------------
+@node bfun_lib, central_lib, bimodules_lib, Non-commutative libraries
 @section bfun_lib
 @c lib bfun.lib
 @c ----------------------------------------------------------

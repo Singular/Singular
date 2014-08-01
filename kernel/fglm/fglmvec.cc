@@ -482,7 +482,7 @@ number fglmVector::gcd () const
       current = rep->getconstelem (i);
       if(!nIsZero (current))
       {
-        number temp = n_Gcd (theGcd, current, currRing->cf);
+        number temp = n_SubringGcd (theGcd, current, currRing->cf);
         nDelete (&theGcd);
         theGcd = temp;
         if(nIsOne (theGcd))
@@ -506,7 +506,7 @@ number fglmVector::clearDenom ()
     if(!nIsZero (rep->getconstelem (i)))
     {
       isZero = FALSE;
-      number temp = n_Lcm (theLcm, rep->getconstelem (i), currRing->cf);
+      number temp = n_NormalizeHelper (theLcm, rep->getconstelem (i), currRing->cf);
       nDelete (&theLcm);
       theLcm = temp;
     }

@@ -2225,7 +2225,7 @@ EXAMPLE: example genus; shows an example
      setring R0;
      return(pa);
    }
-   if(!rpr)
+   if(rpr)
    {
       list LZ=minAssGTZ(I);
       if(size(LZ)>1)
@@ -2241,6 +2241,10 @@ EXAMPLE: example genus; shows an example
       {
          I=LZ[1];
       }
+   }
+   else
+   {
+     I=radical(I);
    }
    I=std(I);
    if(dim(I)!=1)
@@ -2278,7 +2282,10 @@ EXAMPLE: example genus; shows an example
    }
    else
    {
-      def R=basering;
+     def R=changeord(list(list("dp",1:nvars(basering))));
+     setring R;
+     ideal I=imap(R0,I);
+     I=std(I);
    }
    if(dim(I)==2)
    {

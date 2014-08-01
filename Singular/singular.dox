@@ -1,4 +1,6 @@
-/*! \page singular_page Singular Interpreter and related functionality
+/*! 
+
+ \page singular_page Singular Interpreter and related functionality
 
  Iterpreter and wrappers over kernel (\ref kernel_page)
  

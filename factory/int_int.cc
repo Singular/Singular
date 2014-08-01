@@ -86,8 +86,9 @@ InternalCF* InternalInteger::genOne()
         return new InternalInteger( 1 );
 }
 
-//{{{ InternalCF * InternalInteger::neg ()
-// docu: see CanonicalForm::operator -()
+/** InternalCF * InternalInteger::neg ()
+ * @sa CanonicalForm::operator -()
+**/
 InternalCF *
 InternalInteger::neg ()
 {
@@ -105,7 +106,7 @@ InternalInteger::neg ()
         return this;
     }
 }
-//}}}
+
 
 
 InternalCF* InternalInteger::addsame( InternalCF * c )
@@ -207,8 +208,9 @@ InternalCF* InternalInteger::mulsame( InternalCF * c )
     }
 }
 
-//{{{ int InternalInteger::comparesame, comparecoeff ( InternalCF * c )
-// docu: see CanonicalForm::operator <(), CanonicalForm::operator ==()
+/**
+ * @sa CanonicalForm::operator <(), CanonicalForm::operator ==(), InternalInteger::comparecoeff()
+**/
 int
 InternalInteger::comparesame ( InternalCF * c )
 {
@@ -216,13 +218,16 @@ InternalInteger::comparesame ( InternalCF * c )
     return mpz_cmp( thempi, MPI( c ) );
 }
 
+/**
+ * @sa CanonicalForm::operator <(), CanonicalForm::operator ==(), InternalInteger::comparesame()
+**/
 int
 InternalInteger::comparecoeff ( InternalCF * c )
 {
     ASSERT( ::is_imm( c ) == INTMARK, "incompatible base coefficients" );
     return mpz_cmp_si( thempi, imm2int( c ) );
 }
-//}}}
+
 
 InternalCF* InternalInteger::addcoeff( InternalCF* c )
 {
@@ -363,8 +368,9 @@ InternalCF* InternalInteger::mulcoeff( InternalCF* c )
     }
 }
 
-//{{{ InternalCF * InternalInteger::bgcdsame, bgcdcoeff ( const InternalCF * const c )
-// docu: see CanonicalForm::bgcd()
+/**
+ * @sa CanonicalForm::bgcd(), InternalInteger::bgcdcoeff()
+**/
 InternalCF *
 InternalInteger::bgcdsame ( const InternalCF * const c ) const
 {
@@ -391,6 +397,9 @@ InternalInteger::bgcdsame ( const InternalCF * const c ) const
         return new InternalInteger( result );
 }
 
+/**
+ * @sa CanonicalForm::bgcd(), InternalInteger::bgcdsame()
+**/
 InternalCF *
 InternalInteger::bgcdcoeff ( const InternalCF * const c )
 {
@@ -419,9 +428,10 @@ InternalInteger::bgcdcoeff ( const InternalCF * const c )
     if ( cInt < 0 ) cInt = -cInt;
     return int2imm( cInt );
 }
-//}}}
 
-//{{{ InternalCF * InternalInteger::bextgcdsame( InternalCF * c, CanonicalForm & a, CanonicalForm & b )
+/**
+ * @sa CanonicalForm::bextgcd(), InternalInteger::bextgcdcoeff()
+**/
 InternalCF *
 InternalInteger::bextgcdsame( InternalCF * c, CanonicalForm & a, CanonicalForm & b )
 {
@@ -474,6 +484,9 @@ InternalInteger::bextgcdsame( InternalCF * c, CanonicalForm & a, CanonicalForm &
         return new InternalInteger( result );
 }
 
+/**
+ * @sa CanonicalForm::bextgcd(), InternalInteger::bextgcdsame()
+**/
 InternalCF *
 InternalInteger::bextgcdcoeff( InternalCF * c, CanonicalForm & a, CanonicalForm & b )
 {
@@ -516,7 +529,6 @@ InternalInteger::bextgcdcoeff( InternalCF * c, CanonicalForm & a, CanonicalForm 
 
     return result.getval();
 }
-//}}}
 
 long InternalInteger::intval() const
 {
@@ -528,17 +540,18 @@ int InternalInteger::intmod( int p ) const
   return (int)mpz_fdiv_ui( thempi, (unsigned long)p );
 }
 
-//{{{ int InternalInteger::sign () const
-// docu: see CanonicalForm::sign()
+/** int InternalInteger::sign () const
+ * @sa CanonicalForm::sign()
+**/
 int
 InternalInteger::sign () const
 {
     return mpz_sgn( thempi );
 }
-//}}}
 
-//{{{ InternalCF * InternalInteger::sqrt ()
-// docu: see CanonicalForm::sqrt()
+/** InternalCF * InternalInteger::sqrt ()
+ * @sa CanonicalForm::sqrt()
+**/
 InternalCF *
 InternalInteger::sqrt ()
 {
@@ -555,14 +568,13 @@ InternalInteger::sqrt ()
     else
         return new InternalInteger( result );
 }
-//}}}
 
-//{{{ int InternalInteger::ilog2 ()
-// docu: see CanonicalForm::ilog2()
+/** int InternalInteger::ilog2 ()
+ * @sa CanonicalForm::ilog2()
+**/
 int
 InternalInteger::ilog2 ()
 {
     ASSERT( mpz_cmp_si( thempi, 0 ) > 0, "log() argument <= 0" );
     return mpz_sizeinbase( thempi, 2 ) - 1;
 }
-//}}}

@@ -789,8 +789,8 @@ char * versionString(/*const bool bShowDetails = false*/ )
 #if defined(mpir_version)
               StringAppend("MPIR(%s)~GMP(%s),", mpir_version, gmp_version);
 #elif defined(gmp_version)
-	      // #if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
-	      //              StringAppend("GMP(%d.%d),",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
+              // #if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
+              //              StringAppend("GMP(%d.%d),",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
               StringAppend("GMP(%s),", gmp_version);
 #endif
 #ifdef HAVE_NTL
@@ -1018,7 +1018,10 @@ void checkall()
       {
         omCheckAddr(hh);
         omCheckAddr((ADDRESS)IDID(hh));
-        if (RingDependend(IDTYP(hh))) Print("%s typ %d in Top\n",IDID(hh),IDTYP(hh));
+        if (RingDependend(IDTYP(hh)))
+        {
+          Print("%s typ %d in Top (should be in ring)\n",IDID(hh),IDTYP(hh));
+        }
         hh=IDNEXT(hh);
       }
       hh=basePack->idroot;
@@ -1027,12 +1030,18 @@ void checkall()
         if (IDTYP(hh)==PACKAGE_CMD)
         {
           idhdl h2=IDPACKAGE(hh)->idroot;
-          while (h2!=NULL)
+          if (IDPACKAGE(hh)!=basePack)
           {
-            omCheckAddr(h2);
-            omCheckAddr((ADDRESS)IDID(h2));
-            if (RingDependend(IDTYP(h2))) Print("%s typ %d in %s\n",IDID(h2),IDTYP(h2),IDID(hh));
-            h2=IDNEXT(h2);
+            while (h2!=NULL)
+            {
+              omCheckAddr(h2);
+              omCheckAddr((ADDRESS)IDID(h2));
+              if (RingDependend(IDTYP(h2)))
+              {
+                Print("%s typ %d in %s (should be in ring)\n",IDID(h2),IDTYP(h2),IDID(hh));
+              }
+              h2=IDNEXT(h2);
+            }
           }
         }
         hh=IDNEXT(hh);
@@ -1245,6 +1254,20 @@ void siInit(char *name)
   #endif
   feSetOptValue(FE_OPT_CPUS, cpus);
 
+#ifdef SINGULAR_4_1
+// default coeffs
+  {
+  idhdl h;
+  h=enterid(omStrDup("QQ"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+  IDDATA(h)=(char*)nInitChar(n_Q,NULL);
+  h=enterid(omStrDup("ZZ"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+  IDDATA(h)=(char*)nInitChar(n_Z,NULL);
+  //h=enterid(omStrDup("RR"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+  //IDDATA(h)=(char*)nInitChar(n_R,NULL);
+  //h=enterid(omStrDup("CC"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+  //IDDATA(h)=(char*)nInitChar(n_long_C,NULL);
+  }
+#endif  
 // loading standard.lib -----------------------------------------------
   if (! feOptValue(FE_OPT_NO_STDLIB))
   {

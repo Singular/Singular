@@ -378,7 +378,6 @@ Manual/trapezoid.tst
 Manual/triangL_solve.tst
 Manual/triangM_solve.tst
 Manual/truncate.tst
-Manual/varNum.tst
 Manual/absFactorize.tst
 Manual/absValue.tst
 Manual/Ann.tst
@@ -402,7 +401,6 @@ Manual/elimrep.tst
 Manual/engine.tst
 Manual/ERROR.tst
 Manual/exteriorBasis.tst
-Manual/gcdN.tst
 Manual/genericmat.tst
 Manual/GKdim.tst
 Manual/hessenberg.tst
@@ -611,7 +609,6 @@ Manual/ellipticAdd.tst
 Manual/envelope.tst
 Manual/equidimMax.tst
 Manual/execute.tst
-Manual/exgcdN.tst
 Manual/extendring.tst
 Manual/farey.tst
 Manual/findTorsion.tst
@@ -1438,6 +1435,5 @@ Manual/ellipticcovers.tst
 Manual/multiDegBasis.tst
 Manual/graver4ti2.tst
 Manual/hilbert4ti2.tst
-Manual/isPositive.tst
 Manual/markov4ti2.tst
 

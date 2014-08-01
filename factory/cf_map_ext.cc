@@ -2,14 +2,13 @@
 //*****************************************************************************
 /** @file cf_map_ext.cc
  *
- * @author Martin Lee
- * @date   16.11.2009
- *
  * This file implements functions to map between extensions of finite fields
  *
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
  *
+ * @author Martin Lee
+ * @date   16.11.2009
 **/
 //*****************************************************************************
 
@@ -165,7 +164,9 @@ CanonicalForm GF2FalphaHelper (const CanonicalForm& F, const Variable& alpha)
 CanonicalForm GF2FalphaRep (const CanonicalForm& F, const Variable& alpha)
 {
   Variable beta= rootOf (gf_mipo);
-  return GF2FalphaHelper (F, beta) (alpha, beta);
+  CanonicalForm result= GF2FalphaHelper (F, beta) (alpha, beta);
+  prune (beta);
+  return result;
 }
 
 /// change representation by residue classes modulo a Conway polynomial
@@ -339,11 +340,15 @@ primitiveElement (const Variable& alpha, Variable& beta, bool fail)
   CanonicalForm mipo2;
   primitive= false;
   fail= false;
+  bool initialized= false;
   do
   {
     BuildIrred (NTL_mipo, d);
     mipo2= convertNTLzzpX2CF (NTL_mipo, Variable (1));
-    beta= rootOf (mipo2);
+    if (!initialized)
+      beta= rootOf (mipo2);
+    else
+      setMipo (beta, mipo2);
     primitive= isPrimitive (beta, fail);
     if (primitive)
       break;

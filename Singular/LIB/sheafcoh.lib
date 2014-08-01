@@ -115,21 +115,6 @@ static proc TensorModuleMult(int m, module M)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static proc max(int i,int j)
-{
-  if(i>j){return(i);}
-  return(j);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-static proc min(int i,int j)
-{
-  if(i>j){return(j);}
-  return(i);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 proc truncate(module phi, int d)
 "USAGE:   truncate(M,d);  M module, d int
 ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree

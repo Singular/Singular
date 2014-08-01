@@ -545,7 +545,7 @@ int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
     FALSE,
     setRingGlobal
   );
-  return 0;
+  return MAX_TOK;
 }
 
 /* #else
