@@ -223,6 +223,7 @@ Short/primitiv_s.tst
 ;;;;;;;;;;;;;;;;;;;; Short/pyobject.tst
 Short/qhw_s.tst
 Short/quotient_s.tst
+Short/randomIdeal.tst
 Short/rcyclic_13_32003_lp.tst
 Short/rcyclic_14_32003_lp.tst
 Short/rcyclic_15_32003_lp.tst

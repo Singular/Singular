@@ -1,0 +1,736 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+version="$Id$";
+category="Test utilities";
+info="
+LIBRARY:  randomIdeal.lib      construction of random ideal generators
+
+AUTHORS:  J. Kroeker, kroeker@math.uni-hannover.de
+
+
+
+PROCEDURES:
+
+   
+   defaultIdealGenerator()            create a random ideal generator with default settings
+   defaultIdealGeneratorParams()      get  default settings for ideal generator construction
+   idealGeneratorFromParams(params)   create a random ideal generator with custom settings
+   polyGeneratorFromParams(params)    create a random polynomial generator with custom settings
+   randomVariable()                   get random ring parameter or varible
+   createRandomCoeffGenerator(..)     create a generator for random coefficients
+   createRandomMonomialGenerator(..)  create a generator for random monomials
+   createRandomTermGenerator(..)      create a generator for random polynomial terms
+   createRandomPolyGenerator(..)      create a generator for random polynomials
+   createRandomIdealGenerator(..)     create a generator for random ideals
+
+";
+
+LIB "random.lib";
+LIB "ring.lib";
+
+// define struct TIdealGeneratingParameters, used by the 'randomIdeal' library later on
+proc mod_init()
+{
+    if (not defined(TIdealGeneratingParameters_def) )
+    {
+      int TIdealGeneratingParameters_def=0;
+      newstruct("TIdealGeneratingParameters","int absMaxCoeff,int bFractionsOn, int minMonomialDegree, int maxMonomialDegree, int maxTermsPerGen, int maxGens ");
+    }
+}
+
+
+
+proc randomVariable()
+"USAGE:   randomVariable( );
+RETURN:   random basering parameter or varible
+"
+{
+    int pos =  random(1, npars(basering)+ nvars(basering) );
+    if (pos>npars(basering))
+    {
+        return ( var(  pos-npars(basering) ) );
+    }
+    else
+    {
+        return ( par(pos) );
+    }
+}
+
+// return   index i such that par(i)==variable or 0 if variable is not a basering parameter
+static proc getParIdx(variable)
+{
+   int numPars = npars(basering);
+   int i;
+   for ( i=1; i<=numPars; i++ )
+   {
+       if ( variable==par(i) ) 
+       { 
+            return(i); 
+       }       
+   }
+   return (0);
+}
+
+
+// check if passed variable is a basering parameter
+static proc isParameter(variable)
+{
+   return ( getParIdx(variable)>0);
+}
+
+// check if passed variable is a basering variable
+static proc isVariable(variable)
+{
+   return ( rvar(variable)>0);
+}
+
+
+static proc testRandomVariable()
+{
+    ring rng = (0,a,b,c),(x,y),dp;
+    int numPars = npars(basering);
+    int numVars = nvars(basering);
+    intmat mp [1][numPars];
+    intmat mv [1][numVars];
+    int i,j,k;
+    for ( i=1; i<1000; i++ )
+    {
+        if (defined(unknown)) {kill unknown;}
+        poly unknown = randomVariable();
+
+        if ( isParameter(unknown) )  
+        {
+               ASSUME(0, (getParIdx(unknown)>0) and (getParIdx(unknown)<=numPars));
+               mp[1, getParIdx(unknown) ] = int(1) ;
+        }
+        else
+        {
+           if ( isVariable(unknown)  )  
+           { 
+             ASSUME(0, (rvar(unknown)>0) and (rvar(unknown)<=numVars));
+             mv[1, rvar(unknown) ] = int(1);
+           }
+           else
+           {
+                ERROR("unknown is neither variable nor parameter");
+           }           
+        }        
+    }
+    for ( i=1; i<=numPars; i++ )
+    {
+        ASSUME(0,  mp[1,i] == int(1) );
+    }
+    for ( i=1; i<=numVars; i++ )
+    {
+        ASSUME(0,  mv[1,i] == int(1) );
+    }
+}
+
+
+
+static proc getRandomProcName(string prefix)
+"USAGE:   getRandomProcName( prefix);
+@*
+RETURN:   random non defined procedure name with given prefix
+"
+{
+
+   string name = prefix + string(random(1,1000000000));
+
+   while (  defined(`name`) ) 
+   {
+       name = prefix  + string(random(1,1000000000));
+   }
+  
+   return( name );
+}
+
+proc createRandomZCoeffGenerator(pAbsMaxCoeff, bExcludeZero)
+"USAGE:   createRandomZCoeffGenerator( absMaxCoeff, bExcludeZero);
+@*        absMaxCoeff: int
+RETURN:   a random coefficient 'generator' with coefficients in {-absMaxCoeff, absMaxCoeff}
+"
+{
+     if (bExcludeZero)  
+     {
+         ASSUME(0, pAbsMaxCoeff>0); 
+     }
+     string cmd = "proc rCoeff(    )
+     {
+        number c = random( -" + string(pAbsMaxCoeff) + "," + string(pAbsMaxCoeff) + " ); 
+        if (" + string(bExcludeZero) + ")  
+        {
+            while (c==0)  
+            {
+                 c = random( -" + string(pAbsMaxCoeff) + "," + string(pAbsMaxCoeff) + " ); 
+            } 
+        }
+        return(c);
+     }";
+
+    execute(cmd);
+    return (rCoeff);
+}
+
+
+
+proc createRandomQCoeffGenerator(pAbsMaxCoeff, bExcludeZero, bFractionsOn)
+"USAGE:   createRandomQCoeffGenerator( absMaxCoeff, bExcludeZero, bFractionsOn);
+@*        absMaxCoeff: int
+RETURN:   a random coefficient 'generator' with coefficients in {-absMaxCoeff, absMaxCoeff}
+"
+{
+     if (bExcludeZero)  
+     {
+         ASSUME(0, pAbsMaxCoeff>0); 
+     }
+     string cmd = "proc rCoeff(    )
+     {
+        number c = random( -" + string(pAbsMaxCoeff) + "," + string(pAbsMaxCoeff) + " ); 
+        number d = random( 1," + string(pAbsMaxCoeff) + " );  
+        if (" + string(bExcludeZero) + ")  
+        {
+            while (c==0)  
+            {
+                 c = random( -" + string(pAbsMaxCoeff) + "," + string(pAbsMaxCoeff) + " );
+            }
+        }
+        if (" + string(bFractionsOn) + ") {        c = c / d; }
+        return(c);
+     }";
+
+    execute(cmd);
+    return (rCoeff);
+}
+
+
+proc createRandomCoeffGenerator(pAbsMaxCoeff, bExcludeZero, bFractionsOn)
+"USAGE:   createRandomCoeffGenerator( absMaxCoeff, bExcludeZero,bFractionsOn);
+@*        absMaxCoeff: int
+RETURN:   a random coefficient 'generator' with coefficients in {-absMaxCoeff, absMaxCoeff}
+"
+{
+     string cmd = "proc rCoeff(    )
+     {
+        proc rCoefGen;
+        if (char(basering)==0)
+        {
+            if ( hasFieldCoefficient(basering) )
+            {
+                rCoefGen = createRandomQCoeffGenerator(" + string(pAbsMaxCoeff) + "," + string(bExcludeZero)+"," + string(bFractionsOn)+") ;
+            }
+            else
+            {
+                rCoefGen = createRandomZCoeffGenerator(" + string(pAbsMaxCoeff) + "," + string(bExcludeZero)+"  );
+            }
+        }
+        else
+        {
+            rCoefGen = createRandomZCoeffGenerator(" + string(pAbsMaxCoeff) + "," + string(bExcludeZero)+"  );
+        }
+        return(rCoefGen());
+     }";
+     execute(cmd);
+     return (rCoeff);
+}
+
+
+proc createRandomCoeffMatrixGenerator(rows,cols, pAbsMaxCoeff)
+"USAGE:   createRandomCoeffMatrixGenerator(cols,rows, absMaxCoeff);
+@*        rows: int, matrix rows
+@*        cols: int, matrix cols
+@*        absMaxCoeff: int
+RETURN:   a random matrix 'generator' with entries in {-absMaxCoeff, absMaxCoeff}
+"
+{
+     ASSUME(0, cols>0);
+     ASSUME(0, rows>0);
+     string cmd = "proc rCoeffMat(    )
+     {
+        ASSUME(0, defined(basering) );
+        intmat mat = sparsemat("+string(rows)+","+string(cols)+",random(0,100),"+string(pAbsMaxCoeff)+");
+        return(mat);
+     }";
+
+    execute(cmd);
+    return (rCoeffMat);
+}
+
+
+
+static proc testRandomCoeffGenerator()
+{
+    ring rng = 0,x,dp;
+    int absMaxCoeff = 10;
+    int bExcludeZero=0;
+    nit bFractionsOn = 0;
+    proc coeffG = createRandomCoeffGenerator( absMaxCoeff, bExcludeZero,bFractionsOn );
+    int i;
+    intmat m [1][2*absMaxCoeff+1];
+    number coeff ;
+    for ( i=1; i<10000; i++ )
+    {
+        coeff =  coeffG();
+        ASSUME(0, coeff <=absMaxCoeff and coeff >=- absMaxCoeff );
+        m[1,int(coeff)+absMaxCoeff+1]=int(1);
+    }
+    for ( i=1; i<=2*absMaxCoeff+1; i++ )
+    {
+        ASSUME(0,  m[1,int(coeff)+absMaxCoeff+1] == int(1) );
+    }
+}
+
+
+
+proc createRandomMonomialGenerator(pMinMonomialDegree,  pMaxMonomialDegree )
+"USAGE:   createRandomMonomialGenerator( pMinMonomialDegree, pMaxMonomialDegree );
+@*        pMinMonomialDegree: int (expected >=0)
+@*        pMaxMonomialDegree: int (expected >=0)
+RETURN:   a random monomial generator, with monomials not exceeding pMaxMonomialDegree
+"
+{
+     ASSUME(0, pMaxMonomialDegree>=0 );
+     ASSUME(0, pMinMonomialDegree>=0 );
+     string cmd = "proc rMon(    )
+     {
+        ASSUME(0, defined(basering) );
+        poly tmpMonomial = 1; 
+
+        int monomialDegree = random( "+ string(pMinMonomialDegree) +", " + string(pMaxMonomialDegree) + ") ;
+
+        int factorNr;
+        for ( factorNr = 1; factorNr <= monomialDegree ; factorNr++)
+        {
+             tmpMonomial = tmpMonomial* randomVariable() ;
+        }
+        return(tmpMonomial);
+    }";
+
+    execute(cmd);
+    return (rMon);
+}
+
+
+proc createRandomMonomialMatrixGenerator(rows,cols, pMinMonomialDegree, pMaxMonomialDegree)
+"USAGE:   createRandomCoeffMatrixGenerator(cols,rows, pMinMonomialDegree, pMaxMonomialDegree);
+@*        rows: int, matrix rows
+@*        cols: int, matrix cols
+@*        absMaxCoeff: int
+RETURN:   a random matrix 'generator' with entries in {-absMaxCoeff, absMaxCoeff}
+"
+{
+  
+     ASSUME(0, cols>0);
+     ASSUME(0, rows>0);
+     string cmd = "proc rMonomialMat(    )
+     {
+        ASSUME(0, defined(basering) );
+        proc monGvys345g = createRandomMonomialGenerator("+string(pMinMonomialDegree)+","+string(pMaxMonomialDegree)+");
+        matrix mat42349523463454534553267404["+string(rows)+"]["+string(cols)+"] ;
+        int i,j;
+        for (i=1;i<="+string(rows)+";i++)
+        {
+            for (j=1;j<="+string(cols)+";j++)
+            {
+               mat42349523463454534553267404[i,j] = monGvys345g();
+            }
+        }
+        return(mat42349523463454534553267404);
+     }";
+
+    execute(cmd);
+    return (rMonomialMat);
+}
+
+
+static proc testRandomMonomialGenerator()
+{
+    ring rng = 0,x,dp;
+    int maxDegree = 10;
+    int minDegree = 1; 
+    proc monomialG = createRandomMonomialGenerator(1, maxDegree);
+    int i;
+    intmat m[1][maxDegree+1];
+    poly rndMonomial;
+    int monDegree;
+    for ( i=1; i<1000; i++ )
+    {
+        rndMonomial =  monomialG();
+        monDegree = deg(rndMonomial);
+        ASSUME(0, monDegree >=minDegree );
+        ASSUME(0, monDegree <=maxDegree );
+        m[1,monDegree+1]=int(1);
+    }
+    int one = 1;
+    for ( i=2; i<=maxDegree+1; i++ )
+    {
+        ASSUME(0,  m[1,i] ==one );
+        ASSUME(0,  m[1,i] ==int(1) );
+    }
+}
+
+
+
+proc createRandomTermGenerator(  pCoeffGen, pMonomialGen )
+"USAGE:   createRandomTermGenerator( coeffGenerator, monomialGenerator );
+@*        coeffGenerator   : a random coefficient generator function
+@*        monomialGenerator: a random monomial generator function
+RETURN:   a random Term generator, ( randomCoefficient*randomMonomial )
+"
+{
+  
+     string randomCoeffGenName = getRandomProcName("coeffGen");
+     string randomMonomialGenName = getRandomProcName("monomialGen");
+
+     string cmd = "    
+     proc "+randomCoeffGenName+"=pCoeffGen;   
+     proc "+randomMonomialGenName+"=pMonomialGen;
+     export("+randomCoeffGenName+");
+     export("+randomMonomialGenName+");
+     proc randomTerm(    )
+     {
+        ASSUME(0, defined(basering) );
+        number coeff = RandomIdeal::"+randomCoeffGenName+"(  );       
+        poly tmpMonomial = coeff*RandomIdeal::"+randomMonomialGenName+"(  );
+        return(tmpMonomial);
+    }";
+
+    execute(cmd);
+    return (randomTerm);
+}
+
+static proc testRandomTermGenerator()
+{
+    ring rng = 0,x,dp;
+    int maxDegree = 10;
+    int minDegree = 1;
+    int absMaxCoeff = 15;
+    int bExcludeZero = minDegree>0;
+    int bFractionsOn = 1;
+    proc coeffG = createRandomCoeffGenerator(absMaxCoeff, bExcludeZero,bFractionsOn);
+    proc monomialG = createRandomMonomialGenerator(minDegree, maxDegree);
+    proc termG = createRandomTermGenerator(coeffG,monomialG);
+    int i;
+ 
+    poly rndTerm;
+ 
+    for ( i=1; i<1000; i++ )
+    {
+        rndTerm =  termG();
+        ASSUME(0, (leadcoef(rndTerm)>= -absMaxCoeff) and  (leadcoef(rndTerm)<= absMaxCoeff) );
+        ASSUME(0,  (deg(rndTerm)<= maxDegree) );
+    }
+}
+
+proc monomialExists(poly pol, poly term)
+{
+   ASSUME(0, size(term)<=1);
+   int i;
+   for (i = 1; i<=size(pol); i++)
+   {
+       if ( leadexp(pol[i])==leadexp(term) )
+       {
+            return(1);
+       }
+   }
+   return(0);
+}
+
+
+
+proc createRandomPolyGenerator( randomTermGenerator, minDegree, maxDegree, maxTerms )
+"USAGE:   createRandomPolyGenerator( randomTermGenerator, minDegree, maxDegree, maxTerms );
+@*        termGenerator   : a random term generator function
+@*        maxTerms: int, max number of polynomial summands
+RETURN:   a random polynomial generator
+"
+{
+    ASSUME(0, maxTerms >= 0 );
+    string randomTermGeneratorName = getRandomProcName("termG");
+
+    string cmd = "
+    proc "+randomTermGeneratorName+"=randomTermGenerator;
+    export("+randomTermGeneratorName+");
+    proc randomPolyGenerator( ) 
+    {
+        ASSUME(0, defined(basering) );
+        poly term,pol;    
+        int termMonomials = random( 1 , "+string(maxTerms)+" );
+        int monomialcount = 0;
+        // cannot check size(term)>=termMonomials, since it may be impossible to reach that number.
+        while ( monomialcount <= termMonomials or (deg(term)<"+string(minDegree)+") )
+        {
+            term = RandomIdeal::"+randomTermGeneratorName+"( );
+            if (not (monomialExists(pol,term)))
+            {
+                pol = pol + term;
+            }
+            monomialcount = monomialcount+1;
+        }
+        return(pol);
+    }";
+
+    execute(cmd);
+    return (randomPolyGenerator);
+}
+
+
+
+proc createRandomPolyGenerator2( absMaxCoeff, minDegree, maxDegree, maxTerms )
+"USAGE:   createRandomPolyGenerator( randomTermGenerator,minDegree, maxDegree, maxTerms );
+@*        termGenerator   : a random term generator function
+@*        maxTerms: int, max number of polynomial summands
+RETURN:   a random polynomial generator
+"
+{
+
+    ASSUME(0, maxTerms >= 0 );
+    string cmd = "
+    proc randomPolyGenerator( ) 
+    {
+        ASSUME(0, defined(basering) );
+        proc mc52345529345805 = createRandomCoeffMatrixGenerator(1,"+string(maxTerms)+","+string(absMaxCoeff)+");
+        proc mm52345529345805 = createRandomMonomialMatrixGenerator("+string(maxTerms)+",1,"+string(minDegree)+","+string(maxDegree)+");
+        matrix prod = mc52345529345805()*mm52345529345805();
+        poly term =prod[1,1];
+        return(term);
+    }";
+
+    execute(cmd);
+    return (randomPolyGenerator);
+}
+
+
+static proc testRandomPolyGenerator()
+{
+    ring rng = 0,x,dp;
+    int maxDegree = 3;
+    int minDegree = 3;
+    int absMaxCoeff = 15;
+    int maxTerms = 5;
+    int bExcludeZero = minDegree>0;
+    int bFractionsOn = 1;
+    //dbprint(1,"bExcludeZero",bExcludeZero);
+    proc coeffG = createRandomCoeffGenerator(absMaxCoeff, bExcludeZero, bFractionsOn);
+    proc monomialG = createRandomMonomialGenerator(minDegree, maxDegree);
+    proc termG = createRandomTermGenerator(coeffG, monomialG);
+    proc polyG = createRandomPolyGenerator(termG, minDegree, maxDegree, maxTerms);
+    proc polyG2 = createRandomPolyGenerator2( absMaxCoeff, minDegree, maxDegree, maxTerms );
+    int i;
+ 
+    poly rndPoly;
+    int degree1 ;
+    for ( i=1; i<500; i++ )
+    {
+        rndPoly =  polyG();   
+        degree1 =  deg(rndPoly);
+        /*
+            dbprint(1,"rndPoly=",rndPoly);
+            dbprint(1,"voice=",voice);
+            dbprint(1,"size(rndPoly)=",size(rndPoly));
+            dbprint(1,"deg(rndPoly)=",deg(rndPoly));
+
+            dbprint(1,"degree1=",rndPoly);
+            dbprint(1,"minDegree=",minDegree);
+        */
+        //ASSUME(0,  (minDegree <= (deg(rndPoly))) ); // enabling this line causes an different error!!     
+        ASSUME(0,  (deg(rndPoly)== degree1) );
+        ASSUME(0,  (deg(rndPoly)== minDegree) );
+        ASSUME(0,  degree1 >= minDegree );  // ok 
+        ASSUME(0,  (deg(rndPoly)>= minDegree) ); // equivalent statement as above, but fails sometime.
+        
+        ASSUME(0,  (deg(rndPoly)<= maxDegree) );
+
+        ASSUME(0,  (size(rndPoly)<= maxTerms) );
+        ASSUME(0,  leadcoef(rndPoly) >= (-maxTerms*absMaxCoeff) );
+        ASSUME(0,  leadcoef(rndPoly)<= ( maxTerms*absMaxCoeff) ) ;
+
+        rndPoly =  polyG2() ;     
+        ASSUME(0,  (deg(rndPoly)>= minDegree) );
+        ASSUME(0,  (deg(rndPoly)<= maxDegree) );
+        ASSUME(0,  (size(rndPoly)<= maxTerms) );
+        ASSUME(0,  leadcoef(rndPoly) >= (-maxTerms*absMaxCoeff) );
+        ASSUME(0,  leadcoef(rndPoly)<= ( maxTerms*absMaxCoeff) ) ;
+    }
+}
+
+
+
+proc createRandomIdealGenerator(  polyGen, maxGens )
+"USAGE:   createRandomIdealGenerator( randomPolyGenerator, maxGens );
+@*        randomPolyGenerator   : a random polynomial generator function
+@*        maxGens: int, max number of ideal generators
+RETURN:   a random ideal generating function
+"
+{
+
+     string randomPolyGeneratorName = getRandomProcName("polyGen");
+
+     string cmd = "
+     proc "+randomPolyGeneratorName+"=polyGen;
+     export("+randomPolyGeneratorName+");
+
+     proc randomIdealGenerator( ) 
+     {
+         ASSUME(0, defined(basering) );
+         int numGens= random(1, "+string(maxGens)+");
+
+         ideal rndIdeal;
+         int generatorId;
+
+         for (generatorId = numGens; generatorId >= 1; generatorId--)
+         {
+            rndIdeal[generatorId] =RandomIdeal::"+randomPolyGeneratorName+"(); ;
+         }  
+         return (rndIdeal);
+     }
+    ";
+
+    execute(cmd);
+    return (randomIdealGenerator);
+}
+
+
+static proc testRandomIdealGenerator()
+{
+    ring rng = 0,x,dp;
+    int maxDegree = 10;
+    int minDegree = 1;
+    int absMaxCoeff = 15;
+    int maxTerms = 5;
+    int maxNumGens=4;
+    int bExcludeZero = minDegree>0;
+    int bFractionsOn =1;
+    proc coeffG = createRandomCoeffGenerator(absMaxCoeff,bExcludeZero,bFractionsOn);
+    proc monomialG = createRandomMonomialGenerator( minDegree, maxDegree );
+    proc termG = createRandomTermGenerator(coeffG,monomialG);
+    proc polyG = createRandomPolyGenerator(termG, minDegree, maxDegree, maxTerms);
+
+    proc idealG = createRandomIdealGenerator( polyG, maxNumGens );
+
+    int i;
+ 
+    ideal rndideal;
+ 
+    for ( i=1; i<1000; i++ )
+    {
+        rndideal =  idealG();
+        ASSUME(0,  size(rndideal) <=maxNumGens );
+    }
+}
+
+
+
+
+proc defaultIdealGeneratorParams()
+"USAGE:   defaultIdealGeneratorParams(   );
+
+RETURN:   default params(TIdealGeneratingParameters) for constructing an ideal generating function,
+@*   params.absMaxCoeff = 15;
+@*   params.bFractionsOn = 1;
+@*   params.minMonomialDegree = 0;
+@*   params.maxMonomialDegree = 3;
+@*   params.maxTermsPerGen = 4;
+@*   params.maxGens = 4;
+"
+{
+   TIdealGeneratingParameters params;
+   params.absMaxCoeff = 15;
+   params.bFractionsOn = 1;
+   params.minMonomialDegree = 0;
+   params.maxMonomialDegree = 3;
+   params.maxTermsPerGen = 4;
+   params.maxGens = 4;
+   return(params);
+}
+
+
+
+proc idealGeneratorFromParams(TIdealGeneratingParameters params)
+"USAGE:   idealGeneratorFromParams( params );
+@*        params   : TIdealGeneratingParameters , construction parameters
+RETURN:   a random ideal generating function 
+"
+{
+       int bExcludeZero =  params.minMonomialDegree>0;
+       proc coeffG    = createRandomCoeffGenerator   ( params.absMaxCoeff, bExcludeZero , params.bFractionsOn );
+       proc monomialG = createRandomMonomialGenerator( params.minMonomialDegree, params.maxMonomialDegree );
+       proc termG     = createRandomTermGenerator    ( coeffG, monomialG );
+       proc polyG     = createRandomPolyGenerator    ( termG,  params.minMonomialDegree, params.maxMonomialDegree , params.maxTermsPerGen );
+       proc idealG    = createRandomIdealGenerator   ( polyG, params.maxGens );
+
+      return (idealG);
+}
+example
+{
+    ring rng = integer,(x,y),dp;
+          
+    TIdealGeneratingParameters genParams= defaultIdealGeneratorParams();
+    // adjust random ideal generator params:
+
+    genParams.maxGens=1; 
+
+    genParams.absMaxCoeff = 15;
+    genParams.minMonomialDegree = 2;
+    genParams.maxMonomialDegree = 3;
+    genParams.maxTermsPerGen = 4;
+    genParams.maxGens = 1;
+    proc idealG = idealGeneratorFromParams( genParams  );
+
+    //  generate a random ideal with parameters as above:
+    idealG();
+}
+
+proc polyGeneratorFromParams(TIdealGeneratingParameters params)
+"USAGE:   polyGeneratorFromParams( params );
+@*        params   : TIdealGeneratingParameters , construction parameters
+RETURN:   a random poly generating function 
+"
+{
+       int bExcludeZero =  params.minMonomialDegree>0;
+       proc coeffG    = createRandomCoeffGenerator   ( params.absMaxCoeff, bExcludeZero, params.bFractionsOn);
+       proc monomialG = createRandomMonomialGenerator( params.minMonomialDegree, params.maxMonomialDegree );
+       proc termG     = createRandomTermGenerator    ( coeffG, monomialG );
+       proc polyG     = createRandomPolyGenerator    ( termG, params.minMonomialDegree, params.maxMonomialDegree, params.maxTermsPerGen );
+      return (polyG);
+}
+example
+{
+    ring rng = integer,(x,y),dp;
+          
+    TIdealGeneratingParameters genParams= defaultIdealGeneratorParams();
+    // adjust random ideal generator params:
+    proc polyG = polyGeneratorFromParams( genParams  );
+
+    //  generate a random poly:
+    polyG();
+}
+ 
+
+
+
+proc defaultIdealGenerator( )
+"USAGE:   defaultIdealGenerator(   );
+RETURN:   get a random ideal generating function with default settings (see defaultIdealGeneratorParams())
+"
+proc defaultIdealGenerator()
+{
+       TIdealGeneratingParameters params= defaultIdealGeneratorParams();
+       return( idealGeneratorFromParams(params) ) ;
+     
+}
+example
+{
+    ring rng = integer,(x,y),dp;
+    
+    // get a default random ideal generator:
+    proc idealG = defaultIdealGenerator( );
+
+    // generate a random ideal:
+    idealG();
+}
+
+
+
+
+
