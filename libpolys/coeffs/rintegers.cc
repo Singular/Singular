@@ -372,7 +372,7 @@ static const char * nlEatLongC(char *s, mpz_ptr i)
 }
 
 
-CanonicalForm nrzConvSingNFactoryN(number n, BOOLEAN setChar, const coeffs /*r*/)
+static CanonicalForm nrzConvSingNFactoryN(number n, BOOLEAN setChar, const coeffs /*r*/)
 {
   if (setChar) setCharacteristic( 0 );
 
@@ -383,7 +383,7 @@ CanonicalForm nrzConvSingNFactoryN(number n, BOOLEAN setChar, const coeffs /*r*/
   return term;
 }
 
-number nrzConvFactoryNSingN(const CanonicalForm n, const coeffs r)
+static number nrzConvFactoryNSingN(const CanonicalForm n, const coeffs r)
 {
   if (n.isImm())
     return nrzInit(n.intval(),r);
