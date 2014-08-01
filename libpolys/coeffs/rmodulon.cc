@@ -742,6 +742,29 @@ number nrnMapZ(number from, const coeffs src, const coeffs dst)
   }
   return nrnMapGMP(from,src,dst);
 }
+#elif SI_INTEGER_VARIANT==1
+number nrnMapZ(number from, const coeffs src, const coeffs dst)
+{
+  return nrnMapQ(from,src,dst);
+}
+#endif
+#if SI_INTEGER_VARIANT!=2
+void nrnWrite (number &a, const coeffs)
+{
+  char *s,*z;
+  if (a==NULL)
+  {
+    StringAppendS("o");
+  }
+  else
+  {
+    int l=mpz_sizeinbase((int_number) a, 10) + 2;
+    s=(char*)omAlloc(l);
+    z=mpz_get_str(s,10,(int_number) a);
+    StringAppendS(z);
+    omFreeSize((ADDRESS)s,l);
+  }
+}
 #endif
 
 number nrnMapQ(number from, const coeffs src, const coeffs dst)
@@ -764,7 +787,7 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
   {
     return nrnMapZ;
   }
-  if ((src->rep==n_rep_gap_rat) && nCoeff_is_Q(src))
+  if (src->rep==n_rep_gap_rat) /*&& nCoeff_is_Q(src)) or Z*/
   {
     return nrnMapQ;
   }

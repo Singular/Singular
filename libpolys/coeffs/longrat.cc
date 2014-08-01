@@ -2900,9 +2900,10 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
 
 }
 
-static char* nlCoeffString(const coeffs)
+static char* nlCoeffString(const coeffs r)
 {
-  return omStrDup("0");
+  if (r->cfDiv==nlDiv) return omStrDup("0");
+  else                 return omStrDup("integer");
 }
 
 #define SSI_BASE 16
@@ -3033,6 +3034,15 @@ char * nlCoeffName(const coeffs r)
   else                 return (char*)"ZZ";
 }
 
+static number nlLcm(number a,number b,const coeffs r)
+{
+  number g=nlGcd(a,b,r);
+  number n1=nlMult(a,b,r);
+  number n2=nlDiv(n1,g,r);
+  nlDelete(&g,r);
+  nlDelete(&n1,r);
+  return n2;
+}
 
 BOOLEAN nlInitChar(coeffs r, void*p)
 {
@@ -3070,6 +3080,7 @@ BOOLEAN nlInitChar(coeffs r, void*p)
     r->cfIsUnit = nlIsUnit;
     r->cfGetUnit = nlGetUnit;
     r->cfQuot1 = nlQuot1;
+    r->cfLcm = nlLcm;
   }
   r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;

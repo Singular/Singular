@@ -48,7 +48,11 @@ number  nrnExtGcd      (number a, number b, number *s, number *t, const coeffs r
 number  nrnXExtGcd      (number a, number b, number *s, number *t, number *u, number *v, const coeffs r);
 number  nrnQuotRem      (number a, number b, number *s, const coeffs r);
 nMapFunc nrnSetMap     (const coeffs src, const coeffs dst);
+#if SI_INTEGER_VARIANT==2
 #define  nrnWrite      nrzWrite
+#else
+void nrnWrite (number &a, const coeffs);
+#endif
 const char *  nrnRead  (const char *s, number *a, const coeffs r);
 void     nrnCoeffWrite (const coeffs r, BOOLEAN details);
 #ifdef LDEBUG

@@ -73,8 +73,8 @@ optional:
 -cfExactDiv (otherwise: it is cfDiv): for optimization. Behaviour undefined if 
   the division does not work
 -cfSize (otherwise: !cfIsZero(..))
-  Question: is this a mathematical size or a printing size? ie. what is the use
-  for it?
+  should measure the complexity, used for pivot strategies etc.
+  Required: size(0)==0, size(a)>0 for a!=0
 -cfRePart (otherwise: cfCopy)
 -cfImPart (otherwise returns cfInit(0))
 -cfWriteShort (otherwise: cfWriteLong)

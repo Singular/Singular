@@ -127,7 +127,7 @@ number nrzCopyMap(number a, const coeffs /*src*/, const coeffs dst)
 int nrzSize(number a, const coeffs)
 {
   if (a == NULL) return 0;
-  return sizeof(mpz_t);
+  return ((mpz_ptr)a)->_mp_alloc;
 }
 
 /*
@@ -540,6 +540,12 @@ static inline number nrz_short(number x)
 }
 
 
+int nrzSize(number a, const coeffs)
+{
+  if (a == NULL) return 0;
+  if (n_Z_IS_SMALL(a)) return 1;
+  return ((mpz_ptr)a)->_mp_alloc;
+}
 
 
 /*
@@ -648,25 +654,26 @@ number nrzLcm (number a, number b, const coeffs R)
     int g = int_gcd(SR_TO_INT(a), SR_TO_INT(b));
     return nrzMult(a, INT_TO_SR(SR_TO_INT(b)/g), R);
   }
-  else if (n_Z_IS_SMALL(a))
-  {
-    erg = (int_number) omAllocBin(gmp_nrz_bin);
-    mpz_init_set(erg, (int_number) b);
-    unsigned long g = mpz_gcd_ui(NULL, erg, (unsigned long) ABS(SR_TO_INT(a)));
-    mpz_mul_si(erg, erg, SR_TO_INT(a)/g);
-  }
-  else if (n_Z_IS_SMALL(b))
-  {
-    erg = (int_number) omAllocBin(gmp_nrz_bin);
-    mpz_init_set(erg, (int_number) a);
-    unsigned long g = mpz_gcd_ui(NULL, erg, (unsigned long) ABS(SR_TO_INT(b)));
-    mpz_mul_si(erg, erg, SR_TO_INT(b)/g);
-  }
   else
   {
     erg = (int_number) omAllocBin(gmp_nrz_bin);
-    mpz_init(erg);
-    mpz_lcm(erg, (int_number) a, (int_number) b);
+    if (n_Z_IS_SMALL(a))
+    {
+      mpz_init_set(erg, (int_number) b);
+      unsigned long g = mpz_gcd_ui(NULL, erg, (unsigned long) ABS(SR_TO_INT(a)));
+      mpz_mul_si(erg, erg, SR_TO_INT(a)/g);
+    }
+    else if (n_Z_IS_SMALL(b))
+    {
+      mpz_init_set(erg, (int_number) a);
+      unsigned long g = mpz_gcd_ui(NULL, erg, (unsigned long) ABS(SR_TO_INT(b)));
+      mpz_mul_si(erg, erg, SR_TO_INT(b)/g);
+    }
+    else
+    {
+      mpz_init(erg);
+      mpz_lcm(erg, (int_number) a, (int_number) b);
+    }
   }
   return (number) erg;
 }
@@ -1692,7 +1699,7 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   r->cfGreaterZero = nrzGreaterZero;
   r->cfPower = nrzPower;
   r->cfGcd  = nrzGcd;
-  //r->cfLcm  = nrzLcm;
+  r->cfLcm  = nrzLcm;
   r->cfDelete= nrzDelete;
   r->cfSetMap = nrzSetMap;
   r->cfCoeffWrite = nrzCoeffWrite;
@@ -1715,6 +1722,11 @@ BOOLEAN nrzInitChar(coeffs r,  void *)
   return FALSE;
 }
 
+#elif SI_INTEGER_VARIANT == 1
+BOOLEAN nrzInitChar(coeffs r,  void *)
+{
+  return nlInitChar(r,(void*)1);
+}
 #else
 #error set SI_INTEGER_VARIANT
 #endif
