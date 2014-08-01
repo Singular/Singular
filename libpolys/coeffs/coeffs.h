@@ -270,9 +270,6 @@ struct n_Procs_s
    void    (*cfWriteFd)(number a, FILE *f, const coeffs r);
    number  (*cfReadFd)( s_buff f, const coeffs r);
 
-   /// For extensions (writes into global string buffer)
-   char *  (*cfName)(number n, const coeffs r);
-
    /// Inplace: a *= b
    void    (*cfInpMult)(number &a, number b, const coeffs r);
 

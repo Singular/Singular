@@ -45,7 +45,6 @@ number nAEQLcm          (number a, number b, const coeffs r);
 
 void    nAEQDelete       (number *a, const coeffs r);//
 number    nAEQSetMap      (number a, const coeffs r);//
-char*    nAEQName         (number a, const coeffs r);//
 void    nAEQInpMult      (number &a ,number b, const coeffs r);//
 void    nAEQCoeffWrite   (const coeffs r, BOOLEAN details);//
 

@@ -255,13 +255,6 @@ number    nAEQSetMap        (number a, const coeffs)
         return a;
 }
 */
-char*    nAEQName       (number, const coeffs)
-{
-    char* c=new char;
-    *c='c';
-
-    return c;
-}
 
 void    nAEQInpMult       (number &, number, const coeffs)
 {
@@ -331,7 +324,6 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
     r->cfLcm  = nAEQLcm; // ZU BEARBEITEN
     r->cfDelete= nAEQDelete;
     r->cfSetMap = npSetMap;
-    r->cfName = nAEQName;
     r->cfInpMult=nAEQInpMult; //????
     r->cfCoeffWrite=nAEQCoeffWrite; //????
 

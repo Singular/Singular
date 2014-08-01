@@ -349,13 +349,21 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
           }
           else if(pIsConstant((poly)input->data))
           {
-            output->name=ndName(pGetCoeff((poly)input->data), currRing->cf);
+            StringSetS("");
+            number n=(pGetCoeff((poly)input->data));
+            n_Write(n, currRing->cf);
+            (pGetCoeff((poly)input->data))=n;
+            output->name=StringEndS();
           }
         }
       }
       else if ((input->rtyp==NUMBER_CMD) && (input->name==NULL))
       {
-        output->name=ndName((number)input->data, currRing->cf);
+        StringSetS("");
+        number n=(number)input->data;
+        n_Write(n, currRing->cf);
+        input->data=(void*)n;
+        output->name=StringEndS();
       }
       else
       {
