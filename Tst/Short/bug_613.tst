@@ -5,9 +5,10 @@ LIB("ring.lib");
 
 proc isNthPrimitiveRoot(number root, int n)
 {
+   if (n>0) { ASSUME(0, "0" != string(minpoly) ); }
    if ( n==1 ) { return(1==root); }
    number m=root;
-   int i; //caution: if i is already globally defined, no warning...
+   int i; 
    for (i=2;i<n;i++)
    {
        m = m*root;
