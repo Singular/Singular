@@ -66,7 +66,7 @@ EXAMPLE: example primdecZ; shows an example
    }
 
 
-   if(deg(I[1]) == 0)
+   if(size(I)==1 && deg(I[1]) == 0)
    {
       ideal J = I;
    }
@@ -94,7 +94,6 @@ EXAMPLE: example primdecZ; shows an example
       setring Rhelp;
       number q=imap(R,q);
       //=== computes the primes occuring in a generator of I intersect Z
-
       list L = primefactors(q);
 
       list A;
@@ -170,13 +169,14 @@ EXAMPLE: example primdecZ; shows an example
             }
             i_sleep = system("sh", "sleep "+string(t));
          }
-
       }
       else
       {
          for(j=1;j<=size(L[2]);j++)
          {
-            A[size(A)+1] = modp(J, L[1][j], L[2][j]);
+            p=int(L[1][j]);
+            nu=int(L[2][j]);
+            A[size(A)+1] = modp(J, p,nu );
          }
       }
 
