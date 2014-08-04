@@ -61,6 +61,12 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
     poly p=p_One(r);
     for(int i=rVar(r);i>0;i--)
       p_SetExp(p,i,si_min(p_GetExp(f,i,r),p_GetExp(g,i,r)),r);
+    if (rField_is_Ring(r))
+    {
+      number c = p_GetCoeff(f,r);
+      number d = p_GetCoeff(g,r);
+      p_SetCoeff(p,n_Gcd(c,d,r->cf),r);
+    }
     p_Setm(p,r);
     return p;
 #if 0
@@ -87,6 +93,12 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
     poly h=f;
     for(int i=rVar(r);i>0;i--)
       p_SetExp(p,i,p_GetExp(g,i,r),r);
+    if (rField_is_Ring(r))
+    {
+      number c = p_GetCoeff(f,r);
+      number d = p_GetCoeff(g,r);
+      p_SetCoeff(p,n_Gcd(c,d,r->cf),r);
+    }
     while(h!=NULL)
     {
       for(int i=rVar(r);i>0;i--)
