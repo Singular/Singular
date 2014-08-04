@@ -5925,6 +5925,8 @@ the first argument.
 @item @strong{Note:}
 The random generator can be set to a startvalue with
 the function @code{system}, resp.@: by a command line option.
+@*Internally a random generator with values in  1 to 2^31 - 2
+and a full period is used, max-min may not be larger than 2^31-2.
 @item @strong{Example:}
 @smallexample
 @c example

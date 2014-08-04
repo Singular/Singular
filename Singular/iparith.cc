@@ -2990,6 +2990,7 @@ static BOOLEAN jjRANDOM(leftv res, leftv u, leftv v)
 {
   int i=(int)(long)u->Data();
   int j=(int)(long)v->Data();
+  if (j-i <0) {WerrorS("invalid range for random"); return TRUE;}
   res->data =(char *)(long)((i > j) ? i : (siRand() % (j-i+1)) + i);
   return FALSE;
 }
