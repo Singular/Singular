@@ -4102,7 +4102,7 @@ static proc int_ass_primary_e(ideal i, int e)
 
 //computes the annihilator of Ext^n(R/i,R) with given resolution re
 //n is not necessarily the number of variables
-// !! borrowed correct code from 'ehv.lib::AnnExtEHV' by Kai Dehmann !! duplicate code!! (jk) 
+// !! borrowed correct code from 'ehv.lib::AnnExtEHV' by Kai Dehmann !! duplicate code!! (jk)
 
 static proc AnnExt_R(int n,list re)
 "USAGE:   AnnExt_R(n,re); n integer, re resolution
@@ -4140,7 +4140,7 @@ RETURN:  ideal, the annihilator of Ext^n(R/I,R) with given
       return(ann);
     }
 
-  ideal ann = ideal(1);  
+  ideal ann = ideal(1);
   return(ann);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -6731,7 +6731,7 @@ EXAMPLE: example equidimMaxEHV; shows an example
   ideal j=groebner(i);
   int cod=nvars(basering)-dim(j);
 
-  
+
   if(cod > nvars(basering))
     {
       dbprint(printlevel,"//If I is the entire ring...");
