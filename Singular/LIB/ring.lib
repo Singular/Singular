@@ -837,7 +837,8 @@ EXAMPLE: example rootofUnity; shows examples
   {
     ERROR(" the procedure works only with one ring parameter variable");
   }
-  if (n<1) {  ERROR(" cannot compute ("+string(n)+")-th primitive root of unity"); }
+  if (n<0) {  ERROR(" cannot compute ("+string(n)+")-th primitive root of unity"); }
+  if (n==0) { return(number(0));}
   number mp = par(1);
   if (n==1) { return(mp-1); }
   if (n==2) { return(mp+1); }
@@ -867,7 +868,7 @@ EXAMPLE: example rootofUnity; shows examples
   {
     if ( deg(@l[j]) == d) { @d[cnt]=@l[j]; cnt++; }
   }
-  
+
   j=1;
   int i;
   number pw;
@@ -886,23 +887,24 @@ EXAMPLE: example rootofUnity; shows examples
 
   setring OldRing;
 
-  list rl = ringlist( OldRing); 
+  list rl = ringlist( OldRing);
   while ( j<=@sized )
   {
      ASSUME(0, n%2 ==0);
      setring OldRing;
-     @rng = ring(rl);    
-     setring @rng; 
+     @rng = ring(rl);
+     setring @rng;
      list @rl = imap(@@rR,@d);
      number mp = leadcoef( @rl[j] );
      minpoly = mp;
      number mp = minpoly;
-     number pw = a^(n div 2);
+     number pw = par(1)^(n div 2);
      if ( (pw != 1) || n==1 )  {  break;  }
      j = j+1;
   }
   setring OldRing;
-  mp = imap(@rng,mp);
+  list @rl=imap(@@rR,@d);
+  mp = leadcoef( @rl[j] );
   kill @@rR;
   return(mp);
 }
