@@ -824,7 +824,7 @@ static proc splitCharp(list l)
           rp=delete(rp,1);
           keep1=keep1+rp;
 
-          option(noredSB);
+          option(set,op);
         }
         kill RL;
       }
@@ -6932,7 +6932,7 @@ EXAMPLE: example newDecompStep; shows an example
   ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
-  intvec op,@vv;
+  intvec op@P, op,@vv;
   def  @P = basering;
   list primary,indep,ltras;
   intvec @vh,isat,@w;
@@ -7064,7 +7064,9 @@ EXAMPLE: example newDecompStep; shows an example
 
   int lp=islp();
 
+  op@P = option(get);
   execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),(C,lp);");
+
   op=option(get);
   option(redSB);
 
@@ -7118,6 +7120,7 @@ EXAMPLE: example newDecompStep; shows an example
     if(size(fried)==nvars(basering))
     {
       setring @P;
+      option(set,op@P);
       primary[1]=i;
       primary[2]=i;
       if (intersectOption == "intersect")
@@ -7186,6 +7189,7 @@ EXAMPLE: example newDecompStep; shows an example
         intersection = @j;
       }
       setring @P;
+      option(set,op@P);
       if (intersectOption == "intersect")
       {
         return(list(imap(gnir,pr), imap(gnir,intersection)));
@@ -7203,6 +7207,7 @@ EXAMPLE: example newDecompStep; shows an example
   if (dim(@j)==-1)
   {
     setring @P;
+    option(set,op@P);
     primary=ideal(1),ideal(1);
     if (intersectOption == "intersect")
     {
@@ -7309,7 +7314,7 @@ EXAMPLE: example newDecompStep; shows an example
       }
       primary=resu;
     }
-    option(set,op);
+    option(set,op@P);
     if (intersectOption == "intersect")
     {
       return(list(primary, fetch(gnir,@j)));
@@ -7805,6 +7810,7 @@ EXAMPLE: example newDecompStep; shows an example
   //---------------------------------------------------------------------------
 
   setring @P;
+  option(set,op@P);
   primary=imap(gnir,quprimary);
 
   if (intersectOption == "intersect")
