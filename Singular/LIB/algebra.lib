@@ -586,6 +586,7 @@ EXAMPLE: example is_injective; shows an example
       map psi = S,proj;
       L[1] = size(NF(psi(ker),std(0))) == 0;
     }
+    setring bsr;
     if ( defined(pau) != voice )
     {  return (L[1]);
     }
