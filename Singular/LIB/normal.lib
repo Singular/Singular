@@ -2183,6 +2183,10 @@ EXAMPLE: example genus; shows an example
 "
 {
    ASSUME(0, not isQuotientRing(basering) );
+   if ( string(minpoly) !="0" ) 
+   {
+      ERROR("genus does not yet support extension fields");
+   }
 
    int w = printlevel-voice+2;  // w=printlevel (default: w=0)
 
@@ -2308,6 +2312,8 @@ EXAMPLE: example genus; shows an example
    }
    else
    {
+      short=0;
+      string smp = string(minpoly);
       if(dim(I)==0)
       {
          execute("ring Rhelp=("+charstr(R0)+"),(@s,@t),dp;");
@@ -2316,6 +2322,7 @@ EXAMPLE: example genus; shows an example
       {
          execute("ring Rhelp=("+charstr(R0)+"),(@s),dp;");
       }
+      execute("minpoly = "+smp+";");
       def newR=R+Rhelp;
       setring newR;
       ideal I=imap(R,I);
