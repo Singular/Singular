@@ -6688,7 +6688,6 @@ void kDebugPrint(kStrategy strat)
     else  Print("%p\n",(void*)strat->red);
   PrintS("posInT: ");
     if (strat->posInT==posInT0) PrintS("posInT0\n");
-    else if (strat->posInT==posInT0) PrintS("posInT0\n");
     else if (strat->posInT==posInT1) PrintS("posInT1\n");
     else if (strat->posInT==posInT11) PrintS("posInT11\n");
     else if (strat->posInT==posInT110) PrintS("posInT110\n");
