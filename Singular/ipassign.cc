@@ -205,6 +205,12 @@ static BOOLEAN jjMINPOLY(leftv, leftv a)
       return TRUE;
     }
   }
+  if ((rVar(currRing->cf->extRing)!=1)
+  && !n_IsZero((number)a->Data(), currRing->cf) )
+  {
+    WerrorS("only univarite minpoly allowed");
+    return TRUE;
+  }
 
   if ( currRing->idroot != NULL )
   {

@@ -545,7 +545,7 @@ EXAMPLE: example gauss_col; shows an example
    {
      def @R=changeord(list(list("C",0:1),list("dp",1:nvars(R))),R);
      setring @R; u=1;
-     execute("minpoly="+mp+";");
+     if (mp!="0") { execute("minpoly="+mp+";");}
      matrix A = imap(R,A);
      module M = A;
    }
