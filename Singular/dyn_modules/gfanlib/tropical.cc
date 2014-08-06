@@ -194,6 +194,10 @@ void tropical_setup(SModulFunctions* p)
   // p->iiAddCproc("","tropicalCurve0",FALSE,tropicalCurve0);
   // p->iiAddCproc("","tropicalCurve1",FALSE,tropicalCurve1);
   p->iiAddCproc("","tropicalStartingPoint",FALSE,tropicalStartingPoint);
+  p->iiAddCproc("","positiveTropicalStartingPoint",FALSE,positiveTropicalStartingPoint);
+  p->iiAddCproc("","nonNegativeTropicalStartingPoint",FALSE,nonNegativeTropicalStartingPoint);
+  p->iiAddCproc("","negativeTropicalStartingPoint",FALSE,negativeTropicalStartingPoint);
+  p->iiAddCproc("","nonPositiveTropicalStartingPoint",FALSE,nonPositiveTropicalStartingPoint);
   p->iiAddCproc("","tropicalStartingCone",FALSE,tropicalStartingCone);
   p->iiAddCproc("","tropicalVariety",FALSE,tropicalVariety);
 #endif //NDEBUG

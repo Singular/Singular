@@ -34,6 +34,15 @@ static bool checkContainmentInTropicalVariety(const groebnerCone sigma)
 }
 
 
+static bool checkOneCodimensionalLinealitySpace(const groebnerCone sigma)
+{
+  gfan::ZCone zc = sigma.getPolyhedralCone();
+  int linDim = zc.dimensionOfLinealitySpace();
+  int dim = zc.dimension();
+  return (linDim+1)==dim;
+}
+
+
 /***
  * Computes a starting point by traversing the Groebner fan,
  * checking each cone whether it contains a ray in the tropical variety.
@@ -75,6 +84,148 @@ std::pair<gfan::ZVector,groebnerCone> tropicalStartingDataViaGroebnerFan(const i
   gfan::ZVector emptyVector = gfan::ZVector(0);
   groebnerCone emptyCone = groebnerCone();
   return std::pair<gfan::ZVector,groebnerCone>(emptyVector,emptyCone);
+}
+
+BOOLEAN positiveTropicalStartingPoint(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
+  {
+    ideal I = (ideal) u->Data();
+    if (idSize(I)==1)
+    {
+      tropicalStrategy currentStrategy(I,currRing);
+      poly g = I->m[0];
+      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,currentStrategy);
+      for (std::set<gfan::ZCone>::iterator zc=Tg.begin(); zc!=Tg.end(); zc++)
+      {
+        gfan::ZMatrix ray = zc->extremeRays();
+        for (int i=0; i<ray.getHeight(); i++)
+        {
+          if (ray[i].isPositive())
+          {
+            res->rtyp = BIGINTMAT_CMD;
+            res->data = (void*) zVectorToBigintmat(ray[i]);
+            return FALSE;
+          }
+        }
+      }
+      res->rtyp = BIGINTMAT_CMD;
+      res->data = (void*) zVectorToBigintmat(gfan::ZVector(0));
+      return FALSE;
+    }
+    WerrorS("positiveTropicalStartingPoint: ideal not principal");
+    return TRUE;
+  }
+  WerrorS("positiveTropicalStartingPoint: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN nonNegativeTropicalStartingPoint(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
+  {
+    ideal I = (ideal) u->Data();
+    if (idSize(I)==1)
+    {
+      tropicalStrategy currentStrategy(I,currRing);
+      poly g = I->m[0];
+      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,currentStrategy);
+      for (std::set<gfan::ZCone>::iterator zc=Tg.begin(); zc!=Tg.end(); zc++)
+      {
+        gfan::ZMatrix ray = zc->extremeRays();
+        for (int i=0; i<ray.getHeight(); i++)
+        {
+          if (ray[i].isNonNegative())
+          {
+            res->rtyp = BIGINTMAT_CMD;
+            res->data = (void*) zVectorToBigintmat(ray[i]);
+            return FALSE;
+          }
+        }
+      }
+      res->rtyp = BIGINTMAT_CMD;
+      res->data = (void*) zVectorToBigintmat(gfan::ZVector(0));
+      return FALSE;
+    }
+    WerrorS("nonNegativeTropicalStartingPoint: ideal not principal");
+    return TRUE;
+  }
+  WerrorS("nonNegativeTropicalStartingPoint: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN negativeTropicalStartingPoint(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
+  {
+    ideal I = (ideal) u->Data();
+    if (idSize(I)==1)
+    {
+      tropicalStrategy currentStrategy(I,currRing);
+      poly g = I->m[0];
+      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,currentStrategy);
+      for (std::set<gfan::ZCone>::iterator zc=Tg.begin(); zc!=Tg.end(); zc++)
+      {
+        gfan::ZMatrix ray = zc->extremeRays();
+        for (int i=0; i<ray.getHeight(); i++)
+        {
+          gfan::ZVector negatedRay = gfan::Integer(-1)*ray[i];
+          if (negatedRay.isPositive())
+          {
+            res->rtyp = BIGINTMAT_CMD;
+            res->data = (void*) zVectorToBigintmat(ray[i]);
+            return FALSE;
+          }
+        }
+      }
+      res->rtyp = BIGINTMAT_CMD;
+      res->data = (void*) zVectorToBigintmat(gfan::ZVector(0));
+      return FALSE;
+    }
+    WerrorS("negativeTropicalStartingPoint: ideal not principal");
+    return TRUE;
+  }
+  WerrorS("negativeTropicalStartingPoint: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN nonPositiveTropicalStartingPoint(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
+  {
+    ideal I = (ideal) u->Data();
+    if (idSize(I)==1)
+    {
+      tropicalStrategy currentStrategy(I,currRing);
+      poly g = I->m[0];
+      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,currentStrategy);
+      for (std::set<gfan::ZCone>::iterator zc=Tg.begin(); zc!=Tg.end(); zc++)
+      {
+        gfan::ZMatrix ray = zc->extremeRays();
+        for (int i=0; i<ray.getHeight(); i++)
+        {
+          gfan::ZVector negatedRay = gfan::Integer(-1)*ray[i];
+          if (negatedRay.isNonNegative())
+          {
+            res->rtyp = BIGINTMAT_CMD;
+            res->data = (void*) zVectorToBigintmat(ray[i]);
+            return FALSE;
+          }
+        }
+      }
+      res->rtyp = BIGINTMAT_CMD;
+      res->data = (void*) zVectorToBigintmat(gfan::ZVector(0));
+      return FALSE;
+    }
+    WerrorS("nonPositiveTropicalStartingPoint: ideal not principal");
+    return TRUE;
+  }
+  WerrorS("nonPositiveTropicalStartingPoint: unexpected parameters");
+  return TRUE;
 }
 
 BOOLEAN tropicalStartingPoint(leftv res, leftv args)
@@ -183,6 +334,7 @@ groebnerCone tropicalStartingCone(const ideal I, const ring r, const tropicalStr
   id_Delete(&J,s);
 
   assume(checkContainmentInTropicalVariety(tropicalStartingCone));
+  assume(checkOneCodimensionalLinealitySpace(tropicalStartingCone));
   return tropicalStartingCone;
 }
 

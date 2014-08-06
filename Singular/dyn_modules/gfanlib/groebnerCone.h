@@ -12,6 +12,14 @@
 
 #include <tropicalStrategy.h>
 
+/** \file
+ * implementation of the class groebnerCone
+ *
+ * groebnerCone is a class that encapsulates relevant (possibly redundant) information about a groebnerCone.
+ * Moreover, it contains implrementation of several highly non-trivial algorithms, such as computing its neighbours
+ * in the Groebner fan or computing its neighbours in the tropical variety.
+ */
+
 class groebnerCone;
 struct groebnerCone_compare;
 typedef std::set<groebnerCone,groebnerCone_compare> groebnerCones;
@@ -21,7 +29,13 @@ class groebnerCone
 {
 
 private:
+  /**
+   * ideal to which this Groebner cone belongs to
+   */
   ideal polynomialIdeal;
+  /**
+   * ring in which the ideal exists
+   */
   ring polynomialRing;
   gfan::ZCone polyhedralCone;
   gfan::ZVector interiorPoint;

@@ -36,7 +36,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
     if (v==NULL)
     {
       tropicalStrategy currentStrategy(I,currRing);
-      gfan::ZFan* tropI = tropicalVariety(I,currRing,currentStrategy);
+      gfan::ZFan* tropI = tropicalVariety(currentStrategy);
       res->rtyp = fanID;
       res->data = (char*) tropI;
       return FALSE;
@@ -46,7 +46,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
       number p = (number) v->CopyD();
       tropicalStrategy currentStrategy(I,p,currRing);
       setOptionRedSB();
-      gfan::ZFan* tropI = tropicalVariety(I,currRing,currentStrategy);
+      gfan::ZFan* tropI = tropicalVariety(currentStrategy);
       undoSetOptionRedSB();
       res->rtyp = fanID;
       res->data = (char*) tropI;

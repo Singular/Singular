@@ -16,7 +16,7 @@
  * by reading the coefficients and that g is initially reduced
  * with respect to p-t
  **/
-static bool pReduce(poly g, const number p, const ring r)
+static bool pReduce(poly &g, const number p, const ring r)
 {
   poly toBeChecked = pNext(g);
   pNext(g) = NULL; poly gEnd = g;
@@ -54,10 +54,10 @@ static bool pReduce(poly g, const number p, const ring r)
         subst=p_LmInit(toBeChecked,r);
         p_AddExp(subst,1,power,r);
         p_SetCoeff(subst,coeff,r);
-        p_Setm(subst,r); pTest(subst);
+        p_Setm(subst,r); p_Test(subst,r);
         toBeChecked=p_LmDeleteAndNext(toBeChecked,r);
         toBeChecked=p_Add_q(toBeChecked,subst,r);
-        pTest(toBeChecked);
+        p_Test(toBeChecked,r);
       }
       else
       {
@@ -67,6 +67,7 @@ static bool pReduce(poly g, const number p, const ring r)
       }
     }
   }
+  p_Test(g,r);
   return false;
 }
 
@@ -105,7 +106,9 @@ BOOLEAN pppReduce(leftv res, leftv args)
  **/
 bool ppreduceInitially(poly &h, const poly g, const ring r)
 {
-  pTest(h); pTest(g); poly hCache;
+  p_Test(h,r);
+  p_Test(g,r);
+  poly hCache;
   for (hCache=h; hCache; pIter(hCache))
     if (p_LeadmonomDivisibleBy(g,hCache,r)) break;
   if (hCache)
@@ -116,12 +119,12 @@ bool ppreduceInitially(poly &h, const poly g, const ring r)
     p_SetExp(hAlphaT,1,p_GetExp(hCache,1,r)-p_GetExp(g,1,r),r);
     for (int i=2; i<=r->N; i++)
       p_SetExp(hAlphaT,i,0,r);
-    p_Setm(hAlphaT,r); pTest(hAlphaT);
-    poly q1 = p_Mult_nn(h,gAlpha,r); pTest(q1);
-    poly q2 = p_Mult_q(p_Copy(g,r),hAlphaT,r); pTest(q2);
-    q2 = p_Neg(q2,r); pTest(q2);
+    p_Setm(hAlphaT,r); p_Test(hAlphaT,r);
+    poly q1 = p_Mult_nn(h,gAlpha,r); p_Test(q1,r);
+    poly q2 = p_Mult_q(p_Copy(g,r),hAlphaT,r); p_Test(q2,r);
+    q2 = p_Neg(q2,r); p_Test(q2,r);
     h = p_Add_q(q1,q2,r);
-    pTest(h);
+    p_Test(h,r);
     return true;
   }
   return false;

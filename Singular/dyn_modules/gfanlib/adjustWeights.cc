@@ -95,9 +95,12 @@ gfan::ZVector valued_adjustWeightUnderHomogeneity(const gfan::ZVector e, const g
     k = gfan::Integer((long)1)-(e[0]/w[0]);
   for (unsigned i=1; i<e.size(); i++)
   {
-    gfan::Integer kk = gfan::Integer((long)1)-(gfan::Integer((long)e[i].sign())*e[i])/w[i];
-    if (k<kk)
-      k = kk;
+    if (e[i].sign()<=0)
+    {
+      gfan::Integer kk = gfan::Integer((long)1)-(e[i]/w[i]);
+      if (k<kk)
+        k = kk;
+    }
   }
   /* compute e+k*w, check it for correctness and return it */
   gfan::ZVector v = e+k*w;

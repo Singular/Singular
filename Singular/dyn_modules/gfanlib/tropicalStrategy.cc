@@ -37,12 +37,100 @@ int dim(ideal I, ring r)
   return d;
 }
 
+static bool noExtraReduction(ideal /*I*/, ring /*r*/, number /*p*/)
+{
+  return false;
+}
+
+/**
+ * Initializes all relevant structures and information for the trivial valuation case,
+ * i.e. computing a tropical variety without any valuation.
+ *g
+ */
+tropicalStrategy::tropicalStrategy(ideal I, ring r):
+  originalRing(rCopy(r)),
+  originalIdeal(id_Copy(I,r)),
+  dimensionOfIdeal(dim(originalIdeal,originalRing)),
+  linealitySpace(homogeneitySpace(originalIdeal,originalRing)),
+  startingRing(rCopy(originalRing)),
+  startingIdeal(id_Copy(originalIdeal,originalRing)),
+  uniformizingParameter(NULL),
+  shortcutRing(rCopy(originalRing)),
+  onlyLowerHalfSpace(false),
+  weightAdjustingAlgorithm1(nonvalued_adjustWeightForHomogeneity),
+  weightAdjustingAlgorithm2(nonvalued_adjustWeightUnderHomogeneity),
+  extraReductionAlgorithm(noExtraReduction)
+{
+  assume(rField_is_Q(r));
+}
+
+/**
+ * Given a polynomial ring r over the rational numbers and a weighted ordering,
+ * returns a polynomial ring s over the integers with one extra variable, which is weighted -1.
+ */
+static ring constructStartingRing(ring r)
+{
+  assume(rField_is_Q(r));
+
+  ring s = rCopy0(r,FALSE,FALSE);
+  nKillChar(s->cf);
+  s->cf = nInitChar(n_Z,NULL);
+
+  int n = rVar(s)+1;
+  s->N = n;
+  char** oldNames = s->names;
+  s->names = (char**) omAlloc((n+1)*sizeof(char**));
+  s->names[0] = omStrDup("t");
+  for (int i=1; i<n; i++)
+    s->names[i] = oldNames[i-1];
+  omFree(oldNames);
+
+  s->order = (int*) omAlloc0(3*sizeof(int));
+  s->block0 = (int*) omAlloc0(3*sizeof(int));
+  s->block1 = (int*) omAlloc0(3*sizeof(int));
+  s->wvhdl = (int**) omAlloc0(3*sizeof(int**));
+  s->order[0] = ringorder_ws;
+  s->block0[0] = 1;
+  s->block1[0] = n;
+  s->wvhdl[0] = (int*) omAlloc(n*sizeof(int));
+  s->wvhdl[0][0] = 1;
+  for (int i=1; i<n; i++)
+    s->wvhdl[0][i] = -(r->wvhdl[0][i-1]);
+  s->order[1] = ringorder_C;
+
+  rComplete(s);
+  return s;
+}
+
+static ring writeOrderingAsWP(ring r)
+{
+  assume(r->order[0]==ringorder_wp || r->order[0]==ringorder_dp);
+  if (r->order[0]==ringorder_dp)
+  {
+    ring s = rCopy0(r,FALSE,TRUE);
+    rComplete(s);
+    return s;
+  }
+  return rCopy(r);
+}
 
 /***
  * Initializes all relevant structures and information for the valued case,
  * i.e. computing a tropical variety over the rational numbers with p-adic valuation
  **/
-tropicalStrategy::tropicalStrategy(ideal J, number q, ring s)
+tropicalStrategy::tropicalStrategy(ideal J, number q, ring s):
+  originalRing(rCopy(s)),
+  originalIdeal(id_Copy(J,s)),
+  dimensionOfIdeal(dim(originalIdeal,originalRing)),
+  linealitySpace(homogeneitySpace(originalIdeal,originalRing)),
+  startingRing(rCopy(originalRing)),
+  startingIdeal(id_Copy(originalIdeal,originalRing)),
+  uniformizingParameter(NULL),
+  shortcutRing(rCopy(originalRing)),
+  onlyLowerHalfSpace(false),
+  weightAdjustingAlgorithm1(nonvalued_adjustWeightForHomogeneity),
+  weightAdjustingAlgorithm2(nonvalued_adjustWeightUnderHomogeneity),
+  extraReductionAlgorithm(noExtraReduction)
 {
   /* assume that the ground field of the originalRing is Q */
   assume(rField_is_Q(s));
@@ -76,35 +164,6 @@ tropicalStrategy::tropicalStrategy(ideal J, number q, ring s)
   extraReductionAlgorithm = ppreduceInitially;
 }
 
-static bool nothing(ideal /*I*/, ring /*r*/, number /*p*/)
-{
-  return false;
-}
-
-/***
- * Initializes all relevant structures and information for the valued case,
- * i.e. computing a tropical variety without any valuation.
- **/
-tropicalStrategy::tropicalStrategy(ideal I, ring r)
-{
-  /* assume that the ground field of the originalRing is Q */
-  assume(rField_is_Q(r));
-
-  onlyLowerHalfSpace = false;                         // convex computations in the whole vector space
-  originalRing = rCopy(r);
-  originalIdeal = id_Copy(I,r);
-  dimensionOfIdeal = dim(originalIdeal,originalRing); // compute dimension of ideal
-  startingRing = rCopy(originalRing);                 // starting ring is the original ring
-  startingIdeal = id_Copy(I,startingRing);
-  uniformizingParameter = NULL;                       // no uniformizing parameter
-  linealitySpace = homogeneitySpace(I,startingRing);  // compute lineality space of tropical variety
-
-  /* set function pointers to the appropiate functions */
-  weightAdjustingAlgorithm1 = nonvalued_adjustWeightForHomogeneity;
-  weightAdjustingAlgorithm2 = nonvalued_adjustWeightUnderHomogeneity;
-  extraReductionAlgorithm = nothing;
-}
-
 tropicalStrategy::tropicalStrategy(const tropicalStrategy& currentStrategy):
   originalRing(rCopy(currentStrategy.getOriginalRing())),
   startingRing(rCopy(currentStrategy.getStartingRing())),
@@ -112,9 +171,9 @@ tropicalStrategy::tropicalStrategy(const tropicalStrategy& currentStrategy):
   startingIdeal(id_Copy(currentStrategy.getStartingIdeal(),startingRing)),
   dimensionOfIdeal(currentStrategy.getDimensionOfIdeal()),
   onlyLowerHalfSpace(currentStrategy.restrictToLowerHalfSpace()),
-  weightAdjustingAlgorithm1(currentStrategy.getWeightAdjustingAlgorithm1()),
-  weightAdjustingAlgorithm2(currentStrategy.getWeightAdjustingAlgorithm2()),
-  extraReductionAlgorithm(currentStrategy.getExtraReductionAlgorithm())
+  weightAdjustingAlgorithm1(currentStrategy.weightAdjustingAlgorithm1),
+  weightAdjustingAlgorithm2(currentStrategy.weightAdjustingAlgorithm2),
+  extraReductionAlgorithm(currentStrategy.extraReductionAlgorithm)
 {
   if (startingRing) rTest(startingRing);
   if (startingIdeal) id_Test(startingIdeal,startingRing);
@@ -139,9 +198,9 @@ tropicalStrategy& tropicalStrategy::operator=(const tropicalStrategy& currentStr
   startingIdeal = id_Copy(currentStrategy.getStartingIdeal(),startingRing);
   dimensionOfIdeal = currentStrategy.getDimensionOfIdeal();
   onlyLowerHalfSpace = currentStrategy.restrictToLowerHalfSpace();
-  weightAdjustingAlgorithm1 = currentStrategy.getWeightAdjustingAlgorithm1();
-  weightAdjustingAlgorithm2 = currentStrategy.getWeightAdjustingAlgorithm2();
-  extraReductionAlgorithm = currentStrategy.getExtraReductionAlgorithm();
+  weightAdjustingAlgorithm1 = currentStrategy.weightAdjustingAlgorithm1;
+  weightAdjustingAlgorithm2 = currentStrategy.weightAdjustingAlgorithm2;
+  extraReductionAlgorithm = currentStrategy.extraReductionAlgorithm;
 
   if (startingRing) rTest(startingRing);
   if (startingIdeal) id_Test(startingIdeal,startingRing);
