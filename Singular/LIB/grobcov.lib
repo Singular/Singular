@@ -1044,7 +1044,7 @@ proc incquotient(ideal N, poly f)
 }
 
 // eliminates the ith element from a list or an intvec
-proc elimfromlist(l, int i)
+proc elimfromlist(def l, int i)
 {
   if(typeof(l)=="list"){list L;}
   if (typeof(l)=="intvec"){intvec L;}

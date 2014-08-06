@@ -2448,7 +2448,7 @@ example
   facFirstWeyl(h);
 }
 
-static proc checkForHomogInhomogInterchangabilityNthWeyl(list factors, posLeft, posRight)
+static proc checkForHomogInhomogInterchangabilityNthWeyl(list factors, int posLeft, int posRight)
 "
 INPUT:  A list consisting of factors of a certain polynomial in the nth Weyl
         algebra, factors, and a position from the left and the right, where the last swap was done.
@@ -6440,7 +6440,7 @@ example
 //is the first Weyl algebra. The polynomial must only contain
 //the two arguments, which are also given by the user.
 
-proc facSubWeyl(poly h, X, D)
+proc facSubWeyl(poly h, poly X, poly D)
 "USAGE:  facSubWeyl(h,x,y); h, X, D polynomials
 RETURN: list
 ASSUME: X and D are variables of a basering, which satisfy DX = XD +1.
@@ -7409,7 +7409,7 @@ ASSUMPTIONS:
   keepring(sAlgebra);
 }//fromWeylToShiftPoly
 
-static proc fromNthWeylToNthShiftPoly(poly h, sAlgebra)
+static proc fromNthWeylToNthShiftPoly(poly h, def sAlgebra)
 "
 USAGE: Given a polynomial in the nth Weyl algebra, this method returns it -- if possible --
        as an element in the nth shift algebra, which is given in the method header.
