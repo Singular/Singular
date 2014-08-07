@@ -54,7 +54,6 @@
 #include <Singular/cntrlc.h>
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
 #include <Singular/ipshell.h>
 #include <Singular/ipconv.h>
 #include <coeffs/ffields.h>
@@ -65,26 +64,25 @@
 #include <polys/monomials/maps.h>
 
 /* include Hilbert-function */
-#include <kernel/stairc.h>
+#include <kernel/GBEngine/stairc.h>
 
 /** kstd2.cc */
-#include <kernel/kutil.h>
-#include <kernel/khstd.h>
+#include <kernel/GBEngine/kutil.h>
+#include <kernel/GBEngine/khstd.h>
 
 #include <Singular/walk.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <Singular/ipid.h>
 #include <Singular/tok.h>
-#include <kernel/febase.h>
 #include <coeffs/numbers.h>
 #include <Singular/ipid.h>
 #include <polys/monomials/ring.h>
-#include <kernel/kstd1.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <polys/matpol.h>
 #include <polys/weight.h>
 #include <misc/intvec.h>
-#include <kernel/syz.h>
+#include <kernel/GBEngine/syz.h>
 #include <Singular/lists.h>
 #include <polys/prCopy.h>
 #include <polys/monomials/ring.h>
@@ -749,7 +747,7 @@ static ideal MstdhomCC(ideal G)
 intvec* MivMatrixOrder(intvec* iv)
 {
   int i, nR = iv->length();
-  
+
   intvec* ivm = new intvec(nR*nR);
 
   for(i=0; i<nR; i++)
@@ -770,7 +768,7 @@ intvec* MivMatrixOrderRefine(intvec* iv, intvec* iw)
 {
   assume(iv->length() == iw->length());
   int i, nR = iv->length();
-  
+
   intvec* ivm = new intvec(nR*nR);
 
   for(i=0; i<nR; i++)
@@ -913,7 +911,7 @@ intvec* MPertVectors(ideal G, intvec* ivtarget, int pdeg)
      if (mpz_cmp(maxdeg,  tot_deg) > 0 )
      {
        mpz_set(tot_deg, maxdeg);
-     } 
+     }
   }
   mpz_mul_ui(inveps, tot_deg, maxA);
   mpz_add_ui(inveps, inveps, 1);
@@ -1755,7 +1753,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
     }
   }
   mpz_t *vec=(mpz_t*)omAlloc(nRing*sizeof(mpz_t));
-  
+
 
   // there is no 0<t<=1, so define the next weight vector to be equal to the current weight vector
   if(mpz_cmp(t_nenner, t_null) == 0)
@@ -1805,7 +1803,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
     mpz_mul_si(s_zaehler, t_zaehler, (*diff_weight)[j]);
     mpz_add(sntz, s_nenner, s_zaehler);
     mpz_init_set(vec[j], sntz);
-   
+
 #ifdef NEXT_VECTORS_CC
     Print("\n//** MwalkNextWeightCC:  j = %d ==> ", j);
     PrintS("(");
@@ -1912,7 +1910,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
         PrintS("\n//** MwalkNextWeightCC: OVERFLOW: ");
         mpz_out_str( stdout, 10, vec[j]);
         PrintS(" is greater than 2147483647 (max. integer representation)");
-        Print("\n//  So vector[%d] := %d may be wrong.\n",j+1, vec[j]);
+        Print("\n//  So vector[%d] may be wrong.\n",j+1/*,gmp: vec[j]*/);
       }
     }
   }
@@ -1934,7 +1932,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
   mpz_clear(sing_int);
   mpz_clear(dcw);
   mpz_clear(t_null);
- 
+
   if(Overflow_Error == FALSE)
   {
     Overflow_Error = nError;
@@ -2219,7 +2217,7 @@ static ring VMrRefine(intvec* va, intvec* vb)
   r->OrdSgn    = 1;
 
   // complete ring intializations
-  
+
   rComplete(r);
 
   //rChangeCurrRing(r);
@@ -2294,7 +2292,7 @@ static ring VMrDefault(intvec* va)
   r->OrdSgn    = 1;
 
   // complete ring intializations
-  
+
   rComplete(r);
 
   //rChangeCurrRing(r);
@@ -2358,7 +2356,7 @@ static void VMrDefaultlp(void)
   r->OrdSgn    = 1;
 
   /* complete ring intializations */
-  
+
   rComplete(r);
 
   rChangeCurrRing(r);
@@ -2488,7 +2486,7 @@ static void DefRingParlp(void)
   r->OrdSgn    = 1;
 
   // complete ring intializations
-  
+
   rComplete(r);
 
   // clean up history
@@ -2971,7 +2969,7 @@ static intvec* TranPertVector(ideal G, intvec* iva)
 
 #ifdef INVEPS_SMALL_IN_TRAN
   if(mpz_cmp_ui(ndeg, nV)>0 && nV > 3)
-  { 
+  {
     mpz_cdiv_q_ui(ndeg, ndeg, nV);
   }
  //PrintS("\n// choose the \"small\" inverse epsilon:");
@@ -3835,7 +3833,7 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight, intvec* targe
         {
           (*result)[i] = (*next_weight1)[i];
         }
-      }    
+      }
     }
     else
     {
@@ -4055,7 +4053,7 @@ static ideal REC_GB_Mwalk(ideal G, intvec* curr_weight, intvec* orig_target_weig
     to = clock();
     // compute a next weight vector
     intvec* next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
-  
+
 
     xtnw = xtnw + clock() - to;
 
@@ -4272,7 +4270,7 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M, ring baseRing)
     if(isNolVector(curr_weight) == 0)
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,curr_weight,currRing);
-    }	
+    }
     else
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,last_omega,currRing);
@@ -4560,7 +4558,7 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
     if(isNolVector(curr_weight) == 0)
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,curr_weight,currRing);
-    }	
+    }
     else
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,last_omega,currRing);
@@ -4830,7 +4828,7 @@ ideal Mpwalk(ideal Go, intvec* curr_weight, intvec* target_weight, int op_deg, i
     if(isNolVector(curr_weight) == 0)
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,curr_weight,currRing);
-    }	
+    }
     else
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,last_omega,currRing);
@@ -5039,7 +5037,7 @@ ideal Mprwalk(ideal Go, intvec* curr_weight, intvec* target_weight, int weight_r
     if(isNolVector(curr_weight) == 0)
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,curr_weight,currRing);
-    }	
+    }
     else
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,last_omega,currRing);
@@ -6311,9 +6309,9 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight, intvec* t
         nOverflow_Error = Overflow_Error;
 #endif
         tproc = clock()-xftinput;
-        
+
         Print("\n//  main routine takes %d steps and calls \"Mpwalk\" (1,%d):", nwalk,  tp_deg);
-        
+
         // compute the red. GB of <G> w.r.t. the lex order by the "recursive-modified" perturbation walk alg (1,tp_deg)
         G = Mpwalk_MAltwalk1(G, curr_weight, tp_deg);
         delete next_weight;
