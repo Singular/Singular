@@ -7934,6 +7934,26 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
         }
       }
     }
+    #ifdef HAVE_RINGS
+    if(rField_is_Ring(currRing))
+    {
+        for (l=IDELEMS(r)-1;l>=0;l--)
+        {
+            if(r->m[l]!=NULL)
+            {
+                if(!nGreaterZero(pGetCoeff(r->m[l])))
+                {
+                    r->m[l]->coef = nInpNeg(r->m[l]->coef);
+                    while(pNext(r->m[l])!= NULL)
+                    {
+                        pNext(r->m[l])->coef= nInpNeg(pNext(r->m[l])->coef);
+                        pIter(r->m[l]);
+                    }
+                }
+            }
+        }
+    }
+    #endif
     if (/*TEST_OPT_REDSB &&*/ reduction_found)
     {
       for (l=IDELEMS(r)-1;l>=0;l--)

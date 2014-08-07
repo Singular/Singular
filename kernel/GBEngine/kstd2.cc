@@ -1601,7 +1601,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif /* MYTEST */
   if (TEST_OPT_DEBUG) messageSets(strat);
 #endif /* KDEBUG */
-
+  
   if (TEST_OPT_SB_1)
   {
     #ifdef HAVE_RINGS
