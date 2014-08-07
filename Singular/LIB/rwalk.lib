@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-=======
 //
->>>>>>> 92644b759d66f085c842e4284d78c2e203291b67
-version="$Id$";
+version="version rwalk.lib 4.0.0.0 Aug_2014 ";
 category="Commutative Algebra";
 
 info="

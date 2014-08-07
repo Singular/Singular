@@ -30,12 +30,12 @@ LIB "modstd.lib";
 
 proc modpWalk(def II, int p, int variant, list #)
 "USAGE:  modpWalk(I,p,#); I ideal, p integer, variant integer
-ASSUME:  If size(#) > 0, then 
+ASSUME:  If size(#) > 0, then
            #[1] is an intvec describing the current weight vector
            #[2] is an intvec describing the target weight vector
 RETURN:  ideal - a standard basis of I mod p, integer - p
 NOTE:    The procedure computes a standard basis of the ideal I modulo p and
-         fetches the result to the basering. 
+         fetches the result to the basering.
 EXAMPLE: example modpWalk; shows an example
 "
 {
@@ -88,7 +88,7 @@ EXAMPLE: example modpWalk; shows an example
       if(!((order == "simple") || (sizerl > 4)))
       {
         list rl@r = ringlist(@r);
-        nvar@r = nvars(@r);      
+        nvar@r = nvars(@r);
         intvec w;
         for(k = 1; k <= nvar@r; k++)
         {
@@ -235,18 +235,18 @@ example
 
 proc modWalk(def II, int variant, list #)
 "USAGE:  modWalk(II); II ideal or list(ideal,int)
-ASSUME:  If variant = 
+ASSUME:  If variant =
 @*       - 1 the Random Walk algorithm with radius II[2] is applied
            to II[1] if II = list(ideal, int). It is applied to II with radius 2
            if II is an ideal.
-@*	 - 2, the Groebner Walk algorithm is applied to II[1] or to II, respectively.
+@*       - 2, the Groebner Walk algorithm is applied to II[1] or to II, respectively.
 @*       - 3, the Fractal Walk algorithm with random element is applied to II[1] or II,
            respectively.
 @*       - 4, the Fractal Walk algorithm is applied to II[1] or II, respectively.
 @*       - 5, the Perturbation Walk algorithm with random element is applied to II[1]
            or II, respectively, with radius II[3] and perturbation degree II[2].
-@*	 - 6, the Perturbation Walk algorithm is applied to II[1] or II, respectively,
-	   with perturbation degree II[3].
+@*       - 6, the Perturbation Walk algorithm is applied to II[1] or II, respectively,
+           with perturbation degree II[3].
          If size(#) > 0, then # contains either 1, 2 or 4 integers such that
 @*       - #[1] is the number of available processors for the computation,
 @*       - #[2] is an optional parameter for the exactness of the computation,
@@ -299,7 +299,6 @@ EXAMPLE: example modWalk; shows an example
       {
         II[3] = 2;
       }
-    
     }
     else
     {
@@ -377,7 +376,7 @@ EXAMPLE: example modWalk; shows an example
         {
           ERROR("Unexpected type of input.");
         }
-      }  
+      }
     }
     if(size(#) == 3)
     {
@@ -738,7 +737,7 @@ proc parallelChinrem(list T1, list T2, int n1)
     arguments_chinrem[size(arguments_chinrem)+1] = list(list(J),T2);
   }
   results_chinrem = parallelWaitAll("chinrem",arguments_chinrem);
-    for(j=1; j <= size(results_chinrem); j++)  
+    for(j=1; j <= size(results_chinrem); j++)
     {
       J = results_chinrem[j];
       attrib(J,"isSB",1);

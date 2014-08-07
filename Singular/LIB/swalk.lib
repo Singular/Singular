@@ -72,7 +72,7 @@ EXAMPLE: example swalk; shows an example
        else {
               l=collectDiffExpo(Gold);
               ulast=last(curr_weight, target_weight, l);
-	      vector new_weight=(1-ulast)*curr_weight+ulast*target_weight;
+              vector new_weight=(1-ulast)*curr_weight+ulast*target_weight;
               vector w=cleardenom(new_weight);
               v=changeType(w);
               list p= ringlist(old_ring);
@@ -137,11 +137,11 @@ EXAMPLE: example swalk; shows an example
        Gold=Gnew;
        def old_ring=new_ring;
        setring old_ring;
-       
+
        kill new_ring;
        if(curr_weight==target_weight){n=1;}
        else {
-              l=collectDiffExpo(Gold); 
+              l=collectDiffExpo(Gold);
               vector new_weight=RandomNextWeight(Gold, l, curr_weight, target_weight, weight_rad, pdeg);
               vector w=cleardenom(new_weight);
               v=changeType(w);
