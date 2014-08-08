@@ -722,7 +722,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             char* ps = pString((poly) d);
             s = (char*) omAlloc(strlen(ps) + 10);
             sprintf(s,"%s(%s)", (t /*Typ()*/ == POLY_CMD ? "poly" : "vector"), ps);
-	    omFree(ps);
+            omFree(ps);
             return s;
           }
           else
@@ -829,7 +829,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           }
           else
             return s;
-        } 
+        }
         case RING_CMD:
         case QRING_CMD:
           s  = rString((ring)d);
@@ -1466,17 +1466,17 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       }
       if ((currRing->algring!=NULL) && ((vnr=r_IsRingVar(id,currRing->algring))>=0))
       {
-	BOOLEAN ok=FALSE;
-	poly p = pmInit(id,ok);
-	if (ok && (p!=NULL))
-	{
+        BOOLEAN ok=FALSE;
+        poly p = pmInit(id,ok);
+        if (ok && (p!=NULL))
+        {
           v->data = (void *)pGetCoeff(p);
-	  v->rtyp = NUMBER_CMD;
+          v->rtyp = NUMBER_CMD;
           v->name = id;
           pGetCoeff(p)=NULL;
           pLmFree(p);
           return;
-	}
+        }
       }
 
     }
@@ -1654,8 +1654,12 @@ int sleftv::Eval()
         if(!nok)
         {
           nok=iiMake_proc(h,req_packhdl,&d->arg2);
+          this->CleanUp(currRing);
           if (!nok)
+          {
             memcpy(this,&iiRETURNEXPR,sizeof(sleftv));
+            memset(&iiRETURNEXPR,0,sizeof(sleftv));
+          }
         }
       }
       else nok=TRUE;
@@ -1709,6 +1713,7 @@ int sleftv::Eval()
     }
     else
     {
+      sleftv tmp;
       int toktype=iiTokType(d->op);
       if ((toktype==CMD_M)
       ||( toktype==ROOT_DECL_LIST)
@@ -1732,43 +1737,45 @@ int sleftv::Eval()
             d->arg3.Init();
           }
           if (d->argc==0)
-            nok=nok||iiExprArithM(this,NULL,d->op);
+            nok=nok||iiExprArithM(&tmp,NULL,d->op);
           else
-            nok=nok||iiExprArithM(this,&d->arg1,d->op);
+            nok=nok||iiExprArithM(&tmp,&d->arg1,d->op);
         }
         else
         {
           nok=d->arg1.Eval();
-          nok=nok||iiExprArithM(this,&d->arg1,d->op);
+          nok=nok||iiExprArithM(&tmp,&d->arg1,d->op);
         }
       }
       else if (d->argc==1)
       {
         nok=d->arg1.Eval();
-        nok=nok||iiExprArith1(this,&d->arg1,d->op);
+        nok=nok||iiExprArith1(&tmp,&d->arg1,d->op);
       }
       else if(d->argc==2)
       {
         nok=d->arg1.Eval();
         nok=nok||d->arg2.Eval();
-        nok=nok||iiExprArith2(this,&d->arg1,d->op,&d->arg2);
+        nok=nok||iiExprArith2(&tmp,&d->arg1,d->op,&d->arg2);
       }
       else if(d->argc==3)
       {
         nok=d->arg1.Eval();
         nok=nok||d->arg2.Eval();
         nok=nok||d->arg3.Eval();
-        nok=nok||iiExprArith3(this,d->op,&d->arg1,&d->arg2,&d->arg3);
+        nok=nok||iiExprArith3(&tmp,d->op,&d->arg1,&d->arg2,&d->arg3);
       }
       else if(d->argc!=0)
       {
         nok=d->arg1.Eval();
-        nok=nok||iiExprArithM(this,&d->arg1,d->op);
+        nok=nok||iiExprArithM(&tmp,&d->arg1,d->op);
       }
       else // d->argc == 0
       {
-        nok = iiExprArithM(this, NULL, d->op);
+        nok = iiExprArithM(&tmp, NULL, d->op);
       }
+      this->CleanUp(currRing);
+      memcpy(this,&tmp,sizeof(tmp));
     }
   }
   else if (((rtyp==0)||(rtyp==DEF_CMD))
