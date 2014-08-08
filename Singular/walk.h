@@ -52,22 +52,19 @@ intvec* MSimpleIV(intvec* iv);
 
 /* Okt -- Nov'01 */
 // compute a Groebner basis of an ideal G w.r.t. lexicographic order
-ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M, ring baseRing);
+ideal Mwalk(ideal G, intvec* curr_weight, intvec* target_weight);
+
 // random walk algorithm to compute a Groebner basis
-ideal Mrwalk(ideal Go, intvec* curr_weight, intvec* target_weight, int weight_rad, int pert_deg, ring baseRing);
+ideal Mrwalk(ideal Go, intvec* curr_weight, intvec* target_weight, int weight_rad, int pert_deg);
 
 /* the perturbation walk algorithm */
-
-ideal Mpwalk(ideal Go, intvec* curr_weight, intvec* target_weight, int op_deg, int tp_deg, ring baseRing);
-/* the perturbation walk algorithm with random element */
-
-ideal Mprwalk(ideal Go, intvec* curr_weight, intvec* target_weight, int weight_rad, int op_deg, int tp_deg, ring baseRing);
+ideal Mpwalk(ideal G,int op,int tp,intvec* curr_weight,intvec* target_weight, int nP);
 
 /* The fractal walk algorithm */
-ideal Mfwalk(ideal Go, intvec* curr_weight, intvec* orig_target_weight, int pert_deg, ring XXRing);
+ideal Mfwalk(ideal G, intvec* ivstart, intvec* ivtarget);
 
 /* The fractal walk algorithm with random element */
-ideal Mfrwalk(ideal Go, intvec* curr_weight, intvec* orig_target_weight, int pert_deg, int weight_rad, ring baseRing);
+ideal Mfrwalk(ideal G, intvec* ivstart, intvec* ivtarget,int weight_rad);
 
 /* Implement Tran's idea */
 intvec* TranMPertVectorslp(ideal G);

@@ -30,12 +30,12 @@ LIB "modstd.lib";
 
 proc modpWalk(def II, int p, int variant, list #)
 "USAGE:  modpWalk(I,p,#); I ideal, p integer, variant integer
-ASSUME:  If size(#) > 0, then
+ASSUME:  If size(#) > 0, then 
            #[1] is an intvec describing the current weight vector
            #[2] is an intvec describing the target weight vector
 RETURN:  ideal - a standard basis of I mod p, integer - p
 NOTE:    The procedure computes a standard basis of the ideal I modulo p and
-         fetches the result to the basering.
+         fetches the result to the basering. 
 EXAMPLE: example modpWalk; shows an example
 "
 {
@@ -81,14 +81,15 @@ EXAMPLE: example modpWalk; shows an example
   }
 
 //-------------------------  make i homogeneous  -----------------------------
-/*  if(!mixedTest() && !h)
+
+  if(!hasMixedOrdering() && !h)
   {
     if(!((find(ordstr_R0, "M") > 0) || (find(ordstr_R0, "a") > 0) || neg))
     {
       if(!((order == "simple") || (sizerl > 4)))
       {
         list rl@r = ringlist(@r);
-        nvar@r = nvars(@r);
+        nvar@r = nvars(@r);      
         intvec w;
         for(k = 1; k <= nvar@r; k++)
         {
@@ -104,7 +105,7 @@ EXAMPLE: example modpWalk; shows an example
       }
     }
   }
-*/
+
 //-------------------------  compute a standard basis mod p  -----------------------------
 
   if(variant == 1)
@@ -145,37 +146,14 @@ EXAMPLE: example modpWalk; shows an example
   {
     if(size(#) == 2)
     {
-      i=fwalk(i,#);
+      trwalk(i,radius,pert_deg,#);
     }
     else
     {
-      i=fwalk(i);
+      trwalk(i,radius,pert_deg);
     }
   }
-  if(variant == 5)
-  {
-    if(size(#) == 2)
-    {
-     i=prwalk(i,radius,pert_deg,pert_deg,#);
-    }
-    else
-    {
-      i=prwalk(i,radius,pert_deg,pert_deg);
-    }
-  }
-  if(variant == 6)
-  {
-    if(size(#) == 2)
-    {
-      i=pwalk(i,pert_deg,pert_deg,#);
-    }
-    else
-    {
-      i=pwalk(i,pert_deg,pert_deg);
-    }
-  }
-  /*
-  if(!mixedTest() && !h)
+  if(!hasMixedOrdering() && !h)
   {
     if(!((find(ordstr_R0, "M") > 0) || (find(ordstr_R0, "a") > 0) || neg))
     {
@@ -189,7 +167,7 @@ EXAMPLE: example modpWalk; shows an example
         kill HomR;
       }
     }
-  }*/
+  }
   setring R0;
   return(list(fetch(@r,i),p));
 }
@@ -201,9 +179,9 @@ example
   int p = 181;
   intvec a = 2,1,3,4;
   intvec b = 1,9,1,1;
-  ring ra = 0,x(1..4),(a(a),lp);
+  ring ra = 0,(w,x,y,z),(a(a),lp);
   ideal I = std(cyclic(4));
-  ring rb = 0,x(1..4),(a(b),lp);
+  ring rb = 0,(w,x,y,z),(a(b),lp);
   ideal I = imap(ra,I);
   modpWalk(I,p,1,a,b);
   std(I);
@@ -235,18 +213,10 @@ example
 
 proc modWalk(def II, int variant, list #)
 "USAGE:  modWalk(II); II ideal or list(ideal,int)
-ASSUME:  If variant =
-@*       - 1 the Random Walk algorithm with radius II[2] is applied
-           to II[1] if II = list(ideal, int). It is applied to II with radius 2
-           if II is an ideal.
-@*       - 2, the Groebner Walk algorithm is applied to II[1] or to II, respectively.
-@*       - 3, the Fractal Walk algorithm with random element is applied to II[1] or II,
-           respectively.
-@*       - 4, the Fractal Walk algorithm is applied to II[1] or II, respectively.
-@*       - 5, the Perturbation Walk algorithm with random element is applied to II[1]
-           or II, respectively, with radius II[3] and perturbation degree II[2].
-@*       - 6, the Perturbation Walk algorithm is applied to II[1] or II, respectively,
-           with perturbation degree II[3].
+ASSUME:  If variant = 1 the random walk algorithm with radius II[2] is applied
+         to II[1] if II = list(ideal, int). It is applied to II with radius 2
+         if II is an ideal. If variant = 2, the Groebner walk algorithm is
+         applied to II[1] or to II, respectively.
          If size(#) > 0, then # contains either 1, 2 or 4 integers such that
 @*       - #[1] is the number of available processors for the computation,
 @*       - #[2] is an optional parameter for the exactness of the computation,
@@ -299,6 +269,7 @@ EXAMPLE: example modWalk; shows an example
       {
         II[3] = 2;
       }
+    
     }
     else
     {
@@ -376,7 +347,7 @@ EXAMPLE: example modWalk; shows an example
         {
           ERROR("Unexpected type of input.");
         }
-      }
+      }  
     }
     if(size(#) == 3)
     {
@@ -496,7 +467,7 @@ EXAMPLE: example modWalk; shows an example
 
 //-------------------------  Save current options  -----------------------------
   intvec opt = option(get);
-  //option(redSB);
+  option(redSB);
 
 //--------------------  Initialize the list of primes  -------------------------
   int tt = timer;
@@ -555,8 +526,8 @@ EXAMPLE: example modWalk; shows an example
       N = N*T2[i];
     }
     H = chinrem(T1,T2);
-    J = parallelFarey(H,N,n1);
-    //J=farey(H,N);
+    //J = parallelFarey(H,N,n1);
+    J=farey(H,N);
     if(printlevel >= 10)
     {
       "CPU-time for lifting-process is "+string(timer - tt)+" seconds.";
@@ -566,8 +537,8 @@ EXAMPLE: example modWalk; shows an example
 //----------------  Test if we already have a standard basis of I --------------
 
     tt = timer; rt = rtimer;
-    pTest = pTestSB(I,J,L,variant);
-    //pTest = primeTestSB(I,J,L,variant);
+    //pTest = pTestSB(I,J,L,variant);
+    pTest = primeTestSB(I,J,L,variant);
     if(printlevel >= 10)
     {
       "CPU-time for pTest is "+string(timer - tt)+" seconds.";
@@ -621,6 +592,7 @@ EXAMPLE: example modWalk; shows an example
     j = size(L)+1;
     tt = timer; rt = rtimer;
     L = primeList(I,n3,L,n1);
+L;
     if(printlevel >= 10)
     {
       "CPU-time for primeList: "+string(timer-tt)+" seconds.";
@@ -671,9 +643,8 @@ example
   ring R=0,(x,y,z),lp;
   ideal I=-x+y2z-z,xz+1,x2+y2-1;
   // I is a standard basis in dp
-  ideal J = modWalk(I,1);
-  J;
-/*  modWalk(I,2,2,0);
+  modWalk(I,1);
+  modWalk(I,2,2,0);
   modWalk(I,3,system("cpu"),0);
   std(I);
 
@@ -682,7 +653,7 @@ example
   ring r=0,x(1..6),lp;
   ideal i=fetch(r0,i0);
   modWalk(i,1,system("cpu"),0);
-  modWalk(i,3);*/
+  modWalk(i,3);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -737,7 +708,7 @@ proc parallelChinrem(list T1, list T2, int n1)
     arguments_chinrem[size(arguments_chinrem)+1] = list(list(J),T2);
   }
   results_chinrem = parallelWaitAll("chinrem",arguments_chinrem);
-    for(j=1; j <= size(results_chinrem); j++)
+    for(j=1; j <= size(results_chinrem); j++)  
     {
       J = results_chinrem[j];
       attrib(J,"isSB",1);
