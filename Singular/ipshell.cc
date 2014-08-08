@@ -5436,7 +5436,7 @@ void rKill(idhdl h)
       if ((currRingHdl==NULL)&&(currRing->idroot==NULL))
       {
         for (int i=myynest;i>=0;i--)
-	  if (iiLocalRing[i]==currRing) return;
+          if (iiLocalRing[i]==currRing) return;
         currRing=NULL;
       }
     }
@@ -5681,8 +5681,7 @@ BOOLEAN iiTestAssume(leftv a, leftv b)
       if (b->Data()==NULL) { Werror("ASSUME failed:%s",assume_yylinebuf);return TRUE;}
     }
   }
-  else
-     b->CleanUp();
+  b->CleanUp();
   a->CleanUp();
   return FALSE;
 }
