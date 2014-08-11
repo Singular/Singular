@@ -301,7 +301,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
         {
           if (BVERBOSE(V_REDEFINE))
             Warn("redefining %s **",s);
-          IDID(h)=NULL;
+          if (s==IDID(h)) IDID(h)=NULL;
           killhdl2(h,&currRing->idroot,currRing);
         }
         else
