@@ -656,7 +656,7 @@ static inline int p_Comp_k_n(poly a, poly b, int k, ring r)
  * Allocation/Initalization/Deletion
  *
  ***************************************************************/
-#if PDEBUG > 2
+#if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
 static inline poly p_New(const ring r, omBin bin)
 #else
 static inline poly p_New(const ring /*r*/, omBin bin)
