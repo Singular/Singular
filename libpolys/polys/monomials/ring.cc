@@ -456,8 +456,8 @@ void rDelete(ring r)
 
   assume( r->ref <= 0 );
 
-  if( r->ref > 0 ) // ->ref means the number of Interpreter objects refearring to the ring...
-    return; // NOTE: There may be memory leaks due to inconsisten use of r->ref!!! (e.g. due to ext_fields)
+  if( r->ref > 0 ) // ->ref means the number of Interpreter objects referring to the ring...
+    return;       // this should never happen.
 
   if( r->qideal != NULL )
   {
@@ -3833,11 +3833,6 @@ void rUnComplete(ring r)
         }
 
       omFreeSize((ADDRESS)r->typ,r->OrdSize*sizeof(sro_ord)); r->typ = NULL;
-    }
-
-    if (r->order != NULL)
-    {
-      // delete r->order!!!???
     }
 
     if (r->PolyBin != NULL)
