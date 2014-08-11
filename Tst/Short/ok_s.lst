@@ -6,7 +6,7 @@ bug_tr237
 ; do not try bug_tr276 without 2.2 GB RAM free
 ; bug_tr276
 bug_tr501
-bug_554
+; bug_554 ;ehv.lib depr.
 bug_tr559
 bug_tr587
 bug_tr599
