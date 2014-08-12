@@ -419,6 +419,7 @@ void killlocals(int v)
 
 void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOOLEAN fullname)
 {
+  package savePack=currPack;
   idhdl h,start;
   BOOLEAN all = typ<0;
   BOOLEAN really_all=FALSE;
@@ -448,16 +449,21 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
         }
         else if(IDTYP(h)==PACKAGE_CMD)
         {
+          currPack=IDPACKAGE(h);
           //Print("list_cmd:package\n");
           all=TRUE;typ=PROC_CMD;fullname=TRUE;really_all=TRUE;
           h=IDPACKAGE(h)->idroot;
         }
         else
+        {
+          currPack=savePack;
           return;
+        }
       }
       else
       {
         Werror("%s is undefined",what);
+        currPack=savePack;
         return;
       }
     }
@@ -497,6 +503,7 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
     }
     h = IDNEXT(h);
   }
+  currPack=savePack;
 }
 
 void test_cmd(int i)
