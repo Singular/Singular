@@ -980,7 +980,7 @@ int  sleftv::Typ()
   void *d=data;
   if (t==IDHDL) t=IDTYP((idhdl)data);
   else if (t==ALIAS_CMD)
-  { idhdl h=(idhdl)IDDATA((idhdl)data); t=IDTYP(h);d==IDDATA(h); }
+  { idhdl h=(idhdl)IDDATA((idhdl)data); t=IDTYP(h);d=IDDATA(h); }
   switch (t)
   {
 #ifdef SINGULAR_4_1
