@@ -666,11 +666,11 @@ nMapFunc nrSetMap(const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
 
-  if (src->rep=n_rep_gap_rat) /*Q, Z */
+  if (src->rep==n_rep_gap_rat) /*Q, Z */
   {
     return nrMapQ;
   }
-  if (src->rep=n_rep_gap_gmp) /*Q, Z */
+  if (src->rep==n_rep_gap_gmp) /*Q, Z */
   {
     return nrMapZ;
   }

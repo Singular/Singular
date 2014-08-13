@@ -737,7 +737,7 @@ static poly ChooseP(ideal I)
     return(m);
 }
 
-//searches for a monomial of degree d>=2 and divides it by a variable (result monomial of deg d-1)
+///searches for a monomial of degree d>=2 and divides it by a variable (result monomial of deg d-1)
 static poly SearchP(ideal I)
 {
     int i,j,exp;
@@ -756,9 +756,11 @@ static poly SearchP(ideal I)
         {
             p_SetExp(res, j, exp - 1, currRing);
             p_Setm(res,currRing);
-            return(res);
+            break;
         }
     }
+    assume( j <= currRing->N );
+    return(res);
 }
 
 //test if the ideal is of the form (x1, ..., xr)

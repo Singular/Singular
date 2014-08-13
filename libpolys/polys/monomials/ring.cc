@@ -3777,12 +3777,12 @@ static void rCheckOrdSgn(ring r,int i/*current block*/)
     r->OrdSgn=oo;
   }
   if (notfound
-  && (r->order[i]==ringorder_ls)
+  && ((r->order[i]==ringorder_ls)
      || (r->order[i]==ringorder_ds)
      || (r->order[i]==ringorder_Ds)
      || (r->order[i]==ringorder_ws)
      || (r->order[i]==ringorder_Ws)
-     || (r->order[i]==ringorder_rs)
+     || (r->order[i]==ringorder_rs))
   )
     r->OrdSgn=-1;
 }

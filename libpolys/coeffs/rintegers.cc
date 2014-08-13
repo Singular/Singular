@@ -1471,11 +1471,11 @@ nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)
   {
     return nrzMapQ;
   }
-  if ((src->rep=n_rep_int) && nCoeff_is_Ring_2toM(src))
+  if ((src->rep==n_rep_int) && nCoeff_is_Ring_2toM(src))
   {
     return nrzMapMachineInt;
   }
-  if ((src->rep=n_rep_int) && nCoeff_is_Zp(src))
+  if ((src->rep==n_rep_int) && nCoeff_is_Zp(src))
   {
     return nrzMapZp;
   }

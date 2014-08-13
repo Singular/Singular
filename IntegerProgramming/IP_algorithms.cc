@@ -1,6 +1,6 @@
 // IP_algorithms.cc
 
-#ifndef IP_ALGORITMS_CC
+#ifndef IP_ALGORITHMS_CC
 #define IP_ALGORITHMS_CC
 
 #include "IP_algorithms.h"
