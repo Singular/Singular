@@ -5360,7 +5360,7 @@ void rKill(ring r)
     }
     int j;
 #ifdef USE_IILOCALRING
-    for (j=0;j<iiRETURNEXPR_len;j++)
+    for (j=0;j<myynest;j++)
     {
       if (iiLocalRing[j]==r)
       {
