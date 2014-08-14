@@ -2483,7 +2483,7 @@ static void DefRingPar(intvec* va)
   res->VarOffset = NULL;
   res->ref=0;
 
-  res->cf = currRing->cf; currRing->cf->ref++;
+  res->cf = nCopyCoeff(currRing->cf);
 
 
   /*weights: entries for 3 blocks: NULL Made:???*/
@@ -2552,7 +2552,7 @@ static void DefRingParlp(void)
   r->VarOffset = NULL;
   r->ref=0;
 
-  r->cf = currRing->cf; currRing->cf->ref++;
+  r->cf = nCopyCoeff(currRing->cf);
 
 
   r->cf  = currRing->cf;

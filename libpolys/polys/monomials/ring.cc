@@ -730,8 +730,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
   if (r1->cf==r2->cf)
   {
-    tmpR.cf=r1->cf;
-    r1->cf->ref++;
+    tmpR.cf=nCopyCoeff(r1->cf);
   }
   else /* different type */
   {
@@ -739,16 +738,14 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     {
       if (getCoeffType(r2->cf)==n_Q)
       {
-        tmpR.cf=r1->cf;
-        r1->cf->ref++;
+        tmpR.cf=nCopyCoeff(r1->cf);
       }
       else if (nCoeff_is_Extension(r2->cf) && rChar(r2) == rChar(r1))
       {
         /*AlgExtInfo extParam;
         extParam.r = r2->cf->extRing;
         extParam.i = r2->cf->extRing->qideal;*/
-        tmpR.cf=r2->cf;
-        r2->cf->ref++;
+        tmpR.cf=nCopyCoeff(r2->cf);
       }
       else
       {
@@ -765,13 +762,11 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     {
       if (getCoeffType(r2->cf)==n_Zp)
       {
-        tmpR.cf=r2->cf;
-        r2->cf->ref++;
+        tmpR.cf=nCopyCoeff(r2->cf);
       }
       else if (nCoeff_is_Extension(r2->cf))
       {
-        tmpR.cf=r2->cf;
-        r2->cf->ref++;
+        tmpR.cf=nCopyCoeff(r2->cf);
       }
       else
       {
@@ -783,13 +778,11 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     {
       if (r1->cf->extRing->cf==r2->cf)
       {
-        tmpR.cf=r1->cf;
-        r1->cf->ref++;
+        tmpR.cf=nCopyCoeff(r1->cf);
       }
       else if (getCoeffType(r1->cf->extRing->cf)==n_Zp && getCoeffType(r2->cf)==n_Q) //r2->cf == n_Zp should have been handled above
       {
-        tmpR.cf=r1->cf;
-        r1->cf->ref++;
+        tmpR.cf=nCopyCoeff(r1->cf);
       }
       else
       {
@@ -1306,8 +1299,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 
   //struct omBin   PolyBin; /* Bin from where monoms are allocated */
   //memset: res->PolyBin=NULL; // rComplete
-  res->cf=r->cf;     /* coeffs */
-  res->cf->ref++;
+  res->cf=nCopyCoeff(r->cf);     /* coeffs */
 
   //memset: res->ref=0; /* reference counter to the ring */
 
@@ -1449,8 +1441,7 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
 
   //struct omBin   PolyBin; /* Bin from where monoms are allocated */
   //memset: res->PolyBin=NULL; // rComplete
-  res->cf=r->cf;     /* coeffs */
-  res->cf->ref++;
+  res->cf=nCopyCoeff(r->cf);     /* coeffs */
 
   //memset: res->ref=0; /* reference counter to the ring */
 
@@ -2723,9 +2714,9 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   res->block0=block0;
   res->block1=block1;
   res->bitmask=exp_limit;
-  int tmpref=r->cf->ref;
+  //int tmpref=r->cf->ref0;
   rComplete(res, 1);
-  r->cf->ref=tmpref;
+  //r->cf->ref=tmpref;
 
   // adjust res->pFDeg: if it was changed globally, then
   // it must also be changed for new ring
@@ -2836,9 +2827,9 @@ ring rModifyRing_Wp(ring r, int* weights)
   /*polynomial ring*/
   res->OrdSgn    = 1;
 
-  int tmpref=r->cf->ref;
+  //int tmpref=r->cf->ref;
   rComplete(res, 1);
-  r->cf->ref=tmpref;
+  //r->cf->ref=tmpref;
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
   {
@@ -2896,9 +2887,9 @@ ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsign
     res->block0=block0;
     res->block1=block1;
     res->bitmask=exp_limit;
-    int tmpref=r->cf->ref;
+    //int tmpref=r->cf->ref;
     rComplete(res, 1);
-    r->cf->ref=tmpref;
+    //r->cf->ref=tmpref;
 
 #ifdef HAVE_PLURAL
     if (rIsPluralRing(r))
