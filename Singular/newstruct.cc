@@ -360,9 +360,12 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
             res->rtyp=RING_CMD;
             res->data=al->m[nm->pos-1].data;
             r=(ring)res->data;
-            if (r==NULL) { res->data=(void *)currRing; r=currRing; }
-            if (r!=NULL) r->ref++;
-            else Werror("ring of this member is not set and no basering found");
+            if (r==NULL)
+            {
+              res->data=(void *)currRing; r=currRing;
+              if (r!=NULL) r->ref++;
+              else Werror("ring of this member is not set and no basering found");
+            }
             return r==NULL;
           }
           else if (RingDependend(nm->typ)
