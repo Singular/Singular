@@ -7906,34 +7906,64 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
     int q;
     poly p;
     BOOLEAN reduction_found=FALSE;
-    for (l=IDELEMS(r)-1;l>=0;l--)
+    if (!rField_is_Ring(currRing))
     {
-      if (r->m[l]!=NULL)
+      for (l=IDELEMS(r)-1;l>=0;l--)
       {
-        for(q=IDELEMS(Q)-1; q>=0;q--)
+        if (r->m[l]!=NULL)
         {
-          if ((Q->m[q]!=NULL)&&(pLmEqual(Q->m[q],r->m[l])))
+          for(q=IDELEMS(Q)-1; q>=0;q--)
           {
-            #ifdef HAVE_RINGS
-            //Also need divisibility of the leading coefficients
-            if((!rField_is_Ring(currRing)) || (pDivisibleBy(Q->m[q],r->m[l])))
-            #endif
-            if (TEST_OPT_REDSB)
+            if ((Q->m[q]!=NULL)&&(pLmEqual(Q->m[q],r->m[l])))
             {
-              p=r->m[l];
-              r->m[l]=kNF(Q,NULL,p);
-              pDelete(&p);
-              reduction_found=TRUE;
+              if (TEST_OPT_REDSB)
+              {
+                p=r->m[l];
+                r->m[l]=kNF(Q,NULL,p);
+                pDelete(&p);
+                reduction_found=TRUE;
+              }
+              else
+              {
+                pDelete(&r->m[l]); // and set it to NULL
+              }
+              break;
             }
-            else
-            {
-              pDelete(&r->m[l]); // and set it to NULL
-            }
-            break;
           }
         }
       }
     }
+    #ifdef HAVE_RINGS
+    //Also need divisibility of the leading coefficients
+    else
+    {
+      for (l=IDELEMS(r)-1;l>=0;l--)
+      {
+        if (r->m[l]!=NULL)
+        {
+          for(q=IDELEMS(Q)-1; q>=0;q--)
+          {
+            if ((Q->m[q]!=NULL)&&(pLmEqual(Q->m[q],r->m[l]))
+            && pDivisibleBy(Q->m[q],r->m[l]))
+            {
+              if (TEST_OPT_REDSB)
+              {
+                p=r->m[l];
+                r->m[l]=kNF(Q,NULL,p);
+                pDelete(&p);
+                reduction_found=TRUE;
+              }
+              else
+              {
+                pDelete(&r->m[l]); // and set it to NULL
+              }
+              break;
+            }
+          }
+        }
+      }
+    }
+    #endif
     if (/*TEST_OPT_REDSB &&*/ reduction_found)
     {
       for (l=IDELEMS(r)-1;l>=0;l--)
