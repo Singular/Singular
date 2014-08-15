@@ -133,8 +133,6 @@ ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *bloc
   r->order = ord;
   r->block0 = block0;
   r->block1 = block1;
-  /*polynomial ring*/
-  r->OrdSgn    = 1;
 
   /* complete ring intializations */
   rComplete(r);
@@ -2824,8 +2822,6 @@ ring rModifyRing_Wp(ring r, int* weights)
   res->order[1]  = ringorder_C;
   /* the last block: everything is 0 */
   res->order[2]  = 0;
-  /*polynomial ring*/
-  res->OrdSgn    = 1;
 
   //int tmpref=r->cf->ref;
   rComplete(res, 1);
@@ -3359,6 +3355,7 @@ BOOLEAN rComplete(ring r, int force)
   r->BitsPerExp = bits;
   r->ExpPerLong = BIT_SIZEOF_LONG / bits;
   r->divmask=rGetDivMask(bits);
+  if (r->OrdSgn!=-1) r->OrdSgn=1; //rCheckOrdSgn will changed that, if needed
 
   // will be used for ordsgn:
   long *tmp_ordsgn=(long *)omAlloc0(3*(n+r->N)*sizeof(long));
@@ -3750,43 +3747,45 @@ BOOLEAN rComplete(ring r, int force)
   return FALSE;
 }
 
-static void rCheckOrdSgn(ring r,int i/*current block*/)
-{ // set r->OrdSgn
-  int jj;
-  int oo=-1;
-  int notfound=1;
-  for(jj=i-1;jj>=0;jj--)
+static void rCheckOrdSgn(ring r,int b/*current block*/)
+{ // set r->OrdSgn, return, if already checked
+  if (r->OrdSgn==-1) return;
+  // for each variable:
+  for(int i=1;i<=r->N;i++)
   {
-    if(((r->order[jj]==ringorder_a)
-      ||(r->order[jj]==ringorder_aa)
-      ||(r->order[jj]==ringorder_a64))
-    &&(r->block0[jj]<=r->block0[i])
-    &&(r->block1[jj]>=r->block1[i]))
+    int found=0;
+    // for all blocks:
+    for(int j=0;(j<=b) && (found==0);j++)
     {
-      int res=1;
-      if (r->order[jj]!=ringorder_a64)
+      // search the first block containing var(i)
+      if ((r->block0[j]<=i)&&(r->block1[j]>=i))
       {
-        for(int j=r->block1[jj]-r->block0[jj]; j>=0;j--)
+        // what kind if block is it?
+        if ((r->order[j]==ringorder_ls)
+        || (r->order[j]==ringorder_ds)
+        || (r->order[j]==ringorder_Ds)
+        || (r->order[j]==ringorder_ws)
+        || (r->order[j]==ringorder_Ws)
+        || (r->order[j]==ringorder_rs))
         {
-          if(r->wvhdl[jj][j]<=0) { res=-1; break;}
+          r->OrdSgn=-1;
+          return;
+        }
+        if((r->order[j]==ringorder_a)
+        ||(r->order[j]==ringorder_aa))
+        {
+          // <0: local/mixed ordering return
+          // >0: var(i) is okay, look at other vars
+          // ==0: look at other blocks for var(i)
+          if(r->wvhdl[j][i-r->block0[j]]<0) { r->OrdSgn=-1; return;}
+          if(r->wvhdl[j][i-r->block0[j]]>0) { found=1; break;}
         }
       }
-      oo=res;
-      notfound=0;
     }
-    r->OrdSgn=oo;
   }
-  if (notfound
-  && ((r->order[i]==ringorder_ls)
-     || (r->order[i]==ringorder_ds)
-     || (r->order[i]==ringorder_Ds)
-     || (r->order[i]==ringorder_ws)
-     || (r->order[i]==ringorder_Ws)
-     || (r->order[i]==ringorder_rs))
-  )
-    r->OrdSgn=-1;
+  // no local var found in 1..N:
+  //r->OrdSgn=1;
 }
-
 
 void rUnComplete(ring r)
 {
@@ -4696,8 +4695,6 @@ static ring rAssure_Global(rRingOrder_t b1, rRingOrder_t b2, const ring r)
     res->block0[0] = 1;
     res->block1[0] = r->N;
   }
-  // HANNES: This sould be set in rComplete
-  res->OrdSgn = 1;
   rComplete(res, 1);
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))

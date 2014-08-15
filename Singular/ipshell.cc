@@ -1567,8 +1567,6 @@ idhdl rDefault(const char *s)
   r->order[1]  = ringorder_C;
   /* the last block: everything is 0 */
   r->order[2]  = 0;
-  /*polynomial ring*/
-  r->OrdSgn    = 1;
 
   /* complete ring intializations */
   rComplete(r);
@@ -2306,7 +2304,6 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
     for (j=0; j < n-1; j++)
       R->order[j] = (int) ringorder_unspec;
     // orderings
-    R->OrdSgn=1;
     for(j=0;j<n-1;j++)
     {
     // todo: a(..), M
