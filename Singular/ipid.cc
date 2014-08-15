@@ -211,6 +211,7 @@ idhdl idrec::set(const char * s, int level, int t, BOOLEAN init)
     if (t == PROC_CMD)
     {
       IDPROC(h)->language=LANG_NONE;
+      IDPROC(h)->ref=1;
     }
     else if (t == PACKAGE_CMD)
     {
