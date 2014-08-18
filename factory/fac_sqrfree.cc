@@ -67,7 +67,7 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
     CFFList F;
     Variable v = aa.mvar();
     CanonicalForm lcinv;
-    while ( ! c.degree(v) == 0 )
+    while ( c.degree(v) != 0 )
     {
         y = gcd( w, c ); z = w / y;
         if ( degree( z, v ) > 0 )
