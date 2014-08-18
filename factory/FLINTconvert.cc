@@ -140,7 +140,7 @@ convertnmod_poly_t2FacCF (const nmod_poly_t poly, const Variable& x)
   for (int i= 0; i < nmod_poly_length (poly); i++)
   {
     ulong coeff= nmod_poly_get_coeff_ui (poly, i);
-    if (!coeff == 0)
+    if (coeff != 0)
       result += CanonicalForm ((long)coeff)*power (x,i);
   }
   return result;
