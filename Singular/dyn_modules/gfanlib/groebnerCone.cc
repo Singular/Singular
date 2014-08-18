@@ -33,6 +33,8 @@ static bool checkOrderingAndCone(const ring r, const gfan::ZCone zc)
   {
     int n = rVar(r); int* w = r->wvhdl[0];
     gfan::ZVector v = wvhdlEntryToZVector(n,w);
+    if (r->order[0]==ringorder_ws)
+      v = gfan::Integer((long)-1)*v;
     if (!zc.contains(v))
     {
       std::cout << "ERROR: weight of ordering not inside Groebner cone!" << std::endl

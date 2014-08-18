@@ -7,6 +7,7 @@
 // for various commands in dim(ideal I, ring r):
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/stairc.h>
+#include <Singular/ipshell.h> // for isPrime(int i)
 
 /***
  * Computes the dimension of an ideal I in ring r
@@ -55,7 +56,7 @@ tropicalStrategy::tropicalStrategy(ideal I, ring r):
   startingRing(rCopy(originalRing)),
   startingIdeal(id_Copy(originalIdeal,originalRing)),
   uniformizingParameter(NULL),
-  shortcutRing(rCopy(originalRing)),
+  shortcutRing(NULL),
   onlyLowerHalfSpace(false),
   weightAdjustingAlgorithm1(nonvalued_adjustWeightForHomogeneity),
   weightAdjustingAlgorithm2(nonvalued_adjustWeightUnderHomogeneity),
@@ -136,21 +137,37 @@ tropicalStrategy::tropicalStrategy(ideal J, number q, ring s):
   assume(rField_is_Q(s));
   originalRing = rCopy(s);
 
-  /* replace Q with Z for the startingRing */
-  startingRing = rCopy0(originalRing);
-  nKillChar(startingRing->cf);
-  startingRing->cf = nInitChar(n_Z,NULL);
-  rComplete(startingRing);
+  /* replace Q with Z for the startingRing
+   * and add an extra variable for tracking the uniformizing parameter */
+  startingRing = constructStartingRing(originalRing);
 
-  /* map p into the new coefficient domain */
+  /* map the uniformizing parameter into the new coefficient domain */
   nMapFunc nMap = n_SetMap(originalRing->cf,startingRing->cf);
   uniformizingParameter = nMap(q,originalRing->cf,startingRing->cf);
 
-  /* map J into the new polynomial ring */
+  /* map the input ideal into the new polynomial ring */
   int k = idSize(J);
-  startingIdeal = idInit(k);
+  startingIdeal = idInit(k+1);
+  poly g = p_One(startingRing);
+  p_SetCoeff(g,uniformizingParameter,startingRing);
+  pNext(g) = p_One(startingRing);
+  p_SetExp(pNext(g),1,1,startingRing);
+  p_SetCoeff(pNext(g),n_Init(-1,startingRing->cf),startingRing);
+  p_Setm(pNext(g),startingRing);
+  startingIdeal->m[0] = g;
+  int n = rVar(originalRing);
+  int* shiftByOne = (int*) omAlloc((n+1)*sizeof(int));
+  for (int i=1; i<=n; i++)
+    shiftByOne[i]=i+1;
   for (int i=0; i<k; i++)
-    startingIdeal->m[i] = p_PermPoly(J->m[i],NULL,originalRing,startingRing,nMap,NULL,0);
+    startingIdeal->m[i+1] = p_PermPoly(J->m[i],shiftByOne,originalRing,startingRing,nMap,NULL,0);
+  omFreeSize(shiftByOne,(n+1)*sizeof(int));
+
+  /* construct the shorcut ring */
+  shortcutRing = rCopy0(startingRing);
+  nKillChar(shortcutRing->cf);
+  shortcutRing->cf = nInitChar(n_Zp,(void*)(long)IsPrime(n_Int(uniformizingParameter,startingRing->cf)));
+  rComplete(shortcutRing);
 
   /* compute the dimension of the ideal in the original ring */
   dimensionOfIdeal = dim(J,s);

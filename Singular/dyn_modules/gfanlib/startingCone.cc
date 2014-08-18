@@ -51,9 +51,12 @@ static bool checkOneCodimensionalLinealitySpace(const groebnerCone sigma)
  **/
 std::pair<gfan::ZVector,groebnerCone> tropicalStartingDataViaGroebnerFan(const ideal I, const ring r, const tropicalStrategy& currentStrategy)
 {
+  std::cout << "computing starting cone" << std::endl;
   currentStrategy.reduce(I,r);
+  std::cout << "finished reduction" << std::endl;
 
   const groebnerCone sigma(I,r,currentStrategy);
+  std::cout << "finished first maximal Groebner cone" << std::endl;
   gfan::ZVector startingPoint = sigma.tropicalPoint();
   if (startingPoint.size() > 0)
     return std::make_pair(startingPoint,sigma);
@@ -63,6 +66,7 @@ std::pair<gfan::ZVector,groebnerCone> tropicalStartingDataViaGroebnerFan(const i
 
   while (!workingList.empty())
   {
+    std::cout << "traversing groebner fan..." << std::endl;
     const groebnerCone sigma = *(workingList.begin());
     groebnerCones neighbours = sigma.groebnerNeighbours();
     for (groebnerCones::iterator tau = neighbours.begin(); tau!=neighbours.end(); tau++)

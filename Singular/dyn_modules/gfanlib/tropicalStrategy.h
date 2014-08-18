@@ -206,6 +206,17 @@ public:
     n_Delete(&p,r->cf);
     return b;
   }
+
+  /**
+   * returns true, if I contains a monomial.
+   * returns false otherwise.
+   **/
+  bool containsMonomial(ideal I, ring r) const
+  {
+    ring rFinite = rCopy0(r);
+    nKillChar(rFinite.coeffs());
+    rFinite->cf =
+  }
 };
 
 int dim(ideal I, ring r);

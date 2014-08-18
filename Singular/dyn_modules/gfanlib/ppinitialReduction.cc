@@ -18,6 +18,9 @@
  **/
 static bool pReduce(poly &g, const number p, const ring r)
 {
+  if (g==NULL)
+    return false;
+
   poly toBeChecked = pNext(g);
   pNext(g) = NULL; poly gEnd = g;
   poly gCache;
@@ -106,6 +109,8 @@ BOOLEAN pppReduce(leftv res, leftv args)
  **/
 bool ppreduceInitially(poly &h, const poly g, const ring r)
 {
+  if (h==NULL || g==NULL)
+    return false;
   p_Test(h,r);
   p_Test(g,r);
   poly hCache;
@@ -203,6 +208,11 @@ bool ppreduceInitially(ideal I, const number p, const ring r)
   for (int i=0; i<m-1; i++)
     for (int j=i+1; j<m; j++)
       if (ppreduceInitially(I->m[i], I->m[j],r) && pReduce(I->m[i],p,r)) return true;
+
+  /***
+   * removes the elements of I which have been reduced to 0 in the previous two passes
+   **/
+  idSkipZeroes(I);
   return false;
 }
 
@@ -248,12 +258,12 @@ bool ppreduceInitially(ideal I, const number p, const poly g, const ring r)
 {
   int n=idSize(I);
   idInsertPoly(I,g);
-  poly cache; n++; int j;
-  for (j=n-1; j>0; j--)
+  int j;
+  for (j=n; j>0; j--)
   {
     if (p_LmCmp(I->m[j], I->m[j-1],r)>0)
     {
-      cache = I->m[j];
+      poly cache = I->m[j];
       I->m[j] = I->m[j-1];
       I->m[j-1] = cache;
     }
@@ -280,6 +290,10 @@ bool ppreduceInitially(ideal I, const number p, const poly g, const ring r)
   for (int k=j+1; k<n; k++)
     if (ppreduceInitially(I->m[j], I->m[k], r) && pReduce(I->m[j],p,r)) return true;
 
+  /***
+   * removes the elements of I which have been reduced to 0 in the previous two passes
+   **/
+  idSkipZeroes(I);
   return false;
 }
 
@@ -474,10 +488,10 @@ BOOLEAN ppreduceInitially3(leftv res, leftv args)
 #endif //NDEBUG
 
 
-/***
+/**
  * reduces I initially with respect to itself.
  * assumes that the generators of I are homogeneous in x and that p-t is in I.
- **/
+ */
 bool ppreduceInitially(ideal I, ring r, number p)
 {
   assume(!n_IsUnit(p,r->cf));
@@ -497,14 +511,18 @@ bool ppreduceInitially(ideal I, ring r, number p)
       idInsertPoly(it->second,I->m[i]);
     else
     {
-      std::pair<std::map<long,ideal>::iterator,bool> ret;
-      ret = H.insert(std::pair<long,ideal>(d,idInit(16)));
-      idInsertPoly(ret.first->second,I->m[i]);
+      std::pair<long,ideal> Hd(d,idInit(1));
+      Hd.second->m[0] = I->m[i];
+      H.insert(Hd);
     }
   }
 
   std::map<long,ideal>::iterator it=H.begin();
   ideal Hi = it->second;
+  assume(idSize(Hi)==1);
+  assume(pLength(Hi->m[0])==2);
+  it++;
+  Hi = it->second;
 
   /***
    * Step 2: reduce each component initially with respect to itself
@@ -519,6 +537,10 @@ bool ppreduceInitially(ideal I, ring r, number p)
   for (it++; it!=H.end(); it++)
   {
     int l=idSize(Hi); int k=l; poly cache;
+    /**
+     * sorts Hi according to degree in t in descending order
+     * (lowest first, highest last)
+     */
     do
     {
       int j=0;
