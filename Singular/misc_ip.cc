@@ -1301,11 +1301,7 @@ void siInit(char *name)
     n_pAE=nRegister(n_unknown,n_pAEInitChar);
     if (n_pAE!=n_unknown)
     {
-      h=enterid(omStrDup("pAE"),0/*level*/, PROC_CMD,&(basePack->idroot),TRUE /*init*/,FALSE /*search*/);
-      IDPROC(h)->language=LANG_C;
-      IDPROC(h)->libname=omStrDup("kernel");
-      IDPROC(h)->procname=omStrDup("pAE");
-      IDPROC(h)->data.o.function=ii_pAE_init;
+      iiAddCproc("kernel","pAE",FALSE,ii_pAE_init);
     }
   }
 #endif
