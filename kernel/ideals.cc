@@ -1650,6 +1650,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   return h3;
 }
 
+#ifdef WITH_OLD_MINOR
 /*2
 * compute the which-th ar-minor of the matrix a
 */
@@ -1717,7 +1718,6 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
   return (poly) 1;
 }
 
-#ifdef WITH_OLD_MINOR
 /*2
 * compute all ar-minors of the matrix a
 */

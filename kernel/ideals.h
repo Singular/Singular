@@ -157,7 +157,9 @@ ideal   idQuot (ideal h1,ideal h2,
 //ideal   idElimination (ideal h1,poly delVar);
 ideal   idElimination (ideal h1,poly delVar, intvec *hilb=NULL);
 
+#ifdef WITH_OLD_MINOR
 poly idMinor(matrix a, int ar, unsigned long which, ideal R = NULL);
+#endif
 ideal   idMinors(matrix a, int ar, ideal R = NULL);
 
 ideal idMinEmbedding(ideal arg,BOOLEAN inPlace=FALSE, intvec **w=NULL);

@@ -948,25 +948,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         res->data=(char*)ll;
         return FALSE;
       }
-  /*==================== forking experiments ======================*/
-      if(strcmp(sys_cmd, "waitforssilinks")==0)
-      {
-        if ((h != NULL) && (h->Typ() == LIST_CMD) &&
-            (h->next != NULL) && (h->next->Typ() == INT_CMD))
-        {
-          lists L = (lists)h->Data();
-          int timeMillisec = (int)(long)h->next->Data();
-          int n = slStatusSsiL(L, timeMillisec * 1000);
-          res->rtyp = INT_CMD;
-          res->data = (void*)(long)n;
-          return FALSE;
-        }
-        else
-        {
-          Werror( "expected list of open ssi links and timeout");
-          return TRUE;
-        }
-      }
+      else
   /*==================== neworder =============================*/
   // should go below
       if(strcmp(sys_cmd,"neworder")==0)
@@ -2668,19 +2650,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
 #endif
-  /*==================== naIdeal ==================================*/
-//       // This seems to be obsolette with the new Frank's alg.ext field...
-//       if(strcmp(sys_cmd,"naIdeal")==0)
-//       {
-//         if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
-//         {
-//           naSetIdeal((ideal)h->Data());
-//           return FALSE;
-//         }
-//         else
-//            WerrorS("ideal expected");
-//       }
-//       else
   /*==================== pDivStat =============================*/
   #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if(strcmp(sys_cmd,"pDivStat")==0)
@@ -3153,32 +3122,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
          else return TRUE;
          return FALSE;
        }
-  /*==================== minor =================*/
-      if (strcmp(sys_cmd, "minor")==0)
-      {
-        matrix a = (matrix) h->Data();
-        h = h->next;
-        int ar = (int)(long) h->Data();
-        h = h->next;
-        int which = (int)(long) h->Data();
-        h = h->next;
-        ideal R = NULL;
-        if (h != NULL)
-        {
-          R = (ideal) h->Data();
-        }
-        res->data=(poly) idMinor(a, ar, (unsigned long) which, R);
-        if (res->data == (poly) 1)
-        {
-          res->rtyp=INT_CMD;
-          res->data = 0;
-        }
-        else
-        {
-          res->rtyp=POLY_CMD;
-        }
-        return(FALSE);
-      }
       else
   /*==================== F5 Implementation =================*/
   #ifdef HAVE_F5
