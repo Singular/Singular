@@ -102,7 +102,7 @@ matrix evHessenberg(matrix M)
 
   for(int k=1,j=2;k<n-1;k++,j=k+1)
   {
-    while(j<=n&&MATELEM(M,j,k)==0)
+    while(j<=n&&MATELEM(M,j,k)==NULL)
       j++;
 
     if(j<=n)

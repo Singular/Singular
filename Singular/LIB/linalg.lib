@@ -1362,6 +1362,7 @@ list l;
     int l[2][i];  multiplicity of i-th eigenvalue of M
 @end format
 EXAMPLE: example eigenvals; shows examples
+KEYWORDS: eigenvalue
 "
 {
   if(system("with","eigenval"))
