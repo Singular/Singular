@@ -127,6 +127,7 @@ poly initial(const poly p, const ring r, const gfan::ZVector w)
  **/
 ideal initial(const ideal I, const ring r, const gfan::ZVector w)
 {
+  idSkipZeroes(I);
   int k = idSize(I); ideal inI = idInit(k);
   for (int i=0; i<k; i++)
     inI->m[i] = initial(I->m[i],r,w);

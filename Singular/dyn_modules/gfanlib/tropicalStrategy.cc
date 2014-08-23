@@ -48,10 +48,12 @@ static bool noExtraReduction(ideal /*I*/, ring /*r*/, number /*p*/)
  * i.e. computing a tropical variety without any valuation.
  *g
  */
-tropicalStrategy::tropicalStrategy(ideal I, ring r):
+tropicalStrategy::tropicalStrategy(const ideal I, const ring r,
+                                   const bool completelyHomogeneous,
+                                   const bool completeSpace):
   originalRing(rCopy(r)),
   originalIdeal(id_Copy(I,r)),
-  dimensionOfIdeal(dim(originalIdeal,originalRing)),
+  expectedDimension(dim(originalIdeal,originalRing)),
   linealitySpace(homogeneitySpace(originalIdeal,originalRing)),
   startingRing(rCopy(originalRing)),
   startingIdeal(id_Copy(originalIdeal,originalRing)),
@@ -62,7 +64,14 @@ tropicalStrategy::tropicalStrategy(ideal I, ring r):
   weightAdjustingAlgorithm2(nonvalued_adjustWeightUnderHomogeneity),
   extraReductionAlgorithm(noExtraReduction)
 {
-  assume(rField_is_Q(r));
+  assume(rField_is_Q(r) || rField_is_Zp(r));
+  if (!completelyHomogeneous)
+  {
+    weightAdjustingAlgorithm1 = valued_adjustWeightForHomogeneity;
+    weightAdjustingAlgorithm2 = valued_adjustWeightUnderHomogeneity;
+  }
+  if (!completeSpace)
+    onlyLowerHalfSpace = true;
 }
 
 /**
@@ -100,6 +109,7 @@ static ring constructStartingRing(ring r)
   s->order[1] = ringorder_C;
 
   rComplete(s);
+  rTest(s);
   return s;
 }
 
@@ -110,6 +120,7 @@ static ring writeOrderingAsWP(ring r)
   {
     ring s = rCopy0(r,FALSE,TRUE);
     rComplete(s);
+    rTest(s);
     return s;
   }
   return rCopy(r);
@@ -122,16 +133,16 @@ static ring writeOrderingAsWP(ring r)
 tropicalStrategy::tropicalStrategy(ideal J, number q, ring s):
   originalRing(rCopy(s)),
   originalIdeal(id_Copy(J,s)),
-  dimensionOfIdeal(dim(originalIdeal,originalRing)),
-  linealitySpace(homogeneitySpace(originalIdeal,originalRing)),
-  startingRing(rCopy(originalRing)),
-  startingIdeal(id_Copy(originalIdeal,originalRing)),
-  uniformizingParameter(NULL),
-  shortcutRing(rCopy(originalRing)),
-  onlyLowerHalfSpace(false),
-  weightAdjustingAlgorithm1(nonvalued_adjustWeightForHomogeneity),
-  weightAdjustingAlgorithm2(nonvalued_adjustWeightUnderHomogeneity),
-  extraReductionAlgorithm(noExtraReduction)
+  expectedDimension(dim(originalIdeal,originalRing)+1),
+  linealitySpace(gfan::ZCone()), // to come, see below
+  startingRing(NULL),            // to come, see below
+  startingIdeal(NULL),           // to come, see below
+  uniformizingParameter(NULL),   // to come, see below
+  shortcutRing(NULL),            // to come, see below
+  onlyLowerHalfSpace(true),
+  weightAdjustingAlgorithm1(valued_adjustWeightForHomogeneity),
+  weightAdjustingAlgorithm2(valued_adjustWeightUnderHomogeneity),
+  extraReductionAlgorithm(ppreduceInitially)
 {
   /* assume that the ground field of the originalRing is Q */
   assume(rField_is_Q(s));
@@ -163,64 +174,75 @@ tropicalStrategy::tropicalStrategy(ideal J, number q, ring s):
     startingIdeal->m[i+1] = p_PermPoly(J->m[i],shiftByOne,originalRing,startingRing,nMap,NULL,0);
   omFreeSize(shiftByOne,(n+1)*sizeof(int));
 
+  linealitySpace = homogeneitySpace(startingIdeal,startingRing);
+
   /* construct the shorcut ring */
   shortcutRing = rCopy0(startingRing);
   nKillChar(shortcutRing->cf);
   shortcutRing->cf = nInitChar(n_Zp,(void*)(long)IsPrime(n_Int(uniformizingParameter,startingRing->cf)));
   rComplete(shortcutRing);
-
-  /* compute the dimension of the ideal in the original ring */
-  dimensionOfIdeal = dim(J,s);
-
-  /* set the flag that convex computations only occur in the lower half space to true */
-  onlyLowerHalfSpace = true;
-
-  /* set the function pointers to the appropiate functions */
-  weightAdjustingAlgorithm1 = valued_adjustWeightForHomogeneity;
-  weightAdjustingAlgorithm2 = valued_adjustWeightUnderHomogeneity;
-  extraReductionAlgorithm = ppreduceInitially;
+  rTest(shortcutRing);
 }
 
 tropicalStrategy::tropicalStrategy(const tropicalStrategy& currentStrategy):
   originalRing(rCopy(currentStrategy.getOriginalRing())),
+  originalIdeal(id_Copy(currentStrategy.getOriginalIdeal(),currentStrategy.getOriginalRing())),
+  expectedDimension(currentStrategy.getExpectedDimension()),
+  linealitySpace(currentStrategy.getHomogeneitySpace()),
   startingRing(rCopy(currentStrategy.getStartingRing())),
+  startingIdeal(id_Copy(currentStrategy.getStartingIdeal(),currentStrategy.getStartingRing())),
   uniformizingParameter(n_Copy(currentStrategy.getUniformizingParameter(),startingRing->cf)),
-  startingIdeal(id_Copy(currentStrategy.getStartingIdeal(),startingRing)),
-  dimensionOfIdeal(currentStrategy.getDimensionOfIdeal()),
+  shortcutRing(rCopy(currentStrategy.getShortcutRing())),
   onlyLowerHalfSpace(currentStrategy.restrictToLowerHalfSpace()),
   weightAdjustingAlgorithm1(currentStrategy.weightAdjustingAlgorithm1),
   weightAdjustingAlgorithm2(currentStrategy.weightAdjustingAlgorithm2),
   extraReductionAlgorithm(currentStrategy.extraReductionAlgorithm)
 {
+  if (originalRing) rTest(originalRing);
+  if (originalIdeal) id_Test(originalIdeal,originalRing);
   if (startingRing) rTest(startingRing);
   if (startingIdeal) id_Test(startingIdeal,startingRing);
+  if (uniformizingParameter) n_Test(uniformizingParameter,startingRing->cf);
+  if (shortcutRing) rTest(shortcutRing);
 }
 
 tropicalStrategy::~tropicalStrategy()
 {
+  if (originalRing) rTest(originalRing);
+  if (originalIdeal) id_Test(originalIdeal,originalRing);
   if (startingRing) rTest(startingRing);
   if (startingIdeal) id_Test(startingIdeal,startingRing);
+  if (uniformizingParameter) n_Test(uniformizingParameter,startingRing->cf);
+  if (shortcutRing) rTest(shortcutRing);
 
+  id_Delete(&originalIdeal,originalRing);
+  rDelete(originalRing);
   id_Delete(&startingIdeal,startingRing);
   n_Delete(&uniformizingParameter,startingRing->cf);
-  rDelete(originalRing);
   rDelete(startingRing);
+  rDelete(shortcutRing);
 }
 
 tropicalStrategy& tropicalStrategy::operator=(const tropicalStrategy& currentStrategy)
 {
   originalRing = rCopy(currentStrategy.getOriginalRing());
+  originalIdeal = id_Copy(currentStrategy.getOriginalIdeal(),currentStrategy.getOriginalRing());
+  expectedDimension = currentStrategy.getExpectedDimension();
   startingRing = rCopy(currentStrategy.getStartingRing());
+  startingIdeal = id_Copy(currentStrategy.getStartingIdeal(),currentStrategy.getStartingRing());
   uniformizingParameter = n_Copy(currentStrategy.getUniformizingParameter(),startingRing->cf);
-  startingIdeal = id_Copy(currentStrategy.getStartingIdeal(),startingRing);
-  dimensionOfIdeal = currentStrategy.getDimensionOfIdeal();
+  shortcutRing = rCopy(currentStrategy.getShortcutRing());
   onlyLowerHalfSpace = currentStrategy.restrictToLowerHalfSpace();
   weightAdjustingAlgorithm1 = currentStrategy.weightAdjustingAlgorithm1;
   weightAdjustingAlgorithm2 = currentStrategy.weightAdjustingAlgorithm2;
   extraReductionAlgorithm = currentStrategy.extraReductionAlgorithm;
 
+  if (originalRing) rTest(originalRing);
+  if (originalIdeal) id_Test(originalIdeal,originalRing);
   if (startingRing) rTest(startingRing);
   if (startingIdeal) id_Test(startingIdeal,startingRing);
+  if (uniformizingParameter) n_Test(uniformizingParameter,startingRing->cf);
+  if (shortcutRing) rTest(shortcutRing);
 
   return *this;
 }

@@ -20,6 +20,7 @@ static bool pReduce(poly &g, const number p, const ring r)
 {
   if (g==NULL)
     return false;
+  p_Test(g,r);
 
   poly toBeChecked = pNext(g);
   pNext(g) = NULL; poly gEnd = g;
@@ -42,12 +43,15 @@ static bool pReduce(poly &g, const number p, const ring r)
     {
       if (n_DivBy(p_GetCoeff(toBeChecked,r),p,r->cf))
       {
-        coeff=n_Div(p_GetCoeff(toBeChecked,r),p,r->cf);
         power=1;
+        coeff=n_Div(p_GetCoeff(toBeChecked,r),p,r->cf);
         while (n_DivBy(coeff,p,r->cf))
         {
-          coeff=n_Div(p_GetCoeff(pNext(g),r),p,r->cf);
           power++;
+          number coeff0 = n_Div(coeff,p,r->cf);
+          n_Delete(&coeff,r->cf);
+          coeff = coeff0;
+          coeff0 = NULL;
           if (power<1)
           {
             WerrorS("pReduce: overflow in exponent");
@@ -67,6 +71,7 @@ static bool pReduce(poly &g, const number p, const ring r)
         pNext(gEnd)=toBeChecked;
         pIter(gEnd); pIter(toBeChecked);
         pNext(gEnd)=NULL;
+        p_Test(g,r);
       }
     }
   }
@@ -192,7 +197,7 @@ bool ppreduceInitially(ideal I, const number p, const ring r)
     }
     n=j;
   } while(n);
-  for (int i=1; i<m; i++)
+  for (int i=0; i<m; i++)
     if (pReduce(I->m[i],p,r)) return true;
 
   /***
@@ -256,10 +261,10 @@ BOOLEAN ppreduceInitially1(leftv res, leftv args)
  **/
 bool ppreduceInitially(ideal I, const number p, const poly g, const ring r)
 {
-  int n=idSize(I);
   idInsertPoly(I,g);
+  int n=idSize(I);
   int j;
-  for (j=n; j>0; j--)
+  for (j=n-1; j>0; j--)
   {
     if (p_LmCmp(I->m[j], I->m[j-1],r)>0)
     {
@@ -369,7 +374,7 @@ bool ppreduceInitially(ideal H, const number p, const ideal G, const ring r)
       if (p_LmCmp(pNext(T->m[i-1]),pNext(T->m[i]),r)<0)
       {
         g=T->m[i-1];
-        T->m[i-1]=I->m[i];
+        T->m[i-1]=T->m[i];
         T->m[i]=g;
         j = i;
       }
@@ -388,10 +393,10 @@ bool ppreduceInitially(ideal H, const number p, const ideal G, const ring r)
       if (p_LeadmonomDivisibleBy(G->m[i],pNext(T->m[0]),r)) break;
     if (i<k)
     {
-      g = p_Init(r);
+      g = p_One(r);
       for (int j=2; j<=r->N; j++)
         p_SetExp(g,j,p_GetExp(pNext(T->m[0]),j,r)-p_GetExp(G->m[i],j,r),r);
-      p_SetCoeff(g,n_Init(1,r->cf),r); p_Setm(g,r);
+      p_Setm(g,r);
       g = p_Mult_q(g,p_Copy(G->m[i],r),r);
       ppreduceInitially(I,p,g,r);
     }
@@ -503,6 +508,7 @@ bool ppreduceInitially(ideal I, ring r, number p)
   std::map<long,ideal> H; int n = idSize(I);
   for (int i=0; i<n; i++)
   {
+    I->m[i] = p_Cleardenom(I->m[i],r);
     long d = 0;
     for (int j=2; j<=r->N; j++)
       d += p_GetExp(I->m[i],j,r);

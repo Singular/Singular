@@ -61,6 +61,7 @@ static ring permuteWeighstOfRingVariables(const ring &r, const int* const sigma)
     s->wvhdl[1][j] = r->wvhdl[1][sigma[j+1]];
   }
   rComplete(s,1);
+  rTest(s);
   return s;
 }
 
@@ -92,6 +93,7 @@ static inline ring createInitialRingForSaturation(const ring &r, const gfan::ZVe
   s->order[1]=ringorder_C;
 
   rComplete(s,1);
+  rTest(s);
   return s;
 }
 
@@ -135,6 +137,7 @@ poly checkForMonomialsViaStepwiseSaturation(const ideal &I, const gfan::ZVector 
   nKillChar(r->cf);
   r->cf = nInitChar(n_Zp,(void*)(long)n_Int(p_GetCoeff(I->m[0],currRing),currRing->cf));
   rComplete(r);
+  rTest(r);
 
   ideal J = id_Copy(I, currRing); poly cache; number temp;
   for (int i=0; i<IDELEMS(I); i++)

@@ -37,12 +37,12 @@ static void deleteOrdering(ring r)
  *        the interior point lies on the intersection of both maximal Groebner cones
  *  (2) Is is a Groebner basis of the same ideal with respect to the ordering on s
  **/
-std::pair<ideal,ring> flip(const ideal I, const ring r, const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal, const tropicalStrategy& currentStrategy)
+std::pair<ideal,ring> flip0(const ideal I, const ring r,
+                            const gfan::ZVector interiorPoint,
+                            const gfan::ZVector facetNormal,
+                            const gfan::ZVector adjustedInteriorPoint,
+                            const gfan::ZVector adjustedFacetNormal)
 {
-  /* read out appropiate functions for adjusting weights and adjust themm */
-  gfan::ZVector adjustedInteriorPoint = currentStrategy.adjustWeightForHomogeneity(interiorPoint);
-  gfan::ZVector adjustedFacetNormal = currentStrategy.adjustWeightUnderHomogeneity(facetNormal,adjustedInteriorPoint);
-
   /* create a ring with weighted ordering  */
   bool ok;
   ring sAdjusted = rCopy0(r);
@@ -61,7 +61,8 @@ std::pair<ideal,ring> flip(const ideal I, const ring r, const gfan::ZVector inte
   sAdjusted->block1[1] = n;
   sAdjusted->wvhdl[1] = ZVectorToIntStar(adjustedFacetNormal,ok);
   sAdjusted->order[2] = ringorder_C;
-  rComplete(sAdjusted,1);
+  rComplete(sAdjusted);
+  rTest(sAdjusted);
   nMapFunc identity = n_SetMap(r->cf,sAdjusted->cf);
 
   /* compute initial ideal and map it to the new ordering */
@@ -99,7 +100,8 @@ std::pair<ideal,ring> flip(const ideal I, const ring r, const gfan::ZVector inte
   s->block0[2] = 1;
   s->block1[2] = n;
   s->order[3] = ringorder_C;
-  rComplete(s,1);
+  rComplete(s);
+  rTest(s);
   identity = n_SetMap(sAdjusted->cf,s->cf);
   k = idSize(IsAdjustedGB); ideal IsGB = idInit(k);
   for (int i=0; i<k; i++)

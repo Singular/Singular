@@ -4,7 +4,12 @@
 #include <gfanlib/gfanlib_vector.h>
 #include <gfanlib/gfanlib_zcone.h>
 #include <libpolys/polys/simpleideals.h>
+#include <kernel/ideals.h> // for idSize
 #include <set>
+#include <callgfanlib_conversion.h>
+#include <containsMonomial.h>
+#include <flip.h>
+#include <initial.h>
 
 /** \file
  * implementation of the class tropicalStrategy
@@ -32,9 +37,12 @@ private:
    */
   ideal originalIdeal;
   /**
-   * dimension of the input ideal
+   * the expected Dimension of the polyhedral output,
+   * i.e. the dimension of the ideal if trivial valuation
+   * or the dimension of the ideal plus one if non-trivial valuation
+   * (as the output is supposed to be intersected with a hyperplane)
    */
-  int dimensionOfIdeal;
+  int expectedDimension;
   /**
    * the homogeneity space of the Grobner fan
    */
@@ -86,7 +94,7 @@ public:
   /**
    * Constructor for the trivial valuation case
    */
-  tropicalStrategy(const ideal I, const ring r);
+  tropicalStrategy(const ideal I, const ring r, const bool completelyHomogeneous=true, const bool completeSpace=true);
   /**
    * Constructor for the non-trivial valuation case
    * p is the uniformizing parameter of the valuation
@@ -105,6 +113,11 @@ public:
    **/
   tropicalStrategy& operator=(const tropicalStrategy& currentStrategy);
 
+  bool isConstantCoefficientCase() const
+  {
+    bool b = (uniformizingParameter==NULL);
+    return b;
+  }
 
   /**
    * returns the polynomial ring over the field with valuation
@@ -113,6 +126,15 @@ public:
   {
     rTest(originalRing);
     return originalRing;
+  }
+
+  /**
+   * returns the input ideal over the field with valuation
+   */
+  ideal getOriginalIdeal() const
+  {
+    if (originalIdeal) id_Test(originalIdeal,originalRing);
+    return originalIdeal;
   }
 
   /**
@@ -129,16 +151,16 @@ public:
    */
   ideal getStartingIdeal() const
   {
-    id_Test(startingIdeal,startingRing);
+    if (startingIdeal) id_Test(startingIdeal,startingRing);
     return startingIdeal;
   }
 
   /**
-   * returns the dimension of the input ideal
+   * returns the expected Dimension of the polyhedral output
    */
-  int getDimensionOfIdeal() const
+  int getExpectedDimension() const
   {
-    return dimensionOfIdeal;
+    return expectedDimension;
   }
 
   /**
@@ -146,7 +168,14 @@ public:
    */
   number getUniformizingParameter() const
   {
+    if (uniformizingParameter) n_Test(uniformizingParameter,startingRing->cf);
     return uniformizingParameter;
+  }
+
+  ring getShortcutRing() const
+  {
+    rTest(shortcutRing);
+    return shortcutRing;
   }
 
   /**
@@ -197,7 +226,7 @@ public:
    * reduces the generators of an ideal I so that
    * the inequalities and equations of the Groebner cone can be read off.
    */
-  bool reduce(ideal I, ring r) const
+  bool reduce(ideal I, const ring r) const
   {
     rTest(r);  id_Test(I,r);
     nMapFunc nMap = n_SetMap(startingRing->cf,r->cf);
@@ -211,11 +240,133 @@ public:
    * returns true, if I contains a monomial.
    * returns false otherwise.
    **/
-  bool containsMonomial(ideal I, ring r) const
+  poly checkInitialIdealForMonomial(const ideal I, const ring r, const gfan::ZVector w) const
   {
-    ring rFinite = rCopy0(r);
-    nKillChar(rFinite.coeffs());
-    rFinite->cf =
+    gfan::ZVector v = adjustWeightForHomogeneity(w);
+    if (isConstantCoefficientCase())
+    {
+      ring rShortcut = rCopy0(r);
+      bool overflow;
+      /**
+       * prepend extra weight vector for homogeneity
+       */
+      int* order = rShortcut->order;
+      int* block0 = rShortcut->block0;
+      int* block1 = rShortcut->block1;
+      int** wvhdl = rShortcut->wvhdl;
+      int h = rBlocks(r); int n = rVar(r);
+      rShortcut->order = (int*) omAlloc0((h+1)*sizeof(int));
+      rShortcut->block0 = (int*) omAlloc0((h+1)*sizeof(int));
+      rShortcut->block1 = (int*) omAlloc0((h+1)*sizeof(int));
+      rShortcut->wvhdl = (int**) omAlloc0((h+1)*sizeof(int*));
+      rShortcut->order[0] = ringorder_a;
+      rShortcut->block0[0] = 1;
+      rShortcut->block1[0] = n;
+      rShortcut->wvhdl[0] = ZVectorToIntStar(v,overflow);
+      for (int i=1; i<=h; i++)
+      {
+        rShortcut->order[i] = order[i-1];
+        rShortcut->block0[i] = block0[i-1];
+        rShortcut->block1[i] = block1[i-1];
+        rShortcut->wvhdl[i] = wvhdl[i-1];
+      }
+      rComplete(rShortcut);
+      rTest(rShortcut);
+      omFree(order);
+      omFree(block0);
+      omFree(block1);
+      omFree(wvhdl);
+
+      ideal inI = initial(I,r,w);
+      int k = idSize(inI);
+      ideal inIShortcut = idInit(k);
+      nMapFunc identity = n_SetMap(r->cf,rShortcut->cf);
+      for (int i=0; i<k; i++)
+        inIShortcut->m[i] = p_PermPoly(inI->m[i],NULL,r,rShortcut,identity,NULL,0);
+
+      poly p = checkForMonomialViaSuddenSaturation(inIShortcut,rShortcut);
+      poly monomial = NULL;
+      if (p!=NULL)
+      {
+        monomial=p_One(r);
+        for (int i=1; i<n; i++)
+          p_SetExp(monomial,i,p_GetExp(p,i,rShortcut),r);
+        p_Delete(&p,rShortcut);
+      }
+      id_Delete(&inI,r);
+      id_Delete(&inIShortcut,rShortcut);
+      rDelete(rShortcut);
+      return monomial;
+    }
+    else
+    {
+      ring rShortcut = rCopy0(r);
+      bool overflow;
+      /**
+       * prepend extra weight vector for homogeneity
+       */
+      int* order = rShortcut->order;
+      int* block0 = rShortcut->block0;
+      int* block1 = rShortcut->block1;
+      int** wvhdl = rShortcut->wvhdl;
+      int h = rBlocks(r); int n = rVar(r);
+      rShortcut->order = (int*) omAlloc0((h+1)*sizeof(int));
+      rShortcut->block0 = (int*) omAlloc0((h+1)*sizeof(int));
+      rShortcut->block1 = (int*) omAlloc0((h+1)*sizeof(int));
+      rShortcut->wvhdl = (int**) omAlloc0((h+1)*sizeof(int*));
+      rShortcut->order[0] = ringorder_a;
+      rShortcut->block0[0] = 1;
+      rShortcut->block1[0] = n;
+      rShortcut->wvhdl[0] = ZVectorToIntStar(v,overflow);
+      for (int i=1; i<=h; i++)
+      {
+        rShortcut->order[i] = order[i-1];
+        rShortcut->block0[i] = block0[i-1];
+        rShortcut->block1[i] = block1[i-1];
+        rShortcut->wvhdl[i] = wvhdl[i-1];
+      }
+      omFree(order);
+      omFree(block0);
+      omFree(block1);
+      omFree(wvhdl);
+      /**
+       * change ground domain into finite field
+       */
+      nKillChar(rShortcut->cf);
+      rShortcut->cf = nCopyCoeff(shortcutRing->cf);
+      rComplete(rShortcut);
+      rTest(rShortcut);
+
+      ideal inI = initial(I,r,w);
+      int k = idSize(inI);
+      ideal inIShortcut = idInit(k);
+      nMapFunc takingResidues = n_SetMap(r->cf,rShortcut->cf);
+      for (int i=0; i<k; i++)
+        inIShortcut->m[i] = p_PermPoly(inI->m[i],NULL,r,rShortcut,takingResidues,NULL,0);
+
+      idSkipZeroes(inIShortcut);
+      poly p = checkForMonomialViaSuddenSaturation(inIShortcut,rShortcut);
+      poly monomial = NULL;
+      if (p!=NULL)
+      {
+        monomial=p_One(r);
+        for (int i=1; i<n; i++)
+          p_SetExp(monomial,i,p_GetExp(p,i,rShortcut),r);
+        p_Delete(&p,rShortcut);
+      }
+      id_Delete(&inI,r);
+      id_Delete(&inIShortcut,rShortcut);
+      rDelete(rShortcut);
+      return monomial;
+    }
+  }
+  std::pair<ideal,ring> flip(const ideal I, const ring r,
+                             const gfan::ZVector interiorPoint,
+                             const gfan::ZVector facetNormal) const
+  {
+    gfan::ZVector adjustedInteriorPoint = adjustWeightForHomogeneity(interiorPoint);
+    gfan::ZVector adjustedFacetNormal = adjustWeightUnderHomogeneity(facetNormal,adjustedInteriorPoint);
+    return flip0(I,r,interiorPoint,facetNormal,adjustedInteriorPoint,adjustedFacetNormal);
   }
 };
 

@@ -177,9 +177,6 @@ groebnerCones tropicalNeighbours(const groebnerCone sigma, const tropicalStrateg
   int d = zc.dimension();
   gfan::ZMatrix interiorPoints = facetInteriorPoints(zc);
   groebnerCones neighbours;
-  bool (*red)(ideal I, ring r, number p);
-  red = currentCase.reduce;
-  number p = currentCase.uniformizingParameter;
 
   for (int i=0; i<interiorPoints.getHeight(); i++)
   {
@@ -195,7 +192,7 @@ groebnerCones tropicalNeighbours(const groebnerCone sigma, const tropicalStrateg
       std::pair<ideal,ring> flipped = flip(I,r,w,*ray,currentCase);
       ideal I = flipped.first;
       ring r = flipped.second;
-      red(I,r,p);
+      currentCase->reduce(I,r);
       gfan::ZCone c = sloppyGroebnerCone(I,r,*ray);
       gfan::ZVector p = c.getRelativeInteriorPoint();
       neighbours.insert(groebnerCone(I,r,c,p));

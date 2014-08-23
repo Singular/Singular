@@ -3,7 +3,7 @@
 
 static bool checkForNonPositiveEntries(const gfan::ZVector w)
 {
-  for (unsigned i=1; i<w.size(); i++)
+  for (unsigned i=0; i<w.size(); i++)
   {
     if (w[i].sign()<=0)
     {
@@ -14,6 +14,27 @@ static bool checkForNonPositiveEntries(const gfan::ZVector w)
   }
   return true;
 }
+
+static bool checkForNonPositiveLaterEntries(const gfan::ZVector w)
+{
+  if (w[0].sign()<0)
+  {
+    std::cout << "ERROR: negative weight in weight vector first entry" << std::endl
+              << "weight: " << w << std::endl;
+    return false;
+  }
+  for (unsigned i=1; i<w.size(); i++)
+  {
+    if (w[i].sign()<=0)
+    {
+      std::cout << "ERROR: non-positive weight in weight vector later entries" << std::endl
+                << "weight: " << w << std::endl;
+      return false;
+    }
+  }
+  return true;
+}
+
 
 /***
  * Returns a strictly positive weight vector v with respect to whom
@@ -49,7 +70,7 @@ gfan::ZVector valued_adjustWeightForHomogeneity(const gfan::ZVector w)
   v[0]=-w[0];
   for (unsigned i=1; i<w.size(); i++)
     v[i]=-w[i]+max+1;
-  assume(checkForNonPositiveEntries(v));
+  assume(checkForNonPositiveLaterEntries(v));
   return v;
 }
 
@@ -86,12 +107,12 @@ gfan::ZVector nonvalued_adjustWeightUnderHomogeneity(const gfan::ZVector e, cons
 
 gfan::ZVector valued_adjustWeightUnderHomogeneity(const gfan::ZVector e, const gfan::ZVector w)
 {
-  assume(checkForNonPositiveEntries(w));
+  assume(checkForNonPositiveLaterEntries(w));
   /* find k such that e+k*w is strictly positive,
    * i.e. k such that e[i]+k*w[i] is strictly positive
    * for all i=0,...,n */
   gfan::Integer k((long)0);
-  if (e[0].sign()<=0)
+  if (e[0].sign()<=0 && w[0].sign()>0)
     k = gfan::Integer((long)1)-(e[0]/w[0]);
   for (unsigned i=1; i<e.size(); i++)
   {
@@ -104,6 +125,6 @@ gfan::ZVector valued_adjustWeightUnderHomogeneity(const gfan::ZVector e, const g
   }
   /* compute e+k*w, check it for correctness and return it */
   gfan::ZVector v = e+k*w;
-  assume(checkForNonPositiveEntries(v));
+  assume(checkForNonPositiveLaterEntries(v));
   return v;
 }

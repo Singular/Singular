@@ -16,10 +16,10 @@
 static matrix divisionDiscardingRemainder(const poly f, const ideal G, const ring r)
 {
   ring origin = currRing;
-  rComplete(r);
   if (origin != r) rChangeCurrRing(r);
   ideal F = idInit(1); F->m[0]=f;
-  ideal m = idLift(G,F,NULL,FALSE,FALSE);
+  ideal m = idLift(G,F);
+  // ideal m = idLift(G,F,NULL,FALSE,TRUE);
   F->m[0]=NULL; id_Delete(&F, currRing);
   matrix Q = id_Module2formatedMatrix(m,IDELEMS(G),1,currRing);
   if (origin != r) rChangeCurrRing(origin);
@@ -52,6 +52,7 @@ BOOLEAN dwr0(leftv res, leftv args)
  **/
 poly witness(const poly m, const ideal I, const ideal inI, const ring r)
 {
+  assume(idSize(I)==idSize(inI));
   matrix Q = divisionDiscardingRemainder(m,inI,r);
 
   int k = idSize(I);

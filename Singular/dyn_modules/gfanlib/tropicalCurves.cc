@@ -99,7 +99,8 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector u, const
     throw 0; //weightOverflow;
 
   /* complete the ring and return it */
-  rComplete(s,1);
+  rComplete(s);
+  rTest(s);
   return s;
 }
 
@@ -113,7 +114,7 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
                                    const tropicalStrategy currentStrategy)
 {
   int k = idSize(inI);
-  int d = currentStrategy.getDimensionOfIdeal();
+  int d = currentStrategy.getExpectedDimension();
 
   /* Compute the common refinement over all tropical varieties
    * of the polynomials in the generating set */
@@ -167,10 +168,21 @@ std::set<gfan::ZVector> raysOfTropicalStar(ideal I, const ring r, const gfan::ZV
 {
   std::set<gfan::ZCone> C = tropicalStar(I,r,u,currentStrategy);
   std::set<gfan::ZVector> raysOfC;
-  for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end(); zc++)
+  if (!currentStrategy.restrictToLowerHalfSpace())
   {
-    assume(zc->dimensionOfLinealitySpace()+1 == zc->dimension());
-    raysOfC.insert(zc->semiGroupGeneratorOfRay());
+    for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end(); zc++)
+    {
+      assume(zc->dimensionOfLinealitySpace()+1 == zc->dimension());
+      raysOfC.insert(zc->semiGroupGeneratorOfRay());
+    }
+  }
+  else
+  {
+    for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end(); zc++)
+    {
+      assume(zc->dimensionOfLinealitySpace()+2 == zc->dimension());
+      raysOfC.insert(zc->getRelativeInteriorPoint());
+    }
   }
   return raysOfC;
 }

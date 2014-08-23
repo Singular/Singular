@@ -39,6 +39,7 @@ private:
   ring polynomialRing;
   gfan::ZCone polyhedralCone;
   gfan::ZVector interiorPoint;
+  gfan::ZVector negativePointInLineality;
   const tropicalStrategy* currentStrategy;
 
 public:
@@ -68,6 +69,7 @@ public:
   ring getPolynomialRing() const { return polynomialRing; };
   gfan::ZCone getPolyhedralCone() const { return polyhedralCone; };
   gfan::ZVector getInteriorPoint() const { return interiorPoint; };
+  gfan::ZVector getNegativePointInLineality() const { return negativePointInLineality; };
   const tropicalStrategy* getTropicalStrategy() const {return currentStrategy; };
 
   friend struct groebnerCone_compare;

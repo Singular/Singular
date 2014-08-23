@@ -26,15 +26,19 @@ gfan::ZCone homogeneitySpace(ideal I, ring r)
   gfan::ZMatrix equations = gfan::ZMatrix(0,n);
   for (int i=0; i<IDELEMS(I); i++)
   {
-    g = (poly) I->m[i]; pGetExpV(g,leadexpv);
-    leadexpw = intStar2ZVector(n, leadexpv);
-    pIter(g);
-    while (g != NULL)
+    g = (poly) I->m[i];
+    if (g)
     {
-      pGetExpV(g,tailexpv);
-      tailexpw = intStar2ZVector(n, tailexpv);
-      equations.appendRow(leadexpw-tailexpw);
+      p_GetExpV(g,leadexpv,r);
+      leadexpw = intStar2ZVector(n,leadexpv);
       pIter(g);
+      while (g)
+      {
+        p_GetExpV(g,tailexpv,r);
+        tailexpw = intStar2ZVector(n,tailexpv);
+        equations.appendRow(leadexpw-tailexpw);
+        pIter(g);
+      }
     }
   }
   omFreeSize(leadexpv,(n+1)*sizeof(int));

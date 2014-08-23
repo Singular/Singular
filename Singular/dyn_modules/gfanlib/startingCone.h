@@ -4,7 +4,7 @@
 #include <groebnerCone.h>
 #include <tropicalStrategy.h>
 
-groebnerCone tropicalStartingCone(const ideal I, const ring r, const tropicalStrategy& currentCase);
+groebnerCone tropicalStartingCone(const tropicalStrategy& currentCase);
 
 BOOLEAN tropicalStartingPoint(leftv res, leftv args);
 BOOLEAN positiveTropicalStartingPoint(leftv res, leftv args);

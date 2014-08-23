@@ -10,6 +10,7 @@
 #include <bbcone.h>
 #include <tropicalVarietyOfPolynomials.h>
 #include <tropicalVariety.h>
+#include <tropicalStrategy.h>
 
 
 /***
@@ -22,9 +23,8 @@ static bool checkContainmentInTropicalVariety(const groebnerCone sigma)
   gfan::ZVector w = sigma.getInteriorPoint();
   ideal I = sigma.getPolynomialIdeal();
   ring r = sigma.getPolynomialRing();
-  ideal inI = sloppyInitial(I,r,w);
-  poly s = checkForMonomialViaSuddenSaturation(inI,r);
-  id_Delete(&inI,r);
+  const tropicalStrategy* currentStrategy = sigma.getTropicalStrategy();
+  poly s = currentStrategy->checkInitialIdealForMonomial(I,r,w);
   if (s)
   {
     p_Delete(&s,r);
@@ -43,30 +43,27 @@ static bool checkOneCodimensionalLinealitySpace(const groebnerCone sigma)
 }
 
 
-/***
- * Computes a starting point by traversing the Groebner fan,
+/**
+ * Computes a starting point outside the lineatliy space by traversing the Groebner fan,
  * checking each cone whether it contains a ray in the tropical variety.
- * Returns a point in the tropical variety and a maximal Groebner cone
- * containing the point.
+ * Returns a point in the tropical variety and a maximal Groebner cone containing the point.
  **/
 std::pair<gfan::ZVector,groebnerCone> tropicalStartingDataViaGroebnerFan(const ideal I, const ring r, const tropicalStrategy& currentStrategy)
 {
-  std::cout << "computing starting cone" << std::endl;
-  currentStrategy.reduce(I,r);
-  std::cout << "finished reduction" << std::endl;
-
+  // start by computing a maximal Groebner cone and
+  // check whether one of its rays lies in the tropical variety
   const groebnerCone sigma(I,r,currentStrategy);
-  std::cout << "finished first maximal Groebner cone" << std::endl;
   gfan::ZVector startingPoint = sigma.tropicalPoint();
   if (startingPoint.size() > 0)
     return std::make_pair(startingPoint,sigma);
+
+  // if not, traverse the groebnerFan and until such a cone is found
+  // and return the maximal cone together with a point in its ray
   groebnerCones groebnerFan;
   groebnerCones workingList;
   workingList.insert(sigma);
-
   while (!workingList.empty())
   {
-    std::cout << "traversing groebner fan..." << std::endl;
     const groebnerCone sigma = *(workingList.begin());
     groebnerCones neighbours = sigma.groebnerNeighbours();
     for (groebnerCones::iterator tau = neighbours.begin(); tau!=neighbours.end(); tau++)
@@ -85,6 +82,8 @@ std::pair<gfan::ZVector,groebnerCone> tropicalStartingDataViaGroebnerFan(const i
     groebnerFan.insert(sigma);
     workingList.erase(sigma);
   }
+
+  // return some trivial output, if such a cone cannot be found
   gfan::ZVector emptyVector = gfan::ZVector(0);
   groebnerCone emptyCone = groebnerCone();
   return std::pair<gfan::ZVector,groebnerCone>(emptyVector,emptyCone);
@@ -263,7 +262,7 @@ BOOLEAN tropicalStartingPoint(leftv res, leftv args)
       return FALSE;
     }
     gfan::ZCone C0 = currentStrategy.getHomogeneitySpace();
-    if (C0.dimension()==currentStrategy.getDimensionOfIdeal())
+    if (C0.dimension()==currentStrategy.getExpectedDimension())
     {
       gfan::ZMatrix lin = C0.generatorsOfLinealitySpace();
       res->rtyp = BIGINTMAT_CMD;
@@ -292,56 +291,179 @@ static gfan::ZCone linealitySpaceOfGroebnerFan(const ideal I, const ring r)
   for (int i=0; i<k; i++)
   {
     poly g = I->m[i];
-    p_GetExpV(g,expv,r);
-    gfan::ZVector leadexp = intStar2ZVector(n,expv);
-    for (pIter(g); g; pIter(g))
+    if (g)
     {
       p_GetExpV(g,expv,r);
-      equations.appendRow(leadexp-intStar2ZVector(n,expv));
+      gfan::ZVector leadexp = intStar2ZVector(n,expv);
+      for (pIter(g); g; pIter(g))
+      {
+        p_GetExpV(g,expv,r);
+        equations.appendRow(leadexp-intStar2ZVector(n,expv));
+      }
     }
   }
   omFreeSize(expv,(n+1)*sizeof(int));
   return gfan::ZCone(gfan::ZMatrix(0,n),equations);
 }
 
-
 /***
  * Computes a starting cone in the tropical variety.
  **/
-groebnerCone tropicalStartingCone(const ideal I, const ring r, const tropicalStrategy& currentStrategy)
+groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
 {
-  ring s = rCopy(r);
-  int k = idSize(I); ideal inI = idInit(k);
-  nMapFunc identityMap = n_SetMap(r->cf,s->cf);
-  for (int i=0; i<k; i++)
-    inI->m[i] = p_PermPoly(I->m[i],NULL,r,s,identityMap,NULL,0);
-
-  gfan::ZCone zc = linealitySpaceOfGroebnerFan(inI,s);
-  gfan::ZVector startingPoint; groebnerCone ambientMaximalCone;
-  while (zc.dimension()<currentStrategy.getDimensionOfIdeal())
+  ring r = currentStrategy.getStartingRing();
+  ideal I = currentStrategy.getStartingIdeal();
+  if (currentStrategy.isConstantCoefficientCase())
   {
-    std::pair<gfan::ZVector,groebnerCone> startingData = tropicalStartingDataViaGroebnerFan(inI,s,currentStrategy);
-    startingPoint = startingData.first;
-    ambientMaximalCone = groebnerCone(startingData.second);
+    // copy the data, so that it be deleted when passed to the loop
+    // s <- r
+    // inI <- I
+    ring s = rCopy(r);
+    int k = idSize(I); ideal inI = idInit(k);
+    nMapFunc identityMap = n_SetMap(r->cf,s->cf);
+    for (int i=0; i<k; i++)
+      inI->m[i] = p_PermPoly(I->m[i],NULL,r,s,identityMap,NULL,0);
 
+    // repeatedly computes a point in the tropical variety outside the lineality space,
+    // take the initial ideal with respect to it
+    // and check whether the dimension of its homogeneity space
+    // equals the dimension of the tropical variety
+    gfan::ZCone zc = linealitySpaceOfGroebnerFan(inI,s);
+    gfan::ZVector startingPoint; groebnerCone ambientMaximalCone;
+    while (zc.dimension()<currentStrategy.getExpectedDimension())
+    {
+      // compute a point in the tropical variety outside the lineality space
+      std::pair<gfan::ZVector,groebnerCone> startingData = tropicalStartingDataViaGroebnerFan(inI,s,currentStrategy);
+      startingPoint = startingData.first;
+      ambientMaximalCone = groebnerCone(startingData.second);
+
+      id_Delete(&inI,s); rDelete(s);
+      inI = ambientMaximalCone.getPolynomialIdeal();
+      s = ambientMaximalCone.getPolynomialRing();
+
+      // compute the initial ideal with respect to the weight
+      inI = sloppyInitial(inI,s,startingPoint);
+      zc = linealitySpaceOfGroebnerFan(inI,s);
+    }
+
+    // once the dimension of the homogeneity space equals that of the tropical variety
+    // we know that we have an initial ideal with respect to a weight
+    // in the relative interior of a maximal cone in the tropical variety
+    // from this we can read of the inequalities and equations
+
+    // but before doing so, we must lift the generating set of inI
+    // to a generating set of I
+    ideal J = lift(I,r,inI,s);
+    groebnerCone startingCone(J,inI,s,currentStrategy);
+    id_Delete(&inI,s);
+    id_Delete(&J,s);
+
+    assume(checkContainmentInTropicalVariety(startingCone));
+    return startingCone;
+  }
+  else
+  {
+    // copy the data, so that it be deleted when passed to the loop
+    // s <- r
+    // inI <- I
+    ring s = rCopy(r);
+    int k = idSize(I); ideal inI = idInit(k);
+    nMapFunc identityMap = n_SetMap(r->cf,s->cf);
+    for (int i=0; i<k; i++)
+      inI->m[i] = p_PermPoly(I->m[i],NULL,r,s,identityMap,NULL,0);
+
+    // and check whether the dimension of its homogeneity space
+    // equals the dimension of the tropical variety
+    gfan::ZCone zc = linealitySpaceOfGroebnerFan(inI,s);
+    if (zc.dimension()==currentStrategy.getExpectedDimension())
+    { // this shouldn't happen as trivial cases should be caught beforehand
+      // this is the case that the tropical variety consists soely out of the lineality space
+      groebnerCone startingCone(I,inI,s,currentStrategy);
+      id_Delete(&inI,s);
+      rDelete(s);
+      return startingCone;
+    }
+
+    // compute a point in the tropical variety outside the lineality space
+    // compute the initial ideal with respect to the weight
+    std::pair<gfan::ZVector,groebnerCone> startingData = tropicalStartingDataViaGroebnerFan(inI,s,currentStrategy);
+    gfan::ZVector startingPoint = startingData.first;
+    groebnerCone ambientMaximalCone = groebnerCone(startingData.second);
     id_Delete(&inI,s); rDelete(s);
     inI = ambientMaximalCone.getPolynomialIdeal();
     s = ambientMaximalCone.getPolynomialRing();
-
     inI = sloppyInitial(inI,s,startingPoint);
     zc = linealitySpaceOfGroebnerFan(inI,s);
+
+    // and check whether the dimension of its homogeneity space
+    // equals the dimension of the tropical variety
+    if (zc.dimension()==currentStrategy.getExpectedDimension())
+    { // this case shouldn't happen as trivial cases should be caught beforehand
+      // this is the case that the tropical variety has a one-codimensional lineality space
+      ideal J = lift(I,r,inI,s);
+      groebnerCone startingCone(J,inI,s,currentStrategy);
+      id_Delete(&inI,s);
+      id_Delete(&J,s);
+      return startingCone;
+    }
+
+    // from this point on, inI contains the uniformizing parameter,
+    // hence it contains a monomial if and only if its residue over the residue field does.
+    // so we will switch to the residue field
+    ring rShortcut = rCopy0(r);
+    nKillChar(rShortcut->cf);
+    rShortcut->cf = nCopyCoeff((currentStrategy.getShortcutRing())->cf);
+    rComplete(rShortcut);
+    rTest(rShortcut);
+    k = idSize(inI);
+    ideal inIShortcut = idInit(k);
+    nMapFunc takingResidues = n_SetMap(s->cf,rShortcut->cf);
+    for (int i=0; i<k; i++)
+      inIShortcut->m[i] = p_PermPoly(inI->m[i],NULL,s,rShortcut,takingResidues,NULL,0);
+    idSkipZeroes(inIShortcut);
+    id_Delete(&inI,s);
+
+    // we are interested in a maximal cone of the tropical variety of inIShortcut
+    // this basically equivalent to the case without valuation (or constant coefficient case)
+    // except that our ideal is still only homogeneous in the later variables,
+    // hence we set the optional parameter completelyHomogeneous as 'false'
+    tropicalStrategy shortcutStrategy(inIShortcut,rShortcut,false);
+    groebnerCone startingConeShortcut = tropicalStartingCone(shortcutStrategy);
+    id_Delete(&inIShortcut,rShortcut); rDelete(rShortcut);
+
+    // now we need to obtain the initial of the residue of inI
+    // with respect to a weight in the tropical cone,
+    // and obtain the initial of inI with respect to the same weight
+    ring sShortcut = startingConeShortcut.getPolynomialRing();
+    inIShortcut = startingConeShortcut.getPolynomialIdeal();
+    gfan::ZCone zd = startingConeShortcut.getPolyhedralCone();
+    gfan::ZVector interiorPoint = startingConeShortcut.getInteriorPoint();
+    inIShortcut = sloppyInitial(inIShortcut,sShortcut,interiorPoint);
+
+    s = rCopy0(sShortcut); // s will be a ring over the valuation ring
+    nKillChar(s->cf);      // with the same ordering as sShortcut
+    s->cf = nCopyCoeff(r->cf);
+    rComplete(s);
+    rTest(s);
+
+    k = idSize(inIShortcut); // inI will be overwritten with initial of inI
+    inI = idInit(k+1);
+    inI->m[0] = p_One(s);    // with respect to that weight
+    identityMap = n_SetMap(r->cf,s->cf); // first element will obviously be p
+    p_SetCoeff(inI->m[0],identityMap(currentStrategy.getUniformizingParameter(),r->cf,s->cf),s);
+    nMapFunc findingRepresentatives = n_SetMap(sShortcut->cf,s->cf);
+    for (int i=0; i<k; i++)              // and then come the rest
+      inI->m[i+1] = p_PermPoly(inIShortcut->m[i],NULL,sShortcut,s,findingRepresentatives,NULL,0);
+
+    ideal J = lift(I,r,inI,s);
+    groebnerCone startingCone(J,inI,s,currentStrategy);
+    id_Delete(&inI,s);
+    id_Delete(&J,s);
+    rDelete(s);
+
+    return startingCone;
   }
-
-  ideal J = lift(I,r,inI,s);
-  groebnerCone tropicalStartingCone(J,inI,s,currentStrategy);
-  id_Delete(&inI,s);
-  id_Delete(&J,s);
-
-  assume(checkContainmentInTropicalVariety(tropicalStartingCone));
-  assume(checkOneCodimensionalLinealitySpace(tropicalStartingCone));
-  return tropicalStartingCone;
 }
-
 
 BOOLEAN tropicalStartingCone(leftv res, leftv args)
 {
@@ -356,10 +478,11 @@ BOOLEAN tropicalStartingCone(leftv res, leftv args)
       leftv w = v->next;
       if (w==NULL)
       {
-        tropicalStrategy valuedCase(I,p,currRing);
-        groebnerCone sigma = tropicalStartingCone(I,currRing,valuedCase);
+        tropicalStrategy currentStrategy(I,p,currRing);
+        groebnerCone sigma = tropicalStartingCone(currentStrategy);
+        gfan::ZCone* startingCone = new gfan::ZCone(sigma.getPolyhedralCone());
         res->rtyp = coneID;
-        res->data = (char*) new gfan::ZCone(sigma.getPolyhedralCone());
+        res->data = (char*) startingCone;
         return FALSE;
       }
     }
@@ -367,8 +490,8 @@ BOOLEAN tropicalStartingCone(leftv res, leftv args)
     {
       if (v==NULL)
       {
-        tropicalStrategy nonValuedCase(I,currRing);
-        groebnerCone sigma = tropicalStartingCone(I,currRing,nonValuedCase);
+        tropicalStrategy currentStrategy(I,currRing);
+        groebnerCone sigma = tropicalStartingCone(currentStrategy);
         res->rtyp = coneID;
         res->data = (char*) new gfan::ZCone(sigma.getPolyhedralCone());
         return FALSE;
