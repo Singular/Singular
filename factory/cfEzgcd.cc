@@ -306,7 +306,8 @@ int Hensel (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
   long termEstimate= size (U);
   for (int i= A.min(); i <= A.max(); i++)
   {
-    if (!A[i].isZero())
+    if (!A[i].isZero() &&
+        ((getCharacteristic() > degree (U,i)) || getCharacteristic() == 0))
     {
       termEstimate *= degree (U,i)*2;
       termEstimate /= 3;
@@ -432,6 +433,7 @@ bool findeval (const CanonicalForm & F, const CanonicalForm & G,
   }
 }
 
+/// real implementation of EZGCD over Z
 static CanonicalForm
 ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
         bool internal )
@@ -775,6 +777,8 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b,
 }
 #endif
 
+/// Extended Zassenhaus GCD over Z.
+/// In case things become too dense we switch to a modular algorithm.
 CanonicalForm
 ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 {
@@ -789,155 +793,12 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 }
 
 #ifdef HAVE_NTL
-static inline
-int Hensel_P (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
-              const CFArray& LeadCoeffs )
-{
-  CFList factors;
-  factors.append (G[1]);
-  factors.append (G[2]);
-
-  CFMap NN, MM;
-  Evaluation A= optimize4Lift (UU, MM, NN, AA);
-
-  CanonicalForm U= MM (UU);
-  CFArray LCs= CFArray (1,2);
-  LCs [1]= MM (LeadCoeffs [1]);
-  LCs [2]= MM (LeadCoeffs [2]);
-
-  CFList evaluation;
-  long termEstimate= size (U);
-  for (int i= A.min(); i <= A.max(); i++)
-  {
-    if (!A[i].isZero() && (getCharacteristic() > degree (U,i))) //TODO find a good estimate for getCharacteristic() <= degree (U,i)
-    {
-      termEstimate *= degree (U,i)*2;
-      termEstimate /= 3;
-    }
-    evaluation.append (A [i]);
-  }
-  if (termEstimate/getNumVars(U) > 500)
-    return -1;
-  CFList UEval;
-  CanonicalForm shiftedU= myShift2Zero (U, UEval, evaluation);
-
-  if (size (shiftedU)/getNumVars (U) > 500)
-    return -1;
-
-  CFArray shiftedLCs= CFArray (2);
-  CFList shiftedLCsEval1, shiftedLCsEval2;
-  shiftedLCs[0]= myShift2Zero (LCs[1], shiftedLCsEval1, evaluation);
-  shiftedLCs[1]= myShift2Zero (LCs[2], shiftedLCsEval2, evaluation);
-  factors.insert (1);
-  int liftBound= degree (UEval.getLast(), 2) + 1;
-  CFArray Pi;
-  CFMatrix M= CFMatrix (liftBound, factors.length() - 1);
-  CFList diophant;
-  CFArray lcs= CFArray (2);
-  lcs [0]= shiftedLCsEval1.getFirst();
-  lcs [1]= shiftedLCsEval2.getFirst();
-  nonMonicHenselLift12 (UEval.getFirst(), factors, liftBound, Pi, diophant, M,
-                        lcs, false);
-
-  for (CFListIterator i= factors; i.hasItem(); i++)
-  {
-    if (!fdivides (i.getItem(), UEval.getFirst()))
-      return 0;
-  }
-
-  int * liftBounds;
-  bool noOneToOne= false;
-  if (U.level() > 2)
-  {
-    liftBounds= new int [U.level() - 1]; /* index: 0.. U.level()-2 */
-    liftBounds[0]= liftBound;
-    for (int i= 1; i < U.level() - 1; i++)
-      liftBounds[i]= degree (shiftedU, Variable (i + 2)) + 1;
-    factors= nonMonicHenselLift2 (UEval, factors, liftBounds, U.level() - 1,
-                                  false, shiftedLCsEval1, shiftedLCsEval2, Pi,
-                                  diophant, noOneToOne);
-    delete [] liftBounds;
-    if (noOneToOne)
-      return 0;
-  }
-  G[1]= factors.getFirst();
-  G[2]= factors.getLast();
-  G[1]= myReverseShift (G[1], evaluation);
-  G[2]= myReverseShift (G[2], evaluation);
-  G[1]= NN (G[1]);
-  G[2]= NN (G[2]);
-  return 1;
-}
-
-static inline
-bool findeval_P (const CanonicalForm & F, const CanonicalForm & G,
-                 CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db,
-                 REvaluation & b, int delta, int degF, int degG, int maxeval,
-                 int & count, int& k, int bound, int& l)
-{
-  if( count == 0 && delta != 0)
-  {
-    if( count++ > maxeval )
-      return false;
-  }
-  if (count > 0)
-  {
-    b.nextpoint(k);
-    if (k == 0)
-      k++;
-    l++;
-    if (l > bound)
-    {
-      l= 1;
-      k++;
-      if (k > tmax (F.level(), G.level()) - 1)
-        return false;
-      b.nextpoint (k);
-    }
-    if (count++ > maxeval)
-      return false;
-  }
-  while( true )
-  {
-    Fb = b( F );
-    if( degree( Fb, 1 ) == degF )
-    {
-      Gb = b( G );
-      if( degree( Gb, 1 ) == degG )
-      {
-        Db = gcd( Fb, Gb );
-        if( delta > 0 )
-        {
-          if( degree( Db, 1 ) <= delta )
-            return true;
-        }
-        else
-          return true;
-      }
-    }
-    if (k == 0)
-      k++;
-    b.nextpoint(k);
-    l++;
-    if (l > bound)
-    {
-      l= 1;
-      k++;
-      if (k > tmax (F.level(), G.level()) - 1)
-        return false;
-      b.nextpoint (k);
-    }
-    if( count++ > maxeval )
-      return false;
-  }
-}
-
 // parameters for heuristic
 static int maxNumEval= 200;
 static int sizePerVars1= 500; //try dense gcd if size/#variables is bigger
 
 /// Extended Zassenhaus GCD for finite fields.
-/// In case things become too dense we switch to a modular algorithm
+/// In case things become too dense we switch to a modular algorithm.
 CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
 {
   if (FF.isZero() && degree(GG) > 0) return GG/Lc(GG);
@@ -1153,7 +1014,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   while( !gcdfound )
   {
     TIMING_START (ez_p_eval);
-    if( !findeval_P( F, G, Fb, Gb, Db, b, delta, degF, degG, maxeval, count, o,
+    if( !findeval( F, G, Fb, Gb, Db, b, delta, degF, degG, maxeval, count, o,
          maxeval/maxNumVars, t ))
     { // too many eval. used --> try another method
       Off (SW_USE_EZGCD_P);
@@ -1247,7 +1108,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
     {
       bt = b;
       TIMING_START (ez_p_eval);
-      if( !findeval_P(F,G,Fbt,Gbt,Dbt, bt, delta, degF, degG, maxeval, count, o,
+      if( !findeval(F,G,Fbt,Gbt,Dbt, bt, delta, degF, degG, maxeval, count, o,
            maxeval/maxNumVars, t ))
       { // too many eval. used --> try another method
         Off (SW_USE_EZGCD_P);
@@ -1452,7 +1313,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
       }
 
       TIMING_START (ez_p_hensel_lift);
-      gcdfound= Hensel_P (B*lcD, DD, b, lcDD);
+      gcdfound= Hensel (B*lcD, DD, b, lcDD);
       TIMING_END_AND_PRINT (ez_p_hensel_lift, "time for Hensel lift in EZ_P: ");
 
       if (gcdfound == -1) //things became dense
