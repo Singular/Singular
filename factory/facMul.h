@@ -18,8 +18,10 @@
 #include "fac_util.h"
 
 #ifdef HAVE_NTL
-/// multiplication of univariate polys over a finite field using NTL, if we are
-/// in GF factory's default multiplication is used.
+/// multiplication of univariate polys using FLINT/NTL over F_p, F_q, Z/p^k,
+/// Z/p^k[t]/(f), Z, Q, Q(a), if we are in GF factory's default multiplication
+/// is used. If @a b!= 0 and getCharacteristic() == 0 the input will be
+/// considered as elements over Z/p^k or Z/p^k[t]/(f).
 ///
 /// @return @a mulNTL returns F*G
 CanonicalForm
@@ -28,8 +30,11 @@ mulNTL (const CanonicalForm& F, ///< [in] a univariate poly
         const modpk& b= modpk() ///< [in] coeff bound
        );
 
-/// mod of univariate polys over a finite field using NTL, if we are
-/// in GF factory's default mod is used.
+/// mod of univariate polys using FLINT/NTL over F_p, F_q, Z/p^k,
+/// Z/p^k[t]/(f), Z, Q, Q(a), if we are in GF factory's default multiplication
+/// is used. If @a b!= 0 and getCharacteristic() == 0 the input will be
+/// considered as elements over Z/p^k or Z/p^k[t]/(f); in this case invertiblity
+/// of Lc(G) is not checked
 ///
 /// @return @a modNTL returns F mod G
 CanonicalForm
@@ -38,8 +43,11 @@ modNTL (const CanonicalForm& F, ///< [in] a univariate poly
         const modpk& b= modpk() ///< [in] coeff bound
        );
 
-/// division of univariate polys over a finite field using NTL, if we are
-/// in GF factory's default division is used.
+/// division of univariate polys using FLINT/NTL over F_p, F_q, Z/p^k,
+/// Z/p^k[t]/(f), Z, Q, Q(a), if we are in GF factory's default multiplication
+/// is used. If @a b!= 0 and getCharacteristic() == 0 the input will be
+/// considered as elements over Z/p^k or Z/p^k[t]/(f); in this case invertiblity
+/// of Lc(G) is not checked
 ///
 /// @return @a divNTL returns F/G
 CanonicalForm
@@ -48,8 +56,8 @@ divNTL (const CanonicalForm& F, ///< [in] a univariate poly
         const modpk& b= modpk() ///< [in] coeff bound
        );
 
-/// division with remainder of @a F by
-/// @a G wrt Variable (1) modulo @a M.
+/// division with remainder of @a F by @a G wrt Variable (1) modulo @a M.
+/// Uses an algorithm based on Burnikel, Ziegler "Fast recursive division".
 ///
 /// @return @a Q returns the dividend, @a R returns the remainder.
 /// @sa divrem()
@@ -61,8 +69,8 @@ void divrem2 (const CanonicalForm& F, ///< [in] bivariate, compressed polynomial
               const CanonicalForm& M  ///< [in] power of Variable (2)
              );
 
-/// division with remainder of @a F by
-/// @a G wrt Variable (1) modulo @a MOD.
+/// division with remainder of @a F by @a G wrt Variable (1) modulo @a MOD.
+/// Uses an algorithm based on Burnikel, Ziegler "Fast recursive division".
 ///
 /// @sa divrem2()
 void divrem (
