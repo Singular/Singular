@@ -34,7 +34,7 @@
 
 static inline
 CanonicalForm
-pthRoot (const CanonicalForm & F, const int & q)
+pthRoot (const CanonicalForm & F, int q)
 {
   CanonicalForm A= F;
   int p= getCharacteristic ();
@@ -124,7 +124,7 @@ pthRoot (const CanonicalForm & F, const fmpz_t& q, const Variable& alpha)
 #endif
 
 CanonicalForm
-maxpthRoot (const CanonicalForm & F, const int & q, int& l)
+maxpthRoot (const CanonicalForm & F, int q, int& l)
 {
   CanonicalForm result= F;
   bool derivZero= true;
