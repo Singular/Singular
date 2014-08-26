@@ -280,13 +280,27 @@ ratBiFactorize (const CanonicalForm & G,         ///< [in] a bivariate poly
 CFList conv (const CFFList& L ///< [in] a CFFList
             );
 
+/// compute p^k larger than the bound on the coefficients of a factor of @a f
+/// over Q (mipo)
 modpk
-coeffBound ( const CanonicalForm & f, int p, const CanonicalForm& mipo );
+coeffBound (const CanonicalForm & f,  ///< [in] poly over Z[a]
+            int p,                    ///< [in] some positive integer
+            const CanonicalForm& mipo ///< [in] minimal polynomial with
+                                      ///< denominator 1
+           );
 
-void findGoodPrime(const CanonicalForm &f, int &start);
+/// find a big prime p from our tables such that no term of f vanishes mod p
+void findGoodPrime(const CanonicalForm &f, ///< [in] poly over Z or Z[a]
+                   int &start              ///< [in,out] index of big prime in
+                                           /// cf_primetab.h
+                  );
 
+/// compute p^k larger than the bound on the coefficients of a factor of @a f
+/// over Z
 modpk
-coeffBound ( const CanonicalForm & f, int p );
+coeffBound (const CanonicalForm & f, ///< [in] poly over Z
+            int p                    ///< [in] some positive integer
+           );
 
 #endif
 
