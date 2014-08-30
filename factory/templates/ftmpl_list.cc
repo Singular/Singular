@@ -672,6 +672,21 @@ List<T> Difference ( const List<T> & F, const T & G, int (*ecmpf)( const T&, con
 }
 
 template <class T>
+List<T> Difference ( const List<T> & F, const T & G)
+{
+    List<T> L;
+    ListIterator<T> i;
+    int found;
+    for ( i = F; i.hasItem(); ++i )
+    {
+        found = G == i.getItem();
+        if ( ! found )
+            L.append( i.getItem() );
+    }
+    return L;
+}
+
+template <class T>
 T prod ( const List<T> & F )
 {
     ListIterator<T> i;

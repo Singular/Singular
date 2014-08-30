@@ -126,6 +126,9 @@ template <class T>
 List<T> Difference ( const List<T> &, const List<T> & , int (*ecmpf)( const T&, const T& ));
 
 template <class T>
+List<T> Difference ( const List<T> & F, const T & G);
+
+template <class T>
 List<T> Difference ( const List<T> & F, const T & G, int (*ecmpf)( const T&, const T& ));
 
 template <class T>

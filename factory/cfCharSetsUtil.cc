@@ -486,7 +486,7 @@ inplaceUnion (const ListCFList& a, ListCFList& b)
   for (i= a; i.hasItem(); i++)
   {
     elem= i.getItem();
-    if ((!elem.isEmpty()) && (!find (b, elem, operator==)))
+    if ((!elem.isEmpty()) && (!find (b, elem)))
       b.insert(elem);
   }
 }
@@ -508,7 +508,7 @@ adjoin (const CFList& is, const CFList& qs, const ListCFList& qh)
   if (iscopy.isEmpty())
     return iss;
 
-  qhi= Difference (qh, qs, operator==);
+  qhi= Difference (qh, qs);
   length= qhi.length();
 
   for (i= iscopy; i.hasItem(); i++)
@@ -546,7 +546,7 @@ adjoinb (const CFList & is, const CFList & qs, const ListCFList & qh,
   }
   if (iscopy.isEmpty())
     return iss;
-  qhi= Difference (qh, qs, operator==);
+  qhi= Difference (qh, qs);
   length= qhi.length();
   for (i= iscopy; i.hasItem(); i++)
   {
@@ -939,14 +939,14 @@ contract (const ListCFList& cs)
   for (ListCFListIterator i= cs; i.hasItem() && ii < l; i++, ii++)
   {
     iitem= i.getItem();
-    if (!find (mem, iitem, operator==))
+    if (!find (mem, iitem))
     {
       j= i;
       j++;
       for (; j.hasItem(); j++)
       {
         jitem= j.getItem();
-        if (!find (mem, jitem, operator==))
+        if (!find (mem, jitem))
         {
           if (contractsub (iitem, jitem))
           {
@@ -962,6 +962,6 @@ contract (const ListCFList& cs)
       }
     }
   }
-  return Difference (cs,ts, operator==);
+  return Difference (cs,ts);
 }
 
