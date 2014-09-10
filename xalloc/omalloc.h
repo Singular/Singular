@@ -70,6 +70,8 @@ static inline void * omAlloc(size_t s)
 }
 static inline void * omAlloc0(size_t s)
 { void *d=omAlloc(s);memset(d,0,s); return d; }
+static inline void * omalloc0(size_t s)
+{ if (s!=0) { void *d=omAlloc(s);memset(d,0,s); return d;} else return NULL; }
 
 static inline void *omRealloc(void *d, size_t ns)
 { if (d==NULL) return omAlloc(ns);
