@@ -84,7 +84,7 @@ public:
   //-------------
   unsigned int size()const{return v.size();};
   void resize(int n){v.resize(n,typ());};
-  void grow(int i){if(size()<i)resize(i);}
+  void grow(int i){if((int)size()<i)resize(i);}
   void push_back(typ a)
   {
     v.push_back(a);

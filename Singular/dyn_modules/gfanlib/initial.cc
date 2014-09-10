@@ -38,9 +38,9 @@ gfan::ZVector WDeg(const poly p, const ring r, const gfan::ZMatrix W)
   return d;
 }
 
-/***
+/**
  * Checks if p is sorted with respect to w.
- **/
+ */
 static bool checkSloppyInput(const poly p, const ring r, const gfan::ZVector w)
 {
   long d = wDeg(p,r,w);

@@ -37,11 +37,11 @@ static void deleteOrdering(ring r)
  *        the interior point lies on the intersection of both maximal Groebner cones
  *  (2) Is is a Groebner basis of the same ideal with respect to the ordering on s
  **/
-std::pair<ideal,ring> flip0(const ideal I, const ring r,
-                            const gfan::ZVector interiorPoint,
-                            const gfan::ZVector facetNormal,
-                            const gfan::ZVector adjustedInteriorPoint,
-                            const gfan::ZVector adjustedFacetNormal)
+std::pair<ideal,ring> flip(const ideal I, const ring r,
+                           const gfan::ZVector interiorPoint,
+                           const gfan::ZVector facetNormal,
+                           const gfan::ZVector adjustedInteriorPoint,
+                           const gfan::ZVector adjustedFacetNormal)
 {
   /* create a ring with weighted ordering  */
   bool ok;
@@ -77,8 +77,8 @@ std::pair<ideal,ring> flip0(const ideal I, const ring r,
   ring origin = currRing;
   rChangeCurrRing(sAdjusted);
   ideal inIsAdjustedGB = kStd(inIsAdjusted,currRing->qideal,testHomog,&nullVector);
-  id_Delete(&inIsAdjusted,sAdjusted);
   ideal IsAdjustedGB = lift(I,r,inIsAdjustedGB,sAdjusted);
+  id_Delete(&inIsAdjusted,sAdjusted);
   id_Delete(&inIsAdjustedGB,sAdjusted);
 
   ring s = rCopy0(r);

@@ -1609,6 +1609,27 @@ BOOLEAN facetContaining(leftv res, leftv args)
 }
 
 
+BOOLEAN memleaktest(leftv res, leftv args)
+{
+  bigintmat* ineq = NULL;
+  if (args->Typ() == INTMAT_CMD)
+  {
+    intvec* ineq0 = (intvec*) args->Data();
+    ineq = iv2bim(ineq0,coeffs_BIGINT);
+  }
+  else
+    ineq = (bigintmat*) args->Data();
+  gfan::ZMatrix* zm = bigintmatToZMatrix(ineq);
+  gfan::ZCone* zc = new gfan::ZCone(*zm, gfan::ZMatrix(0, zm->getWidth()));
+  delete zm;
+  if (args->Typ() == INTMAT_CMD)
+    delete ineq;
+  res->rtyp = coneID;
+  res->data = (void*) zc;
+  return FALSE;
+}
+
+
 void bbcone_setup(SModulFunctions* p)
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -1663,6 +1684,7 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("","listContainsCone",FALSE,containsCone);
   p->iiAddCproc("","listOfFacets",FALSE,listOfFacets);
   p->iiAddCproc("","facetContaining",FALSE,facetContaining);
+  p->iiAddCproc("","memleaktest",FALSE,memleaktest);
   coneID=setBlackboxStuff(b,"cone");
 }
 

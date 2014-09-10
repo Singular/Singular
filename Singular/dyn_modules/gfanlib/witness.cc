@@ -13,14 +13,28 @@
  * ordering active in r.
  * Returns an error if this is not possible.
  **/
-static matrix divisionDiscardingRemainder(const poly f, const ideal G, const ring r)
+matrix divisionDiscardingRemainder(const poly f, const ideal G, const ring r)
 {
   ring origin = currRing;
   if (origin != r) rChangeCurrRing(r);
   ideal F = idInit(1); F->m[0]=f;
   ideal m = idLift(G,F);
-  // ideal m = idLift(G,F,NULL,FALSE,TRUE);
   F->m[0]=NULL; id_Delete(&F, currRing);
+  matrix Q = id_Module2formatedMatrix(m,IDELEMS(G),1,currRing);
+  if (origin != r) rChangeCurrRing(origin);
+  return Q;
+}
+
+/**
+ * Given F[0],...,F[l] and G[0],...,G[k],
+ * computes Q[i,j] for i=0,..,k and j=0,...,l such that
+ * F[j] = Q[0,j]*G[0]+...+Q[k,j]*G[k].
+ */
+matrix divisionDiscardingRemainder(const ideal F, const ideal G, const ring r)
+{
+  ring origin = currRing;
+  if (origin != r) rChangeCurrRing(r);
+  ideal m = idLift(G,F);
   matrix Q = id_Module2formatedMatrix(m,IDELEMS(G),1,currRing);
   if (origin != r) rChangeCurrRing(origin);
   return Q;
@@ -88,3 +102,29 @@ BOOLEAN witness0(leftv res, leftv args)
   return FALSE;
 }
 #endif
+
+/***
+ * Let w be the uppermost weight vector in the matrix defining the ordering on r.
+ * Let I be a Groebner basis of an ideal in r, inI its initial form with respect w.
+ * Given an w-homogeneous element m of inI, computes a witness g of m in I,
+ * i.e. g in I such that in_w(g)=m.
+ **/
+ideal witness(const ideal inI, const ideal J, const ring r)
+{
+  ring origin = currRing;
+  if (origin!=r)
+    rChangeCurrRing(r);
+  ideal NFinI = kNF(J,r->qideal,inI);
+  if (origin!=r)
+    rChangeCurrRing(origin);
+
+  int k = idSize(inI);
+  ideal I = idInit(k);
+  for (int i=0; i<k; i++)
+  {
+    I->m[i] = p_Add_q(p_Copy(inI->m[i],r),p_Neg(NFinI->m[i],r),r);
+    NFinI->m[i] = NULL;
+  }
+
+  return I;
+}

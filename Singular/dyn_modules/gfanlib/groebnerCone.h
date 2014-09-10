@@ -34,12 +34,19 @@ private:
    */
   ideal polynomialIdeal;
   /**
+   * reduced form of the ideal from which the equations and inequalities can be read
+   */
+  ideal reducedPolynomialIdeal;
+  /**
+   * generators of the initial ideal
+   */
+  ideal initialPolynomialIdeal;
+  /**
    * ring in which the ideal exists
    */
   ring polynomialRing;
   gfan::ZCone polyhedralCone;
   gfan::ZVector interiorPoint;
-  gfan::ZVector negativePointInLineality;
   const tropicalStrategy* currentStrategy;
 
 public:
@@ -66,10 +73,11 @@ public:
   }
 
   ideal getPolynomialIdeal() const { return polynomialIdeal; };
+  ideal getReducedPolynomialIdeal() const { return reducedPolynomialIdeal; };
+  ideal getInitialPolynomialIdeal() const { return initialPolynomialIdeal; };
   ring getPolynomialRing() const { return polynomialRing; };
   gfan::ZCone getPolyhedralCone() const { return polyhedralCone; };
   gfan::ZVector getInteriorPoint() const { return interiorPoint; };
-  gfan::ZVector getNegativePointInLineality() const { return negativePointInLineality; };
   const tropicalStrategy* getTropicalStrategy() const {return currentStrategy; };
 
   friend struct groebnerCone_compare;

@@ -11,6 +11,7 @@
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_matrix.h>
 
+#include <initial.h>
 #include <tropicalStrategy.h>
 #include <groebnerCone.h>
 #include <callgfanlib_conversion.h>
@@ -56,6 +57,8 @@ static bool checkPolyhedralInput(const gfan::ZCone zc, const gfan::ZVector p)
 
 groebnerCone::groebnerCone():
   polynomialIdeal(NULL),
+  reducedPolynomialIdeal(NULL),
+  initialPolynomialIdeal(NULL),
   polynomialRing(NULL),
   polyhedralCone(gfan::ZCone(0)),
   interiorPoint(gfan::ZVector(0)),
@@ -65,13 +68,19 @@ groebnerCone::groebnerCone():
 
 groebnerCone::groebnerCone(const ideal I, const ring r, const tropicalStrategy& currentCase):
   polynomialIdeal(NULL),
+  reducedPolynomialIdeal(NULL),
+  initialPolynomialIdeal(NULL),
   polynomialRing(NULL),
   currentStrategy(&currentCase)
 {
   assume(checkPolynomialInput(I,r));
-  if (I) polynomialIdeal = id_Copy(I,r);
+  if (I)
+  {
+    polynomialIdeal = id_Copy(I,r);
+    reducedPolynomialIdeal = id_Copy(I,r);
+  }
   if (r) polynomialRing = rCopy(r);
-  currentCase.reduce(I,r);
+  currentCase.reduce(reducedPolynomialIdeal,polynomialRing);
 
   int n = rVar(polynomialRing);
   poly g = NULL;
@@ -80,9 +89,9 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const tropicalStrategy& 
   gfan::ZVector leadexpw = gfan::ZVector(n);
   gfan::ZVector tailexpw = gfan::ZVector(n);
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-  for (int i=0; i<idSize(polynomialIdeal); i++)
+  for (int i=0; i<idSize(reducedPolynomialIdeal); i++)
   {
-    g = I->m[i];
+    g = reducedPolynomialIdeal->m[i];
     if (g)
     {
       p_GetExpV(g,leadexpv,r);
@@ -109,6 +118,7 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const tropicalStrategy& 
   polyhedralCone = gfan::ZCone(inequalities,gfan::ZMatrix(0, inequalities.getWidth()));
   polyhedralCone.canonicalize();
   interiorPoint = polyhedralCone.getRelativeInteriorPoint();
+  initialPolynomialIdeal = sloppyInitial(reducedPolynomialIdeal,polynomialRing,interiorPoint);
   assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
 }
 
@@ -121,21 +131,27 @@ static bool checkOrderingAndWeight(const ideal I, const ring r, const gfan::ZVec
 
 groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, const tropicalStrategy& currentCase):
   polynomialIdeal(NULL),
+  reducedPolynomialIdeal(NULL),
+  initialPolynomialIdeal(NULL),
   polynomialRing(NULL),
   currentStrategy(&currentCase)
 {
   assume(checkPolynomialInput(I,r));
-  if (I) polynomialIdeal = id_Copy(I,r);
+  if (I)
+  {
+    polynomialIdeal = id_Copy(I,r);
+    reducedPolynomialIdeal = id_Copy(I,r);
+  }
   if (r) polynomialRing = rCopy(r);
-  currentCase.reduce(I,r);
+  currentCase.reduce(reducedPolynomialIdeal,polynomialRing);
 
-  int n = rVar(r);
+  int n = rVar(polynomialRing);
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
   gfan::ZMatrix equations = gfan::ZMatrix(0,n);
   int* expv = (int*) omAlloc((n+1)*sizeof(int));
-  for (int i=0; i<idSize(polynomialIdeal); i++)
+  for (int i=0; i<idSize(reducedPolynomialIdeal); i++)
   {
-    poly g = polynomialIdeal->m[i];
+    poly g = reducedPolynomialIdeal->m[i];
     if (g)
     {
       p_GetExpV(g,expv,polynomialRing);
@@ -166,6 +182,7 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, 
   polyhedralCone = gfan::ZCone(inequalities,equations);
   polyhedralCone.canonicalize();
   interiorPoint = polyhedralCone.getRelativeInteriorPoint();
+  initialPolynomialIdeal = sloppyInitial(reducedPolynomialIdeal,polynomialRing,interiorPoint);
   assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
 }
 
@@ -175,21 +192,27 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, 
  **/
 groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& u, const gfan::ZVector& w, const tropicalStrategy& currentCase):
   polynomialIdeal(NULL),
+  reducedPolynomialIdeal(NULL),
+  initialPolynomialIdeal(NULL),
   polynomialRing(NULL),
   currentStrategy(&currentCase)
 {
   assume(checkPolynomialInput(I,r));
-  if (I) polynomialIdeal = id_Copy(I,r);
+  if (I)
+  {
+    polynomialIdeal = id_Copy(I,r);
+    reducedPolynomialIdeal = id_Copy(I,r);
+  }
   if (r) polynomialRing = rCopy(r);
-  currentCase.reduce(I,r);
+  currentCase.reduce(reducedPolynomialIdeal,polynomialRing);
 
-  int n = rVar(r);
+  int n = rVar(polynomialRing);
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
   gfan::ZMatrix equations = gfan::ZMatrix(0,n);
   int* expv = (int*) omAlloc((n+1)*sizeof(int));
-  for (int i=0; i<idSize(polynomialIdeal); i++)
+  for (int i=0; i<idSize(reducedPolynomialIdeal); i++)
   {
-    poly g = polynomialIdeal->m[i];
+    poly g = reducedPolynomialIdeal->m[i];
     if (g)
     {
       p_GetExpV(g,expv,polynomialRing);
@@ -221,23 +244,29 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& u, 
   polyhedralCone = gfan::ZCone(inequalities,equations);
   polyhedralCone.canonicalize();
   interiorPoint = polyhedralCone.getRelativeInteriorPoint();
+  initialPolynomialIdeal = sloppyInitial(reducedPolynomialIdeal,polynomialRing,interiorPoint);
   assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
 }
 
 
 groebnerCone::groebnerCone(const ideal I, const ideal inI, const ring r, const tropicalStrategy& currentCase):
   polynomialIdeal(id_Copy(I,r)),
+  reducedPolynomialIdeal(id_Copy(I,r)),
+  initialPolynomialIdeal(id_Copy(inI,r)),
   polynomialRing(rCopy(r)),
   currentStrategy(&currentCase)
 {
   assume(checkPolynomialInput(I,r));
   assume(checkPolynomialInput(inI,r));
+  currentStrategy->reduce(reducedPolynomialIdeal,polynomialRing);
+  // currentStrategy->reduce(initialPolynomialIdeal,polynomialRing);
+
   int n = rVar(r);
   gfan::ZMatrix equations = gfan::ZMatrix(0,n);
   int* expv = (int*) omAlloc((n+1)*sizeof(int));
-  for (int i=0; i<idSize(inI); i++)
+  for (int i=0; i<idSize(initialPolynomialIdeal); i++)
   {
-    poly g = inI->m[i];
+    poly g = initialPolynomialIdeal->m[i];
     if (g)
     {
       p_GetExpV(g,expv,r);
@@ -251,9 +280,9 @@ groebnerCone::groebnerCone(const ideal I, const ideal inI, const ring r, const t
     }
   }
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-  for (int i=0; i<idSize(I); i++)
+  for (int i=0; i<idSize(reducedPolynomialIdeal); i++)
   {
-    poly g = I->m[i];
+    poly g = reducedPolynomialIdeal->m[i];
     if (g)
     {
       p_GetExpV(g,expv,r);
@@ -282,6 +311,8 @@ groebnerCone::groebnerCone(const ideal I, const ideal inI, const ring r, const t
 
 groebnerCone::groebnerCone(const groebnerCone &sigma):
   polynomialIdeal(NULL),
+  reducedPolynomialIdeal(NULL),
+  initialPolynomialIdeal(NULL),
   polynomialRing(NULL),
   polyhedralCone(gfan::ZCone(sigma.getPolyhedralCone())),
   interiorPoint(gfan::ZVector(sigma.getInteriorPoint())),
@@ -291,6 +322,8 @@ groebnerCone::groebnerCone(const groebnerCone &sigma):
   assume(checkOrderingAndCone(sigma.getPolynomialRing(),sigma.getPolyhedralCone()));
   assume(checkPolyhedralInput(sigma.getPolyhedralCone(),sigma.getInteriorPoint()));
   if (sigma.getPolynomialIdeal()) polynomialIdeal = id_Copy(sigma.getPolynomialIdeal(),sigma.getPolynomialRing());
+  if (sigma.getReducedPolynomialIdeal()) reducedPolynomialIdeal = id_Copy(sigma.getReducedPolynomialIdeal(),sigma.getPolynomialRing());
+  if (sigma.getInitialPolynomialIdeal()) initialPolynomialIdeal = id_Copy(sigma.getInitialPolynomialIdeal(),sigma.getPolynomialRing());
   if (sigma.getPolynomialRing()) polynomialRing = rCopy(sigma.getPolynomialRing());
 }
 
@@ -332,6 +365,8 @@ gfan::ZVector groebnerCone::tropicalPoint() const
   for (int i=0; i<R.getHeight(); i++)
   {
     assume(!currentStrategy->restrictToLowerHalfSpace() || R[i][0].sign()<=0);
+    if (currentStrategy->restrictToLowerHalfSpace() && R[i][0].sign()==0)
+      continue;
     poly s = currentStrategy->checkInitialIdealForMonomial(I,r,R[i]);
     if (s==NULL)
     {
@@ -348,6 +383,15 @@ bool groebnerCone::checkFlipConeInput(const gfan::ZVector interiorPoint, const g
   if (!polyhedralCone.contains(interiorPoint))
   {
     std::cout << "ERROR: interiorPoint is not contained in the Groebner cone!" << std::endl
+              << "cone: " << std::endl
+              << toString(&polyhedralCone)
+              << "interiorPoint:" << std::endl
+              << interiorPoint << std::endl;
+    return false;
+  }
+  if (polyhedralCone.containsRelatively(interiorPoint))
+  {
+    std::cout << "ERROR: interiorPoint is contained in the interior of the maximal Groebner cone!" << std::endl
               << "cone: " << std::endl
               << toString(&polyhedralCone)
               << "interiorPoint:" << std::endl
@@ -378,10 +422,10 @@ bool groebnerCone::checkFlipConeInput(const gfan::ZVector interiorPoint, const g
   return true;
 }
 
-/***
+/**
  * Given an interior point on the facet and the outer normal factor on the facet,
  * returns the adjacent groebnerCone sharing that facet
- **/
+ */
 groebnerCone groebnerCone::flipCone(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const
 {
   assume(this->checkFlipConeInput(interiorPoint,facetNormal));
@@ -390,8 +434,7 @@ groebnerCone groebnerCone::flipCone(const gfan::ZVector interiorPoint, const gfa
    *   Hence it is sufficient to compute the initial form with respect to facetNormal,
    *   to obtain an initial form with respect to interiorPoint+e*facetNormal,
    *   for e>0 sufficiently small */
-  std::pair<ideal,ring> flipped = currentStrategy->flip(polynomialIdeal,polynomialRing,interiorPoint,facetNormal);
-  std::cout << "finished flip" << std::endl;
+  std::pair<ideal,ring> flipped = currentStrategy->flip(reducedPolynomialIdeal,polynomialRing,interiorPoint,facetNormal);
   assume(checkPolynomialInput(flipped.first,flipped.second));
   groebnerCone flippedCone(flipped.first, flipped.second, interiorPoint, facetNormal, *currentStrategy);
   return flippedCone;
@@ -463,7 +506,14 @@ groebnerCones groebnerCone::groebnerNeighbours() const
   groebnerCones neighbours;
   for (int i=0; i<interiorPoints.getHeight(); i++)
   {
-    std::cout << "performing flip " << i << " out of " << interiorPoints.getHeight() << std::endl;
+    gfan::ZVector w = interiorPoints[i];
+    gfan::ZVector v = facetNormals[i];
+    if (currentStrategy->restrictToLowerHalfSpace())
+    {
+      assume(w[0].sign()<=0);
+      if (w[0].sign()==0 && v[0].sign()>0)
+        continue;
+    }
     neighbours.insert(this->flipCone(interiorPoints[i],facetNormals[i]));
   }
   return neighbours;

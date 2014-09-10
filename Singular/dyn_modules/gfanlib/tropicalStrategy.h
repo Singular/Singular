@@ -10,6 +10,7 @@
 #include <containsMonomial.h>
 #include <flip.h>
 #include <initial.h>
+#include <witness.h>
 
 /** \file
  * implementation of the class tropicalStrategy
@@ -118,6 +119,16 @@ public:
     bool b = (uniformizingParameter==NULL);
     return b;
   }
+  bool isValuationTrivial() const
+  {
+    bool b = (uniformizingParameter==NULL);
+    return b;
+  }
+  bool isValuationNonTrivial() const
+  {
+    bool b = (uniformizingParameter!=NULL);
+    return b;
+  }
 
   /**
    * returns the polynomial ring over the field with valuation
@@ -223,150 +234,121 @@ public:
   }
 
   /**
+   * If valuation trivial, returns a copy of r with a positive weight prepended,
+   * such that any ideal homogeneous with respect to w is homogeneous with respect to that weight.
+   * If valuation non-trivial, changes the coefficient ring to the residue field.
+   */
+  ring getShortcutRingPrependingWeight(const ring r, const gfan::ZVector w) const;
+
+  /**
+   * Returns a copy of the shortcutRing which is weighted with respect to w first and v second.
+   * If valuation trivial, the coefficient ring will be the field with valuation.
+   * If valuation non-trivial, the coefficient ring will be the residue field.
+   */
+  ring getShortcutRingDoublyWeighted(const gfan::ZVector w, const gfan::ZVector v) const;
+
+  /**
+   * copies r and prepends extra weight w
+   */
+  ring copyAndPrependWeight(const ring r, const gfan::ZVector w) const;
+
+  /**
+   * changes the coefficient ring of r to be the residue field
+   */
+  void changeCoefficientToResidueField(ring r) const;
+
+
+
+  /**
    * reduces the generators of an ideal I so that
    * the inequalities and equations of the Groebner cone can be read off.
    */
-  bool reduce(ideal I, const ring r) const
-  {
-    rTest(r);  id_Test(I,r);
-    nMapFunc nMap = n_SetMap(startingRing->cf,r->cf);
-    number p = nMap(uniformizingParameter,startingRing->cf,r->cf);
-    bool b = this->extraReductionAlgorithm(I,r,p);
-    n_Delete(&p,r->cf);
-    return b;
-  }
+  bool reduce(ideal I, const ring r) const;
 
   /**
    * returns true, if I contains a monomial.
    * returns false otherwise.
    **/
-  poly checkInitialIdealForMonomial(const ideal I, const ring r, const gfan::ZVector w) const
+  poly checkInitialIdealForMonomial(const ideal I, const ring r, const gfan::ZVector w) const;
+
+  /**
+   * suppose w a weight in maximal groebner cone of >
+   * suppose I (initially) reduced standard basis w.r.t. > and inI initial forms of its elements w.r.t. w
+   * suppose inJ elements of initial ideal that are homogeneous w.r.t w
+   * returns J elements of ideal whose initial form w.r.t. w are inI
+   * in particular, if w lies also inthe maximal groebner cone of another ordering >'
+   * and inJ is a standard basis of the initial ideal w.r.t. >'
+   * then the returned J will be a standard baiss of the ideal w.r.t. >'
+   */
+  ideal getWitness(const ideal inJ, const ideal inI, const ideal I, const ring r) const;
+
+  /**
+   * given generators of the initial ideal, computes its standard basis
+   */
+  ideal getStdOfInitialIdeal(const ideal inI, const ring r) const;
+
+  /**
+   * given an interior point of a groebner cone
+   * computes the groebner cone adjacent to it
+   */
+  std::pair<ideal,ring> getFlip(const ideal I, const ring r, const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
+
+  /**
+   * checks whether the first elements of I is p-t
+   */
+  static bool checkFirstGenerator(ideal I, ring r)
   {
-    gfan::ZVector v = adjustWeightForHomogeneity(w);
-    if (isConstantCoefficientCase())
+    // check for correct size of ideal and first generator
+    if (idSize(I)==0)
     {
-      ring rShortcut = rCopy0(r);
-      bool overflow;
-      /**
-       * prepend extra weight vector for homogeneity
-       */
-      int* order = rShortcut->order;
-      int* block0 = rShortcut->block0;
-      int* block1 = rShortcut->block1;
-      int** wvhdl = rShortcut->wvhdl;
-      int h = rBlocks(r); int n = rVar(r);
-      rShortcut->order = (int*) omAlloc0((h+1)*sizeof(int));
-      rShortcut->block0 = (int*) omAlloc0((h+1)*sizeof(int));
-      rShortcut->block1 = (int*) omAlloc0((h+1)*sizeof(int));
-      rShortcut->wvhdl = (int**) omAlloc0((h+1)*sizeof(int*));
-      rShortcut->order[0] = ringorder_a;
-      rShortcut->block0[0] = 1;
-      rShortcut->block1[0] = n;
-      rShortcut->wvhdl[0] = ZVectorToIntStar(v,overflow);
-      for (int i=1; i<=h; i++)
-      {
-        rShortcut->order[i] = order[i-1];
-        rShortcut->block0[i] = block0[i-1];
-        rShortcut->block1[i] = block1[i-1];
-        rShortcut->wvhdl[i] = wvhdl[i-1];
-      }
-      rComplete(rShortcut);
-      rTest(rShortcut);
-      omFree(order);
-      omFree(block0);
-      omFree(block1);
-      omFree(wvhdl);
-
-      ideal inI = initial(I,r,w);
-      int k = idSize(inI);
-      ideal inIShortcut = idInit(k);
-      nMapFunc identity = n_SetMap(r->cf,rShortcut->cf);
-      for (int i=0; i<k; i++)
-        inIShortcut->m[i] = p_PermPoly(inI->m[i],NULL,r,rShortcut,identity,NULL,0);
-
-      poly p = checkForMonomialViaSuddenSaturation(inIShortcut,rShortcut);
-      poly monomial = NULL;
-      if (p!=NULL)
-      {
-        monomial=p_One(r);
-        for (int i=1; i<n; i++)
-          p_SetExp(monomial,i,p_GetExp(p,i,rShortcut),r);
-        p_Delete(&p,rShortcut);
-      }
-      id_Delete(&inI,r);
-      id_Delete(&inIShortcut,rShortcut);
-      rDelete(rShortcut);
-      return monomial;
+      WerrorS("checkFirstElement: ideal empty");
+      return false;
     }
-    else
+    poly p = I->m[0];
+    if (size(p)!=2)
     {
-      ring rShortcut = rCopy0(r);
-      bool overflow;
-      /**
-       * prepend extra weight vector for homogeneity
-       */
-      int* order = rShortcut->order;
-      int* block0 = rShortcut->block0;
-      int* block1 = rShortcut->block1;
-      int** wvhdl = rShortcut->wvhdl;
-      int h = rBlocks(r); int n = rVar(r);
-      rShortcut->order = (int*) omAlloc0((h+1)*sizeof(int));
-      rShortcut->block0 = (int*) omAlloc0((h+1)*sizeof(int));
-      rShortcut->block1 = (int*) omAlloc0((h+1)*sizeof(int));
-      rShortcut->wvhdl = (int**) omAlloc0((h+1)*sizeof(int*));
-      rShortcut->order[0] = ringorder_a;
-      rShortcut->block0[0] = 1;
-      rShortcut->block1[0] = n;
-      rShortcut->wvhdl[0] = ZVectorToIntStar(v,overflow);
-      for (int i=1; i<=h; i++)
-      {
-        rShortcut->order[i] = order[i-1];
-        rShortcut->block0[i] = block0[i-1];
-        rShortcut->block1[i] = block1[i-1];
-        rShortcut->wvhdl[i] = wvhdl[i-1];
-      }
-      omFree(order);
-      omFree(block0);
-      omFree(block1);
-      omFree(wvhdl);
-      /**
-       * change ground domain into finite field
-       */
-      nKillChar(rShortcut->cf);
-      rShortcut->cf = nCopyCoeff(shortcutRing->cf);
-      rComplete(rShortcut);
-      rTest(rShortcut);
-
-      ideal inI = initial(I,r,w);
-      int k = idSize(inI);
-      ideal inIShortcut = idInit(k);
-      nMapFunc takingResidues = n_SetMap(r->cf,rShortcut->cf);
-      for (int i=0; i<k; i++)
-        inIShortcut->m[i] = p_PermPoly(inI->m[i],NULL,r,rShortcut,takingResidues,NULL,0);
-
-      idSkipZeroes(inIShortcut);
-      poly p = checkForMonomialViaSuddenSaturation(inIShortcut,rShortcut);
-      poly monomial = NULL;
-      if (p!=NULL)
-      {
-        monomial=p_One(r);
-        for (int i=1; i<n; i++)
-          p_SetExp(monomial,i,p_GetExp(p,i,rShortcut),r);
-        p_Delete(&p,rShortcut);
-      }
-      id_Delete(&inI,r);
-      id_Delete(&inIShortcut,rShortcut);
-      rDelete(rShortcut);
-      return monomial;
+      WerrorS("checkFirstElement: no binomial");
+      return false;
     }
-  }
-  std::pair<ideal,ring> flip(const ideal I, const ring r,
-                             const gfan::ZVector interiorPoint,
-                             const gfan::ZVector facetNormal) const
-  {
-    gfan::ZVector adjustedInteriorPoint = adjustWeightForHomogeneity(interiorPoint);
-    gfan::ZVector adjustedFacetNormal = adjustWeightUnderHomogeneity(facetNormal,adjustedInteriorPoint);
-    return flip0(I,r,interiorPoint,facetNormal,adjustedInteriorPoint,adjustedFacetNormal);
+
+    // check first term
+    int n = rVar(r);
+    if (!n_IsUnit(p_GetCoeff(p,r->cf),r->cf))
+    {
+      WerrorS("checkFirstElement: wrong coefficient");
+      return false;
+    }
+    for (int i=1; i<=n; i++)
+    {
+      if (p_GetExp(p,i,r)!=0)
+      {
+        WerrorS("checkFirstElement: wrong exponent vector");
+        return false;
+      }
+    }
+
+    // check second term
+    pIter(p);
+    if (!n_IsOne(p_GetCoeff(p,r->cf),r->cf))
+    {
+      WerrorS("checkFirstElement: wrong coefficient");
+      return false;
+    }
+    if (p_GetExp(p,1,r)!=1)
+    {
+      WerrorS("checkFirstElement: wrong exponent vector");
+      return false;
+    }
+    for (int i=2; i<=n; i++)
+    {
+      if (p_GetExp(p,i,r)!=0)
+      {
+        WerrorS("checkFirstElement: wrong exponent vector");
+        return false;
+      }
+    }
+
+    return true;
   }
 };
 

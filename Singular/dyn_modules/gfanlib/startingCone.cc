@@ -456,6 +456,7 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
       inI->m[i+1] = p_PermPoly(inIShortcut->m[i],NULL,sShortcut,s,findingRepresentatives,NULL,0);
 
     ideal J = lift(I,r,inI,s);
+    // currentStrategy.reduce(J,s);
     groebnerCone startingCone(J,inI,s,currentStrategy);
     id_Delete(&inI,s);
     id_Delete(&J,s);
