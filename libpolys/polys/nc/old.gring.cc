@@ -2863,6 +2863,13 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
   // all data in 'curr'!
   if (CN != NULL)       /* create matrix C = CN * Id */
   {
+    if (!p_IsConstant(CN,curr))
+    {
+      Werror("Incorrect input : non-constants are not allowed as coefficients (first argument)");
+      return TRUE;
+    }
+    assume(p_IsConstant(CN,curr));
+     
     nN = p_GetCoeff(CN, curr);
     if (n_IsZero(nN, curr))
     {
@@ -2910,7 +2917,16 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
         if (MATELEM(CC,i,j) == NULL)
           qN = NULL;
         else
+	{   
+	  if (!p_IsConstant(MATELEM(CC,i,j),curr))
+          {
+            Werror("Incorrect input : non-constants are not allowed as coefficients (first argument at [%d, %d])", i, j);
+            return TRUE;
+          }	      
+	  assume(p_IsConstant(MATELEM(CC,i,j),curr));
           qN = p_GetCoeff(MATELEM(CC,i,j),curr);
+	}
+	 
 
         if ( qN == NULL )   /* check the consistency: Cij!=0 */
         // find also illegal pN
