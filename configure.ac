@@ -55,6 +55,15 @@ link_all_deplibs=yes
 link_all_deplibs_CXX=yes
 
 # Checks for libraries.
+
+# This test for -lpthread etc has to come before AX_PTHREAD,
+# because libtool tends to ignore -pthread in linking shared C++-libs
+# see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=25460
+# (happens with ubuntu 14.04)
+AC_SEARCH_LIBS(sem_wait,[rt pthreads pthread],[],[
+  AC_MSG_ERROR([sem_wait not found in rt,pthreads,pthread])
+])
+
 #AC_CHECK_LIB(pthread,pthread_create)
 AX_PTHREAD([], [
   AC_MSG_ERROR([Pthread library not found. Please set PTHREAD_CFLAGS and PTHREAD_LIBS correctly for your setup])
@@ -69,7 +78,8 @@ AC_MSG_RESULT(${PTHREAD_LIBS:-unset})
 
 # Set the correct PTHREAD flags and, if needed, change the compiler to one that is pthread-enabled.
 CC="$PTHREAD_CC"
-PTHREAD_LDFLAGS="$PTHREAD_CFLAGS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+LDFLAGS="$LDFLAGS $PTHREAD_LDFLAGS"
 
 AC_SUBST(PTHREAD_CFLAGS)
 AC_SUBST(PTHREAD_LDFLAGS)
