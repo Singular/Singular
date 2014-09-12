@@ -65,7 +65,7 @@ BEGIN_NAMESPACE_SINGULARXX     BEGIN_NAMESPACE(SYZEXTRA)
 
 BEGIN_NAMESPACE(SORT_c_ds)
 
-#if (defined(HAVE_QSORT_R) && (defined __APPLE__ || defined __MACH__ || defined __DARWIN__ || defined __FREEBSD__ || defined __BSD__ || defined OpenBSD3_1 || defined OpenBSD3_9))
+#if (defined(HAVE_QSORT_R) && (defined __APPLE__ || defined __MACH__ || defined __DARWIN__ || defined __FreeBSD__ || defined __BSD__ || defined OpenBSD3_1 || defined OpenBSD3_9))
 static int cmp_c_ds(void *R, const void *p1, const void *p2){
 #elif (defined(HAVE_QSORT_R) && (defined _GNU_SOURCE || defined __GNU__ || defined __linux__))
 static int cmp_c_ds(const void *p1, const void *p2, void *R){
@@ -388,7 +388,7 @@ void Sort_c_ds(const ideal id, const ring r)
 {
   const int sizeNew = IDELEMS(id);
 
-#if ( (defined(HAVE_QSORT_R)) && (defined __APPLE__ || defined __MACH__ || defined __DARWIN__ || defined __FREEBSD__ || defined __BSD__ || defined OpenBSD3_1 || defined OpenBSD3_9) )
+#if ( (defined(HAVE_QSORT_R)) && (defined __APPLE__ || defined __MACH__ || defined __DARWIN__ || defined __FreeBSD__ || defined __BSD__ || defined OpenBSD3_1 || defined OpenBSD3_9) )
 #define qsort_my(m, s, ss, r, cmp) qsort_r(m, s, ss, r, cmp)
 #elif ( (defined(HAVE_QSORT_R)) && (defined _GNU_SOURCE || defined __GNU__ || defined __linux__))
 #define qsort_my(m, s, ss, r, cmp) qsort_r(m, s, ss, cmp, r)
