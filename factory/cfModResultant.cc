@@ -639,7 +639,8 @@ resultantZ (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
       i--;
     }
 
-    ASSERT (i >= 0, "ran out of primes"); //sic
+    if (i <= 0)
+      return resultant (A, B, x);
 
     setCharacteristic (p);
 

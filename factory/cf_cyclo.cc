@@ -25,10 +25,6 @@
 #include <NTL/ZZ.h>
 #endif
 
-
-/// integer factorization using table look-ups,
-/// function may fail if integer contains primes which exceed the largest prime
-/// in our table
 int* integerFactorizer (const long integer, int& length, bool& fail)
 {
   ASSERT (integer != 0 && integer != 1 && integer != -1,
@@ -109,8 +105,6 @@ int* makeDistinct (int* factors, const int factors_length, int& length)
   return result;
 }
 
-/// compute the n-th cyclotomic polynomial,
-/// function may fail if integer_factorizer fails to factorize n
 CanonicalForm cyclotomicPoly (int n, bool& fail)
 {
   fail= false;
@@ -137,8 +131,6 @@ CanonicalForm cyclotomicPoly (int n, bool& fail)
 }
 
 #ifdef HAVE_NTL
-/// checks if alpha is a primitive element, alpha is assumed to be an algebraic
-/// variable over some finite prime field
 bool isPrimitive (const Variable& alpha, bool& fail)
 {
   int p= getCharacteristic();

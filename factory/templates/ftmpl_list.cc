@@ -100,7 +100,7 @@ List<T>::List( const List<T>& l )
         last = first;
         cur = cur->prev;
         while ( cur )
-	{
+        {
             first = new ListItem<T>( *(cur->item), first, 0 );
             first->next->prev = first;
             cur = cur->prev;
@@ -143,19 +143,19 @@ List<T>& List<T>::operator=( const List<T>& l )
     {
         ListItem<T> *dummy;
         while ( first )
-	{
+        {
             dummy = first;
             first = first->next;
             delete dummy;
         }
         ListItem<T>* cur = l.last;
         if ( cur )
-	{
+        {
             first = new ListItem<T>( *(cur->item), 0, 0 );
             last = first;
             cur = cur->prev;
             while ( cur )
-	    {
+            {
                 first = new ListItem<T>( *(cur->item), first, 0 );
                 first->next->prev = first;
                 cur = cur->prev;
@@ -163,13 +163,29 @@ List<T>& List<T>::operator=( const List<T>& l )
             _length = l._length;
         }
         else
-	{
+        {
             first = last = 0;
             _length = 0;
         }
         _length = l._length;
     }
     return *this;
+}
+
+template <class T>
+int operator== ( const List<T>& l1, const List<T>& l2 )
+{
+    if (l1.length() != l2.length())
+      return 0;
+    ListIterator<T> iter2= l2;
+    for (ListIterator<T> iter1= l1; iter1.hasItem(); iter1++)
+    {
+      if (!(iter1.getItem() == iter2.getItem()))
+        return 0;
+      iter2++;
+    }
+
+    return 1;
 }
 
 
@@ -200,7 +216,7 @@ void List<T>::insert ( const T& t, int (*cmpf)( const T&, const T& ) )
         if ( c == 0 )
             *cursor->item = t;
         else
-	{
+        {
             cursor = cursor->prev;
             cursor->next = new ListItem<T>( t, cursor->next, cursor );
             cursor->next->next->prev = cursor->next;
@@ -226,7 +242,7 @@ void List<T>::insert ( const T& t, int (*cmpf)( const T&, const T& ), void (*ins
         if ( c == 0 )
             insf( *cursor->item, t );
         else
-	{
+        {
             cursor = cursor->prev;
             cursor->next = new ListItem<T>( t, cursor->next, cursor );
             cursor->next->next->prev = cursor->next;
@@ -274,12 +290,12 @@ void List<T>::removeFirst()
     {
         _length--;
         if ( first == last )
-	{
+        {
             delete first;
             first = last = 0;
         }
         else
-	{
+        {
             ListItem<T> *dummy = first;
             first->next->prev = 0;
             first = first->next;
@@ -304,12 +320,12 @@ void List<T>::removeLast()
     {
         _length--;
         if ( first == last )
-	{
+        {
             delete last;
             first = last = 0;
         }
         else
-	{
+        {
             ListItem<T> *dummy = last;
             last->prev->next = 0;
             last = last->prev;
@@ -326,13 +342,13 @@ void List<T>::sort( int (*swapit) ( const T&, const T& ) )
     {
         int swap;
         do
-	{
+        {
             swap = 0;
             ListItem<T> *cur = first;
             while ( cur->next )
-	    {
+            {
                 if ( swapit( *(cur->item), *(cur->next->item) ) )
-		{
+                {
                     T* dummy = cur->item;
                     cur->item = cur->next->item;
                     cur->next->item = dummy;
@@ -480,7 +496,7 @@ void ListIterator<T>::insert ( const T & t )
         if ( ! current->prev )
             theList->insert( t );
         else
-	{
+        {
             current->prev = new ListItem<T>( t, current, current->prev );
             current->prev->prev->next = current->prev;
             theList->_length++;
@@ -497,7 +513,7 @@ void ListIterator<T>::append ( const T & t )
         if ( ! current->next )
             theList->append( t );
         else
-	{
+        {
             current->next = new ListItem<T>( t, current->next, current );
             current->next->next->prev = current->next;
             theList->_length++;
@@ -513,7 +529,7 @@ void ListIterator<T>::remove ( int moveright )
     {
         ListItem <T>*dummynext = current->next, *dummyprev = current->prev;
         if ( current->prev )
-	{
+        {
             current->prev->next = current->next;
             if ( current->next )
                 current->next->prev = current->prev;
@@ -523,7 +539,7 @@ void ListIterator<T>::remove ( int moveright )
             current = ( moveright ) ? dummynext : dummyprev;
         }
         else
-	{
+        {
             if ( current->next )
                 current->next->prev = 0;
             theList->first = current->next;
@@ -557,7 +573,7 @@ List<T> Union ( const List<T> & F, const List<T> & G )
         iselt = false;
         j = G;
         while ( ( ! iselt ) && j.hasItem() )
-	{
+        {
             iselt =  f == j.getItem();
             j++;
         }
@@ -579,6 +595,30 @@ List<T> Union ( const List<T> & F, const List<T> & G, int (*cmpf)( const T&, con
 }
 
 template <class T>
+List<T> Union ( const List<T> & F, const List<T> & G, int (*ecmpf)( const T&, const T& ))
+{
+    List<T> L = G;
+    ListIterator<T> i, j;
+    T f;
+    bool iselt;
+
+    for ( i = F; i.hasItem(); i++ )
+    {
+        f = i.getItem();
+        iselt = false;
+        j = G;
+        while ( ( ! iselt ) && j.hasItem() )
+        {
+            iselt =  ecmpf (f, j.getItem());
+            j++;
+        }
+        if ( ! iselt )
+            L.append( f );
+    }
+    return L;
+}
+
+template <class T>
 List<T> Difference ( const List<T> & F, const List<T> & G )
 {
     List<T> L;
@@ -593,6 +633,55 @@ List<T> Difference ( const List<T> & F, const List<T> & G )
             found = f == j.getItem();
         if ( ! found )
             L.append( f );
+    }
+    return L;
+}
+
+template <class T>
+List<T> Difference ( const List<T> & F, const List<T> & G, int (*ecmpf)( const T&, const T& ))
+{
+    List<T> L;
+    ListIterator<T> i, j;
+    T f;
+    int found;
+    for ( i = F; i.hasItem(); ++i )
+    {
+        f = i.getItem();
+        found = 0;
+        for ( j = G; j.hasItem() && (!found); ++j )
+            found = ecmpf (f, j.getItem());
+        if ( ! found )
+            L.append( f );
+    }
+    return L;
+}
+
+template <class T>
+List<T> Difference ( const List<T> & F, const T & G, int (*ecmpf)( const T&, const T& ))
+{
+    List<T> L;
+    ListIterator<T> i;
+    int found;
+    for ( i = F; i.hasItem(); ++i )
+    {
+        found = ecmpf (G, i.getItem());
+        if ( ! found )
+            L.append( i.getItem() );
+    }
+    return L;
+}
+
+template <class T>
+List<T> Difference ( const List<T> & F, const T & G)
+{
+    List<T> L;
+    ListIterator<T> i;
+    int found;
+    for ( i = F; i.hasItem(); ++i )
+    {
+        found = G == i.getItem();
+        if ( ! found )
+            L.append( i.getItem() );
     }
     return L;
 }
@@ -620,3 +709,18 @@ bool find (const List<T> & F, const T& t)
   }
   return false;
 }
+
+template <class T>
+bool find (const List<T> & F, const T& t, int (*ecmpf)( const T&, const T& ))
+{
+  if (F.length() == 0) return false;
+  ListIterator<T> J= F;
+  while (J.hasItem())
+  {
+    if (ecmpf (J.getItem(), t))
+      return true;
+    J++;
+  }
+  return false;
+}
+

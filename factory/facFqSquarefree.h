@@ -140,7 +140,7 @@ sqrfPart (const CanonicalForm& F,  ///< [in] a poly
 /// @sa pthRoot()
 CanonicalForm
 maxpthRoot (const CanonicalForm & F, ///< [in] a poly which is a pth power
-            const int & q,           ///< [in] size of the field
+            int q,                   ///< [in] size of the field
             int& l                   ///< [in,out] @a l maximal, s.t. @a F is
                                      ///< a p^l-th power
            );

@@ -4,7 +4,14 @@
 /** @file facMul.cc
  *
  * This file implements functions for fast multiplication and division with
- * remainder
+ * remainder.
+ *
+ * Nomenclature rules: kronSub* -> plain Kronecker substitution
+ *                     reverseSubst* -> reverse Kronecker substitution
+ *                     kronSubRecipro* -> reciprocal Kronecker substitution as
+ *                                        described in D. Harvey "Faster
+ *                                        polynomial multiplication via
+ *                                        multipoint Kronecker substitution"
  *
  * @author Martin Lee
  *
@@ -32,7 +39,7 @@
 // univariate polys
 
 #ifdef HAVE_FLINT
-void kronSub (fmpz_poly_t result, const CanonicalForm& A, int d)
+void kronSubQa (fmpz_poly_t result, const CanonicalForm& A, int d)
 {
   int degAy= degree (A);
   fmpz_poly_init2 (result, d*(degAy + 1));
@@ -105,8 +112,8 @@ mulFLINTQa (const CanonicalForm& F, const CanonicalForm& G,
   int d= degAa + 1 + degBa;
 
   fmpz_poly_t FLINTA,FLINTB;
-  kronSub (FLINTA, A, d);
-  kronSub (FLINTB, B, d);
+  kronSubQa (FLINTA, A, d);
+  kronSubQa (FLINTB, B, d);
 
   fmpz_poly_mul (FLINTA, FLINTA, FLINTB);
 
@@ -213,8 +220,8 @@ mulFLINTQaTrunc (const CanonicalForm& F, const CanonicalForm& G,
   int d= degAa + 1 + degBa;
 
   fmpz_poly_t FLINTA,FLINTB;
-  kronSub (FLINTA, A, d);
-  kronSub (FLINTB, B, d);
+  kronSubQa (FLINTA, A, d);
+  kronSubQa (FLINTB, B, d);
 
   int k= d*m;
   fmpz_poly_mullow (FLINTA, FLINTA, FLINTB, k);
@@ -2145,8 +2152,8 @@ mulMod2FLINTQ (const CanonicalForm& F, const CanonicalForm& G, const
   B *= g;
 
   fmpz_poly_t FLINTA, FLINTB;
-  kronSub (FLINTA, A, d1);
-  kronSub (FLINTB, B, d1);
+  kronSubQa (FLINTA, A, d1);
+  kronSubQa (FLINTB, B, d1);
   int k= d1*degree (M);
 
   fmpz_poly_mullow (FLINTA, FLINTA, FLINTB, (long) k);
