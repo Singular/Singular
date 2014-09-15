@@ -826,10 +826,10 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
   delete hseries2;
 }
 
-static void hDegree0(ideal S, ideal Q)
+static void hDegree0(ideal S, ideal Q, const ring r=currRing)
 {
   int  mc;
-  hexist = hInit(S, Q, &hNexist);
+  hexist = hInit(S, Q, &hNexist,r);
   if (!hNexist)
   {
     hMu = -1;
@@ -838,8 +838,8 @@ static void hDegree0(ideal S, ideal Q)
   else
     hMu = 0;
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
-  hvar = (varset)omAlloc((pVariables + 1) * sizeof(int));
-  hpur0 = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(int));
+  hvar = (varset)omAlloc((rVar(r) + 1) * sizeof(int));
+  hpur0 = (scmon)omAlloc((1 + (rVar(r) * rVar(r))) * sizeof(int));
   mc = hisModule;
   if (!mc)
   {
@@ -848,7 +848,7 @@ static void hDegree0(ideal S, ideal Q)
   }
   else
     hstc = (scfmon)omAlloc(hNexist * sizeof(scmon));
-  stcmem = hCreate(pVariables - 1);
+  stcmem = hCreate(rVar(r) - 1);
   loop
   {
     if (mc)
@@ -860,16 +860,16 @@ static void hDegree0(ideal S, ideal Q)
         break;
       }
     }
-    hNvar = pVariables;
+    hNvar = rVar(r);
     for (int i = hNvar; i; i--)
       hvar[i] = i;
     hStaircase(hstc, &hNstc, hvar, hNvar);
     hSupp(hstc, hNstc, hvar, &hNvar);
-    if ((hNvar == pVariables) && (hNstc >= pVariables))
+    if ((hNvar == rVar(r)) && (hNstc >= rVar(r)))
     {
       if ((hNvar > 2) && (hNstc > 10))
         hOrdSupp(hstc, hNstc, hvar, hNvar);
-      memset(hpur0, 0, (pVariables + 1) * sizeof(int));
+      memset(hpur0, 0, (rVar(r) + 1) * sizeof(int));
       hPure(hstc, 0, &hNstc, hvar, hNvar, hpur0, &hNpure);
       if (hNpure == hNvar)
       {
@@ -885,18 +885,18 @@ static void hDegree0(ideal S, ideal Q)
     if (mc <= 0 || hMu < 0)
       break;
   }
-  hKill(stcmem, pVariables - 1);
-  omFreeSize((ADDRESS)hpur0, (1 + (pVariables * pVariables)) * sizeof(int));
-  omFreeSize((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
+  hKill(stcmem, rVar(r) - 1);
+  omFreeSize((ADDRESS)hpur0, (1 + (rVar(r) * rVar(r))) * sizeof(int));
+  omFreeSize((ADDRESS)hvar, (rVar(r) + 1) * sizeof(int));
   omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);
   if (hisModule)
     omFreeSize((ADDRESS)hstc, hNexist * sizeof(scmon));
 }
 
-int  scMult0Int(ideal S, ideal Q)
+int  scMult0Int(ideal S, ideal Q, const ring r)
 {
-  hDegree0(S, Q);
+  hDegree0(S, Q,r);
   return hMu;
 }
 
