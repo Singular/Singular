@@ -5,19 +5,18 @@
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
 
-
-
-
 #include <kernel/mod2.h>
 
-
-#include <kernel/structs.h>
 #include <omalloc/omalloc.h>
-#include <kernel/ideals.h>
-#include <kernel/polys.h>
 #include <misc/intvec.h>
 #include <coeffs/numbers.h>
+
+#include <kernel/structs.h>
+#include <kernel/ideals.h>
+#include <kernel/polys.h>
+
 #include <kernel/combinatorics/hutil.h>
+#include <kernel/combinatorics/hilb.h>
 #include <kernel/combinatorics/stairc.h>
 
 int  hCo, hMu, hMu2;

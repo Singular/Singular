@@ -7,7 +7,13 @@
 * ABSTRACT
 */
 
-#include <kernel/structs.h>
+struct spolyrec  ; typedef struct spolyrec polyrec; typedef polyrec * poly;
+struct ip_sring  ; typedef struct ip_sring                          * ring;
+struct sip_sideal; typedef struct sip_sideal                        * ideal;
+
+class intvec; 
+
+extern ring currRing;
 
 void scComputeHC(ideal s,ideal Q, int  k,poly &hEdge, ring tailRing = currRing);
 #if 0 // - alternative implementation for tests
@@ -25,13 +31,6 @@ void scPrintDegree(int co, int mu);
 void scDegree(ideal  s,intvec *modulweight,ideal Q=NULL);
 
 ideal scKBase(int deg, ideal  s, ideal Q=NULL, intvec * mv=NULL);
-
-intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree,
-                     ideal Q=NULL, ring tailRing = currRing);
-intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL, ring tailRing = currRing);
-intvec * hSecondSeries(intvec *hseries1);
-
-void hLookSeries(ideal S, intvec *modulweight, ideal Q=NULL);
 
 #endif
 

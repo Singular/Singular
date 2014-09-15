@@ -5,21 +5,29 @@
 *  ABSTRACT -  Hilbert series
 */
 
-
-
-
 #include <kernel/mod2.h>
-#include <kernel/structs.h>
+
 #include <omalloc/omalloc.h>
-#include <kernel/polys.h>
+#include <misc/auxiliary.h>
+#include <misc/mylimits.h>
 #include <misc/intvec.h>
-#include <kernel/combinatorics/hutil.h>
+
+#include <kernel/combinatorics/hilb.h>
 #include <kernel/combinatorics/stairc.h>
+#include <kernel/combinatorics/hutil.h>
+
+#include <polys/monomials/ring.h>
+#include <polys/monomials/p_polys.h>
+#include <polys/simpleideals.h>
+
+
+// #include <kernel/structs.h>
+// #include <kernel/polys.h>
 //ADICHANGES:
 #include <kernel/ideals.h>
-#include <kernel/GBEngine/kstd1.h>
-#include<gmp.h>
-#include<vector>
+// #include <kernel/GBEngine/kstd1.h>
+// #include<gmp.h>
+// #include<vector>
 
 
 static int  **Qpol;

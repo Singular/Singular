@@ -5,14 +5,15 @@
 * ABSTRACT: Utilities for staircase operations
 */
 
-
-
-
 #include <kernel/mod2.h>
-#include <kernel/structs.h>
+// #include <kernel/structs.h>
 #include <omalloc/omalloc.h>
-#include <kernel/ideals.h>
-#include <kernel/polys.h>
+
+#include <polys/simpleideals.h>
+#include <polys/monomials/p_polys.h>
+
+// #include <kernel/ideals.h>
+// #include <kernel/polys.h>
 #include <kernel/combinatorics/hutil.h>
 
 scfmon hexist, hstc, hrad, hwork;
@@ -32,15 +33,18 @@ static scfmon hsecure= NULL;
 
 scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
 {
-  int  sl, ql, i, k = 0;
-  polyset si, qi, ss;
-  scfmon ex, ek;
   if (tailRing != currRing)
     hisModule = id_RankFreeModule(S, currRing, tailRing);
   else
-    hisModule = id_RankFreeModule(S,currRing);
+    hisModule = id_RankFreeModule(S, currRing);
+
   if (hisModule < 0)
     hisModule = 0;
+   
+  int  sl, ql, i, k = 0;
+  polyset si, qi, ss;
+  scfmon ex, ek;
+   
   if (S!=NULL)
   {
     si = S->m;
@@ -90,7 +94,7 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
     if (*si!=NULL)
     {
       *ek = (scmon) omAlloc(((currRing->N)+1)*sizeof(int));
-      pGetExpV(*si, *ek);
+      p_GetExpV(*si, *ek, currRing);
       ek++;
     }
     si++;
@@ -100,7 +104,7 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
     if (*qi!=NULL)
     {
       *ek = (scmon) omAlloc(((currRing->N)+1)*sizeof(int));
-      pGetExpV(*qi, *ek);
+      p_GetExpV(*qi, *ek, currRing);
       ek++;
     }
     qi++;

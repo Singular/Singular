@@ -32,29 +32,34 @@
 #include <polys/monomials/maps.h>
 #include <polys/coeffrings.h>
 #include <polys/sparsmat.h>
-#include <Singular/mod_lib.h>
 #include <polys/weight.h>
 #include <polys/ext_fields/transext.h>
-#  include <polys/clapsing.h>
+#include <polys/clapsing.h>
 
 #include <kernel/combinatorics/stairc.h>
-#include <kernel/polys.h>
-#include <Singular/fevoices.h>
-#include <kernel/ideals.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <kernel/oswrapper/timer.h>
-#include <kernel/preimage.h>
-#include <kernel/GBEngine/units.h>
-#include <kernel/spectrum/GMPrat.h>
-#include <kernel/GBEngine/tgb.h>
-#include <kernel/groebner_walk/walkProc.h>
-#include <kernel/linear_algebra/linearAlgebra.h>
-#include <kernel/GBEngine/syz.h>
+#include <kernel/combinatorics/hilb.h>
 
 #include <kernel/linear_algebra/interpolation.h>
-#  include <kernel/GBEngine/kstdfac.h>
-#  include <kernel/fglm/fglm.h>
+#include <kernel/linear_algebra/linearAlgebra.h>
+#include <kernel/linear_algebra/MinorInterface.h>
 
+#include <kernel/spectrum/GMPrat.h>
+#include <kernel/groebner_walk/walkProc.h>
+#include <kernel/oswrapper/timer.h>
+#include <kernel/fglm/fglm.h>
+
+#include <kernel/GBEngine/kstdfac.h>
+#include <kernel/GBEngine/syz.h>
+#include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/units.h>
+#include <kernel/GBEngine/tgb.h>
+
+#include <kernel/preimage.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+
+#include <Singular/mod_lib.h>
+#include <Singular/fevoices.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <Singular/sdb.h>
@@ -66,7 +71,6 @@
 #include <Singular/ipprint.h>
 #include <Singular/attrib.h>
 #include <Singular/links/silink.h>
-#include <kernel/linear_algebra/MinorInterface.h>
 #include <Singular/misc_ip.h>
 #include <Singular/linearAlgebra_ip.h>
 
