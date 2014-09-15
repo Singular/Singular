@@ -1137,6 +1137,8 @@ void slicehilb(ideal I)
 static intvec * hSeries(ideal S, intvec *modulweight,
                 int /*notstc*/, intvec *wdegree, ideal Q, ring tailRing)
 {
+  id_TestTail(S, currRing, tailRing);
+   
   intvec *work, *hseries1=NULL;
   int  mc;
   int  p0;
@@ -1369,22 +1371,25 @@ static void hPrintHilb(intvec *hseries)
 /*
 *caller
 */
-void hLookSeries(ideal S, intvec *modulweight, ideal Q)
+void hLookSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring tailRing)
 {
-  int co, mu, l;
-  intvec *hseries2;
-  intvec *hseries1 = hFirstSeries(S, modulweight, Q);
+  id_TestTail(S, currRing, tailRing);
+
+  intvec *hseries1 = hFirstSeries(S, modulweight, Q, wdegree, tailRing);
+   
   hPrintHilb(hseries1);
-  l = hseries1->length()-1;
-  if (l > 1)
-    hseries2 = hSecondSeries(hseries1);
-  else
-    hseries2 = hseries1;
+   
+  const int l = hseries1->length()-1;
+   
+  intvec *hseries2 = (l > 1) ? hSecondSeries(hseries1) : hseries1;
+   
+  int co, mu;
   hDegreeSeries(hseries1, hseries2, &co, &mu);
+   
   PrintLn();
   hPrintHilb(hseries2);
   if ((l == 1) &&(mu == 0))
-    scPrintDegree((currRing->N)+1, 0);
+    scPrintDegree(rVar(currRing)+1, 0);
   else
     scPrintDegree(co, mu);
   if (l>1)

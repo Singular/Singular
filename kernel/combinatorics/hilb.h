@@ -15,12 +15,12 @@ class intvec;
 
 extern ring currRing;
 
-intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree,
-                     ideal Q=NULL, ring tailRing = currRing);
+intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree, ideal Q=NULL, ring tailRing = currRing);
 intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL, ring tailRing = currRing);
+
 intvec * hSecondSeries(intvec *hseries1);
 
-void hLookSeries(ideal S, intvec *modulweight, ideal Q=NULL);
+void hLookSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL, ring tailRing = currRing); 
 
 #endif
 

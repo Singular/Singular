@@ -71,6 +71,8 @@ void hDimSolve(scmon pure, int Npure, scfmon rad, int Nrad,
 
 int  scDimInt(ideal S, ideal Q)
 {
+  id_Test(S, currRing);
+  id_Test(Q, currRing);
   int  mc;
   hexist = hInit(S, Q, &hNexist, currRing);
   if (!hNexist)
@@ -208,6 +210,8 @@ static void hIndSolve(scmon pure, int Npure, scfmon rad, int Nrad,
 
 intvec * scIndIntvec(ideal S, ideal Q)
 {
+  id_Test(S, currRing);
+  id_Test(Q, currRing);
   intvec *Set=new intvec((currRing->N));
   int  mc,i;
   hexist = hInit(S, Q, &hNexist, currRing);
@@ -691,6 +695,8 @@ static void hDimMult(scmon pure, int Npure, scfmon rad, int Nrad,
 
 static void hDegree(ideal S, ideal Q)
 {
+  id_Test(S, currRing);
+  id_Test(Q, currRing);
   int  di;
   int  mc;
   hexist = hInit(S, Q, &hNexist, currRing);
@@ -789,6 +795,8 @@ static void hDegree(ideal S, ideal Q)
 
 int  scMultInt(ideal S, ideal Q)
 {
+  id_Test(S, currRing);
+  id_Test(Q, currRing);
   hDegree(S, Q);
   return hMu;
 }
@@ -809,6 +817,8 @@ void scPrintDegree(int co, int mu)
 
 void scDegree(ideal S, intvec *modulweight, ideal Q)
 {
+  id_Test(S, currRing);
+  id_Test(Q, currRing);
   int co, mu, l;
   intvec *hseries2;
   intvec *hseries1 = hFirstSeries(S, modulweight, Q);
@@ -829,8 +839,11 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
 
 static void hDegree0(ideal S, ideal Q, const ring r=currRing)
 {
+  id_Test(S, r);  
+  id_Test(Q, r);
+   
   int  mc;
-  hexist = hInit(S, Q, &hNexist, currRing);
+  hexist = hInit(S, Q, &hNexist, r);
   if (!hNexist)
   {
     hMu = -1;
@@ -897,6 +910,8 @@ static void hDegree0(ideal S, ideal Q, const ring r=currRing)
 
 int  scMult0Int(ideal S, ideal Q, const ring r)
 {
+  id_Test(S, r);  
+  id_Test(Q, r);  
   hDegree0(S, Q);
   return hMu;
 }
@@ -980,6 +995,8 @@ static void hHedgeStep(scmon pure, scfmon stc,
 
 void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
 {
+  id_TestTail(S, currRing, tailRing);  
+  id_TestTail(Q, currRing, tailRing);  
   int  i;
   int  k = ak;
 
@@ -1308,11 +1325,14 @@ static ideal scIdKbase()
     pNext(q) = NULL;
     q = p;
   } while (q!=NULL);
+   
+  id_Test(res, currRing);   
   return res;
 }
 
 ideal scKBase(int deg, ideal s, ideal Q, intvec * mv)
 {
+  id_Test(Q, currRing);  
   int  i, di;
   poly p;
 
@@ -1375,6 +1395,7 @@ ende:
     last = p;
     ideal res=scIdKbase();
     res->rank=s->rank;
+    id_Test(res, currRing);
     return res;
   }
 }
@@ -1382,6 +1403,9 @@ ende:
 #if 0 //-- alternative implementation of scComputeHC
 void scComputeHCw(ideal ss, ideal Q, int ak, poly &hEdge, ring tailRing)
 {
+  id_TestTail(ss, currRing, tailRing);  
+  id_TestTail(Q, currRing, tailRing);
+   
   int  i, di;
   poly p;
 
