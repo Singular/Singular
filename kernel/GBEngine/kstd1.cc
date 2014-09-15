@@ -1743,7 +1743,7 @@ loop_count = 1;
     if (strat->kHEdgeFound)
     {
       if ((TEST_OPT_FINDET)
-      || ((TEST_OPT_MULTBOUND) && (scMult0Int((strat->Shdl)) < Kstd1_mu)))
+      || ((TEST_OPT_MULTBOUND) && (scMult0Int(strat->Shdl,NULL,strat->tailRing) < Kstd1_mu)))
       {
         // obachman: is this still used ???
         /*
