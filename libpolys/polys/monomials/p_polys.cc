@@ -774,9 +774,7 @@ long pLDeg0(poly p,int *l, const ring r)
 long pLDeg0c(poly p,int *l, const ring r)
 {
   assume(p!=NULL);
-#ifdef PDEBUG
-  _p_Test(p,r,PDEBUG);
-#endif
+  p_Test(p,r);
   p_CheckPolyRing(p, r);
   long o;
   int ll=1;
@@ -801,9 +799,7 @@ long pLDeg0c(poly p,int *l, const ring r)
       else break;
       pp = p;
     }
-#ifdef PDEBUG
-    _p_Test(pp,r,PDEBUG);
-#endif
+    p_Test(pp,r);
     o = r->pFDeg(pp, r);
   }
   *l=ll;
@@ -1445,9 +1441,7 @@ poly p_mInit(const char *st, BOOLEAN &ok, const ring r)
     p_Delete(&p,r);
     return NULL;
   }
-  #ifdef PDEBUG
-  _p_Test(p,r,PDEBUG);
-  #endif
+  p_Test(p,r);
   ok=!errorreported;
   return p;
 }
@@ -2039,9 +2033,7 @@ static poly p_TwoMonPower(poly p, int exp, const ring r)
   {
     p_MonPower(p,exp,r);
     p_MonPower(tail,exp,r);
-#ifdef PDEBUG
     p_Test(p,r);
-#endif
     return p;
   }
   eh = exp >> 1;
@@ -2088,9 +2080,7 @@ static poly p_TwoMonPower(poly p, int exp, const ring r)
 //   else
 //     pIter(tail);
 // }
-#ifdef PDEBUG
   p_Test(res,r);
-#endif
   return res;
 }
 

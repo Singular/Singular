@@ -24,8 +24,9 @@
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
+// #include <coeffs/longrat.h>
 
-#include <kernel/polys.h>
+
 #include <polys/monomials/ring.h>
 #include <polys/matpol.h>
 #include <polys/weight.h>
@@ -36,10 +37,10 @@
 
 #include <kernel/ideals.h>
 
+#include <kernel/polys.h>
+
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/syz.h>
-
-#include <coeffs/longrat.h>
 
 
 /* #define WITH_OLD_MINOR */

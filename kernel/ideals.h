@@ -6,8 +6,12 @@
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
+
+#include <polys/monomials/ring.h>
+#include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>
-#include <kernel/polys.h>
+
+extern ring currRing;
 
 #include <kernel/structs.h> // for tHomog
 
@@ -53,15 +57,10 @@ static inline int idSize(const ideal id)
 
 #define idSimpleAdd(A,B) id_SimpleAdd(A,B,currRing)
 
-#ifdef PDEBUG
-#define idTest(A) id_DBTest(A, PDEBUG, __FILE__,__LINE__,currRing)
-#define idPrint(id) idShow(id, currRing, currRing)
-#else
-#define idTest(A)  do {} while (0)
-#define idPrint(A) do {} while (0)
-#endif
-
 ideal id_Copy (ideal h1, const ring r);
+
+#define idPrint(id) id_Print(id, currRing, currRing)
+#define idTest(id)  id_Test(id, currRing)
 
 #if 0
 
