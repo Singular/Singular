@@ -20,16 +20,39 @@
  **/
 static bool checkContainmentInTropicalVariety(const groebnerCone sigma)
 {
-  gfan::ZVector w = sigma.getInteriorPoint();
   ideal I = sigma.getPolynomialIdeal();
   ring r = sigma.getPolynomialRing();
   const tropicalStrategy* currentStrategy = sigma.getTropicalStrategy();
-  poly s = currentStrategy->checkInitialIdealForMonomial(I,r,w);
-  if (s)
+
+  gfan::ZCone zc = sigma.getPolyhedralCone();
+  gfan::ZMatrix zm = zc.extremeRays();
+  for (int i=0; i<zm.getHeight(); i++)
   {
-    p_Delete(&s,r);
-    return false;
+    gfan::ZVector w = zm[i];
+    if (currentStrategy->isValuationNonTrivial() && w[0].sign()==0)
+      continue;
+    poly s = currentStrategy->checkInitialIdealForMonomial(I,r,w);
+    if (s)
+    {
+      p_Delete(&s,r);
+      return false;
+    }
   }
+
+  zm = zc.generatorsOfLinealitySpace();
+  for (int i=0; i<zm.getHeight(); i++)
+  {
+    gfan::ZVector w = zm[i];
+    if (currentStrategy->isValuationNonTrivial() && w[0].sign()==0)
+      continue;
+    poly s = currentStrategy->checkInitialIdealForMonomial(I,r,w);
+    if (s)
+    {
+      p_Delete(&s,r);
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -312,7 +335,7 @@ static gfan::ZCone linealitySpaceOfGroebnerFan(const ideal I, const ring r)
 groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
 {
   ring r = currentStrategy.getStartingRing();
-  ideal I = currentStrategy.getStartingIdeal();
+  const ideal I = currentStrategy.getStartingIdeal();
   if (currentStrategy.isConstantCoefficientCase())
   {
     // copy the data, so that it be deleted when passed to the loop
@@ -358,7 +381,7 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     id_Delete(&inI,s);
     id_Delete(&J,s);
 
-    assume(checkContainmentInTropicalVariety(startingCone));
+    // assume(checkContainmentInTropicalVariety(startingCone));
     return startingCone;
   }
   else
@@ -462,6 +485,7 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     id_Delete(&J,s);
     rDelete(s);
 
+    assume(checkContainmentInTropicalVariety(startingCone));
     return startingCone;
   }
 }

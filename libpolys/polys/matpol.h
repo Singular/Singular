@@ -9,6 +9,7 @@
 
 // #include <kernel/structs.h>
 #include <polys/monomials/ring.h>
+#include <string.h>
 
 // THIS IS REALLY DIRTY: ip_smatrix HAS TO BE IDENTICAL TO ip_sideal
 // SO, DON'T CHANGE THE DECLARATION OF ip_smatrix
@@ -89,6 +90,8 @@ BOOLEAN mp_IsDiagUnit(matrix U, const ring r);
 void iiWriteMatrix(matrix im, const char *n, int dim, const ring r, int spaces);
 
 char * iiStringMatrix(matrix im, int dim, const ring r, char ch=',');
+
+void mp_Write(matrix im, const ring r);
 
 extern omBin ip_smatrix_bin;
 

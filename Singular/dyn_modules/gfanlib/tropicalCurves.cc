@@ -141,9 +141,9 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
       inIs->m[j] = p_PermPoly(inI->m[j],NULL,r,s,identity,NULL,0);
 
     inIs = gfanlib_kStd_wrapper(inIs,s,isHomog);
-    ideal ininIs = initial(inIs,s,W[W.getHeight()-1]);
+    ideal ininIs = initial(inIs,s,w,W);
 
-    poly mons = checkForMonomialViaSuddenSaturation(inIs,s);
+    poly mons = checkForMonomialViaSuddenSaturation(ininIs,s);
     if (mons)
     {
       poly gs = witness(mons,inIs,ininIs,s);
@@ -164,16 +164,16 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
 }
 
 
-std::set<gfan::ZVector> raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u, const tropicalStrategy& currentStrategy)
+gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u, const tropicalStrategy& currentStrategy)
 {
   std::set<gfan::ZCone> C = tropicalStar(I,r,u,currentStrategy);
-  std::set<gfan::ZVector> raysOfC;
+  gfan::ZMatrix raysOfC(0,u.size());
   if (!currentStrategy.restrictToLowerHalfSpace())
   {
     for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end(); zc++)
     {
       assume(zc->dimensionOfLinealitySpace()+1 == zc->dimension());
-      raysOfC.insert(zc->semiGroupGeneratorOfRay());
+      raysOfC.appendRow(zc->semiGroupGeneratorOfRay());
     }
   }
   else
@@ -181,7 +181,7 @@ std::set<gfan::ZVector> raysOfTropicalStar(ideal I, const ring r, const gfan::ZV
     for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end(); zc++)
     {
       assume(zc->dimensionOfLinealitySpace()+2 == zc->dimension());
-      raysOfC.insert(zc->getRelativeInteriorPoint());
+      raysOfC.appendRow(zc->getRelativeInteriorPoint());
     }
   }
   return raysOfC;

@@ -9,6 +9,7 @@
 #define LIB_Z_H_
 
 #include <string.h>
+#include <iostream>
 #include <ostream>
 
 #define OLD 1
@@ -67,6 +68,15 @@ public:
     f<<str;
     freefunc(str,strlen(str)+1);
     return f;
+  }
+  void debugPrint() const
+  {
+    void (*freefunc)(void *, size_t);
+    mp_get_memory_functions(0,0,&freefunc);
+    char *str=mpz_get_str(0,10,value);
+    std::cout << str;
+    freefunc(str,strlen(str)+1);
+    return;
   }
   Integer& operator+=(const Integer& a)
     {
@@ -328,6 +338,11 @@ namespace gfan{
           f<<valueToWord();
         }
       return f;
+    }
+    friend void debugPrint(IntegerTemplate const &a)
+    {
+      std::cout << a << std::endl;
+      return;
     }
     LimbWord signExtension(LimbWord a)
     {

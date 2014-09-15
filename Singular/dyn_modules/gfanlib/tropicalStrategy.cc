@@ -194,8 +194,8 @@ tropicalStrategy::tropicalStrategy(const tropicalStrategy& currentStrategy):
   linealitySpace(currentStrategy.getHomogeneitySpace()),
   startingRing(rCopy(currentStrategy.getStartingRing())),
   startingIdeal(id_Copy(currentStrategy.getStartingIdeal(),currentStrategy.getStartingRing())),
-  uniformizingParameter(n_Copy(currentStrategy.getUniformizingParameter(),startingRing->cf)),
-  shortcutRing(rCopy(currentStrategy.getShortcutRing())),
+  uniformizingParameter(NULL),
+  shortcutRing(NULL),
   onlyLowerHalfSpace(currentStrategy.restrictToLowerHalfSpace()),
   weightAdjustingAlgorithm1(currentStrategy.weightAdjustingAlgorithm1),
   weightAdjustingAlgorithm2(currentStrategy.weightAdjustingAlgorithm2),
@@ -205,8 +205,16 @@ tropicalStrategy::tropicalStrategy(const tropicalStrategy& currentStrategy):
   if (originalIdeal) id_Test(originalIdeal,originalRing);
   if (startingRing) rTest(startingRing);
   if (startingIdeal) id_Test(startingIdeal,startingRing);
-  if (uniformizingParameter) n_Test(uniformizingParameter,startingRing->cf);
-  if (shortcutRing) rTest(shortcutRing);
+  if (currentStrategy.getUniformizingParameter())
+  {
+    uniformizingParameter = n_Copy(currentStrategy.getUniformizingParameter(),startingRing->cf);
+    n_Test(uniformizingParameter,startingRing->cf);
+  }
+  if (currentStrategy.getShortcutRing())
+  {
+    shortcutRing = rCopy(currentStrategy.getShortcutRing());
+    rTest(shortcutRing);
+  }
 }
 
 tropicalStrategy::~tropicalStrategy()
@@ -220,10 +228,10 @@ tropicalStrategy::~tropicalStrategy()
 
   id_Delete(&originalIdeal,originalRing);
   rDelete(originalRing);
-  id_Delete(&startingIdeal,startingRing);
-  n_Delete(&uniformizingParameter,startingRing->cf);
-  rDelete(startingRing);
-  rDelete(shortcutRing);
+  if (startingIdeal) id_Delete(&startingIdeal,startingRing);
+  if (uniformizingParameter) n_Delete(&uniformizingParameter,startingRing->cf);
+  if (startingRing) rDelete(startingRing);
+  if (shortcutRing) rDelete(shortcutRing);
 }
 
 tropicalStrategy& tropicalStrategy::operator=(const tropicalStrategy& currentStrategy)
@@ -250,14 +258,65 @@ tropicalStrategy& tropicalStrategy::operator=(const tropicalStrategy& currentStr
   return *this;
 }
 
+void tropicalStrategy::putUniformizingBinomialInFront(ideal I, const ring r, const number q) const
+{
+  poly p = p_One(r);
+  p_SetCoeff(p,q,r);
+  poly t = p_One(r);
+  p_SetExp(t,1,1,r);
+  p_Setm(t,r);
+  poly pt = p_Add_q(p,p_Neg(t,r),r);
+
+  int k = idSize(I);
+  int l;
+  for (l=0; l<k; l++)
+  {
+    if (p_EqualPolys(I->m[l],pt,r))
+      break;
+  }
+  p_Delete(&pt,r);
+
+  if (l>1)
+  {
+    pt = I->m[l];
+    for (int i=l; i>0; i--)
+      I->m[l] = I->m[l-1];
+    I->m[0] = pt;
+    pt = NULL;
+  }
+  return;
+}
+
 bool tropicalStrategy::reduce(ideal I, const ring r) const
 {
   rTest(r);
   id_Test(I,r);
-  nMapFunc nMap = n_SetMap(startingRing->cf,r->cf);
-  number p = nMap(uniformizingParameter,startingRing->cf,r->cf);
-  bool b = this->extraReductionAlgorithm(I,r,p);
+
+  if (isValuationTrivial())
+    return false;
+
+  nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
+  number p = identity(uniformizingParameter,startingRing->cf,r->cf);
+  bool b = extraReductionAlgorithm(I,r,p);
+  // putUniformizingBinomialInFront(I,r,p);
   n_Delete(&p,r->cf);
+
+  return b;
+}
+
+bool tropicalStrategy::pReduce(ideal I, const ring r) const
+{
+  rTest(r);
+  id_Test(I,r);
+
+  if (isValuationTrivial())
+    return false;
+
+  nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
+  number p = identity(uniformizingParameter,startingRing->cf,r->cf);
+  bool b = pReduce0(I,p,r);
+  n_Delete(&p,r->cf);
+
   return b;
 }
 
@@ -292,7 +351,7 @@ ring tropicalStrategy::getShortcutRingPrependingWeight(const ring r, const gfan:
   }
 
   // if valuation non-trivial, change coefficient ring to residue field
-  if (valuationIsNonTrivial())
+  if (isValuationNonTrivial())
   {
     nKillChar(rShortcut->cf);
     rShortcut->cf = nCopyCoeff(shortcutRing->cf);
@@ -329,7 +388,7 @@ poly tropicalStrategy::checkInitialIdealForMonomial(const ideal I, const ring r,
   // check initial ideal for monomial and
   // if it exsists, return a copy of the monomial in the input ring
   poly p = checkForMonomialViaSuddenSaturation(inIShortcut,rShortcut);
-  poly monomial = NULL;
+  poly monomial = NULL; int n = rVar(r);
   if (p!=NULL)
   {
     monomial=p_One(r);
@@ -353,7 +412,7 @@ ring tropicalStrategy::copyAndChangeCoefficientRing(const ring r) const
   return rShortcut;
 }
 
-ideal getWitness(const ideal inJ, const ideal inI, const ideal I, const ring r) const
+ideal tropicalStrategy::getWitness(const ideal inJ, const ideal inI, const ideal I, const ring r) const
 {
   // if the valuation is trivial and the ring and ideal have not been extended,
   // then it is sufficient to return the difference between the elements of inJ
@@ -364,15 +423,16 @@ ideal getWitness(const ideal inJ, const ideal inI, const ideal I, const ring r) 
   // then we can make a shortcut through the residue field
   else
   {
-    checkFirstGenerator(I,r);
     assume(idSize(inI)==idSize(I));
+    int uni = findPositionOfUniformizingBinomial(I,r);
+    assume(uni>=0);
     /**
      * change ground ring into finite field
      * and map the data into it
      */
     ring rShortcut = copyAndChangeCoefficientRing(r);
 
-    int k = idSize(inI);
+    int k = idSize(inJ);
     int l = idSize(I);
     ideal inJShortcut = idInit(k);
     ideal inIShortcut = idInit(l);
@@ -389,26 +449,47 @@ ideal getWitness(const ideal inJ, const ideal inI, const ideal I, const ring r) 
      * and map the result back to r
      */
     matrix QShortcut = divisionDiscardingRemainder(inJShortcut,inIShortcut,rShortcut);
-    matrix Q = mpNew(k,l);
+    matrix Q = mpNew(l,k);
     nMapFunc takingRepresentatives = n_SetMap(rShortcut->cf,r->cf);
     for (int ij=k*l-1; ij>=0; ij--)
-      Q->m[ij] = p_PermPoly(Q->m[ij],NULL,rShortcut,r,takingRepresentatives,NULL,0);
+      Q->m[ij] = p_PermPoly(QShortcut->m[ij],NULL,rShortcut,r,takingRepresentatives,NULL,0);
+
+    nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
+    number p = identity(uniformizingParameter,startingRing->cf,r->cf);
 
     /**
      * Compute the normal forms
      */
     ideal J = idInit(k);
-    for (int j=0; j<l; j++)
+    for (int j=0; j<k; j++)
     {
       poly q0 = p_Copy(inJ->m[j],r);
-      for (int i=1; i<k; i++)
-        q0 = p_Add_q(q0,p_Neg(p_Mult_q(p_Copy(MATELEM(Q,i,j),r),p_Copy(inI->m[i],r),r),r),r);
-      J->m[j] = p_Mult_q(q0,p_Copy(J->m[0],r),r);
-      q0 = NULL;
-      for (int i=1; i<k; i++)
-        J->m[j] = p_Add_q(I->m[j],p_Mult_q(p_Copy(MATELEM(Q,i,j),r),p_Copy(I->m[i],r),r),r);
+      for (int i=0; i<l; i++)
+      {
+        poly qij = p_Copy(MATELEM(Q,i+1,j+1),r);
+        poly inIi = p_Copy(inI->m[i],r);
+        q0 = p_Add_q(q0,p_Neg(p_Mult_q(qij,inIi,r),r),r);
+      }
+      q0 = p_Div_nn(q0,p,r);
+      poly q0g0 = p_Mult_q(q0,p_Copy(I->m[uni],r),r);
+      // q0 = NULL;
+      poly qigi = NULL;
+      for (int i=0; i<l; i++)
+      {
+        poly qij = p_Copy(MATELEM(Q,i+1,j+1),r);
+        // poly inIi = p_Copy(I->m[i],r);
+        poly Ii = p_Copy(I->m[i],r);
+        qigi = p_Add_q(qigi,p_Mult_q(qij,Ii,r),r);
+      }
+      J->m[j] = p_Add_q(q0g0,qigi,r);
     }
 
+    id_Delete(&inIShortcut,rShortcut);
+    id_Delete(&inJShortcut,rShortcut);
+    mp_Delete(&QShortcut,rShortcut);
+    rDelete(rShortcut);
+    mp_Delete(&Q,r);
+    n_Delete(&p,r->cf);
     return J;
   }
 }
@@ -436,42 +517,39 @@ ideal tropicalStrategy::getStdOfInitialIdeal(const ideal inI, const ring r) cons
     k = idSize(inJShortcut);
     inJ = idInit(k+1);
     inJ->m[0] = p_One(r);
-    p_SetCoeff(inJ->m[0],nMap(uniformizingParameter,startingRing->cf,r->cf),r);
+    nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
+    p_SetCoeff(inJ->m[0],identity(uniformizingParameter,startingRing->cf,r->cf),r);
     for (int i=0; i<k; i++)
       inJ->m[i+1] = p_PermPoly(inJShortcut->m[i],NULL,rShortcut,r,takingRepresentatives,NULL,0);
+
+    id_Delete(&inIShortcut,rShortcut);
+    rDelete(rShortcut);
   }
   return inJ;
 }
 
-ring tropicalStrategy::copyAndChangeOrderingWP(const ring r, const gfan::ZVector w, const gfan::ZVector v)
+static void deleteOrdering(ring r)
 {
-  // copy shortcutRing and change to desired ordering
-  bool ok;
-  ring s = rCopy0(r);
-  int n = rVar(s);
-  deleteOrdering(s);
-  gfan::ZVector wAdjusted = adjustWeightForHomogeneity(w);
-  gfan::ZVector vAdjusted = adjustWeightUnderHomogeneity(wAdjusted,v);
-  s->order = (int*) omAlloc0(4*sizeof(int));
-  s->block0 = (int*) omAlloc0(4*sizeof(int));
-  s->block1 = (int*) omAlloc0(4*sizeof(int));
-  s->wvhdl = (int**) omAlloc0(4*sizeof(int**));
-  s->order[0] = ringorder_a;
-  s->block0[0] = 1;
-  s->block1[0] = n;
-  s->wvhdl[0] = ZVectorToIntStar(adjustedInteriorPoint,ok);
-  s->order[1] = ringorder_wp;
-  s->block0[1] = 1;
-  s->block1[1] = n;
-  s->wvhdl[1] = ZVectorToIntStar(adjustedFacetNormal,ok);
-  s->order[2] = ringorder_C;
-  rComplete(s);
-  rTest(s);
-
-  return s;
+  if (r->order != NULL)
+  {
+    int i=rBlocks(r);
+    assume(r->block0 != NULL && r->block1 != NULL && r->wvhdl != NULL);
+    /* delete order */
+    omFreeSize((ADDRESS)r->order,i*sizeof(int));
+    omFreeSize((ADDRESS)r->block0,i*sizeof(int));
+    omFreeSize((ADDRESS)r->block1,i*sizeof(int));
+    /* delete weights */
+    for (int j=0; j<i; j++)
+      if (r->wvhdl[j]!=NULL)
+        omFree(r->wvhdl[j]);
+    omFreeSize((ADDRESS)r->wvhdl,i*sizeof(int *));
+  }
+  else
+    assume(r->block0 == NULL && r->block1 == NULL && r->wvhdl == NULL);
+  return;
 }
 
-ring tropicalStrategy::copyAndChangeOrderingDP(const ring r, const gfan::ZVector w, const gfan::ZVector v)
+ring tropicalStrategy::copyAndChangeOrderingWP(const ring r, const gfan::ZVector w, const gfan::ZVector v) const
 {
   // copy shortcutRing and change to desired ordering
   bool ok;
@@ -479,7 +557,7 @@ ring tropicalStrategy::copyAndChangeOrderingDP(const ring r, const gfan::ZVector
   int n = rVar(s);
   deleteOrdering(s);
   gfan::ZVector wAdjusted = adjustWeightForHomogeneity(w);
-  gfan::ZVector vAdjusted = adjustWeightUnderHomogeneity(wAdjusted,v);
+  gfan::ZVector vAdjusted = adjustWeightUnderHomogeneity(v,wAdjusted);
   s->order = (int*) omAlloc0(5*sizeof(int));
   s->block0 = (int*) omAlloc0(5*sizeof(int));
   s->block1 = (int*) omAlloc0(5*sizeof(int));
@@ -487,11 +565,40 @@ ring tropicalStrategy::copyAndChangeOrderingDP(const ring r, const gfan::ZVector
   s->order[0] = ringorder_a;
   s->block0[0] = 1;
   s->block1[0] = n;
-  s->wvhdl[0] = ZVectorToIntStar(adjustedInteriorPoint,ok);
+  s->wvhdl[0] = ZVectorToIntStar(wAdjusted,ok);
   s->order[1] = ringorder_a;
   s->block0[1] = 1;
   s->block1[1] = n;
-  s->wvhdl[1] = ZVectorToIntStar(adjustedFacetNormal,ok);
+  s->wvhdl[1] = ZVectorToIntStar(vAdjusted,ok);
+  s->order[2] = ringorder_dp;
+  s->block0[2] = 1;
+  s->block1[2] = n;
+  s->order[3] = ringorder_C;
+  rComplete(s);
+  rTest(s);
+
+  return s;
+}
+
+ring tropicalStrategy::copyAndChangeOrderingLS(const ring r, const gfan::ZVector w, const gfan::ZVector v) const
+{
+  // copy shortcutRing and change to desired ordering
+  bool ok;
+  ring s = rCopy0(r);
+  int n = rVar(s);
+  deleteOrdering(s);
+  s->order = (int*) omAlloc0(5*sizeof(int));
+  s->block0 = (int*) omAlloc0(5*sizeof(int));
+  s->block1 = (int*) omAlloc0(5*sizeof(int));
+  s->wvhdl = (int**) omAlloc0(5*sizeof(int**));
+  s->order[0] = ringorder_a;
+  s->block0[0] = 1;
+  s->block1[0] = n;
+  s->wvhdl[0] = ZVectorToIntStar(w,ok);
+  s->order[1] = ringorder_a;
+  s->block0[1] = 1;
+  s->block1[1] = n;
+  s->wvhdl[1] = ZVectorToIntStar(v,ok);
   s->order[2] = ringorder_dp;
   s->block0[2] = 1;
   s->block1[2] = n;
@@ -503,22 +610,22 @@ ring tropicalStrategy::copyAndChangeOrderingDP(const ring r, const gfan::ZVector
 }
 
 
-std::pair<ideal,ring> tropicalStrategy::getFlip(const ideal I, const ring r,
+std::pair<ideal,ring> tropicalStrategy::getFlip(const ideal I, const ideal redI, const ring r,
                                                 const gfan::ZVector interiorPoint,
                                                 const gfan::ZVector facetNormal) const
 {
   assume(isValuationTrivial() || interiorPoint[0].sign()<0);
-  assume(checkFirstGenerators(I,r));
+  assume(checkForUniformizingBinomial(I,r));
 
   // get a generating system of the initial ideal
   // and compute a standard basis with respect to adjacent ordering
-  ideal inIr = initial(I,r,interiorPoint);
+  ideal inIr = initial(redI,r,interiorPoint);
   ring sAdjusted = copyAndChangeOrderingWP(r,interiorPoint,facetNormal);
   nMapFunc identity = n_SetMap(r->cf,sAdjusted->cf);
-  int k = idSize(I); ideal inIs = idInit(k);
+  int k = idSize(I); ideal inIsAdjusted = idInit(k);
   for (int i=0; i<k; i++)
     inIsAdjusted->m[i] = p_PermPoly(inIr->m[i],NULL,r,sAdjusted,identity,NULL,0);
-  ideal inJsAdjusted = getStdOfInitialIdeal(inIsAdjusted,sShortcut);
+  ideal inJsAdjusted = getStdOfInitialIdeal(inIsAdjusted,sAdjusted);
 
   // find witnesses of the new standard basis elements of the initial ideal
   // with the help of the old standard basis of the ideal
@@ -528,11 +635,100 @@ std::pair<ideal,ring> tropicalStrategy::getFlip(const ideal I, const ring r,
   for (int i=0; i<k; i++)
     inJr->m[i] = p_PermPoly(inJsAdjusted->m[i],NULL,sAdjusted,r,identity,NULL,0);
 
-  ideal Jr = getWitness(inJr,inIr,I,r);
-  ring s = copyAndChangeOrderingDP(r,interiorPoint,facetNormal);
+  ideal Jr = getWitness(inJr,inIr,redI,r);
+  ring s = copyAndChangeOrderingLS(r,interiorPoint,facetNormal);
   identity = n_SetMap(r->cf,s->cf);
+  ideal Js = idInit(k);
   for (int i=0; i<k; i++)
-    Js->m[i] = p_PermPoly(inJsAdjusted->m[i],NULL,r,s,identity,NULL,0);
+    Js->m[i] = p_PermPoly(Jr->m[i],NULL,r,s,identity,NULL,0);
 
+  // this->reduce(Jr,r);
+  // cleanup
+  id_Delete(&inJsAdjusted,sAdjusted);
+  rDelete(sAdjusted);
+  id_Delete(&Jr,r);
+  id_Delete(&inJr,r);
+
+  assume(isValuationTrivial() || isOrderingLocalInT(s));
   return std::make_pair(Js,s);
+}
+
+
+bool tropicalStrategy::checkForUniformizingBinomial(const ideal I, const ring r) const
+{
+  // if the valuation is trivial,
+  // then there is no special condition the first generator has to fullfill
+  if (isValuationTrivial())
+    return true;
+
+  // if the valuation is non-trivial then checks if the first generator is p-t
+  nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
+  poly p = p_One(r);
+  p_SetCoeff(p,identity(uniformizingParameter,startingRing->cf,r->cf),r);
+  poly t = p_One(r);
+  p_SetExp(t,1,1,r);
+  p_Setm(t,r);
+  poly pt = p_Add_q(p,p_Neg(t,r),r);
+
+  for (int i=0; i<idSize(I); i++)
+  {
+    if (p_EqualPolys(I->m[i],pt,r))
+    {
+      p_Delete(&pt,r);
+      return true;
+    }
+  }
+  p_Delete(&pt,r);
+  return false;
+}
+
+int tropicalStrategy::findPositionOfUniformizingBinomial(const ideal I, const ring r) const
+{
+  assume(isValuationNonTrivial());
+
+  // if the valuation is non-trivial then checks if the first generator is p-t
+  nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
+  poly p = p_One(r);
+  p_SetCoeff(p,identity(uniformizingParameter,startingRing->cf,r->cf),r);
+  poly t = p_One(r);
+  p_SetExp(t,1,1,r);
+  p_Setm(t,r);
+  poly pt = p_Add_q(p,p_Neg(t,r),r);
+
+  for (int i=0; i<idSize(I); i++)
+  {
+    if (p_EqualPolys(I->m[i],pt,r))
+    {
+      p_Delete(&pt,r);
+      return i;
+    }
+  }
+  p_Delete(&pt,r);
+  return -1;
+}
+
+bool tropicalStrategy::checkForUniformizingParameter(const ideal inI, const ring r) const
+{
+  // if the valuation is trivial,
+  // then there is no special condition the first generator has to fullfill
+  if (isValuationTrivial())
+    return true;
+
+  // if the valuation is non-trivial then checks if the first generator is p
+  if (inI->m[0]==NULL)
+    return false;
+  nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
+  poly p = p_One(r);
+  p_SetCoeff(p,identity(uniformizingParameter,startingRing->cf,r->cf),r);
+
+  for (int i=0; i<idSize(inI); i++)
+  {
+    if (p_EqualPolys(inI->m[i],p,r))
+    {
+      p_Delete(&p,r);
+      return true;
+    }
+  }
+  p_Delete(&p,r);
+  return false;
 }

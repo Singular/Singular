@@ -34,8 +34,11 @@ matrix divisionDiscardingRemainder(const ideal F, const ideal G, const ring r)
 {
   ring origin = currRing;
   if (origin != r) rChangeCurrRing(r);
-  ideal m = idLift(G,F);
-  matrix Q = id_Module2formatedMatrix(m,IDELEMS(G),1,currRing);
+  ideal R; matrix U;
+  ideal m = idLift(G,F,&R,FALSE,FALSE,TRUE,&U);
+  matrix Q = id_Module2formatedMatrix(m,IDELEMS(G),IDELEMS(F),currRing);
+  id_Delete(&R,r);
+  mp_Delete(&U,r);
   if (origin != r) rChangeCurrRing(origin);
   return Q;
 }

@@ -17,13 +17,13 @@ static bool checkForNonPositiveEntries(const gfan::ZVector w)
 
 static bool checkForNonPositiveLaterEntries(const gfan::ZVector w)
 {
-  if (w[0].sign()<0)
-  {
-    std::cout << "ERROR: negative weight in weight vector first entry" << std::endl
-              << "weight: " << w << std::endl;
-    return false;
-  }
-  for (unsigned i=1; i<w.size(); i++)
+  // if (w[0].sign()<0)
+  // {
+  //   std::cout << "ERROR: negative weight in weight vector first entry" << std::endl
+  //             << "weight: " << w << std::endl;
+  //   return false;
+  // }
+  for (unsigned i=0; i<w.size(); i++)
   {
     if (w[i].sign()<=0)
     {
@@ -70,7 +70,7 @@ gfan::ZVector valued_adjustWeightForHomogeneity(const gfan::ZVector w)
   v[0]=-w[0];
   for (unsigned i=1; i<w.size(); i++)
     v[i]=-w[i]+max+1;
-  assume(checkForNonPositiveLaterEntries(v));
+  // assume(checkForNonPositiveLaterEntries(v));
   return v;
 }
 
@@ -107,7 +107,7 @@ gfan::ZVector nonvalued_adjustWeightUnderHomogeneity(const gfan::ZVector e, cons
 
 gfan::ZVector valued_adjustWeightUnderHomogeneity(const gfan::ZVector e, const gfan::ZVector w)
 {
-  assume(checkForNonPositiveLaterEntries(w));
+  // assume(checkForNonPositiveLaterEntries(w));
   /* find k such that e+k*w is strictly positive,
    * i.e. k such that e[i]+k*w[i] is strictly positive
    * for all i=0,...,n */

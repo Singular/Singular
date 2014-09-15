@@ -13,7 +13,9 @@ BOOLEAN ppreduceInitially3(leftv res, leftv args);
 BOOLEAN ppreduceInitially4(leftv res, leftv args);
 #endif
 
-bool ppreduceInitially(ideal I, ring r, number p);
+bool isOrderingLocalInT(const ring r);
+bool pReduce0(ideal &I, const number p, const ring r);
+bool ppreduceInitially(ideal I, const ring r, const number p);
 BOOLEAN ppreduceInitially(leftv res, leftv args);
 
 #endif

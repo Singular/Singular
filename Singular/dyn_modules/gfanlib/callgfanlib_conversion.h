@@ -18,6 +18,8 @@ gfan::ZVector wvhdlEntryToZVector(const int n, const int* wvhdl0);
 int* ZVectorToIntStar(const gfan::ZVector &v, bool &overflow);
 char* toString(gfan::ZMatrix const &m);
 
+gfan::ZVector expvToZVector(const int n, const int* expv);
+
 gfan::ZFan* toFanStar(std::set<gfan::ZCone> setOfCones);
 std::set<gfan::ZVector> rays(std::set<gfan::ZCone> setOfCones);
 

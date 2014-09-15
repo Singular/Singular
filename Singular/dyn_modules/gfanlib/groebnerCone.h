@@ -93,6 +93,7 @@ public:
    * returns the adjacent groebnerCone sharing that facet
    **/
   bool checkFlipConeInput(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
+  bool pointsOutwards(const gfan::ZVector) const;
   groebnerCone flipCone(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
 
   /***

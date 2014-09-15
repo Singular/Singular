@@ -39,7 +39,9 @@ ideal sloppyInitial(const ideal I, const ring r, const gfan::ZVector w);
 poly initial(const poly p, const ring r, const gfan::ZVector w);
 ideal initial(const ideal I, const ring r, const gfan::ZVector w);
 poly initial(const poly p, const ring r, const gfan::ZMatrix W);
-poly initial(const ideal I, const ring r, const gfan::ZMatrix W);
+ideal initial(const ideal I, const ring r, const gfan::ZMatrix W);
+poly initial(const poly p, const ring r, const gfan::ZVector w, const gfan::ZMatrix W);
+ideal initial(const ideal I, const ring r, const gfan::ZVector w, const gfan::ZMatrix W);
 
 
 poly initial(const poly p, const ring r);

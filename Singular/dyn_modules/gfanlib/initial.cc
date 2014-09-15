@@ -38,6 +38,15 @@ gfan::ZVector WDeg(const poly p, const ring r, const gfan::ZMatrix W)
   return d;
 }
 
+gfan::ZVector WDeg(const poly p, const ring r, const gfan::ZVector w, const gfan::ZMatrix W)
+{
+  gfan::ZVector d = gfan::ZVector(W.getHeight()+1);
+  d[0] = wDeg(p,r,w);
+  for (int i=0; i<W.getHeight(); i++)
+    d[i+1] = wDeg(p,r,W[i]);
+  return d;
+}
+
 /**
  * Checks if p is sorted with respect to w.
  */
@@ -165,6 +174,33 @@ poly initial(const poly p, const ring r, const gfan::ZMatrix W)
   return q0;
 }
 
+poly initial(const poly p, const ring r, const gfan::ZVector w, const gfan::ZMatrix W)
+{
+  int n = rVar(r);
+  poly q0 = p_Head(p,r);
+  poly q1 = q0;
+  gfan::ZVector d = WDeg(p,r,w,W);
+  for (poly currentTerm = p->next; currentTerm; pIter(currentTerm))
+  {
+    gfan::ZVector e = WDeg(currentTerm,r,w,W);
+    if (d<e)
+    {
+      p_Delete(&q0,r);
+      q0 = p_Head(p,r);
+      q1 = q0;
+      d = e;
+    }
+    else
+      if (d==e)
+      {
+        pNext(q1) = p_Head(currentTerm,r);
+        pIter(q1);
+      }
+  }
+  return q0;
+}
+
+
 /***
  * Runs the above procedure over all generators of an ideal.
  * Returns the initial ideal if and only if the weight is in the maximal Groebner cone
@@ -178,6 +214,13 @@ ideal initial(const ideal I, const ring r, const gfan::ZMatrix W)
   return inI;
 }
 
+ideal initial(const ideal I, const ring r, const gfan::ZVector w, const gfan::ZMatrix W)
+{
+  int k = idSize(I); ideal inI = idInit(k);
+  for (int i=0; i<k; i++)
+    inI->m[i] = initial(I->m[i],r,w,W);
+  return inI;
+}
 
 #ifndef NDEBUG
 BOOLEAN initial0(leftv res, leftv args)

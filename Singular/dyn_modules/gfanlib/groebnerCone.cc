@@ -80,6 +80,7 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const tropicalStrategy& 
     reducedPolynomialIdeal = id_Copy(I,r);
   }
   if (r) polynomialRing = rCopy(r);
+  currentCase.pReduce(polynomialIdeal,r);
   currentCase.reduce(reducedPolynomialIdeal,polynomialRing);
 
   int n = rVar(polynomialRing);
@@ -95,12 +96,12 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const tropicalStrategy& 
     if (g)
     {
       p_GetExpV(g,leadexpv,r);
-      leadexpw = intStar2ZVector(n, leadexpv);
+      leadexpw = expvToZVector(n, leadexpv);
       pIter(g);
       while (g)
       {
         p_GetExpV(g,tailexpv,r);
-        tailexpw = intStar2ZVector(n, tailexpv);
+        tailexpw = expvToZVector(n, tailexpv);
         inequalities.appendRow(leadexpw-tailexpw);
         pIter(g);
       }
@@ -108,12 +109,12 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const tropicalStrategy& 
   }
   omFreeSize(leadexpv,(n+1)*sizeof(int));
   omFreeSize(tailexpv,(n+1)*sizeof(int));
-  if (currentStrategy->restrictToLowerHalfSpace())
-  {
-    gfan::ZVector lowerHalfSpaceCondition = gfan::ZVector(n);
-    lowerHalfSpaceCondition[0] = -1;
-    inequalities.appendRow(lowerHalfSpaceCondition);
-  }
+  // if (currentStrategy->restrictToLowerHalfSpace())
+  // {
+  //   gfan::ZVector lowerHalfSpaceCondition = gfan::ZVector(n);
+  //   lowerHalfSpaceCondition[0] = -1;
+  //   inequalities.appendRow(lowerHalfSpaceCondition);
+  // }
 
   polyhedralCone = gfan::ZCone(inequalities,gfan::ZMatrix(0, inequalities.getWidth()));
   polyhedralCone.canonicalize();
@@ -143,6 +144,7 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, 
     reducedPolynomialIdeal = id_Copy(I,r);
   }
   if (r) polynomialRing = rCopy(r);
+  currentCase.pReduce(polynomialIdeal,r);
   currentCase.reduce(reducedPolynomialIdeal,polynomialRing);
 
   int n = rVar(polynomialRing);
@@ -204,6 +206,7 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& u, 
     reducedPolynomialIdeal = id_Copy(I,r);
   }
   if (r) polynomialRing = rCopy(r);
+  currentCase.pReduce(polynomialIdeal,r);
   currentCase.reduce(reducedPolynomialIdeal,polynomialRing);
 
   int n = rVar(polynomialRing);
@@ -258,6 +261,7 @@ groebnerCone::groebnerCone(const ideal I, const ideal inI, const ring r, const t
 {
   assume(checkPolynomialInput(I,r));
   assume(checkPolynomialInput(inI,r));
+  currentCase.pReduce(polynomialIdeal,r);
   currentStrategy->reduce(reducedPolynomialIdeal,polynomialRing);
   // currentStrategy->reduce(initialPolynomialIdeal,polynomialRing);
 
@@ -434,7 +438,7 @@ groebnerCone groebnerCone::flipCone(const gfan::ZVector interiorPoint, const gfa
    *   Hence it is sufficient to compute the initial form with respect to facetNormal,
    *   to obtain an initial form with respect to interiorPoint+e*facetNormal,
    *   for e>0 sufficiently small */
-  std::pair<ideal,ring> flipped = currentStrategy->flip(reducedPolynomialIdeal,polynomialRing,interiorPoint,facetNormal);
+  std::pair<ideal,ring> flipped = currentStrategy->getFlip(polynomialIdeal,reducedPolynomialIdeal,polynomialRing,interiorPoint,facetNormal);
   assume(checkPolynomialInput(flipped.first,flipped.second));
   groebnerCone flippedCone(flipped.first, flipped.second, interiorPoint, facetNormal, *currentStrategy);
   return flippedCone;
@@ -546,7 +550,7 @@ static gfan::ZMatrix interiorPointsOfFacets(const gfan::ZCone zc)
   /* these are the cases i=1,...,r-2 */
   for (int i=1; i<r-1; i++)
   {
-    newInequalities = inequalities.submatrix(0,0,i-1,c);
+    newInequalities = inequalities.submatrix(0,0,i,c);
     newInequalities.append(inequalities.submatrix(i+1,0,r,c));
     newEquations = equations;
     newEquations.appendRow(inequalities[i]);
@@ -565,6 +569,13 @@ static gfan::ZMatrix interiorPointsOfFacets(const gfan::ZCone zc)
 }
 
 
+bool groebnerCone::pointsOutwards(const gfan::ZVector w) const
+{
+  gfan::ZCone dual = polyhedralCone.dualCone();
+  return (!dual.contains(w));
+}
+
+
 /***
  * Returns a complete list of neighboring Groebner cones in the tropical variety.
  **/
@@ -577,9 +588,13 @@ groebnerCones groebnerCone::tropicalNeighbours() const
     if (!(currentStrategy->restrictToLowerHalfSpace() && interiorPoints[i][0].sign()==0))
     {
       ideal initialIdeal = initial(polynomialIdeal,polynomialRing,interiorPoints[i]);
-      std::set<gfan::ZVector> rays = raysOfTropicalStar(initialIdeal,polynomialRing,interiorPoints[i],*currentStrategy);
-      for (std::set<gfan::ZVector>::iterator ray = rays.begin(); ray!=rays.end(); ray++)
-        neighbours.insert(this->flipCone(interiorPoints[i],*ray));
+      gfan::ZMatrix ray = raysOfTropicalStar(initialIdeal,polynomialRing,interiorPoints[i],*currentStrategy);
+      for (int j=0; j<ray.getHeight(); j++)
+        if (pointsOutwards(ray[j]))
+        {
+          groebnerCone neighbour = flipCone(interiorPoints[i],ray[j]);
+          neighbours.insert(neighbour);
+        }
     }
   }
   return neighbours;

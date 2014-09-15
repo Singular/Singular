@@ -90,6 +90,25 @@ private:
    */
   bool (*extraReductionAlgorithm) (ideal I, ring r, number p);
 
+  ring copyAndChangeCoefficientRing(const ring r) const;
+  ring copyAndChangeOrderingWP(const ring r, const gfan::ZVector w, const gfan::ZVector v) const;
+  ring copyAndChangeOrderingLS(const ring r, const gfan::ZVector w, const gfan::ZVector v) const;
+
+  /**
+   * if valuation non-trivial, checks whether the generating system contains p-t
+   * otherwise returns true
+   */
+  bool checkForUniformizingBinomial(const ideal I, const ring r) const;
+
+  /**
+   * if valuation non-trivial, checks whether the genearting system contains p
+   * otherwise returns true
+   */
+  bool checkForUniformizingParameter(const ideal inI, const ring r) const;
+  int findPositionOfUniformizingBinomial(const ideal I, const ring r) const;
+  void putUniformizingBinomialInFront(ideal I, const ring r, const number q) const;
+
+
 public:
 
   /**
@@ -153,7 +172,7 @@ public:
    */
   ring getStartingRing() const
   {
-    rTest(startingRing);
+    if (startingRing) rTest(startingRing);
     return startingRing;
   }
 
@@ -185,7 +204,7 @@ public:
 
   ring getShortcutRing() const
   {
-    rTest(shortcutRing);
+    if (shortcutRing) rTest(shortcutRing);
     return shortcutRing;
   }
 
@@ -257,13 +276,13 @@ public:
    */
   void changeCoefficientToResidueField(ring r) const;
 
-
-
   /**
    * reduces the generators of an ideal I so that
    * the inequalities and equations of the Groebner cone can be read off.
    */
   bool reduce(ideal I, const ring r) const;
+
+  bool pReduce(ideal I, const ring r) const;
 
   /**
    * returns true, if I contains a monomial.
@@ -291,65 +310,7 @@ public:
    * given an interior point of a groebner cone
    * computes the groebner cone adjacent to it
    */
-  std::pair<ideal,ring> getFlip(const ideal I, const ring r, const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
-
-  /**
-   * checks whether the first elements of I is p-t
-   */
-  static bool checkFirstGenerator(ideal I, ring r)
-  {
-    // check for correct size of ideal and first generator
-    if (idSize(I)==0)
-    {
-      WerrorS("checkFirstElement: ideal empty");
-      return false;
-    }
-    poly p = I->m[0];
-    if (size(p)!=2)
-    {
-      WerrorS("checkFirstElement: no binomial");
-      return false;
-    }
-
-    // check first term
-    int n = rVar(r);
-    if (!n_IsUnit(p_GetCoeff(p,r->cf),r->cf))
-    {
-      WerrorS("checkFirstElement: wrong coefficient");
-      return false;
-    }
-    for (int i=1; i<=n; i++)
-    {
-      if (p_GetExp(p,i,r)!=0)
-      {
-        WerrorS("checkFirstElement: wrong exponent vector");
-        return false;
-      }
-    }
-
-    // check second term
-    pIter(p);
-    if (!n_IsOne(p_GetCoeff(p,r->cf),r->cf))
-    {
-      WerrorS("checkFirstElement: wrong coefficient");
-      return false;
-    }
-    if (p_GetExp(p,1,r)!=1)
-    {
-      WerrorS("checkFirstElement: wrong exponent vector");
-      return false;
-    }
-    for (int i=2; i<=n; i++)
-    {
-      if (p_GetExp(p,i,r)!=0)
-      {
-        WerrorS("checkFirstElement: wrong exponent vector");
-        return false;
-      }
-    }
-
-    return true;
-  }
+  std::pair<ideal,ring> getFlip(const ideal I, const ideal redI, const ring r, const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
 };
 
 int dim(ideal I, ring r);

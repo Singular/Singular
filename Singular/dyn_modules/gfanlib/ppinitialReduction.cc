@@ -8,6 +8,18 @@
 #include <map>
 #include <set>
 
+bool isOrderingLocalInT(const ring r)
+{
+  poly one = p_One(r);
+  poly t = p_One(r);
+  p_SetExp(t,1,1,r);
+  p_Setm(t,r);
+  int s = p_LmCmp(one,t,r);
+  p_Delete(&one,r);
+  p_Delete(&t,r);
+  return (s==1);
+}
+
 /***
  * changes a polynomial g with the help p-t such that
  * 1) each term of g has a distinct monomial in x
@@ -79,7 +91,6 @@ static bool pReduce(poly &g, const number p, const ring r)
   return false;
 }
 
-
 #ifndef NDEBUG
 BOOLEAN pppReduce(leftv res, leftv args)
 {
@@ -104,6 +115,22 @@ BOOLEAN pppReduce(leftv res, leftv args)
   return TRUE;
 }
 #endif //NDEBUG
+
+bool pReduce0(ideal &I, const number p, const ring r)
+{
+  int k = idSize(I);
+  for (int i=0; i<k; i++)
+  {
+    if (I->m[i]!=NULL)
+    {
+      number c = p_GetCoeff(I->m[i],r);
+      if (!n_Equal(p,c,r->cf))
+        if (pReduce(I->m[i],p,r))
+          return true;
+    }
+  }
+  return false;
+}
 
 
 /***
@@ -493,6 +520,32 @@ BOOLEAN ppreduceInitially3(leftv res, leftv args)
 #endif //NDEBUG
 
 
+static std::vector<int> synchronize(const ideal I, const ideal Hi)
+{
+  int k = idSize(Hi);
+  int l = idSize(I);
+  std::vector<int> synch(k);
+  int j;
+  for (int i=0; i<k; i++)
+  {
+    for (j=0; j<l; j++)
+    {
+      if (I->m[i]==Hi->m[j])
+        synch[i] = j;
+    }
+    if (j==l)
+      synch[i] = -1;
+  }
+  return synch;
+}
+
+static void synchronize(ideal I, const ideal Hi, const std::vector<int> synch)
+{
+  for (unsigned i=0; i<synch.size(); i++)
+    if (synch[i]>=0)
+      I->m[i] = Hi->m[synch[i]];
+}
+
 /**
  * reduces I initially with respect to itself.
  * assumes that the generators of I are homogeneous in x and that p-t is in I.
@@ -524,17 +577,18 @@ bool ppreduceInitially(ideal I, ring r, number p)
   }
 
   std::map<long,ideal>::iterator it=H.begin();
-  ideal Hi = it->second;
-  assume(idSize(Hi)==1);
-  assume(pLength(Hi->m[0])==2);
   it++;
-  Hi = it->second;
+  ideal Hi = it->second;
 
   /***
    * Step 2: reduce each component initially with respect to itself
    *  and all lower components
    **/
+  std::vector<int> synch = synchronize(I,Hi);
   if (ppreduceInitially(Hi,p,r)) return true;
+  synchronize(I,Hi,synch);
+  id_Test(Hi,r);
+  id_Test(I,r);
 
   ideal G = idInit(n); int m=0;
   ideal GG = (ideal) omAllocBin(sip_sideal_bin);
@@ -576,7 +630,9 @@ bool ppreduceInitially(ideal I, ring r, number p)
         G->m[i] = Hi->m[kH++];
     }
     m += l; IDELEMS(GG) = m; GG->m = &G->m[n-m];
+    std::vector<int> synch = synchronize(I,it->second);
     if (ppreduceInitially(it->second,p,GG,r)) return true;
+    synchronize(I,it->second,synch);
     idShallowDelete(&Hi); Hi = it->second;
   }
   idShallowDelete(&Hi);

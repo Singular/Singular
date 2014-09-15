@@ -95,6 +95,14 @@ gfan::ZVector intStar2ZVector(const int d, const int* i)
   return zv;
 }
 
+gfan::ZVector expvToZVector(const int n, const int* expv)
+{
+  gfan::ZVector zv(n);
+  for(int i=0; i<n; i++)
+    zv[i]=gfan::Integer(expv[i+1]);
+  return zv;
+}
+
 gfan::ZVector wvhdlEntryToZVector(const int n, const int* wvhdl0)
 {
   gfan::ZVector zv(n);
