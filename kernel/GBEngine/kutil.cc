@@ -54,7 +54,7 @@
 #include <polys/monomials/ring.h>
 #include <kernel/ideals.h>
 //#include "cntrlc.h"
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <polys/operations/pShallowCopyDelete.h>
 

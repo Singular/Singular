@@ -7,7 +7,7 @@ noinst_LTLIBRARIES=libcombinatorics.la
 libcombinatorics_la_SOURCES=hdegree.cc hilb.cc hutil.cc
 
 libcombinatorics_la_includedir=$(includedir)/singular/kernel/combinatorics
-libcombinatorics_la_include_HEADERS=hutil.h
+libcombinatorics_la_include_HEADERS=hutil.h stairc.h
 
 
 

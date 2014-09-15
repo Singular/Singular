@@ -25,7 +25,7 @@
 
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/kutil.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 //#include "cntrlc.h"
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/syz.h>

@@ -68,7 +68,7 @@
 
 #include <kernel/fast_mult.h>
 #include <kernel/digitech.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/syz.h>

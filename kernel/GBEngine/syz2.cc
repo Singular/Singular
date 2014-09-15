@@ -29,7 +29,7 @@
 
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/kutil.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 
 #include <kernel/GBEngine/syz.h>
 #include <kernel/ideals.h>

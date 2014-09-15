@@ -18,7 +18,6 @@
  - \ref kernel/GBEngine/ratgring.h
  - \ref kernel/GBEngine/ringgb.h
  - \ref kernel/GBEngine/shiftgb.h
- - \ref kernel/GBEngine/stairc.h
  - \ref kernel/GBEngine/syz.h
  - \ref kernel/GBEngine/tgb.h
  - \ref kernel/GBEngine/tgb_internal.h

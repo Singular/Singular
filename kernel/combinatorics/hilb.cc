@@ -14,7 +14,7 @@
 #include <kernel/polys.h>
 #include <misc/intvec.h>
 #include <kernel/combinatorics/hutil.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 //ADICHANGES:
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/kstd1.h>

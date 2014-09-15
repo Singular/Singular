@@ -37,7 +37,7 @@
 #include <polys/ext_fields/transext.h>
 #  include <polys/clapsing.h>
 
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <kernel/polys.h>
 #include <Singular/fevoices.h>
 #include <kernel/ideals.h>

@@ -64,7 +64,7 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 // HEADERS:
 #include <kernel/combinatorics/hutil.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/maps/fast_maps.h>
@@ -145,7 +145,6 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/GBEngine/shiftgb.h>
 #include <kernel/spectrum/spectrum.h>
 #include <kernel/spectrum/splist.h>
-#include <kernel/GBEngine/stairc.h>
 #include <kernel/structs.h>
 #include <kernel/GBEngine/syz.h>
 // #include <kernel/testpoly.h> // Too old?

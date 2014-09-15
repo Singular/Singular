@@ -49,7 +49,7 @@
 #include <polys/monomials/maps.h>
 
 /* include Hilbert-function */
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 
 /** kstd2.cc */
 #include <kernel/GBEngine/kutil.h>
