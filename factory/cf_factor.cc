@@ -636,7 +636,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     //USE NTL
     if (ch>2)
     {
-#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if (HAVE_FLINT && __FLINT_RELEASE >= 20400)
       nmod_poly_t FLINTmipo, leadingCoeff;
       fq_nmod_ctx_t fq_con;
 

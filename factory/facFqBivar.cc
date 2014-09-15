@@ -171,7 +171,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
     CanonicalForm buf= GF2FalphaRep (A, beta);
     if (getCharacteristic() > 2)
     {
-#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if (HAVE_FLINT && __FLINT_RELEASE >= 20400)
       nmod_poly_t FLINTmipo, leadingCoeff;
       fq_nmod_ctx_t fq_con;
       fq_nmod_poly_t FLINTA;
@@ -238,7 +238,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   {
     if (getCharacteristic() > 2)
     {
-#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if (HAVE_FLINT && __FLINT_RELEASE >= 20400)
       nmod_poly_t FLINTmipo, leadingCoeff;
       fq_nmod_ctx_t fq_con;
       fq_nmod_poly_t FLINTA;

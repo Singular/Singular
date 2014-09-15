@@ -79,7 +79,7 @@ pthRoot (const CanonicalForm & F, const ZZ& q, const Variable& alpha)
 }
 #endif
 
-#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if (HAVE_FLINT && __FLINT_RELEASE >= 20400)
 CanonicalForm
 pthRoot (const CanonicalForm & F, const fmpz_t& q, const Variable& alpha)
 {
@@ -237,11 +237,11 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
     return CFFList (CFFactor (F/Lc(F), 1));
 
   CanonicalForm buffer;
-#if defined(HAVE_NTL) || (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if defined(HAVE_NTL) || (HAVE_FLINT && __FLINT_RELEASE >= 20400)
   if (alpha.level() == 1)
 #endif
     buffer= pthRoot (A, ipower (p, k));
-#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if (HAVE_FLINT && __FLINT_RELEASE >= 20400)
   else
   {
     fmpz_t qq;

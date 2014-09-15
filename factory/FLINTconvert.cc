@@ -45,7 +45,7 @@ extern "C"
 #include <flint/fmpq_poly.h>
 #include <flint/nmod_mat.h>
 #include <flint/fmpz_mat.h>
-#if (__FLINT_VERSION_MINOR >= 4)
+#if ( __FLINT_RELEASE >= 20400)
 #include <flint/fq.h>
 #include <flint/fq_poly.h>
 #include <flint/fq_nmod.h>
@@ -270,7 +270,7 @@ convertFLINTnmod_poly_factor2FacCFFList (const nmod_poly_factor_t fac,
   return result;
 }
 
-#if __FLINT_VERSION_MINOR >= 4
+#if __FLINT_RELEASE >= 20400
 CFFList
 convertFLINTFq_nmod_poly_factor2FacCFFList (const fq_nmod_poly_factor_t fac,
                                        const Variable& x, const Variable& alpha,
@@ -312,7 +312,7 @@ convertFmpz_mod_poly_t2FacCF (const fmpz_mod_poly_t poly, const Variable& x,
   return b (result);
 }
 
-#if __FLINT_VERSION_MINOR >= 4
+#if __FLINT_RELEASE >= 20400
 void
 convertFacCF2Fq_nmod_t (fq_nmod_t result, const CanonicalForm& f,
                         const fq_nmod_ctx_t ctx)
@@ -500,7 +500,7 @@ CFMatrix* convertNmod_mat_t2FacCFMatrix(const nmod_mat_t m)
   return res;
 }
 
-#if __FLINT_VERSION_MINOR >= 4
+#if __FLINT_RELEASE >= 20400
 void
 convertFacCFMatrix2Fq_nmod_mat_t (fq_nmod_mat_t M,
                                   const fq_nmod_ctx_t fq_con, const CFMatrix &m)

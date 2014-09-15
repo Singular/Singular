@@ -46,7 +46,7 @@ TIMING_DEFINE_PRINT (product2)
 TIMING_DEFINE_PRINT (hensel23)
 TIMING_DEFINE_PRINT (hensel)
 
-#if (!(HAVE_FLINT && __FLINT_VERSION_MINOR >= 4))
+#if (!(HAVE_FLINT && __FLINT_RELEASE >= 20400))
 static
 CFList productsNTL (const CFList& factors, const CanonicalForm& M)
 {
@@ -86,7 +86,7 @@ CFList productsNTL (const CFList& factors, const CanonicalForm& M)
 }
 #endif
 
-#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if (HAVE_FLINT && __FLINT_RELEASE >= 20400)
 static
 CFList productsFLINT (const CFList& factors, const CanonicalForm& M)
 {
@@ -167,7 +167,7 @@ void tryDiophantine (CFList& result, const CanonicalForm& F,
       return;
     i.getItem()= reduce (i.getItem()*inv, M);
   }
-#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if (HAVE_FLINT && __FLINT_RELEASE >= 20400)
   bufFactors= productsFLINT (bufFactors, M);
 #else
   bufFactors= productsNTL (bufFactors, M);

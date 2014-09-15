@@ -34,7 +34,7 @@ extern "C"
 #include <flint/nmod_poly.h>
 #include <flint/nmod_mat.h>
 #include <flint/fmpz_mat.h>
-#if (__FLINT_VERSION_MINOR >= 4)
+#if ( __FLINT_RELEASE >= 20400)
 #include <flint/fq.h>
 #include <flint/fq_poly.h>
 #include <flint/fq_nmod.h>
@@ -140,7 +140,7 @@ convertFmpz_mod_poly_t2FacCF (
                                                 ///< coeffs in (-p/2,p/2)
                              );
 
-#if __FLINT_VERSION_MINOR >= 4
+#if __FLINT_RELEASE >= 20400
 /// conversion of a FLINT element of F_q to a CanonicalForm with alg. variable 
 /// alpha
 CanonicalForm
@@ -223,7 +223,7 @@ void convertFacCFMatrix2nmod_mat_t (nmod_mat_t M,     ///<[in,out] nmod_mat_t
 CFMatrix* convertNmod_mat_t2FacCFMatrix(const nmod_mat_t m ///<[in] nmod_mat_t
                                        );
 
-#if __FLINT_VERSION_MINOR >= 4
+#if __FLINT_RELEASE >= 20400
 /// conversion of a FLINT matrix over F_q to a factory matrix
 CFMatrix*
 convertFq_nmod_mat_t2FacCFMatrix(const fq_nmod_mat_t m,       ///< [in] fq_nmod_mat_t

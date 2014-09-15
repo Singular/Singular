@@ -707,7 +707,7 @@ CanonicalForm::operator *= ( const CanonicalForm & cf )
     else  if ( is_imm( cf.value ) )
         value = value->mulcoeff( cf.value );
     else  if ( value->level() == cf.value->level() ) {
-#if (HAVE_NTL && HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if (HAVE_NTL && HAVE_FLINT && __FLINT_RELEASE >= 20400)
         if (value->levelcoeff() == cf.value->levelcoeff() && cf.isUnivariate() && (*this).isUnivariate())
         {
           if (value->level() < 0 || CFFactory::gettype() == GaloisFieldDomain || (size (cf) <= 10 || size (*this) <= 10) )
@@ -761,7 +761,7 @@ CanonicalForm::operator /= ( const CanonicalForm & cf )
     else  if ( is_imm( cf.value ) )
         value = value->dividecoeff( cf.value, false );
     else  if ( value->level() == cf.value->level() ) {
-#if (HAVE_NTL && HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if (HAVE_NTL && HAVE_FLINT && __FLINT_RELEASE >= 20400)
         if ( value->levelcoeff() == cf.value->levelcoeff() && (*this).isUnivariate() && cf.isUnivariate())
         {
             if (value->level() < 0 || CFFactory::gettype() == GaloisFieldDomain)
