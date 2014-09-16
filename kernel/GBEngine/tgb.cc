@@ -475,7 +475,7 @@ wlen_type pELength (poly p, slimgb_alg * c, ring /*r*/)
   return s;
 }
 
-wlen_type kEBucketLength (kBucket * b, poly lm, int /*sugar*/, slimgb_alg * ca)
+wlen_type kEBucketLength (kBucket * b, poly lm, slimgb_alg * ca)
 {
   wlen_type s = 0;
   if(lm == NULL)
@@ -611,7 +611,7 @@ wlen_type red_object::guess_quality (slimgb_alg * c)
       }
 #endif
       //FIXME:not quadratic
-      wlen_type erg = kEBucketLength (this->bucket, this->p, this->sugar, c);
+      wlen_type erg = kEBucketLength (this->bucket, this->p, c);
       //erg*=cs;//for quadratic
       erg *= cs;
       if(TEST_V_COEFSTRAT)
@@ -625,7 +625,7 @@ wlen_type red_object::guess_quality (slimgb_alg * c)
   {
     if(c->eliminationProblem)
       //if (false)
-      s = kEBucketLength (this->bucket, this->p, this->sugar, c);
+      s = kEBucketLength (this->bucket, this->p, c);
     else
       s = bucket_guess (bucket);
   }
@@ -2857,10 +2857,6 @@ static void go_on (slimgb_alg * c)
     buf[j].sev = pGetShortExpVector (p[j]);
     buf[j].bucket = kBucketCreate (currRing);
     p_Test (p[j], c->r);
-    if(c->eliminationProblem)
-    {
-      buf[j].sugar = c->pTotaldegree_full (p[j]);
-    }
     int len = pLength (p[j]);
     kBucketInit (buf[j].bucket, buf[j].p, len);
     buf[j].initial_quality = buf[j].guess_quality (c);
@@ -4339,10 +4335,6 @@ multi_reduction_lls_trick (red_object * los, int /*losl*/, slimgb_alg * c,
     int j = erg.reduce_by;
     int old_length = c->strat->lenS[j]; // in view of S
     los[bp].p = p;
-    if(c->eliminationProblem)
-    {
-      los[bp].sugar = c->pTotaldegree_full (p);
-    }
     kBucketInit (los[bp].bucket, p, old_length);
     wlen_type qal = pQuality (clear_into, c, new_length);
     int pos_in_c = -1;
@@ -4508,8 +4500,6 @@ multi_reduction_find (red_object * los, int losl, slimgb_alg * c, int startf,
   {
     assume ((i == losl - 1) || (pLmCmp (los[i].p, los[i + 1].p) <= 0));
     assume (is_valid_ro (los[i]));
-    assume ((!(c->eliminationProblem))
-            || (los[i].sugar >= c->pTotaldegree (los[i].p)));
     j = kFindDivisibleByInS_easy (strat, los[i]);
     if(j >= 0)
     {
@@ -4900,10 +4890,6 @@ void simple_reducer::reduce (red_object * r, int l, int u)
   for(i = l; i <= u; i++)
   {
     this->do_reduce (r[i]);
-    if(c->eliminationProblem)
-    {
-      r[i].sugar = si_max (r[i].sugar, reducer_deg);
-    }
   }
   for(i = l; i <= u; i++)
   {
@@ -4955,10 +4941,6 @@ void multi_reduce_step (find_erg & erg, red_object * r, slimgb_alg * c)
       //p_Content(red, c->r);
     }
     pNormalize (red);
-    if(c->eliminationProblem)
-    {
-      r[rn].sugar = c->pTotaldegree_full (red);
-    }
 
     if((!(erg.fromS)) && (TEST_V_UPTORADICAL))
     {
