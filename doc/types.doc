@@ -4324,7 +4324,7 @@ belong to different rings.
 
 
 @item Purpose:
-defines a new type with elemnts given by the last argmuent (string_expression).
+defines a new type with elements given by the last argument (string_expression).
 The name of the new type is the first argument (of type string) and must
 be longer than one character.
 @*The second name (of type string) is an already defined type
