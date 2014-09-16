@@ -239,7 +239,11 @@ void Warn(const char *fmt, ...)
   va_list ap;
   va_start(ap, fmt);
   char *s=(char *)omAlloc(256);
+#ifdef HAVE_VSNPRINTF
+  vsnprintf(s, 256, fmt, ap);
+#else
   vsprintf(s, fmt, ap);
+#endif
   WarnS(s);
   omFreeSize(s,256);
   va_end(ap);
