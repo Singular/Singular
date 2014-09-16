@@ -1360,7 +1360,7 @@ static BOOLEAN leadcomp(leftv res, leftv h)
     if (p != NULL )
     {
       assume( p != NULL );
-      assume( p_LmTest(p, r) );
+      p_LmTest(p, r);
 
       const unsigned long iComp = p_GetComp(p, r);
 
@@ -1393,7 +1393,7 @@ static BOOLEAN leadrawexp(leftv res, leftv h)
     const poly p = (poly)(h->Data());
 
     assume( p != NULL );
-    assume( p_LmTest(p, r) );
+    p_LmTest(p, r);
 
     const int iExpSize = r->ExpL_Size;
 

@@ -693,7 +693,7 @@ long p_WTotaldegree(poly p, const ring r)
 
 long p_DegW(poly p, const short *w, const ring R)
 {
-  assume( p_Test(p, R) );
+  p_Test(p, R);
   assume( w != NULL );
   long r=-LONG_MAX;
 
@@ -3881,7 +3881,7 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
   else
     qq = p_PermPoly(zz, par_perm-1, srcExtRing, dst, nMap, NULL, rVar (srcExtRing)-1);
 
-  assume (p_Test (qq, dst));
+  p_Test (qq, dst);
 
 //       poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst, nMapFunc nMap, int *par_perm, int OldPar)
 
@@ -3921,7 +3921,7 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
 
       number n = nMap(p_GetCoeff(p, oldRing), oldRing->cf, dst->cf);
 
-      assume (n_Test (n,dst->cf));
+      n_Test (n,dst->cf);
 
       if ( nCoeff_is_algExt(dst->cf) )
         n_Normalize(n, dst->cf);

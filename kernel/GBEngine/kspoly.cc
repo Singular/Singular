@@ -53,8 +53,8 @@ int ksReducePoly(LObject* PR,
 #endif
   int ret = 0;
   ring tailRing = PR->tailRing;
-  assume(kTest_L(PR));
-  assume(kTest_T(PW));
+  kTest_L(PR);
+  kTest_T(PW);
 
   poly p1 = PR->GetLmTailRing();   // p2 | p1
   poly p2 = PW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
@@ -188,8 +188,8 @@ int ksReducePolySig(LObject* PR,
 #endif
   int ret = 0;
   ring tailRing = PR->tailRing;
-  assume(kTest_L(PR));
-  assume(kTest_T(PW));
+  kTest_L(PR);
+  kTest_T(PW);
 
   // signature-based stuff:
   // checking for sig-safeness first
@@ -380,7 +380,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 #ifdef KDEBUG
   create_count++;
 #endif
-  assume(kTest_L(Pair));
+  kTest_L(Pair);
   poly p1 = Pair->p1;
   poly p2 = Pair->p2;
   Pair->tailRing = tailRing;
@@ -495,8 +495,8 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
   poly Lp =     PR->GetLmCurrRing();
   poly Save =   PW->GetLmCurrRing();
 
-  assume(kTest_L(PR));
-  assume(kTest_T(PW));
+  kTest_L(PR);
+  kTest_T(PW);
   pAssume(pIsMonomOf(Lp, Current));
 
   assume(Lp != NULL && Current != NULL && pNext(Current) != NULL);

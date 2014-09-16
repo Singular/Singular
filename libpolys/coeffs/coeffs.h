@@ -707,15 +707,14 @@ static inline nMapFunc n_SetMap(const coeffs src, const coeffs dst)
 #ifdef LDEBUG
 static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenumber, const coeffs r)
 #else
-static inline BOOLEAN n_DBTest(number, const char*, const int, const coeffs)
+static inline BOOLEAN n_DBTest(number, const char*, const int, const coeffs) // is it really necessary to define this function in any case?
 #endif
 {
-  assume(r != NULL);
-#ifdef LDEBUG
-  assume(r->cfDBTest != NULL);
-  return r->cfDBTest(n, filename, linenumber, r);
-#else
+#ifndef LDEBUG
   return TRUE;
+#else
+  assume(r != NULL); assume(r->cfDBTest != NULL);
+  return r->cfDBTest(n, filename, linenumber, r);
 #endif
 }
 

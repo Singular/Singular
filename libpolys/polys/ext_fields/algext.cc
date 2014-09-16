@@ -935,11 +935,11 @@ number naCopyTrans2AlgExt(number a, const coeffs src, const coeffs dst)
     }
   }
   definiteReduce(p, dst->extRing->qideal->m[0], dst);
-  assume (p_Test (p, dst->extRing));
+  p_Test (p, dst->extRing);
   if (!DENIS1(fa))
   {
     definiteReduce(q, dst->extRing->qideal->m[0], dst);
-    assume (p_Test (q, dst->extRing));
+    p_Test (q, dst->extRing);
     if (q != NULL)
     {
       number t= naDiv ((number)p,(number)q, dst);
@@ -998,7 +998,7 @@ number naGenMap(number a, const coeffs cf, const coeffs dst)
   poly f = (poly)a;
   poly g = prMapR(f, nMap, rSrc, rDst);
 
-  assume(n_Test((number)g, dst));
+  n_Test((number)g, dst);
   return (number)g;
 }
 
@@ -1028,7 +1028,7 @@ number naGenTrans2AlgExt(number a, const coeffs cf, const coeffs dst)
   else
     result=(number)g;
 
-  assume(n_Test((number)result, dst));
+  n_Test((number)result, dst);
   return (number)result;
 }
 

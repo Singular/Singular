@@ -86,8 +86,8 @@ static int cmp_c_ds(const void *p1, const void *p2){ void *R = currRing;
   assume( a != NULL );
   assume( b != NULL );
 
-  assume( p_LmTest(a, r) );
-  assume( p_LmTest(b, r) );
+  p_LmTest(a, r);
+  p_LmTest(b, r);
 
 
   const signed long iCompDiff = p_GetComp(a, r) - p_GetComp(b, r);
@@ -164,8 +164,8 @@ static int cmp_poly(const poly &a, const poly &b)
   assume( a != NULL );
   assume( b != NULL );
 
-  assume( p_LmTest(a, r) );
-  assume( p_LmTest(b, r) );
+  p_LmTest(a, r);
+  p_LmTest(b, r);
   assume( p_GetComp(a, r) == 0 );
   assume( p_GetComp(b, r) == 0 );
 
@@ -335,7 +335,7 @@ poly leadmonom(const poly p, const ring r, const bool bSetZeroComp)
   if( p != NULL )
   {
     assume( p != NULL );
-    assume( p_LmTest(p, r) );
+    p_LmTest(p, r);
 
     m = p_LmInit(p, r);
     p_SetCoeff0(m, n_Copy(p_GetCoeff(p, r), r), r);
@@ -347,7 +347,7 @@ poly leadmonom(const poly p, const ring r, const bool bSetZeroComp)
 
     assume( m != NULL );
     assume( pNext(m) == NULL );
-    assume( p_LmTest(m, r) );
+    p_LmTest(m, r);
 
     if( bSetZeroComp )
       assume( p_GetComp(m, r) == 0 );
@@ -1209,7 +1209,8 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
     m_spoly_bucket = kBucketCreate(r);
 
   sBucket_pt& tail   = m_sum_bucket; assume( tail != NULL );
-  kBucket_pt& bucket = m_spoly_bucket; assume( bucket != NULL ); kbTest(bucket);
+  kBucket_pt& bucket = m_spoly_bucket; assume( bucket != NULL ); 
+  kbTest(bucket);
 
 
 //  kBucketInit(bucket, NULL, 0); // not needed!?
