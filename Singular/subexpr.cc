@@ -612,7 +612,10 @@ void * slInternalCopy(leftv source, const int t, void *d, Subexpr e)
   {
       if ((e==NULL)
       || (source->rtyp==LIST_CMD)
-      || ((source->rtyp==IDHDL)&&(IDTYP((idhdl)source->data)==LIST_CMD)))
+      || ((source->rtyp==IDHDL)
+          &&((IDTYP((idhdl)source->data)==LIST_CMD)
+	    || (IDTYP((idhdl)source->data)>MAX_TOK)))
+      || (source->rtyp>MAX_TOK))
         return (void *)omStrDup((char *)d);
       else if (e->next==NULL)
       {
