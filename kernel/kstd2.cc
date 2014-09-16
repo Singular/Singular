@@ -1702,7 +1702,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl,uptodeg,lV);
       //      enterpairsShift(vw,strat->sl,strat->P.ecart,pos,strat, strat->tl,uptodeg,lV);
       // posInS only depends on the leading term
-      strat->enterS(strat->P, pos, strat, strat->tl);
+      strat->enterS(strat->P, pos, strat, -1);
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);

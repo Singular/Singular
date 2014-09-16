@@ -790,7 +790,7 @@ BOOLEAN kTest (kStrategy strat)
   }
 
   // test L
-  if (strat->L != NULL)
+  if ((strat->L != NULL) && (strat->S_2_R[0]!=-1))
   {
     for (i=0; i<=strat->Ll; i++)
     {
@@ -840,10 +840,10 @@ BOOLEAN kTest_TS(kStrategy strat)
   // test strat->R, strat->T[i].i_r
   for (i=0; i<=strat->tl; i++)
   {
-    if (strat->T[i].i_r < 0 || strat->T[i].i_r > strat->tl)
+    if (strat->T[i].i_r < -1 || strat->T[i].i_r > strat->tl)
       return dReportError("strat->T[%d].i_r == %d out of bounds", i,
                           strat->T[i].i_r);
-    if (strat->R[strat->T[i].i_r] != &(strat->T[i]))
+    if ((strat->T[i].i_r!=-1) && (strat->R[strat->T[i].i_r] != &(strat->T[i])))
       return dReportError("T[%d].i_r with R out of sync", i);
   }
   // test containment of S inT
@@ -854,7 +854,7 @@ BOOLEAN kTest_TS(kStrategy strat)
       j = kFindInT(strat->S[i], strat->T, strat->tl);
       if (j < 0)
         return dReportError("S[%d] not in T", i);
-      if (strat->S_2_R[i] != strat->T[j].i_r)
+      if ((strat->S_2_R[i]!=-1) && (strat->S_2_R[i] != strat->T[j].i_r))
         return dReportError("S_2_R[%d]=%d != T[%d].i_r=%d\n",
                             i, strat->S_2_R[i], j, strat->T[j].i_r);
     }
@@ -862,15 +862,18 @@ BOOLEAN kTest_TS(kStrategy strat)
   // test strat->L[i].i_r1
   for (i=0; i<=strat->Ll; i++)
   {
-    if ((strat->L[i].p1 != NULL) && (strat->L[i].p2))
+    if ((strat->L[i].p1 != NULL) && (strat->L[i].p2!=NULL))
     {
-      if (strat->L[i].i_r1 < 0 ||
-          strat->L[i].i_r1 > strat->tl ||
-          strat->L[i].T_1(strat)->p != strat->L[i].p1)
-        return dReportError("L[%d].i_r1 out of sync", i);
-      if (strat->L[i].i_r2 < 0 ||
-          strat->L[i].i_r2 > strat->tl ||
-          strat->L[i].T_2(strat)->p != strat->L[i].p2);
+      if (strat->L[i].i_r1!=-1)
+      {
+        if (strat->L[i].i_r1 < 0 ||
+            strat->L[i].i_r1 > strat->tl ||
+            strat->L[i].T_1(strat)->p != strat->L[i].p1)
+          return dReportError("L[%d].i_r1 out of sync", i);
+        if (strat->L[i].i_r2 < 0 ||
+            strat->L[i].i_r2 > strat->tl ||
+            strat->L[i].T_2(strat)->p != strat->L[i].p2);
+      }
     }
     else
     {
@@ -6947,12 +6950,11 @@ void updateSShift(kStrategy strat,int uptodeg,int lV)
     h.GetTP(); // creates correct t_p
     /*puts the elements of S with their shifts to T*/
     //    int atT, int uptodeg, int lV)
-    strat->S_2_R[i] = strat->tl + 1; // the el't with shift 0 will be inserted first
+    strat->S_2_R[i] = -1;
     // need a small check for above; we insert >=1 elements
     // insert this check into kTest_TS ?
     enterTShift(h,strat,atT,uptodeg,lV);
   }
-  /* what about setting strat->tl? */
 }
 #endif
 
@@ -7439,17 +7441,11 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 
     /* TEMPORARILY DISABLED FOR SHIFTS because there's no i*/
     /* at the beginning we DO NOT set atR = -1 ANYMORE*/
-    if ( (atR >= 0) && (shiftcount==0) && (ifromS >=0) )
-    {
-      Lp.i_r1 = kFindInT(Lp.p1,strat); //strat->S_2_R[ifromS];
-      Lp.i_r2 = atR;
-    }
-    else
     {
       /* END _ TEMPORARILY DISABLED FOR SHIFTS */
       Lp.i_r1 = -1;
       Lp.i_r2 = -1;
-     }
+    }
     strat->initEcartPair(&Lp,q,p,ecartq,ecart);
 
     if (TEST_OPT_INTSTRATEGY)
