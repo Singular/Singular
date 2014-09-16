@@ -800,10 +800,18 @@ p_GetTotalDegree(const unsigned long l, const ring r)
  * Dispatcher to r->p_Procs, they do the tests/checks
  *
  ***************************************************************/
-// returns a copy of p
+/// returns a copy of p (without any additional testing)
+static inline poly p_Copy_noCheck(poly p, const ring r)
+{
+  assume(r != NULL); assume(r->p_Procs != NULL); assume(r->p_Procs->p_Copy != NULL);
+  return r->p_Procs->p_Copy(p, r);
+}
+
+/// returns a copy of p
 static inline poly p_Copy(poly p, const ring r)
 {
-  const poly pp = r->p_Procs->p_Copy(p, r);
+  p_Test(p,r);
+  const poly pp = p_Copy_noCheck(p, r);
   p_Test(pp,r);
   return pp;
 }
@@ -828,10 +836,10 @@ static inline poly p_Copy(poly p, const ring lmRing, const ring tailRing)
   {
 #ifndef PDEBUG
     if (tailRing == lmRing)
-      return tailRing->p_Procs->p_Copy(p, tailRing);
+      return p_Copy_noCheck(p, tailRing);
 #endif
     poly pres = p_Head(p, lmRing);
-    pNext(pres) = tailRing->p_Procs->p_Copy(pNext(p), tailRing);
+    pNext(pres) = p_Copy_noCheck(pNext(p), tailRing);
     return pres;
   }
   else

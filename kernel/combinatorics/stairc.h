@@ -26,7 +26,7 @@ intvec * scIndIntvec(ideal S, ideal Q=NULL);
 
 int scDimInt(ideal  s,ideal Q=NULL);
 int scMultInt(ideal  s,ideal Q=NULL);
-int scMult0Int(ideal  s,ideal Q=NULL, const ring r=currRing);
+int scMult0Int(ideal  s,ideal Q=NULL, const ring tailRing = currRing);
 void scPrintDegree(int co, int mu);
 void scDegree(ideal  s,intvec *modulweight,ideal Q=NULL);
 

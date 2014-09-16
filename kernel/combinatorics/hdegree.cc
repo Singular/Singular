@@ -837,13 +837,13 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
   delete hseries2;
 }
 
-static void hDegree0(ideal S, ideal Q, const ring r=currRing)
+static void hDegree0(ideal S, ideal Q, const ring tailRing)
 {
-  id_Test(S, r);  
-  id_Test(Q, r);
+  id_TestTail(S, currRing, tailRing);  
+  id_TestTail(Q, currRing, tailRing);
    
   int  mc;
-  hexist = hInit(S, Q, &hNexist, r);
+  hexist = hInit(S, Q, &hNexist, tailRing);
   if (!hNexist)
   {
     hMu = -1;
@@ -851,6 +851,9 @@ static void hDegree0(ideal S, ideal Q, const ring r=currRing)
   }
   else
     hMu = 0;
+   
+  const ring r = currRing;
+   
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc(((r->N) + 1) * sizeof(int));
   hpur0 = (scmon)omAlloc((1 + ((r->N) * (r->N))) * sizeof(int));
@@ -908,11 +911,11 @@ static void hDegree0(ideal S, ideal Q, const ring r=currRing)
     omFreeSize((ADDRESS)hstc, hNexist * sizeof(scmon));
 }
 
-int  scMult0Int(ideal S, ideal Q, const ring r)
+int  scMult0Int(ideal S, ideal Q, const ring tailRing)
 {
-  id_Test(S, r);  
-  id_Test(Q, r);  
-  hDegree0(S, Q);
+  id_TestTail(S, currRing, tailRing);  
+  id_TestTail(Q, currRing, tailRing);
+  hDegree0(S, Q, tailRing);
   return hMu;
 }
 
@@ -1015,7 +1018,7 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
   #endif
 
   hNvar = (currRing->N);
-  hexist = hInit(S, Q, &hNexist, tailRing);
+  hexist = hInit(S, Q, &hNexist, tailRing); // tailRing?
   if (k!=0)
     hComp(hexist, hNexist, k, hexist, &hNstc);
   else
@@ -1308,25 +1311,22 @@ static void scInKbase( scfmon stc, int Nstc, int Nvar)
   }
 }
 
-static ideal scIdKbase()
+static ideal scIdKbase(poly q, const int rank)
 {
-  polyset mm;
-  ideal res;
-  poly p, q = last;
-  int i = pLength(q);
-  res = idInit(i,1);
-  mm = res->m;
-  i = 0;
+  ideal res = idInit(pLength(q), rank);
+  polyset mm = res->m;
+  int i = 0;
   do
   {
-    mm[i] = q;
-    i++;
-    p = pNext(q);
+    *mm = q; ++mm;
+
+    const poly p = pNext(q);
     pNext(q) = NULL;
     q = p;
+     
   } while (q!=NULL);
    
-  id_Test(res, currRing);   
+  id_Test(res, currRing);   // WRONG RANK!!!???
   return res;
 }
 
@@ -1390,17 +1390,13 @@ ende:
   pLmDelete(&p);
   if (p == NULL)
     return idInit(1,s->rank);
-  else
-  {
-    last = p;
-    ideal res=scIdKbase();
-    res->rank=s->rank;
-    id_Test(res, currRing);
-    return res;
-  }
+   
+  last = p;
+  return scIdKbase(p, s->rank);
 }
 
 #if 0 //-- alternative implementation of scComputeHC
+/*
 void scComputeHCw(ideal ss, ideal Q, int ak, poly &hEdge, ring tailRing)
 {
   id_TestTail(ss, currRing, tailRing);  
@@ -1421,7 +1417,7 @@ void scComputeHCw(ideal ss, ideal Q, int ak, poly &hEdge, ring tailRing)
   stcmem = hCreate((currRing->N) - 1);
   hexist = hInit(s, Q, &hNexist, currRing);
   p = last = pInit();
-  /*pNext(p) = NULL;*/
+  // pNext(p) = NULL;
   act = (scmon)omAlloc(((currRing->N) + 1) * sizeof(int));
   *act = 0;
   if (!hNexist)
@@ -1462,8 +1458,7 @@ ende:
   else
   {
     last = p;
-    ideal res=scIdKbase();
-    res->rank=ss->rank;
+    ideal res=scIdKbase(p, ss->rank);
     poly p_ind=res->m[0]; int ind=0;
     for(i=IDELEMS(res)-1;i>0;i--)
     {
@@ -1483,4 +1478,5 @@ ende:
     return;
   }
 }
+ */ 
 #endif

@@ -155,7 +155,7 @@ intvec *newhilb;
 
 Lm = id_Head(strat->Shdl,currRing);
 
-newhilb =hHstdSeries(Lm,w,strat->kHomW,Q,currRing);
+newhilb =hHstdSeries(Lm,w,strat->kHomW,Q,currRing); // ,strat->tailRing?
 
 #if ADIDEBUG
 PrintS("\nOriginal\n");

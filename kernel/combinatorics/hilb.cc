@@ -1137,7 +1137,7 @@ void slicehilb(ideal I)
 static intvec * hSeries(ideal S, intvec *modulweight,
                 int /*notstc*/, intvec *wdegree, ideal Q, ring tailRing)
 {
-  id_TestTail(S, currRing, tailRing);
+//  id_TestTail(S, currRing, tailRing);
    
   intvec *work, *hseries1=NULL;
   int  mc;
@@ -1292,11 +1292,15 @@ static intvec * hSeries(ideal S, intvec *modulweight,
 
 intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree, ideal Q, ring tailRing)
 {
+  id_TestTail(S, currRing, tailRing);
+  id_TestTail(Q, currRing, tailRing);
   return hSeries(S, modulweight, 0, wdegree, Q, tailRing);
 }
 
 intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring tailRing)
 {
+  id_TestTail(S, currRing, tailRing);
+  id_TestTail(Q, currRing, tailRing);
   return hSeries(S, modulweight, 1, wdegree, Q, tailRing);
 }
 
