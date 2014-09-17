@@ -73,7 +73,7 @@ static poly _p_Mult_q_Bucket(poly p, const int lp,
   assume(p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
   pAssume1(! pHaveCommonMonoms(p, q));
 #ifdef HAVE_RINGS
-  assume(!rField_is_Ring(currRing) || rField_is_Domain(currRing));
+  assume(!rField_is_Ring(r) || rField_is_Domain(r));
 #endif
   assume(lp >= 1 && lq >= 1);
   p_Test(p, r);
