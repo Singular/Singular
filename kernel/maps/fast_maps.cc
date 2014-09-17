@@ -436,12 +436,16 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
 static int maPoly_Substitute(macoeff c, poly p, ring dest_r)
 {
   // substitute the monomial: go through macoeff
-  int len=pLength(p);
+  int len;
+  BOOLEAN zero_div= (rField_is_Ring(dest_r) && !rField_is_Domain(dest_r));
   int done=0;
   while (c!=NULL)
   {
     done++;
     poly t=pp_Mult_nn(p,c->n,dest_r);
+    #ifdef HAVE_RINGS
+    if (zero_div) len=pLength(t);
+    #endif
     sBucket_Add_p(c->bucket, t, len);
     c=c->next;
   }
