@@ -704,8 +704,6 @@ number nlIntDiv (number a, number b)
 #if defined(LDEBUG)
   u->debug=123456;
 #endif
-  assume(a->s==3);
-  assume(b->s==3);
   mpz_init_set(u->z,aa);
   /* u=u/b */
   u->s = 3;
