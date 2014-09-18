@@ -17,8 +17,12 @@ nodist_coeffs_test_SOURCES = coeffs_test_runner.cpp
 nodist_polys_test_SOURCES = polys_test_runner.cpp
 nodist_rings_test_SOURCES = rings_test_runner.cpp
 
-coeffs_test_LDADD = ${top_builddir}/coeffs/libcoeffs.la
-polys_test_LDADD = ${top_builddir}/polys/libpolys.la ../../resources/libresources.la ../../omalloc/libomalloc.la
+coeffs_test_LDADD = ${top_builddir}/coeffs/libcoeffs.la \
+${top_builddir}/reporter/libreporter.la ${top_builddir}/misc/libmisc.la \
+$(FACTORY_LIBS) $(RESOURCES_LIBS) $(OMALLOC_LIBS) \
+$(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
+
+polys_test_LDADD = ${top_builddir}/polys/libpolys.la $(coeffs_test_LDADD)
 rings_test_LDADD = $(polys_test_LDADD)
 
 BUILT_SOURCES = gftables MOD \

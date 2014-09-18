@@ -122,7 +122,11 @@ CLEANFILES = $(BUILT_SOURCES)
 TESTS = test 
 check_PROGRAMS = $(TESTS)
 
-test_LDADD=libpolys.la ../../resources/libresources.la ../../omalloc/libomalloc.la
+test_LDADD=libpolys.la \ 
+${top_builddir}/reporter/libreporter.la ${top_builddir}/misc/libmisc.la \
+$(FACTORY_LIBS) $(RESOURCES_LIBS) $(OMALLOC_LIBS) \
+$(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
+
 test_SOURCES=test.cc
 
 gftables: ${top_srcdir}/../factory/gftables
