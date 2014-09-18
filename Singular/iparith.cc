@@ -7930,44 +7930,16 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 /* must be ordered: first operations for chars (infix ops),
  * then alphabetically */
 
-BOOLEAN iiExprArith1(leftv res, leftv a, int op)
+BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dArith1, int i)
 {
   memset(res,0,sizeof(sleftv));
   BOOLEAN call_failed=FALSE;
 
   if (!errorreported)
   {
-#ifdef SIQ
-    if (siq>0)
-    {
-      //Print("siq:%d\n",siq);
-      command d=(command)omAlloc0Bin(sip_command_bin);
-      memcpy(&d->arg1,a,sizeof(sleftv));
-      //a->Init();
-      d->op=op;
-      d->argc=1;
-      res->data=(char *)d;
-      res->rtyp=COMMAND;
-      return FALSE;
-    }
-#endif
-    int at=a->Typ();
-    // handling bb-objects ----------------------------------------------------
-    if (at>MAX_TOK)
-    {
-      blackbox *bb=getBlackboxStuff(at);
-      if (bb!=NULL)
-      {
-        if(!bb->blackbox_Op1(op,res,a)) return FALSE;
-        if (errorreported) return TRUE;
-        // else: no op defined
-      }
-      else          return TRUE;
-    }
-
     BOOLEAN failed=FALSE;
+    int at=a->Typ();
     iiOp=op;
-    int i=iiTabIndex(dArithTab1,JJTAB1LEN,op);
     int ti = i;
     while (dArith1[i].cmd==op)
     {
@@ -8067,6 +8039,49 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       }
     }
     res->rtyp = UNKNOWN;
+  }
+  a->CleanUp();
+  return TRUE;
+}
+BOOLEAN iiExprArith1(leftv res, leftv a, int op)
+{
+  memset(res,0,sizeof(sleftv));
+  BOOLEAN call_failed=FALSE;
+
+  if (!errorreported)
+  {
+#ifdef SIQ
+    if (siq>0)
+    {
+      //Print("siq:%d\n",siq);
+      command d=(command)omAlloc0Bin(sip_command_bin);
+      memcpy(&d->arg1,a,sizeof(sleftv));
+      //a->Init();
+      d->op=op;
+      d->argc=1;
+      res->data=(char *)d;
+      res->rtyp=COMMAND;
+      return FALSE;
+    }
+#endif
+    int at=a->Typ();
+    // handling bb-objects ----------------------------------------------------
+    if (at>MAX_TOK)
+    {
+      blackbox *bb=getBlackboxStuff(at);
+      if (bb!=NULL)
+      {
+        if(!bb->blackbox_Op1(op,res,a)) return FALSE;
+        if (errorreported) return TRUE;
+        // else: no op defined
+      }
+      else          return TRUE;
+    }
+
+    BOOLEAN failed=FALSE;
+    iiOp=op;
+    int i=iiTabIndex(dArithTab1,JJTAB1LEN,op);
+    return iiExprArith1Tab(res,a,op, dArith1, i);
   }
   a->CleanUp();
   return TRUE;
