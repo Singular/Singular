@@ -281,7 +281,7 @@ TESTS = test
 check_PROGRAMS = $(TESTS)
 
 test_SOURCES = test.cc
-test_LDADD   = libfactory.la
+test_LDADD   = libfactory.la ../resources/libresources.la
 
 ####################################################
 ## PKG config 

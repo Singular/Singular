@@ -18,7 +18,7 @@ nodist_polys_test_SOURCES = polys_test_runner.cpp
 nodist_rings_test_SOURCES = rings_test_runner.cpp
 
 coeffs_test_LDADD = ${top_builddir}/coeffs/libcoeffs.la
-polys_test_LDADD = ${top_builddir}/polys/libpolys.la
+polys_test_LDADD = ${top_builddir}/polys/libpolys.la ../../resources/libresources.la ../../omalloc/libomalloc.la
 rings_test_LDADD = $(polys_test_LDADD)
 
 BUILT_SOURCES = gftables MOD \
