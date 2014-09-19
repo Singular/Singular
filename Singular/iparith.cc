@@ -7930,7 +7930,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 /* must be ordered: first operations for chars (infix ops),
  * then alphabetically */
 
-BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dArith1, int i)
+BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dArith1, int i, int at, struct sConvertTypes *dConvertTypes)
 {
   memset(res,0,sizeof(sleftv));
   BOOLEAN call_failed=FALSE;
@@ -7938,7 +7938,6 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dArith1, in
   if (!errorreported)
   {
     BOOLEAN failed=FALSE;
-    int at=a->Typ();
     iiOp=op;
     int ti = i;
     while (dArith1[i].cmd==op)
@@ -7976,7 +7975,7 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dArith1, in
       {
         int ai;
         //Print("test %s\n",Tok2Cmdname(dArith1[i].arg));
-        if ((ai=iiTestConvert(at,dArith1[i].arg))!=0)
+        if ((ai=iiTestConvert(at,dArith1[i].arg,dConvertTypes))!=0)
         {
           if (currRing!=NULL)
           {
@@ -7985,7 +7984,7 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dArith1, in
           if (traceit&TRACE_CALL)
             Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(dArith1[i].arg));
           res->rtyp=dArith1[i].res;
-          failed= ((iiConvert(at,dArith1[i].arg,ai,a,an))
+          failed= ((iiConvert(at,dArith1[i].arg,ai,a,an,dConvertTypes))
           || (call_failed=dArith1[i].p(res,an)));
           // everything done, clean up temp. variables
           if (failed)
@@ -8081,7 +8080,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     BOOLEAN failed=FALSE;
     iiOp=op;
     int i=iiTabIndex(dArithTab1,JJTAB1LEN,op);
-    return iiExprArith1Tab(res,a,op, dArith1, i);
+    return iiExprArith1Tab(res,a,op, dArith1, i,at,dConvertTypes);
   }
   a->CleanUp();
   return TRUE;

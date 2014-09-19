@@ -251,6 +251,8 @@ void paPrint(const char *n,package p);
 BOOLEAN iiTestAssume(leftv a, leftv b);
 
 /* table inteface for iiAddCproc */
-BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dArith1, int i);
+BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op,
+            struct sValCmd1* dArith1, int i, int at,
+            struct sConvertTypes *dConvertTypes);
 #endif
 
