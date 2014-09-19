@@ -30,6 +30,7 @@ static bool checkPolynomialInput(const ideal I, const ring r)
 
 static bool checkOrderingAndCone(const ring r, const gfan::ZCone zc)
 {
+  return true;
   if (r)
   {
     int n = rVar(r); int* w = r->wvhdl[0];
@@ -174,12 +175,12 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, 
     }
   }
   omFreeSize(expv,(n+1)*sizeof(int));
-  if (currentStrategy->restrictToLowerHalfSpace())
-  {
-    gfan::ZVector lowerHalfSpaceCondition = gfan::ZVector(n);
-    lowerHalfSpaceCondition[0] = -1;
-    inequalities.appendRow(lowerHalfSpaceCondition);
-  }
+  // if (currentStrategy->restrictToLowerHalfSpace())
+  // {
+  //   gfan::ZVector lowerHalfSpaceCondition = gfan::ZVector(n);
+  //   lowerHalfSpaceCondition[0] = -1;
+  //   inequalities.appendRow(lowerHalfSpaceCondition);
+  // }
 
   polyhedralCone = gfan::ZCone(inequalities,equations);
   polyhedralCone.canonicalize();
@@ -237,12 +238,12 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& u, 
     }
   }
   omFreeSize(expv,(n+1)*sizeof(int));
-  if (currentStrategy->restrictToLowerHalfSpace())
-  {
-    gfan::ZVector lowerHalfSpaceCondition = gfan::ZVector(n);
-    lowerHalfSpaceCondition[0] = -1;
-    inequalities.appendRow(lowerHalfSpaceCondition);
-  }
+  // if (currentStrategy->restrictToLowerHalfSpace())
+  // {
+  //   gfan::ZVector lowerHalfSpaceCondition = gfan::ZVector(n);
+  //   lowerHalfSpaceCondition[0] = -1;
+  //   inequalities.appendRow(lowerHalfSpaceCondition);
+  // }
 
   polyhedralCone = gfan::ZCone(inequalities,equations);
   polyhedralCone.canonicalize();
@@ -438,7 +439,7 @@ groebnerCone groebnerCone::flipCone(const gfan::ZVector interiorPoint, const gfa
    *   Hence it is sufficient to compute the initial form with respect to facetNormal,
    *   to obtain an initial form with respect to interiorPoint+e*facetNormal,
    *   for e>0 sufficiently small */
-  std::pair<ideal,ring> flipped = currentStrategy->getFlip(polynomialIdeal,reducedPolynomialIdeal,polynomialRing,interiorPoint,facetNormal);
+  std::pair<ideal,ring> flipped = currentStrategy->getFlip(reducedPolynomialIdeal,polynomialRing,interiorPoint,facetNormal);
   assume(checkPolynomialInput(flipped.first,flipped.second));
   groebnerCone flippedCone(flipped.first, flipped.second, interiorPoint, facetNormal, *currentStrategy);
   return flippedCone;

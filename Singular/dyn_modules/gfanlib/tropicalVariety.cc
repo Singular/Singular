@@ -1,4 +1,5 @@
 #include <callgfanlib_conversion.h>
+#include <std_wrapper.h>
 #include <bbfan.h>
 #include <groebnerCone.h>
 #include <tropicalVarietyOfIdeals.h>
@@ -35,17 +36,21 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
     leftv v = u->next;
     if (v==NULL)
     {
-      tropicalStrategy currentStrategy(I,currRing);
       setOptionRedSB();
+      if (!hasFlag(u,FLAG_STD))
+        I = gfanlib_kStd_wrapper(I,currRing);
+      tropicalStrategy currentStrategy(I,currRing);
       gfan::ZFan* tropI = tropicalVariety(currentStrategy);
-      undoSetOptionRedSB();
       res->rtyp = fanID;
       res->data = (char*) tropI;
+      undoSetOptionRedSB();
       return FALSE;
     }
     if ((v!=NULL) && (v->Typ()==NUMBER_CMD))
     {
       number p = (number) v->CopyD();
+      if (!hasFlag(u,FLAG_STD))
+        I = gfanlib_kStd_wrapper(I,currRing);
       tropicalStrategy currentStrategy(I,p,currRing);
       gfan::ZFan* tropI = tropicalVariety(currentStrategy);
       res->rtyp = fanID;

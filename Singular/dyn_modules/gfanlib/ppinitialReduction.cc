@@ -28,7 +28,7 @@ bool isOrderingLocalInT(const ring r)
  * by reading the coefficients and that g is initially reduced
  * with respect to p-t
  **/
-static bool pReduce(poly &g, const number p, const ring r)
+bool pReduce(poly &g, const number p, const ring r)
 {
   if (g==NULL)
     return false;
@@ -91,6 +91,57 @@ static bool pReduce(poly &g, const number p, const ring r)
   return false;
 }
 
+void ptNormalize(poly* gStar, const number p, const ring r)
+{
+  poly g = *gStar;
+  if (g==NULL || n_DivBy(p_GetCoeff(g,r),p,r->cf))
+    return;
+  p_Test(g,r);
+
+  // create p-t
+  poly pt = p_Init(r);
+  p_SetCoeff(pt,n_Copy(p,r->cf),r);
+
+  pNext(pt) = p_Init(r);
+  p_SetExp(pNext(pt),1,1,r);
+  p_Setm(pNext(pt),r);
+  p_SetCoeff(pNext(pt),n_Init(-1,r->cf),r);
+
+  // make g monic with the help of p-t
+  number a,b;
+  number gcd = n_ExtGcd(p_GetCoeff(g,r),p,&a,&b,r->cf);
+  assume(n_IsUnit(gcd,r->cf));
+  // now a*leadcoef(g)+b*p = gcd with gcd being a unit
+  // so a*g+b*(p-t)*leadmonom(g) should have a unit as leading coefficient
+  // but first check whether b is 0,
+  // since p_Mult_nn doesn't allow 0 as number input
+  if (n_IsZero(b,r->cf))
+  {
+    n_Delete(&a,r->cf);
+    n_Delete(&b,r->cf);
+    n_Delete(&gcd,r->cf);
+    p_Delete(&pt,r);
+    return;
+  }
+  poly m = p_Head(g,r);
+  p_SetCoeff(m,n_Init(1,r->cf),r);
+  g = p_Add_q(p_Mult_nn(g,a,r),p_Mult_nn(p_Mult_mm(pt,m,r),b,r),r);
+  n_Delete(&a,r->cf);
+  n_Delete(&b,r->cf);
+  n_Delete(&gcd,r->cf);
+  p_Delete(&m,r);
+
+  p_Test(g,r);
+  return;
+}
+
+void ptNormalize(ideal I, const number p, const ring r)
+{
+  for (int i=0; i<idSize(I); i++)
+    ptNormalize(&(I->m[i]),p,r);
+  return;
+}
+
 #ifndef NDEBUG
 BOOLEAN pppReduce(leftv res, leftv args)
 {
@@ -139,8 +190,9 @@ bool pReduce0(ideal &I, const number p, const ring r)
  * returns true if reductions have taken place.
  * assumes that h and g are in pReduced form and homogeneous in x of the same degree
  **/
-bool ppreduceInitially(poly &h, const poly g, const ring r)
+bool ppreduceInitially(poly* hStar, const poly g, const ring r)
 {
+  poly h = *hStar;
   if (h==NULL || g==NULL)
     return false;
   p_Test(h,r);
@@ -162,6 +214,7 @@ bool ppreduceInitially(poly &h, const poly g, const ring r)
     q2 = p_Neg(q2,r); p_Test(q2,r);
     h = p_Add_q(q1,q2,r);
     p_Test(h,r);
+    hStar = &h;
     return true;
   }
   return false;
@@ -182,14 +235,14 @@ BOOLEAN ppreduceInitially0(leftv res, leftv args)
       Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
       h = (poly) u->CopyD();
       g = (poly) v->CopyD();
-      (void)ppreduceInitially(h,g,currRing);
+      (void)ppreduceInitially(&h,g,currRing);
       p_Delete(&h,currRing);
       p_Delete(&g,currRing);
       omUpdateInfo();
       Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
       h = (poly) u->CopyD();
       g = (poly) v->CopyD();
-      (void)ppreduceInitially(h,g,currRing);
+      (void)ppreduceInitially(&h,g,currRing);
       p_Delete(&g,currRing);
       res->rtyp = POLY_CMD;
       res->data = (char*) h;
@@ -232,14 +285,14 @@ bool ppreduceInitially(ideal I, const number p, const ring r)
    **/
   for (int i=0; i<m-1; i++)
     for (int j=i+1; j<m; j++)
-      if (ppreduceInitially(I->m[j], I->m[i], r) && pReduce(I->m[j],p,r)) return true;
+      if (ppreduceInitially(&I->m[j], I->m[i], r) && pReduce(I->m[j],p,r)) return true;
 
   /***
    * the second pass. removing terms divisible by lt(g_j) out of g_i for i<j
    **/
   for (int i=0; i<m-1; i++)
     for (int j=i+1; j<m; j++)
-      if (ppreduceInitially(I->m[i], I->m[j],r) && pReduce(I->m[i],p,r)) return true;
+      if (ppreduceInitially(&I->m[i], I->m[j],r) && pReduce(I->m[i],p,r)) return true;
 
   /***
    * removes the elements of I which have been reduced to 0 in the previous two passes
@@ -308,9 +361,9 @@ bool ppreduceInitially(ideal I, const number p, const poly g, const ring r)
    * removing terms with the same monomials in x as lt(g_j) out of g_k for j<k
    **/
   for (int i=0; i<j; i++)
-    if (ppreduceInitially(I->m[j], I->m[i], r) && pReduce(I->m[j],p,r)) return true;
+    if (ppreduceInitially(&I->m[j], I->m[i], r) && pReduce(I->m[j],p,r)) return true;
   for (int k=j+1; k<n; k++)
-    if (ppreduceInitially(I->m[k], I->m[j], r) && pReduce(I->m[k],p,r)) return true;
+    if (ppreduceInitially(&I->m[k], I->m[j], r) && pReduce(I->m[k],p,r)) return true;
 
   /***
    * the second pass. removing terms divisible by lt(g_j) and lt(g_k) out of g_i for i<j<k
@@ -318,9 +371,9 @@ bool ppreduceInitially(ideal I, const number p, const poly g, const ring r)
    **/
   for (int i=0; i<j; i++)
     for (int k=j; k<n; k++)
-      if (ppreduceInitially(I->m[i], I->m[k], r) && pReduce(I->m[i],p,r)) return true;
+      if (ppreduceInitially(&I->m[i], I->m[k], r) && pReduce(I->m[i],p,r)) return true;
   for (int k=j+1; k<n; k++)
-    if (ppreduceInitially(I->m[j], I->m[k], r) && pReduce(I->m[j],p,r)) return true;
+    if (ppreduceInitially(&I->m[j], I->m[k], r) && pReduce(I->m[j],p,r)) return true;
 
   /***
    * removes the elements of I which have been reduced to 0 in the previous two passes
@@ -375,7 +428,7 @@ BOOLEAN ppreduceInitially2(leftv res, leftv args)
  * assumes that the generators of H are homogeneous in x of the same degree,
  * assumes that the generators of G are homogeneous in x of lesser degree.
  **/
-bool ppreduceInitially(ideal H, const number p, const ideal G, const ring r)
+bool ppreduceInitially(ideal &H, const number p, const ideal G, const ring r)
 {
   /***
    * Step 1: reduce H initially with respect to itself and with respect to p-t
@@ -522,8 +575,8 @@ BOOLEAN ppreduceInitially3(leftv res, leftv args)
 
 static std::vector<int> synchronize(const ideal I, const ideal Hi)
 {
-  int k = idSize(Hi);
-  int l = idSize(I);
+  int k = idSize(I);
+  int l = idSize(Hi);
   std::vector<int> synch(k);
   int j;
   for (int i=0; i<k; i++)
@@ -531,7 +584,10 @@ static std::vector<int> synchronize(const ideal I, const ideal Hi)
     for (j=0; j<l; j++)
     {
       if (I->m[i]==Hi->m[j])
+      {
         synch[i] = j;
+        break;
+      }
     }
     if (j==l)
       synch[i] = -1;
@@ -543,14 +599,25 @@ static void synchronize(ideal I, const ideal Hi, const std::vector<int> synch)
 {
   for (unsigned i=0; i<synch.size(); i++)
     if (synch[i]>=0)
+    {
       I->m[i] = Hi->m[synch[i]];
+      std::cout << i << " -> " << synch[i] << std::endl;
+    }
+}
+
+void z_Write(number p, ring r)
+{
+  poly g = p_One(r);
+  p_SetCoeff(g,p,r);
+  p_Write(g,r);
+  return;
 }
 
 /**
  * reduces I initially with respect to itself.
  * assumes that the generators of I are homogeneous in x and that p-t is in I.
  */
-bool ppreduceInitially(ideal I, ring r, number p)
+bool ppreduceInitially(ideal I, const ring r, const number p)
 {
   assume(!n_IsUnit(p,r->cf));
 
@@ -584,9 +651,9 @@ bool ppreduceInitially(ideal I, ring r, number p)
    * Step 2: reduce each component initially with respect to itself
    *  and all lower components
    **/
-  std::vector<int> synch = synchronize(I,Hi);
+  // std::vector<int> synch = synchronize(I,Hi);
   if (ppreduceInitially(Hi,p,r)) return true;
-  synchronize(I,Hi,synch);
+  // synchronize(I,Hi,synch);
   id_Test(Hi,r);
   id_Test(I,r);
 
@@ -624,19 +691,22 @@ bool ppreduceInitially(ideal I, ring r, number p)
         memcpy(&(G->m[i]),&(Hi->m[kH]),(n-i)*sizeof(poly));
         break;
       }
+      if (kH==l)
+        break;
       if (p_GetExp(G->m[kG],1,r)>p_GetExp(Hi->m[kH],1,r))
         G->m[i] = G->m[kG++];
       else
         G->m[i] = Hi->m[kH++];
     }
     m += l; IDELEMS(GG) = m; GG->m = &G->m[n-m];
-    std::vector<int> synch = synchronize(I,it->second);
+    // std::vector<int> synch = synchronize(I,it->second);
     if (ppreduceInitially(it->second,p,GG,r)) return true;
-    synchronize(I,it->second,synch);
+    // synchronize(I,it->second,synch);
     idShallowDelete(&Hi); Hi = it->second;
   }
   idShallowDelete(&Hi);
 
+  ptNormalize(I,p,r);
   omFreeBin((ADDRESS)GG, sip_sideal_bin); idShallowDelete(&G);
   return false;
 }

@@ -6,13 +6,6 @@
 #include <tropicalStrategy.h>
 #include <utility>
 
-/***
- * Given f and G={g1,...,gk}, computes Q=(q1,...,qk) such that
- * f = q1*g1+...+qk*gk
- * is a determinate division with remainder with respect to the
- * ordering active in r.
- * Returns an error if this is not possible.
- **/
 matrix divisionDiscardingRemainder(const poly f, const ideal G, const ring r)
 {
   ring origin = currRing;
@@ -25,11 +18,6 @@ matrix divisionDiscardingRemainder(const poly f, const ideal G, const ring r)
   return Q;
 }
 
-/**
- * Given F[0],...,F[l] and G[0],...,G[k],
- * computes Q[i,j] for i=0,..,k and j=0,...,l such that
- * F[j] = Q[0,j]*G[0]+...+Q[k,j]*G[k].
- */
 matrix divisionDiscardingRemainder(const ideal F, const ideal G, const ring r)
 {
   ring origin = currRing;
@@ -43,30 +31,6 @@ matrix divisionDiscardingRemainder(const ideal F, const ideal G, const ring r)
   return Q;
 }
 
-#ifndef NDEBUG
-BOOLEAN dwr0(leftv res, leftv args)
-{
-  leftv u = args;
-  leftv v = u->next;
-  poly f = (poly) u->CopyD();
-  ideal G = (ideal) v->CopyD();
-  omUpdateInfo();
-  Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-  matrix Q = divisionDiscardingRemainder(f,G,currRing);
-  p_Delete(&f,currRing);
-  id_Delete(&G,currRing);
-  res->rtyp = MATRIX_CMD;
-  res->data = (char*) Q;
-  return FALSE;
-}
-#endif
-
-/***
- * Let w be the uppermost weight vector in the matrix defining the ordering on r.
- * Let I be a Groebner basis of an ideal in r, inI its initial form with respect w.
- * Given an w-homogeneous element m of inI, computes a witness g of m in I,
- * i.e. g in I such that in_w(g)=m.
- **/
 poly witness(const poly m, const ideal I, const ideal inI, const ring r)
 {
   assume(idSize(I)==idSize(inI));
@@ -85,33 +49,6 @@ poly witness(const poly m, const ideal I, const ideal inI, const ring r)
   return f;
 }
 
-#ifndef NDEBUG
-BOOLEAN witness0(leftv res, leftv args)
-{
-  leftv u = args;
-  leftv v = u->next;
-  leftv w = v->next;
-  poly m = (poly) u->CopyD();
-  ideal G = (ideal) v->CopyD();
-  ideal inG = (ideal) w->CopyD();
-  omUpdateInfo();
-  Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-  poly f = witness(m,G,inG,currRing);
-  p_Delete(&m,currRing);
-  id_Delete(&G,currRing);
-  id_Delete(&inG,currRing);
-  res->rtyp = POLY_CMD;
-  res->data = (char*) f;
-  return FALSE;
-}
-#endif
-
-/***
- * Let w be the uppermost weight vector in the matrix defining the ordering on r.
- * Let I be a Groebner basis of an ideal in r, inI its initial form with respect w.
- * Given an w-homogeneous element m of inI, computes a witness g of m in I,
- * i.e. g in I such that in_w(g)=m.
- **/
 ideal witness(const ideal inI, const ideal J, const ring r)
 {
   ring origin = currRing;
@@ -131,3 +68,37 @@ ideal witness(const ideal inI, const ideal J, const ring r)
 
   return I;
 }
+
+#ifndef NDEBUG
+BOOLEAN dwrDebug(leftv res, leftv args)
+{
+  leftv u = args;
+  leftv v = u->next;
+  ideal F = (ideal) u->CopyD();
+  ideal G = (ideal) v->CopyD();
+  omUpdateInfo();
+  Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+  matrix Q = divisionDiscardingRemainder(F,G,currRing);
+  id_Delete(&F,currRing);
+  id_Delete(&G,currRing);
+  res->rtyp = MATRIX_CMD;
+  res->data = (char*) Q;
+  return FALSE;
+}
+
+BOOLEAN witnessDebug(leftv res, leftv args)
+{
+  leftv u = args;
+  leftv v = u->next;
+  ideal inI = (ideal) u->CopyD();
+  ideal J = (ideal) v->CopyD();
+  omUpdateInfo();
+  Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+  ideal I = witness(inI,J,currRing);
+  id_Delete(&inI,currRing);
+  id_Delete(&J,currRing);
+  res->rtyp = IDEAL_CMD;
+  res->data = (char*) I;
+  return FALSE;
+}
+#endif

@@ -18,4 +18,6 @@ bool pReduce0(ideal &I, const number p, const ring r);
 bool ppreduceInitially(ideal I, const ring r, const number p);
 BOOLEAN ppreduceInitially(leftv res, leftv args);
 
+void z_Write(number p, ring r);
+
 #endif

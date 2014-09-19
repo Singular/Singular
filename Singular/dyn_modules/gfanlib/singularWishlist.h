@@ -68,6 +68,6 @@ inline void idShallowDelete (ideal *h)
     *h=NULL;
   }
   return;
- }
+}
 
 #endif

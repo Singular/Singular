@@ -39,8 +39,8 @@ private:
   ideal originalIdeal;
   /**
    * the expected Dimension of the polyhedral output,
-   * i.e. the dimension of the ideal if trivial valuation
-   * or the dimension of the ideal plus one if non-trivial valuation
+   * i.e. the dimension of the ideal if valuation trivial
+   * or the dimension of the ideal plus one if valuation non-trivial
    * (as the output is supposed to be intersected with a hyperplane)
    */
   int expectedDimension;
@@ -301,6 +301,8 @@ public:
    */
   ideal getWitness(const ideal inJ, const ideal inI, const ideal I, const ring r) const;
 
+  ideal computeLift(const ideal inJs, const ring s, const ideal inIr, const ideal Ir, const ring r) const;
+
   /**
    * given generators of the initial ideal, computes its standard basis
    */
@@ -310,7 +312,7 @@ public:
    * given an interior point of a groebner cone
    * computes the groebner cone adjacent to it
    */
-  std::pair<ideal,ring> getFlip(const ideal I, const ideal redI, const ring r, const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
+  std::pair<ideal,ring> getFlip(const ideal Ir, const ring r, const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
 };
 
 int dim(ideal I, ring r);

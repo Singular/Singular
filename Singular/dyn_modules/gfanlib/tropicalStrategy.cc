@@ -8,6 +8,7 @@
 // for various commands in dim(ideal I, ring r):
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/stairc.h>
+#include <kernel/GBEngine/kstd1.h>
 #include <Singular/ipshell.h> // for isPrime(int i)
 
 /***
@@ -47,7 +48,6 @@ static bool noExtraReduction(ideal /*I*/, ring /*r*/, number /*p*/)
 /**
  * Initializes all relevant structures and information for the trivial valuation case,
  * i.e. computing a tropical variety without any valuation.
- *g
  */
 tropicalStrategy::tropicalStrategy(const ideal I, const ring r,
                                    const bool completelyHomogeneous,
@@ -66,7 +66,6 @@ tropicalStrategy::tropicalStrategy(const ideal I, const ring r,
   extraReductionAlgorithm(noExtraReduction)
 {
   assume(rField_is_Q(r) || rField_is_Zp(r));
-  startingIdeal = gfanlib_kStd_wrapper(startingIdeal,startingRing);
   if (!completelyHomogeneous)
   {
     weightAdjustingAlgorithm1 = valued_adjustWeightForHomogeneity;
@@ -128,6 +127,44 @@ static ring writeOrderingAsWP(ring r)
   return rCopy(r);
 }
 
+static ideal constructStartingIdeal(ideal originalIdeal, ring originalRing, number uniformizingParameter, ring startingRing)
+{
+  // construct p-t
+  poly g = p_One(startingRing);
+  p_SetCoeff(g,uniformizingParameter,startingRing);
+  pNext(g) = p_One(startingRing);
+  p_SetExp(pNext(g),1,1,startingRing);
+  p_SetCoeff(pNext(g),n_Init(-1,startingRing->cf),startingRing);
+  p_Setm(pNext(g),startingRing);
+  ideal pt = idInit(1);
+  pt->m[0] = g;
+
+  // map originalIdeal from originalRing into startingRing
+  int k = idSize(originalIdeal);
+  ideal J = idInit(k+1);
+  nMapFunc nMap = n_SetMap(originalRing->cf,startingRing->cf);
+  int n = rVar(originalRing);
+  int* shiftByOne = (int*) omAlloc((n+1)*sizeof(int));
+  for (int i=1; i<=n; i++)
+    shiftByOne[i]=i+1;
+  for (int i=0; i<k; i++)
+    J->m[i] = p_PermPoly(originalIdeal->m[i],shiftByOne,originalRing,startingRing,nMap,NULL,0);
+  omFreeSize(shiftByOne,(n+1)*sizeof(int));
+
+  ring origin = currRing;
+  rChangeCurrRing(startingRing);
+  ideal startingIdeal = kNF(pt,startingRing->qideal,J);
+  rChangeCurrRing(origin);
+  assume(startingIdeal->m[k]==NULL);
+  startingIdeal->m[k] = pt->m[0];
+  startingIdeal = gfanlib_kStd_wrapper(startingIdeal,startingRing);
+
+  id_Delete(&J,startingRing);
+  pt->m[0] = NULL;
+  id_Delete(&pt,startingRing);
+  return startingIdeal;
+}
+
 /***
  * Initializes all relevant structures and information for the valued case,
  * i.e. computing a tropical variety over the rational numbers with p-adic valuation
@@ -148,7 +185,6 @@ tropicalStrategy::tropicalStrategy(ideal J, number q, ring s):
 {
   /* assume that the ground field of the originalRing is Q */
   assume(rField_is_Q(s));
-  originalRing = rCopy(s);
 
   /* replace Q with Z for the startingRing
    * and add an extra variable for tracking the uniformizing parameter */
@@ -159,23 +195,7 @@ tropicalStrategy::tropicalStrategy(ideal J, number q, ring s):
   uniformizingParameter = nMap(q,originalRing->cf,startingRing->cf);
 
   /* map the input ideal into the new polynomial ring */
-  int k = idSize(J);
-  startingIdeal = idInit(k+1);
-  poly g = p_One(startingRing);
-  p_SetCoeff(g,uniformizingParameter,startingRing);
-  pNext(g) = p_One(startingRing);
-  p_SetExp(pNext(g),1,1,startingRing);
-  p_SetCoeff(pNext(g),n_Init(-1,startingRing->cf),startingRing);
-  p_Setm(pNext(g),startingRing);
-  startingIdeal->m[0] = g;
-  int n = rVar(originalRing);
-  int* shiftByOne = (int*) omAlloc((n+1)*sizeof(int));
-  for (int i=1; i<=n; i++)
-    shiftByOne[i]=i+1;
-  for (int i=0; i<k; i++)
-    startingIdeal->m[i+1] = p_PermPoly(J->m[i],shiftByOne,originalRing,startingRing,nMap,NULL,0);
-  omFreeSize(shiftByOne,(n+1)*sizeof(int));
-  startingIdeal = gfanlib_kStd_wrapper(startingIdeal,startingRing);
+  startingIdeal = constructStartingIdeal(J,s,uniformizingParameter,startingRing);
 
   linealitySpace = homogeneitySpace(startingIdeal,startingRing);
 
@@ -528,6 +548,22 @@ ideal tropicalStrategy::getStdOfInitialIdeal(const ideal inI, const ring r) cons
   return inJ;
 }
 
+ideal tropicalStrategy::computeLift(const ideal inJs, const ring s, const ideal inIr, const ideal Ir, const ring r) const
+{
+  int k = idSize(inJs);
+  ideal inJr = idInit(k);
+  nMapFunc identitysr = n_SetMap(s->cf,r->cf);
+  for (int i=0; i<k; i++)
+    inJr->m[i] = p_PermPoly(inJs->m[i],NULL,s,r,identitysr,NULL,0);
+
+  ideal Jr = getWitness(inJr,inIr,Ir,r);
+  nMapFunc identityrs = n_SetMap(r->cf,s->cf);
+  ideal Js = idInit(k);
+  for (int i=0; i<k; i++)
+    Js->m[i] = p_PermPoly(Jr->m[i],NULL,r,s,identityrs,NULL,0);
+  return Js;
+}
+
 static void deleteOrdering(ring r)
 {
   if (r->order != NULL)
@@ -609,20 +645,19 @@ ring tropicalStrategy::copyAndChangeOrderingLS(const ring r, const gfan::ZVector
   return s;
 }
 
-
-std::pair<ideal,ring> tropicalStrategy::getFlip(const ideal I, const ideal redI, const ring r,
+std::pair<ideal,ring> tropicalStrategy::getFlip(const ideal Ir, const ring r,
                                                 const gfan::ZVector interiorPoint,
                                                 const gfan::ZVector facetNormal) const
 {
   assume(isValuationTrivial() || interiorPoint[0].sign()<0);
-  assume(checkForUniformizingBinomial(I,r));
+  assume(checkForUniformizingBinomial(Ir,r));
 
   // get a generating system of the initial ideal
   // and compute a standard basis with respect to adjacent ordering
-  ideal inIr = initial(redI,r,interiorPoint);
+  ideal inIr = initial(Ir,r,interiorPoint);
   ring sAdjusted = copyAndChangeOrderingWP(r,interiorPoint,facetNormal);
   nMapFunc identity = n_SetMap(r->cf,sAdjusted->cf);
-  int k = idSize(I); ideal inIsAdjusted = idInit(k);
+  int k = idSize(Ir); ideal inIsAdjusted = idInit(k);
   for (int i=0; i<k; i++)
     inIsAdjusted->m[i] = p_PermPoly(inIr->m[i],NULL,r,sAdjusted,identity,NULL,0);
   ideal inJsAdjusted = getStdOfInitialIdeal(inIsAdjusted,sAdjusted);
@@ -635,7 +670,7 @@ std::pair<ideal,ring> tropicalStrategy::getFlip(const ideal I, const ideal redI,
   for (int i=0; i<k; i++)
     inJr->m[i] = p_PermPoly(inJsAdjusted->m[i],NULL,sAdjusted,r,identity,NULL,0);
 
-  ideal Jr = getWitness(inJr,inIr,redI,r);
+  ideal Jr = getWitness(inJr,inIr,Ir,r);
   ring s = copyAndChangeOrderingLS(r,interiorPoint,facetNormal);
   identity = n_SetMap(r->cf,s->cf);
   ideal Js = idInit(k);
