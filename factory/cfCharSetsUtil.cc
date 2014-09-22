@@ -599,11 +599,8 @@ CanonicalForm normalize (const CanonicalForm& F)
       On (SW_RATIONAL);
     G= F;
     G *= bCommonDen (G);
-    if (!isRat)
-      Off (SW_RATIONAL);
-    if (isRat)
-      Off (SW_RATIONAL);
-    G= F/icontent (F);
+    Off (SW_RATIONAL);
+    G /= icontent (G);
     if (isRat)
       On (SW_RATIONAL);
     if (lc(G) < 0)
