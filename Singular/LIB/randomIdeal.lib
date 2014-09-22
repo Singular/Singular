@@ -81,7 +81,7 @@ LIB "random.lib";
 LIB "ring.lib";
 
 // define struct TIdealGeneratingParameters, used by the 'randomIdeal' library later on
-proc mod_init()
+static proc mod_init()
 {
     // randomIdealTestMemoryLeaks: a flag to enable/disable memory leak related test in the unit tests of this library.
     def randomIdealTestMemoryLeaks = 1; 
