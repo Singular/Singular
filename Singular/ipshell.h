@@ -254,5 +254,12 @@ BOOLEAN iiTestAssume(leftv a, leftv b);
 BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op,
             struct sValCmd1* dArith1, int i, int at,
             struct sConvertTypes *dConvertTypes);
+BOOLEAN iiExprArith2Tab(leftv res, leftv a, int op, 
+            struct sValCmd2* dArith2,int i, int at, 
+            struct sConvertTypes *dConvertTypes);
+BOOLEAN iiExprArith3Tab(leftv res, leftv a, int op, 
+            struct sValCmd3* dArith3,int i, int at, 
+            struct sConvertTypes *dConvertTypes);
+
 #endif
 
