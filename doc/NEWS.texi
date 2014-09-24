@@ -21,6 +21,10 @@
 
 @heading News for version @value{VERSION}
 
+Version 4-0-1 is a bug fix release.
+
+@heading News for version 4-0-0
+
 Version 4-0-0 is a milestone relase of Singular.
 The new release series 4 aims for an entirely modularized architecture
 simplifying connectivity with other systems and paving the way
