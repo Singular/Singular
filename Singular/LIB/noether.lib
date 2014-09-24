@@ -307,7 +307,7 @@ NOTE:    It uses the procedure  modNPos_test to test Noether position.
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-proc TestLastVarIsInGenericPos (ideal i)
+static proc TestLastVarIsInGenericPos (ideal i)
 "USAGE:   TestLastVarIsInGenericPos (i); i a monomial ideal,
 RETURN:  1 if the last variable is in generic position for i and 0 otherwise.
 THEORY:  The last variable is in generic position if the quotient of the ideal
@@ -516,8 +516,8 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
 
 //////////////////////////////////////////////////////////////////////////////
 //
-proc reg (ideal i)
-"USAGE:  reg (i); i ideal
+proc regCM (ideal i)
+"USAGE:  regCM (i); i ideal
 RETURN:  the Castelnuovo-Mumford regularity of i.
          (returns -1 if i is not homogeneous)
 ASSUME:  i is a homogeneous ideal.
@@ -753,7 +753,7 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
 "
 {
 //--------------------------- initialisation ---------------------------------
-  "// WARNING: The characteristic of base field musr be zero.
+  "// WARNING: The characteristic of base field must be zero.
 // This procedure is probabilistic and  it computes the initial
 //ideals modulo the prime number 2147483647";
   int e,ii,jj,H,h,d,time,p,nl;
