@@ -1511,7 +1511,7 @@ ideal interpolation(const std::vector<ideal>& L, intvec *v)
      WerrorS("list and intvec must have the same length!");
      return NULL;
   }
-  assume( n_points > 0 ); 
+  assume( n_points > 0 );
   variables=currRing->N;
   only_modp=rField_is_Zp(currRing);
   if (only_modp) myp=rChar(currRing);

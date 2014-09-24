@@ -1801,7 +1801,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
             || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
-      
+
        //stops computation if
        // 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
        //a predefined number Kstd1_deg

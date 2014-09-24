@@ -11,7 +11,7 @@ struct spolyrec  ; typedef struct spolyrec polyrec; typedef polyrec * poly;
 struct ip_sring  ; typedef struct ip_sring                          * ring;
 struct sip_sideal; typedef struct sip_sideal                        * ideal;
 
-class intvec; 
+class intvec;
 
 extern ring currRing;
 
@@ -20,7 +20,7 @@ intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegre
 
 intvec * hSecondSeries(intvec *hseries1);
 
-void hLookSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL, ring tailRing = currRing); 
+void hLookSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL, ring tailRing = currRing);
 
 #endif
 

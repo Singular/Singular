@@ -10,7 +10,7 @@ boost::python::str Poly_as_str(const Poly& p)
 {
   using boost::python::str;
   //ring r=p.getRing();
- 
+
   char* out=p.c_string();
   return boost::python::str(out,strlen(out));
 }
@@ -18,7 +18,7 @@ boost::python::str Vector_as_str(const Vector& p)
 {
   using boost::python::str;
   //ring r=p.getRing();
- 
+
   char* out=p.c_string();
   return boost::python::str(out,strlen(out));
 }
@@ -38,10 +38,10 @@ void export_poly()
     .def("__iter__", boost::python::iterator<Poly>())
     //read monomials (only) from string
     .def(boost::python::init <const char* >())
-    
+
     .def("leadCoef",&Poly::leadCoef)
     .def("leadExp", &Poly::leadExp)
-   
+
     .def(-self)
     .def(self*=self)
     .def(self+=self)
@@ -54,9 +54,9 @@ void export_poly()
     .def(self+Number())
     .def(self+=Number())
     .def(self*=Number())
-    
+
     .def(self*self);
-  
+
 }
 
 

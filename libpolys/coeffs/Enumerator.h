@@ -1,14 +1,14 @@
 // -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file Enumerator.h
  *
  * Abstract API for enumerators.
- * 
+ *
  * ABSTRACT: Abstract interface for forward iteratable containers (enumerators)
  * of standalone objects (e.g. polynomials as sets of numbers), without any
- * knowledge of their internals. 
+ * knowledge of their internals.
  *
  * @author Oleksandr Motsak
  *
@@ -20,7 +20,7 @@
 #define ENUMERATOR_H
 
 /** @class IBaseEnumerator
- * 
+ *
  * Base enumerator interface for simple iteration over a generic collection.
  *
  * Abstract API of enumerators for enumerable collections of standalone objects.
@@ -36,7 +36,7 @@
  *   }
  * @endcode
  *
- * Note that the Reset() 
+ * Note that the Reset()
  *
  * @sa IEnumerator
  */
@@ -47,7 +47,7 @@ class IBaseEnumerator // IDisposable
     /// returns true if the enumerator was successfully advanced to the
     /// next element;
     /// false if the enumerator has passed the end of the collection.
-    virtual bool MoveNext() = 0;    
+    virtual bool MoveNext() = 0;
 
     /// Sets the enumerator to its initial position: -1,
     /// which is before the first element in the collection.
@@ -55,7 +55,7 @@ class IBaseEnumerator // IDisposable
 
     /// Current position is inside the collection (not -1 or past the end)
     virtual bool IsValid() const = 0;
-   
+
   private:
     /// disable copy constructor and assigment operator
     IBaseEnumerator(const IBaseEnumerator&);
@@ -70,7 +70,7 @@ class IBaseEnumerator // IDisposable
 
 
 /** @class IAccessor
- * 
+ *
  * Templated accessor interface for accessing individual data (for instance, of an enumerator).
  *
  * T is the type of objects to access, available via the Current() method.
@@ -92,13 +92,13 @@ class IAccessor // IDisposable
     virtual const_reference Current() const = 0;
 
  protected:
-    IAccessor(){}   
+    IAccessor(){}
     ~IAccessor() {} // TODO: needed?
-  
+
 };
 
 /** @class IEnumerator
- * 
+ *
  * Templated enumerator interface for simple iteration over a generic collection of T's.
  *
  * Abstract API of enumerators for generic enumerable collections of standalone
@@ -107,9 +107,9 @@ class IAccessor // IDisposable
  *
  * @code
  *   IEnumerator<T>& itr = ...;
- *   
+ *
  *   itr.Reset(); // goes before the first element, thus no itr.Current() is available here!
- *   
+ *
  *   while( itr.MoveNext() )
  *   {
  *      use/change itr.Current()...
@@ -137,7 +137,7 @@ class IEnumerator: public virtual IBaseEnumerator, public virtual IAccessor<T>
 //??// #include <iterator>
 
 /** @class IBaseIterator
- * 
+ *
  * A base abstract iterator API with virtualized standard iterator operators
  *
  * Abstract API for iterators that should work with STL and BOOST.
@@ -167,7 +167,7 @@ class IBaseIterator //??// : public std::iterator<std::forward_iterator_tag, A>
 };
 
 /** @class AIterator
- * 
+ *
  * An abstract iterator with virtualized assigment operator and
  * constructors.
  *
@@ -195,7 +195,7 @@ class IIterator: public IBaseIterator<A>
 };
 
 /** @class IContainer
- * 
+ *
  * Container of standalone objects
  *
  * Abstract API for containers of objects and their iterators
@@ -209,7 +209,7 @@ class IContainer
     typedef T value_type;
     typedef value_type& reference;
     typedef const value_type& const_reference;
-//??//    typedef std::size_t size_type;    
+//??//    typedef std::size_t size_type;
 //??//    virtual size_type size() const = 0;
     virtual bool empty() const = 0;
 
@@ -221,10 +221,10 @@ class IContainer
     virtual const_iterator begin() const = 0;
     virtual const_iterator end() const = 0;
 };
-#endif 
+#endif
 
 
-#endif 
+#endif
 /* #ifndef ENUMERATOR_H */
 
 // Vi-modeline: vim: filetype=c:syntax:shiftwidth=2:tabstop=8:textwidth=0:expandtab

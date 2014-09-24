@@ -565,7 +565,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         }
       }
       #else
-      factoryError ("univariate factorization over Z depends on NTL(missing)"); 
+      factoryError ("univariate factorization over Z depends on NTL(missing)");
       return CFFList (CFFactor (f, 1));
       #endif
     }

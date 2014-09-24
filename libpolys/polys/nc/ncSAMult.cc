@@ -5,7 +5,7 @@
  *  File:    ncSAMult.cc
  *  Purpose: implementation of multiplication in simple NC subalgebras
  *  Author:  motsak
- *  Created: 
+ *  Created:
  *******************************************************************/
 
 #define MYTEST 0
@@ -59,18 +59,18 @@ static poly ggnc_pp_Mult_mm(const poly p, const poly m, const ring r)
 
   assume( (p != NULL) && (m != NULL) && (r != NULL) );
 
-#if OUTPUT  
+#if OUTPUT
   PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ggnc_pp_Mult_mm(p, m) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
   PrintLn();
-  PrintS("p: "); p_Write(p, r);    
-  PrintS("m: "); p_Write(m, r);      
+  PrintS("p: "); p_Write(p, r);
+  PrintS("m: "); p_Write(m, r);
 #endif
   poly pResult;
-  
+
   if (p_IsConstant(m, r))
     pResult = pp_Mult_nn(p, p_GetCoeff(m,r),r);
   else
-  {  
+  {
     CGlobalMultiplier* const pMultiplier = r->GetNC()->GetGlobalMultiplier();
     assume( pMultiplier != NULL );
 
@@ -81,12 +81,12 @@ static poly ggnc_pp_Mult_mm(const poly p, const poly m, const ring r)
     pResult = p_Mult_nn(pResult, p_GetCoeff(m, r), r);
   }
 
-#if OUTPUT  
+#if OUTPUT
   p_Test(pResult, r);
 
   PrintS("ggnc_pp_Mult_mm(p, m) => "); p_Write(pResult, r);
-  PrintS("p: "); p_Write(p, r);    
-  PrintS("m: "); p_Write(m, r);      
+  PrintS("p: "); p_Write(p, r);
+  PrintS("m: "); p_Write(m, r);
   PrintS("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
   PrintLn();
 #endif
@@ -105,13 +105,13 @@ static poly ggnc_p_Mult_mm(poly p, const poly m, const ring r)
 
   assume( (p != NULL) && (m != NULL) && (r != NULL) );
 
-#if OUTPUT  
+#if OUTPUT
   PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ggnc_p_Mult_mm(p, m) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
   PrintLn();
   PrintS("p: ");
-  p_Write(p, r);    
+  p_Write(p, r);
   PrintS("m: ");
-  p_Write(m, r);  
+  p_Write(m, r);
 #endif
 
   poly pResult;
@@ -119,7 +119,7 @@ static poly ggnc_p_Mult_mm(poly p, const poly m, const ring r)
   if (p_IsConstant(m, r))
     pResult = p_Mult_nn(p, p_GetCoeff(m,r),r);
   else
-  {  
+  {
     CGlobalMultiplier* const pMultiplier = r->GetNC()->GetGlobalMultiplier();
     assume( pMultiplier != NULL );
 
@@ -130,16 +130,16 @@ static poly ggnc_p_Mult_mm(poly p, const poly m, const ring r)
     pResult = p_Mult_nn(pResult, p_GetCoeff(m, r), r);
   }
 
-#if OUTPUT  
+#if OUTPUT
   p_Test(pResult, r);
 
-  PrintS("ggnc_p_Mult_mm(p, m) => "); p_Write(pResult, r);      
-//  PrintS("p: "); p_Write(p, r);    
-  PrintS("m: "); p_Write(m, r);      
+  PrintS("ggnc_p_Mult_mm(p, m) => "); p_Write(pResult, r);
+//  PrintS("p: "); p_Write(p, r);
+  PrintS("m: "); p_Write(m, r);
   PrintS("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
   PrintLn();
 #endif
-  
+
   return pResult;
 
 }
@@ -157,11 +157,11 @@ static poly ggnc_mm_Mult_p(const poly m, poly p, const ring r)
   p_Test(m, r);
   p_Test(p, r);
 
-#if OUTPUT  
+#if OUTPUT
   PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ggnc_mm_Mult_p(m, p) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
   PrintLn();
-  PrintS("m: "); p_Write(m, r);      
-  PrintS("p: "); p_Write(p, r);    
+  PrintS("m: "); p_Write(m, r);
+  PrintS("p: "); p_Write(p, r);
 #endif
 
   poly pResult;
@@ -169,7 +169,7 @@ static poly ggnc_mm_Mult_p(const poly m, poly p, const ring r)
   if (p_IsConstant(m, r))
     pResult = p_Mult_nn(p, p_GetCoeff(m,r),r);
   else
-  {  
+  {
     CGlobalMultiplier* const pMultiplier = r->GetNC()->GetGlobalMultiplier();
     assume( pMultiplier != NULL );
 
@@ -179,17 +179,17 @@ static poly ggnc_mm_Mult_p(const poly m, poly p, const ring r)
     p_Test(pResult, r);
     pResult = p_Mult_nn(pResult, p_GetCoeff(m, r), r);
   }
-  
-#if OUTPUT  
+
+#if OUTPUT
   p_Test(pResult, r);
 
-  PrintS("ggnc_mm_Mult_p(m, p) => "); p_Write(pResult, r);      
-//  PrintS("p: "); p_Write(p, r);    
-  PrintS("m: "); p_Write(m, r);      
+  PrintS("ggnc_mm_Mult_p(m, p) => "); p_Write(pResult, r);
+//  PrintS("p: "); p_Write(p, r);
+  PrintS("m: "); p_Write(m, r);
   PrintS("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
   PrintLn();
 #endif
-  
+
   return pResult;
 }
 
@@ -204,20 +204,20 @@ static poly ggnc_mm_Mult_pp(const poly m, const poly p, const ring r)
 
   p_Test(m, r);
   p_Test(p, r);
-  
-#if OUTPUT  
+
+#if OUTPUT
   PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ggnc_mm_Mult_pp(m, p) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
   PrintLn();
-  PrintS("m: "); p_Write(m, r);      
-  PrintS("p: "); p_Write(p, r);    
+  PrintS("m: "); p_Write(m, r);
+  PrintS("p: "); p_Write(p, r);
 #endif
-  
+
   poly pResult;
 
   if (p_IsConstant(m, r))
     pResult = pp_Mult_nn(p, p_GetCoeff(m,r),r);
   else
-  {  
+  {
     CGlobalMultiplier* const pMultiplier = r->GetNC()->GetGlobalMultiplier();
     assume( pMultiplier != NULL );
 
@@ -228,28 +228,28 @@ static poly ggnc_mm_Mult_pp(const poly m, const poly p, const ring r)
     pResult = p_Mult_nn(pResult, p_GetCoeff(m, r), r);
   }
 
-#if OUTPUT  
+#if OUTPUT
   p_Test(pResult, r);
 
-  PrintS("ggnc_mm_Mult_pp(m, p) => "); p_Write(pResult, r);      
-  PrintS("p: "); p_Write(p, r);    
-  PrintS("m: "); p_Write(m, r);      
+  PrintS("ggnc_mm_Mult_pp(m, p) => "); p_Write(pResult, r);
+  PrintS("p: "); p_Write(p, r);
+  PrintS("m: "); p_Write(m, r);
   PrintS("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
   PrintLn();
 #endif
-  
+
   return pResult;
 }
 
 static void ggnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 {
-#if OUTPUT  
+#if OUTPUT
   PrintS("|ggnc_p_ProcsSet()");
   PrintLn();
 #endif
 
   assume( p_Procs != NULL );
-  
+
   // "commutative"
   p_Procs->p_Mult_mm  = rGR->p_Procs->p_Mult_mm  = ggnc_p_Mult_mm;
   p_Procs->pp_Mult_mm = rGR->p_Procs->pp_Mult_mm = ggnc_pp_Mult_mm;
@@ -266,15 +266,15 @@ static void ggnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 
 BOOLEAN ncInitSpecialPairMultiplication(ring r)
 {
-#if OUTPUT  
+#if OUTPUT
   PrintS("ncInitSpecialPairMultiplication(ring), ring: \n");
   rWrite(r, TRUE);
   PrintLn();
 #endif
-  
+
   if(!rIsPluralRing(r))// ; // :(((
     return TRUE;
-  
+
   if(rIsSCA(r))
     return TRUE;
 
@@ -294,7 +294,7 @@ BOOLEAN ncInitSpecialPairMultiplication(ring r)
 CGlobalMultiplier::CGlobalMultiplier(ring r):
     CMultiplier<poly>(r), m_RingFormulaMultiplier(GetFormulaPowerMultiplier(r))
 {
-#if OUTPUT  
+#if OUTPUT
   PrintS("CGlobalMultiplier::CGlobalMultiplier(ring)!");
   PrintLn();
 #endif
@@ -306,7 +306,7 @@ CGlobalMultiplier::CGlobalMultiplier(ring r):
 
 CGlobalMultiplier::~CGlobalMultiplier()
 {
-#if OUTPUT  
+#if OUTPUT
   PrintS("CGlobalMultiplier::~CGlobalMultiplier()!");
   PrintLn();
 #endif
@@ -326,15 +326,15 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
 
   const ring r = GetBasering();
 
-#if OUTPUT  
+#if OUTPUT
   PrintS("CGlobalMultiplier::MultiplyEE(expLeft, expRight)!");
   PrintLn();
-  PrintS("expL: "); p_Write(expLeft, GetBasering());    
-  PrintS("expR: "); p_Write(expRight, GetBasering());    
+  PrintS("expL: "); p_Write(expLeft, GetBasering());
+  PrintS("expR: "); p_Write(expRight, GetBasering());
 #endif
 
 //  CCacheHash<poly>::CCacheItem* pLookup;
-//  
+//
 //  int b = m_cache->LookupEE(expLeft, expRight, pLookup);
 //  // TODO!!!
 //
@@ -356,18 +356,18 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
   {
     if( ei == 0 )
       ei = p_GetExp(expRight, ++i, r);
-    
+
     if( ej == 0 )
       ej = p_GetExp(expLeft, --j, r);
   }
 
-  
-#if OUTPUT  
+
+#if OUTPUT
   PrintS("<CGlobalMultiplier::MultiplyEE>");
   PrintLn();
-  Print("i: %d, j: %d", i, j); 
+  Print("i: %d, j: %d", i, j);
   PrintLn();
-  Print("ei: %d, ej: %d", ei, ej); 
+  Print("ei: %d, ej: %d", ei, ej);
   PrintLn();
 #endif
 
@@ -391,7 +391,7 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
       --i;
       ei = 0;
     }
-      
+
     if( i == j )
     {
       if( ej != 0 )
@@ -408,7 +408,7 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
         p_SetExp(product, i, e, r);
     }
 
-    p_Setm(product, r);    
+    p_Setm(product, r);
 
   } else
   { // i < j, ei != 0, ej != 0
@@ -425,21 +425,21 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
     else
  //    return m_RingFormulaMultiplier->Multiply(j, i, b, a);
       product = CFormulaPowerMultiplier::Multiply( PairType, i, j, ei, ej, GetBasering());
-    
 
-#if OUTPUT  
+
+#if OUTPUT
     PrintS("<CGlobalMultiplier::MultiplyEE> ==> ");
     PrintLn();
-    Print("i: %d, j: %d", i, j); 
+    Print("i: %d, j: %d", i, j);
     PrintLn();
-    Print("ei: %d, ej: %d", ei, ej); 
+    Print("ei: %d, ej: %d", ei, ej);
     PrintLn();
-    PrintS("<product>: "); p_Write(product, GetBasering());  
+    PrintS("<product>: "); p_Write(product, GetBasering());
 #endif
-    
+
 
     // TODO: Choose some multiplication strategy!!!
-    
+
     while( (product != NULL) && !((i == NVars()) && (j == 1)) )
     {
 
@@ -448,13 +448,13 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
       if( i < NVars() )
       {
         ei = p_GetExp(expRight, ++i, r);
-        
+
         while( (ei == 0) && (i < NVars()) )
           ei = p_GetExp(expRight, ++i, r);
 
         if( ei != 0 )
           product = m_powers->MultiplyPEDestroy(product, CPower(i, ei));
-      } 
+      }
 
       if( j > 1 )
       {
@@ -468,35 +468,35 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
       }
 
 
-#if OUTPUT  
+#if OUTPUT
       PrintS("<CGlobalMultiplier::MultiplyEE> ==> ");
       PrintLn();
-      Print("i: %d, j: %d", i, j); 
+      Print("i: %d, j: %d", i, j);
       PrintLn();
-      Print("ei: %d, ej: %d", ei, ej); 
+      Print("ei: %d, ej: %d", ei, ej);
       PrintLn();
-      PrintS("<product>: "); p_Write(product, GetBasering());  
+      PrintS("<product>: "); p_Write(product, GetBasering());
 #endif
-      
+
     }
 
   }
 
-//  // TODO!      
+//  // TODO!
 //
 //  m_cache->StoreEE( expLeft, expRight, product);
 //  // up to now:
-  return product; 
+  return product;
 }
 
     // Monom * Exponent
 poly CGlobalMultiplier::MultiplyME(const poly pMonom, const CGlobalMultiplier::CExponent expRight)
 {
-#if OUTPUT  
-  PrintS("CGlobalMultiplier::MultiplyME(monom, expR)!");  
+#if OUTPUT
+  PrintS("CGlobalMultiplier::MultiplyME(monom, expR)!");
   PrintLn();
-  PrintS("Monom: "); p_Write(pMonom, GetBasering());    
-  PrintS("expR: "); p_Write(expRight, GetBasering());    
+  PrintS("Monom: "); p_Write(pMonom, GetBasering());
+  PrintS("expR: "); p_Write(expRight, GetBasering());
 #endif
 
   return MultiplyEE(pMonom, expRight);
@@ -505,11 +505,11 @@ poly CGlobalMultiplier::MultiplyME(const poly pMonom, const CGlobalMultiplier::C
     // Exponent * Monom
 poly CGlobalMultiplier::MultiplyEM(const CGlobalMultiplier::CExponent expLeft, const poly pMonom)
 {
-#if OUTPUT  
-  PrintS("CGlobalMultiplier::MultiplyEM(expL, monom)!");  
+#if OUTPUT
+  PrintS("CGlobalMultiplier::MultiplyEM(expL, monom)!");
   PrintLn();
-  PrintS("expL: "); p_Write(expLeft, GetBasering());    
-  PrintS("Monom: "); p_Write(pMonom, GetBasering());    
+  PrintS("expL: "); p_Write(expLeft, GetBasering());
+  PrintS("Monom: "); p_Write(pMonom, GetBasering());
 #endif
 
   return MultiplyEE(expLeft, pMonom);
@@ -523,7 +523,7 @@ poly CGlobalMultiplier::MultiplyEM(const CGlobalMultiplier::CExponent expLeft, c
 CCommutativeSpecialPairMultiplier::CCommutativeSpecialPairMultiplier(ring r, int i, int j):
     CSpecialPairMultiplier(r, i, j)
 {
-#if OUTPUT  
+#if OUTPUT
   Print("CCommutativeSpecialPairMultiplier::CCommutativeSpecialPairMultiplier(ring, i: %d, j: %d)!", i, j);
   PrintLn();
 #endif
@@ -532,7 +532,7 @@ CCommutativeSpecialPairMultiplier::CCommutativeSpecialPairMultiplier(ring r, int
 
 CCommutativeSpecialPairMultiplier::~CCommutativeSpecialPairMultiplier()
 {
-#if OUTPUT  
+#if OUTPUT
   PrintS("CCommutativeSpecialPairMultiplier::~CCommutativeSpecialPairMultiplier()");
   PrintLn();
 #endif
@@ -541,8 +541,8 @@ CCommutativeSpecialPairMultiplier::~CCommutativeSpecialPairMultiplier()
 // Exponent * Exponent
 poly CCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
-#if OUTPUT  
-  Print("CCommutativeSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);  
+#if OUTPUT
+  Print("CCommutativeSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);
   PrintLn();
 #endif
 
@@ -555,7 +555,7 @@ poly CCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int 
 CAntiCommutativeSpecialPairMultiplier::CAntiCommutativeSpecialPairMultiplier(ring r, int i, int j):
 		CSpecialPairMultiplier(r, i, j)
 {
-#if OUTPUT  
+#if OUTPUT
 	Print("CAntiCommutativeSpecialPairMultiplier::CAntiCommutativeSpecialPairMultiplier(ring, i: %d, j: %d)!", i, j);
 	PrintLn();
 #endif
@@ -564,7 +564,7 @@ CAntiCommutativeSpecialPairMultiplier::CAntiCommutativeSpecialPairMultiplier(rin
 
 CAntiCommutativeSpecialPairMultiplier::~CAntiCommutativeSpecialPairMultiplier()
 {
-#if OUTPUT  
+#if OUTPUT
 	PrintS("CAntiCommutativeSpecialPairMultiplier::~CAntiCommutativeSpecialPairMultiplier()");
 	PrintLn();
 #endif
@@ -573,8 +573,8 @@ CAntiCommutativeSpecialPairMultiplier::~CAntiCommutativeSpecialPairMultiplier()
 // Exponent * Exponent
 poly CAntiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
-#if OUTPUT  
-	Print("CAntiCommutativeSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);  
+#if OUTPUT
+	Print("CAntiCommutativeSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);
 	PrintLn();
 #endif
 
@@ -587,7 +587,7 @@ poly CAntiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const 
 CQuasiCommutativeSpecialPairMultiplier::CQuasiCommutativeSpecialPairMultiplier(ring r, int i, int j, number q):
 		CSpecialPairMultiplier(r, i, j), m_q(q)
 {
-#if OUTPUT  
+#if OUTPUT
 	Print("CQuasiCommutativeSpecialPairMultiplier::CQuasiCommutativeSpecialPairMultiplier(ring, i: %d, j: %d, q)!", i, j);
 	PrintLn();
 	PrintS("Parameter q: ");
@@ -598,7 +598,7 @@ CQuasiCommutativeSpecialPairMultiplier::CQuasiCommutativeSpecialPairMultiplier(r
 
 CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier()
 {
-#if OUTPUT  
+#if OUTPUT
 	PrintS("CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier()");
 	PrintLn();
 #endif
@@ -607,8 +607,8 @@ CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier(
 // Exponent * Exponent
 poly CQuasiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
-#if OUTPUT  
-	Print("CQuasiCommutativeSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);  
+#if OUTPUT
+	Print("CQuasiCommutativeSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);
 	PrintLn();
 #endif
 
@@ -622,7 +622,7 @@ poly CQuasiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const
 CWeylSpecialPairMultiplier::CWeylSpecialPairMultiplier(ring r, int i, int j, number g):
     CSpecialPairMultiplier(r, i, j), m_g(g)
 {
-#if OUTPUT  
+#if OUTPUT
   Print("CWeylSpecialPairMultiplier::CWeylSpecialPairMultiplier(ring, i: %d, j: %d, g)!", i, j);
   PrintLn();
   PrintS("Parameter g: ");
@@ -633,7 +633,7 @@ CWeylSpecialPairMultiplier::CWeylSpecialPairMultiplier(ring r, int i, int j, num
 
 CWeylSpecialPairMultiplier::~CWeylSpecialPairMultiplier()
 {
-#if OUTPUT  
+#if OUTPUT
   PrintS("CWeylSpecialPairMultiplier::~CWeylSpecialPairMultiplier()");
   PrintLn();
 #endif
@@ -642,13 +642,13 @@ CWeylSpecialPairMultiplier::~CWeylSpecialPairMultiplier()
 // Exponent * Exponent
 poly CWeylSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
-#if OUTPUT  
-  Print("CWeylSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);  
+#if OUTPUT
+  Print("CWeylSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);
   PrintLn();
 #endif
   // Char == 0, otherwise - problem!
 
-  
+
   const ring r = GetBasering();
 
   assume( expLeft*expRight > 0 );
@@ -660,7 +660,7 @@ poly CWeylSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRigh
 CHWeylSpecialPairMultiplier::CHWeylSpecialPairMultiplier(ring r, int i, int j, int k):
     CSpecialPairMultiplier(r, i, j), m_k(k)
 {
-#if OUTPUT  
+#if OUTPUT
   Print("CHWeylSpecialPairMultiplier::CHWeylSpecialPairMultiplier(ring, i: %d, j: %d, k: %d)!", i, j, k);
   PrintLn();
 #endif
@@ -669,7 +669,7 @@ CHWeylSpecialPairMultiplier::CHWeylSpecialPairMultiplier(ring r, int i, int j, i
 
 CHWeylSpecialPairMultiplier::~CHWeylSpecialPairMultiplier()
 {
-#if OUTPUT  
+#if OUTPUT
   PrintS("CHWeylSpecialPairMultiplier::~CHWeylSpecialPairMultiplier()");
   PrintLn();
 #endif
@@ -678,8 +678,8 @@ CHWeylSpecialPairMultiplier::~CHWeylSpecialPairMultiplier()
 // Exponent * Exponent
 poly CHWeylSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
-#if OUTPUT  
-  Print("CHWeylSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);  
+#if OUTPUT
+  Print("CHWeylSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);
   PrintLn();
 #endif
   // Char == 0, otherwise - problem!
@@ -697,7 +697,7 @@ poly CHWeylSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRig
 CShiftSpecialPairMultiplier::CShiftSpecialPairMultiplier(ring r, int i, int j, int s, number c):
     CSpecialPairMultiplier(r, i, j), m_shiftCoef(c), m_shiftVar(s)
 {
-#if OUTPUT  
+#if OUTPUT
   Print("CShiftSpecialPairMultiplier::CShiftSpecialPairMultiplier(ring, i: %d, j: %d, s: %d, c)!", i, j, s);
   PrintLn();
   PrintS("Parameter c: "); n_Write(c, r);
@@ -707,7 +707,7 @@ CShiftSpecialPairMultiplier::CShiftSpecialPairMultiplier(ring r, int i, int j, i
 
 CShiftSpecialPairMultiplier::~CShiftSpecialPairMultiplier()
 {
-#if OUTPUT  
+#if OUTPUT
   PrintS("CShiftSpecialPairMultiplier::~CShiftSpecialPairMultiplier()");
   PrintLn();
 #endif
@@ -716,8 +716,8 @@ CShiftSpecialPairMultiplier::~CShiftSpecialPairMultiplier()
 // Exponent * Exponent
 poly CShiftSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
-#if OUTPUT  
-  Print("CShiftSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);  
+#if OUTPUT
+  Print("CShiftSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);
   PrintLn();
 #endif
   // Char == 0, otherwise - problem!
@@ -739,7 +739,7 @@ poly CShiftSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRig
 CExternalSpecialPairMultiplier::CExternalSpecialPairMultiplier(ring r, int i, int j, Enum_ncSAType type):
     CSpecialPairMultiplier(r, i, j), m_ncSAtype(type)
 {
-#if OUTPUT  
+#if OUTPUT
   Print("CExternalSpecialPairMultiplier::CExternalSpecialPairMultiplier(ring, i: %d, j: %d, type: %d, c)!", i, j, (int)type);
   PrintLn();
 #endif
@@ -748,7 +748,7 @@ CExternalSpecialPairMultiplier::CExternalSpecialPairMultiplier(ring r, int i, in
 
 CExternalSpecialPairMultiplier::~CExternalSpecialPairMultiplier()
 {
-#if OUTPUT  
+#if OUTPUT
   PrintS("CExternalSpecialPairMultiplier::~CExternalSpecialPairMultiplier()");
   PrintLn();
 #endif
@@ -757,8 +757,8 @@ CExternalSpecialPairMultiplier::~CExternalSpecialPairMultiplier()
 // Exponent * Exponent
 poly CExternalSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
-#if OUTPUT  
-  Print("CExternalSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);  
+#if OUTPUT
+  Print("CExternalSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);
   PrintLn();
 #endif
   // Char == 0, otherwise - problem!
@@ -767,7 +767,7 @@ poly CExternalSpecialPairMultiplier::MultiplyEE(const int expLeft, const int exp
 
   const ring r = GetBasering();
 
-  return CFormulaPowerMultiplier::Multiply(m_ncSAtype, GetI(), GetJ(), expRight, expLeft, r); 
+  return CFormulaPowerMultiplier::Multiply(m_ncSAtype, GetI(), GetJ(), expRight, expLeft, r);
 
 }
 
@@ -778,7 +778,7 @@ poly CExternalSpecialPairMultiplier::MultiplyEE(const int expLeft, const int exp
 // factory method!
 CSpecialPairMultiplier* AnalyzePair(const ring r, int i, int j)
 {
-#if OUTPUT  
+#if OUTPUT
   Print("AnalyzePair(ring, i: %d, j: %d)!", i, j);
   PrintLn();
 #endif
@@ -791,7 +791,7 @@ CSpecialPairMultiplier* AnalyzePair(const ring r, int i, int j)
   // last possibility:
   return new CExternalSpecialPairMultiplier(r, i, j, type); // For tests!
 
-  
+
   if( type == _ncSA_1xy0x0y0 )
     return new CCommutativeSpecialPairMultiplier(r, i, j);
 
@@ -803,16 +803,16 @@ CSpecialPairMultiplier* AnalyzePair(const ring r, int i, int j)
     const number q = p_GetCoeff(GetC(r, i, j), r);
     return new CQuasiCommutativeSpecialPairMultiplier(r, i, j, q);
   }
-  
+
   const poly d = GetD(r, i, j);
-  
+
   assume( d != NULL );
   assume( pNext(d) == NULL );
 
   const number g = p_GetCoeff(d, r);
 
   if( type == _ncSA_1xy0x0yG ) // Weyl
-    return new CWeylSpecialPairMultiplier(r, i, j, g);          
+    return new CWeylSpecialPairMultiplier(r, i, j, g);
 
   if( type == _ncSA_1xyAx0y0 ) // Shift 1
     return new CShiftSpecialPairMultiplier(r, i, j, i, g);
@@ -832,7 +832,7 @@ CSpecialPairMultiplier* AnalyzePair(const ring r, int i, int j)
 
 CPowerMultiplier::CPowerMultiplier(ring r): CMultiplier<CPower>(r)
 {
-#if OUTPUT  
+#if OUTPUT
   PrintS("CPowerMultiplier::CPowerMultiplier(ring)!");
   PrintLn();
 #endif
@@ -847,7 +847,7 @@ CPowerMultiplier::CPowerMultiplier(ring r): CMultiplier<CPower>(r)
 
 CPowerMultiplier::~CPowerMultiplier()
 {
-#if OUTPUT  
+#if OUTPUT
   PrintS("CPowerMultiplier::~CPowerMultiplier()!");
   PrintLn();
 #endif
@@ -864,18 +864,18 @@ poly CPowerMultiplier::MultiplyME(const poly pMonom, const CExponent expRight)
   const int n = expRight.Power;
 
   const ring r = GetBasering();
-  
-#if OUTPUT  
+
+#if OUTPUT
   Print("CPowerMultiplier::MultiplyME(monom * var(%d)^{%d})!", j, n);
   PrintLn();
-  PrintS("Monom: "); p_Write(pMonom, r);  
+  PrintS("Monom: "); p_Write(pMonom, r);
 #endif
 
   assume( (j > 0) && (j <= NVars()));
 
   if( n == 0 )
     return p_Head(pMonom, r); // Copy?!?
-  
+
 
   int v = NVars();
   int e = p_GetExp(pMonom, v, r);
@@ -886,37 +886,37 @@ poly CPowerMultiplier::MultiplyME(const poly pMonom, const CExponent expRight)
   // TODO: review this!
   if( v == j )
   {
-    poly p = p_Head(pMonom, r);    
+    poly p = p_Head(pMonom, r);
     p_SetExp(p, v, e + n, r);
-    p_Setm(p, r);    
+    p_Setm(p, r);
 
     return p;
   }
 
   assume( v > j );
   assume( e > 0 );
- 
+
   // And now the General Case: v > j!
 
   poly p = MultiplyEE( CPower(v, e), expRight ); // Easy way!
 
   --v;
-  
+
   while(v > 0)
   {
     e = p_GetExp(pMonom, v, GetBasering());
-    
+
     if( e > 0 )
       p = MultiplyEPDestroy(CPower(v, e), p);
 
     --v;
   }
 
-#if OUTPUT  
+#if OUTPUT
   PrintS("CPowerMultiplier::MultiplyME() ===> ");
-  p_Write(p, GetBasering());  
+  p_Write(p, GetBasering());
 #endif
-  
+
   return p;
 }
 
@@ -930,10 +930,10 @@ poly CPowerMultiplier::MultiplyEM(const CExponent expLeft, const poly pMonom)
   const int j = expLeft.Var;
   const int n = expLeft.Power;
 
-#if OUTPUT  
+#if OUTPUT
   Print("CPowerMultiplier::MultiplyEM(var(%d)^{%d} * monom)!", j, n);
   PrintLn();
-  PrintS("Monom: "); p_Write(pMonom, r);  
+  PrintS("Monom: "); p_Write(pMonom, r);
 #endif
 
   assume( (j > 0) && (j <= NVars()));
@@ -948,11 +948,11 @@ poly CPowerMultiplier::MultiplyEM(const CExponent expLeft, const poly pMonom)
   while((v < j) && (e == 0))
     e = p_GetExp(pMonom, ++v, r);
 
-  if( v == j ) 
+  if( v == j )
   {
-    poly p = p_Head(pMonom, r);    
+    poly p = p_Head(pMonom, r);
     p_SetExp(p, j, e + n, r);
-    p_Setm(p, r);    
+    p_Setm(p, r);
 
     return p;
   }
@@ -960,7 +960,7 @@ poly CPowerMultiplier::MultiplyEM(const CExponent expLeft, const poly pMonom)
   assume( v < j );
   assume( e > 0 );
 
-  
+
   // And now the General Case: v > j!
 
   poly p = MultiplyEE( expLeft, CPower(v, e) ); // Easy way!
@@ -970,20 +970,20 @@ poly CPowerMultiplier::MultiplyEM(const CExponent expLeft, const poly pMonom)
   while(v <= NVars())
   {
     e = p_GetExp(pMonom, v, r);
-    
+
     if( e > 0 )
       p = MultiplyPEDestroy(p, CPower(v, e));
-          
+
     ++v;
   }
 
-#if OUTPUT  
+#if OUTPUT
   PrintS("CPowerMultiplier::MultiplyEM() ===> ");
-  p_Write(p, r);  
+  p_Write(p, r);
 #endif
 
   return p;
-  
+
 }
 
 
@@ -991,7 +991,7 @@ poly CPowerMultiplier::MultiplyEM(const CExponent expLeft, const poly pMonom)
 // Computes: var(j)^{expLeft} * var(i)^{expRight}
 poly CPowerMultiplier::MultiplyEE(const CExponent expLeft, const CExponent expRight)
 {
-#if OUTPUT  
+#if OUTPUT
   PrintS("CPowerMultiplier::MultiplyEE)!");
   PrintLn();
 #endif
@@ -999,7 +999,7 @@ poly CPowerMultiplier::MultiplyEE(const CExponent expLeft, const CExponent expRi
   const int i = expRight.Var, j = expLeft.Var;
   const int ei = expRight.Power, ej = expLeft.Power;
 
-#if OUTPUT  
+#if OUTPUT
   Print("Input: var(%d)^{%d} * var(%d)^{%d}", j, ej, i, ei);
   PrintLn();
 #endif
@@ -1010,7 +1010,7 @@ poly CPowerMultiplier::MultiplyEE(const CExponent expLeft, const CExponent expRi
   assume(i <= NVars());
   assume(ei > 0);
   assume(ej > 0);
-  
+
   if( i >= j )
   {
     const ring r = GetBasering();
@@ -1042,15 +1042,15 @@ poly CPowerMultiplier::MultiplyEE(const CExponent expLeft, const CExponent expRi
     {
       // Perform general NC Multiplication:
       // TODO
-      
+
       WerrorS("Sorry the general case is not implemented this way yet!!!");
       assume(0);
 
       // poly product = NULL;
     }
   }
-  
-  return NULL;  
+
+  return NULL;
 }
 
 
@@ -1061,11 +1061,11 @@ poly CPowerMultiplier::MultiplyEE(const CExponent expLeft, const CExponent expRi
 CSpecialPairMultiplier::CSpecialPairMultiplier(ring r, int i, int j):
     CMultiplier<int>(r), m_i(i), m_j(j)
 {
-#if OUTPUT  
+#if OUTPUT
   Print("CSpecialPairMultiplier::CSpecialPairMultiplier(ring, i: %d, j: %d)!", i, j);
   PrintLn();
 #endif
-  
+
   assume(i < j);
   assume(i > 0);
   assume(j <= NVars());
@@ -1074,7 +1074,7 @@ CSpecialPairMultiplier::CSpecialPairMultiplier(ring r, int i, int j):
 
 CSpecialPairMultiplier::~CSpecialPairMultiplier()
 {
-#if OUTPUT  
+#if OUTPUT
   PrintS("CSpecialPairMultiplier::~CSpecialPairMultiplier()!");
   PrintLn();
 #endif
@@ -1085,20 +1085,20 @@ CSpecialPairMultiplier::~CSpecialPairMultiplier()
 // Monom * Exponent
 poly CSpecialPairMultiplier::MultiplyME(const poly pMonom, const CExponent expRight)
 {
-#if OUTPUT  
-  Print("CSpecialPairMultiplier::MultiplyME(monom, var(%d)^{%d})!", GetI(), expRight);  
+#if OUTPUT
+  Print("CSpecialPairMultiplier::MultiplyME(monom, var(%d)^{%d})!", GetI(), expRight);
   PrintLn();
   PrintS("Monom: "); p_Write(pMonom, GetBasering());
 #endif
-  
+
   return MultiplyEE(p_GetExp(pMonom, GetJ(), GetBasering()), expRight);
 }
 
     // Exponent * Monom
 poly CSpecialPairMultiplier::MultiplyEM(const CExponent expLeft, const poly pMonom)
 {
-#if OUTPUT  
-  Print("CSpecialPairMultiplier::MultiplyEM(var(%d)^{%d}, monom)!", GetJ(), expLeft);  
+#if OUTPUT
+  Print("CSpecialPairMultiplier::MultiplyEM(var(%d)^{%d}, monom)!", GetJ(), expLeft);
   PrintLn();
   PrintS("Monom: "); p_Write(pMonom, GetBasering());
 #endif

@@ -141,7 +141,7 @@ convertFmpz_mod_poly_t2FacCF (
                              );
 
 #if __FLINT_RELEASE >= 20400
-/// conversion of a FLINT element of F_q to a CanonicalForm with alg. variable 
+/// conversion of a FLINT element of F_q to a CanonicalForm with alg. variable
 /// alpha
 CanonicalForm
 convertFq_nmod_t2FacCF (const fq_nmod_t poly, ///< [in] fq_nmod_t
@@ -181,7 +181,7 @@ convertFacCF2Fq_poly_t (fq_poly_t result,      ///< [in,out] fq_poly_t
 /// conversion of a factory univariate poly over F_q to a FLINT fq_nmod_poly_t
 void
 convertFacCF2Fq_nmod_poly_t (fq_nmod_poly_t result, ///< [in,out] fq_nmod_poly_t
-                             const CanonicalForm& f,///< [in] univariate poly 
+                             const CanonicalForm& f,///< [in] univariate poly
                                                     ///< over Fq
                              const fq_nmod_ctx_t ctx///< [in] Fq context
                             );

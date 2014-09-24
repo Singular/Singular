@@ -1,9 +1,9 @@
 // -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file syzextra.h
- * 
+ *
  * Computation of Syzygies
  *
  * ABSTRACT: Computation of Syzygies due to Schreyer
@@ -65,9 +65,9 @@ struct SchreyerSyzygyComputationFlags
   //      __SYZCHECK__(attr.__SYZCHECK__),
         __LEAD2SYZ__(attr.__LEAD2SYZ__),  __TAILREDSYZ__(attr.__TAILREDSYZ__),
         __HYBRIDNF__(attr.__HYBRIDNF__), __IGNORETAILS__(attr.__IGNORETAILS__),
-        __SYZNUMBER__(attr.__SYZNUMBER__), __TREEOUTPUT__(attr.__TREEOUTPUT__), 
+        __SYZNUMBER__(attr.__SYZNUMBER__), __TREEOUTPUT__(attr.__TREEOUTPUT__),
         m_rBaseRing(attr.m_rBaseRing)
-    {}   
+    {}
 
   /// output all the intermediate states
   const int __DEBUG__; // DebugOutput;
@@ -90,7 +90,7 @@ struct SchreyerSyzygyComputationFlags
 
   /// Syzygy level (within a resolution)
   mutable int __SYZNUMBER__;
-   
+
   inline void  nextSyzygyLayer() const
   {
      __SYZNUMBER__++;
@@ -111,7 +111,7 @@ class CLCM: public SchreyerSyzygyComputationFlags, public std::vector<bool>
     CLCM(const ideal& L, const SchreyerSyzygyComputationFlags& flags);
 
     bool Check(const poly m) const;
-    
+
   private:
     bool m_compute;
 
@@ -121,7 +121,7 @@ class CLCM: public SchreyerSyzygyComputationFlags, public std::vector<bool>
 
 class CLeadingTerm
 {
-  public: 
+  public:
     CLeadingTerm(unsigned int label,  const poly lt, const ring);
 
   public:
@@ -165,7 +165,7 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
     ~CReducerFinder();
 
     // TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?
-    poly // const_iterator // TODO: return const_iterator it, s.th: it->m_lt is the needed 
+    poly // const_iterator // TODO: return const_iterator it, s.th: it->m_lt is the needed
     FindReducer(const poly product, const poly syzterm, const CReducerFinder& checker) const;
 
     bool IsDivisible(const poly q) const;
@@ -176,11 +176,11 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
     int PreProcessTerm(const poly t, CReducerFinder& syzChecker) const;
 
     poly FindReducer(const poly multiplier, const poly monom, const poly syzterm, const CReducerFinder& checker) const;
-    
+
 #ifndef NDEBUG
     void DebugPrint() const;
 #endif
-    
+
   private:
     ideal m_L; ///< only for debug
 
@@ -201,21 +201,21 @@ struct CCacheCompare
 {
   const ring & m_ring;
 
-  CCacheCompare(); 
-  
+  CCacheCompare();
+
   CCacheCompare(const ring& r): m_ring(r) { assume(r != NULL); }
 
   CCacheCompare(const CCacheCompare& lhs): m_ring(lhs.m_ring) { assume(m_ring != NULL); }
   CCacheCompare& operator=(const CCacheCompare& lhs) { assume(lhs.m_ring != NULL); return (const_cast<CCacheCompare&>(lhs)); }
-    
+
   inline bool operator() (const TCacheKey& l, const TCacheKey& r) const { assume(m_ring != NULL); return my_p_LmCmp(l, r, m_ring); }
 };
-   
+
 typedef std::map<TCacheKey, TCacheValue, CCacheCompare> TP2PCache; // deallocation??? !!!
 typedef std::map<int, TP2PCache> TCache;
 
 /** @class SchreyerSyzygyComputation syzextra.h
- * 
+ *
  * Computing syzygies after Schreyer
  *
  * Storing/accumulating data during the computation requires some global
@@ -228,14 +228,14 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
 {
   friend class CLCM;
   friend class CReducerFinder;
-  
+
   public:
     /// Construct a global object for given input data (separated into leads & tails)
     SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const SchreyerSyzygyComputationFlags setting):
         SchreyerSyzygyComputationFlags(setting),
-        m_idLeads(idLeads), m_idTails(id_Copy(idTails, setting.m_rBaseRing)), 
+        m_idLeads(idLeads), m_idTails(id_Copy(idTails, setting.m_rBaseRing)),
         m_syzLeads(NULL), m_syzTails(NULL),
-        m_LS(NULL), m_lcm(m_idLeads, setting), 
+        m_LS(NULL), m_lcm(m_idLeads, setting),
         m_div(m_idLeads, setting), m_checker(NULL, setting), m_cache(),
         m_sum_bucket(NULL), m_spoly_bucket(NULL)
     {
@@ -244,7 +244,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /// Construct a global object for given input data (separated into leads & tails)
     SchreyerSyzygyComputation(const ideal idLeads, const ideal idTails, const ideal syzLeads, const SchreyerSyzygyComputationFlags setting):
         SchreyerSyzygyComputationFlags(setting),
-        m_idLeads(idLeads), m_idTails(id_Copy(idTails, setting.m_rBaseRing)), 
+        m_idLeads(idLeads), m_idTails(id_Copy(idTails, setting.m_rBaseRing)),
         m_syzLeads(syzLeads), m_syzTails(NULL),
         m_LS(syzLeads), m_lcm(m_idLeads, setting),
         m_div(m_idLeads, setting), m_checker(NULL, setting), m_cache(),
@@ -259,22 +259,22 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
       }
     }
 
-    /// Destructor should not destruct the resulting m_syzLeads, m_syzTails. 
-    ~SchreyerSyzygyComputation(){ CleanUp(); } 
+    /// Destructor should not destruct the resulting m_syzLeads, m_syzTails.
+    ~SchreyerSyzygyComputation(){ CleanUp(); }
 
     /// Convert the given ideal of tails into the internal representation (with reducers!)
     /// Preprocess m_idTails as well...?
     void SetUpTailTerms();
-    
+
     /// Read off the results while detaching them from this object
     /// NOTE: no copy!
     inline void ReadOffResult(ideal& syzL, ideal& syzT)
     {
-      syzL = m_syzLeads; syzT = m_syzTails; 
+      syzL = m_syzLeads; syzT = m_syzTails;
 
       m_syzLeads = m_syzTails = NULL; // m_LS ?
     }
-    
+
     /// The main driver function: computes
     void ComputeSyzygy();
 
@@ -284,7 +284,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
 
     poly SchreyerSyzygyNF(const poly syz_lead, poly syz_2 = NULL) const;
 
-    /// High level caching function!!! 
+    /// High level caching function!!!
     poly TraverseTail(poly multiplier, const int tail) const;
 
     // REMOVE?
@@ -297,14 +297,14 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /// low level computation...
     poly ComputeImage(poly multiplier, const int tail) const;
 
-    // 
+    //
     poly TraverseNF(const poly syz_lead, const poly syz_2 = NULL) const;
 
-    
+
   public:
     /// just for testing via the wrapper below
     inline poly _FindReducer(const poly product, const poly syzterm) const
-        { return m_div.FindReducer(product, syzterm, m_checker); }  
+        { return m_div.FindReducer(product, syzterm, m_checker); }
  private:
     void CleanUp();
   protected:
@@ -328,7 +328,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
 
     /// output (syzygy) tails
     ideal m_syzTails;
-    
+
     /*mutable?*/ ideal m_LS; ///< leading syzygy terms used for reducing syzygy tails
 
 
@@ -344,32 +344,32 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /*
     // need more data here:
     // (m_idLeads : m_tailterm) = (m, pos, compl), s.th: compl * m_tailterm divides m_idLeads[pos]
-    // but resulting sysygy compl * gen(pos) should not be in 
+    // but resulting sysygy compl * gen(pos) should not be in
     // Idea: extend CReducerFinder??!!
     struct CTailTerm
     {
       const poly m_tailterm;
-      
+
       const CReducerFinder m_reducers; // positions are labels (in m_idLeads)...
-      // compl - to be computed if needed? 
+      // compl - to be computed if needed?
 
       CTailTerm(const poly tt, const CReducerFinder reds): m_tailterm(tt), m_reducers(reds) {}
     };
 
     typedef std::vector<const CTailTerm*> TTail;
     typedef std::vector<TTail> TTailTerms;
-    
+
     TTailTerms m_idTailTerms;
     */
-   
+
     mutable TCache m_cache; // cacher comp + poly -> poly! // mutable???
 
 /// TODO: look into m_idTailTerms!!!!!!!!!!!!!!!!!!!!!!!! map? heaps???
     // NOTE/TODO: the following globally shared buckets violate reentrance - they should rather belong to TLS!
-    
-    /// used for simple summing up 
+
+    /// used for simple summing up
     mutable sBucket_pt m_sum_bucket;
-    
+
     /// for S-Polynomial reductions
     mutable kBucket_pt m_spoly_bucket;
 };
@@ -409,7 +409,7 @@ static inline poly FindReducer(poly product, poly syzterm,
   return syz._FindReducer(product, syzterm);
 }
 
-static inline poly TraverseTail(poly multiplier, poly tail, 
+static inline poly TraverseTail(poly multiplier, poly tail,
                                 ideal L, ideal T, ideal LS, const SchreyerSyzygyComputationFlags A)
 {
   SchreyerSyzygyComputation syz(L, T, LS, A);
@@ -432,10 +432,10 @@ static inline poly SchreyerSyzygyNF(poly syz_lead, poly syz_2,
 }
 
 END_NAMESPACE
-   
+
 END_NAMESPACE_SINGULARXX
 
-#endif 
+#endif
 /* #ifndef SYZEXTRA_H */
 
 // Vi-modeline: vim: filetype=c:syntax:shiftwidth=2:tabstop=8:textwidth=0:expandtab

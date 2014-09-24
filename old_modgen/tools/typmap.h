@@ -6,7 +6,7 @@
 #define _TYPMAP_H
 char type_conv[MAX_TOK][32];
 
-void init_type_conv() 
+void init_type_conv()
 {
   strcpy(type_conv[NONE], "none");
   strcpy(type_conv[NONE], "void");

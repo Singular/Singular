@@ -7,7 +7,7 @@
 
 # ifdef DISABLE_GMP_CPP
 #  undef __cplusplus
-extern "C" 
+extern "C"
 {
 */
 

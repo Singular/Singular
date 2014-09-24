@@ -33,8 +33,8 @@ static scfmon hsecure= NULL;
 
 scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
 {
-  id_TestTail(S, currRing, tailRing);  
-  id_TestTail(Q, currRing, tailRing);  
+  id_TestTail(S, currRing, tailRing);
+  id_TestTail(Q, currRing, tailRing);
 
 //   if (tailRing != currRing)
     hisModule = id_RankFreeModule(S, currRing, tailRing);
@@ -43,11 +43,11 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
 
   if (hisModule < 0)
     hisModule = 0;
-   
+
   int  sl, ql, i, k = 0;
   polyset si, qi, ss;
   scfmon ex, ek;
-   
+
   if (S!=NULL)
   {
     si = S->m;

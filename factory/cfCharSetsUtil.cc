@@ -31,11 +31,11 @@ degpsmax (const CFList & PS, const Variable & x,
   if (A[varlevel] != __ARRAY_INIT__)
     return A[varlevel];
   int max= 0, temp, count= 0;
-  
+
   for (CFListIterator i= PS; i.hasItem(); i++)
   {
     temp= degree (i.getItem(), x);
-    if (temp > max) 
+    if (temp > max)
     {
       max= temp;
       count = 0;
@@ -113,14 +113,14 @@ Tdeg (const CFList & PS, const Variable & x, Intarray & A, Intarray & B,
       if (degree (elem, x) == k)
         LCdegList.append (LC (elem, x));
     }
-    
+
     if (LCdegList.length() > 0)
     {
       CFList TermList;
       int newmin, newnopslc;
 
       min= totaldegree (LCdegList.getFirst());
-      TermList= get_Terms (LCdegList.getFirst()); 
+      TermList= get_Terms (LCdegList.getFirst());
       nopslc= TermList.length();
       for (i= LCdegList; i.hasItem(); i++)
       {
@@ -129,11 +129,11 @@ Tdeg (const CFList & PS, const Variable & x, Intarray & A, Intarray & B,
         TermList= get_Terms(elem);
         newnopslc= TermList.length();
         if (newmin < min)
-          min= newmin; 
+          min= newmin;
         if (newnopslc < nopslc)
           nopslc= newnopslc;
       }
-      
+
     }
     E[varlevel]= min;
     F[varlevel]= nopslc;
@@ -185,8 +185,8 @@ degord (const Variable & x, const Variable & y, const CFList & PS,
 // NOTE:
 //    this doesn't give always the correct answer:
 //    If a variable is assigned the highest level in the definition of the
-//    original ring, but doesn't occure in any of the 
-//    polynomials, get_max_var returns the variable with a level lower than 
+//    original ring, but doesn't occure in any of the
+//    polynomials, get_max_var returns the variable with a level lower than
 //    the highest level.
 //    Is there a workaround?
 // But for the redefinition of the ring this doesn't matter due to the
@@ -273,11 +273,11 @@ reorderb (const Varlist & difference, const CFList & PS,
     v[i]= J.getItem();
     i++;
   }
-  
+
   while (gap <= n)
     gap = __INIT_GAP__ * gap + 1;
   gap /= __INIT_GAP__;
-  
+
   while (gap > 0)
   {
     for (i= gap; i <= n - 1; i++)

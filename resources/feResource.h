@@ -52,7 +52,7 @@ void feInitResources(const char* argv0);
 void feReInitResources();
 #endif /* end ifdef __cplusplus */
 
-extern char* feArgv0; 
+extern char* feArgv0;
 
 const char fePathSep =
 /* not really cygwin, applies to all windows systems:*/

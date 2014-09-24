@@ -58,12 +58,12 @@ static char* nrnCoeffString(const coeffs r)
   return s;
 }
 
-static void nrnKillChar(coeffs r) 
+static void nrnKillChar(coeffs r)
 {
   mpz_clear(r->modNumber);
   mpz_clear(r->modBase);
   omFreeBin((void *) r->modBase, gmp_nrz_bin);
-  omFreeBin((void *) r->modNumber, gmp_nrz_bin); 
+  omFreeBin((void *) r->modNumber, gmp_nrz_bin);
 }
 
 coeffs nrnQuot1(number c, const coeffs r)
@@ -410,7 +410,7 @@ number nrnXExtGcd(number a, number b, number *s, number *t, number *u, number *v
     mpz_mul(bv, bv, uu);
     mpz_clear(uu);
     omFreeBin(uu, gmp_nrz_bin);
-  } 
+  }
   nrnDelete(&ui, r);
 #ifdef CF_DEB
   StringSetS("xgcd");
@@ -636,15 +636,15 @@ number nrnIntDiv(number a, number b, const coeffs r)
 
 /* CF: note that Z/nZ has (at least) two distinct euclidean structures
  * 1st phi(a) := (a mod n) which is just the structure directly
- *     inherited from Z 
+ *     inherited from Z
  * 2nd phi(a) := gcd(a, n)
  * The 1st version is probably faster as everything just comes from Z,
  * but the 2nd version behaves nicely wrt. to quotient operations
  * and HNF and such. In agreement with nrnMod we imlement the 2nd here
  *
- * For quotrem note that if b exactly divides a, then 
+ * For quotrem note that if b exactly divides a, then
  *   min(v_p(a), v_p(n))  >= min(v_p(b), v_p(n))
- * so if we divide  a and b by g:= gcd(a,b,n), then   b becomes a 
+ * so if we divide  a and b by g:= gcd(a,b,n), then   b becomes a
  * unit mod n/g.
  * Thus we 1st compute the remainder (similar to nrnMod) and then
  * the exact quotient.

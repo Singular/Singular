@@ -136,7 +136,7 @@ CanonicalForm myGetVars (const CanonicalForm& F ///< [in] a polynomial
 
 /// evaluate @a F at @a evaluation
 ///
-/// @return @a evaluateAtEval returns a list containing the successive 
+/// @return @a evaluateAtEval returns a list containing the successive
 /// evaluations of @a F, last entry is @a F again
 CFList
 evaluateAtEval (const CanonicalForm& F,   ///<[in] some poly
@@ -168,7 +168,7 @@ CFList recoverFactors (const CanonicalForm& F, ///< [in] some poly F
                                                ///< factor candidates
                       );
 
-/// divides factors shifted by evaluation by their content wrt. Variable(1) and 
+/// divides factors shifted by evaluation by their content wrt. Variable(1) and
 /// checks if these polys divide F
 ///
 /// @return returns factors of F

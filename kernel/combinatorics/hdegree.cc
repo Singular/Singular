@@ -839,9 +839,9 @@ void scDegree(ideal S, intvec *modulweight, ideal Q)
 
 static void hDegree0(ideal S, ideal Q, const ring tailRing)
 {
-  id_TestTail(S, currRing, tailRing);  
+  id_TestTail(S, currRing, tailRing);
   id_TestTail(Q, currRing, tailRing);
-   
+
   int  mc;
   hexist = hInit(S, Q, &hNexist, tailRing);
   if (!hNexist)
@@ -851,9 +851,9 @@ static void hDegree0(ideal S, ideal Q, const ring tailRing)
   }
   else
     hMu = 0;
-   
+
   const ring r = currRing;
-   
+
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc(((r->N) + 1) * sizeof(int));
   hpur0 = (scmon)omAlloc((1 + ((r->N) * (r->N))) * sizeof(int));
@@ -913,7 +913,7 @@ static void hDegree0(ideal S, ideal Q, const ring tailRing)
 
 int  scMult0Int(ideal S, ideal Q, const ring tailRing)
 {
-  id_TestTail(S, currRing, tailRing);  
+  id_TestTail(S, currRing, tailRing);
   id_TestTail(Q, currRing, tailRing);
   hDegree0(S, Q, tailRing);
   return hMu;
@@ -998,8 +998,8 @@ static void hHedgeStep(scmon pure, scfmon stc,
 
 void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
 {
-  id_TestTail(S, currRing, tailRing);  
-  id_TestTail(Q, currRing, tailRing);  
+  id_TestTail(S, currRing, tailRing);
+  id_TestTail(Q, currRing, tailRing);
   int  i;
   int  k = ak;
 
@@ -1323,16 +1323,16 @@ static ideal scIdKbase(poly q, const int rank)
     const poly p = pNext(q);
     pNext(q) = NULL;
     q = p;
-     
+
   } while (q!=NULL);
-   
+
   id_Test(res, currRing);   // WRONG RANK!!!???
   return res;
 }
 
 ideal scKBase(int deg, ideal s, ideal Q, intvec * mv)
 {
-  id_Test(Q, currRing);  
+  id_Test(Q, currRing);
   int  i, di;
   poly p;
 
@@ -1390,7 +1390,7 @@ ende:
   pLmDelete(&p);
   if (p == NULL)
     return idInit(1,s->rank);
-   
+
   last = p;
   return scIdKbase(p, s->rank);
 }
@@ -1399,9 +1399,9 @@ ende:
 /*
 void scComputeHCw(ideal ss, ideal Q, int ak, poly &hEdge, ring tailRing)
 {
-  id_TestTail(ss, currRing, tailRing);  
+  id_TestTail(ss, currRing, tailRing);
   id_TestTail(Q, currRing, tailRing);
-   
+
   int  i, di;
   poly p;
 
@@ -1478,5 +1478,5 @@ ende:
     return;
   }
 }
- */ 
+ */
 #endif

@@ -1209,7 +1209,7 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
     m_spoly_bucket = kBucketCreate(r);
 
   sBucket_pt& tail   = m_sum_bucket; assume( tail != NULL );
-  kBucket_pt& bucket = m_spoly_bucket; assume( bucket != NULL ); 
+  kBucket_pt& bucket = m_spoly_bucket; assume( bucket != NULL );
   kbTest(bucket);
 
 

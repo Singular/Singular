@@ -1409,7 +1409,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   /* propagate characteristic up so that it becomes
      directly accessible in cf: */
   cf->ch = R->cf->ch;
-  
+
   cf->is_field=TRUE;
   cf->is_domain=TRUE;
   cf->rep=n_rep_poly;

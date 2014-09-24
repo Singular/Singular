@@ -59,11 +59,11 @@ void IpIdTest::setUp() {
 void IpIdTest::tearDown() {
 }
 
-void IpIdTest::test_iiS2I() 
+void IpIdTest::test_iiS2I()
 {
   const char *s1 = "1233";
   printf("iiS2I(%s)=%d\n", s1, iiS2I(s1));
-  
+
   return;
 }
 
@@ -75,7 +75,7 @@ void IpIdTest::test_enterid() {
   idhdl rh;
   std::cout<<"enterid\n";
   printf("Base: %p\n", basePack);
-  
+
   std::cout<<"enterid\n";
   std::cout<<"enterid\n";
   fStart = Time();
@@ -108,7 +108,7 @@ void IpIdTest::test_enterid() {
   while (h!=NULL)
   {
     std::cout<<"Name: "<<h->id<<std::endl;
-    
+
     h = IDNEXT(h);
   }
 #endif

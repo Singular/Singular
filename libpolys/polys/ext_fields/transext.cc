@@ -192,8 +192,8 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
   //check_N(a,cf);
   const poly num = NUM(t);
   assume(num != NULL);   /**< t != 0 ==> numerator(t) != 0 */
-  
-  p_Test(num, ntRing); 
+
+  p_Test(num, ntRing);
 
   const poly den = DEN(t);
 

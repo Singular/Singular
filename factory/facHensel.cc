@@ -6,7 +6,7 @@
  * This file implements functions to lift factors via Hensel lifting.
  *
  * ABSTRACT: Hensel lifting is described in "Efficient Multivariate
- * Factorization over Finite Fields" by L. Bernardin & M. Monagon and 
+ * Factorization over Finite Fields" by L. Bernardin & M. Monagon and
  * "Algorithms for Computer Algebra" by Geddes, Czapor, Labahn
  *
  * @author Martin Lee
@@ -408,7 +408,7 @@ modularDiophant (const CanonicalForm& f, const CFList& factors,
           for (CFListIterator i= result; i.hasItem(); i++, j++)
             i.getItem() *= Lc (j.getItem())*denf;
         }
-        if (factors.getFirst().level() != 1 && 
+        if (factors.getFirst().level() != 1 &&
             !bCommonDen (factors.getFirst()).isOne())
         {
           CanonicalForm denFirst= bCommonDen (factors.getFirst());
@@ -2562,7 +2562,7 @@ nonMonicHenselLift2 (const CFList& eval, const CFList& factors, int* l, int
     sortList (buf, Variable (1));
   CFArray bufPi= Pi;
   CFMatrix M= CFMatrix (l[1], factors.length());
-  CFList result= 
+  CFList result=
     nonMonicHenselLift232(eval, buf, l, bufDiophant, bufPi, M, LCs1, LCs2, bad);
   if (bad)
     return CFList();

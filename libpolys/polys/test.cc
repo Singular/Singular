@@ -40,7 +40,7 @@
 #define  TS_ASSERT_EQUALS(a, b) assume( a == b )
 #define  TS_ASSERT_DIFFERS(a, b) assume( a != b )
 #define  TS_FAIL(a) WerrorS(a)
-    
+
 
 namespace
 {
@@ -85,9 +85,9 @@ namespace
     StringSetS("");
     n_Write(a, r);
 
-    std::stringstream ss; 
+    std::stringstream ss;
     {
-      char* s = StringEndS();  ss << s; omFree(s); 
+      char* s = StringEndS();  ss << s; omFree(s);
     }
 
     return ss.str();
@@ -127,11 +127,11 @@ void PrintRing(const ring r)
     StringSetS("");
     p_Write(a, r);
 
-    std::stringstream ss; 
+    std::stringstream ss;
     {
-      char* s = StringEndS();  ss << s; omFree(s); 
+      char* s = StringEndS();  ss << s; omFree(s);
     }
-     
+
     return ss.str();
   }
 
@@ -398,7 +398,7 @@ void Test(const ring r)
    }
 
 
-int main( int, char *argv[] ) 
+int main( int, char *argv[] )
 {
   assume( sizeof(long) == SIZEOF_LONG );
 
@@ -409,7 +409,7 @@ int main( int, char *argv[] )
     return(1);
   }
 
-   
+
   feInitResources(argv[0]);
 
   StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
@@ -418,12 +418,12 @@ int main( int, char *argv[] )
 
   { char* s = StringEndS(); PrintS(s); omFree(s); }
 
-   
+
    test_Z13_t();
    test_QQ_t();
    test_Z11_x_y_z();
    test_QQ_x_y_z();
-   test_Z13_t_GF();   
+   test_Z13_t_GF();
 
    return 0;
 }

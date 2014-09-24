@@ -2632,8 +2632,8 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
   }
   else
   {
-    if (IDELEMS(M)>IDELEMS(r)) { 
-       idDelete(&M); 
+    if (IDELEMS(M)>IDELEMS(r)) {
+       idDelete(&M);
        M=idCopy(r); }
   }
   return r;

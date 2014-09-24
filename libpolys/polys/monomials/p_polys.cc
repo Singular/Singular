@@ -1228,7 +1228,7 @@ BOOLEAN p_OneComp(poly p, const ring r)
 */
 int p_IsPurePower(const poly p, const ring r)
 {
-#ifdef HAVE_RINGS 
+#ifdef HAVE_RINGS
   if (rField_is_Ring(r))
           {
           if (p == NULL) return 0;
@@ -3037,8 +3037,8 @@ void p_ProjectiveUnique(poly ph, const ring r)
   }
 
   p_Cleardenom(ph, r); //performs also a p_Content
-  
-  
+
+
     /* normalize ph over a transcendental extension s.t.
        lead (ph) is > 0 if extRing->cf == Q
        or lead (ph) is monic if extRing->cf == Zp*/
@@ -4615,7 +4615,7 @@ unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r)
   assume(p != NULL);
   assume(pp != NULL);
   if (p == NULL || pp == NULL) return 0;
-  
+
   unsigned long ev = 0; // short exponent vector
   unsigned int n = BIT_SIZEOF_LONG / r->N; // number of bits per exp
   unsigned int m1; // highest bit which is filled with (n+1)

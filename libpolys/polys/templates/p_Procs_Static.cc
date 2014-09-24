@@ -39,7 +39,7 @@ const BOOLEAN p_procs_dynamic = FALSE;
 
 // define DoSetProc and InitSetProcs
 // cast_A_to_B<what##_Proc_Ptr, what##_Proc_Ptr> ???
-//  _p_procs->what =            cast_vptr_to_A<what##_Proc_Ptr>( ??? 
+//  _p_procs->what =            cast_vptr_to_A<what##_Proc_Ptr>( ???
 #define SetStaticProcFromArray(what, type, field, length, ord) \
   _p_procs->what =            (what##_Proc_Ptr)( \
     what##_Proc_##type [index(what##_Proc, field, length, ord)])

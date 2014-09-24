@@ -13,7 +13,7 @@ static inline int n_GetChar(const ring r){ return n_GetChar(r->cf); }
 
 // static inline BOOLEAN n_Test(number n, const char *filename, const int linenumber, const ring r){ return n_DBTest( n, filename, linenumber, r->cf); }
 // static inline BOOLEAN n_Test(number a, const ring r){  return n_DBTest(a, __FILE__, __LINE__, r); }
-// #define n_Test(a,r)  
+// #define n_Test(a,r)
 
 
 

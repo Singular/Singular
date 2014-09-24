@@ -3409,7 +3409,7 @@ void make_version(char *p,int what)
 void copy_string(lp_modes mode)
 {
 #ifdef STANDALONE_PARSER
-  if ((texinfo_out 
+  if ((texinfo_out
      && (last_cmd == LP_INFO || last_cmd == LP_CATEGORY || last_cmd == LP_URL))
   || (category_out && last_cmd == LP_CATEGORY)
 )

@@ -1,10 +1,10 @@
 /*! \file kernel/polys.h Compatiblity layer for legacy polynomial operations (over @ref currRing)
-  
- Macro defines for legacy polynomial operations used in @ref kernel_page and @ref singular_page.  
- They take no ring argument since they work with @ref currRing by default. 
+
+ Macro defines for legacy polynomial operations used in @ref kernel_page and @ref singular_page.
+ They take no ring argument since they work with @ref currRing by default.
  Notice that they have different prefix: `p` instead of `p_`.
 
- See also related global ring variable and the correct ring changeing routine: 
+ See also related global ring variable and the correct ring changeing routine:
  - \ref currRing
  - \ref rChangeCurrRing
 */

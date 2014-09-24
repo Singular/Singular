@@ -88,7 +88,7 @@ struct nc_struct
   // initial data: square matrices rVar() x rVar()
   // logically: upper triangular!!!
   // TODO: eliminate this waste of memory!!!!
-  matrix C; 
+  matrix C;
   matrix D;
 
   // computed data:
@@ -96,7 +96,7 @@ struct nc_struct
   matrix COM;
   int *MTsize; // size 0.. (rVar()*rVar()-1)/2
 
-  // IsSkewConstant indicates whethere coeffs C_ij are all equal, 
+  // IsSkewConstant indicates whethere coeffs C_ij are all equal,
   // effective together with nc_type=nc_skew
   int IsSkewConstant;
 
@@ -113,28 +113,28 @@ struct nc_struct
         // 1 <= iAltVarsStart <= iAltVarsEnd <= r->N
         short iFirstAltVar, iLastAltVar; // = 0 by default
 
-        // for factors of super-commutative algebras we need 
-        // the part of general quotient ideal modulo squares!    
+        // for factors of super-commutative algebras we need
+        // the part of general quotient ideal modulo squares!
         ideal idSCAQuotient; // = NULL by default. // must be deleted in Kill!
       } sca;
     } data;
 
   public:
-    
+
     inline nc_type& ncRingType() { return (type); };
     inline nc_type ncRingType() const { return (type); };
 
-    inline short& FirstAltVar() 
+    inline short& FirstAltVar()
         { assume(ncRingType() == nc_exterior); return (data.sca.iFirstAltVar); };
-    inline short& LastAltVar () 
+    inline short& LastAltVar ()
         { assume(ncRingType() == nc_exterior); return (data.sca.iLastAltVar ); };
 
-    inline short FirstAltVar() const 
+    inline short FirstAltVar() const
         { assume(ncRingType() == nc_exterior); return (data.sca.iFirstAltVar); };
-    inline short LastAltVar () const 
+    inline short LastAltVar () const
         { assume(ncRingType() == nc_exterior); return (data.sca.iLastAltVar ); };
 
-    inline ideal& SCAQuotient() 
+    inline ideal& SCAQuotient()
         { assume(ncRingType() == nc_exterior); return (data.sca.idSCAQuotient); };
   private:
 
@@ -142,7 +142,7 @@ struct nc_struct
     CFormulaPowerMultiplier* m_PowerMultiplier;
 
   public:
- 
+
     inline CGlobalMultiplier* GetGlobalMultiplier() const
         { return (m_Multiplier); };
 
@@ -155,7 +155,7 @@ struct nc_struct
 
     inline CFormulaPowerMultiplier*& GetFormulaPowerMultiplier()
         { return (m_PowerMultiplier); };
-   
+
   public:
     nc_pProcs p_Procs; // NC procedures.
 
@@ -322,7 +322,7 @@ BOOLEAN nc_CallPlural(matrix cc, matrix dd, poly cn, poly dn, ring r,
                       bool bCopyInput, //< true
                       bool bBeQuiet, //< false
                       ring curr,
-                      bool dummy_ring = false 
+                      bool dummy_ring = false
 		      /* allow to create a nc-ring with 1 variable*/);
 
 
@@ -339,12 +339,12 @@ ideal idOppose(ring Rop_src, ideal I, const ring Rop_dst);
 
 
 
-// returns the LCM of the head terms of a and b with the given component 
-// NOTE: coeff will be created but remains undefined(zero?) 
+// returns the LCM of the head terms of a and b with the given component
+// NOTE: coeff will be created but remains undefined(zero?)
 poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r);
 
 // returns the LCM of the head terms of a and b with component = max comp. of a & b
-// NOTE: coeff will be created but remains undefined(zero?) 
+// NOTE: coeff will be created but remains undefined(zero?)
 poly p_Lcm(const poly a, const poly b, const ring r);
 
 
@@ -352,7 +352,7 @@ poly p_Lcm(const poly a, const poly b, const ring r);
 
 
 const int GENERICMASK = 0x000; // gnc... must do its dirty job first!
-const int SCAMASK     = 0x001; 
+const int SCAMASK     = 0x001;
 
 #if 0
 static const bool bNoPluralMultiplication = false;  // use only formula shortcuts in my OOP Multiplier
@@ -374,7 +374,7 @@ const int TESTSYZSCAMASK = 0x0100 | SCAMASK;
 
 
 
-// NCExtensions Mask Property 
+// NCExtensions Mask Property
 int& getNCExtensions();
 int  setNCExtensions(int iMask);
 
@@ -394,7 +394,7 @@ void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
 
 // read only access to NC matrices C/D:
 // get C_{i,j}, 1 <= row = i < j = col <= N
-static inline poly GetC( const ring r, int i, int j ) 
+static inline poly GetC( const ring r, int i, int j )
 {
   assume(r!= NULL && rIsPluralRing(r));
   const matrix C = GetNC(r)->C;
@@ -405,7 +405,7 @@ static inline poly GetC( const ring r, int i, int j )
 }
 
 // get D_{i,j}, 1 <= row = i < j = col <= N
-static inline poly GetD( const ring r, int i, int j ) 
+static inline poly GetD( const ring r, int i, int j )
 {
   assume(r!= NULL && rIsPluralRing(r));
   const matrix D = GetNC(r)->D;

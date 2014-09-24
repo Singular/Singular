@@ -20,16 +20,16 @@ class CCacheHash
   private:
     ring m_basering;
     int m_NVars;
-    
+
   public:
     CCacheHash(ring r): m_basering(r), m_NVars(r->N){};
 
     ring GetBasering() const { return m_basering; };
     inline int NVars() const { return m_NVars; }
-    
+
     virtual ~CCacheHash(){};
 
-    
+
     enum EHistoryType {
       MULT_LOOKUP = 0,
       MULT_STORE  = 1
@@ -53,7 +53,7 @@ class CCacheHash
       long lHits;
     };
 
-    
+
     // -1 means no hits!
     int LookupEE(CExponent a, CExponent b, CCacheItem*& pItems)
     {
@@ -64,7 +64,7 @@ class CCacheHash
       PrintLn();
 */
       History(MULT_LOOKUP, a, b);
-      
+
       pItems = NULL;
       return -1;
     }
@@ -75,17 +75,17 @@ class CCacheHash
       PrintS("CCacheHash::StoreEE(a, b, Product)!");
       PrintLn();
 */
-      
+
       History(MULT_STORE, a, b, pProduct);
 
 /*
       PrintS("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
       PrintLn();
 */
-      
+
       return false; // the pair was not stored!
     };
-    
+
     virtual void History(const EHistoryType , const CExponent /*a*/, const CExponent /*b*/, const poly = NULL)
     {
       PrintS("CCacheHash::History(a, b, [p])!\n");

@@ -50,11 +50,11 @@ Node* GenNode::insert(LPoly* d) {
             next = next->insert(d);
             return this;
         }
-        case 1: {   
+        case 1: {
             GenNode* newNode = new GenNode(d,this);
             return newNode;
         }
-    }            
+    }
     return this;
 }
 
@@ -113,13 +113,13 @@ insert an element in list
 void LpList::insert(LPoly* d) {
    start->insert(d);
    // there is no return value also we get the address of the new element in the list
-   // returning this value in the other insert functions is due to their virtual 
+   // returning this value in the other insert functions is due to their virtual
    // declaration in the base class Node
 }
 
 /*
 ==============================
-get all elements from the list 
+get all elements from the list
 ==============================
 */
 void LpList::get() {

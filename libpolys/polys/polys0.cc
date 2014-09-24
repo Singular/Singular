@@ -25,7 +25,7 @@ static void writemon(poly p, int ko, const ring r)
   assume(r != NULL);
   const coeffs C = r->cf;
   assume(C != NULL);
-  
+
   BOOLEAN wroteCoef=FALSE,writeGen=FALSE;
   const BOOLEAN bNotShortOut = (rShortOut(r) == FALSE);
 
@@ -39,12 +39,12 @@ static void writemon(poly p, int ko, const ring r)
   )
   )
   {
-    if( bNotShortOut ) 
+    if( bNotShortOut )
       n_WriteLong(pGetCoeff(p),C);
     else
       n_WriteShort(pGetCoeff(p),C);
-    
-    wroteCoef=(bNotShortOut) 
+
+    wroteCoef=(bNotShortOut)
     || (rParameter(r)!=NULL)
     || rField_is_R(r) || (rField_is_long_R(r)) || (rField_is_long_C(r));
     writeGen=TRUE;
@@ -53,11 +53,11 @@ static void writemon(poly p, int ko, const ring r)
   {
     if (n_GreaterZero(pGetCoeff(p),C))
     {
-      if( bNotShortOut ) 
+      if( bNotShortOut )
         n_WriteLong(pGetCoeff(p),C);
       else
         n_WriteShort(pGetCoeff(p),C);
-      
+
       wroteCoef=(bNotShortOut)
       || (rParameter(r)!=NULL)
       || rField_is_R(r) || (rField_is_long_R(r)) || (rField_is_long_C(r));
@@ -103,12 +103,12 @@ void p_String0Short(const poly p, ring lmRing, ring tailRing)
   // (changing naRing->ShortOut for a while) is due to Hans!
   // Just think of other ring using the VERY SAME naRing and possible
   // side-effects...
-  const BOOLEAN bLMShortOut = rShortOut(lmRing); 
-  const BOOLEAN bTAILShortOut = rShortOut(tailRing); 
+  const BOOLEAN bLMShortOut = rShortOut(lmRing);
+  const BOOLEAN bTAILShortOut = rShortOut(tailRing);
 
   lmRing->ShortOut = rCanShortOut(lmRing);
   tailRing->ShortOut = rCanShortOut(tailRing);
-  
+
   p_String0(p, lmRing, tailRing);
 
   lmRing->ShortOut = bLMShortOut;
@@ -122,8 +122,8 @@ void p_String0Long(const poly p, ring lmRing, ring tailRing)
   // (changing naRing->ShortOut for a while) is due to Hans!
   // Just think of other ring using the VERY SAME naRing and possible
   // side-effects...
-  const BOOLEAN bLMShortOut = rShortOut(lmRing); 
-  const BOOLEAN bTAILShortOut = rShortOut(tailRing); 
+  const BOOLEAN bLMShortOut = rShortOut(lmRing);
+  const BOOLEAN bTAILShortOut = rShortOut(tailRing);
 
   lmRing->ShortOut = FALSE;
   tailRing->ShortOut = FALSE;

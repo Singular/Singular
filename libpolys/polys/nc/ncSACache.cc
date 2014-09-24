@@ -3,9 +3,9 @@
 ****************************************/
 /***************************************************************
  *  File:    ncSACache.cc
- *  Purpose: implementation of special Cache+Hash for Multiplier 
+ *  Purpose: implementation of special Cache+Hash for Multiplier
  *  Author:  motsak
- *  Created: 
+ *  Created:
  *******************************************************************/
 
 #define MYTEST 0
@@ -29,7 +29,7 @@
 #endif
 
 #if OUTPUT
-namespace 
+namespace
 {
   static const char* m_Typenames[2] = {"lookup", "store"};
 }

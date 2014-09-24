@@ -19,7 +19,7 @@
 #include <omalloc/omalloc.h>
 
 #pragma GCC push_options
-#pragma GCC optimize ("wrapv") 
+#pragma GCC optimize ("wrapv")
 
 /*0 implementation*/
 
@@ -363,7 +363,7 @@ intvec * ivMult(intvec * a, intvec * b)
 }
 
 /*2
-*computes a triangular matrix 
+*computes a triangular matrix
 */
 //void ivTriangMat(intvec * imat)
 //{
@@ -372,7 +372,7 @@ intvec * ivMult(intvec * a, intvec * b)
 //  ivTriangIntern(imat,i,j);
 //  i *= imat->cols();
 //  for(j=k;j>=i;j--)
-//    (*imat)[j] = 0; 
+//    (*imat)[j] = 0;
 //}
 
 /* def. internals */
@@ -393,7 +393,7 @@ static void ivOptRecursive(intvec *, intvec *, intvec *,
 static void ivOptSolve(intvec *, intvec *, int &, int &);
 static void ivContent(intvec *);
 static int ivL1Norm(intvec *);
-static int ivCondNumber(intvec *, int); 
+static int ivCondNumber(intvec *, int);
 
 /* Triangulierung in intmat.cc */
 void ivTriangIntern(intvec *imat, int &ready, int &all)
@@ -738,7 +738,7 @@ static void ivOptSolve(intvec *res, intvec *w, int &l, int &j)
     j = ivL1Norm(w);
     for(k=w->rows()-1;k>=0;k--)
       (*res)[k] = (*w)[k];
-  } 
+  }
 }
 
 static int ivL1Norm(intvec *w)

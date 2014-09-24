@@ -1,7 +1,7 @@
 #include <libpolys/coeffs/bigintmat.h>
 #include "nforder.h"
 #include <reporter/reporter.h>
-#include "libpolys/coeffs/numbers.h" 
+#include "libpolys/coeffs/numbers.h"
 #include "libpolys/coeffs/coeffs.h"
 #include "Singular/ipid.h"
 #include "nforder_ideal.h"
@@ -13,7 +13,7 @@
 //// Konstruktoren/Destruktoren ////
 ////////////////////////////////////
 
-/*________________0_______________*/ 
+/*________________0_______________*/
 void nforder_ideal::init() {
   memset(this, 0, sizeof(nforder_ideal));
 }
@@ -102,7 +102,7 @@ nforder_ideal * nf_idAdd(nforder_ideal *A, nforder_ideal *B)
   assume(A->order() == B->order());
   nforder * O = (nforder*) A->order()->data;
   coeffs C = O->basecoeffs();
-  bigintmat * r = new bigintmat(O->getDim(), 2*O->getDim(), C), 
+  bigintmat * r = new bigintmat(O->getDim(), 2*O->getDim(), C),
             *s1, *s2;
   number den = NULL;
   if (B->isFractional()) {
@@ -214,7 +214,7 @@ nforder_ideal * nf_idMult(nforder_ideal *A, nforder_ideal *B)
 
   if (A->isFractional()) {
     den = A->viewBasisDen();
-  } 
+  }
   if (B->isFractional()) {
     if (den)
       den = n_Mult(den, B->viewBasisDen(), C);
@@ -234,7 +234,7 @@ nforder_ideal * nf_idMult(nforder_ideal *A, nforder_ideal *B)
   delete t1;
   return D;
 }
- 
+
 nforder_ideal* nf_idMult(nforder_ideal * A, number b)
 {
   nforder * O = (nforder*) A->order()->data;

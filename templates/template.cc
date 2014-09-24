@@ -1,10 +1,10 @@
 // -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file template.cc
- * 
- * This file implements the class Template. 
+ *
+ * This file implements the class Template.
  *
  * ABSTRACT: We need this for something...
  *

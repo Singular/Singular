@@ -7,7 +7,7 @@
 * ABSTRACT
 */
 
-class intvec; 
+class intvec;
 
 struct omBin_s   ; typedef struct omBin_s omBin_t ; typedef omBin_t * omBin;
 

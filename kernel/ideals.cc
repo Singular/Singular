@@ -1211,7 +1211,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
 {
   idTest(h1);
   idTest(h2);
-   
+
   ideal temph1;
   poly     p,q = NULL;
   int i,l,ll,k,kkk,kmax;
@@ -1267,7 +1267,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
     {
       if (h4->m[i-1]!=NULL)
       {
-        p = p_Copy_noCheck(h4->m[i-1], currRing); p_Shift(&p,1,currRing); 
+        p = p_Copy_noCheck(h4->m[i-1], currRing); p_Shift(&p,1,currRing);
 	// pTest(p);
         h4->m[i] = p;
       }
@@ -1313,7 +1313,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
     si_opt_1 |= Sy_bit(OPT_SB_1);
   }
   idDelete(&temph1);
-  idTest(h4); 
+  idTest(h4);
   return h4;
 }
 /*2

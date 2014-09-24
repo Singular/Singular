@@ -29,7 +29,7 @@
 #include "gb_hack.h"
 
 #include <polys/monomials/ring.h>
-   
+
 #include <coeffs/numbers.h>
 #include <polys/coeffrings.h>
 
@@ -70,7 +70,7 @@ poly nc_p_CopyPut(poly a, const ring r);
 poly nc_p_Bracket_qq(poly p, const poly q, const ring r);
 
 // only SCA can be used by default, formulas are off by default
-int  iNCExtensions = SCAMASK | NOFORMULAMASK; 
+int  iNCExtensions = SCAMASK | NOFORMULAMASK;
 
 int& getNCExtensions()
 {
@@ -472,7 +472,7 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
   // pExpVectorCopy(F,F0);
   memcpy(G, G0,(rN+1)*sizeof(int));
   //  pExpVectorCopy(G,G0);
-  F[0]=0; 
+  F[0]=0;
   G[0]=0;
 
   iF=rN;
@@ -2580,7 +2580,7 @@ poly nc_p_CopyGet(poly a, const ring r)
 #ifndef PDEBUG
   p_Test(a, r);
 #endif
-   
+
 //  if (r != currRing)
 //  {
 //#ifdef PDEBUF
@@ -2772,7 +2772,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 //  if( save != curr )
 //    rChangeCurrRing(curr);
 
-   
+
 #if OUTPUT
   if( CCC != NULL )
   {
@@ -2869,7 +2869,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
       return TRUE;
     }
     assume(p_IsConstant(CN,curr));
-     
+
     nN = p_GetCoeff(CN, curr);
     if (n_IsZero(nN, curr))
     {
@@ -2917,16 +2917,16 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
         if (MATELEM(CC,i,j) == NULL)
           qN = NULL;
         else
-	{   
+	{
 	  if (!p_IsConstant(MATELEM(CC,i,j),curr))
           {
             Werror("Incorrect input : non-constants are not allowed as coefficients (first argument at [%d, %d])", i, j);
             return TRUE;
-          }	      
+          }	
 	  assume(p_IsConstant(MATELEM(CC,i,j),curr));
           qN = p_GetCoeff(MATELEM(CC,i,j),curr);
 	}
-	 
+	
 
         if ( qN == NULL )   /* check the consistency: Cij!=0 */
         // find also illegal pN
@@ -3056,7 +3056,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
   {
 #ifndef SING_NDEBUG
     WarnS("Changing the NC-structure of an existing NC-ring!!!");
-#endif    
+#endif
     nc_rKill(r);
   }
 
@@ -3167,14 +3167,14 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
     } else
        assume( FALSE );
   }
-  r->GetNC()->COM=COM;  
+  r->GetNC()->COM=COM;
 
   nc_p_ProcsSet(r, r->p_Procs);
 
   if(bSetupQuotient) // Test me!!!
     nc_SetupQuotient(r, NULL, false); // no copy!
 
-  
+
 //  if (save != currRing)
 //    rChangeCurrRing(save);
 
@@ -3392,7 +3392,7 @@ BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
 
 //////  if (nMap != nCopy) diagnose = FALSE;
   if (nMap == NULL) diagnose = FALSE;
-  
+
 
   /* same number of variables */
   if (rBase->N != rCandidate->N) diagnose = FALSE;
@@ -3417,7 +3417,7 @@ poly pOppose(ring Rop, poly p, const ring dst)
   if (  Rop == dst )  return(p_Copy(p, dst));
   /* check Rop == rOpposite(currRing) */
 
-  
+
   if ( !rIsLikeOpposite(dst, Rop) )
   {
     WarnS("an opposite ring should be used");
@@ -3430,7 +3430,7 @@ poly pOppose(ring Rop, poly p, const ring dst)
   /* since we know that basefields coinside! */
 
   // coinside???
-  
+
   int *perm=(int *)omAlloc0((Rop->N+1)*sizeof(int));
   if (!p_IsConstantPoly(p, Rop))
   {

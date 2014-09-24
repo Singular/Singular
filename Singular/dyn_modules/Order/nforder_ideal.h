@@ -16,22 +16,22 @@ private:
   ////////////////////////////////////
   number norm, norm_den, min, min_den;
   coeffs ord;  // but of dynamic type order! (as cring)
-  bigintmat *basis; 
+  bigintmat *basis;
   number den;  // fractional ideals....
 public:
-  
+
   ////////////////////////////////////
   /// 0 Konstruktoren/Destruktoren ///
   ////////////////////////////////////
   nforder_ideal();
   void init();
-  nforder_ideal(bigintmat *basis, 
-                   number * min, number * min_den, 
-                   number * norm, number * norm_den, 
-                   const coeffs ord); 
-  nforder_ideal(bigintmat *basis, const coeffs q); 
+  nforder_ideal(bigintmat *basis,
+                   number * min, number * min_den,
+                   number * norm, number * norm_den,
+                   const coeffs ord);
+  nforder_ideal(bigintmat *basis, const coeffs q);
   nforder_ideal(nforder_ideal *i, int);
-  
+
   ~nforder_ideal();
   void Write();
   char * String();
@@ -40,7 +40,7 @@ public:
   ////////////////////////////////////
   // +1 Zugriff auf Membervariablen //
   ////////////////////////////////////
-  
+
   number getNorm(), getNormDen(), getMin(), getMinDen();
   inline coeffs order() const { return ord; }
   inline bigintmat * viewBasis() {return basis;};
@@ -52,11 +52,11 @@ public:
   inline number viewNorm() { return norm;};
   inline number viewMin() { return norm;};
   inline void setBasisDenTransfer(number a){den = a;}
-  
+
   ////////////////////////////////////
   ////// +2 Elementoperationen ///////
   ////////////////////////////////////
-  // Addiert/Subtrahiert/Multipliziert zu a das Element b hinzu  
+  // Addiert/Subtrahiert/Multipliziert zu a das Element b hinzu
 };
 
 nforder_ideal* nf_idAdd(nforder_ideal *a, nforder_ideal *b);

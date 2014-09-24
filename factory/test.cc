@@ -119,14 +119,14 @@ int main( int, char *argv[] )
   t= test2 (3);
   if (t < 0)
     ret += t;
-  
+
   t= test2 (101);
   if (t < 0)
     ret += t;
-  
+
   t= test2 (43051);
   if (t < 0)
     ret += t;
-  
+
   return ret;
 }

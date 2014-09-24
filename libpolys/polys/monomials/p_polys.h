@@ -849,13 +849,13 @@ static inline poly p_Copy(poly p, const ring lmRing, const ring tailRing)
 // deletes *p, and sets *p to NULL
 static inline void p_Delete(poly *p, const ring r)
 {
-  assume( p!= NULL ); 
+  assume( p!= NULL );
   r->p_Procs->p_Delete(p, r);
 }
 
 static inline void p_Delete(poly *p,  const ring lmRing, const ring tailRing)
 {
-  assume( p!= NULL ); 
+  assume( p!= NULL );
   if (*p != NULL)
   {
 #ifndef PDEBUG

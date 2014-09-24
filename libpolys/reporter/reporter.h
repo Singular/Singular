@@ -82,7 +82,7 @@ void feStringAppendResources(int warn = -1);
  * Shall ONLY be used for a temporary redirection of the standard output
  * (i.e. if Singular runs as a server)
  */
-// unlike the StringSet/StringEndS stuff: 
+// unlike the StringSet/StringEndS stuff:
 // only one SPrintStart/SPrintEnd buffer may be active
 // the returned string must be free via omFree
 void SPrintStart();

@@ -1921,7 +1921,7 @@ static BOOLEAN _m2_end(leftv res, leftv h)
 
 END_NAMESPACE
 
-extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions) 
+extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
 {
 
 #define ADD(C,D,E) \

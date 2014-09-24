@@ -8,7 +8,7 @@
 */
 #include <coeffs/coeffs.h>
 
-/// Get a mapping function from src into the domain of this type: 
+/// Get a mapping function from src into the domain of this type:
 nMapFunc  ngfSetMap(const coeffs src, const coeffs dst);
 
 /// Initialize r
