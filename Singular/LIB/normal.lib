@@ -4085,6 +4085,7 @@ static proc substpartSpecial(ideal endid, ideal endphi)
       export(norid);
       export(normap);
       list L = newBAS;
+      setring BAS;
       return(L);
 
    //Hier scheint interred gut zu sein, da es Ergebnis relativ schnell
