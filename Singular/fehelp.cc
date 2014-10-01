@@ -82,7 +82,7 @@ static BOOLEAN heGenInit(int,int);    static void heGenHelp(heEntry hentry,int);
 static BOOLEAN heDummyInit(int,int);   static void heDummyHelp(heEntry hentry,int);
 static BOOLEAN heEmacsInit(int,int);   static void heEmacsHelp(heEntry hentry,int);
 
-#ifdef ix86_Win
+#ifdef __CYGWIN__
 static void heHtmlHelp(heEntry hentry,int);
 static void heWinHelp(heEntry hentry,int);
 static void heWinHtmlHelp(heEntry hentry,int);
@@ -136,7 +136,7 @@ void feHelp(char *str)
   {
     if (heCurrentHelpBrowser == NULL) feHelpBrowser(NULL, 0);
     assume(heCurrentHelpBrowser != NULL);
-#ifdef ix86_Win
+#ifdef __CYGWIN__
     if (strcmp(heCurrentHelpBrowser->browser,"htmlhelp")==0)
     {
       // In Windows always let htmlhelp handle request, if standard
@@ -215,7 +215,7 @@ static void feBrowserFile()
       if ((buf[0]!='#') && (buf[0]>' ')) br++;
     }
     fseek(f,0,SEEK_SET);
-#ifdef ix86_Win
+#ifdef __CYGWIN__
     // for the 7(!) default browsers and make htmlhelp the default default
     heHelpBrowsers=(heBrowser_s*)omAlloc0((br+7)*sizeof(heBrowser_s));
     br = 0;
@@ -259,7 +259,7 @@ static void feBrowserFile()
   }
   else
   {
-#ifdef ix86_Win
+#ifdef __CYGWIN__
     // for the 7(!) default browsers
     heHelpBrowsers=(heBrowser_s*)omAlloc0(7*sizeof(heBrowser_s));
     heHelpBrowsers[br].browser="htmlhelp";
@@ -273,7 +273,7 @@ static void feBrowserFile()
     heHelpBrowsers=(heBrowser_s*)omAlloc0(4*sizeof(heBrowser_s));
 #endif
   }
-#ifdef ix86_Win
+#ifdef __CYGWIN__
   heHelpBrowsers[br].browser="winhlp";
   heHelpBrowsers[br].init_proc=heGenInit;
   heHelpBrowsers[br].help_proc=heWinHelp;
@@ -326,7 +326,7 @@ const char* feHelpBrowser(char* which, int warn)
 
     // First, try emacs, if emacs-option is set
     // Under Win, always use html
-#ifndef ix86_Win
+#ifndef __CYGWIN__
     if (feOptValue(FE_OPT_EMACS) != NULL)
     {
       while (heHelpBrowsers[i].browser != NULL)
@@ -934,7 +934,7 @@ static BOOLEAN heGenInit(int warn, int br)
   return TRUE;
 }
 
-#ifdef ix86_Win
+#ifdef __CYGWIN__
 
 static void heHtmlHelp(heEntry hentry, int br)
 {
@@ -1093,7 +1093,7 @@ static void heGenHelp(heEntry hentry, int br)
   (void) system(sys);
 }
 
-#ifdef ix86_Win
+#ifdef __CYGWIN__
 static void heHtmlHelp(heEntry hentry)
 {
   char url[MAXPATHLEN];

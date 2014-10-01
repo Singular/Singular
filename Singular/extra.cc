@@ -135,7 +135,7 @@
 #endif
 #endif
 
-#ifdef ix86_Win /* only for the DLLTest */
+#ifdef __CYGWIN__ /* only for the DLLTest */
 /* #include "WinDllTest.h" */
 #ifdef HAVE_DL
 #include <polys/mod_raw.h>
@@ -180,7 +180,7 @@
 
 //#endif /* not HAVE_DYNAMIC_LOADING */
 
-#ifdef ix86_Win
+#ifdef __CYGWIN__
 //#include <Python.h>
 //#include <python_wrapper.h>
 #endif
@@ -189,7 +189,7 @@
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h);
 #endif
 
-#ifdef ix86_Win  /* PySingular initialized? */
+#ifdef __CYGWIN__  /* PySingular initialized? */
 static int PyInitialized = 0;
 #endif
 
@@ -3000,7 +3000,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
        else
 
   /*==================== DLL =================*/
-  #ifdef ix86_Win
+  #ifdef __CYGWIN__
   #ifdef HAVE_DL
   /* testing the DLL functionality under Win32 */
         if (strcmp(sys_cmd, "DLL") == 0)
@@ -3664,7 +3664,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  #ifdef ix86_Win
+  #ifdef __CYGWIN__
   /*==================== Python Singular =================*/
       if (strcmp(sys_cmd, "python") == 0)
       {

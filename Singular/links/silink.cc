@@ -37,7 +37,7 @@
 #include <unistd.h>
 
 // #ifdef HAVE_DBM
-// #ifdef ix86_Win
+// #ifdef __CYGWIN__
 // #define USE_GDBM
 // #endif
 // #endif
