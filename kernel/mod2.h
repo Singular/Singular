@@ -23,7 +23,7 @@
 #define SINGULAR_SUB_VERSION 0
 #else
 #define SINGULAR_MINOR_VERSION 0
-#define SINGULAR_SUB_VERSION 0
+#define SINGULAR_SUB_VERSION 1
 #endif
 #define S_ROOT_DIR ""
 
