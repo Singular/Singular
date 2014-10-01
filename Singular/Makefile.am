@@ -82,6 +82,7 @@ SingularHEADERS = \
    fglm.h \
    gms.h \
    grammar.h \
+   htmlhelp.h \
    idrec.h \
    ipconv.h \
    ipid.h \
