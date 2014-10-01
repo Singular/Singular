@@ -24,7 +24,7 @@
 #----------------------------------------------------
 # the default help browsers builtin, dummy and emacs are always 
 #   available and should NOT be mentioned here
-# ix86_Win: has additional default browsers: htmlhelp, html and winhlp
+# __CYGWIN__: has additional default browsers: htmlhelp, html and winhlp
 #   also not mentioned here
 #----------------------------------------------------
 htmlview!xDhE:htmlview:!htmlview %h &

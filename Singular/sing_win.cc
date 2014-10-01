@@ -10,7 +10,7 @@
 
 
 #include <kernel/mod2.h>
-#ifdef ix86_Win
+#ifdef __CYGWIN__
 #include <windows.h>
 #include <winuser.h>
 #include <Singular/htmlhelp.h>
@@ -109,4 +109,4 @@ const char *dynl_error()
   return errmsg;
 }
 
-#endif /*ix86_Win */
+#endif /*__CYGWIN__ */

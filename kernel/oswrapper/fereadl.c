@@ -189,7 +189,7 @@ void fe_init (void)
     }
     else
     {
-      #ifndef ix86_Win
+      #ifndef __CYGWIN__
       extern char *BC;
       extern char *UP;
       extern char PC;
