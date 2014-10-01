@@ -166,10 +166,6 @@ char* feResourceDefault(const char* key)
 
 void feInitResources(const char* argv0)
 {
-#if defined(__CYGWIN__) && defined(__GNUC__)
-  if (cygwin32_posix_path_list_p (getenv("PATH")))
-    fePathSep = ':';
-#endif
   if (argv0==NULL)
   {
     //WarnS("illegal argv[0]==NULL");
