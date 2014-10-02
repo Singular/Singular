@@ -326,15 +326,15 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  else
   AC_MSG_RESULT(yes)
   
-  L=""
+  LL=""
   
-  for a in ${with_builtinmodules//,/ }; 
+  for a in `echo ${with_builtinmodules}|tr ',' ' '`; 
   do
     AC_MSG_CHECKING([whether to build-in '$a'?])
     
-      L+=" add($a)"
-      LL+=" $a"
-      BUILTIN_LIBS+=" dyn_modules/$a/$a.la"
+      L="${L} add($a)"
+      LL="${LL} $a"
+      BUILTIN_LIBS="${BUILTIN_LIBS} dyn_modules/$a/$a.la"
       AC_MSG_RESULT(yes)
       
 # *) AC_MSG_ERROR([bad value ${enableval} for	    --enable-debug]) ;;
