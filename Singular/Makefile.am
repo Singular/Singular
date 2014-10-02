@@ -54,7 +54,6 @@ SOURCES = \
    sdb.cc\
    links/silink.cc\
    links/sing_dbm.cc\
-   sing_win.cc\
    links/slInit_Static.cc\
    links/ssiLink.cc\
    links/semaphore.c\
@@ -82,7 +81,6 @@ SingularHEADERS = \
    fglm.h \
    gms.h \
    grammar.h \
-   htmlhelp.h \
    idrec.h \
    ipconv.h \
    ipid.h \
@@ -108,7 +106,6 @@ SingularHEADERS = \
    sdb.h \
    links/silink.h \
    links/sing_dbm.h \
-   sing_win.h \
    links/slInit.h \
    links/ssiLink.h \
    links/simpleipc.h \

@@ -117,7 +117,6 @@
 
 #include <kernel/spectrum/GMPrat.h>
 
-// #include "htmlhelp.h" // For Windows //
 #include <kernel/combinatorics/hutil.h>
 // #include <kernel/Ideal.h> // Too old?
 
@@ -201,7 +200,6 @@
 #include <Singular/sdb.h>
 #include <Singular/links/silink.h>
 #include <Singular/links/sing_dbm.h>
-#include <Singular/sing_win.h>
 #include <Singular/links/slInit.h>
 #include <Singular/links/ssiLink.h>
 #include <Singular/stype.h>

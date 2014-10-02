@@ -54,15 +54,6 @@ void feReInitResources();
 
 extern char* feArgv0;
 
-const char fePathSep =
-/* not really cygwin, applies to all windows systems:*/
-#if (defined(__CYGWIN__))
-                ';'
-#else
-                ':'
-#endif
-                ;
-
-
+const char fePathSep = ':' ;
 
 #endif

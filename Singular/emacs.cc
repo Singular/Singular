@@ -8,6 +8,9 @@
 
 
 
+#ifdef __CYGWIN__
+#define BOOLEAN boolean
+#endif
 #include <kernel/mod2.h>
 
 
@@ -38,9 +41,6 @@
 #undef system
 #endif
 
-#ifndef BOOLEAN
-#define BOOLEAN int
-#endif
 #ifndef FALSE
 #define FALSE 0
 #endif

@@ -24,8 +24,6 @@
 #----------------------------------------------------
 # the default help browsers builtin, dummy and emacs are always 
 #   available and should NOT be mentioned here
-# __CYGWIN__: has additional default browsers: htmlhelp, html and winhlp
-#   also not mentioned here
 #----------------------------------------------------
 htmlview!xDhE:htmlview:!htmlview %h &
 mac!xhE:open:O:x86_64-Darwin:!open %f &
