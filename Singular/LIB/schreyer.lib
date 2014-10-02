@@ -134,7 +134,7 @@ static proc Sinit(module M)
 {
   def @save = basering;
   
-  int @DEBUG = !system("with", "ndebug");
+  int @DEBUG = 0; // !system("with", "ndebug");
   if( @DEBUG )
   {
     "Sinit::Input";
@@ -222,7 +222,7 @@ static proc Sinit(module M)
 
 static proc Sstep()
 {
-  int @DEBUG = !system("with", "ndebug");
+  int @DEBUG = 0; // !system("with", "ndebug");
 
   if( @DEBUG )
   {
@@ -565,14 +565,14 @@ static proc SSinit(def M)
   // TODO! DONE?
   def @save = basering;
   
-  int @DEBUG = !system("with", "ndebug");
+  int @DEBUG = 0; // !system("with", "ndebug");
 
   if( typeof( attrib(SSinit, "DEBUG") ) == "int" )
   {
     @DEBUG = attrib(SSinit, "DEBUG");
   }
 
-  int @SYZCHECK = @DEBUG; 
+  int @SYZCHECK = 0; // @DEBUG; 
 
   if( typeof( attrib(SSinit, "SYZCHECK") ) == "int" )
   {
@@ -766,7 +766,7 @@ static proc SSinit(def M)
     attrib(S, "LEAD2SYZ", attrib(SSinit, "LEAD2SYZ") );
   } else
   { 
-    attrib(S, "LEAD2SYZ", 1);
+    attrib(S, "LEAD2SYZ", 0);
   }
 
   if( typeof( attrib(SSinit, "TAILREDSYZ") ) == "int" )
@@ -783,7 +783,7 @@ static proc SSinit(def M)
     attrib(S, "HYBRIDNF", attrib(SSinit, "HYBRIDNF") );
   } else
   { 
-    attrib(S, "HYBRIDNF", 2);
+    attrib(S, "HYBRIDNF", 0);
   }
   
   attrib(S, "DEBUG", @DEBUG);
@@ -847,7 +847,7 @@ proc SSComputeLeadingSyzygyTerms(def L)
     int @DEBUG = attrib(basering, "DEBUG");
   } else
   {
-    int @DEBUG = !system("with", "ndebug");
+    int @DEBUG = 0; // !system("with", "ndebug");
   }
 
   if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
@@ -966,7 +966,7 @@ proc SSCompute2LeadingSyzygyTerms(def L)
     int @DEBUG = attrib(basering, "DEBUG");
   } else
   {
-    int @DEBUG = !system("with", "ndebug");
+    int @DEBUG = 0; // !system("with", "ndebug");
   }
 
   if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
@@ -1189,7 +1189,7 @@ proc SSFindReducer(def product, def syzterm, def L, list #)
     int @DEBUG = attrib(basering, "DEBUG");
   } else
   {
-    int @DEBUG = !system("with", "ndebug");
+    int @DEBUG = 0; // !system("with", "ndebug");
   }
 
   if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
@@ -1320,7 +1320,7 @@ proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
     int @DEBUG = attrib(basering, "DEBUG");
   } else
   {
-    int @DEBUG = !system("with", "ndebug");
+    int @DEBUG = 0; // !system("with", "ndebug");
   }
 
 
@@ -1430,7 +1430,7 @@ proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
     int @DEBUG = attrib(basering, "DEBUG");
   } else
   {
-    int @DEBUG = !system("with", "ndebug");
+    int @DEBUG = 0; // !system("with", "ndebug");
   }
 
   if( typeof( attrib(basering, "KERCHECK") ) == "int" )
@@ -1511,7 +1511,7 @@ proc SSSchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
     int @DEBUG = attrib(basering, "DEBUG");
   } else
   {
-    int @DEBUG = !system("with", "ndebug");
+    int @DEBUG = 0; // !system("with", "ndebug");
   }
 
   if( @DEBUG )
@@ -2116,13 +2116,13 @@ example
 
 static proc loadme()
 {
-  int @DEBUG = !system("with", "ndebug");
+  int @DEBUG = 0; // !system("with", "ndebug");
 
   if( @DEBUG )
   {
     
-    "ndebug?: ", system("with", "ndebug");
-    "om_ndebug?: ", system("with", "om_ndebug");
+//    "ndebug?: ", system("with", "ndebug");
+//    "om_ndebug?: ", system("with", "om_ndebug");
 
     listvar(Top);
     listvar(Schreyer);
@@ -2133,7 +2133,7 @@ static proc loadme()
   {
     if( 1 )
     {
-
+/*
       if( @DEBUG )
       {
         "Loading the Debug version!";
@@ -2141,7 +2141,7 @@ static proc loadme()
       {
         "Loading the Release version!";
       }
-      
+*/      
       load("syzextra.so");
 
       if( @DEBUG )
@@ -2189,57 +2189,6 @@ static proc loadme()
 
       exportto(Schreyer, Syzextra::ComputeResolution);      
     }
-/*
-    else
-    {
-
-      load("syzextra.so");
-
-      if( @DEBUG )
-      {      
-        listvar(Syzextra_g);
-      }
-      
-      exportto(Top, Syzextra_g::ClearContent);
-      exportto(Top, Syzextra_g::ClearDenominators);
-
-      exportto(Schreyer, Syzextra_g::m2_end);
-
-//      export Syzextra_g;
-//      exportto(Schreyer, Syzextra_g::noop);
-      exportto(Schreyer, Syzextra_g::DetailedPrint);
-      exportto(Schreyer, Syzextra_g::leadmonomial);
-      exportto(Schreyer, Syzextra_g::leadcomp);
-//      exportto(Schreyer, Syzextra_g::leadrawexp);
-//      exportto(Schreyer, Syzextra_g::ISUpdateComponents);
-      exportto(Schreyer, Syzextra_g::SetInducedReferrence);
-      exportto(Schreyer, Syzextra_g::GetInducedData);
-//      exportto(Schreyer, Syzextra_g::GetAMData);
-//      exportto(Schreyer, Syzextra_g::SetSyzComp);
-      exportto(Schreyer, Syzextra_g::MakeInducedSchreyerOrdering);
-//      exportto(Schreyer, Syzextra_g::MakeSyzCompOrdering);
-      exportto(Schreyer, Syzextra_g::idPrepare);
-//      exportto(Schreyer, Syzextra_g::reduce_syz);
-//      exportto(Schreyer, Syzextra_g::p_Content);
-
-      exportto(Schreyer, Syzextra_g::ProfilerStart); exportto(Schreyer, Syzextra_g::ProfilerStop);
-
-      exportto(Schreyer, Syzextra_g::Tail);
-      exportto(Schreyer, Syzextra_g::ComputeLeadingSyzygyTerms);
-      exportto(Schreyer, Syzextra_g::Compute2LeadingSyzygyTerms);
-      exportto(Schreyer, Syzextra_g::Sort_c_ds);
-
-      exportto(Schreyer, Syzextra_g::FindReducer);
-      
-      exportto(Schreyer, Syzextra_g::ReduceTerm);
-      exportto(Schreyer, Syzextra_g::TraverseTail);
-
-      exportto(Schreyer, Syzextra_g::SchreyerSyzygyNF);
-      exportto(Schreyer, Syzextra_g::ComputeSyzygy);
-
-      exportto(Schreyer, Syzextra_g::ComputeResolution);      
-    }
-*/
 
     exportto(Top, DetailedPrint);
     exportto(Top, GetInducedData);
