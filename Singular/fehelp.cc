@@ -828,7 +828,6 @@ static BOOLEAN heGenInit(int warn, int br)
       case ' ': break;
       case 'i': /* singular.hlp */
       case 'x': /* singular.idx */
-      case 'C': /* chm file Manual.chm */
       case 'h': /* html dir */
                if (feResource(*p, warn) == NULL)
                {
