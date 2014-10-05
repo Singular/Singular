@@ -28,14 +28,10 @@ as @code{a-b-c-d} where a,b,c and d are numbers:
 @end itemize
 @sc{Singular} does also have "inofficiall" build orginating from
 a code version between "officiall" version: such builds display
-"Develpment version a-b-c" in the header while "official" versions
-show "version a-b-c". Also the manual describes version a-b-c.
+"Development version a.b.c" in the header while "official" versions
+show "version a.b.c". Also the manual describes version a-b-c.
 To get the complete version number, use
 @code{system("version");} or use @code{SINGULAR_VERSION} in C.
-
-      
-
-
 
 @c ---------------------------------------------------------------------------
 @node Notes for Singular users, Notes for developers, Version schema for Singular, Singular 3 and Singular 4 
