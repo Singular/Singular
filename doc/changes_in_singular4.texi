@@ -5,7 +5,7 @@ between Singular 3-1-7 and Singular 4.* (formerly known as Spielwiese) both for 
 and Singular users. In what follows we will refer to the systems as Singular 3 and Singular 4.
 
 @menu
-* Version schnema for Singular::
+* Version schema for Singular::
 * Notes for Singular users::
 * Notes for developers::
 * Building Singular::
