@@ -20,8 +20,8 @@ and Singular users. In what follows we will refer to the systems as Singular 3 a
 @sc{Singular} version are of the form @code{a.b.c.d} which may also be written 
 as @code{a-b-c-d} where a,b,c and d are numbers:
 @itemize
-@item a is change with majaor, incomptible changes
-@item b is changed with incompatible changes
+@item a is changed with major, incompatible changes
+@item b is changed with incompatible changes (of some commands/libraries)
 @item c is changed with compatible chnages (i.e. new commands,
       extended options, new algorithms, etc.)
 @item d is changed with each release (i.e. with bug fixes, etc.)
