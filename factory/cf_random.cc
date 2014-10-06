@@ -27,6 +27,7 @@ public:
     ~RandomGenerator() {}
     int generate();
     void seed( int ss ) { seedInit( ss ); }
+    int currentSeed() { return s; }
 };
 
 RandomGenerator::RandomGenerator() : ia(16807), im(2147483647), iq(127773), ir(2836), deflt(123459876)
@@ -171,6 +172,11 @@ int factoryrandom( int n )
         return (int)ranGen.generate();
     else
         return ranGen.generate() % n;
+}
+
+int currentFactorySeed (   )
+{
+    return ranGen.currentSeed();
 }
 
 void factoryseed ( int s )
