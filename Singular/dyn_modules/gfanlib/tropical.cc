@@ -174,7 +174,7 @@ void tropical_setup(SModulFunctions* p)
 {
   p->iiAddCproc("","groebnerCone",FALSE,groebnerCone);
   p->iiAddCproc("","maximalGroebnerCone",FALSE,maximalGroebnerCone);
-  p->iiAddCproc("","initial",FALSE,initial);
+  // p->iiAddCproc("","initial",FALSE,initial);
   // p->iiAddCproc("","tropicalNeighbours",FALSE,tropicalNeighbours);
 #ifndef NDEBUG
   // p->iiAddCproc("","initial0",FALSE,initial0);

@@ -366,7 +366,7 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
       s = ambientMaximalCone.getPolynomialRing();
 
       // compute the initial ideal with respect to the weight
-      inI = sloppyInitial(inI,s,startingPoint);
+      inI = initial(inI,s,startingPoint);
       zc = linealitySpaceOfGroebnerFan(inI,s);
     }
 
@@ -416,7 +416,7 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     id_Delete(&inJ,s); rDelete(s);
     inJ = ambientMaximalCone.getPolynomialIdeal();
     s = ambientMaximalCone.getPolynomialRing();
-    inJ = sloppyInitial(inJ,s,startingPoint);
+    inJ = initial(inJ,s,startingPoint);
     ideal inI = initial(I,r,startingPoint);
     zc = linealitySpaceOfGroebnerFan(inJ,s);
 
@@ -463,7 +463,7 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     inJShortcut = startingConeShortcut.getPolynomialIdeal();
     gfan::ZCone zd = startingConeShortcut.getPolyhedralCone();
     gfan::ZVector interiorPoint = startingConeShortcut.getInteriorPoint();
-    inJShortcut = sloppyInitial(inJShortcut,sShortcut,interiorPoint);
+    inJShortcut = initial(inJShortcut,sShortcut,interiorPoint);
     inI = initial(inI,r,interiorPoint);
 
     s = rCopy0(sShortcut); // s will be a ring over the valuation ring

@@ -120,7 +120,7 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const tropicalStrategy& 
   polyhedralCone = gfan::ZCone(inequalities,gfan::ZMatrix(0, inequalities.getWidth()));
   polyhedralCone.canonicalize();
   interiorPoint = polyhedralCone.getRelativeInteriorPoint();
-  initialPolynomialIdeal = sloppyInitial(reducedPolynomialIdeal,polynomialRing,interiorPoint);
+  initialPolynomialIdeal = initial(reducedPolynomialIdeal,polynomialRing,interiorPoint);
   assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
 }
 
@@ -185,7 +185,7 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, 
   polyhedralCone = gfan::ZCone(inequalities,equations);
   polyhedralCone.canonicalize();
   interiorPoint = polyhedralCone.getRelativeInteriorPoint();
-  initialPolynomialIdeal = sloppyInitial(reducedPolynomialIdeal,polynomialRing,interiorPoint);
+  initialPolynomialIdeal = initial(reducedPolynomialIdeal,polynomialRing,interiorPoint);
   assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
 }
 
@@ -248,7 +248,7 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& u, 
   polyhedralCone = gfan::ZCone(inequalities,equations);
   polyhedralCone.canonicalize();
   interiorPoint = polyhedralCone.getRelativeInteriorPoint();
-  initialPolynomialIdeal = sloppyInitial(reducedPolynomialIdeal,polynomialRing,interiorPoint);
+  initialPolynomialIdeal = initial(reducedPolynomialIdeal,polynomialRing,interiorPoint);
   assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
 }
 

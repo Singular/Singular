@@ -282,7 +282,7 @@ public:
    */
   bool reduce(ideal I, const ring r) const;
 
-  bool pReduce(ideal I, const ring r) const;
+  void pReduce(ideal I, const ring r) const;
 
   /**
    * returns true, if I contains a monomial.

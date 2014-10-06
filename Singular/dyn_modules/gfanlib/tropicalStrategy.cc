@@ -324,20 +324,20 @@ bool tropicalStrategy::reduce(ideal I, const ring r) const
   return b;
 }
 
-bool tropicalStrategy::pReduce(ideal I, const ring r) const
+void tropicalStrategy::pReduce(ideal I, const ring r) const
 {
   rTest(r);
   id_Test(I,r);
 
   if (isValuationTrivial())
-    return false;
+    return;
 
   nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
   number p = identity(uniformizingParameter,startingRing->cf,r->cf);
-  bool b = pReduce0(I,p,r);
+  pReduce0(I,p,r);
   n_Delete(&p,r->cf);
 
-  return b;
+  return;
 }
 
 ring tropicalStrategy::getShortcutRingPrependingWeight(const ring r, const gfan::ZVector v) const

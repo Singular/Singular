@@ -7,6 +7,10 @@
 
 #include <map>
 #include <set>
+#include <iostream>
+#include <exception>
+
+#include <ppinitialReduction.h>
 
 bool isOrderingLocalInT(const ring r)
 {
@@ -28,10 +32,10 @@ bool isOrderingLocalInT(const ring r)
  * by reading the coefficients and that g is initially reduced
  * with respect to p-t
  **/
-bool pReduce(poly &g, const number p, const ring r)
+void pReduce(poly &g, const number p, const ring r)
 {
   if (g==NULL)
-    return false;
+    return;
   p_Test(g,r);
 
   poly toBeChecked = pNext(g);
@@ -67,7 +71,7 @@ bool pReduce(poly &g, const number p, const ring r)
           if (power<1)
           {
             WerrorS("pReduce: overflow in exponent");
-            return true;
+            throw 0;
           }
         }
         subst=p_LmInit(toBeChecked,r);
@@ -88,7 +92,7 @@ bool pReduce(poly &g, const number p, const ring r)
     }
   }
   p_Test(g,r);
-  return false;
+  return;
 }
 
 void ptNormalize(poly* gStar, const number p, const ring r)
@@ -167,7 +171,7 @@ BOOLEAN pppReduce(leftv res, leftv args)
 }
 #endif //NDEBUG
 
-bool pReduce0(ideal &I, const number p, const ring r)
+void pReduce0(ideal &I, const number p, const ring r)
 {
   int k = idSize(I);
   for (int i=0; i<k; i++)
@@ -176,11 +180,10 @@ bool pReduce0(ideal &I, const number p, const ring r)
     {
       number c = p_GetCoeff(I->m[i],r);
       if (!n_Equal(p,c,r->cf))
-        if (pReduce(I->m[i],p,r))
-          return true;
+        pReduce(I->m[i],p,r);
     }
   }
-  return false;
+  return;
 }
 
 
@@ -214,9 +217,12 @@ bool ppreduceInitially(poly* hStar, const poly g, const ring r)
     q2 = p_Neg(q2,r); p_Test(q2,r);
     h = p_Add_q(q1,q2,r);
     p_Test(h,r);
-    hStar = &h;
+    p_Test(g,r);
+    *hStar = h;
     return true;
   }
+  p_Test(h,r);
+  p_Test(g,r);
   return false;
 }
 
@@ -278,21 +284,23 @@ bool ppreduceInitially(ideal I, const number p, const ring r)
     n=j;
   } while(n);
   for (int i=0; i<m; i++)
-    if (pReduce(I->m[i],p,r)) return true;
+    pReduce(I->m[i],p,r);
 
   /***
    * the first pass. removing terms with the same monomials in x as lt(g_i) out of g_j for i<j
    **/
   for (int i=0; i<m-1; i++)
     for (int j=i+1; j<m; j++)
-      if (ppreduceInitially(&I->m[j], I->m[i], r) && pReduce(I->m[j],p,r)) return true;
+      if (ppreduceInitially(&I->m[j], I->m[i], r))
+        pReduce(I->m[j],p,r);
 
   /***
    * the second pass. removing terms divisible by lt(g_j) out of g_i for i<j
    **/
   for (int i=0; i<m-1; i++)
     for (int j=i+1; j<m; j++)
-      if (ppreduceInitially(&I->m[i], I->m[j],r) && pReduce(I->m[i],p,r)) return true;
+      if (ppreduceInitially(&I->m[i], I->m[j],r))
+        pReduce(I->m[i],p,r);
 
   /***
    * removes the elements of I which have been reduced to 0 in the previous two passes
@@ -337,10 +345,13 @@ BOOLEAN ppreduceInitially1(leftv res, leftv args)
 
 /***
  * inserts g into I and reduces I with respect to itself and p-t
+ * returns the position in I in which g was inserted
  * assumes that I was already sorted and initially reduced in the first place
  **/
-bool ppreduceInitially(ideal I, const number p, const poly g, const ring r)
+int ppreduceInitially(ideal I, const number p, const poly g, const ring r)
 {
+  id_Test(I,r);
+  p_Test(g,r);
   idInsertPoly(I,g);
   int n=idSize(I);
   int j;
@@ -361,9 +372,11 @@ bool ppreduceInitially(ideal I, const number p, const poly g, const ring r)
    * removing terms with the same monomials in x as lt(g_j) out of g_k for j<k
    **/
   for (int i=0; i<j; i++)
-    if (ppreduceInitially(&I->m[j], I->m[i], r) && pReduce(I->m[j],p,r)) return true;
+    if (ppreduceInitially(&I->m[j], I->m[i], r))
+      pReduce(I->m[j],p,r);
   for (int k=j+1; k<n; k++)
-    if (ppreduceInitially(&I->m[k], I->m[j], r) && pReduce(I->m[k],p,r)) return true;
+    if (ppreduceInitially(&I->m[k], I->m[j], r))
+      pReduce(I->m[k],p,r);
 
   /***
    * the second pass. removing terms divisible by lt(g_j) and lt(g_k) out of g_i for i<j<k
@@ -371,15 +384,18 @@ bool ppreduceInitially(ideal I, const number p, const poly g, const ring r)
    **/
   for (int i=0; i<j; i++)
     for (int k=j; k<n; k++)
-      if (ppreduceInitially(&I->m[i], I->m[k], r) && pReduce(I->m[i],p,r)) return true;
+      if (ppreduceInitially(&I->m[i], I->m[k], r))
+        pReduce(I->m[i],p,r);
   for (int k=j+1; k<n; k++)
-    if (ppreduceInitially(&I->m[j], I->m[k], r) && pReduce(I->m[j],p,r)) return true;
+    if (ppreduceInitially(&I->m[j], I->m[k], r))
+      pReduce(I->m[j],p,r);
 
   /***
    * removes the elements of I which have been reduced to 0 in the previous two passes
    **/
   idSkipZeroes(I);
-  return false;
+  id_Test(I,r);
+  return j;
 }
 
 
@@ -422,6 +438,78 @@ BOOLEAN ppreduceInitially2(leftv res, leftv args)
 #endif //NDEBUG
 
 
+static poly ppNext(poly p, int l)
+{
+  poly q = p;
+  for (int i=0; i<l; i++)
+  {
+    if (q==NULL)
+      break;
+    pIter(q);
+  }
+  return q;
+}
+
+
+static void sortMarks(const ideal H, const ring r, std::vector<mark> &T)
+{
+  std::pair<int,int> pointerToTerm;
+  int k=T.size();
+  do
+  {
+    int j=0;
+    for (int i=1; i<k-1; i++)
+    {
+      int generatorA = T[i-1].first;
+      int termA = T[i-1].second;
+      int generatorB = T[i].first;
+      int termB = T[i].second;
+      if (p_LmCmp(ppNext(H->m[generatorA],termA),ppNext(H->m[generatorB],termB),r)<0)
+      {
+        mark cache=T[i-1];
+        T[i-1]=T[i];
+        T[i]=cache;
+        j = i;
+      }
+    }
+    k=j;
+  } while(k);
+  return;
+}
+
+
+static poly getTerm(const ideal H, const mark ab)
+{
+  int a = ab.first;
+  int b = ab.second;
+  return ppNext(H->m[a],b);
+}
+
+
+static void adjustMarks(std::vector<mark> &T, const int newEntry)
+{
+  for (unsigned i=0; i<T.size(); i++)
+  {
+    if (T[i].first>=newEntry)
+      T[i].first = T[i].first+1;
+  }
+  return;
+}
+
+
+static void cleanupMarks(const ideal H, std::vector<mark> &T)
+{
+  for (unsigned i=0; i<T.size();)
+  {
+    if (getTerm(H,T[i])==NULL)
+      T.erase(T.begin()+i);
+    else
+      i++;
+  }
+  return;
+}
+
+
 /***
  * reduces H initially with respect to itself, with respect to p-t,
  * and with respect to G.
@@ -436,79 +524,55 @@ bool ppreduceInitially(ideal &H, const number p, const ideal G, const ring r)
   if (ppreduceInitially(H,p,r)) return true;
 
   /***
-   * Step 2: initialize a working list T and an ideal I in which the reductions will take place
+   * Step 2: initialize an ideal I in which the reductions will take place-
+   *   along the reduction it will be enlarged with elements that will be discarded at the end
+   *   initialize a working list T which keeps track.
+   *   the working list T is a vector of pairs of integer.
+   *   if T contains a pair (i,j) then that means that in the i-th element of H
+   *   term j and subsequent terms need to be checked for reduction.
+   *   T is sorted by the ordering on the temrs the pairs correspond to.
    **/
   int m=idSize(H),n=0;
-  ideal I = idInit(m), T = idInit(m);
+  ideal I = idInit(m);
+  std::vector<mark> T;
   for (int i=0; i<m; i++)
   {
     I->m[i]=H->m[i];
-    if (pNext(H->m[i])) T->m[n++]=H->m[i];
+    if (pNext(I->m[i])!=NULL)
+      T.push_back(std::make_pair<int,int>(i,1));
   }
-  poly g; int k=n;
-  do
-  {
-    int j=0;
-    for (int i=1; i<k; i++)
-    {
-      if (p_LmCmp(pNext(T->m[i-1]),pNext(T->m[i]),r)<0)
-      {
-        g=T->m[i-1];
-        T->m[i-1]=T->m[i];
-        T->m[i]=g;
-        j = i;
-      }
-    }
-    k=j;
-  } while(k);
 
   /***
    * Step 3: as long as the working list is not empty, successively reduce terms in it
    *   by adding suitable elements to I and reducing it initially with respect to itself
    **/
-  k=idSize(G);
-  while (n)
+  int k=idSize(G);
+  while (T.size()>0)
   {
+    sortMarks(I,r,T);
+    std::cout << "T.size()=" << T.size() << std::endl;
+    std::cout << "T[0] = (" << T[0].first << "," << T[0].second << ")" << std::endl;
     int i=0; for (; i<k; i++)
-      if (p_LeadmonomDivisibleBy(G->m[i],pNext(T->m[0]),r)) break;
+      if (p_LeadmonomDivisibleBy(G->m[i],getTerm(I,T[0]),r)) break;
     if (i<k)
     {
-      g = p_One(r);
+      if (T[0].first==10 && T[0].second==3)
+      {
+        std::cout << "check this" << std::endl;
+      }
+      std::cout << "reducing" << std::endl;
+      poly g = p_One(r); poly h0 = getTerm(I,T[0]);
+      assume(h0!=NULL);
       for (int j=2; j<=r->N; j++)
-        p_SetExp(g,j,p_GetExp(pNext(T->m[0]),j,r)-p_GetExp(G->m[i],j,r),r);
+        p_SetExp(g,j,p_GetExp(h0,j,r)-p_GetExp(G->m[i],j,r),r);
       p_Setm(g,r);
       g = p_Mult_q(g,p_Copy(G->m[i],r),r);
-      ppreduceInitially(I,p,g,r);
+      int newEntry = ppreduceInitially(I,p,g,r);
+      adjustMarks(T,newEntry);
     }
     else
-      pIter(T->m[0]);
-    for (int i=0; i<n;)
-    {
-      if (!pNext(T->m[i]))
-      {
-        for (int j=i; j<n-1; j++)
-          T->m[j]=T->m[j+1];
-        T->m[--n]=NULL;
-      }
-      else
-        i++;
-    }
-    int l = n;
-    do
-    {
-      int j=0;
-      for (int i=1; i<l; i++)
-      {
-        if (p_LmCmp(pNext(T->m[i-1]),pNext(T->m[i]),r)<0)
-        {
-          g=T->m[i-1];
-          T->m[i-1]=I->m[i];
-          T->m[i]=g;
-          j = i;
-        }
-      }
-      l=j;
-    } while(l);
+      T[0].second = T[0].second+1;
+    cleanupMarks(I,T);
   }
 
   /***
@@ -527,7 +591,6 @@ bool ppreduceInitially(ideal &H, const number p, const ideal G, const ring r)
     }
   }
   id_Delete(&I,r);
-  id_Delete(&T,r);
   return false;
 }
 
@@ -700,7 +763,12 @@ bool ppreduceInitially(ideal I, const ring r, const number p)
     }
     m += l; IDELEMS(GG) = m; GG->m = &G->m[n-m];
     // std::vector<int> synch = synchronize(I,it->second);
+    id_Test(it->second,r);
+    id_Test(GG,r);
+    if (ppreduceInitially(it->second,p,r)) return true;
     if (ppreduceInitially(it->second,p,GG,r)) return true;
+    id_Test(it->second,r);
+    id_Test(GG,r);
     // synchronize(I,it->second,synch);
     idShallowDelete(&Hi); Hi = it->second;
   }
