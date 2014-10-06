@@ -1428,9 +1428,10 @@ leftv sleftv::LHdl()
 
 BOOLEAN assumeStdFlag(leftv h)
 {
-  if ((h->e!=NULL)&&(h->LTyp()==LIST_CMD))
+  if (h->e!=NULL)
   {
-    return assumeStdFlag(h->LData());
+    leftv hh=h->LData();
+    if (h!=hh) return assumeStdFlag(h->LData());
   }
   if (!hasFlag(h,FLAG_STD))
   {
