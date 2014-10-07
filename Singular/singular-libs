@@ -23,7 +23,7 @@ SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
 	paraplanecurves.lib phindex.lib \
 	pointid.lib poly.lib \
 	presolve.lib primdec.lib primdecint.lib \
-	primitiv.lib qhmoduli.lib random.lib realclassify.lib \
+	primitiv.lib qhmoduli.lib random.lib randomIdeal.lib realclassify.lib \
 	realrad.lib reesclos.lib resbinomial.lib \
 	resgraph.lib resjung.lib resolve.lib \
 	reszeta.lib ring.lib rinvar.lib rootsmr.lib rootsur.lib \
