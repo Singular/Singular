@@ -1071,6 +1071,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   /*================= absBiFact ======================*/
+    #ifdef HAVE_NTL
     if (strcmp(sys_cmd, "absFact") == 0)
     {
       if (h!=NULL)
@@ -1102,6 +1103,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       else return TRUE;
     }
     else
+    #endif
   /* =================== LLL via NTL ==============================*/    
   #ifdef HAVE_NTL
     if (strcmp(sys_cmd, "LLL") == 0)
