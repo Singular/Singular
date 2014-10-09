@@ -295,6 +295,9 @@ struct n_Procs_s
    /// create i^th parameter or NULL if not possible
    number  (*cfParameter)(const int i, const coeffs r);
 
+   /// a function returning random elements
+   number (*cfRandom)(int r, void *p1, void *p2, const coeffs cf);
+
    /// function pointer behind n_ClearContent
    nCoeffsEnumeratorFunc cfClearContent;
 

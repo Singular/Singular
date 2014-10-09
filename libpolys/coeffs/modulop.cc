@@ -447,6 +447,11 @@ static number npReadFd(s_buff f, const coeffs r)
   return (number)(long)dd;
 }
 
+static number npRandom(int r, void*, void *, const coeffs cf)
+{
+  return npInit(r,cf);
+}
+
 BOOLEAN npInitChar(coeffs r, void* p)
 {
   assume( getCoeffType(r) == ID );
@@ -523,6 +528,8 @@ BOOLEAN npInitChar(coeffs r, void* p)
 
   r->convSingNFactoryN=npConvSingNFactoryN;
   r->convFactoryNSingN=npConvFactoryNSingN;
+
+  r->cfRandom=npRandom;
 
   // io via ssi
   r->cfWriteFd=npWriteFd;

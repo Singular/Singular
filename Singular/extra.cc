@@ -606,7 +606,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return TRUE;
       }
       res->rtyp=INT_CMD;
-      res->data=(void*)(long) siRandomStart;
+      res->data=(void*)(long) siSeed;
       return FALSE;
     }
     else

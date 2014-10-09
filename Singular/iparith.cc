@@ -6259,6 +6259,23 @@ static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
   res->data = (char *)iv;
   return FALSE;
 }
+#ifdef SINGULAR_4_1
+static BOOLEAN jjRANDOM_CF(leftv res, leftv u, leftv v, leftv w)
+// <coeff>, par1, par2 -> number2
+{
+  coeffs cf=(coeffs)u->Data();
+  if ((cf!=NULL) && (cf->cfRandom!=NULL))
+  {
+    number n=cf->cfRandom(siRandom(),v->Data(),w->Data(),cf);
+    number2 nn=(number2)omAlloc(sizeof(*r));
+    nn->cf=cf;
+    nn->n=n;
+    res->data=nn;
+    return FALSE;
+  }
+  return TRUE;
+}
+#endif
 static BOOLEAN jjSUBST_Test(leftv v,leftv w,
   int &ringvar, poly &monomexpr)
 {
