@@ -45,16 +45,11 @@
 /* Undefine to disable Gerhard's and Wilfried's fast and dirty std computations */
 #define FAST_AND_DIRTY
 
-#if 0
-/* defined(HAVE_DYNAMIC_LOADING)? TODO: the following features are not tested in legacy Singular! :( */
-
 /* eigenvalues */
 #define HAVE_EIGENVAL 1
 
 /* Gauss-Manin system */
 #define HAVE_GMS 1
-
-#endif
 
 /* include simpleipc/semaphore code, link against librt/libpthread */
 #define HAVE_SIMPLEIPC 1
