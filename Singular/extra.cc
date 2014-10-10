@@ -2970,22 +2970,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         else
   #endif
   #endif
-  /*==================== eigenvalues ==================================*/
-  #ifdef HAVE_EIGENVAL
-      if(strcmp(sys_cmd,"eigenvals")==0)
-      {
-        return evEigenvals(res,h);
-      }
-      else
-  #endif
-  /*==================== Gauss-Manin system ==================================*/
-  #ifdef HAVE_GMS
-      if(strcmp(sys_cmd,"gmsnf")==0)
-      {
-        return gmsNF(res,h);
-      }
-      else
-  #endif
   /*==================== facstd_debug ==================================*/
   #if !defined(SING_NDEBUG)
       if(strcmp(sys_cmd,"facstd")==0)
