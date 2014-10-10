@@ -6,6 +6,12 @@ extern "C" {
 extern int siSeed;
 int siRand();
 
+typedef int (*siRandProc)();
+typedef int (*siRandProc1)(int);
+int siRandNext(int);
+int siRandPlus1(int);
+
+
 #ifdef __cplusplus
 }
 #endif

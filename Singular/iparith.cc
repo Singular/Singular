@@ -6266,8 +6266,8 @@ static BOOLEAN jjRANDOM_CF(leftv res, leftv u, leftv v, leftv w)
   coeffs cf=(coeffs)u->Data();
   if ((cf!=NULL) && (cf->cfRandom!=NULL))
   {
-    number n=cf->cfRandom(siRandom(),v->Data(),w->Data(),cf);
-    number2 nn=(number2)omAlloc(sizeof(*r));
+    number n=cf->cfRandom(siRand,(number)v->Data(),(number)w->Data(),cf);
+    number2 nn=(number2)omAlloc(sizeof(*nn));
     nn->cf=cf;
     nn->n=n;
     res->data=nn;

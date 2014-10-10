@@ -447,9 +447,9 @@ static number npReadFd(s_buff f, const coeffs r)
   return (number)(long)dd;
 }
 
-static number npRandom(int r, void*, void *, const coeffs cf)
+static number npRandom(siRandProc p, number, number, const coeffs cf)
 {
-  return npInit(r,cf);
+  return npInit(p(),cf);
 }
 
 BOOLEAN npInitChar(coeffs r, void* p)

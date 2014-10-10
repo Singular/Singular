@@ -9,6 +9,7 @@
 
 
 #include <misc/auxiliary.h>
+#include <misc/sirandom.h>
 
 #include <factory/factory.h>
 
@@ -3044,12 +3045,12 @@ static number nlLcm(number a,number b,const coeffs r)
   return n2;
 }
 
-static number nlRandom(int r, void* v2, void *, const coeffs cf)
+static number nlRandom(siRandProc p, number v2, number, const coeffs cf)
 {
-  number a=nlInit(r,cf);
+  number a=nlInit(p(),cf);
   if (v2!=NULL)
   {
-    number b=nlInit((long)v2,cf);
+    number b=nlInit(p(),cf);
     number c=nlDiv(a,b,cf);
     nlDelete(&b,cf);
     nlDelete(&a,cf);

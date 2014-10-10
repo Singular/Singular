@@ -28,14 +28,22 @@
 
 int siSeed = 1;
 
+int siRandNext(int r)
+{
+  r = A * (r % Q) - R * (r / Q);
+
+  if ( r < 0 )
+    r += M;
+
+  return( r );
+}
 
 int siRand()
 {
-  siSeed = A * (siSeed % Q) - R * (siSeed / Q);
-
-  if ( siSeed < 0 )
-    siSeed += M;
-
-  return( siSeed );
+  siSeed=siRandNext(siSeed);
+  return siSeed;
 }
-
+int siRandPlus1(int r)
+{
+  return r+1;
+}
