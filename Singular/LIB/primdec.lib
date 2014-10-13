@@ -4193,35 +4193,17 @@ EXAMPLE: example zeroRad; shows an example"
 
    string cR="ring @R="+string(p)+",("+parstr(R)+","+varstr(R)+"),dp;";
    execute(cR);
+
    ideal F=imap(R,F);
-   ideal I=imap(R,I);
-   dbprint(printlevel-voice, "in @R, I=",I);
-   dbprint(printlevel-voice, "in @R, F=",F);
 
-   // 1. renaming: parstr->ppar, varstr->vvar   
-   //string nR1="ring @S1="+string(p)+",( ppar(1.."+string(m)+"),vvar(1.."+string(n)+") ),dp;";
-   //execute(nR1);
-    
-   //ideal I = fetch(@R,I);
-   //dbprint(printlevel-voice, "in @S1, I=",I);
-
-   // 2. introducing nev variables y(1..npars(R)). Due to renaming we control all variable names and there can be no conflicts.
-   string nR="ring @S="+string(p)+",(y(1.."+string(m)+"),vvar(1.."+string(n)+"),ppar(1.."+string(m)+") ),dp;";
+   string nR="ring @S="+string(p)+",(qxobxpltuzoaxbcny(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
    execute(nR);
 
    ideal G=fetch(@R,F);    //G[i](t(1)^(p^-k),...,t(m)^(p^-k),x(i))=sep(F[i])
-   //ideal I= imap(@S1,I);
 
-   ideal  map@R@SIdeal ;
-   int mpos;
-   for (mpos  =    1; mpos <= m;    mpos++)   {    map@R@SIdeal[mpos]=var(m+n+mpos);  } // map parstr y to ppar
-   for (mpos = m  +1; mpos <= m+n;  mpos++)   {    map@R@SIdeal[mpos]=var(mpos);    } // map varstr to vvar
-
-   map map@R@S= @R,map@R@SIdeal;
-   ideal I= map@R@S(I);
-
-   dbprint(printlevel-voice, "in @S, I=",I);
-   dbprint(printlevel-voice, "in @S, G=",G);
+   ideal I=imap(R,I);
+   dbprint(printlevel-voice, "in @R, I=",I);
+   dbprint(printlevel-voice, "in @R, F=",F);
 
    ideal J=I+G;
    poly el=1;
@@ -4231,28 +4213,10 @@ EXAMPLE: example zeroRad; shows an example"
      J=J,var(i)^k-var(m+n+i);
      el=el*var(i);
    }
-
+  
    J=eliminate(J,el);
-   dbprint(printlevel-voice, "in @S, J=",J);
-
-   //setring @S1;
-   //ideal J=imap(@S,J);
-   //dbprint(printlevel-voice, "in @S1, J=",J);
-   //setring @R;
-   //ideal J=fetch(@S1,J);
-   //dbprint(printlevel-voice, "in @R, J=",J);
    setring R;
-   ideal  mapIdeal ;
- 
-   for (mpos  =    1; mpos <= m;    mpos++)   {    mapIdeal[mpos]=0;              } // map y to 0
-   for (mpos = m  +1; mpos <= m+n;  mpos++)   {    mapIdeal[mpos]=var(mpos-m);    } // map vvar to vars
-   for (mpos = m+n+1; mpos <= m+n+m;mpos++)   {    mapIdeal[mpos]=par(mpos-m-n);  } // map ppar to pars
-
-   map backmap= @S,mapIdeal;
-   ideal J=backmap(J);
-   //ideal J=imap(@R,J);
-
-   dbprint(printlevel-voice, "in R, J=",J);
+   ideal J=imap(@S,J);
    return(J);
 }
 example
