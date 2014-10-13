@@ -34,7 +34,7 @@ galeon!xDhE:galeon:!galeon -n %h &
 netscape!xDhE:netscape:!(netscape -remote "openURL(%h)")||(netscape %h) &
 cygwin!xhE:cygstart:!cygstart "%h" &
 cygwin-www!E:cygstart:!cygstart "%H" &
-safari!xhE:/Applications/Safari.app:!open /Applications/Safari.app %h
+safari!xhE:/Applications/Safari.app:!open -a /Applications/Safari.app %h
 tkinfo!xDiE:tkinfo:!tkinfo '(%i)%n' &
 xinfo!xDiE:xterm:E:info:!xterm -e info -f %i --node='%n' &
 info!xiE:info:!info -f %i --node='%n'
@@ -50,8 +50,8 @@ konqueror-www!DE:konqueror:!konqueror http://www.singular.uni-kl.de/Manual/%v/ &
 galeon-www-idx!xDE:galeon:!galeon -n %H &
 galeon-www!DE:galeon:!galeon -n http://www.singular.uni-kl.de/Manual/%v/ &
 netscape-www!DE:netscape:!(netscape -remote "openURL(http://www.singular.uni-kl.de/Manual/%v/)")||(netscape http://www.singular.uni-kl.de/Manual/%v/) &
-safari-www-idx!xE:/Applications/Safari.app:!open /Applications/Safari.app %H
-safari-www!E:/Applications/Safari.app:!open /Applications/Safari.app http://www.singular.uni-kl.de/Manual/%v/
+safari-www-idx!xE:/Applications/Safari.app:!open -a /Applications/Safari.app %H
+safari-www!E:/Applications/Safari.app:!open -a /Applications/Safari.app http://www.singular.uni-kl.de/Manual/%v/
 lynx-www-idx!xE:lynx:!lynx %H
 lynx-www!E:lynx:!lynx http://www.singular.uni-kl.de/Manual/%v/
 
