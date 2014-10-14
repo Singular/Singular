@@ -177,7 +177,7 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
 
     poly FindReducer(const poly multiplier, const poly monom, const poly syzterm, const CReducerFinder& checker) const;
 
-#ifndef NDEBUG
+#ifndef SING_NDEBUG
     void DebugPrint() const;
 #endif
 
