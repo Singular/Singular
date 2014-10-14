@@ -9,20 +9,12 @@
 
 #include <vector>
 #include <set>
+#include <sstream>
 
-
-#include "config.h"
-
-#ifdef HAVE_CDD_SETOPER_H
+//extern "C"{
 #include "cdd/setoper.h"
 #include "cdd/cdd.h"
-#elif HAVE_CDDLIB_SETOPER_H
-#include "cddlib/setoper.h"
-#include "cddlib/cdd.h"
-#else
-#include "setoper.h"
-#include "cdd.h"
-#endif
+//}
 
 namespace gfan{
 
@@ -47,7 +39,7 @@ class LpSolver
     dd_colrange d_input,j;
     dd_RepresentationType rep=dd_Inequality;
     // dd_boolean found=dd_FALSE, newformat=dd_FALSE, successful=dd_FALSE;
-    // char command[dd_linelenmax], comsave[dd_linelenmax];
+    char command[dd_linelenmax], comsave[dd_linelenmax];
     dd_NumberType NT;
 
     (*Error)=dd_NoError;
@@ -67,7 +59,7 @@ class LpSolver
       dd_set_si(M->matrix[i][0],0);
       for (j = 1; j < d_input; j++) {
         g[i][j-1].setGmp(mpq_numref(M->matrix[i][j]));
-        mpz_init_set_ui(mpq_denref(M->matrix[i][j]), 1);
+        mpz_set_ui(mpq_denref(M->matrix[i][j]), 1);
         mpq_canonicalize(M->matrix[i][j]);
       }
     }
@@ -110,13 +102,14 @@ class LpSolver
   static bool isFacet(ZMatrix const &g, int index)
   {
     bool ret;
-    dd_MatrixPtr M=NULL/*,M2=NULL,M3=NULL*/;
+    // dd_MatrixPtr M=NULL,M2=NULL,M3=NULL;
+    dd_MatrixPtr M=NULL;
     // dd_colrange d;
     dd_ErrorType err=dd_NoError;
     // dd_rowset redrows,linrows,ignoredrows, basisrows;
     // dd_colset ignoredcols, basiscols;
     // dd_DataFileType inputfile;
-    // FILE *reading=NULL;
+    FILE *reading=NULL;
 
     cddinitGmp();
 
@@ -335,6 +328,7 @@ public:
   void removeRedundantRows(ZMatrix &inequalities, ZMatrix &equations, bool removeInequalityRedundancies)
   {
     cddinitGmp();
+
     int numberOfEqualities=equations.getHeight();
     int numberOfInequalities=inequalities.getHeight();
     int numberOfRows=numberOfEqualities+numberOfInequalities;
@@ -450,12 +444,12 @@ _L99:
   }
   void dual(ZMatrix const &inequalities, ZMatrix const &equations, ZMatrix &dualInequalities, ZMatrix &dualEquations)
   {
-    // int result;
+    int result;
 
     dd_MatrixPtr A=NULL;
     dd_ErrorType err=dd_NoError;
 
-    cddinitGmp();
+	cddinitGmp();
 
     A=ZMatrix2MatrixGmp(inequalities, equations, &err);
 
@@ -474,8 +468,8 @@ _L99:
     dd_FreePolyhedra(poly);
 
     return;
-   // _L99:
-   //  assert(0);
+   _L99:
+    assert(0);
   }
   // this procedure is take from cddio.c.
   static void dd_ComputeAinc(dd_PolyhedraPtr poly)
@@ -605,9 +599,9 @@ _L99:
     dd_FreePolyhedra(poly);
 
     return ret;
-   // _L99:
-   //  assert(0);
-   //  return std::vector<std::vector<int> >();
+   _L99:
+    assert(0);
+    return std::vector<std::vector<int> >();
   }
 
 };
@@ -701,7 +695,7 @@ void ZCone::ensureStateAsMinimum(int s)const
         {
           QMatrix m=ZToQMatrix(equations);
           m.reduce();
-          m.REformToRREform(true);
+          m.REformToRREform();
           ZMatrix inequalities2(0,equations.getWidth());
           for(int i=0;i<inequalities.getHeight();i++)
             {
@@ -709,8 +703,8 @@ void ZCone::ensureStateAsMinimum(int s)const
             }
           inequalities=LpSolver::fastNormals(inequalities2);
           goto noFallBack;
-        // fallBack://alternativ (disabled)
-        //   lpSolver.removeRedundantRows(inequalities,equations,true);
+        fallBack://alternativ (disabled)
+          lpSolver.removeRedundantRows(inequalities,equations,true);
         noFallBack:;
         }
       else
@@ -720,7 +714,7 @@ void ZCone::ensureStateAsMinimum(int s)const
     {
       QMatrix equations2=ZToQMatrix(equations);
       equations2.reduce(false,false,true);
-      equations2.REformToRREform();
+      equations2.REformToRREform(true);
       for(int i=0;i<inequalities.getHeight();i++)
         {
           inequalities[i]=QToZVectorPrimitive(equations2.canonicalize(ZToQVector(inequalities[i])));
@@ -732,15 +726,22 @@ void ZCone::ensureStateAsMinimum(int s)const
     state=s;
 }
 
-void operator<<(std::ostream &f, ZCone const &c)
+std::ostream &operator<<(std::ostream &f, ZCone const &c)
 {
   f<<"Ambient dimension:"<<c.n<<std::endl;
   f<<"Inequalities:"<<std::endl;
   f<<c.inequalities<<std::endl;
   f<<"Equations:"<<std::endl;
   f<<c.equations<<std::endl;
+  return f;
 }
 
+std::string ZCone::toString()const
+{
+	std::stringstream f;
+	f<<*this;
+	return f.str();
+}
 
 ZCone::ZCone(int ambientDimension):
   preassumptions(PCP_impliedEquationsKnown|PCP_facetsKnown),
@@ -933,11 +934,31 @@ ZCone ZCone::positiveOrthant(int dimension)
 
 ZCone ZCone::givenByRays(ZMatrix const &generators, ZMatrix const &linealitySpace)
 {
-  ZCone dual(generators,linealitySpace);
+  //rewrite modulo lineality space
+/*  ZMatrix newGenerators(generators.getHeight(),generators.getWidth());
+  {
+    QMatrix l=ZToQMatrix(linealitySpace);
+    l.reduce();
+    for(int i=0;i<generators.getHeight();i++)
+      newGenerators[i]=QToZVectorPrimitive(l.canonicalize(ZToQVector(generators[i])));
+  }
+*/
+//	  ZCone dual(newGenerators,linealitySpace);
+	  ZCone dual(generators,linealitySpace);
+//  dual.findFacets();
+//  dual.canonicalize();
   ZMatrix inequalities=dual.extremeRays();
-  ZMatrix equations=dual.generatorsOfLinealitySpace();
 
-  return ZCone(inequalities,equations,3);
+/*  ZMatrix span=generators;
+  span.append(linealitySpace);
+  QMatrix m2Q=ZToQMatrix(span);
+  ZMatrix equations=QToZMatrixPrimitive(m2Q.reduceAndComputeKernel());
+*/
+  ZMatrix equations=dual.generatorsOfLinealitySpace();
+//  equations.reduce();equations.removeZeroRows();
+
+
+  return ZCone(inequalities,equations,PCP_impliedEquationsKnown|PCP_facetsKnown);
 }
 
 
@@ -1222,11 +1243,15 @@ ZCone ZCone::link(ZVector const &w)const
 bool ZCone::hasFace(ZCone const &f)const
 {
   if(!contains(f.getRelativeInteriorPoint()))return false;
-  ZCone temp1=faceContaining(f.getRelativeInteriorPoint());
-  temp1.canonicalize();
+  ZCone temp=faceContaining(f.getRelativeInteriorPoint());
+  temp.canonicalize();
+//  ZCone temp2=*this;
   ZCone temp2=f;
   temp2.canonicalize();
-  return !(temp2!=temp1);
+//  std::cout << temp << std::endl;
+//  std::cout << temp2 << std::endl;
+
+  return !(temp2!=temp);
 }
 
 ZCone ZCone::faceContaining(ZVector const &v)const

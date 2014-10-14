@@ -147,7 +147,7 @@ public:
       */
      ZMatrix generatorsOfSpan()const;
      /**
-      * Compute generators of the lineality space of the cone. They are stored as rows of the returned matrix.
+      * Compute generators of the lineality space of the cone. The returned set of generators is a vector spaces basis. They are stored as rows of the returned matrix.
       */
      ZMatrix generatorsOfLinealitySpace()const;
      /**
@@ -162,6 +162,7 @@ public:
       * Returns true iff the extreme rays are known.
       */
      bool areExtremeRaysKnown()const{return haveExtremeRaysBeenCached;}
+
      /**
       * Takes the cone to a canonical form. After taking cones to canonical form, two cones are the same
       * if and only if their matrices of equations and inequalities are the same.
@@ -341,17 +342,18 @@ public:
        Tests if f is a face of the cone.
      */
     bool hasFace(ZCone const &f)const;
-  /**
-   Computes the face of the cone containing v in its relative interior.
-   The vector MUST be contained in the cone.
-   */
+    /**
+       Computes the face of the cone containing v in its relative interior.
+       The vector MUST be contained in the cone.
+    */
     ZCone faceContaining(ZVector const &v)const;
     /**
      * Computes the projection of the cone to the first newn coordinates.
      * The ambient space of the returned cone has dimension newn.
      */
-   // PolyhedralCone projection(int newn)const;
-    friend void operator<<(std::ostream &f, ZCone const &c);
+    // PolyhedralCone projection(int newn)const;
+    friend std::ostream &operator<<(std::ostream &f, ZCone const &c);
+    std::string toString()const;
 };
 
 };

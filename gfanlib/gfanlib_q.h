@@ -30,6 +30,8 @@ public:
   Rational(signed long int value_)
   {
     mpq_init(value);
+//    mpz_init_set_si(mpq_numref(value), value_);
+//    mpz_init_set_ui(mpq_denref(value), 1);
     mpz_set_si(mpq_numref(value), value_);
     mpz_set_ui(mpq_denref(value), 1);
     mpq_canonicalize(value);
@@ -47,6 +49,8 @@ public:
   explicit Rational(Integer const & value_)
   {
     mpq_init(value);
+//    mpz_init_set(mpq_numref(value), value_.value);
+//    mpz_init_set_ui(mpq_denref(value), 1);
     mpz_set(mpq_numref(value), value_.value);
     mpz_set_ui(mpq_denref(value), 1);
     mpq_canonicalize(value);
@@ -155,7 +159,7 @@ public:
   {
     return mpq_sgn(value);
   }
-  static Rational gcd(Rational const &a, Rational const /*&b*/, Rational /*&s*/, Rational /*t*/)
+  static Rational gcd(Rational const &a, Rational const &b, Rational &s, Rational &t)
   {
 /*    mpz_t r;
     mpz_init(r);

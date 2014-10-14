@@ -8,9 +8,9 @@
 #include "gfanlib_polymakefile.h"
 
 #include <assert.h>
+#include <stdio.h>
 #include <sstream>
 #include <istream>
-#include <stdio.h>
 
 using namespace std;
 
@@ -52,7 +52,7 @@ static list<int> readIntList(istream &s)
 {
   list<int> ret;
   int c=s.peek();
-  while(((c>='0') && (c<='9')) || (c==' '))
+  while(((c>='0') && (c<='9'))|| (c==' '))
     {
       //      fprintf(Stderr,"?\n");
       int r;
@@ -170,9 +170,9 @@ void PolymakeFile::close()
     }
   else
     {
-      // fprintf(f,"_application %s\n",application.c_str());
-      // fprintf(f,"_version 2.2\n");
-      // fprintf(f,"_type %s\n",type.c_str());
+      fprintf(f,"_application %s\n",application.c_str());
+      fprintf(f,"_version 2.2\n");
+      fprintf(f,"_type %s\n",type.c_str());
 
       for(list<PolymakeProperty>::const_iterator i=properties.begin();i!=properties.end();i++)
         {
@@ -200,9 +200,9 @@ void PolymakeFile::writeStream(ostream &file)
     }
   else
     {
-      // file << "_application " << application << endl;
-      // file << "_version 2.2\n";
-      // file << "_type " << type << endl;
+      file << "_application " << application << endl;
+      file << "_version 2.2\n";
+      file << "_type " << type << endl;
 
       for(list<PolymakeProperty>::const_iterator i=properties.begin();i!=properties.end();i++)
         {

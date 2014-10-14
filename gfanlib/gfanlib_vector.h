@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 
 #include "gfanlib_z.h"
 #include "gfanlib_q.h"
@@ -288,6 +289,14 @@ public:
     }
     return f<<")";
   }
+
+  std::string toString()const
+  {
+	  std::stringstream f;
+	  f<<*this;
+	  return f.str();
+  }
+
   typ gcd()const
   {
     typ temp1,temp2;
@@ -392,9 +401,8 @@ inline ZVector QToZVectorPrimitive(QVector const &v)
     mpz_clear(lcm);
 
     return ret;
-}
+};
 
-}
-
+};
 
 #endif /* LIB_ZVECTOR_H_ */

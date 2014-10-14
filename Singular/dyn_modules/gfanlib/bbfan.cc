@@ -45,7 +45,7 @@ char* bbfan_String(blackbox* /*b*/, void *d)
   else
   {
     gfan::ZFan* zf = (gfan::ZFan*)d;
-    std::string s = zf->toStringJustRaysAndMaximalCones();
+    std::string s = zf->toString(2+4+8+128);
     return omStrDup(s.c_str());
   }
 }
@@ -688,20 +688,20 @@ BOOLEAN isPure(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN isComplete(leftv res, leftv args)
-{
-  leftv u=args;
-  if ((u != NULL) && (u->Typ() == fanID))
-  {
-    gfan::ZFan* zf = (gfan::ZFan*) u->Data();
-    int b = zf->isComplete();
-    res->rtyp = INT_CMD;
-    res->data = (void*) (long) b;
-    return FALSE;
-  }
-  WerrorS("isComplete: unexpected parameters");
-  return TRUE;
-}
+// BOOLEAN isComplete(leftv res, leftv args)
+// {
+//   leftv u=args;
+//   if ((u != NULL) && (u->Typ() == fanID))
+//   {
+//     gfan::ZFan* zf = (gfan::ZFan*) u->Data();
+//     int b = zf->isComplete();
+//     res->rtyp = INT_CMD;
+//     res->data = (void*) (long) b;
+//     return FALSE;
+//   }
+//   WerrorS("isComplete: unexpected parameters");
+//   return TRUE;
+// }
 
 BOOLEAN fVector(leftv res, leftv args)
 {
