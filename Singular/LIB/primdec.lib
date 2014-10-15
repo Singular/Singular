@@ -5309,7 +5309,7 @@ static proc reconvList(list l)
 {
    int i;
    list re;
-   for(i=1;i<=size(l);i++)
+   for(i=size(l);i>0;i--)
    {
       re[2*i-1]=l[i][1];
       re[2*i]=l[i][2];
