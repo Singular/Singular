@@ -49,7 +49,7 @@
 #define HAVE_EIGENVAL 1
 
 /* Gauss-Manin system */
-/*#define HAVE_GMS 1*/
+#define HAVE_GMS 1
 
 /* include simpleipc/semaphore code, link against librt/libpthread */
 #define HAVE_SIMPLEIPC 1

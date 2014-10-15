@@ -7217,10 +7217,10 @@ returns names of people who contributed to the @sc{Singular} kernel as string.
 returns the number of cpus as int (for creating multiple threads/processes).
 (see @code{system("--cpus")}).
 @c ..........................
-@c @item @code{system("eigenvals",} matrix @code{)}
-@c @cindex system, eigenvals
-@c returns the list of the eigenvalues of the matrix (as ideal, intvec).
-@c (see @code{system("hessenberg")}).
+@item @code{system("eigenvals",} matrix @code{)}
+@cindex system, eigenvals
+returns the list of the eigenvalues of the matrix (as ideal, intvec).
+(see @code{system("hessenberg")}).
 @c ..........................
 @item @code{system("env",} ring @code{)}
 @cindex system, env
@@ -7252,10 +7252,10 @@ returns the precision for floating point numbers
 returns the degree of the "highest corner" from the last
 std computation (or 0).
 @c ..........................
-@c @item @code{system("hessenberg",} matrix @code{)}
-@c @cindex system, hessenberg
-@c @cindex hessenberg
-@c returns the Hessenberg matrix (via QR algorithm).
+@item @code{system("hessenberg",} matrix @code{)}
+@cindex system, hessenberg
+@cindex hessenberg
+returns the Hessenberg matrix (via QR algorithm).
 @c ..........................
 @item @code{system("install",} s1, s2, p3, i4 @code{)}
 @cindex system, install
