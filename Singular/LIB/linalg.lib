@@ -1250,6 +1250,11 @@ example
 
 static proc rowcolswap(matrix M,int i,int j)
 {
+  if(system("with","eigenval"))
+  {
+    return(system("rowcolswap",M,i,j));
+  }
+  //--------------------------------------------
   if(i==j)
   {
     return(M);
@@ -1273,6 +1278,11 @@ static proc rowcolswap(matrix M,int i,int j)
 
 static proc rowelim(matrix M,int i,int j,int k)
 {
+  if(system("with","eigenval"))
+  {
+    return(system("rowelim",M,i,j,k));
+  }
+  // -----------------------
   if(jet(M[i,k],0)==0||jet(M[j,k],0)==0)
   {
     return(M);
@@ -1490,7 +1500,7 @@ proc spnf(list #)
 ASSUME:  ncols(a)==size(m)
 RETURN:  list l:
             l[1] an ideal, the generators of a; sorted and with multiple entries displayed only once@*
-            l[2] and intvec, l[2][i] provides the multiplicity of l[1][i]
+            l[2] an intvec, l[2][i] provides the multiplicity of l[1][i]
 EXAMPLE: example spnf; shows examples
 "
 {
