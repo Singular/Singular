@@ -6774,7 +6774,6 @@ EXAMPLE: example testPrimary; shows an example
 {
    ASSUME(0, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
-   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    int i;
    pr=reconvList(pr);
