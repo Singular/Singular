@@ -46,7 +46,7 @@
 #define FAST_AND_DIRTY
 
 /* eigenvalues */
-/*#define HAVE_EIGENVAL 1*/
+#define HAVE_EIGENVAL 1
 
 /* Gauss-Manin system */
 /*#define HAVE_GMS 1*/

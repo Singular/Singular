@@ -1101,6 +1101,22 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif
+  /*==================== rowelim ==================================*/
+  #ifdef HAVE_EIGENVAL
+    if(strcmp(sys_cmd,"rowelim")==0)
+    {
+      return evRowElim(res,h);
+    }
+    else
+  #endif
+  /*==================== rowcolswap ==================================*/
+  #ifdef HAVE_EIGENVAL
+    if(strcmp(sys_cmd,"rowcolswap")==0)
+    {
+      return evSwap(res,h);
+    }
+    else
+  #endif
   /*==================== Gauss-Manin system ==================================*/
   #ifdef HAVE_GMS
     if(strcmp(sys_cmd,"gmsnf")==0)

@@ -13,12 +13,10 @@
 #ifdef HAVE_EIGENVAL
 
 #include <kernel/structs.h>
-//#include "ipid.h"
 #include <misc/intvec.h>
 #include <coeffs/numbers.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
-//#include "lists.h"
 #include <polys/matpol.h>
 #include <polys/clapsing.h>
 #include <kernel/linear_algebra/eigenval.h>
@@ -50,8 +48,11 @@ matrix evRowElim(matrix M,int i,int j,int k)
 {
   if(MATELEM(M,i,k)==NULL||MATELEM(M,j,k)==NULL)
     return(M);
+  poly p1=pp_Jet(MATELEM(M,i,k),0,currRing);
+  poly p2=pp_Jet(MATELEM(M,j,k),0,currRing);
+  if ((p1==NULL)||(p2==NULL)) return (M);
 
-  poly p=pNSet(nDiv(pGetCoeff(MATELEM(M,i,k)),pGetCoeff(MATELEM(M,j,k))));
+  poly p=pNSet(nDiv(pGetCoeff(p1),pGetCoeff(p2)));
   pNormalize(p);
 
   for(int l=1;l<=MATCOLS(M);l++)
@@ -66,6 +67,8 @@ matrix evRowElim(matrix M,int i,int j,int k)
   }
 
   pDelete(&p);
+  pDelete(&p1);
+  pDelete(&p2);
 
   return(M);
 }
@@ -102,7 +105,9 @@ matrix evHessenberg(matrix M)
 
   for(int k=1,j=2;k<n-1;k++,j=k+1)
   {
-    while(j<=n&&MATELEM(M,j,k)==NULL)
+    while((j<=n)
+    &&((MATELEM(M,j,k)==NULL)
+      || (p_Totaldegree(MATELEM(M,j,k),currRing)!=0)))
       j++;
 
     if(j<=n)

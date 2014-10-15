@@ -429,7 +429,8 @@ void simple_gauss2(tgb_matrix* mat)
         assume(mat->min_col_not_zero_in_row(i)>=col);
         if(!(mat->is_zero_entry(i,col)))
         {
-          number c1=nInpNeg(nCopy(mat->get(i,col)));
+          number c1=nCopy(mat->get(i,col));
+          c1=nInpNeg(c1);
           number c2=mat->get(row,col);
           number n1=c1;
           number n2=c2;
