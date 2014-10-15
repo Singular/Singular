@@ -21,6 +21,12 @@ proc primdecMinpolyExample()
 proc testPrimdecMinpolyExample()  {    return( primdecMinpolyExample() );   }
 testPrimdecMinpolyExample();
 
+// check that redefinig gnir1 is gone away:
+system("random",1463736066);
+ring rng2 = (0),(x,y,z,u,w),dp;
+ideal I2 = -28*1*x*z*w*1-15*y*z*u*w,-28*1^2*x*u+14*1*x^2*y*w*1+17,12*1*u*w^2*1+18*x*y^2*w;
+list result2 = primdecGTZ (I2);
+
 
 LIB "tst.lib"; tst_status(1);
 $

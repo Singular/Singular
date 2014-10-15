@@ -3200,6 +3200,7 @@ EXAMPLE: example decomp; shows an example
     if((deg(@j[1])==0)||(dim(@j)<jdim))
     {
       setring gnir;
+      kill gnir1;
       break;
     }
     for (lauf=1;lauf<=size(@j);lauf++)
