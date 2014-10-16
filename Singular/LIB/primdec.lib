@@ -545,7 +545,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
   list keepresult,act,keepprime;
   poly @f;
   int sl=size(l);
-  for(i=1;i<=sl div 2;i++)
+  for(i=sl div 2;i>=1;i--)
   {
     if(sact[2][i]>1)
     {
