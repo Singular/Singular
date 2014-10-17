@@ -7242,10 +7242,10 @@ argument. The return type is string.
 @item @code{system("getPrecDigits")}
 @cindex system, getPrecDigits
 returns the precision for floating point numbers
-@c @c ..........................
-@c @item @code{system("gmsnf",} ideal, ideal, matrix,int, int @code{)}
-@c @cindex system, gmsnf
-@c Gauss-Manin system: for gmspoly.lib, gmssing.lib
+@c ..........................
+@item @code{system("gmsnf",} ideal, ideal, matrix,int, int @code{)}
+@cindex system, gmsnf
+Gauss-Manin system: for gmspoly.lib, gmssing.lib
 @c ..........................
 @item @code{system("HC")}
 @cindex system, HC
