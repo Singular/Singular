@@ -614,7 +614,7 @@ void * slInternalCopy(leftv source, const int t, void *d, Subexpr e)
       || (source->rtyp==LIST_CMD)
       || ((source->rtyp==IDHDL)
           &&((IDTYP((idhdl)source->data)==LIST_CMD)
-	    || (IDTYP((idhdl)source->data)>MAX_TOK)))
+            || (IDTYP((idhdl)source->data)>MAX_TOK)))
       || (source->rtyp>MAX_TOK))
         return (void *)omStrDup((char *)d);
       else if (e->next==NULL)
@@ -763,6 +763,11 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           }
           else
             return pString((poly)d);
+
+        #ifdef SINGULAR_4_1
+        case CNUMBER_CMD:
+          return n2String((number2)d,typed);
+        #endif
 
         case NUMBER_CMD:
           StringSetS((char*) (typed ? "number(" : ""));
