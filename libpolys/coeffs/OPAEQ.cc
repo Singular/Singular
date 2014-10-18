@@ -276,6 +276,10 @@ BOOLEAN nAEQClearDenominators  (number, const coeffs)
     return FALSE;
 }
 
+static char * n_QAECoeffName(const coeffs r)
+{
+  return (char *)"QAE";
+}
 
 
 //INITIALISIERUNG FÜR SINGULAR
@@ -285,7 +289,7 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
 {
     // r->is_field,is_domain?
     r->ch=0;
-    r->cfKillChar=NULL;
+    r->cfKillChar=ndKillChar;
     r->nCoeffIsEqual=ndCoeffIsEqual;
     r->cfMult  = nAEQMult;
     r->cfSub   = nAEQSub;
@@ -296,6 +300,7 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
     r->cfInit = nAEQInit;
     r->cfSize  = nAEQSize;
     r->cfInt  = nAEQInt;
+    r->cfCoeffName = n_QAECoeffName;
 #ifdef HAVE_RINGS
     //r->cfDivComp = NULL; // only for ring stuff
     //r->cfIsUnit = NULL; // only for ring stuff

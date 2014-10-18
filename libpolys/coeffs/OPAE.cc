@@ -285,7 +285,10 @@ BOOLEAN nAEClearDenominators  (number, const coeffs)
         return FALSE;
 }
 
-
+static char * n_AECoeffName(const coeffs r)
+{
+  return (char *)"AE";
+}
 
 //INITIALISIERUNG FÜR SINGULAR
 
@@ -294,7 +297,7 @@ BOOLEAN n_AEInitChar(coeffs r, void *)
 {
     // r->is_field, r->is_domain?
     r->ch = 0;
-    r->cfKillChar=NULL;
+    r->cfKillChar = ndKillChar; /* dummy */
     r->nCoeffIsEqual=ndCoeffIsEqual;
     r->cfMult  = nAEMult;
     r->cfSub   = nAESub;
@@ -305,6 +308,7 @@ BOOLEAN n_AEInitChar(coeffs r, void *)
     r->cfInit = nAEInit;
     r->cfSize  = nAESize;
     r->cfInt  = nAEInt;
+    r->cfCoeffName = n_AECoeffName;
 #ifdef HAVE_RINGS
     //r->cfDivComp = NULL; // only for ring stuff
     //r->cfIsUnit = NULL; // only for ring stuff
