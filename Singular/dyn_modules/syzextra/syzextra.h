@@ -62,17 +62,15 @@ struct SchreyerSyzygyComputationFlags
 
     SchreyerSyzygyComputationFlags(const SchreyerSyzygyComputationFlags& attr):
         __DEBUG__(attr.__DEBUG__),
-  //      __SYZCHECK__(attr.__SYZCHECK__),
         __LEAD2SYZ__(attr.__LEAD2SYZ__),  __TAILREDSYZ__(attr.__TAILREDSYZ__),
         __HYBRIDNF__(attr.__HYBRIDNF__), __IGNORETAILS__(attr.__IGNORETAILS__),
         __SYZNUMBER__(attr.__SYZNUMBER__), __TREEOUTPUT__(attr.__TREEOUTPUT__),
+        __SYZCHECK__(attr.__SYZCHECK__),
         m_rBaseRing(attr.m_rBaseRing)
     {}
 
   /// output all the intermediate states
   const int __DEBUG__; // DebugOutput;
-
-  //  const bool __SYZCHECK__; // CheckSyzygyProperty: never tested here...
 
   /// ?
   const int __LEAD2SYZ__; // TwoLeadingSyzygyTerms;
@@ -98,6 +96,9 @@ struct SchreyerSyzygyComputationFlags
 
   /// output lifting tree
   const int __TREEOUTPUT__;
+
+  /// CheckSyzygyProperty: TODO
+  const int __SYZCHECK__; 
 
   /// global base ring
   const ring m_rBaseRing;

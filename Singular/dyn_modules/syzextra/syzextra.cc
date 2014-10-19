@@ -63,6 +63,50 @@ USING_NAMESPACE( SINGULARXXNAME :: DEBUG )
 BEGIN_NAMESPACE_SINGULARXX     BEGIN_NAMESPACE(SYZEXTRA)
 
 
+BEGIN_NAMESPACE_NONAME
+
+static inline poly pp_Add_qq( const poly a, const poly b, const ring R)
+{
+  return p_Add_q( p_Copy(a, R), p_Copy(b, R), R );
+}
+
+static inline poly p_VectorProductLT( poly s,  const ideal& L, const ideal& T, const ring& R)
+{
+  assume( IDELEMS(L) == IDELEMS(T) );
+  poly vp = NULL; // resulting vector product
+
+  while( s != NULL )
+  {
+    const poly nxt = pNext(s);
+    pNext(s) = NULL;
+
+    if( !n_IsZero( p_GetCoeff(s, R), R) )
+    {
+      const int i = p_GetComp(s, R) - 1;
+      assume( i >= 0 ); assume( i < IDELEMS(L) );
+      p_SetComp(s, 0, R); p_SetmComp(s, R);
+
+      vp = p_Add_q( vp, pp_Mult_qq( s, L->m[i], R ), R); 
+      vp = p_Add_q( vp, pp_Mult_qq( s, T->m[i], R ), R); 
+    }
+
+    p_Delete(&s, R);
+
+    s = nxt;
+  };
+
+  assume( s == NULL );
+
+  return vp;
+}
+
+static inline int atGetInt(idhdl rootRingHdl, const char* attribute, long def)
+{
+  return ((int)(long)(atGet(rootRingHdl, attribute, INT_CMD, (void*)def)));
+}
+
+END_NAMESPACE
+
 BEGIN_NAMESPACE(SORT_c_ds)
 
 #if (defined(HAVE_QSORT_R) && (defined __APPLE__ || defined __MACH__ || defined __DARWIN__ || defined __FreeBSD__ || defined __BSD__ || defined OpenBSD3_1 || defined OpenBSD3_9))
@@ -271,7 +315,7 @@ static void writeLatexTerm(const poly t, const ring r, const bool bCurrSyz = tru
     {
       if (writeMult)
       {
-        PrintS(" \\\\cdot ");
+        PrintS(" ");
         writeMult = FALSE;
       } else
       if( writePlus )
@@ -298,7 +342,7 @@ static void writeLatexTerm(const poly t, const ring r, const bool bCurrSyz = tru
   if (comp > 0 )
   {
     if (writeMult)
-      PrintS(" \\\\cdot ");
+      PrintS("  ");
      else
       if( writePlus )
         PrintS(" + ");
@@ -632,12 +676,6 @@ ideal SchreyerSyzygyComputation::Compute1LeadingSyzygyTerms()
   const ring& r = m_rBaseRing;
 //  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
 
-//   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
-//   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
-//   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
-//   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
-//   const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
-
   assume(!__LEAD2SYZ__);
 
   // 1. set of components S?
@@ -745,13 +783,6 @@ ideal SchreyerSyzygyComputation::Compute2LeadingSyzygyTerms()
   const ideal& id = m_idLeads;
   const ring& r = m_rBaseRing;
 //  const SchreyerSyzygyComputationFlags& attributes = m_atttributes;
-
-//   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
-//   const BOOLEAN __SYZCHECK__   = attributes.__SYZCHECK__;
-//   const BOOLEAN __LEAD2SYZ__   = attributes.__LEAD2SYZ__;
-//   const BOOLEAN __HYBRIDNF__   = attributes.__HYBRIDNF__;
-//  const BOOLEAN __TAILREDSYZ__ = attributes.__TAILREDSYZ__;
-
 
   // 1. set of components S?
   // 2. for each component c from S: set of indices of leading terms
@@ -1079,7 +1110,53 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
     if( method )
       TT->m[k] = SchreyerSyzygyNF(a, a2);
     else
-      TT->m[k] = TraverseNF(a, a2);
+      TT->m[k] = TraverseNF(a, a2); // TODO: WRONG
+
+    if( __SYZCHECK__ )      
+    {
+      // TODO: check the correctness (syzygy property): a + TT->m[k] should be a syzygy!!!
+
+      poly s = pp_Add_qq( a, TT->m[k], R); // current syzygy
+
+      poly vp = p_VectorProductLT(s, L, T, R); 
+
+      if( (__DEBUG__ | __TREEOUTPUT__) && (vp != NULL) )
+      {
+        Warn("SchreyerSyzygyComputation::ComputeSyzygy: failed syzygy property for syzygy [%d], non-zero image is as follows: ", k);        
+        dPrint(vp, R, R, 0);       p_Delete(&vp, R);
+        
+        PrintS("SchreyerSyzygyComputation::ComputeSyzygy: Wrong syzygy is as follows: ");
+        s = pp_Add_qq( a, TT->m[k], R);
+        dPrint(s, R, R, 0); p_Delete(&s, R);
+
+        PrintS("SchreyerSyzygyComputation::ComputeSyzygy: Testing with the other method");
+        
+        if( !method )
+          s = SchreyerSyzygyNF(a, a2);
+        else
+          s = TraverseNF(a, a2);
+
+        s = p_Add_q( a, s, R); // another syzygy
+        PrintS("SchreyerSyzygyComputation::ComputeSyzygy: The other method gives the following  syzygy: ");
+        dPrint(s, R, R, 0); 
+        
+        vp = p_VectorProductLT(s, L, T, R);
+        
+        if( vp == NULL )
+        {
+          PrintS("SchreyerSyzygyComputation::ComputeSyzygy: .... which is correct!!! ");
+        } else
+        {
+          Warn("SchreyerSyzygyComputation::ComputeSyzygy: failed to compute syzygy tail[%d] with both methods!!! Non-zero image (2nd) is as follows: ", k);        
+          dPrint(vp, R, R, 0);
+        }
+        
+      } else
+        assume( vp == NULL );
+
+      p_Delete(&vp, R);
+    }
+
   }
 
 #ifndef SING_NDEBUG
@@ -1521,39 +1598,21 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
 
     PrintS("], \"noderesult\": \"");
     writeLatexTerm(s, r, true, false);
-    PrintS("\" },");
+    PrintS("\" },"); 
   }
 
   return s;
 }
 
-
-
-
-
-BEGIN_NAMESPACE_NONAME
-
-static inline int atGetInt(idhdl rootRingHdl, const char* attribute, long def)
-{
-  return ((int)(long)(atGet(rootRingHdl, attribute, INT_CMD, (void*)def)));
-}
-
-END_NAMESPACE
-
-
 SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl):
-#ifndef SING_NDEBUG
-     __DEBUG__( atGetInt(rootRingHdl,"DEBUG", 0) ),
-#else
     __DEBUG__( atGetInt(rootRingHdl,"DEBUG", 0) ),
-#endif
-//    __SYZCHECK__( (BOOLEAN)atGetInt(rootRingHdl, "SYZCHECK", __DEBUG__) ),
-    __LEAD2SYZ__( atGetInt(rootRingHdl, "LEAD2SYZ", 1) ),
+    __LEAD2SYZ__( atGetInt(rootRingHdl, "LEAD2SYZ", 0) ),
     __TAILREDSYZ__( atGetInt(rootRingHdl, "TAILREDSYZ", 1) ),
-    __HYBRIDNF__( atGetInt(rootRingHdl, "HYBRIDNF", 2) ),
+    __HYBRIDNF__( atGetInt(rootRingHdl, "HYBRIDNF", 1) ),
     __IGNORETAILS__( atGetInt(rootRingHdl, "IGNORETAILS", 0) ),
     __SYZNUMBER__( atGetInt(rootRingHdl, "SYZNUMBER", 0) ),
     __TREEOUTPUT__( atGetInt(rootRingHdl, "TREEOUTPUT", 0) ),
+    __SYZCHECK__( atGetInt(rootRingHdl, "SYZCHECK", 0) ),
     m_rBaseRing( rootRingHdl->data.uring )
 {
 #ifndef SING_NDEBUG
@@ -1566,7 +1625,7 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
     Print("   TAILREDSYZ: \t%d\n", __TAILREDSYZ__);
     Print("  IGNORETAILS: \t%d\n", __IGNORETAILS__);
     Print("   TREEOUTPUT: \t%d\n", __TREEOUTPUT__);
-
+    Print("     SYZCHECK: \t%d\n", __SYZCHECK__);
   }
 #endif
 
