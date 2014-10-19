@@ -40,21 +40,18 @@ void sattr::Print()
 
 attr sattr::Copy()
 {
-  if (this!=NULL)
+  assume (this!=NULL);
+
+  omCheckAddrSize(this,sizeof(sattr));
+  attr n=(attr)omAlloc0Bin(sattr_bin);
+  n->atyp=atyp;
+  if (name!=NULL) n->name=omStrDup(name);
+  n->data=CopyA();
+  if (next!=NULL)
   {
-    omCheckAddrSize(this,sizeof(sattr));
-    attr n=(attr)omAlloc0Bin(sattr_bin);
-    n->atyp=atyp;
-    if (name!=NULL) n->name=omStrDup(name);
-    n->data=CopyA();
-    if (next!=NULL)
-    {
-      n->next=next->Copy();
-    }
-    return n;
-  }
-  else
-    return NULL;
+    n->next=next->Copy();
+  }  
+  return n;
 }
 
 // in subexr.cc:

@@ -1187,7 +1187,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
 //  typedef ideal *            resolvente;
 
   _res->length = length + 1; // index + 1;
-  _res->fullres = (resolvente)omAlloc0((_res->length)*sizeof(ideal));
+  _res->fullres = (resolvente)omAlloc0((_res->length+1)*sizeof(ideal));
   int index = 0;
   _res->fullres[index++] = M;
 
