@@ -2187,7 +2187,23 @@ static proc loadme()
       exportto(Schreyer, Syzextra::SchreyerSyzygyNF);
       exportto(Schreyer, Syzextra::ComputeSyzygy);
 
-      exportto(Schreyer, Syzextra::ComputeResolution);      
+      exportto(Schreyer, Syzextra::ComputeResolution);
+
+//      newstruct("SRESOLUTION","ring _r, resolution _res"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
+//      newstruct("SSYZYGY","ring _r, module _syz"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
+      // TODO: SSres - return SRESOLUTION?
+
+//      system("install","SRESOLUTION","string",SRESOLUTION_string, 1);
+//      system("install","SRESOLUTION","print",SRESOLUTION_print, 1);
+//      system("install","SRESOLUTION","list",SRESOLUTION_list, 1);
+
+//      system("install","SRESOLUTION","betti",SRESOLUTION_betti, 2); // http://www.singular.uni-kl.de/Manual/latest/sing_260.htm#SEC299
+//      system("install","SRESOLUTION","minres",SRESOLUTION_minres, 1); // http://www.singular.uni-kl.de/Manual/latest/sing_344.htm#SEC383
+
+      // TODO: SSsyz? SSYZYGY? // TODO: C/C++ computation for Syzygy?
+//      system("install","SSYZYGY","string",SSYZYGY_string, 1);
+//      system("install","SSYZYGY","print",SSYZYGY_print, 1);
+//      system("install","SSYZYGY","module",SSYZYGY_module, 1);
     }
 
     exportto(Top, DetailedPrint);

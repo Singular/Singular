@@ -525,9 +525,9 @@ int CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) con
     bool coprime = true;
     for(TReducers::const_iterator vit = v.begin(); (vit != v.end()) && coprime; ++vit )
     {
-      assume( m_L->m[(*vit)->m_label] == (*vit)->m_lt );
+      assume( (*vit)->CheckLT( m_L ) );
 
-      const poly p = (*vit)->m_lt;
+      const poly p = (*vit)->lt();
 
       assume( p_GetComp(p, r) == comp );
 
@@ -550,7 +550,7 @@ int CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) con
       {
         poly ss = p_LmInit(t, r);
         p_SetCoeff0(ss, n_Init(1, r), r); // for delete & printout only!...
-        p_SetComp(ss, (*vit)->m_label + 1, r); // coeff?
+        p_SetComp(ss, (*vit)->label() + 1, r); // coeff?
         p_Setm(ss, r);
 
         coprime = ( syzChecker.IsDivisible(ss) );
@@ -566,6 +566,8 @@ int CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) con
         p_LmDelete(&ss, r); // deletes coeff as well???
       }
 
+      assume( p == (*vit)->lt() );
+      assume( (*vit)->CheckLT( m_L ) );
     }
 
 #ifndef SING_NDEBUG
@@ -924,6 +926,14 @@ ideal SchreyerSyzygyComputation::Compute2LeadingSyzygyTerms()
 
 poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 {
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
+
   const ideal& L = m_idLeads;
   const ideal& T = m_idTails;
 
@@ -936,6 +946,18 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
   assume( a != NULL );
 
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    PrintS("SchreyerSyzygyComputation::TraverseNF(syz_lead, poly syz_2), \n");
+    PrintS("syz_lead: \n");
+    dPrint(a, R, R, 1);
+    PrintS("syz_2: \n");
+    dPrint(a2, R, R, 1);
+    PrintLn();
+  }
+#endif
+  
   if( __TREEOUTPUT__ )
   {
      PrintS("{ \"nodelabel\": \""); writeLatexTerm(a, R); PrintS("\", \"children\": [");
@@ -946,6 +968,14 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
   poly t = TraverseTail(aa, r);
 
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
+  
   if( a2 != NULL )
   {
     assume( __LEAD2SYZ__ );
@@ -967,6 +997,13 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
     if( __TREEOUTPUT__ )
        PrintS("]},");
 
+#ifndef SING_NDEBUG
+    if( __DEBUG__ )
+    {
+      m_div.Verify();
+      m_checker.Verify();
+    }
+#endif
   } else
     t = p_Add_q(t, ReduceTerm(aa, L->m[r], a), R);
 
@@ -976,14 +1013,40 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
   if( __TREEOUTPUT__ )
   {
-     PrintS("], \"noderesult\": \""); writeLatexTerm(t, R, true, false); PrintS("\" },");
+    poly tt = pp_Add_qq( a, t, R);  // TODO: ADD a?
+    PrintS("], \"noderesult\": \""); writeLatexTerm(tt, R, true, false); PrintS("\", \"proc\": \"TraverseNF\" },");
+    p_Delete(&tt, R);
   }
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    PrintS("SchreyerSyzygyComputation::TraverseNF(syz_lead, poly syz_2), ==>>> \n");
+    dPrint(t, R, R, 0);
+    PrintLn();
+  }
+#endif
+
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
+  
   return t;
 }
 
-
 void SchreyerSyzygyComputation::ComputeSyzygy()
 {
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
+
   assume( m_idLeads != NULL );
   assume( m_idTails != NULL );
 
@@ -1083,7 +1146,16 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   }
 #endif
 
-  for( int k = size - 1; k >= 0; k-- )
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
+  
+//  for( int k = 0; k < size; ++k ) // TODO: reversed order =>> ALL wrong :((((
+  for( int k = size - 1; k >= 0; --k ) 
   {
     const poly a = LL->m[k]; assume( a != NULL );
 
@@ -1107,20 +1179,55 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 
     //    TT->m[k] = a2;
 
+#ifndef SING_NDEBUG
+    if( __DEBUG__ )
+    {
+      m_div.Verify();
+      m_checker.Verify();
+    }
+#endif
+
+    poly nf;
+    
     if( method )
-      TT->m[k] = SchreyerSyzygyNF(a, a2);
+      nf = SchreyerSyzygyNF(a, a2);
     else
-      TT->m[k] = TraverseNF(a, a2); // TODO: WRONG
+      nf = TraverseNF(a, a2); // TODO: WRONG
+
+#ifndef SING_NDEBUG
+    if( __DEBUG__ )
+    {
+      m_div.Verify();
+      m_checker.Verify();
+    }
+#endif
+
+    TT->m[k] = nf; // ???
+    
+#ifndef SING_NDEBUG
+    if( __DEBUG__ )
+    {
+      m_div.Verify();
+      m_checker.Verify();
+    }
+#endif
 
     if( __SYZCHECK__ )      
     {
+#ifndef SING_NDEBUG
+      if( __DEBUG__ )
+      {
+      m_div.Verify();
+        m_checker.Verify();
+      }
+#endif
       // TODO: check the correctness (syzygy property): a + TT->m[k] should be a syzygy!!!
 
       poly s = pp_Add_qq( a, TT->m[k], R); // current syzygy
 
       poly vp = p_VectorProductLT(s, L, T, R); 
 
-      if( (__DEBUG__ | __TREEOUTPUT__) && (vp != NULL) )
+      if( __DEBUG__ && (vp != NULL) && ! __TREEOUTPUT__ )
       {
         Warn("SchreyerSyzygyComputation::ComputeSyzygy: failed syzygy property for syzygy [%d], non-zero image is as follows: ", k);        
         dPrint(vp, R, R, 0);       p_Delete(&vp, R);
@@ -1136,7 +1243,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
         else
           s = TraverseNF(a, a2);
 
-        s = p_Add_q( a, s, R); // another syzygy
+        s = p_Add_q( p_Copy(a, R), s, R); // another syzygy // :((((
         PrintS("SchreyerSyzygyComputation::ComputeSyzygy: The other method gives the following  syzygy: ");
         dPrint(s, R, R, 0); 
         
@@ -1150,6 +1257,14 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
           Warn("SchreyerSyzygyComputation::ComputeSyzygy: failed to compute syzygy tail[%d] with both methods!!! Non-zero image (2nd) is as follows: ", k);        
           dPrint(vp, R, R, 0);
         }
+
+#ifndef SING_NDEBUG
+        if( __DEBUG__ )
+        {
+	  m_div.Verify();
+	  m_checker.Verify(); 
+        }
+#endif
         
       } else
         assume( vp == NULL );
@@ -1157,6 +1272,13 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
       p_Delete(&vp, R);
     }
 
+#ifndef SING_NDEBUG
+    if( __DEBUG__ )
+    {
+      m_div.Verify();
+      m_checker.Verify();
+    }
+#endif
   }
 
 #ifndef SING_NDEBUG
@@ -1219,11 +1341,10 @@ void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTer
   }
 }
 
-#define NOPRODUCT 1
+#define NOPRODUCT 0
 
 poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2) const
 {
-
   assume( !__IGNORETAILS__ );
 
   const ideal& L = m_idLeads;
@@ -1232,10 +1353,23 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
 
   assume( syz_lead != NULL );
 
+
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    PrintS("SchreyerSyzygyComputation::SchreyerSyzygyNF(syz_lead, poly syz_2), \n");
+    PrintS("syz_lead: \n");
+    dPrint(syz_lead, r, r, 1);
+    PrintS("syz_2: \n");
+    dPrint(syz_2, r, r, 1);
+    PrintLn();
+  }
+#endif
+
   if( __TREEOUTPUT__ )
   {
-//     PrintS("%%%% BEGIN LIFTHYBRID DIAGRAMM\n");
-    PrintS("{   \"nodelabel\": \""); writeLatexTerm(syz_lead, r); PrintS("\", \"children\": [");
+    PrintS("{   \"nodelabel\": \""); writeLatexTerm(syz_lead, r);
+    PrintS("\", \"children\": [");
   }
 
   if( syz_2 == NULL )
@@ -1258,7 +1392,7 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
 
     if( __TREEOUTPUT__ )
     {
-      PrintS("{ \"nodelabel\": \""); writeLatexTerm(syz_2, r); PrintS("\", \"edgelable\": \""); writeLatexTerm(aa, r, false); PrintS("\" },");
+      PrintS("{ \"nodelabel\": \""); writeLatexTerm(syz_2, r); PrintS("\", \"edgelabel\": \""); writeLatexTerm(aa, r, false); PrintS("\" },");
     }
 
     syz_2 = m_div.FindReducer(aa, syz_lead, m_checker);
@@ -1328,7 +1462,7 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
 
       if( __TREEOUTPUT__ )
       {
-        PrintS("{ \"nodelabel\": \""); writeLatexTerm(t, r); PrintS("\", \"edgelable\": \""); writeLatexTerm(spoly, r, false); PrintS("\" },");
+        PrintS("{ \"nodelabel\": \""); writeLatexTerm(t, r); PrintS("\", \"edgelabel\": \""); writeLatexTerm(spoly, r, false); PrintS("\" },");
       }
 
       kBucket_Plus_mm_Mult_pp(bucket, p, T->m[c], 0); // pLength(T->m[c])?
@@ -1354,6 +1488,15 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
     PrintS("]},");
   }
 
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    PrintS("SchreyerSyzygyComputation::SchreyerSyzygyNF(syz_lead, poly syz_2) =>>> \n");
+    dPrint(result, r, r, 0);
+    PrintLn();
+    // TODO: Add SyzCheck!!!???
+  }
+#endif
 
   return result;
 }
@@ -1368,6 +1511,14 @@ bool my_p_LmCmp (poly a, poly b, const ring r) { return p_LmCmp(a, b, r) == -1; 
 // NOTE: better store complete syz. terms!!?
 poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) const
 {
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
+
   const ring& r = m_rBaseRing;
 
   assume(m_idTails !=  NULL && m_idTails->m != NULL);
@@ -1398,9 +1549,11 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
        if( __TREEOUTPUT__ )
        {
 //         PrintS("{ \"nodelabel\": \""); writeLatexTerm(multiplier, r, false);
-//         Print(" \\\\cdot \\\\GEN{%d}\", \"children\": [ ", tail + 1);
-          Print("{ \"lookedupnode\": \"1\", \"nodelabel\": \"");
-          writeLatexTerm(p, r, true, false);
+//         Print("  \\\\GEN{%d}\", \"children\": [ ", tail + 1);
+         PrintS("{ \"proc\": \"TraverseTail-lookup\", \"nodelabel\": \"");
+         writeLatexTerm(multiplier, r, false); Print(" \\\\GEN{%d}\", \"look-up-poly\": \"", tail + 1);
+         writeLatexTerm(p, r, true, false);
+         PrintS("\", ");
        }
 
        if( !n_Equal( pGetCoeff(multiplier), pGetCoeff(itr->first), r) ) // normalize coeffs!?
@@ -1410,22 +1563,39 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
          n_Delete(&n, r);
 
          if( __TREEOUTPUT__ )
-           Print("\", \"RESCALEDRESULT\": \"1\" },");
+           PrintS("\"rescale\": \"1\", ");
        } else
        {
          if( __TREEOUTPUT__ )
-           Print("\", \"RESCALEDRESULT\": \"0\" },");
+           PrintS("\"rescale\": \"0\", ");
        }
 
+       if( __TREEOUTPUT__ )
+       {
+         PrintS("\"noderesult\": \"");
+         writeLatexTerm(p, r, true, false);
+         PrintS("\" },");
+       }
+
+#ifndef SING_NDEBUG
+       if( __DEBUG__ )
+       {
+         m_div.Verify();
+         m_checker.Verify();
+       }
+#endif
+       
        return p;
      }
 
+
      if( __TREEOUTPUT__ )
      {
-//        PrintS("{ \"nodelabel\": \""); writeLatexTerm(multiplier, r, false); Print(" \\\\cdot \\\\GEN{%d}\", \"children\": [", tail + 1);
+       PrintS("{ \"nodelabel\": \""); writeLatexTerm(multiplier, r, false); Print(" \\\\GEN{%d}\", \"children\": [", tail + 1);
      }
-
+     
      const poly p = ComputeImage(multiplier, tail);
+
      T.insert( TP2PCache::value_type(p_Copy(multiplier, r), p) ); //     T[ multiplier ] = p;
 
 //     if( p == NULL )
@@ -1433,9 +1603,17 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
 
      if( __TREEOUTPUT__ )
      {
-//        PrintS("], \"storedResult\": \""); writeLatexTerm(p, r, true, false); PrintS("\" },");
+       PrintS("], \"noderesult\": \""); writeLatexTerm(p, r, true, false); PrintS("\", \"proc\": \"TraverseTail-compute-and-store1\" },");
      }
 
+#ifndef SING_NDEBUG
+     if( __DEBUG__ )
+     {
+       m_div.Verify();
+       m_checker.Verify();
+     }
+#endif
+     
      return p_Copy(p, r);
   }
 
@@ -1443,7 +1621,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
 
   if( __TREEOUTPUT__ )
   {
-//     PrintS("{ \"nodelabel\": \""); writeLatexTerm(multiplier, r, false); Print(" \\\\cdot \\\\GEN{%d}\", \"children\": [", tail + 1);
+    PrintS("{ \"nodelabel\": \""); writeLatexTerm(multiplier, r, false); Print(" \\\\GEN{%d}\", \"children\": [", tail + 1);
   }
 
 
@@ -1458,8 +1636,16 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
 
   if( __TREEOUTPUT__ )
   {
-//     PrintS("], \"storedResult\": \""); writeLatexTerm(p, r, true, false); PrintS("\" },");
+    PrintS("], \"noderesult\": \""); writeLatexTerm(p, r, true, false); PrintS("\", \"proc\": \"TraverseTail-compute-and-store2\" },");
   }
+
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
 
   return p_Copy(p, r);
 }
@@ -1477,6 +1663,14 @@ poly SchreyerSyzygyComputation::ComputeImage(poly multiplier, const int tail) co
 
 poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 {
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
+
   assume( !__IGNORETAILS__ );
 
   const ideal& L = m_idLeads;
@@ -1517,8 +1711,24 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 
     sBucketClearAdd(sum, &s, &len);
     assume( pLength(s) == len );
+#ifndef SING_NDEBUG
+    if( __DEBUG__ )
+    {
+      m_div.Verify();
+      m_checker.Verify();
+    }
+#endif
+
     return s;
   }
+
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
 
   return NULL;
 
@@ -1529,6 +1739,14 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 
 poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction, poly syztermCheck) const
 {
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
+
   assume( !__IGNORETAILS__ );
 
   const ideal& L = m_idLeads;
@@ -1549,32 +1767,50 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
   {
 #if NOPRODUCT
     s = m_div.FindReducer(multiplier, term4reduction, syztermCheck, m_checker);
-
+    
     if( s == NULL ) // No Reducer?
      return s;
 
     if( __TREEOUTPUT__ )
     {
-      PrintS("{ \"nodelabel\": \""); writeLatexTerm(s, r);
+      poly product = pp_Mult_mm(multiplier, term4reduction, r);
+      PrintS("{ \"proc\": \"ReduceTerm-NOPRODUCT\", \"nodelabel\": \""); writeLatexTerm(s, r); PrintS("\", \"edgelabel\": \""); writeLatexTerm(product, r, false);
+      p_Delete(&product, r);
     }
 
 #else
     // NOTE: only LT(term4reduction) should be used in the following:
     poly product = pp_Mult_mm(multiplier, term4reduction, r);
-    s = m_div.FindReducer(product, syztermCheck, m_checker);
+    s = m_div.FindReducer(product, syztermCheck, m_checker); // ??
 
     if( s == NULL ) // No Reducer?
      return s;
 
     if( __TREEOUTPUT__ )
     {
-      PrintS("{ \"nodelabel\": \""); writeLatexTerm(s, r); PrintS("\", \"edgelable\": \""); writeLatexTerm(product, r, false);
+      PrintS("{ \"proc\": \"ReduceTerm-PRODUCT\", \"nodelabel\": \""); writeLatexTerm(s, r); PrintS("\", \"edgelabel\": \""); writeLatexTerm(product, r, false);
     }
 
     p_Delete(&product, r);
 #endif
   }
 
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
+
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
+  
   if( s == NULL ) // No Reducer?
     return s;
 
@@ -1601,6 +1837,15 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
     PrintS("\" },"); 
   }
 
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
+
+  
   return s;
 }
 
@@ -1640,7 +1885,53 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
 
 CLeadingTerm::CLeadingTerm(unsigned int _label,  const poly _lt, const ring R):
     m_sev( p_GetShortExpVector(_lt, R) ),  m_label( _label ),  m_lt( _lt )
-{ }
+#ifndef SING_NDEBUG
+    , _R(R), m_lt_copy( p_Copy(_lt, R) )
+#endif  
+    
+{
+  assume( pNext(_lt) == NULL );
+  assume( sev() == p_GetShortExpVector(lt(), R) );
+}
+
+CLeadingTerm::~CLeadingTerm()
+{
+#ifndef SING_NDEBUG
+  assume( p_EqualPolys(m_lt, m_lt_copy, _R) );
+  assume( m_sev == p_GetShortExpVector(m_lt, _R) );
+  
+  poly p = const_cast<poly>(m_lt_copy);
+  p_Delete(&p, _R);
+#endif  
+}
+
+poly CLeadingTerm::lt() const
+{
+#ifndef SING_NDEBUG
+//  assume( (long)(*m_lt) == (long)(*m_lt_copy) );
+  assume( p_EqualPolys(m_lt, m_lt_copy, _R) );
+  assume( m_sev == p_GetShortExpVector(m_lt, _R) );  
+#endif
+  return m_lt;
+}
+unsigned long CLeadingTerm::sev() const
+{
+#ifndef SING_NDEBUG
+  assume( p_EqualPolys(m_lt, m_lt_copy, _R) );
+  assume( m_sev == p_GetShortExpVector(m_lt, _R) );  
+#endif
+  return m_sev;
+}
+
+unsigned int CLeadingTerm::label() const
+{
+#ifndef SING_NDEBUG
+  assume( p_EqualPolys(m_lt, m_lt_copy, _R) );
+  assume( m_sev == p_GetShortExpVector(m_lt, _R) );  
+#endif
+  return m_label;
+}
+
 
 
 CReducerFinder::~CReducerFinder()
@@ -1734,20 +2025,32 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(const poly a, const poly b, const p
   return TRUE;
 }
 
+
+bool CLeadingTerm::CheckLT( const ideal & L ) const
+{
+//  for( int i = IDELEMS(L); i >= 0; --i) assume( pNext(L->m[i]) == NULL ); // ???
+  return ( L->m[label()] == lt() );
+} 
+
 bool CLeadingTerm::DivisibilityCheck(const poly product, const unsigned long not_sev, const ring r) const
 {
-  const poly p = m_lt;
+  // may have no coeff yet
+//  assume ( !n_IsZero( p_GetCoeff(product, r), r ) );
 
-  assume( p_GetComp(p, r) == p_GetComp(product, r) );
+  assume ( !n_IsZero( p_GetCoeff(lt(), r), r ) );
+  assume( sev() == p_GetShortExpVector(lt(), r) );
 
-//  const int k = m_label;
+  assume( product != NULL );
+  assume( (p_GetComp(lt(), r) == p_GetComp(product, r)) || (p_GetComp(lt(), r) == 0) ); 
+
+#ifndef SING_NDEBUG
+  assume( r == _R );
+#endif   
+  
+//  const int k = label();
 //  assume( m_L->m[k] == p );
 
-  const unsigned long p_sev = m_sev;
-
-  assume( p_sev == p_GetShortExpVector(p, r) );
-
-  return p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r);
+  return p_LmShortDivisibleByNoComp(lt(), sev(), product, not_sev, r);
 
 }
 
@@ -1755,24 +2058,29 @@ bool CLeadingTerm::DivisibilityCheck(const poly product, const unsigned long not
 /// and a module term 't'
 bool CLeadingTerm::DivisibilityCheck(const poly m, const poly t, const unsigned long not_sev, const ring r) const
 {
-  const poly p = m_lt;
+  assume ( !n_IsZero( p_GetCoeff(lt(), r), r ) );
+  assume( sev() == p_GetShortExpVector(lt(), r) );
 
-  assume( p_GetComp(p, r) == p_GetComp(t, r) );
+  assume( m != NULL );
+  assume( t != NULL );  
+  assume ( !n_IsZero( p_GetCoeff(m, r), r ) );
+  assume ( !n_IsZero( p_GetCoeff(t, r), r ) );
+
 // assume( p_GetComp(m, r) == 0 );
+  assume( (p_GetComp(lt(), r) == p_GetComp(t, r))  || (p_GetComp(lt(), r) == 0)  );
 
-//  const int k = m_label;
+//  const int k = label();
 //  assume( m_L->m[k] == p );
 
-  const unsigned long p_sev = m_sev;
-  assume( p_sev == p_GetShortExpVector(p, r) );
-
-  if (p_sev & not_sev)
+#ifndef SING_NDEBUG
+  assume( r == _R );
+#endif   
+  
+  if (sev() & not_sev)
     return false;
 
-  return _p_LmDivisibleByNoComp(p, m, t, r);
-
+  return _p_LmDivisibleByNoComp(lt(), m, t, r);
 //  return p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r);
-
 }
 
 
@@ -1802,7 +2110,14 @@ class CDivisorEnumerator: public SchreyerSyzygyComputationFlags
         m_active(false)
     {
       assume( m_comp >= 0 );
-      assume( m_reds.m_L != NULL );
+      assume( m_reds.m_L != NULL ); /// TODO: m_L should stay the same!!!
+      
+      assume( product != NULL ); // may have no coeff yet :(
+//      assume ( !n_IsZero( p_GetCoeff(product, m_rBaseRing), m_rBaseRing ) );
+#ifndef SING_NDEBUG
+      if( __DEBUG__ )
+        m_reds.Verify();
+#endif
     }
 
     inline bool Reset()
@@ -1846,20 +2161,22 @@ class CDivisorEnumerator: public SchreyerSyzygyComputationFlags
       // looking for the next good entry
       for( ; m_current != m_finish; ++m_current )
       {
-        assume( m_reds.m_L->m[Current().m_label] == Current().m_lt );
+        assume( Current().CheckLT( m_reds.m_L ) );
 
         if( Current().DivisibilityCheck(m_product, m_not_sev, m_rBaseRing) )
         {
 #ifndef SING_NDEBUG
           if( __DEBUG__ )
           {
-            Print("CDivisorEnumerator::MoveNext::est LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + Current().m_label);
-            dPrint(Current().m_lt, m_rBaseRing, m_rBaseRing, 1);
+            Print("CDivisorEnumerator::MoveNext::est LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + Current().label());
+            dPrint(Current().lt(), m_rBaseRing, m_rBaseRing, 1);
           }
 #endif
 //          m_active = true;
+          assume( Current().CheckLT( m_reds.m_L ) );
           return true;
         }
+        assume( Current().CheckLT( m_reds.m_L ) );        
       }
 
       // the end... :(
@@ -1874,6 +2191,15 @@ class CDivisorEnumerator: public SchreyerSyzygyComputationFlags
 
 bool CReducerFinder::IsDivisible(const poly product) const
 {
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+    DebugPrint();
+#endif
+  
+  assume( product != NULL );
+
+  // NOTE: q may have no coeff!!!  
+
   CDivisorEnumerator itr(*this, product);
   if( !itr.Reset() )
     return false;
@@ -1900,14 +2226,14 @@ bool CReducerFinder::IsDivisible(const poly product) const
 
   for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
   {
-    assume( m_L->m[(*vit)->m_label] == (*vit)->m_lt );
+    assume( (*vit)->CheckLT( m_L ) );
 
     if( (*vit)->DivisibilityCheck(product, not_sev, r) )
     {
       if( __DEBUG__ )
       {
-        Print("_FindReducer::Test LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + (*vit)->m_label);
-        dPrint((*vit)->m_lt, r, r, 1);
+        Print("_FindReducer::Test LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + (*vit)->label());
+        dPrint((*vit)->lt(), r, r, 1);
       }
 
       return true;
@@ -1920,6 +2246,35 @@ bool CReducerFinder::IsDivisible(const poly product) const
 
 
 #ifndef SING_NDEBUG
+void CReducerFinder::Verify() const
+{
+  const ring& r = m_rBaseRing;
+
+  for( CReducersHash::const_iterator it = m_hash.begin(); it != m_hash.end(); it++)
+  {
+    const TReducers& reducers = it->second;
+
+    for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
+    {
+      assume( (*vit)->CheckLT( m_L ) );
+      
+      const poly p = (*vit)->lt();
+      
+      const unsigned long p_sev = (*vit)->sev();
+      assume( p_sev == p_GetShortExpVector(p, r) );
+      
+      assume( p_GetComp(p, r) == it->first );
+
+      const int k = (*vit)->label();        
+      assume( m_L->m[k] == p );
+       
+      pp_Test(p, r, r);
+    }
+  }
+}
+   
+   
+
 void CReducerFinder::DebugPrint() const
 {
   const ring& r = m_rBaseRing;
@@ -1931,19 +2286,23 @@ void CReducerFinder::DebugPrint() const
 
     for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
     {
-      const poly p = (*vit)->m_lt;
-
-      assume( p_GetComp(p, r) == it->first );
-
-      const int k = (*vit)->m_label;
-
+      assume( (*vit)->CheckLT( m_L ) );
+      
+      const int k = (*vit)->label();
+      const poly p = (*vit)->lt();
+       
+      pp_Test(p, r, r);
+      
       assume( m_L->m[k] == p );
 
-      const unsigned long p_sev = (*vit)->m_sev;
-
+      const unsigned long p_sev = (*vit)->sev();
       assume( p_sev == p_GetShortExpVector(p, r) );
+      
+      assume( p_GetComp(p, r) == it->first );
 
       Print("L[%d]: ", k); dPrint(p, r, r, 0); Print("SEV: %ld\n", p_sev);
+      
+      assume( m_L->m[k] == p );
     }
   }
 }
@@ -1977,7 +2336,17 @@ class CDivisorEnumerator2: public SchreyerSyzygyComputationFlags
       assume( m_reds.m_L != NULL );
       assume( m_multiplier != NULL );
       assume( m_term != NULL );
+      
+      assume( m != NULL );
+      assume( t != NULL );  
+      assume ( !n_IsZero( p_GetCoeff(m, m_rBaseRing), m_rBaseRing ) );
+      assume ( !n_IsZero( p_GetCoeff(t, m_rBaseRing), m_rBaseRing ) );
+      
 //      assume( p_GetComp(m_multiplier, m_rBaseRing) == 0 );
+#ifndef SING_NDEBUG
+      if( __DEBUG__ )
+        m_reds.Verify();
+#endif
     }
 
     inline bool Reset()
@@ -2021,21 +2390,23 @@ class CDivisorEnumerator2: public SchreyerSyzygyComputationFlags
       // looking for the next good entry
       for( ; m_current != m_finish; ++m_current )
       {
-        assume( m_reds.m_L->m[Current().m_label] == Current().m_lt );
+        assume( Current().CheckLT( m_reds.m_L ) );
 
         if( Current().DivisibilityCheck(m_multiplier, m_term, m_not_sev, m_rBaseRing) )
         {
 #ifndef SING_NDEBUG
           if( __DEBUG__ )
           {
-            Print("CDivisorEnumerator::MoveNext::est LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + Current().m_label);
-            dPrint(Current().m_lt, m_rBaseRing, m_rBaseRing, 1);
+            Print("CDivisorEnumerator::MoveNext::est LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + Current().label());
+            dPrint(Current().lt(), m_rBaseRing, m_rBaseRing, 1);
           }
 #endif
 //          m_active = true;
+          assume( Current().CheckLT( m_reds.m_L ) );        
           return true;
 
         }
+        assume( Current().CheckLT( m_reds.m_L ) );        
       }
 
       // the end... :(
@@ -2050,6 +2421,14 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
                                  const poly syzterm,
                                  const CReducerFinder& syz_checker) const
 {
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    DebugPrint();
+    syz_checker.Verify();
+  }
+#endif
+
   CDivisorEnumerator2 itr(*this, multiplier, t);
   if( !itr.Reset() )
     return NULL;
@@ -2071,23 +2450,27 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
 
   if (__DEBUG__ && (syzterm != NULL))
   {
-    const poly m = L->m[c];
-
-    assume( m != NULL ); assume( pNext(m) == NULL );
-
-    poly lm = p_Mult_mm(leadmonom(syzterm, r), m, r);
-
-    poly pr = p_Mult_q( leadmonom(multiplier, r, false), leadmonom(t, r, false), r);
-
-    assume( p_EqualPolys(lm, pr, r) );
+    const poly m = L->m[c]; assume( m != NULL ); assume( pNext(m) == NULL );
 
     //  def @@c = leadcomp(syzterm); int @@r = int(@@c);
     //  def @@product = leadmonomial(syzterm) * L[@@r];
+    poly lm = p_Mult_mm( leadmonom(syzterm, r, true), m, r); // !NC :(
+    poly pr = p_Mult_q( leadmonom(multiplier, r, true), leadmonom(t, r, false), r); // !NC :(
+
+    assume( p_EqualPolys(lm, pr, r) );
 
     p_Delete(&lm, r);
     p_Delete(&pr, r);
   }
 
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    DebugPrint();
+    syz_checker.Verify();
+  }
+#endif
+  
   const BOOLEAN to_check = (syz_checker.IsNonempty()); // __TAILREDSYZ__ &&
 
   const poly q = p_New(r); pNext(q) = NULL;
@@ -2097,8 +2480,10 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
 
   while( itr.MoveNext() )
   {
-    const poly p = itr.Current().m_lt;
-    const int k  = itr.Current().m_label;
+    assume( itr.Current().CheckLT( L ) ); // ???
+    
+    const poly p = itr.Current().lt(); // ???
+    const int k  = itr.Current().label();
 
     p_ExpVectorSum(q, multiplier, t, r); // q == product == multiplier * t // TODO: do it once?
     p_ExpVectorDiff(q, q, p, r); // (LM(product) / LM(L[k]))
@@ -2117,6 +2502,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
           dPrint(syzterm, r, r, 1);
         }
 #endif
+        assume( itr.Current().CheckLT( L ) ); // ???
         continue;
       }
 
@@ -2129,6 +2515,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
         PrintS("_FindReducer::Test LS: q is divisible by LS[?] !:((: ");
       }
 #endif
+      assume( itr.Current().CheckLT( L ) ); // ???
       continue;
     }
 
@@ -2136,6 +2523,15 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
     p_SetCoeff0(q, n_InpNeg( n_Div(n, p_GetCoeff(p, r), r), r), r);
     n_Delete(&n, r);
 
+#ifndef SING_NDEBUG
+    if( __DEBUG__ )
+    {
+      DebugPrint();
+      syz_checker.Verify();
+    }
+#endif
+    
+    assume( itr.Current().CheckLT( L ) ); // ???
     return q;
   }
 
@@ -2167,12 +2563,12 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
   for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
   {
 
-    const poly p = (*vit)->m_lt;
-    const int k = (*vit)->m_label;
+    const poly p = (*vit)->lt(); // ??
+    const int k = (*vit)->label();
 
-    assume( L->m[k] == p );
+    assume( L->m[k] == p ); // CheckLT
 
-//    const unsigned long p_sev = (*vit)->m_sev;
+//    const unsigned long p_sev = (*vit)->sev();
 //    assume( p_sev == p_GetShortExpVector(p, r) );
 
 //    if( !p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r) )
@@ -2225,6 +2621,14 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
 */
 
   p_LmFree(q, r);
+  
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    DebugPrint();
+    syz_checker.Verify();
+  }
+#endif
 
   return NULL;
 
@@ -2233,11 +2637,21 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
 
 poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const CReducerFinder& syz_checker) const
 {
+
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    DebugPrint();
+    syz_checker.Verify();
+  }
+#endif
+
   CDivisorEnumerator itr(*this, product);
   if( !itr.Reset() )
     return NULL;
 
 
+  
   const ring& r = m_rBaseRing;
 
   assume( product != NULL );
@@ -2266,18 +2680,27 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
     p_Delete(&lm, r);
   }
 
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    DebugPrint();
+    syz_checker.Verify();
+  }
+#endif
 
   const BOOLEAN to_check = (syz_checker.IsNonempty()); // __TAILREDSYZ__ &&
 
   const poly q = p_New(r); pNext(q) = NULL;
 
   if( __DEBUG__ )
-    p_SetCoeff0(q, 0, r); // for printing q
+    p_SetCoeff0(q, 0, r); // ONLY for printing q
 
   while( itr.MoveNext() )
   {
-    const poly p = itr.Current().m_lt;
-    const int k  = itr.Current().m_label;
+    assume( itr.Current().CheckLT( L ) ); // ???
+    
+    const poly p = itr.Current().lt(); // ??
+    const int k  = itr.Current().label();
 
     p_ExpVectorDiff(q, product, p, r); // (LM(product) / LM(L[k]))
     p_SetComp(q, k + 1, r);
@@ -2294,11 +2717,12 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
           dPrint(syzterm, r, r, 1);
         }
 #endif
+        assume( itr.Current().CheckLT( L ) ); // ???
         continue;
       }
 
     // while the complement (the fraction) is not reducible by leading syzygies
-    if( to_check && syz_checker.IsDivisible(q) )
+    if( to_check && syz_checker.IsDivisible(q) ) // ????? 
     {
 #ifndef SING_NDEBUG
       if( __DEBUG__ )
@@ -2306,11 +2730,22 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
         PrintS("_FindReducer::Test LS: q is divisible by LS[?] !:((: ");
       }
 #endif
+      assume( itr.Current().CheckLT( L ) ); // ???
       continue;
     }
 
     p_SetCoeff0(q, n_InpNeg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
 
+    assume( itr.Current().CheckLT( L ) ); // ???
+    
+#ifndef SING_NDEBUG
+    if( __DEBUG__ )
+    {
+      DebugPrint();
+      syz_checker.Verify();
+    }
+#endif
+    
     return q;
   }
 
@@ -2350,15 +2785,15 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
 
   for(TReducers::const_iterator vit = reducers.begin(); vit != reducers.end(); vit++ )
   {
-    const poly p = (*vit)->m_lt;
+    const poly p = (*vit)->lt(); // ???
 
     assume( p_GetComp(p, r) == comp );
 
-    const int k = (*vit)->m_label;
+    const int k = (*vit)->label();
 
-    assume( L->m[k] == p );
+    assume( L->m[k] == p ); // CheckLT
 
-    const unsigned long p_sev = (*vit)->m_sev;
+    const unsigned long p_sev = (*vit)->sev();
 
     assume( p_sev == p_GetShortExpVector(p, r) );
 
@@ -2404,6 +2839,14 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
 
   p_LmFree(q, r);
 
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    DebugPrint();
+    syz_checker.Verify();
+  }
+#endif
+  
   return NULL;
 }
 
