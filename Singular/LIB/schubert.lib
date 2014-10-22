@@ -900,7 +900,7 @@ EXAMPLE:    example rationalCurve; shows an example
     variety P = projectiveSpace(n);
     stack M = moduliSpace(P,d);
     def F = fixedPoints(M);
-    int ncpus = system("cpu");
+    int ncpus = system("--cpus");
     int sizeF = size(F);
     list args;
     int from = 1;

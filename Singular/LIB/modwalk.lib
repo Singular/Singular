@@ -278,7 +278,7 @@ EXAMPLE: example modWalk; shows an example
   }
 
 //--------------------  Initialize optional parameters  ------------------------
-  n1 = system("cpu");
+  n1 = system("--cpus");
   if(size(#) == 0)
   {
     int exactness = 1;
@@ -645,14 +645,14 @@ example
   // I is a standard basis in dp
   modWalk(I,1);
   modWalk(I,2,2,0);
-  modWalk(I,3,system("cpu"),0);
+  modWalk(I,3,system("--cpus"),0);
   std(I);
 
   ring r0=0,x(1..6),dp;
   ideal i0=std(cyclic(6));
   ring r=0,x(1..6),lp;
   ideal i=fetch(r0,i0);
-  modWalk(i,1,system("cpu"),0);
+  modWalk(i,1,system("--cpus"),0);
   modWalk(i,3);
 }
 

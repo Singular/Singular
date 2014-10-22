@@ -162,7 +162,7 @@ static proc mod_init()
     int sem_cores = Resources::sem_cores;
     exportto(Tasks, sem_cores);
     // the number of leaves in the parallel tree (not strict)
-    int sem_leaves = semaphore(system("cpu")+10);
+    int sem_leaves = semaphore(system("--cpus")+10);
     exportto(Tasks, sem_leaves);
     // the number of processes waiting for sem_cores with low priority
     int sem_queue = semaphore(2);
