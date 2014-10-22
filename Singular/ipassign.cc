@@ -647,9 +647,7 @@ static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr)
   extern procinfo *iiInitSingularProcinfo(procinfo *pi, const char *libname,
                                           const char *procname, int line,
                                           long pos, BOOLEAN pstatic=FALSE);
-  extern void piCleanUp(procinfov pi);
-
-  if(res->data!=NULL) piCleanUp((procinfo *)res->data);
+  if(res->data!=NULL) piKill((procinfo *)res->data);
   if(a->Typ()==STRING_CMD)
   {
     res->data = (void *)omAlloc0Bin(procinfo_bin);

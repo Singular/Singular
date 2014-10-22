@@ -635,8 +635,18 @@ const char * piProcinfo(procinfov pi, const char *request)
   return "??";
 }
 
-void piCleanUp(procinfov pi)
+BOOLEAN piKill(procinfov pi)
 {
+  Voice *p=currentVoice;
+  while (p!=NULL)
+  {
+    if (p->pi==pi && pi->ref <= 1)
+    {
+      Warn("`%s` in use, can not be killed",pi->procname);
+      return TRUE;
+    }
+    p=p->next;
+  }
   (pi->ref)--;
   if (pi->ref <= 0)
   {
@@ -655,24 +665,8 @@ void piCleanUp(procinfov pi)
     }
     memset((void *) pi, 0, sizeof(procinfo));
     pi->language=LANG_NONE;
-  }
-}
-
-BOOLEAN piKill(procinfov pi)
-{
-  Voice *p=currentVoice;
-  while (p!=NULL)
-  {
-    if (p->pi==pi && pi->ref <= 1)
-    {
-      Warn("`%s` in use, can not be killed",pi->procname);
-      return TRUE;
-    }
-    p=p->next;
-  }
-  piCleanUp(pi);
-  if (pi->ref <= 0)
     omFreeBin((ADDRESS)pi,  procinfo_bin);
+  }
   return FALSE;
 }
 
