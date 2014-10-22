@@ -1,0 +1,1946 @@
+/////////////////////////////////////////////////////////////////////
+version="on hess.lib  4.0.1.0 Oct_2014 $"; //$Id$
+category="Hess";
+info="
+LIBRARY:  hess.lib  Riemann-Roch space of divisors
+          on function fields and curves
+
+AUTHORS:  I. Stenger: stenger@mathematik.uni-kl.de
+
+OVERVIEW:
+Let f be an absolutely irreducible polynomial in two variables x,y.
+Assume that f is monic as a polynomial in y. Let F = Quot(k[x,y]/f)
+be the function field defined by f.
+Define O_F = IntCl(k[x],F) and O_(F,inf) = IntCl(k[1/x],F).
+We represent a divisor D on F by two fractional ideals
+I and J of O_F and O_(F,inf), respectively. The Riemann-Roch
+space L(D) is then the intersection of I^(-1) and J^(-1).
+
+PROCEDURES:
+RiemannRochHess()     Computes a vector space basis of the
+                      Riemann-Roch space of a divisor
+";
+
+LIB "integralbasis.lib";
+LIB "qhmoduli.lib";
+LIB "dmodloc.lib";
+LIB "modstd.lib";
+LIB "matrix.lib";
+LIB "absfact.lib";
+
+
+/////////////////////////////////////////////////////////////////////
+///////////////////// Main Procedure ////////////////////////////////
+
+//__________________________________________________________________
+proc RiemannRochHess(poly f,list divisorD,string s)
+"USAGE: RiemannRochHess(f,divisorD,s); f polynomial, divisorD list,
+        s string
+NOTE: All fractional ideals must represented by a list of size two.
+      The first element is an ideal of k[x,y] and the second element
+      the common denominator, i.e, a polynomial of k[x].
+ASSUME: The base ring R must be a ring in two variables, say x,y,
+        or three variables, say x,y,z.
+        If nvars(R) = 2:
+        - f is an absolutely irreducible polynomial, monic as a
+        polynomial in y.
+        - List divisorD describes a divisor D of F = Quot(k[x,y]/f).
+          If (s = "ideals")
+          D is given in ideal representation, i.e., divisorD is a
+          list of size 2.
+          divisorD[1] is the finite ideal of D, i.e., the
+          fractional ideal of D of IntCl(k[x],F).
+          divisorD[2] is the infinite ideal of D, i.e,
+          the fractional ideal of D of IntCl(k[1/x],F).
+          If (s = "free")
+          D is given in free representation, i.e., divisorD is a list
+          of size 2, containing the finite and infinite places of D
+          with exponents.
+          divisorD[i], i = 1,2, is a list. Each element of the list
+          is again a list. The first entry is a fractional ideal,
+          and the second an integer, the exponent of the place.
+        If nvars(R) = 3:
+        - f is an absolutely irreducible homogeneous polynomial
+          describing the projective plane curve corresponding to
+          the function field F. We assume that the dehomogenization
+          of f w.r.t. z is monic as a polynomial in y.
+          List divisorD describes a divisor D of F.
+          If (s = "ideals")
+          D is given in ideal representation, i.e., divisorD is
+          a list of size 2. divisorD[1] is an ideal of the base
+          ring representing the positive divisor of D and
+          divisorD[2] is an ideal of the base ring representing the
+          negative divisor. (i.e. D = (I) -(J)).
+          If (s = "free")
+          D is given in free representation, i.e., divisorD is a
+          list of places of D. D[i][1] is an prime ideal and D[i][2]
+          an integer, the exponent of the place.
+RETURN: A vector space basis of the Riemann-Roch space of D,
+        stored in a list RRBasis. The list RRBasis contains a
+        list, say rbasis, and a polynomial, say den. The basis of
+        L(D) consists of all rational functions g/den, where g is
+        an element of rbasis.
+EXAMPLE: exampleRiemannRochHess; shows an example
+"
+{
+  int i,j;
+
+  if ( (nvars(basering) != 2) && (nvars(basering) != 3) )
+  {
+    ERROR("Basering must have two or three variables.");
+  }
+  int pr;
+
+  // the affine case - no transformation needed
+  if (nvars(basering) == 2)
+  {
+    def R_aff = basering;
+    poly f_aff = f;
+  }
+
+  //the projective case, dehomogenize the input polynomial
+  //and change to the affine ring
+  if (nvars(basering) == 3)
+  {
+    if (homog(f)==0)
+    {
+      ERROR("Input polynomial must be homogeneous.");
+    }
+    pr = 1;
+    def R = basering;
+    list rlpr = ringlist(R);
+    rlpr[2] = list(var(1),var(2));
+    rlpr[3] = list(list("dp",1:2),list("C",0));
+    def R_aff = ring(rlpr);  // corresponding affine ring
+    poly f_aff = subst(f,var(3),1);
+    setring R_aff;
+    poly f_aff = imap(R,f_aff);
+  }
+
+  //Checking assumptions
+  //////////////////////////////////////////////////////////////
+
+  // No parameters or algebraic numbers are allowed.
+  if(npars(R_aff) >0)
+  {
+    ERROR("No parameters or algebraic extensions are
+    allowed in the base ring.");
+  }
+
+  // The polynomial f must be monic in the 2-th variable.
+  matrix cs = coeffs(f_aff, var(2));
+  if(cs[size(cs),1] != 1)
+  {
+    ERROR("The input polynomial must be monic as a polynomial
+    in the second variable.");
+  }
+
+  // The polynomial f must be irreducible.
+  if (char(R_aff) == 0)
+  {
+    if(isIrreducible(f_aff) == 0)
+    {
+      ERROR("The input polynomial must be irreducible.");
+    }
+  }
+
+  //Defining ring for the reduction
+  ////////////////////////////////////////////////////////////
+
+  list rl=ringlist(R_aff);
+  rl[2] = list(var(1));
+  rl[3] = list(list("lp",1),list("C",0));
+  def Rone = ring(rl);
+
+  //Compute the integral bases
+  ////////////////////////////////////////////////////////////
+
+  //integral basis of IntCL(k[x],F);
+  list FinBasis = integralBasis(f_aff,2);
+
+  // integral basis of IntCL(k[1/x],F)
+  list Infin;
+  list InfBasis;
+  if(pr)
+  // computes the geometric places of infinity as well
+  {
+    Infin = maxorderInfinite(f_aff,1);
+    InfBasis = Infin[1];
+  }
+  else
+  {
+    list Infin = maxorderInfinite(f_aff);
+    InfBasis = Infin[1];
+  }
+
+  if (printlevel >= 3)
+  {
+    "Integral basis of the maximal finite order:","";FinBasis;pause();"";
+    "Integral basis of the maximal infinite order:";"";InfBasis;pause();"";
+  }
+
+  //Compute the Ideal representation
+  ////////////////////////////////////////////////////////////
+
+  list Fin, Inf;
+  if ( s == "ideals")
+  // the divisor is given by two ideals
+  {
+    if(pr == 1)
+    // geometric case: the divisor is given by two homogeneous
+    // ideals I,J representing two effective divisors,
+    // transform the divisor in two fractional ideals
+    // Fin and Inf
+    {
+      setring R;
+      list FinBasis = imap(R_aff,FinBasis);
+      list Infin = imap(R_aff,Infin);
+
+      // the transformed divisor
+      divisorD = divisorTrans(f,divisorD,FinBasis,Infin,"ideals");
+      setring R_aff;
+      list divisorD = imap(R,divisorD);
+    }
+
+    Fin = divisorD[1];
+    Inf = divisorD[2];
+  }
+
+  if (s == "free")
+  // the divisor is given by a list of places
+  {
+    if (pr)
+    {
+      setring R;
+      list FinBasis = imap(R_aff,FinBasis);
+      list Infin = imap(R_aff,Infin);
+      divisorD = divisorTrans(f,divisorD,FinBasis,Infin,"free");
+      setring R_aff;
+      list divisorD = imap(R,divisorD);
+    }
+    // computes the ideal representation from the free rep.
+    divisorD = Free2IdealRepresentation(f_aff,FinBasis,InfBasis,divisorD);
+    Fin = divisorD[1];
+    Inf = divisorD[2];
+  }
+
+  //Compute free bases for I and J
+  ////////////////////////////////////////////////////////////
+
+  Fin = freeGenerators(f_aff,FinBasis,Fin,1);
+  Inf = freeGenerators(f_aff,InfBasis,Inf,2);
+
+  if (printlevel >= 3)
+  {
+    "Integral basis of the finite ideal I:";"";Fin;pause();"";
+    "Integral basis of the infinite ideal J:";"";Inf;pause();"";
+  }
+
+  //Compute free bases for I^(-1) and J^(-1)
+  ////////////////////////////////////////////////////////////
+
+  Fin = inverseIdeal(f_aff,FinBasis,Fin,1);
+  Inf = inverseIdeal(f_aff,InfBasis,Inf,2);
+
+  if (printlevel >= 3)
+  {
+    "Integral basis of the inverse ideal of I:";"";Fin;pause();"";
+    "Integral basis of the inverse ideal of J:";"";Inf;pause();"";
+  }
+
+  //Compute the transition matrix
+  ////////////////////////////////////////////////////////////
+  list T = transmatrix(f_aff,Inf,Fin);
+
+
+  //Reduce the transition matrix
+  ////////////////////////////////////////////////////////////
+  setring Rone;
+  list T = imap(R_aff,T);
+  poly denT = T[2];
+  list reducedT = redmatrix(T[1]);
+  matrix redT = reducedT[1]; //reduced matrix
+  matrix trafoT = reducedT[2];  // transformation matrix
+
+
+  //Compute the k[x]-invariants d_j
+  ////////////////////////////////////////////////////////////
+
+  list Dcoef = computeInvariants(redT,denT);
+
+  if (printlevel >= 3)
+  {
+    "List of k[x]-invariants:";"";Dcoef;pause();"";
+  }
+
+  //Compute the transformed basis of I^(-1)
+  ////////////////////////////////////////////////////////////
+
+  setring R_aff;
+  matrix trafoT = imap(Rone,trafoT);
+
+
+  // compute the basis
+  // (v_1,...,v_n) = ((v_1)',...,(v_n)')*trafoT,
+  // where {v_i} basis of I^(-1)
+
+  list final = multiplyMatrixList(trafoT,Fin[1]);
+
+  if (printlevel >= 3)
+  {
+    "Transformed basis of I^(-1):";"";list(final,Fin[2]);pause();"";
+  }
+
+  //Compute a k-basis of L(D)
+  ////////////////////////////////////////////////////////////
+
+  number lcDen = leadcoef(Fin[2]);
+  list rrbasis;
+  int counter;
+  poly ftemp;
+  for (i=1;i<=size(Dcoef);i++)
+  {
+    for (j=0; j<=(-Dcoef[i]); j++)
+    {
+      counter++;
+      ftemp = (var(1)^j*final[i])/lcDen;
+      ftemp = ftemp*(1/content(ftemp));
+      rrbasis[counter]= ftemp;
+    }
+  }
+  list RRbasis = rrbasis, Fin[2]/lcDen;
+
+  if (pr)
+  {
+    setring R;
+    list RRbasis = imap(R_aff,RRbasis);
+    return(RRbasis);
+  }
+  return(RRbasis);
+}
+
+example
+{ "EXAMPLE:"; echo=2;
+  ring R = 0,(x,y),dp;
+  poly f  = y^2*(y-1)^3-x^5;
+  list A1 = list(ideal(x,y-1),1),2;
+  list A2 = list(ideal(y^2-y+1,x),1),3;
+  list A3 =  list(ideal(1,y-x),x),-2;
+  list D = A1,A2;
+  list E = list(A3);
+  RiemannRochHess(f,list(D,E),"free");
+  ring S = 0,(x,y,z),dp;
+  poly f = y^2*(y-1)^3-x^5;
+  f  = homog(f,z);
+  ideal P1 = x,y-z;
+  ideal P2 = y^2-yz+z^2,x;
+  ideal P3 = x-y,z;
+  list B1 = P1,2;
+  list B2 = P2,3;
+  list B3 = P3,-2;
+  list Ddivisor = B1,B2,B3;
+  RiemannRochHess(f,Ddivisor,"free");
+  ideal I = intersect(P1^2,P2^3);
+  ideal J = P3^2;
+  RiemannRochHess(f,list(I,J),"ideals");
+}
+
+
+////////////////////////////////////////////////////////////////////
+///////////////////// Essential Static Procedures //////////////////
+
+//_________________________________________________________________
+static  proc matrixrep(poly f,list intbasis,list A)
+"USAGE: matrixrep(f,intbasis,A);f poly,intbasis list,A list
+ASSUME: The base ring R must be a ring in two variables, say x,y, and
+        f must be monic as polynomial in the second variable.
+        List intbasis contains an integral basis (w1,...,wn)
+        of IntCl(k[x],F) or of IntCl(k[1/x],F).
+        List A contains two polynomials which represent an element of
+        Quot(R[x]).
+RETURN: A list, say repmatrix, containing two elements. repmatrix[1] is
+        a matrix, say M, with entries in k[x], and repmatrix[2] a
+        polynomial, say d, such that M_a := M/d is a representation
+        matrix of a, i.e. a*(w1,..,wn) = (w1,..,wn)*M_a
+"
+{
+  def Rbase = basering;
+  list rl = ringlist(Rbase);
+  rl[2] = list(var(2), var(1));
+  rl[3] = list(list("lp",1:2),list("C",0));
+  def Rreduction = ring(rl);   // make var(2) > var(1)
+
+  rl = ringlist(Rbase);
+  rl[1] = list(char(Rbase),list(var(1)),list(list("dp",1)),ideal(0));
+  rl[2] = list(var(2));
+  rl[3] = list(list("dp",1),list("C",0));
+  def QF = ring(rl);   // make var(1) transcendental
+
+  int i,j,k,l;
+  ideal IntBasis = intbasis[1];
+  poly d = intbasis[2];
+  int sizeIntBasis = size(IntBasis);
+
+  setring Rreduction;  //var(2) > var(1)
+  list A = imap(Rbase,A);
+  ideal IntBasis = imap(Rbase,IntBasis);
+  ideal fred = std(imap(Rbase,f));
+  IntBasis = reduce(IntBasis,fred);
+  //coeffiecient matrix w. r. t. the integral basis
+  matrix M = coeffs(IntBasis,var(1));
+
+  setring QF;
+  matrix M = imap(Rreduction,M);
+  poly d = imap(Rbase,d);
+  // coefficient matrix with denominator
+  M = 1/d*M;
+  // inverse of the coefficient matrix
+  list L = luinverse(M);
+
+  setring Rreduction;
+  list multiA;
+  for(i = 1;i<=sizeIntBasis;i++)
+  {
+    multiA[i] = reduce(A[1]*IntBasis[i],fred);
+  }
+  // coefficient matrix w.r.t. A[1]*IntBasis
+  matrix multiM = coeffs(ideal(multiA[1..sizeIntBasis]),var(1));
+
+  // for positive characteristic - necessary if all coefficients
+  // reduce to zero
+  if (nrows(multiM)!= sizeIntBasis || ncols(multiM)!= sizeIntBasis)
+  {
+    multiM = zerosM(sizeIntBasis);
+  }
+
+  setring QF;
+  list A = imap(Rbase,A);
+  matrix multiM = imap(Rreduction,multiM);
+  // multiply the both coefficient matrices
+  matrix D = L[2]*multiM;
+  D = 1/(d*A[2])*D;
+  number a = contentMatrix(D);
+  number numera = numerator(a);
+  number denoma = denominator(a);
+  D = (1/a)*D;
+
+  setring Rbase;
+  matrix D = imap(QF,D);
+  poly numera = imap(QF,numera);
+  poly denoma = imap(QF,denoma);
+  number lcd= leadcoef(denoma);
+  list repmatrix;
+  repmatrix = list((numera/lcd)*D,denoma/lcd);
+  return(repmatrix);
+}
+
+//__________________________________________________________________
+static proc freeGenerators(poly f,list intbasis,list fracIdeal,int opt)
+"USAGE: freeGenerators(f,intbasis,fracIdeal,opt); f polynomial,
+        intbasis list, fracIdeal list, opt integer
+ASSUME: The base ring R must be a ring in two variables, say x,y, and
+        f must be monic as polynomial in the second variable.
+        List intbasis contains an integral basis of:
+        - IntCl(k[x],F), if opt = 1;
+        - IntCl(k[1/x],F), if opt = 2;
+        List fracIdeals contains two elements, an ideal I and a
+        polynomial d representing the fractional ideal I/d
+RETURN: List of size 2, say freeGens, where freeGens[1] is an
+        ideal J and freeGens[2] a polynomial D such that
+        J[1]/D, ..., J[n]/D is a basis of I/d as free k[x]-(opt = 1)
+        resp. k[1/x]-module (opt = 2)
+"
+{
+  def Rbase = basering;
+  list rl = ringlist(Rbase);
+  rl[3] = list(list("C",1:2),list("dp",0));
+  def Rhermite = ring(rl);
+  rl = ringlist(Rbase);
+  rl[2] = list(var(1));
+  rl[3] = list(list("lp",1),list("C",0));
+  def Ronevar = ring(rl);   // only one variable
+
+  int i,j,k;
+  ideal I = fracIdeal[1];
+  list T,polynomialT,denominatorT;
+
+  for(i=1; i<=size(I);i++)
+  {
+    // compute representation matrices for every generator of I
+    T[i] = matrixrep(f,intbasis,list(I[i],fracIdeal[2]));
+    // list containing only the polynomial matrices
+    polynomialT[i] = T[i][1];
+    // list containing the corresponding denominators
+    denominatorT[i] = poly(T[i][2]);
+  }
+  poly commonden = lcm(denominatorT[1..size(denominatorT)]);
+  for(i=1; i<=size(polynomialT);i++)
+  {
+    // multiply with common denominator
+    polynomialT[i] = (commonden/denominatorT[i])*polynomialT[i];
+  }
+  matrix M = concat(polynomialT);
+
+  if (opt == 1)         // compute a k[x]-basis
+  {
+    setring Rhermite;
+    matrix M = imap(Rbase,M);
+
+    // compute n generators of the big rep. matrix via Groebner basis
+    module Mfinal = std(module(M));
+
+    setring Rbase;
+    module Mfinal = imap(Rhermite,Mfinal);
+    matrix P = Mfinal;
+  }
+  else     // compute a k[1/x]-basis
+  {
+    list P1 = normalFormInf(list(M,commonden),"free");
+    matrix P = P1[1];
+    commonden = P1[2];
+  }
+
+  ideal IB = intbasis[1];
+  list Z = multiplyMatrixList(P,IB);
+  ideal J = ideal(Z[1..size(IB)]);
+  poly gcdJ = idealGcd(J);
+  poly D = intbasis[2]*commonden;
+  poly comgcd = gcd(gcdJ,D);
+  // cancel out common divisor
+  J = J/comgcd;
+  D = D/comgcd;
+  list freeGens = J,D;
+  return(freeGens);
+}
+
+//___________________________________________________________________
+static proc inverseIdeal(poly f,list intbasis,list fracIdeal,int opt)
+"USAGE: inverseIdeal(f,intbasis,fracIdeal,opt); f polynomial,
+        intbasis list, A list, opt integer
+ASSUME: The base ring R must be a ring in two variables, say x,y,
+        and f must be monic as polynomial in the second variable.
+        List intbasis contains an integral basis of:
+        - IntCl(k[x],F), if opt = 1;
+        - IntCl(k[1/x],F), if opt = 2;
+        List fracIdeal contains two elements, an ideal I and a
+        polynomial d representing the fractional ideal I/d
+RETURN: A list inverseId of size 2. inverseId[1] contains an ideal,
+        say J, inverseId[2] a polynomial, say D.
+        Then J/D is a free k[x]- (opt = 1)  resp. k[1/x]-basis
+        (opt = 2) for the inverse ideal of I/d
+"
+{
+  def Rbase = basering;
+  list rl = ringlist(Rbase);
+  rl[2] = list(var(2), var(1));
+  rl[3] = list(list("lp",1:2),list("C",0));
+  def Rreduction = ring(rl);   // make var(2) > var(1)
+
+  rl = ringlist(Rbase);
+  rl[2] = list(var(1));
+  rl[3] = list(list("c",0),list("lp",1));
+  def Rhelp = ring(rl);
+  // ring with one variable, need for Hermite Normal Form
+
+  rl = ringlist(Rbase);
+  rl[1] = list(char(Rbase),list(var(1)),list(list("dp",1)),ideal(0));
+  rl[2] = list(var(2));
+  rl[3] = list(list("dp",1),list("C",0));
+  def QF = ring(rl);   // make var(1) transcendental
+
+  int i,j;
+  ideal I = fracIdeal[1];
+  list T,polynomialT,denominatorT;
+  for(i=1; i<=size(I);i++)
+  {
+    T[i] = matrixrep(f,intbasis,list(I[i],fracIdeal[2]));
+    polynomialT[i] = transpose(T[i][1]);
+    denominatorT[i] = poly(T[i][2]);
+  }
+  poly commonden = lcm(denominatorT[1..size(denominatorT)]);
+
+  for(i=1; i<=size(polynomialT);i++)
+  {
+    polynomialT[i] = (commonden/denominatorT[i])*polynomialT[i];
+  }
+
+  // as in freeGenerators: compute big representation matrix
+  matrix M = concat(polynomialT);
+
+  if (opt == 1)  // inverse ideal in ICl(k[x],F)
+  {
+    setring Rhelp;
+    matrix M = imap(Rbase,M);
+    // computes Hermite Normal Form of the matrix via Groebner basis
+    module TM = std(module(M));
+    setring Rbase;
+    matrix TM = imap(Rhelp,TM);
+    M = transpose(TM);
+  }
+  else   // inverse idal in ICl(K[1/x],F)
+  {
+    list P1 = normalFormInf(list(M,commonden),"inverse");
+    M = P1[1];
+    commonden = P1[2];
+  }
+  ideal IB = intbasis[1];
+  list Minverse = inverse_B(M);
+
+  setring QF;
+  list Minverse = imap(Rbase,Minverse);
+  poly commonden = imap(Rbase,commonden);
+  ideal IB = imap(Rbase,IB);
+  matrix invM = (commonden/Minverse[2])*Minverse[1];
+  ideal Z;
+  poly contZ;
+  int n = size(IB);
+  for (i=1; i<=n; i++)
+  {
+    Z[i]=0;
+    for(j=1; j<=n; j++)
+    {
+      Z[i] = Z[i] + IB[j]*invM[j,i];
+    }
+  }
+  matrix Z1[1][n] = Z;
+  number a = contentMatrix(Z1);
+  number numera = numerator(a);
+  number denoma = denominator(a);
+  Z = (1/a)*Z;
+
+  setring Rbase;
+  ideal Z = imap(QF,Z);
+  poly numera = imap(QF,numera);
+  poly denoma = imap(QF,denoma);
+  list inverseId;
+  poly D = gcd(numera,poly(intbasis[2]));
+  inverseId = list(Z*(numera/D),(intbasis[2]/D)*denoma);
+  return(inverseId);
+}
+
+//__________________________________________________________________
+static proc transmatrix(poly f,list A,list B)
+"USAGE: transmatrix(f,A,B); f polynomial, A list, B list
+ASSUME: The base ring R must be a ring in two variables, say x,y,
+        and f must be monic as polynomial in the second variable.
+        List A (resp. B) consists of two elements.
+        A[1] (resp. B[1]) a list of n elements of k[x],
+        A[2] (resp. B[2]) common denominators such that the
+        corresponding fractions are k(x)-linear independent
+RETURN: List transm of size 2. transm[1] is a matrix with
+        entries in k[x], say M, and transm[2] a polynomial in k[x],
+        say D, such that (M/D) is the transition matrix from A to B,
+        i.e, A[1]/A[2]*(M/D) = B[1]/B[2]
+"
+{
+  def Rbase = basering;
+  list rl = ringlist(Rbase);
+  rl[2] = list(var(2), var(1));
+  rl[3] = list(list("lp",1:2),list("C",0));
+  def Rreduction = ring(rl);   // make var(2) > var(1)
+  rl = ringlist(Rbase);
+  rl[1] = list(char(Rbase),list(var(1)),list(list("dp",1)),ideal(0));
+  rl[2] = list(var(2));
+  rl[3] = list(list("dp",1),list("C",0));
+  def QF = ring(rl);   // make var(1) transcendental
+
+  ideal a = A[1];
+  ideal b = B[1];
+
+  setring Rreduction;
+  ideal a = imap(Rbase,a);
+  ideal b = imap(Rbase,b);
+  ideal fred = std(imap(Rbase,f));
+  a = reduce(a,fred);
+  b = reduce(b,fred);
+  // coefficient matrices w.r.t. 1,...,y^(n-1)
+  matrix M_a = coeffs(a,var(1));
+  matrix M_b = coeffs(b,var(1));
+
+  setring QF;
+  list A = imap(Rbase,A);
+  list B = imap(Rbase,B);
+  matrix M_a = imap(Rreduction,M_a);
+  matrix M_b = imap(Rreduction,M_b);
+  poly d_a = A[2];
+  poly d_b = B[2];
+  matrix N_a = 1/d_a*M_a;
+  matrix N_b = 1/d_b*M_b;
+  list L = luinverse(N_a);
+  matrix M = L[2]*N_b;
+  number cont = contentMatrix(M);
+  number numer = numerator(cont);
+  number denom = denominator(cont);
+  M = (1/cont)*M;
+
+  setring Rbase;
+  matrix M = imap(QF,M);
+  poly numer = imap(QF,numer);
+  poly denom = imap(QF,denom);
+  list transm;
+  transm = numer*M,denom;
+  return(transm);
+}
+
+//___________________________________________________________________
+static proc maxorderInfinite(poly f, int #)
+"USAGE:  maxorderInfinite(f[,#]); f polynomial, # integer
+ASSUME: The base ring must be a ring in two variables, say x,y.
+        - f is an irreducible polynomial and the
+        second variable describes the integral element, say y.
+        The degree of f in y is n.
+        - optional integer #. If # is given, then # = 1 and the
+        infinite places of the function field F are computed if
+        Kummer's theorem applies.
+RETURN: - If # is not given:
+        A list InfBasis of size 1. InfBasis[1] contains an
+        integral basis of IntCl(k[1/x],F), stored in a list with
+        n = [F:k(x)] elements and a common denominator.
+        - If # = 1:
+        A list InfBasis of size 3.
+        InfBasis[1] contains an integral basis of IntCl(k[1/x],F).
+        InfBasis[2] is an integer k.
+        If we set f1 = t^(kn)*f(1/t,y) and define u = y*t^k,
+        then f1 is a monic polynomial in u with coefficients in
+        k[t].
+        InfBasis[3] a list containing the infinite places of
+        the function field, if the compuation was possible. Else
+        the list is empty.
+"
+{
+  def Rbase = basering;
+  int k,l,i;
+
+  //Necessary rings for substitution
+  //////////////////////////////////////////////////////////////////
+
+  list rl = ringlist(Rbase);
+  rl[1] = list(char(Rbase),list("t"),list(list("dp",1)),ideal(0));
+  rl[2] = list(var(1),var(2),"u");
+  rl[3] = list(list("dp",1:3),list("C",0));
+  def Rnew = ring(rl);
+
+  rl = ringlist(Rbase);
+  rl[2] = list("t","u");
+  def Rintegral = ring(rl);
+  // ring with the new two variables, for the computation of the integral basis
+
+  //two additional rings needed for changing t,u back to x,y
+  rl = ringlist(Rbase);
+  rl[2] = list(var(1),var(2),"t","u");
+  rl[3] = list(list("dp",1:4),list("C",0));
+  def Rhelp = ring(rl);
+
+  rl = ringlist(Rbase);
+  rl[1] = list(char(Rbase),list(var(1)),list(list("dp",1)),ideal(0));
+  rl[2] = list(var(2),"t","u");
+  rl[3] = list(list("dp",1:3),list("C",0));
+  def Rhelp1 = ring(rl);
+
+  //Substitute the variables
+  //////////////////////////////////////////////////////////////////
+
+  setring Rnew;   //1 additional parameter, 1 add. variable
+  poly f = imap(Rbase,f);
+  poly f1 = subst(f,var(1),(1/t)); // subst. x by 1/t
+
+  matrix Cf = coeffs(f,var(2));
+  int n = nrows(Cf)-1;   // degree of f in y
+  list degs;
+  for(i=1; i<=n; i++)
+  {
+    // f = y^n + a_(n-1)(x)*y^(n-1)+....
+    degs[i] = list(i-1,deg(Cf[i,1])); // degs[i] =[i,deg(a_i(x))]
+  }
+
+  // find the minimum multiple of n such that  t^(k*n)*f(1/t,y)
+  // is monic after replacing y*t^k by u
+  while (l==0)
+  {
+    l=1;
+    k=k+1;
+    for(i=1; i<=size(degs); i++)
+    {
+      if(degs[i][2] != -1)  // if (a_i(x) != 0)
+      {
+        if((k*n-degs[i][2])<(k*degs[i][1]))
+        {
+          l=0; break;
+        }
+      }
+    }
+  }
+
+  f1 = f1*t^(k*n);
+  poly v = u/(t^k);
+  poly fintegral = subst(f1,var(2),v);  // replace y by u/t^k
+
+  // compute integral basis of the new polynomial in t,u
+  setring Rintegral;
+  poly fintegral = imap(Rnew,fintegral);
+  list Z = integralBasis(fintegral,2);
+
+  //Check if Kummer's Theorem apply
+  //////////////////////////////////////////////////////////////////
+  if (# == 1)
+  {
+    poly fInfinity = substitute(fintegral,t,0);
+    list factors = factorize(fInfinity,2);
+    list degsinf = factors[2];
+    int kum = 1;
+    for (i=1; i<=size(degsinf[1]);i++)
+    {
+      // check if all exponents are 1
+      if (degsinf[1][i] != 1)
+      {
+        kum = 0;
+        break;
+      }
+    }
+    if (kum == 0)
+    // check if 1,...,y^{n-1} is an integral basis
+    {
+      if (Z[2] == 1)
+      {
+        kum = 1;
+        for (i = 1; i<=size(Z[1]); i++)
+        {
+          if (Z[1][i] != u^(i-1))
+          {
+            kum = 0;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  //Reverse the substitution
+  //////////////////////////////////////////////////////////////////
+
+  setring Rnew; // t as parameter, u as variable
+  list Z = imap(Rintegral,Z);
+  ideal IB = Z[1];
+  poly d = Z[2];
+  IB = subst(IB,u,var(2)*(t^k));
+  d = subst(d,u,var(2)*(t^k));  // replace u by y*t^k
+
+  if (# == 1)
+  {
+    if (kum == 1)
+    {
+      list factors = imap(Rintegral,factors);
+      list Zfacs = factors[1];
+      ideal I = substitute(ideal(Zfacs[1..size(Zfacs)]),u,var(2)*(t^k));
+      Zfacs = I[1..size(I)];
+    }
+  }
+
+  setring Rhelp; // t as variable
+  ideal IB = imap(Rnew,IB);
+  poly d = imap(Rnew,d);
+  matrix C = coeffs(IB,t);
+  matrix Cden = coeffs(d,t);
+  int p = nrows(C)-1; // maximum degree of IB in t
+  int pden = nrows(Cden)-1;
+
+  setring Rhelp1; // var(1) as parameter, t as variable
+  ideal IB = imap(Rhelp,IB);
+  poly d = imap(Rhelp,d);
+  matrix Cden = imap(Rhelp,Cden);
+  IB = subst(IB,t,(1/par(1)));  // replace t by 1/x
+  d = subst(d,t,(1/par(1)));
+  IB = IB*par(1)^p;
+  d = d*par(1)^pden;
+
+  //Compute the infinite places
+  //////////////////////////////////////////////////////////////////
+  if (# == 1)
+  {
+    if (kum == 1)
+    {
+      list Zfacs = imap(Rnew,Zfacs);
+      list pfacs;
+      for (i=1;i<=size(Zfacs);i++)
+      {
+        pfacs[i]=deg(substitute(Zfacs[i],var(1),1));
+        Zfacs[i]=ideal(Zfacs[i],t);
+        Zfacs[i]=substitute(Zfacs[i],t,(1/par(1)));
+        Zfacs[i]=list(Zfacs[i]*par(1)^pfacs[i],par(1)^pfacs[i]);
+      }
+    }
+  }
+
+  setring Rbase;
+  ideal IB = imap(Rhelp1,IB);
+  poly d = imap(Rhelp1,d);
+  poly den;
+  if(p >= pden)
+  {
+    den = d*var(1)^(p-pden);
+  }
+  else
+  {
+    IB = IB*var(1)*(pden-p);
+    den = d;
+  }
+  list final = IB,den;
+
+  if ( # == 1)
+  {
+    list InfPlaces;
+    if (kum == 1)
+    {
+      list Zfacs = imap(Rhelp1,Zfacs);
+      InfPlaces = Zfacs;
+      list InfBasis = final,k,InfPlaces;
+      return(InfBasis);
+    }
+    else
+    {
+      return(final,k,InfPlaces);
+    }
+  }
+
+  list InfBasis = list(final);
+  return(InfBasis);
+}
+
+//__________________________________________________________________
+static proc redmatrix(matrix A)
+"USAGE: redmatrix(A); A matrix
+ASSUME: The basering must be a polynomial ring in one variable,
+        say k[x], A a mxn-matrix with entries in k[x]
+RETURN: A list containing two matrices, say A' and T such that
+        A' is the reduced matrix of A and T the
+        transformation matrix, i.e., A' = A*T.
+THEORY: Consider the columns of the matrix A as a basis
+        of a lattice. Denote the column degree of the j-th column
+        by deg(j). Create vectors hc(j) in k^m containing the
+        coefficient of the deg(j)-th power of x of column j.
+        A basis is called reduced if the {hc(j)} are linearly
+        independent.
+        If the basis is non-reduced we proceed reduction steps
+        until the above criterion is satisfied.
+        In a reduction step of column j we add a certain k[x]-
+        combination of the other columns to column j, such that
+        the column-degree decreases.
+"
+{
+  if (nvars(basering) != 1)
+  {
+    ERROR("The base ring must be a ring in one variables.");
+  }
+  int m = nrows(A);
+  int n = ncols(A);
+  matrix T = unitmat(m);
+  list d;
+  int i,j,counter;
+  int h = 1;
+  int pos, maxd;
+  while(h)
+  {
+    for (j=1; j<=n; j++)
+    {
+      d[j]=colDegree(A,j);
+    }
+    matrix M[m][n];
+    for (j=1; j<=n; j++)
+    {
+      for (i=1; i<=m; i++)
+      {
+        M[i,j]=coefficientAt(A,j,d[j])[i];  // computes the hc(j)
+      }
+    }
+    module S = M;
+    matrix N = matrix(syz(M));
+    if(rank(N)==0)   // hc(j) are linearly independent
+    {
+      h=0;
+    }
+    else
+    {
+      h = ncols(N);
+    }
+    list ind;
+    list degind;
+
+    for (j=1; j<=Min(intvec(1,h));j++)
+    // minimum needed to avoid unnecessary first reduction
+    // step in the reduced case
+    {
+      for (i=1; i<= ncols(M); i++)
+      {
+        if(N[i,j]!=0)
+        {
+          counter++;
+          // position of non-zero entry
+          ind[counter]=i;
+          // degree of non-zero entry
+          degind[counter]=d[i];
+        }
+      }
+      counter = 0;
+      // determine the maximal column degree
+      maxd = Max(degind);
+      i=0;
+      // find the column, where the maximum is attained
+      while(i<=size(degind))
+      {
+        i=i+1;
+        if (degind[i] == maxd)
+        {
+          pos = i;
+          break;
+        }
+      }
+      pos = ind[pos];
+      for (i=1;i<=size(ind);i++)
+      {
+        if (ind[i] != pos)
+        {
+          matrix A1=addcol(A,ind[i],N[ind[i],j]/N[pos,j]*var(1)^(maxd-d[ind[i]]),pos);
+          matrix T1=addcol(T,ind[i],N[ind[i],j]/N[pos,j]*var(1)^(maxd-d[ind[i]]),pos);
+          A=A1;
+          T=T1;
+          kill A1;
+          kill T1;
+        }
+      }
+      kill degind,ind;
+    }
+    kill M,N,S;
+  }
+  list final = A,T;
+  return(final);
+}
+
+//__________________________________________________________________
+static proc normalFormInf(list K,string sopt)
+"USAGE: normalFormInf(K,sopt); K list, sopt string
+ASSUME: The basering must be a polynomial ring in one variable,
+        say k[x].
+        K is a list of size 2. K[1] is a matrix, say A, with entries in
+        k[x] and K[2] a polynomial, say den.
+        A/den is a matrix with entries in k[1/x].
+        sopt is either "free" or "inverse"
+RETURN: A list, say norFormInf, of size 2. norFormInf[1] is a matrix,
+        say M, and norFormInf[2] a polynomial, say D.
+        The matrix M/D is a normal form of the matrix A/den which is
+        needed for the
+        - if (sopt = "free")
+        computation of an int. basis of an ideal of IntCl[k[1/x],F)
+        - if (sopt = "inverse")
+        computation of a int. basis of the inverse of an ideal
+        of IntCl[k[1/x],F)
+THEORY For computing a normal form with coefficients. in k[1/x]
+       we have to replace 1/x by another variable, compute the normal
+       with the aid of Groebner bases and reverse the substitution.
+"
+{
+  def Rbase = basering;
+
+  //_____________Necessary rings for substitution___________________
+
+  list rl = ringlist(Rbase);
+  rl[1] =list(char(Rbase),list("helppar"),list(list("dp",1)),ideal(0));
+  def QF = ring(rl);   // basering with additional parameter helppar
+
+  rl = ringlist(Rbase);
+  rl[2] = list(var(1),var(2),"helppar");
+  rl[3] = list(list("dp",1:3),list("C",0));
+  def Rhelp = ring(rl);  // basering with additional variable helppar
+
+  rl = ringlist(Rbase);
+  rl[2] = list("helppar");
+  rl[3] = list(list("c",0),list("lp",1));
+  def Rhelpinv = ring(rl);  // ring with one variable, ordering c
+
+  rl = ringlist(Rbase);
+  rl[2] = list("helppar");
+  rl[3] = list(list("C",0),list("lp",1));
+  def Rhelpfree = ring(rl); // ring with one variable, ordering C
+
+  setring QF;
+  list K = imap(Rbase, K);
+  matrix A = K[1];
+  poly den = K[2];
+  matrix A1 = subst(A,var(1),1/helppar);
+  poly den1 = subst(den, var(1),1/helppar);
+  A1 = (1/den1)*A1;
+
+  // transform into a polynomial matrix with entries
+  // in k[helppar]
+  number a = contentMatrix(A1);
+  number numera = numerator(a);
+  number denoma = denominator(a);
+  A1 = (1/a)*A1;  // A1 matrix with entries in k[helppar]
+
+  setring Rhelp;
+  matrix A1 = imap(QF,A1);
+  poly numera = imap(QF,numera);
+  poly denoma = imap(QF,denoma);
+  number lcd= leadcoef(denoma);
+  A1 = (numera/lcd)*A1;
+  poly den = denoma/lcd;
+
+   //_____________Compute a normal form___________________
+  if (sopt == "inverse")
+  {
+    setring Rhelpinv;
+    matrix A1 = imap(Rhelp,A1);
+    module S = std(module(A1));
+    A1 = S;
+    list mat;
+    int i;
+    int nc = ncols(A1);
+    // change order of columns to obtain a lower triangular
+    // matrix
+    for(i=1; i<=nc; i++)
+    {
+      mat[i]=A1[nc-i+1];
+    }
+    A1= concat(mat);
+    setring Rhelp;
+    A1 = imap(Rhelpinv,A1);
+    matrix A = transpose(A1);
+  }
+  if (sopt ==  "free")
+  {
+    setring Rhelpfree;
+    matrix A1 = imap(Rhelp,A1);
+    module S = std(module(A1));
+    A1 = S;
+    setring Rhelp;
+    matrix A = imap(Rhelpfree,A1);
+  }
+
+   //_____________Reverse substitution__________________
+  intvec v = 1;
+  // change variables back from helppar to x
+  def Rpar = vars2pars(v);
+  setring Rpar;
+  poly den = imap(Rhelp,den);
+  matrix A = imap(Rhelp,A);
+  A = subst(A,helppar,1/par(1));
+  den = subst(den, helppar,1/par(1));
+  A = (1/den)*A;
+  number a = contentMatrix(A);
+  number numera = numerator(a);
+  number denoma = denominator(a);
+  A = (1/a)*A;
+
+  setring Rbase;
+  matrix A = imap(Rpar,A);
+  poly numera = imap(Rpar,numera);
+  poly denoma = imap(Rpar,denoma);
+  number lcd= leadcoef(denoma);
+  list final;
+  final = list((numera/lcd)*A,denoma/lcd);
+
+  return(final);
+}
+
+//////////////////////////////////////////////////////////////////
+///////////////////// AUXILARY STATIC PROCEDURES /////////////////
+
+//_________________________________________________________________
+static proc colDegree(matrix A, int j)
+"USAGE: colDegree(A,j); A matrix, j integer
+ASSUME: Base ring must be a polynomial ring in one variable,
+        integer j describes a column of A
+RETURN: A list, containing the maximum degree occurring in the
+        entries of the j-th column of A and the corresponding row
+"
+{
+  if(nvars(basering) != 1)
+  {
+    ERROR("The base ring must be a ring in one variables.");
+  }
+  int d;
+  int nc = ncols(A);
+  int nr = nrows(A);
+  if( j< 1 || j>nc)
+  {
+    ERROR("j doesn't describe a column of the input matrix");
+  }
+
+  // ideal of the entries of the j-th column
+  ideal I = A[1..nr,j];
+  matrix C = coeffs(I,var(1));
+  // maximal degree occurring in the j-th column
+  d = nrows(C)-1;
+  return(d);
+}
+
+//_________________________________________________________________
+static proc coefficientAt(matrix A, int j, int e);
+"USAGE: coefficientAt(A,j,e); A matrix, j,e intger
+ASSUME: Base ring is polynomial ring in one variable,
+        j describes a column of A, e non-negative integer
+        smaller or equal to the column degree of
+        the j-th column.
+RETURN: A list Z of the size of the j-th column:
+        - if A[i,j] has a monomial with degree e, the
+        corresponding coefficient is stored in Z[i]
+        - else Z[i] = 0
+"
+{
+  if(nvars(basering) != 1)
+  {
+    ERROR("The base ring must be a ring in one variables.");
+  }
+  int d,i;
+  int nc = ncols(A);
+  int nr = nrows(A);
+  if (j<1 || j>nc)
+  {
+    ERROR("j doesn't describe a column of the input matrix");
+  }
+  ideal I = A[1..nr,j];
+  matrix C = coeffs(I,var(1));
+  d = nrows(C)-1;
+  list Z;
+  if (e>d || e<0)
+  {
+    ERROR("e negative or larger than the maximum degree");
+  }
+  for (i=1; i<=ncols(C); i++)
+  {
+    Z[i]=C[e+1,i];
+  }
+  return(Z);
+}
+
+//__________________________________________________________________
+static proc computeInvariants(matrix T,poly denT)
+"USAGE: computeInvariants(T,denT); T matrix, denT polynomial
+ASSUME: Base ring has one variable,say x, T/denT is square matrix
+        with entries in k(x)
+RETURN: The k[x]-invariants of T/denT stored in a list.
+"
+{
+  list Dcoef;
+  int i,j;
+  int counter_inv;
+  list S;
+  for (j=1; j<=ncols(T); j++)
+  {
+    S=list();
+    for(i=1; i<=nrows(T); i++)
+    {
+      if (T[i,j] != 0)
+      {
+        counter_inv++;
+        S[counter_inv]= deg(T[i,j])-deg(denT);
+      }
+    }
+    Dcoef[j] = Max(S);
+    counter_inv = 0;
+  }
+  return(Dcoef);
+}
+
+//__________________________________________________________________
+static proc contentMatrix(matrix A)
+"USAGE: contentMatrix(A); A matrix
+NOTE:   Base ring is allowed to have parameters
+RETURN: The content of all entries of the matrix A
+"
+{
+  def Rbase = basering;
+  int nv = nvars(Rbase);
+  list rl = ringlist(Rbase);
+  rl[2][nv + 1] = "helpv";
+  rl[3] = list(list("dp",1:(nv+1)),list("C",0));
+  def Rhelp = ring(rl);
+
+  setring Rhelp;
+  matrix A = imap(Rbase,A);
+  poly contCol;
+  int i;
+  for (i=1; i<=ncols(A); i++)
+  {
+    contCol = contCol+ content(A[i])*(helpv^i);
+  }
+  number contmat = content(contCol);
+
+  setring Rbase;
+  number contmat = imap(Rhelp,contmat);
+  return(contmat);
+}
+
+//__________________________________________________________________
+static proc idealGcd(ideal A)
+"USAGE: idealGcd(A); A ideal
+ASSUME: Ideal in the base ring
+RETURN: The greatest common divisor of the given
+        generators of I
+{
+  poly med;
+  poly intermed;
+  int i;
+  med = A[1];
+  for (i=1; i<size(A); i++){
+    intermed = gcd(med,A[i+1]);
+    med = intermed;
+  }
+  return(med);
+}
+
+//__________________________________________________________________
+static proc ideal2list(ideal I)
+{
+  list D = list(I[1..size(I)]);
+  return(D);
+}
+
+//__________________________________________________________________
+static proc zerosM(int n)
+{
+  matrix A = unitmat(n);
+  int i;
+  for (i=1;i<=n;i++)
+  {
+    A[i,i]=0;
+  }
+  return(A);
+}
+
+//__________________________________________________________________
+static proc multiplyMatrixList(matrix T,ideal L)
+{
+  list final;
+  int i,j;
+  for (j=1; j<=ncols(T);j++)
+  {
+    final[j]=0;
+    for (i=1; i<=nrows(T);i++)
+    {
+      final[j] = final[j] + L[i]*T[i,j];
+    }
+  }
+  return(final);
+}
+
+//__________________________________________________________________
+static proc isIrreducible(poly f)
+"USAGE:  isIrreducible(f); f poly
+RETURN:  1 iff the given polynomial f is irreducible; 0 otherwise.
+THEORY:  This test is performed by computing the absolute
+         factorization of f.
+KEYWORDS: irreducible.
+"
+{
+  def r = basering;
+  def s = absFactorize(f);
+  setring s;
+  list L = absolute_factors;
+  int result = 0;
+  if (L[4] == 1){result = 1;}
+  setring r;
+  kill s;
+  return (result);
+}
+
+///////////////////////////////////////////////////////////////////
+/////////// STATIC PROCEDURES FOR FRACTIONAL IDEALS ///////////////
+
+//_________________________________________________________________
+static proc sumFracIdeals(list A,list B)
+"USAGE: sumFracIdeals(A,B); A list, B list
+ASSUME: List A (resp. B) represent fractional ideals,
+        A[1] is an integral ideal and A[2] a common
+        denominator
+RETURN: The sum of the two fractional ideals, again
+        stored in a list.
+"
+{
+  ideal K = A[1]*B[2]+A[2]*B[1];
+  poly d = A[2]*B[2];
+  K = simplify(K,8);
+  poly gcdK = idealGcd(K);
+  poly commonfac = gcd(gcdK,d);
+  list final = K/commonfac,d/commonfac;
+  return(final);
+}
+
+//__________________________________________________________________
+
+static proc multiplyFracIdeals(list A,list B)
+"USAGE: multiplyFracIdeals(A,B); A list, B list
+ASSUME: List A (resp. B) represents a fractional ideals,
+        A[1] is an integral ideal and A[2] a common
+        denominator
+RETURN: The product of the two fractional ideals,
+        again stored in a list
+NOTE:   We cannot multiply the integral ideals directly, since the
+        integral ideals may contain 1 and are simplified
+        during the multiplication
+        Consequently, we multiply the ideals by multiplying each
+        element
+"
+{
+  list A1 = ideal2list(A[1]); // transform ideals to lists
+  list B1 = ideal2list(B[1]);
+  list multiplyAB = multiplyList(A1,B1);
+  ideal multAB = ideal(multiplyAB[1..size(multiplyAB)]);
+  multAB = simplify(multAB,8);
+  poly d = A[2]*B[2];
+  return (list(multAB,d));
+}
+
+//_________________________________________________________________
+static proc powerFracIdeal(list A, int d)
+"USAGE: powerFracIdeal(A,d); A list, d integer
+ASSUME: List A represents a fractional ideal:
+        A[1] is an integral ideal and A[2] a common
+        denominator
+RETURN: The d-th power of the fractional ideal,
+        again stored in a list.
+"
+{
+  if (d<0)
+  {
+    ERROR("only non-negative integers allowed")
+  }
+  int i;
+  list final = A;
+  for (i=1;i<d;i++)
+  {
+    final = multiplyFracIdeals(final,A);
+  }
+  return(final);
+}
+
+//__________________________________________________________________
+static proc isEqualFracIdeal(list A,list B)
+"USAGE: isEqualFracIdeal(A,B); A list, B list
+ASSUME: List A (resp. B) represents a fractional ideal:
+        A[1] is an integral ideal and A[2] a common
+        denominator
+RETURN: 1 if the fractional ideals are equal, 0 else
+"
+{
+  int d;
+  if ( isEqualId(B[2]*A[1],A[2]*B[1]) )
+  {
+    d = 1;
+  }
+  return(d);
+}
+
+//__________________________________________________________________
+static proc isEqualId(ideal I,ideal J)
+{
+  int d;
+  if (isIncluded(I,J) && isIncluded(J,I))
+  {
+  d = 1;
+  }
+  return(d);
+}
+
+//__________________________________________________________________
+static proc multiplyList(list A,list B)
+"USAGE:  multiplyList(A,B); A list, B list
+ASSUME:  list A and list B contain polynomials of the
+         base ring
+RETURN:  list obtained by multiplying every element of
+         list A with every element of list B
+"
+{
+  int nA = size(A);
+  int nB = size(B);
+  list multiL;
+  int i,j;
+  for(i=1;i<=nA;i++)
+  {
+    for(j=1;j<=nB;j++)
+    {
+      multiL[(i-1)*nB+j]=A[i]*B[j];
+    }
+  }
+  return(multiL);
+}
+
+////////////////////////////////////////////////////////////////////
+/////// STATIC PROCEDURES FOR TRANSFORMATION OF THE INPUT //////////
+
+//__________________________________________________________________
+static proc Free2IdealRepresentation(poly f,list FinBasis,
+                                     list InfBasis,list Dformal)
+"USAGE: Free2IdealRepresentation(f,FinBasis,InfBasis,Dformal); f
+        polynomial, FinBasis list, InfBasis list, Dformal list
+ASSUME: The base ring must have two variables.
+        - f is an absolutely irreducible polynomial defining the
+        function field F/k
+        - list FinBasis obtains an integral basis of IntCL[k[x],F)
+        - list InfBasis obtains an integral basis of IntCl(k[1/x],F)
+        - list Dformal of size 2 representing a divisor D
+         Dformal[1] is a list containing the finite places of D
+         Dformal[2] is a list containing the infinite places of D
+RETURN: A list DIdeals of size 2, the ideal representation
+        of D. DIdeals[1] is the finite (fractional) ideal of D,
+        DIdeals[2] is the infinite (fractional) ideal of D.
+"
+{
+  def Rbase = basering;
+
+  int i;
+  list DFinite = Dformal[1];
+  list DInfinite = Dformal[2];
+  list DFinitePos = ideal(1),1;
+  list DFiniteNeg = ideal(1),1;
+  list DInfinitePos = ideal(1),1;
+  list DInfiniteNeg = ideal(1),1;
+  ideal Itmp;
+  poly dtmp;
+  list Ltmp;
+  for (i=1;i<=size(DFinite);i++)
+  {
+    if (DFinite[i][2]>= 0)
+    {
+      if (size(DFinite[i][1][1]) == 2)
+      {
+        Itmp = DFinite[i][1][1][1]^DFinite[i][2], DFinite[i][1][1][2]^DFinite[i][2];
+        dtmp = DFinite[i][1][2]^DFinite[i][2];
+        Ltmp = Itmp,dtmp;
+      }
+      else
+      {
+        Ltmp = powerFracIdeal(DFinite[i][1],DFinite[i][2]);
+      }
+      DFinitePos = multiplyFracIdeals(Ltmp,DFinitePos);
+    }
+    else
+    {
+      if (size(DFinite[i][1][1]) == 2)
+      {
+        Itmp = DFinite[i][1][1][1]^(-DFinite[i][2]), DFinite[i][1][1][2]^(-DFinite[i][2]);
+        dtmp = DFinite[i][1][2]^(-DFinite[i][2]);
+        Ltmp = Itmp,dtmp;
+      }
+      else
+      {
+        Ltmp = powerFracIdeal(DFinite[i][1],-DFinite[i][2]);
+      }
+      DFiniteNeg = multiplyFracIdeals(Ltmp,DFiniteNeg);
+    }
+  }
+  for (i=1;i<=size(DInfinite);i++)
+  {
+    if (DInfinite[i][2]>= 0)
+    {
+      if (size(DInfinite[i][1][1]) == 2)
+      {
+        Itmp = DInfinite[i][1][1][1]^DInfinite[i][2], DInfinite[i][1][1][2]^DInfinite[i][2];
+        dtmp = DInfinite[i][1][2]^DInfinite[i][2];
+        Ltmp = Itmp,dtmp;
+      }
+      else
+      {
+        Ltmp = powerFracIdeal(DInfinite[i][1],DInfinite[i][2]);
+      }
+      DInfinitePos = multiplyFracIdeals(Ltmp,DInfinitePos);
+    }
+    else
+    {
+      if (size(DInfinite[i][1][1]) == 2)
+      {
+        Itmp = DInfinite[i][1][1][1]^(-DInfinite[i][2]), DInfinite[i][1][1][2]^(-DInfinite[i][2]);
+        dtmp = DInfinite[i][1][2]^(-DInfinite[i][2]);
+        Ltmp = Itmp,dtmp;
+      }
+      else
+      {
+        Ltmp = powerFracIdeal(DInfinite[i][1],-DInfinite[i][2]);
+      }
+      DInfiniteNeg = multiplyFracIdeals(Ltmp,DInfinitePos);
+    }
+  }
+
+  DFiniteNeg = freeGenerators(f,FinBasis,DFiniteNeg,1);
+  DFiniteNeg = inverseIdeal(f,FinBasis,DFiniteNeg,1);
+  list Fin = multiplyFracIdeals(DFinitePos,DFiniteNeg);
+
+  DInfiniteNeg = freeGenerators(f,InfBasis,DInfiniteNeg,2);
+  DInfiniteNeg = inverseIdeal(f,InfBasis,DInfiniteNeg,2);
+  list Inf = multiplyFracIdeals(DInfinitePos,DInfiniteNeg);
+
+  return(list(Fin,Inf));
+}
+
+//__________________________________________________________________
+
+static proc divisorTrans(poly f,list D,list FinBasis,list Infin,
+                         string s)
+"USAGE: divisorTrans(f,D,FinBasis,Infin,s); f polynomial, D list
+        FinBasis list, Infin list, s string
+ASSUME: - f is an absolutely irreducible homogeneous polynomial in
+        three variables, say x,y,z, describing a projective curve
+        - string s is either "ideals" or "free"
+        "ideals": list D contains two ideals, say I and J
+                  representing a divisor (I) - (J)
+        "free": list D contains lists, each list a place
+                and a exponent
+        - list FinBasis contains an integral basis of IntCl(k[x],F)
+        - list Infin contains an integral basis of IntCl(k[1/x],F),
+        an integer k and the infinite places of F if their
+        computation was possible
+RETUN:  The corresponding divisor on F in ideal representation
+        (needed for the procedure RiemannRochHess).
+        A list of size 2, say divisortrans.
+        If (s = "ideals"), then the transformed divisor is given in
+        ideal representation.
+        If (s = "free"), then the transformed divisor is given in
+        free representation.
+THEORY: We compute first the places corresponding to affine
+        points on the curve, i.e. the places in the chart (z=1)
+        For the points at infinity (z=0) we allow only
+        non-singular points.
+"
+{
+
+  def Rbase = basering;
+  int i,j;
+  poly f_aff = subst(f,var(3),1);
+  list rl = ringlist(Rbase);
+  rl[2] = list(var(1),var(2));
+  rl[3] = list(list("dp",1:2),list("C",0));
+  def R_aff = ring(rl);  // corresponding affine ring
+
+  // list of all infinite places of F
+  list InfPlaces = Infin[3];
+
+  InfPlaces = transformPlacesAtInfinity(f,Infin[2],InfPlaces);
+  //list containing the infinite places of the function field
+  // and the corresponding places in the chart z = 0 of
+  // the projective curve if the computation is possible
+
+  if (s == "ideals")
+  {
+    ideal I = D[1];
+    ideal J = D[2];
+    ideal I1,J1;
+
+    // ideals corresponding to affine points on the curve (z=1)
+    I1 = sat(I,var(3))[1];
+    J1 = sat(J,var(3))[1];
+    ideal Ifin = std(subst(I1,var(3),1));
+    ideal Jfin = std(subst(J1,var(3),1));
+
+    // ideals corresponding to points at infinity (z=0)
+    list InfIdeals;
+    list InfPos = ideal(1),1;
+    list InfNeg = ideal(1),1;
+    list InfTmp;
+    int d;
+    ideal Iinf, Jinf;
+    Iinf = sat(I,I1)[1];
+    Jinf = sat(J,J1)[1];
+
+    if (size(InfPlaces) == 0)
+    {
+      "WARNING: Infinite places have not been computed!"
+    }
+    for (i=1;i<=size(InfPlaces);i++)
+    {
+      if(isIncluded(Iinf,InfPlaces[i][1]))
+      {
+        d = sat(Iinf,InfPlaces[i][1])[2];
+        InfTmp = powerFracIdeal(InfPlaces[i][2],d);
+        InfPos = multiplyFracIdeals(InfPos,InfTmp);
+
+      }
+      if (isIncluded(Jinf,InfPlaces[i][1]))
+      {
+        d = sat(Jinf,InfPlaces[i][1])[2];
+        InfTmp = powerFracIdeal(InfPlaces[i][2],d);
+        InfNeg = multiplyFracIdeals(InfNeg,InfTmp);
+      }
+    }
+
+    list FinPos = Ifin,1;
+    list FinNeg = Jfin,1;
+    FinNeg = freeGenerators(f_aff,FinBasis,FinNeg,1);
+    FinNeg = inverseIdeal(f_aff,FinBasis,FinNeg,1);
+    list Fin = multiplyFracIdeals(FinPos,FinNeg);
+    InfNeg = freeGenerators(f_aff,Infin[1],InfNeg,2);
+    InfNeg = inverseIdeal(f_aff,Infin[1],InfNeg,2);
+    list Inf = multiplyFracIdeals(InfPos,InfNeg);
+
+    return(list(Fin,Inf));
+  }
+
+  if ( s == "free")
+  {
+    list PlacesFin;
+    list PlacesInf;
+    ideal Itemp;
+    int counter_fin,counter_inf;
+    for (i=1;i<=size(D);i++)
+    {
+      if (reduce(var(3),std(D[i][1])) != 0)
+      {
+        counter_fin++;
+        Itemp = subst(D[i][1],var(3),1);
+        PlacesFin[counter_fin] = list(list(Itemp,1),D[i][2]);
+        D = delete(D,i);
+        i=i-1;
+      }
+    }
+    if (size(InfPlaces) == 0)
+    {
+      "WARNING: Infinite places have not been computed!"
+      PlacesInf[1] = list(list(ideal(1),1),1);
+    }
+    else
+    {
+      for (i=1;i<=size(D);i++)
+      {
+        for(j=1;j<=size(InfPlaces);j++)
+        {
+          if (isEqualId(D[i][1],InfPlaces[j][1]))
+          {
+            counter_inf++;
+            PlacesInf[counter_inf] = list(InfPlaces[i][2],D[i][2]);
+          }
+        }
+      }
+    }
+    return(list(PlacesFin,PlacesInf));
+  }
+}
+
+//___________________________________________________________________
+static proc infPlaces (poly f)
+// from brnoeth.lib
+{
+  intvec iv;
+  def base_r=basering;
+  ring r_auxz=char(basering),(x,y,z),lp;
+  poly F=imap(base_r,f);
+  poly f_inf=subst(F,z,0);
+  setring base_r;
+  poly f_inf=imap(r_auxz,f_inf);
+  ideal I=factorize(f_inf,1);  // points at infinity as homogeneous
+  // polynomials
+  int s=size(I);
+  int i;
+  list IP_S=list();          // for singular points at infinity
+  list IP_NS=list();         // for non-singular points at infinity
+  int counter_S;
+  int counter_NS;
+  poly aux;
+
+  for (i=1;i<=s;i=i+1)
+  {
+    aux=subst(I[i],y,1);
+    if (aux==1)
+    {
+      // the point is (1:0:0)
+      setring r_auxz;
+      poly f_yz=subst(F,x,1);
+      if ( subst(subst(diff(f_yz,y),y,0),z,0)==0 &&
+           subst(subst(diff(f_yz,z),y,0),z,0)==0 )
+      {
+        // the point is singular
+        counter_S=counter_S+1;
+        kill f_yz;
+        setring base_r;
+        IP_S[counter_S]=ideal(I[i],var(3));
+      }
+      else
+      {
+      // the point is non-singular
+        counter_NS=counter_NS+1;
+        kill f_yz;
+        setring base_r;
+        IP_NS[counter_NS]=ideal(I[i],var(3));
+      }
+    }
+    else
+    {
+    // the point is (a:1:0) | a is root of aux
+      if (deg(aux)==1)
+      {
+      // the point is rational and no field extension is needed
+        setring r_auxz;
+        poly f_xz=subst(F,y,1);
+        poly aux=imap(base_r,aux);
+        number A=-number(subst(aux,x,0));
+        map phi=r_auxz,x+A,0,z;
+        poly f_origin=phi(f_xz);
+
+        if ( subst(subst(diff(f_origin,x),x,0),z,0)==0 &&
+        subst(subst(diff(f_origin,z),x,0),z,0)==0 )
+        {
+          // the point is singular
+          counter_S=counter_S+1;
+          kill f_xz,aux,A,phi,f_origin;
+          setring base_r;
+
+          IP_S[counter_S]=ideal(I[i],var(3));
+        }
+        else
+        {
+           // the point is non-singular
+          counter_NS=counter_NS+1;
+          kill f_xz,aux,A,phi,f_origin;
+          setring base_r;
+          IP_NS[counter_NS]=ideal(I[i],var(3));
+        }
+      }
+      else
+      {
+      // the point is non-rational and a field extension with
+      // minpoly=aux is needed
+
+        ring r_ext=(char(basering),@a),(x,y,z),lp;
+        poly F=imap(r_auxz,F);
+        poly f_xz=subst(F,y,1);
+        poly aux=imap(base_r,aux);
+        minpoly=number(subst(aux,x,@a));
+        map phi=r_ext,x+@a,0,z;
+        poly f_origin=phi(f_xz);
+
+        if ( subst(subst(diff(f_origin,x),x,0),z,0)==0 &&
+        subst(subst(diff(f_origin,z),x,0),z,0)==0 )
+        {
+
+          // the point is singular
+          counter_S=counter_S+1;
+          setring base_r;
+
+          kill r_ext;
+          IP_S[counter_S]=ideal(I[i],var(3));
+        }
+        else
+        {
+          // the point is non-singular
+          counter_NS=counter_NS+1;
+          setring base_r;
+          kill r_ext;
+          IP_NS[counter_NS]=ideal(I[i],var(3));
+        }
+      }
+    }
+  }
+  kill r_auxz;
+  return(list(IP_S,IP_NS));
+}
+
+//__________________________________________________________________
+static proc transformPlacesAtInfinity(poly f,int k,list InfPlacesF)
+"USAGE: transformPlacesAtInfinity(f,k,InfPlacesF); f polynomial,
+        k integer, InfPlaces list
+ASSUME: The base ring must be a ring in three variables, say x,y,z.
+        - f is a homogeneous polynomial and
+        - integer k such that if we subst. in f1 = t^(kn)*f(1/t,y)
+          y*t^k by u, then f1 is a monic polynomial in u with
+          coefficients in k[t].
+        - InfPlacesF is a list containing the infinite places of F,
+          if the computation was possible, else empty
+RETURN: A list, say places.
+        - If the computation of the infinite places of F was
+        not possible, then places is empty.
+        - Else, places is list of size m, where m is the number of
+        infinite places of F.
+        places[i] is a list of size 2. places[i][1] an geometric
+        place at infinity, i.e. a point in the chart z = 0, and
+        places[i][2] the corresponding infinite place of F.
+"
+{
+  list places;
+
+  // Kummer's Theorem does not apply
+  // no computation of places at infinity possible
+  if (size(InfPlacesF) == 0)
+  {
+    return(places);
+  }
+
+  // compute the places of f at z = 0
+  list InfGeo = infPlaces(f);
+  // no singular places at infinity allowed
+  if ( size(InfGeo[1]) != 0 )
+  {
+    return(places);
+  }
+
+  // non-singular places
+  list NSPlaces = InfGeo[2];
+  if (size(NSPlaces) != size(InfPlacesF))
+  {
+    ERROR("number of infinite places must be the same");
+  }
+
+  int i,j;
+  int d, degtmp;
+  ideal Itemp;
+  list Ltemp;
+  if (size(NSPlaces) == 1)
+  {
+    places[1] = list(NSPlaces[1], InfPlacesF[1]);
+  }
+  else
+  {
+    for (i = 1; i<=size(NSPlaces); i++)
+    {
+      if (reduce(var(1),std(NSPlaces[i])) == 0)
+      // (x,z) is a place at infinity
+      {
+        d = 1;
+        Itemp = NSPlaces[i];       // put it on the end of the list
+        NSPlaces[i] = NSPlaces[size(NSPlaces)];
+        NSPlaces[size(NSPlaces)] = Itemp;
+        break;
+      }
+    }
+    if (d == 0)
+    // (x,z) is not a place at infinity, simply transform the places
+    {
+      for (i = 1; i<= size(NSPlaces); i++)
+      {
+        Itemp = NSPlaces[i];
+        degtmp = deg(Itemp[1]);
+        Itemp = Itemp[1], var(1)^(k*degtmp -1);
+        Ltemp = Itemp,var(1)^(k*degtmp);
+        places[i] = list(NSPlaces[i],Ltemp);
+      }
+    }
+
+    else
+    //(x,z) is a place at infinity, no directly transformation
+    // is possible - transform first the other places, the remaining
+    // places must be (x,z)
+    {
+      for (i = 1; i < size(NSPlaces); i++)
+      {
+        Itemp = NSPlaces[i];
+        degtmp = deg(Itemp[1]);
+        Itemp = Itemp[1], var(1)^(k*degtmp -1);
+        Ltemp = Itemp,var(1)^(k*degtmp);
+        for (j = 1; j <= size(InfPlacesF); j++)
+        {
+          if (Ltemp[2] == InfPlacesF[j][2])
+          {
+            if (isEqualId(Ltemp[1], InfPlacesF[j][1]))
+            {
+              places[i] = list(NSPlaces[i], Ltemp);
+              InfPlacesF = delete(InfPlacesF,j);
+            }
+          }
+        }
+      }
+      if (size(InfPlacesF) != 1)
+      {
+        ERROR("more than 1 place left - wrong transformation");
+      }
+      places[size(NSPlaces)] = list(ideal(x,z),InfPlacesF[1]);
+    }
+  }
+  return(places);
+}
+
