@@ -2919,7 +2919,9 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   //bivariate case
   if (A.level() == 2)
   {
-    CFList buf= biFactorize (F, info);
+    CFList buf= biSqrfFactorizeHelper (F, info);
+    if (buf.getFirst().inCoeffDomain())
+      buf.removeFirst();
     return buf;
   }
 

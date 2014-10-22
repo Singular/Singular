@@ -50,7 +50,7 @@ biFactorize (const CanonicalForm& F,       ///< [in] a bivariate poly
             );
 
 inline CFList
-biSqrfFactorizeHelper (const CanonicalForm& G, ExtensionInfo& info)
+biSqrfFactorizeHelper (const CanonicalForm& G, const ExtensionInfo& info)
 {
   CFMap N;
   CanonicalForm F= compress (G, N);
