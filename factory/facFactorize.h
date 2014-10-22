@@ -39,7 +39,7 @@ factorizationWRTDifferentSecondVars (
 ///
 /// @return @a multiFactorize returns a factorization of F
 CFList
-multiFactorize (const CanonicalForm& F,     ///< [in] poly to be factored
+multiFactorize (const CanonicalForm& F,     ///< [in] sqrfree poly
                 const Variable& v           ///< [in] some algebraic variable
                );
 
