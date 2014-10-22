@@ -3533,7 +3533,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   {
     attr *aa=u->Attribute();
     attr a=NULL;
-    if (aa!=NULL) a=(*aa)->Copy();
+    if ((aa!=NULL)&&(*aa!=NULL)) a=(*aa)->Copy();
     jjSTD_1_ID(res,(ideal)u->CopyD(),r,(ideal)v->CopyD(),a);
   }
   if(!TEST_OPT_DEGBOUND) setFlag(res,FLAG_STD);
