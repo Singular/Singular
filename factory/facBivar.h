@@ -32,7 +32,7 @@ TIMING_DEFINE_PRINT(fac_bi_factor_sqrf)
 /// @return @a biFactorize returns a list of factors of F. If F is not monic
 ///         its leading coefficient is not outputted.
 CFList
-biFactorize (const CanonicalForm& F,       ///< [in] a bivariate poly
+biFactorize (const CanonicalForm& F,       ///< [in] a sqrfree bivariate poly
              const Variable& v             ///< [in] some algebraic variable
             );
 

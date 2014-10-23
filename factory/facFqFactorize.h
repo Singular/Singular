@@ -33,7 +33,7 @@ TIMING_DEFINE_PRINT (fac_fq_factor_squarefree)
 /// @return @a multiFactorize returns a factorization of F
 /// @sa biFactorize(), extFactorize()
 CFList
-multiFactorize (const CanonicalForm& F,    ///< [in] poly to be factored
+multiFactorize (const CanonicalForm& F,    ///< [in] sqrfree poly
                 const ExtensionInfo& info  ///< [in] info about extension
                );
 

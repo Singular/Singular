@@ -45,12 +45,12 @@ static const double log2exp= 1.442695041;
 ///         its leading coefficient is not outputted.
 /// @sa extBifactorize()
 CFList
-biFactorize (const CanonicalForm& F,       ///< [in] a bivariate poly
+biFactorize (const CanonicalForm& F,       ///< [in] a sqrfree bivariate poly
              const ExtensionInfo& info     ///< [in] information about extension
             );
 
 inline CFList
-biSqrfFactorizeHelper (const CanonicalForm& G, ExtensionInfo& info)
+biSqrfFactorizeHelper (const CanonicalForm& G, const ExtensionInfo& info)
 {
   CFMap N;
   CanonicalForm F= compress (G, N);
