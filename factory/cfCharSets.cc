@@ -675,7 +675,7 @@ irrCharSeries (const CFList & PS)
             else
               cst.append (i.getItem());
           }
-          is= Union (factorsOfInitials (cst), is);
+          is= Union (factorsOfInitials (Union (cst,  CFList (reducible))), is);
           iss= Union (adjoinb (ts, qs, qqi, cst), adjoin (is, qs, qqi));
         }
         else
