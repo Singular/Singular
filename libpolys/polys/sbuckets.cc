@@ -56,6 +56,26 @@ static omBin sBucket_bin = omGetSpecBin(sizeof(sBucket));
 ring sBucketGetRing(const sBucket_pt bucket)
 { return bucket->bucket_ring; }
 
+
+bool sIsEmpty(const sBucket_pt bucket)
+{
+  for(int i = 0; i < (BIT_SIZEOF_LONG - 3); i++)
+  {    
+    assume( i < (BIT_SIZEOF_LONG - 3) );
+    assume( pLength(bucket->buckets[i].p) == bucket->buckets[i].length );
+
+    if( bucket->buckets[i].p != NULL )
+      return false;
+
+    if( bucket->buckets[i].length != 0 )
+      return false;
+  }
+
+  return( bucket->max_bucket == 0 );
+
+}
+
+
 /// Copy sBucket non-intrusive!!!
 sBucket_pt    sBucketCopy(const sBucket_pt bucket)
 {
@@ -63,8 +83,10 @@ sBucket_pt    sBucketCopy(const sBucket_pt bucket)
 
   sBucket_pt newbucket = sBucketCreate(r);
 
-  for(int i = 0; bucket->buckets[i].p != NULL; i++)
-  {
+  newbucket->max_bucket = bucket->max_bucket;
+
+  for(int i = 0; i <= bucket->max_bucket; i++)
+  {    
     assume( i < (BIT_SIZEOF_LONG - 3) );
     assume( pLength(bucket->buckets[i].p) == bucket->buckets[i].length );
 
@@ -258,12 +280,16 @@ void sBucketClearAdd(sBucket_pt bucket, poly *p, int *length)
 
   while (bucket->buckets[i].p == NULL)
   {
+    assume( bucket->buckets[i].length == 0 );
     i++;
     if (i > bucket->max_bucket) goto done;
   }
 
   pr = bucket->buckets[i].p;
   lr = bucket->buckets[i].length;
+
+  assume( pr != NULL && (lr > 0) );
+  
   bucket->buckets[i].p = NULL;
   bucket->buckets[i].length = 0;
   i++;
@@ -272,19 +298,32 @@ void sBucketClearAdd(sBucket_pt bucket, poly *p, int *length)
   {
     if (bucket->buckets[i].p != NULL)
     {
+      assume( bucket->buckets[i].length == pLength(bucket->buckets[i].p) );
+      
       pr = p_Add_q(pr, bucket->buckets[i].p, lr, bucket->buckets[i].length,
                    bucket->bucket_ring);
+      
       bucket->buckets[i].p = NULL;
       bucket->buckets[i].length = 0;
     }
+
+    assume( bucket->buckets[i].p == NULL );
+    assume( bucket->buckets[i].length == 0 );    
     i++;
   }
 
-  done:
+done:
+  
   *p = pr;
   *length = lr;
+  
   bucket->max_bucket = 0;
+
+  assume( sIsEmpty(bucket) );
 }
+
+
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Sorts a poly using BucketSort
