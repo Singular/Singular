@@ -261,5 +261,6 @@ BOOLEAN iiExprArith3Tab(leftv res, leftv a, int op,
             struct sValCmd3* dArith3,int i, int at,
             struct sConvertTypes *dConvertTypes);
 
+BOOLEAN iiCheckTypes(leftv args, const short *type_list, int report=0);
 #endif
 

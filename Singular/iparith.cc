@@ -6665,12 +6665,9 @@ static BOOLEAN jjCALL3ARG(leftv res, leftv u)
 
 static BOOLEAN jjCOEF_M(leftv, leftv v)
 {
-  if((v->Typ() != VECTOR_CMD)
-  || (v->next->Typ() != POLY_CMD)
-  || (v->next->next->Typ() != MATRIX_CMD)
-  || (v->next->next->next->Typ() != MATRIX_CMD))
+  short t[]={5,VECTOR_CMD,POLY_CMD,MATRIX_CMD,MATRIX_CMD,IDHDL};
+  if (iiCheckTypes(v,t))
      return TRUE;
-  if (v->next->next->rtyp!=IDHDL) return TRUE;
   idhdl c=(idhdl)v->next->next->data;
   if (v->next->next->next->rtyp!=IDHDL) return TRUE;
   idhdl m=(idhdl)v->next->next->next->data;
@@ -6756,6 +6753,12 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
 
   return FALSE;
 }
+
+//BOOLEAN jjDISPATCH(leftv res, leftv v)
+//{
+//  WerrorS("`dispatch`: not implemented");
+//  return TRUE;
+//}
 
 //static BOOLEAN jjEXPORTTO_M(leftv res, leftv u)
 //{
@@ -6958,36 +6961,26 @@ static BOOLEAN jjLU_INVERSE(leftv res, leftv v)
      inspect the first entry of the returned list to see
      whether A is invertible. */
   matrix iMat; int invertible;
-  if (v->next == NULL)
+  short t1[]={1,MATRIX_CMD};
+  short t2[]={3,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD};
+  if (iiCheckTypes(v,t1))
   {
-    if (v->Typ() != MATRIX_CMD)
+    matrix aMat = (matrix)v->Data();
+    int rr = aMat->rows();
+    int cc = aMat->cols();
+    if (rr != cc)
     {
-      Werror("expected either one or three matrices");
+      Werror("given matrix (%d x %d) is not quadratic, hence not invertible", rr, cc);
       return TRUE;
     }
-    else
+    if (!idIsConstant((ideal)aMat))
     {
-      matrix aMat = (matrix)v->Data();
-      int rr = aMat->rows();
-      int cc = aMat->cols();
-      if (rr != cc)
-      {
-        Werror("given matrix (%d x %d) is not quadratic, hence not invertible", rr, cc);
-        return TRUE;
-      }
-      if (!idIsConstant((ideal)aMat))
-      {
-        WerrorS("matrix must be constant");
-        return TRUE;
-      }
-      invertible = luInverse(aMat, iMat);
+      WerrorS("matrix must be constant");
+      return TRUE;
     }
+    invertible = luInverse(aMat, iMat);
   }
-  else if ((v->Typ() == MATRIX_CMD) &&
-           (v->next->Typ() == MATRIX_CMD) &&
-           (v->next->next != NULL) &&
-           (v->next->next->Typ() == MATRIX_CMD) &&
-           (v->next->next->next == NULL))
+  else if (iiCheckTypes(v,t2))
   {
      matrix pMat = (matrix)v->Data();
      matrix lMat = (matrix)v->next->Data();
@@ -7051,12 +7044,8 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
         H is the matrix with column vectors spanning the homogeneous
         solution space.
      The method produces an error if matrix and vector sizes do not fit. */
-  if ((v == NULL) || (v->Typ() != MATRIX_CMD) ||
-      (v->next == NULL) || (v->next->Typ() != MATRIX_CMD) ||
-      (v->next->next == NULL) || (v->next->next->Typ() != MATRIX_CMD) ||
-      (v->next->next->next == NULL) ||
-      (v->next->next->next->Typ() != MATRIX_CMD) ||
-      (v->next->next->next->next != NULL))
+  short t[]={4,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD,MATRIX_CMD};
+  if (!iiCheckTypes(v,t))
   {
     WerrorS("expected exactly three matrices and one vector as input");
     return TRUE;
@@ -7144,12 +7133,15 @@ static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
 }
 static BOOLEAN jjJET4(leftv res, leftv u)
 {
+  short t1[]={4,POLY_CMD,POLY_CMD,POLY_CMD,INTVEC_CMD};
+  short t2[]={4,VECTOR_CMD,POLY_CMD,POLY_CMD,INTVEC_CMD};
+  short t3[]={4,IDEAL_CMD,MATRIX_CMD,INT_CMD,INTVEC_CMD};
+  short t4[]={4,MODUL_CMD,MATRIX_CMD,INT_CMD,INTVEC_CMD};
   leftv u1=u;
   leftv u2=u1->next;
   leftv u3=u2->next;
   leftv u4=u3->next;
-  if((u2->Typ()==POLY_CMD)&&(u3->Typ()==INT_CMD)&&(u4->Typ()==INTVEC_CMD)
-  &&((u1->Typ()==POLY_CMD)||(u1->Typ()==VECTOR_CMD)))
+  if (iiCheckTypes(u,t1)||iiCheckTypes(u,t2))
   {
     if(!pIsUnit((poly)u2->Data()))
     {
@@ -7162,8 +7154,7 @@ static BOOLEAN jjJET4(leftv res, leftv u)
     return FALSE;
   }
   else
-  if((u2->Typ()==MATRIX_CMD)&&(u3->Typ()==INT_CMD)&&(u4->Typ()==INTVEC_CMD)
-  &&((u1->Typ()==IDEAL_CMD)||(u1->Typ()==MODUL_CMD)))
+  if (iiCheckTypes(u,t3)||iiCheckTypes(u,t4))
   {
     if(!mp_IsDiagUnit((matrix)u2->Data(), currRing))
     {

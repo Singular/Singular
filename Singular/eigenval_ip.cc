@@ -22,6 +22,7 @@
 #include <polys/matpol.h>
 #include <polys/clapsing.h>
 #include <kernel/linear_algebra/eigenval.h>
+#include <Singular/ipshell.h>
 #include <Singular/eigenval_ip.h>
 
 
@@ -29,24 +30,18 @@ BOOLEAN evSwap(leftv res,leftv h)
 {
   if(currRing)
   {
-    if(h&&h->Typ()==MATRIX_CMD)
+    short t[]={3,MATRIX_CMD,INT_CMD,INT_CMD};
+    if (iiCheckTypes(h,t,1))
     {
       matrix M=(matrix)h->Data();
       h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int i=(int)(long)h->Data();
-        h=h->next;
-        if(h&&h->Typ()==INT_CMD)
-        {
-          int j=(int)(long)h->Data();
-          res->rtyp=MATRIX_CMD;
-          res->data=(void *)evSwap(mp_Copy(M, currRing),i,j);
-          return FALSE;
-        }
-      }
+      int i=(int)(long)h->Data();
+      h=h->next;
+      int j=(int)(long)h->Data();
+      res->rtyp=MATRIX_CMD;
+      res->data=(void *)evSwap(mp_Copy(M, currRing),i,j);
+      return FALSE;
     }
-    WerrorS("<matrix>,<int>,<int> expected");
     return TRUE;
   }
   WerrorS("no ring active");
@@ -57,29 +52,20 @@ BOOLEAN evRowElim(leftv res,leftv h)
 {
   if(currRing)
   {
-    if(h&&h->Typ()==MATRIX_CMD)
+    short t[]={4,MATRIX_CMD,INT_CMD,INT_CMD,INT_CMD};
+    if (iiCheckTypes(h,t,1))
     {
       matrix M=(matrix)h->CopyD();
       h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int i=(int)(long)h->Data();
-        h=h->next;
-        if(h&&h->Typ()==INT_CMD)
-        {
-          int j=(int)(long)h->Data();
-          h=h->next;
-          if(h&&h->Typ()==INT_CMD)
-          {
-            int k=(int)(long)h->Data();
-            res->rtyp=MATRIX_CMD;
-            res->data=(void *)evRowElim(M,i,j,k);
-            return FALSE;
-          }
-        }
-      }
+      int i=(int)(long)h->Data();
+      h=h->next;
+      int j=(int)(long)h->Data();
+      h=h->next;
+      int k=(int)(long)h->Data();
+      res->rtyp=MATRIX_CMD;
+      res->data=(void *)evRowElim(M,i,j,k);
+      return FALSE;
     }
-    WerrorS("<matrix>,<int>,<int>,<int> expected");
     return TRUE;
   }
   WerrorS("no ring active");
@@ -90,29 +76,20 @@ BOOLEAN evColElim(leftv res,leftv h)
 {
   if(currRing)
   {
-    if(h&&h->Typ()==MATRIX_CMD)
+    short t[]={4,MATRIX_CMD,INT_CMD,INT_CMD,INT_CMD};
+    if (iiCheckTypes(h,t,1))
     {
       matrix M=(matrix)h->Data();
       h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int i=(int)(long)h->Data();
-        h=h->next;
-        if(h&&h->Typ()==INT_CMD)
-        {
-          int j=(int)(long)h->Data();
-          h=h->next;
-          if(h&&h->Typ()==INT_CMD)
-          {
-            int k=(int)(long)h->Data();
-            res->rtyp=MATRIX_CMD;
-            res->data=(void *)evColElim(mp_Copy(M, currRing),i,j,k);
-            return FALSE;
-          }
-        }
-      }
+      int i=(int)(long)h->Data();
+      h=h->next;
+      int j=(int)(long)h->Data();
+      h=h->next;
+      int k=(int)(long)h->Data();
+      res->rtyp=MATRIX_CMD;
+      res->data=(void *)evColElim(mp_Copy(M, currRing),i,j,k);
+      return FALSE;
     }
-    WerrorS("<matrix>,<int>,<int>,<int> expected");
     return TRUE;
   }
   WerrorS("no ring active");

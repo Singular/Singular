@@ -11,7 +11,6 @@
 #include <kernel/mod2.h>
 
 #ifdef HAVE_PCV
-//#if !defined(HAVE_DYNAMIC_LOADING) || defined(BUILD_MODULE)
 
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
@@ -20,6 +19,7 @@
 #include <kernel/ideals.h>
 #include <Singular/lists.h>
 #include <polys/matpol.h>
+#include <Singular/ipshell.h>
 #include <Singular/pcv.h>
 
 static int pcvMaxDegree;
@@ -70,37 +70,31 @@ lists pcvPMulL(poly p,lists l1)
 
 BOOLEAN pcvLAddL(leftv res,leftv h)
 {
-  if(h&&h->Typ()==LIST_CMD)
+  short t[]={2,LIST_CMD,LIST_CMD};
+  if (iiCheckTypes(h,t,1))
   {
     lists l1=(lists)h->Data();
     h=h->next;
-    if(h&&h->Typ()==LIST_CMD)
-    {
-      lists l2=(lists)h->Data();
-      res->rtyp=LIST_CMD;
-      res->data=(void*)pcvLAddL(l1,l2);
-      return FALSE;
-    }
+    lists l2=(lists)h->Data();
+    res->rtyp=LIST_CMD;
+    res->data=(void*)pcvLAddL(l1,l2);
+    return FALSE;
   }
-  WerrorS("<list>,<list> expected");
   return TRUE;
 }
 
 BOOLEAN pcvPMulL(leftv res,leftv h)
 {
-  if(h&&h->Typ()==POLY_CMD)
+  short t[]={2,POLY_CMD,LIST_CMD};
+  if (iiCheckTypes(h,t,1))
   {
     poly p=(poly)h->Data();
     h=h->next;
-    if(h&&h->Typ()==LIST_CMD)
-    {
-      lists l=(lists)h->Data();
-      res->rtyp=LIST_CMD;
-      res->data=(void*)pcvPMulL(p,l);
-      return FALSE;
-    }
+    lists l=(lists)h->Data();
+    res->rtyp=LIST_CMD;
+    res->data=(void*)pcvPMulL(p,l);
+    return FALSE;
   }
-  WerrorS("<poly>,<list> expected");
   return TRUE;
 }
 
@@ -324,24 +318,18 @@ BOOLEAN pcvP2CV(leftv res,leftv h)
 {
   if(currRing)
   {
-    if(h&&h->Typ()==LIST_CMD)
+    short t[]={3,LIST_CMD,INT_CMD,INT_CMD};
+    if (iiCheckTypes(h,t,1))
     {
       lists p=(lists)h->Data();
       h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int d0=(int)(long)h->Data();
-        h=h->next;
-        if(h&&h->Typ()==INT_CMD)
-        {
-          int d1=(int)(long)h->Data();
-          res->rtyp=LIST_CMD;
-          res->data=(void*)pcvP2CV(p,d0,d1);
-          return FALSE;
-        }
-      }
+      int d0=(int)(long)h->Data();
+      h=h->next;
+      int d1=(int)(long)h->Data();
+      res->rtyp=LIST_CMD;
+      res->data=(void*)pcvP2CV(p,d0,d1);
+      return FALSE;
     }
-    WerrorS("<list>,<int>,<int> expected");
     return TRUE;
   }
   WerrorS("no ring active");
@@ -352,24 +340,18 @@ BOOLEAN pcvCV2P(leftv res,leftv h)
 {
   if(currRing)
   {
-    if(h&&h->Typ()==LIST_CMD)
+    short t[]={3,LIST_CMD,INT_CMD,INT_CMD};
+    if (iiCheckTypes(h,t,1))
     {
       lists pl=(lists)h->Data();
       h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int d0=(int)(long)h->Data();
-        h=h->next;
-        if(h&&h->Typ()==INT_CMD)
-        {
-          int d1=(int)(long)h->Data();
-          res->rtyp=LIST_CMD;
-          res->data=(void*)pcvCV2P(pl,d0,d1);
-          return FALSE;
-        }
-      }
+      int d0=(int)(long)h->Data();
+      h=h->next;
+      int d1=(int)(long)h->Data();
+      res->rtyp=LIST_CMD;
+      res->data=(void*)pcvCV2P(pl,d0,d1);
+      return FALSE;
     }
-    WerrorS("<list>,<int>,<int> expected");
     return TRUE;
   }
   WerrorS("no ring active");
@@ -390,19 +372,16 @@ BOOLEAN pcvDim(leftv res,leftv h)
 {
   if(currRing)
   {
-    if(h&&h->Typ()==INT_CMD)
+    short t[]={2,INT_CMD,INT_CMD};
+    if (iiCheckTypes(h,t,1))
     {
       int d0=(int)(long)h->Data();
       h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int d1=(int)(long)h->Data();
-        res->rtyp=INT_CMD;
-        res->data=(void*)(long)pcvDim(d0,d1);
-        return FALSE;
-      }
+      int d1=(int)(long)h->Data();
+      res->rtyp=INT_CMD;
+      res->data=(void*)(long)pcvDim(d0,d1);
+      return FALSE;
     }
-    WerrorS("<int>,<int> expected");
     return TRUE;
   }
   WerrorS("no ring active");
@@ -446,24 +425,20 @@ BOOLEAN pcvBasis(leftv res,leftv h)
 {
   if(currRing)
   {
-    if(h&&h->Typ()==INT_CMD)
+    short t[]={2,INT_CMD,INT_CMD};
+    if (iiCheckTypes(h,t,1))
     {
       int d0=(int)(long)h->Data();
       h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int d1=(int)(long)h->Data();
-        res->rtyp=LIST_CMD;
-        res->data=(void*)pcvBasis(d0,d1);
-        return FALSE;
-      }
+      int d1=(int)(long)h->Data();
+      res->rtyp=LIST_CMD;
+      res->data=(void*)pcvBasis(d0,d1);
+      return FALSE;
     }
-    WerrorS("<int>,<int> expected");
     return TRUE;
   }
   WerrorS("no ring active");
   return TRUE;
 }
 
-//#endif /* !defined(HAVE_DYNAMIC_LOADING) || defined(BUILD_MODULE) */
 #endif /* HAVE_PCV */
