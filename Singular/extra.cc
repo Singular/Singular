@@ -1838,7 +1838,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
       if (h == NULL || h->Typ() != IDEAL_CMD ||
         h->next == NULL || h->next->Typ() != INTVEC_CMD ||
-        h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD)
+        h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD ||
+        h->next->next->next == NULL || h->next->next->next->Typ() != RING_CMD)
       {
         WerrorS("system(\"Mwalk\", ideal, intvec, intvec) expected");
         return TRUE;
@@ -1853,7 +1854,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       ideal arg1 = (ideal) h->Data();
       intvec* arg2 = (intvec*) h->next->Data();
       intvec* arg3   =  (intvec*) h->next->next->Data();
-      ideal result = (ideal) Mwalk(arg1, arg2, arg3);
+      ring arg4   =  (ring) h->next->next->next->Data();
+      ideal result = (ideal) Mwalk(arg1, arg2, arg3,arg4);
       res->rtyp = IDEAL_CMD;
       res->data =  result;
       return FALSE;
@@ -1863,32 +1865,30 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   /*==================== Mpwalk =================*/
   #ifdef HAVE_WALK
   #ifdef MPWALK_ORIG
-    if (strcmp(sys_cmd, "Mpwalk") == 0)
+    if (strcmp(sys_cmd, "Mwalk") == 0)
     {
-      if (h == NULL || h->Typ() != IDEAL_CMD ||
-        h->next == NULL || h->next->Typ() != INT_CMD ||
-        h->next->next == NULL || h->next->next->Typ() != INT_CMD ||
-        h->next->next->next == NULL ||
-        h->next->next->next->Typ() != INTVEC_CMD ||
-        h->next->next->next->next == NULL ||
-        h->next->next->next->next->Typ() != INTVEC_CMD)
+      if(h == NULL || h->Typ() != IDEAL_CMD ||
+         h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+         h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD||
+         h->next->next->next == NULL || h->next->next->next->Typ() != RING_CMD)
       {
-        WerrorS("system(\"Mpwalk\", ideal, int, int, intvec, intvec) expected");
-        return TRUE;
+        Werror("system(\"Mwalk\", ideal, intvec, intvec,ring) expected");
+          return TRUE;
       }
-      if (((intvec*) h->next->next->next->Data())->length() != currRing->N &&
-        ((intvec*) h->next->next->next->next->Data())->length()!=currRing->N)
+      if ((((intvec*) h->next->Data())->length() != currRing->N &&
+          ((intvec*) h->next->next->Data())->length() != currRing->N ) &&
+          (((intvec*) h->next->Data())->length() != (currRing->N)*(currRing->N) &&
+          ((intvec*) h->next->next->Data())->length() != (currRing->N)*(currRing->N)))
       {
-        Werror("system(\"Mpwalk\" ...) intvecs not of length %d\n",
-               currRing->N);
+        Werror("system(\"Mwalk\" ...) intvecs not of length %d or %d\n",
+               currRing->N,(currRing->N)*(currRing->N));
         return TRUE;
       }
       ideal arg1 = (ideal) h->Data();
-      int arg2 = (int) h->next->Data();
-      int arg3 = (int) h->next->next->Data();
-      intvec* arg4 = (intvec*) h->next->next->next->Data();
-      intvec* arg5   =  (intvec*) h->next->next->next->next->Data();
-      ideal result = (ideal) Mpwalk(arg1, arg2, arg3, arg4, arg5);
+      intvec* arg2 = (intvec*) h->next->Data();
+      intvec* arg3   =  (intvec*) h->next->next->Data();
+      ring arg4 = (ring) h->next->next->next->Data();
+      ideal result = (ideal) Mwalk(arg1, arg2, arg3,arg4);
       res->rtyp = IDEAL_CMD;
       res->data =  result;
       return FALSE;
@@ -1897,33 +1897,31 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #else
     if (strcmp(sys_cmd, "Mpwalk") == 0)
     {
-      if (h == NULL || h->Typ() != IDEAL_CMD ||
-        h->next == NULL || h->next->Typ() != INT_CMD ||
-        h->next->next == NULL || h->next->next->Typ() != INT_CMD ||
-        h->next->next->next == NULL ||
-        h->next->next->next->Typ() != INTVEC_CMD ||
-        h->next->next->next->next == NULL ||
-        h->next->next->next->next->Typ() != INTVEC_CMD||
-        h->next->next->next->next->next == NULL ||
-        h->next->next->next->next->next->Typ() != INT_CMD)
+      if(h == NULL || h->Typ() != IDEAL_CMD ||
+         h->next == NULL || h->next->Typ() != INT_CMD ||
+         h->next->next == NULL || h->next->next->Typ() != INT_CMD ||
+         h->next->next->next == NULL || h->next->next->next->Typ() != INTVEC_CMD ||
+         h->next->next->next->next == NULL ||
+         h->next->next->next->next->Typ() != INTVEC_CMD ||
+         h->next->next->next->next->next == NULL ||
+         h->next->next->next->next->next->Typ() != INT_CMD)
       {
-        WerrorS("system(\"Mpwalk\", ideal, int, int, intvec, intvec, int) expected");
+        Werror("system(\"Mpwalk\", ideal, int, int, intvec, intvec, int) expected");
         return TRUE;
       }
-      if (((intvec*) h->next->next->next->Data())->length() != currRing->N &&
-        ((intvec*) h->next->next->next->next->Data())->length()!=currRing->N)
+      if(((intvec*) h->next->next->next->Data())->length() != currRing->N &&
+         ((intvec*) h->next->next->next->next->Data())->length()!=currRing->N)
       {
-        Werror("system(\"Mpwalk\" ...) intvecs not of length %d\n",
-                 currRing->N);
+        Werror("system(\"Mpwalk\" ...) intvecs not of length %d\n",currRing->N);
         return TRUE;
       }
       ideal arg1 = (ideal) h->Data();
-      int arg2 = (int) ((long)(h->next->Data()));
-      int arg3 = (int) ((long)(h->next->next->Data()));
+      int arg2 = (int) (long) h->next->Data();
+      int arg3 = (int) (long) h->next->next->Data();
       intvec* arg4 = (intvec*) h->next->next->next->Data();
-      intvec* arg5   =  (intvec*) h->next->next->next->next->Data();
-      int arg6   =  (int) ((long)(h->next->next->next->next->next->Data()));
-      ideal result = (ideal) Mpwalk(arg1, arg2, arg3, arg4, arg5, arg6);
+      intvec* arg5 = (intvec*) h->next->next->next->next->Data();
+      int arg6 = (int) (long) h->next->next->next->next->next->Data();
+      ideal result = (ideal) Mpwalk(arg1, arg2, arg3, arg4, arg5,arg6);
       res->rtyp = IDEAL_CMD;
       res->data =  result;
       return FALSE;
@@ -1934,21 +1932,26 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   /*==================== Mrwalk =================*/
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "Mrwalk") == 0)
-    { // Random Walk
-      if (h == NULL || h->Typ() != IDEAL_CMD ||
-        h->next == NULL || h->next->Typ() != INTVEC_CMD ||
-        h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD ||
-        h->next->next->next == NULL || h->next->next->next->Typ() != INT_CMD ||
-        h->next->next->next->next == NULL || h->next->next->next->next->Typ() != INT_CMD)
+    {
+      if(h == NULL || h->Typ() != IDEAL_CMD ||
+         h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+         h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD ||
+         h->next->next->next == NULL || h->next->next->next->Typ() != INT_CMD ||
+         h->next->next->next->next == NULL ||
+         h->next->next->next->next->Typ() != INT_CMD ||
+         h->next->next->next->next->next == NULL ||
+         h->next->next->next->next->next->Typ() != RING_CMD)
       {
-        WerrorS("system(\"Mrwalk\", ideal, intvec, intvec, int, int) expected");
+        Werror("system(\"Mrwalk\", ideal, intvec, intvec, int, int, ring) expected");
         return TRUE;
       }
-      if (((intvec*) h->next->Data())->length() != currRing->N &&
-        ((intvec*) h->next->next->Data())->length() != currRing->N )
+      if((((intvec*) h->next->Data())->length() != currRing->N &&
+         ((intvec*) h->next->next->Data())->length() != currRing->N ) &&
+         (((intvec*) h->next->Data())->length() != (currRing->N)*(currRing->N) &&
+         ((intvec*) h->next->next->Data())->length() != (currRing->N)*(currRing->N) ))
       {
-        Werror("system(\"Mrwalk\" ...) intvecs not of length %d\n",
-               currRing->N);
+        Werror("system(\"Mrwalk\" ...) intvecs not of length %d or %d\n",
+               currRing->N,(currRing->N)*(currRing->N));
         return TRUE;
       }
       ideal arg1 = (ideal) h->Data();
@@ -1956,7 +1959,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       intvec* arg3 =  (intvec*) h->next->next->Data();
       int arg4 = (int)(long) h->next->next->next->Data();
       int arg5 = (int)(long) h->next->next->next->next->Data();
-      ideal result = (ideal) Mrwalk(arg1, arg2, arg3, arg4, arg5);
+      ring arg6 = (ring) h->next->next->next->next->next->Data();
+      ideal result = (ideal) Mrwalk(arg1, arg2, arg3, arg4, arg5, arg6);
       res->rtyp = IDEAL_CMD;
       res->data =  result;
       return FALSE;
@@ -2062,18 +2066,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if (strcmp(sys_cmd, "Mfrwalk") == 0)
     {
       if (h == NULL || h->Typ() != IDEAL_CMD ||
-        h->next == NULL || h->next->Typ() != INTVEC_CMD ||
-        h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD ||
-        h->next->next->next == NULL || h->next->next->next->Typ() != INT_CMD)
+          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD ||
+          h->next->next->next == NULL || h->next->next->next->Typ() != INT_CMD)
       {
-        WerrorS("system(\"Mfrwalk\", ideal, intvec, intvec, int) expected");
+        Werror("system(\"Mfrwalk\", ideal, intvec, intvec, int, int, ring) expected");
         return TRUE;
       }
       if (((intvec*) h->next->Data())->length() != currRing->N &&
-        ((intvec*) h->next->next->Data())->length() != currRing->N )
+          ((intvec*) h->next->next->Data())->length() != currRing->N)
       {
-        Werror("system(\"Mfrwalk\" ...) intvecs not of length %d\n",
-                 currRing->N);
+        Werror("system(\"Mfrwalk\" ...) intvecs not of length %d\n",currRing->N);
         return TRUE;
       }
       ideal arg1 = (ideal) h->Data();
@@ -2081,6 +2084,43 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       intvec* arg3 = (intvec*) h->next->next->Data();
       int arg4 = (int)(long) h->next->next->next->Data();
       ideal result = (ideal) Mfrwalk(arg1, arg2, arg3, arg4);
+      res->rtyp = IDEAL_CMD;
+      res->data =  result;
+      return FALSE;
+    }
+    else
+  /*==================== Mprwalk =================*/
+    if (strcmp(sys_cmd, "Mprwalk") == 0)
+    {
+      if (h == NULL || h->Typ() != IDEAL_CMD ||
+          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD ||
+          h->next->next->next == NULL || h->next->next->next->Typ() != INT_CMD ||
+          h->next->next->next->next == NULL ||
+          h->next->next->next->next->Typ() != INT_CMD ||
+          h->next->next->next->next->next == NULL ||
+          h->next->next->next->next->next->Typ() != INT_CMD ||
+          h->next->next->next->next->next->next == NULL ||
+          h->next->next->next->next->next->next->Typ() != RING_CMD)
+      {
+        Werror("system(\"Mprwalk\", ideal, intvec, intvec, int, int, int, ring) expected");
+        return TRUE;
+      }
+      if (((intvec*) h->next->Data())->length() != currRing->N &&
+          ((intvec*) h->next->next->Data())->length() != currRing->N )
+      {
+        Werror("system(\"Mrwalk\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      ideal arg1 = (ideal) h->Data();
+      intvec* arg2 = (intvec*) h->next->Data();
+      intvec* arg3 =  (intvec*) h->next->next->Data();
+      int arg4 = (int)(long) h->next->next->next->Data();
+      int arg5 = (int)(long) h->next->next->next->next->Data();
+      int arg6 = (int)(long) h->next->next->next->next->next->Data();
+      ring arg7 = (ring) h->next->next->next->next->next->next->Data();
+      ideal result = (ideal) Mprwalk(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
       res->rtyp = IDEAL_CMD;
       res->data =  result;
       return FALSE;
@@ -2176,6 +2216,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
   #endif
   /*==================== TranMrImprovwalk =================*/
+  #if 0
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "TranMrImprovwalk") == 0)
     {
@@ -2207,6 +2248,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
+  #endif
   #endif
   /*================= Extended system call ========================*/
     {
