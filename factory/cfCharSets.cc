@@ -517,14 +517,9 @@ irredAS (CFList & AS, int & indexRed, CanonicalForm & reducible)
   for (i= AS; i.hasItem(); i++ )
   {
     nr += 1;
-    if (degree (i.getItem()) > 1)
-    {
-      qs= factorize (i.getItem());
-      if (qs.getFirst().factor().inCoeffDomain())
-        qs.removeFirst();
-    }
-    else
-      qs= CFFList (CFFactor (normalize (i.getItem()), 1));
+    qs= factorize (i.getItem());
+    if (qs.getFirst().factor().inCoeffDomain())
+      qs.removeFirst();
 
     if ((qs.length() >= 2 ) || (qs.getFirst().exp() > 1))
     {
