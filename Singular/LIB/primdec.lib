@@ -3185,14 +3185,7 @@ EXAMPLE: example decomp; shows an example
       execute("map phi=gnir,"+@va+";");
       op=option(get);
       option(redSB);
-      if(homo==1)
-      {
-        ideal @j=std(phi(@j),@hilb,@w);
-      }
-      else
-      {
-        ideal @j=groebner(phi(@j));
-      }
+      ideal @j=groebner(phi(@j));
       ideal ser=phi(ser);
 
       option(set,op);
