@@ -960,9 +960,8 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
   
   if( __TREEOUTPUT__ )
   {
-     PrintS("{ \"nodelabel\": \""); writeLatexTerm(a, R); PrintS("\", \"children\": [");
+     PrintS("{ \"proc\": \"TraverseNF\", \"nodelabel\": \""); writeLatexTerm(a, R); PrintS("\", \"children\": [");
   }
-
 
   poly aa = leadmonom(a, R); assume( aa != NULL); // :(
 
@@ -982,7 +981,7 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
     if( __TREEOUTPUT__ )
     {
-       PrintS("{ \"nodelabel\": \""); writeLatexTerm(a2, R); PrintS("\", \"children\": [");
+       PrintS("{ \"proc\": \"TraverseNF2\", \"nodelabel\": \""); writeLatexTerm(a2, R); PrintS("\", \"children\": [");
     }
 
     // replace the following... ?
@@ -994,8 +993,6 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
     p_Delete(&aa2, R);
 
-    if( __TREEOUTPUT__ )
-       PrintS("]},");
 
 #ifndef SING_NDEBUG
     if( __DEBUG__ )
@@ -1004,17 +1001,19 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
       m_checker.Verify();
     }
 #endif
+
+    if( __TREEOUTPUT__ )
+      PrintS("], \"noderesult\": \""); writeLatexTerm(t, R, true, false); PrintS("\" },");
+    
   } else
     t = p_Add_q(t, ReduceTerm(aa, L->m[r], a), R);
 
   p_Delete(&aa, R);
 
-  // TODO: print t???
-
   if( __TREEOUTPUT__ )
   {
-    poly tt = pp_Add_qq( a, t, R);  // TODO: ADD a?
-    PrintS("], \"noderesult\": \""); writeLatexTerm(tt, R, true, false); PrintS("\", \"proc\": \"TraverseNF\" },");
+    poly tt = pp_Add_qq( a, t, R);    
+    PrintS("], \"noderesult\": \""); writeLatexTerm(tt, R, true, false); PrintS("\" },");
     p_Delete(&tt, R);
   }
 #ifndef SING_NDEBUG
@@ -1341,7 +1340,7 @@ void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTer
   }
 }
 
-#define NOPRODUCT 0
+#define NOPRODUCT 1
 
 poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2) const
 {
@@ -1544,45 +1543,43 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
        if( itr->second == NULL )
          return (NULL);
 
-       poly p = p_Copy(itr->second, r); // no copy???
-
        if( __TREEOUTPUT__ )
        {
 //         PrintS("{ \"nodelabel\": \""); writeLatexTerm(multiplier, r, false);
 //         Print("  \\\\GEN{%d}\", \"children\": [ ", tail + 1);
-         PrintS("{ \"proc\": \"TraverseTail-lookup\", \"nodelabel\": \"");
-         writeLatexTerm(multiplier, r, false); Print(" \\\\GEN{%d}\", \"look-up-poly\": \"", tail + 1);
-         writeLatexTerm(p, r, true, false);
+         PrintS("{ \"proc\": \"TTLookup\", \"nodelabel\": \"");
+         writeLatexTerm(itr->first, r, false); Print(" \\\\GEN{%d}\", \"Lookup\": \"", tail + 1);
+         writeLatexTerm(itr->second, r, true, false);
          PrintS("\", ");
        }
+       
+       poly p = p_Copy(itr->second, r); // COPY!!!
+
 
        if( !n_Equal( pGetCoeff(multiplier), pGetCoeff(itr->first), r) ) // normalize coeffs!?
        {
-         number n = n_Div( pGetCoeff(multiplier), pGetCoeff(itr->first), r);
-         p = p_Mult_nn(p, n, r);
+         number n = n_Div( pGetCoeff(multiplier), pGetCoeff(itr->first), r); // new number
+         
+         if( __TREEOUTPUT__ )
+         {
+           StringSetS("");
+           n_Write(n, r);
+           char* s = StringEndS();
+           Print("\"recale\": \"%s\", ", s);
+           omFree(s);
+         }
+         
+         p = p_Mult_nn(p, n, r); // !
          n_Delete(&n, r);
-
-         if( __TREEOUTPUT__ )
-           PrintS("\"rescale\": \"1\", ");
-       } else
-       {
-         if( __TREEOUTPUT__ )
-           PrintS("\"rescale\": \"0\", ");
        }
 
        if( __TREEOUTPUT__ )
        {
-         PrintS("\"noderesult\": \"");
-         writeLatexTerm(p, r, true, false);
-         PrintS("\" },");
+         PrintS("\"noderesult\": \"");         writeLatexTerm(p, r, true, false);         PrintS("\" },");
        }
 
 #ifndef SING_NDEBUG
-       if( __DEBUG__ )
-       {
-         m_div.Verify();
-         m_checker.Verify();
-       }
+       if( __DEBUG__ )       {         m_div.Verify();         m_checker.Verify();       }
 #endif
        
        return p;
@@ -1591,20 +1588,20 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
 
      if( __TREEOUTPUT__ )
      {
-       PrintS("{ \"nodelabel\": \""); writeLatexTerm(multiplier, r, false); Print(" \\\\GEN{%d}\", \"children\": [", tail + 1);
+       Print("{ \"proc\": \"TTStore%d\", \"nodelabel\": \"", tail + 1); writeLatexTerm(multiplier, r, false); Print(" \\\\GEN{%d}\", \"children\": [", tail + 1);
      }
      
      const poly p = ComputeImage(multiplier, tail);
+
+     if( __TREEOUTPUT__ )
+     {
+       PrintS("], \"noderesult\": \""); writeLatexTerm(p, r, true, false); PrintS("\" },");
+     }
 
      T.insert( TP2PCache::value_type(p_Copy(multiplier, r), p) ); //     T[ multiplier ] = p;
 
 //     if( p == NULL )
 //        return (NULL);
-
-     if( __TREEOUTPUT__ )
-     {
-       PrintS("], \"noderesult\": \""); writeLatexTerm(p, r, true, false); PrintS("\", \"proc\": \"TraverseTail-compute-and-store1\" },");
-     }
 
 #ifndef SING_NDEBUG
      if( __DEBUG__ )
@@ -1621,23 +1618,23 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
 
   if( __TREEOUTPUT__ )
   {
-    PrintS("{ \"nodelabel\": \""); writeLatexTerm(multiplier, r, false); Print(" \\\\GEN{%d}\", \"children\": [", tail + 1);
+    Print("{ \"proc\": \"TTStore%d\", \"nodelabel\": \"", 0); writeLatexTerm(multiplier, r, false); Print(" \\\\GEN{%d}\", \"children\": [", tail + 1);
   }
 
 
   const poly p = ComputeImage(multiplier, tail);
 
+  if( __TREEOUTPUT__ )
+  {
+    PrintS("], \"noderesult\": \""); writeLatexTerm(p, r, true, false); PrintS("\" },");
+  }
+  
   T.insert( TP2PCache::value_type(p_Copy(multiplier, r), p) );
 
   m_cache.insert( TCache::value_type(tail, T) );
 
 //  if( p == NULL )
 //    return (NULL);
-
-  if( __TREEOUTPUT__ )
-  {
-    PrintS("], \"noderesult\": \""); writeLatexTerm(p, r, true, false); PrintS("\", \"proc\": \"TraverseTail-compute-and-store2\" },");
-  }
 
 #ifndef SING_NDEBUG
   if( __DEBUG__ )
@@ -1652,10 +1649,34 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
 
 poly SchreyerSyzygyComputation::ComputeImage(poly multiplier, const int tail) const
 {
+  const ring& r = m_rBaseRing;
+
+  assume(m_idTails !=  NULL && m_idTails->m != NULL);
+  assume( tail >= 0 && tail < IDELEMS(m_idTails) );
+  
   const poly t = m_idTails->m[tail]; // !!!
 
   if(t != NULL)
-    return TraverseTail(multiplier, t);
+  {
+    if( __TREEOUTPUT__ )
+    {
+      PrintS("{ \"proc\": \"ComputeImage\", \"nodelabel\": \"");
+      writeLatexTerm(multiplier, r, false);
+      Print(" \\\\GEN{%d}\", \"edgelabel\": \"", tail + 1);
+      writeLatexTerm(t, r, false);
+      PrintS("\", \"children\": [");
+    }
+    
+    const poly p = TraverseTail(multiplier, t);
+
+    if( __TREEOUTPUT__ )
+    {
+      PrintS("], \"noderesult\": \""); writeLatexTerm(p, r, true, false); PrintS("\" },");
+    }
+    
+    return p;
+    
+  }
 
   return NULL;
 }
@@ -1682,7 +1703,6 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
   assume( L != NULL );
   assume( T != NULL );
 
-
   if( (!__TAILREDSYZ__) || m_lcm.Check(multiplier) )
   {
 //    const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(tail) < MIN_LENGTH_BUCKET);
@@ -1694,6 +1714,12 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 
 //    CPolynomialSummator sum(r, bUsePolynomial);
 //    poly s = NULL;
+
+    if( __TREEOUTPUT__ )
+    {
+      Print("{ \"proc\": \"TTPoly\", \"nodelabel\": \""); writeLatexTerm(multiplier, r, false); Print(" * \\\\ldots \", \"children\": [");
+    }
+    
     for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
     {
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1718,6 +1744,11 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
       m_checker.Verify();
     }
 #endif
+
+    if( __TREEOUTPUT__ )
+    {
+      PrintS("], \"noderesult\": \""); writeLatexTerm(s, r, true, false); PrintS("\" },");
+    }   
 
     return s;
   }
@@ -1774,7 +1805,7 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
     if( __TREEOUTPUT__ )
     {
       poly product = pp_Mult_mm(multiplier, term4reduction, r);
-      PrintS("{ \"proc\": \"ReduceTerm-NOPRODUCT\", \"nodelabel\": \""); writeLatexTerm(s, r); PrintS("\", \"edgelabel\": \""); writeLatexTerm(product, r, false);
+      PrintS("{ \"proc\": \"RdTrmNoP\", \"nodelabel\": \""); writeLatexTerm(s, r); PrintS("\", \"edgelabel\": \""); writeLatexTerm(product, r, false);
       p_Delete(&product, r);
     }
 
@@ -1788,7 +1819,7 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
 
     if( __TREEOUTPUT__ )
     {
-      PrintS("{ \"proc\": \"ReduceTerm-PRODUCT\", \"nodelabel\": \""); writeLatexTerm(s, r); PrintS("\", \"edgelabel\": \""); writeLatexTerm(product, r, false);
+      PrintS("{ \"proc\": \"RdTrmP\", \"nodelabel\": \""); writeLatexTerm(s, r); PrintS("\", \"edgelabel\": \""); writeLatexTerm(product, r, false);
     }
 
     p_Delete(&product, r);
@@ -1803,18 +1834,9 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
   }
 #endif
 
-#ifndef SING_NDEBUG
-  if( __DEBUG__ )
-  {
-    m_div.Verify();
-    m_checker.Verify();
-  }
-#endif
-  
   if( s == NULL ) // No Reducer?
     return s;
-
-
+  
   poly b = leadmonom(s, r);
 
   const int c = p_GetComp(s, r) - 1;
@@ -1834,9 +1856,18 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
 
     PrintS("], \"noderesult\": \"");
     writeLatexTerm(s, r, true, false);
-    PrintS("\" },"); 
+    PrintS("\"");
+
+    if( syztermCheck != NULL )
+    {
+      PrintS(", \"syztermCheck\":\"" );
+      writeLatexTerm(syztermCheck, r, true, false);
+      PrintS("\" },");      
+    } else
+      PrintS(" },");
   }
 
+  
 #ifndef SING_NDEBUG
   if( __DEBUG__ )
   {
