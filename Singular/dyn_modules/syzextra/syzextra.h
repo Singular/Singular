@@ -334,6 +334,8 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /// leading + second terms
     ideal Compute2LeadingSyzygyTerms();
 
+    
+
   private:
     /// input leading terms
     const ideal m_idLeads;

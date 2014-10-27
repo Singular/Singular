@@ -1215,11 +1215,11 @@ proc SSFindReducer(def product, def syzterm, def L, list #)
 
     "syzterm: ", syzterm;
     "product: ", product;
-    "L: ", L;
+//    "L: ", L;
 //    "T: ", T;
     if( size(#) > 0 )
     {
-      "LSyz: ", #;
+//      "LSyz: ", #;
     }
   }
 
@@ -1331,11 +1331,11 @@ proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
     "syzterm: ", syzterm;
     "mult: ", m;
     "term: ", t;
-    "L: ", L;
-    "T: ", T;
+//    "L: ", L;
+//    "T: ", T;
     if( size(#) > 0 )
     {
-      "LSyz: ", #;
+//      "LSyz: ", #;
     }
 //    "attrib(LS, 'isSB')", attrib(LS, "isSB");
   }
@@ -1408,7 +1408,7 @@ proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
       "m: ", m;
       "t: ", t;
       "syzterm: ", syzterm;
-      L; T; #;
+       L; T; #;
       m2_end(666);
     }  
   }
@@ -1451,7 +1451,7 @@ proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
 
     if( size(#) > 0 )
     {
-      "LSyz: "; #[1];
+//      "LSyz: "; #[1];
     }
   }
 
@@ -1520,10 +1520,10 @@ proc SSSchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
 
     "syzygy_lead: ", syz_lead;
     "syzygy 2nd : ", syz_2;
-    L; T; 
+//    L; T; 
     if( size(#) > 0 )
     {
-      "LSyz: "; #[1];
+//      "LSyz: "; #[1];
     }
   }
 
@@ -1600,8 +1600,9 @@ proc SSSchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
 proc SSComputeSyzygy(def L, def T)
 {
 //  rtimer, "***TIMESNAP0 for ComputeSyzygy(L,T): on level: [",attrib(basering,"SYZNUMBER"),"] :: t: ", timer, ", r: ", rtimer;
-  int @DEBUG = attrib(basering, "DEBUG");
+  int @DEBUG    = attrib(basering, "DEBUG");
   int @KERCHECK = attrib(basering, "KERCHECK");
+  int @SYZCHECK = attrib(basering, "SYZCHECK");
 
   if( @DEBUG )
   {
@@ -1652,6 +1653,28 @@ proc SSComputeSyzygy(def L, def T)
       LL = SSComputeLeadingSyzygyTerms(L);
     }
 
+    if( ncols(LL) != ncols(@LL) )
+    {
+      "ERROR in SSComputeSyzygy: wrong leading syzygies!?";
+      "";
+      L; T;
+      "";
+      type(LL);
+      type(@LL);
+      m2_end(666);
+    }
+
+    if( size( module( matrix(LL) - matrix(@LL) ) ) != 0 )
+    {
+      "ERROR in SSComputeSyzygy: wrong leading syzygies!?";
+      "";
+      L; T;
+      "";
+      type(LL);
+      type(@LL);
+      m2_end(666);
+    }
+
     module TT, SYZ;
 
     vector a, a2; bigint c; int r; poly aa;
@@ -1667,6 +1690,7 @@ proc SSComputeSyzygy(def L, def T)
 
       vector @tail = 0;
 
+//      for(int k = 1; k <= ncols(LL); k++ )
       for(int k = ncols(LL); k > 0; k-- )
       {
         // leading syz. term:
@@ -1676,7 +1700,7 @@ proc SSComputeSyzygy(def L, def T)
         {
           c = leadcomp(a); r = int(c); aa = leadmonomial(a);
 	  
-	  if( @TREEOUTPUT ){ "\ROOT{", (lead(a)), "}"; }
+          if( @TREEOUTPUT ){ "\ROOT{", (lead(a)), "}"; }
           
           // NF reduction:
           if( @HYBRIDNF == 0 ) // Traverse approach:
@@ -1688,7 +1712,7 @@ proc SSComputeSyzygy(def L, def T)
             {      
               a2 = LL2[k]; c = leadcomp(a2); r = int(c); aa = leadmonomial(a2);
 	      
-	      if( @TREEOUTPUT ){ "\CHILD{", (lead(a2)), "}{", ( aa*L[r]), "}"; }
+              if( @TREEOUTPUT ){ "\CHILD{", (lead(a2)), "}{", ( aa*L[r]), "}"; }
 	      
               @tail = a2 + @tail + SSTraverseTail(aa, T[r], L, T, LS);
             } else
@@ -1717,7 +1741,7 @@ proc SSComputeSyzygy(def L, def T)
               }
             }
 	    
-	    if( @TREEOUTPUT ){ "\CHILD{", (a2), "}{", ( aa*L[r]), "}"; }
+            if( @TREEOUTPUT ){ "\CHILD{", (a2), "}{", ( aa*L[r]), "}"; }
 
             @tail = SSSchreyerSyzygyNF(a, a2, L, T, LS);
           }
@@ -1725,18 +1749,30 @@ proc SSComputeSyzygy(def L, def T)
 
         TT[k] = @tail;
         SYZ[k] = a + @tail;
-      }
-    }
 
-    if( ncols(LL) != ncols(@LL) )
-    {
-      "ERROR in SSComputeSyzygy: wrong leading syzygies!?";
-      "";
-      L; T;
-      "";
-      type(LL);
-      type(@LL);
-      m2_end(666);
+        if ( TT[k] != @TT[k] )
+        {
+          "ERROR in SSComputeSyzygy: wrong tail syzygy!?";
+          "INPUT";
+          L; T;
+          "LEADING SYZYGY TERMS";
+          type(LL);
+          
+          "CURRENT TAILS";
+          type(TT);
+          type(@TT);
+          
+          "WRONG TAIL [", k, "]:";
+          type(TT[k]);
+          type(@TT[k]);
+
+//          "IMAGES:";
+//              transpose( transpose(N) * transpose(MRES) );              
+          
+          m2_end(666);
+        }
+
+      } // FOR
     }
 
     if( ncols(TT) != ncols(@TT) )
@@ -1752,18 +1788,6 @@ proc SSComputeSyzygy(def L, def T)
       type(@TT);
       m2_end(666);
     }
-    
-    if( size( module( matrix(LL) - matrix(@LL) ) ) != 0 )
-    {
-      "ERROR in SSComputeSyzygy: wrong leading syzygies!?";
-      "";
-      L; T;
-      "";
-      type(LL);
-      type(@LL);
-      m2_end(666);
-    }
-
 
     if( size( module( matrix(TT) - matrix(@TT) ) ) != 0 )
     {

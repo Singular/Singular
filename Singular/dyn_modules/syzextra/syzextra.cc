@@ -144,8 +144,8 @@ static int cmp_c_ds(const void *p1, const void *p2){ void *R = currRing;
   const int __DEBUG__ = 0;
   if( __DEBUG__ )
   {
-    PrintS("cmp_c_ds: a, b: \np1: "); dPrint(a, r, r, 2);
-    PrintS("b: "); dPrint(b, r, r, 2);
+    PrintS("cmp_c_ds: a, b: \np1: "); dPrint(a, r, r, 0);
+    PrintS("b: "); dPrint(b, r, r, 0);
     PrintLn();
   }
 #endif
@@ -217,8 +217,8 @@ static int cmp_poly(const poly &a, const poly &b)
   const int __DEBUG__ = 0;
   if( __DEBUG__ )
   {
-    PrintS("cmp_lex: a, b: \np1: "); dPrint(a, r, r, 2);
-    PrintS("b: "); dPrint(b, r, r, 2);
+    PrintS("cmp_lex: a, b: \np1: "); dPrint(a, r, r, 0);
+    PrintS("b: "); dPrint(b, r, r, 0);
     PrintLn();
   }
 #endif
@@ -457,6 +457,7 @@ void SchreyerSyzygyComputation::CleanUp()
 
   if( m_sum_bucket != NULL )
   {
+    assume ( sIsEmpty(m_sum_bucket) );
     sBucketDestroy(&m_sum_bucket);
     m_sum_bucket = NULL;
   }
@@ -539,7 +540,7 @@ int CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) con
           if( __DEBUG__ | 0)
           {
             PrintS("CReducerFinder::PreProcessTerm, 't' is NOT co-prime with the following leading term: \n");
-            dPrint(p, r, r, 1);
+            dPrint(p, r, r, 0);
           }
 #endif
           coprime = false; // t not coprime with p!
@@ -559,7 +560,7 @@ int CReducerFinder::PreProcessTerm(const poly t, CReducerFinder& syzChecker) con
         if( __DEBUG__ && !coprime)
         {
           PrintS("CReducerFinder::PreProcessTerm, 't' is co-prime with p but may lead to NOT divisible syz.term: \n");
-          dPrint(ss, r, r, 1);
+          dPrint(ss, r, r, 0);
         }
 #endif
 
@@ -618,7 +619,7 @@ void SchreyerSyzygyComputation::SetUpTailTerms()
         if( __DEBUG__)
         {
           Print("SchreyerSyzygyComputation::SetUpTailTerms(): PP (%d) the following TT: \n", k);
-          dPrint(t, r, r, 1);
+          dPrint(t, r, r, 0);
         }
 #endif
 
@@ -752,7 +753,7 @@ ideal SchreyerSyzygyComputation::Compute1LeadingSyzygyTerms()
 //   if( __DEBUG__ && FALSE )
 //   {
 //     PrintS("ComputeLeadingSyzygyTerms::Temp0: \n");
-//     dPrint(newid, r, r, 1);
+//     dPrint(newid, r, r, 0);
 //   }
 
   // the rest of newid is assumed to be zeroes...
@@ -764,7 +765,7 @@ ideal SchreyerSyzygyComputation::Compute1LeadingSyzygyTerms()
 //   if( __DEBUG__ && FALSE )
 //   {
 //     PrintS("ComputeLeadingSyzygyTerms::Temp1: \n");
-//     dPrint(newid, r, r, 1);
+//     dPrint(newid, r, r, 0);
 //   }
 
   idSkipZeroes(newid); // #define SIMPL_NULL 2
@@ -772,7 +773,7 @@ ideal SchreyerSyzygyComputation::Compute1LeadingSyzygyTerms()
 //   if( __DEBUG__ )
 //   {
 //     PrintS("ComputeLeadingSyzygyTerms::Output: \n");
-//     dPrint(newid, r, r, 1);
+//     dPrint(newid, r, r, 0);
 //   }
 
   Sort_c_ds(newid, r);
@@ -875,7 +876,7 @@ ideal SchreyerSyzygyComputation::Compute2LeadingSyzygyTerms()
 //   if( __DEBUG__ && FALSE )
 //   {
 //     PrintS("Compute2LeadingSyzygyTerms::Temp0: \n");
-//     dPrint(newid, r, r, 1);
+//     dPrint(newid, r, r, 0);
 //   }
 
   if( !__TAILREDSYZ__ )
@@ -887,7 +888,7 @@ ideal SchreyerSyzygyComputation::Compute2LeadingSyzygyTerms()
 //     if( __DEBUG__ && FALSE )
 //     {
 //       PrintS("Compute2LeadingSyzygyTerms::Temp1 (deldiv): \n");
-//       dPrint(newid, r, r, 1);
+//       dPrint(newid, r, r, 0);
 //     }
   }
   else
@@ -912,7 +913,7 @@ ideal SchreyerSyzygyComputation::Compute2LeadingSyzygyTerms()
 //     if( __DEBUG__ && FALSE )
 //     {
 //       PrintS("Compute2LeadingSyzygyTerms::Temp1 (std): \n");
-//       dPrint(newid, r, r, 1);
+//       dPrint(newid, r, r, 0);
 //     }
 
   }
@@ -951,9 +952,9 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
   {
     PrintS("SchreyerSyzygyComputation::TraverseNF(syz_lead, poly syz_2), \n");
     PrintS("syz_lead: \n");
-    dPrint(a, R, R, 1);
+    dPrint(a, R, R, 0);
     PrintS("syz_2: \n");
-    dPrint(a2, R, R, 1);
+    dPrint(a2, R, R, 0);
     PrintLn();
   }
 #endif
@@ -1058,6 +1059,8 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   if( m_sum_bucket == NULL )
     m_sum_bucket = sBucketCreate(R);
 
+  assume ( sIsEmpty(m_sum_bucket) );
+
   if( m_spoly_bucket == NULL )
     m_spoly_bucket = kBucketCreate(R);
 
@@ -1153,7 +1156,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   }
 #endif
   
-//  for( int k = 0; k < size; ++k ) // TODO: reversed order =>> ALL wrong :((((
+//  for( int k = 0; k < size; ++k ) // TODO: should be fine now!
   for( int k = size - 1; k >= 0; --k ) 
   {
     const poly a = LL->m[k]; assume( a != NULL );
@@ -1331,7 +1334,7 @@ void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTer
       const ring& r = m_rBaseRing;
       PrintS("SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms: \n");
       PrintS("m_syzLeads: \n");
-      dPrint(m_syzLeads, r, r, 1);
+      dPrint(m_syzLeads, r, r, 0);
       PrintS("m_checker.Initialize(m_syzLeads) => \n");
       m_checker.DebugPrint();
     }
@@ -1358,9 +1361,9 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
   {
     PrintS("SchreyerSyzygyComputation::SchreyerSyzygyNF(syz_lead, poly syz_2), \n");
     PrintS("syz_lead: \n");
-    dPrint(syz_lead, r, r, 1);
+    dPrint(syz_lead, r, r, 0);
     PrintS("syz_2: \n");
-    dPrint(syz_2, r, r, 1);
+    dPrint(syz_2, r, r, 0);
     PrintLn();
   }
 #endif
@@ -1415,14 +1418,15 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
   if( m_sum_bucket == NULL )
     m_sum_bucket = sBucketCreate(r);
 
+  assume( sIsEmpty(m_sum_bucket) );
+  
   if( m_spoly_bucket == NULL )
     m_spoly_bucket = kBucketCreate(r);
 
-  sBucket_pt& tail   = m_sum_bucket; assume( tail != NULL );
-  kBucket_pt& bucket = m_spoly_bucket; assume( bucket != NULL );
-  kbTest(bucket);
-
-
+  sBucket_pt tail   = m_sum_bucket; assume( tail != NULL ); m_sum_bucket = NULL;
+  
+  kBucket_pt bucket = m_spoly_bucket; assume( bucket != NULL ); kbTest(bucket); m_spoly_bucket = NULL;
+  
 //  kBucketInit(bucket, NULL, 0); // not needed!?
 
   poly p = leadmonom(syz_lead, r); // :(
@@ -1476,12 +1480,29 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
 
   // now bucket must be empty!
   kbTest(bucket);
+  
   assume( kBucketClear(bucket) == NULL );
+  
+  
 
   poly result; int len;
   sBucketClearAdd(tail, &result, &len); // TODO: use Merge with sBucket???
   assume( pLength(result) == len );
 
+  assume( tail != NULL ); assume ( sIsEmpty(tail) );
+
+  if( m_sum_bucket == NULL )
+    m_sum_bucket = tail;
+  else
+    sBucketDestroy(&tail);
+  
+
+  if( m_spoly_bucket == NULL )
+    m_spoly_bucket = bucket;
+  else
+    kBucketDestroy(&bucket);
+  
+  
   if( __TREEOUTPUT__ )
   {
     PrintS("]},");
@@ -1684,14 +1705,6 @@ poly SchreyerSyzygyComputation::ComputeImage(poly multiplier, const int tail) co
 
 poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 {
-#ifndef SING_NDEBUG
-  if( __DEBUG__ )
-  {
-    m_div.Verify();
-    m_checker.Verify();
-  }
-#endif
-
   assume( !__IGNORETAILS__ );
 
   const ideal& L = m_idLeads;
@@ -1703,56 +1716,6 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
   assume( L != NULL );
   assume( T != NULL );
 
-  if( (!__TAILREDSYZ__) || m_lcm.Check(multiplier) )
-  {
-//    const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(tail) < MIN_LENGTH_BUCKET);
-    if( m_sum_bucket == NULL )
-      m_sum_bucket = sBucketCreate(r);
-
-    sBucket_pt& sum   = m_sum_bucket; assume( sum != NULL );
-    poly s; int len;
-
-//    CPolynomialSummator sum(r, bUsePolynomial);
-//    poly s = NULL;
-
-    if( __TREEOUTPUT__ )
-    {
-      Print("{ \"proc\": \"TTPoly\", \"nodelabel\": \""); writeLatexTerm(multiplier, r, false); Print(" * \\\\ldots \", \"children\": [");
-    }
-    
-    for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
-    {
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      const poly rt = ReduceTerm(multiplier, p, NULL); // TODO: also return/store length?
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-      const int lp = pLength(rt);
-      if( rt != NULL && lp != 0 )
-        sBucket_Add_p(sum, rt, lp);
-    }
-
-    sBucketClearAdd(sum, &s, &len);
-    assume( pLength(s) == len );
-#ifndef SING_NDEBUG
-    if( __DEBUG__ )
-    {
-      m_div.Verify();
-      m_checker.Verify();
-    }
-#endif
-
-    if( __TREEOUTPUT__ )
-    {
-      PrintS("], \"noderesult\": \""); writeLatexTerm(s, r, true, false); PrintS("\" },");
-    }   
-
-    return s;
-  }
-
 #ifndef SING_NDEBUG
   if( __DEBUG__ )
   {
@@ -1761,7 +1724,80 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
   }
 #endif
 
-  return NULL;
+  if(!(  (!__TAILREDSYZ__)   ||   m_lcm.Check(multiplier)     ))
+    return NULL;
+    
+  //    const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(tail) < MIN_LENGTH_BUCKET);
+
+  sBucket_pt sum;
+
+  if( m_sum_bucket == NULL )
+    sum = sBucketCreate(r);
+  else
+  {
+    if( !sIsEmpty(m_sum_bucket) )
+      sum = sBucketCreate(r);
+    else
+    {
+      sum = m_sum_bucket;
+      m_sum_bucket = NULL;
+    }
+  }
+
+
+  assume( sum != NULL ); assume ( sIsEmpty(sum) );
+  assume( r == sBucketGetRing(sum) );
+
+  poly s; int len;
+
+  //    CPolynomialSummator sum(r, bUsePolynomial);
+  //    poly s = NULL;
+
+  if( __TREEOUTPUT__ )
+  {
+    Print("{ \"proc\": \"TTPoly\", \"nodelabel\": \""); writeLatexTerm(multiplier, r, false); Print(" * \\\\ldots \", \"children\": [");
+  }
+
+  for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
+  {
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    const poly rt = ReduceTerm(multiplier, p, NULL); // TODO: also return/store length?
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    const int lp = pLength(rt);
+
+    if( rt != NULL && lp != 0 )
+      sBucket_Add_p(sum, rt, lp);
+  }
+
+  sBucketClearAdd(sum, &s, &len); // Will Not Clear?!?
+
+  assume( sum != NULL ); assume ( sIsEmpty(sum) );
+
+  if( m_sum_bucket == NULL )
+    m_sum_bucket = sum;
+  else
+    sBucketDestroy(&sum);   
+
+  assume( pLength(s) == len );
+#ifndef SING_NDEBUG
+  if( __DEBUG__ )
+  {
+    m_div.Verify();
+    m_checker.Verify();
+  }
+#endif
+
+  if( __TREEOUTPUT__ )
+  {
+    PrintS("], \"noderesult\": \""); writeLatexTerm(s, r, true, false); PrintS("\" },");
+  }
+
+  return s;
 
 }
 
@@ -1892,7 +1928,7 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
     m_rBaseRing( rootRingHdl->data.uring )
 {
 #ifndef SING_NDEBUG
-  if( __DEBUG__ )
+  if( __DEBUG__ && 0 )
   {
     PrintS("SchreyerSyzygyComputationFlags: \n");
     Print("        DEBUG: \t%d\n", __DEBUG__);
@@ -2200,7 +2236,7 @@ class CDivisorEnumerator: public SchreyerSyzygyComputationFlags
           if( __DEBUG__ )
           {
             Print("CDivisorEnumerator::MoveNext::est LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + Current().label());
-            dPrint(Current().lt(), m_rBaseRing, m_rBaseRing, 1);
+            dPrint(Current().lt(), m_rBaseRing, m_rBaseRing, 0);
           }
 #endif
 //          m_active = true;
@@ -2224,7 +2260,7 @@ bool CReducerFinder::IsDivisible(const poly product) const
 {
 #ifndef SING_NDEBUG
   if( __DEBUG__ )
-    DebugPrint();
+    Verify();
 #endif
   
   assume( product != NULL );
@@ -2264,7 +2300,7 @@ bool CReducerFinder::IsDivisible(const poly product) const
       if( __DEBUG__ )
       {
         Print("_FindReducer::Test LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + (*vit)->label());
-        dPrint((*vit)->lt(), r, r, 1);
+        dPrint((*vit)->lt(), r, r, 0);
       }
 
       return true;
@@ -2429,7 +2465,7 @@ class CDivisorEnumerator2: public SchreyerSyzygyComputationFlags
           if( __DEBUG__ )
           {
             Print("CDivisorEnumerator::MoveNext::est LS: q is divisible by LS[%d] !:((, diviser is: ", 1 + Current().label());
-            dPrint(Current().lt(), m_rBaseRing, m_rBaseRing, 1);
+            dPrint(Current().lt(), m_rBaseRing, m_rBaseRing, 0);
           }
 #endif
 //          m_active = true;
@@ -2455,7 +2491,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
 #ifndef SING_NDEBUG
   if( __DEBUG__ )
   {
-    DebugPrint();
+    Verify();
     syz_checker.Verify();
   }
 #endif
@@ -2497,7 +2533,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
 #ifndef SING_NDEBUG
   if( __DEBUG__ )
   {
-    DebugPrint();
+    Verify();
     syz_checker.Verify();
   }
 #endif
@@ -2530,7 +2566,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
         if( __DEBUG__ )
         {
           Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
-          dPrint(syzterm, r, r, 1);
+          dPrint(syzterm, r, r, 0);
         }
 #endif
         assume( itr.Current().CheckLT( L ) ); // ???
@@ -2557,7 +2593,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
 #ifndef SING_NDEBUG
     if( __DEBUG__ )
     {
-      DebugPrint();
+      Verify();
       syz_checker.Verify();
     }
 #endif
@@ -2626,7 +2662,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
         if( __DEBUG__ )
         {
           Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
-          dPrint(syzterm, r, r, 1);
+          dPrint(syzterm, r, r, 0);
         }
 
         continue;
@@ -2656,7 +2692,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
 #ifndef SING_NDEBUG
   if( __DEBUG__ )
   {
-    DebugPrint();
+    Verify();
     syz_checker.Verify();
   }
 #endif
@@ -2672,7 +2708,7 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
 #ifndef SING_NDEBUG
   if( __DEBUG__ )
   {
-    DebugPrint();
+    Verify();
     syz_checker.Verify();
   }
 #endif
@@ -2714,7 +2750,7 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
 #ifndef SING_NDEBUG
   if( __DEBUG__ )
   {
-    DebugPrint();
+    Verify();
     syz_checker.Verify();
   }
 #endif
@@ -2745,7 +2781,7 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
         if( __DEBUG__ )
         {
           Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
-          dPrint(syzterm, r, r, 1);
+          dPrint(syzterm, r, r, 0);
         }
 #endif
         assume( itr.Current().CheckLT( L ) ); // ???
@@ -2772,7 +2808,7 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
 #ifndef SING_NDEBUG
     if( __DEBUG__ )
     {
-      DebugPrint();
+      Verify();
       syz_checker.Verify();
     }
 #endif
@@ -2846,7 +2882,7 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
         if( __DEBUG__ )
         {
           Print("_FindReducer::Test SYZTERM: q == syzterm !:((, syzterm is: ");
-          dPrint(syzterm, r, r, 1);
+          dPrint(syzterm, r, r, 0);
         }
 
         continue;
@@ -2873,7 +2909,7 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
 #ifndef SING_NDEBUG
   if( __DEBUG__ )
   {
-    DebugPrint();
+    Verify();
     syz_checker.Verify();
   }
 #endif

@@ -534,7 +534,7 @@ static BOOLEAN _ComputeLeadingSyzygyTerms(leftv res, leftv h)
     if( __DEBUG__ )
     {
       PrintS("ComputeLeadingSyzygyTerms::Input: \n");
-      dPrint(id, r, r, 1);
+      dPrint(id, r, r, 0);
     }
 
     assume( !__LEAD2SYZ__ );
@@ -589,7 +589,7 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
     if( __DEBUG__ )
     {
       PrintS("Sort_c_ds::Input: \n");
-      dPrint(id, r, r, 1);
+      dPrint(id, r, r, 0);
     }
 
     assume (h->Next() == NULL);
@@ -604,7 +604,7 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
     if( __DEBUG__ )
     {
       PrintS("Sort_c_ds::Output: \n");
-      dPrint(id, r, r, 1);
+      dPrint(id, r, r, 0);
     }
 
     // NOTE: nothing is to be returned!!!
@@ -733,16 +733,17 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
   {
     PrintS("FindReducer(product, syzterm, L, T, #)::Input: \n");
 
-    PrintS("product: "); dPrint(product, r, r, 2);
-    PrintS("syzterm: "); dPrint(syzterm, r, r, 2);
-    PrintS("L: "); dPrint(L, r, r, 0);
-//    PrintS("T: "); dPrint(T, r, r, 4);
+    PrintS("product: "); dPrint(product, r, r, 0);
+    PrintS("syzterm: "); dPrint(syzterm, r, r, 0);
+//    PrintS("L: "); dPrint(L, r, r, 0);
+//    PrintS("T: "); dPrint(T, r, r, 0);
 
     if( LS == NULL )
-      PrintS("LS: NULL\n");
+//      PrintS("LS: NULL\n");
+      ;
     else
     {
-      PrintS("LS: "); dPrint(LS, r, r, 0);
+//      PrintS("LS: "); dPrint(LS, r, r, 0);
     }
   }
 
@@ -752,7 +753,7 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
   if( __DEBUG__ )
   {
     PrintS("FindReducer::Output: \n");
-    dPrint((poly)res->data, r, r, 2);
+    dPrint((poly)res->data, r, r, 0);
   }
 
   return FALSE;
@@ -834,17 +835,18 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
   {
     PrintS("SchreyerSyzygyNF(syz_lead, syz_2, L, T, #)::Input: \n");
 
-    PrintS("syz_lead: "); dPrint(syz_lead, r, r, 2);
-    PrintS("syz_2: "); dPrint(syz_2, r, r, 2);
+    PrintS("syz_lead: "); dPrint(syz_lead, r, r, 0);
+    PrintS("syz_2: "); dPrint(syz_2, r, r, 0);
 
-    PrintS("L: "); dPrint(L, r, r, 0);
-    PrintS("T: "); dPrint(T, r, r, 0);
+//    PrintS("L: "); dPrint(L, r, r, 0);
+//    PrintS("T: "); dPrint(T, r, r, 0);
 
     if( LS == NULL )
-      PrintS("LS: NULL\n");
+//      PrintS("LS: NULL\n")
+          ;
     else
     {
-      PrintS("LS: "); dPrint(LS, r, r, 0);
+//      PrintS("LS: "); dPrint(LS, r, r, 0);
     }
   }
 
@@ -856,7 +858,7 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
   {
     PrintS("SchreyerSyzygyNF::Output: ");
 
-    dPrint((poly)res->data, r, r, 2);
+    dPrint((poly)res->data, r, r, 0);
   }
 
 
@@ -952,18 +954,19 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
   {
     PrintS("ReduceTerm(m, t, syzterm, L, T, #)::Input: \n");
 
-    PrintS("m: "); dPrint(multiplier, r, r, 2);
-    PrintS("t: "); dPrint(term4reduction, r, r, 2);
-    PrintS("syzterm: "); dPrint(syztermCheck, r, r, 2);
+    PrintS("m: "); dPrint(multiplier, r, r, 0);
+    PrintS("t: "); dPrint(term4reduction, r, r, 0);
+    PrintS("syzterm: "); dPrint(syztermCheck, r, r, 0);
 
-    PrintS("L: "); dPrint(L, r, r, 0);
-    PrintS("T: "); dPrint(T, r, r, 0);
+//    PrintS("L: "); dPrint(L, r, r, 0);
+//    PrintS("T: "); dPrint(T, r, r, 0);
 
     if( LS == NULL )
-      PrintS("LS: NULL\n");
+//      PrintS("LS: NULL\n")
+          ;
     else
     {
-      PrintS("LS: "); dPrint(LS, r, r, 0);
+//      PrintS("LS: "); dPrint(LS, r, r, 0);
     }
   }
 
@@ -997,7 +1000,7 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
   {
     PrintS("ReduceTerm::Output: ");
 
-    dPrint((poly)res->data, r, r, 2);
+    dPrint((poly)res->data, r, r, 0);
   }
 
 
@@ -1082,17 +1085,18 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
   {
     PrintS("TraverseTail(m, t, L, T, #)::Input: \n");
 
-    PrintS("m: "); dPrint(multiplier, r, r, 2);
-    PrintS("t: "); dPrint(tail, r, r, 10);
+    PrintS("m: "); dPrint(multiplier, r, r, 0);
+    PrintS("t: "); dPrint(tail, r, r, 0);
 
-    PrintS("L: "); dPrint(L, r, r, 0);
-    PrintS("T: "); dPrint(T, r, r, 0);
+//    PrintS("L: "); dPrint(L, r, r, 0);
+//    PrintS("T: "); dPrint(T, r, r, 0);
 
     if( LS == NULL )
-      PrintS("LS: NULL\n");
+//      PrintS("LS: NULL\n")
+          ;
     else
     {
-      PrintS("LS: "); dPrint(LS, r, r, 0);
+//      PrintS("LS: "); dPrint(LS, r, r, 0);
     }
   }
 
@@ -1103,7 +1107,7 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
   if( __DEBUG__ )
   {
     PrintS("TraverseTail::Output: ");
-    dPrint((poly)res->data, r, r, 2);
+    dPrint((poly)res->data, r, r, 0);
   }
 
   return FALSE;
@@ -1176,7 +1180,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
     PrintS("ComputeResolution(M, length)::Input: \n");
     Print( "starting length: %ld\n", length);
     PrintS("M: \n"); dPrint(M, r, r, 0);
-    PrintS("L=LEAD(M): \n"); dPrint(L, r, r, 1);
+    PrintS("L=LEAD(M): \n"); dPrint(L, r, r, 0);
     PrintS("T=TAIL(M): \n"); dPrint(T, r, r, 0);
   }
 
@@ -1204,8 +1208,8 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
     if( __DEBUG__ )
     {
       Print("ComputeResolution()::Separated Syzygy[%d]: \n", index);
-      PrintS("LL: \n"); dPrint(LL, r, r, 1);
-      PrintS("TT: \n"); dPrint(TT, r, r, 2);
+//      PrintS("LL: \n"); dPrint(LL, r, r, 0);
+//      PrintS("TT: \n"); dPrint(TT, r, r, 0);
     }
     size = IDELEMS(LL);
 
@@ -1298,9 +1302,8 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
   if( __DEBUG__ )
   {
     PrintS("ComputeSyzygy(L, T)::Input: \n");
-
-    PrintS("L: "); dPrint(L, r, r, 0);
-    PrintS("T: "); dPrint(T, r, r, 0);
+//    PrintS("L: "); dPrint(L, r, r, 0);
+//    PrintS("T: "); dPrint(T, r, r, 0);
   }
 
   ideal LL, TT;
@@ -1317,8 +1320,9 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
 
   if( __DEBUG__ )
   {
-    PrintS("ComputeSyzygy::Output: ");
+    PrintS("ComputeSyzygy::Output: \nLL: \n");
     dPrint(LL, r, r, 0);
+    PrintS("\nTT: \n");
     dPrint(TT, r, r, 0);
   }
 
