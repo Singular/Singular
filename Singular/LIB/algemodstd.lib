@@ -206,7 +206,7 @@ static proc degtest(intvec v)
 static proc chinRm(list m, list ll, list lk,list l1,int uz)
 {
     poly ff,c;
-    
+
     for(int i=1;i<=uz;i++)
     {
         c = division(l1[i]*ll[i],m[i])[2][1];
@@ -236,7 +236,7 @@ EXAMPLE: example chinrempoly; shows an example
     {
         f=f*m[i];
     }
-    
+
     ideal I,J;
     list l1,ll,lk,l2;
     poly c,ff;
@@ -245,7 +245,7 @@ EXAMPLE: example chinrempoly; shows an example
         lk[j]=f/m[j];
         ll[j]=extgcd(lk[j],m[j])[2];
     }
-    
+
     for(i=1;i<=sz;i++)
     {
         for(j=1;j<=uz;j++)
