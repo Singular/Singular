@@ -1970,7 +1970,12 @@ void rComposeC(lists L, ring R)
   && (r2=SHORT_REAL_LENGTH))
     R->cf = nInitChar(n_R, NULL);
   else
+  {
+    LongComplexInfo* p = (LongComplexInfo *)omAlloc0(sizeof(LongComplexInfo));
+    p->float_len=r1;
+    p->float_len2=r2;
     R->cf = nInitChar(n_long_R, NULL);
+  }
 
   if ((r1<=SHORT_REAL_LENGTH)   // should go into nInitChar
   && (r2=SHORT_REAL_LENGTH))

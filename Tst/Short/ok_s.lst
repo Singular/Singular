@@ -2,6 +2,7 @@ abusalem
 bug_misc
 bug_minpoly
 bug_newstruct
+bug_ringlist
 bug_tr237
 ; do not try bug_tr276 without 2.2 GB RAM free
 ; bug_tr276

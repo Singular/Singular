@@ -386,9 +386,12 @@ void ngfWrite (number &a, const coeffs r)
 
 BOOLEAN ngfCoeffIsEqual (const coeffs r, n_coeffType n, void * parameter)
 {
-  if (n==ID) {
+  if (n==ID)
+  {
     LongComplexInfo* p = (LongComplexInfo *)(parameter);
-    if (p->float_len == r->float_len && p->float_len2 == r->float_len2)
+    if ((p!=NULL)
+    && (p->float_len == r->float_len)
+    && (p->float_len2 == r->float_len2))
       return TRUE;
   }
   return FALSE;
