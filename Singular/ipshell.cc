@@ -5971,7 +5971,10 @@ static void iiReportTypes(int nr,int t,const short *T)
 {
   char *buf=(char*)omAlloc(250);
   buf[0]='\0';
-  sprintf(buf,"par. %d is of type `%s`, expected ",nr,Tok2Cmdname(t));
+  if (nr==0)
+    sprintf(buf,"wrong length of parameters(%d), expected ",t);
+  else
+    sprintf(buf,"par. %d is of type `%s`, expected ",nr,Tok2Cmdname(t));
   for(int i=1;i<=T[0];i++)
   {
     strcat(buf,"`");
@@ -5994,7 +5997,11 @@ BOOLEAN iiCheckTypes(leftv args, const short *type_list, int report)
     }
   }
   int l=args->listLength();
-  if (l!=(int)type_list[0]) return FALSE;
+  if (l!=(int)type_list[0])
+  {
+    if (report) iiReportTypes(0,l,type_list);
+    return FALSE;
+  }
   for(int i=1;i<=l;i++,args=args->next)
   {
     short t=type_list[i];

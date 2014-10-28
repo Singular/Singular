@@ -960,22 +960,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "btest") == 0)
     {
-      poly p;
-      int lV;
-      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      short t[]={2,POLY_CMD,INT_CMD};
+      if (iiCheckTypes(h,t,1))
       {
-        p=(poly)h->CopyD();
+        poly p=(poly)h->CopyD();
         h=h->next;
-      }
-      else return TRUE;
-      if ((h!=NULL) && (h->Typ()==INT_CMD))
-      {
-        lV=(int)((long)(h->Data()));
+        int lV=(int)((long)(h->Data()));
         res->rtyp = INT_CMD;
         res->data = (void*)(long)pLastVblock(p, lV);
+        return FALSE;
       }
       else return TRUE;
-      return FALSE;
     }
     else
   #endif
@@ -983,25 +978,20 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "shrinktest") == 0)
     {
-      poly p;
-      int lV;
-      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      short t[]={2,POLY_CMD,INT_CMD};
+      if (iiCheckTypes(h,t,1))
       {
-        p=(poly)h->CopyD();
+        poly p=(poly)h->CopyD();
         h=h->next;
-      }
-      else return TRUE;
-      if ((h!=NULL) && (h->Typ()==INT_CMD))
-      {
-        lV=(int)((long)(h->Data()));
+        int lV=(int)((long)(h->Data()));
         res->rtyp = POLY_CMD;
         //        res->data = p_mShrink(p, lV, currRing);
         //        kStrategy strat=new skStrategy;
         //        strat->tailRing = currRing;
         res->data = p_Shrink(p, lV, currRing);
+        return FALSE;
       }
       else return TRUE;
-      return FALSE;
     }
     else
   #endif
@@ -1131,12 +1121,10 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   /*==================== spadd =============================*/
     if(strcmp(sys_cmd,"spadd") == 0)
     {
-      if ((h->next!=NULL)
-      && (h->Typ()==LIST_CMD)
-      && (h->next->Typ()==LIST_CMD))
+      short t[]={2,LIST_CMD,LIST_CMD};
+      if (iiCheckTypes(h,t,1))
       {
-        if (h->next->next==NULL)
-          return spaddProc(res,h,h->next);
+        return spaddProc(res,h,h->next);
       }
       return TRUE;
     }
@@ -1144,12 +1132,10 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   /*==================== spmul =============================*/
     if(strcmp(sys_cmd,"spmul") == 0)
     {
-      if ((h->next!=NULL)
-      && (h->Typ()==LIST_CMD)
-      && (h->next->Typ()==INT_CMD))
+      short t[]={2,LIST_CMD,INT_CMD};
+      if (iiCheckTypes(h,t,1))
       {
-        if (h->next->next==NULL)
-          return spmulProc(res,h,h->next);
+        return spmulProc(res,h,h->next);
       }
       return TRUE;
     }
@@ -1161,10 +1147,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_SHEAFCOH_TRICKS
     if(strcmp(sys_cmd,"tensorModuleMult")==0)
     {
+      short t[]={2,INT_CMD,MODUL_CMD};
   //      WarnS("tensorModuleMult!");
-      if (h!=NULL && h->Typ()==INT_CMD && h->Data() != NULL &&
-            h->next != NULL && h->next->Typ() == MODUL_CMD
-            && h->next->Data() != NULL)
+      if (iiCheckTypes(h,t,1))
       {
         int m = (int)( (long)h->Data() );
         ideal M = (ideal)h->next->Data();
@@ -1172,7 +1157,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         res->data=(void *)id_TensorModuleMult(m, M, currRing);
         return FALSE;
       }
-      WerrorS("system(\"tensorModuleMult\", int, module) expected");
       return TRUE;
     }
     else
@@ -1200,23 +1184,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_PLURAL
     if (strcmp(sys_cmd, "bracket") == 0)
     {
-      poly p;
-      poly q;
-      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      short t[]={2,POLY_CMD,POLY_CMD};
+      if (iiCheckTypes(h,t,1))
       {
-        p=(poly)h->CopyD();
+        poly p=(poly)h->CopyD();
         h=h->next;
+        poly q=(poly)h->Data();
+        res->rtyp=POLY_CMD;
+        if (rIsPluralRing(currRing))  res->data=nc_p_Bracket_qq(p,q, currRing);
+        return FALSE;
       }
-      else return TRUE;
-      if ((h!=NULL) && (h->Typ()==POLY_CMD))
-      {
-        q=(poly)h->Data();
-      }
-      else return TRUE;
-      res->rtyp=POLY_CMD;
-      if (rIsPluralRing(currRing))  res->data=nc_p_Bracket_qq(p,q, currRing);
-      else res->data=NULL;
-      return FALSE;
+      return TRUE;
     }
     else
   #endif
@@ -1836,14 +1814,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "Mwalk") == 0)
     {
-      if (h == NULL || h->Typ() != IDEAL_CMD ||
-        h->next == NULL || h->next->Typ() != INTVEC_CMD ||
-        h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD ||
-        h->next->next->next == NULL || h->next->next->next->Typ() != RING_CMD)
-      {
-        WerrorS("system(\"Mwalk\", ideal, intvec, intvec) expected");
-        return TRUE;
-      }
+      short t[]={4,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,RING_CMD};
+      if (!iiCheckTypes(h,t,1)) return TRUE;
       if (((intvec*) h->next->Data())->length() != currRing->N &&
         ((intvec*) h->next->next->Data())->length() != currRing->N )
       {
