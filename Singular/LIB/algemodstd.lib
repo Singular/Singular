@@ -98,7 +98,7 @@ static proc minpolyTask(poly f,int p)
         {
             return(1);
         }
-       else
+        else
         {
             nr = testfact(ur);
             k=ncols(L[1]);
@@ -202,21 +202,17 @@ static proc degtest(intvec v)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//chinese remaindering for polynomials only for input of size two  ///
 
-static proc Chinideal(list l,list m)
+static proc chinRm(list m, list ll, list lk,list l1,int uz)
 {
-    ideal I;
-    list L=extgcd(m[2],m[1]);
-    ideal F=m[1]*m[2];
-    attrib(F,"isSB",1);
-    poly F1=L[2]*m[2];
-    poly F2=m[1]*L[3];
-    for(int j=1;j<=size(l[1]);j++)
+    poly ff,c;
+    
+    for(int i=1;i<=uz;i++)
     {
-        I[j]=reduce(l[1][j]*F1+l[2][j]*F2,F);
+        c = division(l1[i]*ll[i],m[i])[2][1];
+        ff = ff + c*lk[i];
     }
-    return(I);
+    return(ff);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -226,31 +222,40 @@ proc chinrempoly(list l,list m)
 RETURN:  a polynomial (resp. ideal) which is congruent to l[i] modulo m[i] for all i
 NOTE: The procedure applies chinese remaindering to the first argument w.r.t. the
       moduli given in the second. The elements in the first list must be of same type
-      which can be polynomial or ideal. The moduli must be of type polynomial.
+      which can be polynomial or ideal. The moduli must be of type polynomial. Elements
+      in the second list must be distinct and co-prime.
 SEE ALSO: chinrem
 EXAMPLE: example chinrempoly; shows an example
 "
 {
-    int n,j;
-    n=size(l);
-    ideal m1=m[1];
-    if(n==1 && size(m)==1)
+    int i,j,sz,uz;
+    uz = size(l);
+    sz = ncols(ideal(l[1]));
+    poly f=1;
+    for(i=1;i<=uz;i++)
     {
-        option(redSB);
-        attrib(m1,"isSB",1);
-        return(simplify(reduce(l[1],m1),2));
+        f=f*m[i];
     }
-    else
+    
+    ideal I,J;
+    list l1,ll,lk,l2;
+    poly c,ff;
+    for(j=1;j<=uz;j++)
     {
-        ideal I=l[1];
-        poly g=m[1];
-        for(j=2;j<=n;j++)
+        lk[j]=f/m[j];
+        ll[j]=extgcd(lk[j],m[j])[2];
+    }
+    
+    for(i=1;i<=sz;i++)
+    {
+        for(j=1;j<=uz;j++)
         {
-            I=Chinideal(list(I,ideal(l[j])),list(g,m[j]));
-            g=g*m[j];
+            I = l[j];
+            l1[j] = I[i];
         }
+        J[i] = chinRm(m,ll,lk,l1,uz);
     }
-    return(I);
+    return(J);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -290,9 +295,9 @@ example
 static proc LiftPolyCRT(ideal I)
 {
     /*
-    * compute std for each factor and combine this result
-    * to modulo minpoly via CRT for poly over char p>0
-    */
+     * compute std for each factor and combine this result
+     * to modulo minpoly via CRT for poly over char p>0
+     */
     int u,in,j;
     list LL,Lk;
     ideal J,K,II;
@@ -302,16 +307,21 @@ static proc LiftPolyCRT(ideal I)
     f=I[u];
     K=factorize(f,1);
     in=ncols(K);
-    ideal cI;
     for(j=1;j<=in;j++)
     {
         LL[j]=K[j];
-        cI=K[j];
         ideal I(j)=J,K[j];
-        option(redSB);
         I(j)=std(I(j));
-        attrib(cI,"isSB",1);
-        Lk[j]=simplify(reduce(I(j),cI),2);
+        if(size(I(j))==1)
+        {
+            Lk[j]=I(j);
+        }
+        else
+        {
+            I(j)[1]=0;
+            I(j)=simplify(I(j), 2);
+            Lk[j]=I(j);
+        }
     }
     // apply CRT for polynomials
     II =chinrempoly(Lk,LL),f;
@@ -373,7 +383,7 @@ static proc cleardenomIdeal(ideal I)
     {
         return(I);
     }
-   else
+    else
     {
         for(int i=1;i<=t;i++)
         {
@@ -388,10 +398,13 @@ static proc cleardenomIdeal(ideal I)
 static proc modStdparallelized(ideal I)
 {
     // apply modular.lib
+    /* save options */
+    intvec opt = option(get);
     option(redSB);
     I = modular("Algemodstd::LiftPolyCRT", list(I), PrimeTestTask, Modstd::deleteUnluckyPrimes_std,
               PtestStd, Modstd::finalTest_std,536870909);
     attrib(I, "isSB", 1);
+    option(set,opt);
     return(I);
 }
 
@@ -412,14 +425,18 @@ EXAMPLE: example algemodStd; shows an example
     poly f;
     ideal J;
     int n=nvars(Rbs);
+    if(size(I)==0)
+    {
+        return(ideal(0));
+    }
     if(npars(Rbs)==0)
     {
-         J=modStd(I,L);//if algebraic number is in Q
-         if(size(#)>0)
-         {
-             return(cleardenomIdeal(J));
-         }
-       return(J);
+        J=modStd(I,L);//if algebraic number is in Q
+        if(size(#)>0)
+        {
+            return(cleardenomIdeal(J));
+        }
+        return(J);
     }
     list rl=ringlist(Rbs);
     f=rl[1][4][1];
@@ -431,6 +448,7 @@ EXAMPLE: example algemodStd; shows an example
     setring S;
     poly f=imap(Rbs,f);
     ideal I=imap(Rbs,I);
+    I = simplify(I,2);// eraze the zero generatos
     ideal J;
     if(f==0)
     {
