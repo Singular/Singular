@@ -307,16 +307,21 @@ static proc LiftPolyCRT(ideal I)
     f=I[u];
     K=factorize(f,1);
     in=ncols(K);
-    ideal cI;
     for(j=1;j<=in;j++)
     {
         LL[j]=K[j];
-        cI=K[j];
         ideal I(j)=J,K[j];
-        option(redSB);
         I(j)=std(I(j));
-        attrib(cI,"isSB",1);
-        Lk[j]=simplify(reduce(I(j),cI),2);
+        if(size(I(j))==1)
+        {
+            Lk[j]=I(j);
+        }
+        else
+        {
+            I(j)[1]=0;
+            I(j)=simplify(I(j), 2);
+            Lk[j]=I(j);
+        }
     }
     // apply CRT for polynomials
     II =chinrempoly(Lk,LL),f;
@@ -443,6 +448,7 @@ EXAMPLE: example algemodStd; shows an example
     setring S;
     poly f=imap(Rbs,f);
     ideal I=imap(Rbs,I);
+    I = simplify(I,2);// eraze the zero generatos
     ideal J;
     if(f==0)
     {
