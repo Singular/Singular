@@ -415,6 +415,10 @@ EXAMPLE: example algemodStd; shows an example
     poly f;
     ideal J;
     int n=nvars(Rbs);
+    if(size(I)==0)
+    {
+        return(ideal(0));
+    }
     if(npars(Rbs)==0)
     {
          J=modStd(I,L);//if algebraic number is in Q
