@@ -98,7 +98,7 @@ static proc minpolyTask(poly f,int p)
         {
             return(1);
         }
-       else
+        else
         {
             nr = testfact(ur);
             k=ncols(L[1]);
@@ -295,9 +295,9 @@ example
 static proc LiftPolyCRT(ideal I)
 {
     /*
-    * compute std for each factor and combine this result
-    * to modulo minpoly via CRT for poly over char p>0
-    */
+     * compute std for each factor and combine this result
+     * to modulo minpoly via CRT for poly over char p>0
+     */
     int u,in,j;
     list LL,Lk;
     ideal J,K,II;
@@ -383,7 +383,7 @@ static proc cleardenomIdeal(ideal I)
     {
         return(I);
     }
-   else
+    else
     {
         for(int i=1;i<=t;i++)
         {
@@ -431,12 +431,12 @@ EXAMPLE: example algemodStd; shows an example
     }
     if(npars(Rbs)==0)
     {
-         J=modStd(I,L);//if algebraic number is in Q
-         if(size(#)>0)
-         {
-             return(cleardenomIdeal(J));
-         }
-       return(J);
+        J=modStd(I,L);//if algebraic number is in Q
+        if(size(#)>0)
+        {
+            return(cleardenomIdeal(J));
+        }
+        return(J);
     }
     list rl=ringlist(Rbs);
     f=rl[1][4][1];
