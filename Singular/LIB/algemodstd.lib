@@ -388,10 +388,13 @@ static proc cleardenomIdeal(ideal I)
 static proc modStdparallelized(ideal I)
 {
     // apply modular.lib
+    /* save options */
+    intvec opt = option(get);
     option(redSB);
     I = modular("Algemodstd::LiftPolyCRT", list(I), PrimeTestTask, Modstd::deleteUnluckyPrimes_std,
               PtestStd, Modstd::finalTest_std,536870909);
     attrib(I, "isSB", 1);
+    option(set,opt);
     return(I);
 }
 
