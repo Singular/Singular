@@ -251,16 +251,44 @@ void paPrint(const char *n,package p);
 BOOLEAN iiTestAssume(leftv a, leftv b);
 
 /* table inteface for iiAddCproc */
-BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op,
-            struct sValCmd1* dArith1, int i, int at,
-            struct sConvertTypes *dConvertTypes);
-BOOLEAN iiExprArith2Tab(leftv res, leftv a, int op,
-            struct sValCmd2* dArith2,int i, int at,
-            struct sConvertTypes *dConvertTypes);
-BOOLEAN iiExprArith3Tab(leftv res, leftv a, int op,
-            struct sValCmd3* dArith3,int i, int at,
-            struct sConvertTypes *dConvertTypes);
+/// apply an operation 'op' to an argument a
+/// return TRUE on failure
+BOOLEAN iiExprArith1Tab(leftv res,///< [out] pre-allocated result
+                        leftv a,  ///< [in]  argument
+                        int op,   ///< [in]  operation
+                        struct sValCmd1* dA1, ///< [in] table of possible proc
+                                                  ///< assumes dArith1[0].cmd==op
+                        int at,   ///< [in] a->Typ()
+                        struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
+                        );
+/// apply an operation 'op' to arguments a and a->next
+/// return TRUE on failure
+BOOLEAN iiExprArith2Tab(leftv res,///< [out] pre-allocated result
+                        leftv a,  ///< [in]  2 arguments
+                        int op,   ///< [in]  operation
+                        struct sValCmd2* dA2,///< [in] table of possible proc
+                                   ///< assumes dA2[0].cmd==op
+                        int at,    ///< [in] a->Typ()
+                        struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
+                        );
+/// apply an operation 'op' to arguments a, a->next and a->next->next
+/// return TRUE on failure
+BOOLEAN iiExprArith3Tab(leftv res, ///< [out] pre-allocated result
+                        leftv a,   ///< [in]  3 arguments
+                        int op,    ///< [in]  operation
+                        struct sValCmd3* dA3,///< [in] table of possible proc
+                                   ///< assumes dA3[0].cmd==op
+                        int at,    ///< [in] a->Typ()
+                        struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
+                        );
 
-BOOLEAN iiCheckTypes(leftv args, const short *type_list, int report=0);
+/// check a list of arguemys against a given field of types
+/// return TRUE if the types match
+/// return FALSE (and, if report) report an error via Werror otherwise
+BOOLEAN iiCheckTypes(leftv args,/// < [in] argument list (may be NULL)
+                      const short *type_list,///< [in] field of types
+                                             ///< len, t1,t2,...
+                      int report=0  /// ;in] report error?
+                      );
 #endif
 

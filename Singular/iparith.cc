@@ -7760,7 +7760,7 @@ static Subexpr jjMakeSub(leftv e)
 
 static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
                                     BOOLEAN proccall,
-                                    struct sValCmd2* dArith2,int i,
+                                    struct sValCmd2* dA2,
                                     int at, int bt,
                                     struct sConvertTypes *dConvertTypes)
 {
@@ -7769,22 +7769,21 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
 
   if (!errorreported)
   {
-    int index=i;
-
+    int i=0;
     iiOp=op;
-    while (dArith2[i].cmd==op)
+    while (dA2[i].cmd==op)
     {
-      if ((at==dArith2[i].arg1)
-      && (bt==dArith2[i].arg2))
+      if ((at==dA2[i].arg1)
+      && (bt==dA2[i].arg2))
       {
-        res->rtyp=dArith2[i].res;
+        res->rtyp=dA2[i].res;
         if (currRing!=NULL)
         {
-          if (check_valid(dArith2[i].valid_for,op)) break;
+          if (check_valid(dA2[i].valid_for,op)) break;
         }
         if (traceit&TRACE_CALL)
           Print("call %s(%s,%s)\n",iiTwoOps(op),Tok2Cmdname(at),Tok2Cmdname(bt));
-        if ((call_failed=dArith2[i].p(res,a,b)))
+        if ((call_failed=dA2[i].p(res,a,b)))
         {
           break;// leave loop, goto error handling
         }
@@ -7796,32 +7795,32 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
       i++;
     }
     // implicite type conversion ----------------------------------------------
-    if (dArith2[i].cmd!=op)
+    if (dA2[i].cmd!=op)
     {
       int ai,bi;
       leftv an = (leftv)omAlloc0Bin(sleftv_bin);
       leftv bn = (leftv)omAlloc0Bin(sleftv_bin);
       BOOLEAN failed=FALSE;
-      i=index; /*iiTabIndex(dArithTab2,JJTAB2LEN,op);*/
+      i=0; /*iiTabIndex(dArithTab2,JJTAB2LEN,op);*/
       //Print("op: %c, type: %s %s\n",op,Tok2Cmdname(at),Tok2Cmdname(bt));
-      while (dArith2[i].cmd==op)
+      while (dA2[i].cmd==op)
       {
-        //Print("test %s %s\n",Tok2Cmdname(dArith2[i].arg1),Tok2Cmdname(dArith2[i].arg2));
-        if ((ai=iiTestConvert(at,dArith2[i].arg1))!=0)
+        //Print("test %s %s\n",Tok2Cmdname(dA2[i].arg1),Tok2Cmdname(dA2[i].arg2));
+        if ((ai=iiTestConvert(at,dA2[i].arg1))!=0)
         {
-          if ((bi=iiTestConvert(bt,dArith2[i].arg2))!=0)
+          if ((bi=iiTestConvert(bt,dA2[i].arg2))!=0)
           {
-            res->rtyp=dArith2[i].res;
+            res->rtyp=dA2[i].res;
             if (currRing!=NULL)
             {
-              if (check_valid(dArith2[i].valid_for,op)) break;
+              if (check_valid(dA2[i].valid_for,op)) break;
             }
             if (traceit&TRACE_CALL)
               Print("call %s(%s,%s)\n",iiTwoOps(op),
-              Tok2Cmdname(dArith2[i].arg1),Tok2Cmdname(dArith2[i].arg2));
-            failed= ((iiConvert(at,dArith2[i].arg1,ai,a,an))
-            || (iiConvert(bt,dArith2[i].arg2,bi,b,bn))
-            || (call_failed=dArith2[i].p(res,an,bn)));
+              Tok2Cmdname(dA2[i].arg1),Tok2Cmdname(dA2[i].arg2));
+            failed= ((iiConvert(at,dA2[i].arg1,ai,a,an))
+            || (iiConvert(bt,dA2[i].arg2,bi,b,bn))
+            || (call_failed=dA2[i].p(res,an,bn)));
             // everything done, clean up temp. variables
             if (failed)
             {
@@ -7864,7 +7863,7 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
         Werror("`%s` is not defined",s);
       else
       {
-        i=index; /*iiTabIndex(dArithTab2,JJTAB2LEN,op);*/
+        i=0; /*iiTabIndex(dArithTab2,JJTAB2LEN,op);*/
         s = iiTwoOps(op);
         if (proccall)
         {
@@ -7878,18 +7877,18 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
         }
         if ((!call_failed) && BVERBOSE(V_SHOW_USE))
         {
-          while (dArith2[i].cmd==op)
+          while (dA2[i].cmd==op)
           {
-            if(((at==dArith2[i].arg1)||(bt==dArith2[i].arg2))
-            && (dArith2[i].res!=0)
-            && (dArith2[i].p!=jjWRONG2))
+            if(((at==dA2[i].arg1)||(bt==dA2[i].arg2))
+            && (dA2[i].res!=0)
+            && (dA2[i].p!=jjWRONG2))
             {
               if (proccall)
                 Werror("expected %s(`%s`,`%s`)"
-                  ,s,Tok2Cmdname(dArith2[i].arg1),Tok2Cmdname(dArith2[i].arg2));
+                  ,s,Tok2Cmdname(dA2[i].arg1),Tok2Cmdname(dA2[i].arg2));
               else
                 Werror("expected `%s` %s `%s`"
-                  ,Tok2Cmdname(dArith2[i].arg1),s,Tok2Cmdname(dArith2[i].arg2));
+                  ,Tok2Cmdname(dA2[i].arg1),s,Tok2Cmdname(dA2[i].arg2));
             }
             i++;
           }
@@ -7903,14 +7902,14 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
   return TRUE;
 }
 BOOLEAN iiExprArith2Tab(leftv res, leftv a, int op,
-                                    struct sValCmd2* dArith2,int i,
+                                    struct sValCmd2* dA2,
                                     int at,
                                     struct sConvertTypes *dConvertTypes)
 {
   leftv b=a->next;
   a->next=NULL;
   int bt=b->Typ();
-  BOOLEAN bo=iiExprArith2TabIntern(res,a,op,b,TRUE,dArith2,i,at,bt,dConvertTypes);
+  BOOLEAN bo=iiExprArith2TabIntern(res,a,op,b,TRUE,dA2,at,bt,dConvertTypes);
   a->next=b;
   a->CleanUp();
   return bo;
@@ -7964,7 +7963,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
       else          return TRUE;
     }
     int i=iiTabIndex(dArithTab2,JJTAB2LEN,op);
-    return iiExprArith2TabIntern(res,a,op,b,proccall,dArith2,i,at,bt,dConvertTypes);
+    return iiExprArith2TabIntern(res,a,op,b,proccall,dArith2+i,at,bt,dConvertTypes);
   }
   a->CleanUp();
   b->CleanUp();
@@ -7975,7 +7974,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 /* must be ordered: first operations for chars (infix ops),
  * then alphabetically */
 
-BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dArith1, int i, int at, struct sConvertTypes *dConvertTypes)
+BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dA1, int at, struct sConvertTypes *dConvertTypes)
 {
   memset(res,0,sizeof(sleftv));
   BOOLEAN call_failed=FALSE;
@@ -7984,19 +7983,19 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dArith1, in
   {
     BOOLEAN failed=FALSE;
     iiOp=op;
-    int ti = i;
-    while (dArith1[i].cmd==op)
+    int i = 0;
+    while (dA1[i].cmd==op)
     {
-      if (at==dArith1[i].arg)
+      if (at==dA1[i].arg)
       {
         if (currRing!=NULL)
         {
-          if (check_valid(dArith1[i].valid_for,op)) break;
+          if (check_valid(dA1[i].valid_for,op)) break;
         }
         if (traceit&TRACE_CALL)
           Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(at));
-        res->rtyp=dArith1[i].res;
-        if ((call_failed=dArith1[i].p(res,a)))
+        res->rtyp=dA1[i].res;
+        if ((call_failed=dA1[i].p(res,a)))
         {
           break;// leave loop, goto error handling
         }
@@ -8011,26 +8010,26 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dArith1, in
       i++;
     }
     // implicite type conversion --------------------------------------------
-    if (dArith1[i].cmd!=op)
+    if (dA1[i].cmd!=op)
     {
       leftv an = (leftv)omAlloc0Bin(sleftv_bin);
-      i=ti;
+      i=0;
       //Print("fuer %c , typ: %s\n",op,Tok2Cmdname(at));
-      while (dArith1[i].cmd==op)
+      while (dA1[i].cmd==op)
       {
         int ai;
-        //Print("test %s\n",Tok2Cmdname(dArith1[i].arg));
-        if ((ai=iiTestConvert(at,dArith1[i].arg,dConvertTypes))!=0)
+        //Print("test %s\n",Tok2Cmdname(dA1[i].arg));
+        if ((ai=iiTestConvert(at,dA1[i].arg,dConvertTypes))!=0)
         {
           if (currRing!=NULL)
           {
-            if (check_valid(dArith1[i].valid_for,op)) break;
+            if (check_valid(dA1[i].valid_for,op)) break;
           }
           if (traceit&TRACE_CALL)
-            Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(dArith1[i].arg));
-          res->rtyp=dArith1[i].res;
-          failed= ((iiConvert(at,dArith1[i].arg,ai,a,an,dConvertTypes))
-          || (call_failed=dArith1[i].p(res,an)));
+            Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(dA1[i].arg));
+          res->rtyp=dA1[i].res;
+          failed= ((iiConvert(at,dA1[i].arg,ai,a,an,dConvertTypes))
+          || (call_failed=dA1[i].p(res,an)));
           // everything done, clean up temp. variables
           if (failed)
           {
@@ -8065,18 +8064,18 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dArith1, in
       }
       else
       {
-        i=ti;
+        i=0;
         const char *s = iiTwoOps(op);
         Werror("%s(`%s`) failed"
                 ,s,Tok2Cmdname(at));
         if ((!call_failed) && BVERBOSE(V_SHOW_USE))
         {
-          while (dArith1[i].cmd==op)
+          while (dA1[i].cmd==op)
           {
-            if ((dArith1[i].res!=0)
-            && (dArith1[i].p!=jjWRONG))
+            if ((dA1[i].res!=0)
+            && (dA1[i].p!=jjWRONG))
               Werror("expected %s(`%s`)"
-                ,s,Tok2Cmdname(dArith1[i].arg));
+                ,s,Tok2Cmdname(dA1[i].arg));
             i++;
           }
         }
@@ -8125,7 +8124,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     BOOLEAN failed=FALSE;
     iiOp=op;
     int i=iiTabIndex(dArithTab1,JJTAB1LEN,op);
-    return iiExprArith1Tab(res,a,op, dArith1, i,at,dConvertTypes);
+    return iiExprArith1Tab(res,a,op, dArith1+i,at,dConvertTypes);
   }
   a->CleanUp();
   return TRUE;
@@ -8136,31 +8135,33 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
  * then alphabetically */
 
 static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv c,
-  struct sValCmd3* dArith3,int i, int at, int bt, int ct,
+  struct sValCmd3* dA3, int at, int bt, int ct,
   struct sConvertTypes *dConvertTypes)
 {
   memset(res,0,sizeof(sleftv));
   BOOLEAN call_failed=FALSE;
 
+  assume(dA3[0].cmd==op);
+
   if (!errorreported)
   {
+    int i=0;
     iiOp=op;
-    int index=i;
-    while (dArith3[i].cmd==op)
+    while (dA3[i].cmd==op)
     {
-      if ((at==dArith3[i].arg1)
-      && (bt==dArith3[i].arg2)
-      && (ct==dArith3[i].arg3))
+      if ((at==dA3[i].arg1)
+      && (bt==dA3[i].arg2)
+      && (ct==dA3[i].arg3))
       {
-        res->rtyp=dArith3[i].res;
+        res->rtyp=dA3[i].res;
         if (currRing!=NULL)
         {
-          if (check_valid(dArith3[i].valid_for,op)) break;
+          if (check_valid(dA3[i].valid_for,op)) break;
         }
         if (traceit&TRACE_CALL)
           Print("call %s(%s,%s,%s)\n",
             iiTwoOps(op),Tok2Cmdname(at),Tok2Cmdname(bt),Tok2Cmdname(ct));
-        if ((call_failed=dArith3[i].p(res,a,b,c)))
+        if ((call_failed=dA3[i].p(res,a,b,c)))
         {
           break;// leave loop, goto error handling
         }
@@ -8172,36 +8173,36 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
       i++;
     }
     // implicite type conversion ----------------------------------------------
-    if (dArith3[i].cmd!=op)
+    if (dA3[i].cmd!=op)
     {
       int ai,bi,ci;
       leftv an = (leftv)omAlloc0Bin(sleftv_bin);
       leftv bn = (leftv)omAlloc0Bin(sleftv_bin);
       leftv cn = (leftv)omAlloc0Bin(sleftv_bin);
       BOOLEAN failed=FALSE;
-      i=index;
-      while ((dArith3[i].cmd!=op)&&(dArith3[i].cmd!=0)) i++;
-      while (dArith3[i].cmd==op)
+      i=0;
+      //while ((dA3[i].cmd!=op)&&(dA3[i].cmd!=0)) i++;
+      while (dA3[i].cmd==op)
       {
-        if ((ai=iiTestConvert(at,dArith3[i].arg1))!=0)
+        if ((ai=iiTestConvert(at,dA3[i].arg1))!=0)
         {
-          if ((bi=iiTestConvert(bt,dArith3[i].arg2))!=0)
+          if ((bi=iiTestConvert(bt,dA3[i].arg2))!=0)
           {
-            if ((ci=iiTestConvert(ct,dArith3[i].arg3))!=0)
+            if ((ci=iiTestConvert(ct,dA3[i].arg3))!=0)
             {
-              res->rtyp=dArith3[i].res;
+              res->rtyp=dA3[i].res;
               if (currRing!=NULL)
               {
-                if (check_valid(dArith3[i].valid_for,op)) break;
+                if (check_valid(dA3[i].valid_for,op)) break;
               }
               if (traceit&TRACE_CALL)
                 Print("call %s(%s,%s,%s)\n",
-                  iiTwoOps(op),Tok2Cmdname(dArith3[i].arg1),
-                  Tok2Cmdname(dArith3[i].arg2),Tok2Cmdname(dArith3[i].arg3));
-              failed= ((iiConvert(at,dArith3[i].arg1,ai,a,an))
-                || (iiConvert(bt,dArith3[i].arg2,bi,b,bn))
-                || (iiConvert(ct,dArith3[i].arg3,ci,c,cn))
-                || (call_failed=dArith3[i].p(res,an,bn,cn)));
+                  iiTwoOps(op),Tok2Cmdname(dA3[i].arg1),
+                  Tok2Cmdname(dA3[i].arg2),Tok2Cmdname(dA3[i].arg3));
+              failed= ((iiConvert(at,dA3[i].arg1,ai,a,an))
+                || (iiConvert(bt,dA3[i].arg2,bi,b,bn))
+                || (iiConvert(ct,dA3[i].arg3,ci,c,cn))
+                || (call_failed=dA3[i].p(res,an,bn,cn)));
               // everything done, clean up temp. variables
               if (failed)
               {
@@ -8255,24 +8256,24 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
         Werror("`%s` is not defined",s);
       else
       {
-        i=index;
-        while ((dArith3[i].cmd!=op)&&(dArith3[i].cmd!=0)) i++;
+        i=0;
+        //while ((dA3[i].cmd!=op)&&(dA3[i].cmd!=0)) i++;
         const char *s = iiTwoOps(op);
         Werror("%s(`%s`,`%s`,`%s`) failed"
                 ,s,Tok2Cmdname(at),Tok2Cmdname(bt),Tok2Cmdname(ct));
         if ((!call_failed) && BVERBOSE(V_SHOW_USE))
         {
-          while (dArith3[i].cmd==op)
+          while (dA3[i].cmd==op)
           {
-            if(((at==dArith3[i].arg1)
-            ||(bt==dArith3[i].arg2)
-            ||(ct==dArith3[i].arg3))
-            && (dArith3[i].res!=0))
+            if(((at==dA3[i].arg1)
+            ||(bt==dA3[i].arg2)
+            ||(ct==dA3[i].arg3))
+            && (dA3[i].res!=0))
             {
               Werror("expected %s(`%s`,`%s`,`%s`)"
-                  ,s,Tok2Cmdname(dArith3[i].arg1)
-                  ,Tok2Cmdname(dArith3[i].arg2)
-                  ,Tok2Cmdname(dArith3[i].arg3));
+                  ,s,Tok2Cmdname(dA3[i].arg1)
+                  ,Tok2Cmdname(dA3[i].arg2)
+                  ,Tok2Cmdname(dA3[i].arg3));
             }
             i++;
           }
@@ -8332,7 +8333,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
     iiOp=op;
     int i=0;
     while ((dArith3[i].cmd!=op)&&(dArith3[i].cmd!=0)) i++;
-    return iiExprArith3TabIntern(res,op,a,b,c,dArith3,i,at,bt,ct,dConvertTypes);
+    return iiExprArith3TabIntern(res,op,a,b,c,dArith3+i,at,bt,ct,dConvertTypes);
   }
   a->CleanUp();
   b->CleanUp();
@@ -8341,7 +8342,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
   return TRUE;
 }
 BOOLEAN iiExprArith3Tab(leftv res, leftv a, int op,
-                                    struct sValCmd3* dArith3,int i,
+                                    struct sValCmd3* dA3,
                                     int at,
                                     struct sConvertTypes *dConvertTypes)
 {
@@ -8351,7 +8352,7 @@ BOOLEAN iiExprArith3Tab(leftv res, leftv a, int op,
   leftv c=b->next;
   b->next=NULL;
   int ct=c->Typ();
-  BOOLEAN bo=iiExprArith3TabIntern(res,op,a,b,c,dArith3,i,at,bt,ct,dConvertTypes);
+  BOOLEAN bo=iiExprArith3TabIntern(res,op,a,b,c,dA3,at,bt,ct,dConvertTypes);
   b->next=c;
   a->next=b;
   a->CleanUp();
