@@ -1890,7 +1890,7 @@ static proc SSstep()
 
       
   // TODO: N  = SYZ( M )!!!
-  module N, LL, TT; (N, LL, TT) = SSComputeSyzygy(/*M, */L, T/*, @RANK*/); 
+  module N, LL, TT; (N, LL, TT) = SSComputeSyzygy(/*M, */L, T/*, @RANK*/);
 
   // shift syz.comp by @RANK:
   module Z;
@@ -2136,7 +2136,52 @@ example
   MRES;
 }
 
+static proc SRES_betti2(SRES SR, def a)
+{
+  def R = SR.r; setring R;
+  return ( betti(SR.rsltn, a) );
+}
 
+static proc SRES_betti1(SRES SR)
+{
+  def R = SR.r; setring R;
+  return ( betti(SR.rsltn) );  
+}
+
+static proc SRES_print(SRES SR)
+{
+  def R = SR.r; setring R;
+  "Schreyer resolution: ";
+  SR.rsltn; //  print ();
+  "over the ring: "; R;
+}
+
+proc SRES_list(SRES SR)
+{
+  def save = basering;  
+  def R = SR.r;
+
+  if( 0 )  // ( save == R ) // TODO: not implemented :(((
+  {
+    list L = SR.rsltn;
+    return (L);
+  }
+    
+  setring R;
+  list L = SR.rsltn;
+  setring save;  
+  return (imap( R, L ));
+}
+
+static proc SRES_minres(SRES SR)
+{
+  def save = basering;
+  SRES S;
+  def R = SR.r; S.r = R;
+  setring R;
+  S.rsltn = minres(SR.rsltn);
+  return (S);
+}
 
 static proc loadme()
 {
@@ -2151,14 +2196,14 @@ static proc loadme()
     listvar(Top);
     listvar(Schreyer);
   }
-//  listvar(Syzextra); listvar(Syzextra_g);
+//  listvar(Syzextra);
 
   if( !defined(DetailedPrint) )
   {
     if( 1 )
     {
 /*
-      if( @DEBUG )
+      if( system("with", "ndebug") )
       {
         "Loading the Debug version!";
       } else
@@ -2213,17 +2258,19 @@ static proc loadme()
 
       exportto(Schreyer, Syzextra::ComputeResolution);
 
-//      newstruct("SRESOLUTION","ring _r, resolution _res"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
-//      newstruct("SSYZYGY","ring _r, module _syz"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
+      newstruct("SRES","ring r,resolution rsltn"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
+      newstruct("SSYZ","ring r,module szg"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
       // TODO: SSres - return SRESOLUTION?
 
-//      system("install","SRESOLUTION","string",SRESOLUTION_string, 1);
-//      system("install","SRESOLUTION","print",SRESOLUTION_print, 1);
-//      system("install","SRESOLUTION","list",SRESOLUTION_list, 1);
+//      system("install","SRES","string",SRES_string, 1);
+      system("install","SRES","print",SRES_print, 1);
 
-//      system("install","SRESOLUTION","betti",SRESOLUTION_betti, 2); // http://www.singular.uni-kl.de/Manual/latest/sing_260.htm#SEC299
-//      system("install","SRESOLUTION","minres",SRESOLUTION_minres, 1); // http://www.singular.uni-kl.de/Manual/latest/sing_344.htm#SEC383
+      system("install","SRES","betti",SRES_betti1, 1); // http://www.singular.uni-kl.de/Manual/latest/sing_260.htm#SEC299
+      system("install","SRES","betti",SRES_betti2, 2); // http://www.singular.uni-kl.de/Manual/latest/sing_260.htm#SEC299
+      system("install","SRES","minres",SRES_minres, 1); // http://www.singular.uni-kl.de/Manual/latest/sing_344.htm#SEC383
 
+//      system("install","SRES","list", SRES_list, 1); // will never work :(((
+      
       // TODO: SSsyz? SSYZYGY? // TODO: C/C++ computation for Syzygy?
 //      system("install","SSYZYGY","string",SSYZYGY_string, 1);
 //      system("install","SSYZYGY","print",SSYZYGY_print, 1);
@@ -2529,6 +2576,23 @@ proc TestSSres(def I)
   SCheck(R);
   StopAddResTest(RR, S, @t,@m); 
   kill S, RR; setring save; kill R;
+}
+
+proc s_res(def I, int l)
+{
+  def R=SSinit(I); setring R; int @l = size(RES);
+  SRES ret; ret.r = R; 
+  ret.rsltn = ComputeResolution(RES[@l], LRES[@l], TRES[@l], l);
+  return (ret);
+}
+
+proc s_syz(def I)
+{
+  def R=SSinit(I); setring R;
+  int @l = size(RES); //   def M =  RES[@l];
+  module N, LL, TT; (N, LL, TT) = SSComputeSyzygy(LRES[@l], TRES[@l]);
+  SSYZ ret; ret.r = R; ret.szg = N; // Schreyer::ComputeResolution(RES[2], LRES[2], TRES[2], 0);
+  return (ret);
 }
 
 proc TestSSSres(def I)

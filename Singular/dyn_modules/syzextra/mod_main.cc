@@ -1120,7 +1120,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
 
   const BOOLEAN __DEBUG__      = attributes.__DEBUG__;
 
-  const char* usage = "`ComputeResolution(<ideal/module>[,int])` expected";
+  const char* usage = "`ComputeResolution(<ideal/module>, <same as before>, <same as before>[,int])` expected";
   const ring r = attributes.m_rBaseRing;
 
   NoReturn(res);
@@ -1132,6 +1132,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
     return TRUE;
   }
 
+  const int type = h->Typ();
   ideal M = (ideal)(h->CopyD()); // copy for resolution...!???
   int size = IDELEMS(M);
 
@@ -1140,7 +1141,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
   h = h->Next();
 
   // lead
-  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  if ((h==NULL) || (h->Typ()!=type) || (h->Data() == NULL))
   {
     WerrorS(usage);
     return TRUE;
@@ -1150,7 +1151,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
   assume( IDELEMS(L) == size );
 
   h = h->Next();
-  if ((h==NULL) || (h->Typ()!=IDEAL_CMD && h->Typ() !=MODUL_CMD) || (h->Data() == NULL))
+  if ((h==NULL) || (h->Typ()!=type) || (h->Data() == NULL))
   {
     WerrorS(usage);
     return TRUE;

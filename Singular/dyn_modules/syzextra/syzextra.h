@@ -65,7 +65,7 @@ struct SchreyerSyzygyComputationFlags
         __LEAD2SYZ__(attr.__LEAD2SYZ__),  __TAILREDSYZ__(attr.__TAILREDSYZ__),
         __HYBRIDNF__(attr.__HYBRIDNF__), __IGNORETAILS__(attr.__IGNORETAILS__),
         __SYZNUMBER__(attr.__SYZNUMBER__), __TREEOUTPUT__(attr.__TREEOUTPUT__),
-        __SYZCHECK__(attr.__SYZCHECK__),
+        __SYZCHECK__(attr.__SYZCHECK__), __PROT__(attr.__SYZCHECK__),
         m_rBaseRing(attr.m_rBaseRing)
     {}
 
@@ -98,7 +98,10 @@ struct SchreyerSyzygyComputationFlags
   const int __TREEOUTPUT__;
 
   /// CheckSyzygyProperty: TODO
-  const int __SYZCHECK__; 
+  const int __SYZCHECK__;
+
+  /// TEST_OPT_PROT
+  const bool __PROT__;
 
   /// global base ring
   const ring m_rBaseRing;
@@ -124,10 +127,27 @@ class CLeadingTerm
 {
   public:
     CLeadingTerm(unsigned int label,  const poly lt, const ring);
+
+#ifndef SING_NDEBUG
     ~CLeadingTerm();
+#endif
+   
+    bool DivisibilityCheck(const poly product, const unsigned long not_sev, const ring r) const;
+    bool DivisibilityCheck(const poly multiplier, const poly t, const unsigned long not_sev, const ring r) const;
 
+    bool CheckLT( const ideal & L ) const;
+
+#ifndef SING_NDEBUG
+    poly lt() const;    
+    unsigned long sev() const;
+    unsigned int label() const;
+#else
+    inline poly lt() const { return m_lt; };
+    inline unsigned long sev() const { return m_sev; };
+    inline unsigned int label() const { return m_label; };   
+#endif
+   
   private:
-
     const unsigned long m_sev; ///< not short exp. vector
     
     // NOTE/TODO: either of the following should be enough:
@@ -136,23 +156,9 @@ class CLeadingTerm
     const poly          m_lt; ///< the leading term itself L[label-1]
 
 #ifndef SING_NDEBUG
-    const ring _R;  const poly          m_lt_copy; ///< original copy of lt (only for debug!!!)
-#endif
-    
-
-  public:
-    
-    bool DivisibilityCheck(const poly product, const unsigned long not_sev, const ring r) const;
-    bool DivisibilityCheck(const poly multiplier, const poly t, const unsigned long not_sev, const ring r) const;
-
-    bool CheckLT( const ideal & L ) const;
-
-    poly lt() const;    
-    unsigned long sev() const;
-    unsigned int label() const;
-
-  private:
-
+    const ring _R;  const poly          m_lt_copy; ///< original copy of LEAD(lt) (only for debug!!!)
+#endif  
+   
     // disable the following:
     CLeadingTerm();
     CLeadingTerm(const CLeadingTerm&);

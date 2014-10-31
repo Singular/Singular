@@ -592,14 +592,14 @@ void SchreyerSyzygyComputation::SetUpTailTerms()
   assume( idTails->m != NULL );
   const ring r = m_rBaseRing;
 
+  unsigned long pp[4] = {0,0,0,0}; // count preprocessed terms...
+  
 #ifndef SING_NDEBUG
   if( __DEBUG__ | 0)
   {
     PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): Tails: \n");
     dPrint(idTails, r, r, 0);
   }
-
-  unsigned long pp[4] = {0,0,0,0}; // count preprocessed terms...
 #endif
 
   for( int p = IDELEMS(idTails) - 1; p >= 0; --p )
@@ -609,9 +609,8 @@ void SchreyerSyzygyComputation::SetUpTailTerms()
       const int k = m_div.PreProcessTerm(t, m_checker); // 0..3
       assume( 0 <= k && k <= 3 );
 
-#ifndef SING_NDEBUG
-      pp[k]++;
-#endif
+      if( __PROT__ )
+        pp[k]++;
 
       if( k )
       {
@@ -632,12 +631,6 @@ void SchreyerSyzygyComputation::SetUpTailTerms()
 
 #ifndef SING_NDEBUG
   if( !__TREEOUTPUT__ )
-  if( TEST_OPT_PROT | 1)
-    Print("%%      **!!**      SchreyerSyzygyComputation::SetUpTailTerms()::PreProcessing(): X: {c: %lu, C: %lu, P: %lu} + %lu\n", pp[1], pp[2], pp[3], pp[0]);
-#endif
-
-#ifndef SING_NDEBUG
-  if( !__TREEOUTPUT__ )
   if( __DEBUG__ | 0)
   {
     PrintS("SchreyerSyzygyComputation::SetUpTailTerms(): Preprocessed Tails: \n");
@@ -645,6 +638,10 @@ void SchreyerSyzygyComputation::SetUpTailTerms()
   }
 #endif
 
+  if( __PROT__ )
+    Print("(PP/ST: {c: %lu, C: %lu, P: %lu} + %lu)", pp[1], pp[2], pp[3], pp[0]);
+
+  
 }
 /*
   m_idTailTerms.resize( IDELEMS(idTails) );
@@ -961,8 +958,10 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
   
   if( __TREEOUTPUT__ )
   {
-     PrintS("{ \"proc\": \"TraverseNF\", \"nodelabel\": \""); writeLatexTerm(a, R); PrintS("\", \"children\": [");
-  }
+     PrintS("{ \"proc\": \"TraverseNF\", \"nodelabel\": \""); 
+     writeLatexTerm(a, R); 
+     PrintS("\", \"children\": [");
+  }   
 
   poly aa = leadmonom(a, R); assume( aa != NULL); // :(
 
@@ -982,7 +981,10 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
     if( __TREEOUTPUT__ )
     {
-       PrintS("{ \"proc\": \"TraverseNF2\", \"nodelabel\": \""); writeLatexTerm(a2, R); PrintS("\", \"children\": [");
+  
+       PrintS("{ \"proc\": \"TraverseNF2\", \"nodelabel\": \""); 
+       writeLatexTerm(a2, R); 
+       PrintS("\", \"children\": [");
     }
 
     // replace the following... ?
@@ -1004,7 +1006,12 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 #endif
 
     if( __TREEOUTPUT__ )
-      PrintS("], \"noderesult\": \""); writeLatexTerm(t, R, true, false); PrintS("\" },");
+    {
+       PrintS("], \"noderesult\": \"");
+       writeLatexTerm(t, R, true, false);
+       PrintS("\" },");
+    }
+     
     
   } else
     t = p_Add_q(t, ReduceTerm(aa, L->m[r], a), R);
@@ -1013,9 +1020,11 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
   if( __TREEOUTPUT__ )
   {
-    poly tt = pp_Add_qq( a, t, R);    
-    PrintS("], \"noderesult\": \""); writeLatexTerm(tt, R, true, false); PrintS("\" },");
-    p_Delete(&tt, R);
+     poly tt = pp_Add_qq( a, t, R);    
+     PrintS("], \"noderesult\": \"");
+     writeLatexTerm(tt, R, true, false);
+     PrintS("\" },");
+     p_Delete(&tt, R);
   }
 #ifndef SING_NDEBUG
   if( __DEBUG__ )
@@ -1071,27 +1080,26 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 #endif
 
   if( __TREEOUTPUT__ )
-  {
     Print("\n{ \"syzygylayer\": \"%d\", \"hybridnf\": \"%d\", \"diagrams\": \n[", __SYZNUMBER__, __HYBRIDNF__ );
-  }
+  
+  if( __PROT__ )
+    Print("SYZ{%d}:", __SYZNUMBER__ );
 
   if( m_syzLeads == NULL )
   {
 #ifndef SING_NDEBUG
-    if( !__TREEOUTPUT__ )
-    if( TEST_OPT_PROT | 1)
+    if( __PROT__ )
     {
       t = getTimer(); r = getRTimer();
-      Print("%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: t: %d, r: %d\n", r, t, r);
+      Print("\n%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: t: %d, r: %d\n", r, t, r);
     }
 #endif
     ComputeLeadingSyzygyTerms( __LEAD2SYZ__ && !__IGNORETAILS__ ); // 2 terms OR 1 term!
 #ifndef SING_NDEBUG
-    if( !__TREEOUTPUT__ )
-    if( TEST_OPT_PROT | 1)
+    if( __PROT__ )
     {
       t = getTimer() - t; r = getRTimer() - r;
-      Print("%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: dt: %d, dr: %d\n", getRTimer(), t, r);
+      Print("\n%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::ComputeLeadingSyzygyTerms: dt: %d, dr: %d\n", getRTimer(), t, r);
     }
 #endif
 
@@ -1111,40 +1119,39 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   }
 
 
-  // use hybrid method?
-  const bool method = (__HYBRIDNF__  == 1) || (__HYBRIDNF__ == 2 && __SYZNUMBER__ < 3);
+  // use hybrid (Schreyer NF) method?
+  const bool method = (__HYBRIDNF__  == 1); //  || (__HYBRIDNF__ == 2 && __SYZNUMBER__ < 3);
+
 
   if(  !__IGNORETAILS__)
   {
     if( T != NULL )
     {
 #ifndef SING_NDEBUG
-      if( !__TREEOUTPUT__ )
-      if( TEST_OPT_PROT | 1 )
+      if( __PROT__ )
       {
         t = getTimer(); r = getRTimer();
-        Print("%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): t: %d, r: %d\n", r, t, r);
+        Print("\n%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): t: %d, r: %d\n", r, t, r);
       }
 #endif
 
       SetUpTailTerms();
+       
 #ifndef SING_NDEBUG
-      if( !__TREEOUTPUT__ )
-      if( TEST_OPT_PROT | 1)
+      if( __PROT__ )
       {
         t = getTimer() - t; r = getRTimer() - r;
-        Print("%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): dt: %d, dr: %d\n", getRTimer(), t, r);
+        Print("\n%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SetUpTailTerms(): dt: %d, dr: %d\n", getRTimer(), t, r);
       }
 #endif
     }
   }
 
 #ifndef SING_NDEBUG
-  if( !__TREEOUTPUT__ )
-  if( TEST_OPT_PROT | 1)
+  if( __PROT__ )
   {
     t = getTimer(); r = getRTimer();
-    Print("%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: t: %d, r: %d\n", r, t, r);
+    Print("\n%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: t: %d, r: %d\n", r, t, r);
   }
 #endif
 
@@ -1206,23 +1213,8 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 
     TT->m[k] = nf; // ???
     
-#ifndef SING_NDEBUG
-    if( __DEBUG__ )
-    {
-      m_div.Verify();
-      m_checker.Verify();
-    }
-#endif
-
     if( __SYZCHECK__ )      
     {
-#ifndef SING_NDEBUG
-      if( __DEBUG__ )
-      {
-      m_div.Verify();
-        m_checker.Verify();
-      }
-#endif
       // TODO: check the correctness (syzygy property): a + TT->m[k] should be a syzygy!!!
 
       poly s = pp_Add_qq( a, TT->m[k], R); // current syzygy
@@ -1263,14 +1255,17 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 #ifndef SING_NDEBUG
         if( __DEBUG__ )
         {
-	  m_div.Verify();
-	  m_checker.Verify(); 
+          m_div.Verify();
+          m_checker.Verify(); 
         }
 #endif
         
       } else
         assume( vp == NULL );
 
+      if( __PROT__ )
+        Print("@*[%d]%s=0@", k, (vp == NULL)? "!" : "=");
+      
       p_Delete(&vp, R);
     }
 
@@ -1284,18 +1279,20 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   }
 
 #ifndef SING_NDEBUG
-  if( !__TREEOUTPUT__ )
-  if( TEST_OPT_PROT | 1)
-  {
-    t = getTimer() - t; r = getRTimer() - r;
-    Print("%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: dt: %d, dr: %d\n", getRTimer(), t, r);
-  }
+    if( __PROT__ )
+    {
+      t = getTimer() - t; r = getRTimer() - r;
+      Print("\n%% %5d **!TIME4!** SchreyerSyzygyComputation::ComputeSyzygy::SyzygyLift: dt: %d, dr: %d\n", getRTimer(), t, r);
+    }
 #endif
 
   TT->rank = id_RankFreeModule(TT, R);
 
   if( __TREEOUTPUT__ )
     PrintS("\n]},");
+  
+  if( __PROT__ )
+    PrintLn();
 }
 
 void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTerms)
@@ -1341,6 +1338,10 @@ void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTer
 #endif
     assume( m_checker.IsNonempty() ); // TODO: this always fails... BUG????
   }
+
+  if( __PROT__ )
+    Print("[L%dS:%d]", bComputeSecondTerms ? 2 : 1, IDELEMS(m_syzLeads));
+      
 }
 
 #define NOPRODUCT 1
@@ -1373,6 +1374,9 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
     PrintS("{   \"nodelabel\": \""); writeLatexTerm(syz_lead, r);
     PrintS("\", \"children\": [");
   }
+  
+  if( __PROT__ )
+    Print("(NF:PR, %s)", (NOPRODUCT == 1)? "*_*": "-*-" );
 
   if( syz_2 == NULL )
   {
@@ -1475,6 +1479,10 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
 
       sBucket_Add_p(tail, t, 1); // tail.AddAndDelete(t, 1);
     } // otherwise discard that leading term altogether!
+    else
+      if( __PROT__ )
+        PrintS("$");
+    
     kbTest(bucket);
   }
 
@@ -1544,6 +1552,11 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
   assume(m_idTails !=  NULL && m_idTails->m != NULL);
   assume( tail >= 0 && tail < IDELEMS(m_idTails) );
 
+
+  if( __PROT__ )
+    Print("(NF:TT, %s)", (NOPRODUCT == 1)? "*_*": "-*-" );
+  
+
 /*  return ComputeImage(multiplier, tail); */
 
   // TODO: store (multiplier, tail) -.-^-.-^-.--> !
@@ -1590,9 +1603,16 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
            omFree(s);
          }
          
+         if( __PROT__ )
+           PrintS("l*");
+           
+         
          p = p_Mult_nn(p, n, r); // !
-         n_Delete(&n, r);
-       }
+         n_Delete(&n, r);        
+       } else
+         if( __PROT__ )
+           PrintS("l=");
+       
 
        if( __TREEOUTPUT__ )
        {
@@ -1619,6 +1639,9 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
        PrintS("], \"noderesult\": \""); writeLatexTerm(p, r, true, false); PrintS("\" },");
      }
 
+     if( __PROT__ )
+       Print("s%d", tail + 1);
+
      T.insert( TP2PCache::value_type(p_Copy(multiplier, r), p) ); //     T[ multiplier ] = p;
 
 //     if( p == NULL )
@@ -1642,13 +1665,15 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
     Print("{ \"proc\": \"TTStore%d\", \"nodelabel\": \"", 0); writeLatexTerm(multiplier, r, false); Print(" \\\\GEN{%d}\", \"children\": [", tail + 1);
   }
 
-
   const poly p = ComputeImage(multiplier, tail);
 
   if( __TREEOUTPUT__ )
   {
     PrintS("], \"noderesult\": \""); writeLatexTerm(p, r, true, false); PrintS("\" },");
   }
+
+  if( __PROT__ )
+    Print("s%d", tail + 1);
   
   T.insert( TP2PCache::value_type(p_Copy(multiplier, r), p) );
 
@@ -1725,7 +1750,12 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 #endif
 
   if(!(  (!__TAILREDSYZ__)   ||   m_lcm.Check(multiplier)     ))
+  {
+    if( __TAILREDSYZ__ && __PROT__ )
+      PrintS("%");
+    
     return NULL;
+  }
     
   //    const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(tail) < MIN_LENGTH_BUCKET);
 
@@ -1836,7 +1866,12 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
     s = m_div.FindReducer(multiplier, term4reduction, syztermCheck, m_checker);
     
     if( s == NULL ) // No Reducer?
-     return s;
+    {      
+      if( __PROT__ )
+        PrintS("$" );
+      
+      return s;
+    }
 
     if( __TREEOUTPUT__ )
     {
@@ -1851,7 +1886,12 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
     s = m_div.FindReducer(product, syztermCheck, m_checker); // ??
 
     if( s == NULL ) // No Reducer?
-     return s;
+    {
+      if( __PROT__ )
+        PrintS("$" );
+
+      return s;
+    }
 
     if( __TREEOUTPUT__ )
     {
@@ -1871,7 +1911,12 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
 #endif
 
   if( s == NULL ) // No Reducer?
+  {
+    if( __TAILREDSYZ__&& __PROT__ )
+      PrintS("%" );
+    
     return s;
+  }
   
   poly b = leadmonom(s, r);
 
@@ -1920,11 +1965,12 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
     __DEBUG__( atGetInt(rootRingHdl,"DEBUG", 0) ),
     __LEAD2SYZ__( atGetInt(rootRingHdl, "LEAD2SYZ", 0) ),
     __TAILREDSYZ__( atGetInt(rootRingHdl, "TAILREDSYZ", 1) ),
-    __HYBRIDNF__( atGetInt(rootRingHdl, "HYBRIDNF", 1) ),
+    __HYBRIDNF__( atGetInt(rootRingHdl, "HYBRIDNF", 0) ),
     __IGNORETAILS__( atGetInt(rootRingHdl, "IGNORETAILS", 0) ),
     __SYZNUMBER__( atGetInt(rootRingHdl, "SYZNUMBER", 0) ),
     __TREEOUTPUT__( atGetInt(rootRingHdl, "TREEOUTPUT", 0) ),
     __SYZCHECK__( atGetInt(rootRingHdl, "SYZCHECK", 0) ),
+    __PROT__(TEST_OPT_PROT),
     m_rBaseRing( rootRingHdl->data.uring )
 {
 #ifndef SING_NDEBUG
@@ -1953,51 +1999,45 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
 CLeadingTerm::CLeadingTerm(unsigned int _label,  const poly _lt, const ring R):
     m_sev( p_GetShortExpVector(_lt, R) ),  m_label( _label ),  m_lt( _lt )
 #ifndef SING_NDEBUG
-    , _R(R), m_lt_copy( p_Copy(_lt, R) )
+    , _R(R), m_lt_copy( p_Head(_lt, R) )
 #endif  
-    
 {
-  assume( pNext(_lt) == NULL );
+#ifndef SING_NDEBUG
+  assume( pNext(m_lt_copy) == NULL );
+#endif  
   assume( sev() == p_GetShortExpVector(lt(), R) );
 }
 
+#ifndef SING_NDEBUG
 CLeadingTerm::~CLeadingTerm()
 {
-#ifndef SING_NDEBUG
-  assume( p_EqualPolys(m_lt, m_lt_copy, _R) );
+  assume( p_LmEqual(m_lt, m_lt_copy, _R) );
   assume( m_sev == p_GetShortExpVector(m_lt, _R) );
   
   poly p = const_cast<poly>(m_lt_copy);
   p_Delete(&p, _R);
-#endif  
 }
-
 poly CLeadingTerm::lt() const
 {
-#ifndef SING_NDEBUG
-//  assume( (long)(*m_lt) == (long)(*m_lt_copy) );
-  assume( p_EqualPolys(m_lt, m_lt_copy, _R) );
+  assume( p_LmEqual(m_lt, m_lt_copy, _R) );
   assume( m_sev == p_GetShortExpVector(m_lt, _R) );  
-#endif
   return m_lt;
 }
+
 unsigned long CLeadingTerm::sev() const
 {
-#ifndef SING_NDEBUG
-  assume( p_EqualPolys(m_lt, m_lt_copy, _R) );
+  assume( p_LmEqual(m_lt, m_lt_copy, _R) );
   assume( m_sev == p_GetShortExpVector(m_lt, _R) );  
-#endif
   return m_sev;
 }
 
 unsigned int CLeadingTerm::label() const
 {
-#ifndef SING_NDEBUG
-  assume( p_EqualPolys(m_lt, m_lt_copy, _R) );
+  assume( p_LmEqual(m_lt, m_lt_copy, _R) );
   assume( m_sev == p_GetShortExpVector(m_lt, _R) );  
-#endif
   return m_label;
 }
+#endif  
 
 
 
