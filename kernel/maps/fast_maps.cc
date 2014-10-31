@@ -438,6 +438,7 @@ static int maPoly_Substitute(macoeff c, poly p, ring dest_r)
   // substitute the monomial: go through macoeff
   int len;
   BOOLEAN zero_div= (rField_is_Ring(dest_r) && !rField_is_Domain(dest_r));
+  if (!zero_div) len=pLength(p);
   int done=0;
   while (c!=NULL)
   {
