@@ -1775,7 +1775,6 @@ static inline BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, const ri
 static inline BOOLEAN p_IsConstantComp(const poly p, const ring r)
 {
   if (p == NULL) return TRUE;
-  p_Test(p, r);
   return (pNext(p)==NULL) && p_LmIsConstantComp(p, r);
 }
 

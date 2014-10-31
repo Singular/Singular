@@ -1313,7 +1313,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
     si_opt_1 |= Sy_bit(OPT_SB_1);
   }
   idDelete(&temph1);
-  idTest(h4);
+  //idTest(h4);//see remark at the beginning
   return h4;
 }
 /*2
