@@ -422,6 +422,7 @@ proc primaryTest (ideal i, poly p)
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
+  if(i[1]==1){return(ideal(1));}
   int m=1;
   int n=nvars(basering);
   int e,f;
