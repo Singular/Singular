@@ -8844,7 +8844,6 @@ extBiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       A= A.mapinto();
       ExtensionInfo info2= ExtensionInfo (extension);
       factors= biFactorize (A, info2);
-      normalize(factors);
 
       CanonicalForm mipo= gf_mipo;
       setCharacteristic (getCharacteristic());
