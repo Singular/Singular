@@ -160,6 +160,7 @@ Short/eliminate_7.tst
 Short/elimlib_s.tst
 Short/equising_s.tst
 ;;;; Short/facstd.tst
+Short/factorize_mod7.tst
 Short/factorizep_s.tst
 Short/factorizeQa_s.tst
 Short/factorizeQ_s.tst
