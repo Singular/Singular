@@ -7710,7 +7710,7 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
 
   if (success)
   {
-    F= H;
+    F= H/Lc(H);
     delete [] bounds;
     bounds= computeBounds (F, d, isIrreducible);
     if (isIrreducible)
