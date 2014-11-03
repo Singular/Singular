@@ -56,6 +56,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define NOPRODUCT 1
+
 // USING_NAMESPACE_SINGULARXX;
 USING_NAMESPACE( SINGULARXXNAME :: DEBUG )
 
@@ -1122,6 +1124,15 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   // use hybrid (Schreyer NF) method?
   const bool method = (__HYBRIDNF__  == 1); //  || (__HYBRIDNF__ == 2 && __SYZNUMBER__ < 3);
 
+  if( __PROT__ )
+     {
+	if (method)
+	  Print("(NF:PR, %s)", (NOPRODUCT == 1)? "*_*": "-*-" );
+	else
+	  Print("(NF:TT, %s)", (NOPRODUCT == 1)? "*_*": "-*-" );
+     }
+   
+   
 
   if(  !__IGNORETAILS__)
   {
@@ -1263,8 +1274,8 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
       } else
         assume( vp == NULL );
 
-      if( __PROT__ )
-        Print("@*[%d]%s=0@", k, (vp == NULL)? "!" : "=");
+      if( __PROT__ && (vp != NULL) )
+        Print("!%d!", k); // check k'th syzygy failed
       
       p_Delete(&vp, R);
     }
@@ -1344,8 +1355,6 @@ void SchreyerSyzygyComputation::ComputeLeadingSyzygyTerms(bool bComputeSecondTer
       
 }
 
-#define NOPRODUCT 1
-
 poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2) const
 {
   assume( !__IGNORETAILS__ );
@@ -1375,9 +1384,6 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
     PrintS("\", \"children\": [");
   }
   
-  if( __PROT__ )
-    Print("(NF:PR, %s)", (NOPRODUCT == 1)? "*_*": "-*-" );
-
   if( syz_2 == NULL )
   {
     const int rr = p_GetComp(syz_lead, r) - 1;
@@ -1481,7 +1487,7 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
     } // otherwise discard that leading term altogether!
     else
       if( __PROT__ )
-        PrintS("$");
+        PrintS("$"); // LOT
     
     kbTest(bucket);
   }
@@ -1553,8 +1559,6 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
   assume( tail >= 0 && tail < IDELEMS(m_idTails) );
 
 
-  if( __PROT__ )
-    Print("(NF:TT, %s)", (NOPRODUCT == 1)? "*_*": "-*-" );
   
 
 /*  return ComputeImage(multiplier, tail); */
@@ -1604,14 +1608,14 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
          }
          
          if( __PROT__ )
-           PrintS("l*");
+           PrintS("l*"); // lookup & rescale
            
          
          p = p_Mult_nn(p, n, r); // !
          n_Delete(&n, r);        
        } else
          if( __PROT__ )
-           PrintS("l=");
+           PrintS("l"); // lookup no rescale
        
 
        if( __TREEOUTPUT__ )
@@ -1640,7 +1644,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
      }
 
      if( __PROT__ )
-       Print("s%d", tail + 1);
+       PrintS("S"); // store
 
      T.insert( TP2PCache::value_type(p_Copy(multiplier, r), p) ); //     T[ multiplier ] = p;
 
@@ -1673,7 +1677,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
   }
 
   if( __PROT__ )
-    Print("s%d", tail + 1);
+    PrintS("S"); // %d", tail + 1);
   
   T.insert( TP2PCache::value_type(p_Copy(multiplier, r), p) );
 
@@ -1752,7 +1756,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
   if(!(  (!__TAILREDSYZ__)   ||   m_lcm.Check(multiplier)     ))
   {
     if( __TAILREDSYZ__ && __PROT__ )
-      PrintS("%");
+      PrintS("%"); // check LCM !
     
     return NULL;
   }
@@ -1868,7 +1872,7 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
     if( s == NULL ) // No Reducer?
     {      
       if( __PROT__ )
-        PrintS("$" );
+        PrintS("$" ); // LOT?!
       
       return s;
     }
@@ -1888,7 +1892,7 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
     if( s == NULL ) // No Reducer?
     {
       if( __PROT__ )
-        PrintS("$" );
+        PrintS("$" ); // LOT?!
 
       return s;
     }
@@ -1913,7 +1917,7 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
   if( s == NULL ) // No Reducer?
   {
     if( __TAILREDSYZ__&& __PROT__ )
-      PrintS("%" );
+      PrintS("%" ); // LCM check
     
     return s;
   }

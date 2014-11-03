@@ -65,7 +65,7 @@ struct SchreyerSyzygyComputationFlags
         __LEAD2SYZ__(attr.__LEAD2SYZ__),  __TAILREDSYZ__(attr.__TAILREDSYZ__),
         __HYBRIDNF__(attr.__HYBRIDNF__), __IGNORETAILS__(attr.__IGNORETAILS__),
         __SYZNUMBER__(attr.__SYZNUMBER__), __TREEOUTPUT__(attr.__TREEOUTPUT__),
-        __SYZCHECK__(attr.__SYZCHECK__), __PROT__(attr.__SYZCHECK__),
+        __SYZCHECK__(attr.__SYZCHECK__), __PROT__(attr.__PROT__),
         m_rBaseRing(attr.m_rBaseRing)
     {}
 
