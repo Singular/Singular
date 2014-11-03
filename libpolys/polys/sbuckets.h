@@ -18,12 +18,12 @@ struct  spolyrec; typedef struct spolyrec polyrec; typedef polyrec* poly;
 struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* const_ring;
 
 
+
 //////////////////////////////////////////////////////////////////////////
 // Creation/Destruction of buckets
 //
 sBucket_pt    sBucketCreate(ring r);
 void          sBucketDestroy(sBucket_pt *bucket);
-
 
 //////////////////////////////////////////////////////////////////////////
 // New API:
@@ -34,6 +34,11 @@ sBucket_pt    sBucketCopy(const sBucket_pt bucket);
 
 /// Returns bucket ring
 ring sBucketGetRing(const sBucket_pt bucket);
+
+/// Test whether bucket is empty!?
+bool sIsEmpty(const sBucket_pt bucket);
+
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Convertion from/to SBpolys

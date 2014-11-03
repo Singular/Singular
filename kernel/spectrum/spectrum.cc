@@ -31,7 +31,7 @@
 //extern ring currRing;
 
 #include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <kernel/spectrum/multicnt.h>
 #include <kernel/spectrum/GMPrat.h>
 #include <kernel/spectrum/kmatrix.h>

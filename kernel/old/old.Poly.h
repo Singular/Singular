@@ -613,7 +613,7 @@ inline PolyBase<variant, create_type, error_traits>&
 PolyBase<variant, create_type, error_traits>::operator*=(const Poly & p2){
     copy_on_write();
     *ptr *= *p2.ptr;
- 
+
     return *this;
   }
 #endif

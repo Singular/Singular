@@ -57,16 +57,16 @@ extern moddef module_def;
 extern int yylineno;
 extern int do_create_makefile;
 extern char *sectname[];
- 
+
 extern int init_modgen(moddef *module_def, char *filename);
 extern int write_intro(moddefv module);
 extern void write_mod_init(moddefv module, FILE *fp);
 extern void enter_id(FILE *fp, char *name, char *value,
                      int lineno, char *file);
- 
+
 procdef procedure_decl;
 
- 
+
 void yyerror(char * fmt)
   {
     if(!iseof) printf("%s at line %d\n", fmt, yylineno);
@@ -952,7 +952,7 @@ case 15:
           int rc = 0;
           void (*write_cmd)(moddefv module, var_token type,
                             idtyp t, void *arg1, void *arg2);
-          
+
           switch(sectnum) {
               case 1: /* pass 1: */
                 if( (vt=checkvar(yyvsp[-2].name, VAR_STRING, &write_cmd)) ) {
@@ -978,7 +978,7 @@ case 15:
                 }
                 break;
               default: break;
-                
+
           }
           free(yyvsp[-2].name);
           free(yyvsp[0].sv.string);
@@ -1000,7 +1000,7 @@ case 16:
                 }
                 break;
               default: break;
-                
+
           }
           free(yyvsp[-2].name);
           free(yyvsp[0].name);
@@ -1020,7 +1020,7 @@ case 17:
                 }
                 break;
               default: break;
-                
+
           }
           free(yyvsp[-2].name);
           //free($3);
@@ -1040,7 +1040,7 @@ case 18:
                 }
                 break;
               default: break;
-                
+
           }
           free(yyvsp[-2].name);
         ;
@@ -1072,7 +1072,7 @@ case 19:
                 }
                 break;
               default: break;
-                
+
           }
           free(yyvsp[-2].name);
           if(rc)return(rc);
@@ -1154,7 +1154,7 @@ case 36:
 #line 391 "mod_grammar.y"
 {
           init_proc(&procedure_decl, yyvsp[0].name, NULL, yylineno, LANG_SINGULAR);
-          free(yyvsp[0].name); 
+          free(yyvsp[0].name);
           if(write_singular_procedures(&module_def, &procedure_decl))
             return(myyyerror("Error while creating bin-file\n"));
         ;
@@ -1286,7 +1286,7 @@ case 56:
 {
           long len = strlen(yyvsp[0].name);
           long newlen = procedure_decl.example_len + len;
-          
+
           procedure_decl.example_string =
             (char *)realloc((void *)procedure_decl.example_string, newlen+1);
           memset(procedure_decl.example_string+procedure_decl.example_len,
@@ -1300,7 +1300,7 @@ case 57:
 #line 521 "mod_grammar.y"
 { cmd_token vt;
           void (*write_cmd)(moddefv module, procdefv pi, void *arg);
-          
+
           switch(vt=checkcmd(yyvsp[-1].name, &write_cmd, CMDT_SINGLE, 0)) {
               case CMD_NONE:
                 return(myyyerror("Line %d: Unknown command '%s' in section %d\n",
@@ -1330,7 +1330,7 @@ case 58:
 {
           cmd_token vt;
           void (*write_cmd)(moddefv module, procdefv pi, void *arg);
-          
+
           switch(vt=checkcmd(yyvsp[-3].name, &write_cmd, CMDT_0, 1)) {
               case CMD_NONE:
                 return(myyyerror("Line %d: Unknown command '%s' in section %d\n",
@@ -1354,7 +1354,7 @@ case 59:
 {
           cmd_token vt;
           void (*write_cmd)(moddefv module, procdefv pi, void *arg);
-          
+
           switch(vt=checkcmd(yyvsp[-4].name, &write_cmd, CMDT_ANY, 1)) {
               case CMD_NONE:
                 return(myyyerror("Line %d: Unknown command '%s' in section %d\n",
@@ -1378,7 +1378,7 @@ case 60:
 {
           cmd_token vt;
           void (*write_cmd)(moddefv module, procdefv pi, void *arg);
-          
+
           switch(vt=checkcmd(yyvsp[-7].name, &write_cmd, CMDT_ANY, 1)) {
               case CMD_NONE:
                 return(myyyerror("Line %d: Unknown command '%s' in section %d\n",
@@ -1402,7 +1402,7 @@ case 61:
 {
           cmd_token vt;
           void (*write_cmd)(moddefv module, procdefv pi, void *arg);
-          
+
           switch(vt=checkcmd(yyvsp[-2].name, &write_cmd, CMDT_EQ, 0)) {
               case CMD_NONE:
                 return(myyyerror("Line %d: Unknown command '%s' in section %d\n",
@@ -1494,7 +1494,7 @@ case 70:
 case 71:
 #line 694 "mod_grammar.y"
 {
-          if(check_reseverd(yyvsp[0].name)) 
+          if(check_reseverd(yyvsp[0].name))
             return(myyyerror("Line %d: variablename '%s' is reserved\n",
                             yylineno, yyvsp[0].name));
           AddParam(&procedure_decl, &yyvsp[-1].tp, yyvsp[0].name);
@@ -1511,7 +1511,7 @@ case 72:
 case 73:
 #line 707 "mod_grammar.y"
 {
-          if(check_reseverd(yyvsp[0].name)) 
+          if(check_reseverd(yyvsp[0].name))
             return(myyyerror("Line %d: variablename '%s' is reserved\n",
                             yylineno, yyvsp[0].name));
           AddParam(&procedure_decl, &yyvsp[-1].tp, yyvsp[0].name);

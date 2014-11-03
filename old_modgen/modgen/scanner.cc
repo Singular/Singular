@@ -712,7 +712,7 @@ char *yytext;
 #include "mod_grammar.h"
 
 #define DEBUG 3
- 
+
 #  define YYLP_ERR_NONE    0
 #  define YYLP_DEF_BR2     1
 #  define YYLP_BODY_BR2    2
@@ -743,9 +743,9 @@ char *yytext;
   extern procdef procedure_decl;
 
   char *sectname[] = { "sect -0", "section 1",
-                       "Singular", "procedures", "C-part" 
+                       "Singular", "procedures", "C-part"
   };
-  
+
   struct _states {
     char name[32];
     int state;
@@ -756,13 +756,13 @@ char *yytext;
   int read_string(char **buffer, long *start, long end);
   int libread(FILE* f, char* buf, int max_size);
   void add_action(char *new_text);
- 
+
   void push_state(int state, int new_state, char *name);
   void switch_state(int state, int new_state, char *name);
   void pop_state();
   int return_sect_token(int passed, int old_sect, int new_sect);
   extern int init_modgen(moddef *module_def, char *filename);
- 
+
 static char * dupyytext()
 {
   if (yyleng>0) yytext[yyleng-1] = '\0';
@@ -1118,7 +1118,7 @@ YY_RULE_SETUP
 case 3:
 YY_RULE_SETUP
 #line 181 "scanner.l"
-{ 
+{
                   int passed = (oldsectnum == sectnum) ? 0 : 1;
                   int old_sect = sectnum;
 
@@ -1132,7 +1132,7 @@ YY_RULE_SETUP
 case 4:
 YY_RULE_SETUP
 #line 191 "scanner.l"
-{ 
+{
                   int passed = (oldsectnum == sectnum) ? 0 : 1;
                   int old_sect = sectnum;
 
@@ -1146,7 +1146,7 @@ YY_RULE_SETUP
 case 5:
 YY_RULE_SETUP
 #line 201 "scanner.l"
-{ 
+{
                   int passed = (oldsectnum == sectnum) ? 0 : 1;
                   int old_sect = sectnum;
 
@@ -1160,7 +1160,7 @@ YY_RULE_SETUP
 case 6:
 YY_RULE_SETUP
 #line 211 "scanner.l"
-{ 
+{
                   int passed = (oldsectnum == sectnum) ? 0 : 1;
                   int old_sect = sectnum;
 
@@ -1201,7 +1201,7 @@ YY_RULE_SETUP
 case 11:
 YY_RULE_SETUP
 #line 234 "scanner.l"
-{ 
+{
 	        yylineno++;
 		push_state(YYSTATE, CODEBLOCK, "CODEBLOCK");
 		fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
@@ -1246,7 +1246,7 @@ YY_RULE_SETUP
 case 18:
 YY_RULE_SETUP
 #line 253 "scanner.l"
-{ do_return++; 
+{ do_return++;
                   lvalp->sv.lineno = yylineno;
                   push_state(YYSTATE, STRING, "string");
                 }
@@ -1310,7 +1310,7 @@ YY_RULE_SETUP
 case 25:
 YY_RULE_SETUP
 #line 291 "scanner.l"
-{ yylineno++; 
+{ yylineno++;
 	           lvalp->name = yytext;
 		   return CODEPART; }
 	YY_BREAK
@@ -1405,7 +1405,7 @@ push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
 case 39:
 YY_RULE_SETUP
 #line 332 "scanner.l"
-++yylineno; ACTION_ECHO; 
+++yylineno; ACTION_ECHO;
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
@@ -1467,7 +1467,7 @@ push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
 case 48:
 YY_RULE_SETUP
 #line 359 "scanner.l"
-++yylineno; ACTION_ECHO; 
+++yylineno; ACTION_ECHO;
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
@@ -1491,7 +1491,7 @@ YY_RULE_SETUP
 case 51:
 YY_RULE_SETUP
 #line 371 "scanner.l"
-{ 
+{
 	           int i,tok;
 #if DEBUG > 1
 	           printf("(%d) VAR: %s\n", yylineno, yytext);
@@ -1555,7 +1555,7 @@ YY_RULE_SETUP
 case 58:
 YY_RULE_SETUP
 #line 409 "scanner.l"
-{ lvalp->name = yytext; 
+{ lvalp->name = yytext;
 	          return CODEPART; }
 	YY_BREAK
 case YY_STATE_EOF(SECT4):
@@ -1585,14 +1585,14 @@ push_state(YYSTATE, COMMENT, "COMMENT");yymore();
 case 61:
 YY_RULE_SETUP
 #line 426 "scanner.l"
-++yylineno; ACTION_ECHO; 
+++yylineno; ACTION_ECHO;
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
 #line 427 "scanner.l"
-{ do_return++; 
+{ do_return++;
 	           lvalp->sv.lineno = yylineno;
-                   push_state(YYSTATE, STRING, "string"); 
+                   push_state(YYSTATE, STRING, "string");
                  }
 	YY_BREAK
 case 63:
@@ -1613,7 +1613,7 @@ YY_RULE_SETUP
 case 65:
 YY_RULE_SETUP
 #line 438 "scanner.l"
-{ 
+{
 	           int i,tok;
 #if DEBUG > 1
 	           printf("(%d) VAR: %s\n", yylineno, yytext);
@@ -1717,7 +1717,7 @@ YY_RULE_SETUP
 case 80:
 YY_RULE_SETUP
 #line 485 "scanner.l"
-{ 
+{
 	           lvalp->sv.lineno = yylineno;
                    push_state(YYSTATE, STRING, "string"); yymore();}
 	YY_BREAK
@@ -1833,7 +1833,7 @@ YY_RULE_SETUP
 case 97:
 YY_RULE_SETUP
 #line 536 "scanner.l"
-{ lvalp->name = yytext; 
+{ lvalp->name = yytext;
                 pop_state();
                 return ANYTOK; }
 	YY_BREAK

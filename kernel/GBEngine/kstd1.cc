@@ -35,7 +35,7 @@
 #include <kernel/GBEngine/kutil.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/khstd.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 //#include "cntrlc.h"
 #include <kernel/ideals.h>
 //#include "../Singular/ipid.h"
@@ -129,8 +129,8 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
 {
   int ret;
 #if KDEBUG > 0
-  assume(kTest_L(h));
-  assume(kTest_T(with));
+  kTest_L(h);
+  kTest_T(with);
 #endif
   // Hmmm ... why do we do this -- polys from T should already be normalized
   if (!TEST_OPT_INTSTRATEGY)
@@ -1067,7 +1067,7 @@ void updateLHC(kStrategy strat)
 {
 
   int i = 0;
-  assume(kTest_TS(strat));
+  kTest_TS(strat);
   while (i <= strat->Ll)
   {
     if (pNext(strat->L[i].p) == strat->tail)
@@ -1112,12 +1112,12 @@ void updateLHC(kStrategy strat)
     else
     {
 #ifdef KDEBUG
-      assume(kTest_L(&(strat->L[i]), strat->tailRing, TRUE, i, strat->T, strat->tl));
+      kTest_L(&(strat->L[i]), strat->tailRing, TRUE, i, strat->T, strat->tl);
 #endif
       i++;
     }
   }
-  assume(kTest_TS(strat));
+  kTest_TS(strat);
 }
 
 /*2
@@ -1151,7 +1151,7 @@ void firstUpdate(kStrategy strat)
 {
   if (strat->update)
   {
-    assume(kTest_TS(strat));
+    kTest_TS(strat);
     strat->update = (strat->tl == -1);
     if (TEST_OPT_WEIGHTM)
     {
@@ -1208,7 +1208,7 @@ void firstUpdate(kStrategy strat)
       }
 #endif
   }
-  assume(kTest_TS(strat));
+  kTest_TS(strat);
 }
 
 /*2
@@ -1530,7 +1530,7 @@ loop_count = 1;
     updateL(strat);
     reorderL(strat);
   }
-  assume(kTest_TS(strat));
+  kTest_TS(strat);
   strat->use_buckets = kMoraUseBucket(strat);
   /*- compute-------------------------------------------*/
 
@@ -1743,7 +1743,7 @@ loop_count = 1;
     if (strat->kHEdgeFound)
     {
       if ((TEST_OPT_FINDET)
-      || ((TEST_OPT_MULTBOUND) && (scMult0Int((strat->Shdl)) < Kstd1_mu)))
+      || ((TEST_OPT_MULTBOUND) && (scMult0Int(strat->Shdl,NULL,strat->tailRing) < Kstd1_mu)))
       {
         // obachman: is this still used ???
         /*
@@ -1757,7 +1757,7 @@ loop_count = 1;
         while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       }
     }
-    assume(kTest_TS(strat));
+    kTest_TS(strat);
 
       #if ADIDEBUG
   PrintLn();
@@ -1898,7 +1898,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   /*- compute------------------------------------------- -*/
   p = pCopy(q);
   deleteHC(&p,&o,&j,strat);
-  assume(kTest(strat));
+  kTest(strat);
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
   if (BVERBOSE(23)) kDebugPrint(strat);
   if (p!=NULL) p = redMoraNF(p,strat, lazyReduce & KSTD_NF_ECART);
@@ -2632,8 +2632,8 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
   }
   else
   {
-    if (IDELEMS(M)>IDELEMS(r)) { 
-       idDelete(&M); 
+    if (IDELEMS(M)>IDELEMS(r)) {
+       idDelete(&M);
        M=idCopy(r); }
   }
   return r;
@@ -2907,7 +2907,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
     withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
-  assume(kTest_TS(strat));
+  kTest_TS(strat);
 
 #ifdef HAVE_TAIL_RING
   kStratInitChangeTailRing(strat);

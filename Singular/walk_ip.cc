@@ -24,7 +24,7 @@
 #include <Singular/attrib.h>
 #include <Singular/ipconv.h>
 #include <Singular/links/silink.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <polys/weight.h>
 #include <kernel/spectrum/semic.h>
 #include <kernel/spectrum/splist.h>

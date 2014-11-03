@@ -46,7 +46,7 @@ RETURN:      true, if the by optionName given option is active, false otherwise.
 EXAMPLE:     example optionIsSet;
 "
 {
-   def op = option(get);
+   intvec op = option(get);
    //sanity check, if option is valid. will raise an error if not
    option(optionName);    option("no" + optionName);
    option(set,op);

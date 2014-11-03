@@ -1,7 +1,7 @@
 #include <libpolys/coeffs/bigintmat.h>
 #include "nforder.h"
 #include <reporter/reporter.h>
-#include"libpolys/coeffs/numbers.h" 
+#include"libpolys/coeffs/numbers.h"
 #include "libpolys/coeffs/coeffs.h"
 #include "Singular/ipid.h"
 
@@ -12,7 +12,7 @@
 //// Konstruktoren/Destruktoren ////
 ////////////////////////////////////
 
-/*________________0_______________*/ 
+/*________________0_______________*/
 void nforder::init() {
   rc = 1;
   // Gibt es eine Multtable, so gibt es keine Baseorder
@@ -41,7 +41,7 @@ nforder::nforder(int dim, bigintmat **m,const coeffs q) {
 
 nforder::nforder(nforder *o, bigintmat *base, number div, const coeffs q) {
    init();
-   m_coeffs = q;  
+   m_coeffs = q;
    basis = new bigintmat(base);
    //neue Ordnung erzeugen und übergebene Daten kopieren
    baseorder = o;
@@ -199,7 +199,7 @@ bigintmat *nforder::traceMatrix() {
   bigintmat *base2 = new bigintmat(dimension, 1, basecoeffs());
   bigintmat *mm = new bigintmat(dimension, dimension, basecoeffs());
   number sum;
-  
+
   for (int i=1; i<=dimension; i++) {
     for (int j=i; j<=dimension; j++) {
       // Berechnet Produkt von Basiselementen i und j und speichert es in base1
@@ -335,18 +335,18 @@ void nforder::elMult(bigintmat *a, bigintmat *b) {
     bigintmat *sum = new bigintmat(dimension, 1, C);
     bigintmat *tmp = new bigintmat(dimension, 1, C);
     number ntmp;
- 
+
     for (int i=1; i<=dimension; i++) {
       // Laufe mit i durch Basiselemente
       for (int j=1; j<=dimension; j++) {
         // Laufe mit j durch Basiselemente
         // Speichere Produkt von Basiselem. i mit Basiselem. j als Koeff.vektor in tmp
-        
+
         multtable[i-1]->getcol(j, tmp);
         // Multipliziere ihn mit a[i] und b[j]
         ntmp = n_Mult(a->view(i, 1), b->view(j, 1), C);
         tmp->skalmult(ntmp, C);
-        
+
         n_Delete(&ntmp, C);
         // und addiere alles auf
         sum->add(tmp);
@@ -425,7 +425,7 @@ void basis_elt(bigintmat *m, int i) {
     number t1 = n_Init(0,m->basecoeffs());
     for (int j=0; ((j<m->rows()) || (j<m->cols())); j++) {
       m->set(j, t1);
-      
+
     }
     n_Delete(&t1,m->basecoeffs());
     number t2 = n_Init(1,m->basecoeffs());
@@ -444,13 +444,13 @@ void basis_elt(bigintmat *m, int i) {
 //  similar, expand the multring to deal with ideals
 
 bigintmat *radicalmodpbase(nforder *o, number p, coeffs c) {
-  
+
   number dimen = n_Init(o->getDim(), o->basecoeffs());
   int n = o->getDim();
 
   bigintmat *m, *bas;
   // Berechnet F_p-Basis von I_p/pI_p (Radical mod p)
-  // Dazu: 
+  // Dazu:
   if (n_Greater(p, dimen, c)) {
     // Falls Primzahl größer gleich Dimension der Ordnung, so berechne Kern der Spurmatrix modulo p.
     // also works it p is no prime.
@@ -469,15 +469,15 @@ bigintmat *radicalmodpbase(nforder *o, number p, coeffs c) {
       ex = temp;
       j++;
     }
-    
+
     // Berechne Abbildungsmatrix der oben genannten Abbildung und speichere diese in m (genauere Erklärung dazu: Siehe multmap())
     m = new bigintmat(n, n, o->basecoeffs());
     bas = new bigintmat(n, 1, o->basecoeffs());
     bigintmat *prod = new bigintmat(n, 1, o->basecoeffs());
-    
+
     number klauf;
     number eins = n_Init(1, o->basecoeffs());
-    
+
     for (int i=1; i<=n; i++) {
       basis_elt(bas, i);
       prod->copy(bas);
@@ -496,9 +496,9 @@ bigintmat *radicalmodpbase(nforder *o, number p, coeffs c) {
     delete prod;
     n_Delete(&ex, o->basecoeffs());
     n_Delete(&eins, o->basecoeffs());
-    
+
   }
-  
+
   bigintmat *kbase = new bigintmat(n, n, o->basecoeffs());
 
   // Speichere Basiselemente von Kern der Matrix m (Spurmatrix oder Abbildungsmatrix, je nach if-else-Fall) (von Z/pZ -> Z/pZ) in kbase (ersten kdim Spalten bilden Basis)
@@ -506,7 +506,7 @@ bigintmat *radicalmodpbase(nforder *o, number p, coeffs c) {
   // Schreibe für jedes i=1,, .., dimension p*(i-tes Basiselement) als Spalten in Matrix gen, dahinter die oben errechnete Basis vom Kern
   // Wir erhalten (als Spalten) ein Erzeugendensystem vom Kern von Z->Z/pZ: x->x^(p^j)
   bigintmat *gen = new bigintmat(n, n+kdim, o->basecoeffs());
-  
+
   for (int i=1; i<=n; i++) {
     basis_elt(bas, i);
     bas->skalmult(p, c);
@@ -516,7 +516,7 @@ bigintmat *radicalmodpbase(nforder *o, number p, coeffs c) {
     kbase->getcol(i, bas);
     gen->setcol(i+n, bas);
   }
-  
+
   // HNF auf EZS anwenden liefert (als letzten dimension Spalten) eine Basis des Kerns
   gen->hnf();
   bigintmat *tmp = new bigintmat(n, 1, o->basecoeffs());
@@ -526,10 +526,10 @@ bigintmat *radicalmodpbase(nforder *o, number p, coeffs c) {
     gen->getcol(gen->cols()-n+i, tmp);
     nbase->setcol(i, tmp);
   }
-  
+
   n_Delete(&dimen, o->basecoeffs());
   delete m;
-  delete bas; 
+  delete bas;
   delete kbase;
   delete gen;
   delete tmp;
@@ -575,7 +575,7 @@ number multring(bigintmat *nbase, nforder *o, number p) {
     lon->concatcol(oldlon, mm);
     delete oldlon;
   }
-  
+
   lon->skaldiv(divi);
 
   bigintmat * red;
@@ -589,10 +589,10 @@ number multring(bigintmat *nbase, nforder *o, number p) {
   }
   delete lon;
   red->inpTranspose();
-  
+
   number divisor = red->pseudoinv(nbase);
   nbase->hnf();
-  
+
   delete inv;
   delete mm;
   delete temp;
@@ -618,7 +618,7 @@ nforder *onestep(nforder *o, number p, coeffs c) {
   }
 
   nforder *no = new nforder(o, basis, divisor, c);
-  
+
   delete basis;
   n_Delete(&divisor, c);
   return no;

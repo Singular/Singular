@@ -37,4 +37,4 @@ TESTS = test
 check_PROGRAMS = $(TESTS)
 
 test_SOURCES = test.cc
-test_LDADD   = libcoeffs.la
+test_LDADD   = libcoeffs.la $(libcoeffs_la_LIBADD)

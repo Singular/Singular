@@ -100,13 +100,7 @@ ListCFList
 contract (const ListCFList& cs);
 
 bool
-isMember (const CFList& cs, const ListCFList& pi);
-
-bool
 isSubset (const CFList &PS, const CFList& Cset);
-
-ListCFList
-minus (const ListCFList& a, const CFList& b);
 
 ListCFList
 adjoin (const CFList& is, const CFList& qs, const ListCFList& qh);
@@ -114,9 +108,6 @@ adjoin (const CFList& is, const CFList& qs, const ListCFList& qh);
 ListCFList
 adjoinb (const CFList & is, const CFList & qs, const ListCFList & qh,
          const CFList & cs);
-
-ListCFList
-MyUnion (const ListCFList& a, const ListCFList& b);
 
 void
 inplaceUnion (const ListCFList& a, ListCFList& b);

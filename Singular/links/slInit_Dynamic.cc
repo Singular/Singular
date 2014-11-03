@@ -43,7 +43,7 @@ si_link_extension slInitDBMExtension(si_link_extension s)
   s->Read2=(slRead2Proc)dynl_sym_warn(handle, "dbRead2");
   s->Write=(slWriteProc)dynl_sym_warn(handle, "dbWrite");
 
-  if (s->Open == NULL || s->Close == NULL || 
+  if (s->Open == NULL || s->Close == NULL ||
       s->Read == NULL || s->Read2 == NULL)
     return NULL;
 

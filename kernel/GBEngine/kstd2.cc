@@ -833,7 +833,7 @@ poly redtailSba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
 
   //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
   //L->Normalize(); // HANNES: should have a test
-  assume(kTest_L(L));
+  kTest_L(L);
   return L->GetLmCurrRing();
 }
 
@@ -1366,7 +1366,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
-  assume(kTest_TS(strat));
+  kTest_TS(strat);
 
 #ifdef KDEBUG
 #if MYTEST
@@ -1593,7 +1593,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef KDEBUG
     memset(&(strat->P), 0, sizeof(strat->P));
 #endif /* KDEBUG */
-    assume(kTest_TS(strat));
+    kTest_TS(strat);
   }
 #ifdef KDEBUG
 #if MYTEST
@@ -1758,7 +1758,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   //   withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
-  assume(kTest_TS(strat));
+  kTest_TS(strat);
 
 #ifdef KDEBUG
 #if MYTEST
@@ -1801,7 +1801,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         && ((strat->honey && (strat->L[strat->Ll].ecart+currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
             || ((!strat->honey) && (currRing->pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
-      
+
        //stops computation if
        // 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
        //a predefined number Kstd1_deg
@@ -2245,7 +2245,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef KDEBUG
     memset(&(strat->P), 0, sizeof(strat->P));
 #endif /* KDEBUG */
-    assume(kTest_TS(strat));
+    kTest_TS(strat);
   }
 #ifdef KDEBUG
 #if MYTEST
@@ -2427,7 +2427,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   //  for (i=strat->sl;i>=0;i--)
   //    pNorm(strat->S[i]);
   //}
-  assume(kTest(strat));
+  kTest(strat);
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
   if (BVERBOSE(23)) kDebugPrint(strat);
   int max_ind;
@@ -2898,7 +2898,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   //    withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
-  assume(kTest_TS(strat));
+  kTest_TS(strat);
 
 #ifdef HAVE_TAIL_RING
   kStratInitChangeTailRing(strat);
@@ -3136,7 +3136,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 #ifdef KDEBUG
     memset(&(strat->P), 0, sizeof(strat->P));
 #endif
-    assume(kTest_TS(strat));
+    kTest_TS(strat);
   }
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG) messageSets(strat);

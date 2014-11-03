@@ -11,7 +11,7 @@
 
 /**
  * @class bigintmat bigintmat.h <coeffs/bigintmat.h>
- * 
+ *
  * Matrices of numbers
  *
  * Matrices are stored as 1-dim c-arrays but interpreted 2-dim as matrices.
@@ -28,7 +28,7 @@
  *
  * Be careful with the get/set/view/rawset functions to understand which
  * arguments are copied/ deleted or only assigned.
- * 
+ *
  * @Note: no reference counting here!
  */
 class bigintmat
@@ -142,7 +142,7 @@ class bigintmat
       }
     }
 
-    /// helper function to map from 2-dim coordinates, starting by 1 to 
+    /// helper function to map from 2-dim coordinates, starting by 1 to
     /// 1-dim coordinate, starting by 0
     int index(int r, int c) const
     {
@@ -226,31 +226,31 @@ class bigintmat
     // Funktionen von Kira, Jan, Marco
     // !WICHTIG: Überall, wo eine number übergeben wird, und damit gearbeitet wird, die coeffs mitübergeben und erst
     // überprüfen, ob diese mit basecoeffs übereinstimmen. Falls nein: Breche ab!
-    
+
     /// swap columns i and j
     void swap(int i, int j);
 
     /// swap rows i and j
-    void swaprow(int i, int j); 
+    void swaprow(int i, int j);
 
     ///find index of 1st non-zero entry in row i
     int findnonzero(int i);
 
     ///find index of 1st non-zero entry in column j
-    int findcolnonzero(int j); 
+    int findcolnonzero(int j);
 
     ///copies the j-th column into the matrix a - which needs to be pre-allocated with the correct size.
-    void getcol(int j, bigintmat *a); 
-                                    
+    void getcol(int j, bigintmat *a);
+
     ///copies the no-columns staring by j (so j...j+no-1) into the pre-allocated a
-    void getColRange(int j, int no, bigintmat *a); 
+    void getColRange(int j, int no, bigintmat *a);
 
     void getrow(int i, bigintmat *a); ///< Schreibt i-te Zeile in Vektor (Matrix) a
     void setcol(int j, bigintmat *m); ///< Setzt j-te Spalte gleich übergebenem Vektor (Matrix) m
     void setrow(int i, bigintmat *m); ///< Setzt i-te Zeile gleich übergebenem Vektor (Matrix) m
 
     ///horizontally join the matrices, m <- m|a
-    void appendCol (bigintmat *a);  
+    void appendCol (bigintmat *a);
 
     ///append i zero-columns to the matrix
     void extendCols (int i);

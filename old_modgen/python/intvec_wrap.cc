@@ -6,7 +6,7 @@
 
 using namespace boost::python;
 static boost::python::object intvec_as_str(const Intvec& p)
-{  
+{
   using boost::python::str;
   //ring r=p.getRing();
   str helper;

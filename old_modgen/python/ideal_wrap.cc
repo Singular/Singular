@@ -62,7 +62,7 @@ void export_ideal()
      .def("ring",Ideal_get_Ring)
      .def(boost::python::init <>())
      .def(vector_indexing_suite<Ideal >());
-   
+
 }
 void export_module()
 {
@@ -75,7 +75,7 @@ void export_module()
      .def("ring",Ideal_get_Ring)
      .def(boost::python::init <>())
      .def(vector_indexing_suite<Module>());
-   
+
 }
 
 

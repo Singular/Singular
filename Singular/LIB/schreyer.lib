@@ -134,7 +134,7 @@ static proc Sinit(module M)
 {
   def @save = basering;
   
-  int @DEBUG = !system("with", "ndebug");
+  int @DEBUG = 0; // !system("with", "ndebug");
   if( @DEBUG )
   {
     "Sinit::Input";
@@ -222,7 +222,7 @@ static proc Sinit(module M)
 
 static proc Sstep()
 {
-  int @DEBUG = !system("with", "ndebug");
+  int @DEBUG = 0; // !system("with", "ndebug");
 
   if( @DEBUG )
   {
@@ -565,14 +565,14 @@ static proc SSinit(def M)
   // TODO! DONE?
   def @save = basering;
   
-  int @DEBUG = !system("with", "ndebug");
+  int @DEBUG = 0; // !system("with", "ndebug");
 
   if( typeof( attrib(SSinit, "DEBUG") ) == "int" )
   {
     @DEBUG = attrib(SSinit, "DEBUG");
   }
 
-  int @SYZCHECK = @DEBUG; 
+  int @SYZCHECK = 0; // @DEBUG; 
 
   if( typeof( attrib(SSinit, "SYZCHECK") ) == "int" )
   {
@@ -766,7 +766,7 @@ static proc SSinit(def M)
     attrib(S, "LEAD2SYZ", attrib(SSinit, "LEAD2SYZ") );
   } else
   { 
-    attrib(S, "LEAD2SYZ", 1);
+    attrib(S, "LEAD2SYZ", 0);
   }
 
   if( typeof( attrib(SSinit, "TAILREDSYZ") ) == "int" )
@@ -783,7 +783,7 @@ static proc SSinit(def M)
     attrib(S, "HYBRIDNF", attrib(SSinit, "HYBRIDNF") );
   } else
   { 
-    attrib(S, "HYBRIDNF", 2);
+    attrib(S, "HYBRIDNF", 0);
   }
   
   attrib(S, "DEBUG", @DEBUG);
@@ -847,7 +847,7 @@ proc SSComputeLeadingSyzygyTerms(def L)
     int @DEBUG = attrib(basering, "DEBUG");
   } else
   {
-    int @DEBUG = !system("with", "ndebug");
+    int @DEBUG = 0; // !system("with", "ndebug");
   }
 
   if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
@@ -966,7 +966,7 @@ proc SSCompute2LeadingSyzygyTerms(def L)
     int @DEBUG = attrib(basering, "DEBUG");
   } else
   {
-    int @DEBUG = !system("with", "ndebug");
+    int @DEBUG = 0; // !system("with", "ndebug");
   }
 
   if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
@@ -1189,7 +1189,7 @@ proc SSFindReducer(def product, def syzterm, def L, list #)
     int @DEBUG = attrib(basering, "DEBUG");
   } else
   {
-    int @DEBUG = !system("with", "ndebug");
+    int @DEBUG = 0; // !system("with", "ndebug");
   }
 
   if( typeof( attrib(basering, "SYZCHECK") ) == "int" )
@@ -1215,11 +1215,11 @@ proc SSFindReducer(def product, def syzterm, def L, list #)
 
     "syzterm: ", syzterm;
     "product: ", product;
-    "L: ", L;
+//    "L: ", L;
 //    "T: ", T;
     if( size(#) > 0 )
     {
-      "LSyz: ", #;
+//      "LSyz: ", #;
     }
   }
 
@@ -1320,7 +1320,7 @@ proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
     int @DEBUG = attrib(basering, "DEBUG");
   } else
   {
-    int @DEBUG = !system("with", "ndebug");
+    int @DEBUG = 0; // !system("with", "ndebug");
   }
 
 
@@ -1331,11 +1331,11 @@ proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
     "syzterm: ", syzterm;
     "mult: ", m;
     "term: ", t;
-    "L: ", L;
-    "T: ", T;
+//    "L: ", L;
+//    "T: ", T;
     if( size(#) > 0 )
     {
-      "LSyz: ", #;
+//      "LSyz: ", #;
     }
 //    "attrib(LS, 'isSB')", attrib(LS, "isSB");
   }
@@ -1408,7 +1408,7 @@ proc SSReduceTerm(poly m, def t, def syzterm, def L, def T, list #)
       "m: ", m;
       "t: ", t;
       "syzterm: ", syzterm;
-      L; T; #;
+       L; T; #;
       m2_end(666);
     }  
   }
@@ -1430,7 +1430,7 @@ proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
     int @DEBUG = attrib(basering, "DEBUG");
   } else
   {
-    int @DEBUG = !system("with", "ndebug");
+    int @DEBUG = 0; // !system("with", "ndebug");
   }
 
   if( typeof( attrib(basering, "KERCHECK") ) == "int" )
@@ -1451,7 +1451,7 @@ proc SSTraverseTail(poly m, def @tail, def L, def T, list #)
 
     if( size(#) > 0 )
     {
-      "LSyz: "; #[1];
+//      "LSyz: "; #[1];
     }
   }
 
@@ -1511,7 +1511,7 @@ proc SSSchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
     int @DEBUG = attrib(basering, "DEBUG");
   } else
   {
-    int @DEBUG = !system("with", "ndebug");
+    int @DEBUG = 0; // !system("with", "ndebug");
   }
 
   if( @DEBUG )
@@ -1520,10 +1520,10 @@ proc SSSchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
 
     "syzygy_lead: ", syz_lead;
     "syzygy 2nd : ", syz_2;
-    L; T; 
+//    L; T; 
     if( size(#) > 0 )
     {
-      "LSyz: "; #[1];
+//      "LSyz: "; #[1];
     }
   }
 
@@ -1600,8 +1600,9 @@ proc SSSchreyerSyzygyNF(vector syz_lead, vector syz_2, def L, def T, list #)
 proc SSComputeSyzygy(def L, def T)
 {
 //  rtimer, "***TIMESNAP0 for ComputeSyzygy(L,T): on level: [",attrib(basering,"SYZNUMBER"),"] :: t: ", timer, ", r: ", rtimer;
-  int @DEBUG = attrib(basering, "DEBUG");
+  int @DEBUG    = attrib(basering, "DEBUG");
   int @KERCHECK = attrib(basering, "KERCHECK");
+  int @SYZCHECK = attrib(basering, "SYZCHECK");
 
   if( @DEBUG )
   {
@@ -1652,6 +1653,28 @@ proc SSComputeSyzygy(def L, def T)
       LL = SSComputeLeadingSyzygyTerms(L);
     }
 
+    if( ncols(LL) != ncols(@LL) )
+    {
+      "ERROR in SSComputeSyzygy: wrong leading syzygies!?";
+      "";
+      L; T;
+      "";
+      type(LL);
+      type(@LL);
+      m2_end(666);
+    }
+
+    if( size( module( matrix(LL) - matrix(@LL) ) ) != 0 )
+    {
+      "ERROR in SSComputeSyzygy: wrong leading syzygies!?";
+      "";
+      L; T;
+      "";
+      type(LL);
+      type(@LL);
+      m2_end(666);
+    }
+
     module TT, SYZ;
 
     vector a, a2; bigint c; int r; poly aa;
@@ -1667,6 +1690,7 @@ proc SSComputeSyzygy(def L, def T)
 
       vector @tail = 0;
 
+//      for(int k = 1; k <= ncols(LL); k++ )
       for(int k = ncols(LL); k > 0; k-- )
       {
         // leading syz. term:
@@ -1676,7 +1700,7 @@ proc SSComputeSyzygy(def L, def T)
         {
           c = leadcomp(a); r = int(c); aa = leadmonomial(a);
 	  
-	  if( @TREEOUTPUT ){ "\ROOT{", (lead(a)), "}"; }
+          if( @TREEOUTPUT ){ "\ROOT{", (lead(a)), "}"; }
           
           // NF reduction:
           if( @HYBRIDNF == 0 ) // Traverse approach:
@@ -1688,7 +1712,7 @@ proc SSComputeSyzygy(def L, def T)
             {      
               a2 = LL2[k]; c = leadcomp(a2); r = int(c); aa = leadmonomial(a2);
 	      
-	      if( @TREEOUTPUT ){ "\CHILD{", (lead(a2)), "}{", ( aa*L[r]), "}"; }
+              if( @TREEOUTPUT ){ "\CHILD{", (lead(a2)), "}{", ( aa*L[r]), "}"; }
 	      
               @tail = a2 + @tail + SSTraverseTail(aa, T[r], L, T, LS);
             } else
@@ -1717,7 +1741,7 @@ proc SSComputeSyzygy(def L, def T)
               }
             }
 	    
-	    if( @TREEOUTPUT ){ "\CHILD{", (a2), "}{", ( aa*L[r]), "}"; }
+            if( @TREEOUTPUT ){ "\CHILD{", (a2), "}{", ( aa*L[r]), "}"; }
 
             @tail = SSSchreyerSyzygyNF(a, a2, L, T, LS);
           }
@@ -1725,18 +1749,30 @@ proc SSComputeSyzygy(def L, def T)
 
         TT[k] = @tail;
         SYZ[k] = a + @tail;
-      }
-    }
 
-    if( ncols(LL) != ncols(@LL) )
-    {
-      "ERROR in SSComputeSyzygy: wrong leading syzygies!?";
-      "";
-      L; T;
-      "";
-      type(LL);
-      type(@LL);
-      m2_end(666);
+        if ( TT[k] != @TT[k] )
+        {
+          "ERROR in SSComputeSyzygy: wrong tail syzygy!?";
+          "INPUT";
+          L; T;
+          "LEADING SYZYGY TERMS";
+          type(LL);
+          
+          "CURRENT TAILS";
+          type(TT);
+          type(@TT);
+          
+          "WRONG TAIL [", k, "]:";
+          type(TT[k]);
+          type(@TT[k]);
+
+//          "IMAGES:";
+//              transpose( transpose(N) * transpose(MRES) );              
+          
+          m2_end(666);
+        }
+
+      } // FOR
     }
 
     if( ncols(TT) != ncols(@TT) )
@@ -1752,18 +1788,6 @@ proc SSComputeSyzygy(def L, def T)
       type(@TT);
       m2_end(666);
     }
-    
-    if( size( module( matrix(LL) - matrix(@LL) ) ) != 0 )
-    {
-      "ERROR in SSComputeSyzygy: wrong leading syzygies!?";
-      "";
-      L; T;
-      "";
-      type(LL);
-      type(@LL);
-      m2_end(666);
-    }
-
 
     if( size( module( matrix(TT) - matrix(@TT) ) ) != 0 )
     {
@@ -1866,7 +1890,7 @@ static proc SSstep()
 
       
   // TODO: N  = SYZ( M )!!!
-  module N, LL, TT; (N, LL, TT) = SSComputeSyzygy(/*M, */L, T/*, @RANK*/); 
+  module N, LL, TT; (N, LL, TT) = SSComputeSyzygy(/*M, */L, T/*, @RANK*/);
 
   // shift syz.comp by @RANK:
   module Z;
@@ -2112,36 +2136,81 @@ example
   MRES;
 }
 
+static proc SRES_betti2(SRES SR, def a)
+{
+  def R = SR.r; setring R;
+  return ( betti(SR.rsltn, a) );
+}
 
+static proc SRES_betti1(SRES SR)
+{
+  def R = SR.r; setring R;
+  return ( betti(SR.rsltn) );  
+}
+
+static proc SRES_print(SRES SR)
+{
+  def R = SR.r; setring R;
+  "Schreyer resolution: ";
+  SR.rsltn; //  print ();
+  "over the ring: "; R;
+}
+
+proc SRES_list(SRES SR)
+{
+  def save = basering;  
+  def R = SR.r;
+
+  if( 0 )  // ( save == R ) // TODO: not implemented :(((
+  {
+    list L = SR.rsltn;
+    return (L);
+  }
+    
+  setring R;
+  list L = SR.rsltn;
+  setring save;  
+  return (imap( R, L ));
+}
+
+static proc SRES_minres(SRES SR)
+{
+  def save = basering;
+  SRES S;
+  def R = SR.r; S.r = R;
+  setring R;
+  S.rsltn = minres(SR.rsltn);
+  return (S);
+}
 
 static proc loadme()
 {
-  int @DEBUG = !system("with", "ndebug");
+  int @DEBUG = 0; // !system("with", "ndebug");
 
   if( @DEBUG )
   {
     
-    "ndebug?: ", system("with", "ndebug");
-    "om_ndebug?: ", system("with", "om_ndebug");
+//    "ndebug?: ", system("with", "ndebug");
+//    "om_ndebug?: ", system("with", "om_ndebug");
 
     listvar(Top);
     listvar(Schreyer);
   }
-//  listvar(Syzextra); listvar(Syzextra_g);
+//  listvar(Syzextra);
 
   if( !defined(DetailedPrint) )
   {
     if( 1 )
     {
-
-      if( @DEBUG )
+/*
+      if( system("with", "ndebug") )
       {
         "Loading the Debug version!";
       } else
       {
         "Loading the Release version!";
       }
-      
+*/      
       load("syzextra.so");
 
       if( @DEBUG )
@@ -2187,59 +2256,26 @@ static proc loadme()
       exportto(Schreyer, Syzextra::SchreyerSyzygyNF);
       exportto(Schreyer, Syzextra::ComputeSyzygy);
 
-      exportto(Schreyer, Syzextra::ComputeResolution);      
-    }
-/*
-    else
-    {
+      exportto(Schreyer, Syzextra::ComputeResolution);
 
-      load("syzextra.so");
+      newstruct("SRES","ring r,resolution rsltn"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
+      newstruct("SSYZ","ring r,module szg"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
+      // TODO: SSres - return SRESOLUTION?
 
-      if( @DEBUG )
-      {      
-        listvar(Syzextra_g);
-      }
+//      system("install","SRES","string",SRES_string, 1);
+      system("install","SRES","print",SRES_print, 1);
+
+      system("install","SRES","betti",SRES_betti1, 1); // http://www.singular.uni-kl.de/Manual/latest/sing_260.htm#SEC299
+      system("install","SRES","betti",SRES_betti2, 2); // http://www.singular.uni-kl.de/Manual/latest/sing_260.htm#SEC299
+      system("install","SRES","minres",SRES_minres, 1); // http://www.singular.uni-kl.de/Manual/latest/sing_344.htm#SEC383
+
+//      system("install","SRES","list", SRES_list, 1); // will never work :(((
       
-      exportto(Top, Syzextra_g::ClearContent);
-      exportto(Top, Syzextra_g::ClearDenominators);
-
-      exportto(Schreyer, Syzextra_g::m2_end);
-
-//      export Syzextra_g;
-//      exportto(Schreyer, Syzextra_g::noop);
-      exportto(Schreyer, Syzextra_g::DetailedPrint);
-      exportto(Schreyer, Syzextra_g::leadmonomial);
-      exportto(Schreyer, Syzextra_g::leadcomp);
-//      exportto(Schreyer, Syzextra_g::leadrawexp);
-//      exportto(Schreyer, Syzextra_g::ISUpdateComponents);
-      exportto(Schreyer, Syzextra_g::SetInducedReferrence);
-      exportto(Schreyer, Syzextra_g::GetInducedData);
-//      exportto(Schreyer, Syzextra_g::GetAMData);
-//      exportto(Schreyer, Syzextra_g::SetSyzComp);
-      exportto(Schreyer, Syzextra_g::MakeInducedSchreyerOrdering);
-//      exportto(Schreyer, Syzextra_g::MakeSyzCompOrdering);
-      exportto(Schreyer, Syzextra_g::idPrepare);
-//      exportto(Schreyer, Syzextra_g::reduce_syz);
-//      exportto(Schreyer, Syzextra_g::p_Content);
-
-      exportto(Schreyer, Syzextra_g::ProfilerStart); exportto(Schreyer, Syzextra_g::ProfilerStop);
-
-      exportto(Schreyer, Syzextra_g::Tail);
-      exportto(Schreyer, Syzextra_g::ComputeLeadingSyzygyTerms);
-      exportto(Schreyer, Syzextra_g::Compute2LeadingSyzygyTerms);
-      exportto(Schreyer, Syzextra_g::Sort_c_ds);
-
-      exportto(Schreyer, Syzextra_g::FindReducer);
-      
-      exportto(Schreyer, Syzextra_g::ReduceTerm);
-      exportto(Schreyer, Syzextra_g::TraverseTail);
-
-      exportto(Schreyer, Syzextra_g::SchreyerSyzygyNF);
-      exportto(Schreyer, Syzextra_g::ComputeSyzygy);
-
-      exportto(Schreyer, Syzextra_g::ComputeResolution);      
+      // TODO: SSsyz? SSYZYGY? // TODO: C/C++ computation for Syzygy?
+//      system("install","SSYZYGY","string",SSYZYGY_string, 1);
+//      system("install","SSYZYGY","print",SSYZYGY_print, 1);
+//      system("install","SSYZYGY","module",SSYZYGY_module, 1);
     }
-*/
 
     exportto(Top, DetailedPrint);
     exportto(Top, GetInducedData);
@@ -2540,6 +2576,23 @@ proc TestSSres(def I)
   SCheck(R);
   StopAddResTest(RR, S, @t,@m); 
   kill S, RR; setring save; kill R;
+}
+
+proc s_res(def I, int l)
+{
+  def R=SSinit(I); setring R; int @l = size(RES);
+  SRES ret; ret.r = R; 
+  ret.rsltn = ComputeResolution(RES[@l], LRES[@l], TRES[@l], l);
+  return (ret);
+}
+
+proc s_syz(def I)
+{
+  def R=SSinit(I); setring R;
+  int @l = size(RES); //   def M =  RES[@l];
+  module N, LL, TT; (N, LL, TT) = SSComputeSyzygy(LRES[@l], TRES[@l]);
+  SSYZ ret; ret.r = R; ret.szg = N; // Schreyer::ComputeResolution(RES[2], LRES[2], TRES[2], 0);
+  return (ret);
 }
 
 proc TestSSSres(def I)

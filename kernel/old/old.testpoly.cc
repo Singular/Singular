@@ -31,5 +31,5 @@ void testPoly(){
   p2.print();
   p.print();
   p4.print();
-  
+
 }

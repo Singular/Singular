@@ -10,14 +10,20 @@
 
 
 #include <kernel/mod2.h>
+
 #include <misc/options.h>
 #include <misc/intvec.h>
+
 #include <polys/simpleideals.h>
-#include <kernel/polys.h>
+
+#include <kernel/combinatorics/stairc.h>
+#include <kernel/combinatorics/hilb.h>
+
 #include <kernel/GBEngine/kutil.h>
-#include <kernel/GBEngine/stairc.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/khstd.h>
+
+#include <kernel/polys.h>
 
 #define ADIDEBUG 0
 
@@ -149,7 +155,7 @@ intvec *newhilb;
 
 Lm = id_Head(strat->Shdl,currRing);
 
-newhilb =hHstdSeries(Lm,w,strat->kHomW,Q,currRing);
+newhilb =hHstdSeries(Lm,w,strat->kHomW,Q,currRing); // ,strat->tailRing?
 
 #if ADIDEBUG
 PrintS("\nOriginal\n");

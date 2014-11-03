@@ -2183,7 +2183,7 @@ EXAMPLE: example genus; shows an example
 "
 {
    ASSUME(0, not isQuotientRing(basering) );
-   if ( string(minpoly) !="0" ) 
+   if ( string(minpoly) !="0" )
    {
       ERROR("genus does not yet support extension fields");
    }
@@ -2287,17 +2287,23 @@ EXAMPLE: example genus; shows an example
    list N=findvars(I,0);
    if(size(N[1])==1)
    {
-
       poly p=I[1];
      // if(deg(squarefree(p))<deg(p)){ERROR("Curve is not reduced");}
       return(-deg(p)+1);
    }
    if(size(N[1]) < nvars(R0))
    {
-      string newvar=string(N[1]);
-      execute("ring R=("+charstr(R0)+"),("+newvar+"),dp;");
-      ideal I =imap(R0,I);
-      attrib(I,"isSB",1);
+     string newvar=string(N[1]);
+     execute("ring R=("+charstr(R0)+"),("+newvar+"),dp;");
+     ideal I =imap(R0,I);
+     if((ringlist(R0)[3][1][1]=="dp")&&(size(ringlist(R0)[3])==2))
+     {
+       attrib(I,"isSB",1);
+     }
+     else
+     {
+       I=std(I);
+     }
    }
    else
    {
@@ -4011,7 +4017,10 @@ static proc substpartSpecial(ideal endid, ideal endphi)
 
         for ( jj = n(ii-1)+1; jj<=n(ii); jj++)
         {
-          if( Le[4][jj] !=0 )     //jj=index of var which was not substituted
+          if(  Le[4][jj] !=0 or                                             // jj=index of var which was not substituted
+               (  (ii==n3-1) and ( jj==n(ii) ) and  (size(newg2)==0) )      // or we have no variables yet in the new ring and 
+                                                                            // want to keep at least the last one!
+            ) 
           {
             kk=kk+1;
             newg2[kk] = g2[jj];   //not substituted var from varlist
@@ -4076,6 +4085,7 @@ static proc substpartSpecial(ideal endid, ideal endphi)
       export(norid);
       export(normap);
       list L = newBAS;
+      setring BAS;
       return(L);
 
    //Hier scheint interred gut zu sein, da es Ergebnis relativ schnell

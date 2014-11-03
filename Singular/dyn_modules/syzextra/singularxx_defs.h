@@ -33,8 +33,8 @@
 
 #else
 
-#define BEGIN_NAMESPACE(a) 
-#define END_NAMESPACE 
+#define BEGIN_NAMESPACE(a)
+#define END_NAMESPACE
 
 #define USING_NAMESPACE(a)
 #define FROM_NAMESPACE(a, s) s
@@ -67,7 +67,7 @@
 #else
 #define LIKELY(expression) (expression)
 #define UNLIKELY(expression) (expression)
-#endif 
+#endif
 
 // #include "CSingularTypes.h"
 

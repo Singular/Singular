@@ -33,7 +33,6 @@ int libread(FILE* f, char* buf, int max_size);
 int current_pos(int i);
 void print_version(lp_modes mode, char *p);
 void copy_string(lp_modes mode);
-extern void piCleanUp(procinfov pi);
 void make_version(char *p, int what);
 
 int brace1 = 0;  /* { } */
@@ -335,7 +334,7 @@ static     { p_static=TRUE; }
                                 yylplineno, current_pos(0),p_static);
                  if ((!p_static) && (h_top != NULL) && autoexport)
                  {
-                   if(IDPROC(h_top)!=NULL) piCleanUp((procinfo *)IDPROC(h_top));
+                   if(IDPROC(h_top)!=NULL) piKill((procinfo *)IDPROC(h_top));
                    IDPROC(h_top)=IDPROC(h0);
                    IDPROC(h_top)->ref++;
                  }
@@ -867,7 +866,7 @@ void make_version(char *p,int what)
 void copy_string(lp_modes mode)
 {
 #ifdef STANDALONE_PARSER
-  if ((texinfo_out 
+  if ((texinfo_out
      && (last_cmd == LP_INFO || last_cmd == LP_CATEGORY || last_cmd == LP_URL))
   || (category_out && last_cmd == LP_CATEGORY)
 )

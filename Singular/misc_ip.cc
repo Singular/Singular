@@ -784,9 +784,9 @@ extern "C"
 char * versionString(/*const bool bShowDetails = false*/ )
 {
   StringSetS("");
-  StringAppend("Singular for %s version %s (%s, %d bit) %s #%s",
+  StringAppend("Singular for %s version %s (%d, %d bit) %s #%s",
                S_UNAME, VERSION, // SINGULAR_VERSION,
-               PACKAGE_VERSION, SIZEOF_VOIDP*8, singular_date, GIT_VERSION);
+               SINGULAR_VERSION, SIZEOF_VOIDP*8, singular_date, GIT_VERSION);
   StringAppendS("\nwith\n\t");
 
 #if defined(mpir_version)
@@ -1301,11 +1301,7 @@ void siInit(char *name)
     n_pAE=nRegister(n_unknown,n_pAEInitChar);
     if (n_pAE!=n_unknown)
     {
-      h=enterid(omStrDup("pAE"),0/*level*/, PROC_CMD,&(basePack->idroot),TRUE /*init*/,FALSE /*search*/);
-      IDPROC(h)->language=LANG_C;
-      IDPROC(h)->libname=omStrDup("kernel");
-      IDPROC(h)->procname=omStrDup("pAE");
-      IDPROC(h)->data.o.function=ii_pAE_init;
+      iiAddCproc("kernel","pAE",FALSE,ii_pAE_init);
     }
   }
 #endif

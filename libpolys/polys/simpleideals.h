@@ -62,12 +62,12 @@ void    id_Normalize(ideal id, const ring r);
 int id_MinDegW(ideal M,intvec *w, const ring r);
 
 #ifdef PDEBUG
-void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r);
-#define id_Test(A, r) id_DBTest(A, PDEBUG, __FILE__,__LINE__, r)
-// #define id_Print(id, r) id_Show(id, r)
+void id_DBTest(ideal h1, int level, const char *f,const int l, const ring lR, const ring tR );
+#define id_TestTail(A, lR, tR) id_DBTest(A, PDEBUG, __FILE__,__LINE__, lR, tR)
+#define id_Test(A, lR) id_DBTest(A, PDEBUG, __FILE__,__LINE__, lR, lR)
 #else
-#define id_Test(A, r)  do {} while (0)
-// #define id_Print(A, r) do {} while (0)
+#define id_TestTail(A, lR, tR)  do {} while (0)
+#define id_Test(A, lR) do {} while (0)
 #endif
 
 ideal id_Copy (ideal h1,const ring r);
@@ -130,7 +130,11 @@ int     idGetNumberOfChoise(int t, int d, int begin, int end, int * choise);
 
 #ifdef PDEBUG
 void idShow(const ideal id, const ring lmRing, const ring tailRing, const int debugPrint = 0);
+#define id_Print(id, lR, tR) idShow(id, lR, tR)
+#else
+#define id_Print(A, lR, tR) do {} while (0)
 #endif
+
 
 
 /// insert h2 into h1 depending on the two boolean parameters:

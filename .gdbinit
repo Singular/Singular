@@ -1,5 +1,7 @@
 break dErrorBreak
 break omReportError
+break dPolyReportError
+
 
 
 ### http://sourceware.org/gdb/onlinedocs/gdb/Define.html#Define

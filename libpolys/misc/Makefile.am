@@ -6,7 +6,6 @@ noinst_LTLIBRARIES = libmisc.la  libintvec.la
 ##### libmiscdir = $(libdir)/singular
 
 libmisc_la_LIBADD = libintvec.la 
-## ${top_builddir}/../omalloc/libomalloc.la ${top_builddir}/../resources/libresources.la
 
 ## libmisc_la_LDFLAGS    = -release ${PACKAGE_VERSION}
 

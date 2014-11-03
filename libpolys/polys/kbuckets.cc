@@ -91,8 +91,8 @@ BOOLEAN kbTest_i(kBucket_pt bucket, int i)
   if (bucket->coef[i]!=NULL)
   {
     assume(bucket->buckets[i]!=NULL);
-    _p_Test(bucket->coef[i],bucket->bucket_ring,PDEBUG);
-    }
+    p_Test(bucket->coef[i],bucket->bucket_ring);
+  }
   #endif
   pFalseReturn(p_Test(bucket->buckets[i], bucket->bucket_ring));
   if (bucket->buckets_length[i] != pLength(bucket->buckets[i]))

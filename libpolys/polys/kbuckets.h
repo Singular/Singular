@@ -211,21 +211,21 @@ inline poly kBucketGetLm(kBucket_pt bucket, p_kBucketSetLm_Proc_Ptr _p_kBucketSe
 #endif
 
   poly& lead = bucket->buckets[0];
-  
+
   if (lead == NULL)
     _p_kBucketSetLm(bucket);
 
 #ifdef  HAVE_COEF_BUCKETS
   assume(bucket->coef[0]==NULL);
 #endif
-  
+
   return lead;
 }
 
 inline poly kBucketGetLm(kBucket_pt bucket)
 {
   return kBucketGetLm(bucket, bucket->bucket_ring->p_Procs->p_kBucketSetLm); // TODO: needs ring :(
-}   
+}
 
 inline poly kBucketExtractLm(kBucket_pt bucket)
 {
@@ -235,7 +235,7 @@ inline poly kBucketExtractLm(kBucket_pt bucket)
   #endif
   bucket->buckets[0] = NULL;
   bucket->buckets_length[0] = 0;
-  
+
   return lm;
 }
 

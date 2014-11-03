@@ -1,0 +1,484 @@
+////////////////////////////////////////////////////////////////////////////////
+version="version algemodstd.lib 4.0.1.0 Sep_2014 ";  // $Id$
+category="Commutative Algebra";
+info="
+
+LIBRARY:   algemodstd.lib  Groebner bases of ideals in polynomial rings
+                           over algebraic number fields
+AUTHORS:   D.K. Boku       boku@mathematik.uni-kl.de
+@*         W. Decker       decker@mathematik.uni-kl.de
+@*         C. Fieker       fieker@mathematik.uni-kl.de
+
+OVERVIEW:
+  A library for computing the Groebner basis of an ideal in the polynomial
+  ring over an algebraic number field Q(t) using the modular methods, where t is
+  algebraic over the field of rational numbers Q. For the case Q(t) = Q, the procedure
+  is inspired by Arnold [1]. This idea is then extended
+  to the case t not in Q using factorization as follows:
+  Let f be the minimal polynomial of t.
+  For I, I' ideals in Q(t)[X], Q[X,t]/<f> respectively, we map I to I' via the map sending
+  t to t + <f>.
+  We first choose a prime p such that f has at least two factors in characteristic p and
+  add each factor f_i to I' to obtain the ideal J'_i = I' + <f_i>.
+  We then compute a standard basis G'_i of J'_i for each i and combine the G'_i to G_p
+  (a standard basis of I'_p) using chinese remaindering for polynomials. The procedure is
+  repeated for many primes p, where we compute the G_p in parallel until the
+  number of primes is sufficiently large to recover the correct standard basis G' of I'.
+  Finally, by mapping G' back to Q(t)[X], a standard basis G of I is obtained.
+
+REFERENCES:
+  [1] E. A. Arnold: Modular algorithms for computing Groebner bases.
+      J. Symb. Comp. 35, 403-419 (2003).
+
+PROCEDURES:
+  chinrempoly(l,m);       chinese remaindering for polynomials
+  algemodStd(I);          standard basis of I over algebraic number field using modular methods
+";
+
+LIB "modstd.lib";
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc testPrime(int p, ideal I)
+{
+    /*
+     * test whether a prime p divides the denominator(s)
+     * and leading coefficients of generating set of ideal
+     */
+    int i,j;
+    poly f;
+    number num;
+    bigint d1,d2,d3;
+    for(i = 1; i <= size(I); i++)
+    {
+        f = cleardenom(I[i]);
+        if(f == 0)
+        {
+            return(0);
+        }
+        num = leadcoef(I[i])/leadcoef(f);
+        d1 = bigint(numerator(num));
+        d2 = bigint(denominator(num));
+        if( (d1 mod p) == 0)
+        {
+            return(0);
+        }
+        if((d2 mod p) == 0)
+        {
+            return(0);
+        }
+        for(j = size(f); j > 0; j--)
+        {
+            d3 = bigint(leadcoef(f[j]));
+            if( (d3 mod p) == 0)
+            {
+                return(0);
+            }
+        }
+    }
+    return(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/* return 1 if the number of factors are in the required bound , 0 else */
+
+static proc minpolyTask(poly f,int p)
+{
+    /*
+     * bound for irreducible factor(s) of (f mod p)
+     * see testfact()
+     */
+    int nr,k,ur;
+    ur=deg(f);
+    list L=factmodp(f,p);
+    if(degtest(L[2])==1)
+    {
+        // now each factor is squarefree
+        if(ur<=3)
+        {
+            return(1);
+        }
+        else
+        {
+            nr = testfact(ur);
+            k=ncols(L[1]);
+            if(nr < k && k < (ur-nr))// set bound for k
+            {
+                return(1);
+            }
+        }
+    }
+    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/* return 1 if both testPrime(p,J) and minpolyTask(f,p) is true, 0 else */
+
+static proc PrimeTestTask(int p, list L)
+{
+    /* L=list(I), I=J,f; J ideal , f minpoly */
+    int sz,nr,dg;
+    ideal J=L[1];
+    sz=ncols(J);
+    poly f=J[sz];
+    dg=deg(f);
+    if(!testPrime(p,J) or !minpolyTask(f,p))
+    {
+        return(0);
+    }
+    return(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/* compute factors of f mod p with multiplicity */
+
+static proc factmodp(poly f, int p)
+{
+    def R=basering;
+    list l=ringlist(R);
+    l[1]=p;
+    def S=ring(l);
+    setring S;
+    list L=factorize(imap(R,f),2);
+    ideal J=L[1];
+    intvec v=L[2];
+    list scx=J,v;
+    setring R;
+    return(imap(S,scx));
+    kill S;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/* set a bound for number of factors w.r.t degree nr*/
+
+static proc testfact(int nr)
+{
+    // nr must be greater than 3
+    int i;
+    if(nr>3 and nr<=5)
+    {
+        i=1;
+    }
+    if(nr>5 and nr<=10)
+    {
+        i=2;
+    }
+    if(nr>10 and nr<=15)
+    {
+        i=3;
+    }
+    if(nr>15 and nr<=20)
+    {
+        i=4;
+    }
+    if(nr>20 and nr<=25)
+    {
+        i=5;
+    }
+    if(nr>25 and nr<=30)
+    {
+        i=6;
+    }
+    if(nr>30)
+    {
+        i=10;
+    }
+    return(i);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// return 1 if v[i]>1 , 0 else
+
+static proc degtest(intvec v)
+{
+    for(int j=1;j<=nrows(v);j++)
+    {
+        if(v[j]>1)
+        {
+            return(0);
+        }
+    }
+    return(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc chinRm(list m, list ll, list lk,list l1,int uz)
+{
+    poly ff,c;
+
+    for(int i=1;i<=uz;i++)
+    {
+        c = division(l1[i]*ll[i],m[i])[2][1];
+        ff = ff + c*lk[i];
+    }
+    return(ff);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc chinrempoly(list l,list m)
+"USAGE:  chinrempoly(l, m); l list, m list
+RETURN:  a polynomial (resp. ideal) which is congruent to l[i] modulo m[i] for all i
+NOTE: The procedure applies chinese remaindering to the first argument w.r.t. the
+      moduli given in the second. The elements in the first list must be of same type
+      which can be polynomial or ideal. The moduli must be of type polynomial. Elements
+      in the second list must be distinct and co-prime.
+SEE ALSO: chinrem
+EXAMPLE: example chinrempoly; shows an example
+"
+{
+    int i,j,sz,uz;
+    uz = size(l);
+    sz = ncols(ideal(l[1]));
+    poly f=1;
+    for(i=1;i<=uz;i++)
+    {
+        f=f*m[i];
+    }
+
+    ideal I,J;
+    list l1,ll,lk,l2;
+    poly c,ff;
+    for(j=1;j<=uz;j++)
+    {
+        lk[j]=f/m[j];
+        ll[j]=extgcd(lk[j],m[j])[2];
+    }
+
+    for(i=1;i<=sz;i++)
+    {
+        for(j=1;j<=uz;j++)
+        {
+            I = l[j];
+            l1[j] = I[i];
+        }
+        J[i] = chinRm(m,ll,lk,l1,uz);
+    }
+    return(J);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+    ring rr=97,x,dp;
+    poly f=x^7-7*x + 3;
+    ideal J=factorize(f,1);
+    J;
+    list m=J[1..ncols(J)];
+    list l= x^2+2*x+3, x^2+5, x^2+7;
+    ideal I=chinrempoly(l,m);
+    I;
+    ring s=0,x,dp;
+    list m= x^2+2*x+3, x^3+5, x^4+x^3+7;
+    list l=x^3 + 2, x^4 + 7, x^5 + 11;
+    ideal I=chinrempoly(l,m);
+    I;
+    int p=prime(536546513);
+    ring r = p, (x,y,a), (dp(2),dp(1));
+    poly minpolynomial = a^2+1;
+    ideal kf=factorize(minpolynomial,1);//return factors without multiplicity
+    kf;
+    ideal k=(a+1)*x2+y, 3x-ay+ a+2;
+    option(redSB);
+    ideal k1=k,kf[1];
+    ideal k2 =k,kf[2];
+    k1=std(k1);
+    k2=std(k2);
+    list l=k1,k2;
+    list m=kf[1..ncols(kf)];
+    ideal I=chinrempoly(l,m);
+    I=simplify(I,2);
+    I;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc LiftPolyCRT(ideal I)
+{
+    /*
+     * compute std for each factor and combine this result
+     * to modulo minpoly via CRT for poly over char p>0
+     */
+    int u,in,j;
+    list LL,Lk;
+    ideal J,K,II;
+    poly f;
+    u=ncols(I);
+    J=I[1..u-1];
+    f=I[u];
+    K=factorize(f,1);
+    in=ncols(K);
+    for(j=1;j<=in;j++)
+    {
+        LL[j]=K[j];
+        ideal I(j)=J,K[j];
+        I(j)=std(I(j));
+        if(size(I(j))==1)
+        {
+            Lk[j]=I(j);
+        }
+        else
+        {
+            I(j)[1]=0;
+            I(j)=simplify(I(j), 2);
+            Lk[j]=I(j);
+        }
+    }
+    // apply CRT for polynomials
+    II =chinrempoly(Lk,LL),f;
+    return(II);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc PtestStd(string command, list args, ideal result, int p)
+{
+    /*
+     * let G be std of I which is not yet known whether it is the correct
+     *  standard basis or not. So this procedure does the first test
+     */
+    def br = basering;
+    list lbr = ringlist(br);
+    if (typeof(lbr[1]) == "int")
+    {
+        lbr[1] = p;
+    }
+    else
+    {
+        lbr[1][1] = p;
+    }
+    def rp = ring(lbr);
+    setring(rp);
+    ideal Ip = fetch(br, args)[1];
+    ideal Gp = fetch(br, result);
+    attrib(Gp, "isSB", 1);
+    int i;
+    for (i = ncols(Ip); i > 0; i--)
+    {
+        if (reduce(Ip[i], Gp, 1) != 0)
+        {
+            setring(br);
+            return(0);
+        }
+    }
+    Ip = LiftPolyCRT(Ip);
+    attrib(Ip,"isSB",1);
+    for (i = ncols(Gp); i > 0; i--)
+    {
+        if (reduce(Gp[i], Ip, 1) != 0)
+        {
+            setring(br);
+            return(0);
+        }
+    }
+    setring(br);
+    return(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc cleardenomIdeal(ideal I)
+{
+    int t=ncols(I);
+    if(size(I)==0)
+    {
+        return(I);
+    }
+    else
+    {
+        for(int i=1;i<=t;i++)
+        {
+            I[i]=cleardenom(I[i]);
+        }
+    }
+    return(I);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc modStdparallelized(ideal I)
+{
+    // apply modular.lib
+    /* save options */
+    intvec opt = option(get);
+    option(redSB);
+    I = modular("Algemodstd::LiftPolyCRT", list(I), PrimeTestTask, Modstd::deleteUnluckyPrimes_std,
+              PtestStd, Modstd::finalTest_std,536870909);
+    attrib(I, "isSB", 1);
+    option(set,opt);
+    return(I);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/* main procedure */
+proc algemodStd(ideal I, list #)
+"USAGE:  algemodStd(I, #); I ideal, # optional parameters
+RETURN:  standard basis of I over algebraic number field
+NOTE: The procedure passes to @ref{modStd} if the ground field has no
+      parameter. In this case, the optional parameters # (if given)
+      are directly passed to @ref{modStd}.
+SEE ALSO: modStd
+EXAMPLE: example algemodStd; shows an example
+"
+{
+    list L=#;
+    def Rbs=basering;
+    poly f;
+    ideal J;
+    int n=nvars(Rbs);
+    if(size(I)==0)
+    {
+        return(ideal(0));
+    }
+    if(npars(Rbs)==0)
+    {
+        J=modStd(I,L);//if algebraic number is in Q
+        if(size(#)>0)
+        {
+            return(cleardenomIdeal(J));
+        }
+        return(J);
+    }
+    list rl=ringlist(Rbs);
+    f=rl[1][4][1];
+    rl[2][n+1]=rl[1][2][1];
+    rl[1]=rl[1][1];
+    rl[3][size(rl[3])+1]=rl[3][size(rl[3])];
+    rl[3][size(rl[3])-1]=list("dp",1);
+    def S=ring(rl);
+    setring S;
+    poly f=imap(Rbs,f);
+    ideal I=imap(Rbs,I);
+    I = simplify(I,2);// eraze the zero generatos
+    ideal J;
+    if(f==0)
+    {
+        ERROR("minpoly must be non-zero");
+    }
+    I=I,f;
+    J=modStdparallelized(I);
+    setring Rbs;
+    J=imap(S,J);
+    J=simplify(J,2);
+    if(size(#)>0)
+    {
+        return(cleardenomIdeal(J));
+    }
+    return(J);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+    ring r1 =(0,a),(x,y),dp;
+    minpoly =a^2+1;
+    ideal k=(a/2+1)*x^2+2/3y, 3*x-a*y+ a/7+2;
+    ideal I=algemodStd(k);
+    I;
+    ring r2 =(0,a),(x,y,z),dp;
+    minpoly =a^3 +2;
+    ideal k=(a^2+a/2)*x^2+(a^2 -2/3*a)*yz, (3*a^2+1)*zx-(a+4/7)*y+ a+2/5;
+    ideal IJ=algemodStd(k);
+    IJ;
+    ring r3=0,(x,y),dp;// ring without parameter
+    ideal I = x2 + y, xy - 7y + 2x;
+    I=algemodStd(I);
+    I;
+}

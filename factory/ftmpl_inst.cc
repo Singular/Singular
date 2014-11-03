@@ -150,9 +150,15 @@ template int tabs ( const int & );
 #endif
 
 //
+template int operator== (const List<CanonicalForm> &, const List<CanonicalForm> &);
 template List<CanonicalForm> Union ( const List<CanonicalForm> &, const List<CanonicalForm> & );
+template List<CFList> Union ( const List<CFList>&, const List<CFList>&);
 template List<CanonicalForm> Difference ( const List<CanonicalForm> &, const List<CanonicalForm> & );
+template List<List<CanonicalForm> > Difference ( const List<List<CanonicalForm> >&, const List<List<CanonicalForm> >&);
+template List<List<CanonicalForm> > Difference ( const List<List<CanonicalForm> >&, const List<CanonicalForm>&);
+
 template CanonicalForm prod ( const List<CanonicalForm> & );
 template bool find ( const List<CanonicalForm> &, const CanonicalForm&);
+template bool find ( const List<List<CanonicalForm> >&, const List<CanonicalForm>&);
 // place here your own template stuff, not yet instantiated by factory
 //

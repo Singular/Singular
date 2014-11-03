@@ -52,7 +52,7 @@ FILE * feFopen(const char *path, const char *mode, char *where,
     if (path[1] == DIR_SEP)
     {
       const char* home = getenv("HOME");
-#ifdef ix86_Win
+#ifdef __CUGWIN__
       if ((home==NULL)||(!access(home,X_OK)))
         home = getenv("SINGHOME");
 #endif
@@ -165,7 +165,7 @@ FILE * feFopen(const char *path, const char *mode, char *where,
 // Make sure that mode contains binary option
 FILE* myfopen(const char *path, const char *mode)
 {
-#if (defined(CYGWIN) || defined(ix86_Win))
+#if (defined(__CUGWIN__))
   char mmode[4];
   int i;
   int done = 0;

@@ -5,7 +5,7 @@
  *  File:    ncSAFormula.cc
  *  Purpose: implementation of multiplication by formulas in simple NC subalgebras
  *  Author:  motsak
- *  Created: 
+ *  Created:
  *******************************************************************/
 
 #define MYTEST 0
@@ -50,7 +50,7 @@
 
 bool ncInitSpecialPowersMultiplication(ring r)
 {
-#if OUTPUT  
+#if OUTPUT
   Print("ncInitSpecialPowersMultiplication(ring), ring: \n");
   rWrite(r, TRUE);
   PrintLn();
@@ -66,11 +66,11 @@ bool ncInitSpecialPowersMultiplication(ring r)
     return false;
   }
 
-  
+
   r->GetNC()->GetFormulaPowerMultiplier() = new CFormulaPowerMultiplier(r);
 
   return true;
-  
+
 }
 
 
@@ -82,7 +82,7 @@ bool ncInitSpecialPowersMultiplication(ring r)
 // TODO: return q-coeff?
 static inline BOOLEAN AreCommutingVariables(const ring r, int i, int j/*, number *qq*/)
 {
-#if OUTPUT  
+#if OUTPUT
   Print("AreCommutingVariables(ring, k: %d, i: %d)!", j, i);
   PrintLn();
 #endif
@@ -105,7 +105,7 @@ static inline BOOLEAN AreCommutingVariables(const ring r, int i, int j/*, number
   {
     const poly d = GetD(r, i, j);
 
-#if OUTPUT  
+#if OUTPUT
     Print("D_{%d, %d} = ", i, j); p_Write(d, r);
 #endif
 
@@ -117,7 +117,7 @@ static inline BOOLEAN AreCommutingVariables(const ring r, int i, int j/*, number
   {
     const number q = p_GetCoeff(GetC(r, i, j), r);
 
-    if( !n_IsOne(q, r) ) 
+    if( !n_IsOne(q, r) )
       return FALSE;
   }
 
@@ -134,7 +134,7 @@ static inline BOOLEAN AreCommutingVariables(const ring r, int i, int j/*, number
 
 static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
 {
-#if OUTPUT  
+#if OUTPUT
   Print("AnalyzePair(ring, i: %d, j: %d):", i, j);
   PrintLn();
 #endif
@@ -150,7 +150,7 @@ static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
   const number q = p_GetCoeff(c, r);
   const poly d = GetD(r, i, j);
 
-#if 0 && OUTPUT  
+#if 0 && OUTPUT
   Print("C_{%d, %d} = ", i, j); p_Write(c, r); PrintLn();
   Print("D_{%d, %d} = ", i, j); p_Write(d, r);
 #endif
@@ -182,14 +182,14 @@ static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
         if( k > 0 ) // d = var(k)^??
         {
           const int exp = p_GetExp(d, k, r);
-          
+
           if (exp == 1)
           {
             if(k == i) // 2 -ubalgebra in var(i) & var(j), with linear relation...?
               return _ncSA_1xyAx0y0;
 
             if(k == j)
-              return _ncSA_1xy0xBy0;              
+              return _ncSA_1xy0xBy0;
           } else if ( exp == 2 && k!= i && k != j)  // Homogenized Weyl algebra [x, Dx] = t^2?
           {
 //            number qi, qj;
@@ -197,7 +197,7 @@ static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
             {
               const number g = p_GetCoeff(d, r);
 
-              if (n_IsOne(g, r)) 
+              if (n_IsOne(g, r))
                 return _ncSA_1xy0x0yT2; // save k!?, G = LC(d) == qi == qj == 1!!!
             }
           }
@@ -206,7 +206,7 @@ static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
     }
     // Hmm, what about a more general case of q != 1???
   }
-#if OUTPUT  
+#if OUTPUT
   Print("C_{%d, %d} = ", i, j); p_Write(c, r);
   Print("D_{%d, %d} = ", i, j); p_Write(d, r);
   PrintS("====>>>>_ncSA_notImplemented\n");
@@ -218,7 +218,7 @@ static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
 
 CFormulaPowerMultiplier::CFormulaPowerMultiplier(ring r): m_NVars(r->N), m_BaseRing(r)
 {
-#if OUTPUT  
+#if OUTPUT
   Print("CFormulaPowerMultiplier::CFormulaPowerMultiplier(ring)!");
   PrintLn();
 #endif
@@ -235,7 +235,7 @@ CFormulaPowerMultiplier::CFormulaPowerMultiplier(ring r): m_NVars(r->N), m_BaseR
 
 CFormulaPowerMultiplier::~CFormulaPowerMultiplier()
 {
-#if OUTPUT  
+#if OUTPUT
   Print("CFormulaPowerMultiplier::~CFormulaPowerMultiplier()!");
   PrintLn();
 #endif
@@ -261,8 +261,8 @@ static inline void CorrectPolyWRTOrdering(poly &pResult, const ring r)
 ///////////////////////////////////////////////////////////////////////////////////////////
 static inline poly ncSA_1xy0x0y0(const int i, const int j, const int n, const int m, const ring r)
 {
-#if OUTPUT  
-  Print("ncSA_1xy0x0y0(var(%d)^{%d}, var(%d)^{%d}, r)!", j, m, i, n);  
+#if OUTPUT
+  Print("ncSA_1xy0x0y0(var(%d)^{%d}, var(%d)^{%d}, r)!", j, m, i, n);
   PrintLn();
 #endif
 
@@ -279,8 +279,8 @@ static inline poly ncSA_1xy0x0y0(const int i, const int j, const int n, const in
 ///////////////////////////////////////////////////////////////////////////////////////////
 static inline poly ncSA_Mxy0x0y0(const int i, const int j, const int n, const int m, const ring r)
 {
-#if OUTPUT  
-  Print("ncSA_{M = -1}xy0x0y0(var(%d)^{%d}, var(%d)^{%d}, r)!", j, m, i, n);  
+#if OUTPUT
+  Print("ncSA_{M = -1}xy0x0y0(var(%d)^{%d}, var(%d)^{%d}, r)!", j, m, i, n);
   PrintLn();
 #endif
 
@@ -299,8 +299,8 @@ static inline poly ncSA_Mxy0x0y0(const int i, const int j, const int n, const in
 ///////////////////////////////////////////////////////////////////////////////////////////
 static inline poly ncSA_Qxy0x0y0(const int i, const int j, const int n, const int m, const number m_q, const ring r)
 {
-#if OUTPUT  
-  Print("ncSA_Qxy0x0y0(var(%d)^{%d}, var(%d)^{%d}, Q, r)!", j, m, i, n);  
+#if OUTPUT
+  Print("ncSA_Qxy0x0y0(var(%d)^{%d}, var(%d)^{%d}, Q, r)!", j, m, i, n);
   PrintLn();
 #endif
 
@@ -328,7 +328,7 @@ static inline poly ncSA_Qxy0x0y0(const int i, const int j, const int n, const in
     if( min > 1 )
     {
       n_Power(t, min, &qN, r);
-      n_Delete(&t, r);      
+      n_Delete(&t, r);
     }
     else
       qN = t;
@@ -348,8 +348,8 @@ static inline poly ncSA_Qxy0x0y0(const int i, const int j, const int n, const in
 ///////////////////////////////////////////////////////////////////////////////////////////
 static inline poly ncSA_1xy0x0yG(const int i, const int j, const int n, const int m, const number m_g, const ring r)
 {
-#if OUTPUT  
-  Print("ncSA_1xy0x0yG(var(%d)^{%d}, var(%d)^{%d}, G, r)!", j, m, i, n);  
+#if OUTPUT
+  Print("ncSA_1xy0x0yG(var(%d)^{%d}, var(%d)^{%d}, G, r)!", j, m, i, n);
   PrintLn();
   number t = n_Copy(m_g, r);
   PrintS("Parameter G: "); n_Write(t, r);
@@ -436,7 +436,7 @@ static inline poly ncSA_1xy0x0yG(const int i, const int j, const int n, const in
   p_SetExp(p, j, km, r); // y ^ (m-k)
   p_SetExp(p, i, kn, r); // x ^ (n-k)
 
-  p_Setm(p, r); // 
+  p_Setm(p, r); //
 
   pNext(pLast) = p;
 
@@ -448,8 +448,8 @@ static inline poly ncSA_1xy0x0yG(const int i, const int j, const int n, const in
 ///////////////////////////////////////////////////////////////////////////////////////////
 static inline poly ncSA_1xy0x0yT2(const int i, const int j, const int n, const int m, const int m_k, const ring r)
 {
-#if OUTPUT  
-  Print("ncSA_1xy0x0yT2(var(%d)^{%d}, var(%d)^{%d}, t: var(%d), r)!", j, m, i, n, m_k);  
+#if OUTPUT
+  Print("ncSA_1xy0x0yT2(var(%d)^{%d}, var(%d)^{%d}, t: var(%d), r)!", j, m, i, n, m_k);
   PrintLn();
 #endif
 
@@ -463,7 +463,7 @@ static inline poly ncSA_1xy0x0yT2(const int i, const int j, const int n, const i
 
   p_SetExp(p, j, km--, r); // y ^ (m)
   p_SetExp(p, i, kn--, r); // x ^ (n)
-//  p_SetExp(p, m_k, k << 1, r); // homogenization with var(m_k) ^ (2*k) 
+//  p_SetExp(p, m_k, k << 1, r); // homogenization with var(m_k) ^ (2*k)
 
   p_Setm(p, r); // pResult = x^n * y^m
 
@@ -499,8 +499,8 @@ static inline poly ncSA_1xy0x0yT2(const int i, const int j, const int n, const i
     p_SetExp(p, j, km--, r); // y ^ (m-k)
     p_SetExp(p, i, kn--, r); // x ^ (n-k)
 
-    p_SetExp(p, m_k, k << 1, r); // homogenization with var(m_k) ^ (2*k) 
-    
+    p_SetExp(p, m_k, k << 1, r); // homogenization with var(m_k) ^ (2*k)
+
     p_Setm(p, r); // pResult = x^(n-k) * y^(m-k)
 
     pNext(pLast) = p;
@@ -537,9 +537,9 @@ static inline poly ncSA_1xy0x0yT2(const int i, const int j, const int n, const i
   p_SetExp(p, j, km, r); // y ^ (m-k)
   p_SetExp(p, i, kn, r); // x ^ (n-k)
 
-  p_SetExp(p, m_k, k << 1, r); // homogenization with var(m_k) ^ (2*k) 
+  p_SetExp(p, m_k, k << 1, r); // homogenization with var(m_k) ^ (2*k)
 
-  p_Setm(p, r); // 
+  p_Setm(p, r); //
 
   pNext(pLast) = p;
 
@@ -562,7 +562,7 @@ static inline poly ncSA_ShiftAx(int i, int j, int n, int m, const number m_shift
   poly p = p_One( r);
 
   p_SetExp(p, j, k, r); // Y^{k}
-  p_SetExp(p, i, n, r); 
+  p_SetExp(p, i, n, r);
 
   p_Setm(p, r); // pResult = C_k * x^n * y^k, k == m
 
@@ -580,11 +580,11 @@ static inline poly ncSA_ShiftAx(int i, int j, int n, int m, const number m_shift
   for(; k > 0; k-- )
   {
     number t = n_Init(k + 1, r);  // t = k+1
-    n_InpMult(c, t, r);           // c = c' * (k+1) 
+    n_InpMult(c, t, r);           // c = c' * (k+1)
     n_InpMult(c, nn, r);          // c = (c' * (k+1)) * (alpha * n)
 
     n_Delete(&t, r);
-    t = n_Init(mk++, r);         
+    t = n_Init(mk++, r);
     c = n_Div(c, t, r);           // c = ((c' * (k+1))  * (alpha * n)) / (m-k);
     n_Delete(&t, r);
 
@@ -608,7 +608,7 @@ static inline poly ncSA_ShiftAx(int i, int j, int n, int m, const number m_shift
   {
     n_InpMult(c, nn, r);          // c = (c' * (0+1)) * (alpha * n)
 
-    number t = n_Init(m, r);         
+    number t = n_Init(m, r);
     c = n_Div(c, t, r);           // c = ((c' * (0+1))  * (alpha * n)) / (m-0);
     n_Delete(&t, r);
   }
@@ -620,7 +620,7 @@ static inline poly ncSA_ShiftAx(int i, int j, int n, int m, const number m_shift
   p_SetExp(p, j, k, r); // y^k
   p_SetExp(p, i, n, r); // x^n
 
-  p_Setm(p, r); // 
+  p_Setm(p, r); //
 
   pNext(pLast) = p;
 
@@ -631,12 +631,12 @@ static inline poly ncSA_ShiftAx(int i, int j, int n, int m, const number m_shift
 ///////////////////////////////////////////////////////////////////////////////////////////
 static inline poly ncSA_1xyAx0y0(const int i, const int j, const int n, const int m, const number m_shiftCoef, const ring r)
 {
-#if OUTPUT  
-  Print("ncSA_1xyAx0y0(var(%d)^{%d}, var(%d)^{%d}, A, r)!", j, m, i, n);  
+#if OUTPUT
+  Print("ncSA_1xyAx0y0(var(%d)^{%d}, var(%d)^{%d}, A, r)!", j, m, i, n);
   PrintLn();
   number t = n_Copy(m_shiftCoef, r);
   PrintS("Parameter A: "); n_Write(t, r);
-  n_Delete(&t, r);  
+  n_Delete(&t, r);
 #endif
 
   return ncSA_ShiftAx(i, j, n, m, m_shiftCoef, r);
@@ -644,12 +644,12 @@ static inline poly ncSA_1xyAx0y0(const int i, const int j, const int n, const in
 ///////////////////////////////////////////////////////////////////////////////////////////
 static inline poly ncSA_1xy0xBy0(const int i, const int j, const int n, const int m, const number m_shiftCoef, const ring r)
 {
-#if OUTPUT  
-  Print("ncSA_1xy0xBy0(var(%d)^{%d}, var(%d)^{%d}, B, r)!", j, m, i, n);  
+#if OUTPUT
+  Print("ncSA_1xy0xBy0(var(%d)^{%d}, var(%d)^{%d}, B, r)!", j, m, i, n);
   PrintLn();
   number t = n_Copy(m_shiftCoef, r);
   PrintS("Parameter B: "); n_Write(t, r);
-  n_Delete(&t, r);  
+  n_Delete(&t, r);
 #endif
 
   return ncSA_ShiftAx(j, i, m, n, m_shiftCoef, r);
@@ -662,8 +662,8 @@ static inline poly ncSA_1xy0xBy0(const int i, const int j, const int n, const in
 
 static inline poly ncSA_Multiply( Enum_ncSAType type, const int i, const int j, const int n, const int m, const ring r)
 {
-#if OUTPUT  
-  Print("ncSA_Multiply(type: %d, ring, (var(%d)^{%d} * var(%d)^{%d}, r)!", (int)type, j, m, i, n);  
+#if OUTPUT
+  Print("ncSA_Multiply(type: %d, ring, (var(%d)^{%d} * var(%d)^{%d}, r)!", (int)type, j, m, i, n);
   PrintLn();
 #endif
 
@@ -690,7 +690,7 @@ static inline poly ncSA_Multiply( Enum_ncSAType type, const int i, const int j, 
 
   if( type == _ncSA_1xy0x0yT2 ) // Homogenous Weyl...
     return ::ncSA_1xy0x0yT2(i, j, n, m, p_IsPurePower(d, r), r);
-  
+
   if( type == _ncSA_1xyAx0y0 ) // Shift 1
     return ::ncSA_1xyAx0y0(i, j, n, m, g, r);
 

@@ -1,9 +1,9 @@
 // -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file DebugPrint.h
- * 
+ *
  * Detailed print for debugging
  *
  * ABSTRACT: dPrint outputs as much info as possible
@@ -34,7 +34,7 @@ void dPrint(const ideal id, const ring lmRing = currRing, const ring tailRing = 
 
 END_NAMESPACE               END_NAMESPACE_SINGULARXX
 
-#endif 
+#endif
 /* #ifndef DEBUGPRINT_H */
 
 // Vi-modeline: vim: filetype=c:syntax:shiftwidth=2:tabstop=8:textwidth=0:expandtab

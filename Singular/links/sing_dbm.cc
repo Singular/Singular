@@ -22,7 +22,7 @@
 #  include <Singular/links/silink.h>
 #  include <Singular/links/sing_dbm.h>
 
-// #ifdef ix86_Win
+// #ifdef __CYGWIN__
 // #  define USE_GDBM
 // #  define BLOCKSIZE 1
 // #  define GDBM_STATIC

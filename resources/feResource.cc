@@ -86,9 +86,6 @@ feResourceConfig_s feResourceConfigs[] =
   {"InfoFile",  'i',    feResFile,  "SINGULAR_INFO_FILE",   "%D/info/singular.hlp", (char *)""},
   {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%D/doc/singular.idx",  (char *)""},
   {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%D/singular/html",              (char *)""},
-#ifdef ix86_Win
-  {"HtmlHelpFile",'C',  feResFile,  "SINGULAR_CHM_FILE",    "%r/doc/Manual.chm",    (char *)""},
-#endif
   {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/Manual/",    (char *)""},
   {"ExDir",     'm',    feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",          (char *)""},
   {"Path",      'p',    feResPath,  NULL,                   "%b;%P;$PATH",             (char *)""},
@@ -99,7 +96,7 @@ feResourceConfig_s feResourceConfigs[] =
   {"EmacsLoad", 'l',    feResFile,  "ESINGULAR_EMACS_LOAD", "%e/.emacs-singular",   (char *)""},
   {"EmacsDir",  'e',    feResDir,   "ESINGULAR_EMACS_DIR",  "%D/singular/emacs",             (char *)""},
   {"SingularXterm",'M', feResBinary,"TSINGULAR_SINGULAR",   "%b/Singular",          (char *)""},
-#ifdef ix86_Win
+#ifdef __CYGWIN__
   {"rxvt",      'X',    feResBinary,"RXVT",                 "%b/rxvt",              (char *)""},
 #else
   {"xterm",     'X',    feResBinary,"XTERM",                "%b/xterm",             (char *)""},
@@ -129,7 +126,7 @@ static char* feCleanUpFile(char* fname);
 static char* feCleanUpPath(char* path);
 static void mystrcpy(char* d, char* s);
 static char* feSprintf(char* s, const char* fmt, int warn = -1);
-#if defined(ix86_Win) && defined(__GNUC__)
+#if defined(__CYGWIN__) && defined(__GNUC__)
 // utility function of Cygwin32:
 extern "C" int cygwin32_posix_path_list_p (const char *path);
 #endif
@@ -166,10 +163,6 @@ char* feResourceDefault(const char* key)
 
 void feInitResources(const char* argv0)
 {
-#if defined(ix86_Win) && defined(__GNUC__)
-  if (cygwin32_posix_path_list_p (getenv("PATH")))
-    fePathSep = ':';
-#endif
   if (argv0==NULL)
   {
     //WarnS("illegal argv[0]==NULL");
@@ -406,7 +399,7 @@ static char* feGetExpandedExecutable()
       printf("Bug >>feArgv0 == ''<< at %s:%d\n",__FILE__,__LINE__);
     return NULL;
   }
-#ifdef ix86_Win // stupid WINNT sometimes gives you argv[0] within ""
+#ifdef __CYGWIN__ // stupid WINNT sometimes gives you argv[0] within ""
   if (*feArgv0 == '"')
   {
     int l = strlen(feArgv0);
@@ -470,7 +463,7 @@ static char* feCleanResourceValue(feResourceType type, char* value)
 #ifdef RESOURCE_DEBUG
       printf("Clean value:%s\n", value);
 #endif
-#ifdef ix86_Win
+#ifdef __CYGWIN__
 #ifdef RESOURCE_DEBUG
       printf("Clean WINNT value:%s\n", value);
 #endif

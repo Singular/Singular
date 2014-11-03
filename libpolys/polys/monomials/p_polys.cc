@@ -693,7 +693,7 @@ long p_WTotaldegree(poly p, const ring r)
 
 long p_DegW(poly p, const short *w, const ring R)
 {
-  assume( p_Test(p, R) );
+  p_Test(p, R);
   assume( w != NULL );
   long r=-LONG_MAX;
 
@@ -774,9 +774,7 @@ long pLDeg0(poly p,int *l, const ring r)
 long pLDeg0c(poly p,int *l, const ring r)
 {
   assume(p!=NULL);
-#ifdef PDEBUG
-  _p_Test(p,r,PDEBUG);
-#endif
+  p_Test(p,r);
   p_CheckPolyRing(p, r);
   long o;
   int ll=1;
@@ -801,9 +799,7 @@ long pLDeg0c(poly p,int *l, const ring r)
       else break;
       pp = p;
     }
-#ifdef PDEBUG
-    _p_Test(pp,r,PDEBUG);
-#endif
+    p_Test(pp,r);
     o = r->pFDeg(pp, r);
   }
   *l=ll;
@@ -1232,7 +1228,7 @@ BOOLEAN p_OneComp(poly p, const ring r)
 */
 int p_IsPurePower(const poly p, const ring r)
 {
-#ifdef HAVE_RINGS 
+#ifdef HAVE_RINGS
   if (rField_is_Ring(r))
           {
           if (p == NULL) return 0;
@@ -1445,9 +1441,7 @@ poly p_mInit(const char *st, BOOLEAN &ok, const ring r)
     p_Delete(&p,r);
     return NULL;
   }
-  #ifdef PDEBUG
-  _p_Test(p,r,PDEBUG);
-  #endif
+  p_Test(p,r);
   ok=!errorreported;
   return p;
 }
@@ -2039,9 +2033,7 @@ static poly p_TwoMonPower(poly p, int exp, const ring r)
   {
     p_MonPower(p,exp,r);
     p_MonPower(tail,exp,r);
-#ifdef PDEBUG
     p_Test(p,r);
-#endif
     return p;
   }
   eh = exp >> 1;
@@ -2088,9 +2080,7 @@ static poly p_TwoMonPower(poly p, int exp, const ring r)
 //   else
 //     pIter(tail);
 // }
-#ifdef PDEBUG
   p_Test(res,r);
-#endif
   return res;
 }
 
@@ -3047,8 +3037,8 @@ void p_ProjectiveUnique(poly ph, const ring r)
   }
 
   p_Cleardenom(ph, r); //performs also a p_Content
-  
-  
+
+
     /* normalize ph over a transcendental extension s.t.
        lead (ph) is > 0 if extRing->cf == Q
        or lead (ph) is monic if extRing->cf == Zp*/
@@ -3891,7 +3881,7 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
   else
     qq = p_PermPoly(zz, par_perm-1, srcExtRing, dst, nMap, NULL, rVar (srcExtRing)-1);
 
-  assume (p_Test (qq, dst));
+  p_Test (qq, dst);
 
 //       poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst, nMapFunc nMap, int *par_perm, int OldPar)
 
@@ -3931,7 +3921,7 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
 
       number n = nMap(p_GetCoeff(p, oldRing), oldRing->cf, dst->cf);
 
-      assume (n_Test (n,dst->cf));
+      n_Test (n,dst->cf);
 
       if ( nCoeff_is_algExt(dst->cf) )
         n_Normalize(n, dst->cf);
@@ -4625,7 +4615,7 @@ unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r)
   assume(p != NULL);
   assume(pp != NULL);
   if (p == NULL || pp == NULL) return 0;
-  
+
   unsigned long ev = 0; // short exponent vector
   unsigned int n = BIT_SIZEOF_LONG / r->N; // number of bits per exp
   unsigned int m1; // highest bit which is filled with (n+1)

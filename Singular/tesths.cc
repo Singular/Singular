@@ -131,7 +131,7 @@ int main(          /* main entry to Singular */
 "                                                           0<\n"
 " by: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann     \\   %s\n"
 "FB Mathematik der Universitaet, D-67653 Kaiserslautern        \\\n"
-, PACKAGE_VERSION, VERSION_DATE);
+, VERSION, VERSION_DATE);
   if (feOptValue(FE_OPT_NO_SHELL)) Warn("running in restricted mode:"
     " shell invocation and links are disallowed");
   }

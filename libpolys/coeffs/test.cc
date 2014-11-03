@@ -35,7 +35,7 @@ void Print(/*const*/ number a, const coeffs r, BOOLEAN eoln = TRUE)
   n_Write(a, r);
 
 
-  if( eoln ) 
+  if( eoln )
     PrintLn();
 
   { char* s = StringEndS(); PrintS(s); omFree(s); }
@@ -46,42 +46,42 @@ void PrintSized(/*const*/ number a, const coeffs r, BOOLEAN eoln = TRUE)
 {
   Print(a, r, FALSE);
   Print(", of size: %d", n_Size(a, r));
-  
-  if( eoln ) 
+
+  if( eoln )
     PrintLn();
 }
-  
+
 
 
 bool TestArith(const coeffs r)
 {
   number a = n_Init(66666, r);
-   
+
   PrintS("a: "); PrintSized(a, r);
 
   number two = n_Init(2, r);
-  
+
   PrintS("two: "); PrintSized(two, r);
 
-  if (n_NumberOfParameters(r) > 0) 
+  if (n_NumberOfParameters(r) > 0)
   {
     number z = n_Param(1, r); // also any integer instead of 0//?
 
     PrintS("Parameter: "); PrintSized(z, r);
-    
-    n_Delete(&z, r);    
+
+    n_Delete(&z, r);
   }
-  
+
   number aa = n_Add(a, a, r);
 
   PrintS("aa = a + a: "); PrintSized(aa, r);
-  
+
   number aa2 = n_Mult(a, two, r);
 
   PrintS("aa2 = a * 2: "); PrintSized(aa2, r);
 
   number aa1 = n_Mult(two, a, r);
- 
+
   PrintS("aa1 = 2 * a: "); PrintSized(aa1, r);
 
   n_Delete(&a, r);
@@ -89,7 +89,7 @@ bool TestArith(const coeffs r)
 
 
   a = n_Sub( aa, aa1, r );
-  
+
   PrintS("a = aa - aa1: "); PrintSized(a, r);
 
   if( !n_IsZero(a, r) )
@@ -117,7 +117,7 @@ bool TestArith(const coeffs r)
   n_Delete(&a, r);
 
 
-  
+
   if( !n_Equal(aa, aa1, r) )
     WarnS("TestArith: ERROR: aa != aa1  !!!\n");
 
@@ -126,9 +126,9 @@ bool TestArith(const coeffs r)
 
   if( !n_Equal(aa1, aa2, r) )
     WarnS("TestArith: ERROR: aa1 != aa2  !!!\n");
-  
 
-  
+
+
 
   n_Delete(&aa, r);
   n_Delete(&aa1, r);
@@ -160,17 +160,17 @@ namespace
       CASE(n_Znm);
       CASE(n_Z2m);
       CASE(n_CF);
-      default: return o << "Unknown type: [" << (const unsigned long) type << "]";  
-    }   
+      default: return o << "Unknown type: [" << (const unsigned long) type << "]";
+    }
 #undef CASE
     return o;
   }
 }
-  
+
 
 bool Test(const n_coeffType type, void* p = NULL)
 {
-  cout  << endl << "----------------------- Testing coeffs: [" << type << ", " << p << 
+  cout  << endl << "----------------------- Testing coeffs: [" << type << ", " << p <<
                 "]: -----------------------" << endl;
 
   const coeffs r = nInitChar( type, p );
@@ -190,7 +190,7 @@ bool Test(const n_coeffType type, void* p = NULL)
   {
     assume( r->cfInit == nlInit );
     assume( r->cfAdd == nlAdd );
-    assume( r->cfDelete == nlDelete );    
+    assume( r->cfDelete == nlDelete );
   }
   else if( type == n_long_R )
   {
@@ -202,7 +202,7 @@ bool Test(const n_coeffType type, void* p = NULL)
   {
 //     assume( r->cfInit == ngcInit );
 //     assume( r->cfAdd == ngcAdd );
-//     assume( r->cfDelete == ngcDelete );    
+//     assume( r->cfDelete == ngcDelete );
   }
   else if( type == n_R )
   {
@@ -243,7 +243,7 @@ bool Test(const n_coeffType type, void* p = NULL)
 }
 
 
-int main( int, char *argv[] ) 
+int main( int, char *argv[] )
 {
   assume( sizeof(long) == SIZEOF_LONG );
 
@@ -254,7 +254,7 @@ int main( int, char *argv[] )
     return(1);
   }
 
-   
+
   feInitResources(argv[0]);
 
   StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
@@ -264,7 +264,7 @@ int main( int, char *argv[] )
   { char* s = StringEndS(); PrintS(s); omFree(s); }
 
   int c = 0;
-  
+
   n_coeffType type;
 
 
@@ -288,7 +288,7 @@ int main( int, char *argv[] )
 
 #endif
 
-  
+
   type =  n_Q;
   if( Test(type) )
     c ++;
@@ -314,9 +314,9 @@ int main( int, char *argv[] )
    if( Test(type, (void*) param) )
      c ++;
 
-   // it should not be used by numbers... right? 
+   // it should not be used by numbers... right?
    // TODO: what is our policy wrt param-pointer-ownership?
-   delete param; 
+   delete param;
    // Q: no way to deRegister a type?
 
    param = new GFInfo();
@@ -361,7 +361,7 @@ int main( int, char *argv[] )
 #endif
 
   // polynomial rings needed for: n_algExt, n_transExt !
-  
+
   return c;
 
 }

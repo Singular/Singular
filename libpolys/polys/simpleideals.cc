@@ -76,14 +76,14 @@ void idShow(const ideal id, const ring lmRing, const ring tailRing, const int de
 }
 #endif
 
-/// index of generator with leading term in ground ring (if any); 
+/// index of generator with leading term in ground ring (if any);
 /// otherwise -1
 int id_PosConstant(ideal id, const ring r)
 {
   id_Test(id, r);
-  const int N = IDELEMS(id) - 1; 
-  const poly * m = id->m + N; 
- 
+  const int N = IDELEMS(id) - 1;
+  const poly * m = id->m + N;
+
   for (int k = N; k >= 0; --k, --m)
   {
     const poly p = *m;
@@ -91,7 +91,7 @@ int id_PosConstant(ideal id, const ring r)
        if (p_LmIsConstantComp(p, r) == TRUE)
 	 return k;
   }
-   
+
   return -1;
 }
 
@@ -416,7 +416,7 @@ ideal id_Copy(ideal h1, const ring r)
 }
 
 #ifdef PDEBUG
-void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r)
+void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r, const ring tailRing)
 {
   int i;
 
@@ -425,10 +425,12 @@ void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r)
     // assume(IDELEMS(h1) > 0); for ideal/module, does not apply to matrix
     omCheckAddrSize(h1,sizeof(*h1));
     omdebugAddrSize(h1->m,h1->ncols*h1->nrows*sizeof(poly));
+
     /* to be able to test matrices: */
     for (i=(h1->ncols*h1->nrows)-1; i>=0; i--)
-      _p_Test(h1->m[i], r, level);
-    int new_rk=id_RankFreeModule(h1,r);
+      _pp_Test(h1->m[i], r, tailRing, level);
+
+    int new_rk=id_RankFreeModule(h1, r, tailRing);
     if(new_rk > h1->rank)
     {
       dReportError("wrong rank %d (should be %d) in %s:%d\n",

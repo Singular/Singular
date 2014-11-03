@@ -1,9 +1,9 @@
 // -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file test.h
- * 
+ *
  * Let's try to put parameters where they should be, compare F1 and F2.
  *
  * ABSTRACT: Issue reported: https://bugzilla.gnome.org/show_bug.cgi?id=316311
@@ -14,7 +14,7 @@
  **/
 /*****************************************************************************/
 
-  /** F1. 
+  /** F1.
    *
    * This is function 1.
    *
@@ -28,13 +28,13 @@
      int & r1
          );
 
-  /** F2. 
+  /** F2.
    *
    * This is function 2.
    *
    * @params <- We would prefere all parameters to be here...
    *
-   * @param []  
+   * @param []
    *
    * The end!
    */

@@ -109,7 +109,7 @@ class moddef {
   FILE * fmtfp3;          /* temporary file */
   FILE * binfp;           /* include singular procedures are stored
                              in an extra file */
-  FILE * docfp;		  /* help/example is stored in this file 
+  FILE * docfp;		  /* help/example is stored in this file
                              for building the reference manual */
   char * filename;        /* inputfile to parse */
   char * name;            /* name of the module directory*/
@@ -126,7 +126,7 @@ class moddef {
   int      filecnt;
 };
 
-class stringdef 
+class stringdef
 {
   public:
   char *string;

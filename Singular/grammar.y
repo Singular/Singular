@@ -35,7 +35,7 @@
 #include <kernel/ideals.h>
 #include <coeffs/numbers.h>
 #include <kernel/polys.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <kernel/oswrapper/timer.h>
 #include <Singular/cntrlc.h>
 #include <polys/monomials/maps.h>

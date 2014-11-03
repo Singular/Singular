@@ -713,7 +713,7 @@ char *complexToStr( gmp_complex & c, const unsigned int oprec, const coeffs src 
 {
   const char * complex_parameter = "I";
   int N = 1; // strlen(complex_parameter);
-   
+
   if (nCoeff_is_long_C(src))
   {
     complex_parameter = n_ParameterNames(src)[0];
@@ -721,7 +721,7 @@ char *complexToStr( gmp_complex & c, const unsigned int oprec, const coeffs src 
   }
 
   assume( complex_parameter != NULL && N > 0);
-  
+
   char *out,*in_imag,*in_real;
 
   c.SmallToZero();

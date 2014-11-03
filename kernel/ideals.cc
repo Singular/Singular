@@ -24,8 +24,9 @@
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
+// #include <coeffs/longrat.h>
 
-#include <kernel/polys.h>
+
 #include <polys/monomials/ring.h>
 #include <polys/matpol.h>
 #include <polys/weight.h>
@@ -36,14 +37,13 @@
 
 #include <kernel/ideals.h>
 
+#include <kernel/polys.h>
+
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/GBEngine/syz.h>
 
-#include <coeffs/longrat.h>
-
 
 /* #define WITH_OLD_MINOR */
-#define pCopy_noCheck(p) pCopy(p)
 
 /*0 implementation*/
 
@@ -1207,9 +1207,11 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
 *BEWARE: the returned ideals may contain incorrectly ordered polys !
 *
 */
-static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
-                               BOOLEAN *addOnlyOne, int *kkmax)
+static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *addOnlyOne, int *kkmax)
 {
+  idTest(h1);
+  idTest(h2);
+
   ideal temph1;
   poly     p,q = NULL;
   int i,l,ll,k,kkk,kmax;
@@ -1265,8 +1267,8 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
     {
       if (h4->m[i-1]!=NULL)
       {
-        p = pCopy_noCheck(h4->m[i-1]);
-        p_Shift(&p,1,currRing);
+        p = p_Copy_noCheck(h4->m[i-1], currRing); p_Shift(&p,1,currRing);
+	// pTest(p);
         h4->m[i] = p;
       }
     }
@@ -1311,6 +1313,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
     si_opt_1 |= Sy_bit(OPT_SB_1);
   }
   idDelete(&temph1);
+  //idTest(h4);//see remark at the beginning
   return h4;
 }
 /*2
@@ -1650,6 +1653,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   return h3;
 }
 
+#ifdef WITH_OLD_MINOR
 /*2
 * compute the which-th ar-minor of the matrix a
 */
@@ -1717,7 +1721,6 @@ poly idMinor(matrix a, int ar, unsigned long which, ideal R)
   return (poly) 1;
 }
 
-#ifdef WITH_OLD_MINOR
 /*2
 * compute all ar-minors of the matrix a
 */

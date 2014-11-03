@@ -1,6 +1,6 @@
 // BigInt.h
 
-// A BigInt-class with not much more functions than needed by the 
+// A BigInt-class with not much more functions than needed by the
 // LLL-algorithm. Wrapper class for the GNU MP library.
 
 #ifndef BIG_INT_H
@@ -43,7 +43,7 @@ class BigInt
     BigInt  operator -- ( int );
 
     friend BigInt operator - ( const BigInt& );
-  
+
     friend bool operator <  ( const BigInt&, const BigInt& );
     friend bool operator <= ( const BigInt&, const BigInt& );
     friend bool operator >  ( const BigInt&, const BigInt& );
@@ -62,7 +62,7 @@ class BigInt
     friend bool operator >= ( const BigInt&, const int& );
     friend bool operator == ( const BigInt&, const int& );
     friend bool operator != ( const BigInt&, const int& );
-  
+
     friend int    sgn ( const BigInt& );
     friend BigInt abs ( const BigInt& );
 };

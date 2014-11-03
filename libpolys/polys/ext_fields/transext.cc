@@ -79,7 +79,7 @@
 
 
 #ifdef LDEBUG
-#define ntTest(a) assume(ntDBTest(a,__FILE__,__LINE__,cf))
+#define ntTest(a) ntDBTest(a,__FILE__,__LINE__,cf)
 BOOLEAN  ntDBTest(number a, const char *f, const int l, const coeffs r);
 #else
 #define ntTest(a) do {} while (0)
@@ -192,13 +192,14 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
   //check_N(a,cf);
   const poly num = NUM(t);
   assume(num != NULL);   /**< t != 0 ==> numerator(t) != 0 */
-  assume( _p_Test(num, ntRing,1) );
+
+  p_Test(num, ntRing);
 
   const poly den = DEN(t);
 
   if (den != NULL) // !DENIS1(f)
   {
-    assume( _p_Test(den, ntRing,1) );
+    p_Test(den, ntRing);
 
     if(p_IsConstant(den, ntRing) && (n_IsOne(pGetCoeff(den), ntCoeffs)))
     {
@@ -1759,7 +1760,7 @@ number ntInvers(number a, const coeffs cf)
 number ntMap00(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
-  assume(n_Test(a, src));
+  n_Test(a, src);
   assume(src->rep == dst->extRing->cf->rep);
   if ((SR_HDL(a) & SR_INT) || (a->s==3))
   {
@@ -1781,7 +1782,7 @@ number ntMap00(number a, const coeffs src, const coeffs dst)
 number ntMapZ0(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
-  assume(n_Test(a, src));
+  n_Test(a, src);
   nMapFunc nMap=n_SetMap(src,dst->extRing->cf);
   poly p=p_NSet(nMap(a, src,dst->extRing->cf), dst->extRing);
   if (n_IsZero(pGetCoeff(p),dst->extRing->cf))
@@ -1795,7 +1796,7 @@ number ntMapZ0(number a, const coeffs src, const coeffs dst)
 number ntMapP0(number a, const coeffs src, const coeffs dst)
 {
   if (n_IsZero(a, src)) return NULL;
-  assume(n_Test(a, src));
+  n_Test(a, src);
   /* mapping via intermediate int: */
   int n = n_Int(a, src);
   number q = n_Init(n, dst->extRing->cf);
@@ -1833,7 +1834,7 @@ number ntCopyMap(number a, const coeffs cf, const coeffs dst)
   DEN(result) = h;
   COM(result) = COM(f);
   //check_N((number)result,dst);
-  assume(n_Test((number)result, dst));
+  n_Test((number)result, dst);
   return (number)result;
 }
 
@@ -1860,20 +1861,20 @@ number ntGenMap(number a, const coeffs cf, const coeffs dst)
   DEN(result) = h;
   COM(result) = COM(f);
   //check_N((number)result,dst);
-  assume(n_Test((number)result, dst));
+  n_Test((number)result, dst);
   return (number)result;
 }
 
 number ntCopyAlg(number a, const coeffs cf, const coeffs dst)
 {
-  assume( n_Test(a, cf) );
+  n_Test(a, cf) ;
   if (n_IsZero(a, cf)) return NULL;
   return ntInit(prCopyR((poly)a, cf->extRing, dst->extRing),dst);
 }
 
 number ntGenAlg(number a, const coeffs cf, const coeffs dst)
 {
-  assume( n_Test(a, cf) );
+  n_Test(a, cf) ;
   if (n_IsZero(a, cf)) return NULL;
 
   const nMapFunc nMap=n_SetMap(cf->extRing->cf,dst->extRing->cf);
@@ -1883,7 +1884,7 @@ number ntGenAlg(number a, const coeffs cf, const coeffs dst)
 /* assumes that src = Q, dst = Z/p(t_1, ..., t_s) */
 number ntMap0P(number a, const coeffs src, const coeffs dst)
 {
-  assume( n_Test(a, src) );
+  n_Test(a, src) ;
   if (n_IsZero(a, src)) return NULL;
   // int p = rChar(dst->extRing);
   number q = nlModP(a, src, dst->extRing->cf);
@@ -1898,7 +1899,7 @@ number ntMap0P(number a, const coeffs src, const coeffs dst)
 
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(f) = g; // DEN(f) = NULL; COM(f) = 0;
-  assume(n_Test((number)f, dst));
+  n_Test((number)f, dst);
   //check_N((number)f,dst);
   return (number)f;
 }
@@ -1906,14 +1907,14 @@ number ntMap0P(number a, const coeffs src, const coeffs dst)
 /* assumes that src = Z/p, dst = Z/p(t_1, ..., t_s) */
 number ntMapPP(number a, const coeffs src, const coeffs dst)
 {
-  assume( n_Test(a, src) );
+  n_Test(a, src) ;
   if (n_IsZero(a, src)) return NULL;
   assume(src == dst->extRing->cf);
   poly p = p_One(dst->extRing);
   p_SetCoeff(p, n_Copy(a, src), dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(f) = p; // DEN(f) = NULL; COM(f) = 0;
-  assume(n_Test((number)f, dst));
+  n_Test((number)f, dst);
   //check_N((number)f,dst);
   return (number)f;
 }
@@ -1921,7 +1922,7 @@ number ntMapPP(number a, const coeffs src, const coeffs dst)
 /* assumes that src = Z/u, dst = Z/p(t_1, ..., t_s), where u != p */
 number ntMapUP(number a, const coeffs src, const coeffs dst)
 {
-  assume( n_Test(a, src) );
+  n_Test(a, src) ;
   if (n_IsZero(a, src)) return NULL;
   /* mapping via intermediate int: */
   int n = n_Int(a, src);
@@ -1936,7 +1937,7 @@ number ntMapUP(number a, const coeffs src, const coeffs dst)
   p_SetCoeff(p, q, dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(f) = p; // DEN(f) = NULL; COM(f) = 0;
-  assume(n_Test((number)f, dst));
+  n_Test((number)f, dst);
   //check_N((number)f,dst);
   return (number)f;
 }

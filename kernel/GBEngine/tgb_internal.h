@@ -291,7 +291,6 @@ class red_object
   kBucket_pt bucket;
   poly p;
   unsigned long sev;
-  int sugar;
   void flatten();
   void validate();
   wlen_type initial_quality;

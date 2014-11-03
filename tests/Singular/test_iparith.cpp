@@ -78,7 +78,7 @@ void IpArithTest::setUp() {
 void IpArithTest::tearDown() {
 }
 
-void IpArithTest::test_iiArithFindCmd() 
+void IpArithTest::test_iiArithFindCmd()
 {
   const char *name = "LIB";
   double fStart = Time();
@@ -91,7 +91,7 @@ void IpArithTest::test_iiArithFindCmd()
   const char * name2 = "nix";
   pos = iiArithFindCmd(name2);
   CPPUNIT_ASSERT(pos==-1);
-  
+
   return;
 }
 
@@ -105,12 +105,12 @@ void IpArithTest::test_Timing1()
   while(iiArithGetCmd(nMax)!=NULL) nMax++;
   fEnd = Time();
   printf("Find sizeof sArithBase Time: %f %f %f\n", fEnd, fStart, fEnd-fStart);
-  
+
   fStart = Time();
   for(int i=0; i<1000000; i++) {
     int pos = random() % nMax;
     CPPUNIT_ASSERT(iiArithGetCmd(pos)!=NULL);
-    
+
   }
   fEnd = Time();
   printf("Find sizeof iiArithGetCmd 1000000 loop Time: %f\n", fEnd-fStart);
@@ -132,7 +132,7 @@ void IpArithTest::test_Timing1()
   printf("Add rc=%d - %f\n", rc, fEnd-fStart);
   CPPUNIT_ASSERT_EQUAL(0, rc);
   CPPUNIT_ASSERT(0 != iiArithAddCmd("ATestCMD2", 0, 998, 0, -1));
-  
+
 
   fStart = Time();
   for(int i=0; i<10000; i++) {

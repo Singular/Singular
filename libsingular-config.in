@@ -41,11 +41,11 @@ ECHOn="printf"
 usage()
 {
     cat <<EOF
-Usage: libpolys-config [OPTION]
+Usage: libsingular-config [OPTION]
 
 Known values for OPTION are:
 
-  --prefix		show libpolys installation prefix 
+  --prefix		show libsingular installation prefix 
   --libs		print library linking information
   --cflags		print pre-processor and compiler flags
   --help		display this help and exit

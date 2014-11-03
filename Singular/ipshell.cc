@@ -40,7 +40,7 @@
 #include <Singular/attrib.h>
 #include <Singular/ipconv.h>
 #include <Singular/links/silink.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <polys/weight.h>
 #include <kernel/spectrum/semic.h>
 #include <kernel/spectrum/splist.h>
@@ -1970,7 +1970,12 @@ void rComposeC(lists L, ring R)
   && (r2=SHORT_REAL_LENGTH))
     R->cf = nInitChar(n_R, NULL);
   else
+  {
+    LongComplexInfo* p = (LongComplexInfo *)omAlloc0(sizeof(LongComplexInfo));
+    p->float_len=r1;
+    p->float_len2=r2;
     R->cf = nInitChar(n_long_R, NULL);
+  }
 
   if ((r1<=SHORT_REAL_LENGTH)   // should go into nInitChar
   && (r2=SHORT_REAL_LENGTH))
@@ -2095,19 +2100,26 @@ void rComposeRing(lists L, ring R)
 static void rRenameVars(ring R)
 {
   int i,j;
-  for(i=0;i<R->N-1;i++)
+  BOOLEAN ch;
+  do
   {
-    for(j=i+1;j<R->N;j++)
+    ch=0;
+    for(i=0;i<R->N-1;i++)
     {
-      if (strcmp(R->names[i],R->names[j])==0)
+      for(j=i+1;j<R->N;j++)
       {
-        Warn("name conflict var(%d) and var(%d): `%s`, rename to `@(%d)`",i+1,j+1,R->names[i],j+1);
-        omFree(R->names[j]);
-        R->names[j]=(char *)omAlloc(10);
-        sprintf(R->names[j],"@(%d)",j+1);
+        if (strcmp(R->names[i],R->names[j])==0)
+        {
+          ch=TRUE;
+          Warn("name conflict var(%d) and var(%d): `%s`, rename to `@%s`",i+1,j+1,R->names[i],R->names[i]);
+          omFree(R->names[j]);
+          R->names[j]=(char *)omAlloc(2+strlen(R->names[i]));
+          sprintf(R->names[j],"@%s",R->names[i]);
+        }
       }
     }
   }
+  while (ch);
   for(i=0;i<rPar(R); i++)
   {
     for(j=0;j<R->N;j++)
@@ -5960,3 +5972,53 @@ BOOLEAN iiAssignCR(leftv r, leftv arg)
   return TRUE;// not handled -> error for now
 }
 
+static void iiReportTypes(int nr,int t,const short *T)
+{
+  char *buf=(char*)omAlloc(250);
+  buf[0]='\0';
+  if (nr==0)
+    sprintf(buf,"wrong length of parameters(%d), expected ",t);
+  else
+    sprintf(buf,"par. %d is of type `%s`, expected ",nr,Tok2Cmdname(t));
+  for(int i=1;i<=T[0];i++)
+  {
+    strcat(buf,"`");
+    strcat(buf,Tok2Cmdname(T[i]));
+    strcat(buf,"`");
+    if (i<T[0]) strcat(buf,",");
+  }
+  WerrorS(buf);
+}
+
+BOOLEAN iiCheckTypes(leftv args, const short *type_list, int report)
+{
+  if (args==NULL)
+  {
+    if (type_list[0]==0) return TRUE;
+    else
+    {
+      if (report) WerrorS("no arguments expected");
+      return FALSE;
+    }
+  }
+  int l=args->listLength();
+  if (l!=(int)type_list[0])
+  {
+    if (report) iiReportTypes(0,l,type_list);
+    return FALSE;
+  }
+  for(int i=1;i<=l;i++,args=args->next)
+  {
+    short t=type_list[i];
+    if (t!=ANY_TYPE)
+    {
+      if (((t==IDHDL)&&(args->rtyp!=IDHDL)) 
+      || (t!=args->Typ()))
+      {
+        if (report) iiReportTypes(i,args->Typ(),type_list);
+        return FALSE;
+      }
+    }
+  }
+  return TRUE;
+}

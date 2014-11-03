@@ -9,7 +9,7 @@
  * @note some of the code is code from libfac or derived from code from libfac.
  * Libfac is written by M. Messollen. See also COPYING for license information
  * and README for general information on characteristic sets.
- * 
+ *
  * ABSTRACT: Descriptions can be found in B. Trager "Algebraic Factoring and
  * Rational Function Integration" and A. Steel "Conquering Inseparability:
  * Primary decomposition and multivariate factorization over algebraic function
@@ -366,8 +366,8 @@ simpleExtension (CFList& backSubst, const CFList & Astar,
         rb= R.mvar()-s*ra;
         for (; j.hasItem(); j++)
         {
-          j.getItem()= j.getItem() (ra, oldR.mvar());
           j.getItem()= j.getItem() (rb, i.getItem().mvar());
+          j.getItem()= j.getItem() (ra, oldR.mvar());
         }
         prune (alpha);
       }
@@ -395,11 +395,12 @@ simpleExtension (CFList& backSubst, const CFList & Astar,
         for (; j.hasItem(); j++)
         {
           CanonicalForm powdenra= power (denra, degree (j.getItem(),
-                                                        oldR.mvar()));
-          j.getItem()= evaluate (j.getItem(),ra, denra, powdenra, oldR.mvar());
-          powdenra= power (denra, degree (j.getItem(), i.getItem().mvar()));
+                                         i.getItem().mvar()));
           j.getItem()= evaluate (j.getItem(), rb, denrb, powdenra,
                                  i.getItem().mvar());
+          powdenra= power (denra, degree (j.getItem(), oldR.mvar()));
+          j.getItem()= evaluate (j.getItem(),ra, denra, powdenra, oldR.mvar());
+
         }
       }
 

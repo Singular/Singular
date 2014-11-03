@@ -88,7 +88,7 @@ CPolynomialSummator::~CPolynomialSummator()
   }
   else
   {
-    assume(m_temp.m_poly == NULL); // otherwise wrong usage pattern!    
+    assume(m_temp.m_poly == NULL); // otherwise wrong usage pattern!
     if(m_temp.m_poly!=NULL)
     {
 #ifdef PDEBUG

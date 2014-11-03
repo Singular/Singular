@@ -123,13 +123,13 @@ BOOLEAN checkArgumentIsBigint(leftv arg, number* result)
       } else
         return FALSE;
       break;
-    case CNUMBER_CMD: 
+    case CNUMBER_CMD:
       {
         number2 n = (number2)arg->Data();
         if (getCoeffType(n->cf) == n_Z) {
           *result = n->n;
           return TRUE;
-        } 
+        }
         return FALSE;
         break;
       }
@@ -228,7 +228,7 @@ BOOLEAN checkBigintmatDim(bigintmat * b, int r, int c)
     _res->rtyp = CNUMBER_CMD;                                   \
     _res->data = _r;                                            \
   } while (0)
-    
+
 
 static BOOLEAN build_ring(leftv result, leftv arg)
 {
@@ -429,7 +429,7 @@ static BOOLEAN smithtest(leftv result, leftv arg)
 
   bigintmat * A, *B;
   diagonalForm(a, &A, &B);
- 
+
 
   result->rtyp = NONE;
   return FALSE;
@@ -461,50 +461,50 @@ extern "C" int SI_MOD_INIT(Order)(SModulFunctions* psModulFunctions)
   psModulFunctions->iiAddCproc(
           (currPack->libname? currPack->libname: ""),
           "Discriminant",
-          FALSE, 
-          discriminant); 
+          FALSE,
+          discriminant);
 
   psModulFunctions->iiAddCproc(
           (currPack->libname? currPack->libname: ""),
           "EltFromMat",
-          FALSE, 
-          elt_from_mat); 
+          FALSE,
+          elt_from_mat);
 
   psModulFunctions->iiAddCproc(
           (currPack->libname? currPack->libname: ""),
           "NFOrderSimplify",
-          FALSE, 
-          nforder_simplify); 
+          FALSE,
+          nforder_simplify);
 
   psModulFunctions->iiAddCproc(
           (currPack->libname? currPack->libname: ""),
           "EltNorm",
-          FALSE, 
-          eltNorm); 
+          FALSE,
+          eltNorm);
 
   psModulFunctions->iiAddCproc(
           (currPack->libname? currPack->libname: ""),
           "EltTrace",
-          FALSE, 
-          eltTrace); 
+          FALSE,
+          eltTrace);
 
   psModulFunctions->iiAddCproc(
           (currPack->libname? currPack->libname: ""),
           "EltRepMat",
-          FALSE, 
-          eltRepMat); 
+          FALSE,
+          eltRepMat);
 
   psModulFunctions->iiAddCproc(
           (currPack->libname? currPack->libname: ""),
           "SmithTest",
-          FALSE, 
-          smithtest); 
+          FALSE,
+          smithtest);
 
   psModulFunctions->iiAddCproc(
           (currPack->libname? currPack->libname: ""),
           "IdealFromMat",
-          FALSE, 
-          ideal_from_mat); 
+          FALSE,
+          ideal_from_mat);
 
   module_help_main(
      (currPack->libname? currPack->libname: "NFOrder"),// the library name,

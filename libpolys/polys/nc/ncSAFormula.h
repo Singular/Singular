@@ -22,7 +22,7 @@ enum Enum_ncSAType
   _ncSA_Qxy0x0y0 = 0x02, // quasi-commutative
   _ncSA_1xyAx0y0 = 0x10, // shift 1
   _ncSA_1xy0xBy0 = 0x20, // shift 2
-  _ncSA_1xy0x0yG = 0x30, // Weyl  
+  _ncSA_1xy0x0yG = 0x30, // Weyl
   _ncSA_1xy0x0yT2 = 0x100 // homogenized Weyl algebra?
 };
 
@@ -30,11 +30,11 @@ class CFormulaPowerMultiplier
 {
   private:
     Enum_ncSAType* m_SAPairTypes; // upper triangular submatrix of pairs 1 <= i < j <= N of a N x N matrix.
-    
+
     const int m_NVars;
     const ring m_BaseRing;
 
-    
+
 
   public:
     inline int NVars() const { return m_NVars; }
@@ -69,16 +69,16 @@ class CFormulaPowerMultiplier
 
     static poly ncSA_1xy0x0y0(const int i, const int j, const int n, const int m, const ring r);
     static poly ncSA_Mxy0x0y0(const int i, const int j, const int n, const int m, const ring r);
-    
+
     static poly ncSA_Qxy0x0y0(const int i, const int j, const int n, const int m, const number m_q, const ring r);
 
-    static poly ncSA_1xy0x0yG(const int i, const int j, const int n, const int m, const number m_g, const ring r); 
-    static poly ncSA_1xy0x0yT2(const int i, const int j, const int n, const int m, const int k, const ring r); 
+    static poly ncSA_1xy0x0yG(const int i, const int j, const int n, const int m, const number m_g, const ring r);
+    static poly ncSA_1xy0x0yT2(const int i, const int j, const int n, const int m, const int k, const ring r);
 
     static poly ncSA_1xyAx0y0(const int i, const int j, const int n, const int m, const number m_shiftCoef, const ring r);
     static poly ncSA_1xy0xBy0(const int i, const int j, const int n, const int m, const number m_shiftCoef, const ring r);
-       
-    
+
+
 
     // Higher level abstraction for keeping track of all the pair types!
     poly Multiply( int i, int j, const int n, const int m);
@@ -101,4 +101,4 @@ static inline CFormulaPowerMultiplier* GetFormulaPowerMultiplier(const ring r)
 
 
 #endif // HAVE_PLURAL :(
-#endif // 
+#endif //

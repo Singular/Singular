@@ -4,6 +4,7 @@
 
  Main header in `/kernel/combinatorics/`:
  - \ref kernel/combinatorics/hutil.h
+ - \ref kernel/combinatorics/stairc.h
  
 */
 

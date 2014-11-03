@@ -21,7 +21,7 @@ void rChangeCurrRing(ring r)
   #endif
   if( r != NULL )
   {
-    rTest(r);    
+    rTest(r);
 
     //------------ set global ring vars --------------------------------
     currRing = r;

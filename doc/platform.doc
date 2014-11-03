@@ -61,7 +61,7 @@ at
 Release versions of @sc{Singular} are also available
 from our FTP site
 @display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/4-0-0/}.
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/4-0-1/}.
 @end display
 
 @c @include README_download.texi

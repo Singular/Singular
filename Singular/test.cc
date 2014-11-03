@@ -62,7 +62,7 @@
 
 // HEADERS:
 #include <kernel/combinatorics/hutil.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/maps/fast_maps.h>
@@ -117,7 +117,6 @@
 
 #include <kernel/spectrum/GMPrat.h>
 
-// #include "htmlhelp.h" // For Windows //
 #include <kernel/combinatorics/hutil.h>
 // #include <kernel/Ideal.h> // Too old?
 
@@ -151,7 +150,6 @@
 
 #include <kernel/spectrum/spectrum.h>
 #include <kernel/spectrum/splist.h>
-#include <kernel/GBEngine/stairc.h>
 #include <kernel/structs.h>
 #include <kernel/GBEngine/syz.h>
 // #include <kernel/testpoly.h> // Too old?
@@ -202,7 +200,6 @@
 #include <Singular/sdb.h>
 #include <Singular/links/silink.h>
 #include <Singular/links/sing_dbm.h>
-#include <Singular/sing_win.h>
 #include <Singular/links/slInit.h>
 #include <Singular/links/ssiLink.h>
 #include <Singular/stype.h>

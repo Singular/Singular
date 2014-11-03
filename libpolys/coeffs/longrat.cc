@@ -9,6 +9,7 @@
 
 
 #include <misc/auxiliary.h>
+#include <misc/sirandom.h>
 
 #include <factory/factory.h>
 
@@ -3044,6 +3045,20 @@ static number nlLcm(number a,number b,const coeffs r)
   return n2;
 }
 
+static number nlRandom(siRandProc p, number v2, number, const coeffs cf)
+{
+  number a=nlInit(p(),cf);
+  if (v2!=NULL)
+  {
+    number b=nlInit(p(),cf);
+    number c=nlDiv(a,b,cf);
+    nlDelete(&b,cf);
+    nlDelete(&a,cf);
+    a=c;
+  }
+  return a;
+}
+
 BOOLEAN nlInitChar(coeffs r, void*p)
 {
   r->is_domain=TRUE;
@@ -3124,6 +3139,8 @@ BOOLEAN nlInitChar(coeffs r, void*p)
 #endif
   r->convSingNFactoryN=nlConvSingNFactoryN;
   r->convFactoryNSingN=nlConvFactoryNSingN;
+
+  r->cfRandom=nlRandom;
 
   // io via ssi
   r->cfWriteFd=nlWriteFd;

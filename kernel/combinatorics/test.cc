@@ -69,15 +69,16 @@ extern "C" {void m2_end(int i){exit(i);}}
 
 // HEADERS:
 #include <kernel/combinatorics/hutil.h>
+#include <kernel/combinatorics/hilb.h>
+#include <kernel/combinatorics/stairc.h>
+
 #include <kernel/ideals.h>
 #include <kernel/digitech.h>
 #include <kernel/fast_mult.h>
 
 // #include <kernel/spectrum/kmatrix.h>
 #include <kernel/preimage.h>
-
 #include <kernel/structs.h>
-
 #include <kernel/polys.h>
 
 void TestGBEngine()
@@ -280,7 +281,7 @@ void TestGBEngine()
 
 }
 
- 
+
 
 void TestSimpleRingArithmetcs()
 {

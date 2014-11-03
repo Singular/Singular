@@ -20,6 +20,19 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+New libraries:
+@itemize
+@item algemodstd.lib (@nref{algemodstd_lib})
+@item brillnoether.lib (@nref{brillnoether_lib})
+@item hess.lib (@nref{hess_lib})
+@end itemize
+
+@heading News for version 4-0-1
+
+Version 4-0-1 is a bug fix release.
+New feature: attribute @code{ring_cf} for @code{ring}.
+
+@heading News for version 4-0-0
 
 Version 4-0-0 is a milestone relase of Singular.
 The new release series 4 aims for an entirely modularized architecture

@@ -17,7 +17,7 @@ int main(void)
 #  endif
 
    return ret;
-/*   
+/*
  #define __cplusplus_backup __cplusplus
 
 #ifdef __cplusplus_backup
@@ -27,7 +27,7 @@ int main(void)
 #endif
 
 #undef __cplusplus
-   
+
 #ifdef __cplusplus_backup
   printf("__cplusplus_backup: %s\n", QUOTEME(__cplusplus_backup) );
 #else

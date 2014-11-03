@@ -30,36 +30,36 @@ private:
   number discriminant;
   int dimension;
   coeffs m_coeffs;
-  bigintmat **multtable; // Multiplikationstabelle als Array von Matrizen ... 
-  nforder *baseorder; // ... oder zu Grunde liegende Ordnung  
-  bigintmat *basis; // Lin.Komb. der Basiselemente von baseorder zu Basiselementen der Ordnung (Eine Zeile ^= ein Basiselement)  
-  number divisor; // Hauptnenner der Linearkombination der Basiselemente  
-    // Entweder multtable oder baseorder zeigt auf NULL - je nachdem, wie die Ordnung konstruiert wurde  
+  bigintmat **multtable; // Multiplikationstabelle als Array von Matrizen ...
+  nforder *baseorder; // ... oder zu Grunde liegende Ordnung
+  bigintmat *basis; // Lin.Komb. der Basiselemente von baseorder zu Basiselementen der Ordnung (Eine Zeile ^= ein Basiselement)
+  number divisor; // Hauptnenner der Linearkombination der Basiselemente
+    // Entweder multtable oder baseorder zeigt auf NULL - je nachdem, wie die Ordnung konstruiert wurde
   bigintmat *inv_basis; // (inv_basis/inv_divisor) = (basis/divisor)^-1
-  number inv_divisor; // 
+  number inv_divisor; //
   int flags;
-  
+
   ////////////////////////////////////
   /////// -1 Memberfunktionen ////////
   ////////////////////////////////////
   // Genauere Beschreibung aller Funktionen in der Funktionen.odt
-  
+
   void init(); //basic initialisation
 public:
   void calcdisc(); // Berechnet Diskriminante
   inline int ref_count_incref(){return rc++;};
   inline int ref_count_decref(){return rc--;};
   inline int ref_count(){return rc;};
-  
-  
+
+
   ////////////////////////////////////
   /// 0 Konstruktoren/Destruktoren ///
   ////////////////////////////////////
-   //Lädt entweder Multiplikationstabelle von location, oder legt Ordnung o zu Grunde (mit Basis base und Hauptnenner div)  
+   //Lädt entweder Multiplikationstabelle von location, oder legt Ordnung o zu Grunde (mit Basis base und Hauptnenner div)
   nforder(int dim, bigintmat **m, const coeffs q); // (keine Übergabe von const char *, sondern von bigintmat *, diese wird kopiert und als multtable verwendet)
   nforder(nforder *o, bigintmat *base, number div, const coeffs q);
   nforder(nforder *o, int);
-  
+
   ~nforder();
   void Write();
   char* String();
@@ -69,13 +69,13 @@ public:
   ////////////////////////////////////
   // +1 Zugriff auf Membervariablen //
   ////////////////////////////////////
-  
+
   number getDisc();
   inline number viewDisc(){return discriminant;};
   int getDim();
   inline coeffs basecoeffs() const { return m_coeffs; }
   number getDiv();
-  // Liefert Zeiger auf Kopier der Objekte zurück  
+  // Liefert Zeiger auf Kopier der Objekte zurück
   bool getMult(bigintmat **m);
   nforder *getBase();
   bigintmat *getBasis();
@@ -87,20 +87,20 @@ public:
   inline bool isMaximalKnown() {return (flags & (1<<is_maximal_known)) != 0;};
   inline bool isMaximal() {return isMaximalKnown() && (flags & (1<<is_maximal_known));};
   inline void setIsMaximal(bool is) {flags = (flags & (~((1<<is_maximal_known) + (1<<is_maximal)))) | (1<<is_maximal_known) | (is*(1<<is_maximal));};
-  
-  
-  
+
+
+
   ////////////////////////////////////
   ////// +2 Elementoperationen ///////
   ////////////////////////////////////
-  // Addiert/Subtrahiert/Multipliziert zu a das Element b hinzu  
+  // Addiert/Subtrahiert/Multipliziert zu a das Element b hinzu
   void elAdd(bigintmat *a, bigintmat *b);
   void elSub(bigintmat *a, bigintmat *b);
   void elMult(bigintmat *a, bigintmat *b);
   number elTrace(bigintmat *a);
   number elNorm(bigintmat *a);
   bigintmat * elRepMat(bigintmat *a);
-  
+
   ////////////////////////////////////
   //// +3 Funktionen für Round 2 /////
   ////////////////////////////////////
@@ -110,7 +110,7 @@ public:
   bigintmat *traceMatrix();
 
   void createmulttable(bigintmat **a);
-  
+
 };
 
 ////////////////////////////////////
@@ -122,7 +122,7 @@ void basis_elt(bigintmat *m, int i);
 ////////////////////////////////////
 //////////// 2 Round 2 /////////////
 ////////////////////////////////////
-/* Liefert bzgl. Primzahl p um eines größere Ordnung von o zurück */ 
+/* Liefert bzgl. Primzahl p um eines größere Ordnung von o zurück */
 nforder *onestep(nforder *o, number p, coeffs c);
 /* Macht liefert p-maximale Ordnung von o zurück  */
 nforder *pmaximal(nforder *o, number p);

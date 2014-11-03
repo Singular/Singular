@@ -432,6 +432,7 @@ proc primaryTest (ideal i, poly p)
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
+  if(i[1]==1){return(ideal(1));}
   int m=1;
   int n=nvars(basering);
   int e,f;
@@ -555,7 +556,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
   list keepresult,act,keepprime;
   poly @f;
   int sl=size(l);
-  for(i=1;i<=sl div 2;i++)
+  for(i=sl div 2;i>=1;i--)
   {
     if(sact[2][i]>1)
     {
@@ -3419,8 +3420,8 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
 
   if(homo==1)
   {
-    if((ordstr(@P)[3]=="d")||(ordstr(@P)[1]=="d")||(ordstr(@P)[1]=="w")
-       ||(ordstr(@P)[3]=="w"))
+    if(((ordstr(@P)[3]=="d")||(ordstr(@P)[1]=="d")||(ordstr(@P)[1]=="w")
+       ||(ordstr(@P)[3]=="w"))&&(size(ringlist(@P)[3])==2))
     {
       ideal jwork=imap(@P,tras);
       attrib(jwork,"isSB",1);
@@ -3468,14 +3469,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
       execute("map phi=gnir,"+@va+";");
       op=option(get);
       option(redSB);
-      if(homo==1)
-      {
-        ideal @j=std(phi(@j),@hilb,@w);
-      }
-      else
-      {
-        ideal @j=groebner(phi(@j));
-      }
+      ideal @j=groebner(phi(@j));
       ideal ser=phi(ser);
 
       option(set,op);
@@ -3483,6 +3477,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
     if((deg(@j[1])==0)||(dim(@j)<jdim))
     {
       setring gnir;
+      kill gnir1;
       break;
     }
     for (lauf=1;lauf<=size(@j);lauf++)
@@ -5637,7 +5632,7 @@ static proc reconvList(list l)
 {
    int i;
    list re;
-   for(i=1;i<=size(l);i++)
+   for(i=size(l);i>0;i--)
    {
       re[2*i-1]=l[i][1];
       re[2*i]=l[i][2];
@@ -7393,7 +7388,7 @@ static proc testPrimary_i(int patchPrimaryDecomposition,list pr, ideal k)
 //           For other parameters see 'testPrimary'
    ASSUME(0, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
-   ASSUME(0, hasGlobalOrdering(basering) ) ;
+
    int i;
    pr=reconvList(pr);
    if (patchPrimaryDecomposition==1)
@@ -9336,6 +9331,7 @@ EXAMPLE: example newZero_decomp; shows an example
       {
         helpprim=@lh[2];
         lres0[1]=primary[2*@k-1];
+        attrib(lres0[1],"isSB",1);
         ser1=psi(helpprim);
         lres0[2]=psi1(ser1);
         if(size(reduce(lres0[2],lres0[1],1))==0)

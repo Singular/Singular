@@ -21,7 +21,7 @@
 
 /* This is the same structure as in Singular's kernel/structs.h.
  * Duplicating the following code sniplets is save, because it is used
- * independently here. 
+ * independently here.
  * Moreover, it is recommended not to include structs.h here, because otherwise
  * changing the latter could break modgen also.
  */

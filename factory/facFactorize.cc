@@ -219,7 +219,9 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   //bivariate case
   if (A.level() == 2)
   {
-    CFList buf= biFactorize (F, v);
+    CFList buf= ratBiSqrfFactorize (F, v);
+    if (buf.getFirst().inCoeffDomain())
+      buf.removeFirst();
     return buf;
   }
 

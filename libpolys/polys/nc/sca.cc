@@ -476,7 +476,7 @@ poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing)
   p_Test(pMonom, rRing);
 #endif
 
-  if (/*(*/  pPoly == NULL  /*)*/) /*|| ( pMonom == NULL )*/ 
+  if (/*(*/  pPoly == NULL  /*)*/) /*|| ( pMonom == NULL )*/
     return NULL;
 
   const int iComponentMonomM = p_GetComp(pMonom, rRing);
@@ -1126,7 +1126,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
         break;
       }
     }
-  
+
 #if ((defined(PDEBUG) && OUTPUT) || MYTEST)
   Print("ScaVars!: [%d, %d]\n", iAltVarStart, iAltVarEnd);
 #endif
@@ -1275,7 +1275,7 @@ void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 //         r->GetNC()->BucketPolyRed_Z()= gnc_kBucketPolyRed_Z;
 #endif
 
-  // local ordering => Mora, otherwise - Buchberger!        
+  // local ordering => Mora, otherwise - Buchberger!
   if (rHasLocalOrMixedOrdering(rGR))
     rGR->GetNC()->p_Procs.GB          = cast_A_to_vptr(sca_mora);
   else

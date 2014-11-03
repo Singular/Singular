@@ -33,7 +33,7 @@
 #include "fglmgauss.h"
 #include <misc/intvec.h>
 #include <kernel/GBEngine/kstd1.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <factory/templates/ftmpl_list.h>
 
 // obachman: Got rid off those "redefiende messages by includeing fglm.h

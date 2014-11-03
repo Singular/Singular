@@ -70,19 +70,19 @@ int IsCmd(char *n, int & tok)
   int an=1;
   int i,v;
   int en=LAST_IDENTIFIER;
-  
+
   if( strcmp(n, "SELF") == 0) {
     tok = SELF_CMD;
     logx("IsCmd: [%d] %s\n", tok, n);
     return tok;
   }
-  
+
   if( strcmp(n, "none") == 0) {
     tok = NONE;
     logx("IsCmd: [%d] %s\n", tok, n);
     return tok;
   }
-  
+
   loop
   {
     if(an>=en-1)
@@ -146,11 +146,11 @@ int IsCmd(char *n, int & tok)
   }
 #endif
   logx("IsCmd: [%d] %s\n", tok, n);
-  
+
   if( (cmds[i].toktype==ROOT_DECL) ||
       (cmds[i].toktype==ROOT_DECL_LIST) ||
       (cmds[i].toktype==RING_DECL) ||
-      ((cmds[i].toktype>=DRING_CMD) && (cmds[i].toktype<=VECTOR_CMD))) 
+      ((cmds[i].toktype>=DRING_CMD) && (cmds[i].toktype<=VECTOR_CMD)))
     return cmds[i].toktype;
   return 0;
 }
@@ -197,9 +197,9 @@ void PrintProc(
   )
 {
   int i;
-  
+
   printf("proc: %s(", pi.procname);
-  
+
   for(i=0; i<pi.paramcnt; i++) {
     printf("%s", pi.param[i].name);
     if(i < (pi.paramcnt-1)) printf(",");
@@ -213,17 +213,17 @@ void make_version(char *p, moddefv module)
   char ver[10];
   char date[16];
   char libnamebuf[128];
-  
+
   module->major = 0;
   module->minor = 0;
   module->level = 0;
-  
+
   ver[0]='0'; ver[1]='.'; ver[2]='0'; ver[3]='.'; ver[4]='0'; ver[5]='\0';
   date[0]='?'; date[1]='\0';
   //if(what) sscanf(p,"%*[^=]= %*s %*s %10s %16s",ver,date);
   sscanf(p,"%*s %*s %10s %16s",ver,date);
   sscanf(ver, "%d.%d.%d", &module->major, &module->minor, &module->level);
-  
+
   sprintf(libnamebuf,"(%s,%s)", ver, date);
   if(strcmp(libnamebuf, "(0.0.0,?)")==0)
   {
@@ -255,7 +255,7 @@ void Add2files(
                                    (module->filecnt+1)*sizeof(cfiles));
   }
   if(module->files == NULL) { printf("ERROR\n"); return; }
-  
+
   memset((void *) &module->files[module->filecnt], '\0', sizeof(cfiles));
   memcpy((void *)(&(module->files[module->filecnt])),
          (void *)&cfnew, sizeof(cfiles));
@@ -273,7 +273,7 @@ void Add2proclist(
 {
   procdef pnew;
   logx("Add2proclist(%s, %s)\n", name, ret_val);
-  
+
   memset((void *)&pnew, '\0', sizeof(procdef));
 
   pnew.procname = (char *)malloc(strlen(name)+1);
@@ -290,16 +290,16 @@ void Add2proclist(
   (pnew).is_static = 0;
   (pnew).paramcnt = 0;
   pnew.c_code = NULL;
-  
+
   pnew.return_val.name = (char *)malloc(strlen(ret_val)+1);
   memset(pnew.return_val.name, '\0', strlen(ret_val)+1);
   memcpy(pnew.return_val.name, ret_val, strlen(ret_val));
-  
+
   pnew.return_val.typname = (char *)malloc(strlen(ret_typname)+1);
   memset(pnew.return_val.typname, '\0', strlen(ret_typname)+1);
   memcpy(pnew.return_val.typname, ret_typname, strlen(ret_typname));
   pnew.return_val.typ = ret_typ;
-  
+
   if(module->proccnt==0) {
     module->procs = (procdefv)malloc(sizeof(procdef)+1);
   }
@@ -308,7 +308,7 @@ void Add2proclist(
                                    (module->proccnt+1)*sizeof(procdef));
   }
   if(module->procs == NULL) { printf("ERROR\n"); return; }
-  
+
   memset((void *) &module->procs[module->proccnt], '\0', sizeof(procdef));
   memcpy((void *)(&(module->procs[module->proccnt])),
          (void *)&pnew, sizeof(procdef));
@@ -349,7 +349,7 @@ void AddParam(
       (paramdefv)realloc(module->procs[proccnt].param,
                          (paramcnt+1)*sizeof(paramdef));
   }
-  
+
   memcpy((void *)(&module->procs[proccnt].param[paramcnt]),
          (void *)&pnew, sizeof(paramdef));
   (module->procs[proccnt].paramcnt)++;
@@ -378,7 +378,7 @@ void generate_mod(
   int proccnt;
   FILE *fp_c, *fp_h;
   char *filename;
-  
+
   if(strcmp(S_UNAME, "ix86-Linux") == 0) {
     systyp = SYSTYP_LINUX;
   } else if (strcmp(S_UNAME, "HPUX-9")==0) {
@@ -388,7 +388,7 @@ void generate_mod(
   }
   init_type_conv();
   printf("SYSTYP:%d\n", systyp);
-  
+
   filename = (char *)malloc(strlen(module->name)+5);
   sprintf(filename, "%s.cc", module->name);
   fp_c = fopen(filename, "w");
@@ -400,21 +400,21 @@ void generate_mod(
   fp_h = fopen(filename, "w");
   write_header(fp_h, module->name);
   printf("%s  ...", filename);fflush(stdout);
-  
+
   /* building mod_init() */
   fprintf(fp_c, "extern \"C\"\n");
   fprintf(fp_c, "int mod_init(int(*iiAddCproc)())\n{\n");
   fprintf(fp_c, "  idhdl h;\n\n");
-  
+
   if(module->version != NULL) enter_id(fp_c, "version", module->version);
   if(module->info != NULL) enter_id(fp_c, "info", module->info);
   if(module->helpfile != NULL) enter_id(fp_c, "helpfile", module->helpfile);
-  
+
   for(proccnt=0; proccnt<module->proccnt; proccnt++) {
     printf("->%s, %s\n", module->procs[proccnt].procname,
            module->procs[proccnt].funcname);
     fprintf(fp_c, "  iiAddCproc(\"%s\",\"%s\",%s, mod_%s);\n",
-	    module->name, module->procs[proccnt].procname, 
+	    module->name, module->procs[proccnt].procname,
 	    module->procs[proccnt].is_static ? "TRUE" : "FALSE",
             module->procs[proccnt].funcname);
   }
@@ -434,7 +434,7 @@ void generate_mod(
 void generate_header(procdefv pi, FILE *fp)
 {
   int i;
-  
+
   fprintf(fp, "BOOLEAN mod_%s(leftv res, leftv h);\n", pi->funcname);
   switch( pi->return_val.typ) {
       case SELF_CMD:
@@ -475,12 +475,12 @@ void generate_function(procdefv pi, FILE *fp)
 {
   int cnt = 0, i;
   printf("%s has %d paramters\n", pi->funcname, pi->paramcnt);
-  
+
   fprintf(fp, "BOOLEAN mod_%s(leftv res, leftv h)\n{\n", pi->funcname);
   if(pi->paramcnt>0) {
     if(pi->param[0].typ==SELF_CMD) {
       if(pi->c_code != NULL) fprintf(fp, "%s\n", pi->c_code);
-  
+
       fprintf(fp, "  return(%s(res,h));\n", pi->funcname);
       fprintf(fp, "}\n\n");
     }
@@ -491,9 +491,9 @@ void generate_function(procdefv pi, FILE *fp)
         fprintf(fp, "  leftv res%d = (leftv)Alloc0(sizeof(sleftv));\n", i);
 
       fprintf(fp, "\n");
-    
+
       if(pi->c_code != NULL) fprintf(fp, "%s\n", pi->c_code);
-  
+
       for (i=0;i<pi->paramcnt; i++) gen_func_param_check(fp, pi, i);
 
       fprintf(fp, "  if(v!=NULL) { tok = v->Typ(); goto mod_%s_error; }\n",
@@ -519,7 +519,7 @@ void generate_function(procdefv pi, FILE *fp)
             }
             fprintf(fp, ");\n  return FALSE;\n\n");
       }
-      
+
       fprintf(fp, "  mod_%s_error:\n", pi->funcname);
       fprintf(fp, "    Werror(\"%s(`%%s`) is not supported\", Tok2Cmdname(tok));\n",
               pi->procname);
@@ -543,16 +543,16 @@ void generate_function(procdefv pi, FILE *fp)
             fprintf(fp, "  %s();\n", pi->funcname);
             fprintf(fp, "  return FALSE;\n}\n\n");
             break;
-            
+
           default:
             fprintf(fp, "  res->rtyp = %s;\n", pi->return_val.typname);
             fprintf(fp, "  res->data = (void *)%s();\n", pi->funcname);
             fprintf(fp, "  return FALSE;\n}\n\n");
       }
-    
+
   }
-      
-      
+
+
 }
 
 /*========================================================================*/
@@ -561,7 +561,7 @@ void  mod_write_header(FILE *fp, char *module)
 #if 0
   FILE *fp;
   char buf[BUFLEN];
-  
+
   regex_t preg;
   regmatch_t   pmatch[1];
   size_t  nmatch = 0;
@@ -573,7 +573,7 @@ void  mod_write_header(FILE *fp, char *module)
   if(!regexec(&preg, d_entry->d_name, nmatch, pmatch, REG_NOTBOL))
     cert_count++;
   regfree(&preg);
-  
+
 #else
   write_header(fp, module);
   fprintf(fp, "#include <stdlib.h>\n");
@@ -598,7 +598,7 @@ void write_header(FILE *fp, char *module, char *comment)
   fprintf(fp, "%s * Don't edit this file\n%s */\n", comment, comment);
   fprintf(fp, "%s\n", comment);
   fprintf(fp, "%s\n", comment);
-  
+
 }
 
 /*========================================================================*/
@@ -627,12 +627,12 @@ static char *object_name(char *p)
       case SYSTYP_LINUX:
         sprintf(r, "%s.lo", p);
         break;
-        
+
       case SYSTYP_HPUX9:
         sprintf(r, "%s.o", p);
         break;
   }
-  
+
   *q = '.';
   return(r);
 }
@@ -644,7 +644,7 @@ void mod_create_makefile(moddefv module)
   fp = fopen("Makefile", "w");
   cfilesv cf = module->files;
   int i;
-  
+
   printf("Creating Makefile  ...");fflush(stdout);
   write_header(fp, module->name, "#");
   fprintf(fp, "CC\t= gcc\n");
@@ -653,7 +653,7 @@ void mod_create_makefile(moddefv module)
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");
   fprintf(fp, "SRCS\t= ");
-  
+
   for(i=0; i<module->filecnt; i++)
     fprintf(fp, "%s ", cf[i].filename);
 
@@ -669,7 +669,7 @@ void mod_create_makefile(moddefv module)
         fprintf(fp, "%%.lo: %%.cc Makefile\n");
         fprintf(fp, "\t${CC} ${CFLAGS} -c -fPIC -DPIC $< -o $*.lo\n");
         fprintf(fp, "\n");
-  
+
         fprintf(fp, "%%.la: %%.cc Makefile\n");
         fprintf(fp, "\t${CC} ${CFLAGS} -c $< -o $*.la\n");
         fprintf(fp, "\n");
@@ -695,15 +695,15 @@ void mod_create_makefile(moddefv module)
         fprintf(fp, "\t${LD} -b -o %s.sl \\\n", module->name);
         fprintf(fp, "\t\t${OBJS}\n");
         break;
-        
+
   }
 
   fprintf(fp, "clean:\n");
   fprintf(fp, "\trm -f *.o *.lo *.so* *.sl *.la *~ core\n\n");
-  
+
   fprintf(fp, "distclean: clean\n");
   fprintf(fp, "\trm -f %s.cc %s.h Makefile\n\n", module->name, module->name);
-  
+
   fprintf(fp, "\n");
   fprintf(fp, "\n");
 

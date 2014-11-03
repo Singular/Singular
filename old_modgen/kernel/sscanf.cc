@@ -37,9 +37,9 @@ BOOLEAN IOsscanf(leftv res, leftv h)
   Print("sscanf(%s,%s,<va_list>)\n", input, format);
   //Print("sscanf(%s,%s,%s[%d])\n", input, format, (char *)a1, (int)a2);
   //Print("sscanf(%s,%s,%s[%d])\n", input, format, (char *)args[0], (int)args[1]);
-Print("sscanf(%s,%s,%s)\n", input, format, (char *)args[0]);  
+Print("sscanf(%s,%s,%s)\n", input, format, (char *)args[0]);
   //va_end(args);
-  
+
   FreeL(input);
   FreeL(format);
   res->rtyp=NONE;

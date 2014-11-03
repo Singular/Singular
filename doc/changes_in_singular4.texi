@@ -5,14 +5,36 @@ between Singular 3-1-7 and Singular 4.* (formerly known as Spielwiese) both for 
 and Singular users. In what follows we will refer to the systems as Singular 3 and Singular 4.
 
 @menu
+* Version schema for Singular::
 * Notes for Singular users::
 * Notes for developers::
 * Building Singular::
 @end menu
 
+@c ---------------------------------------------------------------------------
+@node Version schema for Singular, Notes for Singular users, , Singular 3 and Singular 4 
+@subsection Version schema for Singular
+@cindex Version schema for Singular
+@cindex Version number
+
+@sc{Singular} version is of the form @code{a.b.c.d} which may also be written 
+as @code{a-b-c-d} where a,b,c and d are numbers:
+@itemize
+@item a is changed with major, incompatible changes
+@item b is changed with incompatible changes (of some commands/libraries)
+@item c is changed with compatible chnages (i.e. new commands,
+      extended options, new algorithms, etc.)
+@item d is changed with each release (i.e. with bug fixes, etc.)
+@end itemize
+@sc{Singular} does also have "inofficiall" build orginating from
+a code version between "officiall" version: such builds display
+"Development version a.b.c" in the header while "official" versions
+show "version a.b.c". Also the manual describes version a-b-c.
+To get the complete version number, use
+@code{system("version");} or use @code{SINGULAR_VERSION} in C.
 
 @c ---------------------------------------------------------------------------
-@node Notes for Singular users, Notes for developers, , Singular 3 and Singular 4 
+@node Notes for Singular users, Notes for developers, Version schema for Singular, Singular 3 and Singular 4 
 @subsection Notes for Singular users
 @cindex Notes for Singular users
 

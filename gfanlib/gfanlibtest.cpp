@@ -44,7 +44,7 @@ string toPrintString(gfan::ZMatrix const &m, int fieldWidth, char *tab=0)
 	  temp<<m[i][j];
 	  string temp2=temp.str();
 	  for(int k=temp2.size();k<fieldWidth;k++)s<<" ";
-	  s<<temp2;  
+	  s<<temp2;
 	  if(i+1!=m.getHeight() || j+1!=m.getWidth())
 	    {
 	      s<<" ";

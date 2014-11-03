@@ -235,13 +235,13 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
     n_CoeffWrite(r); PrintLn();
   }
 
-  if (n_NumberOfParameters(r) > 0) 
+  if (n_NumberOfParameters(r) > 0)
   {
     number z = n_Param(1, r); // also any integer instead of 0//?
     PrintS("Parameter: "); PrintSized(z, r);
-    n_Delete(&z, r);    
+    n_Delete(&z, r);
   }
-   
+
 
   clog << "Char: " << n_GetChar(r) << endl;
 

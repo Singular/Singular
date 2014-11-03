@@ -415,7 +415,7 @@ int hasAlgVar (const CanonicalForm &f)
 
 /// pseudo division of f and g wrt. x s.t. multiplier*f=q*g+r
 void
-psqr (const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, 
+psqr (const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q,
       CanonicalForm & r, CanonicalForm& multiplier, const Variable& x)
 {
     ASSERT( x.level() > 0, "type error: polynomial variable expected" );

@@ -53,7 +53,7 @@ BOOST_PYTHON_MODULE(Singular){
           DifferentDomainException>(different_ring_translator);
   export_poly();
 
-  
+
 
   export_number();
   export_vector();
@@ -63,7 +63,7 @@ BOOST_PYTHON_MODULE(Singular){
   //export_interpreter();
   export_ring();
   export_intvec();
-  boost::python::class_<PowerSeries>("power_series")       
+  boost::python::class_<PowerSeries>("power_series")
     .def(boost::python::init <const PowerSeries::numerator_type &,const PowerSeries::denominator_type&>())
     .def("__iter__", boost::python::iterator<PowerSeries>());
   boost::python::class_<VectorPowerSeries>("vector_power_series")
@@ -73,7 +73,7 @@ BOOST_PYTHON_MODULE(Singular){
 
 
   //    .def(self+=self)
-   
+
   //   .def(self+self)
   //.def(self*=Number())
   //.def(Number() * self);
@@ -83,7 +83,7 @@ BOOST_PYTHON_MODULE(factory){
   boost::python::class_<Variable>("variable")
     .def(boost::python::init <const int, char>())
     .def(boost::python::init <char>())
-    
+
     .def(boost::python::init <const int>());
   export_CF();
 }

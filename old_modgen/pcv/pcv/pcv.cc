@@ -28,7 +28,7 @@ idhdl enter_id(char *name, char *value, idtyp t)
          case PACKAGE_CMD: break;
          case PROC_CMD: break;
      }
-  } else 
+  } else
       Warn("Cannot create '%s'\n", name);
   return(h);
 }
@@ -61,7 +61,7 @@ idhdl add_singular_proc(char *procname, int line,
   pi->data.s.example_lineno = 0;
   pi->data.s.body = NULL;
   pi->data.s.help_chksum = 0;
-  
+
   return(h);
 }
 
@@ -87,11 +87,11 @@ int mod_init(int(*iiAddCproc)())
   idhdl helphdl = enter_id("Help", NULL, PACKAGE_CMD);
   idhdl examplehdl = enter_id("Example", NULL, PACKAGE_CMD);
 
-  
+
    if( helphdl == NULL)
      Warn("Cannot create help-package\n");
    else fill_help_package(helphdl);
-  
+
    if( examplehdl == NULL)
      Warn("Cannot create example-package\n");
    else fill_example_package(examplehdl);
@@ -215,7 +215,7 @@ BOOLEAN mod_P2CV(leftv res, leftv h)
     WerrorS("no ring active");
     return TRUE;
   }
-  
+
 #line 47 "pcv.mod"
 #line 222 "pcv.cc"
   if(v==NULL) goto mod_P2CV_error;
@@ -292,7 +292,7 @@ BOOLEAN mod_CV2P(leftv res, leftv h)
     WerrorS("no ring active");
     return TRUE;
   }
-  
+
 #line 62 "pcv.mod"
 #line 299 "pcv.cc"
   if(v==NULL) goto mod_CV2P_error;
@@ -367,7 +367,7 @@ BOOLEAN mod_Dim(leftv res, leftv h)
     WerrorS("no ring active");
     return TRUE;
   }
-  
+
 #line 77 "pcv.mod"
 #line 374 "pcv.cc"
   if(v==NULL) goto mod_Dim_error;
@@ -432,7 +432,7 @@ BOOLEAN mod_Basis(leftv res, leftv h)
     WerrorS("no ring active");
     return TRUE;
   }
-  
+
 #line 92 "pcv.mod"
 #line 439 "pcv.cc"
   if(v==NULL) goto mod_Basis_error;

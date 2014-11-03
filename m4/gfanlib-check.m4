@@ -24,13 +24,14 @@ if test "x$ENABLE_GFANLIB" = xyes; then
 
  BACKUP_LIBS=$LIBS
 
- LIBS="-lcddgmp $GMP_LIBS $LIBS"
+ LIBS="$LIBS -lcddgmp $GMP_LIBS "
 
- AC_LANG_PUSH(C++)
+ AC_LANG_PUSH(C)
  AC_LINK_IFELSE(
   [
    AC_LANG_PROGRAM(
     [
+    #define GMPRATIONAL
      #ifdef HAVE_SETOPER_H
      # include <setoper.h>
      # include <cdd.h>
@@ -43,23 +44,27 @@ if test "x$ENABLE_GFANLIB" = xyes; then
      # include <cddlib/setoper.h>
      # include <cddlib/cdd.h>
      #endif
-    ], [dd_set_global_constants()]    )
+    ], [dd_set_global_constants(); dd_log=dd_FALSE; ] 
+    )
   ],
-  [PASSED_ALL_TESTS_FOR_GFANLIB="1"] [CDDGMPLDFLAGS="-lcddgmp"],
+  [PASSED_ALL_TESTS_FOR_GFANLIB="1"] [CDDGMPLDFLAGS="-lcddgmp $GMP_LIBS"]  [CDDGMPCPPFLAGS="-DGMPRATIONAL"],
   [PASSED_ALL_TESTS_FOR_GFANLIB="0"]
  )
  AC_LANG_POP()
 
  LIBS=$BACKUP_LIBS
 
- AC_MSG_RESULT(no)
-
- AC_SUBST(CDDGMPLDFLAGS) 
 else
- AC_MSG_RESULT(no)
  PASSED_ALL_TESTS_FOR_GFANLIB="0"
 fi
 
+ if test "x$PASSED_ALL_TESTS_FOR_GFANLIB" = x1; then  
+  AC_MSG_RESULT(yes)
+  AC_SUBST(CDDGMPLDFLAGS) 
+  AC_SUBST(CDDGMPCPPFLAGS) 
+ else
+  AC_MSG_RESULT(no) 
+ fi
 
 AM_CONDITIONAL(HAVE_GFANLIB, test "x$PASSED_ALL_TESTS_FOR_GFANLIB" = x1)
 AC_DEFINE_UNQUOTED(HAVE_GFANLIB, ${PASSED_ALL_TESTS_FOR_GFANLIB}, [whether gfanlib support is enabled])

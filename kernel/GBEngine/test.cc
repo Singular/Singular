@@ -48,7 +48,7 @@
 // TODO: DUE to its use in kutil.cc :(((
 char * showOption(){return NULL;}
 
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/GBEngine/khstd.h>
 #include <kernel/GBEngine/kstd1.h>
@@ -65,7 +65,6 @@ char * showOption(){return NULL;}
 #include <kernel/GBEngine/ratgring.h>
 #include <kernel/GBEngine/ringgb.h>
 #include <kernel/GBEngine/shiftgb.h>
-#include <kernel/GBEngine/stairc.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/GBEngine/tgbgauss.h>
 #include <kernel/GBEngine/tgb.h>

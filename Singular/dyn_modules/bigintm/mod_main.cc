@@ -40,7 +40,7 @@ static BOOLEAN bigintm_setup0(leftv __res, leftv /*__v*/)
 }
 
 
-extern "C" int SI_MOD_INIT(bigintm)(SModulFunctions* psModulFunctions) 
+extern "C" int SI_MOD_INIT(bigintm)(SModulFunctions* psModulFunctions)
 {
    psModulFunctions->iiAddCproc(currPack->libname,(char*)"printBlackboxTypes",FALSE, printBlackboxTypes0);
    psModulFunctions->iiAddCproc(currPack->libname,(char*)"bigintm_setup",FALSE, bigintm_setup0);

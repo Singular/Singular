@@ -1192,6 +1192,8 @@ struct sConvertTypes dConvertTypes[] =
 //  end of list
    { 0,               0,              NULL_VAL , NULL_VAL }
 };
+#else
+extern struct sConvertTypes dConvertTypes[];
 #endif
 #ifdef IPASSIGN
 struct sValAssign dAssign[]=

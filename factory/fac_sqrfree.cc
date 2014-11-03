@@ -107,7 +107,7 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
     return F;
 }
 
-CanonicalForm 
+CanonicalForm
 sqrfPart (const CanonicalForm& F)
 {
   if (F.inCoeffDomain())

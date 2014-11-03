@@ -173,9 +173,19 @@ void *idrecDataInit(int t)
     case RING_CMD:
       return (void*) omAlloc0Bin(sip_sring_bin);
     case PACKAGE_CMD:
-      return (void*) omAlloc0Bin(sip_package_bin);
+    {
+      package pa=(package)omAlloc0Bin(sip_package_bin);
+      pa->language=LANG_NONE;
+      pa->loaded = FALSE;
+      return (void*)pa;
+    }
     case PROC_CMD:
-      return (void *) omAlloc0Bin(procinfo_bin);
+    {
+      procinfov pi=(procinfov)omAlloc0Bin(procinfo_bin);
+      pi->ref=1;
+      pi->language=LANG_NONE;
+      return (void*)pi;
+    }
     case RESOLUTION_CMD:
       return  (void *)omAlloc0(sizeof(ssyStrategy));
     //other types: without init (int,script,poly,def,package)
@@ -227,18 +237,7 @@ idhdl idrec::set(const char * s, int level, int t, BOOLEAN init)
       // IDRING(h)=rCopy(currRing);
       /* QRING_CMD is ring dep => currRing !=NULL */
     }
-    else
 #endif
-    if (t == PROC_CMD)
-    {
-      IDPROC(h)->language=LANG_NONE;
-      IDPROC(h)->ref=1;
-    }
-    else if (t == PACKAGE_CMD)
-    {
-      IDPACKAGE(h)->language=LANG_NONE;
-      IDPACKAGE(h)->loaded = FALSE;
-    }
   }
   // --------------------------------------------------------
   if (at_start)
@@ -636,8 +635,18 @@ const char * piProcinfo(procinfov pi, const char *request)
   return "??";
 }
 
-void piCleanUp(procinfov pi)
+BOOLEAN piKill(procinfov pi)
 {
+  Voice *p=currentVoice;
+  while (p!=NULL)
+  {
+    if (p->pi==pi && pi->ref <= 1)
+    {
+      Warn("`%s` in use, can not be killed",pi->procname);
+      return TRUE;
+    }
+    p=p->next;
+  }
   (pi->ref)--;
   if (pi->ref <= 0)
   {
@@ -656,24 +665,8 @@ void piCleanUp(procinfov pi)
     }
     memset((void *) pi, 0, sizeof(procinfo));
     pi->language=LANG_NONE;
-  }
-}
-
-BOOLEAN piKill(procinfov pi)
-{
-  Voice *p=currentVoice;
-  while (p!=NULL)
-  {
-    if (p->pi==pi && pi->ref <= 1)
-    {
-      Warn("`%s` in use, can not be killed",pi->procname);
-      return TRUE;
-    }
-    p=p->next;
-  }
-  piCleanUp(pi);
-  if (pi->ref <= 0)
     omFreeBin((ADDRESS)pi,  procinfo_bin);
+  }
   return FALSE;
 }
 

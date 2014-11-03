@@ -24,23 +24,22 @@ class slists
   public:
     void Clean(ring r=currRing)
     {
-      if (this!=NULL)
+      assume (this!=NULL);
+      
+      if (nr>=0)
       {
-        if (nr>=0)
+        int i;
+        for(i=nr;i>=0;i--)
         {
-          int i;
-          for(i=nr;i>=0;i--)
-          {
-            if (m[i].rtyp!=DEF_CMD) m[i].CleanUp(r);
-          }
-          omFreeSize((ADDRESS)m, (nr+1)*sizeof(sleftv));
-          nr=-1;
+          if (m[i].rtyp!=DEF_CMD) m[i].CleanUp(r);
         }
-        //omFreeSize((ADDRESS)this, sizeof(slists));
-        omFreeBin((ADDRESS)this,slists_bin);
+        omFreeSize((ADDRESS)m, (nr+1)*sizeof(sleftv));
+        nr=-1;
       }
+      //omFreeSize((ADDRESS)this, sizeof(slists));
+      omFreeBin((ADDRESS)this,slists_bin);
     }
-  INLINE_THIS void Init(int l=0);
+    INLINE_THIS void Init(int l=0);
     int    nr; /* the number of elements in the list -1 */
                /* -1: empty list */
     sleftv  *m;  /* field of sleftv */

@@ -46,7 +46,7 @@ neworder (const CFList & PolyList)
   for (int i= highest_level; i>=1; i--)
   {
     oldorder.insert (Variable (i));
-    CFList is_one= only_in_one (PS1, Variable (i)); 
+    CFList is_one= only_in_one (PS1, Variable (i));
     if (is_one.length() == 1)
     {
       reorder.insert (Variable (i));
@@ -55,7 +55,7 @@ neworder (const CFList & PolyList)
     else if (is_one.length() == 0)
     {
       reorder.append (Variable (i)); // assigne it the highest level
-      PS1= Difference (PS1, is_one); 
+      PS1= Difference (PS1, is_one);
     }
   }
   difference= Difference (oldorder, reorder);
@@ -436,14 +436,14 @@ charSeries (const CFList& L)
 
     l= tmp.getFirst();
 
-    tmp= minus (tmp, l);
+    tmp= Difference (tmp, l);
 
     select (ppi, l.length(), ppi1, ppi2);
 
     inplaceUnion (ppi2, qqi);
 
     if (count > 0)
-      ppi= MyUnion (ListCFList (l), ppi1);
+      ppi= Union (ppi1, ListCFList (l));
     else
       ppi= ListCFList();
 
@@ -454,7 +454,7 @@ charSeries (const CFList& L)
 
     if (charset.length() > 0 && charset.getFirst().level() > 0)
     {
-      result= MyUnion (result, ListCFList (charset));
+      result= Union (ListCFList (charset), result);
       ini= factorsOfInitials (charset);
 
       ini= Union (ini, factorPSet (StoredFactors.FS1));
@@ -467,7 +467,7 @@ charSeries (const CFList& L)
     }
 
     tmp2= adjoin (ini, l, qqi);
-    tmp= MyUnion (tmp, tmp2);
+    tmp= Union (tmp2, tmp);
 
     StoredFactors.FS1= CFList();
     StoredFactors.FS2= CFList();
@@ -517,14 +517,9 @@ irredAS (CFList & AS, int & indexRed, CanonicalForm & reducible)
   for (i= AS; i.hasItem(); i++ )
   {
     nr += 1;
-    if (degree (i.getItem()) > 1)
-    {
-      qs= factorize (i.getItem());
-      if (qs.getFirst().factor().inCoeffDomain())
-        qs.removeFirst();
-    }
-    else
-      qs= CFFList (CFFactor (normalize (i.getItem()), 1));
+    qs= factorize (i.getItem());
+    if (qs.getFirst().factor().inCoeffDomain())
+      qs.removeFirst();
 
     if ((qs.length() >= 2 ) || (qs.getFirst().exp() > 1))
     {
@@ -549,14 +544,17 @@ irredAS (CFList & AS, int & indexRed, CanonicalForm & reducible)
         if (degree (i.getItem()) > 1)
         {  // search for a non linear elem
           qs= facAlgFunc2 (i.getItem(), as);
-          if (qs.getFirst().factor().inCoeffDomain())
-            qs.removeFirst();
-          if (qs.length() > 1 || qs.getFirst().exp() > 1)
-          { //found elem is reducible
-            reducible= i.getItem();
-            indexRed= nr + 1;
-            break;
-          }
+          if (qs.length() > 0)
+	  {
+	    if (qs.getFirst().factor().inCoeffDomain())
+              qs.removeFirst();
+            if (qs.length() > 1 || qs.getFirst().exp() > 1)
+            { //found elem is reducible
+              reducible= i.getItem();
+              indexRed= nr + 1;
+              break;
+            }
+	  }
         }
       }
     }
@@ -615,7 +613,7 @@ irrCharSeries (const CFList & PS)
     else
     {
       nr_of_iteration += 1;
-      ppi= MyUnion (ListCFList (qs), ppi1);
+      ppi= Union (ppi1, ListCFList (qs));
     }
 
     StoreFactors StoredFactors;
@@ -635,16 +633,16 @@ irrCharSeries (const CFList & PS)
       {
         if (!isSubset (cs,qs))
           cs= charSetViaCharSetN (Union (qs,cs));
-        if (!isMember (cs, pi))
+        if (!find (pi, cs))
         {
-          pi= MyUnion (pi, ListCFList (cs));
+          pi= Union (ListCFList (cs), pi);
           if (cs.getFirst().level() > 0)
           {
             ts= irredAS (cs, indexRed, reducible);
 
             if (indexRed <= 0) //irreducible
             {
-              qsi= MyUnion (qsi, ListCFList(cs));
+              qsi= Union (ListCFList(cs), qsi);
               if (cs.length() == highestlevel)
                 is= factorPSet (factorset);
               else
@@ -669,11 +667,11 @@ irrCharSeries (const CFList & PS)
           {
             if (i.getItem() == reducible)
               break;
-            else 
+            else
               cst.append (i.getItem());
           }
-          is= Union (factorsOfInitials (cst), is);
-          iss= MyUnion (adjoin (is, qs, qqi), adjoinb (ts, qs, qqi, cst));
+          is= Union (factorsOfInitials (Union (cst,  CFList (reducible))), is);
+          iss= Union (adjoinb (ts, qs, qqi, cst), adjoin (is, qs, qqi));
         }
         else
           iss= adjoin (Union (is, ts), qs, qqi);
@@ -684,7 +682,7 @@ irrCharSeries (const CFList & PS)
     if (qhi.length() > 1)
     {
       qhi.removeFirst();
-      qhi= MyUnion (qhi, iss);
+      qhi= Union (iss, qhi);
     }
     else
       qhi= iss;

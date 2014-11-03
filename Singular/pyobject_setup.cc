@@ -45,7 +45,7 @@ void pyobject_setup()
 }
 
 /// Explicitely load, if not loaded already
-BOOLEAN pyobject_ensure() 
+BOOLEAN pyobject_ensure()
 {
 
   int tok = -1;

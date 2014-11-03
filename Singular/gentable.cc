@@ -283,6 +283,7 @@ const char * iiTwoOps(int t)
 /*2
 * try to convert 'inputType' in 'outputType'
 * return 0 on failure, an index (<>0) on success
+* GENTABLE variant!
 */
 int iiTestConvert (int inputType, int outputType)
 {

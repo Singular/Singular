@@ -111,10 +111,25 @@ public:
 };
 
 template <class T>
+int operator== (const List<T>&, const List<T>& );
+
+template <class T>
 List<T> Union ( const List<T>&, const List<T>& );
 
 template <class T>
 List<T> Difference ( const List<T>&, const List<T>& );
+
+template <class T>
+List<T> Union ( const List<T> &, const List<T> & , int (*ecmpf)( const T&, const T& ));
+
+template <class T>
+List<T> Difference ( const List<T> &, const List<T> & , int (*ecmpf)( const T&, const T& ));
+
+template <class T>
+List<T> Difference ( const List<T> & F, const T & G);
+
+template <class T>
+List<T> Difference ( const List<T> & F, const T & G, int (*ecmpf)( const T&, const T& ));
 
 template <class T>
 List<T> Union ( const List<T>&, const List<T>&, int (*cmpf)( const T&, const T& ), void (*insf)( T&, const T& ) );
@@ -125,4 +140,6 @@ T prod ( const List<T>& );
 template <class T>
 bool find (const List<T>&, const T& t);
 
+template <class T>
+bool find (const List<T> & F, const T& t, int (*ecmpf)( const T&, const T& ));
 #endif /* ! INCL_LIST_H */
