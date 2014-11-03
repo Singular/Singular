@@ -2442,7 +2442,7 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
         {
           g= prod (T);
           T.removeFirst();
-          result.append (g/myContent (g));
+          g /= myContent (g);
           g /= Lc (g);
           appendTestMapDown (result, g, info, source, dest);
           return result;
@@ -2503,7 +2503,9 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
     if (T.length() < 2*s || T.length() == s)
     {
       delete [] v;
-      appendTestMapDown (result, buf/myContent(buf), info, source, dest);
+      buf /= myContent (buf);
+      buf /= Lc (buf);
+      appendTestMapDown (result, buf, info, source, dest);
       return result;
     }
     for (int i= 0; i < T.length(); i++)
@@ -2511,7 +2513,11 @@ extNonMonicFactorRecombination (const CFList& factors, const CanonicalForm& F,
     noSubset= false;
   }
   if (T.length() < 2*s)
-    appendMapDown (result, F/myContent(F), info, source, dest);
+  {
+    buf= F/myContent (F);
+    buf /= Lc (buf);
+    appendMapDown (result, buf, info, source, dest);
+  }
 
   delete [] v;
   return result;
