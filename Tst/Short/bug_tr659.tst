@@ -36,7 +36,7 @@ proc test656()
     ASSUME(0, size(pc1)==1);
 }
 int i ; 
-// repeat test, since the computation originaly failed randomly, independent of random seed...
+// repeat test, since the computation originaly failed occationally, independent of random seed...
 for (i=1; i<12; i++)     {    test656();  }
 
 tst_status(1);$
