@@ -1,6 +1,5 @@
 LIB "tst.lib";
 tst_init();
-Exp $");
 option(prot);
 ring r=32003,(y,t,x,z,w),dp;
 ideal i=6*t^5*x^3*z^4+5*x^5*z^7+4*t^4*y*z^3*w^4,
