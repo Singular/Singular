@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version resjung.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version resjung.lib 4.0.1.0 Nov_2014 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  jung.lib      Resolution of surface singularities (Desingularization)
@@ -250,7 +250,7 @@ EXAMPLE: example jungresolve; shows an example.
   list result;
   list nor = jungnormal(id,noeth);
   for(int i = 1;i<=size(nor);i++){
-    if(defined(R)){kill R;}
+    if(defined(R)==voice){kill R;}
     def R3 = nor[i];
     setring R3;
     def R = changeord(list(list("dp",1:nvars(basering))));
@@ -263,8 +263,8 @@ EXAMPLE: example jungresolve; shows an example.
       for(int j =1;j<=size(res[1]);j++){
         def R2 = res[1][j];
         setring R2;
-        if(defined(QIdeal)){kill QIdeal;}
-        if(defined(BMap)){kill BMap;}
+        if(defined(QIdeal)==voice){kill QIdeal;}
+        if(defined(BMap)==voice){kill BMap;}
         if(BO[1]<>0){ideal QIdeal = BO[1]+BO[2];}
         else{ideal QIdeal = BO[2];}
         map g = R,BO[5];
@@ -369,7 +369,7 @@ static proc branchlocus(ideal id)
             break;
           }
         }
-        kill k;
+        //kill k;
         if(attrib(w,"isMonic")==1){
           index = j;
           break;
@@ -476,8 +476,10 @@ EXAMPLE: example embresolve shows an example
   list BO = createBO(J,l);
   kill J,l;
   list result = resolve2(BO);
-  if(defined(Lowdim)){
-    for(int i = 1;i<=size(result);i++){
+  if(defined(Lowdim)==voice)
+  {
+    for(int i = 1;i<=size(result);i++)
+    {
     //had zero dimensional components which I add now to the end result
       def RingforEmbeddedResolution = result[i];
       setring RingforEmbeddedResolution;
@@ -684,11 +686,13 @@ static proc resolve2(list BO){
   return(result);
 }
 
-static proc NoetherP_test(ideal id){
+static proc NoetherP_test(ideal id)
+{
   def A = basering;
   list ringA=ringlist(A);
   int index = 0;
-  if(size(id)==1 && nvars(A)){  //test if V(id) = C[x,y,z]/<f>
+  if(size(id)==1 && nvars(A))
+  {  //test if V(id) = C[x,y,z]/<f>
     list L;
     intvec v = 1,1,1;
     L[1] = "lp";
@@ -696,7 +700,8 @@ static proc NoetherP_test(ideal id){
     kill v;
     poly f = id[1];
     int j = 0;
-    for(int i = 1;i<=3;i++){
+    for(int i = 1;i<=3;i++)
+    {
       setring A;
       list l = ringA;  //change ordering to lp and var(i)>var(j) j<>i
       list vari = ringA[2];
@@ -713,24 +718,25 @@ static proc NoetherP_test(ideal id){
       if(defined(v)){kill v;}
       intvec v = leadexp(I[1]);
       attrib(v,"isMonic",1);
-      if(defined(k)){kill k;}
-      for(int k = 2;k<=3;k++){  //checks whether f is monic in var(i)
-        if(v[k] <> 0 || v[1] == 0){
+      //if(defined(k)==voice){kill k;}
+      for(int k = 2;k<=3;k++)
+      {  //checks whether f is monic in var(i)
+        if(v[k] <> 0 || v[1] == 0)
+        {
           attrib(v,"isMonic",0);
           j++;
           break;
         }
       }
       kill k;
-      if(attrib(v,"isMonic")==1){
+      if(attrib(v,"isMonic")==1)
+      {
         index = i;
         return(index);
       }
       kill R;
     }
-    if(j == 3){
-      return(0);
-    }
+    if(j == 3){ return(0); }
   }
   else{     //not yet a test for more variables
     return(index);
