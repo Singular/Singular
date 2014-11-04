@@ -1004,7 +1004,7 @@ example
   basering;///does show the ring
   poly f=t**3*cx**2-cy**2*dt+i**3*sx;
   f;
-  VarToPar(f);
+  Complex(f);
 }
 //////////////////////////////////
 proc VarToPar(poly f)

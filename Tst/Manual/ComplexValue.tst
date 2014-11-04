@@ -7,5 +7,5 @@ setinitials(V,D,P);////does not show the ring, as there is  no output
 basering;///does show the ring
 poly f=t**3*cx**2-cy**2*dt+i**3*sx;
 f;
-VarToPar(f);
+ComplexValue(f);
 tst_status(1);$
