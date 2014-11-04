@@ -25,18 +25,14 @@ size(pc2); // must be 1
 kill rng;
 
 // tr.656 (incomplete primary decomp with primdecSY)
-proc test656()
-{
-    ring rng656 = (0),(xy,xg,xt,xb),dp;
-    ideal I = -11658/12181*xg*xt*xb-8219/674*xg*xb^2,
-    307/3906*xy^2+20884/14685*xg^3+21229/26747*xg,
-    -3493/11608*xy+13440/12053*xg*xt-1161/3359*xb-1377/857;
-    def L1 =  primdecSY(I,0);
-    def pc1 =  primdecSY(L1[1][1],0);
-    ASSUME(0, size(pc1)==1);
-}
 int i ; 
 // repeat test, since the computation originaly failed occasionally, independent of random seed...
-for (i=1; i<12; i++)     {    test656();  }
+ring rng656 = (0),(y,g,t,b),dp;
+ideal I = -11658/12181*g*t*b-8219/674*g*b^2,
+307/3906*y^2+20884/14685*g^3+21229/26747*g,
+-3493/11608*y+13440/12053*g*t-1161/3359*b-1377/857;
+list L1;
+for (i=1; i<12; i++)
+{ L1=primdecSY(I,0);size(primdecSY(L1[1][1])); }
 
 tst_status(1);$
