@@ -14,6 +14,6 @@ attrib(J,"isSB");
 //no warning should be printed , since isSubset computes standard basis for J before calling reduce!
 isSubset( I, J ); 
 
-$;
+tst_status(1);$;
 
 
