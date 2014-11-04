@@ -93,7 +93,6 @@ Short/bug_interpol.tst
 Short/bug_mres.tst
 ;;;; Short/bug_M.tst
 Short/bug_napMultT.tst
-Short/bug_newstruct3.tst
 Short/bug_pd.tst
 Short/bug_presolve.tst
 Short/bug_primdec.tst
