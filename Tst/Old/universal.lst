@@ -312,8 +312,7 @@ string
 subexpr
 subexpr1
 substit
-; DIFF syzygies
-syzygies_new
+syzygies
 syzygy
 teste
 time
