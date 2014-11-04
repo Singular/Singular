@@ -5611,6 +5611,7 @@ void rKill(ring r)
 // any variables depending on r ?
     while (r->idroot!=NULL)
     {
+      r->idroot->lev=myynest; // avoid warning about kill global objects
       killhdl2(r->idroot,&(r->idroot),r);
     }
     if (r==currRing)
