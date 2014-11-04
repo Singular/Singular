@@ -1040,7 +1040,6 @@ pmat.tst
 pnormalform.tst
 poly.tst
 poly2list.tst
-poly_BR_PLURAL_BR.tst
 poly_declarations.tst
 poly_declarations_BR_PLURAL_BR.tst
 poly_expressions.tst
