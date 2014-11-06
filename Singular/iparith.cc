@@ -8380,6 +8380,7 @@ BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt)
 BOOLEAN iiExprArithM(leftv res, leftv a, int op)
 {
   memset(res,0,sizeof(sleftv));
+  BOOLEAN bo;
 
   if (!errorreported)
   {
@@ -8455,7 +8456,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
         }
         if (traceit&TRACE_CALL)
           Print("call %s(... (%d args))\n", iiTwoOps(op),args);
-        if (dArithM[i].p(res,a))
+        if ((failed=dArithM[i].p(res,a))==TRUE)
         {
           break;// leave loop, goto error handling
         }

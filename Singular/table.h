@@ -789,6 +789,7 @@ struct sValCmdM dArithM[]=
  {D(jjKLAMMER_PL),  '(',           ANY_TYPE,           -2      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBREAK0),    BREAKPOINT_CMD,  NONE,               0       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBREAK1),    BREAKPOINT_CMD,  NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
+,{D(iiBranchTo),  BRANCHTO_CMD,    NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
 #ifdef SINGULAR_4_1
 ,{D(jjCALL3ARG),  CMATRIX_CMD,     CMATRIX_CMD,        3       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL2ARG),  CNUMBER_CMD,     CNUMBER_CMD,        2       , ALLOW_PLURAL |ALLOW_RING}
@@ -861,6 +862,7 @@ cmdnames cmds[] =
   { "betti",       0, BETTI_CMD ,         CMD_12},
   { "bigint",      0, BIGINT_CMD ,        ROOT_DECL},
   { "bigintmat",   0, BIGINTMAT_CMD ,     BIGINTMAT_CMD},
+  { "branchTo",    0, BRANCHTO_CMD ,      CMD_M},
   #ifdef HAVE_PLURAL
   { "bracket",     0, BRACKET_CMD ,       CMD_2},
   #endif
@@ -899,7 +901,7 @@ cmdnames cmds[] =
   { "eliminate",   0, ELIMINATION_CMD,    CMD_23},
   { "else",        0, ELSE_CMD ,          ELSE_CMD},
   #ifdef HAVE_PLURAL
-  { "envelope",    0, ENVELOPE_CMD ,       CMD_1},
+  { "envelope",    0, ENVELOPE_CMD ,      CMD_1},
   #endif
   { "eval",        0, EVAL ,              EVAL},
   { "example",     0, EXAMPLE_CMD ,       EXAMPLE_CMD},

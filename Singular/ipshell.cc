@@ -1173,6 +1173,63 @@ BOOLEAN iiDefaultParameter(leftv p)
   tmp.data=at->CopyA();
   return iiAssign(p,&tmp);
 }
+BOOLEAN iiBranchTo(leftv r, leftv args)
+{
+  // <string1...stringN>,<proc>
+  // known: args!=NULL, l>=1
+  int l=args->listLength();
+  int ll=0;
+  if (iiCurrArgs!=NULL) ll=iiCurrArgs->listLength();
+  if (ll!=(l-1)) return FALSE;
+  leftv h=args;
+  short *t=(short*)omAlloc(l*sizeof(short));
+  t[0]=l-1;
+  int b;
+  int i;
+  for(i=1;i<l;i++,h=h->next)
+  {
+    if (h->Typ()!=STRING_CMD)
+    {
+      omFree(t);
+      Werror("arg %d is not a string",i);
+      return TRUE;
+    }
+    int tt;
+    b=IsCmd((char *)h->Data(),tt);
+    if(b) t[i]=tt;
+    else
+    {
+      omFree(t);
+      Werror("arg %d is not a type name",i);
+      return TRUE;
+    }
+  }
+  if (h->Typ()!=PROC_CMD)
+  {
+    omFree(t);
+    Werror("last arg is not a proc",i);
+    return TRUE;
+  }
+  b=iiCheckTypes(iiCurrArgs,t,0);
+  omFree(t);
+  if (b && (h->rtyp==IDHDL) && (h->e==NULL))
+  {
+    BOOLEAN err;
+    //Print("branchTo: %s\n",h->Name());
+    iiCurrProc=(idhdl)h->data;
+    err=iiAllStart(IDPROC(iiCurrProc),IDPROC(iiCurrProc)->data.s.body,BT_proc,IDPROC(iiCurrProc)->data.s.body_lineno-(iiCurrArgs==NULL));
+    exitBuffer(BT_proc);
+    if (iiCurrArgs!=NULL)
+    {
+      if (!err) Warn("too many arguments for %s",IDID(iiCurrProc));
+      iiCurrArgs->CleanUp();
+      omFreeBin((ADDRESS)iiCurrArgs, sleftv_bin);
+      iiCurrArgs=NULL;
+    }
+    return 2-err;
+  }
+  return FALSE;
+}
 BOOLEAN iiParameter(leftv p)
 {
   if (iiCurrArgs==NULL)
@@ -6013,7 +6070,7 @@ BOOLEAN iiCheckTypes(leftv args, const short *type_list, int report)
     short t=type_list[i];
     if (t!=ANY_TYPE)
     {
-      if (((t==IDHDL)&&(args->rtyp!=IDHDL)) 
+      if (((t==IDHDL)&&(args->rtyp!=IDHDL))
       || (t!=args->Typ()))
       {
         if (report) iiReportTypes(i,args->Typ(),type_list);
