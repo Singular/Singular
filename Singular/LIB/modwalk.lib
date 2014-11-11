@@ -15,6 +15,7 @@ OVERVIEW:
   Journal of Symbolic Computation 35, 403-419 (2003).
 
 PROCEDURES:
+modpWalk(ideal,int,int,int[,int,int,int,int])    standard basis conversion of I in prime characteristic
 modWalk(ideal,int,int[,int,int,int,int]);        standard basis conversion of I using modular methods (chinese remainder)
 ";
 
@@ -28,7 +29,7 @@ LIB "modstd.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc modpWalk(def II, int p, int variant, list #)
+proc modpWalk(def II, int p, int variant, list #)
 "USAGE:  modpWalk(I,p,#); I ideal, p integer, variant integer
 ASSUME:  If size(#) > 0, then 
            #[1] is an intvec describing the current weight vector
@@ -79,40 +80,12 @@ EXAMPLE: example modpWalk; shows an example
       order = "simple";
     }
   }
-
-//-------------------------  make i homogeneous  -----------------------------
-  if(!mixedTest() && !h)
-  {
-    if(!((find(ordstr_R0, "M") > 0) || (find(ordstr_R0, "a") > 0) || neg))
-    {
-      if(!((order == "simple") || (sizerl > 4)))
-      {
-        list rl@r = ringlist(@r);
-        nvar@r = nvars(@r);      
-        intvec w;
-        for(k = 1; k <= nvar@r; k++)
-        {
-          w[k] = deg(var(k));
-        }
-        w[nvar@r + 1] = 1;
-        rl@r[2][nvar@r + 1] = "homvar";
-        rl@r[3][2][2] = w;
-        def HomR = ring(rl@r);
-        setring HomR;
-        ideal i = imap(@r, i);
-        i = homog(i, homvar);
-      }
-    }
-  }
-
 //-------------------------  compute a standard basis mod p  -----------------------------
-
   if(variant == 1)
   {
     if(size(#)>0)
     {
       i = rwalk(i,radius,pert_deg,#);
-     // rwalk(i,radius,pert_deg,#); std(i);
     }
     else
     {
@@ -174,22 +147,7 @@ EXAMPLE: example modpWalk; shows an example
       i=pwalk(i,pert_deg,pert_deg);
     }
   }
-  
-  if(!mixedTest() && !h)
-  {
-    if(!((find(ordstr_R0, "M") > 0) || (find(ordstr_R0, "a") > 0) || neg))
-    {
-      if(!((order == "simple") || (sizerl > 4)))
-      {
-        i = subst(i, homvar, 1);
-        i = simplify(i, 34);
-        setring @r;
-        i = imap(HomR, i);
-        i = interred(i);
-        kill HomR;
-      }
-    }
-  }
+
   setring R0;
   return(list(fetch(@r,i),p));
 }
@@ -486,7 +444,7 @@ EXAMPLE: example modWalk; shows an example
   intvec L = primeList(I,n2);
   if(n2 > 4)
   {
-  //  L[5] = prime(random(an,en));
+    L[5] = prime(random(an,en));
   }
   if(printlevel >= 10)
   {
@@ -527,7 +485,6 @@ EXAMPLE: example modWalk; shows an example
     T2 = LL[2];
 //-------------------  Now all leading ideals are the same  --------------------
 //-------------------  Lift results to basering via farey  ---------------------
-
     tt = timer; rt = rtimer;
     N = T2[1];
     for(i=2; i<=size(T2); i++)
@@ -544,10 +501,8 @@ EXAMPLE: example modWalk; shows an example
     }
 
 //----------------  Test if we already have a standard basis of I --------------
-
     tt = timer; rt = rtimer;
-    pTest = pTestSB(I,J,L,variant);
-    //pTest = primeTestSB(I,J,L,variant);
+    pTest = primeTest(J, prime(random(1000000000,2134567879)));
     if(printlevel >= 10)
     {
       "CPU-time for pTest is "+string(timer - tt)+" seconds.";
@@ -595,7 +550,6 @@ EXAMPLE: example modWalk; shows an example
       }
     }
 //--------------  We do not already have a standard basis of I, therefore do the main computation for more primes  --------------
-
     T1 = H;
     T2 = N;
     j = size(L)+1;
@@ -612,7 +566,6 @@ EXAMPLE: example modWalk; shows an example
     {
       for(i=j; i<=size(L); i++)
       {
-        //Arguments[i-j+1] = list(II,L[i],variant,list(curr_weight,target_weight));
         Arguments[size(Arguments)+1] = list(II,L[i],variant,list(curr_weight,target_weight));
       }
     }
@@ -620,7 +573,6 @@ EXAMPLE: example modWalk; shows an example
     {
       for(i=j; i<=size(L); i++)
       {
-        //Arguments[i-j+1] = list(II,L[i],variant);
         Arguments[size(Arguments)+1] = list(II,L[i],variant);
       }
     }
@@ -631,7 +583,6 @@ EXAMPLE: example modWalk; shows an example
     }
     for(i=1; i<=size(PP); i++)
     {
-      //P[size(P) + 1] = PP[i];
       T1[size(T1) + 1] = PP[i][1];
       T2[size(T2) + 1] = bigint(PP[i][2]);
     }
@@ -648,9 +599,8 @@ example
   "EXAMPLE:";
   echo = 2;
   ring R=0,(x,y,z),lp;
-  ideal I=-x+y2z-z,xz+1,x2+y2-1;
-  // I is a standard basis in dp
-  ideal J = modWalk(I,1);
+  ideal I= y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
+  ideal J = modWalk(I,2);
   J;
 }
 
@@ -771,206 +721,7 @@ static proc parallelFarey(ideal H, bigint N, int n1)
   }
   return(J);
 }
-//////////////////////////////////////////////////////////////////////////////////
-static proc primeTestSB(def II, ideal J, list L, int variant, list #)
-"USAGE:  primeTestSB(I,J,L,variant,#); I,J ideals, L intvec of primes, variant int
-RETURN:  1 (resp. 0) if for a randomly chosen prime p that is not in L
-         J mod p is (resp. is not) a standard basis of I mod p
-EXAMPLE: example primeTestSB; shows an example
-"
-{
-if(typeof(II) == "ideal")
-  {
-  ideal I = II;
-  int radius = 2;
-  }
-if(typeof(II) == "list")
-  {
-  ideal I = II[1];
-  int radius = II[2];
-  }
 
-int i,j,k,p;
-def R = basering;
-list r = ringlist(R);
-
-while(!j)
-  {
-  j = 1;
-  p = prime(random(1000000000,2134567879));
-  for(i = 1; i <= size(L); i++)
-    {
-    if(p == L[i])
-      {
-      j = 0;
-      break;
-      }
-    }
-  if(j)
-    {
-    for(i = 1; i <= ncols(I); i++)
-      {
-      for(k = 2; k <= size(I[i]); k++)
-        {
-        if((denominator(leadcoef(I[i][k])) mod p) == 0)
-          {
-          j = 0;
-          break;
-          }
-        }
-      if(!j)
-        {
-        break;
-        }
-      }
-    }
-  if(j)
-    {
-    if(!primeTest(I,p))
-      {
-      j = 0;
-      }
-    }
-  }
-r[1] = p;
-def @R = ring(r);
-setring @R;
-ideal I = imap(R,I);
-ideal J = imap(R,J);
-attrib(J,"isSB",1);
-
-int t = timer;
-j = 1;
-if(isIncluded(I,J) == 0)
-  {
-  j = 0;
-  }
-if(printlevel >= 11)
-  {
-  "isIncluded(I,J) takes "+string(timer - t)+" seconds";
-  "j = "+string(j);
-  }
-t = timer;
-if(j)
-  {
-  if(size(#) > 0)
-    {
-    ideal K = modpWalk(I,p,variant,#)[1];
-    }
-  else
-    {
-    ideal K = modpWalk(I,p,variant)[1];
-    }
-  t = timer;
-  if(isIncluded(J,K) == 0)
-    {
-    j = 0;
-    }
-  if(printlevel >= 11)
-    {
-    "isIncluded(K,J) takes "+string(timer - t)+" seconds";
-    "j = "+string(j);
-    }
-  }
-setring R;
-
-return(j);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   intvec L = 2,3,5;
-   ring r = 0,(x,y,z),lp;
-   ideal I = x+1,x+y+1;
-   ideal J = x+1,y;
-   primeTestSB(I,I,L,1);
-   primeTestSB(I,J,L,1);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-static proc pTestSB(ideal I, ideal J, list L, int variant, list #)
-"USAGE:  pTestSB(I,J,L,variant,#); I,J ideals, L intvec of primes, variant int
-RETURN:  1 (resp. 0) if for a randomly chosen prime p that is not in L
-         J mod p is (resp. is not) a standard basis of I mod p
-EXAMPLE: example pTestSB; shows an example
-"
-{
-   int i,j,k,p;
-   def R = basering;
-   list r = ringlist(R);
-
-   while(!j)
-   {
-      j = 1;
-      p = prime(random(1000000000,2134567879));
-      for(i = 1; i <= size(L); i++)
-      {
-         if(p == L[i]) { j = 0; break; }
-      }
-      if(j)
-      {
-         for(i = 1; i <= ncols(I); i++)
-         {
-            for(k = 2; k <= size(I[i]); k++)
-            {
-               if((denominator(leadcoef(I[i][k])) mod p) == 0) { j = 0; break; }
-            }
-            if(!j){ break; }
-         }
-      }
-      if(j)
-      {
-         if(!primeTest(I,p)) { j = 0; }
-      }
-   }
-   r[1] = p;
-   def @R = ring(r);
-   setring @R;
-   ideal I = imap(R,I);
-   ideal J = imap(R,J);
-   attrib(J,"isSB",1);
-
-   int t = timer;
-   j = 1;
-   if(isIncluded(I,J) == 0) { j = 0; }
-
-   if(printlevel >= 11)
-   {
-      "isIncluded(I,J) takes "+string(timer - t)+" seconds";
-      "j = "+string(j);
-   }
-
-   t = timer;
-   if(j)
-   {
-      if(size(#) > 0)
-      {
-         ideal K = modpStd(I,p,variant,#[1])[1];
-      }
-      else
-      {
-         ideal K = groebner(I);
-      }
-      t = timer;
-      if(isIncluded(J,K) == 0) { j = 0; }
-
-      if(printlevel >= 11)
-      {
-         "isIncluded(J,K) takes "+string(timer - t)+" seconds";
-         "j = "+string(j);
-      }
-   }
-   setring R;
-   return(j);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   intvec L = 2,3,5;
-   ring r = 0,(x,y,z),dp;
-   ideal I = x+1,x+y+1;
-   ideal J = x+1,y;
-   pTestSB(I,I,L,2);
-   pTestSB(I,J,L,2);
-}
 ////////////////////////////////////////////////////////////////////////////////
 static proc mixedTest()
 "USAGE:  mixedTest();

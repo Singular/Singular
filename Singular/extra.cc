@@ -1927,7 +1927,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "Mfrwalk") == 0)
     {
-      const short t[]={6,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD,RING_CMD};
+      const short t[]={4,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD};
       if (!iiCheckTypes(h,t,1)) return TRUE;
       if (((intvec*) h->next->Data())->length() != currRing->N &&
           ((intvec*) h->next->next->Data())->length() != currRing->N)
