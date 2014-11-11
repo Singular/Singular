@@ -7264,12 +7264,19 @@ s2 must be a reserved operator with i4 operands
 (i4 may be 1,2,3; use 4 for more than 3 or a varying number of arguments)
 See @xref{Commands for user defined types}.
 @c ..........................
-@item @code{system("LLL",} m @code{)}
+@item @code{system("LLL",} B @code{)}
 @cindex system, LLL
 @cindex LLL
-m must be a matrix or an intmat.
-iinterface to NTLs LLL (Exact Arithmetic Variant over ZZ).
-Returns the same type as the input.
+B must be a matrix or an intmat.
+Interface to NTLs LLL (Exact Arithmetic Variant over ZZ).
+Returns the same type as the input.@*
+B is an m x n matrix, viewed as m rows of n-vectors.  m may be less
+than, equal to, or greater than n, and the rows need not be
+linearly independent.  B is transformed into an LLL-reduced basis.
+The first m-rank(B) rows of B are zero.@*
+More specifically, elementary row transformations are performed on
+B so that the non-zero rows of new-B form an LLL-reduced basis
+for the lattice spanned by the rows of old-B.
 @c ..........................
 @item @code{system("nblocks")} or @code{system("nblocks",} ring_name @code{)}
 @cindex nblocks
