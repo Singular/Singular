@@ -13,11 +13,14 @@ properties(mandatory):
 mandatory:
 -cfCoeffWrite
 -cfCoeffString
--cfMult, cfSub ,cfAdd ,cfDiv
+-cfMult, cfSub, cfAdd, cfDiv
+  cfDiv is supposed to be a Euclidean division in rings that are meant 
+  to be Euclidean and an exact division otherwise.
 -cfInit
 -cfInt
 -cfMPZ
 -cfInpNeg
+  negates (mult. by -1) in-place. 
 -cfInvers
 -cfWriteLong
 -cfRead
@@ -27,9 +30,10 @@ mandatory:
 -cfIsOne
 -cfIsMOne
 -cfGreaterZero
--cfPower
 -cfSetMap
 -cfQuot1
+ appears to create a quotient ring modulo 1 element. Probably mainly
+ supported by Z -> Zm and Zm -> Zn
 -ch
 
 mandatory for certain types of coeffs:
@@ -37,44 +41,77 @@ mandatory for certain types of coeffs:
 -cfKillChar: if additional initializations have to be undone (data, etc)
 -cfSetChar: if additional initializations to use numbers from this coeffs is needed (should not be needed)
 -cfIntMod: if the ring has a meaningful Euclidean structure
+ In this case, this computes the remainder under the Euclidean division.
 -cfGcd, cfExtGcd,cfXExtGcd,cfEucNorm: if the ring (or a subring)  has a meaningful Euclidean structure
+ +Gcd: the usual Gcd
+ +ExtGcd(a,b) -> g = ea+fb, the usual extended version with co-factors
+ +XExtGcd(a,b) -> (a,b)*((e,f)(u,v)) = (g,0) and the matrix is unimodular.
+ If the Euclidean ring is a domain, one can compute the matrix from the normal
+ ExtGcd, however in the presence of zero-divisors, this does not work, hence the
+ more general function.
 -cfSubringGcd: if cf is q quotient field of a ring: Gcd of that ring
   (example: Q: Gcd for Z, Q(t): Gcd for Z[t], Z/p(t): Gcd for Z/p[t])
+  Z[t] has no gcd. Is there a function to get the ring as well?
 -cfAnn: in a principal ideal ring (with zero divisors)
+ a generator for the annihilator
 -cfWriteFd,cfReadFd: for use of ssi
 -cfDelete: if has_simple_Alloc==0, otherwise noop
 -cfCopy: if has_simple_Alloc==0, otherwise trivial
 -iNumberOfParameters (otherwise 0)
+  probably related to (multivariate) polynomial rings.
 -pParameterNames (otherwise NULL)
 -if cf is not a field: cfDivComp, cfIsUnit, cfGetUnit, cfDivBy
+  +DivComp(a,b) returns 2 if b|a and a|b, -1 if b|a, 1 if a|b and 0 otherwise.
+  +IsUnit
+  +GetUnit(a) returns a unit u s.th. au is normalised (ie. positive for Z,
+  a canonical rep in Z/mZ, a monic polynomial in K[x], ..)
+  +DivBy(a,b) returns TRUE iff b divides a
 -cfDBTest: for debugging, noop otherwise
 -cfInitMPZ: otherwise via cfInit
 
 optional:
--cfExactDiv (otherwise: it is cfDiv): for optimization
+-cfExactDiv (otherwise: it is cfDiv): for optimization. Behaviour undefined if 
+  the division does not work
 -cfSize (otherwise: !cfIsZero(..))
+  should measure the complexity, used for pivot strategies etc.
+  Required: size(0)==0, size(a)>0 for a!=0
 -cfRePart (otherwise: cfCopy)
 -cfImPart (otherwise returns cfInit(0))
 -cfWriteShort (otherwise: cfWriteLong)
--cfNormalize (otherwise: noop)
+-cfNormalize (otherwise: noop) paired with cfGetUnit: a == Normalize(a)*GetUnit(a)
+ Question: make GetUnit return the inverse?
 -cfGetDenom (otherwise cfInit(1))
+ Question: what is the use? Is a*Den(a) mathematically integral or has no
+ denominator in the current rep?
+ Stupid example: take K=Q as a number field with basis 1/2. Then wrt to the basis
+ 1/2, the element 1/2 has no denominator, hence Den(1/2)=1. However...
 -cfGetNumerator (otherwiser cfCopy)
--cfName (otherwise return NULL)
 -cfInpMult (otherwise via cfMult/cfDelet): for optimization
 -cfInpAdd (otherwise via cfAdd/cfDelet): for optimization
--cfFarey,cfChineseRemainder (otherwise: error)
+-cfFarey:(x, M) find a/b in the quotient field of R sth. a = bx mod M and both
+ a and b are suitable smaller than M. Implemented for Z -> Q currently.
+-cfChineseRemainder (otherwise: error)
+ takes arrays a and q of length r to find a single
+ A = a[i]mod q[i]. A can be chosen in the symmetric or positive remainder.
+ Question: do the q[i] have to be coprime?
+
 -cfParDeg (otherwise: -1 for 0, 0 for non-zero)
+ Use?
 -cfParameter (otherwise: error)
+ Use?
 
 automatic:
 -nNULL (by nInitChar)
 -ref (by nInitChar,nKillChar)
 -type (by nInitChar)
 to describe:
--cfLcm
+-cfLcm for Euclidean rings the product divided by the (a) gcd.
 -cfNormalizeHelper
 -cfQuotRem
+ returns both the Euclidean quotient and the remainder in one go.
 -cfRandom
+ Question: random(Z)?
 -cfClearContent
 -cfClearDenominators
+-cfPower only small exponents (machine int) supported right now.
 

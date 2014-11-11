@@ -20,7 +20,7 @@ Date: 2009/11/03 06:57:32
 //#include "ring.h"        //apparently not needed
 #include <Singular/lists.h>
 #include <polys/prCopy.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <fstream>        //read-write cones to files
 #include <string>
 #include <sstream>

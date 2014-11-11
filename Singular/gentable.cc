@@ -125,7 +125,6 @@ struct sConvertTypes
 
 const char * Tok2Cmdname(int tok)
 {
-  int i = 0;
   if (tok < 0)
   {
     return cmds[0].name;
@@ -140,9 +139,10 @@ const char * Tok2Cmdname(int tok)
   //if (tok==OBJECT) return "object";
   //if (tok==PRINT_EXPR) return "print_expr";
   if (tok==IDHDL) return "identifier";
-  if (tok==CRING_CMD) return "ring(cf)";
+  if (tok==CRING_CMD) return "(c)ring";
   // we do not blackbox objects during table generation:
   //if (tok>MAX_TOK) return getBlackboxName(tok);
+  int i = 0;
   while (cmds[i].tokval!=0)
   {
     if ((cmds[i].tokval == tok)&&(cmds[i].alias==0))
@@ -151,7 +151,22 @@ const char * Tok2Cmdname(int tok)
     }
     i++;
   }
+  i=0;// try again for old/alias names:
+  while (cmds[i].tokval!=0)
+  {
+    if (cmds[i].tokval == tok)
+    {
+      return cmds[i].name;
+    }
+    i++;
+  }
+  #if 0
+  char *s=(char*)malloc(10);
+  sprintf(s,"(%d)",tok);
+  return s;
+  #else
   return cmds[0].name;
+  #endif
 }
 /*---------------------------------------------------------------------*/
 /**
@@ -268,6 +283,7 @@ const char * iiTwoOps(int t)
 /*2
 * try to convert 'inputType' in 'outputType'
 * return 0 on failure, an index (<>0) on success
+* GENTABLE variant!
 */
 int iiTestConvert (int inputType, int outputType)
 {

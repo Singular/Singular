@@ -109,7 +109,7 @@ public:
     mpf_t b;
     mpf_init(b);
     mpf_pow_ui( b, this->t, (unsigned long)exp );
-    return gmp_float(b); 
+    return gmp_float(b);
   };
 
   friend bool operator == ( const gmp_float & a, const gmp_float & b );
@@ -204,7 +204,7 @@ public:
   ~gmp_complex() {}
 
   gmp_complex & neg ( );
-  
+
   friend gmp_complex operator + ( const gmp_complex & a, const gmp_complex & b );
   friend gmp_complex operator - ( const gmp_complex & a, const gmp_complex & b );
   friend gmp_complex operator * ( const gmp_complex & a, const gmp_complex & b );

@@ -45,7 +45,7 @@ extern "C"
 #include <flint/fmpq_poly.h>
 #include <flint/nmod_mat.h>
 #include <flint/fmpz_mat.h>
-#if (__FLINT_VERSION_MINOR >= 4)
+#if ( __FLINT_RELEASE >= 20400)
 #include <flint/fq.h>
 #include <flint/fq_poly.h>
 #include <flint/fq_nmod.h>
@@ -140,7 +140,7 @@ convertnmod_poly_t2FacCF (const nmod_poly_t poly, const Variable& x)
   for (int i= 0; i < nmod_poly_length (poly); i++)
   {
     ulong coeff= nmod_poly_get_coeff_ui (poly, i);
-    if (!coeff == 0)
+    if (coeff != 0)
       result += CanonicalForm ((long)coeff)*power (x,i);
   }
   return result;
@@ -176,7 +176,9 @@ void convertCF2Fmpq (fmpq_t result, const CanonicalForm& f)
 
 CanonicalForm convertFmpq_t2CF (const fmpq_t q)
 {
-  //ASSERT (isOn (SW_RATIONAL), "expected rational");
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
 
   CanonicalForm num, den;
   mpz_t nnum, nden;
@@ -185,16 +187,25 @@ CanonicalForm convertFmpq_t2CF (const fmpq_t q)
   fmpz_get_mpz (nnum, fmpq_numref (q));
   fmpz_get_mpz (nden, fmpq_denref (q));
 
+  CanonicalForm result;
   if (mpz_is_imm (nnum) && mpz_is_imm (nden))
   {
     num= CanonicalForm (mpz_get_si(nnum));
     den= CanonicalForm (mpz_get_si(nden));
     mpz_clear (nnum);
     mpz_clear (nden);
-    return num/den;
+    result= num/den;
+    if (!isRat)
+      Off (SW_RATIONAL);
+    return result;
   }
   else
-    return make_cf (nnum, nden, false);
+  {
+    result= make_cf (nnum, nden, false);
+    if (!isRat)
+      Off (SW_RATIONAL);
+    return result;
+  }
 }
 
 CanonicalForm
@@ -226,13 +237,18 @@ void convertFacCF2Fmpz_array (fmpz* result, const CanonicalForm& f)
 
 void convertFacCF2Fmpq_poly_t (fmpq_poly_t result, const CanonicalForm& f)
 {
-  //ASSERT (isOn (SW_RATIONAL), "expected poly over Q");
+  bool isRat= isOn (SW_RATIONAL);
+  if (!isRat)
+    On (SW_RATIONAL);
 
   fmpq_poly_init2 (result, degree (f)+1);
   _fmpq_poly_set_length (result, degree (f) + 1);
   CanonicalForm den= bCommonDen (f);
   convertFacCF2Fmpz_array (fmpq_poly_numref (result), f*den);
   convertCF2Fmpz (fmpq_poly_denref (result), den);
+
+  if (!isRat)
+    Off (SW_RATIONAL);
 }
 
 CFFList
@@ -254,7 +270,7 @@ convertFLINTnmod_poly_factor2FacCFFList (const nmod_poly_factor_t fac,
   return result;
 }
 
-#if __FLINT_VERSION_MINOR >= 4
+#if __FLINT_RELEASE >= 20400
 CFFList
 convertFLINTFq_nmod_poly_factor2FacCFFList (const fq_nmod_poly_factor_t fac,
                                        const Variable& x, const Variable& alpha,
@@ -296,7 +312,7 @@ convertFmpz_mod_poly_t2FacCF (const fmpz_mod_poly_t poly, const Variable& x,
   return b (result);
 }
 
-#if __FLINT_VERSION_MINOR >= 4
+#if __FLINT_RELEASE >= 20400
 void
 convertFacCF2Fq_nmod_t (fq_nmod_t result, const CanonicalForm& f,
                         const fq_nmod_ctx_t ctx)
@@ -484,7 +500,7 @@ CFMatrix* convertNmod_mat_t2FacCFMatrix(const nmod_mat_t m)
   return res;
 }
 
-#if __FLINT_VERSION_MINOR >= 4
+#if __FLINT_RELEASE >= 20400
 void
 convertFacCFMatrix2Fq_nmod_mat_t (fq_nmod_mat_t M,
                                   const fq_nmod_ctx_t fq_con, const CFMatrix &m)

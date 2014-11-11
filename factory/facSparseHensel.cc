@@ -185,7 +185,7 @@ sparseHeuristic (const CanonicalForm& A, const CFList& biFactors,
   {
     if (moreBiFactors[i-1].length() != minFactorsLength)
     {
-      moreBiFactors[i-1]= 
+      moreBiFactors[i-1]=
         recombination (moreBiFactors [i-1], uniFactors, 1,
                        moreBiFactors[i-1].length()-uniFactors.length()+1,
                        eval[i], Variable (i + 2)
@@ -303,7 +303,7 @@ sparseHeuristic (const CanonicalForm& A, const CFList& biFactors,
           if (i == index1)
             continue;
           found= -1;
-          if ((found= search (storeFactors[i][1][k], tmp1, 
+          if ((found= search (storeFactors[i][1][k], tmp1,
                               seperator[i][k][n], seperator[i][k][n+1])) >= 0)
             mat[mm][index2 + found - seperator [i][k][n]]= 1;
           index2 += seperator [i][k][n+1]-seperator[i][k][n];

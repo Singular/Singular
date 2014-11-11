@@ -37,6 +37,9 @@
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
 
+#ifdef SINGULAR_4_1
+#include <Singular/number2.h>
+#endif
 #ifdef HAVE_DYNAMIC_LOADING
 #include <polys/mod_raw.h>
 #endif /* HAVE_DYNAMIC_LOADING */
@@ -132,11 +135,16 @@ void *idrecDataInit(int t)
   switch (t)
   {
     //the type with init routines:
+#ifdef SINGULAR_4_1
+    case CNUMBER_CMD:
+      return (void*)n2Init(0,NULL);
+    case CMATRIX_CMD:
+#endif
+    case BIGINTMAT_CMD:
+      return (void *)new bigintmat();
     case INTVEC_CMD:
     case INTMAT_CMD:
       return (void *)new intvec();
-    case BIGINTMAT_CMD:
-      return (void *)new bigintmat();
     case NUMBER_CMD:
       return (void *) nInit(0);
     case BIGINT_CMD:
@@ -165,9 +173,19 @@ void *idrecDataInit(int t)
     case RING_CMD:
       return (void*) omAlloc0Bin(sip_sring_bin);
     case PACKAGE_CMD:
-      return (void*) omAlloc0Bin(sip_package_bin);
+    {
+      package pa=(package)omAlloc0Bin(sip_package_bin);
+      pa->language=LANG_NONE;
+      pa->loaded = FALSE;
+      return (void*)pa;
+    }
     case PROC_CMD:
-      return (void *) omAlloc0Bin(procinfo_bin);
+    {
+      procinfov pi=(procinfov)omAlloc0Bin(procinfo_bin);
+      pi->ref=1;
+      pi->language=LANG_NONE;
+      return (void*)pi;
+    }
     case RESOLUTION_CMD:
       return  (void *)omAlloc0(sizeof(ssyStrategy));
     //other types: without init (int,script,poly,def,package)
@@ -219,17 +237,7 @@ idhdl idrec::set(const char * s, int level, int t, BOOLEAN init)
       // IDRING(h)=rCopy(currRing);
       /* QRING_CMD is ring dep => currRing !=NULL */
     }
-    else
 #endif
-    if (t == PROC_CMD)
-    {
-      IDPROC(h)->language=LANG_NONE;
-    }
-    else if (t == PACKAGE_CMD)
-    {
-      IDPACKAGE(h)->language=LANG_NONE;
-      IDPACKAGE(h)->loaded = FALSE;
-    }
   }
   // --------------------------------------------------------
   if (at_start)
@@ -293,7 +301,7 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN
         {
           if (BVERBOSE(V_REDEFINE))
             Warn("redefining %s **",s);
-          IDID(h)=NULL;
+          if (s==IDID(h)) IDID(h)=NULL;
           killhdl2(h,&currRing->idroot,currRing);
         }
         else
@@ -396,6 +404,14 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   //printf("kill %s, id %x, typ %d lev: %d\n",IDID(h),(int)IDID(h),IDTYP(h),IDLEV(h));
   idhdl hh;
 
+  if (TEST_V_ALLWARN
+  && (IDLEV(h)!=myynest)
+  &&(IDLEV(h)==0))
+  {
+    if (((*ih)==basePack->idroot)
+    || ((currRing!=NULL)&&((*ih)==currRing->idroot)))
+      Warn("kill global `%s` at line >>%s<<\n",IDID(h),my_yylinebuf);
+  }
   if (h->attribute!=NULL)
   {
     //h->attribute->killAll(r); MEMORY LEAK!
@@ -627,8 +643,18 @@ const char * piProcinfo(procinfov pi, const char *request)
   return "??";
 }
 
-void piCleanUp(procinfov pi)
+BOOLEAN piKill(procinfov pi)
 {
+  Voice *p=currentVoice;
+  while (p!=NULL)
+  {
+    if (p->pi==pi && pi->ref <= 1)
+    {
+      Warn("`%s` in use, can not be killed",pi->procname);
+      return TRUE;
+    }
+    p=p->next;
+  }
   (pi->ref)--;
   if (pi->ref <= 0)
   {
@@ -647,24 +673,8 @@ void piCleanUp(procinfov pi)
     }
     memset((void *) pi, 0, sizeof(procinfo));
     pi->language=LANG_NONE;
-  }
-}
-
-BOOLEAN piKill(procinfov pi)
-{
-  Voice *p=currentVoice;
-  while (p!=NULL)
-  {
-    if (p->pi==pi && pi->ref <= 1)
-    {
-      Warn("`%s` in use, can not be killed",pi->procname);
-      return TRUE;
-    }
-    p=p->next;
-  }
-  piCleanUp(pi);
-  if (pi->ref <= 0)
     omFreeBin((ADDRESS)pi,  procinfo_bin);
+  }
   return FALSE;
 }
 

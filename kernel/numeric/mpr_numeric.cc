@@ -469,7 +469,7 @@ bool rootContainer::solver( const int polishmode )
   found_roots= laguer_driver( ad, theroots, polishmode != 0 );
   if (!found_roots)
     WarnS("rootContainer::solver: No roots found!");
- 
+
   // free memory
   for ( i=0; i <= tdg; i++ ) delete ad[i];
   omFreeSize( (void *) ad, (tdg+1)*sizeof(gmp_complex*) );
@@ -933,7 +933,7 @@ void rootArranger::arrange()
             }
           }
         } // rtest
-        if (!found) 
+        if (!found)
         {
           WarnS("rootArranger::arrange: precision lost");
           mprec*=10;
@@ -962,7 +962,7 @@ void rootArranger::arrange()
         }
 //#endif
       }
-#endif      
+#endif
     } // r
   } // xkoord
 }

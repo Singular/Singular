@@ -29,15 +29,15 @@ int init_modgen(
 {
   char tmpfile[64];
   char *p, *q;
-  
+
   modlineno = 0;
-  
+
   if(module_def == NULL) return -1;
   memset(module_def, '\0', sizeof(moddef));
 
   if ( (q=strrchr(filename, '/')) == NULL) q = filename;
   else q++;
-  
+
   module_def->filename = (char *)malloc(strlen(q)+1);
   if(module_def->filename != NULL ) {
     memset(module_def->filename, '\0', strlen(q)+1);
@@ -49,7 +49,7 @@ int init_modgen(
   module_def->name = (char *)malloc(strlen(tmpfile)+1);
   memset(module_def->name, '\0', strlen(tmpfile)+1);
   memcpy(module_def->name, tmpfile, strlen(tmpfile));
-  
+
   return (create_tmpfile(module_def));
 }
 
@@ -61,7 +61,7 @@ int create_tmpfile(
 {
   char tmpfile[64];
   FILE *fp;
-  
+
   memset(tmpfile, '\0', sizeof(tmpfile));
   snprintf(tmpfile, sizeof(tmpfile), "modgen.tmpXXXXXX");
 #ifdef HAVE_MKSTEMP
@@ -71,7 +71,7 @@ int create_tmpfile(
 #endif /* HAVE_MKSTEMP */
 
   if(debug)printf("create_tmpfile '%s'\n", tmpfile );
-  
+
   if (close(creat(tmpfile, 0600)) < 0) {
     (void) unlink (tmpfile);        /*  Blow it away!!  */
     return -1;
@@ -90,7 +90,7 @@ int create_tmpfile(
         fclose(fp);
         return -1;
   }
-  
+
   return 0;
 }
 
@@ -105,7 +105,7 @@ char *build_filename(
 
   if(do_create_srcdir)
   {
-    switch(what) 
+    switch(what)
     {
         case 1:
           snprintf(p, sizeof(p), "%s/%s.cc", module->name, text);
@@ -120,7 +120,7 @@ char *build_filename(
 	  snprintf(p, sizeof(p), "%s/%s.pl", module->name, text);
 	  break;
         default:
-          snprintf(p, sizeof(p), "%s/%s", module->name, text); 
+          snprintf(p, sizeof(p), "%s/%s", module->name, text);
           break;
     }
   } else {
@@ -164,7 +164,7 @@ int myyyerror(
 unsigned long crccheck(
   char *file
   )
-{ 
+{
   unsigned char buf[BUFLEN1];
   unsigned long crc = 0;
   long length = 0;
@@ -177,8 +177,8 @@ unsigned long crccheck(
   {
     return 0;
   }
-  
-  // read the file chunk by chunk, determine the lenght and 
+
+  // read the file chunk by chunk, determine the lenght and
   // start computing the checksum
   while ((bytes_read = fread (buf, 1, BUFLEN1, fp)) > 0)
   {
@@ -189,7 +189,7 @@ unsigned long crccheck(
   }
 
   // check if something went wrong and close the file
-  if (ferror (fp)) return 0; 
+  if (ferror (fp)) return 0;
   if (fclose(fp)==EOF) return 0;
 
   // second part of checksum computation

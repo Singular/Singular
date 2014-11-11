@@ -13,7 +13,7 @@
 #undef USE_READLINE4
 
 //----------------------------------------
-#ifdef ix86_Win
+#ifdef __CYGWIN__
 #define READLINE_STATIC
 #endif
 #include <omalloc/omalloc.h>

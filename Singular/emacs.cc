@@ -8,6 +8,9 @@
 
 
 
+#ifdef __CYGWIN__
+#define BOOLEAN boolean
+#endif
 #include <kernel/mod2.h>
 
 
@@ -22,7 +25,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#ifdef ix86_Win
+#ifdef __CYGWIN__
 #include <windows.h>
 #endif
 
@@ -38,9 +41,6 @@
 #undef system
 #endif
 
-#ifndef BOOLEAN
-#define BOOLEAN int
-#endif
 #ifndef FALSE
 #define FALSE 0
 #endif
@@ -54,7 +54,7 @@
 #  define  DIR_SEPP "/"
 #  define  UP_DIR ".."
 
-#ifndef ix86_Win
+#ifndef __CYGWIN__
 void error(const char *fmt, ...)
 {
   va_list ap;
@@ -211,7 +211,7 @@ int main(int argc, char** argv)
     exit(1);
   }
 
-#ifdef ix86_Win
+#ifdef __CYGWIN__
 #define EXTRA_XTERM_ARGS "+vb -sl 2000 -fb Courier-bold-12 -tn xterm -cr Red3"
 #else
 #define EXTRA_XTERM_ARGS ""
@@ -268,7 +268,7 @@ int main(int argc, char** argv)
     {
       // look in home-dir
       emacs_load = getenv("HOME");
-#ifdef ix86_Win
+#ifdef __CYGWIN__
       if ((emacs_load==NULL)||(!access(emacs_load,X_OK)))
         emacs_load = getenv("SINGHOME");
 #endif

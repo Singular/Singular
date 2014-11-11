@@ -307,8 +307,8 @@ NOTE:    It uses the procedure  modNPos_test to test Noether position.
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-proc Test (ideal i)
-"USAGE:   Test (i); i a monomial ideal,
+static proc TestLastVarIsInGenericPos (ideal i)
+"USAGE:   TestLastVarIsInGenericPos (i); i a monomial ideal,
 RETURN:  1 if the last variable is in generic position for i and 0 otherwise.
 THEORY:  The last variable is in generic position if the quotient of the ideal
          with respect to this variable is equal to the quotient of the ideal with respect to the maximal ideal.
@@ -373,7 +373,7 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
     dbprint(2,"sat(i)=0 and the time of this computation: " + string(rtimer-time) + "/100sec.");
     return();
   }
-  if (Test(I) == 1 )
+  if (TestLastVarIsInGenericPos(I) == 1 )
   {
     dbprint(2,"sat(i)=" + string(maxdeg1(K)) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
     return();
@@ -402,7 +402,7 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
       dbprint(2,"sat(i)=0 and the time of this computation: " + string(rtimer-time) + "/100sec.");
       return();
     }
-    if (Test(I) == 1 )
+    if (TestLastVarIsInGenericPos(I) == 1 )
     {
       dbprint(2,"sat(i)=" + string(maxdeg1(K)) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
       return();
@@ -468,7 +468,7 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
     dbprint(2,"msat(i)=0 and the time of this computation: " + string(rtimer-time) + "/100sec.");
     return();
   }
-  if (Test(I) == 1 )
+  if (TestLastVarIsInGenericPos(I) == 1 )
   {
     dbprint(2,"msat(i)=" + string(maxdeg1(K)) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
     return();
@@ -506,7 +506,7 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
       dbprint(2,"msat(i)=0 and the time of this computation: " + string(rtimer-time) + "/100sec.");
       return();
     }
-    if (Test(lsbi1) == 1 )
+    if (TestLastVarIsInGenericPos(lsbi1) == 1 )
     {
       dbprint(2,"msat(i)=" + string(maxdeg1(K)) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
       return();
@@ -516,8 +516,8 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
 
 //////////////////////////////////////////////////////////////////////////////
 //
-proc reg (ideal i)
-"USAGE:  reg (i); i ideal
+proc regCM (ideal i)
+"USAGE:  regCM (i); i ideal
 RETURN:  the Castelnuovo-Mumford regularity of i.
          (returns -1 if i is not homogeneous)
 ASSUME:  i is a homogeneous ideal.
@@ -575,7 +575,7 @@ ASSUME:  i is a homogeneous ideal.
   }
   else
   {
-    if (Test(I) == 1)
+    if (TestLastVarIsInGenericPos(I) == 1)
     {
       h=maxdeg1(K);
     }
@@ -593,7 +593,7 @@ ASSUME:  i is a homogeneous ideal.
         {
           h=0;break;
         }
-        if (Test(I) == 1 )
+        if (TestLastVarIsInGenericPos(I) == 1 )
         {
           h=maxdeg1(K);break;
         }
@@ -619,7 +619,7 @@ ASSUME:  i is a homogeneous ideal.
     }
     else
     {
-      if (Test(I) == 1)
+      if (TestLastVarIsInGenericPos(I) == 1)
       {
         H=maxdeg1(K);
       }
@@ -637,7 +637,7 @@ ASSUME:  i is a homogeneous ideal.
           {
             H=0;break;
           }
-          if (Test(I) == 1 )
+          if (TestLastVarIsInGenericPos(I) == 1 )
           {
             H=maxdeg1(K);break;
           }
@@ -753,7 +753,7 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
 "
 {
 //--------------------------- initialisation ---------------------------------
-  "// WARNING: The characteristic of base field musr be zero.
+  "// WARNING: The characteristic of base field must be zero.
 // This procedure is probabilistic and  it computes the initial
 //ideals modulo the prime number 2147483647";
   int e,ii,jj,H,h,d,time,p,nl;
@@ -797,7 +797,7 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
   }
   else
   {
-    if (Test(I) == 1)
+    if (TestLastVarIsInGenericPos(I) == 1)
     {
       h=maxdeg1(K);
     }
@@ -826,7 +826,7 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
         {
           h=0;break;
         }
-        if (Test(I) == 1 )
+        if (TestLastVarIsInGenericPos(I) == 1 )
         {
           h=maxdeg1(K);break;
         }
@@ -864,7 +864,7 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
     }
     else
     {
-      if (Test(I) == 1)
+      if (TestLastVarIsInGenericPos(I) == 1)
       {
         H=maxdeg1(K);
       }
@@ -894,7 +894,7 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
           {
             H=0;break;
           }
-          if (Test(I) == 1 )
+          if (TestLastVarIsInGenericPos(I) == 1 )
           {
             H=maxdeg1(K);break;
           }

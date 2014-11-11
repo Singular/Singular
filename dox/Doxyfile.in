@@ -38,7 +38,7 @@ PROJECT_NAME           =
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = " [$(git_version)] "
+PROJECT_NUMBER         =$(git_version)
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -823,7 +823,9 @@ EXCLUDE_SYMLINKS       = YES
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */test.cc
+EXCLUDE_PATTERNS       = \
+*/test.cc \
+*[Cc]onfig.h \
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -1982,7 +1984,7 @@ PREDEFINED             = \
 "HAVE_GFANLIB=1" \
 "HAVE_RINGS=1" \
 "HAVE_MORE_FIELDS_IMPLEMENTED=1" \
-"__FLINT_VERSION_MINOR=4" \
+"__FLINT_RELEASE=20400" \
 "__GMP_BITS_PER_MP_LIMB=100" \
 __cplusplus \
 GENTABLE \
@@ -2047,8 +2049,8 @@ PLURAL_INTERNAL_DECLARATIONS \
 PLURAL_INTERNAL_DECLARATIONS_GB_HACK \
 SEMIC_PRINT \
 SI_COUNTEDREF_AUTOLOAD \
-SINGULAR 
-
+SINGULAR \
+SINGULAR_4_1
 
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this

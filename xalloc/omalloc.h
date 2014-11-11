@@ -70,20 +70,22 @@ static inline void * omAlloc(size_t s)
 }
 static inline void * omAlloc0(size_t s)
 { void *d=omAlloc(s);memset(d,0,s); return d; }
+static inline void * omalloc0(size_t s)
+{ if (s!=0) { void *d=omAlloc(s);memset(d,0,s); return d;} else return NULL; }
 
 static inline void *omRealloc(void *d, size_t ns)
 { if (d==NULL) return omAlloc(ns);
-  else 
+  else
   {
-    long *dd=(long*)d; dd--; dd=(long*)realloc(dd,ns+sizeof(long)); 
+    long *dd=(long*)d; dd--; dd=(long*)realloc(dd,ns+sizeof(long));
     *dd=ns+sizeof(long);dd++; return dd;
   }
 }
 static inline void *omReallocSize(void *d, size_t os, size_t ns)
 { if (d==NULL) return omAlloc(ns);
-  else 
+  else
   {
-    long *dd=(long*)d; dd--; dd=(long*)realloc(dd,ns+sizeof(long)); 
+    long *dd=(long*)d; dd--; dd=(long*)realloc(dd,ns+sizeof(long));
     *dd=ns+sizeof(long);dd++; return dd;
   }
 }
@@ -158,9 +160,9 @@ enum omError_e
   omError_MaxError
 };
 // typedef enum omError_e omError_t;
-   
+
 #define omSizeWOfAddr(P)         (omSizeOfAddr(P)/sizeof(long))
-   
+
 #define omTypeAllocBin(T,P,B)    P=(T)omAlloc(B)
 #define omTypeAlloc(T,P,S)       P=(T)omAlloc(S)
 #define omTypeAlloc0Bin(T,P,B)   P=(T)omAlloc0(B)
@@ -170,9 +172,9 @@ enum omError_e
 #define omAllocBin(B)            omAlloc(B)
 #define omAllocBin0(B)           omAlloc0(B)
 #define omAlloc0Bin(B)           omAlloc0(B)
-#define omInitInfo()             
+#define omInitInfo()
 #define omInitGetBackTrace()
-#define omUpdateInfo()             
+#define omUpdateInfo()
 #define omPrintStats(F)
 #define omPrintInfo(F)
 #define omPrintBinStats(F)

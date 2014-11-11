@@ -23,10 +23,10 @@
 
 
 
-// used by "rSum" from ring.cc only! 
+// used by "rSum" from ring.cc only!
 // purpose init nc structure for initially commutative ring:
 // "creates a commutative nc extension; "converts" comm.ring to a Plural ring"
-ring nc_rCreateNCcomm(ring r); 
+ring nc_rCreateNCcomm(ring r);
 
 
 
@@ -119,4 +119,4 @@ inline void nc_BucketPolyRed_Z(kBucket_pt b, poly p, number *c)
 
 }
 
-#endif // 
+#endif //

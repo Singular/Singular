@@ -40,7 +40,7 @@
 #include <Singular/attrib.h>
 #include <Singular/ipconv.h>
 #include <Singular/links/silink.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <polys/weight.h>
 #include <kernel/spectrum/semic.h>
 #include <kernel/spectrum/splist.h>
@@ -73,6 +73,10 @@
 #include <kernel/maps/fast_maps.h>
 #endif
 
+#ifdef SINGULAR_4_1
+#include <Singular/number2.h>
+#include <libpolys/coeffs/bigintmat.h>
+#endif
 leftv iiCurrArgs=NULL;
 idhdl iiCurrProc=NULL;
 const char *lastreserved=NULL;
@@ -220,6 +224,20 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                      Print(" <%lx>",(long)(IDRING(h)));
 #endif
                    break;
+#ifdef SINGULAR_4_1
+    case CNUMBER_CMD:
+                   {  number2 n=(number2)IDDATA(h);
+                      Print(" (%s)",n->cf->cfCoeffName(n->cf));
+                      break;
+                   }
+    case CMATRIX_CMD:
+                   {  bigintmat *b=(bigintmat*)IDDATA(h);
+                      Print(" %d x %d (%s)",
+                        b->rows(),b->cols(),
+                        b->basecoeffs()->cfCoeffName(b->basecoeffs()));
+                      break;
+                   }
+#endif
     /*default:     break;*/
   }
   PrintLn();
@@ -401,6 +419,7 @@ void killlocals(int v)
 
 void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOOLEAN fullname)
 {
+  package savePack=currPack;
   idhdl h,start;
   BOOLEAN all = typ<0;
   BOOLEAN really_all=FALSE;
@@ -428,18 +447,23 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
         {
           h=IDRING(h)->idroot;
         }
-        else if((IDTYP(h)==PACKAGE_CMD) || (IDTYP(h)==POINTER_CMD))
+        else if(IDTYP(h)==PACKAGE_CMD)
         {
-          //Print("list_cmd:package or pointer\n");
+          currPack=IDPACKAGE(h);
+          //Print("list_cmd:package\n");
           all=TRUE;typ=PROC_CMD;fullname=TRUE;really_all=TRUE;
           h=IDPACKAGE(h)->idroot;
         }
         else
+        {
+          currPack=savePack;
           return;
+        }
       }
       else
       {
         Werror("%s is undefined",what);
+        currPack=savePack;
         return;
       }
     }
@@ -479,6 +503,7 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
     }
     h = IDNEXT(h);
   }
+  currPack=savePack;
 }
 
 void test_cmd(int i)
@@ -1148,6 +1173,63 @@ BOOLEAN iiDefaultParameter(leftv p)
   tmp.data=at->CopyA();
   return iiAssign(p,&tmp);
 }
+BOOLEAN iiBranchTo(leftv r, leftv args)
+{
+  // <string1...stringN>,<proc>
+  // known: args!=NULL, l>=1
+  int l=args->listLength();
+  int ll=0;
+  if (iiCurrArgs!=NULL) ll=iiCurrArgs->listLength();
+  if (ll!=(l-1)) return FALSE;
+  leftv h=args;
+  short *t=(short*)omAlloc(l*sizeof(short));
+  t[0]=l-1;
+  int b;
+  int i;
+  for(i=1;i<l;i++,h=h->next)
+  {
+    if (h->Typ()!=STRING_CMD)
+    {
+      omFree(t);
+      Werror("arg %d is not a string",i);
+      return TRUE;
+    }
+    int tt;
+    b=IsCmd((char *)h->Data(),tt);
+    if(b) t[i]=tt;
+    else
+    {
+      omFree(t);
+      Werror("arg %d is not a type name",i);
+      return TRUE;
+    }
+  }
+  if (h->Typ()!=PROC_CMD)
+  {
+    omFree(t);
+    Werror("last arg is not a proc",i);
+    return TRUE;
+  }
+  b=iiCheckTypes(iiCurrArgs,t,0);
+  omFree(t);
+  if (b && (h->rtyp==IDHDL) && (h->e==NULL))
+  {
+    BOOLEAN err;
+    //Print("branchTo: %s\n",h->Name());
+    iiCurrProc=(idhdl)h->data;
+    err=iiAllStart(IDPROC(iiCurrProc),IDPROC(iiCurrProc)->data.s.body,BT_proc,IDPROC(iiCurrProc)->data.s.body_lineno-(iiCurrArgs==NULL));
+    exitBuffer(BT_proc);
+    if (iiCurrArgs!=NULL)
+    {
+      if (!err) Warn("too many arguments for %s",IDID(iiCurrProc));
+      iiCurrArgs->CleanUp();
+      omFreeBin((ADDRESS)iiCurrArgs, sleftv_bin);
+      iiCurrArgs=NULL;
+    }
+    return 2-err;
+  }
+  return FALSE;
+}
 BOOLEAN iiParameter(leftv p)
 {
   if (iiCurrArgs==NULL)
@@ -1159,7 +1241,7 @@ BOOLEAN iiParameter(leftv p)
     return TRUE;
   }
   leftv h=iiCurrArgs;
-  leftv rest=h->next; /*iiCurrArgs is not NULLi here*/
+  leftv rest=h->next; /*iiCurrArgs is not NULL here*/
   BOOLEAN is_default_list=FALSE;
   if (strcmp(p->name,"#")==0)
   {
@@ -1542,8 +1624,6 @@ idhdl rDefault(const char *s)
   r->order[1]  = ringorder_C;
   /* the last block: everything is 0 */
   r->order[2]  = 0;
-  /*polynomial ring*/
-  r->OrdSgn    = 1;
 
   /* complete ring intializations */
   rComplete(r);
@@ -1947,7 +2027,12 @@ void rComposeC(lists L, ring R)
   && (r2=SHORT_REAL_LENGTH))
     R->cf = nInitChar(n_R, NULL);
   else
+  {
+    LongComplexInfo* p = (LongComplexInfo *)omAlloc0(sizeof(LongComplexInfo));
+    p->float_len=r1;
+    p->float_len2=r2;
     R->cf = nInitChar(n_long_R, NULL);
+  }
 
   if ((r1<=SHORT_REAL_LENGTH)   // should go into nInitChar
   && (r2=SHORT_REAL_LENGTH))
@@ -2072,19 +2157,26 @@ void rComposeRing(lists L, ring R)
 static void rRenameVars(ring R)
 {
   int i,j;
-  for(i=0;i<R->N-1;i++)
+  BOOLEAN ch;
+  do
   {
-    for(j=i+1;j<R->N;j++)
+    ch=0;
+    for(i=0;i<R->N-1;i++)
     {
-      if (strcmp(R->names[i],R->names[j])==0)
+      for(j=i+1;j<R->N;j++)
       {
-        Warn("name conflict var(%d) and var(%d): `%s`, rename to `@(%d)`",i+1,j+1,R->names[i],j+1);
-        omFree(R->names[j]);
-        R->names[j]=(char *)omAlloc(10);
-        sprintf(R->names[j],"@(%d)",j+1);
+        if (strcmp(R->names[i],R->names[j])==0)
+        {
+          ch=TRUE;
+          Warn("name conflict var(%d) and var(%d): `%s`, rename to `@%s`",i+1,j+1,R->names[i],R->names[i]);
+          omFree(R->names[j]);
+          R->names[j]=(char *)omAlloc(2+strlen(R->names[i]));
+          sprintf(R->names[j],"@%s",R->names[i]);
+        }
       }
     }
   }
+  while (ch);
   for(i=0;i<rPar(R); i++)
   {
     for(j=0;j<R->N;j++)
@@ -2132,7 +2224,7 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
     R->cf->ref++;
   }
   else
-#endif  
+#endif
   if (L->m[0].Typ()==INT_CMD)
   {
     int ch = (int)(long)L->m[0].Data();
@@ -2281,7 +2373,6 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
     for (j=0; j < n-1; j++)
       R->order[j] = (int) ringorder_unspec;
     // orderings
-    R->OrdSgn=1;
     for(j=0;j<n-1;j++)
     {
     // todo: a(..), M
@@ -5549,11 +5640,11 @@ void rKill(ring r)
     }
     int j;
 #ifdef USE_IILOCALRING
-    for (j=0;j<iiRETURNEXPR_len;j++)
+    for (j=0;j<myynest;j++)
     {
       if (iiLocalRing[j]==r)
       {
-        if (j<myynest) Warn("killing the basering for level %d",j);
+        if (j+1==myynest) Warn("killing the basering for level %d",j);
         iiLocalRing[j]=NULL;
       }
     }
@@ -5577,6 +5668,7 @@ void rKill(ring r)
 // any variables depending on r ?
     while (r->idroot!=NULL)
     {
+      r->idroot->lev=myynest; // avoid warning about kill global objects
       killhdl2(r->idroot,&(r->idroot),r);
     }
     if (r==currRing)
@@ -5618,12 +5710,6 @@ void rKill(idhdl h)
     else
     {
       currRingHdl=rFindHdl(r,currRingHdl);
-      if ((currRingHdl==NULL)&&(currRing->idroot==NULL))
-      {
-        for (int i=myynest;i>=0;i--)
-          if (iiLocalRing[i]==currRing) return;
-        currRing=NULL;
-      }
     }
   }
 }
@@ -5866,8 +5952,7 @@ BOOLEAN iiTestAssume(leftv a, leftv b)
       if (b->Data()==NULL) { Werror("ASSUME failed:%s",assume_yylinebuf);return TRUE;}
     }
   }
-  else
-     b->CleanUp();
+  b->CleanUp();
   a->CleanUp();
   return FALSE;
 }
@@ -5945,3 +6030,53 @@ BOOLEAN iiAssignCR(leftv r, leftv arg)
   return TRUE;// not handled -> error for now
 }
 
+static void iiReportTypes(int nr,int t,const short *T)
+{
+  char *buf=(char*)omAlloc(250);
+  buf[0]='\0';
+  if (nr==0)
+    sprintf(buf,"wrong length of parameters(%d), expected ",t);
+  else
+    sprintf(buf,"par. %d is of type `%s`, expected ",nr,Tok2Cmdname(t));
+  for(int i=1;i<=T[0];i++)
+  {
+    strcat(buf,"`");
+    strcat(buf,Tok2Cmdname(T[i]));
+    strcat(buf,"`");
+    if (i<T[0]) strcat(buf,",");
+  }
+  WerrorS(buf);
+}
+
+BOOLEAN iiCheckTypes(leftv args, const short *type_list, int report)
+{
+  if (args==NULL)
+  {
+    if (type_list[0]==0) return TRUE;
+    else
+    {
+      if (report) WerrorS("no arguments expected");
+      return FALSE;
+    }
+  }
+  int l=args->listLength();
+  if (l!=(int)type_list[0])
+  {
+    if (report) iiReportTypes(0,l,type_list);
+    return FALSE;
+  }
+  for(int i=1;i<=l;i++,args=args->next)
+  {
+    short t=type_list[i];
+    if (t!=ANY_TYPE)
+    {
+      if (((t==IDHDL)&&(args->rtyp!=IDHDL))
+      || (t!=args->Typ()))
+      {
+        if (report) iiReportTypes(i,args->Typ(),type_list);
+        return FALSE;
+      }
+    }
+  }
+  return TRUE;
+}

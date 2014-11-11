@@ -264,7 +264,7 @@ poly pSubstPar(poly p, int par, poly image)
       memset(v,0,sizeof(sleftv));
 
       number d = n_GetDenom(p_GetCoeff(p, currRing), currRing);
-      assume( p_Test((poly)NUM(d), R) );
+      p_Test((poly)NUM(d), R);
 
       if ( n_IsOne (d, currRing->cf) )
       {
@@ -279,7 +279,7 @@ poly pSubstPar(poly p, int par, poly image)
       number num = n_GetNumerator(p_GetCoeff(p, currRing), currRing);
       memset(&tmpW,0,sizeof(sleftv));
       tmpW.rtyp = POLY_CMD;
-      assume( p_Test((poly)NUM(num), R) );
+      p_Test((poly)NUM(num), R);
 
       tmpW.data = NUM (num); // a copy of this poly will be used
 
@@ -317,7 +317,7 @@ poly pSubstPar(poly p, int par, poly image)
       number num = n_GetNumerator(p_GetCoeff(p, currRing), currRing);
       memset(&tmpW,0,sizeof(sleftv));
       tmpW.rtyp = POLY_CMD;
-      assume( p_Test((poly)num, R) );
+      p_Test((poly)num, R);
 
 
       p_Normalize((poly)num,R);

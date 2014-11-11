@@ -2,7 +2,7 @@
  * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file facIrredTest.h
- * 
+ *
  * This file provides a probabilistic irreducibility test for polynomials over
  * Z/p.
  *

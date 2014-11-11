@@ -1316,7 +1316,7 @@ InternalPoly::tryDividecoeff( InternalCF* cc, bool invert, const CanonicalForm& 
           if (getRefCount() <= 1)
             delete this;
           else
-            decRefCount(); 
+            decRefCount();
           return dummy; //is equal to CFFactory::basic ( 0L ) in this case
         }
         if (is_imm(dummy))

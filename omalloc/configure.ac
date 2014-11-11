@@ -484,12 +484,13 @@ AC_TRY_RUN([
 #include <stdio.h>
 #include <stdlib.h>
 #include "omGetBackTrace.c"
-int test_backtrace()
+int test_backtrace0()
 {
-  void* bt;
-  int i = omGetBackTrace(&bt, 0, 10);
+  void* bt @<:@ 10 @:>@ ;
+  int i = omGetBackTrace(bt, 0, 10);
   return i;
 }
+int test_backtrace(){ return test_backtrace0(); }
 int main()
 {
    int i;
@@ -517,7 +518,7 @@ AC_TRY_RUN([
 #include <stdlib.h>
 #include "omReturn.h"
 #include "omStructs.h"
-#include "omGetBackTrace.h"
+/* #include "omGetBackTrace.h" */
 #include "omGetBackTrace.c"
 #include "omRet2Info.c"
 

@@ -147,7 +147,7 @@ private:
   smpoly piv, oldpiv;  // pivot and previous pivot
   smpoly dumm;         // allocated dummy
   ring _R;
-  
+
   void smColToRow();
   void smRowToCol();
   void smFinalMult();
@@ -1668,7 +1668,7 @@ void sm_PolyDiv(poly a, poly b, const ring R)
 //#define X_MAS
 #ifdef X_MAS
 // Note: the following in not addapted to SW :(
-/* 
+/*
 ///  returns the part of (a*b)/exp(lead(c)) with nonegative exponents
 poly smMultDiv(poly a, poly b, const poly c)
 {

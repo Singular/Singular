@@ -314,7 +314,7 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
   // The use of the hosten_shapiro procedure is useful here because the head
   // of the computed saturation generator is smaller if less variables are
   // involved.
-  int* sat_var = NULL;  
+  int* sat_var = NULL;
   int number_of_sat_var = A.hosten_shapiro(sat_var);
   if( (number_of_sat_var == 0) || (sat_var == NULL) )
   {
@@ -335,7 +335,7 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
   // The "saturation generator" seems to be a monomial, but is interpreted
   // as a binomial with tail 1 by the designed data structures.
 
-  delete[] sat_var; 
+  delete[] sat_var;
   delete[] generator;
 
   return *this;

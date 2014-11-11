@@ -489,7 +489,7 @@ resultantFp (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
       equalCount= 0;
 
     count++;
-    if (count > bound || (prob && equalCount == 2 && !H.isOne()))
+    if (count > bound || (prob && equalCount == 2 && !H.inCoeffDomain()))
     {
       if (!algExt && degree (H, alpha) <= 0)
         break;
@@ -639,7 +639,8 @@ resultantZ (const CanonicalForm& A, const CanonicalForm& B, const Variable& x,
       i--;
     }
 
-    ASSERT (i >= 0, "ran out of primes"); //sic
+    if (i <= 0)
+      return resultant (A, B, x);
 
     setCharacteristic (p);
 

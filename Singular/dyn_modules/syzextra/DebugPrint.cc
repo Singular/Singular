@@ -1,9 +1,9 @@
 // -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file DebugPrint.cc
- * 
+ *
  * Here we implement dPrint-s.
  *
  * ABSTRACT: debug-detailed-printing

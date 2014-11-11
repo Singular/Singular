@@ -36,12 +36,12 @@
  *    %% start of section 2
  *
  *    proc [<return-type>] <procname>[(argtypelist)] {
- *     
+ *
  *    }
  *
  *    %% start of section 3
  *    // some other c/C++ code
- *    
+ *
  */
 
 /*
@@ -49,7 +49,7 @@
  *   1.    start parsing the module-definition file
  *   1.1   write c/C++  code into a temporary file
  *   1.2   get modulename in section 1
- *   2     arrived at the beginnig of section 
+ *   2     arrived at the beginnig of section
  *   2.1   write header of .cc and .h files
  *   2.2   append tmpfile to .cc file
  *   2.3   parse section 2
@@ -124,7 +124,7 @@ void usage(char *name)
       printf("\t-%c (--%s) %s\n", long_options[i].val,
                  long_options[i].name, "");
     }
-  } 
+  }
 }
 
 main( int argc, char *argv[] )
@@ -148,11 +148,11 @@ main( int argc, char *argv[] )
         case 'm' : do_create_makefile = 0; break;
 	case 'i' : inst_dir=optarg; break;
 	case 's' : do_create_srcdir = 0; break;
-          
+
         case '?' : usage(argv[0]);
           return 0;
           break;
-          
+
         default:
           printf ("?? getopt returned character code 0%o ??\n", c);
     }
@@ -164,7 +164,7 @@ main( int argc, char *argv[] )
     usage(argv[0]);
     return 1;
   }
-  
+
   iiInitArithmetic();
   if(init_modgen(&module_def, argv[optind])) return 1;
   init_type_conv();
@@ -185,7 +185,7 @@ main( int argc, char *argv[] )
   }
   while (!i);
   if(trace)printf("files for module '%s' created.\n", argv[optind]);
-  
+
   //fflush(module_def.fmtfp);
   //PrintProclist(&module_def);
   //mod_create_makefile(&module_def);
@@ -210,7 +210,7 @@ main( int argc, char *argv[] )
       printf("Cannot open .bin file!!\n");
     }
   }
-  if(module_def.modfp_h != NULL) { 
+  if(module_def.modfp_h != NULL) {
     fprintf(module_def.modfp_h,"unsigned long crcsum=%lu;\n",cksm);
     write_crctable(module_def.modfp_h);
     fclose(module_def.modfp_h);

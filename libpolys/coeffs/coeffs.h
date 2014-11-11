@@ -1,5 +1,6 @@
-/*!
- \file coeffs/coeffs.h Coeff. Rings and Fields (interface)
+/*! \file coeffs/coeffs.h Coefficient rings, fields and other domains suitable for Singular polynomials
+
+  The main interface for Singular coefficients: \ref coeffs is the main handler for Singular numbers
 */
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -9,6 +10,7 @@
 #define COEFFS_H
 
 #include <misc/auxiliary.h>
+#include <misc/sirandom.h>
 /* for assume: */
 #include <reporter/reporter.h>
 #include <reporter/s_buff.h>
@@ -56,6 +58,12 @@ struct ip_sring;
 typedef struct ip_sring *         ring;
 typedef struct ip_sring const *   const_ring;
 
+/// @class coeffs coeffs.h coeffs/coeffs.h
+///
+/// The main handler for Singular numbers which are suitable for Singular polynomials.
+///
+/// With it one may implement a ring, a field, a domain etc.
+///
 struct n_Procs_s;
 typedef struct  n_Procs_s  *coeffs;
 typedef struct  n_Procs_s  const * const_coeffs;
@@ -263,9 +271,6 @@ struct n_Procs_s
    void    (*cfWriteFd)(number a, FILE *f, const coeffs r);
    number  (*cfReadFd)( s_buff f, const coeffs r);
 
-   /// For extensions (writes into global string buffer)
-   char *  (*cfName)(number n, const coeffs r);
-
    /// Inplace: a *= b
    void    (*cfInpMult)(number &a, number b, const coeffs r);
 
@@ -290,6 +295,9 @@ struct n_Procs_s
 
    /// create i^th parameter or NULL if not possible
    number  (*cfParameter)(const int i, const coeffs r);
+
+   /// a function returning random elements
+   number (*cfRandom)(siRandProc p, number p1, number p2, const coeffs cf);
 
    /// function pointer behind n_ClearContent
    nCoeffsEnumeratorFunc cfClearContent;
@@ -397,11 +405,13 @@ struct n_Procs_s
   coeffs (*cfQuot1)(number c, const coeffs r);
 #endif
 
-  /*CF: for blackbox rings */
+  /*CF: for blackbox rings, contains data needed to define the ring.
+   * contents depends on the actual example.*/
   void * data;
 #ifdef LDEBUG
    // must be last entry:
    /// Test: is "a" a correct number?
+   // DB as in debug, not data base.
    BOOLEAN (*cfDBTest)(number a, const char *f, const int l, const coeffs r);
 #endif
 };
@@ -417,6 +427,9 @@ static inline n_coeffType getCoeffType(const coeffs r)
 /// one-time initialisations for new coeffs
 /// in case of an error return NULL
 coeffs nInitChar(n_coeffType t, void * parameter);
+
+/// "copy" coeffs, i.e. increment ref
+static inline coeffs nCopyCoeff(const coeffs cf) { cf->ref++; return cf;}
 
 /// undo all initialisations
 void nKillChar(coeffs r);
@@ -484,6 +497,8 @@ static inline BOOLEAN n_IsMOne(number n, const coeffs r)
 /// !!!                 and raise errors instead, in these cases
 /// !!! Do not follow this recommendation: while writing polys,
 /// !!! between 2 monomials will be an additional + iff !n_GreaterZero(next coeff)
+///     Then change definition to include n_GreaterZero => printing does NOT
+///     start with -
 ///
 static inline BOOLEAN n_GreaterZero(number n, const coeffs r)
 {
@@ -696,15 +711,14 @@ static inline nMapFunc n_SetMap(const coeffs src, const coeffs dst)
 #ifdef LDEBUG
 static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenumber, const coeffs r)
 #else
-static inline BOOLEAN n_DBTest(number, const char*, const int, const coeffs)
+static inline BOOLEAN n_DBTest(number, const char*, const int, const coeffs) // is it really necessary to define this function in any case?
 #endif
 {
-  assume(r != NULL);
-#ifdef LDEBUG
-  assume(r->cfDBTest != NULL);
-  return r->cfDBTest(n, filename, linenumber, r);
-#else
+#ifndef LDEBUG
   return TRUE;
+#else
+  assume(r != NULL); assume(r->cfDBTest != NULL);
+  return r->cfDBTest(n, filename, linenumber, r);
 #endif
 }
 
@@ -906,13 +920,6 @@ static inline BOOLEAN nCoeff_is_transExt(const coeffs r)
 /// BOOLEAN n_Test(number a, const coeffs r)
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
 
-// Missing wrappers for: (TODO: review this?)
-// cfIntMod, cfRead, cfName, cfInit_bigint
-
-// HAVE_RINGS: cfDivComp, cfIsUnit, cfGetUnit, cfDivBy
-// BUT NOT cfExtGcd...!
-
-
 /// Computes the content and (inplace) divides it out on a collection
 /// of numbers
 /// number @em c is the content (i.e. the GCD of all the coeffs, which
@@ -963,6 +970,4 @@ static inline void n_ClearDenominators(ICoeffsEnumerator& numberCollectionEnumer
 void   n_Print(number& a,  const coeffs r);
 
 #endif
-
-
 

@@ -48,7 +48,7 @@
 // TODO: DUE to its use in kutil.cc :(((
 char * showOption(){return NULL;}
 
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/GBEngine/khstd.h>
 #include <kernel/GBEngine/kstd1.h>
@@ -65,7 +65,6 @@ char * showOption(){return NULL;}
 #include <kernel/GBEngine/ratgring.h>
 #include <kernel/GBEngine/ringgb.h>
 #include <kernel/GBEngine/shiftgb.h>
-#include <kernel/GBEngine/stairc.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/GBEngine/tgbgauss.h>
 #include <kernel/GBEngine/tgb.h>
@@ -440,9 +439,9 @@ void TestSimpleRingArithmetcs()
 
   poly pp = pp_Mult_qq( p, p, R);
 
-  Print("p: "); p_Write0(p, R); Print(", deg(p): %d", p_Totaldegree(p, R)); assume( 1 == p_Totaldegree(p, R) );
+  Print("p: "); p_Write0(p, R); Print(", deg(p): %ld", p_Totaldegree(p, R)); assume( 1 == p_Totaldegree(p, R) );
 
-  Print("; p*p : "); p_Write0(pp, R); Print("deg(pp): %d\n", p_Totaldegree(pp, R)); assume( 2 == p_Totaldegree(pp, R) );
+  Print("; p*p : "); p_Write0(pp, R); Print("deg(pp): %ld\n", p_Totaldegree(pp, R)); assume( 2 == p_Totaldegree(pp, R) );
 
 
   p_Delete(&p, R);

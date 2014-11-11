@@ -1,4 +1,5 @@
 ///////////////////////////////////////////////////////////////
+
 version="version grwalk.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Commutative Algebra";
 
@@ -213,53 +214,6 @@ static proc OrderStringalp_NP(string Wpal,list #)
 }
 
 
-proc gwalk(ideal Go, list #)
-"SYNTAX: gwalk(ideal i);
-         gwalk(ideal i, intvec v, intvec w);
-TYPE:    ideal
-PURPOSE: compute the standard basis of the ideal, calculated via
-         the improved Groebner walk algorithm  from the ordering
-         \"(a(v),lp)\", \"dp\" or \"Dp\"
-         to the ordering  \"(a(w),lp)\" or \"(a(1,0,...,0),lp)\".
-SEE ALSO: std, stdfglm, groebner, pwalk, fwalk, twalk, awalk1, awalk2
-KEYWORDS: Groebner walk
-EXAMPLE: example gwalk; shows an example"
-{
-
-   /* we use ring with ordering (a(...),lp,C) */
-   list OSCTW    = OrderStringalp_NP("al", #);//"dp"
-   //list OSCTW    = OrderStringalp("al", "Dp");//Dp
-
-   string ord_str =   OSCTW[2];
-   intvec curr_weight   =   OSCTW[3]; /* original weight vector */
-   intvec target_weight =   OSCTW[4]; /* terget weight vector */
-   kill OSCTW;
-   option(redSB);
-   def xR = basering;
-
-   execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
-   def old_ring = basering;
-
-   //print("//** help ring = " + string(basering));
-   ideal G = fetch(xR, Go);
-   G = system("Mwalk", G, curr_weight, target_weight);
-
-   setring xR;
-   //kill Go;
-
-   keepring basering;
-   ideal result = fetch(old_ring, G);
-   attrib(result,"isSB",1);
-   return (result);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  //** compute a Groebner basis of I w.r.t. lp.
-  ring r = 32003,(z,y,x), lp;
-  ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
-  gwalk(I);
-}
 
 
 /* 16 Mai 2003 */
@@ -298,6 +252,54 @@ example
     ring r = 32003,(z,y,x), lp;
     ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
     awalk1(I,3);
+}
+
+proc gwalk(ideal Go, list #)
+"SYNTAX: gwalk(ideal i);
+         gwalk(ideal i, intvec v, intvec w);
+TYPE:    ideal
+PURPOSE: compute the standard basis of the ideal, calculated via
+         the improved Groebner walk algorithm  from the ordering
+         \"(a(v),lp)\", \"dp\" or \"Dp\"
+         to the ordering  \"(a(w),lp)\" or \"(a(1,0,...,0),lp)\".
+SEE ALSO: std, stdfglm, groebner, pwalk, fwalk, twalk, awalk1, awalk2
+KEYWORDS: Groebner walk
+EXAMPLE: example gwalk; shows an example"
+{
+
+   /* we use ring with ordering (a(...),lp,C) */
+   list OSCTW    = OrderStringalp_NP("al", #);//"dp"
+   //list OSCTW    = OrderStringalp("al", "Dp");//Dp
+
+   string ord_str =   OSCTW[2];
+   intvec curr_weight   =   OSCTW[3]; /* original weight vector */
+   intvec target_weight =   OSCTW[4]; /* terget weight vector */
+   kill OSCTW;
+   option(redSB);
+   def xR = basering;
+
+   execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
+   def old_ring = basering;
+
+   //print("//** help ring = " + string(basering));
+   ideal G = fetch(xR, Go);
+   G = system("Mwalk", G, curr_weight, target_weight,basering);
+
+   setring xR;
+   //kill Go;
+
+   keepring basering;
+   ideal result = fetch(old_ring, G);
+   attrib(result,"isSB",1);
+   return (result);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  //** compute a Groebner basis of I w.r.t. lp.
+  ring r = 32003,(z,y,x), lp;
+  ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
+  gwalk(I);
 }
 
 
@@ -388,6 +390,7 @@ example
 }
 
 
+
 proc awalk2(ideal Go, list #)
 "SYNTAX: awalk2(ideal i);
          awalk2(ideal i, intvec v, intvec w);
@@ -472,8 +475,9 @@ EXAMPLE: example pwalk; shows an example"
   def old_ring = basering;
 
   ideal G = fetch(xR, Go);
-  G = system("Mpwalk", G, n1, n2, curr_weight, target_weight,nP);
 
+  G = system("Mpwalk", G, n1, n2, curr_weight, target_weight,nP);
+ 
   setring xR;
   //kill Go;
 
@@ -487,7 +491,10 @@ example
     "EXAMPLE:"; echo = 2;
     ring r = 32003,(z,y,x), lp;
     ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
-    pwalk(I,2,3);
+    //I = std(I);
+    //ring rr = 32003,(z,y,x),lp;
+    //ideal I = fetch(r,I);
+    pwalk(I,2,2);
 }
 
 

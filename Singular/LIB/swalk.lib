@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////
-version="version swalk.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version swalk.lib 4.0.0.0 Jun_2013 ";
 category="Commutative Algebra";
 info="
 LIBRARY: swalk.lib               Sagbi Walk Conversion Algorithm
@@ -17,14 +17,12 @@ THEORY: The concept of SAGBI ( Subalgebra Analog to Groebner Basis for Ideals)
  Converting bases with the Grobner Walk. J. Symbolic Computation 24 (1997),
  465-469].
 
-PROCEDURE:
+PROCEDURES:
  swalk(ideal[,intvec]);   Sagbi basis of subalgebra via Sagbi walk algorithm
+ rswalk(ideal,int,int[,intvec]); Sagbi basis of subalgebra via Random Sagbi Walk Algorithm
 ";
 
 LIB "sagbi.lib";
-LIB "crypto.lib";
-LIB "atkins.lib";
-LIB "random.lib";
 //////////////////////////////////////////////////////////////////////////////
 proc swalk(ideal Gox, list #)
 "USAGE:  swalk(i[,v,w]); i ideal, v,w int vectors
@@ -41,13 +39,10 @@ EXAMPLE: example swalk; shows an example
   intvec icurr_weight   =   OSCTW[3]; /* original weight vector */
   intvec itarget_weight =   OSCTW[4]; /* terget weight vector */
   kill OSCTW;
-      option(redSB);
+  option(redSB);
   def xR = basering;
   list rl=ringlist(xR);
-  if(size(#) == 0)
-  {
-    rl[3][1][1]="dp";
-  }
+  rl[3][1][1]="dp";
   def ostR=ring(rl);
   setring ostR;
   def new_ring = basering;
@@ -56,7 +51,6 @@ EXAMPLE: example swalk; shows an example
   Gnew=interreduceSd(Gnew);
   vector curr_weight=changeTypeInt(icurr_weight);
   vector target_weight=changeTypeInt(itarget_weight);
-  curr_weight;
   ideal Gold;
   list l;
   intvec v;
@@ -72,7 +66,7 @@ EXAMPLE: example swalk; shows an example
        else {
               l=collectDiffExpo(Gold);
               ulast=last(curr_weight, target_weight, l);
-	      vector new_weight=(1-ulast)*curr_weight+ulast*target_weight;
+              vector new_weight=(1-ulast)*curr_weight+ulast*target_weight;
               vector w=cleardenom(new_weight);
               v=changeType(w);
               list p= ringlist(old_ring);
@@ -85,11 +79,10 @@ EXAMPLE: example swalk; shows an example
               kill old_ring;
               ideal Gnew=Convert(Gold);
               Gnew=interreduceSd(Gnew);
-         }
+           }
     }
    setring xR;
    ideal result = fetch(old_ring, Gnew);
-   kill old_ring;
    attrib(result,"isSB",1);
    return (result);
 }
@@ -102,7 +95,7 @@ example
 }
 //////////////////////////////////////////////////////////////////////////////
 proc rswalk(ideal Gox, int weight_rad, int pdeg, list #)
-"USAGE:  rswalk(i[,v,w]); i ideal, v,w int vectors
+"USAGE:  rswalk(i,weight_rad,p_deg[,v,w]); i ideal, v,w int vectors
 RETURN: The sagbi basis of the subalgebra defined by the generators of i,
         calculated via the Sagbi walk algorithm from the ordering dp to lp
         if v,w are not given (resp. from the ordering (a(v),lp) to the
@@ -167,7 +160,7 @@ example
   "EXAMPLE:";echo = 2;
   ring r = 0,(x,y), lp;
   ideal I =x2,y2,xy+y,2xy2+y3;
-  swalk(I,7);
+  swalk(I,2,2);
 }
 //////////////////////////////////////////////////////////////////////////////
 static proc inprod(vector v,vector w)
@@ -286,34 +279,6 @@ example
 }
 
 //////////////////////////////////////////////////////////////////////////////
-static proc test_in_cone(vector w, list l)
-{
- int i,j,k;
- vector v;
- poly n;
- number a;
- for(i=1;i<=size(l);i++)
- {
-    for(j=1;j<=size(l[i]);j++)
-    {
-        v=0;
-        for(k=1;k<=size(l[i][j]);k++)
-        {
-            v=v+l[i][j][k]*gen(k);
-        }
-        n = inprod(w,v);
-        a = leadcoef(n);
-        if(a<0)
-        {
-           return(0);
-        }
-    }
- }
- return(1);
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
 static proc last( vector c, vector t,list l)
 "USAGE: last(c,t,l); c,t vectors, l list
 RETURN: a  parametric value which corresponds to vector lies along the path
@@ -324,8 +289,7 @@ EXAMPLE: example last; shows an example
 {
  number ul=1;
  int i,j,k;
- number a,b,z,u;
- poly n,q;
+ number u;
  vector v;
  for(i=1;i<=size(l);i++)
  {
@@ -336,22 +300,19 @@ EXAMPLE: example last; shows an example
         {
             v=v+l[i][j][k]*gen(k);
         }
-        n= inprod(c,v);
-        q= inprod(t,v);
-        a=leadcoef(n);
-        b=leadcoef(q);
-        z=a-b;
+        poly n= inprod(c,v);
+        poly q= inprod(t,v);
+        number a=leadcoef(n);
+        number b=leadcoef(q);
+        number z=a-b;
         if(b<0)
-            {
+        {
             u=a/z;
-            if(u<ul)
-            {
-               ul=u;
-             }
+            if(u<ul) {ul=u;}
         }
+        kill a,b,z,n,q ;
     }
- }~
- kill a,b,z,n,q,u;
+ }
  return(ul);
 }
 example
@@ -447,155 +408,6 @@ example
    ideal Gold=xy+z2,y3+x2y2;
    Lift(In,InG,Gold);
 }
-//////////////////////////////////////////////////////////////////////////////
-static proc PertVectors(ideal Gold, vector target_weight, int pdeg)
-{
-int nV = nvars(basering);
-int nG = size(Gold);
-int i;
-number ntemp, maxAi, maxA;
-if(pdeg > nV || pdeg <= 0)
-  {
-    intvec v_null=0;
-    return v_null;
-  }
-if(pdeg == 1)
-  {
-    return target_weight;
-  }
-maxAi=0;
-for(i=1; i<=nV; i++)
-  {
-    ntemp = leadcoef(inprod(target_weight,gen(i)));
-    if(ntemp < 0)
-      {
-        ntemp = -ntemp;
-      }
-    if(maxAi < ntemp)
-      {
-        maxAi = ntemp;
-      }
-  }
-maxA = maxAi+pdeg-1;
-number epsilon = maxA*deg(Gold)+1;
-vector pert_weight = epsilon^(pdeg-1)*target_weight;
-for(i=2; i<=pdeg; i++)
-  {
-    pert_weight = pert_weight + epsilon^(pdeg-i)*gen(i);
-  }
-return(pert_weight);
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-static proc RandomNextWeight(ideal Gold, list L, vector curr_weight, vector target_weight,int weight_rad, int pdeg)
-"USAGE: RandomNextWeight(Gold, L, curr_weight, target_weight);
-RETURN: Intermediate next weight vector
-EXAMPLE: example RandomNextWeight; shows an example
-"
-{
-  int i,n1,n2,n3;
-  number norm, weight_norm;
-  def Rold = basering;
-  int nV = nvars(basering);
-  number ulast=last(curr_weight, target_weight, L);
-  vector new_weight=(1-ulast)*curr_weight+ulast*target_weight;
-  vector w1=cleardenom(new_weight);
-  intvec v1=changeType(w1);
-  list p= ringlist(Rold);
-  p[3][1][2]= v1;
-  def new_ring=ring(p);
-  setring new_ring;
-  ideal Gold = fetch(Rold, Gold);
-  n1=size(Initial(Gold));
-  setring Rold;
-  intvec next_weight;
-  kill new_ring;
-  while(1)
-  {
-    weight_norm = 0;
-    while(weight_norm == 0)
-    {
-      for(i=1; i<=nV; i++)
-      {
-        next_weight[i] = random(1,10000)-5000;
-        weight_norm = weight_norm + next_weight[i]^2;
-      }
-      norm = 0;
-      while(norm^2 < weight_norm)
-      {
-         norm=norm+1;
-      }
-      weight_norm = 1+norm;
-    }
-    new_weight = 0;
-    for(i=1; i<=nV;i++)
-    {
-      if(next_weight[i] < 0)
-      {
-        new_weight = new_weight + (1 + round(weight_rad*leadcoef(next_weight[i])/weight_norm))*gen(i);
-      }
-      else
-      {
-        new_weight = new_weight + ( round(weight_rad*leadcoef(next_weight[i])/weight_norm))*gen(i);
-      }
-    }
-    new_weight = new_weight + curr_weight;
-    if(test_in_cone(new_weight, L)==1)
-    {
-      break;
-    }
-  }
-  kill next_weight;
-  kill norm;
-  vector w2=cleardenom(new_weight);
-  intvec v2=changeType(w2);
-  p[3][1][2]= v2;
-  def new_ring=ring(p);
-  setring new_ring;
-  ideal Gold = fetch(Rold, Gold);
-  n2=size(Initial(Gold));
-  setring Rold;
-  kill new_ring;
-
-  vector w3=cleardenom(PertVectors(Gold,target_weight,pdeg));
-  intvec v3=changeType(w3);
-  p[3][1][2]= v1;
-  def new_ring=ring(p);
-  setring new_ring;
-  ideal Gold = fetch(Rold, Gold);
-  n3=size(Initial(Gold));
-  setring Rold;
-  kill new_ring;
-  kill p;
-
-  if(n2<n1)
-  {
-    if(n3<n2)
-    {
-      // n3<n2<n1
-      return(w3);
-    }
-    else
-    {
-      // n2<n1 und n2<=n3
-      return(w2);
-    }
-  }
-  else
-  {
-    if(n3<n1)
-    {
-      //n3<n1<=n2
-      return(w3);
-    }
-    else
-    {
-      // n1<=n3 und n1<=n2
-      return(w1);
-    }
-  }
-}
 
 //////////////////////////////////////////////////////////////////////////////
 static proc Convert( ideal Gold )
@@ -605,7 +417,7 @@ EXAMPLE: example Convert; shows an example
 "
 {
  ideal In=Initial(Gold);
- ideal InG=sagbi(In); //+In;
+ ideal InG=sagbi(In,1)+In;
  ideal Gnew=Lift(In,InG,Gold);
  return(Gnew);
 }
@@ -636,7 +448,7 @@ EXAMPLE: example interreduceSd; shows an example
      M=delete(l,j);
      for(i=1;i<=size(M);i++)
      { B[i]=M[i];}
-     f=sagbiNF(f,B,1)[1];
+     f=sagbiNF(f,B,1);
      J=J+f;
   }
   return(J);
@@ -852,9 +664,185 @@ static proc OrderStringalp_NP(string Wpal,list #)
   result[4] = target_weight;
   return(result);
 }
+//////////////////////////////////////////////////////////////////////////////
+static proc test_in_cone(vector w, list l)
+{
+ int i,j,k;
+ vector v;
+ poly n;
+ number a;
+ for(i=1;i<=size(l);i++)
+ {
+    for(j=1;j<=size(l[i]);j++)
+    {
+        v=0;
+        for(k=1;k<=size(l[i][j]);k++)
+        {
+            v=v+l[i][j][k]*gen(k);
+        }
+        n = inprod(w,v);
+        a = leadcoef(n);
+        if(a<0)
+        {
+           return(0);
+        }
+    }
+ }
+ return(1);
+}
+//////////////////////////////////////////////////////////////////////////////
+static proc PertVectors(ideal Gold, vector target_weight, int pdeg)
+{
+int nV = nvars(basering);
+int nG = size(Gold);
+int i;
+number ntemp, maxAi, maxA;
+if(pdeg > nV || pdeg <= 0)
+  {
+    intvec v_null=0;
+    return v_null;
+  }
+if(pdeg == 1)
+  {
+    return target_weight;
+  }
+maxAi=0;
+for(i=1; i<=nV; i++)
+  {
+    ntemp = leadcoef(inprod(target_weight,gen(i)));
+    if(ntemp < 0)
+      {
+        ntemp = -ntemp;
+      }
+    if(maxAi < ntemp)
+      {
+        maxAi = ntemp;
+      }
+  }
+maxA = maxAi+pdeg-1;
+number epsilon = maxA*deg(Gold)+1;
+vector pert_weight = epsilon^(pdeg-1)*target_weight;
+for(i=2; i<=pdeg; i++)
+  {
+    pert_weight = pert_weight + epsilon^(pdeg-i)*gen(i);
+  }
+return(pert_weight);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+static proc RandomNextWeight(ideal Gold, list L, vector curr_weight,
+                      vector target_weight,int weight_rad, int pdeg)
+"USAGE: RandomNextWeight(Gold, L, curr_weight, target_weight);
+RETURN: Intermediate next weight vector
+EXAMPLE: example RandomNextWeight; shows an example
+"
+{
+  int i,n1,n2,n3;
+  number norm, weight_norm;
+  def Rold = basering;
+  int nV = nvars(basering);
+  number ulast=last(curr_weight, target_weight, L);
+  vector new_weight=(1-ulast)*curr_weight+ulast*target_weight;
+  vector w1=cleardenom(new_weight);
+  intvec v1=changeType(w1);
+  list p= ringlist(Rold);
+  p[3][1][2]= v1;
+  def new_ring=ring(p);
+  setring new_ring;
+  ideal Gold = fetch(Rold, Gold);
+  n1=size(Initial(Gold));
+  setring Rold;
+  intvec next_weight;
+  kill new_ring;
+  while(1)
+  {
+    weight_norm = 0;
+    while(weight_norm == 0)
+    {
+      for(i=1; i<=nV; i++)
+      {
+        next_weight[i] = random(1,10000)-5000;
+        weight_norm = weight_norm + next_weight[i]^2;
+      }
+      norm = 0;
+      while(norm^2 < weight_norm)
+      {
+         norm=norm+1;
+      }
+      weight_norm = 1+norm;
+    }
+    new_weight = 0;
+    for(i=1; i<=nV;i++)
+    {
+      if(next_weight[i] < 0)
+      {
+        new_weight = new_weight + (1 + round(weight_rad*leadcoef(next_weight[i])/weight_norm))*gen(i);
+      }
+      else
+      {
+        new_weight = new_weight + ( round(weight_rad*leadcoef(next_weight[i])/weight_norm))*gen(i);
+      }
+    }
+    new_weight = new_weight + curr_weight;
+    if(test_in_cone(new_weight, L)==1)
+    {
+      break;
+    }
+  }
+  kill next_weight;
+  kill norm;
+  vector w2=cleardenom(new_weight);
+  intvec v2=changeType(w2);
+  p[3][1][2]= v2;
+  def new_ring=ring(p);
+  setring new_ring;
+  ideal Gold = fetch(Rold, Gold);
+  n2=size(Initial(Gold));
+  setring Rold;
+  kill new_ring;
+
+  vector w3=cleardenom(PertVectors(Gold,target_weight,pdeg));
+  intvec v3=changeType(w3);
+  p[3][1][2]= v1;
+  def new_ring=ring(p);
+  setring new_ring;
+  ideal Gold = fetch(Rold, Gold);
+  n3=size(Initial(Gold));
+  setring Rold;
+  kill new_ring;
+  kill p;
+
+  if(n2<n1)
+  {
+    if(n3<n2)
+    {
+      // n3<n2<n1
+      return(w3);
+    }
+    else
+    {
+      // n2<n1 und n2<=n3
+      return(w2);
+    }
+  }
+  else
+  {
+    if(n3<n1)
+    {
+      //n3<n1<=n2
+      return(w3);
+    }
+    else
+    {
+      // n1<=n3 und n1<=n2
+      return(w1);
+    }
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////*
-/*Further examples
+Further examples
 ring r=0,(x,y,z),lp;
 
 ideal I=x2y4, y4z2, xy4z+y2z, xy6z2+y10z5;

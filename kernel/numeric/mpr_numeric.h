@@ -150,7 +150,7 @@ class rootArranger
 {
 public:
   friend lists listOfRoots( rootArranger*, const unsigned int oprec );
-   
+
   rootArranger( rootContainer ** _roots,
 		rootContainer ** _mu,
 		const int _howclean = PM_CORRUPT );

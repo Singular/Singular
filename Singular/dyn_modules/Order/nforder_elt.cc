@@ -219,7 +219,7 @@ static nMapFunc EltSetMap(const coeffs src, const coeffs dst)
 static void EltDelete(number * a, const coeffs r)
 {
 //  Print("Deleting %lx\n%s\n", *a, (((bigintmat*)(*a))->String()));
-  
+
   delete (bigintmat*)(*a);
   *a = NULL;
 }
@@ -247,7 +247,7 @@ BOOLEAN n_nfOrderInit(coeffs r,  void * parameter)
   r->cfInvers = EltInvers;
   r->cfCopy = EltCopy;
   r->data = parameter;
-  
+
   r->cfWriteLong = EltWrite;
   r->cfRead =EltRead;
   r->cfGreater = EltGreater;

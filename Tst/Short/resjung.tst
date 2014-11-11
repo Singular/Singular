@@ -1,4 +1,4 @@
-//LIB "tst.lib";
+LIB "tst.lib";
 tst_init();
 
 LIB"resjung.lib";
@@ -62,3 +62,5 @@ for(i=1;i<=k;i++)
   setring r;
   kill S;
 }
+
+tst_status(1);$

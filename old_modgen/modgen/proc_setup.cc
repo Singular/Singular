@@ -29,16 +29,16 @@ int init_proc(
   )
 {
   int i;
-  
+
   if( p == NULL) return -1;
   if( p->procname != NULL ) free(p->procname);
-  
+
   if( p->funcname != NULL ) free(p->funcname);
   if( p->c_code != NULL ) free(p->c_code);
   if( p->help_string != NULL) free(p->help_string);
   if( p->example_string != NULL) free(p->example_string);
-  
-  if( p->paramcnt>0 ) { 
+
+  if( p->paramcnt>0 ) {
     //free(p->param);
   }
 
@@ -56,17 +56,17 @@ int init_proc(
     p->return_val.typname = strdup("NONE");
     p->return_val.typ = NONE;
   }
-  
+
   p->language = language;
   p->lineno = lineno;
   p->flags.auto_header = 1;
-  
+
   p->flags.do_declaration = 1;
   p->flags.declaration_done = 0;
   p->flags.do_typecheck = default_do_typecheck;
   p->flags.typecheck_done = 0;
   p->flags.do_return = default_do_return;
-  
+
   return 0;
 }
 
@@ -80,10 +80,10 @@ void AddParam(
   paramdef pnew;
   int paramcnt = 0;
   char typname[32];
-  
+
   memset(typname, 0, sizeof(typname));
   decl2str(vnew->typ, typname);
-  
+
 #if DEBUG
   logx("AddParam(%d, %s, %s, %d)\n", p->paramcnt, p->procname,
        typname, vnew->typ);
@@ -113,7 +113,7 @@ void AddParam(
       (paramdefv)realloc(p->param,
                          (paramcnt+1)*sizeof(paramdef));
   }
-  
+
   memcpy((void *)(&p->param[paramcnt]),
          (void *)&pnew, sizeof(paramdef));
   (p->paramcnt)++;
@@ -157,7 +157,7 @@ void proc_set_default_var(
         break;
   }
   printf("\n");
-  
+
   return;
 }
 
@@ -172,8 +172,8 @@ void proc_set_var(
 {
   int *i;
   char *q;
-  
-  
+
+
 //  printf(">>>>>>>>Test 4 %s()[%d] '%s' = ", p->procname, type, varname);
   fflush(stdout);
   switch(type) {
@@ -204,7 +204,7 @@ void proc_set_var(
         break;
   }
 //  printf("\n");
-  
+
   return;
 }
 
@@ -216,7 +216,7 @@ char *ReservedVarnames[] = {
   "__v_save"
   "__tok",
   "__index",
-  NULL 
+  NULL
 };
 
 int check_reseverd(
@@ -224,10 +224,10 @@ int check_reseverd(
   )
 {
   int i;
-  
+
   for(i=0; ReservedVarnames[i] != NULL; i++)
     if(strcmp(ReservedVarnames[i], name)==0) return 1;
   return 0;
 }
-  
+
 /*========================================================================*/

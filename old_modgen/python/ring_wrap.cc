@@ -23,7 +23,7 @@ void ring_set(Ring & r){
       shadow_hdl->data.uring=r.pimpl.get();
       rChangeCurrRing(r.pimpl.get());
       currRingHdl=shadow_hdl;
-      
+
     }
 void export_ring(){
 boost::python::class_<Ring>("Ring", "reference to a Singular ring")

@@ -20,7 +20,8 @@ In case of minor changes to this style guide, old code sources need _not_ be adj
 
 There may be collisions with other existing and widely-used style guides, e.g. when including `std` sources. Such code _may be used as it is_, i.e., it does _not_ need to be wrapped in code which conforms to the style guide at hand.
 
-See also the [Build System description](@ref bs_page) and the [Legacy C programming style guide](@ref legacystyleguide).
+See also the [Build System description](@ref bs_page) and the 
+[Legacy C/C++ programming style guide](@ref legacystyleguide).
 
 ## Naming Conventions
 
@@ -175,6 +176,10 @@ C& C::multiplyWith10Cs(C& c1, C& c2, ...
  * Each routine is preceded by a Doxygen-conformal comment about its input parameters, output values, relations that are expected to hold among them, and possible side effects on other variables, if any.
  * Difficult and more involved algorithmic parts of routines are documented directly  before or between the corresponding lines of code, even though these comments may not appear in the Doxygen-generated developer's manual.
  * Even harder algorithmic parts must come with a link to related literature which clarifies the respective passages of the algorithm.
+
+Some doxygen-related links: 
+ * Manual <http://www.stack.nl/~dimitri/doxygen/manual/> 
+ * QRC: <http://www.digilife.be/quickreferences/QRC/Doxygen%20Quick%20Reference.pdf>, <http://www.sztaki.hu/~szcsaba/software/DoxygenQuickReference.pdf>
 
 ## BNF Specification for Naming Conventions
 

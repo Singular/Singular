@@ -7,7 +7,7 @@
  * \f$ F_{p} \f$ , \f$ F_{p}(\alpha ) \f$ or GF, based on "Modern Computer
  * Algebra, Chapter 15" by J. von zur Gathen & J. Gerhard and "Factoring
  * multivariate polynomials over a finite field" by L. Bernardin.
- * Factor Recombination is described in "Factoring polynomials over global 
+ * Factor Recombination is described in "Factoring polynomials over global
  * fields" by K. Belabas, M. van Hoeij, J. Klueners, A. Steel
  *
  *
@@ -171,7 +171,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
     CanonicalForm buf= GF2FalphaRep (A, beta);
     if (getCharacteristic() > 2)
     {
-#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if (HAVE_FLINT && __FLINT_RELEASE >= 20400)
       nmod_poly_t FLINTmipo, leadingCoeff;
       fq_nmod_ctx_t fq_con;
       fq_nmod_poly_t FLINTA;
@@ -238,7 +238,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
   {
     if (getCharacteristic() > 2)
     {
-#if (HAVE_FLINT && __FLINT_VERSION_MINOR >= 4)
+#if (HAVE_FLINT && __FLINT_RELEASE >= 20400)
       nmod_poly_t FLINTmipo, leadingCoeff;
       fq_nmod_ctx_t fq_con;
       fq_nmod_poly_t FLINTA;
@@ -815,7 +815,7 @@ Variable chooseExtension (const Variable & alpha, const Variable& beta, int k)
 void
 earlyFactorDetection (CFList& reconstructedFactors, CanonicalForm& F, CFList&
                       factors, int& adaptedLiftBound, int*& factorsFoundIndex,
-                      DegreePattern& degs, bool& success, int deg, const 
+                      DegreePattern& degs, bool& success, int deg, const
                       CanonicalForm& eval, const modpk& b, CanonicalForm& den)
 {
   DegreePattern bufDegs1= degs;
@@ -7710,7 +7710,7 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
 
   if (success)
   {
-    F= H;
+    F= H/Lc(H);
     delete [] bounds;
     bounds= computeBounds (F, d, isIrreducible);
     if (isIrreducible)
@@ -8262,9 +8262,9 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     return factors;
   }
 
-  
+
   //check trivial case
-  if (degree (A) == 1 || degree (A, 1) == 1 || 
+  if (degree (A) == 1 || degree (A, 1) == 1 ||
       (size (A) == 2 && igcd (degree (A), degree (A,1))==1))
   {
     factors.append (A);
@@ -8667,7 +8667,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     }
     else if (alpha.level() == 1 && !GF)
     {
-      CFList lll= henselLiftAndLatticeRecombi (A, uniFactors, alpha, degs, 
+      CFList lll= henselLiftAndLatticeRecombi (A, uniFactors, alpha, degs,
                                                symmetric, evaluation);
       factors= Union (lll, factors);
     }

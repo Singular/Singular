@@ -230,9 +230,9 @@ L2[4]=L[4];
 L[1]=L2;
 def K=ring(L);
 setring(K);
-def Borid=imap(r,Borid);
-def N=imap(r,N);
-def B=imap(r,B);
+ideal Borid=imap(r,Borid);
+list N=imap(r,N);
+list B=imap(r,B);
 //NumN contains only scalars so I do not imap it
 int j;
 list Q;
@@ -790,10 +790,10 @@ setring H;
 list R=list();
 list S=list();
 //print("anello definito");
-def V=imap(r,V1);
+list V=imap(r,V1);
 //def G=imap(r,G1);
 //print(V);
-def MM=imap(r,M);
+list MM=imap(r,M);
 list G=list();
 list N=list();
 for(i=1; i<=size(MM); i++)

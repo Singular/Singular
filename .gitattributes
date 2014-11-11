@@ -1,2 +1,8 @@
-.git* export-ignore
 *.gz.uu diff=gz.uu
+.git* export-ignore
+/Tst/ export-ignore
+/doc/ export-ignore
+/old_modgen/ export-ignore
+/clone_autogen_generated_stuff.sh export-ignore
+/git-archive export-ignore
+

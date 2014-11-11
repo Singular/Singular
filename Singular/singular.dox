@@ -1,15 +1,18 @@
 /*! 
-
  \page singular_page Singular Interpreter and related functionality
 
- Iterpreter and wrappers over kernel (\ref kernel_page)
+
+ \brief Main Singular application and its iterpreter (also available as a library)
+
+ Some functions are just wrappers over \ref kernel_page.
  
  Singular can be easily extended by means of dynamic modules:
  - \subpage dynmodules_page
 
- TODO: The sub-package structure is not yet defined for Singular package...
-
  How to add kernel functions to the interpreter:
  \verbinclude Singular/HOWTO.addKernelCmds
- 
+
+ \verbinclude Singular/README
+
+ TODO: The sub-package structure is not yet defined for Singular package...
 */

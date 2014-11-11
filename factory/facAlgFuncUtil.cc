@@ -183,7 +183,7 @@ subst (const CanonicalForm& f, const CFList& a, const CFList& b,
       }
     }
   }
-  result= reduce (result, Rstar);
+  result= Prem (result, CFList (Rstar));
   result /= vcontent (result, Variable (Rstar.level() + 1));
   return result;
 }
@@ -415,7 +415,7 @@ int hasAlgVar (const CanonicalForm &f)
 
 /// pseudo division of f and g wrt. x s.t. multiplier*f=q*g+r
 void
-psqr (const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, 
+psqr (const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q,
       CanonicalForm & r, CanonicalForm& multiplier, const Variable& x)
 {
     ASSERT( x.level() > 0, "type error: polynomial variable expected" );
@@ -607,11 +607,19 @@ QuasiInverse (const CanonicalForm& f, const CanonicalForm& g,
 {
   CanonicalForm pi, pi1, q, t0, t1, Hi, bi, pi2;
   bool isRat= isOn (SW_RATIONAL);
+  pi= f;
+  pi1= g;
+  if (isRat)
+  {
+    pi *= bCommonDen (pi);
+    pi1 *= bCommonDen (pi1);
+  }
   CanonicalForm m,tmp;
   if (isRat && getCharacteristic() == 0)
     Off (SW_RATIONAL);
-  pi= f/content (f,x);
-  pi1= g/content (g,x);
+
+  pi= pi/content (pi,x);
+  pi1= pi1/content (pi1,x);
 
   t0= 0;
   t1= 1;
@@ -646,8 +654,8 @@ QuasiInverse (const CanonicalForm& f, const CanonicalForm& g,
     }
   }
   t1 /= gcd (pi1, t1);
-  if (!isRat && getCharacteristic() == 0)
-    Off (SW_RATIONAL);
+  if (isRat && getCharacteristic() == 0)
+    On (SW_RATIONAL);
   return t1;
 }
 

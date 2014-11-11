@@ -1,8 +1,11 @@
-/*! \page kernel_numeric_page Numerical algorithms for Singular
+/*! \page kernel_numeric_page Numerical algorithms
 
- This sub-package of kernel (\ref kernel_page) contains
- numerical algorithms. 
-
- TODO: list those algorithms... and corresponding interpreter functions...?
+ \brief This sub-package of \ref kernel_page contains some numerical algorithms
  
+ Main header(s) in `/kernel/numeric/`:
+ - \ref kernel/numeric/mpr_base.h
+ - \ref kernel/numeric/mpr_inout.h
+ - \ref kernel/numeric/mpr_numeric.h
 */
+
+// TODO: list those algorithms... and corresponding interpreter functions...?

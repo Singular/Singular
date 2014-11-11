@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version crypto.lib 4.0.0.1 Jun_2014 "; // $Id$
+version="version crypto.lib 4.0.0.1 Aug_2014 "; // $Id$
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
@@ -73,6 +73,7 @@ EXAMPLE:example decimal; shows an example
    bigint m=0;
    for(i=1;i<=n;i++)
    {
+      k=0;
       if(s[i]=="1"){k=1;}
       if(s[i]=="2"){k=2;}
       if(s[i]=="3"){k=3;}

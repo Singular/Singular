@@ -12,18 +12,20 @@
 /* please include singularconfig.h exclusively via <kernel/mod2.h> and before any other header */
 # include <singularconfig.h>
 
-# include <misc/auxiliary.h>
+//# include <misc/auxiliary.h>
 
 #define SINGULAR_MAJOR_VERSION 4
 
-/*#define SINGULAR_4_1*/
+/*#define SINGULAR_4_1 1*/
 
 #ifdef SINGULAR_4_1
+#undef VERSION
+#define VERSION "4.1.0"
 #define SINGULAR_MINOR_VERSION 1
 #define SINGULAR_SUB_VERSION 0
 #else
 #define SINGULAR_MINOR_VERSION 0
-#define SINGULAR_SUB_VERSION 0
+#define SINGULAR_SUB_VERSION 1
 #endif
 #define S_ROOT_DIR ""
 
@@ -45,16 +47,11 @@
 /* Undefine to disable Gerhard's and Wilfried's fast and dirty std computations */
 #define FAST_AND_DIRTY
 
-#if 0
-/* defined(HAVE_DYNAMIC_LOADING)? TODO: the following features are not tested in legacy Singular! :( */
-
 /* eigenvalues */
 #define HAVE_EIGENVAL 1
 
 /* Gauss-Manin system */
 #define HAVE_GMS 1
-
-#endif
 
 /* include simpleipc/semaphore code, link against librt/libpthread */
 #define HAVE_SIMPLEIPC 1
@@ -95,9 +92,12 @@
 #define ALIGN_8
 #endif
 
+#ifdef SINGULAR_4_1
+#define SINGULAR_VERSION 4100
+#else
 #define SINGULAR_PATCHLEVEL 1
 #define SINGULAR_VERSION ((SINGULAR_MAJOR_VERSION*1000 + SINGULAR_MINOR_VERSION*100 + SINGULAR_SUB_VERSION*10)+SINGULAR_PATCHLEVEL)
-
+#endif
 /*******************************************************************
  * Miscellanous Defines
  ******************************************************************/

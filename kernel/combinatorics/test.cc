@@ -69,15 +69,16 @@ extern "C" {void m2_end(int i){exit(i);}}
 
 // HEADERS:
 #include <kernel/combinatorics/hutil.h>
+#include <kernel/combinatorics/hilb.h>
+#include <kernel/combinatorics/stairc.h>
+
 #include <kernel/ideals.h>
 #include <kernel/digitech.h>
 #include <kernel/fast_mult.h>
 
 // #include <kernel/spectrum/kmatrix.h>
 #include <kernel/preimage.h>
-
 #include <kernel/structs.h>
-
 #include <kernel/polys.h>
 
 void TestGBEngine()
@@ -280,7 +281,7 @@ void TestGBEngine()
 
 }
 
- 
+
 
 void TestSimpleRingArithmetcs()
 {
@@ -308,9 +309,9 @@ void TestSimpleRingArithmetcs()
 
   poly pp = pp_Mult_qq( p, p, R);
 
-  Print("p: "); p_Write0(p, R); Print(", deg(p): %d", p_Totaldegree(p, R)); assume( 1 == p_Totaldegree(p, R) );
+  Print("p: "); p_Write0(p, R); Print(", deg(p): %ld", p_Totaldegree(p, R)); assume( 1 == p_Totaldegree(p, R) );
 
-  Print("; p*p : "); p_Write0(pp, R); Print("deg(pp): %d\n", p_Totaldegree(pp, R)); assume( 2 == p_Totaldegree(pp, R) );
+  Print("; p*p : "); p_Write0(pp, R); Print("deg(pp): %ld\n", p_Totaldegree(pp, R)); assume( 2 == p_Totaldegree(pp, R) );
 
 
   p_Delete(&p, R);

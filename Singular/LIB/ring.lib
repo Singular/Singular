@@ -46,7 +46,7 @@ RETURN:      true, if the by optionName given option is active, false otherwise.
 EXAMPLE:     example optionIsSet;
 "
 {
-   def op = option(get);
+   intvec op = option(get);
    //sanity check, if option is valid. will raise an error if not
    option(optionName);    option("no" + optionName);
    option(set,op);
@@ -835,10 +835,10 @@ EXAMPLE: example rootofUnity; shows examples
 {
   if ( npars(basering) !=1 )
   {
-    "the procedure works only with one parameter";
-    return(0);
+    ERROR(" the procedure works only with one ring parameter variable");
   }
-  if (n<1) { return(0); }
+  if (n<0) {  ERROR(" cannot compute ("+string(n)+")-th primitive root of unity"); }
+  if (n==0) { return(number(0));}
   number mp = par(1);
   if (n==1) { return(mp-1); }
   if (n==2) { return(mp+1); }
@@ -868,24 +868,43 @@ EXAMPLE: example rootofUnity; shows examples
   {
     if ( deg(@l[j]) == d) { @d[cnt]=@l[j]; cnt++; }
   }
-  if ( size(@d)==1 )
+
+  j=1;
+  int i;
+  number pw;
+
+  int @sized = size(@d);
+
+  if (@sized==1)
   {
-    res = poly(@d[1]);
+       setring OldRing;
+       list @rl = imap(@@rR,@d);
+       mp = number(@rl[1]);
+       kill @@rR;
+       return(mp);
   }
-  else
+  def @rng;
+
+  setring OldRing;
+
+  list rl = ringlist( OldRing);
+  while ( j<=@sized )
   {
-    j=1;
-    while  ( j <= size(@d) )
-    {
-      res = @d[j]-lead(@d[j]);
-      if ( leadcoef(res) >=0 ) { j++; }
-      else { break; }
-    }
-    res = @d[j];
+     ASSUME(0, n%2 ==0);
+     setring OldRing;
+     @rng = ring(rl);
+     setring @rng;
+     list @rl = imap(@@rR,@d);
+     number mp = leadcoef( @rl[j] );
+     minpoly = mp;
+     number mp = minpoly;
+     number pw = par(1)^(n div 2);
+     if ( (pw != 1) || n==1 )  {  break;  }
+     j = j+1;
   }
   setring OldRing;
-  poly I = imap(@@rR,res);
-  mp = leadcoef(I);
+  list @rl=imap(@@rR,@d);
+  mp = leadcoef( @rl[j] );
   kill @@rR;
   return(mp);
 }
@@ -902,7 +921,7 @@ example
 
 
 
-proc isQuotientRing( rng )
+proc isQuotientRing(def rng )
 "USAGE: isQuotientRing ( rng );
 RETURN:  1 if rng is a quotient ring, 0 otherwise.
 PURPOSE: check if typeof a rng "qring"
@@ -957,7 +976,7 @@ static proc testIsQuotientRing()
    ASSUME(0, isQuotientRing(qrng3) ) ;
 }
 
-proc hasFieldCoefficient( rng )
+proc hasFieldCoefficient(def rng )
 "USAGE: hasFieldCoefficient ( rng );
 RETURN:  1 if the coeffcients form a field, 0 otherwise.
 KEYWORDS: ring coefficients
@@ -976,7 +995,7 @@ example
   hasFieldCoefficient(rng2);  // yes
 }
 
-proc hasGlobalOrdering (rng)
+proc hasGlobalOrdering (def rng)
 "USAGE: hasGlobalOrdering ( rng );
 RETURN:  1 if rng has a global monomial ordering, 0 otherwise.
 KEYWORDS: monomial ordering
@@ -993,7 +1012,7 @@ example
   hasGlobalOrdering(rng2);  // no
 }
 
-proc hasCommutativeVars (rng)
+proc hasCommutativeVars (def rng)
 "USAGE: hasCommutativeVars ( rng );
 RETURN:  1 if rng is a commutative polynomial ring, 0 otherwise.
 KEYWORDS: plural
@@ -1009,7 +1028,7 @@ example
  hasCommutativeVars(r);
 }
 
-proc hasNumericCoeffs(rng)
+proc hasNumericCoeffs(def rng)
 "USAGE: hasNumericCoeffs ( rng );
 RETURN:  1 if rng has inexact coeffcients, 0 otherwise.
 KEYWORDS: floating point
@@ -1019,7 +1038,7 @@ EXAMPLE: example hasNumericCoeffs; shows an example
   ERROR("not yet implemented");
 }
 
-proc isSubModule(I,J)
+proc isSubModule(def I,def J)
 "USAGE: isSubModule(I,J): I, J: ideal or module
 RETURN: 1 if module(I) is in module(J), 0 otherwise
 EXAMPLE: isSubModule; shows an example

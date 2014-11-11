@@ -45,7 +45,6 @@ number nAELcm          (number a, number b, const coeffs r);
 
 void    nAEDelete       (number *a, const coeffs r);//
 number    nAESetMap      (number a, const coeffs r);//
-char*    nAEName         (number a, const coeffs r);//
 void    nAEInpMult      (number &a ,number b, const coeffs r);//
 void    nAECoeffWrite   (const coeffs r, BOOLEAN details);//
 

@@ -8,7 +8,6 @@
 #  i- requires singular.hlp
 #  h- requires html dir
 #  D- requires the enviroment variable DISPLAY
-#  C- requires Windows-help: Manual.chm
 #  E:executable:- requires the named exectable
 #  O:`uname -m`-`uname -s`:- requires the named uname
 #  (ubuntu has an open completely different from open on OsX)
@@ -24,8 +23,6 @@
 #----------------------------------------------------
 # the default help browsers builtin, dummy and emacs are always 
 #   available and should NOT be mentioned here
-# ix86_Win: has additional default browsers: htmlhelp, html and winhlp
-#   also not mentioned here
 #----------------------------------------------------
 htmlview!xDhE:htmlview:!htmlview %h &
 mac!xhE:open:O:x86_64-Darwin:!open %f &
@@ -35,7 +32,9 @@ firefox!xDhE:firefox:!firefox %h &
 konqueror!xDhE:konqueror:!konqueror %h &
 galeon!xDhE:galeon:!galeon -n %h &
 netscape!xDhE:netscape:!(netscape -remote "openURL(%h)")||(netscape %h) &
-safari!xhE:/Applications/Safari.app:!open /Applications/Safari.app %h
+cygwin!xhE:cygstart:!cygstart "%h" &
+cygwin-www!E:cygstart:!cygstart "%H" &
+safari!xhE:/Applications/Safari.app:!open -a /Applications/Safari.app %h
 tkinfo!xDiE:tkinfo:!tkinfo '(%i)%n' &
 xinfo!xDiE:xterm:E:info:!xterm -e info -f %i --node='%n' &
 info!xiE:info:!info -f %i --node='%n'
@@ -51,8 +50,8 @@ konqueror-www!DE:konqueror:!konqueror http://www.singular.uni-kl.de/Manual/%v/ &
 galeon-www-idx!xDE:galeon:!galeon -n %H &
 galeon-www!DE:galeon:!galeon -n http://www.singular.uni-kl.de/Manual/%v/ &
 netscape-www!DE:netscape:!(netscape -remote "openURL(http://www.singular.uni-kl.de/Manual/%v/)")||(netscape http://www.singular.uni-kl.de/Manual/%v/) &
-safari-www-idx!xE:/Applications/Safari.app:!open /Applications/Safari.app %H
-safari-www!E:/Applications/Safari.app:!open /Applications/Safari.app http://www.singular.uni-kl.de/Manual/%v/
+safari-www-idx!xE:/Applications/Safari.app:!open -a /Applications/Safari.app %H
+safari-www!E:/Applications/Safari.app:!open -a /Applications/Safari.app http://www.singular.uni-kl.de/Manual/%v/
 lynx-www-idx!xE:lynx:!lynx %H
 lynx-www!E:lynx:!lynx http://www.singular.uni-kl.de/Manual/%v/
 

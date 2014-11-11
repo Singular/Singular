@@ -21,11 +21,14 @@
 #include "cf_factory.h"
 
 CanonicalForm modGCDFq (const CanonicalForm& F, const CanonicalForm& G,
-                  Variable & alpha, CFList& l, bool& top_level);
+                        Variable & alpha, CFList& l, bool& top_level);
 
 /// GCD of A and B over \f$ F_{p}(\alpha ) \f$
-static inline CanonicalForm modGCDFq (const CanonicalForm& A, const CanonicalForm& B,
-                                Variable & alpha)
+static inline
+CanonicalForm modGCDFq (const CanonicalForm& A, ///<[in] poly over F_q
+                        const CanonicalForm& B, ///<[in] poly over F_q
+                        Variable & alpha        ///<[in] algebraic variable
+                       )
 {
   CFList list;
   bool top_level= true;
@@ -33,32 +36,44 @@ static inline CanonicalForm modGCDFq (const CanonicalForm& A, const CanonicalFor
 }
 
 
-CanonicalForm modGCDFp (const CanonicalForm& F, const CanonicalForm&  G,
-                           bool& top_level, CFList& l);
+CanonicalForm
+modGCDFp (const CanonicalForm& F, const CanonicalForm& G, bool& top_level,
+          CFList& l);
 
-CanonicalForm modGCDFp (const CanonicalForm& F, const CanonicalForm&  G, CanonicalForm& coF, CanonicalForm& coG,
-                           bool& topLevel, CFList& l);
+CanonicalForm
+modGCDFp (const CanonicalForm& F, const CanonicalForm& G,
+          CanonicalForm& coF, CanonicalForm& coG,
+          bool& topLevel, CFList& l);
 
 ///GCD of A and B over \f$ F_{p} \f$
-static inline CanonicalForm modGCDFp (const CanonicalForm& A, const CanonicalForm& B)
+static inline
+CanonicalForm modGCDFp (const CanonicalForm& A, ///<[in] poly over F_p
+                        const CanonicalForm& B  ///<[in] poly over F_p
+                       )
 {
   CFList list;
   bool top_level= true;
   return modGCDFp (A, B, top_level, list);
 }
 
-static inline CanonicalForm modGCDFp (const CanonicalForm& A, const CanonicalForm& B, CanonicalForm& coA, CanonicalForm& coB)
+static inline
+CanonicalForm modGCDFp (const CanonicalForm& A, const CanonicalForm& B,
+                        CanonicalForm& coA, CanonicalForm& coB)
 {
   CFList list;
   bool top_level= true;
   return modGCDFp (A, B, coA, coB, top_level, list);
 }
 
-CanonicalForm modGCDGF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
-        bool& top_level);
+CanonicalForm
+modGCDGF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
+          bool& top_level);
 
 /// GCD of A and B over GF
-static inline CanonicalForm modGCDGF (const CanonicalForm& A, const CanonicalForm& B)
+static inline
+CanonicalForm modGCDGF (const CanonicalForm& A, ///<[in] poly over GF
+                        const CanonicalForm& B  ///<[in] poly over GF
+                       )
 {
   ASSERT (CFFactory::gettype() == GaloisFieldDomain,
           "GF as base field expected");
@@ -72,7 +87,9 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
 
 /// Zippel's sparse GCD over Fp
 static inline
-CanonicalForm sparseGCDFp (const CanonicalForm& A, const CanonicalForm& B)
+CanonicalForm sparseGCDFp (const CanonicalForm& A, ///<[in] poly over F_p
+                           const CanonicalForm& B  ///<[in] poly over F_p
+                          )
 {
   ASSERT (CFFactory::gettype() == FiniteFieldDomain,
           "Fp as base field expected");
@@ -81,27 +98,36 @@ CanonicalForm sparseGCDFp (const CanonicalForm& A, const CanonicalForm& B)
   return sparseGCDFp (A, B, topLevel, list);
 }
 
-/// Zippel's sparse GCD over Fq
+
 CanonicalForm
 sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
              const Variable& alpha, CFList& l, bool& topLevel);
 
+/// Zippel's sparse GCD over Fq
 static inline
-CanonicalForm sparseGCDFq (const CanonicalForm& A, const CanonicalForm& B,
-                           const Variable& alpha)
+CanonicalForm sparseGCDFq (const CanonicalForm& A, ///<[in] poly over F_q
+                           const CanonicalForm& B, ///<[in] poly over F_q
+                           const Variable& alpha   ///<[in] algebraic variable
+                          )
 {
   CFList list;
   bool topLevel= true;
   return sparseGCDFq (A, B, alpha, list, topLevel);
 }
 
+/// extract monomials of F, parts in algebraic variable are considered
+/// coefficients
 CFArray
-getMonoms (const CanonicalForm& F);
+getMonoms (const CanonicalForm& F ///<[in] some poly
+          );
 
 bool
 terminationTest (const CanonicalForm& F, const CanonicalForm& G,
                  const CanonicalForm& coF, const CanonicalForm& coG,
                  const CanonicalForm& cand);
 
-CanonicalForm modGCDZ ( const CanonicalForm & FF, const CanonicalForm & GG );
+/// modular GCD over Z
+CanonicalForm modGCDZ (const CanonicalForm & FF, ///<[in] poly over Z
+                       const CanonicalForm & GG  ///<[in] poly over Z
+                      );
 #endif

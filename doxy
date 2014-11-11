@@ -62,10 +62,18 @@ cd "$P"
 
 INPUTTXT=`echo "$INPUT" | sed -e 's@[ :]@_@g' -e 's@[\\\/]@__@g'`
 
-OUTPUT=`mktemp -d -q "./DOXY.$INPUTTXT.XXXXXX"`
-if [ $? -ne 0 ]; then
-    echo "$0: Can't create temp dir name, exiting..."
-    exit 1
+OUTPUT="./DOXY.$INPUTTXT"
+# `mktemp -d -q "./DOXY.$INPUTTXT.XXX"`
+#if [ $? -ne 0 ]; then
+#    echo "$0: Can't create temp dir name, exiting..."
+#    exit 1
+#fi
+
+if [ -d "$OUTPUT" ]; then
+    echo "Directory '$OUTPUT' exists! Deleting..."
+    rm -Rf "$OUTPUT/*"
+else
+    mkdir -p "$OUTPUT/"
 fi
 
 export OUTPUT

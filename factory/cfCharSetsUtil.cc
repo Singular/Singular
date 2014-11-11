@@ -31,11 +31,11 @@ degpsmax (const CFList & PS, const Variable & x,
   if (A[varlevel] != __ARRAY_INIT__)
     return A[varlevel];
   int max= 0, temp, count= 0;
-  
+
   for (CFListIterator i= PS; i.hasItem(); i++)
   {
     temp= degree (i.getItem(), x);
-    if (temp > max) 
+    if (temp > max)
     {
       max= temp;
       count = 0;
@@ -113,14 +113,14 @@ Tdeg (const CFList & PS, const Variable & x, Intarray & A, Intarray & B,
       if (degree (elem, x) == k)
         LCdegList.append (LC (elem, x));
     }
-    
+
     if (LCdegList.length() > 0)
     {
       CFList TermList;
       int newmin, newnopslc;
 
       min= totaldegree (LCdegList.getFirst());
-      TermList= get_Terms (LCdegList.getFirst()); 
+      TermList= get_Terms (LCdegList.getFirst());
       nopslc= TermList.length();
       for (i= LCdegList; i.hasItem(); i++)
       {
@@ -129,11 +129,11 @@ Tdeg (const CFList & PS, const Variable & x, Intarray & A, Intarray & B,
         TermList= get_Terms(elem);
         newnopslc= TermList.length();
         if (newmin < min)
-          min= newmin; 
+          min= newmin;
         if (newnopslc < nopslc)
           nopslc= newnopslc;
       }
-      
+
     }
     E[varlevel]= min;
     F[varlevel]= nopslc;
@@ -185,8 +185,8 @@ degord (const Variable & x, const Variable & y, const CFList & PS,
 // NOTE:
 //    this doesn't give always the correct answer:
 //    If a variable is assigned the highest level in the definition of the
-//    original ring, but doesn't occure in any of the 
-//    polynomials, get_max_var returns the variable with a level lower than 
+//    original ring, but doesn't occure in any of the
+//    polynomials, get_max_var returns the variable with a level lower than
 //    the highest level.
 //    Is there a workaround?
 // But for the redefinition of the ring this doesn't matter due to the
@@ -273,11 +273,11 @@ reorderb (const Varlist & difference, const CFList & PS,
     v[i]= J.getItem();
     i++;
   }
-  
+
   while (gap <= n)
     gap = __INIT_GAP__ * gap + 1;
   gap /= __INIT_GAP__;
-  
+
   while (gap > 0)
   {
     for (i= gap; i <= n - 1; i++)
@@ -456,99 +456,16 @@ sortCFListByLevel (CFList& list)
 
 
 /* basic operations on lists */
-
-bool
-isMember (const CanonicalForm& f, const CFList& F)
-{
-  for (CFListIterator i= F; i.hasItem(); i++)
-  {
-    if (i.getItem().mapinto() == f.mapinto())
-      return 1;
-  }
-  return 0;
-}
-
-/// are list A and B the same?
-bool
-isSame (const CFList& A, const CFList& B)
-{
-  if (A.length() != B.length())
-    return 0;
-
-  CFListIterator i;
-
-  for (i= A; i.hasItem(); i++)
-  {
-    if (!isMember (i.getItem(), B))
-      return 0;
-  }
-  for (i= B; i.hasItem(); i++)
-  {
-    if (!isMember (i.getItem(), A))
-      return 0;
-  }
-  return 1;
-}
-
-
-/// is List cs contained in List of lists pi?
-bool
-isMember (const CFList& cs, const ListCFList& pi)
-{
-  if (pi.isEmpty())
-    return 0;
-
-  ListCFListIterator i;
-
-  for (i= pi; i.hasItem(); i++)
-  {
-    if (i.getItem().length() != cs.length())
-      continue;
-    if (isSame (cs, i.getItem()))
-      return 1;
-  }
-  return 0;
-}
-
 /// is PS a subset of Cset ?
 bool
 isSubset (const CFList &PS, const CFList& Cset)
 {
   for (CFListIterator i= PS; i.hasItem(); i++)
   {
-    if (!isMember (i.getItem(), Cset))
+    if (!find (Cset, i.getItem()))
       return 0;
   }
   return 1;
-}
-
-/// Union of two List of Lists
-ListCFList
-MyUnion (const ListCFList& a, const ListCFList& b)
-{
-  if (a.isEmpty())
-    return b;
-  if (b.isEmpty())
-    return a;
-
-  ListCFList output;
-  ListCFListIterator i;
-  CFList elem;
-
-  for (i= a; i.hasItem(); i++)
-  {
-    elem= i.getItem();
-    if ((!elem.isEmpty()) && (!isMember (elem, output)))
-      output.append(elem);
-  }
-
-  for (i= b; i.hasItem(); i++)
-  {
-    elem= i.getItem();
-    if ((!elem.isEmpty()) && (!isMember (elem, output)))
-      output.append(elem);
-  }
-  return output;
 }
 
 /// Union of a and b stored in b
@@ -569,38 +486,9 @@ inplaceUnion (const ListCFList& a, ListCFList& b)
   for (i= a; i.hasItem(); i++)
   {
     elem= i.getItem();
-    if ((!elem.isEmpty()) && (!isMember (elem, b)))
+    if ((!elem.isEmpty()) && (!find (b, elem)))
       b.insert(elem);
   }
-}
-
-///if list b is member of the list of lists a remove b and return the rest
-ListCFList
-minus (const ListCFList& a, const CFList& b)
-{
-  ListCFList output;
-  ListCFListIterator i;
-  CFList elem;
-
-  for (i= a; i.hasItem(); i++)
-  {
-    elem= i.getItem();
-    if ((!elem.isEmpty()) && (!isSame (elem, b)))
-      output.append (elem);
-  }
-  return output;
-}
-
-/// remove all elements of b from list of lists a and return the rest
-ListCFList
-minus (const ListCFList& a, const ListCFList& b)
-{
-  ListCFList output= a;
-
-  for (ListCFListIterator i= b; i.hasItem(); i++)
-    output = minus (output, i.getItem());
-
-  return output;
 }
 
 ListCFList
@@ -620,7 +508,7 @@ adjoin (const CFList& is, const CFList& qs, const ListCFList& qh)
   if (iscopy.isEmpty())
     return iss;
 
-  qhi= minus (qh, qs);
+  qhi= Difference (qh, qs);
   length= qhi.length();
 
   for (i= iscopy; i.hasItem(); i++)
@@ -658,7 +546,7 @@ adjoinb (const CFList & is, const CFList & qs, const ListCFList & qh,
   }
   if (iscopy.isEmpty())
     return iss;
-  qhi= minus (qh, qs);
+  qhi= Difference (qh, qs);
   length= qhi.length();
   for (i= iscopy; i.hasItem(); i++)
   {
@@ -711,11 +599,8 @@ CanonicalForm normalize (const CanonicalForm& F)
       On (SW_RATIONAL);
     G= F;
     G *= bCommonDen (G);
-    if (!isRat)
-      Off (SW_RATIONAL);
-    if (isRat)
-      Off (SW_RATIONAL);
-    G= F/icontent (F);
+    Off (SW_RATIONAL);
+    G /= icontent (G);
     if (isRat)
       On (SW_RATIONAL);
     if (lc(G) < 0)
@@ -1051,14 +936,14 @@ contract (const ListCFList& cs)
   for (ListCFListIterator i= cs; i.hasItem() && ii < l; i++, ii++)
   {
     iitem= i.getItem();
-    if (!isMember (iitem, mem))
+    if (!find (mem, iitem))
     {
       j= i;
       j++;
       for (; j.hasItem(); j++)
       {
         jitem= j.getItem();
-        if (!isMember (jitem, mem))
+        if (!find (mem, jitem))
         {
           if (contractsub (iitem, jitem))
           {
@@ -1074,6 +959,6 @@ contract (const ListCFList& cs)
       }
     }
   }
-  return minus (cs,ts);
+  return Difference (cs,ts);
 }
 

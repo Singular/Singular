@@ -79,11 +79,11 @@ namespace
     StringSetS("");
     p_Write(a, r);
 
-    std::stringstream ss; 
+    std::stringstream ss;
     {
-      char* s = StringEndS();  ss << s; omFree(s); 
+      char* s = StringEndS();  ss << s; omFree(s);
     }
-     
+
     return ss.str();
   }
 
@@ -2297,7 +2297,7 @@ public:
     TS_ASSERT_EQUALS(rVar(s), 3);
 
     Test(s);
-    
+
     rDelete(s); // kills 'cf' and 'r' as well
   }
   void test_Q_Ext_s_t()
@@ -2370,7 +2370,7 @@ public:
     TS_ASSERT_EQUALS(rVar(s), 3);
 
     Test(s);
-    
+
     /* some special tests: */
     poly v1 = NULL;
     plusTerm(v1, 1, 1, 1, cf->extRing);       // s
@@ -2404,11 +2404,11 @@ public:
       nn = tmp;
       clog << i << ". "; PrintSized(nn, cf);
     }
-    
+
     n_Delete(&prod, cf); n_Delete(&nn, cf);
     n_Delete(&v_n, cf); n_Delete(&w_n, cf);
     n_Delete(&vOverW_n, cf); n_Delete(&wOverV_n, cf);
-    
+
     rDelete(s); // kills 'cf' and 'r' as well
   }
   void test_Q_Ext_Performance()
@@ -2483,7 +2483,7 @@ public:
     TS_ASSERT_EQUALS(rVar(s), 1);
 
     Test(s);
-    
+
     /* a special performance test: */
     poly entry = NULL;
     for (int ti = 0; ti <= 20; ti++)
@@ -2511,7 +2511,7 @@ public:
     p_Write(theProduct, s);
     clog << "...ending multiplication" << endl;
     n_Delete(&qfactorAsN, cf); p_Delete(&theProduct, s);
-    
+
     /* a very special performance test: */
     specialPoly(entry, s);
     p_Write(entry, s);
@@ -2529,7 +2529,7 @@ public:
     p_Write(theProduct, s);
     clog << "...ending very special multiplication" << endl;
     n_Delete(&qfactorAsN, cf); p_Delete(&theProduct, s);
-        
+
     rDelete(s); // kills 'cf' and 'r' as well
   }
   void test_Q_Ext_s_t_NestedFractions()
@@ -2592,7 +2592,7 @@ public:
     TS_ASSERT( (s->cf->extRing!=NULL) );
     TS_ASSERT( !rField_is_GF(s, 25) );
     TS_ASSERT_EQUALS(rVar(s), 3);
-    
+
     /* test 1 for nested fractions, i.e. fractional coefficients: */
     poly v1 = NULL;
     plusTermOverQ(v1, 21, 2, 1, 1, cf->extRing);       // 21/2*s
@@ -2607,7 +2607,7 @@ public:
     number v3_n = n_Div(v1_n, v2_n, cf);   // (45*s + 20) / (6s - 35*t)
     PrintSized(v3_n, cf);
     n_Delete(&v1_n, cf); n_Delete(&v2_n, cf); n_Delete(&v3_n, cf);
-    
+
     /* test 2 for nested fractions, i.e. fractional coefficients: */
     v1 = NULL;
     plusTermOverQ(v1, 1, 2, 1, 1, cf->extRing);       // 1/2*s
@@ -2629,7 +2629,7 @@ public:
     number z_n = n_Div(v_n, w_n, cf);          // -5/7*s - 10/21*t
     PrintSized(z_n, cf);
     n_Delete(&v_n, cf); n_Delete(&w_n, cf); n_Delete(&z_n, cf);
-    
+
     rDelete(s); // kills 'cf' and 'r' as well
   }
 };

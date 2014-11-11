@@ -19,7 +19,10 @@ Before sending a pull request to merge your changes, make sure that
     * consider special cases! Optimally all decision branches of new functions should be covered by tests
  * the Singular test suite passes without failure. [Instructions on running the test suite](Running-test) is available on this wiki.
 
-A mirror of the repository is available at <git://www.singular.uni-kl.de/Singular.git>, with a web interface
+@note Almost everything GitHub-related can be done from command-line with the
+following tool <http://hub.github.com>.
+
+@note A mirror of the repository is available at <git://www.singular.uni-kl.de/Singular.git>, with a web interface
 at <http://www.singular.uni-kl.de/git>
 
 Another mirror can be found at Google Code: <https://code.google.com/p/singular/>

@@ -23,7 +23,7 @@ FILE*feFopen(const char *path, const char *mode, char *where=0, short useWerror=
 FILE *myfopen(const char *path, const char *mode);
 size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 
-extern "C" 
+extern "C"
 {
 #endif
 

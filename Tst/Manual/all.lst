@@ -8,7 +8,6 @@ A_Z.tst
 Access_to_elements_of_a_user_defined_type.tst
 Adj_div.tst
 Algebraic_dependence.tst
-AltVarEnd.tst
 AltVarStart.tst
 Ann.tst
 ArnoldAction.tst
@@ -244,7 +243,6 @@ annil.tst
 appelF1.tst
 appelF2.tst
 appelF4.tst
-applyAdF.tst
 areZeroElements.tst
 arrange.tst
 ask.tst
@@ -1040,7 +1038,6 @@ pmat.tst
 pnormalform.tst
 poly.tst
 poly2list.tst
-poly_BR_PLURAL_BR.tst
 poly_declarations.tst
 poly_declarations_BR_PLURAL_BR.tst
 poly_expressions.tst

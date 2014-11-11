@@ -1,9 +1,9 @@
 // -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file PolyEnumerator.h
- * 
+ *
  * Concrete implementation of enumerators over polynomials
  *
  * @author Oleksandr Motsak
@@ -21,11 +21,11 @@
 #include <reporter/reporter.h> // for assume etc.
 
 /** @class CBasePolyEnumerator
- * 
+ *
  * Base polynomial enumerator for simple iteration over terms of polynomials.
  *
  * Note that the first element desn't exist directly after Reset() call.
- * 
+ *
  * The class doesn't inherit from IAccessor and thus doesn't override Current().
  *
  * @sa IBaseEnumerator, @sa CPolyCoeffsEnumerator
@@ -36,7 +36,7 @@ class CBasePolyEnumerator: public virtual IBaseEnumerator
   friend class CRecursivePolyCoeffsEnumerator;
   private:
     poly m_poly; ///< essentially immutable original iterable object
-    
+
     static const spolyrec m_prevposition_struct; ///< tag for "-1" position
 
   protected:
@@ -55,21 +55,21 @@ class CBasePolyEnumerator: public virtual IBaseEnumerator
     {
       m_poly = p;
       m_position = const_cast<poly>(&m_prevposition_struct);
-      assume( !IsValid() ); 
+      assume( !IsValid() );
     }
 
     /// This enumerator is an empty polynomial by default
     CBasePolyEnumerator(poly p = NULL):
         IBaseEnumerator(), m_poly(p), m_position(const_cast<poly>(&m_prevposition_struct))
     {
-      assume( !IsValid() ); 
+      assume( !IsValid() );
     }
-    
+
     /// Sets the position marker to the leading term.
     virtual void Reset()
     {
       m_position = const_cast<poly>(&m_prevposition_struct);
-      assume( !IsValid() ); 
+      assume( !IsValid() );
     }
 
 
@@ -92,7 +92,7 @@ class CBasePolyEnumerator: public virtual IBaseEnumerator
           return true;
         }
       }
-      
+
       if (m_position == &m_prevposition_struct) // -1 position?
       {
         assume( !IsValid() );
@@ -113,10 +113,10 @@ class CBasePolyEnumerator: public virtual IBaseEnumerator
 typedef IEnumerator<number> IPolyCoeffsEnumerator;
 
 /** @class CPolyCoeffsEnumerator
- * 
+ *
  * This is a polynomial enumerator for simple iteration over
  * coefficients of polynomials.
- * 
+ *
  * It is required to inherit this class from IEnumerator<number> for
  * its use in coeffs and implement IAccessor<number> interface.
  *
@@ -130,12 +130,12 @@ class CPolyCoeffsEnumerator: public CBasePolyEnumerator, public virtual IPolyCoe
 {
   public:
     CPolyCoeffsEnumerator(poly p): CBasePolyEnumerator(p) {}
-    
+
     /// Gets the current element in the collection (read and write).
     virtual IPolyCoeffsEnumerator::reference Current()
     {
       assume( IsValid() );
-      return pGetCoeff(m_position);      
+      return pGetCoeff(m_position);
     }
 
     /// Gets the current element in the collection (read only).
@@ -168,10 +168,10 @@ class CRecursivePolyCoeffsEnumerator: public IPolyCoeffsEnumerator
     virtual bool IsValid() const
     {
       return m_global_enumerator.IsValid() &&  m_local_enumerator.IsValid();
-    }    
-    
+    }
+
   public:
-   
+
     /// NOTE: carefull: don't destruct the input enumerator before doing it with this one...
     /// this also changes the original IPolyCoeffsEnumerator& itr!
     CRecursivePolyCoeffsEnumerator(IPolyCoeffsEnumerator& itr): m_global_enumerator(itr), m_local_enumerator(NULL) {}
@@ -197,7 +197,7 @@ class CRecursivePolyCoeffsEnumerator: public IPolyCoeffsEnumerator
 
       assume( FALSE ); return MoveNext(); // this should not happen as p should be non-zero, but just in case...
     }
-    
+
     virtual void Reset()
     {
       m_global_enumerator.Reset();
@@ -220,7 +220,7 @@ class CRecursivePolyCoeffsEnumerator: public IPolyCoeffsEnumerator
 };
 
 
-#endif 
+#endif
 /* #ifndef POLYENUMERATOR_H */
 
 // Vi-modeline: vim: filetype=c:syntax:shiftwidth=2:tabstop=8:textwidth=0:expandtab

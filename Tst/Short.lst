@@ -1,6 +1,7 @@
 Short/absfact.tst
 Short/alexpoly.tst
 Short/algebralib.tst
+Short/algemodstd_s
 Short/allres_s.tst
 Short/arcAtPoint.tst
 Short/assprimeszerodim_s.tst
@@ -44,14 +45,18 @@ Short/bug_42.tst
 Short/bug_43.tst
 Short/bug_44.tst
 Short/bug_46.tst
+Short/bug_469.tst
 Short/bug_47.tst
 Short/bug_48.tst
 Short/bug_49.tst
 Short/bug_50.tst
 Short/bug_51.tst
 Short/bug_52.tst
+Short/bug_509.tst
 Short/bug_526.tst
 Short/bug_527_s.tst
+Short/bug_529.tst
+Short/bug_574.tst
 Short/bug_597.tst
 Short/bug_53.tst
 Short/bug_54.tst
@@ -60,8 +65,14 @@ Short/bug_55.tst
 Short/bug_532_s.tst
 Short/bug_538_s.tst
 Short/bug_540.tst
+Short/bug_583.tst
 Short/bug_5.tst
 Short/bug_6.tst
+Short/bug_609.tst
+Short/bug_611.tst
+Short/bug_613.tst
+Short/bug_632.tst
+Short/bug_633.tst
 Short/bug_7.tst
 Short/bug_8.tst
 Short/bug_9.tst
@@ -82,7 +93,6 @@ Short/bug_interpol.tst
 Short/bug_mres.tst
 ;;;; Short/bug_M.tst
 Short/bug_napMultT.tst
-Short/bug_newstruct3.tst
 Short/bug_pd.tst
 Short/bug_presolve.tst
 Short/bug_primdec.tst
@@ -126,6 +136,7 @@ Short/bug_tr404.tst
 Short/bug_tr485.tst
 Short/bug_tr489.tst
 Short/bug_tr549.tst
+Short/bug_tr595.tst
 Short/bug_tr628.tst
 Short/bug_x_i_j.tst
 Short/charseries.tst
@@ -148,6 +159,7 @@ Short/eliminate_7.tst
 Short/elimlib_s.tst
 Short/equising_s.tst
 ;;;; Short/facstd.tst
+Short/factorize_mod7.tst
 Short/factorizep_s.tst
 Short/factorizeQa_s.tst
 Short/factorizeQ_s.tst
@@ -216,6 +228,7 @@ Short/polylib_s.tst
 Short/primdec2.tst
 ; Short/primdec3.tst ; too long!
 Short/primdec_s.tst
+Short/primdecint_some_special_cases.tst
 Short/primefactors.tst
 Short/primitiv_s.tst
 ;;;;;;;;;;;;;;;;;;;; Short/pyobject.tst
@@ -298,7 +311,6 @@ Short/zerodim_5_32003_lp_slimgb.tst
 Short/zerodim_54_32003_lp_slimgb.tst
 Short/zerodim_57_32003_lp_slimgb.tst
 Short/zerodim_58_32003_lp_slimgb.tst
-Short/zerodim_59_32003_lp_slimgb.tst
 Short/zerodim_60_32003_lp_slimgb.tst
 Short/zerodim_61_32003_lp_slimgb.tst
 Short/zerodim_62_32003_lp_slimgb.tst

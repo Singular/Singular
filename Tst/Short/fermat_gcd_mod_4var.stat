@@ -1,20 +1,20 @@
-1 >> tst_memory_0 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:937764
-1 >> tst_memory_1 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:2214688
-1 >> tst_memory_2 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:2255660
-1 >> tst_timer :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:36
-2 >> tst_memory_0 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:939328
-2 >> tst_memory_1 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:2215716
-2 >> tst_memory_2 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:2256688
-2 >> tst_timer :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:6
-3 >> tst_memory_0 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:939328
-3 >> tst_memory_1 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:2215716
-3 >> tst_memory_2 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:2256688
-3 >> tst_timer :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:65
-4 >> tst_memory_0 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:939328
-4 >> tst_memory_1 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:2215716
-4 >> tst_memory_2 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:2256688
-4 >> tst_timer :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:175
-5 >> tst_memory_0 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:939456
-5 >> tst_memory_1 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:2215716
-5 >> tst_memory_2 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:2256688
-5 >> tst_timer_1 :: 1374251174:3160:3-1-6:ix86-Linux:mamawutz:283
+1 >> tst_memory_0 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:953572
+1 >> tst_memory_1 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:2239316
+1 >> tst_memory_2 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:2280288
+1 >> tst_timer :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:44
+2 >> tst_memory_0 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:955136
+2 >> tst_memory_1 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:2240344
+2 >> tst_memory_2 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:2281316
+2 >> tst_timer :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:6
+3 >> tst_memory_0 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:955136
+3 >> tst_memory_1 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:2240344
+3 >> tst_memory_2 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:2281316
+3 >> tst_timer :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:73
+4 >> tst_memory_0 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:955136
+4 >> tst_memory_1 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:2240344
+4 >> tst_memory_2 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:2281316
+4 >> tst_timer :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:199
+5 >> tst_memory_0 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:955264
+5 >> tst_memory_1 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:2240344
+5 >> tst_memory_2 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:2281316
+5 >> tst_timer_1 :: 1415107326:4011, 32 bit:4.0.1:i686-Linux:mamawutz:323

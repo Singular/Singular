@@ -6,6 +6,18 @@
 /*
 * ABSTRACT
 */
+
+class intvec;
+
+struct omBin_s   ; typedef struct omBin_s omBin_t ; typedef omBin_t * omBin;
+
+struct ip_sring  ; typedef struct ip_sring                          * ring;
+struct sip_sideal; typedef struct sip_sideal                        * ideal;
+struct spolyrec  ; typedef struct spolyrec polyrec; typedef polyrec * poly;
+typedef                                                     poly    * polyset;
+
+extern ring currRing;
+
 typedef int * scmon;
 typedef scmon * scfmon;
 typedef int * varset;
@@ -42,7 +54,6 @@ extern indset ISet, JSet;
 extern int  hCo, hMu, hMu2;
 
 
-scfmon hInit(ideal S, ideal Q, int * Nexist, ring tailRing);
 void hDelete(scfmon ev, int ev_length);
 void hComp(scfmon exist, int Nexist, int ak, scfmon stc, int * Nstc);
 void hSupp(scfmon stc, int Nstc, varset var, int * Nvar);
@@ -73,5 +84,7 @@ void hIndAllMult(scmon pure, int Npure, scfmon rad, int Nrad,
  varset var, int Nvar);
 void hDegreeSeries(intvec *s1, intvec *s2, int *co, int *mu);
 
+
+scfmon hInit(ideal S, ideal Q, int * Nexist, ring tailRing);
 void slicehilb(ideal I);
 #endif

@@ -1,9 +1,12 @@
 /*! \page kernel_fglm_page FGLM algorithms
 
- This sub-package of kernel (\ref kernel_page) contains
- FGLM algorithms. 
+ \brief This sub-package of \ref kernel_page contains some FGLM algorithms.
 
- TODO: list those algorithms... and corresponding interpreter functions...?
- 
+ Main header(s) in `/kernel/fglm/`:
+ - \ref kernel/fglm/fglm.h
+ - \ref kernel/fglm/fglmgauss.h
+ - \ref kernel/fglm/fglmvec.h
 */
 
+//  TODO: list those algorithms... and corresponding interpreter functions...?
+ 

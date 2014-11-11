@@ -407,7 +407,7 @@ proc gitFan(ideal a, bigintmat Q, list #)
 PURPOSE: Returns the GIT-fan of the H-action defined by Q on V(a).
 An optional third parameter of type 'int' is interpreted as the
 number of CPU-cores you would like to use.
-Note that 'system("cpu");' returns the number of cpu available
+Note that 'system("--cpus");' returns the number of cpu available
 in your system.
 RETURN: a fan.
 EXAMPLE: example gitFan; shows an example

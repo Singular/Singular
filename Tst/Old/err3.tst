@@ -90,5 +90,9 @@ ncols(D); nrows(D);
 option(prot);    
 
 module E=Ext(2,D,J);
+//---------------------------------------------
+// tr.600 (assign to 1 x 1 bigintmat)
+
+bigintmat b[1][1] = 7;
 
 LIB "tst.lib";tst_status(1);$

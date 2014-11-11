@@ -6,7 +6,7 @@
 // header files together.
 
 #ifndef BINOMIAL__TERM_ORDERING_H
-#define BINONIAL__TERM_ORDERING_H
+#define BINOMIAL__TERM_ORDERING_H
 
 #include "term_ordering.h"
 #include "binomial.h"

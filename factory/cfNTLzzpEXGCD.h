@@ -40,12 +40,12 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 This entire copyright notice should be placed in an appropriately
-conspicuous place accompanying all distributions of software that 
+conspicuous place accompanying all distributions of software that
 make use of NTL.
 
 The above terms apply to all of the software modules distributed with NTL,
-i.e., all source files in either the ntl-xxx.tar.gz or WinNTL-xxx.zip 
-distributions.  In general, the individual files do not contain 
+i.e., all source files in either the ntl-xxx.tar.gz or WinNTL-xxx.zip
+distributions.  In general, the individual files do not contain
 copyright notices.
 
 Note that the quad_float package is derived from the doubledouble package,
@@ -56,7 +56,7 @@ notices.
 Note that the traditional long integer package used by NTL, lip.c, is derived
 from---and represents an extensive modification of---
 a package originally developed and copyrighted by Arjen Lenstra,
-who has agreed to renounce any copyright claims on the particular 
+who has agreed to renounce any copyright claims on the particular
 version of the long integer package appearing in NTL, so that the
 this package now is covered by the GNU GPL as well.
 
@@ -64,7 +64,7 @@ Note that the alternative long integer package used by NTL is GMP,
 which is written by Torbjorn Granlund <tege@swox.com>.
 GMP is licensed under the terms of the GNU Lesser General Public License.
 
-Note that NTL makes use of the RSA Data Security, Inc. MD5 Message 
+Note that NTL makes use of the RSA Data Security, Inc. MD5 Message
 Digest Algorithm.
 
 Note that prior to version 4.0, NTL was distributed under the following terms:

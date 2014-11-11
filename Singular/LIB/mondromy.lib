@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version mondromy.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version mondromy.lib 4.0.1.0 Sep_2014 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  mondromy.lib  Monodromy of an Isolated Hypersurface Singularity
@@ -66,19 +66,6 @@ static proc pcvbasis(int i0,int i1)
   return(system("pcvBasis",i0,i1));
 }
 
-static proc pcvinit()
-{
-  if(0 ) //system("with","DynamicLoading"))
-  {
-    pcvladdl=Pcv::LAddL;
-    pcvpmull=Pcv::PMulL;
-    pcvmindeg=Pcv::MinDeg;
-    pcvp2cv=Pcv::P2CV;
-    pcvcv2p=Pcv::CV2P;
-    pcvdim=Pcv::Dim;
-    pcvbasis=Pcv::Basis;
-  }
-}
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc min(intvec v)
@@ -591,8 +578,6 @@ static proc decmide(matrix M,ideal eM0,list bM0)
 
 static proc nonqhmonodromy(poly f,int mu,int opt)
 {
-  pcvinit();
-
   dbprint(printlevel-voice+2,"//computing kappa, xi and u with "+
     "u*f^kappa=(matrix(jacob(f))*xi)[1,1]...");
   list jl=jacoblift(f);
@@ -936,8 +921,6 @@ DISPLAY: The procedure displays more comments for higher printlevel.
 EXAMPLE: example H2basis; shows an example.
 "
 {
-  pcvinit();
-
   dbprint(printlevel-voice+2,"//basering="+string(basering));
 
   int i;

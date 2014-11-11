@@ -159,7 +159,7 @@ char * StringEndS()
   if (strlen(r)<1024)
   {
     // if the used buffer is a "smal block",
-    // substitue the "large" initial block by a smal one
+    // substitue the "large" initial block by a small one
     char *s=omStrDup(r); omFree(r); r=s;
   }
   return r;
@@ -239,7 +239,11 @@ void Warn(const char *fmt, ...)
   va_list ap;
   va_start(ap, fmt);
   char *s=(char *)omAlloc(256);
+#ifdef HAVE_VSNPRINTF
+  vsnprintf(s, 256, fmt, ap);
+#else
   vsprintf(s, fmt, ap);
+#endif
   WarnS(s);
   omFreeSize(s,256);
   va_end(ap);

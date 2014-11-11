@@ -267,29 +267,36 @@ BOOLEAN jjEQUAL_CR(leftv res, leftv a, leftv b)
 // -----------------------------------------------------------
 number2 n2Copy(const number2 d)
 {
-  number2 r=(number2)omAlloc(sizeof(*r));
-  d->cf->ref++;
-  r->cf=d->cf;
-  if (d->cf!=NULL)
-    r->n=n_Copy(d->n,d->cf);
-  else
-    r->n=NULL;
+  number2 r=NULL;
+  if ((d!=NULL)&&(d->cf!=NULL))
+  {
+    r=(number2)omAlloc(sizeof(*r));
+    d->cf->ref++;
+    r->cf=d->cf;
+    if (d->cf!=NULL)
+      r->n=n_Copy(d->n,d->cf);
+    else
+      r->n=NULL;
+  }
   return r;
 }
 void n2Delete(number2 &d)
 {
-  if (d->cf!=NULL)
+  if (d!=NULL)
   {
-    n_Delete(&d->n,d->cf);
+    if (d->cf!=NULL)
+    {
+      n_Delete(&d->n,d->cf);
+      nKillChar(d->cf);
+    }
+    omFreeSize(d,sizeof(*d));
+    d=NULL;
   }
-  nKillChar(d->cf);
-  omFreeSize(d,sizeof(*d));
-  d=NULL;
 }
 char *n2String(number2 d, BOOLEAN typed)
 {
   StringSetS("");
-  if (d->cf!=NULL)
+  if ((d!=NULL) && (d->cf!=NULL))
   {
     if (typed) StringAppendS("Number(");
     n_Write(d->n,d->cf);

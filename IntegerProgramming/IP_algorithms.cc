@@ -1,6 +1,6 @@
 // IP_algorithms.cc
 
-#ifndef IP_ALGORITMS_CC
+#ifndef IP_ALGORITHMS_CC
 #define IP_ALGORITHMS_CC
 
 #include "IP_algorithms.h"
@@ -2251,7 +2251,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
       "input file has suspicious format"<<endl;
 
   float *hom_grad=new float[variables];
-  
+
   for(int _i=0;_i<variables;_i++)
   {
     input>>hom_grad[_i];
@@ -2275,7 +2275,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
       return 0;
     }
   }
-  
+
 
 
 ///////////////////////// computation ////////////////////////////////////////

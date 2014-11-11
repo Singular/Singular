@@ -82,13 +82,6 @@ static BOOLEAN heGenInit(int,int);    static void heGenHelp(heEntry hentry,int);
 static BOOLEAN heDummyInit(int,int);   static void heDummyHelp(heEntry hentry,int);
 static BOOLEAN heEmacsInit(int,int);   static void heEmacsHelp(heEntry hentry,int);
 
-#ifdef ix86_Win
-static void heHtmlHelp(heEntry hentry,int);
-static void heWinHelp(heEntry hentry,int);
-static void heWinHtmlHelp(heEntry hentry,int);
-#include "sing_win.h"
-#endif
-
 static heBrowser heCurrentHelpBrowser = NULL;
 static int heCurrentHelpBrowserIndex= -1;
 
@@ -136,17 +129,6 @@ void feHelp(char *str)
   {
     if (heCurrentHelpBrowser == NULL) feHelpBrowser(NULL, 0);
     assume(heCurrentHelpBrowser != NULL);
-#ifdef ix86_Win
-    if (strcmp(heCurrentHelpBrowser->browser,"htmlhelp")==0)
-    {
-      // In Windows always let htmlhelp handle request, if standard
-      strcpy(hentry.key, str);
-      *hentry.node = '\0';
-      *hentry.url = '\0';
-      hentry.chksum = 0;
-      heBrowserHelp(&hentry);
-    }
-#endif
 
     StringSetS("");
     int found = heReKey2Entry(idxfile, str, &hentry);
@@ -215,21 +197,9 @@ static void feBrowserFile()
       if ((buf[0]!='#') && (buf[0]>' ')) br++;
     }
     fseek(f,0,SEEK_SET);
-#ifdef ix86_Win
-    // for the 7(!) default browsers and make htmlhelp the default default
-    heHelpBrowsers=(heBrowser_s*)omAlloc0((br+7)*sizeof(heBrowser_s));
-    br = 0;
-    heHelpBrowsers[br].browser="htmlhelp";
-    heHelpBrowsers[br].init_proc=heGenInit;
-    heHelpBrowsers[br].help_proc=heWinHtmlHelp;
-    heHelpBrowsers[br].required="C";
-    // heHelpBrowsers[br].action=NULL;
-    br++;
-#else
     // for the 4(!) default browsers
     heHelpBrowsers=(heBrowser_s*)omAlloc0((br+4)*sizeof(heBrowser_s));
     br = 0;
-#endif
     while (fgets( buf, sizeof(buf), f))
     {
       if ((buf[0]!='#') && (buf[0]>' '))
@@ -259,34 +229,9 @@ static void feBrowserFile()
   }
   else
   {
-#ifdef ix86_Win
-    // for the 7(!) default browsers
-    heHelpBrowsers=(heBrowser_s*)omAlloc0(7*sizeof(heBrowser_s));
-    heHelpBrowsers[br].browser="htmlhelp";
-    heHelpBrowsers[br].init_proc=heGenInit;
-    heHelpBrowsers[br].help_proc=heWinHtmlHelp;
-    heHelpBrowsers[br].required="C";
-    // heHelpBrowsers[br].action=NULL;
-    br++;
-#else
     // for the 4(!) default browsers
     heHelpBrowsers=(heBrowser_s*)omAlloc0(4*sizeof(heBrowser_s));
-#endif
   }
-#ifdef ix86_Win
-  heHelpBrowsers[br].browser="winhlp";
-  heHelpBrowsers[br].init_proc=heGenInit;
-  heHelpBrowsers[br].help_proc=heWinHelp;
-  heHelpBrowsers[br].required="h";
-  //heHelpBrowsers[br].action=NULL;
-  br++;
-  heHelpBrowsers[br].browser="html";
-  heHelpBrowsers[br].init_proc=heGenInit;
-  heHelpBrowsers[br].help_proc=heHtmlHelp;
-  heHelpBrowsers[br].required="h";
-  //heHelpBrowsers[br].action=NULL;
-  br++;
-#endif
   heHelpBrowsers[br].browser="builtin";
   heHelpBrowsers[br].init_proc=heGenInit;
   heHelpBrowsers[br].help_proc=heBuiltinHelp;
@@ -325,8 +270,6 @@ const char* feHelpBrowser(char* which, int warn)
       return heCurrentHelpBrowser->browser;
 
     // First, try emacs, if emacs-option is set
-    // Under Win, always use html
-#ifndef ix86_Win
     if (feOptValue(FE_OPT_EMACS) != NULL)
     {
       while (heHelpBrowsers[i].browser != NULL)
@@ -342,7 +285,6 @@ const char* feHelpBrowser(char* which, int warn)
       }
       i=0;
     }
-#endif
     while (heHelpBrowsers[i].browser != NULL)
     {
       if (heHelpBrowsers[i].init_proc(0,i))
@@ -886,7 +828,6 @@ static BOOLEAN heGenInit(int warn, int br)
       case ' ': break;
       case 'i': /* singular.hlp */
       case 'x': /* singular.idx */
-      case 'C': /* chm file Manual.chm */
       case 'h': /* html dir */
                if (feResource(*p, warn) == NULL)
                {
@@ -934,51 +875,6 @@ static BOOLEAN heGenInit(int warn, int br)
   return TRUE;
 }
 
-#ifdef ix86_Win
-
-static void heHtmlHelp(heEntry hentry, int br)
-{
-  char url[MAXPATHLEN];
-  char* html_dir = feResource('h' /*"HtmlDir"*/);
-  sprintf(url, "%s/%s",
-          (html_dir != NULL ? html_dir : feResource('u' /*"ManualUrl"*/)),
-          (hentry!=NULL && *(hentry->url)!='\0' ? hentry->url : "index.htm"));
-
-  heOpenWinntUrl(url, (html_dir != NULL ? 1 : 0));
-}
-
-static void heWinHtmlHelp(heEntry hentry, int br)
-// Function to call the Microsoft HTML Help System
-// Uses API Call Function in sing_win.cc
-{
-  char keyw[MAX_HE_ENTRY_LENGTH];
-  if ((hentry!=NULL)&&(hentry->key!=NULL))
-    strcpy(keyw,hentry->key);
-  else
-    strcpy(keyw," ");
-  char* helppath = feResource('C' /*"CHM Datei"*/);
-  heOpenWinHtmlHelp(keyw,helppath);
-}
-
-static void heWinHelp(heEntry hentry, int br)
-{
-  char keyw[MAX_HE_ENTRY_LENGTH];
-  if ((hentry!=NULL)&&(hentry->key!=NULL))
-    strcpy(keyw,hentry->key);
-  else
-    strcpy(keyw," ");
-  char* helppath = feResource('h' /*"HtmlDir"*/);
-  const char *filename="/Manual.hlp";
-  int helppath_len=0;
-  if (helppath!=NULL) helppath_len=strlen(helppath);
-  char *callpath=(char *)omAlloc0(helppath_len+strlen(filename)+1);
-  if ((helppath!=NULL) && (*helppath>' '))
-    strcpy(callpath,helppath);
-  strcat(callpath,filename);
-  heOpenWinntHlp(keyw,callpath);
-  omfree(callpath);
-}
-#endif
 static void heGenHelp(heEntry hentry, int br)
 {
   char sys[MAX_SYSCMD_LEN];
@@ -1092,38 +988,6 @@ static void heGenHelp(heEntry hentry, int br)
   Print("running `%s`\n",sys);
   (void) system(sys);
 }
-
-#ifdef ix86_Win
-static void heHtmlHelp(heEntry hentry)
-{
-  char url[MAXPATHLEN];
-  char* html_dir = feResource('h' /*"HtmlDir"*/);
-  sprintf(url, "%s/%s",
-          (html_dir != NULL ? html_dir : feResource('u' /*"ManualUrl"*/)),
-          (hentry!=NULL && *(hentry->url)!='\0' ? hentry->url : "index.htm"));
-
-  heOpenWinntUrl(url, (html_dir != NULL ? 1 : 0));
-}
-
-static void heWinHelp(heEntry hentry)
-{
-  char keyw[MAX_HE_ENTRY_LENGTH];
-  if ((hentry!=NULL)&&(hentry->key!=NULL))
-    strcpy(keyw,hentry->key);
-  else
-    strcpy(keyw," ");
-  char* helppath = feResource('h' /*"HtmlDir"*/);
-  const char *filename="/Manual.hlp";
-  int helppath_len=0;
-  if (helppath!=NULL) helppath_len=strlen(helppath);
-  char *callpath=(char *)omAlloc0(helppath_len+strlen(filename)+1);
-  if ((helppath!=NULL) && (*helppath>' '))
-    strcpy(callpath,helppath);
-  strcat(callpath,filename);
-  heOpenWinntHlp(keyw,callpath);
-  omfree(callpath);
-}
-#endif
 
 static BOOLEAN heDummyInit(int /*warn*/, int /*br*/)
 {

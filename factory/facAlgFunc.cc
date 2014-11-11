@@ -9,7 +9,7 @@
  * @note some of the code is code from libfac or derived from code from libfac.
  * Libfac is written by M. Messollen. See also COPYING for license information
  * and README for general information on characteristic sets.
- * 
+ *
  * ABSTRACT: Descriptions can be found in B. Trager "Algebraic Factoring and
  * Rational Function Integration" and A. Steel "Conquering Inseparability:
  * Primary decomposition and multivariate factorization over algebraic function
@@ -366,8 +366,8 @@ simpleExtension (CFList& backSubst, const CFList & Astar,
         rb= R.mvar()-s*ra;
         for (; j.hasItem(); j++)
         {
-          j.getItem()= j.getItem() (ra, oldR.mvar());
           j.getItem()= j.getItem() (rb, i.getItem().mvar());
+          j.getItem()= j.getItem() (ra, oldR.mvar());
         }
         prune (alpha);
       }
@@ -382,11 +382,8 @@ simpleExtension (CFList& backSubst, const CFList & Astar,
 
         CanonicalForm numinv, deninv;
         numinv= QuasiInverse (tmp.getFirst(), LC (h), tmp.getFirst().mvar());
-
-        if (getCharacteristic() == 0)
-          Off (SW_RATIONAL);
         h *= numinv;
-        h= reduce (h, tmp.getFirst());
+        h= Prem (h, tmp);
         deninv= LC(h);
 
         ra= -h[0];
@@ -398,11 +395,12 @@ simpleExtension (CFList& backSubst, const CFList & Astar,
         for (; j.hasItem(); j++)
         {
           CanonicalForm powdenra= power (denra, degree (j.getItem(),
-                                                        oldR.mvar()));
-          j.getItem()= evaluate (j.getItem(),ra, denra, powdenra, oldR.mvar());
-          powdenra= power (denra, degree (j.getItem(), i.getItem().mvar()));
+                                         i.getItem().mvar()));
           j.getItem()= evaluate (j.getItem(), rb, denrb, powdenra,
                                  i.getItem().mvar());
+          powdenra= power (denra, degree (j.getItem(), oldR.mvar()));
+          j.getItem()= evaluate (j.getItem(),ra, denra, powdenra, oldR.mvar());
+
         }
       }
 
@@ -518,7 +516,7 @@ Trager (const CanonicalForm & F, const CFList & Astar,
 
       if (normFactors.getFirst().factor().inCoeffDomain())
         normFactors.removeFirst();
-      if (normFactors.length() == 1 && normFactors.getLast().exp() == 1)
+      if (normFactors.length() < 1 || (normFactors.length() == 1 && normFactors.getLast().exp() == 1))
       {
         f= backSubst (f, backSubsts, Astar);
         f *= bCommonDen (f);
@@ -540,7 +538,7 @@ Trager (const CanonicalForm & F, const CFList & Astar,
           else
           {
             fnew= fnew (g.mvar() + s*Rstar.mvar(), g.mvar());
-            fnew= reduce (fnew, Rstar);
+            fnew= Prem (fnew, CFList (Rstar));
           }
 
           h= alg_gcd (g, fnew, Rstarlist);

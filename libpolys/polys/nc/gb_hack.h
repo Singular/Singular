@@ -36,12 +36,7 @@ poly kNF(ideal, ideal, poly, int, int, const ring _currRing);
 extern void WerrorS(const char *);
 
 # define STR_EXPAND(tok) #tok
-# define D(A) A \
-{               \
-                WerrorS("This is a hack. Function is not defined: " \
-                        STR_EXPAND(A) \
-                       ); \
-}
+# define D(A)    A{ WerrorS("This is a hack. Function is not defined: " STR_EXPAND(A) ); return NULL; }
 
 D(ideal gnc_gr_bba(const ideal, const ideal, const intvec *, const intvec *, kStrategy, const ring _currRing))
 D(ideal gnc_gr_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy, const ring _currRing))

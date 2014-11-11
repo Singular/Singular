@@ -64,7 +64,7 @@ char *iiArithGetCmd(int nPos){return NULL; }
 
 // HEADERS:
 #include <kernel/combinatorics/hutil.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/syz.h>
 #include <kernel/maps/fast_maps.h>
@@ -145,7 +145,6 @@ char *iiArithGetCmd(int nPos){return NULL; }
 #include <kernel/GBEngine/shiftgb.h>
 #include <kernel/spectrum/spectrum.h>
 #include <kernel/spectrum/splist.h>
-#include <kernel/GBEngine/stairc.h>
 #include <kernel/structs.h>
 #include <kernel/GBEngine/syz.h>
 // #include <kernel/testpoly.h> // Too old?
@@ -551,9 +550,9 @@ void TestSimpleRingArithmetcs()
 
   poly pp = pp_Mult_qq( p, p, R);
 
-  Print("p: "); p_Write0(p, R); Print(", deg(p): %d", p_Totaldegree(p, R)); assume( 1 == p_Totaldegree(p, R) );
+  Print("p: "); p_Write0(p, R); Print(", deg(p): %ld", p_Totaldegree(p, R)); assume( 1 == p_Totaldegree(p, R) );
 
-  Print("; p*p : "); p_Write0(pp, R); Print("deg(pp): %d\n", p_Totaldegree(pp, R)); assume( 2 == p_Totaldegree(pp, R) );
+  Print("; p*p : "); p_Write0(pp, R); Print("deg(pp): %ld\n", p_Totaldegree(pp, R)); assume( 2 == p_Totaldegree(pp, R) );
 
 
   p_Delete(&p, R);

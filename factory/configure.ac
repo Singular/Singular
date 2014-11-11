@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_INIT([factory], [4.0.0])
+AC_INIT([factory], [4.0.1])
 AC_CONFIG_SRCDIR(canonicalform.cc)
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([.])
@@ -383,7 +383,7 @@ AC_SUBST(MAKEHEADERFLAGS)
 #AC_SUBST(installtargets)
 #AC_SUBST(uninstalltargets)
 
-factory_version="4.0.0"
+factory_version="4.0.1"
 factory_configuration="'$ac_configure_args' in `pwd`"
 AC_SUBST(factory_version)
 

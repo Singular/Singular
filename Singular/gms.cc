@@ -45,7 +45,7 @@ lists gmsNF(ideal p,ideal g,matrix B,int D,int K)
         pIncrExp(m,1);
         pSetm(m);
         for(int i=0;i<MATROWS(B);i++)
-	{
+        {
           poly m0=pDiff(m,i+2);
           if(MATELEM(B0,i+1,j+1)!=NULL)
             p->m[k]=pAdd(p->m[k],ppMult_mm(MATELEM(B0,i+1,j+1),m));
@@ -67,7 +67,7 @@ lists gmsNF(ideal p,ideal g,matrix B,int D,int K)
       {
         int i=pGetExp(p->m[k],1);
         do
-	{
+        {
           poly p0=p->m[k];
           pIter(p->m[k]);
           pNext(p0)=NULL;
@@ -105,7 +105,7 @@ BOOLEAN gmsNF(leftv res,leftv h)
   {
     if(h&&h->Typ()==IDEAL_CMD)
     {
-      ideal p=(ideal)h->Data();
+      ideal p=(ideal)h->CopyD();
       h=h->next;
       if(h&&h->Typ()==IDEAL_CMD)
       {
@@ -123,10 +123,10 @@ BOOLEAN gmsNF(leftv res,leftv h)
             {
               int K=(int)(long)h->Data();
               res->rtyp=LIST_CMD;
-              res->data=(void *)gmsNF(idCopy(p),g,B,D,K);
+              res->data=(void *)gmsNF(p,g,B,D,K);
               return FALSE;
-	    }
-	  }
+            }
+          }
         }
       }
     }

@@ -88,7 +88,7 @@ poly maEvalVariable(poly p, int v,int pExp, ideal s, const ring dst_r)
   return res;
 }
 
-static poly maEvalMonom(map theMap, poly p,ring preimage_r, ideal s, 
+static poly maEvalMonom(map theMap, poly p,ring preimage_r, ideal s,
            nMapFunc nMap, const ring dst_r)
 {
     p_Test(p,preimage_r);
@@ -159,7 +159,7 @@ poly maEval(map theMap, poly p,ring preimage_r,nMapFunc nMap, ideal s, const rin
 
     assume(dst_r != NULL);
     assume(dst_r->cf != NULL);
-    
+
     if (nCoeff_is_algExt(dst_r->cf))
       result = p_MinPolyNormalize(result, dst_r);
   }

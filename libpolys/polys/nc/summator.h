@@ -34,7 +34,7 @@ class CPolynomialSummator
     union
     {
       sBucket_pt m_bucket;
-//      kBucket_pt m_kbucket; 
+//      kBucket_pt m_kbucket;
       poly       m_poly;
     } m_temp;
   public:

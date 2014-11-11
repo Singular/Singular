@@ -219,7 +219,9 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
   //bivariate case
   if (A.level() == 2)
   {
-    CFList buf= biFactorize (F, v);
+    CFList buf= ratBiSqrfFactorize (F, v);
+    if (buf.getFirst().inCoeffDomain())
+      buf.removeFirst();
     return buf;
   }
 
@@ -276,7 +278,14 @@ multiFactorize (const CanonicalForm& F, const Variable& v)
 
   A *= bCommonDen (A);
   CFList Aeval, list, evaluation, bufEvaluation, bufAeval;
-  int factorNums= 1;
+  int factorNums= 2;
+  //p is irreducible. But factorize does not recognizes this. However, if you
+  //change factorNums to 2 at line 281 in facFactorize.cc it will. That change
+  //might impair performance in some cases since you do twice as many
+  //bivariate factorizations as before. Otherwise you need to change
+  //precomputeLeadingCoeff to detect these cases and trigger more bivariate
+  // factorizations.
+  // (http://www.singular.uni-kl.de:8002/trac/ticket/666)
   CFList biFactors, bufBiFactors;
   CanonicalForm evalPoly;
   int lift, bufLift, lengthAeval2= A.level()-2;

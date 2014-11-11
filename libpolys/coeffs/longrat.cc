@@ -9,6 +9,7 @@
 
 
 #include <misc/auxiliary.h>
+#include <misc/sirandom.h>
 
 #include <factory/factory.h>
 
@@ -2900,9 +2901,10 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
 
 }
 
-static char* nlCoeffString(const coeffs)
+static char* nlCoeffString(const coeffs r)
 {
-  return omStrDup("0");
+  if (r->cfDiv==nlDiv) return omStrDup("0");
+  else                 return omStrDup("integer");
 }
 
 #define SSI_BASE 16
@@ -3027,7 +3029,35 @@ BOOLEAN nlCoeffIsEqual(const coeffs r, n_coeffType n, void *p)
   return FALSE;
 }
 
+char * nlCoeffName(const coeffs r)
+{
+  if (r->cfDiv==nlDiv) return (char*)"QQ";
+  else                 return (char*)"ZZ";
+}
 
+static number nlLcm(number a,number b,const coeffs r)
+{
+  number g=nlGcd(a,b,r);
+  number n1=nlMult(a,b,r);
+  number n2=nlDiv(n1,g,r);
+  nlDelete(&g,r);
+  nlDelete(&n1,r);
+  return n2;
+}
+
+static number nlRandom(siRandProc p, number v2, number, const coeffs cf)
+{
+  number a=nlInit(p(),cf);
+  if (v2!=NULL)
+  {
+    number b=nlInit(p(),cf);
+    number c=nlDiv(a,b,cf);
+    nlDelete(&b,cf);
+    nlDelete(&a,cf);
+    a=c;
+  }
+  return a;
+}
 
 BOOLEAN nlInitChar(coeffs r, void*p)
 {
@@ -3039,6 +3069,7 @@ BOOLEAN nlInitChar(coeffs r, void*p)
   r->nCoeffIsEqual=nlCoeffIsEqual;
   r->cfKillChar = ndKillChar; /* dummy */
   r->cfCoeffString=nlCoeffString;
+  r->cfCoeffName=nlCoeffName;
 
   r->cfInitMPZ = nlInitMPZ;
   r->cfMPZ  = nlMPZ;
@@ -3064,6 +3095,7 @@ BOOLEAN nlInitChar(coeffs r, void*p)
     r->cfIsUnit = nlIsUnit;
     r->cfGetUnit = nlGetUnit;
     r->cfQuot1 = nlQuot1;
+    r->cfLcm = nlLcm;
   }
   r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;
@@ -3107,6 +3139,8 @@ BOOLEAN nlInitChar(coeffs r, void*p)
 #endif
   r->convSingNFactoryN=nlConvSingNFactoryN;
   r->convFactoryNSingN=nlConvFactoryNSingN;
+
+  r->cfRandom=nlRandom;
 
   // io via ssi
   r->cfWriteFd=nlWriteFd;

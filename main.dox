@@ -1,18 +1,19 @@
 /*! 
-\page main_page Introductory developers manual
+\page main_page Introduction to Singular kernel development
 
-The Singular kernel development introduction contains:
+\brief Introductory pages for new kernel development
 
 - \subpage build_sources_page "Building Singular from Sources",
 - \subpage development_model_page "New git-supported Development Model",
 - \subpage howto_contribute_page "HowTo CONTRIBUTE to Singular development",
-- \subpage styleguide "Newer C/C++ programming style guide",
-- \subpage legacystyleguide "Legacy C programming style guide",
-- \subpage bs_page "the build system",
-- \subpage changes_in_sw_page "significant SW changes",
-- somewhat outdated Singular kernel documentation: <ftp://www.mathematik.uni-kl.de/pub/Math/Singular/doc/singular-anatomy.tgz>,
-- a short description of the Singular restructurization: <http://www.singular.uni-kl.de/gap-meeting-2012/SW.Aug.12.motsak.2.pdf> and
-- the current internal structure and dependencies can be seen at \subpage deps_page. 
+- \subpage styleguide "C/C++ programming style guide",
+- \subpage bs_page "Singular build system",
+- \subpage changes_in_sw_page "Significant changes in Singular 4",
+- Somewhat outdated Singular kernel documentation: <br/> 
+  <ftp://www.mathematik.uni-kl.de/pub/Math/Singular/doc/singular-anatomy.tgz>,
+- Short description of the Singular restructurization: <br/>
+  <http://www.singular.uni-kl.de/gap-meeting-2012/SW.Aug.12.motsak.2.pdf> and
+- Current internal structure and dependencies can be seen at \subpage deps_page. 
   Top-level packages are:
   - \subpage omalloc_page "Singular Memory Manager",
   - \subpage resources_page "Resource Handling Helpers",
@@ -21,11 +22,16 @@ The Singular kernel development introduction contains:
   - \subpage kernel_page "Mathematical Algorithms",
   - \subpage singular_page "Singular Interpreter and related".
 
-Note that Singlar may rely on some third-party \subpage external_packages_page "Packages".
+\Note Singlar relies on some third-party \subpage external_packages_page "Packages".
+
+\Note In case of any uncovered topics or unanswered questions please report
+them to us.
 */
 
 /*!
 \page deps_page Dependencies between Singular packages
+
+\brief Current Singular packages and sub-packages with expected dependencies between them
 
 - \ref omalloc_page 
 - \ref resources_page 
@@ -55,11 +61,15 @@ Dependencies between Singular packages (and sub-grouppings) are shown as arrows 
 
 
 /*!
-\page bs_page Singular Build System (autotools)
+\page bs_page Singular Build System
 
-We use autotools. Here is a good autotools (mythbuster) manual: https://www.flameeyes.eu/autotools-mythbuster/
-Singular consists of several packages (that is, libraries with own
-configure scripts): 
+\brief Short introduction to the Singular build system 
+
+We use autotools. 
+Here is a good autotools (mythbuster) manual:
+<https://www.flameeyes.eu/autotools-mythbuster/>
+Singular consists of several packages, 
+which are (mostly standalone) libraries with their own configuration scripts:
 
 - \ref omalloc_page 
 - \ref resources_page
@@ -67,8 +77,8 @@ configure scripts):
 - \ref libpolys_page 
 - \ref singular_page
 
-Moreover some of these (top-level) libraries combine smaller ones into
-itself. 
+Moreover some of the top-level libraries combine smaller ones into
+itself: 
 - \ref libpolys_page 
   - \ref libpolys_misc_page
   - \ref libpolys_reporter_page
@@ -103,7 +113,7 @@ package or library.
 Please test the build system with `make distcheck` before submitting
 in case of a build system chenges.
 
-See also \ref styleguide and \ref legacystyleguide .
+See also \ref styleguide.
 */
 
 /*!
@@ -126,6 +136,7 @@ See also \ref styleguide and \ref legacystyleguide .
 \dir Singular
 \ref singular_page
 */
+
 /*!
 \dir ./factory
 \ref factory_page
@@ -137,8 +148,9 @@ Templates for new sources and headers
 
  
 /*!
-\page copying_page COPYING
-This is the Singular copying agreement
+\page copying_page Singular copying agreement
+
+\brief COPYING
 
 \verbinclude COPYING
 */

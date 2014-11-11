@@ -135,8 +135,6 @@ BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
 
 void   ndNormalize(number&, const coeffs) { }
 
-char * ndName(number, const coeffs) { return NULL; }
-
 number ndReturn0(number, const coeffs r) { return n_Init(0,r); }
 
 number ndGcd(number, number, const coeffs r) { return n_Init(1,r); }
@@ -343,7 +341,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfSize = ndSize;
     n->cfGetDenom= ndGetDenom;
     n->cfGetNumerator= ndGetNumerator;
-    n->cfName =  ndName;
     n->cfImPart=ndReturn0;
     n->cfDelete= ndDelete;
     n->cfAnn = ndAnn;
@@ -456,7 +453,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfNormalizeHelper!=NULL);
     assume(n->cfDelete!=NULL);
     assume(n->cfSetMap!=NULL);
-    assume(n->cfName!=NULL);
     assume(n->cfInpMult!=NULL);
 //    assume(n->cfInit_bigint!=NULL);
     assume(n->cfCoeffWrite != NULL);

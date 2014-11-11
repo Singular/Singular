@@ -1,10 +1,10 @@
 // -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file template.h
- * 
- * This file defines the class Template. 
+ *
+ * This file defines the class Template.
  *
  * ABSTRACT: We need this for something...
  *
@@ -23,33 +23,33 @@
 BEGIN_NAMESPACE_SINGULARXX
 
 /** @class Template template.h <someRootDirectory/template.h>
- * 
+ *
  * Brief description of class Template.
  *
- * Detailed description of class Template. 
+ * Detailed description of class Template.
  *
  * @sa some other classes
  */
 class Template: public TemplateBaseClass
 {
 public:
-  /// Name type of *this.  
+  /// Name type of *this.
   typedef Template Self;
 
   /// My enum. Or yours, if you want!
-  enum MyEnum 
+  enum MyEnum
   {
     int EVal1, ///< Enum value 1
     int EVal2  ///< Enum value 2
   };
 
-  /// Default constructor. 
+  /// Default constructor.
   /// And now goes the detailed description....
   Template();
 
-  /// Default destructor. 
+  /// Default destructor.
   ~Template();
-  
+
 
   /// Brief method description.
   ///
@@ -58,7 +58,7 @@ public:
   /// @return information about return value
   /// @sa strcpy2
   ///
-  int someMethod( 
+  int someMethod(
 	     int a, ///< [in] some int
 	     int &o ///< [in,out] integer input and resulting value
 	    );
@@ -82,14 +82,14 @@ public:
                );
 
 protected:
-  /// Short description of some flag till first dot. Everything after that will 
+  /// Short description of some flag till first dot. Everything after that will
   /// be considered as a detaiiled description.
   bool m_bSomeFlag;
 };
 
 END_NAMESPACE_SINGULARXX
 
-#endif 
+#endif
 /* #ifndef TEMPLATE_H */
 
 // Vi-modeline: vim: filetype=c:syntax:shiftwidth=2:tabstop=8:textwidth=0:expandtab

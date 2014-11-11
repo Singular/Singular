@@ -697,8 +697,8 @@ static proc esComputation (int typ, poly p_F, list #)
     string minpolyStr = string(minpoly);
     str = " ring HNERing = (" + charstr(basering) + "), (x,y), ls;";
     execute (str);
-    str = "minpoly ="+ minpolyStr+";";
-    execute(str);
+    if (minpolyStr!="0")
+    {str = "minpoly ="+ minpolyStr+";";execute(str);}
     ring_is_changed=1;
     // Basering changed to HNERing (variables x,y, with ls ordering)
 

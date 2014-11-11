@@ -1,0 +1,225 @@
+////////////////////////////////////////////////////////////////////
+version="version brillnoether.lib 4.0.1.0 Oct_2014 "; // $Id$
+category="Algebraic Geometry";
+info="
+LIBRARY:  brillnoether.lib  Riemann-Roch spaces of divisors on curves
+AUTHORS:  I. Stenger:       stenger@mathematik.uni-kl.de
+          Janko Boehm       boehm@mathematik.uni-kl.de
+
+
+PROCEDURES:
+
+RiemannRochBN();     Computes a vector space basis of the
+                     Riemann-Roch space of a divisor D on a
+                     projective curve C
+
+";
+
+LIB "normal.lib";
+LIB "paraplanecurves.lib";
+LIB "qhmoduli.lib";
+LIB "divisors.lib";
+
+
+
+///////////////////////////////////////////////////////////////////
+///////////////////// Main Procedure //////////////////////////////
+//_________________________________________________________________
+proc RiemannRochBN(ideal C,ideal I,ideal J)
+"USAGE: RiemannRochBN(C,I,J); ideal C, ideal I, ideal J
+ASSUME: C is a homogeneous ideal defining a projective curve.
+        If C is a non-planar curve, then C is assumed to be
+        nonsingular. This assumption is not checked.
+        The ideals I and J represent a
+        a divisor D on C.
+RETURN: A vector space basis of the Riemann-Roch space of D,
+        stored in a list RRBasis. The list RRBasis contains a
+        list IH and a form F. The vector space basis of L(D)
+        consists of all rational functions G/F, where G is an
+        element of IH.
+EXAMPLE: example RiemannRochBN; shows an example
+"
+{
+  def R_base = basering;
+  int i,boundFinal,boundReg,boundDeg;
+
+  // C is a plane curve and is allowed to have singularities
+  // involves the computation of the (Gorenstein) adjoint ideal
+  if (nvars(R_base) == 3)
+  {
+    poly f = C[1];
+
+    //computation of the Gorenstein adjoint
+    ideal adjointId = adjointIdeal(f);
+
+    // every form of I defines an adjoint curve of C
+    I = intersect(I,adjointId);
+
+   // the curve is a plane curve, regularity not needed
+    boundReg = 1;
+  }
+  else
+  {
+    // curve is non-planar and is assumed to be nonsingular
+    // need to compute the regularity as a lower bound
+    // for the degrees
+    def Cres = mres(C,0);
+    boundReg = regularity(Cres)-1;
+    if (printlevel > 1)
+    {
+      "The regularity is"+string(boundReg);
+    }
+  }
+  qring Q = std(C);
+  ideal I = imap(R_base,I);
+  ideal J = imap(R_base,J);
+
+  divisor D =  makeDivisor(I,J);
+  // kill common places of the positive and negative divisor
+  D = normalForm(D);
+  I = D.num;
+  J = D.den;
+  // compute a set of minimal generators
+  //I = minbase(sat(I,maxideal(1))[1]);
+  //J = minbase(sat(J,maxideal(1))[1]);
+
+  list degI;
+
+  for (i=1; i<=size(I); i++)
+  {
+    degI[i]=deg(I[i]);
+  }
+  // compute the minimal degree of the gen. set
+  boundDeg = Min(degI);
+  boundFinal = Max(list(boundReg,boundDeg));
+
+  // choose a form F of I of degree greater or equal than boundFinal
+  // such that the deg(<F>:J) = deg(<F>)
+  poly F = findRandomForm(I,J,boundFinal);
+  if (printlevel > 1)
+  {
+    "The chosen form is "+string(F);
+  }
+
+  int n = deg(F[1]);
+
+  // compute the residual divisor
+  ideal Iresidual = quotient((sat(ideal(F),maxideal(1)))[1],I);
+  ideal IH = intersect(Iresidual,J);
+  IH = minbase(truncate1(IH,n));
+
+  //choose all forms of IH degree n
+  IH = chooseGenerators(IH,n);
+  setring R_base;
+  ideal IH = imap(Q,IH);
+  poly F = imap(Q,F);
+  list RRBasis = IH,F;
+  return(RRBasis);
+}
+
+example
+{ "EXAMPLE:"; echo=2;
+  ring R = 0,(x,y,z),dp;
+  poly f = y^2+x^2-1;
+  f = homog(f,z);
+  ideal C = f;
+  ideal P1 = x,y-z;
+  ideal P2 = x^2+y^2,z;
+  ideal I = intersect(P1^3,P2^2);
+  ideal P3 = x+z,y;
+  ideal J = P3^2;
+  RiemannRochBN(C,I,J);
+}
+
+
+////////////////////////////////////////////////////////////////////
+///////////////////// Essential Static Procedures //////////////////
+
+//_________________________________________________________________
+static proc truncate1(ideal I,int r)
+"USAGE: truncate1(I,r); ideal I,int r
+ASSUME: I homogeneous ideal
+RETURN: the subideal of I consisting of all forms of
+        degree greater or equal than r
+"
+{
+  ideal IH;
+  int i;
+  for (i=1;i<=size(I);i++)
+  {
+    if (deg(I[i]) < r )
+    {
+      IH = IH+maxideal(r-deg(I[i]))*I[i];
+    }
+    else
+    {
+     IH = IH+I[i];
+    }
+  }
+  return(IH);
+}
+
+//__________________________________________________________________
+static proc findRandomForm(ideal I,ideal J,int r)
+"USAGE: findRandomForm(I,J,r); ideal I, ideal J, int r
+ASSUME: I and J are homogeneous ideals
+RETURN: a form F of I of degree greater or than r such
+        that the ideals <F>:J and <F> have the same degree
+THEORY: Assures that the divisor defined by F and the
+        divisor defined by J have disjoint supports.
+"
+{
+  int i,s;
+  int h=1;
+  ideal F1,G;
+  while(h)
+  {
+    s = 0;
+    while (s<5)
+    {
+      s++;
+      poly Fhelp;
+      for (i=1;i<=size(I);i++)
+      {
+        if( deg(I[i]) <= r)
+        {
+          Fhelp = Fhelp + I[i]*sparseid(1,r-deg(I[i]),r-deg(I[i]),0,10)[1];
+        }
+      }
+      G = Fhelp;
+      F1 = quotient(G,J);
+      if (mult(std(F1)) == mult(std(G)))
+      {
+        if (dim(std(G)) < dim(std(ideal(0))))
+        {
+          h = 0;
+          break;
+        }
+      }
+      kill Fhelp;
+      r++;
+    }
+
+  }
+  poly finalform = G[1];
+  return(finalform);
+}
+
+//__________________________________________________________________
+static proc chooseGenerators(ideal I,int r)
+{
+  int i;
+  ideal final;
+  int counter;
+  for (i=1; i<=size(I);i++)
+  {
+    if(deg(I[i]) == r)
+    {
+      counter++;
+      final[counter] = I[i];
+    }
+  }
+  return(final);
+}
+
+

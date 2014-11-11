@@ -22,6 +22,7 @@
 #include <polys/matpol.h>
 #include <polys/clapsing.h>
 #include <kernel/linear_algebra/eigenval.h>
+#include <Singular/ipshell.h>
 #include <Singular/eigenval_ip.h>
 
 
@@ -29,24 +30,18 @@ BOOLEAN evSwap(leftv res,leftv h)
 {
   if(currRing)
   {
-    if(h&&h->Typ()==MATRIX_CMD)
+    short t[]={3,MATRIX_CMD,INT_CMD,INT_CMD};
+    if (iiCheckTypes(h,t,1))
     {
       matrix M=(matrix)h->Data();
       h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int i=(int)(long)h->Data();
-        h=h->next;
-        if(h&&h->Typ()==INT_CMD)
-        {
-          int j=(int)(long)h->Data();
-          res->rtyp=MATRIX_CMD;
-          res->data=(void *)evSwap(mp_Copy(M, currRing),i,j);
-          return FALSE;
-        }
-      }
+      int i=(int)(long)h->Data();
+      h=h->next;
+      int j=(int)(long)h->Data();
+      res->rtyp=MATRIX_CMD;
+      res->data=(void *)evSwap(mp_Copy(M, currRing),i,j);
+      return FALSE;
     }
-    WerrorS("<matrix>,<int>,<int> expected");
     return TRUE;
   }
   WerrorS("no ring active");
@@ -57,29 +52,20 @@ BOOLEAN evRowElim(leftv res,leftv h)
 {
   if(currRing)
   {
-    if(h&&h->Typ()==MATRIX_CMD)
+    short t[]={4,MATRIX_CMD,INT_CMD,INT_CMD,INT_CMD};
+    if (iiCheckTypes(h,t,1))
     {
-      matrix M=(matrix)h->Data();
+      matrix M=(matrix)h->CopyD();
       h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int i=(int)(long)h->Data();
-        h=h->next;
-        if(h&&h->Typ()==INT_CMD)
-        {
-          int j=(int)(long)h->Data();
-          h=h->next;
-          if(h&&h->Typ()==INT_CMD)
-          {
-            int k=(int)(long)h->Data();
-            res->rtyp=MATRIX_CMD;
-            res->data=(void *)evRowElim(mp_Copy(M, currRing),i,j,k);
-            return FALSE;
-	  }
-        }
-      }
+      int i=(int)(long)h->Data();
+      h=h->next;
+      int j=(int)(long)h->Data();
+      h=h->next;
+      int k=(int)(long)h->Data();
+      res->rtyp=MATRIX_CMD;
+      res->data=(void *)evRowElim(M,i,j,k);
+      return FALSE;
     }
-    WerrorS("<matrix>,<int>,<int>,<int> expected");
     return TRUE;
   }
   WerrorS("no ring active");
@@ -90,29 +76,20 @@ BOOLEAN evColElim(leftv res,leftv h)
 {
   if(currRing)
   {
-    if(h&&h->Typ()==MATRIX_CMD)
+    short t[]={4,MATRIX_CMD,INT_CMD,INT_CMD,INT_CMD};
+    if (iiCheckTypes(h,t,1))
     {
       matrix M=(matrix)h->Data();
       h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int i=(int)(long)h->Data();
-        h=h->next;
-        if(h&&h->Typ()==INT_CMD)
-        {
-          int j=(int)(long)h->Data();
-          h=h->next;
-          if(h&&h->Typ()==INT_CMD)
-          {
-            int k=(int)(long)h->Data();
-            res->rtyp=MATRIX_CMD;
-            res->data=(void *)evColElim(mp_Copy(M, currRing),i,j,k);
-            return FALSE;
-	  }
-        }
-      }
+      int i=(int)(long)h->Data();
+      h=h->next;
+      int j=(int)(long)h->Data();
+      h=h->next;
+      int k=(int)(long)h->Data();
+      res->rtyp=MATRIX_CMD;
+      res->data=(void *)evColElim(mp_Copy(M, currRing),i,j,k);
+      return FALSE;
     }
-    WerrorS("<matrix>,<int>,<int>,<int> expected");
     return TRUE;
   }
   WerrorS("no ring active");
@@ -147,9 +124,9 @@ lists evEigenvals(matrix M)
     return(l);
   }
 
-  M=evHessenberg((matrix)id_Jet((ideal)M,0,currRing));
+  M=evHessenberg(M);
 
-  int n=MATROWS(M);
+  int n=MATCOLS(M);
   ideal e=idInit(n,1);
   intvec *m=new intvec(n);
 
@@ -180,7 +157,7 @@ lists evEigenvals(matrix M)
         MATELEM(M0,i,i)=pSub(MATELEM(M0,i,i),pCopy(t));
 
       intvec *m0;
-      ideal e0=singclap_factorize(mp_DetBareiss(M,currRing),&m0,2, currRing);
+      ideal e0=singclap_factorize(mp_DetBareiss(M0,currRing),&m0,2, currRing);
       if (e0==NULL)
       {
         l->Init(0);
@@ -190,32 +167,33 @@ lists evEigenvals(matrix M)
       for(int i=0;i<IDELEMS(e0);i++)
       {
         if(pNext(e0->m[i])==NULL)
-	{
+        {
           (*m)[k]=(*m0)[i];
           k++;
         }
         else
         if(pGetExp(e0->m[i],1)<2&&pGetExp(pNext(e0->m[i]),1)<2&&
            pNext(pNext(e0->m[i]))==NULL)
-	{
-          number e1=nInpNeg(nCopy(pGetCoeff(e0->m[i])));
+        {
+          number e1=nCopy(pGetCoeff(e0->m[i]));
+          e1=nInpNeg(e1);
           if(pGetExp(pNext(e0->m[i]),1)==0)
             e->m[k]=pNSet(nDiv(pGetCoeff(pNext(e0->m[i])),e1));
           else
-	    e->m[k]=pNSet(nDiv(e1,pGetCoeff(pNext(e0->m[i]))));
+            e->m[k]=pNSet(nDiv(e1,pGetCoeff(pNext(e0->m[i]))));
           nDelete(&e1);
           pNormalize(e->m[k]);
           (*m)[k]=(*m0)[i];
           k++;
         }
         else
-	{
+        {
           e->m[k]=e0->m[i];
           pNormalize(e->m[k]);
           e0->m[i]=NULL;
           (*m)[k]=(*m0)[i];
           k++;
-	}
+        }
       }
 
       delete(m0);
@@ -239,7 +217,7 @@ lists evEigenvals(matrix M)
       {
         if(e->m[i0]==NULL&&!nGreaterZero(pGetCoeff(e->m[i1]))||
            e->m[i1]==NULL&&
-	  (nGreaterZero(pGetCoeff(e->m[i0]))||pNext(e->m[i0])!=NULL)||
+          (nGreaterZero(pGetCoeff(e->m[i0]))||pNext(e->m[i0])!=NULL)||
            e->m[i0]!=NULL&&e->m[i1]!=NULL&&
           (pNext(e->m[i0])!=NULL&&pNext(e->m[i1])==NULL||
            pNext(e->m[i0])==NULL&&pNext(e->m[i1])==NULL&&
@@ -292,9 +270,9 @@ BOOLEAN evEigenvals(leftv res,leftv h)
   {
     if(h&&h->Typ()==MATRIX_CMD)
     {
-      matrix M=(matrix)h->Data();
+      matrix M=(matrix)h->CopyD();
       res->rtyp=LIST_CMD;
-      res->data=(void *)evEigenvals(mp_Copy(M, currRing));
+      res->data=(void *)evEigenvals(M);
       return FALSE;
     }
     WerrorS("<matrix> expected");

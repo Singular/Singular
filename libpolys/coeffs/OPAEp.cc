@@ -276,13 +276,6 @@ number    nAEpSetMap        (number a, const coeffs)
         return a;
 }
 */
-char*    nAEpName       (number, const coeffs)
-{
-    char* c=new char;
-    *c='c';
-
-    return c;
-}
 
 void    nAEpInpMult       (number &a, number b, const coeffs)
 {
@@ -360,7 +353,6 @@ BOOLEAN n_pAEInitChar(coeffs r, void *p)
     r->cfLcm  = nAEpLcm; // ZU BEARBEITEN
     r->cfDelete= nAEpDelete;
     r->cfSetMap = npSetMap;
-    r->cfName = nAEpName;
     r->cfInpMult=nAEpInpMult; //????
     r->cfCoeffWrite=nAEpCoeffWrite; //????
 

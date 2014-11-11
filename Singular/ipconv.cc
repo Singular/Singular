@@ -297,7 +297,7 @@ static void * iiL2R(void * data)
 * try to convert 'input' of type 'inputType' to 'output' of type 'outputType'
 * return FALSE on success
 */
-BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv output)
+BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv output,struct sConvertTypes *dConvertTypes)
 {
   memset(output,0,sizeof(sleftv));
   if ((inputType==outputType)
@@ -349,13 +349,21 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
           }
           else if(pIsConstant((poly)input->data))
           {
-            output->name=ndName(pGetCoeff((poly)input->data), currRing->cf);
+            StringSetS("");
+            number n=(pGetCoeff((poly)input->data));
+            n_Write(n, currRing->cf);
+            (pGetCoeff((poly)input->data))=n;
+            output->name=StringEndS();
           }
         }
       }
       else if ((input->rtyp==NUMBER_CMD) && (input->name==NULL))
       {
-        output->name=ndName((number)input->data, currRing->cf);
+        StringSetS("");
+        number n=(number)input->data;
+        n_Write(n, currRing->cf);
+        input->data=(void*)n;
+        output->name=StringEndS();
       }
       else
       {
@@ -412,7 +420,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
 * try to convert 'inputType' in 'outputType'
 * return 0 on failure, an index (<>0) on success
 */
-int iiTestConvert (int inputType, int outputType)
+int iiTestConvert (int inputType, int outputType,struct sConvertTypes *dConvertTypes)
 {
   if ((inputType==outputType)
   || (outputType==DEF_CMD)

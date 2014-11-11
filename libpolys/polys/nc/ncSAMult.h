@@ -53,14 +53,14 @@ class CMultiplier
     {
       const ring r = GetBasering();
       poly pMonom = LM(pTerm, r);
-      
+
       poly result = p_Mult_nn(MultiplyME(pMonom, expRight), p_GetCoeff(pTerm, r), r);
 
       p_Delete(&pMonom, r);
 
       return result;
     }
-    
+
 
     // Exponent * Term -> Exponent * Monom
     inline poly MultiplyET(const CExponent expLeft, const poly pTerm)
@@ -72,30 +72,30 @@ class CMultiplier
 
       p_Delete(&pMonom, r);
       return result;
-      
+
 
     }
 
 //  protected:
 
     // Exponent * Exponent
-    virtual poly MultiplyEE(const CExponent expLeft, const CExponent expRight) = 0;    
+    virtual poly MultiplyEE(const CExponent expLeft, const CExponent expRight) = 0;
 
     // Monom * Exponent
     virtual poly MultiplyME(const poly pMonom, const CExponent expRight) = 0;
-    
+
     // Exponent * Monom
     virtual poly MultiplyEM(const CExponent expLeft, const poly pMonom) = 0;
-      
+
   private: // no copy constuctors!
     CMultiplier();
     CMultiplier(const CMultiplier&);
     CMultiplier& operator=(const CMultiplier&);
-    
+
 };
 
 
-class CSpecialPairMultiplier: public CMultiplier<int> 
+class CSpecialPairMultiplier: public CMultiplier<int>
 {
   private:
     int m_i; // 2-gen subalgebra in these variables...
@@ -103,14 +103,14 @@ class CSpecialPairMultiplier: public CMultiplier<int>
 
 //    poly m_c_ij;
 //    poly m_d_ij;
-    
-    
+
+
   public:
     // 1 <= i < j <= NVars()
     CSpecialPairMultiplier(ring r, int i, int j);
     virtual ~CSpecialPairMultiplier();
 
-    inline int GetI() const { return m_i; } // X 
+    inline int GetI() const { return m_i; } // X
     inline int GetJ() const { return m_j; } // Y > X!
 
 //  protected:
@@ -157,7 +157,7 @@ struct CPower // represents var(iVar)^{iPower}
     return p;
   };
 */
-  
+
 };
 
 
@@ -194,7 +194,7 @@ class CPowerMultiplier: public CMultiplier<CPower>
 
       return m_specialpairs[( (NVars() * ((i)-1) - ((i) * ((i)-1))/2 + (j)-1) - (i) )];
     }
-    
+
 //  protected:
     typedef CPower CExponent;
 
@@ -219,19 +219,19 @@ class CPowerMultiplier: public CMultiplier<CPower>
       CPolynomialSummator sum(GetBasering(), bUsePolynomial);
 
       for( poly q = pPoly; q !=NULL; q = pNext(q) )
-        sum += MultiplyTE(q, expRight); 
+        sum += MultiplyTE(q, expRight);
 
       return sum;
     }
 
-    // Exponent * Poly 
+    // Exponent * Poly
     inline poly MultiplyEP(const CExponent expLeft, const poly pPoly)
     {
       bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
       CPolynomialSummator sum(GetBasering(), bUsePolynomial);
 
       for( poly q = pPoly; q !=NULL; q = pNext(q) )
-        sum += MultiplyET(expLeft, q); 
+        sum += MultiplyET(expLeft, q);
 
       return sum;
     }
@@ -243,24 +243,24 @@ class CPowerMultiplier: public CMultiplier<CPower>
       CPolynomialSummator sum(GetBasering(), bUsePolynomial);
 
       for( ; pPoly!=NULL; pPoly  = p_LmDeleteAndNext(pPoly, GetBasering()) )
-        sum += MultiplyTE(pPoly, expRight); 
+        sum += MultiplyTE(pPoly, expRight);
 
       return sum;
     }
 
-    // Exponent * Poly 
+    // Exponent * Poly
     inline poly MultiplyEPDestroy(const CExponent expLeft, poly pPoly)
     {
       bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
       CPolynomialSummator sum(GetBasering(), bUsePolynomial);
 
       for( ; pPoly!=NULL; pPoly  = p_LmDeleteAndNext(pPoly, GetBasering()) )
-        sum += MultiplyET(expLeft, pPoly); 
+        sum += MultiplyET(expLeft, pPoly);
 
       return sum;
     }
 
-    
+
 };
 
 
@@ -274,19 +274,19 @@ class CGlobalMultiplier: public CMultiplier<poly>
 
   public:
     typedef CMultiplier<poly> CBaseType;
-    
+
     CGlobalMultiplier(ring r);
     virtual ~CGlobalMultiplier();
 
 
-//  protected:    
+//  protected:
     typedef poly CExponent;
 
     // the following methods are literally equal!
-    
+
     // Exponent * Exponent
     // TODO: handle components!!!
-    virtual poly MultiplyEE(const CExponent expLeft, const CExponent expRight);    
+    virtual poly MultiplyEE(const CExponent expLeft, const CExponent expRight);
 
     // Monom * Exponent
     virtual poly MultiplyME(const poly pMonom, const CExponent expRight);
@@ -314,7 +314,7 @@ class CGlobalMultiplier: public CMultiplier<poly>
 #ifdef PDEBUG
           {
             const int iComponent = p_GetComp(q, GetBasering());
-            assume(iComponent == 0);          
+            assume(iComponent == 0);
             if( iComponent!=0 )
             {
               Werror("MultiplyPE: both sides have non-zero components: %d and %d!\n", iComponent, iComponentMonom);
@@ -323,7 +323,7 @@ class CGlobalMultiplier: public CMultiplier<poly>
             }
 
           }
-#endif                    
+#endif
           sum += MultiplyTE(q, expRight); // NO Component!!!
         }
         poly t = sum; p_SetCompP(t, iComponentMonom, GetBasering());
@@ -335,7 +335,7 @@ class CGlobalMultiplier: public CMultiplier<poly>
         {
           const int iComponent = p_GetComp(q, GetBasering());
 
-#ifdef PDEBUG          
+#ifdef PDEBUG
           if( iComponent!=0 )
           {
             Warn("MultiplyPE: Multiplication in the left module from the right by component %d!\n", iComponent);
@@ -343,14 +343,14 @@ class CGlobalMultiplier: public CMultiplier<poly>
           }
 #endif
           poly t = MultiplyTE(q, expRight); // NO Component!!!
-          p_SetCompP(t, iComponent, GetBasering());          
-          sum += t;          
-        }        
+          p_SetCompP(t, iComponent, GetBasering());
+          sum += t;
+        }
         return sum;
       } // iComponentMonom == 0!
     }
 
-    // Exponent * Poly 
+    // Exponent * Poly
     inline poly MultiplyEP(const CExponent expLeft, const poly pPoly)
     {
       assume( pPoly != NULL );      assume( expLeft != NULL );
@@ -366,7 +366,7 @@ class CGlobalMultiplier: public CMultiplier<poly>
 #ifdef PDEBUG
           {
             const int iComponent = p_GetComp(q, GetBasering());
-            assume(iComponent == 0);          
+            assume(iComponent == 0);
             if( iComponent!=0 )
             {
               Werror("MultiplyEP: both sides have non-zero components: %d and %d!\n", iComponent, iComponentMonom);
@@ -374,7 +374,7 @@ class CGlobalMultiplier: public CMultiplier<poly>
               return NULL;
             }
           }
-#endif                    
+#endif
           sum += MultiplyET(expLeft, q);
         }
         poly t = sum; p_SetCompP(t, iComponentMonom, GetBasering());
@@ -387,9 +387,9 @@ class CGlobalMultiplier: public CMultiplier<poly>
           const int iComponent = p_GetComp(q, GetBasering());
 
           poly t = MultiplyET(expLeft, q); // NO Component!!!
-          p_SetCompP(t, iComponent, GetBasering());          
-          sum += t;          
-        }        
+          p_SetCompP(t, iComponent, GetBasering());
+          sum += t;
+        }
         return sum;
       } // iComponentMonom == 0!
     }
@@ -411,7 +411,7 @@ class CGlobalMultiplier: public CMultiplier<poly>
 #ifdef PDEBUG
           {
             const int iComponent = p_GetComp(q, GetBasering());
-            assume(iComponent == 0);          
+            assume(iComponent == 0);
             if( iComponent!=0 )
             {
               Werror("MultiplyPEDestroy: both sides have non-zero components: %d and %d!\n", iComponent, iComponentMonom);
@@ -420,7 +420,7 @@ class CGlobalMultiplier: public CMultiplier<poly>
             }
 
           }
-#endif                    
+#endif
           sum += MultiplyTE(q, expRight); // NO Component!!!
         }
         poly t = sum; p_SetCompP(t, iComponentMonom, GetBasering());
@@ -432,7 +432,7 @@ class CGlobalMultiplier: public CMultiplier<poly>
         {
           const int iComponent = p_GetComp(q, GetBasering());
 
-#ifdef PDEBUG          
+#ifdef PDEBUG
           if( iComponent!=0 )
           {
             Warn("MultiplyPEDestroy: Multiplication in the left module from the right by component %d!\n", iComponent);
@@ -440,15 +440,15 @@ class CGlobalMultiplier: public CMultiplier<poly>
           }
 #endif
           poly t = MultiplyTE(q, expRight); // NO Component!!!
-          p_SetCompP(t, iComponent, GetBasering());          
-          sum += t;          
-        }        
+          p_SetCompP(t, iComponent, GetBasering());
+          sum += t;
+        }
         return sum;
       } // iComponentMonom == 0!
 
     }
 
-    // Exponent * Poly 
+    // Exponent * Poly
     inline poly MultiplyEPDestroy(const CExponent expLeft, poly pPoly)
     {
 
@@ -465,7 +465,7 @@ class CGlobalMultiplier: public CMultiplier<poly>
 #ifdef PDEBUG
           {
             const int iComponent = p_GetComp(q, GetBasering());
-            assume(iComponent == 0);          
+            assume(iComponent == 0);
             if( iComponent!=0 )
             {
               Werror("MultiplyEPDestroy: both sides have non-zero components: %d and %d!\n", iComponent, iComponentMonom);
@@ -473,7 +473,7 @@ class CGlobalMultiplier: public CMultiplier<poly>
               return NULL;
             }
           }
-#endif                    
+#endif
           sum += MultiplyET(expLeft, q);
         }
         poly t = sum; p_SetCompP(t, iComponentMonom, GetBasering());
@@ -486,16 +486,16 @@ class CGlobalMultiplier: public CMultiplier<poly>
           const int iComponent = p_GetComp(q, GetBasering());
 
           poly t = MultiplyET(expLeft, q); // NO Component!!!
-          p_SetCompP(t, iComponent, GetBasering());          
-          sum += t;          
-        }        
+          p_SetCompP(t, iComponent, GetBasering());
+          sum += t;
+        }
         return sum;
       } // iComponentMonom == 0!
 
     }
 
 
-    
+
 
 };
 
@@ -509,7 +509,7 @@ class CCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
 		virtual ~CCommutativeSpecialPairMultiplier();
 
 		// Exponent * Exponent
-		virtual poly MultiplyEE(const int expLeft, const int expRight);    
+		virtual poly MultiplyEE(const int expLeft, const int expRight);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -520,7 +520,7 @@ class CAntiCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
 		virtual ~CAntiCommutativeSpecialPairMultiplier();
 
 		// Exponent * Exponent
-		virtual poly MultiplyEE(const int expLeft, const int expRight);    
+		virtual poly MultiplyEE(const int expLeft, const int expRight);
 };
 
 
@@ -536,7 +536,7 @@ class CQuasiCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
 		virtual ~CQuasiCommutativeSpecialPairMultiplier();
 
 		// Exponent * Exponent
-		virtual poly MultiplyEE(const int expLeft, const int expRight);    
+		virtual poly MultiplyEE(const int expLeft, const int expRight);
 };
 
 
@@ -552,7 +552,7 @@ class CWeylSpecialPairMultiplier: public CSpecialPairMultiplier
     virtual ~CWeylSpecialPairMultiplier();
 
     // Exponent * Exponent
-    virtual poly MultiplyEE(const int expLeft, const int expRight);    
+    virtual poly MultiplyEE(const int expLeft, const int expRight);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -567,14 +567,14 @@ class CHWeylSpecialPairMultiplier: public CSpecialPairMultiplier
     virtual ~CHWeylSpecialPairMultiplier();
 
     // Exponent * Exponent
-    virtual poly MultiplyEE(const int expLeft, const int expRight);    
+    virtual poly MultiplyEE(const int expLeft, const int expRight);
 };
 
 
 //////////////////////////////////////////////////////////////////////////
 class CShiftSpecialPairMultiplier: public CSpecialPairMultiplier
 {
-  private:    
+  private:
     const number m_shiftCoef;
     const int m_shiftVar;
     // TODO: make cache for some 'good' powers!?
@@ -584,7 +584,7 @@ class CShiftSpecialPairMultiplier: public CSpecialPairMultiplier
     virtual ~CShiftSpecialPairMultiplier();
 
     // Exponent * Exponent
-    virtual poly MultiplyEE(const int expLeft, const int expRight);    
+    virtual poly MultiplyEE(const int expLeft, const int expRight);
 };
 
 
@@ -602,9 +602,9 @@ class CExternalSpecialPairMultiplier: public CSpecialPairMultiplier
     virtual ~CExternalSpecialPairMultiplier();
 
     // Exponent * Exponent
-    virtual poly MultiplyEE(const int expLeft, const int expRight);    
+    virtual poly MultiplyEE(const int expLeft, const int expRight);
 };
 
 
 #endif // HAVE_PLURAL :(
-#endif // 
+#endif //

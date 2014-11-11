@@ -1,5 +1,4 @@
 aa
-agnes
 alex1
 alex2
 ;algmap
@@ -313,8 +312,7 @@ string
 subexpr
 subexpr1
 substit
-; DIFF syzygies
-syzygies_new
+syzygies
 syzygy
 teste
 time

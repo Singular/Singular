@@ -24,10 +24,6 @@
 
 #include <string.h>
 
-#ifndef ix86_Win
-//#include<values.h>
-#endif
-
 #include <misc/intvec.h>
 #include <misc/mylimits.h>
 #include <kernel/spectrum/GMPrat.h>

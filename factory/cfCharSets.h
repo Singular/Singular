@@ -71,7 +71,7 @@ irrCharSeries (const CFList & PS);
 // variables. For internal and external (e.g. Singular/Macaulay2) library use.
 // This is really experimental!
 // See the comments in reorder.cc.
-// 
+//
 // this gives you a heuristically optimal ordering for the ring variables
 // if you use the irreducible characteristic series.
 Varlist neworder (const CFList & PolyList);
@@ -90,11 +90,11 @@ IntList neworderint (const CFList & PolyList);
 // #include <tmpl_inst.h> // for typedef's
 // CFList PS= <setup-your-list-of-CanonicalForms>;
 // Varlist betterorder= neworder(PS);
-// PS= reorder(betterorder,PS); // reorder variables in PS from oldorder 
+// PS= reorder(betterorder,PS); // reorder variables in PS from oldorder
 //                                 to betterorder
 // ListCFList Q= IrrCharSeries( PS );
 // Q= reorder(betterorder,Q);   // revert ordering to oldorder
-// 
+//
 CFList reorder (const Varlist & betterorder, const CFList & PS);
 CFFList reorder (const Varlist & betterorder, const CFFList & PS);
 ListCFList reorder (const Varlist & betterorder, const ListCFList & Q);

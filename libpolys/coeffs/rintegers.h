@@ -62,6 +62,9 @@ void    nrzInitExp(int c, coeffs r);
 void    nrzDelete(number *a, const coeffs r);
 coeffs  nrzQuot1(number c, const coeffs r);
 
+//CanonicalForm nrzConvSingNFactoryN(number n, BOOLEAN setChar, const coeffs /*r*/);
+//number nrzConvFactoryNSingN(const CanonicalForm n, const coeffs r);
+
 number nrzMapQ(number from, const coeffs src, const coeffs dst);
 #endif
 #endif

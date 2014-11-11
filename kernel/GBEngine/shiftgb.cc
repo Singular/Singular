@@ -29,7 +29,7 @@
 #include <misc/intvec.h>
 #include <kernel/structs.h>
 #include <kernel/GBEngine/kInline.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <polys/weight.h>
 #include <misc/intvec.h>
 #include <kernel/GBEngine/shiftgb.h>
