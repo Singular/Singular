@@ -1744,7 +1744,7 @@ intvec* singntl_LLL(intvec*  m, const ring)
   int i,j;
   for(i=r;i>0;i--)
   {
-    for(j=r;j>0;j--)
+    for(j=c;j>0;j--)
     {
       M(i,j)=IMATELEM(*m,i,j);
     }
