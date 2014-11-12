@@ -925,7 +925,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         }
         else if (h->Typ()==INTMAT_CMD)
         {
-          res->data=(char *)singntl_LLL((intvec*)h->Data(), currRing);
+          res->data=(char *)singntl_LLL((intvec*)h->Data());
           return FALSE;
         }
         else return TRUE;
@@ -3237,7 +3237,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           }
           else if (h->Typ()==INTMAT_CMD)
           {
-            res->data=(char *)singntl_HNF((intvec*)h->Data(), currRing);
+            res->data=(char *)singntl_HNF((intvec*)h->Data());
             return FALSE;
           }
           else return TRUE;
