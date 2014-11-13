@@ -1053,11 +1053,11 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
   poly aa = leadmonom(a, R); assume( aa != NULL); // :(
 
-  poly t = TraverseTail(aa, r);
-
 #ifndef SING_NDEBUG
   if( __DEBUG__ )  {    m_div.Verify();    m_checker.Verify();  }
 #endif
+
+  poly t = TraverseTail(aa, r);
   
   if( a2 != NULL )
   {
@@ -1076,35 +1076,36 @@ poly SchreyerSyzygyComputation::TraverseNF(const poly a, const poly a2) const
 
     assume( r2 >= 0 && r2 < IDELEMS(T) );
 
-    t = p_Add_q(a2, p_Add_q(t, TraverseTail(aa2, r2), R), R);
-
+    poly s =  TraverseTail(aa2, r2);
+    
     p_Delete(&aa2, R);
 
     
     if( __TREEOUTPUT__ )
     {
-       PrintS("], \"noderesult\": \"");
-       writeLatexTerm(t, R, true, false);
-       PrintS("\" },");
+      PrintS("], \"noderesult\": \"");
+      writeLatexTerm(s, R, true, false);
+      PrintS("\" },");
     }
 
+    t = p_Add_q(a2, p_Add_q(t, s, R), R);
 
 #ifndef SING_NDEBUG
     if( __DEBUG__ )    {      m_div.Verify();      m_checker.Verify();    }
 #endif
    
   } else
-    t = p_Add_q(t, ReduceTerm(aa, L->m[r], a), R);
+    t = p_Add_q(t, ReduceTerm(aa, L->m[r], a), R); // should be identical to bove with a2
 
   p_Delete(&aa, R);
 
   if( __TREEOUTPUT__ )
   {
-     poly tt = pp_Add_qq( a, t, R);    
+//     poly tt = pp_Add_qq( a, t, R);
      PrintS("], \"noderesult\": \"");
-     writeLatexTerm(tt, R, true, false);
+     writeLatexTerm(t, R, true, false);
      PrintS("\" },");
-     p_Delete(&tt, R);
+//     p_Delete(&tt, R);
   }
 #ifndef SING_NDEBUG
   if( __DEBUG__ )
@@ -1266,13 +1267,13 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
     if( method )
       nf = SchreyerSyzygyNF(a, a2);
     else
-      nf = TraverseNF(a, a2); // TODO: WRONG
+      nf = TraverseNF(a, a2); 
 
 #ifndef SING_NDEBUG
     if( __DEBUG__ )    {      m_div.Verify();      m_checker.Verify();    }
 #endif
 
-    TT->m[k] = nf; // ???
+    TT->m[k] = nf; 
     
     if( __SYZCHECK__ )      
     {
@@ -1611,7 +1612,6 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
        
        poly p = p_Copy(itr->second, r); // COPY!!!
 
-
        if( !n_Equal( pGetCoeff(multiplier), pGetCoeff(itr->first), r) ) // normalize coeffs!?
        {
          number n = n_Div( pGetCoeff(multiplier), pGetCoeff(itr->first), r); // new number
@@ -1789,7 +1789,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
   //    CPolynomialSummator sum(r, bUsePolynomial);
   //    poly s = NULL;
 
-  if( __TREEOUTPUT__ )
+  if( __TREEOUTPUT__ & 0 )
   {
     Print("{ \"proc\": \"TTPoly\", \"nodelabel\": \""); writeLatexTerm(multiplier, r, false); Print(" * \\\\ldots \", \"children\": [");
   }
@@ -1829,7 +1829,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
   if( __DEBUG__ )  {    m_div.Verify();    m_checker.Verify();  }
 #endif
 
-  if( __TREEOUTPUT__ )
+  if( __TREEOUTPUT__ & 0 )
   {
     PrintS("], \"noderesult\": \""); writeLatexTerm(s, r, true, false); PrintS("\" },");
   }
@@ -1925,14 +1925,11 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
 
   const poly t = TraverseTail(b, c); // T->m[c];
 
-  if( t != NULL )
-    s = p_Add_q(s, t, r);
-
   if( __TREEOUTPUT__ )
   {
 
     PrintS("], \"noderesult\": \"");
-    writeLatexTerm(s, r, true, false);
+    writeLatexTerm(t, r, true, false);
     PrintS("\"");
 
     if( syztermCheck != NULL )
@@ -1943,6 +1940,10 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
     } else
       PrintS(" },");
   }
+
+
+  if( t != NULL )
+    s = p_Add_q(s, t, r);
 
   
 #ifndef SING_NDEBUG

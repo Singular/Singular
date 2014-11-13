@@ -373,6 +373,7 @@ struct CCacheCompare
 typedef std::map<TCacheKey, TCacheValue, CCacheCompare> TP2PCache; // deallocation??? !!!
 typedef std::map<int, TP2PCache> TCache;
 
+
 /** @class SchreyerSyzygyComputation syzextra.h
  *
  * Computing syzygies after Schreyer
@@ -453,8 +454,15 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /// The result is stored into m_syzLeads
     void ComputeLeadingSyzygyTerms(bool bComputeSecondTerms = true);
 
+
+
+    /// Main HybridNF == 1: poly reduce + LOT + LCM?
     poly SchreyerSyzygyNF(const poly syz_lead, poly syz_2 = NULL) const;
 
+
+    // Main (HybridNF == 0) Tree Travers + LOT + LCM?
+    poly TraverseNF(const poly syz_lead, const poly syz_2 = NULL) const;
+    
     /// High level caching function!!!
     poly TraverseTail(poly multiplier, const int tail) const;
 
@@ -468,8 +476,6 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /// low level computation...
     poly ComputeImage(poly multiplier, const int tail) const;
 
-    //
-    poly TraverseNF(const poly syz_lead, const poly syz_2 = NULL) const;
 
 
   public:
