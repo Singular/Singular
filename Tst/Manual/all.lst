@@ -107,7 +107,6 @@ KSpencerKernel.tst
 Kernel_of_module_homomorphisms.tst
 KoszulHomology.tst
 LIB.tst
-LLL.tst
 Left_and_two-sided_Groebner_bases.tst
 LengthSym.tst
 LengthSymElement.tst
