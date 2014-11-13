@@ -8,23 +8,21 @@
 
 
 
-
-
 #include <misc/auxiliary.h>
-#include "flintconv.h"
 #include <coeffs/coeffs.h>
 #include <polys/monomials/p_polys.h>
 
 #include <omalloc/omalloc.h>
-#include <coeffs/longrat.h>
-#include <coeffs/modulop.h>
+// #include <coeffs/longrat.h>
+// #include <coeffs/modulop.h>
 #include <polys/sbuckets.h>
 #include <polys/clapconv.h>
 
 #include "simpleideals.h"
 
+#include "flintconv.h"
+
 #ifdef HAVE_FLINT
-#ifdef FLINT_VER_2_4_5
 int convFlintISingI (fmpz_t f)
 {
   int res;
@@ -49,6 +47,7 @@ void convSingNFlintN(fmpz_t f, mpz_t z)
 }
 
 
+#ifdef FLINT_VER_2_4_5
 bigintmat* singflint_LLL(bigintmat*  m)
 {
   int r=m->rows();
