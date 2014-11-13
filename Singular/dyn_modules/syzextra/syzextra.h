@@ -277,7 +277,9 @@ class CLeadingTerm
     const poly          m_lt; ///< the leading term itself L[label-1]
 
 #ifndef SING_NDEBUG
-    const ring _R;  const poly          m_lt_copy; ///< original copy of LEAD(lt) (only for debug!!!)
+    const ring _R;
+    
+    const poly          m_lt_copy; ///< original copy of LEAD(lt) (only for debug!!!)
 #endif  
    
     // disable the following:
