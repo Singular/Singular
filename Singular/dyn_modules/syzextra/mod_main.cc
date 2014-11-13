@@ -1928,7 +1928,47 @@ static BOOLEAN _m2_end(leftv res, leftv h)
   return FALSE;
 }
 
+// no args.
+// init num stats
+static BOOLEAN _NumberStatsInit(leftv res, leftv h)
+{
+  if ( (h!=NULL) && (h->Typ()!=INT_CMD) )
+  {
+    WerrorS("`NumberStatsInit([<int>])` expected");
+    return TRUE;
+  }
 
+  unsigned long v = 0;
+
+  if( h != NULL )
+    v = (unsigned long)(h->Data());
+
+  number_stats_Init(v);
+  
+  NoReturn(res);
+  return FALSE;
+}
+
+// maybe one arg.
+// print num stats
+static BOOLEAN _NumberStatsPrint(leftv res, leftv h)
+{
+  if ( (h!=NULL) && (h->Typ()!=STRING_CMD) )
+  {
+    WerrorS("`NumberStatsPrint([<string>])` expected");
+    return TRUE;
+  }
+  
+  const char* msg = NULL;
+
+  if( h != NULL )
+    msg = (const char*)(h->Data());
+  
+  number_stats_Print(msg);
+
+  NoReturn(res);
+  return FALSE;
+}
 
 END_NAMESPACE
 
@@ -1988,6 +2028,9 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD("ComputeResolution", FALSE, _ComputeResolution);
 //  ADD("GetAMData", FALSE, GetAMData);
 
+  ADD("NumberStatsInit", FALSE, _NumberStatsInit);
+  ADD("NumberStatsPrint", FALSE, _NumberStatsPrint);
+  
   //  ADD("", FALSE, );
 
 #undef ADD
