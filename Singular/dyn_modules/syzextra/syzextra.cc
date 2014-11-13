@@ -2153,6 +2153,7 @@ bool CLeadingTerm::DivisibilityCheck(const poly product, const unsigned long not
 
 }
 
+#if NOPRODUCT
 /// as DivisibilityCheck(multiplier * t, ...) for monomial 'm'
 /// and a module term 't'
 bool CLeadingTerm::DivisibilityCheck(const poly m, const poly t, const unsigned long not_sev, const ring r) const
@@ -2181,7 +2182,7 @@ bool CLeadingTerm::DivisibilityCheck(const poly m, const poly t, const unsigned 
   return _p_LmDivisibleByNoComp(lt(), m, t, r);
 //  return p_LmShortDivisibleByNoComp(p, p_sev, product, not_sev, r);
 }
-
+#endif
 
 
 /// TODO:
@@ -2404,6 +2405,8 @@ void CReducerFinder::DebugPrint() const
   }
 }
 #endif
+
+#if NOPRODUCT
 
 /// TODO:
 class CDivisorEnumerator2: public SchreyerSyzygyComputationFlags
@@ -2713,6 +2716,7 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
   return NULL;
 
 }
+#endif
 
 
 poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const CReducerFinder& syz_checker) const

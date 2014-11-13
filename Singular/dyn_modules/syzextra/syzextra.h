@@ -32,6 +32,9 @@ class idrec; typedef idrec *   idhdl;
 
 class kBucket; typedef kBucket* kBucket_pt;
 
+#ifndef NOPRODUCT
+# define NOPRODUCT 1
+#endif
 
 BEGIN_NAMESPACE_SINGULARXX    BEGIN_NAMESPACE(SYZEXTRA)
 
@@ -253,9 +256,11 @@ class CLeadingTerm
     ~CLeadingTerm();
 #endif
    
-    bool DivisibilityCheck(const poly product, const unsigned long not_sev, const ring r) const;
+#if NOPRODUCT
     bool DivisibilityCheck(const poly multiplier, const poly t, const unsigned long not_sev, const ring r) const;
-
+#endif
+    bool DivisibilityCheck(const poly product, const unsigned long not_sev, const ring r) const;
+    
     bool CheckLT( const ideal & L ) const;
 
 #ifndef SING_NDEBUG
@@ -292,9 +297,11 @@ class CLeadingTerm
 // TODO: needs a specialized variant without a component (hash!)
 class CReducerFinder: public SchreyerSyzygyComputationFlags
 {
-  friend class CDivisorEnumerator;
+#if NOPRODUCT
   friend class CDivisorEnumerator2;
-
+#endif
+  friend class CDivisorEnumerator;
+  
   public:
     typedef long TComponentKey;
     typedef std::vector<const CLeadingTerm*> TReducers;
@@ -310,18 +317,23 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
 
     ~CReducerFinder();
 
+    
+#if NOPRODUCT
+    poly
+        FindReducer(const poly multiplier, const poly monom, const poly syzterm, const CReducerFinder& checker) const;
+
+#endif
     // TODO: save shortcut (syz: |-.->) LM(LM(m) * "t") -> syz?
     poly // const_iterator // TODO: return const_iterator it, s.th: it->m_lt is the needed
-    FindReducer(const poly product, const poly syzterm, const CReducerFinder& checker) const;
+        FindReducer(const poly product, const poly syzterm, const CReducerFinder& checker) const;
 
     bool IsDivisible(const poly q) const;
 
+    
     inline bool IsNonempty() const { return !m_hash.empty(); }
 
     /// is the term to be "preprocessed" as lower order term or lead to only reducible syzygies...
     int PreProcessTerm(const poly t, CReducerFinder& syzChecker) const;
-
-    poly FindReducer(const poly multiplier, const poly monom, const poly syzterm, const CReducerFinder& checker) const;
 
 #ifndef SING_NDEBUG
     void DebugPrint() const;
