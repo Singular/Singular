@@ -34,7 +34,7 @@ SOURCES = \
 	sparsmat.cc \
         ${USE_P_PROCS_STATIC_CC} ${USE_P_PROCS_DYNAMIC_CC} mod_raw.cc \
         ext_fields/algext.cc ext_fields/transext.cc \
-	clapsing.cc clapconv.cc \
+	clapsing.cc clapconv.cc  flintconv.cc\
 	nc/old.gring.cc PolyEnumerator.cc
 
 LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \
@@ -43,7 +43,7 @@ LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \
 	operations/pShallowCopyDelete.h \
 	templates/p_Procs.h templates/p_MemAdd.h templates/p_MemCmp.h \
 	kbuckets.h sbuckets.h simpleideals.h weight.h matpol.h \
-	sparsmat.h clapsing.h clapconv.h coeffrings.h \
+	sparsmat.h clapsing.h clapconv.h coeffrings.h flintconv.h\
 	ext_fields/algext.h ext_fields/transext.h mod_raw.h  
 
 EXTRA_DIST = \
