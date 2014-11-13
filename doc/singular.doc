@@ -369,7 +369,6 @@ LIB "all.lib";
 * homolog_lib:: procedures for homological algebra
 * integralbasis_lib:: Integral basis in algebraic function fields
 * intprog_lib:: Integer Programming
-* lll_lib:: Integral LLL-Algorithm
 * locnormal_lib:: Normalization of affine domains using local methods
 * modnormal_lib:: Normalization of affine domains using modular methods
 * modstd_lib:: Groebner basis of ideals via modular computations
@@ -424,15 +423,11 @@ LIB "all.lib";
 @subsection integralbasis_lib
 @c lib integralbasis.lib
 @c ----------------------------------------------------------
-@node intprog_lib, lll_lib, integralbasis_lib, Commutative algebra
+@node intprog_lib, locnormal_lib, integralbasis_lib, Commutative algebra
 @subsection intprog_lib
 @c lib intprog.lib
 @c ----------------------------------------------------------
-@node lll_lib, locnormal_lib, intprog_lib, Commutative algebra
-@subsection lll_lib
-@c lib lll.lib
-@c ----------------------------------------------------------
-@node locnormal_lib, modnormal_lib, lll_lib,  Commutative algebra
+@node locnormal_lib, modnormal_lib, intprog_lib,  Commutative algebra
 @subsection locnormal_lib
 @c lib locnormal.lib
 @c ----------------------------------------------------------
