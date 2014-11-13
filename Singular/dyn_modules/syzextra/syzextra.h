@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <map>
+#include <string.h>
 
 // include basic definitions
 #include "singularxx_defs.h"
@@ -263,6 +264,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         m_div(m_idLeads, setting), m_checker(NULL, setting), m_cache(),
         m_sum_bucket(NULL), m_spoly_bucket(NULL)
     {
+      if( __PROT__ ) memset( &m_stat, 0, sizeof(m_stat) );
     }
 
     /// Construct a global object for given input data (separated into leads & tails)
@@ -274,6 +276,8 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         m_div(m_idLeads, setting), m_checker(NULL, setting), m_cache(),
         m_sum_bucket(NULL), m_spoly_bucket(NULL)
     {
+      if( __PROT__ ) memset( &m_stat, 0, sizeof(m_stat) );
+      
       if( __TAILREDSYZ__ && !__IGNORETAILS__)
       {
         if (syzLeads != NULL)
@@ -290,6 +294,9 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /// Preprocess m_idTails as well...?
     void SetUpTailTerms();
 
+    /// print statistics about the used heuristics
+    void PrintStats() const;
+
     /// Read off the results while detaching them from this object
     /// NOTE: no copy!
     inline void ReadOffResult(ideal& syzL, ideal& syzT)
@@ -297,7 +304,11 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
       syzL = m_syzLeads; syzT = m_syzTails;
 
       m_syzLeads = m_syzTails = NULL; // m_LS ?
+      
+      if ( __PROT__ )
+        PrintStats();
     }
+
 
     /// The main driver function: computes
     void ComputeSyzygy();
@@ -400,6 +411,14 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     mutable kBucket_pt m_spoly_bucket;
 };
 
+   
+    /// Statistics:
+    ///  0..3: as in SetUpTailTerms()::PreProcessTerm() // TODO!!??
+    ///  4: number of terms discarded due to LOT heuristics
+    ///  5: number of terms discarded due to LCM heuristics
+    ///  6, 7: lookups without & with rescale, 8: stores
+    mutable unsigned long m_stat[9];
+};
 
 // The following wrappers are just for testing separate functions on highest level (within schreyer.lib)
 
