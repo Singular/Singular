@@ -19,6 +19,7 @@
 #include <vector>
 #include <map>
 #include <string.h>
+#include <stack>
 
 // include basic definitions
 #include "singularxx_defs.h"
@@ -29,7 +30,6 @@ struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* c
 struct sip_sideal; typedef struct sip_sideal *       ideal;
 class idrec; typedef idrec *   idhdl;
 
-class sBucket; typedef sBucket* sBucket_pt;
 class kBucket; typedef kBucket* kBucket_pt;
 
 
@@ -51,6 +51,126 @@ ideal id_Tail(const ideal id, const ring r);
 
 /// inplace sorting of the module (ideal) id wrt <_(c,ds)
 void Sort_c_ds(const ideal id, const ring r);
+
+
+class sBucket; typedef sBucket* sBucket_pt;
+
+/** @class SBucketFactory syzextra.h
+ *
+ * sBucket Factory
+ *
+ * Cleate/store/reuse buckets
+ * 
+ */
+class SBucketFactory: private std::stack <sBucket_pt>
+{
+  private:
+    typedef std::stack <sBucket_pt> Base;
+//    typedef std::vector<Bucket> Memory;
+//    typedef std::deque <Bucket> Memory;
+//    typedef std::stack <Bucket, Memory > Base;
+
+  public:
+    typedef Base::value_type Bucket;
+
+    SBucketFactory(const ring r)
+#ifndef SING_NDEBUG    
+        : m_ring(r)
+#endif
+    {
+      push ( _CreateBucket(r) ); // start with at least one sBucket...? 
+      assume( top() != NULL );
+    };
+
+    ~SBucketFactory()
+    {
+      while( !empty() )
+      {
+        _DestroyBucket( top() );
+        pop();
+      }
+    }
+    
+    Bucket getBucket(const ring r, const bool remove = true)
+    {
+      assume( r == m_ring );
+
+      Bucket bt = NULL;
+
+      if( !empty() )
+      {
+        bt = top();
+
+        if( remove ) 
+          pop();
+      }
+      else
+      {
+        bt = _CreateBucket(r);
+
+        if( !remove )
+        {
+          push(bt);
+          assume( bt == top() );
+        }
+      }
+
+      assume( bt != NULL );
+      assume( _IsBucketEmpty(bt) );
+      assume( r == _GetBucketRing(bt) );
+
+      return bt;
+    }
+
+    // TODO: this may be spared if we give-out a smart Bucket (which returns here upon its destructor!)
+    void putBucket(const Bucket & bt, const bool replace = false)
+    {
+      assume( bt != NULL );      
+      assume( _IsBucketEmpty(bt) );
+      assume( m_ring == _GetBucketRing(bt) );
+
+      if( empty() )
+        push( bt );
+      else
+      {
+        if( replace )
+          top() = bt;
+        else
+        {
+          if( bt != top() )
+            push( bt );
+        }
+      }
+
+      assume( bt == top() );
+    }    
+
+  private:
+
+#ifndef SING_NDEBUG    
+    const ring m_ring; ///< For debugging: all buckets are over the same ring... right?!
+
+    /// get bucket ring
+    static ring _GetBucketRing(const Bucket& bt);
+
+    static bool  _IsBucketEmpty(const Bucket& bt);
+#endif
+
+    /// inital allocation for new buckets
+    static Bucket _CreateBucket(const ring r);
+
+    /// we only expect empty buckets to be left at the end for destructor
+    /// bt will be set to NULL
+    static void _DestroyBucket(Bucket & bt);
+
+  private:
+    SBucketFactory();
+    SBucketFactory(const SBucketFactory&);
+    void operator=(const SBucketFactory&);
+
+};
+
+
 
 
 
@@ -262,7 +382,8 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         m_syzLeads(NULL), m_syzTails(NULL),
         m_LS(NULL), m_lcm(m_idLeads, setting),
         m_div(m_idLeads, setting), m_checker(NULL, setting), m_cache(),
-        m_sum_bucket(NULL), m_spoly_bucket(NULL)
+        m_sum_bucket_factory(setting.m_rBaseRing),
+        m_spoly_bucket(NULL)
     {
       if( __PROT__ ) memset( &m_stat, 0, sizeof(m_stat) );
     }
@@ -274,7 +395,8 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         m_syzLeads(syzLeads), m_syzTails(NULL),
         m_LS(syzLeads), m_lcm(m_idLeads, setting),
         m_div(m_idLeads, setting), m_checker(NULL, setting), m_cache(),
-        m_sum_bucket(NULL), m_spoly_bucket(NULL)
+        m_sum_bucket_factory(setting.m_rBaseRing),
+        m_spoly_bucket(NULL)
     {
       if( __PROT__ ) memset( &m_stat, 0, sizeof(m_stat) );
       
@@ -405,11 +527,10 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     // NOTE/TODO: the following globally shared buckets violate reentrance - they should rather belong to TLS!
 
     /// used for simple summing up
-    mutable sBucket_pt m_sum_bucket;
+    mutable SBucketFactory m_sum_bucket_factory; // sBucket_pt
 
     /// for S-Polynomial reductions
-    mutable kBucket_pt m_spoly_bucket;
-};
+    mutable kBucket_pt m_spoly_bucket; // only used inside of SchreyerSyzygyNF! destruction by CleanUp()!
 
    
     /// Statistics:

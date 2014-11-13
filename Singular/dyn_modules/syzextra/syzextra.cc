@@ -70,6 +70,83 @@ BEGIN_NAMESPACE_SINGULARXX     BEGIN_NAMESPACE(SYZEXTRA)
 
 BEGIN_NAMESPACE_NONAME
 
+#ifndef SING_NDEBUG                                                                                                                          
+ring SBucketFactory::_GetBucketRing(const SBucketFactory::Bucket& bt)
+{                                                                                                                                            
+  assume( bt != NULL );                                                                                                                      
+  return sBucketGetRing(bt);                                                                                                                 
+}                                                                                                                                            
+
+bool SBucketFactory::_IsBucketEmpty(const SBucketFactory::Bucket& bt)
+{                                                                                                                                            
+  assume( bt != NULL );                                                                                                                      
+  return sIsEmpty(bt);                                                                                                                       
+}
+#endif
+
+SBucketFactory::Bucket SBucketFactory::_CreateBucket(const ring r)
+{
+  const Bucket bt = sBucketCreate(r);
+
+  assume( bt != NULL );
+  assume( _IsBucketEmpty(bt) );
+  assume( r == _GetBucketRing(bt) );
+
+  return bt;
+}
+
+void SBucketFactory::_DestroyBucket(SBucketFactory::Bucket & bt)
+{
+  if( bt != NULL )
+  {
+    assume( _IsBucketEmpty(bt) );
+    sBucketDestroy( &bt );
+    bt = NULL;
+  }
+}  
+
+class SBucketWrapper
+{
+  typedef SBucketFactory::Bucket Bucket;
+  
+  private:
+    Bucket m_bucket;
+
+    SBucketFactory& m_factory;
+  public:    
+    SBucketWrapper(const ring r, SBucketFactory& factory):
+        m_bucket( factory.getBucket(r) ),
+        m_factory( factory )
+    {}
+
+    ~SBucketWrapper()
+    {
+      m_factory.putBucket( m_bucket );
+    }
+
+  public:
+
+    /// adds p to the internal bucket
+    /// destroys p, l == length(p)
+    inline void Add( poly p, const int l )
+    {
+      assume( pLength(p) == l );
+      sBucket_Add_p( m_bucket, p, l );
+    }
+
+    /// adds p to the internal bucket
+    /// destroys p
+    inline void Add( poly p ){ Add(p, pLength(p)); }
+
+    poly ClearAdd()
+    {
+      poly p; int l;
+      sBucketClearAdd(m_bucket, &p, &l);
+      assume( pLength(p) == l );
+      return p;
+    }    
+};
+   
 static inline poly pp_Add_qq( const poly a, const poly b, const ring R)
 {
   return p_Add_q( p_Copy(a, R), p_Copy(b, R), R );
@@ -460,12 +537,12 @@ void SchreyerSyzygyComputation::CleanUp()
 
   id_Delete(const_cast<ideal*>(&m_idTails), m_rBaseRing); // TODO!!!
 
-  if( m_sum_bucket != NULL )
+/*if( m_sum_bucket != NULL )
   {
     assume ( sIsEmpty(m_sum_bucket) );
     sBucketDestroy(&m_sum_bucket);
     m_sum_bucket = NULL;
-  }
+  }*/
 
   if( m_spoly_bucket != NULL )
   {
@@ -1080,10 +1157,9 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   ideal& TT = m_syzTails;
   const ring& R = m_rBaseRing;
 
-  if( m_sum_bucket == NULL )
-    m_sum_bucket = sBucketCreate(R);
-
-  assume ( sIsEmpty(m_sum_bucket) );
+//  if( m_sum_bucket == NULL )
+//    m_sum_bucket = sBucketCreate(R);
+//  assume ( sIsEmpty(m_sum_bucket) );
 
   if( m_spoly_bucket == NULL )
     m_spoly_bucket = kBucketCreate(R);
@@ -1427,16 +1503,12 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
   int  c = p_GetComp(syz_lead, r) - 1;
 
   assume( c >= 0 && c < IDELEMS(T) );
-
-  if( m_sum_bucket == NULL )
-    m_sum_bucket = sBucketCreate(r);
-
-  assume( sIsEmpty(m_sum_bucket) );
   
   if( m_spoly_bucket == NULL )
     m_spoly_bucket = kBucketCreate(r);
 
-  sBucket_pt tail   = m_sum_bucket; assume( tail != NULL ); m_sum_bucket = NULL;
+  SBucketWrapper tail(r, m_sum_bucket_factory);
+
   
   kBucket_pt bucket = m_spoly_bucket; assume( bucket != NULL ); kbTest(bucket); m_spoly_bucket = NULL;
   
@@ -1458,10 +1530,9 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
   kbTest(bucket);
   p_Delete(&p, r);
 
-  // TODO: use bucket!?
 //  const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(spoly) < MIN_LENGTH_BUCKET);
 //  CPolynomialSummator tail(r, bUsePolynomial);
-  sBucket_Add_p(tail, syz_2, 1); // tail.AddAndDelete(syz_2, 1);
+  tail.Add(syz_2, 1);
 
   kbTest(bucket);
   for( poly spoly = kBucketExtractLm(bucket); spoly != NULL; p_LmDelete(&spoly, r), spoly = kBucketExtractLm(bucket))
@@ -1486,7 +1557,7 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
 
       p_Delete(&p, r);
 
-      sBucket_Add_p(tail, t, 1); // tail.AddAndDelete(t, 1);
+      tail.Add(t, 1);
     } // otherwise discard that leading term altogether!
     else
       if( __PROT__ ) ++ m_stat[4]; // PrintS("$"); // LOT
@@ -1494,24 +1565,13 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
     kbTest(bucket);
   }
 
-  // now bucket must be empty!
   kbTest(bucket);
   
+  // now bucket must be empty!
   assume( kBucketClear(bucket) == NULL );
   
-  
-
-  poly result; int len;
-  sBucketClearAdd(tail, &result, &len); // TODO: use Merge with sBucket???
-  assume( pLength(result) == len );
-
-  assume( tail != NULL ); assume ( sIsEmpty(tail) );
-
-  if( m_sum_bucket == NULL )
-    m_sum_bucket = tail;
-  else
-    sBucketDestroy(&tail);
-  
+  const poly result = tail.ClearAdd(); // TODO: use Merge with sBucket???
+ 
 
   if( m_spoly_bucket == NULL )
     m_spoly_bucket = bucket;
@@ -1758,6 +1818,8 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
     
   //    const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(tail) < MIN_LENGTH_BUCKET);
 
+  SBucketWrapper sum(r, m_sum_bucket_factory);
+/*  
   sBucket_pt sum;
 
   if( m_sum_bucket == NULL )
@@ -1776,8 +1838,9 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 
   assume( sum != NULL ); assume ( sIsEmpty(sum) );
   assume( r == sBucketGetRing(sum) );
+*/  
 
-  poly s; int len;
+//  poly s; int len;
 
   //    CPolynomialSummator sum(r, bUsePolynomial);
   //    poly s = NULL;
@@ -1787,32 +1850,37 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
     Print("{ \"proc\": \"TTPoly\", \"nodelabel\": \""); writeLatexTerm(multiplier, r, false); Print(" * \\\\ldots \", \"children\": [");
   }
 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   for(poly p = tail; p != NULL; p = pNext(p))   // iterate over the tail
   {
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     const poly rt = ReduceTerm(multiplier, p, NULL); // TODO: also return/store length?
+    sum.Add(rt);
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    const int lp = pLength(rt);
-
-    if( rt != NULL && lp != 0 )
-      sBucket_Add_p(sum, rt, lp);
+//    const int lp = pLength(rt);
+//    if( rt != NULL && lp != 0 )
+//      sBucket_Add_p(sum, rt, lp);
   }
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  sBucketClearAdd(sum, &s, &len); // Will Not Clear?!?
+//  sBucketClearAdd(sum, &s, &len); // Will Not Clear?!?
+  const poly s = sum.ClearAdd();
 
-  assume( sum != NULL ); assume ( sIsEmpty(sum) );
-
+//  assume( sum != NULL ); assume ( sIsEmpty(sum) );
+/*
   if( m_sum_bucket == NULL )
     m_sum_bucket = sum;
   else
     sBucketDestroy(&sum);   
 
   assume( pLength(s) == len );
+*/
+  
 #ifndef SING_NDEBUG
   if( __DEBUG__ )
   {
@@ -3016,7 +3084,7 @@ template class std::map< CReducerFinder::TComponentKey, CReducerFinder::TReducer
 template class std::map<TCacheKey, TCacheValue, struct CCacheCompare>;
 template class std::map<int, TP2PCache>;
 
-
+template class std::stack <sBucket_pt>;
 
 END_NAMESPACE               END_NAMESPACE_SINGULARXX
 
