@@ -409,7 +409,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         m_sum_bucket_factory(setting.m_rBaseRing),
         m_spoly_bucket(NULL)
     {
-      if( __PROT__ ) memset( &m_stat, 0, sizeof(m_stat) );
+      if( UNLIKELY(__PROT__) ) memset( &m_stat, 0, sizeof(m_stat) );
     }
 
     /// Construct a global object for given input data (separated into leads & tails)
@@ -422,9 +422,9 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         m_sum_bucket_factory(setting.m_rBaseRing),
         m_spoly_bucket(NULL)
     {
-      if( __PROT__ ) memset( &m_stat, 0, sizeof(m_stat) );
+      if( UNLIKELY(__PROT__) ) memset( &m_stat, 0, sizeof(m_stat) );
       
-      if( __TAILREDSYZ__ && !__IGNORETAILS__)
+      if( LIKELY(__TAILREDSYZ__ && !__IGNORETAILS__) )
       {
         if (syzLeads != NULL)
           m_checker.Initialize(syzLeads);
@@ -451,7 +451,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
 
       m_syzLeads = m_syzTails = NULL; // m_LS ?
       
-      if ( __PROT__ )
+      if ( UNLIKELY(__PROT__) )
         PrintStats();
     }
 
