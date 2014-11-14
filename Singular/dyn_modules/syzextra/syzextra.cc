@@ -946,12 +946,18 @@ ideal SchreyerSyzygyComputation::Compute2LeadingSyzygyTerms()
       const number& lc1 = p_GetCoeff(p , r);
       const number& lc2 = p_GetCoeff(pp, r);
 
-      number g = n_Lcm( lc1, lc2, r->cf );
+#if NODIVISION
+      assume( n_IsOne(lc1, r->cf) ); 
+      assume( n_IsOne(lc2, r->cf) ); 
 
+      p_SetCoeff0( m, n_Init( 1, r->cf), r );
+      p_SetCoeff0(mm, n_Init(-1, r->cf), r );
+#else
+      number g = n_Lcm( lc1, lc2, r->cf );
       p_SetCoeff0(m ,       n_Div(g, lc1, r), r);
       p_SetCoeff0(mm, n_InpNeg(n_Div(g, lc2, r), r), r);
-
       n_Delete(&g, r);
+#endif      
 
       p_Setm(m, r); // should not do anything!!!
       p_Setm(mm, r); // should not do anything!!!
@@ -1562,7 +1568,9 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
 
 // };
 
-bool my_p_LmCmp (poly a, poly b, const ring r) { return p_LmCmp(a, b, r) == -1; } // TODO: change to simple lex. memory compare!
+
+   
+   bool my_p_LmCmp (poly a, poly b, const ring r) { return p_LmCmp(a, b, r) == -1; } // TODO: change to simple lex. memory compare!
 
 // NOTE: need p_Copy?????? for image + multiplier!!???
 // NOTE: better store complete syz. terms!!?
@@ -1579,8 +1587,9 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
 
 
   
-
-/*  return ComputeImage(multiplier, tail); */
+  if( __NOCACHING__ )
+    return ComputeImage(multiplier, tail);
+   
 
   // TODO: store (multiplier, tail) -.-^-.-^-.--> !
   TCache::iterator top_itr = m_cache.find(tail);
@@ -1963,6 +1972,7 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
     __SYZNUMBER__( atGetInt(rootRingHdl, "SYZNUMBER", 0) ),
     __TREEOUTPUT__( atGetInt(rootRingHdl, "TREEOUTPUT", 0) ),
     __SYZCHECK__( atGetInt(rootRingHdl, "SYZCHECK", 0) ),
+    __NOCACHING__( atGetInt(rootRingHdl, "NOCACHING", 0) ),
     __PROT__(TEST_OPT_PROT),
     m_rBaseRing( rootRingHdl->data.uring )
 {
@@ -2612,7 +2622,16 @@ poly CReducerFinder::FindReducer(const poly multiplier, const poly t,
     }
 
     number n = n_Mult( p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
-    p_SetCoeff0(q, n_InpNeg( n_Div(n, p_GetCoeff(p, r), r), r), r);
+
+#if NODIVISION
+    // we assume all leading coeffs to be 1! 
+    assume( n_IsOne(p_GetCoeff(p, r), r->cf) );
+#else
+    if( !n_IsOne( p_GetCoeff(p, r), r ) )
+      n = n_Div(n, p_GetCoeff(p, r), r);
+#endif
+
+    p_SetCoeff0(q, n_InpNeg(n, r), r);
     n_Delete(&n, r);
 
 #ifndef SING_NDEBUG
@@ -2811,7 +2830,13 @@ poly CReducerFinder::FindReducer(const poly product, const poly syzterm, const C
       continue;
     }
 
+     
+#if NODIVISION
+    assume( n_IsOne(p_GetCoeff(p, r), r->cf) );
+    p_SetCoeff0(q, n_InpNeg( n_Copy(p_GetCoeff(product, r), r), r), r);
+#else
     p_SetCoeff0(q, n_InpNeg( n_Div( p_GetCoeff(product, r), p_GetCoeff(p, r), r), r), r);
+#endif
 
     assume( itr.Current().CheckLT( L ) ); // ???
     

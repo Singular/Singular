@@ -36,6 +36,11 @@ class kBucket; typedef kBucket* kBucket_pt;
 # define NOPRODUCT 1
 #endif
 
+// set to 1 if all leading coeffs are assumed to be all =1...
+#ifndef NODIVISION
+# define NODIVISION 1
+#endif
+
 BEGIN_NAMESPACE_SINGULARXX    BEGIN_NAMESPACE(SYZEXTRA)
 
 poly leadmonom(const poly p, const ring r, const bool bSetZeroComp = true);
@@ -190,6 +195,7 @@ struct SchreyerSyzygyComputationFlags
         __HYBRIDNF__(attr.__HYBRIDNF__), __IGNORETAILS__(attr.__IGNORETAILS__),
         __SYZNUMBER__(attr.__SYZNUMBER__), __TREEOUTPUT__(attr.__TREEOUTPUT__),
         __SYZCHECK__(attr.__SYZCHECK__), __PROT__(attr.__PROT__),
+        __NOCACHING__(attr.__NOCACHING__),
         m_rBaseRing(attr.m_rBaseRing)
     {}
 
@@ -225,7 +231,10 @@ struct SchreyerSyzygyComputationFlags
   const int __SYZCHECK__;
 
   /// TEST_OPT_PROT
-  const bool __PROT__;
+  const bool __PROT__;   
+   
+  /// no caching/stores/lookups
+  const int __NOCACHING__;
 
   /// global base ring
   const ring m_rBaseRing;
