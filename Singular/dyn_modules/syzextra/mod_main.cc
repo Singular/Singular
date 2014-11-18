@@ -262,9 +262,7 @@ static BOOLEAN DetailedPrint(leftv __res, leftv h)
 
     const ring r = currRing;
 
-#ifdef LDEBUG
-    r->cf->cfDBTest(n,__FILE__,__LINE__,r->cf);
-#endif
+    n_Test(n, r->cf);
 
     StringSetS("");
     n_Write(n, r->cf);

@@ -9,18 +9,15 @@
 #include <string.h>
 #include <stdlib.h>
 
-
-
-
 #include <misc/auxiliary.h>
-
+#include <omalloc/omalloc.h>
 #include <factory/factory.h>
 
-#include "coeffs.h"
+#include <reporter/reporter.h>
+
+#include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
 
-#include <reporter/reporter.h>
-#include <omalloc/omalloc.h>
 #include <coeffs/numbers.h>
 #include <coeffs/longrat.h>
 #include <coeffs/modulop.h>
@@ -40,6 +37,10 @@
 #include <polys/ext_fields/transext.h>
 #endif
 
+
+#ifdef HAVE_NUMSTATS
+struct SNumberStatistic number_stats;
+#endif /* HAVE_NUMSTATS */ 
 
 
 //static int characteristic = 0;
@@ -485,6 +486,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 
 void nKillChar(coeffs r)
 {
+  STATISTIC(nKillChar);
   if (r!=NULL)
   {
     r->ref--;
@@ -552,3 +554,12 @@ void n_Print(number& a,  const coeffs r)
    n_Write(a, r);
    { char* s = StringEndS(); Print("%s", s); omFree(s); }
 }
+
+
+number n_convFactoryNSingN( const CanonicalForm n, const coeffs r)
+{ STATISTIC(n_convFactoryNSingN); assume(r != NULL); assume(r->convFactoryNSingN != NULL); return r->convFactoryNSingN(n, r); }
+
+
+
+CanonicalForm n_convSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
+{ STATISTIC(n_convSingNFactoryN); assume(r != NULL); assume(r->convSingNFactoryN != NULL); return r->convSingNFactoryN(n, setChar, r); }
