@@ -23,20 +23,15 @@ AC_DEFUN([SING_CHECK_PLURAL],
 AC_MSG_CHECKING(whether non-commutative subsystem should be enabled)
 
 AC_ARG_ENABLE(plural, AS_HELP_STRING([--disable-plural], [Disable non-commutative subsystem]),
-[if test "x$enableval" = xyes; then
-     ENABLE_PLURAL="yes"
- else
-     ENABLE_PLURAL="no"
- fi
-],[ENABLE_PLURAL="yes"])
+[ENABLE_PLURAL="$enableval"],[ENABLE_PLURAL="yes"])
 
-if test "x$ENABLE_PLURAL" = xyes; then
+if test "x$ENABLE_PLURAL" != xno; then
   AC_DEFINE(HAVE_PLURAL,[1],[Enable non-commutative subsystem])
   #TODO make a seperate switch
   AC_DEFINE(HAVE_SHIFTBBA,[1],[Enable letterplace])
 fi
 
-AM_CONDITIONAL([ENABLE_PLURAL],[test x$ENABLE_PLURAL = xyes])
+AM_CONDITIONAL([ENABLE_PLURAL],[test x$ENABLE_PLURAL != xno])
 
 AC_MSG_RESULT($ENABLE_PLURAL)
 
@@ -299,7 +294,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AC_ARG_VAR( [BUILTIN_LIBS], [LIB FLAGS for buildins] )
  AC_ARG_WITH(builtinmodules, 
    AS_HELP_STRING([--with-builtinmodules], [List of builtin modules (experimental), default: staticdemo,bigintm,syzextra]),
-   [if test "x$with_builtinmodules" == xyes; then
+   [if test "x$with_builtinmodules" = "xyes"; then
     with_builtinmodules=syzextra
    fi], 
    [with_builtinmodules=""]
