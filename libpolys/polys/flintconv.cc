@@ -9,6 +9,9 @@
 
 
 #include <misc/auxiliary.h>
+#include "flintconv.h"
+
+#ifdef FLINT_VER_2_4_5
 #include <coeffs/coeffs.h>
 #include <polys/monomials/p_polys.h>
 
@@ -20,7 +23,6 @@
 
 #include "simpleideals.h"
 
-#include "flintconv.h"
 
 #ifdef HAVE_FLINT
 int convFlintISingI (fmpz_t f)
@@ -47,7 +49,6 @@ void convSingNFlintN(fmpz_t f, mpz_t z)
 }
 
 
-#ifdef FLINT_VER_2_4_5
 bigintmat* singflint_LLL(bigintmat*  m)
 {
   int r=m->rows();
