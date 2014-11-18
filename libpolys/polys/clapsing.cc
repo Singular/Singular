@@ -1675,7 +1675,7 @@ matrix singntl_HNF(matrix  m, const ring s )
   return res;
 }
 
-intvec* singntl_HNF(intvec*  m, const ring)
+intvec* singntl_HNF(intvec*  m)
 {
   int r=m->rows();
   if (r!=m->cols())
@@ -1735,7 +1735,7 @@ matrix singntl_LLL(matrix  m, const ring s )
   return res;
 }
 
-intvec* singntl_LLL(intvec*  m, const ring)
+intvec* singntl_LLL(intvec*  m)
 {
   int r=m->rows();
   int c=m->cols();
@@ -1744,7 +1744,7 @@ intvec* singntl_LLL(intvec*  m, const ring)
   int i,j;
   for(i=r;i>0;i--)
   {
-    for(j=r;j>0;j--)
+    for(j=c;j>0;j--)
     {
       M(i,j)=IMATELEM(*m,i,j);
     }

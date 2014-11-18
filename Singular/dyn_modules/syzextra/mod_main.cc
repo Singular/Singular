@@ -531,7 +531,7 @@ static BOOLEAN _ComputeLeadingSyzygyTerms(leftv res, leftv h)
 
     assume(id != NULL);
 
-    if( __DEBUG__ )
+    if( UNLIKELY( __DEBUG__ ) )
     {
       PrintS("ComputeLeadingSyzygyTerms::Input: \n");
       dPrint(id, r, r, 0);
@@ -586,7 +586,7 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
 
     assume(id != NULL);
 
-    if( __DEBUG__ )
+    if( UNLIKELY( __DEBUG__ ) )
     {
       PrintS("Sort_c_ds::Input: \n");
       dPrint(id, r, r, 0);
@@ -601,7 +601,7 @@ static BOOLEAN _Sort_c_ds(leftv res, leftv h)
 //    res->data = id;
 //    res->rtyp = h->Typ();
 
-    if( __DEBUG__ )
+    if( UNLIKELY( __DEBUG__ ) )
     {
       PrintS("Sort_c_ds::Output: \n");
       dPrint(id, r, r, 0);
@@ -645,7 +645,7 @@ static BOOLEAN _Compute2LeadingSyzygyTerms(leftv res, leftv h)
 
     assume(id != NULL);
 
-    if( __DEBUG__ )
+    if( UNLIKELY( __DEBUG__ ) )
     {
       PrintS("Compute2LeadingSyzygyTerms::Input: \n");
       dPrint(id, r, r, 0);
@@ -724,12 +724,14 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
     h = h->Next();
   }
 
-  if( __TAILREDSYZ__ )
+#ifndef SING_NDEBUG 
+  if( LIKELY( __TAILREDSYZ__) )
     assume (LS != NULL);
+#endif
 
   assume( h == NULL );
 
-  if( __DEBUG__ )
+  if( UNLIKELY(__DEBUG__) )
   {
     PrintS("FindReducer(product, syzterm, L, T, #)::Input: \n");
 
@@ -750,7 +752,7 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
   res->rtyp = VECTOR_CMD;
   res->data = FindReducer(product, syzterm, L, LS, attributes);
 
-  if( __DEBUG__ )
+  if( UNLIKELY( __DEBUG__ ) )
   {
     PrintS("FindReducer::Output: \n");
     dPrint((poly)res->data, r, r, 0);
@@ -826,12 +828,14 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
     h = h->Next();
   }
 
-  if( __TAILREDSYZ__ )
+#ifndef SING_NDEBUG 
+  if( LIKELY( __TAILREDSYZ__) )
     assume (LS != NULL);
+#endif
 
   assume( h == NULL );
 
-  if( __DEBUG__ )
+  if( UNLIKELY( __DEBUG__ ) )
   {
     PrintS("SchreyerSyzygyNF(syz_lead, syz_2, L, T, #)::Input: \n");
 
@@ -854,7 +858,7 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
   res->data = SchreyerSyzygyNF(syz_lead,
                                (syz_2!=NULL)? p_Copy(syz_2, r): syz_2, L, T, LS, attributes);
 
-  if( __DEBUG__ )
+  if( UNLIKELY( __DEBUG__ ) )
   {
     PrintS("SchreyerSyzygyNF::Output: ");
 
@@ -945,12 +949,14 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
     h = h->Next();
   }
 
-  if( __TAILREDSYZ__ )
+#ifndef SING_NDEBUG 
+  if( LIKELY( __TAILREDSYZ__) )
     assume (LS != NULL);
+#endif
 
   assume( h == NULL );
 
-  if( __DEBUG__ )
+  if( UNLIKELY( __DEBUG__ ) )
   {
     PrintS("ReduceTerm(m, t, syzterm, L, T, #)::Input: \n");
 
@@ -971,7 +977,7 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
   }
 
 
-  if (__DEBUG__ && syztermCheck != NULL)
+  if ( UNLIKELY( __DEBUG__ && syztermCheck != NULL) )
   {
     const int c = p_GetComp(syztermCheck, r) - 1;
     assume( c >= 0 && c < IDELEMS(L) );
@@ -996,7 +1002,7 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
   res->data = ReduceTerm(multiplier, term4reduction, syztermCheck, L, T, LS, attributes);
 
 
-  if( __DEBUG__ )
+  if( UNLIKELY( __DEBUG__ ) )
   {
     PrintS("ReduceTerm::Output: ");
 
@@ -1076,12 +1082,14 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
     h = h->Next();
   }
 
-  if( __TAILREDSYZ__ )
+#ifndef SING_NDEBUG 
+  if( LIKELY( __TAILREDSYZ__) )
     assume (LS != NULL);
+#endif
 
   assume( h == NULL );
 
-  if( __DEBUG__ )
+  if( UNLIKELY( __DEBUG__ ) )
   {
     PrintS("TraverseTail(m, t, L, T, #)::Input: \n");
 
@@ -1104,7 +1112,7 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
   res->data = TraverseTail(multiplier, tail, L, T, LS, attributes);
 
 
-  if( __DEBUG__ )
+  if( UNLIKELY( __DEBUG__ ) )
   {
     PrintS("TraverseTail::Output: ");
     dPrint((poly)res->data, r, r, 0);
@@ -1176,7 +1184,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
   if( length <= 0 )
     length = 1 + rVar(r);
 
-  if( __DEBUG__ )
+  if( UNLIKELY( __DEBUG__ ) )
   {
     PrintS("ComputeResolution(M, length)::Input: \n");
     Print( "starting length: %ld\n", length);
@@ -1196,7 +1204,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
   int index = 0;
   _res->fullres[index++] = M;
 
-//  if (attributes.__TREEOUTPUT__)
+//  if (UNLIKELY(attributes.__TREEOUTPUT__))
 //    Print("{ \"RESOLUTION: HYBRIDNF:%d, TAILREDSYZ: %d, LEAD2SYZ: %d, IGNORETAILS: %d\": [\n", attributes.__HYBRIDNF__, attributes.__TAILREDSYZ__, attributes.__LEAD2SYZ__, attributes.__IGNORETAILS__);
 
   while( (!idIs0(L)) && (index < length))
@@ -1206,7 +1214,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
 
     ComputeSyzygy(L, T, LL, TT, attributes);
 
-    if( __DEBUG__ )
+    if( UNLIKELY( __DEBUG__ ) )
     {
       Print("ComputeResolution()::Separated Syzygy[%d]: \n", index);
 //      PrintS("LL: \n"); dPrint(LL, r, r, 0);
@@ -1228,7 +1236,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
     }
     M->rank = id_RankFreeModule(M, r);
 
-    if( __DEBUG__ )
+    if( UNLIKELY( __DEBUG__ ) )
     {
       Print("ComputeResolution()::Restored Syzygy[%d]: \n", index);
       PrintS("M = LL + TT: \n"); dPrint(M, r, r, 0);
@@ -1236,7 +1244,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
 
     _res->fullres[index++] = M; // ???
   }
-//  if (attributes.__TREEOUTPUT__)
+//  if ( UNLIKELY(attributes.__TREEOUTPUT__) )
 //    PrintS("] }\n");
 
   id_Delete(&L, r); id_Delete(&T, r);
@@ -1244,7 +1252,7 @@ static BOOLEAN _ComputeResolution(leftv res, leftv h)
   res->data = _res;
   res->rtyp = RESOLUTION_CMD;
 
-  if( __DEBUG__ )
+  if( UNLIKELY(__DEBUG__) )
   {
     Print("ComputeResolution::Output (index: %d): ", index);
 //    class sleftv; typedef sleftv * leftv;
@@ -1300,7 +1308,7 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
 
   h = h->Next(); assume( h == NULL );
 
-  if( __DEBUG__ )
+  if( UNLIKELY( __DEBUG__ ) )
   {
     PrintS("ComputeSyzygy(L, T)::Input: \n");
 //    PrintS("L: "); dPrint(L, r, r, 0);
@@ -1319,7 +1327,7 @@ static BOOLEAN _ComputeSyzygy(leftv res, leftv h)
 
   res->data = l; res->rtyp = LIST_CMD;
 
-  if( __DEBUG__ )
+  if( UNLIKELY( __DEBUG__ ) )
   {
     PrintS("ComputeSyzygy::Output: \nLL: \n");
     dPrint(LL, r, r, 0);

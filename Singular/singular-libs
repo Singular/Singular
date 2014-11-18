@@ -16,7 +16,7 @@ SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
 	hnoether.lib \
 	homolog.lib hyperel.lib integralbasis.lib inout.lib intprog.lib \
 	jacobson.lib \
-	kskernel.lib latex.lib linalg.lib lll.lib makedbm.lib \
+	kskernel.lib latex.lib linalg.lib makedbm.lib \
 	matrix.lib modstd.lib mondromy.lib monomialideal.lib \
 	mprimdec.lib mregular.lib \
 	noether.lib normal.lib normaliz.lib ntsolve.lib \

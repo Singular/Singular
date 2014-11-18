@@ -2318,6 +2318,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
               i,rParameter(r)[i],rParameter(currRing)[i]);
       }
     }
+    if (IDTYP(w)==ALIAS_CMD) w=(idhdl)IDDATA(w);
     sleftv tmpW;
     memset(&tmpW,0,sizeof(sleftv));
     tmpW.rtyp=IDTYP(w);

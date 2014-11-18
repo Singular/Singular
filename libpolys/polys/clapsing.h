@@ -51,9 +51,9 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r );
 # ifdef HAVE_NTL
 #  if 1
 matrix  singntl_HNF(matrix A, const ring r);
-intvec* singntl_HNF(intvec* A, const ring r);
+intvec* singntl_HNF(intvec* A);
 matrix  singntl_LLL(matrix A, const ring r);
-intvec* singntl_LLL(intvec* A, const ring r);
+intvec* singntl_LLL(intvec* A);
 
 ideal singclap_absFactorize ( poly f, ideal & mipos, intvec ** exps, int & n, const ring r);
 #  endif

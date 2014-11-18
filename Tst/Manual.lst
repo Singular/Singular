@@ -1410,7 +1410,6 @@ Manual/spectralNeg.tst
 Manual/SannfsBFCT.tst
 Manual/startNmz.tst ; needs normaliz!
 ; Manual/memory.tst ; HW-dependent: contains memory output!
-; Manual/LLL.tst
 ; Manual/system.tst ;; outputs build-dependent info!
 Manual/solve_IP.tst ; needs solve_IP!
 ; Manual/datetime.tst

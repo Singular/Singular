@@ -523,7 +523,7 @@ proc gcdTest(ideal act)
   {
     return(0);
   }
-  for (i=1;i<=size(act)-1;i++)
+  for (i=1;i<size(act);i++)
   {
     for(j=i+1;j<=size(act);j++)
     {
@@ -1435,7 +1435,7 @@ proc zeroSp(ideal i)
   //avoid factorization of the same polynomial
   for(j=2;j<=size(F);j++)
   {
-    for(k=1;k<=j-1;k++)
+    for(k=1;k<j;k++)
     {
       ti=F[k];
       te=subst(ti,var(k),var(j));
@@ -2015,7 +2015,7 @@ EXAMPLE: example minAssPrimes; shows an example
         ndim=dim(@pr[j]);
         if(ndim>odim)
         {
-           for(k=count;k<=j-1;k++)
+           for(k=count;k<j;k++)
            {
               pos[k]=1;
            }
@@ -4423,7 +4423,7 @@ static proc min_ass_prim_charsets1 (ideal PS)
   {
     PHI[i]=ideal(m[i,1..ncols(m)]);
     I=0;
-    for(j=size(PHI[i]);j>0;j=j-1)
+    for(j=ncols(PHI[i]);j>0;j--)
     {
       I=I,ini_mod(PHI[i][j]);
     }
@@ -4848,7 +4848,7 @@ static proc pseudo_prim_dec_special_charsets (ideal SI,list V6, int choo)
           {
             m=minAssPrimes(SP,1);
           }
-          for(j=size(m);j>=1;j=j-1)
+          for(j=size(m);j>=1;j--)
             {
               m[j]=std(m[j]);
             }

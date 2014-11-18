@@ -9,7 +9,7 @@ noinst_HEADERS = list.h binomial__term_ordering.h BigInt.h LLL.h matrix.h ideal.
 
 bindir=$(libexecdir)/singular/MOD
 
-bin_PROGRAMS = toric_ideal solve_IP change_cost gen_test LLL
+bin_PROGRAMS = toric_ideal solve_IP change_cost gen_test
 
 COMMON_SOURCES = term_ordering.cc binomial.cc \
         list.cc BigInt.cc LLL.cc matrix.cc ideal.cc Buchberger.cc \
@@ -19,8 +19,6 @@ toric_ideal_SOURCES = $(COMMON_SOURCES) toric_ideal.cc
 solve_IP_SOURCES = $(COMMON_SOURCES) solve_IP.cc
 change_cost_SOURCES = $(COMMON_SOURCES) change_cost.cc
 gen_test_SOURCES = $(COMMON_SOURCES) gen_test.cc
-
-LLL_SOURCES = LLL_lattice_to_send.cc
 
 # for now we don't install any additional help files...
 EXTRA_DIST = README change_cost.hlp solve_IP.hlp toric_ideal.hlp
