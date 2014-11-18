@@ -524,7 +524,6 @@ Trager (const CanonicalForm & F, const CFList & Astar,
         f /= vcontent (f, as.getFirst().mvar());
 
         L.append (CFFactor (f, 1));
-        break;
       }
       else
       {
