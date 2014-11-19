@@ -250,7 +250,7 @@ class skStrategy
 public:
   kStrategy next;
   int (*red)(LObject * L,kStrategy strat);
-  void (*initEcart)(LObject * L);
+  void (*initEcart)(TObject * L);
   int (*posInT)(const TSet T,const int tl,LObject &h);
   int (*posInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
@@ -447,8 +447,8 @@ void messageSets (kStrategy strat);
 #define messageSets(s)  ((void) 0)
 #endif
 
-void initEcartNormal (LObject* h);
-void initEcartBBA (LObject* h);
+void initEcartNormal (TObject* h);
+void initEcartBBA (TObject* h);
 void initS (ideal F, ideal Q,kStrategy strat);
 void initSL (ideal F, ideal Q,kStrategy strat);
 void updateS(BOOLEAN toT,kStrategy strat);
