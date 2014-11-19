@@ -321,6 +321,14 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
     {
       PrintS("-");mflush();
     }
+    int i;
+    if (strat->redTailChange)
+    {
+      for(i=strat->tl;i>=0;i--)
+      {
+        strat->initEcart(&strat->T[i]);
+      }
+    }
     ideal fac;
     ideal fac_copy;
 
@@ -333,7 +341,6 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
 
     deleteInS(si,strat);
 
-    int i;
     for(i=IDELEMS(fac)-1;i>=0;i--)
     {
       kStrategy n=strat;
