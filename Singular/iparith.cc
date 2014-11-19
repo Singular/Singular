@@ -7121,6 +7121,15 @@ static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
     {
       (*iv)[i]=(int)(long)h->Data();
     }
+    else if (h->Typ()==INTVEC_CMD)
+    {
+      intvec *ivv=(intvec*)h->Data();
+      for(int j=0;j<ivv->length();j++,i++)
+      {
+        (*iv)[i]=(*ivv)[j];
+      }
+      i--;
+    }
     else
     {
       delete iv;
