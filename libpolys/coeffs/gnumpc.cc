@@ -481,7 +481,7 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   n->cfCoeffString=ngcCoeffString;
 
   n->cfDelete  = ngcDelete;
-  n->cfNormalize=ndNormalize;
+  //n->cfNormalize=ndNormalize;
   n->cfInit   = ngcInit;
   n->cfInt    = ngcInt;
   n->cfAdd     = ngcAdd;
@@ -510,7 +510,7 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
   n->cfCoeffWrite = ngcCoeffWrite;
     // cfSize  = ndSize;
 #ifdef LDEBUG
-  n->cfDBTest  = ndDBTest; // not yet implemented: ngcDBTest
+  //n->cfDBTest  = ndDBTest; // not yet implemented: ngcDBTest
 #endif
 
   n->nCoeffIsEqual = ngcCoeffIsEqual;

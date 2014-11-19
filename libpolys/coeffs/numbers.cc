@@ -42,75 +42,74 @@
 struct SNumberStatistic number_stats;
 #endif /* HAVE_NUMSTATS */ 
 
-
 //static int characteristic = 0;
 //extern int IsPrime(int p);
 
 n_Procs_s *cf_root=NULL;
 
 void   nNew(number* d) { *d=NULL; }
-void   ndDelete(number* d, const coeffs) { *d=NULL; }
-number ndAnn(number, const coeffs) { return NULL;}
-char* ndCoeffString(const coeffs r)
+
+
+static void   ndDelete(number* d, const coeffs) { *d=NULL; }
+static number ndAnn(number, const coeffs) { return NULL;}
+static char* ndCoeffString(const coeffs r)
 {
   char *s=(char *)omAlloc(11);snprintf(s,11,"Coeffs(%d)",r->type);
   return s;
 }
-void   ndInpMult(number &a, number b, const coeffs r)
+static void   ndInpMult(number &a, number b, const coeffs r)
 {
-  number n=n_Mult(a,b,r);
-  n_Delete(&a,r);
+  number n=r->cfMult(a,b,r);
+  r->cfDelete(&a,r);
   a=n;
 }
-void ndInpAdd(number &a, number b, const coeffs r)
+static void ndInpAdd(number &a, number b, const coeffs r)
 {
-  number n=n_Add(a,b,r);
-  n_Delete(&a,r);
+  number n=r->cfAdd(a,b,r);
+  r->cfDelete(&a,r);
   a=n;
 }
 
-void ndPower(number a, int i, number * res, const coeffs r)
+static void ndPower(number a, int i, number * res, const coeffs r)
 {
   if (i==0) {
-    *res = n_Init(1, r);
+    *res = r->cfInit(1, r);
   } else if (i==1) {
-    *res = n_Copy(a, r);
+    *res = r->cfCopy(a, r);
   } else if (i==2) {
-    *res = n_Mult(a, a, r);
+    *res = r->cfMult(a, a, r);
   } else if (i<0) {
-    number b = n_Invers(a, r);
+    number b = r->cfInvers(a, r);
     ndPower(b, -i, res, r);
-    n_Delete(&b, r);
+    r->cfDelete(&b, r);
   } else {
     ndPower(a, i/2, res, r);
-    n_InpMult(*res, *res, r);
+    r->cfInpMult(*res, *res, r);
     if (i&1) {
-      n_InpMult(*res, a, r);
+      r->cfInpMult(*res, a, r);
     }
   }
 }
+
 #ifdef LDEBUG
-void   nDBDummy1(number* d,char *, int) { *d=NULL; }
-BOOLEAN ndDBTest(number, const char *, const int, const coeffs)
-{
-  return TRUE;
-}
+// static void   nDBDummy1(number* d,char *, int) { *d=NULL; }
+static BOOLEAN ndDBTest(number, const char *, const int, const coeffs){ return TRUE; }
 #endif
 
-number ndFarey(number,number,const coeffs r)
+static number ndFarey(number,number,const coeffs r)
 {
   Werror("farey not implemented for %s (c=%d)",r->cfCoeffString(r),getCoeffType(r));
   return NULL;
 }
-number ndChineseRemainder(number *,number *,int,BOOLEAN,const coeffs r)
+static number ndChineseRemainder(number *,number *,int,BOOLEAN,const coeffs r)
 {
   Werror("ChineseRemainder not implemented for %s (c=%d)",r->cfCoeffString(r),getCoeffType(r));
-  return n_Init(0,r);
+  return r->cfInit(0,r);
 }
 
 static int ndParDeg(number n, const coeffs r)
 {
-  return (-n_IsZero(n,r));
+  return (-r->cfIsZero(n,r));
 }
 
 static number ndParameter(const int, const coeffs r)
@@ -134,24 +133,16 @@ BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
   return ret;
 }
 
-void   ndNormalize(number&, const coeffs) { }
+static void   ndNormalize(number&, const coeffs) { }
+static number ndReturn0(number, const coeffs r)        { return r->cfInit(0,r); }
+static number ndGcd(number, number, const coeffs r)    { return r->cfInit(1,r); }
+static number ndIntMod(number, number, const coeffs r) { return r->cfInit(0,r); }
+static number ndGetDenom(number &, const coeffs r)     { return r->cfInit(1,r); }
+static number ndGetNumerator(number &a,const coeffs r) { return r->cfCopy(a,r); }
+static int    ndSize(number a, const coeffs r)         { return (int)r->cfIsZero(a,r)==FALSE; }
+static char * ndCoeffName(const coeffs r)              { return r->cfCoeffString(r); }
 
-number ndReturn0(number, const coeffs r) { return n_Init(0,r); }
-
-number ndGcd(number, number, const coeffs r) { return n_Init(1,r); }
-
-number ndIntMod(number, number, const coeffs r) { return n_Init(0,r); }
-
-number ndGetDenom(number &, const coeffs r) { return n_Init(1,r); }
-number ndGetNumerator(number &a,const coeffs r) { return n_Copy(a,r); }
-
-int ndSize(number a, const coeffs r) { return (int)n_IsZero(a,r)==FALSE; }
-
-char * ndCoeffName(const coeffs r)
-{
-  return r->cfCoeffString(r);
-}
-void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs r)
+static void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs r)
 {
   assume(r != NULL);
 
@@ -225,7 +216,7 @@ void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, co
     c = n_Copy(curr, r); // c == 1 and nothing else to do...
 }
 
-void ndClearDenominators(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& d, const coeffs r)
+static void ndClearDenominators(ICoeffsEnumerator& /*numberCollectionEnumerator*/, number& d, const coeffs r)
 {
   assume( r != NULL );
   assume( !(nCoeff_is_Q(r) || nCoeff_is_transExt(r) || nCoeff_is_algExt(r)) );
@@ -234,35 +225,36 @@ void ndClearDenominators(ICoeffsEnumerator& /*numberCollectionEnumerator*/, numb
   d = n_Init(1, r);
 }
 
-number ndCopy(number a, const coeffs) { return a; }
+static number ndCopy(number a, const coeffs) { return a; }
 number ndCopyMap(number a, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == getCoeffType(aRing) );
   if ( nCoeff_has_simple_Alloc(r) && nCoeff_has_simple_Alloc(aRing) )
     return a;
   else
-    return n_Copy(a, r);
+    return r->cfCopy(a, r);
 }
-void ndKillChar(coeffs) {}
-void ndSetChar(const coeffs) {}
 
-number nd_Copy(number a, const coeffs r) { return n_Copy(a, r); }
+static void ndKillChar(coeffs) {}
+static void ndSetChar(const coeffs) {}
+
+number nd_Copy(number a, const coeffs r) { return r->cfCopy(a, r); }
 
 #ifdef HAVE_RINGS
-BOOLEAN ndDivBy(number, number, const coeffs) { return TRUE; } // assume a,b !=0
-int ndDivComp(number, number, const coeffs) { return 2; }
-BOOLEAN ndIsUnit(number a, const coeffs r) { return !n_IsZero(a,r); }
-number  ndExtGcd (number, number, number *, number *, const coeffs r) { return n_Init(1,r); }
+static BOOLEAN ndDivBy(number, number, const coeffs) { return TRUE; } // assume a,b !=0
+static int ndDivComp(number, number, const coeffs) { return 2; }
+static BOOLEAN ndIsUnit(number a, const coeffs r) { return !r->cfIsZero(a,r); }
+static number  ndExtGcd (number, number, number *, number *, const coeffs r) { return r->cfInit(1,r); }
 #endif
 
-CanonicalForm ndConvSingNFactoryN( number, BOOLEAN /*setChar*/, const coeffs)
+static CanonicalForm ndConvSingNFactoryN( number, BOOLEAN /*setChar*/, const coeffs)
 {
   CanonicalForm term(0);
   Werror("no conversion to factory");
   return term;
 }
 
-number ndConvFactoryNSingN( const CanonicalForm, const coeffs)
+static number ndConvFactoryNSingN( const CanonicalForm, const coeffs)
 {
   Werror("no conversion from factory");
   return NULL;
@@ -271,18 +263,18 @@ number ndConvFactoryNSingN( const CanonicalForm, const coeffs)
 /**< [in, out] a bigint number >= 0  */
 /**< [out] the GMP equivalent    */
 /// Converts a non-negative bigint number into a GMP number.
-void ndMPZ(mpz_t result, number &n, const coeffs r)
+static void ndMPZ(mpz_t result, number &n, const coeffs r)
 {
-  mpz_init_set_si( result, n_Int(n, r) );
+  mpz_init_set_si( result, r->cfInt(n, r) );
 }
 
-number ndInitMPZ(mpz_t m, const coeffs r)
+static number ndInitMPZ(mpz_t m, const coeffs r)
 {
-  return n_Init( mpz_get_si(m), r);
+  return r->cfInit( mpz_get_si(m), r);
 }
 
 
-BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void *)
+static BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void *)
 {
   /* test, if r is an instance of nInitCoeffs(n,parameter) */
   /* if paramater is not needed */
@@ -359,7 +351,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfPower = ndPower;
     n->cfCoeffName = ndCoeffName;
 
-    // n->cfKillChar = ndKillChar; /* dummy */
+    n->cfKillChar = ndKillChar; /* dummy */
     n->cfSetChar = ndSetChar; /* dummy */
     // temp. removed to catch all the coeffs which miss to implement this!
 
@@ -380,6 +372,10 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     //n->cfGetUnit = (nMapFunc)NULL;
 #endif
 
+#ifdef LDEBUG
+    n->cfDBTest=ndDBTest; 
+#endif
+     
     n->convSingNFactoryN=ndConvSingNFactoryN;
     n->convFactoryNSingN=ndConvFactoryNSingN;
 
@@ -461,10 +457,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfClearContent != NULL);
     assume(n->cfClearDenominators != NULL);
 
-#ifdef LDEBUG
-    if(n->cfDBTest==NULL)
-    { n->cfDBTest=ndDBTest;Warn("cfDBTest is NULL for coeff %d",t); }
-#endif
     assume(n->type==t);
 
 #ifndef SING_NDEBUG
@@ -475,7 +467,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 #endif
 
    if( n->nNULL == NULL )
-     n->nNULL = n_Init(0, n); // may still remain NULL
+     n->nNULL = n->cfInit(0, n); // may still remain NULL
   }
   else
   {
@@ -500,8 +492,8 @@ void nKillChar(coeffs r)
       {
         n->next=n->next->next;
         if (cf_root==r) cf_root=n->next;
-        r->cfDelete(&(r->nNULL),r);
-        if (r->cfKillChar!=NULL) r->cfKillChar(r);
+        n_Delete(&(r->nNULL),r);
+        assume (r->cfKillChar!=NULL); r->cfKillChar(r); // STATISTIC(nKillChar);
         omFreeSize((void *)r, sizeof(n_Procs_s));
         r=NULL;
       }

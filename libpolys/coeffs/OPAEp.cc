@@ -315,7 +315,7 @@ BOOLEAN n_pAEInitChar(coeffs r, void *p)
 
     r->ch=c;
     r->cfKillChar=NULL;
-    r->nCoeffIsEqual=ndCoeffIsEqual;
+    //r->nCoeffIsEqual=ndCoeffIsEqual;
     r->cfMult  = nAEpMult;
     r->cfSub   = nAEpSub;
     r->cfAdd   = nAEpAdd;
