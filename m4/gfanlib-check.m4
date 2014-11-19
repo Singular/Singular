@@ -5,19 +5,18 @@ AC_DEFUN([SING_CHECK_GFANLIB],
 
 AC_ARG_ENABLE(gfanlib,
 AS_HELP_STRING([--enable-gfanlib], [Enables gfanlib, a package for basic convex geometry]),
-[ENABLE_GFANLIB="yes"],
-[ENABLE_GFANLIB="no"])
+[ENABLE_GFANLIB="$enableval"],
+[ENABLE_GFANLIB=""])
 
-AC_MSG_CHECKING(whether to build with gfanlib)
+AC_MSG_CHECKING(whether to check for gfanlib)
 
-if test "x$ENABLE_GFANLIB" = xyes; then
- AC_MSG_RESULT(yes)
+if test "x$ENABLE_GFANLIB" != "xno"; then
+ AC_MSG_RESULT([yes])
 
  AC_CHECK_HEADERS([setoper.h cdd/setoper.h cddlib/setoper.h])
 
- if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no -a "$ac_cv_header_cddlib_setoper_h" == no
- then
-	AC_MSG_WARN([Error, setoper.h is missing!]) 
+ if test "x$ac_cv_header_setoper_h" = xno -a "x$ac_cv_header_cdd_setoper_h" = xno -a "x$ac_cv_header_cddlib_setoper_h" = xno; then
+   AC_MSG_WARN([Note that setoper.h is missing!]) 
  fi
 
  AC_MSG_CHECKING([whether libcddgmp is usable])
@@ -54,18 +53,23 @@ if test "x$ENABLE_GFANLIB" = xyes; then
 
  LIBS=$BACKUP_LIBS
 
+ if test "x$PASSED_ALL_TESTS_FOR_GFANLIB" = x1; then
+  AC_MSG_RESULT([yes])
+  AC_SUBST(CDDGMPLDFLAGS) 
+  AC_SUBST(CDDGMPCPPFLAGS)
+ else 
+  AC_MSG_RESULT([no])
+  if test "x$ENABLE_GFANLIB" = "xyes"; then 
+   AC_MSG_ERROR([Error, could not use libcddgmp])
+  fi
+ fi 
 else
+ AC_MSG_RESULT(no) 
  PASSED_ALL_TESTS_FOR_GFANLIB="0"
 fi
 
- if test "x$PASSED_ALL_TESTS_FOR_GFANLIB" = x1; then  
-  AC_MSG_RESULT(yes)
-  AC_SUBST(CDDGMPLDFLAGS) 
-  AC_SUBST(CDDGMPCPPFLAGS) 
- else
-  AC_MSG_RESULT(no) 
- fi
 
+  
 AM_CONDITIONAL(HAVE_GFANLIB, test "x$PASSED_ALL_TESTS_FOR_GFANLIB" = x1)
 AC_DEFINE_UNQUOTED(HAVE_GFANLIB, ${PASSED_ALL_TESTS_FOR_GFANLIB}, [whether gfanlib support is enabled])
 
