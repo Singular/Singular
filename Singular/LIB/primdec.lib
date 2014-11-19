@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version primdec.lib 4.0.0.0 Jun_2013 "; // $Id: 1bad4a2764566ebfbaf7d41ebe176d76cd8ca463 $
+version="version primdec.lib 4.0.1.1 Nov_2014 "; // $Id: ab9989ce2525a1c82cb5f48ff29fc3f34a3b1941 $
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -422,6 +422,7 @@ proc primaryTest (ideal i, poly p)
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   ASSUME(0, hasGlobalOrdering(basering) ) ;
+  if(i[1]==1){return(ideal(1));}
   int m=1;
   int n=nvars(basering);
   int e,f;
@@ -522,7 +523,7 @@ proc gcdTest(ideal act)
   {
     return(0);
   }
-  for (i=1;i<=size(act)-1;i++)
+  for (i=1;i<size(act);i++)
   {
     for(j=i+1;j<=size(act);j++)
     {
@@ -545,7 +546,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
   list keepresult,act,keepprime;
   poly @f;
   int sl=size(l);
-  for(i=1;i<=sl div 2;i++)
+  for(i=sl div 2;i>=1;i--)
   {
     if(sact[2][i]>1)
     {
@@ -1434,7 +1435,7 @@ proc zeroSp(ideal i)
   //avoid factorization of the same polynomial
   for(j=2;j<=size(F);j++)
   {
-    for(k=1;k<=j-1;k++)
+    for(k=1;k<j;k++)
     {
       ti=F[k];
       te=subst(ti,var(k),var(j));
@@ -2014,7 +2015,7 @@ EXAMPLE: example minAssPrimes; shows an example
         ndim=dim(@pr[j]);
         if(ndim>odim)
         {
-           for(k=count;k<=j-1;k++)
+           for(k=count;k<j;k++)
            {
               pos[k]=1;
            }
@@ -3136,8 +3137,8 @@ EXAMPLE: example decomp; shows an example
 
   if(homo==1)
   {
-    if((ordstr(@P)[3]=="d")||(ordstr(@P)[1]=="d")||(ordstr(@P)[1]=="w")
-       ||(ordstr(@P)[3]=="w"))
+    if(((ordstr(@P)[3]=="d")||(ordstr(@P)[1]=="d")||(ordstr(@P)[1]=="w")
+       ||(ordstr(@P)[3]=="w"))&&(size(ringlist(@P)[3])==2))
     {
       ideal jwork=imap(@P,tras);
       attrib(jwork,"isSB",1);
@@ -3185,14 +3186,7 @@ EXAMPLE: example decomp; shows an example
       execute("map phi=gnir,"+@va+";");
       op=option(get);
       option(redSB);
-      if(homo==1)
-      {
-        ideal @j=std(phi(@j),@hilb,@w);
-      }
-      else
-      {
-        ideal @j=groebner(phi(@j));
-      }
+      ideal @j=groebner(phi(@j));
       ideal ser=phi(ser);
 
       option(set,op);
@@ -3200,6 +3194,7 @@ EXAMPLE: example decomp; shows an example
     if((deg(@j[1])==0)||(dim(@j)<jdim))
     {
       setring gnir;
+      kill gnir1;
       break;
     }
     for (lauf=1;lauf<=size(@j);lauf++)
@@ -4426,9 +4421,9 @@ static proc min_ass_prim_charsets1 (ideal PS)
   list ITPHI;  // their initial terms
   for(i=nrows(m);i>=1; i--)
   {
-    PHI[i]=ideal(m[i,1..ncols(m)]);
+    PHI[i]=simplify(ideal(m[i,1..ncols(m)]),2);
     I=0;
-    for(j=size(PHI[i]);j>0;j=j-1)
+    for(j=ncols(PHI[i]);j>0;j--)
     {
       I=I,ini_mod(PHI[i][j]);
     }
@@ -4853,7 +4848,7 @@ static proc pseudo_prim_dec_special_charsets (ideal SI,list V6, int choo)
           {
             m=minAssPrimes(SP,1);
           }
-          for(j=size(m);j>=1;j=j-1)
+          for(j=size(m);j>=1;j--)
             {
               m[j]=std(m[j]);
             }
@@ -5309,7 +5304,7 @@ static proc reconvList(list l)
 {
    int i;
    list re;
-   for(i=1;i<=size(l);i++)
+   for(i=size(l);i>0;i--)
    {
       re[2*i-1]=l[i][1];
       re[2*i]=l[i][2];
@@ -6774,7 +6769,6 @@ EXAMPLE: example testPrimary; shows an example
 {
    ASSUME(0, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
-   ASSUME(0, hasGlobalOrdering(basering) ) ;
 
    int i;
    pr=reconvList(pr);
@@ -8664,6 +8658,7 @@ EXAMPLE: example newZero_decomp; shows an example
       {
         helpprim=@lh[2];
         lres0[1]=primary[2*@k-1];
+        attrib(lres0[1],"isSB",1);
         ser1=psi(helpprim);
         lres0[2]=psi1(ser1);
         if(size(reduce(lres0[2],lres0[1],1))==0)
