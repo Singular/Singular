@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version primdec.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version primdec.lib 4.0.1.1 Nov_2014 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -4421,7 +4421,7 @@ static proc min_ass_prim_charsets1 (ideal PS)
   list ITPHI;  // their initial terms
   for(i=nrows(m);i>=1; i--)
   {
-    PHI[i]=ideal(m[i,1..ncols(m)]);
+    PHI[i]=simplify(ideal(m[i,1..ncols(m)]),2);
     I=0;
     for(j=ncols(PHI[i]);j>0;j--)
     {
