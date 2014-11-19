@@ -221,7 +221,7 @@ static BOOLEAN ipPrint_CRING(leftv u)
     else                     PrintS("ring (with zero-divisors): ");
   }
   else PrintS("field: ");
-  PrintS(r->cfCoeffName(r));
+  PrintS(nCoeffName(r));
   return FALSE;
 }
 #endif

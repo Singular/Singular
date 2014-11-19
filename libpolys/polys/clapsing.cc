@@ -1629,11 +1629,11 @@ number singclap_det_bi( bigintmat * m, const coeffs cf)
   {
     for(j=m->cols();j>0;j--)
     {
-      M(i,j)=cf->convSingNFactoryN(BIMATELEM(*m,i,j),setchar,cf);
+      M(i,j)=n_convSingNFactoryN(BIMATELEM(*m,i,j),setchar,cf);
       setchar=FALSE;
     }
   }
-  number res= cf->convFactoryNSingN( determinant(M,m->rows()),cf ) ;
+  number res=n_convFactoryNSingN( determinant(M,m->rows()),cf ) ;
   return res;
 }
 

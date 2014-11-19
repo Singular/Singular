@@ -1802,7 +1802,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     xx=(number *)omAlloc(rl*sizeof(number));
     if (nMap==NULL)
     {
-      Werror("not implemented: map bigint -> %s",cf->cfCoeffString(cf));
+      Werror("not implemented: map bigint -> %s", nCoeffString(cf));
       return TRUE;
     }
     for(i=rl-1;i>=0;i--)
@@ -2341,8 +2341,8 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
   return TRUE;
 err_fetch:
   Werror("no identity map from %s (%s -> %s)",u->Fullname(),
-    r->cf->cfCoeffString(r->cf),
-    currRing->cf->cfCoeffString(currRing->cf));
+         nCoeffString(r->cf),
+         nCoeffString(currRing->cf));
   return TRUE;
 }
 static BOOLEAN jjFIND2(leftv res, leftv u, leftv v)
@@ -3752,7 +3752,7 @@ static BOOLEAN jjBI2N(leftv res, leftv u)
     res->data=nMap(n,coeffs_BIGINT,currRing->cf);
   else
   {
-    Werror("cannot convert bigint to cring %s",currRing->cf->cfCoeffString(currRing->cf));
+    Werror("cannot convert bigint to cring %s", nCoeffString(currRing->cf));
     bo=TRUE;
   }
   n_Delete(&n,coeffs_BIGINT);
@@ -6270,7 +6270,7 @@ static BOOLEAN jjRANDOM_CF(leftv res, leftv u, leftv v, leftv w)
   coeffs cf=(coeffs)u->Data();
   if ((cf!=NULL) && (cf->cfRandom!=NULL))
   {
-    number n=cf->cfRandom(siRand,(number)v->Data(),(number)w->Data(),cf);
+    number n= n_Random(siRand,(number)v->Data(),(number)w->Data(),cf);
     number2 nn=(number2)omAlloc(sizeof(*nn));
     nn->cf=cf;
     nn->n=n;

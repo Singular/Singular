@@ -8,7 +8,7 @@
 static inline number n_Copy(number n, const ring r){ return n_Copy(n, r->cf); }
 static inline void n_Delete(number* p, const ring r){ n_Delete(p, r->cf); }
 static inline BOOLEAN n_Equal(number a, number b, const ring r){ return n_Equal(a, b, r->cf); }
-static inline nMapFunc n_SetMap(const ring src, const ring dst){ return dst->cf->cfSetMap(src->cf,dst->cf); }
+static inline nMapFunc n_SetMap(const ring src, const ring dst){ return n_SetMap(src->cf,dst->cf); }
 static inline int n_GetChar(const ring r){ return n_GetChar(r->cf); }
 
 // static inline BOOLEAN n_Test(number n, const char *filename, const int linenumber, const ring r){ return n_DBTest( n, filename, linenumber, r->cf); }
