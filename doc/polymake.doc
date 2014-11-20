@@ -69,6 +69,8 @@ All functions are to be called with a preceding ``Polymake::''.
 * nLatticePoints::
 * normalFan(polymake)::
 * visual::
+* vertexAdjacencyGraph::
+* vertexEdgeGraph::
 @end menu
 @c --------------------------------------------------------------------------------
 @node boundaryLatticePoints,ehrhartPolynomialCoeff,,polymake_so
@@ -976,6 +978,8 @@ via an edge of p.
   list L = Polymake::vertexAdjacencyGraph(p);
   L;
 @c example
+@end smallexample
+@end table
 @c --------------------------------------------------------------------------------
 @node vertexEdgeGraph,visual,vertexAdjacencyGraph,polymake_so
 @subsubsection vertexEdgeGraph
@@ -998,6 +1002,8 @@ each intvec represents an edge of p connecting vertex i with vertex j.
   list L = Polymake::vertexEdgeGraph(p);
   L;
 @c example
+@end smallexample
+@end table
 @c --------------------------------------------------------------------------------
 @node visual,,vertexEdgeGraph,polymake_so
 @subsubsection visual

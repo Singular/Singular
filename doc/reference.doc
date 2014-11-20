@@ -310,7 +310,6 @@ value of type int is the multiplicity (see @ref{mult})
 @end table
 @c ref
 See
-@ref{Expressions};
 @ref{killattrib}.
 @c ref
 @c ---------------------------------------
