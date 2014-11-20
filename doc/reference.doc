@@ -308,11 +308,11 @@ value of type int is the dimension (see @ref{dim})
 value of type int is the multiplicity (see @ref{mult})
 @end table
 @end table
-@c @c ref
-@c See
-@c @ref{Expressions};
-@c @ref{killattrib}.
-@c @c ref
+@c ref
+See
+@ref{Expressions};
+@ref{killattrib}.
+@c ref
 @c ---------------------------------------
 @node bareiss, betti, attrib, Functions
 @subsection bareiss
