@@ -1112,7 +1112,7 @@ void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
 * computes the normal ecart;
 * used in mora case and if pLexOrder & sugar in bba case
 */
-void initEcartNormal (LObject* h)
+void initEcartNormal (TObject* h)
 {
   h->FDeg = h->pFDeg();
   h->ecart = h->pLDeg() - h->FDeg;
@@ -1120,7 +1120,7 @@ void initEcartNormal (LObject* h)
   h->length=h->pLength=pLength(h->p);
 }
 
-void initEcartBBA (LObject* h)
+void initEcartBBA (TObject* h)
 {
   h->FDeg = h->pFDeg();
   (*h).ecart = 0;

@@ -2367,7 +2367,8 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
 
   if ((w !=NULL)&&(*w!=NULL) &&(del>0))
   {
-    intvec *wtmp=new intvec((*w)->length()-del);
+    int nl=si_max((*w)->length()-del,1);
+    intvec *wtmp=new intvec(nl);
     for(i=0;i<res->rank;i++) (*wtmp)[i]=(**w)[i];
     delete *w;
     *w=wtmp;

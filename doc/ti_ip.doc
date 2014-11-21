@@ -58,7 +58,7 @@ I= ( x^v(i)+ - x^v(i)- | i=1,@dots{},r ).
 @end ifinfo
 
 The required lattice basis can be computed using the LLL-algorithm
-(@ref{lll_lib},
+(@ref{system},
 see @pxref{[Coh93]}). For the computation of the saturation, there are various
 possibilities described in the
 @tex
@@ -149,7 +149,7 @@ for the integer kernel of $A$
 @ifinfo
 v(1),@dots{},v(r) for the integer kernel of A
 @end ifinfo
-using the LLL-algorithm (@ref{lll_lib}).
+using the LLL-algorithm (@ref{system}).
 The ideal corresponding to the lattice basis vectors
 @tex
 $$ I_1=<x^{v_i^+}-x^{v_i^-}|i=1,\ldots,r> $$
@@ -212,7 +212,7 @@ with positive coefficients in its row space. This is a real restriction,
 i.e., the algorithm will not necessarily work in the general case.
 
 A lattice basis v(1),@dots{},v(r) is again computed via the
-LLL-algorithm (@ref{lll_lib}).
+LLL-algorithm (@ref{system}).
 The saturation step is performed in the following way:
 First note that w induces a positive grading w.r.t.@: which the ideal @*
 @display
