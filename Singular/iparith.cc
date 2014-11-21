@@ -107,14 +107,8 @@ ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
   #include <kernel/GBEngine/nc.h>
   #include <polys/nc/nc.h>
   #include <polys/nc/sca.h>
-  #define ALLOW_PLURAL     1
-  #define NO_PLURAL        0
-  #define COMM_PLURAL      2
   #define  PLURAL_MASK 3
 #else /* HAVE_PLURAL */
-  #define ALLOW_PLURAL     0
-  #define NO_PLURAL        0
-  #define COMM_PLURAL      0
   #define  PLURAL_MASK     0
 #endif /* HAVE_PLURAL */
 
@@ -125,6 +119,9 @@ ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
   #define RING_MASK        0
   #define ZERODIVISOR_MASK 0
 #endif
+#define ALLOW_PLURAL     1
+#define NO_PLURAL        0
+#define COMM_PLURAL      2
 #define ALLOW_RING       4
 #define NO_RING          0
 #define NO_ZERODIVISOR   8
@@ -7791,6 +7788,14 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
         {
           if (check_valid(dA2[i].valid_for,op)) break;
         }
+        else
+        {
+          if (RingDependend(dA2[i].res))
+          {
+            WerrorS("no ring active");
+            break;
+          }
+        }
         if (traceit&TRACE_CALL)
           Print("call %s(%s,%s)\n",iiTwoOps(op),Tok2Cmdname(at),Tok2Cmdname(bt));
         if ((call_failed=dA2[i].p(res,a,b)))
@@ -7824,6 +7829,14 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
             if (currRing!=NULL)
             {
               if (check_valid(dA2[i].valid_for,op)) break;
+            }
+            else
+            {
+              if (RingDependend(dA2[i].res))
+              {
+                WerrorS("no ring active");
+                break;
+              }
             }
             if (traceit&TRACE_CALL)
               Print("call %s(%s,%s)\n",iiTwoOps(op),
@@ -8002,6 +8015,14 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dA1, int at
         {
           if (check_valid(dA1[i].valid_for,op)) break;
         }
+        else
+        {
+          if (RingDependend(dA1[i].res))
+          {
+            WerrorS("no ring active");
+            break;
+          }
+        }
         if (traceit&TRACE_CALL)
           Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(at));
         res->rtyp=dA1[i].res;
@@ -8034,6 +8055,14 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dA1, int at
           if (currRing!=NULL)
           {
             if (check_valid(dA1[i].valid_for,op)) break;
+          }
+          else
+          {
+            if (RingDependend(dA1[i].res))
+            {
+              WerrorS("no ring active");
+              break;
+            }
           }
           if (traceit&TRACE_CALL)
             Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(dA1[i].arg));

@@ -20,6 +20,8 @@
 #include "grammar.h"
 #include "tok.h"
 
+inline int RingDependend(int t) { return (BEGIN_RING<t)&&(t<END_RING); }
+
 // to produce convert_table.texi for doc:
 int produce_convert_table=0;
 
@@ -347,6 +349,10 @@ void ttGen1()
           s,
           Tok2Cmdname(dArith1[i].arg),
           Tok2Cmdname(dArith1[i].res));
+    if (RingDependend(dArith1[i].res) && (!RingDependend(dArith1[i].arg)))
+    {
+      fprintf(outfile,"// WARNING: %s requires currRing\n",s);
+    }
     i++;
   }
   fprintf(outfile,"/*---------------------------------------------*/\n");
@@ -361,6 +367,12 @@ void ttGen1()
           Tok2Cmdname(dArith2[i].arg1),
           Tok2Cmdname(dArith2[i].arg2),
           Tok2Cmdname(dArith2[i].res));
+    if (RingDependend(dArith2[i].res)
+       && (!RingDependend(dArith2[i].arg1))
+       && (!RingDependend(dArith2[i].arg2)))
+    {
+      fprintf(outfile,"// WARNING: %s requires currRing\n",s);
+    }
     i++;
   }
   fprintf(outfile,"/*---------------------------------------------*/\n");
@@ -376,6 +388,13 @@ void ttGen1()
           Tok2Cmdname(dArith3[i].arg2),
           Tok2Cmdname(dArith3[i].arg3),
           Tok2Cmdname(dArith3[i].res));
+    if (RingDependend(dArith3[i].res)
+       && (!RingDependend(dArith3[i].arg1))
+       && (!RingDependend(dArith3[i].arg2))
+       && (!RingDependend(dArith3[i].arg3)))
+    {
+      fprintf(outfile,"// WARNING: %s requires currRing\n",s);
+    }
     i++;
   }
   fprintf(outfile,"/*---------------------------------------------*/\n");
