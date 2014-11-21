@@ -4,8 +4,6 @@
 
 gfan::ZFan* tropicalVariety(const tropicalStrategy currentStrategy)
 {
-  ideal I = currentStrategy.getStartingIdeal();
-  ring r = currentStrategy.getStartingRing();
   groebnerCone startingCone = tropicalStartingCone(currentStrategy);
   groebnerCones tropicalVariety = tropicalTraversal(startingCone);
   return toFanStar(tropicalVariety);

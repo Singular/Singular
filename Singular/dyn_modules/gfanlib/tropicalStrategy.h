@@ -12,6 +12,14 @@
 #include <initial.h>
 #include <witness.h>
 
+#ifndef NDEBUG
+
+#include <Singular/ipshell.h> // for isPrime(int i)
+#include <adjustWeights.h>
+#include <ppinitialReduction.h>
+
+#endif
+
 /** \file
  * implementation of the class tropicalStrategy
  *
@@ -108,7 +116,6 @@ private:
   int findPositionOfUniformizingBinomial(const ideal I, const ring r) const;
   void putUniformizingBinomialInFront(ideal I, const ring r, const number q) const;
 
-
 public:
 
   /**
@@ -124,6 +131,14 @@ public:
    * copy constructor
    */
   tropicalStrategy(const tropicalStrategy& currentStrategy);
+
+
+#ifndef NDEBUG
+  tropicalStrategy();
+
+  static tropicalStrategy debugStrategy(const ideal startIdeal, number unifParameter, ring startRing);
+#endif
+
   /**
    * destructor
    */
@@ -316,5 +331,10 @@ public:
 };
 
 int dim(ideal I, ring r);
+
+#ifndef NDEBUG
+BOOLEAN getWitnessDebug(leftv res, leftv args);
+BOOLEAN getFlipDebug(leftv res, leftv args);
+#endif
 
 #endif

@@ -3,6 +3,16 @@
 
 #include <libpolys/polys/monomials/p_polys.h>
 
+/* #ifndef NDEBUG */
+/* void z_Write(number p, ring r) */
+/* { */
+/*   poly g = p_One(r); */
+/*   p_SetCoeff(g,p,r); */
+/*   p_Write(g,r); */
+/*   return; */
+/* } */
+/* #endif */
+
 static inline BOOLEAN _p_LeadmonomDivisibleByNoComp(poly a, poly b, const ring r)
 {
   int i=r->VarL_Size - 1;
@@ -46,6 +56,9 @@ static inline BOOLEAN _p_LeadmonomDivisibleByNoComp(poly a, poly b, const ring r
   return TRUE;
 }
 
+/**
+ * p_LmDivisibleBy checks also the divisibility of coefficients
+ **/
 static inline BOOLEAN p_LeadmonomDivisibleBy(poly a, poly b, const ring r)
 {
   p_LmCheckPolyRing1(b, r);
@@ -56,6 +69,9 @@ static inline BOOLEAN p_LeadmonomDivisibleBy(poly a, poly b, const ring r)
   return FALSE;
 }
 
+/**
+ * id_ShallowDelete deletes the monomials of the polynomials stored inside of it
+ **/
 inline void idShallowDelete (ideal *h)
 {
   if (*h != NULL)

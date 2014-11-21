@@ -170,11 +170,71 @@ BOOLEAN maximalGroebnerCone(leftv res, leftv args)
 }
 
 
+BOOLEAN initial(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == POLY_CMD) && (u->next == NULL))
+  {
+    leftv v = u->next;
+    if ((v !=NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
+    {
+      poly p = (poly) u->Data();
+      gfan::ZVector* weightVector;
+      if (v->Typ() == INTVEC_CMD)
+      {
+        intvec* w0 = (intvec*) v->Data();
+        bigintmat* w1 = iv2bim(w0,coeffs_BIGINT);
+        w1->inpTranspose();
+        weightVector = bigintmatToZVector(*w1);
+        delete w1;
+      }
+      else
+      {
+        bigintmat* w1 = (bigintmat*) v->Data();
+        weightVector = bigintmatToZVector(*w1);
+      }
+      res->rtyp = IDEAL_CMD;
+      res->data = (void*) initial(p, currRing, *weightVector);
+      delete weightVector;
+      return FALSE;
+    }
+  }
+  if ((u != NULL) && (u->Typ() == IDEAL_CMD) && (u->next == NULL))
+  {
+    leftv v = u->next;
+    if ((v !=NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
+    {
+      ideal I = (ideal) u->Data();
+      gfan::ZVector* weightVector;
+      if (v->Typ() == INTVEC_CMD)
+      {
+        intvec* w0 = (intvec*) v->Data();
+        bigintmat* w1 = iv2bim(w0,coeffs_BIGINT);
+        w1->inpTranspose();
+        weightVector = bigintmatToZVector(*w1);
+        delete w1;
+      }
+      else
+      {
+        bigintmat* w1 = (bigintmat*) v->Data();
+        weightVector = bigintmatToZVector(*w1);
+      }
+      res->rtyp = POLY_CMD;
+      res->data = (void*) initial(I, currRing, *weightVector);
+      delete weightVector;
+      return FALSE;
+    }
+  }
+  WerrorS("initial: unexpected parameters");
+  return TRUE;
+}
+
+
 void tropical_setup(SModulFunctions* p)
 {
   p->iiAddCproc("","groebnerCone",FALSE,groebnerCone);
   p->iiAddCproc("","maximalGroebnerCone",FALSE,maximalGroebnerCone);
-  // p->iiAddCproc("","initial",FALSE,initial);
+  p->iiAddCproc("","initial",FALSE,initial);
   // p->iiAddCproc("","tropicalNeighbours",FALSE,tropicalNeighbours);
 #ifndef NDEBUG
   // p->iiAddCproc("","initial0",FALSE,initial0);
@@ -182,7 +242,8 @@ void tropical_setup(SModulFunctions* p)
   // p->iiAddCproc("","ppreduceInitially0",FALSE,ppreduceInitially0);
   // p->iiAddCproc("","ppreduceInitially1",FALSE,ppreduceInitially1);
   // p->iiAddCproc("","ppreduceInitially2",FALSE,ppreduceInitially2);
-  // p->iiAddCproc("","ppreduceInitially3",FALSE,ppreduceInitially3);
+  p->iiAddCproc("","ptNormalize",FALSE,ptNormalize);
+  p->iiAddCproc("","ppreduceInitially3",FALSE,ppreduceInitially3);
   // p->iiAddCproc("","ppreduceInitially4",FALSE,ppreduceInitially4);
   // p->iiAddCproc("","ttpReduce",FALSE,ttpReduce);
   // p->iiAddCproc("","ttreduceInitially0",FALSE,ttreduceInitially0);
@@ -197,6 +258,9 @@ void tropical_setup(SModulFunctions* p)
   // p->iiAddCproc("","tropicalVariety01",FALSE,tropicalVariety01);
   // p->iiAddCproc("","tropicalCurve0",FALSE,tropicalCurve0);
   // p->iiAddCproc("","tropicalCurve1",FALSE,tropicalCurve1);
+  p->iiAddCproc("","reduceInitiallyDebug",FALSE,reduceInitiallyDebug);
+  p->iiAddCproc("","getWitnessDebug",FALSE,getWitnessDebug);
+  p->iiAddCproc("","getFlipDebug",FALSE,getFlipDebug);
   p->iiAddCproc("","tropicalStartingPoint",FALSE,tropicalStartingPoint);
   p->iiAddCproc("","positiveTropicalStartingPoint",FALSE,positiveTropicalStartingPoint);
   p->iiAddCproc("","nonNegativeTropicalStartingPoint",FALSE,nonNegativeTropicalStartingPoint);

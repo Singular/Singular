@@ -194,6 +194,7 @@ void initial(ideal* IStar, const ring r, const gfan::ZVector w, const gfan::ZMat
   return;
 }
 
+
 /***
  * throwaway code
  **/
@@ -339,25 +340,4 @@ void initial(ideal* IStar, const ring r, const gfan::ZVector w, const gfan::ZMat
 //   for (int i=0; i<k; i++)
 //     inI->m[i] = initial(I->m[i],r);
 //   return inI;
-// }
-
-// BOOLEAN initial(leftv res, leftv args)
-// {
-//   leftv u = args;
-//   if ((u != NULL) && (u->Typ() == POLY_CMD) && (u->next == NULL))
-//   {
-//     poly p = (poly) u->Data();
-//     res->rtyp = POLY_CMD;
-//     res->data = (void*) initial(p, currRing);
-//     return FALSE;
-//   }
-//   if ((u != NULL) && (u->Typ() == IDEAL_CMD) && (u->next == NULL))
-//   {
-//     ideal I = (ideal) u->Data();
-//     res->rtyp = IDEAL_CMD;
-//     res->data = (void*) initial(I, currRing);
-//     return FALSE;
-//   }
-//   WerrorS("initial: unexpected parameters");
-//   return TRUE;
 // }

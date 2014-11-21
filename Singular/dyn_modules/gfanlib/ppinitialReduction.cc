@@ -1,17 +1,15 @@
-#include <kernel/polys.h>
+#include <libpolys/polys/monomials/p_polys.h>
 #include <Singular/ipid.h>
 
-#include <libpolys/polys/monomials/p_polys.h>
 #include <singularWishlist.h>
-#include <tropicalStrategy.h>
+#include <ppinitialReduction.h>
 
 #include <map>
 #include <set>
-#include <iostream>
 #include <exception>
 
-#include <ppinitialReduction.h>
 
+#ifndef NDEBUG
 bool isOrderingLocalInT(const ring r)
 {
   poly one = p_One(r);
@@ -22,6 +20,32 @@ bool isOrderingLocalInT(const ring r)
   p_Delete(&one,r);
   p_Delete(&t,r);
   return (s==1);
+}
+#endif
+
+void divideByCommonGcd(poly &g, const ring r)
+{
+  number commonGcd = n_Copy(p_GetCoeff(g,r),r->cf);
+  for (poly gCache=pNext(g); gCache; pIter(gCache))
+  {
+    number commonGcdCache = n_Gcd(commonGcd,p_GetCoeff(gCache,r),r->cf);
+    n_Delete(&commonGcd,r->cf);
+    commonGcd = commonGcdCache;
+    if (n_IsOne(commonGcd,r->cf))
+    {
+      n_Delete(&commonGcd,r->cf);
+      return;
+    }
+  }
+  for (poly gCache=g; gCache; pIter(gCache))
+  {
+    number oldCoeff = p_GetCoeff(gCache,r);
+    number newCoeff = n_Div(oldCoeff,commonGcd,r->cf);
+    p_SetCoeff(gCache,newCoeff,r);
+  }
+  p_Test(g,r);
+  n_Delete(&commonGcd,r->cf);
+  return;
 }
 
 /***
@@ -92,6 +116,7 @@ void pReduce(poly &g, const number p, const ring r)
     }
   }
   p_Test(g,r);
+  divideByCommonGcd(g,r);
   return;
 }
 
@@ -147,6 +172,30 @@ void ptNormalize(ideal I, const number p, const ring r)
 }
 
 #ifndef NDEBUG
+BOOLEAN ptNormalize(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if ((v!=NULL) && (v->Typ()==NUMBER_CMD))
+    {
+      omUpdateInfo();
+      Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+      ideal I = (ideal) u->CopyD();
+      number p = (number) v->CopyD();
+      ptNormalize(I,p,currRing);
+      n_Delete(&p,currRing->cf);
+      res->rtyp = IDEAL_CMD;
+      res->data = (char*) I;
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
+#endif //NDEBUG
+
+#ifndef NDEBUG
 BOOLEAN pppReduce(leftv res, leftv args)
 {
   leftv u = args;
@@ -171,7 +220,7 @@ BOOLEAN pppReduce(leftv res, leftv args)
 }
 #endif //NDEBUG
 
-void pReduce0(ideal &I, const number p, const ring r)
+void pReduce(ideal &I, const number p, const ring r)
 {
   int k = idSize(I);
   for (int i=0; i<k; i++)
@@ -187,12 +236,12 @@ void pReduce0(ideal &I, const number p, const ring r)
 }
 
 
-/***
+/**
  * reduces h initially with respect to g,
  * returns false if h was initially reduced in the first place,
  * returns true if reductions have taken place.
  * assumes that h and g are in pReduced form and homogeneous in x of the same degree
- **/
+ */
 bool ppreduceInitially(poly* hStar, const poly g, const ring r)
 {
   poly h = *hStar;
@@ -376,7 +425,12 @@ int ppreduceInitially(ideal I, const number p, const poly g, const ring r)
       pReduce(I->m[j],p,r);
   for (int k=j+1; k<n; k++)
     if (ppreduceInitially(&I->m[k], I->m[j], r))
+    {
       pReduce(I->m[k],p,r);
+      for (int l=j+1; l<k; l++)
+        if (ppreduceInitially(&I->m[k], I->m[l], r))
+          pReduce(I->m[k],p,r);
+    }
 
   /***
    * the second pass. removing terms divisible by lt(g_j) and lt(g_k) out of g_i for i<j<k
@@ -386,9 +440,10 @@ int ppreduceInitially(ideal I, const number p, const poly g, const ring r)
     for (int k=j; k<n; k++)
       if (ppreduceInitially(&I->m[i], I->m[k], r))
         pReduce(I->m[i],p,r);
-  for (int k=j+1; k<n; k++)
-    if (ppreduceInitially(&I->m[j], I->m[k], r))
-      pReduce(I->m[j],p,r);
+  for (int k=j; k<n-1; k++)
+    for (int l=k+1; l<n; l++)
+      if (ppreduceInitially(&I->m[k], I->m[l], r))
+        pReduce(I->m[j],p,r);
 
   /***
    * removes the elements of I which have been reduced to 0 in the previous two passes
@@ -532,7 +587,7 @@ bool ppreduceInitially(ideal &H, const number p, const ideal G, const ring r)
    *   term j and subsequent terms need to be checked for reduction.
    *   T is sorted by the ordering on the temrs the pairs correspond to.
    **/
-  int m=idSize(H),n=0;
+  int m=idSize(H);
   ideal I = idInit(m);
   std::vector<mark> T;
   for (int i=0; i<m; i++)
@@ -550,17 +605,10 @@ bool ppreduceInitially(ideal &H, const number p, const ideal G, const ring r)
   while (T.size()>0)
   {
     sortMarks(I,r,T);
-    std::cout << "T.size()=" << T.size() << std::endl;
-    std::cout << "T[0] = (" << T[0].first << "," << T[0].second << ")" << std::endl;
     int i=0; for (; i<k; i++)
       if (p_LeadmonomDivisibleBy(G->m[i],getTerm(I,T[0]),r)) break;
     if (i<k)
     {
-      if (T[0].first==10 && T[0].second==3)
-      {
-        std::cout << "check this" << std::endl;
-      }
-      std::cout << "reducing" << std::endl;
       poly g = p_One(r); poly h0 = getTerm(I,T[0]);
       assume(h0!=NULL);
       for (int j=2; j<=r->N; j++)
@@ -614,15 +662,6 @@ BOOLEAN ppreduceInitially3(leftv res, leftv args)
         p = (number) v->CopyD();
         G = (ideal) w->CopyD();
         (void) ppreduceInitially(H,p,G,currRing);
-        id_Delete(&H,currRing);
-        id_Delete(&G,currRing);
-        n_Delete(&p,currRing->cf);
-        omUpdateInfo();
-        Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
-        H = (ideal) u->CopyD();
-        p = (number) v->CopyD();
-        G = (ideal) w->CopyD();
-        (void) ppreduceInitially(H,p,G,currRing);
         n_Delete(&p,currRing->cf);
         id_Delete(&G,currRing);
         res->rtyp = IDEAL_CMD;
@@ -634,47 +673,6 @@ BOOLEAN ppreduceInitially3(leftv res, leftv args)
   return TRUE;
 }
 #endif //NDEBUG
-
-
-static std::vector<int> synchronize(const ideal I, const ideal Hi)
-{
-  int k = idSize(I);
-  int l = idSize(Hi);
-  std::vector<int> synch(k);
-  int j;
-  for (int i=0; i<k; i++)
-  {
-    for (j=0; j<l; j++)
-    {
-      if (I->m[i]==Hi->m[j])
-      {
-        synch[i] = j;
-        break;
-      }
-    }
-    if (j==l)
-      synch[i] = -1;
-  }
-  return synch;
-}
-
-static void synchronize(ideal I, const ideal Hi, const std::vector<int> synch)
-{
-  for (unsigned i=0; i<synch.size(); i++)
-    if (synch[i]>=0)
-    {
-      I->m[i] = Hi->m[synch[i]];
-      std::cout << i << " -> " << synch[i] << std::endl;
-    }
-}
-
-void z_Write(number p, ring r)
-{
-  poly g = p_One(r);
-  p_SetCoeff(g,p,r);
-  p_Write(g,r);
-  return;
-}
 
 /**
  * reduces I initially with respect to itself.
@@ -707,16 +705,16 @@ bool ppreduceInitially(ideal I, const ring r, const number p)
   }
 
   std::map<long,ideal>::iterator it=H.begin();
-  it++;
   ideal Hi = it->second;
+  idShallowDelete(&Hi);
+  it++;
+  Hi = it->second;
 
   /***
    * Step 2: reduce each component initially with respect to itself
    *  and all lower components
    **/
-  // std::vector<int> synch = synchronize(I,Hi);
   if (ppreduceInitially(Hi,p,r)) return true;
-  // synchronize(I,Hi,synch);
   id_Test(Hi,r);
   id_Test(I,r);
 
@@ -762,47 +760,44 @@ bool ppreduceInitially(ideal I, const ring r, const number p)
         G->m[i] = Hi->m[kH++];
     }
     m += l; IDELEMS(GG) = m; GG->m = &G->m[n-m];
-    // std::vector<int> synch = synchronize(I,it->second);
     id_Test(it->second,r);
     id_Test(GG,r);
-    if (ppreduceInitially(it->second,p,r)) return true;
     if (ppreduceInitially(it->second,p,GG,r)) return true;
     id_Test(it->second,r);
     id_Test(GG,r);
-    // synchronize(I,it->second,synch);
     idShallowDelete(&Hi); Hi = it->second;
   }
   idShallowDelete(&Hi);
 
   ptNormalize(I,p,r);
-  omFreeBin((ADDRESS)GG, sip_sideal_bin); idShallowDelete(&G);
+  omFreeBin((ADDRESS)GG, sip_sideal_bin);
+  idShallowDelete(&G);
   return false;
 }
 
 
-// #ifndef NDEBUG
-// BOOLEAN ppreduceInitially4(leftv res, leftv args)
-// {
-//   leftv u = args;
-//   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-//   {
-//     ideal I;
-//     omUpdateInfo();
-//     Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-//     I = (ideal) u->CopyD();
-//     (void) ppreduceInitially(I,currRing);
-//     id_Delete(&I,currRing);
-//     omUpdateInfo();
-//     Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
-//     I = (ideal) u->CopyD();
-//     (void) ppreduceInitially(I,currRing);
-//     res->rtyp = IDEAL_CMD;
-//     res->data = (char*) I;
-//     return FALSE;
-//   }
-//   return TRUE;
-// }
-// #endif
+#ifndef NDEBUG
+BOOLEAN reduceInitiallyDebug(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if ((v != NULL) && (v->Typ() == NUMBER_CMD))
+    {
+      omUpdateInfo();
+      Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+      ideal I = (ideal) u->CopyD();
+      number p = (number) v->Data();
+      (void) ppreduceInitially(I,currRing,p);
+      res->rtyp = IDEAL_CMD;
+      res->data = (char*) I;
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
+#endif
 
 
 // BOOLEAN ppreduceInitially(leftv res, leftv args)

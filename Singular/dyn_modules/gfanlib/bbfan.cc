@@ -308,48 +308,42 @@ BOOLEAN ncones(leftv res, leftv args)
 {
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
-    {
-      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
-      int d = zf->getAmbientDimension();
-      int n = 0;
+  {
+    gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+    int d = zf->getAmbientDimension();
+    int n = 0;
 
-      for (int i=0; i<=d; i++)
-        n = n + zf->numberOfConesOfDimension(i,0,0);
+    for (int i=0; i<=d; i++)
+      n = n + zf->numberOfConesOfDimension(i,0,0);
 
-      res->rtyp = INT_CMD;
-      res->data = (void*) (long) n;
-      return FALSE;
-    }
-  else
-    {
-      WerrorS("check_compatibility: unexpected parameters");
-      return TRUE;
-    }
+    res->rtyp = INT_CMD;
+    res->data = (void*) (long) n;
+    return FALSE;
+  }
+  WerrorS("ncones: unexpected parameters");
+  return TRUE;
 }
 
 BOOLEAN nmaxcones(leftv res, leftv args)
 {
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
-    {
-      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+  {
+    gfan::ZFan* zf = (gfan::ZFan*)u->Data();
 
-      int n = 0;
-      for (int d=0; d<=zf->getAmbientDimension(); d++)
-        { n = n + zf->numberOfConesOfDimension(d,0,1); }
+    int n = 0;
+    for (int d=0; d<=zf->getAmbientDimension(); d++)
+      n = n + zf->numberOfConesOfDimension(d,0,1);
 
-      res->rtyp = INT_CMD;
-      res->data = (void*) (long) n;
-      return FALSE;
-    }
-  else
-    {
-      WerrorS("nmaxcones: unexpected parameters");
-      return TRUE;
-    }
+    res->rtyp = INT_CMD;
+    res->data = (void*) (long) n;
+    return FALSE;
+  }
+  WerrorS("nmaxcones: unexpected parameters");
+  return TRUE;
 }
 
-bool isCompatible(gfan::ZFan* zf, gfan::ZCone* zc)
+bool isCompatible(const gfan::ZFan* zf, const gfan::ZCone* zc)
 {
   bool b = (zf->getAmbientDimension() == zc->ambientDimension());
   if(b)
@@ -465,36 +459,43 @@ BOOLEAN containsInCollection(leftv res, leftv args)
       return TRUE;
     }
   }
-  // if ((u != NULL) && (u->Typ() == coneID))
-  // {
-  //   leftv v=u->next;
-  //   if ((v != NULL) && (v->Typ() == coneID))
-  //   {
-  //     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-  //     gfan::ZCone* zd = (gfan::ZCone*)v->Data();
-  //     res->rtyp = INT_CMD;
-  //     res->data = (void*) (int) hasFace(zc,zd);
-  //     return FALSE;
-  //   }
-  // }
   WerrorS("containsInCollection: unexpected parameters");
   return TRUE;
 }
 
-// BOOLEAN coneContaining(leftv res, leftv args)
-// {
-//   leftv u=args;
-//   if ((u != NULL) && (u->Typ() == fanID))
-//   {
-//     if ((v != NULL) && (v->Typ() == BIGINTMAT_CMD))
-//     {
-//       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
-//       bigintmat* vec = (bigintmat*)v->Data();
-//     }
-//   }
-//   WerrorS("coneContaining: unexpected parameters");
-//   return TRUE;
-// }
+BOOLEAN coneContaining(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == fanID))
+  {
+    leftv v=u->next;
+    if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
+    {
+      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+      gfan::ZVector* point;
+      if (v->Typ() == INTVEC_CMD)
+      {
+        intvec* w0 = (intvec*) v->Data();
+        bigintmat* w1 = iv2bim(w0,coeffs_BIGINT);
+        w1->inpTranspose();
+        point = bigintmatToZVector(*w1);
+        delete w1;
+      }
+      else
+      {
+        bigintmat* w1 = (bigintmat*) v->Data();
+        point = bigintmatToZVector(*w1);
+      }
+      lists L = (lists)omAllocBin(slists_bin);
+      res->rtyp = LIST_CMD;
+      res->data = (void*) L;
+      delete point;
+      return FALSE;
+    }
+  }
+  WerrorS("coneContaining: unexpected parameters");
+  return TRUE;
+}
 
 BOOLEAN removeCone(leftv res, leftv args)
 {

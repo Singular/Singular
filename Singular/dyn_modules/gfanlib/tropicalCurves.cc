@@ -129,7 +129,7 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
    * If the initial ideal is not monomial free, compute a witness for the monomial
    * and compute the common refinement with its tropical variety.
    * If all initial ideals are monomial free, then we have our tropical curve */
-  for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end(); zc++)
+  for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end();)
   {
     gfan::ZVector w = zc->getRelativeInteriorPoint();
     gfan::ZMatrix W = zc->generatorsOfSpan();
@@ -156,6 +156,8 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
       p_Delete(&gs,s);
       zc = C.begin();
     }
+    else
+      zc++;
     id_Delete(&inIs,s);
     id_Delete(&ininIs,s);
     rDelete(s);

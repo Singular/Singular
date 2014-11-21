@@ -89,16 +89,23 @@ BOOLEAN dwrDebug(leftv res, leftv args)
 BOOLEAN witnessDebug(leftv res, leftv args)
 {
   leftv u = args;
-  leftv v = u->next;
-  ideal inI = (ideal) u->CopyD();
-  ideal J = (ideal) v->CopyD();
-  omUpdateInfo();
-  Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-  ideal I = witness(inI,J,currRing);
-  id_Delete(&inI,currRing);
-  id_Delete(&J,currRing);
-  res->rtyp = IDEAL_CMD;
-  res->data = (char*) I;
-  return FALSE;
+  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if ((v!=NULL) && (v->Typ()==IDEAL_CMD))
+    {
+      omUpdateInfo();
+      Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+      ideal inI = (ideal) u->CopyD();
+      ideal J = (ideal) v->CopyD();
+      ideal I = witness(inI,J,currRing);
+      id_Delete(&inI,currRing);
+      id_Delete(&J,currRing);
+      res->rtyp = IDEAL_CMD;
+      res->data = (char*) I;
+      return FALSE;
+    }
+  }
+  return TRUE;
 }
 #endif

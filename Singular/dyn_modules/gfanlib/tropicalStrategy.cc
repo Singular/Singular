@@ -334,7 +334,7 @@ void tropicalStrategy::pReduce(ideal I, const ring r) const
 
   nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
   number p = identity(uniformizingParameter,startingRing->cf,r->cf);
-  pReduce0(I,p,r);
+  ::pReduce(I,p,r);
   n_Delete(&p,r->cf);
 
   return;
@@ -767,3 +767,133 @@ bool tropicalStrategy::checkForUniformizingParameter(const ideal inI, const ring
   p_Delete(&p,r);
   return false;
 }
+
+
+
+#ifndef NDEBUG
+tropicalStrategy::tropicalStrategy():
+  originalRing(NULL),
+  originalIdeal(NULL),
+  expectedDimension(NULL),
+  linealitySpace(gfan::ZCone()), // to come, see below
+  startingRing(NULL),            // to come, see below
+  startingIdeal(NULL),           // to come, see below
+  uniformizingParameter(NULL),   // to come, see below
+  shortcutRing(NULL),            // to come, see below
+  onlyLowerHalfSpace(false),
+  weightAdjustingAlgorithm1(NULL),
+  weightAdjustingAlgorithm2(NULL),
+  extraReductionAlgorithm(NULL)
+{
+}
+
+tropicalStrategy tropicalStrategy::debugStrategy(const ideal startIdeal, number unifParameter, ring startRing)
+{
+  tropicalStrategy debug;
+  debug.originalRing = rCopy(startRing);
+  debug.originalIdeal = id_Copy(startIdeal,startRing);
+  debug.startingRing = rCopy(startRing);
+  debug.startingIdeal = id_Copy(startIdeal,startRing);
+  debug.uniformizingParameter = n_Copy(unifParameter,startRing->cf);
+
+  debug.shortcutRing = rCopy0(startRing);
+  nKillChar(debug.shortcutRing->cf);
+  debug.shortcutRing->cf = nInitChar(n_Zp,(void*)(long)IsPrime(n_Int(unifParameter,startRing->cf)));
+  rComplete(debug.shortcutRing);
+  rTest(debug.shortcutRing);
+
+  debug.onlyLowerHalfSpace = true;
+  debug.weightAdjustingAlgorithm1 = valued_adjustWeightForHomogeneity;
+  debug.weightAdjustingAlgorithm2 = valued_adjustWeightUnderHomogeneity;
+  debug.extraReductionAlgorithm = ppreduceInitially;
+
+  return debug;
+}
+
+BOOLEAN getWitnessDebug(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if ((v!=NULL) && (v->Typ()==IDEAL_CMD))
+    {
+      leftv w = v->next;
+      if ((w!=NULL) && (w->Typ()==IDEAL_CMD))
+      {
+        leftv x = w->next;
+        if ((x!=NULL) && (x->Typ()==NUMBER_CMD))
+        {
+          omUpdateInfo();
+          Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+
+          ideal inJ = (ideal) u->CopyD();
+          ideal inI = (ideal) v->CopyD();
+          ideal I = (ideal) w->CopyD();
+          number p = (number) x->CopyD();
+          tropicalStrategy debug = tropicalStrategy::debugStrategy(I,p,currRing);
+          ideal J = debug.getWitness(inJ,inI,I,currRing);
+          id_Delete(&inJ,currRing);
+          id_Delete(&inI,currRing);
+          id_Delete(&I,currRing);
+          n_Delete(&p,currRing->cf);
+          res->rtyp = IDEAL_CMD;
+          res->data = (char*) J;
+          return FALSE;
+        }
+      }
+    }
+  }
+  return TRUE;
+}
+
+BOOLEAN getFlipDebug(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if ((v!=NULL) && (v->Typ()==NUMBER_CMD))
+    {
+      leftv w = v->next;
+      if ((w!=NULL) && (w->Typ()==BIGINTMAT_CMD))
+      {
+        leftv x = w->next;
+        if ((x!=NULL) && (x->Typ()==BIGINTMAT_CMD))
+        {
+          omUpdateInfo();
+          Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+
+          ideal I = (ideal) u->CopyD();
+          number p = (number) v->CopyD();
+          bigintmat* interiorPoint0 = (bigintmat*) w->CopyD();
+          bigintmat* facetNormal0 = (bigintmat*) x->CopyD();
+          tropicalStrategy debug = tropicalStrategy::debugStrategy(I,p,currRing);
+
+          gfan::ZVector* interiorPoint = bigintmatToZVector(interiorPoint0);
+          gfan::ZVector* facetNormal = bigintmatToZVector(facetNormal0);
+          std::pair<ideal,ring> Js = debug.getFlip(I,currRing,*interiorPoint,*facetNormal);
+          ideal J = Js.first;
+          ring s = Js.second;
+
+          id_Delete(&J,s);
+          rDelete(s);
+
+          id_Delete(&I,currRing);
+          n_Delete(&p,currRing->cf);
+          delete interiorPoint0;
+          delete facetNormal0;
+          delete interiorPoint;
+          delete facetNormal;
+
+          res->rtyp = NONE;
+          res->data = NULL;
+          return FALSE;
+        }
+      }
+    }
+  }
+  WerrorS("getFlipDebug: unexpected parameters");
+  return TRUE;
+}
+#endif
