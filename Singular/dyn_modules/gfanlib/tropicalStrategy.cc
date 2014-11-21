@@ -514,37 +514,35 @@ ideal tropicalStrategy::getWitness(const ideal inJ, const ideal inI, const ideal
   }
 }
 
-ideal tropicalStrategy::getStdOfInitialIdeal(const ideal inI, const ring r) const
+ideal tropicalStrategy::computeStdOfInitialIdeal(const ideal inI, const ring r) const
 {
-  ideal inJ;
+  // if valuation trivial, then compute std as usual
   if (isValuationTrivial())
-    // if valuation trivial, then compute std as usual
-    inJ = gfanlib_kStd_wrapper(inI,r);
-  else
-  {
-    // if valuation non-trivial, then uniformizing parameter is in ideal
-    // so switch to residue field first and compute standard basis over the residue field
-    ring rShortcut = copyAndChangeCoefficientRing(r);
-    nMapFunc takingResidues = n_SetMap(r->cf,rShortcut->cf);
-    int k = idSize(inI);
-    ideal inIShortcut = idInit(k);
-    for (int i=0; i<k; i++)
-      inIShortcut->m[i] = p_PermPoly(inI->m[i],NULL,r,rShortcut,takingResidues,NULL,0);
-    ideal inJShortcut = gfanlib_kStd_wrapper(inIShortcut,rShortcut);
+    return gfanlib_kStd_wrapper(inI,r);
 
-    // and lift the result back to the ring with valuation
-    nMapFunc takingRepresentatives = n_SetMap(rShortcut->cf,r->cf);
-    k = idSize(inJShortcut);
-    inJ = idInit(k+1);
-    inJ->m[0] = p_One(r);
-    nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
-    p_SetCoeff(inJ->m[0],identity(uniformizingParameter,startingRing->cf,r->cf),r);
-    for (int i=0; i<k; i++)
-      inJ->m[i+1] = p_PermPoly(inJShortcut->m[i],NULL,rShortcut,r,takingRepresentatives,NULL,0);
+  // if valuation non-trivial, then uniformizing parameter is in ideal
+  // so switch to residue field first and compute standard basis over the residue field
+  ring rShortcut = copyAndChangeCoefficientRing(r);
+  nMapFunc takingResidues = n_SetMap(r->cf,rShortcut->cf);
+  int k = idSize(inI);
+  ideal inIShortcut = idInit(k);
+  for (int i=0; i<k; i++)
+    inIShortcut->m[i] = p_PermPoly(inI->m[i],NULL,r,rShortcut,takingResidues,NULL,0);
+  ideal inJShortcut = gfanlib_kStd_wrapper(inIShortcut,rShortcut);
 
-    id_Delete(&inIShortcut,rShortcut);
-    rDelete(rShortcut);
-  }
+  // and lift the result back to the ring with valuation
+  nMapFunc takingRepresentatives = n_SetMap(rShortcut->cf,r->cf);
+  k = idSize(inJShortcut);
+  ideal inJ = idInit(k+1);
+  inJ->m[0] = p_One(r);
+  nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
+  p_SetCoeff(inJ->m[0],identity(uniformizingParameter,startingRing->cf,r->cf),r);
+  for (int i=0; i<k; i++)
+    inJ->m[i+1] = p_PermPoly(inJShortcut->m[i],NULL,rShortcut,r,takingRepresentatives,NULL,0);
+
+  id_Delete(&inJShortcut,rShortcut);
+  id_Delete(&inIShortcut,rShortcut);
+  rDelete(rShortcut);
   return inJ;
 }
 
@@ -657,10 +655,11 @@ std::pair<ideal,ring> tropicalStrategy::getFlip(const ideal Ir, const ring r,
   ideal inIr = initial(Ir,r,interiorPoint);
   ring sAdjusted = copyAndChangeOrderingWP(r,interiorPoint,facetNormal);
   nMapFunc identity = n_SetMap(r->cf,sAdjusted->cf);
-  int k = idSize(Ir); ideal inIsAdjusted = idInit(k);
+  int k = idSize(Ir);
+  ideal inIsAdjusted = idInit(k);
   for (int i=0; i<k; i++)
     inIsAdjusted->m[i] = p_PermPoly(inIr->m[i],NULL,r,sAdjusted,identity,NULL,0);
-  ideal inJsAdjusted = getStdOfInitialIdeal(inIsAdjusted,sAdjusted);
+  ideal inJsAdjusted = computeStdOfInitialIdeal(inIsAdjusted,sAdjusted);
 
   // find witnesses of the new standard basis elements of the initial ideal
   // with the help of the old standard basis of the ideal
@@ -679,8 +678,10 @@ std::pair<ideal,ring> tropicalStrategy::getFlip(const ideal Ir, const ring r,
 
   // this->reduce(Jr,r);
   // cleanup
+  id_Delete(&inIsAdjusted,sAdjusted);
   id_Delete(&inJsAdjusted,sAdjusted);
   rDelete(sAdjusted);
+  id_Delete(&inIr,r);
   id_Delete(&Jr,r);
   id_Delete(&inJr,r);
 

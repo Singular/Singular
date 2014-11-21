@@ -7,7 +7,7 @@ groebnerCones tropicalTraversal(const groebnerCone startingCone)
   workingList.insert(startingCone);
   while(!workingList.empty())
   {
-    std::cout << "starting traversal" << std::endl;
+    // std::cout << "starting traversal" << std::endl;
     const groebnerCone sigma=*(workingList.begin());
     const groebnerCones neighbours = sigma.tropicalNeighbours();
     for (groebnerCones::iterator tau = neighbours.begin(); tau!=neighbours.end(); tau++)
@@ -17,8 +17,8 @@ groebnerCones tropicalTraversal(const groebnerCone startingCone)
     }
     tropicalVariety.insert(sigma);
     workingList.erase(sigma);
-    std::cout << "tropicalVariety.size():" << tropicalVariety.size() << std::endl;
-    std::cout << "workingList.size():" << workingList.size() << std::endl;
+    // std::cout << "tropicalVariety.size():" << tropicalVariety.size() << std::endl;
+    // std::cout << "workingList.size():" << workingList.size() << std::endl;
   }
   return tropicalVariety;
 }

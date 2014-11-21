@@ -75,13 +75,11 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
       }
       if ((v!=NULL) && (v->Typ()==NUMBER_CMD))
       {
-        number p = (number) v->CopyD();
+        number p = (number) v->Data();
         tropicalStrategy currentStrategy(I,p,currRing);
         std::set<gfan::ZCone> maxCones = tropicalVariety(g,currRing,currentStrategy);
         res->rtyp = fanID;
         res->data = (char*) toZFan(maxCones);
-        id_Delete(&I,currRing);
-        n_Delete(&p,currRing->cf);
         return FALSE;
       }
     }
@@ -89,34 +87,32 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
     if (v==NULL)
     {
       setOptionRedSB();
+      ideal stdI;
       if (!hasFlag(u,FLAG_STD))
-      {
-        ideal stdI = gfanlib_kStd_wrapper(I,currRing);
-        id_Delete(&I,currRing);
-        I = stdI;
-      }
+        stdI = gfanlib_kStd_wrapper(I,currRing);
+      else
+        stdI = id_Copy(I,currRing);
       tropicalStrategy currentStrategy(I,currRing);
       gfan::ZFan* tropI = tropicalVariety(currentStrategy);
       res->rtyp = fanID;
       res->data = (char*) tropI;
       undoSetOptionRedSB();
-      id_Delete(&I,currRing);
+      id_Delete(&stdI,currRing);
       return FALSE;
     }
     if ((v!=NULL) && (v->Typ()==NUMBER_CMD))
     {
-      number p = (number) v->CopyD();
+      number p = (number) v->Data();
+      ideal stdI;
       if (!hasFlag(u,FLAG_STD))
-      {
-        ideal stdI = gfanlib_kStd_wrapper(I,currRing);
-        id_Delete(&I,currRing);
-        I = stdI;
-      }
-      tropicalStrategy currentStrategy(I,p,currRing);
+        stdI = gfanlib_kStd_wrapper(I,currRing);
+      else
+        stdI = id_Copy(I,currRing);
+      tropicalStrategy currentStrategy(stdI,p,currRing);
       gfan::ZFan* tropI = tropicalVariety(currentStrategy);
       res->rtyp = fanID;
       res->data = (char*) tropI;
-      id_Delete(&I,currRing);
+      id_Delete(&stdI,currRing);
       return FALSE;
     }
     return FALSE;

@@ -103,8 +103,7 @@ BOOLEAN bbcone_Assign(leftv l, leftv r)
       gfan::ZCone* zd = (gfan::ZCone*)l->Data();
       delete zd;
     }
-    gfan::ZCone* zc = (gfan::ZCone*)r->Data();
-    newZc = new gfan::ZCone(*zc);
+    newZc = (gfan::ZCone*)r->CopyD();
   }
   else if (r->Typ()==INT_CMD)
   {

@@ -321,7 +321,7 @@ public:
   /**
    * given generators of the initial ideal, computes its standard basis
    */
-  ideal getStdOfInitialIdeal(const ideal inI, const ring r) const;
+  ideal computeStdOfInitialIdeal(const ideal inI, const ring r) const;
 
   /**
    * given an interior point of a groebner cone
