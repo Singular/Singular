@@ -84,8 +84,7 @@ BOOLEAN bbfan_Assign(leftv l, leftv r)
       gfan::ZFan* zd = (gfan::ZFan*) l->Data();
       delete zd;
     }
-    gfan::ZFan* zf = (gfan::ZFan*) r->Data();
-    newZf = new gfan::ZFan(*zf);
+    newZf = (gfan::ZFan*) r->CopyD();
   }
   else if (r->Typ()==INT_CMD)
   {

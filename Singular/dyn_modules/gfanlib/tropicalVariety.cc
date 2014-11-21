@@ -46,7 +46,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
   leftv u = args;
   if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
   {
-    ideal I = (ideal) u->CopyD();
+    ideal I = (ideal) u->Data();
     leftv v = u->next;
 
     if (idSize(I)==1)
@@ -56,6 +56,10 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
       {
         tropicalStrategy currentStrategy(I,currRing);
         std::set<gfan::ZCone> maxCones = tropicalVariety(g,currRing,currentStrategy);
+        // gfan::ZFan* zf = toZFan(maxCones);
+        // delete zf;
+        // res->rtyp = NONE;
+        // res->data = NULL;
         // while (1)
         // {
         //   omUpdateInfo();
@@ -67,7 +71,6 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
         // }
         res->rtyp = fanID;
         res->data = (char*) toZFan(maxCones);
-        id_Delete(&I,currRing);
         return FALSE;
       }
       if ((v!=NULL) && (v->Typ()==NUMBER_CMD))
