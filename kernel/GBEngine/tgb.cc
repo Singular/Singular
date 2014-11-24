@@ -39,6 +39,22 @@ static const int delay_factor = 3;
 #define ADD_LATER_SIZE 500
 #if 1
 static omBin lm_bin = NULL;
+static int add_to_reductors(slimgb_alg* c, poly h, int len, int ecart, BOOLEAN simplified=FALSE);
+static void multi_reduction(red_object* los, int & losl, slimgb_alg* c);
+static void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c);
+static BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, slimgb_alg* c);
+static poly gcd_of_terms(poly p, ring r);
+static int tgb_pair_better_gen(const void* ap,const void* bp);
+static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, slimgb_alg* c=NULL);
+static BOOLEAN state_is(calc_state state, const int & i, const int & j, slimgb_alg* c);
+static void super_clean_top_of_pair_list(slimgb_alg* c);
+static int simple_posInS (kStrategy strat, poly p,int len, wlen_type wlen);
+static int* make_connections(int from, int to, poly bound, slimgb_alg* c);
+static BOOLEAN has_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* state);
+static void shorten_tails(slimgb_alg* c, poly monom);
+static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n=0);
+static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
+static int bucket_guess(kBucket* bucket);
 
 static void simplify_poly (poly p, ring r)
 {
