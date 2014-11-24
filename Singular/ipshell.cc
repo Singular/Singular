@@ -227,14 +227,14 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
 #ifdef SINGULAR_4_1
     case CNUMBER_CMD:
                    {  number2 n=(number2)IDDATA(h);
-                      Print(" (%s)",n->cf->cfCoeffName(n->cf));
+                      Print(" (%s)",nCoeffName(n->cf));
                       break;
                    }
     case CMATRIX_CMD:
                    {  bigintmat *b=(bigintmat*)IDDATA(h);
                       Print(" %d x %d (%s)",
                         b->rows(),b->cols(),
-                        b->basecoeffs()->cfCoeffName(b->basecoeffs()));
+                        nCoeffName(b->basecoeffs()));
                       break;
                    }
 #endif

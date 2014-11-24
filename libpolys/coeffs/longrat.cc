@@ -3067,7 +3067,7 @@ BOOLEAN nlInitChar(coeffs r, void*p)
   //const int ch = (int)(long)(p);
 
   r->nCoeffIsEqual=nlCoeffIsEqual;
-  r->cfKillChar = ndKillChar; /* dummy */
+  //r->cfKillChar = ndKillChar; /* dummy */
   r->cfCoeffString=nlCoeffString;
   r->cfCoeffName=nlCoeffName;
 

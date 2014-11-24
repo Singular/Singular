@@ -289,8 +289,8 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
 {
     // r->is_field,is_domain?
     r->ch=0;
-    r->cfKillChar=ndKillChar;
-    r->nCoeffIsEqual=ndCoeffIsEqual;
+    //r->cfKillChar=ndKillChar;
+    //r->nCoeffIsEqual=ndCoeffIsEqual;
     r->cfMult  = nAEQMult;
     r->cfSub   = nAEQSub;
     r->cfAdd   = nAEQAdd;

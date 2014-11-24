@@ -1556,7 +1556,7 @@ void bigintmat::hnf()
 #if 0
     char * s;
     ::Print("mat over Z is \n");
-    ::Print("%s\n", s = basecoeffs()->cfCoeffString(basecoeffs()));
+    ::Print("%s\n", s = nCoeffString(basecoeffs()));
     omFree(s);
     Print();
     ::Print("\n(%d x %d)\n", rows(), cols());

@@ -18,7 +18,7 @@ char *crString(coeffs c)
   {
     return omStrDup("oo");
   }
-  return omStrDup(c->cfCoeffName(c));
+  return omStrDup(nCoeffName(c));
 }
 void crPrint(coeffs c)
 {

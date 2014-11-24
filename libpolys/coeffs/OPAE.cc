@@ -297,8 +297,8 @@ BOOLEAN n_AEInitChar(coeffs r, void *)
 {
     // r->is_field, r->is_domain?
     r->ch = 0;
-    r->cfKillChar = ndKillChar; /* dummy */
-    r->nCoeffIsEqual=ndCoeffIsEqual;
+    //r->cfKillChar = ndKillChar; /* dummy */
+    //r->nCoeffIsEqual=ndCoeffIsEqual;
     r->cfMult  = nAEMult;
     r->cfSub   = nAESub;
     r->cfAdd   = nAEAdd;

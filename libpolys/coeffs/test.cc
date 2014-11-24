@@ -185,56 +185,8 @@ bool Test(const n_coeffType type, void* p = NULL)
   assume( r->cfWriteLong != NULL );
   assume( r->cfAdd != NULL );
   assume( r->cfDelete != NULL );
-
-  if( type == n_Q )
-  {
-    assume( r->cfInit == nlInit );
-    assume( r->cfAdd == nlAdd );
-    assume( r->cfDelete == nlDelete );
-  }
-  else if( type == n_long_R )
-  {
-    assume( r->cfInit == ngfInit );
-    assume( r->cfAdd == ngfAdd );
-    assume( r->cfDelete == ngfDelete );
-  }
-  else if( type == n_long_C )
-  {
-//     assume( r->cfInit == ngcInit );
-//     assume( r->cfAdd == ngcAdd );
-//     assume( r->cfDelete == ngcDelete );
-  }
-  else if( type == n_R )
-  {
-    assume( r->cfInit == nrInit );
-    assume( r->cfAdd == nrAdd );
-//    assume( r->cfDelete == nrDelete ); // No?
-  }
-#ifdef HAVE_RINGS
-  else if( type == n_Z2m )
-  {
-    assume( r->cfInit == nr2mInit );
-    assume( r->cfAdd == nr2mAdd );
-    assume( r->cfDelete == ndDelete );
-  }
-  else if( type == n_Zn )
-  {
-    assume( r->cfInit == nrnInit );
-    assume( r->cfAdd == nrnAdd );
-    assume( r->cfDelete == nrnDelete );
-  }
-#endif
-  else if( type == n_GF )
-  {
-//     assume( r->cfInit == nfInit );
-//     assume( r->cfAdd == nfAdd );
-    //assume( r->cfDelete == nfDelete );
-  }
-  else
-  {
-    // ...
-  }
-
+  assume( r->cfKillChar != NULL );
+   
   bool ret = TestArith( r );
 
   nKillChar( r );
