@@ -26,7 +26,7 @@
  **/
 
 //  Have to define this when this code shall be used:
-#define FLINT_VER_2_4_5
+//#define FLINT_VER_2_4_5
 #ifdef FLINT_VER_2_4_5
 #include <polys/matpol.h>
 #include <coeffs/bigintmat.h>
