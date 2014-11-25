@@ -974,10 +974,8 @@ EXAMPLE: example watchdog; shows an example
 }
 example
 { "EXAMPLE:"; echo=2;
-  ring r=0,(x,y,z),dp;
-  poly f=x^30+y^30;
-  watchdog(1,"factorize(eval("+string(f)+"))");
-  watchdog(100,"factorize(eval("+string(f)+"))");
+  watchdog(1,"system(\"sh\",\"sleep 5\")");
+  watchdog(10,"system(\"sh\",\"sleep 5\")");
 }
 ///////////////////////////////////////////////////////////////////////////////
 
