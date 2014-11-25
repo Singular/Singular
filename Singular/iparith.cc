@@ -750,6 +750,11 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         {
           v->name = omStrDup(v->name);
         }
+        else if (v->rtyp!=0)
+        {
+          WerrorS("reserved name with ::");
+          return TRUE;
+        }
         v->req_packhdl=IDPACKAGE(packhdl);
         syMake(v, v->name, packhdl);
         memcpy(res, v, sizeof(sleftv));
