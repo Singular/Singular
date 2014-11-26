@@ -34,17 +34,20 @@ int convFlintISingI (fmpz_t f)
 
 void convSingIFlintI(fmpz_t f, int p)
 {
+  fmpz_init(f);
   fmpz_set_si(f,p);
   return;
 }
 
 void convFlintNSingN (mpz_t z, fmpz_t f)
 {
+  mpz_init(z);
   fmpz_get_mpz(z,f);
 }
 
 void convSingNFlintN(fmpz_t f, mpz_t z)
 {
+  fmpz_init(f);
   fmpz_set_mpz(f,z);
 }
 
@@ -69,7 +72,9 @@ bigintmat* singflint_LLL(bigintmat*  m, bigintmat* T)
     {
       n_MPZ(n, BIMATELEM(*m, i, j),m->basecoeffs());
       convSingNFlintN(dummy,n);
+      mpz_clear(n);
       fmpz_set(fmpz_mat_entry(M, i-1, j-1), dummy);
+      fmpz_clear(dummy);
     }
   }
   if(T != NULL)
@@ -80,7 +85,9 @@ bigintmat* singflint_LLL(bigintmat*  m, bigintmat* T)
       {
         n_MPZ(n, BIMATELEM(*T, i, j),T->basecoeffs());
         convSingNFlintN(dummy,n);
+        mpz_clear(n);
         fmpz_set(fmpz_mat_entry(Transf, i-1, j-1), dummy);
+        fmpz_clear(dummy);
       }
     }
   }
@@ -97,6 +104,7 @@ bigintmat* singflint_LLL(bigintmat*  m, bigintmat* T)
       convFlintNSingN(n, fmpz_mat_entry(M, i-1, j-1));
       n_Delete(&(BIMATELEM(*res,i,j)),res->basecoeffs());
       BIMATELEM(*res,i,j)=n_InitMPZ(n,res->basecoeffs());
+      mpz_clear(n);
     }
   }
   if(T != NULL)
@@ -108,6 +116,7 @@ bigintmat* singflint_LLL(bigintmat*  m, bigintmat* T)
         convFlintNSingN(n, fmpz_mat_entry(Transf, i-1, j-1));
         n_Delete(&(BIMATELEM(*T,i,j)),T->basecoeffs());
         BIMATELEM(*T,i,j)=n_InitMPZ(n,T->basecoeffs());
+        mpz_clear(n);
       }
     }
   }
@@ -131,6 +140,7 @@ intvec* singflint_LLL(intvec*  m, intvec* T)
     {
       convSingIFlintI(dummy,IMATELEM(*m,i,j));
       fmpz_set(fmpz_mat_entry(M, i-1, j-1), dummy);
+      fmpz_clear(dummy);
     }
   }
   if(T != NULL)
@@ -141,6 +151,7 @@ intvec* singflint_LLL(intvec*  m, intvec* T)
       {
         convSingIFlintI(dummy,IMATELEM(*T,i,j));
         fmpz_set(fmpz_mat_entry(Transf, i-1, j-1), dummy);
+        fmpz_clear(dummy);
       }
     }
   }
