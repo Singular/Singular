@@ -2620,7 +2620,7 @@ LCHeuristic (CanonicalForm& A, const CanonicalForm& LCmultiplier,
     for (iter= oldAeval[i]; iter.hasItem(); iter++, iter2++)
       iter2.getItem() *= power (xx, degree (LC (iter.getItem(),1), xx));
   }
-  CanonicalForm tmp;
+  CanonicalForm tmp, quot1, quot2, quot3;
   iter2= vars1;
   for (iter= leadingCoeffs[lengthAeval-1]; iter.hasItem(); iter++, iter2++)
   {
@@ -2660,24 +2660,33 @@ LCHeuristic (CanonicalForm& A, const CanonicalForm& LCmultiplier,
             else
             {
               tmp= ii.getItem().factor();
-              iter2.getItem() /= tmp;
-              CFListIterator iter3= evaluation;
-              for (int jj= A.level(); jj > 2; jj--, iter3++)
-                tmp= tmp (iter3.getItem(), jj);
-              if (!tmp.inCoeffDomain())
+              if (fdivides (tmp, iter2.getItem(), quot1))
               {
-                int index3= 1;
-                for (iter3= biFactors; iter3.hasItem(); iter3++, index3++)
+                CFListIterator iter3= evaluation;
+                for (int jj= A.level(); jj > 2; jj--, iter3++)
+                  tmp= tmp (iter3.getItem(), jj);
+                if (!tmp.inCoeffDomain())
                 {
-                  if (index3 == index2)
+                  int index3= 1;
+                  for (iter3= biFactors; iter3.hasItem(); iter3++, index3++)
                   {
-                    iter3.getItem() /= tmp;
-                    iter3.getItem() /= Lc (iter3.getItem());
-                    break;
+                    if (index3 == index2)
+                    {
+                      if (fdivides (tmp, iter3.getItem(), quot2))
+                      {
+                        if (fdivides (ii.getItem().factor(), A, quot3))
+                        {
+                          A               = quot3;
+                          iter2.getItem() = quot2;
+                          iter3.getItem() = quot3;
+                          iter3.getItem() /= Lc (iter3.getItem());
+                          break;
+                        }
+                      }
+                    }
                   }
                 }
               }
-              A /= ii.getItem().factor();
             }
           }
           iter.getItem() /= getVars (ii.getItem().factor());
@@ -2698,21 +2707,30 @@ LCHeuristic (CanonicalForm& A, const CanonicalForm& LCmultiplier,
             if (index2 == index)
             {
               tmp= power (ii.getItem().factor(), ii.getItem().exp());
-              iter2.getItem() /= tmp;
-              A /= tmp;
-              CFListIterator iter3= evaluation;
-              for (int jj= A.level(); jj > 2; jj--, iter3++)
-                tmp= tmp (iter3.getItem(), jj);
-              if (!tmp.inCoeffDomain())
+              if (fdivides (tmp, A, quot1))
               {
-                int index3= 1;
-                for (iter3= biFactors; iter3.hasItem(); iter3++, index3++)
+                if (fdivides (tmp, iter2.getItem()))
                 {
-                  if (index3 == index2)
+                  CFListIterator iter3= evaluation;
+                  for (int jj= A.level(); jj > 2; jj--, iter3++)
+                    tmp= tmp (iter3.getItem(), jj);
+                  if (!tmp.inCoeffDomain())
                   {
-                    iter3.getItem() /= tmp;
-                    iter3.getItem() /= Lc (iter3.getItem());
-                    break;
+                    int index3= 1;
+                    for (iter3= biFactors; iter3.hasItem(); iter3++, index3++)
+                    {
+                      if (index3 == index2)
+                      {
+                        if (fdivides (tmp, iter3.getItem(), quot3))
+                        {
+                          A               =  quot1;
+                          iter2.getItem() =  quot2;
+                          iter3.getItem() =  quot3;
+                          iter3.getItem() /= Lc (iter3.getItem());
+                          break;
+                        }
+                      }
+                    }
                   }
                 }
               }
