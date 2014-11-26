@@ -992,7 +992,10 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
                   bigintmat* m = (bigintmat*)h->Data();
                   bigintmat* T = new bigintmat(m->rows(),m->rows(),m->basecoeffs());
                   for(int i = 1; i<=m->rows(); i++)
-                    BIMATELEM(*T,i,i)=n_Init(1, m->basecoeffs());
+                  {
+                    n_Delete(&(BIMATELEM(*T,i,i)),T->basecoeffs());
+                    BIMATELEM(*T,i,i)=n_Init(1, T->basecoeffs());
+                  }
                   m = singflint_LLL(m,T);
                   lists L = (lists)omAllocBin(slists_bin);
                   L->Init(2);

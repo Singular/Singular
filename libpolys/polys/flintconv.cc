@@ -95,7 +95,8 @@ bigintmat* singflint_LLL(bigintmat*  m, bigintmat* T)
     for(j=c;j>0;j--)
     {
       convFlintNSingN(n, fmpz_mat_entry(M, i-1, j-1));
-      BIMATELEM(*res,i,j)=n_InitMPZ(n,m->basecoeffs());
+      n_Delete(&(BIMATELEM(*res,i,j)),res->basecoeffs());
+      BIMATELEM(*res,i,j)=n_InitMPZ(n,res->basecoeffs());
     }
   }
   if(T != NULL)
@@ -105,7 +106,8 @@ bigintmat* singflint_LLL(bigintmat*  m, bigintmat* T)
       for(j=T->cols();j>0;j--)
       {
         convFlintNSingN(n, fmpz_mat_entry(Transf, i-1, j-1));
-        BIMATELEM(*T,i,j)=n_InitMPZ(n,m->basecoeffs());
+        n_Delete(&(BIMATELEM(*T,i,j)),T->basecoeffs());
+        BIMATELEM(*T,i,j)=n_InitMPZ(n,T->basecoeffs());
       }
     }
   }
