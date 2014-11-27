@@ -17,7 +17,7 @@ template class std::vector< amp::mpfr_record* >;
 poly p_svdInit(char *s)
 {
   poly p=pInit();
-  currRing->cf->nRead(s,&pGetCoeff(p));
+  n_Read(s, &pGetCoeff(p), currRing->cf);
   return p;
 }
 

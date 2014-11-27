@@ -61,6 +61,11 @@
 #undef NOSTREAMIO
 #endif
 
+
+#ifndef HAVE_NUMSTATS
+// #define HAVE_NUMSTATS
+#undef HAVE_NUMSTATS
+#endif
 // ----------------  end of parts/extensions
 
 // ---------------- Singular standard types etc.

@@ -159,7 +159,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfRead        = nrnRead;
   r->cfPower       = nrnPower;
   r->cfSetMap      = nrnSetMap;
-  r->cfNormalize   = ndNormalize;
+  //r->cfNormalize   = ndNormalize;
   r->cfLcm         = nrnLcm;
   r->cfGcd         = nrnGcd;
   r->cfIsUnit      = nrnIsUnit;

@@ -44,7 +44,7 @@ void TestSum(const coeffs r, const unsigned long N)
 
   s = n_Init(N  , r);
   i = n_Init(N+1, r);
-  ndInpMult(s, i, r);
+  n_InpMult(s, i, r);
   n_Delete(&i, r);
 
   clog<< "N*(N+1): ("<< N*(N+1) << ")"; PrintSized(s, r);
@@ -86,10 +86,10 @@ void TestSum(const coeffs r, const unsigned long N)
   for( int k = N; k >= 0; k-- )
   {
     i = n_Init(k, r);
-    ndInpAdd(s, i, r); // s += i
+    n_InpAdd(s, i, r); // s += i
 
     i = n_InpNeg(i, r);
-    ndInpAdd(ss, i, r); // ss -= i
+    n_InpAdd(ss, i, r); // ss -= i
 
     n_Delete(&i, r);
   }
@@ -120,14 +120,14 @@ void TestArith(const coeffs r)
   number two = n_Init(2, r);
 
   number t = n_Init(1, r);
-  ndInpAdd(t, t, r);
+  n_InpAdd(t, t, r);
   TS_ASSERT( n_Equal(two, t, r) );
   n_Delete(&t, r);
 
   if( getCoeffType(r) == n_Q )
   {
     number t = n_Init(1, r);
-    nlInpAdd(t, t, r);
+    n_InpAdd(t, t, r);
     TS_ASSERT( n_Equal(two, t, r) );
     n_Delete(&t, r);
   }

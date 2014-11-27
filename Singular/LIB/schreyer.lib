@@ -2258,6 +2258,9 @@ static proc loadme()
 
       exportto(Schreyer, Syzextra::ComputeResolution);
 
+      exportto(Top, Syzextra::NumberStatsInit);
+      exportto(Top, Syzextra::NumberStatsPrint);
+
       newstruct("SRES","ring r,resolution rsltn"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
       newstruct("SSYZ","ring r,module szg"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
       // TODO: SSres - return SRESOLUTION?
@@ -2580,9 +2583,12 @@ proc TestSSres(def I)
 
 proc s_res(def I, int l)
 {
+  int @prot = (find(option(),"prot") != 0);
   def R=SSinit(I); setring R; int @l = size(RES);
   SRES ret; ret.r = R; 
+  if(@prot){ NumberStatsInit(); }
   ret.rsltn = ComputeResolution(RES[@l], LRES[@l], TRES[@l], l);
+  if(@prot){ NumberStatsPrint("Number statistic for s_res with ComputeResolution"); }
   return (ret);
 }
 

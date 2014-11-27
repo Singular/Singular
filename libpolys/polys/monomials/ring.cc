@@ -616,8 +616,7 @@ char * rVarStr(ring r)
 
 /// TODO: make it a virtual method of coeffs, together with:
 /// Decompose & Compose, rParameter & rPar
-char * rCharStr(ring r)
-{ return r->cf->cfCoeffString(r->cf); }
+char * rCharStr(const ring r){ assume( r != NULL ); return nCoeffString(r->cf); }
 
 char * rParStr(ring r)
 {

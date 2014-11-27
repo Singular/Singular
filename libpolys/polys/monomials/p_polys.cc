@@ -1360,7 +1360,7 @@ const char * p_Read(const char *st, poly &rc, const ring r)
   if (r==NULL) { rc=NULL;return st;}
   int i,j;
   rc = p_Init(r);
-  const char *s = r->cf->cfRead(st,&(rc->coef),r->cf);
+  const char *s = n_Read(st,&(p_GetCoeff(rc, r)),r->cf);
   if (s==st)
   /* i.e. it does not start with a coeff: test if it is a ringvar*/
   {
@@ -2764,7 +2764,7 @@ poly p_Cleardenom(poly p, const ring r)
       p = start;
       while (p!=NULL)
       {
-        /* should be:
+        /* should be: // NOTE: don't use ->coef!!!!
         * number hh;
         * nGetDenom(p->coef,&hh);
         * nMult(&h,&hh,&d);
@@ -2905,7 +2905,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
       p = ph;
       while (p!=NULL)
       {
-        /* should be:
+        /* should be: // NOTE: don't use ->coef!!!!
         * number hh;
         * nGetDenom(p->coef,&hh);
         * nMult(&h,&hh,&d);
@@ -2940,7 +2940,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
             p = ph;
             while (p!=NULL)
             {
-              /* should be:
+              /* should be: // NOTE: don't use ->coef!!!!
               * number hh;
               * nGetDenom(p->coef,&hh);
               * nMult(&h,&hh,&d);

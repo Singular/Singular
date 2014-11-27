@@ -56,7 +56,6 @@ coeffs coeffs_BIGINT;
 FILE   *feFilePending; /*temp. storage for grammar.y */
 
 proclevel *procstack=NULL;
-#define TEST
 //idhdl idroot = NULL;
 
 idhdl currPackHdl = NULL;

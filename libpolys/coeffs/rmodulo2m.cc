@@ -106,7 +106,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->is_domain=FALSE;
   r->rep=n_rep_int;
 
-  r->cfKillChar    = ndKillChar; /* dummy*/
+  //r->cfKillChar    = ndKillChar; /* dummy*/
   r->nCoeffIsEqual = nr2mCoeffIsEqual;
   r->cfCoeffString = nr2mCoeffString;
 
@@ -120,7 +120,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->ch = (int)r->mod2mMask + 1;
 
   r->cfInit        = nr2mInit;
-  r->cfCopy        = ndCopy;
+  //r->cfCopy        = ndCopy;
   r->cfInt         = nr2mInt;
   r->cfAdd         = nr2mAdd;
   r->cfSub         = nr2mSub;
@@ -143,7 +143,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfRead        = nr2mRead;
   r->cfPower       = nr2mPower;
   r->cfSetMap      = nr2mSetMap;
-  r->cfNormalize   = ndNormalize;
+//  r->cfNormalize   = ndNormalize; // default
   r->cfLcm         = nr2mLcm;
   r->cfGcd         = nr2mGcd;
   r->cfIsUnit      = nr2mIsUnit;

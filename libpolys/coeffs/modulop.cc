@@ -502,14 +502,14 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfIsMOne = npIsMOne;
   r->cfGreaterZero = npGreaterZero;
   //r->cfPower = npPower;
-  r->cfGetDenom = ndGetDenom;
-  r->cfGetNumerator = ndGetNumerator;
+  //r->cfGetDenom = ndGetDenom;
+  //r->cfGetNumerator = ndGetNumerator;
   //r->cfGcd  = ndGcd;
   //r->cfLcm  = ndGcd;
   //r->cfDelete= ndDelete;
   r->cfSetMap = npSetMap;
   //r->cfName = ndName;
-  r->cfInpMult=ndInpMult;
+  //r->cfInpMult=ndInpMult;
 #ifdef NV_OPS
   if (c>NV_MAX_PRIME)
   {
