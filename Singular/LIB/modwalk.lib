@@ -29,7 +29,7 @@ LIB "modstd.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-proc modpWalk(def II, int p, int variant, list #)
+proc modpWalk(def II, int p, int variant, int reduction, list #)
 "USAGE:  modpWalk(I,p,#); I ideal, p integer, variant integer
 ASSUME:  If size(#) > 0, then 
            #[1] is an intvec describing the current weight vector
@@ -85,33 +85,33 @@ EXAMPLE: example modpWalk; shows an example
   {
     if(size(#)>0)
     {
-      i = rwalk(i,radius,pert_deg,#);
+      i = rwalk(i,radius,pert_deg,reduction,#);
     }
     else
     {
-      i = rwalk(i,radius,pert_deg);
+      i = rwalk(i,radius,pert_deg,reduction);
     }
   }
   if(variant == 2)
   {
     if(size(#) == 2)
     {
-      i = gwalk(i,#);
+      i = gwalk(i,reduction,#);
     }
     else
     {
-      i = gwalk(i);
+      i = gwalk(i,reduction);
     }
   }
   if(variant == 3)
   {
     if(size(#) == 2)
     {
-      i = frandwalk(i,radius,#);
+      i = frandwalk(i,radius,reduction,#);
     }
     else
     {
-      i = frandwalk(i,radius);
+      i = frandwalk(i,radius,reduction);
     }
   }
   if(variant == 4)
@@ -129,22 +129,22 @@ EXAMPLE: example modpWalk; shows an example
   {
     if(size(#) == 2)
     {
-     i=prwalk(i,radius,pert_deg,pert_deg,#);
+     i=prwalk(i,radius,pert_deg,pert_deg,reduction,#);
     }
     else
     {
-      i=prwalk(i,radius,pert_deg,pert_deg);
+      i=prwalk(i,radius,pert_deg,pert_deg,reduction);
     }
   }
   if(variant == 6)
   {
     if(size(#) == 2)
     {
-      i=pwalk(i,pert_deg,pert_deg,#);
+      i=pwalk(i,pert_deg,pert_deg,reduction,#);
     }
     else
     {
-      i=pwalk(i,pert_deg,pert_deg);
+      i=pwalk(i,pert_deg,pert_deg,reduction);
     }
   }
 
@@ -161,15 +161,16 @@ example
   intvec b = 1,9,1,1;
   ring ra = 0,x(1..4),(a(a),lp);
   ideal I = std(cyclic(4));
+  int reduction = 1;
   ring rb = 0,x(1..4),(a(b),lp);
   ideal I = imap(ra,I);
-  modpWalk(I,p,1,a,b);
+  modpWalk(I,p,1,reduction,a,b);
   std(I);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-proc modWalk(def II, int variant, list #)
+proc modWalk(def II, int variant, int reduction, list #)
 "USAGE:  modWalk(II); II ideal or list(ideal,int)
 ASSUME:  If variant = 
 @*       - 1 the Random Walk algorithm with radius II[2] is applied
@@ -461,14 +462,14 @@ EXAMPLE: example modWalk; shows an example
   {
     for(i=1; i<=size(L); i++)
     {
-      Arguments[i] = list(II,L[i],variant,list(curr_weight,target_weight));
+      Arguments[i] = list(II,L[i],variant,reduction,list(curr_weight,target_weight));
     }
   }
   else
   {
     for(i=1; i<=size(L); i++)
     {
-      Arguments[i] = list(II,L[i],variant);
+      Arguments[i] = list(II,L[i],variant,reduction);
     }
   }
   P = parallelWaitAll("modpWalk",Arguments);
@@ -566,14 +567,14 @@ EXAMPLE: example modWalk; shows an example
     {
       for(i=j; i<=size(L); i++)
       {
-        Arguments[size(Arguments)+1] = list(II,L[i],variant,list(curr_weight,target_weight));
+        Arguments[size(Arguments)+1] = list(II,L[i],variant,reduction,list(curr_weight,target_weight));
       }
     }
     else
     {
       for(i=j; i<=size(L); i++)
       {
-        Arguments[size(Arguments)+1] = list(II,L[i],variant);
+        Arguments[size(Arguments)+1] = list(II,L[i],variant,reduction);
       }
     }
     PP = parallelWaitAll("modpWalk",Arguments);
@@ -600,7 +601,8 @@ example
   echo = 2;
   ring R=0,(x,y,z),lp;
   ideal I= y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
-  ideal J = modWalk(I,2);
+  int reduction = 0;
+  ideal J = modWalk(I,1,1);
   J;
 }
 

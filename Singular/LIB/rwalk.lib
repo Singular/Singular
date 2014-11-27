@@ -140,9 +140,10 @@ static proc OrderStringalp_NP(string Wpal,list #)
 /****************
  * Random Walk  *
  ****************/
-proc rwalk(ideal Go, int radius, int pert_deg, list #)
+proc rwalk(ideal Go, int radius, int pert_deg, int reduction, int printout, list #)
 "SYNTAX: rwalk(ideal i, int radius);
          if size(#)>0 then rwalk(ideal i, int radius, intvec v, intvec w);
+         intermediate Groebner bases are not reduced if reduction = 0
 TYPE:    ideal
 PURPOSE: compute the standard basis of the ideal, calculated via
          the Random walk algorithm  from the ordering
@@ -177,7 +178,7 @@ execute("ring ostR = "+charstr(xR)+",("+varstr(xR)+"),"+ord_str+";");
 def old_ring = basering;
 
 ideal G = fetch(xR, Go);
-G = system("Mrwalk", G, curr_weight, target_weight, radius, pert_deg, basering);
+G = system("Mrwalk", G, curr_weight, target_weight, radius, pert_deg, reduction, printout);
 
 setring xR;
 kill Go;
@@ -195,13 +196,15 @@ example
   ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
   int radius = 1;
   int perturb_deg = 2;
-  rwalk(I,radius,perturb_deg);
+  int reduction = 0;
+  int printout = 1;
+  rwalk(I,radius,perturb_deg,reduction,printout);
 }
 
 /*****************************************
  * Perturbation Walk with random element *
  *****************************************/
-proc prwalk(ideal Go, int radius, int o_pert_deg, int t_pert_deg, list #)
+proc prwalk(ideal Go, int radius, int o_pert_deg, int t_pert_deg, int reduction, int printout, list #)
 "SYNTAX: rwalk(ideal i, int radius);
          if size(#)>0 then rwalk(ideal i, int radius, intvec v, intvec w);
 TYPE:    ideal
@@ -226,6 +229,7 @@ else
   {
   OSCTW= OrderStringalp_NP("al", #);
   }
+int nP = OSCTW[1];
 string ord_str = OSCTW[2];
 intvec curr_weight = OSCTW[3]; // original weight vector
 intvec target_weight = OSCTW[4]; // target weight vector
@@ -237,7 +241,8 @@ execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
 def old_ring = basering;
 
 ideal G = fetch(xR, Go);
-G = system("Mprwalk", G, curr_weight, target_weight, radius, o_pert_deg, t_pert_deg, basering);
+G = system("Mprwalk", G, curr_weight, target_weight, radius, o_pert_deg, t_pert_deg,
+           nP, reduction, printout);
 
 setring xR;
 kill Go;
@@ -256,7 +261,9 @@ example
   int radius = 1;
   int o_perturb_deg = 2;
   int t_perturb_deg = 2;
-  prwalk(I,radius,o_perturb_deg,t_perturb_deg);
+  int reduction = 0;
+  int printout = 2;
+  prwalk(I,radius,o_perturb_deg,t_perturb_deg,reduction,printout);
 }
 
 /************************************
@@ -313,5 +320,6 @@ example
     "EXAMPLE:"; echo = 2;
     ring r = 0,(z,y,x), lp;
     ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
-    frandwalk(I,2);
+    int reduction = 0;
+    frandwalk(I,2,0);
 }

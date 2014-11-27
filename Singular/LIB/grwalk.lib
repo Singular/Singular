@@ -254,9 +254,9 @@ example
     awalk1(I,3);
 }
 
-proc gwalk(ideal Go, list #)
-"SYNTAX: gwalk(ideal i);
-         gwalk(ideal i, intvec v, intvec w);
+proc gwalk(ideal Go, int reduction,int printout, list #)
+"SYNTAX: gwalk(ideal i, int reduction, int printout);
+         gwalk(ideal i, int reduction, int printout, intvec v, intvec w);
 TYPE:    ideal
 PURPOSE: compute the standard basis of the ideal, calculated via
          the improved Groebner walk algorithm  from the ordering
@@ -283,7 +283,7 @@ EXAMPLE: example gwalk; shows an example"
 
    //print("//** help ring = " + string(basering));
    ideal G = fetch(xR, Go);
-   G = system("Mwalk", G, curr_weight, target_weight,basering);
+   G = system("Mwalk", G, curr_weight, target_weight,basering,reduction,printout);
 
    setring xR;
    //kill Go;
@@ -299,7 +299,7 @@ example
   //** compute a Groebner basis of I w.r.t. lp.
   ring r = 32003,(z,y,x), lp;
   ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
-  gwalk(I);
+  gwalk(I,0,1);
 }
 
 
@@ -345,9 +345,9 @@ proc awalk1_tmp(ideal Go, int n2, list #)
    return (result);
 }
 
-proc fwalk(ideal Go, list #)
-"SYNTAX: fwalk(ideal i);
-         fwalk(ideal i, intvec v, intvec w);
+proc fwalk(ideal Go, int reduction, list #)
+"SYNTAX: fwalk(ideal i,int reductioin);
+         fwalk(ideal i, int reduction intvec v, intvec w);
 TYPE:    ideal
 PURPOSE: compute the standard basis of the ideal w.r.t. the
         lexicographical ordering or a weighted-lex ordering,
@@ -371,7 +371,7 @@ EXAMPLE: example fwalk; shows an example"
    //print("//** help ring = " + string(basering));
 
    ideal G = fetch(xR, Go);
-   G = system("Mfwalk", G, curr_weight, target_weight);
+   G = system("Mfwalk", G, curr_weight, target_weight, reduction);
 
    setring xR;
    //kill Go;
@@ -386,7 +386,8 @@ example
     "EXAMPLE:"; echo = 2;
     ring r = 32003,(z,y,x), lp;
     ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
-    fwalk(I);
+    int reduction = 1;
+    fwalk(I,reduction);
 }
 
 
@@ -436,9 +437,9 @@ example
     awalk2(I);
 }
 
-proc pwalk(ideal Go, int n1, int n2, list #)
-"SYNTAX: pwalk(int d, ideal i, int n1, int n2);
-         pwalk(int d, ideal i, int n1, int n2, intvec v, intvec w);
+proc pwalk(ideal Go, int n1, int n2, int reduction, int printout, list #)
+"SYNTAX: pwalk(int d, ideal i, int n1, int n2, int reduction, int printout);
+         pwalk(int d, ideal i, int n1, int n2, int reduction, int printout, intvec v, intvec w);
 TYPE:    ideal
 PURPOSE: compute the standard basis of the ideal, calculated via
          the perturbation walk algorithm  from the ordering
@@ -476,7 +477,7 @@ EXAMPLE: example pwalk; shows an example"
 
   ideal G = fetch(xR, Go);
 
-  G = system("Mpwalk", G, n1, n2, curr_weight, target_weight,nP);
+  G = system("Mpwalk",G,n1,n2,curr_weight,target_weight,nP,reduction,printout);
  
   setring xR;
   //kill Go;
@@ -491,10 +492,9 @@ example
     "EXAMPLE:"; echo = 2;
     ring r = 32003,(z,y,x), lp;
     ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
-    //I = std(I);
-    //ring rr = 32003,(z,y,x),lp;
-    //ideal I = fetch(r,I);
-    pwalk(I,2,2);
+    int reduction = 1;
+    int printout = 2;
+    pwalk(I,2,2,reduction,printout);
 }
 
 
