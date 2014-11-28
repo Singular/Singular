@@ -278,11 +278,8 @@ EXAMPLE: example squarefree; shows some examples.
   string mipl="0";
   if (size(parstr(altring))==1) { mipl=string(minpoly); }
  //---- test: char = (p^k,a) (-> gcd not implemented) or (p,a) (gcd works) ----
-  if ((char(basering)!=0) and (charstr(basering)!=string(char(basering)))) {
-    string tststr=charstr(basering);
-    tststr=tststr[1..find(tststr,",")-1];           //-> "p^k" bzw. "p"
-    gcd_ok=(tststr==string(char(basering)));
-  }
+  //if ((char(basering)!=0) and (charstr(basering)!=string(char(basering))))
+  gcd_ok= ! hasGFCoefficient(basering);
   execute("ring rsqrf = ("+charstr(altring)+"),(x,y),dp;");
   if ((gcd_ok!=0) && (mipl!="0")) { execute("minpoly="+mipl+";"); }
   poly f=fetch(altring,f);
@@ -2739,9 +2736,8 @@ EXAMPLE: example hnexpansion;  shows an example
  def altring=basering;
 
  //--------- Falls Ring (p^k,a),...: Wechsel in (p,a),... + minpoly -----------
- if ( (find(charstr(basering),string(char(basering)))!=1) &&
-      (charstr(basering)<>"real")&&
-      (charstr(basering)<>"complex") ) {
+ if ( hasGFCoefficient(basering) )
+ {
    string strmip=string(minpoly);
    string strf=string(f);
    execute("ring tempr=("+string(char(basering))+","+parstr(basering)+"),("
@@ -2906,17 +2902,17 @@ RETURN: list:  first entry = HNEring  (containing list hne, poly f)
    dbprint(printlevel-voice+2,
    " Warning: all variables except the first two will be ignored!");
  }
- if (find(charstr(basering),string(char(basering)))!=1) {
-   " ring of type (p^k,a) not implemented";
+ if (hasGFCoefficient(basering))
+ {
+   ERROR(" ring of type (p^k,a) not implemented");
  //----------------------------------------------------------------------------
  // weder primitives Element noch factorize noch map "char p^k" -> "char -p"
  // [(p^k,a)->(p,a) ground field] noch fetch
  //----------------------------------------------------------------------------
-   return(list());
  }
  //----------------- Definition eines neuen Ringes: HNEring -------------------
  string namex=varstr(1); string namey=varstr(2);
- if (string(char(altring))==charstr(altring)) { // kein Parameter, nicht 'real'
+ if ((npars(altring)==0)&&(find(charstr(altring),"real")==0)) { // kein Parameter, nicht 'real'
    ring HNEring = char(altring),(x,y),ls;
    map m=altring,x,y;
    poly f=m(f);
