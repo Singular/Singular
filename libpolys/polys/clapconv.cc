@@ -247,39 +247,11 @@ CanonicalForm convSingAFactoryA ( poly p , const Variable & a, const ring r )
 
 static number convFactoryNSingAN( const CanonicalForm &f, const ring r)
 {
-  if ( f.isImm() )
-  {
-    long longf=f.intval();
-    int intf=(int) longf;
-    if((long)intf==longf)
-    {
-      assume (r->cf->extRing != NULL);
-      return n_Init(f.intval(),r->cf->extRing->cf);
-    }
-    else return nlRInit( longf );
-  }
-  else
-  {
-    number z=ALLOC_RNUMBER();
-#if defined(LDEBUG)
-    z->debug=123456;
-#endif
-    gmp_numerator( f, z->z );
-    if ( f.den().isOne() )
-    {
-      z->s = 3;
-    }
-    else
-    {
-      gmp_denominator( f, z->n );
-      z->s = 0;
-      nlNormalize(z,r->cf->extRing->cf);
-    }
-    /*#ifdef LDEBUG
-    nlTest(z,r->cf->extRing->cf);
-    #endif*/
-    return z;
-  }
+  assume (r != NULL);
+  assume (r->cf != NULL);
+  assume (r->cf->extRing != NULL);
+  // it seems that r->cf->extRing->cf has to be Q ... ?
+  return n_convFactoryNSingN( f, r->cf->extRing->cf );
 }
 
 poly convFactoryASingA ( const CanonicalForm & f, const ring r )
