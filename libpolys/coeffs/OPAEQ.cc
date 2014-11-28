@@ -328,7 +328,10 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
     r->cfGcd  = nAEQGcd;
     r->cfLcm  = nAEQLcm; // ZU BEARBEITEN
     r->cfDelete= nAEQDelete;
-    r->cfSetMap = npSetMap;
+   
+    extern nMapFunc npSetMap(const coeffs src, const coeffs dst); // FIXME: BUG?
+    r->cfSetMap = npSetMap; // WHY??? // TODO: this seems to be a bug!
+   
     r->cfInpMult=nAEQInpMult; //????
     r->cfCoeffWrite=nAEQCoeffWrite; //????
 

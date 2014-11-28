@@ -352,7 +352,10 @@ BOOLEAN n_pAEInitChar(coeffs r, void *p)
     r->cfGcd  = nAEpGcd;
     r->cfLcm  = nAEpLcm; // ZU BEARBEITEN
     r->cfDelete= nAEpDelete;
-    r->cfSetMap = npSetMap;
+
+    extern nMapFunc npSetMap(const coeffs src, const coeffs dst); // FIXME: BUG?
+    r->cfSetMap = npSetMap; // WHY??? // TODO: this seems to be a bug!
+
     r->cfInpMult=nAEpInpMult; //????
     r->cfCoeffWrite=nAEpCoeffWrite; //????
 
