@@ -346,7 +346,7 @@ BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs /*r*/)
 }
 #endif
 
-CanonicalForm nlConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs /*r*/ )
+static CanonicalForm nlConvSingNFactoryN( number n, const BOOLEAN setChar, const coeffs /*r*/ )
 {
   if (setChar) setCharacteristic( 0 );
 
@@ -389,18 +389,19 @@ CanonicalForm nlConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs /*r*/
   return term;
 }
 
-number nlConvFactoryNSingN( const CanonicalForm n, const coeffs r)
+number nlRInit (long i);
+
+static number nlConvFactoryNSingN( const CanonicalForm f, const coeffs r)
 {
-  if (n.isImm())
+  if (f.isImm())
   {
-    long lz=n.intval();
-    int iz=(int)lz;
+    const long lz=f.intval();
+    const int iz=(int)lz;
     if ((long)iz==lz)
-    {
-      return nlInit(n.intval(),r);
-    }
-    else  return nlRInit(lz);
-    return nlInit(n.intval(),r);
+      return nlInit(f.intval(),r);
+    else
+      return nlRInit(lz);
+//    return nlInit(f.intval(),r);
   }
   else
   {
@@ -408,20 +409,18 @@ number nlConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 #if defined(LDEBUG)
     z->debug=123456;
 #endif
-    gmp_numerator( n, z->z );
-    if ( n.den().isOne() )
+    gmp_numerator( f, z->z );
+    if ( f.den().isOne() )
       z->s = 3;
     else
     {
-      gmp_denominator( n, z->n );
+      gmp_denominator( f, z->n );
       z->s = 0;
     }
     nlNormalize(z,r);
     return z;
   }
 }
-
-number nlRInit (long i);
 
 static number nlMapR(number from, const coeffs src, const coeffs dst)
 {
