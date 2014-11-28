@@ -1930,6 +1930,7 @@ static BOOLEAN _m2_end(leftv res, leftv h)
 
 // no args.
 // init num stats
+#ifdef HAVE_NUMSTATS
 static BOOLEAN _NumberStatsInit(leftv res, leftv h)
 {
   if ( (h!=NULL) && (h->Typ()!=INT_CMD) )
@@ -1948,9 +1949,11 @@ static BOOLEAN _NumberStatsInit(leftv res, leftv h)
   NoReturn(res);
   return FALSE;
 }
+#endif
 
 // maybe one arg.
 // print num stats
+#ifdef HAVE_NUMSTATS
 static BOOLEAN _NumberStatsPrint(leftv res, leftv h)
 {
   if ( (h!=NULL) && (h->Typ()!=STRING_CMD) )
@@ -1969,6 +1972,7 @@ static BOOLEAN _NumberStatsPrint(leftv res, leftv h)
   NoReturn(res);
   return FALSE;
 }
+#endif
 
 END_NAMESPACE
 
@@ -2028,8 +2032,10 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
   ADD("ComputeResolution", FALSE, _ComputeResolution);
 //  ADD("GetAMData", FALSE, GetAMData);
 
+#ifdef HAVE_NUMSTATS
   ADD("NumberStatsInit", FALSE, _NumberStatsInit);
   ADD("NumberStatsPrint", FALSE, _NumberStatsPrint);
+#endif
   
   //  ADD("", FALSE, );
 

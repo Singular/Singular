@@ -123,27 +123,22 @@ struct SNumberStatistic
 #define STATISTIC(F) {extern struct SNumberStatistic number_stats; number_stats.F += 1;}
 #endif
 
+#ifdef HAVE_NUMSTATS
 /// set all counters to zero
 static inline void number_stats_Init(const unsigned long defaultvalue = 0)
 {
-#ifndef HAVE_NUMSTATS
-  WarnS("Please note that number statistic was disabled in compile-time");
-  (void)(defaultvalue);
-#else
   extern struct SNumberStatistic number_stats;
   number_stats.Init(defaultvalue);
-#endif
 }
+#endif
 
+#ifdef HAVE_NUMSTATS
 /// print out all counters
 static inline void number_stats_Print(const char * const msg = NULL)
 {
-#ifndef HAVE_NUMSTATS
-  Warn("Please note that number statistic was disabled in compile-time [message: %s]", msg);
-#else
   extern struct SNumberStatistic number_stats;
   number_stats.Print(msg);
-#endif
 }
+#endif
 #endif /* NUMSTAT */
 
