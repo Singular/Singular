@@ -42,6 +42,11 @@
 
 #define nSetMap(R)        n_SetMap(R,currRing->cf)
 
+/// only for debug, over any initalized currRing 
+#define nPrint(a)         n_Print(a,currRing->cf)
+
+
+
 
 // --------------------------------------------------------------
 // internal to coeffs, but public for all realizations

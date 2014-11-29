@@ -4209,9 +4209,6 @@ BOOLEAN    semicProc   ( leftv res,leftv u,leftv v )
 
 #endif
 
-//from mpr_inout.cc
-extern void nPrint(number n);
-
 BOOLEAN loNewtonP( leftv res, leftv arg1 )
 {
   res->data= (void*)loNewtonPolytope( (ideal)arg1->Data() );

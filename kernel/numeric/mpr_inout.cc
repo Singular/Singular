@@ -54,16 +54,6 @@ TIMING_DEFINE_PRINT(mpr_solver)
 
 //<-
 
-//-> nPrint(number n)
-void nPrint(number n)
-{
-  poly o=pOne();
-  pSetCoeff(o, nCopy(n) );
-  pWrite0( o );
-  pDelete( &o );
-}
-//<-
-
 //------------------------------------------------------------------------------
 
 //-> void mprPrintError( mprState state )
