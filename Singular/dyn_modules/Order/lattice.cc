@@ -1068,8 +1068,8 @@ bigintmat * minkowksi(bigintmat ** elementarray,int size_elementarray, number * 
             n_Delete(&pot,comp);
             for(int j=1;j<=size_elementarray;j++){
                 complexmat->set(r1+2*i,j,n_Mult(complexmat->view(r1+2*i,j),sqrt2,comp),comp);
-                complexmat->set(r1+2*i-1,j,ngcRePart(complexmat->view(r1+2*i,j),comp),comp);
-                complexmat->set(r1+2*i,j,ngcImPart(complexmat->view(r1+2*i,j),comp),comp);
+                complexmat->set(r1+2*i-1,j,n_RePart(complexmat->view(r1+2*i,j),comp),comp);
+                complexmat->set(r1+2*i,j,n_ImPart(complexmat->view(r1+2*i,j),comp),comp);
             }
         }
     }
@@ -1096,14 +1096,14 @@ bigintmat * minkowksi(bigintmat ** elementarray,int size_elementarray, number * 
 }
 
 bool IsReal(number a, coeffs coef){ //Im(a)==0
-    number imag = ngcImPart(a, coef);
+    number imag = n_ImPart(a, coef);
     bool out = n_IsZero(imag,coef);
     n_Delete(&imag,coef);
     return out;
 }
 
 bool ImagGreaterZero(number a, coeffs coef){ //Im(a)>0
-    number imag = ngcImPart(a, coef);
+    number imag = n_ImPart(a, coef);
     bool out = n_GreaterZero(imag,coef);
     n_Delete(&imag,coef);
     return out;
