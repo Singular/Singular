@@ -618,10 +618,10 @@ static proc SSinit(def M)
     M = std(M);
     option(set, opts);
     kill opts;
-  } else
-  {
-    M = simplify(M, 2 + 4 + 32); // interreduce?
-  }
+  }//  else
+  // {
+    M = simplify(M, 1 + 2 + 4 + 32); // interreduce?
+  // }
 
   if( @IGNORETAILS )
   {
