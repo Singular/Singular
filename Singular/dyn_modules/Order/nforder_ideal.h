@@ -6,7 +6,7 @@
 #ifndef NFORDER_IDEAL_HPP
 #define NFORDER_IDEAL_HPP
 
-#include <libpolys/coeffs/bigintmat.h>
+#include <coeffs/bigintmat.h>
 
 class nforder_ideal
 {

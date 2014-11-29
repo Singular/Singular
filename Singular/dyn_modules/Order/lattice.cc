@@ -1,15 +1,14 @@
-#include <libpolys/coeffs/bigintmat.h>
+#include <coeffs/bigintmat.h>
 #include "lattice.h"
 //#include "kernel/febase.h"  // for Print, WerrorS
-#include "libpolys/coeffs/numbers.h"
-#include "libpolys/coeffs/coeffs.h"
+#include <coeffs/numbers.h>
+#include <coeffs/coeffs.h>
 #include "Singular/ipid.h"
 #include <iostream>
 #include <vector>
 #include <utility>
 //for minkowski
 #include "kernel/numeric/mpr_numeric.h"
-#include "libpolys/coeffs/gnumpc.cc"
 
 
 //NOTE: Todo: Combine scalarproduct and gram_matrix

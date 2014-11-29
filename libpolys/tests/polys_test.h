@@ -2,15 +2,6 @@
 using namespace std;
 
 // the following headers are private...
-#include <coeffs/longrat.h>
-#include <coeffs/gnumpfl.h>
-#include <coeffs/gnumpc.h>
-#include <coeffs/shortfl.h>
-#include <coeffs/ffields.h>
-#include <coeffs/modulop.h>
-#include <coeffs/rmodulon.h>
-#include <coeffs/rmodulo2m.h>
-#include <coeffs/rintegers.h>
 
 
 #include <polys/monomials/ring.h>

@@ -5,66 +5,66 @@
 * ABSTRACT:
 */
 
-
-
 #include <kernel/mod2.h>
-#include <misc/auxiliary.h>
 
-
-#include <misc/options.h>
-#include <misc/mylimits.h>
+#include <omalloc/omalloc.h>
 
 #include <factory/factory.h>
 
-#include <Singular/maps_ip.h>
-#include <Singular/tok.h>
+#include <misc/auxiliary.h>
 #include <misc/options.h>
-#include <Singular/ipid.h>
+#include <misc/mylimits.h>
 #include <misc/intvec.h>
-#include <omalloc/omalloc.h>
-#include <kernel/polys.h>
+
 #include <coeffs/numbers.h>
-#include <polys/prCopy.h>
-#include <kernel/ideals.h>
-#include <polys/matpol.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <polys/monomials/ring.h>
-#include <Singular/subexpr.h>
-#include <Singular/fevoices.h>
-#include <kernel/oswrapper/feread.h>
-#include <polys/monomials/maps.h>
-#include <kernel/GBEngine/syz.h>
-#include <coeffs/numbers.h>
-//#include <polys/ext_fields/longalg.h>
-#include <Singular/lists.h>
-#include <Singular/attrib.h>
-#include <Singular/ipconv.h>
-#include <Singular/links/silink.h>
-#include <kernel/combinatorics/stairc.h>
-#include <polys/weight.h>
-#include <kernel/spectrum/semic.h>
-#include <kernel/spectrum/splist.h>
-#include <kernel/spectrum/spectrum.h>
-////// #include <coeffs/gnumpfl.h>
-//#include <kernel/mpr_base.h>
-////// #include <coeffs/ffields.h>
-#include <polys/clapsing.h>
-#include <kernel/combinatorics/hutil.h>
-#include <polys/monomials/ring.h>
-#include <Singular/ipshell.h>
-#include <polys/ext_fields/algext.h>
-#include <coeffs/mpr_complex.h>
-#include <coeffs/longrat.h>
+#include <coeffs/coeffs.h>
+
 #include <coeffs/rmodulon.h>
+
+#include <polys/monomials/ring.h>
+#include <polys/monomials/maps.h>
+
+#include <polys/prCopy.h>
+#include <polys/matpol.h>
+
+#include <polys/weight.h>
+#include <polys/clapsing.h>
+
+
+#include <polys/ext_fields/algext.h>
+#include <polys/ext_fields/transext.h>
+
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
 
 #include <kernel/numeric/mpr_base.h>
 #include <kernel/numeric/mpr_numeric.h>
 
+#include <kernel/GBEngine/syz.h>
+#include <kernel/GBEngine/kstd1.h>
+
+#include <kernel/combinatorics/stairc.h>
+#include <kernel/combinatorics/hutil.h>
+
+#include <kernel/spectrum/semic.h>
+#include <kernel/spectrum/splist.h>
+#include <kernel/spectrum/spectrum.h>
+
+#include <kernel/oswrapper/feread.h>
+
+#include <Singular/lists.h>
+#include <Singular/attrib.h>
+#include <Singular/ipconv.h>
+#include <Singular/links/silink.h>
+#include <Singular/ipshell.h>
+#include <Singular/maps_ip.h>
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
+#include <Singular/subexpr.h>
+#include <Singular/fevoices.h>
+
 #include <math.h>
 #include <ctype.h>
-
-#include <polys/ext_fields/algext.h>
-#include <polys/ext_fields/transext.h>
 
 // define this if you want to use the fast_map routine for mapping ideals
 #define FAST_MAP
@@ -75,7 +75,7 @@
 
 #ifdef SINGULAR_4_1
 #include <Singular/number2.h>
-#include <libpolys/coeffs/bigintmat.h>
+#include <coeffs/bigintmat.h>
 #endif
 leftv iiCurrArgs=NULL;
 idhdl iiCurrProc=NULL;

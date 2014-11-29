@@ -21,7 +21,6 @@
 
 #include <coeffs/numbers.h>
 #include <coeffs/coeffs.h>
-#include <coeffs/rmodulon.h>
 
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>

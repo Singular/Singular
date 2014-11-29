@@ -39,7 +39,6 @@
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
-#include <coeffs/longrat.h>
 
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>

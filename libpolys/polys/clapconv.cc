@@ -11,13 +11,14 @@
 
 
 #include <misc/auxiliary.h>
+#include <omalloc/omalloc.h>
 
 #include <factory/factory.h>
 
-#include <omalloc/omalloc.h>
 #include <coeffs/coeffs.h>
-#include <coeffs/longrat.h>
-#include <coeffs/modulop.h>
+
+#include <coeffs/longrat.h> // snumber is necessary
+
 #include <polys/monomials/p_polys.h>
 #include <polys/sbuckets.h>
 #include <polys/clapconv.h>
