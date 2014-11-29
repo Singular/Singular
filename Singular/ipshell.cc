@@ -1303,10 +1303,10 @@ BOOLEAN iiAlias(leftv p)
          delete IDINTVEC(pp);
          break;
       case NUMBER_CMD:
-         nDelete(&IDNUMBER(pp));
+         n_Delete(&IDNUMBER(pp), currRing->cf); 
          break;
       case BIGINT_CMD:
-         n_Delete(&IDNUMBER(pp),currRing->cf);
+         n_Delete(&IDNUMBER(pp),coeffs_BIGINT); //BUG: currRing->cf);?
          break;
       case MAP_CMD:
          {
@@ -1805,7 +1805,8 @@ void rDecomposeRing(leftv h,const ring R)
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
   LL->m[0].rtyp=BIGINT_CMD;
-  LL->m[0].data=nlMapGMP((number) R->cf->modBase, R->cf, R->cf);
+  extern number nlMapGMP(number from, const coeffs src, const coeffs dst);
+  LL->m[0].data=nlMapGMP((number) R->cf->modBase, R->cf, R->cf); // FIXME: n_InitMPZ(R->cf->modBase, coeffs_BIGINT); ? // What is this???
   LL->m[1].rtyp=INT_CMD;
   LL->m[1].data=(void *) R->cf->modExponent;
   L->m[1].rtyp=LIST_CMD;
@@ -2089,8 +2090,8 @@ void rComposeRing(lists L, ring R)
     lists LL=(lists)L->m[1].data;
     if ((LL->nr >= 0) && LL->m[0].rtyp == BIGINT_CMD)
     {
-      number tmp= (number) LL->m[0].data;
-      n_MPZ (modBase, tmp, coeffs_BIGINT);
+      number tmp= (number) LL->m[0].CopyD(); // CopyD()?
+      n_MPZ (modBase, tmp, coeffs_BIGINT);   // FIXME: deletes tmp: previous CopyD() should NOT be necessary! 
     }
     else if (LL->nr >= 0 && LL->m[0].rtyp == INT_CMD)
     {
@@ -5265,6 +5266,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #ifdef HAVE_RINGS
   else if ((pn->name != NULL) && (strcmp(pn->name, "integer") == 0))
   {
+    // TODO: change to use coeffs_BIGINT!? 
     modBase = (int_number) omAlloc(sizeof(mpz_t));
     mpz_init_set_si(modBase, 0);
     if (pn->next!=NULL)
@@ -5286,9 +5288,10 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       }
       else if (pn->next->Typ()==BIGINT_CMD)
       {
-        number p=(number)pn->next->CopyD();
-        nlGMP(p,(number)modBase,coeffs_BIGINT);
-        nlDelete(&p,coeffs_BIGINT);
+        number p=(number)pn->next->CopyD();     // CopyD()?
+        extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(number n, number &i,const coeffs r)???
+        nlGMP(p,(number)modBase,coeffs_BIGINT); // FIXME: n_MPZ( modBase, p, coeffs_BIGINT); ?
+        n_Delete(&p,coeffs_BIGINT);
       }
     }
     else

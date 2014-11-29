@@ -713,8 +713,8 @@ number nr2mMapQ(number from, const coeffs src, const coeffs dst)
   mpz_init(erg);
   int_number k = (int_number)omAlloc(sizeof(mpz_t));
   mpz_init_set_ui(k, dst->mod2mMask);
-
-  nlGMP(from, (number)erg, src);
+  extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(number n, number &i,const coeffs r)???
+  nlGMP(from, (number)erg, src); // FIXME: n_MPZ(erg, from, src); // ?
   mpz_and(erg, erg, k);
   number res = (number)mpz_get_ui(erg);
 
