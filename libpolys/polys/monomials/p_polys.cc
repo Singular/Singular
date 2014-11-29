@@ -8,11 +8,6 @@
  *  Created: 8/00
  *******************************************************************/
 
-
-
-
-
-
 #include <ctype.h>
 
 #include <omalloc/omalloc.h>
@@ -22,8 +17,8 @@
 #include <misc/options.h>
 #include <misc/intvec.h>
 
-#include <coeffs/longrat.h> // ???
-#include <coeffs/ffields.h>
+
+#include <coeffs/longrat.h> // snumber is needed...
 
 #include <polys/PolyEnumerator.h>
 

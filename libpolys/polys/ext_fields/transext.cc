@@ -32,24 +32,18 @@
 *
 *           TODO: the description above needs a major update!!!
 */
-
-
-
-
-
 #define TRANSEXT_PRIVATES
-
-
-
 
 #include <misc/auxiliary.h>
 
 #include <omalloc/omalloc.h>
+#include <factory/factory.h>
 
 #include <reporter/reporter.h>
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
+
 #include <coeffs/longrat.h>
 
 #include <polys/monomials/ring.h>
@@ -58,10 +52,10 @@
 
 #include <polys/clapsing.h>
 #include <polys/clapconv.h>
-#include <factory/factory.h>
 
-#include <polys/ext_fields/transext.h>
 #include <polys/prCopy.h>
+#include "transext.h"
+#include "algext.h"
 
 #include <polys/PolyEnumerator.h>
 

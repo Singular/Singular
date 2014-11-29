@@ -2,9 +2,6 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-
-
-
 #include <kernel/mod2.h>
 
 #include <factory/factory.h>
@@ -12,7 +9,7 @@
 #include <misc/options.h>
 #include <misc/intvec.h>
 
-#include <coeffs/longrat.h>
+#include <coeffs/longrat.h> // snumber ...
 
 #include <polys/monomials/ring.h>
 

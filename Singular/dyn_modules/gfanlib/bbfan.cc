@@ -2,16 +2,17 @@
 
 #if HAVE_GFANLIB
 
+#include <misc/intvec.h>
+#include <coeffs/coeffs.h>
+#include <coeffs/bigintmat.h>
+
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
-#include <misc/intvec.h>
-#include <coeffs/longrat.h>
-#include <coeffs/bigintmat.h>
 
-#include <bbfan.h>
-#include <bbcone.h>
-#include <gfan.h>
+#include "bbfan.h"
+#include "bbcone.h"
+#include "gfan.h"
 #include <sstream>
 
 // #include <kernel/bigintmat.h>

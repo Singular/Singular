@@ -8,21 +8,18 @@
  *  Created: 8/00
  *******************************************************************/
 
-
-
 #include <misc/auxiliary.h>
-
 #include <factory/factory.h>
 
 #include <misc/options.h>
 
 #include <polys/monomials/p_polys.h>
+#include <polys/kbuckets.h>
+
 #include <polys/templates/p_Procs.h>
 #include <polys/templates/p_MemCmp.h>
 #include <polys/templates/p_MemAdd.h>
 #include <polys/templates/p_MemCopy.h>
-#include <polys/templates/p_Numbers.h>
-#include <polys/kbuckets.h>
 
 #include "p_Mult_q.h"
 
