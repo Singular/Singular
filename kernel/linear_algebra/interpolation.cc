@@ -1753,7 +1753,7 @@ ideal interpolation(const std::vector<ideal>& L, intvec *v)
 #endif
              mpz_init_set(n->z,temp->polycoef[a]);
              n->s=3;
-             nlNormalize(n, currRing->cf);
+             n_Normalize(n, currRing->cf);
              p=pNSet(n); //a monomial
              for (j=0;j<variables;j++) pSetExp(p,j+1,temp->polyexp[a][j]);
              pSetm(p); // after all pSetExp

@@ -9,18 +9,15 @@
 #include <stdio.h>
 #include <string.h>
 
-
-
-
 #include <misc/auxiliary.h>
-
 #include <omalloc/omalloc.h>
 #include <reporter/reporter.h>
 
 #include "coeffs.h"
 #include "numbers.h"
-
 #include "longrat.h"
+
+extern void     nlNormalize(number &x, const coeffs r); // FIXME
 
 /// Our Type!
 static const n_coeffType ID = n_Q;
