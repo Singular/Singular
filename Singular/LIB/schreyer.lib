@@ -2693,11 +2693,10 @@ proc TestSSresAttribs(def M, list #)
  if( !@treeout )
  {
 //   Testlres(M);  
-   Testnres(M);
-   Testsres(M);
+//   Testnres(M);
+//   Testsres(M);
 //   TestSres(M); // too long for the last medium test :(
  }
-
 
 //  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M); // TODO: FIX ERROR!!!!
 //  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
@@ -2706,8 +2705,8 @@ proc TestSSresAttribs(def M, list #)
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
 
 //  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
-  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
   attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
 
 
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
@@ -2730,13 +2729,13 @@ proc TestSSresAttribs2tr(def M, list #)
   attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
 //  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
 
-  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSSres(M);
-  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
+//  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSSres(M);
+//  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
 
   
 //  Testlres(M);  
-  Testnres(M);  
+//  Testnres(M);  
 //  Testsres(M);  
 //  TestSres(M); // too long for the last medium test :(
 
