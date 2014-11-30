@@ -36,7 +36,8 @@ class kBucket; typedef kBucket* kBucket_pt;
 # define NOPRODUCT 1
 #endif
 
-// set to 1 if all leading coeffs are assumed to be all =1...
+// set to 1 if all leading coeffs are assumed to be all =1... 
+// note the use of simplify on input in SSinit!
 #ifndef NODIVISION
 # define NODIVISION 1
 #endif

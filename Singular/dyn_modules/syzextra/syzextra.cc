@@ -450,12 +450,18 @@ static void writeLatexTerm(const poly t, const ring r, const bool bCurrSyz = tru
 
 
 
-static FORCE_INLINE poly myp_Head(const poly p, const ring r)
+static FORCE_INLINE poly myp_Head(const poly p, const bool bIgnoreCoeff, const ring r)
 {
- p_Test(p,r);
- const poly pp = p_Head(p, r);
- p_Test(pp,r);
- return pp;  
+  assume( p != NULL ); p_LmCheckPolyRing1(p, r);
+   
+  poly np; omTypeAllocBin(poly, np, r->PolyBin);
+  p_SetRingOfLm(np, r);
+  memcpy(np->exp, p->exp, r->ExpL_Size*sizeof(long));
+  pNext(np) = NULL;
+  pSetCoeff0(np, (bIgnoreCoeff)? NULL : n_Copy(pGetCoeff(p), r->cf));
+
+  p_LmCheckPolyRing1(np, r);
+  return np;  
 }
    
 
@@ -1577,9 +1583,8 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
 
 // };
 
-
    
-   bool my_p_LmCmp (poly a, poly b, const ring r) { return p_LmCmp(a, b, r) == -1; } // TODO: change to simple lex. memory compare!
+bool my_p_LmCmp (poly a, poly b, const ring r) { return p_LmCmp(a, b, r) == -1; } // TODO: change to simple lex. memory compare!
 
 // NOTE: need p_Copy?????? for image + multiplier!!???
 // NOTE: better store complete syz. terms!!?
@@ -1614,7 +1619,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
      {
        assume( p_LmEqual(itr->first, multiplier, r) );
 
-       if( itr->second == NULL )
+       if( itr->second == NULL ) // leadcoeff plays no role if value is NULL!
          return (NULL);
 
        if( UNLIKELY( __TREEOUTPUT__ ) )
@@ -1683,7 +1688,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
      
      p_Test(multiplier, r);
      
-     T.insert( TP2PCache::value_type(myp_Head(multiplier, r), p) ); //     T[ multiplier ] = p;
+     T.insert( TP2PCache::value_type(myp_Head(multiplier, (p==NULL), r), p) ); //     T[ multiplier ] = p;
 
      p_Test(multiplier, r);
 
@@ -1713,7 +1718,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
 
   if( UNLIKELY( __PROT__ ) ) ++ m_stat[8]; // PrintS("S"); // store // %d", tail + 1);
   
-  T.insert( TP2PCache::value_type(p_Copy(multiplier, r), p) );
+  T.insert( TP2PCache::value_type(myp_Head(multiplier, (p==NULL), r), p) );
 
   m_cache.insert( TCache::value_type(tail, T) );
 
@@ -2040,7 +2045,7 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
 CLeadingTerm::CLeadingTerm(unsigned int _label,  const poly _lt, const ring R):
     m_sev( p_GetShortExpVector(_lt, R) ),  m_label( _label ),  m_lt( _lt )
 #ifndef SING_NDEBUG
-    , _R(R), m_lt_copy( myp_Head(_lt, R) )
+    , _R(R), m_lt_copy( myp_Head(_lt, true, R) ) // note that p_LmEqual only tests exponents!
 #endif  
 {
 #ifndef SING_NDEBUG
