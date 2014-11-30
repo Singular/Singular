@@ -2258,11 +2258,9 @@ static proc loadme()
 
       exportto(Schreyer, Syzextra::ComputeResolution);
 
-      if (defined(NumberStatsInit))
-      {
-        exportto(Top, Syzextra::NumberStatsInit);
-        exportto(Top, Syzextra::NumberStatsPrint);
-      }
+      exportto(Schreyer, Syzextra::NumberStatsInit);
+      exportto(Schreyer, Syzextra::NumberStatsPrint);
+
       newstruct("SRES","ring r,resolution rsltn"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
       newstruct("SSYZ","ring r,module szg"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
       // TODO: SSres - return SRESOLUTION?
