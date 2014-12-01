@@ -16,8 +16,6 @@
 
 #define SINGULAR_MAJOR_VERSION 4
 
-/*#define SINGULAR_4_1 1*/
-
 #ifdef SINGULAR_4_1
 #undef VERSION
 #define VERSION "4.1.0"
