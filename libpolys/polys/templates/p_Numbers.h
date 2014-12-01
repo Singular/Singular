@@ -114,7 +114,7 @@ static FORCE_INLINE void n_InpAdd_FieldZp(number &n1, number n2, const ring r)
 }
 #else
 static FORCE_INLINE void n_InpAdd_FieldZp(number &n1, number n2, const ring r)
-{ npAddM(n1, n2, r->cf); }
+{ n1=npAddM(n1, n2, r->cf); }
 #endif
 
 #define DO_LFORCE_INLINE
