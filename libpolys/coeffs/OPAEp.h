@@ -6,6 +6,7 @@
 
 #include <coeffs/coeffs.h>
 
+#ifdef SINGULAR_4_1
 
 BOOLEAN n_pAEInitChar(coeffs , void *);
 BOOLEAN nAEpCoeffIsEqual     (number a, number b, const coeffs r);
@@ -51,6 +52,5 @@ void    nAEpCoeffWrite   (const coeffs r, BOOLEAN details);//
 BOOLEAN nAEpClearContent  (number a, const coeffs r);//
 BOOLEAN nAEpClearDenominators  (number a, const coeffs r);//
 
-
-
+#endif
 #endif

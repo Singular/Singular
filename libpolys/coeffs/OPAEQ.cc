@@ -8,6 +8,8 @@
 
 #include <misc/auxiliary.h>
 
+#ifdef SINGULAR_4_1
+
 #include <factory/factory.h>
 
 #include <string.h>
@@ -343,4 +345,4 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
     r->has_simple_Inverse=TRUE;
     return FALSE;
 }
-
+#endif

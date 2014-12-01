@@ -8,6 +8,8 @@
 
 #include <misc/auxiliary.h>
 
+#ifdef SINGULAR_4_1
+
 #include <factory/factory.h>
 
 #include <string.h>
@@ -258,12 +260,11 @@ void    nAEDelete       (number *, const coeffs)
         return;
 }
 
-/*
-number    nAESetMap        (number a, const coeffs)
+nMapFunc  nAESetMap (const coeffs src, const coeffs dst)
 {
-        return a;
+  if (src==dst) return nAECopyMap;
+  else return NULL;
 }
-*/
 
 void    nAEInpMult       (number &, number, const coeffs)
 {
@@ -337,8 +338,7 @@ BOOLEAN n_AEInitChar(coeffs r, void *)
     r->cfLcm  = nAELcm; // ZU BEARBEITEN
     r->cfDelete= nAEDelete;
 
-    extern nMapFunc npSetMap(const coeffs src, const coeffs dst); // FIXME: BUG?
-    r->cfSetMap = npSetMap; // WHY??? // TODO: this seems to be a bug!
+    r->cfSetMap = nAESetMap;
    
     r->cfInpMult=nAEInpMult; //????
     r->cfCoeffWrite=nAECoeffWrite; //????
@@ -352,4 +352,4 @@ BOOLEAN n_AEInitChar(coeffs r, void *)
     r->has_simple_Inverse=TRUE;
     return FALSE;
 }
-
+#endif
