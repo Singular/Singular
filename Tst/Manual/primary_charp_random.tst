@@ -6,6 +6,5 @@ list L=group_reynolds(A);
 string newring="alskdfj";
 molien(L[2..size(L)],newring);
 matrix P=primary_charp_random(L[1],newring,1);
-kill `newring`;
 print(P);
 tst_status(1);$

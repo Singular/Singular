@@ -11,8 +11,7 @@ string newring="Qadjoint";
 matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
 matrix REY=reynolds_molien(A,newring);
 print(REY);
-setring Qadjoint;
+setring Finvar::Qadjoint;
 print(M);
 setring S;
-kill Qadjoint;
 tst_status(1);$

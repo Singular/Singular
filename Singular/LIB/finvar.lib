@@ -752,7 +752,7 @@ EXAMPLE: example molien; shows an example
     { ring `newring`=0,x,dp;          // element, it is very easy to calculate
       matrix M[1][2]=1,(1-x)^n;       // the Molien series
     }
-    exportto(Top,`newring`);          // we keep the ring where we computed the
+    export(`newring`);                // we keep the ring where we computed the
     export M;                         // Molien series in such that we can
     setring br;                       // keep it
     if (v)
@@ -881,10 +881,10 @@ example
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
          list L=group_reynolds(A);
          molien(L[2..size(L)],newring);
-         setring alksdfjlaskdjf;
+         setring Finvar::alksdfjlaskdjf;
          print(M);
          setring S;
-         kill alksdfjlaskdjf;
+         kill Finvar::alksdfjlaskdjf;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1428,10 +1428,10 @@ example
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
          matrix REY=reynolds_molien(A,newring);
          print(REY);
-         setring Qadjoint;
+         setring Finvar::Qadjoint;
          print(M);
          setring S;
-         kill Qadjoint;
+         kill Finvar::Qadjoint;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -2368,7 +2368,7 @@ example
          string newring="alskdfj";
          molien(L[2..size(L)],newring);
          matrix P=primary_charp(L[1],newring);
-         kill `newring`;
+         kill Finvar::`newring`;
          print(P);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -3506,7 +3506,7 @@ example
          string newring="alskdfj";
          molien(L[2..size(L)],newring);
          matrix P=primary_charp_random(L[1],newring,1);
-         kill `newring`;
+         kill Finvar::`newring`;
          print(P);
 }
 ///////////////////////////////////////////////////////////////////////////////

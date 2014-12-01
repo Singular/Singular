@@ -3,6 +3,6 @@ LIB "kskernel.lib";
 int p=6;
 int q=7;
 KSker(p,q);
-setring KSring;
+setring Kskernel::KSring;
 print(KSkernel);
 tst_status(1);$
