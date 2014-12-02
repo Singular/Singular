@@ -1192,12 +1192,12 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   }
   // basic product criterion
   pLcm(p,strat->S[i],Lp.lcm);
+  pSetm(Lp.lcm);
 
   #if ADIDEBUG
   PrintS("\nLp.lcm (lcm) = ");pWrite(Lp.lcm);
   #endif
 
-  pSetm(Lp.lcm);
   assume(!strat->sugarCrit);
   if (pHasNotCF(p,strat->S[i]) && n_IsUnit(pGetCoeff(p),currRing->cf)
       && n_IsUnit(pGetCoeff(strat->S[i]),currRing->cf))
@@ -1251,8 +1251,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
         }
         break;
       }
-      else
-      if (compare == -1)
+      else if (compare == -1)
       {
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
@@ -5573,8 +5572,17 @@ poly redtailBba_Z (LObject* L, int pos, kStrategy strat )
         }
         else
         {
-          if (Ln.p!=NULL) Ln.p=pAdd(Ln.p,mm);
-          else if (Ln.t_p!=NULL)  Ln.t_p=p_Add_q(Ln.t_p,mm,strat->tailRing);
+	  if ((Ln.t_p!=NULL)&&(Ln.p==NULL))
+	    Ln.GetP();
+          if (Ln.p!=NULL)
+	  {
+	    Ln.p=pAdd(Ln.p,mm);
+	    if (Ln.t_p!=NULL)
+	    {
+	      pNext(Ln.t_p)=NULL;
+	      p_LmDelete(Ln.t_p,strat->tailRing);
+	    }
+	  }
         }
       }
       else
