@@ -5,6 +5,9 @@
 ****************************************/
 
 #include <coeffs/coeffs.h>
+#include <misc/auxiliary.h>
+
+#ifdef SINGULAR_4_1
 
 
 BOOLEAN n_AEInitChar(coeffs , void *);
@@ -51,6 +54,5 @@ void    nAECoeffWrite   (const coeffs r, BOOLEAN details);//
 BOOLEAN nAEClearContent  (number a, const coeffs r);//
 BOOLEAN nAEClearDenominators  (number a, const coeffs r);//
 
-
-
+#endif
 #endif

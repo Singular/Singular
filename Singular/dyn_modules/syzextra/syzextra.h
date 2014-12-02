@@ -36,7 +36,8 @@ class kBucket; typedef kBucket* kBucket_pt;
 # define NOPRODUCT 1
 #endif
 
-// set to 1 if all leading coeffs are assumed to be all =1...
+// set to 1 if all leading coeffs are assumed to be all =1... 
+// note the use of simplify on input in SSinit!
 #ifndef NODIVISION
 # define NODIVISION 1
 #endif
@@ -190,51 +191,51 @@ struct SchreyerSyzygyComputationFlags
     SchreyerSyzygyComputationFlags(idhdl rootRingHdl);
 
     SchreyerSyzygyComputationFlags(const SchreyerSyzygyComputationFlags& attr):
-        __DEBUG__(attr.__DEBUG__),
-        __LEAD2SYZ__(attr.__LEAD2SYZ__),  __TAILREDSYZ__(attr.__TAILREDSYZ__),
-        __HYBRIDNF__(attr.__HYBRIDNF__), __IGNORETAILS__(attr.__IGNORETAILS__),
-        __SYZNUMBER__(attr.__SYZNUMBER__), __TREEOUTPUT__(attr.__TREEOUTPUT__),
-        __SYZCHECK__(attr.__SYZCHECK__), __PROT__(attr.__PROT__),
-        __NOCACHING__(attr.__NOCACHING__),
+        OPT__DEBUG(attr.OPT__DEBUG),
+        OPT__LEAD2SYZ(attr.OPT__LEAD2SYZ),  OPT__TAILREDSYZ(attr.OPT__TAILREDSYZ),
+        OPT__HYBRIDNF(attr.OPT__HYBRIDNF), OPT__IGNORETAILS(attr.OPT__IGNORETAILS),
+        OPT__SYZNUMBER(attr.OPT__SYZNUMBER), OPT__TREEOUTPUT(attr.OPT__TREEOUTPUT),
+        OPT__SYZCHECK(attr.OPT__SYZCHECK), OPT__PROT(attr.OPT__PROT),
+        OPT__NOCACHING(attr.OPT__NOCACHING),
         m_rBaseRing(attr.m_rBaseRing)
     {}
 
   /// output all the intermediate states
-  const int __DEBUG__; // DebugOutput;
+  const int OPT__DEBUG; // DebugOutput;
 
   /// ?
-  const int __LEAD2SYZ__; // TwoLeadingSyzygyTerms;
+  const int OPT__LEAD2SYZ; // TwoLeadingSyzygyTerms;
 
   /// Reduce syzygy tails wrt the leading syzygy terms
-  const int __TAILREDSYZ__; // TailReducedSyzygies;
+  const int OPT__TAILREDSYZ; // TailReducedSyzygies;
 
   /// Use the usual NF's S-poly reduction while dropping lower order terms
   /// 2 means - smart selection!
-  const int __HYBRIDNF__; // UseHybridNF
+  const int OPT__HYBRIDNF; // UseHybridNF
 
 
   /// ignore tails and compute the pure Schreyer frame
-  const int __IGNORETAILS__; // @IGNORETAILS
+  const int OPT__IGNORETAILS; // @IGNORETAILS
 
   /// Syzygy level (within a resolution)
-  mutable int __SYZNUMBER__;
+  mutable int OPT__SYZNUMBER;
 
   inline void  nextSyzygyLayer() const
   {
-     __SYZNUMBER__++;
+     OPT__SYZNUMBER++;
   }
 
   /// output lifting tree
-  const int __TREEOUTPUT__;
+  const int OPT__TREEOUTPUT;
 
   /// CheckSyzygyProperty: TODO
-  const int __SYZCHECK__;
+  const int OPT__SYZCHECK;
 
   /// TEST_OPT_PROT
-  const bool __PROT__;   
+  const bool OPT__PROT;   
    
   /// no caching/stores/lookups
-  const int __NOCACHING__;
+  const int OPT__NOCACHING;
 
   /// global base ring
   const ring m_rBaseRing;
@@ -409,7 +410,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         m_sum_bucket_factory(setting.m_rBaseRing),
         m_spoly_bucket(NULL)
     {
-      if( UNLIKELY(__PROT__) ) memset( &m_stat, 0, sizeof(m_stat) );
+      if( UNLIKELY(OPT__PROT) ) memset( &m_stat, 0, sizeof(m_stat) );
     }
 
     /// Construct a global object for given input data (separated into leads & tails)
@@ -422,9 +423,9 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         m_sum_bucket_factory(setting.m_rBaseRing),
         m_spoly_bucket(NULL)
     {
-      if( UNLIKELY(__PROT__) ) memset( &m_stat, 0, sizeof(m_stat) );
+      if( UNLIKELY(OPT__PROT) ) memset( &m_stat, 0, sizeof(m_stat) );
       
-      if( LIKELY(__TAILREDSYZ__ && !__IGNORETAILS__) )
+      if( LIKELY(OPT__TAILREDSYZ && !OPT__IGNORETAILS) )
       {
         if (syzLeads != NULL)
           m_checker.Initialize(syzLeads);
@@ -451,7 +452,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
 
       m_syzLeads = m_syzTails = NULL; // m_LS ?
       
-      if ( UNLIKELY(__PROT__) )
+      if ( UNLIKELY(OPT__PROT) )
         PrintStats();
     }
 

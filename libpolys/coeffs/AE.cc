@@ -3,6 +3,7 @@
 #include "AE.h"
 
 
+#ifdef SINGULAR_4_1
 
 using namespace std;
 
@@ -1275,3 +1276,4 @@ void int_poly::poly_print()
 #endif
 }
 
+#endif

@@ -618,10 +618,10 @@ static proc SSinit(def M)
     M = std(M);
     option(set, opts);
     kill opts;
-  } else
-  {
-    M = simplify(M, 2 + 4 + 32); // interreduce?
-  }
+  }//  else
+  // {
+    M = simplify(M, 1 + 2 + 4 + 32); // interreduce?
+  // }
 
   if( @IGNORETAILS )
   {
@@ -2258,8 +2258,8 @@ static proc loadme()
 
       exportto(Schreyer, Syzextra::ComputeResolution);
 
-      exportto(Top, Syzextra::NumberStatsInit);
-      exportto(Top, Syzextra::NumberStatsPrint);
+      exportto(Schreyer, Syzextra::NumberStatsInit);
+      exportto(Schreyer, Syzextra::NumberStatsPrint);
 
       newstruct("SRES","ring r,resolution rsltn"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
       newstruct("SSYZ","ring r,module szg"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
@@ -2693,11 +2693,10 @@ proc TestSSresAttribs(def M, list #)
  if( !@treeout )
  {
 //   Testlres(M);  
-   Testnres(M);
-   Testsres(M);
+//   Testnres(M);
+//   Testsres(M);
 //   TestSres(M); // too long for the last medium test :(
  }
-
 
 //  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M); // TODO: FIX ERROR!!!!
 //  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
@@ -2706,8 +2705,8 @@ proc TestSSresAttribs(def M, list #)
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 0); attrib(SSinit, "HYBRIDNF", 1); TestSSres(M);
 
 //  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
-  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
   attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSSres(M);
+  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
 
 
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSres(M);
@@ -2730,13 +2729,13 @@ proc TestSSresAttribs2tr(def M, list #)
   attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
 //  attrib(SSinit, "LEAD2SYZ", 0); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
 
-  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSSres(M);
-  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
+//  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 0); TestSSSres(M);
+//  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 1); TestSSSres(M);
 //  attrib(SSinit, "LEAD2SYZ", 1); attrib(SSinit, "TAILREDSYZ", 1); attrib(SSinit, "HYBRIDNF", 2); TestSSSres(M);
 
   
 //  Testlres(M);  
-  Testnres(M);  
+//  Testnres(M);  
 //  Testsres(M);  
 //  TestSres(M); // too long for the last medium test :(
 

@@ -2901,8 +2901,15 @@ static void nlClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
 
 }
 
+char * nlCoeffName(const coeffs r)
+{
+  if (r->cfDiv==nlDiv) return (char*)"QQ";
+  else                 return (char*)"ZZ";
+}
+
 static char* nlCoeffString(const coeffs r)
 {
+  //return omStrDup(nlCoeffName(r));
   if (r->cfDiv==nlDiv) return omStrDup("0");
   else                 return omStrDup("integer");
 }
@@ -3027,12 +3034,6 @@ BOOLEAN nlCoeffIsEqual(const coeffs r, n_coeffType n, void *p)
     if ((p!=NULL)&&(r->cfDiv!=nlDiv)) return TRUE;
   }
   return FALSE;
-}
-
-char * nlCoeffName(const coeffs r)
-{
-  if (r->cfDiv==nlDiv) return (char*)"QQ";
-  else                 return (char*)"ZZ";
 }
 
 static number nlLcm(number a,number b,const coeffs r)

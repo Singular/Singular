@@ -243,6 +243,7 @@ number nrzIntMod (number a,number b, const coeffs)
   mpz_init(r);
   mpz_tdiv_qr(erg, r, (int_number) a, (int_number) b);
   mpz_clear(erg);
+  omFreeBin(erg, gmp_nrz_bin);
   return (number) r;
 }
 

@@ -205,21 +205,21 @@ EXAMPLE:  setglobalrings; shows an example"
   Rx[1]=0;
   def D=ring(Rx);
   def @RP=D+@P;
-  exportto(Top,@R);      // global ring K[a][x]
-  exportto(Top,@P);      // global ring K[a]
-  exportto(Top,@RP);     // global ring K[x,a] with product order
+  export(@R);      // global ring K[a][x]
+  export(@P);      // global ring K[a]
+  export(@RP);     // global ring K[x,a] with product order
   setring(RR);
 }
 example
 { "EXAMPLE:"; echo = 2;
   ring R=(0,a,b),(x,y,z),dp;
   setglobalrings();
-  @R;
-  @P;
-  @RP;
-ringlist(@R);
-ringlist(@P);
-ringlist(@RP);
+  Grobcov::@R;
+  Grobcov::@P;
+  Grobcov::@RP;
+ringlist(Grobcov::@R);
+ringlist(Grobcov::@P);
+ringlist(Grobcov::@RP);
 }
 
 //*************Auxiliary routines**************

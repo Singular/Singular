@@ -9,5 +9,5 @@ print(gmsjacob);
 print(gmsstd);
 print(gmsmatrix);
 print(gmsbasis);
-gmsmaxdeg;
+Gmssing::gmsmaxdeg;
 tst_status(1);$

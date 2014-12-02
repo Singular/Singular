@@ -38,8 +38,6 @@
 #include <math.h>
 //<-
 
-extern void nPrint(number n);  // for debugging output
-
 //%s
 //-----------------------------------------------------------------------------
 //-------------- sparse resultant matrix --------------------------------------

@@ -8,6 +8,8 @@
 
 #include <misc/auxiliary.h>
 
+#ifdef SINGULAR_4_1
+
 #include <factory/factory.h>
 
 #include <string.h>
@@ -328,7 +330,10 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
     r->cfGcd  = nAEQGcd;
     r->cfLcm  = nAEQLcm; // ZU BEARBEITEN
     r->cfDelete= nAEQDelete;
-    r->cfSetMap = npSetMap;
+   
+    extern nMapFunc npSetMap(const coeffs src, const coeffs dst); // FIXME: BUG?
+    r->cfSetMap = npSetMap; // WHY??? // TODO: this seems to be a bug!
+   
     r->cfInpMult=nAEQInpMult; //????
     r->cfCoeffWrite=nAEQCoeffWrite; //????
 
@@ -340,4 +345,4 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
     r->has_simple_Inverse=TRUE;
     return FALSE;
 }
-
+#endif

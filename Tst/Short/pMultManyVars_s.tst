@@ -15,9 +15,9 @@ proc pMultManyVars_Test(string rs)
   rs;
   rs = "ring r = " + rs + ";";
   execute(rs);
-  int n_vars = tst_rgen_nvars[tst_rgen_var_index];
+  int n_vars = tst_rgen_nvars[Tst::tst_rgen_var_index];
   ideal id = tst_cyclic(5);
-  tst_TestMult(id, 2,size(tst_rgen_comp_orderings[tst_rgen_comp_index]));
+  tst_TestMult(id, 2,size(tst_rgen_comp_orderings[Tst::tst_rgen_comp_index]));
   kill r;
 }
 
