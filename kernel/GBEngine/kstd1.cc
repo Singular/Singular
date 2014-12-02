@@ -354,7 +354,7 @@ int redRiloc (LObject* h,kStrategy strat)
   long d,reddeg;
 
 
-  #if ADIDEBUG_NF
+#if ADIDEBUG_NF
   int iii;
   PrintLn();
   PrintS("---------------------------- NEW REDRILOC COMPUTATION ----------------------------");
@@ -366,47 +366,47 @@ int redRiloc (LObject* h,kStrategy strat)
   PrintLn();
   PrintS("    The actual reducer T is: ");
   if(strat->tl<0)
-    {PrintS(" Empty.");PrintLn();}
+    {PrintS(" Empty.\n");
   else
   for (iii=0;iii<=strat->tl;iii++)
-    {
+  {
     PrintLn();
-    PrintS("      T[");printf("%i",iii);PrintS("] = ");p_Write(strat->T[iii].p,strat->tailRing);
+    Print("      T[%i] = ",iii);p_Write(strat->T[iii].p,strat->tailRing);
     PrintLn();
-    }
-  #endif /* ADIDEBUG_NF */
+  }
+#endif /* ADIDEBUG_NF */
 
   d = h->GetpFDeg()+ h->ecart;
   reddeg = strat->LazyDegree+d;
   h->SetShortExpVector();
-  #if ADIDEBUG_NF
-   PrintLn();
-  PrintS("  Searching for a poly in T that divides h (of ecart ");
-  printf("%i",h->ecart);PrintS(") ...");
+#if ADIDEBUG_NF
   PrintLn();
-  #endif
+  PrintS("  Searching for a poly in T that divides h (of ecart ");
+  Print("%i) ...",h->ecart);
+  PrintLn();
+#endif
   loop
   {
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
-    #if ADIDEBUG_NF
-      if(j != -1)
-        {
-        ei = strat->T[j].ecart;
-        PrintLn();
-        PrintS("    Found one: T[");printf("%i",j);
-        PrintS("] of ecart ");printf("%i",ei);
-        PrintS(": ");p_Write(strat->T[j].p,strat->tailRing);
-        PrintLn();
-        PrintS("    Try to find another with smaller ecart:");
-        PrintLn();
-        }
-      else
-        {
-        PrintLn();
-        PrintS("    No poly in T divides h.");
-        PrintLn();
-        }
-     #endif
+#if ADIDEBUG_NF
+    if(j != -1)
+    {
+      ei = strat->T[j].ecart;
+      PrintLn();
+      Print("    Found one: T[%i",j);
+      Print("] of ecart %i",ei);
+      PrintS(": ");p_Write(strat->T[j].p,strat->tailRing);
+      PrintLn();
+      PrintS("    Try to find another with smaller ecart:");
+      PrintLn();
+    }
+    else
+    {
+      PrintLn();
+      PrintS("    No poly in T divides h.");
+      PrintLn();
+    }
+#endif
     if (j < 0)
     {
       if (strat->honey) h->SetLength(strat->length_pLength);
@@ -415,9 +415,9 @@ int redRiloc (LObject* h,kStrategy strat)
 
     ei = strat->T[j].ecart;
     ii = j;
-    #if ADIDEBUG_NF
+#if ADIDEBUG_NF
     iii=ii;
-    #endif
+#endif
     if (ei > h->ecart && ii < strat->tl)
     {
       li = strat->T[j].length;
@@ -451,23 +451,21 @@ int redRiloc (LObject* h,kStrategy strat)
         }
       }
 
-
-    #if ADIDEBUG_NF
-    if(iii == ii)
+#if ADIDEBUG_NF
+      if(iii == ii)
       {
-      PrintLn();
-      PrintS("    None was found.");
-      PrintLn();
+        PrintLn();
+        PrintS("    None was found.");
+        PrintLn();
       }
-    else
+      else
       {
-      PrintLn();
-      PrintS("    A better one (ecart = ");printf("%i",ei);PrintS("): T[");
-      printf("%i] = ",ii);p_Write(strat->T[ii].p,strat->tailRing);
-      PrintLn();
+        PrintLn();
+        Print("    A better one (ecart = %i): T[",ei);
+        Print("%i] = ",ii);p_Write(strat->T[ii].p,strat->tailRing);
+        PrintLn();
       }
-    #endif
-
+#endif
     }
 
     // end of search: have to reduce with pi
@@ -1471,11 +1469,6 @@ void initMora(ideal F,kStrategy strat)
   kOptimizeLDeg(currRing->pLDeg, strat);
 }
 
-#ifdef HAVE_ASSUME
-static int mora_count = 0;
-static int mora_loop_count;
-#endif
-
 void kDebugPrint(kStrategy strat);
 
 ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
@@ -1485,10 +1478,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 int loop_count;
 loop_count = 1;
 #endif
-#endif
-#ifdef HAVE_ASSUME
-  mora_count++;
-  mora_loop_count = 0;
 #endif
   int olddeg = 0;
   int reduc = 0;
@@ -1546,9 +1535,6 @@ loop_count = 1;
 
   while (strat->Ll >= 0)
   {
-#ifdef HAVE_ASSUME
-    mora_loop_count++;
-#endif
     #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
     #endif
@@ -1575,57 +1561,50 @@ loop_count = 1;
       else strat->noClearS=TRUE;
     }
 
-        #if ADIDEBUG
-    #ifdef KDEBUG
-
+#if ADIDEBUG
+#ifdef KDEBUG
     PrintLn();
-    PrintS("-------------------------------- LOOP ");printf("%d",loop_count);
-    PrintS(" ---------------------------------------");
-    PrintLn();
+    Print("-------------------------------- LOOP %d ---------------------------------------\n",loop_count);
     //print the list L: (p1,p2,p)
     PrintLn();
-    PrintS("    The pair list L -- in loop ");
-    printf("%d",loop_count);PrintS(" -- is: "); PrintLn();
+    Print("    The pair list L -- in loop %d  -- is:\n",loop_count);
     for(int iii=0;iii<=strat->Ll;iii++)
-      {
+    {
       PrintLn();
-      PrintS("    L[");printf("%d",iii);Print("]: ");
+      Print("    L[%d]: ",iii);
       PrintLn();
       PrintS("        ");p_Write(strat->L[iii].p1,strat->tailRing);
       PrintS("        ");p_Write(strat->L[iii].p2,strat->tailRing);
       PrintS("        ");p_Write(strat->L[iii].p,strat->tailRing);
-      }
+    }
     PrintLn();
-    #endif
-    #endif
-
+#endif
+#endif
 
     strat->P = strat->L[strat->Ll];/*- picks the last element from the lazyset L -*/
     if (strat->Ll==0) strat->interpt=TRUE;
     strat->Ll--;
 
-    #if ADIDEBUG
-    #ifdef KDEBUG
-    PrintS("    My new pair P = (p1,p2,p) is: "); PrintLn();
+#if ADIDEBUG
+#ifdef KDEBUG
+    PrintS("    My new pair P = (p1,p2,p) is:\n");
     PrintS("      p1 = "); p_Write(strat->P.p1,strat->tailRing);PrintLn();
     PrintS("      p2 = "); p_Write(strat->P.p2,strat->tailRing);PrintLn();
     PrintS("      p = "); p_Write(strat->P.p,strat->tailRing); PrintLn();
     PrintLn();
-    PrintS("    The old reducer list T -- at the beg of loop ");
-    printf("%d",loop_count);PrintS(" -- is :");
+    Print("    The old reducer list T -- at the beg of loop %d -- is :",loop_count);
     if(strat->tl<0)
-      {PrintS(" Empty.");PrintLn();}
+    {PrintS(" Empty.");PrintLn();}
     else
     for(int iii=0;iii<=strat->tl;iii++)
-      {
-        PrintLn();
-        PrintS("    T[");printf("%d",iii);PrintS("]:");
-        p_Write(strat->T[iii].p,strat->T->tailRing);
-      }
+    {
+      PrintLn();
+      Print("    T[%d]:",iii);
+      p_Write(strat->T[iii].p,strat->T->tailRing);
+    }
     PrintLn();
-
-    #endif /* ADIDEBUG */
-    #endif
+#endif /* ADIDEBUG */
+#endif
 
     // create the real Spoly
     if (pNext(strat->P.p) == strat->tail)
@@ -1696,19 +1675,17 @@ loop_count = 1;
       {
         superenterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
 
-        #if ADIDEBUG
-        PrintLn();
-    PrintS("    The new pair list L -- after superenterpairs in loop ");
-    printf("%d",loop_count);PrintS(" -- is: "); PrintLn();
-    for(int iii=0;iii<=strat->Ll;iii++)
-    {
-    PrintLn();
-    PrintS("    L[");printf("%d",iii);PrintS("]:");PrintLn();
-    PrintS("         ");p_Write(strat->L[iii].p1,strat->tailRing);
-    PrintS("         ");p_Write(strat->L[iii].p2,strat->tailRing);
-    PrintS("         ");p_Write(strat->L[iii].p,strat->tailRing);
-    }
-    #endif
+#if ADIDEBUG
+        Print("\n    The new pair list L -- after superenterpairs in loop %d -- is:\n",loop_count);
+        for(int iii=0;iii<=strat->Ll;iii++)
+        {
+          PrintLn();
+          PrintS("    L[%d]:\n",iii);
+          PrintS("         ");p_Write(strat->L[iii].p1,strat->tailRing);
+          PrintS("         ");p_Write(strat->L[iii].p2,strat->tailRing);
+          PrintS("         ");p_Write(strat->L[iii].p,strat->tailRing);
+        }
+#endif
       }
       else
 #endif
@@ -1720,17 +1697,17 @@ loop_count = 1;
 
       // apply hilbert criterion
       if (hilb!=NULL)
-        {
+      {
         if (strat->homog==isHomog)
           khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
         else
           khCheckLocInhom(Q,w,hilb,hilbcount,strat);
-        }
+      }
 
       // clear strat->P
       if (strat->P.lcm!=NULL)
 #if defined(HAVE_RINGS) || defined(HAVE_RINGS_LOC)
-   pLmDelete(strat->P.lcm);
+        pLmDelete(strat->P.lcm);
 #else
         pLmFree(strat->P.lcm);
 #endif
@@ -1759,20 +1736,17 @@ loop_count = 1;
     }
     kTest_TS(strat);
 
-      #if ADIDEBUG
-  PrintLn();
-  PrintS("    The new reducer list T -- at the end of loop ");
-  printf("%d",loop_count);PrintS(" -- is "); PrintLn();
-  for(int iii=0;iii<=strat->tl;iii++)
+#if ADIDEBUG
+    Print("\n    The new reducer list T -- at the end of loop %d -- is\n",loop_count);
+    for(int iii=0;iii<=strat->tl;iii++)
     {
-    PrintLn();
-    PrintS("    T[");printf("%d",iii);PrintS("]:");
-    p_Write(strat->T[iii].p,strat->tailRing);
+      PrintS("\n    T[%d]:",iii);
+      p_Write(strat->T[iii].p,strat->tailRing);
     }
-  PrintLn();
+    PrintLn();
 
-  loop_count++;
-  #endif /* ADIDEBUG */
+    loop_count++;
+#endif /* ADIDEBUG */
   }
   /*- complete reduction of the standard basis------------------------ -*/
   if (TEST_OPT_REDSB) completeReduce(strat);
