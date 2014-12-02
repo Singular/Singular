@@ -262,7 +262,7 @@ void    nAEDelete       (number *, const coeffs)
 
 nMapFunc  nAESetMap (const coeffs src, const coeffs dst)
 {
-  if (src==dst) return nAECopyMap;
+  if (src==dst) return ndCopyMap; // UNDEFINED: nAECopyMap; // BUG :(
   else return NULL;
 }
 
