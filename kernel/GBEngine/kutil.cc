@@ -334,8 +334,8 @@ void cancelunit (LObject* L,BOOLEAN inNF)
   poly p = L->GetLmTailRing();
 
 #ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
-                  lc = p_GetCoeff(p,r);
+    if (rField_is_Ring(r) /*&& (!rHasGlobalOrdering(r))*/)
+      lc = p_GetCoeff(p,r);
 #endif
 
 #ifdef HAVE_RINGS_LOC
@@ -358,16 +358,23 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       p_Delete(&pNext(p), r);
       if (!inNF)
       {
-             number eins;
-              #ifdef HAVE_RINGS
-              if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
-                              eins = nCopy(lc);
-                    else
-                     #endif
-              eins=nInit(1);
-              if (L->p != NULL)  pSetCoeff(L->p,eins);
-        else if (L->t_p != NULL) nDelete(&pGetCoeff(L->t_p));
-        if (L->t_p != NULL) pSetCoeff0(L->t_p,eins);
+        number eins;
+#ifdef HAVE_RINGS
+        if (rField_is_Ring(r) /*&& (!rHasGlobalOrdering(r))*/)
+          eins = nCopy(lc);
+        else
+#endif
+          eins=nInit(1);
+        if (L->p != NULL)
+        {
+          pSetCoeff(L->p,eins);
+          if (L->t_p != NULL)
+            pSetCoeff0(L->t_p,eins);
+        }
+        else
+          pSetCoeff(L->t_p,eins);
+        /* p and t_p share the same coeff, if both are !=NULL */
+        /* p==NULL==t_p cannot happen here */
       }
       L->ecart = 0;
       L->length = 1;
@@ -376,7 +383,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       L->max = NULL;
 
       if (L->t_p != NULL && pNext(L->t_p) != NULL)
-        pNext(L->t_p) = NULL;
+        p_Delete(&pNext(L->t_p),r);
       if (L->p != NULL && pNext(L->p) != NULL)
         pNext(L->p) = NULL;
 
@@ -390,9 +397,9 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       #ifdef HAVE_RINGS
       // Note: As long as qring j forbidden if j contains integer (i.e. ground rings are
       //       domains), no zerodivisor test needed  CAUTION
-      if (rField_is_Ring(currRing) && currRing->OrdSgn == -1)
-              if(n_DivBy(p_GetCoeff(h,r->cf),lc,r->cf) == 0)
-                      return;
+      if (rField_is_Ring(r) /*&&(!rHasGlobalOrdering(r)) */)
+        if(n_DivBy(p_GetCoeff(h,r->cf),lc,r->cf) == 0)
+          return;
       #endif
       if (i == r->N) break; // does divide, try next monom
     }
@@ -1828,7 +1835,7 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   int sigCmp = p_LmCmp(pSigMult,sSigMult,currRing);
 //#if 1
 #if DEBUGF5
-  printf("IN PAIR GENERATION - COMPARING SIGS: %d\n",sigCmp);
+  Print("IN PAIR GENERATION - COMPARING SIGS: %d\n",sigCmp);
   pWrite(pSigMult);
   pWrite(sSigMult);
 #endif
@@ -1996,7 +2003,7 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
     pDelete (&m1);
     pDelete (&m2);
 #if DEBUGF5
-    printf("SIGNATURE OF PAIR:  ");
+    PrintS("SIGNATURE OF PAIR:  ");
     pWrite(Lp.sig);
 #endif
     /*- the pair (S[i],p) enters B -*/
@@ -3583,88 +3590,70 @@ void clearSbatch (poly h,int k,int pos,kStrategy strat)
 */
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
-  #if ADIDEBUG
-  PrintLn();
-  PrintS("Enter superenterpairs");
-  PrintLn();
+#if ADIDEBUG
+  PrintS("\nEnter superenterpairs\n");
   int iii = strat->Ll;
-  #endif
+#endif
   assume (rField_is_Ring(currRing));
   // enter also zero divisor * poly, if this is non zero and of smaller degree
   if (!(rField_is_Domain(currRing))) enterExtendedSpoly(h, strat);
-   #if ADIDEBUG
+#if ADIDEBUG
   if(iii==strat->Ll)
   {
-    PrintLn();
-    PrintS("                enterExtendedSpoly has not changed the list L.");
-    PrintLn();
+    PrintS("\n                enterExtendedSpoly has not changed the list L.\n");
   }
   else
   {
     PrintLn();
-    PrintS("                enterExtendedSpoly changed the list L: ");
-    PrintLn();
+    PrintS("\n                enterExtendedSpoly changed the list L:\n");
     for(iii=0;iii<=strat->Ll;iii++)
     {
-      PrintLn();
-      PrintS("                L[");printf("%d",iii);PrintS("]:");PrintLn();
+      Print("\n                L[%d]:\n",iii);
       PrintS("                     ");p_Write(strat->L[iii].p1,strat->tailRing);
       PrintS("                     ");p_Write(strat->L[iii].p2,strat->tailRing);
       PrintS("                     ");p_Write(strat->L[iii].p,strat->tailRing);
     }
   }
   iii = strat->Ll;
-  #endif
+#endif
   initenterpairs(h, k, ecart, 0, strat, atR);
-  #if ADIDEBUG
+#if ADIDEBUG
   if(iii==strat->Ll)
   {
-    PrintLn();
-    PrintS("                initenterpairs has not changed the list L.");
-    PrintLn();
+    PrintS("\n                initenterpairs has not changed the list L.\n");
   }
   else
   {
-    PrintLn();
-    PrintS("                initenterpairs changed the list L: ");
-    PrintLn();
+    PrintS("\n                initenterpairs changed the list L:\n");
     for(iii=0;iii<=strat->Ll;iii++)
     {
-      PrintLn();
-      PrintS("                L[");printf("%d",iii);PrintS("]:");PrintLn();
+      Print("\n                L[%d]:\n",iii);
       PrintS("                     ");p_Write(strat->L[iii].p1,strat->tailRing);
       PrintS("                     ");p_Write(strat->L[iii].p2,strat->tailRing);
       PrintS("                     ");p_Write(strat->L[iii].p,strat->tailRing);
     }
   }
   iii = strat->Ll;
-  #endif
+#endif
   initenterstrongPairs(h, k, ecart, 0, strat, atR);
-  #if ADIDEBUG
+#if ADIDEBUG
   if(iii==strat->Ll)
   {
-    PrintLn();
-    PrintS("                initenterstrongPairs has not changed the list L.");
-    PrintLn();
+    PrintS("\n                initenterstrongPairs has not changed the list L.\n");
   }
   else
   {
-    PrintLn();
-    PrintS("                initenterstrongPairs changed the list L: ");
-    PrintLn();
+    PrintS("\n                initenterstrongPairs changed the list L:\n");
     for(iii=0;iii<=strat->Ll;iii++)
     {
-      PrintLn();
-      PrintS("                L[");printf("%d",iii);PrintS("]:");PrintLn();
+      Print("\n                L[%d]:\n",iii);
       PrintS("                     ");p_Write(strat->L[iii].p1,strat->tailRing);
       PrintS("                     ");p_Write(strat->L[iii].p2,strat->tailRing);
       PrintS("                     ");p_Write(strat->L[iii].p,strat->tailRing);
     }
   }
-  PrintLn();
-  PrintS("End of superenterpairs");
-  PrintLn();
-  #endif
+  PrintS("\nEnd of superenterpairs\n");
+#endif
   clearSbatch(h, k, pos, strat);
 }
 #endif
@@ -5092,7 +5081,7 @@ BOOLEAN syzCriterion(poly sig, unsigned long not_sevSig, kStrategy strat)
     {
 //#if 1
 #ifdef DEBUGF5
-      printf("DELETE!\n");
+      PrintS("DELETE!\n");
 #endif
       //printf("- T -\n\n");
       return TRUE;
@@ -5133,7 +5122,7 @@ BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
     for (int k=min; k<max; k++)
     {
 #ifdef F5DEBUG
-      printf("COMP %d/%d - MIN %d - MAX %d - SYZL %ld\n",comp,strat->currIdx,min,max,strat->syzl);
+      Print("COMP %d/%d - MIN %d - MAX %d - SYZL %ld\n",comp,strat->currIdx,min,max,strat->syzl);
       Print("checking with: %d --  ",k);
       pWrite(pHead(strat->syz[k]));
 #endif
@@ -5152,7 +5141,7 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
   //printf("Faugere Rewritten Criterion\n");
 //#if 1
 #ifdef DEBUGF5
-  printf("rewritten criterion checks:  ");
+  PrintS("rewritten criterion checks:  ");
   pWrite(sig);
 #endif
   for(int k = strat->sl; k>=start; k--)
@@ -5167,7 +5156,7 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
     {
 //#if 1
 #ifdef DEBUGF5
-      printf("DELETE!\n");
+      PrintS("DELETE!\n");
 #endif
       return TRUE;
     }
@@ -5572,17 +5561,17 @@ poly redtailBba_Z (LObject* L, int pos, kStrategy strat )
         }
         else
         {
-	  if ((Ln.t_p!=NULL)&&(Ln.p==NULL))
-	    Ln.GetP();
+          if ((Ln.t_p!=NULL)&&(Ln.p==NULL))
+            Ln.GetP();
           if (Ln.p!=NULL)
-	  {
-	    Ln.p=pAdd(Ln.p,mm);
-	    if (Ln.t_p!=NULL)
-	    {
-	      pNext(Ln.t_p)=NULL;
-	      p_LmDelete(Ln.t_p,strat->tailRing);
-	    }
-	  }
+          {
+            Ln.p=pAdd(Ln.p,mm);
+            if (Ln.t_p!=NULL)
+            {
+              pNext(Ln.t_p)=NULL;
+              p_LmDelete(Ln.t_p,strat->tailRing);
+            }
+          }
         }
       }
       else
@@ -6120,7 +6109,7 @@ void initSyzRules (kStrategy strat)
     strat->syzl       = 0;
     strat->syzidxmax  = comp;
 #if defined(DEBUGF5) || defined(DEBUGF51)
-    printf("------------- GENERATING SYZ RULES NEW ---------------\n");
+    PrintS("------------- GENERATING SYZ RULES NEW ---------------\n");
 #endif
     i = 1;
     j = 0;
@@ -6214,23 +6203,22 @@ void initSyzRules (kStrategy strat)
     }
 //#if 1
 #ifdef DEBUGF5
-    Print("Principal syzygies:\n");
-    printf("syzl   %d\n",strat->syzl);
-    printf("syzmax %d\n",strat->syzmax);
-    printf("ps     %d\n",ps);
-    Print("--------------------------------\n");
+    PrintS("Principal syzygies:\n");
+    Print("syzl   %d\n",strat->syzl);
+    Print("syzmax %d\n",strat->syzmax);
+    Print("ps     %d\n",ps);
+    PrintS("--------------------------------\n");
     for(i=0;i<=strat->syzl-1;i++)
     {
-      printf("%d - ",i);
+      Print("%d - ",i);
       pWrite(strat->syz[i]);
     }
     for(i=0;i<strat->currIdx;i++)
     {
-      printf("%d - %d\n",i,strat->syzIdx[i]);
+      Print("%d - %d\n",i,strat->syzIdx[i]);
     }
-    Print("--------------------------------\n");
+    PrintS("--------------------------------\n");
 #endif
-
   }
 }
 
@@ -7294,16 +7282,16 @@ void enterSyz(LObject p, kStrategy strat, int atT)
   }
 //#if 1
 #ifdef DEBUGF5
-    Print("--- Syzygies ---\n");
-    printf("syzl   %d\n",strat->syzl);
-    printf("syzmax %d\n",strat->syzmax);
-    Print("--------------------------------\n");
+    PrintS("--- Syzygies ---\n");
+    Print("syzl   %d\n",strat->syzl);
+    Print("syzmax %d\n",strat->syzmax);
+    PrintS("--------------------------------\n");
     for(i=0;i<=strat->syzl-1;i++)
     {
-      printf("%d - ",i);
+      Print("%d - ",i);
       pWrite(strat->syz[i]);
     }
-    Print("--------------------------------\n");
+    PrintS("--------------------------------\n");
 #endif
 }
 
