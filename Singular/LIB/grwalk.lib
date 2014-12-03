@@ -345,7 +345,7 @@ proc awalk1_tmp(ideal Go, int n2, list #)
    return (result);
 }
 
-proc fwalk(ideal Go, int reduction, list #)
+proc fwalk(ideal Go, int reduction, int printout, list #)
 "SYNTAX: fwalk(ideal i,int reductioin);
          fwalk(ideal i, int reduction intvec v, intvec w);
 TYPE:    ideal
@@ -371,7 +371,7 @@ EXAMPLE: example fwalk; shows an example"
    //print("//** help ring = " + string(basering));
 
    ideal G = fetch(xR, Go);
-   G = system("Mfwalk", G, curr_weight, target_weight, reduction);
+   G = system("Mfwalk", G, curr_weight, target_weight, reduction, printout);
 
    setring xR;
    //kill Go;
@@ -387,7 +387,8 @@ example
     ring r = 32003,(z,y,x), lp;
     ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
     int reduction = 1;
-    fwalk(I,reduction);
+    int printout = 1;
+    fwalk(I,reduction,printout);
 }
 
 

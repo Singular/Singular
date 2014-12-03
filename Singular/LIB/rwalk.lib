@@ -9,7 +9,7 @@ AUTHOR: Stephan Oberfranz
 PROCEDURES:
 rwalk(ideal,int,int[,intvec,intvec]);   standard basis of ideal via Random Walk algorithm
 rwalk(ideal,int[,intvec,intvec]);       standard basis of ideal via Random Perturbation Walk algorithm
-frwalk(ideal,int[,intvec,intvec]);      standard basis of ideal via Random Fractal Walk algorithm
+frandwalk(ideal,int[,intvec,intvec]);      standard basis of ideal via Random Fractal Walk algorithm
 ";
 
 /***********************************
@@ -269,9 +269,9 @@ example
 /************************************
  * Fractal Walk with random element *
  ************************************/
-proc frandwalk(ideal Go, int radius, list #)
-"SYNTAX: frwalk(ideal i, int radius);
-         frwalk(ideal i, int radius, intvec v, intvec w);
+proc frandwalk(ideal Go, int radius, int reduction, int printout, list #)
+"SYNTAX: frwalk(ideal i, int radius, int reduction, int printout);
+         frwalk(ideal i, int radius, int reduction, int printout, intvec v, intvec w);
 TYPE:    ideal
 PURPOSE: compute the standard basis of the ideal, calculated via
          the Random Fractal walk algorithm  from the ordering
@@ -305,7 +305,8 @@ EXAMPLE: example frwalk; shows an example"
    //print("//** help ring = " + string(basering));
    ideal G = fetch(xR, Go);
    int pert_deg = 2;
-   G = system("Mfrwalk", G, curr_weight, target_weight, radius);
+
+   G = system("Mfrwalk", G, curr_weight, target_weight, radius, reduction, printout);
 
    setring xR;
    //kill Go;
@@ -321,5 +322,5 @@ example
     ring r = 0,(z,y,x), lp;
     ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
     int reduction = 0;
-    frandwalk(I,2,0);
+    frandwalk(I,2,0,1);
 }

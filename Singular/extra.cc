@@ -1935,7 +1935,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "Mfwalk") == 0)
     {
-      const short t[]={4,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD};
+      const short t[]={5,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD};
       if (!iiCheckTypes(h,t,1)) return TRUE;
       if (((intvec*) h->next->Data())->length() != currRing->N &&
         ((intvec*) h->next->next->Data())->length() != currRing->N )
@@ -1948,7 +1948,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       intvec* arg2 = (intvec*) h->next->Data();
       intvec* arg3 = (intvec*) h->next->next->Data();
       int arg4 = (int)(long) h->next->next->next->Data();
-      ideal result = (ideal) Mfwalk(arg1, arg2, arg3, arg4);
+      int arg5 = (int)(long) h->next->next->next->next->Data();
+      ideal result = (ideal) Mfwalk(arg1, arg2, arg3, arg4, arg5);
       res->rtyp = IDEAL_CMD;
       res->data =  result;
       return FALSE;
@@ -1959,20 +1960,33 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "Mfrwalk") == 0)
     {
-      const short t[]={5,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD};
+      const short t[]={6,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD,INT_CMD};
       if (!iiCheckTypes(h,t,1)) return TRUE;
+/*
       if (((intvec*) h->next->Data())->length() != currRing->N &&
           ((intvec*) h->next->next->Data())->length() != currRing->N)
       {
         Werror("system(\"Mfrwalk\" ...) intvecs not of length %d\n",currRing->N);
         return TRUE;
       }
+*/
+      if((((intvec*) h->next->Data())->length() != currRing->N &&
+         ((intvec*) h->next->next->Data())->length() != currRing->N ) &&
+         (((intvec*) h->next->Data())->length() != (currRing->N)*(currRing->N) &&
+         ((intvec*) h->next->next->Data())->length() != (currRing->N)*(currRing->N) ))
+      {
+        Werror("system(\"Mfrwalk\" ...) intvecs not of length %d or %d\n",
+               currRing->N,(currRing->N)*(currRing->N));
+        return TRUE;
+      }
+
       ideal arg1 = (ideal) h->Data();
       intvec* arg2 = (intvec*) h->next->Data();
       intvec* arg3 = (intvec*) h->next->next->Data();
       int arg4 = (int)(long) h->next->next->next->Data();
       int arg5 = (int)(long) h->next->next->next->next->Data();
-      ideal result = (ideal) Mfrwalk(arg1, arg2, arg3, arg4, arg5);
+      int arg6 = (int)(long) h->next->next->next->next->next->Data();
+      ideal result = (ideal) Mfrwalk(arg1, arg2, arg3, arg4, arg5, arg6);
       res->rtyp = IDEAL_CMD;
       res->data =  result;
       return FALSE;

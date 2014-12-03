@@ -67,10 +67,10 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,intvec* target
 ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int op_deg, int tp_deg, int nP, int reduction, int printout);
 
 /* The fractal walk algorithm */
-ideal Mfwalk(ideal G, intvec* ivstart, intvec* ivtarget, int reduction);
+ideal Mfwalk(ideal G, intvec* ivstart, intvec* ivtarget, int reduction, int printout);
 
 /* The fractal walk algorithm with random element */
-ideal Mfrwalk(ideal G, intvec* ivstart, intvec* ivtarget, int weight_rad, int reduction);
+ideal Mfrwalk(ideal G, intvec* ivstart, intvec* ivtarget, int weight_rad, int reduction, int printout);
 
 /* Implement Tran's idea */
 intvec* TranMPertVectorslp(ideal G);
