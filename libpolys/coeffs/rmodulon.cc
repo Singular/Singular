@@ -280,7 +280,7 @@ number nrnLcm(number a, number b, const coeffs r)
   number erg = nrnGcd(NULL, a, r);
   number tmp = nrnGcd(NULL, b, r);
   mpz_lcm((int_number)erg, (int_number)erg, (int_number)tmp);
-  nrnDelete(&tmp, NULL);
+  nrnDelete(&tmp, r);
   return (number)erg;
 }
 
