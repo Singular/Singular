@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version algebra.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version algebra.lib 4.0.1.1 Dec_2014 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps
@@ -76,7 +76,8 @@ EXAMPLE: example algebra_containment; shows an example
     //-----------------
     // ---------- create new ring with extra variables --------------------
     execute ("ring R=("+charstr(br)+"),(x(1..n),y(1..m)),(dp(n),dp(m));");
-    execute ("minpoly=number("+mp+");");
+    if (mp!="0")
+    { execute ("minpoly=number("+mp+");"); }
     ideal vars=x(1..n);
     map emb=br,vars;
     ideal A=ideal(emb(A));
@@ -179,7 +180,8 @@ EXAMPLE: example module_containment; shows an example
   // ---------- create new ring with extra variables --------------------
     execute
    ("ring R=("+charstr(br)+"),(x(1..n),y(1..m),z(1..n)),(lp(n),dp(m),lp(n));");
-    execute ("minpoly=number("+mp+");");
+    if (mp!="0")
+    { execute ("minpoly=number("+mp+");"); }
     ideal vars = x(1..n);
     map emb = br,vars;
     ideal P = emb(P);
@@ -266,7 +268,8 @@ EXAMPLE: example inSubring; shows an example
   list l;
   // neu CL 10/05:
   int is_qring;
-  if (size(ideal(gnir))>0) {
+  if (size(ideal(gnir))>0)
+  {
     is_qring=1;
     ideal IdQ = ideal(gnir);
   }
@@ -275,7 +278,8 @@ EXAMPLE: example inSubring; shows an example
   //with the ring k[y(0),...,y(n)] is computed, the result is ker
    execute ("ring r1= ("+charstr(basering)+"),(x(1..n),y(0..z)),lp;");
  //  execute ("ring r1= ("+charstr(basering)+"),(y(0..z),x(1..n)),dp;");
-  execute ("minpoly=number("+mp+");");
+  if (mp!="0")
+  { execute ("minpoly=number("+mp+");"); }
   ideal va = x(1..n);
   map emb = gnir,va;
   ideal nett = emb(I);
@@ -363,7 +367,8 @@ EXAMPLE: example algDependent; shows an example
     if ( tt == 1 )
     {
       execute ("ring R1=("+charstr(br)+"),y(1..m),dp;");
-      execute ("minpoly=number("+mp+");");
+      if (mp!="0")
+      { execute ("minpoly=number("+mp+");"); }
       setring br;
       map phi = R1,A;
       setring R1;
@@ -371,7 +376,8 @@ EXAMPLE: example algDependent; shows an example
     }
  // ---------- create new ring with extra variables --------------------
     execute ("ring R2=("+charstr(br)+"),(x(1..n),y(1..m)),(dp);");
-    execute ("minpoly=number("+mp+");");
+    if (mp!="0")
+    { execute ("minpoly=number("+mp+");"); }
     if( tt == 1 )
     {
       ideal ker = imap(R1,ker);
@@ -396,7 +402,8 @@ EXAMPLE: example algDependent; shows an example
  // eliminate m variables x(i) from ideal A[i] - y(i) by choosing product
  // order
        {execute ("ring R3=("+charstr(br)+"),(x(1..n),y(1..m)),(dp(n),dp(m));");
-        execute ("minpoly=number("+mp+");");
+        if (mp!="0")
+        { execute ("minpoly=number("+mp+");"); }
         if ( s != 0 )
         { ideal vars = x(1..n);
           map emb = br,vars;
@@ -494,7 +501,8 @@ EXAMPLE: example alg_kernel; shows an example
     // algDependent is called with "bestoption" if tt = 0
     def S = L[2];
     execute ("ring R=("+charstr(basering)+"),(@(1..n),"+varstr(pr)+"),(dp);");
-    execute ("minpoly=number("+mp+");");
+    if (mp!="0")
+    { execute ("minpoly=number("+mp+");"); }
     ideal ker = fetch(S,ker);       //in order to have variable names correct
     string sker = string(ker);
     if (defined(nker) == voice)
@@ -644,7 +652,8 @@ EXAMPLE: example is_surjective; shows an example
     string mp=string(minpoly);
   // ------------ create new ring with extra variables ---------------------
     execute ("ring R=("+charstr(br)+"),(x(1..n),y(1..m)),(dp(n),dp(m));");
-    execute ("minpoly=number("+mp+");");
+    if (mp!="0")
+    { execute ("minpoly=number("+mp+");"); }
     ideal vars = x(1..n);
     map emb = br,vars;
     if ( s != 0 )
@@ -716,7 +725,8 @@ EXAMPLE: example is_bijective; shows an example
     string mp=string(minpoly);
   // ------------ create new ring with extra variables ---------------------
     execute ("ring R=("+charstr(br)+"),(x(1..n),y(1..m)),(dp(n),dp(m));");
-    execute ("minpoly=number("+mp+");");
+    if (mp!="0")
+    { execute ("minpoly=number("+mp+");"); }
     ideal vars = x(1..n);
     map emb = br,vars;
     if ( s != 0 )
