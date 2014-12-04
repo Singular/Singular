@@ -2,7 +2,7 @@
 #define NUMBER2_H
 
 #ifdef SINGULAR_4_1
-#include<libpolys/coeffs/coeffs.h>
+#include<coeffs/coeffs.h>
 struct snumber2;
 typedef struct snumber2 *   number2;
 struct snumber2

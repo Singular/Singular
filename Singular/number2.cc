@@ -1,14 +1,15 @@
 #include "kernel/mod2.h" // general settings/macros
 
 #ifdef SINGULAR_4_1
-#include"reporter/reporter.h"  // for Print, WerrorS
-#include"Singular/ipid.h" // for SModulFunctions, leftv
-#include"coeffs/numbers.h" // nRegister, coeffs.h
-#include"coeffs/rmodulon.h" // ZnmInfo
-#include"coeffs/bigintmat.h" // bigintmat
-#include"coeffs/longrat.h" // nlGMP
-#include"Singular/blackbox.h" // blackbox type
-#include"Singular/ipshell.h" // IsPrime
+#include <reporter/reporter.h>  // for Print, WerrorS
+#include <coeffs/numbers.h> // nRegister, coeffs.h
+#include <coeffs/rmodulon.h> // ZnmInfo
+#include <coeffs/bigintmat.h> // bigintmat
+
+#include <Singular/blackbox.h> // blackbox type
+#include <Singular/ipshell.h> // IsPrime
+
+#include <Singular/ipid.h> // for SModulFunctions, leftv
 
 #include <Singular/number2.h>
 
@@ -61,7 +62,8 @@ BOOLEAN jjCRING_Zm(leftv res, leftv a, leftv b)
   {
     ZnmInfo info;
     number modBase= (number) omAlloc(sizeof(mpz_t));
-    nlGMP(i2,modBase,coeffs_BIGINT);
+    extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(number n, number &i,const coeffs r)???
+    nlGMP(i2,modBase,coeffs_BIGINT); // FIXME: n_MPZ(modBase,i2,coeffs_BIGINT); // ?
     info.base= (mpz_ptr)modBase;
     info.exp= 1;
     res->data=(void *)nInitChar(n_Zn,&info);

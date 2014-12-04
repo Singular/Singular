@@ -4,14 +4,9 @@
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
-
-
-
-
-
+#include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 
-#include <misc/auxiliary.h>
 #include <misc/mylimits.h>
 #include <misc/sirandom.h>
 
@@ -19,8 +14,6 @@
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
-#include <coeffs/ffields.h>
-#include <coeffs/longrat.h>
 
 #include <string.h>
 #include <math.h>
@@ -802,8 +795,13 @@ nMapFunc nfSetMap(const coeffs src, const coeffs dst)
   {
     return nfMapP;    /* Z/p -> GF(p,n) */
   }
+   
   if (src->rep==n_rep_gap_rat) /*Q, Z */
+  {
+    extern number nlModP(number q, const coeffs Q, const coeffs Zp); // Map q \in QQ \to Zp // FIXME!
     return nlModP;
+  }
+   
   return NULL;     /* default */
 }
 

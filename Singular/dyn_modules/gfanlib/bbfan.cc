@@ -2,16 +2,17 @@
 
 #if HAVE_GFANLIB
 
+#include <misc/intvec.h>
+#include <coeffs/coeffs.h>
+#include <coeffs/bigintmat.h>
+
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
-#include <misc/intvec.h>
-#include <coeffs/longrat.h>
-#include <coeffs/bigintmat.h>
 
-#include <bbfan.h>
-#include <bbcone.h>
-#include <gfan.h>
+#include "bbfan.h"
+#include "bbcone.h"
+#include "gfan.h"
 #include <sstream>
 
 // #include <kernel/bigintmat.h>
@@ -121,11 +122,11 @@ static gfan::IntMatrix permutationIntMatrix(const bigintmat* iv)
   for (int r = 1; r <= rr; r++)
     for (int c = 1; c <= cc; c++)
     {
-      number temp1 = nlInit(1,NULL);
-      number temp2 = nlSub(IMATELEM(*iv, r, c),temp1,coeffs_BIGINT);
+      number temp1 = n_Init(1,coeffs_BIGINT);
+      number temp2 = n_Sub(IMATELEM(*iv, r, c),temp1,coeffs_BIGINT);
       ivCopy->set(r,c,temp2);
-      nlDelete(&temp1,NULL);
-      nlDelete(&temp2,NULL);
+      n_Delete(&temp1,coeffs_BIGINT);
+      n_Delete(&temp2,coeffs_BIGINT);
     }
   gfan::ZMatrix* zm = bigintmatToZMatrix(ivCopy);
   gfan::IntMatrix im = gfan::IntMatrix(gfan::ZToIntMatrix(*zm));

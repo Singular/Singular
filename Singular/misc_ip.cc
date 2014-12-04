@@ -39,9 +39,8 @@
 #include "links/silink.h"
 #include "mod_lib.h"
 
-// the following 2 inline functions are just convenience shortcuts for Frank's code:
-static inline void number2mpz(number n, mpz_t m){ n_MPZ(m, n, coeffs_BIGINT); }
-static inline number mpz2number(mpz_t m){ return n_InitMPZ(m, coeffs_BIGINT); }
+static FORCE_INLINE void number2mpz(number n, mpz_t m){ number2mpz(n, coeffs_BIGINT, m); }
+static FORCE_INLINE number mpz2number(mpz_t m){ return mpz2number(m, coeffs_BIGINT); }
 
 
 void setListEntry(lists L, int index, mpz_t n)

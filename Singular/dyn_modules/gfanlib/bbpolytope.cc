@@ -6,7 +6,6 @@
 #include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
 #include <misc/intvec.h>
-#include <coeffs/longrat.h>
 #include <coeffs/bigintmat.h>
 
 #include <bbcone.h>
