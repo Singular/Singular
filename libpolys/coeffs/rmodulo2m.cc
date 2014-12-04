@@ -714,7 +714,7 @@ number nr2mMapQ(number from, const coeffs src, const coeffs dst)
   mpz_ptr k = (mpz_ptr)omAlloc(sizeof(mpz_t));
   mpz_init_set_ui(k, dst->mod2mMask);
 
-  nlGMP(from, (number)erg, src);
+  nlGMP(from, (number)erg, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
   mpz_and(erg, erg, k);
   number res = (number)mpz_get_ui(erg);
 

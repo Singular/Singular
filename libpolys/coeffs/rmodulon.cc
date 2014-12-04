@@ -59,7 +59,7 @@ number  nrnXExtGcd      (number a, number b, number *s, number *t, number *u, nu
 number  nrnQuotRem      (number a, number b, number *s, const coeffs r);
 nMapFunc nrnSetMap     (const coeffs src, const coeffs dst);
 #if SI_INTEGER_VARIANT==2
-extern void    nrzWrite       (number &a, const coeffs r); // FIXME
+// FIXME? TODO? // extern void    nrzWrite       (number &a, const coeffs r); // FIXME
 # define  nrnWrite      nrzWrite
 #else
 void nrnWrite (number &a, const coeffs);
@@ -817,8 +817,8 @@ void nrnWrite (number &a, const coeffs)
 number nrnMapQ(number from, const coeffs src, const coeffs dst)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
-  mpz_init(erg);
-  nlGMP(from, (number)erg, src);
+  mpz_init(erg);  
+  nlGMP(from, (number)erg, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
   mpz_mod(erg, erg, dst->modNumber);
   return (number)erg;
 }
