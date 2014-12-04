@@ -2554,12 +2554,16 @@ static proc TestSSres(def I)
 }
 
 proc s_res(def I, int l)
-"USAGE:  s_res(M, len)
-RETURN:  SRES, a blackbox object with a Schreyer resolution
-PURPOSE: computes a Schreyer resolution of M of length at most len (see [BMSS])
+"USAGE:  s_res(ideal/module M, int len)
+RETURN:  SRES, a blackbox object containing a (part of) Schreyer resolution
+PURPOSE: compute a Schreyer resolution of M of length at most len (see [BMSS])
 NOTE:    If given len is zero then nvars(basering) + 1 is used instead.
 @* SRES can be printed, treated by betti and minres or converted to list & mapped into the current ring with @code{SRES_list}
 @* This functions is not related to other helpers from this library.
+@* One can switch on computation protocol and statistic (depending on the build) by setting the @code{prot} option.
+@* Further recognized switches are the following attributes of @code{Schreyer::SSinit} procedure:
+LEAD2SYZ, TAILREDSYZ, HYBRIDNF
+DEBUG, ...
 SEE ALSO: sres
 EXAMPLE: example s_res; shows an example
 "
