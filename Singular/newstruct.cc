@@ -266,6 +266,7 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
       }
       lists n2=(lists)r->Data();
       n2=lCopy_newstruct(n2);
+      r->CleanUp();
       if (l->rtyp==IDHDL)
       {
         IDDATA((idhdl)l->data)=(char *)n2;
