@@ -1186,24 +1186,23 @@ void firstUpdate(kStrategy strat)
     strat->red = redFirst;
     strat->use_buckets = kMoraUseBucket(strat);
 #else
-  if ( (!rField_is_Ring(currRing)) || (currRing->OrdSgn != -1))
+    if ( (!rField_is_Ring(currRing)) || (rHasGlobalOrdering(currRing)))
     {
-    strat->red = redFirst;
+      strat->red = redFirst;
       strat->use_buckets = kMoraUseBucket(strat);
-      }
+    }
 #endif
-
     updateT(strat);
 
 #ifndef HAVE_RINGS
     strat->posInT = posInT2;
     reorderT(strat);
 #else
-  if ( (!rField_is_Ring(currRing)) || (currRing->OrdSgn != -1))
+    if ( (!rField_is_Ring(currRing)) || (rHasGlobalOrdering(currRing)))
     {
-    strat->posInT = posInT2;
+      strat->posInT = posInT2;
       reorderT(strat);
-      }
+    }
 #endif
   }
   kTest_TS(strat);
@@ -1362,7 +1361,7 @@ void initSba(ideal F,kStrategy strat)
 #if defined(HAVE_RINGS) || defined(HAVE_RINGS_LOC)  //TODO Oliver
   if (rField_is_Ring(currRing))
   {
-    if(currRing->OrdSgn == -1)
+    if(rHasLocalOrMixedOrdering(currRing))
       {strat->red = redRiloc;}
     else
       {strat->red2 = redRing;}
@@ -2177,16 +2176,16 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #endif
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
-    {
-    if(currRing->OrdSgn == -1)
+  {
+    if(rHasLocalOrMixedOrdering(currRing))
       r=mora(F,Q,NULL,hilb,strat);
     else
       r=bba(F,Q,NULL,hilb,strat);
-    }
+  }
   else
 #endif
   {
-    if (currRing->OrdSgn==-1)
+    if (rHasLocalOrMixedOrdering(currRing))
     {
       if (w!=NULL)
         r=mora(F,Q,*w,hilb,strat);
@@ -2328,7 +2327,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
   else
 #endif
   {
-    if (currRing->OrdSgn==-1)
+    if (rHasLocalOrMixedOrdering(currRing))
     {
       if (w!=NULL)
         r=mora(F,Q,*w,hilb,strat);
@@ -2425,7 +2424,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
 #ifdef KDEBUG
   idTest(F);
 #endif
-  if (currRing->OrdSgn==-1)
+  if (rHasLocalOrMixedOrdering(currRing))
   {
     /* error: no local ord yet with shifts */
     Print("No local ordering possible for shifts");
@@ -2551,7 +2550,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     strat->LazyPass*=2;
   }
   strat->homog=h;
-  if (currRing->OrdSgn==-1)
+  if (rHasLocalOrMixedOrdering(currRing))
   {
     if (w!=NULL)
       r=mora(F,Q,*w,hilb,strat);
@@ -2646,7 +2645,7 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
   strat->ak = si_max(id_RankFreeModule(F,currRing),pMaxComp(p));
   poly res;
 
-  if (currRing->OrdSgn==-1)
+  if (rHasLocalOrMixedOrdering(currRing))
     res=kNF1(F,Q,pp,strat,lazyReduce);
   else
     res=kNF2(F,Q,pp,strat,lazyReduce);
@@ -2699,7 +2698,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
     strat->ak = si_max(strat->ak,(int)F->rank);
   }
 
-  if (currRing->OrdSgn==-1)
+  if (rHasLocalOrMixedOrdering(currRing))
     res=kNF1(F,Q,pp,strat,lazyReduce);
   else
     res=kNF2(F,Q,pp,strat,lazyReduce);
@@ -2769,7 +2768,7 @@ ideal kInterRedOld (ideal F, ideal Q)
   strat->T           = initT();
   strat->R           = initR();
   strat->sevT        = initsevT();
-  if (currRing->OrdSgn == -1)   strat->honey = TRUE;
+  if (rHasLocalOrMixedOrdering(currRing))   strat->honey = TRUE;
   initS(tempF, tempQ, strat);
   if (TEST_OPT_REDSB)
     strat->noTailReduction=FALSE;
@@ -3079,7 +3078,7 @@ ideal kInterRed (ideal F, ideal Q)
 #ifdef HAVE_PLURAL
   if(rIsPluralRing(currRing)) return kInterRedOld(F,Q);
 #endif
-  if ((currRing->OrdSgn==-1)|| (rField_is_numeric(currRing))
+  if ((rHasLocalOrMixedOrdering(currRing))|| (rField_is_numeric(currRing))
   #ifdef HAVE_RINGS
   ||(rField_is_Ring(currRing))
   #endif

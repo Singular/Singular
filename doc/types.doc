@@ -3586,6 +3586,9 @@ none
 @item Purpose:
 declares a quotient ring as the basering modulo ideal_expression and sets
 it as current basering.
+
+Operations based on standard bases (e.g. @code{std},@code{groebner}, etc., @code{reduce}) and functions which require a standard basis (e.g. @code{dim},@code{hilb}, etc.) operated with the residue classes; all others on the polynomial objects.
+
 @item Example:
 @smallexample
 @c example
@@ -3596,6 +3599,15 @@ basering;
 // simplification is not immediate:
 (x+y)^2;
 reduce(_,std(0));
+// polynomial and residue class:
+ring R=0,(x,y),dp;
+qring Q=std(y);
+poly p1=x;
+poly p2=x+y;
+// comparing polynomial objects:
+p1==p2;
+// comparing residue classes:
+reduce(p1,std(0))==reduce(p2,std(0));
 @c example
 @end smallexample
 @end table

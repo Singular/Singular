@@ -1,8 +1,12 @@
 #ifndef NUMBER2_H
 #define NUMBER2_H
 
+#include <libpolys/misc/auxiliary.h>
+
 #ifdef SINGULAR_4_1
-#include<libpolys/coeffs/coeffs.h>
+#include <omalloc/omalloc.h>
+#include <libpolys/coeffs/coeffs.h>
+#include <kernel/structs.h>
 struct snumber2;
 typedef struct snumber2 *   number2;
 struct snumber2

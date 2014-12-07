@@ -5955,11 +5955,13 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{rank (} matrix_expression @code{)}
+#*@code{rank (} matrix_expression @code{,1)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
 returns the rank of a given matrix which is filled with elements
-of the ground field
+of the ground field.
+@*The first variant uses a LU-decomposition, the second a row-echelon form.
 @item @strong{Note:}
 The function works by computing the row echelon form of the matrix using
 the same algorithm as for @code{ludecomp}.

@@ -600,7 +600,6 @@ BOOLEAN ngcInitChar(coeffs n, void* parameter)
     n->float_len2 = SHORT_REAL_LENGTH;
   }
 
-  assume( n->float_len <= n->float_len2 );
   assume( pParameterNames != NULL );
   assume( pParameterNames[0] != NULL );
 

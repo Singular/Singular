@@ -2669,9 +2669,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
         assume((i == 0) && (j == 0));
         if (try_omit_comp)
         {
-#ifndef SING_NDEBUG
-          Warn("WRONG USAGE? of rModifyRing: omitting component due to the ordering block [%d]: %d (ringorder_s)", i, r_ord);
-#endif
+          // tried, but cannot omit component due to the ordering block [%d]: %d (ringorder_s)", i, r_ord
           try_omit_comp = FALSE;
         }
         order[j]=r_ord; /*r->order[i];*/
