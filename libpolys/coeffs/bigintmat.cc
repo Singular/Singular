@@ -18,7 +18,7 @@
 #include <string.h>
 
 ///create Z/nA of type n_Zn
-static coeffs numbercoeffs(number n, coeffs c) 
+static coeffs numbercoeffs(number n, coeffs c) // TODO: FIXME: replace with n_CoeffRingQuot1
 {
   mpz_t p;
   number2mpz(n, c, p);
