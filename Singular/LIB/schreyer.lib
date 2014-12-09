@@ -589,7 +589,7 @@ static proc SSinit(def M)
 
   if( typeof( attrib(SSinit, "RINGCHANGE") ) == "int" )
   {
-    @RINGCHANGE = attrib(SSinit, "@RINGCHANGE");
+    @RINGCHANGE = attrib(SSinit, "RINGCHANGE");
   }
 
 
@@ -2551,7 +2551,7 @@ EXAMPLE: example s_res; shows an example
 
   if( typeof( attrib(SSinit, "RINGCHANGE") ) == "int" )
   {
-    @RINGCHANGE = attrib(SSinit, "@RINGCHANGE");
+    @RINGCHANGE = attrib(SSinit, "RINGCHANGE");
   }
   
   def R=SSinit(I);
@@ -2600,7 +2600,7 @@ proc s_res_bm(def I)
 
   if( typeof( attrib(SSinit, "RINGCHANGE") ) == "int" )
   {
-    @RINGCHANGE = attrib(SSinit, "@RINGCHANGE");
+    @RINGCHANGE = attrib(SSinit, "RINGCHANGE");
   }
   int t,tt,sum;
   sum = 0;
