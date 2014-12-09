@@ -2827,7 +2827,7 @@ EXAMPLE: example decomp; shows an example
     list absprimary,abskeep,absprimarytmp,abskeeptmp;
   }
   homo=homog(i);
-  if(homo==1)
+  if(homo)
   {
     if(attrib(i,"isSB")!=1)
     {
@@ -4182,30 +4182,32 @@ static proc simplifyIdeal(ideal i)
 
   def r=basering;
 
-  int j,k;
-  map phi;
-  poly p;
-
   ideal iwork=i;
-  ideal imap1=maxideal(1);
   ideal imap2=maxideal(1);
 
 
-  for(j=1;j<=nvars(basering);j++)
+  if (char(r)!=2)
   {
-    for(k=1;k<=size(i);k++)
+    int j,k;
+    map phi;
+    poly p;
+    ideal imap1=maxideal(1);
+    for(j=1;j<=nvars(basering);j++)
     {
-      if(deg(iwork[k]/var(j))==0)
+      for(k=1;k<=ncols(i);k++)
       {
-        p=-1/leadcoef(iwork[k]/var(j))*iwork[k];
-        imap1[j]=p+2*var(j);
-        phi=r,imap1;
-        iwork=phi(iwork);
-        iwork=subst(iwork,var(j),0);
-        iwork[k]=var(j);
-        imap1=maxideal(1);
-        imap2[j]=-p;
-        break;
+        if(deg(iwork[k]/var(j))==0)
+        {
+          p=-1/leadcoef(iwork[k]/var(j))*iwork[k];
+          imap1[j]=p+2*var(j);
+          phi=r,imap1;
+          iwork=phi(iwork);
+          iwork=subst(iwork,var(j),0);
+          iwork[k]=var(j);
+          imap1=maxideal(1);
+          imap2[j]=-p;
+          break;
+        }
       }
     }
   }
@@ -5862,6 +5864,7 @@ EXAMPLE: example radical; shows an example
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   dbprint(printlevel - voice, "Radical, version 2006.05.08");
+  if(size(i) == 0){return(ideal(0));}
   if(attrib(basering,"global")!=1)
   {
 // algorithms only work in global case!
@@ -5876,7 +5879,6 @@ EXAMPLE: example radical; shows an example
       def j=imap(s,j);
       return(j);
   }
-  if(size(i) == 0){return(ideal(0));}
   int j;
   def P0 = basering;
   list Pl=ringlist(P0);
