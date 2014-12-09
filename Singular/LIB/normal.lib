@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version normal.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version normal.lib 4.0.1.1 Dec_2014 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -2328,7 +2328,8 @@ EXAMPLE: example genus; shows an example
       {
          execute("ring Rhelp=("+charstr(R0)+"),(@s),dp;");
       }
-      execute("minpoly = "+smp+";");
+      if (smp!="0")
+      { execute("minpoly = "+smp+";");}
       def newR=R+Rhelp;
       setring newR;
       ideal I=imap(R,I);
