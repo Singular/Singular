@@ -2072,10 +2072,10 @@ void rComposeRing(lists L, ring R)
   // ----------------------------------------
   // 0: string: integer
   // no further entries --> Z
-  int_number modBase = NULL;
+  mpz_ptr modBase = NULL;
   unsigned int modExponent = 1;
 
-  modBase = (int_number) omAlloc(sizeof(mpz_t));
+  modBase = (mpz_ptr) omAlloc(sizeof(mpz_t));
   if (L->nr == 0)
   {
     mpz_init_set_ui(modBase,0);
@@ -2129,7 +2129,7 @@ void rComposeRing(lists L, ring R)
   else if (modExponent > 1)
   {
     //R->cf->ch = R->cf->modExponent;
-    if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(NATNUMBER)))
+    if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(unsigned long)))
     {
       /* this branch should be active for modExponent = 2..32 resp. 2..64,
            depending on the size of a long on the respective platform */
@@ -5122,7 +5122,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 {
 #ifdef HAVE_RINGS
   //unsigned int ringtype = 0;
-  int_number modBase = NULL;
+  mpz_ptr modBase = NULL;
   unsigned int modExponent = 1;
 #endif
   int float_len=0;
@@ -5265,7 +5265,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #ifdef HAVE_RINGS
   else if ((pn->name != NULL) && (strcmp(pn->name, "integer") == 0))
   {
-    modBase = (int_number) omAlloc(sizeof(mpz_t));
+    modBase = (mpz_ptr) omAlloc(sizeof(mpz_t));
     mpz_init_set_si(modBase, 0);
     if (pn->next!=NULL)
     {
@@ -5308,7 +5308,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     // we have an exponent
     if (modExponent > 1 && cf == NULL)
     {
-      if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(NATNUMBER)))
+      if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(unsigned long)))
       {
         /* this branch should be active for modExponent = 2..32 resp. 2..64,
            depending on the size of a long on the respective platform */

@@ -49,11 +49,6 @@ struct snumber;
 typedef struct snumber *   number;
 
 /* standard types */
-#ifdef HAVE_RINGS
-typedef unsigned long NATNUMBER;
-typedef mpz_ptr int_number;
-#endif
-
 struct ip_sring;
 typedef struct ip_sring *         ring;
 typedef struct ip_sring const *   const_ring;
@@ -371,7 +366,6 @@ struct n_Procs_s
    //   int npPrimeM; // NOTE: npPrimeM is deprecated, please use ch instead!
   int npPminus1M; ///< characteristic - 1
 //-------------------------------------------
-#ifdef HAVE_RINGS
    int     (*cfDivComp)(number a,number b,const coeffs r);
    BOOLEAN (*cfIsUnit)(number a,const coeffs r);
    number  (*cfGetUnit)(number a,const coeffs r);
@@ -396,13 +390,12 @@ struct n_Procs_s
      Cases 1.), 2.), and 4.) are covered by the implementation
      in the files rmodulon.h and rmodulon.cc, whereas case 3.)
      is implemented in the files rmodulo2m.h and rmodulo2m.cc. */
-  int_number    modBase;
+  mpz_ptr    modBase;
   unsigned long modExponent;
-  int_number    modNumber;
+  mpz_ptr    modNumber;
   unsigned long mod2mMask;
   //returns coeffs with updated ch, modNumber and modExp
   coeffs (*cfQuot1)(number c, const coeffs r);
-#endif
 
   /*CF: for blackbox rings, contains data needed to define the ring.
    * contents depends on the actual example.*/

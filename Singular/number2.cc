@@ -43,7 +43,7 @@ BOOLEAN jjCRING_Zp(leftv res, leftv a, leftv b)
     else
     {
       ZnmInfo info;
-      mpz_ptr modBase= (int_number) omAlloc(sizeof(mpz_t));
+      mpz_ptr modBase= (mpz_ptr) omAlloc(sizeof(mpz_t));
       mpz_init_set_ui(modBase,i2);
       info.base= modBase;
       info.exp= 1;
