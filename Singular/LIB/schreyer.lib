@@ -2165,8 +2165,8 @@ EXAMPLE: example s_res; shows an example
 {
   if( typeof(SR) != "SRES" )
   {
-    list L = SR;
-    return (L);
+    list @@@L = SR;
+    return (@@@L);
   }
   
   def save = basering;  
@@ -2176,9 +2176,10 @@ EXAMPLE: example s_res; shows an example
 //    {      list L = SR.rsltn;      return (L);    }
     
   setring R;
-  list L = SR.rsltn;
+  
+  list @@@L = SR.rsltn;
   setring save;  
-  return (imap( R, L ));    
+  return (imap( R, @@@L ));
 }
 
 static proc loadme()
@@ -2579,7 +2580,82 @@ example
   print(SRES_list(rs));
   print(betti(rs, 1)); //minimal betties
   print(minres(rs));
+  kill rs;
+  
+  def  rs = s_res_bm(M); 
+  print(rs);
+  print(betti(rs, 0)); // non-minimal betties
+  print(SRES_list(rs));
+  print(betti(rs, 1)); //minimal betties
+  print(minres(rs));
+
 }
+
+proc s_res_bm(def I)
+{
+  int @prot = (find(option(),"prot") != 0) && (defined(NumberStatsInit)) && (defined(NumberStatsPrint));
+  def @save = basering;
+  
+  int @RINGCHANGE = 0;
+
+  if( typeof( attrib(SSinit, "RINGCHANGE") ) == "int" )
+  {
+    @RINGCHANGE = attrib(SSinit, "@RINGCHANGE");
+  }
+  int t,tt,sum;
+  sum = 0;
+  
+t=rtimer;def R=SSinit(I);tt=rtimer;
+
+  "%% Setup(SSinit) TIME:", tt - t; 
+  sum = sum + (tt-t);
+
+  if( @RINGCHANGE ){ setring R; }
+  
+  int @l = size(RES);
+  module N, L, T, LL, TT;
+  L = LRES[@l];
+  T = TRES[@l];
+
+  
+  int ss = attrib(basering, "SYZNUMBER");
+  
+  while ( 1 )
+  {
+    if(@prot){ NumberStatsInit(); }
+
+//  SSstep():
+t=rtimer;(N,LL,TT)=SSComputeSyzygy(L,T);tt=rtimer;
+    
+    @l = @l + 1; 
+    if(@prot){ NumberStatsPrint("Number statistic for SSComputeSyzygy["+string(@l-2)+"]"); }
+    "%% SSstep[",@l-2, "] TIME:", tt - t;    
+    sum = sum + (tt-t);
+    
+    if( (size(LL) == 0) || (size(N) == 0) ) { break; }
+    L = LL; T = TT; RES[@l] = N; // LRES[@l] = LL; TRES[@l] = TT;
+
+    ss = ss + 1; attrib(basering, "SYZNUMBER", ss );    
+  }
+  
+  "%% Whole Resolution (with "+string(@l)+"syzygies) TIME:", sum;
+  resolution rsltn = list(RES[2..size(RES)]);
+  
+  print(rsltn);
+  "Non-minimal betties: ";
+  print(betti(rsltn, 0), "betti");
+  "Minimal betties: ";
+  print(betti(rsltn, 1), "betti");
+  
+  if( !@RINGCHANGE )
+  {
+    return (rsltn); // ret
+  }
+  
+  SRES ret; ret.r = R; ret.rsltn = rsltn;
+  return (ret);
+}
+
 
 static proc s_syz(def I)
 {
