@@ -548,8 +548,6 @@ static proc SSinit(def M)
   {
     ERROR("Sorry: need an ideal or a module for input");
   }
-
-  // TODO! DONE?
   def @save = basering;
   
   int @DEBUG = 0; // !system("with", "ndebug");
@@ -587,12 +585,18 @@ static proc SSinit(def M)
     @TREEOUTPUT = attrib(SSinit, "TREEOUTPUT");
   }
 
-  
+  int @RINGCHANGE = 0;
+
+  if( typeof( attrib(SSinit, "RINGCHANGE") ) == "int" )
+  {
+    @RINGCHANGE = attrib(SSinit, "@RINGCHANGE");
+  }
+
+
   if( @DEBUG )
   {
     "SSinit::Input";
     type(M);
-//    DetailedPrint(M);
     attrib(M);
   }
 
@@ -605,10 +609,9 @@ static proc SSinit(def M)
     M = std(M);
     option(set, opts);
     kill opts;
-  }//  else
-  // {
-    M = simplify(M, 1 + 2 + 4 + 32); // interreduce?
-  // }
+  }
+
+  M = simplify(M, 1 + 2 + 4 + 32);
 
   if( @IGNORETAILS )
   {
@@ -620,9 +623,7 @@ static proc SSinit(def M)
       type(M);
     }
   }
-
   
-
   def @N = MySort(M); // TODO: replace with inplace sorting!!!
   def LEAD = lead(@N);
 
@@ -671,51 +672,66 @@ static proc SSinit(def M)
   intvec @DEGS = deg(M[1..@SIZE]); // store actuall degrees of input elements
   
   // TODO: what about real modules? weighted ones?
-  
-  list @l = ringlist(@save);
 
-  int @z = 0; ideal @m = maxideal(1); intvec @wdeg = deg(@m[1..ncols(@m)]);
-
-  // NOTE: @wdeg will be ignored anyway :(
-  @l[3] = list(list("C", @z), list("lp", @wdeg)); 
-
-  kill @z, @wdeg; // since these vars are ring independent!
-
-  def S = ring(@l); // --MakeInducedSchreyerOrdering(1);
-
-  module F = freemodule(@RANK);
-  intvec @V = deg(F[1..@RANK]);
-  
-  setring S; // ring with an easy divisibility test ("C, lex")
-
-  if( @DEBUG )
+  if( @RINGCHANGE )
   {
-    "SSinit::NewRing(C, lex)";
-    basering; 
-    DetailedPrint(basering);
-  }
+    list @l = ringlist(@save);
+    int @z = 0; ideal @m = maxideal(1); intvec @wdeg = deg(@m[1..ncols(@m)]);
+    // NOTE: @wdeg will be ignored anyway :(
+    @l[3] = list(list("C", @z), list("lp", @wdeg)); 
+    kill @z, @m, @wdeg; // since these vars are ring independent!
+    def S = ring(@l); // --MakeInducedSchreyerOrdering(1);
+    kill @l;
+    setring S; // ring with an easy divisibility test ("C, lex") // or not!???
+    if( @DEBUG )
+    {
+      "SSinit::NewRing(C,lex)?";
+      basering; 
+      DetailedPrint(basering);
+    }
+  } else 
+  { def S = basering; }
 
   // Setup the leading syzygy^{-1} module to zero:
   module Z = 0; Z[@RANK] = 0; attrib(Z, "isHomog", intvec(0));  
+
+  if( !@RINGCHANGE )
+  {
+    if( defined(RES) )  { if( @DEBUG ){ "WARN: killing existing object: RES!"; }; kill RES; }
+    if( defined(MRES) ) { if( @DEBUG ){ "WARN: killing existing object: MRES!"; }; kill MRES; }
+    if( defined(LRES) ) { if( @DEBUG ){ "WARN: killing existing object: LRES!"; }; kill LRES; }
+    if( defined(TRES) ) { if( @DEBUG ){ "WARN: killing existing object: TRES!"; }; kill TRES; }
+  }
 
   module MRES = Z;
   
   list RES;  RES[1] = Z;
   list LRES; LRES[1] = Z;
   list TRES; TRES[1] = Z;
-  
-  def M = imap(@save, M);
+ 
+  if( !defined(M) )
+  {
+    def M = imap(@save, M);
+  }
 
+  module F = freemodule(@RANK); intvec @V = deg(F[1..@RANK]); kill F;
+  
   attrib(M, "isHomog", @V);
   attrib(M, "isSB", 1);
   attrib(M, "degrees", @DEGS);  
   
-  def LEAD = imap(@save, LEAD);
+  if( !defined(LEAD) )
+  {
+    def LEAD = imap(@save, LEAD);
+  }  
   
   attrib(LEAD, "isHomog", @V);
   attrib(LEAD, "isSB", 1);  
   
-  def TAIL = imap(@save, TAIL);
+  if( !defined(TAIL) )
+  {
+    def TAIL = imap(@save, TAIL);
+  }  
 
   if( @DEBUG )
   {
@@ -723,7 +739,6 @@ static proc SSinit(def M)
     type(M);
     attrib(M);
     attrib(M, "isHomog");
-//    DetailedPrint(M);
   }
 
   if( @SYZCHECK )
@@ -764,7 +779,6 @@ static proc SSinit(def M)
     attrib(S, "TAILREDSYZ", 1);
   }
 
-
   if( typeof( attrib(SSinit, "HYBRIDNF") ) == "int" )
   {
     attrib(S, "HYBRIDNF", attrib(SSinit, "HYBRIDNF") );
@@ -772,7 +786,8 @@ static proc SSinit(def M)
   { 
     attrib(S, "HYBRIDNF", 0);
   }
-  
+
+  // maybe resetting existing ring attributes!
   attrib(S, "DEBUG", @DEBUG);
   attrib(S, "SYZCHECK", @SYZCHECK);
   attrib(S, "KERCHECK", @KERCHECK);
@@ -2127,139 +2142,100 @@ static proc SRES_print(SRES SR)
   "over the ring: "; R;
 }
 
-// cannot be automatically used via overloading :(
-proc SRES_list(SRES SR)
-"TODO!"
-{
-  def save = basering;  
-  def R = SR.r;
-
-  if( 0 )  // ( save == R ) // TODO: not implemented :(((
-  {
-    list L = SR.rsltn;
-    return (L);
-  }
-    
-  setring R;
-  list L = SR.rsltn;
-  setring save;  
-  return (imap( R, L ));
-}
-
 static proc SRES_minres(SRES SR)
 {
   def save = basering;
   SRES S;
   def R = SR.r; S.r = R;
   setring R;
-  S.rsltn = minres(SR.rsltn);
+  S.rsltn = minres(SR.rsltn); // in target ring :(
   return (S);
+}
+
+
+// cannot be automatically used via overloading :(
+proc SRES_list(def SR)
+"USAGE:  SRES_list(resolution)
+RETURN:  list
+PURPOSE: convert given resolution to a list
+NOTE:    result is over basering
+SEE ALSO: s_res, resolution
+EXAMPLE: example s_res; shows an example
+"
+{
+  if( typeof(SR) != "SRES" )
+  {
+    list L = SR;
+    return (L);
+  }
+  
+  def save = basering;  
+  def R = SR.r;
+
+//    if( 0 )  // ( save == R ) // TODO: not implemented :(((
+//    {      list L = SR.rsltn;      return (L);    }
+    
+  setring R;
+  list L = SR.rsltn;
+  setring save;  
+  return (imap( R, L ));    
 }
 
 static proc loadme()
 {
-  int @DEBUG = 0; // !system("with", "ndebug");
+  int @DEBUG = 0; // !system("with", "ndebug"); //    "om_ndebug?: ", system("with", "om_ndebug");
 
-  if( @DEBUG )
+  if( @DEBUG )  {    listvar(Syzextra);    listvar(Schreyer);    listvar(Top);  }
+
+  if( !defined(Schreyer::ComputeResolution) )
   {
+    load("syzextra.so");
+      
+      if( @DEBUG ){        listvar(Syzextra);      }
+      
+//      exportto(Top, Syzextra::ClearContent); //      exportto(Top, Syzextra::ClearDenominators);     exportto(Schreyer, Syzextra::noop);
+//      exportto(Schreyer, Syzextra::leadrawexp); //      exportto(Schreyer, Syzextra::ISUpdateComponents);
+//      exportto(Schreyer, Syzextra::GetAMData);//      exportto(Schreyer, Syzextra::SetSyzComp);
+//      exportto(Schreyer, Syzextra::MakeSyzCompOrdering); //      exportto(Schreyer, Syzextra::reduce_syz);//      exportto(Schreyer, Syzextra::p_Content);
+    exportto(Schreyer, Syzextra::DetailedPrint);
+    exportto(Schreyer, Syzextra::m2_end);
+    exportto(Schreyer, Syzextra::leadmonomial);
+    exportto(Schreyer, Syzextra::leadcomp);
+    exportto(Schreyer, Syzextra::SetInducedReferrence);
+    exportto(Schreyer, Syzextra::GetInducedData);
+    exportto(Schreyer, Syzextra::MakeInducedSchreyerOrdering);
+    exportto(Schreyer, Syzextra::idPrepare);
     
-//    "ndebug?: ", system("with", "ndebug");
-//    "om_ndebug?: ", system("with", "om_ndebug");
+    exportto(Schreyer, Syzextra::ProfilerStart);   exportto(Schreyer, Syzextra::ProfilerStop);
+    exportto(Schreyer, Syzextra::NumberStatsInit); exportto(Schreyer, Syzextra::NumberStatsPrint);
+    
+    exportto(Schreyer, Syzextra::Tail);
+    exportto(Schreyer, Syzextra::ComputeLeadingSyzygyTerms);
+    exportto(Schreyer, Syzextra::Compute2LeadingSyzygyTerms);
+    exportto(Schreyer, Syzextra::Sort_c_ds);
+    
+    exportto(Schreyer, Syzextra::FindReducer);
 
-    listvar(Syzextra);
-    listvar(Schreyer);
-    listvar(Top);
-  }
-
-  if( !defined(Schreyer::DetailedPrint) )
-  {
-    if( 1 )
-    {
-/*
-      if( system("with", "ndebug") )
-      {
-        "Loading the Debug version!";
-      } else
-      {
-        "Loading the Release version!";
-      }
-*/      
-      load("syzextra.so");
-
-      if( @DEBUG )
-      {
-        listvar(Syzextra);
-      }
-      
-//      exportto(Top, Syzextra::ClearContent);
-//      exportto(Top, Syzextra::ClearDenominators);
-      exportto(Schreyer, Syzextra::m2_end);
-      
-//      export Syzextra;
-
-//      exportto(Schreyer, Syzextra::noop);
-      exportto(Schreyer, Syzextra::DetailedPrint);
-      exportto(Schreyer, Syzextra::leadmonomial);
-      exportto(Schreyer, Syzextra::leadcomp);
-//      exportto(Schreyer, Syzextra::leadrawexp);
-//      exportto(Schreyer, Syzextra::ISUpdateComponents);
-      exportto(Schreyer, Syzextra::SetInducedReferrence);
-      exportto(Schreyer, Syzextra::GetInducedData);
-//      exportto(Schreyer, Syzextra::GetAMData);
-//      exportto(Schreyer, Syzextra::SetSyzComp);
-      exportto(Schreyer, Syzextra::MakeInducedSchreyerOrdering);
-//      exportto(Schreyer, Syzextra::MakeSyzCompOrdering);
-      exportto(Schreyer, Syzextra::idPrepare);
-//      exportto(Schreyer, Syzextra::reduce_syz);
-//      exportto(Schreyer, Syzextra::p_Content);
-
-      exportto(Schreyer, Syzextra::ProfilerStart); exportto(Schreyer, Syzextra::ProfilerStop);
-
-      exportto(Schreyer, Syzextra::Tail);
-      exportto(Schreyer, Syzextra::ComputeLeadingSyzygyTerms);      
-      exportto(Schreyer, Syzextra::Compute2LeadingSyzygyTerms);
-      exportto(Schreyer, Syzextra::Sort_c_ds);
-
-      exportto(Schreyer, Syzextra::FindReducer);
-
-      exportto(Schreyer, Syzextra::ReduceTerm);
-      exportto(Schreyer, Syzextra::TraverseTail);
-
-      exportto(Schreyer, Syzextra::SchreyerSyzygyNF);
-      exportto(Schreyer, Syzextra::ComputeSyzygy);
-
-      exportto(Schreyer, Syzextra::ComputeResolution);
-
-      exportto(Schreyer, Syzextra::NumberStatsInit);
-      exportto(Schreyer, Syzextra::NumberStatsPrint);
-
-      newstruct("SRES","ring r,resolution rsltn"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
-      // TODO: SSres - return SRESOLUTION?
-
+    exportto(Schreyer, Syzextra::ReduceTerm);
+    exportto(Schreyer, Syzextra::TraverseTail);
+    
+    exportto(Schreyer, Syzextra::SchreyerSyzygyNF);
+    exportto(Schreyer, Syzextra::ComputeSyzygy);
+    exportto(Schreyer, Syzextra::ComputeResolution);
+    
+    // TODO: SSres - return SRESOLUTION?
+    newstruct("SRES","ring r,resolution rsltn"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
 //      system("install","SRES","string",SRES_string, 1);
-      system("install","SRES","print",SRES_print, 1);
-
-      system("install","SRES","betti",SRES_betti1, 1); // http://www.singular.uni-kl.de/Manual/latest/sing_260.htm#SEC299
-      system("install","SRES","betti",SRES_betti2, 2); // http://www.singular.uni-kl.de/Manual/latest/sing_260.htm#SEC299
-      system("install","SRES","minres",SRES_minres, 1); // http://www.singular.uni-kl.de/Manual/latest/sing_344.htm#SEC383
-
-//      system("install","SRES","list", SRES_list, 1); // will never work :(((
-      
-      // TODO: SSsyz? SSYZYGY? // TODO: C/C++ computation for Syzygy?
-//      newstruct("SSYZ","ring r,module szg"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
-//      system("install","SSYZYGY","string",SSYZYGY_string, 1);
-//      system("install","SSYZYGY","print",SSYZYGY_print, 1);
-//      system("install","SSYZYGY","module",SSYZYGY_module, 1);
-    }
+    system("install","SRES","print",SRES_print, 1);
+    system("install","SRES","betti",SRES_betti1, 1); // http://www.singular.uni-kl.de/Manual/latest/sing_260.htm#SEC299
+    system("install","SRES","betti",SRES_betti2, 2); // http://www.singular.uni-kl.de/Manual/latest/sing_260.htm#SEC299
+    system("install","SRES","minres",SRES_minres, 1); // http://www.singular.uni-kl.de/Manual/latest/sing_344.htm#SEC383
+    system("install","SRES","list", SRES_list, 1); // will never work :(((
 
 //    exportto(Top, DetailedPrint);
-//    exportto(Top, GetInducedData);
+//    exportto(Top, s_res); // GetInducedData);
 
-    if( @DEBUG )
-    {
-      listvar(Top);
-      listvar(Schreyer);
-    }
+    if( @DEBUG )    {      listvar(Top);      listvar(Schreyer);    }
   }
   
   mod_assure_load();
@@ -2269,10 +2245,10 @@ static proc loadme()
 
 static proc mod_assure_load()
 {
-  if( !defined(GetInducedData) )
+  if( !defined(Schreyer::ComputeResolution) )
   {
-    "ERROR: Sorry but we are missing the dynamic module (syzextra.so)...";
-    $
+    "ERROR: Sorry but you seems to be missing the necessary dynamic module (syzextra.so)!";
+//    $
     // m2_end(666); // :(
   }
 }
@@ -2555,10 +2531,9 @@ static proc TestSSres(def I)
 
 proc s_res(def I, int l)
 "USAGE:  s_res(ideal/module M, int len)
-RETURN:  SRES, a blackbox object containing a (part of) Schreyer resolution
+RETURN:  resolution object or SRES
 PURPOSE: compute a Schreyer resolution of M of length at most len (see [BMSS])
 NOTE:    If given len is zero then nvars(basering) + 1 is used instead.
-@* SRES can be printed, treated by betti and minres or converted to list & mapped into the current ring with @code{SRES_list}
 @* This functions is not related to other helpers from this library.
 @* One can switch on computation protocol and statistic (depending on the build) by setting the @code{prot} option.
 @* Further recognized switches are the following attributes of @code{Schreyer::SSinit} procedure:
@@ -2569,18 +2544,36 @@ EXAMPLE: example s_res; shows an example
 "
 {
   int @prot = (find(option(),"prot") != 0) && (defined(NumberStatsInit)) && (defined(NumberStatsPrint));
-  def R=SSinit(I); setring R; int @l = size(RES);
-  SRES ret; ret.r = R; 
+  def @save = basering;
+  
+  int @RINGCHANGE = 0;
+
+  if( typeof( attrib(SSinit, "RINGCHANGE") ) == "int" )
+  {
+    @RINGCHANGE = attrib(SSinit, "@RINGCHANGE");
+  }
+  
+  def R=SSinit(I);
+  if( @RINGCHANGE ){ setring R; }
+  
+  int @l = size(RES);
   if(@prot){ NumberStatsInit(); }
-  ret.rsltn = ComputeResolution(RES[@l], LRES[@l], TRES[@l], l);
+  def rsltn = ComputeResolution(RES[@l], LRES[@l], TRES[@l], l);
   if(@prot){ NumberStatsPrint("Number statistic for s_res with ComputeResolution"); }
+  
+  if( !@RINGCHANGE )
+  {
+    return (rsltn); // ret
+  }
+  
+  SRES ret; ret.r = R; ret.rsltn = rsltn;  
   return (ret);
 }
 example
 { "EXAMPLE:"; echo = 2;
   ring R;
   module M = maxideal(1); M;
-  SRES rs = s_res(M, 0); 
+  def  rs = s_res(M, 0); 
   print(rs);
   print(betti(rs, 0)); // non-minimal betties
   print(SRES_list(rs));
@@ -2619,7 +2612,7 @@ static proc TestSSSres(def I)
   timer=0;rtimer=0;def R=SSinit(I);setring R;def RR=ComputeResolution(RES[2], LRES[2], TRES[2], 0);
 @m=rtimer;
   if(@PROFILE){ProfilerStop();}
-RR=minres(RR);def S=betti(RR,1);@t=rtimer;
+RR=minres(RR); def S=betti(RR,1);@t=rtimer;
 //  DetailedPrint(RR,0);  print(RR);  print(S, "betti");
   SCheck(R);
   StopAddResTest(RR, S, @t,@m); 
