@@ -708,6 +708,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       {
         return TRUE;
       }
+      if (rField_is_Ring(currRing))
+      {
+        WerrorS("field required");
+	return TRUE;
+      }
       matrix pMat  = (matrix)h->Data();
       matrix lMat  = (matrix)h->next->Data();
       matrix dMat  = (matrix)h->next->next->Data();
