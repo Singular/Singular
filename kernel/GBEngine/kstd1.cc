@@ -264,6 +264,7 @@ int redEcart (LObject* h,kStrategy strat)
     // are we done ???
     if (h->IsNull())
     {
+      assume(!rField_is_Ring(currRing));
       if (h->lcm!=NULL) pLmFree(h->lcm);
       h->Clear();
       return 0;
@@ -616,6 +617,7 @@ int redFirst (LObject* h,kStrategy strat)
 #endif
     if (h->IsNull())
     {
+      assume(!rField_is_Ring(currRing));
       if (h->lcm!=NULL) pLmFree(h->lcm);
       h->Clear();
       return 0;
@@ -1590,7 +1592,7 @@ loop_count = 1;
     if (pNext(strat->P.p) == strat->tail)
     {
       /*- deletes the short spoly and computes -*/
-#ifdef HAVE_RINGS_LOC
+#ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
         pLmDelete(strat->P.p);
       else
