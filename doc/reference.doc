@@ -281,7 +281,17 @@ Non-reserved attributes may be used, however, in procedures and can
 considerably speed up computations.
 @sp 1
 @item @strong{Reserved attributes:}
-(isSB, isHomog are used by the kernel, the other are used by libraries)
+@cindex isSB
+@cindex isHomg
+@cindex rank
+@cindex isCI
+@cindex isCM
+@cindex withSB
+@cindex withHilb
+@cindex withRes
+@cindex withDim
+@cindex withMult
+(isSB, isHomog, rank are used by the kernel, the other are used by libraries)
 @table @code
 @item isSB
 the standard basis property is set by all commands computing a standard
@@ -295,7 +305,7 @@ complete intersection property
 @item isCM
 Cohen-Macaulay property
 @item rank
-set the rank of a module (see @ref{nrows})
+set/get the rank of a module (see @ref{nrows})
 @item withSB
 value of type ideal, resp.@: module, is std
 @item withHilb
