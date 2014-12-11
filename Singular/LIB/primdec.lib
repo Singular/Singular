@@ -4173,11 +4173,9 @@ static proc analyze(list pr)
 //                  Shimoyama-Yokoyama
 //
 ///////////////////////////////////////////////////////////////////////////////
-
 static proc simplifyIdeal(ideal i)
 {
   ASSUME(1, hasFieldCoefficient(basering) );
-  ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
   def r=basering;
@@ -4185,14 +4183,38 @@ static proc simplifyIdeal(ideal i)
   ideal iwork=i;
   ideal imap2=maxideal(1);
 
-
-  if (char(r)!=2)
+  int j,k;
+  map phi;
+  poly p;
+  ideal imap1=maxideal(1);
+  // first try: very simple substitutions
+  intvec tested=0:nvars(r);
+  for(j=1;j<=nvars(r);j++)
   {
-    int j,k;
-    map phi;
-    poly p;
-    ideal imap1=maxideal(1);
-    for(j=1;j<=nvars(basering);j++)
+    for(k=1;k<=ncols(i);k++)
+    {
+      if(deg(iwork[k]/var(j))==0)
+      {
+        p=-1/leadcoef(iwork[k]/var(j))*iwork[k];
+        if(size(p)<=2)
+        {
+          tested[j]=1;
+          imap1[j]=p+2*var(j);
+          phi=r,imap1;
+          iwork=phi(iwork);
+          iwork=subst(iwork,var(j),0);
+          iwork[k]=var(j);
+          imap1=maxideal(1);
+          imap2[j]=-p;
+          break;
+        }
+      }
+    }
+  }
+  // second try: substitutions not so simple
+  for(j=1;j<=nvars(r);j++)
+  {
+    if (tested[j]==0)
     {
       for(k=1;k<=ncols(i);k++)
       {
