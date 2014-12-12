@@ -2684,7 +2684,7 @@ proc algeDeco(ideal i, int w)
       }
    }
 //---Ende Provisorium
-   string mp="poly p="+string(minpoly)+";";
+   string mp="poly @p="+string(minpoly)+";";
    string gnir="ring RH="+string(char(R))+",("+varstr(R)+","+string(par(1))
                 +"),dp;";
    execute(gnir);
@@ -2696,7 +2696,7 @@ proc algeDeco(ideal i, int w)
    {
      if(i[j]!=I[j]){break;}
    }
-   if((j>ncols(i))&&(deg(p)==1))
+   if((j>ncols(i))&&(deg(@p)==1))
    {
      setring R;
      kill RH;
@@ -2708,7 +2708,7 @@ proc algeDeco(ideal i, int w)
    }
    else
    {
-      i=i,p;
+      i=i,@p;
    }
    list pr;
 
@@ -2725,6 +2725,7 @@ proc algeDeco(ideal i, int w)
    {
       pr=minAssPrimes(i);
    }
+
    if(n<nvars(basering))
    {
       gnir="ring RS="+string(char(R))+",("+varstr(RH)
@@ -2746,6 +2747,7 @@ proc algeDeco(ideal i, int w)
       setring R;
       list pr=imap(RH,pr);
    }
+
    list re;
    if(w==2)
    {
