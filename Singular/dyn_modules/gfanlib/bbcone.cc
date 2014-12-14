@@ -958,13 +958,22 @@ BOOLEAN uniquePoint(leftv res, leftv args)
 
 gfan::ZVector randomPoint(const gfan::ZCone* zc)
 {
-  gfan::ZMatrix rays = zc->extremeRays();
   gfan::ZVector rp = gfan::ZVector(zc->ambientDimension());
+
+  gfan::ZMatrix rays = zc->extremeRays();
   for (int i=0; i<rays.getHeight(); i++)
   {
     int n = siRand();
     rp = rp + n * rays[i];
   }
+
+  gfan::ZMatrix lins = zc->generatorsOfLinealitySpace();
+  for (int i=0; i<lins.getHeight(); i++)
+  {
+    int n = siRand();
+    rp = rp + n * lins[i];
+  }
+
   return rp;
 }
 

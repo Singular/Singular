@@ -129,6 +129,9 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
    * If the initial ideal is not monomial free, compute a witness for the monomial
    * and compute the common refinement with its tropical variety.
    * If all initial ideals are monomial free, then we have our tropical curve */
+  // gfan::ZFan* zf = toFanStar(C);
+  // std::cout << zf->toString();
+  // delete zf;
   for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end();)
   {
     gfan::ZVector w = zc->getRelativeInteriorPoint();
@@ -140,13 +143,14 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
     for (int j=0; j<k; j++)
       inIs->m[j] = p_PermPoly(inI->m[j],NULL,r,s,identity,NULL,0);
 
-    inIs = gfanlib_kStd_wrapper(inIs,s,isHomog);
-    ideal ininIs = initial(inIs,s,w,W);
+    ideal inIsSTD = gfanlib_kStd_wrapper(inIs,s,isHomog);
+    ideal ininIs = initial(inIsSTD,s,w,W);
 
-    poly mons = checkForMonomialViaSuddenSaturation(ininIs,s);
+    poly mons = currentStrategy.checkInitialIdealForMonomial(ininIs,s,w);
+    // poly mons = checkForMonomialViaSuddenSaturation(ininIs,s);
     if (mons)
     {
-      poly gs = witness(mons,inIs,ininIs,s);
+      poly gs = witness(mons,inIsSTD,ininIs,s);
       C = intersect(C,tropicalVariety(gs,s,currentStrategy),d);
       nMapFunc mMap = n_SetMap(s->cf,r->cf);
       poly gr = p_PermPoly(gs,NULL,s,r,mMap,NULL,0);
@@ -155,12 +159,55 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
       p_Delete(&mons,s);
       p_Delete(&gs,s);
       zc = C.begin();
+      // gfan::ZFan* zf = toFanStar(C);
+      // std::cout << zf->toString();
+      // delete zf;
+      id_Delete(&inIs,s);
+      id_Delete(&inIsSTD,s);
+      id_Delete(&ininIs,s);
+      rDelete(s);
     }
     else
-      zc++;
-    id_Delete(&inIs,s);
-    id_Delete(&ininIs,s);
-    rDelete(s);
+    {
+      gfan::ZVector wNeg = -w;
+      if (zc->contains(wNeg))
+      {
+        s = genericlyWeightedOrdering(r,u,wNeg,W,currentStrategy);
+        identity = n_SetMap(r->cf,s->cf);
+        inIs = idInit(k);
+        for (int j=0; j<k; j++)
+          inIs->m[j] = p_PermPoly(inI->m[j],NULL,r,s,identity,NULL,0);
+
+        inIsSTD = gfanlib_kStd_wrapper(inIs,s,isHomog);
+        ininIs = initial(inIsSTD,s,wNeg,W);
+
+        mons = currentStrategy.checkInitialIdealForMonomial(ininIs,s,wNeg);
+        // mons = checkForMonomialViaSuddenSaturation(ininIs,s);
+        if (mons)
+        {
+          poly gs = witness(mons,inIsSTD,ininIs,s);
+          C = intersect(C,tropicalVariety(gs,s,currentStrategy),d);
+          nMapFunc mMap = n_SetMap(s->cf,r->cf);
+          poly gr = p_PermPoly(gs,NULL,s,r,mMap,NULL,0);
+          idInsertPoly(inI,gr);
+          k++;
+          p_Delete(&mons,s);
+          p_Delete(&gs,s);
+          zc = C.begin();
+          // gfan::ZFan* zf = toFanStar(C);
+          // std::cout << zf->toString();
+          // delete zf;
+        }
+        else
+          zc++;
+        id_Delete(&inIs,s);
+        id_Delete(&inIsSTD,s);
+        id_Delete(&ininIs,s);
+        rDelete(s);
+      }
+      else
+        zc++;
+    }
   }
   return C;
 }
@@ -169,13 +216,17 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
 gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u, const tropicalStrategy& currentStrategy)
 {
   std::set<gfan::ZCone> C = tropicalStar(I,r,u,currentStrategy);
+  gfan::ZFan* zf = toFanStar(C);
+  std::cout << zf->toString();
+  delete zf;
   gfan::ZMatrix raysOfC(0,u.size());
   if (!currentStrategy.restrictToLowerHalfSpace())
   {
     for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end(); zc++)
     {
       assume(zc->dimensionOfLinealitySpace()+1 == zc->dimension());
-      raysOfC.appendRow(zc->semiGroupGeneratorOfRay());
+      gfan::ZMatrix ray = zc->extremeRays();
+      raysOfC.appendRow(ray[0]);
     }
   }
   else
@@ -195,34 +246,30 @@ gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u, c
  * which is weighted homogeneous with respect to weight w in ring r
  **/
 #ifndef NDEBUG
-// BOOLEAN tropicalCurve0(leftv res, leftv args)
-// {
-//   leftv u = args;
-//   ideal I = (ideal) u->CopyD();
-//   leftv v = u->next;
-//   int d = (int)(long) v->CopyD();
-//   tropicalStrategy currentCase = nonValuedCase;
-//   std::set<gfan::ZCone> C = tropicalCurve(I,currRing,d,currentCase);
-//   id_Delete(&I,currRing);
-//   omUpdateInfo();
-//   Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-//   res->rtyp = fanID;
-//   res->data = (char*) toFanStar(C);
-//   return FALSE;
-// }
-// BOOLEAN tropicalCurve1(leftv res, leftv args)
-// {
-//   leftv u = args;
-//   ideal I = (ideal) u->CopyD();
-//   leftv v = u->next;
-//   int d = (int)(long) v->CopyD();
-//   tropicalStrategy currentCase = valuedCase;
-//   std::set<gfan::ZCone> C = tropicalCurve(I,currRing,d,currentCase);
-//   id_Delete(&I,currRing);
-//   omUpdateInfo();
-//   Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-//   res->rtyp = fanID;
-//   res->data = (char*) toFanStar(C);
-//   return FALSE;
-// }
+BOOLEAN tropicalStarDebug(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if ((v!=NULL) && (v->Typ()==BIGINTMAT_CMD))
+    {
+      omUpdateInfo();
+      Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+      ideal inI = (ideal) u->CopyD();
+      bigintmat* u = (bigintmat*) v->CopyD();
+      tropicalStrategy currentCase(inI,currRing);
+      gfan::ZVector* v = bigintmatToZVector(u);
+      std::set<gfan::ZCone> C = tropicalStar(inI,currRing,*v,currentCase);
+      id_Delete(&inI,currRing);
+      delete u;
+      delete v;
+      res->rtyp = fanID;
+      res->data = (char*) toFanStar(C);
+      return FALSE;
+    }
+  }
+  WerrorS("tropicalStarDebug: unexpected parameters");
+  return TRUE;
+}
 #endif

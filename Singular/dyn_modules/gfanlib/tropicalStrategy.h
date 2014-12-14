@@ -135,7 +135,6 @@ public:
 
 #ifndef NDEBUG
   tropicalStrategy();
-
   static tropicalStrategy debugStrategy(const ideal startIdeal, number unifParameter, ring startRing);
 #endif
 
@@ -232,14 +231,6 @@ public:
   }
 
   /**
-   * returns the dimension of the homogeneity space
-   */
-  int getDimensionOfHomogeneitySpace() const
-  {
-    return linealitySpace.dimension();
-  }
-
-  /**
    * returns true, if valuation non-trivial, false otherwise
    */
   bool restrictToLowerHalfSpace() const
@@ -275,23 +266,6 @@ public:
   ring getShortcutRingPrependingWeight(const ring r, const gfan::ZVector w) const;
 
   /**
-   * Returns a copy of the shortcutRing which is weighted with respect to w first and v second.
-   * If valuation trivial, the coefficient ring will be the field with valuation.
-   * If valuation non-trivial, the coefficient ring will be the residue field.
-   */
-  ring getShortcutRingDoublyWeighted(const gfan::ZVector w, const gfan::ZVector v) const;
-
-  /**
-   * copies r and prepends extra weight w
-   */
-  ring copyAndPrependWeight(const ring r, const gfan::ZVector w) const;
-
-  /**
-   * changes the coefficient ring of r to be the residue field
-   */
-  void changeCoefficientToResidueField(ring r) const;
-
-  /**
    * reduces the generators of an ideal I so that
    * the inequalities and equations of the Groebner cone can be read off.
    */
@@ -300,10 +274,19 @@ public:
   void pReduce(ideal I, const ring r) const;
 
   /**
-   * returns true, if I contains a monomial.
-   * returns false otherwise.
+   * If given w, assuming w is in the Groebner cone of the ordering on r
+   * and I is a standard basis with respect to that ordering,
+   * checks whether the initial ideal of I with respect to w contains a monomial.
+   * If no w is given, assuming that I is already an initial form of some ideal,
+   * checks whether I contains a monomial.
+   * In both cases returns a monomial, if it contains one, returns NULL otherwise.
    **/
-  poly checkInitialIdealForMonomial(const ideal I, const ring r, const gfan::ZVector w) const;
+  poly checkInitialIdealForMonomial(const ideal I, const ring r, const gfan::ZVector w=0) const;
+
+  /**
+   * given generators of the initial ideal, computes its standard basis
+   */
+  ideal computeStdOfInitialIdeal(const ideal inI, const ring r) const;
 
   /**
    * suppose w a weight in maximal groebner cone of >
@@ -314,27 +297,20 @@ public:
    * and inJ is a standard basis of the initial ideal w.r.t. >'
    * then the returned J will be a standard baiss of the ideal w.r.t. >'
    */
-  ideal getWitness(const ideal inJ, const ideal inI, const ideal I, const ring r) const;
+  ideal computeWitness(const ideal inJ, const ideal inI, const ideal I, const ring r) const;
 
   ideal computeLift(const ideal inJs, const ring s, const ideal inIr, const ideal Ir, const ring r) const;
-
-  /**
-   * given generators of the initial ideal, computes its standard basis
-   */
-  ideal computeStdOfInitialIdeal(const ideal inI, const ring r) const;
 
   /**
    * given an interior point of a groebner cone
    * computes the groebner cone adjacent to it
    */
-  std::pair<ideal,ring> getFlip(const ideal Ir, const ring r, const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
+  std::pair<ideal,ring> computeFlip(const ideal Ir, const ring r, const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
 };
 
-int dim(ideal I, ring r);
-
 #ifndef NDEBUG
-BOOLEAN getWitnessDebug(leftv res, leftv args);
-BOOLEAN getFlipDebug(leftv res, leftv args);
+BOOLEAN computeWitnessDebug(leftv res, leftv args);
+BOOLEAN computeFlipDebug(leftv res, leftv args);
 #endif
 
 #endif

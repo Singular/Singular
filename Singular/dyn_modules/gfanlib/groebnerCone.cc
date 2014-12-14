@@ -338,6 +338,8 @@ groebnerCone::~groebnerCone()
   assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
   assume(checkPolyhedralInput(polyhedralCone,interiorPoint));
   if (polynomialIdeal) id_Delete(&polynomialIdeal,polynomialRing);
+  if (reducedPolynomialIdeal) id_Delete(&reducedPolynomialIdeal,polynomialRing);
+  if (initialPolynomialIdeal) id_Delete(&initialPolynomialIdeal,polynomialRing);
   if (polynomialRing) rDelete(polynomialRing);
 }
 
@@ -439,9 +441,11 @@ groebnerCone groebnerCone::flipCone(const gfan::ZVector interiorPoint, const gfa
    *   Hence it is sufficient to compute the initial form with respect to facetNormal,
    *   to obtain an initial form with respect to interiorPoint+e*facetNormal,
    *   for e>0 sufficiently small */
-  std::pair<ideal,ring> flipped = currentStrategy->getFlip(reducedPolynomialIdeal,polynomialRing,interiorPoint,facetNormal);
+  std::pair<ideal,ring> flipped = currentStrategy->computeFlip(reducedPolynomialIdeal,polynomialRing,interiorPoint,facetNormal);
   assume(checkPolynomialInput(flipped.first,flipped.second));
   groebnerCone flippedCone(flipped.first, flipped.second, interiorPoint, facetNormal, *currentStrategy);
+  id_Delete(&flipped.first,flipped.second);
+  rDelete(flipped.second);
   return flippedCone;
 }
 
@@ -505,6 +509,7 @@ static std::pair<gfan::ZMatrix,gfan::ZMatrix> interiorPointsAndNormalsOfFacets(c
 groebnerCones groebnerCone::groebnerNeighbours() const
 {
   std::pair<gfan::ZMatrix, gfan::ZMatrix> facetsData = interiorPointsAndNormalsOfFacets(polyhedralCone);
+
   gfan::ZMatrix interiorPoints = facetsData.first;
   gfan::ZMatrix facetNormals = facetsData.second;
 
@@ -519,7 +524,7 @@ groebnerCones groebnerCone::groebnerNeighbours() const
       if (w[0].sign()==0 && v[0].sign()>0)
         continue;
     }
-    neighbours.insert(this->flipCone(interiorPoints[i],facetNormals[i]));
+    neighbours.insert(flipCone(interiorPoints[i],facetNormals[i]));
   }
   return neighbours;
 }
@@ -596,6 +601,7 @@ groebnerCones groebnerCone::tropicalNeighbours() const
           groebnerCone neighbour = flipCone(interiorPoints[i],ray[j]);
           neighbours.insert(neighbour);
         }
+      id_Delete(&initialIdeal,polynomialRing);
     }
   }
   return neighbours;
@@ -615,3 +621,112 @@ gfan::ZFan* toFanStar(groebnerCones setOfCones)
   else
     return new gfan::ZFan(gfan::ZFan::fullFan(currRing->N));
 }
+
+
+#ifndef NDEBUG
+
+BOOLEAN flipConeDebug(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if ((v!=NULL) && (v->Typ()==NUMBER_CMD))
+    {
+      leftv w = v->next;
+      if ((w!=NULL) && (w->Typ()==BIGINTMAT_CMD))
+      {
+        leftv x = w->next;
+        if ((x!=NULL) && (x->Typ()==BIGINTMAT_CMD))
+        {
+          omUpdateInfo();
+          Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+
+          ideal I = (ideal) u->CopyD();
+          number p = (number) v->CopyD();
+          bigintmat* interiorPoint0 = (bigintmat*) w->CopyD();
+          bigintmat* facetNormal0 = (bigintmat*) x->CopyD();
+          tropicalStrategy debug = tropicalStrategy::debugStrategy(I,p,currRing);
+
+          gfan::ZVector* interiorPoint = bigintmatToZVector(interiorPoint0);
+          gfan::ZVector* facetNormal = bigintmatToZVector(facetNormal0);
+
+          groebnerCone sigma(I,currRing,debug);
+          groebnerCone theta = sigma.flipCone(*interiorPoint,*facetNormal);
+
+          id_Delete(&I,currRing);
+          n_Delete(&p,currRing->cf);
+          delete interiorPoint0;
+          delete facetNormal0;
+          delete interiorPoint;
+          delete facetNormal;
+
+          res->rtyp = NONE;
+          res->data = NULL;
+          return FALSE;
+        }
+      }
+    }
+  }
+  WerrorS("computeFlipDebug: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN groebnerNeighboursDebug(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if ((v!=NULL) && (v->Typ()==NUMBER_CMD))
+    {
+      omUpdateInfo();
+      Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+
+      ideal I = (ideal) u->CopyD();
+      number p = (number) v->CopyD();
+
+      tropicalStrategy debug = tropicalStrategy::debugStrategy(I,p,currRing);
+      groebnerCone sigma(I,currRing,debug);
+      groebnerCones neighbours = sigma.groebnerNeighbours();
+
+      id_Delete(&I,currRing);
+      n_Delete(&p,currRing->cf);
+      res->rtyp = NONE;
+      res->data = NULL;
+      return FALSE;
+    }
+  }
+  WerrorS("computeFlipDebug: unexpected parameters");
+  return TRUE;
+}
+
+BOOLEAN tropicalNeighboursDebug(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if ((v!=NULL) && (v->Typ()==NUMBER_CMD))
+    {
+      omUpdateInfo();
+      Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+
+      ideal I = (ideal) u->CopyD();
+      number p = (number) v->CopyD();
+
+      tropicalStrategy debug = tropicalStrategy::debugStrategy(I,p,currRing);
+      groebnerCone sigma(I,currRing,debug);
+      groebnerCones neighbours = sigma.groebnerNeighbours();
+
+      id_Delete(&I,currRing);
+      n_Delete(&p,currRing->cf);
+      res->rtyp = NONE;
+      res->data = NULL;
+      return FALSE;
+    }
+  }
+  WerrorS("computeFlipDebug: unexpected parameters");
+  return TRUE;
+}
+#endif

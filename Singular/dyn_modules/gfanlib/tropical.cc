@@ -173,7 +173,7 @@ BOOLEAN maximalGroebnerCone(leftv res, leftv args)
 BOOLEAN initial(leftv res, leftv args)
 {
   leftv u = args;
-  if ((u != NULL) && (u->Typ() == POLY_CMD) && (u->next == NULL))
+  if ((u != NULL) && (u->Typ() == POLY_CMD))
   {
     leftv v = u->next;
     if ((v !=NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
@@ -193,13 +193,13 @@ BOOLEAN initial(leftv res, leftv args)
         bigintmat* w1 = (bigintmat*) v->Data();
         weightVector = bigintmatToZVector(*w1);
       }
-      res->rtyp = IDEAL_CMD;
+      res->rtyp = POLY_CMD;
       res->data = (void*) initial(p, currRing, *weightVector);
       delete weightVector;
       return FALSE;
     }
   }
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD) && (u->next == NULL))
+  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
   {
     leftv v = u->next;
     if ((v !=NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
@@ -219,7 +219,7 @@ BOOLEAN initial(leftv res, leftv args)
         bigintmat* w1 = (bigintmat*) v->Data();
         weightVector = bigintmatToZVector(*w1);
       }
-      res->rtyp = POLY_CMD;
+      res->rtyp = IDEAL_CMD;
       res->data = (void*) initial(I, currRing, *weightVector);
       delete weightVector;
       return FALSE;
@@ -259,8 +259,12 @@ void tropical_setup(SModulFunctions* p)
   // p->iiAddCproc("","tropicalCurve0",FALSE,tropicalCurve0);
   // p->iiAddCproc("","tropicalCurve1",FALSE,tropicalCurve1);
   p->iiAddCproc("","reduceInitiallyDebug",FALSE,reduceInitiallyDebug);
-  p->iiAddCproc("","getWitnessDebug",FALSE,getWitnessDebug);
-  p->iiAddCproc("","getFlipDebug",FALSE,getFlipDebug);
+  p->iiAddCproc("","computeWitnessDebug",FALSE,computeWitnessDebug);
+  p->iiAddCproc("","computeFlipDebug",FALSE,computeFlipDebug);
+  p->iiAddCproc("","flipConeDebug",FALSE,flipConeDebug);
+  p->iiAddCproc("","groebnerNeighboursDebug",FALSE,groebnerNeighboursDebug);
+  p->iiAddCproc("","tropicalNeighboursDebug",FALSE,tropicalNeighboursDebug);
+  p->iiAddCproc("","tropicalStarDebug",FALSE,tropicalStarDebug);
   p->iiAddCproc("","tropicalStartingPoint",FALSE,tropicalStartingPoint);
   p->iiAddCproc("","positiveTropicalStartingPoint",FALSE,positiveTropicalStartingPoint);
   p->iiAddCproc("","nonNegativeTropicalStartingPoint",FALSE,nonNegativeTropicalStartingPoint);

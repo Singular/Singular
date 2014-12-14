@@ -47,13 +47,14 @@ gfan::ZVector nonvalued_adjustWeightForHomogeneity(const gfan::ZVector w)
   gfan::Integer min=w[0];
   for (unsigned i=1; i<w.size(); i++)
     if (w[i]<min) min=w[i];
+
+  if (min.sign()>0)
+    return w;
+
   /* compute w+(1-min)*(1,...,1) and return it */
   gfan::ZVector v=gfan::ZVector(w.size());
-  if (min<1)
-  {
-    for (unsigned i=0; i<w.size(); i++)
-      v[i]=w[i]-min+1;
-  }
+  for (unsigned i=0; i<w.size(); i++)
+    v[i]=w[i]-min+1;
   assume(checkForNonPositiveEntries(v));
   return v;
 }

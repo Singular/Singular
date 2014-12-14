@@ -4,6 +4,7 @@
 #include <ttinitialReduction.h>
 #include <tropical.h>
 #include <std_wrapper.h>
+#include <tropicalCurves.h>
 
 // for various commands in dim(ideal I, ring r):
 #include <kernel/ideals.h>
@@ -40,8 +41,77 @@ int dim(ideal I, ring r)
   return d;
 }
 
-static bool noExtraReduction(ideal /*I*/, ring /*r*/, number /*p*/)
+static void swapElements(ideal I, ideal J)
 {
+  assume(idSize(I)==idSize(J));
+
+  for (int i=0; i<idSize(I); i++)
+  {
+    poly cache = I->m[i];
+    I->m[i] = J->m[i];
+    J->m[i] = cache;
+  }
+
+  return;
+}
+
+static bool noExtraReduction(ideal I, ring r, number /*p*/)
+{
+  int n = rVar(r);
+  gfan::ZVector allOnes(n);
+  for (int i=0; i<n; i++)
+    allOnes[i] = 1;
+  ring rShortcut = rCopy0(r);
+
+  int* order = rShortcut->order;
+  int* block0 = rShortcut->block0;
+  int* block1 = rShortcut->block1;
+  int** wvhdl = rShortcut->wvhdl;
+
+  int h = rBlocks(r);
+  rShortcut->order = (int*) omAlloc0((h+1)*sizeof(int));
+  rShortcut->block0 = (int*) omAlloc0((h+1)*sizeof(int));
+  rShortcut->block1 = (int*) omAlloc0((h+1)*sizeof(int));
+  rShortcut->wvhdl = (int**) omAlloc0((h+1)*sizeof(int*));
+  rShortcut->order[0] = ringorder_a;
+  rShortcut->block0[0] = 1;
+  rShortcut->block1[0] = n;
+  bool overflow;
+  rShortcut->wvhdl[0] = ZVectorToIntStar(allOnes,overflow);
+  for (int i=1; i<=h; i++)
+  {
+    rShortcut->order[i] = order[i-1];
+    rShortcut->block0[i] = block0[i-1];
+    rShortcut->block1[i] = block1[i-1];
+    rShortcut->wvhdl[i] = wvhdl[i-1];
+  }
+
+  rComplete(rShortcut);
+  rTest(rShortcut);
+
+  omFree(order);
+  omFree(block0);
+  omFree(block1);
+  omFree(wvhdl);
+
+  int k = idSize(I);
+  ideal IShortcut = idInit(k);
+  nMapFunc intoShortcut = n_SetMap(r->cf,rShortcut->cf);
+  for (int i=0; i<k; i++)
+    IShortcut->m[i] = p_PermPoly(I->m[i],NULL,r,rShortcut,intoShortcut,NULL,0);
+
+  ideal JShortcut = gfanlib_kStd_wrapper(IShortcut,rShortcut);
+
+  ideal J = idInit(k);
+  nMapFunc outofShortcut = n_SetMap(rShortcut->cf,r->cf);
+  for (int i=0; i<k; i++)
+    J->m[i] = p_PermPoly(JShortcut->m[i],NULL,rShortcut,r,outofShortcut,NULL,0);
+
+  swapElements(I,J);
+  id_Delete(&IShortcut,rShortcut);
+  id_Delete(&JShortcut,rShortcut);
+  rDelete(rShortcut);
+  id_Delete(&J,r);
   return false;
 }
 
@@ -312,9 +382,6 @@ bool tropicalStrategy::reduce(ideal I, const ring r) const
   rTest(r);
   id_Test(I,r);
 
-  if (isValuationTrivial())
-    return false;
-
   nMapFunc identity = n_SetMap(startingRing->cf,r->cf);
   number p = identity(uniformizingParameter,startingRing->cf,r->cf);
   bool b = extraReductionAlgorithm(I,r,p);
@@ -412,7 +479,7 @@ poly tropicalStrategy::checkInitialIdealForMonomial(const ideal I, const ring r,
   if (p!=NULL)
   {
     monomial=p_One(r);
-    for (int i=1; i<n; i++)
+    for (int i=1; i<=n; i++)
       p_SetExp(monomial,i,p_GetExp(p,i,rShortcut),r);
     p_Delete(&p,rShortcut);
   }
@@ -432,7 +499,7 @@ ring tropicalStrategy::copyAndChangeCoefficientRing(const ring r) const
   return rShortcut;
 }
 
-ideal tropicalStrategy::getWitness(const ideal inJ, const ideal inI, const ideal I, const ring r) const
+ideal tropicalStrategy::computeWitness(const ideal inJ, const ideal inI, const ideal I, const ring r) const
 {
   // if the valuation is trivial and the ring and ideal have not been extended,
   // then it is sufficient to return the difference between the elements of inJ
@@ -554,7 +621,7 @@ ideal tropicalStrategy::computeLift(const ideal inJs, const ring s, const ideal 
   for (int i=0; i<k; i++)
     inJr->m[i] = p_PermPoly(inJs->m[i],NULL,s,r,identitysr,NULL,0);
 
-  ideal Jr = getWitness(inJr,inIr,Ir,r);
+  ideal Jr = computeWitness(inJr,inIr,Ir,r);
   nMapFunc identityrs = n_SetMap(r->cf,s->cf);
   ideal Js = idInit(k);
   for (int i=0; i<k; i++)
@@ -643,9 +710,9 @@ ring tropicalStrategy::copyAndChangeOrderingLS(const ring r, const gfan::ZVector
   return s;
 }
 
-std::pair<ideal,ring> tropicalStrategy::getFlip(const ideal Ir, const ring r,
-                                                const gfan::ZVector interiorPoint,
-                                                const gfan::ZVector facetNormal) const
+std::pair<ideal,ring> tropicalStrategy::computeFlip(const ideal Ir, const ring r,
+                                                    const gfan::ZVector interiorPoint,
+                                                    const gfan::ZVector facetNormal) const
 {
   assume(isValuationTrivial() || interiorPoint[0].sign()<0);
   assume(checkForUniformizingBinomial(Ir,r));
@@ -669,7 +736,7 @@ std::pair<ideal,ring> tropicalStrategy::getFlip(const ideal Ir, const ring r,
   for (int i=0; i<k; i++)
     inJr->m[i] = p_PermPoly(inJsAdjusted->m[i],NULL,sAdjusted,r,identity,NULL,0);
 
-  ideal Jr = getWitness(inJr,inIr,Ir,r);
+  ideal Jr = computeWitness(inJr,inIr,Ir,r);
   ring s = copyAndChangeOrderingLS(r,interiorPoint,facetNormal);
   identity = n_SetMap(r->cf,s->cf);
   ideal Js = idInit(k);
@@ -769,8 +836,6 @@ bool tropicalStrategy::checkForUniformizingParameter(const ideal inI, const ring
   return false;
 }
 
-
-
 #ifndef NDEBUG
 tropicalStrategy::tropicalStrategy():
   originalRing(NULL),
@@ -811,7 +876,7 @@ tropicalStrategy tropicalStrategy::debugStrategy(const ideal startIdeal, number 
   return debug;
 }
 
-BOOLEAN getWitnessDebug(leftv res, leftv args)
+BOOLEAN computeWitnessDebug(leftv res, leftv args)
 {
   leftv u = args;
   if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
@@ -833,7 +898,7 @@ BOOLEAN getWitnessDebug(leftv res, leftv args)
           ideal I = (ideal) w->CopyD();
           number p = (number) x->CopyD();
           tropicalStrategy debug = tropicalStrategy::debugStrategy(I,p,currRing);
-          ideal J = debug.getWitness(inJ,inI,I,currRing);
+          ideal J = debug.computeWitness(inJ,inI,I,currRing);
           id_Delete(&inJ,currRing);
           id_Delete(&inI,currRing);
           id_Delete(&I,currRing);
@@ -848,7 +913,7 @@ BOOLEAN getWitnessDebug(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN getFlipDebug(leftv res, leftv args)
+BOOLEAN computeFlipDebug(leftv res, leftv args)
 {
   leftv u = args;
   if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
@@ -873,7 +938,7 @@ BOOLEAN getFlipDebug(leftv res, leftv args)
 
           gfan::ZVector* interiorPoint = bigintmatToZVector(interiorPoint0);
           gfan::ZVector* facetNormal = bigintmatToZVector(facetNormal0);
-          std::pair<ideal,ring> Js = debug.getFlip(I,currRing,*interiorPoint,*facetNormal);
+          std::pair<ideal,ring> Js = debug.computeFlip(I,currRing,*interiorPoint,*facetNormal);
           ideal J = Js.first;
           ring s = Js.second;
 
@@ -894,7 +959,7 @@ BOOLEAN getFlipDebug(leftv res, leftv args)
       }
     }
   }
-  WerrorS("getFlipDebug: unexpected parameters");
+  WerrorS("computeFlipDebug: unexpected parameters");
   return TRUE;
 }
 #endif
