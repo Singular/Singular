@@ -1111,3 +1111,17 @@ example
    hasMixedOrdering();
 }
 
+proc changeordTo(def r,string o)
+{
+  list rl=ringlist(r);
+  rl[3]=list(list("C",0),list(o,1:nvars(r)));
+  def rr=ring(rl);
+  return(rr);
+}
+example
+{
+  ring r=0,(x,y),lp;
+  def rr=changeordToCdp(r,"dp");
+  rr;
+}
+

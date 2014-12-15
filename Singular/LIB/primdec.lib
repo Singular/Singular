@@ -100,7 +100,8 @@ NOTE:    result is a std basis in the basering
   def @P= basering;
   if(ordstr(basering)[1,2]!="dp")
   {
-    execute("ring @Phelp=("+charstr(@P)+"),("+varstr(@P)+"),(C,dp);");
+    def @Phelp=changeordTo(basering,"dp");
+    setring @Phelp;
     ideal inew=std(imap(@P,id));
     ideal  @h=imap(@P,h);
   }
@@ -1453,7 +1454,8 @@ proc zeroSp(ideal i)
     }
     ready=0;
   }
-  execute( "ring P=("+charstr(R)+"),("+varstr(R)+"),(C,dp);");
+  def P=changeordTo(R,"dp");
+  setring P;
   ideal i=imap(R,i);
   if(npars(basering)==0)
   {
@@ -1874,7 +1876,7 @@ static proc prepareQuotientring (int nnp)
 "USAGE:   prepareQuotientring(nnp); nnp int
 RETURN:  string = to define Kvar(nnp+1),...,var(nvars)[..rest ]
 NOTE:
-EXAMPLE: example independentSet; shows an example
+EXAMPLE: example prepareQuotientring; shows an example
 "
 {
   ASSUME(1, hasFieldCoefficient(basering) );
@@ -1914,7 +1916,6 @@ example
    basering;
    phi;
    setring @Q;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2190,7 +2191,8 @@ EXAMPLE: example minAssPrimes; shows an example
   if( (dim(i) == 0 ) && ( npars(P) == 0) )
   {
     int di = vdim(i);
-    execute ("ring gnir=("+charstr(P)+"),("+varstr(P)+"),lp;");
+    def gnir=changeordTo(P,"lp");
+    setring gnir;
     ideal J = std(imap(P,i));
     attrib(J, "isSB", 1);
     if(vdim(J) != di)
@@ -2317,7 +2319,8 @@ static proc union(list li)
 
   def P=basering;
 
-  execute("ring ir = ("+charstr(basering)+"),("+varstr(basering)+"),(C,lp);");
+  def ir=changeordTo(basering,"lp");
+  setring ir;
   list l=fetch(P,li);
   list @erg;
 
@@ -2438,7 +2441,8 @@ EXAMPLE:example equidim; shows an example
   }
   else
   {
-     execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),dp;");
+     def gnir=changeordTo(basering,"dp");
+     setring gnir;
      ideal i=imap(P,i);
      ideal j=groebner(i);
   }
@@ -2512,7 +2516,7 @@ EXAMPLE: example equidimMax; shows an example
   if(attrib(basering,"global")!=1)
   {
       ERROR(
-      "// Not implemented for this ordering, please change to global ordering."
+      "Not implemented for this ordering, please change to a global ordering."
       );
   }
 
@@ -2542,7 +2546,8 @@ EXAMPLE: example equidimMax; shows an example
   }
   else
   {
-     execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),dp;");
+     def gnir=changeordTo(basering,"dp");
+     setring gnir;
      ideal i=imap(P,i);
      ideal j=groebner(i);
   }
@@ -2883,7 +2888,8 @@ EXAMPLE: example decomp; shows an example
 
   int lp=islp();
 
-  execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),(C,lp);");
+  def gnir=changeordTo(basering,"lp");
+  setring gnir;
   op=option(get);
   option(redSB);
 
@@ -3134,7 +3140,8 @@ EXAMPLE: example decomp; shows an example
   }
   else
   {
-    execute( "ring @Phelp=("+charstr(gnir)+"),("+varstr(gnir)+"),(C,dp);");
+    def @Phelp=changeordTo(gnir,"dp");
+    setring @Phelp;
   }
 
   if(homo==1)
