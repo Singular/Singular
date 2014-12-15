@@ -103,15 +103,12 @@ struct SNumberStatistic
 #undef _Z
     }
 
-    inline void Print(const char * const msg = NULL) const
+    inline void Print() const
     {
-      ::Print("%s:\n", (msg == NULL) ? "Statistic about number operations" : msg);
-      
 #define _P(F) if(this->F > 0) ::Print("%21s: %13lu\n", # F, this->F)
       ALL_STATISTIC(_P);       
       _P(n_CancelOut);
 #undef _P
-      ::PrintLn();
     }
 
 #define _UL(F) unsigned long F
@@ -127,7 +124,7 @@ struct SNumberStatistic
 static inline void number_stats_Init(const unsigned long defaultvalue = 0)
 {
 #ifndef HAVE_NUMSTATS
-  WarnS("Please note that number statistic was disabled in compile-time");
+  WarnS("Please enable NUMSTATS first!"); 
   (void)(defaultvalue);
 #else
   extern struct SNumberStatistic number_stats;
@@ -138,12 +135,14 @@ static inline void number_stats_Init(const unsigned long defaultvalue = 0)
 /// print out all counters
 static inline void number_stats_Print(const char * const msg = NULL)
 {
+   ::Print("%s:\n", (msg == NULL) ? "Statistic about number operations" : msg);
 #ifndef HAVE_NUMSTATS
-  Warn("Please note that number statistic was disabled in compile-time [message: %s]", msg);
+  WarnS("Please enable NUMSTATS first!"); 
 #else
   extern struct SNumberStatistic number_stats;
-  number_stats.Print(msg);
+  number_stats.Print();
 #endif
+  ::PrintLn();
 }
 #endif /* NUMSTAT */
 
