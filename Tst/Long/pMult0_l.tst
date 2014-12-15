@@ -18,10 +18,10 @@ proc pAdd_Test(string rs)
   rs;
   rs = "ring r = " + rs + ";";
   execute(rs);
-  int n_vars = tst_rgen_nvars[tst_rgen_var_index];
+  int n_vars = tst_rgen_nvars[Tst::tst_rgen_var_index];
   ideal id = tst_cyclic(n_vars);
   tst_TestMult(id, how_often[n_vars],
-               size(tst_rgen_comp_orderings[tst_rgen_comp_index]));
+               size(tst_rgen_comp_orderings[Tst::tst_rgen_comp_index]));
  
   kill r;
 }

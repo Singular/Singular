@@ -61,6 +61,11 @@
 #undef NOSTREAMIO
 #endif
 
+/* the following cunstruct is to make it painless to add -DHAVE_NUMSTATS to CPPFLAGS for configure */
+#ifndef HAVE_NUMSTATS
+/* #define HAVE_NUMSTATS */
+#undef HAVE_NUMSTATS
+#endif /* HAVE_NUMSTATS */
 // ----------------  end of parts/extensions
 
 // ---------------- Singular standard types etc.
@@ -72,6 +77,12 @@
 /* SI_BIGINT_VARIANT: 1: from longrat.cc
  *                    2: given by SI_INTEGER_VARIANT */
 #define SI_BIGINT_VARIANT 1
+
+/* preparation for versio 4.1.0: */
+#ifndef SINGULAR_4_1
+/* #define SINGULAR_4_1 */
+#undef SINGULAR_4_1
+#endif /* SINGULAR_4_1 */
 
 #ifndef SIZEOF_LONG
 

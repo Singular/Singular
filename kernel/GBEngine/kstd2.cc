@@ -215,19 +215,19 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
 
   poly p = input_p;
   poly zeroPoly = NULL;
-  NATNUMBER a = (NATNUMBER) pGetCoeff(p);
+  unsigned long a = (unsigned long) pGetCoeff(p);
 
   int k_ind2 = 0;
   int a_ind2 = ind2(a);
 
-  // NATNUMBER k = 1;
+  // unsigned long k = 1;
   // of interest is only k_ind2, special routine for improvement ... TODO OLIVER
   for (int i = 1; i <= leadRing->N; i++)
   {
     k_ind2 = k_ind2 + ind_fact_2(p_GetExp(p, i, leadRing));
   }
 
-  a = (NATNUMBER) pGetCoeff(p);
+  a = (unsigned long) pGetCoeff(p);
 
   number tmp1;
   poly tmp2, tmp3;
@@ -250,7 +250,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
         s_exp = s_exp - 2;
       }
       p_SetExp(lead_mult, i, p_GetExp(p, i,leadRing) - s_exp, tailRing);
-      for (NATNUMBER j = 1; j <= s_exp; j++)
+      for (unsigned long j = 1; j <= s_exp; j++)
       {
         tmp1 = nInit(j);
         tmp2 = p_ISet(1, tailRing);
@@ -279,13 +279,13 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
     pNext(tmp2) = zeroPoly;
     return tmp2;
   }
-/*  NATNUMBER alpha_k = twoPow(leadRing->ch - k_ind2);
+/*  unsigned long alpha_k = twoPow(leadRing->ch - k_ind2);
   if (1 == 0 && alpha_k <= a)
   {  // Temporarly disabled, reducing coefficients not compatible with std TODO Oliver
     zeroPoly = p_ISet((a / alpha_k)*alpha_k, tailRing);
     for (int i = 1; i <= leadRing->N; i++)
     {
-      for (NATNUMBER j = 1; j <= p_GetExp(p, i, leadRing); j++)
+      for (unsigned long j = 1; j <= p_GetExp(p, i, leadRing); j++)
       {
         tmp1 = nInit(j);
         tmp2 = p_ISet(1, tailRing);
@@ -297,12 +297,12 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
         }
         else
         {
-          tmp3 = p_ISet((NATNUMBER) tmp1, tailRing);
+          tmp3 = p_ISet((unsigned long) tmp1, tailRing);
           zeroPoly = p_Mult_q(zeroPoly, p_Add_q(tmp2, tmp3, tailRing), tailRing);
         }
       }
     }
-    tmp2 = p_ISet((NATNUMBER) pGetCoeff(zeroPoly), leadRing);
+    tmp2 = p_ISet((unsigned long) pGetCoeff(zeroPoly), leadRing);
     for (int i = 1; i <= leadRing->N; i++)
     {
       pSetExp(tmp2, i, p_GetExp(zeroPoly, i, tailRing));

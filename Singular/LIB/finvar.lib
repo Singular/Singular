@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version finvar.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version finvar.lib 4.0.1.1 Dec_2104 "; // $Id$
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -752,7 +752,7 @@ EXAMPLE: example molien; shows an example
     { ring `newring`=0,x,dp;          // element, it is very easy to calculate
       matrix M[1][2]=1,(1-x)^n;       // the Molien series
     }
-    exportto(Top,`newring`);          // we keep the ring where we computed the
+    export(`newring`);                // we keep the ring where we computed the
     export M;                         // Molien series in such that we can
     setring br;                       // keep it
     if (v)
@@ -881,10 +881,10 @@ example
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
          list L=group_reynolds(A);
          molien(L[2..size(L)],newring);
-         setring alksdfjlaskdjf;
+         setring Finvar::alksdfjlaskdjf;
          print(M);
          setring S;
-         kill alksdfjlaskdjf;
+         kill Finvar::alksdfjlaskdjf;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1428,10 +1428,10 @@ example
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
          matrix REY=reynolds_molien(A,newring);
          print(REY);
-         setring Qadjoint;
+         setring Finvar::Qadjoint;
          print(M);
          setring S;
-         kill Qadjoint;
+         kill Finvar::Qadjoint;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1489,7 +1489,10 @@ EXAMPLE: example partial_molien; shows an example
     poly A(1)=M[1,2];                 // denominator of Molien series (for now)
     string mp=string(minpoly);
     execute("ring R=("+charstr(br)+"),("+varstr(br)+"),ds;");
-    execute("minpoly=number("+mp+");");
+    if (mp!="0")
+    {
+      execute("minpoly=number("+mp+");");
+    }
     poly A(1)=0;                      // A(1) will contain the sum of n terms -
     poly min;                         // min will be our smallest term -
     poly A(2)=fetch(br,A(2));         // fetching A(2) and M[1,2] into R
@@ -2368,7 +2371,7 @@ example
          string newring="alskdfj";
          molien(L[2..size(L)],newring);
          matrix P=primary_charp(L[1],newring);
-         kill `newring`;
+         kill Finvar::`newring`;
          print(P);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -3506,7 +3509,7 @@ example
          string newring="alskdfj";
          molien(L[2..size(L)],newring);
          matrix P=primary_charp_random(L[1],newring,1);
-         kill `newring`;
+         kill Finvar::`newring`;
          print(P);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -7625,14 +7628,15 @@ EXAMPLE: example orbit_variety; shows an example
     int m=ncols(F);
     string mp=string(minpoly);
     execute("ring R=("+charstr(br)+"),("+varstr(br)+",y(1..m)),dp;");
-    execute("minpoly=number("+mp+");");
+    if (mp!="0")
+    { execute("minpoly=number("+mp+");"); }
     ideal I=ideal(imap(br,F));
     for (int i=1;i<=m;i++)
-    { I[i]=I[i]-y(i);
-    }
+    { I[i]=I[i]-y(i); }
     I=elim(I,1..n);
     execute("ring "+newring+"=("+charstr(br)+"),(y(1..m)),dp(m);");
-    execute("minpoly=number("+mp+");");
+    if (mp!="0")
+    { execute("minpoly=number("+mp+");"); }
     ideal vars;
     for (i=2;i<=n;i++)
     { vars[i]=0;
@@ -7854,7 +7858,8 @@ EXAMPLE: example relative_orbit_variety; shows an example
     int m=ncols(F);
     string mp=string(minpoly);
     execute("ring R=("+charstr(br)+"),("+varstr(br)+",y(1..m)),lp;");
-    execute("minpoly=number("+mp+");");
+    if (mp!="0")
+    { execute("minpoly=number("+mp+");"); }
     ideal J=ideal(imap(br,F));
     ideal I=imap(br,I);
     for (int i=1;i<=m;i++)
@@ -7880,7 +7885,8 @@ EXAMPLE: example relative_orbit_variety; shows an example
     }
     G=compress(G);
     execute("ring "+newring+"=("+charstr(br)+"),(y(1..m)),lp;");
-    execute("minpoly=number("+mp+");");
+    if (mp!="0")
+    { execute("minpoly=number("+mp+");"); }
     ideal vars;
     for (i=2;i<=n;i++)
     { vars[i]=0;

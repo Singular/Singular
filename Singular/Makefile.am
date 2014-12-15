@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -I ../m4
+ACLOCAL_AMFLAGS = -I../m4
 
 GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-version)
 
@@ -155,6 +155,7 @@ optional_Singular_programs =
 
 bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 
+# the following dependency leads to Singular relinking upon a library update!
 Singular ESingular TSingular $(optional_Singular_programs): ${abs_builddir}/LIB
 
 Singular_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h

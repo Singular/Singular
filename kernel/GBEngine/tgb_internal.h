@@ -308,40 +308,12 @@ enum calc_state
     //UNIMPORTANT,
     //SOONTREP
   };
-//static BOOLEAN pair_cmp(sorted_pair_node* a,sorted_pair_node* b);
 template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set);
-static int add_to_reductors(slimgb_alg* c, poly h, int len, int ecart, BOOLEAN simplified=FALSE);
-static int bucket_guess(kBucket* bucket);
-static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
-static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n=0);
 void free_sorted_pair_node(sorted_pair_node* s, ring r);
-static void shorten_tails(slimgb_alg* c, poly monom);
-static void replace_pair(int & i, int & j, slimgb_alg* c);
-//static sorted_pair_node** add_to_basis(poly h, int i, int j,slimgb_alg* c, int* ip=NULL);
-//static void do_this_spoly_stuff(int i,int j,slimgb_alg* c);
-//ideal t_rep_gb(ring r,ideal arg_I);
 ideal do_t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode,int deg_pos);
-static BOOLEAN has_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* state);
-//static int* make_connections(int from, poly bound, slimgb_alg* c);
-static int* make_connections(int from, int to, poly bound, slimgb_alg* c);
 void now_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* c);
-//static void soon_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* c);
-//static int pLcmDeg(poly a, poly b);
-static int simple_posInS (kStrategy strat, poly p,int len, wlen_type wlen);
-//static BOOLEAN find_next_pair(slimgb_alg* c, BOOLEAN go_higher=TRUE);
 
-//static sorted_pair_node* pop_pair(slimgb_alg* c);
-//static BOOLEAN no_pairs(slimgb_alg* c);
 void clean_top_of_pair_list(slimgb_alg* c);
-static void super_clean_top_of_pair_list(slimgb_alg* c);
-static BOOLEAN state_is(calc_state state, const int & i, const int & j, slimgb_alg* c);
-static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, slimgb_alg* c=NULL);
-static int tgb_pair_better_gen(const void* ap,const void* bp);
-static poly redTailShort(poly h, kStrategy strat);
-static poly gcd_of_terms(poly p, ring r);
-static BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, slimgb_alg* c);
-//static poly kBucketGcd(kBucket* b, ring r);
-static void multi_reduction(red_object* los, int & losl, slimgb_alg* c);
 int slim_nsize(number n, ring r);
 sorted_pair_node* quick_pop_pair(slimgb_alg* c);
 sorted_pair_node* top_pair(slimgb_alg* c);
@@ -350,7 +322,6 @@ sorted_pair_node**  spn_merge(sorted_pair_node** p, int pn,sorted_pair_node **q,
 int kFindDivisibleByInS_easy(kStrategy strat,const red_object & obj);
 int tgb_pair_better_gen2(const void* ap,const void* bp);
 int kFindDivisibleByInS_easy(kStrategy strat,poly p, long sev);
-//static int quality(poly p, int len, slimgb_alg* c);
 /**
    makes on each red_object in a region a single_step
  **/
@@ -401,9 +372,6 @@ struct find_erg
   BOOLEAN fromS;//else from los
 
 };
-
-static void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c);
-//static void finalize_reduction_step(reduction_step* r);
 
 template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set)
 {
@@ -1456,7 +1424,6 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
 
 }
 #endif
-static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c);
 wlen_type pELength(poly p, ring r);
 int terms_sort_crit(const void* a, const void* b);
 //void simplest_gauss_modp(number* a, int nrows,int ncols);

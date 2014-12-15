@@ -12,11 +12,9 @@
 /* please include singularconfig.h exclusively via <kernel/mod2.h> and before any other header */
 # include <singularconfig.h>
 
-//# include <misc/auxiliary.h>
+# include <misc/auxiliary.h>
 
 #define SINGULAR_MAJOR_VERSION 4
-
-/*#define SINGULAR_4_1 1*/
 
 #ifdef SINGULAR_4_1
 #undef VERSION

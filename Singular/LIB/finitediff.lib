@@ -544,8 +544,8 @@ EXAMPLE: example setinitials; shows an example
   def LV=variable;
   def @variables=variable;
   def @derivatives=der;
-  exportto(Top,@variables);
-  exportto(Top,@derivatives);
+  export(@variables);
+  export(@derivatives);
   re(der);
   int j;
   string dvar="d"+print(LV[1],"%s");
@@ -602,7 +602,6 @@ EXAMPLE: example setinitials; shows an example
   // comment by VL: it's better to return this ring! causes many changes
   // across the library
   export(R);
-  exportto(Top,basering);
 }
 example
 {
@@ -1004,7 +1003,7 @@ example
   basering;///does show the ring
   poly f=t**3*cx**2-cy**2*dt+i**3*sx;
   f;
-  VarToPar(f);
+  ComplexValue(f);
 }
 //////////////////////////////////
 proc VarToPar(poly f)

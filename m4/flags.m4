@@ -51,9 +51,9 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
   AS_HELP_STRING([--disable-optimizationflags], [build the without default optimization flags]),
   [ENABLE_OPTIMIZATION="$enableval"], [ENABLE_OPTIMIZATION="yeah"])
   
- if test "x${ENABLE_DEBUG}" == xyes; then
+ if test "x${ENABLE_DEBUG}" = xyes; then
   SINGULAR_CFLAGS=""
-  if test "x${ENABLE_OPTIMIZATION}" == xyeah; then
+  if test "x${ENABLE_OPTIMIZATION}" = xyeah; then
    ENABLE_OPTIMIZATION="no"
    AC_MSG_WARN([Please note that we disable implicit (default) optimization flags since you have enabled the debug flags... ])
   fi
@@ -64,26 +64,26 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
   AC_DEFINE([SING_NDEBUG],1,"Disable Singular Debug")
  fi
 
- if test "x${ENABLE_OPTIMIZATION}" == xyeah; then
+ if test "x${ENABLE_OPTIMIZATION}" = xyeah; then
    ENABLE_OPTIMIZATION="yes"
  fi
   
- if test "x${ENABLE_OPTIMIZATION}" == xyes; then
-  if test "x${ENABLE_DEBUG}" == xyes; then
+ if test "x${ENABLE_OPTIMIZATION}" = xyes; then
+  if test "x${ENABLE_DEBUG}" = xyes; then
    AC_MSG_WARN([Please note that you will be using our optimization flags together with debug flags... ])
   fi
  fi 
 
  AC_MSG_CHECKING([whether optimization flags should be used])
- if test "x${ENABLE_OPTIMIZATION}" == xyes; then
+ if test "x${ENABLE_OPTIMIZATION}" = xyes; then
   AC_MSG_RESULT([yes])
  else
   AC_MSG_RESULT([no])
  fi
  
  
- AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" == xyes)
- AM_CONDITIONAL(WANT_OPTIMIZATIONFLAGS, test x"${ENABLE_OPTIMIZATION}" == xyes)
+ AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" = xyes)
+ AM_CONDITIONAL(WANT_OPTIMIZATIONFLAGS, test x"${ENABLE_OPTIMIZATION}" = xyes)
 
  AC_DEFINE_UNQUOTED([SINGULAR_CFLAGS],"$SINGULAR_CFLAGS",[SINGULAR_CFLAGS])
  AC_SUBST(SINGULAR_CFLAGS)
@@ -104,7 +104,7 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
 
  AC_SUBST(POLYMAKE_CXXFLAGS)
 
- if test "x${ENABLE_DEBUG}" == xyes; then
+ if test "x${ENABLE_DEBUG}" = xyes; then
   DBGFLAGS="-g -ftrapv -fdiagnostics-show-option -Wall -Wextra"
   #  -pedantic too strict ??? -Wvla -Wno-long-long ???
   AC_LANG_PUSH([C])
@@ -119,7 +119,7 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  ## for clang: -Wunneeded-internal-declaration 
 
  if test "x${ENABLE_OPTIMIZATION}" != xno; then
-  OPTFLAGS="-O3 -Wno-unused-function -Wno-trigraphs -Wno-unused-parameter -Wno-unused-variable -fomit-frame-pointer -fwrapv -fvisibility=default -finline-functions -fno-exceptions -fno-rtti -fno-threadsafe-statics -fno-enforce-eh-specs -fconserve-space -funroll-loops"
+  OPTFLAGS="-O3 -Wno-unused-function -Wno-trigraphs -Wno-unused-parameter -Wunknown-pragmas -Wno-unused-variable -fomit-frame-pointer -fwrapv -fvisibility=default -finline-functions -fno-exceptions -fno-rtti -fno-threadsafe-statics -fno-enforce-eh-specs -fconserve-space -funroll-loops"
   #  -O3 - crashes gcc???!!!  
   # -fpermissive  
   AC_LANG_PUSH([C])

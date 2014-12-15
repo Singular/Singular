@@ -4,6 +4,7 @@
 #include "AEQ.h"
 
 
+#ifdef SINGULAR_4_1
 
 using namespace std;
 
@@ -916,3 +917,4 @@ void Q_poly::Q_poly_print()
 #endif
 }
 
+#endif

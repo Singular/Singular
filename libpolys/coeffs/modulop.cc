@@ -502,14 +502,14 @@ BOOLEAN npInitChar(coeffs r, void* p)
   r->cfIsMOne = npIsMOne;
   r->cfGreaterZero = npGreaterZero;
   //r->cfPower = npPower;
-  r->cfGetDenom = ndGetDenom;
-  r->cfGetNumerator = ndGetNumerator;
+  //r->cfGetDenom = ndGetDenom;
+  //r->cfGetNumerator = ndGetNumerator;
   //r->cfGcd  = ndGcd;
   //r->cfLcm  = ndGcd;
   //r->cfDelete= ndDelete;
   r->cfSetMap = npSetMap;
   //r->cfName = ndName;
-  r->cfInpMult=ndInpMult;
+  //r->cfInpMult=ndInpMult;
 #ifdef NV_OPS
   if (c>NV_MAX_PRIME)
   {
@@ -687,10 +687,10 @@ static number npMapLongR(number from, const coeffs /*src*/, const coeffs dst_r)
 */
 number npMapGMP(number from, const coeffs /*src*/, const coeffs dst)
 {
-  int_number erg = (int_number) omAlloc(sizeof(mpz_t)); // evtl. spaeter mit bin
+  mpz_ptr erg = (mpz_ptr) omAlloc(sizeof(mpz_t)); // evtl. spaeter mit bin
   mpz_init(erg);
 
-  mpz_mod_ui(erg, (int_number) from, dst->ch);
+  mpz_mod_ui(erg, (mpz_ptr) from, dst->ch);
   number r = (number) mpz_get_si(erg);
 
   mpz_clear(erg);

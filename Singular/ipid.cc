@@ -56,7 +56,6 @@ coeffs coeffs_BIGINT;
 FILE   *feFilePending; /*temp. storage for grammar.y */
 
 proclevel *procstack=NULL;
-#define TEST
 //idhdl idroot = NULL;
 
 idhdl currPackHdl = NULL;
@@ -404,6 +403,14 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   //printf("kill %s, id %x, typ %d lev: %d\n",IDID(h),(int)IDID(h),IDTYP(h),IDLEV(h));
   idhdl hh;
 
+  if (TEST_V_ALLWARN
+  && (IDLEV(h)!=myynest)
+  &&(IDLEV(h)==0))
+  {
+    if (((*ih)==basePack->idroot)
+    || ((currRing!=NULL)&&((*ih)==currRing->idroot)))
+      Warn("kill global `%s` at line >>%s<<\n",IDID(h),my_yylinebuf);
+  }
   if (h->attribute!=NULL)
   {
     //h->attribute->killAll(r); MEMORY LEAK!

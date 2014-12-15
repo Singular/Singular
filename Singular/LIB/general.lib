@@ -923,8 +923,11 @@ NOTE:    * the current basering should not be watchdog_rneu, since
 EXAMPLE: example watchdog; shows an example
 "
 {
-  string rname=nameof(basering);
-  def rsave=basering;
+  if (defined(basering))
+  {
+    string rname=nameof(basering);
+    def rsave=basering;
+  }
   if (defined(watchdog_rneu))
   {
     kill watchdog_rneu;
@@ -941,13 +944,16 @@ EXAMPLE: example watchdog; shows an example
     if (j==1)
     {
       def result = read(l_fork);
-      if (nameof(basering)!=rname)
+      if (defined(rsave))
       {
-        def watchdog_rneu=basering;
-        setring rsave;
-        if (!defined(result))
+        if (nameof(basering)!=rname)
         {
-          def result=fetch(watchdog_rneu,result);
+          def watchdog_rneu=basering;
+          setring rsave;
+          if (!defined(result))
+          {
+            def result=fetch(watchdog_rneu,result);
+          }
         }
       }
       if(defined(watchdog_interrupt))
@@ -974,10 +980,9 @@ EXAMPLE: example watchdog; shows an example
 }
 example
 { "EXAMPLE:"; echo=2;
-  ring r=0,(x,y,z),dp;
-  poly f=x^30+y^30;
-  watchdog(1,"factorize(eval("+string(f)+"))");
-  watchdog(100,"factorize(eval("+string(f)+"))");
+  proc sleep(int s) {return(system("sh","sleep "+string(s)));}
+  watchdog(1,"sleep(5)");
+  watchdog(10,"sleep(5)");
 }
 ///////////////////////////////////////////////////////////////////////////////
 

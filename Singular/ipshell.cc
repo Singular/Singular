@@ -227,14 +227,14 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
 #ifdef SINGULAR_4_1
     case CNUMBER_CMD:
                    {  number2 n=(number2)IDDATA(h);
-                      Print(" (%s)",n->cf->cfCoeffName(n->cf));
+                      Print(" (%s)",nCoeffName(n->cf));
                       break;
                    }
     case CMATRIX_CMD:
                    {  bigintmat *b=(bigintmat*)IDDATA(h);
                       Print(" %d x %d (%s)",
                         b->rows(),b->cols(),
-                        b->basecoeffs()->cfCoeffName(b->basecoeffs()));
+                        nCoeffName(b->basecoeffs()));
                       break;
                    }
 #endif
@@ -1173,6 +1173,63 @@ BOOLEAN iiDefaultParameter(leftv p)
   tmp.data=at->CopyA();
   return iiAssign(p,&tmp);
 }
+BOOLEAN iiBranchTo(leftv r, leftv args)
+{
+  // <string1...stringN>,<proc>
+  // known: args!=NULL, l>=1
+  int l=args->listLength();
+  int ll=0;
+  if (iiCurrArgs!=NULL) ll=iiCurrArgs->listLength();
+  if (ll!=(l-1)) return FALSE;
+  leftv h=args;
+  short *t=(short*)omAlloc(l*sizeof(short));
+  t[0]=l-1;
+  int b;
+  int i;
+  for(i=1;i<l;i++,h=h->next)
+  {
+    if (h->Typ()!=STRING_CMD)
+    {
+      omFree(t);
+      Werror("arg %d is not a string",i);
+      return TRUE;
+    }
+    int tt;
+    b=IsCmd((char *)h->Data(),tt);
+    if(b) t[i]=tt;
+    else
+    {
+      omFree(t);
+      Werror("arg %d is not a type name",i);
+      return TRUE;
+    }
+  }
+  if (h->Typ()!=PROC_CMD)
+  {
+    omFree(t);
+    Werror("last arg is not a proc",i);
+    return TRUE;
+  }
+  b=iiCheckTypes(iiCurrArgs,t,0);
+  omFree(t);
+  if (b && (h->rtyp==IDHDL) && (h->e==NULL))
+  {
+    BOOLEAN err;
+    //Print("branchTo: %s\n",h->Name());
+    iiCurrProc=(idhdl)h->data;
+    err=iiAllStart(IDPROC(iiCurrProc),IDPROC(iiCurrProc)->data.s.body,BT_proc,IDPROC(iiCurrProc)->data.s.body_lineno-(iiCurrArgs==NULL));
+    exitBuffer(BT_proc);
+    if (iiCurrArgs!=NULL)
+    {
+      if (!err) Warn("too many arguments for %s",IDID(iiCurrProc));
+      iiCurrArgs->CleanUp();
+      omFreeBin((ADDRESS)iiCurrArgs, sleftv_bin);
+      iiCurrArgs=NULL;
+    }
+    return 2-err;
+  }
+  return FALSE;
+}
 BOOLEAN iiParameter(leftv p)
 {
   if (iiCurrArgs==NULL)
@@ -1421,6 +1478,10 @@ BOOLEAN iiExport (leftv v, int toLev)
 /*assume root!=idroot*/
 BOOLEAN iiExport (leftv v, int toLev, package pack)
 {
+#ifdef SINGULAR_4_1
+  if ((pack==basePack)&&(pack!=currPack))
+  { Warn("'exportto' to Top is depreciated in >>%s<<",my_yylinebuf);}
+#endif
   BOOLEAN nok=FALSE;
   leftv rv=v;
   while (v!=NULL)
@@ -2011,10 +2072,10 @@ void rComposeRing(lists L, ring R)
   // ----------------------------------------
   // 0: string: integer
   // no further entries --> Z
-  int_number modBase = NULL;
+  mpz_ptr modBase = NULL;
   unsigned int modExponent = 1;
 
-  modBase = (int_number) omAlloc(sizeof(mpz_t));
+  modBase = (mpz_ptr) omAlloc(sizeof(mpz_t));
   if (L->nr == 0)
   {
     mpz_init_set_ui(modBase,0);
@@ -2068,7 +2129,7 @@ void rComposeRing(lists L, ring R)
   else if (modExponent > 1)
   {
     //R->cf->ch = R->cf->modExponent;
-    if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(NATNUMBER)))
+    if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(unsigned long)))
     {
       /* this branch should be active for modExponent = 2..32 resp. 2..64,
            depending on the size of a long on the respective platform */
@@ -4152,9 +4213,6 @@ BOOLEAN    semicProc   ( leftv res,leftv u,leftv v )
 
 #endif
 
-//from mpr_inout.cc
-extern void nPrint(number n);
-
 BOOLEAN loNewtonP( leftv res, leftv arg1 )
 {
   res->data= (void*)loNewtonPolytope( (ideal)arg1->Data() );
@@ -5064,7 +5122,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 {
 #ifdef HAVE_RINGS
   //unsigned int ringtype = 0;
-  int_number modBase = NULL;
+  mpz_ptr modBase = NULL;
   unsigned int modExponent = 1;
 #endif
   int float_len=0;
@@ -5207,7 +5265,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #ifdef HAVE_RINGS
   else if ((pn->name != NULL) && (strcmp(pn->name, "integer") == 0))
   {
-    modBase = (int_number) omAlloc(sizeof(mpz_t));
+    modBase = (mpz_ptr) omAlloc(sizeof(mpz_t));
     mpz_init_set_si(modBase, 0);
     if (pn->next!=NULL)
     {
@@ -5250,7 +5308,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     // we have an exponent
     if (modExponent > 1 && cf == NULL)
     {
-      if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(NATNUMBER)))
+      if ((mpz_cmp_ui(modBase, 2) == 0) && (modExponent <= 8*sizeof(unsigned long)))
       {
         /* this branch should be active for modExponent = 2..32 resp. 2..64,
            depending on the size of a long on the respective platform */
@@ -5611,6 +5669,7 @@ void rKill(ring r)
 // any variables depending on r ?
     while (r->idroot!=NULL)
     {
+      r->idroot->lev=myynest; // avoid warning about kill global objects
       killhdl2(r->idroot,&(r->idroot),r);
     }
     if (r==currRing)
@@ -6012,7 +6071,7 @@ BOOLEAN iiCheckTypes(leftv args, const short *type_list, int report)
     short t=type_list[i];
     if (t!=ANY_TYPE)
     {
-      if (((t==IDHDL)&&(args->rtyp!=IDHDL)) 
+      if (((t==IDHDL)&&(args->rtyp!=IDHDL))
       || (t!=args->Typ()))
       {
         if (report) iiReportTypes(i,args->Typ(),type_list);

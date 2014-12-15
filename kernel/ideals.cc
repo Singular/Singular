@@ -213,7 +213,7 @@ ideal idSect (ideal h1,ideal h2)
   int i,j,k,length;
   int flength = id_RankFreeModule(h1,currRing);
   int slength = id_RankFreeModule(h2,currRing);
-  int rank=si_min(flength,slength);
+  int rank=si_max(h1->rank,h2->rank);
   if ((idIs0(h1)) || (idIs0(h2)))  return idInit(1,rank);
 
   ideal first,second,temp,temp1,result;
@@ -2367,7 +2367,8 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
 
   if ((w !=NULL)&&(*w!=NULL) &&(del>0))
   {
-    intvec *wtmp=new intvec((*w)->length()-del);
+    int nl=si_max((*w)->length()-del,1);
+    intvec *wtmp=new intvec(nl);
     for(i=0;i<res->rank;i++) (*wtmp)[i]=(**w)[i];
     delete *w;
     *w=wtmp;

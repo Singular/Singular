@@ -4,6 +4,7 @@
 #include "AEp.h"
 
 
+#ifdef SINGULAR_4_1
 
 
 using namespace std;
@@ -1043,3 +1044,4 @@ void p_poly::p_poly_print()
 #endif
 }
 
+#endif

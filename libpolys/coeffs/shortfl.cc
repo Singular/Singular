@@ -708,7 +708,7 @@ BOOLEAN nrInitChar(coeffs n, void* p)
   n->is_domain=TRUE;
   n->rep=n_rep_float;
 
-  n->cfKillChar = ndKillChar; /* dummy */
+  //n->cfKillChar = ndKillChar; /* dummy */
   n->ch = 0;
   n->cfCoeffString = nrCoeffString;
 
@@ -721,7 +721,7 @@ BOOLEAN nrInitChar(coeffs n, void* p)
   n->cfExactDiv= nrDiv;
   n->cfInpNeg   = nrNeg;
   n->cfInvers= nrInvers;
-  n->cfCopy  = ndCopy;
+  //n->cfCopy  = ndCopy;
   n->cfGreater = nrGreater;
   n->cfEqual = nrEqual;
   n->cfIsZero = nrIsZero;
@@ -737,10 +737,10 @@ BOOLEAN nrInitChar(coeffs n, void* p)
     /* nName= ndName; */
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
-  n->cfDBTest=ndDBTest; // not yet implemented: nrDBTest;
+  //n->cfDBTest=ndDBTest; // not yet implemented: nrDBTest;
 #endif
 
-  n->nCoeffIsEqual = ndCoeffIsEqual;
+  //n->nCoeffIsEqual = ndCoeffIsEqual;
 
   n->float_len = SHORT_REAL_LENGTH;
   n->float_len2 = SHORT_REAL_LENGTH;

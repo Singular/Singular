@@ -11,8 +11,7 @@ string newring="alksdfjlaskdjf";
 matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
 list L=group_reynolds(A);
 molien(L[2..size(L)],newring);
-setring alksdfjlaskdjf;
+setring Finvar::alksdfjlaskdjf;
 print(M);
 setring S;
-kill alksdfjlaskdjf;
 tst_status(1);$

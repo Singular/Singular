@@ -107,14 +107,8 @@ ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
   #include <kernel/GBEngine/nc.h>
   #include <polys/nc/nc.h>
   #include <polys/nc/sca.h>
-  #define ALLOW_PLURAL     1
-  #define NO_PLURAL        0
-  #define COMM_PLURAL      2
   #define  PLURAL_MASK 3
 #else /* HAVE_PLURAL */
-  #define ALLOW_PLURAL     0
-  #define NO_PLURAL        0
-  #define COMM_PLURAL      0
   #define  PLURAL_MASK     0
 #endif /* HAVE_PLURAL */
 
@@ -125,6 +119,9 @@ ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
   #define RING_MASK        0
   #define ZERODIVISOR_MASK 0
 #endif
+#define ALLOW_PLURAL     1
+#define NO_PLURAL        0
+#define COMM_PLURAL      2
 #define ALLOW_RING       4
 #define NO_RING          0
 #define NO_ZERODIVISOR   8
@@ -752,6 +749,11 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         if(v->rtyp == IDHDL)
         {
           v->name = omStrDup(v->name);
+        }
+        else if (v->rtyp!=0)
+        {
+          WerrorS("reserved name with ::");
+          return TRUE;
         }
         v->req_packhdl=IDPACKAGE(packhdl);
         syMake(v, v->name, packhdl);
@@ -1802,7 +1804,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     xx=(number *)omAlloc(rl*sizeof(number));
     if (nMap==NULL)
     {
-      Werror("not implemented: map bigint -> %s",cf->cfCoeffString(cf));
+      Werror("not implemented: map bigint -> %s", nCoeffString(cf));
       return TRUE;
     }
     for(i=rl-1;i>=0;i--)
@@ -2318,6 +2320,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
               i,rParameter(r)[i],rParameter(currRing)[i]);
       }
     }
+    if (IDTYP(w)==ALIAS_CMD) w=(idhdl)IDDATA(w);
     sleftv tmpW;
     memset(&tmpW,0,sizeof(sleftv));
     tmpW.rtyp=IDTYP(w);
@@ -2340,8 +2343,8 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
   return TRUE;
 err_fetch:
   Werror("no identity map from %s (%s -> %s)",u->Fullname(),
-    r->cf->cfCoeffString(r->cf),
-    currRing->cf->cfCoeffString(currRing->cf));
+         nCoeffString(r->cf),
+         nCoeffString(currRing->cf));
   return TRUE;
 }
 static BOOLEAN jjFIND2(leftv res, leftv u, leftv v)
@@ -3751,7 +3754,7 @@ static BOOLEAN jjBI2N(leftv res, leftv u)
     res->data=nMap(n,coeffs_BIGINT,currRing->cf);
   else
   {
-    Werror("cannot convert bigint to cring %s",currRing->cf->cfCoeffString(currRing->cf));
+    Werror("cannot convert bigint to cring %s", nCoeffString(currRing->cf));
     bo=TRUE;
   }
   n_Delete(&n,coeffs_BIGINT);
@@ -6269,7 +6272,7 @@ static BOOLEAN jjRANDOM_CF(leftv res, leftv u, leftv v, leftv w)
   coeffs cf=(coeffs)u->Data();
   if ((cf!=NULL) && (cf->cfRandom!=NULL))
   {
-    number n=cf->cfRandom(siRand,(number)v->Data(),(number)w->Data(),cf);
+    number n= n_Random(siRand,(number)v->Data(),(number)w->Data(),cf);
     number2 nn=(number2)omAlloc(sizeof(*nn));
     nn->cf=cf;
     nn->n=n;
@@ -7120,6 +7123,15 @@ static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
     {
       (*iv)[i]=(int)(long)h->Data();
     }
+    else if (h->Typ()==INTVEC_CMD)
+    {
+      intvec *ivv=(intvec*)h->Data();
+      for(int j=0;j<ivv->length();j++,i++)
+      {
+        (*iv)[i]=(*ivv)[j];
+      }
+      i--;
+    }
     else
     {
       delete iv;
@@ -7781,6 +7793,14 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
         {
           if (check_valid(dA2[i].valid_for,op)) break;
         }
+        else
+        {
+          if (RingDependend(dA2[i].res))
+          {
+            WerrorS("no ring active");
+            break;
+          }
+        }
         if (traceit&TRACE_CALL)
           Print("call %s(%s,%s)\n",iiTwoOps(op),Tok2Cmdname(at),Tok2Cmdname(bt));
         if ((call_failed=dA2[i].p(res,a,b)))
@@ -7814,6 +7834,14 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
             if (currRing!=NULL)
             {
               if (check_valid(dA2[i].valid_for,op)) break;
+            }
+            else
+            {
+              if (RingDependend(dA2[i].res))
+              {
+                WerrorS("no ring active");
+                break;
+              }
             }
             if (traceit&TRACE_CALL)
               Print("call %s(%s,%s)\n",iiTwoOps(op),
@@ -7992,6 +8020,14 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dA1, int at
         {
           if (check_valid(dA1[i].valid_for,op)) break;
         }
+        else
+        {
+          if (RingDependend(dA1[i].res))
+          {
+            WerrorS("no ring active");
+            break;
+          }
+        }
         if (traceit&TRACE_CALL)
           Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(at));
         res->rtyp=dA1[i].res;
@@ -8024,6 +8060,14 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dA1, int at
           if (currRing!=NULL)
           {
             if (check_valid(dA1[i].valid_for,op)) break;
+          }
+          else
+          {
+            if (RingDependend(dA1[i].res))
+            {
+              WerrorS("no ring active");
+              break;
+            }
           }
           if (traceit&TRACE_CALL)
             Print("call %s(%s)\n",iiTwoOps(op),Tok2Cmdname(dA1[i].arg));
@@ -8380,6 +8424,7 @@ BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt)
 BOOLEAN iiExprArithM(leftv res, leftv a, int op)
 {
   memset(res,0,sizeof(sleftv));
+  BOOLEAN bo;
 
   if (!errorreported)
   {
@@ -8455,7 +8500,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
         }
         if (traceit&TRACE_CALL)
           Print("call %s(... (%d args))\n", iiTwoOps(op),args);
-        if (dArithM[i].p(res,a))
+        if ((failed=dArithM[i].p(res,a))==TRUE)
         {
           break;// leave loop, goto error handling
         }

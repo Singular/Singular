@@ -417,14 +417,14 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
   n->is_domain=TRUE;
   n->rep=n_rep_gmp_float;
 
-  n->cfKillChar = ndKillChar; /* dummy */
+  //n->cfKillChar = ndKillChar; /* dummy */
 
   n->cfSetChar = ngfSetChar;
   n->ch = 0;
   n->cfCoeffString=ngfCoeffString;
 
   n->cfDelete  = ngfDelete;
-  n->cfNormalize=ndNormalize;
+  //n->cfNormalize=ndNormalize;
   n->cfInit   = ngfInit;
   n->cfInt    = ngfInt;
   n->cfAdd     = ngfAdd;
@@ -447,7 +447,7 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
   n->cfSetMap = ngfSetMap;
   n->cfCoeffWrite = ngfCoeffWrite;
 #ifdef LDEBUG
-  n->cfDBTest  = ndDBTest; // not yet implemented: ngfDBTest
+  //n->cfDBTest  = ndDBTest; // not yet implemented: ngfDBTest
 #endif
 
   n->nCoeffIsEqual = ngfCoeffIsEqual;
@@ -464,7 +464,6 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
     n->float_len2 = SHORT_REAL_LENGTH;
   }
 
-  assume( n->float_len <= n->float_len2 );
   assume( n->float_len2 >= SHORT_REAL_LENGTH );
 
   assume( n_NumberOfParameters(n) == 0 );

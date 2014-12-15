@@ -56,9 +56,7 @@
 #include "ipshell.h"
 #include "blackbox.h"
 
-#ifdef SINGULAR_4_1
 #include <Singular/number2.h>
-#endif
 
 
 /*=================== proc =================*/

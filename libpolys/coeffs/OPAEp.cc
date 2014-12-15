@@ -8,6 +8,8 @@
 
 #include <misc/auxiliary.h>
 
+#ifdef SINGULAR_4_1
+
 #include <factory/factory.h>
 
 #include <string.h>
@@ -315,7 +317,7 @@ BOOLEAN n_pAEInitChar(coeffs r, void *p)
 
     r->ch=c;
     r->cfKillChar=NULL;
-    r->nCoeffIsEqual=ndCoeffIsEqual;
+    //r->nCoeffIsEqual=ndCoeffIsEqual;
     r->cfMult  = nAEpMult;
     r->cfSub   = nAEpSub;
     r->cfAdd   = nAEpAdd;
@@ -352,7 +354,10 @@ BOOLEAN n_pAEInitChar(coeffs r, void *p)
     r->cfGcd  = nAEpGcd;
     r->cfLcm  = nAEpLcm; // ZU BEARBEITEN
     r->cfDelete= nAEpDelete;
-    r->cfSetMap = npSetMap;
+
+    extern nMapFunc npSetMap(const coeffs src, const coeffs dst); // FIXME: BUG?
+    r->cfSetMap = npSetMap; // WHY??? // TODO: this seems to be a bug!
+
     r->cfInpMult=nAEpInpMult; //????
     r->cfCoeffWrite=nAEpCoeffWrite; //????
 
@@ -365,4 +370,4 @@ BOOLEAN n_pAEInitChar(coeffs r, void *p)
     r->has_simple_Inverse=TRUE;
     return FALSE;
 }
-
+#endif

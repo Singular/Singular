@@ -10,11 +10,7 @@
 #include <coeffs/coeffs.h>
 #include <coeffs/rintegers.h>
 
-#ifndef NATNUMBER
-#define NATNUMBER unsigned long
-#endif
-
-typedef struct { int_number base; NATNUMBER exp; } ZnmInfo;
+typedef struct { mpz_ptr base;  unsigned long exp; } ZnmInfo;
 
 BOOLEAN nrnInitChar    (coeffs r, void*);
 number  nrnCopy        (number a, const coeffs r);

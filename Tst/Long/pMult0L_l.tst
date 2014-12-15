@@ -16,14 +16,14 @@ tst_rgen_init();
 intvec how_often = 0,0,0,25,15,10,7,5,4,3;
 proc pAdd_Test(string rs)
 {
-   tst_rgen_Lring;
+  Tst::tst_rgen_Lring;
   rs = "ring r = " + rs + ";";
   execute(rs);
-  int n_vars = tst_rgen_nvars[tst_rgen_var_index];
+  int n_vars = tst_rgen_nvars[Tst::tst_rgen_var_index];
 //  ideal id = 1, tst_FullIdeal();
   ideal id = cyclic(n_vars);
   tst_TestMult(id, how_often[n_vars],
-               size(tst_rgen_comp_orderings[tst_rgen_comp_index]));
+               size(tst_rgen_comp_orderings[Tst::tst_rgen_comp_index]));
  
   kill r;
 }

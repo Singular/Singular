@@ -281,7 +281,17 @@ Non-reserved attributes may be used, however, in procedures and can
 considerably speed up computations.
 @sp 1
 @item @strong{Reserved attributes:}
-(isSB, isHomog are used by the kernel, the other are used by libraries)
+@cindex isSB
+@cindex isHomg
+@cindex rank
+@cindex isCI
+@cindex isCM
+@cindex withSB
+@cindex withHilb
+@cindex withRes
+@cindex withDim
+@cindex withMult
+(isSB, isHomog, rank are used by the kernel, the other are used by libraries)
 @table @code
 @item isSB
 the standard basis property is set by all commands computing a standard
@@ -295,7 +305,7 @@ complete intersection property
 @item isCM
 Cohen-Macaulay property
 @item rank
-set the rank of a module (see @ref{nrows})
+set/get the rank of a module (see @ref{nrows})
 @item withSB
 value of type ideal, resp.@: module, is std
 @item withHilb
@@ -308,11 +318,10 @@ value of type int is the dimension (see @ref{dim})
 value of type int is the multiplicity (see @ref{mult})
 @end table
 @end table
-@c @c ref
-@c See
-@c @ref{Expressions};
-@c @ref{killattrib}.
-@c @c ref
+@c ref
+See
+@ref{killattrib}.
+@c ref
 @c ---------------------------------------
 @node bareiss, betti, attrib, Functions
 @subsection bareiss
@@ -5956,11 +5965,13 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{rank (} matrix_expression @code{)}
+#*@code{rank (} matrix_expression @code{,1)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
 returns the rank of a given matrix which is filled with elements
-of the ground field
+of the ground field.
+@*The first variant uses a LU-decomposition, the second a row-echelon form.
 @item @strong{Note:}
 The function works by computing the row echelon form of the matrix using
 the same algorithm as for @code{ludecomp}.
@@ -7264,12 +7275,19 @@ s2 must be a reserved operator with i4 operands
 (i4 may be 1,2,3; use 4 for more than 3 or a varying number of arguments)
 See @xref{Commands for user defined types}.
 @c ..........................
-@item @code{system("LLL",} m @code{)}
+@item @code{system("LLL",} B @code{)}
 @cindex system, LLL
 @cindex LLL
-m must be a matrix or an intmat.
-iinterface to NTLs LLL (Exact Arithmetic Variant over ZZ).
-Returns the same type as the input.
+B must be a matrix or an intmat.
+Interface to NTLs LLL (Exact Arithmetic Variant over ZZ).
+Returns the same type as the input.@*
+B is an m x n matrix, viewed as m rows of n-vectors.  m may be less
+than, equal to, or greater than n, and the rows need not be
+linearly independent.  B is transformed into an LLL-reduced basis.
+The first m-rank(B) rows of B are zero.@*
+More specifically, elementary row transformations are performed on
+B so that the non-zero rows of new-B form an LLL-reduced basis
+for the lattice spanned by the rows of old-B.
 @c ..........................
 @item @code{system("nblocks")} or @code{system("nblocks",} ring_name @code{)}
 @cindex nblocks

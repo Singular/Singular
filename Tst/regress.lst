@@ -115,7 +115,6 @@ Manual/ishyper.tst
 Manual/jordanbasis.tst
 Manual/kohom.tst
 Manual/kontrahom.tst
-Manual/LLL.tst
 Manual/matrix_operations.tst
 Manual/Module_orderings_1.tst
 Manual/Module_orderings_2.tst
@@ -266,7 +265,6 @@ Manual/NullCone.tst
 Manual/nvars.tst
 Manual/pardeg.tst
 Manual/pmat.tst
-Manual/poly_BR_PLURAL_BR.tst
 Manual/poly_operations.tst
 Manual/primecoeffs.tst
 Manual/primefactors.tst
@@ -496,9 +494,7 @@ Manual/addrow.tst
 Manual/adjoint.tst
 Manual/algebra_containment.tst
 Manual/allPositive.tst
-Manual/AltVarEnd.tst
 Manual/annil.tst
-Manual/applyAdF.tst
 Manual/binomial.tst
 Manual/blowUp2.tst
 Manual/bracket.tst
@@ -1441,7 +1437,6 @@ Manual/spectralNeg.tst
 ; Manual/grobcovold.tst
 Manual/SannfsBFCT.tst
 Old/aa.tst
-Old/agnes.tst
 Old/alex1.tst
 Old/alex2.tst
 ; Old/algmap.tst
@@ -1755,7 +1750,6 @@ Old/string.tst
 Old/subexpr1.tst
 Old/subexpr.tst
 Old/substit.tst
-Old/syzygies_new.tst
 Old/syzygies.tst
 Old/syzygy.tst
 Old/teste.tst

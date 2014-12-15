@@ -276,7 +276,7 @@ public:
   kStrategy next;
   int (*red)(LObject * L,kStrategy strat);
   int (*red2)(LObject * L,kStrategy strat);
-  void (*initEcart)(LObject * L);
+  void (*initEcart)(TObject * L);
   int (*posInT)(const TSet T,const int tl,LObject &h);
   int (*posInLSba)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
@@ -506,8 +506,8 @@ void messageSets (kStrategy strat);
 #define messageSets(s)  do {} while (0)
 #endif
 
-void initEcartNormal (LObject* h);
-void initEcartBBA (LObject* h);
+void initEcartNormal (TObject* h);
+void initEcartBBA (TObject* h);
 void initS (ideal F, ideal Q,kStrategy strat);
 void initSL (ideal F, ideal Q,kStrategy strat);
 void initSLSba (ideal F, ideal Q,kStrategy strat);

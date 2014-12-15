@@ -1823,9 +1823,12 @@ when necessary
 during standard bases computations or by an explicit reduction using
 the command @code{reduce(f, std(0))} (@pxref{reduce}).
 
+Operations based on standard bases (e.g. @code{std},@code{groebner}, etc., @code{reduce}) and functions which require a standard basis (e.g. @code{dim},@code{hilb}, etc.) operated with the residue classes; all others on the polynomial objects.
+
 @strong{Example:}
 @smallexample
 @c example
+  // defintion and usage:
   ring r=32003,(x,y),dp;
   poly f=x3+yx2+3y+4;
   qring q=std(maxideal(2));
@@ -1833,6 +1836,15 @@ the command @code{reduce(f, std(0))} (@pxref{reduce}).
   poly g=fetch(r, f);
   g;
   reduce(g,std(0));
+  // polynomial and residue class:
+  ring R=0,(x,y),dp;
+  qring Q=std(y);
+  poly p1=x;
+  poly p2=x+y;
+  // comparing polynomial objects:
+  p1==p2;
+  // comparing residue classes:
+  reduce(p1,std(0))==reduce(p2,std(0));
 @c example
 @end smallexample
 

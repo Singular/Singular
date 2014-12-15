@@ -2,6 +2,7 @@ abusalem
 bug_misc
 bug_minpoly
 bug_newstruct
+bug_ring
 bug_ringlist
 bug_tr237
 ; do not try bug_tr276 without 2.2 GB RAM free
@@ -22,6 +23,10 @@ bug_tr661
 bug_tr662
 bug_tr664
 bug_tr665
+bug_tr666
+bug_tr667
+bug_tr668
+bug_tr671
 bug_genus_etc
 facstd
 fermat_gcd_1var

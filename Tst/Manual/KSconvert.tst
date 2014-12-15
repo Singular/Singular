@@ -3,8 +3,8 @@ LIB "kskernel.lib";
 int p=6;
 int q=7;
 KSker(p,q);
-setring KSring;
+setring Kskernel::KSring;
 KSconvert(KSkernel);
-setring KSring2;
+setring Kskernel::KSring2;
 print(KSkernel2);
 tst_status(1);$

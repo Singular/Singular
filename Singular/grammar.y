@@ -676,7 +676,9 @@ elemexpr:
           }
         | CMD_M '(' exprlist ')'
           {
-            if(iiExprArithM(&$$,&$3,$1)) YYERROR;
+            int b=iiExprArithM(&$$,&$3,$1); // handle branchTo
+            if (b==TRUE) YYERROR;
+            if (b==2) YYACCEPT;
           }
         | mat_cmd '(' expr ',' expr ',' expr ')'
           {

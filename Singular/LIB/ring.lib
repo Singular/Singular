@@ -24,6 +24,7 @@ PROCEDURES:
              (parameters in square brackets [] are optional)
  optionIsSet(opt)         check if as a string given option is set or not.
  hasFieldCoefficient      check if the coefficient ring is considered a field
+ hasGFCoefficient         check if the coefficient ring is GF(p,k)
  hasNumericCoeffs(rng)    check for use of floating point numbers
  hasCommutativeVars(rng)  non-commutive or commnuative polynomial ring
  hasGlobalOrdering(rng)   global versus mixed/local monomial ordering
@@ -995,6 +996,27 @@ example
   hasFieldCoefficient(rng2);  // yes
 }
 
+proc hasGFCoefficient(def rng )
+"USAGE: hasGFCoefficient ( rng );
+RETURN:  1 if the coeffcients form GF(p,k), 0 otherwise.
+KEYWORDS: ring coefficients
+EXAMPLE: example hasGFCoefficient; shows an example
+"
+{
+  return((charstr(rng)!=string(char(rng))) &&
+  (npars(rng)==1) &&
+  (find(charstr(rng),string(char(rng)))!=1) &&
+  (charstr(basering)<>"real")&&
+  (charstr(basering)<>"complex") );
+}
+example
+{
+  ring r1 = integer,x,dp;
+  hasGF(r1);
+  ring r2 = (4,a),x,dp;
+  hasGF(r2);
+}
+
 proc hasGlobalOrdering (def rng)
 "USAGE: hasGlobalOrdering ( rng );
 RETURN:  1 if rng has a global monomial ordering, 0 otherwise.
@@ -1087,5 +1109,19 @@ example
    hasMixedOrdering();
    ring R3 = 181,x(1..9),(dp(5),lp(4));
    hasMixedOrdering();
+}
+
+proc changeordTo(def r,string o)
+{
+  list rl=ringlist(r);
+  rl[3]=list(list("C",0),list(o,1:nvars(r)));
+  def rr=ring(rl);
+  return(rr);
+}
+example
+{
+  ring r=0,(x,y),lp;
+  def rr=changeordToCdp(r,"dp");
+  rr;
 }
 

@@ -130,7 +130,7 @@ ring G;  Gauss-Manin system of t with variable s
   ideal gmsstd;  standard basis of Jacobian ideal
   matrix gmsmatrix;  matrix(gmsjacob)*gmsmatrix==matrix(gmsstd)
   ideal gmsbasis;  monomial vector space basis of Jacobian algebra
-  int gmsmaxdeg;  maximal weight of variables
+  int Gmssing::gmsmaxdeg;  maximal weight of variables
 @end format
 NOTE:     gmsbasis is a C[[s]]-basis of H'' and [t,s]=s^2
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice
@@ -206,7 +206,6 @@ EXAMPLE:  example gmsring; shows examples
 
   attrib(gmsstd,"isSB",1);
   export gmspoly,gmsjacob,gmsstd,gmsmatrix,gmsbasis,gmsmaxdeg;
-  exportto(Top, gmsmaxdeg);
 
   return(G);
 }
@@ -221,7 +220,7 @@ example
   print(gmsstd);
   print(gmsmatrix);
   print(gmsbasis);
-  gmsmaxdeg;
+  Gmssing::gmsmaxdeg;
 }
 ///////////////////////////////////////////////////////////////////////////////
 

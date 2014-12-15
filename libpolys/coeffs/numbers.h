@@ -42,6 +42,11 @@
 
 #define nSetMap(R)        n_SetMap(R,currRing->cf)
 
+/// only for debug, over any initalized currRing 
+#define nPrint(a)         n_Print(a,currRing->cf)
+
+
+
 
 // --------------------------------------------------------------
 // internal to coeffs, but public for all realizations
@@ -49,25 +54,25 @@
 #define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
 
 /* the dummy routines: */
-void nDummy1(number* d);
-void ndDelete(number* d, const coeffs r);
-number ndGcd(number a, number b, const coeffs);
-number ndCopy(number a, const coeffs r);
+// void nDummy1(number* d);
+// void ndDelete(number* d, const coeffs r);
+// number ndGcd(number a, number b, const coeffs);
+// number ndCopy(number a, const coeffs r);
 number ndCopyMap(number a, const coeffs src, const coeffs dst);
-int ndSize(number a, const coeffs r);
-number ndGetDenom(number &n, const coeffs r);
-number ndGetNumerator(number &a,const coeffs r);
-number ndReturn0(number n, const coeffs r);
-number ndIntMod(number a, number b, const coeffs r);
+// int ndSize(number a, const coeffs r);
+// number ndGetDenom(number &n, const coeffs r);
+// number ndGetNumerator(number &a,const coeffs r);
+// number ndReturn0(number n, const coeffs r);
+// number ndIntMod(number a, number b, const coeffs r);
 
-void   ndInpMult(number &a, number b, const coeffs r);
-void   ndInpAdd(number &a, number b, const coeffs r);
+// void   ndInpMult(number &a, number b, const coeffs r);
+// void   ndInpAdd(number &a, number b, const coeffs r);
 
-void ndKillChar(coeffs);
+// void ndKillChar(coeffs);
 
-number  ndInit_bigint(number i, const coeffs dummy, const coeffs dst);
+// number  ndInit_bigint(number i, const coeffs dummy, const coeffs dst);
 
-BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void * parameter);
+// BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void * parameter);
 
 /// Test whether a is a zero divisor in r
 /// i.e. not coprime with char. of r
@@ -75,24 +80,19 @@ BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void * parameter);
 /// should ONLY be used for debug stuff /tests
 BOOLEAN n_IsZeroDivisor( number a, const coeffs r);
 
-#ifdef LDEBUG
-void nDBDummy1(number* d,char *f, int l);
-BOOLEAN ndDBTest(number a, const char *f, const int l, const coeffs r);
-#endif
-
-#define nDivBy0 "div by 0"
+const char* const nDivBy0 = "div by 0";
 
 // dummy routines
-void   ndNormalize(number& d, const coeffs); // nNormalize...
+// void   ndNormalize(number& d, const coeffs); // nNormalize...
 
 /// initialize an object of type coeff, return FALSE in case of success
 typedef BOOLEAN (*cfInitCharProc)(coeffs, void *);
 n_coeffType nRegister(n_coeffType n, cfInitCharProc p);
 
 /// divide by the first (leading) number and return it, i.e. make monic
-void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs r);
+// void ndClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs r);
 
 /// does nothing (just returns a dummy one number)
-void ndClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& d, const coeffs r);
+// void ndClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, number& d, const coeffs r);
 
 #endif

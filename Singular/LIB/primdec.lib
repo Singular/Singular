@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version primdec.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version primdec.lib 4.0.1.1 Nov_2014 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -110,7 +110,8 @@ NOTE:    result is a std basis in the basering
   def @P= basering;
   if(ordstr(basering)[1,2]!="dp")
   {
-    execute("ring @Phelp=("+charstr(@P)+"),("+varstr(@P)+"),(C,dp);");
+    def @Phelp=changeordTo(basering,"dp");
+    setring @Phelp;
     ideal inew=std(imap(@P,id));
     ideal  @h=imap(@P,h);
   }
@@ -533,7 +534,7 @@ proc gcdTest(ideal act)
   {
     return(0);
   }
-  for (i=1;i<=size(act)-1;i++)
+  for (i=1;i<size(act);i++)
   {
     for(j=i+1;j<=size(act);j++)
     {
@@ -1445,7 +1446,7 @@ proc zeroSp(ideal i)
   //avoid factorization of the same polynomial
   for(j=2;j<=size(F);j++)
   {
-    for(k=1;k<=j-1;k++)
+    for(k=1;k<j;k++)
     {
       ti=F[k];
       te=subst(ti,var(k),var(j));
@@ -1463,7 +1464,8 @@ proc zeroSp(ideal i)
     }
     ready=0;
   }
-  execute( "ring P=("+charstr(R)+"),("+varstr(R)+"),(C,dp);");
+  def P=changeordTo(R,"dp");
+  setring P;
   ideal i=imap(R,i);
   if(npars(basering)==0)
   {
@@ -1887,7 +1889,7 @@ static proc prepareQuotientring (int nnp)
 "USAGE:   prepareQuotientring(nnp); nnp int
 RETURN:  string = to define Kvar(nnp+1),...,var(nvars)[..rest ]
 NOTE:
-EXAMPLE: example independentSet; shows an example
+EXAMPLE: example prepareQuotientring; shows an example
 "
 {
   ASSUME(1, hasFieldCoefficient(basering) );
@@ -1927,7 +1929,6 @@ example
    basering;
    phi;
    setring @Q;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2078,7 +2079,7 @@ static proc minAssPrimesold_i(int patchPrimaryDecomposition, ideal i, list #)
         ndim=dim(@pr[j]);
         if(ndim>odim)
         {
-           for(k=count;k<=j-1;k++)
+           for(k=count;k<j;k++)
            {
               pos[k]=1;
            }
@@ -2309,7 +2310,8 @@ static proc minAssPrimes_i(int patchPrimaryDecomposition, ideal i, list #)
   if( (dim(i) == 0 ) && ( npars(P) == 0) )
   {
     int di = vdim(i);
-    execute ("ring gnir=("+charstr(P)+"),("+varstr(P)+"),lp;");
+    def gnir=changeordTo(P,"lp");
+    setring gnir;
     ideal J = std(imap(P,i));
     attrib(J, "isSB", 1);
     if(vdim(J) != di)
@@ -2436,7 +2438,8 @@ static proc union(list li)
   {
      li1Size=size(li[1]);
   }
-  execute("ring ir = ("+charstr(basering)+"),("+varstr(basering)+"),(C,lp);");
+  def ir=changeordTo(basering,"lp");
+  setring ir;
   list l;
   if ( liSize > 0) 
   {
@@ -2446,7 +2449,7 @@ static proc union(list li)
      }
      else
      {
-         ASSUME(0, size(li)==1);
+         ASSUME(1, size(li)==1);
          l[1] = list();
      }
   }
@@ -2580,7 +2583,8 @@ EXAMPLE:example equidim; shows an example
   }
   else
   {
-     execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),dp;");
+     def gnir=changeordTo(basering,"dp");
+     setring gnir;
      ideal i=imap(P,i);
      ideal j=groebner(i);
   }
@@ -2654,7 +2658,7 @@ EXAMPLE: example equidimMax; shows an example
   if(attrib(basering,"global")!=1)
   {
       ERROR(
-      "// Not implemented for this ordering, please change to global ordering."
+      "Not implemented for this ordering, please change to a global ordering."
       );
   }
 
@@ -2684,7 +2688,8 @@ EXAMPLE: example equidimMax; shows an example
   }
   else
   {
-     execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),dp;");
+     def gnir=changeordTo(basering,"dp");
+     setring gnir;
      ideal i=imap(P,i);
      ideal j=groebner(i);
   }
@@ -2868,7 +2873,7 @@ static proc algeDeco_i(int patchPrimaryDecomposition, ideal i, int w)
       }
    }
 //---Ende Provisorium
-   string mp="poly p="+string(minpoly)+";";
+   string mp="poly @p="+string(minpoly)+";";
    string gnir="ring RH="+string(char(R))+",("+varstr(R)+","+string(par(1))
                 +"),dp;";
    execute(gnir);
@@ -2880,7 +2885,7 @@ static proc algeDeco_i(int patchPrimaryDecomposition, ideal i, int w)
    {
      if(i[j]!=I[j]){break;}
    }
-   if((j>ncols(i))&&(deg(p)==1))
+   if((j>ncols(i))&&(deg(@p)==1))
    {
      setring R;
      kill RH;
@@ -2892,7 +2897,7 @@ static proc algeDeco_i(int patchPrimaryDecomposition, ideal i, int w)
    }
    else
    {
-      i=i,p;
+      i=i,@p;
    }
    list pr;
 
@@ -2909,7 +2914,9 @@ static proc algeDeco_i(int patchPrimaryDecomposition, ideal i, int w)
    {
       pr=minAssPrimes_i(patchPrimaryDecomposition,i);
    }
+
    int sizepr = size(pr);
+
    if(n<nvars(basering))
    {
       gnir="ring RS="+string(char(R))+",("+varstr(RH)
@@ -2934,6 +2941,7 @@ static proc algeDeco_i(int patchPrimaryDecomposition, ideal i, int w)
       setring R;
       if (sizepr>0)  { list pr=imap(RH,pr); }
    }
+
    list re;
    if(w==2)
    {
@@ -3060,7 +3068,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
     list absprimary,abskeep,absprimarytmp,abskeeptmp;
   }
   homo=homog(i);
-  if(homo==1)
+  if(homo)
   {
     if(attrib(i,"isSB")!=1)
     {
@@ -3136,7 +3144,8 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
 
   int lp=islp();
 
-  execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),(C,lp);");
+  def gnir=changeordTo(basering,"lp");
+  setring gnir;
   op=option(get);
   option(redSB);
 
@@ -3415,7 +3424,8 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
   }
   else
   {
-    execute( "ring @Phelp=("+charstr(gnir)+"),("+varstr(gnir)+"),(C,dp);");
+    def @Phelp=changeordTo(gnir,"dp");
+    setring @Phelp;
   }
 
   if(homo==1)
@@ -4448,39 +4458,63 @@ static proc analyze(list pr)
 //                  Shimoyama-Yokoyama
 //
 ///////////////////////////////////////////////////////////////////////////////
-
 static proc simplifyIdeal(ideal i)
 {
   ASSUME(1, hasFieldCoefficient(basering) );
-  ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
   def r=basering;
 
+  ideal iwork=i;
+  ideal imap2=maxideal(1);
+
   int j,k;
   map phi;
   poly p;
-
-  ideal iwork=i;
   ideal imap1=maxideal(1);
-  ideal imap2=maxideal(1);
-
-
-  for(j=1;j<=nvars(basering);j++)
+  // first try: very simple substitutions
+  intvec tested=0:nvars(r);
+  for(j=1;j<=nvars(r);j++)
   {
-    for(k=1;k<=size(i);k++)
+    for(k=1;k<=ncols(i);k++)
     {
       if(deg(iwork[k]/var(j))==0)
       {
         p=-1/leadcoef(iwork[k]/var(j))*iwork[k];
-        imap1[j]=p+2*var(j);
-        phi=r,imap1;
-        iwork=phi(iwork);
-        iwork=subst(iwork,var(j),0);
-        iwork[k]=var(j);
-        imap1=maxideal(1);
-        imap2[j]=-p;
-        break;
+        if(size(p)<=2)
+        {
+          tested[j]=1;
+          imap1[j]=p+2*var(j);
+          phi=r,imap1;
+          iwork=phi(iwork);
+          iwork=subst(iwork,var(j),0);
+          iwork[k]=var(j);
+          imap1=maxideal(1);
+          imap2[j]=-p;
+          break;
+        }
+      }
+    }
+  }
+  // second try: substitutions not so simple
+  for(j=1;j<=nvars(r);j++)
+  {
+    if (tested[j]==0)
+    {
+      for(k=1;k<=ncols(i);k++)
+      {
+        if(deg(iwork[k]/var(j))==0)
+        {
+          p=-1/leadcoef(iwork[k]/var(j))*iwork[k];
+          imap1[j]=p+2*var(j);
+          phi=r,imap1;
+          iwork=phi(iwork);
+          iwork=subst(iwork,var(j),0);
+          iwork[k]=var(j);
+          imap1=maxideal(1);
+          imap2[j]=-p;
+          break;
+        }
       }
     }
   }
@@ -4721,9 +4755,9 @@ static proc min_ass_prim_charsets1_i (int patchPrimaryDecomposition, ideal PS)
   list ITPHI;  // their initial terms
   for(i=nrows(m);i>=1; i--)
   {
-    PHI[i]=ideal(m[i,1..ncols(m)]);
+    PHI[i]=simplify(ideal(m[i,1..ncols(m)]),2);
     I=0;
-    for(j=size(PHI[i]);j>0;j=j-1)
+    for(j=ncols(PHI[i]);j>0;j--)
     {
       I=I,ini_mod(PHI[i][j]);
     }
@@ -5176,7 +5210,7 @@ static proc pseudo_prim_dec_special_charsets_i (int patchPrimaryDecomposition, i
           {
             m=minAssPrimes_i(patchPrimaryDecomposition,SP,1);
           }
-          for(j=size(m);j>=1;j=j-1)
+          for(j=size(m);j>=1;j--)
             {
               m[j]=std(m[j]);
             }
@@ -6443,6 +6477,7 @@ EXAMPLE: example radical; shows an example
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   dbprint(printlevel - voice, "Radical, version 2006.05.08");
+  if(size(i) == 0){return(ideal(0));}
   if(attrib(basering,"global")!=1)
   {
 // algorithms only work in global case!
@@ -6457,7 +6492,6 @@ EXAMPLE: example radical; shows an example
       def j=imap(s,j);
       return(j);
   }
-  if(size(i) == 0){return(ideal(0));}
   int j;
   def P0 = basering;
   list Pl=ringlist(P0);

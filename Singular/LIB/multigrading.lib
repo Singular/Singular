@@ -1587,10 +1587,10 @@ static proc gcdcomb(int a, int b)
 
 proc lll(def A)
 "
-The lll algorithm of lll.lib only works for lists of vectors.
-Maybe one should rescript it for matrices. This method will
-convert a matrix to a list, plug it into lll and make the result
-a matrix and return it.
+The lll algorithm of NTL only works for intmat/matrix.
+This method will convert the input, call lll and
+return the result in the same format.
+(list of intvec resp. intmat)
 "
 {
   if(typeof(A) == "list")
@@ -1627,14 +1627,13 @@ a matrix and return it.
       }
     }
     m= system ("LLL", m);
-    list result= list();
+    list result;
     intvec buf;
 
-    for (i= 1; i <= sizeA; i++)
+    for (i= sizeA; i >=1 ; i--)
     {
       buf = intvec (m[i , 1..columns]);
-      result= result+ list (buf);
-
+      result[i]= buf;
     }
     return(result);
   }

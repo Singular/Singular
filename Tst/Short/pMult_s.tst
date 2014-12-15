@@ -15,13 +15,13 @@ proc pAdd_Test(string rs)
   rs;
   rs = "ring r = " + rs + ";";
   execute(rs);
-  int n_vars = tst_rgen_nvars[tst_rgen_var_index];
+  int n_vars = tst_rgen_nvars[Tst::tst_rgen_var_index];
   ideal id = tst_cyclic(n_vars);
   if (n_vars == 1)
   {
     id = var(1), id;
   }
-  tst_TestMult(id, n_vars, size(tst_rgen_comp_orderings[tst_rgen_comp_index]));
+  tst_TestMult(id, n_vars, size(Tst::tst_rgen_comp_orderings[Tst::tst_rgen_comp_index]));
   kill r;
 }
   

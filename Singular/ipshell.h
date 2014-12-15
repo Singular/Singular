@@ -290,5 +290,8 @@ BOOLEAN iiCheckTypes(leftv args,/// < [in] argument list (may be NULL)
                                              ///< len, t1,t2,...
                       int report=0  /// ;in] report error?
                       );
+
+BOOLEAN iiBranchTo(leftv r, leftv args);
+
 #endif
 

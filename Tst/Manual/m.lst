@@ -247,7 +247,6 @@ NullCone
 nvars
 pardeg
 pmat
-poly_BR_PLURAL_BR
 poly_operations
 primecoeffs
 primefactors
@@ -471,9 +470,7 @@ addrow
 adjoint
 algebra_containment
 allPositive
-AltVarEnd
 annil
-applyAdF
 binomial
 blowUp2
 bracket
