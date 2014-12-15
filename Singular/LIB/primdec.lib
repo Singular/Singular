@@ -2684,7 +2684,7 @@ proc algeDeco(ideal i, int w)
       }
    }
 //---Ende Provisorium
-   string mp="poly p="+string(minpoly)+";";
+   string mp="poly @p="+string(minpoly)+";";
    string gnir="ring RH="+string(char(R))+",("+varstr(R)+","+string(par(1))
                 +"),dp;";
    execute(gnir);
@@ -2696,7 +2696,7 @@ proc algeDeco(ideal i, int w)
    {
      if(i[j]!=I[j]){break;}
    }
-   if((j>ncols(i))&&(deg(p)==1))
+   if((j>ncols(i))&&(deg(@p)==1))
    {
      setring R;
      kill RH;
@@ -2708,7 +2708,7 @@ proc algeDeco(ideal i, int w)
    }
    else
    {
-      i=i,p;
+      i=i,@p;
    }
    list pr;
 
@@ -2725,6 +2725,7 @@ proc algeDeco(ideal i, int w)
    {
       pr=minAssPrimes(i);
    }
+
    if(n<nvars(basering))
    {
       gnir="ring RS="+string(char(R))+",("+varstr(RH)
@@ -2746,6 +2747,7 @@ proc algeDeco(ideal i, int w)
       setring R;
       list pr=imap(RH,pr);
    }
+
    list re;
    if(w==2)
    {
@@ -2827,7 +2829,7 @@ EXAMPLE: example decomp; shows an example
     list absprimary,abskeep,absprimarytmp,abskeeptmp;
   }
   homo=homog(i);
-  if(homo==1)
+  if(homo)
   {
     if(attrib(i,"isSB")!=1)
     {
@@ -4173,39 +4175,63 @@ static proc analyze(list pr)
 //                  Shimoyama-Yokoyama
 //
 ///////////////////////////////////////////////////////////////////////////////
-
 static proc simplifyIdeal(ideal i)
 {
   ASSUME(1, hasFieldCoefficient(basering) );
-  ASSUME(1, not isQuotientRing(basering) ) ;
   ASSUME(1, hasGlobalOrdering(basering) ) ;
 
   def r=basering;
 
+  ideal iwork=i;
+  ideal imap2=maxideal(1);
+
   int j,k;
   map phi;
   poly p;
-
-  ideal iwork=i;
   ideal imap1=maxideal(1);
-  ideal imap2=maxideal(1);
-
-
-  for(j=1;j<=nvars(basering);j++)
+  // first try: very simple substitutions
+  intvec tested=0:nvars(r);
+  for(j=1;j<=nvars(r);j++)
   {
-    for(k=1;k<=size(i);k++)
+    for(k=1;k<=ncols(i);k++)
     {
       if(deg(iwork[k]/var(j))==0)
       {
         p=-1/leadcoef(iwork[k]/var(j))*iwork[k];
-        imap1[j]=p+2*var(j);
-        phi=r,imap1;
-        iwork=phi(iwork);
-        iwork=subst(iwork,var(j),0);
-        iwork[k]=var(j);
-        imap1=maxideal(1);
-        imap2[j]=-p;
-        break;
+        if(size(p)<=2)
+        {
+          tested[j]=1;
+          imap1[j]=p+2*var(j);
+          phi=r,imap1;
+          iwork=phi(iwork);
+          iwork=subst(iwork,var(j),0);
+          iwork[k]=var(j);
+          imap1=maxideal(1);
+          imap2[j]=-p;
+          break;
+        }
+      }
+    }
+  }
+  // second try: substitutions not so simple
+  for(j=1;j<=nvars(r);j++)
+  {
+    if (tested[j]==0)
+    {
+      for(k=1;k<=ncols(i);k++)
+      {
+        if(deg(iwork[k]/var(j))==0)
+        {
+          p=-1/leadcoef(iwork[k]/var(j))*iwork[k];
+          imap1[j]=p+2*var(j);
+          phi=r,imap1;
+          iwork=phi(iwork);
+          iwork=subst(iwork,var(j),0);
+          iwork[k]=var(j);
+          imap1=maxideal(1);
+          imap2[j]=-p;
+          break;
+        }
       }
     }
   }
@@ -5862,6 +5888,7 @@ EXAMPLE: example radical; shows an example
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
   dbprint(printlevel - voice, "Radical, version 2006.05.08");
+  if(size(i) == 0){return(ideal(0));}
   if(attrib(basering,"global")!=1)
   {
 // algorithms only work in global case!
@@ -5876,7 +5903,6 @@ EXAMPLE: example radical; shows an example
       def j=imap(s,j);
       return(j);
   }
-  if(size(i) == 0){return(ideal(0));}
   int j;
   def P0 = basering;
   list Pl=ringlist(P0);

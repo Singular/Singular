@@ -11,10 +11,6 @@
 #include <coeffs/coeffs.h>
 #include <coeffs/rintegers.h>
 
-#ifndef NATNUMBER
-#define NATNUMBER unsigned long
-#endif
-
 BOOLEAN nr2mInitChar    (coeffs r, void*);
 
 number  nr2mCopy        (number a, const coeffs r);
@@ -59,23 +55,23 @@ number nr2mMapQ(number from, const coeffs src, const coeffs dst);
 static inline number nr2mMultM(number a, number b, const coeffs r)
 {
   return (number)
-    ((((NATNUMBER) a) * ((NATNUMBER) b)) & ((NATNUMBER)r->mod2mMask));
+    ((((unsigned long) a) * ((unsigned long) b)) & ((unsigned long)r->mod2mMask));
 }
 
 static inline number nr2mAddM(number a, number b, const coeffs r)
 {
   return (number)
-    ((((NATNUMBER) a) + ((NATNUMBER) b)) & ((NATNUMBER)r->mod2mMask));
+    ((((unsigned long) a) + ((unsigned long) b)) & ((unsigned long)r->mod2mMask));
 }
 
 static inline number nr2mSubM(number a, number b, const coeffs r)
 {
-  return (number)((NATNUMBER)a < (NATNUMBER)b ?
-                       r->mod2mMask - (NATNUMBER)b + (NATNUMBER)a + 1:
-                       (NATNUMBER)a - (NATNUMBER)b);
+  return (number)((unsigned long)a < (unsigned long)b ?
+                       r->mod2mMask - (unsigned long)b + (unsigned long)a + 1:
+                       (unsigned long)a - (unsigned long)b);
 }
 
-#define nr2mNegM(A,r) (number)((r->mod2mMask - (NATNUMBER)(A) + 1) & r->mod2mMask)
+#define nr2mNegM(A,r) (number)((r->mod2mMask - (unsigned long)(A) + 1) & r->mod2mMask)
 #define nr2mEqualM(A,B)  ((A)==(B))
 
 

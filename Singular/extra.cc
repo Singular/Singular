@@ -708,6 +708,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       {
         return TRUE;
       }
+      if (rField_is_Ring(currRing))
+      {
+        WerrorS("field required");
+	return TRUE;
+      }
       matrix pMat  = (matrix)h->Data();
       matrix lMat  = (matrix)h->next->Data();
       matrix dMat  = (matrix)h->next->next->Data();
@@ -942,18 +947,88 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
       if (h!=NULL)
       {
-        res->rtyp=h->Typ();
-        if (h->Typ()==BIGINTMAT_CMD)
+        if(h->next == NULL)
         {
-          res->data=(char *)singflint_LLL((bigintmat*)h->Data());
-          return FALSE;
+            res->rtyp=h->Typ();
+            if (h->Typ()==BIGINTMAT_CMD)
+            {
+              res->data=(char *)singflint_LLL((bigintmat*)h->Data(), NULL);
+              return FALSE;
+            }
+            else if (h->Typ()==INTMAT_CMD)
+            {
+              res->data=(char *)singflint_LLL((intvec*)h->Data(), NULL);
+              return FALSE;
+            }
+            else return TRUE;
         }
-        else if (h->Typ()==INTMAT_CMD)
+        if(h->next->Typ()!= INT_CMD)
         {
-          res->data=(char *)singflint_LLL((intvec*)h->Data());
-          return FALSE;
+            WerrorS("matrix,int or bigint,int expected");
+            return TRUE;
         }
-        else return TRUE;
+        if(h->next->Typ()== INT_CMD)
+        {
+            if(((int)((long)(h->next->Data())) != 0) && (int)((long)(h->next->Data()) != 1))
+            {
+                WerrorS("int is different from 0, 1");
+                return TRUE;
+            }
+            res->rtyp=h->Typ();
+            if((long)(h->next->Data()) == 0)
+            {
+                if (h->Typ()==BIGINTMAT_CMD)
+                {
+                  res->data=(char *)singflint_LLL((bigintmat*)h->Data(), NULL);
+                  return FALSE;
+                }
+                else if (h->Typ()==INTMAT_CMD)
+                {
+                  res->data=(char *)singflint_LLL((intvec*)h->Data(), NULL);
+                  return FALSE;
+                }
+                else return TRUE;
+            }
+            // This will give also the transformation matrix U s.t. res = U * m
+            if((long)(h->next->Data()) == 1)
+            {
+                if (h->Typ()==BIGINTMAT_CMD)
+                {
+                  bigintmat* m = (bigintmat*)h->Data();
+                  bigintmat* T = new bigintmat(m->rows(),m->rows(),m->basecoeffs());
+                  for(int i = 1; i<=m->rows(); i++)
+                  {
+                    n_Delete(&(BIMATELEM(*T,i,i)),T->basecoeffs());
+                    BIMATELEM(*T,i,i)=n_Init(1, T->basecoeffs());
+                  }
+                  m = singflint_LLL(m,T);
+                  lists L = (lists)omAllocBin(slists_bin);
+                  L->Init(2);
+                  L->m[0].rtyp = BIGINTMAT_CMD;  L->m[0].data = (void*)m;
+                  L->m[1].rtyp = BIGINTMAT_CMD;  L->m[1].data = (void*)T;
+                  res->data=L;
+                  res->rtyp=LIST_CMD;
+                  return FALSE;
+                }
+                else if (h->Typ()==INTMAT_CMD)
+                {
+                  intvec* m = (intvec*)h->Data();
+                  intvec* T = new intvec(m->rows(),m->rows(),(int)0);
+                  for(int i = 1; i<=m->rows(); i++)
+                    IMATELEM(*T,i,i)=1;
+                  m = singflint_LLL(m,T);
+                  lists L = (lists)omAllocBin(slists_bin);
+                  L->Init(2);
+                  L->m[0].rtyp = INTMAT_CMD;  L->m[0].data = (void*)m;
+                  L->m[1].rtyp = INTMAT_CMD;  L->m[1].data = (void*)T;
+                  res->data=L;
+                  res->rtyp=LIST_CMD;
+                  return FALSE;
+                }
+                else return TRUE;
+            }
+        }
+        
       }
       else return TRUE;
     }

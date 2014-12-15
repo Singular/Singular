@@ -1798,10 +1798,10 @@ static proc infPlaces (poly f)
       // minpoly=aux is needed
 
         ring r_ext=(char(basering),@a),(x,y,z),lp;
-        poly F=imap(r_auxz,F);
-        poly f_xz=subst(F,y,1);
         poly aux=imap(base_r,aux);
         minpoly=number(subst(aux,x,@a));
+        poly F=imap(r_auxz,F);
+        poly f_xz=subst(F,y,1);
         map phi=r_ext,x+@a,0,z;
         poly f_origin=phi(f_xz);
 

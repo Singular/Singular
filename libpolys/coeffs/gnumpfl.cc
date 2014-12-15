@@ -464,7 +464,6 @@ BOOLEAN ngfInitChar(coeffs n, void *parameter)
     n->float_len2 = SHORT_REAL_LENGTH;
   }
 
-  assume( n->float_len <= n->float_len2 );
   assume( n->float_len2 >= SHORT_REAL_LENGTH );
 
   assume( n_NumberOfParameters(n) == 0 );

@@ -213,7 +213,7 @@ ideal idSect (ideal h1,ideal h2)
   int i,j,k,length;
   int flength = id_RankFreeModule(h1,currRing);
   int slength = id_RankFreeModule(h2,currRing);
-  int rank=si_min(flength,slength);
+  int rank=si_max(h1->rank,h2->rank);
   if ((idIs0(h1)) || (idIs0(h2)))  return idInit(1,rank);
 
   ideal first,second,temp,temp1,result;

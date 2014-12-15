@@ -19,7 +19,7 @@
 #endif
 
 //extern int nrzExp;
-//extern NATNUMBER nrzModul;
+//extern unsigned long nrzModul;
 
 BOOLEAN nrzInitChar    (coeffs r,  void * parameter);
 number  nrzCopy        (number a, const coeffs r);

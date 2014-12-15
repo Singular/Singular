@@ -66,6 +66,7 @@ BITSET kOptions=Sy_bit(OPT_PROT)           /*  0 */
                 |Sy_bit(OPT_WEIGHTM);      /* 31 */
 
 /* the list of all options which may be used by option and test */
+/* defintion of ALL options: libpolys/misc/options.h */
 BITSET validOpts=Sy_bit(0)
                 |Sy_bit(1)
                 |Sy_bit(2) // obachman 10/00: replaced by notBucket
@@ -263,6 +264,7 @@ int redEcart (LObject* h,kStrategy strat)
     // are we done ???
     if (h->IsNull())
     {
+      assume(!rField_is_Ring(currRing));
       if (h->lcm!=NULL) pLmFree(h->lcm);
       h->Clear();
       return 0;
@@ -380,10 +382,7 @@ int redRiloc (LObject* h,kStrategy strat)
   reddeg = strat->LazyDegree+d;
   h->SetShortExpVector();
 #if ADIDEBUG_NF
-  PrintLn();
-  PrintS("  Searching for a poly in T that divides h (of ecart ");
-  Print("%i) ...",h->ecart);
-  PrintLn();
+  Print("\n  Searching for a poly in T that divides h (of ecart %i) ...\n",h->ecart);
 #endif
   loop
   {
@@ -392,19 +391,13 @@ int redRiloc (LObject* h,kStrategy strat)
     if(j != -1)
     {
       ei = strat->T[j].ecart;
-      PrintLn();
-      Print("    Found one: T[%i",j);
-      Print("] of ecart %i",ei);
-      PrintS(": ");p_Write(strat->T[j].p,strat->tailRing);
-      PrintLn();
-      PrintS("    Try to find another with smaller ecart:");
-      PrintLn();
+      Print("\n    Found one: T[%i] of ecart %i: ",j,ei);
+      p_Write(strat->T[j].p,strat->tailRing);
+      PrintS("\n    Try to find another with smaller ecart:\n");
     }
     else
     {
-      PrintLn();
-      PrintS("    No poly in T divides h.");
-      PrintLn();
+      PrintS("\n    No poly in T divides h.\n");
     }
 #endif
     if (j < 0)
@@ -454,15 +447,12 @@ int redRiloc (LObject* h,kStrategy strat)
 #if ADIDEBUG_NF
       if(iii == ii)
       {
-        PrintLn();
-        PrintS("    None was found.");
-        PrintLn();
+        PrintS("\n    None was found.\n");
       }
       else
       {
-        PrintLn();
-        Print("    A better one (ecart = %i): T[",ei);
-        Print("%i] = ",ii);p_Write(strat->T[ii].p,strat->tailRing);
+        Print("\n    A better one (ecart = %i): T[%i] = ",ei,ii);
+        p_Write(strat->T[ii].p,strat->tailRing);
         PrintLn();
       }
 #endif
@@ -499,8 +489,7 @@ int redRiloc (LObject* h,kStrategy strat)
     // now we finally can reduce
     doRed(h,&(strat->T[ii]),strat->fromT,strat);
     #if ADIDEBUG_NF
-    PrintLn();
-    PrintS("  Partial Reduced h = ");p_Write(h->p,strat->tailRing);
+    PrintS("\n  Partial Reduced h = ");p_Write(h->p,strat->tailRing);
     PrintLn();
     #endif
     strat->fromT=FALSE;
@@ -508,7 +497,7 @@ int redRiloc (LObject* h,kStrategy strat)
     // are we done ???
     if (h->IsNull())
     {
-      if (h->lcm!=NULL) pLmFree(h->lcm);
+      if (h->lcm!=NULL) pLmDelete(h->lcm);
       h->Clear();
       return 0;
     }
@@ -628,6 +617,7 @@ int redFirst (LObject* h,kStrategy strat)
 #endif
     if (h->IsNull())
     {
+      assume(!rField_is_Ring(currRing));
       if (h->lcm!=NULL) pLmFree(h->lcm);
       h->Clear();
       return 0;
@@ -1341,7 +1331,6 @@ void initBba(ideal /*F*/,kStrategy strat)
 //  }
 }
 
-
 void initSba(ideal F,kStrategy strat)
 {
   int i;
@@ -1358,7 +1347,7 @@ void initSba(ideal F,kStrategy strat)
     strat->LazyPass *=4;
     strat->red2 = redHomog;
   }
-#if defined(HAVE_RINGS) || defined(HAVE_RINGS_LOC)  //TODO Oliver
+#if defined(HAVE_RINGS) || defined(HAVE_RINGS_LOC)  //TODO Oliver  
   if (rField_is_Ring(currRing))
   {
     if(rHasLocalOrMixedOrdering(currRing))
@@ -1562,16 +1551,12 @@ loop_count = 1;
 
 #if ADIDEBUG
 #ifdef KDEBUG
-    PrintLn();
-    Print("-------------------------------- LOOP %d ---------------------------------------\n",loop_count);
+    Print("\n-------------------------------- LOOP %d ---------------------------------------\n",loop_count);
     //print the list L: (p1,p2,p)
-    PrintLn();
-    Print("    The pair list L -- in loop %d  -- is:\n",loop_count);
+    Print("\n    The pair list L -- in loop %d  -- is:\n",loop_count);
     for(int iii=0;iii<=strat->Ll;iii++)
     {
-      PrintLn();
-      Print("    L[%d]: ",iii);
-      PrintLn();
+      Print("\n    L[%d]:\n",iii);
       PrintS("        ");p_Write(strat->L[iii].p1,strat->tailRing);
       PrintS("        ");p_Write(strat->L[iii].p2,strat->tailRing);
       PrintS("        ");p_Write(strat->L[iii].p,strat->tailRing);
@@ -1590,15 +1575,13 @@ loop_count = 1;
     PrintS("      p1 = "); p_Write(strat->P.p1,strat->tailRing);PrintLn();
     PrintS("      p2 = "); p_Write(strat->P.p2,strat->tailRing);PrintLn();
     PrintS("      p = "); p_Write(strat->P.p,strat->tailRing); PrintLn();
-    PrintLn();
-    Print("    The old reducer list T -- at the beg of loop %d -- is :",loop_count);
+    Print("\n    The old reducer list T -- at the beg of loop %d -- is :",loop_count);
     if(strat->tl<0)
-    {PrintS(" Empty.");PrintLn();}
+    {PrintS(" Empty.\n");}
     else
     for(int iii=0;iii<=strat->tl;iii++)
     {
-      PrintLn();
-      Print("    T[%d]:",iii);
+      Print("\n    T[%d]:",iii);
       p_Write(strat->T[iii].p,strat->T->tailRing);
     }
     PrintLn();
@@ -1609,7 +1592,7 @@ loop_count = 1;
     if (pNext(strat->P.p) == strat->tail)
     {
       /*- deletes the short spoly and computes -*/
-#ifdef HAVE_RINGS_LOC
+#ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
         pLmDelete(strat->P.p);
       else
@@ -1678,8 +1661,7 @@ loop_count = 1;
         Print("\n    The new pair list L -- after superenterpairs in loop %d -- is:\n",loop_count);
         for(int iii=0;iii<=strat->Ll;iii++)
         {
-          PrintLn();
-          PrintS("    L[%d]:\n",iii);
+          PrintS("\n    L[%d]:\n",iii);
           PrintS("         ");p_Write(strat->L[iii].p1,strat->tailRing);
           PrintS("         ");p_Write(strat->L[iii].p2,strat->tailRing);
           PrintS("         ");p_Write(strat->L[iii].p,strat->tailRing);
@@ -2095,10 +2077,11 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
-  if (TEST_OPT_SB_1)
+  if (TEST_OPT_SB_1
     #ifdef HAVE_RINGS
-    if(!rField_is_Ring(currRing))
+    &&(!rField_is_Ring(currRing))
     #endif
+    )
     strat->newIdeal = newIdeal;
   if (rField_has_simple_inverse(currRing))
     strat->LazyPass=20;
