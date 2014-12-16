@@ -2090,8 +2090,9 @@ void rComposeRing(lists L, ring R)
     lists LL=(lists)L->m[1].data;
     if ((LL->nr >= 0) && LL->m[0].rtyp == BIGINT_CMD)
     {
-      number tmp= (number) LL->m[0].data; // .CopyD()? see below
-      n_MPZ (modBase, tmp, coeffs_BIGINT); // FIXME: deletes tmp: previous CopyD() should NOT be necessary! 
+      number tmp= (number) LL->m[0].data; // never use CopyD() on list elements
+                                    // assume that tmp is integer, not rational
+      n_MPZ (modBase, tmp, coeffs_BIGINT);
     }
     else if (LL->nr >= 0 && LL->m[0].rtyp == INT_CMD)
     {
@@ -5266,7 +5267,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #ifdef HAVE_RINGS
   else if ((pn->name != NULL) && (strcmp(pn->name, "integer") == 0))
   {
-    // TODO: change to use coeffs_BIGINT!? 
+    // TODO: change to use coeffs_BIGINT!?
     modBase = (mpz_ptr) omAlloc(sizeof(mpz_t));
     mpz_init_set_si(modBase, 0);
     if (pn->next!=NULL)
@@ -5316,6 +5317,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
            depending on the size of a long on the respective platform */
         //ringtype = 1;       // Use Z/2^ch
         cf=nInitChar(n_Z2m,(void*)(long)modExponent);
+	mpz_clear(modBase);
         omFreeSize (modBase, sizeof (mpz_t));
       }
       else
