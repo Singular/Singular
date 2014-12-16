@@ -13,7 +13,7 @@ Singular ICON "singular.ico"
 
 #define SINGULAR_RC_VERSION @SINGULAR_MAJOR_VERSION@, @SINGULAR_MINOR_VERSION@, @SINGULAR_SUB_VERSION@, 0
 
-1 VERSIONINFO 
+1 VERSIONINFO
 FILEVERSION SINGULAR_RC_VERSION
 PRODUCTVERSION SINGULAR_RC_VERSION
 FILEOS VOS_NT_WINDOWS32
@@ -32,7 +32,7 @@ BEGIN
    VALUE "FileDescription", "Runs Singular within rxvt (a terminal emulator).\000"
 #else
   VALUE "FileDescription", "A System for Polynomial Computations\000"
-#endif   
+#endif
 #endif
 #ifndef SINGULAR
    VALUE "FileVersion", "based on Singular @SINGULAR_VERSION@ and run 1.1.4\000"

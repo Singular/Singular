@@ -31,7 +31,7 @@ LIBRARY: mega.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C
 poly mysum(
 	poly i,
 	poly j
-	) 
+	)
 "Return sum of i and j"
 {
    poly h;
@@ -41,14 +41,14 @@ poly mysum(
 
   // generate typecheck and typeconversation code
   %typecheck;
-  
+
   h = pCopy(i);
   %return = (void *)pAdd(h , j);
 }
 int mysumint(
 	int i,
 	int j
-	) 
+	)
 "Return sum of i and j"
 {
   // generate internal variable declaration
@@ -57,12 +57,12 @@ int mysumint(
 
   // generate typecheck and typeconversation code
   %typecheck;
-  
+
   //%return = (void*)((int)i->Data() + (int)j->Data());
   %return = (void *)(i + j);
 }
 example
-{ Demo::mysum(2,3); 
+{ Demo::mysum(2,3);
 }
 
 

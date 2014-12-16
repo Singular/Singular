@@ -5,29 +5,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.util.*;
@@ -47,7 +47,7 @@ public class UpdateRayframeImmediatlyThread extends Thread implements Runnable {
 	jv4surfex jv4sx_project;
 
 	boolean killMe = false;
- 
+
 	SavePic saveThread;
 
 	boolean showOnlySelectedLamp = false;
@@ -87,15 +87,15 @@ public class UpdateRayframeImmediatlyThread extends Thread implements Runnable {
 		//Lamps.add(lamp);
 		this.selectedLamp = selectedLamp;
 		this.showOnlySelectedLamp = showOnlySelectedLamp;
-		
+
 	}
-	
+
 
 
 	public void start() {
 		if (t == null) {
 			t = new Thread(this);
-			t.start(); 
+			t.start();
 		}
 	}
 
@@ -109,11 +109,11 @@ public class UpdateRayframeImmediatlyThread extends Thread implements Runnable {
 		String fn = surfex_.tmpDir + "uit" + rand + "test.png";
 		saveThread = new SavePic(fn, false, project.antialiasing.isSelected(),
 					 rayFrame.panel.getSize().height
-					 / project.getInterpolConst(), 
+					 / project.getInterpolConst(),
 					 rayFrame.panel.getSize().width
-					 / project.getInterpolConst(), 
+					 / project.getInterpolConst(),
 					 72, surfex_, project, jv4sx.getCamPos(), jv4sx.getViewDir(), jv4sx.getUpVector(),
-					 jv4sx.getRightVector(),project.parAdmin.getAllParams(),project.parAdmin.getAllParamValues(), 
+					 jv4sx.getRightVector(),project.parAdmin.getAllParams(),project.parAdmin.getAllParamValues(),
 					 jv4sx, Lamps);
 		// falls nur eine Lampe angezeigt werden soll:;
 		if (surfex_.configFrame.surf.isSelected()) {
@@ -122,13 +122,13 @@ public class UpdateRayframeImmediatlyThread extends Thread implements Runnable {
 		} else {
 			fn = surfex_.tmpDir + "uit" + rand + "test.png";
 		}
-	
 
-		
+
+
 		// System.out.println("Test");
 		while (me == t) {
 			synchronized (this) {
-				
+
 				updateLamps();
 
 				if (project.equals(surfex_.getCurrentProject())
@@ -137,12 +137,12 @@ public class UpdateRayframeImmediatlyThread extends Thread implements Runnable {
 				//	System.out.println("visible:"+rand+"ray:"+rayFrame.rand);
 					// nur neu berechnen, wenn dies das aktuelle project ist
 					// und auch sichtbar ist
-					
+
 					// damit das Programm noch reagiert);
 					/*
 					 * try { sleep(100); } catch (InterruptedException e) { }
 					 */
-			
+
 					// das muss hier stehen, weil sonst aus irgendwelchen Gruenden
 					// das normale previewFenster nicht mitupdated
 					// wenn man Lampen nur an und aus schaltet
@@ -153,11 +153,11 @@ public class UpdateRayframeImmediatlyThread extends Thread implements Runnable {
 							rayFrame.panel.getSize().height
 									/ project.getInterpolConst(),
 							rayFrame.panel.getSize().width
-									/ project.getInterpolConst(), 72, 
+									/ project.getInterpolConst(), 72,
 							surfex_, project, jv4sx.getCamPos(), jv4sx
 									.getViewDir(), jv4sx.getUpVector(),
 							jv4sx.getRightVector(),project.parAdmin.getAllParams(),project.parAdmin.getAllParamValues(), jv4sx, Lamps, jv4sx_project);
-					
+
 					//int i=System.in.readln();
 					// System.out.println("1" );
 					if (saveThread.getSurfCode().equals(old_surfCode)) {
@@ -186,7 +186,7 @@ public class UpdateRayframeImmediatlyThread extends Thread implements Runnable {
 						} catch (InterruptedException e) {
 
 						}
-						
+
 						// falls nur eine Lampe angezeigt werden soll:;
 						//			      System.out.println("finally");
 						Runtime r = Runtime.getRuntime();
@@ -232,7 +232,7 @@ public class UpdateRayframeImmediatlyThread extends Thread implements Runnable {
 
 					//  SwingUtilities.updateComponentTreeUI(bt4);
 				} else {
-					
+
 					// dieses Project ist nicht das aktuell betrachtete -> nichts machen
 					try {
 						sleep(50);
@@ -267,10 +267,10 @@ public class UpdateRayframeImmediatlyThread extends Thread implements Runnable {
 			 */// Lamps=new Vector();
 			// Lamps.add(selectedLamp);
 			//}
-			
+
 		//	saveThread.updateLamps(Lamps);
 		} else {
-			// 
+			//
 			//System.out.println(rand);
 			Lamps = project.getAllLamps();
 			//System.out.println("s" + vec2Str(jv4sx.getCamPos()));

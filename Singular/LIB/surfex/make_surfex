@@ -13,4 +13,4 @@ javac *.java
 #javac SaveMovieDialog.java
 #javac jv4surfex.java
 
-jar cmf mainClass.txt surfex.jar *.class images jv 
+jar cmf mainClass.txt surfex.jar *.class images jv

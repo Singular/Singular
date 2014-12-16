@@ -22,7 +22,7 @@ proc test5prim (int p)
     d2= d2*x(i);
     f2= f2*x(i);
     g2= g2*x(i);
-    
+
     d= d1*d2 - 1;
     f= f1*f2 + 2;
     g= g1*g2 - 2;

@@ -16,4 +16,4 @@ x4*x8-x7*x9-x9*x10-410*x9,
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
     tst_status(1);$
-    
+

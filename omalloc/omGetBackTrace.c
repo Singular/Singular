@@ -49,7 +49,7 @@ int omGetBackTrace(void** bt, int start, int max)
     OM_GET_BACK_TRACE(1)
     OM_GET_BACK_TRACE(2)
 /* the following fails on Mac OsX, but the debugging
- * support it provides is too useful to disable it 
+ * support it provides is too useful to disable it
  */
 #ifdef __linux
 #if defined(__x86_64) || defined(__i386)
@@ -67,7 +67,7 @@ int omGetBackTrace(void** bt, int start, int max)
     OM_GET_BACK_TRACE(14)
     OM_GET_BACK_TRACE(15)
     OM_GET_BACK_TRACE(16)
-    OM_GET_BACK_TRACE(17) 
+    OM_GET_BACK_TRACE(17)
 #endif
 #endif
   }

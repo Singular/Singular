@@ -12,7 +12,7 @@ proc econ(int n) {
 
   int z = n-1;
   ring R = 32003,(x(0..z)),dp;
-  
+
   int m,j,k;
   ideal i;
   poly p;
@@ -24,7 +24,7 @@ proc econ(int n) {
       p = p + x(k)*x(j)*x(z);
       k++;
     }
-    p = p - (m+1);  
+    p = p - (m+1);
     i[m+1] = p;
     p = 1;
   }
@@ -47,7 +47,7 @@ proc econh(int n) {
 
   int z = n-1;
   ring R = 32003,(x(0..z),h),dp;
-  
+
   int m,j,k;
   ideal i;
   poly p;
@@ -59,7 +59,7 @@ proc econh(int n) {
       p = p + x(k)*x(j)*x(z);
       k++;
     }
-    p = p - (m+1)*h^3;  
+    p = p - (m+1)*h^3;
     i[m+1] = p;
     p = 1;
   }
@@ -80,12 +80,12 @@ proc econh(int n) {
 
 string bench = econ(11);
 sprintf(bench);
-ideal f; 
+ideal f;
 f = sba(i,0,1);
 killall;
 string bench = econh(11);
 sprintf(bench);
-ideal f; 
+ideal f;
 f = sba(i,1,1);
 killall;
 

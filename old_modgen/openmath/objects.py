@@ -1,5 +1,5 @@
 """Implementation of openmath basic objects"""
-from omexceptions import UnsupportedOperationError 
+from omexceptions import UnsupportedOperationError
 from  omexceptions import OutOfScopeError, EvaluationFailedError
 from exceptions import NotImplementedError
 from copy import copy
@@ -31,7 +31,7 @@ class OMCD(object):
         return hash((self.name,self.base))
 
 
-        
+
 class OMCDImplementation(object):
     converter=None
     def __init__(self, cd):
@@ -45,13 +45,13 @@ class OMCDImplementation(object):
             return
         "FIXME: implements this later safer against name conflicts"
         if callable(value) and (not isinstance(value, ImplementedSymbol)):
-            
+
             if self.converter!=None:
                 object.__setattr__(
-                    self, 
-                    name, 
+                    self,
+                    name,
                     ImplementedSymbol(
-                        OMS(name,self.cd), 
+                        OMS(name,self.cd),
                         self.converter(value)))
             else:
                 object.__setattr__(self, name, ImplementedSymbol(OMS(name,self.cd), value))
@@ -105,9 +105,9 @@ lambdasym = OMS("lambda", cdFns1)
 def islambda(sym):
     "return True, iff sym is the lambda binder"
     return lambdasym == sym
-    
+
 class OMBIND(object):
-    """hopefully fixed possible problems: reevaluation writes new scope, 
+    """hopefully fixed possible problems: reevaluation writes new scope,
        if it isn't
        meant so, references do not work correctly because of scopes
        solve this by first evaluation to bounded OMBinding"""
@@ -146,16 +146,16 @@ class OMBIND(object):
         erg = self.calcErg(context)
         self.unbind()
         #print "__call__ erg is", erg
-        return erg   
-        
+        return erg
+
     XMLtag = "OMBIND"
     def getChildren(self):
         "get children for (XML) representation"
         return [self.binder]+self.variables+[self.block]
-    
+
     def __str__(self):
         return "OMBIND(self.binder"+", "+str(self.variables) +", " + str(self.block) +")"
-        
+
 
 class OMOBJ(object):
     def __init__(self, children):
@@ -187,7 +187,7 @@ class OMA(object):
         #super(OMApply, self).__init__()
         self.func = func
         self.args = args
-        
+
     def evaluate(self, context):
         efunc = context.evaluate(self.func)
         eargs = [context.evaluate(a) for a in self.args]
@@ -208,7 +208,7 @@ class OMA(object):
     def __repr__ (self):
         return "OMA"+"("+str(self.func)+str(self.args)
     XMLtag="OMA"
-        
+
 
 # class OMB(SimpleValue):
 #     def __init__(self, value):
@@ -250,11 +250,11 @@ class OMATTR(object):
 if __name__ == '__main__':
     print OMV("x")
     print OMA(OMV("x"),[OMV("y"),1])
-  
+
 
     #from binding import OMBinding, lambdasym
 
-    
+
     context["x"] = 1
 
     x = OMV("x")
@@ -269,7 +269,7 @@ if __name__ == '__main__':
     print OMA(arith1.implementation.plus, [1,2])
     print context.evaluate(OMA(arith1.implementation.plus, [1,2]))
     application = OMA(OMS("plus", arith1.content), [1,2])
-    
+
     print context.evaluate(application)
     firstArg=OMBinding(lambdasym,[OMVar("x"), OMVar("y")], OMVar("x"))
     #print context.evaluate(firstArg)
@@ -277,22 +277,22 @@ if __name__ == '__main__':
     print context.evaluate(application)
     application = OMApply(firstArg, [y,x])
     print context.evaluate(application)
-    
+
     #print type(context.lookupImplementation(arith1.plussym))
     #application=OMApply(arith1.plussym,[x])
     #application=OMApply(arith1.plussym,[x,x])
     application = OMApply(OMS("plus", arith1.content), [x, x])
-    
+
     print context.evaluate(application)
     application = OMApply(OMS("plus", arith1.content), [x, x, x])
-    
+
     print context.evaluate(application)
     i =  OMint(22482489)
     print i.body
     print i.XMLEncode(context)
     print context.XMLEncodeObject(OMS("plus", arith1.content))
     #i.body="dshj"
-   
+
 #optimize(OMObjectBase.__init__)
 #optimize(OMObjectBase.XMLPreEncode)
 #optimize(SimpleValue.__init__)

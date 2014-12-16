@@ -5,7 +5,7 @@ LIB"reszeta.lib";
 
 "============== U16";
 ring R=0,(x,y,z),dp;
-ideal I=y5+x2y2+x3-xz2;  //U16 
+ideal I=y5+x2y2+x3-xz2;  //U16
 list L=resolve(I);
 zetaDL(L,1);
 kill L;kill R;
@@ -52,7 +52,7 @@ kill L;kill R;
 
 "============== W17";
 ring R=0,(x,y,z),dp;
-ideal I=x4+xy5+y7+z2;  //W17   
+ideal I=x4+xy5+y7+z2;  //W17
 list L=resolve(I);
 zetaDL(L,1);
 kill L;kill R;
@@ -84,7 +84,7 @@ kill L;kill R;
 
 "============== (y2-x3)^2-x7+z2";
 ring R=0,(x,y,z),dp;
-ideal I=(y2-x3)^2-x7+z2;  
+ideal I=(y2-x3)^2-x7+z2;
 list L=resolve(I);
 zetaDL(L,1);
 kill L;kill R;

@@ -25,7 +25,7 @@ class slists
     void Clean(ring r=currRing)
     {
       assume (this!=NULL);
-      
+
       if (nr>=0)
       {
         int i;

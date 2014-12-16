@@ -6,9 +6,9 @@ poly f = y4z3+2x2y2z2+3x5+4z4+5y2;
 f;
 
 leadmonom(f);
-leadexp(f); 
+leadexp(f);
 lead(f);
-leadcoef(f); 
+leadcoef(f);
 f - lead(f);
 
 tst_status(1);$

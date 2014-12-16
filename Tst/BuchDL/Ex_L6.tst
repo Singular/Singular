@@ -66,7 +66,7 @@ triang_solve(T,20);      // 20 digits should be displayed
 if (not(defined(primdecGTZ))){ LIB "primdec.lib"; }
 list TR;
 int k,j;
-for (k=1; k<=size(T); k++) 
+for (k=1; k<=size(T); k++)
   { TR = TR + triangMH(std(zeroRad(T[k]))); }
 triang_solve(TR,20);
 //->   // ** Laguerre: Too many iterations!
@@ -85,7 +85,7 @@ for (k=2; k<=size(TR); k++)
       TS = TS+list(JJ);  }
 }
 size(TS);      // number of triangular bases
-//->   11  
+//->   11
 def RC = triang_solve(TS,20);
 setring RC;
 basering;
@@ -123,11 +123,11 @@ def F = factorize(I[1],1); F;
 ring R1 = (0,a), (x,y), lp;
 map phi = R,x,y,a;
 number n = number(phi(F)[2]); minpoly = n; if(defined(phi)){kill phi;} map phi = R,x,y,a;
-ideal Iz = phi(I);              // substitute a for z   
+ideal Iz = phi(I);              // substitute a for z
 Iz = simplify(Iz,2); Iz;        // remove zero generators
 //->   Iz[1]=y2
 //->   Iz[2]=x2+2*xy-x-y-2
-ideal Izy = reduce(Iz,std(y)); // substitute 0 for y   
+ideal Izy = reduce(Iz,std(y)); // substitute 0 for y
 Izy = simplify(Izy,2); Izy;
 //->   Izy[1]=x2-x-2
 def Fzy = factorize(Izy[1],1); Fzy;
@@ -136,8 +136,8 @@ def Fzy = factorize(Izy[1],1); Fzy;
 ring R2 = (0,b), (x,y), lp;
 map phi = R,x,y,b;
 number n = number(phi(F)[1]); minpoly = n; if(defined(phi)){kill phi;} map phi = R,x,y,b;
-ideal Iz = phi(I);              // substitute a for z   
-Iz = simplify(Iz,2); Iz;        // remove zero generators    
+ideal Iz = phi(I);              // substitute a for z
+Iz = simplify(Iz,2); Iz;        // remove zero generators
 //->   Iz[1]=y2+(b2+1)
 //->   Iz[2]=x2+2*xy-x-y+(-b2-3)
 def Fz = factorize(Iz[1],1);  Fz;
@@ -191,7 +191,7 @@ poly f, g = x2+y2-1, x2+2y2-1;
 resultant(f,g,x);
 //->   y4
 eliminate(ideal(f,g),x);
-//->   _[1]=y2 
+//->   _[1]=y2
 
 
 kill S;
@@ -201,7 +201,7 @@ poly f = x-t32;
 poly g = y-t48+t56+t60+t62+t63;
 int aa = timer;
 poly h = resultant(f,g,t);
-h; 
+h;
 //->   x63-595965x62-32x61y+6143174x61+3656768x60y+464x59y2-70859517x60
 //->   -65651616x59y-13277840x58y2-4064x57y3+49771514x59+220805184x58y+
 //->   [...]
@@ -283,7 +283,7 @@ ring R = (0,a(1..3),b(1..3),c(1..3)), (x,y), dp;
 poly f0 = a(1)+a(2)*xy+a(3)*y2;
 poly f1 = b(1)+b(2)*xy+b(3)*y2;
 poly f2 = c(1)*x+c(2)*y+c(3)*xy;
-ideal I = f0, f1, f2;  
+ideal I = f0, f1, f2;
 def M0 = mpresmat(I,0);      // depends on random choices
 print(M0);
 //->   (b(1)),0,     0,     0,     0,     0,     0,     0,     0,
@@ -295,7 +295,7 @@ print(M0);
 //->   0,     (a(2)),0,     (b(2)),0,     0,     (c(3)),(c(1)),0,
 //->   0,     0,     (a(2)),0,     (b(2)),(b(3)),0,     (c(3)),(a(3)),
 //->   0,     0,     0,     0,     0,     (b(2)),0,     0,     (a(2))
-def p = det(M0); 
+def p = det(M0);
 p;
 //->   (-a(1)^3*b(1)*b(2)*b(3)^2*c(3)^2+ [...]
 
@@ -309,7 +309,7 @@ factorize(p,1);
 kill R,S;
 //================  Example 6.45 (new Session)  ========================
 ring R = (0,u,v,w), (x,y), dp;
-poly f1 = x3+y-xy-1;   
+poly f1 = x3+y-xy-1;
 poly f2 = x2+y2+4x+4y-2;
 ideal I = u+vx+wy, f1, f2;
 def M0 = mpresmat(I,0);  // the evaluated sparse resultant matrix

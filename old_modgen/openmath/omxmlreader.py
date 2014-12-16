@@ -3,7 +3,7 @@ from xml.dom.xmlbuilder import *
 from xml.dom import Node
 import xml.dom as dom
 import base64
-#from 
+#from
 from StringIO import StringIO
 import re
 import sys
@@ -19,7 +19,7 @@ def readFile(input_file_name):
     docIS.byteStream=docstream
     doc= DOMBuilder().parse(docIS)
     docstream.close()
-    
+
     root=doc.lastChild
     return root
 
@@ -27,7 +27,7 @@ def readStream(input_stream):
     docIS=DOMInputSource()
     docIS.byteStream=input_stream
     doc= DOMBuilder().parse(docIS)
-    
+
     root=doc.lastChild
     return root
 def  get_text_in_children(n):
@@ -48,7 +48,7 @@ def remove_white_space(node):
     for node in remove_list:
         node.parentNode.removeChild(node)
         node.unlink()
-        
+
 class OMFromXMLBuilder:
     def buildFromNode(self, node):
         erg=None
@@ -71,7 +71,7 @@ class OMFromXMLBuilder:
             if node.hasAttribute("cdbase"):
                 #FIXME: obtain from ancestors
                 cdbase=node.getAttribute("cdbase")
-            else: 
+            else:
                 cdbase=None
             cdname=node.getAttribute("cd")
             name=node.getAttribute("name")
@@ -132,7 +132,7 @@ class OMFromXMLBuilder:
 #TODO: handle ancestors cdbase
 if __name__=='__main__':
     import CD.arith1 as arith1
-    
+
     if len(sys.argv)<=2:
         print "Usage: python omxmlreader [--evaluate] input output"
     state=0

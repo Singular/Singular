@@ -50,14 +50,14 @@ ring R=0,(x,y),ds;
 poly f=y4+xy+x2y6+x7;
 poly g=y4;
 poly q=Weierstrass(f,g,10);
-poly w=jet(q*f,10); 
+poly w=jet(q*f,10);
 ring S=(0,x),y,ds;
 poly w=imap(R,w);
 w;
 
 setring R;
 q=Weierstrass(f,g,15);
-w=jet(q*f,15);  
+w=jet(q*f,15);
 setring S;
 w=imap(R,w);
 w;

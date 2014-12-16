@@ -14,7 +14,7 @@ proc addIdealZ(ideal I,ideal J)
     return(I);
 }
 
- 
+
 proc coefPrimeZW(ideal I)
 {
    return(Primdecint::coefPrimeZ(I));

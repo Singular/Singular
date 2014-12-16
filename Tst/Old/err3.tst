@@ -77,7 +77,7 @@ kill r4;
 LIB "matrix.lib";LIB "homolog.lib";
 
 
-int n=5;             
+int n=5;
 int m=3;
 int N=n*(n+1) div 2;       //Anz. der Variablen
 ring R=32003,x(1..N),dp;
@@ -87,7 +87,7 @@ J=std(J);
 module D=J*freemodule(N)+transpose(jacob(J)); // der Differentialmodul
 D = transpose(D);
 ncols(D); nrows(D);
-option(prot);    
+option(prot);
 
 module E=Ext(2,D,J);
 //---------------------------------------------

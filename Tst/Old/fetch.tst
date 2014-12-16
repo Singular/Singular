@@ -19,7 +19,7 @@ proc generate_weight_str(int j)
 {
   int i;
   string res_str = "(";
-  
+
   for (i=1; i<j; i++)
   {
     res_str = res_str + string(i) + ",";
@@ -60,11 +60,11 @@ proc extend_orderings(list olist, int j)
     o2 = o1;
     o3 = o1;
   }
-      
-  // add weight orderings 
+
+  // add weight orderings
   olist = olist + list("Wp" + weight_string, "wp" + weight_string);
 
-    
+
   for (i=1; i<=size(olist); i++)
   {
     nl = nl + list(olist[i], "(C," + olist[i] + ")", "(c," + olist[i] + ")",
@@ -90,16 +90,16 @@ proc extend_orderings(list olist, int j)
 
   // and, last but not least, a Matrix ordering
   nl = nl + list("M(m)");
-  
+
   return (nl);
 }
-    
+
 proc check_fetch(int n, list olist)
 {
   int i;
   int j;
   list e_olist;
-  
+
   for (j=1; j<=n; j = j + (j div 10) + 1)
   {
     e_olist = extend_orderings(olist, j);

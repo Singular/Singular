@@ -5,7 +5,7 @@ $(FACTORY_INCLUDES) $(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
 ${NTL_CFLAGS} $(FLINT_CFLAGS) ${GMP_CFLAGS}
 
 # noinst???
-noinst_LTLIBRARIES = libcoeffs.la 
+noinst_LTLIBRARIES = libcoeffs.la
 ###### libcoeffsdir = $(libdir)/singular
 # noinst_HEADERS= \
 #	gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h \
@@ -31,7 +31,7 @@ $(FACTORY_LIBS) $(RESOURCES_LIBS) $(OMALLOC_LIBS) \
 $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
 
 TESTS_ENVIRONMENT = SINGULARPATH='${top_srcdir}/../factory:${top_builddir}/../factory'
-TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='$(top_builddir)' 
+TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='$(top_builddir)'
 
 TESTS = test
 check_PROGRAMS = $(TESTS)

@@ -23,7 +23,7 @@ def create_ring(char=0, nvars=1, varNames=None, ordering="dp", degvec=None, regi
     for i in range(nvars):
         v=singular.var(i+1)
         register[str(v)]=v
-        
+
     old_ring.set()
     return res
 
@@ -47,15 +47,15 @@ class EquivalenceRelation(object):
     pass
   def rewrite(self, a,b):
     a=self.canonical(a)
-    b=self.canonical(b)    
+    b=self.canonical(b)
     if not a==b:
       self.mydict[a]=b
   def __getitem__(self,key):
     return self.canonical(key)
   def __setitem__(self, val, key):
     self.rewrite(val,key)
-    
-    
+
+
 class chaintrans(object):
   def __init__(self, chain,full):
     self.table={}

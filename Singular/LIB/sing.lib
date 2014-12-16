@@ -368,9 +368,9 @@ EXAMPLE: example slocus; shows an example
 "
 {
   // quotient rings currently not supported
-  ASSUME( 0, 0==isQuotientRing(basering) ); 
+  ASSUME( 0, 0==isQuotientRing(basering) );
   // integer coefficient rings currently not supported
-  ASSUME( 0, hasFieldCoefficient(basering) ); 
+  ASSUME( 0, hasFieldCoefficient(basering) );
 
 
   def R=basering;
@@ -421,7 +421,7 @@ EXAMPLE: example slocus; shows an example
 {
   ideal ist=std(i);
   if ( size(ist)==0 ) // we have a zero ideal
-  { 
+  {
      // the zero locus of the zero ideal is nonsingular
      return( ideal(1) ) ;
   }

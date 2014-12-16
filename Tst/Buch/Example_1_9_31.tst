@@ -18,7 +18,7 @@ print(S); print( size( module(transpose(S)*transpose(K)) ) );
 
 option(returnSB);
 
-option(); S = syz(K);      
+option(); S = syz(K);
 print(S); print( size( module(transpose(S)*transpose(K)) ) );
 
 K = x+y+z,y+z,z;

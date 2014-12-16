@@ -28,7 +28,7 @@ LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C
 
 //cxxsource = proclist.cc , misc.cc;
 //cxxsource = misc.cc;
-/*cxxsource = sscanf.cc 
+/*cxxsource = sscanf.cc
 */
 
 %%
@@ -51,7 +51,7 @@ example
  *           procedure without any parameter and no return value;
  * PURPOSE:  shows a list of all defined procedure.
  */
-none proclist 
+none proclist
 {
   piShowProcList();
   %return();
@@ -75,7 +75,7 @@ static start_sg
 int mysum(
 	int i,
 	int j
-	) 
+	)
 "Return sum of i and j"
 {
   // generate internal variable declaration
@@ -84,12 +84,12 @@ int mysum(
 
   // generate typecheck and typeconversation code
   %typecheck;
-  
+
   //%return = (void*)((int)i->Data() + (int)j->Data());
   %return = (void *)(i + j);
 }
 example
-{ Demo::mysum(2,3); 
+{ Demo::mysum(2,3);
 }
 
 ideal toid()
@@ -142,12 +142,12 @@ k_test(
 //function="k_test_func";
 {
   %declaration;
-  
+
   printf("Nur ein Test\n");
 
   %typecheck;
   %return;
-  
+
 }
 
 into {

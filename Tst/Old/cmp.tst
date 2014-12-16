@@ -49,6 +49,6 @@ proc check_comp(int n, list olist)
 check_comp(9, orderings);
 
 LIB "tst.lib";tst_status(1);$
-  
-  
+
+
 

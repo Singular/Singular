@@ -166,8 +166,8 @@ m;
 testPrimary(pr2,i);
 kill r;
 
-ring r = 32003,(b,c,d,e,f,g,h,j,k,l),(C,dp); 
-ideal i= 
+ring r = 32003,(b,c,d,e,f,g,h,j,k,l),(C,dp);
+ideal i=
 (l-k)^9,
 (l-k)^8*(l-b),
 (l-k)^7*(l-c),

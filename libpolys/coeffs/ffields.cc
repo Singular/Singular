@@ -796,12 +796,12 @@ nMapFunc nfSetMap(const coeffs src, const coeffs dst)
   {
     return nfMapP;    /* Z/p -> GF(p,n) */
   }
-   
+
   if (src->rep==n_rep_gap_rat) /*Q, Z */
   {
     return nlModP; // FIXME? TODO? // extern number nlModP(number q, const coeffs Q, const coeffs Zp); // Map q \in QQ \to Zp // FIXME!
   }
-   
+
   return NULL;     /* default */
 }
 

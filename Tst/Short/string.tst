@@ -26,7 +26,7 @@ proc MyPrint(def what)
    print(what, "%t");
 }
 
-list l = 1, 2; 
+list l = 1, 2;
 MyPrint(l);
 
 list ll;
@@ -62,13 +62,13 @@ MyPrint(r);
 
 ideal i;
 MyPrint(i);
- 
+
 number n = 12345;
 MyPrint(n);
- 
+
 vector v = [x+1, y];
 MyPrint(v);
- 
+
 poly p = x2+y3+n;
 MyPrint(p);
 
@@ -94,7 +94,7 @@ print(M,"betti");
 print(M, "%b");
 l[2] = M;
 MyPrint(l);
- 
+
 ideal j = z2,x;
 resolution re = res(j,0);
 MyPrint(re);

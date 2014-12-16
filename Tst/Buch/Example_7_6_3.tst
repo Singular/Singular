@@ -21,7 +21,7 @@ ideal f=x*(y-1),y,z*(y-1);
 module N=0;
 isReg(f,N);
 
-f=x*(y-1),z*(y-1),y; 
+f=x*(y-1),z*(y-1),y;
 isReg(f,N);
 
 

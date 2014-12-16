@@ -477,7 +477,7 @@ EXAMPLE: example pwalk; shows an example"
   ideal G = fetch(xR, Go);
 
   G = system("Mpwalk", G, n1, n2, curr_weight, target_weight,nP);
- 
+
   setring xR;
   //kill Go;
 

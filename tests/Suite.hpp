@@ -7,11 +7,11 @@
 
 namespace Singular {
   namespace tests {
-    
+
     class Suite : public CPPUNIT_NS::TestFixture {
     public:
       static CPPUNIT_NS::Test *suite() {
-        CPPUNIT_NS::TestSuite *suiteOfTests = 
+        CPPUNIT_NS::TestSuite *suiteOfTests =
           new CPPUNIT_NS::TestSuite( "SingularTestSuite" );
 
 

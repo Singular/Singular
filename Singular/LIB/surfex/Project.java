@@ -5,29 +5,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.awt.BorderLayout;
@@ -87,9 +87,9 @@ public class Project extends JPanel implements ActionListener {
   public String projectName;
 
   String old_tmpsubdir = "";
- 
+
   String old_surfCodePart1 = "", old_surfCodePart2 = "";
- 
+
   public AppearanceScheme appearanceScheme = new AppearanceScheme();
 
   public boolean saveDone = false;
@@ -100,7 +100,7 @@ public class Project extends JPanel implements ActionListener {
   public String filename;
 
   SavePicDialog savePicDialog;
-  
+
   SaveMovieDialog saveMovieDialog;
 
   RayFrame rayFrame;
@@ -120,7 +120,7 @@ public class Project extends JPanel implements ActionListener {
   JButton bt6 = new JButton();
 
   JButton bt7 = new JButton();
-  
+
   int rand;
 
   JCheckBox raytraceAlways = new JCheckBox("permanently", true);
@@ -134,67 +134,67 @@ public class Project extends JPanel implements ActionListener {
   JTextField clipRadius = new JTextField("9.0");
 
     double scale = 1.0;
-    
+
     String rootFinder = "bezier_all_roots";
     String epsilon = "0.00000000000001";
 
     int interpolConst = 2;
-    JComboBox interpolConstBox = null; 
+    JComboBox interpolConstBox = null;
 
 //  JSlider scaleSlider = null;
 
 //  JLabel scaleLabel = null;
-    
+
     JPanel controlpanel = new JPanel();
-    
+
     EquationAdmin eqAdm;
-    
+
     CurveAdmin cuAdm;
-    
+
     ParameterAdmin parAdmin;
-    
+
     public SolitaryPointsAdmin solPtsAdm;
-    
+
     String tmp_surfex_file = "tmp_surfex.jpg";
-    
-    Project(surfex su, jv4surfex jv4sx, int proNr, String proName) {    
+
+    Project(surfex su, jv4surfex jv4sx, int proNr, String proName) {
 	surfex_ = su;
 	rayFrame = surfex_.rayFrame;
 	this.jv4sx = jv4sx;
 	ProjectNumber = proNr;
 	projectName = proName;
-	
+
 	// create a new temporary filename: tmp_surfex_file
 	Random myRNG = new Random();
 	int myRN = myRNG.nextInt(99999999);
 	//System.out.println("rn:"+myRN);
 	tmp_surfex_file = "tmp_surfex_" + myRN + "_" + proNr + ".jpg";
-	
+
 	savePicDialog = new SavePicDialog(projectName, rayFrame, this, surfex_);
-	
-	
+
+
 	// int i, String filename, RayFrame ray, surfex su,
 	// jv4surfex jv4sx
 	eqAdm = new EquationAdmin(proNr, "", surfex_.rayFrame, surfex_,
 				  surfex_.jv4sx, this);
 	cuAdm = new CurveAdmin(proNr, "", surfex_, this);
-	
+
 	setLayout(new BorderLayout());//new GridLayout(3,1));
 	JPanel toplinePanel = new JPanel(new BorderLayout());
 	JPanel toplineGridPanel = new JPanel(new GridLayout(2, 1));
 	JPanel controlpanel = new JPanel(new FlowLayout());
 	JPanel globalConfigPanel = new JPanel(new FlowLayout());
 	JPanel leftFlushGCPanel = new JPanel(new BorderLayout());
-	
-	
+
+
 	toplinePanel.add(toplineGridPanel, BorderLayout.WEST);
 	toplineGridPanel.add(controlpanel);
 	leftFlushGCPanel.add(globalConfigPanel, BorderLayout.WEST);
 	toplineGridPanel.add(leftFlushGCPanel);
-	
-	
+
+
 	add(toplinePanel, BorderLayout.NORTH);
-	
+
 	parAdmin = new ParameterAdmin(surfex_, this);
 	JSplitPane tempPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 					      new JScrollPane(eqAdm), new JScrollPane(cuAdm));
@@ -205,24 +205,24 @@ public class Project extends JPanel implements ActionListener {
 	//add(tempPanel1,BorderLayout.CENTER);
 	//tempPanel.add(new JScrollPane(eqAdm));
 	//tempPanel.add(new JScrollPane(cuAdm));
-	
+
 	solPtsAdm = new SolitaryPointsAdmin(surfex_, this);
 	JSplitPane tempPanel2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 					       tempPanel1, new JScrollPane(solPtsAdm));
 	tempPanel2.setDividerLocation(300);
 	add(tempPanel2, BorderLayout.CENTER);
-	
+
 	//JPanel controlpanel=new JPanel();
-	
+
 	//this.add(controlpanel, BorderLayout.NORTH);
-	
+
 	JButton closeProject;
 	try {
 	    if ((surfex_.filePrefix).equals("")) {
 		closeProject = new JButton(new ImageIcon("images/closeProject.gif"));
 	    } else {
 		closeProject = new JButton(new ImageIcon(new URL(
-							     surfex_.filePrefix + 
+							     surfex_.filePrefix +
 							     "images/closeProject.gif")));
 	    }
 	} catch (MalformedURLException e) {
@@ -235,10 +235,10 @@ public class Project extends JPanel implements ActionListener {
 	if (!surfex_.inAnApplet) {
 //	    controlpanel.add(closeProject);
 	}
-	
+
 	// some space:
 	controlpanel.add(new JLabel("   "));
-	
+
 	JButton save;
 	try {
 	    if ((surfex_.filePrefix).equals("")) {
@@ -257,7 +257,7 @@ public class Project extends JPanel implements ActionListener {
 	if (!surfex_.inAnApplet) {
 	    //controlpanel.add(save);
 	}
-	
+
 	JButton saveas;
 	try {
 	    if ((surfex_.filePrefix).equals("")) {
@@ -270,14 +270,14 @@ public class Project extends JPanel implements ActionListener {
 	    System.out.println(e.toString());
 	    saveas = new JButton();
 	}
-	saveas.setToolTipText("save this Project as...");    
-	
+	saveas.setToolTipText("save this Project as...");
+
 	saveas.addActionListener(this);
 	saveas.setActionCommand("saveas");
 	//if(!surfex_.inAnApplet) {
 	controlpanel.add(saveas);
 	//}
-	
+
 	// button1:
 	bt3.setText("your files");
 	bt3.setToolTipText("show your files in a new browser window");
@@ -290,7 +290,7 @@ public class Project extends JPanel implements ActionListener {
 	if (surfex_.inAnApplet) {
 	    controlpanel.add(bt3);
 	}
-	
+
 	JButton savePic;
 	try {
 	    if ((surfex_.filePrefix).equals("")) {
@@ -307,7 +307,7 @@ public class Project extends JPanel implements ActionListener {
 	savePic.addActionListener(this);
 	savePic.setActionCommand("savePic");
 	controlpanel.add(savePic);
-	
+
 	JButton saveMovie;
 	try {
 	    if ((surfex_.filePrefix).equals("")) {
@@ -324,7 +324,7 @@ public class Project extends JPanel implements ActionListener {
 	saveMovie.addActionListener(this);
 	saveMovie.setActionCommand("saveMovie");
 	controlpanel.add(saveMovie);
-	
+
 	JButton lampButt;
 	try {
 	    if ((surfex_.filePrefix).equals("")) {
@@ -341,10 +341,10 @@ public class Project extends JPanel implements ActionListener {
 	lampButt.addActionListener(this);
 	lampButt.setActionCommand("configure lamps");
 //    controlpanel.add(lampButt);
-	
+
 	// some space:
 	controlpanel.add(new JLabel("   "));
-	
+
 	//
 	bt6.setText("add param.");
 	bt6.setToolTipText("add a parameter");
@@ -355,7 +355,7 @@ public class Project extends JPanel implements ActionListener {
 		}
 	    });
 	controlpanel.add(bt6);
-	
+
 	//
 	bt1.setText("add eqn.");
 	bt1.setToolTipText("add an equation");
@@ -366,7 +366,7 @@ public class Project extends JPanel implements ActionListener {
 		}
 	    });
 	controlpanel.add(bt1);
-	
+
 	//
 	bt5.setText("add curve");
 	bt5.setToolTipText("add a curve");
@@ -377,7 +377,7 @@ public class Project extends JPanel implements ActionListener {
 		}
 	    });
 	controlpanel.add(bt5);
-	
+
     //
 	bt7.setText("add pt.");
 	bt7.setToolTipText("add a point");
@@ -387,10 +387,10 @@ public class Project extends JPanel implements ActionListener {
 		}
 	    });
 	controlpanel.add(bt7);
-	
+
 	// some space:
 	controlpanel.add(new JLabel("   "));
-	
+
 	//
 	bt2.setText("raytrace");
 	bt2.setEnabled(false);
@@ -402,8 +402,8 @@ public class Project extends JPanel implements ActionListener {
 		}
 	    });
 //	controlpanel.add(bt2);
-	
-	// 
+
+	//
 	//controlpanel.add(new JLabel("permanently"));
 	//    getContentPane().add(bt4);
 	raytraceAlways.addChangeListener(new ChangeListener() {
@@ -413,13 +413,13 @@ public class Project extends JPanel implements ActionListener {
 	    });
 	raytraceAlways.setEnabled(false);
 //	controlpanel.add(raytraceAlways);
-	
+
 	// some space:
 	//controlpanel.add(new JLabel(" "));
-	
+
 	// a checkbox for activating antialiasing
 	globalConfigPanel.add(antialiasing);
-	
+
 	Vector temp = new Vector();
 	temp.add(new Integer(1));
 	temp.add(new Integer(2));
@@ -434,7 +434,7 @@ public class Project extends JPanel implements ActionListener {
 	    });
 	globalConfigPanel.add(new JLabel(" preview quality:"));
 	globalConfigPanel.add(interpolConstBox);
-	
+
 	// a button for choosing the background color:
 	bgColorButton = new JButton();
 	bgColorButton.setBackground(Color.white);
@@ -464,7 +464,7 @@ public class Project extends JPanel implements ActionListener {
 	globalConfigPanel.add(clipMode);
 	globalConfigPanel.add(new JLabel(" clip-radius:"));
 	globalConfigPanel.add(clipRadius);
-	
+
 	/*   // the Slider for scaling:
 	     scaleSlider = new JSlider(1, 1000);
 	     scaleLabel = new JLabel("1.0");
@@ -500,19 +500,19 @@ public class Project extends JPanel implements ActionListener {
     //  controlpanel.add(bt4);
 
 
-	
+
 	rand=(int)(Math.random()*2000000000);
-	
+
 	// muss nach pqrameterAdmin instanziert werden, da auf paramComboBox zurueckgegriffen wird
 	saveMovieDialog = new SaveMovieDialog(projectName, rayFrame, this, surfex_);
-	
+
 	lampAdmin=new LampAdmin(surfex_,this);
-	
-	
-//    jv4sx.disp.getCamera().setScale(1.0);    
-	jv4sx.setScale(1.0);    
+
+
+//    jv4sx.disp.getCamera().setScale(1.0);
+	jv4sx.setScale(1.0);
 //    System.out.println("Scale:" + jv4sx.getScale());
-	
+
     }
 
     public void clear() {
@@ -530,7 +530,7 @@ public class Project extends JPanel implements ActionListener {
     public String getRootFinder() {
 	return(rootFinder);
     }
-    
+
     public void setEpsilon(String s) {
 	epsilon = s;
     }
@@ -538,7 +538,7 @@ public class Project extends JPanel implements ActionListener {
     public String getEpsilon() {
 	return(epsilon);
     }
-    
+
     public double getScale() {
 	return(scale);
     }
@@ -550,13 +550,13 @@ public class Project extends JPanel implements ActionListener {
     public String getClipRadius() {
 	return(clipRadius.getText());
     }
-    
+
     public void setScale(double s) {
 //	System.out.println("setScale P:"+s);
 	scale = s;
 //	jv4sx.setScale(s);
     }
-    
+
     public void setInterpolConst(int c) {
 	interpolConst = c;
     }
@@ -564,7 +564,7 @@ public class Project extends JPanel implements ActionListener {
     public int getInterpolConst() {
 	return(interpolConst);
     }
-  
+
   public Vector getAllLamps(){
   	return lampAdmin.getAllLamps();
   }
@@ -584,16 +584,16 @@ public class Project extends JPanel implements ActionListener {
   public void bt6ActionPerformed(ActionEvent evt) {
     newParameter();
   }
-  
+
   public boolean eqauls(Project p){
   	if(p!=null){
   		return (this.rand==p.rand);
-  		
+
   	}else{
   		System.out.println("error in project.equals(project p):Nullpinter");
   	}
   	return false;
-  	
+
   }
 
   public void newParameter() {
@@ -764,7 +764,7 @@ public class Project extends JPanel implements ActionListener {
         new String[] { "JPG", "JPEG", "jpg", "jpeg",
         //"gif", "tif",
             //"spc",
-//            "sun" 
+//            "sun"
 	});
     fileChooser.addChoosableFileFilter(acfFilter);
 
@@ -790,7 +790,7 @@ public class Project extends JPanel implements ActionListener {
     }
     savePicDialog.setVisible(true);
   }
-  
+
   public void showSaveMovieDialog() {
       if (antialiasing.isSelected()) {
 	  saveMovieDialog.antialiasingQuality.setSelectedIndex(5);
@@ -800,7 +800,7 @@ public class Project extends JPanel implements ActionListener {
       surfex_.showMoviePreview = true;
       saveMovieDialog.setVisible(true);
   }
-    
+
     public String getSuxFile() {
 	String str = "";
     str += "this is surfex v" + surfex_.strVersion + "\n";
@@ -845,7 +845,7 @@ public class Project extends JPanel implements ActionListener {
 		URLConnection connection = url.openConnection();
 		connection.setUseCaches(false);
 		connection.setDoOutput(true);
-		
+
 		PrintWriter out = new PrintWriter(connection.getOutputStream());
 		//System.out.println("save
 		// tmpdir:"+surfex_.getCurrentProject().old_tmpsubdir);
@@ -858,7 +858,7 @@ public class Project extends JPanel implements ActionListener {
 			   + "&prg_code_part1="
 			   + URLEncoder.encode(getSuxFile()));
 		out.close();
-		
+
 		BufferedReader in = new BufferedReader(new InputStreamReader(
 							   connection.getInputStream()));
 		String inputLine = in.readLine();
@@ -870,10 +870,10 @@ public class Project extends JPanel implements ActionListener {
 	    } catch (Exception e) {
 		System.out.println("closeSurfex:" + e.toString());
 	    }
-	    	    
+
 	    return;
 	}
-	
+
 	// Project speichern
 	// lege datei an oder ueberschreibe
 	if (filename == null) {
@@ -893,7 +893,7 @@ public class Project extends JPanel implements ActionListener {
 	    FileOutputStream fo = new FileOutputStream(filename);
 	    /*
 	     * JDK-1.0-Version:
-	     * 
+	     *
 	     * PrintStream ps = new PrintStream(fo); ps.println(dStr);
 	     */
 	    PrintWriter pw = new PrintWriter(fo, true);
@@ -903,12 +903,12 @@ public class Project extends JPanel implements ActionListener {
 	    System.out.println(er);
 	}
     }
-    
+
     // Ereignismethoden
     public void actionPerformed(ActionEvent e) {
 	String command = e.getActionCommand();
 	//  System.out.println(command );
-	
+
 	actionCommand(command);
   }
 
@@ -1075,12 +1075,12 @@ public class Project extends JPanel implements ActionListener {
       // tollen Bildspeicherdialog anzeigen ....
       showSavePicDialog();
     }
-    
+
     if (command == "saveMovie") {
       // tollen Bildspeicherdialog anzeigen ....
       showSaveMovieDialog();
     }
-    
+
     if(command =="configure lamps"){
     	lampAdmin.showall();
     }
@@ -1108,14 +1108,14 @@ public class Project extends JPanel implements ActionListener {
 					 antialiasing, h, w, d, surfex_, this,this.jv4sx.getCamPos(),
 					 this.jv4sx.getViewDir(),this.jv4sx.getUpVector(),this.jv4sx.getRightVector(),
 					 parAdmin.getAllParams(),parAdmin.getAllParamValues(),
-					 this.jv4sx,this.getAllLamps());  
-	
+					 this.jv4sx,this.getAllLamps());
+
 	saveThread.start();
     }
   } // end of saveFile()
-  
-  
-    
+
+
+
     public void loadProject(String filelocation) {
 	try {
 	    filename = filelocation;
@@ -1140,7 +1140,7 @@ public class Project extends JPanel implements ActionListener {
 	    System.out.println(e.toString());
 	}
     }
-    
+
     public void loadProject(URL url) {
 	try {
 	    BufferedReader bs = new BufferedReader(
@@ -1150,18 +1150,18 @@ public class Project extends JPanel implements ActionListener {
 	    System.out.println(e.toString());
 	}
     }
-    
+
     public void loadProject(BufferedReader bs) {
 	try {
 	    String version = bs.readLine().substring(16);
-	    String version_num = version.substring(0, version.indexOf(".")) 
+	    String version_num = version.substring(0, version.indexOf("."))
 		+ version.substring(version.indexOf(".")+1, version.indexOf(".")+3)
 		+ version.substring(version.indexOf(".")+4);
 	    int iVersion = Integer.parseInt(version_num);
-	    
+
 //	    System.out.println("ver:"+iVersion);
 	    String nix = bs.readLine();
-	    String datatype = bs.readLine(); // one out of: "complete", "specify", 
+	    String datatype = bs.readLine(); // one out of: "complete", "specify",
 	    // "onlyeqns", "onlystyle", "eqnsvis"
 	    //System.out.println("datatype:"+datatype);
 	    if (datatype.equals("specify")) {
@@ -1211,12 +1211,12 @@ public class Project extends JPanel implements ActionListener {
 		parAdmin.loadParameters(bs, datatype, iVersion);
 		solPtsAdm.loadSolitaryPoints(bs, datatype, iVersion);
 	    } // end of else
-	    
+
 	} catch (IOException e) {
 	    System.out.println("loadProject-Error:" + e);
 	}
     }
-    
+
     public void scaleSliderUpdated() {
 	//System.out.println("ssUpd:"+Double.parseDouble(scaleLabel.getText()));
 	//  eqAdm.lastScale = Double.parseDouble(scaleLabel.getText());
@@ -1227,7 +1227,7 @@ public class Project extends JPanel implements ActionListener {
 	eqAdm.jv4sx.updateDisp();
 	//surfex_.raytrace();
 	//eqAdm.updateJV4SXandReconstructLastView();
-	
+
     }
 } // end class Project
 

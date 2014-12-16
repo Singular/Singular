@@ -15,7 +15,7 @@ pystr + pyone;
 pystr();
 pystr(1, pyone);
 
-// Compute something in python 
+// Compute something in python
 def result = python_eval("4+5");
 result;
 
@@ -206,7 +206,7 @@ other;
 released = other;  // -> error
 released;
 
-proc from_types(def arg) { 
+proc from_types(def arg) {
   if (typeof(arg) == "poly") { return (from_poly(arg)); }
   if (typeof(arg) == "another") { return (arg.p); }
 }

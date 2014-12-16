@@ -13,7 +13,7 @@ typeof(_);
 kill r;
 ring r=0,(x,y),dp;
 def S=nc_algebra(1,1); setring S;
-// it is a Weyl algebra 
+// it is a Weyl algebra
 S;
 yx;      // not correct input
 y*x;     // correct input

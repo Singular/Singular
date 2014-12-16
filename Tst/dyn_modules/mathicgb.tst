@@ -219,9 +219,9 @@ proc makeHCyclic(int n) {
 
 proc bench(int n) {
   printf("Testing cyclic-%;", n);
-  testGB(makeCyclic(n));  
+  testGB(makeCyclic(n));
   printf("Testing hcyclic-%;", n);
-  testGB(makeHCyclic(n));  
+  testGB(makeHCyclic(n));
 }
 
 bench(7);

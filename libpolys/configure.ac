@@ -76,14 +76,14 @@ case $host_os in
 esac
 
 dnl INCLUDES=""
-dnl dnl OS specific flags and options (does work without the following:) 
+dnl dnl OS specific flags and options (does work without the following:)
 dnl case "$host" in
 dnl     *-*-freebsd*)
 dnl         LIBS="$LIBS -L/usr/local/lib -lc"
 dnl 	CFLAGS="$CFLAGS -I/usr/local/include"
 dnl 	INCLUDES="$INCLUDES -I/usr/local/include"
 dnl 	;;
-dnl esac	
+dnl esac
 dnl AC_SUBST(INCLUDES)
 
 SING_CHECK_OMALLOC()
@@ -96,7 +96,7 @@ AC_ARG_VAR( [RESOURCES_LIBS], [LIBS for libresources] )
 AC_MSG_CHECKING(whether libresources should be used)
 
 if test "x$ENABLE_RESOURCES" = xyes;
-then 
+then
   AC_MSG_RESULT(yes)
 
   AC_MSG_CHECKING([  RESOURCES_INCLUDES?..])
@@ -109,7 +109,7 @@ then
   AC_SUBST(PKG_REQUIRE)
 else
   AC_MSG_RESULT(no)
-fi 
+fi
 
 AM_CONDITIONAL([ENABLE_RESOURCES],[test "x$ENABLE_RESOURCES" = xyes])
 

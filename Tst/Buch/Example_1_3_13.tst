@@ -2,13 +2,13 @@ LIB "tst.lib";
 tst_init();
 
 ring R = 32003,(x,y,z),dp;
-ideal I = x2+y2-z5, z-x-y2;     
-qring Q = groebner(I);  
+ideal I = x2+y2-z5, z-x-y2;
+qring Q = groebner(I);
 Q;
 
 poly f = z2 + y2;
 poly g = z2+2x-2z-3z5+3x2+6y2;
-reduce(f-g,std(0)); 
+reduce(f-g,std(0));
 
 setring R;
 poly f = z2 + y2;
@@ -17,8 +17,8 @@ reduce(f-g,groebner(I));
 
 setring Q;
 ideal q = quotient(0,f);
-q = reduce(q,std(0));     
-size(q);              
+q = reduce(q,std(0));
+size(q);
 kill R;
 kill Q;
 

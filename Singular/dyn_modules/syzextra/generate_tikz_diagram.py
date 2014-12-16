@@ -11,21 +11,21 @@ env = Environment()
 #output_top_node_tmpl = env.from_string(r"""\node[bag,draw] {${{ nodelabel }}$} \mathfootnote{  {{ nodelabel }} \mapsto {%- if noderesult %} {{ noderesult }}  {%- endif %} }""")
 #def output_node(data, top):
 #    #print data['nodename']
-#    if top: 
+#    if top:
 #        return output_top_node_tmpl.render(**data)
 #    else:
 #        return output_node_tmpl.render(**data)
-    
+
 
 
 
 # {{ output_node(self, false) }}
 mypic_node_tmpl = env.from_string(r"""node[bag] {{ '(%d)' % hash(self) }}
-{ 
+{
   {{ '$%s$' % nodelabel if nodelabel }}  \mathfootnote{  {{ ' %s: ' % proc if proc }}  {{ ' %s ' % nodelabel if nodelabel }}  {{ ' \mapsto %s ' % noderesult if noderesult }}  {{ ' (rescale: %s) ' % rescale if rescale }}  {{ ' (look\_up\_poly: %s) ' % look_up_poly if look_up_poly }}  }
 }
 {%- if children %}{%- for child_node in children %}
-child 
+child
 {
 {{ render_node(child_node) | indent(2,true) }}
 }
@@ -35,7 +35,7 @@ edge from parent[ed] node[arr] {    {{ '\mathtiny{%s}' % edgelabel if edgelabel 
 
 
 # name=%d,% hash(self)
-node_tmpl = env.from_string(r"""[ {\mathfootnote{ {{ '%s' % nodelabel if nodelabel }} }{ {{'%s' % proc if proc}}{{',\lambda: %s' % recale if recale}}{{',LUP(%s)' % Lookup if Lookup}}{{'\mapsto %s' % noderesult if noderesult}} } }, {{ 'bag,edge={ed},edge label={node[arr]{ ' }} {{ '\mathtiny{%s}' % edgelabel if edgelabel }} } }  
+node_tmpl = env.from_string(r"""[ {\mathfootnote{ {{ '%s' % nodelabel if nodelabel }} }{ {{'%s' % proc if proc}}{{',\lambda: %s' % recale if recale}}{{',LUP(%s)' % Lookup if Lookup}}{{'\mapsto %s' % noderesult if noderesult}} } }, {{ 'bag,edge={ed},edge label={node[arr]{ ' }} {{ '\mathtiny{%s}' % edgelabel if edgelabel }} } }
  {%- if children %}{%- for child_node in children %}
  {{ render_node(child_node) | indent(2,true) }}
  {%- endfor %}{%- endif %}
@@ -43,7 +43,7 @@ node_tmpl = env.from_string(r"""[ {\mathfootnote{ {{ '%s' % nodelabel if nodelab
 """)
 
 # {{ output_node(self, true) }}
-# name=%d, % hash(self) 
+# name=%d, % hash(self)
 tree_tmpl = env.from_string(r"""[ {\mathfootnote{ {{ '%s' % nodelabel if nodelabel }} }{ {{'%s' % proc if proc}}{{',\lambda: %s' % recale if recale}}{{',LUP(%s)' % Lookup if Lookup}}{{'\mapsto %s' % noderesult if noderesult}} } }, {{ 'bag,draw' }}
  {%- if children %}{%- for child_node in children %}
  {{ render_node(child_node) | indent(2,true) }}
@@ -52,11 +52,11 @@ tree_tmpl = env.from_string(r"""[ {\mathfootnote{ {{ '%s' % nodelabel if nodelab
 
 # {{ output_node(self, true) }}
 mypic_tree_tmpl = env.from_string(r"""\node[bag,draw]  {{ '(%d)' % hash(self) }}
-{ 
+{
   {{ '$%s$' % nodelabel if nodelabel }}  \mathfootnote{  {{ ' %s: ' % proc if proc }}  {{ ' %s ' % nodelabel if nodelabel }}  {{ ' \mapsto %s ' % noderesult if noderesult }}  {{ ' (rescale: %s) ' % rescale if rescale }}  {{ ' (look\_up\_poly: %s) ' % look_up_poly if look_up_poly }}  }
 }
 {%- if children %}{%- for child_node in children %}
-child 
+child
 {
 {{ render_node(child_node) | indent(2, true) }}
 }
@@ -105,9 +105,9 @@ header = r"""
 
 \usepackage{color}   %May be necessary if you want to color links
 \usepackage{hyperref}
-\hypersetup{    
-  colorlinks=true, %set true if you want colored links    
-  linktoc=all,     %set to all if you want both sections and subsections linked    
+\hypersetup{
+  colorlinks=true, %set true if you want colored links
+  linktoc=all,     %set to all if you want both sections and subsections linked
   linkcolor=blue,  %choose some color if you want links to stand out
 }
 
@@ -174,7 +174,7 @@ header = r"""
 % Define styles for bags and leafs
 %\tikzstyle{bag}=[text centered,black]
 %\tikzstyle{arr}=[draw=none,above=1pt,sloped,anchor=base,pos=0.65,opacity=1,gray]
-%% 
+%%
 %\tikzstyle{end} = [circle, minimum width=4pt,fill, inner sep=1pt]
 %\tikzstyle{ed} =[draw,->,very thin,opacity=1,black]
 
@@ -207,7 +207,7 @@ header = r"""
 % \newcommand{\mathtiny}[1]{\ensuremath{{#1}}}
 
 \tikzstyle{arr}=[draw=none,above=2pt,sloped,anchor=base,pos=0.59,opacity=1,gray,font=\scriptsize]
-%% 
+%%
 %\tikzstyle{end} = [circle, minimum width=4pt,fill, inner sep=1pt]
 \tikzstyle{ed} =[dashed,->,thin,opacity=0.5,black]
 
@@ -241,33 +241,33 @@ footer = r"""
 """
 
 
-sections = { -1: '%% -----  ',  0: '\\newpage\\chapter', 1: '\\section', 2: '\\subsection', 3: '\\subsubsection'}    
+sections = { -1: '%% -----  ',  0: '\\newpage\\chapter', 1: '\\section', 2: '\\subsection', 3: '\\subsubsection'}
 
 def printHeader(k, i):
     if i not in sections:
 	i = -1
-    
+
     print( sections[i] + "{" + k + "}\n" );
 
-    
+
 def generateSyzList(data):
 
     for s in data:
         assert( "syzygylayer" in s );
         assert( "diagrams" in s );
-        
+
         printHeader("$SYZ^{" + str( s["syzygylayer"] +"}(M):$" ), 2)
-        
+
         for (i, d) in enumerate(s["diagrams"], start = 1):
             assert( "nodelabel" in d );
 
-            if( "noderesult" in d ):            
+            if( "noderesult" in d ):
                 printHeader("({" + str(i) + "}): $" + str(d["nodelabel"]) + " \mapsto "+ str(d["noderesult"]) + "$", 3)
             else:
                 printHeader("({" + str(i) + "}): $" + str(d["nodelabel"]) + " \mapsto \ldots $", 3)
-                
+
             generate(d)
-            
+
 
 def generateRes(data):
     for (k, v) in data.iteritems():
@@ -278,21 +278,21 @@ def generateRes(data):
 def generateExample(e):
     assert ("Example" in e);
     assert ("computations" in e);
-    
+
     printHeader(e["Example"], 0)
-    
+
     for c in e["computations"]:
         generateRes(c)
-   
+
 def generateTests(data):
     # Top-most level: "EXAMPLES": [ {} ]
-  
+
     for (k, v) in data.iteritems():
         printHeader(k, -1)
         for e in v:
             generateExample(e)
-    
-        
+
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -305,9 +305,9 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--tests", help="input file contains multiple tests / examples / resolutions", action="store_true")
 
     args = parser.parse_args()
-    
+
     raw = open(args.input_file, "r").read().replace('\n', '')
-    
+
     raw = re.sub(r', *}', r'}',    raw)
     raw = re.sub(r', *]', r']',    raw)
     raw = re.sub(r'\@', r'\\\@',     raw)
@@ -315,16 +315,16 @@ if __name__ == "__main__":
     raw = re.sub(r'\%', r'\\\%',     raw)
     raw = re.sub(r'\\*cdot', r'',     raw)
 ###    raw = re.sub(r'\\',   r'\\\\', raw)
-   
+
     if args.view:
         print (raw)
 
     data = simplejson.loads(raw)
-    
+
     if args.dump:
         print( simplejson.dumps(data, indent=3 * ' ') )
-        
-    elif args.gen:    
+
+    elif args.gen:
         if args.full:
             print header
 
@@ -332,11 +332,11 @@ if __name__ == "__main__":
             generateTests(data)
         elif args.res:
             generateRes(data)
-        else:    
+        else:
             generate(data)
 
         if args.full:
             print footer
-        
-        
+
+
 

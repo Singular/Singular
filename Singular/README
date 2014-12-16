@@ -9,7 +9,7 @@
 
 This directory contains the source files for the Singular interpreter and
 the following subdirectories:
- 
+
   'LIB'   -- contains Singular libraries written in Singular's
              programming language
 

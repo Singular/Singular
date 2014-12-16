@@ -7,7 +7,7 @@
 @cindex  Non-commutative LIBs
 @cindex  PLURAL LIBs
 
-@c @sc{Plural} comes with a set of standard libraries. 
+@c @sc{Plural} comes with a set of standard libraries.
 @c Their content is described in the following subsections.
 
 The content of libraries, created for non-commutative extensions of

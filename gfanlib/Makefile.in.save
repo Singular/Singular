@@ -59,7 +59,7 @@ DISTFILES=${SOURCES} ${HEADERS}
 
 OBJS := $(CXXSOURCES:.cpp=.o) $(CSOURCES:.c=.o)
 
-.cpp.o:	
+.cpp.o:
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 .c.o:
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
@@ -80,11 +80,11 @@ install: all
 ##
 ## clean targest
 ##
-mostlyclean: 
+mostlyclean:
 	-rm -f *.o *.og core *.op
 
 clean: mostlyclean
 	-rm -f *.bak *.d *.dd depend *.a *.so*
 
-tags:   
+tags:
 	ctags *.c *.h *.cc *.inc

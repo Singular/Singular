@@ -5,7 +5,7 @@
 # Short Version of the Installation Intructions:
 # ----------------------------------------------
 # (For longer installation instructions, see further down.)
-# 
+#
 # Run this script by typing the following into a shell:
 # ./INSTALL_LINUX
 # This writes a script called "surfex" to a directory contained in your bash path.
@@ -31,7 +31,7 @@
 #         idea: Oliver Labs (2001) during the Dagstuhl workshop Algebra, Geometry, and Software Systems
 #         this version is based on some older code by Richard Morris and Oliver Labs
 #
-# @address previous versions: 
+# @address previous versions:
 #          - (until Oct. 2005): department of mathematics, University of Mainz, Germany
 #          - (until March 2006): RICAM at Linz, Austria
 #          - since then: University of the Saarland (Saarbruecken, Germany)
@@ -64,7 +64,7 @@
 # - Run the INSTALL_LINUX script, e.g. by typing the following into the shell:
 #   ./INSTALL_LINUX
 #
-# - This produces a script, called "surfex" and copies it to a directory contained in your bash path. 
+# - This produces a script, called "surfex" and copies it to a directory contained in your bash path.
 #
 
 #
@@ -91,7 +91,7 @@ function findbinpath() {
     tstbinpath=~/bin
     echo $PATH | grep "$tstbinpath" >$mytmp
     if [ -s $mytmp ] && [ -a $tstbinpath ]; then return 0; fi
-    
+
     echo
     echo
     echo ">>> $tstbinpath is not contained in your bash path."
@@ -101,11 +101,11 @@ function findbinpath() {
     echo "(Please, type 'yes' or 'no' and then press ENTER.)"
     read
     answer="$REPLY"
-    echo 
+    echo
     echo "REPLY:$answer."
-    echo 
+    echo
     if [ "$answer" == "yes" ] && ! [ -d $tstbinpath ]; then mkdir $tstbinpath; fi
-    failmsg="$tstbinpath could not be created. 
+    failmsg="$tstbinpath could not be created.
 Please solve this problem (probably you have to login as superuser (root), and then rerun INSTALL_LINUX."
     if [ "$answer" == "yes" ] && ! [ -d $tstbinpath ]; then failexit; fi
     if [ "$answer" == "yes" ] && [ -d $tstbinpath ]; then echo "export PATH=$tstbinpath:\$PATH" >>~/.bashrc ; fi
@@ -122,7 +122,7 @@ Please solve this problem (probably you have to login as superuser (root), and t
 
     tstbinpath=""
     failmsg="We could not find a nice path in your bash path.
-You chose not to create ~/bin. 
+You chose not to create ~/bin.
 So, please, solve the problem on your own."
     failexit
 }
@@ -164,7 +164,7 @@ function maybecopytopath() {
 }
 
 function failexit() {
-    echo 
+    echo
     # if a message was specified, then display it and exit:
     if [ -n "$failmsg" ]; then echo $failmsg; fi
     if [ -n "$failmsg" ]; then exit; fi
@@ -192,13 +192,13 @@ if [ -s $mytmp ]; then echo "$tstprg found."; else echo "
 
 >>> $tstprg not found!
 
-This problem might be caused by two reasons: 
+This problem might be caused by two reasons:
 
 (1) Either you have not installed java (e.g. from www.java.sun.com) yet.
 In that case, quit INSTALL_LINUX, install java, and rerun INSTALL_LINUX.
 
 (2) Or $tstprg is not contained in your path yet.
-In that case, INSTALL_LINUX can try to solve this problem for you by copying $tstprg to a directory 
+In that case, INSTALL_LINUX can try to solve this problem for you by copying $tstprg to a directory
 which is contained in your path.
 "; fi
 if ! [ -s $mytmp ]; then maybecopytopath; fi
@@ -215,13 +215,13 @@ if [ -s $mytmp ]; then echo "$tstprg found."; else echo "
 
 >>> $tstprg not found!
 
-If you have already installed surf then this problem might be caused by two reasons: 
+If you have already installed surf then this problem might be caused by two reasons:
 
-(1) Either the surf program has a different name (e.g. surf-1.0.5). 
+(1) Either the surf program has a different name (e.g. surf-1.0.5).
 In that case, quit INSTALL_LINUX, rename the surf program to $tstprg, and rerun INSTALL_LINUX.
 
-(2) Or $tstprg is the correct filename, but $tstprg is not contained in your bash path. 
-In that case, INSTALL_LINUX can try to solve the problem for you. 
+(2) Or $tstprg is the correct filename, but $tstprg is not contained in your bash path.
+In that case, INSTALL_LINUX can try to solve the problem for you.
 "; fi
 
 if ! [ -s $mytmp ]; then maybecopytopath; fi
@@ -238,7 +238,7 @@ if [ -s $mytmp ]; then echo "convert found."; else echo "
 
 >>> $tstprg not found!
 
-If you want to produce movies using surfex, 
+If you want to produce movies using surfex,
 then $tstprg has to be contained in your bash path.
 One of the following options should apply:
 
@@ -246,7 +246,7 @@ One of the following options should apply:
 In that case, quit INSTALL_LINUX, install convert, and rerun INSTALL_LINUX.
 
 (2) convert is installed, but $tstprg is not contained in the bash path yet.
-In that case, INSTALL_LINUX can try to solve this problem for you by copying $tstprg to a directory 
+In that case, INSTALL_LINUX can try to solve this problem for you by copying $tstprg to a directory
 which is contained in your path.
 
 (3) I do not want to produce movies using surfex.
@@ -293,7 +293,7 @@ If this does not work, you might have to edit the file \"surfex\".
 Please, contact us if you do not manage to get surfex run on your system.
 "
 
-echo "We are happy to receive any kind of feedback, 
+echo "We are happy to receive any kind of feedback,
 
 Stephan Holzer and Oliver Labs
 
@@ -306,8 +306,8 @@ www.surfex.AlgebraicSurface.net
 # Disclaimer:
 # -----------
 #
-# surfex comes without any warranty. 
-# Feel free to use and distribute surfex. 
+# surfex comes without any warranty.
+# Feel free to use and distribute surfex.
 #
 
 rm $mytmp

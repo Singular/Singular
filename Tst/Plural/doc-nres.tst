@@ -11,7 +11,7 @@ i=std(i);
 resolution F=nres(i,0);
 F;
 for (int a=1;a<=size(list(F));a++)
-{ 
+{
 printf("Module: %s",a);
 print(matrix(F[a]));
 }

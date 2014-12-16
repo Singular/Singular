@@ -5,29 +5,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.awt.BorderLayout;
@@ -59,16 +59,16 @@ import jv.vecmath.*;
 
 public class LampAdmin extends JFrame implements ActionListener {
 
-	final int N=7; // ANzahl Objekte pro Lampe in GUI 
+	final int N=7; // ANzahl Objekte pro Lampe in GUI
 	JPanel[] lampPanel=new JPanel[N+1];
 	JPanel[] lampPanelContent=new JPanel[N+1];
-	
+
 	boolean lastRAB;
 
 	//LampAdminUpdater lampAdminUpdater;
-	
-	//JComboBox paramComboBox; // used for SaveMovieDialog 
- 
+
+	//JComboBox paramComboBox; // used for SaveMovieDialog
+
 	public Vector lampList = new Vector();
 
 //	updateJV4SX();
@@ -77,19 +77,19 @@ public class LampAdmin extends JFrame implements ActionListener {
 	PdVector lastPosition = new PdVector(10.0, 20.0, -20.0);
 	PdVector lastUpVector = new PdVector(0.0, 0.0, 0.0);
 	PdVector lastInterest = new PdVector(0.0, 0.0, 0.0);
-	
+
 	Project pro;
 
 	Lamp theDarkLamp;
-	
+
 	int selectedLamp;
-	
+
 	boolean lampIsSelected=false;
-	
+
 	surfex surfex;
 
 	RayFrame LampPrevRayFrame;//
-	
+
 	JButton addButton = new JButton();
 
 	JSlider scaleSlider;
@@ -97,7 +97,7 @@ public class LampAdmin extends JFrame implements ActionListener {
 	public jv4surfex jv4sx = null;
 
 	boolean showOnlySelectedLamp=true;
-	
+
 	JLabel scaleLabel;
 
 	JPanel Panel = new JPanel(new BorderLayout());
@@ -135,17 +135,17 @@ public class LampAdmin extends JFrame implements ActionListener {
 
 		if (surfex.iaa) {
 			jv4sx = new jv4surfex(true, surfex.theApplet, surfex, 624,100);
-			// surfex.theApplet = theApplet; 
+			// surfex.theApplet = theApplet;
 		} else {
 			jv4sx = new jv4surfex(false, null, surfex,624,100);//, 624);
 		}
 		//System.out.println(vec2Str(jv4sx.getCamPos()));
-		
-	
-			
+
+
+
 			//jv4sx.show();
-			
-			
+
+
 
 		//paramComboBox=new JComboBox();
 
@@ -172,7 +172,7 @@ public class LampAdmin extends JFrame implements ActionListener {
 
 		getContentPane().setLayout(new BorderLayout());
 
-		
+
 		lampPanel[0]=new JPanel(new BorderLayout());
 		for(int kkk=0;kkk<N;kkk++){
 			lampPanel[kkk+1]=new JPanel(new BorderLayout());
@@ -182,10 +182,10 @@ public class LampAdmin extends JFrame implements ActionListener {
 		}
 		//lampPanel[N]=new JPanel(new BorderLayout());
 		//lampPanel[N]=new JPanel(new BorderLayout());
-		
-		
+
+
 		lampPanelContent[N]=new JPanel(new GridLayout(11,1));
-		
+
 		lampPanel[N].add(lampPanelContent[N],BorderLayout.WEST);
 		lampPanelContent[0].add(new JLabel(" Lamp "));
 		lampPanelContent[1].add(new JLabel(" preview "));
@@ -195,16 +195,16 @@ public class LampAdmin extends JFrame implements ActionListener {
 		lampPanelContent[5].add(new JLabel(" intensity "));
 		lampPanelContent[6].add(new JLabel(" color "));
 		lampPanelContent[7].add(new JLabel(" shines "));
-		
-		
+
+
 		//lampPanel[N].add(lampPanel[N-1],BorderLayout.CENTER);
-		
-		
-		
+
+
+
 //		add(lampPanelGes, BorderLayout.CENTER);
 
-		
-		
+
+
 //  ADD-BUTTON
 /*		addButton.setText("add lamp");
 		addButton.setToolTipText("add lamp");
@@ -214,7 +214,7 @@ public class LampAdmin extends JFrame implements ActionListener {
 				addButtonActionPerformed(evt);
 			}
 		});
-		
+
 		controlPanel.add(addButton);
 */
 		//		 a button for choosing the background color:
@@ -244,7 +244,7 @@ public class LampAdmin extends JFrame implements ActionListener {
 				//if(ChangeEvent.)
 				//System.out.println("1 prev invisible");
 				raytraceAlwaysChanged(evt);
-				
+
 			}
 		});
 		controlPanel.add(raytracePreview);
@@ -270,21 +270,21 @@ public class LampAdmin extends JFrame implements ActionListener {
 		      }
 		    });
 
-			
+
 		    int tret;
-		
+
 
 		    loadDefaultLampSettig1();
-		
+
 		lampPanelContent[0].add(new JLabel(" ")); // looks nicer
-		
-		
+
+
 
 		this.setContentPane(Panel);
 		Panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 		this.pack();
 		this.setVisible(false);
-		
+
 		lastRAB=this.raytracePreview.isSelected();
 		//showall();
 
@@ -300,26 +300,26 @@ public class LampAdmin extends JFrame implements ActionListener {
 
 		updateJV4SXandReconstructLastView();
 		//		System.out.println(vec2Str(jv4sx.getCamPos()));
-				
+
 		//		jv4sx.showDefault();
-			
-		
+
+
 		updateRayframeImmediatlyThread = new UpdateRayframeImmediatlyThread(
-				LampPrevRayFrame, surfex, pro, jv4sx,pro.jv4sx, getModifiedLampList(), 
+				LampPrevRayFrame, surfex, pro, jv4sx,pro.jv4sx, getModifiedLampList(),
 				showOnlySelectedLamp,getSelectedLamp());
 		updateRayframeImmediatlyThread.start();
 
-		
-		
+
+
 		//
-	
+
 		SwingUtilities.updateComponentTreeUI(this);
 	}
-	
+
 	public String vec2Str(double[] v) {
 		return ("<" + v[0] + "," + v[1] + "," + v[2] + ">");
 	}
-	
+
 	public Lamp getSelectedLamp(){
 		//System.out.println("sdgdfgfdgfdg");
 		return ((Lamp)lampList.elementAt(selectedLamp));
@@ -335,7 +335,7 @@ public class LampAdmin extends JFrame implements ActionListener {
 	public Vector getModifiedLampList(){
 		Vector lamps=new Vector();
 		lamps.add(getCameraLamp());
-		
+
 		// switch off other lamps
 		makeDarkLamp();
 		lamps.add(theDarkLamp);
@@ -347,11 +347,11 @@ public class LampAdmin extends JFrame implements ActionListener {
 		lamps.add(theDarkLamp);
 		lamps.add(theDarkLamp);
 		return lamps;
-		
+
 	}
-	
+
 	public void loadDefaultLampSettig1(){
-		
+
 		newLamp(-100.000000,100.000000,100.000000,255,255,255,50,true);
 		newLamp(0.000000,100.000000,100.000000,255,255,255,50,false);
 		newLamp(100.000000,100.000000,100.000000,255,255,255,70,true);
@@ -361,24 +361,24 @@ public class LampAdmin extends JFrame implements ActionListener {
 		newLamp(-100.000000,-100.000000,100.000000,255,255,255,50,false);
 		newLamp(0.000000,-100.000000,100.000000,255,255,255,30,true);
 		newLamp(100.000000,-100.000000,100.000000,255,255,255,50,false);
-		
-		
+
+
 		 lampIsSelected=true;
 		setSelectedLamp(2); // Lampe 3 als selected betrachten
 	//	 lampIsSelected=true
 		//	System.out.println("t1"+getSelectedLamp().getXpos());
 	}
-	
+
 	public void makeDarkLamp(){
 		Color c=new Color(0,0,0);
 		theDarkLamp=getNewLamp(0.0,0.0,0.0,c,0,true);
 	}
-	
+
 	public Lamp getNewLamp(double x, double y, double z,
-			Color c, 
+			Color c,
 			int i,
 			boolean shines){
-		
+
 		Lamp lamp=new Lamp(pro,this);//(Lamp)lampList.lastElement();
 		lamp.setKoords(x,y,z);
 		lamp.setIntensity( i);
@@ -386,12 +386,12 @@ public class LampAdmin extends JFrame implements ActionListener {
 		lamp.setIsShining(shines);
 		//SwingUtilities.updateComponentTreeUI(lamp);
 		return lamp;
-		
+
 	}
-	
+
 	public Vector getLampsForJv4sx(){
 		// returned alle Lampen die angeschaltet sind.
-		
+
 		Vector list=new Vector();
 		ListIterator li=lampList.listIterator();
 		Lamp tmp;
@@ -401,20 +401,20 @@ public class LampAdmin extends JFrame implements ActionListener {
 				list.add(tmp);
 //				System.out.println(tmp.lampNo+" "+selectedLamp);
 			}
-		}		
+		}
 //		while(list.size()<9){
 	//		list.add(theDarkLamp);
 		//	System.out.println(theDarkLamp.getXpos());
-			
+
 	//	}
 		return list;
 	}
-	
+
 	public boolean lampIsSelected(){
 		return lampIsSelected;//selectedLamp)==null)?false:true;
 	}
 	public synchronized void setSelectedLamp(int no){
-		
+
 		if(lampIsSelected()){
 			if(updateRayframeImmediatlyThread!=null){
 				updateRayframeImmediatlyThread.stop();
@@ -427,36 +427,36 @@ public class LampAdmin extends JFrame implements ActionListener {
 		//System.out.println("joahr----"+((Lamp)getAllLamps().firstElement()).getXpos());
 			jv4sx.setLamps(getLampsForJv4sx());
 		//	System.out.println("joahr2");
-		
+
 		}
 		lampIsSelected=true;
 		}else{
 			selectedLamp=no;
 		}
-		
-		
+
+
 		getSelectedLamp().setSelected(true);
 	//	System.out.println("7"+vec2Str(jv4sx.getCamPos()));
 	//	System.out.println("t1"+getSelectedLamp().getXpos());
-		
+
 		updatePreview();
 	//	System.out.println("8"+vec2Str(jv4sx.getCamPos()));
 	//	System.out.println("t1"+getSelectedLamp().getXpos());
 	//	System.out.println("joahr3");
 	}
-	
+
 	public void updatePreview(){
 		jv4sx.showDefault();
 		jv4sx.disp.getCamera().setPosition(getSelectedLamp().getPos());
-		
-		
+
+
 		newUpdateRayframeImmediatlyThread();
 		jv4sx.updateDisp();
 	}
-	
+
 	public Vector getAllLamps(){
 		// returned alle Lampen die angeschaltet sind.
-		
+
 		Vector list=new Vector();
 		ListIterator li=lampList.listIterator();
 		Lamp tmp;
@@ -465,17 +465,17 @@ public class LampAdmin extends JFrame implements ActionListener {
 			if(tmp.isShining()){
 				list.add(tmp);
 			}
-		}		
+		}
 		while(list.size()<9){
 			list.add(theDarkLamp);
 		//	System.out.println(theDarkLamp.getXpos());
-			
+
 		}
 		return list;
 	}
-	
+
 	public void newLamp(double x, double y, double z,
-			int r, int g, int b, 
+			int r, int g, int b,
 			int i,
 			boolean shines){
 		newLamp();
@@ -485,11 +485,11 @@ public class LampAdmin extends JFrame implements ActionListener {
 		lamp.setColor(r,g,b);
 		lamp.setIsShining(shines);
 		//SwingUtilities.updateComponentTreeUI(lamp);
-		
-		
+
+
 	}
-	
-	
+
+
 
 	public void raytracePreviewChanged(ChangeEvent evt) {
 
@@ -508,7 +508,7 @@ public class LampAdmin extends JFrame implements ActionListener {
 			}else {
 		//		System.out.println("prev invisible");
 				jv4sx.setVisible(false);
- 
+
 				lastRAB = showTriangPrev.isSelected();
 			}
 		}
@@ -528,7 +528,7 @@ public class LampAdmin extends JFrame implements ActionListener {
 			}else {
 		//		System.out.println("prev invisible");
 				this.LampPrevRayFrame.setVisible(false);
- 
+
 				lastRAB = raytracePreview.isSelected();
 			}
 		}
@@ -561,9 +561,9 @@ public class LampAdmin extends JFrame implements ActionListener {
 		System.out.println("close");
 		lampManagerInvisible();
 	}
-	
-	
-	
+
+
+
 	public void lampManagerInvisible(){
 		setVisible(false);
 		this.LampPrevRayFrame.setVisible(false);
@@ -698,12 +698,12 @@ public class LampAdmin extends JFrame implements ActionListener {
 
 	/*public Vector getParameterNames(){
 	 Vector l = new Vector();//new String[lampList.size()];
-	 
+
 	 ListIterator li = lampList.listIterator();
 	 while (li.hasNext()) {
 	 l.add(((OneParameter)li.next()).nameLabel.getText()) ;
 	 //i++;
-	 }		
+	 }
 	 return l;
 	 }*/
 
@@ -728,13 +728,13 @@ public class LampAdmin extends JFrame implements ActionListener {
 		setVisible(true);
 		toFront();
 	}
-	
+
 	public void lampManagerToFront(){
 		this.setVisible(true);
 		LampPrevRayFrame.setVisible(true);
 		jv4sx.setVisible(true);
 	}
-	
+
 	public void updateJV4SXandReconstructLastView() {
 		//  System.out.println("updateJV4SXandRec...");
 		//  jv4sx.disp.getCamera().setUpVector(lastUpVector);
@@ -745,8 +745,8 @@ public class LampAdmin extends JFrame implements ActionListener {
 				+ "(uses JavaView)");
 		jv4sx.updateDisp();
 	}
-	
-	
+
+
 
 } // end class ParameterAdmin
 

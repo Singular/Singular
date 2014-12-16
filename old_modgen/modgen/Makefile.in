@@ -125,12 +125,12 @@ scanner.cc: scanner.l mod_grammar.h modgen.h
 ############################################################
 clean:
 	rm -f *.o core modgen
-	rm -f decl.inc 
+	rm -f decl.inc
 	rm -f pathnames.h
 
 distclean: clean
-	rm -f a.out *~ 
-	rm -f mod_grammar.cc mod_grammar.h decl.inc 
+	rm -f a.out *~
+	rm -f mod_grammar.cc mod_grammar.h decl.inc
 #	rm -f Makefile
 
 

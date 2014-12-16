@@ -39,7 +39,7 @@ function(add_grammar  GEN_TARGET GEN_CPP_FILE GEN_H_FILE INFILE)
   add_custom_command(OUTPUT ${_GEN_CPP_FILE}
     COMMAND ${BISON} ${_OPT} -o ${_GEN_CPP_FILE} ${INFILE}
     COMMAND mv ${NAME}.hpp ${_GEN_H_FILE}
-     
+
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_SOURCE_CPP_FILE} ${_GEN_CPP_FILE}
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_SOURCE_H_FILE} ${_GEN_H_FILE}
 

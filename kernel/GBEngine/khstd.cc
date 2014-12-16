@@ -204,5 +204,5 @@ if(newhilb->compare(hilb) == 0)
    }
 
 id_Delete(&Lm,currRing);
-	
+
 }

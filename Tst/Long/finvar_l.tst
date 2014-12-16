@@ -106,7 +106,7 @@ tst_status();
 kill R6;
 
 ring R7 = (0),(a,b,c,d,e,f),(L(255),dp(6),C);
-matrix A1[6][6] = 
+matrix A1[6][6] =
 0,0,1,0,0,0,
 1,0,0,0,0,0,
 0,1,0,0,0,0,
@@ -137,7 +137,7 @@ tst_status();
 kill R7;
 
 ring R8 = (0),(a,b,c,d,e,f),(L(255),dp(6),C);
-matrix A1[6][6] = 
+matrix A1[6][6] =
 1,0,0,0,0,0,
 0,0,0,1,0,0,
 0,0,0,0,1,0,
@@ -168,7 +168,7 @@ tst_status();
 kill R8;
 
 ring R9 = 0,(x(1..6)),(L(255),dp);
-matrix A1 [6][6]= 
+matrix A1 [6][6]=
 0,0,0,0,0,1,
 0,0,0,0,1,0,
 0,0,0,1,0,0,
@@ -199,7 +199,7 @@ tst_status();
 kill R9;
 
 ring R10 = 0,(x(1..8)),(L(255),dp);
-matrix A1 [8][8]= 
+matrix A1 [8][8]=
 0,0,0,0,0,0,0,1,
 0,0,0,0,0,0,1,0,
 0,0,0,0,0,1,0,0,
@@ -270,9 +270,9 @@ matrix IS2 = irred_secondary_no_molien(L[1],REY,1);
 // the following is not unique!
 IS2;
 tst_status();
-// these are the elementary symmetric polynomials, 
+// these are the elementary symmetric polynomials,
 // that can be used as primary invariants in this example:
-matrix P[1][7] = 
+matrix P[1][7] =
 x(1)+x(2)+x(3)+x(4)+x(5)+x(6)+x(7),
 x(1)*x(2)+x(1)*x(3)+x(1)*x(4)+x(2)*x(3)+x(2)*x(4)+x(3)*x(4)+x(1)*x(5)+x(2)*x(5)+x(3)*x(5)+x(4)*x(5)+x(1)*x(6)+x(2)*x(6)+x(3)*x(6)+x(4)*x(6)+x(5)*x(6)+x(1)*x(7)+x(2)*x(7)+x(3)*x(7)+x(4)*x(7)+x(5)*x(7)+x(6)*x(7),
 x(1)*x(2)*x(3)+x(1)*x(2)*x(4)+x(1)*x(3)*x(4)+x(2)*x(3)*x(4)+x(1)*x(2)*x(5)+x(1)*x(3)*x(5)+x(1)*x(4)*x(5)+x(2)*x(3)*x(5)+x(2)*x(4)*x(5)+x(3)*x(4)*x(5)+x(1)*x(2)*x(6)+x(1)*x(3)*x(6)+x(1)*x(4)*x(6)+x(1)*x(5)*x(6)+x(2)*x(3)*x(6)+x(2)*x(4)*x(6)+x(2)*x(5)*x(6)+x(3)*x(4)*x(6)+x(3)*x(5)*x(6)+x(4)*x(5)*x(6)+x(1)*x(2)*x(7)+x(1)*x(3)*x(7)+x(1)*x(4)*x(7)+x(1)*x(5)*x(7)+x(1)*x(6)*x(7)+x(2)*x(3)*x(7)+x(2)*x(4)*x(7)+x(2)*x(5)*x(7)+x(2)*x(6)*x(7)+x(3)*x(4)*x(7)+x(3)*x(5)*x(7)+x(3)*x(6)*x(7)+x(4)*x(5)*x(7)+x(4)*x(6)*x(7)+x(5)*x(6)*x(7),
@@ -348,11 +348,11 @@ TST13a==TST13b;
 tst_status();
 
 ring R14 = 0,(x(1..9)),dp;
-matrix Gperm = 
+matrix Gperm =
    invariant_algebra_perm(list(list(list(1,2,3,4,5,6,7,8,9))));
 tst_status();
 list L = group_reynolds(GetGroup(list(list(list(1,2,3,4,5,6,7,8,9)))));
-matrix Grey  = 
+matrix Grey  =
    invariant_algebra_reynolds(L[1]);
 tst_status();
 // the following is not unique!

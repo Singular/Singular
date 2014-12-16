@@ -9,7 +9,7 @@ int homalg_variable_i; int homalg_variable_j; int homalg_variable_k; list homalg
 proc IsMemberOfList (int i, list l)
 {
   int k = size(l);
-  
+
   for (int p=1; p<=k; p++)
   {
     if (l[p]==i)
@@ -26,7 +26,7 @@ proc Difference (list a, list b)
   list c;
   int s=size(a);
   int l = 1;
-  
+
   for (int p=1; p<=s; p++)
   {
     if (IsMemberOfList(a[p],b)==0)
@@ -136,7 +136,7 @@ proc GetColumnIndependentUnitPositions (matrix M, list pos_list)
 {
   int m = nrows(M);
   int n = ncols(M);
-  
+
   list rest;
   for (int o=m; o>=1; o--)
   {
@@ -147,7 +147,7 @@ proc GetColumnIndependentUnitPositions (matrix M, list pos_list)
   list rest2;
   list pos;
   int i; int k; int a; int s = 1;
-  
+
   for (int j=1; j<=n; j++)
   {
     for (i=1; i<=r; i++)
@@ -178,7 +178,7 @@ proc GetColumnIndependentUnitPositionsLocal (matrix M, list pos_list, matrix max
 {
   int m = nrows(M);
   int n = ncols(M);
-  
+
   list rest;
   for (int o=m; o>=1; o--)
   {
@@ -189,7 +189,7 @@ proc GetColumnIndependentUnitPositionsLocal (matrix M, list pos_list, matrix max
   list rest2;
   list pos;
   int i; int k; int a; int s = 1;
-  
+
   for (int j=1; j<=n; j++)
   {
     for (i=1; i<=r; i++)
@@ -220,7 +220,7 @@ proc GetRowIndependentUnitPositions (matrix M, list pos_list)
 {
   int m = nrows(M);
   int n = ncols(M);
-  
+
   list rest;
   for (int o=n; o>=1; o--)
   {
@@ -231,7 +231,7 @@ proc GetRowIndependentUnitPositions (matrix M, list pos_list)
   list rest2;
   list pos;
   int j; int k; int a; int s = 1;
-  
+
   for (int i=1; i<=m; i++)
   {
     for (j=1; j<=r; j++)
@@ -262,7 +262,7 @@ proc GetRowIndependentUnitPositionsLocal (matrix M, list pos_list, matrix max_id
 {
   int m = nrows(M);
   int n = ncols(M);
-  
+
   list rest;
   for (int o=n; o>=1; o--)
   {
@@ -273,7 +273,7 @@ proc GetRowIndependentUnitPositionsLocal (matrix M, list pos_list, matrix max_id
   list rest2;
   list pos;
   int j; int k; int a; int s = 1;
-  
+
   for (int i=1; i<=m; i++)
   {
     for (j=1; j<=r; j++)
@@ -810,7 +810,7 @@ proc NonTrivialWeightedDegreePerColumnWithRowPosition (matrix M, weights)
 }
 
 
-proc Diff (matrix m, matrix n) // following the Macaulay2 convention 
+proc Diff (matrix m, matrix n) // following the Macaulay2 convention
 {
   int f = nrows(m);
   int p = ncols(m);

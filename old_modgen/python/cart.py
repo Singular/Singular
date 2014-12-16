@@ -3,7 +3,7 @@ def xcombine(*seqin):
     '''returns a generator which returns combinations of argument sequences
 for example xcombine((1,2),(3,4)) returns a generator; calling the next()
 method on the generator will return [1,3], [1,4], [2,3], [2,4] and
-StopIteration exception.  This will not create the whole list of 
+StopIteration exception.  This will not create the whole list of
 combinations in memory at once.'''
     def rloop(seqin,comb):
         '''recursive looping function'''
@@ -11,7 +11,7 @@ combinations in memory at once.'''
             for item in seqin[0]:
                 newcomb=comb+[item]     # add next item to current combination
                 # call rloop w/ remaining seqs, newcomb
-                for item in rloop(seqin[1:],newcomb):   
+                for item in rloop(seqin[1:],newcomb):
                     yield item          # seqs and newcomb
         else:                           # processing last sequence
             yield comb                  # comb finished, add to list
@@ -20,7 +20,7 @@ combinations in memory at once.'''
 def cartn(sequence, n):
   tocombine=list(itertools.repeat(sequence,n))
   return itertools.imap(tuple,xcombine(*tocombine))
-  
+
 if __name__=='__main__':
   for i in cartn([1,2,3],4):
     print i

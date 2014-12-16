@@ -4,9 +4,9 @@ tst_init();
 
 ring A = 0,x,lp;
 number n = 12345/6789;
-n^5; 
+n^5;
 
-ring A1 = 32003,x,lp; 
+ring A1 = 32003,x,lp;
 number(123456789)^5;
 
 ring A2 = (2^3,a),x,lp;

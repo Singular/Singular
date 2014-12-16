@@ -23,5 +23,5 @@
 
 add extra suffix __T
 
-+ names: 
++ names:
 #define p_Copy p_Copy__FieldGeneral_LengthGeneral_OrdGeneral

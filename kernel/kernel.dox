@@ -1,13 +1,13 @@
 /*!
  \page kernel_page Several involved mathematical algorithms (kernel)
- 
+
  \brief Some core mathematical algorithms
 
  These algorithms rely on \ref libpolys_page.
- 
+
  The files in `/kernel/` directory are combined into a internal library
  kernelCommon, which contains the functions (e.g. \ref rChangeCurrRing in \ref kernel/polys.h)
- and data members (e.g. \ref currRing in \ref kernel/polys.h) 
+ and data members (e.g. \ref currRing in \ref kernel/polys.h)
  that can be shared among the following sub-packages:
 
  - \subpage kernel_numeric_page
@@ -19,8 +19,8 @@
  - \subpage kernel_spectrum_page
  - \subpage kernel_linear_algebra_page
  - \subpage kernel_oswrapper_page
- 
- 
+
+
  Main header(s) of kernelCommon:
  - \ref kernel/digitech.h
  - \ref kernel/fast_mult.h
@@ -29,8 +29,8 @@
  - \ref kernel/polys.h
  - \ref kernel/preimage.h
  - \ref kernel/structs.h
- 
- Basic Singular mathematical algorithms are described in 
+
+ Basic Singular mathematical algorithms are described in
  <A HREF="ftp://www.mathematik.uni-kl.de/pub/Math/Singular/doc/singular_algorithms.tex.gz">singular_algorithms.tex.gz</A>
 
  \verbinclude kernel/README

@@ -10,7 +10,7 @@ proc sortPDZ(list l)
    intvec save_opt=option(get);
    option(redSB,redTail);
    for(i=1;i<=size(l);i++){l[i][1]=std(l[i][1]);l[i][2]=std(l[i][2]);}
-   option(set,save_opt); 
+   option(set,save_opt);
    notReady=1;
    while(notReady)
    {
@@ -35,7 +35,7 @@ proc sortPDZ(list l)
          }
       }
    }
-   return(l);  
+   return(l);
 }
 
 proc compareI(ideal I, ideal J)
@@ -53,7 +53,7 @@ sortPDZ(primdecZ(I,3));
 
 
 ring R3 = integer,(w,z,y,x),dp;
-ideal I = 2*3*181*32003, xzw+(-y^2+y)*z^2, (-x^2+x)*w^2+yzw, 
+ideal I = 2*3*181*32003, xzw+(-y^2+y)*z^2, (-x^2+x)*w^2+yzw,
           ((y^4-2*y^3+y^2)*x-y^4+y^3)*z^3,y2z2w+(-y*4+2*y^3-y^2)*z3;
 sortPDZ(primdecZ(I,1));
 sortPDZ(primdecZ(I,3));
@@ -75,7 +75,7 @@ sortPDZ(primdecZ(I,3));
 sortPDZ(primdecZ(I,4));
 
 ring R8 = integer,(x,y,z),dp;
-ideal I = x2-y2-(z+2)^2, xy-(z+2)^2, 
+ideal I = x2-y2-(z+2)^2, xy-(z+2)^2,
           y3+x*(z+2)^2-y*(z+2)^2+2*(z+2)^3+xy-(z+2)^2,
           -y^2*(z+2)^2+2*(z+2)^4+x2-y2+(z+2)^2,
           y3z9+3y2z10+3yz11+z12-y2z2+2z4;
@@ -123,7 +123,7 @@ ideal I = 181*49^2, x(4)^4, x(1)*x(4)^3, x(1)*x(2)*x(4)^2,
 sortPDZ(primdecZ(I,1));
 sortPDZ(primdecZ(I,3));
 
-ring R15 = integer,(x,y,z),dp;  
+ring R15 = integer,(x,y,z),dp;
 ideal I = 32003*181*64,
           ((z^2-z)*y^2 + (z^2 -z)*y)*x,
           (z*y^3 + z*y^2)*x,

@@ -44,7 +44,7 @@ list P2CV(list pl,int d0,int d1) {
     WerrorS("no ring active");
     return TRUE;
   }
-  
+
   %typecheck;
   %return(pcvP2CV(pl, d0, d1));
 }
@@ -59,7 +59,7 @@ list CV2P(list pl,int d0,int d1)
     WerrorS("no ring active");
     return TRUE;
   }
-  
+
   %typecheck;
   %return(pcvCV2P(pl, d0, d1));
 }
@@ -74,7 +74,7 @@ int Dim(int d0,int d1)
     WerrorS("no ring active");
     return TRUE;
   }
-  
+
   %typecheck;
   %return(pcvDim);
 }
@@ -89,7 +89,7 @@ list Basis(int d0,int d1)
     WerrorS("no ring active");
     return TRUE;
   }
-  
+
   %typecheck;
   %return(pcvBasis);
 }

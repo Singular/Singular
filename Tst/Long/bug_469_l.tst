@@ -17,14 +17,14 @@ g3 = genus(J,"nor");
 g3;
 
 
-ASSUME(0, g1==g2 && g2==g3 ); 
+ASSUME(0, g1==g2 && g2==g3 );
 
-/* needs too long... 
+/* needs too long...
 
 LIB("normal.lib");
 ring  r = 0,(y,x),dp;
 ideal I = y^5-y^3-y*x^5-x^9;
-dim(std(I) ); 
+dim(std(I) );
 g1 = genus(I);
 g1;
 g2 = genus(I,"pri");
@@ -33,7 +33,7 @@ g3 = genus(I,"nor");
 g3;
 
 
-ASSUME(0, g1==g2 && g2==g3 ); 
+ASSUME(0, g1==g2 && g2==g3 );
 
 list nor = normal(I);
 
@@ -48,7 +48,7 @@ g3 = genus(s,"nor");
 g3;
 
 
-ASSUME(0, g1==g2 && g2==g3 ); 
+ASSUME(0, g1==g2 && g2==g3 );
 
 
 LIB("normal.lib");
@@ -64,7 +64,7 @@ g3 = genus(J,"nor");
 g3;
 
 
-ASSUME(0, g1==g2 && g2==g3 ); 
+ASSUME(0, g1==g2 && g2==g3 );
 
 
 kill rng;

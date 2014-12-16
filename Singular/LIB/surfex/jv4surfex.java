@@ -7,38 +7,38 @@
 //
 // Parts of this file were written by Eike Preuss (a javaview developer)
 //
-/** 
+/**
  * Load a file, display, on request return rotation.
- * 
+ *
  * @see     jv.viewer.PvViewer
  * @author    Eike Preuss
  * @version   17.10.01, 1.00 created (ep) copied from javaview.java :-)<br>
- */ 
+ */
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.applet.AppletContext;
@@ -74,11 +74,11 @@ import jv.vecmath.PdVector;
 
 public class jv4surfex {
     private boolean inAnApplet = false;
-    
+
     double lastScale,factor;
-    
+
     Vector lamps=new Vector();
-    
+
     double scale = 1.0;
     public double scaleMin = 0.0;
     public double scaleMax = 10.0;
@@ -87,20 +87,20 @@ public class jv4surfex {
     JTextField scaleLabelMin = null;
     JTextField scaleLabelMax = null;
     JTextField scaleLabelCur = null;
-    
+
     LampAdminUpdater lampAdminUpdater;//=new LampAdminUpdater();
-    
+
     private Frame frame = null;
 
-    Panel pScale = null;    
+    Panel pScale = null;
     //    public PvDisplayIf disp = null;
-    
+
     int xPos = 824;
-    
+
     boolean lastb=false;
-    
+
     Frame jv4sxFrame;
-    
+
     public void setScaleMinMax(double smin, double smax) {
 	scaleMin = smin;
 	scaleMax = smax;
@@ -113,7 +113,7 @@ public class jv4surfex {
 
     public void setScale(double s) {
 //	System.out.println("setScale jv4:"+s);
-	scale = s; 
+	scale = s;
 //	System.out.println("scale1:"+scale);
 	try {
 	    surfex_.getCurrentProject().setScale(scale);
@@ -129,32 +129,32 @@ public class jv4surfex {
 //	System.out.println("scale2:"+scaleLabelCur.getText()+","+scale);
 	updateDisp();
     }
-    
+
     public double getScale() {
 //	System.out.println("scale:"+scale);
 	return(scale);
     }
-    
+
     public void setVisible(boolean b){
 	frame.setVisible(b);
     }
-    
+
     public PvDisplay disp = null;
-    
+
     surfex surfex_;
-    
-    public jv4surfex(boolean iaa, Applet theApplet, surfex sx, 
+
+    public jv4surfex(boolean iaa, Applet theApplet, surfex sx,
 		     int xPos, JTextField x,JTextField y,JTextField z) {
 	this.xPos = xPos;
 	init(iaa, theApplet, sx,x,y,z,1);
     }
-    public jv4surfex(boolean iaa, Applet theApplet, surfex sx, 
+    public jv4surfex(boolean iaa, Applet theApplet, surfex sx,
 		     int xPos, double factor) {
 	this.xPos = xPos;
 	init(iaa, theApplet, sx, new JTextField(),
 	     new JTextField(), new JTextField(),factor);
     }
-    
+
     public jv4surfex(boolean iaa, Applet theApplet, surfex sx,
 		     JTextField x,JTextField y,JTextField z) {
 	init(iaa, theApplet, sx,x,y,z,1);
@@ -164,14 +164,14 @@ public class jv4surfex {
 		     JTextField x,JTextField y,JTextField z,
 		     double factor) {
 	init(iaa, theApplet, sx,x,y,z,factor);
-    } 
-    
+    }
+
     public void init(boolean iaa, Applet theApplet, surfex sx,
 		     JTextField x,JTextField y,JTextField z, double factor){
 	inAnApplet = iaa;
 	surfex_ = sx;
 	lampAdminUpdater=new LampAdminUpdater(factor, scaleMin, scaleMax);
-	
+
 	this.factor=factor;
 	frame = new Frame("triangulated view - surfex (uses JavaView)");
 	frame.setLayout(new BorderLayout());
@@ -193,10 +193,10 @@ public class jv4surfex {
 	//    cam.setUpVector(new PdVector(0.0,1.0,0.0));
 	//    cam.setViewDir(new PdVector(1.0,2.0,2.0));
 	//    cam.setPosition(new PdVector(10.0,20.0,-20.0));
-	
+
 	// Add display to frame
 	frame.add(BorderLayout.CENTER, (Component) disp);
-	
+
 	// the Slider for scaling:
 	scaleSlider = new JSlider(1, 1000);
 	scale = 1.0;
@@ -210,7 +210,7 @@ public class jv4surfex {
 // 	labelTable.put(new Integer(500), new JLabel("5"));
 // 	labelTable.put(new Integer(1000), new JLabel("10"));
 //	scaleSlider.setLabelTable(labelTable);
-	
+
 /*	    scaleSlider.addChangeListener(new ChangeListener() {
 	    public void stateChanged(ChangeEvent evt) {
 	    String str = "" + scaleSlider.getValue();// / 100.0;
@@ -274,7 +274,7 @@ public class jv4surfex {
 	pScale.add(BorderLayout.SOUTH, pScaleVals);
 
 	frame.add(BorderLayout.SOUTH, pScale);
-	
+
 //	    p2.add(BorderLayout.CENTER,p3);
 	//add(scaleLabel);
 	p2.add(BorderLayout.SOUTH,scaleSlider);
@@ -284,41 +284,41 @@ public class jv4surfex {
 	p3.add(y);
 	p3.add(new JLabel(" z:"));
 	p3.add(z);
-	
+
 	frame.pack();
 	// Position of left upper corner and size of frame when run as application.
-	
+
 	frame.setBounds(new Rectangle(xPos, 0, 200, 200));
-	
+
 	frame.setVisible(false);
-	
+
 	lampAdminUpdater.setJv4sx(this);
 	lampAdminUpdater.setSlider(scaleSlider);
 	lampAdminUpdater.setPosTextFields(x,y,z);
 	lampAdminUpdater.start();
-	
+
     }
-    
+
     public void setPosTextFields2(JTextField x,JTextField y,JTextField z){
-	
+
 	lampAdminUpdater.setPosTextFields2(x,y,z);
     }
     public void setPosTextFields(JTextField x,JTextField y,JTextField z){
-	
+
 	lampAdminUpdater.setPosTextFields(x,y,z);
     }
-    
+
     /*public void setCamPos(double x, double y, double z){
       lampAdminUpdater.setCamPos(x,y,z);
       }*/
-    
-    
-    
+
+
+
     /*public void updateScaleSliderValue(){
       scaleSlider.setValue((int)disp.getCamera().getScale());
       scaleLabel.setText(Double.toString(disp.getCamera().getScale()));
       }*/
-    
+
     /*public void scaleSliderUpdated() {
     //System.out.println("ssUpd:"+Double.parseDouble(scaleLabel.getText()));
     lastScale = Double.parseDouble(scaleLabel.getText());
@@ -329,16 +329,16 @@ public class jv4surfex {
     System.out.println("testsjfd"+lastScale);
     //surfex_.raytrace();
     //eqAdm.updateJV4SXandReconstructLastView();
-    
+
     }*/
-    
+
     public void changeFrameTitle(String s) {
 	frame.setTitle(s);
     }
-    
+
     public void show() {
 //	     System.out.println("s44 "+disp.getCamera().getScale());
-	
+
 	double lastScale_tmp=disp.getCamera().getScale();
 	frame.setVisible(true);
 	setScale(scale);
@@ -349,7 +349,7 @@ public class jv4surfex {
 	frame.toFront();
 	//	disp.fit();
     }
-    
+
     public void setParameterWarning(boolean b){
 	if(b!=lastb){
 	    if(b){
@@ -361,48 +361,48 @@ public class jv4surfex {
 	    }
 	}
     }
-    
+
     public void hide() {
 	frame.setVisible(false);
     }
-    
+
     public void setLamps(Vector lamps){
 	this.lamps=lamps;
 //		System.out.println("222joahr----"+((Lamp)lamps.firstElement()).getXpos());
-	
+
     }
-    
+
     public boolean showDefault() {
 	//	System.out.println("showDefault()");
 	PgElementSet geom = new PgElementSet();
 	PgElementSet geom2 = new PgElementSet();
 	PgElementSet[] geoma = new PgElementSet[9];
-	
-	
+
+
 	geom.setName("Sphere");
 	// Compute coordinates and mesh of a geometry. Other tutorials
 	// show more details how to create one geometries.
 	//geom.setNumElements(lamps.size());
-	
+
 	//geom.(new PdVector(100000000,100,100));
 	//geom.setCenter(new PdVector(100000000,100,100));
-	
+
 	geom.computeSphere(10, 10, factor/3);
 	//	geom.setTransparency(1000.5);
-	
+
 	disp.removeGeometries();
-	
-	
+
+
 	int i=lamps.size()-1;
 	Lamp l;
 //		System.out.println("lampsize:"+lamps.size());
 	for(i=0;i<lamps.size();i++){
 	    //	System.out.println("333joahr----"+((Lamp)lamps.firstElement()).getXpos());
-	    
+
 	    l=(Lamp)lamps.elementAt(i);//(Lamp)li.next();
-	    
+
 	    PdVector[] p=new PdVector[4];
-	    
+
 	    //l=;
 	    //	System.out.println(i+"joahr");
 	    //	System.out.println(l);
@@ -411,60 +411,60 @@ public class jv4surfex {
 	    p[2]=new PdVector(l.getXpos()-1,l.getYpos()-1,l.getZpos());
 	    p[3]=new PdVector(l.getXpos()-1,l.getYpos()+1,l.getZpos());
 	    //geom.computeSphere(10, 10, factor/3);
-	    
+
 	    /*
 	      p[0]=new PdVector(0,0,0);
 			p[1]=new PdVector(10000,0,10000);
 			p[2]=new PdVector(0,10000,10000);
 			p[3]=new PdVector(0,0,10000);
 	    */
-	    
+
 //			geoma[i].setGeneralElementColor(l.colorButton.getBackground());
 	    geoma[i] = new PgElementSet();
 	    geoma[i].computeSphere(10, 10, factor/30);
-	    
-	    
-	    
-	    
+
+
+
+
 	    geoma[i].translate(new PdVector(l.getXpos(),l.getYpos(),l.getZpos()));//setElementVertices(i,p);
 	    disp.addGeometry(geoma[i]);
 	    //	disp.fit();
 	    //	disp.addGeometry(geom);
 	    //		disp.showAxes(true);
 	}
-	
-	
-	
+
+
+
 	// folgendes wird gemacht, damit die grosse Kugel in der Mitte steht und nicht irgenwas schief geht ...
 	// ich habe alles andere versucht und nun nach 12h bug-suche scheint mir dies die letzte Moeglichkeit
-	
-	
+
+
 	disp.addGeometry(geom);
-	
+
 	addCentr(1000000000,0,0);
 	addCentr(-1000000000,0,0);
 	addCentr(0,-100000000,0);
 	addCentr(0,100000000,0);
 	addCentr(0,0,-1000000000);
 	addCentr(0,0,1000000000);
-	
+
 	disp.fit();
 	disp.update(disp);
 	return true;
     }
-    
+
     private void addCentr(int x, int y, int z){
 	PgElementSet centratoren1 = new PgElementSet();
 	centratoren1.computeSphere(2, 2, 1.0);
 	centratoren1.translate(new PdVector(x,y,z));
 	disp.addGeometry(centratoren1);
-	
+
     }
-    
+
     public void updateDisp() {
 	disp.update(disp);
     }
-    
+
     /**
      * @return    false, if file could not be loaded
      */
@@ -481,20 +481,20 @@ public class jv4surfex {
 	    } else {
 		geoms = myLoader.load(fullfilename);
 	    }
-	    
-	    //		System.out.println("loaded!");		
+
+	    //		System.out.println("loaded!");
 	    //		System.out.println("title:"+geoms[0].getTitle());
 	    disp.removeGeometries();
 	    disp.addGeometry(geoms[0]);
 	    //		disp.fit();
-	    disp.update(disp); 
+	    disp.update(disp);
 	    return (true);
 	} catch (Exception e) {
 	    System.out.println("PgJvxLoader:" + e.toString());
 	}
 	return false;
     }
-    
+
     /**
      * Returns angles you have to rotate about y,x and z axis.
      */
@@ -504,14 +504,14 @@ public class jv4surfex {
 	third.normalize();
 	return (third.m_data);
     }
-    
+
     public double[] getUpVector() {
 	PvCameraIf cam = disp.getCamera();
 	PdVector second = PdVector.copyNew(cam.getUpVector());
 	second.normalize();
 	return (second.m_data);
     }
-    
+
     public double[] getRightVector() {
 	PvCameraIf cam = disp.getCamera();
 	PdVector third = PdVector.copyNew(cam.getViewDir());
@@ -524,18 +524,18 @@ public class jv4surfex {
 	first.normalize();
 	return (first.m_data);
     }
-    
+
     public double[] getCamPos() {
 	PvCameraIf cam = disp.getCamera();
 	PdVector pos = PdVector.copyNew(cam.getPosition());
 	//	pos.multScalar(2.0);
 	return (pos.m_data);
 	}
-    
+
     public void setCamPos2(double x,double y,double z) {
 	PvCameraIf cam = disp.getCamera();
 	cam.setPosition(new PdVector(x,y,z));
-	//	pos.multScalar(2.0); 
+	//	pos.multScalar(2.0);
 	//return (pos.m_data);
     }
 	/*
@@ -545,7 +545,7 @@ public class jv4surfex {
 	  //	pos.multScalar(2.0);
 	  return (pos.m_data);
 	  }*/
-    
+
     public double[] getCameraRotationYXZ() {
 	PvCameraIf cam = disp.getCamera();
 	PdVector third = PdVector.copyNew(cam.getViewDir());
@@ -557,10 +557,10 @@ public class jv4surfex {
 	second.normalize();
 	PdVector first = PdVector.crossNew(second, third);
 	//    System.out.println("crossNew:"+first);
-	
+
 	double[] ret = PdVector.frameToStandardFrame(first, second, third);
 	//    System.out.println("ret:"+ret[0]+", "+ret[1]+", "+ret[2]);
 	ret[0] = -ret[0];
 	return ret;
     }
-} 
+}

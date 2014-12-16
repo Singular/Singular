@@ -7,7 +7,7 @@ LIB "ncalg.lib";
 def A = makeUsl2();
 setring A;
 ideal T = 4*e*f+h^2-2*h; // central element in U(sl_2)
-T = twostd(T);     
+T = twostd(T);
 T;
 qring Q = twostd(T);
 ideal I = e2,f;

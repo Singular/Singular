@@ -6,7 +6,7 @@ noop();
 proc NegativeNumber(number c)
 {
   string s = sprintf("(%s)", c); int i = 1;
-  
+
   // cannot run ouside of s (with '(((('), right?
   while( s[i] == "(" || s[i] == " " ) { i++; };
 
@@ -17,7 +17,7 @@ proc NegativeNumber(number c)
 
 proc TestClearContent(def i, number c, def o)
 {
-  "";   
+  "";
   "Test: ClearContent(", i, " --?-> ", o, " / => ", c, "): ";
   int pass = 1;
   number @c = ClearContent(i);
@@ -31,7 +31,7 @@ proc TestClearContent(def i, number c, def o)
   {
     "ERROR: wrong content: ", @c, " instead of ", c;
     pass = 0;
-  }  
+  }
   if( i != o )
   {
     "ERROR: wrong element after clearing content: ", i, " instead of ", o;
@@ -45,20 +45,20 @@ proc TestClearContent(def i, number c, def o)
   {
     basering;
     "ERROR: [TestClearContent -- FAILED]";
-    m2_end(666);    
+    m2_end(666);
   }
-  ""; 
+  "";
 }
 
 
 proc TestClearDenominators(def i, number c, def o)
 {
   def ii = cleardenom(i);
-  "";   
+  "";
   "Test: ClearDenominators(", i, " --?-> ", o, " / => ", c, "): ";
   int pass = 1;
   number @c = ClearDenominators(i);
-  
+
 //  if( NegativeNumber(leadcoef(i)) )
 //  {
 //    "ERROR: negative leading coeff. after clearing denominators: ", leadcoef(i), " instead of ", leadcoef(o);
@@ -77,7 +77,7 @@ proc TestClearDenominators(def i, number c, def o)
 
   number cntnt = ClearContent(i); // cleardenom seems to run clearcontent on its own...
   if( i != ii )
-  {    
+  {
     "WARNING/ERROR?: result of clearing denominators: ", i, " is inconsistent with cleardenom(): ", ii;
 //    pass = 0;
   }
@@ -90,9 +90,9 @@ proc TestClearDenominators(def i, number c, def o)
   {
     basering;
     "ERROR: [TestClearDenominators -- FAILED]";
-    m2_end(666);    
+    m2_end(666);
   }
-  ""; 
+  "";
 }
 
 proc TestClearRingX(poly X)
@@ -162,11 +162,11 @@ TestClearDenominators(-vector([1/2,1/4,3/2,111111111111]), -number(4), vector([2
 
 }
 
-ring R = 0, (x), dp; 
+ring R = 0, (x), dp;
 TestClearRingX(x);
 kill R;
 
-ring R = 0, (x, y, z), dp; 
+ring R = 0, (x, y, z), dp;
 TestClearRingX(x);
 TestClearRingX(y);
 TestClearRingX(z);
@@ -185,11 +185,11 @@ TestClearContent(-poly(9x2y2z-18xyz2-18xyz+18z2+18z), -number(9), poly(x2y2z-2xy
 TestClearContent(poly(4x3+2xy3), number(2), poly(2x3+xy3)); // j[1]: Old/err3.tst
 TestClearContent(-poly(4x3+2xy3), -number(2), poly(2x3+xy3)); // j[1]: Old/err3.tst
 
-TestClearContent(poly(2xy), number(2), poly(xy)); // _[2]: Manual/Delta.tst	
-TestClearContent(poly(6x2z+2y2z), number(2), poly(3x2z+y2z)); // _[3]: Manual/Delta.tst	
+TestClearContent(poly(2xy), number(2), poly(xy)); // _[2]: Manual/Delta.tst
+TestClearContent(poly(6x2z+2y2z), number(2), poly(3x2z+y2z)); // _[3]: Manual/Delta.tst
 
 kill R;
-ring R=0,(x,y),dp; 
+ring R=0,(x,y),dp;
 TestClearRingX(x);
 TestClearRingX(y);
 TestClearRingX(xy);
@@ -209,7 +209,7 @@ ring R = (0, m1, m2, M, g, L), (Dt), (dp(1), C);
 TestClearDenominators((-g)/(m2)*gen(3)+(-m1*g)/(m2^2)*gen(2), number((m2^2)), (-m2*g)*gen(3)+(-m1*g)*gen(2));
 
 // cleardenom(_);
-   
+
 
 
 kill R;
@@ -252,8 +252,8 @@ cleardenom(_);
 cleardenom(_);
 
 // TestClearDenominators(vector([(1/(2t)), 1]), number(2t), vector([1, (2t)]));
-// alg:  [((1/3)/(2t)), 1] ->[1, (6t)], (6t) 
-// TestClearDenominators(vector([((1/3)/(2t)), 1]), number(6t), vector([1, (6t)])); 
+// alg:  [((1/3)/(2t)), 1] ->[1, (6t)], (6t)
+// TestClearDenominators(vector([((1/3)/(2t)), 1]), number(6t), vector([1, (6t)]));
 
 // trans. [((1/3)/(2t)), 1] -> [(1/3), (2t)], (2t) ???
 
@@ -358,7 +358,7 @@ minpoly = a2 + 1;
 
 R;
 //   characteristic : 0
-//   1 parameter    : a 
+//   1 parameter    : a
 //   minpoly        : (a2+1)
 //   number of vars : 5
 //        block   1 : ordering a
@@ -392,7 +392,7 @@ kill Q;
 
 poly P = (2a)*x;
 poly Q = (4a)*y;
-         
+
 gcd(P, Q);
 gcd(-P, Q);
 gcd(P, -Q);

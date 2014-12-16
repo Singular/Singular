@@ -99,14 +99,14 @@ class SimpleErrorHandler(object):
     def handle_unsupported_cd(self, symbol):
         pass
     def handle_unexpected_symbol(self, symbol):
-        pass 
+        pass
 class SimpleXMLEncoder(object):
     def __init__(self):
       self.re_inner=compile("&")
       self.re_outer=compile("<")
     def encode(self, string):
         #return sub("<","&lt;",sub("&","&amp;",string))
-      return self.re_outer.sub("&lt", self.re_inner.sub("&amp", string)) 
+      return self.re_outer.sub("&lt", self.re_inner.sub("&amp", string))
 class Scope(object):
     def __init__(self):
         self.dicts=[]

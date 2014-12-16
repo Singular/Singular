@@ -14,7 +14,7 @@ kill r;
 ring r=0,(x,y),ds;
 ideal I=2-x,y;
 dim(std(I));
-// case over integers 
+// case over integers
 ring r=integer,(x,y),dp;
 ideal I=2,x;
 dim(std(I));

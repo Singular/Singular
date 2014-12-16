@@ -14,7 +14,7 @@ interred(std(i));
 setring p;
 ideal i=y,z,y+u2+uv3,z+uv3;
 option(redSB);
-std(i);                    
+std(i);
 NF(_,std(ideal(y+u2+uv3,z+uv3)));
 interred(std(i));
 interred(NF(std(i),std(ideal(y+u2+uv3,z+uv3))));

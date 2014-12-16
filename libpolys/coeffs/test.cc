@@ -186,7 +186,7 @@ bool Test(const n_coeffType type, void* p = NULL)
   assume( r->cfAdd != NULL );
   assume( r->cfDelete != NULL );
   assume( r->cfKillChar != NULL );
-   
+
   bool ret = TestArith( r );
 
   nKillChar( r );

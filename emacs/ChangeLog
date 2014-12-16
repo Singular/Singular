@@ -14,7 +14,7 @@
 	* singular.el (singular-exit-singular): New strategy for the
 	communication between `singular-exit-singular' and
 	`singular-exit-sentinel'. Some new functions and variables
-	introduced. 
+	introduced.
 	(singular-restart): now deletes a running singular process
 	(singular-exit-sentinel): On demand inserts a string indicating
 	that the process was killed
@@ -23,7 +23,7 @@
 
 	* singular.el (singular-interactive-mode-menu-init): Also remove
 	  "Singular"-start menu
-	  (singular-interactive-mode-map): corrected key for 
+	  (singular-interactive-mode-map): corrected key for
 	  singular-exit-singular
 	  (singular-help): added new version of Jens
 
@@ -39,8 +39,8 @@
 
 	* .emacs-singular added template for Singular button in toolbar
 
-	* singular.el (singular-dynamic-complete): regexp 
-	  singular-prompt-regexp now is obsolete. Used 
+	* singular.el (singular-dynamic-complete): regexp
+	  singular-prompt-regexp now is obsolete. Used
 	  (singular-prompt-skip-forward) instead
 	  key pattern for "C-c $" and "C-c <" changed (did not work
 	  for emacs20)
@@ -56,17 +56,17 @@
 1999-08-25  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
 
 	* singular.el (singular-other) now has 4 arguments
-	  
+
 	* singular.el Added "-t" to singular-switches-magic
 
 1999-08-23  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
 
 	* singular.el (singular-interactive-mode-menu-init): Any menu
           installed by comint-mode is removed
-	  
+
 	* singular.el (singular-exit-sentinel): remove libraries menu only if buffer is
 	  existent
-	  
+
 	* singular.el Added a "*" to some variables` doc string
 
 1999-08-27  Jens Schmidt  <schmidt@de.oracle.com>
@@ -173,7 +173,7 @@
 
 	  All references changed.  New function `singular-prompt-init'
 	  added which is called in `singular-interactive-mode'
-	
+
 	* .emacs-singular: loads customization from ~/.emacs-singular-cust
 	  if present
 
@@ -197,7 +197,7 @@
 	  (singular-scan-header-got-emacs-home) introduced
 	  singular-executable-default, ... are now defcustom
 	  (singular-exit-sentinel) now call (singular-scan-header-exit)
-	
+
 	* singular.el: added (singular-comint-init)
 	  improved dynamical generation of library menu
 	  scan header functionality improved
@@ -206,7 +206,7 @@
 	  (singular) renamed to (singular-internal)
 	  new functions (singular), (singular-restart), (singular-other)
 	  new variables for last singular arguments incl. history
-	  
+
 1999-08-15  Jens Schmidt  <schmidt@de.oracle.com>
 
 	* singular.el: new folding `Sending input interactive'.  Functions
@@ -445,7 +445,7 @@
 	  function in `singular-interactive-mode'.  Key map does not
 	  inherit keymap from `comint-mode' any longer.  New prefix maps
 	  used.
-	
+
 	* singular.el (singular-demo-load): uses
 	  `insert-file-contents-literally' now
 
@@ -690,12 +690,12 @@
 	Added variable singular-demo-mode-print-messages
 
 	* singular.el (singular-demo-mode): changed message text
-	(singular-other): if singular options are read from minibuffer, do 
+	(singular-other): if singular options are read from minibuffer, do
 	not display the "-t" option. Add it automatically.
 	(singular-other): Changed minibuffer text
 	(singular-exit-singular): Added (kill-buffer)
 
-	* singular.el (singular-do-folding): Added (recenter) to prevent 
+	* singular.el (singular-do-folding): Added (recenter) to prevent
 	error in subst-char-in-region. Temporary?
 
 	* singular.el (singular-other): Added
@@ -705,21 +705,21 @@
         * singular.el: added key-bindings
 	Introduced new variable singular-start-menu (temporary)
 	Updated submenu "load library"
-	
+
         * singular.el: set-face for new font-lock faces now uses argument
 	'append for XEmacs
 	Changed (get-buffer-process (cur...)) to (singular-process)
 	(singular-demo-mode): added message on enter
 
-	* singular.el (singular-emacs-simple-sec-start-at): Removed error: 
+	* singular.el (singular-emacs-simple-sec-start-at): Removed error:
        	(point) was used instead of pos
 	(singular-emacs-simple-sec-end-at): Removed error: (point) was
 	used instead of pos
 
 	* singular.el (singular-interactive-mode-syntax-table): Added
-	additional entries 
+	additional entries
 
-	* singular.el (singular-font-lock-keywords-1): Added new regexps 
+	* singular.el (singular-font-lock-keywords-1): Added new regexps
 	(font-lock-singular-error-face): Added new face
 	(font-lock-singular-warn-face): Added new face
 	(font-lock-singular-prompt-face): Added new face
@@ -768,13 +768,13 @@ Thu Jul 30 11:45:28 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 1998-07-29  T. Wichmann  <wichmann@itwm.uni-kl.de>
 
-	* singular.el : simple-secs for XEmacs partially implemented 
+	* singular.el : simple-secs for XEmacs partially implemented
 
 Wed Jul 29 10:50:47 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* singular.el (singular-extended-prompt-regexp,
 	  singular-string-start-anchored-prompt-regexp,
-	  singular-prompt-sequence-regexp): new constants 
+	  singular-prompt-sequence-regexp): new constants
 	  (singular-strip-white-space, singular-strip-prompts,
 	  singular-skip-prompt-forward): new functions
 

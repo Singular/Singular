@@ -19,7 +19,7 @@
 #include <tok.h>
 
 #define DEBUG 0
- 
+
 #  define YYLP_ERR_NONE    0
 #  define YYLP_DEF_BR2     1
 #  define YYLP_BODY_BR2    2
@@ -59,23 +59,23 @@ moddef module_def;
 #define C_CODE_NONE 0
 #define C_CODE_PROC 1
 #define C_CODE_MAIN 2
- 
+
  char string_type = 0;
 #define STRING_NONE 0
 #define STRING_INFO 1
 #define STRING_VERS 2
  long string_start = 0;
  long string_end = 0;
- 
+
 char *yylp_buffer_start;
 
 int libread(FILE* f, char* buf, int max_size);
 int current_pos(int i);
 int read_string(char **buffer, long *start, long end);
- 
+
 void push_state(int state, int new_state);
 void pop_state();
- 
+
 #  undef YY_INPUT
 #  define YY_INPUT(buf,result,max_size) \
           if ( ((result = libread( (yyin), (char *) buf, max_size )) < 0 ) \
@@ -171,11 +171,11 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
 <cstring>\n { yylplineno++; }
 <cstring>{col} {
             switch(string_type) {
-                case STRING_INFO:                     
+                case STRING_INFO:
                   read_string(&module_def.info, &string_start, string_end);
                   break;
-                  
-                case STRING_VERS:                     
+
+                case STRING_VERS:
                   read_string(&module_def.version, &string_start, string_end);
                   make_version(module_def.version, &module_def);
                   break;
@@ -421,10 +421,10 @@ int current_pos(int i)
   return(i+offset+(int)(yytext-yylp_buffer_start));
 }
 
-int read_string(char **p, long *start, long end) 
+int read_string(char **p, long *start, long end)
 {
   char *buffer;
-  
+
   if(*start > 0 ) {
     long len = end - *start;
     if(len>=0) {
@@ -439,7 +439,7 @@ int read_string(char **p, long *start, long end)
     *start = 0;
   }
 }
-                
+
 void push_state(int state, int new_state)
 {
   state_level++;

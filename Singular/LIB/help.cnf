@@ -21,7 +21,7 @@
 #  %n: the info node
 #  %v: Singular version (in the form 4-0-0)
 #----------------------------------------------------
-# the default help browsers builtin, dummy and emacs are always 
+# the default help browsers builtin, dummy and emacs are always
 #   available and should NOT be mentioned here
 #----------------------------------------------------
 htmlview!xDhE:htmlview:!htmlview %h &

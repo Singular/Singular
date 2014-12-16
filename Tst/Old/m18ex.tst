@@ -4,18 +4,18 @@
   poly f = y4-2x3y2-4x5y+x6-x7;
   list hn = develop(f);
   show(hn[1]);     // Hamburger-Noether matrix
-  displayHNE(hn);  // Hamburger-Noether developement 
+  displayHNE(hn);  // Hamburger-Noether developement
   setring s;
   displayInvariants(hn);
   // invariants(hn); will return the invariants as list
   param(hn);       // partial parametrization of f
-                   // param takes the first variable as 
+                   // param takes the first variable as
                    // except the ring has >2 variables
   ring extring=0,(x,y,t),ds;
   poly f=x3+2xy2+y2;
   list hn=develop(f,-1);
   param(hn);       // partial parametrization of f
-  list hn1=develop(f,6);  
+  list hn1=develop(f,6);
   param(hn1);     // a better parametrization
   // instead or recomputing you may extend the developement:
   list hn2=extdevelop(hn,12);

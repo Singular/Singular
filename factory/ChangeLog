@@ -12,7 +12,7 @@ Fri Feb 14 16:53:42 CET 2003 * hannes: bugfix
 
 Thu Nov  7 11:29:33 MET 2002 Hans Schoenemann <hannes@mathematik.uni-kl.de>
         * interface to NTL
-	* many fixes 
+	* many fixes
 
 Wed Aug 22 16:25:16 MET DST 2001 Hans Schoenemann <hannes@mathematik.uni-kl.de>
         * Version 1.3c: some utility functions for libfac
@@ -97,7 +97,7 @@ Mon Jun 29 12:41:40 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
   	  Declarations marked as `CF_INLINE' or `CF_NO_INLINE', resp.
 	* canonicalform.h (CF_INLINE, CF_NO_INLINE): new #defines.
 	  `cf_iter_inline.cc' (conditionally) #included.
-	
+
 	* cf_iter.cc, cf_iter.h (operator++, coeff, hasTerms, exp):
 	  definitions moved to `cf_iter_inline.cc'.  Declarations marked
  	  as `CF_INLINE' or `CF_NO_INLINE', resp.
@@ -248,7 +248,7 @@ Mon Mar 23 17:00:00 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 Tue Mar 17 16:57:10 MET 1998  Jens Schmidt
 
-	* int_int.cc, int_int.h, int_poly.cc, int_poly.h, int_intdiv.cc, 
+	* int_int.cc, int_int.h, int_poly.cc, int_poly.h, int_intdiv.cc,
 	* ChangeLog:
 	  ***** merge from branch `factory-gcd' to main trunk
 
@@ -768,7 +768,7 @@ Tue Oct 28 14:46:08 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
     **************** Factory Version 1.3b released ****************
 
-	
+
 	* NEWS: updated to 1.3b
 
 	* README: doc fix.  Updated to 1.3b.
@@ -1215,7 +1215,7 @@ Tue Jul 22 11:04:30 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
     **************** Factory Version 1.3a released ****************
 
-	
+
 	* configure.in: doc fix
 
 	* INSTALL: doc fix

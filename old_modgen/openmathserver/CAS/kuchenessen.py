@@ -24,7 +24,7 @@ class kuchen:
                 return (1,1)
             else:
                 return x
-        
+
 
         gebiete=[quad_simple(a) for a in self.gebiete]
         g2=gebiete[:]
@@ -61,7 +61,7 @@ class kuchen:
         else:
             g=[(l,column),(l,r-1-column)]
         return kuchen(self.gebiete[:rect_n]+g+self.gebiete[rect_n+1:])
-    
+
     def take_row(self, rect_n, row):
         """works only for row in the first half"""
         (l,r)=self.gebiete[rect_n]
@@ -73,7 +73,7 @@ class kuchen:
         else:
             g=[(row,r),(l-1-row,r)]
         return kuchen(self.gebiete[:rect_n]+g+self.gebiete[rect_n+1:])
-    
+
     def right_options(self):
         s=Set()
         for i in range(len(self.gebiete)):
@@ -97,7 +97,7 @@ class kuchen:
             try:
                 fuzzy=0
                 for (l,r) in self.gebiete:
-                    if (r%2==0) and (l!=r): 
+                    if (r%2==0) and (l!=r):
                         raise strategy_failed
                     if (l%2==1) or (l==r):
                         fuzzy=fuzzy+1
@@ -114,7 +114,7 @@ class kuchen:
                             if (l==r):
                                 #even case
                                 return [self.take_column(i,j)]
-                            
+
                 else:
                     for i in range(len(self.gebiete)):
                         if (l%2==0) and (r%2==1):
@@ -142,9 +142,9 @@ class kuchen:
         l=list(s)
         return [kuchen(k) for k in l]
 
-        
-        
-        
+
+
+
     def right_options_move(self):
         """Not al and not necessarily the best right options,
         but if there is a right option <= 0, then the return
@@ -156,7 +156,7 @@ class kuchen:
             try:
                 fuzzy=0
                 for (l,r) in self.gebiete:
-                    if (r%2==0) and (l!=r): 
+                    if (r%2==0) and (l!=r):
                         raise strategy_failed
                     if (l%2==1) or (l==r):
                         fuzzy=fuzzy+1
@@ -197,10 +197,10 @@ class kuchen:
                     if (r>1) and (j!=1):
                         continue
                 d[sets.ImmutableSet(self.take_column(i,j).__char())]=(i,j)
-       
+
         return [(kuchen(k),d[k]) for k in d.keys()]
 
-    
+
     def left_options(self):
         s=Set()
         for i in range(len(self.gebiete)):
@@ -213,21 +213,21 @@ class kuchen:
                 s.add(self.take_row(i,j).__char())
         l=list(s)
         return [kuchen(k) for k in l]
-   
+
     def greater_equal_zero(self):
         k=self.simplify()
         if k.__char() in kuchen.__greater_equal_zero_set:
             return True
         if k.__char() in kuchen.__not_greater_equal_zero_set:
             return False
-       
+
         erg=k.__do_greater_equal_zero()
         if erg:
             kuchen.__greater_equal_zero_set.add(k.__char())
         else:
             kuchen.__not_greater_equal_zero_set.add(k.__char())
         return erg
-    
+
     def __do_greater_equal_zero(self):
         class myError(Exception):
             pass
@@ -243,7 +243,7 @@ class kuchen:
             return True
         except myError:
             pass
-        
+
         complex_positiv_index=-1;
         complexity=0
         for i in range(len(self.gebiete)):
@@ -311,7 +311,7 @@ class kuchen:
             if o[i].smaller_equal_zero():
                 return False
         return True
-    
+
     def smaller_equal_zero(self):
         k=self.negative()
         return k.greater_equal_zero()
@@ -340,4 +340,3 @@ except:
 	print "no openmath library available"
 
 
-	

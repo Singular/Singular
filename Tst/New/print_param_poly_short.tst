@@ -17,7 +17,7 @@ proc Test()
   "(var(1)):                           ", (var(1));
   "(var(1)**2):                        ", (var(1)**2);
   "(-2)*(var(1)**2):                   ", (-2)*(var(1)**2);
-  
+
   "::::             both: ";
   "(par(1))*(var(1)):                  ", (par(1))*(var(1));
   "(par(1))*(var(1)**2):               ", (par(1))*(var(1)**2);
@@ -28,30 +28,30 @@ proc Test()
 
 " ::::::::::::::::::::: SHORT!!! ::::::::::::::::::::: ";
 
-ring r=(0,Q),(x),dp; 
+ring r=(0,Q),(x),dp;
 Test();
-minpoly = par(1)^2 - par(1) + 1; 
-Test(); 
+minpoly = par(1)^2 - par(1) + 1;
+Test();
 kill r;
-ring r=(121,Q),(x),dp; 
-Test(); 
+ring r=(121,Q),(x),dp;
+Test();
 kill r;
-ring r=(complex,30,Q),(x),dp; 
-Test(); 
+ring r=(complex,30,Q),(x),dp;
+Test();
 kill r;
 
 
 " ::::::::::::::::::::: PAR:LONG!! ::::::::::::::::::::: ";
 
-ring r=(0,Q9),(x),dp; 
+ring r=(0,Q9),(x),dp;
 Test();
-minpoly = par(1)^2 - par(1) + 1; 
-Test();
-kill r;
-ring r=(121,Q9),(x),dp; 
+minpoly = par(1)^2 - par(1) + 1;
 Test();
 kill r;
-ring r=(complex,30,Q9),(x),dp; 
+ring r=(121,Q9),(x),dp;
+Test();
+kill r;
+ring r=(complex,30,Q9),(x),dp;
 Test();
 kill r;
 
@@ -60,15 +60,15 @@ kill r;
 
 " ::::::::::::::::::::: VAR:LONG!! ::::::::::::::::::::: ";
 
-ring r=(0,Q),(x9),dp; 
+ring r=(0,Q),(x9),dp;
 Test();
-minpoly = par(1)^2 - par(1) + 1; 
-Test();
-kill r;
-ring r=(121,Q),(x9),dp; 
+minpoly = par(1)^2 - par(1) + 1;
 Test();
 kill r;
-ring r=(complex,30,Q),(x9),dp; 
+ring r=(121,Q),(x9),dp;
+Test();
+kill r;
+ring r=(complex,30,Q),(x9),dp;
 Test();
 kill r;
 
@@ -77,17 +77,17 @@ kill r;
 
 " ::::::::::::::::::::: LONG!! ::::::::::::::::::::: ";
 
-ring r=(0,Q9),(x9),dp; 
+ring r=(0,Q9),(x9),dp;
 Test();
-minpoly = par(1)^2 - par(1) + 1; 
-Test();
-kill r;
-
-ring r=(121,Q9),(x9),dp; 
+minpoly = par(1)^2 - par(1) + 1;
 Test();
 kill r;
 
-ring r=(complex,30,Q9),(x9),dp; 
+ring r=(121,Q9),(x9),dp;
+Test();
+kill r;
+
+ring r=(complex,30,Q9),(x9),dp;
 Test();
 kill r;
 

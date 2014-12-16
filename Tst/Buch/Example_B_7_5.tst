@@ -3,7 +3,7 @@ tst_init();
 
 // ==================================== example B.7.5 =======================
 
-LIB"absfact.lib";  
+LIB"absfact.lib";
 
 ring R1=0,(x,y),dp;
 poly f=(x2+y2)^3*(x3+y2)^5*(x4+4)^2;

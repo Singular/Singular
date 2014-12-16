@@ -6,7 +6,7 @@
   ideal i=maxideal(2);
   write (l,1,";",2,";","ideal i=",i,";");
   status(l, "open", "yes");    // now link is open
-  status(l, "mode");           // for writing 
+  status(l, "mode");           // for writing
   write("example.txt","int j=5;");// data is appended to file
   read("example.txt");         // data is returned as string
   close(l);                    // link is closed

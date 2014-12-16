@@ -34,7 +34,7 @@ poly f = (x-a)*(y-a);
 factorize(f);
 
 //ticket #89
-ring ri =(0,i),(a,b,c),dp; 
+ring ri =(0,i),(a,b,c),dp;
 minpoly = i2+1;
 poly f = (a+b)^2+c^2;
 factorize(f);

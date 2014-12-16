@@ -2418,7 +2418,7 @@ void p_SimpleContent(poly ph, int smax, const ring r)
     d=n_Gcd(h,pGetCoeff(p),r->cf);
     n_Delete(&h,r->cf);
     h = d;
-#else    
+#else
     STATISTIC(n_Gcd); nlInpGcd(h,pGetCoeff(p),r->cf); // FIXME? TODO? // extern void nlInpGcd(number &a, number b, const coeffs r);
 #endif
     if(n_Size(h,r->cf)<smax)

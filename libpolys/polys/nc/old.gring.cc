@@ -2922,11 +2922,11 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
           {
             Werror("Incorrect input : non-constants are not allowed as coefficients (first argument at [%d, %d])", i, j);
             return TRUE;
-          }	
+          }
 	  assume(p_IsConstant(MATELEM(CC,i,j),curr));
           qN = p_GetCoeff(MATELEM(CC,i,j),curr);
 	}
-	
+
 
         if ( qN == NULL )   /* check the consistency: Cij!=0 */
         // find also illegal pN

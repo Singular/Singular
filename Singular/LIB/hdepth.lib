@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version hdepth.lib 4.0.0.0 Jun_2013"; // 
+version="version hdepth.lib 4.0.0.0 Jun_2013"; //
 category="Commutative Algebra";
 info="
 LIBRARY: hdepth.lib     Procedures for computing hdepth_1
@@ -12,7 +12,7 @@ KEYWORDS: hdepth, library
 
 PROCEDURES:
   hdepth(M [,debug]);        hdepth_1 computation of a module M (wrt Z-grading)
-  hdepth_p(g, d, debug) the minimum number t <= d s.t. 1/g^t is positive 
+  hdepth_p(g, d, debug) the minimum number t <= d s.t. 1/g^t is positive
 ";
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ RETURN:  poly, the inverse of the poly p in the power series ring till order bou
     if(bound<=1)
         {
             ERROR("My inverse : negative bound in the inverse");
-        } 
+        }
     if(p == 0)
 	    {
 	        ERROR("My inverse : p is 0");
@@ -33,7 +33,7 @@ RETURN:  poly, the inverse of the poly p in the power series ring till order bou
     original = p;
     if(leadcoef(p) == 0)
         {
-            ERROR("My inverse : the power series is not a unit.");  
+            ERROR("My inverse : the power series is not a unit.");
         }
     poly q = 1/p[1];
     poly res = q;
@@ -93,7 +93,7 @@ RETURN:  number, the sum of the coefficients
     number c;
 	while(f!=0)
 	    {
-    		c = c+leadcoef(f);  
+    		c = c+leadcoef(f);
 	    	f=f-lead(f);
     	}
 	return(int(c));
@@ -165,14 +165,14 @@ RETURN:  int
 PURPOSE: compute the hdepth_1 of a module M
 EXAMPLE: example hdepth; shows examples
 "
-{   
+{
     int debug;
     if(size(#)>0)
         {
             if(typeof(#[1])=="int")
                 {debug = #[1];}
         }
-    else 
+    else
         {debug = 1;}
     M = std(M);
     int d=nvars(basering)-dim(M);

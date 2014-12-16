@@ -17,6 +17,6 @@ TESTS_ENVIRONMENT += SINGULAR_ROOT_DIR='${abs_top_builddir}'
 TESTS = test
 check_PROGRAMS = $(TESTS)
 test_SOURCES = test.cc
-test_LDADD   = libspectrum.la ${builddir}/../libkernelCommon.la 
+test_LDADD   = libspectrum.la ${builddir}/../libkernelCommon.la
 
 CLEANFILES = $(TESTS)

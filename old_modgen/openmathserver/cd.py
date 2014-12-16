@@ -24,7 +24,7 @@ class OMCDImplementation(object):
         symbol=OMSymbol(symbolname,self.cd)
         impl = ImplementedOMSymbol(symbol,func)
         self[symbol]=impl
-        
+
 
 
 class ImplementedOMSymbol(OMSymbol):

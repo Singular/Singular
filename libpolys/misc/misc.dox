@@ -1,11 +1,11 @@
 /*! \page libpolys_misc_page Miscellaneous things
 
- - \ref intvec, 
- - \ref intvec64, 
- - \ref option, \ref test, 
+ - \ref intvec,
+ - \ref intvec64,
+ - \ref option, \ref test,
  - and global vars...
 
  Common auxiliary.h is supposed to contain some generally useful macro
- 
+
 */
 

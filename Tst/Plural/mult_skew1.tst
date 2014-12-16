@@ -17,13 +17,13 @@ for(i=1;i<=N;i++)
   for(j=1;j<=N;j++)
   {
     for(k=1;k<=N;k++)
-    { 
+    {
        f=(z^k*y^j)*x^i;
        g=z^k*(y^j*x^i);
        g=g-f;
        if (g!=0) {"Fail";i;j;k;f;}
     }
-  }  
+  }
 }
 z^7*y^6*x^5;
 tst_status(1);$

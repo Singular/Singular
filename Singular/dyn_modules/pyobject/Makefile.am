@@ -8,7 +8,7 @@ if SI_BUILTIN_PYOBJECT
 else !SI_BUILTIN_PYOBJECT
   module_LTLIBRARIES = pyobject.la
   moduledir = $(libexecdir)/singular/MOD
-  P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION 
+  P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
 # Add under Mac OS X: -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
   P_PROCS_MODULE_LDFLAGS = -module -export-dynamic -avoid-version -flat_namespace -weak_reference_mismatches weak -undefined dynamic_lookup
 ###  -export-dynamic -shared -module -avoid-version (add to all DMs?)

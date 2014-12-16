@@ -1,5 +1,5 @@
 """Implementation of openmath basic objects"""
-from omexceptions import UnsupportedOperationError 
+from omexceptions import UnsupportedOperationError
 from  omexceptions import OutOfScopeError, EvaluationFailedError
 from exceptions import NotImplementedError
 from copy import copy
@@ -28,7 +28,7 @@ class OMObjectBase(object):
     #    self.attributes={}
     attributes={}
     #dangerous, if you change attributes, always copy attributes
-    
+
     def __getChildren(self):
         try:
             return self.getChildren()
@@ -104,7 +104,7 @@ class OMObjectBase(object):
         __setXMLAttributes,__delXMLAttributes,\
         "xml attributes")
     def XMLEncode(self, context):
-        
+
         attr=self.XMLAttributes
         if attr:
             attrstr = " "+" ".join([a.encode(context) for a in attr])
@@ -180,7 +180,7 @@ class OMVar(OMObjectBase):
     XMLtag = "OMV"
     def getXMLAttributes(self):
         return [XMLAttribute("name", self.name)]
-        
+
 class OMApply(OMObjectBase):
     def __init__(self, func, args):
         #super(OMApply, self).__init__()
@@ -206,7 +206,7 @@ class OMApply(OMObjectBase):
         return [self.func]+self.args
     def setChildren(self):
         raise UnsupportedOperationError
-        
+
 class OMSymbol(OMObjectBase):
     def __init__(self,name,cd = None):
         #super(OMSymbol,self).__init__()
@@ -272,7 +272,7 @@ class OMfloat(SimpleValue):
     def __str__(self):
         return "OMfloat("+repr(self.value)+")"
     XMLtag = "OMF"
-    
+
     def getXMLAttributes(self):
         return {"dec":str(self.value)}
 class OMString(SimpleValue):
@@ -360,17 +360,17 @@ if __name__ == '__main__':
     #application=OMApply(arith1.plussym,[x])
     #application=OMApply(arith1.plussym,[x,x])
     application = OMApply(OMSymbol("plus", arith1.content), [x, x])
-    
+
     print context.evaluate(application)
     application = OMApply(OMSymbol("plus", arith1.content), [x, x, x])
-    
+
     print context.evaluate(application)
     i =  OMint(22482489)
     print i.body
     print i.XMLEncode(context)
     print context.XMLEncodeObject(OMSymbol("plus", arith1.content))
     #i.body="dshj"
-   
+
 #optimize(OMObjectBase.__init__)
 optimize(OMObjectBase.XMLPreEncode)
 optimize(SimpleValue.__init__)

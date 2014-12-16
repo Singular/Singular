@@ -6,7 +6,7 @@ proc fitting(matrix M, int n)
   n=nrows(M)-n;
   if(n<=0){return(ideal(1));}
   if((n>nrows(M))||(n>ncols(M))){return(ideal(0));}
-  return(std(minor(M,n)));  
+  return(std(minor(M,n)));
 }
 
 proc isFlat(matrix M)
@@ -26,11 +26,11 @@ proc isFlat(matrix M)
 ring A=0,(x,y),dp;
 matrix M[3][3]=x-1,y,x,x,x+1,y,x2,xy+x+1,x2+y;
 print(M);
-qring B=std(x2+x-y);   
+qring B=std(x2+x-y);
 matrix M=fetch(A,M);
 isFlat(M);
 setring A;
-qring C=std(x2+x+y);      
+qring C=std(x2+x+y);
 matrix M=fetch(A,M);
 isFlat(M);
 

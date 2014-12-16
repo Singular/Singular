@@ -50,7 +50,7 @@ message(STATUS "omalloc: '${WITH_MALLOC}'")
   set(${GEN_HAVE_MALLOC_SOURCE} ${_GEN_HAVE_MALLOC_SOURCE} PARENT_SCOPE)
   set(${GEN_OMALLOC_USES_MALLOC} ${_GEN_OMALLOC_USES_MALLOC} PARENT_SCOPE)
 
-  # check 
+  # check
   message(STATUS "whether malloc provides SizeOfAddr")
   set(TESTFILE "${CMAKE_CURRENT_BINARY_DIR}/dummy.c")
   set(_TEST_SOURCE "#include \"${_GEN_MALLOC_HEADER}\"

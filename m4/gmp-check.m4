@@ -11,10 +11,10 @@ DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
 
 AC_ARG_WITH(gmp,
 [  --with-gmp= <path>|yes Use GMP library. This library is mandatory for Singular
-	                 compilation. If argument is yes or <empty> that means 
+	                 compilation. If argument is yes or <empty> that means
    	       		 the library is reachable with the standard search path
 			 "/usr" or "/usr/local" (set as default). Otherwise you
-			 give the <path> to the directory which contain the 
+			 give the <path> to the directory which contain the
 			 library.
 ],
 		[if test "$withval" = yes ; then
@@ -34,8 +34,8 @@ AC_MSG_CHECKING(for GMP >= $min_gmp_version)
 
 AC_LANG_PUSH([C])
 
-for GMP_HOME in ${GMP_HOME_PATH} 
-  do	
+for GMP_HOME in ${GMP_HOME_PATH}
+  do
 #	if test -r "$GMP_HOME/include/gmp.h"; then
 
 		if test "x$GMP_HOME" != "x/usr"; then
@@ -45,7 +45,7 @@ for GMP_HOME in ${GMP_HOME_PATH}
 			GMP_CFLAGS=""
 			GMP_LIBS="-lgmp"
 		fi
-	
+
 		CFLAGS="${BACKUP_CFLAGS} ${GMP_CFLAGS}"
 		LIBS="${BACKUP_LIBS} ${GMP_LIBS}"
 
@@ -85,10 +85,10 @@ for GMP_HOME in ${GMP_HOME_PATH}
 				])
 				ifelse([$2], , :, [$2])
 				break
-			],[			
+			],[
 				gmp_problem="$gmp_problem $GMP_HOME"
 				unset GMP_CFLAGS
-				unset GMP_LIBS	
+				unset GMP_LIBS
 			],[
 				AC_MSG_RESULT(unknown)
 				echo "WARNING: You appear to be cross compiling, so there is no way to determine"
@@ -97,18 +97,18 @@ for GMP_HOME in ${GMP_HOME_PATH}
 				AC_SUBST(GMP_LIBS)
 				AC_SUBST(GMP_HOME)
 				HAVE_GMP=yes
-				AC_DEFINE(HAVE_GMP,1,[Define if GMP is installed])	
+				AC_DEFINE(HAVE_GMP,1,[Define if GMP is installed])
 				ifelse([$2], , :, [$2])
 				break
-			])	
+			])
 		],[
-		gmp_found="no"	
+		gmp_found="no"
 		unset GMP_CFLAGS
-		unset GMP_LIBS	
+		unset GMP_LIBS
 		])
 
 #	else
-#		gmp_found="no"	
+#		gmp_found="no"
 #	fi
 done
 AC_LANG_POP([C])

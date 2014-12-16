@@ -12,4 +12,4 @@ x1*x7*x13*x19*x25*x31-1;
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
     tst_status(1);$
-    
+

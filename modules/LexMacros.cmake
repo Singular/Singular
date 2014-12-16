@@ -27,7 +27,7 @@ function(add_lex GEN_CPP_FILE INFILE PREFIX)
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_SOURCE_CPP_FILE} ${_GEN_CPP_FILE}
     COMMAND ls -l ${_GEN_CPP_FILE}.tmp ${_GEN_CPP_FILE}
 #    COMMAND ls -l ${_GEN_CPP_FILE}.tmp ${_GEN_CPP_FILE} ${_orig}
-     
+
     DEPENDS ${INFILE}
     COMMENT "Compiling '${INFILE}'..."
     )

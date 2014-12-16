@@ -381,7 +381,7 @@ BOOLEAN n_AEInitChar(coeffs r, void *)
     r->cfDelete= nAEDelete;
 
     r->cfSetMap = nAESetMap;
-   
+
     r->cfInpMult=nAEInpMult; //????
     r->cfCoeffWrite=nAECoeffWrite; //????
 

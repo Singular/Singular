@@ -14,13 +14,13 @@ mandatory:
 -cfCoeffWrite
 -cfCoeffString
 -cfMult, cfSub, cfAdd, cfDiv
-  cfDiv is supposed to be a Euclidean division in rings that are meant 
+  cfDiv is supposed to be a Euclidean division in rings that are meant
   to be Euclidean and an exact division otherwise.
 -cfInit
 -cfInt
 -cfMPZ
 -cfInpNeg
-  negates (mult. by -1) in-place. 
+  negates (mult. by -1) in-place.
 -cfInvers
 -cfWriteLong
 -cfRead
@@ -70,7 +70,7 @@ mandatory for certain types of coeffs:
 -cfInitMPZ: otherwise via cfInit
 
 optional:
--cfExactDiv (otherwise: it is cfDiv): for optimization. Behaviour undefined if 
+-cfExactDiv (otherwise: it is cfDiv): for optimization. Behaviour undefined if
   the division does not work
 -cfSize (otherwise: !cfIsZero(..))
   should measure the complexity, used for pivot strategies etc.

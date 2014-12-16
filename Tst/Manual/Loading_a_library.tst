@@ -1,4 +1,4 @@
-LIB "tst.lib"; tst_init(); 
+LIB "tst.lib"; tst_init();
  option(noloadLib);   // show no loading of libraries;
                     // standard.lib is loaded
  listvar(package);

@@ -48,7 +48,7 @@ proc testPrimDecsAreEquivalent()
     L2[2] = list( ideal(0), ideal(0)  );
     ASSUME(0, 1 == primDecsAreEquivalent(L1,L2) );
 
-  
+
 
 }
 

@@ -34,7 +34,7 @@ poly f = y13-y15+x2y9+x2y10-2x2y11-x2y12+x2y13-3x3y11+3x3y13+x4y6
 +3x8y5+3x8y6-4x8y7+x8y8+x8y9-4x8y10+2x9y2-4x9y3+2x9y4+7x9y5-5x9y6
 -3x9y7+x9y8+3x10y2-x10y3+5x10y5-3x10y6-3x10y7-x10y9+4x11y-x11y2
 -4x11y3+x11y4-x12+4x12y+x12y2-3x12y3+x12y4-x12y5-x12y6+x14-x14y2;
-factorize(f);  
+factorize(f);
 //->   [1]:
 //->      _[1]=-1
 //->      _[2]=-y4+2x3y2-x6+4x5y+x7
@@ -72,13 +72,13 @@ displayHNE(hne);
 //->   // Hamburger-Noether development of branch nr.4:
 //->     x = z(1)*y
 //->     y = -z(1)^2
- 
+
 //->   // Hamburger-Noether development of branch nr.5:
 //->     x = (a)*y^2
 
 //->   // Hamburger-Noether development of branch nr.6:
 //->     x = (-a)*y^2
- 
+
 ring R_param = (0,a), (x,y,t), ls;
 minpoly = a2+1;
 list hne = imap(HNring,hne);
@@ -103,10 +103,10 @@ displayInvariants(hne);
 //->   degree of the conductor   : 16
 //->   delta invariant           : 8
 //->   sequence of multiplicities: 4,2,2,1,1
-//->   [...] 
-//->    -------------- intersection multiplicities : -------------- 
+//->   [...]
+//->    -------------- intersection multiplicities : --------------
 
-//->   branch |    6     5     4     3     2    
+//->   branch |    6     5     4     3     2
 //->   -------+-----------------------------
 //->       1  |    1,    1,    2,    4,    1
 //->       2  |    1,    1,    2,    4
@@ -125,7 +125,7 @@ ideal G = std(I); G;       // compute Groebner basis
 //->   G[2]=xy2z-x3
 dim(G);                    // global dimension
 //->   2
-ring R1 = 0, (x,y,z), ds;  // implements local ring at (0,0,0) 
+ring R1 = 0, (x,y,z), ds;  // implements local ring at (0,0,0)
 ideal I = imap(R,I);
 ideal G = std(I); G;       // compute standard basis
 //->   G[1]=x3-xy2z
@@ -162,37 +162,37 @@ radical(SLoc);
 
 kill R,R1;
 //=================== Example 9.36 (new Session) =====================
-ring S = 0, (x,y), ds;     // the local ring 
-poly f = y2-2x28y-4x21y17+4x14y33-8x7y49+x56+20y65+4x49y16; 
+ring S = 0, (x,y), ds;     // the local ring
+poly f = y2-2x28y-4x21y17+4x14y33-8x7y49+x56+20y65+4x49y16;
 ideal I = f, jacob(f);
 vdim(std(I));              // Tjurina number at the origin
-//->   2260 
+//->   2260
 ring R = 0, (x,y), dp;      // the affine ring Q[x,y]
 ideal I = fetch(S,I);
 vdim(std(I));
-//->   2260 
-ring SH = 0, (x,y,z), dp; 
-poly f = fetch(S,f); 
-poly fhom = homog(f,z); 
-ring R1 = 0, (y,z), dp; 
-map phi = SH,1,y,z; 
-poly g = phi(fhom);         // fhom in the affine chart (x=1) 
+//->   2260
+ring SH = 0, (x,y,z), dp;
+poly f = fetch(S,f);
+poly fhom = homog(f,z);
+ring R1 = 0, (y,z), dp;
+map phi = SH,1,y,z;
+poly g = phi(fhom);         // fhom in the affine chart (x=1)
 g;
 //->   20y65+y2z63-8y49z9+4y33z18-4y17z27-2yz36+4y16+z9
-ideal J = g, jacob(g); 
+ideal J = g, jacob(g);
 vdim(std(J));
-//->   120 
-ring R2 = 0, (y,z), ds;     // the local ring at (1:0:0) 
-ideal J = fetch(R1,J); 
+//->   120
+ring R2 = 0, (y,z), ds;     // the local ring at (1:0:0)
+ideal J = fetch(R1,J);
 vdim(std(J));
-//->   120 
+//->   120
 
 
 kill S,R,SH,R1,R2;
 //=================== Example 9.39 (new Session) =====================
 ring R_loc = 0, (x,y), ds;    // local monomial order
 poly f, g = 2x2-y3, 2x2-y5;
-ideal I = f, g;   
+ideal I = f, g;
 vdim(std(I));  // intersection multiplicity at origin
 //->   6
 LIB "surf.lib";
@@ -203,7 +203,7 @@ ring R_aff = 0, (x,y), dp;    // global monomial order
 ideal I = imap(R_loc,I);
 vdim(std(I));
 //->   10
-if (not(defined(primdecGTZ))){ LIB "primdec.lib"; } 
+if (not(defined(primdecGTZ))){ LIB "primdec.lib"; }
 primdecGTZ(I);
 //->   [1]:
 //->      [1]:
@@ -233,7 +233,7 @@ ideal I = F, G;
 vdim(std(I));   // intersection number at (0,0) for general fiber
 //->   0
 ring Rt_aff = (0,t), (x,y), dp;
-ideal I = imap(Rt_loc,I);    
+ideal I = imap(Rt_loc,I);
 vdim(std(I));   // sum of intersection numbers for general fiber
 //->   10
 primdecGTZ(I);
@@ -282,12 +282,12 @@ milnor(F);        // sum of Milnor numbers for general fiber
 milnor(G);
 //->   4
 setring R_loc;
-poly h0 = diff(g,x); 
+poly h0 = diff(g,x);
 poly h0_prime = diff(g,x)+diff(g,y);
-poly hc = diff(g_def,x); 
+poly hc = diff(g_def,x);
 poly hc_prime = diff(g_def,x)+diff(g_def,y);
 //   plot(h0*h0_prime,"scale_x=0.15; scale_y=0.15;");
-//   plot(hc*hc_prime,"scale_x=0.000005; scale_y=0.015;"); 
+//   plot(hc*hc_prime,"scale_x=0.000005; scale_y=0.015;");
 
 
 kill R_loc,Rt_loc,R_aff,Rt_aff;
@@ -295,11 +295,11 @@ kill R_loc,Rt_loc,R_aff,Rt_aff;
 ring R = 0, (x,y,z), dp;
 ideal I0 = x-z, y-z^2;       // vanishing at the origin
 ideal I1 = x-z+1, y-z^2+1;   // not vanishing at the origin
-ideal I = intersect(I0,I1); 
+ideal I = intersect(I0,I1);
 I = std(I); I;
 //->   _[1]=z2+x-y-z
 //->   _[2]=x2-2xz+y
-ring Rloc = 0, (x,y,z), ds; 
+ring Rloc = 0, (x,y,z), ds;
 ideal Iloc = fetch(R,I);
 Iloc = std(Iloc); Iloc;
 //->   _[1]=x-y-z+z2

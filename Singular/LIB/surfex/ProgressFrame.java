@@ -5,29 +5,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.awt.*;
@@ -44,7 +44,7 @@ public class ProgressFrame extends JPanel
    // private LongTask task;
     private JTextArea taskOutput;
     private String newline = "\n";
-    
+
     public boolean processCanceled=false;
 
     JButton playMovieButton=new JButton("play Movie");
@@ -52,7 +52,7 @@ public class ProgressFrame extends JPanel
     JButton cancelButton=new JButton("cancel");
 
     JButton closeButton=new JButton("close");
-    
+
     JLabel previewLabel=new JLabel(new ImageIcon("prevstart.jpg"));
 
     public ProgressFrame(int LengthOfTask) {
@@ -61,7 +61,7 @@ public class ProgressFrame extends JPanel
 
 
         ImageIcon i=new ImageIcon();
-        
+
         progressBar = new JProgressBar(0, LengthOfTask);
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
@@ -87,22 +87,22 @@ public class ProgressFrame extends JPanel
         pane.add(previewPanel,BorderLayout.CENTER);
     //    System.out.println("dsfkgreg--------------");
         JPanel controlPanel=new JPanel(new GridLayout(1,3));
-        
+
         playMovieButton.setEnabled(false);
-        controlPanel.add(playMovieButton); 
+        controlPanel.add(playMovieButton);
         cancelButton.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent ae){
         		processCanceled=true;
         	}
-        	
+
         });
         controlPanel.add(cancelButton);
     //    controlPanel.add(closeButton);
         pane.add(controlPanel,BorderLayout.SOUTH);
        // newContentPane.setOpaque(true); //content panes must be opaque
         //frame.setContentPane(pane);
-        
-        
+
+
         //JPanel panel = new JPanel();
         //panel.add(progressBar);
 
@@ -110,7 +110,7 @@ public class ProgressFrame extends JPanel
        //add(new JScrollPane(taskOutput), BorderLayout.CENTER);
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        
+
     }
 
     /**
@@ -134,15 +134,15 @@ public class ProgressFrame extends JPanel
 	    taskOutput.setCaretPosition(
 		taskOutput.getDocument().getLength());
 	}
-	
+
     }
-    
+
     public void refresh(int progress, String Message, String prevFileLoc){
 	      refresh(progress, Message);
 	     // previewLabel.setText(prevFileLoc);
 	      previewLabel.setIcon(new ImageIcon(prevFileLoc));
 //	      System.out.println("preview update");
     }
-    
+
 }
 

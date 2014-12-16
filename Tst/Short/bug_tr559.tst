@@ -12,7 +12,7 @@ ideal J = 3, y-4, x*z;
 
 ideal stdJ =  groebner(J);
 stdJ;
-def reduceRes = reduce( J, stdJ); 
+def reduceRes = reduce( J, stdJ);
 reduceRes;
 
 tst_status(1);$

@@ -4,12 +4,12 @@ tst_init();
 LIB"ring.lib";
 proc PrimaryTest(ideal i, poly p)
 "USAGE:   PrimaryTest(i,p); i standard basis with respect to
-          lp, p irreducible polynomial in K[var(n)], 
+          lp, p irreducible polynomial in K[var(n)],
           p^a=i[1] for some a;
-RETURN:   an ideal, the radical of i if i is primary and in 
-          general position with respect to lp, 
+RETURN:   an ideal, the radical of i if i is primary and in
+          general position with respect to lp,
           the zero ideal else.
-"  
+"
 {
    int m,e;
    int n=nvars(basering);
@@ -23,7 +23,7 @@ RETURN:   an ideal, the radical of i if i is primary and in
        n--;
 //----------------i[m] has a power of var(n) as leading term
        attrib(prm,"isSB",1);
-//--- ?? i[m]=(c*var(n)+h)^e modulo prm for h 
+//--- ?? i[m]=(c*var(n)+h)^e modulo prm for h
 //     in K[var(n+1),...], c in K ??
        e=deg(lead(i[m]));
        t=leadcoef(i[m])*e*var(n)+(i[m]-lead(i[m]))
@@ -48,10 +48,10 @@ RETURN:   an ideal, the radical of i if i is primary and in
 proc zeroDecomp(ideal i)
 "USAGE:  zeroDecomp(i); i zerodimensional ideal
 RETURN:  list l of lists of two ideals such that the
-         intersection(l[j][1], j=1..)=i, the l[i][1] are 
+         intersection(l[j][1], j=1..)=i, the l[i][1] are
          primary and the l[i][2] their radicals
 NOTE:    algorithm of Gianni/Trager/Zacharias
-"  
+"
 {
    def  BAS = basering;
 //----the ordering is changed to the lexicographical one
@@ -62,7 +62,7 @@ NOTE:    algorithm of Gianni/Trager/Zacharias
    list result,rest;
    ideal primary,prim;
    option(redSB);
-   
+
 //------the random coordinatechange and its inverse
    ideal m=maxideal(1);
    m[n]=0;
@@ -73,14 +73,14 @@ NOTE:    algorithm of Gianni/Trager/Zacharias
    map invphi=R,m;
    ideal j=groebner(phi(i));
 //-------------factorization of the first element in i
-   list fac=factorize(j[1],2);   
+   list fac=factorize(j[1],2);
 //-------------computation of the primaries and primes
    for(k=1;k<=size(fac[1]);k++)
    {
      p=fac[1][k]^fac[2][k];
      primary=groebner(j+p);
      prim=PrimaryTest(primary,fac[1][k]);
-//---test whether all ideals were primary and in general 
+//---test whether all ideals were primary and in general
 //   position
      if(prim==0)
      {
@@ -115,17 +115,17 @@ NOTE:    algorithm of Gianni/Trager/Zacharias
 proc prepareQuotientring(ideal i)
 "USAGE:   prepareQuotientring(i); i standard basis
 RETURN:   a list l of two strings:
-          l[1] to define K[x\u,u ], u a maximal independent 
+          l[1] to define K[x\u,u ], u a maximal independent
           set for i
-          l[2] to define K(u)[x\u ], u a maximal independent 
+          l[2] to define K(u)[x\u ], u a maximal independent
           set for i
           both rings with lexicographical ordering
-"  
+"
 {
   string va,pa;
-//v describes the independent set u: var(j) is in 
+//v describes the independent set u: var(j) is in
 //u iff v[j]!=0
-  intvec v=indepSet(i); 
+  intvec v=indepSet(i);
   int k;
 
   for(k=1;k<=size(v);k++)
@@ -139,12 +139,12 @@ RETURN:   a list l of two strings:
       va=va+"var("+string(k)+"),";
     }
   }
-  
+
   pa=pa[1..size(pa)-1];
   va=va[1..size(va)-1];
-  
+
   string newring
-  ="ring nring=("+charstr(basering)+"),("+va+","+pa+"),lp;";  
+  ="ring nring=("+charstr(basering)+"),("+va+","+pa+"),lp;";
   string quotring
   ="ring quring=("+charstr(basering)+","+pa+"),("+va+"),lp;";
   return(newring,quotring);
@@ -177,10 +177,10 @@ proc prepareSat(ideal i)
 proc decomp(ideal i)
 "USAGE:  decomp(i); i ideal
 RETURN:  list l of lists of two ideals such that the
-         intersection(l[j][1], j=1..)=i, the l[i][1] are 
+         intersection(l[j][1], j=1..)=i, the l[i][1] are
          primary and the l[i][2] their radicals
 NOTE:    algorithm of Gianni/Trager/Zacharias
-"  
+"
 {
    if(size(i)==0)
    {
@@ -190,22 +190,22 @@ NOTE:    algorithm of Gianni/Trager/Zacharias
    ideal j;
    int n=nvars(BAS);
    int k;
-   
+
    ideal SBi=std(i);
    int d=dim(SBi);
-//---the trivial case and the zero-dimensional case 
+//---the trivial case and the zero-dimensional case
    if ((d==0)||(d==-1))
    {
       return(zeroDecomp(i));
    }
-//---prepare the quotientring with respect to a maximal 
+//---prepare the quotientring with respect to a maximal
 //   independent set
    list quotring=prepareQuotientring(SBi);
    execute (quotring[1]);
-//---we use this ring to compute a standardbasis of i*quring 
+//---we use this ring to compute a standardbasis of i*quring
 //   which is in i
    ideal i=std(imap(BAS,i));
-//---pass to the quotientring with respect to a maximal 
+//---pass to the quotientring with respect to a maximal
 //   independent set
    execute(quotring[2]);
    ideal i=imap(nring,i);
@@ -235,7 +235,7 @@ NOTE:    algorithm of Gianni/Trager/Zacharias
    }
    q=q^sat(i,q)[2];
 
-//---i=intersection((i:q),(i,q)) and ra is the primary 
+//---i=intersection((i:q),(i,q)) and ra is the primary
 //   decomposition of i:q
    if(deg(q)>0)
    {
@@ -256,7 +256,7 @@ proc equidimensional(ideal i)
 RETURN:  list l of two ideals such that intersetion(l[1],
          l[2])=i
          l[1] is equidimensional and dim(l[1])>dim(l[2])
-" 
+"
 {
    def  BAS = basering;
 
@@ -265,26 +265,26 @@ RETURN:  list l of two ideals such that intersetion(l[1],
    int n=nvars(BAS);
    int k;
    list result;
-   
-//-----the trivial cases 
+
+//-----the trivial cases
    if ((d==-1)||(n==d)||(n==1)||(d==0))
    {
       result=i,ideal(1);
       return(result);
    }
-//-----prepare the quotientring with respect to a maximal 
+//-----prepare the quotientring with respect to a maximal
 //     independent set
    list quotring=prepareQuotientring(SBi);
    execute (quotring[1]);
-//-----we use this ring to compute a standardbasis of 
+//-----we use this ring to compute a standardbasis of
 //     i*quring which is in i
    ideal eq=std(imap(BAS,i));
-//-----pass to the quotientring with respect to a maximal 
+//-----pass to the quotientring with respect to a maximal
 //     independent set
    execute (quotring[2]);
-   ideal eq=imap(nring,eq); 
+   ideal eq=imap(nring,eq);
    kill nring;
-//-----preparation for saturation 
+//-----preparation for saturation
    poly p=prepareSat(eq);
 //-----back to the original ring
    setring BAS;
@@ -293,11 +293,11 @@ RETURN:  list l of two ideals such that intersetion(l[1],
    kill quring;
 //-----compute the intersection of eq with BAS
    eq=sat(eq,p)[1];
- 
+
    SBi=std(quotient(i,eq));
-   
+
    if(d>dim(SBi))
-   { 
+   {
      result=eq,SBi;
      return(result);
    }
@@ -329,14 +329,14 @@ proc radical(ideal i)
 "USAGE:  radical(i); i ideal
 RETURN:  ideal = the radical of i
 NOTE:    algorithm of Krick/Logar
-"  
+"
 {
    def  BAS = basering;
    ideal j;
    int n=nvars(BAS);
    int k;
 
-   option(redSB);   
+   option(redSB);
    ideal SBi=std(i);
    option(noredSB);
    int d=dim(SBi);
@@ -356,14 +356,14 @@ NOTE:    algorithm of Krick/Logar
       }
       return(std(i));
    }
-//-----prepare the quotientring with respect to a maximal 
+//-----prepare the quotientring with respect to a maximal
 //     independent set
    list quotring=prepareQuotientring(SBi);
    execute (quotring[1]);
-//-----we use this ring to compute a standardbasis of 
+//-----we use this ring to compute a standardbasis of
 //     i*quring which is in i
    ideal i=std(imap(BAS,i));
-//-----pass to the quotientring with respect to a maximal 
+//-----pass to the quotientring with respect to a maximal
 //     independent set
    execute( quotring[2]);
    ideal i=imap(nring,i);
@@ -386,7 +386,7 @@ NOTE:    algorithm of Krick/Logar
 }
 
    ring  r = 0,(x,y,z),dp;
-   ideal i = 
+   ideal i =
    intersect(ideal(x,y,z)^3,ideal(x-y-z)^2,ideal(x-y,x-z)^2);
    ideal j = radical(i);
    j;

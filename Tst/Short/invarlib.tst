@@ -16,6 +16,6 @@ tst_status(1);
 $
 
 This is the file invarlib.tst
-To run the tests and create the .res file 
-go to the directory containing this file and type  
+To run the tests and create the .res file
+go to the directory containing this file and type
 Singular -teqr12345678 invarlib.tst > invarlib.res

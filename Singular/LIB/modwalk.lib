@@ -30,12 +30,12 @@ LIB "modstd.lib";
 
 static proc modpWalk(def II, int p, int variant, list #)
 "USAGE:  modpWalk(I,p,#); I ideal, p integer, variant integer
-ASSUME:  If size(#) > 0, then 
+ASSUME:  If size(#) > 0, then
            #[1] is an intvec describing the current weight vector
            #[2] is an intvec describing the target weight vector
 RETURN:  ideal - a standard basis of I mod p, integer - p
 NOTE:    The procedure computes a standard basis of the ideal I modulo p and
-         fetches the result to the basering. 
+         fetches the result to the basering.
 EXAMPLE: example modpWalk; shows an example
 "
 {
@@ -88,7 +88,7 @@ EXAMPLE: example modpWalk; shows an example
       if(!((order == "simple") || (sizerl > 4)))
       {
         list rl@r = ringlist(@r);
-        nvar@r = nvars(@r);      
+        nvar@r = nvars(@r);
         intvec w;
         for(k = 1; k <= nvar@r; k++)
         {
@@ -174,7 +174,7 @@ EXAMPLE: example modpWalk; shows an example
       i=pwalk(i,pert_deg,pert_deg);
     }
   }
-  
+
   if(!mixedTest() && !h)
   {
     if(!((find(ordstr_R0, "M") > 0) || (find(ordstr_R0, "a") > 0) || neg))
@@ -213,7 +213,7 @@ example
 
 proc modWalk(def II, int variant, list #)
 "USAGE:  modWalk(II); II ideal or list(ideal,int)
-ASSUME:  If variant = 
+ASSUME:  If variant =
 @*       - 1 the Random Walk algorithm with radius II[2] is applied
            to II[1] if II = list(ideal, int). It is applied to II with radius 2
            if II is an ideal.
@@ -277,7 +277,7 @@ EXAMPLE: example modWalk; shows an example
       {
         II[3] = 2;
       }
-    
+
     }
     else
     {
@@ -355,7 +355,7 @@ EXAMPLE: example modWalk; shows an example
         {
           ERROR("Unexpected type of input.");
         }
-      }  
+      }
     }
     if(size(#) == 3)
     {
@@ -706,7 +706,7 @@ static proc parallelChinrem(list T1, list T2, int n1)
     arguments_chinrem[size(arguments_chinrem)+1] = list(list(J),T2);
   }
   results_chinrem = parallelWaitAll("chinrem",arguments_chinrem);
-    for(j=1; j <= size(results_chinrem); j++)  
+    for(j=1; j <= size(results_chinrem); j++)
     {
       J = results_chinrem[j];
       attrib(J,"isSB",1);

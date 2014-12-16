@@ -60,7 +60,7 @@ ring sBucketGetRing(const sBucket_pt bucket)
 bool sIsEmpty(const sBucket_pt bucket)
 {
   for(int i = 0; i < (BIT_SIZEOF_LONG - 3); i++)
-  {    
+  {
     assume( i < (BIT_SIZEOF_LONG - 3) );
     assume( pLength(bucket->buckets[i].p) == bucket->buckets[i].length );
 
@@ -86,7 +86,7 @@ sBucket_pt    sBucketCopy(const sBucket_pt bucket)
   newbucket->max_bucket = bucket->max_bucket;
 
   for(int i = 0; i <= bucket->max_bucket; i++)
-  {    
+  {
     assume( i < (BIT_SIZEOF_LONG - 3) );
     assume( pLength(bucket->buckets[i].p) == bucket->buckets[i].length );
 
@@ -289,7 +289,7 @@ void sBucketClearAdd(sBucket_pt bucket, poly *p, int *length)
   lr = bucket->buckets[i].length;
 
   assume( pr != NULL && (lr > 0) );
-  
+
   bucket->buckets[i].p = NULL;
   bucket->buckets[i].length = 0;
   i++;
@@ -299,24 +299,24 @@ void sBucketClearAdd(sBucket_pt bucket, poly *p, int *length)
     if (bucket->buckets[i].p != NULL)
     {
       assume( bucket->buckets[i].length == pLength(bucket->buckets[i].p) );
-      
+
       pr = p_Add_q(pr, bucket->buckets[i].p, lr, bucket->buckets[i].length,
                    bucket->bucket_ring);
-      
+
       bucket->buckets[i].p = NULL;
       bucket->buckets[i].length = 0;
     }
 
     assume( bucket->buckets[i].p == NULL );
-    assume( bucket->buckets[i].length == 0 );    
+    assume( bucket->buckets[i].length == 0 );
     i++;
   }
 
 done:
-  
+
   *p = pr;
   *length = lr;
-  
+
   bucket->max_bucket = 0;
 
   assume( sIsEmpty(bucket) );

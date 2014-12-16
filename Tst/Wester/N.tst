@@ -1,6 +1,6 @@
 LIB "tst.lib"; tst_init();
 
-ring R = (0 , l1, l2, n11, n22, g, p11, p12, p21, p22, 
+ring R = (0 , l1, l2, n11, n22, g, p11, p12, p21, p22,
              a12, a21, a22),(q1,q2,q3,q4),lp;
 
 poly res1 = p11*p22*q1^2*q4^2-p12*p21*q1^2*q4^2-n22*p11*p22*q1*q4^2+2*n11*p11*p22*q1*q4^2-

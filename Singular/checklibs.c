@@ -44,7 +44,7 @@ void get_next()
     {
       if (buf[i]>=127) { non_ascii_found=1;non_ascii++;non_ascii_line=lines; break; }
     }
-    if (non_ascii_found) printf("non-ascii:>>%s<<\n",buf); 
+    if (non_ascii_found) printf("non-ascii:>>%s<<\n",buf);
     if (footer==0) /* we are still in the header */
     {
       if (strstr(buf,"@*")!=NULL) star_nl++;

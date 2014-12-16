@@ -1028,7 +1028,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
                 else return TRUE;
             }
         }
-        
+
       }
       else return TRUE;
     }

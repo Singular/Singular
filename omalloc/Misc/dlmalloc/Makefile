@@ -3,7 +3,7 @@ CCC = CC
 CFLAGS = -O2
 RM = rm -f
 DISTFILES = COPYRIGHT Makefile malloc-trace.c malloc-trace.h \
-            print-trace.c trace-test.c 
+            print-trace.c trace-test.c
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<

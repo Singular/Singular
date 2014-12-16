@@ -40,7 +40,7 @@ def process_input(source):
             ind=[int(s) for s in line.split()]
 
             input_numbers+=ind
-            
+
         else:
             if(isheader(line)):
                 m=re.match("^p cnf\s+(?P<vars>\d+)\s+(?P<clauses>\d+)\s*\n",line)
@@ -64,7 +64,7 @@ def gen_clauses(input_numbers):
         else:
             act.append(i)
     return erg
-    
+
 def xor(a,b):
     return (a and not b) or (b and not a)
 def gen_poly_Singular(clause):
@@ -109,13 +109,13 @@ exit;
     ideal=",\n".join([gen_poly_Magma(p) for p in clauses])
     ideal=ideal+",\n"+",\n".join(["x"+str(i)+"^2+x"+str(i) for i in xrange(1,vars+1)])
     return start_str.substitute({"nvars":str(vars), "var_list":var_list, "ideal":ideal})
-    
+
 def gen_poly_PB(clause):
     def term2string(t):
         if len(t)==0:
             return "1"
         return "*".join(["x("+str(v) +")" for v in t])
-    
+
     vars=tuple([v for v in clause if v>0])
     negated_vars=tuple([-v for v in clause if v<0])
     if len(negated_vars)>0:
@@ -127,7 +127,7 @@ def gen_poly_PB(clause):
     res="+".join([term2string(t) for t in terms])
     return res
     #add_vars=[negated_var[i] for (i,j) in enumerate(combination) if j==1]
-    
+
 def gen_PB(clauses):
     start_str=Template("""from PyPolyBoRi import *
 r=Ring($vars)
@@ -137,8 +137,8 @@ ideal=\
 [
 """)
     start_str=start_str.substitute(vars=vars)
-    
-    
+
+
 
     poly_str=",\\\n   ".join([gen_poly_PB(c) for c in clauses])
     end_str="""]
@@ -169,7 +169,7 @@ def  convert_file_PB(cnf,invert):
     out.close()
 def  convert_file_Singular(cnf,invert):
     clauses=gen_clauses(process_input(open(cnf)))
-    
+
     #clauses=gen_clauses(process_input(sys.stdin))
     if invert:
         clauses=[[-i for i in c] for c in clauses]
@@ -186,7 +186,7 @@ def  convert_file_Singular(cnf,invert):
 
 def  convert_file_Magma(cnf,invert):
     clauses=gen_clauses(process_input(open(cnf)))
-    
+
     #clauses=gen_clauses(process_input(sys.stdin))
     if invert:
         clauses=[[-i for i in c] for c in clauses]
@@ -199,8 +199,8 @@ def  convert_file_Magma(cnf,invert):
     out=open(out_file_name,"w")
     #print out
     out.write(gen_Magma(clauses))
-    out.close()    
-    
+    out.close()
+
 if __name__=='__main__':
     (options, args) = parser.parse_args()
     #clauses=gen_clauses(process_input(open(options.cnf)))

@@ -787,7 +787,7 @@ nMapFunc npSetMap(const coeffs src, const coeffs dst)
   }
 #endif
   if (src->rep==n_rep_gap_rat)  /* Q, Z */
-  {    
+  {
     return nlModP; // npMap0; // FIXME? TODO? // extern number nlModP(number q, const coeffs Q, const coeffs Zp); // Map q \in QQ \to Zp // FIXME!
   }
   if ((src->rep==n_rep_int) &&  nCoeff_is_Zp(src) )

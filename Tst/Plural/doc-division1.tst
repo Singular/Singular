@@ -14,5 +14,5 @@ L;
 // now we show that the formula above holds
 matrix M[1][1] = s^2; matrix N = matrix(I);
 matrix T = matrix(L[1]); matrix R = matrix(L[2]); matrix U  = matrix(L[3]);
-transpose(U)*transpose(M) - transpose(T)*transpose(N) - transpose(R); 
+transpose(U)*transpose(M) - transpose(T)*transpose(N) - transpose(R);
 tst_status(1);$

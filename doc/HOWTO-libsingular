@@ -45,7 +45,7 @@ main()
 
   // compute p1+p2
   p1=p_Add_q(p1,p2,R); p2=NULL;
-  pWrite(p1); 
+  pWrite(p1);
 
   // clean up:
   pDelete(&p1);

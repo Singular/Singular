@@ -1,5 +1,5 @@
 //
-// solve_s.tst - short tests for 
+// solve_s.tst - short tests for
 
 LIB "tst.lib";
 tst_init();

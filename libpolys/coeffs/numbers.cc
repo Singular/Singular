@@ -39,7 +39,7 @@
 
 #ifdef HAVE_NUMSTATS
 struct SNumberStatistic number_stats;
-#endif /* HAVE_NUMSTATS */ 
+#endif /* HAVE_NUMSTATS */
 
 //static int characteristic = 0;
 //extern int IsPrime(int p);
@@ -372,9 +372,9 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 #endif
 
 #ifdef LDEBUG
-    n->cfDBTest=ndDBTest; 
+    n->cfDBTest=ndDBTest;
 #endif
-     
+
     n->convSingNFactoryN=ndConvSingNFactoryN;
     n->convFactoryNSingN=ndConvFactoryNSingN;
 

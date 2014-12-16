@@ -32,7 +32,7 @@ ideal jeq = groebner(eq);
 jeq;
 std(eq);
 slimgb(eq);
-// returns one generator 
+// returns one generator
 // jeq[1]=20*x1*x2^2+64*x1*x2+48*x1-25*x2^4-160*x2^3-335*x2^2-236*x2-12
 // instead of 3 (which gives e.g. std or slimgb)
 

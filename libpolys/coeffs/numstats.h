@@ -106,7 +106,7 @@ struct SNumberStatistic
     inline void Print() const
     {
 #define _P(F) if(this->F > 0) ::Print("%21s: %13lu\n", # F, this->F)
-      ALL_STATISTIC(_P);       
+      ALL_STATISTIC(_P);
       _P(n_CancelOut);
 #undef _P
     }
@@ -124,7 +124,7 @@ struct SNumberStatistic
 static inline void number_stats_Init(const unsigned long defaultvalue = 0)
 {
 #ifndef HAVE_NUMSTATS
-  WarnS("Please enable NUMSTATS first!"); 
+  WarnS("Please enable NUMSTATS first!");
   (void)(defaultvalue);
 #else
   extern struct SNumberStatistic number_stats;
@@ -137,7 +137,7 @@ static inline void number_stats_Print(const char * const msg = NULL)
 {
    ::Print("%s:\n", (msg == NULL) ? "Statistic about number operations" : msg);
 #ifndef HAVE_NUMSTATS
-  WarnS("Please enable NUMSTATS first!"); 
+  WarnS("Please enable NUMSTATS first!");
 #else
   extern struct SNumberStatistic number_stats;
   number_stats.Print();

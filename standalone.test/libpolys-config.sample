@@ -15,7 +15,7 @@ Usage: libpolys-config [OPTION]
 
 Known values for OPTION are:
 
-  --prefix		show libpolys installation prefix 
+  --prefix		show libpolys installation prefix
   --libs		print library linking information
   --cflags		print pre-processor and compiler flags
   --help		display this help and exit
@@ -62,7 +62,7 @@ while test $# -gt 0; do
 	;;
 
     --libs)
-	${ECHOn} " -L${libdir} -lpolys_g -lcoeffs_g  -lreporter_g -lmisc_g -lomalloc_g -ldl -lgmp  " 
+	${ECHOn} " -L${libdir} -lpolys_g -lcoeffs_g  -lreporter_g -lmisc_g -lomalloc_g -ldl -lgmp  "
 	;;
 
     *)

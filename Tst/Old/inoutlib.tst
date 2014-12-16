@@ -3,7 +3,7 @@ LIB "inout.lib";
 example allprint;
 example lprint;
 example pmat;
-example rMacaulay; 
+example rMacaulay;
 example show;
 example split;
 example tab;

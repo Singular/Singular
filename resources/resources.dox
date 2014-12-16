@@ -3,15 +3,15 @@
  \page resources_page System environment and resource management
 
  This is a package that handled the system environment variables and especially the search path for Singular resources (like libraries and modules).
- 
+
  This may be used by factory in order to search for its precomputed
  tables and thus have been separated into a standalone top-level package.
- 
+
  Note that this package has no further dependencies,
  while it is used by the rest of Singular packages:
- - \ref factory_page, 
- - \ref libpolys_page, 
- - \ref kernel_page, 
+ - \ref factory_page,
+ - \ref libpolys_page,
+ - \ref kernel_page,
  - \ref singular_page.
- 
+
 */

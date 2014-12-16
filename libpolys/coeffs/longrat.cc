@@ -200,7 +200,7 @@ static number nlMapP(number from, const coeffs src, const coeffs dst)
   assume( getCoeffType(src) == n_Zp );
 
   number to = nlInit(npInt(from,src), dst); // FIXME? TODO? // extern int     npInt         (number &n, const coeffs r);
-   
+
   return to;
 }
 

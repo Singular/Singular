@@ -817,7 +817,7 @@ void nrnWrite (number &a, const coeffs)
 number nrnMapQ(number from, const coeffs src, const coeffs dst)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
-  mpz_init(erg);  
+  mpz_init(erg);
   nlGMP(from, (number)erg, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
   mpz_mod(erg, erg, dst->modNumber);
   return (number)erg;

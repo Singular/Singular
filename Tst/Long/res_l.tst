@@ -70,7 +70,7 @@ int alpha=5;
 int beta= 5;
 int t=0;
 poly f =x^a+y^b+z^c+x^alpha*y^(beta-5)+x^(alpha-2)*y^(beta-3)+x^(alpha-3)*y^(beta-4)*z^2+x^(alpha-4)*y^(beta-4)*(y^2+t*x)^2;
-ideal j =jacob(f); 
+ideal j =jacob(f);
 ideal i=homog(j,w);
 timer=1;
 list I=mres(i,0);
@@ -100,7 +100,7 @@ ideal i=
 6550a3+4965a2b+12096ab2-12270b3-14859a2c+2541abc-8313b2c-13376ac2-2239bc2
 +2634c3-1804a2d-9400abd-15441b2d+4784acd+7087bcd-10294c2d+8698ad2-6351bd2-387cd2
 -11534d3-13666a2e+14767abe+5618b2e+8275ace+675bce+11539c2e-3124ade-14915bde
-+15670cde-7223d2e-1840ae2-14459be2+895ce2-12702de2+2068e3, 
++15670cde-7223d2e-1840ae2-14459be2+895ce2-12702de2+2068e3,
 15942a3+4739a2b-5019ab2-6691b3+600a2c-1561abc+14937b2c-14659ac2-8392bc2
 +12410c3+3327a2d-14426abd+7985b2d-10298acd-2630bcd-4528c2d-12983ad2+8567bd2
 -14036cd2+10885d3-7763a2e-3366abe-3579b2e+2908ace-5392bce-336c2e+10534ade-11990bde

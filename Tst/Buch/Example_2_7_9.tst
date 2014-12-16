@@ -33,7 +33,7 @@ proc tensorMod(matrix Phi, matrix Psi)
    matrix A=tensorMaps(unitmat(s),Psi);  //Is tensor Psi
    matrix B=tensorMaps(Phi,unitmat(q));  //Phi tensor Iq
    matrix R=concat(A,B);                 //sum of A and B
-   return(R);     
+   return(R);
 }
 
 ring A=0,(x,y,z),dp;

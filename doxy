@@ -5,7 +5,7 @@ if [ "$#" -le 0 ]; then
   echo "Usage: $0 input_file(s)" >&2
   exit 1
 fi
-    
+
 INPUT="$@"
 
 P=`pwd`
@@ -32,30 +32,30 @@ SRCDIR=`pwd -P`
 SRCDIR="$SRCDIR/$TARGET_FILE"
 # echo $SRCDIR
 
-   
+
 if [ -z "$DOXYGEN" ]; then
 	DOXYGEN=`which doxygen`
-	
+
 	if [ $? -ne 0 ]; then
 	        echo Please add 'doxygen' to your PATH
 		exit 1
 	fi
-	
+
 	export DOXYGEN
 fi
 
 if [ ! -x "$DOXYGEN" ]; then
 	echo Please make "$DOXYGEN" - executable!;
-	exit 1; 
+	exit 1;
 fi
 
 if [ -z "$DOXYGEN_CONFIG" ]; then
 	export DOXYGEN_CONFIG="$SRCDIR/dox/Doxyfile.in1"
 fi
-	
+
 if [ ! -r "$DOXYGEN_CONFIG" ]; then
 	echo Please make the doxygen configuration readable: "$DOXYGEN_CONFIG"!;
-	exit 1; 
+	exit 1;
 fi
 
 cd "$P"
@@ -81,7 +81,7 @@ export OUTPUT
 export INPUT
 
 export GENERATE_HTML=YES GENERATE_LATEX=YES GENERATE_RTF=YES GENERATE_MAN=YES GENERATE_XML=YES \
-       HTML_OUTPUT=htm  LATEX_OUTPUT=tex   RTF_OUTPUT=rtf   MAN_OUTPUT=man   XML_OUTPUT=xml 
+       HTML_OUTPUT=htm  LATEX_OUTPUT=tex   RTF_OUTPUT=rtf   MAN_OUTPUT=man   XML_OUTPUT=xml
 
 export abs_top_srcdir="$SRCDIR" abs_top_builddir="$SRCDIR"
 

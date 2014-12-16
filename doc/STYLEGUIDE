@@ -70,7 +70,7 @@
 
 + @tex and '@end tex' should always be on separate lines
 
-+ keine latex-Konstrukte in @tex.. @end tex, 
++ keine latex-Konstrukte in @tex.. @end tex,
   also z.B. kein \begin{..}...\end{..}, etc.:
   hier darf nur auftauchen, was sowohl von tex als auch von latex
   verstanden wird

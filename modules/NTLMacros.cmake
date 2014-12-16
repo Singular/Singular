@@ -5,11 +5,11 @@
 #    CFLAGS='-O2 -fomit-frame-pointer'
 #    CXXFLAGS='-O2 -fomit-frame-pointer -fno-rtti'
 
-function(add_ntl GEN_TARGET GEN_LIB DIR) 
+function(add_ntl GEN_TARGET GEN_LIB DIR)
   message(STATUS "add_ntl")
   set(_GEN_LIB "${DIR}/src/ntl.a")
   set(_GEN_TARGET "generate_ntl")
-  #    LIBDIR= INCLUDEDIR= PREFIX= 
+  #    LIBDIR= INCLUDEDIR= PREFIX=
   set(_cxx_flags "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
   set(_cc_flags "${CMAKE_CC_FLAGS} ${CMAKE_CC_FLAGS_RELEASE}")
 
@@ -32,7 +32,7 @@ function(add_ntl GEN_TARGET GEN_LIB DIR)
     COMMENT "Compiling 'ntl' number theory library..."
     )
 
-  add_custom_target(generate_ntl DEPENDS 
+  add_custom_target(generate_ntl DEPENDS
     ${DIR}/setup4)
 
   set(${GEN_TARGET} ${_GEN_TARGET} PARENT_SCOPE)

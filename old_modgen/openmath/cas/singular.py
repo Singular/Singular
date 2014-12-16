@@ -18,7 +18,7 @@ def poly_in_ring2OM(p):
   pe=poly2OM(p)
   r=ring2OM(p.ring())
   return OMA(DMPsym,[r,pe])
-  
+
 def gb2OM(gb):
   i=ideal2OM(gb)
   o=ordering2OM(gb.ring())
@@ -48,14 +48,14 @@ def ideal2OM(i):
 def ring2OM(r):
     nv=singular.nvars(r)
     f=encode_field(r)
-    return OMA(poly_ring_dsym,[f,nv])   
+    return OMA(poly_ring_dsym,[f,nv])
 
 def OM2ring(ring_desc, ordering="dp"):
   assert isinstance(ring_desc, OMA)
   if (ring_desc.args[0]==Rationals):
     i=ring_desc.args[1]
     return create_ring(char=0, nvars=i, ordering=ordering)
- 
+
   raise SingularException("ring not supported")
 def OM2poly(poly_desc):
   """assumes the right ring is set"""
@@ -70,7 +70,7 @@ def OM2term(term_desc):
   assert isinstance(term_desc, OMA)
   assert len(term_desc.args)==singular.nvars(Ring())+1
   assert isinstance(term_desc.args[0], int)
-  
+
   coef=Number(term_desc.args[0])
   exp=IntVector()
   for e in term_desc.args[1:]:
@@ -133,16 +133,16 @@ def input_convert(f):
             i=OM2ideal_raw(dmpl)
             save_ring=r
             return i
-        
+
         return a
-            
+
     def wrapper(*args):
         return f(*[my2OM(a) for a in args])
-    
-    
+
+
     wrapper.__name__=f.__name__
     return wrapper
-    
+
 def output_convert(f):
     def my2om(a):
         """FIXME: very dirty"""
@@ -152,16 +152,16 @@ def output_convert(f):
             return ideal2OM(a)
         if (isinstance(a,list)):
             return cd.list1.list2OM([my2om(a2) for a2 in a])
-        
+
         return a
-            
+
     def wrapper(*args):
         return my2om(f(*args))
-    
-    
+
+
     wrapper.__name__=f.__name__
     return wrapper
-    
+
 def min_ass_func(dmpl):
     r=OM2ring(dmpl.args[0])
     r.set()
@@ -173,7 +173,7 @@ def min_ass_func2(i):
 
     l=singular.minAssGTZ(i)
     return cd.list1.list2OM([ideal2OM(i) for i in l])
-    
+
 
 def singular_default_converter(f):
     return output_convert(input_convert(f))

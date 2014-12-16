@@ -28,5 +28,5 @@ while (size(rs) > 1)
   pMultManyVars_Test(rs);
   rs = tst_next_ring();
 }
- 
+
 tst_status(1);$

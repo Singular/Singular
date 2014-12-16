@@ -1,6 +1,6 @@
 LIB "tst.lib"; tst_init();
   ring r=0,(x,y,z),dp;
-  timer = 0; 
+  timer = 0;
   poly p=(x+2y+3z+4xy+5xz+6yz)^20;
   // timer as int_expression:
   int t = timer;

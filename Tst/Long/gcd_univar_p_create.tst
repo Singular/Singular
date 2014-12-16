@@ -15,8 +15,8 @@ kill r;
 "anborg 7(1/p/1)";
 ring r=(32003,u),(x,y,z),dp;
 ideal i=
-u3x2+yz+xy2z+xyz2+xyz+xy+xz+yz, 
-ux2y2z+xy2z2+x2yz+xyz+yz+x+z, 
+u3x2+yz+xy2z+xyz2+xyz+xy+xz+yz,
+ux2y2z+xy2z2+x2yz+xyz+yz+x+z,
 u2x2y2z2+x2y2z+xy2z+xyz+xz+z+1;
 option(prot);
 option(redSB);
@@ -31,7 +31,7 @@ kill s;
 kill r;
 
 "coprasse(1/p/1)";
-ring r=(32003,u),(x,y,z,t),dp; 
+ring r=(32003,u),(x,y,z,t),dp;
 ideal i=
 y2z+2xyt-2x-z,
 -x3z+4xy2z+4x2yt+2y3t+4x2-10y2+4xz-10yt+2,

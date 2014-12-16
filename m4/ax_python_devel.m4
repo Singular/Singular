@@ -270,7 +270,7 @@ EOD`
 	fi
 	AC_MSG_RESULT([$PYTHON_EXTRA_LIBS])
 	AC_SUBST(PYTHON_EXTRA_LIBS)
-	
+
 	#
 	# linking flags needed when embedding: LINKFORSHARED is buggy  on OSX  see http://bugs.python.org/issue3588 and  http://stackoverflow.com/questions/6490513/vim-failing-to-compile-with-python-on-os-x
 	#

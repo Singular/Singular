@@ -14,7 +14,7 @@ I:	invert(Hilbert(40))		with inverse ok
 J:	check I				ok
 K:	invert(Hilbert(70))		with inverse ok
 L:	check K				ok
-M1:	det(sparse, rank 26, 5 var)	ok	
+M1:	det(sparse, rank 26, 5 var)	ok
 M2:	det(sparse, rank 101, 5 var)	ok
 N:	subst algebraic numbers		no chance
 O1:	3 dets (sparse, rank 15, 22 var)	ok

@@ -35,7 +35,7 @@ info	="LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C python(input)
  * PURPOSE:  interprets the string in python
  */
 none python(string a)
-{ 
+{
   %declaration;
   %typecheck;
   mbpython(a);

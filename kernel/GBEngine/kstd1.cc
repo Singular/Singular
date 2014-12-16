@@ -1347,7 +1347,7 @@ void initSba(ideal F,kStrategy strat)
     strat->LazyPass *=4;
     strat->red2 = redHomog;
   }
-#if defined(HAVE_RINGS) || defined(HAVE_RINGS_LOC)  //TODO Oliver  
+#if defined(HAVE_RINGS) || defined(HAVE_RINGS_LOC)  //TODO Oliver
   if (rField_is_Ring(currRing))
   {
     if(rHasLocalOrMixedOrdering(currRing))

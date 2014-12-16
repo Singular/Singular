@@ -1569,10 +1569,10 @@ public:
           for(i=start;i<=lastIndex;i++)
           {
             if (row_array[i]!=zero)
-	    { STATISTIC(n_Sub);		  
+	    { STATISTIC(n_Sub);
               other_row_array[i]=F4mat_to_number_type(npSubM((number)(long) other_row_array[i], (number)(long) row_array[i],currRing->cf));
 	    }
-	     
+
           }
       }
       else
@@ -1584,7 +1584,7 @@ public:
 	    { STATISTIC(n_Add);
               other_row_array[i]=F4mat_to_number_type(npAddM(npMult(coef2,(number)(long) row_array[i],currRing->cf),(number)(long) other_row_array[i],currRing->cf));
 	    }
-	     
+
           }
         }
         updateStartIndex(other_row,start);
@@ -1735,7 +1735,7 @@ public:
 	  {
 	    STATISTIC(n_Add);
             other_row_array[i]=F4mat_to_number_type(npAddM(npMult(coef,(number)(long)row_array[i],currRing->cf),(number)(long)other_row_array[i],currRing->cf));
-	  }	   
+	  }
         }
         updateLastReducibleIndex(other_row,r);
       }

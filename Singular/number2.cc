@@ -61,7 +61,7 @@ BOOLEAN jjCRING_Zm(leftv res, leftv a, leftv b)
   if (c1->type==n_Z)
   {
     ZnmInfo info;
-    number modBase= (number) omAlloc(sizeof(mpz_t));    
+    number modBase= (number) omAlloc(sizeof(mpz_t));
     nlGMP(i2,modBase,coeffs_BIGINT); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(modBase,i2,coeffs_BIGINT); // ?
     info.base= (mpz_ptr)modBase;
     info.exp= 1;

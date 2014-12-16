@@ -7,7 +7,7 @@ tst_init();
 proc msetring(int charac, int nv, string ordering)
 {
   execute("ring r = " + string(charac) + ",x(1.." + string(nv) + "), " +
-  ordering + ";"); 
+  ordering + ";");
   keepring r;
 }
 
@@ -29,7 +29,7 @@ proc ecyclic_i(int i, int comps)
   }
   return (p);
 }
-  
+
 proc rcyclic_i(int i, int vars, int comps)
 {
   int j, k, l;
@@ -60,7 +60,7 @@ proc rcyclic_g(int vars, int comps)
 {
   ideal id;
   int i;
-  
+
   for (i=1; i<vars; i++)
   {
     id[i] = rcyclic_i(i, vars, comps);
@@ -152,7 +152,7 @@ proc generate_weight_str(int j)
 {
   int i;
   string res_str = "(";
-  
+
   for (i=1; i<j; i++)
   {
     res_str = res_str + string(i) + ",";
@@ -188,11 +188,11 @@ proc extend_orderings(list olist, int j)
     o2 = o1;
     o3 = o1;
   }
-      
-  // add weight orderings 
+
+  // add weight orderings
   olist = olist + list("Wp" + weight_string, "wp" + weight_string);
 
-    
+
   for (i=1; i<=size(olist); i++)
   {
     nl = nl + list(olist[i], "(C," + olist[i] + ")", "(c," + olist[i] + ")",
@@ -231,7 +231,7 @@ proc mystd
   {
     id_poly = id_poly + id_res[i];
     if (size(id_res[i]) > 2)
-    {   
+    {
       lead(id_res[i]), lead(id_res[i] - lead(id_res[i])), size(id_res[i]);
     }
     else
@@ -250,8 +250,8 @@ proc gencopy
   int n = #[2];
   int i, j;
   module m;
-  
-  
+
+
   for (i=1; i<=size(id); i++)
   {
     m[i] = id[i];
@@ -262,7 +262,7 @@ proc gencopy
   }
   return (m);
 }
-  
+
 
 proc std_extended_range(int from, int to, int charac, list orderings)
 {
@@ -297,7 +297,7 @@ proc std_range(int from, int to, int charac, list orderings)
   int k, j;
   list olist = orderings;
   global_char = charac;
-  
+
   for (k=from; k<=to; k++)
   {
     for (j=1; j <= size(olist); j++)
@@ -327,9 +327,9 @@ list global_orderings = "dp", "lp", "Dp", "ls", "ds", "Ds";
 
 
 std_extended_range(2, 6, 32003, global_orderings);
- 
+
 std_extended_range(7, 9, 32003, list("dp"));
-  
+
 std_range(10,15, 32003, list("dp"));
 
 std_range(2,6, 0, global_orderings);

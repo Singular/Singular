@@ -17,46 +17,46 @@ poly f=x7+y7+(x-y)^2*x2y2+x2y4; // Newton non-degenerate
 tau_es(f);
 list K=esIdeal(f);
 vdim(std(K[1])); // tau_es
-vdim(std(K[2])); // tau_es_fix 
-// 
+vdim(std(K[2])); // tau_es_fix
+//
 f=x7+y7+(x-y)^2*x2y2; // Newton degenerate
 tau_es(f);
 K=esIdeal(f);
-vdim(std(K[1])); 
-vdim(std(K[2])); 
+vdim(std(K[1]));
+vdim(std(K[2]));
 //
 f=x6y-3x4y4-x4y5+3x2y7-x4y6+2x2y8-y10+2x2y9-y11+x2y10-y12-y13;  // 4 branches
-tau_es(f);        
+tau_es(f);
 K=esIdeal(f);
 vdim(std(K[1]));
 K;
 kill rr;
 
 ///////////////////////////////////////////////////////////////////////////////
-//                  Teste Verhalten in verschiedenen Ringen 
+//                  Teste Verhalten in verschiedenen Ringen
 proc tst(list d)
 {
  int i;
  for(i=1;i<=size(d);i++)
    {
      execute(d[i]);
-     
+
      poly f = y8+4x3y6+6x6y4+2x5y5+4x9y2+4x8y3+x12+2x11y+2x10y2+x13;
-               	    
+
      list L=versal(f);
      def Px=L[1];
      setring Px;
      poly F = Fs[1,1];
-              
+
      list EsList = esStratum(F);
-     EsList[2];  
-     if (typeof(EsList[1])=="list") 
-     { 
+     EsList[2];
+     if (typeof(EsList[1])=="list")
+     {
        ideal ES = EsList[1][1]; kill EsList;
      }
      else
      {
-       def R=EsList[1]; kill EsList; setring R; 
+       def R=EsList[1]; kill EsList; setring R;
      }
      option(redSB);
      ES=std(ES);
@@ -103,7 +103,7 @@ esStratum(F);
 isEquising(F);
 kill rr;
 ///////////////////////////////////////////////////////////////////////////
-//      1st order es-deformation of irred. poly   
+//      1st order es-deformation of irred. poly
 ring rr=0,(A,B,C,x,y),ls;
 poly f=x7+y7+(x-y)^2*x2y2;
 poly F=f+A*y*diff(f,x)+B*x*diff(f,x)+C*diff(f,y);
@@ -141,7 +141,7 @@ ring R = 0, (x,y), ls;
 poly f = (y4-x4)^2 - x10;
 list L = versal(f);        //compute semiuniversal deformation
 def Px=L[1]; setring Px;
-poly F = Fs[1,1];          
+poly F = Fs[1,1];
 list M=esStratum(F);       //compute the equisingularity stratum
 def ESSring = M[1]; setring ESSring;
 option(redSB);
@@ -150,7 +150,7 @@ size(ES);    //-> 42
 ES[1];       //-> 8*A(1)+8*A(22)+A(1)^3
 ES[34];      //-> 8*A(40)-A(1)^2+A(1)*A(22)
 poly F = reduce(imap(Px,F),ES);  //A(1),A(22) both appear in F
-poly g = subst(F, A(22), -A(1)-(1/8)*A(1)^3); 
+poly g = subst(F, A(22), -A(1)-(1/8)*A(1)^3);
 for (int ii=1; ii<=44; ii++){ g = subst(g,A(ii),random(1,100)); }
 setring R;
 milnor(f);                //-> 57

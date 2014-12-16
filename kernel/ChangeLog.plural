@@ -13,20 +13,20 @@
 	file: exterior2.tst
 	DONE(11.12.02) todo: in twostd, running from qring should be
 	done another std() in order to get reduced result
-	
+
 	DONE: buckets in multiplication (p_Mult_mm, mm_Mult_p)
 	version 1.17 - add cvs -m "buckets added", not
 	just nCopy
 	todo: syz(i) with the canonical method, think about
 	Schreyer and LaScala (double homogenization)
 	Print(p) at gr_kstd2.cc:877 is commented out
-	
+
 23.01.03-
 31.01.03
-	Updated multiplication: 
+	Updated multiplication:
 	now we search for the shortest path with nc_uu_Mult_ww_horvert
 	An old code is called nc_uu_Mult_ww_vert, is used by default.
-	
+
 	Further on, we should compute metrics.
 
 	A function added:
@@ -47,5 +47,5 @@ until
 
 18.03.03
 	fixed: extra "type print" in ring.cc
-        new strategy of bucket used in bracket 
+        new strategy of bucket used in bracket
 

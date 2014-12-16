@@ -16,9 +16,9 @@ then
 else
  F="$1"
  if [ -r "$F" ];
- then 
+ then
    cat "$F"
- else  
+ else
    echo -n "UNKNOWN_GIT_VERSION"
- fi  
+ fi
 fi

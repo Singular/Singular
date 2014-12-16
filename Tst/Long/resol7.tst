@@ -82,7 +82,7 @@ kill L;kill R;
 
 "============== D6";
 ring R=0,(x,y,z),dp;
-ideal I=x2y-y5+z2; // D_6        
+ideal I=x2y-y5+z2; // D_6
 list L=resolve(I,"A");
 zetaDL(L,1,"local");
 kill L;kill R;
@@ -166,7 +166,7 @@ kill L;kill R;
 
 "============== Z11";
 ring R=0,(x,y,z),dp;
-ideal I=xy4+y5+x3y+z2; // Z11   
+ideal I=xy4+y5+x3y+z2; // Z11
 list L=resolve(I,"A");
 zetaDL(L,1,"local");
 kill L;kill R;
@@ -202,28 +202,28 @@ kill L;kill R;
 
 "============== Cayley cubic";
 ring R=0,(x,y,z),dp;
-ideal I=xy+xz+yz+xyz;  //Cayley cubic 
+ideal I=xy+xz+yz+xyz;  //Cayley cubic
 list L=resolve(I,"A");
 zetaDL(L,1,"local");
 kill L;kill R;
 
 "============== E12";
 ring R=0,(x,y,z),dp;
-ideal I=y7+xy5+x3+z2;  //E12    
+ideal I=y7+xy5+x3+z2;  //E12
 list L=resolve(I,"A");
 zetaDL(L,1,"local");
 kill L;kill R;
 
 "============== E13";
 ring R=0,(x,y,z),dp;
-ideal I=y8+xy5+x3+z2;  //E13  
+ideal I=y8+xy5+x3+z2;  //E13
 list L=resolve(I,"A");
 zetaDL(L,1,"local");
 kill L;kill R;
 
 "============== E14";
 ring R=0,(x,y,z),dp;
-ideal I=y8+xy6+x3+z2;  //E14 
+ideal I=y8+xy6+x3+z2;  //E14
 list L=resolve(I,"A");
 zetaDL(L,1,"local");
 kill L;kill R;
@@ -244,7 +244,7 @@ kill L;kill R;
 
 "============== Q12";
 ring R=0,(x,y,z),dp;
-ideal I=xy4+y5+x3+yz2;  //Q12 
+ideal I=xy4+y5+x3+yz2;  //Q12
 list L=resolve(I,"A");
 zetaDL(L,1,"local");
 kill L;kill R;
@@ -258,7 +258,7 @@ kill L;kill R;
 
 "============== S12";
 ring R=0,(x,y,z),dp;
-ideal I=z5+xz3+x2y+y2z;  //S12  
+ideal I=z5+xz3+x2y+y2z;  //S12
 list L=resolve(I,"A");
 zetaDL(L,1,"local");
 kill L;kill R;

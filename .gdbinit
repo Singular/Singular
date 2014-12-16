@@ -10,7 +10,7 @@ break dPolyReportError
 define pp
   if $argc > 0
     print $arg0
-    if $arg0 != 0 
+    if $arg0 != 0
       print *$arg0
 
       if $argc == 2
@@ -21,14 +21,14 @@ define pp
     end
   end
 end
-     
+
 
 
 # print number coeffs
 define nn
   if $argc > 0
     print $arg0
-    if $arg0 != 0 
+    if $arg0 != 0
       print *$arg0
 
       if $argc == 2
@@ -39,4 +39,4 @@ define nn
     end
   end
 end
-     
+

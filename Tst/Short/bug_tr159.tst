@@ -2,7 +2,7 @@ LIB "tst.lib";
 tst_init();
 
 // NF was not 0 as expected - not enough searching in kFind...InS
-intmat m1[8][8] = 
+intmat m1[8][8] =
  2, 2, 2, 4, 1, 1, 3, 3,
  0, 0, 0,-1, 0, 0, 0, 0,
  0, 0, 0, 0,-1, 0, 0, 0,
@@ -50,6 +50,6 @@ Q;
 
 ideal t = a_1_0, b_1_1, b_2_1, b_2_2, b_2_3, b_3_4, b_3_5, c_4_8;
 option(prot);
-NF(b_2_1,t); 
+NF(b_2_1,t);
 
 tst_status(1);$
