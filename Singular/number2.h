@@ -5,7 +5,7 @@
 
 #ifdef SINGULAR_4_1
 #include <omalloc/omalloc.h>
-#include <libpolys/coeffs/coeffs.h>
+#include <coeffs/coeffs.h>
 #include <kernel/structs.h>
 struct snumber2;
 typedef struct snumber2 *   number2;

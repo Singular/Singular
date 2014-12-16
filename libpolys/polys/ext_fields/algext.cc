@@ -39,6 +39,7 @@
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
+
 #include <coeffs/longrat.h>
 
 #include <polys/monomials/ring.h>
@@ -958,7 +959,7 @@ number naMap0P(number a, const coeffs src, const coeffs dst)
   if (n_IsZero(a, src)) return NULL;
   // int p = rChar(dst->extRing);
 
-  number q = nlModP(a, src, dst->extRing->cf);
+  number q = nlModP(a, src, dst->extRing->cf); // FIXME? TODO? // extern number nlModP(number q, const coeffs Q, const coeffs Zp); // Map q \in QQ \to pZ
 
   poly result = p_NSet(q, dst->extRing);
 

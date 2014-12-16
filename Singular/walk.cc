@@ -41,10 +41,8 @@
 #include <omalloc/omalloc.h>
 #include <Singular/ipshell.h>
 #include <Singular/ipconv.h>
-#include <coeffs/ffields.h>
 #include <coeffs/coeffs.h>
 #include <Singular/subexpr.h>
-#include <polys/templates/p_Procs.h>
 
 #include <polys/monomials/maps.h>
 

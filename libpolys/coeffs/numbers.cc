@@ -18,7 +18,6 @@
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
 
-#include <coeffs/numbers.h>
 #include <coeffs/longrat.h>
 #include <coeffs/modulop.h>
 #include <coeffs/gnumpfl.h>
@@ -27,9 +26,9 @@
 #include <coeffs/shortfl.h>
 
 #ifdef HAVE_RINGS
-#include <coeffs/rmodulo2m.h>
-#include <coeffs/rmodulon.h>
-#include <coeffs/rintegers.h>
+# include <coeffs/rmodulo2m.h>
+# include <coeffs/rmodulon.h>
+# include <coeffs/rintegers.h>
 #endif
 
 #ifdef HAVE_POLYEXTENSIONS

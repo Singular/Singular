@@ -2,20 +2,16 @@
 
 #if HAVE_GFANLIB
 
-#include <bbfan.h>
-#include <bbpolytope.h>
-
 #include <misc/intvec.h>
 #include <misc/sirandom.h>
-#include <coeffs/longrat.h>
+
 #include <coeffs/bigintmat.h>
+#include <coeffs/longrat.h>
 
 #include <Singular/ipid.h>
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
-
-#include <sstream>
 
 // #include <omalloc/omalloc.h>
 // #include <kernel/intvec.h>
@@ -26,6 +22,11 @@
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>
 
+#include "bbfan.h"
+#include "bbpolytope.h"
+
+
+#include <sstream>
 
 int coneID;
 

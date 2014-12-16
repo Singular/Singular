@@ -8,8 +8,7 @@
 */
 #include <misc/auxiliary.h>
 
-struct n_Procs_s;
-typedef struct  n_Procs_s  *coeffs;
+struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 
 /// Initialize r (n_long_C)
 BOOLEAN ngcInitChar(coeffs r, void*);

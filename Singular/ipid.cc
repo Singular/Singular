@@ -19,7 +19,6 @@
 
 #include <coeffs/numbers.h>
 #include <coeffs/bigintmat.h>
-#include <coeffs/longrat.h>
 
 #include <polys/matpol.h>
 #include <polys/monomials/ring.h>

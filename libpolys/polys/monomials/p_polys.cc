@@ -8,11 +8,6 @@
  *  Created: 8/00
  *******************************************************************/
 
-
-
-
-
-
 #include <ctype.h>
 
 #include <omalloc/omalloc.h>
@@ -22,8 +17,8 @@
 #include <misc/options.h>
 #include <misc/intvec.h>
 
-#include <coeffs/longrat.h> // ???
-#include <coeffs/ffields.h>
+
+#include <coeffs/longrat.h> // snumber is needed...
 
 #include <polys/PolyEnumerator.h>
 
@@ -132,7 +127,7 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, const ring R)
     number n=n_ChineseRemainderSym(x,q,rl,TRUE,R->cf);
     for(j=rl-1;j>=0;j--)
     {
-      x[j]=NULL; // nlInit(0...) takes no memory
+      x[j]=NULL; // n_Init(0...) takes no memory
     }
     if (n_IsZero(n,R)) p_Delete(&h,R);
     else
@@ -2420,13 +2415,13 @@ void p_SimpleContent(poly ph, int smax, const ring r)
   while (p!=NULL)
   {
 #if 0
-    d=nlGcd(h,pGetCoeff(p),r->cf);
-    nlDelete(&h,r->cf);
+    d=n_Gcd(h,pGetCoeff(p),r->cf);
+    n_Delete(&h,r->cf);
     h = d;
-#else
-    nlInpGcd(h,pGetCoeff(p),r->cf);
+#else    
+    STATISTIC(n_Gcd); nlInpGcd(h,pGetCoeff(p),r->cf); // FIXME? TODO? // extern void nlInpGcd(number &a, number b, const coeffs r);
 #endif
-    if(nlSize(h,r->cf)<smax)
+    if(n_Size(h,r->cf)<smax)
     {
       //if (TEST_OPT_PROT) PrintS("g");
       return;
@@ -2434,20 +2429,20 @@ void p_SimpleContent(poly ph, int smax, const ring r)
     pIter(p);
   }
   p = ph;
-  if (!nlGreaterZero(pGetCoeff(p),r->cf)) h=nlNeg(h,r->cf);
-  if(nlIsOne(h,r->cf)) return;
+  if (!n_GreaterZero(pGetCoeff(p),r->cf)) h=n_InpNeg(h,r->cf);
+  if(n_IsOne(h,r->cf)) return;
   //if (TEST_OPT_PROT) PrintS("c");
   while (p!=NULL)
   {
 #if 1
-    d = nlExactDiv(pGetCoeff(p),h,r->cf);
+    d = n_ExactDiv(pGetCoeff(p),h,r->cf);
     p_SetCoeff(p,d,r);
 #else
-    nlInpExactDiv(pGetCoeff(p),h,r->cf);
+    STATISTIC(n_ExactDiv); nlInpExactDiv(pGetCoeff(p),h,r->cf); // no such function... ?
 #endif
     pIter(p);
   }
-  nlDelete(&h,r->cf);
+  n_Delete(&h,r->cf);
 }
 #endif
 
@@ -2461,19 +2456,19 @@ static number p_InitContent(poly ph, const ring r)
   assume(rField_is_Q(r));
   if (pNext(pNext(ph))==NULL)
   {
-    return nlGetNom(pGetCoeff(pNext(ph)),r->cf);
+    return n_GetNumerator(pGetCoeff(pNext(ph)),r->cf);
   }
   poly p=ph;
-  number n1=nlGetNom(pGetCoeff(p),r->cf);
+  number n1=n_GetNumerator(pGetCoeff(p),r->cf);
   pIter(p);
-  number n2=nlGetNom(pGetCoeff(p),r->cf);
+  number n2=n_GetNumerator(pGetCoeff(p),r->cf);
   pIter(p);
   number d;
   number t;
   loop
   {
     nlNormalize(pGetCoeff(p),r->cf);
-    t=nlGetNom(pGetCoeff(p),r->cf);
+    t=n_GetNumerator(pGetCoeff(p),r->cf);
     if (nlGreaterZero(t,r->cf))
       d=nlAdd(n1,t,r->cf);
     else
@@ -2484,7 +2479,7 @@ static number p_InitContent(poly ph, const ring r)
     pIter(p);
     if (p==NULL) break;
     nlNormalize(pGetCoeff(p),r->cf);
-    t=nlGetNom(pGetCoeff(p),r->cf);
+    t=n_GetNumerator(pGetCoeff(p),r->cf);
     if (nlGreaterZero(t,r->cf))
       d=nlAdd(n2,t,r->cf);
     else
@@ -2512,7 +2507,7 @@ static number p_InitContent(poly ph, const ring r)
     pIter(ph);
     if(ph==NULL)
     {
-      if (s2==-1) return nlCopy(d,r->cf);
+      if (s2==-1) return n_Copy(d,r->cf);
       break;
     }
     if (SR_HDL(pGetCoeff(ph))&SR_INT)
@@ -2532,7 +2527,7 @@ static number p_InitContent(poly ph, const ring r)
       s=mpz_size1(d->z);
     }
   }
-  return nlGcd(d,d2,r->cf);
+  return n_Gcd(d,d2,r->cf);
 }
 #endif
 

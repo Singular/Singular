@@ -1,10 +1,8 @@
 #ifndef QPOLY
 #define QPOLY
 
-
-#include <gmp.h>
-#include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
+#include "si_gmp.h"
 
 #ifdef SINGULAR_4_1
 

@@ -7,24 +7,55 @@
 * ngf == number gnu floats
 */
 
-
 #include <misc/auxiliary.h>
-
-#include <coeffs/coeffs.h>
 #include <omalloc/omalloc.h>
-#include <reporter/reporter.h>
-#include <coeffs/numbers.h>
-#include <coeffs/modulop.h>
-#include <coeffs/longrat.h>
-#include <coeffs/shortfl.h>
 
-#include <coeffs/gnumpfl.h>
-#include <coeffs/mpr_complex.h>
+#include <reporter/reporter.h>
+
+#include "coeffs.h"
+#include "numbers.h"
+#include "mpr_complex.h"
+
+#include "longrat.h"
+#include "shortfl.h"
+#include "gnumpfl.h"
+#include "modulop.h"
 
 //ring ngfMapRing; // to be used also in gnumpc.cc
 
 /// Our Type!
 static const n_coeffType ID = n_long_R;
+
+/// Get a mapping function from src into the domain of this type:
+nMapFunc  ngfSetMap(const coeffs src, const coeffs dst);
+
+const char *   ngfRead (const char *s, number *a, const coeffs r);
+
+ // Private interface should be hidden!!!
+/// Note: MAY NOT WORK AS EXPECTED!
+BOOLEAN  ngfGreaterZero(number za, const coeffs r);
+BOOLEAN  ngfGreater(number a, number b, const coeffs r);
+BOOLEAN  ngfEqual(number a, number b, const coeffs r);
+BOOLEAN  ngfIsOne(number a, const coeffs r);
+BOOLEAN  ngfIsMOne(number a, const coeffs r);
+BOOLEAN  ngfIsZero(number za, const coeffs r);
+number   ngfInit(long i, const coeffs r);
+int      ngfInt(number &n, const coeffs r);
+number   ngfNeg(number za, const coeffs r);
+number   ngfInvers(number a, const coeffs r);
+number   ngfAdd(number la, number li, const coeffs r);
+number   ngfSub(number la, number li, const coeffs r);
+number   ngfMult(number a, number b, const coeffs r);
+number   ngfDiv(number a, number b, const coeffs r);
+void     ngfPower(number x, int exp, number *lu, const coeffs r);
+number   ngfCopy(number a, const coeffs r);
+number   ngf_Copy(number a, coeffs r);
+void     ngfWrite(number &a, const coeffs r);
+void     ngfCoeffWrite(const coeffs r, BOOLEAN details);
+
+void     ngfDelete(number *a, const coeffs r);
+
+number ngfMapQ(number from, const coeffs src, const coeffs r);
 
 union nf
 {
@@ -515,8 +546,8 @@ static number ngfMapP(number from, const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
   assume( getCoeffType(src) ==  n_Zp );
-
-  return ngfInit(npInt(from,src), dst);
+  
+  return ngfInit(npInt(from,src), dst); // FIXME? TODO? // extern int     npInt         (number &n, const coeffs r);
 }
 
 static number ngfMapC(number from, const coeffs src, const coeffs dst)
