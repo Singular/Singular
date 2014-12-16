@@ -24,10 +24,6 @@
 
 #include <string.h>
 
-// enable large primes (32003 < p < 2^31-)
-#define NV_OPS
-#define NV_MAX_PRIME 32003
-
 /// Our Type!
 static const n_coeffType ID = n_Zp;
 

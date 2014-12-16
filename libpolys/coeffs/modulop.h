@@ -15,6 +15,11 @@
 //#define HAVE_DIV_MOD
 // define if an if should be used
 //#define HAVE_GENERIC_ADD
+
+// enable large primes (32003 < p < 2^31-)
+#define NV_OPS
+#define NV_MAX_PRIME 32003
+
 struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 struct snumber; typedef struct snumber *   number;
 
