@@ -7,14 +7,12 @@
 //Schauen was hier überhaupt sinn macht
 
 #include <misc/auxiliary.h>
-#include <omalloc/omalloc.h>
 
 #ifdef SINGULAR_4_1
 
+#include <omalloc/omalloc.h>
 #include <factory/factory.h>
-
 #include <misc/mylimits.h>
-
 #include <reporter/reporter.h>
 
 #include "coeffs.h"
@@ -22,6 +20,7 @@
 #include "mpr_complex.h"
 #include "OPAEp.h"
 #include "AEp.h"
+#include "modulop.h"
 
 #include <string.h>
 

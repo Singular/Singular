@@ -5,6 +5,7 @@
 #include <coeffs/numbers.h> // nRegister, coeffs.h
 #include <coeffs/rmodulon.h> // ZnmInfo
 #include <coeffs/bigintmat.h> // bigintmat
+#include <coeffs/longrat.h> // BIGINTs: nlGMP
 
 #include <Singular/blackbox.h> // blackbox type
 #include <Singular/ipshell.h> // IsPrime

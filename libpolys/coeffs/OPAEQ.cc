@@ -10,17 +10,18 @@
 
 #ifdef SINGULAR_4_1
 
+#include <omalloc/omalloc.h>
 #include <factory/factory.h>
+#include <misc/mylimits.h>
+#include <reporter/reporter.h>
+
+#include "coeffs.h"
+#include "numbers.h"
+#include "mpr_complex.h"
+#include "AEQ.h"
+#include "modulop.h"
 
 #include <string.h>
-#include <omalloc/omalloc.h>
-#include <coeffs/coeffs.h>
-#include <reporter/reporter.h>
-#include <coeffs/numbers.h>
-#include <coeffs/mpr_complex.h>
-#include <misc/mylimits.h>
-#include <coeffs/AEQ.h>
-
 
 BOOLEAN nAEQCoeffIsEqual     (number a, number b, const coeffs r);
 number  nAEQMult        (number a, number b, const coeffs r);
