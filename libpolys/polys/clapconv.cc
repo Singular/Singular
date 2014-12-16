@@ -250,7 +250,7 @@ static number convFactoryNSingAN( const CanonicalForm &f, const ring r)
   assume (r != NULL);
   assume (r->cf != NULL);
   assume (r->cf->extRing != NULL);
-  // it seems that r->cf->extRing->cf has to be Q ... ?
+  // r->cf->extRing->cf has to be Q or Z/p (the supported types of factory)
   return n_convFactoryNSingN( f, r->cf->extRing->cf );
 }
 
