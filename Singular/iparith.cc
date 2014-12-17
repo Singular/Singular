@@ -6869,6 +6869,122 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
   res->data=(char *)id;
   return FALSE;
 }
+static BOOLEAN jjFETCH_M(leftv res, leftv u)
+{
+  ring r=(ring)u->Data();
+  leftv v=u->next;
+  leftv perm_var_l=v->next;
+  leftv perm_par_l=v->next->next;
+  if ((perm_var_l->Typ()!=INTVEC_CMD)
+  ||((perm_par_l!=NULL)&&(perm_par_l->Typ()!=INTVEC_CMD))
+  ||(u->Typ()!=RING_CMD))
+  {
+    WerrorS("fetch(<ring>,<name>[,<intvec>[,<intvec>])");
+    return TRUE;
+  }
+  intvec *perm_var_v=(intvec*)perm_var_l->Data();
+  intvec *perm_par_v=NULL;
+  if (perm_par_l!=NULL)
+    perm_par_v=(intvec*)perm_par_l->Data();
+  idhdl w;
+  nMapFunc nMap;
+
+  if ((w=r->idroot->get(v->Name(),myynest))!=NULL)
+  {
+    int *perm=NULL;
+    int *par_perm=NULL;
+    int par_perm_size=0;
+    BOOLEAN bo;
+    if ((nMap=n_SetMap(r->cf,currRing->cf))==NULL)
+    {
+      // Allow imap/fetch to be make an exception only for:
+      if ( (rField_is_Q_a(r) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
+            (rField_is_Q(currRing) || rField_is_Q_a(currRing) ||
+             (rField_is_Zp(currRing) || rField_is_Zp_a(currRing))))
+           ||
+           (rField_is_Zp_a(r) &&  // Zp(a..) -> Zp(a..) || Zp
+            (rField_is_Zp(currRing, r->cf->ch) ||
+             rField_is_Zp_a(currRing, r->cf->ch))) )
+      {
+        par_perm_size=rPar(r);
+      }
+      else
+      {
+        goto err_fetch;
+      }
+    }
+    else
+      par_perm_size=rPar(r);
+    perm=(int *)omAlloc0((r->N+1)*sizeof(int));
+    if (par_perm_size!=0)
+      par_perm=(int *)omAlloc0(par_perm_size*sizeof(int));
+    int i;
+    if (perm_par_l==NULL)
+    {
+      if (par_perm_size!=0)
+        for(i=si_min(rPar(r),rPar(currRing))-1;i>=0;i--) par_perm[i]=-(i+1);
+    }
+    else
+    {
+      if (par_perm_size==0) WarnS("source ring has no parameters");
+      else
+      {
+        for(i=si_min(rPar(r),rPar(currRing))-1;i>=0;i--)
+        {
+          if (i<perm_par_v->length()) par_perm[i]=(*perm_par_v)[i];
+        }
+      }
+    }
+    for(i=si_min(rVar(r),rVar(currRing))-1;i>=0;i--)
+    {
+      if (i<perm_var_v->length()) perm[i+1]=(*perm_var_v)[i];
+    }
+    if (BVERBOSE(V_IMAP))
+    {
+      for(i=1;i<=si_min(r->N,currRing->N);i++)
+      {
+        if (perm[i]>0)
+          Print("// var nr %d: %s -> var %s\n",i,r->names[i-1],currRing->names[perm[i]-1]);
+	else if (perm[i]<0)
+          Print("// var nr %d: %s -> par %s\n",i,r->names[i-1],rParameter(currRing)[-perm[i]-1]);
+      }
+      for(i=1;i<=si_min(rPar(r),rPar(currRing));i++) // possibly empty loop
+      {
+        if (par_perm[i-1]<0)
+          Print("// par nr %d: %s -> par %s\n",
+              i,rParameter(r)[i-1],rParameter(currRing)[-par_perm[i-1]-1]);
+        else if (par_perm[i-1]>0)
+          Print("// par nr %d: %s -> var %s\n",
+              i,rParameter(r)[i-1],currRing->names[par_perm[i-1]-1]);
+      }
+    }
+    if (IDTYP(w)==ALIAS_CMD) w=(idhdl)IDDATA(w);
+    sleftv tmpW;
+    memset(&tmpW,0,sizeof(sleftv));
+    tmpW.rtyp=IDTYP(w);
+    tmpW.data=IDDATA(w);
+    if ((bo=maApplyFetch(IMAP_CMD,NULL,res,&tmpW, r,
+                         perm,par_perm,par_perm_size,nMap)))
+    {
+      Werror("cannot map %s of type %s(%d)",v->name, Tok2Cmdname(w->typ),w->typ);
+    }
+    if (perm!=NULL)
+      omFreeSize((ADDRESS)perm,(r->N+1)*sizeof(int));
+    if (par_perm!=NULL)
+      omFreeSize((ADDRESS)par_perm,par_perm_size*sizeof(int));
+    return bo;
+  }
+  else
+  {
+    Werror("identifier %s not found in %s",v->Fullname(),u->Fullname());
+  }
+  return TRUE;
+err_fetch:
+  Werror("no identity map from %s (%s -> %s)",u->Fullname(),
+         nCoeffString(r->cf),
+         nCoeffString(currRing->cf));
+  return TRUE;
+}
 static BOOLEAN jjINTERSECT_PL(leftv res, leftv v)
 {
   leftv h=v;
@@ -8223,11 +8339,11 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
       //while ((dA3[i].cmd!=op)&&(dA3[i].cmd!=0)) i++;
       while (dA3[i].cmd==op)
       {
-        if ((ai=iiTestConvert(at,dA3[i].arg1))!=0)
+        if ((ai=iiTestConvert(at,dA3[i].arg1,dConvertTypes))!=0)
         {
-          if ((bi=iiTestConvert(bt,dA3[i].arg2))!=0)
+          if ((bi=iiTestConvert(bt,dA3[i].arg2,dConvertTypes))!=0)
           {
-            if ((ci=iiTestConvert(ct,dA3[i].arg3))!=0)
+            if ((ci=iiTestConvert(ct,dA3[i].arg3,dConvertTypes))!=0)
             {
               res->rtyp=dA3[i].res;
               if (currRing!=NULL)
@@ -8238,9 +8354,9 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
                 Print("call %s(%s,%s,%s)\n",
                   iiTwoOps(op),Tok2Cmdname(dA3[i].arg1),
                   Tok2Cmdname(dA3[i].arg2),Tok2Cmdname(dA3[i].arg3));
-              failed= ((iiConvert(at,dA3[i].arg1,ai,a,an))
-                || (iiConvert(bt,dA3[i].arg2,bi,b,bn))
-                || (iiConvert(ct,dA3[i].arg3,ci,c,cn))
+              failed= ((iiConvert(at,dA3[i].arg1,ai,a,an,dConvertTypes))
+                || (iiConvert(bt,dA3[i].arg2,bi,b,bn,dConvertTypes))
+                || (iiConvert(ct,dA3[i].arg3,ci,c,cn,dConvertTypes))
                 || (call_failed=dA3[i].p(res,an,bn,cn)));
               // everything done, clean up temp. variables
               if (failed)
@@ -8330,7 +8446,6 @@ static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv 
 BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
 {
   memset(res,0,sizeof(sleftv));
-  BOOLEAN call_failed=FALSE;
 
   if (!errorreported)
   {
@@ -8419,7 +8534,6 @@ BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt)
 BOOLEAN iiExprArithM(leftv res, leftv a, int op)
 {
   memset(res,0,sizeof(sleftv));
-  BOOLEAN bo;
 
   if (!errorreported)
   {
