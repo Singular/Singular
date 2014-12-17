@@ -1,7 +1,7 @@
 AC_INIT([libpolys], [4.0.1])
 
 AC_CONFIG_MACRO_DIR([../m4])
-AC_CONFIG_AUX_DIR([.])
+AC_CONFIG_AUX_DIR([../build-aux])
 AC_CONFIG_SRCDIR([reporter/reporter.h])
 AC_CONFIG_HEADER([_config.h])
 

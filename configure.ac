@@ -4,7 +4,7 @@ AC_DEFINE([VERSION_DATE],["Sep 2014"],[release date])
 _AC_SRCDIRS(["$ac_dir"])
 
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_AUX_DIR([.])
+AC_CONFIG_AUX_DIR([build-aux])
 
 AC_CONFIG_SRCDIR([Singular/tesths.cc])
 

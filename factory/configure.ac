@@ -15,7 +15,7 @@ dnl #
 AC_INIT([factory], [4.0.1])
 AC_CONFIG_SRCDIR(canonicalform.cc)
 AC_CONFIG_MACRO_DIR([../m4])
-AC_CONFIG_AUX_DIR([.])
+AC_CONFIG_AUX_DIR([../build-aux])
 AC_CONFIG_HEADER([_config.h])
 
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
