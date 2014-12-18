@@ -6877,7 +6877,7 @@ static BOOLEAN jjFETCH_M(leftv res, leftv u)
   leftv perm_par_l=v->next->next;
   if ((perm_var_l->Typ()!=INTVEC_CMD)
   ||((perm_par_l!=NULL)&&(perm_par_l->Typ()!=INTVEC_CMD))
-  ||(u->Typ()!=RING_CMD))
+  ||((u->Typ()!=RING_CMD)&&(u->Typ()!=QRING_CMD)))
   {
     WerrorS("fetch(<ring>,<name>[,<intvec>[,<intvec>])");
     return TRUE;
@@ -6915,7 +6915,7 @@ static BOOLEAN jjFETCH_M(leftv res, leftv u)
     }
     else
       par_perm_size=rPar(r);
-    perm=(int *)omAlloc0((r->N+1)*sizeof(int));
+    perm=(int *)omAlloc0((rVar(r)+1)*sizeof(int));
     if (par_perm_size!=0)
       par_perm=(int *)omAlloc0(par_perm_size*sizeof(int));
     int i;
@@ -6929,23 +6929,35 @@ static BOOLEAN jjFETCH_M(leftv res, leftv u)
       if (par_perm_size==0) WarnS("source ring has no parameters");
       else
       {
-        for(i=si_min(rPar(r),rPar(currRing))-1;i>=0;i--)
+        for(i=rPar(r)-1;i>=0;i--)
         {
           if (i<perm_par_v->length()) par_perm[i]=(*perm_par_v)[i];
+          if ((par_perm[i]<-rPar(currRing))
+          || (par_perm[i]>rVar(currRing)))
+          {
+            Warn("invalid entry for par %d: %d\n",i,par_perm[i]);
+            par_perm[i]=0;
+          }
         }
       }
     }
-    for(i=si_min(rVar(r),rVar(currRing))-1;i>=0;i--)
+    for(i=rVar(r)-1;i>=0;i--)
     {
       if (i<perm_var_v->length()) perm[i+1]=(*perm_var_v)[i];
+      if ((perm[i]<-rPar(currRing))
+      || (perm[i]>rVar(currRing)))
+      {
+        Warn("invalid entry for var %d: %d\n",i,perm[i]);
+        perm[i]=0;
+      }
     }
     if (BVERBOSE(V_IMAP))
     {
-      for(i=1;i<=si_min(r->N,currRing->N);i++)
+      for(i=1;i<=si_min(rVar(r),rVar(currRing));i++)
       {
         if (perm[i]>0)
           Print("// var nr %d: %s -> var %s\n",i,r->names[i-1],currRing->names[perm[i]-1]);
-	else if (perm[i]<0)
+        else if (perm[i]<0)
           Print("// var nr %d: %s -> par %s\n",i,r->names[i-1],rParameter(currRing)[-perm[i]-1]);
       }
       for(i=1;i<=si_min(rPar(r),rPar(currRing));i++) // possibly empty loop
@@ -6969,7 +6981,7 @@ static BOOLEAN jjFETCH_M(leftv res, leftv u)
       Werror("cannot map %s of type %s(%d)",v->name, Tok2Cmdname(w->typ),w->typ);
     }
     if (perm!=NULL)
-      omFreeSize((ADDRESS)perm,(r->N+1)*sizeof(int));
+      omFreeSize((ADDRESS)perm,(rVar(r)+1)*sizeof(int));
     if (par_perm!=NULL)
       omFreeSize((ADDRESS)par_perm,par_perm_size*sizeof(int));
     return bo;
