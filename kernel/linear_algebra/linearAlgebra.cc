@@ -406,7 +406,8 @@ bool luSolveViaLUDecomp(const matrix pMat, const matrix lMat,
 
   /* determine whether uMat * xVec = yVec is solvable */
   bool isSolvable = true;
-  bool isZeroRow; int nonZeroRowIndex;
+  bool isZeroRow;
+  int nonZeroRowIndex = 0 ;   // handle case that the matrix is zero
   for (int r = m; r >= 1; r--)
   {
     isZeroRow = true;
@@ -429,11 +430,14 @@ bool luSolveViaLUDecomp(const matrix pMat, const matrix lMat,
        We do not know in advance what the dimension (dim) of the latter
        solution space will be. Thus, we start with the possibly too wide
        matrix N and later copy the relevant columns of N into H. */
-    int nonZeroC; int lastNonZeroC = n + 1;
+    int nonZeroC  =  0 ; 
+    int lastNonZeroC = n + 1;
+
     for (int r = nonZeroRowIndex; r >= 1; r--)
     {
       for (nonZeroC = 1; nonZeroC <= n; nonZeroC++)
         if (MATELEM(uMat, r, nonZeroC) != NULL) break;
+
       for (int w = lastNonZeroC - 1; w >= nonZeroC + 1; w--)
       {
         /* this loop will only be done when the given linear system has
@@ -466,6 +470,13 @@ bool luSolveViaLUDecomp(const matrix pMat, const matrix lMat,
       pNormalize(MATELEM(xVec, nonZeroC, 1));
       lastNonZeroC = nonZeroC;
     }
+    for (int w = lastNonZeroC - 1; w >= 1; w--)
+    {
+       // remaining variables are free
+       dim++;
+       MATELEM(N, w, dim) = pOne();
+    }
+
     if (dim == 0)
     {
       /* that means the given linear system has exactly one solution;
@@ -483,7 +494,6 @@ bool luSolveViaLUDecomp(const matrix pMat, const matrix lMat,
     /* clean up N */
     idDelete((ideal*)&N);
   }
-
   idDelete((ideal*)&cVec);
   idDelete((ideal*)&yVec);
 
