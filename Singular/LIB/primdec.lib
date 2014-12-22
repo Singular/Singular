@@ -3226,7 +3226,7 @@ EXAMPLE: example decomp; shows an example
     //map phi:K[var(1),...,var(nva)] --->K(var(nnpr+1),..,var(nva))[..rest..]
     //------------------------------------------------------------------------
 
-    def quotring=prepareQuotientring(nvars(basering)-indep[@m][3],"lp");
+    quotring=prepareQuotientring(nvars(basering)-indep[@m][3],"lp");
 
     //---------------------------------------------------------------------
     //we pass to the quotientring   K(var(nnp+1),..,var(nva))[..the rest..]
@@ -3339,6 +3339,7 @@ EXAMPLE: example decomp; shows an example
     @h=imap(quotring,@h);
 
     kill quotring;
+    def quotring;
 
     @n2=size(quprimary);
     @n3=@n2;
@@ -3538,7 +3539,7 @@ EXAMPLE: example decomp; shows an example
         //and the map phi:K[var(1),...,var(nva)] ---->
         //--->K(var(nnpr+1),..,var(nva))[..the rest..]
         //------------------------------------------------------------------
-
+        if (defined(quotring)==voice) {kill quotring;}
         def quotring=prepareQuotientring(nvars(basering)-restindep[@m][3],"lp");
 
         //------------------------------------------------------------------
