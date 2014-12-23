@@ -17,7 +17,7 @@ def encodeSub(om, parent):
         sub.set("name",om.name)
         return
     if isinstance(om, OMS):
-        
+
         sub=et.SubElement(parent,"OMS")
         sub.set("name",om.name)
         sub.set("cdbase", om.cd.base)
@@ -38,7 +38,7 @@ def encodeSub(om, parent):
         return
     print om
     raise Exception
-        
+
 def encodeTop(om):
     if isinstance(om, int):
         sub=et.Element("OMI")
@@ -70,4 +70,3 @@ def encode(om):
     root=encodeTop(om)
     tree = et.ElementTree(root)
     return tree
-    

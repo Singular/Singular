@@ -59,7 +59,7 @@ LINKAGE BOOLEAN dbOpen(si_link l, short flag, leftv u)
   }
   if(flag & SI_LINK_READ)
     {
-      if (strcmp(l->mode,"rw")==0) mode="rw";	
+      if (strcmp(l->mode,"rw")==0) mode="rw";
     }
   //if (((db = (DBM_info *)omAlloc(sizeof *db)) != NULL)
   //&&((db->db = dbm_open(l->name, dbm_flags, 0664 )) != NULL ))

@@ -32,7 +32,7 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
                 [absolute path name of Python executable]
             ),
             [],[withval="yes"]
-        ) 
+        )
         si_try_embed="no"
         py_save_ifs="$IFS"; IFS="${IFS}$PATH_SEPARATOR,"
         for elt in $withval; do
@@ -45,7 +45,7 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
             ;;
             *)
             si_withval=$elt
-          esac 
+          esac
         done
         IFS="$py_save_ifs"
         if test x"$si_withval" = x""
@@ -59,7 +59,7 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
         if test "$withval" = "no"
         then
             ax_python_use=false
-        else        
+        else
             if test "$withval" = "yes"
             then
                 # "yes" was specified, but we don't have a path
@@ -78,7 +78,7 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
             if test -z "$PYTHON"
             then
                 AC_MSG_RESULT([no path to python found, skipping python interface!])
-            else 
+            else
                 AX_PYTHON_VERSION_CHECK([$1],
                   [ AC_MSG_RESULT(yes)
                     AX_PYTHON_VERSION_CHECK([3],
@@ -106,20 +106,20 @@ AC_DEFUN([AX_PYTHON_WITH_VERSION],
                     AC_MSG_RESULT([too old, skipping python interface!])]
                 )
             fi
-        fi   
+        fi
 
         if  test x"$si_embed_python" = x"yes"
-        then 
+        then
           AC_DEFINE(EMBED_PYTHON,1,integrate python)
 #          AC_SUBST(EMBED_PYOBJECT_CFLAGS,"\${PYTHON_CSPEC}")
 #          AC_SUBST(EMBED_PYOBJECT_LDFLAGS,"\${PYTHON_LSPEC}")
         fi
-	if test x"$ax_python_use" = x"true" 
-	then 
+	if test x"$ax_python_use" = x"true"
+	then
           AC_DEFINE(HAVE_PYTHON,1,[compile python-related stuff])
         fi
     fi
-    
+
     AM_CONDITIONAL(PYTHON_USE, test x"$ax_python_use" = x"true")
     AM_CONDITIONAL(SI_EMBED_PYTHON, test x"$ax_python_use$si_embed_python" = x"trueyes")
     AM_CONDITIONAL(PYTHON_MODULE, test x"$ax_python_use" = x"true" -a x"$si_embed_python" != x"yes" )

@@ -5,29 +5,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.awt.BorderLayout;
@@ -53,7 +53,7 @@ public class ParameterAdmin extends JPanel implements ActionListener {
 	JPanel parPanel;
 
 	JComboBox paramComboBox; // wird fuer den SaveMovieDialog gebraucht
-	
+
 	public Vector parList = new Vector();
 
 	Project project;
@@ -63,7 +63,7 @@ public class ParameterAdmin extends JPanel implements ActionListener {
 	ParameterAdmin(surfex su, Project pro) {
 		surfex_ = su;
 		project = pro;
-		
+
 		paramComboBox=new JComboBox();
 
 		setLayout(new BorderLayout());
@@ -85,35 +85,35 @@ public class ParameterAdmin extends JPanel implements ActionListener {
 		ListIterator li = parList.listIterator();
 		OneParameter tmpParameter;
 		int i=0;
-		
+
 		while (li.hasNext()) {
 			tmpParameter=((OneParameter)li.next());
 			s[i]=tmpParameter.nameLabel.getText();
-			
-			
+
+
 			i++;
-		}	
+		}
 		return s;
 	}
-	
+
     public double[] getAllParamValues(){
 	double[] s=new double[this.parList.size()];
 	ListIterator li = parList.listIterator();
 	OneParameter tmpParameter;
 	int i=0;
-	
+
 	while (li.hasNext()) {
 	    tmpParameter=((OneParameter)li.next());
 	    s[i]=tmpParameter.getValue()/1000.0;
-	    
+
 	    i++;
-	}	
+	}
 	return s;
     }
-    
-	
-	
-	
+
+
+
+
 	public void newParameter() {
 		//  System.out.println("newParameter");
 		OneParameter par = new OneParameter(project);
@@ -138,8 +138,8 @@ public class ParameterAdmin extends JPanel implements ActionListener {
 		parList.add(par);
 		//  System.out.println("parList:"+parList.size());
 		parPanel.add(par);
-		
-		
+
+
 		// rausfinden, wo man den Parameter in ComboBox einfuegen kann:
 		int i=0;
 		//System.out.;
@@ -152,7 +152,7 @@ public class ParameterAdmin extends JPanel implements ActionListener {
 		//i--;
 //		System.out.println("index:"+i);
 		paramComboBox.insertItemAt(par.nameLabel.getText(),i);
-		
+
 		if(project.saveMovieDialog!=null){
 			//nur updaten, falls es ihn ueberhaupt gibt...
 			SwingUtilities.updateComponentTreeUI(project.saveMovieDialog);
@@ -179,7 +179,7 @@ public class ParameterAdmin extends JPanel implements ActionListener {
 	    String nix = bs.readLine();
 	    String zeile1;
 	    boolean first = true;
-	    
+
 	    for (k = Integer.parseInt(bs.readLine()); k > 0; k--) {
 		zeile1 = bs.readLine();//) != null) {
 		newParameter();
@@ -206,17 +206,17 @@ public class ParameterAdmin extends JPanel implements ActionListener {
 				    .parseDouble(bs.readLine());
 				((OneParameter) parList.lastElement()).newFrom = ((OneParameter) parList
 										  .lastElement()).oldFrom;
-				
+
 				((OneParameter) parList.lastElement()).oldTo = Double
 				    .parseDouble(bs.readLine());
 				((OneParameter) parList.lastElement()).newTo = ((OneParameter) parList
 										.lastElement()).oldTo;
-				
+
 				((OneParameter) parList.lastElement()).parSlider
 				    .setMinimum((int)(((OneParameter) parList.lastElement()).newFrom*1000.0));
 				((OneParameter) parList.lastElement()).parSlider
 				    .setMaximum((int)(((OneParameter) parList.lastElement()).newTo*1000.0));
-				
+
 				((OneParameter) parList.lastElement()).parSlider
 				    .setValue(Integer.parseInt(bs
 							       .readLine()));
@@ -241,7 +241,7 @@ public class ParameterAdmin extends JPanel implements ActionListener {
 			.newFrom = ((OneParameter) parList.lastElement()).oldFrom;
 		    ((OneParameter) parList.lastElement()).oldTo = Double
 			.parseDouble(bs.readLine());
-		    ((OneParameter) parList.lastElement()).newTo = 
+		    ((OneParameter) parList.lastElement()).newTo =
 			((OneParameter) parList.lastElement()).oldTo;
 		    ((OneParameter) parList.lastElement()).parSlider
 			.setMinimum((int)(((OneParameter) parList
@@ -252,7 +252,7 @@ public class ParameterAdmin extends JPanel implements ActionListener {
 		    ((OneParameter) parList.lastElement()).parSlider
 			.setValue(Integer.parseInt(bs.readLine()));
 		    ((OneParameter) parList.lastElement()).from
-			.setText("" + ((OneParameter) 
+			.setText("" + ((OneParameter)
 				       parList.lastElement()).newFrom);
 		    ((OneParameter) parList.lastElement()).to
 			.setText("" + ((OneParameter) parList.lastElement()).newTo);
@@ -274,23 +274,23 @@ public class ParameterAdmin extends JPanel implements ActionListener {
 	    System.out.println(e);
 	}
     }
-    
+
     /*public Vector getParameterNames(){
       Vector l = new Vector();//new String[parList.size()];
-      
+
       ListIterator li = parList.listIterator();
       while (li.hasNext()) {
       l.add(((OneParameter)li.next()).nameLabel.getText()) ;
       //i++;
-      }		
+      }
       return l;
       }*/
-    
+
     public JComboBox getParamComboBox(){
 	return paramComboBox;
-	
+
     }
-    
+
     public OneParameter getParameter(String s){
 	ListIterator li = parList.listIterator();
 		OneParameter tmpParameter;
@@ -299,15 +299,15 @@ public class ParameterAdmin extends JPanel implements ActionListener {
 			if(tmpParameter.nameLabel.getText().compareTo(s)==0){
 				return tmpParameter;
 			}
-			
-			
+
+
 			//i++;
-		}		
+		}
 		return null;
 	}
-	
-	
-	
+
+
+
 } // end class ParameterAdmin
 
 

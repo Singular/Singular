@@ -5,29 +5,77 @@
 * ABSTRACT: numbers (integers)
 */
 
-
-
 #include <misc/auxiliary.h>
-
-#ifdef HAVE_RINGS
-
-#include <string.h>
-#include <misc/mylimits.h>
-#include <coeffs/coeffs.h>
-#include <reporter/reporter.h>
 #include <omalloc/omalloc.h>
-#include <coeffs/numbers.h>
-#include <coeffs/longrat.h>
-#include <coeffs/mpr_complex.h>
-#include <coeffs/rintegers.h>
-#include <coeffs/rmodulon.h>
-#include "si_gmp.h"
-#include "factory/factory.h"
 
 #include <factory/factory.h>
 
+#include <misc/mylimits.h>
+#include <reporter/reporter.h>
+
+#include "coeffs.h"
+#include "numbers.h"
+
+#include "si_gmp.h"
+
+#include "mpr_complex.h"
+#include "rintegers.h"
+#include "rmodulon.h"
+#include "longrat.h"
+
+#include <string.h>
+
+#ifdef HAVE_RINGS
+
+
 /// Our Type!
 static const n_coeffType ID = n_Z;
+
+number  nrzCopy        (number a, const coeffs r);
+int     nrzSize        (number a, const coeffs r);
+void    nrzDelete      (number *a, const coeffs r);
+BOOLEAN nrzGreaterZero (number k, const coeffs r);
+number  nrzMult        (number a, number b, const coeffs r);
+number  nrzInit        (long i, const coeffs r);
+int     nrzInt         (number &n, const coeffs r);
+number  nrzAdd         (number a, number b, const coeffs r);
+number  nrzSub         (number a, number b, const coeffs r);
+void    nrzPower       (number a, int i, number * result, const coeffs r);
+BOOLEAN nrzIsZero      (number a, const coeffs r);
+BOOLEAN nrzIsOne       (number a, const coeffs r);
+BOOLEAN nrzIsMOne      (number a, const coeffs r);
+BOOLEAN nrzIsUnit      (number a, const coeffs r);
+number  nrzGetUnit     (number a, const coeffs r);
+number  nrzDiv         (number a, number b, const coeffs r);
+number  nrzExactDiv    (number a, number b, const coeffs r);
+number  nrzIntMod      (number a, number b, const coeffs r);
+number  nrzNeg         (number c, const coeffs r);
+number  nrzInvers      (number c, const coeffs r);
+BOOLEAN nrzGreater     (number a, number b, const coeffs r);
+BOOLEAN nrzDivBy       (number a, number b, const coeffs r);
+int     nrzDivComp     (number a, number b, const coeffs r);
+BOOLEAN nrzEqual       (number a, number b, const coeffs r);
+number  nrzLcm         (number a,number b, const coeffs r);
+number  nrzGcd         (number a,number b, const coeffs r);
+number  nrzExtGcd      (number a, number b, number *s, number *t, const coeffs r);
+nMapFunc nrzSetMap     (const coeffs src, const coeffs dst);
+void    nrzWrite       (number &a, const coeffs r);
+const char *  nrzRead  (const char *s, number *a, const coeffs r);
+char *  nrzName        (number n, const coeffs r);
+void    nrzCoeffWrite  (const coeffs r, BOOLEAN details);
+#ifdef LDEBUG
+BOOLEAN nrzDBTest      (number a, const char *f, const int l, const coeffs r);
+#endif
+void    nrzSetExp(int c, coeffs r);
+void    nrzInitExp(int c, coeffs r);
+void    nrzDelete(number *a, const coeffs r);
+coeffs  nrzQuot1(number c, const coeffs r);
+
+//CanonicalForm nrzConvSingNFactoryN(number n, BOOLEAN setChar, const coeffs /*r*/);
+//number nrzConvFactoryNSingN(const CanonicalForm n, const coeffs r);
+
+number nrzMapQ(number from, const coeffs src, const coeffs dst);
+
 
 omBin gmp_nrz_bin = omGetSpecBin(sizeof(mpz_t));
 
@@ -282,7 +330,7 @@ number nrzMapQ(number from, const coeffs src, const coeffs /*dst*/)
 {
   mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
-  nlGMP(from, (number) erg, src);
+  nlGMP(from, (number) erg, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
   return (number) erg;
 }
 

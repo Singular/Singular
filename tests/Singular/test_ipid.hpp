@@ -34,7 +34,7 @@ namespace Singular {
       void test_killid();
       void test_killhdl();
       void test_ggetid();
-      
+
     private:
       package _basePack;
     };

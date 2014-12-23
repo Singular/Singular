@@ -1,7 +1,7 @@
 @comment this file contains the list of new features and difference between Singular 3.* and Singular 4.*
 
 The purpose of this section is to describe new features and changes
-between Singular 3-1-7 and Singular 4.* (formerly known as Spielwiese) both for developers 
+between Singular 3-1-7 and Singular 4.* (formerly known as Spielwiese) both for developers
 and Singular users. In what follows we will refer to the systems as Singular 3 and Singular 4.
 
 @menu
@@ -12,12 +12,12 @@ and Singular users. In what follows we will refer to the systems as Singular 3 a
 @end menu
 
 @c ---------------------------------------------------------------------------
-@node Version schema for Singular, Notes for Singular users, , Singular 3 and Singular 4 
+@node Version schema for Singular, Notes for Singular users, , Singular 3 and Singular 4
 @subsection Version schema for Singular
 @cindex Version schema for Singular
 @cindex Version number
 
-@sc{Singular} version is of the form @code{a.b.c.d} which may also be written 
+@sc{Singular} version is of the form @code{a.b.c.d} which may also be written
 as @code{a-b-c-d} where a,b,c and d are numbers:
 @itemize
 @item a is changed with major, incompatible changes
@@ -34,14 +34,14 @@ To get the complete version number, use
 @code{system("version");} or use @code{SINGULAR_VERSION} in C.
 
 @c ---------------------------------------------------------------------------
-@node Notes for Singular users, Notes for developers, Version schema for Singular, Singular 3 and Singular 4 
+@node Notes for Singular users, Notes for developers, Version schema for Singular, Singular 3 and Singular 4
 @subsection Notes for Singular users
 @cindex Notes for Singular users
 
 @subsubheading Coefficient rings
 @cindex Coefficient rings
 
-To allow for easy integration of new coefficient rings into Singular, the the way 
+To allow for easy integration of new coefficient rings into Singular, the the way
 coefficient rings are being handled has been redesigned.
 
 In general, the user syntax has not changed, however there are some changes in the behaviour of Singular:
@@ -99,7 +99,7 @@ result of various computations (in particular Groebner bases).
 @cindex New libraries depending on Singular 4
 
 In Singular 4 there several new features are implemented within a
-dynamic module @code{syzextra.so}, not available in Singular 3. 
+dynamic module @code{syzextra.so}, not available in Singular 3.
 It implements the low-level functions for Schreyer resolutions and many auxiliary functions.
 The following new libraries @ref{derham_lib}, @ref{schreyer_lib} depend on it:
 
@@ -115,7 +115,7 @@ The following new libraries @ref{derham_lib}, @ref{schreyer_lib} depend on it:
 
 @c table @asis
 @itemize @bullet
-@item The tree structure of the binary Singular distribution has been changed. 
+@item The tree structure of the binary Singular distribution has been changed.
 The typical tree now looks as show at @uref{https://github.com/Singular/Sources/wiki/Sw-tree}
 
 @item Accordingly Singular search paths (where Singular searches for libraries, dynamic modules, etc.) have been changed. You can display them by calling Singular by @code{Singular -v}.
@@ -127,7 +127,7 @@ The typical tree now looks as show at @uref{https://github.com/Singular/Sources/
 @subsubheading Library versioning
 @cindex Library versioning
 
-Due to switching from Subversion to GIT revision control system for the Singular source code, 
+Due to switching from Subversion to GIT revision control system for the Singular source code,
 library version variables (displayed when loading a library) have changed.
 
 
@@ -141,9 +141,9 @@ deg(x*gen(1));
 @expansion{} 11
 @end smallexample
 
-will assign weights 1,2,3 to x,y,z respectively, and weights 10,20,30,40,0,0,... to 
+will assign weights 1,2,3 to x,y,z respectively, and weights 10,20,30,40,0,0,... to
 components of any free module defined over R. This ordering will first sort
-by this weighted degree, then by dp on the ring monomials and then will give priority 
+by this weighted degree, then by dp on the ring monomials and then will give priority
 to the large component index.
 
 @subsubheading Future benefits of Singular 4
@@ -174,10 +174,10 @@ of Singular to facilitate easier maintenance and future development:
 @itemize @bullet
 @item Build System : automake, libfac has been integrated into Factory
 @item Removed MP (Multi protocol) in favor of SSI links.
-@item Separation/modularization into libraries and packages 
+@item Separation/modularization into libraries and packages
 @c add diagram as an image?
 @item For easy integration of new coeffcient rings,
-we defined a generic interface for coefficient 
+we defined a generic interface for coefficient
 rings and a supporting framework for making them
 accessible to the user.
 
@@ -212,7 +212,7 @@ The user can build and install Singular with the following standard UNIX-like pr
 In contrast to Singular 3, there are now many more configuration options.
 
 All possible options for configure can be seen by running the configure script with
-option @code{--help}. On a multicore compute consider running make with the 
+option @code{--help}. On a multicore compute consider running make with the
 option @code{-f [cores]}.
 
 @subsection Side-by-side installation

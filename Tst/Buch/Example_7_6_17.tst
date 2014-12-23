@@ -32,7 +32,7 @@ proc binom (int n, int k)
    if ( k > n-k )
    { k = n-k;
    }
-   if ( k<=0 or k>n )              
+   if ( k<=0 or k>n )
    { r = (k==0)*r;
    }
    for (l=1; l<=k; l++ )

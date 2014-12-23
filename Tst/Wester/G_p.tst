@@ -12,7 +12,7 @@ tst_InitTimer();
 poly g = gcd(p, q);
 
 tst_ReportTimer("Gp");
-  
+
 factorize(g);
 kill R;
 

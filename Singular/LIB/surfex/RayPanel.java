@@ -5,29 +5,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.awt.Dimension;
@@ -53,16 +53,16 @@ public class RayPanel extends JPanel {
 	Dimension offDimension;
 
 	Image offImage;
-	
-	
+
+
 
 	String picname = "";
 
 	RayPanel() {
-	} 
-	
-	
-	
+	}
+
+
+
 	public void changeBackground(String pn) {
 		picname = pn;
 		if (theIMG != null) {

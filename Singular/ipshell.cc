@@ -5,66 +5,67 @@
 * ABSTRACT:
 */
 
-
-
 #include <kernel/mod2.h>
-#include <misc/auxiliary.h>
 
-
-#include <misc/options.h>
-#include <misc/mylimits.h>
+#include <omalloc/omalloc.h>
 
 #include <factory/factory.h>
 
-#include <Singular/maps_ip.h>
-#include <Singular/tok.h>
+#include <misc/auxiliary.h>
 #include <misc/options.h>
-#include <Singular/ipid.h>
+#include <misc/mylimits.h>
 #include <misc/intvec.h>
-#include <omalloc/omalloc.h>
-#include <kernel/polys.h>
+
 #include <coeffs/numbers.h>
-#include <polys/prCopy.h>
-#include <kernel/ideals.h>
-#include <polys/matpol.h>
-#include <kernel/GBEngine/kstd1.h>
-#include <polys/monomials/ring.h>
-#include <Singular/subexpr.h>
-#include <Singular/fevoices.h>
-#include <kernel/oswrapper/feread.h>
-#include <polys/monomials/maps.h>
-#include <kernel/GBEngine/syz.h>
-#include <coeffs/numbers.h>
-//#include <polys/ext_fields/longalg.h>
-#include <Singular/lists.h>
-#include <Singular/attrib.h>
-#include <Singular/ipconv.h>
-#include <Singular/links/silink.h>
-#include <kernel/combinatorics/stairc.h>
-#include <polys/weight.h>
-#include <kernel/spectrum/semic.h>
-#include <kernel/spectrum/splist.h>
-#include <kernel/spectrum/spectrum.h>
-////// #include <coeffs/gnumpfl.h>
-//#include <kernel/mpr_base.h>
-////// #include <coeffs/ffields.h>
-#include <polys/clapsing.h>
-#include <kernel/combinatorics/hutil.h>
-#include <polys/monomials/ring.h>
-#include <Singular/ipshell.h>
-#include <polys/ext_fields/algext.h>
-#include <coeffs/mpr_complex.h>
-#include <coeffs/longrat.h>
+#include <coeffs/coeffs.h>
+
 #include <coeffs/rmodulon.h>
+#include <coeffs/longrat.h>
+
+#include <polys/monomials/ring.h>
+#include <polys/monomials/maps.h>
+
+#include <polys/prCopy.h>
+#include <polys/matpol.h>
+
+#include <polys/weight.h>
+#include <polys/clapsing.h>
+
+
+#include <polys/ext_fields/algext.h>
+#include <polys/ext_fields/transext.h>
+
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
 
 #include <kernel/numeric/mpr_base.h>
 #include <kernel/numeric/mpr_numeric.h>
 
+#include <kernel/GBEngine/syz.h>
+#include <kernel/GBEngine/kstd1.h>
+
+#include <kernel/combinatorics/stairc.h>
+#include <kernel/combinatorics/hutil.h>
+
+#include <kernel/spectrum/semic.h>
+#include <kernel/spectrum/splist.h>
+#include <kernel/spectrum/spectrum.h>
+
+#include <kernel/oswrapper/feread.h>
+
+#include <Singular/lists.h>
+#include <Singular/attrib.h>
+#include <Singular/ipconv.h>
+#include <Singular/links/silink.h>
+#include <Singular/ipshell.h>
+#include <Singular/maps_ip.h>
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
+#include <Singular/subexpr.h>
+#include <Singular/fevoices.h>
+
 #include <math.h>
 #include <ctype.h>
-
-#include <polys/ext_fields/algext.h>
-#include <polys/ext_fields/transext.h>
 
 // define this if you want to use the fast_map routine for mapping ideals
 #define FAST_MAP
@@ -75,7 +76,7 @@
 
 #ifdef SINGULAR_4_1
 #include <Singular/number2.h>
-#include <libpolys/coeffs/bigintmat.h>
+#include <coeffs/bigintmat.h>
 #endif
 leftv iiCurrArgs=NULL;
 idhdl iiCurrProc=NULL;
@@ -1306,7 +1307,7 @@ BOOLEAN iiAlias(leftv p)
          nDelete(&IDNUMBER(pp));
          break;
       case BIGINT_CMD:
-         n_Delete(&IDNUMBER(pp),currRing->cf);
+         n_Delete(&IDNUMBER(pp),coeffs_BIGINT);
          break;
       case MAP_CMD:
          {
@@ -1805,7 +1806,7 @@ void rDecomposeRing(leftv h,const ring R)
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
   LL->m[0].rtyp=BIGINT_CMD;
-  LL->m[0].data=nlMapGMP((number) R->cf->modBase, R->cf, R->cf);
+  LL->m[0].data=nlMapGMP((number) R->cf->modBase, R->cf, R->cf); // TODO: what is this?? // extern number nlMapGMP(number from, const coeffs src, const coeffs dst); // FIXME: replace with n_InitMPZ(R->cf->modBase, coeffs_BIGINT); ?
   LL->m[1].rtyp=INT_CMD;
   LL->m[1].data=(void *) R->cf->modExponent;
   L->m[1].rtyp=LIST_CMD;
@@ -2089,7 +2090,8 @@ void rComposeRing(lists L, ring R)
     lists LL=(lists)L->m[1].data;
     if ((LL->nr >= 0) && LL->m[0].rtyp == BIGINT_CMD)
     {
-      number tmp= (number) LL->m[0].data;
+      number tmp= (number) LL->m[0].data; // never use CopyD() on list elements
+                                    // assume that tmp is integer, not rational
       n_MPZ (modBase, tmp, coeffs_BIGINT);
     }
     else if (LL->nr >= 0 && LL->m[0].rtyp == INT_CMD)
@@ -5265,6 +5267,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #ifdef HAVE_RINGS
   else if ((pn->name != NULL) && (strcmp(pn->name, "integer") == 0))
   {
+    // TODO: change to use coeffs_BIGINT!?
     modBase = (mpz_ptr) omAlloc(sizeof(mpz_t));
     mpz_init_set_si(modBase, 0);
     if (pn->next!=NULL)
@@ -5286,9 +5289,9 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       }
       else if (pn->next->Typ()==BIGINT_CMD)
       {
-        number p=(number)pn->next->CopyD();
-        nlGMP(p,(number)modBase,coeffs_BIGINT);
-        nlDelete(&p,coeffs_BIGINT);
+        number p=(number)pn->next->CopyD(); // FIXME: why CopyD() here if nlGMP should not overtake p!?
+        nlGMP(p,(number)modBase,coeffs_BIGINT); // TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // FIXME: n_MPZ( modBase, p, coeffs_BIGINT); ?
+        n_Delete(&p,coeffs_BIGINT);
       }
     }
     else
@@ -5314,6 +5317,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
            depending on the size of a long on the respective platform */
         //ringtype = 1;       // Use Z/2^ch
         cf=nInitChar(n_Z2m,(void*)(long)modExponent);
+	mpz_clear(modBase);
         omFreeSize (modBase, sizeof (mpz_t));
       }
       else

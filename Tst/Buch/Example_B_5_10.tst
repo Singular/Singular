@@ -9,11 +9,11 @@ poly g=z2+z+1;          //polynomial to factorize
 resultant(f,g,x);
 resultant(f,subst(g,z,z+x),x);
 
-poly h=y5+y3+y2+y+1;    //the minimal polynomial for the new 
+poly h=y5+y3+y2+y+1;    //the minimal polynomial for the new
                         //field extension
 poly G=subst(g,z,z+xy); //the transformed polynomial
-poly r=resultant(f,G,x);  
-r;                      //the norm r of the transformed 
+poly r=resultant(f,G,x);
+r;                      //the norm r of the transformed
                         //polynomial
 
 
@@ -25,13 +25,13 @@ factorize(s);
 ring S=(2,y),(z,x),lp;
 minpoly=y5+y3+y2+y+1;
 poly r=imap(R,r);
-poly f1=gcd(r,z10+z9+z7+z6+z3+z2+1); //the gcd with the first 
+poly f1=gcd(r,z10+z9+z7+z6+z3+z2+1); //the gcd with the first
                                      //factor
 f1;
 f1=simplify(f1,1);                   //we normalize f1
 f1;
-poly f2=gcd(r,z10+z9+z7+z5+z2+z+1); //the gcd with the second 
-                                    //factor 
+poly f2=gcd(r,z10+z9+z7+z5+z2+z+1); //the gcd with the second
+                                    //factor
 f2=simplify(f2,1);
 f2;
 

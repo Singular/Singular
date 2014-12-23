@@ -478,8 +478,13 @@ EXAMPLE: example pwalk; shows an example"
 
   ideal G = fetch(xR, Go);
 
+<<<<<<< HEAD
   G = system("Mpwalk",G,n1,n2,curr_weight,target_weight,nP,reduction,printout);
  
+=======
+  G = system("Mpwalk", G, n1, n2, curr_weight, target_weight,nP);
+
+>>>>>>> f533f6f7667328bccb271b19b2f603aaebe41596
   setring xR;
   //kill Go;
 

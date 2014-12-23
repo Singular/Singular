@@ -675,10 +675,10 @@ static void _omMarkAsStatic(void* addr)
 {
   omTrackAddr d_addr = (omTrackAddr) addr;
   if (!omCheckPtr(addr, omError_MaxError, OM_FLR))
-  {  
+  {
     omAssume(omIsTrackAddr(addr) && omOutAddr_2_TrackAddr(addr) == d_addr);
     d_addr->flags |= OM_FSTATIC;
-  }  
+  }
 }
 
 static void _omUnMarkAsStatic(void* addr)

@@ -2,7 +2,7 @@ LIB "tst.lib";
 tst_init();
 
 LIB("primdec.lib");
- 
+
 ring rng = 0,(x,y),dp;
 
 ideal I = 1;

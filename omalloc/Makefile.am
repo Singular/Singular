@@ -26,7 +26,7 @@ omalloc_provide.c omAllocFunc.c
 
 EXTRA_DIST = omalloc.c omtTestAlloc.c omtTest.h omMmap.c
 
-AM_CPPFLAGS =-I${top_srcdir}/.. -I${top_builddir}/..  
+AM_CPPFLAGS =-I${top_srcdir}/.. -I${top_builddir}/..
 
 libomalloc_la_SOURCES=$(SOURCES) $(noinst_HEADERS)
 

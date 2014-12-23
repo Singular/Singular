@@ -64,7 +64,7 @@ kill r,r1;
 
 
 example deltaLoc;
-example genus; 
+example genus;
 
 tst_status(1);$
 

@@ -47,7 +47,7 @@ ideal I;
 intvec DD;
 intvec G,D,F;
 
-// KLEIN quartic over F_4 (p=2) 
+// KLEIN quartic over F_4 (p=2)
 
 f=x3y+y3+x;
 list KLEIN=Adj_div(f);
@@ -86,7 +86,7 @@ SK[3];
 setring r;
 kill R,RR,RP;
 
-// HERMITE curve over F_4 (p=2) 
+// HERMITE curve over F_4 (p=2)
 
 f=x3+y2+y;
 list HC2=Adj_div(f);
@@ -125,7 +125,7 @@ y[1,6]=1;
 print(decodeSV(y,SV2));
 killall();
 
-// HERMITE curve over F_9 (p=3) 
+// HERMITE curve over F_9 (p=3)
 
 ring r=3,(x,y),lp;
 list HC3=Adj_div(y3+y-x4);
@@ -142,7 +142,7 @@ setring ER3;
 intvec G=15;
 intvec D=2..28;
 // we already have a rational divisor G and 27 more points over F_9;
-// let us construct the corresponding residual AG code of type 
+// let us construct the corresponding residual AG code of type
 //     [27,14,>=11] over F_9
 matrix C3=AGcode_Omega(G,D,HC3);
 print(C3);
@@ -156,8 +156,8 @@ list SH3=sys_code(H3);
 print(SH3[1]);
 print(SH3[2]);
 SH3[3];
-// we can correct 3 errors and the genus is 3, thus F must have 
-//    degree 6 and support disjoint to that of D : 
+// we can correct 3 errors and the genus is 3, thus F must have
+//    degree 6 and support disjoint to that of D :
 intvec F=6;
 list SV3=prepSV(G,D,F,HC3);
 // now we produce 3 errors on the zero-codeword :

@@ -1,11 +1,11 @@
 /*! \page kernel_combinatorics_page Combinatorical algorithms
 
- \brief This sub-package of \ref kernel_page contains some combinatorical algorithms. 
+ \brief This sub-package of \ref kernel_page contains some combinatorical algorithms.
 
  Main header in `/kernel/combinatorics/`:
  - \ref kernel/combinatorics/hutil.h
  - \ref kernel/combinatorics/stairc.h
- 
+
 */
 
 // TODO: list those algorithms... and corresponding interpreter functions...?

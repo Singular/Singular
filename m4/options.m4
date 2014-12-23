@@ -52,11 +52,11 @@ fi
 
 AC_DEFUN([SING_CHECK_OMALLOC],
 [
-  AC_ARG_ENABLE(omalloc, 
+  AC_ARG_ENABLE(omalloc,
     [AS_HELP_STRING([--enable-omalloc],[build for use with omalloc])],
     [if test "x$enableval" = "xyes"; then
       ENABLE_OMALLOC=yes
-    fi], 
+    fi],
       ENABLE_OMALLOC=no)
 
   AC_ARG_VAR( [OMALLOC_INCLUDES], [INCLUDES for libomalloc] )
@@ -94,7 +94,7 @@ AC_DEFUN([SING_CHECK_OMALLOC],
     AC_LANG_POP([C])
 
     AC_DEFINE([HAVE_OMALLOC],[1])
- 
+
     PKG_REQUIRE="$PKG_REQUIRE omalloc"
     AC_SUBST(PKG_REQUIRE)
   else
@@ -106,11 +106,11 @@ AC_DEFUN([SING_CHECK_OMALLOC],
 
 AC_DEFUN([SING_USE_OMALLOC],
 [
- AC_ARG_ENABLE(omalloc, 
+ AC_ARG_ENABLE(omalloc,
   [AS_HELP_STRING([--disable-omalloc], [do NOT use omalloc within the factory])],
   [if test "x$enableval"  = "xyes"; then
     ENABLE_OMALLOC=yes
-   fi], 
+   fi],
     ENABLE_OMALLOC=add)
 
  ENABLE_OMALLOC_ARG=""
@@ -150,11 +150,11 @@ AC_DEFUN([SING_USE_OMALLOC],
 
 AC_DEFUN([SING_USE_RESOURCES],
 [
- AC_ARG_ENABLE(resources, 
+ AC_ARG_ENABLE(resources,
   [AS_HELP_STRING([--disable-resources], [do NOT use libresources within the factory])],
   [if test "x$enableval"  = "xyes"; then
     ENABLE_RESOURCES=yes
-   fi], 
+   fi],
     ENABLE_RESOURCES=yes)
 
  AC_MSG_CHECKING(whether to use libresources in factory and co.)
@@ -261,7 +261,7 @@ AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
     CFLAGS="$CFLAGS ${FACTORY_INCLUDES}"
     CXXFLAGS="$CXXFLAGS ${FACTORY_INCLUDES}"
     LIBS="${FACTORY_LIBS} $LIBS"
- 
+
     AC_CHECK_HEADERS([factory/factory.h],,AC_MSG_WARN([trusting the factory locations given: ${FACTORY_INCLUDES}]))
 
     CFLAGS="$CFLAGS_save"
@@ -272,7 +272,7 @@ AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
     AC_LANG_POP([C++])
 
     AC_DEFINE(HAVE_FACTORY,[1],[Enable factory])
- 
+
     PKG_REQUIRE="$PKG_REQUIRE factory"
     AC_SUBST(PKG_REQUIRE)
   else
@@ -292,11 +292,11 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AC_MSG_CHECKING([built-in modules])
 
  AC_ARG_VAR( [BUILTIN_LIBS], [LIB FLAGS for buildins] )
- AC_ARG_WITH(builtinmodules, 
+ AC_ARG_WITH(builtinmodules,
    AS_HELP_STRING([--with-builtinmodules], [List of builtin modules (experimental), default: staticdemo,bigintm,syzextra]),
    [if test "x$with_builtinmodules" = "xyes"; then
     with_builtinmodules=syzextra
-   fi], 
+   fi],
    [with_builtinmodules=""]
  )
  # staticdemo,bigintm,
@@ -314,24 +314,24 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   bi_singmathic=false
   bi_bigintm=false
   bi_Order=false
-  
-  
+
+
  if test -z "$with_builtinmodules"; then
   AC_MSG_RESULT(no)
  else
   AC_MSG_RESULT(yes)
-  
+
   LL=""
-  
-  for a in `echo ${with_builtinmodules}|tr ',' ' '`; 
+
+  for a in `echo ${with_builtinmodules}|tr ',' ' '`;
   do
     AC_MSG_CHECKING([whether to build-in '$a'?])
-    
+
       L="${L} add($a)"
       LL="${LL} $a"
       BUILTIN_LIBS="${BUILTIN_LIBS} dyn_modules/$a/$a.la"
       AC_MSG_RESULT(yes)
-      
+
 # *) AC_MSG_ERROR([bad value ${enableval} for	    --enable-debug]) ;;
 
       case "${a}" in
@@ -341,8 +341,8 @@ AC_DEFUN([SING_BUILTIN_MODULES],
        gfanlib ) bi_gfanlib=true ;;
        polymake ) bi_polymake=true ;;
        singmathic ) bi_singmathic=true ;;
-       bigintm ) bi_bigintm=true ;;       
-       Order ) bi_Order=true ;;       
+       bigintm ) bi_bigintm=true ;;
+       Order ) bi_Order=true ;;
       esac
 
 ###### In case of out-of tree building: the build dir is empty in configure time!!!
@@ -351,8 +351,8 @@ AC_DEFUN([SING_BUILTIN_MODULES],
 ##    else
 ##      AC_MSG_RESULT(no)
     fi
-    
-#    A=`echo "SI_BUILTIN_$a" | sed -e "y:m4_cr_letters-:m4_cr_LETTERS[]_:"  -e "/^@<:@m4_cr_digits@:>@/s/^/_/"`      
+
+#    A=`echo "SI_BUILTIN_$a" | sed -e "y:m4_cr_letters-:m4_cr_LETTERS[]_:"  -e "/^@<:@m4_cr_digits@:>@/s/^/_/"`
 #    echo "A:: $A"
 #    AM_CONDITIONAL(m4_unquote([A]),[test -d "Singular/dyn_modules/$a"]) ## :(((
   done # for
@@ -360,13 +360,13 @@ AC_DEFUN([SING_BUILTIN_MODULES],
   AC_DEFINE_UNQUOTED([SI_BUILTINMODULES],"$LL",[Refined list of builtin modules])
 
  fi # else ("x$with_builtinmodules" != xno)
- 
+
  AC_MSG_CHECKING([SI_BUILTINMODULES_ADD(add)...])
  AC_MSG_RESULT(${L:-unset})
- 
+
  AC_DEFINE_UNQUOTED([SI_BUILTINMODULES_ADD(add)],[$L],[Add(list) for Builtin modules])
  AC_SUBST(BUILTIN_LIBS)
- 
+
  AM_CONDITIONAL([SI_BUILTIN_STATICDEMO], [test x$bi_staticdemo = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_SYZEXTRA], [test x$bi_syzextra = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_PYOBJECT], [test x$bi_pyobject = xtrue])
@@ -375,7 +375,7 @@ AC_DEFUN([SING_BUILTIN_MODULES],
  AM_CONDITIONAL([SI_BUILTIN_SINGMATHIC], [test x$bi_singmathic = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_BIGINTM], [test x$bi_bigintm = xtrue])
  AM_CONDITIONAL([SI_BUILTIN_ORDER], [test x$bi_Order = xtrue])
- 
+
  AC_MSG_CHECKING([BUILTIN_LIBS...])
  AC_MSG_RESULT(${BUILTIN_LIBS:-unset})
 ])

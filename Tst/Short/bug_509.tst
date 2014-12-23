@@ -14,8 +14,8 @@ proc testRadicalZ()
 
 proc testRadicalZ_2()
 {
-    ring rng = integer,(a,b,c),dp;   
-    ideal i = a^2*b^4 + c^2-1,4*a^2*b^3; 
+    ring rng = integer,(a,b,c),dp;
+    ideal i = a^2*b^4 + c^2-1,4*a^2*b^3;
     def result = Primdecint::radicalZ(i);
     ideal expectedResult = 2*c^ 2-2, 2*a*b, a*b^2*c-a*b^ 2+c^2-1,a^2*b^3+a*b*c+a*b;
     ASSUME( 0, 0 == size(   reduce(result,std(expectedResult) )   ) );

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
-#include <coeffs/coeffs.h>
+#include <misc/auxiliary.h>
 
 // defines are in struct.h
 // define if a*b is with mod instead of tables
@@ -20,50 +20,10 @@
 #define NV_OPS
 #define NV_MAX_PRIME 32003
 
-// extern int npGen; // obsolete
+struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
+struct snumber; typedef struct snumber *   number;
 
 BOOLEAN npInitChar(coeffs r, void* p);
-
-BOOLEAN npGreaterZero (number k, const coeffs r);
-number  npMult        (number a, number b, const coeffs r);
-number  npInit        (long i, const coeffs r);
-int     npInt         (number &n, const coeffs r);
-number  npAdd         (number a, number b,const coeffs r);
-number  npSub         (number a, number b,const coeffs r);
-void    npPower       (number a, int i, number * result,const coeffs r);
-BOOLEAN npIsZero      (number a,const coeffs r);
-BOOLEAN npIsOne       (number a,const coeffs r);
-BOOLEAN npIsMOne       (number a,const coeffs r);
-number  npDiv         (number a, number b,const coeffs r);
-number  npNeg         (number c,const coeffs r);
-number  npInvers      (number c,const coeffs r);
-BOOLEAN npGreater     (number a, number b,const coeffs r);
-BOOLEAN npEqual       (number a, number b,const coeffs r);
-void    npWrite       (number &a, const coeffs r);
-void    npCoeffWrite  (const coeffs r, BOOLEAN details);
-const char *  npRead  (const char *s, number *a,const coeffs r);
-#ifdef LDEBUG
-BOOLEAN npDBTest      (number a, const char *f, const int l, const coeffs r);
-#define npTest(A,r)     npDBTest(A,__FILE__,__LINE__, r)
-#else
-#define npTest(A,r)     (0)
-#endif
-
-//int     npGetChar();
-
-nMapFunc npSetMap(const coeffs src, const coeffs dst);
-number  npMapP(number from, const coeffs src, const coeffs r);
-/*-------specials for spolys, do NOT use otherwise--------------------------*/
-/* for npMultM, npSubM, npNegM, npEqualM : */
-#ifdef HAVE_DIV_MOD
-extern unsigned short *npInvTable;
-#else
-#ifndef HAVE_MULT_MOD
-extern long npPminus1M;
-extern unsigned short *npExpTable;
-extern unsigned short *npLogTable;
-#endif
-#endif
 
 // inline number npMultM(number a, number b, int npPrimeM)
 // // return (a*b)%n
@@ -163,9 +123,11 @@ static inline BOOLEAN npIsZeroM (number  a, const coeffs)
 //   return (number)(((long)a*(long)b) % npPrimeM);
 // }
 
+// The folloing is reused inside gnumpc.cc, gnumpfl.cc and longrat.cc
+int     npInt         (number &n, const coeffs r);
 
-
-
+// The following is currently used in OPAE.cc, OPAEQ.cc and OPAEp.cc for setting their SetMap...
+nMapFunc npSetMap(const coeffs src, const coeffs dst); // FIXME! BUG?
 
 #define npEqualM(A,B,r)  ((A)==(B))
 

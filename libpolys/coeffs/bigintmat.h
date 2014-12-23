@@ -5,9 +5,7 @@
 #define BIGINTMAT_H
 
 #include <omalloc/omalloc.h>
-#include <resources/feFopen.h>
 #include <coeffs/coeffs.h>
-#include <coeffs/rmodulon.h>
 
 /**
  * @class bigintmat bigintmat.h <coeffs/bigintmat.h>
@@ -328,11 +326,7 @@ number solveAx(bigintmat *A, bigintmat *b, bigintmat *x); // solves Ax=b*d for a
 ///a basis for the nullspace of a mod p: only used internally in Round2.
 /// Don't use it.
 int kernbase (bigintmat *a, bigintmat *c, number p, coeffs q);
-coeffs numbercoeffs(number n, coeffs c);
 bool nCoeffs_are_equal(coeffs r, coeffs s);
-// Geklaut aus anderer Datei:
-static inline void number2mpz(number n, coeffs c, mpz_t m){ n_MPZ(m, n, c); }
-static inline number mpz2number(mpz_t m, coeffs c){ return n_InitMPZ(m, c); }
 // enden wieder
 void diagonalForm(bigintmat *a, bigintmat **b, bigintmat **c);
 

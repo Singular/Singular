@@ -1989,16 +1989,23 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{fetch (} ring_name@code{,} name @code{)}
+@*@code{fetch (} ring_name@code{,} name@code{,} intvec_expression @code{)}
+@*@code{fetch (} ring_name@code{,} name@code{,} intvec_expression@code{,} intvec_expression  @code{)}
 @item @strong{Type:}
 number, poly, vector, ideal, module, matrix or list
 (the same type as the second argument)
 @item @strong{Purpose:}
 maps objects between rings.
 @code{fetch} is the identity map between rings and qrings,
-the i-th variable of the source ring is mapped to the i-th
+in the first case the i-th variable of the source ring is mapped to the i-th
 variable of the basering.
 If the basering has less variables than the source ring these variables are mapped to zero.
-The coefficient fields must be compatible.
+In the 2nd and 3rd form the intvec describes the permation of the variables:
+an i at position j maps the variable @code{var(j)} of the source to the variable
+@code{var(i)} of the destination. Negative numbers (and the fourth argument)
+describe mapping of parameters.
+@*A zero means that that variable/parameter is mapped to 0.
+@*The coefficient fields must be compatible.
 (See @ref{map} for a description of possible mappings between
 different ground fields).
 @*@code{fetch} offers a convenient way to change
@@ -2029,6 +2036,7 @@ variables, not their names.
   v;
   ideal k=fetch(q,i);
   k;
+  fetch(q,i,1..nvars(q)); // equivalent to fetch(q,i)
 @c example
 @end smallexample
 @end table

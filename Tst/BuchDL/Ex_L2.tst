@@ -14,7 +14,7 @@ matrix B = randommat(4,2,maxideal(1),100);
 matrix M = concat(B,A);  // from matrix.lib
 print(M);
 
-ideal I = minor(M,3); 
+ideal I = minor(M,3);
 ideal GI = groebner(I);
 int codimI = nvars(R)-dim(GI);
 codimI;
@@ -48,7 +48,7 @@ singI_sat;
 //->    singI_sat[2]=x(0)
 //->    singI_sat[3]=3297*x(2)^2-2680*x(2)*x(3)-5023*x(3)^2
 
-ideal IL = x(0),x(1);   
+ideal IL = x(0),x(1);
 reduce(I,groebner(IL),1);
 //->   _[1]=0
 //->   _[2]=0

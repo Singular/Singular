@@ -2,7 +2,7 @@ LIB "tst.lib"; tst_init();
 
 ring R = 0,(x,y,z), (dp, C);
 
-module M1; 
+module M1;
 M1[30]=x^4*gen(5)+x^3*z*gen(10)+x^2*z*gen(20)-x*z*gen(25);
 M1[1]=x*y*gen(1)+y*z*gen(6)+z*gen(11);
 M1[2]=x*y*gen(2)+y*z*gen(7)+z*gen(12);
@@ -34,7 +34,7 @@ M1[27]=x^4*gen(2)+x^3*z*gen(7)+x^2*z*gen(17)-x*z*gen(22);
 M1[28]=x^4*gen(3)+x^3*z*gen(8)+x^2*z*gen(18)-x*z*gen(23);
 M1[29]=x^4*gen(4)+x^3*z*gen(9)+x^2*z*gen(19)-x*z*gen(24);
 
-module M2; 
+module M2;
 M2[30]=x^4*gen(21)+x^3*z*gen(22)+x^2*z*gen(24)-x*z*gen(25);
 M2[1]=x*y*gen(1)+y*z*gen(2)+z*gen(3);
 M2[2]=x^2*gen(5)+x*y*gen(3)-y^2*gen(4)-gen(5);

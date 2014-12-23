@@ -23,4 +23,3 @@ q;
 jet(p*q,4);
 
 tst_status(1);$
-        

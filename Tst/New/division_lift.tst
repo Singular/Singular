@@ -14,7 +14,7 @@ R;
 //                  : names    x y z
 //        block   3 : ordering C$39 = void
 
-ideal G = 
+ideal G =
 x2+y3,
 x2y,
 x3,
@@ -23,7 +23,7 @@ z4
 
 // attrib(G, "isSB", 1);
 
-ideal M = 
+ideal M =
 x2+y3,
 z4,
 y4,
@@ -32,5 +32,5 @@ xy3
 
 // TRACE=3; option(prot);
 division(G, M); // idLift(Gomega, M, NULL, FALSE, FALSE, TRUE, NULL);
- 
+
 tst_status(1);$

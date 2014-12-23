@@ -49,7 +49,7 @@
 #cmakedefine NOSTREAMIO 1
 
 /* which C++ header variants to use */
-#cmakedefine HAVE_IOSTREAM_H 1 
+#cmakedefine HAVE_IOSTREAM_H 1
 #cmakedefine HAVE_FSTREAM_H 1
 #cmakedefine HAVE_STRSTREAM_H 1
 

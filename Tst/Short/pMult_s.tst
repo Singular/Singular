@@ -24,8 +24,8 @@ proc pAdd_Test(string rs)
   tst_TestMult(id, n_vars, size(Tst::tst_rgen_comp_orderings[Tst::tst_rgen_comp_index]));
   kill r;
 }
-  
-  
+
+
 string rs = tst_next_ring();
 
 while (size(rs) > 1)

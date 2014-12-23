@@ -10,7 +10,7 @@ proc testWrongNCAlgebra(cc)
  if(!defined(A)) { return(); } // OK
 
 // setring A; print(ringlist(A)[5]); setring save;
- 
+
  ERROR("Wrong NC-algebra definition with " + string(typeof(cc)) + "{"+string(cc)+"}" );
 }
 

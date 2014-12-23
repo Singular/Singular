@@ -12,7 +12,7 @@
 ;;
 ;; - "Singular" is written with an upper-case `S' in comments, doc
 ;;   strings, and messages.  As part of symbols, it is written with
-;;   a lower-case `s'. 
+;;   a lower-case `s'.
 ;; - When referring to the Singular interactive mode, do it in that
 ;;   wording.  Use the notation `singular-interactive-mode' only when
 ;;   really referring to the lisp object.
@@ -429,7 +429,7 @@ This function is called at mode initialization time."
      ;; note: we use font-lock-reference-face here even Emacs says that
      ;; this face is obsolete and suggests to use font-lock-constant-face,
      ;; since XEmacs20/21 does not know the constant-face but the
-     ;; reference-face. 
+     ;; reference-face.
      ("^   [\\?].*`\\(\\sw\\sw+;?\\)`" 1 font-lock-reference-face t)
      ))
   "Gaudy level highlighting for Singular interactive mode.")
@@ -458,7 +458,7 @@ This function is called at mode initialization time."
 For XEmacs, this function is called exactly once when singular.el is
 loaded.
 For Emacs, this function is called  at mode initialization time."
-  (cond 
+  (cond
    ;; Emacs
    ((eq singular-emacs-flavor 'emacs)
     (singular-debug 'interactive (message "Setting up Font Lock mode for Emacs"))
@@ -548,7 +548,7 @@ KEY-MODEL should be one of the valid values of `singular-cursor-key-model'."
 			      (t
 			       (define-key singular-interactive-mode-map prev-key nil)
 			       (define-key singular-interactive-mode-map next-key nil))))))
-			      
+
 	  ;; here is where list position are mapped to keys
 	  (list (list (nth 0 key-model) [up] [down])
 		(list (nth 1 key-model) [?\C-p] [?\C-n])
@@ -635,18 +635,18 @@ This alist can be used for completion."
       (setq elem (car libs))
       (if (> (length elem) 1)
           (setq menudef
-                (append 
-		 (list 
+                (append
+		 (list
 		  (append (list (car elem))
 			  (singular-menu-build-libraries-menu (cdr elem))))
 		 menudef))
-        (setq menudef 
+        (setq menudef
 	      (append (list (vector (car elem)
 				    (list 'singular-load-library nil
 					  (car elem))
                                     t))
 		      menudef))
-        (setq singular-standard-libraries-alist 
+        (setq singular-standard-libraries-alist
 	      (append (list elem) singular-standard-libraries-alist)))
       (setq libs (cdr libs)))
     menudef))
@@ -666,7 +666,7 @@ up a menu with submenues for each category in the submenu (\"Commands\"
             singular-standard-libraries-alist))
   (easy-menu-change '("Commands")
 		    "Libraries"
-		    (append 
+		    (append
 		     (singular-menu-build-libraries-menu
 		      singular-standard-libraries-with-categories)
 		     (append '("---") singular-menu-initial-library-menu))))
@@ -683,7 +683,7 @@ This function is called by `singular-exec'."
   "Initialize library submenu from singular command menu.
 Sets the submenu (\"Commands\" \"Libraries\") to the value of
 `singular-menu-initial-library-menu'."
-  (singular-debug 'interactive 
+  (singular-debug 'interactive
 		  (message "Removing libraries from menu"))
   (easy-menu-change '("Commands") "Libraries" singular-menu-initial-library-menu))
 
@@ -692,10 +692,10 @@ Sets the submenu (\"Commands\" \"Libraries\") to the value of
 ;;   Singular   Commands
 ;; That's what we want. So DO NOT exchange both (or ..) statements!
 (or singular-interactive-mode-menu-2
-    (easy-menu-define 
+    (easy-menu-define
      singular-interactive-mode-menu-2
      singular-interactive-mode-map ""
-     (list 
+     (list
       "Commands"
       ["Fold/Unfold Latest Output" singular-folding-toggle-fold-latest-output t]
       ["Fold/Unfold At Point" singular-folding-toggle-fold-at-point-or-all t]
@@ -739,7 +739,7 @@ Sets the submenu (\"Commands\" \"Libraries\") to the value of
 
 This function is called  at mode initialization time."
   ;; Remove any potential menu which comint-mode might has added.
-  (cond 
+  (cond
    ;; Emacs
    ((eq singular-emacs-flavor 'emacs)
     ;; Note that easy-menu-remove is a nop in emacs.
@@ -757,7 +757,7 @@ This function is called  at mode initialization time."
     (easy-menu-remove '("Signals"))))	; XEmacs 21
 
   ;; Note: easy-menu-add is not necessary in emacs, since the menu
-  ;; is added automatically with the keymap. 
+  ;; is added automatically with the keymap.
   ;; See help on `easy-menu-add'
   (easy-menu-add singular-interactive-mode-menu-1)
   (easy-menu-add singular-interactive-mode-menu-2))
@@ -1180,7 +1180,7 @@ This function is called at mode initialization time."
 ;; - Simple sections do not overlap.  Thus, any point in the buffer may be
 ;;   covered by at most one simple section.
 ;; - Besides from their start and their end, simple sections have some type
-;;   associated. 
+;;   associated.
 ;; - Simple sections are realized using overlays (extents for XEmacs)
 ;;   which define the start and, end, and type (via properties) of the
 ;;   simple section.  Actually, as a lisp object a simple section is
@@ -1555,7 +1555,7 @@ Assumes that no narrowing is in effect."
       (setq simple-sec (singular-xemacs-simple-sec-before last-end))
       (if (eq type (singular-xemacs-simple-sec-type simple-sec))
 	  ;; move existing extent
-	  (setq simple-sec (set-extent-endpoints simple-sec 
+	  (setq simple-sec (set-extent-endpoints simple-sec
 						 (extent-start-position simple-sec) end))
 	;; create new extent
 	(setq simple-sec (make-extent last-end end))
@@ -2550,7 +2550,7 @@ Removes it and sets `singular-help-topic' accordingly."
 (defun singular-help-post-output-filter (&rest ignore)
   "Call `singular-help' if `singular-help-topic' is non-nil."
   (when singular-help-topic
-    (save-excursion 
+    (save-excursion
       (singular-help singular-help-topic))
     (setq singular-help-topic nil)))
 
@@ -2633,7 +2633,7 @@ o otherwise, the constant `singular-help-fall-back-file-name' is used
 ;; Note: We use singular-help-topic-history for singular-example, too
 (defun singular-example (&optional command)
   "Show Singular example on COMMAND."
-  (interactive 
+  (interactive
    (list (completing-read "Example for: " singular-examples-alist
 			  nil nil nil 'singular-help-topic-history)))
   (let ((process (singular-process))
@@ -2655,7 +2655,7 @@ This function is called at mode initialization time."
 ;;}}}
 
 ;;{{{ Singular commands, help topics and standard libraries alists
-(defvar singular-commands-alist nil 
+(defvar singular-commands-alist nil
   "An alist containing all Singular commands to complete.
 
 This variable is buffer-local.")
@@ -2683,11 +2683,11 @@ This variable is buffer-local.")
 ;; Scanning of header
 ;;
 (defconst singular-scan-header-emacs-home-regexp "^// \\*\\* EmacsDir: \\(.+\\)\n"
-  "Regular expression matching the location of emacs home in Singular 
+  "Regular expression matching the location of emacs home in Singular
 header.")
 
 (defconst singular-scan-header-info-file-regexp "^// \\*\\* InfoFile: \\(.+\\)\n"
-  "Regular expression matching the location of Singular info file in 
+  "Regular expression matching the location of Singular info file in
 Singular header.")
 
 (defconst singular-scan-header-time-stamp 0
@@ -2721,7 +2721,7 @@ On success calls `singular-menu-install-libraries'."
   (if (load (singular-expand-emacs-file-name "lib-cmpl.el" t) t t t)
       (singular-menu-install-libraries)
     (message "Can't find library index file!")))
-  
+
 
 (defun singular-scan-header-pre-output-filter (output)
   "Filter function for hook `singular-pro-output-filter-functions'.
@@ -2738,7 +2738,7 @@ been searching for more than 20 seconds."
     ;; Search for emacs home directory
     (when (string-match singular-scan-header-emacs-home-regexp output)
       (let ((emacs-home (substring output (match-beginning 1) (match-end 1))))
-	(singular-debug 'interactive 
+	(singular-debug 'interactive
 			(message "scan header: emacs home path found"))
 	;; in any case, remove marker from output
 	(setq output (replace-match "" t t output))
@@ -2753,7 +2753,7 @@ been searching for more than 20 seconds."
     ;; Search for Singular info file
     (when (string-match singular-scan-header-info-file-regexp output)
       (let ((file-name (substring output (match-beginning 1) (match-end 1))))
-	(singular-debug 'interactive 
+	(singular-debug 'interactive
 			(message "scan header: singular.hlp path found"))
 	;; in any case, remove marker from output
 	(setq output (replace-match "" t t output))
@@ -2764,9 +2764,9 @@ been searching for more than 20 seconds."
 	  (setq singular-scan-header-scan-for (delq 'info-file singular-scan-header-scan-for))
 	  (setq singular-help-file-name file-name))))
 
-    ;; Remove from hook if everything is found or if we already waited 
+    ;; Remove from hook if everything is found or if we already waited
     ;; too long.
-    (if (or (eq singular-scan-header-scan-for nil) 
+    (if (or (eq singular-scan-header-scan-for nil)
 	    (> (singular-time-stamp-difference (current-time) singular-scan-header-time-stamp) 20))
 	(remove-hook 'singular-pre-output-filter-functions 'singular-scan-header-pre-output-filter))
 
@@ -2789,7 +2789,7 @@ This function is called by `singular-exec'."
     (setq singular-scan-header-scan-for (append singular-scan-header-scan-for '(emacs-home))))
 
   ;; Up to now this seems to be the best place to initialize
-  ;; `singular-help-file-name' since singular-help gets initialized 
+  ;; `singular-help-file-name' since singular-help gets initialized
   ;; only on mode start-up, not on Singular start-up
   ;;
   ;; if singular-help-file-name is not set, mark, that we have to scan for it
@@ -2812,12 +2812,12 @@ This function is called by `singular-exit-sentinel'."
 ;;
 ;; handling of emacs home directory
 ;;
-;; A note on `singular-emacs-home-directory': If this variable is set 
+;; A note on `singular-emacs-home-directory': If this variable is set
 ;; before singular.el is evaluated, the header of the first Singular
 ;; started is NOT searched for the singular-emacs-home-directory.
-;; Anyhow, all subsequent calls of Singular will scan the header 
+;; Anyhow, all subsequent calls of Singular will scan the header
 ;; regardless of the initial state of this variable. (The exit-sentinel
-;; will set this variable back to nil.) 
+;; will set this variable back to nil.)
 ;; See also `singular-scan-header-exit'.
 (defvar singular-emacs-home-directory nil
   "Path to the emacs sub-directory of Singular as string.
@@ -2870,7 +2870,7 @@ Assumes the COMPLETION-ALIST is not nil."
 	   (insert completion))
 	  (t
 	   (message "Making completion list...")
-	   (let ((list (all-completions pattern 
+	   (let ((list (all-completions pattern
 					completion-alist)))
 	     (with-output-to-temp-buffer "*Completions*"
 	       (display-completion-list list)))
@@ -2879,7 +2879,7 @@ Assumes the COMPLETION-ALIST is not nil."
 (defun singular-dynamic-complete ()
   "Dynamic complete word before point.
 Performs file name completion if point is inside a string.
-Performs completion of Singular help topics if point is at the end of a 
+Performs completion of Singular help topics if point is at the end of a
 help command (\"help\" or \"?\").
 Performs completion of Singular examples if point is at the end of an
 example command (\"example\").
@@ -3121,7 +3121,7 @@ the demo file is still waiting to be sent to Singular."
 			       (or singular-demo-last-directory
 				   singular-demo-load-directory)
 			       nil t))))))
-      
+
       (setq singular-demo-last-directory (file-name-directory demo-file-name))
       demo-file-name)))
 
@@ -3250,7 +3250,7 @@ This function is called  at mode initialization time."
       (setq singular-demo-end (make-marker)))
   (make-local-variable 'singular-demo-last-directory))
 ;;}}}
-      
+
 ;;{{{ Some lengthy notes on input and output
 
 ;; NOT READY[so sorry]!
@@ -3851,7 +3851,7 @@ This variable is buffer-local.")
 (defvar singular-switches-magic '("-t" "--emacs")
   "Additional magic switches for Singular process.
 List of switch-strings which are automagically added when new Singular
-processes are started, one string for each command line argument. 
+processes are started, one string for each command line argument.
 This list should at least contain the options \"--emacs\" and \"-t\". If
 you are running a Singular with version < 1.2 , remove option \"--exec\"
 from the list.")
@@ -3877,17 +3877,17 @@ This variable is buffer-local.")
 
 This function is called at mode initialization time."
   (singular-debug 'interactive (message "Initializing exec"))
-  (set (make-local-variable 'singular-executable-last) 
+  (set (make-local-variable 'singular-executable-last)
        singular-executable-default)
-  (set (make-local-variable 'singular-directory-last) 
+  (set (make-local-variable 'singular-directory-last)
        singular-directory-default)
-  (set (make-local-variable 'singular-name-last) 
+  (set (make-local-variable 'singular-name-last)
        singular-name-default)
   (set (make-local-variable 'singular-switches-last)
        singular-switches-default)
-  (set (make-local-variable 'singular-exit-insert-killed-marker) 
+  (set (make-local-variable 'singular-exit-insert-killed-marker)
        nil)
-  (set (make-local-variable 'singular-exit-cleanup-done) 
+  (set (make-local-variable 'singular-exit-cleanup-done)
        nil))
 
 (defvar singular-exit-cleanup-done nil
@@ -3940,7 +3940,7 @@ Inserts a string indicating that the Singular process is killed."
     (singular-exit-cleanup)
     (delete-process process)
     (save-excursion
-      ;; Because of timing problems it would be better if 
+      ;; Because of timing problems it would be better if
       ;; singular-exit-sentinel would insert this string (see Version 1.41)
       ;; but this is not possible for XEmacs: The function (process-mark)
       ;; called within singular-exit-sentinel returns a mark with no
@@ -3958,7 +3958,7 @@ If called non-interactiveley, MODE should be one of 'abort, 'quit, 'restart,
 or 'continue."
   (interactive
    (let (answer)
-     (while (not answer) 
+     (while (not answer)
        (setq answer (read-from-minibuffer
 		   "(a)bort current command, (q)uit, (r)estart Singular or (c)ontinue? "))
        (setq answer
@@ -4017,7 +4017,7 @@ Returns BUFFER."
 	    (singular-input-filter-init (point))
 	    (singular-output-filter-init (point))
 	    (singular-simple-sec-init (point))
-	    
+
 	    ;; completion should be initialized before scan header!
 	    (singular-completion-init)
 	    (singular-scan-header-init)
@@ -4039,7 +4039,7 @@ Returns BUFFER."
 
 	    ;; execute hooks
 	    (run-hooks 'singular-exec-hook))
-	  
+
 	  buffer)
       ;; this code is unwide-protected
       (set-buffer old-buffer))))
@@ -4065,14 +4065,14 @@ Sets singular-*-last values."
   (let* ((buffer-name (singular-process-name-to-buffer-name name))
 	 ;; buffer associated with Singular, nil if there is none
 	 (buffer (get-buffer buffer-name)))
-    
+
     ;; If directory is set, make sure that it ends in a "/" at the end.
     ;; The check is done on both slash and backslash, but we unconditionally
     ;; insert a slash. Hopefully that works on NT, too.
     (and directory
 	 (not (memq (aref directory (1- (length directory))) '(?/ ?\\)))
 	 (setq directory (concat directory "/")))
-    
+
     (if (not buffer)
 	(progn
 	  ;; create new buffer and call `singular-interactive-mode'
@@ -4081,17 +4081,17 @@ Sets singular-*-last values."
 	  (set-buffer buffer)
 	  (and directory
 	       (setq default-directory directory))
-	  
+
 	  (singular-debug 'interactive (message "Calling `singular-interactive-mode'"))
 	  (singular-interactive-mode)))
-    
+
     (if (not (comint-check-proc buffer))
 	;; create new process if there is none
 	(singular-exec buffer name executable
 		       (if (file-exists-p singular-start-file)
 			   singular-start-file)
 		       (append switches singular-switches-magic)))
-    
+
     ;; pop to buffer
     (singular-debug 'interactive (message "Calling `pop-to-buffer'"))
     (singular-pop-to-buffer singular-same-window buffer))
@@ -4109,15 +4109,15 @@ Sets singular-*-last values."
 
 (defun singular-generate-new-buffer-name (name)
   "Generate a unique buffer name for a singular interactive buffer.
-The string NAME is the desired name for the singular interactive 
+The string NAME is the desired name for the singular interactive
 buffer, without surrounding stars.
 The string returned is surrounded by stars.
 
 If no buffer with name \"*NAME*\" exists, return \"*NAME*\".
-Otherwise check for buffer called \"*NAME<n>*\" where n is a 
+Otherwise check for buffer called \"*NAME<n>*\" where n is a
 increasing number and return \"*NAME<n>*\" if no such buffer
 exists."
-  (let ((new-name (singular-process-name-to-buffer-name name)) 
+  (let ((new-name (singular-process-name-to-buffer-name name))
 	(count 2))
     (while (get-buffer new-name)
       (setq new-name (singular-process-name-to-buffer-name
@@ -4126,7 +4126,7 @@ exists."
     new-name))
 
 (defun singular ()
-  "Run an inferior Singular process using default arguments.  
+  "Run an inferior Singular process using default arguments.
 Starts a Singular process, with I/O through an Emacs buffer, using the
 values of `singular-executable-default', `singular-directory-default',
 `singular-switches-default', and `singular-name-default'.
@@ -4169,7 +4169,7 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 
   (if (singular-process t)
       (singular-kill-singular))
-      
+
   (singular-internal singular-executable-last
 		     singular-directory-last
 		     singular-switches-last
@@ -4209,20 +4209,20 @@ Every time `singular-other' starts a new Singular process it runs the hooks
 on `singular-exec-hook'.
 
 Type \\[describe-mode] in the Singular buffer for a list of commands."
-  (interactive 
+  (interactive
    (let* ((exec (read-file-name "Singular executable: "))
-	 ;; Remark: Do NOT call `expand-file-name' after the 
+	 ;; Remark: Do NOT call `expand-file-name' after the
 	 ;; above read-file-name! It has to be possible to enter a command
 	 ;; without path which should be searched for in $PATH.
 	 ;; `start-process' is intelligent enough to start commands with
 	 ;; not-expanded name.
 	  (dir (file-name-directory (read-file-name "Default directory: "
-						    nil 
+						    nil
 						    (or singular-directory-default
 							default-directory)
 						    t)))
 	 (switch "")
-	 (bufname (singular-generate-new-buffer-name 
+	 (bufname (singular-generate-new-buffer-name
 		   (downcase (file-name-nondirectory exec)))))
 
      ;; Get command line arguments and append magic switches
@@ -4234,7 +4234,7 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 	 (setq switches-default (cdr switches-default))))
      ;; note: magic switches are appended by `singular-internal'
      (setq switch (split-string (read-from-minibuffer "Singular options: "
-						      switch nil nil 
+						      switch nil nil
 						      singular-switches-history)
 				" "))
      ;; Generate new buffer name
@@ -4257,7 +4257,7 @@ If called with prefix argument, kills the Singular buffer."
   (interactive "P")
   (singular-debug 'interactive
 		  (message "exit singular called"))
-  
+
   (singular-kill-singular)
   (if kill-singular-buffer
       (kill-buffer (current-buffer))))

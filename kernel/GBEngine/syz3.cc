@@ -1889,7 +1889,7 @@ syStrategy syKosz(ideal arg,int * length)
           ideal initial=id_Head(syzstr->res[0],currRing);
           int len=0,reg=0;
           intvec *w=NULL;
-          ring dp_C_ring = rAssure_dp_C(currRing); rChangeCurrRing(dp_C_ring);	
+          ring dp_C_ring = rAssure_dp_C(currRing); rChangeCurrRing(dp_C_ring);
           initial = idrMoveR_NoSort(initial, syzstr->syRing, dp_C_ring);
           resolvente res = sySchreyerResolvente(initial,-1,&len,TRUE, TRUE);
           intvec * dummy = syBetti(res,len,&reg, w);

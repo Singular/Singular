@@ -26,7 +26,7 @@ pc2;
 ideal rpc2 = L[2][2]; // incorrect!!
 rpc2;
 
-radical(L[2][1]); 
+radical(L[2][1]);
 
 idealsEqual( radical(pc2), rpc2 ); // = 0!
 ///////////////////////////////////////////

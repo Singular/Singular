@@ -6,7 +6,7 @@ tst_init();
 LIB "ncalg.lib";
 def A = makeUsl(2);
 setring A;
-option(redSB);  
+option(redSB);
 option(redTail); // we wish to compute reduced bases
 ideal I = e2,f;
 ideal LI = std(I);

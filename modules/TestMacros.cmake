@@ -3,7 +3,7 @@
 #
 #
 
-function(singular_create_test GEN_TARGET GEN_FILE CMD INFILE) 
+function(singular_create_test GEN_TARGET GEN_FILE CMD INFILE)
 
   message("create testsuite...")
 #  set(${GEN_FILE} ${INFILE} PARENT_SCOPE)

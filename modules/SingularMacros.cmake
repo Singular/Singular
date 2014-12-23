@@ -35,7 +35,7 @@ function(singular_mk_version GEN_H_FILE)
   write_file(${_filenameTmp} "#define CXX       \"${_CXX}\"" APPEND)
   write_file(${_filenameTmp} "#define CC_FLAGS  \"${_CC_FLAGS}\"" APPEND)
   write_file(${_filenameTmp} "#define CXX_FLAGS \"${_CXX_FLAGS}\"" APPEND)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${_filenameTmp}" "${_GEN_H_FILE}"
     #OUTPUT_QUIET ERROR_QUIET
     )
@@ -135,13 +135,13 @@ endfunction()
 
 #################################################################
 ### copy/install Singular(LIB)s -files
-### 
+###
 function(singular_copy_LIB FILES)
 
   message(STATUS "Copying Singular library files.")
   foreach(loop_var ${ARGV})
     #message(STATUS "Copying ${loop_var}")
-    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
       "${loop_var}" "${CMAKE_CURRENT_BINARY_DIR}"
       #OUTPUT_QUIET ERROR_QUIET
       )
@@ -171,7 +171,7 @@ macro(singular_mk_allLIB TARGET OUT_FILE LIBFILES)
     endif( ${i} GREATER 2)
   endforeach(loop_var)
 
-  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${_tmpFile}" "${_outFile}"
     )
 #COMMAND ${CMAKE_COMMAND} -E remove "${_tmpFile}"

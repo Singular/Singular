@@ -5,19 +5,19 @@
 
 ####################################################################
 ##
-## Configuration: 
+## Configuration:
 ##
 ## 1.) You MUST set SINGULAR and LIBPARSE to the newset versions of
-##     the Singular and libparse program (they are located at 
+##     the Singular and libparse program (they are located at
 ##     ${SingularRoot}/<uname> within a distribution).
-## 
+##
 SINGULAR = Singular
 LIBPARSE = libparse
 
 ##
 ## 2.) Set this to the name of your latex2html program, if you have latex2html
-##     
-LATEX2HTML = 
+##
+LATEX2HTML =
 
 
 ##
@@ -43,13 +43,13 @@ TEXI2DVI	= texi2dvi
 TEXI2HTML	= ./texi2html
 DVIPS           = dvips
 
-# 
+#
 # setting of program parameters
 #
 # set this to 0 if you want no chattering, to 2 (3,4) if you want more
 VERBOSE		= 1
 # doc2tex parameters
-DOC2TEX_OPTS	=  -verbose ${VERBOSE} -Singular ${SINGULAR} 
+DOC2TEX_OPTS	=  -verbose ${VERBOSE} -Singular ${SINGULAR}
 # texi2html parameters
 TMP_DIR		= /tmp
 TEXI2HTML_OPTS  = -expand tex -short_ref
@@ -82,10 +82,10 @@ endif
 %.tex: %.doc
 	${PERL} ${DOC2TEX} ${DOC2TEX_OPTS} -o $@ $<
 
-%.doc: %.perl 
+%.doc: %.perl
 	${PERL} ${PL2DOC} -doc -o $@ $<
 
-%.perl: %.lib 
+%.perl: %.lib
 	${LIBPARSE} -i $< > $@
 
 
@@ -93,7 +93,7 @@ endif
 
 mostlyclean:
 	rm -f *.perl *.doc *.tex *.dvi *.ps *.hlp *.gif *.html *_l2h*
-	rm -f *.ky *.cp *.cps *.fn *.pg *.toc *.tp *.vr *.aux *.log *.toc 
+	rm -f *.ky *.cp *.cps *.fn *.pg *.toc *.tp *.vr *.aux *.log *.toc
 
 clean: mostlyclean
 	rm -rf ${D2T_SUBDIR}

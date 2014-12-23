@@ -25,8 +25,8 @@ def int_tuple2iv(a):
     for e in a:
         res.append(e)
     return res
-    
-    
+
+
 def list2arg_list(args):
     l=_Singular.i_arg_list()
     for a in args:
@@ -40,7 +40,7 @@ def list2arg_list(args):
 #            for a2 in a:
 #                at.append(a2)
 #            l.append(at)
-        
+
         l.append(a)
     return l
 class SingularGlobalsProxy(object):
@@ -77,8 +77,8 @@ class SingularGlobalsProxy(object):
                 raise AttributeError("Global variable " + name + " not present in the Singular interpreter")
         if proc.is_proc():
             def fun_wrapper(*args):
-                
-                
+
+
                 proc=_Singular.get_idhdl(name)
                 if not proc.is_proc():
                     proc.print_type()
@@ -116,7 +116,7 @@ def find_rings(arglist):
     if isinstance(item,Polynomial) or isinstance(item,Ideal) or isinstance(item, Number) or isinstance(item, Vector):
       return [item.ring()]
   return []
-  
+
 
 oldrings=[]
 def prepare_ring(arglist):

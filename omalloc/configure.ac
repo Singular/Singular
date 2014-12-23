@@ -306,7 +306,7 @@ AC_TRY_RUN([
 int main()
 {
   void* addr = OM_MALLOC_MALLOC(512);
-#ifdef OM_MALLOC_SIZEOF_ADDR 
+#ifdef OM_MALLOC_SIZEOF_ADDR
   if (OM_MALLOC_SIZEOF_ADDR(addr) < 512)
     exit(1);
   exit(0);

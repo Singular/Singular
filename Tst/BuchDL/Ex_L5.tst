@@ -5,13 +5,13 @@ tst_init();
 //======================  Example 5.15 =============================
 ring Rxyz = 0, (x,y,z,t), (dp(3),ds(1));
 ideal I = x2-t27yz, xz-t13y, x-t14z2;
-module M = syz(I); 
+module M = syz(I);
 print(M);
-//->   0,      -1,  
+//->   0,      -1,
 //->   z2t14-x,zt14,
-//->   xz-yt13,x    
+//->   xz-yt13,x
 ring Kxyz = 0, (x,y,z), dp;
-ideal I1 = imap(Rxyz,I);  
+ideal I1 = imap(Rxyz,I);
 module M1 = imap(Rxyz,M);  // reducing the syzygies
 M1 = std(M1);
 print(M1);
@@ -56,8 +56,8 @@ ideal F = x2, xz, wx, w2y;
 
 proc displayHilbPoly(ideal G)
 "USAGE:  displayHilbPoly(G), G of type ideal
-ASSUME:  G must be a homogeneous Groebner basis for an ideal of the 
-         active ring in the SINGULAR session; say, G generates the 
+ASSUME:  G must be a homogeneous Groebner basis for an ideal of the
+         active ring in the SINGULAR session; say, G generates the
          homogeneous ideal I of R.
 RETURN:  None.
 NOTE:    Displays the Hilbert polynomial of R/I.
@@ -73,19 +73,19 @@ NOTE:    Displays the Hilbert polynomial of R/I.
     QM = QM+co[i]*t^(i-1);
   }
   poly QMi = QM;          // the polynomial Q_M(t)
-  int ifac = 1; 
-  list a; 
+  int ifac = 1;
+  list a;
   for (i=1; i<=d+1; i=i+1)
   {
     a = insert(a, subst(QMi,t,1)/ifac, i-1);
     QMi = diff((QMi),t);
     ifac = ifac*i;
   }
-  poly PM = (-1)^(d)*a[d+1]; 
+  poly PM = (-1)^(d)*a[d+1];
   poly bin = 1;
   for (i=1; i<=d; i=i+1)
   {
-    bin = bin*(t+i)/i;    // compute binomial coeff. by recursion 
+    bin = bin*(t+i)/i;    // compute binomial coeff. by recursion
     PM = PM+(-1)^(d-i)*a[d+1-i]*bin;
   }
   print(PM);
@@ -112,8 +112,8 @@ std(I);
 //->   _[2]=x*t(2)-t(1)^2
 //->   _[3]=x*t(1)-t(2)
 //->   _[4]=x^2-t(1)
-ring R1 = 0, t(1..2), dp; 
-module phi = gen(1)*(t(1)^3-t(2)^2), 
+ring R1 = 0, t(1..2), dp;
+module phi = gen(1)*(t(1)^3-t(2)^2),
              gen(2)*(t(1)^3-t(2)^2),
              gen(2)*t(2)-gen(1)*t(1)^2,
              gen(2)*t(1)-gen(1)*t(2);
@@ -156,7 +156,7 @@ kill R;
 //=============== continuation of Example 5.34 ==========================
 ring S = 32003, x(0..4), dp;
 module MI=maxideal(1);
-attrib(MI,"isHomog",intvec(-1));  
+attrib(MI,"isHomog",intvec(-1));
 resolution kos = nres(MI,0);
 print(betti(kos),"betti");
 //->              0     1     2     3     4     5
@@ -205,7 +205,7 @@ print(betti(FI),"betti");
 int codimI = nvars(S)-dim(I);
 codimI;
 //->   2
-degree(I); 
+degree(I);
 //->   4
 nvars(S)-dim(groebner(minor(jacob(I),codimI) + I));
 //->   5
@@ -223,8 +223,8 @@ ring R = 0, (x,y,z,w), dp;
 ideal I = xz-y2, wz-xy, wy-x2;
 ring R_loc = 0, (x,y,z,w), ds;
 ideal I = imap(R,I);
-isCM(I); 
-//->   1 
+isCM(I);
+//->   1
 
 
 kill R,S,w,codimI;

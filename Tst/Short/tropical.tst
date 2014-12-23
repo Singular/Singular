@@ -23,7 +23,7 @@ displayTropicalLifting(tropicalLifting(g,intvec(1,-1),4),"subst");
 // --------------------------------------------------------
 // Example 3 - the ideal is not zero dimensional
 // --------------------------------------------------------
-ring r1=0,(t,x,y),dp; 
+ring r1=0,(t,x,y),dp;
 poly f=(9t27-12t26-5t25+21t24+35t23-51t22-40t21+87t20+56t19-94t18-62t17+92t16+56t15-70t14-42t13+38t12+28t11+18t10-50t9-48t8+40t7+36t6-16t5-12t4+4t2)*x2+(-9t24+12t23-4t22-42t20+28t19+30t18-20t17-54t16+16t15+48t14-16t12+8t11-18t10-26t9+30t8+20t7-24t6+4t5+28t4-8t3-16t2+4)*xy+(6t16-10t15-2t14+16t13+4t12-18t11-10t10+24t9+6t8-20t7+8t6+8t5-20t4-4t3+12t2+4t-4)*y2+(-9t28+3t27+8t26-4t25-45t24-6t23+42t22+30t21-94t20-40t19+68t18+82t17-38t16-60t15+26t14+36t13-22t12-20t11+4t10+4t9+12t8+8t7-8t6-8t5+4t4)*x+(9t27-21t26+16t25+14t24+12t23-61t22+27t21+80t20-19t19-100t18+26t17+96t16-24t15-84t14+44t12-2t11-18t10+2t9+40t8+4t7-32t6-12t5+4t3+12t2-4)*y+(9t27-12t26+4t25+36t23-18t22-28t21-2t20+54t19+14t18-52t17-44t16+24t15+40t14-4t13-12t12+4t11-4t10-4t9+4t8);
 f;
 displayTropicalLifting(tropicalLifting(f,intvec(1,-1,-4),3),"subst");
@@ -53,7 +53,7 @@ displayTropicalLifting(tropicalLifting(f3,intvec(3,-2),4,"isInTrop","findAll"),"
 ring r=(0,t),(x,y),dp;
 poly f=t*(x7+y7+1)+1/t*(x4+y4+x2+y2+x3y+xy3)+1/t7*x2y2;
 list graph=tropicalCurve(f);
-graph; 
+graph;
 size(graph)-1;
 drawTropicalCurve(graph,"onlytexfile");
 poly g=t3*(x7+y7+1)+1/t3*(x4+y4+x2+y2+x3y+xy3)+1/t21*x2y2;

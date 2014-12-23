@@ -8,7 +8,7 @@ tst_init();
 
 LIB "brnoeth.lib";
 
-// special CURVE over F_64 (p=2) 
+// special CURVE over F_64 (p=2)
 
 ring r=2,(x,y),lp;
 poly f=y9+y8+xy6+x2y3+y2+x3;
@@ -54,7 +54,7 @@ size(POINTS);
 setring r;
 killall();
 
-// SUZUKI curve over F_8 (p=2) 
+// SUZUKI curve over F_8 (p=2)
 
 ring r=2,(x,y),lp;
 poly f=x10+x3+y8+y;
@@ -96,7 +96,7 @@ size(POINTS);
 setring r;
 killall();
 
-// special HYPERELLIPTIC curve over F_16 (p=2) 
+// special HYPERELLIPTIC curve over F_16 (p=2)
 
 ring r=2,(x,y),lp;
 intvec G,D,F;

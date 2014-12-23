@@ -25,7 +25,7 @@ size(pc2); // must be 1
 kill rng;
 
 // tr.656 (incomplete primary decomp with primdecSY)
-int i ; 
+int i ;
 // repeat test, since the computation originaly failed occasionally, independent of random seed...
 ring rng656 = (0),(y,g,t,b),dp;
 ideal I = -11658/12181*g*t*b-8219/674*g*b^2,

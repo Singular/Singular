@@ -13,13 +13,13 @@ Description: computer algebra system for polynomial computations (meta package)
  emphasis on the special needs of commutative algebra, algebraic geometry,
  and singularity theory.
  .
- This meta package provides a complete installation for users. 
+ This meta package provides a complete installation for users.
 
 Package: singular-bin
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: computer algebra system for polynomial computations (binary files)
- Singular is a computer algebra system for polynomial computations with 
+ Singular is a computer algebra system for polynomial computations with
  emphasis on the special needs of commutative algebra, algebraic geometry,
  and singularity theory.
  .

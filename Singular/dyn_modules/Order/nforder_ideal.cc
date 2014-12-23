@@ -1,8 +1,8 @@
-#include <libpolys/coeffs/bigintmat.h>
+#include <coeffs/bigintmat.h>
 #include "nforder.h"
 #include <reporter/reporter.h>
-#include "libpolys/coeffs/numbers.h"
-#include "libpolys/coeffs/coeffs.h"
+#include <coeffs/numbers.h>
+#include <coeffs/coeffs.h>
 #include "Singular/ipid.h"
 #include "nforder_ideal.h"
 

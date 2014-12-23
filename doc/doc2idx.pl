@@ -16,7 +16,7 @@
 
 ####
 $Usage = <<EOT;
-Usage:  
+Usage:
 $0 singular-index-file html-index-file chksum-db
 Outputs sorted lines of the form $indexentry\t$nodename\t$url\t$chksum
 EOT
@@ -35,7 +35,7 @@ unless ($return = do $db_file)
   die "couldn't parse $db_file: $@" if $@;
   die "couldn't do $db_file: $!"    unless defined $return;
   die "couldn't run $db_file"       unless $return;
-} 
+}
 
 # fill hashes
 # first: HLP

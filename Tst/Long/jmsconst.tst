@@ -46,7 +46,7 @@ JMarkedScheme(Borid,r);
 
 //Example 7
 ring r=0, (x,y,z),rp;
-ideal Borid=z,y^6,x^3*y^5; 
+ideal Borid=z,y^6,x^3*y^5;
 JMarkedScheme(Borid,r);
 // 10 equations.
 

@@ -13,7 +13,7 @@ temp1;
 ideal temp2=reduce(J,std(I));
 temp2;
 
-ASSUME(0,size(temp1)==0);  
+ASSUME(0,size(temp1)==0);
 ASSUME(0,size(temp2)==0);
 
 tst_status(1);

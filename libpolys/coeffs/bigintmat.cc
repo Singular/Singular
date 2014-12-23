@@ -9,16 +9,27 @@
 
 #include <misc/auxiliary.h>
 
-
-
 #include "bigintmat.h"
 #include <misc/intvec.h>
-#include <coeffs/longrat.h>
 
+#include "rmodulon.h"
 
 #include <math.h>
 #include <string.h>
 
+///create Z/nA of type n_Zn
+static coeffs numbercoeffs(number n, coeffs c) // TODO: FIXME: replace with n_CoeffRingQuot1
+{
+  mpz_t p;
+  number2mpz(n, c, p);
+  ZnmInfo *pp = new ZnmInfo;
+  pp->base = p;
+  pp->exp = 1;
+  coeffs nc = nInitChar(n_Zn, (void*)pp);
+  mpz_clear(p);
+  delete pp;
+  return nc;
+}
 
 //#define BIMATELEM(M,I,J) (M)[ (M).index(I,J) ]
 
@@ -483,7 +494,7 @@ char* bigintmat::StringAsPrinted()
     }
     else  // Mit Leerzeichen auffüllen und zahl reinschreiben
     {
-      for (int j=0; j<colwid[cj]-_nl; j++)
+      for (int j=0; j<(colwid[cj]-_nl); j++)
         ps[pos+j] = ' ';
       for (int j=0; j<_nl; j++)
         ps[pos+colwid[cj]-_nl+j] = ts[j];
@@ -1924,8 +1935,8 @@ static number bimFarey(bigintmat *A, number N, bigintmat *L) {
         return NULL;
       }
 
-      number d = nlGetDenom(q, Q),
-             n = nlGetNumerator(q, Q);
+      number d = n_GetDenom(q, Q),
+             n = n_GetNumerator(q, Q);
 
       n_Delete(&q, Q);
       n_Delete(&ad, Z);
@@ -2434,19 +2445,6 @@ int kernbase (bigintmat *a, bigintmat *c, number p, coeffs q) {
   return c->cols();
 }
 
-
-///create Z/nA of type n_Zn
-coeffs numbercoeffs(number n, coeffs c) {
-  mpz_t p;
-  number2mpz(n, c, p);
-  ZnmInfo *pp = new ZnmInfo;
-  pp->base = p;
-  pp->exp = 1;
-  coeffs nc = nInitChar(n_Zn, (void*)pp);
-  mpz_clear(p);
-  delete pp;
-  return nc;
-}
 
 bool nCoeffs_are_equal(coeffs r, coeffs s) {
   if ((r == NULL) || (s == NULL))

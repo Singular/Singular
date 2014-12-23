@@ -160,8 +160,8 @@ std(i);
 facstd(i);
 
 
-ring r=0,(a,b,c,d,e,f,g,h,k,o),lp; 
-ideal i= 
+ring r=0,(a,b,c,d,e,f,g,h,k,o),lp;
+ideal i=
 o+1,
 k4+k,
 hk,

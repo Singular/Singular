@@ -3,7 +3,7 @@
 
 @defines = ("PR_DELETE_SRC",  "Move", "Copy",
             "PR_RING_EQUAL",   "REqual", "NoREqual",
-            "PR_NUMBER_SIMPLE", "NSimple", "NoNSimple", 
+            "PR_NUMBER_SIMPLE", "NSimple", "NoNSimple",
             "PR_NO_SORT", "NoSort", "Sort");
 
 @def = ("Move", "REqual", "NSimple", "NoSort");

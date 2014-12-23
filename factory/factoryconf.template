@@ -8,7 +8,7 @@
 /**
  *
  * @file factoryconf.h
- * 
+ *
  * `factoryconf.h' serves as a configuration file for the
  * installed source files (templates and `factory.h') the same
  * way as `config.h' serves as a configuration file for the

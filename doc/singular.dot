@@ -21,15 +21,15 @@ digraph singular {
 	factory_libfac -> libpolys;
 	factory_libfac -> kernel;
 	factory_libfac -> SingularInterpreter;
-	
+
 	misc -> reporter;
 	misc -> coeffs;
 	misc -> polys;
 	reporter -> coeffs;
 	reporter -> polys;
-	reporter -> misc;	
+	reporter -> misc;
 	polys -> ext_fields;
-	coeffs -> ext_fields;	
+	coeffs -> ext_fields;
         coeffs [ fontcolor=blue ];
 	coeffs -> polys;
 	edge [style=dashed];
@@ -46,7 +46,7 @@ digraph singular {
         SingularInterpreter [ fontcolor=red ];
         numeric -> SingularInterpreter;
         libpolys -> SingularInterpreter;
-	
+
         IntegerProgramming [ fontcolor=blue ];
 }
 

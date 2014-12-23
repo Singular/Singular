@@ -11,7 +11,7 @@ int N;
 number a,b,c;
 
 N = 5;
-f = x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2    
+f = x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2
    +24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;
 a = signaturePuiseux(N,f);
 b = signatureNemethi(N,f);
@@ -69,7 +69,7 @@ a;
 a == b;
 
 
-N = 6;     
+N = 6;
 f = x71+6x65+15x59-630x52y6+20x53+6230x46y6+910x39y12+15x47
     -7530x40y6+14955x33y12-285x26y18+6x41+1230x34y6+4680x27y12
     +1830x20y18+30x13y24+x35-5x28y6+10x21y12-10x14y18+5x7y24-y30;
@@ -90,6 +90,6 @@ f = -x3y3+x6y+xy6-x4y4;
 b = signatureNemethi(N,f,1);
 c = signatureNemethi(N,f,2);
 b;
-b == c;    
+b == c;
 
 tst_status(1);$

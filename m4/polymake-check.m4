@@ -14,15 +14,15 @@ if test "x$ENABLE_POLYMAKE" != xno; then
 
 
   if test "x$PASSED_ALL_TESTS_FOR_GFANLIB" != x1; then
-  
+
    PASSED_ALL_TEST_FOR_POLYMAKE="no";
-   
-   if test "x$ENABLE_POLYMAKE" = xyes; then  
+
+   if test "x$ENABLE_POLYMAKE" = xyes; then
     AC_MSG_ERROR([gfanlib was not enabled])
    else
     AC_MSG_WARN([gfanlib was not enabled])
    fi
-   
+
   else
 
 ##  AC_MSG_CHECKING(whether polymake is properly installed)
@@ -58,22 +58,22 @@ if test "x$ENABLE_POLYMAKE" != xno; then
       PASSED_ALL_TEST_FOR_POLYMAKE="yes";
     else
       PASSED_ALL_TEST_FOR_POLYMAKE="no";
-      
-      if test "x$ENABLE_POLYMAKE" = xyes; then      
+
+      if test "x$ENABLE_POLYMAKE" = xyes; then
         AC_MSG_ERROR([outdated polymake version])
-      fi	
+      fi
     fi
    else
     PASSED_ALL_TEST_FOR_POLYMAKE="no";
-   
-    if test "x$ENABLE_POLYMAKE" = xyes; then      
+
+    if test "x$ENABLE_POLYMAKE" = xyes; then
      AC_MSG_ERROR([polymake not installed])
-    fi	
+    fi
    fi
   fi
 else
   AC_MSG_RESULT(no)
-  
+
   PASSED_ALL_TEST_FOR_POLYMAKE="no";
 fi
 

@@ -34,12 +34,12 @@ if [ -z $goodversion ];
       else
 	  #echo `echo $arg|sed -e "s/-.*/SPECIALVALUE/"`
 	  if  [ SPECIALVALUE = `echo $arg|sed -e "s/-.*/SPECIALVALUE/"` ];
-	      
+
 	      then
 	      dummy=0;
 	  else
 	      file=$arg
-	      
+
 	  fi
       fi
     done
@@ -56,7 +56,7 @@ if [ -z $goodversion ];
 	#echo "file does not exist"
 	exit 1;
     fi
-	
+
 else
     #echo "good version";
     flex $1 $2 $3 $4 $5 $6 $7 $8 $9

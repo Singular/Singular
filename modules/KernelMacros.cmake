@@ -3,7 +3,7 @@
 #
 #
 
-function(mk_prcopy GEN_FILE INFILE) 
+function(mk_prcopy GEN_FILE INFILE)
 
   message("mk_prcopy...")
 #  set(${GEN_FILE} ${INFILE} PARENT_SCOPE)

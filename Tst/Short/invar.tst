@@ -27,23 +27,23 @@ kill rf;
   m[5,1]=1+x(1)*x(4)^2;
   ideal in=invariantRing(m,x(3),x(1),0);
   in;
-  
+
   actionIsProper(m);
-  
+
   //computes the relations between the invariants
   int z=size(in);
   ideal null;
   ring r1=0,(y(1..z)),dp;
   setring rd;
   map phi=r1,in;
-  setring r1;  
-  ideal ker=preimage(rd,phi,null); 
+  setring r1;
+  ideal ker=preimage(rd,phi,null);
   ker;
 kill rd,r1;
   int n=5;
-  
+
   ring w=0,(x(1..n)),wp(1..n);
-  
+
   // definition of the vectorfield m=sum m[i]*d/dx(i)
   matrix m[n][1];
   int i;

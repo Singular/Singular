@@ -9,7 +9,7 @@ $Usage = <<EOT;
 $0 [-Singular binary] [-hlp file] [cmpl 'hlp|cmd|lib'] [-help]
 Generates completion strings for singular emacs mode and prints it to STDOUT
 EOT
-  
+
 #
 # default settings of command-line arguments
 #
@@ -100,7 +100,7 @@ print STDOUT <<EOT;
   '(
 EOT
 #' prevents breaking of fontification
- 
+
 foreach $string (@strings)
 {
   print STDOUT "    $string\n";

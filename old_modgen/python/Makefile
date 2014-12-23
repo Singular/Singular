@@ -29,9 +29,9 @@ DOBJS	= python.og poly_wrap.og vector_wrap.og CF_wrap.og\
 default:
 	echo "use scons for building this project"
 
-all:	python_module.so python_module_g.so 
+all:	python_module.so python_module_g.so
 
-%.o: %.cc Makefile 
+%.o: %.cc Makefile
 	${CXX} ${CFLAGS} -c -fPIC -DPIC $< -o $*.o
 
 %.og: %.cc Makefile

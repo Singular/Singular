@@ -2,8 +2,8 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT: encapsulation of call to Win32 WinHelp call for opening 
-            a help file 
+* ABSTRACT: encapsulation of call to Win32 WinHelp call for opening
+            a help file
 */
 
 /* you can try this out by compiling with -DTEST and runing:
@@ -12,7 +12,7 @@
 #include <windows.h>
 #include <winuser.h>
 
-#ifndef MAXPATHLEN 
+#ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
 #endif
 
@@ -22,7 +22,7 @@ void heOpenWinntHlp(const char* keyw)
   char path[MAXPATHLEN];
 #ifdef TEST
   printf("keyw:%s\n", keyw);
-#endif    
+#endif
   cygwin_conv_to_full_win32_path(helppath, path);
 #ifdef TEST
   printf("path:%s\n", path);

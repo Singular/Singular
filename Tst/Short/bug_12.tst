@@ -9,7 +9,7 @@ poly f=x6y4-x-a;poly g=x9y6-x-b;
 poly s=z-ux-vy;
 ideal id=s,f;
 poly f1=eliminate(id,y)[1];f1;
-ideal id=s,g; 
+ideal id=s,g;
 poly g1=eliminate(id,y)[1];g1;
 poly h=resultant(f1,g1,x);h;
 factorize(h);

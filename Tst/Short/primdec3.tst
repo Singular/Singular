@@ -8,8 +8,8 @@ proc sortMinAss(list l)
    ideal K;
    intvec save=option(get);option(redSB);
    for(i=1;i<=size(l);i++){"start interrred";l[i]=interred(l[i]);"end interred";}
- 
-   
+
+
    notReady=1;
    while(notReady)
    {
@@ -36,7 +36,7 @@ proc sortMinAss(list l)
    }
    option(set,save);
    return(l);
-} 
+}
 proc sortGTZ(list l)
 {
    int i,j,notReady;
@@ -44,7 +44,7 @@ proc sortGTZ(list l)
    intvec save_opt=option(get);
    option(redSB,redTail);
    for(i=1;i<=size(l);i++){"start";l[i][1]=std(l[i][1]);l[i][2]=std(l[i][2]);"end";}
-   option(set,save_opt); 
+   option(set,save_opt);
    notReady=1;
    while(notReady)
    {
@@ -69,7 +69,7 @@ proc sortGTZ(list l)
          }
       }
    }
-   return(l);  
+   return(l);
 }
 proc compareI(ideal I, ideal J)
 {
@@ -110,7 +110,7 @@ ideal gls=y^2*z+2*y*x*t-z-2*x,
 sortMinAss(zerodec(gls));
 sortGTZ(primdecGTZ(gls));
 
-//5. cyclic5  vdim=70, 
+//5. cyclic5  vdim=70,
 //zerodec-time:49  (matrix:0 charpoly:25 factor:23)
 //primdecGTZ-time: 28
 ring rs= 0,(a,b,c,d,e),dp;

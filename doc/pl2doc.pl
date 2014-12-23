@@ -6,15 +6,15 @@
 #
 ####
 $Usage = <<EOT;
-Usage:  
-$0 [-o out_file -db db_file -no_ex -no_fun -doc] library_perl_file.doc 
+Usage:
+$0 [-o out_file -db db_file -no_ex -no_fun -doc] library_perl_file.doc
 Convert library_perl_file.pl to library_perl_file.doc
 EOT
 
 ###################################################################
 # parse command line options
 #
-while (@ARGV && $ARGV[0] =~ /^-/) 
+while (@ARGV && $ARGV[0] =~ /^-/)
 {
   $_ = shift(@ARGV);
   if (/^-o$/)    { $out_file = shift(@ARGV); next;}
@@ -23,7 +23,7 @@ while (@ARGV && $ARGV[0] =~ /^-/)
   if (/^-no_fun$/)    { $no_fun = 1;next;}
   if (/^-doc$/)       { $doc = 1; next;}
   if (/^-h(elp)?$/)   { print $Usage; exit;}
-  
+
   die "Error: Unknown option: $_:$Usage\n";
 }
 
@@ -77,7 +77,7 @@ unless ($no_fun)
       die "couldn't parse $db_file: $@" if $@;
       die "couldn't do $db_file: $!"    unless defined $return;
       die "couldn't run $db_file"       unless $return;
-    } 
+    }
   }
 
   # print help and example of each function
@@ -92,7 +92,7 @@ unless ($no_fun)
     print LDOC ", " . $lib ."_lib\n";
     print LDOC "\@subsubsection " . $procs[$i] . "\n";
     print LDOC "\@cindex ". $procs[$i] . "\n";
-    if ($db_file && 
+    if ($db_file &&
 	(!defined($CHECKSUMS{$procs[$i]}) ||
 	 $CHECKSUMS{$procs[$i]} != $chksum{$procs[$i]}))
     {
@@ -116,7 +116,7 @@ unless ($no_fun)
       print LDOC "\@end table\n";
     }
     # print example
-    if ($example{$procs[$i]} && 
+    if ($example{$procs[$i]} &&
 	($ex = &CleanUpExample($lib, $example{$procs[$i]})))
     {
       print LDOC "\@strong{Example:}\n";
@@ -148,7 +148,7 @@ unless ($no_fun)
   }
 }
 
-# 
+#
 # und Tschuess
 #
 if ($doc)
@@ -162,7 +162,7 @@ if ($doc)
 \@bye
 EOT
 }
-  
+
 close(LDOC);
 if ($error)
 {
@@ -185,7 +185,7 @@ sub OutLibInfo
   }
   print $FH "\@table \@asis\n";
   $table_is_open = 1;
-  
+
   my ($ref) = OutInfo($FH, $info, $l_fun);
 
   print $FH "\@end table\n" if $table_is_open;
@@ -308,8 +308,8 @@ sub FormatInfoText
       next;
     }
     # break line if
-    $text .= '@*' 
-      if ($line =~ /\w/ 
+    $text .= '@*'
+      if ($line =~ /\w/
 	  && $pline =~ /\w/	 # line and prev line are not empty
 	  && $line !~ /^\s*\@\*/ # line does not start with @*
 	  && $pline !~ /\@\*\s*/ # prev line does not end with @*
@@ -340,7 +340,7 @@ sub CleanAscii
   $a =~ s/{/\@{/g; # escape {}
   $a =~ s/}/\@}/g;
   $a =~ s/\t/ /g;
-  $a =~ s/ +/ /g;	   
+  $a =~ s/ +/ /g;
   return $a;
 }
 
@@ -373,7 +373,7 @@ sub OutInfoItem
     $text =~ s/\s*$//;
     $text =~ s/.*$// if ($text=~/parameters.*brackets.*are.*optional.*$/);
     $text .= "\n";
-    
+
     my ($proc, $pargs, $pinfo, $line);
     if ($l_fun)
     {
@@ -395,7 +395,7 @@ sub OutInfoItem
       }
       else
       {
-	$pinfo .= $line; 
+	$pinfo .= $line;
       }
     }
     OutProcInfo($FH, $proc, $procargs, $pinfo, $l_fun) if $proc && $pinfo;
@@ -407,7 +407,7 @@ sub OutInfoItem
     # index entries
     return OutKeywords($FH, $text);
   }
-  
+
   if (! $table_is_open)
   {
     print $FH "\@table \@asis\n";
@@ -495,7 +495,7 @@ sub OutKeywords
 sub CleanUpExample
 {
   local($lib, $example) = @_;
-  
+
   # find portion in {}
   $example =~ s/^[^{]*{(.*)}[^}]*$/$1/s;
 
@@ -523,13 +523,13 @@ sub CleanUpExample
   # prepend LIB command
   if ($so_module =~ /lib/)
   {
-    $example = "LIB \"$lib.lib\";\n".$example 
+    $example = "LIB \"$lib.lib\";\n".$example
       if ($example && $lib ne "standard");
   }
   else
   {
     $example = "LIB\(\"$lib.so\"\);\n".$example;
-  }  
+  }
   # erase empty lines
   $example =~ s/^\s*\n//g;
   # erase spaces from beginning of lines
@@ -574,13 +574,13 @@ This file contains the formatted documentation of $library
 \@chapter Singular libraries
 
 \@menu
-* ${lib}_lib::  
+* ${lib}_lib::
 \@end menu
-  
+
 \@node ${lib}_lib,,,Singular libraries
 \@section ${lib}_lib
 
-\@example 
+\@example
 -------BEGIN OF PART WHICH IS INCLUDED IN MANUAL-----
 \@end example
 

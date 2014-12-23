@@ -5,29 +5,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.awt.BorderLayout;
@@ -95,43 +95,43 @@ import javax.swing.filechooser.FileFilter;
 
 public class SaveMovieDialog extends JFrame {
     JTextField tf;
-    
+
     RayFrame rayFrame;
     //JComboBox outputFormat;
-    
+
     JComboBox colorType;
 
     JComboBox omitType;
-    
+
     JComboBox antialiasingQuality;
-    
+
     JComboBox standardDim;
-    
-    
+
+
     JSpinner XrotSpinner =new JSpinner(new SpinnerNumberModel(1,0,5,1));
     JSpinner YrotSpinner =new JSpinner(new SpinnerNumberModel(2,0,5,1));
     JSpinner ZrotSpinner =new JSpinner(new SpinnerNumberModel(0,0,5,1));
     JSpinner FramesPerSecond=new JSpinner(new SpinnerNumberModel(5,1,60,1));
-    
+
     JScrollPane listScrollPane;
-    
+
     private JList parameterList;
     private DefaultListModel listModel;
-    
+
     private static final String addString = "add";
     private static final String removeString = "remove from list";
     private JLabel addLabel;
     private JButton removeButton;
     private JComboBox paramName;
-    
-    
+
+
     JRadioButton ROTATE = new JRadioButton("ROTATE_Y_AXIS");
-    
-    
+
+
     JComboBox measure;
-    
+
     JPanel panel = new JPanel();/*
-				  
+
 //		JRadioButton povCode = new JRadioButton("PovRay code");
 
 //JRadioButton surfCode = new JRadioButton("Surf code");
@@ -145,55 +145,55 @@ public class SaveMovieDialog extends JFrame {
 //		{ 640, 640 } };
 
 				*/	ChangeListener CL;
-    
+
     //boolean last[] = { true, false, false, false, false, false, false, false,
     //		false, false, false, true, false, false, true, false };
-    
+
     //boolean actionWasPerformed = false;
-    
+
     JTextField width;
-    
+
     JTextField height;
-    
+
     int heightvalue=0;
     int widthvalue=0;
-    
+
     JCheckBox aspectRatio = new JCheckBox("Preserve aspect ratio", false);
-    
+
     //JRadioButton unitPixels = new JRadioButton("Pixels", true);
-    
+
     JTextField dpi = new JTextField("300");
-    
+
     //JRadioButton unitCm = new JRadioButton("cm");
-    
+
     //JRadioButton unitInches = new JRadioButton("inches");
-    
+
     //int i, j;
-    
+
     //JCheckBox ditheredCb = new JCheckBox("dithered - black/white", false);
-    
+
     //public JCheckBox antialiasing = new JCheckBox("antialiasing", false);
-    
+
     JButton SaveButton = new JButton("create and save as");
-    
+
     boolean actionWasPerformed = false;
-    
-    
+
+
     JButton CancelButton = new JButton("cancel");
-    
+
     JButton DefaultButton = new JButton("default");
-    
+
     JLabel newSize = new JLabel();
-    
+
     JTextField Time = new JTextField("10");
-    
-    
+
+
     Project project;
-    
+
     surfex surfex_;
-    
+
     String projectName;
-    
+
     SaveMovieDialog(String proName, RayFrame ray, Project pro, surfex su) {
 	super("save movie " + proName);
 	surfex_ = su;
@@ -201,12 +201,12 @@ public class SaveMovieDialog extends JFrame {
 	project = pro;
 	this.projectName = proName;
 	//setSize(790, 400);
-	
+
 	JPanel contentPane = (JPanel) getContentPane();
 	JPanel contentPane1l = new JPanel(new BorderLayout());
 	JPanel contentPane1l2 = new JPanel(new BorderLayout());
 	JPanel contentPane1r = new JPanel(new BorderLayout());
-	
+
 	JPanel contentPane2 = new JPanel(new BorderLayout());
 	JPanel contentPane3 = new JPanel(new BorderLayout());
 	JPanel contentPane4 = new JPanel(new BorderLayout());
@@ -215,23 +215,23 @@ public class SaveMovieDialog extends JFrame {
 	JPanel contentPane7 = new JPanel(new BorderLayout());
 	JPanel contentPane8 = new JPanel(new BorderLayout());
 	JPanel contentPane9 = new JPanel(new BorderLayout());
-	
+
 	JPanel sizePanel=new JPanel();//new GridLayout(2,3));
 	JPanel newSizePanel=new JPanel(new BorderLayout());
 	//JPanel DpiPanel=new JPanel(new GridLayout(1,2));
 	JPanel fpsPanel=new JPanel(new GridLayout(1,2));
 	JPanel lengthPanel=new JPanel(new GridLayout(1,2));
 	JPanel omitTypePanel=new JPanel();
-	
+
 	JPanel someStandardDimPanel=new JPanel();//(new GridLayout(2,3));
 	JPanel colorTypePanel=new JPanel();//(new GridLayout(2,3));
 	JPanel antialiasingPanel=new JPanel();//(new GridLayout(2,3));
-	
+
 	JPanel paramPanel=new JPanel(new BorderLayout());//(new GridLayout(2,3));
 	JPanel paramAddPanel=new JPanel();//(new GridLayout(2,3));
 	JPanel rotatePanel=new JPanel(new GridLayout(1,6));
-	
-	
+
+
 	sizePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("current size"),BorderFactory.createEmptyBorder(5,5,5,5)));
 	newSizePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("set size"),BorderFactory.createEmptyBorder(5,5,5,5)));
 	//DpiPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Dpi"),BorderFactory.createEmptyBorder(5,5,5,5)));
@@ -247,10 +247,10 @@ public class SaveMovieDialog extends JFrame {
 	contentPane1l.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("resolution"),BorderFactory.createEmptyBorder(5,5,5,5)));
 	contentPane1l2.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("frames"),BorderFactory.createEmptyBorder(5,5,5,5)));
 	contentPane1r.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("general settings"),BorderFactory.createEmptyBorder(5,5,5,5)));
-	
+
 
 	JPanel paneLeft = new JPanel(new BorderLayout());
-	
+
 	contentPane.setLayout(new BorderLayout());
 	paneLeft.add(contentPane1l,BorderLayout.NORTH);
 	paneLeft.add(contentPane1l2,BorderLayout.SOUTH);
@@ -276,24 +276,24 @@ public class SaveMovieDialog extends JFrame {
 	contentPane6.add(antialiasingPanel, BorderLayout.NORTH);
 	contentPane6.add(contentPane7,BorderLayout.CENTER);
 	contentPane7.add(paramPanel, BorderLayout.NORTH);
-	
+
 	contentPane7.add(contentPane8,BorderLayout.CENTER);
 	contentPane8.add(paramAddPanel, BorderLayout.NORTH);
 	contentPane8.add(contentPane9,BorderLayout.CENTER);
 	contentPane9.add(rotatePanel, BorderLayout.NORTH);
 	//*///contentPane6.add(contentPane2,BorderLayout.CENTER);
-	
+
 	//outputFormat=new JComboBox();
-	
+
 	//outputFormat.insertItemAt("raytraced picture",0);
-	
+
 	if (true || surfex_.inAnApplet) {
-	    
+
 	    //		outputFormat.insertItemAt("povray code",1);
-	    //	outputFormat.insertItemAt("surf code",2);	
+	    //	outputFormat.insertItemAt("surf code",2);
 	}
 	//outputFormat.setSelectedIndex(0);
-	
+
 	CL = new ChangeListener() {
 		public void stateChanged(ChangeEvent ev) {
 		    String command = ((AbstractButton) ev.getSource()).getText();
@@ -323,7 +323,7 @@ public class SaveMovieDialog extends JFrame {
 		    }
 		    }
 		    }
-		    
+
 		    if (command.hashCode() == rb[8].getText().hashCode()
 		    && rb[8].isSelected()) {
 		    //      System.out.println("funktion nicht geschrieben ...");
@@ -451,33 +451,33 @@ public class SaveMovieDialog extends JFrame {
 				// System.out.println("clicked" );
 			*/
 			}
-			
+
 		};
 
-	
+
 // 	width = new JTextField(rayFrame.getContentPane().getSize().width+"");
 // 	height = new JTextField(rayFrame.getContentPane().getSize().height+"");
 	width = new JTextField("300");
 	height = new JTextField("300");
 	//	rb[10] = new JRadioButton("Set new size:", true);
-	
-	
+
+
 	//	ButtonGroup group = new ButtonGroup();
 	//	ButtonGroup standardDim = new ButtonGroup();
-	
+
 	// adding container
 	//	panel.setLayout(new GridLayout(9, 2));
 	//	panel.add(new JLabel("output format:"));
-	
+
 	//outputFormatPanel.add(outputFormat);
-	
+
 /*		panel.add(surfCode);
 		panel.add(new JLabel(""));
-		
+
 		panel.add(raytracedPic);
 		panel.add(new JLabel(""));
 */
-	
+
 	colorType=new JComboBox();
 	colorType.insertItemAt("color",0);
 	colorType.insertItemAt("dithered - black/white",1);
@@ -493,7 +493,7 @@ public class SaveMovieDialog extends JFrame {
 	omitType.insertItemAt("omit last frame",2);
 	omitType.setSelectedIndex(0);
 	omitTypePanel.add(omitType);
-	
+
 	antialiasingQuality=new JComboBox();
 	antialiasingQuality.insertItemAt("1",0);
 	antialiasingQuality.insertItemAt("2",1);
@@ -504,58 +504,58 @@ public class SaveMovieDialog extends JFrame {
 	antialiasingQuality.setSelectedIndex(0);
 	panel.add(new JLabel("antialiasing level:"));
 	antialiasingPanel.add(antialiasingQuality);
-	
+
 	paramPanel.add(new JLabel());
 	// p6N.add(new JLabel("Parameters to run:"));
 	// p6N.add(new JLabel());
-	
+
 	// p6C.add(new JLabel());
 	listModel = new DefaultListModel();
-	
+
 	//Create the list and put it in a scroll pane.
 	parameterList = new JList(listModel);
 	parameterList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	parameterList.setSelectedIndex(0);
-	
+
 	// parameterList.addListSelectionListener(this);
 	parameterList.setVisibleRowCount(2);
 	listScrollPane = new JScrollPane(parameterList);
-	
+
 	//   addLabel = new JLabel("Add Params to List:");
-	
-	
-	
+
+
+
 ////////////////////////	//
 	//addButton .... in JLabel aendern
-	
-	
-	
-	
+
+
+
+
 	addListener addListener = new addListener(addLabel);
 	//  addButton.setActionCommand(addString);
 	//  addButton.addActionListener(addListener);
 	//  addButton.setEnabled(false);
-	
+
 	removeButton = new JButton(removeString);
 	removeButton.setActionCommand(removeString);
 	removeButton.addActionListener(new removeListener());
 	removeButton.setEnabled(false);
-	
+
 	paramName = pro.parAdmin.paramComboBox;
 	paramName.addActionListener(addListener);
 	// paramName.setEnabled(false);
 	//  paramName.getDocument().addDocumentListener(addListener);
 	//String name = listModel.getElementAt(
 	//                    parameterList.getSelectedIndex()).toString();
-	
-	
-	
+
+
+
 	paramPanel.add(listScrollPane,BorderLayout.CENTER);
 	paramPanel.add(removeButton,BorderLayout.SOUTH);
 	// p6S.add(new JLabel());
 	// p6S.add(addLabel);
 	paramAddPanel.add(paramName);
-	
+
 	rotatePanel.add(new JLabel("#x-rot"));
 	//XrotSpinner.set
 	rotatePanel.add(XrotSpinner);
@@ -563,30 +563,30 @@ public class SaveMovieDialog extends JFrame {
 	rotatePanel.add(YrotSpinner);
 	rotatePanel.add(new JLabel("#z-rot"));
 	rotatePanel.add(ZrotSpinner);
-	
-	
+
+
 	panel.add(new JLabel("  Current size:"));
 	sizePanel.add(newSize);//
 	//new JLabel(rayFrame.getContentPane().getSize().width + " x "
 	//		+ rayFrame.getContentPane().getSize().height));
 	panel.add(new JLabel("  New size:"));
-	
+
 	JPanel p1 = new JPanel(new GridLayout(3, 2));
 	newSizePanel.add(p1,BorderLayout.CENTER);
-	
+
 //	setNewSize(rayFrame.getContentPane().getSize().height,rayFrame.getContentPane().getSize().width);
 	setNewSize(300, 300);
-	
+
 	//	p1.add(newSize);
 	//	p1.add(new JLabel(" "));
-	
+
 	//panel.add(rb[10]);
 	//standardDim.add(rb[10]);
 	//rb[10].addChangeListener(CL);
-	
+
 //		panel.add(new JLabel(""));
-	
-	
+
+
 	p1.add(new JLabel("  width:"));
 	width.addKeyListener(new KeyListener() {
 		public void keyReleased(KeyEvent keyEvent) {
@@ -601,15 +601,15 @@ public class SaveMovieDialog extends JFrame {
 		    updateLabel_newSize();
 		    //	outputFormat.setSelectedIndex(0);
 		}
-		
+
 		public void keyPressed(KeyEvent keyEvent) {
 		}
-		
+
 		public void keyTyped(KeyEvent keyEvent) {
 		}
 	    });
 	p1.add(width);
-	
+
 	//JPanel p2 = new JPanel(new GridLayout(1, 2));
 	//panel.add(p2);
 	p1.add(new JLabel("  height:"));
@@ -626,41 +626,41 @@ public class SaveMovieDialog extends JFrame {
 		    //rb[10].setSelected(true);
 		    updateLabel_newSize();
 		}
-		
+
 		public void keyPressed(KeyEvent keyEvent) {
 		}
-		
+
 		public void keyTyped(KeyEvent keyEvent) {
 		}
 	    });
 	p1.add(height);
-	
+
 	JPanel p3 = new JPanel(new GridLayout(1, 2));
 	//DpiPanel.add(p3);
 	p3.add(new JLabel("  DPI:"));
 	dpi.addKeyListener(new KeyListener() {
 		public void keyReleased(KeyEvent keyEvent) {
-		    
+
 		    updateLabel_newSize();
 		    //outputFormat.setSelectedIndex(0);
 		}
-		
+
 		public void keyPressed(KeyEvent keyEvent) {
 		}
-		
+
 		public void keyTyped(KeyEvent keyEvent) {
 		}
 	    });
 	//	p3.add(dpi);
-	
+
 	measure=new JComboBox();
-	
+
 	measure.insertItemAt("pixel",0);
 	measure.insertItemAt("cm",1);
 	measure.insertItemAt("inch",2);
-	
+
 	measure.setSelectedIndex(0);
-	
+
 	measure.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent ae){
 		    setHeight(Double.valueOf(height.getText()).doubleValue());
@@ -678,8 +678,8 @@ public class SaveMovieDialog extends JFrame {
 		    }
 		}
 	    });
-	
-	
+
+
 	//JPanel p35 = new JPanel(new GridLayout(1, 2));
 	//panel.add(p35);
 	//	p1.add(new JLabel("Unit:"));
@@ -692,18 +692,18 @@ public class SaveMovieDialog extends JFrame {
   units.add(unitPixels);
   unitPixels.addChangeListener(CL);
   p4.add(unitPixels);
-  
+
   panel.add(new JLabel(""));
-  
+
   JPanel p5 = new JPanel(new GridLayout(1, 2));
   panel.add(p5);
   units.add(unitCm);
   unitCm.addChangeListener(CL);
   p5.add(new JLabel(""));
   p5.add(unitCm);
-  
+
   panel.add(new JLabel(""));
-  
+
   JPanel p6 = new JPanel(new GridLayout(1, 2));
   panel.add(p6);
   units.add(unitInches);
@@ -714,31 +714,31 @@ public class SaveMovieDialog extends JFrame {
 //	newSizePanel.add(aspectRatio,BorderLayout.SOUTH);
 	aspectRatio.addChangeListener(CL);
 	//	panel.add(new JLabel("(raytraced preview)"));
-	
-	
+
+
 	fpsPanel.add(new JLabel(" frames per sec.: "));
 	fpsPanel.add(this.FramesPerSecond);
-	
+
 	lengthPanel.add(new JLabel(" seconds: "));
 	lengthPanel.add(this.Time);
-	
+
 	Time.addKeyListener(new KeyListener() {
 		public void keyReleased(KeyEvent keyEvent) {
-		    
+
 		    updateLabel_newSize();
 		    //ROTATE_Y_AXIS_Button.setSelected(true);
 		}
-		
+
 		public void keyPressed(KeyEvent keyEvent) {
 		}
-		
+
 		public void keyTyped(KeyEvent keyEvent) {
 		}
 	    });
-	
-	
+
+
 	standardDim=new JComboBox();
-	standardDim.insertItemAt("choose a size (in pixels)",0);	
+	standardDim.insertItemAt("choose a size (in pixels)",0);
  	standardDim.insertItemAt("for presentation (600x600)",1);
  	standardDim.insertItemAt("for web (300x300)",2);
 	standardDim.insertItemAt("240 x 240",3);
@@ -750,7 +750,7 @@ public class SaveMovieDialog extends JFrame {
 	standardDim.insertItemAt("900 x 900",9);
 	standardDim.insertItemAt("1024 x 1024",10);
 	standardDim.insertItemAt("1200 x 1200",11);
-	
+
 	standardDim.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent ae){
 		    int i=standardDim.getSelectedIndex();
@@ -770,15 +770,15 @@ public class SaveMovieDialog extends JFrame {
 		    }
 		}
 	    });
-	
+
 	standardDim.setSelectedIndex(0);
-	
+
 	//panel.add(new JLabel("some standard dimensions:"));
 	someStandardDimPanel.add(standardDim);
-	
-	
+
+
 /*		JPanel panel2 = new JPanel(new GridLayout(12, 3));
-		
+
 panel2.add(new JLabel());
 panel2.add(new JLabel());
 panel2.add(new JLabel());
@@ -878,22 +878,22 @@ rb[8] = new JRadioButton("Best fit to desktop");
 //		                  System.out.println("fps:"+((Integer)FramesPerSecond.getModel().getValue()).intValue());
 				  surfex_.showMoviePreview = true;
 		                  SaveMovie saveThread = new SaveMovie(
-		                      filelocation, 
-				      surfex_, 
+		                      filelocation,
+				      surfex_,
 		                      ((Integer)FramesPerSecond.getModel().getValue()).intValue(),
 		                      Integer.parseInt(dpi.getText()),
 		                      ((colorType.getSelectedIndex())==1),
-		                      ((antialiasingQuality.getSelectedIndex())!=0), 
+		                      ((antialiasingQuality.getSelectedIndex())!=0),
 				      Integer.parseInt(Time.getText()),
 				      omitType.getSelectedIndex(),
 		                      Integer.parseInt(height.getText()),
 		                      Integer.parseInt(width.getText()),
 		                      (colorType.getSelectedIndex()==2), //RotType
-		                      1, 
+		                      1,
 				      surfex_.getCurrentProject(),
-		                      surfex_.getCurrentProject().jv4sx.getCamPos(), 
-				      surfex_.getCurrentProject().jv4sx.getViewDir(), 
-				      surfex_.getCurrentProject().jv4sx.getUpVector(), 
+		                      surfex_.getCurrentProject().jv4sx.getCamPos(),
+				      surfex_.getCurrentProject().jv4sx.getViewDir(),
+				      surfex_.getCurrentProject().jv4sx.getUpVector(),
 				      surfex_.getCurrentProject().jv4sx.getRightVector(),
 				      ((Integer)XrotSpinner.getModel().getValue()).intValue(),
 				      ((Integer)YrotSpinner.getModel().getValue()).intValue(),
@@ -1021,7 +1021,7 @@ rb[8] = new JRadioButton("Best fit to desktop");
 		              }
 		             };
 
-		          
+
 		                FileFilter acfFilter = new ExtensionFileFilter(
 		                    "all common files", new String[] {
 		                        "gif", "mng"});
@@ -1033,8 +1033,8 @@ rb[8] = new JRadioButton("Best fit to desktop");
 		                spcFilter = new ExtensionFileFilter("*.gif",
 		                      new String[] { "gif" });
 		                fileChooser.addChoosableFileFilter(spcFilter);
-		                
-		            
+
+
 
 		            // adding actionListener
 		            fileChooser.addActionListener(actionListener);
@@ -1047,7 +1047,7 @@ rb[8] = new JRadioButton("Best fit to desktop");
 
 		          // end: command == "load"
 		        }
-		        if (command.hashCode() == 
+		        if (command.hashCode() ==
 			    DefaultButton.getText().hashCode()) {
 			    //setVisible(false);
 			    newSize.setText(rayFrame.getContentPane().getSize().width
@@ -1066,12 +1066,12 @@ rb[8] = new JRadioButton("Best fit to desktop");
 			    //_3d.setSelected(false);
 			    aspectRatio.setSelected(true);
 			    //ROTATE_Y_AXIS_Button.setSelected(true);
-			    
-			    
-			    
-		          
-		          
-		          /* 
+
+
+
+
+
+		          /*
 		          for (i = 0; i <= 15; i++) {
 		            last[i] = false;
 		          }
@@ -1101,11 +1101,11 @@ rb[8] = new JRadioButton("Best fit to desktop");
 		group.add(raytracedPic);
 		group.add(povCode);
 		group.add(surfCode);
-		
-	*/	
+
+	*/
 		this.pack();
 		setVisible(false);
-	
+
 		this.setLocation(200,100);
 		setVisible(false);
 	}
@@ -1137,7 +1137,7 @@ rb[8] = new JRadioButton("Best fit to desktop");
 		}
 		// SwingUtilities.updateComponentTreeUI(this);
 	}
-	
+
 	public void updateSize(int h,int w){
 		setNewSize(h,w);
 		if(measure.getSelectedIndex()==0){
@@ -1152,15 +1152,15 @@ rb[8] = new JRadioButton("Best fit to desktop");
 			setWidth(w/(Double.valueOf(dpi.getText()).doubleValue()));
 			setHeight(h/(Double.valueOf(dpi.getText()).doubleValue()));
 		}
-		
+
 	}
-	
+
 	public void setNewSize(int h, int w){
 		heightvalue=h;
 		widthvalue=w;
 		newSize.setText(h+" x "+w);
 	}
-	
+
 	public void setHeight(double h){
 		if(measure.getSelectedIndex()==0){
 			//pixel ist selektiert, d.h. keine Nachkommastellen anzeigen!
@@ -1170,8 +1170,8 @@ rb[8] = new JRadioButton("Best fit to desktop");
 			// angabe in cm / inch:
 			// bis zu acht stellen (mit komma ) anzeigen:
 			height.setText((h+"        ").substring(0,8).replaceAll(" ",""));
-	
-		}		
+
+		}
 	}public void setWidth(double w){
 		if(measure.getSelectedIndex()==0){
 			//pixel ist selektiert, d.h. keine Nachkommastellen anzeigen!
@@ -1181,18 +1181,18 @@ rb[8] = new JRadioButton("Best fit to desktop");
 			// angabe in cm / inch:
 			// bieigen:
 			width.setText((w+"        ").substring(0,8).replaceAll(" ",""));
-	
+
 		}
 	}
 
-	  
+
 	  class removeListener implements ActionListener {
 	        public void actionPerformed(ActionEvent e) {
 	            //This method can be called only if
 	            //there's a valid selection
 	            //so go ahead and remove whatever's selected.
 	            int index = parameterList.getSelectedIndex();
-	            
+
 //	          rausfinden, wo man den Parameter in ComboBox einfuegen kann:
 	        int i=0;
 	        //System.out.;
@@ -1202,11 +1202,11 @@ rb[8] = new JRadioButton("Best fit to desktop");
 	            break;
 	          }
 	        }
-	        
+
 	        paramName.insertItemAt(parameterList.getSelectedValue(),i);
-	        
-	            
-	            
+
+
+
 	            listModel.remove(index);
 
 	            int size = listModel.getSize();
@@ -1219,19 +1219,19 @@ rb[8] = new JRadioButton("Best fit to desktop");
 	                    //removed item in last position
 	                    index--;
 	                }
-	                
+
 	                parameterList.setSelectedIndex(index);
 	                parameterList.ensureIndexIsVisible(index);
 	            }
-	            
+
 
 	            SwingUtilities.updateComponentTreeUI(paramName);
 
 	            SwingUtilities.updateComponentTreeUI(listScrollPane);
 	        }
-	        
-	        
-	        
+
+
+
 	    }
 
 	    //This listener is shared by the text field and the hire button.
@@ -1256,7 +1256,7 @@ rb[8] = new JRadioButton("Best fit to desktop");
 	            } else {           //add after the selected item
 	                index++;
 	            }
-	            
+
 	            // In ScrollPane kopieren und aus ComboBox loeschen
 	            int i;
 	            String Item =(String)paramName.getSelectedItem();
@@ -1266,7 +1266,7 @@ rb[8] = new JRadioButton("Best fit to desktop");
 	            break;
 	          }
 	        }
-	            
+
 	            listModel.insertElementAt(Item, i);
 	            //System.out.println();
 	            paramName.removeItemAt(paramName.getSelectedIndex());
@@ -1283,7 +1283,7 @@ rb[8] = new JRadioButton("Best fit to desktop");
 	            parameterList.ensureIndexIsVisible(index);
 	            }
 	        }
-	        
+
 //	      Required by DocumentListener.
 	        public void insertUpdate(DocumentEvent e) {
 	            enableButton();
@@ -1300,7 +1300,7 @@ rb[8] = new JRadioButton("Best fit to desktop");
 	                enableButton();
 	            }
 	        }
-	        
+
 	        private void enableButton() {
 	            if (!alreadyEnabled) {
 	                button.setEnabled(true);
@@ -1330,16 +1330,16 @@ rb[8] = new JRadioButton("Best fit to desktop");
 	            }
 	        }
 	    }
-	    
 
-	    
+
+
 	    private String[] getParametersToRun(){
 	      String[] l=new String[parameterList.getModel().getSize()];
 	      int i;
 	      for(i=0;i<parameterList.getModel().getSize();i++){
 	        l[i]=(String)parameterList.getModel().getElementAt(i);
 	      }
-	      
+
 	      return l;
 	    }
 } // end class SavePicDialog

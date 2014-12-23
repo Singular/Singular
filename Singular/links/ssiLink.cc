@@ -5,36 +5,39 @@
  * File:    ssiLink.h
  *  Purpose: declaration of sl_link routines for ssi
  ***************************************************************/
+#define TRANSEXT_PRIVATES 1 /* allow access to transext internals */
+
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
 
 #include <misc/intvec.h>
 #include <misc/options.h>
+
 #include <reporter/si_signals.h>
 #include <reporter/s_buff.h>
-#include <coeffs/longrat.h>
-#include <coeffs/bigintmat.h>
 
-#define TRANSEXT_PRIVATES 1 // allow access to transext internals
+#include <coeffs/bigintmat.h>
+#include <coeffs/longrat.h>
+
 #include <polys/monomials/ring.h>
-#include <polys/matpol.h>
-#include <polys/simpleideals.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/ext_fields/transext.h>
+#include <polys/simpleideals.h>
+#include <polys/matpol.h>
 
 #include <kernel/oswrapper/timer.h>
+#include <kernel/oswrapper/feread.h>
+#include <kernel/oswrapper/rlimit.h>
 
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>
-#include <kernel/oswrapper/rlimit.h>
 #include <Singular/subexpr.h>
 #include <Singular/links/silink.h>
 #include <Singular/cntrlc.h>
 #include <Singular/lists.h>
 #include <Singular/blackbox.h>
-#include <kernel/oswrapper/feread.h>
 #include <Singular/links/ssiLink.h>
 
 #ifdef HAVE_SIMPLEIPC

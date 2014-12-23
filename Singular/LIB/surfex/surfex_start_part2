@@ -1,7 +1,7 @@
 # the temporary directory in which surfex stores temporary image files etc.:
 tmp_dir=/tmp
 
-# the standard equation which will be displayed 
+# the standard equation which will be displayed
 # if the user does not specify an equation or filename:
 std_eqn="x^3+y^3+z^3+1-0.25*(x+y+z+1)^3"
 
@@ -18,12 +18,12 @@ std_eqn="x^3+y^3+z^3+1-0.25*(x+y+z+1)^3"
 #
 
 allargs=""
-if [ -z $1 ] ; then 
+if [ -z $1 ] ; then
     # if the user does not specify any argument, then we use the standard equation:
     allargs="-e $std_eqn"
-else 
-    # if the user has given some arguments then we want to pass all these 
-    # to the java program surfex. 
+else
+    # if the user has given some arguments then we want to pass all these
+    # to the java program surfex.
     # therefore, we store them all in one string here:
     allargs=$*
 fi

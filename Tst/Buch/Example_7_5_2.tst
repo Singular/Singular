@@ -33,18 +33,18 @@ proc tensorMod(matrix Phi, matrix Psi)
    matrix A=tensorMaps(unitmat(s),Psi);  //Is tensor Psi
    matrix B=tensorMaps(Phi,unitmat(q));  //Phi tensor Iq
    matrix R=concat(A,B);                 //sum of A and B
-   return(R);     
+   return(R);
 }
 proc Tor(int i, matrix Ps, matrix Ph)
 {
-   if(i==0){return(module(tensorMod(Ps,Ph)));}  
+   if(i==0){return(module(tensorMod(Ps,Ph)));}
                                   //the tensor product
    list Phi   = mres(Ph,i+1);     // a resolution of Ph;
    module Im  = tensorMaps(unitmat(nrows(Phi[i])),Ps);
    module f   = tensorMaps(matrix(Phi[i]),unitmat(nrows(Ps)));
    module Im1 = tensorMaps(unitmat(ncols(Phi[i])),Ps);
    module Im2 = tensorMaps(matrix(Phi[i+1]),unitmat(nrows(Ps)));
-   module ker = modulo(f,Im);            
+   module ker = modulo(f,Im);
    module tor = modulo(ker,Im1+Im2);
    tor        = prune(tor);
    return(tor);
@@ -67,7 +67,7 @@ prune(modulo(L,J));
 matrix Ph=t;
 matrix Ps[1][2]=I;
 
-Tor(1,Ps,Ph);  
+Tor(1,Ps,Ph);
 
 matrix Pl[1][4]=J;
 

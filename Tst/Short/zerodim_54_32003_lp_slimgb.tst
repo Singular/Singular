@@ -12,4 +12,4 @@ a*b*c*d*x*f-1;
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
     tst_status(1);$
-    
+

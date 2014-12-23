@@ -1,11 +1,11 @@
 #
 # publish script for the java program surfex
-# 
+#
 # - copies all necessary files to a subdirectory
 # - then makes a .tar.gz from that
 #
 
-# make all 
+# make all
 # and compress to jar file:
 ./make_surfex
 
@@ -49,7 +49,7 @@ cp INSTALL_WINDOWS $subdir/
 # the script to start surf under cygwin:
 cp cygwinsurf $subdir/
 
-# the programming helper scripts: 
+# the programming helper scripts:
 cp make_surfex $subdir/
 cp publish_surfex $subdir/
 

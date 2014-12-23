@@ -65,7 +65,7 @@ AC_CACHE_CHECK([whether the linker accepts $1], CACHEVAR, [
   AC_LINK_IFELSE([AC_LANG_PROGRAM()],
     [AS_VAR_SET(CACHEVAR,[yes])],
     [AS_VAR_SET(CACHEVAR,[no])])
-  CFLAGS="$_save_cflags"  
+  CFLAGS="$_save_cflags"
   LDFLAGS=$ax_check_save_flags])
 AS_IF([test x"AS_VAR_GET(CACHEVAR)" = xyes],
   [m4_default([$2], :)],

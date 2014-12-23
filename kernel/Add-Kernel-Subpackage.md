@@ -1,5 +1,5 @@
 Addition of a new sub-package within `/kernel/` {#adding_kernel_package}
-=============================================== 
+===============================================
 
    1. create a new directory (e.g. `/kernel/somepackage`) in `/kernel/` for your sub-package (`somepackage`)
    2. place all the necessary **sources** and **headers** there (`/kernel/somepackage`)

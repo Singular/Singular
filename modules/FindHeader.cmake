@@ -27,7 +27,7 @@ macro(check_cpp_header HEADER)
   STRING(TOUPPER ${HEADER} ENABLE_FLAG)
   STRING(REGEX REPLACE "/" "_" ENABLE_FLAG ${ENABLE_FLAG})
   STRING(REGEX REPLACE ".H$" "_H" ENABLE_FLAG ${ENABLE_FLAG})
-  
+
   set(_srcfile ${CMAKE_BINARY_DIR}/temp.cpp)
   set(srccode "#include <${HEADER}>\nint main() { return 0\;}")
   file(WRITE ${_srcfile} ${srccode})

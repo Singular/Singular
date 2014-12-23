@@ -9,7 +9,7 @@ OBJS	= scanner.o misc.o
 #	iparith.o febase.o \
 #	mmalloc.o mmallocb.o mminit.o mmutil.o mmblock.o mmspec.o
 
-# subexpr.o 
+# subexpr.o
 
 all	= modgen
 

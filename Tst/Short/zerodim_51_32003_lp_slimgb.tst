@@ -9,4 +9,4 @@ z^4*y+y^4*x-2*y*x^2-3;
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
     tst_status(1);$
-    
+

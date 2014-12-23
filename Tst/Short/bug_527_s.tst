@@ -9,8 +9,8 @@ def pdec = primdecZ(I);
 ASSUME(0, size(pdec)==0);
 
 I=0;
-pdec = primdecZ(I); 
-ASSUME(0, size( pdec ) ==1  ); 
+pdec = primdecZ(I);
+ASSUME(0, size( pdec ) ==1  );
 ASSUME(0, size( pdec[1] ) == 2 ) ;
 ASSUME(0, size( pdec[1][1] )==0 );
 ASSUME(0, size( pdec[1][2] )==0 );

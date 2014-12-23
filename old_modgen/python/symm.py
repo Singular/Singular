@@ -56,7 +56,7 @@ symbols=len(canonical_to_index)
 def six_j_symbol(v):
   i=vartrans[v]
   return var_cache[i-1]
-  
+
 
 def w(i):
   return var_cache[wtrans[i]-1]

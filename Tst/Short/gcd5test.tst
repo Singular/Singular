@@ -22,7 +22,7 @@ proc test5 (int p)
     d2= d2*(x(i) + 1);
     f2= f2*(x(i) - 2);
     g2= g2*(x(i) + 2);
-    
+
     d= d1*d2 - 2;
     f= f1*f2 + 2;
     g= g1*g2 - 2;

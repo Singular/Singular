@@ -1,4 +1,4 @@
-// the following initialization is needed for linkage on Mac OS X, 
+// the following initialization is needed for linkage on Mac OS X,
 // since initialized variables will be "D" (uninit. go to "C") segments
 #include <misc/options.h>
 unsigned si_opt_1 = 0;

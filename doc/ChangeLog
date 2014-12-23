@@ -1,7 +1,7 @@
 Fri Feb  7 13:32:09 2003  Viktor Levandovskyy <levandov@mathematik.uni-kl.de>
 
 	* plural documentation is merged with singular docs
-	* new targets: 
+	* new targets:
 		make plu_html (builds autonomous plural HTML)
 		make plural.hlp (plural info)
 	* if "@set withplural 1" exists in singular.doc, then
@@ -27,9 +27,9 @@ Thu Jun 18 12:42:39 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 Tue Jun  9 16:52:29 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* Makefile.in (install): `singular.hlp' added as dependency
-	
+
 	* Makefile.in: Major clean up.  Many doc fixes.
-	(install): 
+	(install):
 
 	* Makefile.in (${SINGULAR}, Makefile): `cd ${prefix}' replaced by
 	  `cd ..'
@@ -173,7 +173,7 @@ Tue May 19 08:58:04 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	  (Rings and orderings): fixes fixed
 	  (General syntax of a ring declaration): fixes fixed
 	  (Examples of ring declarations): fixes fixed
-	  (Term orderings): 
+	  (Term orderings):
 
 	* general.doc (Interrupting SINGULAR, Editing input): fixes fixed
 	  (Command line options): fixes fixed
@@ -349,6 +349,6 @@ Tue Apr 28 14:46:50 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	  into nodes `Functions' and `Control structures', resp.
 	  (Command): renamed to to `Functions and variables'
 
-Mon Apr 27 18:35:25 MET DST 1998 hannes: 
+Mon Apr 27 18:35:25 MET DST 1998 hannes:
   added map and sub-sections to types.doc
   removed dring

@@ -31,7 +31,7 @@ namespace CxxTest
 	{
 	    parseCommandLine( argc, argv );
 	}
-	
+
         void enterWorld( const WorldDescription &wd )
         {
             getTotalTests( wd );
@@ -187,7 +187,7 @@ namespace CxxTest
             HMODULE dll = LoadLibraryA( "comctl32.dll" );
             if ( !dll )
 		return;
-		
+
 	    typedef void (WINAPI *FUNC)( void );
 	    FUNC func = (FUNC)GetProcAddress( dll, "InitCommonControls" );
 	    if ( !func )

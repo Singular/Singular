@@ -10,16 +10,16 @@ genus(EI);
 genus(EI,"nor");
 genus(EI,"pri");
 
-ASSUME(0, genus(EI)       == genus(EI,"pri") ); 
-ASSUME(0, genus(EI,"nor") == genus(EI,"pri") ); 
+ASSUME(0, genus(EI)       == genus(EI,"pri") );
+ASSUME(0, genus(EI,"nor") == genus(EI,"pri") );
 
 EI = z^2, x*y;
 genus(EI);
 genus(EI,"nor");
 genus(EI,"pri");
 
-ASSUME(0, genus(EI)       == genus(EI,"pri") ); 
-ASSUME(0, genus(EI,"nor") == genus(EI,"pri") ); 
+ASSUME(0, genus(EI)       == genus(EI,"pri") );
+ASSUME(0, genus(EI,"nor") == genus(EI,"pri") );
 
 
 tst_status(1); $

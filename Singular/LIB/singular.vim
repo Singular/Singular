@@ -41,16 +41,16 @@ syn keyword     Label          version category info
 "Numbers
 syn match       Number         "\d\+"
 "Floats
-syn match       Float          "[+-]\?\d\+\.\d*" " stuff like -12.05 
+syn match       Float          "[+-]\?\d\+\.\d*" " stuff like -12.05
 syn match       Float          "[+-]\?\d\+\.\d*e[+-]\?\d\+" " stuff like +0.3e-2 or even 1.e-02
 
 " IDENTIFIER
 " Functions, up to now just basic commands, no library functions
-syn keyword     Function        attrib 
-syn keyword     Function        bareiss betti 
-syn keyword     Function        char char_series charstr chinrem cleardenom close coef coeffs contract 
-syn keyword     Function        datetime dbprint defined deg degree delete det diff dim division dump 
-syn keyword     Function        eliminate eval ERROR example execute extgcd 
+syn keyword     Function        attrib
+syn keyword     Function        bareiss betti
+syn keyword     Function        char char_series charstr chinrem cleardenom close coef coeffs contract
+syn keyword     Function        datetime dbprint defined deg degree delete det diff dim division dump
+syn keyword     Function        eliminate eval ERROR example execute extgcd
 syn keyword     Function        facstd factmodd factorize farey fetch fglm fglmquot find finduni fprintf freemodule frwalk
 syn keyword     Function        gcd gen getdump groebner
 syn keyword     Function        help highcorner hilb homog hres
@@ -76,7 +76,7 @@ syn keyword     Conditional    if else
 " Repeat
 syn keyword     Repeat         for while
 "Keyword, also known as stuff that fits nowhere else (within statements)
-syn keyword     Keyword        break breakpoint continue export exportto importfrom keepring load quit return ~ 
+syn keyword     Keyword        break breakpoint continue export exportto importfrom keepring load quit return ~
 
 " TYPE
 syn keyword     Type           bigint def ideal int intmat intvec link list map matrix module number package poly proc qring resolution ring string vector pyobject

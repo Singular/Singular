@@ -9,7 +9,7 @@ C[1,3]=1/Q2;
 C[2,3]=Q2;
 D[1,2]=-Q*z;
 D[1,3]=1/Q*y;
-D[2,3]=-Q*x; 
+D[2,3]=-Q*x;
 def S=nc_algebra(C,D);setring S;
 // it is quantum deformation U'_q(so_3)
 // where q=Q^2 specialized at the 3rd root of unity

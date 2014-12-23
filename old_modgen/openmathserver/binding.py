@@ -10,9 +10,9 @@ lambdasym = OMSymbol("lambda", cdFns1)
 def islambda(sym):
     "return True, iff sym is the lambda binder"
     return lambdasym == sym
-    
+
 class OMBinding(OMObjectBase):
-    """hopefully fixed possible problems: reevaluation writes new scope, 
+    """hopefully fixed possible problems: reevaluation writes new scope,
        if it isn't
        meant so, references do not work correctly because of scopes
        solve this by first evaluation to bounded OMBinding"""
@@ -50,10 +50,10 @@ class OMBinding(OMObjectBase):
         erg = self.calcErg(context)
         self.unbind()
         #print "__call__ erg is", erg
-        return erg   
-        
+        return erg
+
     XMLtag = "OMBIND"
     def getChildren(self):
         "get children for (XML) representation"
         return [self.binder]+self.variables+[self.block]
-    
+

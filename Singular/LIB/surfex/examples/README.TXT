@@ -11,12 +11,12 @@ surfex - command line examples
 
 There are also some examples on how to use the command line to produce some
 images and movies (these require the external tool "convert" to be installed
-on your system) using surfex.  
+on your system) using surfex.
 The command line examples are contained in the files:
 commandline_examples
-and 
+and
 make_cayley_...
-There is no documentation of the command line way of using surfex yet; 
+There is no documentation of the command line way of using surfex yet;
 however, we hope that the examples will allow to use it nevertheless.
 
 

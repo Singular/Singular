@@ -2,7 +2,7 @@ LIB "tst.lib"; tst_init();
 
 intvec iv1m1 = intvec(1,-1);
 
-"iv1m1: ", iv1m1; 
+"iv1m1: ", iv1m1;
 
 
 ring A = (0),(x,d),(dp(2),C);

@@ -12,7 +12,7 @@ I;
 //->   I[3]=x2-wy
 qring Q = groebner(I);
 resolution F=mres(maxideal(1),0);
-//->   // ** full resolution in a qring may be infinite, 
+//->   // ** full resolution in a qring may be infinite,
 //->         setting max length to 6
 print(betti(F),"betti");
 //->              0     1     2     3     4     5     6
@@ -68,7 +68,7 @@ kill S;
 //======================  Example 4.13 (new session) =======================
 ring S = 32003, x(0..4), dp;
 module MI=maxideal(1);
-attrib(MI,"isHomog",intvec(-1));  
+attrib(MI,"isHomog",intvec(-1));
 resolution kos = nres(MI,0);
 print(betti(kos),"betti");
 //->              0     1     2     3     4     5
@@ -117,7 +117,7 @@ print(betti(FI),"betti");
 int codimI = nvars(S)-dim(I);
 codimI;
 //->   2
-degree(I); 
+degree(I);
 //->   4
 nvars(S)-dim(groebner(minor(jacob(I),codimI) + I));
 //->   5
@@ -129,7 +129,7 @@ if (not(defined(dsum))){ LIB "matrix.lib"; }
 ring S = 32003, x(0..4), dp;
 resolution kos = nres(maxideal(1),0);
 betti(kos);
-//->   1,5,10,10,5,1 
+//->   1,5,10,10,5,1
 matrix kos5 = kos[5];
 matrix tphi = transpose(dsum(kos5,kos5));
 matrix kos3 = kos[3];
@@ -148,11 +148,11 @@ matrix talpha0 = concat(tbeta0,tgamma0);
 matrix zero[20][1];
 matrix tpsi = transpose(psi);
 matrix tpresg = concat(tpsi,zero);
-matrix pres = module(transpose(talpha0)) 
+matrix pres = module(transpose(talpha0))
                 + module(transpose(tpresg));
 module dir = transpose(pres);
 dir = prune(dir);
-homog(dir);  
+homog(dir);
 //->   1
 intvec deg_dir = attrib(dir,"isHomog");
 attrib(dir,"isHomog",deg_dir-2);        // set degrees

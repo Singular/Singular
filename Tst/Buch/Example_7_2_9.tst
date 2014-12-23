@@ -6,7 +6,7 @@ proc fitting(matrix M, int n)
   n=nrows(M)-n;
   if(n<=0){return(ideal(1));}
   if((n>nrows(M))||(n>ncols(M))){return(ideal(0));}
-  return(std(minor(M,n)));  
+  return(std(minor(M,n)));
 }
 
 proc isLocallyFree(matrix M, int n)

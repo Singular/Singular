@@ -722,7 +722,7 @@ static BOOLEAN _FindReducer(leftv res, leftv h)
     h = h->Next();
   }
 
-#ifndef SING_NDEBUG 
+#ifndef SING_NDEBUG
   if( LIKELY( OPT__TAILREDSYZ) )
     assume (LS != NULL);
 #endif
@@ -826,7 +826,7 @@ static BOOLEAN _SchreyerSyzygyNF(leftv res, leftv h)
     h = h->Next();
   }
 
-#ifndef SING_NDEBUG 
+#ifndef SING_NDEBUG
   if( LIKELY( OPT__TAILREDSYZ) )
     assume (LS != NULL);
 #endif
@@ -947,7 +947,7 @@ static BOOLEAN _ReduceTerm(leftv res, leftv h)
     h = h->Next();
   }
 
-#ifndef SING_NDEBUG 
+#ifndef SING_NDEBUG
   if( LIKELY( OPT__TAILREDSYZ) )
     assume (LS != NULL);
 #endif
@@ -1080,7 +1080,7 @@ static BOOLEAN _TraverseTail(leftv res, leftv h)
     h = h->Next();
   }
 
-#ifndef SING_NDEBUG 
+#ifndef SING_NDEBUG
   if( LIKELY( OPT__TAILREDSYZ) )
     assume (LS != NULL);
 #endif
@@ -1944,7 +1944,7 @@ static BOOLEAN _NumberStatsInit(leftv res, leftv h)
     v = (unsigned long)(h->Data());
 
   number_stats_Init(v);
-  
+
   NoReturn(res);
   return FALSE;
 }
@@ -1958,12 +1958,12 @@ static BOOLEAN _NumberStatsPrint(leftv res, leftv h)
     WerrorS("`NumberStatsPrint([<string>])` expected");
     return TRUE;
   }
-  
+
   const char* msg = NULL;
 
   if( h != NULL )
     msg = (const char*)(h->Data());
-  
+
   number_stats_Print(msg);
 
   NoReturn(res);
@@ -2030,7 +2030,7 @@ extern "C" int SI_MOD_INIT(syzextra)(SModulFunctions* psModulFunctions)
 
   ADD("NumberStatsInit", FALSE, _NumberStatsInit);
   ADD("NumberStatsPrint", FALSE, _NumberStatsPrint);
-  
+
   //  ADD("", FALSE, );
 
 #undef ADD

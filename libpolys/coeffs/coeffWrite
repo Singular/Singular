@@ -5,7 +5,7 @@
     if (r==currRing)
     {
       StringSetS("//   minpoly        : ");
-      nfShowMipo();PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s); 
+      nfShowMipo();PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s);
     }
   }
 #ifdef HAVE_RINGS
@@ -57,7 +57,7 @@
       }
       else if (r==currRing)
       {
-        StringSetS(""); nWrite(r->minpoly); PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s); 
+        StringSetS(""); nWrite(r->minpoly); PrintS(StringEndS("\n")); // NOTE/TODO: use StringAppendS("\n"); omFree(s);
       }
       else
       {

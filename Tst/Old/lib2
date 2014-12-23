@@ -23,7 +23,7 @@ RETURNS: ideal, union_(k=1...) of i:j^k
     i=@i;
   }
   return (@i);
-}		
+}
 example
 {  "EXAMPLE:";
    " ring r=2,(x,y,z),dp;";            ring @r=2,(x,y,z),dp;

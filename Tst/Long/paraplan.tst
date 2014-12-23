@@ -89,7 +89,7 @@ poly f = y^8-x^3*(z+x)^5;  // 1 sing at origin, 1 further sing, no OMPs,
 adjointIdeal(f,1);
 adjointIdeal(f,2);
 def RP1 = paraPlaneCurve(f);  // time 0
-testParametrization(f,RP1);  
+testParametrization(f,RP1);
 setring RP1; PARA;
 kill RR;kill RP1;
 // -------------------------------------------------------
@@ -151,7 +151,7 @@ kill SS;kill RP1;
 // Example 14
 // -------------------------------------------------------
 ring SS = 0, (u,v,z), dp;
-poly f = 
+poly f =
 2*u^7+u^6*v+3*u^5*v^2+u^4*v^3+2*u^3*v^4+u^2*v^5+2*u*v^6+v^7
 -7780247/995328*u^6*z-78641/9216*u^5*v*z-10892131/995328*u^4*v^2*z
 -329821/31104*u^3*v^3*z-953807/331776*u^2*v^4*z-712429/248832*u*v^5*z
@@ -190,7 +190,7 @@ f = f+1022525576391791616258310v2z5+82293493608853837667471uz6;
 f = f+496839109904761426785889vz6+103766136235628614937587z7; // 15 nodes
 adjointIdeal(f,2);
 def RP1 = paraPlaneCurve(f);  // time 72
-testParametrization(f,RP1);  
+testParametrization(f,RP1);
 setring RP1; PARA;
 kill SS;kill RP1;
 

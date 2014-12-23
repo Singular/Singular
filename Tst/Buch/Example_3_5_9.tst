@@ -6,9 +6,9 @@ proc d(ideal I)
    int n=nvars(basering);
    int j,b,a;
    I=simplify(I,2);  //cancels zeros in the generators of I
-   if(size(I)==0) {return(n);}  //size counts the generators 
+   if(size(I)==0) {return(n);}  //size counts the generators
                                 //not equal to 0
-   for(j=1;j<=n;j++)    
+   for(j=1;j<=n;j++)
    {
      if(I[1]/var(j)!=0)
      {

@@ -10,7 +10,7 @@ proc check_ideal_std(int n, string ostring)
   }
   idealstr = idealstr + "x(" + string(n-1) + "),";
 
-  
+
   for (i=0; i < n-1; i++)
   {
     idealstr = idealstr + "x("+ string(i % n) + ")*x(" + string((i+1) % n) + ") + ";
@@ -32,7 +32,7 @@ proc check_ideal_std(int n, string ostring)
   std(j);
 }
 
-  
+
 proc check_module_std(int n, string ostring)
 {
   "check_module_std n=",n," ostring=",ostring;
@@ -48,7 +48,7 @@ proc check_module_std(int n, string ostring)
   }
   modulestr = modulestr + "x(" + string(n-1) + ")*gen(" +  string(n) + "), ";
 
-  
+
   for (i=0; i < n-1; i++)
   {
     modulestr = modulestr + "x("+ string(i % n) + ")*x(" + string((i+1) % n) +
@@ -89,7 +89,7 @@ list orderings = "lp", "dp", "Dp", "ls", "ds", "Ds";
 
 list l = "dp";
 
-  
+
 proc check_std(int n, list olist)
 {
   int i;

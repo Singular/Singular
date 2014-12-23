@@ -7,12 +7,12 @@ module J=[y,z],[z,y];
 ideal K=quotient(I,J);
 K;
 
-reduce(K*J,std(I));  
+reduce(K*J,std(I));
 
 qring S=std(K);
 module Null;
 module J=[xy,xyz-x2y2],[xy2,y2x];
-ideal Ann=quotient(Null,J); 
+ideal Ann=quotient(Null,J);
 Ann;
 
 tst_status(1);$

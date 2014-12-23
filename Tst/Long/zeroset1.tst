@@ -7,7 +7,7 @@
 // email : bayert@in.tum.de
 //
 // Last change 10.12.2000
-// 
+//
 // written in the frame of the diploma thesis (advisor: Prof. Gert-Martin Greuel)
 // "Computations of moduli spaces of semiquasihomogenous singularities and an
 //  implementation in Singular"
@@ -16,24 +16,24 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 LIB "tst.lib";
-LIB "zeroset.lib";         
+LIB "zeroset.lib";
 
 tst_init();
- 
+
 
 
 proc TestzerosetLIB(S)
 // plug in the elements from the zero-set in the generators of the ideal
 // result should be 0,0,...,0.
 {
-     
+
         setring S;
         map F;
 
         print(" #Points = " + string(vdim(std(id))) + "; #Solutions = " + string(size(theZeroset)));
-        print(" minpoly = " + string(minpoly)); 
+        print(" minpoly = " + string(minpoly));
         print(" ideal = " + string(id));
-        
+
 
         for(int i = 1; i <= size(theZeroset); i++) {
                 F = theZeroset[i];
@@ -55,7 +55,7 @@ theZeroset;
 kill R;
 kill S;
 //tst_status();
- 
+
 // example 2
 
 ring R = 0,(x,y,z), lp;
@@ -66,7 +66,7 @@ setring S;
 minpoly;
 id;
 theZeroset;
-       
+
 kill R;
 kill S;
 //tst_status();
@@ -101,7 +101,7 @@ theZeroset;
 kill R;
 kill S;
 //tst_status();
-         
+
 // example 5
 
 ring R = (0,a),(x,y,z), lp;
@@ -133,7 +133,7 @@ theZeroset;
 kill R;
 kill S;
 //tst_status();
-         
+
 // example 7
 
 ring R = (0,a),(x(1..5)), lp;

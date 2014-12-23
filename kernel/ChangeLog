@@ -5,29 +5,29 @@ Fri Jan 19 17:56:20 CET 2001 hannes:
 * highcorner for global case fixed
 * highcorner for qring fixed
 Tue Feb  1 09:33:35 MET 2000 hannes: summary of changes
-* lift changed: - uses interanlly a different algorithm 
+* lift changed: - uses interanlly a different algorithm
                   (for SB and NON-SB unified)
                 - can be used with an optional 3rd argument (a matrix name),
                   if given, the "matrix of units" will be stored in it
 * new command: division (extension of lift)
      division(M,SM) returns a list (T,U,R) with SM*U+R=M*T
-* new monomial ordering (internal change only): 
+* new monomial ordering (internal change only):
    use of inline function instead of a function pointer
    (possible point for difficulties: mcompSchrB(polys.cc), pSetSchreyerOrdM
    (polys.cc))
-* new Library: 
+* new Library:
    spectrum.lib: interface to Stefan Endrass' spectrum routines
    (Stefan Endrass/H.Schoenemann)
    (still incomplete, requires a "special" Singular)
-* new Library: 
+* new Library:
    CaMuReg.lib: PROCEDURES FOR COMPUTING CASTELNUOVO-MUMFORD REGULARITY
    Authors:I.Bermejo/Ph.Gimenez/G.-M.Greuel
    (not included in the documemtation, not included in the tests)
-* new command: hres 
+* new command: hres
     - computes a free resolution of an ideal using Hilbert-driven algorithm
 * new commands: convhull, simplex (M.Wenk)
   (not documented, not included in the documemtation, not included in the tests)
-  
+
 Fri Aug 13 13:20:01 MET DST 1999 hannes
 * made fe_fgets_stdin an function pointer instead of a macro
   ( febase.cc febase.h feread.cc misc.cc sing_mp.cc tesths.cc)
@@ -35,7 +35,7 @@ Fri Aug 13 13:20:01 MET DST 1999 hannes
 Thu Aug 12 12:57:49 MET DST 1999 hannes
 * integrated "spectrum" by Stefan Endrass, inactive by default
   (Makefile.in claptmpl.cc feResource.cc iparith.cc mod2.h.in
-  tok.h GMPrat.h GMPrat.cc kmatrix.h multicnt.h multicnt.cc 
+  tok.h GMPrat.h GMPrat.cc kmatrix.h multicnt.h multicnt.cc
   npolygon.h npolygon.cc semic.h semic.cc spectrum.h spectrum.cc
   splist.h splist.cc)
 

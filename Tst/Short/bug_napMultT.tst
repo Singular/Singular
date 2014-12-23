@@ -2,7 +2,7 @@ LIB "tst.lib";
 tst_init();
 
 // this was a bug in napMultT due to incorrect handling of
-// nacNeg 
+// nacNeg
 option(prot);
 LIB "hnoether.lib";
 ring r=(0,i),(a,b),dp;

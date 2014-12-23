@@ -1,7 +1,7 @@
 /*! \page kernel_numeric_page Numerical algorithms
 
  \brief This sub-package of \ref kernel_page contains some numerical algorithms
- 
+
  Main header(s) in `/kernel/numeric/`:
  - \ref kernel/numeric/mpr_base.h
  - \ref kernel/numeric/mpr_inout.h

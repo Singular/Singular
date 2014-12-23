@@ -19,11 +19,11 @@ DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
 
 AC_ARG_WITH(flint,
 [  --with-flint=<path>|yes|no  Use FLINT library. If argument is no, you do not have
-                            the library installed on your machine (set as 
-			    default). If argument is yes or <empty> that means 
-			    the library is reachable with the standard search 
-			    path (/usr or /usr/local). Otherwise you give the 
-			    <path> to the directory which contain the library. 
+                            the library installed on your machine (set as
+			    default). If argument is yes or <empty> that means
+			    the library is reachable with the standard search
+			    path (/usr or /usr/local). Otherwise you give the
+			    <path> to the directory which contain the library.
 	     ],
 	     [if test "$withval" = yes ; then
 			FLINT_HOME_PATH="${DEFAULT_CHECKING_PATH}"
@@ -45,8 +45,8 @@ fi
 
 AC_LANG_PUSH([C])
 
-for FLINT_HOME in ${FLINT_HOME_PATH} 
- do	
+for FLINT_HOME in ${FLINT_HOME_PATH}
+ do
 ## if test -r "$FLINT_HOME/include/flint/fmpz.h"; then
 
 	if test "x$FLINT_HOME" != "x/usr"; then
@@ -54,13 +54,13 @@ for FLINT_HOME in ${FLINT_HOME_PATH}
 		FLINT_LIBS="-L${FLINT_HOME}/lib"
 	else
 		FLINT_CFLAGS=""
-		FLINT_LIBS=""		
+		FLINT_LIBS=""
 	fi
-	
+
 	# we suppose that mpfr and mpir to be in the same place or available by default
 	FLINT_LIBS="$FLINT_LIBS -lflint -lmpfr"
-	
-	CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CFLAGS}" 
+
+	CFLAGS="${BACKUP_CFLAGS} ${FLINT_CFLAGS} ${GMP_CFLAGS}"
 	LIBS="${BACKUP_LIBS} ${FLINT_LIBS} ${GMP_LIBS}"
 
 	AC_TRY_LINK(
@@ -69,25 +69,25 @@ for FLINT_HOME in ${FLINT_HOME_PATH}
 	[
 	AC_TRY_RUN(
 	[#include <flint/flint.h>
-	int main () { if ((int) version[0] < 2) return -1; else return 0; }	
-	],[
-	flint_found="yes"	
-	break
-	],[	
-	flint_problem="$problem $FLINT_HOME"	
-	unset FLINT_CFLAGS
-	unset FLINT_LIBS	
+	int main () { if ((int) version[0] < 2) return -1; else return 0; }
 	],[
 	flint_found="yes"
-	flint_cross="yes"	
 	break
-	])	
+	],[
+	flint_problem="$problem $FLINT_HOME"
+	unset FLINT_CFLAGS
+	unset FLINT_LIBS
+	],[
+	flint_found="yes"
+	flint_cross="yes"
+	break
+	])
 	],
 	[
 	flint_found="no"
 	flint_checked="$checked $FLINT_HOME"
 	unset FLINT_CFLAGS
-	unset FLINT_LIBS	
+	unset FLINT_LIBS
 	])
 #else
 #	flint_found="no"
@@ -100,7 +100,7 @@ LIBS=${BACKUP_LIBS}
 #unset LD_LIBRARY_PATH
 
 
-if test "x$flint_found" = "xyes" ; then		
+if test "x$flint_found" = "xyes" ; then
 	AC_SUBST(FLINT_CFLAGS)
 	AC_SUBST(FLINT_LIBS)
 	AC_SUBST(FLINT_HOME)
@@ -120,8 +120,8 @@ elif test -n "$flint_problem"; then
 	ifelse([$3], , :, [$3])
 elif test   "x$flint_found" = "xno";  then
 	AC_MSG_RESULT(not found)
-	ifelse([$3], , :, [$3])	
-fi	
+	ifelse([$3], , :, [$3])
+fi
 
 AM_CONDITIONAL(SING_HAVE_FLINT, test "x$HAVE_FLINT" = "xyes")
 ])

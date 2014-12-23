@@ -16,7 +16,7 @@ With makeheader it is possible to generate a single header
 file out of several other header files.
 
 To include a header file into the generated header file
-(= <outfile>) use the two lines 
+(= <outfile>) use the two lines
 
 /*MAKEHEADER*/
 #include "<includefile>"
@@ -72,7 +72,7 @@ if test ! -r "$infile"; then
     echo "makeheader: Cannot open template file $infile for reading" 1>&2
     exit 1
 fi
-    
+
 # try to create $outfile if it does not exist
 if test -w "$outfile" || cp /dev/null "$outfile" > /dev/null 2> /dev/null; then
     :

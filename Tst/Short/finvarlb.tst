@@ -46,7 +46,7 @@ tst_status(1);
 $
 
 This is the file finvarlb.tst
-To run the tests and create the .res file 
+To run the tests and create the .res file
 go to the directory containing this file and type
-  
+
 Singular -teqr12345678 finvarlb.tst > finvarlb.res

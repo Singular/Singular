@@ -19,12 +19,12 @@
 /*
  * This program is based on the runemacs.c distributed with XEmacs 21.0
  *
- * Simple program to start gnu-win32 X11 programs (and native XEmacs) 
+ * Simple program to start gnu-win32 X11 programs (and native XEmacs)
  * with its console window hidden.
  *
  * This program is provided purely for convenience, since most users will
  * use XEmacs in windowing (GUI) mode, and will not want to have an extra
- * console window lying around. Ditto for desktop shortcuts to gnu-win32 
+ * console window lying around. Ditto for desktop shortcuts to gnu-win32
  * X11 executables.
  */
 
@@ -169,7 +169,7 @@ void xemacs_special(char* exec)
       if ( ((p2 = strrchr(p, '\\')) && stricmp(p2, "\\bin") == 0) ||
            ((p2 = strrchr(p, '/')) && stricmp(p2, "/bin") == 0) )
       {
-         *p2 = '\0';   
+         *p2 = '\0';
 #if defined(__CYGWIN__)
          CYGWIN_CONV_TO_POSIX_PATH((exec2,tmp));
          strcpy(exec2,tmp);
@@ -201,7 +201,7 @@ int build_cmdline(char* new_cmdline, char* exec, int argc, char* argv[])
       char_cnt += strlen(argv[i]);
    if (char_cnt > MAX_ARGS*MAX_PATH) /* then we ran out of room */
       error("command line too long -\n%s",new_cmdline);
-   
+
    strcpy(new_cmdline,exec);
    for (i = first_arg; i < argc; i++)
    {
@@ -228,7 +228,7 @@ int build_cmdline(char* new_cmdline, char* exec, int argc, char* argv[])
  *  4) otherwise, search path (and _prepend_ "." to the path!!!)
  *  5) convert to cygwin-style path to resolve symlinks within the pathspec
  *  6) check filename: if it's a symlink, resolve it by peeking inside
- *  7) convert to win32-style path+filename since we're using Windows 
+ *  7) convert to win32-style path+filename since we're using Windows
  *       createProcess() to launch
  */
 void process_execname(char *exec, const char* execname,const char* execpath )
@@ -241,15 +241,15 @@ void process_execname(char *exec, const char* execname,const char* execpath )
    int i,j;
 
    int len = 0;
-   /* 
-    * STARTS WITH / or \ 
+   /*
+    * STARTS WITH / or \
     * execpath NOT used
     */
    if ((execname[0] == '\\') || (execname[0] == '/'))
    {
 #if defined(__CYGWIN__)
       strcpy(exec_tmp,execname);
-#else    
+#else
       exec_tmp[0] = ((char) (_getdrive() + ((int) 'A') - 1));
       exec_tmp[1] = ':';
       exec_tmp[2] = '\0';
@@ -267,7 +267,7 @@ void process_execname(char *exec, const char* execname,const char* execpath )
       }
       Trace((exec_tmp2));
    }
-   /* 
+   /*
     * STARTS WITH x:\ or x:/
     * execpath NOT used
     */
@@ -275,7 +275,7 @@ void process_execname(char *exec, const char* execname,const char* execpath )
        (execname[1] == ':') &&
        ((execname[2] == '\\') || (execname[2] == '/')))
    {
-      strcpy(exec_tmp,execname);       
+      strcpy(exec_tmp,execname);
       Trace(("x: -\nexec_tmp\t%s\nexecname\t%s\nexecpath\t%s\n",
              exec_tmp,execname,execpath));
       if (! fileExistsMulti(exec_tmp2,NULL,exec_tmp,exts,NUM_EXTENSIONS) )
@@ -288,7 +288,7 @@ void process_execname(char *exec, const char* execname,const char* execpath )
       }
       Trace((exec_tmp2));
    }
-   /* 
+   /*
     * STARTS WITH ./ or .\
     */
    else if ((execname[0] == '.') &&
@@ -320,7 +320,7 @@ void process_execname(char *exec, const char* execname,const char* execpath )
    {
       orig_pathlist = getenv("PATH");
       if ((pathlist = malloc (strlen(orig_pathlist)
-                              + strlen(".") 
+                              + strlen(".")
                               + strlen(execpath)+ 3)) == NULL)
          error("internal error - out of memory");
       strcpy(pathlist,".");
@@ -368,7 +368,7 @@ void process_execname(char *exec, const char* execname,const char* execpath )
 
       CYGWIN_CONV_TO_POSIX_PATH((exec_tmp,sym_link_name));
       Trace((sym_link_name));
-      
+
       if (lstat(sym_link_name, &stbuf) == 0)
       {
          if ((stbuf.st_mode & S_IFLNK) == S_IFLNK)
@@ -377,7 +377,7 @@ void process_execname(char *exec, const char* execname,const char* execpath )
                error("problem reading symbolic link for %s",exec_tmp);
             else
             {
-                // if realname starts with '/' it's a rootpath 
+                // if realname starts with '/' it's a rootpath
                 if (real_name[0] == '/')
                     strcpy(exec_tmp2,real_name);
                 else // otherwise, it's relative to the symlink's location
@@ -396,9 +396,9 @@ void process_execname(char *exec, const char* execname,const char* execpath )
          error("can't locate executable - %s",sym_link_name);
    }
    CYGWIN_CONV_TO_FULL_WIN32_PATH((exec_tmp2,exec));
-#else					
+#else
    strcpy (exec, exec_tmp2);
-#endif  
+#endif
 }
 int endsWith(const char* s1, const char* s2)
 {
@@ -509,14 +509,14 @@ int get_exec_name_and_path(char* execname, char* execpath)
  * CYGWIN ONLY:
  *   additionally, backslash escapes next character, even if that
  *   next character is a delimiter. Or a double quote.
- *   WARNING: this means that backslash may NOT be a delimiter 
+ *   WARNING: this means that backslash may NOT be a delimiter
  */
 char* my_strtok(char* s, const char* delim, char** lasts)
 {
    char *spanp;
    int c, sc;
    char *tok;
-   
+
    if ((s == NULL) && ((s = *lasts) == NULL))
       return NULL;
    /* Skip leading delimiters */
@@ -561,7 +561,7 @@ cont:
          }
          c = *s++; /* otherwise, skip the escaped character */
       }
-#endif   
+#endif
       spanp = (char *)delim;
       do {
          if ((sc = *spanp++) == c) {
@@ -627,7 +627,7 @@ char *pfopen(char *retval, const char *name, const char *dirs)
     char returnval[MAX_PATH + FILENAME_MAX + 100];
     char *recursive_name;
     int foundit = FALSE;
-    
+
     returnval[0] = '\0';
 
     if (dirs == NULL || dirs[0] == '\0')
@@ -651,7 +651,7 @@ char *pfopen(char *retval, const char *name, const char *dirs)
         strcpy(retval,returnval);
     return retval;
 }
-int fileExistsMulti(char* fullname, const char* path, 
+int fileExistsMulti(char* fullname, const char* path,
                     const char* name_noext, const char* exts[],
                     const int extcnt)
 {
@@ -688,10 +688,10 @@ int fileExists(char* fullname, const char* path, const char* name)
    }
    else
       work[0]='\0';
-   
+
    strcat(work, name);
 #if defined(__CYGWIN__)
-   CYGWIN_CONV_TO_POSIX_PATH((work, work2)); 
+   CYGWIN_CONV_TO_POSIX_PATH((work, work2));
 #else
    strcpy(work2,work);
 #endif

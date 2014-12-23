@@ -24,7 +24,7 @@ poly C1=x^3+x;
 poly C2=y^3+y;
 poly C3=z^3+z;
 ideal I=Cq,C1,C2,C3;
-option(); I=std(I); 
+option(); I=std(I);
 option(); module a=syz(I);
 print(a); print( size(module(transpose(a)*transpose(I)) ) );
 kill a;

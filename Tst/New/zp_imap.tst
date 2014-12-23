@@ -3,7 +3,7 @@ LIB "tst.lib"; tst_init();
 ring R = (0),(x,y,z),(ds(3),C);
 poly p = -7/5;
 
-ring @R = (1000000007),(x,y,z),(ds(3),C); 
+ring @R = (1000000007),(x,y,z),(ds(3),C);
 
 (-7/5) == 200000000;
 

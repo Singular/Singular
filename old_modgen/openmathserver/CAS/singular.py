@@ -17,7 +17,7 @@ def encodePolyWithRing(p):
   pe=encodePoly(p)
   r=encodeRing(p.ring())
   return OMApply(DMPsym,[r,pe])
-  
+
 def encodeGB(gb):
   i=encodeIdeal(gb)
   o=encodeOrdering(gb.ring())
@@ -47,7 +47,7 @@ def encodeIdeal(i):
 def encodeRing(r):
     nv=singular.nvars(r)
     f=encodeField(r)
-    return OMApply(poly_ring_dsym,[f,OMint(nv)])   
+    return OMApply(poly_ring_dsym,[f,OMint(nv)])
 
 def ringFromOM(ring_desc, ordering="dp"):
   assert isinstance(ring_desc, OMApply)
@@ -68,7 +68,7 @@ def termFromOM(term_desc):
   assert isinstance(term_desc, OMApply)
   assert len(term_desc.args)==singular.nvars(ring())+1
   assert isinstance(term_desc.args[0], OMint)
-  
+
   coef=number(term_desc.args[0].getValue())
   exp=intvec()
   for e in term_desc.args[1:]:

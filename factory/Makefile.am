@@ -202,7 +202,7 @@ gftables/5329 gftables/54289 gftables/57121 gftables/58081 \
 gftables/59049 gftables/6241 gftables/625 gftables/63001 \
 gftables/64 gftables/6561 gftables/6859 gftables/6889 gftables/729 \
 gftables/7921 gftables/8 gftables/81 gftables/8192 gftables/841 \
-gftables/9 gftables/9409 gftables/961 
+gftables/9 gftables/9409 gftables/961
 
 
 ####################################################
@@ -212,7 +212,7 @@ gftables/9 gftables/9409 gftables/961
 # generating gftable but the tables are not necessarily needed to
 # compile and use libfactory (though it will be a lot slower).
 
-EXTRA_PROGRAMS = gengftables 
+EXTRA_PROGRAMS = gengftables
 gengftables_SOURCES = gengftables-conway.cc
 gengftables_LDADD = libfactory.la $(FLINT_LIBS) $(GMP_LIBS) $(NTL_LIBS)
 
@@ -256,7 +256,7 @@ DISTCLEANFILES =  config.h readcf.cc
 
 cplusplus_SOURCES = cplusplus.cc
 
-cplusplus.h: cplusplus$(EXEEXT) 
+cplusplus.h: cplusplus$(EXEEXT)
 	./cplusplus$(EXEEXT)  >$@
 	cp $@ include/factory/
 
@@ -284,7 +284,7 @@ test_SOURCES = test.cc
 test_LDADD   = libfactory.la $(libfactory_la_LIBADD)
 
 ####################################################
-## PKG config 
+## PKG config
 ##
 
 pkgconfigdir = $(libdir)/pkgconfig
