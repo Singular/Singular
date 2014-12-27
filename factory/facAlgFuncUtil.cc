@@ -121,66 +121,52 @@ subst (const CanonicalForm& f, const CFList& a, const CFList& b,
        const CanonicalForm& Rstar, bool isFunctionField)
 {
   if (isFunctionField)
-    ASSERT (2*a.length() == b.length(), "wrong length of lists");
+    ASSERT ((a.length() - 1)*4 == b.length() || (a.length() == 1 && b.length() == 2), "wrong length of lists");
   else
-    ASSERT (a.length() == b.length(), "lists of equal length expected");
+    ASSERT ((a.length() - 1)*2 == b.length() || (a.length() == 1 && b.length() == 1), "lists of equal length expected");
   CFListIterator j= b;
-  CanonicalForm result= f, tmp, powj;
+  CanonicalForm result= f, tmp, powj, tmp3;
   CFListIterator i= a;
-  int length= a.length();
-  int count= 0;
-  for (; i.hasItem() && j.hasItem(); i++, j++, count++)
+  CanonicalForm tmp1= i.getItem();
+  i++;
+  CanonicalForm tmp2= j.getItem();
+  j++;
+  for (;i.hasItem() && j.hasItem(); i++, j++)
   {
-    if (length - count == 2)
+    if (!isFunctionField)
     {
-      if (!isFunctionField)
-      {
-        result= result (b.getLast(), a.getLast().mvar());
-        result= result (j.getItem(), i.getItem().mvar());
-        break;
-      }
-      else
-      {
-        tmp= b.getLast();
-        j++;
-        j++;
-        powj= power (tmp, degree (result, a.getLast().mvar()));
-        result= evaluate (result, j.getItem(), tmp, powj, a.getLast().mvar());
-
-        if (fdivides (powj, result, tmp))
-          result= tmp;
-
-        result /= vcontent (result, Variable (a.getLast().level() + 1));
-        j--;
-        j--;
-        tmp= j.getItem();
-        j++;
-        powj= power (j.getItem(), degree (result, i.getItem().mvar()));
-        result= evaluate (result, tmp, j.getItem(), powj, i.getItem().mvar());
-
-        if (fdivides (powj, result, tmp))
-          result= tmp;
-
-        result /= vcontent (result, Variable (i.getItem().level() + 1));
-        break;
-      }
+      result= result (j.getItem(), i.getItem().mvar());
+      result= result (tmp2, tmp1.mvar());
+      tmp1= i.getItem();
+      j++;
+      if (j.hasItem())
+        tmp2= j.getItem();
     }
     else
     {
-      if (!isFunctionField)
-        result= result (j.getItem(), i.getItem().mvar());
-      else
-      {
         tmp= j.getItem();
         j++;
+        tmp3= j.getItem();
+        j++;
         powj= power (j.getItem(), degree (result, i.getItem().mvar()));
-        result= evaluate (result, tmp, j.getItem(), powj, i.getItem().mvar());
+        result= evaluate (result, tmp3, j.getItem(), powj, i.getItem().mvar());
+
+        if (fdivides (powj, result, tmp3))
+          result= tmp3;
+
+        result /= vcontent (result, Variable (i.getItem().level() + 1));
+
+        powj= power (tmp, degree (result, tmp1.mvar()));
+        result= evaluate (result, tmp2, tmp, powj, tmp1.mvar());
 
         if (fdivides (powj, result, tmp))
           result= tmp;
 
-        result /= vcontent (result, Variable (i.getItem().level() + 1));
-      }
+        result /= vcontent (result, Variable (tmp1.level() + 1));
+        tmp1= i.getItem();
+        j++;
+        if (j.hasItem())
+          tmp2= j.getItem();
     }
   }
   result= Prem (result, CFList (Rstar));
