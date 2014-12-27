@@ -314,7 +314,7 @@ static BOOLEAN DetailedPrint(leftv __res, leftv h)
 
     const ring save = currRing;
     const ring r = syzstr->syRing;
-    const ring rr = (r != NULL) ? r: save;
+//    const ring rr = (r != NULL) ? r: save;
 
 
     const int iLength = syzstr->length;
