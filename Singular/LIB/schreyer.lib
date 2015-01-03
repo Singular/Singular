@@ -3047,7 +3047,7 @@ b*d+47*c*d-27*a*e+37*b*e+21*c*e+31*d*e-31*a*f+23*b*f+47*c*f+42*d*f+11*e*f, a*d+7
 // draw helpers
 static proc repeat(int n, string c) { string r = ""; while( n > 0 ){ r = r + c; n--; } return(r); }
 static proc pad(int m, string s, string c){ string r = s; while( size(r) < m ){ r = c + r; } return(r); }
-
+static proc mstring( int m, string c){ if( m < 0 ) { return (c); }; return (string(m)); }
 // view helper
 static proc draw ( intmat D, int d )
 {
@@ -3069,15 +3069,11 @@ static proc draw ( intmat D, int d )
   // head/foot dash lines:
   string dash  = repeat( (max + 1) * (nc - 2*d) , "-");
   string dash2 = repeat( (max + 1) * (nc - 2*d) , "=");
-  string v;
   for ( r = d+1; r <= (nr-d); r++ )
   {
     middle = middle + pad(max, string(D[r,1]), " ") + " :"; 
-    for ( c = d+1; c < (nc-d); c++ )
-    { if(D[r,c] < 0){ v = "."; } else { v = string(D[r,c]); };
-      middle = middle + pad(max, v, " ") + " "; 
-    }
-    middle = middle + pad(max, string(D[r,nc-d]), " ") + " |" + pad(max, string(D[r,nc]), " ") + newline;
+    for ( c = d+1; c < (nc-d); c++ ) { middle = middle + pad(max, mstring(D[r,c], "."), " ") + " "; }
+    middle = middle + pad(max, mstring(D[r,nc-d], "."), " ") + " |" + pad(max, string(D[r,nc]), " ") + newline;
   }
   string corner = repeat(max, " ");
   // print everything all at once:
