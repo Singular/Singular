@@ -599,18 +599,13 @@ static proc SSinit(def M)
     attrib(M);
   }
 
-  int @IS_A_SB = attrib(M, "isSB"); // ??? only if all weights were zero?!
-
-  if( !@IS_A_SB )
-  {
-    def opts = option(get);
-    option(redSB); option(redTail);
-    M = std(M);
-    option(set, opts);
-    kill opts;
-  }
-
-  M = simplify(M, 1 + 2 + 4 + 32);
+  def opts = option(get); 
+  option(redSB); option(redTail);
+    M = simplify(interred(groebner(M)), 1 + 2 + 4 + 32); // NOTE: we require interreduced GB for input
+  option(set, opts); kill opts;
+  
+//  int @IS_A_SB = attrib(M, "isSB");  if( !@IS_A_SB )  {  } else  {  }
+// attrib(M, "isSB", 1);
 
   if( @IGNORETAILS )
   {
