@@ -3723,7 +3723,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         if (primFail)
           ; //ERROR
         else
-          imPrimElem= mapPrimElem (primElem, vBuf, v);
+          imPrimElem= mapPrimElem (primElem, alpha, v);
 
         CFList source, dest;
         CanonicalForm bufA= mapUp (A, alpha, v, primElem, imPrimElem,
