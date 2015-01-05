@@ -4123,36 +4123,32 @@ RETURN:  ideal, the annihilator of Ext^n(R/I,R) with given
 {
 
   if(n < 0)
-    {
-      ideal ann = ideal(1);
-      return(ann);
-    }
+  {
+    return(ideal(1));
+  }
   int l = size(re);
 
   if(n < l)
+  {
+    matrix f = transpose(re[n+1]);
+    if(n == 0)
     {
-      matrix f = transpose(re[n+1]);
-      if(n == 0)
-        {
-          matrix g = 0*gen(ncols(f));
-        }
-      else
-        {
-          matrix g = transpose(re[n]);
-        }
-      module k = syz(f);
-      ideal ann = quotient1(g,k);
-      return(ann);
+      matrix g = matrix(0,1,ncols(f));
     }
+    else
+    {
+      matrix g = transpose(re[n]);
+    }
+    module k = syz(f);
+    return(quotient1(g,k));
+  }
 
   if(n == l)
-    {
-      ideal ann = Ann(transpose(re[n]));
-      return(ann);
-    }
+  {
+    return(Ann(transpose(re[n])));
+  }
 
-  ideal ann = ideal(1);
-  return(ann);
+  return(ideal(1));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -7046,7 +7042,8 @@ EXAMPLE: example newDecompStep; shows an example
   int lp=islp();
 
   op@P = option(get);
-  execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),(C,lp);");
+  def gnir=changeordTo(basering,"lp");
+  setring gnir;
 
   op=option(get);
   option(redSB);
