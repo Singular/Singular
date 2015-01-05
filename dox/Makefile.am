@@ -38,4 +38,4 @@ clean-local:
 	rm -rf html
 endif
 
-EXTRA_DIST = Doxyfile.in1 Doxyfile.in
+EXTRA_DIST = Doxyfile.in logo.png DoxygenLayout.xml header.html footer.html stylesheet.css
