@@ -6826,7 +6826,7 @@ EXAMPLE: example zerodec; shows an example
   execute("ring P1=("+charstr(R)+"),T,dp;");
   matrix n=imap(R,n);
   time = timer;
-  poly charpol=det(n-T*freemodule(d));
+  poly charpol=det(n-var(1)*freemodule(d));
   dbprint(printlevel-voice+2,"// time for computing char poly: "+
          string(timer-time));
 //------------------- factorize characteristic polynomial -------------------
@@ -6858,7 +6858,7 @@ EXAMPLE: example zerodec; shows an example
     intvec ov=option(get);;
     option(redSB);
     list re1;
-    ideal new = T-imap(R,p),imap(R,J);
+    ideal new = var(1)-imap(R,p),imap(R,J);
     attrib(new, "isSB",1);    //we know that new is a standard basis
     for(j=1;j<=f;j++)
     {
@@ -7145,8 +7145,8 @@ EXAMPLE: example newDecompStep; shows an example
       result = newDecompStep(@j, indepOption, intersectOption, @wr);
       if (intersectOption == "intersect")
       {
-       list pr = result[1];
-       ideal intersection = result[2];
+        list pr = result[1];
+        ideal intersection = result[2];
       }
       else
       {
@@ -7345,7 +7345,8 @@ EXAMPLE: example newDecompStep; shows an example
   }
   else
   {
-    execute( "ring @Phelp=("+charstr(gnir)+"),("+varstr(gnir)+"),(C,dp);");
+    def @Phelp=changeordTo(gnir,"dp");
+    setring @Phelp;
   }
 
   if(homo==1)
