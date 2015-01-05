@@ -101,6 +101,15 @@ void   nlNormalize(number &x, const coeffs r);
 void   nlInpGcd(number &a, number b, const coeffs r);
 void   nlDelete(number *a, const coeffs r);
 
+
+/// create a rational i/j (implicitly) over Q
+/// NOTE: make sure to use correct Q in debug mode
+number   nlInit2 (int i, int j, const coeffs r);
+
+/// create a rational i/j (implicitly) over Q
+/// NOTE: make sure to use correct Q in debug mode
+number   nlInit2gmp (mpz_t i, mpz_t j, const coeffs r);
+
 // FIXME: TODO:  why only if HAVE_RINGS? bug?
 #  ifdef HAVE_RINGS
 void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(number n, number &i,const coeffs r)???

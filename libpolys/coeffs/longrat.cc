@@ -43,9 +43,6 @@ LINLINE void nlInpMult(number &a, number b, const coeffs r);
 number nlRInit (long i);
 
 
-number   nlInit2 (int i, int j, const coeffs r);
-number   nlInit2gmp (mpz_t i, mpz_t j, const coeffs r);
-
 // number nlInitMPZ(mpz_t m, const coeffs r);
 // void nlMPZ(mpz_t m, number &n, const coeffs r);
 
