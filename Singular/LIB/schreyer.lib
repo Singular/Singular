@@ -3289,7 +3289,7 @@ transpose graded module/map or a chain complex?...
       j--;
       i++;
     };
-    return (L);    
+    return (ordres(L));    
   }
 
  // use initial grading if given
