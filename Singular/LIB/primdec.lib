@@ -1896,16 +1896,23 @@ EXAMPLE: example prepareQuotientring; shows an example
   else
   {
     if (typeof(rl[1])=="list")
-    list rl1=rl[1];
-    list rl2=rl[2];
-    rl1[1]=list(rl1[1][1],
-            rl[1][2]+list(rl2[nnp+1..nvars(basering)]),
-	    list(list("lp",1:(size(rl[1][2])+nvars(basering)-nnp))),
-	    ideal(0));
-    rl[1]=rl1;
-    rl[2]=list(rl2[1..nnp]);
-    rl[3]=list(list(order,1:nnp),list("C",0));
+    {
+        list rl1=rl[1];
+        list rl2=rl[2];
+        rl1[1]=list(rl1[1][1],
+                rl[1][2]+list(rl2[nnp+1..nvars(basering)]),
+	        list(list("lp",1:(size(rl[1][2])+nvars(basering)-nnp))),
+	        ideal(0));
+        rl[1]=rl1;
+        rl[2]=list(rl2[1..nnp]);
+        rl[3]=list(list(order,1:nnp),list("C",0));
+    }    
+    else
+    {
+        ERROR("Unexpected case in prepareQuotientring. Please inform the authors");
+    }
   }
+  
   def quotring=ring(rl);
   return(quotring);
 }
