@@ -1,0 +1,9 @@
+#!/bin/sh
+cp -r ../m4 m4
+sed -e 's:AC_CONFIG_AUX_DIR.*:AC_CONFIG_AUX_DIR([.]):' <configure.ac >c.ac
+sed -e 's:AC_CONFIG_MACRO_DIR.*:AC_CONFIG_MACRO_DIR([m4]):' <c.ac >configure.ac
+sed -e 's:ACLOCAL_AMFLAGS.*:ACLOCAL_AMFLAGS = -I m4:' <Makefile.am >m.am
+mv m.am Makefile.am
+autoreconf  -v -f -i
+make dist
+
