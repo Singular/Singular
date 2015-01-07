@@ -3429,8 +3429,8 @@ transpose graded module/map or a chain complex?...
  
  intvec d; module N;  
 
- if( size(#) > 0 ) { (N,d) = reorder(M, 1, #[1]); }
- else              { (N,d) = reorder(M, 1); }  // TODO: unnecessary!?
+ if( size(#) > 0 ) { (N,d) = reorder(M, -1, #[1]); }
+ else              { (N,d) = reorder(M, -1); }
 
  kill M; module M = transpose(N);
  attrib( M, "isHomog", -d ); // set the grading
@@ -3439,7 +3439,9 @@ transpose graded module/map or a chain complex?...
  
  kill N,d; module N; intvec d;
  // reverse order:
- (N,d) = reorder(M, -1); kill M;
+ (N,d) = reorder(M, 1); kill M;
+
+/*
  module M = transpose(N); 
  attrib( M, "isHomog", -d ); // set the grading
 
@@ -3458,11 +3460,12 @@ transpose graded module/map or a chain complex?...
  (N,d) = reorder(M, 1);
  
  kill M;
+*/
 
 // "e"; view( N );
  
- ASSUME(2, issorted(attrib(N, "isHomog"), 1) );
- ASSUME(2, issorted(grdeg(N), 1) );
+ ASSUME(1, issorted(attrib(N, "isHomog"), 1) );
+ ASSUME(1, issorted(grdeg(N), 1) );
 
 
  return (N);
@@ -3522,14 +3525,14 @@ reorder graded module/map or a chain complex?...
   kill N,d; module N; intvec d;
   // reverse order:
   (N,d) = reorder(M, -1); kill M;
-  // int i = ncols(N); N = N[i..1]; d = d[i..1]; kill i;
+ 
   module M = transpose(N); 
   attrib( M, "isHomog", -d ); // set the grading
 
 // "c";  view(M);
 
-  ASSUME(2, issorted(-d, 1) );
-  ASSUME(2, issorted(grdeg(M), 1) );
+  ASSUME(1, issorted(attrib(M, "isHomog"), 1) );
+  ASSUME(1, issorted(grdeg(M), 1) );
   
   return (M);
 }
@@ -3569,7 +3572,7 @@ test/output reordering res(I) & gr-traspose of res
   kill L, R;
 }
 example
-{ "EXAMPLE:"; echo = 2; int assumeLevel = 2;
+{ "EXAMPLE:"; echo = 2; int assumeLevel = 5;
 
   string Name = "castelnuovo"; int @p=31991; ring R = (@p),(x,y,z,u,v), dp;ideal I = 5153xy2-98/23y3-101/51xyz+33/41y2z+99/79xz2+7136yz2-106/111z3+119/53xyu+34/57y2u-77/92xzu+84/73yzu-109/78z2u-27/56xu2+10023yu2+82/103zu2-34/25u3+3/2xyv-68/25y2v+12721xzv+4/63yzv-73/21z2v-7291xuv-91/53yuv-4/79zuv-34/91u2v-122/53xv2+123/70yv2-64/73zv2+44/65uv2+14/31v3,xy2-15202y3+10613xyz+13640y2z-107/103xz2+5292yz2+19/119z3-10042xyu+2770y2u+7957xzu+14008yzu+92/121z2u-92/51xu2+1178yu2+1/117zu2-12726u3+82/101xyv-92/17y2v-107/56xzv+14233yzv+79/28z2v+51/50xuv-31/5yuv+95/91zuv+19/108u2v+12151xv2-69/110yv2+37/89zv2-63/116uv2-88/23v3,-5153x2+37/23xy+8706y2-13160xz+68/115yz+5548z2-22/61xu-113/98yu+11818zu+2114u2-101/97xv+89/22yv-3355zv-113/5uv-5521v2;TestGRRes(Name, 2, I); kill R, Name, @p;  "";
   
