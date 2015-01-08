@@ -4026,9 +4026,9 @@ standard basis of K^m,
 @*- L is an (m x m) matrix in lower triangular form with all diagonal
 entries equal to 1, and
 @*- U is an (m x n) matrix in upper row echelon form.
-@*The fourth argument, b, is expected to be an (m x 1) matrix, i.e., a vector.
+@*The fourth argument, b, is expected to be an (m x 1) matrix.
 
-@code{list L=lusolve(P,L,U,b);} fills the list L with either one entry = 0
+@code{list Q=lusolve(P,L,U,b);} fills the list Q with either one entry = 0
 (signaling that A*x=b has no solution), or with the three entries 1, x, H,
 where x is any (n x 1) solution of the given linear system, and H is a
 matrix the columns of which span the solution space of the homogeneous
