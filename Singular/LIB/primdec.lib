@@ -2650,6 +2650,9 @@ proc algeDeco(ideal i, int w)
    ASSUME(0, not isQuotientRing(basering) ) ;
    ASSUME(0, hasGlobalOrdering(basering) ) ;
 
+// the really needed things:
+   ASSUME(1, typeof(ringlist(basering)[1])=="list"); // in alg. extension
+
 //reduces primery decomposition over algebraic extensions to
 //the other cases
    def R=basering;
@@ -2693,11 +2696,13 @@ proc algeDeco(ideal i, int w)
       }
    }
 //---Ende Provisorium
-   string mp="poly @p="+string(minpoly)+";";
-   string gnir="ring RH="+string(char(R))+",("+varstr(R)+","+string(par(1))
-                +"),dp;";
-   execute(gnir);
-   execute(mp);
+   list R_l=ringlist(R);
+   ideal @p=R_l[1][4]; // minpoly
+   R_l[2]=R_l[2]+R_l[1][2]; // vars
+   R_l[1]=R_l[1][1];  // char
+   R_l[3]=list(list("dp",1:size(R_l[2])),list("C",0)); // ord
+   def RH=ring(R_l); kill R_l;setring RH;
+   ideal @pp=imap(R,@p); poly @p=@pp[1];
    ideal i=imap(R,i);
    ideal I=subst(i,var(nvars(basering)),0);
    int j;
@@ -2709,9 +2714,11 @@ proc algeDeco(ideal i, int w)
    {
      setring R;
      kill RH;
-     kill gnir;
-     string gnir="ring RH="+string(char(R))+",("+varstr(R)+"),dp;";
-     execute(gnir);
+     // remove extension, set order to dp:
+     list R_l=ringlist(R);
+     R_l[1]=R_l[1][1]; // char
+     R_l[3]=list(list("dp",1:nvars(R)),list("C",0)); // ord
+     def RH=ring(R_l); kill R_l; setring RH;
      ideal i=imap(R,i);
      ideal J;
    }
@@ -2737,9 +2744,11 @@ proc algeDeco(ideal i, int w)
 
    if(n<nvars(basering))
    {
-      gnir="ring RS="+string(char(R))+",("+varstr(RH)
-                +"),(dp("+string(n)+"),lp);";
-      execute(gnir);
+      // remove extension, set order to dp(n),lp:
+      list R_l=ringlist(basering);
+      if (typeof(R_l[1])=="list") { R_l[1]=R_l[1][1]; }
+      R_l[3]=list(list("dp",1:n),list("lp",1:(nvars(basering)-n)),list("C",0));
+      def RS=ring(R_l); kill R_l; setring RS;
       list pr=imap(RH,pr);
       ideal K;
       for(j=1;j<=size(pr);j++)
