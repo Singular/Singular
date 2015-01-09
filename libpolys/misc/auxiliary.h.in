@@ -127,6 +127,8 @@ typedef long int64;
 
 
 
+#ifndef _WIN32
+/* 32bit and 64bit windows witnh gcc defines their own BOOLEAN */
 #if (SIZEOF_LONG == 8)
 typedef int BOOLEAN;
 /* testet on x86_64, gcc 3.4.6: 2 % */
@@ -134,6 +136,7 @@ typedef int BOOLEAN;
 #else
 /* testet on athlon, gcc 2.95.4: 1 % */
 typedef short BOOLEAN;
+#endif
 #endif
 
 #ifndef FALSE
