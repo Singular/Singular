@@ -1,6 +1,6 @@
 //// Singular library normaliz.lib
 
-version="version normaliz.lib 4.1.0.0 Jan_2015 "; // $Id$
+version="version normaliz.lib 4.0.1.0 Jan_2015 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: normaliz.lib  Provides an interface for the use of Normaliz 2.8 or
@@ -1057,22 +1057,13 @@ example
   ideal I=x3,x2y,y3;
   list l=intclMonIdeal(I);
   exportNuminvs();
-  // now the following variables are set:
+  // for example, now the following variables are set:
   nmz_hilbert_basis_elements;
   nmz_number_extreme_rays;
   nmz_rank;
   nmz_index;
   nmz_number_support_hyperplanes;
-  nmz_size_triangulation;
-  nmz_sum_dets;
-  nmz_graded;
-  nmz_degree_1_elements;
-  nmz_grading;
-  nmz_grading_denom;
   nmz_multiplicity;
-  nmz_multiplicity_denom;
-  nmz_hilbert_series_num;
-  nmz_hilbert_series_denom;
   nmz_primary;
 }
 
