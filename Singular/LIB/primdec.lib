@@ -3934,12 +3934,6 @@ EXAMPLE: example zeroRad; shows an example"
    execute(cR);
    ideal F=imap(R,F);
 
-   //string nR1="ring @S1="+string(p)+",("+varstr(R)+","+parstr(R)+",@y(1..m)),dp;";
-   //execute(nR1);
-   //list lR=ringlist(@S1)[2];
-   //lR=lR[(size(lR)-m+1)..(size(lR))];
-   //"TEST:",string(lR),"<<<",m;
-
    string nR="ring @S="+string(p)+",(@y(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
    execute(nR);
 
