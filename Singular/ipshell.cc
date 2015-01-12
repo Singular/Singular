@@ -1218,7 +1218,13 @@ BOOLEAN iiBranchTo(leftv r, leftv args)
     BOOLEAN err;
     //Print("branchTo: %s\n",h->Name());
     iiCurrProc=(idhdl)h->data;
-    err=iiAllStart(IDPROC(iiCurrProc),IDPROC(iiCurrProc)->data.s.body,BT_proc,IDPROC(iiCurrProc)->data.s.body_lineno-(iiCurrArgs==NULL));
+    procinfo * pi=IDPROC(iiCurrProc);
+    if( pi->data.s.body==NULL )
+    {
+      iiGetLibProcBuffer(pi);
+      if (pi->data.s.body==NULL) return TRUE;
+    }
+    err=iiAllStart(pi,pi->data.s.body,BT_proc,pi->data.s.body_lineno-(iiCurrArgs==NULL));
     exitBuffer(BT_proc);
     if (iiCurrArgs!=NULL)
     {
