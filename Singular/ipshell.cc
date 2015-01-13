@@ -1224,6 +1224,13 @@ BOOLEAN iiBranchTo(leftv r, leftv args)
       iiGetLibProcBuffer(pi);
       if (pi->data.s.body==NULL) return TRUE;
     }
+    if ((pi->pack!=NULL)&&(currPack!=pi->pack))
+    {
+      currPack=pi->pack;
+      iiCheckPack(currPack);
+      currPackHdl=packFindHdl(currPack);
+      //Print("set pack=%s\n",IDID(currPackHdl));
+    }
     err=iiAllStart(pi,pi->data.s.body,BT_proc,pi->data.s.body_lineno-(iiCurrArgs==NULL));
     exitBuffer(BT_proc);
     if (iiCurrArgs!=NULL)
@@ -5323,7 +5330,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
            depending on the size of a long on the respective platform */
         //ringtype = 1;       // Use Z/2^ch
         cf=nInitChar(n_Z2m,(void*)(long)modExponent);
-	mpz_clear(modBase);
+        mpz_clear(modBase);
         omFreeSize (modBase, sizeof (mpz_t));
       }
       else
