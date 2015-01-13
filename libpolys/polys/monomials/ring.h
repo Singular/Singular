@@ -747,16 +747,16 @@ inline BOOLEAN rHasLocalOrMixedOrdering(const ring r){ return (r->OrdSgn==-1); }
 #define rHasGlobalOrdering_currRing() rHasGlobalOrdering(currRing)
 #define rHasLocalOrMixedOrdering_currRing() rHasLocalOrMixedOrdering(currRing)
 
-BOOLEAN rOrd_is_Totaldegree_Ordering(ring r );
+BOOLEAN rOrd_is_Totaldegree_Ordering(const ring r);
 
 /// return TRUE if p_SetComp requires p_Setm
-BOOLEAN rOrd_SetCompRequiresSetm(ring r);
+BOOLEAN rOrd_SetCompRequiresSetm(const ring r);
 rOrderType_t    rGetOrderType(ring r);
 
 /// returns TRUE if var(i) belongs to p-block
-BOOLEAN rIsPolyVar(int i, ring r);
+BOOLEAN rIsPolyVar(int i, const ring r);
 
-static inline BOOLEAN rOrd_is_Comp_dp(ring r)
+static inline BOOLEAN rOrd_is_Comp_dp(const ring r)
 {
   assume(r != NULL);
   assume(r->cf != NULL);
