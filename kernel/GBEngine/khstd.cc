@@ -149,13 +149,12 @@ If Yes, we know that all polys that we need are already in the standard basis
 so delete all the remaining pairs
 */
 {
-int i;
-ideal Lm;
-intvec *newhilb;
+  ideal Lm;
+  intvec *newhilb;
 
-Lm = id_Head(strat->Shdl,currRing);
+  Lm = id_Head(strat->Shdl,currRing);
 
-newhilb =hHstdSeries(Lm,w,strat->kHomW,Q,currRing); // ,strat->tailRing?
+  newhilb =hHstdSeries(Lm,w,strat->kHomW,Q,currRing); // ,strat->tailRing?
 
 #if ADIDEBUG
 PrintS("\nOriginal\n");
@@ -187,22 +186,20 @@ int   i, j, l, k;
   }
 #endif
 
-if(newhilb->compare(hilb) == 0)
-	{
-		while (strat->Ll>=0)
-          {
-            count++;
-            if(TEST_OPT_PROT)
-            {
-              PrintS("h");
-              mflush();
-            }
-            deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
-          }
-          delete newhilb;
-          return;
-   }
-
-id_Delete(&Lm,currRing);
-
+  if(newhilb->compare(hilb) == 0)
+  {
+    while (strat->Ll>=0)
+    {
+      count++;
+      if(TEST_OPT_PROT)
+      {
+        PrintS("h");
+        mflush();
+      }
+      deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+    }
+    delete newhilb;
+    return;
+  }
+  id_Delete(&Lm,currRing);
 }
