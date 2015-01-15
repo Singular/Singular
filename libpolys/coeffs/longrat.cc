@@ -80,8 +80,6 @@ number   nlFarey(number nN, number nP, const coeffs CF);
 BOOLEAN  nlDBTest(number a, const char *f, const int l);
 #endif
 
-extern number nlOne; // FIXME? TODO? //  move into coeffs?
-
 nMapFunc nlSetMap(const coeffs src, const coeffs dst);
 
 // in-place operations
@@ -96,8 +94,8 @@ BOOLEAN nlDBTest(number a, char *f,int l, const coeffs r);
 
 
 // 64 bit version:
-//#if SIZEOF_LONG == 8
-#if 0
+#if SIZEOF_LONG == 8
+//#if 0
 #define MAX_NUM_SIZE 60
 #define POW_2_28 (1L<<60)
 #define POW_2_28_32 (1L<<28)
@@ -176,8 +174,6 @@ number nlShort3_noinline(number x) // assume x->s==3
   return nlShort3(x);
 }
 
-
-number nlOne=INT_TO_SR(1);
 
 #if (__GNU_MP_VERSION*10+__GNU_MP_VERSION_MINOR < 31)
 void mpz_mul_si (mpz_ptr r, mpz_srcptr s, long int si)
@@ -330,12 +326,11 @@ BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs /*r*/)
   //  return FALSE;
   //}
   if (mpz_size1(a->z)>MP_SMALL) return TRUE;
-  LONG ui=(int)mpz_get_si(a->z);
+  LONG ui=(LONG)mpz_get_si(a->z);
   if ((((ui<<3)>>3)==ui)
   && (mpz_cmp_si(a->z,(long)ui)==0))
   {
     Print("!!longrat:im int %d in %s:%d\n",ui,f,l);
-    f=NULL;
     return FALSE;
   }
   return TRUE;
@@ -391,13 +386,7 @@ static number nlConvFactoryNSingN( const CanonicalForm f, const coeffs r)
 {
   if (f.isImm())
   {
-    const long lz=f.intval();
-    const int iz=(int)lz;
-    if ((long)iz==lz)
-      return nlInit(f.intval(),r);
-    else
-      return nlRInit(lz);
-//    return nlInit(f.intval(),r);
+    return nlInit(f.intval(),r);
   }
   else
   {
@@ -2366,9 +2355,14 @@ LINLINE BOOLEAN nlEqual (number a, number b, const coeffs r)
 LINLINE number nlInit (long i, const coeffs r)
 {
   number n;
+  #if MAX_NUM_SIZE == 60
+  if (((i << 3) >> 3) == i) n=INT_TO_SR(i);
+  else                      n=nlRInit(i);
+  #else
   LONG ii=(LONG)i;
-  if ( ((ii << 3) >> 3) == ii ) n=INT_TO_SR(ii);
-  else                          n=nlRInit(ii);
+  if ( (((long)ii==i) && ((ii << 3) >> 3) == ii )) n=INT_TO_SR(ii);
+  else                                             n=nlRInit(i);
+  #endif
   nlTest(n, r);
   return n;
 }
