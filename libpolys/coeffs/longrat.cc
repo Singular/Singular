@@ -53,7 +53,7 @@ number nlExtGcd(number a, number b, number *s, number *t, const coeffs);
 number   nlNormalizeHelper(number a, number b, const coeffs r);   /*special routine !*/
 BOOLEAN  nlGreater(number a, number b, const coeffs r);
 BOOLEAN  nlIsMOne(number a, const coeffs r);
-int      nlInt(number &n, const coeffs r);
+long     nlInt(number &n, const coeffs r);
 number   nlBigInt(number &n);
 
 #ifdef HAVE_RINGS
@@ -94,8 +94,8 @@ BOOLEAN nlDBTest(number a, char *f,int l, const coeffs r);
 
 
 // 64 bit version:
-#if SIZEOF_LONG == 8
-//#if 0
+//#if SIZEOF_LONG == 8
+#if 0
 #define MAX_NUM_SIZE 60
 #define POW_2_28 (1L<<60)
 #define POW_2_28_32 (1L<<28)
@@ -192,7 +192,7 @@ static number nlMapP(number from, const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(src) == n_Zp );
 
-  number to = nlInit(npInt(from,src), dst); // FIXME? TODO? // extern int     npInt         (number &n, const coeffs r);
+  number to = nlInit(npInt(from,src), dst); // FIXME? TODO? // extern long     npInt         (number &n, const coeffs r);
 
   return to;
 }
@@ -608,34 +608,30 @@ int nlSize(number a, const coeffs)
 /*2
 * convert number to int
 */
-int nlInt(number &i, const coeffs r)
+long nlInt(number &i, const coeffs r)
 {
   nlTest(i, r);
   nlNormalize(i,r);
   if (SR_HDL(i) & SR_INT)
   {
-    int dummy = SR_TO_INT(i);
-    if((long)dummy == SR_TO_INT(i))
-        return SR_TO_INT(i);
-    else
-        return 0;
+    return SR_TO_INT(i);
   }
   if (i->s==3)
   {
     if(mpz_size1(i->z)>MP_SMALL) return 0;
-    int ul=(int)mpz_get_si(i->z);
-    if (mpz_cmp_si(i->z,(long)ul)!=0) return 0;
+    long ul=mpz_get_si(i->z);
+    if (mpz_cmp_si(i->z,ul)!=0) return 0;
     return ul;
   }
   mpz_t tmp;
-  int ul;
+  long ul;
   mpz_init(tmp);
   MPZ_DIV(tmp,i->z,i->n);
   if(mpz_size1(tmp)>MP_SMALL) ul=0;
   else
   {
-    ul=(int)mpz_get_si(tmp);
-    if (mpz_cmp_si(tmp,(long)ul)!=0) ul=0;
+    ul=mpz_get_si(tmp);
+    if (mpz_cmp_si(tmp,ul)!=0) ul=0;
   }
   mpz_clear(tmp);
   return ul;
@@ -952,7 +948,7 @@ number  nlGetUnit (number n, const coeffs r)
 
 coeffs nlQuot1(number c, const coeffs r)
 {
-  int ch = r->cfInt(c, r);
+  long ch = r->cfInt(c, r);
   mpz_ptr dummy;
   dummy = (mpz_ptr) omAlloc(sizeof(mpz_t));
   mpz_init_set_ui(dummy, ch);

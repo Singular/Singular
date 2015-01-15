@@ -103,7 +103,7 @@ BOOLEAN  ntIsOne(number a, const coeffs cf);
 BOOLEAN  ntIsMOne(number a, const coeffs cf);
 BOOLEAN  ntIsZero(number a, const coeffs cf);
 number   ntInit(long i, const coeffs cf);
-int      ntInt(number &a, const coeffs cf);
+long     ntInt(number &a, const coeffs cf);
 number   ntNeg(number a, const coeffs cf);
 number   ntInvers(number a, const coeffs cf);
 number   ntAdd(number a, number b, const coeffs cf);
@@ -627,7 +627,7 @@ number ntInit(poly p, const coeffs cf)
   return (number)f;
 }
 
-int ntInt(number &a, const coeffs cf)
+long ntInt(number &a, const coeffs cf)
 {
   //check_N(a,cf);
   ntTest(a);

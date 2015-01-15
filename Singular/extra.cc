@@ -711,7 +711,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       if (rField_is_Ring(currRing))
       {
         WerrorS("field required");
-	return TRUE;
+        return TRUE;
       }
       matrix pMat  = (matrix)h->Data();
       matrix lMat  = (matrix)h->next->Data();
@@ -3710,6 +3710,29 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
   #endif
+/*==================== test64 =================*/
+  #if 0
+    if(strcmp(sys_cmd,"test64")==0)
+    {
+      long l=8;int i;
+      for(i=1;i<62;i++)
+      {
+        l=l<<1;
+        number n=n_Init(l,coeffs_BIGINT);
+        Print("%ld= ",l);n_Print(n,coeffs_BIGINT);
+        CanonicalForm nn=n_convSingNFactoryN(n,TRUE,coeffs_BIGINT);
+        n_Delete(&n,coeffs_BIGINT);
+        n=n_convFactoryNSingN(nn,coeffs_BIGINT);
+        PrintS(" F:");
+        n_Print(n,coeffs_BIGINT);
+        PrintLn();
+        n_Delete(&n,coeffs_BIGINT);
+      }
+      Print("SIZEOF_LONG=%d\n",SIZEOF_LONG);
+      return FALSE;
+    }
+    else
+   #endif
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

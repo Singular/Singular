@@ -31,7 +31,7 @@ number  nr2mCopy        (number a, const coeffs r);
 BOOLEAN nr2mGreaterZero (number k, const coeffs r);
 number  nr2mMult        (number a, number b, const coeffs r);
 number  nr2mInit        (long i, const coeffs r);
-int     nr2mInt         (number &n, const coeffs r);
+long    nr2mInt         (number &n, const coeffs r);
 number  nr2mAdd         (number a, number b, const coeffs r);
 number  nr2mSub         (number a, number b, const coeffs r);
 void    nr2mPower       (number a, int i, number * result, const coeffs r);
@@ -117,7 +117,7 @@ static char* nr2mCoeffString(const coeffs r)
 coeffs nr2mQuot1(number c, const coeffs r)
 {
     coeffs rr;
-    int ch = r->cfInt(c, r);
+    long ch = r->cfInt(c, r);
     mpz_t a,b;
     mpz_init_set(a, r->modNumber);
     mpz_init_set_ui(b, ch);
@@ -339,10 +339,8 @@ number nr2mInit(long i, const coeffs r)
 /*
  * convert a number to an int in ]-k/2 .. k/2],
  * where k = 2^m; i.e., an int in ]-2^(m-1) .. 2^(m-1)];
- * note that the code computes a long which will then
- * automatically casted to int
  */
-static long nr2mLong(number &n, const coeffs r)
+long nr2mInt(number &n, const coeffs r)
 {
   unsigned long nn = (unsigned long)(unsigned long)n & r->mod2mMask;
   unsigned long l = r->mod2mMask >> 1; l++; /* now: l = 2^(m-1) */
@@ -350,10 +348,6 @@ static long nr2mLong(number &n, const coeffs r)
     return (long)((unsigned long)nn - r->mod2mMask - 1);
   else
     return (long)((unsigned long)nn);
-}
-int nr2mInt(number &n, const coeffs r)
-{
-  return (int)nr2mLong(n,r);
 }
 
 number nr2mAdd(number a, number b, const coeffs r)
@@ -833,7 +827,7 @@ BOOLEAN nr2mDBTest (number a, const char *, const int, const coeffs r)
 
 void nr2mWrite (number &a, const coeffs r)
 {
-  long i = nr2mLong(a, r);
+  long i = nr2mInt(a, r);
   StringAppend("%ld", i);
 }
 

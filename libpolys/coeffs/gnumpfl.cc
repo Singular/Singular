@@ -40,7 +40,7 @@ BOOLEAN  ngfIsOne(number a, const coeffs r);
 BOOLEAN  ngfIsMOne(number a, const coeffs r);
 BOOLEAN  ngfIsZero(number za, const coeffs r);
 number   ngfInit(long i, const coeffs r);
-int      ngfInt(number &n, const coeffs r);
+long     ngfInt(number &n, const coeffs r);
 number   ngfNeg(number za, const coeffs r);
 number   ngfInvers(number a, const coeffs r);
 number   ngfAdd(number la, number li, const coeffs r);
@@ -81,20 +81,20 @@ number ngfInit (long i, const coeffs r)
 /*2
 * convert number to int
 */
-int ngfInt(number &i, const coeffs r)
+long ngfInt(number &i, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 
   double d=(double)*(gmp_float*)i;
   if (d<0.0)
-    return (int)(d-0.5);
+    return (long)(d-0.5);
   else
-    return (int)(d+0.5);
+    return (long)(d+0.5);
 }
 
 int ngfSize(number n, const coeffs r)
 {
-  int i = ngfInt(n, r);
+  long i = ngfInt(n, r);
   /* basically return the largest integer in n;
      only if this happens to be zero although n != 0,
      return 1;

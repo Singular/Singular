@@ -498,7 +498,7 @@ class CoeffsTestSuite : public CxxTest::TestSuite
      number q4 = n_Init(30, cf);
      number q5 = n_Mult(q3, q4, cf);
      TS_ASSERT(n_Test(q5, cf));
-     Print("21/2 * 30 = %d\n", n_Int(q5, cf));
+     Print("21/2 * 30 = %ld\n", n_Int(q5, cf));
      TS_ASSERT(n_Test(q5, cf));
      n_Delete(&q1, cf);
      n_Delete(&q2, cf);
