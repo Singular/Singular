@@ -1,14 +1,10 @@
 #ifndef AEP_H
 #define AEP_H
 
-
-#include <gmp.h>
-#include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
+#include "si_gmp.h"
 
 #ifdef SINGULAR_4_1
-
-
 
 class p_poly // Klasse von p_polynomen mit Typ (Grad, Koeffizienten ganzzahlig)
 {

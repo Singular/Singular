@@ -8,7 +8,7 @@ example A_L;
 example corank;
 example basicinvariants;
 example init_debug;
-example debug_log; 
+example debug_log;
 example singularity;
 example Hcode;
 example milnorcode;

@@ -12,8 +12,8 @@ qring rngQ = iq;
 ideal J = 3, y-4, x*z;
 
 ideal stdJ =  groebner(J);
-stdJ; 
-def reduceRes = reduce( J, stdJ); 
+stdJ;
+def reduceRes = reduce( J, stdJ);
 
 std(reduceRes);
 rngQ;

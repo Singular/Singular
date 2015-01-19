@@ -5,29 +5,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.awt.BorderLayout;
@@ -52,12 +52,12 @@ import javax.swing.SwingUtilities;
 // class EquationAdmin
 //
 //////////////  ////////////////////////////////////////////////
- 
+
 public class EquationAdmin extends JPanel implements ActionListener {
 	//   Anfang Variablen
 	// GUI
 	Equation oldeq;
- 
+
 	public String img_filename;
 
 	JPanel eqnpanel = new JPanel();
@@ -126,8 +126,8 @@ public class EquationAdmin extends JPanel implements ActionListener {
 		scale[1] = lastScale;
 		scale[2] = lastScale;
 
-		//updateJV4SX(); 
- 
+		//updateJV4SX();
+
 	}
 
     public void clear() {
@@ -135,17 +135,17 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	eqncounter = 0;
 	eqnpanel.removeAll();
     }
- 
+
     public Vector getEqNrs() {
 	Vector temp = new Vector();
-	temp.add("-"); 
+	temp.add("-");
 	ListIterator li = eqnList.listIterator();
 	while (li.hasNext()) {
 	    temp.add(new Integer(((Equation) li.next()).eqnr));
 	}
 	return temp;
     }
-    
+
     public Equation getEqnFromNo(int no) {
 	ListIterator li = eqnList.listIterator();
 	Equation tmpEq;
@@ -157,20 +157,20 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	}
 	return (null);
     }
-    
+
     EquationAdmin(int i, String filename, RayFrame ray, surfex su,
 		  jv4surfex jv4sx, Project myp) {
 	project = myp;
 	this.jv4sx = jv4sx;
 	//	System.out.println("a"+vec2Str(jv4sx.getCamPos()));
-	
+
 	this.filename = filename;
 	rayFrame = ray;
 	ProjectNumber = i;
 	projectName = "Project" + i;
 	this.surfex_ = su;
 	img_filename = surfex_.tmpDir + "test.png";
-	
+
 	//savePicDialog = new SavePicDialog(projectName, rayFrame, this, surfex_);
 	// es muss vorher der Projectname da sein
 	//updateJV4SX();
@@ -179,30 +179,30 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	lastPosition = new PdVector(10.0, 20.0, -20.0);
 	lastUpVector = new PdVector(0.0, 1.0, 0.0);
 	lastInterest = new PdVector(0.0, 1.0, 0.0);
-	
+
 	ang[0] = 3.2;
 	ang[1] = 0.3;
 	ang[2] = -0.9;
 	scale[0] = lastScale;
 	scale[1] = lastScale;
 	scale[2] = lastScale;
-	
+
 	this.setLayout(new BorderLayout());
-	
+
 	eqnpanel.setLayout(new GridLayout(20, 0));
 	newEquation();
-	
+
 	oldeq = (Equation) eqnList.firstElement();
 	//  ((Equation) eqnList.firstElement()).setBasePlane(true, jv4sx, scale);
 	((Equation) eqnList.firstElement()).setBasePlaneDefault();
 	this.add(eqnpanel);
     }
-    
+
     // Ereignismethoden
     public void actionPerformed(ActionEvent e) {
 	String command = e.getActionCommand();
 	//  System.out.println(command );
-	
+
 	if (command.length() >= 15
 	    && command.substring(0, 15).hashCode() == "basePlaneButton"
 	    .hashCode()) {
@@ -250,13 +250,13 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	    updateEquationPanel();
 	}
     }
-    
+
     /*
     public void savePovCode(String filename) {
 	// erzeuge POVCode und
 	try {
 	    FileOutputStream fo = new FileOutputStream(filename);
-	    
+
 	    PrintWriter pw = new PrintWriter(fo, true);
 	    //pw.println("String");
 	    //      pw.println("camera { location 20*z look_at <0,0,0> angle 45 up <0,1,0> right <1,0,0>}");
@@ -300,7 +300,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	    pw.println("#declare scale_y = 1.0;");
 	    pw.println("#declare scale_z = 1.0;");
 	    pw.println("#declare Radius=4.5;");
-	    
+
 	    // Polynome aus der Liste uebergebn
 	    ListIterator li = eqnList.listIterator();
 	    Equation thisEqn;
@@ -314,16 +314,16 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	} catch (IOException er) {
 	    System.out.println(er);
 	}
-	
+
     }
     */
-    
+
     public void updateScale() {
 	scale[0] = 1.0 / jv4sx.getScale();
 	scale[1] = 1.0 / jv4sx.getScale();
 	scale[2] = 1.0 / jv4sx.getScale();
     }
-    
+
     public String fileFormatFromExt(String strFilename) {
 //	System.out.println("str:"+strFilename);
 	int ind = strFilename.lastIndexOf(".");
@@ -345,43 +345,43 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	    }
 	}
     }
-    
+
     public String getSurfCode_Part1(Dimension d, boolean antialiasing,
 				    jv4surfex jv4sx) {
-	
+
 	double[] p=new double[3];
-	
+
 	p[0]=0.0;
 	p[1]=0.0;
 	p[2]=0.0;
-	
+
 	return getSurfCode_Part1(d, antialiasing,
 				 "rot_x=0.0; rot_y=0.0; rot_z=0.0;\n", null, null, jv4sx,p);// default;
     }
-    
-    public String getSurfCode_Part1(Dimension d, boolean antialiasing, 
-				    String[] runningParams, 
-				    double[] runningParamsValues, 
+
+    public String getSurfCode_Part1(Dimension d, boolean antialiasing,
+				    String[] runningParams,
+				    double[] runningParamsValues,
 				    jv4surfex jv4sx) {
-	
+
 	double[] p=new double[3];
-	
+
 	p[0]=0.0;
 	p[1]=0.0;
 	p[2]=0.0;
 	return getSurfCode_Part1(d, antialiasing,
-				 "rot_x=0.0; rot_y=0.0; rot_z=0.0;\n", 
-				 runningParams,  
-				 runningParamsValues, 
+				 "rot_x=0.0; rot_y=0.0; rot_z=0.0;\n",
+				 runningParams,
+				 runningParamsValues,
 				 jv4sx,
 				 p);// default;
     }
-    
+
     public String getSurfCode_Part1(Dimension d, boolean antialiasing,
-				    String rotateString, 
-				    String[] runningParams, 
-				    double[] runningParamsValues, 
-				    jv4surfex jv4sx, 
+				    String rotateString,
+				    String[] runningParams,
+				    double[] runningParamsValues,
+				    jv4surfex jv4sx,
 				    double[] zusatzRot) {
 	// width and height of the image
 	//  System.out.println("getSurfCode_Part1");
@@ -437,22 +437,22 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	//    System.out.println("x:"+scale[0]+",y:"+scale[1]+",z:"+scale[2]);
 	//    strSurf += "rot_x="+ang[1]+"; rot_y="+ang[0]+"; rot_z="+ang[2]+";\n";
 	strSurf += rotateString;//"rot_x=0.0; rot_y=0.0; rot_z=0.0;\n";
-	strSurf += "scale_x=" + scale[0] + ";\n"+ 
+	strSurf += "scale_x=" + scale[0] + ";\n"+
 	    "scale_y=" + scale[1]
-	    + ";\n"+ 
+	    + ";\n"+
 	    "scale_z=" + scale[2] + ";\n";
-	
+
 	// tetrahedral coordinates:
 // 	strSurf += "poly xx=z-1+sqrt(2)*x;\n"+
 // 	    "poly yy=z-1-sqrt(2)*x;\n"+
-// 	    "poly zz=-(z+1+sqrt(2)*y);\n"+ 
+// 	    "poly zz=-(z+1+sqrt(2)*y);\n"+
 // 	    "poly ww=-(z+1-sqrt(2)*y);\n";
-	
+
 	// define some constants:
 	strSurf += "double PI = 2*arcsin(1);";
-	
+
 	ListIterator li;
-	
+
 	// copy the parameters here:
 	strSurf += "\n" + "// the parameters:\n";
 	int lp = 0;
@@ -476,13 +476,13 @@ public class EquationAdmin extends JPanel implements ActionListener {
 		    }
 	    }
 //			System.out.println("was rauskomt:"+thisSurfCode);
-	    
+
 	    strSurf += thisSurfCode;
 	    lp++;
 	    //      }
 	    cp++;
 	}
-	
+
 	// get the equations of the surfaces used:
 	strSurf += "\n" + "// the equations:\n";
 	li = eqnList.listIterator();
@@ -508,7 +508,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	    if (thisEqn.isSelected() && !(thisEqn.visType.getSelectedIndex()==2)) {
 		if (lc <= 9) {
 		    // at most 10 surfaces are allowed!
-		    strSurf += thisEqn.getSurfCode("f" + ec, lc + 1, 
+		    strSurf += thisEqn.getSurfCode("f" + ec, lc + 1,
 						   jv4sx.getCameraRotationYXZ())+"\n";
 		    lc++;
 		    thisEqn.surf_no = lc;
@@ -542,8 +542,8 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	    }
 	    ecc++;
 	}
-	
-	// get the coordinates of the isolated points 
+
+	// get the coordinates of the isolated points
 	// and draw the small spheres:
 	strSurf += "\n" + "// the solitary points (shown as spheres):\n";
 	li = project.solPtsAdm.solPtsList.listIterator();
@@ -577,7 +577,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 		}
 	    }
 	}
-	
+
 	// set the rotation:
 	strSurf += "\n" + "// the rotation:\n";
 	double ang[] = jv4sx.getCameraRotationYXZ();
@@ -587,22 +587,22 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	    } else {
 		strSurface = "surface" + (i + 1);
 	    }
-	    
+
 	    strSurf += strSurface + "=rotate(" + strSurface + "," + (zusatzRot[0])
 		+ ",yAxis);\n";
 	    strSurf += strSurface + "=rotate(" + strSurface + "," + (zusatzRot[1])
 		+ ",xAxis);\n";
 	    strSurf += strSurface + "=rotate(" + strSurface + "," + (zusatzRot[2])
 		+ ",zAxis);\n";
-	    
-	    
+
+
 	    strSurf += strSurface + "=rotate(" + strSurface + "," + (ang[0])
 		+ ",yAxis);\n";
 	    strSurf += strSurface + "=rotate(" + strSurface + "," + (ang[1])
 		+ ",xAxis);\n";
 	    strSurf += strSurface + "=rotate(" + strSurface + "," + (ang[2])
 		+ ",zAxis);\n";
-	    
+
 	    //			System.out.println("0:"+ang[0]+" zusatz:"+zusatzRot[0]);
 	    if(zusatzRot[0]!=0){
 		//	System.out.println("1:"+ang[1]+" zusatz:"+zusatzRot[1]);
@@ -616,7 +616,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	    strSurf += "clip_front = 1000; clip_back = -1000;\n";
 	}
 	strSurf += "radius = "+project.getClipRadius()+";\n";
-	
+
 	// set the rotation:
 	strSurf += "\n" + "// the rotation:\n";
 	for (int i = 0; i < lcc; i++) {
@@ -625,22 +625,22 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	    } else {
 		strSurface = "clip_surface" + (i + 1);
 	    }
-	    
+
 	    strSurf += strSurface + "=rotate(" + strSurface + "," + (zusatzRot[0])
 		+ ",yAxis);\n";
 	    strSurf += strSurface + "=rotate(" + strSurface + "," + (zusatzRot[1])
 		+ ",xAxis);\n";
 	    strSurf += strSurface + "=rotate(" + strSurface + "," + (zusatzRot[2])
 		+ ",zAxis);\n";
-	    
-	    
+
+
 	    strSurf += strSurface + "=rotate(" + strSurface + "," + (ang[0])
 		+ ",yAxis);\n";
 	    strSurf += strSurface + "=rotate(" + strSurface + "," + (ang[1])
 		+ ",xAxis);\n";
 	    strSurf += strSurface + "=rotate(" + strSurface + "," + (ang[2])
 		+ ",zAxis);\n";
-	    
+
 	    //			System.out.println("0:"+ang[0]+" zusatz:"+zusatzRot[0]);
 	    if(zusatzRot[0]!=0){
 		//	System.out.println("1:"+ang[1]+" zusatz:"+zusatzRot[1]);
@@ -648,15 +648,15 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	    //	System.out.println("2:"+ang[2]+" zusatz:"+zusatzRot[2]);
 	}
 
-						   
-	
+
+
 	//  strSurf += "origin_x=" + origin[0] + "; origin_y=" + origin[1] +
 	//      "; origin_z=" + origin[2] + ";\n";
 	//  strSurf += "clip = cube; radius=3.2;\n";
 	//
 	strSurf += "draw_surface;\n";
 	//  strSurf += strMidamble2 + "\n";
-	
+
 	// draw the curves given by intersections of some of the equations above:
 	strSurf += "\n" + "// the curves:\n";
 	li = project.cuAdm.cunList.listIterator();
@@ -675,7 +675,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 		//    System.out.println("cu:"+thisCun.C[0].getSelectedItem().toString());
 		tmpSurfNo = (thisCun.C[0].getSelectedItem().toString());
 		if (!tmpSurfNo.equals("-")) {
-		    iTmpSurfNo = ((Equation) 
+		    iTmpSurfNo = ((Equation)
 				  (eqnList.elementAt(
 				      Integer.parseInt(tmpSurfNo) - 1))).surf_no;
 //		    System.out.println("surf_no:"+iTmpSurfNo);
@@ -690,52 +690,52 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	    }
 	    cc++;
 	}
-	
+
 	strSurf += "\n" + "// save the image:\n";
 	strSurf += "filename=\"";
-	
+
 	return strSurf;
     }
-    
+
     public String getSurfCode_Part2(String filename) {
 	String strSurf = "";
 	strSurf += "color_file_format=" + fileFormatFromExt(filename) + ";\n";
 //	strSurf += "jpeg_quality=100;";
 	strSurf += "save_color_image;\n";
-	
+
 	return strSurf;
     }
-    
+
     public String getSurfCode_Dither_Part1(int res) {
 	String strSurf = "";
 	strSurf += "resolution = " + res + ";\n";
 	strSurf += "dither_surface;\n";
 	strSurf += "filename=\"";
-	
+
 	return strSurf;
     }
-    
+
     public String getSurfCode_Dither_Part2() {
 	String strSurf = "\";\n";
 	strSurf += "dither_file_format=tiff;\n";
 	strSurf += "save_dithered_image;\n";
-	
+
 	return strSurf;
     }
-    
+
     public void saveSurfCode(String filename, String imgFilename,
 			     boolean antialiasing, jv4surfex jv4sx) {
 //	System.out.println("save...");
 	try {
 	    FileOutputStream fo = new FileOutputStream(filename);
-	    
+
 	    PrintWriter pw = new PrintWriter(fo, true);
-	    
+
 	    pw.println("scale_x = " + scale[0] + ";");
 	    pw.println("scale_y = " + scale[1] + ";");
 	    pw.println("scale_z = " + scale[2] + ";");
 	    pw.println("radius="+project.getClipRadius()+";");
-	    
+
 	    pw.println("illumination = ambient_light + diffuse_light + reflected_light + transmitted_light;");
 	    pw.println("ambient      = 40;\ndiffuse      = 80;\nreflected    = 80;\ntransmitted  = 20;");
 	    pw.println("smoothness   = 50;\ntransparence = 0;");
@@ -763,9 +763,9 @@ public class EquationAdmin extends JPanel implements ActionListener {
 		thisEqn = (Equation) li.next();
 		if (thisEqn.isSelected()) {
 		    if (lc <= 9) {
-			thisEqn.savesurfCode(pw, 
-					     "f" + ec, 
-					     lc + 1, 
+			thisEqn.savesurfCode(pw,
+					     "f" + ec,
+					     lc + 1,
 					     jv4sx.getCameraRotationYXZ());
 			lc++;
 			pw.println("");
@@ -773,20 +773,20 @@ public class EquationAdmin extends JPanel implements ActionListener {
 		}
 		ec++;
 	    }
-	    
+
 	    pw.println("draw_surface;");
 	    pw.println("filename=\"" + imgFilename + "\";");
 	    pw.println("color_file_format=" + fileFormatFromExt(imgFilename)
 		       + ";");
 //	    pw.println("jpeg_quality=100;");
 	    pw.println("save_color_image;");
-	    
+
 	    pw.close();
 	} catch (IOException er) {
 	    System.out.println(er);
 	}
     }
-    
+
     public void updateEquationPanel() {
 	eqnpanel.removeAll();
 	eqnpanel.setLayout(new GridLayout(20, 0));
@@ -801,23 +801,23 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	}
 	SwingUtilities.updateComponentTreeUI(this);
     }
-    
+
     // Ende Ereignismethoden
-    
+
     // Methoden
     public double[] getAngles() {
 	ang = jv4sx.getCameraRotationYXZ();
 	return (ang);
     }
-    
+
     public double[] getScales() {
 	return (scale);
     }
-    
+
     public String vec2Str(double[] v) {
 	return ("<" + v[0] + "," + v[1] + "," + v[2] + ">");
     }
-    
+
     public void newEquation() {
 	Equation eqn = new Equation(eqnList.size() + 1, ++eqncounter, this,
 				    jv4sx, surfex_);
@@ -825,7 +825,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 					.getEquationColorInside(eqn.getEqNo()));
 	eqn.colorButton_o.setBackground(project.appearanceScheme
 					.getEquationColorOutside(eqn.getEqNo()));
-	
+
 	eqnpanel.add(eqn);
 	eqnList.add(eqn);
 	//tbuttons.add(eqn.basePlaneButton);
@@ -867,7 +867,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 //		    System.out.println("no int:"+tmpStr);
 		    double tmpD = project.getScale();
 		    try{
-			jv4sx.setScaleMinMax(Double.parseDouble(tmpStr), 
+			jv4sx.setScaleMinMax(Double.parseDouble(tmpStr),
 					     Double.parseDouble(bs.readLine()));
 			cTmp = Integer.parseInt(bs.readLine());
 		    } catch(Exception doubEx) {
@@ -880,8 +880,8 @@ public class EquationAdmin extends JPanel implements ActionListener {
 		//	project.scaleSlider.setValue((int) (lastScale * 100));
 //				project.scaleSliderUpdated();
 		project.bgColorButton.setBackground(
-		    new Color(cTmp, 
-			      Integer.parseInt(bs.readLine()), 
+		    new Color(cTmp,
+			      Integer.parseInt(bs.readLine()),
 			      Integer.parseInt(bs.readLine())));
 		project.antialiasing.setSelected(
 		    (Boolean.valueOf(bs.readLine())).booleanValue());
@@ -961,7 +961,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	}
 	updateJV4SXandReconstructLastView();
     } // end loadGeneralData()
-    
+
     ///
     public void loadEquations(BufferedReader bs, String datatype,
 			      int iVersion) {
@@ -974,7 +974,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	    //      System.out.println("nix:"+nix);
 	    String zeile1;
 	    boolean first = true;
-	    
+
 	    for (k = Integer.parseInt(num_eqns); k > 0; k--) {
 		zeile1 = bs.readLine();//) != null) {
 		if (first) {
@@ -1074,12 +1074,12 @@ public class EquationAdmin extends JPanel implements ActionListener {
 			//      System.out.println("colors...");
 			((Equation) eqnList.lastElement()).colorButton_i
 			    .setBackground(new Color(
-					       Integer.parseInt(bs.readLine()), 
-					       Integer.parseInt(bs.readLine()), 
+					       Integer.parseInt(bs.readLine()),
+					       Integer.parseInt(bs.readLine()),
 					       Integer.parseInt(bs.readLine())));
 			((Equation) eqnList.lastElement()).colorButton_o
-			    .setBackground(new Color(Integer.parseInt(bs.readLine()), 
-						     Integer.parseInt(bs.readLine()), 
+			    .setBackground(new Color(Integer.parseInt(bs.readLine()),
+						     Integer.parseInt(bs.readLine()),
 						     Integer.parseInt(bs.readLine())));
 			int i = Integer.parseInt(bs.readLine());
 			if (i != 255) {
@@ -1092,7 +1092,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 				.setBackground(new Color(255, 255, 255));
 			}
 		    }
-		    
+
 		    if (datatype.equals("complete")
 			|| datatype.equals("onlystyle")
 			|| datatype.equals("eqnsvis")) {
@@ -1128,7 +1128,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	}
 	//  System.out.println("end lE.");
     } // end loadEquations()
-    
+
     public void save(PrintWriter pw) {
 	//  System.out.println("save Eq" );
 	ListIterator li = eqnList.listIterator();
@@ -1138,7 +1138,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	    ((Equation) li.next()).saveYourself(pw);
 	}
     }
-    
+
     public String save() {
 	String str = "";
 	//  System.out.println("save Eq" );
@@ -1150,7 +1150,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	}
 	return (str);
     }
-    
+
     public void updateJV4SX() {
 	////////////////////
 	/// muss noch gefuellt werden ...
@@ -1165,11 +1165,11 @@ public class EquationAdmin extends JPanel implements ActionListener {
 		break;
 	    }
 	}
-	
+
 	jv4sx.changeFrameTitle(projectName
 			       + "triangulated view - surfex (uses JavaView)");
     }
-    
+
     public void updateJV4SXandReconstructLastView() {
 //	System.out.println("updateJV4SXandRec...");
 	ListIterator li = eqnList.listIterator();
@@ -1182,7 +1182,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 		break;
 	    }
 	}
-	
+
 	//		System.out.println("scale2:"+jv4sx.getScale());
 	//  jv4sx.disp.getCamera().setUpVector(lastUpVector);
 	// jv4sx.disp.getCamera().setViewDir(lastViewDir);
@@ -1196,7 +1196,7 @@ public class EquationAdmin extends JPanel implements ActionListener {
 	//		jv4sx.disp.getCamera().setScale(lastScale);
 	//jv4sx.disp.getCamera().setFullPosition(lastInterest, lastPosition, lastUpVector);
 //	System.out.println("scale3:"+jv4sx.getScale());
-	
+
 	jv4sx.changeFrameTitle(projectName
 			       + "triangulated view - surfex (uses JavaView)");
 	//System.out.println("u"+vec2Str(jv4sx.getCamPos()));

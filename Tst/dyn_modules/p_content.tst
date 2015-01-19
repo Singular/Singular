@@ -96,10 +96,10 @@ $$
 
 LIB "teachstd.lib";
 printlevel = 0;
-standard(I); 
+standard(I);
 
 simplify(_, 1+2+4);
- 
+
 ideal II = _;
 slimgb(II);
 
@@ -176,7 +176,7 @@ std(I); // is correct as well!!!
 // U, V, S-1
 
 
-matrix Z; 
+matrix Z;
 liftstd(I,Z);
 
 

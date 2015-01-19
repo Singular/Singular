@@ -8,7 +8,7 @@ C[1,3]=1/Q2;
 C[2,3]=Q2;
 D[1,2]=-Q*z;
 D[1,3]=1/Q*y;
-D[2,3]=-Q*x; 
+D[2,3]=-Q*x;
 def S=nc_algebra(C,D); setring S;
 int N=5;
 poly f;
@@ -21,13 +21,13 @@ for(i=1;i<=N;i++)
   for(j=1;j<=N;j++)
   {
     for(k=1;k<=N;k++)
-    { 
+    {
        f=(z^k*y^j)*x^i;
        g=z^k*(y^j*x^i);
        g=g-f;
        if (g!=0) {"Fail";i;j;k;f;}
     }
-  }  
+  }
 }
 z^5*y^4*x^3;
 tst_status(1);$

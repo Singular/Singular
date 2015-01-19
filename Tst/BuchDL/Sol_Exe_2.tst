@@ -9,14 +9,14 @@ if (not(defined(algDependent))) { LIB "algebra.lib"; }
 def L = algDependent(ideal(f1,f2,f3));
 L[1];
 def S = L[2];
-setring S; 
-ker; 
+setring S;
+ker;
 
 setring R;
 poly g, g1, g2 = x4+y4, x+y, xy;
 L = algebra_containment(g,ideal(g1,g2),1);
-def S2 = L[2]; 
-setring S2; 
+def S2 = L[2];
+setring S2;
 check;
 
 ring T = 0, x(1..3), dp;
@@ -49,17 +49,17 @@ ideal I = maxideal(3),maxideal(2),x,y,1;
 ring R = 0, (x,y,a(1..10)), (dp(2),dp(10));
 ideal I = imap(S,I);
 matrix A[10][1] = a(1..10);
-poly f = (matrix(I)*A)[1,1]; 
+poly f = (matrix(I)*A)[1,1];
 ideal J = f, diff(f,x), diff(f,y);
 J = groebner(J);
 // check for generators for J that do not depend on x,y
 ideal JJ;
 for (int i=1; i<=size(J); i++)
-{ 
+{
   if (J[i][1]<y) { JJ = JJ,J[i]; }
 }
 JJ = simplify(JJ,2);             // erase zero generators
-size(JJ); 
+size(JJ);
 //-> 1
 homog(JJ);
 //-> 1

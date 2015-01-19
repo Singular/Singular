@@ -21,7 +21,7 @@ $PREFIX = '';  # should be overwritten by cmd-line argument
 
 $AUTO_PREFIX = 0; # this is needed, so that prefix settings are used
 
-$AUTO_LINK = 0; 
+$AUTO_LINK = 0;
 
 $SPLIT = 0;
 
@@ -34,7 +34,7 @@ $DEBUG = 1;
 $VERBOSE = 5;
 
 #
-# Options controlling Extensions and Special Features 
+# Options controlling Extensions and Special Features
 #
 $HTML_VERSION = "3.2";
 
@@ -57,7 +57,7 @@ $ADDRESS = '';
 $INFO = '';
 
 #
-# Switches controlling Image Generation 
+# Switches controlling Image Generation
 #
 $ASCII_MODE = 0;
 
@@ -82,20 +82,20 @@ $ANTI_ALIAS_TEXT = 1;
 #
 $NO_NAVIGATION = 1;
 $ADDRESS = '';
-$INFO = 0;              # 0 = do not make a "About this document..." section 
+$INFO = 0;              # 0 = do not make a "About this document..." section
 
 #
-#Switches for Linking to other documents 
+#Switches for Linking to other documents
 #
 # actuall -- we don't care
 
 $MAX_SPLIT_DEPTH = 0;	# Stop making separate files at this depth
 
-$MAX_LINK_DEPTH = 0;    # Stop showing child nodes at this depth   
+$MAX_LINK_DEPTH = 0;    # Stop showing child nodes at this depth
 
 $NOLATEX = 0;           # 1 = do not pass unknown environments to Latex
 
-$EXTERNAL_IMAGES = 0;   # 1 = leave the images outside the document 
+$EXTERNAL_IMAGES = 0;   # 1 = leave the images outside the document
 
 $ASCII_MODE = 0;        # 1 = do not use any icons or internal images
 
@@ -108,29 +108,29 @@ $SHOW_SECTION_NUMBERS = 0;
 $CHILDLINE = "";
 
 # This is the line width measured in pixels and it is used to right justify
-# equations and equation arrays; 
-$LINE_WIDTH = 500;		
+# equations and equation arrays;
+$LINE_WIDTH = 500;
 
 # Used in conjunction with AUTO_NAVIGATION
-$WORDS_IN_PAGE = 300;	
+$WORDS_IN_PAGE = 300;
 
-# Affects ONLY the way accents are processed 
-$default_language = 'english';	
+# Affects ONLY the way accents are processed
+$default_language = 'english';
 
-# The value of this variable determines how many words to use in each 
+# The value of this variable determines how many words to use in each
 # title that is added to the navigation panel (see below)
-# 
+#
 $WORDS_IN_NAVIGATION_PANEL_TITLES = 0;
 
 # This number will determine the size of the equations, special characters,
 # and anything which will be converted into an inlined image
-# *except* "image generating environments" such as "figure", "table" 
+# *except* "image generating environments" such as "figure", "table"
 # or "minipage".
 # Effective values are those greater than 0.
 # Sensible values are between 0.1 - 4.
 $MATH_SCALE_FACTOR = 1.5;
 
-# This number will determine the size of 
+# This number will determine the size of
 # image generating environments such as "figure", "table" or "minipage".
 # Effective values are those greater than 0.
 # Sensible values are between 0.1 - 4.
@@ -144,29 +144,29 @@ $FIGURE_SCALE_FACTOR = 1.6;
 $EXTERNAL_UP_LINK = "";
 $EXTERNAL_UP_TITLE = "";
 
-# If this is set then the resulting HTML will look marginally better if viewed 
+# If this is set then the resulting HTML will look marginally better if viewed
 # with Netscape.
 $NETSCAPE_HTML = 1;
 
 # Valid paper sizes are "letter", "legal", "a4","a3","a2" and "a0"
 # Paper sizes has no effect other than in the time it takes to create inlined
 # images and in whether large images can be created at all ie
-#  - larger paper sizes *MAY* help with large image problems 
+#  - larger paper sizes *MAY* help with large image problems
 #  - smaller paper sizes are quicker to handle
 $PAPERSIZE = "a4";
 
-# Replace "english" with another language in order to tell LaTeX2HTML that you 
+# Replace "english" with another language in order to tell LaTeX2HTML that you
 # want some generated section titles (eg "Table of Contents" or "References")
 # to appear in a different language. Currently only "english" and "french"
 # is supported but it is very easy to add your own. See the example in the
-# file "latex2html.config" 
+# file "latex2html.config"
 $TITLES_LANGUAGE = "english";
 
 ### Navigation Panel ##########################################################
 #
 # The navigation panel is constructed out of buttons and section titles.
-# These can be configured in any combination with arbitrary text and 
-# HTML tags interspersed between them. 
+# These can be configured in any combination with arbitrary text and
+# HTML tags interspersed between them.
 # The buttons available are:
 # $PREVIOUS - points to the previous section
 # $UP  - points up to the "parent" section
@@ -182,50 +182,50 @@ $TITLES_LANGUAGE = "english";
 #
 # Also for each of the $PREVIOUS $UP $NEXT $NEXT_GROUP and $PREVIOUS_GROUP
 # buttons there are equivalent $PREVIOUS_TITLE, $UP_TITLE, etc variables
-# which contain the titles of their corresponding sections. 
+# which contain the titles of their corresponding sections.
 # Each title is empty if there is no corresponding section.
 #
 # The subroutine below constructs the navigation panels in each page.
 # Feel free to mix and match buttons, titles, your own text, your logos,
 # and arbitrary HTML (the "." is the Perl concatenation operator).
 sub top_navigation_panel {
-# 
+#
 #     # Now add a few buttons with a space between them
 #     "$NEXT $UP $PREVIOUS $CONTENTS $INDEX $CUSTOM_BUTTONS" .
-#     
+#
 #     "<BR>\n" .		# Line break
-# 	
+#
 #     # If ``next'' section exists, add its title to the navigation panel
-#     ($NEXT_TITLE ? "<B> Next:</B> $NEXT_TITLE\n" : undef) . 
-#     
+#     ($NEXT_TITLE ? "<B> Next:</B> $NEXT_TITLE\n" : undef) .
+#
 #     # Similarly with the ``up'' title ...
-#     ($UP_TITLE ? "<B>Up:</B> $UP_TITLE\n" : undef) . 
-#  
+#     ($UP_TITLE ? "<B>Up:</B> $UP_TITLE\n" : undef) .
+#
 #     # ... and the ``previous'' title
 #     ($PREVIOUS_TITLE ? "<B> Previous:</B> $PREVIOUS_TITLE\n" : undef) .
-#    
-#     #  Line Break, horizontal rule (3-d dividing line) and new paragraph  
-#     "<BR> <P>\n"		
+#
+#     #  Line Break, horizontal rule (3-d dividing line) and new paragraph
+#     "<BR> <P>\n"
 }
 
 sub bot_navigation_panel {
 #     #  Start with a horizontal rule (3-d dividing line)
-#     "<HR>".			
-#     
+#     "<HR>".
+#
 #     # Now add a few buttons with a space between them
 #     "$NEXT $UP $PREVIOUS $CONTENTS $INDEX $CUSTOM_BUTTONS" .
-#     
+#
 #     "<BR>\n" .		# Line break
-# 	
+#
 #     # If ``next'' section exists, add its title to the navigation panel
-#     ($NEXT_TITLE ? "<B> Next:</B> $NEXT_TITLE\n" : undef) . 
-#     
+#     ($NEXT_TITLE ? "<B> Next:</B> $NEXT_TITLE\n" : undef) .
+#
 #     # Similarly with the ``up'' title ...
-#     ($UP_TITLE ? "<B>Up:</B> $UP_TITLE\n" : undef) . 
-#  
+#     ($UP_TITLE ? "<B>Up:</B> $UP_TITLE\n" : undef) .
+#
 #     # ... and the ``previous'' title
-#     ($PREVIOUS_TITLE ? "<B> Previous:</B> $PREVIOUS_TITLE\n" : undef) 
-#    
+#     ($PREVIOUS_TITLE ? "<B> Previous:</B> $PREVIOUS_TITLE\n" : undef)
+#
 }
 
 1;	# This must be the last line

@@ -15,7 +15,7 @@ OVERVIEW:
  which is a graded subalgebra of R[t]. The degree-k-component is the integral
  closure of the k-th power of I.
 
- In contrast to the previous version, the library uses 'normal.lib' to compute the 
+ In contrast to the previous version, the library uses 'normal.lib' to compute the
  integral closure of R[It]. This improves the performance considerably.
 
 PROCEDURES:

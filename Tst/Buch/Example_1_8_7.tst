@@ -5,7 +5,7 @@ ring  A=0,(x,y,z),lp;
 ideal I=x2+y+z-1,
          x+y2+z-1,
          x+y+z2-1;
-ideal J=groebner(I);        
+ideal J=groebner(I);
 J;
 
 LIB"solve.lib";

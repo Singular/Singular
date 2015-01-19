@@ -108,7 +108,7 @@ proc isSubset(ideal I,ideal J)
 RETURN:  integer, 1 if I is a subset of J and 0 otherwise
 "
 {
-  if ( attrib(J,"isSB") == 0) { J = groebner(J); } 
+  if ( attrib(J,"isSB") == 0) { J = groebner(J); }
   int s = ncols(I);
   for(int i=1; i<=s; i++)
     {
@@ -1366,7 +1366,7 @@ example
 //                                                                 //
 /////////////////////////////////////////////////////////////////////
 proc removeRedundantComponents(list primdecResult)
-"USAGE:   removeRedundantComponents(L); L a primary decomposition 
+"USAGE:   removeRedundantComponents(L); L a primary decomposition
 RETURN:  an irredundant primary decomposition.
 EXAMPLE: example removeRedundantComponents; shows an example"
 proc removeRedundantComponents(list primdecResult)
@@ -1375,21 +1375,21 @@ proc removeRedundantComponents(list primdecResult)
 
    i = 1;
    j = 1;
-   while  ( i<=size(primdecResult) ) 
-   {  
+   while  ( i<=size(primdecResult) )
+   {
      ASSUME(1, i>0 &&  i<=size(primdecResult) );
      ASSUME(1, j>0 &&  j<=size(primdecResult) );
 
       if (i!=j)
       {
           if ( isSubset( std(primdecResult[j][1]) , std(primdecResult[i][1]) ) )
-          { 
+          {
               primdecResult[i] =  primdecResult[j];
               primdecResult = delete(primdecResult,j);
               j = j - 1; /*correct j due to deletion */
               if ( j<i )  {    i = i -1;   } /*correct i */
           }
-      } 
+      }
       j = j + 1;
       if ( j > size(primdecResult) )
       {

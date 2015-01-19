@@ -9,5 +9,5 @@ resolution rl = lres(i, 0);rl;
 intmat is = betti(rs);is;
 intmat il = betti(rl);il;
 if (size(is) != size(il)) {"ERROR: is != il";}
-tst_status(1); 
+tst_status(1);
 $

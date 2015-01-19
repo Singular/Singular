@@ -74,8 +74,8 @@ double mmap_size_sum;
 double time_ini=0.0, time_prev=0.0, time_cur=0.0, time_sum;
 
 unsigned long reqs[32] = {
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 void
@@ -94,7 +94,7 @@ print_request_distribution() {
   printf("# size distribution:\n");
   printf("#       bin        N\n");
   for (i = 0; i < 32; ++i) {
-    if (reqs[i] != 0) 
+    if (reqs[i] != 0)
       printf(" %10ld%10ld\n", b, reqs[i]);
     b <<= 1;
   }

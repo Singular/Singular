@@ -9,21 +9,53 @@
 
 
 #include <misc/auxiliary.h>
-#include <coeffs/shortfl.h>
+#include <misc/mylimits.h>
+
+#include <reporter/reporter.h>
+
+#include "numbers.h"
+#include "coeffs.h"
+#include "mpr_complex.h"
+
+#include "shortfl.h"
+#include "longrat.h"
 
 #include <string.h>
 #include <math.h>
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
-#include <reporter/reporter.h>
-#include <coeffs/numbers.h>
-#include <coeffs/longrat.h>
-#include <coeffs/mpr_complex.h>
-
-#include <misc/mylimits.h>
 
 /// Our Type!
 static const n_coeffType ID = n_R;
+
+// Private interface should be hidden!!!
+
+BOOLEAN nrGreaterZero (number k, const coeffs r);
+number  nrMult        (number a, number b, const coeffs r);
+number  nrInit        (long i, const coeffs r);
+long    nrInt         (number &n, const coeffs r);
+number  nrAdd         (number a, number b, const coeffs r);
+number  nrSub         (number a, number b, const coeffs r);
+void    nrPower       (number a, int i, number * result, const coeffs r);
+BOOLEAN nrIsZero      (number a, const coeffs r);
+BOOLEAN nrIsOne       (number a, const coeffs r);
+BOOLEAN nrIsMOne      (number a, const coeffs r);
+number  nrDiv         (number a, number b, const coeffs r);
+number  nrNeg         (number c, const coeffs r);
+number  nrInvers      (number c, const coeffs r);
+BOOLEAN nrGreater     (number a, number b, const coeffs r);
+BOOLEAN nrEqual       (number a, number b, const coeffs r);
+void    nrWrite       (number &a, const coeffs r);
+const char *  nrRead  (const char *s, number *a, const coeffs r);
+
+#ifdef LDEBUG
+BOOLEAN nrDBTest(number a, const coeffs r, const char *f, const int l);
+#endif
+
+/// Get a mapping function from src into the domain of this type: n_R
+nMapFunc nrSetMap(const coeffs src, const coeffs dst);
+
+// Where are the following used?
+// int     nrGetChar();
+number nrMapQ(number from, const coeffs r, const coeffs aRing);
 
 static const float nrEps = 1.0e-3;
 
@@ -84,14 +116,14 @@ number nrInit (long i, const coeffs r)
 /*2
 * convert a number to int
 */
-int nrInt(number &n, const coeffs r)
+long nrInt(number &n, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 
-  int i;
+  long i;
   float f = nf(n).F();
   if (((float)(-MAX_INT_VAL-1) <= f) || ((float)MAX_INT_VAL >= f))
-    i = (int)f;
+    i = (long)f;
   else
     i = 0;
   return i;

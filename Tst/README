@@ -1,16 +1,16 @@
 README file for Singular test-suite
 ===================================
 
-This is the test-suite for Singular. This directory contains 
+This is the test-suite for Singular. This directory contains
 
-regress.cmd	-- perl script which drives tests 
+regress.cmd	-- perl script which drives tests
 Short		-- directory containing "short" tests
 Long		-- directory containing "long" tests
 Old			-- directory containing "old" (TST) tests
 recommended set of tests:
 ./regress.cmd Old/universal.lst Buch/buch.lst Plural/short.lst Plural/dmod.lst Short/ok_s.lst Long/ok_l.lst
 
-Run 
+Run
   perl ./regress.cmd -h
 for a summary of the comand-line options of regress.cmd.
 
@@ -18,9 +18,9 @@ To test(s) correctness of Singular:
 -----------------------------------
 1.) Put the Singular binary in this directory
     (prefered solution: ln -s <path_to_Singular_binary> Singular)
-2.) Run 
+2.) Run
      perl ./regress.cmd [*.tst] [*.lst]
-    with the desired tst (i.e., Singular test scripts) or lst (list 
+    with the desired tst (i.e., Singular test scripts) or lst (list
     of tst files -- see Old/universal.lst for an example) file(s).
     (prefered test scenario:
     perl ./regress.cmd Old/universal.lst Short/ok_s.lst Long/ok_l.lst
@@ -30,8 +30,8 @@ To test(s) correctness of Singular:
     status 0.
 4.) If differences between the new results and the
     previously obtained results are found, regress.cmd exits with
-    status != 0, and, for each file xx.tst which lead to a 
-    difference, the coresponding files xx.new.res, xx.res, and xx.diff 
+    status != 0, and, for each file xx.tst which lead to a
+    difference, the coresponding files xx.new.res, xx.res, and xx.diff
     are kept, and differences are written to stdout.
 5.) The Singular executable which is used for testing can
     alternatively be specified using the -s <Singular> option.
@@ -40,13 +40,13 @@ To test(s) correctness of Singular:
 To test memory/timing performance of Singular:
 ----------------------------------------------
 1.) Put the Singular binary in this directory
-2.) Run 
+2.) Run
      perl ./regress.cmd -e [*.tst] [*.lst]
-    with the desired tst (i.e., Singular test scripts) or lst (list 
+    with the desired tst (i.e., Singular test scripts) or lst (list
     of tst files -- see Old/universal.lst for an example) file(s).
 3.) If no result differences occur, and if timing/memory performance
     differences are less than $error_val (currently set to 5)
-    per-cent, then regress.cmd exits with status 0. 
+    per-cent, then regress.cmd exits with status 0.
 4.) Otherwise, exit status is != 0, and the corresponding files
     xx.new.res, xx.res, xx.diff, and xx.stat.diff (which logs the
     differences of timing/memory performance) are kept, and
@@ -56,28 +56,28 @@ To test memory/timing performance of Singular:
     status != 0 if timing/memory performance is above specified
     per-cent.
 6.) The timing/memory performance differenes which trigger an error
-    (or, report) can be also be set: Either use 
-      ./regress.cmd -[e,r] all%<val> 
+    (or, report) can be also be set: Either use
+      ./regress.cmd -[e,r] all%<val>
     which sets tolerance of all criteria to <val> per-cent, or, use
-      ./regress.cmd -[e,r] <crit>%<val> 
+      ./regress.cmd -[e,r] <crit>%<val>
     which sets tolerance of all <crit> to <val> per-cent.
 
 To generate new result file(s):
 -------------------------------
-Run 
+Run
     perl ./regress.cmd -g [*.tst] [*.lst]
-with the desired tst (i.e., Singular test scripts) or lst (list 
-of tst files). 
+with the desired tst (i.e., Singular test scripts) or lst (list
+of tst files).
 NOTE: Running regress.cmd with the -g option re-generates the result
 and stat files, i.e., all previous results and statisitics are
 overwritten and lost!
 
 To include timing/memory statistics for a machine:
 ---------------------------------------------------
-Run 
+Run
     perl ./regress.cmd -m [*.tst] [*.lst]
-with the desired tst (i.e., Singular test scripts) or lst (list 
-of tst files). 
+with the desired tst (i.e., Singular test scripts) or lst (list
+of tst files).
 NOTE:  Running regress.cmd with the -m option merges the
 timings/memory results of the current machine into the respective
 xx.stat file and overwrites previous timings/memory results of the
@@ -87,7 +87,7 @@ current machine.
 To add a new test for a library/commando to the test-suite:
 -----------------------------------------------------------
 * The following files need to be provided:
-	short/xx_s.tst : Singular code for short and basic tests 
+	short/xx_s.tst : Singular code for short and basic tests
 	long/xx_l.tst : Singular code for long and extended tests
   or, alternatively:
         short/xx.tst: Singular code for short tests, only
@@ -107,22 +107,22 @@ To add a new test for a library/commando to the test-suite:
 
 * Rules for providing tst files:
   1.) tst files always start with the following three commandos as
-  preamble: 
+  preamble:
          LIB "tst.lib";
          tst_init();
 	 tst_ignore("CVS ID $Id$"); // or, write own version number here
   tst_init() writes some general info to stdout (like date,
   uname, hostname, version, etc.). The library tst.lib (contained in
   the Singular distribution) provides, among others, the routines
-  tst_init() and tst_ignore(). 
+  tst_init() and tst_ignore().
 
   2.) tst files should end with the following statements:
          tst_status(1); $
   which enables (automatic) checks of the timing/memory performance of
-  Singular. 
+  Singular.
 
   3.) All system-dependent output (like run-times, memory usages,
-  pathnames, dates, etc.) should generally be avoided. 
+  pathnames, dates, etc.) should generally be avoided.
 
   4.) After time/memory critical sections of the tst files, the
   command
@@ -131,20 +131,20 @@ To add a new test for a library/commando to the test-suite:
   timing/memory performance of Singular since the last call to
   tst_status (resp. since the start-up of Singular).
 
-  5.) If system-dependent output can not be avodied, the routine 
+  5.) If system-dependent output can not be avodied, the routine
   tst_ignore(...) should be used:
   tst_ignore(val [, keyword]): 'val' can have arbitrary type for which
                                a string conversion exists;
                                if present, keyword must be one of the
                                following strings: "time", "memory"
   tst_ignore() outputs 'val' by prepending the following prefix:
-  no keyword --       // tst_ignore: 
+  no keyword --       // tst_ignore:
   "time" keyword --   // tst_ignore: time:
   "memory" keyword -- // tst_ignore: memory:
-  which causes automatic tests to ignore these lines when doing a diff 
-  on result files. 
-  
-* The command for generating xx.res.gz.uu and xx.stat is: 
+  which causes automatic tests to ignore these lines when doing a diff
+  on result files.
+
+* The command for generating xx.res.gz.uu and xx.stat is:
   cd <directopry where xx.tst resides>; perl ../regress.cmd -g xx.tst
 
 

@@ -172,15 +172,15 @@ fi
     AS_ECHO(["s/^@%:@def[]ine  *\\(@<:@m4_cr_letters@:>@@<:@_symbol@:>@*\\)\\(.*\\)/@%:@ifndef $_LOW""\\1\\"]) >> _script
     AS_ECHO(["@%:@define $_LOW""\\1\\2\\"]) >> _script
     AS_ECHO(["@%:@endif/"]) >> _script
-    
+
     # now executing _script on _DEF input to create _OUT output file
     echo "@%:@ifndef $_DEF"      >$tmp/pconfig.h
     echo "@%:@def[]ine $_DEF 1" >>$tmp/pconfig.h
     echo ' ' >>$tmp/pconfig.h
-    
+
     echo /'*' $_OUT. Generated automatically at end of configure. '*'/ >>$tmp/pconfig.h
     echo ' ' >>$tmp/pconfig.h
-    
+
     sed -f _script $_INP >>$tmp/pconfig.h
     echo ' ' >>$tmp/pconfig.h
     echo '/* once:' $_DEF '*/' >>$tmp/pconfig.h

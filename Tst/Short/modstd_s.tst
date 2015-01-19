@@ -17,7 +17,7 @@ modStd(I, 0);
 
 /* with parameters */
 ring r3 = (0,u,v,w), (x,y,z), dp;
-ideal I = x+u*y, y+v*z; 
+ideal I = x+u*y, y+v*z;
 modStd(I);
 
 /* for primeTest_std() */

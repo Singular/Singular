@@ -32,7 +32,7 @@ proc cyclicnh(int z)
 
 string bench = cyclicn(7);
 sprintf(bench);
-ideal f; 
+ideal f;
 f = sba(i,1,0);
 f = sba(i,1,1);
 f = sba(i,0,0);
@@ -40,7 +40,7 @@ f = sba(i,0,1);
 killall;
 string bench = cyclicnh(8);
 sprintf(bench);
-ideal f; 
+ideal f;
 f = sba(i,0,1);
 killall;
 

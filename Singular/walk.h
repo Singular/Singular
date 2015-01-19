@@ -51,7 +51,7 @@ intvec* Mivperttarget(ideal G, int ndeg);
 intvec* MSimpleIV(intvec* iv);
 
 /* Okt -- Nov'01 */
-// compute a Groebner basis of an ideal G w.r.t. lexicographic order 
+// compute a Groebner basis of an ideal G w.r.t. lexicographic order
 //ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M);
 ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M, ring baseRing);
 

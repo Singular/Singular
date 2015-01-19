@@ -6,7 +6,7 @@ endif
 
 libgfandir = $(libdir)
 
-AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -DGMPRATIONAL 
+AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -DGMPRATIONAL
 
 SOURCES  = gfanlib_zcone.cpp gfanlib_symmetry.cpp gfanlib_symmetriccomplex.cpp gfanlib_polyhedralfan.cpp gfanlib_zfan.cpp gfanlib_polymakefile.cpp
 libgfan_la_SOURCES   = $(SOURCES)

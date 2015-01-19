@@ -9,9 +9,9 @@ Version: @PACKAGE_VERSION@
 URL: https://github.com/Singular/Sources/tree/spielwiese/@PACKAGE@
 
 # Requires:
-# Conflicts: 
+# Conflicts:
 
 Cflags: -I${includedir} @SINGULAR_CFLAGS@
 Libs: -L${libdir} -l@PACKAGE@
-# Libs.private: 
+# Libs.private:
 

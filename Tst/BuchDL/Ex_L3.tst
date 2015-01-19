@@ -3,7 +3,7 @@ tst_init();
 
 
 2+3+4;
-//->   9 
+//->   9
 2+3; 3+5;
 //->   5
 //->   8
@@ -17,7 +17,7 @@ tst_init();
 //->      ? error occurred in STDIN line ...: `1/3 + 1/5;`
 
 ring R = 0, (x,y), dp;
-ring R1 = 0, x(1..7), dp; 
+ring R1 = 0, x(1..7), dp;
 ring R2 = (0,i), (x,y), dp;
 minpoly = i^2+1;
 ring R3 = (2,a), (x,y), dp;
@@ -34,7 +34,7 @@ basering;
 //->   //   characteristic : 0
 //->   //   number of vars : 4
 //->   //        block   1 : ordering dp
-//->   //                  : names    w x y z 
+//->   //                  : names    w x y z
 //->   //        block   2 : ordering C
 //->   // quotient ring from ideal
 //->   _[1]=y2-xz
@@ -66,12 +66,12 @@ basering;
 //->   //   characteristic : 0
 //->   //   number of vars : 7
 //->   //        block   1 : ordering dp
-//->   //                  : names    x(1) x(2) x(3) 
+//->   //                  : names    x(1) x(2) x(3)
 //->   //        block   2 : ordering wp
-//->   //                  : names    x(4) x(5)  
-//->   //                  : weights     2    1 
+//->   //                  : names    x(4) x(5)
+//->   //                  : weights     2    1
 //->   //        block   3 : ordering dp
-//->   //                  : names    x(6) x(7) 
+//->   //                  : names    x(6) x(7)
 //->   //        block   4 : ordering C
 
 kill R;
@@ -115,15 +115,15 @@ ring R = 0, (x,y), dp;
 poly f = x2+y;
 ring S = 0, (a,b,c), dp;
 map F = R, a-b, c;  // map F: R->S, sending x to a-b, y to c
-poly g = F(f);      // apply the map 
+poly g = F(f);      // apply the map
 g;
 //->   a2-2ab+b2+c
-ring S1 = 2, (a,b,c), lp; 
+ring S1 = 2, (a,b,c), lp;
 qring Q = std(a^2);
 map F1 = R, a-b, c; // target ring is qring, with another
                     // characteristic and monomial order
 poly g=F1(f);
-g;                  // polynomial is not yet reduced 
+g;                  // polynomial is not yet reduced
 //->   a2+b2+c
 reduce(g,std(0));
 //->   b2+c
@@ -140,28 +140,28 @@ fetch(Q,g);
 
 kill R,S,S1,R1,Q;
 //======================  new Session =============================
-ring R = 0, (x,y,z), dp;    
+ring R = 0, (x,y,z), dp;
 ideal I = x2-y, y4-z2;
 
 
 kill R;
 //======================  new Session =============================
-ring R = 0, (x,y,z), dp;    
+ring R = 0, (x,y,z), dp;
 poly f = x2-y;
 poly g = y4-z2;
 ideal I = f,g;
 vector v = [f,0,0,g,0];
 
 kill v; // ---- Alternatively:
-vector v = f*gen(1)+g*gen(4); 
+vector v = f*gen(1)+g*gen(4);
 
 kill R;
 ring R = 0, (x,y,z), (c,dp);
-vector v = [x,y]+[x2,1,z3,0];  
+vector v = [x,y]+[x2,1,z3,0];
 v;
 //->   [x2+x,y+1,z3]
 
-ring S = 0, (x,y,z), (dp,c);  
+ring S = 0, (x,y,z), (dp,c);
 vector v = fetch(R,v);
 v;
 //->   z3*gen(3)+x2*gen(1)+x*gen(1)+y*gen(2)+gen(2)
@@ -178,7 +178,7 @@ print(I);
 //->   x2,0,y,
 //->   -y,0,x,
 //->   y, y,0,
-//->   -y,0,0 
+//->   -y,0,0
 
 matrix MI[4][3] =  x2, 0, y,
                    -y, 0, x,
@@ -234,7 +234,7 @@ print(betti(I,0),"betti");
 //->   total:     5     7
 
 intmat BI = betti(I,0);
-int d = attrib(BI,"rowShift"); 
+int d = attrib(BI,"rowShift");
 d;
 //->   2
 
@@ -242,7 +242,7 @@ d;
 kill R,DV,BI,d;
 //====================== Section 3.5 (new Session) =================
 ring R = 0, (x,y,z), lp;
-ideal  I = 2y+z,3x-y; 
+ideal  I = 2y+z,3x-y;
 std(I);
 //->   _[1]=2y+z
 //->   _[2]=3x-y
@@ -263,16 +263,16 @@ ring R = 0, (x,y,z), dp;
 ideal I = 3x3y+x3+xy3+y2z2, 2x3z-xy-xz3-y4-z2, 2x2yz-2xy2+xz2-y4;
 option(redSB);          // force computation of reduced GBs
 int aa = timer;
-ideal SI = std(I);     
+ideal SI = std(I);
 size(SI);  dim(SI);
 
 ring S = 0, (x,y,z), lp;
 aa = timer;
-ideal J = fglm(R,SI);   
+ideal J = fglm(R,SI);
 
 size(J);                  // number of generators
 //->   8
-size(string(J)) div 68;   // number of lines with 68 characters 
+size(string(J)) div 68;   // number of lines with 68 characters
                           // needed to display J:
 //->   631
 deg(J[1..size(J)]);       // degrees of the generators
@@ -305,15 +305,15 @@ option(redSB);
 ring Rhom = 0, (x,y,z,t), dp;
 ideal I = imap(S,I);
 ideal Ih = homog(I,t);   // generators of I are homogenized
-int aa = timer;  
+int aa = timer;
 Ih = std(Ih);
-intvec H = hilb(Ih,1); 
+intvec H = hilb(Ih,1);
 ring Shom = 0, (x,y,z,t), lp;
 ideal Ih = imap(Rhom,Ih);
-Ih = std(Ih,H); 
+Ih = std(Ih,H);
 Ih = subst(Ih,t,1);
 setring S;
-ideal J = imap(Shom,Ih); 
+ideal J = imap(Shom,Ih);
 size(J);
 //->   102
 
@@ -329,13 +329,13 @@ kill S,Rhom,aa,H,Shom;
 ring R = (32003,a,b,c,d), (t,u,v,w,x,y,z), dp;
 ideal I = -cw+bx, ct+2au-2bu-2cv-(ad+bd),
           -2tx+4wy+4xz+ct-2aw-2dw-2by-2cz+(ab+bd),
-          t*(z-x)+(a-b+d)*(y-w)+c*(x-z), -tw+a*(t-x)+dx, 
+          t*(z-x)+(a-b+d)*(y-w)+c*(x-z), -tw+a*(t-x)+dx,
           -2tv+ct-2du+(ad+bd), ct2-(b2-ab+c2)*t-(acd-cd2);
 int aa = timer;
-ideal SI = slimgb(I);  
+ideal SI = slimgb(I);
 size(SI), dim(SI);
 
-SI = std(I);  
+SI = std(I);
 size(SI), dim(SI);
 
 
@@ -347,7 +347,7 @@ ideal I = 3x3y+x3+xy3+y2z2, 2x3z-xy-xz3-y4-z2, 2x2yz-2xy2+xz2-y4;
 option(redSB);
 option(prot);
 int aa = timer;
-ideal J = groebner(I); 
+ideal J = groebner(I);
 //->   std in (0),(x,y,z,@t),(dp,C)
 //->   [255:1]4(2)sss5s6s7(3)s(4)s(5)s(6)s8(8)s(9)-ss(11)s(12)---9-s(9)-s(
 //->   10)--s--10-s(8)s(9)-s---11------
@@ -362,7 +362,7 @@ ideal J = groebner(I);
 //->   hhhhhh15(10)s(12)s(14)shhhhhhhh16(8)s(10)s(12)shhhhhh17(8)s(10)s(12
 //->   )shhhhhh18(8)s(9)s(11)shhhhhh19(7)s(9)shhhhhh20(5)s(7)shhhh21(5)s(7
 //->   )shhhh22(5)s(7)shhhh23(5)s(7)shhhh24(5)s(6)shhhh25(4)shhhh26(2)shh2
-//->   7shh28shh29shh30shh31shh32shh33shh34shh35shh36shh37shh38shhhh 
+//->   7shh28shh29shh30shh31shh32shh33shh34shh35shh36shh37shh38shhhh
 //->   product criterion:27 chain criterion:4846
 //->   hilbert series criterion:175
 //->   dehomogenization
@@ -394,18 +394,18 @@ matrix(I)*A;
 
 kill R;
 //====================== Example 3.22 (new Session) ===============
-ring R = 0, (x,y), dp;       
+ring R = 0, (x,y), dp;
 ideal I = x7+x5y2, y4-xy7;
 poly f1, f2 = x6y7+x3y5, x6y7+x7y2;
 ideal GI = groebner(I);
 reduce(f1,GI,1);     // see Example 1.39 for reduce
 //->   y5-y4
-reduce(f2,GI,1); 
+reduce(f2,GI,1);
 //->   0
-lift(I,f1);  
+lift(I,f1);
 //->      ? 2nd module lies not in the first
 //->      ? error occurred in STDIN line 8: `lift(I,f1);  `
-matrix C = lift(I,f2); 
+matrix C = lift(I,f2);
 C;
 //->   C[1,1]=x4y22-x2y24-x3y19+xy21+y2
 //->   C[2,1]=x10y15-x6y19-x5
@@ -417,16 +417,16 @@ ideal J2 = f2, x5y9+x6y4;
 reduce(J1,GI,1);     // normal form for the generators of J1
 //->   _[1]=y5-y4
 //->   _[2]=0
-size(reduce(J2,GI,1)); 
+size(reduce(J2,GI,1));
 //->   0
 
 
 kill R;
 //====================== Example 3.23 (new Session) ===============
-ring R = 0, (x,y), dp;       
+ring R = 0, (x,y), dp;
 ideal I = maxideal(3);  // the ideal <x,y>^3
 poly f1, f2 = x, 1-x;
-ring S = 0, (x,y,t), dp;  
+ring S = 0, (x,y,t), dp;
 ideal I = imap(R,I);
 poly f1 = imap(R,f1);
 ideal Jf1 = I, t*f1-1;
@@ -451,7 +451,7 @@ kill R,S;
 //====================== Example 3.24 (new Session) ===============
 ring R = 0, (a,b,c,d,e,f,g,t,u,v,w,y,z), dp;
 ideal I = z2+e2-1, g2+w2+a2-1, t2+u2+b2-1, f2+v2+c2-1, y2+d2-1,
-          zw+ea, gt+wu+ab, tf+uv+bc, fy+cd, a+b+c+d+e, f+g+t+y+1, 
+          zw+ea, gt+wu+ab, tf+uv+bc, fy+cd, a+b+c+d+e, f+g+t+y+1,
           u+v+w+z-1;
 ring Rhom = 0, (a,b,c,d,e,f,g,t,u,v,w,y,z,h), dp;
 ideal I = imap(R,I);
@@ -461,8 +461,8 @@ ideal L = std(J);
 intvec H = hilb(L,1);    // assign Hilbert series
 ideal K = eliminate(J,abcdefgtuvw,H);
 K = subst(K,h,1);        // dehomogenize
-size(K);   
-//->   1 
+size(K);
+//->   1
 K[1];                    // the equation
 //->   790272y16z16-3612672y16z15+3612672y15z16-6530048y16z14-6006784y15z15
 //->   -6530048y14z16+41607168y16z13-56159232y15z14+[...]
@@ -471,9 +471,9 @@ K[1];                    // the equation
 kill R,Rhom,aa,H;
 //====================== Example 3.27 (new Session) ===============
 ring R = 0, x(1..3), dp;
-poly f1 = x(1)^6*x(3)^2-x(2)^6*x(3)^2; 
+poly f1 = x(1)^6*x(3)^2-x(2)^6*x(3)^2;
 poly f2,f3,f4 = x(1)^3-x(2)^3, x(1)^3+x(2)^3, x(3)^3;
-ring S = 0, y(1..4), dp; 
+ring S = 0, y(1..4), dp;
 setring R;
 ideal zero;              // the zero ideal
 map phi = S,f1,f2,f3,f4;
@@ -490,7 +490,7 @@ L[1];            // first entry of L is 1 iff the polynomials are
 //->   1
 def S = L[2];    // second entry of L is a ring which contains
                  // an ideal ker defining the algebraic relation
-setring S; 
+setring S;
 ker;
 //->   ker[1]=y(2)^3*y(3)^3*y(4)^2-y(1)^3
 
@@ -500,12 +500,12 @@ kill R,S,L;
 ring R = 0, x(1..3), dp;
 poly f = x(1)^6*x(2)^6-x(1)^6*x(3)^6;
 poly f1 = x(1)^3*x(2)^3-x(1)^3*x(3)^3;
-poly f2 = x(1)^3*x(2)^3+x(1)^3*x(3)^3;  
-ring S = 0, (x(1..3),y(1..2)), (dp(3),dp(2)); 
+poly f2 = x(1)^3*x(2)^3+x(1)^3*x(3)^3;
+ring S = 0, (x(1..3),y(1..2)), (dp(3),dp(2));
 ideal J = imap(R,f1)-y(1), imap(R,f2)-y(2);
 ideal G = groebner(J);
 reduce(imap(R,f),G);
-//->   y(1)*y(2)  
+//->   y(1)*y(2)
 
 setring R; kill S; //--- Alternatively:
 if (not(defined(algebra_containment))){ LIB "algebra.lib"; }
@@ -513,8 +513,8 @@ algebra_containment(f,ideal(f1,f2));
 //->   // y(1)*y(2)
 //->   1
 def L = algebra_containment(f,ideal(f1,f2),1);
-def S = L[2]; 
-setring S; 
+def S = L[2];
+setring S;
 check;              // polynomial defining the algebraic relation
 //->   y(1)*y(2)
 
@@ -541,20 +541,20 @@ is_surjective(psi);
 
 kill A,B,C,Q;
 //====================== Example 3.30 (new Session) ===============
-ring R = 0, (w,x,y,z), dp; 
+ring R = 0, (w,x,y,z), dp;
 poly f1, f2, f3 = y2-xz, xy-wz, x2z-wyz;
-ideal I = f1, f2, f3; 
+ideal I = f1, f2, f3;
 module phi2 = syz(I);
 print(phi2);
-//->   x, wz, 
+//->   x, wz,
 //->   -y,-xz,
-//->   1, y  
+//->   1, y
 size(syz(phi2));  // we check that there are no higher syzygies
 //->   0
 
 resolution FI = nres(I,0);
 typeof(FI[1]);        // 'typeof' displays type of given object
-//->   ideal 
+//->   ideal
 print(FI[1]);
 //->   y2-xz,
 //->   xy-wz
@@ -562,9 +562,9 @@ print(FI[1]);
 typeof(FI[2]);
 //->   module
 print(FI[2]);
-//->   x, wz, 
+//->   x, wz,
 //->   -y,-xz,
-//->   1, y   
+//->   1, y
 
 print(betti(FI),"betti");
 //->              0     1     2
@@ -601,7 +601,7 @@ homog(I);
 //->   1
 attrib(I,"isHomog");
 //->   0,1,1,2,2
-resolution FInres = nres(I,0);  
+resolution FInres = nres(I,0);
 print(betti(FInres,0),"betti");
 //->              0     1     2
 //->   ------------------------
@@ -680,13 +680,13 @@ print(FPImres[1]);
 //->   0,  -z2,-w2,    wx-yz,
 //->   w,  -x, 0,      0
 print(FPImres[2]);
-//->   xy, 
-//->   wy, 
+//->   xy,
+//->   wy,
 //->   -xz,
-//->   -wz 
+//->   -wz
 resolution FPIsres = sres(PI,0);
 //->      ? ideal not a standardbasis
-//->      ? error occurred in STDIN line 27: 
+//->      ? error occurred in STDIN line 27:
 //->        `resolution FPIsres = sres(PI,0);`
 resolution FPIsres = sres(groebner(PI),0);
 print(betti(FPIsres,0),"betti");
@@ -753,7 +753,7 @@ basering;
 //================= Example 3.44 (continued Session) ===============
 ideal I = x(1)^2*d(2)^2+x(2)^2*d(3)^2, x(1)*d(2)+x(3);
 option(redSB);
-ideal LSI = std(I); 
+ideal LSI = std(I);
 LSI;
 //->   LSI[1]=x(1)*d(2)+x(3)
 //->   LSI[2]=x(3)^2
@@ -831,7 +831,7 @@ basering;
 //================= Example 3.46 (continued Session) ===============
 ideal I = maxideal(1);
 def rI = mres(I,0);
-//->   // ** full resolution in a qring may be infinite, 
+//->   // ** full resolution in a qring may be infinite,
 //->   //    setting max length to 5
 print(betti(rI),"betti");
 //->              0     1     2     3     4     5
@@ -842,8 +842,8 @@ print(betti(rI),"betti");
 print(rI[1],"");
 //->   x(3),x(2),x(1)
 print(rI[2]);
-//->   x(3),x(2),0,   x(1),0,   0,  
-//->   0,   x(3),x(2),0,   x(1),0,  
+//->   x(3),x(2),0,   x(1),0,   0,
+//->   0,   x(3),x(2),0,   x(1),0,
 //->   0,   0,   0,   x(3),x(2),x(1)
 
 
@@ -895,23 +895,23 @@ L[3];
 L[4];
 //->   _[1]=x(1)-y(1)^2
 L[1][2][1] = "b";            // new name for the parameter
-L[2][8] = "w";               // append a new variable with name w 
+L[2][8] = "w";               // append a new variable with name w
 L[3][3][2] = intvec(1,1,1);  // raise the size of the third block
                              // of the monomial order
 def S = ring(L);
 setring S;
 basering;
 //->   //   characteristic : 0
-//->   //   1 parameter    : b 
+//->   //   1 parameter    : b
 //->   //   minpoly        : (b^2+1)
 //->   //   number of vars : 8
 //->   //        block   1 : ordering dp
-//->   //                  : names    x(1) x(2) x(3) 
+//->   //                  : names    x(1) x(2) x(3)
 //->   //        block   2 : ordering wp
-//->   //                  : names    y(1) y(2) 
-//->   //                  : weights     2    5 
+//->   //                  : names    y(1) y(2)
+//->   //                  : weights     2    5
 //->   //        block   3 : ordering lp
-//->   //                  : names    z(1) z(2) w 
+//->   //                  : names    z(1) z(2) w
 //->   //        block   4 : ordering C
 //->   // quotient ring from ideal
 //->   _[1]=x(1)-y(1)^2

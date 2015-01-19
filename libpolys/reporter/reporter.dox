@@ -1,4 +1,4 @@
-/*! \page libpolys_reporter_page Reporter 
+/*! \page libpolys_reporter_page Reporter
 
  The most basic printing and error/warning procedures
  which may be used by Singular (e.g. \ref Werror,\ref Warn,\ref Print).

@@ -7,7 +7,7 @@
 @cindex cone
 
 In order to use convex objects in Singular, Singular has to be build from sources
-together with gfanlib, a C++ library for convex geometry by Anders N. Jensen. 
+together with gfanlib, a C++ library for convex geometry by Anders N. Jensen.
 Please check the readme file for installation instructions.
 
 This version of @sc{Singular} does not support @code{cone}.

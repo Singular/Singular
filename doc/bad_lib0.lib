@@ -7,4 +7,4 @@
   uu // here is the error
   proc t1(int j)
   { return(j); }
-  
+

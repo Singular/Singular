@@ -9,7 +9,7 @@ proc projdim(module M)
    {
      i++;
      if(size(l[i])==0){return(i-1);}
-   }   
+   }
 }
 
 proc isCohenMacaulay1(ideal I)
@@ -32,7 +32,7 @@ kill R;
 
 proc CohenMacaulayTest1(module M, int d)
 {
-  return((d-projdim(M))==dim(std(Ann(M)))); 
+  return((d-projdim(M))==dim(std(Ann(M))));
 }
 
 LIB"primdec.lib";

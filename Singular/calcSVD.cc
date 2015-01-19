@@ -94,14 +94,14 @@ lists testsvd(matrix M)
     for(i=1;i<=si_min(max_i,max_j);i++)
     {
     		MATELEM(Mw,i,i)=p_svdInit(w(i).toString());
-//Print(" after svd:%d,%d=%s\n",i,w(i).toString());        		
+//Print(" after svd:%d,%d=%s\n",i,w(i).toString());
     }
     for(i=1;i<=max_j;i++)
     {
     	for(j=1;j<=max_j;j++)
     	{
     		MATELEM(Mvt,i,j)=p_svdInit(vt(i,j).toString());
-//Print(" after svd:%d,%d=%s\n",i,j,vt(i,j).toString());        		
+//Print(" after svd:%d,%d=%s\n",i,j,vt(i,j).toString());
     	}
     }
     lists L=(lists)omAlloc(sizeof(slists));

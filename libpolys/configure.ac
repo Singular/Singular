@@ -1,7 +1,7 @@
 AC_INIT([libpolys], [4.0.1])
 
 AC_CONFIG_MACRO_DIR([../m4])
-AC_CONFIG_AUX_DIR([.])
+AC_CONFIG_AUX_DIR([../build-aux])
 AC_CONFIG_SRCDIR([reporter/reporter.h])
 AC_CONFIG_HEADER([_config.h])
 
@@ -76,14 +76,14 @@ case $host_os in
 esac
 
 dnl INCLUDES=""
-dnl dnl OS specific flags and options (does work without the following:) 
+dnl dnl OS specific flags and options (does work without the following:)
 dnl case "$host" in
 dnl     *-*-freebsd*)
 dnl         LIBS="$LIBS -L/usr/local/lib -lc"
 dnl 	CFLAGS="$CFLAGS -I/usr/local/include"
 dnl 	INCLUDES="$INCLUDES -I/usr/local/include"
 dnl 	;;
-dnl esac	
+dnl esac
 dnl AC_SUBST(INCLUDES)
 
 SING_CHECK_OMALLOC()
@@ -96,7 +96,7 @@ AC_ARG_VAR( [RESOURCES_LIBS], [LIBS for libresources] )
 AC_MSG_CHECKING(whether libresources should be used)
 
 if test "x$ENABLE_RESOURCES" = xyes;
-then 
+then
   AC_MSG_RESULT(yes)
 
   AC_MSG_CHECKING([  RESOURCES_INCLUDES?..])
@@ -109,7 +109,7 @@ then
   AC_SUBST(PKG_REQUIRE)
 else
   AC_MSG_RESULT(no)
-fi 
+fi
 
 AM_CONDITIONAL([ENABLE_RESOURCES],[test "x$ENABLE_RESOURCES" = xyes])
 
@@ -126,8 +126,8 @@ AC_DEFINE([SINGULAR],[1],[SINGULAR])
 AC_DEFINE([DISABLE_GMP_CPP],[1],[DISABLE_GMP_CPP])
 AC_DEFINE([NOSTREAMIO],[1],[DISABLE_GMP_CPP])
 
-AX_PYTHON_DEFAULT()
-AX_PYTHON_WITH_VERSION([2.4])
+# AX_PYTHON_DEFAULT()
+# AX_PYTHON_WITH_VERSION([2.4])
 
 AC_DEFINE_UNQUOTED([NTL_CFLAGS],"$NTL_CFLAGS",[NTL_CFLAGS])
 AC_DEFINE_UNQUOTED([NTL_LIBS],"$NTL_LIBS",[NTL_LIBS])

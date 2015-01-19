@@ -2,8 +2,8 @@ digraph IncludesInSingular4
 {
   compound=true;
   edge [ arrowhead=open ];
-  graph [ 
-//    rankdir=TB; 
+  graph [
+//    rankdir=TB;
   ];
   pack = 0 ;
   packMode = "graph" ;
@@ -49,7 +49,7 @@ digraph IncludesInSingular4
   subgraph "clusterinternals"
   {
     label="Supporting libraries:";
-    { rank=same; 
+    { rank=same;
       omalloc [ fillcolor=lightgrey, fontcolor=darkgreen, style=filled, color = black, shape=box ] ;
       libresources [ fillcolor=lightgrey, style=filled, color = black, shape=box ]  ;
     } ;
@@ -67,7 +67,7 @@ digraph IncludesInSingular4
     { rank=same; NTL ; FLINT ;  PolyMakeRTL; };
     { rank=same; mathicgb; cddlib; Python2RTL; };
    } ;
-  } ;  
+  } ;
   NTL -> GMP_OR_MPIR [style = "dotted"];
   FLINT -> GMP_OR_MPIR [style = "dotted"];
   cddlib -> GMP_OR_MPIR [style = "dotted"];

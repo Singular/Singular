@@ -6,9 +6,9 @@ LIB("ring.lib");
 proc parIsNthPrimitiveRoot(int n)
 {
    if (n==0) {  return( minpoly==number(0) ); }
-   ASSUME(0, "0" != string(minpoly) ); 
+   ASSUME(0, "0" != string(minpoly) );
    number m=1;
-   int i; 
+   int i;
    for (i=1;i<n;i++)
    {
        m = m*par(1);
@@ -25,7 +25,7 @@ proc testRootofUnity()
     ring rng = (0,a),x,dp;
     minpoly = (a8-a7+a5-a4+a3-a+1);
     ASSUME(0, not parIsNthPrimitiveRoot(30));
-    int i; 
+    int i;
 
     for(i = 0; i<100; i++)
     {

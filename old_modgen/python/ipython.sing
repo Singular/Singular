@@ -19,7 +19,7 @@ from IPython.Shell import IPShellEmbed
 # Now create the IPython shell instance. Put ipshell() anywhere in your code
 # where you want it to open.
 ipshell = IPShellEmbed(argv,banner=banner,exit_msg=exit_msg)
-ipshell()                            
+ipshell()
 #---------------------------------------------------------------------------
 # This code will load an embeddable IPython shell always with no changes for
 # nested embededings.

@@ -12,15 +12,20 @@
 
 
 #include <misc/auxiliary.h>
+#include <omalloc/omalloc.h>
+
+#include <reporter/reporter.h>
 
 //#ifdef HAVE_MPR
 #include <coeffs/coeffs.h>
-#include <reporter/reporter.h>
-#include <omalloc/omalloc.h>
 #include <coeffs/numbers.h>
-#include <coeffs/longrat.h>
-#include <math.h>
+
 #include <coeffs/mpr_complex.h>
+
+#include "longrat.h"
+
+#include <math.h>
+
 
 //%s
 // this was copied form longrat0.cc
@@ -390,7 +395,7 @@ gmp_float numberToFloat( number num, const coeffs src)
       {
         if ( num->s == 0 )
         {
-          nlNormalize( num, src );
+          nlNormalize( num, src ); // FIXME? TODO? // extern void     nlNormalize(number &x, const coeffs r); // FIXME
         }
         if (SR_HDL(num) & SR_INT)
         {
@@ -449,7 +454,7 @@ gmp_float numberFieldToFloat( number num, int k, const coeffs src)
       {
         if ( num->s == 0 )
         {
-          nlNormalize( num, src );
+          nlNormalize( num, src ); // FIXME? TODO? // extern void     nlNormalize(number &x, const coeffs r); // FIXME
         }
         if (SR_HDL(num) & SR_INT)
         {

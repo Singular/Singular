@@ -186,7 +186,7 @@ L[2];
 def HNring = L[1]; setring HNring;  displayHNE(hne);
 ideal P; map phi;
 for (int i=1; i<=size(hne); i++)
-{ 
+{
   P=param(hne[i]);
   phi=HNring,P[1],P[2];
   phi(f);
@@ -200,7 +200,7 @@ L[2];
 def HNring = L[1]; setring HNring;  displayHNE(hne);
 ideal P; map phi;
 for (int i=1; i<=size(hne); i++)
-{ 
+{
   P=param(hne[i]);
   phi=HNring,P[1],P[2];
   ord(phi(f));
@@ -208,7 +208,7 @@ for (int i=1; i<=size(hne); i++)
 kill i,P,phi,L,HNring;
 setring r;
 poly f=(x2-y2)*(x2+y2)*(x2+y4);
-def L=hnexpansion(f,"ess"); 
+def L=hnexpansion(f,"ess");
 L[2];
 def HNring = L[1]; setring HNring;  displayHNE(hne);
 setring r; kill HNring;
@@ -223,7 +223,7 @@ L[2];
 def HNring = L[1]; setring HNring;
 ideal P; map phi;
 for (int i=1; i<=size(hne); i++)
-{ 
+{
   P=param(hne[i]);
   phi=HNring,P[1],P[2];
   phi(f);
@@ -232,12 +232,12 @@ kill i,P,phi,HNring,L,r;
 ring r=(0,a),(x,y),ds;
 minpoly=a2-2;
 poly f=(x2-y2)*(x2+y2)*(2y2+x4)*(y2-x7)*(2x2+y4);
-def L=hnexpansion(f,1); 
+def L=hnexpansion(f,1);
 L[2];
-def HNring = L[1]; setring HNring; 
+def HNring = L[1]; setring HNring;
 ideal P; map phi;
 for (int i=1; i<=size(hne); i++)
-{ 
+{
   P=param(hne[i]);
   phi=HNring,P[1],P[2];
   phi(f);
@@ -247,7 +247,7 @@ kill i,P,phi,HNring,L;
 //--------------- examples with more than one ring change
 ring F3=3,(x,y),dp;
 list L=hnexpansion((x3-xy2+y3)*(x2+y2)*(x4-x3y+xy3+y4));
-def HNring = L[1]; setring HNring;  
+def HNring = L[1]; setring HNring;
 map T; int i;
 for (i=1; i<=size(hne); i++) {
  T=basering,param(hne[i]);
@@ -261,7 +261,7 @@ setring F3;
 poly f=(x3-xy4+y6)*(x2+y2)*(x4-x3y+xy3+y4);
 L=hnexpansion(f,1);
 L[2];
-def HNring = L[1]; setring HNring;  
+def HNring = L[1]; setring HNring;
 map T; int i;
 for (i=1; i<=size(hne); i++) {
  T=basering,param(hne[i]);
@@ -271,7 +271,7 @@ kill HNring,i;
 setring F3;
 f=(x3-xy4+y6)*(x2+y6)*(x4-x3y4+xy12+y16);
 L=hnexpansion((x3-xy4+y6)*(x2+y6)*(x4-x3y4+xy12+y16));
-def HNring = L[1]; setring HNring;  
+def HNring = L[1]; setring HNring;
 map T; int i;
 for (i=1; i<=size(hne); i++) {
  T=basering,param(hne[i]);
@@ -330,15 +330,15 @@ poly p_1 = y4+x6;
 poly p_2 = y7-2x14;
 poly p_3 = p_1^14 + p_2^10+x100+y83;
 z=timer;
-def L=hnexpansion(p_3,"ess"); 
+def L=hnexpansion(p_3,"ess");
 tst_ignore(timer-z,"time");
 tst_ignore(kmemory(),"memory");
 L[2];
 def HNring = L[1]; setring HNring;  displayHNE(hne);
 kill r,L,HNring;
 
-// irreducible example with 3 Puiseux pairs over algebraic number field 
-// (no field extension needed) 
+// irreducible example with 3 Puiseux pairs over algebraic number field
+// (no field extension needed)
 ring r=(199,a),(x,y,t),ds;
 minpoly = 5+12a+3a2-4a3+3a4+a6;
 number I = 23-94a+94a2-38a3-81a4-91a5;   // I^2 = -1
@@ -349,7 +349,7 @@ def f=eliminate(J,t)[1];
 def L=hnexpansion(f);
 displayInvariants(L[1]);
 
-// Example with 1 field extension, 6 conjugate branches, 3 Puiseux pairs 
+// Example with 1 field extension, 6 conjugate branches, 3 Puiseux pairs
 ring r=199,(x,y),ds;
 poly g=y48+24*x3y46+77*x6y44+34*x9y42+79*x12y40+56*x9y43-82*x15y38-93*x12y41
  +72*x18y36+12*x15y39+43*x21y34+42*x18y37-6*x15y40-33*x24y32-99*x21y35
@@ -417,7 +417,7 @@ setring r;
 kill F3;
 
 // ------------ more tests of hnexpansion: --------------------
-list L=hnexpansion((x2+iy3)^7+x15);  
+list L=hnexpansion((x2+iy3)^7+x15);
 def HNring = L[1]; setring HNring;  displayHNE(hne);
 show(extdevelop(hne[1],8));          // Fehler in factorize endlos!
 map T=basering,param(hne[1]);

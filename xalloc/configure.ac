@@ -1,8 +1,7 @@
 AC_INIT([xalloc], [3.1.2.sw])
 AC_CONFIG_SRCDIR(dummy.c)
 AC_CONFIG_MACRO_DIR([../m4])
-
-AC_CONFIG_AUX_DIR([.])
+AC_CONFIG_AUX_DIR([../build-aux])
 
 AM_MAINTAINER_MODE([enable])
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules

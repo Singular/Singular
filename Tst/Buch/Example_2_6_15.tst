@@ -3,16 +3,16 @@ tst_init();
 
 proc extendedNormalForm(matrix M)
 {
-   intvec v=1..nrows(M); 
-   intvec w=nrows(M)+1..nrows(M)+ncols(M); 
+   intvec v=1..nrows(M);
+   intvec w=nrows(M)+1..nrows(M)+ncols(M);
    matrix N=concat(freemodule(nrows(M)),M);
    N=transpose(interred(transpose(N)));
    matrix C=submat(N,v,v);
    C=lift(C,freemodule(nrows(C))); //the inverse matrix of C
-   matrix D=submat(N,v,w); 
-   D=transpose(interred(D)); 
+   matrix D=submat(N,v,w);
+   D=transpose(interred(D));
    list Re=C,D;
-   return(Re);  
+   return(Re);
 }
 
 option(redSB);
@@ -39,10 +39,10 @@ list L= extendedNormalForm(A);
 
 print(L[1]);
 
-print(L[2]); 
+print(L[2]);
 
 matrix V1[5][4]=concat(L[1][1],M*L[1][1],M*M*L[1][1],M*M*M*L[1][1]);
-matrix V2[5][1]=L[1][2]; 
+matrix V2[5][1]=L[1][2];
 
 list F=factorize(L[2][1,1]);
 F;
@@ -66,23 +66,23 @@ matrix S=polyOfEndo(M,F[1][2]^2);
 matrix V11=std(S*V1);
 print(V11);
 
-S=polyOfEndo(M,F[1][3]); 
+S=polyOfEndo(M,F[1][3]);
 matrix V12=std(S*V1);
 print(V12);
 
 matrix B=concat(V11,V12,V2);
-det(B);                 
+det(B);
 
-reduce(M*V11,std(V11));  
+reduce(M*V11,std(V11));
 reduce(M*V12,std(V12));
 reduce(M*V2,std(V2));
 
-matrix C=lift(B,M*B);  
-print(C);   
+matrix C=lift(B,M*B);
+print(C);
 
-matrix v[5][1]=V12[1];   
+matrix v[5][1]=V12[1];
 B=concat(V11,M*v-2*v,v,V2);
 C=lift(B,M*B);
-print(C);  
+print(C);
 
 tst_status(1);$

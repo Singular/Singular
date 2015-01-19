@@ -20,7 +20,7 @@ class Context(object):
     def lookupImplementation(self, oms):
         #print self.implementations
         try:
-            
+
             return getattr(self.implementations[oms.cd],oms.name)
         except ValueError:
             raise NotImplementedError
@@ -72,9 +72,9 @@ class Context(object):
             #print efunc
             return OMA(efunc, eargs)
     def evaluate(self,omobject):
-        
+
         if isinstance(omobject,OMV):
-           
+
             return self.evaluateVariable(omobject)
         if isinstance(omobject,OMS):
             return self.evaluateSymbol(omobject)
@@ -96,7 +96,7 @@ class Context(object):
             return OMint(val)
         if isinstance(val, float):
             return OMfloat(val)
-            
+
             raise NotImplementedError
     def apply(self,func,args):
         try:
@@ -131,14 +131,14 @@ class SimpleErrorHandler(object):
     def handle_unsupported_cd(self, symbol):
         pass
     def handle_unexpected_symbol(self, symbol):
-        pass 
+        pass
 class SimpleXMLEncoder(object):
     def __init__(self):
       self.re_inner=compile("&")
       self.re_outer=compile("<")
     def encode(self, string):
         #return sub("<","&lt;",sub("&","&amp;",string))
-      return self.re_outer.sub("&lt", self.re_inner.sub("&amp", string)) 
+      return self.re_outer.sub("&lt", self.re_inner.sub("&amp", string))
 class Scope(object):
     def __init__(self):
         self.dicts=[]

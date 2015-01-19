@@ -2,8 +2,8 @@
 History of the "surfex" algebraic geometry visualization tool
 -------------------------------------------------------------
 
-If you experience any bug which is not listed here, 
-or if you would want us to add another feature, 
+If you experience any bug which is not listed here,
+or if you would want us to add another feature,
 please, feel free to contact us via our website:
 www.surfex.AlgebraicSurface.net
 
@@ -19,7 +19,7 @@ known bugs:
 - NT: when trying to close the last project, surfex hangs up (so: disabled)
 
 
-feature requests: 
+feature requests:
 -----------------
 
 - OL: good end user documentation
@@ -29,7 +29,7 @@ feature requests:
 - HC: check-box in save movie allowing to omit the first/last frame or not
 - OL: allow other clipping then sphere-clipping
 - HC: produce mpeg-movies
-- OL: save surfex-command-line which would have to be used for producing 
+- OL: save surfex-command-line which would have to be used for producing
       the raytraced image / movie
 - OL: run surfex as a "compute-" or "display-server" for other tools
 - OL: plane curves
@@ -41,10 +41,10 @@ feature requests:
 - OL: when quitting, check if all projects saved
 - OL: complete light source positioning
 - OL: allow to remove parameters/equations/curves/points
-- OL: allow cutting with (several) arbitrary surfaces 
+- OL: allow cutting with (several) arbitrary surfaces
 - OL: allow boolean operations (this requires either to use PovRay or to implement
   this feature in surf!)
-- OL: API to allow other tools to access surfex's features 
+- OL: API to allow other tools to access surfex's features
       (e.g. for use from Cinderella)
 - OL: internally seperate computational part from windows
       (e.g., this makes surfex a lot faster when used as a command line

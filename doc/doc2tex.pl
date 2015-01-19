@@ -14,15 +14,15 @@
 #       ....
 #       @c end computed example $ex_prefix $doc_file:$line
 #       reuse computed examples if ($reuse && -r $ex_prefix.inc)
-#       cut absolute directory names from the loaded messages 
+#       cut absolute directory names from the loaded messages
 #       substituted @,{ and } by @@, @{ resp. @}
 #       wrap around output lines  longer than $ex_length = 73;
-#       Processing is aborted if error occures in Singular run, 
+#       Processing is aborted if error occures in Singular run,
 #       unless 'error' is specified
 #       if no_comp is given, then computation is not run
 #       if unix_only is given, then computation is only run
 #                              under unix
-#       
+#
 #
 ####
 # @c include file
@@ -34,21 +34,21 @@
 # @c ref
 #    -> scans intermediate lines for @ref{..} strings
 #    Creates menu of (sorted) refs for ifinfo
-#    Creates comma-separated (sorted) refs for iftex, prepended with 
+#    Creates comma-separated (sorted) refs for iftex, prepended with
 #    the text before first @ref.
 #
 ####
 # @c lib libname.lib[:proc] [no_ex, no_fun, Fun, (\w*)section]
-#   --> replaced by @include $texfile where 
+#   --> replaced by @include $texfile where
 #        $texfile = $subdir/libname_lib[_noFun,_noEx].tex
-#   --> if $make, calls "make $texfile" 
+#   --> if $make, calls "make $texfile"
 #   --> Error, if $tex_file does not exist
 #   --> if [:proc] is given, then includes only of respective
 #       proc body
 #   --> Fun overwrites global no_fun
 #   --> if (\w*)section is given, replaces @subsubsection by @$1section
 #       and pastes in content of tex file directly
-# 
+#
 #
 ###################################################################
 
@@ -94,7 +94,7 @@ $| = 1;
 $doc_file = pop(@ARGV);
 if ($doc_file =~  /(.+)\..*$/)
 {
-  die "*** Error: Need .doc file as input\n" . &Usage  
+  die "*** Error: Need .doc file as input\n" . &Usage
     unless ($doc_file =~ /(.+)\.doc$/);
 }
 else
@@ -107,7 +107,7 @@ else
 # parse command line options
 #
 $args = join(" ", @ARGV);
-while (@ARGV && $ARGV[0] =~ /^-/) 
+while (@ARGV && $ARGV[0] =~ /^-/)
 {
   $_ = shift(@ARGV);
   if (/^-S(ingular)?$/)  { $Singular = shift(@ARGV); next;}
@@ -130,7 +130,7 @@ $make_opts .= " -s" unless $verbose > 1;
 
 #
 # construct filenames
-# 
+#
 ($doc_dir = $doc_file) =~ s/(.+)\.doc$/$1/;
 if ($doc_dir =~ /(.*)\//)
 {
@@ -150,7 +150,7 @@ unless ($tex_file)
 #
 # open files
 #
-open(DOC, "<$doc_file") 
+open(DOC, "<$doc_file")
   || Error("can't open $doc_file for reading: $!\n" . &Usage);
 open(TEX, ">$tex_file") || Error("can't open $tex_file for writing: $!\n");
 print "(d2t $doc_file==>$tex_file" if ($verbose);
@@ -160,7 +160,7 @@ if (-d $doc_subdir)
 }
 else
 {
-  mkdir($doc_subdir, oct(755)) 
+  mkdir($doc_subdir, oct(755))
     || Error("can't create directory $doc_subdir: $!\n");
   print "(docdir:$doc_subdir)"  if ($verbose > 1);
 }
@@ -170,13 +170,13 @@ if (-d $ex_subdir)
 }
 else
 {
-  mkdir($ex_subdir, oct(755)) 
+  mkdir($ex_subdir, oct(755))
     || Error("can't create directory $ex_subdir: $!\n");
   print "(exdir:$ex_subdir)"  if ($verbose > 1);
 }
 
 #######################################################################
-# 
+#
 # go !
 #
 while (<DOC>)
@@ -217,7 +217,7 @@ while (<DOC>)
 
   print TEX $_;
 
-  if (! $printed_header && /^\@c/) 
+  if (! $printed_header && /^\@c/)
   {
     $printed_header = 1;
     print TEX <<EOT;
@@ -259,10 +259,10 @@ EOT
 #       ....
 #       @c end computed example $ex_prefix $doc_file:$line
 #       reuse computed examples if ($reuse && -r $ex_prefix.inc)
-#       cut absolute directory names from the loaded messages 
+#       cut absolute directory names from the loaded messages
 #       substituted @,{ and } by @@, @{ resp. @}
 #       wrap around output lines  longer than $ex_length = 73;
-#       Processing is aborted if error occures in Singular run, 
+#       Processing is aborted if error occures in Singular run,
 #       unless 'error' is specified
 #       If [no_comp] is given, actual computation is not run
 #       if [unix_only] is given, then computation is only run
@@ -272,7 +272,7 @@ sub HandleExample
 {
   my($inc_file, $ex_file, $lline, $thisexample, $error_ok, $cache, $no_comp,
      $unix_only, $tag);
-  
+
   $lline = $line;
   $section = 'unknown' unless $section;
   $ex_prefix = $section;
@@ -287,12 +287,12 @@ sub HandleExample
   {
     $tag = 'NOTAG';
   }
-  
+
   if ($no_ex or $exclude_ex{$tag})
   {
     print "{$ex_prefix}" if ($verbose);
     print TEX "\@c skipped computation of example $ex_prefix $doc_file:$lline \n";
-    
+
   }
   else
   {
@@ -309,11 +309,11 @@ sub HandleExample
   $error_ok = 1 if /error/;
   $no_comp = 1 if /no_comp/;
   $unix_only = 1 if /unix_only/ && $Win32;
-  
+
   # print content in example file till next @c example
   print TEX "// only supported on Unix platforms\n"
     if $unix_only;
-  
+
   while (<DOC>)
   {
     $line++;
@@ -411,10 +411,10 @@ sub HandleExample
         s/\? error occurred in [^ ]* line/\? error occurred in line/;
 	# break after $ex_length characters
 	$to_do = $_;
-	while (length($to_do) > $ex_length && $to_do =~ /\w/ &&  
+	while (length($to_do) > $ex_length && $to_do =~ /\w/ &&
 	       substr($to_do, $ex_length) !~ /^\s*$/)
 	{
-	  
+
 	  $done .= substr($to_do, 0, $ex_length)."\\\n   ";
 	  $to_do = substr($to_do, $ex_length);
 	}
@@ -431,7 +431,7 @@ sub HandleExample
   }
   print TEX "\@c end example $ex_prefix $doc_file:$lline\n";
 }
-  
+
 ######################################################################
 # @c include file
 #    -> copy content of file into output file protecting texi special chars
@@ -462,22 +462,22 @@ sub HandleInclude
 # @c ref
 #    -> scans intermediate lines for @ref{..} strings
 #    Creates menu of (sorted) refs for ifinfo
-#    Creates comma-separated (sorted) refs for iftex, prepended with 
+#    Creates comma-separated (sorted) refs for iftex, prepended with
 #    the text before first @ref.
 
 sub HandleRef
 {
   local(%refs, @refs, $header, $lline, $lref);
-  
+
   print TEX "\@c inserted refs from $doc_file:$line\n";
-  
+
   # scan lines use %ref to remove duplicates
   $lline = $line;
   while (<DOC>)
   {
     $line++;
     last if (/^\@c\s*ref\s*$/);
-    
+
     while (/\@ref{(.*?)}[;\.]/)
     {
       $refs{$1} = 1;
@@ -491,7 +491,7 @@ sub HandleRef
     $header = $_ unless ($header)
   }
   chomp $header;
-  die "$ERRROR no matching \@c ref found for $doc_file:$lline\n" 
+  die "$ERRROR no matching \@c ref found for $doc_file:$lline\n"
     unless (/^\@c\s*ref\s*$/);
   # sort refs
   @refs = sort(keys(%refs));
@@ -519,16 +519,16 @@ sub HandleRef
   }
   $lref = pop(@refs);
   foreach $ref (@refs) {print TEX "\@ref{".$ref."};\n";}
-  print TEX "\@ref{".$lref."}.\n" if ($lref);  
+  print TEX "\@ref{".$lref."}.\n" if ($lref);
   print TEX "\@end iftex\n\@c end inserted refs from $doc_file:$lline\n";
 }
 
 ###################################################################
 #
 # @c lib libname.lib[:proc] [no_ex, no_fun, Fun, (\w*)section]
-#   --> replaced by @include $texfile where 
+#   --> replaced by @include $texfile where
 #        $texfile = $subdir/libname_lib[_noFun,_noEx].tex
-#   --> if $make, calls "make $texfile" 
+#   --> if $make, calls "make $texfile"
 #   --> Error, if $tex_file does not exist
 #   --> if [:proc] is given, then includes only of respective
 #       proc body
@@ -565,7 +565,7 @@ sub HandleLib
   $n_fun = 0 if (/Fun/);
   $n_ex = 1 if ($no_ex || /no_ex/ || (/unix_only/ && $Win32));
   $section = $1 if /(\w*)section/;
-  
+
   # contruct tex file name
   $tex_file = "$doc_subdir/$lib"."_lib";
   if ($n_fun)
@@ -581,9 +581,9 @@ sub HandleLib
   if ($make)
   {
     print "<lib $lib " if ($verbose);
-    System("$make $make_opts $tag VERBOSE=$verbose $tex_file"); 
+    System("$make $make_opts $tag VERBOSE=$verbose $tex_file");
   }
-  
+
   # make sure file exists
   if (-r $tex_file)
   {
@@ -601,7 +601,7 @@ sub HandleLib
   # see whether we have to paste something in
   if ($proc || $section)
   {
-    open(LTEX, "<$tex_file") 
+    open(LTEX, "<$tex_file")
       || Error("Can't open $tex_file for reading: $!\n");
 
     print TEX "\@c start include of docu for $lib.lib:$proc\n";
@@ -615,7 +615,7 @@ sub HandleLib
 	if ($found)
 	{
 	  s/subsubsection/${section}section/ if $section;
-	  print TEX $_; 
+	  print TEX $_;
 	}
 	last if $found && /c ---end content $proc---/;
       }
@@ -658,7 +658,7 @@ sub protect_texi
   s/\@/\@\@/g;
   s/{/\@{/g;
   s/}/\@}/g;
-}	 
+}
 
 # open w.r.t. include_dirs
 sub Open
@@ -673,7 +673,7 @@ sub Open
     return $dir if(open(FH, $mode.$dir."/".$file));
   }
 }
-    
+
 # system call with echo on verbose > 1 and die on fail
 sub System
 {
@@ -697,7 +697,7 @@ sub Warn
 }
 #
 # leave this here --otherwise fontification in my emacs gets screwd up
-# 
+#
 sub Usage
 {
   return <<EOT;
@@ -711,7 +711,7 @@ where options can be (abbreviated to shortest possible prefix):
   -clean        : delete intermediate files
   -make  cmd    : use cmd as make command to generate tex files for libraries
   -no_reuse     : don't reuse intermediate files
-  -no_ex        : skip computation of examples 
+  -no_ex        : skip computation of examples
   -no_fun       : don't include help for library functions
   -docdir  dir  : put intermediate doc/tex files into 'dir'
                           (default: './d2t_singular')

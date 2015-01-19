@@ -10,7 +10,7 @@
   print(std(T2K));
   printlevel=0;
   module E = Ext(1,syz(m),syz(m));
-  print(std(E));               
+  print(std(E));
   //We see from the matrices that T2K and E are isomorphic
   //as it should be; but both are differently presented
   //-------------------------------------------

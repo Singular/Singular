@@ -16,18 +16,18 @@ ring SNR = 0, (x, a), (lp, C);
 
 option(Imap);
 
-imap(SNB, f);// 
-fetch(SNB, f);// 
+imap(SNB, f);//
+fetch(SNB, f);//
 
 
 imap(SNB, ff);// ?
-fetch(SNB, ff);// 
+fetch(SNB, ff);//
 
 
-imap(SNB, g);// 
-fetch(SNB, g);// 
+imap(SNB, g);//
+fetch(SNB, g);//
 
-imap(SNB, gg);// 
-fetch(SNB, gg);// 
+imap(SNB, gg);//
+fetch(SNB, gg);//
 
 tst_status(1);$

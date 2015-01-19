@@ -6,30 +6,22 @@
 *
 * ngc == number gnu complex
 */
-
-
-
-
-
+#include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 
-#include <misc/auxiliary.h>
 #include <misc/mylimits.h>
-
 #include <reporter/reporter.h>
 
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
+#include "coeffs.h"
+#include "numbers.h"
 
-#include <coeffs/longrat.h>
-#include <coeffs/modulop.h>
+#include "mpr_complex.h"
 
-#include <coeffs/gnumpc.h>
-#include <coeffs/gnumpfl.h>
-#include <coeffs/shortfl.h>
-
-#include <coeffs/mpr_complex.h>
-
+#include "gnumpc.h"
+#include "longrat.h"
+#include "gnumpfl.h"
+#include "modulop.h"
+#include "shortfl.h"
 
 /// Get a mapping function from src into the domain of this type: long_C!
 nMapFunc  ngcSetMap(const coeffs src, const coeffs dst);
@@ -48,7 +40,7 @@ BOOLEAN  ngcIsOne(number a, const coeffs r);
 BOOLEAN  ngcIsMOne(number a, const coeffs r);
 BOOLEAN  ngcIsZero(number za, const coeffs r);
 number   ngcInit(long i, const coeffs r);
-int      ngcInt(number &n, const coeffs r);
+long     ngcInt(number &n, const coeffs r);
 number   ngcNeg(number za, const coeffs r);
 number   ngcInvers(number a, const coeffs r);
 number   ngcParameter(int i, const coeffs r);
@@ -115,11 +107,11 @@ number ngcInit (long i, const coeffs r)
 /*2
 * convert number to int
 */
-int ngcInt(number &i, const coeffs r)
+long ngcInt(number &i, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 
-  return (int)((gmp_complex*)i)->real();
+  return ((gmp_complex*)i)->real();
 }
 
 int ngcSize(number n, const coeffs R)
@@ -387,7 +379,7 @@ const char * ngcRead (const char * s, number * a, const coeffs r)
   if ((*s >= '0') && (*s <= '9'))
   {
     gmp_float *re=NULL;
-    s=ngfRead(s,(number *)&re, r);
+    s=ngfRead(s,(number *)&re, r); // FIXME? TODO? // extern const char *   ngfRead (const char *s, number *a, const coeffs r);
     gmp_complex *aa=new gmp_complex(*re);
     *a=(number)aa;
     delete re;
@@ -674,7 +666,7 @@ static number ngcMapR(number from, const coeffs aRing, const coeffs r)
 
   if ( from != NULL )
   {
-    gmp_complex *res=new gmp_complex((double)nrFloat(from));
+    gmp_complex *res=new gmp_complex((double)nrFloat(from)); // FIXME? TODO? // extern float   nrFloat(number n);
     return (number)res;
   }
   else
@@ -687,7 +679,7 @@ static number ngcMapP(number from, const coeffs aRing, const coeffs r)
   assume( getCoeffType(aRing) ==  n_Zp );
 
   if ( from != NULL )
-    return ngcInit(npInt(from, aRing), r);
+    return ngcInit(npInt(from, aRing), r); // FIXME? TODO? // extern int     npInt         (number &n, const coeffs r);
   else
     return NULL;
 }

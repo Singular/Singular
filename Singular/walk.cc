@@ -41,10 +41,8 @@
 #include <omalloc/omalloc.h>
 #include <Singular/ipshell.h>
 #include <Singular/ipconv.h>
-#include <coeffs/ffields.h>
 #include <coeffs/coeffs.h>
 #include <Singular/subexpr.h>
-#include <polys/templates/p_Procs.h>
 
 #include <polys/monomials/maps.h>
 
@@ -961,7 +959,7 @@ intvec* MivMatrixOrderRefine(intvec* iv, intvec* iw)
 {
   assume(iv->length() == iw->length());
   int i, nR = iv->length();
-  
+
   intvec* ivm = new intvec(nR*nR);
 
   for(i=0; i<nR; i++)
@@ -2575,7 +2573,7 @@ static ring VMrRefine(intvec* va, intvec* vb)
   r->OrdSgn    = 1;
 
   // complete ring intializations
-  
+
   rComplete(r);
 
   //rChangeCurrRing(r);
@@ -4474,7 +4472,7 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight, intvec* targe
         {
           (*result)[i] = (*next_weight1)[i];
         }
-      }    
+      }
     }
     else
     {
@@ -5153,7 +5151,7 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M, ring baseRing)
     if(isNolVector(curr_weight) == 0)
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,curr_weight,currRing);
-    }	
+    }
     else
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,last_omega,currRing);
@@ -5427,7 +5425,7 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
     if(isNolVector(curr_weight) == 0)
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,curr_weight,currRing);
-    }	
+    }
     else
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,last_omega,currRing);
@@ -8335,7 +8333,7 @@ ideal Mprwalk(ideal Go, intvec* curr_weight, intvec* target_weight, int weight_r
     if(isNolVector(curr_weight) == 0)
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,curr_weight,currRing);
-    }	
+    }
     else
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,last_omega,currRing);

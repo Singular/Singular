@@ -1,0 +1,22 @@
+Debian (and Debian based Operating Systems)
+===========================================
+
+The Debian [1] package for Singular is currently maintained by the Debian Science Team [2,3]:
+the git repository for the singular Debian package is at Alioth [4].
+
+[1] https://www.debian.org/
+[2] https://wiki.debian.org/DebianScience
+[3] https://qa.debian.org/developer.php?login=debian-science-maintainers@lists.alioth.debian.org
+[4] http://anonscm.debian.org/cgit/debian-science/packages/singular.git/
+
+
+SINGULAR rpm packages
+=====================
+
+To build Singular rpm packages run (with 4.0.0 replaced by the respective Singular version):
+$ rpmbuild -tb singular-4.0.0.tar.gz
+
+To install the newly created packages run (as superuser, with x86_64 replaced by your architecture
+and 4.0.0 by the respective Singular version):
+$ cd `rpm --eval '%{_topdir}'`/RPMS
+$ rpm -i x86_64/singular-4.0.0-1.x86_64.rpm noarch/singular-common-4.0.0-1.noarch.rpm

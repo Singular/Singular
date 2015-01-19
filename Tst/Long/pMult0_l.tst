@@ -22,7 +22,7 @@ proc pAdd_Test(string rs)
   ideal id = tst_cyclic(n_vars);
   tst_TestMult(id, how_often[n_vars],
                size(tst_rgen_comp_orderings[Tst::tst_rgen_comp_index]));
- 
+
   kill r;
 }
 

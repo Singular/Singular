@@ -99,7 +99,7 @@ list lll = list(1,2);
 reference lref = lll;
 
 lref;
-"lref[2]:"; 
+"lref[2]:";
 
 int elt = lref[2];
 elt;
@@ -238,7 +238,7 @@ refelt.i = 7;
 lonren;
 listofnewstr;
 
-reference refelt2 =lonren[1]; 
+reference refelt2 =lonren[1];
 refelt2.i = 17;
 listofnewstr;
 
@@ -561,22 +561,22 @@ myllsh;
 
 link(myllsh);
 
-                                 
+
 shared val=1;
-val;         
+val;
 list ll=list(val);
-ll;               
-link(ll[1])=8;     
-val;              
+ll;
+link(ll[1])=8;
+val;
 ll;
 shared vv =ll[1];
-vv=9;            
-ll;              
-vv;              
+vv=9;
+ll;
+vv;
 val;
 reference vvv=ll[1];
 vvv=9;
-ll;   
+ll;
 typeof(ll[1]);
 ll[1]=val;
 shared vv =ll[1];
@@ -705,11 +705,11 @@ llshort;
 echo=1;
 newstruct("sqcache", "shared table");
 
-proc cached_square(sqcache cache, int arg) 
+proc cached_square(sqcache cache, int arg)
 {
   if (arg == 0) { return (0); }
   shared value = cache.table[arg];
-  if (system(value, undef)) { value = arg^2; } 
+  if (system(value, undef)) { value = arg^2; }
   return (int(value));
 }
 
@@ -775,7 +775,7 @@ list cll=(0:n+1);
    k = cll[i];
   }
   for( i = 1; i <=n; i++) {
-   k = cll[i]; 
+   k = cll[i];
   }
   for( i = 1; i <=n; i++) {
    k = cll[i];
@@ -836,7 +836,7 @@ shared iter=diag;
 //}
 
 proc print_bdd(shared iter) {
-  string res = "("+string(iter.idx)+", "; 
+  string res = "("+string(iter.idx)+", ";
   shared it1=iter.high;
   shared it0=iter.low;
 
@@ -1011,7 +1011,7 @@ system(sh, "help");
 
 kill i, iref;
 int i =9;
-shared iref = i; 
+shared iref = i;
 link l1 = "ssi:fork"; open(l1);
 write(l1, quote(list(iref, iref)));
 
@@ -1167,14 +1167,14 @@ attrib(ref2, "isSB");
 
 shared shval= I;
 // Ensure reloading does not damage something
-system("reference"); 
+system("reference");
 system("shared");
 reference refTwo = ref2;
 shared shval2 = shval;
 refTwo;
 shval2[1] == shval[1];
 kill refTwo, shval2;
-system("reference"); 
+system("reference");
 system("shared");
 reference refTwo = ref2;
 shared shval2 = shval;

@@ -2,11 +2,11 @@
 //#include"kernel/febase.h"  // for Print, WerrorS
 #include"Singular/ipid.h" // for SModulFunctions, leftv
 #include"Singular/number2.h" // for SModulFunctions, leftv
-#include"libpolys/coeffs/numbers.h" // nRegister, coeffs.h
-#include "libpolys/coeffs/coeffs.h"
+#include<coeffs/numbers.h> // nRegister, coeffs.h
+#include <coeffs/coeffs.h>
 #include"Singular/blackbox.h" // blackbox type
 #include "nforder.h"
-#include "libpolys/coeffs/bigintmat.h"
+#include <coeffs/bigintmat.h>
 
 extern n_coeffType nforder_type;
 
@@ -142,7 +142,7 @@ static int EltSize(number n, const coeffs r)
   return NULL;
 }
    /// convertion to int, 0 if impossible
-static int EltInt(number &n, const coeffs r)
+static long EltInt(number &n, const coeffs r)
 
 {
   Werror("%s called\n", __func__);

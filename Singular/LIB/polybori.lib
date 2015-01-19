@@ -26,11 +26,11 @@ and @code{ring}, as well as @code{bset} which corresponds to the type @code{zdd}
 introduced here. In addition @code{bvar(i)} constructs the Boolean variable corresponding
 to @code{var(i)} from current @code{ring};
 
-For convenience, the corresponding types can be converted explictely or implicitely 
+For convenience, the corresponding types can be converted explictely or implicitely
 while assigning.
 Also several SINGULAR operators were overloaded: @code{bring} comes with @code{nvars},
 @code{bpoly} implements @code{lead}, @code{leadmonom} and @code{leadcoef}.
-Objects of this type  may be added and multiplied, too. 
+Objects of this type  may be added and multiplied, too.
 Finally, @code{bideal} yields @code{std} and @code{size} as well as addition and element access.
 
 
@@ -51,12 +51,12 @@ can be carried out seamlessly in SINGULAR:
 
 
 NOTE: For using this library SINGULAR's @code{python} interface must be available
- on your system. 
+ on your system.
  Please @code{./configure --with-python} when building SINGULAR for this purpose.
 
  There are prebuilt binary packages for @code{PolyBoRi} available
  from @code{http://polybori.sf.net/}.
- 
+
  For building your own @code{PolyBoRi} please ensure that you have @code{scons} and a
  development version of the boost libaries installed on you system.
  Then you may execute the following commands in a @code{bash}-style shell
@@ -94,7 +94,7 @@ PROCEDURES:
   from_boolean_set(bset);                        convert to zdd
 
 
-  bvar(i);                                       return i-th Boolean variable 
+  bvar(i);                                       return i-th Boolean variable
   poly2zdd(poly);                                return zdd of a given polynomial
   zdd2poly(zdd);                                 return polynomial representation of a given zdd
   disp_zdd(zdd);                                 return string with a visualization of a given
@@ -204,8 +204,8 @@ KEYWORDS: PolyBoRi, Boolean Groebner Basis
     zdd_zero.thenBranch=int(0);
     zdd_zero.elseBranch=int(0);
     export(zdd_one);
-    export(zdd_zero); 
-    
+    export(zdd_zero);
+
     python_run("def if_then_else_idx(idx,b,c): return b.set().change(idx).union(c)");
     python_run("_SINGULAR_RINGS = dict()");
     python_run("_SINGULAR_RINGS_ACCESSED = 0");
@@ -304,7 +304,7 @@ example
 
 // Mark cache as accessed and clear garbage every 100 accesses
 static proc bring_mark_cache(list #)
-{ 
+{
   if (int(python_eval("_SINGULAR_RINGS_ACCESSED >= 100"))) {
     python_run("_SINGULAR_RINGS_ACCESSED = 0");
     def erased = python_eval("[_k for (_k,_v) in _SINGULAR_RINGS.items() if _v() is None]");
@@ -315,7 +315,7 @@ static proc bring_mark_cache(list #)
 
 // look up whether we cached this conversion before
 static proc bring_from_cache(def r)
-{ 
+{
   bring_mark_cache();
   def result1 = python_eval("_SINGULAR_RINGS.get('" + string(r) + "', (lambda: None))");
   def result = python_eval("_SINGULAR_DECACHE_RING")(result1);
@@ -502,7 +502,7 @@ proc type2bideal(def I)
     int i; int nlen=size(I); bpoly elt;
     for (i=1; i <= nlen; i++) {
       elt = I[i];
-      pylist.append(pyobject(elt)); 
+      pylist.append(pyobject(elt));
     }
   }
   else { pylist = I; }
@@ -614,7 +614,7 @@ RETURN: 0 or 1 "
 
 proc boolean_set(zdd ss,list #)
 "USAGE: boolean_set(ss[, rb]); ss zdd, rb boolean ring
-RETURN: default: boolean set ss in the representation of a Polybori boolean set 
+RETURN: default: boolean set ss in the representation of a Polybori boolean set
 in the ring rb==boolean_poly_ring(basering); optional input: boolean ring rb
 SEE ALSO: boolean_ideal, boolean_std
 KEYWORDS: PolyBoRi, Boolean Groebner Basis
@@ -741,7 +741,7 @@ EXAMPLE:  example from_boolean_poly; shows an example"
   poly result = 0;
   def terms = python_eval("list")(pb.terms());
   int nlen = size(terms);
-  for (int i = 0; i < nlen; i++) 
+  for (int i = 0; i < nlen; i++)
   {
     result=from_boolean_poly_update(result,terms[i]);
   }
@@ -775,7 +775,7 @@ SEE ALSO: from_boolean_poly
   poly term = 1;
   pyobject currentvar;
   int tlen = size(vars);
-  for (j = 0; j < tlen; j++) 
+  for (j = 0; j < tlen; j++)
   {
     currentvar = vars[j];
     index = int(currentvar.index());
@@ -810,7 +810,7 @@ example
 
 static proc check_additional_ring(list #)
 "USAGE: check_additional_ring(#);
-NOTE: Help function to check whether an additional ring exists and if it is a 
+NOTE: Help function to check whether an additional ring exists and if it is a
 bring or a ring in python."
 {
   pyobject rb;
@@ -837,7 +837,7 @@ bring or a ring in python."
 
 proc boolean_constant(int const, list #)
 "USAGE: boolean_constant(const[, rb]); const constant and rb boolean ring
-RETURN: default: constant const in the representation of the boolean ring 
+RETURN: default: constant const in the representation of the boolean ring
 rb==boolean_poly_ring(basering); optional input: rb=boolean ring rb
 SEE ALSO: boolean_ideal, boolean_std
 KEYWORDS: PolyBoRi, Boolean Groebner Basis
@@ -864,7 +864,7 @@ example
 proc boolean_poly(poly ps, list #)
 "USAGE: boolean_poly(ps[, dir, rb]); ps polynomial, dir integer zero or one, rb
 boolean ring
-RETURN: default: polynomial ps in the representation of the boolean ring 
+RETURN: default: polynomial ps in the representation of the boolean ring
 rb==boolean_poly_ring(basering); optional input: boolean ring rb
 NOTE: via the optional input dir, one can choose the computation method (either
 direct[dir==0] or recursive[dir==1]). default: recursive
@@ -935,9 +935,9 @@ example
   bpoly pp=f;
   from_boolean_poly(pp);
   from_boolean_poly(pp,1);
- 
+
   ring r2=5,(x,y,z),Dp;
-  def rb2=boolean_poly_ring(r2);  
+  def rb2=boolean_poly_ring(r2);
   poly f2=x+y+z;
   bpoly pp2=f2;
   from_boolean_poly(pp);
@@ -948,7 +948,7 @@ example
 
 proc direct_boolean_poly(poly ps, list #)
 "USAGE: boolean_poly(ps[, rb]); ps polynomial, rb boolean ring
-RETURN: default: polynomial ps in the representation of the boolean ring 
+RETURN: default: polynomial ps in the representation of the boolean ring
 rb==boolean_poly_ring(basering); optional input: boolean ring rb
 SEE ALSO: boolean_ideal, boolean_std
 KEYWORDS: PolyBoRi, Boolean Groebner Basis
@@ -990,7 +990,7 @@ example
 // one iteration in direct_boolean_poly
 
 static proc boolean_poly_update(def pb, poly ps, pyobject rb)
-"USAGE: boolean_poly_update(pb,ps,rb); pb boolean polynomial, ps polynomial, 
+"USAGE: boolean_poly_update(pb,ps,rb); pb boolean polynomial, ps polynomial,
 rb boolean ring
 RETURN: update of the boolean polynomial in boolean_poly in one iteration
 SEE ALSO: boolean_poly
@@ -1011,7 +1011,7 @@ SEE ALSO: boolean_poly
 
 proc recursive_boolean_poly(poly ps, list #)
 "USAGE: boolean_poly(ps[, rb]); ps polynomial, rb boolean ring
-RETURN: default: polynomial ps in the representation of the boolean ring 
+RETURN: default: polynomial ps in the representation of the boolean ring
 rb==boolean_poly_ring(basering); optional input: rb boolean ring
 SEE ALSO: boolean_ideal, boolean_std
 KEYWORDS: PolyBoRi, Boolean Groebner Basis
@@ -1065,7 +1065,7 @@ example
 
 proc boolean_ideal(ideal Is, list #)
 "USAGE: boolean_ideal(Is[, rb]); Is Ideal, rb boolean ring
-RETURN: default: ideal Is in the representation of the boolean ring 
+RETURN: default: ideal Is in the representation of the boolean ring
 rb==boolean_poly_ring(basering); optional input: rb boolean ring
 SEE ALSO: boolean_std
 KEYWORDS: PolyBoRi, Boolean Groebner Basis
@@ -1117,7 +1117,7 @@ example
 proc from_boolean_ideal(bideal I)
 "USAGE: from_boolean_ideal(I); I boolean ideal
 RETURN: ideal in Singular
-SEE ALSO: from_boolean_poly, boolean_ideal, boolean_poly, boolean_std, 
+SEE ALSO: from_boolean_poly, boolean_ideal, boolean_poly, boolean_std,
 boolean_poly_ring
 KEYWORDS: PolyBoRi, Boolean Groebner Basis
 EXAMPLE: example from_boolean_ideal; shows an example"
@@ -1125,7 +1125,7 @@ EXAMPLE: example from_boolean_ideal; shows an example"
   ideal re;
   int i;
   int nlen = size(I);
-  for (i = 1; i <= nlen; i++) 
+  for (i = 1; i <= nlen; i++)
   {
     re[i] = from_boolean_poly(I[i]);
   }
@@ -1144,7 +1144,7 @@ example
   list K=(p,pp);
   Ib=K;
   from_boolean_ideal(Ib);
-  
+
   ring rs2=5,(x,y,z),Dp;
   def rb4=boolean_poly_ring(rs2);
   poly p1=x+y;
@@ -1224,7 +1224,7 @@ EXAMPLE: example from_boolean_constant; shows an example"
   pyobject pb = p;
   if (pb==0) { return (poly(0)); }
 
-  return (poly(1)); 
+  return (poly(1));
 }
 
 example
@@ -1243,7 +1243,7 @@ example
 proc recursive_from_boolean_poly(def p)
 "USAGE: recursive_from_boolean_poly(pb); pb boolean polynomial
 RETURN: polynomial in Singular
-SEE ALSO: from_boolean_poly, boolean_ideal, boolean_poly, from_boolean_ideal, 
+SEE ALSO: from_boolean_poly, boolean_ideal, boolean_poly, from_boolean_ideal,
 boolean_poly_ring
 KEYWORDS: PolyBoRi, Boolean Groebner Basis
 EXAMPLE: example recursive_from_boolean_poly; shows an example"
@@ -1252,7 +1252,7 @@ EXAMPLE: example recursive_from_boolean_poly; shows an example"
 
   if (pb==0) { return(0); }
   if (pb==1) { return(1); }
-  
+
   int idx = int(pb.navigation().value());
   def p0=Polynomial(pb.set().subset0(idx));
   def p1 = Polynomial(pb.set().subset1(idx));
@@ -1363,7 +1363,7 @@ EXAMPLE: example disp_zdd; shows an example"
     {
       return(str);
     }
-    else 
+    else
     {
       if (ss==zdd_one)
       {

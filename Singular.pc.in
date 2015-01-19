@@ -9,9 +9,9 @@ Version: @PACKAGE_VERSION@
 URL: https://github.com/Singular/Sources/
 
 Requires: @PKG_REQUIRE@ libpolys
-Conflicts: 
+Conflicts:
 
 Cflags: -I${includedir} -I${includedir}/singular @SINGULAR_CFLAGS@
 Libs: -L${libdir} -lSingular @USEPPROCSDYNAMICLD@
-Libs.private: 
+Libs.private:
 

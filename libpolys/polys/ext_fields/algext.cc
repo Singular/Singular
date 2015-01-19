@@ -39,6 +39,7 @@
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
+
 #include <coeffs/longrat.h>
 
 #include <polys/monomials/ring.h>
@@ -86,7 +87,7 @@ BOOLEAN  naIsOne(number a, const coeffs cf);
 BOOLEAN  naIsMOne(number a, const coeffs cf);
 BOOLEAN  naIsZero(number a, const coeffs cf);
 number   naInit(long i, const coeffs cf);
-int      naInt(number &a, const coeffs cf);
+long     naInt(number &a, const coeffs cf);
 number   naNeg(number a, const coeffs cf);
 number   naInvers(number a, const coeffs cf);
 number   naAdd(number a, number b, const coeffs cf);
@@ -354,7 +355,7 @@ number naInit(long i, const coeffs cf)
   else        return (number)p_ISet(i, naRing);
 }
 
-int naInt(number &a, const coeffs cf)
+long naInt(number &a, const coeffs cf)
 {
   naTest(a);
   poly aAsPoly = (poly)a;
@@ -958,7 +959,7 @@ number naMap0P(number a, const coeffs src, const coeffs dst)
   if (n_IsZero(a, src)) return NULL;
   // int p = rChar(dst->extRing);
 
-  number q = nlModP(a, src, dst->extRing->cf);
+  number q = nlModP(a, src, dst->extRing->cf); // FIXME? TODO? // extern number nlModP(number q, const coeffs Q, const coeffs Zp); // Map q \in QQ \to pZ
 
   poly result = p_NSet(q, dst->extRing);
 

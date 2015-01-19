@@ -5,29 +5,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.awt.BorderLayout;
@@ -55,52 +55,52 @@ import javax.swing.JTextField;
 //////////////////////////////////////////////////////////////
 //
 // class Equation
-// 
+//
 //////////////////////////////////////////////////////////////
 
 public class Equation extends JPanel {
 
-    // Anfang Variablen 
-    
+    // Anfang Variablen
+
     surfex surfex_;
-    
+
     public int surf_no = -1;
-    
+
     // GUI
     public JTextField text;
-    
+
     JPanel configPanel = new JPanel();
-    
+
     JButton basePlaneButton = new JButton();
-    
+
     JButton optionButton = new JButton("opts");
-    
+
     JButton deletePlaneButton = new JButton("del");
-    
+
     JLabel label1, label2;
-    
+
     String eindeutigeEqnNr;
-    
+
     JButton colorButton_i, colorButton_o;
-    
+
 //    JPanel labelpanel = new JPanel(new GridLayout(2, 1));
-    
+
     int eqnr;
-    
+
     jv4surfex jv4sx;
-    
+
     JCheckBox cbox = new JCheckBox();
     JComboBox visType = new JComboBox();
-    
+
     EquationAdmin eqAdm;
-    
+
     OptionButtonPane optionButtonPane;
-    
+
     // zum rechnen
 //    pcalc polyCalc = new pcalc();
-    
+
     // Ende Variablen
-    
+
     public String getImpsurfCode(String strPoly, double[] scale) {
 	String strRichMor = "DEF=" + URLEncoder.encode(strPoly + "=0;")
 	    + "&XMIN=-" + (9.0 / scale[0]) + "&XMAX=" + (9.3 / scale[0])
@@ -110,13 +110,13 @@ public class Equation extends JPanel {
 	    + "&TIMEOUT=1000&VERSION=3";
 	return (strRichMor);
     }
-    
+
     public boolean triangulate(String strPoly, double[] scale,
 			       String eindeutigeEqnNr) {
 	// ??? do this on the webserver!!!
 	//  System.out.println("scale:"+scale[0]+","+scale[1]+","+scale[2]);
 	String strRichMor = getImpsurfCode(strPoly, scale);
-	
+
 	if (surfex_.configFrame.webPro.isSelected()) {
 	    try {
 		URL url = new URL(surfex_.webPrgs.surfPath.getText()
@@ -124,7 +124,7 @@ public class Equation extends JPanel {
 		URLConnection connection = url.openConnection();
 		connection.setUseCaches(false);
 		connection.setDoOutput(true);
-		
+
 		PrintWriter out = new PrintWriter(connection.getOutputStream());
 		//        System.out.println("old subdir:"+surfex_.getCurrentProject().old_tmpsubdir);
 		out
@@ -150,9 +150,9 @@ public class Equation extends JPanel {
 		    //        System.out.println("it works!");
 		    strFilename = in.readLine();
 		    surfex_.getCurrentProject().old_tmpsubdir = in.readLine();
-		    
+
 		    System.out.println("achtung seit Version 020 geaendert damit er kompiliert - ohne test");
-		    
+
 		    //   eqAdm.img_filename = surfex_.webPrgs.surfPath.getText()               + strFilename;
 		} else {
 		    System.out.println("it does not work!");
@@ -171,7 +171,7 @@ public class Equation extends JPanel {
 		    out.write(strRichMor.charAt(pos));
 		}
 		out.close();
-		
+
 		outputFile = new File("./impsurf.sh");
 		out = new FileWriter(outputFile);
 		String strCommand = "#!/bin/sh\n"
@@ -179,7 +179,7 @@ public class Equation extends JPanel {
 		    + "export CONTENT_LENGTH=" + (strRichMor.length())
 		    + "\n " + "./localimpsurfCV <./impsurf.richmor >./"
 		    + eindeutigeEqnNr + ".jvx";
-		
+
 		len = strCommand.length();
 		for (int pos = 0; pos < len; pos++) {
 		    out.write(strCommand.charAt(pos));
@@ -188,7 +188,7 @@ public class Equation extends JPanel {
 	    } catch (Exception e2) {
 		return (false);
 	    }
-	    
+
 	    try {
 		Runtime r = Runtime.getRuntime();
 		Process p;
@@ -201,11 +201,11 @@ public class Equation extends JPanel {
 	}
 	return (true);
     } // end of triangulate()
-    
+
     // Konstruktor
     Equation(int internalEqnr, int eqnr, EquationAdmin ea, jv4surfex jv4sx,
 	     surfex sx) {
-	
+
 //	polyCalc.doPrint = false;
 	eqAdm = ea;
 	this.eqnr = eqnr;
@@ -262,7 +262,7 @@ public class Equation extends JPanel {
 									 .getBackground()));
 		}
 	    });
-	
+
 	colorButton_o = new JButton();
 	colorButton_o.setBackground(new Color(240, 180, 0));
 	colorButton_o.setToolTipText("Select the \"outside\" color");
@@ -273,47 +273,47 @@ public class Equation extends JPanel {
 									 .getBackground()));
 		}
 	    });
-	
+
 	configPanel.add(colorButton_o);
 	configPanel.add(colorButton_i);
 //	configPanel.add(deletePlaneButton);
 	configPanel.add(optionButton);
 	configPanel.add(label1);
     }
-    
+
     //Methoden
     public boolean isSelected() {
 	return (cbox.isSelected());
     }
-    
+
     public int getEqNo() {
 	return (eqnr);
     }
-    
+
     public void setEquationNo(int no) {
 	eqnr = no;
 	eindeutigeEqnNr = eqAdm.ProjectNumber + "_"
 	    + (new Integer(eqnr)).toString();
 	label1.setText("f" + eqnr);
     }
-    
+
     public void updateActionCommands(int internalEqnr) {
 	basePlaneButton.setActionCommand("basePlaneButton" + internalEqnr);
 	deletePlaneButton.setActionCommand("deletePlaneButton" + internalEqnr);
     }
-    
+
     public void setBasePlane(boolean b) {
 	// erhaelt nur false ...
 	basePlaneButton.setBackground(Color.white);
     }
-    
+
     public void setBasePlaneDefault() {
 	basePlaneButton.setBackground(Color.green);
 	//  System.out.println("jv4sx.show()");
 	jv4sx.showDefault();
 	//  jv4sx.show();
     }
-    
+
     public void setBasePlane(boolean b, jv4surfex jv4sx, double[] scale) {
 	//  System.out.println("setBasePlane...");
 	// erhaelt nur false ...
@@ -333,7 +333,7 @@ public class Equation extends JPanel {
 	    jv4sx.show();
 	}
     }
-    
+
     public boolean isBasePlane() {
 	//  System.out.println("bg:"+basePlaneButton.getBackground());
 	return false;
@@ -343,12 +343,12 @@ public class Equation extends JPanel {
 	//      return false;
 	//  }
     }
-    
+
     public String getPolyCode(String polyname) {
 	return ("poly " + polyname + " = "
 		+ text.getText().replaceAll("-", "-1*") + ";");
     }
-    
+
     public String getSurfCode(String polyname, int surface_no, double ang[]) {
 	String str = "";
     //  str += getPolyCode(polyname);
@@ -375,7 +375,7 @@ public class Equation extends JPanel {
 	    str += "transparence" + strSurfNo + " = "
 		+ (new Integer(optionButtonPane.slider1.getValue())) + ";\n";
 	}
-	
+
 	//  str += "surface" + strSurfNo + "=rotate(surface" + strSurfNo + ","
 	//      + ang[0] + ",yAxis);";
 	//  str += "surface" + strSurfNo + "=rotate(surface" + strSurfNo + ","
@@ -384,7 +384,7 @@ public class Equation extends JPanel {
 	//      + ang[2] + ",zAxis);";
 	return (str);
     }
-    
+
     public void savesurfCode(PrintWriter pw, String polyname, int surface_no,
 			     double ang[]) {
 	//  System.out.println("poly print");
@@ -429,7 +429,7 @@ public class Equation extends JPanel {
 		   + (colorButton_o.getBackground().getRed() / 255.0) + ","
 		   + (colorButton_o.getBackground().getGreen() / 255.0) + ","
 		   + (colorButton_o.getBackground().getBlue() / 255.0) + "> }");
-	
+
 	pw.println("finish { specular .6 }");
 	pw.println("clipped_by {");
 	pw.println("      sphere { < 0, 0, 0 >, Radius }");
@@ -443,7 +443,7 @@ public class Equation extends JPanel {
 	pw.println("}");
 	}
     */
-    
+
     public void saveYourself(PrintWriter pw) {
 	pw.println("////////////////// Equation: /////////////////////////");
 	pw.println("" + eqnr + "\n");
@@ -459,7 +459,7 @@ public class Equation extends JPanel {
 	pw.println(visType.getSelectedIndex() + "\n");
 	optionButtonPane.saveYourself(pw);
     }
-    
+
     public String saveYourself() {
 	String str = "";
 	str += "////////////////// Equation: /////////////////////////" + "\n";
@@ -477,7 +477,7 @@ public class Equation extends JPanel {
 	str += optionButtonPane.saveYourself();
 	return (str);
     }
-    
+
     public void updateJV4SX() {
 	//  System.out.println("updateJV4SX!");
 	String strtmpdir = ".";

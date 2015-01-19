@@ -6,12 +6,12 @@ tst_init();
 LIB "deform.lib";
  printlevel =  2;
 ring  r0  = 0,(x,y,z),ls;
- ideal i2 = y4-xy,yz-xz,z4-xz;   
+ ideal i2 = y4-xy,yz-xz,z4-xz;
  list L=versal(i2);
 kill L;
 //-----------------------------------------------------------------------------
 ring  r1  = 0,(x,y,z,u),dp;
- ideal i5 = x3-y2,xz,xu,yz,yu,z3-u2; 
+ ideal i5 = x3-y2,xz,xu,yz,yu,z3-u2;
  list L=versal(i5);
  ideal i6 = z2-xz,zu-xu,u2-yu,yz-xu;
  L=versal(i6); kill L;
@@ -22,7 +22,7 @@ ring r2   = 0,(x(1..d+1)),ls;
  matrix m[2][d] = i7[1..d],i7[2..d+1];
        i7 = minor(m,2);
        i7 = minbase(i7);
- list L=versal(i7); 
+ list L=versal(i7);
  def Px=L[1]; setring Px; Fs; print(Js); print(Rs);
  kill L,Px;
 //------- L_d_d: d generic lines in A^d ---------------------------------------
@@ -31,7 +31,7 @@ ring r3=0,(x(1..d)),ls;
  int n,m; ideal i8;
  for (n=1;n<d;n=n+1)
  { for (m=n+1;m<=d;m=m+1) {i8=i8,x(n)*x(m);}
- } 
+ }
         i8 = simplify(i8,10);
  list L=versal(i8,3,"myring");
  def Px=L[1]; setring Px; Fs;
@@ -43,7 +43,7 @@ ring r6   = 0,(x,y,z,u,v,w),ds;
  def Px=L[1]; setring Px; Fs;
  kill L,Px;
 ring r7   = 0,(x,y,z,u,v),dp;
- ideal I1 = xy,xz,xu,xv,yz,yu,yv,zu,zv,uv;    
+ ideal I1 = xy,xz,xu,xv,yz,yu,yv,zu,zv,uv;
  list L=versal(I1);
  def Px=L[1]; setring Px; Fs;
  kill L,Px;
@@ -97,10 +97,10 @@ for (i'=4;i'<ii;i'=i'+1)
 {
   Mo=m(i');
   list L=mod_versal(Mo,Io);
-  def Qx=L[2]; 
+  def Qx=L[2];
   print(Ms);
   print(Ls);
-  print(Js); 
+  print(Js);
   kill L,Qx;
 }
 list L=mod_versal(m(2),Io,4,"qq","W","dp","oo");

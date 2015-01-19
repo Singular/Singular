@@ -3,7 +3,7 @@ tst_init();
 ring r = 32003,(x,y,z),dp;
 def S=nc_algebra(-1,1); setring S;
 S;
-// ring of some differential-like operators 
+// ring of some differential-like operators
 poly s1  = x3y2+151x5y+186xy6+169y9;
 poly s2  = 1*x^2*y^2*z^2+3z8;
 poly s3  = 5/4x4y2+4/5*x*y^5+2x2y2z3+y7+11x10;
@@ -13,4 +13,4 @@ f;
 short = 0;
 f;
 tst_status(1);$
-                          
+

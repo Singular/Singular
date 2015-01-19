@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT: standard version of C-memory management alloc func 
+* ABSTRACT: standard version of C-memory management alloc func
 * i.e. (malloc/realloc/free)
 */
 
@@ -24,7 +24,7 @@
 /* solution: correctly check OMALLOC_USES_MALLOC from omalloc.h, */
 /* do not rely on the default in Singular as libsingular may be different */
 
-/* define this so that all addr allocated there are marked 
+/* define this so that all addr allocated there are marked
 * as static, i.e. not metioned by omPrintUsedAddr*/
 #define OM_MALLOC_MARK_AS_STATIC
 #define strdup_ strdup__
@@ -45,7 +45,7 @@ void* reallocSize(void* old_addr, size_t old_size, size_t new_size)
   {
    return realloc(old_addr, new_size);
   }
-  else 
+  else
   {
     freeSize(old_addr, old_size);
     return malloc(new_size);

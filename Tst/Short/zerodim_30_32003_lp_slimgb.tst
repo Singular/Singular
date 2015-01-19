@@ -10,4 +10,4 @@ y^2*z+2*x*y*t-2*x-z,
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
     tst_status(1);$
-    
+

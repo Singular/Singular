@@ -16,7 +16,7 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
  AC_CHECK_HEADERS([setoper.h cdd/setoper.h cddlib/setoper.h])
 
  if test "x$ac_cv_header_setoper_h" = xno -a "x$ac_cv_header_cdd_setoper_h" = xno -a "x$ac_cv_header_cddlib_setoper_h" = xno; then
-   AC_MSG_WARN([Note that setoper.h is missing!]) 
+   AC_MSG_WARN([Note that setoper.h is missing!])
  fi
 
  AC_MSG_CHECKING([whether libcddgmp is usable])
@@ -43,7 +43,7 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
      # include <cddlib/setoper.h>
      # include <cddlib/cdd.h>
      #endif
-    ], [dd_set_global_constants(); dd_log=dd_FALSE; ] 
+    ], [dd_set_global_constants(); dd_log=dd_FALSE; ]
     )
   ],
   [PASSED_ALL_TESTS_FOR_GFANLIB="1"] [CDDGMPLDFLAGS="-lcddgmp $GMP_LIBS"]  [CDDGMPCPPFLAGS="-DGMPRATIONAL"],
@@ -55,21 +55,21 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
 
  if test "x$PASSED_ALL_TESTS_FOR_GFANLIB" = x1; then
   AC_MSG_RESULT([yes])
-  AC_SUBST(CDDGMPLDFLAGS) 
+  AC_SUBST(CDDGMPLDFLAGS)
   AC_SUBST(CDDGMPCPPFLAGS)
- else 
+ else
   AC_MSG_RESULT([no])
-  if test "x$ENABLE_GFANLIB" = "xyes"; then 
+  if test "x$ENABLE_GFANLIB" = "xyes"; then
    AC_MSG_ERROR([Error, could not use libcddgmp])
   fi
- fi 
+ fi
 else
- AC_MSG_RESULT(no) 
+ AC_MSG_RESULT(no)
  PASSED_ALL_TESTS_FOR_GFANLIB="0"
 fi
 
 
-  
+
 AM_CONDITIONAL(HAVE_GFANLIB, test "x$PASSED_ALL_TESTS_FOR_GFANLIB" = x1)
 AC_DEFINE_UNQUOTED(HAVE_GFANLIB, ${PASSED_ALL_TESTS_FOR_GFANLIB}, [whether gfanlib support is enabled])
 

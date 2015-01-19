@@ -20,8 +20,8 @@ proc pAdd_Test(string rs)
   tst_TestAdd(id, 3, size(Tst::tst_rgen_comp_orderings[Tst::tst_rgen_comp_index]));
   kill r;
 }
-  
-  
+
+
 string rs = tst_next_ring();
 
 while (size(rs) > 1)
@@ -29,6 +29,6 @@ while (size(rs) > 1)
   pAdd_Test(rs);
   rs = tst_next_ring();
 }
- 
+
 tst_status(1);$
 

@@ -3,7 +3,7 @@
          +18x7y5-18x5y6+9x6y4-18x3y6-9x2y7+9y8;
   // = 9 * (x5-1y2)^2 * (x6-2x3y2-1x2y3+y4)
   factorize(f);
-  // returns factors and multiplicities, 
+  // returns factors and multiplicities,
   // first factor is a constant.
   poly g = (y4+x8)*(x2+y2);
   factorize(g);

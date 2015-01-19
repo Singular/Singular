@@ -1,13 +1,13 @@
 Here is a HowTo for locating memory holes in Singular:
 
 0.) disable optimization and define flag OM_TRACK=5 :
-     set  
-       CXXFLAGS=" -O0 -DOM_TRACK=5 " 
-         CFLAGS=" -O0 -DOM_TRACK=5 " 
+     set
+       CXXFLAGS=" -O0 -DOM_TRACK=5 "
+         CFLAGS=" -O0 -DOM_TRACK=5 "
      explicitly, since configure option '--disable-optimizationflags' does not enable -O0
 
-1.) configure Singular with options 
-     " --enable-debug --with-track-fl --with-track-backtrace " 
+1.) configure Singular with options
+     " --enable-debug --with-track-fl --with-track-backtrace "
      or similar (see available options from 'cd omalloc/ && ./configure --help )
 2.) Use system("mtrack", [<level>, [<filename>]]) to get a report about
     unused memory, where
@@ -16,7 +16,7 @@ Here is a HowTo for locating memory holes in Singular:
  * <filename> is name of file where report should be output to
    (defaults to stdout).
 3.) Running 'regress.cmd -tt <level> file.tst' creates the file
-    'file.mtrack.unused' with report of not freed addresses (<level> has 
+    'file.mtrack.unused' with report of not freed addresses (<level> has
     same meaning as above).
 4.) Within the C/C++ sources, Use 'omMarkAsStatic(addr)' to mark an
     address as static, i.e. as an address which is ok if it is not

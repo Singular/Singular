@@ -1,4 +1,4 @@
-/*! 
+/*!
 
  \page factory_page Multivariate polynomial factorization (factory)
 
@@ -21,6 +21,6 @@
  <A HREF="ftp://www.mathematik.uni-kl.de/pub/Math/Singular/doc/factory.ps.gz">Factory Developer's manual</A>
 
  \note For more information on how to configure, install and add new code to
- factory, see README:  
+ factory, see README:
  \verbinclude factory/README
 */

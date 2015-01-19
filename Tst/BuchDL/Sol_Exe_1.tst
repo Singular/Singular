@@ -7,8 +7,8 @@ ring R;
 R;
 poly f = x^4+x^3*z+x^2*y^2+y*z^4+z^5;
 f;
-ring S = 32003, (x,y,z), lp; 
-poly g = fetch(R,f); 
+ring S = 32003, (x,y,z), lp;
+poly g = fetch(R,f);
 g;
 
 
@@ -20,24 +20,24 @@ ideal MId = maxideal(d);
 int s = size(MId);
 int i,j;
 ideal I;
-for (i=1; i<=10; i++) 
+for (i=1; i<=10; i++)
 {
-  poly f(i); 
+  poly f(i);
   for (j=1; j<=s; j++)
   {
     f(i) = f(i)+random(0,32002)*MId[j];
-  } 
+  }
   I = I, f(i);
 }
 
 // -------------Alternatively--------------
 kill I;
 if (not(defined(randomid))) { LIB "random.lib"; }
-ideal I = randomid(maxideal(d),10,32002); 
+ideal I = randomid(maxideal(d),10,32002);
 // ----------------------------------------
 
 int aa = timer;
-ideal II = groebner(I); 
+ideal II = groebner(I);
 size(II);
 II;
 deg(II[1]);
@@ -64,11 +64,11 @@ resolution rI = mres(I,0);
 print(betti(rI),"betti");
 for (int i=1; i<=3; i++)
 {
-  i,"th syzygy matrix: ";    
-  "--------------------- ";    
+  i,"th syzygy matrix: ";
+  "--------------------- ";
   print(rI[i]);
-  "";    
-  "has data type : ", typeof(rI[i]);   
+  "";
+  "has data type : ", typeof(rI[i]);
   "";
 }
 ideal GI = groebner(I);
@@ -90,15 +90,15 @@ kill R,i,codimI;
 //======================  Exercise 1.4 =============================
 proc maximaldegree (ideal I)
 "USAGE:  maximaldegree(I);   I=ideal
-RETURN: integer; the maximum degree of the given 
+RETURN: integer; the maximum degree of the given
                  generators for I
 NOTE:   return value is -1 if I=0
 "
 {
   if (size(I)>0)
   {
-    int i,dd; 
-    int d = deg(I[1]); 
+    int i,dd;
+    int d = deg(I[1]);
     for (i=2; i<=size(I); i++)
     {
       dd = deg(I[i]);

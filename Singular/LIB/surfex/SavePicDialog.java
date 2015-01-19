@@ -5,29 +5,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.awt.BorderLayout;
@@ -66,25 +66,25 @@ import javax.swing.filechooser.FileFilter;
 
 public class SavePicDialog extends JFrame {
     RayFrame rayFrame;
-    
+
     JTextField tf;
-    
+
     int heightvalue=0;
     int widthvalue=0;
-    
+
     JComboBox outputFormat;
-    
+
     JComboBox colorType;
-    
+
     JComboBox antialiasingQuality;
-    
+
     JComboBox standardDim;
-    
+
     JComboBox measure;
     int oldMeasure;
-    
+
     JPanel panel = new JPanel();/*
-				  
+
 //	JRadioButton povCode = new JRadioButton("PovRay code");
 
 //JRadioButton surfCode = new JRadioButton("Surf code");
@@ -97,48 +97,48 @@ public class SavePicDialog extends JFrame {
 //		{ 1200, 1200 }, { 240, 240 }, { 360, 360 }, { 480, 480 },
 //		{ 640, 640 } };
 
-				*/	
+				*/
     ChangeListener CL;
-    
+
     //boolean last[] = { true, false, false, false, false, false, false, false,
     //		false, false, false, true, false, false, true, false };
-    
+
     //boolean actionWasPerformed = false;
-    
+
     JTextField width;
-    
+
     JTextField height;
-    
+
     JCheckBox aspectRatio = new JCheckBox("Preserve aspect ratio", false);
-    
+
     //JRadioButton unitPixels = new JRadioButton("Pixels", true);
-    
+
     JTextField dpi = new JTextField("300");
-    
+
     //JRadioButton unitCm = new JRadioButton("cm");
-    
+
     //JRadioButton unitInches = new JRadioButton("inches");
-    
+
     //int i, j;
-    
+
     //JCheckBox ditheredCb = new JCheckBox("dithered - black/white", false);
-    
+
     //public JCheckBox antialiasing = new JCheckBox("antialiasing", false);
-    
+
     JButton SaveButton = new JButton("create and save as");
-    
+
     JButton CancelButton = new JButton("cancel");
-    
+
     JButton DefaultButton = new JButton("default");
-    
+
     JLabel newSize = new JLabel();
-    
-    Project project; 
-    
+
+    Project project;
+
     surfex surfex_;
-    
+
     String projectName;
-    
+
     SavePicDialog(String proName, RayFrame ray, Project pro, surfex su) {
 	super("save picture" + proName);
 	surfex_ = su;
@@ -146,11 +146,11 @@ public class SavePicDialog extends JFrame {
 	project = pro;
 	this.projectName = proName;
 	//setSize(790, 400);
-	
+
 	JPanel contentPane = (JPanel) getContentPane();
 	JPanel contentPane1l = new JPanel(new BorderLayout());
 	JPanel contentPane1r = new JPanel(new BorderLayout());
-	
+
 	JPanel contentPane2 = new JPanel(new BorderLayout());
 	JPanel contentPane3 = new JPanel(new BorderLayout());
 	JPanel contentPane4 = new JPanel(new BorderLayout());
@@ -159,18 +159,18 @@ public class SavePicDialog extends JFrame {
 	JPanel contentPane7 = new JPanel(new BorderLayout());
 	JPanel contentPane8 = new JPanel(new BorderLayout());
 	JPanel contentPane9 = new JPanel(new BorderLayout());
-	
-	
+
+
 	JPanel sizePanel=new JPanel();//new GridLayout(2,3));
 	JPanel newSizePanel=new JPanel(new BorderLayout());
 	JPanel DpiPanel=new JPanel(new GridLayout(1,2));
 	JPanel outputFormatPanel=new JPanel();//(new GridLayout(2,3));
-	
+
 	JPanel someStandardDimPanel=new JPanel();//(new GridLayout(2,3));
 	JPanel colorTypePanel=new JPanel();//(new GridLayout(2,3));
 	JPanel antialiasingPanel=new JPanel();//(new GridLayout(2,3));
-	
-	
+
+
 	sizePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("current size (in pixels)"),BorderFactory.createEmptyBorder(5,5,5,5)));
 	newSizePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("set size"),BorderFactory.createEmptyBorder(5,5,5,5)));
 	DpiPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("dots per inch"),BorderFactory.createEmptyBorder(5,5,5,5)));
@@ -180,9 +180,9 @@ public class SavePicDialog extends JFrame {
 	antialiasingPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("select antialiasing quality"),BorderFactory.createEmptyBorder(5,5,5,5)));
 	contentPane1l.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("resolution"),BorderFactory.createEmptyBorder(5,5,5,5)));
 	contentPane1r.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("general settings"),BorderFactory.createEmptyBorder(5,5,5,5)));
-	
-	
-	
+
+
+
 	contentPane.setLayout(new BorderLayout());
 	contentPane.add(contentPane1l,BorderLayout.CENTER);
 	contentPane.add(contentPane1r,BorderLayout.EAST);
@@ -199,24 +199,24 @@ public class SavePicDialog extends JFrame {
 	contentPane6.add(antialiasingPanel, BorderLayout.NORTH);
 	contentPane6.add(contentPane7,BorderLayout.CENTER);
 	contentPane7.add(outputFormatPanel, BorderLayout.NORTH);
-	
+
 	/*	contentPane7.add(contentPane8,BorderLayout.CENTER);
 		contentPane8.add(outputFormatPanel, BorderLayout.NORTH);
 		contentPane8.add(contentPane9,BorderLayout.CENTER);
 		contentPane9.add(sizePanel, BorderLayout.NORTH);
 	*///contentPane6.add(contentPane2,BorderLayout.CENTER);
-	
+
 	outputFormat=new JComboBox();
-	
+
 	outputFormat.insertItemAt("raytraced picture",0);
-	
-	
-	if (true || surfex_.inAnApplet) {	    
-	    outputFormat.insertItemAt("surf code",1);	
+
+
+	if (true || surfex_.inAnApplet) {
+	    outputFormat.insertItemAt("surf code",1);
 //	    outputFormat.insertItemAt("povray code",2);
 	}
 	outputFormat.setSelectedIndex(0);
-	
+
 	CL = new ChangeListener() {
 		public void stateChanged(ChangeEvent ev) {
 		    String command = ((AbstractButton) ev.getSource()).getText();
@@ -246,7 +246,7 @@ public class SavePicDialog extends JFrame {
 		    }
 		    }
 		    }
-		    
+
 		    if (command.hashCode() == rb[8].getText().hashCode()
 		    && rb[8].isSelected()) {
 		    //      System.out.println("funktion nicht geschrieben ...");
@@ -374,33 +374,33 @@ public class SavePicDialog extends JFrame {
 				// System.out.println("clicked" );
 			*/
 		}
-		
+
 	    };
-	
-	
+
+
 // 	width = new JTextField(rayFrame.getContentPane().getSize().width+"");
 // 	height = new JTextField(rayFrame.getContentPane().getSize().height+"");
 	width = new JTextField("300");
 	height = new JTextField("300");
 	//	rb[10] = new JRadioButton("Set new size:", true);
-	
-	
+
+
 	//	ButtonGroup group = new ButtonGroup();
 	//	ButtonGroup standardDim = new ButtonGroup();
-	
+
 	// adding container
 	//	panel.setLayout(new GridLayout(9, 2));
 	//	panel.add(new JLabel("output format:"));
-	
+
 	outputFormatPanel.add(outputFormat);
-	
+
 /*		panel.add(surfCode);
 		panel.add(new JLabel(""));
-		
+
 		panel.add(raytracedPic);
 		panel.add(new JLabel(""));
 */
-	
+
 	colorType=new JComboBox();
 	colorType.insertItemAt("color",0);
 	colorType.insertItemAt("dithered - black/white",1);
@@ -409,7 +409,7 @@ public class SavePicDialog extends JFrame {
 	colorType.setSelectedIndex(0);
 	panel.add(new JLabel("color type:"));
 	colorTypePanel.add(colorType);
-	
+
 	antialiasingQuality=new JComboBox();
 	antialiasingQuality.insertItemAt("1",0);
 	antialiasingQuality.insertItemAt("2",1);
@@ -421,29 +421,29 @@ public class SavePicDialog extends JFrame {
 //	panel.add(new JLabel("antialiasing level:"));
 	antialiasingPanel.add(new JLabel("low(1) - high(6):"));
 	antialiasingPanel.add(antialiasingQuality);
-	
+
 	panel.add(new JLabel("  Current size:"));
 	sizePanel.add(newSize);//
 	//new JLabel(rayFrame.getContentPane().getSize().width + " x "
 	//		+ rayFrame.getContentPane().getSize().height));
 	panel.add(new JLabel("  New size:"));
-	
+
 	JPanel p1 = new JPanel(new GridLayout(3, 2));
 	newSizePanel.add(p1,BorderLayout.CENTER);
-	
+
 //	setNewSize(rayFrame.getContentPane().getSize().height,rayFrame.getContentPane().getSize().width);
 	setNewSize(300,300);
-	
+
 	//	p1.add(newSize);
 	//	p1.add(new JLabel(" "));
-	
+
 	//panel.add(rb[10]);
 	//standardDim.add(rb[10]);
 	//rb[10].addChangeListener(CL);
-	
+
 //		panel.add(new JLabel(""));
-	
-	
+
+
 	p1.add(new JLabel("  width:"));
 	width.addKeyListener(new KeyListener() {
 		public void keyReleased(KeyEvent keyEvent) {
@@ -458,15 +458,15 @@ public class SavePicDialog extends JFrame {
 		    updateLabel_newSize();
 		    outputFormat.setSelectedIndex(0);
 		}
-		
+
 		public void keyPressed(KeyEvent keyEvent) {
 		}
-		
+
 		public void keyTyped(KeyEvent keyEvent) {
 		}
 	    });
 	p1.add(width);
-	
+
 	//JPanel p2 = new JPanel(new GridLayout(1, 2));
 	//panel.add(p2);
 	p1.add(new JLabel("  height:"));
@@ -483,45 +483,45 @@ public class SavePicDialog extends JFrame {
 		    //rb[10].setSelected(true);
 		    updateLabel_newSize();
 		}
-		
+
 		public void keyPressed(KeyEvent keyEvent) {
 		}
-		
+
 		public void keyTyped(KeyEvent keyEvent) {
 		}
 	    });
 	p1.add(height);
-	
-	
-	
-	
+
+
+
+
 	JPanel p3 = new JPanel(new GridLayout(1, 2));
 	DpiPanel.add(p3);
 	p3.add(new JLabel("  dpi:"));
 	dpi.addKeyListener(new KeyListener() {
 		public void keyReleased(KeyEvent keyEvent) {
-		    
+
 		    updateLabel_newSize();
 		    outputFormat.setSelectedIndex(0);
 		}
-		
+
 		public void keyPressed(KeyEvent keyEvent) {
 		}
-		
+
 		public void keyTyped(KeyEvent keyEvent) {
 		}
 	    });
 	p3.add(dpi);
-	
+
 	measure=new JComboBox();
-	
+
 	measure.insertItemAt("pixel",0);
 	measure.insertItemAt("cm",1);
 	measure.insertItemAt("inch",2);
-	
+
 	measure.setSelectedIndex(0);
 	oldMeasure = 0;
-	
+
 	measure.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent ae)
 		    {
@@ -548,11 +548,11 @@ public class SavePicDialog extends JFrame {
 
 		    if(measure.getSelectedIndex()==0){
 			if(oldMeasure==0) {
-			} 
+			}
 			if(oldMeasure==1) {
-			    setWidth((Double.valueOf(width.getText()).doubleValue()) * 
+			    setWidth((Double.valueOf(width.getText()).doubleValue()) *
 				     ((Double.valueOf(dpi.getText())).doubleValue())/2.54);
-			    setHeight((Double.valueOf(height.getText()).doubleValue()) * 
+			    setHeight((Double.valueOf(height.getText()).doubleValue()) *
 				      ((Double.valueOf(dpi.getText())).doubleValue())/2.54);
 			}
 			if(oldMeasure==2) {
@@ -566,11 +566,11 @@ public class SavePicDialog extends JFrame {
 		    }
 		    if(measure.getSelectedIndex()==1){
 			if(oldMeasure==0) {
-			    setWidth((Double.valueOf(width.getText()).doubleValue()) / 
+			    setWidth((Double.valueOf(width.getText()).doubleValue()) /
 				     ((Double.valueOf(dpi.getText())).doubleValue())*2.54);
-			    setHeight((Double.valueOf(height.getText()).doubleValue()) / 
+			    setHeight((Double.valueOf(height.getText()).doubleValue()) /
 				      ((Double.valueOf(dpi.getText()).doubleValue()))*2.54);
-			} 
+			}
 			if(oldMeasure==1) {
 			}
 			if(oldMeasure==2) {
@@ -584,11 +584,11 @@ public class SavePicDialog extends JFrame {
 		    }
 		    if(measure.getSelectedIndex()==2){
 			if(oldMeasure==0) {
-			    setWidth((Double.valueOf(width.getText()).doubleValue()) / 
+			    setWidth((Double.valueOf(width.getText()).doubleValue()) /
 				     ((Double.valueOf(dpi.getText())).doubleValue()));
-			    setHeight((Double.valueOf(height.getText()).doubleValue()) / 
+			    setHeight((Double.valueOf(height.getText()).doubleValue()) /
 				      ((Double.valueOf(dpi.getText())).doubleValue()));
-			} 
+			}
 			if(oldMeasure==1) {
 			    setWidth((Double.valueOf(width.getText()).doubleValue()) / 2.54);
 			    setHeight((Double.valueOf(height.getText()).doubleValue()) / 2.54);
@@ -603,8 +603,8 @@ public class SavePicDialog extends JFrame {
 		    oldMeasure = measure.getSelectedIndex();
 		}
 	    });
-	
-	
+
+
 	//JPanel p35 = new JPanel(new GridLayout(1, 2));
 	//panel.add(p35);
 	p1.add(new JLabel("Unit:"));
@@ -617,9 +617,9 @@ public class SavePicDialog extends JFrame {
   units.add(unitPixels);
   unitPixels.addChangeListener(CL);
   p4.add(unitPixels);
-  
+
   panel.add(new JLabel(""));
-  
+
   JPanel p5 = new JPanel(new GridLayout(1, 2));
   panel.add(p5);
   units.add(unitCm);
@@ -639,10 +639,10 @@ public class SavePicDialog extends JFrame {
 //	newSizePanel.add(aspectRatio,BorderLayout.SOUTH);
 	aspectRatio.addChangeListener(CL);
 	//	panel.add(new JLabel("(raytraced preview)"));
-	
-	
+
+
 	standardDim=new JComboBox();
-	standardDim.insertItemAt("choose a size",0);	
+	standardDim.insertItemAt("choose a size",0);
  	standardDim.insertItemAt("for presentation (600x600)",1);
  	standardDim.insertItemAt("for web (300x300)",2);
 	standardDim.insertItemAt("240 x 240",3);
@@ -657,7 +657,7 @@ public class SavePicDialog extends JFrame {
 // 	standardDim.insertItemAt("Best fit to desktop",1);
 // 	standardDim.insertItemAt("screen size",2);
 
-	
+
 	standardDim.addActionListener(new ActionListener(){
 		public void actionPerformed(ActionEvent ae){
 		    int i=standardDim.getSelectedIndex();
@@ -677,15 +677,15 @@ public class SavePicDialog extends JFrame {
 		    }
 		}
 	    });
-	
+
 	standardDim.setSelectedIndex(0);
-	
+
 	//panel.add(new JLabel("some standard dimensions:"));
 	someStandardDimPanel.add(standardDim);
-	
-	
+
+
 /*		JPanel panel2 = new JPanel(new GridLayout(12, 3));
-		
+
 panel2.add(new JLabel());
 panel2.add(new JLabel());
 panel2.add(new JLabel());
@@ -730,21 +730,21 @@ panel2.add(new JLabel());
 		contentPane.add(panel2, BorderLayout.EAST);
 */
 	JPanel panel3 = new JPanel(new FlowLayout());
-	
+
 	ActionListener AL = new ActionListener() {
 		public void actionPerformed(ActionEvent evt) {
 		    String command = ((JButton) evt.getSource()).getText();
 		    if (command.hashCode() == SaveButton.getText().hashCode()) {
 			//      System.out.println("saveButton!");
 			setVisible(false);
-			
+
 			// creating new Frame
 			final JFrame frame2 = new JFrame("save picture"
 							 + projectName);
-			
+
 			// adding container
 			Container contentPane = frame2.getContentPane();
-			
+
 			if (surfex_.inAnApplet) {
 			    ActionListener aL = new ActionListener() {
 				    public void actionPerformed(ActionEvent actionEvent) {
@@ -782,7 +782,7 @@ panel2.add(new JLabel());
 						    project.saveFile(filelocation, 3,
 								     (colorType.getSelectedIndex()==1),//dithered?
 								     (antialiasingQuality.getSelectedIndex()!=0),
-								     heightvalue,widthvalue,		
+								     heightvalue,widthvalue,
 								     Integer.parseInt(dpi.getText()),surfex_.jv4sx);
 						}
 					    }
@@ -831,17 +831,17 @@ panel2.add(new JLabel());
 //			    System.out.println("saveDialogType");
 			    // adding filechooser
 			    contentPane.add(fileChooser, BorderLayout.CENTER);
-			    
+
 			    // Create ActionListener
 			    ActionListener actionListener = new ActionListener() {
 				    public void actionPerformed(ActionEvent actionEvent) {
 					JFileChooser theFileChooser = (JFileChooser) actionEvent
 					    .getSource();
-					
+
 					// get command2
 					String command2 = actionEvent
 					    .getActionCommand();
-					
+
 					// check if doubleclickt or if "open" was pressed
 					if (command2
 					    .equals(JFileChooser.APPROVE_SELECTION)) {
@@ -852,13 +852,13 @@ panel2.add(new JLabel());
 					    surfex_.currentDirectory = theFileChooser.getCurrentDirectory().getAbsolutePath();
 					    // making savepopup invisible/removing it
 					    frame2.dispose();
-					    
+
 					    // creating complete filepath
 					    String filelocation = new String(
 						selectedFile.getParent()
 							+ File.separator
 						+ selectedFile.getName());
-					    
+
 					    // ausgabe fehler bein z.B.: d:\ -> d:\\ bzw \ -> \\
 					    //          System.out.println("filelocation : "+ filelocation + "\n");
 					    if (outputFormat.getSelectedIndex()==2) {
@@ -899,7 +899,7 @@ panel2.add(new JLabel());
 					}
 				    }
 				};
-			    
+
 			    if (outputFormat.getSelectedIndex()==2) {
 				// povcode
 				FileFilter acfFilter = new ExtensionFileFilter(
@@ -912,12 +912,12 @@ panel2.add(new JLabel());
 				try {
 				    File lastFile = new File(project.filename);
 				    String theName = lastFile.getName();
-				    fileChooser.setSelectedFile( 
+				    fileChooser.setSelectedFile(
 					new File(surfex_.changeFilenameExtension(theName,".pov")));
 //	    System.out.println("name:"+theName);
 				} catch(Exception fileEx) {
 				    System.out.println("fileEx:"+fileEx.toString());
-				}					
+				}
 			    } else {
 				if (outputFormat.getSelectedIndex()==1) {
 				    //surfcode
@@ -933,19 +933,19 @@ panel2.add(new JLabel());
 				    try {
 					File lastFile = new File(project.filename);
 					String theName = lastFile.getName();
-					fileChooser.setSelectedFile( 
+					fileChooser.setSelectedFile(
 					    new File(surfex_.changeFilenameExtension(theName,".pic")));
 //	    System.out.println("name:"+theName);
 				    } catch(Exception fileEx) {
 					System.out.println("fileEx:"+fileEx.toString());
-				    }					    
+				    }
 				} else {
 				    if (outputFormat.getSelectedIndex()==0) {
-					// raytraced pic 
+					// raytraced pic
 					if ((colorType.getSelectedIndex()==1)) { // dithered!
 					    FileFilter acfFilter = new ExtensionFileFilter(
 						"all common files",
-						new String[] { "tif", "ps", "eps", 
+						new String[] { "tif", "ps", "eps",
 							       "xbm", "pgm", "pbm" });
 					    fileChooser.addChoosableFileFilter(acfFilter);
 					    FileFilter spcFilter;
@@ -977,12 +977,12 @@ panel2.add(new JLabel());
 					    try {
 						File lastFile = new File(project.filename);
 						String theName = lastFile.getName();
-						fileChooser.setSelectedFile( 
+						fileChooser.setSelectedFile(
 						    new File(surfex_.changeFilenameExtension(theName,".eps")));
 //	    System.out.println("name:"+theName);
 					    } catch(Exception fileEx) {
 						System.out.println("fileEx:"+fileEx.toString());
-					    }					    
+					    }
 
 // 										spcFilter = new ExtensionFileFilter(
 // 												"*.eps", new String[] { "eps" });
@@ -1003,7 +1003,7 @@ panel2.add(new JLabel());
 					    spcFilter = new ExtensionFileFilter(
 						"*.gif", new String[] { "gif" });
 					    //              fileChooser.addChoosableFileFilter(spcFilter);
-					    
+
 					    spcFilter = new ExtensionFileFilter(
 						"*.ppm", new String[] { "ppm" });
 //					    fileChooser.addChoosableFileFilter(spcFilter);
@@ -1033,7 +1033,7 @@ panel2.add(new JLabel());
 					    try {
 						File lastFile = new File(project.filename);
 						String theName = lastFile.getName();
-						fileChooser.setSelectedFile( 
+						fileChooser.setSelectedFile(
 						    new File(surfex_.changeFilenameExtension(theName,".jpg")));
 //	    System.out.println("name:"+theName);
 					    } catch(Exception fileEx) {
@@ -1042,18 +1042,18 @@ panel2.add(new JLabel());
 					}
 				    }
 				}
-				
+
 			    }
-			    
+
 			    // adding actionListener
 			    fileChooser.addActionListener(actionListener);
 			    frame2.pack();
 			} // end of else (i.e. !inAnApplet)
-			
+
 			frame2.setVisible(true);
-			
+
 			//oeffen den Kram unter filename;
-			
+
 			// end: command == "load"
 		    }
 		    if (command.hashCode() == DefaultButton.getText().hashCode()) {
@@ -1076,10 +1076,10 @@ panel2.add(new JLabel());
 			//last[0] = true;
 			//last[11] = true;
 			//last[14] = true;
-			
+
 			standardDim.setSelectedIndex(0);
 			measure.setSelectedIndex(0);//pixel
-			
+
 			updateLabel_newSize();
 		    }
 		    if (command.hashCode() == CancelButton.getText().hashCode()) {
@@ -1087,7 +1087,7 @@ panel2.add(new JLabel());
 		    }
 		}
 	    };
-	
+
 	//panel3.add(new JLabel());
 	SaveButton.addActionListener(AL);
 	SaveButton.setDefaultCapable(true);
@@ -1097,23 +1097,23 @@ panel2.add(new JLabel());
 	DefaultButton.addActionListener(AL);
 	panel3.add(DefaultButton);
 	//panel3.add(new JLabel());
-	
+
 	contentPane.add(panel3, BorderLayout.SOUTH);
 /*
   group.add(raytracedPic);
   group.add(povCode);
   group.add(surfCode);
-  
-*/	
+
+*/
 	this.pack();
 	this.setLocation(200,100);
 	setVisible(false);
     }
-    
+
     //     void saveFile(String filelocation) {
     //  project.saveFile(filelocation);
     //     } // end of saveFile(String filelocation)
-    
+
     public void updateLabel_newSize() {
 	if (width.getText() != "" && height.getText() != ""
 	    && dpi.getText() != "") {
@@ -1124,7 +1124,7 @@ panel2.add(new JLabel());
 	    }
 	    if (measure.getSelectedIndex()==2) {
 		// inch selektiert
-		
+
 		setNewSize((int)(Double.parseDouble(height.getText()) * Integer
 				 .parseInt(dpi.getText())),(int)(Double.parseDouble(width.getText()) * Integer
 								 .parseInt(dpi.getText())));
@@ -1138,7 +1138,7 @@ panel2.add(new JLabel());
 	}
 	// SwingUtilities.updateComponentTreeUI(this);
     }
-    
+
     public void updateSize(int h,int w){
 	setNewSize(h,w);
 	if(measure.getSelectedIndex()==0){
@@ -1153,24 +1153,24 @@ panel2.add(new JLabel());
 	    setWidth(w/(Double.valueOf(dpi.getText()).doubleValue()));
 	    setHeight(h/(Double.valueOf(dpi.getText()).doubleValue()));
 	}
-	
+
     }
-    
+
     public void setNewSize(int h, int w){
 	heightvalue=h;
 	widthvalue=w;
 	newSize.setText(h+" x "+w);
     }
-    
+
     public void setHeight(double h){
 	if(measure.getSelectedIndex()==0){
-	    //pixel ist selektiert, d.h. keine Nachkommastellen anzeigen!	    
+	    //pixel ist selektiert, d.h. keine Nachkommastellen anzeigen!
 	    height.setText(((int)h)+"");
 	} else {
 	    // angabe in cm / inch:
 	    // bis zu acht stellen (mit komma ) anzeigen:
-	    height.setText((h+"        ").substring(0,8).replaceAll(" ",""));	    
-	}		
+	    height.setText((h+"        ").substring(0,8).replaceAll(" ",""));
+	}
     }
 
     public void setWidth(double w){
@@ -1183,6 +1183,6 @@ panel2.add(new JLabel());
 	    width.setText((w+"        ").substring(0,8).replaceAll(" ",""));
 	}
     }
-    
+
 } // end class SavePicDialog
 

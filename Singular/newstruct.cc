@@ -550,7 +550,7 @@ BOOLEAN newstruct_CheckAssign(blackbox */*b*/, leftv L, leftv R)
   {
     const char *rt1=Tok2Cmdname(rt);
     const char *lt1=Tok2Cmdname(lt);
-    if ((rt>0) && (lt>0) 
+    if ((rt>0) && (lt>0)
     && ((strcmp(rt1,Tok2Cmdname(0))==0)||(strcmp(lt1,Tok2Cmdname(0))==0)))
     {
       Werror("can not assign %s(%d) to member of type %s(%d)",

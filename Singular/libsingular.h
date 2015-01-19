@@ -7,7 +7,6 @@
 #include <kernel/structs.h>
 #include <kernel/polys.h>
 #include <coeffs/numbers.h>
-#include <coeffs/longrat.h>
 #include <kernel/oswrapper/feread.h>
 #include <polys/monomials/ring.h>
 #include <omalloc/omalloc.h>

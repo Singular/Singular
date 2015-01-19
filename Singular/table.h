@@ -801,6 +801,9 @@ struct sValCmdM dArithM[]=
 ,{D(jjDIVISION4), DIVISION_CMD,    ANY_TYPE/*or set by p*/,4   , NO_PLURAL |NO_RING}
 ,{D(jjDBPRINT),   DBPRINT_CMD,     NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
 //,{D(jjEXPORTTO_M),  EXPORTTO_CMD,    NONE,             -2      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL2ARG),  FETCH_CMD,       ANY_TYPE/*or set by p*/,2   , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjFETCH_M),   FETCH_CMD,       ANY_TYPE/*or set by p*/,3   , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjFETCH_M),   FETCH_CMD,       ANY_TYPE/*or set by p*/,4   , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL1ARG),  IDEAL_CMD,       IDEAL_CMD,          1       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjIDEAL_PL),  IDEAL_CMD,       IDEAL_CMD,          -1      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL2ARG),  INTERSECT_CMD,   IDEAL_CMD,          2       , ALLOW_PLURAL |ALLOW_RING}
@@ -912,7 +915,7 @@ cmdnames cmds[] =
   { "factmodd",    0, FMD_CMD ,           CMD_M},
   { "factorize",   0, FAC_CMD ,           CMD_12},
   { "farey",       0, FAREY_CMD ,         CMD_2},
-  { "fetch",       0, FETCH_CMD ,         CMD_2},
+  { "fetch",       0, FETCH_CMD ,         CMD_M},
   { "fglm",        0, FGLM_CMD ,          CMD_2},
   { "fglmquot",    0, FGLMQUOT_CMD,       CMD_2},
   { "find",        0, FIND_CMD ,          CMD_23},

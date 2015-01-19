@@ -1,7 +1,7 @@
 Audience and their wishes:
 A) Developer
 A1  - several independent versions of Singular
-A2  - developer version: additional commands, main sources in the current 
+A2  - developer version: additional commands, main sources in the current
     directory or "nearby"
 B) User
 B1   - binaries installable without administrator privileges
@@ -10,7 +10,7 @@ C) Administrator
 C1   - installable without conflicts
 C2   - installable for several binary architectures
 C3   - few dependencies
-   
+
 What to install ?
 - sub-projects
   - have:
@@ -23,7 +23,7 @@ What to install ?
 - support files for Singular
   - gftables
     (currently: $SINGULARPATH/gftables:%b/LIB/gftables:%b/../LIB/gftables:%b/../../LIB/gftables)
-  - libraries 
+  - libraries
     (currently: $SINGULARPATH:%b/LIB:%b/../LIB:%b/../../LIB)
   - system modules
     (currently %b)

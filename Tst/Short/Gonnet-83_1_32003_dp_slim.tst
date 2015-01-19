@@ -24,4 +24,3 @@ a0*b0+a1*b0+a4*b0+a0*b1+a1*b1+a4*b1+a3*b2+a5*b2+a2*b3+a0*b4+a1*b4+a4*b4+a2*b5+c0
   option(redSB);
   slimgb(MYIDEALNAME);
   tst_status(1);$
-  

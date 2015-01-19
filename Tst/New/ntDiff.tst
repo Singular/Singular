@@ -1,4 +1,4 @@
-LIB "tst.lib"; 
+LIB "tst.lib";
 tst_init();
 
 ring R=0,x,dp;

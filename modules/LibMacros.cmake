@@ -18,7 +18,7 @@ function(unpack_library GEN_FILELIST GEN_TARGET SUBDIR NAME)
     )
   add_custom_target(${_GEN_TARGET}
     COMMAND ${AR} x ${loc}
-    COMMAND ls -l 
+    COMMAND ls -l
     DEPENDS ${NAME}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${SUBDIR}
     COMMENT "Merge:Unpack library ${NAME}")

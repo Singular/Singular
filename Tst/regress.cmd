@@ -11,7 +11,7 @@ use Env;
 # equivalent to command line options -CS, whihc is not supported any more
 use open ':std', ':utf8';
 use open IO => ':bytes';
- 
+
 #################################################################
 #
 # usage
@@ -137,7 +137,7 @@ chop $hostname;
 # flag indicating whether to produce TeamCity output ("" - no):
 $teamcity = "";
 # current argument: test file name?
-$test_file = ""; 
+$test_file = "";
 
 # all previous test_file's:
 %test_files = ();
@@ -158,7 +158,7 @@ sub tc_filter
   local($t) = $_[0];
 
   $t =~ s/\|/|\|/g;
-  
+
   $t =~ s/\n/|n/g;
   $t =~ s/\r/|r/g;
 
@@ -182,21 +182,21 @@ sub putTCmsg
 
     print( "\n##teamcity[$message $text]\n" );
   }
-} 
+}
 sub putTCmsgV
 {
   local($message) = $_[0];
   local($unquotedValue) = tc_filter($_[1]);
-   
+
   putTCmsg( $message, "\'$unquotedValue\'");
-} 
+}
 sub putTCmsgNV
 {
   local($m) = $_[0];
   local($p) = $_[1];
   local($v) = tc_filter($_[2]);
   putTCmsg( $m, "$p=\'$v\'" );
-} 
+}
 sub putTCmsgNV2
 {
   local($m) = $_[0];
@@ -212,17 +212,17 @@ sub putTCmsgNV2
 # teamcity routines:
 #
 sub blockOpened
-{ 
+{
   local($v) = $_[0];
   putTCmsgNV( "blockOpened", "name", $v);
 }
 sub blockClosed
-{ 
+{
   local($v) = $_[0];
   putTCmsgNV( "blockClosed", "name", $v);
 }
 sub tcError
-{ 
+{
   local($text) = tc_filter($_[0]);
   local($details) = tc_filter($_[1]);
   local($status) = tc_filter($_[2]);
@@ -231,7 +231,7 @@ sub tcError
   # The default value is NORMAL.
   # The errorDetails attribute is used only if status is ERROR, in other cases it is ignored.
   # This message fails the build in case its status is ERROR and "Fail build if an error message is logged by build runner" checkbox is checked on build configuration general settings page.
-  
+
   ##teamcity[message text='<message text>' errorDetails='<error details>' status='<status value>']
   putTCmsg( "message", "text=\'$text\' errorDetails=\'$details\' status=\'$status\'");
 }
@@ -244,23 +244,23 @@ sub tcFailure
 }
 
 sub tcLog
-{ 
+{
   local($text) = $_[0];
-  putTCmsgNV2( "message", "text", $text, "status", "NORMAL"); 
+  putTCmsgNV2( "message", "text", $text, "status", "NORMAL");
 }
 sub tcWarn
-{ 
+{
   local($text) = $_[0];
-  putTCmsgNV2( "message", "text", $text, "status", "WARNING"); 
+  putTCmsgNV2( "message", "text", $text, "status", "WARNING");
 }
 
 sub testSuiteStarted
-{ 
+{
   local($v) = $_[0];
   putTCmsgNV( "testSuiteStarted", "name", $v);
 }
 sub testSuiteFinished
-{ 
+{
   local($v) = $_[0];
   putTCmsgNV( "testSuiteFinished", "name", $v);
 }
@@ -273,7 +273,7 @@ sub testNameRemoveLeadingUnderscore
   local($t) = $_[0];
   $t =~ s/^_([a-z0-9][^\/]*)$/\1/g;
   $t =~ s/[\/]_([a-z0-9][^\/]*)$/\/\1/g;
-  return ($t);  
+  return ($t);
 }
 
 sub testStarted
@@ -281,15 +281,15 @@ sub testStarted
   local($v) = $_[0];
   $v = testNameRemoveLeadingUnderscore($v);
   putTCmsgNV2( "testStarted", "name", $v, "captureStandardOutput", "true");
-  $failed = 0;    
+  $failed = 0;
 }
 sub testFinished
-{ 
+{
   local($v) = $_[0];
   local($d) = $_[1];
   $v = testNameRemoveLeadingUnderscore($v);
   putTCmsgNV2( "testFinished", "name", $v, "duration", $d);
-  $failed = 0;   
+  $failed = 0;
 }
 
 sub testFailed
@@ -298,7 +298,7 @@ sub testFailed
   local($m) = $_[1];
 
   $n = testNameRemoveLeadingUnderscore($n);
-    
+
   if( !$failed )
   {
     putTCmsgNV2( "testFailed", "name", $n, "message", $m);
@@ -315,10 +315,10 @@ sub testFailed2
   local($t) = tc_filter($_[2]);
 
   $n = testNameRemoveLeadingUnderscore($n);
-  
+
   if( !$failed )
   {
-    putTCmsg( "testFailed", "name=\'$n\' message=\'$m\' details=\'$t\'"); 
+    putTCmsg( "testFailed", "name=\'$n\' message=\'$m\' details=\'$t\'");
     $failed = 1;
   } else
   {
@@ -333,9 +333,9 @@ sub testFailedCMP
   local($details) = tc_filter($_[2]);
   local($expected) = tc_filter($_[3]);
   local($actual) = tc_filter($_[4]);
-    
+
   $name = testNameRemoveLeadingUnderscore($name);
-    
+
   if( !$failed )
   {
     putTCmsg( "testFailed", "type=\'comparisonFailure\' name=\'$name\' message=\'$msg\' details=\'$details\' expected=\'$expected\' actual=\'$actual\'");
@@ -349,10 +349,10 @@ sub testFailedCMP
 
 ##teamcity[testFailed type='comparisonFailure' name='test_file' message='failure_message' details='message and stack trace' expected='expected value' actual='actual value']
 sub testIgnored
-{ 
+{
   local($n) = $_[0];
   local($m) = $_[1];
-  
+
   $n = testNameRemoveLeadingUnderscore($n);
 
   putTCmsgNV2( "testIgnored", "name", $n, "message", $m);
@@ -397,7 +397,7 @@ sub Diff
   # doo the diff call
   $exit_status = mysystem("$diff -w -b \"$root.res.cleaned\" \"$root.new.res.cleaned\" > \"$root.diff\" 2>&1");
 
-  
+
   # clean up time
   mysystem("$rm -f \"$root.res.cleaned\" \"$root.new.res.cleaned\"");
 
@@ -415,7 +415,7 @@ sub Diff
     local($actual) = mysystem_catch("$cat \"$root.new.res\"");
     testFailedCMP($test_file, "Differences in res files", $details, $expected, $actual )
   }
-    
+
   return($exit_status);
 }
 
@@ -445,7 +445,7 @@ sub tst_status_check
     $crit = $2;
     $new_res = $3;
     next unless $new_res > $mintime_val;
-    
+
     while ($line = <RES_FILE>)
     {
       last if $line =~ /$prefix >> $crit ::.*?$hostname:(\d+)/;
@@ -468,10 +468,10 @@ sub tst_status_check
     next unless $res;
     $res_diff = $new_res - $res;
     $res_diff_pc = int((($new_res / $res) - 1)*100);
-    $res_diff_line = 
+    $res_diff_line =
       "$prefix >> $crit :: new:$new_res old:$res_version$res diff:$res_diff %:$res_diff_pc\n";
     print STATUS_DIFF_FILE $res_diff_line;
-    
+
     if ((defined($error{$crit}) &&  $error{$crit}<abs($res_diff_pc))
 	||
 	(defined($report{$crit}) && $report{$crit}<abs($res_diff_pc)))
@@ -479,7 +479,7 @@ sub tst_status_check
       print "$prefix >> $crit :: new:$new_res old:$res diff:$res_diff %:$res_diff_pc\n"
 	if ($verbosity > 0);
     }
-    
+
     if ($exit_status == 0)
     {
       $exit_status = (defined($error{$crit})
@@ -558,7 +558,7 @@ sub tst_status_merge
     }
     print TEMP_FILE $line;
   }
-  
+
   close(RES_FILE);
   close(NEW_RES_FILE);
   close(TEMP_FILE);
@@ -573,20 +573,20 @@ sub tst_check
   local($system_call, $exit_status, $ignore_pattern, $error_cause);
 
   local($my_test_file) = testNameRemoveLeadingUnderscore($test_file);
-    
+
   if (! ($my_test_file eq $test_file))
   {
     tcLog("The test '$test_file' will be reported to TeamCity as '$my_test_file' as it was _renamed :-/");
-  }   
-  
+  }
+
   if( exists($test_files{$test_file}) && (length($teamcity) > 0) )
   {
      tcWarn("The test '$test_file' have been alreeady tests (with result: $test_files{$test_file})... skipping!");
      return ($test_files{$test_file})
   }
-  
+
   $total_checks++;
-    
+
   # check for existence/readablity of tst and res file
   if (! (-r "$root.tst"))
   {
@@ -624,12 +624,12 @@ sub tst_check
 
   testStarted($test_file);
   print "--- $root " unless ($verbosity == 0);
-  
+
   my $resfile = "\"$root.new.res\"";
   $resfile = "\"$root.mtrack.res\"" if (defined($mtrack));
   my $statfile = "$root.new.stat";
   mysystem("$rm -f \"$statfile\"");
-  
+
   if (defined($mtrack))
   {
     $system_call = "$cat \"$root.tst\" | sed -e 's/\\\\\$/LIB \"general.lib\"; killall(); killall(\"proc\");kill killall;system(\"mtrack\", \"$root.mtrack.unused\", $mtrack); \\\$/' | $singular $singularOptions ";
@@ -639,7 +639,7 @@ sub tst_check
   }
   else
   {
-    
+
     # prepare Singular run
     if ($verbosity > 3 && !$WINNT)
     {
@@ -651,7 +651,7 @@ sub tst_check
     }
   }
   # Go Singular, Go!
-  
+
   my ($user_t,$system_t,$cuser_t,$csystem_t) = times;
   $exit_status = mysystem($system_call);
   my ($user_t,$system_t,$cuser_t2,$csystem_t2) = times;
@@ -659,18 +659,18 @@ sub tst_check
   $csystem_t = $csystem_t2 - $csystem_t;
 
   tcLog("Test: $test_file, user time: $cuser_t, system time: $csystem_t" );
-    
+
   if ($exit_status != 0)
   {
     $error_cause = "Singular call exited with status ($exit_status) != 0";
-    
+
     if( length($teamcity) > 0 )
-    {   
+    {
       ### TODO: add a way to detect timeout!!!
       if( $exit_status == 142 ) # perl sig alarm exit code? NOPE :(((
-      { 
-        local($details) = mysystem_catch("$cat \"$resfile\"");      
-	testFailed2($test_file, "Exit on timeout ($timeout sec)!", $details);    
+      {
+        local($details) = mysystem_catch("$cat \"$resfile\"");
+	testFailed2($test_file, "Exit on timeout ($timeout sec)!", $details);
       }
     }
   }
@@ -683,7 +683,7 @@ sub tst_check
     {
       $error_cause = "Segment fault";
       local($details) = mysystem_catch("$cat \"$resfile\"");
-      testFailed2($test_file, $error_cause, $details);      
+      testFailed2($test_file, $error_cause, $details);
     }
     elsif (! defined($mtrack) && !defined($timings_only))
     {
@@ -746,8 +746,8 @@ sub tst_check
 
     if( length($teamcity) > 0 )
     {
-      local($details) = mysystem_catch("$cat \"$resfile\"");      
-      testFailed2($test_file, $error_cause, $details);    
+      local($details) = mysystem_catch("$cat \"$resfile\"");
+      testFailed2($test_file, $error_cause, $details);
     }
   }
   else
@@ -772,7 +772,7 @@ sub tst_check
       elsif (%merge)
       {
 	($exit_status, $error_cause) = tst_status_merge($root);
-	  
+
 	print (STDERR "Warning: Merge Problems: $error_cause\n")
 	  if ($verbosity > 0 && $exit_status);
       }
@@ -798,9 +798,9 @@ sub tst_check
   $total_checks_pass++ unless $exit_status;
 
   mysystem("mv gmon.out \"gmon.$root.out\"") if (-e "gmon.out");
- 
+
   testFinished($test_file, $cuser_t + $csystem_t);
-  
+
   $test_files{$test_file} = $exit_status;
   return ($exit_status);
 }
@@ -978,10 +978,10 @@ if (-d $singular)
 sub ViewFile
 {
   local($f) = $_[0];
-  
+
   local($ff) = myGetTCprop($f);
   local($b) = "$f: " . $ff;
-    
+
   blockOpened ($b);
   mysystem("cat " . $ff);
   blockClosed ($b);
@@ -993,9 +993,9 @@ sub ViewFile
 #  #  tcLog("|Hi|\r I\'m [Alex]|\nHow are You?|");
 #
 #  blockOpened ("init");
-#  
+#
 # #  print ("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}" );
-#  
+#
 #  tcLog("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}");
 #
 #  if ( length("$ENV{TEAMCITY_BUILD_PROPERTIES_FILE}") > 0 )
@@ -1008,7 +1008,7 @@ sub ViewFile
 #    ViewFile("teamcity.configuration.properties.file");
 #    ViewFile("teamcity.runner.properties.file");
 #  }
-#    
+#
 #  blockClosed ("init");
 # }
 
@@ -1032,8 +1032,8 @@ foreach (@ARGV)
   if ( /^\s*([^ ].*)$/ )
   {
     $_ = $1;
-  }  
-  
+  }
+
   if ( /^\.\/(.*)$/ )
   {
     $_ = $1;
@@ -1053,10 +1053,10 @@ foreach (@ARGV)
 #    tcWarn("Wrong input: [$_] has no extension!");
     next;
   }
-    
-  
-    
-    
+
+
+
+
 
   if ( /^(.*)\/([^\/]*)$/ )
   {
@@ -1092,7 +1092,7 @@ foreach (@ARGV)
 
     local ($b) = $test_file;
     blockOpened ($b);
-    
+
     $lst_used_time = 0;
     $lst_checks = 0;
     $lst_checks_pass = 0;
@@ -1111,18 +1111,18 @@ foreach (@ARGV)
   if ( /^\s*([^\s].*)$/ )
   {
     $_ = $1;
-  }  
-  
+  }
+
   if ( /^\.\/(.*)$/ )
   {
     $_ = $1;
   }
-	
+
       next if (/^\s*$/); #ignore whitespaced lines
       chop if (/\n$/);   #chop of \n
- 
+
       tcLog("path: $path, test_file: $_, file: $file");
-      
+
       if (length($path) > 0)
       {
         $test_file = "$path/$_";
@@ -1133,8 +1133,8 @@ foreach (@ARGV)
       }
 
       $test_file =~ s/^[ ]*\.\///;
-                      
-      
+
+
       $_ = $1 if (/^(.*)\.([^\.\/]*)$/ ); # chop of extension (.tst!!!?)
       if ( /^(.*)\/([^\/]*)$/ )
       {
@@ -1153,7 +1153,7 @@ foreach (@ARGV)
       $lst_checks++;
 
       tcLog("tst_path: $tst_path, tst_base: $tst_base");
-      
+
       my $this_exit_code = tst_check($tst_base);
 
       $lst_checks_pass++ unless $this_exit_code;
@@ -1166,10 +1166,10 @@ foreach (@ARGV)
       }
     }
     close (LST_FILE);
-      
+
     printf("$base Summary: Checks:$lst_checks Failed:%d Time:%.2f\n", $lst_checks - $lst_checks_pass, $lst_used_time)
       unless ($verbosity < 2);
-      
+
     tcLog( sprintf("list '$base' Summary: Checks:$lst_checks Failed:%d Time:%.2f", $lst_checks - $lst_checks_pass, $lst_used_time) );
     blockClosed ($b);
   }
@@ -1197,14 +1197,14 @@ if( length($teamcity) > 0 )
 #  testSuiteFinished($teamcity);
 
 #  blockOpened ("init");
-  
+
 #  print ("TEAMCITY_BUILD_PROPERTIES_FILE: $ENV{TEAMCITY_BUILD_PROPERTIES_FILE}" );
 
 #  blockClosed ("init");
-    
-    
-    
-}  
+
+
+
+}
 
 
 # Und Tschuess

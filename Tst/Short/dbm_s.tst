@@ -9,7 +9,7 @@ proc read_dbm_all (link l)
 {
   string s="";
   s=read(l);
-  while( s != "" ) 
+  while( s != "" )
   {
     s,"=",read(l,s);
     s=read(l);

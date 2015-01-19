@@ -4,23 +4,17 @@
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
-
-
-
-
-
+#include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 
-#include <misc/auxiliary.h>
 #include <misc/mylimits.h>
 #include <misc/sirandom.h>
 
 #include <reporter/reporter.h>
 
-#include <coeffs/coeffs.h>
-#include <coeffs/numbers.h>
-#include <coeffs/ffields.h>
-#include <coeffs/longrat.h>
+#include "coeffs.h"
+#include "numbers.h"
+#include "longrat.h"
 
 #include <string.h>
 #include <math.h>
@@ -30,7 +24,7 @@ BOOLEAN nfGreaterZero (number k, const coeffs r);
 number  nfMult        (number a, number b, const coeffs r);
 number  nfInit        (long i, const coeffs r);
 number  nfParameter   (int i, const coeffs r);
-int     nfInt         (number &n, const coeffs r);
+long    nfInt         (number &n, const coeffs r);
 number  nfAdd         (number a, number b, const coeffs r);
 number  nfSub         (number a, number b, const coeffs r);
 void    nfPower       (number a, int i, number * result, const coeffs r);
@@ -250,9 +244,9 @@ static int nfParDeg(number n, const coeffs r)
 /*2
 * number -> int
 */
-int nfInt (number &, const coeffs )
+long nfInt (number &n, const coeffs )
 {
-  return 0;
+  return (long)n;
 }
 
 /*2
@@ -802,8 +796,12 @@ nMapFunc nfSetMap(const coeffs src, const coeffs dst)
   {
     return nfMapP;    /* Z/p -> GF(p,n) */
   }
+
   if (src->rep==n_rep_gap_rat) /*Q, Z */
-    return nlModP;
+  {
+    return nlModP; // FIXME? TODO? // extern number nlModP(number q, const coeffs Q, const coeffs Zp); // Map q \in QQ \to Zp // FIXME!
+  }
+
   return NULL;     /* default */
 }
 

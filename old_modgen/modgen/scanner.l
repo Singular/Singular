@@ -12,7 +12,7 @@
 #include "mod_grammar.h"
 
 #define DEBUG 3
- 
+
 #  define YYLP_ERR_NONE    0
 #  define YYLP_DEF_BR2     1
 #  define YYLP_BODY_BR2    2
@@ -43,9 +43,9 @@
   extern procdef procedure_decl;
 
   char *sectname[] = { "sect -0", "section 1",
-                       "Singular", "procedures", "C-part" 
+                       "Singular", "procedures", "C-part"
   };
-  
+
   struct _states {
     char name[32];
     int state;
@@ -56,13 +56,13 @@
   int read_string(char **buffer, long *start, long end);
   int libread(FILE* f, char* buf, int max_size);
   void add_action(char *new_text);
- 
+
   void push_state(int state, int new_state, char *name);
   void switch_state(int state, int new_state, char *name);
   void pop_state();
   int return_sect_token(int passed, int old_sect, int new_sect);
   extern int init_modgen(moddef *module_def, char *filename);
- 
+
 static char * dupyytext()
 {
   if (yyleng>0) yytext[yyleng-1] = '\0';
@@ -176,7 +176,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
                   else push_state(YYSTATE, SECT2, "SECT2");
                   return(return_sect_token(passed, old_sect, sectnum));
                 }
-        ^"%procedures".* { 
+        ^"%procedures".* {
                   int passed = (oldsectnum == sectnum) ? 0 : 1;
                   int old_sect = sectnum;
 
@@ -186,7 +186,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
                   else push_state(YYSTATE, SECT3, "SECT3");
                   return(return_sect_token(passed, old_sect, sectnum));
                 }
-        "%procedures".* { 
+        "%procedures".* {
                   int passed = (oldsectnum == sectnum) ? 0 : 1;
                   int old_sect = sectnum;
 
@@ -196,7 +196,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
                   else push_state(YYSTATE, SECT3, "SECT3");
                   return(return_sect_token(passed, old_sect, sectnum));
                 }
-        ^"%C".* { 
+        ^"%C".* {
                   int passed = (oldsectnum == sectnum) ? 0 : 1;
                   int old_sect = sectnum;
 
@@ -206,7 +206,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
                   else push_state(YYSTATE, SECT4, "SECT4");
                   return(return_sect_token(passed, old_sect, sectnum));
                 }
-        "%C".* { 
+        "%C".* {
                   int passed = (oldsectnum == sectnum) ? 0 : 1;
                   int old_sect = sectnum;
 
@@ -229,7 +229,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 		    else lvalp->i = 0;
                   }
                   return BOOLTOK; }
-	^"%{".*{NL} { 
+	^"%{".*{NL} {
 	        yylineno++;
 		push_state(YYSTATE, CODEBLOCK, "CODEBLOCK");
 		fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
@@ -248,7 +248,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
         ";"     { return ';'; }
         ","     { return ','; }
 
-        "\""    { do_return++; 
+        "\""    { do_return++;
                   lvalp->sv.lineno = yylineno;
                   push_state(YYSTATE, STRING, "string");
                 }
@@ -286,7 +286,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 	           yylineno++;
 		   pop_state();
                  }
-           .*{NL}  { yylineno++; 
+           .*{NL}  { yylineno++;
 	           lvalp->name = yytext;
 		   return CODEPART; }
        }
@@ -327,7 +327,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
         {WS}    /* ignore */
         ;       /* ignore */
         "/*"      push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
-        "//".*{NL}  ++yylineno; ACTION_ECHO; 
+        "//".*{NL}  ++yylineno; ACTION_ECHO;
         proc+{WS} {
                   brace1 = 0; /* { */
                   brace2 = 0; /* ( */
@@ -354,7 +354,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
         {WS}    /* ignore */
         ;       /* ignore */
         "/*"      push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
-        "//".*{NL}  ++yylineno; ACTION_ECHO; 
+        "//".*{NL}  ++yylineno; ACTION_ECHO;
         example {
 #if DEBUG > 1
 	          printf(">>>EXAMPLE\n");
@@ -366,7 +366,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 		  return EXAMPLETOK;
                 }
 	static  { return STATICTOK; }
-	{NAME}  { 
+	{NAME}  {
 	           int i,tok;
 #if DEBUG > 1
 	           printf("(%d) VAR: %s\n", yylineno, yytext);
@@ -404,7 +404,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 
 <SECT4>{
         {NL}    { yylineno++; }
-        .*(\n?) { lvalp->name = yytext; 
+        .*(\n?) { lvalp->name = yytext;
 	          return CODEPART; }
 
         <<EOF>>  { sectnum = 0;
@@ -421,10 +421,10 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 		   return '{';
 		 }
          "/*"       push_state(YYSTATE, COMMENT, "COMMENT");yymore();
-         "//".*{NL}  ++yylineno; ACTION_ECHO; 
-         "\""    { do_return++; 
+         "//".*{NL}  ++yylineno; ACTION_ECHO;
+         "\""    { do_return++;
 	           lvalp->sv.lineno = yylineno;
-                   push_state(YYSTATE, STRING, "string"); 
+                   push_state(YYSTATE, STRING, "string");
                  }
 	 {BOOL}  { if(yyleng == 1) sscanf(yytext, "%d", &lvalp->i);
 	           else {
@@ -433,7 +433,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
                    }
                    return BOOLTOK; }
 	 {NUMBER} { sscanf(yytext, "%d", &lvalp->i); return NUMTOK; }
-	 {NAME}  { 
+	 {NAME}  {
 	           int i,tok;
 #if DEBUG > 1
 	           printf("(%d) VAR: %s\n", yylineno, yytext);
@@ -480,7 +480,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 <CODEBLOCK2>{
          "/*"      push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
          "//".*{NL} { yylineno++; lvalp->name = yytext; return CODEPART; }
-         "\""    { 
+         "\""    {
 	           lvalp->sv.lineno = yylineno;
                    push_state(YYSTATE, STRING, "string"); yymore();}
          "{"     { brace1++; yymore();}
@@ -531,7 +531,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
        }
 
 <ANYLINE>{
-       {col}  { lvalp->name = yytext; 
+       {col}  { lvalp->name = yytext;
                 pop_state();
                 return ANYTOK; }
        {NL}   { yylineno++; }

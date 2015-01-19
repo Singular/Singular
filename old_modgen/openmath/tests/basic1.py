@@ -23,8 +23,8 @@ class OMTestCase1(unittest.TestCase):
             #def testSub(self):
             #    expr=OMA(arith1.minus,[2,3])
             #    self.assertResult(expr,-1)
-                
-                
+
+
 if __name__=='__main__':
     context=Context()
     context.addCDImplementation(arith1)

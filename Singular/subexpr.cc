@@ -12,23 +12,22 @@
 #include <misc/intvec.h>
 #include <misc/options.h>
 
-
-#include <coeffs/ffields.h>
 #include <coeffs/numbers.h>
 #include <coeffs/bigintmat.h>
+
+#include <coeffs/ffields.h> // nfShowMipo // minpoly printing...
 
 #include <polys/monomials/maps.h>
 #include <polys/matpol.h>
 #include <polys/monomials/ring.h>
-#include <kernel/polys.h>
 
-#include <coeffs/longrat.h>
 // #include <coeffs/longrat.h>
 
+#include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/kstd1.h>
-#include <kernel/oswrapper/timer.h>
 #include <kernel/GBEngine/syz.h>
+#include <kernel/oswrapper/timer.h>
 
 #include <Singular/tok.h>
 #include <Singular/ipid.h>

@@ -64,7 +64,7 @@ machine dependent, as well. For example "@code{Inf}" on Linux, or
 "@code{+.+00e+00}" on HPUX.
 @*Their input syntax is given by @code{scanf}, but must start with a digit.
 @item
-floating point numbers (type @code{number} from field @code{real} with a precision p larger then 3) use internally @code{mpf_set_default_prec(3.5*p+1)}. 
+floating point numbers (type @code{number} from field @code{real} with a precision p larger then 3) use internally @code{mpf_set_default_prec(3.5*p+1)}.
 @*Their input syntax is given by @code{mpf_set_str} from GMP, but must start with a digit.
 @c @item
 @c a token (in the input) must have 16383 characters or less.
@@ -434,7 +434,7 @@ It also apllies for large numerical constants which are of type @code{bigint}.
 The formation of a monomial has precedence over all operators
 (a monomial is here an optional coefficient followed by any sequence
 of ring variables (possibly followed by
-an exponent) which only conssist of letters, digits 
+an exponent) which only conssist of letters, digits
 and (over the rationals) @code{/} without any whitespace):
 @smallexample
 @c example

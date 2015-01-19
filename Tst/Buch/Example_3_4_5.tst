@@ -11,7 +11,7 @@ ideal M=ideal(sparsetriag(3,3,0,100)
 M;
 
 map phi=R,M;
-ideal J=phi(I); 
+ideal J=phi(I);
 J;
 
 tst_status(1);$

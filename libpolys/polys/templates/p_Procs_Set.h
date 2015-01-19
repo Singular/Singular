@@ -12,7 +12,6 @@
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
  *******************************************************************/
-#include <coeffs/modulop.h>
 
 #include <reporter/reporter.h>
 

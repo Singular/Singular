@@ -62,6 +62,6 @@ typedef polyrec *          poly;
 ///   leaves p and q unmodified
 poly      p_ExtGcd(poly p, poly &pFactor, poly q, poly &qFactor, ring r);
 
-
+char* naCoeffString(const coeffs r); // will be reused in tranext.cc...
 #endif
 /* ALGEXT_H */

@@ -22,7 +22,7 @@ proc generate_weight_str(int j)
 {
   int i;
   string res_str = "(";
-  
+
   for (i=1; i<j; i++)
   {
     res_str = res_str + string(i) + ",";
@@ -37,7 +37,7 @@ proc check_fetch(int n, list olist)
 {
   int i;
   int j;
-  
+
   for (j=1; j<=n; j = j + (j div 10) + 1)
   {
     execute(generate_ring_str(j, "r", olist[1]));

@@ -9,7 +9,7 @@ def S=nc_algebra(1,d);setring S;
 int N=7;
 poly f=1;
 for(int n=0;n<=N;n++)
-{ 
+{
   f=f*(z+N-2*n);
 }
 f;

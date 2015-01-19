@@ -1132,8 +1132,8 @@ static proc extractZ(ideal J, int j, list L, list B)
          {
             //=== this is our way to obtain the coefficients in Z[u] of the
             //=== leading terms of the Groebner basis above
-            string quotring=Primdec::prepareQuotientring(nvars(basering)-L[1][3]);
-            execute(quotring);
+            def quring=Primdec::prepareQuotientring(nvars(basering)-L[1][3],"lp");
+	    setring quring;
             ideal I=imap(Shelp,I);
             list C;
             C[1]= ideal(0); //add dummy entry to tie C to current ring
@@ -1440,8 +1440,8 @@ static proc extractZM(list M, list L)
          module I=imap(S,I);
          //=== this is our way to obtain the coefficients in Z[u] of the
          //=== leading terms of the Groebner basis above
-         string quotring=Primdec::prepareQuotientring(nvars(basering)-L[1][3]);
-         execute(quotring);
+         def quring=Primdec::prepareQuotientring(nvars(basering)-L[1][3],"lp");
+         setring quring;
          module I=imap(Shelp,I);
          list C;
          int i;

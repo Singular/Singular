@@ -32,13 +32,13 @@ proc katsuranh(int z)
 
 string bench = katsuran(11);
 sprintf(bench);
-ideal f; 
+ideal f;
 f = sba(i,1,0);
 f = sba(i,1,1);
 killall;
 string bench = katsuranh(11);
 sprintf(bench);
-ideal f; 
+ideal f;
 f = sba(i,1,0);
 f = sba(i,1,1);
 killall;

@@ -222,7 +222,7 @@ TestJMark(G7V,r);
 
 
 
-//Example 8 
+//Example 8
 ring r=0, (z,y,x),rp;
 jmp r1;
 r1.h=x^4;
@@ -256,7 +256,7 @@ TestJMark(G8F,r);
 
 
 
-//Example 9 
+//Example 9
 ring r=0, (x,y,z),rp;
 jmp r1;
 r1.h=z;
@@ -275,7 +275,7 @@ TestJMark(G9V,r);
 
 
 
-//Example 10 
+//Example 10
 ring r=0, (x,y,z), rp;
 jmp r1;
 r1.h=z;
@@ -328,7 +328,7 @@ TestJMark(G12V,r);
 //Result 12
 //=>1
 
-//Example 13 
+//Example 13
 ring r=0, (x,y,z), rp;
 jmp r1;
 r1.h=z;
@@ -344,7 +344,7 @@ TestJMark(G13F,r);
 //Result 13
 //=>NOT A BASIS
 //0
- 
+
 //Example 14
 ring r=0, (x,y,z),rp;
 jmp r1;

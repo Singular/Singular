@@ -10,7 +10,7 @@
 # NAME="tt"
 NAME="test"
 
-P="." 
+P="."
 # /mnt/DATA/GITHUB/w/GAP/libsing/spielwiese/TARGET/bin"
 
 LIBPOLYSCFLAGS="`sh $P/libsingular-config --cflagsg` -g -Wextra -Winline -Wall -Wno-long-long  -O0 -fno-exceptions"
@@ -21,11 +21,11 @@ echo "Using libpolys from: '$LIBPOLYSPREFIX'"
 echo "Using        CFLAGS: '$LIBPOLYSCFLAGS'"
 echo "Using          LIBS: '$LIBPOLYSLIBS'"
 
-CMD="g++ $LIBPOLYSCFLAGS -c $NAME.cc " 
+CMD="g++ $LIBPOLYSCFLAGS -c $NAME.cc "
 echo "executing '$CMD':"
 $CMD
-# -rdynamic 
-CMD="g++ -static -g -Wextra -Winline -Wall -Wno-long-long -O0 -fno-exceptions $NAME.o -o $NAME $LIBPOLYSLIBS" 
+# -rdynamic
+CMD="g++ -static -g -Wextra -Winline -Wall -Wno-long-long -O0 -fno-exceptions $NAME.o -o $NAME $LIBPOLYSLIBS"
 echo "executing '$CMD':"
 $CMD
 

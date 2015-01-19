@@ -14,8 +14,8 @@ reduce(f,G);
 G=f2,f1;
 reduce(f,G);
 
-reduce(f,S,1); 
+reduce(f,S,1);
 
-reduce(f,S); 
+reduce(f,S);
 
 tst_status(1);$

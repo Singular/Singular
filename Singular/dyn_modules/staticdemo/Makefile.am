@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS = -I ../../m4
 if SI_BUILTIN_STATICDEMO
   noinst_LTLIBRARIES=staticdemo.la
   P_PROCS_MODULE_LDFLAGS = -module
-  P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION 
+  P_PROCS_CPPFLAGS_COMMON = -DSTATIC_VERSION
 
   MYINCLUDES =  -I${top_srcdir} -I${top_builddir} \
       -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \

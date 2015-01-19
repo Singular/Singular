@@ -4,7 +4,7 @@ tst_init();
 // only debug version produces this error:
 ring r = 0,(x, y), dp;
 intmat A[2][2] = 1, 0, 0, 1;
-attrib(basering, "mgrad", A); 
+attrib(basering, "mgrad", A);
 
 proc getGrad2(){ attrib(basering, "mgrad"); }
 getGrad2(); // produces nothing!

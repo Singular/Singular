@@ -40,7 +40,7 @@ kill r;
 //------------------------------------------------------------
  ring S = 32003, x(0..4), dp;
  module MI=maxideal(1);
- attrib(MI,"isHomog",intvec(-1));  
+ attrib(MI,"isHomog",intvec(-1));
  resolution kos = nres(MI,0);
  print(betti(kos),"betti");
  matrix alpha0 = random(32002,10,3);
@@ -60,8 +60,8 @@ kill r;
  A=sheafCoh(F,-4,4);
  A=sheafCoh(F,-4,4,"sres");
  B=sheafCohBGG(F,-4,2);
- 
- dimH(3,F,-4); 
+
+ dimH(3,F,-4);
  dimH(1,F,1);
 
  A=sheafCoh(F,-1,1);

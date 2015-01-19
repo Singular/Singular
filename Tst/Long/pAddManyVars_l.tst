@@ -22,7 +22,7 @@ proc pAddManyVars_Test(string rs)
      tst_TestAdd(id, 1,size(tst_rgen_comp_orderings[Tst::tst_rgen_comp_index]));
   }
   else
-  {  
+  {
       id;
       id[1] + gen(2)*id[1];
   }
@@ -35,5 +35,5 @@ while (size(rs) > 1)
   pAddManyVars_Test(rs);
   rs = tst_next_ring();
 }
- 
+
 tst_status(1);$

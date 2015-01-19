@@ -10,7 +10,7 @@ SOURCES = polys.cc \
     ideals.cc \
     fast_mult.cc digitech.cc \
     preimage.cc \
-    mod2.h 
+    mod2.h
 
 libkernelCommon_la_SOURCES  = $(SOURCES)
 libkernelCommon_la_LIBADD   = ${USEPPROCSDYNAMICLDFLAGS} ${USEPPROCSDYNAMICLD} \
@@ -19,14 +19,14 @@ ${abs_top_builddir}/libpolys/polys/libpolys.la
 ###### libkerneldir = $(libdir)/singular
 
 KERNELHEADERS = mod2.h structs.h polys.h ideals.h \
-	preimage.h fast_mult.h digitech.h 
+	preimage.h fast_mult.h digitech.h
 
 libkernel_la_SOURCES=$(KERNELHEADERS)
 
 libkernel_la_includedir=${includedir}/singular/kernel
 libkernel_la_include_HEADERS=$(KERNELHEADERS)
 
-SUBDIRS=numeric fglm groebner_walk combinatorics spectrum linear_algebra maps GBEngine oswrapper  
+SUBDIRS=numeric fglm groebner_walk combinatorics spectrum linear_algebra maps GBEngine oswrapper
 
 libkernel_la_LIBADD   = \
 ${builddir}/numeric/libnumeric.la \

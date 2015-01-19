@@ -9,4 +9,4 @@ ideal i =  s1, s2-s1, 0,s2*s3, s3^4;
 i;
 size(i);
 ncols(i);
-tst_status(1);$       
+tst_status(1);$

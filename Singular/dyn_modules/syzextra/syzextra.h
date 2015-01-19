@@ -36,7 +36,7 @@ class kBucket; typedef kBucket* kBucket_pt;
 # define NOPRODUCT 1
 #endif
 
-// set to 1 if all leading coeffs are assumed to be all =1... 
+// set to 1 if all leading coeffs are assumed to be all =1...
 // note the use of simplify on input in SSinit!
 #ifndef NODIVISION
 # define NODIVISION 1
@@ -69,7 +69,7 @@ class sBucket; typedef sBucket* sBucket_pt;
  * sBucket Factory
  *
  * Cleate/store/reuse buckets
- * 
+ *
  */
 class SBucketFactory: private std::stack <sBucket_pt>
 {
@@ -83,11 +83,11 @@ class SBucketFactory: private std::stack <sBucket_pt>
     typedef Base::value_type Bucket;
 
     SBucketFactory(const ring r)
-#ifndef SING_NDEBUG    
+#ifndef SING_NDEBUG
         : m_ring(r)
 #endif
     {
-      push ( _CreateBucket(r) ); // start with at least one sBucket...? 
+      push ( _CreateBucket(r) ); // start with at least one sBucket...?
       assume( top() != NULL );
     };
 
@@ -99,7 +99,7 @@ class SBucketFactory: private std::stack <sBucket_pt>
         pop();
       }
     }
-    
+
     Bucket getBucket(const ring r, const bool remove = true)
     {
       assume( r == m_ring );
@@ -110,7 +110,7 @@ class SBucketFactory: private std::stack <sBucket_pt>
       {
         bt = top();
 
-        if( remove ) 
+        if( remove )
           pop();
       }
       else
@@ -134,7 +134,7 @@ class SBucketFactory: private std::stack <sBucket_pt>
     // TODO: this may be spared if we give-out a smart Bucket (which returns here upon its destructor!)
     void putBucket(const Bucket & bt, const bool replace = false)
     {
-      assume( bt != NULL );      
+      assume( bt != NULL );
       assume( _IsBucketEmpty(bt) );
       assume( m_ring == _GetBucketRing(bt) );
 
@@ -152,11 +152,11 @@ class SBucketFactory: private std::stack <sBucket_pt>
       }
 
       assume( bt == top() );
-    }    
+    }
 
   private:
 
-#ifndef SING_NDEBUG    
+#ifndef SING_NDEBUG
     const ring m_ring; ///< For debugging: all buckets are over the same ring... right?!
 
     /// get bucket ring
@@ -232,8 +232,8 @@ struct SchreyerSyzygyComputationFlags
   const int OPT__SYZCHECK;
 
   /// TEST_OPT_PROT
-  const bool OPT__PROT;   
-   
+  const bool OPT__PROT;
+
   /// no caching/stores/lookups
   const int OPT__NOCACHING;
 
@@ -265,27 +265,27 @@ class CLeadingTerm
 #ifndef SING_NDEBUG
     ~CLeadingTerm();
 #endif
-   
+
 #if NOPRODUCT
     bool DivisibilityCheck(const poly multiplier, const poly t, const unsigned long not_sev, const ring r) const;
 #endif
     bool DivisibilityCheck(const poly product, const unsigned long not_sev, const ring r) const;
-    
+
     bool CheckLT( const ideal & L ) const;
 
 #ifndef SING_NDEBUG
-    poly lt() const;    
+    poly lt() const;
     unsigned long sev() const;
     unsigned int label() const;
 #else
     inline poly lt() const { return m_lt; };
     inline unsigned long sev() const { return m_sev; };
-    inline unsigned int label() const { return m_label; };   
+    inline unsigned int label() const { return m_label; };
 #endif
-   
+
   private:
     const unsigned long m_sev; ///< not short exp. vector
-    
+
     // NOTE/TODO: either of the following should be enough:
     const unsigned int  m_label; ///< index in the main L[] + 1
 
@@ -293,10 +293,10 @@ class CLeadingTerm
 
 #ifndef SING_NDEBUG
     const ring _R;
-    
+
     const poly          m_lt_copy; ///< original copy of LEAD(lt) (only for debug!!!)
-#endif  
-   
+#endif
+
     // disable the following:
     CLeadingTerm();
     CLeadingTerm(const CLeadingTerm&);
@@ -311,7 +311,7 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
   friend class CDivisorEnumerator2;
 #endif
   friend class CDivisorEnumerator;
-  
+
   public:
     typedef long TComponentKey;
     typedef std::vector<const CLeadingTerm*> TReducers;
@@ -327,7 +327,7 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
 
     ~CReducerFinder();
 
-    
+
 #if NOPRODUCT
     poly
         FindReducer(const poly multiplier, const poly monom, const poly syzterm, const CReducerFinder& checker) const;
@@ -339,7 +339,7 @@ class CReducerFinder: public SchreyerSyzygyComputationFlags
 
     bool IsDivisible(const poly q) const;
 
-    
+
     inline bool IsNonempty() const { return !m_hash.empty(); }
 
     /// is the term to be "preprocessed" as lower order term or lead to only reducible syzygies...
@@ -424,7 +424,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
         m_spoly_bucket(NULL)
     {
       if( UNLIKELY(OPT__PROT) ) memset( &m_stat, 0, sizeof(m_stat) );
-      
+
       if( LIKELY(OPT__TAILREDSYZ && !OPT__IGNORETAILS) )
       {
         if (syzLeads != NULL)
@@ -451,7 +451,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
       syzL = m_syzLeads; syzT = m_syzTails;
 
       m_syzLeads = m_syzTails = NULL; // m_LS ?
-      
+
       if ( UNLIKELY(OPT__PROT) )
         PrintStats();
     }
@@ -472,7 +472,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
 
     // Main (HybridNF == 0) Tree Travers + LOT + LCM?
     poly TraverseNF(const poly syz_lead, const poly syz_2 = NULL) const;
-    
+
     /// High level caching function!!!
     poly TraverseTail(poly multiplier, const int tail) const;
 
@@ -503,7 +503,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /// leading + second terms
     ideal Compute2LeadingSyzygyTerms();
 
-    
+
 
   private:
     /// input leading terms
@@ -562,7 +562,7 @@ class SchreyerSyzygyComputation: public SchreyerSyzygyComputationFlags
     /// for S-Polynomial reductions
     mutable kBucket_pt m_spoly_bucket; // only used inside of SchreyerSyzygyNF! destruction by CleanUp()!
 
-   
+
     /// Statistics:
     ///  0..3: as in SetUpTailTerms()::PreProcessTerm() // TODO!!??
     ///  4: number of terms discarded due to LOT heuristics

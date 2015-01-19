@@ -375,7 +375,7 @@ int main( int, char *argv[] )
   if (err)
      errorreported = 0; // reset error handling
   else
-     printf("typeof returned type %d, >>%s<<\n",r1.Typ(),r1.Data());
+     printf("typeof returned type %d, >>%s<<\n",r1.Typ(),(char*)r1.Data());
 
   // clean up r1:
   r1.CleanUp();

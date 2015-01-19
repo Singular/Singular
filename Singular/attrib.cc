@@ -50,7 +50,7 @@ attr sattr::Copy()
   if (next!=NULL)
   {
     n->next=next->Copy();
-  }  
+  }
   return n;
 }
 

@@ -5,7 +5,7 @@ tst_init();
 //=============== Example 4.13 (continued) ======================
 ring S = 32003, x(0..4), dp;
 module MI=maxideal(1);
-attrib(MI,"isHomog",intvec(-1));  
+attrib(MI,"isHomog",intvec(-1));
 resolution kos = nres(MI,0);
 matrix alpha0 = random(32002,10,3);
 module pres = module(alpha0)+kos[3];
@@ -56,11 +56,11 @@ matrix talpha0 = concat(tbeta0,tgamma0);
 matrix zero[20][1];
 matrix tpsi = transpose(psi);
 matrix tpresg = concat(tpsi,zero);
-matrix pres = module(transpose(talpha0)) 
+matrix pres = module(transpose(talpha0))
                 + module(transpose(tpresg));
 module dir = transpose(pres);
 dir = prune(dir);
-homog(dir);  
+homog(dir);
 //->   1
 intvec deg_dir = attrib(dir,"isHomog");
 attrib(dir,"isHomog",deg_dir-2);        // set degrees
@@ -87,7 +87,7 @@ kill S,B,deg_dir;
 //=============== Example 4.13 (continued) ======================
 ring S = 32003, x(0..4), dp;
 module MI=maxideal(1);
-attrib(MI,"isHomog",intvec(-1));  
+attrib(MI,"isHomog",intvec(-1));
 resolution kos = nres(MI,0);
 matrix alpha0 = random(32002,10,3);
 module pres = module(alpha0)+kos[3];

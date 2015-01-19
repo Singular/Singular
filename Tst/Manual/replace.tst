@@ -1,6 +1,6 @@
 LIB "tst.lib"; tst_init();
 LIB "findifs.lib";
-" EXAMPLE:"; 
+" EXAMPLE:";
 ring r = (0,dt,theta),Tt,dp;
 poly p = (Tt*dt+theta+1)^2+2;
 string s = texfactorize("",p);

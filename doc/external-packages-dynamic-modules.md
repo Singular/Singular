@@ -1,7 +1,7 @@
 External Packages Singular may rely on {#external_packages_page}
 ======================================
 
-* python (does not work on cygwin32/64) 
+* python (does not work on cygwin32/64)
 * normaliz (works on cygwin32/64, ONLY normaliz version 2.7 is compatible with current libraries)
 * 4ti2 (works on cygwin32/64, tested with 4ti2 1.6)
 * gfan (works on cygwin32/64)

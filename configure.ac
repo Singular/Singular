@@ -4,7 +4,7 @@ AC_DEFINE([VERSION_DATE],["Sep 2014"],[release date])
 _AC_SRCDIRS(["$ac_dir"])
 
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_AUX_DIR([.])
+AC_CONFIG_AUX_DIR([build-aux])
 
 AC_CONFIG_SRCDIR([Singular/tesths.cc])
 
@@ -15,7 +15,7 @@ AX_PREFIX_CONFIG_H([singularconfig.h],[],[_config.h])
 dnl Apparently, this is required for using an AC_CHECK_HEADER within AS_IF(...), at least on Cygwin.
 AC_USE_SYSTEM_EXTENSIONS
 
-AM_MAINTAINER_MODE([enable])   
+AM_MAINTAINER_MODE([enable])
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects]) # -Wno-extra-portability -Werror silent-rules
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -95,7 +95,7 @@ LB_CHECK_FLINT(2.3,,AC_MSG_WARN([Unable to find FLINT (which is strongly recomme
 
 AC_CONFIG_GOOGLE_PERFTOOLS()
 
-## AX_PYTHON_DEFAULT()
+AX_PYTHON_DEFAULT()
 AX_PYTHON_WITH_VERSION([2.4])
 
 LB_CHECK_MATHICGB
@@ -262,9 +262,8 @@ AC_CONFIG_FILES([libsingular-config Singular.pc])
 
 AC_CONFIG_FILES([emacs/Makefile])
 
-AC_CONFIG_FILES([debian/Makefile])
-AC_CONFIG_FILES([redhat/Makefile])
-AC_CONFIG_FILES([redhat/singular.spec])
 AC_CONFIG_FILES([desktop/Makefile desktop/Singular.desktop desktop/Singular-manual.desktop])
+
+AC_CONFIG_FILES([singular.spec])
 
 AC_OUTPUT

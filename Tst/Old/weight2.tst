@@ -12,7 +12,7 @@ e;
 //ideal k0=std(k);
 //"//size "+string(size(k0))+
 //", dim "+string(dim(k0))+", mult "+string(mult(k0))+
-//", lastdeg "+string(ord(k0[size(k0)])); 
+//", lastdeg "+string(ord(k0[size(k0)]));
 //kill r;
 kill h2,e;
 ring s6=32003,(x,y,z),dp;
@@ -34,7 +34,7 @@ e;
 //ideal k0=std(k);
 //"//size "+string(size(k0))+
 //", dim "+string(dim(k0))+", mult "+string(mult(k0))+
-//", lastdeg "+string(ord(k0[size(k0)])); 
+//", lastdeg "+string(ord(k0[size(k0)]));
 //kill r;
 kill s6,e,a,b,c,alpha,beta,t;
 
@@ -52,7 +52,7 @@ e;
 //ideal k0=std(k);
 //"//size "+string(size(k0))+
 //", dim "+string(dim(k0))+", mult "+string(mult(k0))+
-//", lastdeg "+string(ord(k0[size(k0)])); 
+//", lastdeg "+string(ord(k0[size(k0)]));
 //kill r;
 kill s12,e;
 
@@ -68,7 +68,7 @@ E;
 //ideal j=std(k0);
 //"//size "+string(size(j))+
 //", dim "+string(dim(j))+", mult "+string(mult(j))+
-//", lastdeg "+string(ord(j[size(j)])); 
+//", lastdeg "+string(ord(j[size(j)]));
 //kill r;
 kill pa,E;
 
@@ -97,7 +97,7 @@ E;
 //ideal j=std(k0);
 //"//size "+string(size(j))+
 //", dim "+string(dim(j))+", mult "+string(mult(j))+
-//", lastdeg "+string(ord(j[size(j)])); 
+//", lastdeg "+string(ord(j[size(j)]));
 //kill r;
 kill r5,E;
 
@@ -132,13 +132,13 @@ ideal k=i^2;
 ideal j = std(k);
 //"//size "+string(size(j))+
 //", dim "+string(dim(j))+", mult "+string(mult(j))+
-//", lastdeg "+string(ord(j[size(j)])); 
+//", lastdeg "+string(ord(j[size(j)]));
 degBound=0;
 kill vc;
 
 int N=3;
-ring ra3=32003,x(1..N),ds;  
-ideal i0= 
+ring ra3=32003,x(1..N),ds;
+ideal i0=
   -7*x(1)^6-49*x(1)^5*x(2)+16*x(1)^4*x(2)^2+27*x(1)^3*x(2)^3-
 38*x(1)^2*x(2)^4+60*x(1)*x(2)^5+70*x(2)^6-28*x(1)^5*x(3)+85*x(1)^4*x(2)*x(3)+
 69*x(1)^3*x(2)^2*x(3)-13*x(1)^2*x(2)^3*x(3)-65*x(1)*x(2)^4*x(3)+51*x(2)^5*x(3)-
@@ -159,7 +159,7 @@ ideal i0=
 77*x(1)^4*x(3)^2-71*x(1)^3*x(2)*x(3)^2-63*x(1)^2*x(2)^2*x(3)^2-
 22*x(1)*x(2)^3*x(3)^2+17*x(2)^4*x(3)^2+58*x(1)^3*x(3)^3+31*x(1)^2*x(2)*x(3)^3+
 19*x(1)*x(2)^2*x(3)^3-36*x(2)^3*x(3)^3-15*x(1)^2*x(3)^4-9*x(1)*x(2)*x(3)^4+
-42*x(2)^2*x(3)^4-61*x(1)*x(3)^5-67*x(2)*x(3)^5+31*x(3)^6; 
+42*x(2)^2*x(3)^4-61*x(1)*x(3)^5-67*x(2)*x(3)^5+31*x(3)^6;
 ring r=32003,(a,b,c),ds;
 map ff=ra3,a+b2,b2-c3,c;
 ideal i=ff(i0);
@@ -181,7 +181,7 @@ j;
 //", dim "+string(dim(j))+", mult "+string(mult(j))+
 //", lastdeg "+string(ord(j[size(j)]));
 kill r1;
- 
+
 ring r2=32003,(x,y,z),ds;
 poly p1 = 1x3y2+21328x5y+10667x2y4+21328x2yz3+10666xy6+10667y9;
 poly p2 = 1x2y2z2+3z8;
@@ -228,7 +228,7 @@ j;
 //", dim "+string(dim(j))+", mult "+string(mult(j))+
 //", lastdeg "+string(ord(j[size(j)]));
 kill r18;
- 
+
 ring r5=32003,(x,y,z),ds;
 int a=7;
 poly f =xyz*(x+y+z)^2 +(x+y+z)^3 +x^a+y^a+z^a;

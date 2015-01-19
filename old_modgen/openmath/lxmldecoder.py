@@ -19,7 +19,7 @@ class OMFromXMLBuilder:
             if "cdbase" in node.attrib:
                 #FIXME: obtain from ancestors
                 cdbase=node.get("cdbase")
-            else: 
+            else:
                 cdbase=None
             cdname=node.get("cd")
             name=node.get("name")
@@ -45,7 +45,7 @@ class OMFromXMLBuilder:
                 erg=float(node.getAttribute("dec"))
             else:
                 raise NotImplementedError
-            
+
         if (node.tag=="OMR"):
             erg=OMRef(node.get("xref"))
             self.refs.append(erg)

@@ -4,29 +4,89 @@
 /*
 * ABSTRACT: numbers modulo 2^m
 */
-
-
-
-
 #include <misc/auxiliary.h>
 
-#ifdef HAVE_RINGS
+#include <omalloc/omalloc.h>
 
 #include <misc/mylimits.h>
-#include <coeffs/coeffs.h>
 #include <reporter/reporter.h>
-#include <omalloc/omalloc.h>
-#include <coeffs/numbers.h>
-#include <coeffs/longrat.h>
-#include <coeffs/mpr_complex.h>
-#include <coeffs/rmodulo2m.h>
-#include <coeffs/rmodulon.h>
+
 #include "si_gmp.h"
+#include "coeffs.h"
+#include "numbers.h"
+#include "longrat.h"
+#include "mpr_complex.h"
+
+#include "rmodulo2m.h"
+#include "rmodulon.h"
 
 #include <string.h>
 
+#ifdef HAVE_RINGS
+
 /// Our Type!
 static const n_coeffType ID = n_Z2m;
+
+number  nr2mCopy        (number a, const coeffs r);
+BOOLEAN nr2mGreaterZero (number k, const coeffs r);
+number  nr2mMult        (number a, number b, const coeffs r);
+number  nr2mInit        (long i, const coeffs r);
+long    nr2mInt         (number &n, const coeffs r);
+number  nr2mAdd         (number a, number b, const coeffs r);
+number  nr2mSub         (number a, number b, const coeffs r);
+void    nr2mPower       (number a, int i, number * result, const coeffs r);
+BOOLEAN nr2mIsZero      (number a, const coeffs r);
+BOOLEAN nr2mIsOne       (number a, const coeffs r);
+BOOLEAN nr2mIsMOne      (number a, const coeffs r);
+BOOLEAN nr2mIsUnit      (number a, const coeffs r);
+number  nr2mGetUnit     (number a, const coeffs r);
+number  nr2mDiv         (number a, number b, const coeffs r);
+number  nr2mIntDiv      (number a,number b, const coeffs r);
+number  nr2mMod         (number a,number b, const coeffs r);
+number  nr2mNeg         (number c, const coeffs r);
+number  nr2mInvers      (number c, const coeffs r);
+BOOLEAN nr2mGreater     (number a, number b, const coeffs r);
+BOOLEAN nr2mDivBy       (number a, number b, const coeffs r);
+int     nr2mDivComp     (number a, number b, const coeffs r);
+BOOLEAN nr2mEqual       (number a, number b, const coeffs r);
+number  nr2mLcm         (number a, number b, const coeffs r);
+number  nr2mGcd         (number a, number b, const coeffs r);
+number  nr2mExtGcd      (number a, number b, number *s, number *t, const coeffs r);
+nMapFunc nr2mSetMap     (const coeffs src, const coeffs dst);
+void    nr2mWrite       (number &a, const coeffs r);
+const char *  nr2mRead  (const char *s, number *a, const coeffs r);
+char *  nr2mName        (number n, const coeffs r);
+void    nr2mCoeffWrite  (const coeffs r, BOOLEAN details);
+coeffs  nr2mQuot1(number c, const coeffs r);
+#ifdef LDEBUG
+BOOLEAN nr2mDBTest      (number a, const char *f, const int l, const coeffs r);
+#endif
+void    nr2mSetExp(int c, const coeffs r);
+void    nr2mInitExp(int c, const coeffs r);
+
+number nr2mMapQ(number from, const coeffs src, const coeffs dst);
+
+static inline number nr2mMultM(number a, number b, const coeffs r)
+{
+  return (number)
+    ((((unsigned long) a) * ((unsigned long) b)) & ((unsigned long)r->mod2mMask));
+}
+
+static inline number nr2mAddM(number a, number b, const coeffs r)
+{
+  return (number)
+    ((((unsigned long) a) + ((unsigned long) b)) & ((unsigned long)r->mod2mMask));
+}
+
+static inline number nr2mSubM(number a, number b, const coeffs r)
+{
+  return (number)((unsigned long)a < (unsigned long)b ?
+                       r->mod2mMask - (unsigned long)b + (unsigned long)a + 1:
+                       (unsigned long)a - (unsigned long)b);
+}
+
+#define nr2mNegM(A,r) (number)((r->mod2mMask - (unsigned long)(A) + 1) & r->mod2mMask)
+#define nr2mEqualM(A,B)  ((A)==(B))
 
 extern omBin gmp_nrz_bin; /* init in rintegers*/
 
@@ -57,7 +117,7 @@ static char* nr2mCoeffString(const coeffs r)
 coeffs nr2mQuot1(number c, const coeffs r)
 {
     coeffs rr;
-    int ch = r->cfInt(c, r);
+    long ch = r->cfInt(c, r);
     mpz_t a,b;
     mpz_init_set(a, r->modNumber);
     mpz_init_set_ui(b, ch);
@@ -279,10 +339,8 @@ number nr2mInit(long i, const coeffs r)
 /*
  * convert a number to an int in ]-k/2 .. k/2],
  * where k = 2^m; i.e., an int in ]-2^(m-1) .. 2^(m-1)];
- * note that the code computes a long which will then
- * automatically casted to int
  */
-static long nr2mLong(number &n, const coeffs r)
+long nr2mInt(number &n, const coeffs r)
 {
   unsigned long nn = (unsigned long)(unsigned long)n & r->mod2mMask;
   unsigned long l = r->mod2mMask >> 1; l++; /* now: l = 2^(m-1) */
@@ -290,10 +348,6 @@ static long nr2mLong(number &n, const coeffs r)
     return (long)((unsigned long)nn - r->mod2mMask - 1);
   else
     return (long)((unsigned long)nn);
-}
-int nr2mInt(number &n, const coeffs r)
-{
-  return (int)nr2mLong(n,r);
 }
 
 number nr2mAdd(number a, number b, const coeffs r)
@@ -654,7 +708,7 @@ number nr2mMapQ(number from, const coeffs src, const coeffs dst)
   mpz_ptr k = (mpz_ptr)omAlloc(sizeof(mpz_t));
   mpz_init_set_ui(k, dst->mod2mMask);
 
-  nlGMP(from, (number)erg, src);
+  nlGMP(from, (number)erg, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
   mpz_and(erg, erg, k);
   number res = (number)mpz_get_ui(erg);
 
@@ -773,7 +827,7 @@ BOOLEAN nr2mDBTest (number a, const char *, const int, const coeffs r)
 
 void nr2mWrite (number &a, const coeffs r)
 {
-  long i = nr2mLong(a, r);
+  long i = nr2mInt(a, r);
   StringAppend("%ld", i);
 }
 

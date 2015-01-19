@@ -16,7 +16,7 @@ equidimMaxEHV(IR) ;           // should be equal
 // -------------------------------------------------
 LIB"normal.lib";
 ring r2 = 0,( xw, xd, xr),dp;
-  
+
 ideal EI =  -5*xw^2*xd, -9*xr^3+5;
 genus(EI);
 genus(EI,"nor");

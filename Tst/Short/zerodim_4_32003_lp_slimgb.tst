@@ -9,4 +9,4 @@ x^2+y^2+z^2-1;
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
     tst_status(1);$
-    
+

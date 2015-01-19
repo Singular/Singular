@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT: encapsulation of call to Win32 ShellExecute call for opening 
+* ABSTRACT: encapsulation of call to Win32 ShellExecute call for opening
             a URL
 */
 
@@ -11,7 +11,7 @@
 #ifdef WINNT
 #include <windows.h>
 
-#ifndef MAXPATHLEN 
+#ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
 #endif
 
@@ -34,7 +34,7 @@ void heOpenWinntUrl(const char* url, int local)
   }
   else
   {
-    // need to check whether this works 
+    // need to check whether this works
     ShellExecute(NULL, "open", url, 0, 0, SW_SHOWNORMAL);
   }
 }

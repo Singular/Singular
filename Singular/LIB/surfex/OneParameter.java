@@ -5,29 +5,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.awt.BorderLayout;
@@ -51,54 +51,54 @@ import javax.swing.event.ChangeListener;
 //////////////////////////////////////////////////////////////
 
 public class OneParameter extends JPanel {
-    
+
     // Anfang Variablen
-    
+
     Project project;
-    
+
     public int parNo = 0;
-    
+
     public JCheckBox cbox = new JCheckBox("", false);
-    
+
     // GUI
-    
+
     public JLabel nameLabel = null;
-    
+
     public double oldFrom = 0.0;
-    
+
     public double oldTo = 1.0;
-    
+
     public double newFrom = 0.0;
-    
+
     public double newTo = 1.0;
-    
+
     public JTextField from = new JTextField("0.00000");
-    
+
     public JTextField to = new JTextField("1.00000");
-    
+
     public JLabel parLabel = new JLabel("0.50000");
-    
+
     JLabel fromLabel = new JLabel("from:");
-    
+
     JLabel toLabel = new JLabel("to:");
-    
+
     JSlider parSlider = null;
 
-    public JLabel fctLabel = null;    
-    public JTextField fct = new JTextField("");    
+    public JLabel fctLabel = null;
+    public JTextField fct = new JTextField("");
 
     // Ende Variablen
-    
+
     // Konstruktor
     OneParameter(Project pro) {
 	project = pro;
-	
+
 	setLayout(new BorderLayout());
 	JPanel flowPanel = new JPanel();
 	JPanel parText = new JPanel(new FlowLayout());
-	
+
 	//  flowPanel.add(cbox);
-	
+
 	nameLabel = new JLabel("p" + parNo);
 	fctLabel = new JLabel("  "+nameLabel.getText()+":=");
 	fct.setText("     "+nameLabel.getText()+"  ");
@@ -110,7 +110,7 @@ public class OneParameter extends JPanel {
 	    });
 
 	flowPanel.add(nameLabel);
-	
+
 	parSlider = new JSlider(0, 1000);
 	parSlider.setValue(500);
 	parSlider.setMinorTickSpacing(10);
@@ -121,9 +121,9 @@ public class OneParameter extends JPanel {
 		    updateparSliderAndLabel();
 		}
 	    });
-	
+
 	flowPanel.add(new JLabel("   "));
-	
+
 	flowPanel.add(fromLabel);
 	flowPanel.add(from);
 	from.addActionListener(new ActionListener() {
@@ -164,16 +164,16 @@ public class OneParameter extends JPanel {
 		    }
 		}
 	    });
-	
+
 	flowPanel.add(toLabel);
 	flowPanel.add(to);
-	
+
 	flowPanel.add(parSlider);
 	flowPanel.add(parLabel);
 
 	flowPanel.add(fctLabel);
 
-//	add(parText, BorderLayout.CENTER);	
+//	add(parText, BorderLayout.CENTER);
 //	parText.add(fctLabel);
 	add(fct);
 
@@ -182,14 +182,14 @@ public class OneParameter extends JPanel {
 //	add(new JLabel(""), BorderLayout.CENTER);
 
     }
-    
+
     public double getValue(){
 // 	System.out.println("pS:"+parSlider.getValue()+
 // 			   ", min:"+parSlider.getMinimum()+
 // 			   ", max:"+parSlider.getMaximum());
 	return this.parSlider.getValue();//*(parSlider.getMaximum()-parSlider.getMinimum())+parSlider.getMaximum();
     }
-    
+
     public void updateparSliderAndLabel() {
 //	System.out.println("from:"+from.getText()+
 //			   "to:"+to.getText()+
@@ -209,21 +209,21 @@ public class OneParameter extends JPanel {
 	parLabel.setText(""+(parSlider.getValue() / 1000.0));
 	this.repaint();
     }
-    
+
     public boolean isSelected() {
 	return (cbox.isSelected());
     }
-    
+
     public void setParNo(int no) {
 	parNo = no;
 	nameLabel.setText("p" + parNo);
 	fctLabel.setText("  "+nameLabel.getText()+":=");
 	fct.setText(nameLabel.getText());
     }
-    
+
     public void updateActionCommands(int internalCunr) {
     }
-    
+
     public String getSurfCode() {
 	String str = "double " + nameLabel.getText() + "=" + parLabel.getText()
 	    + ";\n";
@@ -231,19 +231,19 @@ public class OneParameter extends JPanel {
 //		System.out.println(str);
 	return (str);
     }
-    
+
     public String getSurfCode(double runningValue) {
 	String str = "double " + nameLabel.getText() + "=" +runningValue
 	    + ";\n";
 	str += nameLabel.getText()+"="+fct.getText()+";\n";
 	return (str);
     }
-    
+
     public void saveYourself(PrintWriter pw) {
 	String str = "";
 	pw.println("////////////////// Parameter: /////////////////////////"
 		   + "\n");
-	
+
 	pw.println("" + parNo + "\n");
 	pw.println("" + newFrom + "\n");
 	pw.println("" + newTo + "\n");
@@ -253,7 +253,7 @@ public class OneParameter extends JPanel {
 	//  pw.println(cbox.isSelected()+"\n");
 	//optionButtonPane.saveYourself(pw);
     }
-    
+
     public String saveYourself() {
 	String str = "";
 	str += "////////////////// Parameter: /////////////////////////\n";

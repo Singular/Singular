@@ -5,29 +5,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.awt.BorderLayout;
@@ -66,7 +66,7 @@ public class Lamp extends JPanel {
 	JButton colorButton;
 
 
-	
+
 	String lastX = "0";
 
 	String lastY = "0";
@@ -87,7 +87,7 @@ public class Lamp extends JPanel {
 	public int lampNo = 0;
 
 	public JCheckBox cbox = new JCheckBox("", true);
-	
+
 	public int oldFrom = 0;
 
 	public int oldTo = 1;
@@ -96,14 +96,14 @@ public class Lamp extends JPanel {
 
 	public int newTo = 1;
 
-	
+
 
 //	 zum rechnen
 //	pcalc polyCalc = new pcalc();
-	
+
 	public JLabel intenseLabel = new JLabel("50");
 
-	
+
 	public JTextField from = new JTextField("0");
 
 	public JTextField to = new JTextField("100");
@@ -136,7 +136,7 @@ public class Lamp extends JPanel {
 	JLabel PreviewPic;
 
 	Lamp previewLamp;
-	
+
 	JButton setPos = new JButton("set Pos");;
 
 	JButton intensity = new JButton("Intensity");
@@ -162,7 +162,7 @@ public class Lamp extends JPanel {
 		PreviewPic = new JLabel();
 		lampPanel[1].add(setPos);
 	//	lampPanel[2].add(xLabel);
-		
+
 		//xPos.setBounds(200, 40, 250, 100);//.setSize(200,50);
 		lampPanel[2].add(xPos);
 //		lampPanel[4].add(yLabel);
@@ -194,11 +194,11 @@ public class Lamp extends JPanel {
 		});
 
 		*/
-		
-	    
-	    
-	    
-	    
+
+
+
+
+
 		intenseSlider.setValue(50);
 		intenseSlider.setMinorTickSpacing(1);
 		intenseSlider.setMajorTickSpacing(10);
@@ -210,7 +210,7 @@ public class Lamp extends JPanel {
 		});
 
 		lampPanel[5].add(intenseSlider);
-		
+
 		colorButton = new JButton();
 //		colorButton.setBorderPainted(true);
   //      colorButton.setBorder(BorderFactory.createBevelBorder(5,new Color(100,100,100),new Color(200,200,200)));//.createEtchedBorder());
@@ -231,15 +231,15 @@ public class Lamp extends JPanel {
 //		lampPanel[2].add(new JLabel(" shines: "));
 		lampPanel[7].add(cbox);
 
-		
+
 	}
-	
+
 	public synchronized void updateLampAdmin(){
 		lampAdmin.setSelectedLamp(lampNo-1);
 	}
-	
+
 	// Konstruktor ohne GUI:
-	
+
 	Lamp(Project pro, LampAdmin lampAdmin) {
 		project = pro;
 		this.lampAdmin = lampAdmin;
@@ -248,19 +248,19 @@ public class Lamp extends JPanel {
 		colorButton = new JButton();
 		colorButton.setBackground(new Color(0, 180, 240));
 	}
-	
+
 	public Lamp previewLamp(double x, double y, double z){
 		previewLamp=getNewLamp(x,y,z,colorButton.getBackground(),getVol(),isShining());
-		
-		
+
+
 		return previewLamp;
 	}
-	
+
 	public Lamp getNewLamp(double x, double y, double z,
-			Color c, 
+			Color c,
 			int i,
 			boolean shines){
-		
+
 		Lamp lamp=new Lamp(project,lampAdmin);//(Lamp)lampList.lastElement();
 		lamp.setKoords(x,y,z);
 		lamp.setIntensity( i);
@@ -268,21 +268,21 @@ public class Lamp extends JPanel {
 		lamp.setIsShining(shines);
 		//SwingUtilities.updateComponentTreeUI(lamp);
 		return lamp;
-		
+
 	}
-	
+
 	public void setColor(Color c){
 		colorButton.setBackground(c);
 		if(previewLamp!=null){
 			previewLamp.setColor(c);
 		}
 	}
-	
+
 	public int getIntensity(){
-		
+
 		return intenseSlider.getValue();
 	}
-	
+
 	public void setIntensity(int i){
 		intenseSlider.setValue(i);
 		updateintenseSliderLabel();
@@ -290,9 +290,9 @@ public class Lamp extends JPanel {
 			previewLamp.setIntensity(i);
 		}
 	}
-	
+
 	public synchronized void updateintenseSliderLabel()  {
-		intenseLabel.setText(""+intenseSlider.getValue());	
+		intenseLabel.setText(""+intenseSlider.getValue());
 		//SwingUtilities.updateComponentTreeUI(this);
 	}
 
@@ -302,7 +302,7 @@ public class Lamp extends JPanel {
 		// was ihn spaeter z.b. in getXpos() abschiesst
 
 		// bloss nicht die previewLamp updaten ;-)
-		
+
 		NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
 		nf.setMaximumFractionDigits(3);//.setsetMinimumIntegerDigits(5); //
 									   // ggf. mit fuehrenden Nullen ausgeben
@@ -355,20 +355,20 @@ public class Lamp extends JPanel {
 
 /*	public synchronized void updateKoords_InvokedByUpdateFrameImmediatlyThread_LampAdmin(
 			jv4surfex jv4sx) {
-		
+
 		// bloss nicht die previewLamp updaten ;-)
-		
-		
+
+
 		double[] ang = new double[3];
 		ang[0] = jv4sx.getCamPos()[0];//-jv4sx.getCamPos()[0];
 		ang[1] = jv4sx.getCamPos()[1];//.getCameraRotationYXZ()[1];//-jv4sx.getCamPos()[1];
 		ang[2] = jv4sx.getCamPos()[2];//getCameraRotationYXZ()[2];//)-jv4sx.getCamPos()[2];
 	//	System.out.println("r" + vec2Str(jv4sx.getCamPos()));
-		
+
 		if (!((lastX.compareTo(getXpos_str()) == 0)
 				&& (lastY.compareTo(getYpos_str()) == 0) && (lastZ
 				.compareTo(getZpos_str()) == 0))) {
- 
+
 			// der Benutzer hat die Koordinaten schriftlich geaendert
 			// -> jv4sx anpassen!!
 			try{
@@ -377,21 +377,21 @@ public class Lamp extends JPanel {
 			jv4sx.disp.getCamera().setPosition(v);
 			jv4sx.setParameterWarning(false);
 			//jv4sx.updateScaleSliderValue();
-			
+
 		//	System.out.println(10/getVecLength()+" - "+jv4sx.disp.getCamera().getScale());
-			
-			
+
+
 			jv4sx.updateDisp();
-			
-			
-			
+
+
+
 			}catch(Exception e){
 				//er hat wahrschinlich nen parameter im Textfeld stehehn und kann deswegen nicht nach double konvertieren
 				jv4sx.setParameterWarning(true);
-				
-				
+
+
 			}
-			
+
 
 			//				 geaenderte Daten speichern
 			// damit man merkt, falls er sie wieder aendert
@@ -408,7 +408,7 @@ public class Lamp extends JPanel {
 				.compareTo(Double.valueOf(ang[2]).toString()) == 0))) {
 			//			 d.h der Benutzer hat die Koordinaten nicht schriftlich geaendert
 			// aber moeglicherweise im jv4sx-previefenster:
-			//			
+			//
 			// d.h. Benutzer hat jvview gedreht
 			setKoords(ang[0], ang[1], ang[2]);
 			//				 geaenderte Daten speichern
@@ -420,7 +420,7 @@ public class Lamp extends JPanel {
 			lastY = getYpos_str();
 			lastZ = getZpos_str();
 		}
-		
+
 
 	}*/
 
@@ -431,9 +431,9 @@ public class Lamp extends JPanel {
 	public PdVector getPos() {
 		return new PdVector(getXpos(), getYpos(), getZpos());
 	}
-	
+
 	public double getVecLength(){
-		
+
 	//	System.out.println(Math.sqrt(2));
 		return Math.sqrt(Math.pow(this.getXpos(),2)+Math.pow(this.getYpos(),2)+Math.pow(this.getZpos(),2));
 	}
@@ -455,8 +455,8 @@ public class Lamp extends JPanel {
 		}
 		setPos.repaint();
 	}
-	
-	
+
+
 
 	public synchronized String getXpos_str() {
 		String str = "";
@@ -555,7 +555,7 @@ public class Lamp extends JPanel {
 	    str+="light"+lampNo+"_blue ="+getBlue()+";\n";
 	    return str;
 	}
-	
+
 	public double evalWithPar(String s,String[] runningParams,
 		      double[] runningParamsValue){
 		int i=0;
@@ -564,23 +564,23 @@ public class Lamp extends JPanel {
 		for(int j=0;j<runningParams.length;j++){
 //			System.out.println("rv:"+runningParamsValue[j]);
 			s=s.replaceAll(runningParams[j],(new Double(runningParamsValue[j])).toString());
-			
+
 		}
 		}
-		
+
 		s=s.replaceAll(" ","");
-		
-		s=s.replaceAll("\\*"," ");		
+
+		s=s.replaceAll("\\*"," ");
 		/*
 		System.out.println("s1:"+s);
-		
+
 		s= polyCalc.showAsPovrayCode(s);
 		System.out.println("s2:"+s);
 
 		if(s.length()>4){
 		s=s.substring(4,s.length()-1);
 		}	//Double.valueOf(s).doubleValue()*genauigkeit;
-		
+
 		// damit es waehrend der Eingabe keine Probleme gibt:
 		s=s.replaceAll("\\+","");
 		if(s.charAt(0)=='-'){
@@ -593,8 +593,8 @@ public class Lamp extends JPanel {
 		s=s.replaceAll("/","");
 		s=s.replaceAll("^","");
 		System.out.println("s3:"+s);
-		*/		
-		
+		*/
+
 		try{
 			return Double.valueOf(s).doubleValue();
 		}catch(Exception e){

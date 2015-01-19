@@ -9,7 +9,7 @@ indepSet(std(I),1);
 
 ring A  = 0,(x,y,t),dp;
 ideal I = y2-x3-3t2x2;
-indepSet(std(I),1);          
+indepSet(std(I),1);
 
 LIB"surf.lib";
 //plot(lead(I));

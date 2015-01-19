@@ -5,29 +5,29 @@
 ////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
-// 
+//
 // SURFEX version 0.90.00
 // =================
 //
 // Saarland University at Saarbruecken, Germany
 // Department of Mathematics and Computer Science
-// 
+//
 // SURFEX on the web: www.surfex.AlgebraicSurface.net
-// 
+//
 // Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 //
 // Copyright (C) 2001-2008
-// 
-// 
+//
+//
 // *NOTICE*
 // ========
-//  
+//
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
 // Free Software Foundation ( version 3 or later of the License ).
-// 
+//
 // See LICENCE.TXT for details.
-// 
+//
 /////////////////////////////////////////////////////////////////////////
 
 import java.util.*;
@@ -93,7 +93,7 @@ public class SaveMovie extends Thread {
   int Xrot, Yrot, Zrot;
 
   String[] parametersToRun;
-  
+
   int rand;
 
   public SaveMovie(String SaveToFileLocation, surfex su, int FramesPerSecond,
@@ -126,7 +126,7 @@ public class SaveMovie extends Thread {
       this.Yrot = Yrot;
       this.Zrot = Zrot;
       this.parametersToRun = parametersToRun;
-      
+
 //     System.out.println(SaveToFileLocation + "SaveToFileLocation");
 //     System.out.println(this.surfex_ + "su");
 //     System.out.println(this.fps + "FramesPerSecond");
@@ -150,17 +150,17 @@ public class SaveMovie extends Thread {
 //     System.out.println(this.Zrot + " zrot");
 
       N = fps * T;
-      
+
       rand=((int)(Math.random()*2000000000));
       //RotTypeROTATE_y_AXIS();//pro.jv4sx.getCamPos(),pro.jv4sx.getViewDir(),pro.jv4sx.getUpVector(),pro.jv4sx.getRightVector());
-      
+
   }
-    
+
     public void run() {
 //     System.out.println("saveMovie gestartet");
 	MakeMovie(StandardRot(Xrot, Yrot, Zrot));//RotTypeROTATE_y_AXIS());
     }
-    
+
     private LinkedList getRotStrings(int rotType) {
 	switch (rotType) {
 	    //case ROTATE_X_AXIS:
@@ -169,9 +169,9 @@ public class SaveMovie extends Thread {
 	    //  case ROTATE_Z_AXIS: return RotTypeROTATE_Z_AXIS();
 	}
 	return null; // wird aber nicht vorkommen
-	
+
     }
-    
+
     private LinkedList StandardRot(int Xrot, int Yrot, int Zrot) {
 	LinkedList rotStrings = new LinkedList();
 	double tmp;
@@ -182,28 +182,28 @@ public class SaveMovie extends Thread {
 	}
 	return rotStrings;
     }
-    
+
     private void MakeMovie(LinkedList rotateStrings){//double[] camPos, double[]
 	// viewDir,double[]
 	// upVector,double[]
 	// rightVector){
 	// eine Drehung produzieren:
-	
+
 	int i=-1;
-	
+
 	JFrame pframe=createAndShowGUI(N);
-	
+
 	double[] runningParametersValue=new double[N];
-	
-	NumberFormat nf=NumberFormat.getNumberInstance(); 
+
+	NumberFormat nf=NumberFormat.getNumberInstance();
 	nf.setMinimumIntegerDigits(3); // ggf. mit fuehrenden Nullen ausgeben
 	ListIterator rotateStringsIterator=rotateStrings.listIterator();
 	OneParameter tmpParam;
-	
-	while(rotateStringsIterator.hasNext() && 
-	      (!((ProgressFrame)pframe.getContentPane()).processCanceled)){ 
-	    i++; 
-	    
+
+	while(rotateStringsIterator.hasNext() &&
+	      (!((ProgressFrame)pframe.getContentPane()).processCanceled)){
+	    i++;
+
 	    int j;
 	    //System.out.println("calc parameters:"+parametersToRun.length);
 	    for(j=0;j<parametersToRun.length;j++){
@@ -215,10 +215,10 @@ public class SaveMovie extends Thread {
 //		System.out.println("param: "+j+" :"+parametersToRun[j]+" value:"+
 //				   runningParametersValue[j]);
 	    }
-	    
+
 	    //System.out.println((i+1)+" / "+N );
-	    if(omitType==0 || 
-	       (omitType==1 && i+1>1) || 
+	    if(omitType==0 ||
+	       (omitType==1 && i+1>1) ||
 	       (omitType==2 && i+1<N)) {
 		if(surfex_.cygwin==1) {
 		    ((ProgressFrame)pframe.getContentPane()).refresh(i+1,
@@ -230,8 +230,8 @@ public class SaveMovie extends Thread {
 		}
 		try {
 		    SavePic save=new SavePic(surfex_.tmpDir+"tmp_surfex_MoviePic_"+rand+"_"+nf.format(i)+".jpg",false,
-					     antialiasing,height, width,300, surfex_, pro, CamPos, 
-					     viewDir, upVector, rightVector, parametersToRun, runningParametersValue, 
+					     antialiasing,height, width,300, surfex_, pro, CamPos,
+					     viewDir, upVector, rightVector, parametersToRun, runningParametersValue,
 					     surfex_.jv4sx, pro.getAllLamps() );
 		    save.setRotateString((String) rotateStringsIterator.next());
 		    save.set3d(this._3d);
@@ -248,19 +248,19 @@ public class SaveMovie extends Thread {
 	    }
 	} // end while()
 
-	
+
 	if(((ProgressFrame)pframe.getContentPane()).processCanceled){
 	    // user hat Prozess abgebrochen
 	}else{
 	    ((ProgressFrame)pframe.getContentPane()).refresh(i+1+(N/20),"producing film from frames...");
-	    
+
 	    // convert the .jpg-files into a movie file:
 //     System.out.println("try convert...");
 	    try {
 //         System.out.println("convert...");
 		Runtime r = Runtime.getRuntime();
 		int delay = 60 / fps;
-		//   
+		//
 // 	System.out.println("sh -exec \"convert -delay "+delay+" -loop 0 "+surfex_.tmpDir+"tmp_surfex_MoviePic_"+rand+"*.jpg \\\""+surfex.toLinux(SaveToFileLocation)+"\\\"\"");
 // 	System.out.println("sh -exec \"convert -delay "+delay+" -loop 0 "+
 // 			   surfex.toWindows(surfex_.tmpDir+"tmp_surfex_MoviePic_"+rand+"*.jpg") +" \\\""+
@@ -285,18 +285,18 @@ public class SaveMovie extends Thread {
 	    } catch (Exception e1) {
 		System.out.println("convert problem.");
 		System.out.println(e1.toString());
-	    }   
+	    }
 //     System.out.println("convert done.");
-	    
-	    
+
+
 	    ((ProgressFrame)pframe.getContentPane()).refresh((int)(N*1.2),"Film was produced successfully");
-	    
-	    
+
+
 	}
 	pframe.dispose();
-	
-    } 
-    
+
+    }
+
     private JFrame createAndShowGUI(int N) {
     //Make sure we have nice window decorations.
     // JFrame.setDefaultLookAndFeelDecorated(true);

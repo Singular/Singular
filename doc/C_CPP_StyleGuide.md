@@ -13,14 +13,14 @@ The purpose of this document is to provide a common style guide for the further 
  * increase its reusability.
 
 The given style guide is _not_ fixed, in the sense that it may be
-updated and modified at any time, in order to further increase its utility. 
+updated and modified at any time, in order to further increase its utility.
 **On the other hand, developers are expected to stick to the
-respective latest version of this style guide.** 
+respective latest version of this style guide.**
 In case of minor changes to this style guide, old code sources need _not_ be adjusted to obey the newest version of the style guide. However, in case of major changes such adjustments may become advisable.
 
 There may be collisions with other existing and widely-used style guides, e.g. when including `std` sources. Such code _may be used as it is_, i.e., it does _not_ need to be wrapped in code which conforms to the style guide at hand.
 
-See also the [Build System description](@ref bs_page) and the 
+See also the [Build System description](@ref bs_page) and the
 [Legacy C/C++ programming style guide](@ref legacystyleguide).
 
 ## Naming Conventions
@@ -158,7 +158,7 @@ The proper ordering of `include` statements in source files is:
  * In case of a non-fitting routine declaration, the declaration may be linefeeded between routine parameters. Then, the next line has to be indented such that method parameters are left-aligned, as in the following example:
 
 ~~~~~~~~~~~~~~~
-C& C::multiplyWith10Cs(C& c1, C& c2, ... 
+C& C::multiplyWith10Cs(C& c1, C& c2, ...
                        C& c9, C& c10)
 ~~~~~~~~~~~~~~~
 
@@ -169,16 +169,16 @@ C& C::multiplyWith10Cs(C& c1, C& c2, ...
 
 ### In-Code Documentation
 
- * In general, all documentation in the code is going to be processed by Doxygen. Therefore, documentation has to follow Doxygen syntax.<br /> 
-   In order to ease documentation, template files for `*.h` and `*.cc` files, which conform to both this style guide and Doxygen syntax are provided. 
-   See [C source template](@ref templates/template.c), [header template](@ref templates/template.h) and [C++ source template](@ref templates/template.cc). 
+ * In general, all documentation in the code is going to be processed by Doxygen. Therefore, documentation has to follow Doxygen syntax.<br />
+   In order to ease documentation, template files for `*.h` and `*.cc` files, which conform to both this style guide and Doxygen syntax are provided.
+   See [C source template](@ref templates/template.c), [header template](@ref templates/template.h) and [C++ source template](@ref templates/template.cc).
  * Each source code file starts with some version information, author, and a short comment about its purpose.
  * Each routine is preceded by a Doxygen-conformal comment about its input parameters, output values, relations that are expected to hold among them, and possible side effects on other variables, if any.
  * Difficult and more involved algorithmic parts of routines are documented directly  before or between the corresponding lines of code, even though these comments may not appear in the Doxygen-generated developer's manual.
  * Even harder algorithmic parts must come with a link to related literature which clarifies the respective passages of the algorithm.
 
-Some doxygen-related links: 
- * Manual <http://www.stack.nl/~dimitri/doxygen/manual/> 
+Some doxygen-related links:
+ * Manual <http://www.stack.nl/~dimitri/doxygen/manual/>
  * QRC: <http://www.digilife.be/quickreferences/QRC/Doxygen%20Quick%20Reference.pdf>, <http://www.sztaki.hu/~szcsaba/software/DoxygenQuickReference.pdf>
 
 ## BNF Specification for Naming Conventions

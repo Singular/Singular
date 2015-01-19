@@ -1,10 +1,10 @@
 LIB "tst.lib";
 tst_init();
 
-ring A  = 0,(x,y),dp;       
+ring A  = 0,(x,y),dp;
 ideal I = x10+x9y2,y8-x2y7;
 poly f  = xy13+y12;
-matrix M=lift(I,f);      
+matrix M=lift(I,f);
 M;
 
 f-M[1,1]*I[1]-M[2,1]*I[2];

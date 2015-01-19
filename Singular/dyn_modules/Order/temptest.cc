@@ -1,8 +1,8 @@
-#include <libpolys/coeffs/bigintmat.h>
+#include <coeffs/bigintmat.h>
 #include "temptest.h"
 #include <reporter/reporter.h>
-#include "libpolys/coeffs/numbers.h"
-#include "libpolys/coeffs/coeffs.h"
+#include <coeffs/numbers.h>
+#include <coeffs/coeffs.h>
 #include "Singular/ipid.h"
 //#include "kernel/febase.h"
 #include "lattice.h"

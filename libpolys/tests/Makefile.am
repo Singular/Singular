@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I ../../m4
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} \
 ${FACTORY_INCLUDES} ${RESOURCES_INCLUDES} ${OMALLOC_INCLUDES} \
-${FLINT_CFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS} 
+${FLINT_CFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS}
 
 TESTS = simple_test \
     coeffs_test \
@@ -36,7 +36,7 @@ MOD:
 	  ln -snf ${top_builddir}/libpolys/polys/.libs/ ${abs_builddir}/MOD; \
 	fi
 
-# How to generate *_runner.cpp 
+# How to generate *_runner.cpp
 simple_test_runner.cpp: simple_test.h
 	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer ${srcdir}/simple_test.h
 

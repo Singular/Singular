@@ -50,7 +50,7 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  AC_ARG_ENABLE([optimizationflags],
   AS_HELP_STRING([--disable-optimizationflags], [build the without default optimization flags]),
   [ENABLE_OPTIMIZATION="$enableval"], [ENABLE_OPTIMIZATION="yeah"])
-  
+
  if test "x${ENABLE_DEBUG}" = xyes; then
   SINGULAR_CFLAGS=""
   if test "x${ENABLE_OPTIMIZATION}" = xyeah; then
@@ -67,12 +67,12 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  if test "x${ENABLE_OPTIMIZATION}" = xyeah; then
    ENABLE_OPTIMIZATION="yes"
  fi
-  
+
  if test "x${ENABLE_OPTIMIZATION}" = xyes; then
   if test "x${ENABLE_DEBUG}" = xyes; then
    AC_MSG_WARN([Please note that you will be using our optimization flags together with debug flags... ])
   fi
- fi 
+ fi
 
  AC_MSG_CHECKING([whether optimization flags should be used])
  if test "x${ENABLE_OPTIMIZATION}" = xyes; then
@@ -80,8 +80,8 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  else
   AC_MSG_RESULT([no])
  fi
- 
- 
+
+
  AM_CONDITIONAL(WANT_DEBUG, test x"${ENABLE_DEBUG}" = xyes)
  AM_CONDITIONAL(WANT_OPTIMIZATIONFLAGS, test x"${ENABLE_OPTIMIZATION}" = xyes)
 
@@ -94,13 +94,13 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  AC_LANG_PUSH([C])
  AX_APPEND_COMPILE_FLAGS(${FLAGS}, [CFLAGS])
  AC_LANG_POP([C])
- 
+
  AC_LANG_PUSH([C++])
  AX_APPEND_COMPILE_FLAGS(${FLAGS}, [CXXFLAGS])
  AX_APPEND_COMPILE_FLAGS([-fexceptions -frtti], [POLYMAKE_CXXFLAGS])
  AC_LANG_POP([C++])
 
- AX_APPEND_LINK_FLAGS(${FLAGS}) 
+ AX_APPEND_LINK_FLAGS(${FLAGS})
 
  AC_SUBST(POLYMAKE_CXXFLAGS)
 
@@ -116,12 +116,12 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
   AX_APPEND_LINK_FLAGS(${DBGFLAGS})
  fi
 
- ## for clang: -Wunneeded-internal-declaration 
+ ## for clang: -Wunneeded-internal-declaration
 
  if test "x${ENABLE_OPTIMIZATION}" != xno; then
   OPTFLAGS="-O3 -Wno-unused-function -Wno-trigraphs -Wno-unused-parameter -Wunknown-pragmas -Wno-unused-variable -fomit-frame-pointer -fwrapv -fvisibility=default -finline-functions -fno-exceptions -fno-rtti -fno-threadsafe-statics -fno-enforce-eh-specs -fconserve-space -funroll-loops"
-  #  -O3 - crashes gcc???!!!  
-  # -fpermissive  
+  #  -O3 - crashes gcc???!!!
+  # -fpermissive
   AC_LANG_PUSH([C])
   AX_APPEND_COMPILE_FLAGS(${OPTFLAGS}, [CFLAGS])
   AC_LANG_POP([C])
@@ -130,7 +130,7 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
 #   AX_APPEND_COMPILE_FLAGS([-fno-threadsafe-statics -fno-enforce-eh-specs -fconserve-space], [CXXFLAGS])
 ###  AX_APPEND_COMPILE_FLAGS([-fno-implicit-templates], [CXXFLAGS]) # problems due to STL
   AC_LANG_POP([C++])
-  AX_APPEND_LINK_FLAGS(${OPTFLAGS}) 
+  AX_APPEND_LINK_FLAGS(${OPTFLAGS})
 #  AX_APPEND_LINK_FLAGS([-fno-threadsafe-statics -fno-enforce-eh-specs -fconserve-space])
 ###  AX_APPEND_LINK_FLAGS([-fno-implicit-templates]) # see above :(
 #  AX_APPEND_LINK_FLAGS([ ])
@@ -140,12 +140,12 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
  AC_LANG_PUSH([C])
  AX_APPEND_COMPILE_FLAGS(${FLAGS2}, [CFLAGS])
  AC_LANG_POP([C])
- 
+
  AC_LANG_PUSH([C++])
  AX_APPEND_COMPILE_FLAGS(${FLAGS2}, [CXXFLAGS])
  AC_LANG_POP([C++])
 
- AX_APPEND_LINK_FLAGS(${FLAGS2}) 
+ AX_APPEND_LINK_FLAGS(${FLAGS2})
 
 # SING_SHOW_FLAGS([before PROG_C_CC])
 

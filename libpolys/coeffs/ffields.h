@@ -8,15 +8,14 @@
 */
 #include <misc/auxiliary.h>
 
-struct n_Procs_s;
-typedef struct  n_Procs_s  *coeffs;
+struct n_Procs_s; typedef struct  n_Procs_s  *coeffs;
 
 //// Initialize r (n_GF)
 BOOLEAN nfInitChar(coeffs r, void*);
 
 /// Show the mininimal polynom....
 /// NOTE: this is used by char *  sleftv::String(void *d, BOOLEAN typed, int dim) (from Singular/subexpr.cc)
-/// TODO: rewrite this UGLYNESS!!!
+/// for printing minpoly
 void    nfShowMipo(const coeffs r);
 
 #endif

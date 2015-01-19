@@ -34,7 +34,7 @@ poly s25=6*w*ys*xs-6*ys*d*l+6*zs*l-6*d*l*y3;
 poly s26=6*w*zs*xs-6*zs*d*l-6*ys*l-6*d*l*z3;
 ideal I=s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,s21,s22,s23,s24,s25,s26;
 ideal J=groebner(I);
-J; 
+J;
 kill R;
 
 tst_status(1);$

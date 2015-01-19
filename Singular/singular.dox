@@ -1,11 +1,11 @@
-/*! 
+/*!
  \page singular_page Singular Interpreter and related functionality
 
 
  \brief Main Singular application and its iterpreter (also available as a library)
 
  Some functions are just wrappers over \ref kernel_page.
- 
+
  Singular can be easily extended by means of dynamic modules:
  - \subpage dynmodules_page
 

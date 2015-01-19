@@ -51,24 +51,24 @@ gcd(C,C);
 extgcd(C,C);
 // -------------------------------------------------------
 newstruct("myunion", "poly p,int i");
-proc to_poly(myunion uni)            
-{                                    
-  return (uni.p);                    
-}                                    
+proc to_poly(myunion uni)
+{
+  return (uni.p);
+}
 
 proc to_int(myunion uni)
-{                       
-  return (uni.i);       
-}                       
+{
+  return (uni.i);
+}
 
 ring r=0,x,dp;
 
 myunion uni;
 uni.p = x+1;
-uni.i = 17; 
+uni.i = 17;
 
 system("install", "myunion", "poly", to_poly, 1);
-system("install", "myunion", "int", to_int, 1);  
+system("install", "myunion", "int", to_int, 1);
 
 poly(uni); // -> x+1
 int(uni);   // -> 17
