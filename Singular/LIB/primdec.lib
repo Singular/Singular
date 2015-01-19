@@ -1196,17 +1196,8 @@ EXAMPLE: example zero_decomp; shows an example
       {
         for(@n=1;@n<=size(lres0) div 2;@n++)
         {
-          if(specialIdealsEqual(lres0[2*@n-1],lres0[2*@n])==1)
-          {
-            lres0[2*@n-1]=groebner(lres0[2*@n-1]);
-            lres0[2*@n]=lres0[2*@n-1];
-            attrib(lres0[2*@n],"isSB",1);
-          }
-          else
-          {
-            lres0[2*@n-1]=groebner(lres0[2*@n-1]);
-            lres0[2*@n]=groebner(lres0[2*@n]);
-          }
+          lres0[2*@n-1]=groebner(lres0[2*@n-1]);
+          lres0[2*@n]=groebner(lres0[2*@n]);
         }
       }
       primary=primary+lres0;
