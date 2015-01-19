@@ -297,10 +297,11 @@ helper for    Reorder gens of M
   else              { (d, p) = order( M, s       ); }  
 
   // grades & ordering permutation for N.  d[p] should be sorted!
-
+  
   def N = module(M[p]);  // reorder the starting ideal/module
 
   attrib( N, "isHomog", w ); // set the grading
+  attrib( N, "rank", size(w) ); // set the grading
 
   d = d[p];
 
@@ -643,11 +644,13 @@ direct sum of graded modules
   int r = nrows(A);
   
   ASSUME( 0, r == size(a) );
-
+  
   module T; T[r] = 0; T = T, module(transpose(B));
   module AB = module(A), transpose(T);
 
   attrib(AB, "isHomog", c);
+  attrib(AB, "rank", size(c));
+  
   return(AB);
 }
 example
@@ -717,9 +720,9 @@ proc grtwist(int a, int d)
 matrix presentation for twisted polynomial ring S(d)^a
 "
 {
-  matrix zero[a][a]; // TODO ???
-  module Z = zero;
+  module Z; Z[a] = 0; 
   attrib(Z, "isHomog", intvec(d:a));
+  attrib(Z, "rank", a);
 
   ASSUME(2, grisequal(Z, grpower( grshift(grzero(), d), a ) )); // optional check
   return(Z); 
