@@ -22,6 +22,7 @@ triang_solve(l,p,[..]); find roots of given triangular system
 ";
 
 LIB "triang.lib";    // needed for triang_solve
+LIB "ring.lib";      // needed for changeordTo
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -691,8 +692,7 @@ EXAMPLE: example solve; shows an example
   {
     if (sb==0)
     {
-      execute("ring dphom=("+charstr(rin)+"),("+
-      varstr(rin)+"),dp;");
+      def dphom=changeordTo(rin,"dp"); setring dphom;
       ideal G = std(imap(rin,G));
       if (dim(G)!=0){ERROR("ideal not zero-dimensional");}
       int vdG=vdim(G);
@@ -735,7 +735,7 @@ EXAMPLE: example solve; shows an example
   {
     if (sb==0)
     {
-      execute("ring dphilb=("+charstr(rin)+"),("+ varstr(rin)+"),dp;");
+      def dphilb=changeordTo(rin,"dp"); setring dphilb;
       ideal G = imap(rin,G);
       G = std(G);
       if (dim(G)!=0){ERROR("ideal not zero-dimensional");}
@@ -746,7 +746,7 @@ EXAMPLE: example solve; shows an example
       G=interred(G);
       attrib(G,"isSB",1);
     }
-    execute("ring lexhilb=("+charstr(rin)+"),("+ varstr(rin)+"),lp;");
+    def lexhilb=changeordTo(rin,"lp"); setring lexhilb;
     option(redTail);
     ideal H = fglm(dphilb,G);
     kill dphilb;
@@ -754,7 +754,7 @@ EXAMPLE: example solve; shows an example
     if (lp){setring rin;}
     else
     {
-      execute("ring lplex=("+charstr(rin)+"),("+varstr(rin)+"),lp;");
+      def lplex=changeordTo(rin,"lp"); setring lplex;
     }
     ideal H = imap(lexhilb,H);
     kill lexhilb;
