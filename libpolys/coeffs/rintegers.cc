@@ -160,6 +160,7 @@ void nrzDelete(number *a, const coeffs)
 
 number nrzCopy(number a, const coeffs)
 {
+  if (a==NULL) return NULL;
   mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init_set(erg, (mpz_ptr) a);
   return (number) erg;

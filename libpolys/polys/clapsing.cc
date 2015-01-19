@@ -153,15 +153,13 @@ poly singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
 
   if (g == NULL)
   {
-    res= p_Copy (f,r);
-    p_Delete (&f, r);
+    res= f;
     f=p_One (r);
     return res;
   }
   if (f==NULL)
   {
-    res= p_Copy (g,r);
-    p_Delete (&g, r);
+    res= g;
     g=p_One (r);
     return res;
   }
@@ -171,7 +169,6 @@ poly singclap_gcd_and_divide ( poly& f, poly& g, const ring r)
   if (rField_is_Q(r) || (rField_is_Zp(r)))
   {
     bool b1=isOn(SW_USE_EZGCD_P);
-    setCharacteristic( rChar(r) );
     F=convSingPFactoryP( f,r );
     G=convSingPFactoryP( g,r );
     GCD=gcd(F,G);

@@ -344,15 +344,8 @@ static CanonicalForm nlConvSingNFactoryN( number n, const BOOLEAN setChar, const
   CanonicalForm term;
   if ( SR_HDL(n) & SR_INT )
   {
-    int nn=SR_TO_INT(n);
-    if ((long)nn==SR_TO_INT(n))
-       term = nn;
-    else
-    {
-        mpz_t dummy;
-        mpz_init_set_si(dummy, SR_TO_INT(n));
-        term = make_cf(dummy);
-    }
+    long nn=SR_TO_INT(n);
+    term = nn;
   }
   else
   {
