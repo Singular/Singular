@@ -236,9 +236,11 @@ proc grdeg( def M, list # )
   int n = nvars(basering) + 1; // index of mod. column in the leadexp
 
   module L = lead(M[1..m]); // leading module-terms for input column vectors
-  intvec d = deg(L[1..m]); // their degrees
+  intvec d = deg(L[1..m]); // their degrees  
   intvec c = leadexp(L[1..m])[n]; // their module-components
-  intvec gr = w[c]; // weights
+  
+  w = intvec(-6665, w); // 0?????
+  intvec gr = w[1+c]; // weights
   
   gr = gr + d; // finally we compute their graded degrees
 
@@ -663,12 +665,13 @@ example
 
   grview(grpower( grshift(grzero(), 10), 5 ) );
   
-  module A = [x+y, x, 0 ], [0, x+y, y];
-  attrib(A,"isHomog", intvec(1,1,1));
+  module A = [x+y, x, 0, 0], [0, x+y, y, 0];
+  attrib(A,"isHomog", intvec(0,0,0,1));
+  attrib(A,"rank", 4);
   grview(A);
   
-  matrix B[2][2] = z,0, 0,z;
-  attrib(B,"isHomog", intvec(-2,-3));
+  matrix B[3][1] = 0,x,y;
+  attrib(B,"isHomog", intvec(2,1,1));
   grview(B);
 
   def C = grsum(A,B);
@@ -677,11 +680,14 @@ example
   homog(C);
   grview(C);
 
-  def D = grsum(grpower(A, 2), grpower(B, 2));
+  def D = grsum(
+     grsum(grpower(A,2), grtwist(1,1)), 
+     grsum(grtwist(1,2), grpower(B,2))
+     );
 
   print(D);
   homog(D);
-  grview(D);  
+  grview(D);
 
   def D10 = grshift(D, 10);
 
@@ -689,17 +695,17 @@ example
   homog(D10);
   grview(D10);
 
-  "";  def T = grtwist(5, 10);
-  
-  print(T);
-  homog(T);
-  grview(T);
-  
-  "";  def TT = grsum(grtwist(3, 0), grtwist(5,-1));
-  
-  print(TT);
-  homog(TT);
-  grview(TT);
+  def DD = grorder(D10);
+
+  print(DD);
+  homog(DD);
+  grview(DD);
+
+  def TTT = grtranspose(DD);
+
+  print(TTT);
+  homog(TTT);
+  grview(TTT);
 }
 
 proc grshift( def M, int d)
