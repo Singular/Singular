@@ -39,8 +39,9 @@ REFERENCES:
 static proc repeat(int n, string c) { string r = ""; while( n > 0 ){ r = r + c; n--; } return(r); }
 static proc pad(int m, string s, string c){ string r = s; while( size(r) < m ){ r = c + r; } return(r); }
 static proc mstring( int m, string c){ if( m < 0 ) { return (c); }; return (string(m)); }
+static proc zstring( int m, int b, string c){ if(b) { return (c); }; return (string(m)); }
 // view helper
-static proc draw ( intmat D, int d )
+static proc draw ( intmat D, intvec zc, int d )
 {
 //  print(D); return ();
   int nc = ncols(D); int nr = nrows(D);
@@ -52,11 +53,11 @@ static proc draw ( intmat D, int d )
   for ( c = d+1; c < (nc-d); c++ )
   {
     head = head + pad(max, string(D[1 , c]), " ") + " ";
-    foot = foot + pad(max, string(D[nr, c]), " ") + " ";
+    foot = foot + pad(max, zstring(D[nr, c], zc[c - d], "?"), " ") + " ";
   }
   // last head/foot enties:
-  head = head + pad(max, string(D[1 , nc-d]), " ");
-  foot = foot + pad(max, string(D[nr, nc-d]), " ");
+  head = head + pad(max, string(D[1 , c]), " ");
+  foot = foot + pad(max, zstring(D[nr, c], zc[c-d], "?"), " ");
   // head/foot dash lines:
   string dash  = repeat( (max + 1) * (nc - 2*d) , "-");
   string dash2 = repeat( (max + 1) * (nc - 2*d) , "=");
@@ -106,7 +107,8 @@ PURPOSE: print the degree/grading data about the GRADED matrix/module/ideal N
   intmat D[nr+2*d][nc+2*d];
   
   module L = module(N); L = lead(L); vector v;
-  int m = 1 + nvars(basering); 
+  int m = 1 + nvars(basering);
+  intvec zc = 0:nc;
   for( c = nc; c > 0; c-- )
   {
     D[1, c+d] = c; // top row indeces
@@ -116,7 +118,8 @@ PURPOSE: print the degree/grading data about the GRADED matrix/module/ideal N
       D[nr+2*d, c+d] = deg(v) + gr[ leadexp(v)[m] ]; // bottom row with computed column induced degrees
     } else
     {
-      D[nr+2*d, c+d] = 0; // TODO: 0/-1 is valid :(
+//      D[nr+2*d, c+d] = 0; // TODO: 0/-1 is valid :(
+      zc[c] = 1; 
     }
   }
   
@@ -129,7 +132,7 @@ PURPOSE: print the degree/grading data about the GRADED matrix/module/ideal N
     }
     D[r+d, nc+2*d] = r; // right-most block with indeces
   }
-  draw(D, d); // print it nicely!
+  draw(D, zc, d); // print it nicely!
 }
 
 
