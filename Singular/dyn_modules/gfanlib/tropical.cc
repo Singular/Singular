@@ -238,7 +238,7 @@ void tropical_setup(SModulFunctions* p)
   // p->iiAddCproc("","tropicalNeighbours",FALSE,tropicalNeighbours);
 #ifndef NDEBUG
   // p->iiAddCproc("","initial0",FALSE,initial0);
-  // p->iiAddCproc("","pppReduce",FALSE,pppReduce);
+  p->iiAddCproc("","pReduceDebug",FALSE,pReduceDebug);
   // p->iiAddCproc("","ppreduceInitially0",FALSE,ppreduceInitially0);
   // p->iiAddCproc("","ppreduceInitially1",FALSE,ppreduceInitially1);
   // p->iiAddCproc("","ppreduceInitially2",FALSE,ppreduceInitially2);

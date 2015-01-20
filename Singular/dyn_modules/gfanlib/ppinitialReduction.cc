@@ -196,7 +196,7 @@ BOOLEAN ptNormalize(leftv res, leftv args)
 #endif //NDEBUG
 
 #ifndef NDEBUG
-BOOLEAN pppReduce(leftv res, leftv args)
+BOOLEAN pReduceDebug(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == POLY_CMD))
@@ -443,7 +443,7 @@ int ppreduceInitially(ideal I, const number p, const poly g, const ring r)
   for (int k=j; k<n-1; k++)
     for (int l=k+1; l<n; l++)
       if (ppreduceInitially(&I->m[k], I->m[l], r))
-        pReduce(I->m[j],p,r);
+        pReduce(I->m[k],p,r);
 
   /***
    * removes the elements of I which have been reduced to 0 in the previous two passes

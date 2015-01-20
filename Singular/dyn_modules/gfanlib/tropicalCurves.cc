@@ -217,7 +217,7 @@ gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u, c
 {
   std::set<gfan::ZCone> C = tropicalStar(I,r,u,currentStrategy);
   gfan::ZFan* zf = toFanStar(C);
-  std::cout << zf->toString();
+  // std::cout << zf->toString();
   delete zf;
   gfan::ZMatrix raysOfC(0,u.size());
   if (!currentStrategy.restrictToLowerHalfSpace())

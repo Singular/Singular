@@ -8,7 +8,7 @@
 
 // for various commands in dim(ideal I, ring r):
 #include <kernel/ideals.h>
-#include <kernel/GBEngine/stairc.h>
+#include <kernel/combinatorics/stairc.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <Singular/ipshell.h> // for isPrime(int i)
 

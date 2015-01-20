@@ -78,7 +78,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
         number p = (number) v->Data();
         tropicalStrategy currentStrategy(I,p,currRing);
         ideal startingIdeal = currentStrategy.getStartingIdeal();
-        ideal startingRing = currentStrategy.getStartingRing();
+        ring startingRing = currentStrategy.getStartingRing();
         poly gStart = startingIdeal->m[0];
         std::set<gfan::ZCone> maxCones = tropicalVariety(gStart,startingRing,currentStrategy);
         res->rtyp = fanID;

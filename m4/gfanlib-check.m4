@@ -56,7 +56,6 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
 
  LIBS=$BACKUP_LIBS
 
-<<<<<<< HEAD
  if test "x$PASSED_ALL_TESTS_FOR_GFANLIB" = x1; then
   AC_MSG_RESULT([yes])
   AC_SUBST(CDDGMPLDFLAGS)
@@ -67,14 +66,9 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
    AC_MSG_ERROR([Error, could not use libcddgmp])
   fi
  fi
-<<<<<<< HEAD
-=======
-=======
  AC_MSG_RESULT(no)
 
  AC_SUBST(CDDGMPLDFLAGS)
->>>>>>> fix: missing -lcddgmp flag when linking libgfan.so
->>>>>>> fix: missing -lcddgmp flag when linking libgfan.so
 else
  AC_MSG_RESULT(no)
  PASSED_ALL_TESTS_FOR_GFANLIB="0"
