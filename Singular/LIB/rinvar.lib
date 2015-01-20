@@ -33,6 +33,7 @@ SEE ALSO: qhmoduli_lib, zeroset_lib
 LIB "presolve.lib";
 LIB "elim.lib";
 LIB "zeroset.lib";
+LIB "ring.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -285,10 +286,8 @@ EXAMPLE: example ImageVariety; shows an example
 {
   int i, dbPrt, nrNewVars;
   intvec wt, wth, hs1;
-  string ringSTR1, ringSTR2, order;
-
   def RARB = basering;
-  nrNewVars = size(F);
+  nrNewVars = ncols(F);
 
   dbPrt = printlevel-voice+2;
   dbprint(dbPrt, "ImageVariety of " + string(I) + " under the map " + string(F));
@@ -298,11 +297,8 @@ EXAMPLE: example ImageVariety; shows an example
   // create new ring for elimination, Y(1),...,Y(m) are slack variables.
 
   string @mPoly = string(minpoly);
-  order = "(dp(" + string(nvars(basering)) + "), dp);";
-  ringSTR1 = "ring RAR1 = (" + charstr(basering) + "), (" + varstr(basering) + ", Y(1.." + string(nrNewVars) + ")), " + order;
-  ringSTR2 = "ring RAR2 = (" + charstr(basering) + "), Y(1.." + string(nrNewVars) + "), dp;";
-  execute(ringSTR1);
-  execute("minpoly = number(" + @mPoly + ");");
+  def RAR1=addNvarsTo(basering,nrNewVars,"Y",1); setring RAR1;
+  string ringSTR2 = "ring RAR2 = (" + charstr(basering) + "), Y(1.." + string(nrNewVars) + "), dp;";
 
   ideal I, J1, J2, Fm;
 

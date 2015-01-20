@@ -32,6 +32,10 @@ PROCEDURES:
  hasFieldCoefficient(rng) coefficients are a field
  isQuotientRing(rng)      ring is a qotient ring
  isSubModule(I,J)         check if I is in J as submodule
+
+ changeordTo(r,o)         change the ordering of a ring to a simple one
+ addvarsTo(r,vars,i)      add variables to a ring
+ addNvarsTo(r,N,name,i)   add N variables to a ring
 ";
 
 LIB "inout.lib";
@@ -1112,6 +1116,10 @@ example
 }
 
 proc changeordTo(def r,string o)
+"USAGE:  changeordTo(ring, string s);
+RETURN:  a ring with the oderinging changed to the (simple) ordering s
+EXAMPLE: example changeordTo(); shows an example
+"
 {
   list rl=ringlist(r);
   rl[3]=list(list("C",0),list(o,1:nvars(r)));
@@ -1120,8 +1128,74 @@ proc changeordTo(def r,string o)
 }
 example
 {
+  "EXAMPLE:"; echo = 2;
   ring r=0,(x,y),lp;
-  def rr=changeordToCdp(r,"dp");
+  def rr=changeordTo(r,"dp");
   rr;
 }
 
+proc addvarsTo(def r,list vars,int blockorder)
+"USAGE:  addvarsTo(ring,list_of_strings, int);
+         int may be: 0:ordering: dp
+                     1:ordering dp,dp
+                     2:oring.ordering,dp
+RETURN:  a ring with the addtional variables
+EXAMPLE: example addvarsTo(); shows an example
+"
+{
+  list rl=ringlist(r);
+  int n=nvars(r);
+  rl[2]=rl[2]+vars;
+  if (blockorder==0)
+  {
+    rl[3]=list(list("C",0),list("dp",1:(nvars(r)+size(vars))));
+  }
+  else
+  {
+    if (blockorder==2)
+    {
+      rl[3]=rl[3]+list(list("dp",1:size(vars)));
+    }
+    else
+    {
+      rl[3]=list(list("C",0),list("dp",1:nvars(r)),list("dp",1:size(vars)));
+    }
+  }
+  def rr=ring(rl);
+  return(rr);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y),lp;
+  def rr=addvarsTo(r,list("a","b"),0);
+  rr; kill rr;
+  def rr=addvarsTo(r,list("a","b"),1);
+  rr; kill rr;
+  def rr=addvarsTo(r,list("a","b"),2);
+  rr;
+}
+proc addNvarsTo(def r,int N,string n,int blockorder)
+"USAGE:  addNvarsTo(ring,int N, string name, int b);
+         b may be: 0:ordering: dp
+                   1:ordering dp,dp
+                   2:oring.ordering,dp
+RETURN:  a ring with N addtional variables
+EXAMPLE: example addNvarsTo(); shows an example
+"
+{
+  list v;
+  for(int i=N;i>0;i--) { v[i]=n+"("+string(i)+")"; }
+  return(addvarsTo(r,v,blockorder));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y),lp;
+  def rr=addNvarsTo(r,2,"@",0);
+  rr; kill rr;
+  def rr=addNvarsTo(r,2,"@",1);
+  rr; kill rr;
+  def rr=addNvarsTo(r,2,"@",2);
+  rr;
+}
