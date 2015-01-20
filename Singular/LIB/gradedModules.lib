@@ -14,6 +14,7 @@ NOTE:
 PROCEDURES:
 
     grzero()        presentation of basering(0)^1
+    grobj(M,w)      construct a graded module object 
     grshift(M,d)    shift graded module M by d
     grtwist(r,d)    presentation of basering(d)^r
     grsum(M,N)      direct sum of two graded modules M \oplus N
@@ -303,10 +304,7 @@ helper for    Reorder gens of M
 
   // grades & ordering permutation for N.  d[p] should be sorted!
   
-  def N = module(M[p]);  // reorder the starting ideal/module
-
-  attrib( N, "isHomog", w ); // set the grading
-  attrib( N, "rank", size(w) ); // set the grading
+  def N = grobj(module(M[p]), w);  // reorder the starting ideal/module
 
   d = d[p];
 
@@ -438,35 +436,13 @@ transpose graded module/map or a chain complex?...
  if( size(#) > 0 ) { (N,d) = reorder(M, -1, #[1]); }
  else              { (N,d) = reorder(M, -1); }
 
- kill M; module M = transpose(N);
- attrib( M, "isHomog", -d ); // set the grading
+ kill M; module M = grobj(transpose(N), -d);
 
 // "b";  grview(M);
  
  kill N,d; module N; intvec d;
  // reverse order:
  (N,d) = reorder(M, 1); kill M;
-
-/*
- module M = transpose(N); 
- attrib( M, "isHomog", -d ); // set the grading
-
-// "c";  grview(M);
- 
- kill N,d; module N; intvec d;
- // reverse order:
- (N,d) = reorder(M, -1); kill M;
- module M = transpose(N); 
- attrib( M, "isHomog", -d ); // set the grading
-
-// "d";  grview(M);
- 
- kill N,d; module N; intvec d;
- // reverse order:
- (N,d) = reorder(M, 1);
- 
- kill M;
-*/
 
 // "e"; grview( N );
  
@@ -523,8 +499,7 @@ reorder graded module/map or a chain complex?...
 
   if( size(#) > 0 ) { (N,d) = reorder(M, 1, #[1]); }
   else              { (N,d) = reorder(M, 1); }  
-  kill M; module M = transpose(N);
-  attrib( M, "isHomog", -d ); // set the grading
+  kill M; module M = grobj(transpose(N), -d);
 
 // "b";  grview(M);
  
@@ -532,8 +507,7 @@ reorder graded module/map or a chain complex?...
   // reverse order:
   (N,d) = reorder(M, -1); kill M;
  
-  module M = transpose(N); 
-  attrib( M, "isHomog", -d ); // set the grading
+  module M = grobj(transpose(N), -d);
 
 // "c";  grview(M);
 
@@ -610,8 +584,7 @@ TODO: can we return this as an undefined value?????
 "
 {
  module Z = 0;
- attrib(Z,"isHomog",intvec(0));
- return (Z);
+ return ( grobj(Z,intvec(0)) );
 }
 
 proc grpower(def A, int p)
@@ -652,11 +625,8 @@ direct sum of graded modules
   
   module T; T[r] = 0; T = T, module(transpose(B));
   module AB = module(A), transpose(T);
-
-  attrib(AB, "isHomog", c);
-  attrib(AB, "rank", size(c));
   
-  return(AB);
+  return(grobj(AB, c));
 }
 example
 { "EXAMPLE:"; echo = 2; int assumeLevel = 5;
@@ -665,22 +635,19 @@ example
 
   grview(grpower( grshift(grzero(), 10), 5 ) );
   
-  module A = [x+y, x, 0, 0], [0, x+y, y, 0];
-  attrib(A,"isHomog", intvec(0,0,0,1));
-  attrib(A,"rank", 4);
+  module A = grobj( module([x+y, x, 0, 0], [0, x+y, y, 0]), intvec(0,0,0,1) );  
   grview(A);
   
-  matrix B[3][1] = 0,x,y;
-  attrib(B,"isHomog", intvec(2,1,1));
+  module B = grobj( module([0,x,y]), intvec(15,1,1) );
   grview(B);
 
-  def C = grsum(A,B);
+  module C = grsum(A,B);
 
   print(C);
   homog(C);
   grview(C);
 
-  def D = grsum(
+  module D = grsum(
      grsum(grpower(A,2), grtwist(1,1)), 
      grsum(grtwist(1,2), grpower(B,2))
      );
@@ -689,23 +656,30 @@ example
   homog(D);
   grview(D);
 
-  def D10 = grshift(D, 10);
+  module D10 = grshift(D, 10);
 
   print(D10);
   homog(D10);
   grview(D10);
 
-  def DD = grorder(D10);
+  module DD = grorder(D10);
 
   print(DD);
   homog(DD);
   grview(DD);
 
-  def TTT = grtranspose(DD);
+  module TTT = grtranspose(DD);
 
   print(TTT);
   homog(TTT);
   grview(TTT);
+
+  module F = grobj( module([x,y,0]), intvec(1,1,5) );
+  grview(B);
+  
+  module T = grsum( F, grsum( grtwist(1, 10), B ) );
+  grview(T);
+
 }
 
 proc grshift( def M, int d)
@@ -714,8 +688,7 @@ shift graded module M by delta so that 1 is in M_d
 "
 {
   intvec a = attrib(M, "isHomog");
-  attrib(M, "isHomog", intvec( a + intvec(d:size(a))) );
-  return (M);
+  return (grobj(M, intvec( a + intvec(d:size(a))) ));
 }
 
 proc grisequal (def A, def B)
@@ -730,9 +703,16 @@ matrix presentation for twisted polynomial ring S(d)^a
 "
 {
   module Z; Z[a] = 0; 
-  attrib(Z, "isHomog", intvec(d:a));
-  attrib(Z, "rank", a);
+  Z = grobj(Z, intvec(d:a));
 
   ASSUME(2, grisequal(Z, grpower( grshift(grzero(), d), a ) )); // optional check
   return(Z); 
-}  
+}
+
+proc grobj(module M, intvec w)
+""
+{
+  attrib(M, "isHomog", w);
+  attrib(M, "rank", size(w));
+  return (M);
+}
