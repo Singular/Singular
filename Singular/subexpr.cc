@@ -1806,7 +1806,7 @@ int sleftv::Eval()
     }
     else
     {
-      sleftv tmp;
+      sleftv tmp; tmp.Init();
       int toktype=iiTokType(d->op);
       if ((toktype==CMD_M)
       ||( toktype==ROOT_DECL_LIST)
