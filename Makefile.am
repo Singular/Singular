@@ -7,9 +7,9 @@ endif
 SUBDIRS = resources omalloc xalloc $(USE_FACTORY) \
 libpolys gfanlib IntegerProgramming \
 kernel Singular \
-dox emacs debian redhat desktop
+dox emacs desktop
 
-EXTRA_DIST = README README.md autogen.sh git-version-gen doxy
+EXTRA_DIST = README README.md README.pkg autogen.sh git-version-gen doxy singular.spec.in
 
 bin_SCRIPTS = libsingular-config
 

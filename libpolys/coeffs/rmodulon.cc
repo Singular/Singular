@@ -33,7 +33,7 @@ void    nrnDelete      (number *a, const coeffs r);
 BOOLEAN nrnGreaterZero (number k, const coeffs r);
 number  nrnMult        (number a, number b, const coeffs r);
 number  nrnInit        (long i, const coeffs r);
-int     nrnInt         (number &n, const coeffs r);
+long    nrnInt         (number &n, const coeffs r);
 number  nrnAdd         (number a, number b, const coeffs r);
 number  nrnSub         (number a, number b, const coeffs r);
 void    nrnPower       (number a, int i, number * result, const coeffs r);
@@ -117,7 +117,7 @@ static void nrnKillChar(coeffs r)
 coeffs nrnQuot1(number c, const coeffs r)
 {
     coeffs rr;
-    int ch = r->cfInt(c, r);
+    long ch = r->cfInt(c, r);
     mpz_t a,b;
     mpz_init_set(a, r->modNumber);
     mpz_init_set_ui(b, ch);
@@ -260,9 +260,9 @@ int nrnSize(number a, const coeffs)
 /*
  * convert a number to int
  */
-int nrnInt(number &n, const coeffs)
+long nrnInt(number &n, const coeffs)
 {
-  return (int)mpz_get_si((mpz_ptr) n);
+  return mpz_get_si((mpz_ptr) n);
 }
 
 /*

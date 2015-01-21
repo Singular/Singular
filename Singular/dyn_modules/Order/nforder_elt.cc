@@ -142,7 +142,7 @@ static int EltSize(number n, const coeffs r)
   return NULL;
 }
    /// convertion to int, 0 if impossible
-static int EltInt(number &n, const coeffs r)
+static long EltInt(number &n, const coeffs r)
 
 {
   Werror("%s called\n", __func__);

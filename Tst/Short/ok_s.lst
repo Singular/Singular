@@ -1,4 +1,5 @@
 abusalem
+bug_ecart
 bug_misc
 bug_minpoly
 bug_newstruct
@@ -27,6 +28,8 @@ bug_tr666
 bug_tr667
 bug_tr668
 bug_tr671
+bug_tr679
+bug_tr686
 bug_genus_etc
 facstd
 fermat_gcd_1var

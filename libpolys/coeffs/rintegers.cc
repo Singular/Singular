@@ -37,7 +37,7 @@ void    nrzDelete      (number *a, const coeffs r);
 BOOLEAN nrzGreaterZero (number k, const coeffs r);
 number  nrzMult        (number a, number b, const coeffs r);
 number  nrzInit        (long i, const coeffs r);
-int     nrzInt         (number &n, const coeffs r);
+long    nrzInt         (number &n, const coeffs r);
 number  nrzAdd         (number a, number b, const coeffs r);
 number  nrzSub         (number a, number b, const coeffs r);
 void    nrzPower       (number a, int i, number * result, const coeffs r);
@@ -160,6 +160,7 @@ void nrzDelete(number *a, const coeffs)
 
 number nrzCopy(number a, const coeffs)
 {
+  if (a==NULL) return NULL;
   mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
   mpz_init_set(erg, (mpz_ptr) a);
   return (number) erg;
@@ -181,9 +182,9 @@ int nrzSize(number a, const coeffs)
 /*
  * convert a number to int
  */
-int nrzInt(number &n, const coeffs)
+long nrzInt(number &n, const coeffs)
 {
-  return (int) mpz_get_si( (mpz_ptr)n);
+  return mpz_get_si( (mpz_ptr)n);
 }
 
 number nrzAdd (number a, number b, const coeffs)
@@ -467,7 +468,7 @@ static char* nrzCoeffString(const coeffs)
 
 coeffs nrzQuot1(number c, const coeffs r)
 {
-    int ch = r->cfInt(c, r);
+    long ch = r->cfInt(c, r);
     mpz_ptr dummy;
     dummy = (mpz_ptr) omAlloc(sizeof(mpz_t));
     mpz_init_set_ui(dummy, ch);
@@ -1068,10 +1069,10 @@ int nrzSize(number a, const coeffs)
 /*
  * convert a number to int
  */
-int nrzInt(number &n, const coeffs)
+long nrzInt(number &n, const coeffs)
 {
   if (n_Z_IS_SMALL(n)) return SR_TO_INT(n);
-  return (int) mpz_get_si( (mpz_ptr)n);
+  return mpz_get_si( (mpz_ptr)n);
 }
 #if CF_DEBUG
 number _nrzAdd(number, number, const coeffs);
@@ -1691,7 +1692,7 @@ coeffs nrzQuot1(number c, const coeffs r)
     dummy = (mpz_ptr) omAlloc(sizeof(mpz_t));
     if(n_Z_IS_SMALL(c))
     {
-      int ch = r->cfInt(c, r);
+      long ch = r->cfInt(c, r);
       mpz_init_set_ui(dummy, ch);
     }
     else

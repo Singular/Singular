@@ -207,6 +207,7 @@ LIB "polymake.lib";
 LIB "primdec.lib";
 LIB "absfact.lib";
 LIB "hnoether.lib";
+LIB "ring.lib";
 //////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1018,10 +1019,9 @@ EXAMPLE:   example puiseuxExpansion;   shows an example"
   if ((1<var(1)) or (1<var(2)))
   {
     def GLOBALRING=basering;
-    number mp=minpoly;
-    execute("ring LOCALRING=("+charstr(basering)+"),("+varstr(basering)+"),ds;");
+    def LOCALRING=changeordTo(GLOBALRING,"ds");
+    setring LOCALRING;
     poly f=imap(GLOBALRING,f);
-    minpoly=imap(GLOBALRING,mp);
   }
   // check if a substitution is necessary
   int noResubst;
@@ -7153,7 +7153,7 @@ RETURN:      list, containing strings representing the numbers a and b scaled
                    larger than c
 NOTE:        the procedure is called by texDrawTropical"
 {
-  execute("ring REALRING=(real,50,100),x,lp;");
+  ring REALRING=(real,50,100),x,lp;
   execute("number aa,bb,cc="+AA[1]+","+AA[2]+","+AA[3]+";");
   number ascale,bscale=1,1;
   if ((aa>cc) or (aa<-cc))
@@ -7186,7 +7186,7 @@ ASSUME:      a and b are strings representing decimal numbers
 RETURN:      string, the string representing the larger of the two numbers a or b
 NOTE:        the procedure is called by texDrawTropical"
 {
-  execute("ring REALRING=(real,50,100),x,lp;");
+  ring REALRING=(real,50,100),x,lp;
   execute("poly aa,bb="+a+","+b+";");
   if (aa<bb)
   {

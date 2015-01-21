@@ -599,18 +599,13 @@ static proc SSinit(def M)
     attrib(M);
   }
 
-  int @IS_A_SB = attrib(M, "isSB"); // ??? only if all weights were zero?!
-
-  if( !@IS_A_SB )
-  {
-    def opts = option(get);
-    option(redSB); option(redTail);
-    M = std(M);
-    option(set, opts);
-    kill opts;
-  }
-
-  M = simplify(M, 1 + 2 + 4 + 32);
+  def opts = option(get); 
+  option(redSB); option(redTail);
+    M = simplify(interred(groebner(M)), 1 + 2 + 4 + 32); // NOTE: we require interreduced GB for input
+  option(set, opts); kill opts;
+  
+//  int @IS_A_SB = attrib(M, "isSB");  if( !@IS_A_SB )  {  } else  {  }
+// attrib(M, "isSB", 1);
 
   if( @IGNORETAILS )
   {
@@ -785,6 +780,15 @@ static proc SSinit(def M)
   {
     attrib(S, "HYBRIDNF", 0);
   }
+
+  if( typeof( attrib(SSinit, "NOCACHING") ) == "int" )
+  {
+    attrib(S, "NOCACHING", attrib(SSinit, "NOCACHING") );
+  } else
+  {
+    attrib(S, "NOCACHING", 0);
+  }
+  
 
   // maybe resetting existing ring attributes!
   attrib(S, "DEBUG", @DEBUG);
@@ -2747,6 +2751,9 @@ static proc testSimple(list #)
   def DEBUG = 0;
   if(size(#) > 0) { DEBUG = #[1]; }
 
+  def TREE = 0;
+  if(size(#) > 1) { TREE = #[2]; }
+
   system("--min-time", "0.01");
   system("--ticks-per-sec", 100);
 
@@ -2757,9 +2764,11 @@ static proc testSimple(list #)
   attrib(SSinit, "SYZCHECK", (DEBUG > 0) );
   attrib(SSinit, "KERCHECK", (DEBUG > 0) );
 
-  attrib(SSinit, "TREEOUTPUT", 0);
+  attrib(SSinit, "TREEOUTPUT", TREE);
   attrib(SSinit, "PROFILE", 0);
   attrib(SSinit, "IGNORETAILS", 0); // not only frame
+  
+  attrib(SSinit, "NOCACHING", 0);
 
   int @treeout = attrib(SSinit, "TREEOUTPUT");
 
@@ -2806,6 +2815,20 @@ static proc testSimple(list #)
   // medium: AGR@101n3d004s009%1;
   M = a*b+7*a*c-16*b*c-27*a*d+37*b*d-2*c*d, d^3, c*d^2, b*d^2, a*d^2, c^2*d, b*c*d, a*c*d, b^2*d, a^2*d, c^3, b*c^2, a*c^2, b^2*c, a^2*c, b^3, a^3;
   TestSSresAttribs(M, "medium: AGR@101n3d004s009%1");
+
+  kill AGR;
+
+
+  string Name = "bordiga"; int @p=31991; ring R = (@p),(x,y,z,u,v), dp;
+  ideal I = -x2y+26/17xy2+70/17y3+96/121x2z+63/82xyz+115/11y2z-8114xz2-40/79yz2+16/125z3+3023x2u-123/70xyu+3395y2u-81/119xzu-23/66yzu+3626z2u+18/53xu2+111/58yu2-34/39zu2+53/40u3-94/17x2v-10/19xyv+81/88y2v-91/33xzv-9967yzv-103/4z2v-26/109xuv+69/97yuv+92/17zuv-19/96u2v+10/21xv2+6147yv2+32/113zv2-79/82uv2-77/51v3,4347x2y-9017xy2+11327y3+18/79x2z-93/43xyz-35/47y2z+14704xz2+10727yz2-1764z3-612x2u+20/107xyu-103/89y2u-39/2xzu+2345yzu+10251z2u-9984xu2-10299yu2+113/118zu2+37/91u3+2/31x2v+9552xyv-47/100y2v-3242xzv+113/27yzv-11271z2v-13/79xuv+15917yuv+5/114zuv+103/119u2v-21/55xv2-59/19yv2+101/68zv2-7817uv2-112/29v3,7228x2y-111/113xy2+5913y3+6/43x2z-11251xyz+27/121y2z+97/96xz2-7398yz2-97/114z3+38/15x2u+5005xyu-41/126y2u-61/116xzu+89/9yzu-4087z2u+26/15xu2-92/103yu2+21/68zu2-4027u3+97/91x2v+5150xyv-4/47y2v-2310xzv+7307yzv-77/86z2v+30/83xuv+413yuv-50zuv-103/106u2v+105/73xv2-109/98yv2+59/63zv2+715uv2+963v3,x3+3487x2y-9744xy2-13276y3-15213x2z-118/51xyz+101/104y2z+2754xz2+9111yz2-17/94z3+11136x2u-43/82xyu-9/41y2u-7306xzu-6839yzu+5692z2u-14682xu2+37/80yu2-85/97zu2-6186u3+34/15x2v+84/109xyv+5086y2v+27/112xzv-3/40yzv+19/120z2v+11222xuv+38/55yuv-24/83zuv+15814u2v-111/61xv2+49/44yv2+125/81zv2+1933uv2-19/71v3;
+  TestSSresAttribs(I, Name);
+  kill @p, Name, R;  
+
+  string Name = "rat.d8.g6"; int @p=31991; ring R = (@p),(x,y,z,u,v), dp;
+  ideal I = -19/125x2y2-87/119xy3-97/21y4+36/53x2yz+2069xy2z-59/50y3z-65/33x2z2-14322xyz2+79/60y2z2-9035xz3-14890yz3+87/47z4-23/48x2yu+45/44xy2u+1972y3u+79/118x2zu-5173xyzu+115/121y2zu+1239xz2u-115/17yz2u-15900z3u-78/95x2u2+67/101xyu2-12757y2u2+12752xzu2+68/21yzu2+103/90z2u2-12917xu3+97/92yu3-24/49zu3-13/79u4-51/61x2yv-3103xy2v+77/117y3v+73/115x2zv-79/33xyzv+123/110y2zv+11969xz2v-31/95yz2v-123/95z3v-105/124x2uv+12624xyuv+2/63y2uv+6579xzuv+13/62yzuv+4388z2uv-12747xu2v-26/105yu2v-78/61zu2v-125/53u3v-5/71xyv2+62/77y2v2+21/44xzv2-9806yzv2+3/91z2v2+361xuv2+568yuv2+2926zuv2+53/38u2v2-14523yv3+2082zv3+113/115uv3,108/73x2y2+4028xy3+38/43y4-1944x2yz+39/80xy2z+8/109y3z+52/27x2z2+103/45xyz2+5834y2z2+63/101xz3+107/80yz3+1178z4-1/6x2yu+78/25xy2u-21/43y3u+50/71x2zu-14693xyzu+15074y2zu+9/103xz2u-7396yz2u-14493z3u+93/25x2u2+61/4xyu2-11306y2u2-79/81xzu2+59/82yzu2-5/106z2u2+89/71xu3-34/11yu3+15/103zu3-115/52u4-54/65x2yv+67/16xy2v-7/68y3v-10/13x2zv+32/85xyzv+1/91y2zv+107/118xz2v+7594yz2v-98/103z3v+9919x2uv-965xyuv+53/34y2uv+119/11xzuv-3400yzuv-8329z2uv+75/98xu2v-24yu2v+55/87zu2v-82/71u3v-73/115x2v2+85/19xyv2-213y2v2-7704xzv2-15347yzv2+14960z2v2+15065xuv2-125/17yuv2+32/83zuv2-14/73u2v2-21/44xv3+79/2yv3-61/32zv3+46/119uv3-2082v4,9/20x2y2+113/71xy3-88/65y4+9983x2yz-6722xy2z+87/68y3z+1893x2z2+65/32xyz2+51/55y2z2-102/53xz3+58/5yz3-7187z4-96/7x2yu-14/87xy2u-3532y3u+95/54x2zu+19/65xyzu-6728y2zu+31/121xz2u+73/106yz2u-91/5z3u-12928x2u2+707xyu2-55/48y2u2-96/25xzu2+15869yzu2-20/107z2u2-10030xu3-13786yu3-122/9zu3+19/59u4-7/52x2yv+101/74xy2v+83/6y3v-91/55x2zv-5266xyzv+85/61y2zv+126/95xz2v+56/51yz2v+13073z3v-50/21x2uv-13553xyuv-116/53y2uv+68/71xzuv-111/98yzuv-11037z2uv+68/121xu2v-124/53yu2v+54/55zu2v+5862u3v+12318x2v2-119/29xyv2+101/17y2v2-51/40xzv2-82/33yzv2-30/41z2v2-29/52xuv2+7817yuv2+8121zuv2-28/99u2v2+1125xv3-73/55yv3-14141zv3+8742uv3-1203v4,x2y2+11357xy3+295y4+144x2yz-31/54xy2z+89/119y3z+1/46x2z2+29/26xyz2+1384y2z2+1461xz3+113/91yz3+9494z4-7/32x2yu+12850xy2u-3626y3u-33/106x2zu-7/60xyzu-5935y2zu-8597xz2u+5527yz2u+1708z3u+6182x2u2-15780xyu2+4669y2u2-38/69xzu2+8412yzu2+9265z2u2-5679xu3-67/18yu3-34/67zu3-7178u4+113/56x2yv-3669xy2v+17/113y3v-87/35x2zv-4871xyzv-111/11y2zv-1131xz2v-72/13yz2v+838z3v-115/4x2uv+3395xyuv-43/68y2uv-82/13xzuv+7042yzuv-88/119z2uv+100/19xu2v+24/11yu2v+89/3zu2v+7395u3v-119/109x2v2+1/104xyv2+18/25y2v2+700xzv2-59/9yzv2-92/87z2v2+2486xuv2-67/103yuv2+1469zuv2-101/91u2v2-79/33xv3+10838yv3+81/4zv3-11843uv3+7204v4,19/125x3-15698x2y-22/117xy2-95/107y3+2027x2z-7750xyz+85/104y2z-15326xz2+31/101yz2+67/81z3-7879x2u-112/115xyu+124/81y2u+99/61xzu-7458yzu+40/33z2u-1502xu2+6591yu2-7/73zu2-42/95u3+93/83x2v-15/112xyv-84/95y2v+35/36xzv+5/24yzv-12768z2v+13232xuv-76/103yuv-79/52zuv-7217u2v+75/92xv2-49/64yv2+17/14zv2-6109uv2+1695v3;
+  TestSSresAttribs(I, Name);
+  kill R, Name, @p;
+
 
   if( @treeout)
   {

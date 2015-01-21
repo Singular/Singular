@@ -1196,17 +1196,8 @@ EXAMPLE: example zero_decomp; shows an example
       {
         for(@n=1;@n<=size(lres0) div 2;@n++)
         {
-          if(specialIdealsEqual(lres0[2*@n-1],lres0[2*@n])==1)
-          {
-            lres0[2*@n-1]=groebner(lres0[2*@n-1]);
-            lres0[2*@n]=lres0[2*@n-1];
-            attrib(lres0[2*@n],"isSB",1);
-          }
-          else
-          {
-            lres0[2*@n-1]=groebner(lres0[2*@n-1]);
-            lres0[2*@n]=groebner(lres0[2*@n]);
-          }
+          lres0[2*@n-1]=groebner(lres0[2*@n-1]);
+          lres0[2*@n]=groebner(lres0[2*@n]);
         }
       }
       primary=primary+lres0;
@@ -1888,24 +1879,31 @@ EXAMPLE: example prepareQuotientring; shows an example
     list rl2=rl[2];
     rl[1]=list(p,
             list(rl2[nnp+1..nvars(basering)]),
-	    list(list("lp",1:(nvars(basering)-nnp))),
-	    ideal(0));
+            list(list("lp",1:(nvars(basering)-nnp))),
+            ideal(0));
     rl[2]=list(rl2[1..nnp]);
     rl[3]=list(list(order,1:nnp),list("C",0));
   }
   else
   {
     if (typeof(rl[1])=="list")
-    list rl1=rl[1];
-    list rl2=rl[2];
-    rl1[1]=list(rl1[1][1],
-            rl[1][2]+list(rl2[nnp+1..nvars(basering)]),
-	    list(list("lp",1:(size(rl[1][2])+nvars(basering)-nnp))),
-	    ideal(0));
-    rl[1]=rl1;
-    rl[2]=list(rl2[1..nnp]);
-    rl[3]=list(list(order,1:nnp),list("C",0));
+    {
+        list rl1=rl[1];
+        list rl2=rl[2];
+        rl1=list(rl1[1][1],
+                rl[1][2]+list(rl2[nnp+1..nvars(basering)]),
+                list(list("lp",1:(size(rl[1][2])+nvars(basering)-nnp))),
+                ideal(0));
+        rl[1]=rl1;
+        rl[2]=list(rl2[1..nnp]);
+        rl[3]=list(list(order,1:nnp),list("C",0));
+    }
+    else
+    {
+        ERROR("Unexpected case in prepareQuotientring. Please inform the authors");
+    }
   }
+
   def quotring=ring(rl);
   return(quotring);
 }
@@ -1952,9 +1950,8 @@ EXAMPLE: example minAssPrimes; shows an example
    map phi=@P,qr[2];
    i=qr[1];
 
-   execute ("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),("
-             +ordstr(basering)+");");
-
+   def gnir=ring(ringlist(@P));
+   setring gnir;
 
    ideal i=fetch(@P,i);
    if(size(#)==0)
@@ -2424,8 +2421,8 @@ EXAMPLE:example equidim; shows an example
   if(((homo==1)||(a==1))&&(find(ordstr(basering),"l")==0)
                                 &&(find(ordstr(basering),"s")==0))
   {
-     execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),("
-                              +ordstr(basering)+");");
+     def gnir=ring(ringlist(basering));
+     setring gnir;
      ideal i=imap(P,i);
      ideal j=i;
      if(a==1)
@@ -2529,8 +2526,8 @@ EXAMPLE: example equidimMax; shows an example
   if(((homo==1)||(a==1))&&(find(ordstr(basering),"l")==0)
                                 &&(find(ordstr(basering),"s")==0))
   {
-     execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),("
-                              +ordstr(basering)+");");
+     def gnir=ring(ringlist(basering));
+     setring gnir;
      ideal i=imap(P,i);
      ideal j=i;
      if(a==1)
@@ -2644,6 +2641,9 @@ proc algeDeco(ideal i, int w)
    ASSUME(0, not isQuotientRing(basering) ) ;
    ASSUME(0, hasGlobalOrdering(basering) ) ;
 
+// the really needed things:
+   ASSUME(1, typeof(ringlist(basering)[1])=="list"); // in alg. extension
+
 //reduces primery decomposition over algebraic extensions to
 //the other cases
    def R=basering;
@@ -2687,11 +2687,13 @@ proc algeDeco(ideal i, int w)
       }
    }
 //---Ende Provisorium
-   string mp="poly @p="+string(minpoly)+";";
-   string gnir="ring RH="+string(char(R))+",("+varstr(R)+","+string(par(1))
-                +"),dp;";
-   execute(gnir);
-   execute(mp);
+   list R_l=ringlist(R);
+   ideal @p=R_l[1][4]; // minpoly
+   R_l[2]=R_l[2]+R_l[1][2]; // vars
+   R_l[1]=R_l[1][1];  // char
+   R_l[3]=list(list("dp",1:size(R_l[2])),list("C",0)); // ord
+   def RH=ring(R_l); kill R_l;setring RH;
+   ideal @pp=imap(R,@p); poly @p=@pp[1];
    ideal i=imap(R,i);
    ideal I=subst(i,var(nvars(basering)),0);
    int j;
@@ -2703,9 +2705,11 @@ proc algeDeco(ideal i, int w)
    {
      setring R;
      kill RH;
-     kill gnir;
-     string gnir="ring RH="+string(char(R))+",("+varstr(R)+"),dp;";
-     execute(gnir);
+     // remove extension, set order to dp:
+     list R_l=ringlist(R);
+     R_l[1]=R_l[1][1]; // char
+     R_l[3]=list(list("dp",1:nvars(R)),list("C",0)); // ord
+     def RH=ring(R_l); kill R_l; setring RH;
      ideal i=imap(R,i);
      ideal J;
    }
@@ -2731,9 +2735,11 @@ proc algeDeco(ideal i, int w)
 
    if(n<nvars(basering))
    {
-      gnir="ring RS="+string(char(R))+",("+varstr(RH)
-                +"),(dp("+string(n)+"),lp);";
-      execute(gnir);
+      // remove extension, set order to dp(n),lp:
+      list R_l=ringlist(basering);
+      if (typeof(R_l[1])=="list") { R_l[1]=R_l[1][1]; }
+      R_l[3]=list(list("dp",1:n),list("lp",1:(nvars(basering)-n)),list("C",0));
+      def RS=ring(R_l); kill R_l; setring RS;
       list pr=imap(RH,pr);
       ideal K;
       for(j=1;j<=size(pr);j++)
@@ -3135,7 +3141,12 @@ EXAMPLE: example decomp; shows an example
   ideal jkeep=@j;
   if(ordstr(@P)[1]=="w")
   {
-    execute("ring @Phelp=("+charstr(gnir)+"),("+varstr(gnir)+"),("+ordstr(@P)+");");
+    list gnir_l=ringlist(gnir);
+    list @P_l=ringlist(@P);
+    gnir_l[3]=@P_l[3]; // ord
+    def @Phelp=ring(gnir_l);
+    setring @Phelp;
+    kill gnir_l,@P_l;
   }
   else
   {
@@ -3176,8 +3187,8 @@ EXAMPLE: example decomp; shows an example
     //this is the good case, nothing to do, just to have the same notations
     //change the ring
     {
-      execute("ring gnir1 = ("+charstr(basering)+"),("+varstr(basering)+"),("
-                              +ordstr(basering)+");");
+      def gnir1=ring(ringlist(basering));
+      setring gnir1;
       ideal @j=fetch(gnir,@j);
       attrib(@j,"isSB",1);
       ideal ser=fetch(gnir,ser);
@@ -3491,8 +3502,8 @@ EXAMPLE: example decomp; shows an example
            //the good case, nothing to do, just to have the same notations
            //change the ring
         {
-          execute("ring gnir1 = ("+charstr(basering)+"),("+
-               varstr(basering)+"),("+ordstr(basering)+");");
+          def gnir1=ring(ringlist(basering));
+          setring gnir1;
           ideal @j=fetch(gnir,jkeep);
           attrib(@j,"isSB",1);
         }
@@ -3850,11 +3861,11 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
- proc zeroRad(ideal I,list #)
+proc zeroRad(ideal I,list #)
 "USAGE:  zeroRad(I) , I a zero-dimensional ideal
- RETURN: the radical of I
- NOTE:  Algorithm of Kemper
- EXAMPLE: example zeroRad; shows an example
+RETURN: the radical of I
+NOTE:  Algorithm of Kemper
+EXAMPLE: example zeroRad; shows an example"
 {
    ASSUME(0, hasFieldCoefficient(basering) );
    ASSUME(0, not isQuotientRing(basering) ) ;
@@ -3890,15 +3901,18 @@ example
 
    for(i=1;i<=n;i++)
    {
-      l[i]=sep(F[i],i);
-      F[i]=l[i][1];
-      if(l[i][2]>k){k=l[i][2];}  //computation of the maximal k
+     l[i]=sep(F[i],i);
+     F[i]=l[i][1];
+     if(l[i][2]>k){k=l[i][2];}  //computation of the maximal k
    }
 
    if((k==0)||(m==0)) //the separable case
    {
-    intvec save=option(get);option(redSB);
-    I=interred(I+F);option(set,save);return(I);
+     intvec save=option(get);
+     option(redSB);
+     I=interred(I+F);
+     option(set,save);
+     return(I);
    }
    //I=simplify(I,1);
 
@@ -3911,12 +3925,7 @@ example
    execute(cR);
    ideal F=imap(R,F);
 
-   string nR1="ring @S1="+string(p)+",("+varstr(R)+","+parstr(R)+",@y(1..m)),dp;";
-   execute(nR1);
-   list lR=ringlist(@S1)[2];
-   lR=lR[(size(lR)-m+1)..(size(lR))];
-
-   string nR="ring @S="+string(p)+",("+string(lR)+","+varstr(R)+","+parstr(R)+"),dp;";
+   string nR="ring @S="+string(p)+",(@y(1..m),"+varstr(R)+","+parstr(R)+"),dp;";
    execute(nR);
 
    ideal G=fetch(@R,F);    //G[i](t(1)^(p^-k),...,t(m)^(p^-k),x(i))=sep(F[i])
@@ -3927,8 +3936,8 @@ example
    k=p^k;
    for(i=1;i<=m;i++)
    {
-      J=J,var(i)^k-var(m+n+i);
-      el=el*var(i);
+     J=J,var(i)^k-var(m+n+i);
+     el=el*var(i);
    }
 
    J=eliminate(J,el);
@@ -4116,36 +4125,32 @@ RETURN:  ideal, the annihilator of Ext^n(R/I,R) with given
 {
 
   if(n < 0)
-    {
-      ideal ann = ideal(1);
-      return(ann);
-    }
+  {
+    return(ideal(1));
+  }
   int l = size(re);
 
   if(n < l)
+  {
+    matrix f = transpose(re[n+1]);
+    if(n == 0)
     {
-      matrix f = transpose(re[n+1]);
-      if(n == 0)
-        {
-          matrix g = 0*gen(ncols(f));
-        }
-      else
-        {
-          matrix g = transpose(re[n]);
-        }
-      module k = syz(f);
-      ideal ann = quotient1(g,k);
-      return(ann);
+      matrix g = matrix(0,1,ncols(f));
     }
+    else
+    {
+      matrix g = transpose(re[n]);
+    }
+    module k = syz(f);
+    return(quotient1(g,k));
+  }
 
   if(n == l)
-    {
-      ideal ann = Ann(transpose(re[n]));
-      return(ann);
-    }
+  {
+    return(Ann(transpose(re[n])));
+  }
 
-  ideal ann = ideal(1);
-  return(ann);
+  return(ideal(1));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -6277,8 +6282,8 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
     //this is the good case, nothing to do, just to have the same notations
     //change the ring
     {
-      execute("ring gnir1 = ("+charstr(basering)+"),("+varstr(basering)+"),("
-                              +ordstr(basering)+");");
+      def gnir1=ring(ringlist(basering));
+      setring gnir1;
       ideal @j = fetch(@P, I);
       attrib(@j, "isSB", 1);
     }
@@ -6823,7 +6828,7 @@ EXAMPLE: example zerodec; shows an example
   execute("ring P1=("+charstr(R)+"),T,dp;");
   matrix n=imap(R,n);
   time = timer;
-  poly charpol=det(n-T*freemodule(d));
+  poly charpol=det(n-var(1)*freemodule(d));
   dbprint(printlevel-voice+2,"// time for computing char poly: "+
          string(timer-time));
 //------------------- factorize characteristic polynomial -------------------
@@ -6855,7 +6860,7 @@ EXAMPLE: example zerodec; shows an example
     intvec ov=option(get);;
     option(redSB);
     list re1;
-    ideal new = T-imap(R,p),imap(R,J);
+    ideal new = var(1)-imap(R,p),imap(R,J);
     attrib(new, "isSB",1);    //we know that new is a standard basis
     for(j=1;j<=f;j++)
     {
@@ -7039,7 +7044,8 @@ EXAMPLE: example newDecompStep; shows an example
   int lp=islp();
 
   op@P = option(get);
-  execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),(C,lp);");
+  def gnir=changeordTo(basering,"lp");
+  setring gnir;
 
   op=option(get);
   option(redSB);
@@ -7141,8 +7147,8 @@ EXAMPLE: example newDecompStep; shows an example
       result = newDecompStep(@j, indepOption, intersectOption, @wr);
       if (intersectOption == "intersect")
       {
-       list pr = result[1];
-       ideal intersection = result[2];
+        list pr = result[1];
+        ideal intersection = result[2];
       }
       else
       {
@@ -7337,11 +7343,13 @@ EXAMPLE: example newDecompStep; shows an example
   ideal jkeep=@j;
   if(ordstr(@P)[1]=="w")
   {
-    execute("ring @Phelp=("+charstr(gnir)+"),("+varstr(gnir)+"),("+ordstr(@P)+");");
+    def @Phelp=ring(ringlist(gnir));
+    setring @Phelp;
   }
   else
   {
-    execute( "ring @Phelp=("+charstr(gnir)+"),("+varstr(gnir)+"),(C,dp);");
+    def @Phelp=changeordTo(gnir,"dp");
+    setring @Phelp;
   }
 
   if(homo==1)
@@ -7516,8 +7524,8 @@ EXAMPLE: example newDecompStep; shows an example
            //the good case, nothing to do, just to have the same notations
            //change the ring
            {
-              execute("ring gnir1 = ("+charstr(basering)+"),("+
-                varstr(basering)+"),("+ordstr(basering)+");");
+              def gnir1=ring(ringlist(basering));
+              setring gnir1;
               ideal @j=fetch(gnir,jkeep);
               attrib(@j,"isSB",1);
            }
@@ -7855,8 +7863,8 @@ static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim,
    //this is the good case, nothing to do, just to have the same notations
    //change the ring
    {
-     execute("ring gnir1 = ("+charstr(basering)+"),("+varstr(basering)+"),("
-                              +ordstr(basering)+");");
+     def gnir1=ring(ringlist(basering));
+     setring gnir1;
      ideal @j = fetch(gnir, @j);
      attrib(@j,"isSB",1);
      ideal ser = fetch(gnir, ser);

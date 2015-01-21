@@ -43,9 +43,6 @@ LINLINE void nlInpMult(number &a, number b, const coeffs r);
 number nlRInit (long i);
 
 
-number   nlInit2 (int i, int j, const coeffs r);
-number   nlInit2gmp (mpz_t i, mpz_t j, const coeffs r);
-
 // number nlInitMPZ(mpz_t m, const coeffs r);
 // void nlMPZ(mpz_t m, number &n, const coeffs r);
 
@@ -56,7 +53,7 @@ number nlExtGcd(number a, number b, number *s, number *t, const coeffs);
 number   nlNormalizeHelper(number a, number b, const coeffs r);   /*special routine !*/
 BOOLEAN  nlGreater(number a, number b, const coeffs r);
 BOOLEAN  nlIsMOne(number a, const coeffs r);
-int      nlInt(number &n, const coeffs r);
+long     nlInt(number &n, const coeffs r);
 number   nlBigInt(number &n);
 
 #ifdef HAVE_RINGS
@@ -82,8 +79,6 @@ number   nlFarey(number nN, number nP, const coeffs CF);
 #ifdef LDEBUG
 BOOLEAN  nlDBTest(number a, const char *f, const int l);
 #endif
-
-extern number nlOne; // FIXME? TODO? //  move into coeffs?
 
 nMapFunc nlSetMap(const coeffs src, const coeffs dst);
 
@@ -180,8 +175,6 @@ number nlShort3_noinline(number x) // assume x->s==3
 }
 
 
-number nlOne=INT_TO_SR(1);
-
 #if (__GNU_MP_VERSION*10+__GNU_MP_VERSION_MINOR < 31)
 void mpz_mul_si (mpz_ptr r, mpz_srcptr s, long int si)
 {
@@ -199,7 +192,7 @@ static number nlMapP(number from, const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(src) == n_Zp );
 
-  number to = nlInit(npInt(from,src), dst); // FIXME? TODO? // extern int     npInt         (number &n, const coeffs r);
+  number to = nlInit(npInt(from,src), dst); // FIXME? TODO? // extern long     npInt         (number &n, const coeffs r);
 
   return to;
 }
@@ -333,12 +326,11 @@ BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs /*r*/)
   //  return FALSE;
   //}
   if (mpz_size1(a->z)>MP_SMALL) return TRUE;
-  LONG ui=(int)mpz_get_si(a->z);
+  LONG ui=(LONG)mpz_get_si(a->z);
   if ((((ui<<3)>>3)==ui)
   && (mpz_cmp_si(a->z,(long)ui)==0))
   {
     Print("!!longrat:im int %d in %s:%d\n",ui,f,l);
-    f=NULL;
     return FALSE;
   }
   return TRUE;
@@ -352,15 +344,8 @@ static CanonicalForm nlConvSingNFactoryN( number n, const BOOLEAN setChar, const
   CanonicalForm term;
   if ( SR_HDL(n) & SR_INT )
   {
-    int nn=SR_TO_INT(n);
-    if ((long)nn==SR_TO_INT(n))
-       term = nn;
-    else
-    {
-        mpz_t dummy;
-        mpz_init_set_si(dummy, SR_TO_INT(n));
-        term = make_cf(dummy);
-    }
+    long nn=SR_TO_INT(n);
+    term = nn;
   }
   else
   {
@@ -394,13 +379,7 @@ static number nlConvFactoryNSingN( const CanonicalForm f, const coeffs r)
 {
   if (f.isImm())
   {
-    const long lz=f.intval();
-    const int iz=(int)lz;
-    if ((long)iz==lz)
-      return nlInit(f.intval(),r);
-    else
-      return nlRInit(lz);
-//    return nlInit(f.intval(),r);
+    return nlInit(f.intval(),r);
   }
   else
   {
@@ -622,34 +601,30 @@ int nlSize(number a, const coeffs)
 /*2
 * convert number to int
 */
-int nlInt(number &i, const coeffs r)
+long nlInt(number &i, const coeffs r)
 {
   nlTest(i, r);
   nlNormalize(i,r);
   if (SR_HDL(i) & SR_INT)
   {
-    int dummy = SR_TO_INT(i);
-    if((long)dummy == SR_TO_INT(i))
-        return SR_TO_INT(i);
-    else
-        return 0;
+    return SR_TO_INT(i);
   }
   if (i->s==3)
   {
     if(mpz_size1(i->z)>MP_SMALL) return 0;
-    int ul=(int)mpz_get_si(i->z);
-    if (mpz_cmp_si(i->z,(long)ul)!=0) return 0;
+    long ul=mpz_get_si(i->z);
+    if (mpz_cmp_si(i->z,ul)!=0) return 0;
     return ul;
   }
   mpz_t tmp;
-  int ul;
+  long ul;
   mpz_init(tmp);
   MPZ_DIV(tmp,i->z,i->n);
   if(mpz_size1(tmp)>MP_SMALL) ul=0;
   else
   {
-    ul=(int)mpz_get_si(tmp);
-    if (mpz_cmp_si(tmp,(long)ul)!=0) ul=0;
+    ul=mpz_get_si(tmp);
+    if (mpz_cmp_si(tmp,ul)!=0) ul=0;
   }
   mpz_clear(tmp);
   return ul;
@@ -966,7 +941,7 @@ number  nlGetUnit (number n, const coeffs r)
 
 coeffs nlQuot1(number c, const coeffs r)
 {
-  int ch = r->cfInt(c, r);
+  long ch = r->cfInt(c, r);
   mpz_ptr dummy;
   dummy = (mpz_ptr) omAlloc(sizeof(mpz_t));
   mpz_init_set_ui(dummy, ch);
@@ -2369,9 +2344,14 @@ LINLINE BOOLEAN nlEqual (number a, number b, const coeffs r)
 LINLINE number nlInit (long i, const coeffs r)
 {
   number n;
+  #if MAX_NUM_SIZE == 60
+  if (((i << 3) >> 3) == i) n=INT_TO_SR(i);
+  else                      n=nlRInit(i);
+  #else
   LONG ii=(LONG)i;
-  if ( ((ii << 3) >> 3) == ii ) n=INT_TO_SR(ii);
-  else                          n=nlRInit(ii);
+  if ( (((long)ii==i) && ((ii << 3) >> 3) == ii )) n=INT_TO_SR(ii);
+  else                                             n=nlRInit(i);
+  #endif
   nlTest(n, r);
   return n;
 }

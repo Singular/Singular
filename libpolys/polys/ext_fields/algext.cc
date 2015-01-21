@@ -87,7 +87,7 @@ BOOLEAN  naIsOne(number a, const coeffs cf);
 BOOLEAN  naIsMOne(number a, const coeffs cf);
 BOOLEAN  naIsZero(number a, const coeffs cf);
 number   naInit(long i, const coeffs cf);
-int      naInt(number &a, const coeffs cf);
+long     naInt(number &a, const coeffs cf);
 number   naNeg(number a, const coeffs cf);
 number   naInvers(number a, const coeffs cf);
 number   naAdd(number a, number b, const coeffs cf);
@@ -355,7 +355,7 @@ number naInit(long i, const coeffs cf)
   else        return (number)p_ISet(i, naRing);
 }
 
-int naInt(number &a, const coeffs cf)
+long naInt(number &a, const coeffs cf)
 {
   naTest(a);
   poly aAsPoly = (poly)a;

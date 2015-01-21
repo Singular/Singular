@@ -1792,8 +1792,18 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 
   if( UNLIKELY( !(  (!OPT__TAILREDSYZ)   ||   m_lcm.Check(multiplier)     )) )
   {
-    if( UNLIKELY(OPT__TAILREDSYZ && OPT__PROT) ) ++ m_stat[5]; // PrintS("%"); // check LCM !
-
+    if( UNLIKELY(OPT__TAILREDSYZ && OPT__PROT) )
+    { 
+      ++ m_stat[5]; // PrintS("%"); // check LCM !
+#ifndef SING_NDEBUG
+      if( OPT__DEBUG )  
+      { 
+        PrintS("\nTT,%:"); dPrint(multiplier, r, r, 0); 
+        PrintS(",  *  :"); dPrint(tail, r, r, 0); 
+        PrintLn(); 
+      }
+#endif
+    }
     return NULL;
   }
 
@@ -1955,7 +1965,19 @@ poly SchreyerSyzygyComputation::ReduceTerm(poly multiplier, poly term4reduction,
 
   if( s == NULL ) // No Reducer?
   {
-    if( UNLIKELY(OPT__TAILREDSYZ && OPT__PROT) ) ++ m_stat[5]; // PrintS("%"); // check LCM !
+    if( UNLIKELY( OPT__TAILREDSYZ && OPT__PROT) ) 
+    { 
+      ++ m_stat[5]; // PrintS("%"); // check LCM !
+#ifndef SING_NDEBUG
+      if( OPT__DEBUG )  
+      { 
+        PrintS("\n%: RedTail("); dPrint(multiplier, r, r, 0);  
+        PrintS(" * : "); dPrint(term4reduction, r,r,0 ); 
+        PrintS(", {  "); dPrint(syztermCheck,r,r,0 );
+        PrintS("  }) ");  PrintLn(); 
+      }
+#endif
+    }
     return NULL;
   }
 
@@ -2015,8 +2037,8 @@ SchreyerSyzygyComputationFlags::SchreyerSyzygyComputationFlags(idhdl rootRingHdl
     OPT__SYZNUMBER( atGetInt(rootRingHdl, "SYZNUMBER", 0) ),
     OPT__TREEOUTPUT( atGetInt(rootRingHdl, "TREEOUTPUT", 0) ),
     OPT__SYZCHECK( atGetInt(rootRingHdl, "SYZCHECK", 0) ),
-    OPT__NOCACHING( atGetInt(rootRingHdl, "NOCACHING", 0) ),
     OPT__PROT(TEST_OPT_PROT),
+    OPT__NOCACHING( atGetInt(rootRingHdl, "NOCACHING", 0) ),
     m_rBaseRing( rootRingHdl->data.uring )
 {
 #ifndef SING_NDEBUG

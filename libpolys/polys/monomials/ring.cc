@@ -1832,7 +1832,7 @@ BOOLEAN rHasSimpleOrderAA(ring r)
 }
 
 // return TRUE if p_SetComp requires p_Setm
-BOOLEAN rOrd_SetCompRequiresSetm(ring r)
+BOOLEAN rOrd_SetCompRequiresSetm(const ring r)
 {
   if (r->typ != NULL)
   {
@@ -1852,7 +1852,7 @@ BOOLEAN rOrd_SetCompRequiresSetm(ring r)
 }
 
 // return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
-BOOLEAN rOrd_is_Totaldegree_Ordering(ring r)
+BOOLEAN rOrd_is_Totaldegree_Ordering(const ring r)
 {
   // Hmm.... what about Syz orderings?
   return (rVar(r) > 1 &&
@@ -1865,7 +1865,7 @@ BOOLEAN rOrd_is_Totaldegree_Ordering(ring r)
 }
 
 // return TRUE if p->exp[r->pOrdIndex] holds a weighted degree of p */
-BOOLEAN rOrd_is_WeightedDegree_Ordering(ring r )
+BOOLEAN rOrd_is_WeightedDegree_Ordering(const ring r )
 {
   // Hmm.... what about Syz orderings?
   return ((rVar(r) > 1) &&
@@ -1874,7 +1874,7 @@ BOOLEAN rOrd_is_WeightedDegree_Ordering(ring r )
            rOrder_is_WeightedOrdering(( rRingOrder_t)r->order[1])));
 }
 
-BOOLEAN rIsPolyVar(int v, ring r)
+BOOLEAN rIsPolyVar(int v,const ring r)
 {
   int  i=0;
   while(r->order[i]!=0)
@@ -3340,6 +3340,28 @@ void p_SetGlobals(const ring r, BOOLEAN complete)
   }
 }
 
+static inline int sign(int x) { return (x > 0) - (x < 0);}
+BOOLEAN rOrd_is_MixedDegree_Ordering(ring r)
+{
+  int i, k;
+  poly p=p_One(r);
+  p_SetExp(p,1,1,r);p_Setm(p,r);
+  int vz=sign(p_FDeg(p,r));
+  for(i=2;i<=rVar(r);i++)
+  {
+    p_SetExp(p,i-1,0,r);
+    p_SetExp(p,i,1,r);
+    p_Setm(p,r);
+    if (sign(p_FDeg(p,r))!=vz)
+    {
+      p_Delete(&p,r);
+      return TRUE;
+    }
+  }
+  p_Delete(&p,r);
+  return FALSE;
+}
+
 BOOLEAN rComplete(ring r, int force)
 {
   if (r->VarOffset!=NULL && force == 0) return FALSE;
@@ -3740,6 +3762,10 @@ BOOLEAN rComplete(ring r, int force)
   // p_Procs: call AFTER NegWeightL
   r->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
   p_ProcsSet(r, r->p_Procs);
+
+  // use totaldegree on crazy oderings:
+  if ((r->pFDeg==p_WTotaldegree) && rOrd_is_MixedDegree_Ordering(r))
+    r->pFDeg = p_Totaldegree;
   return FALSE;
 }
 

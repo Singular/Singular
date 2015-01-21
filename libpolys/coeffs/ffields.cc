@@ -24,7 +24,7 @@ BOOLEAN nfGreaterZero (number k, const coeffs r);
 number  nfMult        (number a, number b, const coeffs r);
 number  nfInit        (long i, const coeffs r);
 number  nfParameter   (int i, const coeffs r);
-int     nfInt         (number &n, const coeffs r);
+long    nfInt         (number &n, const coeffs r);
 number  nfAdd         (number a, number b, const coeffs r);
 number  nfSub         (number a, number b, const coeffs r);
 void    nfPower       (number a, int i, number * result, const coeffs r);
@@ -244,9 +244,9 @@ static int nfParDeg(number n, const coeffs r)
 /*2
 * number -> int
 */
-int nfInt (number &, const coeffs )
+long nfInt (number &n, const coeffs )
 {
-  return 0;
+  return (long)n;
 }
 
 /*2

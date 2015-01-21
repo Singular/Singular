@@ -181,8 +181,8 @@ struct n_Procs_s
    /// how complicated, (0) => 0, or positive
    int     (*cfSize)(number n, const coeffs r);
 
-   /// convertion to int, 0 if impossible
-   int     (*cfInt)(number &n, const coeffs r);
+   /// convertion to long, 0 if impossible
+   long    (*cfInt)(number &n, const coeffs r);
 
    /// Converts a non-negative number n into a GMP number, 0 if impossible
    void     (*cfMPZ)(mpz_t result, number &n, const coeffs r);
@@ -543,7 +543,7 @@ static FORCE_INLINE number n_InitMPZ(mpz_t n,     const coeffs r)
 
 /// conversion of n to an int; 0 if not possible
 /// in Z/pZ: the representing int lying in (-p/2 .. p/2]
-static FORCE_INLINE int n_Int(number &n,       const coeffs r)
+static FORCE_INLINE long n_Int(number &n,       const coeffs r)
 { STATISTIC(n_Int); assume(r != NULL); assume(r->cfInt!=NULL); return r->cfInt(n,r); }
 
 /// conversion of n to a GMP integer; 0 if not possible

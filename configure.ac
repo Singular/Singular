@@ -4,7 +4,7 @@ AC_DEFINE([VERSION_DATE],["Sep 2014"],[release date])
 _AC_SRCDIRS(["$ac_dir"])
 
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_AUX_DIR([.])
+AC_CONFIG_AUX_DIR([build-aux])
 
 AC_CONFIG_SRCDIR([Singular/tesths.cc])
 
@@ -95,7 +95,7 @@ LB_CHECK_FLINT(2.3,,AC_MSG_WARN([Unable to find FLINT (which is strongly recomme
 
 AC_CONFIG_GOOGLE_PERFTOOLS()
 
-## AX_PYTHON_DEFAULT()
+AX_PYTHON_DEFAULT()
 AX_PYTHON_WITH_VERSION([2.4])
 
 LB_CHECK_MATHICGB
@@ -262,9 +262,8 @@ AC_CONFIG_FILES([libsingular-config Singular.pc])
 
 AC_CONFIG_FILES([emacs/Makefile])
 
-AC_CONFIG_FILES([debian/Makefile])
-AC_CONFIG_FILES([redhat/Makefile])
-AC_CONFIG_FILES([redhat/singular.spec])
 AC_CONFIG_FILES([desktop/Makefile desktop/Singular.desktop desktop/Singular-manual.desktop])
+
+AC_CONFIG_FILES([singular.spec])
 
 AC_OUTPUT

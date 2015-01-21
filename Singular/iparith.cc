@@ -238,6 +238,13 @@ extern BOOLEAN expected_parms;
 int iiOp; /* the current operation*/
 
 /*=================== simple helpers =================*/
+static int iin_Int(number &n,coeffs cf)
+{
+  long l=n_Int(n,cf);
+  int i=(int)l;
+  if ((long)i==l) return l;
+  return 0;
+}
 poly pHeadProc(poly p)
 {
   return pHead(p);
@@ -4707,7 +4714,7 @@ static BOOLEAN jjP2I(leftv res, leftv v)
     WerrorS("poly must be constant");
     return TRUE;
   }
-  res->data = (char *)(long)n_Int(pGetCoeff(p),currRing->cf);
+  res->data = (char *)(long)iin_Int(pGetCoeff(p),currRing->cf);
   return FALSE;
 }
 static BOOLEAN jjPREIMAGE_R(leftv res, leftv v)
@@ -5404,14 +5411,14 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 static BOOLEAN jjnInt(leftv res, leftv u)
 {
   number n=(number)u->CopyD(); // n_Int may call n_Normalize
-  res->data=(char *)(long)n_Int(n,currRing->cf);
+  res->data=(char *)(long)iin_Int(n,currRing->cf);
   n_Delete(&n,currRing->cf);
   return FALSE;
 }
 static BOOLEAN jjnlInt(leftv res, leftv u)
 {
   number n=(number)u->Data();
-  res->data=(char *)(long)n_Int(n,coeffs_BIGINT );
+  res->data=(char *)(long)iin_Int(n,coeffs_BIGINT );
   return FALSE;
 }
 /*=================== operations with 3 args.: static proc =================*/

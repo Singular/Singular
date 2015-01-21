@@ -40,7 +40,7 @@ BOOLEAN  ngcIsOne(number a, const coeffs r);
 BOOLEAN  ngcIsMOne(number a, const coeffs r);
 BOOLEAN  ngcIsZero(number za, const coeffs r);
 number   ngcInit(long i, const coeffs r);
-int      ngcInt(number &n, const coeffs r);
+long     ngcInt(number &n, const coeffs r);
 number   ngcNeg(number za, const coeffs r);
 number   ngcInvers(number a, const coeffs r);
 number   ngcParameter(int i, const coeffs r);
@@ -107,11 +107,11 @@ number ngcInit (long i, const coeffs r)
 /*2
 * convert number to int
 */
-int ngcInt(number &i, const coeffs r)
+long ngcInt(number &i, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 
-  return (int)((gmp_complex*)i)->real();
+  return ((gmp_complex*)i)->real();
 }
 
 int ngcSize(number n, const coeffs R)

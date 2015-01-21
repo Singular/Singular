@@ -124,7 +124,7 @@ static inline BOOLEAN npIsZeroM (number  a, const coeffs)
 // }
 
 // The folloing is reused inside gnumpc.cc, gnumpfl.cc and longrat.cc
-int     npInt         (number &n, const coeffs r);
+long    npInt         (number &n, const coeffs r);
 
 // The following is currently used in OPAE.cc, OPAEQ.cc and OPAEp.cc for setting their SetMap...
 nMapFunc npSetMap(const coeffs src, const coeffs dst); // FIXME! BUG?
