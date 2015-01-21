@@ -688,7 +688,7 @@ shift graded module M by delta so that 1 is in M_d
 "
 {
   intvec a = attrib(M, "isHomog");
-  return (grobj(M, intvec( a + intvec(d:size(a))) ));
+  return (grobj(M, intvec( a - intvec(d:size(a))) ));
 }
 
 proc grisequal (def A, def B)
@@ -703,9 +703,9 @@ matrix presentation for twisted polynomial ring S(d)^a
 "
 {
   module Z; Z[a] = 0; 
-  Z = grobj(Z, intvec(d:a));
+  Z = grobj(Z, -intvec(d:a));
 
-  ASSUME(2, grisequal(Z, grpower( grshift(grzero(), d), a ) )); // optional check
+  ASSUME(2, grisequal(Z, grpower( grshift(grzero(), -d), a ) )); // optional check
   return(Z); 
 }
 
