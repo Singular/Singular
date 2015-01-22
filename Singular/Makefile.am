@@ -155,7 +155,8 @@ optional_Singular_programs =
 
 bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 
-all: Singular ESingular TSingular ${abs_builddir}/LIB $(optional_Singular_programs)
+# the following dependency leads to Singular relinking upon a library update!
+Singular ESingular TSingular $(optional_Singular_programs): ${abs_builddir}/LIB
 
 Singular_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
