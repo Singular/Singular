@@ -292,6 +292,40 @@ example
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static proc check_leadmonom_and_size(list L)
+{
+    /*
+     * compare the size of ideals in the list and 
+     * check the corresponding leading monomials
+     * size(L)>=2
+     */
+    ideal J=L[1];
+    int i=size(L);
+    int sc=ncols(J);
+    int j,k;
+    poly g=leadmonom(J[1]);
+    for(j=1;j<=i;j++)
+    {
+        if(ncols(L[j])!=sc)
+        {
+            return(0);
+        }
+    }
+    for(k=2;k<=i;k++)
+    {
+        for(j=1;j<=sc;j++)
+        {
+            if(leadmonom(J[j])!=leadmonom(L[k][j]))
+            {
+                return(0);
+            }
+        }
+    }
+    return(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 static proc LiftPolyCRT(ideal I)
 {
     /*
@@ -323,8 +357,15 @@ static proc LiftPolyCRT(ideal I)
             Lk[j]=I(j);
         }
     }
-    // apply CRT for polynomials
-    II =chinrempoly(Lk,LL),f;
+    if(check_leadmonom_and_size(Lk))
+    {
+        // apply CRT for polynomials
+        II =chinrempoly(Lk,LL),f;
+    }
+    else
+    {
+        II=0;
+    }
     return(II);
 }
 
