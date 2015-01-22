@@ -2553,14 +2553,14 @@ EXAMPLE:example equidim; shows an example
      m=1;
   }
 
-  if(((homo==1)||(a==1))&&(find(ordstr(basering),"l")==0)
+  if(((homo==1)||(a))&&(find(ordstr(basering),"l")==0)
                                 &&(find(ordstr(basering),"s")==0))
   {
      def gnir=ring(ringlist(basering));
      setring gnir;
      ideal i=imap(P,i);
      ideal j=i;
-     if(a==1)
+     if(a)
      {
        attrib(j,"isSB",1);
      }
@@ -2658,14 +2658,14 @@ EXAMPLE: example equidimMax; shows an example
   int a=attrib(i,"isSB");
   int homo=homog(i);
 
-  if(((homo==1)||(a==1))&&(find(ordstr(basering),"l")==0)
+  if(((homo==1)||(a))&&(find(ordstr(basering),"l")==0)
                                 &&(find(ordstr(basering),"s")==0))
   {
      def gnir=ring(ringlist(basering));
      setring gnir;
      ideal i=imap(P,i);
      ideal j=i;
-     if(a==1)
+     if(a)
      {
        attrib(j,"isSB",1);
      }
@@ -3037,7 +3037,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
   int @wr,@k,@n,@m,@n1,@n2,@n3,homo,seri,keepdi,abspri,ab,nn;
   ideal peek=i;
   ideal ser,tras;
-  int isS=(attrib(i,"isSB")==1);
+  int isS=attrib(i,"isSB");
 
   if(size(#)>0)
   {
@@ -7540,7 +7540,7 @@ EXAMPLE: example newDecompStep; shows an example
   list data;
   list result;
   intvec @hilb;
-  int isS=(attrib(i,"isSB")==1);
+  int isS=attrib(i,"isSB");
 
   // Debug
   dbprint(printlevel - voice, "newDecompStep, v2.0");
@@ -7590,18 +7590,17 @@ EXAMPLE: example newDecompStep; shows an example
   homo=homog(i);
   if(homo==1)
   {
-    if(attrib(i,"isSB")!=1)
+    if(attrib(i,"isSB"))
+    {
+      ltras=i,i;
+    }
+    else
     {
       //ltras=mstd(i);
       tras=groebner(i);
       ltras=tras,tras;
-      attrib(ltras[1],"isSB",1);
     }
-    else
-    {
-      ltras=i,i;
-      attrib(ltras[1],"isSB",1);
-    }
+    attrib(ltras[1],"isSB",1);
     tras = ltras[1];
     attrib(tras,"isSB",1);
     if(dim(tras)==0)
