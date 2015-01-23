@@ -49,10 +49,6 @@ gcd5primtest
 gcd5test
 gcd_univar_p_s
 gcd_univar_p_alpha_s
-Katsura_3_32003_lp_slimgb
-Katsura_4_32003_lp_slimgb
-Katsura_5_32003_lp_slimgb
-Katsura_6_32003_lp_slimgb
 modular_s
 modstd_s
 ncfactor_facNthShift1_s
@@ -60,13 +56,6 @@ ncfactor_landau_ex_s
 ncfactor_multipleFacsSameTopAndBottom_s
 ncfactor_nthweylringalt_s
 parallel_s
-pAddManyVarsManyL_s
-pAddManyVars_s
-pAdd_s
-pMultManyVarsManyL_s
-pMultManyVars_s
-pMult_s
-polylib_s
 primdec3
 reesclos
 resources_s
