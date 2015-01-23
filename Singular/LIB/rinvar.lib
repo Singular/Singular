@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-version="version rinvar.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version rinvar.lib 4.0.1.1 Jan_2015 "; // $Id$
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
@@ -126,11 +126,7 @@ EXAMPLE: example ImageGroup; shows an example
   // note that we have omitted all variables which give give rise
   // only to 0's. Note that z(1..newVars) are slack variables
 
-  order = "(dp(" + string(nvars(basering)) + "), dp);";
-  ringSTR1 = "ring RIGR = (" + charstr(basering) + "), (" + varstr(basering)
-                             + ", z(1.." + string(newVars) + "))," + order;
-  execute(ringSTR1);
-  execute("minpoly = number(" + @mPoly + ");");
+  def RIGR=addNvarsTo(basering,newVars,"z",1); setring RIGR;
   ideal I1, I2, Gn, G, F, mEntries, newGaction;
   G = imap(RIGB, Grp);
   F = imap(RIGB, Gaction);
@@ -296,9 +292,14 @@ EXAMPLE: example ImageVariety; shows an example
 
   // create new ring for elimination, Y(1),...,Y(m) are slack variables.
 
-  string @mPoly = string(minpoly);
+  //string @mPoly = string(minpoly);
   def RAR1=addNvarsTo(basering,nrNewVars,"Y",1); setring RAR1;
-  string ringSTR2 = "ring RAR2 = (" + charstr(basering) + "), Y(1.." + string(nrNewVars) + "), dp;";
+  list RAR2l=ringlist(RAR1);
+  list RAR2ll=RAR2l[2];
+  RAR2ll=RAR2ll[size(RAR2ll)-nrNewVars+1..size(RAR2ll)];
+  RAR2l[2]=RAR2ll;
+  RAR2l[3]=list(list("dp",1:nrNewVars),list("C",0));
+  def RAR2=ring(RAR2l);
 
   ideal I, J1, J2, Fm;
 
@@ -325,8 +326,7 @@ EXAMPLE: example ImageVariety; shows an example
 
   J2 = nselect(J1, 1.. nvars(RARB));
 
-  execute(ringSTR2);
-  execute("minpoly = number(" + @mPoly + ");");
+  setring RAR2;
   ideal imageid = imap(RAR1, J2);
   export(imageid);
      dbprint(dbPrt+1, "
