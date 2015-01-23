@@ -8275,15 +8275,18 @@ The first argument must be of type
 @c @code{module},
 @c @code{matrix},
 or @code{list}.
-The result will be of the same type as the first argument.
+The result will be an expression list,
+its type and format will be set by the following assign.
 The function must be a kernel command or a procedure which takes one
-argument and returns a type which can be an element of the result.
+argument and returns a a value.
 @item @strong{Example:}
 @smallexample
 @c example
 proc p(int x) {return(x^2);}
 intvec v=1,2,3;
 apply(v,p);
+intvec vv=apply(v,p);vv;
+list ll=apply(v,p);ll;
 @c example
 @end smallexample
 @end table
