@@ -533,8 +533,7 @@ EXAMPLE: example Ext_R; shows an example
   if( t1==1 )
   { // compute resolution via sres command
     if( attrib(M,"isSB")==0 ) {
-      if (size(M)==0) { attrib(M,"isSB")=1; }
-      else { M=std(M); }
+      M=std(M);
     }
     list resl = sres(M,max+1);
     if (withWeight) {
