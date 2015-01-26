@@ -2285,10 +2285,15 @@ EXAMPLE: example genus; shows an example
    }
    if(size(N) < nvars(R0))
    {
-     string newvar=string(N);
-     execute("ring R=("+charstr(R0)+"),("+newvar+"),dp;");
+     list newvar=N[1..ncols(N)];
+     list @rl0=ringlist(R0);
+     @rl0[2]=list(N[1..ncols(N)]);
+     @rl0[3]=list(list("dp",1:ncols(N)),list("C",0));
+     def R=ring(@rl0); kill @rl0;
+     setring R;
      ideal I =imap(R0,I);
-     if((ringlist(R0)[3][1][1]=="dp")&&(size(ringlist(R0)[3])==2))
+     list @rl0=ringlist(R0);
+     if((@rl0[3][1][1]=="dp")&&(size(@rl0[3])==2))
      {
        attrib(I,"isSB",1);
      }
@@ -2296,6 +2301,7 @@ EXAMPLE: example genus; shows an example
      {
        I=std(I);
      }
+     kill @rl0;
    }
    else
    {
@@ -2306,32 +2312,33 @@ EXAMPLE: example genus; shows an example
    }
    if(dim(I)==2)
    {
-      def newR=basering;
+     def newR=basering;
    }
    else
    {
-      short=0;
-      string smp = string(minpoly);
-      if(dim(I)==0)
-      {
-         execute("ring Rhelp=("+charstr(R0)+"),(@s,@t),dp;");
-      }
-      else
-      {
-         execute("ring Rhelp=("+charstr(R0)+"),(@s),dp;");
-      }
-      if (smp!="0")
-      { execute("minpoly = "+smp+";");}
-      def newR=R+Rhelp;
-      setring newR;
-      ideal I=imap(R,I);
-      I=homog(I,@s);
-      attrib(I,"isSB",1);
+     list @rl0=ringlist(R0);
+     if(dim(I)==0)
+     {
+       @rl0[2]=list("@s","@t");
+       @rl0[3]=list(list("dp",1:2),list("C",0));
+     }
+     else
+     {
+       @rl0[2]=list("@s");
+       @rl0[3]=list(list("dp",1),list("C",0));
+     }
+     def Rhelp=ring(@rl0);
+     kill @rl0;
+     def newR=R+Rhelp;
+     setring newR;
+     ideal I=imap(R,I);
+     I=homog(I,@s);
+     attrib(I,"isSB",1);
    }
 
    if((nvars(basering)<=3)&&(size(I)>1))
    {
-       ERROR("This is not equidimensional");
+     ERROR("This is not equidimensional");
    }
 
    intvec hp=hilbPoly(I);
