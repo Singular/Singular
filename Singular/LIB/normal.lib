@@ -1147,8 +1147,6 @@ EXAMPLE: example normalizationPrimes; shows an example
       {
           "// the ideal was the zero-ideal";
       }
-     // execute("ring newR7="+charstr(basering)+",("+varstr(basering)+"),("
-     //                 +ordstr(basering)+");");
          def newR7 = ring(gnirlist);
          setring newR7;
          ideal norid=ideal(0);
@@ -1596,8 +1594,6 @@ EXAMPLE: example normalizationPrimes; shows an example
          // ------------------ the normal case, RETURN -----------------
          // Now RR[2] must be 1, hence the test for normality was positive
          MB=SM[2];
-         //execute("ring newR7="+charstr(basering)+",("+varstr(basering)+"),("
-         //             +ordstr(basering)+");");
          def newR7 = ring(gnirlist);
          setring newR7;
          ideal norid=fetch(BAS,MB);
@@ -1900,8 +1896,6 @@ EXAMPLE: example normalizationPrimes; shows an example
       ideal new2 = quotient(SM[2],Ann);
       //ideal new2=SL[1],SM[2];
 
-      //execute("ring newR1="+charstr(basering)+",("+varstr(basering)+"),("
-      //                +ordstr(basering)+");");
       def newR1 = ring(gnirlist);
       setring newR1;
 
@@ -1929,8 +1923,6 @@ EXAMPLE: example normalizationPrimes; shows an example
       list delta1 = keepresult1[size(keepresult1)];
 
       setring BAS;
-      //execute("ring newR2="+charstr(basering)+",("+varstr(basering)+"),("
-      //                +ordstr(basering)+");");
       def newR2 = ring(gnirlist);
       setring newR2;
 
@@ -2284,16 +2276,16 @@ EXAMPLE: example genus; shows an example
    {
       return(0);
    }
-   list N=findvars(I,0);
-   if(size(N[1])==1)
+   ideal N=variables(I);
+   if(size(N)==1)
    {
       poly p=I[1];
      // if(deg(squarefree(p))<deg(p)){ERROR("Curve is not reduced");}
       return(-deg(p)+1);
    }
-   if(size(N[1]) < nvars(R0))
+   if(size(N) < nvars(R0))
    {
-     string newvar=string(N[1]);
+     string newvar=string(N);
      execute("ring R=("+charstr(R0)+"),("+newvar+"),dp;");
      ideal I =imap(R0,I);
      if((ringlist(R0)[3][1][1]=="dp")&&(size(ringlist(R0)[3])==2))

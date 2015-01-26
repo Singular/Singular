@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version presolve.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version presolve.lib 4.0.1.2 Jan_2015 "; // $Id$
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -11,7 +11,7 @@ PROCEDURES:
  elimpart(id[,n]);      partial elimination of vars [among first n vars]
  elimpartanyr(i,p);     factors of p partially eliminated from i in any ring
  fastelim(i,p[..]);     fast elimination of factors of p from i [options]
- findvars(id[..]);      ideal of variables occuring in id [more information]
+ findvars(id);          variables occuring/not occurring  in id
  hilbvec(id[,c,o]);     intvec of Hilberseries of id [in char c and ord o]
  linearpart(id);        elements of id of total degree <=1
  tolessvars(id[,]);     maps id to new basering having only vars occuring in id
@@ -836,15 +836,15 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc findvars(def id, list #)
-"USAGE:   findvars(id [,any] ); id=poly/ideal/vector/module/matrix, any=any type
-RETURN:  if no second argument is present: ideal of variables occuring in id,@*
-         if a second argument is given (of any type): list L with 4 entries:
+"USAGE:   findvars(id ); id=poly/ideal/vector/module/matrix
+RETURN:  list L with 4 entries:
   @format
   L[1]: ideal of variables occuring in id
   L[2]: intvec of variables occuring in id
   L[3]: ideal of variables not occuring in id
   L[4]: intvec of variables not occuring in id
   @end format
+SEE ALSO: variables
 EXAMPLE: example findvars; shows an example
 "
 {
@@ -872,15 +872,13 @@ EXAMPLE: example findvars; shows an example
    }
    if ( size(f)>1 ) { f = f[2..size(f)]; }      //intvec of found vars
    if ( size(nf)>1 ) { nf = nf[2..size(nf)]; }  //intvec of vars not found
-   if( size(#)==0 )  { return(found); }
-   if( size(#)!=0 )  { list L = found,f,notfound,nf; return(L); }
+   list L = found,f,notfound,nf; return(L);
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring s  = 0,(e,f,x,y,t,u,v,w,a,d),dp;
    ideal i = w2+f2-1, x2+t2+a2-1;
    findvars(i);
-   findvars(i,1);
 }
 ///////////////////////////////////////////////////////////////////////////////
 

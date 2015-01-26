@@ -388,7 +388,7 @@ EXAMPLE: example blowUp2;  shows an example
       }
 //--- then by dropping non-occuring variables
       testId=Jsub,Esub,laM;
-      templist=findvars(testId,0);
+      templist=findvars(testId);
       if(size(templist[1])<nvars(R))
       {
          for(j=1;j<=size(templist[4]);j++)
@@ -616,7 +616,7 @@ EXAMPLE: example blowUpBO;  shows an example
          {
             LL=LL,BO[4][j];
          }
-         LL=findvars(LL);
+         LL=variables(LL);
          L=elimpart(BO[2]);
          if((size(L[2])!=0)&&(size(std(LL+L[2]))==size(L[2])+size(LL)))
          {
@@ -632,7 +632,7 @@ EXAMPLE: example blowUpBO;  shows an example
       {
         K=K,BO[4][j];
       }
-      list N=findvars(K,0);
+      list N=findvars(K);
       if(size(N[1])<n)
       {
          newvar=string(N[1]);
@@ -1072,7 +1072,7 @@ EXAMPLE: example blowUpBO;  shows an example
                  MM=std(B[4][j]);
                  if(deg(MM[1])>0){LL=LL,MM;}
               }
-              LL=findvars(LL);
+              LL=variables(LL);
               M=elimpart(B[2]);
               if((size(M[2])!=0)&&(size(std(LL+M[2]))==size(M[2])+size(LL)))
               {
@@ -1104,7 +1104,7 @@ EXAMPLE: example blowUpBO;  shows an example
 //--- throw away variables which do not occur
         K=B[1],B[2],B[5];          //Aenderung!!!
         for(j=1;j<=size(B[4]);j++){K=K,B[4][j];}
-        N=findvars(K,0);
+        N=findvars(K);
         if(size(N[1])<n)
         {
            newvar=string(N[1]);
@@ -1152,7 +1152,7 @@ EXAMPLE: example blowUpBO;  shows an example
 //--- and occur in exactly one BO[4][j], which is the hyperplane given by
 //--- this variable
 //!!!! not necessarily in exactly one BO[4][j]
-        list N=findvars(BO[1]+BO[2],0);
+        list N=findvars(BO[1]+BO[2]);
         if(size(N[1])<nvars(basering))
         {
            v=N[4];
@@ -4794,8 +4794,8 @@ static proc testBlowUp(list BO,ideal cent,list tmpList, int j, int extra)
       {
         K=K,BO[4][i];
       }
-      list N=findvars(K,0);
-      //list N=findvars(BO[2],0);
+      list N=findvars(K);
+      //list N=findvars(BO[2]);
       if(size(N[1])<n)
       {
          string newvar=string(N[1]);
