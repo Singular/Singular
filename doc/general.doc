@@ -4093,6 +4093,8 @@ Tests the expression for correctness if the int_constant is smaller
 as a variable @code{assumeLevel}. If no such variable exist the int expression
 is compared against 0. It is possible to define an individual @code{assumeLevel} for each library and/or procedure
 If the expression is evaluated and not true (i.e. does not evaluate to @code{int(0)} an error is raised.
+@item @strong{Note:} @code{ASSUME} shall be used for documentation and debugging, 
+production code of a library must never define @code{assumeLevel}.
 @item @strong{Example:}
 @smallexample
 @c example error

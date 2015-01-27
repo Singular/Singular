@@ -27,6 +27,14 @@ New libraries:
 @item hess.lib (@nref{hess_lib})
 @end itemize
 
+Changed libraries:
+@itemize
+@item findvars (@nref{findvars},@nref{variables})
+@item addvarsTo (@nref{addvarsTo})
+@item addNvarsTo (@nref{addNvarsTo})
+@item normaliz.lib (@nref{normaliz_lib})
+@end itemize
+
 @heading News for version 4-0-1
 
 Version 4-0-1 is a bug fix release.
