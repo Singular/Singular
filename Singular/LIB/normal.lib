@@ -2658,7 +2658,10 @@ EXAMPLE: example deltaLoc;  shows an example
    intvec save_opt=option(get);
    option(redSB);
    def R=basering;
-   execute("ring S=("+charstr(R)+"),(x,y),lp;");
+   list @rl=ringlist(R);
+   @rl[2]=list("x","y");
+   @rl[3]=list(list("lp",1:2),list("C",0));
+   def S=ring(@rl); setring S;
    map phi=R,x,y;
    ideal singL=phi(singL);
    singL=simplify(std(singL),1);
@@ -2671,7 +2674,7 @@ EXAMPLE: example deltaLoc;  shows an example
    {
       map alpha=S,var(1)-singL[2][2],var(2)-singL[1][2];
       f=alpha(f);
-      execute("ring C=("+charstr(S)+"),("+varstr(S)+"),ds;");
+      def C=changeordTo(S,"ds"); setring C;
       poly f=imap(S,f);
       ideal singL=imap(S,singL);
       if((w>=1)&&(ord(f)>=2))
@@ -2718,7 +2721,7 @@ EXAMPLE: example deltaLoc;  shows an example
       map beta=S,a,a;
       poly p=beta(p);
 
-      execute("ring C=("+charstr(S)+",a),("+varstr(S)+"),ds;");
+      execute("ring C=("+charstr(S)+",a),(x,y),ds;");
       number p=number(imap(B,p));
 
       minpoly=p;
