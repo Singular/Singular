@@ -97,12 +97,15 @@ AC_DEFUN([SING_CHECK_SET_ARGS], [
 
  AC_LANG_PUSH([C++])
  AX_APPEND_COMPILE_FLAGS(${FLAGS}, [CXXFLAGS])
- AX_APPEND_COMPILE_FLAGS([-fexceptions -frtti], [FEXCEPTIONS_FRTTI_CXXFLAGS])
+
+ # separate parts of Singular have to be real C++ :)
+ FFLAGS="-fexceptions -frtti"
+ AX_APPEND_COMPILE_FLAGS(${FFLAGS}, [FEXCEPTIONSFRTTI_CXXFLAGS])
+ AC_SUBST(FEXCEPTIONSFRTTI_CXXFLAGS)
+ 
  AC_LANG_POP([C++])
 
  AX_APPEND_LINK_FLAGS(${FLAGS})
-
- AC_SUBST(POLYMAKE_CXXFLAGS)
 
  if test "x${ENABLE_DEBUG}" = xyes; then
   DBGFLAGS="-g -ftrapv -fdiagnostics-show-option -Wall -Wextra"
