@@ -20,6 +20,11 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+New commands:
+@itemize
+@item align (@nref{align})
+@end itemize
+
 New libraries:
 @itemize
 @item algemodstd.lib (@nref{algemodstd_lib})

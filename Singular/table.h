@@ -504,6 +504,8 @@ struct sValCmd2 dArith2[]=
 ,{D(jjKLAMMER_IV),'(',            ANY_TYPE/*set by p*/,ANY_TYPE, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOLON),     ':',            INTVEC_CMD,     INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 // and the procedures with 2 arguments:
+,{D(jjALIGN_V),   ALIGN_CMD,      VECTOR_CMD,     VECTOR_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjALIGN_M),   ALIGN_CMD,      MODUL_CMD,      MODUL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(atATTRIB2),   ATTRIB_CMD,     NONE/*set by p*/,DEF_CMD,   STRING_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjBETTI2),    BETTI_CMD,      INTMAT_CMD,     LIST_CMD,   INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(syBetti2),    BETTI_CMD,      INTMAT_CMD,     RESOLUTION_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -858,6 +860,7 @@ cmdnames cmds[] =
   { "ASSUME",      0, ASSUME_CMD,         ASSUME_CMD},
   { "LIB",         0, LIB_CMD ,           SYSVAR},
   { "alias",       0, ALIAS_CMD ,         PARAMETER},
+  { "align",       0, ALIGN_CMD ,         CMD_2},
   { "and",         0, '&' ,               LOGIC_OP},
   { "apply",       0, APPLY,              APPLY},
   { "attrib",      0, ATTRIB_CMD ,        CMD_123},
