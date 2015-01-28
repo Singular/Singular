@@ -2187,54 +2187,18 @@ EXAMPLE: example s_res; shows an example
 
 static proc mod_init()
 {
-  int @DEBUG = 0; // !system("with", "ndebug"); //    "om_ndebug?: ", system("with", "om_ndebug");
+  load("syzextra.so");
 
-  if( @DEBUG )  {    listvar(Top);  }
-
-  if( !defined(SRES) )
+  if( 1 ) // !defined(Syzextra) )
   {
-      load("syzextra.so");
-
-      if( @DEBUG ){        listvar(Syzextra);      }
-
-//      exportto(Top,   Syzextra::ClearContent); //      exportto(Top,   Syzextra::ClearDenominators);     exportto(Schreyer,   Syzextra::noop);
-//      exportto(Schreyer,   Syzextra::leadrawexp); //      exportto(Schreyer,   Syzextra::ISUpdateComponents);
-//      exportto(Schreyer,   Syzextra::GetAMData);//      exportto(Schreyer,   Syzextra::SetSyzComp);
-//      exportto(Schreyer,   Syzextra::MakeSyzCompOrdering); //      exportto(Schreyer,   Syzextra::reduce_syz);//      exportto(Schreyer,   Syzextra::p_Content);
-
-//    exportto(Schreyer,   Syzextra::DetailedPrint);
-//    exportto(Schreyer,   Syzextra::m2_end);
-//    exportto(Schreyer,   Syzextra::leadmonomial);
-//    exportto(Schreyer,   Syzextra::leadcomp);
-//    exportto(Schreyer,   Syzextra::SetInducedReferrence);
-//    exportto(Schreyer,   Syzextra::GetInducedData);
-//    exportto(Schreyer,   Syzextra::MakeInducedSchreyerOrdering);
-//    exportto(Schreyer,   Syzextra::idPrepare);
-//    exportto(Schreyer,   Syzextra::ProfilerStart);   exportto(Schreyer,   Syzextra::ProfilerStop);
-//    exportto(Schreyer,   Syzextra::NumberStatsInit); exportto(Schreyer,   Syzextra::NumberStatsPrint);
-//    exportto(Schreyer,   Syzextra::Tail);
-//    exportto(Schreyer,   Syzextra::ComputeLeadingSyzygyTerms);
-//    exportto(Schreyer,   Syzextra::Compute2LeadingSyzygyTerms);
-//    exportto(Schreyer,   Syzextra::Sort_c_ds);
-//    exportto(Schreyer,   Syzextra::FindReducer);
-//    exportto(Schreyer,   Syzextra::ReduceTerm);
-//    exportto(Schreyer,   Syzextra::TraverseTail);
-//    exportto(Schreyer,   Syzextra::SchreyerSyzygyNF);
-//    exportto(Schreyer,   Syzextra::ComputeSyzygy);
-//    exportto(Schreyer,   Syzextra::ComputeResolution);
-
     // TODO: SSres - return SRESOLUTION?
     newstruct("SRES","ring r,resolution rsltn"); // http://www.singular.uni-kl.de/Manual/latest/sing_179.htm#SEC218
-//      system("install","SRES","string",SRES_string, 1);
     system("install","SRES","print",SRES_print, 1);
     system("install","SRES","betti",SRES_betti1, 1); // http://www.singular.uni-kl.de/Manual/latest/sing_260.htm#SEC299
     system("install","SRES","betti",SRES_betti2, 2); // http://www.singular.uni-kl.de/Manual/latest/sing_260.htm#SEC299
     system("install","SRES","minres",SRES_minres, 1); // http://www.singular.uni-kl.de/Manual/latest/sing_344.htm#SEC383
-    system("install","SRES","list", SRES_list, 1); // will never work :(((
-
-//    exportto(Top, s_res); //   Syzextra::GetInducedData);
-
-    if( @DEBUG )    {      listvar(Top);      listvar(Schreyer);    }
+//    system("install","SRES","list", SRES_list, 1); // will never work :(((
+//    system("install","SRES","string",SRES_string, 1);
   }
 }
 
