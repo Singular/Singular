@@ -1762,6 +1762,7 @@ static BOOLEAN jjALIGN_M(leftv res, leftv u, leftv v)
     { id_Delete(&M,currRing);return TRUE;}
     p_Shift(&(M->m[i]),s,currRing);
   }
+  M->rank += s; 
   res->data=M;
   return FALSE;
 }
