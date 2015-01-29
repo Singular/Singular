@@ -34,7 +34,7 @@ number  nAEpExactDiv    (number a, number b, const coeffs r);
 number  nAEpInit        (long i, const coeffs r);
 number  nAEpInitMPZ     (mpz_t m, const coeffs r); //nachgucken/fragen
 int     nAEpSize        (number a, const coeffs r);///
-int     nAEpInt         (number &a, const coeffs r);
+long    nAEpInt         (number &a, const coeffs r);
 number  nAEpMPZ         (number a, const coeffs r); //nachgucken/fragen
 number  nAEpNeg         (number c, const coeffs r);
 number  nAEpCopy        (number a, number b, const coeffs r); // nachgicken
@@ -158,7 +158,7 @@ int nAEpSize (number a, const coeffs)
     return f->deg;
 }
 
-int nAEpInt(number &, const coeffs)
+long nAEpInt(number &, const coeffs)
 {
     return 1;
 }

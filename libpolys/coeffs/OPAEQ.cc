@@ -33,7 +33,7 @@ number  nAEQExactDiv    (number a, number b, const coeffs r);
 number  nAEQInit        (long i, const coeffs r);
 number  nAEQInitMPZ     (mpz_t m, const coeffs r); //nachgucken/fragen
 int     nAEQSize        (number a, const coeffs r);///
-int     nAEQInt         (number &a, const coeffs r);
+long    nAEQInt         (number &a, const coeffs r);
 number  nAEQMPZ         (number a, const coeffs r); //nachgucken/fragen
 number  nAEQNeg         (number c, const coeffs r);
 number  nAEQCopy        (number a, number b, const coeffs r); // nachgicken
@@ -150,7 +150,7 @@ int nAEQSize (number a, const coeffs)
     return f->deg;
 }
 
-int nAEQInt(number &, const coeffs)
+long nAEQInt(number &, const coeffs)
 {
     return 1;
 }
