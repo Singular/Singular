@@ -3421,8 +3421,8 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
     list @P_l=ringlist(@P);
     gnir_l[3]=@P_l[3]; // ord
     def @Phelp=ring(gnir_l);
-    setring @Phelp;
     kill gnir_l,@P_l;
+    setring @Phelp;
   }
   else
   {
