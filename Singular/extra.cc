@@ -862,7 +862,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       if (iiCheckTypes(h,t,1))
       {
         int id=0;
-        blackboxIsCmd((char*)h->Data(),id);
+	char *n=(char*)h->Data();
+        blackboxIsCmd(n,id);
         if (id>0)
         {
           blackbox *bb=getBlackboxStuff(id);
@@ -872,7 +873,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
             newstructShow(desc);
             return FALSE;
           }
+	  else Werror("'%s' is not a newstruct",n);
         }
+	else Werror("'%s' is not a blackbox object",n);
       }
       return TRUE;
     }
