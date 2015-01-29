@@ -149,7 +149,7 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
     LObject L= *h;
     L.Copy();
     h->GetP();
-    h->SetLength(strat->length_pLength);
+    h->length=h->pLength=pLength(h->p);
     ret = ksReducePoly(&L, with, strat->kNoetherTail(), NULL, strat);
     if (ret)
     {
