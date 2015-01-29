@@ -26,6 +26,8 @@ gfanlib_la_CPPFLAGS = ${MY_CPPFLAGS} ${P_PROCS_CPPFLAGS_COMMON} ${CDDGMPCPPFLAGS
 gfanlib_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS}
 
 if HAVE_GFANLIB
+# forcefully enable exceptions for polymake
+ CXXFLAGS+= $(FEXCEPTIONSFRTTI_CXXFLAGS)
  gfanlib_la_LIBADD   = ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
 endif
 
