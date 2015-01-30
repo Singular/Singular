@@ -34,10 +34,11 @@ New libraries:
 
 Changed libraries:
 @itemize
-@item findvars (@nref{findvars},@nref{variables})
-@item addvarsTo (@nref{addvarsTo})
-@item addNvarsTo (@nref{addNvarsTo})
-@item normaliz.lib (@nref{normaliz_lib})
+@item Presolve::findvars (@nref{findvars},@nref{variables})
+@item Ring::addvarsTo (@nref{addvarsTo})
+@item Ring::addNvarsTo (@nref{addNvarsTo})
+@item grobcov.lib (grobcovK) (@nref{grobcov_lib})
+@item normaliz.lib (for normaliz >=2.8) (@nref{normaliz_lib})
 @end itemize
 
 @heading News for version 4-0-1
