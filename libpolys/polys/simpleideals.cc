@@ -89,7 +89,7 @@ int id_PosConstant(ideal id, const ring r)
     const poly p = *m;
     if (p!=NULL)
        if (p_LmIsConstantComp(p, r) == TRUE)
-	 return k;
+         return k;
   }
 
   return -1;
@@ -1732,4 +1732,13 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring r)
   for(i=rl-1;i>=0;i--) id_Delete(&(xx[i]),r);
   omFreeSize(xx,rl*sizeof(ideal));
   return result;
+}
+
+void id_Shift(ideal M, int s, const ring r)
+{
+  for(int i=IDELEMS(M)-1; i>=0;i--)
+  {
+    p_Shift(&(M->m[i]),s,r);
+  }
+  M->rank += s;
 }
