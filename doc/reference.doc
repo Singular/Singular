@@ -231,7 +231,7 @@ and @code{LIB} no brackets are allowed.
 @item @strong{Type:}
 type of the first argument
 @item @strong{Purpose:}
-maps module generators @code{gen(i)} to @code(gen(i+s)} for all i.
+maps module generators @code{gen(i)} to @code{gen(i+s)} for all i.
 @item @strong{Example:}
 @smallexample
 @c example
