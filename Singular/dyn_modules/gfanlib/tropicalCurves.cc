@@ -130,12 +130,13 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
    * and compute the common refinement with its tropical variety.
    * If all initial ideals are monomial free, then we have our tropical curve */
   // gfan::ZFan* zf = toFanStar(C);
-  // std::cout << zf->toString();
+  // std::cout << zf->toString(2+4+8+128) << std::endl;
   // delete zf;
   for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end();)
   {
     gfan::ZVector w = zc->getRelativeInteriorPoint();
     gfan::ZMatrix W = zc->generatorsOfSpan();
+    // std::cout << zc->extremeRays() << std::endl;
 
     ring s = genericlyWeightedOrdering(r,u,w,W,currentStrategy);
     nMapFunc identity = n_SetMap(r->cf,s->cf);
@@ -147,9 +148,9 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
     ideal ininIs = initial(inIsSTD,s,w,W);
 
     poly mons = currentStrategy.checkInitialIdealForMonomial(ininIs,s,w);
-    // poly mons = checkForMonomialViaSuddenSaturation(ininIs,s);
     if (mons)
     {
+      // std::cout << "computing witness in tropical star!" << std::endl;
       poly gs = witness(mons,inIsSTD,ininIs,s);
       C = intersect(C,tropicalVariety(gs,s,currentStrategy),d);
       nMapFunc mMap = n_SetMap(s->cf,r->cf);
@@ -160,7 +161,7 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
       p_Delete(&gs,s);
       zc = C.begin();
       // gfan::ZFan* zf = toFanStar(C);
-      // std::cout << zf->toString();
+      // std::cout << zf->toString(2+4+8+128) << std::endl;
       // delete zf;
       id_Delete(&inIs,s);
       id_Delete(&inIsSTD,s);
@@ -169,7 +170,12 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
     }
     else
     {
-      gfan::ZVector wNeg = -w;
+      id_Delete(&inIs,s);
+      id_Delete(&inIsSTD,s);
+      id_Delete(&ininIs,s);
+      rDelete(s);
+
+      gfan::ZVector wNeg = currentStrategy.negateWeight(w);
       if (zc->contains(wNeg))
       {
         s = genericlyWeightedOrdering(r,u,wNeg,W,currentStrategy);
@@ -182,7 +188,6 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
         ininIs = initial(inIsSTD,s,wNeg,W);
 
         mons = currentStrategy.checkInitialIdealForMonomial(ininIs,s,wNeg);
-        // mons = checkForMonomialViaSuddenSaturation(ininIs,s);
         if (mons)
         {
           poly gs = witness(mons,inIsSTD,ininIs,s);
@@ -216,9 +221,9 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
 gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u, const tropicalStrategy& currentStrategy)
 {
   std::set<gfan::ZCone> C = tropicalStar(I,r,u,currentStrategy);
-  gfan::ZFan* zf = toFanStar(C);
+  // gfan::ZFan* zf = toFanStar(C);
   // std::cout << zf->toString();
-  delete zf;
+  // delete zf;
   gfan::ZMatrix raysOfC(0,u.size());
   if (!currentStrategy.restrictToLowerHalfSpace())
   {

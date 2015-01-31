@@ -258,6 +258,22 @@ public:
     return this->weightAdjustingAlgorithm2(v,w);
   }
 
+  gfan::ZVector negateWeight(const gfan::ZVector w) const
+  {
+    gfan::ZVector wNeg(w.size());
+
+    if (this->isValuationNonTrivial())
+    {
+      wNeg[0]=w[0];
+      for (int i=1; i<w.size(); i++)
+        wNeg[i]=w[i];
+    }
+    else
+      wNeg = -w;
+
+    return wNeg;
+  }
+
   /**
    * If valuation trivial, returns a copy of r with a positive weight prepended,
    * such that any ideal homogeneous with respect to w is homogeneous with respect to that weight.

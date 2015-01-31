@@ -538,10 +538,10 @@ BOOLEAN getCone(leftv res, leftv args)
   if ((u != NULL) && (u->Typ() == fanID))
   {
     leftv v=u->next;
-    // if ((v != NULL) && (v->Typ() == INT_CMD))
+    if ((v != NULL) && (v->Typ() == INT_CMD))
     {
       leftv w=v->next;
-      // if ((w != NULL) && (w->Typ() == INT_CMD))
+      if ((w != NULL) && (w->Typ() == INT_CMD))
       {
         gfan::ZFan* zf = (gfan::ZFan*) u->Data();
         int d = (int)(long)v->Data();

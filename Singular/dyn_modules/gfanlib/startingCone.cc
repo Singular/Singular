@@ -71,6 +71,53 @@ static bool checkOneCodimensionalLinealitySpace(const groebnerCone sigma)
  * checking each cone whether it contains a ray in the tropical variety.
  * Returns a point in the tropical variety and a maximal Groebner cone containing the point.
  **/
+std::pair<gfan::ZVector,groebnerCone> tropicalStartingPoint(const ideal I, const ring r, const tropicalStrategy& currentStrategy)
+{
+  // start by computing a maximal Groebner cone and
+  // check whether one of its rays lies in the tropical variety
+  const groebnerCone sigma(I,r,currentStrategy);
+  gfan::ZVector startingPoint = sigma.tropicalPoint();
+  if (startingPoint.size() > 0)
+    return std::make_pair(startingPoint,sigma);
+
+  // if not, traverse the groebnerFan and until such a cone is found
+  // and return the maximal cone together with a point in its ray
+  groebnerCones groebnerFan;
+  groebnerCones workingList;
+  workingList.insert(sigma);
+  while (!workingList.empty())
+  {
+    const groebnerCone sigma = *(workingList.begin());
+    groebnerCones neighbours = sigma.groebnerNeighbours();
+    for (groebnerCones::iterator tau = neighbours.begin(); tau!=neighbours.end(); tau++)
+    {
+      if (groebnerFan.count(*tau) == 0)
+      {
+        if (workingList.count(*tau) == 0)
+        {
+          startingPoint = tau->tropicalPoint();
+          if (startingPoint.size() > 0)
+            return std::make_pair(startingPoint,*tau);
+        }
+        workingList.insert(*tau);
+      }
+    }
+    groebnerFan.insert(sigma);
+    workingList.erase(sigma);
+  }
+
+  // return some trivial output, if such a cone cannot be found
+  gfan::ZVector emptyVector = gfan::ZVector(0);
+  groebnerCone emptyCone = groebnerCone();
+  return std::pair<gfan::ZVector,groebnerCone>(emptyVector,emptyCone);
+}
+
+
+/**
+ * Computes a starting point outside the lineatliy space by traversing the Groebner fan,
+ * checking each cone whether it contains a ray in the tropical variety.
+ * Returns a point in the tropical variety and a maximal Groebner cone containing the point.
+ **/
 std::pair<gfan::ZVector,groebnerCone> tropicalStartingDataViaGroebnerFan(const ideal I, const ring r, const tropicalStrategy& currentStrategy)
 {
   // start by computing a maximal Groebner cone and

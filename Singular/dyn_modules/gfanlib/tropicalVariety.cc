@@ -41,8 +41,6 @@ static gfan::ZFan* toZFan(std::set<gfan::ZCone> maxCones)
 
 BOOLEAN tropicalVariety(leftv res, leftv args)
 {
-  omUpdateInfo();
-  Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
   leftv u = args;
   if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
   {
@@ -112,6 +110,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
       else
         stdI = id_Copy(I,currRing);
       tropicalStrategy currentStrategy(stdI,p,currRing);
+      // tropicalStrategy currentStrategy(I,p,currRing);
       gfan::ZFan* tropI = tropicalVariety(currentStrategy);
       res->rtyp = fanID;
       res->data = (char*) tropI;

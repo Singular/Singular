@@ -234,6 +234,7 @@ void tropical_setup(SModulFunctions* p)
 {
   p->iiAddCproc("","groebnerCone",FALSE,groebnerCone);
   p->iiAddCproc("","maximalGroebnerCone",FALSE,maximalGroebnerCone);
+  p->iiAddCproc("","homogeneitySpace",FALSE,homogeneitySpace);
   p->iiAddCproc("","initial",FALSE,initial);
   // p->iiAddCproc("","tropicalNeighbours",FALSE,tropicalNeighbours);
 #ifndef NDEBUG
@@ -275,5 +276,5 @@ void tropical_setup(SModulFunctions* p)
 #endif //NDEBUG
   // p->iiAddCproc("","ppreduceInitially",FALSE,ppreduceInitially);
   // p->iiAddCproc("","ttreduceInitially",FALSE,ttreduceInitially);
-  // p->iiAddCproc("","homogeneitySpace",FALSE,homogeneitySpace);
+  p->iiAddCproc("","homogeneitySpace",FALSE,homogeneitySpace);
 }

@@ -34,14 +34,6 @@ private:
    */
   ideal polynomialIdeal;
   /**
-   * reduced form of the ideal from which the equations and inequalities can be read
-   */
-  ideal reducedPolynomialIdeal;
-  /**
-   * generators of the initial ideal
-   */
-  ideal initialPolynomialIdeal;
-  /**
    * ring in which the ideal exists
    */
   ring polynomialRing;
@@ -73,8 +65,6 @@ public:
   }
 
   ideal getPolynomialIdeal() const { return polynomialIdeal; };
-  ideal getReducedPolynomialIdeal() const { return reducedPolynomialIdeal; };
-  ideal getInitialPolynomialIdeal() const { return initialPolynomialIdeal; };
   ring getPolynomialRing() const { return polynomialRing; };
   gfan::ZCone getPolyhedralCone() const { return polyhedralCone; };
   gfan::ZVector getInteriorPoint() const { return interiorPoint; };
