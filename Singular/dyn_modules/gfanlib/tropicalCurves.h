@@ -5,10 +5,11 @@
 #include <gfanlib/gfanlib_zfan.h>
 #include <libpolys/polys/monomials/p_polys.h>
 #include <tropicalStrategy.h>
+#include <tropicalVarietyOfPolynomials.h>
 
-std::set<gfan::ZCone> tropicalStar(const ideal I, const ring r, const gfan::ZVector u,
-                                   const tropicalStrategy* currentStrategy);
-gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u,
+ZConesSortedByDimension tropicalStar(const ideal I, const ring r, const gfan::ZVector &u,
+                                     const tropicalStrategy* currentStrategy);
+gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector &u,
                                  const tropicalStrategy* currentStrategy);
 
 #ifndef NDEBUG

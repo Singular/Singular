@@ -9,6 +9,7 @@
 #include <witness.h>
 #include <tropicalStrategy.h>
 #include <tropicalVarietyOfPolynomials.h>
+#include <tropicalCurves.h>
 #include <set>
 #ifndef NDEBUG
 #include <bbfan.h>
@@ -19,18 +20,18 @@
  * computes the intersections of all cones of A with all cones of B,
  * and throws away those of lower dimension than d.
  **/
-static std::set<gfan::ZCone> intersect(const std::set<gfan::ZCone> setA,
-                                       const std::set<gfan::ZCone> setB,
-                                       int d=0)
+static ZConesSortedByDimension intersect(const ZConesSortedByDimension &setA,
+                                         const ZConesSortedByDimension &setB,
+                                         int d=0)
 {
   if (setA.empty())
     return setB;
   if (setB.empty())
     return setA;
-  std::set<gfan::ZCone> setAB;
-  for (std::set<gfan::ZCone>::iterator coneOfA=setA.begin(); coneOfA!=setA.end(); coneOfA++)
+  ZConesSortedByDimension setAB;
+  for (ZConesSortedByDimension::iterator coneOfA=setA.begin(); coneOfA!=setA.end(); coneOfA++)
   {
-    for (std::set<gfan::ZCone>::iterator coneOfB=setB.begin(); coneOfB!=setB.end(); coneOfB++)
+    for (ZConesSortedByDimension::iterator coneOfB=setB.begin(); coneOfB!=setB.end(); coneOfB++)
     {
       gfan::ZCone coneOfIntersection = gfan::intersection(*coneOfA,*coneOfB);
       if (coneOfIntersection.dimension()>=d)
@@ -110,17 +111,17 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector &u, cons
  * of a one-codimensional cone of the tropical variety of I and
  * the initial ideal inI with respect to it, computes the star of the tropical variety in u.
  **/
-std::set<gfan::ZCone> tropicalStar(ideal &inI, const ring &r, const gfan::ZVector &u,
-                                   const tropicalStrategy* currentStrategy)
+ZConesSortedByDimension tropicalStar(ideal inI, const ring r, const gfan::ZVector &u,
+                                     const tropicalStrategy* currentStrategy)
 {
   int k = idSize(inI);
   int d = currentStrategy->getExpectedDimension();
 
   /* Compute the common refinement over all tropical varieties
    * of the polynomials in the generating set */
-  std::set<gfan::ZCone> C = tropicalVariety(inI->m[0],r,currentStrategy);
+  ZConesSortedByDimension C = tropicalVarietySortedByDimension(inI->m[0],r,currentStrategy);
   for (int i=1; i<k; i++)
-    C = intersect(C,tropicalVariety(inI->m[i],r,currentStrategy),d);
+    C = intersect(C,tropicalVarietySortedByDimension(inI->m[i],r,currentStrategy),d);
 
   /* Cycle through all maximal cones of the refinement.
    * Pick a monomial ordering corresponding to a generic weight vector in it
@@ -152,7 +153,7 @@ std::set<gfan::ZCone> tropicalStar(ideal &inI, const ring &r, const gfan::ZVecto
     {
       // std::cout << "computing witness in tropical star!" << std::endl;
       poly gs = witness(mons,inIsSTD,ininIs,s);
-      C = intersect(C,tropicalVariety(gs,s,currentStrategy),d);
+      C = intersect(C,tropicalVarietySortedByDimension(gs,s,currentStrategy),d);
       nMapFunc mMap = n_SetMap(s->cf,r->cf);
       poly gr = p_PermPoly(gs,NULL,s,r,mMap,NULL,0);
       idInsertPoly(inI,gr);
@@ -191,7 +192,7 @@ std::set<gfan::ZCone> tropicalStar(ideal &inI, const ring &r, const gfan::ZVecto
         if (mons)
         {
           poly gs = witness(mons,inIsSTD,ininIs,s);
-          C = intersect(C,tropicalVariety(gs,s,currentStrategy),d);
+          C = intersect(C,tropicalVarietySortedByDimension(gs,s,currentStrategy),d);
           nMapFunc mMap = n_SetMap(s->cf,r->cf);
           poly gr = p_PermPoly(gs,NULL,s,r,mMap,NULL,0);
           idInsertPoly(inI,gr);
@@ -218,16 +219,16 @@ std::set<gfan::ZCone> tropicalStar(ideal &inI, const ring &r, const gfan::ZVecto
 }
 
 
-gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u, const tropicalStrategy* currentStrategy)
+gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector &u, const tropicalStrategy* currentStrategy)
 {
-  std::set<gfan::ZCone> C = tropicalStar(I,r,u,currentStrategy);
+  ZConesSortedByDimension C = tropicalStar(I,r,u,currentStrategy);
   // gfan::ZFan* zf = toFanStar(C);
   // std::cout << zf->toString();
   // delete zf;
   gfan::ZMatrix raysOfC(0,u.size());
   if (!currentStrategy->restrictToLowerHalfSpace())
   {
-    for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end(); zc++)
+    for (ZConesSortedByDimension::iterator zc=C.begin(); zc!=C.end(); zc++)
     {
       assume(zc->dimensionOfLinealitySpace()+1 == zc->dimension());
       gfan::ZMatrix ray = zc->extremeRays();
@@ -236,7 +237,7 @@ gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u, c
   }
   else
   {
-    for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end(); zc++)
+    for (ZConesSortedByDimension::iterator zc=C.begin(); zc!=C.end(); zc++)
     {
       assume(zc->dimensionOfLinealitySpace()+2 == zc->dimension());
       raysOfC.appendRow(zc->getRelativeInteriorPoint());
@@ -265,12 +266,14 @@ BOOLEAN tropicalStarDebug(leftv res, leftv args)
       bigintmat* u = (bigintmat*) v->CopyD();
       tropicalStrategy currentCase(inI,currRing);
       gfan::ZVector* v = bigintmatToZVector(u);
-      std::set<gfan::ZCone> C = tropicalStar(inI,currRing,*v,&currentCase);
+      ZConesSortedByDimension C = tropicalStar(inI,currRing,*v,&currentCase);
       id_Delete(&inI,currRing);
       delete u;
       delete v;
-      res->rtyp = fanID;
-      res->data = (char*) toFanStar(C);
+      res->rtyp = NONE;
+      res->data = NULL;
+      // res->rtyp = fanID;
+      // res->data = (char*) toFanStar(C);
       return FALSE;
     }
   }
