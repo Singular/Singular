@@ -1617,24 +1617,48 @@ BOOLEAN facetContaining(leftv res, leftv args)
 }
 
 
-BOOLEAN memleaktest(leftv res, leftv args)
+/***
+ * Computes a relative interior point for each facet of zc
+ **/
+gfan::ZMatrix interiorPointsOfFacets(const gfan::ZCone zc)
 {
-  bigintmat* ineq = NULL;
-  if (args->Typ() == INTMAT_CMD)
+  gfan::ZMatrix inequalities = zc.getFacets();
+  gfan::ZMatrix equations = zc.getImpliedEquations();
+  int r = inequalities.getHeight();
+  int c = inequalities.getWidth();
+
+  /* our cone has r facets, if r==0 return empty matrices */
+  gfan::ZMatrix relativeInteriorPoints = gfan::ZMatrix(0,c);
+  if (r==0) return relativeInteriorPoints;
+
+  /* next we iterate over each of the r facets,
+   * build the respective cone and add it to the list
+   * this is the i=0 case */
+  gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
+  gfan::ZMatrix newEquations = equations;
+  newEquations.appendRow(inequalities[0]);
+  gfan::ZCone facet = gfan::ZCone(newInequalities,newEquations);
+  relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
+
+  /* these are the cases i=1,...,r-2 */
+  for (int i=1; i<r-1; i++)
   {
-    intvec* ineq0 = (intvec*) args->Data();
-    ineq = iv2bim(ineq0,coeffs_BIGINT);
+    newInequalities = inequalities.submatrix(0,0,i,c);
+    newInequalities.append(inequalities.submatrix(i+1,0,r,c));
+    newEquations = equations;
+    newEquations.appendRow(inequalities[i]);
+    facet = gfan::ZCone(newInequalities,newEquations);
+    relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
   }
-  else
-    ineq = (bigintmat*) args->Data();
-  gfan::ZMatrix* zm = bigintmatToZMatrix(ineq);
-  gfan::ZCone* zc = new gfan::ZCone(*zm, gfan::ZMatrix(0, zm->getWidth()));
-  delete zm;
-  if (args->Typ() == INTMAT_CMD)
-    delete ineq;
-  res->rtyp = coneID;
-  res->data = (void*) zc;
-  return FALSE;
+
+  /* this is the i=r-1 case */
+  newInequalities = inequalities.submatrix(0,0,r-1,c);
+  newEquations = equations;
+  newEquations.appendRow(inequalities[r-1]);
+  facet = gfan::ZCone(newInequalities,newEquations);
+  relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
+
+  return relativeInteriorPoints;
 }
 
 
@@ -1692,7 +1716,6 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("","listContainsCone",FALSE,containsCone);
   p->iiAddCproc("","listOfFacets",FALSE,listOfFacets);
   p->iiAddCproc("","facetContaining",FALSE,facetContaining);
-  p->iiAddCproc("","memleaktest",FALSE,memleaktest);
   coneID=setBlackboxStuff(b,"cone");
 }
 

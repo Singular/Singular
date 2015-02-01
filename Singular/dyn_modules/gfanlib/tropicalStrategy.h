@@ -84,14 +84,14 @@ private:
    * the valuation-sepcific homogeneity conditions is weighted homogeneous with respect to w
    * if and only if it is homogeneous with respect to u
    */
-  gfan::ZVector (*weightAdjustingAlgorithm1) (gfan::ZVector w);
+  gfan::ZVector (*weightAdjustingAlgorithm1) (const gfan::ZVector &w);
   /**
    * A function such that:
    * Given strictly positive weight w and weight v,
    * returns a strictly positive weight u such that on an ideal that is weighted homogeneous
    * with respect to w the weights u and v coincide
    */
-  gfan::ZVector (*weightAdjustingAlgorithm2) (gfan::ZVector v, gfan::ZVector w);
+  gfan::ZVector (*weightAdjustingAlgorithm2) (const gfan::ZVector &v, const gfan::ZVector &w);
   /**
    * A function that reduces the generators of an ideal I so that
    * the inequalities and equations of the Groebner cone can be read off.
@@ -265,7 +265,7 @@ public:
     if (this->isValuationNonTrivial())
     {
       wNeg[0]=w[0];
-      for (int i=1; i<w.size(); i++)
+      for (unsigned i=1; i<w.size(); i++)
         wNeg[i]=w[i];
     }
     else

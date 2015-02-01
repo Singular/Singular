@@ -51,17 +51,12 @@ public:
   ~groebnerCone();
   groebnerCone& operator=(const groebnerCone& sigma);
 
-  void deletePolynomialIdeal()
+  void deletePolynomialData()
   {
     assume ((!polynomialIdeal) || (polynomialIdeal && polynomialRing));
     if (polynomialIdeal) id_Delete(&polynomialIdeal,polynomialRing);
-  }
-
-  void deletePolynomialRing()
-  {
-    assume ((!polynomialIdeal) || (polynomialIdeal && polynomialRing));
     if (polynomialRing) rDelete(polynomialRing);
-    polynomialRing = NULL;
+    polynomialIdeal = NULL;
   }
 
   ideal getPolynomialIdeal() const { return polynomialIdeal; };
@@ -69,32 +64,42 @@ public:
   gfan::ZCone getPolyhedralCone() const { return polyhedralCone; };
   gfan::ZVector getInteriorPoint() const { return interiorPoint; };
   const tropicalStrategy* getTropicalStrategy() const {return currentStrategy; };
-
   friend struct groebnerCone_compare;
 
-  /***
+  /**
+   * Returns true if Groebner cone contains w, false otherwise
+   */
+  bool contains(const gfan::ZVector &w) const;
+
+  /**
    * Returns a point in the tropical variety, if the groebnerCone contains one.
    * Returns an empty vector otherwise.
-   **/
+   */
   gfan::ZVector tropicalPoint() const;
 
-  /***
+  /**
    * Given an interior point on the facet and the outer normal factor on the facet,
    * returns the adjacent groebnerCone sharing that facet
-   **/
-  bool checkFlipConeInput(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
-  bool pointsOutwards(const gfan::ZVector) const;
-  groebnerCone flipCone(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
+   */
+  groebnerCone flipCone(const gfan::ZVector &interiorPoint, const gfan::ZVector &facetNormal) const;
 
-  /***
+  /**
    * Returns a complete list of neighboring Groebner cones.
-   **/
+   */
   groebnerCones groebnerNeighbours() const;
 
-  /***
+  /**
    * Returns a complete list of neighboring Groebner cones in the tropical variety.
-   **/
+   */
   groebnerCones tropicalNeighbours() const;
+
+  /**
+   * Debug tools.
+   */
+  #ifndef NDEBUG
+  bool checkFlipConeInput(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
+  bool pointsOutwards(const gfan::ZVector) const;
+  #endif
 };
 
 struct groebnerCone_compare

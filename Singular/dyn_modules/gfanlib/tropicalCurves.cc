@@ -50,8 +50,8 @@ static std::set<gfan::ZCone> intersect(const std::set<gfan::ZCone> setA,
  * the ordering "lies" on the affine space A running through v and spanned by the row vectors of E,
  * and it lies in a Groebner cone of dimension at least rank(E)=dim(A).
  **/
-static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector u, const gfan::ZVector w,
-                                      const gfan::ZMatrix W, const tropicalStrategy& currentStrategy)
+static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector &u, const gfan::ZVector &w,
+                                      const gfan::ZMatrix &W, const tropicalStrategy* currentStrategy)
 {
   int n = rVar(r);
   int h = W.getHeight();
@@ -73,25 +73,25 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector u, const
   s->order[0] = ringorder_a;
   s->block0[0] = 1;
   s->block1[0] = n;
-  gfan::ZVector uAdjusted = currentStrategy.adjustWeightForHomogeneity(u);
+  gfan::ZVector uAdjusted = currentStrategy->adjustWeightForHomogeneity(u);
   s->wvhdl[0] = ZVectorToIntStar(uAdjusted,overflow);
   s->order[1] = ringorder_a;
   s->block0[1] = 1;
   s->block1[1] = n;
-  gfan::ZVector wAdjusted = currentStrategy.adjustWeightUnderHomogeneity(w,uAdjusted);
+  gfan::ZVector wAdjusted = currentStrategy->adjustWeightUnderHomogeneity(w,uAdjusted);
   s->wvhdl[1] = ZVectorToIntStar(wAdjusted,overflow);
   for (int j=0; j<h-1; j++)
   {
     s->order[j+2] = ringorder_a;
     s->block0[j+2] = 1;
     s->block1[j+2] = n;
-    wAdjusted = currentStrategy.adjustWeightUnderHomogeneity(W[j],uAdjusted);
+    wAdjusted = currentStrategy->adjustWeightUnderHomogeneity(W[j],uAdjusted);
     s->wvhdl[j+2] = ZVectorToIntStar(wAdjusted,overflow);
   }
   s->order[h+1] = ringorder_wp;
   s->block0[h+1] = 1;
   s->block1[h+1] = n;
-  wAdjusted = currentStrategy.adjustWeightUnderHomogeneity(W[h-1],uAdjusted);
+  wAdjusted = currentStrategy->adjustWeightUnderHomogeneity(W[h-1],uAdjusted);
   s->wvhdl[h+1] = ZVectorToIntStar(wAdjusted,overflow);
   s->order[h+2] = ringorder_C;
 
@@ -110,11 +110,11 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector u, const
  * of a one-codimensional cone of the tropical variety of I and
  * the initial ideal inI with respect to it, computes the star of the tropical variety in u.
  **/
-std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector u,
-                                   const tropicalStrategy currentStrategy)
+std::set<gfan::ZCone> tropicalStar(ideal &inI, const ring &r, const gfan::ZVector &u,
+                                   const tropicalStrategy* currentStrategy)
 {
   int k = idSize(inI);
-  int d = currentStrategy.getExpectedDimension();
+  int d = currentStrategy->getExpectedDimension();
 
   /* Compute the common refinement over all tropical varieties
    * of the polynomials in the generating set */
@@ -147,7 +147,7 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
     ideal inIsSTD = gfanlib_kStd_wrapper(inIs,s,isHomog);
     ideal ininIs = initial(inIsSTD,s,w,W);
 
-    poly mons = currentStrategy.checkInitialIdealForMonomial(ininIs,s,w);
+    poly mons = currentStrategy->checkInitialIdealForMonomial(ininIs,s,w);
     if (mons)
     {
       // std::cout << "computing witness in tropical star!" << std::endl;
@@ -175,7 +175,7 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
       id_Delete(&ininIs,s);
       rDelete(s);
 
-      gfan::ZVector wNeg = currentStrategy.negateWeight(w);
+      gfan::ZVector wNeg = currentStrategy->negateWeight(w);
       if (zc->contains(wNeg))
       {
         s = genericlyWeightedOrdering(r,u,wNeg,W,currentStrategy);
@@ -187,7 +187,7 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
         inIsSTD = gfanlib_kStd_wrapper(inIs,s,isHomog);
         ininIs = initial(inIsSTD,s,wNeg,W);
 
-        mons = currentStrategy.checkInitialIdealForMonomial(ininIs,s,wNeg);
+        mons = currentStrategy->checkInitialIdealForMonomial(ininIs,s,wNeg);
         if (mons)
         {
           poly gs = witness(mons,inIsSTD,ininIs,s);
@@ -218,14 +218,14 @@ std::set<gfan::ZCone> tropicalStar(ideal inI, const ring r, const gfan::ZVector 
 }
 
 
-gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u, const tropicalStrategy& currentStrategy)
+gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u, const tropicalStrategy* currentStrategy)
 {
   std::set<gfan::ZCone> C = tropicalStar(I,r,u,currentStrategy);
   // gfan::ZFan* zf = toFanStar(C);
   // std::cout << zf->toString();
   // delete zf;
   gfan::ZMatrix raysOfC(0,u.size());
-  if (!currentStrategy.restrictToLowerHalfSpace())
+  if (!currentStrategy->restrictToLowerHalfSpace())
   {
     for (std::set<gfan::ZCone>::iterator zc=C.begin(); zc!=C.end(); zc++)
     {
@@ -265,7 +265,7 @@ BOOLEAN tropicalStarDebug(leftv res, leftv args)
       bigintmat* u = (bigintmat*) v->CopyD();
       tropicalStrategy currentCase(inI,currRing);
       gfan::ZVector* v = bigintmatToZVector(u);
-      std::set<gfan::ZCone> C = tropicalStar(inI,currRing,*v,currentCase);
+      std::set<gfan::ZCone> C = tropicalStar(inI,currRing,*v,&currentCase);
       id_Delete(&inI,currRing);
       delete u;
       delete v;

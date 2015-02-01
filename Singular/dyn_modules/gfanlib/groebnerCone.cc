@@ -21,6 +21,7 @@
 #include <tropicalCurves.h>
 #include <bbcone.h>
 
+#ifndef NDEBUG
 static bool checkPolynomialInput(const ideal I, const ring r)
 {
   if (r) rTest(r);
@@ -55,6 +56,59 @@ static bool checkPolyhedralInput(const gfan::ZCone zc, const gfan::ZVector p)
 {
   return zc.containsRelatively(p);
 }
+
+static bool checkOrderingAndWeight(const ideal I, const ring r, const gfan::ZVector w, const tropicalStrategy& currentCase)
+{
+  groebnerCone sigma(I,r,currentCase);
+  gfan::ZCone zc = sigma.getPolyhedralCone();
+  return zc.contains(w);
+}
+
+bool groebnerCone::checkFlipConeInput(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const
+{
+  /* check first whether interiorPoint lies on the boundary of the cone */
+  if (!polyhedralCone.contains(interiorPoint))
+  {
+    std::cout << "ERROR: interiorPoint is not contained in the Groebner cone!" << std::endl
+              << "cone: " << std::endl
+              << toString(&polyhedralCone)
+              << "interiorPoint:" << std::endl
+              << interiorPoint << std::endl;
+    return false;
+  }
+  if (polyhedralCone.containsRelatively(interiorPoint))
+  {
+    std::cout << "ERROR: interiorPoint is contained in the interior of the maximal Groebner cone!" << std::endl
+              << "cone: " << std::endl
+              << toString(&polyhedralCone)
+              << "interiorPoint:" << std::endl
+              << interiorPoint << std::endl;
+    return false;
+  }
+  gfan::ZCone hopefullyAFacet = polyhedralCone.faceContaining(interiorPoint);
+  if (hopefullyAFacet.dimension()!=(polyhedralCone.dimension()-1))
+  {
+    std::cout << "ERROR: interiorPoint is not contained in the interior of a facet!" << std::endl
+              << "cone: " << std::endl
+              << toString(&polyhedralCone)
+              << "interiorPoint:" << std::endl
+              << interiorPoint << std::endl;
+    return false;
+  }
+  /* check whether facet normal points outwards */
+  gfan::ZCone dual = polyhedralCone.dualCone();
+  if(dual.contains(facetNormal))
+  {
+    std::cout << "ERROR: facetNormal is not pointing outwards!" << std::endl
+              << "cone: " << std::endl
+              << toString(&polyhedralCone)
+              << "facetNormal:" << std::endl
+              << facetNormal << std::endl;
+    return false;
+  }
+  return true;
+}
+#endif //NDEBUG
 
 groebnerCone::groebnerCone():
   polynomialIdeal(NULL),
@@ -115,13 +169,6 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const tropicalStrategy& 
   interiorPoint = polyhedralCone.getRelativeInteriorPoint();
   assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
   id_Delete(&redI,polynomialRing);
-}
-
-static bool checkOrderingAndWeight(const ideal I, const ring r, const gfan::ZVector w, const tropicalStrategy& currentCase)
-{
-  groebnerCone sigma(I,r,currentCase);
-  gfan::ZCone zc = sigma.getPolyhedralCone();
-  return zc.contains(w);
 }
 
 groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, const tropicalStrategy& currentCase):
@@ -333,6 +380,14 @@ groebnerCone& groebnerCone::operator=(const groebnerCone& sigma)
   return *this;
 }
 
+/**
+ * Returns true if Groebner cone contains w, false otherwise
+ */
+bool groebnerCone::contains(const gfan::ZVector &w) const
+{
+  return polyhedralCone.contains(w);
+}
+
 
 /***
  * Returns a point in the tropical variety, if the groebnerCone contains one.
@@ -361,56 +416,11 @@ gfan::ZVector groebnerCone::tropicalPoint() const
   return gfan::ZVector();
 }
 
-bool groebnerCone::checkFlipConeInput(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const
-{
-  /* check first whether interiorPoint lies on the boundary of the cone */
-  if (!polyhedralCone.contains(interiorPoint))
-  {
-    std::cout << "ERROR: interiorPoint is not contained in the Groebner cone!" << std::endl
-              << "cone: " << std::endl
-              << toString(&polyhedralCone)
-              << "interiorPoint:" << std::endl
-              << interiorPoint << std::endl;
-    return false;
-  }
-  if (polyhedralCone.containsRelatively(interiorPoint))
-  {
-    std::cout << "ERROR: interiorPoint is contained in the interior of the maximal Groebner cone!" << std::endl
-              << "cone: " << std::endl
-              << toString(&polyhedralCone)
-              << "interiorPoint:" << std::endl
-              << interiorPoint << std::endl;
-    return false;
-  }
-  gfan::ZCone hopefullyAFacet = polyhedralCone.faceContaining(interiorPoint);
-  if (hopefullyAFacet.dimension()!=(polyhedralCone.dimension()-1))
-  {
-    std::cout << "ERROR: interiorPoint is not contained in the interior of a facet!" << std::endl
-              << "cone: " << std::endl
-              << toString(&polyhedralCone)
-              << "interiorPoint:" << std::endl
-              << interiorPoint << std::endl;
-    return false;
-  }
-  /* check whether facet normal points outwards */
-  gfan::ZCone dual = polyhedralCone.dualCone();
-  if(dual.contains(facetNormal))
-  {
-    std::cout << "ERROR: facetNormal is not pointing outwards!" << std::endl
-              << "cone: " << std::endl
-              << toString(&polyhedralCone)
-              << "facetNormal:" << std::endl
-              << facetNormal << std::endl;
-    return false;
-  }
-  return true;
-}
-
 /**
  * Given an interior point on the facet and the outer normal factor on the facet,
  * returns the adjacent groebnerCone sharing that facet
  */
-groebnerCone groebnerCone::flipCone(const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const
+groebnerCone groebnerCone::flipCone(const gfan::ZVector &interiorPoint, const gfan::ZVector &facetNormal) const
 {
   assume(this->checkFlipConeInput(interiorPoint,facetNormal));
   /* Note: the polynomial ring created will have a weighted ordering with respect to interiorPoint
@@ -507,51 +517,6 @@ groebnerCones groebnerCone::groebnerNeighbours() const
 }
 
 
-/***
- * Computes a relative interior point for each facet of zc
- **/
-static gfan::ZMatrix interiorPointsOfFacets(const gfan::ZCone zc)
-{
-  gfan::ZMatrix inequalities = zc.getFacets();
-  gfan::ZMatrix equations = zc.getImpliedEquations();
-  int r = inequalities.getHeight();
-  int c = inequalities.getWidth();
-
-  /* our cone has r facets, if r==0 return empty matrices */
-  gfan::ZMatrix relativeInteriorPoints = gfan::ZMatrix(0,c);
-  if (r==0) return relativeInteriorPoints;
-
-  /* next we iterate over each of the r facets,
-   * build the respective cone and add it to the list
-   * this is the i=0 case */
-  gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
-  gfan::ZMatrix newEquations = equations;
-  newEquations.appendRow(inequalities[0]);
-  gfan::ZCone facet = gfan::ZCone(newInequalities,newEquations);
-  relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
-
-  /* these are the cases i=1,...,r-2 */
-  for (int i=1; i<r-1; i++)
-  {
-    newInequalities = inequalities.submatrix(0,0,i,c);
-    newInequalities.append(inequalities.submatrix(i+1,0,r,c));
-    newEquations = equations;
-    newEquations.appendRow(inequalities[i]);
-    facet = gfan::ZCone(newInequalities,newEquations);
-    relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
-  }
-
-  /* this is the i=r-1 case */
-  newInequalities = inequalities.submatrix(0,0,r-1,c);
-  newEquations = equations;
-  newEquations.appendRow(inequalities[r-1]);
-  facet = gfan::ZCone(newInequalities,newEquations);
-  relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
-
-  return relativeInteriorPoints;
-}
-
-
 bool groebnerCone::pointsOutwards(const gfan::ZVector w) const
 {
   gfan::ZCone dual = polyhedralCone.dualCone();
@@ -571,7 +536,7 @@ groebnerCones groebnerCone::tropicalNeighbours() const
     if (!(currentStrategy->restrictToLowerHalfSpace() && interiorPoints[i][0].sign()==0))
     {
       ideal initialIdeal = initial(polynomialIdeal,polynomialRing,interiorPoints[i]);
-      gfan::ZMatrix ray = raysOfTropicalStar(initialIdeal,polynomialRing,interiorPoints[i],*currentStrategy);
+      gfan::ZMatrix ray = raysOfTropicalStar(initialIdeal,polynomialRing,interiorPoints[i],currentStrategy);
       for (int j=0; j<ray.getHeight(); j++)
         if (pointsOutwards(ray[j]))
         {

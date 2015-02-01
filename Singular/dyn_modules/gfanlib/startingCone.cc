@@ -169,7 +169,7 @@ BOOLEAN positiveTropicalStartingPoint(leftv res, leftv args)
     {
       tropicalStrategy currentStrategy(I,currRing);
       poly g = I->m[0];
-      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,currentStrategy);
+      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,&currentStrategy);
       for (std::set<gfan::ZCone>::iterator zc=Tg.begin(); zc!=Tg.end(); zc++)
       {
         gfan::ZMatrix ray = zc->extremeRays();
@@ -204,7 +204,7 @@ BOOLEAN nonNegativeTropicalStartingPoint(leftv res, leftv args)
     {
       tropicalStrategy currentStrategy(I,currRing);
       poly g = I->m[0];
-      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,currentStrategy);
+      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,&currentStrategy);
       for (std::set<gfan::ZCone>::iterator zc=Tg.begin(); zc!=Tg.end(); zc++)
       {
         gfan::ZMatrix ray = zc->extremeRays();
@@ -239,7 +239,7 @@ BOOLEAN negativeTropicalStartingPoint(leftv res, leftv args)
     {
       tropicalStrategy currentStrategy(I,currRing);
       poly g = I->m[0];
-      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,currentStrategy);
+      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,&currentStrategy);
       for (std::set<gfan::ZCone>::iterator zc=Tg.begin(); zc!=Tg.end(); zc++)
       {
         gfan::ZMatrix ray = zc->extremeRays();
@@ -275,7 +275,7 @@ BOOLEAN nonPositiveTropicalStartingPoint(leftv res, leftv args)
     {
       tropicalStrategy currentStrategy(I,currRing);
       poly g = I->m[0];
-      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,currentStrategy);
+      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,&currentStrategy);
       for (std::set<gfan::ZCone>::iterator zc=Tg.begin(); zc!=Tg.end(); zc++)
       {
         gfan::ZMatrix ray = zc->extremeRays();
@@ -311,7 +311,7 @@ BOOLEAN tropicalStartingPoint(leftv res, leftv args)
     if (idSize(I)==1)
     {
       poly g = I->m[0];
-      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,currentStrategy);
+      std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,&currentStrategy);
       if (Tg.empty())
       {
         res->rtyp = BIGINTMAT_CMD;

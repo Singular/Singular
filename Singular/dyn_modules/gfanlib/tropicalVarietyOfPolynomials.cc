@@ -17,7 +17,7 @@
  * An empty set means that the tropical Variety is the whole space,
  * i.e. g is either 0 or a non-zero monomial.
  **/
-std::set<gfan::ZCone> tropicalVariety(const poly g, const ring r, const tropicalStrategy &currentCase)
+std::set<gfan::ZCone> tropicalVariety(const poly g, const ring r, const tropicalStrategy* currentCase)
 {
   int n = rVar(r);
   std::set<gfan::ZCone> tropVar;
@@ -43,7 +43,7 @@ std::set<gfan::ZCone> tropicalVariety(const poly g, const ring r, const tropical
         gfan::ZMatrix equation = gfan::ZMatrix(0,n);
         equation.appendRow(exponents[i]-exponents[j]);
         gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-        if (currentCase.restrictToLowerHalfSpace())
+        if (currentCase->restrictToLowerHalfSpace())
           inequalities.appendRow(lowerHalfSpaceCondition);
         for (int k=0; k<l; k++)
           if (k!=i && k!=j) inequalities.appendRow(exponents[i]-exponents[k]);

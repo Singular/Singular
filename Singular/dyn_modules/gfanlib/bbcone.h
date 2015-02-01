@@ -19,6 +19,7 @@ std::string toString(const gfan::ZCone* const c);
 
 gfan::ZVector randomPoint(const gfan::ZCone* zc);
 gfan::ZCone liftUp(const gfan::ZCone &zc);
+gfan::ZMatrix interiorPointsOfFacets(const gfan::ZCone zc);
 
 #endif
 #endif

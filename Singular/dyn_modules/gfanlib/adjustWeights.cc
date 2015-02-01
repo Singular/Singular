@@ -1,7 +1,7 @@
 #include <gfanlib/gfanlib_vector.h>
 #include <kernel/mod2.h>
 
-static bool checkForNonPositiveEntries(const gfan::ZVector w)
+static bool checkForNonPositiveEntries(const gfan::ZVector &w)
 {
   for (unsigned i=0; i<w.size(); i++)
   {
@@ -15,7 +15,7 @@ static bool checkForNonPositiveEntries(const gfan::ZVector w)
   return true;
 }
 
-static bool checkForNonPositiveLaterEntries(const gfan::ZVector w)
+static bool checkForNonPositiveLaterEntries(const gfan::ZVector &w)
 {
   // if (w[0].sign()<0)
   // {
@@ -41,7 +41,7 @@ static bool checkForNonPositiveLaterEntries(const gfan::ZVector w)
  * any x-homogeneous element is homogeneous to
  * if and only if it is homogeneous with respect to w.
  **/
-gfan::ZVector nonvalued_adjustWeightForHomogeneity(const gfan::ZVector w)
+gfan::ZVector nonvalued_adjustWeightForHomogeneity(const gfan::ZVector &w)
 {
   /* find the smallest entry min of w */
   gfan::Integer min=w[0];
@@ -59,7 +59,7 @@ gfan::ZVector nonvalued_adjustWeightForHomogeneity(const gfan::ZVector w)
   return v;
 }
 
-gfan::ZVector valued_adjustWeightForHomogeneity(const gfan::ZVector w)
+gfan::ZVector valued_adjustWeightForHomogeneity(const gfan::ZVector &w)
 {
   /* find the biggest entry max of w
    * amongst the later entries w[1],...,w[n] */
@@ -80,7 +80,7 @@ gfan::ZVector valued_adjustWeightForHomogeneity(const gfan::ZVector w)
  * on any set of x-homogeneous elements that are also homogeneous with respect to w,
  * w containing only positive weights
  **/
-gfan::ZVector nonvalued_adjustWeightUnderHomogeneity(const gfan::ZVector e, const gfan::ZVector w)
+gfan::ZVector nonvalued_adjustWeightUnderHomogeneity(const gfan::ZVector &e, const gfan::ZVector &w)
 {
   assume(checkForNonPositiveEntries(w));
   /* find k such that e+k*w is strictly positive,
@@ -106,7 +106,7 @@ gfan::ZVector nonvalued_adjustWeightUnderHomogeneity(const gfan::ZVector e, cons
   return v;
 }
 
-gfan::ZVector valued_adjustWeightUnderHomogeneity(const gfan::ZVector e, const gfan::ZVector w)
+gfan::ZVector valued_adjustWeightUnderHomogeneity(const gfan::ZVector &e, const gfan::ZVector &w)
 {
   // assume(checkForNonPositiveLaterEntries(w));
   /* find k such that e+k*w is strictly positive,

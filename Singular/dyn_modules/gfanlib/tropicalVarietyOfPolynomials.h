@@ -12,7 +12,7 @@
 #include <bbfan.h>            // for fanID
 #endif
 
-std::set<gfan::ZCone> tropicalVariety(const poly g, const ring r, const tropicalStrategy &currentCase);
+std::set<gfan::ZCone> tropicalVariety(const poly g, const ring r, const tropicalStrategy* currentCase);
 
 #ifndef NDEBUG
 BOOLEAN tropicalVariety00(leftv res, leftv args);

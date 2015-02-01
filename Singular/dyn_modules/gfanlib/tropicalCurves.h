@@ -7,9 +7,9 @@
 #include <tropicalStrategy.h>
 
 std::set<gfan::ZCone> tropicalStar(const ideal I, const ring r, const gfan::ZVector u,
-                                   const tropicalStrategy& currentStrategy);
+                                   const tropicalStrategy* currentStrategy);
 gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector u,
-                                 const tropicalStrategy& currentStrategy);
+                                 const tropicalStrategy* currentStrategy);
 
 #ifndef NDEBUG
 BOOLEAN tropicalStarDebug(leftv res, leftv args);

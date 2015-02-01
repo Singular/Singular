@@ -53,7 +53,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
       if (v==NULL)
       {
         tropicalStrategy currentStrategy(I,currRing);
-        std::set<gfan::ZCone> maxCones = tropicalVariety(g,currRing,currentStrategy);
+        std::set<gfan::ZCone> maxCones = tropicalVariety(g,currRing,&currentStrategy);
         // gfan::ZFan* zf = toZFan(maxCones);
         // delete zf;
         // res->rtyp = NONE;
@@ -78,7 +78,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
         ideal startingIdeal = currentStrategy.getStartingIdeal();
         ring startingRing = currentStrategy.getStartingRing();
         poly gStart = startingIdeal->m[0];
-        std::set<gfan::ZCone> maxCones = tropicalVariety(gStart,startingRing,currentStrategy);
+        std::set<gfan::ZCone> maxCones = tropicalVariety(gStart,startingRing,&currentStrategy);
         res->rtyp = fanID;
         res->data = (char*) toZFan(maxCones);
         return FALSE;

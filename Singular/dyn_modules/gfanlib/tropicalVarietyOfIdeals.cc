@@ -5,6 +5,6 @@
 gfan::ZFan* tropicalVariety(const tropicalStrategy currentStrategy)
 {
   groebnerCone startingCone = tropicalStartingCone(currentStrategy);
-  groebnerCones tropicalVariety = tropicalTraversal(startingCone);
+  groebnerCones tropicalVariety = tropicalTraversalMinimizingFlips(startingCone);
   return toFanStar(tropicalVariety);
 }
