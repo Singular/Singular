@@ -18,52 +18,52 @@
  * by testing whether the initial Ideal with respect to the interior point
  * is monomial free.
  **/
-static bool checkContainmentInTropicalVariety(const groebnerCone sigma)
-{
-  ideal I = sigma.getPolynomialIdeal();
-  ring r = sigma.getPolynomialRing();
-  const tropicalStrategy* currentStrategy = sigma.getTropicalStrategy();
+// static bool checkContainmentInTropicalVariety(const groebnerCone sigma)
+// {
+//   ideal I = sigma.getPolynomialIdeal();
+//   ring r = sigma.getPolynomialRing();
+//   const tropicalStrategy* currentStrategy = sigma.getTropicalStrategy();
 
-  gfan::ZCone zc = sigma.getPolyhedralCone();
-  gfan::ZMatrix zm = zc.extremeRays();
-  for (int i=0; i<zm.getHeight(); i++)
-  {
-    gfan::ZVector w = zm[i];
-    if (currentStrategy->isValuationNonTrivial() && w[0].sign()==0)
-      continue;
-    poly s = currentStrategy->checkInitialIdealForMonomial(I,r,w);
-    if (s)
-    {
-      p_Delete(&s,r);
-      return false;
-    }
-  }
+//   gfan::ZCone zc = sigma.getPolyhedralCone();
+//   gfan::ZMatrix zm = zc.extremeRays();
+//   for (int i=0; i<zm.getHeight(); i++)
+//   {
+//     gfan::ZVector w = zm[i];
+//     if (currentStrategy->isValuationNonTrivial() && w[0].sign()==0)
+//       continue;
+//     poly s = currentStrategy->checkInitialIdealForMonomial(I,r,w);
+//     if (s)
+//     {
+//       p_Delete(&s,r);
+//       return false;
+//     }
+//   }
 
-  zm = zc.generatorsOfLinealitySpace();
-  for (int i=0; i<zm.getHeight(); i++)
-  {
-    gfan::ZVector w = zm[i];
-    if (currentStrategy->isValuationNonTrivial() && w[0].sign()==0)
-      continue;
-    poly s = currentStrategy->checkInitialIdealForMonomial(I,r,w);
-    if (s)
-    {
-      p_Delete(&s,r);
-      return false;
-    }
-  }
+//   zm = zc.generatorsOfLinealitySpace();
+//   for (int i=0; i<zm.getHeight(); i++)
+//   {
+//     gfan::ZVector w = zm[i];
+//     if (currentStrategy->isValuationNonTrivial() && w[0].sign()==0)
+//       continue;
+//     poly s = currentStrategy->checkInitialIdealForMonomial(I,r,w);
+//     if (s)
+//     {
+//       p_Delete(&s,r);
+//       return false;
+//     }
+//   }
 
-  return true;
-}
+//   return true;
+// }
 
 
-static bool checkOneCodimensionalLinealitySpace(const groebnerCone sigma)
-{
-  gfan::ZCone zc = sigma.getPolyhedralCone();
-  int linDim = zc.dimensionOfLinealitySpace();
-  int dim = zc.dimension();
-  return (linDim+1)==dim;
-}
+// static bool checkOneCodimensionalLinealitySpace(const groebnerCone sigma)
+// {
+//   gfan::ZCone zc = sigma.getPolyhedralCone();
+//   int linDim = zc.dimensionOfLinealitySpace();
+//   int dim = zc.dimension();
+//   return (linDim+1)==dim;
+// }
 
 
 /**
@@ -536,7 +536,7 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     rDelete(s);
     id_Delete(&inI,r);
 
-    assume(checkContainmentInTropicalVariety(startingCone));
+    // assume(checkContainmentInTropicalVariety(startingCone));
     return startingCone;
   }
 }

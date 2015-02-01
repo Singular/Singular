@@ -57,6 +57,7 @@ public:
     if (polynomialIdeal) id_Delete(&polynomialIdeal,polynomialRing);
     if (polynomialRing) rDelete(polynomialRing);
     polynomialIdeal = NULL;
+    polynomialRing = NULL;
   }
 
   ideal getPolynomialIdeal() const { return polynomialIdeal; };
