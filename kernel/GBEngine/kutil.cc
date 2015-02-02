@@ -1472,7 +1472,10 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
     posx = strat->posInL(strat->L,strat->Ll,&h,strat);
   h.sev = pGetShortExpVector(h.p);
   if (currRing!=strat->tailRing)
-    h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+  {
+    if (h.t_p==NULL) /* may already been set by pLdeg() in initEcart */
+      h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+  }
   enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
   return TRUE;
 }
