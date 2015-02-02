@@ -338,9 +338,9 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       lc = pGetCoeff(p);
 #endif
 
-#ifdef HAVE_RINGS
+#ifdef HAVE_RINGS  // needs cleanup
   // Leading coef have to be a unit
-  if ( !(n_IsUnit(pGetCoeff(p), r->cf)) ) return;
+  //if ( !(n_IsUnit(pGetCoeff(p), r->cf)) ) return;
 #endif
 
   if(p_GetComp(p, r) != 0 && !p_OneComp(p, r)) return;
@@ -6545,7 +6545,7 @@ void cancelunit1 (LObject* p,int *suc, int index,kStrategy strat )
 
   if (!pIsVector((*p).p) && ((*p).ecart != 0))
   {
-#ifdef HAVE_RINGS
+#ifdef HAVE_RINGS // needs cleanup
     // Leading coef have to be a unit
     if ( !(n_IsUnit(pGetCoeff((*p).p), currRing->cf)) ) return;
 #endif
