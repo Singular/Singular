@@ -21,7 +21,7 @@ struct ZConeCompareDimensionFirst
       if (n==m)
         return zc<zd;
       else
-        return n<m;
+        return n>m;
     }
 };
 
