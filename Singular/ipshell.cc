@@ -43,6 +43,7 @@
 
 #include <kernel/GBEngine/syz.h>
 #include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/kutil.h> // denominator_list
 
 #include <kernel/combinatorics/stairc.h>
 #include <kernel/combinatorics/hutil.h>
@@ -4799,6 +4800,23 @@ void rSetHdl(idhdl h)
   {
     sLastPrinted.CleanUp();
     memset(&sLastPrinted,0,sizeof(sleftv));
+  }
+
+  if ((rg!=currRing)&&(currRing!=NULL))
+  {
+    denominator_list dd=DENOMINATOR_LIST;
+    if (DENOMINATOR_LIST!=NULL)
+    {
+      if (TEST_V_ALLWARN)
+        Warn("deleting denom_list for ring change to %s",IDID(h));
+      do
+      {
+        n_Delete(&(dd->n),currRing->cf);
+        dd=dd->next;
+        omFree(DENOMINATOR_LIST);
+        DENOMINATOR_LIST=dd;
+      } while(DENOMINATOR_LIST!=NULL);
+    }
   }
 
   // test for valid "currRing":

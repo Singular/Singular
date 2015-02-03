@@ -7259,6 +7259,13 @@ returns names of people who contributed to the @sc{Singular} kernel as string.
 returns the number of cpus as int (for creating multiple threads/processes).
 (see @code{system("--cpus")}).
 @c ..........................
+@item @code{system("denom_list")}
+@cindex denom_list
+@cindex system, denom_list
+returns the list of denominators (number) which occured in the latest std
+computationi(s).
+Is reset to the empty list at ring changes or by this system call.
+@c ..........................
 @item @code{system("eigenvals",} matrix @code{)}
 @cindex system, eigenvals
 returns the list of the eigenvalues of the matrix (as ideal, intvec).
