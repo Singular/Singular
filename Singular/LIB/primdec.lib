@@ -8998,10 +8998,7 @@ EXAMPLE: example newZero_decomp; shows an example
 
   if (dim(j)>0)
   {
-    "// dim(j)>0 . Please send the example to the authors";
-    primary[1]=ideal(1);
-    primary[2]=ideal(1);
-    return(primary);
+    ERROR("dim(j)>0 . Please send the example to the authors");
   }
   j=interred(j);
 
@@ -9054,16 +9051,11 @@ EXAMPLE: example newZero_decomp; shows an example
     primary[1]=j;
     if((size(ser)>0)&&(size(reduce(ser,j,1))==0))
     {
-       "// dim(j)==-1 unexpected. Please send the example to the authors";
-      primary[1]=ideal(1);
-      primary[2]=ideal(1);
-      return(primary);
+      ERROR("dim(ser/j)==-1 unexpected. Please send the example to the authors");
     }
     if(dim(j)==-1)
     {
-      "// dim(j)==-1 unexpected. Please send the example to the authors";
-      primary[1]=ideal(1);
-      primary[2]=ideal(1);
+      ERROR("dim(j)==-1 unexpected. Please send the example to the authors");
     }
     else
     {
@@ -9080,10 +9072,7 @@ EXAMPLE: example newZero_decomp; shows an example
   }
   else
   {
-    "// failure in newZero_decomp. Please send the example to the authors";
-    primary[1]=ideal(1);
-    primary[2]=ideal(1);
-    return(primary);
+    ERROR("failure in newZero_decomp. Please send the example to the authors");
   }
 
 //with the factors new ideals (hopefully the primary decomposition)
@@ -9092,12 +9081,7 @@ EXAMPLE: example newZero_decomp; shows an example
   {
     if(size(#)>1)
     {
-      "// failure in newZero_decomp. Please send the example to the authors";
-      primary[1]=ideal(1);
-      primary[2]=ideal(1);
-      primary[3]=ideal(1);
-      primary[4]=ideal(1);
-      return(primary);
+      ERROR("failure in newZero_decomp. Please send the example to the authors");
     }
     for(@k=1;@k<=size(act[1]);@k++)
     {
