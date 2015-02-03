@@ -338,8 +338,10 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       lc = pGetCoeff(p);
 #endif
 
-#ifdef HAVE_RINGS  // needs cleanup
+#ifdef HAVE_RINGS
   // Leading coef have to be a unit
+  // example 2x+4x2 should be simplified to 2x*(1+2x)
+  // and 2 is not a unit in Z
   //if ( !(n_IsUnit(pGetCoeff(p), r->cf)) ) return;
 #endif
 
@@ -6545,9 +6547,11 @@ void cancelunit1 (LObject* p,int *suc, int index,kStrategy strat )
 
   if (!pIsVector((*p).p) && ((*p).ecart != 0))
   {
-#ifdef HAVE_RINGS // needs cleanup
-    // Leading coef have to be a unit
-    if ( !(n_IsUnit(pGetCoeff((*p).p), currRing->cf)) ) return;
+#ifdef HAVE_RINGS
+    // Leading coef have to be a unit: no
+    // example 2x+4x2 should be simplified to 2x*(1+2x)
+    // and 2 is not a unit in Z
+    //if ( !(n_IsUnit(pGetCoeff((*p).p), currRing->cf)) ) return;
 #endif
     k = 0;
     h1 = r = pCopy((*p).p);
