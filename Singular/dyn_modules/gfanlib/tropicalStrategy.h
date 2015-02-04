@@ -231,6 +231,14 @@ public:
   }
 
   /**
+   * returns true, if v is contained in the homogeneity space; false otherwise
+   */
+  bool homogeneitySpaceContains(const gfan::ZVector &v) const
+  {
+    return linealitySpace.contains(v);
+  }
+
+  /**
    * returns true, if valuation non-trivial, false otherwise
    */
   bool restrictToLowerHalfSpace() const

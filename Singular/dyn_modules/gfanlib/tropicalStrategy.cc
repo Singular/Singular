@@ -457,6 +457,16 @@ ring tropicalStrategy::getShortcutRingPrependingWeight(const ring r, const gfan:
 
 poly tropicalStrategy::checkInitialIdealForMonomial(const ideal I, const ring r, const gfan::ZVector w) const
 {
+  int k = idSize(I);
+  for (int i=0; i<k; i++)
+  {
+    poly g = I->m[i];
+    if (pNext(g)==NULL && (isValuationTrivial() || n_IsOne(p_GetCoeff(g,r),r->cf)))
+    {
+      poly monomial = p_Copy(g,r);
+      return monomial;
+    }
+  }
   // prepend extra weight for homogeneity
   // switch to residue field if valuation is non trivial
   ring rShortcut = getShortcutRingPrependingWeight(r,w);
@@ -464,7 +474,6 @@ poly tropicalStrategy::checkInitialIdealForMonomial(const ideal I, const ring r,
   // compute the initial ideal and map it into the constructed ring
   // if switched to residue field, remove possibly 0 elements
   ideal inI = initial(I,r,w);
-  int k = idSize(inI);
   ideal inIShortcut = idInit(k);
   nMapFunc intoShortcut = n_SetMap(r->cf,rShortcut->cf);
   for (int i=0; i<k; i++)

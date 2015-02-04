@@ -66,55 +66,87 @@ BOOLEAN homogeneitySpace(leftv res, leftv args)
 }
 
 
+gfan::ZCone groebnerCone(const ideal I, const ring r, const gfan::ZVector &w)
+{
+  int n = rVar(r);
+  poly g = NULL;
+  int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
+  int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
+  gfan::ZVector leadexpw = gfan::ZVector(n);
+  gfan::ZVector tailexpw = gfan::ZVector(n);
+
+  gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
+  for (int i=0; i<idSize(I); i++)
+  {
+    g = (poly) I->m[i];
+    if (g!=NULL)
+    {
+      p_GetExpV(g,leadexpv,currRing);
+      leadexpw = intStar2ZVector(n, leadexpv);
+      pIter(g);
+      while (g!=NULL)
+      {
+        pGetExpV(g,tailexpv);
+        tailexpw = intStar2ZVector(n, tailexpv);
+        inequalities.appendRow(leadexpw-tailexpw);
+        pIter(g);
+      }
+    }
+  }
+
+  ideal inI = initial(I,currRing,w);
+  gfan::ZMatrix equations = gfan::ZMatrix(0,n);
+  for (int i=0; i<idSize(I); i++)
+  {
+    g = (poly) inI->m[i];
+    if (g!=NULL)
+    {
+      p_GetExpV(g,leadexpv,currRing);
+      leadexpw = intStar2ZVector(n, leadexpv);
+      pIter(g);
+      while (g!=NULL)
+      {
+        pGetExpV(g,tailexpv);
+        tailexpw = intStar2ZVector(n, tailexpv);
+        equations.appendRow(leadexpw-tailexpw);
+        pIter(g);
+      }
+    }
+  }
+
+  omFreeSize(leadexpv,(n+1)*sizeof(int));
+  omFreeSize(tailexpv,(n+1)*sizeof(int));
+  id_Delete(&inI,currRing);
+  return gfan::ZCone(inequalities,equations);
+}
+
+
 BOOLEAN groebnerCone(leftv res, leftv args)
 {
   leftv u = args;
   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
   {
     leftv v = u->next;
-    if (v == NULL)
+    if ((v !=NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
     {
-      int n = currRing->N;
       ideal I = (ideal) u->Data();
-      poly g = NULL;
-      int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
-      int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
-      gfan::ZVector leadexpw = gfan::ZVector(n);
-      gfan::ZVector tailexpw = gfan::ZVector(n);
-      gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-      gfan::ZMatrix equations = gfan::ZMatrix(0,n);
-      long d;
-      for (int i=0; i<IDELEMS(I); i++)
+      gfan::ZVector* weightVector;
+      if (v->Typ() == INTVEC_CMD)
       {
-        g = (poly) I->m[i]; pGetExpV(g,leadexpv);
-        leadexpw = intStar2ZVector(n, leadexpv);
-        pIter(g);
-        d = p_Deg(g,currRing);
-        while ((g != NULL) && (p_Deg(g,currRing) == d))
-        {
-          pGetExpV(g,tailexpv);
-          tailexpw = intStar2ZVector(n, tailexpv);
-          equations.appendRow(leadexpw-tailexpw);
-          pIter(g);
-        }
-
-        if (g != NULL)
-        {
-          while (g != NULL)
-          {
-            pGetExpV(g,tailexpv);
-            tailexpw = intStar2ZVector(n, tailexpv);
-            inequalities.appendRow(leadexpw-tailexpw);
-            pIter(g);
-          }
-        }
+        intvec* w0 = (intvec*) v->Data();
+        bigintmat* w1 = iv2bim(w0,coeffs_BIGINT);
+        w1->inpTranspose();
+        weightVector = bigintmatToZVector(*w1);
+        delete w1;
       }
-      gfan::ZCone* gCone = new gfan::ZCone(inequalities,equations);
-      omFreeSize(leadexpv,(n+1)*sizeof(int));
-      omFreeSize(tailexpv,(n+1)*sizeof(int));
-
+      else
+      {
+        bigintmat* w1 = (bigintmat*) v->Data();
+        weightVector = bigintmatToZVector(*w1);
+      }
       res->rtyp = coneID;
-      res->data = (void*) gCone;
+      res->data = (void*) new gfan::ZCone(groebnerCone(I,currRing,*weightVector));
+      delete weightVector;
       return FALSE;
     }
   }
@@ -123,7 +155,7 @@ BOOLEAN groebnerCone(leftv res, leftv args)
 }
 
 
-gfan::ZCone* maximalGroebnerCone(const ring &r, const ideal &I)
+gfan::ZCone maximalGroebnerCone(const ideal &I, const ring &r)
 {
   int n = rVar(r);
   poly g = NULL;
@@ -147,7 +179,7 @@ gfan::ZCone* maximalGroebnerCone(const ring &r, const ideal &I)
   }
   omFreeSize(leadexpv,(n+1)*sizeof(int));
   omFreeSize(tailexpv,(n+1)*sizeof(int));
-  return new gfan::ZCone(inequalities,gfan::ZMatrix(0, inequalities.getWidth()));
+  return gfan::ZCone(inequalities,gfan::ZMatrix(0, inequalities.getWidth()));
 }
 
 
@@ -161,7 +193,7 @@ BOOLEAN maximalGroebnerCone(leftv res, leftv args)
     {
       ideal I = (ideal) u->Data();
       res->rtyp = coneID;
-      res->data = (void*) maximalGroebnerCone(currRing, I);
+      res->data = (void*) new gfan::ZCone(maximalGroebnerCone(I,currRing));
       return FALSE;
     }
   }
@@ -276,5 +308,4 @@ void tropical_setup(SModulFunctions* p)
 #endif //NDEBUG
   // p->iiAddCproc("","ppreduceInitially",FALSE,ppreduceInitially);
   // p->iiAddCproc("","ttreduceInitially",FALSE,ttreduceInitially);
-  p->iiAddCproc("","homogeneitySpace",FALSE,homogeneitySpace);
 }

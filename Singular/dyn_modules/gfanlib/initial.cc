@@ -40,7 +40,7 @@ poly initial(const poly p, const ring r, const gfan::ZVector w)
     if (d<e)
     {
       p_Delete(&q0,r);
-      q0 = p_Head(p,r);
+      q0 = p_Head(currentTerm,r);
       q1 = q0;
       d = e;
     }

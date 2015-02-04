@@ -149,10 +149,13 @@ ZConesSortedByDimension tropicalStar(ideal inI, const ring r, const gfan::ZVecto
     ideal ininIs = initial(inIsSTD,s,w,W);
 
     poly mons = currentStrategy->checkInitialIdealForMonomial(ininIs,s,w);
-    if (mons)
+    if (mons!=NULL)
     {
-      // std::cout << "computing witness in tropical star!" << std::endl;
-      poly gs = witness(mons,inIsSTD,ininIs,s);
+      poly gs;
+      if (pNext(mons)==NULL)
+        gs = witness(mons,inIsSTD,ininIs,s);
+      else
+        gs = p_Copy(mons,s);
       C = intersect(C,tropicalVarietySortedByDimension(gs,s,currentStrategy),d);
       nMapFunc mMap = n_SetMap(s->cf,r->cf);
       poly gr = p_PermPoly(gs,NULL,s,r,mMap,NULL,0);
@@ -189,9 +192,13 @@ ZConesSortedByDimension tropicalStar(ideal inI, const ring r, const gfan::ZVecto
         ininIs = initial(inIsSTD,s,wNeg,W);
 
         mons = currentStrategy->checkInitialIdealForMonomial(ininIs,s,wNeg);
-        if (mons)
+        if (mons!=NULL)
         {
-          poly gs = witness(mons,inIsSTD,ininIs,s);
+          poly gs;
+          if (pNext(mons)==NULL)
+            gs = witness(mons,inIsSTD,ininIs,s);
+          else
+            gs = p_Copy(mons,s);
           C = intersect(C,tropicalVarietySortedByDimension(gs,s,currentStrategy),d);
           nMapFunc mMap = n_SetMap(s->cf,r->cf);
           poly gr = p_PermPoly(gs,NULL,s,r,mMap,NULL,0);
@@ -230,17 +237,64 @@ gfan::ZMatrix raysOfTropicalStar(ideal I, const ring r, const gfan::ZVector &u, 
   {
     for (ZConesSortedByDimension::iterator zc=C.begin(); zc!=C.end(); zc++)
     {
-      assume(zc->dimensionOfLinealitySpace()+1 == zc->dimension());
-      gfan::ZMatrix ray = zc->extremeRays();
-      raysOfC.appendRow(ray[0]);
+      assume(zc->dimensionOfLinealitySpace()+1 >= zc->dimension());
+      if (zc->dimensionOfLinealitySpace()+1 >= zc->dimension())
+        raysOfC.appendRow(zc->getRelativeInteriorPoint());
+      else
+      {
+        gfan::ZVector interiorPoint = zc->getRelativeInteriorPoint();
+        if (!currentStrategy->homogeneitySpaceContains(interiorPoint))
+        {
+          raysOfC.appendRow(interiorPoint);
+          raysOfC.appendRow(currentStrategy->negateWeight(interiorPoint));
+        }
+        else
+        {
+          gfan::ZMatrix zm = zc->generatorsOfLinealitySpace();
+          for (int i=0; i<zm.getHeight(); i++)
+          {
+            gfan::ZVector point = zm[i];
+            if (currentStrategy->homogeneitySpaceContains(point))
+            {
+              raysOfC.appendRow(point);
+              raysOfC.appendRow(currentStrategy->negateWeight(point));
+              break;
+            }
+          }
+        }
+      }
     }
   }
   else
   {
     for (ZConesSortedByDimension::iterator zc=C.begin(); zc!=C.end(); zc++)
     {
-      assume(zc->dimensionOfLinealitySpace()+2 == zc->dimension());
-      raysOfC.appendRow(zc->getRelativeInteriorPoint());
+      assume(zc->dimensionOfLinealitySpace()+2 >= zc->dimension());
+      if (zc->dimensionOfLinealitySpace()+2 == zc->dimension())
+        raysOfC.appendRow(zc->getRelativeInteriorPoint());
+      else
+      {
+        gfan::ZVector interiorPoint = zc->getRelativeInteriorPoint();
+        if (!currentStrategy->homogeneitySpaceContains(interiorPoint))
+        {
+          raysOfC.appendRow(interiorPoint);
+          raysOfC.appendRow(currentStrategy->negateWeight(interiorPoint));
+        }
+        else
+        {
+          gfan::ZMatrix zm = zc->generatorsOfLinealitySpace();
+          for (int i=0; i<zm.getHeight(); i++)
+          {
+            gfan::ZVector point = zm[i];
+            if (currentStrategy->homogeneitySpaceContains(point))
+            {
+              raysOfC.appendRow(point);
+              raysOfC.appendRow(currentStrategy->negateWeight(point));
+              break;
+            }
+          }
+        }
+      }
     }
   }
   return raysOfC;

@@ -97,7 +97,7 @@ bool groebnerCone::checkFlipConeInput(const gfan::ZVector interiorPoint, const g
   }
   /* check whether facet normal points outwards */
   gfan::ZCone dual = polyhedralCone.dualCone();
-  if(dual.contains(facetNormal))
+  if(dual.containsRelatively(facetNormal))
   {
     std::cout << "ERROR: facetNormal is not pointing outwards!" << std::endl
               << "cone: " << std::endl
@@ -125,11 +125,13 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const tropicalStrategy& 
   currentStrategy(&currentCase)
 {
   assume(checkPolynomialInput(I,r));
-  if (I) polynomialIdeal = id_Copy(I,r);
   if (r) polynomialRing = rCopy(r);
-  ideal redI = id_Copy(polynomialIdeal,polynomialRing);
-  currentCase.pReduce(redI,polynomialRing);
-  currentCase.reduce(redI,polynomialRing);
+  if (I)
+  {
+    polynomialIdeal = id_Copy(I,r);
+    currentCase.pReduce(polynomialIdeal,polynomialRing);
+    currentCase.reduce(polynomialIdeal,polynomialRing);
+  }
 
   int n = rVar(polynomialRing);
   poly g = NULL;
@@ -138,9 +140,9 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const tropicalStrategy& 
   gfan::ZVector leadexpw = gfan::ZVector(n);
   gfan::ZVector tailexpw = gfan::ZVector(n);
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-  for (int i=0; i<idSize(redI); i++)
+  for (int i=0; i<idSize(polynomialIdeal); i++)
   {
-    g = redI->m[i];
+    g = polynomialIdeal->m[i];
     if (g)
     {
       p_GetExpV(g,leadexpv,r);
@@ -168,7 +170,6 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const tropicalStrategy& 
   polyhedralCone.canonicalize();
   interiorPoint = polyhedralCone.getRelativeInteriorPoint();
   assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
-  id_Delete(&redI,polynomialRing);
 }
 
 groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, const tropicalStrategy& currentCase):
@@ -177,19 +178,21 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, 
   currentStrategy(&currentCase)
 {
   assume(checkPolynomialInput(I,r));
-  if (I) polynomialIdeal = id_Copy(I,r);
   if (r) polynomialRing = rCopy(r);
-  ideal redI = id_Copy(polynomialIdeal,polynomialRing);
-  currentCase.pReduce(redI,polynomialRing);
-  currentCase.reduce(redI,polynomialRing);
+  if (I)
+  {
+    polynomialIdeal = id_Copy(I,r);
+    currentCase.pReduce(polynomialIdeal,polynomialRing);
+    currentCase.reduce(polynomialIdeal,polynomialRing);
+  }
 
   int n = rVar(polynomialRing);
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
   gfan::ZMatrix equations = gfan::ZMatrix(0,n);
   int* expv = (int*) omAlloc((n+1)*sizeof(int));
-  for (int i=0; i<idSize(redI); i++)
+  for (int i=0; i<idSize(polynomialIdeal); i++)
   {
-    poly g = redI->m[i];
+    poly g = polynomialIdeal->m[i];
     if (g)
     {
       p_GetExpV(g,expv,polynomialRing);
@@ -221,7 +224,6 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& w, 
   polyhedralCone.canonicalize();
   interiorPoint = polyhedralCone.getRelativeInteriorPoint();
   assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
-  id_Delete(&redI,polynomialRing);
 }
 
 /***
@@ -234,19 +236,21 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& u, 
   currentStrategy(&currentCase)
 {
   assume(checkPolynomialInput(I,r));
-  if (I) polynomialIdeal = id_Copy(I,r);
   if (r) polynomialRing = rCopy(r);
-  ideal redI = id_Copy(polynomialIdeal,polynomialRing);
-  currentCase.pReduce(redI,polynomialRing);
-  currentCase.reduce(redI,polynomialRing);
+  if (I)
+  {
+    polynomialIdeal = id_Copy(I,r);
+    currentCase.pReduce(polynomialIdeal,polynomialRing);
+    currentCase.reduce(polynomialIdeal,polynomialRing);
+  }
 
   int n = rVar(polynomialRing);
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
   gfan::ZMatrix equations = gfan::ZMatrix(0,n);
   int* expv = (int*) omAlloc((n+1)*sizeof(int));
-  for (int i=0; i<idSize(redI); i++)
+  for (int i=0; i<idSize(polynomialIdeal); i++)
   {
-    poly g = redI->m[i];
+    poly g = polynomialIdeal->m[i];
     if (g)
     {
       p_GetExpV(g,expv,polynomialRing);
@@ -279,7 +283,6 @@ groebnerCone::groebnerCone(const ideal I, const ring r, const gfan::ZVector& u, 
   polyhedralCone.canonicalize();
   interiorPoint = polyhedralCone.getRelativeInteriorPoint();
   assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
-  id_Delete(&redI,polynomialRing);
 }
 
 
@@ -291,9 +294,8 @@ groebnerCone::groebnerCone(const ideal I, const ideal inI, const ring r, const t
   assume(checkPolynomialInput(I,r));
   assume(checkPolynomialInput(inI,r));
 
-  ideal redI = id_Copy(polynomialIdeal,polynomialRing);
-  currentCase.pReduce(redI,polynomialRing);
-  currentCase.reduce(redI,polynomialRing);
+  currentCase.pReduce(polynomialIdeal,polynomialRing);
+  currentCase.reduce(polynomialIdeal,polynomialRing);
 
   int n = rVar(r);
   gfan::ZMatrix equations = gfan::ZMatrix(0,n);
@@ -314,9 +316,9 @@ groebnerCone::groebnerCone(const ideal I, const ideal inI, const ring r, const t
     }
   }
   gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-  for (int i=0; i<idSize(redI); i++)
+  for (int i=0; i<idSize(polynomialIdeal); i++)
   {
-    poly g = redI->m[i];
+    poly g = polynomialIdeal->m[i];
     if (g)
     {
       p_GetExpV(g,expv,r);
@@ -341,7 +343,6 @@ groebnerCone::groebnerCone(const ideal I, const ideal inI, const ring r, const t
   polyhedralCone.canonicalize();
   interiorPoint = polyhedralCone.getRelativeInteriorPoint();
   assume(checkOrderingAndCone(polynomialRing,polyhedralCone));
-  id_Delete(&redI,polynomialRing);
 }
 
 groebnerCone::groebnerCone(const groebnerCone &sigma):
@@ -557,7 +558,11 @@ gfan::ZFan* toFanStar(groebnerCones setOfCones)
     groebnerCones::iterator sigma = setOfCones.begin();
     gfan::ZFan* zf = new gfan::ZFan(sigma->getPolyhedralCone().ambientDimension());
     for (; sigma!=setOfCones.end(); sigma++)
-      zf->insert(sigma->getPolyhedralCone());
+    {
+      gfan::ZCone zc = sigma->getPolyhedralCone();
+      assume(isCompatible(zf,&zc));
+      zf->insert(zc);
+    }
     return zf;
   }
   else
