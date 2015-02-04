@@ -146,35 +146,42 @@ ZConesSortedByDimension tropicalStar(ideal inI, const ring r, const gfan::ZVecto
       inIs->m[j] = p_PermPoly(inI->m[j],NULL,r,s,identity,NULL,0);
 
     ideal inIsSTD = gfanlib_kStd_wrapper(inIs,s,isHomog);
+    id_Delete(&inIs,s);
     ideal ininIs = initial(inIsSTD,s,w,W);
 
-    poly mons = currentStrategy->checkInitialIdealForMonomial(ininIs,s,w);
-    if (mons!=NULL)
+    std::pair<poly,int> mons = currentStrategy->checkInitialIdealForMonomial(ininIs,s);
+
+    if (mons.first!=NULL)
     {
       poly gs;
-      if (pNext(mons)==NULL)
-        gs = witness(mons,inIsSTD,ininIs,s);
+      if (mons.second>=0)
+        // cheap way out, ininIsSTD already contains a monomial in its generators
+        gs = inIsSTD->m[mons.second];
       else
-        gs = p_Copy(mons,s);
+        // compute witness
+        gs = witness(mons.first,inIsSTD,ininIs,s);
+
       C = intersect(C,tropicalVarietySortedByDimension(gs,s,currentStrategy),d);
       nMapFunc mMap = n_SetMap(s->cf,r->cf);
       poly gr = p_PermPoly(gs,NULL,s,r,mMap,NULL,0);
       idInsertPoly(inI,gr);
       k++;
-      p_Delete(&mons,s);
-      p_Delete(&gs,s);
-      zc = C.begin();
-      // gfan::ZFan* zf = toFanStar(C);
-      // std::cout << zf->toString(2+4+8+128) << std::endl;
-      // delete zf;
-      id_Delete(&inIs,s);
+
+      if (mons.second<0)
+      {
+        // if necessary, cleanup mons and gs
+        p_Delete(&mons.first,s);
+        p_Delete(&gs,s);
+      }
+      // cleanup rest, reset zc
       id_Delete(&inIsSTD,s);
       id_Delete(&ininIs,s);
       rDelete(s);
+      zc = C.begin();
     }
     else
     {
-      id_Delete(&inIs,s);
+      // cleanup remaining data of first stage
       id_Delete(&inIsSTD,s);
       id_Delete(&ininIs,s);
       rDelete(s);
@@ -189,31 +196,38 @@ ZConesSortedByDimension tropicalStar(ideal inI, const ring r, const gfan::ZVecto
           inIs->m[j] = p_PermPoly(inI->m[j],NULL,r,s,identity,NULL,0);
 
         inIsSTD = gfanlib_kStd_wrapper(inIs,s,isHomog);
+        id_Delete(&inIs,s);
         ininIs = initial(inIsSTD,s,wNeg,W);
 
-        mons = currentStrategy->checkInitialIdealForMonomial(ininIs,s,wNeg);
-        if (mons!=NULL)
+        mons = currentStrategy->checkInitialIdealForMonomial(ininIs,s);
+        if (mons.first!=NULL)
         {
           poly gs;
-          if (pNext(mons)==NULL)
-            gs = witness(mons,inIsSTD,ininIs,s);
+          if (mons.second>=0)
+            // cheap way out, ininIsSTD already contains a monomial in its generators
+            gs = inIsSTD->m[mons.second];
           else
-            gs = p_Copy(mons,s);
+            // compute witness
+            gs = witness(mons.first,inIsSTD,ininIs,s);
+
           C = intersect(C,tropicalVarietySortedByDimension(gs,s,currentStrategy),d);
           nMapFunc mMap = n_SetMap(s->cf,r->cf);
           poly gr = p_PermPoly(gs,NULL,s,r,mMap,NULL,0);
           idInsertPoly(inI,gr);
           k++;
-          p_Delete(&mons,s);
-          p_Delete(&gs,s);
+
+          if (mons.second<0)
+          {
+            // if necessary, cleanup mons and gs
+            p_Delete(&mons.first,s);
+            p_Delete(&gs,s);
+          }
+          // reset zc
           zc = C.begin();
-          // gfan::ZFan* zf = toFanStar(C);
-          // std::cout << zf->toString();
-          // delete zf;
         }
         else
           zc++;
-        id_Delete(&inIs,s);
+        // cleanup remaining data of second stage
         id_Delete(&inIsSTD,s);
         id_Delete(&ininIs,s);
         rDelete(s);

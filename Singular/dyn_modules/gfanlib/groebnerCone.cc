@@ -407,10 +407,12 @@ gfan::ZVector groebnerCone::tropicalPoint() const
     assume(!currentStrategy->restrictToLowerHalfSpace() || R[i][0].sign()<=0);
     if (currentStrategy->restrictToLowerHalfSpace() && R[i][0].sign()==0)
       continue;
-    poly s = currentStrategy->checkInitialIdealForMonomial(I,r,R[i]);
-    if (s==NULL)
+    std::pair<poly,int> s = currentStrategy->checkInitialIdealForMonomial(I,r,R[i]);
+    if (s.first==NULL)
     {
-      p_Delete(&s,r);
+      if (s.second<0)
+        // if monomial was initialized, delete it
+        p_Delete(&s.first,r);
       return R[i];
     }
   }

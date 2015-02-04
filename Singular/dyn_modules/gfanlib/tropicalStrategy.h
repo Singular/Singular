@@ -305,7 +305,7 @@ public:
    * checks whether I contains a monomial.
    * In both cases returns a monomial, if it contains one, returns NULL otherwise.
    **/
-  poly checkInitialIdealForMonomial(const ideal I, const ring r, const gfan::ZVector w=0) const;
+  std::pair<poly,int> checkInitialIdealForMonomial(const ideal I, const ring r, const gfan::ZVector &w=0) const;
 
   /**
    * given generators of the initial ideal, computes its standard basis

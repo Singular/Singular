@@ -47,13 +47,11 @@ groebnerCones tropicalTraversalMinimizingFlips(const groebnerCone startingCone)
   groebnerCones workingList;
   workingList.insert(startingCone);
   const tropicalStrategy* currentStrategy=startingCone.getTropicalStrategy();
-  // std::cout << "starting traversal" << std::endl;
   while(!workingList.empty())
   {
     /**
      * Pick an element the working list and compute interior points on its facets
      */
-    // std::cout << "picking cone and computing interior facet points..." << std::endl;
     groebnerCone sigma=*(workingList.begin());
     gfan::ZMatrix interiorPoints = interiorPointsOfFacets(sigma.getPolyhedralCone());
 
@@ -66,20 +64,17 @@ groebnerCones tropicalTraversalMinimizingFlips(const groebnerCone startingCone)
       if (!(currentStrategy->restrictToLowerHalfSpace() && interiorPoint[0].sign()==0))
       {
         ideal inI = initial(sigma.getPolynomialIdeal(),sigma.getPolynomialRing(),interiorPoint);
-        // std::cout << "picking interiorPoint and computing rays of tropical star..." << std::endl;
         gfan::ZMatrix normalVectors = raysOfTropicalStar(inI,
                                                          sigma.getPolynomialRing(),
                                                          interiorPoint,
                                                          sigma.getTropicalStrategy());
         id_Delete(&inI,sigma.getPolynomialRing());
 
-        // std::cout << "checking for th neccessity to flip..." << std::endl;
         std::vector<bool> needToFlip = checkNecessaryFlips(tropicalVariety,workingList,interiorPoint,normalVectors);
         for (int j=0; j<normalVectors.getHeight(); j++)
         {
           if (needToFlip[j])
           {
-            // std::cout << "flipping cone..." << std::endl;
             groebnerCone neighbour = sigma.flipCone(interiorPoint,normalVectors[j]);
             workingList.insert(neighbour);
           }
@@ -113,8 +108,8 @@ groebnerCones tropicalTraversal(const groebnerCone startingCone)
     }
     tropicalVariety.insert(sigma);
     workingList.erase(sigma);
-    // std::cout << "tropicalVariety.size():" << tropicalVariety.size() << std::endl;
-    // std::cout << "workingList.size():" << workingList.size() << std::endl;
+    std::cout << "tropicalVariety.size():" << tropicalVariety.size() << std::endl;
+    std::cout << "workingList.size():" << workingList.size() << std::endl;
   }
   return tropicalVariety;
 }

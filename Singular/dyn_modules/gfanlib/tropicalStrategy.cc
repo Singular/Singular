@@ -455,47 +455,62 @@ ring tropicalStrategy::getShortcutRingPrependingWeight(const ring r, const gfan:
   return rShortcut;
 }
 
-poly tropicalStrategy::checkInitialIdealForMonomial(const ideal I, const ring r, const gfan::ZVector w) const
+std::pair<poly,int> tropicalStrategy::checkInitialIdealForMonomial(const ideal I, const ring r, const gfan::ZVector &w) const
 {
+  // quick check whether I already contains an ideal
   int k = idSize(I);
   for (int i=0; i<k; i++)
   {
     poly g = I->m[i];
     if (pNext(g)==NULL && (isValuationTrivial() || n_IsOne(p_GetCoeff(g,r),r->cf)))
-    {
-      poly monomial = p_Copy(g,r);
-      return monomial;
-    }
+      return std::pair<poly,int>(g,i);
   }
-  // prepend extra weight for homogeneity
-  // switch to residue field if valuation is non trivial
-  ring rShortcut = getShortcutRingPrependingWeight(r,w);
 
-  // compute the initial ideal and map it into the constructed ring
-  // if switched to residue field, remove possibly 0 elements
-  ideal inI = initial(I,r,w);
-  ideal inIShortcut = idInit(k);
-  nMapFunc intoShortcut = n_SetMap(r->cf,rShortcut->cf);
-  for (int i=0; i<k; i++)
-    inIShortcut->m[i] = p_PermPoly(inI->m[i],NULL,r,rShortcut,intoShortcut,NULL,0);
-  if (isValuationNonTrivial())
-    idSkipZeroes(inIShortcut);
+  ring rShortcut;
+  ideal inIShortcut;
+  if (w.size()>0)
+  {
+    // if needed, prepend extra weight for homogeneity
+    // switch to residue field if valuation is non trivial
+    rShortcut = getShortcutRingPrependingWeight(r,w);
+
+    // compute the initial ideal and map it into the constructed ring
+    // if switched to residue field, remove possibly 0 elements
+    ideal inI = initial(I,r,w);
+    inIShortcut = idInit(k);
+    nMapFunc intoShortcut = n_SetMap(r->cf,rShortcut->cf);
+    for (int i=0; i<k; i++)
+      inIShortcut->m[i] = p_PermPoly(inI->m[i],NULL,r,rShortcut,intoShortcut,NULL,0);
+    if (isValuationNonTrivial())
+      idSkipZeroes(inIShortcut);
+    id_Delete(&inI,r);
+  }
+  else
+  {
+    rShortcut = r;
+    inIShortcut = I;
+  }
 
   // check initial ideal for monomial and
   // if it exsists, return a copy of the monomial in the input ring
   poly p = checkForMonomialViaSuddenSaturation(inIShortcut,rShortcut);
-  poly monomial = NULL; int n = rVar(r);
+  poly monomial = NULL;
   if (p!=NULL)
   {
     monomial=p_One(r);
-    for (int i=1; i<=n; i++)
+    for (int i=1; i<=rVar(r); i++)
       p_SetExp(monomial,i,p_GetExp(p,i,rShortcut),r);
     p_Delete(&p,rShortcut);
   }
-  id_Delete(&inI,r);
-  id_Delete(&inIShortcut,rShortcut);
-  rDelete(rShortcut);
-  return monomial;
+
+
+  if (w.size()>0)
+  {
+    // if needed, cleanup
+    id_Delete(&inIShortcut,rShortcut);
+    rDelete(rShortcut);
+  }
+  return std::pair<poly,int>(monomial,-1);
 }
 
 ring tropicalStrategy::copyAndChangeCoefficientRing(const ring r) const
