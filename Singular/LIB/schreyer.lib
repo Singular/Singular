@@ -33,13 +33,13 @@ NOTE:
 NOTE:
 @* most comutations require the dynamic or built-in module @code{syzextra}, which will be auto-leaded on demand.
 PROCEDURES:
+  s_res(M, len)   compute Schreyer resolution of module M of maximal length len via LiftTree method from [BMSS]
   Sres(M,len)     helper for computing Schreyer resolution of module M of maximal length len
   Ssyz(M)         helper for computing Schreyer resolution of module M of length 1
   Scontinue(len)  helper for extending currently active resolution by (at most) len syszygies
-  s_res(M, len)   compute Schreyer resolution of module M of maximal length len via LiftTree method from [BMSS]
 REFERENCES:
 @*
-[BMSS] Burcin, E., Motsak, O., Schreyer, F.-O., Steenpass, A.: NEW ALGORITHMS TO COMPUTE SYZYGIES, 2014.
+[BMSS] Burcin, E., Motsak, O., Schreyer, F.-O., Steenpass, A.: Refined algorithms to compute syzygies, 2015 (to appear).
 @*
 [SFO]  Schreyer, F.O.: Die Berechnung von Syzygien mit dem verallgemeinerten Weierstrassschen Divisionssatz,
        Master's thesis, Univ. Hamburg, 1980.
@@ -2473,17 +2473,18 @@ static proc TestSSres(def I)
   kill S, RR; setring save; kill R;
 }
 
+
+// Further recognized switches are the following attributes of @code{Schreyer::SSinit} procedure:
+// LEAD2SYZ, TAILREDSYZ, HYBRIDNF, DEBUG, ...
+
 proc s_res(def I, int l)
 "USAGE:  s_res(ideal/module M, int len)
-RETURN:  resolution object or SRES
-PURPOSE: compute a Schreyer resolution of M of length at most len (see [BMSS])
-NOTE:    If given len is zero then nvars(basering) + 1 is used instead.
-@* This functions is not related to other helpers from this library.
+RETURN:  resolution object over basering
+PURPOSE: compute a non-minimal Schreyer free resolution of M of length at most len via the LiftTree algorithm described in [BMSS].
+NOTE:    If given len is zero then nvars(basering) + 1 is used instead. 
+@* This functions is not related to the helpers from this library. This procedure works in only in commutative case.
 @* One can switch on computation protocol and statistic (depending on the build) by setting the @code{prot} option.
-@* Further recognized switches are the following attributes of @code{Schreyer::SSinit} procedure:
-LEAD2SYZ, TAILREDSYZ, HYBRIDNF
-DEBUG, ...
-SEE ALSO: sres
+SEE ALSO: sres, lres, Sres
 EXAMPLE: example s_res; shows an example
 "
 {
@@ -2517,12 +2518,11 @@ example
 { "EXAMPLE:"; echo = 2;
   ring R;
   module M = maxideal(1); M;
-  def  rs = s_res(M, 0);
-  print(rs);
-  print(betti(rs, 0)); // non-minimal betties
-  print(SRES_list(rs));
-  print(betti(rs, 1)); //minimal betties
+  s_res(M, 0); // Koszul complex
+  list rs = _; // get syzygies
+  print(betti(rs, 0), "betti"); // non-minimal betties
   print(minres(rs));
+  print(betti(rs, 1), "betti"); //minimal betties
 }
 
 static proc s_res_bm(def I)
