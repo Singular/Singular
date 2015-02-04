@@ -721,7 +721,7 @@ EXAMPLE: example isTwoSidedGB; shows examples
   int i; int n = nvars(basering);
   ideal J;
   // determine whether I is a left Groebner basis
-  if (attrib(I,"isSB") == 1)
+  if (attrib(I,"isSB"))
   {
     J = I;
     J = simplify(J,1+2+4+8);

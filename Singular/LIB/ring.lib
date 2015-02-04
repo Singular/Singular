@@ -1069,7 +1069,7 @@ proc isSubModule(def I,def J)
 RETURN: 1 if module(I) is in module(J), 0 otherwise
 EXAMPLE: isSubModule; shows an example
 {
-  if (attrib(J,"isSB")==1)
+  if (attrib(J,"isSB"))
   { return(size(reduce(I,J,1))==0); }
   else
   { return(size(reduce(I,groebner(J),1))==0); }

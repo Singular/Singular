@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: 1407244027:4.0.0, 64 bit:4.0.0:x86_64-Linux:nepomuck:292608
-1 >> tst_memory_1 :: 1407244027:4.0.0, 64 bit:4.0.0:x86_64-Linux:nepomuck:2326528
-1 >> tst_memory_2 :: 1407244027:4.0.0, 64 bit:4.0.0:x86_64-Linux:nepomuck:2379776
-1 >> tst_timer_1 :: 1407244027:4.0.0, 64 bit:4.0.0:x86_64-Linux:nepomuck:2
+1 >> tst_memory_0 :: 1408579461:4.0.0, 32 bit:4.0.0:i686-Linux:vogon.jeltz:259776
+1 >> tst_memory_1 :: 1408579461:4.0.0, 32 bit:4.0.0:i686-Linux:vogon.jeltz:2338816
+1 >> tst_memory_2 :: 1408579461:4.0.0, 32 bit:4.0.0:i686-Linux:vogon.jeltz:2387344
+1 >> tst_timer_1 :: 1408579461:4.0.0, 32 bit:4.0.0:i686-Linux:vogon.jeltz:4

@@ -612,7 +612,16 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-  /*==================== complexNearZero ======================*/
+    /*======================= demon_list =====================*/
+    if (strcmp(sys_cmd,"denom_list")==0)
+    {
+      res->rtyp=LIST_CMD;
+      extern lists get_denom_list();
+      res->data=(lists)get_denom_list();
+      return FALSE;
+    }
+    else
+    /*==================== complexNearZero ======================*/
     if(strcmp(sys_cmd,"complexNearZero")==0)
     {
       const short t[]={2,NUMBER_CMD,INT_CMD};
@@ -862,7 +871,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       if (iiCheckTypes(h,t,1))
       {
         int id=0;
-        blackboxIsCmd((char*)h->Data(),id);
+        char *n=(char*)h->Data();
+        blackboxIsCmd(n,id);
         if (id>0)
         {
           blackbox *bb=getBlackboxStuff(id);
@@ -872,7 +882,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
             newstructShow(desc);
             return FALSE;
           }
+          else Werror("'%s' is not a newstruct",n);
         }
+        else Werror("'%s' is not a blackbox object",n);
       }
       return TRUE;
     }
@@ -3443,15 +3455,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
                 */
 
   #endif
-/*======================= demon_list =====================*/
-  if (strcmp(sys_cmd,"denom_list")==0)
-  {
-    res->rtyp=LIST_CMD;
-    extern lists get_denom_list();
-    res->data=(lists)get_denom_list();
-    return FALSE;
-  }
-  else
   /*==================== mpz_t loader ======================*/
     if(strcmp(sys_cmd, "GNUmpLoad")==0)
     {

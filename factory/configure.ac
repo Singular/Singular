@@ -107,27 +107,18 @@ AH_TEMPLATE([DISABLE_GMP_CPP],[DISABLE_GMP_CPP])
 if test "x$with_Singular" = xyes; then
   AC_DEFINE([SINGULAR],[1])
   AC_DEFINE([DISABLE_GMP_CPP],[1])
-  AC_DEFINE([NOSTREAMIO],[1])
+#  AC_DEFINE([NOSTREAMIO],[1])
 fi
 
+# || test "x$with_Singular" = xyes
 # Use no streamio (C++) if SINGULAR or explicitely disabled
-if test "x$enable_streamio" = xno || test "x$with_Singular" = xyes;  then
+if test "x$enable_streamio" = xno;  then
   AC_DEFINE([NOSTREAMIO],[1])
-else
-  AC_CHECK_HEADERS(iostream.h strstream.h fstream.h iostream string fstream)
-  AC_CHECK_HEADERS(ctype.h, , [ AC_MSG_ERROR(standard C header files not found) ])
-
-  # since the FTE will compile only with stream IO enabled we will not
-  # check for the necessary header files if stream IO is disabled
-  AC_CHECK_HEADERS(stdarg.h signal.h errno.h unistd.h, ,
-    [ AC_MSG_WARN(C/C++ header files not found.
-                    You will not be able to build the Factory Test Environment
-                    (though Factory itself should compile)) ])
 fi
 
 AM_CONDITIONAL(
     [WITH_PARSER_FOR_CANONICAL_FORM],
-    [test x$with_Singular != xyes && test x$enable_streamio != xno])
+    [test "x$enable_streamio" = xyes])
 
 AC_ARG_VAR( [RESOURCES_INCLUDES], [INCLUDES for libresources] )
 AC_ARG_VAR( [RESOURCES_LIBS], [LIBS for libresources] )
@@ -239,10 +230,24 @@ LB_CHECK_FLINT(2.3,,AC_MSG_WARN([Unable to find FLINT (which is strongly recomme
 # - check for header files.
 #
 AC_LANG_CPLUSPLUS
+AC_LANG_PUSH([C++])
 
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h time.h math.h, ,
   [ AC_MSG_ERROR(C header files not found) ])
 AC_CHECK_HEADERS(cstdio)
+
+if test "x$enable_streamio" != xno;  then
+  AC_CHECK_HEADERS(iostream.h strstream.h fstream.h iostream string fstream)
+  AC_CHECK_HEADERS(ctype.h, , [ AC_MSG_ERROR(standard C header files not found) ])
+
+  # since the FTE will compile only with stream IO enabled we will not
+  # check for the necessary header files if stream IO is disabled
+  AC_CHECK_HEADERS(stdarg.h signal.h errno.h unistd.h, ,
+    [ AC_MSG_WARN(C/C++ header files not found.
+                    You will not be able to build the Factory Test Environment
+                    (though Factory itself should compile)) ])
+fi
+
 
 if test "x$enable_timing" != xno; then
   AC_CHECK_HEADERS(sys/param.h sys/times.h, ,

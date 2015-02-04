@@ -20,11 +20,25 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+New commands:
+@itemize
+@item align (@nref{align})
+@end itemize
+
 New libraries:
 @itemize
 @item algemodstd.lib (@nref{algemodstd_lib})
 @item brillnoether.lib (@nref{brillnoether_lib})
 @item hess.lib (@nref{hess_lib})
+@end itemize
+
+Changed libraries:
+@itemize
+@item Presolve::findvars (@nref{findvars},@nref{variables})
+@item Ring::addvarsTo (@nref{addvarsTo})
+@item Ring::addNvarsTo (@nref{addNvarsTo})
+@item grobcov.lib (grobcovK) (@nref{grobcov_lib})
+@item normaliz.lib (for normaliz >=2.8) (@nref{normaliz_lib})
 @end itemize
 
 @heading News for version 4-0-1

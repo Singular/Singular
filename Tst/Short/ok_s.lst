@@ -8,6 +8,7 @@ bug_ringlist
 bug_tr237
 ; do not try bug_tr276 without 2.2 GB RAM free
 ; bug_tr276
+bug_tr488
 bug_tr501
 ; bug_554 ;ehv.lib depr.
 bug_tr559
@@ -30,6 +31,7 @@ bug_tr668
 bug_tr671
 bug_tr679
 bug_tr686
+bug_tr690
 bug_genus_etc
 facstd
 fermat_gcd_1var
@@ -48,10 +50,6 @@ gcd5primtest
 gcd5test
 gcd_univar_p_s
 gcd_univar_p_alpha_s
-Katsura_3_32003_lp_slimgb
-Katsura_4_32003_lp_slimgb
-Katsura_5_32003_lp_slimgb
-Katsura_6_32003_lp_slimgb
 modular_s
 modstd_s
 ncfactor_facNthShift1_s
@@ -59,13 +57,6 @@ ncfactor_landau_ex_s
 ncfactor_multipleFacsSameTopAndBottom_s
 ncfactor_nthweylringalt_s
 parallel_s
-pAddManyVarsManyL_s
-pAddManyVars_s
-pAdd_s
-pMultManyVarsManyL_s
-pMultManyVars_s
-pMult_s
-polylib_s
 primdec3
 reesclos
 resources_s

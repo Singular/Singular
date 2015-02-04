@@ -1,6 +1,4 @@
 break dErrorBreak
-break omReportError
-break dPolyReportError
 
 
 

@@ -43,6 +43,7 @@
 
 #include <kernel/GBEngine/syz.h>
 #include <kernel/GBEngine/kstd1.h>
+#include <kernel/GBEngine/kutil.h> // denominator_list
 
 #include <kernel/combinatorics/stairc.h>
 #include <kernel/combinatorics/hutil.h>
@@ -4801,6 +4802,23 @@ void rSetHdl(idhdl h)
     memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
+  if ((rg!=currRing)&&(currRing!=NULL))
+  {
+    denominator_list dd=DENOMINATOR_LIST;
+    if (DENOMINATOR_LIST!=NULL)
+    {
+      if (TEST_V_ALLWARN)
+        Warn("deleting denom_list for ring change to %s",IDID(h));
+      do
+      {
+        n_Delete(&(dd->n),currRing->cf);
+        dd=dd->next;
+        omFree(DENOMINATOR_LIST);
+        DENOMINATOR_LIST=dd;
+      } while(DENOMINATOR_LIST!=NULL);
+    }
+  }
+
   // test for valid "currRing":
   if ((rg!=NULL) && (rg->idroot==NULL))
   {
@@ -5867,9 +5885,9 @@ void paPrint(const char *n,package p)
 BOOLEAN iiApplyINTVEC(leftv res, leftv a, int op, leftv proc)
 {
   intvec *aa=(intvec*)a->Data();
-  intvec *r=ivCopy(aa);
   sleftv tmp_out;
   sleftv tmp_in;
+  leftv curr=res;
   BOOLEAN bo=FALSE;
   for(int i=0;i<aa->length(); i++)
   {
@@ -5880,15 +5898,20 @@ BOOLEAN iiApplyINTVEC(leftv res, leftv a, int op, leftv proc)
       bo=iiExprArith1(&tmp_out,&tmp_in,op);
     else
       bo=jjPROC(&tmp_out,proc,&tmp_in);
-    if (bo || (tmp_out.rtyp!=INT_CMD))
+    if (bo)
     {
-      if (r!=NULL) delete r;
+      res->CleanUp(currRing);
       Werror("apply fails at index %d",i+1);
       return TRUE;
     }
-    (*r)[i]=(int)(long)tmp_out.data;
+    if (i==0) { memcpy(res,&tmp_out,sizeof(tmp_out)); }
+    else
+    {
+      curr->next=(leftv)omAllocBin(sleftv_bin);
+      curr=curr->next;
+      memcpy(curr,&tmp_out,sizeof(tmp_out));
+    }
   }
-  res->data=(void*)r;
   return FALSE;
 }
 BOOLEAN iiApplyBIGINTMAT(leftv res, leftv a, int op, leftv proc)
@@ -5904,9 +5927,9 @@ BOOLEAN iiApplyIDEAL(leftv res, leftv a, int op, leftv proc)
 BOOLEAN iiApplyLIST(leftv res, leftv a, int op, leftv proc)
 {
   lists aa=(lists)a->Data();
-  lists r=(lists)omAlloc0Bin(slists_bin); r->Init(aa->nr+1);
   sleftv tmp_out;
   sleftv tmp_in;
+  leftv curr=res;
   BOOLEAN bo=FALSE;
   for(int i=0;i<=aa->nr; i++)
   {
@@ -5919,13 +5942,18 @@ BOOLEAN iiApplyLIST(leftv res, leftv a, int op, leftv proc)
     tmp_in.CleanUp();
     if (bo)
     {
-      if (r!=NULL) r->Clean();
+      res->CleanUp(currRing);
       Werror("apply fails at index %d",i+1);
       return TRUE;
     }
-    memcpy(&(r->m[i]),&tmp_out,sizeof(sleftv));
+    if (i==0) { memcpy(res,&tmp_out,sizeof(tmp_out)); }
+    else
+    {
+      curr->next=(leftv)omAllocBin(sleftv_bin);
+      curr=curr->next;
+      memcpy(curr,&tmp_out,sizeof(tmp_out));
+    }
   }
-  res->data=(void*)r;
   return FALSE;
 }
 BOOLEAN iiApply(leftv res, leftv a, int op, leftv proc)

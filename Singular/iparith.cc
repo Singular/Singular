@@ -1742,6 +1742,29 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
   return FALSE;
 }
 #endif
+static BOOLEAN jjALIGN_V(leftv res, leftv u, leftv v)
+{
+  poly p=(poly)u->CopyD();
+  int s=(int)(long)v->Data();
+  if (s+p_MinComp(p,currRing)<=0)
+  { p_Delete(&p,currRing);return TRUE;}
+  p_Shift(&p,s,currRing);
+  res->data=p;
+  return FALSE;
+}
+static BOOLEAN jjALIGN_M(leftv res, leftv u, leftv v)
+{
+  ideal M=(ideal)u->CopyD();
+  int s=(int)(long)v->Data();
+  for(int i=IDELEMS(M)-1; i>=0;i--)
+  {
+    if (s+p_MinComp(M->m[i],currRing)<=0)
+    { id_Delete(&M,currRing);return TRUE;}
+  }
+  id_Shift(M,s,currRing);
+  res->data=M;
+  return FALSE;
+}
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
   coeffs cf;

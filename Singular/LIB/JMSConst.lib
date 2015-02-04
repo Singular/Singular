@@ -946,7 +946,7 @@ list VVV=varstr(basering);
 //L will contain results
 poly h=Minimus(variables(A.h));
 //print(h);
-int l=findvars(h,1)[2][1];
+int l=findvars(h)[2][1];
 if(l!=nvars(basering))
  {
 //print("vero");

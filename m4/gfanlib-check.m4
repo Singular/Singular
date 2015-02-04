@@ -25,7 +25,7 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
 
  LIBS="$LIBS -lcddgmp $GMP_LIBS "
 
- AC_LANG_PUSH(C)
+ AC_LANG_PUSH(C++)
  AC_LINK_IFELSE(
   [
    AC_LANG_PROGRAM(

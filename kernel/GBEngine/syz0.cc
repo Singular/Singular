@@ -667,7 +667,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
               omFreeSize((ADDRESS)pairs,(Fl + gencQ)*sizeof(poly));
               for(k=0;k<IDELEMS(result);k++) pDelete(&((*Shdl)[k]));
 
-	      kBucketDestroy(&(sy0buck));
+              kBucketDestroy(&(sy0buck));
               return result;
             }
           }
@@ -840,16 +840,6 @@ BOOLEAN syTestOrder(ideal M)
   return FALSE;
 }
 
-static void idShift(ideal arg,int index)
-{
-  int i,j=rGetMaxSyzComp(index, currRing);
-  for (i=0;i<IDELEMS(arg);i++)
-  {
-    if (arg->m[i]!=NULL)
-      p_Shift(&arg->m[i],-j,currRing);
-  }
-}
-
 #if 0 /*debug only */
 static void syPrintResolution(resolvente res,int start,int length)
 {
@@ -917,7 +907,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
         syRing = rAssure_CompLastBlock(origR, TRUE);
         if (syRing != origR)
         {
-	  rChangeCurrRing(syRing);
+          rChangeCurrRing(syRing);
           for (i=0; i<IDELEMS(res[1]); i++)
           {
             res[1]->m[i] = prMoveR( res[1]->m[i], origR, syRing);
@@ -930,7 +920,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
         syRing = rAssure_SyzComp_CompLastBlock(origR, TRUE);
         if (syRing != origR)
         {
-	  rChangeCurrRing(syRing);
+          rChangeCurrRing(syRing);
           for (i=0; i<IDELEMS(res[0]); i++)
           {
             res[0]->m[i] = prMoveR( res[0]->m[i], origR, syRing);
@@ -953,7 +943,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
     syzIndex = 1;
     while ((syzIndex < *length) && (!idIs0(res[syzIndex])))
     {
-      idShift(res[syzIndex],syzIndex);
+      id_Shift(res[syzIndex],-rGetMaxSyzComp(syzIndex, currRing),currRing);
       syzIndex++;
     }
   }

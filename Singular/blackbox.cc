@@ -146,6 +146,14 @@ int setBlackboxStuff(blackbox *bb, const char *n)
   }
   else
   {
+    // check for alreday defined bb:
+    for (int i=0;i<MAX_BB_TYPES;i++)
+    {
+      if ((blackboxName[i]!=NULL) && (strcmp(blackboxName[i],n)==0))
+      {
+        Warn("redefining blackbox type %s (%d -> %d)",n,i+BLACKBOX_OFFSET,where+BLACKBOX_OFFSET);
+      }
+    }
     blackboxTable[where]=bb;
     blackboxName[where]=omStrDup(n);
 #ifdef BLACKBOX_DEVEL

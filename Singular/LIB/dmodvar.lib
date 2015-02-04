@@ -697,7 +697,7 @@ static proc smallGenCoDim (ideal I, int Iasgiven)
   int ppl = printlevel - voice + 2;
   int n = nvars(basering);
   int c;
-  if (attrib(I,"isSB") == 1)
+  if (attrib(I,"isSB"))
   {
     c = n - dim(I);
     if (!Iasgiven)

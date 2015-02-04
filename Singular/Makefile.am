@@ -4,6 +4,8 @@ GIT_VERSION := $(shell $(top_srcdir)/git-version-gen $(top_srcdir)/.tarball-git-
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_builddir} -I${top_srcdir}/kernel -I${top_builddir}/kernel -I${top_srcdir}/libpolys -I${top_builddir}/libpolys $(FACTORY_INCLUDES)  $(GMP_CFLAGS) $(NTL_CFLAGS) $(FLINT_CFLAGS) -DGIT_VERSION='"$(GIT_VERSION)"'
 
+all-local: feOpt.inc feOptTS.inc feOptES.inc iparith.inc all.lib gftables MOD ${abs_builddir}/LIB Singular ESingular TSingular
+
 SUBDIRS = dyn_modules
 
 ########################### Possible builtin modules... #########################
@@ -155,9 +157,6 @@ optional_Singular_programs =
 
 bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 
-# the following dependency leads to Singular relinking upon a library update!
-Singular ESingular TSingular $(optional_Singular_programs): ${abs_builddir}/LIB
-
 Singular_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 Singular_LDADD = libSingular.la ${BUILTIN_FLAGS}
@@ -232,10 +231,8 @@ test_SOURCES = test.cc
 test_LDADD = libSingular.la
 
 #########################################################
-### plural_cmd.inc
 # These files are built first
 BUILT_SOURCES = feOpt.inc feOptTS.inc feOptES.inc iparith.inc all.lib gftables MOD
-
 CLEANFILES = $(BUILT_SOURCES) $(EXTRA_PROGRAMS)
 
 clean-local:
@@ -251,10 +248,6 @@ feOptES.inc: feOptES$(EXEEXT)
 
 feOptTS.inc: feOptTS$(EXEEXT)
 	${builddir}/feOptTS$(EXEEXT)
-
-# plural_cmd.inc is only necessary for documentation generation
-#plural_cmd.inc: gentable1$(EXEEXT)
-#	${builddir}/gentable1$(EXEEXT) argument
 
 iparith.inc: gentable1$(EXEEXT) table.h
 	${builddir}/gentable1$(EXEEXT)

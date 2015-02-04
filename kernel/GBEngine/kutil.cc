@@ -335,12 +335,14 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 
 #ifdef HAVE_RINGS
     if (rField_is_Ring(r) /*&& (rHasLocalOrMixedOrdering(r))*/)
-      lc = p_GetCoeff(p,r);
+      lc = pGetCoeff(p);
 #endif
 
-#ifdef HAVE_RINGS_LOC
+#ifdef HAVE_RINGS
   // Leading coef have to be a unit
-  if ( !(nIsUnit(p_GetCoeff(p, r))) ) return;
+  // example 2x+4x2 should be simplified to 2x*(1+2x)
+  // and 2 is not a unit in Z
+  //if ( !(n_IsUnit(pGetCoeff(p), r->cf)) ) return;
 #endif
 
   if(p_GetComp(p, r) != 0 && !p_OneComp(p, r)) return;
@@ -398,7 +400,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       // Note: As long as qring j forbidden if j contains integer (i.e. ground rings are
       //       domains), no zerodivisor test needed  CAUTION
       if (rField_is_Ring(r) /*&&(rHasLocalOrMixedOrdering(r)) */)
-        if(n_DivBy(p_GetCoeff(h,r->cf),lc,r->cf) == 0)
+        if(n_DivBy(pGetCoeff(h),lc,r->cf) == 0)
           return;
       #endif
       if (i == r->N) break; // does divide, try next monom
@@ -546,7 +548,7 @@ void cleanT (kStrategy strat)
 static inline void enlargeL (LSet* L,int* length,const int incr)
 {
   assume((*L)!=NULL);
-  assume((length+incr)>0);
+  assume(((*length)+incr)>0);
 
   *L = (LSet)omReallocSize((*L),(*length)*sizeof(LObject),
                                    ((*length)+incr)*sizeof(LObject));
@@ -906,7 +908,8 @@ BOOLEAN kTest_TS(kStrategy strat)
         return dReportError("L[%d].i_r1 out of sync", i);
       if (strat->L[i].i_r2 < 0 ||
           strat->L[i].i_r2 > strat->tl ||
-          strat->L[i].T_2(strat)->p != strat->L[i].p2);
+          strat->L[i].T_2(strat)->p != strat->L[i].p2)
+        return dReportError("L[%d].i_r2 out of sync", i);
     }
     else
     {
@@ -1439,7 +1442,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
     PrintS(" ; gcd = ");
     wrp(gcd);
     PrintS("\n--- create strong gcd poly: ");
-    Print("\n p: ", i);
+    Print("\n p: %d", i);
     wrp(p);
     Print("\n strat->S[%d]: ", i);
     wrp(strat->S[i]);
@@ -1471,7 +1474,10 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
     posx = strat->posInL(strat->L,strat->Ll,&h,strat);
   h.sev = pGetShortExpVector(h.p);
   if (currRing!=strat->tailRing)
-    h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+  {
+    if (h.t_p==NULL) /* may already been set by pLdeg() in initEcart */
+      h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+  }
   enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
   return TRUE;
 }
@@ -3336,7 +3342,7 @@ void initenterzeropairsRing (poly p, int ecart, kStrategy strat, int atR)
     step[i] = 500000;
   }
   step[1] = 500000;
-  habsind = ind2((long) p_GetCoeff(p, currRing));
+  habsind = ind2(n_Int(pGetCoeff(p), currRing->cf);
   long bound = currRing->ch - habsind;
 #ifdef OLI_DEBUG
   PrintS("-------------\npoly  :");
@@ -6541,9 +6547,11 @@ void cancelunit1 (LObject* p,int *suc, int index,kStrategy strat )
 
   if (!pIsVector((*p).p) && ((*p).ecart != 0))
   {
-#ifdef HAVE_RINGS_LOC
-    // Leading coef have to be a unit
-    if ( !(nIsUnit(p_GetCoeff((*p).p, r))) ) return;
+#ifdef HAVE_RINGS
+    // Leading coef have to be a unit: no
+    // example 2x+4x2 should be simplified to 2x*(1+2x)
+    // and 2 is not a unit in Z
+    //if ( !(n_IsUnit(pGetCoeff((*p).p), currRing->cf)) ) return;
 #endif
     k = 0;
     h1 = r = pCopy((*p).p);
@@ -6556,9 +6564,7 @@ void cancelunit1 (LObject* p,int *suc, int index,kStrategy strat )
         pDelete(&(pNext((*p).p)));
         (*p).ecart = 0;
         (*p).length = 1;
-#ifdef HAVE_RINGS_LOC
-        (*p).pLength = 1;  // Why wasn't this set already?
-#endif
+        (*p).pLength = 1;
         (*suc)=0;
         return;
       }
