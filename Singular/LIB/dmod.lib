@@ -6310,7 +6310,7 @@ EXAMPLE: example bernsteinLift; shows examples
   // now there's only one el-t with leadcomp<>0
   vector V = M2[1];
   number bcand = leadcoef(V[1]); // 1st component
-  V[1]=0;
+  V=V-V[1];
   number ct = content(V); // content of the cofactors
   poly CF = ct*V[ncols(J)]; // polynomial in K[s]<x,dx>, cofactor to F
   dbprint(ppl,"// -3-4- the cofactor candidate found");

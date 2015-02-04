@@ -4264,9 +4264,8 @@ EXAMPLE:  example collectDiv;   shows an example
              setring S;         // back to the ring which we want to consider
              if(savedCent==1)
              {
-               vector otherComp;
-               otherComp[M[int(leadcoef(path[1,ncols(path)])),size(BO[4])-1]]
-                        =1;
+               vector otherComp=
+               gen(M[int(leadcoef(path[1,ncols(path)])),size(BO[4])-1]);
              }
              kill savedCent;
              if (defined(SPa2)){kill SPa2;}

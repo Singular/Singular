@@ -931,7 +931,6 @@ static proc fsplit(ideal e0,intvec m0,matrix A,module H,module H0)
   matrix A0=jet(A,0);
   module U,U0,U1,U2;
   matrix N;
-  s=0;
   for(i=size(F);i>=1;i--)
   {
     N=A0-e0[i];
