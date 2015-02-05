@@ -34,14 +34,16 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
      #ifdef HAVE_SETOPER_H
      # include <setoper.h>
      # include <cdd.h>
-     #endif
+     #else
      #ifdef HAVE_CDD_SETOPER_H
      # include <cdd/setoper.h>
      # include <cdd/cdd.h>
-     #endif
+     #else
      #ifdef HAVE_CDDLIB_SETOPER_H
      # include <cddlib/setoper.h>
      # include <cddlib/cdd.h>
+     #endif
+     #endif
      #endif
     ], [dd_set_global_constants(); dd_log=dd_FALSE; ]
     )
