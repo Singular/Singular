@@ -695,7 +695,7 @@ ring tropicalStrategy::copyAndChangeOrderingWP(const ring r, const gfan::ZVector
   s->block0[1] = 1;
   s->block1[1] = n;
   s->wvhdl[1] = ZVectorToIntStar(vAdjusted,ok);
-  s->order[2] = ringorder_dp;
+  s->order[2] = ringorder_lp;
   s->block0[2] = 1;
   s->block1[2] = n;
   s->order[3] = ringorder_C;
@@ -724,7 +724,7 @@ ring tropicalStrategy::copyAndChangeOrderingLS(const ring r, const gfan::ZVector
   s->block0[1] = 1;
   s->block1[1] = n;
   s->wvhdl[1] = ZVectorToIntStar(v,ok);
-  s->order[2] = ringorder_dp;
+  s->order[2] = ringorder_lp;
   s->block0[2] = 1;
   s->block1[2] = n;
   s->order[3] = ringorder_C;
