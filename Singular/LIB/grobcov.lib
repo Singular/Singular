@@ -84,9 +84,9 @@ NOTATIONS: All given and determined polynomials and ideals are in the
 @*         After defining the ring, the main routines
 @*         grobcov, cgsdr,
 @*         generate the global rings
-@*         @R   (Q[a][x]),
-@*         @P   (Q[a]),
-@*         @RP  (Q[x,a])
+@*         Grobcov::@R   (Q[a][x]),
+@*         Grobcov::@P   (Q[a]),
+@*         Grobcov::@RP  (Q[x,a])
 @*         that are used inside and killed before the output.
 @*         If you want to use some internal routine you must
 @*         create before the above rings by calling setglobalrings();

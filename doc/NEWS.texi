@@ -35,11 +35,12 @@ New libraries:
 
 Changed libraries:
 @itemize
-@item Presolve::findvars (@nref{findvars},@nref{variables})
+@item Presolve::findvars (@nref{findvars}, @nref{variables})
 @item Ring::addvarsTo (@nref{addvarsTo})
 @item Ring::addNvarsTo (@nref{addNvarsTo})
 @item Schreyer::s_res (@nref{s_res})
-@item grobcov.lib (grobcovK) (@nref{grobcov_lib})
+@item grobcov.lib (grobcovK) (@nref{grobcov_lib}) with new routines
+   AddCons (@nref{AddCons}), AddConsP (@nref{AddConsP}).
 @item normaliz.lib (for normaliz >=2.8) (@nref{normaliz_lib})
 @end itemize
 
