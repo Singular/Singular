@@ -9,6 +9,9 @@ KEYWORDS: graded modules, graded homomorphisms, syzygies
 OVERVIEW:
     The library contains several procedures for operations with graded modules/matrices/resolutions
     TODO!
+REFERENCES:
+[MO]   Motsak, O.: Non-commutative Computer Algebra with applications: Graded commutative algebra and related
+       structures in Singular with applications, Ph.D. thesis, TU Kaiserslautern, 2010 TODO!?
 PROCEDURES:
     grzero()        presentation of basering(0)^1
     grobj(M,w)      construct a graded module object
@@ -20,14 +23,7 @@ PROCEDURES:
     grdeg(M)        compute graded degrees of M
     grorder(M)      reorder cols/rows of M for correct graded-block-structure
     grtranspose(M)  reordered graded transpose of M
-
-
-REFERENCES:
-[MO]   Motsak, O.: Non-commutative Computer Algebra with applications: Graded commutative algebra and related
-       structures in Singular with applications, Ph.D. thesis, TU Kaiserslautern, 2010 TODO!?
 ";
-
-
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////

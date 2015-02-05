@@ -1041,6 +1041,16 @@ Issues:
 @c ----------------------------------------------------------
 @node gradedModules_lib,hess_lib, gitfan_lib, Experimental libraries
 @subsection gradedModules_lib
+
+Issues:
+@itemize
+@item @code{assumeLevel} must not occur in libraries
+@item missing documentation:grzero,grobj,grshift,grtwist,grpower,grdeg,grorder,
+     grtranspose
+@item incomplete documentation:grview
+@item missing in header:TestGRRes,grtest,grisequal
+@end itemize
+
 @c lib gradedModules.lib
 @c ----------------------------------------------------------
 @node hess_lib,orbitparam_lib, gradedModules_lib, Experimental libraries
