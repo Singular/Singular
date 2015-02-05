@@ -566,9 +566,7 @@ shared val=1;
 val;
 list ll=list(val);
 ll;
-link(ll[1])=8;
-val;
-ll;
+
 shared vv =ll[1];
 vv=9;
 ll;
