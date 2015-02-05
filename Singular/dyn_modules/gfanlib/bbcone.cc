@@ -1620,7 +1620,7 @@ BOOLEAN facetContaining(leftv res, leftv args)
 /***
  * Computes a relative interior point for each facet of zc
  **/
-gfan::ZMatrix interiorPointsOfFacets(const gfan::ZCone zc)
+gfan::ZMatrix interiorPointsOfFacets(const gfan::ZCone &zc, const std::set<gfan::ZVector> &exceptThese)
 {
   gfan::ZMatrix inequalities = zc.getFacets();
   gfan::ZMatrix equations = zc.getImpliedEquations();
@@ -1638,7 +1638,10 @@ gfan::ZMatrix interiorPointsOfFacets(const gfan::ZCone zc)
   gfan::ZMatrix newEquations = equations;
   newEquations.appendRow(inequalities[0]);
   gfan::ZCone facet = gfan::ZCone(newInequalities,newEquations);
-  relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
+  facet.canonicalize();
+  gfan::ZVector interiorPoint = facet.getRelativeInteriorPoint();
+  if (exceptThese.count(interiorPoint)==0)
+    relativeInteriorPoints.appendRow(interiorPoint);
 
   /* these are the cases i=1,...,r-2 */
   for (int i=1; i<r-1; i++)
@@ -1648,7 +1651,10 @@ gfan::ZMatrix interiorPointsOfFacets(const gfan::ZCone zc)
     newEquations = equations;
     newEquations.appendRow(inequalities[i]);
     facet = gfan::ZCone(newInequalities,newEquations);
-    relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
+    facet.canonicalize();
+    interiorPoint = facet.getRelativeInteriorPoint();
+    if (exceptThese.count(interiorPoint)==0)
+      relativeInteriorPoints.appendRow(interiorPoint);
   }
 
   /* this is the i=r-1 case */
@@ -1656,7 +1662,10 @@ gfan::ZMatrix interiorPointsOfFacets(const gfan::ZCone zc)
   newEquations = equations;
   newEquations.appendRow(inequalities[r-1]);
   facet = gfan::ZCone(newInequalities,newEquations);
-  relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
+  facet.canonicalize();
+  interiorPoint = facet.getRelativeInteriorPoint();
+  if (exceptThese.count(interiorPoint)==0)
+    relativeInteriorPoints.appendRow(interiorPoint);
 
   return relativeInteriorPoints;
 }

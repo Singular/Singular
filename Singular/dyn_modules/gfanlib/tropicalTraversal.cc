@@ -47,13 +47,14 @@ groebnerCones tropicalTraversalMinimizingFlips(const groebnerCone startingCone)
   groebnerCones workingList;
   workingList.insert(startingCone);
   const tropicalStrategy* currentStrategy=startingCone.getTropicalStrategy();
+  std::set<gfan::ZVector> finishedInteriorPoints;
   while(!workingList.empty())
   {
     /**
      * Pick an element the working list and compute interior points on its facets
      */
     groebnerCone sigma=*(workingList.begin());
-    gfan::ZMatrix interiorPoints = interiorPointsOfFacets(sigma.getPolyhedralCone());
+    gfan::ZMatrix interiorPoints = interiorPointsOfFacets(sigma.getPolyhedralCone(),finishedInteriorPoints);
 
     for (int i=0; i<interiorPoints.getHeight(); i++)
     {
@@ -80,6 +81,7 @@ groebnerCones tropicalTraversalMinimizingFlips(const groebnerCone startingCone)
           }
         }
       }
+      finishedInteriorPoints.insert(interiorPoint);
     }
 
     sigma.deletePolynomialData();
