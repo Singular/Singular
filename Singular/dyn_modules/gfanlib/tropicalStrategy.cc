@@ -407,7 +407,7 @@ void tropicalStrategy::pReduce(ideal I, const ring r) const
   return;
 }
 
-ring tropicalStrategy::getShortcutRingPrependingWeight(const ring r, const gfan::ZVector v) const
+ring tropicalStrategy::getShortcutRingPrependingWeight(const ring r, const gfan::ZVector &v) const
 {
   ring rShortcut = rCopy0(r);
 
@@ -674,7 +674,7 @@ static void deleteOrdering(ring r)
   return;
 }
 
-ring tropicalStrategy::copyAndChangeOrderingWP(const ring r, const gfan::ZVector w, const gfan::ZVector v) const
+ring tropicalStrategy::copyAndChangeOrderingWP(const ring r, const gfan::ZVector &w, const gfan::ZVector &v) const
 {
   // copy shortcutRing and change to desired ordering
   bool ok;
@@ -705,7 +705,7 @@ ring tropicalStrategy::copyAndChangeOrderingWP(const ring r, const gfan::ZVector
   return s;
 }
 
-ring tropicalStrategy::copyAndChangeOrderingLS(const ring r, const gfan::ZVector w, const gfan::ZVector v) const
+ring tropicalStrategy::copyAndChangeOrderingLS(const ring r, const gfan::ZVector &w, const gfan::ZVector &v) const
 {
   // copy shortcutRing and change to desired ordering
   bool ok;
@@ -735,8 +735,8 @@ ring tropicalStrategy::copyAndChangeOrderingLS(const ring r, const gfan::ZVector
 }
 
 std::pair<ideal,ring> tropicalStrategy::computeFlip(const ideal Ir, const ring r,
-                                                    const gfan::ZVector interiorPoint,
-                                                    const gfan::ZVector facetNormal) const
+                                                    const gfan::ZVector &interiorPoint,
+                                                    const gfan::ZVector &facetNormal) const
 {
   assume(isValuationTrivial() || interiorPoint[0].sign()<0);
   assume(checkForUniformizingBinomial(Ir,r));

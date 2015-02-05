@@ -99,8 +99,8 @@ private:
   bool (*extraReductionAlgorithm) (ideal I, ring r, number p);
 
   ring copyAndChangeCoefficientRing(const ring r) const;
-  ring copyAndChangeOrderingWP(const ring r, const gfan::ZVector w, const gfan::ZVector v) const;
-  ring copyAndChangeOrderingLS(const ring r, const gfan::ZVector w, const gfan::ZVector v) const;
+  ring copyAndChangeOrderingWP(const ring r, const gfan::ZVector &w, const gfan::ZVector &v) const;
+  ring copyAndChangeOrderingLS(const ring r, const gfan::ZVector &w, const gfan::ZVector &v) const;
 
   /**
    * if valuation non-trivial, checks whether the generating system contains p-t
@@ -266,7 +266,7 @@ public:
     return this->weightAdjustingAlgorithm2(v,w);
   }
 
-  gfan::ZVector negateWeight(const gfan::ZVector w) const
+  gfan::ZVector negateWeight(const gfan::ZVector &w) const
   {
     gfan::ZVector wNeg(w.size());
 
@@ -287,7 +287,7 @@ public:
    * such that any ideal homogeneous with respect to w is homogeneous with respect to that weight.
    * If valuation non-trivial, changes the coefficient ring to the residue field.
    */
-  ring getShortcutRingPrependingWeight(const ring r, const gfan::ZVector w) const;
+  ring getShortcutRingPrependingWeight(const ring r, const gfan::ZVector &w) const;
 
   /**
    * reduces the generators of an ideal I so that
@@ -329,7 +329,7 @@ public:
    * given an interior point of a groebner cone
    * computes the groebner cone adjacent to it
    */
-  std::pair<ideal,ring> computeFlip(const ideal Ir, const ring r, const gfan::ZVector interiorPoint, const gfan::ZVector facetNormal) const;
+  std::pair<ideal,ring> computeFlip(const ideal Ir, const ring r, const gfan::ZVector &interiorPoint, const gfan::ZVector &facetNormal) const;
 };
 
 #ifndef NDEBUG
