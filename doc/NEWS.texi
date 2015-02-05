@@ -30,6 +30,7 @@ New libraries:
 @item algemodstd.lib (@nref{algemodstd_lib})
 @item brillnoether.lib (@nref{brillnoether_lib})
 @item hess.lib (@nref{hess_lib})
+@item gradedModules.lib (@nref{gradedModules_lib})
 @end itemize
 
 Changed libraries:
@@ -37,6 +38,7 @@ Changed libraries:
 @item Presolve::findvars (@nref{findvars},@nref{variables})
 @item Ring::addvarsTo (@nref{addvarsTo})
 @item Ring::addNvarsTo (@nref{addNvarsTo})
+@item Schreyer::s_res (@nref{s_res})
 @item grobcov.lib (grobcovK) (@nref{grobcov_lib})
 @item normaliz.lib (for normaliz >=2.8) (@nref{normaliz_lib})
 @end itemize
