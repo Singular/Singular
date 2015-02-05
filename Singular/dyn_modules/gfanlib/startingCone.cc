@@ -4,7 +4,7 @@
 #include <initial.h>
 #include <lift.h>
 #include <groebnerCone.h>
-#include <neighbours.h>
+// #include <neighbours.h>
 #include <tropicalStrategy.h>
 #include <tropicalCurves.h>
 #include <bbcone.h>
@@ -424,7 +424,7 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
 
     // but before doing so, we must lift the generating set of inI
     // to a generating set of I
-    ideal J = lift(I,r,inI,s);
+    ideal J = lift(I,r,inI,s); // todo: use computeLift from tropicalStrategy
     groebnerCone startingCone(J,inI,s,currentStrategy);
     id_Delete(&inI,s);
     id_Delete(&J,s);
@@ -472,7 +472,7 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     if (zc.dimension()==currentStrategy.getExpectedDimension())
     { // this case shouldn't happen as trivial cases should be caught beforehand
       // this is the case that the tropical variety has a one-codimensional lineality space
-      ideal J = lift(I,r,inJ,s);
+      ideal J = lift(I,r,inJ,s); // todo: use computeLift from tropicalStrategy
       groebnerCone startingCone(J,inJ,s,currentStrategy);
       id_Delete(&inJ,s);
       id_Delete(&J,s);

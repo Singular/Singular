@@ -1,7 +1,7 @@
 #include <tropicalStrategy.h>
 #include <adjustWeights.h>
 #include <ppinitialReduction.h>
-#include <ttinitialReduction.h>
+// #include <ttinitialReduction.h>
 #include <tropical.h>
 #include <std_wrapper.h>
 #include <tropicalCurves.h>
@@ -500,6 +500,7 @@ std::pair<poly,int> tropicalStrategy::checkInitialIdealForMonomial(const ideal I
     monomial=p_One(r);
     for (int i=1; i<=rVar(r); i++)
       p_SetExp(monomial,i,p_GetExp(p,i,rShortcut),r);
+    p_Setm(monomial,r);
     p_Delete(&p,rShortcut);
   }
 

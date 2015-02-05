@@ -64,7 +64,7 @@ public:
   ring getPolynomialRing() const { return polynomialRing; };
   gfan::ZCone getPolyhedralCone() const { return polyhedralCone; };
   gfan::ZVector getInteriorPoint() const { return interiorPoint; };
-  const tropicalStrategy* getTropicalStrategy() const {return currentStrategy; };
+  const tropicalStrategy* getTropicalStrategy() const { return currentStrategy; };
   friend struct groebnerCone_compare;
 
   /**

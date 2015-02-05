@@ -3,6 +3,75 @@
 #include <kernel/GBEngine/kstd1.h>
 #include <libpolys/polys/prCopy.h>
 
+poly checkForMonomialViaSuddenSaturation(const ideal I, const ring r)
+{
+  ring origin = currRing;
+  if (currRing != r)
+    rChangeCurrRing(r);
+
+  ideal M = idInit(1);
+  M->m[0] = p_Init(r);
+  for (int i=1; i<=rVar(r); i++)
+    p_SetExp(M->m[0],i,1,r);
+  p_SetCoeff(M->m[0],n_Init(1,r->cf),r);
+  p_Setm(M->m[0],r); p_Test(M->m[0],r);
+
+  ideal J = id_Copy(I,r); bool b; int k = 0;
+  if (currRing != r) rChangeCurrRing(r);
+  intvec* nullVector = NULL;
+  do
+  {
+    ideal Jstd = kStd(J,currRing->qideal,testHomog,&nullVector);
+    ideal JquotM = idQuot(Jstd,M,true,true);
+    ideal JquotMredJ = kNF(Jstd,currRing->qideal,JquotM);
+    b = idIs0(JquotMredJ);
+    id_Delete(&Jstd,r);
+    id_Delete(&J,r);
+    J = JquotM;
+    id_Delete(&JquotMredJ,r);
+    k++;
+  } while (!b);
+
+  poly monom = NULL;
+  if (id_IsConstant(J,r))
+  {
+    monom = p_Init(r);
+    for (int i=1; i<=rVar(r); i++)
+      p_SetExp(monom,i,k,r);
+    p_SetCoeff(monom,n_Init(1,r->cf),r);
+    p_Setm(monom,r);
+  }
+  id_Delete(&M,r);
+  id_Delete(&J,r);
+
+  if (currRing != origin)
+    rChangeCurrRing(origin);
+  return monom;
+}
+
+
+BOOLEAN checkForMonomial(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
+  {
+    ideal I; poly monom;
+    omUpdateInfo();
+    Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
+    I = (ideal) u->CopyD();
+    monom = checkForMonomialViaSuddenSaturation(I,currRing);
+    id_Delete(&I,currRing);
+    p_Delete(&monom,currRing);
+    omUpdateInfo();
+    Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
+    I = (ideal) u->Data();
+    res->rtyp = POLY_CMD;
+    res->data = (char*) checkForMonomialViaSuddenSaturation(I,currRing);
+    return FALSE;
+  }
+  return TRUE;
+}
+
 #if 0
 // /***
 //  * Creates an int* representing the transposition of the last two variables
@@ -162,95 +231,4 @@ poly checkForMonomialsViaStepwiseSaturation(const ideal &I, const gfan::ZVector 
 
   return NULL;
 }
-#endif
-
-
-poly checkForMonomialViaSuddenSaturation(const ideal I, const ring r)
-{
-  ring origin = currRing;
-  if (currRing != r)
-    rChangeCurrRing(r);
-
-  ideal M = idInit(1);
-  M->m[0] = p_Init(r);
-  for (int i=1; i<=rVar(r); i++)
-    p_SetExp(M->m[0],i,1,r);
-  p_SetCoeff(M->m[0],n_Init(1,r->cf),r);
-  p_Setm(M->m[0],r); p_Test(M->m[0],r);
-
-  // for (int i=1; i<100; i++)
-  // {
-  //   omUpdateInfo();
-  //   Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-  //   ideal J = id_Copy(I,r); bool b; int k = 0;
-  //   intvec* nullVector = NULL;
-  //   do
-  //   {
-  //     ideal Jstd = kStd(J,currRing->qideal,testHomog,&nullVector);
-  //     ideal JquotM = idQuot(Jstd,M,true,true);
-  //     ideal JquotMredJ = kNF(Jstd,currRing->qideal,JquotM);
-  //     b = idIs0(JquotMredJ);
-  //     id_Delete(&Jstd,r);
-  //     id_Delete(&J,r);
-  //     J = JquotM;
-  //     id_Delete(&JquotMredJ,r);
-  //     k++;
-  //   } while (!b);
-  //   id_Delete(&J,r);
-  // }
-
-  ideal J = id_Copy(I,r); bool b; int k = 0;
-  if (currRing != r) rChangeCurrRing(r);
-  intvec* nullVector = NULL;
-  do
-  {
-    ideal Jstd = kStd(J,currRing->qideal,testHomog,&nullVector);
-    ideal JquotM = idQuot(Jstd,M,true,true);
-    ideal JquotMredJ = kNF(Jstd,currRing->qideal,JquotM);
-    b = idIs0(JquotMredJ);
-    id_Delete(&Jstd,r);
-    id_Delete(&J,r);
-    J = JquotM;
-    id_Delete(&JquotMredJ,r);
-    k++;
-  } while (!b);
-
-  poly monom = NULL;
-  if (id_IsConstant(J,r))
-  {
-    monom = p_Init(r);
-    for (int i=1; i<=rVar(r); i++)
-      p_SetExp(monom,i,k,r);
-    p_SetCoeff(monom,n_Init(1,r->cf),r);
-    p_Setm(monom,r);
-  }
-  id_Delete(&M,r);
-  id_Delete(&J,r);
-
-  if (currRing != origin)
-    rChangeCurrRing(origin);
-  return monom;
-}
-
-
-BOOLEAN checkForMonomial(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-  {
-    ideal I; poly monom;
-    omUpdateInfo();
-    Print("usedBytesBefore=%ld\n",om_Info.UsedBytes);
-    I = (ideal) u->CopyD();
-    monom = checkForMonomialViaSuddenSaturation(I,currRing);
-    id_Delete(&I,currRing);
-    p_Delete(&monom,currRing);
-    omUpdateInfo();
-    Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
-    I = (ideal) u->Data();
-    res->rtyp = POLY_CMD;
-    res->data = (char*) checkForMonomialViaSuddenSaturation(I,currRing);
-    return FALSE;
-  }
-  return TRUE;
-}
+#endif //0

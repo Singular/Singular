@@ -18,11 +18,8 @@
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>
 
-#include "bbfan.h"
-#include "bbpolytope.h"
-
-
-#include <sstream>
+#include <bbfan.h>
+#include <bbpolytope.h>
 
 int coneID;
 

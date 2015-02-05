@@ -87,8 +87,8 @@ groebnerCones tropicalTraversalMinimizingFlips(const groebnerCone startingCone)
     sigma.deletePolynomialData();
     workingList.erase(sigma);
     tropicalVariety.insert(sigma);
-    std::cout << "tropicalVariety.size():" << tropicalVariety.size() << std::endl;
-    std::cout << "workingList.size():" << workingList.size() << std::endl;
+    // std::cout << "tropicalVariety.size():" << tropicalVariety.size() << std::endl;
+    // std::cout << "workingList.size():" << workingList.size() << std::endl;
   }
   return tropicalVariety;
 }
@@ -110,8 +110,8 @@ groebnerCones tropicalTraversal(const groebnerCone startingCone)
     }
     tropicalVariety.insert(sigma);
     workingList.erase(sigma);
-    std::cout << "tropicalVariety.size():" << tropicalVariety.size() << std::endl;
-    std::cout << "workingList.size():" << workingList.size() << std::endl;
+    // std::cout << "tropicalVariety.size():" << tropicalVariety.size() << std::endl;
+    // std::cout << "workingList.size():" << workingList.size() << std::endl;
   }
   return tropicalVariety;
 }

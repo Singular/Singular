@@ -61,28 +61,4 @@ void initial(poly* pStar, const ring r, const gfan::ZVector w, const gfan::ZMatr
  */
 void initial(ideal* IStar, const ring r, const gfan::ZVector w, const gfan::ZMatrix W);
 
-/* throwaway code */
-/* #ifndef NDEBUG */
-/* BOOLEAN initial0(leftv res, leftv args); */
-/* #endif */
-/* /\*** */
-/*  * Returns the first terms of p of same weighted degree under w. */
-/*  * Coincides with the initial form of p with respect to w if and only if p was already */
-/*  * sorted with respect to w. */
-/*  **\/ */
-/* poly sloppyInitial(const poly p, const ring r, const gfan::ZVector w); */
-
-/* /\*** */
-/*  * Runs the above procedure over all generators of an ideal. */
-/*  * Coincides with the initial ideal of I with respect to w if and only if */
-/*  * the elements of I were already sorted with respect to w and */
-/*  * I is a standard basis form with respect to w. */
-/*  **\/ */
-/* ideal sloppyInitial(const ideal I, const ring r, const gfan::ZVector w); */
-/* poly initial(const poly p, const ring r, const gfan::ZMatrix W); */
-/* ideal initial(const ideal I, const ring r, const gfan::ZMatrix W); */
-/* poly initial(const poly p, const ring r); */
-/* ideal initial(const ideal I, const ring r); */
-/* BOOLEAN initial(leftv res, leftv args); */
-
 #endif

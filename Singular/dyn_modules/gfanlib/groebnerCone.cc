@@ -17,7 +17,7 @@
 #include <callgfanlib_conversion.h>
 #include <containsMonomial.h>
 #include <initial.h>
-#include <flip.h>
+// #include <flip.h>
 #include <tropicalCurves.h>
 #include <bbcone.h>
 

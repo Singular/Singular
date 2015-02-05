@@ -4,12 +4,12 @@
 #include <callgfanlib_conversion.h>
 #include <bbcone.h>
 #include <ppinitialReduction.h>
-#include <ttinitialReduction.h>
+// #include <ttinitialReduction.h>
 #include <containsMonomial.h>
 #include <initial.h>
 #include <witness.h>
 #include <tropicalCurves.h>
-#include <neighbours.h>
+// #include <neighbours.h>
 #include <tropicalStrategy.h>
 #include <startingCone.h>
 #include <tropicalVariety.h>
@@ -295,8 +295,8 @@ void tropical_setup(SModulFunctions* p)
   p->iiAddCproc("","computeWitnessDebug",FALSE,computeWitnessDebug);
   p->iiAddCproc("","computeFlipDebug",FALSE,computeFlipDebug);
   p->iiAddCproc("","flipConeDebug",FALSE,flipConeDebug);
-  p->iiAddCproc("","groebnerNeighboursDebug",FALSE,groebnerNeighboursDebug);
-  p->iiAddCproc("","tropicalNeighboursDebug",FALSE,tropicalNeighboursDebug);
+  // p->iiAddCproc("","groebnerNeighboursDebug",FALSE,groebnerNeighboursDebug);
+  // p->iiAddCproc("","tropicalNeighboursDebug",FALSE,tropicalNeighboursDebug);
   p->iiAddCproc("","tropicalStarDebug",FALSE,tropicalStarDebug);
   p->iiAddCproc("","tropicalStartingPoint",FALSE,tropicalStartingPoint);
   p->iiAddCproc("","positiveTropicalStartingPoint",FALSE,positiveTropicalStartingPoint);

@@ -2,7 +2,6 @@
 #include <gfanlib/gfanlib_zcone.h>
 #include <libpolys/polys/monomials/p_polys.h>
 #include <callgfanlib_conversion.h>
-#include <gfanlib_exceptions.h>
 #include <std_wrapper.h>
 #include <containsMonomial.h>
 #include <initial.h>
@@ -97,7 +96,7 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector &u, cons
   s->order[h+2] = ringorder_C;
 
   if (overflow)
-    throw 0; //weightOverflow;
+    throw 0; //todo: use a proper custom exception
 
   /* complete the ring and return it */
   rComplete(s);

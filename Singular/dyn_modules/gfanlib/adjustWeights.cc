@@ -1,6 +1,8 @@
 #include <gfanlib/gfanlib_vector.h>
 #include <kernel/mod2.h>
 
+
+#ifndef NDEBUG
 static bool checkForNonPositiveEntries(const gfan::ZVector &w)
 {
   for (unsigned i=0; i<w.size(); i++)
@@ -17,13 +19,7 @@ static bool checkForNonPositiveEntries(const gfan::ZVector &w)
 
 static bool checkForNonPositiveLaterEntries(const gfan::ZVector &w)
 {
-  // if (w[0].sign()<0)
-  // {
-  //   std::cout << "ERROR: negative weight in weight vector first entry" << std::endl
-  //             << "weight: " << w << std::endl;
-  //   return false;
-  // }
-  for (unsigned i=0; i<w.size(); i++)
+  for (unsigned i=1; i<w.size(); i++)
   {
     if (w[i].sign()<=0)
     {
@@ -34,7 +30,7 @@ static bool checkForNonPositiveLaterEntries(const gfan::ZVector &w)
   }
   return true;
 }
-
+#endif //NDEBUG
 
 /***
  * Returns a strictly positive weight vector v with respect to whom
@@ -66,12 +62,13 @@ gfan::ZVector valued_adjustWeightForHomogeneity(const gfan::ZVector &w)
   gfan::Integer max=w[1];
   for (unsigned i=2; i<w.size(); i++)
     if (max<w[i]) max=w[i];
+
   /* compute -w+(1+max)*(0,1,...,1) and return it */
   gfan::ZVector v=gfan::ZVector(w.size());
   v[0]=-w[0];
   for (unsigned i=1; i<w.size(); i++)
     v[i]=-w[i]+max+1;
-  // assume(checkForNonPositiveLaterEntries(v));
+  assume(checkForNonPositiveLaterEntries(v));
   return v;
 }
 
@@ -82,7 +79,8 @@ gfan::ZVector valued_adjustWeightForHomogeneity(const gfan::ZVector &w)
  **/
 gfan::ZVector nonvalued_adjustWeightUnderHomogeneity(const gfan::ZVector &e, const gfan::ZVector &/*w*/)
 {
-  /* since ideal is homogeneous, we can basically do the same as before */
+  /* since our ideal is homogeneous, we can basically do the same as before */
+  /* find the smallest entry min of w */
   gfan::Integer min=e[0];
   for (unsigned i=1; i<e.size(); i++)
     if (e[i]<min) min=e[i];
@@ -100,7 +98,8 @@ gfan::ZVector nonvalued_adjustWeightUnderHomogeneity(const gfan::ZVector &e, con
 
 gfan::ZVector valued_adjustWeightUnderHomogeneity(const gfan::ZVector &e, const gfan::ZVector &w)
 {
-  // assume(checkForNonPositiveLaterEntries(w));
+  assume(checkForNonPositiveLaterEntries(w));
+
   /* find k such that e+k*w is strictly positive,
    * i.e. k such that e[i]+k*w[i] is strictly positive
    * for all i=0,...,n */
@@ -116,6 +115,7 @@ gfan::ZVector valued_adjustWeightUnderHomogeneity(const gfan::ZVector &e, const 
         k = kk;
     }
   }
+
   /* compute e+k*w, check it for correctness and return it */
   gfan::ZVector v = e+k*w;
   assume(checkForNonPositiveLaterEntries(v));
