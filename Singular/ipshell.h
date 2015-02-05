@@ -172,7 +172,7 @@ extern struct sValCmdM dArithM[];
 
 /* ================================================================== */
 /* Assigments : */
-BOOLEAN iiAssign(leftv left, leftv right);
+BOOLEAN iiAssign(leftv left, leftv right, BOOLEAN toplevel=TRUE);
 
 typedef BOOLEAN (*proci)(leftv,leftv,Subexpr);
 struct sValAssign_sys

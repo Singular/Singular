@@ -681,6 +681,12 @@ NOTE:    If v is given id may be any simply indexed object (e.g. any list or
 EXAMPLE: example sort; shows an example
 "
 {  int ii,jj,s,n = 0,0,1,0;
+   string id_typ=typeof(id);
+   if ((id_typ!="ideal")
+   and (id_typ!="module")
+   and (id_typ!="matrix")
+   and (id_typ!="list")
+   and (id_typ!="intvec")) { return (id,0); }
    intvec v;
    if ( defined(basering) ) { def P = basering; }
    if ( size(#)==0 and (typeof(id)=="ideal" or typeof(id)=="module"
