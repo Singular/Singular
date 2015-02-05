@@ -1,51 +1,65 @@
-///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 version="version schreyer.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="General purpose";
 info="
-LIBRARY: schreyer.lib     Schreyer resolution computations and helpers for @code{derham.lib}
+LIBRARY: schreyer.lib Schreyer resolution computations and helpers for derham.lib
 AUTHOR:  Oleksandr Motsak <U@D>, where U={motsak}, D={mathematik.uni-kl.de}
 KEYWORDS: Schreyer ordering; Schreyer resolution; syzygy
 OVERVIEW:
-@* The library contains several procedures for computing a/part of Schreyer resoltion (cf. [SFO]),
-   and some helpers for @code{derham.lib} (which requires resolutions over the homogenized Weyl algebra) for that purpose.
-@* The input for any resolution computation is a set of vectors @code{M} in form of a module over some basering @code{R}.
-   The helpers works both in the commutative and non-commutative setting (cf. [MO]), that is the ring @code{R} may be non-commutative,
-   in which case the ring ordering over it must be global. They produce/work with partial Schreyer resolutions of @code{(R^rank(M))/M}
-   in form of a specially constructed ring (endowed with a special ring ordering that will be extended in the
-   course of a resolution computation) containing a list of modules @code{RES} and a module @code{MRES}:
-@* @code{RES}: the list of modules contains the images of maps (also called syzygy modules) substituting the
-     computed beginning of a Schreyer resolution, that is, each syzygy module is given by a Groebner basis
-     with respect to the corresponding Schreyer ordering.
-@* @code{RES}: the list of modules which starts with a zero map given by @code{rank(M)} zero generators indicating that the image of
-     the first differential map is zero. The second map @code{RES[2]} is given by @code{M}, which indicates that
-     the resolution of @code{(R^rank(M))/M} is being computed.
-@* @code{MRES}: the module is a direct sum of modules from @code{RES} and thus comprises all computed differentials.
-@* Syzygies are shifted so that @code{gen(i)} is mapped to @code{MRES[i]} under the differential map.
-NOTE:
-@* Here, we call a free resolution a Schreyer resolution if each syzygy module is given by a Groebner basis
-     with respect to the corresponding Schreyer ordering.
-@* A Schreyer resolution can be much bigger than a minimal resolution of the same module, but may be easier to construct.
-@* The Schreyer ordering succesively extends the starting module ordering on @code{M} (defined in Singular by the basering @code{R})
-     and is extended to higher syzygies using the following definition:
-@*        a < b if and only if (d(a) < d(b)) OR ( (d(a) = d(b) AND (comp(a) < comp(b)) ),
-@* where @code{d(a)} is the image of an under the differential (given by @code{MRES}),
-     and @code{comp(a)} is the module component, for any module terms @code{a} and @code{b} from the same higher syzygy module.
-NOTE:
-@* most comutations require the dynamic or built-in module @code{syzextra}, which will be auto-leaded on demand.
-PROCEDURES:
-  s_res(M, len)   compute Schreyer resolution of module M of maximal length len via LiftTree method from [BMSS]
-  Sres(M,len)     helper for computing Schreyer resolution of module M of maximal length len
-  Ssyz(M)         helper for computing Schreyer resolution of module M of length 1
-  Scontinue(len)  helper for extending currently active resolution by (at most) len syszygies
+The library contains several procedures for computing a/part of Schreyer 
+resoltion (cf. [SFO]), and some helpers for derham.lib (which requires 
+resolutions over the homogenized Weyl algebra) for that purpose.
+The input for any resolution computation is a set of vectors M in form of a 
+module over some basering R. The helpers works both in the commutative and 
+non-commutative setting (cf. [MO]), that is the ring R may be non-commutative,
+in which case the ring ordering over it must be global. They produce/work with
+partial Schreyer resolutions of (R^rank(M))/M in form of a specially constructed
+ring (endowed with a special ring ordering that will be extended in the course 
+of a resolution computation) containing the following objects:
+@* RES: the list of modules contains the images of maps (also called syzygy 
+modules) substituting the computed beginning of a Schreyer resolution, that is, 
+each syzygy module is given by a Groebner basis with respect to the 
+corresponding Schreyer ordering. RES starts with a zero map given by rank(M)
+zero generators indicating that the image of the first differential map is 
+zero. The second map RES[2] is given by M, which indicates that the resolution
+of (R^rank(M))/M is being computed.
+@* MRES: the module is a direct sum of modules from RES and thus comprises all
+computed differentials. Syzygies are shifted so that gen(i) is mapped to MRES[i]
+under the differential map. 
+@* Here, we call a free resolution a Schreyer resolution if each syzygy 
+module is given by a Groebner basis with respect to the corresponding Schreyer
+ordering. A Schreyer resolution can be much bigger than a minimal resolution of
+the same module, but may be easier to construct. The Schreyer ordering 
+succesively extends the starting module ordering on M (defined in Singular by 
+the basering R) and is extended to higher syzygies using the following 
+definition:
+@* a < b if and only if (d(a)<d(b)) OR ( (d(a)=d(b) AND (comp(a)<comp(b)) ),
+@* where d(a) is the image of an under the differential (given by MRES), and
+comp(a) is the module component, for any module terms a and b from the same
+higher syzygy module.
+
+NOTE: Since most comutations require the module syzextra.so, please be make sure
+ to build it into Singular on Windows.
+
 REFERENCES:
 @*
-[BMSS] Burcin, E., Motsak, O., Schreyer, F.-O., Steenpass, A.: Refined algorithms to compute syzygies, 2015 (to appear).
+[BMSS] Burcin, E., Motsak, O., Schreyer, F.-O., Steenpass, A.: 
+Refined algorithms to compute syzygies, 2015 (to appear).
 @*
-[SFO]  Schreyer, F.O.: Die Berechnung von Syzygien mit dem verallgemeinerten Weierstrassschen Divisionssatz,
-       Master's thesis, Univ. Hamburg, 1980.
+[SFO]  Schreyer, F.O.: Die Berechnung von Syzygien mit dem verallgemeinerten 
+Weierstrassschen Divisionssatz, Master's thesis, Univ. Hamburg, 1980.
 @*
-[MO]   Motsak, O.: Non-commutative Computer Algebra with applications: Graded commutative algebra and related
-       structures in Singular with applications, Ph.D. thesis, TU Kaiserslautern, 2010.
+[MO]   Motsak, O.: Non-commutative Computer Algebra with applications: 
+Graded commutative algebra and related structures in Singular with applications,
+Ph.D. thesis, TU Kaiserslautern, 2010.
+
+PROCEDURES:
+  s_res(M,l)   compute Schreyer resolution via LiftTree method from [BMSS]
+  Sres(M,l)    helper for computing Schreyer resolution
+  Ssyz(M)      helper for computing Schreyer resolution of module M of length 1
+  Scontinue(l) helper for extending currently active resolution
+
+SEE ALSO: syz, sres, lres, res
 ";
 
 static proc prepareSyz( module I, list # )
@@ -2157,7 +2171,7 @@ static proc SRES_minres(SRES SR)
 
 
 // cannot be automatically used via overloading :(
-proc SRES_list(def SR)
+static proc SRES_list(def SR)
 "USAGE:  SRES_list(resolution)
 RETURN:  list
 PURPOSE: convert given resolution to a list
