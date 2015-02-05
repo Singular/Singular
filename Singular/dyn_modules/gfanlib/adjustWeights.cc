@@ -80,28 +80,20 @@ gfan::ZVector valued_adjustWeightForHomogeneity(const gfan::ZVector &w)
  * on any set of x-homogeneous elements that are also homogeneous with respect to w,
  * w containing only positive weights
  **/
-gfan::ZVector nonvalued_adjustWeightUnderHomogeneity(const gfan::ZVector &e, const gfan::ZVector &w)
+gfan::ZVector nonvalued_adjustWeightUnderHomogeneity(const gfan::ZVector &e, const gfan::ZVector &/*w*/)
 {
-  assume(checkForNonPositiveEntries(w));
-  /* find k such that e+k*w is strictly positive,
-   * i.e. k such that e[i]+k*w[i] is strictly positive
-   * for all i=0,...,n
-   * note that the division is rounded towards zero,
-   * hence we increment the value by 1 */
-  gfan::Integer k((long)0);
-  if (e[0].sign()<=0)
-    k = gfan::Integer((long)1)-(e[0]/w[0]);
+  /* since ideal is homogeneous, we can basically do the same as before */
+  gfan::Integer min=e[0];
   for (unsigned i=1; i<e.size(); i++)
-  {
-    if (e[i].sign()<=0)
-    {
-      gfan::Integer kk = gfan::Integer((long)1)-(e[i]/w[i]);
-      if (k<kk)
-        k = kk;
-    }
-  }
-  /* compute e+k*w, check it for correctness and return it */
-  gfan::ZVector v = e+k*w;
+    if (e[i]<min) min=e[i];
+
+  if (min.sign()>0)
+    return e;
+
+  /* compute w+(1-min)*(1,...,1) and return it */
+  gfan::ZVector v=gfan::ZVector(e.size());
+  for (unsigned i=0; i<e.size(); i++)
+    v[i]=e[i]-min+1;
   assume(checkForNonPositiveEntries(v));
   return v;
 }
