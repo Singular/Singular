@@ -7,8 +7,6 @@
 */
 
 #include <stdio.h>
-#include <string.h>
-#include <sstream>
 #include <math.h>
 
 
@@ -757,24 +755,6 @@ void iiWriteMatrix(matrix im, const char *n, int dim, const ring r, int spaces)
     }
   }
 }
-
-void mp_Write(matrix im, const ring r)
-{
-  int i,ii = MATROWS(im)-1;
-  int j,jj = MATCOLS(im)-1;
-  poly *pp = im->m;
-  for (i=0; i<=ii; i++)
-  {
-    for (j=0; j<=jj; j++)
-    {
-      Print("matrix[%u,%u]=",i+1,j+1);
-      if ((i<ii)||(j<jj)) p_Write(*pp++, r);
-      else                p_Write0(*pp, r);
-    }
-  }
-  return;
-}
-
 
 char * iiStringMatrix(matrix im, int dim, const ring r, char ch)
 {

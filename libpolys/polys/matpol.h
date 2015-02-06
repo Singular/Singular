@@ -90,8 +90,6 @@ void iiWriteMatrix(matrix im, const char *n, int dim, const ring r, int spaces);
 
 char * iiStringMatrix(matrix im, int dim, const ring r, char ch=',');
 
-void mp_Write(matrix im, const ring r);
-
 extern omBin ip_smatrix_bin;
 
 #endif/* MATPOL_H */
