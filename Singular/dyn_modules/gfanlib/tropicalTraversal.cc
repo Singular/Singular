@@ -98,7 +98,7 @@ groebnerCones tropicalTraversal(const groebnerCone startingCone)
   groebnerCones tropicalVariety;
   groebnerCones workingList;
   workingList.insert(startingCone);
-  std::cout << "starting traversal" << std::endl;
+  // std::cout << "starting traversal" << std::endl;
   while(!workingList.empty())
   {
     const groebnerCone sigma=*(workingList.begin());
