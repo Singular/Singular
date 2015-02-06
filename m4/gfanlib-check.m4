@@ -15,7 +15,7 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
 
  AC_CHECK_HEADERS([setoper.h cdd/setoper.h cddlib/setoper.h])
 
- if test "$ac_cv_header_setoper_h" == no -a "$ac_cv_header_cdd_setoper_h" == no -a "$ac_cv_header_cddlib_setoper_h" == no
+ if test "x$ac_cv_header_setoper_h" = xno -a "x$ac_cv_header_cdd_setoper_h" = xno -a "x$ac_cv_header_cddlib_setoper_h" = xno
  then
 	AC_MSG_WARN([Error, setoper.h is missing!])
  fi
