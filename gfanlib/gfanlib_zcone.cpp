@@ -11,15 +11,19 @@
 #include <set>
 #include <sstream>
 
-//extern "C"{
+#include <config.h>
 #ifdef HAVE_CDD_SETOPER_H
-#include "cdd/setoper.h"
-#include "cdd/cdd.h"
+#include <cdd/setoper.h>
+#include <cdd/cdd.h>
+#else
+#ifdef HAVE_CDDLIB_SETOPER_H
+#include <cddlib/setoper.h>
+#include <cddlib/cdd.h>
 #else
 #include <setoper.h>
 #include <cdd.h>
 #endif
-//}
+#endif
 
 namespace gfan{
 
