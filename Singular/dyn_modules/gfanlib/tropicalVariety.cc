@@ -4,8 +4,8 @@
 #include <groebnerCone.h>
 #include <tropicalVarietyOfPolynomials.h>
 #include <tropicalVarietyOfIdeals.h>
-#include <libpolys/coeffs/numbers.h>
-#include <libpolys/misc/options.h>
+#include <coeffs/numbers.h>
+#include <misc/options.h>
 #include <kernel/structs.h>
 
 #include <iostream>

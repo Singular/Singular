@@ -1,6 +1,6 @@
 #include <kernel/GBEngine/kstd1.h>
 #include <Singular/lists.h>
-#include <libpolys/polys/monomials/p_polys.h>
+#include <polys/monomials/p_polys.h>
 #include <callgfanlib_conversion.h>
 #include <initial.h>
 #include <tropicalStrategy.h>

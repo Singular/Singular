@@ -2,9 +2,9 @@
 #define CALLGFANLIB_CONVERSION_H
 
 #include <gfanlib/gfanlib.h>
-#include <libpolys/coeffs/bigintmat.h>
-#include <libpolys/coeffs/longrat.h>
-#include <libpolys/coeffs/numbers.h>
+#include <coeffs/bigintmat.h>
+#include <coeffs/longrat.h>
+#include <coeffs/numbers.h>
 
 gfan::Integer* numberToInteger(const number &n);
 number integerToNumber(const gfan::Integer &I);

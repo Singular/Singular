@@ -1,7 +1,7 @@
 #ifndef SINGULARWISHLIST_H
 #define SINGULARWISHLIST_H
 
-#include <libpolys/polys/monomials/p_polys.h>
+#include <polys/monomials/p_polys.h>
 
 /* #ifndef NDEBUG */
 /* void z_Write(number p, ring r) */

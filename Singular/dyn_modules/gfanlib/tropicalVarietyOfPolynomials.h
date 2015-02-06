@@ -2,7 +2,7 @@
 #define GFANLIB_TROPICALVARIETYOFPOLYNOMIALS_H
 
 #include <gfanlib/gfanlib.h>
-#include <libpolys/polys/monomials/p_polys.h>
+#include <polys/monomials/p_polys.h>
 #include <set>
 
 #include <tropicalStrategy.h>

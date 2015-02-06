@@ -2,7 +2,7 @@
 #define GFANLIB_FLIP_H
 
 #include <utility>
-#include <libpolys/polys/simpleideals.h>
+#include <polys/simpleideals.h>
 #include <gfanlib/gfanlib_vector.h>
 
 std::pair<ideal,ring> flip(const ideal I, const ring r,

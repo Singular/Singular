@@ -1,6 +1,6 @@
 #include <gfanlib/gfanlib_matrix.h>
 #include <gfanlib/gfanlib_zcone.h>
-#include <libpolys/polys/monomials/p_polys.h>
+#include <polys/monomials/p_polys.h>
 #include <callgfanlib_conversion.h>
 #include <std_wrapper.h>
 #include <containsMonomial.h>

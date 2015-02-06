@@ -1,5 +1,5 @@
-#include <libpolys/polys/monomials/p_polys.h>
-#include <libpolys/coeffs/coeffs.h>
+#include <polys/monomials/p_polys.h>
+#include <coeffs/coeffs.h>
 
 #include <callgfanlib_conversion.h>
 #include <bbcone.h>

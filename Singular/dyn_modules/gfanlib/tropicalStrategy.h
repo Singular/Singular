@@ -3,7 +3,7 @@
 
 #include <gfanlib/gfanlib_vector.h>
 #include <gfanlib/gfanlib_zcone.h>
-#include <libpolys/polys/simpleideals.h>
+#include <polys/simpleideals.h>
 #include <kernel/ideals.h> // for idSize
 #include <set>
 #include <callgfanlib_conversion.h>

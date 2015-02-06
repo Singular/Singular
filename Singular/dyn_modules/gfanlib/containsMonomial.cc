@@ -1,7 +1,7 @@
 #include <bbcone.h>
 #include <kernel/polys.h>
 #include <kernel/GBEngine/kstd1.h>
-#include <libpolys/polys/prCopy.h>
+#include <polys/prCopy.h>
 
 poly checkForMonomialViaSuddenSaturation(const ideal I, const ring r)
 {

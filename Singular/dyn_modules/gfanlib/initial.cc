@@ -1,5 +1,5 @@
 #include <kernel/ideals.h>
-#include <libpolys/polys/monomials/p_polys.h>
+#include <polys/monomials/p_polys.h>
 
 #include <gfanlib/gfanlib.h>
 

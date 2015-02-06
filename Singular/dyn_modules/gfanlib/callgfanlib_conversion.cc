@@ -1,8 +1,8 @@
 #include <gfanlib/gfanlib.h>
 
-#include <libpolys/coeffs/bigintmat.h>
-#include <libpolys/coeffs/longrat.h>
-#include <libpolys/coeffs/numbers.h>
+#include <coeffs/bigintmat.h>
+#include <coeffs/longrat.h>
+#include <coeffs/numbers.h>
 
 #include <Singular/ipid.h> // for coeffs_BIGINT
 

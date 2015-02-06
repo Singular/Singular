@@ -4,9 +4,9 @@
 #include <kernel/ideals.h>
 #include <Singular/ipid.h>
 
-#include <libpolys/polys/monomials/p_polys.h>
-#include <libpolys/polys/monomials/ring.h>
-#include <libpolys/polys/prCopy.h>
+#include <polys/monomials/p_polys.h>
+#include <polys/monomials/ring.h>
+#include <polys/prCopy.h>
 
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_matrix.h>

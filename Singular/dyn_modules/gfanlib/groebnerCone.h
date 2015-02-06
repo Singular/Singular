@@ -4,8 +4,8 @@
 #include <kernel/polys.h>
 #include <Singular/ipid.h>
 
-#include <libpolys/polys/monomials/ring.h>
-#include <libpolys/polys/simpleideals.h>
+#include <polys/monomials/ring.h>
+#include <polys/simpleideals.h>
 #include <kernel/ideals.h>
 #include <gfanlib/gfanlib.h>
 #include <set>

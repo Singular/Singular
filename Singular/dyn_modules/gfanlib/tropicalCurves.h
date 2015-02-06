@@ -3,7 +3,7 @@
 
 #include <gfanlib/gfanlib_zcone.h>
 #include <gfanlib/gfanlib_zfan.h>
-#include <libpolys/polys/monomials/p_polys.h>
+#include <polys/monomials/p_polys.h>
 #include <tropicalStrategy.h>
 #include <tropicalVarietyOfPolynomials.h>
 

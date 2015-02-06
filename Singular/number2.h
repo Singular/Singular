@@ -1,7 +1,7 @@
 #ifndef NUMBER2_H
 #define NUMBER2_H
 
-#include <libpolys/misc/auxiliary.h>
+#include <misc/auxiliary.h>
 
 #ifdef SINGULAR_4_1
 #include <omalloc/omalloc.h>

@@ -6,7 +6,7 @@
  */
 #include <gfanlib/gfanlib_vector.h>
 #include <gfanlib/gfanlib_matrix.h>
-#include <libpolys/polys/monomials/p_polys.h>
+#include <polys/monomials/p_polys.h>
 
 /**
  * Returns the weighted degree of the leading term of p with respect to w
