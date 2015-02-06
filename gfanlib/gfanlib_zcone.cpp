@@ -12,8 +12,13 @@
 #include <sstream>
 
 //extern "C"{
+#ifdef HAVE_CDD_SETOPER_H
 #include "cdd/setoper.h"
 #include "cdd/cdd.h"
+#else
+#include <setoper.h>
+#include <cdd.h>
+#endif
 //}
 
 namespace gfan{
