@@ -2,7 +2,7 @@ break dErrorBreak
 
 #break omReportError # use in case of problems with omaloc
 #break dPolyReportError # use in case of problems with polynomial arithmetic
-             
+
 
 
 ### http://sourceware.org/gdb/onlinedocs/gdb/Define.html#Define

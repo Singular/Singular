@@ -59,7 +59,7 @@ for (i=0; i<20; i++)
     system("random",1803001481);
     L1 = primdecGTZ (I);
     L2 = primdecSY (I);
-    "equivalent?",primDecsAreEquivalent (L1,L2) ; 
+    "equivalent?",primDecsAreEquivalent (L1,L2) ;
 }
 
 ring r2 = (3,v),(x,y,z,w),dp;
