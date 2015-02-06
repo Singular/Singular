@@ -1650,15 +1650,15 @@ void syMake(leftv v,const char * id, idhdl packhdl)
           v->rtyp = POLY_CMD;
           v->name = id;
         }
-        if (TEST_V_ALLWARN /*&& (myynest>0)*/
-        && ((r_IsRingVar(id, currRing->names,currRing->N)>=0)
-          || ((n_NumberOfParameters(currRing->cf)>0)
-             &&(r_IsRingVar(id, (char**)n_ParameterNames(currRing->cf),
-                                n_NumberOfParameters(currRing->cf))>=0))))
-        {
-        // WARNING: do not use ring variable names in procedures
-          Warn("use of variable >>%s<< in a procedure in line %s",id,my_yylinebuf);
-        }
+        //if (TEST_V_ALLWARN /*&& (myynest>0)*/
+        //&& ((r_IsRingVar(id, currRing->names,currRing->N)>=0)
+        //  || ((n_NumberOfParameters(currRing->cf)>0)
+        //     &&(r_IsRingVar(id, (char**)n_ParameterNames(currRing->cf),
+        //                        n_NumberOfParameters(currRing->cf))>=0))))
+        //{
+        //// WARNING: do not use ring variable names in procedures
+        //  Warn("use of variable >>%s<< in a procedure in line %s",id,my_yylinebuf);
+        //}
         return;
       }
     }

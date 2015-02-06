@@ -984,7 +984,8 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
     && (iiCurrArgs==NULL) /* not in proc header */
     )
     {
-      Warn("use `%s` instead of `def`",Tok2Cmdname(rt));
+      Warn("use `%s` instead of `def` in %s:%d:%s",Tok2Cmdname(rt),
+            currentVoice->filename,yylineno,my_yylinebuf);
     }
     if (l->rtyp==IDHDL)
     {

@@ -1137,10 +1137,14 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
   }
   else
   {
-    //if (name->rtyp!=0)
-    //{
-    //  Warn("`%s` is already in use",name->name);
-    //}
+    if (TEST_V_ALLWARN
+    && (name->rtyp!=0)
+    && (name->rtyp!=IDHDL)
+    && (currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest))
+    {
+      Warn("`%s` is %s in %s:%d:%s",name->name,Tok2Cmdname(name->rtyp),
+      currentVoice->filename,yylineno,my_yylinebuf);
+    }
     {
       sy->data = (char *)enterid(id,lev,t,root,init_b);
     }
