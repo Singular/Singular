@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
-SOURCES = bbcone.cc bbcone.h bbfan.cc bbfan.h bbpolytope.cc bbpolytope.h gfan.h gitfan.cc gitfan.h gfanlib.cc
+SOURCES = gfanlib_exceptions.h callgfanlib_conversion.cc callgfanlib_conversion.h bbcone.cc bbcone.h bbfan.cc bbfan.h bbpolytope.cc bbpolytope.h gfan.h gitfan.cc gitfan.h std_wrapper.cc std_wrapper.h tropicalVarietyOfPolynomials.h tropicalVarietyOfPolynomials.cc ppinitialReduction.cc ppinitialReduction.h containsMonomial.cc containsMonomial.h adjustWeights.cc adjustWeights.h tropicalStrategy.cc tropicalStrategy.h initial.cc initial.h witness.cc witness.h lift.cc lift.h flip.cc flip.h tropicalCurves.cc tropicalCurves.h groebnerCone.cc groebnerCone.h startingCone.cc startingCone.h tropicalTraversal.cc tropicalTraversal.h tropicalVarietyOfIdeals.cc tropicalVarietyOfIdeals.h tropicalVariety.cc tropicalVariety.h tropical.cc tropical.h gfanlib.cc
 
 MY_CPPFLAGS =  -I${top_srcdir} -I${top_builddir} \
 -I${top_srcdir}/libpolys -I${top_builddir}/libpolys \
@@ -26,6 +26,8 @@ gfanlib_la_CPPFLAGS = ${MY_CPPFLAGS} ${P_PROCS_CPPFLAGS_COMMON} ${CDDGMPCPPFLAGS
 gfanlib_la_LDFLAGS  = ${P_PROCS_MODULE_LDFLAGS}
 
 if HAVE_GFANLIB
+# forcefully enable exceptions for polymake
+ CXXFLAGS+= $(FEXCEPTIONSFRTTI_CXXFLAGS)
  gfanlib_la_LIBADD   = ${abs_top_builddir}/gfanlib/libgfan.la ${CDDGMPLDFLAGS}
 endif
 

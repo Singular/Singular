@@ -13,6 +13,7 @@
 
 #if HAVE_GFANLIB
 
+#include <callgfanlib_conversion.h>
 #include <bbcone.h>
 #include <bbfan.h>
 #include <gitfan.h>

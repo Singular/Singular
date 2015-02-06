@@ -35,7 +35,7 @@ namespace gfan{
 
   class SymmetricComplex{
   int n;
-  ZMatrix linealitySpace;
+  ZMatrix linealitySpace; // Has full row rank.
   ZMatrix vertices;
   std::map<ZVector,int> indexMap;
   SymmetryGroup sym;
@@ -84,9 +84,8 @@ namespace gfan{
   bool isMaximal(Cone const &c)const;
   bool isPure()const;
   ZVector fvector(bool boundedPart=false)const;
-  void buildConeLists(bool onlyMaximal, bool compressed, std::vector<std::vector<IntVector > >*conelist/*, ZMatrix *multiplicities*/)const;
+  void buildConeLists(bool onlyMaximal, bool compressed, std::vector<std::vector<IntVector > >*conelist, std::vector<std::vector<Integer > > *multiplicities=0)const;
   std::string toStringJustCones(int dimLow, int dimHigh, bool onlyMaximal, bool group, std::ostream *multiplicities=0, bool compressed=false, bool tPlaneSort=false)const;
-  std::string toStringJustRaysAndMaximalCones(int flags=0)const;
   std::string toString(int flags=0)const;
   bool isSimplicial()const;
   /**

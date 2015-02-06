@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 
 #include "gfanlib_z.h"
 #include "gfanlib_q.h"
@@ -83,7 +84,7 @@ public:
   //-------------
   unsigned int size()const{return v.size();};
   void resize(int n){v.resize(n,typ());};
-  void grow(int i){if(size()<i)resize(i);}
+  void grow(int i){if((int)size()<i)resize(i);}
   void push_back(typ a)
   {
     v.push_back(a);
@@ -288,6 +289,14 @@ public:
     }
     return f<<")";
   }
+
+  std::string toString()const
+  {
+	  std::stringstream f;
+	  f<<*this;
+	  return f.str();
+  }
+
   typ gcd()const
   {
     typ temp1,temp2;
@@ -300,6 +309,20 @@ public:
   {
     assert(!typ::isField());
     return (*this)/gcd();
+  }
+
+  void debugPrint()const
+  {
+    std::stringstream s;
+    s<<"(";
+    for(typename std::vector<typ>::const_iterator i=this->v.begin();i!=this->v.end();i++)
+    {
+      if(i!=this->v.begin()) s<<",";
+      s<<*i;
+    }
+    s<<")"<<std::endl;
+    std::cout << s.str();
+    return;
   }
 };
 
@@ -392,9 +415,8 @@ inline ZVector QToZVectorPrimitive(QVector const &v)
     mpz_clear(lcm);
 
     return ret;
-}
+};
 
-}
-
+};
 
 #endif /* LIB_ZVECTOR_H_ */
