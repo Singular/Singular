@@ -45,14 +45,12 @@ static void swapElements(ideal I, ideal J)
 {
   assume(idSize(I)==idSize(J));
 
-  for (int i=0; i<idSize(I); i++)
+  for (int i=idSize(I)-1; i>=0; i--)
   {
     poly cache = I->m[i];
     I->m[i] = J->m[i];
     J->m[i] = cache;
   }
-
-  return;
 }
 
 static bool noExtraReduction(ideal I, ring r, number /*p*/)
