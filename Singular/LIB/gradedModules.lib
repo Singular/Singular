@@ -3,8 +3,8 @@ version="version gradedModules.lib 4.0.1.1 Jan_2015 "; // $Id$
 category="General purpose?";
 info="
 LIBRARY: gradedModules.lib     Operations with graded modules/matrices/resolutions
-AUTHOR:  Oleksandr Motsak <U@D>, where U=motsak, D=mathematik.uni-kl.de
-         Hanieh Keneshlou <hkeneshlou@yahoo.com>
+AUTHORS:  Oleksandr Motsak <U@D>, where U=motsak, D=mathematik.uni-kl.de
+@*         Hanieh Keneshlou <hkeneshlou@yahoo.com>
 KEYWORDS: graded modules, graded homomorphisms, syzygies
 OVERVIEW:
     The library contains several procedures for operations with graded modules/matrices/resolutions
