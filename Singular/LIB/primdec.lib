@@ -664,15 +664,13 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
           act=sat1(l[2*i-1],act[1][1]);
           if(deg(act[1][1])>0)
           {
+            l[s+2]=ideal(0);
             l[s+1]=std(l[2*i-1],act[2]);
             if(homog(l[s+1])==1)
             {
               l[s+2]=maxideal(1);
             }
-            else
-            {
-              l[s+2]=ideal(0);
-            }
+            //else { l[s+2]=ideal(0); }
             keepprime[s div 2+1]=interred(keepprime[i]+ideal(@f));
             if(homog(keepprime[s div 2+1])==1)
             {
@@ -2810,7 +2808,7 @@ static proc algeDeco_i(int patchPrimaryDecomposition, ideal i, int w)
    def R=basering;
    int n=nvars(R);
 
-   def op = option(get);
+   intvec op = option(get);
 
 //---Anfang Provisorium
    if((size(i)==2) && (w==2))
