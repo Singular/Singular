@@ -273,7 +273,7 @@ EXAMPLE: example gwalk; shows an example"
 
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
-   intvec target_weight =   OSCTW[4]; /* terget weight vector */
+   intvec target_weight =   OSCTW[4]; /* target weight vector */
    kill OSCTW;
    option(redSB);
    def xR = basering;
@@ -298,7 +298,11 @@ example
   "EXAMPLE:"; echo = 2;
   //** compute a Groebner basis of I w.r.t. lp.
   ring r = 32003,(z,y,x), lp;
-  ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
+  ideal I = zy2+yx2+yx+3,
+            z3x+y3+zyx-yx2-yx-3,
+            z2yx3-y5+z2yx2+y3x2+y2x3+y3x+y2x2+3z2x+3y2+3yx,
+            zyx5+y6-y4x2-y3x3+2zyx4-y4x-y3x2+zyx3-3z2yx+3zx3-3y3-3y2x+3zx2,
+            yx7-y7+y5x2+y4x3+3yx6+y5x+y4x2+3yx5-6zyx3+yx4+3x5+3y4+3y3x-6zyx2+6x4+3x3-9zx;
   gwalk(I,0,1);
 }
 
@@ -478,15 +482,10 @@ EXAMPLE: example pwalk; shows an example"
 
   ideal G = fetch(xR, Go);
 
-<<<<<<< HEAD
   G = system("Mpwalk",G,n1,n2,curr_weight,target_weight,nP,reduction,printout);
  
-=======
-  G = system("Mpwalk", G, n1, n2, curr_weight, target_weight,nP);
-
->>>>>>> f533f6f7667328bccb271b19b2f603aaebe41596
   setring xR;
-  //kill Go;
+  //kill Go; //unused
 
   keepring basering;
   ideal result = fetch(old_ring, G);
