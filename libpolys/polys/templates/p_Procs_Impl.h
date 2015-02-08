@@ -30,8 +30,8 @@
  the p_*_Templates.cc and header files which provide the respective
  macros.
 
- At run-time, a fast proc is set/choosen if found/generated, else
- a general proc is set/choosen.
+ At run-time, a fast proc is set/chosen if found/generated, else
+ a general proc is set/chosen.
  *******************************************************************/
 
 // Define HAVE_FAST_P_PROCS to:
@@ -395,7 +395,7 @@ static inline p_Ord ZeroOrd_2_NonZeroOrd(p_Ord ord, int strict)
 /***************************************************************
  *
  * Filters which are applied to field/length/ord, before a proc is
- * choosen
+ * chosen
  *
  *******************************************************************/
 #ifdef p_Procs_Static
