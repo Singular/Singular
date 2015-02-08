@@ -35,6 +35,7 @@ html:
 ## html: doxyfile.stamp
 
 clean-local:
+	rm -f html_dox.log tags
 	rm -rf html
 endif
 
