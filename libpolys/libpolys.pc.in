@@ -8,10 +8,10 @@ Description: The Singular polynomial/coefficient arithmetic and related supporti
 Version: @PACKAGE_VERSION@
 URL: https://github.com/Singular/Sources/tree/spielwiese/@PACKAGE@
 
-Requires: @PKG_REQUIRE@
+Requires: @PKG_REQUIRE@ factory
 Conflicts:
 
 Cflags: -I${includedir} -I${includedir}/singular @SINGULAR_CFLAGS@ @FLINT_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@
-Libs: -L${libdir} -lpolys -lfactory @FLINT_LIBS@ @NTL_LIBS@ @GMP_LIBS@ @USEPPROCSDYNAMICLD@
+Libs: -L${libdir} -lpolys @FLINT_LIBS@ @NTL_LIBS@ @GMP_LIBS@ @USEPPROCSDYNAMICLD@
 Libs.private:
 
