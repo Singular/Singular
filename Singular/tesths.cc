@@ -115,6 +115,13 @@ int main(          /* main entry to Singular */
       exit(1);
     }
     if (optc == 'h') exit(0);
+    switch(option_index)
+    {
+      case FE_OPT_DUMP_VERSIONTUPLE:
+        exit(0);
+        break;
+      default: ;
+    }
   }
 
   /* say hello */

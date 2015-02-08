@@ -170,6 +170,11 @@ int main(int argc, char** argv)
                 no_emacs_call = 1;
                 break;
 
+              case FE_OPT_DUMP_VERSIONTUPLE:
+                feOptDumpVersionTuple();
+                exit(0);
+                break;
+
               default:
                 goto NEXT;
           }

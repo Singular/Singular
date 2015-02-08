@@ -302,6 +302,12 @@ static const char* feOptAction(feOptIndex opt)
         return NULL;
       }
 
+      case FE_OPT_DUMP_VERSIONTUPLE:
+      {
+        feOptDumpVersionTuple();
+        return NULL;
+      }
+
       default:
         return NULL;
   }
@@ -394,6 +400,9 @@ void feOptHelp(const char* name)
   printf("Singular manual (available as on-line info or html manual).\n");
 }
 
-
+void feOptDumpVersionTuple(void)
+{
+  printf("%s\n",VERSION);
+}
 
 #endif // GENERATE_OPTION_INDEX
