@@ -57,7 +57,7 @@ class IBaseEnumerator // IDisposable
     virtual bool IsValid() const = 0;
 
   private:
-    /// disable copy constructor and assigment operator
+    /// disable copy constructor and assignment operator
     IBaseEnumerator(const IBaseEnumerator&);
     void operator=(const IBaseEnumerator&);
 
@@ -168,7 +168,7 @@ class IBaseIterator //??// : public std::iterator<std::forward_iterator_tag, A>
 
 /** @class AIterator
  *
- * An abstract iterator with virtualized assigment operator and
+ * An abstract iterator with virtualized assignment operator and
  * constructors.
  *
  * Abstract API for iterators that should work with STL and BOOST.

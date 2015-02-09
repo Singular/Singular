@@ -614,7 +614,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec *
       message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
               &olddeg,&reduc,strat, red_result);
 
-    // reduction of the element choosen from L
+    // reduction of the element chosen from L
     red_result = strat->red(&strat->P,strat);
 
 
@@ -742,7 +742,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec *
 
         h.PrepareRed(strat->use_buckets);
 
-        // reduction of the element choosen from L(?)
+        // reduction of the element chosen from L(?)
         red_result = strat->red(&h,strat);
 
         // reduction to non-zero new poly

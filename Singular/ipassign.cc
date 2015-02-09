@@ -1698,7 +1698,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       }
       if(like_lists)
       {
-        if (traceit&TRACE_ASSIGN) PrintS("assign list[..]=...or similiar\n");
+        if (traceit&TRACE_ASSIGN) PrintS("assign list[..]=...or similar\n");
         if (like_lists==1)
         {
           // check blackbox/newtype type:
@@ -1734,7 +1734,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
 #endif
       return (bb==NULL) || bb->blackbox_Assign(l,r);
     }
-    // end of handling elems of list and similiar
+    // end of handling elems of list and similar
     rl=r->listLength();
     if (rl==1)
     {

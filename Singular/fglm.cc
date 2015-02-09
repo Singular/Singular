@@ -171,7 +171,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
     for ( k= npar-1; (k >= 0) && (state == FglmOk); k-- )
         if ( pperm[k] >= 0 )
         {
-            WerrorS( "paramater names do not agree" );
+            WerrorS( "parameter names do not agree" );
             state= FglmIncompatibleRings;
         }
     if (pperm != NULL) // OB: ????

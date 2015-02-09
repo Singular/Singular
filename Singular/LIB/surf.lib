@@ -176,7 +176,7 @@ EXAMPLE: example plot; shows an example
   {
     surf_call = "singularsurf ";
     surf_call = surf_call + l + " >/dev/null 2>&1";
-    "Close window to exit from `singularurf`.";
+    "Close window to exit from `singularsurf`.";
 
     i = system("sh", surf_call);
     if (i != 0)
