@@ -12,6 +12,7 @@
  *
  **/
 /*****************************************************************************/
+#define _GNU_SOURCE  /*for qsort_r on cygwin, must be first*/
 
 #include <string.h>
 
