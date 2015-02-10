@@ -3563,6 +3563,7 @@ See
 (factor rings), i.e., rings modulo an ideal.  The ideal has to be given
 as a standard basis.  For a detailed description of the concept
 of rings and quotient rings see @ref{Rings and orderings}.
+Beside the construction, an object describing a quotient ring is of type @code{ring}.
 
 @menu
 * qring declaration::

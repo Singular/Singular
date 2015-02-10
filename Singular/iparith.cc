@@ -8821,6 +8821,7 @@ const char * Tok2Cmdname(int tok)
   //if (tok==PRINT_EXPR) return "print_expr";
   if (tok==IDHDL) return "identifier";
   if (tok==CRING_CMD) return "(c)ring";
+  if (tok==QRING_CMD) return "ring";
   if (tok>MAX_TOK) return getBlackboxName(tok);
   int i;
   for(i=0; i<sArithBase.nCmdUsed; i++)

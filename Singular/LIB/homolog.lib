@@ -1582,7 +1582,7 @@ EXAMPLE: example flatLocus; shows an example
       w++;
       F=fitting(M,w);
    }
-   if(typeof(basering)=="qring")
+   if(size(ideal(basering))>0)
    {
       for(v=w+1;v<=nrows(M);v++)
       {

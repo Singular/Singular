@@ -25,6 +25,11 @@ New commands:
 @item align (@nref{align})
 @end itemize
 
+Change in ring handling:
+@itemize
+@item @code{typeof(} qring @code{)} returns @code{"ring"}
+@end itemize
+
 New libraries:
 @itemize
 @item algemodstd.lib (@nref{algemodstd_lib})
