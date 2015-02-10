@@ -12,12 +12,14 @@
  *
  **/
 /*****************************************************************************/
-#define _GNU_SOURCE  /*for qsort_r on cygwin, must be first*/
+// include header file
+#include <kernel/mod2.h>
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE  /*for qsort_r on cygwin, must be before system includes*/
+#endif
 
 #include <string.h>
 
-// include header file
-#include <kernel/mod2.h>
 
 #include "syzextra.h"
 
