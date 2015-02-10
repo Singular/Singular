@@ -182,6 +182,7 @@ static ring constructStartingRing(ring r)
   return s;
 }
 
+#if 0 /*unused*/
 static ring writeOrderingAsWP(ring r)
 {
   assume(r->order[0]==ringorder_wp || r->order[0]==ringorder_dp);
@@ -194,6 +195,7 @@ static ring writeOrderingAsWP(ring r)
   }
   return rCopy(r);
 }
+#endif
 
 static ideal constructStartingIdeal(ideal originalIdeal, ring originalRing, number uniformizingParameter, ring startingRing)
 {
@@ -869,11 +871,11 @@ tropicalStrategy::tropicalStrategy():
   startingIdeal(NULL),           // to come, see below
   uniformizingParameter(NULL),   // to come, see below
   shortcutRing(NULL),            // to come, see below
-  onlyLowerHalfSpace(false),
-  weightAdjustingAlgorithm1(NULL),
-  weightAdjustingAlgorithm2(NULL),
-  extraReductionAlgorithm(NULL)
+  onlyLowerHalfSpace(false)
 {
+  weightAdjustingAlgorithm1=NULL;
+  weightAdjustingAlgorithm2=NULL;
+  extraReductionAlgorithm=NULL;
 }
 
 tropicalStrategy tropicalStrategy::debugStrategy(const ideal startIdeal, number unifParameter, ring startRing)
