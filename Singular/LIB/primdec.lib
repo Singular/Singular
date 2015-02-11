@@ -7391,7 +7391,7 @@ EXAMPLE: example zerodec; shows an example
 {
   ASSUME(0, hasFieldCoefficient(basering) );
   ASSUME(0, not isQuotientRing(basering) ) ;
-  ASSUME(2, dim(groebner(I))==1 );
+  ASSUME(2, dim(groebner(I))==0 );
   if(attrib(basering,"global")!=1)
   {
     ERROR(
