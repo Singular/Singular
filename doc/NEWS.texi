@@ -52,6 +52,7 @@ Changed libraries:
 @heading News for version 4-0-1
 
 Version 4-0-1 is a bug fix release.
+
 New feature: attribute @code{ring_cf} for @code{ring}.
 
 @heading News for version 4-0-0
