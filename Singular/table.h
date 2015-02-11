@@ -1173,8 +1173,7 @@ struct sConvertTypes dConvertTypes[] =
    { RESOLUTION_CMD,  LIST_CMD,       NULL_VAL /*iiR2L*/ , D(iiR2L_l) },
 // list -> resolution
    { LIST_CMD,        RESOLUTION_CMD, D(iiL2R) , NULL_VAL},
-// ring <-> qring
-   { RING_CMD,        QRING_CMD,      D(iiDummy), NULL_VAL},
+// qring -> qring
    { QRING_CMD,       RING_CMD,       D(iiDummy), NULL_VAL},
 //  end of list
    { 0,               0,              NULL_VAL , NULL_VAL }
