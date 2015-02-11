@@ -23,12 +23,13 @@ ideal I = -2*j+19*o^2,
 list  L = primdecSY(I);
 ideal pc2 = L[2][1];
 pc2;
-ideal rpc2 = L[2][2]; // incorrect!!
+ideal rpc2 = L[2][2]; // was incorrect!!
 rpc2;
 
 radical(L[2][1]);
 
-idealsEqual( radical(pc2), rpc2 ); // = 0!
+idealsEqual( radical(pc2), rpc2 ); // should be 1!
+ASSUME(0, idealsEqual( radical(pc2), rpc2 ) );
 ///////////////////////////////////////////
 // same with groebner(I):
 L = primdecSY (groebner(I) );
