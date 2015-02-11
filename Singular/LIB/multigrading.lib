@@ -739,7 +739,7 @@ EXAMPLE: example getVariableWeights; shows an example
 
   if( size(#) > 0 )
   {
-    if(( typeof(#[1]) == "ring" ) || ( typeof(#[1]) == "qring" ))
+    if( typeof(#[1]) == "ring" )
     {
       def R = #[1];
     }
@@ -834,7 +834,7 @@ EXAMPLE: example getGradingGroup; shows an example
 
   if( size(#) >= i )
   {
-    if( ( typeof(#[i]) == "ring" ) or ( typeof(#[i]) == "qring" ) )
+    if( typeof(#[i]) == "ring" )
     {
       def R = #[i];
       i++;
@@ -943,7 +943,7 @@ EXAMPLE: example getLattice; shows an example
   if( size(#) >= i )
   {
     def a = #[i];
-    if( ( typeof(a) == "ring" ) or ( typeof(a) == "qring" ) )
+    if( typeof(a) == "ring" )
     {
       i++;
     }
@@ -2231,7 +2231,8 @@ EXAMPLE: example pushForward; shows an example
   columns=columns+ncols(toadd1);
 
   //If the image ring is a quotient ring by some ideal, we have to coarsen the grading in order to make the ideal homogeneous.
-  if(typeof(basering)=="qring"){
+  if(size(ideal(basering))>0)
+  {
     //"Entering qring";
     ideal a=ideal(basering);
     for(i=1;i<=size(a);i++){

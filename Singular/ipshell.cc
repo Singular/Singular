@@ -685,38 +685,27 @@ leftv iiMap(map theMap, const char * what)
   }
   if ((r!=NULL) && ((r->typ == RING_CMD) || (r->typ== QRING_CMD)))
   {
-    //if ((nMap=nSetMap(rInternalChar(IDRING(r)),
-    //             IDRING(r)->parameter,
-    //             rPar(IDRING(r)),
-    //             IDRING(r)->minpoly)))
-    if ((nMap=n_SetMap(IDRING(r)->cf, currRing->cf))==NULL)
+    ring src_ring=IDRING(r);
+    if ((nMap=n_SetMap(src_ring->cf, currRing->cf))==NULL)
     {
-////////// WTF?
-//      if (rEqual(IDRING(r),currRing))
-//      {
-//        nMap = n_SetMap(currRing->cf, currRing->cf);
-//      }
-//      else
-//      {
-        Werror("can not map from ground field of %s to current ground field",
+      Werror("can not map from ground field of %s to current ground field",
           theMap->preimage);
-        return NULL;
-//      }
+      return NULL;
     }
-    if (IDELEMS(theMap)<IDRING(r)->N)
+    if (IDELEMS(theMap)<src_ring->N)
     {
       theMap->m=(polyset)omReallocSize((ADDRESS)theMap->m,
                                  IDELEMS(theMap)*sizeof(poly),
-                                 (IDRING(r)->N)*sizeof(poly));
-      for(i=IDELEMS(theMap);i<IDRING(r)->N;i++)
+                                 (src_ring->N)*sizeof(poly));
+      for(i=IDELEMS(theMap);i<src_ring->N;i++)
         theMap->m[i]=NULL;
-      IDELEMS(theMap)=IDRING(r)->N;
+      IDELEMS(theMap)=src_ring->N;
     }
     if (what==NULL)
     {
       WerrorS("argument of a map must have a name");
     }
-    else if ((w=IDRING(r)->idroot->get(what,myynest))!=NULL)
+    else if ((w=src_ring->idroot->get(what,myynest))!=NULL)
     {
       char *save_r=NULL;
       v=(leftv)omAlloc0Bin(sleftv_bin);
@@ -730,6 +719,50 @@ leftv iiMap(map theMap, const char * what)
         IDMAP(w)->preimage=0;
       }
       tmpW.data=IDDATA(w);
+      // check overflow
+      BOOLEAN overflow=FALSE;
+      if ((tmpW.rtyp==IDEAL_CMD)
+        || (tmpW.rtyp==MODUL_CMD)
+        || (tmpW.rtyp==MAP_CMD))
+      {
+        ideal id=(ideal)tmpW.data;
+        for(int j=IDELEMS(theMap)-1;j>=0 && !overflow;j--)
+        {
+          if (theMap->m[j]!=NULL)
+          {
+            long deg_monexp=pTotaldegree(theMap->m[j]);
+            for(int i=IDELEMS(id)-1;i>=0;i--)
+            {
+              poly p=id->m[i];
+              if ((p!=NULL) && (p_Totaldegree(p,src_ring)!=0) &&
+              ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)p_Totaldegree(p,src_ring)/2)))
+              {
+                overflow=TRUE;
+                break;
+              }
+            }
+          }
+        }
+      }
+      else if (tmpW.rtyp==POLY_CMD)
+      {
+        for(int j=IDELEMS(theMap)-1;j>=0 && !overflow;j--)
+        {
+          if (theMap->m[j]!=NULL)
+          {
+            long deg_monexp=pTotaldegree(theMap->m[j]);
+            poly p=(poly)tmpW.data;
+            if ((p!=NULL) && (p_Totaldegree(p,src_ring)!=0) &&
+            ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)p_Totaldegree(p,src_ring)/2)))
+            {
+              overflow=TRUE;
+              break;
+            }
+          }
+        }
+      }
+      if (overflow)
+        Warn("possible OVERFLOW in map, max exponent is %ld",currRing->bitmask/2);
 #if 0
       if (((tmpW.rtyp==IDEAL_CMD)||(tmpW.rtyp==MODUL_CMD)) && idIs0(IDIDEAL(w)))
       {
@@ -747,11 +780,11 @@ leftv iiMap(map theMap, const char * what)
         )
         {
           v->rtyp=IDEAL_CMD;
-          v->data=fast_map(IDIDEAL(w), IDRING(r), (ideal)theMap, currRing);
+          v->data=fast_map(IDIDEAL(w), src_ring, (ideal)theMap, currRing);
         }
         else
 #endif
-        if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,IDRING(r),NULL,NULL,0,nMap))
+        if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,src_ring,NULL,NULL,0,nMap))
         {
           Werror("cannot map %s(%d)",Tok2Cmdname(w->typ),w->typ);
           omFreeBin((ADDRESS)v, sleftv_bin);
@@ -1137,10 +1170,14 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
   }
   else
   {
-    //if (name->rtyp!=0)
-    //{
-    //  Warn("`%s` is already in use",name->name);
-    //}
+    if (TEST_V_ALLWARN
+    && (name->rtyp!=0)
+    && (name->rtyp!=IDHDL)
+    && (currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest))
+    {
+      Warn("`%s` is %s in %s:%d:%s",name->name,Tok2Cmdname(name->rtyp),
+      currentVoice->filename,yylineno,my_yylinebuf);
+    }
     {
       sy->data = (char *)enterid(id,lev,t,root,init_b);
     }

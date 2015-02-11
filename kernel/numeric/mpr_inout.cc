@@ -62,7 +62,7 @@ void mprPrintError( mprState state, const char * name )
   switch (state)
   {
   case mprWrongRType:
-    WerrorS("Unknown resultant matrix type choosen!");
+    WerrorS("Unknown chosen resultant matrix type!");
     break;
   case mprHasOne:
     Werror("One element of the ideal %s is constant!",name);

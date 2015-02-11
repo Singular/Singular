@@ -25,6 +25,11 @@ New commands:
 @item align (@nref{align})
 @end itemize
 
+Change in ring handling:
+@itemize
+@item @code{typeof(} qring @code{)} returns @code{"ring"}
+@end itemize
+
 New libraries:
 @itemize
 @item algemodstd.lib (@nref{algemodstd_lib})
@@ -47,6 +52,7 @@ Changed libraries:
 @heading News for version 4-0-1
 
 Version 4-0-1 is a bug fix release.
+
 New feature: attribute @code{ring_cf} for @code{ring}.
 
 @heading News for version 4-0-0

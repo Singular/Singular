@@ -185,7 +185,7 @@ EXAMPLE: example normal; shows an example
   {
     if ( typeof(#[i]) == "string" )
     {
-//--------------------------- choosen methods -----------------------
+//--------------------------- chosen methods -----------------------
       if ( (#[i]=="isprim") or (#[i]=="isPrim") )
       {decomp = 0;}
 
@@ -5724,7 +5724,7 @@ EXAMPLE: example normalC; shows an example
      }
    }
 
-   //--------------------------- choosen methods -----------------------
+   //--------------------------- chosen methods -----------------------
    // "withGens": computes algebra generators for each irreducible component
    // ### the extra code for withGens should be incorporated in the general case
 

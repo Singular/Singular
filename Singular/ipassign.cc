@@ -984,7 +984,8 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
     && (iiCurrArgs==NULL) /* not in proc header */
     )
     {
-      Warn("use `%s` instead of `def`",Tok2Cmdname(rt));
+      Warn("use `%s` instead of `def` in %s:%d:%s",Tok2Cmdname(rt),
+            currentVoice->filename,yylineno,my_yylinebuf);
     }
     if (l->rtyp==IDHDL)
     {
@@ -1697,7 +1698,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       }
       if(like_lists)
       {
-        if (traceit&TRACE_ASSIGN) PrintS("assign list[..]=...or similiar\n");
+        if (traceit&TRACE_ASSIGN) PrintS("assign list[..]=...or similar\n");
         if (like_lists==1)
         {
           // check blackbox/newtype type:
@@ -1733,7 +1734,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
 #endif
       return (bb==NULL) || bb->blackbox_Assign(l,r);
     }
-    // end of handling elems of list and similiar
+    // end of handling elems of list and similar
     rl=r->listLength();
     if (rl==1)
     {

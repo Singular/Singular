@@ -96,7 +96,7 @@ proc minAssPrimCharsets1Orig  (I)   {    return ( Primdec::min_ass_prim_charsets
 /////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 ring rng1 = 0,(x,y),dp;
-ideal I = x+y,x+1,y;  
+ideal I = x+y,x+1,y;
 
 list pr = primdecGTZE(I);
 ASSUME(0, testPrimaryE(pr,I) );
@@ -158,11 +158,11 @@ testMinAssUnitOrigBehaviour( minAssPrimesOrig,I );
 /////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 ring rng2 = 0,(x,y),dp;
-ideal I = x+y,x+1,y;  
+ideal I = x+y,x+1,y;
 
 if (defined(pr)) {kill pr;}
 list pr = primdecGTZE(I);
- 
+
 testPrimdecUnitOrigBehaviour( primdecGTZ,I );
 testPrimdecUnitOrigBehaviour( primdecGTZkeepKomp,I );
 testMinAssUnitOrigBehaviour( minAssGTZ, I );
@@ -180,9 +180,9 @@ testMinAssUnitOrigBehaviour( minAssPrimesOrig,I );
 /////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 
- 
+
 ring rng3 = 0,(x,y),ds;
-ideal I = x+y,x+1,y;  
+ideal I = x+y,x+1,y;
 
 // illegal ASSUME(0, testPrimaryE(pr,I) );
 testPrimdecUnit( primdecGTZE,I ,0 );
@@ -204,23 +204,23 @@ testPrimdecUnit( minAssCharENoOptimalOrdering,I ,0);
 testPrimdecUnit( primdecGTZ,I ,0);
 
 testPrimdecUnit( primdecGTZ,I ,0);
-//testPrimdecUnit( primdecGTZkeepKomp,I ,0);      
+//testPrimdecUnit( primdecGTZkeepKomp,I ,0);
 testPrimdecUnit( minAssGTZ, I ,0);
-// testPrimdecUnit( minAssGTZFacSTD, I ,0);        
-// testPrimdecUnit( minAssGTZnoFacSTD, I ,0);      
-// testPrimdecUnit( minAssGTZGTZ, I ,0);          
-// testPrimdecUnit( minAssGTZorigNoFacSTD, I ,0);  
+// testPrimdecUnit( minAssGTZFacSTD, I ,0);
+// testPrimdecUnit( minAssGTZnoFacSTD, I ,0);
+// testPrimdecUnit( minAssGTZGTZ, I ,0);
+// testPrimdecUnit( minAssGTZorigNoFacSTD, I ,0);
 testPrimdecUnit( primdecSY, I ,0);
 testPrimdecUnit( primdecSYNoOptimalOrdering, I ,0);
 testPrimdecUnit( minAssChar,I ,0);
 testPrimdecUnit( minAssCharNoOptimalOrdering,I ,0);
-// invalid: testPrimdecUnit( minAssPrimesOrig,I ,0); 
+// invalid: testPrimdecUnit( minAssPrimesOrig,I ,0);
 /////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
- 
-ring rng4 = (7,a),(x,y,z),dp; 
+
+ring rng4 = (7,a),(x,y,z),dp;
 minpoly = 1*a^2+6*a^1+3*a^0;
-ideal I = x+y,x+1,y; 
+ideal I = x+y,x+1,y;
 
 testPrimdecUnitNewBehaviour( wDecompE,        I );
 
@@ -249,12 +249,12 @@ testMinAssUnitNewBehaviour ( minAssPrimesNew,             I );
 //////////////////////////////////////////////////////////////////////////////////////////////
 testPrimdecUnitOrigBehaviour( wDecomp,        I );
 testPrimdecUnitOrigBehaviour( primdecGTZ,I );
-testPrimdecUnitOrigBehaviour( primdecGTZkeepKomp,I ); 
+testPrimdecUnitOrigBehaviour( primdecGTZkeepKomp,I );
 testMinAssUnitOrigBehaviour ( minAssGTZ, I );
-testMinAssUnitOrigBehaviour ( minAssGTZFacSTD, I ); 
-testMinAssUnitOrigBehaviour ( minAssGTZnoFacSTD, I ); 
-testMinAssUnitOrigBehaviour ( minAssGTZGTZ, I );  
-testMinAssUnitOrigBehaviour ( minAssGTZorigNoFacSTD, I ); 
+testMinAssUnitOrigBehaviour ( minAssGTZFacSTD, I );
+testMinAssUnitOrigBehaviour ( minAssGTZnoFacSTD, I );
+testMinAssUnitOrigBehaviour ( minAssGTZGTZ, I );
+testMinAssUnitOrigBehaviour ( minAssGTZorigNoFacSTD, I );
 testPrimdecUnitOrigBehaviour( primdecSY, I );
 testPrimdecUnitOrigBehaviour( primdecSYNoOptimalOrdering, I );
 
@@ -275,9 +275,9 @@ testMinAssUnitOrigBehaviour( minAssPrimesOrig,I );
 
 /////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
- 
+
 ring rng5 = (7,a),(x,y,z),ds; minpoly = a^2 + a+3;
-ideal I = x+y,x+1,y; 
+ideal I = x+y,x+1,y;
 
 testPrimdecUnitNewBehaviour( primdecGTZE,I );
 testPrimdecUnitNewBehaviour( primdecGTZEkeepKomp,I );

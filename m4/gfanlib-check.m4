@@ -15,8 +15,9 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
 
  AC_CHECK_HEADERS([setoper.h cdd/setoper.h cddlib/setoper.h])
 
- if test "x$ac_cv_header_setoper_h" = xno -a "x$ac_cv_header_cdd_setoper_h" = xno -a "x$ac_cv_header_cddlib_setoper_h" = xno; then
-   AC_MSG_WARN([Note that setoper.h is missing!])
+ if test "x$ac_cv_header_setoper_h" = xno -a "x$ac_cv_header_cdd_setoper_h" = xno -a "x$ac_cv_header_cddlib_setoper_h" = xno
+ then
+	AC_MSG_WARN([Error, setoper.h is missing!])
  fi
 
  AC_MSG_CHECKING([whether libcddgmp is usable])
@@ -34,14 +35,16 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
      #ifdef HAVE_SETOPER_H
      # include <setoper.h>
      # include <cdd.h>
-     #endif
+     #else
      #ifdef HAVE_CDD_SETOPER_H
      # include <cdd/setoper.h>
      # include <cdd/cdd.h>
-     #endif
+     #else
      #ifdef HAVE_CDDLIB_SETOPER_H
      # include <cddlib/setoper.h>
      # include <cddlib/cdd.h>
+     #endif
+     #endif
      #endif
     ], [dd_set_global_constants(); dd_log=dd_FALSE; ]
     )
@@ -63,6 +66,9 @@ if test "x$ENABLE_GFANLIB" != "xno"; then
    AC_MSG_ERROR([Error, could not use libcddgmp])
   fi
  fi
+ AC_MSG_RESULT(no)
+
+ AC_SUBST(CDDGMPLDFLAGS)
 else
  AC_MSG_RESULT(no)
  PASSED_ALL_TESTS_FOR_GFANLIB="0"

@@ -351,22 +351,22 @@ ZVector SymmetryGroup::orbitRepresentative(ZVector const &v, Permutation *usedPe
 
   return ret;
 }
-#if 0
-IntegerVector SymmetryGroup::orbitRepresentativeFixing(IntegerVector const &v, IntegerVector const &fixed)const
+
+ZVector SymmetryGroup::orbitRepresentativeFixing(ZVector const &v, ZVector const &fixed)const
 {
         if(trie){
-                return compose(trie->searchStabalizer(v,fixed),v);
+                return trie->searchStabalizer(v,fixed).apply(v);
         }
-  IntegerVector ret=v;
+  ZVector ret=v;
 
   for(ElementContainer::const_iterator i=elements.begin();i!=elements.end();i++)
-    if(compose(*i,fixed)==fixed)
+    if(i->apply(fixed)==fixed)
       {
-        IntegerVector q=compose(*i,v);
+        ZVector q=i->apply(v);
         if(ret<q)ret=q;
       }
         if(trie){
-                IntegerVector temp=compose(trie->searchStabalizer(v,fixed),v);
+                ZVector temp=trie->searchStabalizer(v,fixed).apply(v);
 //              debug<<"Input"<<v;
 //              debug<<"Brute"<<ret;
 //              debug<<"Quick"<<temp;
@@ -375,7 +375,6 @@ IntegerVector SymmetryGroup::orbitRepresentativeFixing(IntegerVector const &v, I
         }
   return ret;
 }
-#endif
 
 bool Permutation::isPermutation(IntVector const &a)
 {

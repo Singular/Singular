@@ -608,7 +608,8 @@ static FORCE_INLINE number n_GetNumerator(number& n, const coeffs r)
 { STATISTIC(n_GetNumerator); assume(r != NULL); assume(r->cfGetNumerator!=NULL); return r->cfGetNumerator(n, r); }
 
 /// return the quotient of 'a' and 'b', i.e., a/b;
-/// raise an error if 'b' is not invertible in r
+/// raises an error if 'b' is not invertible in r
+/// exception in Z: raises an error if 'a' is not divisible by 'b'
 static FORCE_INLINE number n_Div(number a, number b, const coeffs r)
 { STATISTIC(n_Div); assume(r != NULL); assume(r->cfDiv!=NULL); return r->cfDiv(a,b,r); }
 

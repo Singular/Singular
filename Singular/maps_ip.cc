@@ -21,7 +21,7 @@
 #include <polys/prCopy.h>
 #include <polys/ext_fields/transext.h>
 
-//#include <libpolys/polys/ext_fields/longtrans.h>
+//#include <polys/ext_fields/longtrans.h>
 // #include <kernel/longalg.h>
 
 #include <kernel/GBEngine/kstd1.h>

@@ -114,7 +114,7 @@ public:
 
 
 
-// assigment and access operators
+// assignment and access operators
 
   binomial& operator=(const binomial&);
   // assignment operator with memory control

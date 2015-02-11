@@ -9,32 +9,12 @@
 #define LIB_Z_H_
 
 #include <string.h>
+#include <iostream>
 #include <ostream>
 
 #define OLD 1
 #if OLD
 #include "gmp.h"
-
-#if (__GNU_MP_VERSION == 4) && (__GNU_MP_VERSION_MINOR<2)
-extern void *  (*__gmp_allocate_func) __GMP_PROTO ((size_t));
-extern void *  (*__gmp_reallocate_func) __GMP_PROTO ((void *, size_t, size_t));
-extern void    (*__gmp_free_func) __GMP_PROTO ((void *, size_t));
-
-static inline void
-mp_get_memory_functions (void *(**alloc_func) (size_t),
-                         void *(**realloc_func) (void *, size_t, size_t),
-                         void (**free_func) (void *, size_t))
-{
-  if (alloc_func != NULL)
-    *alloc_func = __gmp_allocate_func;
-
-  if (realloc_func != NULL)
-    *realloc_func = __gmp_reallocate_func;
-
-  if (free_func != NULL)
-    *free_func = __gmp_free_func;
-}
-#endif
 
 namespace gfan{
   class Rational;
@@ -88,6 +68,15 @@ public:
     f<<str;
     freefunc(str,strlen(str)+1);
     return f;
+  }
+  void debugPrint() const
+  {
+    void (*freefunc)(void *, size_t);
+    mp_get_memory_functions(0,0,&freefunc);
+    char *str=mpz_get_str(0,10,value);
+    std::cout << str;
+    freefunc(str,strlen(str)+1);
+    return;
   }
   Integer& operator+=(const Integer& a)
     {
@@ -349,6 +338,11 @@ namespace gfan{
           f<<valueToWord();
         }
       return f;
+    }
+    friend void debugPrint(IntegerTemplate const &a)
+    {
+      std::cout << a << std::endl;
+      return;
     }
     LimbWord signExtension(LimbWord a)
     {

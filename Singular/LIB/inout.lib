@@ -366,7 +366,7 @@ EXAMPLE: example show; shows an example
          }
          if( typeof(#[1])=="string" )
          {
-            if( typeof(@@id)=="ring" or typeof(@@id)=="qring")
+            if( typeof(@@id)=="ring")
             {
                def @R@ = @@id;
                setring @R@;
@@ -477,45 +477,21 @@ EXAMPLE: example show; shows an example
       short=@short@; return();
    }
 //---------------------- case: @id@ is a ring/qring ---------------------------
-   if( typeof(@id@)=="ring" or typeof(@id@)=="qring" )
+   if( typeof(@id@)=="ring" )
    {
       setring @id@;
       string s="("+charstr(@id@)+"),("+varstr(@id@)+"),("+ordstr(@id@)+");";
       if( typeof(@id@)=="ring" )
       {
          list na@me@s=names(@id@);
-         kill @id@;
          @@s = tab(@li@)+"// ring:"; @@s,s;
          @@s = tab(@li@)+"// minpoly ="; @@s,minpoly;
+	 if (size(ideal(@id@))>0)
+	 {
+           @@s = tab(@li@)+"// quotient ring from ideal:"; @@s;ideal(@id@);
+	 }
+         kill @id@;
          "// objects belonging to this ring:";
-         listvar(poly);listvar(ideal);
-         listvar(vector);listvar(module);
-         listvar(map);listvar(matrix);
-         listvar(number);listvar(resolution);
-         for(int names@i=1;names@i<=size(na@me@s);names@i++)
-         {
-           def @hi@lf@=`na@me@s[names@i]`;
-           if ((typeof(@hi@lf@)!="poly") and
-               (typeof(@hi@lf@)!="ideal") and
-               (typeof(@hi@lf@)!="vector") and
-               (typeof(@hi@lf@)!="module") and
-               (typeof(@hi@lf@)!="map") and
-               (typeof(@hi@lf@)!="matrix") and
-               (typeof(@hi@lf@)!="number") and
-               (typeof(@hi@lf@)!="resolution"))
-           {
-             listvar(`na@me@s[names@i]`);
-           }
-           kill @hi@lf@;
-         }
-      }
-      if( typeof(@id@)=="qring" )
-      {
-         list na@me@s=names(@id@);
-         @@s = tab(@li@)+"// qring:"; @@s,s;
-         @@s = tab(@li@)+"// minpoly ="; @@s, minpoly;
-         @@s = tab(@li@)+"// quotient ring from ideal:"; @@s;
-         ideal(@id@);
          listvar(poly);listvar(ideal);
          listvar(vector);listvar(module);
          listvar(map);listvar(matrix);

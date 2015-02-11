@@ -44,7 +44,7 @@ SLIB1 = classifyceq.lib classifyci.lib classify_aeq.lib algemodstd.lib \
         dmodloc.lib divisors.lib \
         ffsolve.lib decomp.lib template.lib \
         findifs.lib finitediff.lib \
-        gitfan.lib \
+        gitfan.lib gradedModules.lib \
         locnormal.lib modnormal.lib modular.lib \
 	JMBTest.lib JMSConst.lib multigrading.lib\
 	numerAlg.lib numerDecom.lib \

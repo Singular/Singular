@@ -295,7 +295,7 @@ example
 static proc check_leadmonom_and_size(list L)
 {
     /*
-     * compare the size of ideals in the list and 
+     * compare the size of ideals in the list and
      * check the corresponding leading monomials
      * size(L)>=2
      */

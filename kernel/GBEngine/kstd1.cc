@@ -2896,7 +2896,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
         message(strat->P.pFDeg(),
                 &olddeg,&reduc,strat, red_result);
 
-      /* reduction of the element choosen from L */
+      /* reduction of the element chosen from L */
       red_result = strat->red(&strat->P,strat);
     }
 

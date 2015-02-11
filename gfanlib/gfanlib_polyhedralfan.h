@@ -23,8 +23,7 @@ typedef std::set<ZCone> PolyhedralConeList;
 typedef std::list<IntVector> IntVectorList;
 typedef std::map<int,IntVectorList> IncidenceList;
 
-class PolyhedralFan ;
-
+class PolyhedralFan;
 PolyhedralFan refinement(const PolyhedralFan &a, const PolyhedralFan &b, int cutOffDimension=-1, bool allowASingleConeOfCutOffDimension=false);
 
 /** A PolyhedralFan is simply a collection of canonicalized PolyhedralCones.
@@ -54,9 +53,7 @@ class PolyhedralFan
   int getAmbientDimension()const;
   int getMaxDimension()const;
   int getMinDimension()const;
-
-//   friend PolyhedralFan refinement(const PolyhedralFan &a, const PolyhedralFan &b, int cutOffDimension=-1, bool allowASingleConeOfCutOffDimension=false);
-
+  // friend PolyhedralFan refinement(const PolyhedralFan &a, const PolyhedralFan &b, int cutOffDimension=-1, bool allowASingleConeOfCutOffDimension=false);
   ZMatrix getRays(int dim=1);//This can be called for other dimensions than 1. The term "Rays" still makes sense modulo the common linearity space
   ZMatrix getRelativeInteriorPoints();
   void insert(ZCone const &c);
