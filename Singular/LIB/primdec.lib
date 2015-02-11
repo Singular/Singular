@@ -2362,6 +2362,7 @@ static proc minAssPrimes_i(int patchPrimaryDecomposition, ideal i, list #)
     list re=imap(P,re);
     return(re);
   }
+
   q = facstd(i);
 
 /*
@@ -2541,7 +2542,6 @@ EXAMPLE:example equidim; shows an example
   intvec op ;
   def  P = basering;
   list eq;
-  intvec w;
   int n,m;
   int g=size(i);
   int a=attrib(i,"isSB");
@@ -2573,14 +2573,6 @@ EXAMPLE:example equidim; shows an example
      setring gnir;
      ideal i=imap(P,i);
      ideal j=groebner(i);
-  }
-  if(homo==1)
-  {
-     for(n=1;n<=nvars(basering);n++)
-     {
-        w[n]=ord(var(n));
-     }
-     intvec hil=hilb(j,1,w);
   }
 
   if ((dim(j)==-1)||(size(j)==0)||(nvars(basering)==1)
@@ -2650,7 +2642,6 @@ EXAMPLE: example equidimMax; shows an example
 
   def  P = basering;
   ideal eq;
-  intvec w;
   int n;
   int g=size(i);
   int a=attrib(i,"isSB");
@@ -2681,14 +2672,6 @@ EXAMPLE: example equidimMax; shows an example
   }
   list indep;
   ideal equ,equi;
-  if(homo==1)
-  {
-     for(n=1;n<=nvars(basering);n++)
-     {
-        w[n]=ord(var(n));
-     }
-     intvec hil=hilb(j,1,w);
-  }
   if ((dim(j)==-1)||(size(j)==0)||(nvars(basering)==1)
                   ||(dim(j)==0)||(dim(j)+g==nvars(basering)))
   {
@@ -2700,14 +2683,7 @@ EXAMPLE: example equidimMax; shows an example
 
   execute("ring gnir1 = ("+charstr(basering)+"),("+indep[1][1]+"),("
                               +indep[1][2]+");");
-  if(homo==1)
-  {
-     ideal j=std(imap(gnir,j),hil,w);
-  }
-  else
-  {
-     ideal j=groebner(imap(gnir,j));
-  }
+  ideal j=groebner( imap(gnir,j) );
   def quotring=prepareQuotientring(nvars(basering)-indep[1][3],"lp");
   setring quotring;
   ideal j=imap(gnir1,j);
@@ -3031,7 +3007,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
   initialOp = option(get);
   def  @P = basering;
   list primary,indep,ltras;
-  intvec @vh,isat,@w;
+  intvec @vh,isat;
   int @wr,@k,@n,@m,@n1,@n2,@n3,homo,seri,keepdi,abspri,ab,nn;
   ideal peek=i;
   ideal ser,tras;
@@ -3112,12 +3088,6 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
       }
       return(primary);
     }
-    for(@n=1;@n<=nvars(basering);@n++)
-    {
-      @w[@n]=ord(var(@n));
-    }
-    intvec @hilb=hilb(tras,1,@w);
-    intvec keephilb=@hilb;
   }
 
   //----------------------------------------------------------------
@@ -3149,7 +3119,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
   {
     if(!lp)
     {
-      ideal @j=std(fetch(@P,i),@hilb,@w);
+      ideal @j=groebner( fetch(@P,i) );
     }
     else
     {
@@ -3438,7 +3408,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
     }
     else
     {
-      ideal jwork=std(imap(gnir,@j),@hilb,@w);
+      ideal jwork=groebner( imap(gnir,@j) );
     }
   }
   else
@@ -3704,10 +3674,6 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
         @j=imap(@Phelp,jwork);
         break;
       }
-      if(homo==1)
-      {
-        @hilb=hilb(jwork,1,@w);
-      }
 
       setring gnir;
       @j=imap(@Phelp,jwork);
@@ -3789,14 +3755,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
           execute("map phi=gnir,"+@va+";");
           op=option(get);
           option(redSB);
-          if(homo==1)
-          {
-            ideal @j=std(phi(jkeep),keephilb,@w);
-          }
-          else
-          {
-            ideal @j=groebner(phi(jkeep));
-          }
+          ideal @j=groebner(phi(jkeep));
           ideal ser=phi(ser);
           option(set,op);
         }
@@ -6779,7 +6738,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
 
   attrib(I, "isSB", 1);   // I needs to be a reduced standard basis
   list indep, fett;
-  intvec @w, @hilb, op;
+  intvec op;
   int @wr, @n, @m, lauf, di;
   ideal fac, @h, collectrad, lsau;
   poly @q;
@@ -6793,14 +6752,6 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
   if(size(#) > 0)
   {
     @wr = #[1];
-  }
-  if(homo == 1)
-  {
-    for(@n = 1; @n <= nvars(basering); @n++)
-    {
-      @w[@n] = ord(var(@n));
-    }
-    @hilb = hilb(I, 1, @w);
   }
 
   // SL 2006.04.11 1 Debug messages
@@ -6858,14 +6809,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
       execute("ring gnir1 = (" + charstr(basering) + "), (" + indep[@m][1] + "),("
                               + indep[@m][2] + ");");
       execute("map phi = @P," + @va + ";");
-      if(homo == 1)
-      {
-        ideal @j = std(phi(I), @hilb, @w);
-      }
-      else
-      {
-        ideal @j = groebner(phi(I));
-      }
+      ideal @j = groebner(phi(I));
     }
     if((deg(@j[1]) == 0) || (dim(@j) < jdim))
     {
@@ -7007,10 +6951,6 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
     if((dim(I) < jdim)||(size(te) == 0))
     {
       break;
-    }
-    if(homo==1)
-    {
-      @hilb = hilb(I, 1, @w);
     }
   }
 
@@ -7531,13 +7471,12 @@ EXAMPLE: example newDecompStep; shows an example
   intvec op@P, op,@vv;
   def  @P = basering;
   list primary,indep,ltras;
-  intvec @vh,isat,@w;
+  intvec @vh,isat;
   int @wr,@k,@n,@m,@n1,@n2,@n3,homo,seri,keepdi,abspri,ab,nn;
   ideal peek=i;
   ideal ser,tras;
   list data;
   list result;
-  intvec @hilb;
   int isS=attrib(i,"isSB");
 
   // Debug
@@ -7628,12 +7567,6 @@ EXAMPLE: example newDecompStep; shows an example
         return(primary);
       }
     }
-    for(@n=1;@n<=nvars(basering);@n++)
-    {
-      @w[@n]=ord(var(@n));
-    }
-    @hilb=hilb(tras,1,@w);
-    intvec keephilb=@hilb;
   }
 
   //----------------------------------------------------------------
@@ -7671,7 +7604,7 @@ EXAMPLE: example newDecompStep; shows an example
   {
     if(!lp)
     {
-      ideal @j=std(fetch(@P,i),@hilb,@w);
+      ideal @j=groebner(fetch(@P,i));
     }
     else
     {
@@ -7978,7 +7911,7 @@ EXAMPLE: example newDecompStep; shows an example
     }
     else
     {
-      ideal jwork=std(imap(gnir,@j),@hilb,@w);
+      ideal jwork=groebner(imap(gnir,@j));
     }
   }
   else
@@ -8000,7 +7933,7 @@ EXAMPLE: example newDecompStep; shows an example
   for(@m=1; @m<=size(indep); @m++)
   {
     data[1] = indep[@m];
-    result = newReduction(@j, ser, @hilb, @w, jdim, abspri, @wr, data);
+    result = newReduction(@j, ser, jdim, abspri, @wr, data);
     quprimary = quprimary + result[1];
     if(abspri)
     {
@@ -8056,10 +7989,6 @@ EXAMPLE: example newDecompStep; shows an example
         @j = imap(@Phelp, jwork);
         ser = imap(@Phelp, ser);
         break;
-      }
-      if(homo == 1)
-      {
-        @hilb = hilb(jwork, 1, @w);
       }
 
       setring gnir;
@@ -8153,14 +8082,7 @@ EXAMPLE: example newDecompStep; shows an example
               execute("map phi=gnir,"+@va+";");
               op=option(get);
               option(redSB);
-              if(homo==1)
-              {
-                 ideal @j=std(phi(jkeep),keephilb,@w);
-              }
-              else
-              {
-                ideal @j=groebner(phi(jkeep));
-              }
+              ideal @j=groebner(phi(jkeep));
               ideal ser=phi(ser);
               option(set,op);
            }
@@ -8437,7 +8359,7 @@ example
 // this part was separated as a soubrutine to make the code more clear.
 // Also, since the reduction is performed twice in proc newDecompStep, it should use both times this routine.
 // This is not yet implemented, since the reduction is not exactly the same and some changes should be made.
-static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim, int abspri, int @wr, list data)
+static proc newReduction(ideal @j, ideal ser, int jdim, int abspri, int @wr, list data)
 {
    ASSUME(1, hasFieldCoefficient(basering) );
    ASSUME(1, not isQuotientRing(basering) ) ;
@@ -8500,16 +8422,8 @@ static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim,
      execute("map phi=gnir,"+@va+";");
      op=option(get);
      option(redSB);
-     if(homo==1)
-     {
-       ideal @j=std(phi(@j),@hilb,@w);
-     }
-     else
-     {
-       ideal @j=groebner(phi(@j));
-     }
+     ideal @j=groebner(phi(@j));
      ideal ser=phi(ser);
-
      option(set,op);
    }
    if((deg(@j[1])==0)||(dim(@j)<jdim))
