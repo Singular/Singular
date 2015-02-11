@@ -157,6 +157,21 @@ optional_Singular_programs =
 
 bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 
+man_MANS = Singular.1 ESingular.1 TSingular.1
+
+AM_H2MFLAGS = \
+	--manual="CAS Singular" \
+	--version-option="--dump-versiontuple" \
+	--source="Singular" \
+	--libtool \
+	--no-info
+
+## short descriptions for manpages
+Singular_DESCRIPTION =  "Computer Algebra System for Polynomial Computations -- command-line interface"
+ESingular_DESCRIPTION = "Computer Algebra System for Polynomial Computations -- command-line interface within emacs"
+TSingular_DESCRIPTION = "Computer Algebra System for Polynomial Computations -- command-line interface within a new terminal"
+
+
 Singular_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 Singular_LDADD = libSingular.la ${BUILTIN_FLAGS}
@@ -200,6 +215,15 @@ libparse_SOURCES = libparse.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 libparse_LDADD = ${top_builddir}/omalloc/libomalloc.la
 libparse_LDFLAGS = -static ${AM_LDFLAGS}
+
+%.1: %
+	$(HELP2MAN) \
+			-s 1 \
+			$(AM_H2MFLAGS) \
+			-I $(top_srcdir)/Singular/man/$*.h2m \
+			-n $(if $($(subst -,_,$*)_DESCRIPTION), $($(subst -,_,$*)_DESCRIPTION), "manual page for $*") \
+			-o $@ \
+		$(abs_top_builddir)/Singular/$<
 
 #########################################################
 # the Singular library (*.lib files)

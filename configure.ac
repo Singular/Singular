@@ -43,6 +43,7 @@ AC_CHECK_HEADERS(unistd.h iostream.h sys/time.h sys/times.h asm/sigcontext.h)
 
 AC_CHECK_FUNCS(readlink getcwd getwd setenv putenv qsort_r)
 
+AC_PATH_PROG([HELP2MAN],[help2man])
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 if test -z "$DOXYGEN";
    then AC_MSG_WARN([Doxygen not found - continuing without Doxygen support])
@@ -258,7 +259,8 @@ AC_CONFIG_FILES([Singular/Makefile])
 
 AC_CONFIG_FILES([IntegerProgramming/Makefile])
 
-AC_CONFIG_FILES([libsingular-config Singular.pc])
+AC_CONFIG_FILES([Singular.pc])
+AC_CONFIG_FILES([libsingular-config], [chmod a+x libsingular-config])
 
 AC_CONFIG_FILES([emacs/Makefile])
 
