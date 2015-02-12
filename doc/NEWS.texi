@@ -43,6 +43,7 @@ Changed libraries:
 @item Presolve::findvars (@nref{findvars}, @nref{variables})
 @item Ring::addvarsTo (@nref{addvarsTo})
 @item Ring::addNvarsTo (@nref{addNvarsTo})
+@item Ring::hasAlgExtensionCoefficient (@nref{hasAlgExtensionCoefficient})
 @item Schreyer::s_res (@nref{s_res})
 @item grobcov.lib (grobcovK) (@nref{grobcov_lib}) with new routines
    AddCons (@nref{AddCons}), AddConsP (@nref{AddConsP}).

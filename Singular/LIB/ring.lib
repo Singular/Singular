@@ -30,6 +30,7 @@ PROCEDURES:
  hasGlobalOrdering(rng)   global versus mixed/local monomial ordering
  hasMixedOrdering()       mixed versus global/local ordering
  hasFieldCoefficient(rng) coefficients are a field
+ hasAlgExtensionCoefficient(r) coefficients are an algebraic extension
  isQuotientRing(rng)      ring is a qotient ring
  isSubModule(I,J)         check if I is in J as submodule
 
@@ -923,9 +924,6 @@ example
   r;
 }
 
-
-
-
 proc isQuotientRing(def rng )
 "USAGE: isQuotientRing ( rng );
 RETURN:  1 if rng is a quotient ring, 0 otherwise.
@@ -946,6 +944,7 @@ EXAMPLE: example isQuotientRing ; shows an example
 }
 example
 {
+  "EXAMPLE:";echo=2;
   ring rng = 0,x,dp;
   isQuotientRing(rng); //no
   // if a certain method does not support quotient rings,
@@ -992,12 +991,35 @@ EXAMPLE: example hasFieldCoefficient; shows an example
 }
 example
 {
+  "EXAMPLE:";echo=2;
   ring rng = integer,x,dp;
   hasFieldCoefficient(rng); //no
   // if a certain method supports only rings with integer coefficients,
   // then a parameter test could be performed:
   ring rng2 = 0, x, dp;
   hasFieldCoefficient(rng2);  // yes
+}
+
+proc hasAlgExtensionCoefficient(def rng )
+"USAGE: hasAlgExtensionCoefficient ( rng );
+RETURN:  1 if the coeffcients are an gelebrai extension, 0 otherwise.
+KEYWORDS: ring coefficients
+EXAMPLE: example hasAlgExtensionCoefficient; shows an example
+"
+{
+  def savering=basering;
+  setring rng;
+  int r=(string(minpoly)!="0");
+  setring savering;
+  return(r);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring rng = integer,x,dp;
+  hasAlgExtensionCoefficient(rng); //no
+  ring rng2 = (0,a), x, dp; minpoly=a2-1;
+  hasAlgExtensionCoefficient(rng2);  // yes
 }
 
 proc hasGFCoefficient(def rng )
