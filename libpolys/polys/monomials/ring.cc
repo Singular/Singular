@@ -1050,6 +1050,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       return -1;
     }
   }
+  tmpR.bitmask=si_max(r1->bitmask,r2->bitmask);
   sum=(ring)omAllocBin(sip_sring_bin);
   memcpy(sum,&tmpR,sizeof(ip_sring));
   rComplete(sum);
@@ -3369,7 +3370,13 @@ BOOLEAN rComplete(ring r, int force)
   int n=rBlocks(r)-1;
   int i;
   int bits;
-  r->bitmask=rGetExpSize(r->bitmask,bits,r->N);
+  if (r->bitmask==0)
+  {
+    r->bitmask=rGetExpSize(r->bitmask,bits,r->N);
+    if (r->bitmask > 0xffff) { r->bitmask=0xffff; bits=16; }
+  }
+  else
+    r->bitmask=rGetExpSize(r->bitmask,bits,r->N);
   r->BitsPerExp = bits;
   r->ExpPerLong = BIT_SIZEOF_LONG / bits;
   r->divmask=rGetDivMask(bits);
