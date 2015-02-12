@@ -2516,6 +2516,11 @@ static unsigned long rGetExpSize(unsigned long bitmask, int & bits)
 */
 static unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
 {
+#if SIZEOF_LONG == 8
+  if (N<4) N=4;
+#else
+  if (N<2) N=2;
+#endif
   bitmask =rGetExpSize(bitmask, bits);
   int vars_per_long=BIT_SIZEOF_LONG/bits;
   int bits1;
@@ -3370,13 +3375,7 @@ BOOLEAN rComplete(ring r, int force)
   int n=rBlocks(r)-1;
   int i;
   int bits;
-  if (r->bitmask==0)
-  {
-    r->bitmask=rGetExpSize(r->bitmask,bits,r->N);
-    if (r->bitmask > 0xffff) { r->bitmask=0xffff; bits=16; }
-  }
-  else
-    r->bitmask=rGetExpSize(r->bitmask,bits,r->N);
+  r->bitmask=rGetExpSize(r->bitmask,bits,r->N);
   r->BitsPerExp = bits;
   r->ExpPerLong = BIT_SIZEOF_LONG / bits;
   r->divmask=rGetDivMask(bits);
