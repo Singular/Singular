@@ -1021,7 +1021,7 @@ EXAMPLE: example zero_decomp; shows an example
   {
     primary=splitCharp(primary);
   }
-
+/*
   if((@wr==2)&&(npars(basering)>0)&&(voice>=7)&&(char(basering)>0))
   {
   //the prime decomposition of Yokoyama in characteristic p
@@ -1045,7 +1045,7 @@ EXAMPLE: example zero_decomp; shows an example
       primary[size(primary)+1]=ke[@k];
     }
   }
-
+*/
   if(voice>=9){primary=extF(primary);};
 
 //test whether all ideals in the decomposition are primary and
@@ -4219,6 +4219,38 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static proc algeRad(ideal i)
+{
+   ASSUME(0, hasFieldCoefficient(basering) );
+   ASSUME(0, not isQuotientRing(basering) ) ;
+   ASSUME(0, hasGlobalOrdering(basering) ) ;
+
+//reduces radical computation over algebraic extensions to the other cases
+   def R=basering;
+   int n=nvars(R);
+
+   string mp="poly p="+string(minpoly)+";";
+   string gnir="ring RH="+string(char(R))+",("+varstr(R)+","+string(par(1))
+                +"),dp;";
+   execute(gnir);
+   execute(mp);
+   ideal i=imap(R,i);
+   i=i,p;
+   ideal ra=radical(i);
+
+   gnir="ring RS="+string(char(R))+",("+varstr(RH)
+                +"),(dp("+string(n)+"),lp);";
+   execute(gnir);
+   ideal K=imap(RH,ra);
+   K=std(K);
+   K=K[2..size(K)];
+   setring R;
+   ideal ra=imap(RS,K);
+
+   return( ra );
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 proc radicalEHV(ideal i)
 "USAGE:   radicalEHV(i); i ideal.
@@ -4231,91 +4263,95 @@ NOTE:    Uses the algorithm of Eisenbud/Huneke/Vasconcelos, which
 EXAMPLE: example radicalEHV; shows an example
 "
 {
-   ASSUME(0, hasFieldCoefficient(basering) );
-   ASSUME(0, not isQuotientRing(basering) ) ;
-   if(attrib(basering,"global")!=1)
-   {
-      ERROR(
+  ASSUME(0, hasFieldCoefficient(basering) );
+  ASSUME(0, not isQuotientRing(basering) ) ;
+  if(attrib(basering,"global")!=1)
+  {
+    ERROR(
       "// Not implemented for this ordering, please change to global ordering."
-      );
-   }
+    );
+  }
 
-   if((char(basering)<100)&&(char(basering)!=0))
-   {
-      "WARNING: The characteristic is too small, the result may be wrong";
-   }
-   if ( size(i)==0 ) { return(ideal(0)); }
+  if ( size(i)==0 ) { return(ideal(0)); }
+  if(hasAlgExtensionCoefficient(basering))
+  {
+    return(algeRad(i));
+  }
+  if((char(basering)<100)&&(char(basering)!=0))
+  {
+     "WARNING: The characteristic is too small, the result may be wrong";
+  }
 
-   ideal J,I,I0,radI0,L,radI1,I2,radI2;
-   int l,n;
-   intvec op=option(get);
-   matrix M;
+  ideal J,I,I0,radI0,L,radI1,I2,radI2;
+  int l,n;
+  intvec op=option(get);
+  matrix M;
 
-   option(redSB);
-   list m=mstd(i);
-        I=m[2];
-   option(set,op);
+  option(redSB);
+  list m=mstd(i);
+  I=m[2];
+  option(set,op);
 
-   if ( dim(m[1])<0 ) { return(ideal(1)); }
+  if ( dim(m[1])<0 ) { return(ideal(1)); }
 
-   int cod=nvars(basering)-dim(m[1]);
-   //-------------------complete intersection case:----------------------
-   if(cod==size(m[2]))
-   {
-     J=minor(jacob(I),cod);
-     return(quotient(I,J));
-   }
-   //-----first codim elements of I are a complete intersection:---------
-   for(l=1;l<=cod;l++)
-   {
-      I0[l]=I[l];
-   }
-   n=dim(std(I0))+cod-nvars(basering);
-   //-----last codim elements of I are a complete intersection:----------
-   if(n!=0)
-   {
-      for(l=1;l<=cod;l++)
-      {
-         I0[l]=I[size(I)-l+1];
-      }
-      n=dim(std(I0))+cod-nvars(basering);
-   }
-   //-----taking a generic linear combination of the input:--------------
-   if(n!=0)
-   {
-      M=transpose(sparsetriag(size(m[2]),cod,95,1));
-      I0=ideal(M*transpose(I));
-      n=dim(std(I0))+cod-nvars(basering);
-   }
-   //-----taking a more generic linear combination of the input:---------
-   if(n!=0)
-   {
-      M=transpose(sparsetriag(size(m[2]),cod,0,100));
-      I0=ideal(M*transpose(I));
-      n=dim(std(I0))+cod-nvars(basering);
-   }
-   if(n==0)
-   {
-      J=minor(jacob(I0),cod);
-      radI0=quotient(I0,J);
-      L=quotient(radI0,I);
-      radI1=quotient(radI0,L);
+  int cod=nvars(basering)-dim(m[1]);
+  //-------------------complete intersection case:----------------------
+  if(cod==size(m[2]))
+  {
+    J=minor(jacob(I),cod);
+    return(quotient(I,J));
+  }
+  //-----first codim elements of I are a complete intersection:---------
+  for(l=1;l<=cod;l++)
+  {
+    I0[l]=I[l];
+  }
+  n=dim(std(I0))+cod-nvars(basering);
+  //-----last codim elements of I are a complete intersection:----------
+  if(n!=0)
+  {
+    for(l=1;l<=cod;l++)
+    {
+      I0[l]=I[size(I)-l+1];
+    }
+    n=dim(std(I0))+cod-nvars(basering);
+  }
+  //-----taking a generic linear combination of the input:--------------
+  if(n!=0)
+  {
+    M=transpose(sparsetriag(size(m[2]),cod,95,1));
+    I0=ideal(M*transpose(I));
+    n=dim(std(I0))+cod-nvars(basering);
+  }
+  //-----taking a more generic linear combination of the input:---------
+  if(n!=0)
+  {
+    M=transpose(sparsetriag(size(m[2]),cod,0,100));
+    I0=ideal(M*transpose(I));
+    n=dim(std(I0))+cod-nvars(basering);
+  }
+  if(n==0)
+  {
+    J=minor(jacob(I0),cod);
+    radI0=quotient(I0,J);
+    L=quotient(radI0,I);
+    radI1=quotient(radI0,L);
 
-      if(size(reduce(radI1,m[1],1))==0)
-      {
-         return(I);
-      }
+    if(size(reduce(radI1,m[1],1))==0)
+    {
+      return(I);
+    }
 
-      I2=sat(I,radI1)[1];
+    I2=sat(I,radI1)[1];
 
-      if(deg(I2[1])<=0)
-      {
-         return(radI1);
-      }
-      return(intersect(radI1,radicalEHV(I2)));
-   }
-   //---------------------general case-------------------------------------
-   return(radical(I));
+    if(deg(I2[1])<=0)
+    {
+      return(radI1);
+    }
+    return(intersect(radI1,radicalEHV(I2)));
+  }
+  //---------------------general case-------------------------------------
+  return(radical(I));
 }
 example
 { "EXAMPLE:";  echo = 2;
@@ -6465,6 +6501,10 @@ EXAMPLE: example radical; shows an example
   ASSUME(0, not isQuotientRing(basering) ) ;
   dbprint(printlevel - voice, "Radical, version 2006.05.08");
   if(size(i) == 0){return(ideal(0));}
+  if(hasAlgExtensionCoefficient(basering))
+  {
+    return(algeRad(i));
+  }
   if(attrib(basering,"global")!=1)
   {
 // algorithms only work in global case!
