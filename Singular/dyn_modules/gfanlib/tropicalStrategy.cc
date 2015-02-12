@@ -173,29 +173,32 @@ static ring constructStartingRing(ring r)
   s->block1[0] = n;
   s->wvhdl[0] = (int*) omAlloc(n*sizeof(int));
   s->wvhdl[0][0] = 1;
-  for (int i=1; i<n; i++)
-    s->wvhdl[0][i] = -(r->wvhdl[0][i-1]);
+  if (r->order[0] == ringorder_dp)
+  {
+    for (int i=1; i<n; i++)
+      s->wvhdl[0][i] = -1;
+  }
+  else if (r->order[0] == ringorder_ds)
+  {
+    for (int i=1; i<n; i++)
+      s->wvhdl[0][i] = 1;
+  }
+  else if (r->order[0] == ringorder_ws)
+  {
+    for (int i=1; i<n; i++)
+      s->wvhdl[0][i] = r->wvhdl[0][i-1];
+  }
+  else
+  {
+    for (int i=1; i<n; i++)
+      s->wvhdl[0][i] = -r->wvhdl[0][i-1];
+  }
   s->order[1] = ringorder_C;
 
   rComplete(s);
   rTest(s);
   return s;
 }
-
-#if 0 /*unused*/
-static ring writeOrderingAsWP(ring r)
-{
-  assume(r->order[0]==ringorder_wp || r->order[0]==ringorder_dp);
-  if (r->order[0]==ringorder_dp)
-  {
-    ring s = rCopy0(r,FALSE,TRUE);
-    rComplete(s);
-    rTest(s);
-    return s;
-  }
-  return rCopy(r);
-}
-#endif
 
 static ideal constructStartingIdeal(ideal originalIdeal, ring originalRing, number uniformizingParameter, ring startingRing)
 {
@@ -221,10 +224,11 @@ static ideal constructStartingIdeal(ideal originalIdeal, ring originalRing, numb
     J->m[i] = p_PermPoly(originalIdeal->m[i],shiftByOne,originalRing,startingRing,nMap,NULL,0);
   omFreeSize(shiftByOne,(n+1)*sizeof(int));
 
-  ring origin = currRing;
-  rChangeCurrRing(startingRing);
-  ideal startingIdeal = kNF(pt,startingRing->qideal,J);
-  rChangeCurrRing(origin);
+  // ring origin = currRing;
+  // rChangeCurrRing(startingRing);
+  // ideal startingIdeal = kNF(pt,startingRing->qideal,J);
+  // rChangeCurrRing(origin);
+  ideal startingIdeal = J; J = NULL;
   assume(startingIdeal->m[k]==NULL);
   startingIdeal->m[k] = pt->m[0];
   startingIdeal = gfanlib_kStd_wrapper(startingIdeal,startingRing);
@@ -866,11 +870,11 @@ tropicalStrategy::tropicalStrategy():
   originalRing(NULL),
   originalIdeal(NULL),
   expectedDimension(NULL),
-  linealitySpace(gfan::ZCone()), // to come, see below
-  startingRing(NULL),            // to come, see below
-  startingIdeal(NULL),           // to come, see below
-  uniformizingParameter(NULL),   // to come, see below
-  shortcutRing(NULL),            // to come, see below
+  linealitySpace(gfan::ZCone()),
+  startingRing(NULL),
+  startingIdeal(NULL),
+  uniformizingParameter(NULL),
+  shortcutRing(NULL),
   onlyLowerHalfSpace(false)
 {
   weightAdjustingAlgorithm1=NULL;
