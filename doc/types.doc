@@ -49,7 +49,6 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * package::
 * poly::
 * proc::
-* qring::
 * resolution::
 * ring::
 * string::
@@ -1984,8 +1983,8 @@ Note that @code{name} must be given without the suffix @code{.pag} or
 @section list
 @cindex list
 
-Lists are arrays whose elements can be of different types (including ring and
-qring). If one element belongs to a ring the whole list belongs to that
+Lists are arrays whose elements can be of different types (including ring).
+If one element belongs to a ring the whole list belongs to that
 ring. This applies also to the special list @code{#}. The expression
 @code{list()} is the empty list.
 
@@ -1993,7 +1992,7 @@ Note that a list stores the objects itself and not the names.  Hence, if
 @code{L} is a list, @code{L[1]} for example has no name.  A name, say
 @code{R}, can be created for @code{L[1]} by @code{def R=L[1];}. To store
 also the name of an object, say @code{r}, it can be added to the list
-with @code{nameof(r);}. Rings and qrings may be objects of a list.
+with @code{nameof(r);}. Rings may be objects of a list.
 
 @strong{Note}: Unlike other assignments a ring as an element of a list
 is not a copy but another reference to the same ring.
@@ -2415,7 +2414,7 @@ is a map entry (the image of the corresponding variable)
 
 @table @code
 @item fetch
-the identity map between rings and qrings (see @ref{fetch})
+the identity map between rings (see @ref{fetch})
 @item imap
 a convenient map procedure for inclusions and projections of rings (see @ref{imap})
 @item preimage
@@ -3464,7 +3463,7 @@ variable(s) in string form (see @ref{varstr})
 @c @end example
 
 @c ---------------------------------------
-@node proc, qring, poly, Data types
+@node proc, resolution, poly, Data types
 @section proc
 @cindex proc
 
@@ -3555,65 +3554,7 @@ See
 @c ref
 
 @c ---------------------------------------
-@node qring, resolution, proc, Data types
-@section qring
-@cindex qring
-
-@sc{Singular} offers the opportunity to calculate in quotient rings
-(factor rings), i.e., rings modulo an ideal.  The ideal has to be given
-as a standard basis.  For a detailed description of the concept
-of rings and quotient rings see @ref{Rings and orderings}.
-
-@menu
-* qring declaration::
-@end menu
-
-@c ---------------------------------------
-@node qring declaration,  , qring, qring
-@subsection qring declaration
-@cindex qring declaration
-
-@c ------------------------------------------------------------
-@c   This piece of text exists also in the file general.doc,
-@c   chapter "General syntax of a ring declaration".
-@c   If you change something here, change it there, too!
-@c ------------------------------------------------------------
-@table @strong
-@item Syntax:
-@code{qring} name @code{=} ideal_expression @code{;}
-@item Default:
-none
-@item Purpose:
-declares a quotient ring as the basering modulo ideal_expression and sets
-it as current basering.
-
-Operations based on standard bases (e.g. @code{std},@code{groebner}, etc., @code{reduce}) and functions which require a standard basis (e.g. @code{dim},@code{hilb}, etc.) operated with the residue classes; all others on the polynomial objects.
-
-@item Example:
-@smallexample
-@c example
-ring r=0,(x,y,z),dp;
-ideal i=xy;
-qring q=std(i);
-basering;
-// simplification is not immediate:
-(x+y)^2;
-reduce(_,std(0));
-// polynomial and residue class:
-ring R=0,(x,y),dp;
-qring Q=std(y);
-poly p1=x;
-poly p2=x+y;
-// comparing polynomial objects:
-p1==p2;
-// comparing residue classes:
-reduce(p1,std(0))==reduce(p2,std(0));
-@c example
-@end smallexample
-@end table
-
-@c ---------------------------------------
-@node resolution, ring, qring, Data types
+@node resolution, ring, proc, Data types
 @section resolution
 @cindex resolution
 
@@ -3721,13 +3662,30 @@ For a detailed description of the concept of rings see
 @ref{Rings and orderings}.
 
 @menu
+* qring::
 * ring declarations::
 * ring related functions::
 * ring operations::
+* qring declaration::
 @end menu
 
+@c --------------------------------------------
+@node qring, ring declarations, ,ring
+@subsection qring
+@cindex qring
+
+@sc{Singular} offers the opportunity to calculate in quotient rings
+(factor rings), i.e., rings modulo an ideal.  The ideal has to be given
+as a standard basis.  For a detailed description of the concept
+of rings and quotient rings see @ref{Rings and orderings}.
+Beside the construction, an object describing a quotient ring is of type @code{ring}.
+
+@c ref
+See
+@ref{qring declaration}.
+@c ref
 @c ---------------------------------------
-@node ring declarations, ring related functions, ring, ring
+@node ring declarations, ring related functions, qring, ring
 @subsection ring declarations
 @cindex ring declarations
 
@@ -3829,7 +3787,7 @@ name of the n-th ring variable (see @ref{varstr})
 @end table
 
 @c ---------------------------------------
-@node ring operations, , ring related functions, ring
+@node ring operations, qring declaration, ring related functions, ring
 @subsection ring operations
 @cindex ring operations
 @table @asis
@@ -3862,7 +3820,49 @@ following guide lines into consideration:
 @c ref
 @ref{ring_lib}
 @c ref
+@c ---------------------------------------
+@node qring declaration,  , ring operations, qring
+@subsection qring declaration
+@cindex qring declaration
 
+@c ------------------------------------------------------------
+@c   This piece of text exists also in the file general.doc,
+@c   chapter "General syntax of a ring declaration".
+@c   If you change something here, change it there, too!
+@c ------------------------------------------------------------
+@table @strong
+@item Syntax:
+@code{qring} name @code{=} ideal_expression @code{;}
+@item Default:
+none
+@item Purpose:
+declares a quotient ring as the basering modulo ideal_expression and sets
+it as current basering.
+
+Operations based on standard bases (e.g. @code{std},@code{groebner}, etc., @code{reduce}) and functions which require a standard basis (e.g. @code{dim},@code{hilb}, etc.) operated with the residue classes; all others on the polynomial objects.
+
+@item Example:
+@smallexample
+@c example
+ring r=0,(x,y,z),dp;
+ideal i=xy;
+qring q=std(i);
+basering;
+// simplification is not immediate:
+(x+y)^2;
+reduce(_,std(0));
+// polynomial and residue class:
+ring R=0,(x,y),dp;
+qring Q=std(y);
+poly p1=x;
+poly p2=x+y;
+// comparing polynomial objects:
+p1==p2;
+// comparing residue classes:
+reduce(p1,std(0))==reduce(p2,std(0));
+@c example
+@end smallexample
+@end table
 @c ---------------------------------------
 @node string, vector, ring, Data types
 @section string

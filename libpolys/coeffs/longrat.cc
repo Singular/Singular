@@ -3085,7 +3085,7 @@ static number nlReadFd(s_buff f, const coeffs)
 BOOLEAN nlCoeffIsEqual(const coeffs r, n_coeffType n, void *p)
 {
   /* test, if r is an instance of nInitCoeffs(n,parameter) */
-  /* if paramater is not needed */
+  /* if parameter is not needed */
   if (n==r->type)
   {
     if ((p==NULL)&&(r->cfDiv==nlDiv)) return TRUE;

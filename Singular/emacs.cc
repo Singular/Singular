@@ -134,14 +134,14 @@ int main(int argc, char** argv)
 
           feOptHelp(feArgv0);
           exit(0);
-
-        case '?':
-        case ':':
-        case '\0':
+          break;
+      case '?':
+      case ':':
+      case '\0':
           mainUsage();
           exit(1);
 
-        case  LONG_OPTION_RETURN:
+      case  LONG_OPTION_RETURN:
         {
           switch(option_index)
           {
@@ -168,6 +168,11 @@ int main(int argc, char** argv)
 
               case FE_OPT_NO_CALL:
                 no_emacs_call = 1;
+                break;
+
+              case FE_OPT_DUMP_VERSIONTUPLE:
+                feOptDumpVersionTuple();
+                exit(0);
                 break;
 
               default:

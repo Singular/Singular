@@ -36,7 +36,9 @@ namespace gfan
   ZCone ZFan::getCone(int dimension, int index, bool orbit, bool maximal)const
   {
     IntVector indices=getConeIndices(dimension,index,orbit,maximal);
-    return this->complex->makeZCone(indices);
+    ZCone ret=this->complex->makeZCone(indices);
+    if(maximal)ret.setMultiplicity(((orbit)?multiplicitiesOrbits:multiplicities)[dimension][index]);
+    return ret;
   }
   IntVector ZFan::getConeIndices(int dimension, int index, bool orbit, bool maximal)const
   {
@@ -58,9 +60,9 @@ namespace gfan
         assert(coneCollection);
         complex = new SymmetricComplex(coneCollection->toSymmetricComplex());
         complex->buildConeLists(false,false,&cones);
-        complex->buildConeLists(true,false,&maximalCones);
+        complex->buildConeLists(true,false,&maximalCones,&multiplicities);
         complex->buildConeLists(false,true,&coneOrbits);
-        complex->buildConeLists(true,true,&maximalConeOrbits);
+        complex->buildConeLists(true,true,&maximalConeOrbits,&multiplicitiesOrbits);
       }
   }
   void ZFan::killComplex()const
@@ -315,15 +317,6 @@ namespace gfan
     ensureComplex();
     return complex->isPure();
   }
-  bool ZFan::isComplete()const
-  {
-    ensureConeCollection();
-    if(coneCollection->isEmpty())
-      return 0;
-    int ambientdim=coneCollection->getAmbientDimension();
-    int linealitydim=coneCollection->dimensionOfLinealitySpace();
-    return (ambientdim==linealitydim);
-  }
   void ZFan::insert(ZCone const &c)
   {
     ensureConeCollection();
@@ -360,12 +353,6 @@ std::string ZFan::toString(int flags)const
 //  return "NEEDTOFIXTHIS";
 
   //return theFan.toString();
-}
-
-std::string ZFan::toStringJustRaysAndMaximalCones(int flags)const
-{
-  ensureComplex();
-  return complex->toStringJustRaysAndMaximalCones(flags);
 }
 
 /*int ZFan::getAmbientDimension()const

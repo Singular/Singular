@@ -37,7 +37,7 @@ verifyLUSolveResult(A, RHS, solutionData);
 
 // test lusolve() for the case that the first columns in U are zero.
 
-matrix B[1][2] = 0,1;    
+matrix B[1][2] = 0,1;
 LD =  ludecomp(B);
 P,L,U = LD[1],LD[2],LD[3];
 

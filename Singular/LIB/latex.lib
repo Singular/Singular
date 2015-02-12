@@ -873,8 +873,8 @@ EXAMPLE: example texobj; shows an example
     s = s + l;
   }
 
-  if (typeof(obj) == "ring" or
-      typeof(obj) == "qring") { s = s + D + texring("",obj) + D + newline;}
+  if (typeof(obj) == "ring")
+  { s = s + D + texring("",obj) + D + newline;}
 
   kill obj;
  }
@@ -1125,7 +1125,7 @@ EXAMPLE: example texring; shows an example
   { s = s + texpoly("",maxideal(1),","); }
    s = s + cb + en;
 
-  if (typeof(r)=="qring")
+  if (size(ideal(r))>0) /*qring*/
   { ideal @I = ideal(r);
     if (defined(TeXbrack))
     {
@@ -1371,7 +1371,7 @@ EXAMPLE: example texpoly; shows an example
   string notvalid = "intvec intmat vector matrix module map";
 
   if (typeof(p) == "int") { return(p);}
-  if (typeof(p)  == "ring" or typeof(p) == "qring")
+  if (typeof(p)  == "ring")
   { " -- Call  texring  instead "; return();}
   if (find(notvalid,typeof(p)))
   { " -- Call  texobj  instead "; return();}
@@ -1813,7 +1813,7 @@ static proc tktex (def d)
 
  if (typeofd=="intvec" or typeofd == "intmat" or typeofd =="vector" or
      typeofd=="matrix" or typeofd == "module")   { return(texobj("",d));}
- if (typeofd=="ring" or typeofd=="qring") { return(texring("",d));}
+ if (typeofd=="ring") { return(texring("",d));}
  if (typeofd =="ideal") { return(texobj("",d));}
  if (typeofd=="number" or typeofd=="poly" or typeofd=="ideal")
                                                  { return(texpoly("",d));}

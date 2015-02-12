@@ -10,18 +10,10 @@
 #include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
 
-#include "bbfan.h"
-#include "bbcone.h"
-#include "gfan.h"
+#include <callgfanlib_conversion.h>
+#include <bbfan.h>
+#include <gfan.h>
 #include <sstream>
-
-// #include <kernel/bigintmat.h>
-// #include <omalloc/omalloc.h>
-// #include <kernel/longrat.h>
-// #include <Singular/subexpr.h>
-// #include <Singular/lists.h>
-// #include <gfanlib/gfanlib.h>
-// #include <gfanlib/gfanlib_zfan.h>
 
 int fanID;
 
@@ -45,8 +37,24 @@ char* bbfan_String(blackbox* /*b*/, void *d)
   else
   {
     gfan::ZFan* zf = (gfan::ZFan*)d;
-    std::string s = zf->toStringJustRaysAndMaximalCones();
+    std::string s = zf->toString(2+4+8+128);
     return omStrDup(s.c_str());
+// =======
+//     std::stringstream s;
+//     std::string raysAndCones = zf->toStringJustRaysAndMaximalCones();
+//     s << raysAndCones;
+//     if (zf->getDimension() >= 0) // <=> zf is not empty
+//     {
+//       assert(zf->numberOfConesOfDimension(zf->getDimension()-zf->getLinealityDimension(),0,0));
+//       gfan::ZCone zc = zf->getCone(zf->getDimension()-zf->getLinealityDimension(),0,0,0);
+//       gfan::ZMatrix genLinSpace = zc.generatorsOfLinealitySpace();
+//       char* gens = toString(genLinSpace);
+//       s << std::endl << "GENERATORS_LINEALITY_SPACE:" << std::endl;
+//       s << gens;
+//     }
+//     std::string sstring = s.str();
+//     return omStrDup(sstring.c_str());
+// >>>>>>> status updated 11.03.
   }
 }
 
@@ -76,8 +84,7 @@ BOOLEAN bbfan_Assign(leftv l, leftv r)
       gfan::ZFan* zd = (gfan::ZFan*) l->Data();
       delete zd;
     }
-    gfan::ZFan* zf = (gfan::ZFan*) r->Data();
-    newZf = new gfan::ZFan(*zf);
+    newZf = (gfan::ZFan*) r->CopyD();
   }
   else if (r->Typ()==INT_CMD)
   {
@@ -300,48 +307,42 @@ BOOLEAN ncones(leftv res, leftv args)
 {
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
-    {
-      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
-      int d = zf->getAmbientDimension();
-      int n = 0;
+  {
+    gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+    int d = zf->getAmbientDimension();
+    int n = 0;
 
-      for (int i=0; i<=d; i++)
-        n = n + zf->numberOfConesOfDimension(i,0,0);
+    for (int i=0; i<=d; i++)
+      n = n + zf->numberOfConesOfDimension(i,0,0);
 
-      res->rtyp = INT_CMD;
-      res->data = (void*) (long) n;
-      return FALSE;
-    }
-  else
-    {
-      WerrorS("check_compatibility: unexpected parameters");
-      return TRUE;
-    }
+    res->rtyp = INT_CMD;
+    res->data = (void*) (long) n;
+    return FALSE;
+  }
+  WerrorS("ncones: unexpected parameters");
+  return TRUE;
 }
 
 BOOLEAN nmaxcones(leftv res, leftv args)
 {
   leftv u=args;
   if ((u != NULL) && (u->Typ() == fanID))
-    {
-      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+  {
+    gfan::ZFan* zf = (gfan::ZFan*)u->Data();
 
-      int n = 0;
-      for (int d=0; d<=zf->getAmbientDimension(); d++)
-        { n = n + zf->numberOfConesOfDimension(d,0,1); }
+    int n = 0;
+    for (int d=0; d<=zf->getAmbientDimension(); d++)
+      n = n + zf->numberOfConesOfDimension(d,0,1);
 
-      res->rtyp = INT_CMD;
-      res->data = (void*) (long) n;
-      return FALSE;
-    }
-  else
-    {
-      WerrorS("nmaxcones: unexpected parameters");
-      return TRUE;
-    }
+    res->rtyp = INT_CMD;
+    res->data = (void*) (long) n;
+    return FALSE;
+  }
+  WerrorS("nmaxcones: unexpected parameters");
+  return TRUE;
 }
 
-bool isCompatible(gfan::ZFan* zf, gfan::ZCone* zc)
+bool isCompatible(const gfan::ZFan* zf, const gfan::ZCone* zc)
 {
   bool b = (zf->getAmbientDimension() == zc->ambientDimension());
   if(b)
@@ -457,36 +458,43 @@ BOOLEAN containsInCollection(leftv res, leftv args)
       return TRUE;
     }
   }
-  // if ((u != NULL) && (u->Typ() == coneID))
-  // {
-  //   leftv v=u->next;
-  //   if ((v != NULL) && (v->Typ() == coneID))
-  //   {
-  //     gfan::ZCone* zc = (gfan::ZCone*)u->Data();
-  //     gfan::ZCone* zd = (gfan::ZCone*)v->Data();
-  //     res->rtyp = INT_CMD;
-  //     res->data = (void*) (int) hasFace(zc,zd);
-  //     return FALSE;
-  //   }
-  // }
   WerrorS("containsInCollection: unexpected parameters");
   return TRUE;
 }
 
-// BOOLEAN coneContaining(leftv res, leftv args)
-// {
-//   leftv u=args;
-//   if ((u != NULL) && (u->Typ() == fanID))
-//   {
-//     if ((v != NULL) && (v->Typ() == BIGINTMAT_CMD))
-//     {
-//       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
-//       bigintmat* vec = (bigintmat*)v->Data();
-//     }
-//   }
-//   WerrorS("coneContaining: unexpected parameters");
-//   return TRUE;
-// }
+BOOLEAN coneContaining(leftv res, leftv args)
+{
+  leftv u=args;
+  if ((u != NULL) && (u->Typ() == fanID))
+  {
+    leftv v=u->next;
+    if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
+    {
+      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+      gfan::ZVector* point;
+      if (v->Typ() == INTVEC_CMD)
+      {
+        intvec* w0 = (intvec*) v->Data();
+        bigintmat* w1 = iv2bim(w0,coeffs_BIGINT);
+        w1->inpTranspose();
+        point = bigintmatToZVector(*w1);
+        delete w1;
+      }
+      else
+      {
+        bigintmat* w1 = (bigintmat*) v->Data();
+        point = bigintmatToZVector(*w1);
+      }
+      lists L = (lists)omAllocBin(slists_bin);
+      res->rtyp = LIST_CMD;
+      res->data = (void*) L;
+      delete point;
+      return FALSE;
+    }
+  }
+  WerrorS("coneContaining: unexpected parameters");
+  return TRUE;
+}
 
 BOOLEAN removeCone(leftv res, leftv args)
 {
@@ -558,10 +566,10 @@ BOOLEAN getCone(leftv res, leftv args)
           bool mm = (bool) m;
           if (0<=d && d<=zf->getAmbientDimension())
           {
-            if (0<i && i<=zf->numberOfConesOfDimension(d,oo,mm))
+            int ld = zf->getLinealityDimension();
+            if (0<i && i<=zf->numberOfConesOfDimension(d-ld,oo,mm))
             {
               i=i-1;
-              int ld = zf->getLinealityDimension();
               if (d-ld>=0)
               {
                 gfan::ZCone zc = zf->getCone(d-ld,i,oo,mm);
@@ -688,20 +696,20 @@ BOOLEAN isPure(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN isComplete(leftv res, leftv args)
-{
-  leftv u=args;
-  if ((u != NULL) && (u->Typ() == fanID))
-  {
-    gfan::ZFan* zf = (gfan::ZFan*) u->Data();
-    int b = zf->isComplete();
-    res->rtyp = INT_CMD;
-    res->data = (void*) (long) b;
-    return FALSE;
-  }
-  WerrorS("isComplete: unexpected parameters");
-  return TRUE;
-}
+// BOOLEAN isComplete(leftv res, leftv args)
+// {
+//   leftv u=args;
+//   if ((u != NULL) && (u->Typ() == fanID))
+//   {
+//     gfan::ZFan* zf = (gfan::ZFan*) u->Data();
+//     int b = zf->isComplete();
+//     res->rtyp = INT_CMD;
+//     res->data = (void*) (long) b;
+//     return FALSE;
+//   }
+//   WerrorS("isComplete: unexpected parameters");
+//   return TRUE;
+// }
 
 BOOLEAN fVector(leftv res, leftv args)
 {
@@ -865,89 +873,77 @@ BOOLEAN fanViaCones(leftv res, leftv args)
 }
 
 
-BOOLEAN tropicalVariety(leftv res, leftv args)
-{
-  leftv u=args;
-  if ((u != NULL) && (u->Typ() == POLY_CMD))
-  {
-    int n = rVar(currRing);
-    gfan::ZFan* zf = new gfan::ZFan(n);
-    int* expv1 = (int*)omAlloc((n+1)*sizeof(int));
-    int* expv2 = (int*)omAlloc((n+1)*sizeof(int));
-    int* expvr = (int*)omAlloc((n+1)*sizeof(int));
-    gfan::ZVector expw1 = gfan::ZVector(n);
-    gfan::ZVector expw2 = gfan::ZVector(n);
-    gfan::ZVector expwr = gfan::ZVector(n);
-    gfan::ZMatrix eq, ineq;
-    for (poly s1=(poly)u->Data(); s1!=NULL; pIter(s1))
-    {
-      pGetExpV(s1,expv1);
-      expw1 = intStar2ZVector(n,expv1);
-      for (poly s2=pNext(s1); s2!=NULL; pIter(s2))
-      {
-        pGetExpV(s2,expv2);
-        expw2 = intStar2ZVector(n,expv2);
-        eq = gfan::ZMatrix(0,n);
-        eq.appendRow(expw1-expw2);
-        ineq = gfan::ZMatrix(0,n);
-        for (poly r=(poly)u->Data(); r!=NULL; pIter(r))
-        {
-          pGetExpV(r,expvr);
-          expwr = intStar2ZVector(n,expvr);
-          if ((r!=s1) && (r!=s2))
-          {
-            ineq.appendRow(expw1-expwr);
-          }
-        }
-        gfan::ZCone zc = gfan::ZCone(ineq,eq);
-        zf->insert(zc);
-      }
-    }
-    omFreeSize(expv1,(n+1)*sizeof(int));
-    omFreeSize(expv2,(n+1)*sizeof(int));
-    omFreeSize(expvr,(n+1)*sizeof(int));
-    res->rtyp = fanID;
-    res->data = (void*) zf;
-    return FALSE;
-  }
-  WerrorS("tropicalVariety: unexpected parameters");
-  return TRUE;
-}
+// BOOLEAN tropicalVariety(leftv res, leftv args)
+// {
+//   leftv u=args;
+//   if ((u != NULL) && (u->Typ() == POLY_CMD))
+//   {
+//     int n = rVar(currRing);
+//     gfan::ZFan* zf = new gfan::ZFan(n);
+//     int* expv1 = (int*)omAlloc((n+1)*sizeof(int));
+//     int* expv2 = (int*)omAlloc((n+1)*sizeof(int));
+//     int* expvr = (int*)omAlloc((n+1)*sizeof(int));
+//     gfan::ZVector expw1 = gfan::ZVector(n);
+//     gfan::ZVector expw2 = gfan::ZVector(n);
+//     gfan::ZVector expwr = gfan::ZVector(n);
+//     gfan::ZMatrix eq, ineq;
+//     for (poly s1=(poly)u->Data(); s1!=NULL; pIter(s1))
+//     {
+//       pGetExpV(s1,expv1);
+//       expw1 = intStar2ZVector(n,expv1);
+//       for (poly s2=pNext(s1); s2!=NULL; pIter(s2))
+//       {
+//         pGetExpV(s2,expv2);
+//         expw2 = intStar2ZVector(n,expv2);
+//         eq = gfan::ZMatrix(0,n);
+//         eq.appendRow(expw1-expw2);
+//         ineq = gfan::ZMatrix(0,n);
+//         for (poly r=(poly)u->Data(); r!=NULL; pIter(r))
+//         {
+//           pGetExpV(r,expvr);
+//           expwr = intStar2ZVector(n,expvr);
+//           if ((r!=s1) && (r!=s2))
+//           {
+//             ineq.appendRow(expw1-expwr);
+//           }
+//         }
+//         gfan::ZCone zc = gfan::ZCone(ineq,eq);
+//         zf->insert(zc);
+//       }
+//     }
+//     omFreeSize(expv1,(n+1)*sizeof(int));
+//     omFreeSize(expv2,(n+1)*sizeof(int));
+//     omFreeSize(expvr,(n+1)*sizeof(int));
+//     res->rtyp = fanID;
+//     res->data = (void*) zf;
+//     return FALSE;
+//   }
+//   WerrorS("tropicalVariety: unexpected parameters");
+//   return TRUE;
+// }
 
-gfan::ZFan* commonRefinement(gfan::ZFan* zf, gfan::ZFan* zg)
+gfan::ZFan commonRefinement(gfan::ZFan zf, gfan::ZFan zg)
 {
-  assume(zf->getAmbientDimension() == zg->getAmbientDimension());
+  assume(zf.getAmbientDimension() == zg.getAmbientDimension());
 
   // gather all maximal cones of f and g
   std::list<gfan::ZCone> maximalConesOfF;
-  for (int d=0; d<=zf->getAmbientDimension(); d++)
-  {
-    for (int i=0; i<zf->numberOfConesOfDimension(d,0,1); i++)
-    {
-      maximalConesOfF.push_back(zf->getCone(d,i,0,1));
-    }
-  }
+  for (int d=0; d<=zf.getAmbientDimension(); d++)
+    for (int i=0; i<zf.numberOfConesOfDimension(d,0,1); i++)
+      maximalConesOfF.push_back(zf.getCone(d,i,0,1));
 
   std::list<gfan::ZCone> maximalConesOfG;
-  for (int d=0; d<=zg->getAmbientDimension(); d++)
-  {
-    for (int i=0; i<zg->numberOfConesOfDimension(d,0,1); i++)
-    {
-      maximalConesOfG.push_back(zg->getCone(d,i,0,1));
-    }
-  }
+  for (int d=0; d<=zg.getAmbientDimension(); d++)
+    for (int i=0; i<zg.numberOfConesOfDimension(d,0,1); i++)
+      maximalConesOfG.push_back(zg.getCone(d,i,0,1));
 
   // construct a new fan out of their intersections
-  gfan::ZFan* zr = new gfan::ZFan(zf->getAmbientDimension());
+  gfan::ZFan zr = gfan::ZFan(zf.getAmbientDimension());
   for (std::list<gfan::ZCone>::iterator itf=maximalConesOfF.begin();
        itf != maximalConesOfF.end(); itf++)
-  {
     for (std::list<gfan::ZCone>::iterator itg=maximalConesOfG.begin();
          itg != maximalConesOfG.end(); itg++)
-    {
-      zr->insert(intersection(*itf,*itg));
-    }
-  }
+      zr.insert(intersection(*itf,*itg));
 
   return zr;
 }
@@ -962,7 +958,7 @@ BOOLEAN commonRefinement(leftv res, leftv args)
     {
       gfan::ZFan* zf = (gfan::ZFan*) u->Data();
       gfan::ZFan* zg = (gfan::ZFan*) v->Data();
-      gfan::ZFan* zr = commonRefinement(zf,zg);
+      gfan::ZFan* zr = new gfan::ZFan(commonRefinement(*zf,*zg));
       res->rtyp = fanID;
       res->data = (void*) zr;
       return FALSE;
@@ -1057,7 +1053,7 @@ void bbfan_setup(SModulFunctions* p)
   // iiAddCproc("","isComplete",FALSE,isComplete);  not working as expected, should leave this to polymake
   p->iiAddCproc("","fVector",FALSE,fVector);
   p->iiAddCproc("","containsInCollection",FALSE,containsInCollection);
-  p->iiAddCproc("","tropicalVariety",FALSE,tropicalVariety);
+  // p->iiAddCproc("","tropicalVariety",FALSE,tropicalVariety);
   p->iiAddCproc("","commonRefinement",FALSE,commonRefinement);
   // iiAddCproc("","grFan",FALSE,grFan);
   fanID=setBlackboxStuff(b,"fan");
@@ -1065,3 +1061,18 @@ void bbfan_setup(SModulFunctions* p)
 }
 
 #endif
+// gfan::ZFan commonRefinementCompleteFans(const gfan::ZFan &zf, const gfan::ZFan &zg)
+// {
+//   assume(zf->getAmbientDimension() == zg->getAmbientDimension());
+
+//   gfan::ZFan zfg = gfan::ZFan(zf->getAmbientDimension());
+//   int d = zf->getAmbientDimension();
+//   for (int i=0; i<zf->numberOfConesOfDimension(d,0,1); i++)
+//     for (int j=0; j<zg->numberOfConesOfDimension(d,0,1); j++)
+//     {
+//       gfan::ZCone zc = intersection(zf->getCone(d,i,0,1),zg->getCone(d,j,0,1));
+//       if (zc.dimension()==d) zgf.insert(zc);
+//     }
+
+//   return zfg;
+// }

@@ -1791,7 +1791,7 @@ EXAMPLE: example makeModElimRing; shows an example
   def save; int Noinput = 0;
   if ( size(#)>0 )
   {
-    if ( (typeof(#[1]) == "ring" ) || (typeof(#[1]) == "qring" ) )
+    if (typeof(#[1]) == "ring" )
     {
       save = #[1];
     }

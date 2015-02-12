@@ -41,8 +41,10 @@ class ZFan
   mutable SymmetricComplex *complex;
   mutable std::vector<std::vector<IntVector > > cones;
   mutable std::vector<std::vector<IntVector > > maximalCones;
+  mutable std::vector<std::vector<Integer> > multiplicities; // for maximal cones only
   mutable std::vector<std::vector<IntVector > > coneOrbits;
   mutable std::vector<std::vector<IntVector > > maximalConeOrbits;
+  mutable std::vector<std::vector<Integer> > multiplicitiesOrbits; // for maximal cones orbits only
 
 
   //  SymmetryGroup sym;
@@ -104,18 +106,35 @@ public:
    * Writes to string
    */
   std::string toString(int flags=0)const;
-  std::string toStringJustRaysAndMaximalCones(int flags=0)const;
   /**
    * Returns the dimension of the ambient space.
    */
   int getAmbientDimension()const;
-  int getCodimension()const;
+  /**
+   * Returns the largest dimension of a cone in the fan. If the fan is empty, then -1 is returned.
+   */
   int getDimension()const;
+  /**
+   * Returns the smallest codimension of a cone in the fan. If the fan is empty, then -1 is returned.
+   */
+  int getCodimension()const;
+  /**
+   * Returns the dimension of the lineality space of the fan. Notice that the lineality space of the
+   * empty fan is the ambient space.
+   */
   int getLinealityDimension()const;
+  /**
+   * Returns the f-Vector of the fan.
+   */
   ZVector getFVector()const;
+  /**
+   * Returns true, if the fan is simplicial. False otherwise.
+   */
   bool isSimplicial()const;
+  /**
+   * Returns true, if the fan is pure. False otherwise.
+   */
   bool isPure()const;
-  bool isComplete()const;
   /**
    * Inserts c into the fan.
    * It is a mistake to insert a cone which live in a space of the wrong dimension.
@@ -136,19 +155,10 @@ public:
   int numberOfConesOfDimension(int d, bool orbit, bool maximal)const;
   int numberOfConesInCollection()const;
   /**
-   * Returns the largest dimension of a cone in the fan. If the fan is empty, then -1 is returned.
-   */
-  int dimension()const;
-  /**
-   * Returns the dimension of the lineality space of the fan. Notice that the lineality space of the
-   * empty fan is the ambient space.
-   */
-  // int getLinealityDimension();
-  /**
    * Returns the cone in the collection given by the index. It is a mistake to specify an index which
    * is out of range.
    */
-  ZCone const &getConeInCollection(int index)const;
+  //  ZCone const &getConeInCollection(int index)const;
   /**
    * Returns the cone in the cone of the fan
    */

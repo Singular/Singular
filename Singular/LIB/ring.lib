@@ -604,7 +604,7 @@ SEE ALSO: attrib
 EXAMPLE: example ord_test; shows an example
 "
 {
-   if ((typeof(r) != "ring") and (typeof(r) != "qring"))
+   if (typeof(r) != "ring")
    {
       ERROR("ord_test requires a ring/qring as input");
    }
@@ -738,7 +738,7 @@ EXAMPLE: example preimageLoc ; shows an example
   string newRing,minpoly_string;
   if(attrib(S,"global")!=1)
   {
-    if(typeof(S)=="qring")
+    if(size(ideal(S))>0) /*qring*/
     {
       ideal I=ideal(S);
       newRing="ring S0=("+charstr(S)+"),("+varstr(S)+"),dp;";
@@ -776,7 +776,7 @@ EXAMPLE: example preimageLoc ; shows an example
   def Q=`Q_name`;
   if(attrib(@R,"global")!=1)
   {
-    if(typeof(@R)=="qring")
+    if(size(ideal(@R))>0) /*qring*/
     {
       ideal J=ideal(@R);
       newRing="ring R0=("+charstr(@R)+"),("+varstr(@R)+"),dp;";

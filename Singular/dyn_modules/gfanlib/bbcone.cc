@@ -9,117 +9,19 @@
 #include <coeffs/longrat.h>
 
 #include <Singular/ipid.h>
-#include <Singular/ipid.h>
 #include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
 
-// #include <omalloc/omalloc.h>
-// #include <kernel/intvec.h>
-// #include <kernel/longrat.h>
-// #include <Singular/lists.h>
-// #include <Singular/subexpr.h>
+#include <callgfanlib_conversion.h>
+#include <sstream>
 
 #include <gfanlib/gfanlib.h>
 #include <gfanlib/gfanlib_q.h>
 
-#include "bbfan.h"
-#include "bbpolytope.h"
-
-
-#include <sstream>
+#include <bbfan.h>
+#include <bbpolytope.h>
 
 int coneID;
-
-number integerToNumber(const gfan::Integer &I)
-{
-  mpz_t i;
-  mpz_init(i);
-  I.setGmp(i);
-  long m = 268435456;
-  if(mpz_cmp_si(i,m))
-  {
-    int temp = (int) mpz_get_si(i);
-    return n_Init(temp,coeffs_BIGINT);
-  }
-  else
-    return n_InitMPZ(i,coeffs_BIGINT);
-}
-
-bigintmat* zVectorToBigintmat(const gfan::ZVector &zv)
-{
-  int d=zv.size();
-  bigintmat* bim = new bigintmat(1,d,coeffs_BIGINT);
-  for(int i=1;i<=d;i++)
-  {
-    number temp = integerToNumber(zv[i-1]);
-    bim->set(1,i,temp);
-    n_Delete(&temp,coeffs_BIGINT);
-  }
-  return bim;
-}
-
-bigintmat* zMatrixToBigintmat(const gfan::ZMatrix &zm)
-{
-  int d=zm.getHeight();
-  int n=zm.getWidth();
-  bigintmat* bim = new bigintmat(d,n,coeffs_BIGINT);
-  for(int i=1;i<=d;i++)
-    for(int j=1; j<=n; j++)
-    {
-      number temp = integerToNumber(zm[i-1][j-1]);
-      bim->set(i,j,temp);
-      n_Delete(&temp,coeffs_BIGINT);
-    }
-  return bim;
-}
-
-gfan::Integer* numberToInteger(const number &n)
-{
-  if (SR_HDL(n) & SR_INT)
-    return new gfan::Integer(SR_TO_INT(n));
-  else
-    return new gfan::Integer(n->z);
-}
-
-gfan::ZMatrix* bigintmatToZMatrix(const bigintmat &bim)
-{
-  int d=bim.rows();
-  int n=bim.cols();
-  gfan::ZMatrix* zm = new gfan::ZMatrix(d,n);
-  for(int i=0;i<d;i++)
-    for(int j=0;j<n;j++)
-    {
-      number temp = BIMATELEM(bim, i+1, j+1);
-      gfan::Integer* gi = numberToInteger(temp);
-      (*zm)[i][j] = *gi;
-      delete gi;
-    }
-  return zm;
-}
-
-gfan::ZVector* bigintmatToZVector(const bigintmat &bim)
-{
-  gfan::ZVector* zv=new gfan::ZVector(bim.cols());
-  for(int j=0; j<bim.cols(); j++)
-  {
-    number temp = BIMATELEM(bim, 1, j+1);
-    gfan::Integer* gi = numberToInteger(temp);
-    (*zv)[j] = *gi;
-    n_Delete(&temp,coeffs_BIGINT);
-    delete gi;
-  }
-  return zv;
-}
-
-char* toString(gfan::ZMatrix const &zm)
-{
-  bigintmat* bim = zMatrixToBigintmat(zm);
-  char* s = bim->StringAsPrinted();
-  if (s==NULL)
-    s = (char*) omAlloc0(sizeof(char));
-  delete bim;
-  return s;
-}
 
 std::string toString(const gfan::ZCone* const c)
 {
@@ -198,8 +100,7 @@ BOOLEAN bbcone_Assign(leftv l, leftv r)
       gfan::ZCone* zd = (gfan::ZCone*)l->Data();
       delete zd;
     }
-    gfan::ZCone* zc = (gfan::ZCone*)r->Data();
-    newZc = new gfan::ZCone(*zc);
+    newZc = (gfan::ZCone*)r->CopyD();
   }
   else if (r->Typ()==INT_CMD)
   {
@@ -1054,13 +955,22 @@ BOOLEAN uniquePoint(leftv res, leftv args)
 
 gfan::ZVector randomPoint(const gfan::ZCone* zc)
 {
-  gfan::ZMatrix rays = zc->extremeRays();
   gfan::ZVector rp = gfan::ZVector(zc->ambientDimension());
+
+  gfan::ZMatrix rays = zc->extremeRays();
   for (int i=0; i<rays.getHeight(); i++)
   {
     int n = siRand();
     rp = rp + n * rays[i];
   }
+
+  gfan::ZMatrix lins = zc->generatorsOfLinealitySpace();
+  for (int i=0; i<lins.getHeight(); i++)
+  {
+    int n = siRand();
+    rp = rp + n * lins[i];
+  }
+
   return rp;
 }
 
@@ -1592,56 +1502,6 @@ BOOLEAN containsCone(leftv res, leftv args)
   return TRUE;
 }
 
-gfan::ZVector intStar2ZVector(const int d, const int* i)
-{
-  gfan::ZVector zv(d);
-  for(int j=0; j<d; j++)
-    zv[j]=i[j+1];
-  return zv;
-}
-
-BOOLEAN maximalGroebnerCone(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if (v == NULL)
-    {
-      int n = currRing->N;
-      ideal I = (ideal) u->Data();
-      poly g = NULL;
-      int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
-      int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
-      gfan::ZVector leadexpw = gfan::ZVector(n);
-      gfan::ZVector tailexpw = gfan::ZVector(n);
-      gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-      for (int i=0; i<IDELEMS(I); i++)
-      {
-        g = (poly) I->m[i]; pGetExpV(g,leadexpv);
-        leadexpw = intStar2ZVector(n, leadexpv);
-        pIter(g);
-        while (g != NULL)
-        {
-          pGetExpV(g,tailexpv);
-          tailexpw = intStar2ZVector(n, tailexpv);
-          inequalities.appendRow(leadexpw-tailexpw);
-          pIter(g);
-        }
-      }
-      gfan::ZCone* gCone = new gfan::ZCone(inequalities,gfan::ZMatrix(0, inequalities.getWidth()));
-      omFreeSize(leadexpv,(n+1)*sizeof(int));
-      omFreeSize(tailexpv,(n+1)*sizeof(int));
-
-      res->rtyp = coneID;
-      res->data = (void*) gCone;
-      return FALSE;
-    }
-  }
-  WerrorS("maximalGroebnerCone: unexpected parameters");
-  return TRUE;
-}
-
 
 lists listOfFacets(const gfan::ZCone &zc)
 {
@@ -1695,163 +1555,12 @@ BOOLEAN listOfFacets(leftv res, leftv args)
 }
 
 
-poly initial(poly p)
-{
-  poly g = p;
-  poly h = p_Head(g,currRing);
-  poly f = h;
-  long d = p_Deg(g,currRing);
-  pIter(g);
-  while ((g != NULL) && (p_Deg(g,currRing) == d))
-  {
-    pNext(h) = p_Head(g,currRing);
-    pIter(h);
-    pIter(g);
-  }
-  return(f);
-}
-
-
-BOOLEAN initial(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == POLY_CMD))
-  {
-    leftv v = u->next;
-    if (v == NULL)
-    {
-      poly p = (poly) u->Data();
-      res->rtyp = POLY_CMD;
-      res->data = (void*) initial(p);
-      return FALSE;
-    }
-  }
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if (v == NULL)
-    {
-      ideal I = (ideal) u->Data();
-      ideal inI = idInit(IDELEMS(I));
-      poly g;
-      for (int i=0; i<IDELEMS(I); i++)
-      {
-        g = (poly) I->m[i];
-        inI->m[i]=initial(g);
-      }
-      res->rtyp = IDEAL_CMD;
-      res->data = (void*) inI;
-      return FALSE;
-    }
-  }
-  WerrorS("initial: unexpected parameters");
-  return TRUE;
-}
-
-
-BOOLEAN homogeneitySpace(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if (v == NULL)
-    {
-      int n = currRing->N;
-      ideal I = (ideal) u->Data();
-      poly g;
-      int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
-      int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
-      gfan::ZVector leadexpw = gfan::ZVector(n);
-      gfan::ZVector tailexpw = gfan::ZVector(n);
-      gfan::ZMatrix equations = gfan::ZMatrix(0,n);
-      for (int i=0; i<IDELEMS(I); i++)
-      {
-        g = (poly) I->m[i]; pGetExpV(g,leadexpv);
-        leadexpw = intStar2ZVector(n, leadexpv);
-        pIter(g);
-        while (g != NULL)
-        {
-          pGetExpV(g,tailexpv);
-          tailexpw = intStar2ZVector(n, tailexpv);
-          equations.appendRow(leadexpw-tailexpw);
-          pIter(g);
-        }
-      }
-      gfan::ZCone* gCone = new gfan::ZCone(gfan::ZMatrix(0, equations.getWidth()),equations);
-      omFreeSize(leadexpv,(n+1)*sizeof(int));
-      omFreeSize(tailexpv,(n+1)*sizeof(int));
-
-      res->rtyp = coneID;
-      res->data = (void*) gCone;
-      return FALSE;
-    }
-  }
-  WerrorS("homogeneitySpace: unexpected parameters");
-  return TRUE;
-}
-
-
-BOOLEAN groebnerCone(leftv res, leftv args)
-{
-  leftv u = args;
-  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
-  {
-    leftv v = u->next;
-    if (v == NULL)
-    {
-      int n = currRing->N;
-      ideal I = (ideal) u->Data();
-      poly g = NULL;
-      int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
-      int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
-      gfan::ZVector leadexpw = gfan::ZVector(n);
-      gfan::ZVector tailexpw = gfan::ZVector(n);
-      gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
-      gfan::ZMatrix equations = gfan::ZMatrix(0,n);
-      long d;
-      for (int i=0; i<IDELEMS(I); i++)
-      {
-        g = (poly) I->m[i]; pGetExpV(g,leadexpv);
-        leadexpw = intStar2ZVector(n, leadexpv);
-        pIter(g);
-        d = p_Deg(g,currRing);
-        while ((g != NULL) && (p_Deg(g,currRing) == d))
-        {
-          pGetExpV(g,tailexpv);
-          tailexpw = intStar2ZVector(n, tailexpv);
-          equations.appendRow(leadexpw-tailexpw);
-          pIter(g);
-        }
-
-        if (g != NULL)
-        {
-          while (g != NULL)
-          {
-            pGetExpV(g,tailexpv);
-            tailexpw = intStar2ZVector(n, tailexpv);
-            inequalities.appendRow(leadexpw-tailexpw);
-            pIter(g);
-          }
-        }
-      }
-      gfan::ZCone* gCone = new gfan::ZCone(inequalities,equations);
-      omFreeSize(leadexpv,(n+1)*sizeof(int));
-      omFreeSize(tailexpv,(n+1)*sizeof(int));
-
-      res->rtyp = coneID;
-      res->data = (void*) gCone;
-      return FALSE;
-    }
-  }
-  WerrorS("groebnerCone: unexpected parameters");
-  return TRUE;
-}
-
 /***
  * Given a cone and a point in its boundary,
  * returns the inner normal vector of a facet
  * containing the point.
+ * Unless the point is in the relative interior of the facet
+ * the facet is not unique.
  * In case no facet contains the point,
  * then 0 is returned.
  **/
@@ -1902,6 +1611,60 @@ BOOLEAN facetContaining(leftv res, leftv args)
   }
   WerrorS("facetContaining: unexpected parameters");
   return TRUE;
+}
+
+
+/***
+ * Computes a relative interior point for each facet of zc
+ **/
+gfan::ZMatrix interiorPointsOfFacets(const gfan::ZCone &zc, const std::set<gfan::ZVector> &exceptThese)
+{
+  gfan::ZMatrix inequalities = zc.getFacets();
+  gfan::ZMatrix equations = zc.getImpliedEquations();
+  int r = inequalities.getHeight();
+  int c = inequalities.getWidth();
+
+  /* our cone has r facets, if r==0 return empty matrices */
+  gfan::ZMatrix relativeInteriorPoints = gfan::ZMatrix(0,c);
+  if (r==0) return relativeInteriorPoints;
+
+  /* next we iterate over each of the r facets,
+   * build the respective cone and add it to the list
+   * this is the i=0 case */
+  gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
+  gfan::ZMatrix newEquations = equations;
+  newEquations.appendRow(inequalities[0]);
+  gfan::ZCone facet = gfan::ZCone(newInequalities,newEquations);
+  facet.canonicalize();
+  gfan::ZVector interiorPoint = facet.getRelativeInteriorPoint();
+  if (exceptThese.count(interiorPoint)==0)
+    relativeInteriorPoints.appendRow(interiorPoint);
+
+  /* these are the cases i=1,...,r-2 */
+  for (int i=1; i<r-1; i++)
+  {
+    newInequalities = inequalities.submatrix(0,0,i,c);
+    newInequalities.append(inequalities.submatrix(i+1,0,r,c));
+    newEquations = equations;
+    newEquations.appendRow(inequalities[i]);
+    facet = gfan::ZCone(newInequalities,newEquations);
+    facet.canonicalize();
+    interiorPoint = facet.getRelativeInteriorPoint();
+    if (exceptThese.count(interiorPoint)==0)
+      relativeInteriorPoints.appendRow(interiorPoint);
+  }
+
+  /* this is the i=r-1 case */
+  newInequalities = inequalities.submatrix(0,0,r-1,c);
+  newEquations = equations;
+  newEquations.appendRow(inequalities[r-1]);
+  facet = gfan::ZCone(newInequalities,newEquations);
+  facet.canonicalize();
+  interiorPoint = facet.getRelativeInteriorPoint();
+  if (exceptThese.count(interiorPoint)==0)
+    relativeInteriorPoints.appendRow(interiorPoint);
+
+  return relativeInteriorPoints;
 }
 
 
@@ -1958,10 +1721,6 @@ void bbcone_setup(SModulFunctions* p)
   p->iiAddCproc("","uniquePoint",FALSE,uniquePoint);
   p->iiAddCproc("","listContainsCone",FALSE,containsCone);
   p->iiAddCproc("","listOfFacets",FALSE,listOfFacets);
-  p->iiAddCproc("","maximalGroebnerCone",FALSE,maximalGroebnerCone);
-  p->iiAddCproc("","groebnerCone",FALSE,groebnerCone);
-  p->iiAddCproc("","initial",FALSE,initial);
-  p->iiAddCproc("","homogeneitySpace",FALSE,homogeneitySpace);
   p->iiAddCproc("","facetContaining",FALSE,facetContaining);
   coneID=setBlackboxStuff(b,"cone");
 }

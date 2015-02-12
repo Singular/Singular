@@ -430,7 +430,7 @@ bool luSolveViaLUDecomp(const matrix pMat, const matrix lMat,
        We do not know in advance what the dimension (dim) of the latter
        solution space will be. Thus, we start with the possibly too wide
        matrix N and later copy the relevant columns of N into H. */
-    int nonZeroC  =  0 ; 
+    int nonZeroC  =  0 ;
     int lastNonZeroC = n + 1;
 
     for (int r = nonZeroRowIndex; r >= 1; r--)

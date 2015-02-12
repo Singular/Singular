@@ -58,10 +58,10 @@ void SymmetricComplex::Cone::remap(SymmetricComplex &complex)
   for(unsigned i=0;i<indices.size();i++)
     sum+=vertices[indices[i]];
 
-  int n=sum.size();
+  unsigned n=sum.size();
   Permutation const &bestPermutation=sortKeyPermutation;
 
-  assert((int)bestPermutation.size()==n);
+  assert(bestPermutation.size()==n);
 
   IntVector indicesNew(indices.size());
   int I=0;
@@ -87,12 +87,12 @@ std::set<int> SymmetricComplex::Cone::indexSet()const
 
 bool SymmetricComplex::Cone::isSubsetOf(Cone const &c)const
 {
-  int next=0;
+  unsigned next=0;
   for(unsigned i=0;i<indices.size();i++)
     {
       while(1)
         {
-          if(next>=(int)c.indices.size())return false;
+          if(next>=c.indices.size())return false;
           if(indices[i]==c.indices[next])break;
           next++;
         }
@@ -182,6 +182,11 @@ void SymmetricComplex::insert(Cone const &c)
 }
 
 
+int SymmetricComplex::getLinDim()const
+{
+	return linealitySpace.getHeight();
+}
+
 int SymmetricComplex::getMaxDim()const
 {
   return dimension;
@@ -198,12 +203,6 @@ int SymmetricComplex::getMinDim()const
   return ret;
 }
 
-
-int SymmetricComplex::getLinDim()const
-{
-  ZMatrix zm=linealitySpace;
-  return zm.reduceAndComputeRank();
-}
 
 bool SymmetricComplex::isMaximal(Cone const &c)const
 {
@@ -247,12 +246,13 @@ IntVector SymmetricComplex::dimensionsAtInfinity()const
 }
 #endif
 
-void SymmetricComplex::buildConeLists(bool onlyMaximal, bool compressed, std::vector<std::vector<IntVector > >*conelist/*, ZMatrix *multiplicities*/)const
+void SymmetricComplex::buildConeLists(bool onlyMaximal, bool compressed, std::vector<std::vector<IntVector > >*conelist, std::vector<std::vector<Integer > > *multiplicities)const
 {
   int dimLow=this->linealitySpace.getHeight();
   int dimHigh=this->getMaxDim();
   if(dimHigh<dimLow)dimHigh=dimLow-1;
   if(conelist)*conelist=std::vector<std::vector<IntVector> >(dimHigh-dimLow+1);
+  if(multiplicities)*multiplicities=std::vector<std::vector<Integer> >(dimHigh-dimLow+1);
   for(int d=dimLow;d<=dimHigh;d++)
     {
       int numberOfOrbitsOutput=0;
@@ -261,26 +261,27 @@ void SymmetricComplex::buildConeLists(bool onlyMaximal, bool compressed, std::ve
         {
           int I=0;
           for(ConeContainer::const_iterator i=cones.begin();i!=cones.end();i++,I++)
-            if(i->dimension==d)
-            {
-              numberOfOrbitsOfThisDimension++;
+                  if(i->dimension==d)
+                    {
+                  numberOfOrbitsOfThisDimension++;
               if(!onlyMaximal || isMaximal(*i))
                 {
                   numberOfOrbitsOutput++;
                   // bool isMax=isMaximal(*i);
                   // bool newOrbit=true;
-                  std::set<std::set<int> > temp;
-                  for(SymmetryGroup::ElementContainer::const_iterator k=sym.elements.begin();k!=sym.elements.end();k++)
-                    {
+                  std::set<std::pair<std::set<int>,Integer> > temp;
+                    for(SymmetryGroup::ElementContainer::const_iterator k=sym.elements.begin();k!=sym.elements.end();k++)
+                      {
                         Cone temp1=i->permuted(*k,*this,false);
-                        temp.insert(temp1.indexSet());
+                        temp.insert(std::pair<std::set<int>,Integer>(temp1.indexSet(),temp1.multiplicity));
                         if(compressed)break;
                     }
-                  for(std::set<std::set<int> >::const_iterator j=temp.begin();j!=temp.end();j++)
+                  for(std::set<std::pair<std::set<int>,Integer> >::const_iterator j=temp.begin();j!=temp.end();j++)
                     {
                       IntVector temp;
-                      for(std::set<int>::const_iterator k=j->begin();k!=j->end();k++)temp.push_back(*k);
+                      for(std::set<int>::const_iterator k=j->first.begin();k!=j->first.end();k++)temp.push_back(*k);
                       if(conelist)(*conelist)[d-dimLow].push_back(temp);
+                      if(multiplicities)(*multiplicities)[d-dimLow].push_back(j->second);
  /*                     if(isMax)if(multiplicities)
                         {
 
@@ -292,14 +293,14 @@ void SymmetricComplex::buildConeLists(bool onlyMaximal, bool compressed, std::ve
                       // newOrbit=false;
                       // newDimension=false;
                     }
-                }
-            }
+              }
+                    }
         }
     }
 
 }
 
-std::string SymmetricComplex::toStringJustCones(int dimLow, int dimHigh, bool onlyMaximal, bool group, std::ostream *multiplicities, bool compressed, bool /*tPlaneSort*/)const
+std::string SymmetricComplex::toStringJustCones(int dimLow, int dimHigh, bool onlyMaximal, bool group, std::ostream *multiplicities, bool compressed, bool tPlaneSort)const
 {
   std::stringstream ret;
 
@@ -361,19 +362,6 @@ std::string SymmetricComplex::toStringJustCones(int dimLow, int dimHigh, bool on
     }
 
   return ret.str();
-}
-
-
-std::string SymmetricComplex::toStringJustRaysAndMaximalCones(int flags)const
-{
-  PolymakeFile polymakeFile;
-  polymakeFile.create("NONAME","PolyhedralFan","PolyhedralFan",flags&FPF_xml);
-  polymakeFile.writeMatrixProperty("RAYS",vertices,true);
-  polymakeFile.writeStringProperty("MAXIMAL_CONES",toStringJustCones(getMinDim(),getMaxDim(),true,flags&FPF_group, 0,false,flags&FPF_tPlaneSort));
-
-  std::stringstream s;
-  polymakeFile.writeStream(s);
-  return s.str();
 }
 
 
@@ -537,7 +525,7 @@ IntegerMatrix SymmetricComplex::boundaryMap(int d)
     polymakeFile.writeCardinalProperty("DIM",getMaxDim());
     polymakeFile.writeCardinalProperty("LINEALITY_DIM",linealitySpace.getHeight());
     //    polymakeFile.writeMatrixProperty("RAYS",rays,true,comments);
-    polymakeFile.writeMatrixProperty("RAYS",vertices,true);
+        polymakeFile.writeMatrixProperty("RAYS",vertices,true);
     polymakeFile.writeCardinalProperty("N_RAYS",vertices.getHeight());
 
 
@@ -605,10 +593,12 @@ IntegerMatrix SymmetricComplex::boundaryMap(int d)
   //  log1 fprintf(Stderr,"Done checking.\n");
 
 
-    polymakeFile.writeStringProperty("CONES",toStringJustCones(getMinDim(),getMaxDim(),false,flags&FPF_group, 0,false,flags&FPF_tPlaneSort));
-    polymakeFile.writeStringProperty("MAXIMAL_CONES",toStringJustCones(getMinDim(),getMaxDim(),true,flags&FPF_group, 0,false,flags&FPF_tPlaneSort));
-    polymakeFile.writeStringProperty("CONES_ORBITS",toStringJustCones(getMinDim(),getMaxDim(),false,flags&FPF_group, 0,true,flags&FPF_tPlaneSort));
-    polymakeFile.writeStringProperty("MAXIMAL_CONES_ORBITS",toStringJustCones(getMinDim(),getMaxDim(),true,flags&FPF_group, 0,true,flags&FPF_tPlaneSort));
+    if(flags&FPF_cones)polymakeFile.writeStringProperty("CONES",toStringJustCones(getMinDim(),getMaxDim(),false,flags&FPF_group, 0,false,flags&FPF_tPlaneSort));
+    std::stringstream multiplicities;
+    if(flags&FPF_maximalCones)polymakeFile.writeStringProperty("MAXIMAL_CONES",toStringJustCones(getMinDim(),getMaxDim(),true,flags&FPF_group, &multiplicities,false,flags&FPF_tPlaneSort));
+    if(flags&FPF_conesCompressed)polymakeFile.writeStringProperty("CONES_ORBITS",toStringJustCones(getMinDim(),getMaxDim(),false,flags&FPF_group, 0,true,flags&FPF_tPlaneSort));
+    if((flags&FPF_conesCompressed) && (flags&FPF_maximalCones))polymakeFile.writeStringProperty("MAXIMAL_CONES_ORBITS",toStringJustCones(getMinDim(),getMaxDim(),true,flags&FPF_group, 0,true,flags&FPF_tPlaneSort));
+    if(flags&FPF_multiplicities)polymakeFile.writeStringProperty("MULTIPLICITIES",multiplicities.str());
 
     if(!sym.isTrivial())
       {
@@ -646,7 +636,6 @@ IntegerMatrix SymmetricComplex::boundaryMap(int d)
   //          log1 fprintf(Stderr,"Producing list of maximal cones.\n");
             stringstream multiplicities;
             polymakeFile.writeStringProperty("MAXIMAL_CONES",symCom.toString(symCom.getMinDim(),symCom.getMaxDim(),true,flags&FPF_group, &multiplicities,false,flags&FPF_tPlaneSort));
-            if(flags&FPF_multiplicities)polymakeFile.writeStringProperty("MULTIPLICITIES",multiplicities.str());
   //          log1 fprintf(Stderr,"Done producing list of maximal cones.\n");
           }
       }

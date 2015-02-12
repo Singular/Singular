@@ -972,6 +972,7 @@ Comments should be send to the author of the library directly.
 * ellipticcovers_lib::  Gromov Witten numbers of elliptic curves
 * finitediff_lib:: finite difference schemes for linear differential equations
 * gitfan_lib:: Compute GIT-fans
+* gradedModules_lib::Operations with graded modules/matrices/resolutions
 * hess_lib:: Riemann-Roch space of divisors on function fields and curves
 * orbitparam_lib:: Parametrizing unipotent orbits
 * modular_lib::abstraction layer for modular techniques
@@ -1034,11 +1035,25 @@ Issues:
 @c lib finitediff.lib
 
 @c ----------------------------------------------------------
-@node gitfan_lib,hess_lib, finitediff_lib, Experimental libraries
+@node gitfan_lib,gradedModules_lib, finitediff_lib, Experimental libraries
 @subsection gitfan_lib
 @c lib gitfan.lib
 @c ----------------------------------------------------------
-@node hess_lib,orbitparam_lib, gitfan_lib, Experimental libraries
+@node gradedModules_lib,hess_lib, gitfan_lib, Experimental libraries
+@subsection gradedModules_lib
+
+Issues:
+@itemize
+@item @code{assumeLevel} must not occur in libraries
+@item missing documentation:grzero,grobj,grshift,grtwist,grpower,grdeg,grorder,
+     grtranspose
+@item incomplete documentation:grview
+@item missing in header:TestGRRes,grtest,grisequal
+@end itemize
+
+@c lib gradedModules.lib
+@c ----------------------------------------------------------
+@node hess_lib,orbitparam_lib, gradedModules_lib, Experimental libraries
 @subsection hess_lib
 @c lib hess.lib
 @c ----------------------------------------------------------

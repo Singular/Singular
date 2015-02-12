@@ -234,7 +234,7 @@ SEE ALSO: tst_init
 
     if (!defined(prefix))
     {
-      def prefix = tst_status_counter;
+      int prefix = tst_status_counter;
     }
     tst_status_out(prefix, "tst_memory_0", memory(0));
     tst_status_out(prefix, "tst_memory_1", memory(1));
