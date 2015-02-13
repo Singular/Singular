@@ -66,6 +66,62 @@ BOOLEAN homogeneitySpace(leftv res, leftv args)
 }
 
 
+gfan::ZCone lowerHomogeneitySpace(ideal I, ring r)
+{
+  int n = rVar(r);
+  poly g;
+  int* leadexpv = (int*) omAlloc((n+1)*sizeof(int));
+  int* tailexpv = (int*) omAlloc((n+1)*sizeof(int));
+  gfan::ZVector leadexpw = gfan::ZVector(n);
+  gfan::ZVector tailexpw = gfan::ZVector(n);
+  gfan::ZMatrix equations = gfan::ZMatrix(0,n);
+  for (int i=0; i<IDELEMS(I); i++)
+  {
+    g = (poly) I->m[i];
+    if (g)
+    {
+      p_GetExpV(g,leadexpv,r);
+      leadexpw = intStar2ZVector(n,leadexpv);
+      pIter(g);
+      while (g)
+      {
+        p_GetExpV(g,tailexpv,r);
+        tailexpw = intStar2ZVector(n,tailexpv);
+        equations.appendRow(leadexpw-tailexpw);
+        pIter(g);
+      }
+    }
+  }
+  gfan::ZMatrix inequalities = gfan::ZMatrix(0,n);
+  gfan::ZVector lowerHalfSpaceCondition = gfan::ZVector(n);
+  lowerHalfSpaceCondition[0] = -1;
+  inequalities.appendRow(lowerHalfSpaceCondition);
+
+  omFreeSize(leadexpv,(n+1)*sizeof(int));
+  omFreeSize(tailexpv,(n+1)*sizeof(int));
+  return gfan::ZCone(inequalities,equations);
+}
+
+
+BOOLEAN lowerHomogeneitySpace(leftv res, leftv args)
+{
+  leftv u = args;
+  if ((u != NULL) && (u->Typ() == IDEAL_CMD))
+  {
+    leftv v = u->next;
+    if (v == NULL)
+    {
+      ideal I = (ideal) u->Data();
+      res->rtyp = coneID;
+      res->data = (void*) new gfan::ZCone(lowerHomogeneitySpace(I,currRing));
+      return FALSE;
+    }
+  }
+  WerrorS("lowerHomogeneitySpace: unexpected parameters");
+  return TRUE;
+}
+
+
 gfan::ZCone groebnerCone(const ideal I, const ring r, const gfan::ZVector &w)
 {
   int n = rVar(r);
@@ -267,6 +323,7 @@ void tropical_setup(SModulFunctions* p)
   p->iiAddCproc("","groebnerCone",FALSE,groebnerCone);
   p->iiAddCproc("","maximalGroebnerCone",FALSE,maximalGroebnerCone);
   p->iiAddCproc("","homogeneitySpace",FALSE,homogeneitySpace);
+  p->iiAddCproc("","lowerHomogeneitySpace",FALSE,lowerHomogeneitySpace);
   p->iiAddCproc("","initial",FALSE,initial);
   // p->iiAddCproc("","tropicalNeighbours",FALSE,tropicalNeighbours);
 #ifndef NDEBUG

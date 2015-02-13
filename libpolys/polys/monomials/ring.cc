@@ -1050,6 +1050,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       return -1;
     }
   }
+  tmpR.bitmask=si_max(r1->bitmask,r2->bitmask);
   sum=(ring)omAllocBin(sip_sring_bin);
   memcpy(sum,&tmpR,sizeof(ip_sring));
   rComplete(sum);
@@ -2515,6 +2516,11 @@ static unsigned long rGetExpSize(unsigned long bitmask, int & bits)
 */
 static unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
 {
+#if SIZEOF_LONG == 8
+  if (N<4) N=4;
+#else
+  if (N<2) N=2;
+#endif
   bitmask =rGetExpSize(bitmask, bits);
   int vars_per_long=BIT_SIZEOF_LONG/bits;
   int bits1;
