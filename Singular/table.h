@@ -1184,6 +1184,7 @@ extern struct sConvertTypes dConvertTypes[];
 #ifdef IPASSIGN
 struct sValAssign dAssign[]=
 {
+// same res types must be grouped together
 // proc         res             arg
  {D(jiA_IDEAL),    IDEAL_CMD,      IDEAL_CMD }
 ,{D(jiA_IDEAL_M),  IDEAL_CMD,      MATRIX_CMD }
@@ -1197,8 +1198,8 @@ struct sValAssign dAssign[]=
 ,{D(jiA_MODUL_P),  MODUL_CMD,      POLY_CMD }
 ,{D(jiA_POLY),     POLY_CMD,       POLY_CMD }
 ,{D(jiA_1x1MATRIX),POLY_CMD,       MATRIX_CMD }
-,{D(jiA_QRING),    QRING_CMD,      IDEAL_CMD }
 ,{D(jiA_RING),     RING_CMD,       RING_CMD }
+,{D(jiA_QRING),    QRING_CMD,      IDEAL_CMD }
 ,{D(jiA_RING),     QRING_CMD,      QRING_CMD }
 ,{D(jiA_RING),     QRING_CMD,      RING_CMD }
 ,{D(jiA_STRING),   STRING_CMD,     STRING_CMD }
@@ -1207,7 +1208,6 @@ struct sValAssign dAssign[]=
 ,{D(jiA_POLY),     VECTOR_CMD,     VECTOR_CMD }
 ,{D(jiA_INTVEC),   INTVEC_CMD,     INTVEC_CMD }
 ,{D(jiA_INTVEC),   INTMAT_CMD,     INTMAT_CMD }
-//,{D(jiA_INTVEC),   INTMAT_CMD,     INTVEC_CMD }
 ,{D(jiA_BIGINTMAT),BIGINTMAT_CMD,  BIGINTMAT_CMD}
 ,{D(jiA_NUMBER),   NUMBER_CMD,     NUMBER_CMD }
 ,{D(jiA_BIGINT),   BIGINT_CMD,     BIGINT_CMD }
