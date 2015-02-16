@@ -3669,6 +3669,46 @@ EXAMPLE: example normalP; shows an example
      noFac=1;
    }
 
+
+   // handling a special case;
+   id = groebner(id);  // this cost can be avoided after applying the unit ideal decomposition patch
+   if ( (size(id)==0) or (id[1] == 1) ) 
+   {
+       // id is the zero ideal or id is unit ideal
+       // => The original ring R/id was normal. Nothing to do.
+
+       list result;
+       result[1] = list(ideal(1)); // 
+       result[2] = list();         // = pair(delta invariants , total delta invariant)
+       result[2][1] = intvec(0);   // delta invariant 
+       result[2][2] = int(0);      // total delta invariant
+
+       int bIsUnit = (id[1] == 1);
+
+       if (wring) 
+       {
+            result[3]=result[2]; // pair(delta invariants , total delta invariant)
+            result[2]=result[1];
+            def BR = basering;
+            def rl = ringlist(basering);
+            def rng = ring(rl);
+            setring rng;
+
+            ideal norid = 0;
+            if (bIsUnit)
+            {
+                norid = ideal(number(1));
+            }
+            ideal normap = maxideal(1);
+            export(norid);
+            export(normap);
+            setring BR;
+            result[1] = list(rng);
+       }
+       return (result);
+   }
+
+
    kill #;
    list #;
 //--------------------------- start computation ---------------------------
@@ -3702,6 +3742,10 @@ EXAMPLE: example normalP; shows an example
       }
    }
 
+
+
+
+   
    //----------- compute integral closure for every component -------------
 
       for(i=1; i<=size(prim); i++)
@@ -4143,10 +4187,10 @@ static proc computeRing(ideal J, ideal I, list #)
     setring R1;
     ideal norid = imap(R, I);
     ideal normap = imap(R, maxid);
-    export norid;
-    export normap;
 
     if(noRed == 1){
+      export norid;
+      export normap;
       setring R;
       return(R1);
     }
@@ -6673,7 +6717,7 @@ EXAMPLE: example norTest; shows an example
     LR[3] = newg3;
 //LR;"";
     def newR = ring(LR);
-
+    kill LR; //otherwise it keeps defined and will cause a warning next time norTest is run.
     setring newR;
     ideal norid = fetch(R,norid);
     ideal normap = fetch(R,normap);
