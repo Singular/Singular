@@ -78,15 +78,12 @@ mat2carr(matrix M)              central arrangement from coeff matrix
 arrPrintMatrix(arr A)           readable output as a coeff matrix
 varMat(intvec v)                matrix of the corresponding ring_variables
 varNum(def u)                   number of given variable (enh. version of varNum in dmod.lib)
-
 arrSwapVar(arr A, i, j)         swaps two variables in the arrangement
 arrLastVar(arr A)               ring_variable of largest index used in arrangement
-
 arrCenter(arr A)                computes center of an arrangement
 arrCentral(arr A)               checks if arrangement is central
 arrCentered(arr A)              checks if arrangement is centered
 arrCentralize(arr A)            makes centered arrangement central
-
 arrCoordChange(A, T, #)         performs coordinate change
 arrCoordNormalize(A, v)         performs projection onto coordinate hyperplane
 arrCone(arr A, var)             coned arrangement
@@ -95,7 +92,6 @@ arrLocalize(arr A, intvec v)    localization of an arrangement onto a flat
 arrRestrict(arr A, intvec v)    restricted arrangement onto a flat
 arrIsEssential(arr A)           checks if arrangement is essential
 arrEssentialize(arr A)          essentialized arragnement
-
 arrBoolean(int v)               boolean arrangement
 arrBraid(int v)                 braid arrangement
 arrTypeB(int v)                 type B arrangement
@@ -103,19 +99,14 @@ arrTypeD(int v)                 type D arrangement
 arrRandom(d,m,n)                random (affine) arrangement
 arrRandomCentral(d,m,n)         random central arrangement
 arrEdelmanReiner()              Edelman-Reiner arrangement
-
 arrOrlikSolomon(arr A)          Orlik-Solomon algebra of the arrangement
-
 arrDer(A)                       module of derivation
 arrIsFree(A)                    checks if arrangement is free
 arrExponents(A)                 exponents of a (free) arrangement
-
 arr2multarr(arr A, intvec v)    converts normal arrangement to multiarrangement
 multarr2arr(multarr A)          converts multiarrangement to normal arrangement
-
 multarrRestrict(arr A, v)       restriction of A (as arr) to a flat with multiplicities
 multarrMultRestrict(A, int k)   restriction of A (as multarr) to a hyperplane with multiplicities
-
 arrFlats(arr A)                     intersection lattice
 arrLattice(arr A)               computes the intersection lattice / poset
 moebius(arrposet P)             computes moebius values
@@ -227,7 +218,8 @@ EXAMPLE:    example arrAdd; shows an example"
     return (A);
 }
 
-example{
+example
+{
 "EXAMPLE: Creating a few arrangements"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A= ideal(x,y,z);        A;
@@ -296,7 +288,8 @@ EXAMPLE:    example arrGet; shows an example"
     return (A);
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(x,y,z);
@@ -324,7 +317,8 @@ EXAMPLE:    example arrSet; shows an example"
     return (A);
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(x,y,z);
@@ -369,7 +363,8 @@ EXAMPLE:    example arrDelete; shows an example"
     return (A');
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(x,y,z);
@@ -413,7 +408,8 @@ EXAMPLE:    example arrMinus; shows an example"
     return (A);
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(x,y,z);
@@ -479,7 +475,8 @@ EXAMPLE:    example arrLEQ; shows an example"
     return ((A<=B) & (A>=B));
 }
 
-example{
+example
+{
 "EXAMPLE: Relationships between a few arrangements."; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(x,y,z);
@@ -562,7 +559,8 @@ EXAMPLE:    example tye2arr; shows an example"
     return (arrAdd(#));
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 ideal I = x,y,z;
@@ -585,7 +583,8 @@ EXAMPLE:    example arr2poly; shows an example"
     return (f);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(x+1, 2x-2, y);
@@ -609,7 +608,8 @@ EXAMPLE:    example arr2list; shows an example"
     return (L);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A= ideal(x,y,z);
@@ -630,7 +630,8 @@ EXAMPLE:    example arr2ideal; shows an example"
     return (A.l);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(x,y,z);
@@ -657,7 +658,8 @@ EXAMPLE:    example arr2mat;"
     ERROR("Bad optional input parameter!")
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(x,y,z);
@@ -694,7 +696,8 @@ EXAMPLE:    example mat2arr;"
     return(A);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 matrix M[4][4] = 1,0,1,1,1,1,0,2,0,1,1,3,2,1,1,4;
@@ -724,7 +727,8 @@ EXAMPLE:    example mat2carr;"
     return(A);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 matrix M[4][3] = 1,0,1,1,1,0,0,1,1,2,1,1;
@@ -763,7 +767,8 @@ EXAMPLE:    example arrHomog; shows an example"
 
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(x,y);
@@ -801,7 +806,8 @@ EXAMPLE:    example arrSimplify; shows an example"
     ERROR("Too many input arguments!");
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(2x,2y-1,2z-2);
@@ -822,7 +828,8 @@ EXAMPLE:    example arrSize; shows an example"
     return (size(A.l));
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(x,y,z);
@@ -851,7 +858,8 @@ EXAMPLE:    example arrSubst; shows an example"
     return (A);
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(x,y,z,x+z);
@@ -877,7 +885,8 @@ EXAMPLE:    example arrPrint;"
     A.l;
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(x,y,z);
@@ -904,7 +913,8 @@ EXAMPLE:    example arrPrintMatrix;"
     print(M);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = mat2arr(random(20,5,4));
@@ -934,7 +944,8 @@ EXAMPLE:    example varMat; shows an example"
     return (M);
 }
 
-example{
+example
+{
 "EXAMPLE: 'even' ringvariables"; echo = 2;
 ring R = 0,(x(1..6)),dp;
 intvec v = 2,4,6;
@@ -971,7 +982,8 @@ EXAMPLE:    example varNum; shows an example"
     ERROR("Wrong input type, expected string or ring_variable (poly)!");
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,(x,y,z),dp;
 varNum(y);
@@ -993,7 +1005,8 @@ EXAMPLE:    example arrVariables; shows an example"
     return (variables(A.l));
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,(x,y,z),lp;
 arr A = ideal(x,y,z);
@@ -1015,7 +1028,8 @@ EXAMPLE:    example arrNvars; shows an example"
     return (size(variables(A)));
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,(x,y,z),lp;
 arr A= ideal(x,y,z);
@@ -1051,7 +1065,8 @@ EXAMPLE:    example arrSwapVar; shows an example"
     return (A);
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,(x,y,z),lp;
 arr A  = ideal(x+1,x+y,z);
@@ -1073,7 +1088,8 @@ EXAMPLE:    example arrLastVar; shows an example"
     return ( rvar(variables(A)[arrNvars(A)]) );
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,x(1..10),dp;
 arr A = ideal(x(1), x(2), x(3), x(6));
@@ -1101,7 +1117,8 @@ EXAMPLE:    example arrCentral;"
     return (homog(A));
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 
@@ -1134,7 +1151,8 @@ EXAMPLE:    example arrCentered;"
     return (0);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A= ideal(x,y,x-y+1);        // centerless
@@ -1169,7 +1187,8 @@ EXAMPLE:    example arrCenter;"
     return (Q);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 
@@ -1219,7 +1238,8 @@ EXAMPLE:    example arrCenter;"
     return (A);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = ideal(x-1,y,x-z-1,x-z-1);
@@ -1302,7 +1322,8 @@ EXAMPLE:    example arrCoordChange; shows an example"
     return(A);
 }
 
-example{
+example
+{
 "EXAMPLE: ";    echo =2;
 ring r = 0,(x,y,z),lp;
 arr A = x,y,z;
@@ -1358,24 +1379,14 @@ EXAMPLE:    example arrCoordChange; shows an example"
 
     return (A);
 }
-
-example{
+example
+{
 "EXAMPLE: "; echo=2;
 ring r = 0,(x,y,z),lp;
 arr A = ideal(x,y,z,x+z+4);
 intvec v = 1,2,4;
 arrCoordNormalize(A,v);
 }
-
-
-example{
-"EXAMPLE: "; echo=2;
-ring r = 0,(x,y,z),lp;
-arr A = ideal(x,y,z,x+z+4);
-intvec v = 1,2,4;
-arrCoordNormalize(A,v);
-}
-
 
 // coned arrangement
 proc arrCone(arr A, list #)
@@ -1407,7 +1418,8 @@ EXAMPLE:    example arrCone; shows an example"
     return(A);
 }
 
-example{
+example
+{
 "EXAMPLE: Coning the arrangement A = (x+1, y) alongside x, y and z:"; echo=2;
 ring R = 0,(x,y,z),dp;
 arr  A = ideal(x+1, x,x-2,x-1);
@@ -1453,7 +1465,8 @@ EXAMPLE:    example arrDecone; shows an example"
     return(A);
 }
 
-example{
+example
+{
 "EXAMPLE: We decone arr consisting of (x,y,x+z) with respect to y";
 echo = 2;
 ring R = 0,(x,y,z),dp;
@@ -1480,7 +1493,8 @@ EXAMPLE:    example arrLocalize; shows an example"
     return(L);
 }
 
-example{
+example
+{
 "EXAMPLE: We localize the Braid 3 arrangement at x and y";
 echo = 2;
 ring R = 0,(x,y,z),dp;
@@ -1552,7 +1566,8 @@ EXAMPLE:    example arrRestrict; shows an example"
     return(BR);
 }
 
-example{
+example
+{
 "EXAMPLE: We consider the possible restrictions of the type B3 arrangement ";
 echo = 2;
 ring S = 0,(x,y,z),dp;
@@ -1587,7 +1602,8 @@ EXAMPLE:    example arrIsEssential; shows an example"
     return(0);
 }
 
-example{
+example
+{
 "EXAMPLE: We check wether theseare essential and a non-essential arrangement ";
 echo = 2;
 ring S = 0,(x,y,z),lp;
@@ -1626,7 +1642,8 @@ EXAMPLE:    example arrEssentialize; shows an example"
     return (A);
 }
 
-example{
+example
+{
 "EXAMPLE: We essentialize a non essential arrangement "; echo = 2;
 ring S = 0,(x,y,z),dp;
 arr A=arrBraid(3);
@@ -1655,7 +1672,8 @@ EXAMPLE:    example arrBoolean;"
     return(A);
 }
 
-example{
+example
+{
 "EXAMPLE:Boolean Arrangement, uses the seven first coordinate hyperplanes";
 echo = 2;
 ring R = 0,x(1..10),dp;
@@ -1686,7 +1704,8 @@ EXAMPLE:    example arrBraid;"
     return(A);
 }
 
-example{
+example
+{
 "EXAMPLE: The braid arrangement consists of the hyperplanes x(i)=x(j)";
 echo = 2;
 ring R = 0,x(1..10),dp;
@@ -1721,7 +1740,8 @@ EXAMPLE:    example arrTypeB;"
     return(A);
 }
 
-example{
+example
+{
 "EXAMPLE: The type B reflection arrangement consists of the hyperplanes " +
 "x(i)=x(j), x(i)=-x(j) and the coordinate hyperplanes";
 echo = 2;
@@ -1755,7 +1775,8 @@ EXAMPLE:    example arrTypeD;"
     return(A);
 }
 
-example{
+example
+{
 "EXAMPLE: The type D reflection arrangement consists of the hyperplanes " +
 "x(i)=x(j) and x(i)=-x(j)";
 echo = 2;
@@ -1784,7 +1805,8 @@ EXAMPLE:    example arrRandom;"
     return(A);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,x(1..20),dp;
 arrRandom(7,3,15);
@@ -1810,7 +1832,8 @@ EXAMPLE:    example arrRandomCentral;"
     return(A);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,x(1..20),dp;
 arrRandomCentral(7,3,15);
@@ -1843,7 +1866,8 @@ EXAMPLE:    example arrEdelmanReiner;"
     return(arrER);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring r=0,x(1..5),dp;
 arrEdelmanReiner();
@@ -1931,7 +1955,8 @@ EXAMPLE:    example arrOrlikSolomon;"
     return (basering);
 }
 
-example{
+example
+{
 "EXAMPLE: Computing the Orlik-Solomon-Ideal for the D3-Arrangement"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = arrTypeB(3);
@@ -1969,7 +1994,8 @@ EXAMPLE:    example arrPoincare;"
     return(HP);
 }
 
-example{
+example
+{
 "EXAMPLE: Computing the Poincare polynomial as intvec for the D3-Arrangement"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = arrTypeB(3);
@@ -1993,7 +2019,8 @@ EXAMPLE:    example arrChambers;"
     return ( transpose(ones)*HP );
 }
 
-example{
+example
+{
 "EXAMPLE: Computing the number of chambers for the D3-Arrangement"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = arrTypeD(3);
@@ -2021,7 +2048,8 @@ EXAMPLE:    example arrBoundedChambers;"
     return ( transpose(altOnes)*HP );
 }
 
-example{
+example
+{
 "EXAMPLE: Computing the number of chambers for the D3-Arrangement"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = arrTypeD(3);
@@ -2070,7 +2098,8 @@ EXAMPLE:    example arrDer;"
     return (derivations);
 }
 
-example{
+example
+{
 "EXAMPLE: Computing the derivation module of the boolean and braid arrangement";
 echo = 2;
 ring R = 0,(x,y,z),dp;
@@ -2101,7 +2130,8 @@ EXAMPLE:    example arrIsFree;"
     return ( nvars(basering) == ncols(derivations) );
 }
 
-example{
+example
+{
 "EXAMPLE: checking freeness of the Edelman-Reiner arrangement and its restriction: ";
 echo = 2;
 ring R = 0,(x,y,z),dp;
@@ -2142,7 +2172,8 @@ EXAMPLE:    example arrExponents;"
     return(exp);
 }
 
-example{
+example
+{
 "EXAMPLE: computing the exponents of the Edelman-Reiner arrangement and its restriction: ";
 echo = 2;
 ring R = 0,(x,y,z),dp;
@@ -2237,7 +2268,8 @@ EXAMPLE:    example multarrAdd; shows an example"
     return (A);
 }
 
-example{
+example
+{
 "EXAMPLE: Creating a few multiarrangements"; echo = 2;
 ring R = 0,(x,y,z),dp;
 multarr A = ideal(x,y,z,x);            A;
@@ -2326,7 +2358,8 @@ EXAMPLE:    example multArrQPolys;"
     return(q);
 }
 
-example{
+example
+{
 "EXAMPLE: Computing the Q-Poly for a multiarrangement"; echo = 2;
 ring R = 0,(x,y,z),dp;
 multarr A = ideal(x,y,z,x,y,x-y,x-z,x-z,y-z);            A;
@@ -2353,7 +2386,8 @@ EXAMPLE:    example arr2multarr"
     return(B);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 arr A = arrTypeB(3);            A;
@@ -2377,7 +2411,8 @@ EXAMPLE:    example multarr2arr"
     return(B);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring r = 0,(x,y,z),dp;
 multarr A=x2y3z5;   A;
@@ -2404,7 +2439,8 @@ EXAMPLE:    example multarrPrint;"
     }
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 multarr A = ideal(x2,y3,z);
@@ -2424,7 +2460,8 @@ EXAMPLE:    example multarrSize;"
     return (sum(A.m));
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 multarr A = ideal(x2,y3,z);
@@ -2458,7 +2495,8 @@ EXAMPLE:    example multarrDelete;"
         return (MA);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 multarr A =ideal(x2,y3,z);
@@ -2531,7 +2569,8 @@ EXAMPLE:    example multarrRestrict; "
     return(BR);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,x(1..5),dp;
 arr A = arrEdelmanReiner();   A;
@@ -2578,7 +2617,8 @@ EXAMPLE:    example multarrMultRestrict; "
     return(MA);
 }
 
-example{
+example
+{
 "EXAMPLE:"; echo = 2;
 ring R = 0,(x,y,z),dp;
 multarr A =ideal(x2,y2,z2,(x-y)^3,(x-z)^2,(y-z));    A;
@@ -2728,7 +2768,8 @@ dbprint(3-voice,"Matrix tests: "+string(ntests));
 return (P);
 }
 
-example{
+example
+{
 "EXAMPLE: Intersection lattice of the braid arrangement in 3 dimensions "; echo = 2;
 ring r;
 arrLattice(arrTypeB(3));
@@ -2847,7 +2888,8 @@ EXAMPLE:    example arrCharPoly; shows an example"
     return (P);
 }
 
-example{
+example
+{
 "EXAMPLE: We look at the moebius values of the braid arrangement in 4 dimensions: "; echo = 2;
 ring R = 0,(x,y,z,t),dp;
 arr A = arrBraid(4);
@@ -2896,7 +2938,7 @@ EXAMPLE:    example arrPoincare;"
 {
     while(1){
         if(typeof(input) == "arr"){
-            arr A = input
+            arr A = input;
             arrposet P = arrLattice(A);
             break;
         }
@@ -2927,7 +2969,8 @@ EXAMPLE:    example arrPoincare;"
     return (v);
 }
 
-example{
+example
+{
 "EXAMPLE: The poincare polynomial of the braid arrangement in k dimensions is given as: " +
 "pi(A,t) = (1 + t)*...*(1 + (k-1)*t)"; echo = 2;
 ring R = 0,(x,y,z,u,v),dp;
@@ -2959,7 +3002,8 @@ EXAMPLE:    example arrCharPoly; shows an example"
     return (v);
 }
 
-example{
+example
+{
 "EXAMPLE: The characteristic polynomial of the Braid arrangement in k dimensions is given as: " +
 "X(A,t) = t*(t-1)*...*(t-(k-1)))"; echo = 2;
 ring R = 0,(x,y,z,u,v),dp;
@@ -2984,7 +3028,8 @@ EXAMPLE:    example arrChambers;"
     return(sum(v));
 }
 
-example{
+example
+{
 "EXAMPLE: Computing the number of number of chambers in a simple arrangement"; echo = 2;
 ring R = 0,(x,y),dp;
 arr A = ideal(x,y,x+y-1);
@@ -3009,7 +3054,8 @@ EXAMPLE:    example arrBoundedChambers;"
     return (sum(v));
 }
 
-example{
+example
+{
 "EXAMPLE: Computing the number of bounded chambers in a simple arrangement"; echo = 2;
 ring R = 0,(x,y),dp;
 arr A = ideal(x,y,x+y-1);
@@ -3068,7 +3114,8 @@ EXAMPLE:    example printMoebius;"
     }
 }
 
-example{
+example
+{
 "EXAMPLE: We look at the moebius values of the braid arrangement in 4 dimensions: "; echo = 2;
 ring R = 0,(x,y,z,t),dp;
 arr A = arrBraid(4);
@@ -3214,7 +3261,8 @@ EXAMPLE:    example arrFlats;"
     return (P);
 }
 
-example{
+example
+{
 "EXAMPLE: "; echo = 2;
 ring R = 0,(x(1..5)),dp;
 arrFlats(arrBraid(5));
