@@ -1215,6 +1215,8 @@ void siInit(char *name)
 #endif
     omInitInfo();
 
+// options ---------------------------------------------------------------
+  si_opt_1=0;
 // interpreter tables etc.: -----------------------------------------------
   memset(&sLastPrinted,0,sizeof(sleftv));
   sLastPrinted.rtyp=NONE;
