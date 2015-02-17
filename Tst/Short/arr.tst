@@ -48,4 +48,9 @@ example moebius;
 example arrCharPoly;
 example printMoebius;
 
+ring r  = 0,(x,y,z,u,v,w),Dp;
+arr C = (2x,5x-y,-3x+2,4-2y+2z);
+arr A = arrBraid(6); A;
+arr B = arrBraid(5); B;
+
 tst_status(1);$

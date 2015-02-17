@@ -2763,7 +2763,7 @@ for(rk=2; rk<=rank(ARR); rk++){                    // maximal flat possible has 
 }
 
 dbprint(3-voice,newline);
-dbprint(3-voice,"Computation time: "+string(timer - start)+"s");
+//dbprint(3-voice,"Computation time: "+string(timer - start)+"s");
 dbprint(3-voice,"Matrix tests: "+string(ntests));
 return (P);
 }
@@ -3255,7 +3255,7 @@ EXAMPLE:    example arrFlats;"
     }
 
     print(newline);
-    print("Computation time: "+string(timer - time));
+    //print("Computation time: "+string(timer - time));
     print("Matrix tests: "+string(ntests));
 
     return (P);
