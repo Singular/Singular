@@ -1144,6 +1144,7 @@ Todos/Issues:
 @cindex convex geometry
 
 @menu
+* gfanlib_so:: A gfanlib interface for Singular
 * polymake_so:: A polymake interface for Singular
 @end menu
 
