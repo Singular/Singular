@@ -88,7 +88,7 @@ groebnerCones tropicalTraversalMinimizingFlips(const groebnerCone startingCone)
     workingList.erase(sigma);
     tropicalVariety.insert(sigma);
     if (printlevel > 0)
-      Print("cones finished: %lu   cones in working list: %lu\n", tropicalVariety.size(), workingList.size());
+      Print("cones finished: %u   cones in working list: %u\n", tropicalVariety.size(), workingList.size());
   }
   return tropicalVariety;
 }
@@ -161,7 +161,7 @@ groebnerCones groebnerTraversal(const groebnerCone startingCone)
     sigma.deletePolynomialData();
     groebnerFan.insert(sigma);
     if (printlevel > 0)
-      Print("cones finished: %lu   cones in working list: %lu\n", groebnerFan.size(), workingList.size());
+      Print("cones finished: %u   cones in working list: %u\n", groebnerFan.size(), workingList.size());
   }
   return groebnerFan;
 }
