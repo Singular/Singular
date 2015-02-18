@@ -163,7 +163,7 @@ groebnerCones groebnerTraversal(const groebnerCone startingCone)
     groebnerFan.insert(sigma);
     if (printlevel > 0)
       Print("cones finished: %lu   cones in working list: %lu\n",
-      (unsigned long)groebnerFan.size(), (unsigned long)orkingList.size());
+      (unsigned long)groebnerFan.size(), (unsigned long)workingList.size());
   }
   return groebnerFan;
 }
