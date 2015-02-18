@@ -8,7 +8,7 @@ Access to polymake on singular interpreter level.
 @item @strong{Author:}
 Anders Nedergaard Jensen, email: jensen@@imf.au.dk
 Yue Ren, email: ren@@mathematik.uni-kl.de
-Frank Seelisch, email: seelisch@hs-esslingen.de
+Frank Seelisch, email: seelisch@@hs-esslingen.de
 
 @item @strong{Note:}
 This binary library is an interface to the C++ library gfanlib by Anders Jensen, which is distributed together with Singular.
@@ -20,17 +20,17 @@ Moreover, it contains features for computing the Groebner fan, the Groebner comp
 These functions are listed below.
 @end table
 
-@strong{List of functions:}
-@menu
-* initial::
-* homogeneitySpace::
-* groebnerCone::
-* maximalGroebnerCone::
-* groebnerFan::
-* lowerHomogeneitySpace::
-* groebnerComplex::
-* tropicalVariety::
-@end menu
+@c ref
+See
+@ref{initial};
+@ref{homogeneitySpace};
+@ref{groebnerCone};
+@ref{maximalGroebnerCone};
+@ref{groebnerFan};
+@ref{lowerHomogeneitySpace};
+@ref{groebnerComplex};
+@ref{tropicalVariety}.
+@c ref
 @c --------------------------------------------------------------------------------
 @node initial,homogeneitySpace,,gfanlib_so
 @subsubsection initial

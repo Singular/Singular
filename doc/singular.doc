@@ -1149,7 +1149,13 @@ Todos/Issues:
 @end menu
 
 @c ---------------------------------------------------------
-@node polymake_so, , ,convex geometry
+@node gfanlib_so,polymake_so, ,convex geometry
+@subsection gfanlib_so
+
+@include gfanlib.tex
+
+@c ---------------------------------------------------------
+@node polymake_so, ,gfanlib_so ,convex geometry
 @subsection polymake_so
 
 @include polymake.tex
