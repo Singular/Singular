@@ -65,7 +65,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
       }
       catch (const std::exception& ex)
       {
-        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+        Werror("ERROR: %s",ex.what());
         return TRUE;
       }
     }
@@ -89,7 +89,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
       }
       catch (const std::exception& ex)
       {
-        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+        Werror("ERROR: %s",ex.what());
         return TRUE;
       }
 
@@ -115,7 +115,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
         }
         catch (const std::exception& ex)
         {
-          WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+          Werror("ERROR: %s",ex.what());
           return TRUE;
         }
       }
@@ -135,7 +135,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
         }
         catch (const std::exception& ex)
         {
-          WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+          Werror("ERROR: %s",ex.what());
           return TRUE;
         }
       }
@@ -161,7 +161,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
       }
       catch (const std::exception& ex)
       {
-        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+        Werror("ERROR: %s",ex.what());
         return TRUE;
       }
     }
@@ -184,7 +184,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
       }
       catch (const std::exception& ex)
       {
-        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+        Werror("ERROR: %s",ex.what());
         return TRUE;
       }
     }

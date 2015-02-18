@@ -244,7 +244,7 @@ BOOLEAN groebnerCone(leftv res, leftv args)
       }
       catch (const std::exception& ex)
       {
-        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+        Werror("ERROR: %s",ex.what());
         return TRUE;
       }
     }
@@ -278,7 +278,7 @@ BOOLEAN groebnerCone(leftv res, leftv args)
       }
       catch (const std::exception& ex)
       {
-        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+        Werror("ERROR: %s",ex.what());
         return TRUE;
       }
     }
@@ -337,7 +337,7 @@ BOOLEAN maximalGroebnerCone(leftv res, leftv args)
       }
       catch (const std::exception& ex)
       {
-        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+        Werror("ERROR: %s",ex.what());
         return TRUE;
       }
     }
@@ -356,7 +356,7 @@ BOOLEAN maximalGroebnerCone(leftv res, leftv args)
       }
       catch (const std::exception& ex)
       {
-        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+        Werror("ERROR: %s",ex.what());
         return TRUE;
       }
     }
@@ -424,7 +424,7 @@ BOOLEAN initial(leftv res, leftv args)
       }
       catch (const std::exception& ex)
       {
-        WerrorS("ERROR: "); WerrorS(ex.what()); WerrorS("\n");
+        Werror("ERROR: %s",ex.what());
         return TRUE;
       }
     }
