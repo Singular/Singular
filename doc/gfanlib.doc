@@ -5,9 +5,9 @@
 gfanlib.so
 @item @strong{Purpose:}
 Access to polymake on singular interpreter level.
-@item @strong{Author:}
-Anders Nedergaard Jensen, email: jensen@@imf.au.dk
-Yue Ren, email: ren@@mathematik.uni-kl.de
+@item @strong{Authors:}
+Anders Nedergaard Jensen, email: jensen@@imf.au.dk@*
+Yue Ren, email: ren@@mathematik.uni-kl.de@*
 Frank Seelisch, email: seelisch@@hs-esslingen.de
 
 @item @strong{Note:}
@@ -51,7 +51,7 @@ computes the initial form of a single polynomial or the generators of an ideal w
 Note that the latter only generates the initial ideal, if the generators form a standard basis and the weight vector lies in the maximal Groebner cone of the currently active ordering.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
 LIB "gfanlib.so";
 ring r = 0,(x,y),dp;
 poly g = x+y+1;
@@ -79,7 +79,7 @@ cone
 the linear space of all weight vectors with respect to whom a polynomial or an ideal is weighted homogeneous.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
 LIB "gfanlib.so";
 ring r = 0,(x,y,z),dp;
 poly g = x+y;
@@ -112,7 +112,7 @@ cone
 the cone of all weight vectors with respect to whom the initial form coincides with the initial form with respect to v.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
 LIB "gfanlib.so";
 ring r = 0,(x,y),dp;
 poly g = x+y+1;
@@ -146,7 +146,7 @@ cone
 the cone if all weight vectors with respect to whom the initial form equals the leading term.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
 LIB "gfanlib.so";
 ring r = 0,(x,y),dp;
 poly g = x+y+1;
@@ -180,7 +180,7 @@ the Groebner fan of g or of I
 set printlevel > 0 for status updates on the computation
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
 LIB "gfanlib.so";
 ring r = 0,(x,y),dp;
 poly g = x+y+1;
@@ -208,8 +208,8 @@ cone
 the cone of all weight vectors with non-positive first entry with respect to whom g or I is homogeneous.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
-ring r = integer(t,x,y),dp;
+@c example
+ring r = integer,(t,x,y),dp;
 @c example
 @end smallexample
 @end table
@@ -229,7 +229,7 @@ fan
 the Groebner complex of g or of I with respect to p-adic valuation
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
 LIB "gfanlib.so";
 ring r = 0,(x,y),dp;
 poly g = 2x+y+4;
@@ -263,7 +263,7 @@ fan
 the tropical variety of g or of I, either without or with p-adic valuation
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
 LIB "gfanlib.so";
 ring r = 0,(x,y),dp;
 poly g1 = x+y+1;

@@ -29,49 +29,49 @@ http://www.polymake.org
 and respective third-party software.
 @end table
 
-@strong{List of accessible functions:}
 All functions are to be called with a preceding ``Polymake::''.
-@menu
-* boundaryLatticePoints::
-* ehrhartPolynomialCoeff::
-* facetVertexLatticeDistances::
-* facetWidth::
-* facetWidths::
-* fVector(polymake)::
-* gorensteinIndex::
-* gorensteinVector::
-* hilbertBasis::
-* hStarVector::
-* hVector::
-* interiorLatticePoints::
-* isBounded::
-* isCanonical::
-* isCompressed::
-* isGorenstein::
-* isLatticeEmpty::
-* isNormal::
-* isReflexive::
-* isSmooth::
-* isTerminal::
-* isVeryAmple::
-* latticeCodegree::
-* latticeDegree::
-* latticePoints::
-* latticeVolume::
-* maximalFace::
-* maximalValue::
-* minimalFace::
-* minimalValue::
-* minkowskiSum::
-* nBoundaryLatticePoints::
-* nHilbertBasis::
-* nInteriorLatticePoints::
-* nLatticePoints::
-* normalFan(polymake)::
-* visual::
-* vertexAdjacencyGraph::
-* vertexEdgeGraph::
-@end menu
+@c ref
+See
+@ref{boundaryLatticePoints};
+@ref{ehrhartPolynomialCoeff};
+@ref{facetVertexLatticeDistances};
+@ref{facetWidth};
+@ref{facetWidths};
+@ref{fVector(polymake)};
+@ref{gorensteinIndex};
+@ref{gorensteinVector};
+@ref{hilbertBasis};
+@ref{hStarVector};
+@ref{hVector};
+@ref{interiorLatticePoints};
+@ref{isBounded};
+@ref{isCanonical};
+@ref{isCompressed};
+@ref{isGorenstein};
+@ref{isLatticeEmpty};
+@ref{isNormal};
+@ref{isReflexive};
+@ref{isSmooth};
+@ref{isTerminal};
+@ref{isVeryAmple};
+@ref{latticeCodegree};
+@ref{latticeDegree};
+@ref{latticePoints};
+@ref{latticeVolume};
+@ref{maximalFace};
+@ref{maximalValue};
+@ref{minimalFace};
+@ref{minimalValue};
+@ref{minkowskiSum};
+@ref{nBoundaryLatticePoints};
+@ref{nHilbertBasis};
+@ref{nInteriorLatticePoints};
+@ref{nLatticePoints};
+@ref{normalFan(polymake)};
+@ref{visual};
+@ref{vertexAdjacencyGraph};
+@ref{vertexEdgeGraph}.
+@c ref
 @c --------------------------------------------------------------------------------
 @node boundaryLatticePoints,ehrhartPolynomialCoeff,,polymake_so
 @subsubsection boundaryLatticePoints
