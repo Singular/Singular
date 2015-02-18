@@ -120,6 +120,84 @@ void pReduce(poly &g, const number p, const ring r)
   return;
 }
 
+bool p_xLeadmonomDivisibleBy(const poly g, const poly f, const ring r)
+{
+  poly gx = p_Head(g,r);
+  poly fx = p_Head(f,r);
+  p_SetExp(gx,1,0,r);
+  p_SetExp(fx,1,0,r);
+  p_Setm(gx,r);
+  p_Setm(fx,r);
+  bool b = p_LeadmonomDivisibleBy(gx,fx,r);
+  p_Delete(&gx,r);
+  p_Delete(&fx,r);
+  return b;
+}
+
+void pReduceInhomogeneous(poly &g, const number p, const ring r)
+{
+  if (g==NULL)
+    return;
+  p_Test(g,r);
+
+  poly toBeChecked = pNext(g);
+  pNext(g) = NULL; poly gEnd = g;
+  poly gCache;
+
+  number coeff, pPower; int power; poly subst;
+  while(toBeChecked)
+  {
+    for (gCache = g; gCache; pIter(gCache))
+      if (p_xLeadmonomDivisibleBy(gCache,toBeChecked,r)) break;
+    if (gCache)
+    {
+      n_Power(p,p_GetExp(toBeChecked,1,r)-p_GetExp(gCache,1,r),&pPower,r->cf);
+      coeff = n_Mult(p_GetCoeff(toBeChecked,r),pPower,r->cf);
+      p_SetCoeff(gCache,n_Add(p_GetCoeff(gCache,r),coeff,r->cf),r);
+      n_Delete(&pPower,r->cf); n_Delete(&coeff,r->cf);
+      toBeChecked=p_LmDeleteAndNext(toBeChecked,r);
+    }
+    else
+    {
+      if (n_DivBy(p_GetCoeff(toBeChecked,r),p,r->cf))
+      {
+        power=1;
+        coeff=n_Div(p_GetCoeff(toBeChecked,r),p,r->cf);
+        while (n_DivBy(coeff,p,r->cf))
+        {
+          power++;
+          number coeff0 = n_Div(coeff,p,r->cf);
+          n_Delete(&coeff,r->cf);
+          coeff = coeff0;
+          coeff0 = NULL;
+          if (power<1)
+          {
+            WerrorS("pReduce: overflow in exponent");
+            throw 0;
+          }
+        }
+        subst=p_LmInit(toBeChecked,r);
+        p_AddExp(subst,1,power,r);
+        p_SetCoeff(subst,coeff,r);
+        p_Setm(subst,r); p_Test(subst,r);
+        toBeChecked=p_LmDeleteAndNext(toBeChecked,r);
+        toBeChecked=p_Add_q(toBeChecked,subst,r);
+        p_Test(toBeChecked,r);
+      }
+      else
+      {
+        pNext(gEnd)=toBeChecked;
+        pIter(gEnd); pIter(toBeChecked);
+        pNext(gEnd)=NULL;
+        p_Test(g,r);
+      }
+    }
+  }
+  p_Test(g,r);
+  divideByCommonGcd(g,r);
+  return;
+}
+
 void ptNormalize(poly* gStar, const number p, const ring r)
 {
   poly g = *gStar;
