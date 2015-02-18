@@ -69,7 +69,7 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector &u, cons
   s->wvhdl  = (int**) omAlloc0((h+4)*sizeof(int*));
 
   /* construct a new ordering as describe above */
-  bool overflow;
+  bool overflow = false;
   s->order[0] = ringorder_a;
   s->block0[0] = 1;
   s->block1[0] = n;
@@ -96,7 +96,10 @@ static ring genericlyWeightedOrdering(const ring r, const gfan::ZVector &u, cons
   s->order[h+2] = ringorder_C;
 
   if (overflow)
-    throw 0; //todo: use a proper custom exception
+  {
+    WerrorS("genericlyWeightedOrdering: overflow in weight vector");
+    throw 0; // weightOverflow;
+  }
 
   /* complete the ring and return it */
   rComplete(s);

@@ -11,7 +11,10 @@ long wDeg(const poly p, const ring r, const gfan::ZVector w)
   for (unsigned i=0; i<w.size(); i++)
   {
     if (!w[i].fitsInInt())
+    {
+      WerrorS("wDeg: overflow in weight vector");
       throw 0; // weightOverflow;
+    }
     d += p_GetExp(p,i+1,r)*w[i].toInt();
   }
   return d;
