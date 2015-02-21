@@ -4167,10 +4167,11 @@ static proc computeRing(ideal J, ideal I, list #)
     setring R1;
     ideal norid = imap(R, I);
     ideal normap = imap(R, maxid);
-    export norid;
-    export normap;
+
 
     if(noRed == 1){
+      export norid;
+      export normap;
       setring R;
       return(R1);
     }
@@ -6697,7 +6698,7 @@ EXAMPLE: example norTest; shows an example
     LR[3] = newg3;
 //LR;"";
     def newR = ring(LR);
-
+    kill LR; //otherwise it keeps defined and will cause a warning next time norTest is run.
     setring newR;
     ideal norid = fetch(R,norid);
     ideal normap = fetch(R,normap);
