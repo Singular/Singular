@@ -1,17 +1,18 @@
 ///////////////////////////////////////////////////////////////////////////
 version="version gradedModules.lib 4.0.1.1 Jan_2015 "; // $Id$
-category="General purpose?";
+category="Commutative Algebra";
 info="
 LIBRARY: gradedModules.lib     Operations with graded modules/matrices/resolutions
 AUTHORS:  Oleksandr Motsak <U@D>, where U=motsak, D=mathematik.uni-kl.de
-@*         Hanieh Keneshlou <hkeneshlou@yahoo.com>
+@*        Hanieh Keneshlou <hkeneshlou@yahoo.com>
 KEYWORDS: graded modules, graded homomorphisms, syzygies
 OVERVIEW:
-    The library contains several procedures for operations with graded modules/matrices/resolutions
-    TODO!
+    The library contains several procedures for constructing and manipulating graded modules/matrices/resolutions.
+NOTE:
+    set assumeLevel to positive integer value in order to auto-check all assumptions.
 REFERENCES:
 [MO]   Motsak, O.: Non-commutative Computer Algebra with applications: Graded commutative algebra and related
-       structures in Singular with applications, Ph.D. thesis, TU Kaiserslautern, 2010 TODO!?
+       structures in Singular with applications, Ph.D. thesis, TU Kaiserslautern, 2010
 PROCEDURES:
     grzero()        presentation of basering(0)^1
     grobj(M,w)      construct a graded module object
@@ -35,9 +36,8 @@ PROCEDURES:
 static proc repeat(int n, string c) { string r = ""; while( n > 0 ){ r = r + c; n--; } return(r); }
 static proc pad(int m, string s, string c){ string r = s; while( size(r) < m ){ r = c + r; } return(r); }
 static proc mstring( int m, string c){ if( m < 0 ) { return (c); }; return (string(m)); }
-static proc zstring( int m, int b, string c){ if(b) { return (c); }; return (string(m)); }
 // view helper
-static proc draw ( intmat D, intvec zc, int d )
+static proc draw ( intmat D, int d )
 {
 //  print(D); return ();
   int nc = ncols(D); int nr = nrows(D);
@@ -49,11 +49,11 @@ static proc draw ( intmat D, intvec zc, int d )
   for ( c = d+1; c < (nc-d); c++ )
   {
     head = head + pad(max, string(D[1 , c]), " ") + " ";
-    foot = foot + pad(max, zstring(D[nr, c], zc[c - d], "?"), " ") + " ";
+    foot = foot + pad(max, string(D[nr, c]), " ") + " ";
   }
   // last head/foot enties:
   head = head + pad(max, string(D[1 , c]), " ");
-  foot = foot + pad(max, zstring(D[nr, c], zc[c-d], "?"), " ");
+  foot = foot + pad(max, string(D[nr, c]), " ");
   // head/foot dash lines:
   string dash  = repeat( (max + 1) * (nc - 2*d) , "-");
   string dash2 = repeat( (max + 1) * (nc - 2*d) , "=");
@@ -73,9 +73,12 @@ static proc draw ( intmat D, intvec zc, int d )
       corner + "  " + foot  + "  " + corner );
 }
 
-proc grview(def N)
-"
-PURPOSE: print the degree/grading data about the GRADED matrix/module/ideal N
+proc grview(N)
+"USAGE:  grview(M), graded object M
+RETURN:  nothing
+PURPOSE: print the degree/grading data about the GRADED matrix/module/ideal/mapping object M             
+ASSUME:  M must be graded
+EXAMPLE: example grsum; shows an example
 "
 {
 //  if( size(N) == 0 ) { return (); }
@@ -88,36 +91,24 @@ PURPOSE: print the degree/grading data about the GRADED matrix/module/ideal N
 
 //  typeof( N ) ;  attrib( N );  attrib(N, "isHomog");
 
-  ASSUME(0, /* input must be graded! */ typeof(attrib(N, "isHomog")) == "intvec" );
-
   // input should be graded:
-  intvec gr = attrib(N, "isHomog"); // grading weights?
-  ASSUME(0, /* input must be correctly graded! */ nrows(N) == size(gr) );
-
-//  intvec gr = attrib( N, "isHomog" ); //  module(N); "grading: ", gr;
-
+  ASSUME(1, grtest(N) );
+  
+  intvec G = grdeg(N); 
   matrix M = module(N);
+  
   int nc = ncols(M); int nr = nrows(M);
   int r,c;
   int d = 1; // number of extra cols/rows for extra info around the central degree(N) block in D
   intmat D[nr+2*d][nc+2*d];
 
-  module L = module(N); L = lead(L); vector v;
-  int m = 1 + nvars(basering);
-  intvec zc = 0:nc;
   for( c = nc; c > 0; c-- )
   {
     D[1, c+d] = c; // top row indeces
-    v = L[c];
-    if( v != 0 )
-    {
-      D[nr+2*d, c+d] = deg(v) + gr[ leadexp(v)[m] ]; // bottom row with computed column induced degrees
-    } else
-    {
-//      D[nr+2*d, c+d] = 0; // TODO: 0/-1 is valid :(
-      zc[c] = 1;
-    }
+    D[nr+2*d, c+d] = G[c]; // deg(v) + gr[ leadexp(v)[m] ]; // bottom row with computed column induced degrees
   }
+
+  intvec gr = attrib(N, "isHomog"); // grading weights?
 
   for( r = nr; r > 0; r-- )
   {
@@ -128,7 +119,7 @@ PURPOSE: print the degree/grading data about the GRADED matrix/module/ideal N
     }
     D[r+d, nc+2*d] = r; // right-most block with indeces
   }
-  draw(D, zc, d); // print it nicely!
+  draw(D, d); // print it nicely!
 }
 
 
@@ -199,25 +190,27 @@ static proc mysort( intvec gr, int s )
 }
 
 // Q@Wolfram: what should be done with zero gens!?
-proc grdeg( def M, list # )
-"graded degrees of gens(i.e. columns)"
-{
- // use initial grading if given
-  if( size(#) == 1 )
-  {
-    def w = #[1];
-    if( typeof(w) == "intvec" )
-    {
-      if( nrows(M) == size(w) )
-      {
-        attrib(M, "isHomog", w);
-      }
-    }
-    kill w;
-  }
-
+proc grdeg(M)
+"USAGE:  grdeg(M), graded object M
+RETURN:  intvec of degrees
+PURPOSE: graded degrees of columns (generators) of M
+ASSUME:  M must be a graded object (matrix/module/ideal/mapping)
+NOTE:    if M has zero cols it shoud have attrib(M,'degHomog') set.
+EXAMPLE: example grsum; shows an example
+"
+{           
   ASSUME(1, grtest(M) );
 
+  if ( typeof(attrib(M, "degHomog")) == "intvec" )
+  {    
+    intvec t = attrib(M, "degHomog"); // graded degrees
+    ASSUME(0, ncols(M) == size(t) );
+
+    return (t);
+  }
+  
+  ASSUME(0, ncols(M) == size(M) );
+  
   def w = attrib(M, "isHomog"); // grading weights?
 
   if( size(M) == 0 ){ return (w); } // TODO: Q@Wolfram!???
@@ -229,12 +222,12 @@ proc grdeg( def M, list # )
   intvec d = deg(L[1..m]); // their degrees
   intvec c = leadexp(L[1..m])[n]; // their module-components
 
-  w = intvec(-6665, w); // 0?????
-  intvec gr = w[1+c]; // weights
+//   w = intvec(-6665), w; // 0?????
+  intvec gr = w[c]; //  + 1]; // weights?????
 
   gr = gr + d; // finally we compute their graded degrees
 
-  return (gr); // do we need g or w[c] ?
+  return (gr); 
 }
 
 static proc reorder(def M, int s)
@@ -256,16 +249,24 @@ Reorder gens of M: compute graded degrees and the permutation to sort them
   // grades & ordering permutation for N.  gr[pivot] should be sorted!
   ASSUME(1, issorted(gr[pivot], s));
 
-  module N = grobj(module(M[pivot]), w);  // reorder the starting ideal/module
+  module N = grobj(module(M[pivot]), w, intvec(gr[pivot]));  // reorder the starting ideal/module
 
 //  "reorder: "; grview(N);
 
   return (N, intvec(gr[pivot]));
 }
 
+static proc gtranspose(M)
+"??????"
+{   
+  ASSUME(1, grtest(M) );
+  return (  grobj(transpose(M), -grdeg(M), -attrib(M, "isHomog"))  );
+}
+
+
 proc grtranspose(def M)
 "
-transpose graded module/map or a chain complex?...
+transpose&reorder graded module/map or a chain complex?...
 "
 {
   if( typeof( M ) == "list" )
@@ -310,13 +311,11 @@ transpose graded module/map or a chain complex?...
 // "a";  grview(M);
   ASSUME(1, grtest(M) );
 
-  // TODO: something is wrong here:
-
  intvec d; module N;
 
  (N,d) = reorder(M, -1);
 
- kill M; module M = grobj(transpose(N), -d);
+ kill M; module M = grobj(transpose(N), -d, -attrib(N, "isHomog"));
 
 // "b";  grview(M);
 
@@ -332,8 +331,6 @@ transpose graded module/map or a chain complex?...
 
  return (N);
 }
-
-
 
 proc grorder(def M)
 "
@@ -381,7 +378,7 @@ reorder graded module/map or a chain complex?...
 
   (N,d) = reorder(M, 1); kill M;
 
-  module M = grobj(transpose(N), -d); kill N,d;
+  module M = grobj(transpose(N), -d, -attrib(N, "isHomog")); kill N,d;
 
 // "b";  grview(M);
 
@@ -389,7 +386,7 @@ reorder graded module/map or a chain complex?...
   // reverse order:
   (N,d) = reorder(M, -1); kill M;
 
-  module M = grobj(transpose(N), -d);
+  module M = grobj(transpose(N), -d, -attrib(N, "isHomog"));
 
 // "c";  grview(M);
 
@@ -470,7 +467,7 @@ proc grzero()
 TODO: can we return this as an undefined value?????
 "
 {
- return ( grobj(module([0]), intvec(0)) );
+ return ( grobj(module([0]), intvec(0), intvec(0)) );
 }
 
 proc grpower(def A, int p)
@@ -514,7 +511,11 @@ direct sum of graded modules
   module T = align(module(B), r); //  T;  print(T);  nrows(T); // BUG!!!!
   module S = module(A), T;
 
-  return(grobj(S, c));
+  intvec da = grdeg(A);
+  intvec db = grdeg(B);
+  intvec dc = da, db;
+
+  return(grobj(S, c, dc));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -579,34 +580,22 @@ proc grshift( def M, int d)
 shift graded module M by delta so that 1 is in M_d
 "
 {
+  ASSUME(1, grtest(M) );
+  
   intvec a = attrib(M, "isHomog");
-  return (grobj(M, intvec( a - intvec(d:size(a))) ));
+  a = a - intvec(d:size(a));
+  
+  intvec t = attrib(M, "degHomog");
+  t = t - intvec(d:size(t));
+  
+  return (grobj(M, a, t));
 }
 
-
-proc grtest(def N)
-"test if N is a matrix/module with matching isHomog attribute (intvec)"
-{
-  string t = typeof(N);
-  if( (t != "ideal") && (t != "module") && (t != "matrix") ) { return (0); };  // N should be something like a matrix
-
-  // N must be graded!
-  if ( typeof(attrib(N, "isHomog")) != "intvec" ){ return (0); };
-
-  intvec gr = attrib(N, "isHomog"); // grading weights...
-  if ( nrows(N) > size(gr) ) { return (0); };  // wrong number of rows?
-
-//  if( attrib(N, "rank") != size(gr) ){ return (0); } // wrong rank :(
-
-
-//  if( !homog(N) ) { return (0); };  // N should be homogenous
-
-
-  return (1);
-}
 
 proc grisequal (def A, def B)
-"TODO"
+"
+   TODO
+"
 {
   ASSUME(1, grtest(A) );
   ASSUME(1, grtest(B) );
@@ -618,33 +607,101 @@ proc grisequal (def A, def B)
   intvec wb = attrib(B, "isHomog");
 
   if( (ra != rb) || (ncols(A) != ncols(B)) ){ return (0); } // TODO: ???
-  return ( (wa == wb) &&
+
+  intvec da = grdeg(A);
+  intvec db = grdeg(B);
+  
+  return ( (da == db) && (wa == wb) &&
            (size(module(matrix(A) - matrix(B))) == 0)    ); // TODO: ???
 }
 
 proc grtwist(int a, int d)
 "
-matrix presentation for twisted polynomial ring S(d)^a
+    matrix presentation for twisted polynomial ring S(d)^a
 "
 {
+  ASSUME(0, a > 0);
+  
   module Z; Z[a] = [0];
-  Z = grobj(Z, -intvec(d:a)); // will set the rank as well
-
+  intvec w = -intvec(d:a);
+  Z = grobj(Z, w, w); // will set the rank as well
   ASSUME(2, grisequal(Z, grpower( grshift(grzero(), d), a ) )); // optional check
   return(Z);
 }
 
-proc grobj(def A, intvec w)
-""
+proc grobj(def A, intvec w, list #)
+"
+   TODO
+"
 {
   module M = module(A);
   ASSUME(0, size(w) >= nrows(M) );
+  
   attrib(M, "rank", size(w));
   attrib(M, "isHomog", w);
-  ASSUME(1, grtest(M) );
+
+  if( size(#) > 0 )
+  {
+    ASSUME(0, typeof(#[1]) == "intvec" );
+    ASSUME(0, size(#[1]) == ncols(M) ); 
+    attrib(M, "degHomog", #[1]);
+  }
+  else
+  {
+    ASSUME(0, /* no zero cols please! */ size(M) == ncols(M) ); 
+    attrib(M, "degHomog", grdeg(M));
+  }    
+
+  ASSUME(0, grtest(M) );
   return (M);
 }
 
+proc grtest(def N)
+"test if N is a matrix/module with matching isHomog attribute (intvec)"
+{
+  string t = typeof(N);
+  if( (t != "ideal") && (t != "module") && (t != "matrix") ) { return (0); };  // N should be something like a matrix
+
+  // N must be graded!
+  if ( typeof(attrib(N, "isHomog")) != "intvec" ){ return (0); };
+
+  intvec gr = attrib(N, "isHomog"); // grading weights...
+  if ( nrows(N) != size(gr) ) { return (0); };  // wrong number of rows?
+
+//  if( attrib(N, "rank") != size(gr) ){ return (0); } // wrong rank :(
+
+  if ( typeof(attrib(N, "degHomog")) == "intvec" )
+  {
+    intvec T = attrib(N, "degHomog"); // graded degrees
+    if ( ncols(N) != size(T) ) { return (0); };  // wrong number of cols?
+
+    int k = nvars(basering) + 1; // index of mod. column in the leadexp
+
+    module L = lead(module(N)); vector v;
+
+    // checking T for non-zero N[i]
+    int i = size(T);
+    
+    for (; i > 0; i-- )
+    {
+      v = L[i];
+      if( v != 0 )
+      {
+        if( (deg(v) + gr[ leadexp(v)[k] ]) != T[i] ) { return (0); };  // wrong T[i]        
+      }
+    }
+
+    // TODO: check t on nonzero cols...
+  } else
+  {
+    if( ncols(N) != size(N) ) { return (0); };
+  }
+  
+//  if( !homog(N) ) { return (0); };  // N should be homogenous
+
+  return (1);
+}
+   
 
 static proc align( def A, int d)
 "analog of align kernel command for older Singular versions
