@@ -3349,7 +3349,7 @@ void p_SetGlobals(const ring r, BOOLEAN complete)
 static inline int sign(int x) { return (x > 0) - (x < 0);}
 BOOLEAN rOrd_is_MixedDegree_Ordering(ring r)
 {
-  int i, k;
+  int i;
   poly p=p_One(r);
   p_SetExp(p,1,1,r);p_Setm(p,r);
   int vz=sign(p_FDeg(p,r));

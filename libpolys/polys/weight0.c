@@ -300,13 +300,12 @@ void wSecondSearch(int *A, int *x, int *lpol,
 int npol, int mons, double *rel, double *fk, double wNsqr, int rvar)
 {
   int  n, s0, s1, s2, *xopt;
-  double  one, fx, fopt, wx;
+  double  fx, fopt, wx;
 
   n = rvar;
   xopt = x + (n + 2);
   fopt = *fk * (double)0.999999999999;
   wx = wPrWeight(x, n);
-  one = (double)1.0;
   loop
   {
     wEstimate(A, x, lpol, npol, mons, wx, rel, &fx, &s0, &s1, &s2, wNsqr, rvar);
@@ -388,6 +387,7 @@ void wGcd(int *x, int n)
 }
 
 
+#if 0 /*currently unused*/
 static void wSimple(int *x, int n)
 {
   int g, min, c, d, f, kopt, k, i;
@@ -462,7 +462,7 @@ static void wSimple(int *x, int n)
   if (g==0)
     wGcd(x, n);
 }
-
+#endif
 
 void wNorm(int *degw, int *lpol, int npol, double *rel)
 {
