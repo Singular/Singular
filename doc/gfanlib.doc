@@ -46,9 +46,9 @@ v has as many entries as there are variables in the basering.
 @item @strong{Type:}
 poly or ideal
 @item @strong{Purpose:}
-computes the initial form of a single polynomial or the generators of an ideal with respect to a weight vector.
-
-Note that the latter only generates the initial ideal, if the generators form a standard basis and the weight vector lies in the maximal Groebner cone of the currently active ordering.
+computes the initial form of the polynomial f or the initial forms of the generators of I with respect to weight vector v
+@item @strong{Note:}
+for the initial forms of the generators to generate the initial ideal, I must be a reduced standard basis and v has to lie in the maximal Groebner cone of the current ordering.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -76,7 +76,7 @@ initial(I,intvec(1,1));
 @item @strong{Type:}
 cone
 @item @strong{Purpose:}
-the linear space of all weight vectors with respect to whom a polynomial or an ideal is weighted homogeneous.
+the linear space of all weight vectors with respect to whom a polynomial g or an ideal I is weighted homogeneous.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -105,11 +105,11 @@ generatorsOfLinealitySpace(homogSpace);
 @*@code{groebnerCone(} ideal I, intvec v @code{)}
 @*@code{groebnerCone(} ideal I, bigintmat v @code{)}
 @item @strong{Assume:}
-I reduced standard basis
+I reduced standard basis, v contained in the maximal Groebner cone of the current ordering
 @item @strong{Type:}
 cone
 @item @strong{Purpose:}
-the cone of all weight vectors with respect to whom the initial form coincides with the initial form with respect to v.
+the euklidean closure of all weight vectors with respect to whom the initial form of g or the initial ideal of I coincides with the initial form or the initial ideal with respect to v.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -134,16 +134,14 @@ generatorsOfLinealitySpace(C);
 @cindex maximalGroebnerCone
 @table @code
 @item @strong{Syntax:}
-@code{maximalGroebnerCone(} poly g, intvec v @code{)}
-@*@code{maximalGroebnerCone(} poly g, bigintmat v @code{)}
-@*@code{maximalGroebnerCone(} ideal I, intvec v @code{)}
-@*@code{maximalGroebnerCone(} ideal I, bigintmat v @code{)}
+@code{maximalGroebnerCone(} poly g @code{)}
+@*@code{maximalGroebnerCone(} ideal I @code{)}
 @item @strong{Assume:}
 I reduced standard basis
 @item @strong{Type:}
 cone
 @item @strong{Purpose:}
-the cone if all weight vectors with respect to whom the initial form equals the leading term.
+the euklidean closure of all weight vectors with respect to whom the initial form of g equals its leading term or the initial ideal of I equals its leading ideal.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -171,11 +169,11 @@ generatorsOfLinealitySpace(C);
 @code{groebnerFan(} poly g @code{)}
 @*@code{groebnerFan(} ideal I @code{)}
 @item @strong{Assume:}
-I homogeneous, ground field are the rational numbers
+I homogeneous, ground field is the field of rational numbers
 @item @strong{Type:}
 fan
 @item @strong{Purpose:}
-the Groebner fan of g or of I
+the Groebner fan of g or the Groebner fan I
 @item @strong{Note:}
 set printlevel > 0 for status updates on the computation
 @item @strong{Example:}
@@ -209,7 +207,16 @@ the cone of all weight vectors with non-positive first entry with respect to who
 @item @strong{Example:}
 @smallexample
 @c example
-ring r = integer,(t,x,y),dp;
+ring r = integer,(t,x,y,z),dp;
+poly g = tx+t2y;
+cone homogSpace = lowerHomogeneitySpace(g);
+rays(homogSpace);
+generatorsOfLinealitySpace(homogSpace);
+
+ideal I = tx+y, t2y+z;
+homogSpace = lowerHomogeneitySpace(I);
+rays(homogSpace);
+generatorsOfLinealitySpace(homogSpace);
 @c example
 @end smallexample
 @end table
@@ -219,14 +226,16 @@ ring r = integer,(t,x,y),dp;
 @cindex groebnerComplex
 @table @code
 @item @strong{Syntax:}
-@code{tropicalVariety(} poly g, number p @code{)}
-@*@code{tropicalVariety(} ideal I, number p @code{)}
+@code{groebnerComplex(} poly g, number p @code{)}
+@*@code{groebnerComplex(} ideal I, number p @code{)}
 @item @strong{Assume:}
-I homogeneous, ground field are the rational numbers, p prime
+I homogeneous, ground field are the rational numbers, p prime number
 @item @strong{Type:}
 fan
 @item @strong{Purpose:}
-the Groebner complex of g or of I with respect to p-adic valuation
+the Groebner complex of g or the Groebner complex I with respect to the p-adic valuation
+@item @strong{Note:}
+set printlevel > 0 for status updates on the computation
 @item @strong{Example:}
 @smallexample
 @c example
@@ -260,7 +269,9 @@ I homogeneous, ground field are the rational numbers, p prime
 @item @strong{Type:}
 fan
 @item @strong{Purpose:}
-the tropical variety of g or of I, either without or with p-adic valuation
+the tropical variety of g or the tropical variety of I, either without or with p-adic valuation
+@item @strong{Note:}
+set printlevel > 0 for status updates on the computation
 @item @strong{Example:}
 @smallexample
 @c example
