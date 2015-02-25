@@ -1887,7 +1887,7 @@ si_link ssiCommandLink()
  @param[in] sig
 **/
 /*---------------------------------------------------------------------*/
-void sig_chld_hdl(int sig)
+void sig_chld_hdl(int)
 {
   pid_t kidpid;
   int status;

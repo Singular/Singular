@@ -7982,9 +7982,9 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
       while (dA2[i].cmd==op)
       {
         //Print("test %s %s\n",Tok2Cmdname(dA2[i].arg1),Tok2Cmdname(dA2[i].arg2));
-        if ((ai=iiTestConvert(at,dA2[i].arg1))!=0)
+        if ((ai=iiTestConvert(at,dA2[i].arg1,dConvertTypes))!=0)
         {
-          if ((bi=iiTestConvert(bt,dA2[i].arg2))!=0)
+          if ((bi=iiTestConvert(bt,dA2[i].arg2,dConvertTypes))!=0)
           {
             res->rtyp=dA2[i].res;
             if (currRing!=NULL)
