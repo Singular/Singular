@@ -207,6 +207,7 @@ the cone of all weight vectors with non-positive first entry with respect to who
 @item @strong{Example:}
 @smallexample
 @c example
+LIB "gfanlib.so";
 ring r = integer,(t,x,y,z),dp;
 poly g = tx+t2y;
 cone homogSpace = lowerHomogeneitySpace(g);
