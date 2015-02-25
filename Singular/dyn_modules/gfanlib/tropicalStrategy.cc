@@ -133,7 +133,7 @@ tropicalStrategy::tropicalStrategy(const ideal I, const ring r,
   weightAdjustingAlgorithm2(nonvalued_adjustWeightUnderHomogeneity),
   extraReductionAlgorithm(noExtraReduction)
 {
-  assume(rField_is_Q(r) || rField_is_Zp(r));
+  assume(rField_is_Q(r) || rField_is_Zp(r) || rField_is_Ring_Z(r));
   if (!completelyHomogeneous)
   {
     weightAdjustingAlgorithm1 = valued_adjustWeightForHomogeneity;
@@ -224,11 +224,11 @@ static ideal constructStartingIdeal(ideal originalIdeal, ring originalRing, numb
     J->m[i] = p_PermPoly(originalIdeal->m[i],shiftByOne,originalRing,startingRing,nMap,NULL,0);
   omFreeSize(shiftByOne,(n+1)*sizeof(int));
 
-  // ring origin = currRing;
-  // rChangeCurrRing(startingRing);
-  // ideal startingIdeal = kNF(pt,startingRing->qideal,J);
-  // rChangeCurrRing(origin);
-  ideal startingIdeal = J; J = NULL;
+  ring origin = currRing;
+  rChangeCurrRing(startingRing);
+  ideal startingIdeal = kNF(pt,startingRing->qideal,J); // mathematically redundant,
+  rChangeCurrRing(origin);                              // but helps with upcoming std computation
+  // ideal startingIdeal = J; J = NULL;
   assume(startingIdeal->m[k]==NULL);
   startingIdeal->m[k] = pt->m[0];
   startingIdeal = gfanlib_kStd_wrapper(startingIdeal,startingRing);
@@ -270,6 +270,7 @@ tropicalStrategy::tropicalStrategy(ideal J, number q, ring s):
 
   /* map the input ideal into the new polynomial ring */
   startingIdeal = constructStartingIdeal(J,s,uniformizingParameter,startingRing);
+  reduce(startingIdeal,startingRing);
 
   linealitySpace = homogeneitySpace(startingIdeal,startingRing);
 

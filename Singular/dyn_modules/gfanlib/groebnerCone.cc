@@ -443,59 +443,6 @@ groebnerCone groebnerCone::flipCone(const gfan::ZVector &interiorPoint, const gf
 
 
 /***
- * Computes a relative interior point and an outer normal vector for each facet of zc
- **/
-static std::pair<gfan::ZMatrix,gfan::ZMatrix> interiorPointsAndNormalsOfFacets(const gfan::ZCone zc)
-{
-  gfan::ZMatrix inequalities = zc.getFacets();
-  gfan::ZMatrix equations = zc.getImpliedEquations();
-  int r = inequalities.getHeight();
-  int c = inequalities.getWidth();
-
-  /* our cone has r facets, if r==0 return empty matrices */
-  gfan::ZMatrix relativeInteriorPoints = gfan::ZMatrix(0,c);
-  gfan::ZMatrix outerFacetNormals = gfan::ZMatrix(0,c);
-  if (r==0)
-    return std::make_pair(relativeInteriorPoints,outerFacetNormals);
-
-  /* next we iterate over each of the r facets,
-   * build the respective cone and add it to the list
-   * this is the i=0 case */
-  gfan::ZMatrix newInequalities = inequalities.submatrix(1,0,r,c);
-  gfan::ZMatrix newEquations = equations;
-  newEquations.appendRow(inequalities[0]);
-  gfan::ZCone facet = gfan::ZCone(newInequalities,newEquations);
-  relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
-  assume(zc.contains(relativeInteriorPoints[0]) && !zc.containsRelatively(relativeInteriorPoints[0]));
-  outerFacetNormals.appendRow(-inequalities[0]);
-
-  /* these are the cases i=1,...,r-2 */
-  for (int i=1; i<r-1; i++)
-  {
-    newInequalities = inequalities.submatrix(0,0,i,c);
-    newInequalities.append(inequalities.submatrix(i+1,0,r,c));
-    newEquations = equations;
-    newEquations.appendRow(inequalities[i]);
-    facet = gfan::ZCone(newInequalities,newEquations);
-    relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
-    assume(zc.contains(relativeInteriorPoints[i]) && !zc.containsRelatively(relativeInteriorPoints[i]));
-    outerFacetNormals.appendRow(-inequalities[i]);
-  }
-
-  /* this is the i=r-1 case */
-  newInequalities = inequalities.submatrix(0,0,r-1,c);
-  newEquations = equations;
-  newEquations.appendRow(inequalities[r-1]);
-  facet = gfan::ZCone(newInequalities,newEquations);
-  relativeInteriorPoints.appendRow(facet.getRelativeInteriorPoint());
-  assume(zc.contains(relativeInteriorPoints[r-1]) && !zc.containsRelatively(relativeInteriorPoints[r-1]));
-  outerFacetNormals.appendRow(-inequalities[r-1]);
-
-  return std::make_pair(relativeInteriorPoints,outerFacetNormals);
-}
-
-
-/***
  * Returns a complete list of neighboring Groebner cones.
  **/
 groebnerCones groebnerCone::groebnerNeighbours() const
@@ -564,7 +511,7 @@ gfan::ZFan* toFanStar(groebnerCones setOfCones)
     for (; sigma!=setOfCones.end(); sigma++)
     {
       gfan::ZCone zc = sigma->getPolyhedralCone();
-      assume(isCompatible(zf,&zc));
+      // assume(isCompatible(zf,&zc));
       zf->insert(zc);
     }
     return zf;

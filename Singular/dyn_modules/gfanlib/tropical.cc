@@ -4,16 +4,17 @@
 #include <callgfanlib_conversion.h>
 #include <bbcone.h>
 #include <ppinitialReduction.h>
-// #include <ttinitialReduction.h>
 #include <containsMonomial.h>
 #include <initial.h>
 #include <witness.h>
 #include <tropicalCurves.h>
-// #include <neighbours.h>
 #include <tropicalStrategy.h>
 #include <startingCone.h>
+#include <groebnerFan.h>
+#include <groebnerComplex.h>
 #include <tropicalVariety.h>
 
+int tropicalVerboseLevel = 0;
 
 gfan::ZCone homogeneitySpace(ideal I, ring r)
 {
@@ -50,6 +51,21 @@ gfan::ZCone homogeneitySpace(ideal I, ring r)
 BOOLEAN homogeneitySpace(leftv res, leftv args)
 {
   leftv u = args;
+  if ((u != NULL) && (u->Typ() == POLY_CMD))
+  {
+    leftv v = u->next;
+    if (v == NULL)
+    {
+      poly g = (poly) u->Data();
+      ideal I = idInit(1);
+      I->m[0] = g;
+      res->rtyp = coneID;
+      res->data = (void*) new gfan::ZCone(homogeneitySpace(I,currRing));
+      I->m[0] = NULL;
+      id_Delete(&I,currRing);
+      return FALSE;
+    }
+  }
   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
   {
     leftv v = u->next;
@@ -106,6 +122,21 @@ gfan::ZCone lowerHomogeneitySpace(ideal I, ring r)
 BOOLEAN lowerHomogeneitySpace(leftv res, leftv args)
 {
   leftv u = args;
+  if ((u != NULL) && (u->Typ() == POLY_CMD))
+  {
+    leftv v = u->next;
+    if (v == NULL)
+    {
+      poly g = (poly) u->Data();
+      ideal I = idInit(1);
+      I->m[0] = g;
+      res->rtyp = coneID;
+      res->data = (void*) new gfan::ZCone(lowerHomogeneitySpace(I,currRing));
+      I->m[0] = NULL;
+      id_Delete(&I,currRing);
+      return FALSE;
+    }
+  }
   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
   {
     leftv v = u->next;
@@ -180,30 +211,76 @@ gfan::ZCone groebnerCone(const ideal I, const ring r, const gfan::ZVector &w)
 BOOLEAN groebnerCone(leftv res, leftv args)
 {
   leftv u = args;
+  if ((u != NULL) && (u->Typ() == POLY_CMD))
+  {
+    leftv v = u->next;
+    if ((v !=NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
+    {
+      try
+      {
+        poly g = (poly) u->Data();
+        ideal I = idInit(1);
+        I->m[0] = g;
+        gfan::ZVector* weightVector;
+        if (v->Typ() == INTVEC_CMD)
+        {
+          intvec* w0 = (intvec*) v->Data();
+          bigintmat* w1 = iv2bim(w0,coeffs_BIGINT);
+          w1->inpTranspose();
+          weightVector = bigintmatToZVector(*w1);
+          delete w1;
+        }
+        else
+        {
+          bigintmat* w1 = (bigintmat*) v->Data();
+          weightVector = bigintmatToZVector(*w1);
+        }
+        res->rtyp = coneID;
+        res->data = (void*) new gfan::ZCone(groebnerCone(I,currRing,*weightVector));
+        delete weightVector;
+        I->m[0] = NULL;
+        id_Delete(&I,currRing);
+        return FALSE;
+      }
+      catch (const std::exception& ex)
+      {
+        Werror("ERROR: %s",ex.what());
+        return TRUE;
+      }
+    }
+  }
   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
   {
     leftv v = u->next;
     if ((v !=NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
     {
-      ideal I = (ideal) u->Data();
-      gfan::ZVector* weightVector;
-      if (v->Typ() == INTVEC_CMD)
+      try
       {
-        intvec* w0 = (intvec*) v->Data();
-        bigintmat* w1 = iv2bim(w0,coeffs_BIGINT);
-        w1->inpTranspose();
-        weightVector = bigintmatToZVector(*w1);
-        delete w1;
+        ideal I = (ideal) u->Data();
+        gfan::ZVector* weightVector;
+        if (v->Typ() == INTVEC_CMD)
+        {
+          intvec* w0 = (intvec*) v->Data();
+          bigintmat* w1 = iv2bim(w0,coeffs_BIGINT);
+          w1->inpTranspose();
+          weightVector = bigintmatToZVector(*w1);
+          delete w1;
+        }
+        else
+        {
+          bigintmat* w1 = (bigintmat*) v->Data();
+          weightVector = bigintmatToZVector(*w1);
+        }
+        res->rtyp = coneID;
+        res->data = (void*) new gfan::ZCone(groebnerCone(I,currRing,*weightVector));
+        delete weightVector;
+        return FALSE;
       }
-      else
+      catch (const std::exception& ex)
       {
-        bigintmat* w1 = (bigintmat*) v->Data();
-        weightVector = bigintmatToZVector(*w1);
+        Werror("ERROR: %s",ex.what());
+        return TRUE;
       }
-      res->rtyp = coneID;
-      res->data = (void*) new gfan::ZCone(groebnerCone(I,currRing,*weightVector));
-      delete weightVector;
-      return FALSE;
     }
   }
   WerrorS("groebnerCone: unexpected parameters");
@@ -242,15 +319,46 @@ gfan::ZCone maximalGroebnerCone(const ideal &I, const ring &r)
 BOOLEAN maximalGroebnerCone(leftv res, leftv args)
 {
   leftv u = args;
+  if ((u != NULL) && (u->Typ() == POLY_CMD))
+  {
+    leftv v = u->next;
+    if (v == NULL)
+    {
+      try
+      {
+        poly g = (poly) u->Data();
+        ideal I = idInit(1);
+        I->m[0] = g;
+        res->rtyp = coneID;
+        res->data = (void*) new gfan::ZCone(maximalGroebnerCone(I,currRing));
+        I->m[0] = NULL;
+        id_Delete(&I,currRing);
+        return FALSE;
+      }
+      catch (const std::exception& ex)
+      {
+        Werror("ERROR: %s",ex.what());
+        return TRUE;
+      }
+    }
+  }
   if ((u != NULL) && (u->Typ() == IDEAL_CMD))
   {
     leftv v = u->next;
     if (v == NULL)
     {
-      ideal I = (ideal) u->Data();
-      res->rtyp = coneID;
-      res->data = (void*) new gfan::ZCone(maximalGroebnerCone(I,currRing));
-      return FALSE;
+      try
+      {
+        ideal I = (ideal) u->Data();
+        res->rtyp = coneID;
+        res->data = (void*) new gfan::ZCone(maximalGroebnerCone(I,currRing));
+        return FALSE;
+      }
+      catch (const std::exception& ex)
+      {
+        Werror("ERROR: %s",ex.what());
+        return TRUE;
+      }
     }
   }
   WerrorS("maximalGroebnerCone: unexpected parameters");
@@ -292,25 +400,33 @@ BOOLEAN initial(leftv res, leftv args)
     leftv v = u->next;
     if ((v !=NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
     {
-      ideal I = (ideal) u->Data();
-      gfan::ZVector* weightVector;
-      if (v->Typ() == INTVEC_CMD)
+      try
       {
-        intvec* w0 = (intvec*) v->Data();
-        bigintmat* w1 = iv2bim(w0,coeffs_BIGINT);
-        w1->inpTranspose();
-        weightVector = bigintmatToZVector(*w1);
-        delete w1;
+        ideal I = (ideal) u->Data();
+        gfan::ZVector* weightVector;
+        if (v->Typ() == INTVEC_CMD)
+        {
+          intvec* w0 = (intvec*) v->Data();
+          bigintmat* w1 = iv2bim(w0,coeffs_BIGINT);
+          w1->inpTranspose();
+          weightVector = bigintmatToZVector(*w1);
+          delete w1;
+        }
+        else
+        {
+          bigintmat* w1 = (bigintmat*) v->Data();
+          weightVector = bigintmatToZVector(*w1);
+        }
+        res->rtyp = IDEAL_CMD;
+        res->data = (void*) initial(I, currRing, *weightVector);
+        delete weightVector;
+        return FALSE;
       }
-      else
+      catch (const std::exception& ex)
       {
-        bigintmat* w1 = (bigintmat*) v->Data();
-        weightVector = bigintmatToZVector(*w1);
+        Werror("ERROR: %s",ex.what());
+        return TRUE;
       }
-      res->rtyp = IDEAL_CMD;
-      res->data = (void*) initial(I, currRing, *weightVector);
-      delete weightVector;
-      return FALSE;
     }
   }
   WerrorS("initial: unexpected parameters");
@@ -325,8 +441,11 @@ void tropical_setup(SModulFunctions* p)
   p->iiAddCproc("","homogeneitySpace",FALSE,homogeneitySpace);
   p->iiAddCproc("","lowerHomogeneitySpace",FALSE,lowerHomogeneitySpace);
   p->iiAddCproc("","initial",FALSE,initial);
-  // p->iiAddCproc("","tropicalNeighbours",FALSE,tropicalNeighbours);
+  p->iiAddCproc("","tropicalVariety",FALSE,tropicalVariety);
+  p->iiAddCproc("","groebnerFan",FALSE,groebnerFan);
+  p->iiAddCproc("","groebnerComplex",FALSE,groebnerComplex);
 #ifndef NDEBUG
+  // p->iiAddCproc("","tropicalNeighbours",FALSE,tropicalNeighbours);
   // p->iiAddCproc("","initial0",FALSE,initial0);
   p->iiAddCproc("","pReduceDebug",FALSE,pReduceDebug);
   // p->iiAddCproc("","ppreduceInitially0",FALSE,ppreduceInitially0);
@@ -361,7 +480,6 @@ void tropical_setup(SModulFunctions* p)
   p->iiAddCproc("","negativeTropicalStartingPoint",FALSE,negativeTropicalStartingPoint);
   p->iiAddCproc("","nonPositiveTropicalStartingPoint",FALSE,nonPositiveTropicalStartingPoint);
   p->iiAddCproc("","tropicalStartingCone",FALSE,tropicalStartingCone);
-  p->iiAddCproc("","tropicalVariety",FALSE,tropicalVariety);
 #endif //NDEBUG
   // p->iiAddCproc("","ppreduceInitially",FALSE,ppreduceInitially);
   // p->iiAddCproc("","ttreduceInitially",FALSE,ttreduceInitially);

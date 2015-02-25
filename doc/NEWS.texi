@@ -48,6 +48,7 @@ Changed libraries:
 @item grobcov.lib (grobcovK) (@nref{grobcov_lib}) with new routines
    AddCons (@nref{AddCons}), AddConsP (@nref{AddConsP}).
 @item normaliz.lib (for normaliz >=2.8) (@nref{normaliz_lib})
+@item renmaed groebnerFan to groebnerFanP in polymake.lib (@nref{polymake_lib})
 @end itemize
 
 @heading News for version 4-0-1

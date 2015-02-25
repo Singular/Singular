@@ -13,6 +13,7 @@
 
 BITSET bitsetSave1, bitsetSave2;
 
+
 /***
  * sets option(redSB)
  **/
@@ -21,6 +22,7 @@ static void setOptionRedSB()
   SI_SAVE_OPT(bitsetSave1,bitsetSave2);
   si_opt_1|=Sy_bit(OPT_REDSB);
 }
+
 
 /***
  * sets option(noredSB);
@@ -39,9 +41,60 @@ static gfan::ZFan* toZFan(std::set<gfan::ZCone> maxCones)
   return zf;
 }
 
+
 BOOLEAN tropicalVariety(leftv res, leftv args)
 {
   leftv u = args;
+  if ((u!=NULL) && (u->Typ()==POLY_CMD))
+  {
+    poly g = (poly) u->Data();
+    leftv v = u->next;
+    if (v==NULL)
+    {
+      try
+      {
+        ideal I = idInit(1);
+        I->m[0] = g;
+        tropicalStrategy currentStrategy(I,currRing);
+        std::set<gfan::ZCone> maxCones = tropicalVariety(g,currRing,&currentStrategy);
+        res->rtyp = fanID;
+        res->data = (char*) toZFan(maxCones);
+        I->m[0] = NULL;
+        id_Delete(&I,currRing);
+        return FALSE;
+      }
+      catch (const std::exception& ex)
+      {
+        Werror("ERROR: %s",ex.what());
+        return TRUE;
+      }
+    }
+    if ((v!=NULL) && (v->Typ()==NUMBER_CMD))
+    {
+      try
+      {
+        ideal I = idInit(1);
+        I->m[0] = g;
+        number p = (number) v->Data();
+        tropicalStrategy currentStrategy(I,p,currRing);
+        ideal startingIdeal = currentStrategy.getStartingIdeal();
+        ring startingRing = currentStrategy.getStartingRing();
+        poly gStart = startingIdeal->m[0];
+        std::set<gfan::ZCone> maxCones = tropicalVariety(gStart,startingRing,&currentStrategy);
+        res->rtyp = fanID;
+        res->data = (char*) toZFan(maxCones);
+        I->m[0] = NULL;
+        id_Delete(&I,currRing);
+        return FALSE;
+      }
+      catch (const std::exception& ex)
+      {
+        Werror("ERROR: %s",ex.what());
+        return TRUE;
+      }
+
+    }
+  }
   if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
   {
     ideal I = (ideal) u->Data();
@@ -52,70 +105,88 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
       poly g = I->m[0];
       if (v==NULL)
       {
-        tropicalStrategy currentStrategy(I,currRing);
-        std::set<gfan::ZCone> maxCones = tropicalVariety(g,currRing,&currentStrategy);
-        // gfan::ZFan* zf = toZFan(maxCones);
-        // delete zf;
-        // res->rtyp = NONE;
-        // res->data = NULL;
-        // while (1)
-        // {
-        //   omUpdateInfo();
-        //   Print("usedBytesAfter=%ld\n",om_Info.UsedBytes);
-        //   tropicalStrategy debugTest(I,currRing);
-        //   maxCones = tropicalVariety(g,currRing,debugTest);
-        //   gfan::ZFan* zf = toZFan(maxCones);
-        //   delete zf;
-        // }
-        res->rtyp = fanID;
-        res->data = (char*) toZFan(maxCones);
-        return FALSE;
+        try
+        {
+          tropicalStrategy currentStrategy(I,currRing);
+          std::set<gfan::ZCone> maxCones = tropicalVariety(g,currRing,&currentStrategy);
+          res->rtyp = fanID;
+          res->data = (char*) toZFan(maxCones);
+          return FALSE;
+        }
+        catch (const std::exception& ex)
+        {
+          Werror("ERROR: %s",ex.what());
+          return TRUE;
+        }
       }
       if ((v!=NULL) && (v->Typ()==NUMBER_CMD))
       {
-        number p = (number) v->Data();
-        tropicalStrategy currentStrategy(I,p,currRing);
-        ideal startingIdeal = currentStrategy.getStartingIdeal();
-        ring startingRing = currentStrategy.getStartingRing();
-        poly gStart = startingIdeal->m[0];
-        std::set<gfan::ZCone> maxCones = tropicalVariety(gStart,startingRing,&currentStrategy);
-        res->rtyp = fanID;
-        res->data = (char*) toZFan(maxCones);
-        return FALSE;
+        try
+        {
+          number p = (number) v->Data();
+          tropicalStrategy currentStrategy(I,p,currRing);
+          ideal startingIdeal = currentStrategy.getStartingIdeal();
+          ring startingRing = currentStrategy.getStartingRing();
+          poly gStart = startingIdeal->m[0];
+          std::set<gfan::ZCone> maxCones = tropicalVariety(gStart,startingRing,&currentStrategy);
+          res->rtyp = fanID;
+          res->data = (char*) toZFan(maxCones);
+          return FALSE;
+        }
+        catch (const std::exception& ex)
+        {
+          Werror("ERROR: %s",ex.what());
+          return TRUE;
+        }
       }
     }
 
     if (v==NULL)
     {
-      setOptionRedSB();
-      // ideal stdI;
-      // if (!hasFlag(u,FLAG_STD))
-      //   stdI = gfanlib_kStd_wrapper(I,currRing);
-      // else
-      //   stdI = id_Copy(I,currRing);
-      tropicalStrategy currentStrategy(I,currRing);
-      gfan::ZFan* tropI = tropicalVariety(currentStrategy);
-      res->rtyp = fanID;
-      res->data = (char*) tropI;
-      undoSetOptionRedSB();
-      // id_Delete(&stdI,currRing);
-      return FALSE;
+      try
+      {
+        setOptionRedSB();
+        ideal stdI;
+        if (!hasFlag(u,FLAG_STD))
+          stdI = gfanlib_kStd_wrapper(I,currRing);
+        else
+          stdI = id_Copy(I,currRing);
+        tropicalStrategy currentStrategy(stdI,currRing);
+        gfan::ZFan* tropI = tropicalVariety(currentStrategy);
+        res->rtyp = fanID;
+        res->data = (char*) tropI;
+        undoSetOptionRedSB();
+        id_Delete(&stdI,currRing);
+        return FALSE;
+      }
+      catch (const std::exception& ex)
+      {
+        Werror("ERROR: %s",ex.what());
+        return TRUE;
+      }
     }
     if ((v!=NULL) && (v->Typ()==NUMBER_CMD))
     {
-      number p = (number) v->Data();
-      // ideal stdI;
-      // if (!hasFlag(u,FLAG_STD))
-      //   stdI = gfanlib_kStd_wrapper(I,currRing);
-      // else
-      //   stdI = id_Copy(I,currRing);
-      // tropicalStrategy currentStrategy(stdI,p,currRing);
-      tropicalStrategy currentStrategy(I,p,currRing);
-      gfan::ZFan* tropI = tropicalVariety(currentStrategy);
-      res->rtyp = fanID;
-      res->data = (char*) tropI;
-      // id_Delete(&stdI,currRing);
-      return FALSE;
+      try
+      {
+        number p = (number) v->Data();
+        ideal stdI;
+        if (!hasFlag(u,FLAG_STD))
+          stdI = gfanlib_kStd_wrapper(I,currRing);
+        else
+          stdI = id_Copy(I,currRing);
+        tropicalStrategy currentStrategy(stdI,p,currRing);
+        gfan::ZFan* tropI = tropicalVariety(currentStrategy);
+        res->rtyp = fanID;
+        res->data = (char*) tropI;
+        id_Delete(&stdI,currRing);
+        return FALSE;
+      }
+      catch (const std::exception& ex)
+      {
+        Werror("ERROR: %s",ex.what());
+        return TRUE;
+      }
     }
     return FALSE;
   }

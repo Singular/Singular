@@ -6153,11 +6153,15 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
            "with zero divisors.");
     return TRUE;
   }
+  res->rtyp=IDEAL_CMD;
   if ((mk < 1) || (mk > m->rows()) || (mk > m->cols()))
   {
-    Werror("invalid size of minors: %d (matrix is (%d x %d))", mk,
-           m->rows(), m->cols());
-    return TRUE;
+    ideal I=idInit(1,1);
+    if (mk<1) I->m[0]=p_One(currRing);
+    //Werror("invalid size of minors: %d (matrix is (%d x %d))", mk,
+    //       m->rows(), m->cols());
+    res->data=(void*)I;
+    return FALSE;
   }
   if ((!noAlgorithm) && (strcmp(algorithm, "Cache") == 0)
       && (noCacheMinors || noCacheMonomials))
@@ -6178,7 +6182,6 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
     res->data = getMinorIdeal(m, mk, (noK ? 0 : k), algorithm,
                               (noIdeal ? 0 : IasSB), false);
   if (v_typ!=MATRIX_CMD) idDelete((ideal *)&m);
-  res->rtyp = IDEAL_CMD;
   return FALSE;
 }
 static BOOLEAN jjNEWSTRUCT3(leftv, leftv u, leftv v, leftv w)
