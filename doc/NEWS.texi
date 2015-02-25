@@ -49,6 +49,7 @@ Changed libraries:
    AddCons (@nref{AddCons}), AddConsP (@nref{AddConsP}).
 @item normaliz.lib (for normaliz >=2.8) (@nref{normaliz_lib})
 @item renmaed groebnerFan to groebnerFanP in polymake.lib (@nref{polymake_lib})
+@item renmaed fVector to fVectorP in polymake.lib (@nref{polymake_lib},@nref{polymake_so})
 @end itemize
 
 @heading News for version 4-0-1
