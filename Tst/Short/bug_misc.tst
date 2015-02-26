@@ -6,7 +6,7 @@ proc f;
 f; // was: NULL deref which printing internal structure
 
 // tr.588 ------------------------------------------------------------------------------------
-// the functions syz, intersect, quotient, modulo return a standard base instead of a generating set if returnSB is set.
+// the functions syz, intersect, quotient return a standard base instead of a generating set if returnSB is set.
 option(returnSB);
 ring r=32003,(x,y,z),dp;
 

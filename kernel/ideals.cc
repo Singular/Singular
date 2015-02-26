@@ -2064,7 +2064,7 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
       if (slength==0) p_Shift(&(temp->m[i]),1,currRing);
       p = temp->m[i];
       while (pNext(p)!=NULL) pIter(p);
-      pNext(p) = q;
+      pNext(p) = q; // will be sorted later correctly
     }
     else
       temp->m[i]=q;
@@ -2087,9 +2087,12 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
 
   ring orig_ring=currRing;
   ring syz_ring=rAssure_SyzComp(orig_ring, TRUE); rChangeCurrRing(syz_ring);
-  if (TEST_OPT_RETURN_SB)
-    rSetSyzComp(id_RankFreeModule(temp,orig_ring), syz_ring);
-  else
+  // we can use OPT_RETURN_SB only, if syz_ring==orig_ring,
+  // therefore we disable OPT_RETURN_SB for modulo:
+  // (see tr. #701)
+  //if (TEST_OPT_RETURN_SB)
+  //  rSetSyzComp(IDELEMS(h2)+length, syz_ring);
+  //else
     rSetSyzComp(length, syz_ring);
   ideal s_temp;
 

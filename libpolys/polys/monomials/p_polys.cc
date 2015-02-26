@@ -307,7 +307,7 @@ void p_Setm_General(poly p, const ring r)
         }
         case ro_syzcomp:
         {
-          int c=p_GetComp(p,r);
+          long c=p_GetComp(p,r);
           long sc = c;
           int* Components = (_componentsExternal ? _components :
                              o->data.syzcomp.Components);
