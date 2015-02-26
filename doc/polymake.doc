@@ -29,49 +29,49 @@ http://www.polymake.org
 and respective third-party software.
 @end table
 
-@strong{List of accessible functions:}
 All functions are to be called with a preceding ``Polymake::''.
-@menu
-* boundaryLatticePoints::
-* ehrhartPolynomialCoeff::
-* facetVertexLatticeDistances::
-* facetWidth::
-* facetWidths::
-* fVector(polymake)::
-* gorensteinIndex::
-* gorensteinVector::
-* hilbertBasis::
-* hStarVector::
-* hVector::
-* interiorLatticePoints::
-* isBounded::
-* isCanonical::
-* isCompressed::
-* isGorenstein::
-* isLatticeEmpty::
-* isNormal::
-* isReflexive::
-* isSmooth::
-* isTerminal::
-* isVeryAmple::
-* latticeCodegree::
-* latticeDegree::
-* latticePoints::
-* latticeVolume::
-* maximalFace::
-* maximalValue::
-* minimalFace::
-* minimalValue::
-* minkowskiSum::
-* nBoundaryLatticePoints::
-* nHilbertBasis::
-* nInteriorLatticePoints::
-* nLatticePoints::
-* normalFan(polymake)::
-* visual::
-* vertexAdjacencyGraph::
-* vertexEdgeGraph::
-@end menu
+@c ref
+See
+@ref{boundaryLatticePoints};
+@ref{ehrhartPolynomialCoeff};
+@ref{facetVertexLatticeDistances};
+@ref{facetWidth};
+@ref{facetWidths};
+@ref{fVectorP(polymake)};
+@ref{gorensteinIndex};
+@ref{gorensteinVector};
+@ref{hilbertBasis};
+@ref{hStarVector};
+@ref{hVector};
+@ref{interiorLatticePoints};
+@ref{isBounded};
+@ref{isCanonical};
+@ref{isCompressed};
+@ref{isGorenstein};
+@ref{isLatticeEmpty};
+@ref{isNormal};
+@ref{isReflexive};
+@ref{isSmooth};
+@ref{isTerminal};
+@ref{isVeryAmple};
+@ref{latticeCodegree};
+@ref{latticeDegree};
+@ref{latticePoints};
+@ref{latticeVolume};
+@ref{maximalFace};
+@ref{maximalValue};
+@ref{minimalFace};
+@ref{minimalValue};
+@ref{minkowskiSum};
+@ref{nBoundaryLatticePoints};
+@ref{nHilbertBasis};
+@ref{nInteriorLatticePoints};
+@ref{nLatticePoints};
+@ref{normalFan(polymake)};
+@ref{visual};
+@ref{vertexAdjacencyGraph};
+@ref{vertexEdgeGraph}.
+@c ref
 @c --------------------------------------------------------------------------------
 @node boundaryLatticePoints,ehrhartPolynomialCoeff,,polymake_so
 @subsubsection boundaryLatticePoints
@@ -165,7 +165,7 @@ maximal integral width going over all facet normals
 @end smallexample
 @end table
 @c --------------------------------------------------------------------------------
-@node facetWidths,fVector(polymake),facetWidth,polymake_so
+@node facetWidths,fVectorP(polymake),facetWidth,polymake_so
 @subsubsection facetWidths
 @cindex facetWidths
 @table @code
@@ -187,12 +187,13 @@ vector with the integral widths of p with respect to all facet normals
 @end smallexample
 @end table
 @c --------------------------------------------------------------------------------
-@node fVector(polymake),gorensteinIndex,facetWidths,polymake_so
-@subsubsection fVector
-@cindex fVector(polymake)
+@node fVectorP(polymake),gorensteinIndex,facetWidths,polymake_so
+@subsubsection fVectorP
+@cindex fVectorP(polymake)
+@cindex fVector
 @table @code
 @item @strong{Syntax:}
-@code{Polymake::fVector(} polytope p @code{)}
+@code{Polymake::fVectorP(} polytope p @code{)}
 @item @strong{Type:}
 intvec
 @item @strong{Purpose:}
@@ -207,12 +208,12 @@ and n is the dimension of the ambient space of p.
 @c example no_comp
   intmat M[6][4]=1,1,1,2, 1,-1,-1,-2, 1,1,0,0, 1,-1,0,0, 1,0,1,0, 1,0,-1,0;
   polytope p = polytopeViaPoints(M);
-  Polymake::fVector(p);
+  Polymake::fVectorP(p);
 @c example
 @end smallexample
 @end table
 @c --------------------------------------------------------------------------------
-@node gorensteinIndex,gorensteinVector,fVector(polymake),polymake_so
+@node gorensteinIndex,gorensteinVector,fVectorP(polymake),polymake_so
 @subsubsection gorensteinIndex
 @cindex gorensteinIndex
 @table @code

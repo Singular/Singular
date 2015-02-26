@@ -22,8 +22,8 @@
 #else
 #include <setoper.h>
 #include <cdd.h>
-#endif
-#endif
+#endif //HAVE_CDDLIB_SETOPER_H
+#endif //HAVE_CDD_SETOPER_H
 
 namespace gfan{
 

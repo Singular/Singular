@@ -3669,6 +3669,29 @@ EXAMPLE: example normalP; shows an example
      noFac=1;
    }
 
+   // check for 0-ideal
+   if (size(id)==0)
+   {
+     list result=list(ideal(1)),list(intvec(0),int(0));
+     // delta invariant,total delta invariant
+     if (wring)
+     {
+       result[3]=result[2]; // pair(delta invariants , total delta invariant)
+       result[2]=result[1];
+       def BR = basering;
+       list rl = ringlist(basering);
+       def rng = ring(rl);
+       setring rng;
+       ideal norid = 0;
+       ideal normap = maxideal(1);
+       export(norid);
+       export(normap);
+       setring BR;
+       result[1] = list(rng);
+     }
+     return (result);
+   }
+
    kill #;
    list #;
 //--------------------------- start computation ---------------------------
@@ -3855,6 +3878,7 @@ static proc normalityTest(list mstdid)
    int ii;
 
    ideal J = mstdid[1];         //J is the SB of I
+   if (J[1]==1) { return(ideal(0));}
    ideal I = mstdid[2];
    int h = n-dim(J);            //codimension of V(I), I is a prime ideal
 
@@ -4143,10 +4167,11 @@ static proc computeRing(ideal J, ideal I, list #)
     setring R1;
     ideal norid = imap(R, I);
     ideal normap = imap(R, maxid);
-    export norid;
-    export normap;
+
 
     if(noRed == 1){
+      export norid;
+      export normap;
       setring R;
       return(R1);
     }
@@ -6673,7 +6698,7 @@ EXAMPLE: example norTest; shows an example
     LR[3] = newg3;
 //LR;"";
     def newR = ring(LR);
-
+    kill LR; //otherwise it keeps defined and will cause a warning next time norTest is run.
     setring newR;
     ideal norid = fetch(R,norid);
     ideal normap = fetch(R,normap);

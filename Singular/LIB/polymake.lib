@@ -41,7 +41,7 @@ PROCEDURES USING POLYMAKE:
   newtonPolytopeP()    computes the Newton polytope of a polynomial
   newtonPolytopeLP()  computes the lattice points of the Newton polytope
   normalFanL()         computes the normal fan of a polytope
-  groebnerFan()       computes the Groebner fan of a polynomial
+  groebnerFanP()       computes the Groebner fan of a polynomial
 
 PROCEDURES USING TOPCOM:
   triangulations()    computes all triangulations of a marked polytope
@@ -435,8 +435,8 @@ example
 
 /////////////////////////////////////////////////////////////////////////////
 
-proc groebnerFan (poly f)
-"USAGE:  groebnerFan(f);  f poly
+proc groebnerFanP (poly f)
+"USAGE:  groebnerFanP(f);  f poly
 RETURN:  list, the ith entry of L[1] contains information about the ith cone
                in the Groebner fan dual to the ith vertex in the Newton
                polytope of the f
@@ -459,7 +459,7 @@ NOTE: - if you have already computed the Newton polytope of f then you might wan
 @*    - the procedure calls for its computation polymake by Ewgenij Gawrilow,
         TU Berlin and Michael Joswig, so it only works if polymake is installed;
         see http://www.math.tu-berlin.de/polymake/
-EXAMPLE: example groebnerFan;   shows an example"
+EXAMPLE: example groebnerFanP;   shows an example"
 {
   int i,j;
   // compute the list of exponent vectors of the polynomial, which are
@@ -496,7 +496,7 @@ example
    matrix M[4][1]=1,x,y,z;
    poly f=y3+x2+xy+2xz+yz+z2+1;
    // the Newton polytope of f is
-   list gf=groebnerFan(f);
+   list gf=groebnerFanP(f);
    // the exponent vectors of f are ordered as follows
    gf[4];
    // the first cone of the groebner fan has the inequalities

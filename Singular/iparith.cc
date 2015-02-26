@@ -2714,7 +2714,7 @@ static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
     atSet(res,omStrDup("isHomog"),w_u,INTVEC_CMD);
   }
   delete w_v;
-  if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
+  //if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
 }
 static BOOLEAN jjMOD_BI(leftv res, leftv u, leftv v)
@@ -6153,11 +6153,15 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
            "with zero divisors.");
     return TRUE;
   }
+  res->rtyp=IDEAL_CMD;
   if ((mk < 1) || (mk > m->rows()) || (mk > m->cols()))
   {
-    Werror("invalid size of minors: %d (matrix is (%d x %d))", mk,
-           m->rows(), m->cols());
-    return TRUE;
+    ideal I=idInit(1,1);
+    if (mk<1) I->m[0]=p_One(currRing);
+    //Werror("invalid size of minors: %d (matrix is (%d x %d))", mk,
+    //       m->rows(), m->cols());
+    res->data=(void*)I;
+    return FALSE;
   }
   if ((!noAlgorithm) && (strcmp(algorithm, "Cache") == 0)
       && (noCacheMinors || noCacheMonomials))
@@ -6178,7 +6182,6 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
     res->data = getMinorIdeal(m, mk, (noK ? 0 : k), algorithm,
                               (noIdeal ? 0 : IasSB), false);
   if (v_typ!=MATRIX_CMD) idDelete((ideal *)&m);
-  res->rtyp = IDEAL_CMD;
   return FALSE;
 }
 static BOOLEAN jjNEWSTRUCT3(leftv, leftv u, leftv v, leftv w)
@@ -7979,9 +7982,9 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
       while (dA2[i].cmd==op)
       {
         //Print("test %s %s\n",Tok2Cmdname(dA2[i].arg1),Tok2Cmdname(dA2[i].arg2));
-        if ((ai=iiTestConvert(at,dA2[i].arg1))!=0)
+        if ((ai=iiTestConvert(at,dA2[i].arg1,dConvertTypes))!=0)
         {
-          if ((bi=iiTestConvert(bt,dA2[i].arg2))!=0)
+          if ((bi=iiTestConvert(bt,dA2[i].arg2,dConvertTypes))!=0)
           {
             res->rtyp=dA2[i].res;
             if (currRing!=NULL)

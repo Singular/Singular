@@ -1,0 +1,56 @@
+LIB "tst.lib";
+tst_init();
+LIB "arr.lib";
+example arrSet;
+example type2arr;
+example mat2arr;
+example mat2carr;
+example arrPrintMatrix;
+example varMat;
+example varNum;
+example arrSwapVar;
+example arrLastVar;
+example arrCentral;
+example arrCentered;
+example arrCenter;
+example arrCoordChange;
+example arrCoordNormalize;
+example arrCone;
+example arrDecone;
+example arrLocalize;
+example arrRestrict;
+example arrIsEssential;
+example arrEssentialize;
+example arrBoolean;
+example arrBraid;
+example arrTypeB;
+example arrTypeD;
+example arrEdelmanReiner;
+example arrOrlikSolomon;
+example arrPoincare;
+example arrChambers;
+example arrBoundedChambers;
+example arrDer;
+example arrIsFree;
+example arrExponents;
+example arr2multarr;
+example multarr2arr;
+example multarrRestrict;
+example multarrMultRestrict;
+
+example arrAdd;
+example arrCentralize;
+example arrRandom;
+example arrRandomCentral;
+example arrFlats;
+example arrLattice;
+example moebius;
+example arrCharPoly;
+example printMoebius;
+
+ring r  = 0,(x,y,z,u,v,w),Dp;
+arr C = (2x,5x-y,-3x+2,4-2y+2z);
+arr A = arrBraid(6); A;
+arr B = arrBraid(5); B;
+
+tst_status(1);$

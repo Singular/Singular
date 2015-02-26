@@ -33,6 +33,7 @@ typedef enum {FE_OPT_UNDEF}  feOptIndex;
 
 
 void feOptHelp(const char* name);
+void feOptDumpVersionTuple(void);
 
 #ifdef __cplusplus
 

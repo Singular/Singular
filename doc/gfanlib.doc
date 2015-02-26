@@ -1,0 +1,297 @@
+@cindex gfanlib_so
+
+@table @asis
+@item @strong{Library:}
+gfanlib.so
+@item @strong{Purpose:}
+Access to polymake on singular interpreter level.
+@item @strong{Authors:}
+Anders Nedergaard Jensen, email: jensen@@imf.au.dk@*
+Yue Ren, email: ren@@mathematik.uni-kl.de@*
+Frank Seelisch, email: seelisch@@hs-esslingen.de
+
+@item @strong{Note:}
+This binary library is an interface to the C++ library gfanlib by Anders Jensen, which is distributed together with Singular.
+
+It contains a basic implementation of convex geometry, featuring polyhedral cones, polyhedral fans and polytopes as well as elemental functions on them.
+For a full list of functions available on the objects, please check the respective documentation on the type.
+
+Moreover, it contains features for computing the Groebner fan, the Groebner complex and the tropical varieties.
+These functions are listed below.
+@end table
+
+@c ref
+See
+@ref{initial};
+@ref{homogeneitySpace};
+@ref{groebnerCone};
+@ref{maximalGroebnerCone};
+@ref{groebnerFan};
+@ref{lowerHomogeneitySpace};
+@ref{groebnerComplex};
+@ref{tropicalVariety}.
+@c ref
+@c --------------------------------------------------------------------------------
+@node initial,homogeneitySpace,,gfanlib_so
+@subsubsection initial
+@cindex initial
+@table @code
+@item @strong{Syntax:}
+@code{initial(} poly f, intvec v @code{)}
+@*@code{initial(} poly f, bigintmat v @code{)}
+@*@code{initial(} ideal I, intvec v @code{)}
+@*@code{initial(} ideal I, bigintmat v @code{)}
+@item @strong{Assume:}
+v has as many entries as there are variables in the basering.
+@item @strong{Type:}
+poly or ideal
+@item @strong{Purpose:}
+computes the initial form of the polynomial f or the initial forms of the generators of I with respect to weight vector v
+@item @strong{Note:}
+for the initial forms of the generators to generate the initial ideal, I must be a reduced standard basis and v has to lie in the maximal Groebner cone of the current ordering.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "gfanlib.so";
+ring r = 0,(x,y),dp;
+poly g = x+y+1;
+initial(g,intvec(1,1));
+initial(g,intvec(-1,0));
+initial(g,intvec(0,-1));
+
+ideal I = x2-y3,x3-y2-x;
+I = std(I);
+initial(I,intvec(1,1));
+@c example
+@end smallexample
+@end table
+@c --------------------------------------------------------------------------------
+@node homogeneitySpace,groebnerCone,initial,gfanlib_so
+@subsubsection homogeneitySpace
+@cindex homogeneitySpace
+@table @code
+@item @strong{Syntax:}
+@code{homogeneitySpace(} poly g @code{)}
+@*@code{homogeneitySpace(} ideal I @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+the linear space of all weight vectors with respect to whom a polynomial g or an ideal I is weighted homogeneous.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "gfanlib.so";
+ring r = 0,(x,y,z),dp;
+poly g = x+y;
+cone homogSpace = homogeneitySpace(g);
+rays(homogSpace);
+generatorsOfLinealitySpace(homogSpace);
+
+ideal I = x+y, y+z;
+homogSpace = homogeneitySpace(I);
+rays(homogSpace);
+generatorsOfLinealitySpace(homogSpace);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------------------------------------------------
+@node groebnerCone,maximalGroebnerCone,homogeneitySpace,gfanlib_so
+@subsubsection groebnerCone
+@cindex groebnerCone
+@table @code
+@item @strong{Syntax:}
+@code{groebnerCone(} poly g, intvec v @code{)}
+@*@code{groebnerCone(} poly g, bigintmat v @code{)}
+@*@code{groebnerCone(} ideal I, intvec v @code{)}
+@*@code{groebnerCone(} ideal I, bigintmat v @code{)}
+@item @strong{Assume:}
+I reduced standard basis, v contained in the maximal Groebner cone of the current ordering
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+the euklidean closure of all weight vectors with respect to whom the initial form of g or the initial ideal of I coincides with the initial form or the initial ideal with respect to v.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "gfanlib.so";
+ring r = 0,(x,y),dp;
+poly g = x+y+1;
+cone C = groebnerCone(g,intvec(1,1));
+rays(C);
+generatorsOfLinealitySpace(C);
+
+ideal I = x2-y3,x3-y2-x;
+I = std(I);
+C = groebnerCone(I,intvec(1,1));
+rays(C);
+generatorsOfLinealitySpace(C);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------------------------------------------------
+@node maximalGroebnerCone,groebnerFan,groebnerCone,gfanlib_so
+@subsubsection maximalGroebnerCone
+@cindex maximalGroebnerCone
+@table @code
+@item @strong{Syntax:}
+@code{maximalGroebnerCone(} poly g @code{)}
+@*@code{maximalGroebnerCone(} ideal I @code{)}
+@item @strong{Assume:}
+I reduced standard basis
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+the euklidean closure of all weight vectors with respect to whom the initial form of g equals its leading term or the initial ideal of I equals its leading ideal.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "gfanlib.so";
+ring r = 0,(x,y),dp;
+poly g = x+y+1;
+cone C = maximalGroebnerCone(g);
+rays(C);
+generatorsOfLinealitySpace(C);
+
+ideal I = x2-y3,x3-y2-x;
+I = std(I);
+C = maximalGroebnerCone(I);
+rays(C);
+generatorsOfLinealitySpace(C);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------------------------------------------------
+@node groebnerFan,lowerHomogeneitySpace,maximalGroebnerCone,gfanlib_so
+@subsubsection groebnerFan
+@cindex groebnerFan
+@table @code
+@item @strong{Syntax:}
+@code{groebnerFan(} poly g @code{)}
+@*@code{groebnerFan(} ideal I @code{)}
+@item @strong{Assume:}
+I homogeneous, ground field is the field of rational numbers
+@item @strong{Type:}
+fan
+@item @strong{Purpose:}
+the Groebner fan of g or the Groebner fan I
+@item @strong{Note:}
+set printlevel > 0 for status updates on the computation
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "gfanlib.so";
+ring r = 0,(x,y),dp;
+poly g = x+y+1;
+fan f = groebnerFan(g);
+f;
+
+ring s = 0,(x,y,z),dp;
+ideal I = x2z-y3,x3-y2z-xz2;
+fan f = groebnerFan(I);
+f;
+@c example
+@end smallexample
+@end table
+@c --------------------------------------------------------------------------------
+@node lowerHomogeneitySpace,groebnerComplex,groebnerFan,gfanlib_so
+@subsubsection lowerHomogeneitySpace
+@cindex lowerHomogeneitySpace
+@table @code
+@item @strong{Syntax:}
+@code{lowerHomogeneitySpace(} poly g @code{)}
+@*@code{lowerHomogeneitySpace(} ideal I @code{)}
+@item @strong{Type:}
+cone
+@item @strong{Purpose:}
+the cone of all weight vectors with non-positive first entry with respect to whom g or I is homogeneous.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "gfanlib.so";
+ring r = integer,(t,x,y,z),dp;
+poly g = tx+t2y;
+cone homogSpace = lowerHomogeneitySpace(g);
+rays(homogSpace);
+generatorsOfLinealitySpace(homogSpace);
+
+ideal I = tx+y, t2y+z;
+homogSpace = lowerHomogeneitySpace(I);
+rays(homogSpace);
+generatorsOfLinealitySpace(homogSpace);
+@c example
+@end smallexample
+@end table
+@c --------------------------------------------------------------------------------
+@node groebnerComplex,tropicalVariety,lowerHomogeneitySpace,gfanlib_so
+@subsubsection groebnerComplex
+@cindex groebnerComplex
+@table @code
+@item @strong{Syntax:}
+@code{groebnerComplex(} poly g, number p @code{)}
+@*@code{groebnerComplex(} ideal I, number p @code{)}
+@item @strong{Assume:}
+I homogeneous, ground field are the rational numbers, p prime number
+@item @strong{Type:}
+fan
+@item @strong{Purpose:}
+the Groebner complex of g or the Groebner complex I with respect to the p-adic valuation
+@item @strong{Note:}
+set printlevel > 0 for status updates on the computation
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "gfanlib.so";
+ring r = 0,(x,y),dp;
+poly g = 2x+y+4;
+fan f = groebnerComplex(g,number(2));
+f; // single vertex at (0,1)
+
+ring s = 0,x(1..4),wp(1,11,3,19);
+ideal I =
+2*x(1)^2+3*x(1)*x(2)+24*x(3)*x(4),
+8*x(1)^3+x(2)*x(3)*x(4)+18*x(3)^2*x(4);
+fan f = groebnerComplex(I,number(3));
+rays(f); // fan too large to display
+@c example
+@end smallexample
+@end table
+@c --------------------------------------------------------------------------------
+@node tropicalVariety,,groebnerComplex,gfanlib_so
+@subsubsection tropicalVariety
+@cindex tropicalVariety
+@table @code
+@item @strong{Syntax:}
+@code{tropicalVariety(} poly g @code{)}
+@*@code{tropicalVariety(} poly g, number p @code{)}
+@*@code{tropicalVariety(} ideal I @code{)}
+@*@code{tropicalVariety(} ideal I, number p @code{)}
+@item @strong{Assume:}
+I homogeneous, ground field are the rational numbers, p prime
+@item @strong{Type:}
+fan
+@item @strong{Purpose:}
+the tropical variety of g or the tropical variety of I, either without or with p-adic valuation
+@item @strong{Note:}
+set printlevel > 0 for status updates on the computation
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "gfanlib.so";
+ring r = 0,(x,y),dp;
+poly g1 = x+y+1;
+fan f1 = tropicalVariety(g1);
+f1; // tropical line with vertex at (0,0)
+
+poly g2 = 2x+y+4;
+fan f2 = tropicalVariety(g2,number(2));
+f2; // tropical line with vertex at (0,1)
+
+ring s = 0,x(1..4),wp(1,11,3,19);
+ideal I =
+2*x(1)^2+3*x(1)*x(2)+24*x(3)*x(4),
+8*x(1)^3+x(2)*x(3)*x(4)+18*x(3)^2*x(4);
+fan f = tropicalVariety(I,number(3));
+f;
+@c example
+@end smallexample
+@end table

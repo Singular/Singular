@@ -126,15 +126,15 @@ static gfan::IntMatrix permutationIntMatrix(const bigintmat* iv)
   int cc = iv->cols();
   int rr = iv->rows();
   bigintmat* ivCopy = new bigintmat(rr, cc, coeffs_BIGINT);
+  number temp1 = n_Init(1,coeffs_BIGINT);
   for (int r = 1; r <= rr; r++)
     for (int c = 1; c <= cc; c++)
     {
-      number temp1 = n_Init(1,coeffs_BIGINT);
       number temp2 = n_Sub(IMATELEM(*iv, r, c),temp1,coeffs_BIGINT);
       ivCopy->set(r,c,temp2);
-      n_Delete(&temp1,coeffs_BIGINT);
       n_Delete(&temp2,coeffs_BIGINT);
     }
+  n_Delete(&temp1,coeffs_BIGINT);
   gfan::ZMatrix* zm = bigintmatToZMatrix(ivCopy);
   gfan::IntMatrix im = gfan::IntMatrix(gfan::ZToIntMatrix(*zm));
   delete zm;
@@ -462,39 +462,39 @@ BOOLEAN containsInCollection(leftv res, leftv args)
   return TRUE;
 }
 
-BOOLEAN coneContaining(leftv res, leftv args)
-{
-  leftv u=args;
-  if ((u != NULL) && (u->Typ() == fanID))
-  {
-    leftv v=u->next;
-    if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
-    {
-      gfan::ZFan* zf = (gfan::ZFan*)u->Data();
-      gfan::ZVector* point;
-      if (v->Typ() == INTVEC_CMD)
-      {
-        intvec* w0 = (intvec*) v->Data();
-        bigintmat* w1 = iv2bim(w0,coeffs_BIGINT);
-        w1->inpTranspose();
-        point = bigintmatToZVector(*w1);
-        delete w1;
-      }
-      else
-      {
-        bigintmat* w1 = (bigintmat*) v->Data();
-        point = bigintmatToZVector(*w1);
-      }
-      lists L = (lists)omAllocBin(slists_bin);
-      res->rtyp = LIST_CMD;
-      res->data = (void*) L;
-      delete point;
-      return FALSE;
-    }
-  }
-  WerrorS("coneContaining: unexpected parameters");
-  return TRUE;
-}
+// BOOLEAN coneContaining(leftv res, leftv args)
+// {
+//   leftv u=args;
+//   if ((u != NULL) && (u->Typ() == fanID))
+//   {
+//     leftv v=u->next;
+//     if ((v != NULL) && ((v->Typ() == BIGINTMAT_CMD) || (v->Typ() == INTVEC_CMD)))
+//     {
+//       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+//       gfan::ZVector* point;
+//       if (v->Typ() == INTVEC_CMD)
+//       {
+//         intvec* w0 = (intvec*) v->Data();
+//         bigintmat* w1 = iv2bim(w0,coeffs_BIGINT);
+//         w1->inpTranspose();
+//         point = bigintmatToZVector(*w1);
+//         delete w1;
+//       }
+//       else
+//       {
+//         bigintmat* w1 = (bigintmat*) v->Data();
+//         point = bigintmatToZVector(*w1);
+//       }
+//       lists L = (lists)omAllocBin(slists_bin);
+//       res->rtyp = LIST_CMD;
+//       res->data = (void*) L;
+//       delete point;
+//       return FALSE;
+//     }
+//   }
+//   WerrorS("coneContaining: unexpected parameters");
+//   return TRUE;
+// }
 
 BOOLEAN removeCone(leftv res, leftv args)
 {

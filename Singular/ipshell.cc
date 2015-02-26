@@ -1246,7 +1246,7 @@ BOOLEAN iiBranchTo(leftv r, leftv args)
   if (h->Typ()!=PROC_CMD)
   {
     omFree(t);
-    Werror("last arg is not a proc",i);
+    Werror("last arg (%d) is not a proc",i);
     return TRUE;
   }
   b=iiCheckTypes(iiCurrArgs,t,0);

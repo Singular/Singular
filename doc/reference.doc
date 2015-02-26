@@ -4254,6 +4254,9 @@ and cachedM the total number of cached monomials (counted over all cached
 polynomials). If, for algorithm = @code{C/cache} cachedP and cachedM are
 not provided by the user, the values 200 and 100000, respectively, will
 be used as defaults.
+@item @strong{Note:}
+If @code{mSize} is larger than the given matrix, @code{minor} returns 0,
+if @code{mSize} is smaller than 1, @code{minor} returns 1.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -5062,8 +5065,8 @@ See @ref{option(warn)}.
 @c ---------
 @item @code{returnSB}
 @cindex returnSB, option
-the functions @code{syz}, @code{intersect} (2 arguments), @code{quotient},
-@code{modulo} return a standard base instead of a generating set if
+the functions @code{syz}, @code{intersect} (2 arguments), @code{quotient}
+return a standard base instead of a generating set if
 @code{returnSB} is set. This option should not be used for @code{lift}.
 @c ---------
 @item @code{fastHC}

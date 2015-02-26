@@ -6,7 +6,7 @@ tst_init();
 
 ring rng =(7),(a,x,y,z,w),dp;
 
-ideal PS = 
+ideal PS =
 -2*a*y*z^2-2*y*z^2+2*a*z-3*z-1,
 -2*x*w^2-3*a*x+x,
 -a*y^3+y^3+2*a-2,

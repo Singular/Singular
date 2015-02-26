@@ -973,7 +973,6 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
     return FALSE;
   }
 
-  int i=0;
   if (lt==DEF_CMD)
   {
     if (TEST_V_ALLWARN
@@ -1027,10 +1026,13 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
 #endif
     return (bb==NULL) || bb->blackbox_Assign(l,r);
   }
-  while (((dAssign[i].res!=lt)
-      || (dAssign[i].arg!=rt))
-    && (dAssign[i].res!=0)) i++;
-  if (dAssign[i].res!=0)
+  int start=0;
+  while ((dAssign[start].res!=lt)
+      && (dAssign[start].res!=0)) start++;
+  int i=start;
+  while ((dAssign[i].res==lt)
+      && (dAssign[i].arg!=rt)) i++;
+  if (dAssign[i].res==lt)
   {
     if (traceit&TRACE_ASSIGN) Print("assign %s=%s\n",Tok2Cmdname(lt),Tok2Cmdname(rt));
     BOOLEAN b;
@@ -1043,14 +1045,14 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
     return b;
   }
   // implicite type conversion ----------------------------------------------
-  if (dAssign[i].res==0)
+  if (dAssign[i].res!=lt)
   {
     int ri;
     leftv rn = (leftv)omAlloc0Bin(sleftv_bin);
     BOOLEAN failed=FALSE;
-    i=0;
-    while ((dAssign[i].res!=lt)
-      && (dAssign[i].res!=0)) i++;
+    i=start;
+    //while ((dAssign[i].res!=lt)
+    //  && (dAssign[i].res!=0)) i++;
     while (dAssign[i].res==lt)
     {
       if ((ri=iiTestConvert(rt,dAssign[i].arg))!=0)

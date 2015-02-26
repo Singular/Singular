@@ -2,8 +2,8 @@
 #include <groebnerCone.h>
 #include <tropicalCurves.h>
 
-std::vector<bool> checkNecessaryFlips(const groebnerCones &tropicalVariety, const groebnerCones &workingList,
-                                      const gfan::ZVector &interiorPoint, const gfan::ZMatrix &normalVectors)
+std::vector<bool> checkNecessaryTropicalFlips(const groebnerCones &tropicalVariety, const groebnerCones &workingList,
+                                              const gfan::ZVector &interiorPoint, const gfan::ZMatrix &normalVectors)
 {
   int k = normalVectors.getHeight();
   std::vector<bool> needToFlip(k,true);
@@ -71,7 +71,7 @@ groebnerCones tropicalTraversalMinimizingFlips(const groebnerCone startingCone)
                                                          sigma.getTropicalStrategy());
         id_Delete(&inI,sigma.getPolynomialRing());
 
-        std::vector<bool> needToFlip = checkNecessaryFlips(tropicalVariety,workingList,interiorPoint,normalVectors);
+        std::vector<bool> needToFlip = checkNecessaryTropicalFlips(tropicalVariety,workingList,interiorPoint,normalVectors);
         for (int j=0; j<normalVectors.getHeight(); j++)
         {
           if (needToFlip[j])
@@ -87,31 +87,83 @@ groebnerCones tropicalTraversalMinimizingFlips(const groebnerCone startingCone)
     sigma.deletePolynomialData();
     workingList.erase(sigma);
     tropicalVariety.insert(sigma);
-    // std::cout << "tropicalVariety.size():" << tropicalVariety.size() << std::endl;
-    // std::cout << "workingList.size():" << workingList.size() << std::endl;
+    if (printlevel > 0)
+      Print("cones finished: %lu   cones in working list: %lu\n",
+      (unsigned long)tropicalVariety.size(), (unsigned long)workingList.size());
   }
   return tropicalVariety;
 }
 
-groebnerCones tropicalTraversal(const groebnerCone startingCone)
+
+std::vector<bool> checkNecessaryGroebnerFlips(const groebnerCones &groebnerFan, const groebnerCones &workingList,
+                                              const gfan::ZMatrix &interiorPoints)
 {
-  groebnerCones tropicalVariety;
+  int k = interiorPoints.getHeight();
+  std::vector<bool> needToFlip(k,true);
+
+  for (groebnerCones::iterator sigma = groebnerFan.begin(); sigma!=groebnerFan.end(); sigma++)
+  {
+    for (int i=0; i<k; i++)
+    {
+      if (needToFlip[i] && sigma->contains(interiorPoints[i]))
+        needToFlip[i] = false;
+    }
+  }
+
+  for (groebnerCones::iterator sigma = workingList.begin(); sigma!=workingList.end(); sigma++)
+  {
+    for (int i=0; i<k; i++)
+    {
+      if (needToFlip[i] && sigma->contains(interiorPoints[i]))
+        needToFlip[i] = false;
+    }
+  }
+
+  return needToFlip;
+}
+
+
+groebnerCones groebnerTraversal(const groebnerCone startingCone)
+{
+  const tropicalStrategy* currentStrategy = startingCone.getTropicalStrategy();
+
+  groebnerCones groebnerFan;
   groebnerCones workingList;
   workingList.insert(startingCone);
-  // std::cout << "starting traversal" << std::endl;
+  std::set<gfan::ZVector> finishedInteriorPoints;
+  bool onlyLowerHalfSpace = !currentStrategy->isValuationTrivial();
+
   while(!workingList.empty())
   {
-    const groebnerCone sigma=*(workingList.begin());
-    const groebnerCones neighbours = sigma.tropicalNeighbours();
-    for (groebnerCones::iterator tau = neighbours.begin(); tau!=neighbours.end(); tau++)
+    /**
+     * Pick a maximal Groebner cone from the working list
+     * and compute interior points on its facets as well as outer facet normals
+     */
+    groebnerCone sigma=*(workingList.begin());
+    workingList.erase(workingList.begin());
+
+    std::pair<gfan::ZMatrix,gfan::ZMatrix> interiorPointsAndOuterFacetNormals = interiorPointsAndNormalsOfFacets(sigma.getPolyhedralCone(), finishedInteriorPoints, onlyLowerHalfSpace);
+    gfan::ZMatrix interiorPoints = interiorPointsAndOuterFacetNormals.first;
+    gfan::ZMatrix outerFacetNormals = interiorPointsAndOuterFacetNormals.second;
+    std::vector<bool> needToFlip = checkNecessaryGroebnerFlips(groebnerFan,workingList, interiorPoints);
+
+    for (int i=0; i<interiorPoints.getHeight(); i++)
     {
-      if (tropicalVariety.count(*tau)==0)
-        workingList.insert(*tau);
+      gfan::ZVector interiorPoint = interiorPoints[i];
+
+      if (needToFlip[i]==true)
+      {
+        groebnerCone neighbour = sigma.flipCone(interiorPoint,outerFacetNormals[i]);
+        workingList.insert(neighbour);
+      }
+      finishedInteriorPoints.insert(interiorPoints[i]);
     }
-    tropicalVariety.insert(sigma);
-    workingList.erase(sigma);
-    // std::cout << "tropicalVariety.size():" << tropicalVariety.size() << std::endl;
-    // std::cout << "workingList.size():" << workingList.size() << std::endl;
+
+    sigma.deletePolynomialData();
+    groebnerFan.insert(sigma);
+    if (printlevel > 0)
+      Print("cones finished: %lu   cones in working list: %lu\n",
+      (unsigned long)groebnerFan.size(), (unsigned long)workingList.size());
   }
-  return tropicalVariety;
+  return groebnerFan;
 }
