@@ -83,7 +83,7 @@ static proc draw ( intmat D, int d )
 proc grview(N)
 "USAGE:  grview(M), graded object M
 RETURN:  nothing
-PURPOSE: print the degree/grading data about the GRADED matrix/module/ideal/mapping object M             
+PURPOSE: print the degree/grading data about the GRADED matrix/module/ideal/mapping object M
 ASSUME:  M must be graded
 EXAMPLE: example grview; shows an example
 "
@@ -100,10 +100,10 @@ EXAMPLE: example grview; shows an example
 
   // input should be graded:
   ASSUME(1, grtest(N) );
-  
-  intvec G = grdeg(N); 
+
+  intvec G = grdeg(N);
   matrix M = module(N);
-  
+
   int nc = ncols(M); int nr = nrows(M);
   int r,c;
   int d = 1; // number of extra cols/rows for extra info around the central degree(N) block in D
@@ -220,19 +220,19 @@ ASSUME:  M must be a graded object (matrix/module/ideal/mapping)
 NOTE:    if M has zero cols it shoud have attrib(M,'degHomog') set.
 EXAMPLE: example grdeg; shows an example
 "
-{           
+{
   ASSUME(1, grtest(M) );
 
   if ( typeof(attrib(M, "degHomog")) == "intvec" )
-  {    
+  {
     intvec t = attrib(M, "degHomog"); // graded degrees
     ASSUME(0, ncols(M) == size(t) );
 
     return (t);
   }
-  
+
   ASSUME(0, ncols(M) == size(M) );
-  
+
   def w = attrib(M, "isHomog"); // grading weights?
 
   if( size(M) == 0 ){ return (w); } // TODO: Q@Wolfram!???
@@ -249,7 +249,7 @@ EXAMPLE: example grdeg; shows an example
 
   gr = gr + d; // finally we compute their graded degrees
 
-  return (gr); 
+  return (gr);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -269,7 +269,7 @@ example
 
   grview(D);
   grdeg(D);
-  
+
   def D10 = grshift(D, 10);
 
   grview(D10);
@@ -304,7 +304,7 @@ Reorder gens of M: compute graded degrees and the permutation to sort them
 
 static proc gtranspose(M)
 "??????"
-{   
+{
   ASSUME(1, grtest(M) );
   return (  grobj(transpose(M), -grdeg(M), -attrib(M, "isHomog"))  );
 }
@@ -392,13 +392,13 @@ example
   "Input degrees: "; grview(I);
 
   def RR = mres(I, 0); list L = RR; // sres, lres: no grading! // nres, mres - graded (with attrib(, "isHomog"))
-  
+
   " = Non-minimal betti numbers: "; print(betti(L, 0), "betti");
 
   "Graded (original) structure of 'mres(Input,0)': "; grview(L);
 
   "Graded transpose of the previous resolution "; list LLL = grtranspose( L ); grview( LLL );
-  
+
   "Its non-minimal betti numbers: "; print(betti(LLL, 0), "betti");
 
 }
@@ -484,7 +484,7 @@ example
   def RR = mres(I, 0); // sres, lres: no grading! // nres, mres - graded (with attrib(, "isHomog"))
   list L = RR;
 
-  " = Non-minimal betti numbers: ";  print(betti(L, 0), "betti");  
+  " = Non-minimal betti numbers: ";  print(betti(L, 0), "betti");
   "Graded reordered structure of 'mres(Input,0)': ";  grview(grorder(L));
 }
 
@@ -557,7 +557,7 @@ example
 
 // Q@Woflram?
 proc grzero()
-"USAGE:  grzero() 
+"USAGE:  grzero()
 RETURN:  graded object representing S(0)^1
 PURPOSE: compute presentation of S(0)^1
 EXAMPLE: example grzero; shows an example
@@ -573,7 +573,7 @@ example
   def M = grpower( grshift( grzero(), 10), 5 );
 
   print(M);
-  
+
   grview(M);
 }
 
@@ -623,7 +623,7 @@ example
 
 
 proc grsum(A,B)
-"USAGE:  grsum(A, B), graded objects A and B 
+"USAGE:  grsum(A, B), graded objects A and B
 RETURN:  graded direct sum of input objects
 PURPOSE: compute the graded direct sum of A and B
 EXAMPLE: example grsum; shows an example
@@ -691,13 +691,13 @@ EXAMPLE: example grshift; shows an example
 "
 {
   ASSUME(1, grtest(M) );
-  
+
   intvec a = attrib(M, "isHomog");
   a = a - intvec(d:size(a));
-  
+
   intvec t = attrib(M, "degHomog");
   t = t - intvec(d:size(t));
-  
+
   return (grobj(M, a, t));
 }
 example
@@ -706,7 +706,7 @@ example
   ring r=32003,(x,y,z),dp;
 
   module A = grobj( module([x+y, x, 0, 0], [0, x+y, y, 0]), intvec(0,0,0,1) );
-  
+
   grview(A);
 
   module S = grshift( A,  6);
@@ -716,7 +716,7 @@ example
 
 
 static proc grisequal (def A, def B)
-"USAGE:  grisequal(A, B), graded objects A and B 
+"USAGE:  grisequal(A, B), graded objects A and B
 RETURN:  1 if A == B as graded objects, 0 otherwise
 PURPOSE: test the equality of two graded object
 NOTE: A and B should be literarly the same at the moment. TODO?
@@ -736,7 +736,7 @@ EXAMPLE: example grisequal; shows an example
 
   intvec da = grdeg(A);
   intvec db = grdeg(B);
-  
+
   return ( (da == db) && (wa == wb) &&
            (size(module(matrix(A) - matrix(B))) == 0)    ); // TODO: ???
 }
@@ -746,14 +746,14 @@ example
 }
 
 proc grtwist(int a, int d)
-"USAGE:  grtwist(a,d), int a, d 
+"USAGE:  grtwist(a,d), int a, d
 RETURN:  graded object representing S(d)^a
 PURPOSE: compute presentation of S(d)^a
 EXAMPLE: example grtwist; shows an example
 "
 {
   ASSUME(0, a > 0);
-  
+
   module Z; Z[a] = [0];
   intvec w = -intvec(d:a);
   Z = grobj(Z, w, w); // will set the rank as well
@@ -767,11 +767,11 @@ example
 
   grview(grpower( grshift(grzero(), 10), 5 ) );
 
-  grview( grtwist (5, 10) );  
+  grview( grtwist (5, 10) );
 }
 
 proc grobj(def A, intvec w, list #)
-"USAGE:  grobj(M, w[, d]), matrix/ideal/module M, intvec w, d 
+"USAGE:  grobj(M, w[, d]), matrix/ideal/module M, intvec w, d
 RETURN:  graded object with matrix presentation M, row weighting w [and total graded degrees d of columns]
 PURPOSE: create a valid graded object with a given matrix presentation, weighting [and total graded degrees (in case of zero columns)]
 EXAMPLE: example grobj; shows an example
@@ -779,21 +779,21 @@ EXAMPLE: example grobj; shows an example
 {
   module M = module(A);
   ASSUME(0, size(w) >= nrows(M) );
-  
+
   attrib(M, "rank", size(w));
   attrib(M, "isHomog", w);
 
   if( size(#) > 0 )
   {
     ASSUME(0, typeof(#[1]) == "intvec" );
-    ASSUME(0, size(#[1]) == ncols(M) ); 
+    ASSUME(0, size(#[1]) == ncols(M) );
     attrib(M, "degHomog", #[1]);
   }
   else
   {
-    ASSUME(0, /* no zero cols please! */ size(M) == ncols(M) ); 
+    ASSUME(0, /* no zero cols please! */ size(M) == ncols(M) );
     attrib(M, "degHomog", grdeg(M));
-  }    
+  }
 
   ASSUME(0, grtest(M) );
   return (M);
@@ -809,23 +809,23 @@ example
   module F = grobj( module([x,y,0]), intvec(1,1,5) );
   grview(F);
 
-  int d = 666; // zero can have any degree... 
+  int d = 666; // zero can have any degree...
   module Z = grobj( module([x,0], [0,0,0], [0, y]), intvec(1,2,3), intvec(2, d, 3) );
   grview(Z);
 
   print(Z);
   attrib(Z);
   attrib(Z, "isHomog"); // module weights
-  attrib(Z, "degHomog"); // total degrees  
+  attrib(Z, "degHomog"); // total degrees
 
 }
 
 proc grtest(def N)
-"USAGE:  grtest(M), anyting M 
+"USAGE:  grtest(M), anyting M
 RETURN:  1 if M is a valid graded object, 0 otherwise
 PURPOSE: validate a graded object
 NOTE: M should be an ideal or module or matrix, with weighting attribute
-   'isHomog' and optionally total graded degrees attribute 'degHomog'. 
+   'isHomog' and optionally total graded degrees attribute 'degHomog'.
    Attributes should be compatible with the presentation matrix.
 EXAMPLE: example grtest; shows an example
 "
@@ -852,13 +852,13 @@ EXAMPLE: example grtest; shows an example
 
     // checking T for non-zero N[i]
     int i = size(T);
-    
+
     for (; i > 0; i-- )
     {
       v = L[i];
       if( v != 0 )
       {
-        if( (deg(v) + gr[ leadexp(v)[k] ]) != T[i] ) { return (0); };  // wrong T[i]        
+        if( (deg(v) + gr[ leadexp(v)[k] ]) != T[i] ) { return (0); };  // wrong T[i]
       }
     }
 
@@ -867,11 +867,11 @@ EXAMPLE: example grtest; shows an example
   {
     if( ncols(N) != size(N) ) { return (0); };
   }
-  
+
 //  if( !homog(N) ) { return (0); };  // N should be homogenous
 
   return (1);
-} 
+}
 example
 { "EXAMPLE:"; echo = 2;
 
@@ -882,9 +882,9 @@ example
 // grobj( module([x+y, x, 0, 0], [0, x+y, y, 0]), intvec(0,0) ); // not enough row weights
 // grobj( module([x,0], [0,0,0], [0, y]), intvec(1,2,3) ); // zero column needs (otherwise optional) total degrees
 // grobj( module([x,0], [0,0,0], [0, y]), intvec(1,2,3), intvec(1, 1, 1) ); // incompatible total degrees (on non-zero columns)
-  
+
 }
-   
+
 
 static proc align( def A, int d)
 "analog of align kernel command for older Singular versions
@@ -903,8 +903,8 @@ LIB "random.lib"; // for sparsepoly
 
 proc grrndmat(intvec w, intvec v, list #)
 "USAGE:  grrndmat(src,dst[,p,b]), intvec src, dst[, int p, b]
-RETURN:  matrix of polynomials 
-PURPOSE: generate random matrix compatible with src and dst gradings 
+RETURN:  matrix of polynomials
+PURPOSE: generate random matrix compatible with src and dst gradings
 NOTE:    optional arguments p, b are for 'sparsepoly' (by default: 75%, 30000).
 TODO:    this is experimental at the moment!
 EXAMPLE: example grrndmat; shows an example
@@ -912,7 +912,7 @@ EXAMPLE: example grrndmat; shows an example
 {
   // defaults for sparsepoly
   int p = 75;
-  int b = 30000; 
+  int b = 30000;
 
   if ( size(#) > 0 )
   {
@@ -925,7 +925,7 @@ EXAMPLE: example grrndmat; shows an example
       b = #[2];
     }
   }
-  
+
   int n = size(v); // destination: rows!
   int m = size(w); // source: cols
 
@@ -957,7 +957,7 @@ example
 
 }
 
-// 
+//
 proc grrndmap(def S, def D, list #)
 "USAGE:  grrndmap(S,D[,p,b]), graded modules S, D[, int p, b]
 RETURN:  graded map
@@ -979,7 +979,7 @@ example
   module D = grobj( module([x,y,0]), intvec(1,1,5) );
   grdeg(D);
 
-  int d = 4; // zero can have any degree... 
+  int d = 4; // zero can have any degree...
   module S = grobj( module([x,0], [0,0,0], [0, y]), intvec(0,0,3), intvec(1, d, 1) );
   grdeg(S);
 
