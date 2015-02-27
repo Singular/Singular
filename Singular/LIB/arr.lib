@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version arr.lib 1.0 Apr_2014 "; // $Id$
+version="version arr.lib 4.0.2.0 Feb 2015 "; // $Id$
 category="Miscellaneous";
 
 /*
@@ -303,7 +303,6 @@ proc arrSet(arr A, int k, poly p)
 "USAGE:     arrSet(A, k, p);    arr A, int k, poly p;
 RETURN:     [arr] Arrangement where the k-th hyperplane is replaced by p.
 NOTE:       p must be linear
-SEE ALSO:   arrGet, arrSet
 KEYWORDS:   arrangement; hyperplane; assign; set
 EXAMPLE:    example arrSet; shows an example"
 
@@ -551,7 +550,6 @@ proc type2arr(list #)
 "USAGE:     type2arr(#); # def
 RETURN:     [arr] Arrangement defined by the input
 NOTE:       The procedure tries to cast the input to [arr] using arrAdd
-SEE ALSO:   arrAdd, arr2poly, arr2mat, arr2list, arr2ideal, type2arr
 KEYWORDS:   typecasting; arrangement
 EXAMPLE:    example tye2arr; shows an example"
 
@@ -677,7 +675,7 @@ RETURN:     [arr] interprets the rows of the matrix as the defining polynomial e
             terms, i.e. if M is an m*(n+1) matrix we have
             H_i = Ker( M_i1*x_1 +...+ M_in*x_n + M_i(n+1) ) for i=1...m and
             A = {H_1,...,H_m} the resulting arrangement.
-SEE ALSO:   arr2mat, mat2arr, mat2carr
+SEE ALSO:   mat2carr
 KEYWORDS:   typecasting; matrix; coefficient
 EXAMPLE:    example mat2arr;"
 
@@ -713,7 +711,7 @@ RETURN:     [arr] interprets the rows of the matrix as the defining polynomial e
             of the arrangement. I.e. if M is an m*n matrix we have
             H_i = Ker( M_i1*x_1 +...+ M_in*x_n) for i=1...m and
             A = {H_1,...,H_m} the resulting arrangement.
-SEE ALSO:   arr2mat, mat2arr, mat2carr
+SEE ALSO:   mat2arr
 KEYWORDS:   typecasting; matrix; coefficient; central
 EXAMPLE:    example mat2carr;"
 
@@ -899,7 +897,6 @@ proc arrPrintMatrix(arr A)
 "USAGE:     arPrintMatrix(arr A)
 RETURN:     [] prints arr in matrix form
 NOTE:       differs print(matrix(arr A)) since variables included
-SEE ALSO:   arrPrint, arrPrintMatrix
 KEYWORDS:   print; matrix; coefficient
 EXAMPLE:    example arrPrintMatrix;"
 
@@ -932,7 +929,7 @@ arrPrintMatrix(A);
 proc varMat(intvec v)
 "USAGE:     varMat(v); v intvec
 RETURN:     [matrix] M containing the corresponding ring_variables
-SEE ALSO:   varMat, varNum, arrVariables ,arrNvars, arrSwapVar, arrLastVar
+SEE ALSO:   varMat, varNum, arrSwapVar, arrLastVar
 KEYWORDS:   variables; ring_variable
 EXAMPLE:    example varMat; shows an example"
 
@@ -960,7 +957,7 @@ proc varNum(def u)
 RETURN:     [int] number of given ring variable, or 0 if it does not appear
 NOTE:       This procedure has the same functionality as varNum from the dmod.lib
             package, but also accepts polys as input.
-SEE ALSO:   varMat, varNum, arrVariables ,arrNvars, arrSwapVar, arrLastVar
+SEE ALSO:   varMat, varNum, arrSwapVar, arrLastVar
 KEYWORDS:   variables; ring_variable; number
 EXAMPLE:    example varNum; shows an example"
 
@@ -1044,7 +1041,7 @@ proc arrSwapVar(arr A, def i, def j)
 RETURN:     [arr] A where variables i and j are swapped.
 NOTE:       if i and/or j are integers the algorithm considers the variables
             variables(A)[i] and/or variables(A)[j]
-SEE ALSO:   varMat, varNum, arrVariables ,arrNvars, arrSwapVar, arrLastVar
+SEE ALSO:   varMat, varNum, arrSwapVar, arrLastVar
 KEYWORDS:   swap; variables; ring_variable
 EXAMPLE:    example arrSwapVar; shows an example"
 
@@ -1080,7 +1077,7 @@ proc arrLastVar(arr A)
 RETURN:     [int] number of the last variable A uses
 NOTE:       useful if you want a list containing all variables x_1 ... x_k used in A,
             but you do not want to skip any like variables(A) does.
-SEE ALSO:   varMat, varNum, arrVariables ,arrNvars, arrSwapVar, arrLastVar
+SEE ALSO:   varMat, varNum, arrSwapVar, arrLastVar
 KEYWORDS:   variables; ring_variable
 EXAMPLE:    example arrLastVar; shows an example"
 
@@ -2250,7 +2247,6 @@ static proc multarrAdd
 RETURN:     [multarr] multiarrangement constructed by the input parameters.
 NOTE:       algorithm splits up the list # and uses appropiate procedure
             to handle the input
-SEE ALSO:   multarrAdd
 KEYWORDS:   multiarrangement; equal; constructor; operator
 EXAMPLE:    example multarrAdd; shows an example"
 
@@ -3092,7 +3088,6 @@ proc printMoebius(arrposet P)
 "USAGE:     printMoebius(A); arr A
 RETURN:     [] displays the moebius values of all the flats in the poset
 REMARKS:    Mainly used for debugging.
-SEE ALSO:   printParents, printMoebius, printFlags
 EXAMPLE:    example printMoebius;"
 
 {
