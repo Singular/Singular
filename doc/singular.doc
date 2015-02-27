@@ -965,6 +965,7 @@ Comments should be send to the author of the library directly.
 
 @menu
 * algemodstd_lib:: Groebner bases of ideals in rings over algebraic number fields
+* arr_lib:: algorithms for arrangements of hyperplanes
 * brillnoether_lib:: Riemann-Roch spaces of divisors on curves
 * classifyceq_lib:: simple hypersurface singularities in charateristic p > 0
 * classifyci_lib:: isolated complete intersection singularities in char 0
@@ -988,12 +989,17 @@ Comments should be send to the author of the library directly.
 @end menu
 @c * schubert_lib:: Intersection Theory
 @c ----------------------------------------------------------
-@node algemodstd_lib, brillnoether_lib, , Experimental libraries
+@node algemodstd_lib, arr_lib, , Experimental libraries
 @subsection algemodstd_lib
 
 @c lib algemodstd.lib
 @c ----------------------------------------------------------
-@node brillnoether_lib,classifyceq_lib,algemodstd_lib, Experimental libraries
+@node arr_lib, brillnoether_lib, algemodstd_lib, Experimental libraries
+@subsection arr_lib
+
+@c lib arr.lib
+@c ----------------------------------------------------------
+@node brillnoether_lib,classifyceq_lib,arr_lib, Experimental libraries
 @subsection brillnoether_lib
 
 @c lib brillnoether.lib
@@ -1041,15 +1047,6 @@ Issues:
 @c ----------------------------------------------------------
 @node gradedModules_lib,hess_lib, gitfan_lib, Experimental libraries
 @subsection gradedModules_lib
-
-Issues:
-@itemize
-@item @code{assumeLevel} must not occur in libraries
-@item missing documentation:grzero,grobj,grshift,grtwist,grpower,grdeg,grorder,
-     grtranspose
-@item incomplete documentation:grview
-@item missing in header:TestGRRes,grtest,grisequal
-@end itemize
 
 @c lib gradedModules.lib
 @c ----------------------------------------------------------
@@ -1148,7 +1145,7 @@ Todos/Issues:
 * polymake_so:: A polymake interface for Singular
 @end menu
 
-@c ---------------------------------------------------------
+ ---------------------------------------------------------
 @node gfanlib_so,polymake_so, ,convex geometry
 @subsection gfanlib_so
 

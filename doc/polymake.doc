@@ -87,7 +87,8 @@ intmat
 intmat, whose rows are the lattice points on the relative boundary of p.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+LIB"polymake.lib";
 intmat M[3][3]=1,2,-1, 1,-1,2, 1,-1,-1;
 polytope p = polytopeViaPoints(M);
 Polymake::boundaryLatticePoints(p);
@@ -113,6 +114,7 @@ coefficients of the Ehrhart polynomial of p.
 @item @strong{Example:}
 @smallexample
 @c example no_comp
+  LIB"polymake.lib";
   intmat M[6][4]=1,1,1,2, 1,-1,-1,-2, 1,1,0,0, 1,-1,0,0, 1,0,1,0, 1,0,-1,0;
   polytope p = polytopeViaPoints(M);
   Polymake::ehrhartPolynomialCoeff(p);
@@ -134,7 +136,8 @@ intmat
 intmat, which encodes the lattice distances between vertices (columns) and facets (rows) of p.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[4][3]=1,2,0, 1,0,1, 1,2,1, 1,0,0;
   polytope p = polytopeViaPoints(M);
   intmat D = Polymake::facetVertexLatticeDistances(p);
@@ -157,7 +160,8 @@ int
 maximal integral width going over all facet normals
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[4][3]=1,2,0, 1,0,1, 1,2,1, 1,0,0;
   polytope p = polytopeViaPoints(M);
   Polymake::facetWidth(p);
@@ -179,7 +183,8 @@ intvec
 vector with the integral widths of p with respect to all facet normals
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[4][3]=1,2,0, 1,0,1, 1,2,1, 1,0,0;
   polytope p = polytopeViaPoints(M);
   Polymake::facetWidths(p);
@@ -205,7 +210,8 @@ However it can be regarded as the f-vector of p in (R')^n, where R' denotes the 
 and n is the dimension of the ambient space of p.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[6][4]=1,1,1,2, 1,-1,-1,-2, 1,1,0,0, 1,-1,0,0, 1,0,1,0, 1,0,-1,0;
   polytope p = polytopeViaPoints(M);
   Polymake::fVectorP(p);
@@ -230,7 +236,8 @@ you can check whether p is Gorenstein by Polymake::isGorenstein(p);
 the translation v can be computed via Polymake::gorensteinVector(p).
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example error
+  LIB"polymake.lib";
   intmat M[4][3]=1,1,0, 1,0,1, 1,0,0, 1,1,1;
   polytope p = polytopeViaPoints(M);
   Polymake::gorensteinIndex(p);
@@ -258,7 +265,8 @@ you can check whether p is Gorenstein by Polymake::isGorenstein(p);
 the dilatation n can be computed via Polymake::gorensteinIndex(p).
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example error
+  LIB"polymake.lib";
   intmat M[4][3]=1,1,0, 1,0,1, 1,0,0, 1,1,1;
   polytope p = polytopeViaPoints(M);
   Polymake::gorensteinVector(p);
@@ -284,6 +292,7 @@ the number of elements in the hilbertBasis can be computed through Polymake::nHi
 @item @strong{Example:}
 @smallexample
 @c example no_comp
+  LIB"polymake.lib";
   intmat M[3][3]=1,2,-1, 1,-1,2, 1,-1,-1;
   cone c = coneViaPoints(M);
   Polymake::hilbertBasis(c);
@@ -304,6 +313,7 @@ the h*-vector of p.
 @item @strong{Example:}
 @smallexample
 @c example no_comp
+  LIB"polymake.lib";
   intmat M[6][4]=1,1,1,2, 1,-1,-1,-2, 1,1,0,0, 1,-1,0,0, 1,0,1,0, 1,0,-1,0;
   polytope p = polytopeViaPoints(M);
   Polymake::hStarVector(p);
@@ -323,7 +333,8 @@ intvec
 the h-vector of p.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[6][4]=1,1,1,2, 1,-1,-1,-2, 1,1,0,0, 1,-1,0,0, 1,0,1,0, 1,0,-1,0;
   polytope p = polytopeViaPoints(M);
   Polymake::hVector(p);
@@ -343,7 +354,8 @@ intmat
 intmat, whose rows are the lattice points in the relative interior of p.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[3][3]=1,2,-1, 1,-1,2, 1,-1,-1;
   polytope p = polytopeViaPoints(M);
   Polymake::interiorLatticePoints(p);
@@ -366,7 +378,8 @@ int
 1 if p is bounded, 0 otherwise.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[4][4]=1,1,0,0, 1,0,1,0, 1,0,0,1, 1,-1,-1,-1;
   polytope p = polytopeViaPoints(M);
   Polymake::isBounded(p);
@@ -390,6 +403,7 @@ int
 @item @strong{Example:}
 @smallexample
 @c example no_comp
+  LIB"polymake.lib";
   intmat M[6][4]=1,1,1,2, 1,-1,-1,-2, 1,1,0,0, 1,-1,0,0, 1,0,1,0, 1,0,-1,0;
   polytope p = polytopeViaPoints(M);
   Polymake::isCanonical(p);
@@ -413,7 +427,8 @@ int
 1 if p has maximal facet width 1, 0 otherwise.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[4][3]=1,2,0, 1,0,1, 1,2,1, 1,0,0;
   polytope p = polytopeViaPoints(M);
   Polymake::isCompressed(p);
@@ -436,7 +451,8 @@ int
 1 if p is Gorenstein, i.e. reflexive after dilitation and translation, 0 otherwise.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[4][3]=1,1,0, 1,0,1, 1,0,0, 1,1,1;
   polytope p = polytopeViaPoints(M);
   Polymake::isGorenstein(p);
@@ -460,6 +476,7 @@ int
 @item @strong{Example:}
 @smallexample
 @c example no_comp
+  LIB"polymake.lib";
   intmat M[4][3]=1,1,0, 1,1,1, 1,0,1, 1,0,0;
   polytope p = polytopeViaPoints(M);
   Polymake::isLatticeEmpty(p);
@@ -482,7 +499,8 @@ int
 1 if the projective toric variety defined by p is projectively normal, 0 otherwise.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[6][4]=1,1,1,2, 1,-1,-1,-2, 1,1,0,0, 1,-1,0,0, 1,0,1,0, 1,0,-1,0;
   polytope p = polytopeViaPoints(M);
   Polymake::isNormal(p);
@@ -502,7 +520,8 @@ int
 1 if p is reflexive, 0 otherwise.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[4][4]=1,1,0,0, 1,0,1,0, 1,0,0,1, 1,-1,-1,-1;
   polytope p = polytopeViaPoints(M);
   Polymake::isReflexive(p);
@@ -527,7 +546,8 @@ int
 1 if c, f or p is smooth, 0 otherwise.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[2][2]=1,0, 0,1;
   cone c1 = coneViaPoints(M);
   Polymake::isSmooth(c1);
@@ -566,6 +586,7 @@ int
 @item @strong{Example:}
 @smallexample
 @c example no_comp
+  LIB"polymake.lib";
   intmat M[6][4]=1,1,1,2, 1,-1,-1,-2, 1,1,0,0, 1,-1,0,0, 1,0,1,0, 1,0,-1,0;
   polytope p = polytopeViaPoints(M);
   Polymake::isTerminal(p);
@@ -590,7 +611,8 @@ int
 1 if p is very ample, 0 otherwise.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[3][3]=1,1,0, 1,0,1, 1,-1,-1;
   polytope p = polytopeViaPoints(M);
   Polymake::isVeryAmple(p);
@@ -613,7 +635,8 @@ int
 getDimension(p)+1-latticeDegree(p), which is the smallest number k such that k*p has an interior lattice point.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[4][3]=1,1,0, 1,1,1, 1,0,1, 1,0,0;
   polytope p = polytopeViaPoints(M);
   Polymake::latticeCodegree(p);
@@ -636,7 +659,8 @@ int
 getDimension(p)+1-latticeCodegree(p), which is the degree of the Ehrhart polynomial of p.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[4][3]=1,1,0, 1,1,1, 1,0,1, 1,0,0;
   polytope p = polytopeViaPoints(M);
   Polymake::latticeDegree(p);
@@ -661,7 +685,8 @@ intmat
 intmat, whose rows are the lattice points in p.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[4][3]=1,1,0, 1,1,1, 1,0,1, 1,0,0;
   polytope p = polytopeViaPoints(M);
   Polymake::latticeDegree(p);
@@ -686,7 +711,8 @@ int
 the lattice volume of p.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[4][3]=1,1,0, 1,1,1, 1,0,1, 1,0,0;
   polytope p = polytopeViaPoints(M);
   Polymake::latticeVolume(p);
@@ -716,7 +742,8 @@ intmat, whose rows are the vertices of the face of p on which the linear form v 
 The first coordinate of v corresponds to a shift of the maximal value since p is considered as a polytope in the plane (first coordinate) = 1. Hence the maximal face is independent of the first coordinate of v.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[3][3]=1,1,0, 1,0,1, 1,-1,-1;
   intvec v = 0,1,1;
   polytope p = polytopeViaPoints(M);
@@ -743,7 +770,8 @@ the maximal value of the linear form v on p.
 The first coordinate of v corresponds to a shift of the maximal value since p is considered as a polytope in the plane (first coordinate) = 1.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[3][3]=1,1,0, 1,0,1, 1,-1,-1;
   intvec v = 0,1,1;
   polytope p = polytopeViaPoints(M);
@@ -770,7 +798,8 @@ intmat, whose rows are the vertices of the face of p on which the linear form v 
 The first coordinate of v corresponds to a shift of the minimal value since p is considered as a polytope in the plane (first coordinate) = 1. Hence the minimal face is independent of the first coordinate of v.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[3][3]=1,1,0, 1,0,1, 1,-1,-1;
   intvec v = 0,1,1;
   polytope p = polytopeViaPoints(M);
@@ -797,7 +826,8 @@ the minimal value of the linear form v on p.
 The first coordinate of v corresponds to a shift of the minimal value since p is considered as a polytope in the plane (first coordinate) = 1.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[3][3]=1,1,0, 1,0,1, 1,-1,-1;
   intvec v = 0,1,1;
   polytope p = polytopeViaPoints(M);
@@ -827,7 +857,8 @@ the Minkowski sum of the two input arguments.
 The Minkowski sum of two cones is just the cone generated by their union.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[3][4]=1,1,0,0, 1,0,1,0, 1,0,0,0;
   intmat N[3][4]=1,0,0,1, 1,-1,-1,-1, 1,0,0,0;
   polytope p = polytopeViaPoints(M);
@@ -852,7 +883,8 @@ int
 the number of lattice points on the relative boundary of p.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[3][3]=1,2,-1, 1,-1,2, 1,-1,-1;
   polytope p = polytopeViaPoints(M);
   Polymake::nBoundaryLatticePoints(p);
@@ -875,7 +907,8 @@ int
 the number of elements in the Hilbert basis of the semigroup of lattice points in c.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[3][4]=1,1,0,0, 1,0,1,0, 1,0,0,0;
   intmat N[3][4]=1,0,0,1, 1,-1,-1,-1, 1,0,0,0;
   polytope p = polytopeViaPoints(M);
@@ -901,6 +934,7 @@ the number of lattice points in the relative interior of p.
 @item @strong{Example:}
 @smallexample
 @c example no_comp
+  LIB"polymake.lib";
   intmat M[3][3]=1,2,-1, 1,-1,2, 1,-1,-1;
   polytope p = polytopeViaPoints(M);
   Polymake::nInteriorLatticePoints(p);
@@ -926,6 +960,7 @@ the number of lattice points in p.
 @item @strong{Example:}
 @smallexample
 @c example no_comp
+  LIB"polymake.lib";
   intmat M[3][3]=1,2,-1, 1,-1,2, 1,-1,-1;
   polytope p = polytopeViaPoints(M);
   Polymake::nLatticePoints(p);
@@ -948,7 +983,8 @@ fan
 the normal fan of p.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[6][4] = 1,1,0,0, 1,0,1,0, 1,0,-1,0, 1,0,0,1, 1,0,0,-1, 1,-1,0,0;
   polytope p = polytopeViaPoints(M);
   fan f = normalFan(p);
@@ -973,7 +1009,8 @@ the intvec in position i contains all vertices j which are connected to vertex i
 via an edge of p.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[6][4] = 1,1,0,0, 1,0,1,0, 1,0,-1,0, 1,0,0,1, 1,0,0,-1, 1,-1,0,0;
   polytope p = polytopeViaPoints(M);
   list L = Polymake::vertexAdjacencyGraph(p);
@@ -997,7 +1034,8 @@ the second entry is a list of intvecs representing the edge graph of the vertice
 each intvec represents an edge of p connecting vertex i with vertex j.
 @item @strong{Example:}
 @smallexample
-@c example no_comp
+@c example
+  LIB"polymake.lib";
   intmat M[6][4] = 1,1,0,0, 1,0,1,0, 1,0,-1,0, 1,0,0,1, 1,0,0,-1, 1,-1,0,0;
   polytope p = polytopeViaPoints(M);
   list L = Polymake::vertexEdgeGraph(p);
@@ -1020,6 +1058,7 @@ the normal fan of p.
 @item @strong{Example:}
 @smallexample
 @c example no_comp
+  LIB"polymake.lib";
   intmat M[6][4] = 1,1,0,0, 1,0,1,0, 1,0,-1,0, 1,0,0,1, 1,0,0,-1, 1,-1,0,0;
   polytope p = polytopeViaPoints(M);
   Polymake::visual(p);

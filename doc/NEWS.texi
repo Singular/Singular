@@ -33,6 +33,7 @@ Change in ring handling:
 New libraries:
 @itemize
 @item algemodstd.lib (@nref{algemodstd_lib})
+@item arr.lib (@nref{arr_lib})
 @item brillnoether.lib (@nref{brillnoether_lib})
 @item hess.lib (@nref{hess_lib})
 @item gradedModules.lib (@nref{gradedModules_lib})
@@ -48,8 +49,8 @@ Changed libraries:
 @item grobcov.lib (grobcovK) (@nref{grobcov_lib}) with new routines
    AddCons (@nref{AddCons}), AddConsP (@nref{AddConsP}).
 @item normaliz.lib (for normaliz >=2.8) (@nref{normaliz_lib})
-@item renmaed groebnerFan to groebnerFanP in polymake.lib (@nref{polymake_lib})
-@item renmaed fVector to fVectorP in polymake.lib (@nref{polymake_lib},@nref{polymake_so})
+@item renamed groebnerFan to groebnerFanP in polymake.lib (@nref{polymake_lib})
+@item renamed fVector to fVectorP in polymake.lib (@nref{polymake_lib},@nref{polymake_so})
 @end itemize
 
 @heading News for version 4-0-1
