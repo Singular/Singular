@@ -5155,18 +5155,24 @@ computes a reduced standard basis in any standard basis computation.
 reduction of the tails of polynomials during standard basis
 computations. This option is ring dependent. By default, it is set for
 rings with global degree orderings and not set for all other rings.
+This option changes the reduction strategy and may decrease/increase time
+and memory consumption - it does not ensure tail reduction on the result - use redSB for that.
 @c ---------
 @item @code{redThrough}
 @cindex redThrough, option
 for inhomogenous input, polynomial reductions during standard basis
 computations are never postponed, but always finished through. This option
-is ring   dependent. By default, it is set for rings with global degree
+is ring dependent. By default, it is set for rings with global degree
 orderings and not set for all other rings.
+This option changes the reduction strategy and may decrease/increase time
+and memory consumption.
 @c ---------
 @item @code{sugarCrit}
 @cindex sugarCrit, option
 uses criteria similar to the homogeneous case to keep more pairs which would be
 excluded by other criteria but which may be useful for downstream computations.
+This option changes the strategy for criteria and selection and may decrease/increase time
+and memory consumption.
 @c ---------
 @item @code{weightM}
 @cindex weightM, option
