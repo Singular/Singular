@@ -23,6 +23,8 @@
 New commands:
 @itemize
 @item align (@nref{align})
+@item branchTo (@nref{procs with different argument types})
+@item @code{->} (@nref{proc expression})
 @end itemize
 
 Change in ring handling:
