@@ -3378,7 +3378,6 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
 
   poly @gs,@gh,@p;
   string @va;
-  def quotring;
   list quprimary,htprimary,collectprimary,lsau,lnew,allindep,restindep;
   ideal @h;
   int jdim=dim(@j);
@@ -3511,7 +3510,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
     //map phi:K[var(1),...,var(nva)] --->K(var(nnpr+1),..,var(nva))[..rest..]
     //------------------------------------------------------------------------
 
-    quotring=prepareQuotientring(nvars(basering)-indep[@m][3],"lp");
+    def quotring=prepareQuotientring(nvars(basering)-indep[@m][3],"lp");
 
     //---------------------------------------------------------------------
     //we pass to the quotientring   K(var(nnp+1),..,var(nva))[..the rest..]
@@ -3624,7 +3623,6 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
     @h=imap(quotring,@h);
 
     kill quotring;
-    def quotring;
 
     @n2=size(quprimary);
     @n3=@n2;
@@ -3824,7 +3822,6 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
         //and the map phi:K[var(1),...,var(nva)] ---->
         //--->K(var(nnpr+1),..,var(nva))[..the rest..]
         //------------------------------------------------------------------
-        if (defined(quotring)==voice) {kill quotring;}
         def quotring=prepareQuotientring(nvars(basering)-restindep[@m][3],"lp");
 
         //------------------------------------------------------------------
@@ -4243,7 +4240,10 @@ static proc algeRad(ideal i)
    execute(gnir);
    ideal K=imap(RH,ra);
    K=std(K);
-   K=K[2..size(K)];
+   if (size(K)>1)   
+   { 
+        K = K[2..size(K)];   
+   }
    setring R;
    ideal ra=imap(RS,K);
 
@@ -6501,10 +6501,7 @@ EXAMPLE: example radical; shows an example
   ASSUME(0, not isQuotientRing(basering) ) ;
   dbprint(printlevel - voice, "Radical, version 2006.05.08");
   if(size(i) == 0){return(ideal(0));}
-  if(hasAlgExtensionCoefficient(basering))
-  {
-    return(algeRad(i));
-  }
+
   if(attrib(basering,"global")!=1)
   {
 // algorithms only work in global case!
@@ -6518,6 +6515,10 @@ EXAMPLE: example radical; shows an example
       setring r;
       def j=imap(s,j);
       return(j);
+  }
+  if(hasAlgExtensionCoefficient(basering))
+  {
+    return(algeRad(i));
   }
   int j;
   def P0 = basering;
@@ -6823,7 +6824,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
   int @wr, @n, @m, lauf, di;
   ideal fac, @h, collectrad, lsau;
   poly @q;
-  string @va; def quotring;
+  string @va;
 
   def @P = basering;
   int jdim = dim(I);               // Computes the dimension of I
@@ -6932,7 +6933,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
     // and the map phi:K[var(1),...,var(nva)] ----->
     // K(var(nnpr+1),..,var(nva))[..the rest..]
     //------------------------------------------------------------------------
-    quotring = prepareQuotientring(nvars(basering) - indep[@m][3],"dp");
+    def quotring = prepareQuotientring(nvars(basering) - indep[@m][3],"dp");
     //------------------------------------------------------------------------
     // We pass to the quotientring   K(var(nnp+1),..,var(nva))[..the rest..]
     //------------------------------------------------------------------------
@@ -8229,7 +8230,7 @@ EXAMPLE: example newDecompStep; shows an example
            //--->K(var(nnpr+1),..,var(nva))[..the rest..]
            //------------------------------------------------------------------
 
-           quotring=prepareQuotientring(nvars(basering)-restindep[@m][3],"lp");
+           def quotring=prepareQuotientring(nvars(basering)-restindep[@m][3],"lp");
 
            //------------------------------------------------------------------
            //we pass to the quotientring  K(var(nnp+1),..,var(nva))[..rest..]
