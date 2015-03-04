@@ -34,15 +34,19 @@ Change in ring handling:
 
 New libraries:
 @itemize
-@item algemodstd.lib (@nref{algemodstd_lib})
-@item arr.lib (@nref{arr_lib})
-@item brillnoether.lib (@nref{brillnoether_lib})
-@item hess.lib (@nref{hess_lib})
-@item gradedModules.lib (@nref{gradedModules_lib})
+@item algemodstd.lib:  Groebner bases of ideals in polynomial rings
+      over algebraic number fields(@nref{algemodstd_lib})
+@item arr.lib: arrangements of hyperplanes (@nref{arr_lib})
+@item brillnoether.lib: Riemann-Roch spaces of divisors on curve (@nref{brillnoether_lib})
+@item hess.lib: Riemann-Roch space of divisors
+      on function fields and curves (@nref{hess_lib})
+@item gradedModules.lib: graded modules/matrices/resolutions (@nref{gradedModules_lib})
 @end itemize
 
 Changed libraries:
 @itemize
+@item revised polymake interface (@nref{polymake_lib},@nref{polymake_so})
+@item revised gfanlib interface (@nref{gfanlib_so})
 @item Presolve::findvars (@nref{findvars}, @nref{variables})
 @item Ring::addvarsTo (@nref{addvarsTo})
 @item Ring::addNvarsTo (@nref{addNvarsTo})
