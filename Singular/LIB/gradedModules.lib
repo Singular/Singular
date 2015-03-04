@@ -92,7 +92,7 @@ EXAMPLE: example grview; shows an example
 
   if( typeof( N ) == "list" )
   {
-    int i; for( i = 1; i <= size(N); i++ ){ if(size(N[i])==0){break;}; "i:", i; grview(N[i]); };
+    int i; for( i = 1; i <= size(N); i++ ){ "i:", i; grview(N[i]); };
     return ();
   }
 
@@ -953,8 +953,7 @@ example
 
   ring r=32003,(x,y,z),dp;
 
-  print( grrndmat( intvec(0, 1), intvec(1, 2, 3) ) ); // ???
-
+  print( grrndmat( intvec(0, 1), intvec(1, 2, 3) ) );
 }
 
 //
@@ -963,13 +962,17 @@ proc grrndmap(def S, def D, list #)
 RETURN:  graded map
 PURPOSE: generate random 0-deg graded homomorphism S -> D
 NOTE:    optional arguments p, b are for 'sparsepoly' (by default: 75%, 30000).
-TODO:    this is experimental at the moment! CURRENTLY WRONG!!!
+TODO:    this is experimental at the moment! 
 EXAMPLE: example grrndmap; shows an example
 "
 {
+  ASSUME(1, grtest(S) );
+  ASSUME(1, grtest(D) );
+  
   intvec v = grdeg(S); // source
   intvec w = grdeg(D); // destination
-  return ( grobj( grrndmat(v, w, #), v, w ) );
+  
+  return ( grobj( transpose(grrndmat(v, w, #)), v, w ) );
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -986,4 +989,181 @@ example
   module M = grrndmap( S, D );
   print(M);
   grview(M);
+}
+
+
+proc grgroebner(A)
+"USAGE:  grgroebner(M), graded object M
+RETURN:  graded object
+PURPOSE: compute graded groebner basis of M
+EXAMPLE: example grgroebner; shows an example
+"
+{
+  ASSUME(1, grtest(A));
+
+  return ( grobj( groebner(A), attrib(A, "isHomog") ) );
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+
+  module A = grobj( module([x+y, x, 0, 0], [0, x+y, y, 0]), intvec(0,0,0,1) );
+  grview(A);
+  
+  module B = grgroebner(A);
+  grview(B);
+}
+
+
+proc grtwists(intvec v)
+"USAGE:  grtwists(v), intvec v
+RETURN:  graded object representing S(v[1]) + ... + S(v[size(v)])
+PURPOSE: compute presentation of S(v[1]) + ... + S(v[size(v)])
+EXAMPLE: example grtwists; shows an example
+"
+{
+  int l = size(v);
+  module Z; Z[l] = [0];
+  Z = grobj(Z, v, v); // will set the rank as well
+  return(Z);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+  
+  grview( grtwists ( intvec(-4, 1, 6 )) );
+}
+
+
+proc grsyz(A)
+"USAGE:  grsyz(M), graded object M
+RETURN:  graded object
+PURPOSE: compute graded syzygy of M
+EXAMPLE: example grsyz; shows an example
+"
+{
+  ASSUME(1, grtest(A));
+  intvec v = grdeg(A);
+
+//  attrib(A, "isHomog");
+  
+  module M = syz(A); 
+//  print(M);
+  
+  if( size(M) > 0 ) { return( grobj( M, v ) ); }
+
+  // zero syzygy?
+  return( grtwists(v) ); // ???
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+
+  module A = grobj( module([x+y, x, 0, 3], [0, x+y, y, 2], [y, y, z, 1]), intvec(0,0,0,1) ); 
+  grview(A);
+  
+  module B = grgroebner(A);
+  grview(B);
+
+  module C = grsyz(B);  
+  grview(C);
+}
+
+
+proc grprod(A, B)
+"USAGE:  grprod(M, N), graded objects M and N
+RETURN:  graded object
+PURPOSE: compute graded product M * N (as composition of maps)
+EXAMPLE: example grprod; shows an example
+"
+{
+  ASSUME(1, grtest(A));
+  ASSUME(1, grtest(B));
+
+  return ( grobj( A*B, attrib(A, "isHomog"), grdeg(B) ) );
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+
+  module A = grobj( module([x+y, x, 0, 3], [0, x+y, y, 2], [y, y, z, 1]), intvec(0,0,0,1) ); 
+  grview(A);
+  
+  A = grgroebner(A);
+  grview(A);
+  
+  module B = grsyz(A);
+  grview(B);
+  print(B);
+  
+  module D = grprod( A, B );
+  grview(D);
+  print(D); // must be all zeroes due to syzygy property!
+  ASSUME(0, size(D) == 0);
+}
+
+
+
+
+proc grres(A, l)
+"USAGE:  grres(M, l), graded object M, int l
+RETURN:  graded resolution = list of graded objects
+PURPOSE: compute graded resolution of M (of length l)
+EXAMPLE: example grres; shows an example
+"
+{
+  ASSUME(0, l >= 0);
+  ASSUME(1, grtest(A));
+
+  intvec v = attrib(A, "isHomog");
+  list r = res(A, l);
+
+//  r;  v;
+
+  l = size(r);
+  
+  int i; module m;
+  
+  for ( i = 1; i <= l; i++ )
+  {
+    if( size(r[i]) == 0 ){ r[i] = grtwists(v); i++; break;   }
+
+    r[i] = grobj(r[i], v); v = grdeg(r[i]);
+  }
+  i = i-1;
+
+  return( list(r[1..i]) );
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+
+  module A = grobj( module([x+y, x, 0, 3], [0, x+y, y, 2], [y, y, z, 1]), intvec(0,0,0,1) ); 
+  grview(A);
+  
+  module B = grgroebner(A);
+  grview(B);
+
+  "graded resolution of B: "; def C = grres(B, 0); grview(C);
+
+  int i; int l = size(C);
+
+  "D^2 == 0: "; for (i = 1; i < l; i++ ) { i; grview( grprod(C[i], C[i+1]) ); }
+}
+
+proc grconcat(A, B)
+"
+TODO: src(A) != src(B) but dst(A) == dst(B) =: dst
+construct src(A) + src(B) -----> dst 
+given by (A | B) or (A _over_ B)?!!??
+"
+{
+}
+example
+{ "EXAMPLE:"; echo = 2;
 }

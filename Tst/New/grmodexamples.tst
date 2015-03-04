@@ -21,4 +21,16 @@ int GradedModules::assumeLevel = 5;
   example grobj;
   example grtest;
 
+  example grrndmat;
+  example grrndmap;
+
+
+  example grgroebner;
+  example grsyz;
+  
+  example grprod;
+  example grres;
+  
+  example grtwists;
+  
 tst_status(1);$
