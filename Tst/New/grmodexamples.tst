@@ -16,7 +16,7 @@ int GradedModules::assumeLevel = 5;
   example TestGRRes;
 
   example grorder;
-  example grtranspose;
+  example grtranspose1;
 
   example grobj;
   example grtest;
@@ -32,5 +32,10 @@ int GradedModules::assumeLevel = 5;
   example grres;
   
   example grtwists;
+
+
+  example grtranspose;
+  example grgens;
+  example grpres;
   
 tst_status(1);$
