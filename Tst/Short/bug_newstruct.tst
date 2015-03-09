@@ -1,6 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
+LIB"gfanlib.so";
 // newstruct stuff
 newstruct("pdivisor","list summands, cone tail");
 
