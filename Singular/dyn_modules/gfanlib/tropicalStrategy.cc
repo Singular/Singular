@@ -173,7 +173,15 @@ static ring constructStartingRing(ring r)
   s->block1[0] = n;
   s->wvhdl[0] = (int*) omAlloc(n*sizeof(int));
   s->wvhdl[0][0] = 1;
-  if (r->order[0] == ringorder_dp)
+  if (r->order[0] == ringorder_lp)
+  {
+    s->wvhdl[0][1] = 1;
+  }
+  else if (r->order[0] == ringorder_ls)
+  {
+    s->wvhdl[0][1] = -1;
+  }
+  else if (r->order[0] == ringorder_dp)
   {
     for (int i=1; i<n; i++)
       s->wvhdl[0][i] = -1;

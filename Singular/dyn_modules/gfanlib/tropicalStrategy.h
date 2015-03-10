@@ -147,11 +147,6 @@ public:
    **/
   tropicalStrategy& operator=(const tropicalStrategy& currentStrategy);
 
-  bool isConstantCoefficientCase() const
-  {
-    bool b = (uniformizingParameter==NULL);
-    return b;
-  }
   bool isValuationTrivial() const
   {
     bool b = (uniformizingParameter==NULL);
@@ -197,6 +192,11 @@ public:
   {
     if (startingIdeal) id_Test(startingIdeal,startingRing);
     return startingIdeal;
+  }
+
+  int getExpectedAmbientDimension() const
+  {
+    return rVar(startingRing);
   }
 
   /**

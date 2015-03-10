@@ -44,6 +44,11 @@ std::vector<bool> checkNecessaryTropicalFlips(const groebnerCones &tropicalVarie
 groebnerCones tropicalTraversalMinimizingFlips(const groebnerCone startingCone)
 {
   groebnerCones tropicalVariety;
+  if (startingCone.isTrivial())
+  {
+    return tropicalVariety;
+  }
+
   groebnerCones workingList;
   workingList.insert(startingCone);
   const tropicalStrategy* currentStrategy=startingCone.getTropicalStrategy();

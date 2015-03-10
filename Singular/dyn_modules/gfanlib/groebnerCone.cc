@@ -517,7 +517,7 @@ gfan::ZFan* toFanStar(groebnerCones setOfCones)
     return zf;
   }
   else
-    return new gfan::ZFan(gfan::ZFan::fullFan(currRing->N));
+    return new gfan::ZFan(gfan::ZFan(currRing->N));
 }
 
 
