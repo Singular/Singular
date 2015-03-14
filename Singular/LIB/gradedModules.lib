@@ -37,17 +37,25 @@ PROCEDURES:
     grorder(M)      reorder cols/rows of M for correct graded-block-structure
     grtranspose1(M)  reordered graded transpose of map M
     TestGRRes(n,I)  compute/order/transpose a graded resolution of ideal I
+    grsyz(M)        syzygy. gens!
+    grres(M)        resolution. gens!
+    grlift(A,B)     graded lift, gens!
+    grgroebner(M)   groebner. gens!
+    grconcat(M,N)   sum of maps into the same target module
 ";
 
-
 // TODOs:
-//    grrndmat(s,d[,p,b]) generate random matrix compatible with src and dst gradings
-//    grrndmap(S,D[,p,b]) generate random 0-deg homomorphism S -> D
-
-//    grsyz(M)        gens? vs coker?
-//    grres(M)        gens? vs coker?
-//    grgroebner(M)   gens? vs coker?
-   
+/*
+KeneshlouMatrixPresentation(v)  build some presentation with intvec v
+grrndmat0(s,d[,p,b]) generate random matrix compatible with src and dst gradings
+grrndmap0(S,D[,p,b]) generate random 0-deg homomorphism S -> D
+grrndmap(S,D[,p,b]) generate random 0-deg homomorphism S -> D
+grrndmap2(S,D[,p,b]) generate random 0-deg homomorphism S -> D
+grlifting(A,B)  RANDOM! chain lifting
+grlifting2(A,B)  RANDOM! chain lifting
+mappingcone(M,N) mapping cone?
+mappingcone2(M,N) mapping cone?
+*/
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // . view graded module/map
@@ -934,100 +942,6 @@ static proc align( def A, int d)
   return( module(transpose(T)) );
 }
 
-
-LIB "random.lib"; // for sparsepoly
-
-proc grrndmat(intvec w, intvec v, list #)
-"USAGE:  grrndmat(src,dst[,p,b]), intvec src, dst[, int p, b]
-RETURN:  matrix of polynomials
-PURPOSE: generate random matrix compatible with src and dst gradings
-NOTE:    optional arguments p, b are for 'sparsepoly' (by default: 75%, 30000).
-TODO:    this is experimental at the moment!
-EXAMPLE: example grrndmat; shows an example
-"
-{
-  // defaults for sparsepoly
-  int p = 75;
-  int b = 30000;
-
-  if ( size(#) > 0 )
-  {
-    ASSUME( 0, (typeof(#[1]) == "int") || (typeof(#[1]) == "bigint") );
-    p = #[1];
-
-    if ( size(#) > 1 )
-    {
-      ASSUME( 0, (typeof(#[2]) == "int") || (typeof(#[2]) == "bigint") );
-      b = #[2];
-    }
-  }
-
-  int n = size(v); // destination: rows!
-  int m = size(w); // source: cols
-
-  matrix M[n][m];
-
-  int r,c; intvec ww;
-
-  for( c = m; c > 0; c-- )
-  {
-    ww = v - intvec(w[c]:n);
-    for( r = n; r > 0; r-- )
-    {
-      if( ww[r] >= 0)
-      {
-        M[r,c] = sparsepoly(ww[r], ww[r], p, b);
-      }
-
-    }
-  }
-
-  return(M);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-
-  ring r=32003,(x,y,z),dp;
-
-  print( grrndmat( intvec(0, 1), intvec(1, 2, 3) ) );
-}
-
-//
-proc grrndmap(def S, def D, list #)
-"USAGE:  grrndmap(S,D[,p,b]), graded modules S, D[, int p, b]
-RETURN:  graded map
-PURPOSE: generate random 0-deg graded homomorphism S -> D
-NOTE:    optional arguments p, b are for 'sparsepoly' (by default: 75%, 30000).
-TODO:    this is experimental at the moment! 
-EXAMPLE: example grrndmap; shows an example
-"
-{
-  ASSUME(1, grtest(S) );
-  ASSUME(1, grtest(D) );
-  
-  intvec v = grdeg(S); // source
-  intvec w = grdeg(D); // destination
-  
-  return ( grobj( transpose(grrndmat(v, w, #)), v, w ) );
-}
-example
-{ "EXAMPLE:"; echo = 2;
-
-  ring r=32003,(x,y,z),dp;
-
-  module D = grobj( module([x,y,0]), intvec(1,1,5) );
-  grdeg(D);
-
-  int d = 4; // zero can have any degree...
-  module S = grobj( module([x,0], [0,0,0], [0, y]), intvec(0,0,3), intvec(1, d, 1) );
-  grdeg(S);
-
-  module M = grrndmap( S, D );
-  print(M);
-  grview(M);
-}
-
-
 proc grgroebner(A)
 "USAGE:  grgroebner(M), graded object M
 RETURN:  graded object
@@ -1315,6 +1229,100 @@ example
 }
 
 
+
+LIB "random.lib"; // for sparsepoly
+
+proc grrndmat0(intvec w, intvec v, list #)
+"USAGE:  grrndmat0(src,dst[,p,b]), intvec src, dst[, int p, b]
+RETURN:  matrix of polynomials
+PURPOSE: generate random matrix compatible with src and dst gradings
+NOTE:    optional arguments p, b are for 'sparsepoly' (by default: 75%, 30000).
+TODO:    this is experimental at the moment!
+EXAMPLE: example grrndmat0; shows an example
+"
+{
+  // defaults for sparsepoly
+  int p = 75;
+  int b = 30000;
+
+  if ( size(#) > 0 )
+  {
+    ASSUME( 0, (typeof(#[1]) == "int") || (typeof(#[1]) == "bigint") );
+    p = #[1];
+
+    if ( size(#) > 1 )
+    {
+      ASSUME( 0, (typeof(#[2]) == "int") || (typeof(#[2]) == "bigint") );
+      b = #[2];
+    }
+  }
+
+  int n = size(v); // destination: rows!
+  int m = size(w); // source: cols
+
+  matrix M[n][m];
+
+  int r,c; intvec ww;
+
+  for( c = m; c > 0; c-- )
+  {
+    ww = v - intvec(w[c]:n);
+    for( r = n; r > 0; r-- )
+    {
+      if( ww[r] >= 0)
+      {
+        M[r,c] = sparsepoly(ww[r], ww[r], p, b);
+      }
+
+    }
+  }
+
+  return(M);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+
+  print( grrndmat0( intvec(0, 1), intvec(1, 2, 3) ) );
+}
+
+//
+proc grrndmap0(def S, def D, list #)
+"USAGE:  grrndmap0(S,D[,p,b]), graded modules S, D[, int p, b]
+RETURN:  graded map
+PURPOSE: generate random 0-deg graded homomorphism S -> D
+NOTE:    optional arguments p, b are for 'sparsepoly' (by default: 75%, 30000).
+TODO:    this is experimental at the moment! 
+EXAMPLE: example grrndmap0; shows an example
+"
+{
+  ASSUME(1, grtest(S) );
+  ASSUME(1, grtest(D) );
+  
+  intvec v = grdeg(S); // source
+  intvec w = grdeg(D); // destination
+  
+  return ( grobj( transpose(grrndmat0(v, w, #)), v, w ) );
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+
+  module D = grobj( module([x,y,0]), intvec(1,1,5) );
+  grdeg(D);
+
+  int d = 4; // zero can have any degree...
+  module S = grobj( module([x,0], [0,0,0], [0, y]), intvec(0,0,3), intvec(1, d, 1) );
+  grdeg(S);
+
+  module M = grrndmap0( S, D );
+  print(M);
+  grview(M);
+}
+
+/*
 proc grconcat(A, B)
 "
 TODO: src(A) != src(B) but dst(A) == dst(B) =: dst
@@ -1326,5 +1334,549 @@ given by (A | B) or (A _over_ B)?!!??
 example
 { "EXAMPLE:"; echo = 2;
 }
+*/
 
+
+
+proc KeneshlouMatrixPresentation(intvec a)
+"
+PURPOSE: Direct sum of all omegas_i(i) with powers a[i]
+NOTE: Please document/name this proc properly
+"
+{
+  int n = size(a)-1;
+  //  ring r = 32003,(x(0..n)),dp;
+  ASSUME(0, nvars(basering)==(n+1));
+  int i,j;
+
+  // find first nonzero exponent a_i
+  for(i=1;i<=size(a);i++)
+    {
+      if(a[i]!=0) {break; };
+    }
+
+  // all zeroes?
+  if(i>size(a)) {return (grzero()); };
+
+  for(i=2;i<=n;i++)
+    {
+      if(a[i]!=0) {break; };
+    }
+
+  module N;
+
+  if(i>n) 
+    { // no middle part
+      if(a[1]>0)
+	{
+	  N=grtwist(a[1],0);
+
+	  if(a[n+1]>0)
+	    { N=grsum(N,grtwist(a[n+1],-1));}	     
+	}  
+      else
+	{ N=grtwist(a[n+1],-1);}
+      
+      return (N); // grorder(N)); 
+    }
+  else // i <= n: middle part is present, a_i != 0 
+    { // a = a1  ... |  i:2, a_2 ..... i: n, a_n | .... i: n+1a_(n+1)
+      j = i - 1;
+      module I = maxideal(1);
+      attrib(I,"isHomog", intvec(0));
+      list L = mres(I, 0);
+      list kos = grorder(L);
+      // make sure that graded maps  are represented by blocks corresponding to the betti diagram?
+
+      def S = grpower(grshift(grobj( kos[j+2], attrib(kos[j+2], "isHomog")), j), a[i]);
+
+      i++;
+
+      for(; i <= n; i++)
+	{
+	  if(a[i]==0) { i++; continue; }
+	  j = i - 1;
+	  S = grsum( S, grpower(grshift( grobj( kos[j+2], attrib(kos[j+2], "isHomog")), j), a[i])  );
+	}
+
+      // S is the middle (non-zero) part
+
+      if(a[1] > 0 )
+	{
+	  N=grsum(grtwist(a[1],0), S);
+	}
+      else
+	{ N = S;}
+
+      if(a[n+1] > 0 )
+	{ N=grsum(N, grtwist(a[n+1],-1)); }
+
+
+      return ((N)); //      return (grorder(N)); 
+    }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r = 32003,(x(0..4)),dp;
+
+  def N1 = KeneshlouMatrixPresentation(intvec(2,0,0,0,0)); 
+  grview(N1);
+
+  def N2 = KeneshlouMatrixPresentation(intvec(0,0,0,0,3));
+  grview(N2);
+
+  def N = KeneshlouMatrixPresentation(intvec(2,0,0,0,3));
+  grview(N);
+
+
+  def M1 = KeneshlouMatrixPresentation(intvec(0,1,0,0,0));
+  grview(M1);
+
+  def M2 = KeneshlouMatrixPresentation(intvec(0,1,1,0,0));
+  grview(M2);
+
+  def M3 = KeneshlouMatrixPresentation(intvec(0,0,0,1,0));
+  grview(M3);
+
+  def M = KeneshlouMatrixPresentation(intvec(1,1,1,0,0));
+  grview(M);
+
+
+}
+
+
+
+ 
+proc grrndmat(intvec v, intvec w, list #)
+{
+  int p=75; int b=30000; // defaults for sparsepoly
+  
+  if ( size(#) > 0 )
+  {
+     ASSUME( 0, (typeof(#[1]) == "int") || (typeof(#[1]) == "bigint") );
+     p = #[1];
+
+     if ( size(#) > 1 )
+     {
+       ASSUME( 0, (typeof(#[2]) == "int") || (typeof(#[2]) == "bigint") );
+       b = #[2];
+     }
+  }
+  
+
+  matrix M[size(w)][size(v)];
+  int i,j,c;
+  
+  for(j=1;i<=size(v);j++)
+    {
+      for(i=1;i<=size(w);i++)
+      {
+       c=(w[i]-v[j]);
+       if( c >= 0)
+       {M[i,j]=sparsepoly(c, c, p, b);}
+       //       else        { M[i,j]=0;}
+      
+     }
+    }
+
+  return(M);
+}
+
+proc grhomog0(M,N)
+{
+  intvec v = grdeg(M); // src
+  intvec w = grdeg(N); // dest
+  return ( grobj( grrndmat(v, w), v, w ) );
+}
+
+
+proc grconcat(A,B)
+"USAGE: grconcat(A, B), graded objects A and B, dst(A) == dst(B) =: dst
+RETURN: graded object
+PURPOSE: construct src(A) + src(B) -----> dst  given by (A|B)
+EXAMPLE: example grconcat; shows an example
+"
+{
+
+  ASSUME(0, attrib(A,"isHomog")==attrib(B,"isHomog"));
+  ASSUME(1, grtest(A));
+  ASSUME(1, grtest(B));
+ 
+
+  intvec v=attrib(A,"isHomog");
+  intvec w=grdeg(A),grdeg(B);
+  return(grobj(concat(A,B),v,w));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r;
+  
+  module R=grobj(module([x,y,z]),intvec(0:3));
+  grview(R);
+
+  module S=grobj(module([x,0,y],[xy,zy+x2,0]),intvec(0:3));
+  grview(S);
+
+  def Q=grconcat(R,S);
+  grview(Q);
+}
+
+
+proc grlift(A, B)
+"USAGE: grlift(M, N), graded objects M and N
+RETURN: graded object
+PURPOSE: compute graded matrix which the generators of submodule N in terms of the generators of M.
+EXAMPLE: example grlift; shows an example
+"
+{
+  ASSUME(0, attrib(A,"isHomog")==attrib(B,"isHomog"));
+  ASSUME(1, grtest(A));
+  ASSUME(1, grtest(B));
+
+  return(grobj(lift(A,B),grdeg(A), grdeg(B)));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+  module P=grobj(module([xy,0,xz]),intvec(0,1,0));  P = grgroebner(P);
+  grview(P);
+
+
+  module D=grobj(module([y,0,z],[x2+y2,z,0]),intvec(0,1,0));  D = grgroebner(D);
+  grview(D);
+
+  def G=grlift(D,P);
+  grview(G);
+}
+
+
+proc grlifting(M,N)
+"??"
+{  ASSUME(1, grtest(A));
+   ASSUME(1, grtest(B));
+
+   list rM=grres(M,1); // only syzygy?
+   list rN=grres(N,1); // only syzygy???
+   int i,j,k;
+   list P;
+
+  for(i=1;i<=size(rM);i++)
+  {
+    if(size(rM[i])==0){break;}
+  }
+
+  for(j=1;j<=size(rN);j++)
+  {
+    if(size(rN[j])==0){break;}
+  }
+
+  int t=min(i,j); // always 2!??
+
+  if(t>=2)
+  {
+    P[1]=grrndmap1(M,N);
+    if(t==2){return(P[1])};
+  
+    for(k=2;k<t;k++)
+    {
+      A=grprod(P[k-1],rM[k]);
+      p[k]=grlift(rN[k],A); // BUG: rN[k] may not be a GB! Therefore it is wrong to try to compute whole resolutions in advance!!!
+    }
+    return(P);
+  }  
+  else //t=1 // FIXME: this case can never happen!
+  {return(0);}
+
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+  module P=grobj(module([xy,0,xz]),intvec(0,1,0)); P = grgroebner(P);
+  grview(P);
+
+
+  module D=grobj(module([y,0,z],[x2+y2,z,0]),intvec(0,1,0)); D = grgroebner(D);
+  grview(D);
+
+  def G=grlifting(D,P);
+  grview(G);
+}
+
+// LIB"matrix.lib"; // ? 
+
+proc mappingcone(M,N)
+"??"
+{
+  ASSUME(1, grtest(M));
+  ASSUME(1, grtest(N));
+
+  list P=grlifting(M,N);
+  list rM=grres(M,1);
+  list rN=grres(N,1);
+
+  int i;
+  list T;
+
+  T[1]=grconcat(P[1],rN[2]);
+
+  for(i=2;i<=size(P);i++)
+  {
+    intvec v=attrib(rM[i],"isHomog");
+    intvec w=grdeg(rN[i+1]);
+    int r=size(v);
+    int s=size(w);
+
+    module A=grconcat(P[i],rN[i+1]);
+    module B=grobj(module(zero[r][s]),v,w); // BUG ????
+    module C=grconcat(-rM[i],B);
+    module D=grconcat(grtranspose(C), grtranspose(A));
+
+    T[i]=grtranspose(D);
+  }
+   return(T);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+ring r=32003, (x(0..4)),dp;
+def I=maxideal(1);
+module R=grobj(module(I), intvec(0));
+resolution FR=mres(R,0);
+print(betti(FR,0),"betti");
+module K=grobj(module(FR[1]),intvec(-1),intvec(0,0,0,0,0));
+module S=grsyz(K);
+S = grgroebner(S);
+grview(S)
+module B=grobj(module([1,0,0],[0,1,0],[0,0,1]),intvec(1,1,1),intvec(1,1,1));
+B = grgroebner(B);
+grview(B)
+// the following is totally wrong :(
+/*  
+def Z=grlifting(B,S);
+Z;
+def G=mappingcone(B,S);
+G;
+resolution E=grres(G[1],0);
+print(betti(E,0),"betti");
+module W=grtranspose(G[1]);
+resolution U=grres(W,0);
+ideal P=groebner(flatten(U[2])); // flatten???
+resolution L=mres(P,0);
+print(betti(L),"betti");
+*/
+}
+
+
+proc grrndmap1(defD, def S, list #)
+"USAGE: (D,S), graded objects S and D
+RETURN: graded object
+PURPOSE: construct a random 0-deg graded homomorphism between source of D and S.
+EXAMPLE: example grrndmap1; shows an example
+"
+{
+ASSUME(1, grtest(D) );
+ASSUME(1, grtest(S) );
+intvec v = -grdeg(S); // source
+intvec w = -grdeg(D); // destination
+return (grobj(grrndmat(v, w, #), -w, -v ) );
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+
+  module D=grobj(module([y,0,z],[x2+y2,z,0]),intvec(0,1,0));
+  grview(D);
+
+  module S=grobj(module([x,0,y],[xy,zy+x2,0]),intvec(0,0,0));
+  grview(S);
+
+def H=grrndmap1(D,S);
+grview(H);
+
+}
+
+
+proc grrndmap2(def D, def S, list #)
+"USAGE: (D,S), graded objects S and D
+RETURN: graded object
+PURPOSE: construct a random 0-deg graded homomorphism between target of D and S.
+EXAMPLE: example grrndmap2; shows an example
+"
+{
+  ASSUME(1, grtest(D) );
+  ASSUME(1, grtest(S) );
+  intvec v = -attrib(D, "isHomog"); // source
+  intvec w = -attrib(S, "isHomog"); // target
+  return (grobj(grrndmat(v, w, #), -w, -v ) );
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+
+  module D=grobj(module([y,0,z],[x2+y2,z,0]),intvec(0,1,0));
+  grview(D);
+
+  module S=grobj(module([x,0,y],[xy,zy+x2,0]),intvec(0,0,0));
+  grview(S);
+
+  def G=grrndmap2(D,S);
+  grview(G);
+
+}
+
+proc grlifting2(A,B)
+"USAGE: (A,B), graded objects A and B (matrices defining maps)
+RETURN: map of chain complexes (as a list) 
+PURPOSE: construct a map of chain complexes between free resolution of
+M=coker(A) and N=coker(B).
+NOTE:
+               A     f2     f3
+0<---M<----F0<----F1<----F2<----F3<----
+             |p1   |p2
+
+0<---N<----G0<----G1<----G2<----G3<----
+               B(g1)      g2     g3
+
+EXAMPLE: example grlifting2; shows an example
+"
+{  ASSUME(1, grtest(A));
+   ASSUME(1, grtest(B));
+
+   list rM=grres(A,0);
+   list rN=grres(B,0);
+   int i,j,k;
+   list P;
+
+  // find first zero matrix in rM
+  for(i=1;i<=size(rM);i++)
+  {
+    if(size(rM[i])==0){break;}
+  }
+
+  // find first zero matrix in rN
+  for(j=1;j<=size(rN);j++)
+  {
+    if(size(rN[j])==0){break;}
+  }
+
+  int t=min(i,j);
+
+  P[1]=grrndmap2(A,B);
+
+  // A(or B)=0 
+  if(t==1){return(P[1])};
+ 
+  for(k=2;k<=t;k++)
+  {
+   def E=grprod(P[k-1],rM[k-1]);
+   P[k]=grlift(rN[k-1],E); // ---------->
+   // BUG: rN[k-1] may not be a GB! // see same thing above
+   /* let yi=(pi)o(fi); to take grlift(gi,yi)
+                                      we should have img(yi) is contained in
+				      img(gi)=ker(gi-1),i.e (gi-1)oyi=0. we have
+			          (gi-1)oyi=(gi-1)o(pi)o(fi)=(pi-1)o(fi-1)ofi=0
+  */
+  }
+  return(P);
+}
+example
+{"EXAMPLE:"; echo = 2;
+
+ring r;
+module P=grobj(module([xy,0,xz]),intvec(0,1,0)); P = grgroebner(P);
+grview(P);
+
+module D=grobj(module([y,0,z],[x2+y2,z,0]),intvec(0,1,0)); D = grgroebner(D);
+grview(D);
+
+def T=grlifting2(D,P); T;
+
+// def Z=grlifting2(P,D); Z; // WRONG!!!  
+             
+}
+
+
+
+proc mappingcone2(A,B)
+"USAGE: (A,B), graded objects A and B (matrices defining maps)
+RETURN: chain complex (as a list) 
+PURPOSE: construct the free resolution of a cokernel of a random map between
+M=coker(A), and N=coker(B)
+NOTE: 
+             -f1 0       -f2 0
+  (p1 g1)     p2 g2       p3 g3
+G0<-----F0+G1<------F1+G2<-------F2+G3<-----
+
+EXAMPLE: example mappingcone2;
+"
+
+{
+  ASSUME(1, grtest(A));
+  ASSUME(1, grtest(B));
+
+  list P=grlifting2(A,B);
+  list rM=grres(A,1);
+  list rN=grres(B,1);
+
+  int i;
+  list T;
+
+  T[1]=grconcat(P[1],rN[1]);
+
+  for(i=2;i<=size(P);i++)
+  {
+    intvec v=attrib(rM[i-1],"isHomog");
+    intvec w=grdeg(rN[i]);
+    int r=size(v);
+    int s=size(w);
+
+    module A=grconcat(P[i],rN[i]);
+    module B=grobj(module(zero[r][s]),v,w); // BUG
+    module C=grconcat(-rM[i-1],B);
+    module D=grconcat(grtranspose(C), grtranspose(A));
+
+    T[i]=grtranspose(D);
+  }
+   return(T);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+ring r=32003,(x(0..4)),dp;
+def I=maxideal(1);
+module R=grobj(module(I), intvec(0));
+resolution FR=mres(R,0);
+print(betti(FR,0),"betti");
+module K=grobj(module(FR[1]),intvec(-1),intvec(0:5));
+grview(K);
+
+module S=grsyz(K);
+S = grgroebner(S);
+grview(S);
+S;
+
+module B=grobj(module([1],[0,1],[0,0,1],[0,0,0,1], [0,0,0,0,1]),intvec(0:5));
+B = grgroebner(B);
+grview(B);
+B;
+
+def Z=grlifting2(S,B); // ? 2nd module does not lie in the first 
+Z;
+
+// def G=mappingcone2(S,B); G; // BUG due to zero[][]
+
+/*
+resolution E=grres(G[1],0);
+print(betti(E,0),"betti");
+module W=grtranspose(G[1]);
+resolution U=grres(W,0);
+ideal P=groebner(flatten(U[2])); // flatten???
+resolution L=mres(P,0);
+print(betti(L),"betti");
+*/
+}
 
