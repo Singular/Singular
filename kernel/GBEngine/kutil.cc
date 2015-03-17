@@ -8231,7 +8231,7 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
 
 BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned long expbound)
 {
-  assume((strat->tailRing == currRing) || (strat->tailRing->bitmask < currRing->bitmask));
+  assume((strat->tailRing == currRing) || (strat->tailRing->bitmask <= currRing->bitmask));
   /* initial setup or extending */
 
   if (expbound == 0) expbound = strat->tailRing->bitmask << 1;
