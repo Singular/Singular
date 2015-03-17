@@ -396,15 +396,16 @@ void cancelunit (LObject* L,BOOLEAN inNF)
     {
       i++;
       if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ; // does not divide
-      #ifdef HAVE_RINGS
-      // Note: As long as qring j forbidden if j contains integer (i.e. ground rings are
-      //       domains), no zerodivisor test needed  CAUTION
-      if (rField_is_Ring(r) /*&&(rHasLocalOrMixedOrdering(r)) */)
-        if(n_DivBy(pGetCoeff(h),lc,r->cf) == 0)
-          return;
-      #endif
       if (i == r->N) break; // does divide, try next monom
     }
+    //wrp(p); PrintS(" divide ");wrp(h); PrintLn();
+    #ifdef HAVE_RINGS
+    // Note: As long as qring j forbidden if j contains integer (i.e. ground rings are
+    //       domains), no zerodivisor test needed  CAUTION
+    if (rField_is_Ring(r) /*&&(rHasLocalOrMixedOrdering(r)) */)
+      if(n_DivBy(pGetCoeff(h),lc,r->cf) == 0)
+        return;
+    #endif
     pIter(h);
   }
 }
