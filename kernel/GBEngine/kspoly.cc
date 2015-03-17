@@ -428,7 +428,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
     {
       l1 = (R[Pair->i_r1])->GetpLength() - 1;
     }
-    if (Pair->i_r2 == -1)
+    if ((Pair->i_r2 == -1)||(R[Pair->i_r2]==NULL))
     {
       l2 = pLength(p2) - 1;
     }
