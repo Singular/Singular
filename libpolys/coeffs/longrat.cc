@@ -2567,7 +2567,6 @@ static number nlInitMPZ(mpz_t m, const coeffs)
 {
   number z = ALLOC_RNUMBER();
   mpz_init_set(z->z, m);
-  mpz_init_set_ui(z->n, 1);
   z->s = 3;
   return z;
 }
