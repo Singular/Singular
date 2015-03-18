@@ -425,7 +425,7 @@ void HEckeTest (poly pp,kStrategy strat)
   int   j,/*k,*/p;
 
   strat->kHEdgeFound=FALSE;
-  if (currRing->pLexOrder || currRing->MixedOrder)
+  if (currRing->pLexOrder || rHasMixedOrdering(currRing))
   {
     return;
   }
@@ -3867,7 +3867,7 @@ int posInS (const kStrategy strat, const int length,const poly p,
   int an = 0;
   int en = length;
   int cmp_int = currRing->OrdSgn;
-  if ((currRing->MixedOrder)
+  if ((rHasMixedOrdering(currRing))
 #ifdef HAVE_PLURAL
   && (currRing->real_var_start==0)
 #endif
@@ -7307,8 +7307,8 @@ void initHilbCrit(ideal/*F*/, ideal /*Q*/, intvec **hilb,kStrategy strat)
 {
 
   //if the ordering is local, then hilb criterion
-  //can be used also if tzhe ideal is not homogenous
-  if((rHasLocalOrMixedOrdering(currRing)) && (currRing->MixedOrder == 0 ))
+  //can be used also if the ideal is not homogenous
+  if((rHasLocalOrMixedOrdering(currRing)) && (rHasMixedOrdering(currRing)==FALSE))
   #ifdef HAVE_RINGS
   {
   if(rField_is_Ring(currRing))
@@ -7350,6 +7350,10 @@ void initBuchMoraCrit(kStrategy strat)
   /* alway use tailreduction, except:
   * - in local rings, - in lex order case, -in ring over extensions */
   strat->noTailReduction = !TEST_OPT_REDTAIL;
+  //if(rHasMixedOrdering(currRing)==2)
+  //{
+  // strat->noTailReduction =TRUE;
+  //}
 
 #ifdef HAVE_PLURAL
   // and r is plural_ring
@@ -7422,7 +7426,7 @@ void initSbaCrit(kStrategy strat)
   /* alway use tailreduction, except:
   * - in local rings, - in lex order case, -in ring over extensions */
   strat->noTailReduction = !TEST_OPT_REDTAIL;
-  //strat->noTailReduction = NULL;
+  if(rHasMixedOrdering(currRing)) strat->noTailReduction =TRUE;
 
 #ifdef HAVE_PLURAL
   // and r is plural_ring
@@ -7622,7 +7626,6 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
     }
   }
   strat->fromT = FALSE;
-  strat->noTailReduction = !TEST_OPT_REDTAIL;
   if ((!TEST_OPT_SB_1)
   #ifdef HAVE_RINGS
   || (rField_is_Ring(currRing))
@@ -7816,7 +7819,6 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
     }
   }
   strat->fromT = FALSE;
-  strat->noTailReduction = !TEST_OPT_REDTAIL;
   if (!TEST_OPT_SB_1)
   {
     #ifdef HAVE_RINGS
@@ -8002,6 +8004,7 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
 #endif
 
   strat->noTailReduction = FALSE;
+  //if(rHasMixedOrdering(currRing)) strat->noTailReduction = TRUE;
   if (TEST_OPT_PROT)
   {
     PrintLn();
@@ -9112,7 +9115,6 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
     }
   }
   strat->fromT = FALSE;
-  strat->noTailReduction = !TEST_OPT_REDTAIL;
   if (!TEST_OPT_SB_1)
   {
     /* the only change: we do not fill the set T*/

@@ -1317,7 +1317,8 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   res->ShortOut=r->ShortOut;
   res->CanShortOut=r->CanShortOut;
   res->LexOrder=r->LexOrder; // TRUE if the monomial ordering has polynomial and power series blocks
-  res->MixedOrder=r->MixedOrder; // ?? 1 for lex ordering (except ls), -1 otherwise
+  res->MixedOrder=r->MixedOrder; // TRUE for mixed (global/local) ordering, FALSE otherwise,
+  // 2 for diffenerent signs within one block
   res->ComponentOrder=r->ComponentOrder;
 
   //memset: res->ExpL_Size=0;
@@ -1459,7 +1460,8 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
   res->ShortOut=r->ShortOut;
   res->CanShortOut=r->CanShortOut;
   res->LexOrder=r->LexOrder; // TRUE if the monomial ordering has polynomial and power series blocks
-  res->MixedOrder=r->MixedOrder; // ?? 1 for lex ordering (except ls), -1 otherwise
+  res->MixedOrder=r->MixedOrder; // TRUE for mixed (global/local) ordering, FALSE otherwise,
+  // 2 for diffenerent signs within one block
   res->ComponentOrder=r->ComponentOrder;
 
   //memset: res->ExpL_Size=0;
@@ -3014,7 +3016,7 @@ static void rHighSet(ring r, int o_r, int o)
       {
         int i;
         for(i=r->block1[o]-r->block0[o];i>=0;i--)
-          if (r->wvhdl[o][i]<0) { r->MixedOrder=TRUE; break; }
+          if (r->wvhdl[o][i]<0) { r->MixedOrder=2; break; }
       }
       break;
     case ringorder_c:
@@ -3022,7 +3024,7 @@ static void rHighSet(ring r, int o_r, int o)
       break;
     case ringorder_C:
     case ringorder_S:
-      r->ComponentOrder=-1;
+      r->ComponentOrder=TRUE;
       break;
     case ringorder_M:
       r->LexOrder=TRUE;
@@ -3129,7 +3131,7 @@ static void rSetDegStuff(ring r)
   {
     r->MixedOrder = FALSE;
     for(int ii=block0[0];ii<=block1[0];ii++)
-      if (wvhdl[0][ii-1]<0) { r->MixedOrder=TRUE;break;}
+      if (wvhdl[0][ii-1]<0) { r->MixedOrder=2;break;}
     r->LexOrder=FALSE;
     for(int ii=block0[0];ii<=block1[0];ii++)
       if (wvhdl[0][ii-1]==0) { r->LexOrder=TRUE;break;}
@@ -5627,4 +5629,3 @@ int n_IsParam(const number m, const ring r)
 
   return 0;
 }
-

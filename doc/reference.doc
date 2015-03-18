@@ -3054,7 +3054,7 @@ $L(g_i)$
 $\{g_1,\dots,g_{i-1},g_{i+1},\dots,g_s\}$,
 @end tex
 @item
-in the case of a local or mixed ordering (localization of polynomial ring) and @code{option(redSB);}:
+in the case of a local ordering (localization of polynomial ring) and @code{option(redSB);}:
 @* if
 @ifinfo
 L(g_i) | L(g_j) for any i<>j,
@@ -5148,7 +5148,9 @@ simplifies modulo the current @code{qring} in all assignments.
 @item @code{redSB}
 @cindex redSB, option
 @cindex reduced standard basis
-computes a reduced standard basis in any standard basis computation.
+computes a reduced standard basis in any standard basis computation
+(in rings with global ior local orderings, See @ref{intered} for the discussion
+of reduced for local orderings))
 @c ---------
 @item @code{redTail}
 @cindex redTail, option

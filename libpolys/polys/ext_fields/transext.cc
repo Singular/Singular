@@ -1321,6 +1321,7 @@ void definiteGcdCancellation(number a, const coeffs cf,
 
   /* here we assume: NUM(f), DEN(f) !=NULL, in Z_a reqp. Z/p_a */
   poly pGcd = singclap_gcd_and_divide(NUM(f), DEN(f), ntRing);
+  //PrintS("gcd= ");p_wrp(pGcd,ntRing);PrintLn();
   if (p_IsConstant(pGcd, ntRing)
   && n_IsOne(p_GetCoeff(pGcd, ntRing), ntCoeffs)
   )
@@ -1456,6 +1457,8 @@ void ntNormalize (number &a, const coeffs cf)
 {
   if ( /*(*/ a!=NULL /*)*/ )
   {
+    //PrintS("num=");p_wrp(NUM(a),ntRing);
+    //PrintS(" den=");p_wrp(DEN(a),ntRing);PrintLn();
     definiteGcdCancellation(a, cf, FALSE);
     if ((DEN(a)!=NULL)
     &&(!n_GreaterZero(pGetCoeff(DEN(a)),ntCoeffs)))
