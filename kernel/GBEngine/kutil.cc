@@ -8116,6 +8116,8 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
 */
 BOOLEAN newHEdge(kStrategy strat)
 {
+  if (currRing->pLexOrder || rHasMixedOrdering(currRing))
+    return FALSE;
   int i,j;
   poly newNoether;
 

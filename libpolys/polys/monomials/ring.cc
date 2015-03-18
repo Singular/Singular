@@ -3172,12 +3172,24 @@ static void rSetDegStuff(ring r)
       r->pLDeg = pLDeg1c;
       r->pFDeg = p_Totaldegree;
     }
-    if ((order[0] == ringorder_a)
+    else if ((order[0] == ringorder_a)
     || (order[0] == ringorder_wp)
-    || (order[0] == ringorder_Wp)
-    || (order[0] == ringorder_ws)
-    || (order[0] == ringorder_Ws))
+    || (order[0] == ringorder_Wp))
+    {
       r->pFDeg = p_WFirstTotalDegree;
+    }
+    else if ((order[0] == ringorder_ws)
+    || (order[0] == ringorder_Ws))
+    {
+      for(int ii=block0[0];ii<=block1[0];ii++)
+      {
+        if (wvhdl[0][ii-1]<0) { r->MixedOrder=2;break;}
+      }
+      if (r->MixedOrder==0)
+        r->pFDeg = p_WFirstTotalDegree;
+      else
+        r->pFDeg = p_Totaldegree;
+    }
     r->firstBlockEnds=block1[0];
     r->firstwv = wvhdl[0];
   }
@@ -3205,10 +3217,18 @@ static void rSetDegStuff(ring r)
     if (wvhdl!=NULL) r->firstwv = wvhdl[1];
     if ((order[1] == ringorder_a)
     || (order[1] == ringorder_wp)
-    || (order[1] == ringorder_Wp)
-    || (order[1] == ringorder_ws)
-    || (order[1] == ringorder_Ws))
+    || (order[1] == ringorder_Wp))
       r->pFDeg = p_WFirstTotalDegree;
+    else if ((order[1] == ringorder_ws)
+    || (order[1] == ringorder_Ws))
+    {
+      for(int ii=block0[1];ii<=block1[1];ii++)
+        if (wvhdl[1][ii-1]<0) { r->MixedOrder=2;break;}
+      if (r->MixedOrder==FALSE)
+        r->pFDeg = p_WFirstTotalDegree;
+      else
+        r->pFDeg = p_Totaldegree;
+    }
   }
   /*------- more than one block ----------------------*/
   else
@@ -3245,7 +3265,12 @@ static void rSetDegStuff(ring r)
   }
 
   if (rOrd_is_Totaldegree_Ordering(r) || rOrd_is_WeightedDegree_Ordering(r))
-    r->pFDeg = p_Deg;
+  {
+    if(r->MixedOrder==FALSE)
+      r->pFDeg = p_Deg;
+    else
+      r->pFDeg = p_Totaldegree;
+  }
 
   if( rGetISPos(0, r) != -1 ) // Are there Schreyer induced blocks?
   {
