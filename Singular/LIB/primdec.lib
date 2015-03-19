@@ -4243,7 +4243,7 @@ static proc algeRad(ideal i)
    execute(gnir);
    ideal K=imap(RH,ra);
    K=std(K);
-   K=K[2..size(K)];
+   if (ncols(K)>1) { K=K[2..size(K)];}
    setring R;
    ideal ra=imap(RS,K);
 

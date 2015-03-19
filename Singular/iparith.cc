@@ -2714,7 +2714,7 @@ static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
     atSet(res,omStrDup("isHomog"),w_u,INTVEC_CMD);
   }
   delete w_v;
-  if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
+  //if (TEST_OPT_RETURN_SB) setFlag(res,FLAG_STD);
   return FALSE;
 }
 static BOOLEAN jjMOD_BI(leftv res, leftv u, leftv v)
@@ -7982,9 +7982,9 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
       while (dA2[i].cmd==op)
       {
         //Print("test %s %s\n",Tok2Cmdname(dA2[i].arg1),Tok2Cmdname(dA2[i].arg2));
-        if ((ai=iiTestConvert(at,dA2[i].arg1))!=0)
+        if ((ai=iiTestConvert(at,dA2[i].arg1,dConvertTypes))!=0)
         {
-          if ((bi=iiTestConvert(bt,dA2[i].arg2))!=0)
+          if ((bi=iiTestConvert(bt,dA2[i].arg2,dConvertTypes))!=0)
           {
             res->rtyp=dA2[i].res;
             if (currRing!=NULL)

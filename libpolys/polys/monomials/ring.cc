@@ -1317,7 +1317,8 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   res->ShortOut=r->ShortOut;
   res->CanShortOut=r->CanShortOut;
   res->LexOrder=r->LexOrder; // TRUE if the monomial ordering has polynomial and power series blocks
-  res->MixedOrder=r->MixedOrder; // ?? 1 for lex ordering (except ls), -1 otherwise
+  res->MixedOrder=r->MixedOrder; // TRUE for mixed (global/local) ordering, FALSE otherwise,
+  // 2 for diffenerent signs within one block
   res->ComponentOrder=r->ComponentOrder;
 
   //memset: res->ExpL_Size=0;
@@ -1459,7 +1460,8 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
   res->ShortOut=r->ShortOut;
   res->CanShortOut=r->CanShortOut;
   res->LexOrder=r->LexOrder; // TRUE if the monomial ordering has polynomial and power series blocks
-  res->MixedOrder=r->MixedOrder; // ?? 1 for lex ordering (except ls), -1 otherwise
+  res->MixedOrder=r->MixedOrder; // TRUE for mixed (global/local) ordering, FALSE otherwise,
+  // 2 for diffenerent signs within one block
   res->ComponentOrder=r->ComponentOrder;
 
   //memset: res->ExpL_Size=0;
@@ -3014,7 +3016,7 @@ static void rHighSet(ring r, int o_r, int o)
       {
         int i;
         for(i=r->block1[o]-r->block0[o];i>=0;i--)
-          if (r->wvhdl[o][i]<0) { r->MixedOrder=TRUE; break; }
+          if (r->wvhdl[o][i]<0) { r->MixedOrder=2; break; }
       }
       break;
     case ringorder_c:
@@ -3022,7 +3024,7 @@ static void rHighSet(ring r, int o_r, int o)
       break;
     case ringorder_C:
     case ringorder_S:
-      r->ComponentOrder=-1;
+      r->ComponentOrder=TRUE;
       break;
     case ringorder_M:
       r->LexOrder=TRUE;
@@ -3129,7 +3131,7 @@ static void rSetDegStuff(ring r)
   {
     r->MixedOrder = FALSE;
     for(int ii=block0[0];ii<=block1[0];ii++)
-      if (wvhdl[0][ii-1]<0) { r->MixedOrder=TRUE;break;}
+      if (wvhdl[0][ii-1]<0) { r->MixedOrder=2;break;}
     r->LexOrder=FALSE;
     for(int ii=block0[0];ii<=block1[0];ii++)
       if (wvhdl[0][ii-1]==0) { r->LexOrder=TRUE;break;}
@@ -3170,12 +3172,24 @@ static void rSetDegStuff(ring r)
       r->pLDeg = pLDeg1c;
       r->pFDeg = p_Totaldegree;
     }
-    if ((order[0] == ringorder_a)
+    else if ((order[0] == ringorder_a)
     || (order[0] == ringorder_wp)
-    || (order[0] == ringorder_Wp)
-    || (order[0] == ringorder_ws)
-    || (order[0] == ringorder_Ws))
+    || (order[0] == ringorder_Wp))
+    {
       r->pFDeg = p_WFirstTotalDegree;
+    }
+    else if ((order[0] == ringorder_ws)
+    || (order[0] == ringorder_Ws))
+    {
+      for(int ii=block0[0];ii<=block1[0];ii++)
+      {
+        if (wvhdl[0][ii-1]<0) { r->MixedOrder=2;break;}
+      }
+      if (r->MixedOrder==0)
+        r->pFDeg = p_WFirstTotalDegree;
+      else
+        r->pFDeg = p_Totaldegree;
+    }
     r->firstBlockEnds=block1[0];
     r->firstwv = wvhdl[0];
   }
@@ -3203,10 +3217,18 @@ static void rSetDegStuff(ring r)
     if (wvhdl!=NULL) r->firstwv = wvhdl[1];
     if ((order[1] == ringorder_a)
     || (order[1] == ringorder_wp)
-    || (order[1] == ringorder_Wp)
-    || (order[1] == ringorder_ws)
-    || (order[1] == ringorder_Ws))
+    || (order[1] == ringorder_Wp))
       r->pFDeg = p_WFirstTotalDegree;
+    else if ((order[1] == ringorder_ws)
+    || (order[1] == ringorder_Ws))
+    {
+      for(int ii=block0[1];ii<=block1[1];ii++)
+        if (wvhdl[1][ii-1]<0) { r->MixedOrder=2;break;}
+      if (r->MixedOrder==FALSE)
+        r->pFDeg = p_WFirstTotalDegree;
+      else
+        r->pFDeg = p_Totaldegree;
+    }
   }
   /*------- more than one block ----------------------*/
   else
@@ -3243,7 +3265,12 @@ static void rSetDegStuff(ring r)
   }
 
   if (rOrd_is_Totaldegree_Ordering(r) || rOrd_is_WeightedDegree_Ordering(r))
-    r->pFDeg = p_Deg;
+  {
+    if(r->MixedOrder==FALSE)
+      r->pFDeg = p_Deg;
+    else
+      r->pFDeg = p_Totaldegree;
+  }
 
   if( rGetISPos(0, r) != -1 ) // Are there Schreyer induced blocks?
   {
@@ -3349,7 +3376,7 @@ void p_SetGlobals(const ring r, BOOLEAN complete)
 static inline int sign(int x) { return (x > 0) - (x < 0);}
 BOOLEAN rOrd_is_MixedDegree_Ordering(ring r)
 {
-  int i, k;
+  int i;
   poly p=p_One(r);
   p_SetExp(p,1,1,r);p_Setm(p,r);
   int vz=sign(p_FDeg(p,r));
@@ -5627,4 +5654,3 @@ int n_IsParam(const number m, const ring r)
 
   return 0;
 }
-

@@ -45,11 +45,12 @@ public:
 
   void appendPolynomialBegin(size_t termCount) {}
 
-  void appendTermBegin() {
+  void appendTermBegin(const mgb::GroebnerConfiguration::Component c) {
     if (mTerm == 0)
       mTerm = mIdeal->m[mPolyCount] = pInit();
     else
       mTerm = mTerm->next = pInit();
+    pSetComp(mTerm,c);
   }
 
   void appendExponent(VarIndex index, Exponent exponent) {
@@ -311,7 +312,7 @@ bool setOrder(ring r, mgb::GroebnerConfiguration& conf) {
 
 bool prOrderMatrix(ring r) {
   const int varCount = r->N;
-  mgb::GroebnerConfiguration conf(101, varCount);
+  mgb::GroebnerConfiguration conf(101, varCount,0);
   if (!setOrder(r, conf))
     return false;
   const std::vector<Exponent>& gradings = conf.monomialOrder().second;
@@ -483,7 +484,8 @@ BOOLEAN mathicgb(leftv result, leftv arg)
 
   const int characteristic = n_GetChar(currRing);
   const int varCount = currRing->N;
-  mgb::GroebnerConfiguration conf(characteristic, varCount);
+  const ideal I=(ideal) arg->Data();
+  mgb::GroebnerConfiguration conf(characteristic, varCount,I->rank);
   if (!setOrder(currRing, conf))
     return TRUE;
   if (TEST_OPT_PROT)
@@ -502,7 +504,7 @@ BOOLEAN mathicgb(leftv result, leftv arg)
     toMathic.appendPolynomialBegin(termCount);
 
     for (poly p = origP; p != 0; p = pNext(p)) {
-      toMathic.appendTermBegin();
+      toMathic.appendTermBegin(pGetComp(p));
       for (int i = 1; i <= currRing->N; ++i)
         toMathic.appendExponent(i - 1, pGetExp(p, i));
       const long coefLong = reinterpret_cast<long>(pGetCoeff(p));

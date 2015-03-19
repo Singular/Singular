@@ -3480,10 +3480,12 @@ using the command @code{LIB}. For more information on libraries see
 
 @menu
 * proc declaration::
+* proc expression::
+* procs with different argument types::
 @end menu
 
 @c ---------------------------------------
-@node proc declaration,  , proc, proc
+@node proc declaration, proc expression , proc, proc
 @subsection proc declaration
 @cindex proc declaration
 
@@ -3548,9 +3550,76 @@ users should be declared static. @xref{Procedures in a library}.
 
 @c ref
 See
+@ref{apply};
 @ref{LIB};
 @ref{Libraries};
 @ref{Procedures}
+@c ref
+
+@c ---------------------------------------
+@node proc expression,procs with different argument types,proc declaration, proc
+@subsection proc expression
+@cindex proc expression
+@cindex ->
+
+@table @strong
+@item Syntax:
+variable_name @code{-> @{} expression(s) @code{@}}
+@item Purpose:
+Defines a new function, within @code{apply} or for assigning.
+@item Example:
+@smallexample
+@c example
+  apply(1..3,x->{x**2});
+@c example
+@end smallexample
+@end table
+
+@c ref
+See
+@ref{apply};
+@ref{proc};
+@ref{proc declaration}
+@c ref
+
+@c ---------------------------------------
+@node procs with different argument types, ,proc expression, proc
+@subsection procs with different argument types
+@cindex procs with different argument types
+@cindex branchTo
+
+@table @strong
+@item Syntax:
+@code{branchTo (} string_expression @code{,} ... proc_name @code{)}
+@item Purpose:
+branch to the given procedure if the argument types matches the
+types given as strings (which may be empty - matching the empty argument list).
+The main procedure (@code{p} in the example) must be defined without an argemnt list, and @code{branchTo} statement must be the first statement within
+the procedure body.
+@item Example:
+@smallexample
+@c example error
+  proc p1(int i) { "int:",i; }
+  proc p21(string s) { "string:",s; }
+  proc p22(string s1, string s2) { "two strings:",s1,s2; }
+  proc p()
+  { branchTo("int",p1);
+    branchTo("string","string",p22);
+    branchTo("string",p21);
+    ERROR("not defined for these argument types");
+  }
+  p(1);
+  p("hu");
+  p("ha","ha");
+  p(1,"hu");
+@c example
+@end smallexample
+@end table
+
+@c ref
+See
+@ref{proc};
+@ref{proc declaration}
 @c ref
 
 @c ---------------------------------------

@@ -1246,7 +1246,7 @@ BOOLEAN iiBranchTo(leftv r, leftv args)
   if (h->Typ()!=PROC_CMD)
   {
     omFree(t);
-    Werror("last arg is not a proc",i);
+    Werror("last arg (%d) is not a proc",i);
     return TRUE;
   }
   b=iiCheckTypes(iiCurrArgs,t,0);
@@ -4872,9 +4872,122 @@ void rSetHdl(idhdl h)
   currRingHdl = h;
 }
 
+static leftv rOptimizeOrdAsSleftv(leftv ord)
+{
+  // change some bad orderings/combination into better ones
+  leftv h=ord;
+  while(h!=NULL)
+  {
+    BOOLEAN change=FALSE;
+    intvec *iv = (intvec *)(h->data);
+ // ws(-i) -> wp(i)
+    if ((*iv)[1]==ringorder_ws)
+    {
+      BOOLEAN neg=TRUE;
+      for(int i=2;i<iv->length();i++)
+        if((*iv)[i]>=0) { neg=FALSE; break; }
+      if (neg)
+      {
+        (*iv)[1]=ringorder_wp;
+        for(int i=2;i<iv->length();i++)
+          (*iv)[i]= - (*iv)[i];
+        change=TRUE;
+      }
+    }
+ // Ws(-i) -> Wp(i)
+    if ((*iv)[1]==ringorder_Ws)
+    {
+      BOOLEAN neg=TRUE;
+      for(int i=2;i<iv->length();i++)
+        if((*iv)[i]>=0) { neg=FALSE; break; }
+      if (neg)
+      {
+        (*iv)[1]=ringorder_Wp;
+        for(int i=2;i<iv->length();i++)
+          (*iv)[i]= -(*iv)[i];
+        change=TRUE;
+      }
+    }
+ // wp(1) -> dp
+    if ((*iv)[1]==ringorder_wp)
+    {
+      BOOLEAN all_one=TRUE;
+      for(int i=2;i<iv->length();i++)
+        if((*iv)[i]!=1) { all_one=FALSE; break; }
+      if (all_one)
+      {
+        intvec *iv2=new intvec(3);
+        (*iv2)[0]=1;
+        (*iv2)[1]=ringorder_dp;
+        (*iv2)[2]=iv->length()-2;
+        delete iv;
+        iv=iv2;
+        h->data=iv2;
+        change=TRUE;
+      }
+    }
+ // Wp(1) -> Dp
+    if ((*iv)[1]==ringorder_Wp)
+    {
+      BOOLEAN all_one=TRUE;
+      for(int i=2;i<iv->length();i++)
+        if((*iv)[i]!=1) { all_one=FALSE; break; }
+      if (all_one)
+      {
+        intvec *iv2=new intvec(3);
+        (*iv2)[0]=1;
+        (*iv2)[1]=ringorder_Dp;
+        (*iv2)[2]=iv->length()-2;
+        delete iv;
+        iv=iv2;
+        h->data=iv2;
+        change=TRUE;
+      }
+    }
+ // dp(1)/Dp(1)/rp(1) -> lp(1)
+    if (((*iv)[1]==ringorder_dp)
+    || ((*iv)[1]==ringorder_Dp)
+    || ((*iv)[1]==ringorder_rp))
+    {
+      if (iv->length()==3)
+      {
+        if ((*iv)[2]==1)
+        {
+          (*iv)[1]=ringorder_lp;
+          change=TRUE;
+        }
+      }
+    }
+ // lp(i),lp(j) -> lp(i+j)
+    if(((*iv)[1]==ringorder_lp)
+    && (h->next!=NULL))
+    {
+      intvec *iv2 = (intvec *)(h->next->data);
+      if ((*iv2)[1]==ringorder_lp)
+      {
+        leftv hh=h->next;
+        h->next=hh->next;
+        hh->next=NULL;
+        if ((*iv2)[0]==1)
+          (*iv)[2] += 1; // last block unspecified, at least 1
+        else
+          (*iv)[2] += (*iv2)[2];
+        hh->CleanUp();
+        omFree(hh);
+        change=TRUE;
+      }
+    }
+   // -------------------
+    if (!change) h=h->next;
+ }
+ return ord;
+}
+
+
 BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
 {
   int last = 0, o=0, n = 1, i=0, typ = 1, j;
+  ord=rOptimizeOrdAsSleftv(ord);
   sleftv *sl = ord;
 
   // determine nBlocks

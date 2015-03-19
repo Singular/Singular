@@ -9,7 +9,7 @@ libpolys gfanlib IntegerProgramming \
 kernel Singular \
 dox emacs desktop
 
-EXTRA_DIST = README README.md README.pkg autogen.sh git-version-gen doxy singular.spec.in
+EXTRA_DIST = README README.md README.pkg autogen.sh git-version-gen doxy singular.spec.in singular.spec
 
 bin_SCRIPTS = libsingular-config
 

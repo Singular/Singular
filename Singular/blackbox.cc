@@ -201,6 +201,7 @@ int blackboxIsCmd(const char *n, int & tok)
       return ROOT_DECL;
     }
   }
+  tok=0;
   return 0;
 }
 

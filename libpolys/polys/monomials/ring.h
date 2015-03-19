@@ -740,6 +740,7 @@ BOOLEAN rHasSimpleLexOrder(const ring r);
 
 inline BOOLEAN rHasGlobalOrdering(const ring r){ return (r->OrdSgn==1); }
 inline BOOLEAN rHasLocalOrMixedOrdering(const ring r){ return (r->OrdSgn==-1); }
+inline BOOLEAN rHasMixedOrdering(const ring r) { return (r->MixedOrder); }
 
 // #define rHasGlobalOrdering(R) ((R)->OrdSgn==1)
 // #define rHasLocalOrMixedOrdering(R) ((R)->OrdSgn==-1)

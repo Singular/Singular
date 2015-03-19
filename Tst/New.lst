@@ -52,3 +52,5 @@ New/qring_ZmtoZmn_errorCoprime.tst
 New/qring_ZtoZm.tst
 New/AnnExt_R_bug.tst
 New/bug593_primdecZ.tst
+New/grmodexamples.tst
+New/sres_bug.tst

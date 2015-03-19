@@ -326,6 +326,9 @@ simpleExtension (CFList& backSubst, const CFList & Astar,
   {
     R= Astar.getFirst();
     rb= R.mvar();
+    Returnlist.append (rb);
+    if (isFunctionField)
+      Returnlist.append (denrb);
   }
   else
   {
@@ -407,11 +410,11 @@ simpleExtension (CFList& backSubst, const CFList & Astar,
       Returnlist.append (ra);
       if (isFunctionField)
         Returnlist.append (denra);
+      Returnlist.append (rb);
+      if (isFunctionField)
+        Returnlist.append (denrb);
     }
   }
-  Returnlist.append (rb);
-  if (isFunctionField)
-    Returnlist.append (denrb);
 
   if (isRat && getCharacteristic() == 0)
     On (SW_RATIONAL);

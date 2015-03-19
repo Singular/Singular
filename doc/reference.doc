@@ -3054,7 +3054,7 @@ $L(g_i)$
 $\{g_1,\dots,g_{i-1},g_{i+1},\dots,g_s\}$,
 @end tex
 @item
-in the case of a local or mixed ordering (localization of polynomial ring) and @code{option(redSB);}:
+in the case of a local ordering (localization of polynomial ring) and @code{option(redSB);}:
 @* if
 @ifinfo
 L(g_i) | L(g_j) for any i<>j,
@@ -5065,8 +5065,8 @@ See @ref{option(warn)}.
 @c ---------
 @item @code{returnSB}
 @cindex returnSB, option
-the functions @code{syz}, @code{intersect} (2 arguments), @code{quotient},
-@code{modulo} return a standard base instead of a generating set if
+the functions @code{syz}, @code{intersect} (2 arguments), @code{quotient}
+return a standard base instead of a generating set if
 @code{returnSB} is set. This option should not be used for @code{lift}.
 @c ---------
 @item @code{fastHC}
@@ -5148,25 +5148,33 @@ simplifies modulo the current @code{qring} in all assignments.
 @item @code{redSB}
 @cindex redSB, option
 @cindex reduced standard basis
-computes a reduced standard basis in any standard basis computation.
+computes a reduced standard basis in any standard basis computation
+(in rings with global ior local orderings, See @ref{intered} for the discussion
+of reduced for local orderings))
 @c ---------
 @item @code{redTail}
 @cindex redTail, option
 reduction of the tails of polynomials during standard basis
 computations. This option is ring dependent. By default, it is set for
 rings with global degree orderings and not set for all other rings.
+This option changes the reduction strategy and may decrease/increase time
+and memory consumption - it does not ensure tail reduction on the result - use redSB for that.
 @c ---------
 @item @code{redThrough}
 @cindex redThrough, option
 for inhomogenous input, polynomial reductions during standard basis
 computations are never postponed, but always finished through. This option
-is ring   dependent. By default, it is set for rings with global degree
+is ring dependent. By default, it is set for rings with global degree
 orderings and not set for all other rings.
+This option changes the reduction strategy and may decrease/increase time
+and memory consumption.
 @c ---------
 @item @code{sugarCrit}
 @cindex sugarCrit, option
 uses criteria similar to the homogeneous case to keep more pairs which would be
 excluded by other criteria but which may be useful for downstream computations.
+This option changes the strategy for criteria and selection and may decrease/increase time
+and memory consumption.
 @c ---------
 @item @code{weightM}
 @cindex weightM, option
