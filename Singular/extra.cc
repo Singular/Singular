@@ -1094,7 +1094,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       const short t[]={2,POLY_CMD,INT_CMD};
       if (iiCheckTypes(h,t,1))
       {
-        poly p=(poly)h->CopyD();
+        poly p=(poly)h->Data();
         h=h->next;
         int lV=(int)((long)(h->Data()));
         res->rtyp = POLY_CMD;

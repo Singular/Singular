@@ -170,6 +170,7 @@ poly pLPshift(poly p, int sh, int uptodeg, int lV)
     pIter(pp);
   }
   /* delete pp? */
+  p_Delete(&p,currRing);
   /* int version: returns TRUE if it was successful */
   return(q);
 }
