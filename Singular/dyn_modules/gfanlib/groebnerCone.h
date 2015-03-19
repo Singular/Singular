@@ -67,6 +67,12 @@ public:
   const tropicalStrategy* getTropicalStrategy() const { return currentStrategy; };
   friend struct groebnerCone_compare;
 
+  bool isTrivial() const
+  {
+    bool b = (polynomialRing==NULL);
+    return b;
+  }
+
   /**
    * Returns true if Groebner cone contains w, false otherwise
    */

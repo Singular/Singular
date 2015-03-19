@@ -32,11 +32,10 @@ static void undoSetOptionRedSB()
   SI_RESTORE_OPT(bitsetSave1,bitsetSave2);
 }
 
-static gfan::ZFan* toZFan(std::set<gfan::ZCone> maxCones)
+static gfan::ZFan* toZFan(std::set<gfan::ZCone> maxCones, int d)
 {
-  std::set<gfan::ZCone>::iterator sigma = maxCones.begin();
-  gfan::ZFan* zf = new gfan::ZFan(sigma->ambientDimension());
-  for (; sigma!=maxCones.end(); sigma++)
+  gfan::ZFan* zf = new gfan::ZFan(d);
+  for (std::set<gfan::ZCone>::iterator sigma = maxCones.begin(); sigma!=maxCones.end(); sigma++)
     zf->insert(*sigma);
   return zf;
 }
@@ -58,7 +57,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
         tropicalStrategy currentStrategy(I,currRing);
         std::set<gfan::ZCone> maxCones = tropicalVariety(g,currRing,&currentStrategy);
         res->rtyp = fanID;
-        res->data = (char*) toZFan(maxCones);
+        res->data = (char*) toZFan(maxCones,currentStrategy.getExpectedAmbientDimension());
         I->m[0] = NULL;
         id_Delete(&I,currRing);
         return FALSE;
@@ -82,7 +81,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
         poly gStart = startingIdeal->m[0];
         std::set<gfan::ZCone> maxCones = tropicalVariety(gStart,startingRing,&currentStrategy);
         res->rtyp = fanID;
-        res->data = (char*) toZFan(maxCones);
+        res->data = (char*) toZFan(maxCones,currentStrategy.getExpectedAmbientDimension());
         I->m[0] = NULL;
         id_Delete(&I,currRing);
         return FALSE;
@@ -110,7 +109,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
           tropicalStrategy currentStrategy(I,currRing);
           std::set<gfan::ZCone> maxCones = tropicalVariety(g,currRing,&currentStrategy);
           res->rtyp = fanID;
-          res->data = (char*) toZFan(maxCones);
+          res->data = (char*) toZFan(maxCones,currentStrategy.getExpectedAmbientDimension());
           return FALSE;
         }
         catch (const std::exception& ex)
@@ -130,7 +129,7 @@ BOOLEAN tropicalVariety(leftv res, leftv args)
           poly gStart = startingIdeal->m[0];
           std::set<gfan::ZCone> maxCones = tropicalVariety(gStart,startingRing,&currentStrategy);
           res->rtyp = fanID;
-          res->data = (char*) toZFan(maxCones);
+          res->data = (char*) toZFan(maxCones,currentStrategy.getExpectedAmbientDimension());
           return FALSE;
         }
         catch (const std::exception& ex)
