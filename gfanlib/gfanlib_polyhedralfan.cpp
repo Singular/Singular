@@ -70,14 +70,16 @@ bool PolyhedralFan::isEmpty()const
 
 int PolyhedralFan::getMaxDimension()const
 {
-  assert(!cones.empty());
+  if (cones.empty())
+    return -1;
 
   return cones.begin()->dimension();
 }
 
 int PolyhedralFan::getMinDimension()const
 {
-  assert(!cones.empty());
+  if (cones.empty())
+    return -1;
 
   return cones.rbegin()->dimension();
 }
@@ -861,7 +863,8 @@ int PolyhedralFan::size()const
 
 int PolyhedralFan::dimensionOfLinealitySpace()const
 {
-  assert(cones.size());//slow!
+  if (cones.empty())
+    return n;
   return cones.begin()->dimensionOfLinealitySpace();
 }
 
