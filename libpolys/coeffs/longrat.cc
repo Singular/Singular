@@ -107,6 +107,7 @@ BOOLEAN nlDBTest(number a, char *f,int l, const coeffs r);
 #define LONG int
 #endif
 
+
 static inline number nlShort3(number x) // assume x->s==3
 {
   assume(x->s==3);
@@ -2737,7 +2738,8 @@ void    nlCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
   PrintS("//   coeff. ring is : Integers\n");
 }
 
-number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, const coeffs CF)
+int n_SwitchChinRem=0;
+number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, CFArray &inv_cache,const coeffs CF)
 // elemenst in the array are x[0..(rl-1)], q[0..(rl-1)]
 {
   setCharacteristic( 0 ); // only in char 0
@@ -2750,7 +2752,10 @@ number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, const c
     Q[i]=CF->convSingNFactoryN(q[i],FALSE,CF); // may be larger MAX_INT
   }
   CanonicalForm xnew,qnew;
-  chineseRemainder(X,Q,xnew,qnew);
+  if (n_SwitchChinRem)
+    chineseRemainder(X,Q,xnew,qnew);
+  else
+    chineseRemainderCached(X,Q,xnew,qnew,inv_cache);
   number n=CF->convFactoryNSingN(xnew,CF);
   if (sym)
   {
@@ -2770,7 +2775,8 @@ number   nlChineseRemainderSym(number *x, number *q,int rl, BOOLEAN sym, const c
 }
 number   nlChineseRemainder(number *x, number *q,int rl, const coeffs C)
 {
-  return nlChineseRemainderSym(x,q,rl,TRUE,C);
+  CFArray inv(rl);
+  return nlChineseRemainderSym(x,q,rl,TRUE,inv,C);
 }
 
 static void nlClearContent(ICoeffsEnumerator& numberCollectionEnumerator, number& c, const coeffs cf)

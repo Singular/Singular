@@ -3736,6 +3736,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
    #endif
+/*==================== n_SwitchChinRem =================*/
+    if(strcmp(sys_cmd,"cache_chinrem")==0)
+    {
+      extern int n_SwitchChinRem;
+      Print("caching inverse in chines remainder:%d\n",n_SwitchChinRem);
+      if ((h!=NULL)&&(h->Typ()==INT_CMD))
+        n_SwitchChinRem=(int)(long)h->Data();
+      return FALSE;
+    }
+    else
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

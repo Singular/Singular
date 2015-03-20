@@ -247,3 +247,35 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
     return result;
 }
 
+// returns x where (a * x) % b == 1, inv is a cache
+static CanonicalForm chin_mul_inv(CanonicalForm a, CanonicalForm b, int ind, CFArray &inv)
+{
+  if (inv[ind].isZero())
+  {
+    CanonicalForm s,dummy;
+    (void)bextgcd( a, b, s, dummy );
+    inv[ind]=s;
+    return s;
+  }
+  else
+    return inv[ind];
+}
+
+void chineseRemainderCached(CFArray &a, CFArray &n, CanonicalForm &xnew, CanonicalForm &prod, CFArray &inv)
+{
+  CanonicalForm p, sum = 0; prod=1;
+  int i;
+  int len=n.size();
+
+  for (i = 0; i < len; i++) prod *= n[i];
+
+  for (i = 0; i < len; i++)
+  {
+    p = prod / n[i];
+    sum += a[i] * chin_mul_inv(p, n[i], i, inv) * p;
+  }
+
+  xnew = mod(sum , prod);
+}
+// http://rosettacode.org/wiki/Chinese_remainder_theorem#C
+

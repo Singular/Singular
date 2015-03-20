@@ -1715,13 +1715,14 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring r)
   int i,j;
   number *x=(number *)omAlloc(rl*sizeof(number));
   poly *p=(poly *)omAlloc(rl*sizeof(poly));
+  CFArray inv_cache(rl);;
   for(i=cnt-1;i>=0;i--)
   {
     for(j=rl-1;j>=0;j--)
     {
       p[j]=xx[j]->m[i];
     }
-    result->m[i]=p_ChineseRemainder(p,x,q,rl,r);
+    result->m[i]=p_ChineseRemainder(p,x,q,rl,inv_cache,r);
     for(j=rl-1;j>=0;j--)
     {
       xx[j]->m[i]=p[j];

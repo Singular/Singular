@@ -16,6 +16,7 @@
 /* for assume: */
 #include <reporter/reporter.h>
 #include <reporter/s_buff.h>
+#include <factory/factory.h>
 
 #include <coeffs/si_gmp.h>
 #include <coeffs/Enumerator.h>
@@ -290,7 +291,7 @@ struct n_Procs_s
    /// returns X with X mod q[i]=x[i], i=0..rl-1
    //CF: by the looks of it: q[i] in Z (coeffs_BIGINT)
    //    strange things happen in naChineseRemainder for example.
-   number  (*cfChineseRemainder)(number *x, number *q,int rl, BOOLEAN sym,const coeffs);
+   number  (*cfChineseRemainder)(number *x, number *q,int rl, BOOLEAN sym,CFArray &inv_cache,const coeffs);
 
    /// degree for coeffcients: -1 for 0, 0 for "constants", ...
    int (*cfParDeg)(number x,const coeffs r);
@@ -777,8 +778,8 @@ static FORCE_INLINE BOOLEAN n_DivBy(number a, number b, const coeffs r)
   return !n_IsZero(b, r);
 }
 
-static FORCE_INLINE number n_ChineseRemainderSym(number *a, number *b, int rl, BOOLEAN sym,const coeffs r)
-{ STATISTIC(n_ChineseRemainderSym); assume(r != NULL); assume(r->cfChineseRemainder != NULL); return r->cfChineseRemainder(a,b,rl,sym,r); }
+static FORCE_INLINE number n_ChineseRemainderSym(number *a, number *b, int rl, BOOLEAN sym,CFArray &inv_cache,const coeffs r)
+{ STATISTIC(n_ChineseRemainderSym); assume(r != NULL); assume(r->cfChineseRemainder != NULL); return r->cfChineseRemainder(a,b,rl,sym,inv_cache,r); }
 
 static FORCE_INLINE number n_Farey(number a, number b, const coeffs r)
 { STATISTIC(n_Farey); assume(r != NULL); assume(r->cfFarey != NULL); return r->cfFarey(a,b,r); }
