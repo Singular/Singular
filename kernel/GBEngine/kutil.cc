@@ -7349,7 +7349,10 @@ void initBuchMoraCrit(kStrategy strat)
   strat->pairtest = NULL;
   /* alway use tailreduction, except:
   * - in local rings, - in lex order case, -in ring over extensions */
-  strat->noTailReduction = !TEST_OPT_REDTAIL;
+  if (rHasLocalOrMixedOrdering(currRing))
+    strat->noTailReduction = !(TEST_OPT_REDTAIL || TEST_OPT_REDSB);
+  else
+    strat->noTailReduction = !TEST_OPT_REDTAIL;
   //if(rHasMixedOrdering(currRing)==2)
   //{
   // strat->noTailReduction =TRUE;

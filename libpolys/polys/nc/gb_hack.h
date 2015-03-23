@@ -27,7 +27,7 @@ ideal sca_bba(const ideal, const ideal, const intvec *, const intvec *, kStrateg
 /// Modified modern Sinuglar Mora's algorithm.
 ideal sca_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy, const ring _currRing);
 
-poly kNF(ideal, ideal, poly, int, int, const ring _currRing);
+poly k_NF(ideal, ideal, poly, int, int, const ring _currRing);
 
 
 

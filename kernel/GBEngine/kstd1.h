@@ -26,7 +26,7 @@ poly kNF (ideal F, ideal Q, poly p,int syzComp=0, int lazyReduce=0);
 ideal kNF(ideal F, ideal Q, ideal p,int syzComp=0, int lazyReduce=0);
 
 /// NOTE: this is just a wrapper which sets currRing for the actual kNF call
-poly kNF (ideal F, ideal Q, poly p,int syzComp, int lazyReduce, const ring _currRing);
+poly k_NF (ideal F, ideal Q, poly p,int syzComp, int lazyReduce, const ring _currRing);
 ideal kSba(ideal F,ideal Q, tHomog h, intvec ** mw, int incremental=0, int arri=0, intvec *hilb=NULL,
           int syzComp=0,int newIdeal=0, intvec *vw=NULL);
 
