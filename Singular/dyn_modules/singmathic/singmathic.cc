@@ -463,18 +463,13 @@ BOOLEAN prOrderX(leftv result, leftv arg) {
   return FALSE;
 }
 
-BOOLEAN setRingGlobal(leftv result, leftv arg) {
-  currRing->OrdSgn = 1;
-  result->rtyp=NONE;
-  return FALSE;
-}
-
 BOOLEAN mathicgb(leftv result, leftv arg)
 {
   result->rtyp=NONE;
 
-  if (arg == NULL || arg->next != NULL || arg->Typ() != IDEAL_CMD) {
-    WerrorS("Syntax: mathicgb(<ideal>)");
+  if (arg == NULL || arg->next != NULL || 
+  ((arg->Typ() != IDEAL_CMD) &&(arg->Typ() != MODUL_CMD))){
+    WerrorS("Syntax: mathicgb(<ideal>/<module>)");
     return TRUE;
   }
   if (!rField_is_Zp(currRing)) {
@@ -517,7 +512,7 @@ BOOLEAN mathicgb(leftv result, leftv arg)
   MathicToSingStream fromMathic(characteristic, varCount);
   mgb::computeGroebnerBasis(toMathic, fromMathic);
 
-  result->rtyp=IDEAL_CMD;
+  result->rtyp = arg->Typ();
   result->data = fromMathic.takeIdeal();
   return FALSE;
 }
@@ -540,12 +535,6 @@ int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
     "mathicgb_prOrder",
     FALSE,
     prOrderX
-  );
-  psModulFunctions->iiAddCproc(
-    (currPack->libname ? currPack->libname : ""),
-    "mathicgb_setRingGlobal",
-    FALSE,
-    setRingGlobal
   );
   return MAX_TOK;
 }
