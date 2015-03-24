@@ -3055,15 +3055,18 @@ static BOOLEAN jjREAD2(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjREDUCE_P(leftv res, leftv u, leftv v)
 {
-  assumeStdFlag(v);
-  res->data = (char *)kNF((ideal)v->Data(),currRing->qideal,(poly)u->Data());
+  ideal vi=(ideal)v->Data();
+  if (currRing->qideal!=NULL || vi->ncols>1)
+    assumeStdFlag(v);
+  res->data = (char *)kNF(vi,currRing->qideal,(poly)u->Data());
   return FALSE;
 }
 static BOOLEAN jjREDUCE_ID(leftv res, leftv u, leftv v)
 {
-  assumeStdFlag(v);
   ideal ui=(ideal)u->Data();
   ideal vi=(ideal)v->Data();
+  if (currRing->qideal!=NULL || vi->ncols>1)
+    assumeStdFlag(v);
   res->data = (char *)kNF(vi,currRing->qideal,ui);
   return FALSE;
 }
