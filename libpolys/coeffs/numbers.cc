@@ -100,7 +100,7 @@ static number ndFarey(number,number,const coeffs r)
   Werror("farey not implemented for %s (c=%d)",r->cfCoeffString(r),getCoeffType(r));
   return NULL;
 }
-static number ndChineseRemainder(number *,number *,int,BOOLEAN,const coeffs r)
+static number ndChineseRemainder(number *,number *,int,BOOLEAN,CFArray&,const coeffs r)
 {
   Werror("ChineseRemainder not implemented for %s (c=%d)",r->cfCoeffString(r),getCoeffType(r));
   return r->cfInit(0,r);

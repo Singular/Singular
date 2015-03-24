@@ -1669,7 +1669,8 @@ static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
     q[i]=n_Init((*p)[i], coeffs_BIGINT);
     x[i]=n_Init((*c)[i], coeffs_BIGINT);
   }
-  number n=n_ChineseRemainderSym(x,q,rl,FALSE,coeffs_BIGINT);
+  CFArray iv(rl);
+  number n=n_ChineseRemainderSym(x,q,rl,FALSE,iv,coeffs_BIGINT);
   for(i=rl-1;i>=0;i--)
   {
     n_Delete(&(q[i]),coeffs_BIGINT);
@@ -1887,7 +1888,8 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   if (return_type==BIGINT_CMD)
   {
-    number n=n_ChineseRemainderSym(xx,q,rl,TRUE,coeffs_BIGINT);
+    CFArray i_v(rl);
+    number n=n_ChineseRemainderSym(xx,q,rl,TRUE,i_v,coeffs_BIGINT);
     res->data=(char *)n;
   }
   else
@@ -3053,15 +3055,18 @@ static BOOLEAN jjREAD2(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjREDUCE_P(leftv res, leftv u, leftv v)
 {
-  assumeStdFlag(v);
-  res->data = (char *)kNF((ideal)v->Data(),currRing->qideal,(poly)u->Data());
+  ideal vi=(ideal)v->Data();
+  if (currRing->qideal!=NULL || vi->ncols>1 || rIsPluralRing(currRing))
+    assumeStdFlag(v);
+  res->data = (char *)kNF(vi,currRing->qideal,(poly)u->Data());
   return FALSE;
 }
 static BOOLEAN jjREDUCE_ID(leftv res, leftv u, leftv v)
 {
-  assumeStdFlag(v);
   ideal ui=(ideal)u->Data();
   ideal vi=(ideal)v->Data();
+  if (currRing->qideal!=NULL || vi->ncols>1 || rIsPluralRing(currRing))
+    assumeStdFlag(v);
   res->data = (char *)kNF(vi,currRing->qideal,ui);
   return FALSE;
 }

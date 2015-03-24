@@ -3747,6 +3747,8 @@ basis returned by @code{liftstd}, and @code{T} the transformation matrix
 then @code{matrix(sm)=matrix(m)*T} and @code{sm=ideal(matrix(m)*T)},
 resp.@: @code{sm=module(matrix(m)*T)}.
 @*In an optional third argument the syzygy module will be returned.
+@item @strong{Note:}
+if working in a quotient ring, then @code{matrix(sm)=reduce(matrix(m)*T,0)} and @code{sm=reduce(ideal(matrix(m)*T),0)}.
 @item @strong{Example:}
 @smallexample
 @c example

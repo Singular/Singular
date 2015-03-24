@@ -1608,19 +1608,19 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if(!rField_is_Ring(currRing))
     #endif
     {
-        int k=1;
-        int j;
-        while(k<=strat->sl)
+      int k=1;
+      int j;
+      while(k<=strat->sl)
+      {
+        j=0;
+        loop
         {
-          j=0;
-          loop
-          {
-            if (j>=k) break;
-            clearS(strat->S[j],strat->sevS[j],&k,&j,strat);
-            j++;
-          }
-          k++;
+          if (j>=k) break;
+          clearS(strat->S[j],strat->sevS[j],&k,&j,strat);
+          j++;
         }
+        k++;
+      }
     }
   }
 
