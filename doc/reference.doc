@@ -5151,7 +5151,7 @@ simplifies modulo the current @code{qring} in all assignments.
 @cindex redSB, option
 @cindex reduced standard basis
 computes a reduced standard basis in any standard basis computation
-(in rings with global ior local orderings, See @ref{intered} for the discussion
+(in rings with global ior local orderings, See @ref{interred} for the discussion
 of reduced for local orderings))
 @c ---------
 @item @code{redTail}
