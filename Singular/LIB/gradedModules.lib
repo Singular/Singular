@@ -45,19 +45,19 @@ PROCEDURES:
     grprod(A,B)     composition of graded maps (product of matrices?)
     grgroebner(M)   Groebner Basis of Im(M) as a graded object
     grconcat(M,N)   sum of maps into the same target module
-    grrndmat(s,d[,p,b]) generate random matrix compatible with src and dst gradings
-    grrndmap(S,D[,p,b]) generate random 0-deg homomorphism src(S) -> src(D)
-    grrndmap2(S,D[,p,b]) generate random 0-deg homomorphism dst(S) -> dst(D)
-    grlifting(A,B)  RANDOM! chain lifting
-    grlifting2(A,B)  RANDOM! chain lifting
-    mappingcone(M,N) mapping cone?
-    mappingcone2(M,N) mapping cone2?
-    grlifting3(A,B)  RANDOM! chain lifting??
-    mappingcone3(A,B) mapping cone3?
-    grrange(M)       get the row-weighting attribute
+    grrndmat(s,d[,p,b])   generate random matrix compatible with src and dst gradings
+    grrndmap(S,D[,p,b])   generate random 0-deg homomorphism src(S) -> src(D)
+    grrndmap2(S,D[,p,b])   generate random 0-deg homomorphism dst(S) -> dst(D)
+    grlifting(A,B)     RANDOM! chain lifting
+    grlifting2(A,B)    RANDOM! chain lifting
+    mappingcone(M,N)   mapping cone?
+    mappingcone2(M,N)  mapping cone2?
+    grlifting3(A,B)    RANDOM! chain lifting?
+    mappingcone3(A,B)  mapping cone3?
+    grrange(M)         get the row-weightings
 ";
 
-LIB"matrix.lib"; // ?
+LIB "matrix.lib"; // ?
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // . view graded module/map
@@ -121,7 +121,7 @@ EXAMPLE: example grview; shows an example
     return ();
   }
 
-//  typeof( N ) ;  attrib( N );  attrib(N, "isHomog");
+//  typeof( N ) ;  attrib( N );  grrange(N);
 
   ASSUME(1, grtest(N) ); 
 
@@ -139,7 +139,7 @@ EXAMPLE: example grview; shows an example
     D[nr+2*d, c+d] = G[c]; // deg(v) + gr[ leadexp(v)[m] ]; // bottom row with computed column induced degrees
   }
 
-  intvec gr = attrib(N, "isHomog"); // grading weights?
+  intvec gr = grrange(N); // grading weights?
 
   for( r = nr; r > 0; r-- )
   {
@@ -257,7 +257,7 @@ EXAMPLE: example grdeg; shows an example
 
   ASSUME(0, ncols(M) == size(M) );
 
-  def w = attrib(M, "isHomog"); // grading weights?
+  def w = grrange(M); // grading weights?
 
   if( size(M) == 0 ){ return (w); } // TODO: Q@Wolfram!???
 
@@ -308,7 +308,7 @@ Reorder gens of M: compute graded degrees and the permutation to sort them
   // input should be graded:
   ASSUME(1, grtest(M) );
 
-  intvec w = attrib(M, "isHomog"); // grading weights
+  intvec w = grrange(M); // grading weights
 
   intvec gr = grdeg( M );
 
@@ -346,7 +346,7 @@ EXAMPLE: example grtranspose1; shows an example
     while( i < j )
     {
      if( size(M[i]) == 0 ){ break; }
-     ASSUME(0, typeof(attrib(M[i], "isHomog")) == "intvec");
+     ASSUME(0, typeof(grrange(M[i])) == "intvec");
      i++;
     }
 
@@ -358,7 +358,7 @@ EXAMPLE: example grtranspose1; shows an example
     while( j > 0 )
     {
 //      grview(M[i]);
-      L[j] = grtranspose1( grobj( M[i], attrib(M[i], "isHomog")) );
+      L[j] = grtranspose1( grobj( M[i], grrange(M[i])) );
 //      grview(L[j]);
 
       if( (i > 1) && (j > 0) )
@@ -380,7 +380,7 @@ EXAMPLE: example grtranspose1; shows an example
 
  (N,d) = reorder(M, -1);
 
- kill M; module M = grobj(transpose(N), -d, -attrib(N, "isHomog"));
+ kill M; module M = grobj(transpose(N), -d, -grrange(N));
 
 // "b";  grview(M);
 
@@ -390,7 +390,7 @@ EXAMPLE: example grtranspose1; shows an example
 
 // "e"; grview( N );
 
- ASSUME(1, issorted(attrib(N, "isHomog"), 1) );
+ ASSUME(1, issorted( grrange(N), 1) );
  ASSUME(1, issorted(grdeg(N), 1) );
 
 
@@ -436,7 +436,7 @@ EXAMPLE: example grorder; shows an example
     while( i < j )
     {
       if( size(M[i]) == 0 ){ break; }
-      ASSUME(0, typeof(attrib(M[i], "isHomog")) == "intvec");
+      ASSUME(0, typeof(grrange(M[i])) == "intvec");
       i++;
     }
 
@@ -447,7 +447,7 @@ EXAMPLE: example grorder; shows an example
     while( i > 0 )
     {
 //      "i: ", i;      "A"; grview(M[i]);
-      L[i] = grorder( grobj( M[i], attrib(M[i], "isHomog")) );
+      L[i] = grorder( grobj( M[i], grrange(M[i])) );
 //      "B"; grview(L[i]);
       if( i < j )
       {
@@ -468,7 +468,7 @@ EXAMPLE: example grorder; shows an example
 
   (N,d) = reorder(M, 1); kill M;
 
-  module M = grobj(transpose(N), -d, -attrib(N, "isHomog")); kill N,d;
+  module M = grobj(transpose(N), -d, -grrange(N)); kill N,d;
 
 // "b";  grview(M);
 
@@ -476,11 +476,11 @@ EXAMPLE: example grorder; shows an example
   // reverse order:
   (N,d) = reorder(M, -1); kill M;
 
-  module M = grobj(transpose(N), -d, -attrib(N, "isHomog"));
+  module M = grobj(transpose(N), -d, -grrange(N));
 
 // "c";  grview(M);
 
-  ASSUME(1, issorted(attrib(M, "isHomog"), 1) );
+  ASSUME(1, issorted(grrange(M), 1) );
   ASSUME(1, issorted(grdeg(M), 1) );
 
   return (M);
@@ -648,8 +648,8 @@ EXAMPLE: example grsum; shows an example
   ASSUME(1, grtest(A) );
   ASSUME(1, grtest(B) );
 
-  intvec a = attrib(A, "isHomog");
-  intvec b = attrib(B, "isHomog");
+  intvec a = grrange(A);
+  intvec b = grrange(B);
   intvec c = a,b;
   int r = nrows(A);
 
@@ -708,7 +708,7 @@ EXAMPLE: example grshift; shows an example
 {
   ASSUME(1, grtest(M) );
 
-  intvec a = attrib(M, "isHomog");
+  intvec a = grrange(M);
   a = a - intvec(d:size(a));
 
   intvec t = attrib(M, "degHomog");
@@ -745,8 +745,8 @@ EXAMPLE: example grisequal; shows an example
   int ra = nrows(A);
   int rb = nrows(B);
 
-  intvec wa = attrib(A, "isHomog");
-  intvec wb = attrib(B, "isHomog");
+  intvec wa = grrange(A);
+  intvec wb = grrange(B);
 
   if( (ra != rb) || (ncols(A) != ncols(B)) ){ return (0); } // TODO: ???
 
@@ -796,8 +796,8 @@ EXAMPLE: example grobj; shows an example
   module M = module(A);
   ASSUME(0, size(w) >= nrows(M) );
 
-  attrib(M, "rank", size(w));
-  attrib(M, "isHomog", w);
+  attrib( M, "rank", size(w) );
+  attrib( M, "isHomog", w );
 
   if( size(#) > 0 )
   {
@@ -831,7 +831,7 @@ example
 
   print(Z);
   attrib(Z);
-  attrib(Z, "isHomog"); // module weights
+  grrange(Z); // module weights
   attrib(Z, "degHomog"); // total degrees
 
 }
@@ -854,13 +854,13 @@ EXAMPLE: example grtest; shows an example
     return (0);
   };
 
-  if ( typeof(attrib(N, "isHomog")) != "intvec" )
+  if ( typeof(grrange(N)) != "intvec" )
   {
     if(b) { type(N); attrib(N); "   ? grtest: Input must be graded!";  };
     return (0);
   };
 
-  intvec gr = attrib(N, "isHomog"); // grading weights...
+  intvec gr = grrange(N); // grading weights...
   if ( nrows(N) != size(gr) )
   {
     if(b) { "   ? grtest: Input has wrong number of rows!"; };    
@@ -953,7 +953,7 @@ EXAMPLE: example grgroebner; shows an example
 {
   ASSUME(1, grtest(A));
 
-  return ( grobj( groebner(A), attrib(A, "isHomog") ) );
+  return ( grobj( groebner(A), grrange(A) ) );
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -999,7 +999,7 @@ EXAMPLE: example grsyz; shows an example
   ASSUME(1, grtest(A));
   intvec v = grdeg(A);
 
-//  attrib(A, "isHomog");
+//  grrange(A);
   
   module M = syz(A); 
 //  print(M);
@@ -1035,7 +1035,9 @@ EXAMPLE: example grprod; shows an example
   ASSUME(1, grtest(A));
   ASSUME(1, grtest(B));
 
-  return ( grobj( A*B, attrib(A, "isHomog"), grdeg(B) ) );
+  // TODO: ASSUME(0, grdeg() == grrange());!!! 
+
+  return ( grobj( A*B, grrange(A), grdeg(B) ) );
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -1071,7 +1073,7 @@ EXAMPLE: example grres; shows an example
   ASSUME(0, l >= 0);
   ASSUME(1, grtest(A));
 
-  intvec v = attrib(A, "isHomog");
+  intvec v = grrange(A);
   
   int b = (size(#) > 0);
   if(b) { list r = res(A, l, #[1]); } else { list r = res(A, l); }
@@ -1120,7 +1122,7 @@ EXAMPLE: example grtranspose; shows an example
 "
 {
   ASSUME(1, grtest(M) );
-  return (  grobj(transpose(M), -grdeg(M), -attrib(M, "isHomog"))  );
+  return (  grobj(transpose(M), -grdeg(M), -grrange(M))  );
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -1336,9 +1338,7 @@ NOTE: Please document/name this proc properly
   else // i <= n: middle part is present, a_i != 0 
     { // a = a1  ... |  i:2, a_2 ..... i: n, a_n | .... i: n+1a_(n+1)
       j = i - 1;
-      module I = maxideal(1);
-      attrib(I,"isHomog", intvec(0));
-      list L = mres(I, 0);
+      module I = maxideal(1); attrib(I,"isHomog", intvec(0)); list L = mres(I, 0); // TODO: use grres() instead!!!
       list kos = grorder(L);
       // make sure that graded maps  are represented by blocks corresponding to the betti diagram?
 
@@ -1406,12 +1406,11 @@ EXAMPLE: example grconcat; shows an example
 "
 {
 
-  ASSUME(0, attrib(A,"isHomog")==attrib(B,"isHomog"));
-  ASSUME(1, grtest(A));
-  ASSUME(1, grtest(B));
+  ASSUME(0, grtest(A));
+  ASSUME(0, grtest(B));
+  ASSUME(0, grrange(A)==grrange(B));
  
-
-  intvec v=attrib(A,"isHomog");
+  intvec v = grrange(A);
   intvec w=grdeg(A),grdeg(B);
   return(grobj(concat(A,B),v,w));
 }
@@ -1642,7 +1641,7 @@ proc mappingcone(M,N)
 
   for(i=2;i<=size(P);i++)
   {
-    intvec v=attrib(rM[i],"isHomog");
+    intvec v=grrange(rM[i]);
     intvec w=grdeg(rN[i+1]);
     int r=size(v);
     int s=size(w);
@@ -1732,8 +1731,8 @@ EXAMPLE: example grrndmap2; shows an example
 {
   ASSUME(1, grtest(D) );
   ASSUME(1, grtest(S) );
-  intvec v = -attrib(D, "isHomog"); // source
-  intvec w = -attrib(S, "isHomog"); // target
+  intvec v = -grrange(D); // source
+  intvec w = -grrange(S); // target
   return (grobj(grrndmat(v, w, #), -w, -v ) );
 }
 example
@@ -1859,7 +1858,7 @@ EXAMPLE: example mappingcone2;
 
   for(i=2;i<=size(P);i++)
   {
-    intvec v=attrib(rM[i-1],"isHomog");
+    intvec v=grrange(rM[i-1]);
     intvec w=grdeg(rN[i]);
     int r=size(v);
     int s=size(w);
@@ -1935,7 +1934,7 @@ EXAMPLE: example ????????
 
   for(i=2;i<=size(P);i++)
   {
-    intvec v=attrib(rM[i-1],"isHomog");
+    intvec v=grrange(rM[i-1]);
     intvec w=grdeg(rN[i]);
     int r=size(v);
     int s=size(w);
@@ -2051,12 +2050,12 @@ M=coker(A), and N=coker(B)
 EXAMPLE: example mappingcone3; shows an example
 
 {
-  ASSUME(1, grtest(A));
-  ASSUME(1, grtest(B));
+  ASSUME(0, grtest(A));
+  ASSUME(0, grtest(B));
 
-  list P=grlifting3(A,B);
-  list rM=grres(A,0);
-  list rN=grres(B,0);
+  list P=grlifting4(A,B);
+  list rM=grres(A,0,1);
+  list rN=grres(B,0,1);
 
   int i;
   list T;
@@ -2065,7 +2064,7 @@ EXAMPLE: example mappingcone3; shows an example
 
   for(i=2;i<=size(P);i++)
   {
-    intvec v= attrib(rM[i-1],"isHomog");
+    intvec v= grrange(rM[i-1]);
     intvec w=grdeg(rN[i]);
     int r=size(v);
     int s=size(w);
@@ -2077,6 +2076,8 @@ EXAMPLE: example mappingcone3; shows an example
     module D=grconcat(grtranspose(C), grtranspose(A));
 
     T[i]=grtranspose(D);
+    
+    kill A, B, C, D, v, w, r, s, zero;
   }
    return(T);
 }
@@ -2091,7 +2092,7 @@ grview(A);
 def T= KeneshlouMatrixPresentation(intvec(0,1,0,0,0));
 grview(T);
 
-def F=grlifting3(A,T);
+def F=grlifting4(A,T);
 grview(F);
 
 def G=mappingcone3(A,T);
@@ -2109,7 +2110,7 @@ print(betti(L),"betti");
 def R=KeneshlouMatrixPresentation(intvec(0,0,0,2,0));
 def S=KeneshlouMatrixPresentation(intvec(1,2,0,0,0));
 
-def H=grlifting3(R,S);
+def H=grlifting4(R,S);
 grview(H);
 def G=mappingcone3(R,S); // ????????
 
@@ -2117,7 +2118,7 @@ def G=mappingcone3(R,S); // ????????
 
 def I=KeneshlouMatrixPresentation(intvec(2,3,0,6,2));
 def J=KeneshlouMatrixPresentation(intvec(4,0,1,2,1));
-def N=grlifting3(I,J); // ????????
+def N=grlifting4(I,J); // ????????
 
 }
 
@@ -2132,12 +2133,12 @@ PURPOSE: construct a map of chain complexes between free resolution of
 EXAMPLE: example grlifting4; shows an example
 "
 {
-           ASSUME(1, grtest(A));
-           ASSUME(1, grtest(B));
+           ASSUME(0, grtest(A));
+           ASSUME(0, grtest(B));
 
 
-           list rM=grres(A,0);
-           list rN=grres(B,0);
+           list rM=grres(A,0,1);
+           list rN=grres(B,0,1);
            int i,j,k;
 
            for(i=1;i<=size(rM);i++)
