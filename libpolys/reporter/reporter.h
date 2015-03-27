@@ -22,16 +22,29 @@ extern int     feProt;
 extern BOOLEAN feWarn;
 extern BOOLEAN feOut;
 extern int  traceit ;
+// show entering/leaving proc:
 #define TRACE_SHOW_PROC   1
+// show current line-no:
 #define TRACE_SHOW_LINENO 2
+// show current line and wait for <RET>:
 #define TRACE_SHOW_LINE   4
+// show basering for all lveles of the proc-stack at enteringing/leaving proc,
+// requires RDEBUG to be defined:
 #define TRACE_SHOW_RINGS  8
+// show current line and do not wait for <RET>:
 #define TRACE_SHOW_LINE1  16
+//
 #define TRACE_BREAKPOINT  32
+//
 #define TRACE_TMP_BREAKPOINT  64
+// show all calls to kernel routines (via iparith):
 #define TRACE_CALL       128
+// show all assigns (via ipassign):
 #define TRACE_ASSIGN     256
+// show all automitc type conversions (via ipconv):
 #define TRACE_CONV       512
+// profiling: print line-no to smon.out:
+#define TRACE_PROFILING 1024
 
 
 #define SI_PROT_I    1
