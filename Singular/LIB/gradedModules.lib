@@ -2100,15 +2100,16 @@ grview(T);
 
 def F=grlifting4(A,T); grview(F);
 
-def G=mappingcone3(A,T); grview(G);
+/* BUG in the proc */ // def G=mappingcone3(A,T); grview(G);
 
+/*
 module W=grtranspose(G[1]);
 resolution U=mres(W,0);
 print(betti(U,0),"betti"); // ?
 ideal P=groebner(flatten(U[2]));
 resolution L=mres(P,0);
 print(betti(L),"betti");    
-
+*/
 
 
 def R=KeneshlouMatrixPresentation(intvec(0,0,0,2,0));
@@ -2116,13 +2117,13 @@ def S=KeneshlouMatrixPresentation(intvec(1,2,0,0,0));
 
 def H=grlifting4(R,S); grview(H);
 
-def G=mappingcone3(R,S); // ????????
+/* BUG in the proc */ // def G=mappingcone3(R,S); // ????????
 
 
 def I=KeneshlouMatrixPresentation(intvec(2,3,0,6,2));
 def J=KeneshlouMatrixPresentation(intvec(4,0,1,2,1));
-// def N=grlifting4(I,J); // 2nd module does not lie in the first ?
-def NN=mappingcone3(I,J); // ????????
+// def N=grlifting4(I,J); 
+/* 2nd module does not lie in the first: */ // def NN=mappingcone3(I,J); // ????????
 
 }
 
@@ -2207,6 +2208,6 @@ def H=grlifting4(R,S); grview(H);
 
 def I=KeneshlouMatrixPresentation(intvec(2,3,0,6,2));
 def J=KeneshlouMatrixPresentation(intvec(4,0,1,2,1));
-def N=grlifting4(I,J); // 2nd module does not lie in the first??
+/* 2nd module does not lie in the first: */ // def N=grlifting4(I,J); 
 
 }
