@@ -50,7 +50,7 @@ D(ideal sca_bba(const ideal, const ideal, const intvec *, const intvec *, kStrat
 /// Modified modern Sinuglar Mora's algorithm.
 D(ideal sca_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy, const ring _currRing))
 
-D(poly kNF(ideal, ideal, poly, int, int, const ring _currRing))
+D(poly k_NF(ideal, ideal, poly, int, int, const ring _currRing))
 
 #endif // # ifdef PLURAL_INTERNAL_DECLARATIONS_GB_HACK
 #endif // PLURAL_INTERNAL_DECLARATIONS
