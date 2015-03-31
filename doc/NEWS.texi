@@ -20,6 +20,12 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+
+@itemize
+@item renamed algemodstd_lib to @nref{nfmodstd_lib}
+@end itemize
+
+@heading News for version 4-0-2
 New commands:
 @itemize
 @item align (@nref{align})
@@ -35,7 +41,7 @@ Change in ring handling:
 New libraries:
 @itemize
 @item algemodstd.lib:  Groebner bases of ideals in polynomial rings
-      over algebraic number fields(@nref{algemodstd_lib})
+      over algebraic number fields(renamed to @nref{nfmodstd_lib})
 @item arr.lib: arrangements of hyperplanes (@nref{arr_lib})
 @item brillnoether.lib: Riemann-Roch spaces of divisors on curve (@nref{brillnoether_lib})
 @item hess.lib: Riemann-Roch space of divisors
