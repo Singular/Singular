@@ -1465,7 +1465,7 @@ example
 
 proc grrange(M)
 {
-  ASSUME(1, grtest(M));
+//  ASSUME(1, grtest(M)); // Leads to recursive call due to grtest...
   return( attrib(M, "isHomog") );
 }
 
