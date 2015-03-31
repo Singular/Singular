@@ -26,7 +26,7 @@
 #include "fehelp.h"
 
 
-const char SHORT_OPTS_STRING[] = "bdhqstvxec:r:u:";
+const char SHORT_OPTS_STRING[] = "bdhpqstvxec:r:u:";
 
 //////////////////////////////////////////////////////////////
 //
@@ -212,6 +212,10 @@ static const char* feOptAction(feOptIndex opt)
         feOptHelp(feArgv0);
         return NULL;
 
+      case FE_OPT_PROFILE:
+         traceit=1024;
+         return NULL;
+
       case FE_OPT_QUIET:
         if (feOptSpec[FE_OPT_QUIET].value)
           si_opt_2 &= ~(Sy_bit(0)|Sy_bit(V_LOAD_LIB));
@@ -251,7 +255,7 @@ static const char* feOptAction(feOptIndex opt)
 
       case FE_OPT_RANDOM:
         siRandomStart = (unsigned int) ((unsigned long)
-			                  (feOptSpec[FE_OPT_RANDOM].value));
+                                          (feOptSpec[FE_OPT_RANDOM].value));
         siSeed=siRandomStart;
         factoryseed(siRandomStart);
         return NULL;

@@ -1075,6 +1075,8 @@ void m2_end(int i)
 {
   if (!m2_end_called)
   {
+    extern FILE* File_Profiling;
+    if (File_Profiling!=NULL) { fclose(File_Profiling); File_Profiling=NULL; }
     m2_end_called = TRUE;
 #ifdef HAVE_SIMPLEIPC
     for (int j = SIPC_MAX_SEMAPHORES; j >= 0; j--)
