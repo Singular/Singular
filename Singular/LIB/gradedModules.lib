@@ -68,6 +68,50 @@ LIB "matrix.lib"; // ?
 static proc repeat(int n, string c) { string r = ""; while( n > 0 ){ r = r + c; n--; } return(r); }
 static proc pad(int m, string s, string c){ string r = s; while( size(r) < m ){ r = c + r; } return(r); }
 static proc mstring( int m, string c){ if( m < 0 ) { return (c); }; return (string(m)); }
+
+static proc grsumstr(string R, intvec v)
+"direct sum_i=1^size R(-v[i]), for source and targets of graded objects"
+{
+  if (R  == "")
+  {
+    R = nameof(basering);
+  }
+
+  ASSUME(0, defined(R) && (R != "") );
+
+  int n = size(v);
+
+  if ( (n == 0) or (v == intvec(0)) ) { return (R); }
+
+  ASSUME(0, n > 0 );
+
+  v = -v; // NOTE: due to Mathematical meanings of Singular data
+  
+
+  int lst = v[1];
+  int cnt = 1; 
+
+  string p = R + "(" + string(lst) + ")";
+
+  int k, d;
+  for (k = 2; k <= n; k++ ) 
+  {
+    d = v[k];
+    if( d == lst ) { cnt ++; }
+    else 
+    {
+      if (cnt > 1){ p = p + "^" + string(cnt); }
+
+      cnt = 1; lst = d;
+
+      p = p + " + " + R + "(" + string(lst) + ")";
+    }
+  }
+  if (cnt > 1){ p = p + "^" + string(cnt); }
+
+  return (p);
+}
+
 // view helper
 static proc draw ( intmat D, int d )
 {
@@ -80,29 +124,31 @@ static proc draw ( intmat D, int d )
   string head = ""; string foot = ""; string middle = "";
   for ( c = d+1; c < (nc-d); c++ )
   {
-    head = head + pad(max, string(D[1 , c]), " ") + " ";
+    head = head + pad(max, string(D[1 , c]), ".") + " ";
     foot = foot + pad(max, string(D[nr, c]), " ") + " ";
   }
   // last head/foot enties:
-  head = head + pad(max, string(D[1 , c]), " ");
+  head = head + pad(max, string(D[1 , c]), ".");
   foot = foot + pad(max, string(D[nr, c]), " ");
   // head/foot dash lines:
-  string dash  = repeat( (max + 1) * (nc - 2*d) , "-");
-  string dash2 = repeat( (max + 1) * (nc - 2*d) , "=");
+  string dash  = "-"; string dash2  = "=";
+  dash = repeat( (nc - 2*d) - 1 , repeat(max, dash) + " " ) + repeat(max, dash) + " "; // dash  = repeat( (max + 1) * (nc - 2*d) , dash );
+  dash2 = repeat( (nc - 2*d) - 1 , repeat(max, dash2) + " " ) + repeat(max, dash2) + " "; // dash2 = repeat( (max + 1) * (nc - 2*d) , dash2);
   for ( r = d+1; r <= (nr-d); r++ )
   {
     middle = middle + pad(max, string(D[r,1]), " ") + " :";
-    for ( c = d+1; c < (nc-d); c++ ) { middle = middle + pad(max, mstring(D[r,c], "."), " ") + " "; }
-    middle = middle + pad(max, mstring(D[r,nc-d], "."), " ") + " |" + pad(max, string(D[r,nc]), " ") + newline;
+    for ( c = d+1; c < (nc-d); c++ ) { middle = middle + pad(max, mstring(D[r,c], "-"), " ") + " "; }
+    middle = middle + pad(max, mstring(D[r,nc-d], "-"), " ") + " |" + pad(max, string(D[r,nc]), ".") + newline;
   }
+  string corner_id = repeat(max, ".");
   string corner = repeat(max, " ");
   // print everything all at once:
   print                                     (
-      corner + "  " + head  + "  " + corner + newline +
-      corner + "  " + dash  +  " " + corner + newline +
+      corner + "  " + head  + " ." + corner_id + newline +
+      corner + "  " + dash  + "+"  + corner_id + newline +
                       middle                          +
-      corner + "  " + dash2 +  " " + corner + newline +
-      corner + "  " + foot  + "  " + corner );
+      corner + "  " + dash2 + " "  + corner + newline +
+      corner + "  " + foot +  "  " + corner );
 }
 
 proc grview(N)
@@ -114,10 +160,41 @@ EXAMPLE: example grview; shows an example
 "
 {
 //  if( size(N) == 0 ) { return (); }
+  string msg = "Graded";
+  string lst;
+
+  string arrow = " <- ";
+  string R = nameof(basering);
 
   if( typeof( N ) == "list" )
   {
-    int i; for( i = 1; i <= size(N); i++ ){ "i:", i; grview(N[i]); };
+    msg = msg + " resolution"; 
+    if( size(R) >= 2 )
+    {
+      msg = msg + "(let R:="+R+")";
+      R = "R";
+    }
+
+
+    int i = 1;  int n = size(N);
+    string dst;
+    
+    msg = msg + ": " + newline + grsumstr(R, grrange(N[i])) + " <-- d_" + string(i) + " -- " ;
+    for( ; i < n; i++ )
+    { 
+      dst = grsumstr(R, grdeg(N[i])) +  " <-- d_" + string(i+1) + " --";
+      msg = msg + newline + dst; 
+    };
+
+    msg = msg + newline + grsumstr(R, grdeg(N[i])) + ", given by maps: "; 
+
+    print(msg);
+
+    for( i = 1; i <= size(N); i++ )
+    { 
+      "d_" + string(i) + " :"; grview(N[i]); 
+    };
+
     return ();
   }
 
@@ -150,7 +227,70 @@ EXAMPLE: example grview; shows an example
     }
     D[r+d, nc+2*d] = r; // right-most block with indeces
   }
-  draw(D, d); // print it nicely!
+
+  msg = msg + " homomorphism: ";
+  if( size(R) >= 2 )
+  {
+    msg = msg + "(let R:="+R+")";
+    R = "R";
+  }
+    
+  msg = msg + ": ";
+
+  string dst = grsumstr(R, gr);
+  string src = grsumstr(R, G);
+
+  lst = msg;
+
+  if( (size(lst) + size(dst) + size(src) + 4) > 80 ) 
+  { 
+    if( (size(lst) + size(dst)) > 80 ) { msg = msg + newline; lst = ""; }
+
+    msg = msg + dst + arrow;
+    lst = lst + dst + arrow;
+
+    if( (size(lst) + size(src)) > 80 ) { msg = msg + newline; lst = ""; }
+
+    msg = msg + src;
+    lst = lst + src;
+  } else
+  {
+    msg = msg + dst + arrow + src;
+    lst = lst + dst + arrow + src;
+  }
+
+  if( size(lst) > 70 ) { msg = msg + newline; } // lst = "";
+  msg = msg + ", given by ";
+//  lst = lst + ", given by ";
+
+  if( size(N) == 0 )
+  {
+    msg = msg + "zero matrix.";
+    print(msg);
+  } else
+  {
+    if( nr == nc) // square matreix // detect diagonal?
+    {
+      for (c = nr; c > 0; c-- )
+      {
+        M[c,c] = 0;
+      }
+
+      if( size(module(M)) == 0 )
+      {
+        msg = msg + "a diagonal matrix";
+      } else
+      {
+        msg = msg + "a square matrix";
+      }
+
+    } else 
+    { 
+      msg = msg + "a matrix";
+    }
+    print(msg + ", with degrees: " );
+    draw(D, d); // print it nicely!    
+  }
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -165,6 +305,15 @@ example
 
   module D = grsum( grsum(grpower(A,2), grtwist(1,1)), grsum(grtwist(1,2), grpower(B,2)) );
   grview(D);
+
+  ring R = 0,(w,x,y,z), dp; def I = grobj( ideal(y2-xz, xy-wz, x2z-wyz), intvec(0) );
+  list res1 = grres(I, 0); // non-minimal
+  grview(res1);
+  print(betti(res1,0), "betti");
+
+  list res2 = grres(grshift(I, -10), 0, 1); //  minimal!
+  grview(res2);
+  print(betti(res2,0), "betti");
 }
 
 static proc issorted( intvec g, int s )
