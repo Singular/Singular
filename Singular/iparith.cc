@@ -8314,7 +8314,19 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
 #endif
     int at=a->Typ();
     // handling bb-objects ----------------------------------------------------
-    if (at>MAX_TOK)
+    if(op>MAX_TOK) // explicit type conversion to bb
+    {
+      blackbox *bb=getBlackboxStuff(op);
+      if (bb!=NULL)
+      {
+        res->rtyp=op;
+        res->data=bb->blackbox_Init(bb);
+        if(!bb->blackbox_Assign(res,a)) return FALSE;
+        if (errorreported) return TRUE;
+      }
+      else          return TRUE;
+    }
+    else if (at>MAX_TOK) // argument is of bb-type
     {
       blackbox *bb=getBlackboxStuff(at);
       if (bb!=NULL)
