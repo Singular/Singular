@@ -147,8 +147,8 @@ static proc mod_init()
     // TYPECASTING
     system("install","arr","matrix"     ,arr2mat        ,1);    // coeff matrix
     system("install","arr","poly"       ,arr2poly       ,1);    // defining polynomial
-    system("install","arr","list"       ,arr2list       ,4);    // list of defining polynomials
-    system("install","arr","ideal"      ,arr2ideal      ,4);    // list of defining polynomials
+    system("install","arr","list"       ,arr2list       ,1);    // list of defining polynomials
+    system("install","arr","ideal"      ,arr2ideal      ,1);    // list of defining polynomials
 
     // OTHER
     system("install","arr","variables"  ,arrVariables   ,1);
