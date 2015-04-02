@@ -854,24 +854,77 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
   idhdl save_ring=currRingHdl;
   currRingHdl=(idhdl)1; // fake ring detection
 
-  if(!IsCmd(func,p->t))
+  int tt;
+  if(!(tt=IsCmd(func,p->t)))
   {
-    int t=0;
-    if (func[1]=='\0') p->t=func[0];
-    else if((t=iiOpsTwoChar(func))!=0)
+    int t;
+    if((t=iiOpsTwoChar(func))!=0)
     {
       p->t=t;
+      tt=CMD_2; /* ..,::, ==, <=, <>, >= !=i and +,-,*,/,%,.... */
+      if ((t==PLUSPLUS)
+      ||(t==MINUSMINUS)
+      ||(t=='='))
+        tt=CMD_1; /* ++,--,= */
     }
     else
     {
+      desc->procs=p->next;
+      omFreeSize(p,sizeof(*p));
       Werror(">>%s<< is not a kernel command",func);
       currRingHdl = save_ring;
       return TRUE;
     }
   }
+  switch(tt)
+  {
+    // type conversions:
+    case BIGINTMAT_CMD:
+    case MATRIX_CMD:
+    case INTMAT_CMD:
+    case RING_CMD:
+    case RING_DECL:
+    case RING_DECL_LIST:
+    case ROOT_DECL:
+    case ROOT_DECL_LIST:
+    // operations:
+    case CMD_1:
+      if(args!=1) { Warn("args must be 1 in %s",my_yylinebuf);args=1;}
+      break;
+    case CMD_2:
+      if(args!=2) { Warn("args must be 2 in %s",my_yylinebuf);args=2;}
+      break;
+    case CMD_3:
+      if(args!=3) { Warn("args must be 3 in %s",my_yylinebuf);args=3;}
+      break;
+    case CMD_12:
+      if((args!=1)&&(args!=2)) { Werror("args must in 1 or 2 in %s",my_yylinebuf);}
+      break;
+    case CMD_13:
+      if((args!=1)&&(args!=3)) { Werror("args must in 1 or 3 in %s",my_yylinebuf);}
+      break;
+    case CMD_23:
+      if((args<2)||(args>3)) { Werror("args must in 2..3 in %s",my_yylinebuf);}
+      break;
+    case CMD_123:
+      if((args<1)||(args>3)) { Werror("args must in 1..3 in %s",my_yylinebuf);}
+      break;
+    case CMD_M:
+      if(args!=4) { Warn("args must be 4 in %s",my_yylinebuf);args=4;}
+      break;
+    default:
+      Werror("unknown token type %d in %s",tt,my_yylinebuf);
+      break;
+  }
+  currRingHdl = save_ring;
+  if (errorreported)
+  {
+    desc->procs=p->next;
+    omFreeSize(p,sizeof(*p));
+    return TRUE;
+  }
   p->args=args;
   p->p=pr; pr->ref++;
   pr->is_static=0;
-  currRingHdl = save_ring;
   return FALSE;
 }
