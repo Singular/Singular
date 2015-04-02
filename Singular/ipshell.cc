@@ -131,7 +131,7 @@ int iiOpsTwoChar(const char *s)
               else           return 0;
     case ':': if (s[1]==':') return COLONCOLON;
               else           return 0;
-    case '-': if (s[1]=='-') return COLONCOLON;
+    case '-': if (s[1]=='-') return MINUSMINUS;
               else           return 0;
     case '+': if (s[1]=='+') return PLUSPLUS;
               else           return 0;
