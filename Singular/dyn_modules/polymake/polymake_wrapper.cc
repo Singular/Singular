@@ -1757,8 +1757,12 @@ BOOLEAN PMvertexEdgeGraph(leftv res, leftv args)
   return TRUE;
 }
 
+#include <omp.h>
+// extern "C" void omp_set_num_threads(int num_threads);
+
 extern "C" int SI_MOD_INIT(polymake)(SModulFunctions* p)
 {
+  omp_set_num_threads(1); // avoid multiple threads within polymake/libnormaliz
   if (init_polymake==NULL)
     {init_polymake = new polymake::Main();}
   init_polymake->set_application("fan");
