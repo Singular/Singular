@@ -47,12 +47,12 @@ PROCEDURES:
     grrndmat(s,d[,p,b])   generate random matrix compatible with src and dst gradings
     grrndmap(S,D[,p,b])   generate random 0-deg homomorphism src(S) -> src(D)
     grrndmap2(S,D[,p,b])   generate random 0-deg homomorphism dst(S) -> dst(D)
-    grlifting(A,B)     RANDOM! chain lifting
-    grlifting2(A,B)    RANDOM! chain lifting
+    grlifting(A,B)     RND! chain lifting
+    grlifting2(A,B)    RND! chain lifting
     mappingcone(M,N)   mapping cone?
     mappingcone2(M,N)  mapping cone2?
-    grlifting3(A,B)    RANDOM! chain lifting?
-    grlifting4(A,B)    RANDOM! chain lifting?
+    grlifting3(A,B)    RND! chain lifting? probably wrong one
+    grlifting4(A,B)    RND! chain lifting? newer from #hani# for mappingcone3
     mappingcone3(A,B)  mapping cone3? (using grlifting4 at the moment)
     grrange(M)         get the row-weightings
 ";
@@ -1619,7 +1619,10 @@ proc grrange(M)
 }
 
 proc grlift0(M, N, alpha1)
-"generic random alpha0 : coker(M) -> coker(N) from random alpha1"
+"PURPOSE: generic random alpha0 : coker(M) -> coker(N) from random alpha1
+NOTE: this proc can work only if some assumptions are fulfilled (due
+to Wolfram)! e.g. at the end of a resolution for the source module...
+"
 {
 
   ASSUME(1, grtest(M));
@@ -2189,6 +2192,14 @@ def N=grlifting3(I,J); grview(N); // ???
 G0<-----F0+G1<------F1+G2<-------F2+G3<-----
 */
 
+proc grneg(M)
+"negative map
+TODO for Hanieh: please document this and find good motivating examples for this proc!!
+"
+{
+  return ( grobj(-M, grrange(M), grdeg(M) ) );
+}
+
 // note: not clear which grlifting3 should be used by the following
 // procedure!!?
 proc mappingcone3(A,B)
@@ -2226,8 +2237,9 @@ EXAMPLE: example mappingcone3; shows an example
     module B=grobj(zero,v,w);
 
 //    ASSUME( 0, grtest(B) );
-    ASSUME( 0, grtest(-rM[i-1]) );    
-    module C=grconcat(-rM[i-1],B); // FIXME: '-' is wrong! need a graded-enabled minus (e.g. grneg?)
+//    ASSUME( 0, grtest(-rM[i-1]) );    
+    ASSUME( 0, grtest( grneg( rM[i-1]) ) );
+    module C=grconcat( grneg( rM[i-1] ) ,B); // FIXME: '-' is wrong! need a graded-enabled minus (e.g. grneg?)
     module D=grconcat(grtranspose(C), grtranspose(A));
 
     T[i]=grtranspose(D);
@@ -2249,7 +2261,8 @@ grview(T);
 
 def F=grlifting4(A,T); grview(F);
 
-/* BUG in the proc */ // def G=mappingcone3(A,T); grview(G);
+/* BUG in the proc */ 
+def G=mappingcone3(A,T); grview(G);
 
 /*
 module W=grtranspose(G[1]);
@@ -2266,13 +2279,15 @@ def S=KeneshlouMatrixPresentation(intvec(1,2,0,0,0));
 
 def H=grlifting4(R,S); grview(H);
 
-/* BUG in the proc */ // def G=mappingcone3(R,S); // ????????
+/* BUG in the proc */ 
+def G=mappingcone3(R,S); // ????????
 
 
 def I=KeneshlouMatrixPresentation(intvec(2,3,0,6,2));
 def J=KeneshlouMatrixPresentation(intvec(4,0,1,2,1));
 // def N=grlifting4(I,J); 
-/* 2nd module does not lie in the first: */ // def NN=mappingcone3(I,J); // ????????
+/* 2nd module does not lie in the first: */ 
+def NN=mappingcone3(I,J); // ????????
 
 }
 
@@ -2337,8 +2352,8 @@ grview(T);
 def F=grlifting4(A,T);
 grview(F);
 
-/*
 def G=mappingcone3(A,T);grview(G);
+/*
 module W=grtranspose(G[1]);
 resolution U=mres(W,0);
 print(betti(U,0),"betti"); // ?
@@ -2353,10 +2368,11 @@ def S=KeneshlouMatrixPresentation(intvec(1,2,0,0,0));
 
 def H=grlifting4(R,S); grview(H);
 
-// def G=mappingcone3(R,S); // ????????
+def G=mappingcone3(R,S); // ????????
 
 def I=KeneshlouMatrixPresentation(intvec(2,3,0,6,2));
 def J=KeneshlouMatrixPresentation(intvec(4,0,1,2,1));
-/* 2nd module does not lie in the first: */ // def N=grlifting4(I,J); 
+/* 2nd module does not lie in the first: */
+def N=grlifting4(I,J);
 
 }
