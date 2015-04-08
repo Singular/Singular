@@ -2275,7 +2275,10 @@ print(betti(L),"betti");
 
 
 def R=KeneshlouMatrixPresentation(intvec(0,0,0,2,0));
+grview(R);
+
 def S=KeneshlouMatrixPresentation(intvec(1,2,0,0,0));
+grview(S);
 
 def H=grlifting4(R,S); grview(H);
 
@@ -2286,8 +2289,7 @@ def G=mappingcone3(R,S); // ????????
 def I=KeneshlouMatrixPresentation(intvec(2,3,0,6,2));
 def J=KeneshlouMatrixPresentation(intvec(4,0,1,2,1));
 // def N=grlifting4(I,J); 
-/* 2nd module does not lie in the first: */ 
-def NN=mappingcone3(I,J); // ????????
+/* 2nd module does not lie in the first: */ // def NN=mappingcone3(I,J); // ????????
 
 }
 
@@ -2372,7 +2374,6 @@ def G=mappingcone3(R,S); // ????????
 
 def I=KeneshlouMatrixPresentation(intvec(2,3,0,6,2));
 def J=KeneshlouMatrixPresentation(intvec(4,0,1,2,1));
-/* 2nd module does not lie in the first: */
-def N=grlifting4(I,J);
+/* 2nd module does not lie in the first: */ //def N=grlifting4(I,J);
 
 }
