@@ -1057,7 +1057,7 @@ Issues:
 @subsection modular_lib
 @c lib modular.lib
 @c ----------------------------------------------------------
-@node multigrading_lib,numerAlg_lib,modular_lib, Experimental libraries
+@node multigrading_lib
 @subsection multigrading_lib
 
 Todos/Issues:
