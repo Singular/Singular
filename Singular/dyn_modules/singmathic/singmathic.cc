@@ -521,7 +521,7 @@ template class std::vector<Exponent>;
 template void mgb::computeGroebnerBasis<MathicToSingStream>
   (mgb::GroebnerInputIdealStream&, MathicToSingStream&);
 
-int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
+extern "C" int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
 {
   PrintS("Initializing Singular-Mathic interface Singmathic.\n");
   psModulFunctions->iiAddCproc(
