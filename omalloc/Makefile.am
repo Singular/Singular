@@ -15,14 +15,14 @@ omAllocPrivate.h	omDebug.h		omInline.h		\
 omAllocFunc.h 		mylimits.h
 
 noinst_HEADERS= omPage.h omDefaultConfig.h omReturn.h omGetPageSize.h \
-  omMalloc.h omMallocSystem.h
+  omMalloc.h omMallocSystem.h omallocClass.h
 
 SOURCES=\
 omBinPage.c       omList.c         omAllocEmulate.c omDebug.c        \
 om_Alloc.c        omDebugCheck.c   omOpts.c         omGetBackTrace.c \
 omAllocSystem.c   omError.c        omStats.c	    omRet2Info.c     \
 omBin.c           omDebugTrack.c   		     \
-omalloc_provide.c omAllocFunc.c
+omalloc_provide.c omAllocFunc.c    omallocClass.cc
 
 EXTRA_DIST = omalloc.c omtTestAlloc.c omtTest.h omMmap.c
 

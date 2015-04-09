@@ -12,6 +12,9 @@ AC_CONFIG_AUX_DIR([../build-aux])
 AC_CONFIG_SRCDIR(om_Alloc.c)
 AC_CONFIG_HEADER([_config.h])
 
+AC_PROG_CC
+AC_PROG_CXX
+
 SING_RESET_FLAGS()
 
 AM_MAINTAINER_MODE([enable])

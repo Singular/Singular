@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include <omalloc/omalloc.h>
+#include <omalloc/omallocClass.h>
 #include <misc/mylimits.h>
 
 
@@ -270,7 +271,7 @@ extern int HCord;
 
 class skStrategy;
 typedef skStrategy * kStrategy;
-class skStrategy
+class skStrategy : public omallocClass
 {
 public:
   kStrategy next;

@@ -157,13 +157,13 @@ optional_Singular_programs =
 
 bin_PROGRAMS = Singular ESingular TSingular $(optional_Singular_programs)
 
-Singular_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
+Singular_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 Singular_LDADD = libSingular.la ${BUILTIN_FLAGS}
 
 Singular_LDFLAGS = -static ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
-Singulard_SOURCES = tesths.cc mmalloc.cc fegetopt.c fegetopt.h utils.cc  utils.h
+Singulard_SOURCES = tesths.cc fegetopt.c fegetopt.h utils.cc  utils.h
 
 Singulard_LDADD = libSingular.la ${BUILTIN_FLAGS}
 
