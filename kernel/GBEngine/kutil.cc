@@ -6925,7 +6925,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
 * -puts p to the standardbasis s at position at
 * -saves the result in S
 */
-void enterSBba (LObject p,int atS,kStrategy strat, int atR)
+void enterSBba (LObject &p,int atS,kStrategy strat, int atR)
 {
   strat->news = TRUE;
   /*- puts p to the standardbasis s at position at -*/
@@ -7028,7 +7028,7 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
 * -puts p to the standardbasis s at position at
 * -saves the result in S
 */
-void enterSSba (LObject p,int atS,kStrategy strat, int atR)
+void enterSSba (LObject &p,int atS,kStrategy strat, int atR)
 {
   strat->news = TRUE;
   /*- puts p to the standardbasis s at position at -*/
@@ -7159,7 +7159,7 @@ void enterSSba (LObject p,int atS,kStrategy strat, int atR)
 /*2
 * puts p to the set T at position atT
 */
-void enterT(LObject p, kStrategy strat, int atT)
+void enterT(LObject &p, kStrategy strat, int atT)
 {
   int i;
 
@@ -7238,7 +7238,7 @@ void enterT(LObject p, kStrategy strat, int atT)
 /*2
 * puts signature p.sig to the set syz
 */
-void enterSyz(LObject p, kStrategy strat, int atT)
+void enterSyz(LObject &p, kStrategy strat, int atT)
 {
   int i;
   strat->newt = TRUE;
@@ -8778,8 +8778,8 @@ int posInT_pLength(const TSet set,const int length,LObject &p)
 // kstd1.cc:
 int redFirst (LObject* h,kStrategy strat);
 int redEcart (LObject* h,kStrategy strat);
-void enterSMora (LObject p,int atS,kStrategy strat, int atR=-1);
-void enterSMoraNF (LObject p,int atS,kStrategy strat, int atR=-1);
+void enterSMora (LObject &p,int atS,kStrategy strat, int atR=-1);
+void enterSMoraNF (LObject &p,int atS,kStrategy strat, int atR=-1);
 // ../Singular/misc.cc:
 extern char *  showOption();
 

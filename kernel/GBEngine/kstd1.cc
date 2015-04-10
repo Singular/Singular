@@ -746,8 +746,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         if (j > strat->tl) break;
         if (ei <= H.ecart) break;
         if (((strat->T[j].ecart < ei)
-          || ((strat->T[j].ecart == ei)
-        && (strat->T[j].length < li)))
+          || ((strat->T[j].ecart == ei) && (strat->T[j].length < li)))
         && pLmShortDivisibleBy(strat->T[j].p,strat->sevT[j], H.p, not_sev))
         {
           /*
@@ -1212,7 +1211,7 @@ void firstUpdate(kStrategy strat)
 *    and cancels units if possible
 *  - reorders s,L
 */
-void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
+void enterSMora (LObject &p,int atS,kStrategy strat, int atR = -1)
 {
   enterSBba(p, atS, strat, atR);
   #ifdef KDEBUG
@@ -1266,7 +1265,7 @@ void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
 *  if TRUE
 *  - computes noether
 */
-void enterSMoraNF (LObject p, int atS,kStrategy strat, int atR = -1)
+void enterSMoraNF (LObject &p, int atS,kStrategy strat, int atR = -1)
 {
   enterSBba(p, atS, strat, atR);
   if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
