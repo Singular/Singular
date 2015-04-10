@@ -12,6 +12,7 @@
 
 #include <new>
 #include <stdlib.h>
+#include <omalloc/omalloc.h>
 
 class omallocClass
 {
@@ -22,12 +23,20 @@ void* operator new ( size_t size )
 #ifndef __GNUC__
 throw (std::bad_alloc)
 #endif
-;
+{
+  void* addr;
+  omTypeAlloc(void*, addr, size);
+  return addr;
+}
+
 void operator delete ( void* block )
 #ifndef __GNUC__
 throw ()
 #endif
-;
+{
+  omFree( block );
+}
+
 
 void* operator new[] ( size_t size )
 #ifndef __GNUC__
