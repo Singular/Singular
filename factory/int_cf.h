@@ -25,6 +25,10 @@
 #include "cf_defs.h"
 #include "variable.h"
 
+#ifdef HAVE_OMALLOC
+#include <omalloc/omallocClass.h>
+#endif
+
 class CanonicalForm;
 
 /**
@@ -32,7 +36,11 @@ class CanonicalForm;
  *
  * InternalCF will become an InternalPoly, InternalInteger, InternalRational
 **/
-class InternalCF {
+class InternalCF
+#ifdef HAVE_OMALLOC
+       : public omallocClass
+#endif
+{
 private:
     int refCount;
 protected:
