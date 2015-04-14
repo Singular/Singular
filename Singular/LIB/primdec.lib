@@ -6501,10 +6501,6 @@ EXAMPLE: example radical; shows an example
   ASSUME(0, not isQuotientRing(basering) ) ;
   dbprint(printlevel - voice, "Radical, version 2006.05.08");
   if(size(i) == 0){return(ideal(0));}
-  if(hasAlgExtensionCoefficient(basering))
-  {
-    return(algeRad(i));
-  }
   if(attrib(basering,"global")!=1)
   {
 // algorithms only work in global case!
@@ -6518,6 +6514,10 @@ EXAMPLE: example radical; shows an example
       setring r;
       def j=imap(s,j);
       return(j);
+  }
+  if(hasAlgExtensionCoefficient(basering))
+  {
+    return(algeRad(i));
   }
   int j;
   def P0 = basering;
