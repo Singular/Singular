@@ -5,7 +5,7 @@ lib_LTLIBRARIES=libomalloc.la
 libomalloc_includedir=$(includedir)/omalloc
 
 libomalloc_include_HEADERS = \
-omalloc.h		omDerivedConfig.h	\
+omalloc.h		omallocClass.h          omDerivedConfig.h	\
 omError.h		omStructs.h		omAllocDecl.h		\
 omInlineDecl.h		omBin.h			omMemOps.h		\
 omList.h		omGetBackTrace.h	\
@@ -15,7 +15,7 @@ omAllocPrivate.h	omDebug.h		omInline.h		\
 omAllocFunc.h 		mylimits.h
 
 noinst_HEADERS= omPage.h omDefaultConfig.h omReturn.h omGetPageSize.h \
-  omMalloc.h omMallocSystem.h omallocClass.h
+  omMalloc.h omMallocSystem.h
 
 SOURCES=\
 omBinPage.c       omList.c         omAllocEmulate.c omDebug.c        \
