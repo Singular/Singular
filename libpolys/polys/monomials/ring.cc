@@ -145,7 +145,7 @@ ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *
   assume( cf != NULL);
   return rDefault(cf,N,n,ord_size,ord,block0,block1,wvhdl);
 }
-ring   rDefault(const coeffs cf, int N, char **n)
+ring   rDefault(const coeffs cf, int N, char **n, const NF_Proc NF)
 {
   assume( cf != NULL);
   /*order: lp,0*/
@@ -159,16 +159,18 @@ ring   rDefault(const coeffs cf, int N, char **n)
   /* the last block: everything is 0 */
   order[1]  = 0;
 
-  return rDefault(cf,N,n,2,order,block0,block1);
+  ring r= rDefault(cf,N,n,2,order,block0,block1);
+  r->NF=NF;
+  return r;
 }
 
-ring rDefault(int ch, int N, char **n)
+ring rDefault(int ch, int N, char **n, const NF_Proc NF)
 {
   coeffs cf;
   if (ch==0) cf=nInitChar(n_Q,NULL);
   else       cf=nInitChar(n_Zp,(void*)(long)ch);
   assume( cf != NULL);
-  return rDefault(cf,N,n);
+  return rDefault(cf,N,n,NF);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1302,6 +1304,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 
   res->N=rVar(r);      /* number of vars */
   res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
+  res->NF=r->NF;
 
   res->firstBlockEnds=r->firstBlockEnds;
 #ifdef HAVE_PLURAL
@@ -3394,10 +3397,15 @@ BOOLEAN rOrd_is_MixedDegree_Ordering(ring r)
   p_Delete(&p,r);
   return FALSE;
 }
+static poly rNF_Dummy(ideal, ideal, poly, int, int, const ring _currRing)
+{
+  WerrorS("NF not defined"); return NULL;
+}
 
 BOOLEAN rComplete(ring r, int force)
 {
   if (r->VarOffset!=NULL && force == 0) return FALSE;
+  if (r->NF==NULL) r->NF=rNF_Dummy;
   rSetOutParams(r);
   int n=rBlocks(r)-1;
   int i;

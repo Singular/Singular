@@ -2287,6 +2287,7 @@ static void VMrHomogeneous(intvec* va, intvec* vb)
   }
 
   ring r = (ring) omAlloc0Bin(sip_sring_bin);
+  r->NF = currRing->NF;
   int i, nv = currRing->N;
 
   r->cf  = currRing->cf;
@@ -2369,6 +2370,7 @@ static ring VMrDefault(intvec* va)
   }
 
   ring r = (ring) omAlloc0Bin(sip_sring_bin);
+  r->NF = currRing->NF;
   int i, nv = currRing->N;
 
   r->cf  = currRing->cf;
@@ -2439,6 +2441,7 @@ static ring VMrDefault1(intvec* va)
   }
 
   ring r = (ring) omAlloc0Bin(sip_sring_bin);
+  r->NF = currRing->NF;
   int i, nv = currRing->N;
 
   r->cf  = currRing->cf;
@@ -2514,6 +2517,7 @@ static ring VMrRefine(intvec* va, intvec* vb)
   }
 
   ring r = (ring) omAlloc0Bin(sip_sring_bin);
+  r->NF = currRing->NF;
   int i, nv = currRing->N;
 
   r->cf  = currRing->cf;
@@ -2597,6 +2601,7 @@ static ring VMatrDefault(intvec* va)
   }
 
   ring r = (ring) omAlloc0Bin(sip_sring_bin);
+  r->NF = currRing->NF;
   int i, nv = currRing->N;
 
   r->cf  = currRing->cf;
@@ -2675,6 +2680,7 @@ static ring VMatrRefine(intvec* va, intvec* vb)
   }
 
   ring r = (ring) omAlloc0Bin(sip_sring_bin);
+  r->NF = currRing->NF;
   int i, nv = currRing->N;
   int nvs = nv*nv;
   r->cf  = currRing->cf;
@@ -2758,6 +2764,7 @@ static void VMrDefaultlp(void)
   }
 
   ring r = (ring) omAlloc0Bin(sip_sring_bin);
+  r->NF = currRing->NF;
   int i, nv = currRing->N;
 
   r->cf  = currRing->cf;

@@ -535,7 +535,7 @@ void TestSimpleRingArithmetcs()
   n[1]=omStrDup("y");
   n[2]=omStrDup("z2");
 
-  ring R = rDefault(32003,3,n); //  ring R = rDefault(0,3,n);
+  ring R = rDefault(32003,3,n,k_NF); //  ring R = rDefault(0,3,n);
 
   rWrite(R); PrintLn();
 

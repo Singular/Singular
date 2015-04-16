@@ -352,7 +352,7 @@ int main( int, char *argv[] )
 
   // changing a ring for the interpreter
   // re-using n and R from above
-  ring R = rDefault(32003, 3, n);
+  ring R = rDefault(32003, 3, n,k_NF);
   idhdl newRingHdl=enterid("R" /* ring name*/,
                            0, /*nesting level, 0=global*/
                            RING_CMD,
