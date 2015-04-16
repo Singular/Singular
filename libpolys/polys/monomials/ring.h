@@ -200,8 +200,6 @@ struct nc_struct;
 typedef struct nc_struct   nc_struct;
 #endif
 
-typedef poly (*NF_Proc)(ideal, ideal, poly, int, int, const ring _currRing);
-
 struct ip_sring
 {
 // each entry must have a description and a procedure defining it,
@@ -252,11 +250,6 @@ struct ip_sring
 //   unsigned long cf->modNumber;  /* Z/cf->modNumber */
 //   mpz_ptr    cf->modNumber;
 // #endif
-
-  NF_Proc  NF; /* unused for commutative rings
-                * for noncommutative qrings R/I:
-                *    the k_NF of the corresponding R
-                */
 
   unsigned long options; /* ring dependent options */
 
@@ -343,9 +336,8 @@ struct ip_sring
 ////////// DEPRECATED
 /////// void   rChangeCurrRing(ring r);
 
-// NF must be given as k_NF or equivalent for PLURAL rings:
-ring   rDefault(int ch, int N, char **n, const NF_Proc NF=NULL);
-ring   rDefault(const coeffs cf, int N, char **n, const NF_Proc NF=NULL);
+ring   rDefault(int ch, int N, char **n);
+ring   rDefault(const coeffs cf, int N, char **n);
 ring   rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int **wvhdl=NULL);
 ring   rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1, int **wvhdl=NULL);
 

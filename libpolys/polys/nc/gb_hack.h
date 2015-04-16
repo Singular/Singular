@@ -27,6 +27,8 @@ ideal sca_bba(const ideal, const ideal, const intvec *, const intvec *, kStrateg
 /// Modified modern Sinuglar Mora's algorithm.
 ideal sca_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy, const ring _currRing);
 
+poly k_NF(ideal, ideal, poly, int, int, const ring _currRing);
+
 
 
 # ifdef PLURAL_INTERNAL_DECLARATIONS_GB_HACK
@@ -47,6 +49,8 @@ D(ideal sca_bba(const ideal, const ideal, const intvec *, const intvec *, kStrat
 
 /// Modified modern Sinuglar Mora's algorithm.
 D(ideal sca_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy, const ring _currRing))
+
+D(poly k_NF(ideal, ideal, poly, int, int, const ring _currRing))
 
 #endif // # ifdef PLURAL_INTERNAL_DECLARATIONS_GB_HACK
 #endif // PLURAL_INTERNAL_DECLARATIONS

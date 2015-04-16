@@ -1117,7 +1117,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 
       // square = NF( var(i)^2 | Q )
       // NOTE: there is no better way to check this in general!
-      square = rG->NF(idQuotient, NULL, square, 0, 1, rG); // must ran in currRing == rG!
+      square = k_NF(idQuotient, NULL, square, 0, 1, rG); // must ran in currRing == rG!
 
       if( square != NULL ) // var(i)^2 is not in Q?
       {

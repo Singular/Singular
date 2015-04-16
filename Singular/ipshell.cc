@@ -2270,7 +2270,6 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
   // 5: D
 
   ring R = (ring) omAlloc0Bin(sip_sring_bin);
-  R->NF=k_NF;
 
 
   // ------------------------------------------------------------------
@@ -5319,7 +5318,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 
   // allocated ring
   R = (ring) omAlloc0Bin(sip_sring_bin);
-  R->NF=k_NF;
 
   coeffs cf = NULL;
 
@@ -5388,7 +5386,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 
         TransExtInfo extParam;
 
-        extParam.r = rDefault( ch, pars, names, k_NF); // Q/Zp [ p_1, ... p_pars ]
+        extParam.r = rDefault( ch, pars, names); // Q/Zp [ p_1, ... p_pars ]
         for(int i=pars-1; i>=0;i--)
         {
           omFree(names[i]);
