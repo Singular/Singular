@@ -62,6 +62,19 @@
 // #include <polys/ratgring.h>
 // #endif
 
+static poly NF_Proc_Dummy(ideal, ideal, poly, int, int, const ring _currRing)
+{ WerrorS("nc_NF not defined"); return NULL; }
+static ideal BBA_Proc_Dummy (const ideal, const ideal, const intvec *, const intvec *, kStrategy strat, const ring)
+{ WerrorS("nc_NF not defined"); return NULL; }
+
+// the following funtion poiters are quasi-static:
+// they will be set in siInit and never changes afterwards:
+NF_Proc nc_NF=NF_Proc_Dummy;
+BBA_Proc gnc_gr_bba=BBA_Proc_Dummy;
+BBA_Proc gnc_gr_mora=BBA_Proc_Dummy;
+BBA_Proc sca_bba=BBA_Proc_Dummy;
+BBA_Proc sca_mora=BBA_Proc_Dummy;
+BBA_Proc sca_gr_bba=BBA_Proc_Dummy;
 
 /* copy : */
 poly nc_p_CopyGet(poly a, const ring r);

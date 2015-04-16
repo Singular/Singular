@@ -199,6 +199,12 @@ struct sro_ord
 struct nc_struct;
 typedef struct nc_struct   nc_struct;
 #endif
+class skStrategy;
+typedef skStrategy * kStrategy;
+
+typedef poly (*NF_Proc)(ideal, ideal, poly, int, int, const ring _currRing);
+typedef ideal (*BBA_Proc) (const ideal, const ideal, const intvec *, const intvec *, kStrategy strat, const ring);
+
 
 struct ip_sring
 {

@@ -269,8 +269,6 @@ public:
 
 extern int HCord;
 
-class skStrategy;
-typedef skStrategy * kStrategy;
 class skStrategy : public omallocClass
 {
 public:
