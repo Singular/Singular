@@ -552,4 +552,19 @@ int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
 }
 */
 
+/* ressources: ------------------------------------------------------------
+
+http://stackoverflow.com/questions/3786408/number-of-threads-used-by-intel-tbb
+When you create the scheduler, you can specify the number of threads as
+tbb::task_scheduler_init init(nthread);
+
+    How do I know how many threads are available?
+
+    Do not ask!
+
+        Not even the scheduler knows how many threads really are available
+        There may be other processes running on the machine
+        Routine may be nested inside other parallel routines
+
+*/
 #endif /* HAVE_MATHICGB */
