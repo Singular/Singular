@@ -2204,8 +2204,14 @@ EXAMPLE: example max; shows an example"
 }
 example
 { "EXAMPLE:"; echo=2;
+  // biggest int
   max(2,3);
-  max(4,3);
+  max(1,4,3);
+  // lexicographically biggest intvec
+  max(intvec(1,2),intvec(0,1),intvec(1,1));
+  // polynopmial with biggest leading monomial
+  ring r = 0,x,dp;
+  max(x+1,x2+x);
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc min(def i,list #)
@@ -2228,8 +2234,14 @@ EXAMPLE: example min; shows an example"
 }
 example
 { "EXAMPLE:"; echo=2;
+  // smallest int
   min(2,3);
-  min(4,3);
+  min(1,4,3);
+  // lexicographically smallest intvec
+  min(intvec(1,2),intvec(0,1),intvec(1,1));
+  // polynopmial with smallest leading monomial
+  ring r = 0,x,dp;
+  min(x+1,x2+x);
 }
 
 
