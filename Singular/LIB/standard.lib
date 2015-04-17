@@ -16,8 +16,8 @@ PROCEDURES:
  qslimgb(i)             computes a standard basis with slimgb in a qring
  par2varRing([i])       create a ring making pars to vars, together with i
  datetime()             return date and time as a string
- max(i,j)               maximum of i and j
- min(i,j)               minimum of i and j
+ max(i_1,...,i_k)       maximum of i_1, ..., i_k
+ min(i_1,...,i_k)       minimum of i_1, ..., i_k
 
 ";
 //AUXILIARY PROCEDURES:
@@ -2184,16 +2184,23 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc max(def i,def j)
-"SYNTAX: max (i, j)
-TYPE:    same as type of i resp. j
-PURPOSE: returns the maximum for any 2 arguments of a type
+proc max(def i,list #)
+"SYNTAX: max (i_1, ..., i_k)
+TYPE:    same as type of i_1, ..., i_k resp.
+PURPOSE: returns the maximum for any arguments of a type
          for which '>' is defined
 SEE ALSO: min
 EXAMPLE: example max; shows an example"
 {
-  if(i>j){return(i);}
-  return(j);
+  def maximum = i;
+  for (int j=1; j<=size(#); j++)
+  {
+    if(#[j]>maximum)
+    {
+      maximum = #[j];
+    }
+  }
+  return(maximum);
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -2201,16 +2208,23 @@ example
   max(4,3);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc min(def i,def j)
-"SYNTAX: min (i, j)
-TYPE:    same as type of i resp. j
-PURPOSE: returns the minimum for any 2 arguments of a type
+proc min(def i,list #)
+"SYNTAX: min (i_1, ..., i_k)
+TYPE:    same as type of i_1, ..., i_k resp.
+PURPOSE: returns the minimum for any arguments of a type
          for which '>' is defined
 SEE ALSO: max
 EXAMPLE: example min; shows an example"
 {
-  if(i>j){return(j);}
-  return(i);
+  def minimum = i;
+  for (int j=1; j<=size(#); j++)
+  {
+    if(#[j]<minimum)
+    {
+      minimum = #[j];
+    }
+  }
+  return(minimum);
 }
 example
 { "EXAMPLE:"; echo=2;
