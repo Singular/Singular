@@ -85,7 +85,7 @@ EXAMPLE:  example classify; shows an example"
   def ring_ext = basering;
 
   // Namespaces:
-  if(defined(A_Z)==0) { proc A_Z = general_lib::A_Z; export A_Z; }
+  if(defined(A_Z)==0) { proc A_Z = General::A_Z; export A_Z; }
   init_debug();                    // initialize trace/debug mode
   if(checkring()) { return(f_in); }
   n = nvars(basering);
