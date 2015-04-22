@@ -50,7 +50,6 @@ PROCEDURES:
     grlifting(A,B)     RND! chain lifting
     grlifting2(A,B)    RND! chain lifting
     mappingcone(M,N)   mapping cone?
-    mappingcone2(M,N)  mapping cone2?
     grlifting3(A,B)    RND! chain lifting? probably wrong one
     mappingcone3(A,B)  mapping cone3? 
     grrange(M)         get the row-weightings
@@ -2027,7 +2026,7 @@ module BB = grpres(B);
 def Z=grlifting2(SS,BB);Z;
 def G=mappingcone2(SS,BB);G;
 }
-*/      
+*/
 
 proc grlifting3(A,B) 
 "TODO: grlifting4 was newer and had more documentation than this proc, but was removed... Please verify and update!
