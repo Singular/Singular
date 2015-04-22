@@ -1449,6 +1449,7 @@ proc KeneshlouMatrixPresentation(intvec a)
 RETURN: graded object
 PURPOSE: matrix presentation for direct sum of omega^a[i](i) in form of a graded object
 EXAMPLE: example KeneshlouMatrixPresentation; shows an example
+"
 {
   int n = size(a)-1;
   //  ring r = 32003,(x(0..n)),dp;
