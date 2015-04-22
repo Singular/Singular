@@ -52,10 +52,10 @@ PROCEDURES:
     mappingcone(M,N)   mapping cone?
     mappingcone2(M,N)  mapping cone2?
     grlifting3(A,B)    RND! chain lifting? probably wrong one
-    mappingcone3(A,B)  mapping cone3? (using grlifting4 at the moment)
+    mappingcone3(A,B)  mapping cone3? 
     grrange(M)         get the row-weightings
     grneg(A)           graded object given by -A
-    matrixpres(intvec a)   matrix presentation of direct sum of Omega^a[i](i)
+    matrixpres(a)      matrix presentation of direct sum of Omega^{a[i]}(i)
 ";
 
 LIB "matrix.lib"; // ?
@@ -1459,8 +1459,8 @@ example
 
 proc KeneshlouMatrixPresentation(intvec a)
 "USAGE:  intvec a.
-RETURN: matrix 
-PURPOSE:matrix presentation for direct sum of omega^a[i](i) 
+RETURN: graded object
+PURPOSE: matrix presentation for direct sum of omega^a[i](i) in form of a graded object
 EXAMPLE: example KeneshlouMatrixPresentation; shows an example
 {
   int n = size(a)-1;
@@ -1687,9 +1687,8 @@ example
 proc grlifting(M,N)
 "USAGE:  graded objects M and N
 RETURN: map of chain complexes (as a list)
-PURPOSE: construct a map of chain complexes between free resolution of
-M=Img(M) and N=Img(N).
-EXAMPLE: example grlift; shows an example
+PURPOSE: construct a map of chain complexes between free resolutions of Img(M) and Img(N).
+EXAMPLE: example grlifting; shows an example
 "
 {  ASSUME(1, grtest(M));
    ASSUME(1, grtest(N));
@@ -1778,10 +1777,9 @@ example
 proc mappingcone(M,N)
 "USAGE:M,N graded objects
 RETURN: chain complex (as a list) 
-PURPOSE: construct a free resolution of the cokernel of a random map between
-M=Img(M), and N=Img(N).
+PURPOSE: construct a free resolution of the cokernel of a random map between Img(M), and Img(N).
 EXAMPLE: example mappingcone; shows an example
-
+"
 {
   ASSUME(1, grtest(M));
   ASSUME(1, grtest(N));
@@ -1814,7 +1812,6 @@ EXAMPLE: example mappingcone; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-//Veronese surface
 
 ring r=32003, (x(0..4)),dp;
 def A=KeneshlouMatrixPresentation(intvec(0,0,0,0,3));
@@ -1903,19 +1900,19 @@ example
 
 }
 
+
+//                A     f2     f3
+// 0<---M<----F0<----F1<----F2<----F3<----
+//              |p1   |p2
+// 
+// 0<---N<----G0<----G1<----G2<----G3<----
+//                B(g1)      g2     g3
+// 
 proc grlifting2(A,B)
 "USAGE: (A,B), graded objects A and B (matrices defining maps)
 RETURN: map of chain complexes (as a list) 
 PURPOSE: construct a map of chain complexes between free resolution of
 M=coker(A) and N=coker(B).
-NOTE:
-               A     f2     f3
-0<---M<----F0<----F1<----F2<----F3<----
-             |p1   |p2
-
-0<---N<----G0<----G1<----G2<----G3<----
-               B(g1)      g2     g3
-
 EXAMPLE: example grlifting2; shows an example
 "
 {  ASSUME(1, grtest(A));
@@ -1982,16 +1979,13 @@ def T=grlifting2(DD,PP); T;
 
 
 /*
+//              -f1 0       -f2 0
+//   (p1 g1)     p2 g2       p3 g3
+// G0<-----F0+G1<------F1+G2<-------F2+G3<-----
 proc mappingcone2(A,B)
 "USAGE: (A,B), graded objects A and B (matrices defining maps)
 RETURN: chain complex (as a list) 
-PURPOSE: construct the free resolution of a cokernel of a random map between
-M=coker(A), and N=coker(B)
-NOTE: 
-             -f1 0       -f2 0
-  (p1 g1)     p2 g2       p3 g3
-G0<-----F0+G1<------F1+G2<-------F2+G3<-----
-
+PURPOSE: construct the free resolution of a cokernel of a random map between M=coker(A), and N=coker(B)
 EXAMPLE: example mappingcone2;
 "
 
@@ -2018,8 +2012,8 @@ EXAMPLE: example mappingcone2;
 
     module A=grconcat(P[i],rN[i]);
     module B=grobj(zero,v,w);
-    ASSUME( 0, grtest( grneg( rM[i-1]) ) );
-    module C=grconcat( grneg( rM[i-1] ) ,B); // FIXME: '-' is wrong! need a graded-enabled minus (e.g. grneg?)
+
+    module C=grconcat( grneg( rM[i-1] ) ,B);
     module D=grconcat(grtranspose(C), grtranspose(A));
 
     T[i]=grtranspose(D);
@@ -2055,13 +2049,16 @@ module BB = grpres(B);
 def Z=grlifting2(SS,BB);Z;
 def G=mappingcone2(SS,BB);G;
 }
+*/      
 
 
 
 
 
 
-proc grlifting3(A,B)
+proc grlifting3(A,B) 
+"TODO: grlifting4 was newer and had more documentation than this proc, but was removed... Please verify and update!
+"
 {
   ASSUME(1, grtest(A));
   ASSUME(1, grtest(B));
@@ -2135,60 +2132,52 @@ def S=KeneshlouMatrixPresentation(intvec(1,2,0,0,0));
 
 def H=grlifting3(R, S);
 // grview(H);
-def H=grlifting3(S, R);
 
-/*
-// ???
-def I=KeneshlouMatrixPresentation(intvec(2,3,0,6,2));
-def J=KeneshlouMatrixPresentation(intvec(4,0,1,2,1));
-def N=grlifting3(I,J); grview(N); // ???
-*/
+// 2nd module does not lie in the first:
+// def H=grlifting3(S, R);
+
+
+//def I=KeneshlouMatrixPresentation(intvec(2,3,0,6,2));
+//def J=KeneshlouMatrixPresentation(intvec(4,0,1,2,1));
+//def N=grlifting3(I,J); grview(N); 
 }
 
-
 proc grneg(A)
-"USAGE: A graded object
-RETURN: -A as graded object
-PURPOSE: graded map defined by -A. 
+"USAGE: grneg(A), graded object A
+RETURN: graded object
+PURPOSE: graded map defined by -A 
 EXAMPLE: example grneg; shows an example
 "
 {
-  ASSUME(0, grtest(A));
-return(grobj(-A,grrange(A), grdeg(A) ));
+  ASSUME(1, grtest(A));
+  return( grobj(-A, grrange(A), grdeg(A)) );
 }
 
 example
 { "EXAMPLE:"; echo = 2;
-ring r=0,(x,y,z),dp;
-def A=grobj([x2,yz,xyz],intvec(1,1,0));
-grview(A);
-def F=grneg(A);
-grview(A);
+
+   ring r=0,(x,y,z),dp;
+   def A=grobj([x2,yz,xyz],intvec(1,1,0));
+   grview(A);
+
+   def F=grneg(A);
+   grview(F);
 }
 
-
-
-
-/*
-             -f1 0        -f2 0
-  (p1 g1)     p2 g2        p3 g3
-G0<-----F0+G1<------F1+G2<-------F2+G3<-----
-
-*/
-
-
+//             -f1 0        -f2 0
+//  (p1 g1)     p2 g2        p3 g3
+//G0<-----F0+G1<------F1+G2<-------F2+G3<-----
 proc mappingcone3(A,B)
 "USAGE: (A,B), graded objects A and B (matrices defining maps)
 RETURN: chain complex (as a list) 
-PURPOSE: construct a free resolution of the cokernel of a random map between
-M=coker(A), and N=coker(B)
+PURPOSE: construct a free resolution of the cokernel of a random map between M=coker(A), and N=coker(B)
 EXAMPLE: example mappingcone3; shows an example
-
+"
 {
   ASSUME(1, grtest(A));
   ASSUME(1, grtest(B));
 
-  list P=grlifting4(A,B);
+  list P=grlifting3(A,B);
   list rM=grres(A,0,1);
   list rN=grres(B,0,1);
 
@@ -2211,10 +2200,7 @@ EXAMPLE: example mappingcone3; shows an example
     module A=grconcat(P[i],rN[i]);
     module B=grobj(zero,v,w);
 
-//    ASSUME( 0, grtest(B) );
-//    ASSUME( 0, grtest(-rM[i-1]) );    
-    ASSUME( 0, grtest( grneg( rM[i-1]) ) );
-    module C=grconcat( grneg( rM[i-1] ) ,B); // FIXME: '-' is wrong! need a graded-enabled minus (e.g. grneg?)
+    module C=grconcat( grneg( rM[i-1] ) ,B);
     module D=grconcat(grtranspose(C), grtranspose(A));
 
     T[i]=grtranspose(D);
@@ -2239,7 +2225,7 @@ grview(T);
 
 def F=grlifting3(A,T); grview(F);
 
-/* BUG in the proc */ 
+// BUG in the proc  
 def G=mappingcone3(A,T); grview(G);
 
 /*
@@ -2260,14 +2246,15 @@ grview(S);
 
 def H=grlifting3(R,S); grview(H);
 
-/* BUG in the proc */ 
+// BUG in the proc
 def G=mappingcone3(R,S);
 
 
 def I=KeneshlouMatrixPresentation(intvec(2,3,0,6,2));
 def J=KeneshlouMatrixPresentation(intvec(4,0,1,2,1));
 // def N=grlifting3(I,J); 
-/* 2nd module does not lie in the first: */ // def NN=mappingcone3(I,J); // ????????
+// 2nd module does not lie in the first:
+// def NN=mappingcone3(I,J); // ????????
 
 }
 
@@ -2276,12 +2263,14 @@ def J=KeneshlouMatrixPresentation(intvec(4,0,1,2,1));
 
 
 
+// TODO: Please decide between KeneshlouMatrixPresentation and matrixpres, and replace one with the other!
 proc matrixpres(intvec a)
-"USAGE:  intvec a.
-RETURN: matrix. 
-PURPOSE:matrix presentation for direct sum of omega^a[i](i) 
+"USAGE:  intvec a
+RETURN:  graded object
+PURPOSE: matrix presentation for direct sum of omega^a[i](i) in form of a graded object
 EXAMPLE: example matrixpres; shows an example
-{  
+"
+{
   int n = size(a)-1;
   //  ring r = 32003,(x(0..n)),dp;
   ASSUME(0, nvars(basering)==(n+1));
@@ -2355,7 +2344,33 @@ else // i <= n: middle part is present, a_i != 0
 
 example
 {"EXAMPLE:"; echo = 2;
+ring r = 32003,(x(0..4)),dp;
 
 def R=matrixpres(intvec(1,4,0,0,0));
+grview(R);
 def S=matrixpres(intvec(0,0,3,0,0));
+grview(S);
+
+def N1 = matrixpres(intvec(2,0,0,0,0)); 
+grview(N1);
+
+def N2 = matrixpres(intvec(0,0,0,0,3));
+grview(N2);
+
+def N = matrixpres(intvec(2,0,0,0,3));
+grview(N);
+
+
+def M1 = matrixpres(intvec(0,1,0,0,0));
+grview(M1);
+
+def M2 = matrixpres(intvec(0,1,1,0,0));
+grview(M2);
+
+def M3 = matrixpres(intvec(0,0,0,1,0));
+grview(M3);
+
+def M = matrixpres(intvec(1,1,1,0,0));
+grview(M);
 }
+
