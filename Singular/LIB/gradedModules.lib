@@ -1544,8 +1544,6 @@ example
 
   def M = KeneshlouMatrixPresentation(intvec(1,1,1,0,0));
   grview(M);
-
-
 }
 
 proc grconcat(A,B)
@@ -1577,7 +1575,6 @@ example
   def Q=grconcat(R,S);
   grview(Q);
 }
-
 
 proc grlift(A, B)
 "USAGE: grlift(M, N), graded objects M and N
@@ -1857,7 +1854,6 @@ example
 
 }
 
-
 proc grrndmap2(def D, def S, list #)
 "USAGE: (D,S), graded objects S and D
 RETURN: graded object
@@ -1884,7 +1880,6 @@ example
 
   def G=grrndmap2(D,S);
   grview(G);
-
 }
 
 
@@ -1942,7 +1937,7 @@ EXAMPLE: example grlifting2; shows an example
   return(P);
 }
 example
-{"EXAMPLE:"; echo = 2;
+{ "EXAMPLE:"; echo = 2;
 
 ring r;
 module P=grobj(module([xy,0,xz]),intvec(0,1,0));
@@ -1964,7 +1959,6 @@ def T=grlifting2(DD,PP); T;
              
 }
 
-
 /*
 //              -f1 0       -f2 0
 //   (p1 g1)     p2 g2       p3 g3
@@ -1975,7 +1969,6 @@ RETURN: chain complex (as a list)
 PURPOSE: construct the free resolution of a cokernel of a random map between M=coker(A), and N=coker(B)
 EXAMPLE: example mappingcone2;
 "
-
 {
   ASSUME(1, grtest(A));
   ASSUME(1, grtest(B));
@@ -2007,9 +2000,6 @@ EXAMPLE: example mappingcone2;
   }
   return(T);
 }
-
-
-
 example
 { "EXAMPLE:"; echo = 2;
 
@@ -2037,11 +2027,6 @@ def Z=grlifting2(SS,BB);Z;
 def G=mappingcone2(SS,BB);G;
 }
 */      
-
-
-
-
-
 
 proc grlifting3(A,B) 
 "TODO: grlifting4 was newer and had more documentation than this proc, but was removed... Please verify and update!
@@ -2094,12 +2079,7 @@ proc grlifting3(A,B)
 
    }
    return(P);
-     
-
 }
-
-
-
 example
 {"EXAMPLE:"; echo = 2;
 
@@ -2139,7 +2119,6 @@ EXAMPLE: example grneg; shows an example
   ASSUME(1, grtest(A));
   return( grobj(-A, grrange(A), grdeg(A)) );
 }
-
 example
 { "EXAMPLE:"; echo = 2;
 
@@ -2196,9 +2175,6 @@ EXAMPLE: example mappingcone3; shows an example
   }
    return(T);
 }
-
-
-
 example
 { "EXAMPLE:"; echo = 2;
 
@@ -2244,8 +2220,6 @@ def J=KeneshlouMatrixPresentation(intvec(4,0,1,2,1));
 // def NN=mappingcone3(I,J); // ????????
 
 }
-
-
 
 
 
@@ -2328,9 +2302,9 @@ else // i <= n: middle part is present, a_i != 0
       return ((N)); //      return (grorder(N)); 
     }
 }
-
 example
-{"EXAMPLE:"; echo = 2;
+{ "EXAMPLE:"; echo = 2;
+
 ring r = 32003,(x(0..4)),dp;
 
 def R=matrixpres(intvec(1,4,0,0,0));
