@@ -1341,8 +1341,7 @@ static proc sagbiNFMOD(poly p, ideal G, ideal I, int b)
          h=f;
          f=sagbiNFMODO(f,G,I,b);
     }
-    if(f==0){return(f);}
-    return(lead(f)+sagbiNFMOD(f-lead(f),G,I,b));
+    return(f+sagbiNFMOD(p-lead(p),G,I,b));
 }
 ////////////////////////////////////////////////////////////////////////////////
 static proc createP(ideal I)
