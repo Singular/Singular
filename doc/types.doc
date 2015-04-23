@@ -4498,6 +4498,9 @@ operator @code{.} to access the elements
 @subsection Access to elements of a user defined type
 @cindex Access to elements of a user defined type
 
+Access to elements of a user defined type via @code{.}:
+<object>.<element_name>. The <element_names> are from the definition of the type. Additional, all (potentially) ring dependent elements have an additional
+entry @code{r_}<element_name> for the corresponding ring.
 @*@strong{Example:}
 @smallexample
 @c example
@@ -4508,6 +4511,7 @@ operator @code{.} to access the elements
   ring r;
   A.b=poly(1); // assignment: expression must be of the given type
   A;
+  A.r_b;
 @c example
 @end smallexample
 @c ------------------------------
