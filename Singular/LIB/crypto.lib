@@ -73,7 +73,7 @@ PROCEDURES:
   h_increasing_knapsack(int ksize, int h)                            Creates the smallest h-increasing knapsack of given size ksize and h
   injective_knapsack(int ksize, int kmaxelement)                        Creates all list of all injective knapsacks of given size ksize and maximal element kmaxelement
   calculate_max_sum(list a)                                  Calculates the maximal sum of a given knapsack a
-  is_injective(list a)                                    Checks if knapsack a is injective
+  set_is_injective(list a)                                    Checks if knapsack a is injective
   is_h_injective(list a, int h)                                Checks if knapsack a is h-injective
   is_fix_injective(list a)                                  Checks if knapsack a is fix-injective
   three_elements(list out, int iterations)                          Creates the smallest injective knapsack with a given injective_knapsack by using the three-elements-algorithm with a given number of iterations
@@ -3359,7 +3359,7 @@ EXAMPLE: injective_knapsack; shows an example;
   list output_list;
   for(i=1;i<=size(list_of_lists);i++)
   {
-    if (is_injective(list_of_lists[i])==1)
+    if (set_is_injective(list_of_lists[i])==1)
     {
       output_list=insert(output_list,list_of_lists[i]);
     }
@@ -3392,10 +3392,10 @@ example
   calculate_max_sum(a);
 }
 
-proc is_injective(list a)
-"USAGE:   is_injective(a)
+proc set_is_injective(list a)
+"USAGE:   set_is_injective(a)
 RETURN:  1 if a is injective, 0 otherwise
-EXAMPLE: is_injective; shows an example;
+EXAMPLE: set_is_injective; shows an example;
 "
 {
   //Create all subsets of the set a
@@ -3422,8 +3422,8 @@ example
   "EXAMPLE:"; echo = 2;
   list inj = 1,5,7,41;
   list non_inj = 1,2,3,4;
-  is_injective(inj);
-  is_injective(non_inj);
+  set_is_injective(inj);
+  set_is_injective(non_inj);
 }
 
 proc is_h_injective(list a, int h)
@@ -3553,7 +3553,7 @@ EXAMPLE: three_elements; shows an example;
   int adden = 1;
   int condition = 0;
   out = set_turn(out);
-  if (is_injective(out)==0)
+  if (set_is_injective(out)==0)
   {
     return(0);
   }
@@ -3592,7 +3592,7 @@ example
   list super_increasing = 1,2,4,10,20;
   list a = three_elements(super_increasing,2);
   a;
-  is_injective(a);
+  set_is_injective(a);
 }
 /*
 //===============================================================

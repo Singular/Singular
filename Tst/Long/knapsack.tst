@@ -44,7 +44,7 @@ example super_increasing_knapsack;
 example h_increasing_knapsack;
 example injective_knapsack;
 example calculate_max_sum;
-example is_injective;
+example set_is_injective;
 example is_h_injective;
 example is_fix_injective;
 example three_elements;
