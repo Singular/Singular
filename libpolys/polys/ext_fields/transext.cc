@@ -1961,7 +1961,7 @@ nMapFunc ntSetMap(const coeffs src, const coeffs dst)
       return ntMapZ0;                                 /// Z   -->  K(T)
     if (nCoeff_is_Zp(src) && nCoeff_is_Q(bDst))
       return ntMapP0;                                 /// Z/p     -->  Q(T)
-    if (nCoeff_is_Q(src) && nCoeff_is_Zp(bDst))
+    if (nCoeff_is_Q_or_BI(src) && nCoeff_is_Zp(bDst))
       return ntMap0P;                                 /// Q       --> Z/p(T)
     if (nCoeff_is_Zp(src) && nCoeff_is_Zp(bDst))
     {
