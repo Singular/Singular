@@ -165,7 +165,7 @@ void * newstruct_Copy(blackbox*, void *d)
 }
 
 // Used by newstruct_Assign for overloaded '='
-BOOLEAN newstruct_equal(int op, leftv l, leftv r)
+BOOLEAN newstruct_Assign_user(int op, leftv l, leftv r)
 {
   blackbox *ll=getBlackboxStuff(op);
   assume(ll->data != NULL);
@@ -221,8 +221,39 @@ void lClean_newstruct(lists l)
   omFreeBin((ADDRESS)l,slists_bin);
 }
 
+static BOOLEAN newstruct_Assign_same(leftv l, leftv r)
+{
+  assume(l->Typ() == r->Typ());
+  if (l->Data()!=NULL)
+  {
+    lists n1=(lists)l->Data();
+    lClean_newstruct(n1);
+  }
+  lists n2=(lists)r->Data();
+  n2=lCopy_newstruct(n2);
+  r->CleanUp();
+  if (l->rtyp==IDHDL)
+  {
+    IDDATA((idhdl)l->data)=(char *)n2;
+  }
+  else
+  {
+    l->data=(void *)n2;
+  }
+  return FALSE;
+}
+
 BOOLEAN newstruct_Assign(leftv l, leftv r)
 {
+  assume(l->Typ() > MAX_TOK);
+  if (l->Typ()==r->Typ())
+  {
+    return newstruct_Assign_same(l,r);
+  }
+  // is there an overloading '=' ?
+  sleftv tmp;
+  if(!newstruct_Assign_user(l->Typ(), &tmp, r)) return newstruct_Assign(l, &tmp);
+  // not, try to find an equal type or parent newstruct
   if (r->Typ()>MAX_TOK)
   {
     blackbox *rr=getBlackboxStuff(r->Typ());
@@ -256,33 +287,9 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
         BOOLEAN newstruct_Op1(int, leftv, leftv);  // forward declaration
         if (! newstruct_Op1(l->Typ(), &tmp, r))  return newstruct_Assign(l, &tmp);
       }
+      if (l->Typ()==r->Typ())
+        return newstruct_Assign_same(l,r);
     }
-    if (l->Typ()==r->Typ())
-    {
-      if (l->Data()!=NULL)
-      {
-        lists n1=(lists)l->Data();
-        lClean_newstruct(n1);
-      }
-      lists n2=(lists)r->Data();
-      n2=lCopy_newstruct(n2);
-      r->CleanUp();
-      if (l->rtyp==IDHDL)
-      {
-        IDDATA((idhdl)l->data)=(char *)n2;
-      }
-      else
-      {
-        l->data=(void *)n2;
-      }
-      return FALSE;
-    }
-  }
-  else
-  {
-    assume(l->Typ() > MAX_TOK);
-    sleftv tmp;
-    if(!newstruct_equal(l->Typ(), &tmp, r)) return newstruct_Assign(l, &tmp);
   }
   Werror("assign %s(%d) = %s(%d)",
         Tok2Cmdname(l->Typ()),l->Typ(),Tok2Cmdname(r->Typ()),r->Typ());
