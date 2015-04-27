@@ -4606,7 +4606,8 @@ By default, only objects of the same (user defined) type can be assigned,
 there is no automatic type conversion as for the kernel data types.
 
 But the operator @code{=} can be overidden in oder to write custom
-constructors:
+constructors (the custom contructor does not apply to assignments
+of the same type):
 via @code{system("install",} user_type @code{,"="} @code{,p,1);}.
 The user_type has to be given as a string.
 
@@ -4629,6 +4630,9 @@ The user_type has to be given as a string.
   w;
 @c example
 @end smallexample
+
+The user defined procedure for @code{=} provides also generic type conversions:
+@code{hh A=hh(b);} is equivalent to @code{hh tmp=b; hh A=tmp; kill tmp;}.
 
 @c ------------------------------
 @include cones.tex
