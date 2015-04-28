@@ -481,6 +481,7 @@ BOOLEAN mathicgb(leftv result, leftv arg)
   const int varCount = currRing->N;
   const ideal I=(ideal) arg->Data();
   mgb::GroebnerConfiguration conf(characteristic, varCount,I->rank);
+  conf.setMaxThreadCount(0); // default number of cores
   if (!setOrder(currRing, conf))
     return TRUE;
   if (TEST_OPT_PROT)
@@ -566,5 +567,6 @@ tbb::task_scheduler_init init(nthread);
         There may be other processes running on the machine
         Routine may be nested inside other parallel routines
 
+  conf.setMaxThreadCount(0); // default number of cores
 */
 #endif /* HAVE_MATHICGB */
