@@ -72,7 +72,7 @@ static proc mstring( int m, string c){ if( m < 0 ) { return (c); }; return (stri
 static proc grsumstr(string R, intvec v)
 "direct sum_i=1^size R(-v[i]), for source and targets of graded objects"
 {
-  if (R  == "")
+  if (R == "")
   {
     R = nameof(basering);
   }
@@ -81,35 +81,46 @@ static proc grsumstr(string R, intvec v)
 
   int n = size(v);
 
-  if ( (n == 0) or (v == intvec(0)) ) { return (R); }
+  if (n == 0) { return (R); }
 
   ASSUME(0, n > 0 );
-
+  
   v = -v; // NOTE: due to Mathematical meanings of Singular data
   
 
   int lst = v[1];
   int cnt = 1; 
 
-  string p = R + "(" + string(lst) + ")";
+  string p = R;
+  if( lst != 0 ) { p = p + "(" + string(lst) + ")"; }
 
   int k, d;
   for (k = 2; k <= n; k++ ) 
   {
     d = v[k];
-    if( d == lst ) { cnt ++; }
+    if( d == lst ) { cnt = cnt + 1; }
     else 
     {
       if (cnt > 1){ p = p + "^" + string(cnt); }
 
       cnt = 1; lst = d;
 
-      p = p + " + " + R + "(" + string(lst) + ")";
+      p = p + " + " + R;
+      if( lst != 0 ) { p = p + "(" + string(lst) + ")"; }
     }
   }
   if (cnt > 1){ p = p + "^" + string(cnt); }
 
   return (p);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+
+  def E = grtwist(2, 0);
+  def v = grrange(E); // grdeg(E);
+  grsumstr("", v );  
 }
 
 // view helper
@@ -228,10 +239,10 @@ EXAMPLE: example grview; shows an example
     D[r+d, nc+2*d] = r; // right-most block with indeces
   }
 
-  msg = msg + " homomorphism: ";
+  msg = msg + " homomorphism";
   if( size(R) >= 2 )
   {
-    msg = msg + "(let R:="+R+")";
+    msg = msg + "(let R:="+R+")" ;
     R = "R";
   }
     
@@ -265,11 +276,12 @@ EXAMPLE: example grview; shows an example
 
   if( size(N) == 0 )
   {
-    msg = msg + "zero matrix.";
-    print(msg);
+    msg = msg + "zero ("+ string(nr);
+    if( nr == nc ) { msg = msg + "^2"; } else { msg = msg + " x " + string(nc); }
+    print( msg+") matrix." );
   } else
   {
-    if( nr == nc) // square matreix // detect diagonal?
+    if( nr == nc) // square matrix // detect diagonal?
     {
       for (c = nr; c > 0; c-- )
       {
@@ -288,6 +300,7 @@ EXAMPLE: example grview; shows an example
     { 
       msg = msg + "a matrix";
     }
+    
     print(msg + ", with degrees: " );
     draw(D, d); // print it nicely!    
   }
