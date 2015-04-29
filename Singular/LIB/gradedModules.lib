@@ -25,10 +25,10 @@ PROCEDURES:
     grisequal(A,B)  check whether A is exactly eqal to B? TODO: isomorphic!
     grdeg(M)        compute graded degrees of columns of the map M
     grview(M)       view the graded structure of map M
-    grshift(M,d)    shift graded module coker(M) by d
+    grshift(M,d)    shift graded module coker(M) by +d
     grzero()        presentation of S(0)^1
-    grtwist(r,d)    presentation of S(-d)^r
-    grtwists(v)     presentation of S(-v[1])+...+S(-v[size(v)])
+    grtwist(r,d)    presentation of S(d)^r
+    grtwists(v)     presentation of S(v[1])+...+S(v[size(v)])
     grsum(M,N)      direct sum of two graded modules coker(M) + coker(N)
     grpower(M,p)    direct p-th power of graded module coker(M)
     grtranspose(M)  un-ordered graded transpose of map M        
@@ -864,7 +864,7 @@ example
 proc grshift( def M, int d)
 "USAGE:  grshift(A, d), graded objects A, int d
 RETURN:  shifted graded object
-PURPOSE: shift the grading on A by d: A_i -> A_{i+/-d}?
+PURPOSE: shift the grading on A by d: A(i) -> A(i+d)
 EXAMPLE: example grshift; shows an example
 "
 {
@@ -1139,7 +1139,7 @@ EXAMPLE: example grtwists; shows an example
 {
   int l = size(v);
   module Z; Z[l] = [0];
-  Z = grobj(Z, v, v); // will set the rank as well
+  Z = grobj(Z, -v, -v); // will set the rank as well
   return(Z);
 }
 example
@@ -1169,7 +1169,7 @@ EXAMPLE: example grsyz; shows an example
   if( size(M) > 0 ) { return( grobj( M, v ) ); }
 
   // zero syzygy?
-  return( grtwists(v) ); // ???
+  return( grtwists(-v) ); // ???
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -1248,7 +1248,7 @@ EXAMPLE: example grres; shows an example
   
   for ( i = 1; i <= l; i++ )
   {
-    if( size(r[i]) == 0 ){ r[i] = grtwists(v); i++; break;   }
+    if( size(r[i]) == 0 ){ r[i] = grtwists(-v); i++; break;   }
 
     r[i] = grobj(r[i], v); v = grdeg(r[i]);
   }
