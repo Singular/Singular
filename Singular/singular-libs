@@ -50,7 +50,7 @@ SLIB1 = classifyceq.lib classifyci.lib classify_aeq.lib nfmodstd.lib \
 	numerAlg.lib numerDecom.lib \
         orbitparam.lib parallel.lib polymake.lib\
 	realizationMatroids.lib resources.lib ringgb.lib \
-	schreyer.lib symodstd.lib derham.lib polybori.lib ellipticcovers.lib \
+	schreyer.lib symodstd.lib deRham.lib polybori.lib ellipticcovers.lib \
 	schubert.lib tasks.lib tropical.lib hdepth.lib gradedModules.lib
 
 PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\

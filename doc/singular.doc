@@ -984,7 +984,7 @@ Comments should be send to the author of the library directly.
 * realclassify_lib:: Classification of real singularities
 * resources_lib:: Tools to manage the computational resources
 * tasks_lib:: A parallel framework based on tasks
-* derham_lib:: Computation of deRham cohomology (Singular 4)
+* deRham_lib:: Computation of deRham cohomology
 * schreyer_lib:: Helpers for Schreyer resolution
 @end menu
 @c * schubert_lib:: Intersection Theory
@@ -1114,23 +1114,23 @@ Todos/Issues:
 @c @subsection tasks_lib
 @c @c lib tasks.lib
 @c @c ----------------------------------------------------------
-@c @node schubert_lib,derham_lib,tasks_lib, Experimental libraries
+@c @node schubert_lib,deRham_lib,tasks_lib, Experimental libraries
 @c @subsection schubert_lib
 @c @c lib schubert.lib
 @c @c ----------------------------------------------------------
-@c @node tasks_lib,derham_lib,schubert_lib, Experimental libraries
+@c @node tasks_lib,deRham_lib,schubert_lib, Experimental libraries
 @c ----------------------------------------------------------
-@node tasks_lib,derham_lib,resources_lib, Experimental libraries
+@node tasks_lib,deRham_lib,resources_lib, Experimental libraries
 @subsection tasks_lib
 @c lib tasks.lib
 @c ----------------------------------------------------------
-@node derham_lib,schreyer_lib,tasks_lib, Experimental libraries
-@subsection derham_lib
+@node deRham_lib,schreyer_lib,tasks_lib, Experimental libraries
+@subsection deRham_lib
 
-@c lib derham.lib
+@c lib deRham.lib
 
 @c ----------------------------------------------------------
-@node schreyer_lib,,derham_lib, Experimental libraries
+@node schreyer_lib,,deRham_lib, Experimental libraries
 @subsection schreyer_lib
 
 @c lib schreyer.lib
