@@ -380,9 +380,6 @@ static BOOLEAN jjCOMPARE_IV(leftv res, leftv u, leftv v)
       break;
     case EQUAL_EQUAL:
     case NOTEQUAL: /* negation handled by jjEQUAL_REST */
-      if((r==0)&&(a->rows()!=b->rows()))
-      res->data  = (char *) 0;
-      else
       res->data  = (char *) (r==0);
       break;
   }
