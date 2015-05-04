@@ -1450,7 +1450,7 @@ division by int (component-wise)
 modulo (component-wise)
 
 @item  @code{<>}, @code{==}, @code{<=}, @code{>=}, @code{>}, @code{<}
-comparison (done lexicographically)
+comparison (done lexicographically, different length will be filled with 0 at th right)
 
 @item intvec_expression @code{[} int_expression @code{]}
 is an element of the intvec; the first element has index one.
