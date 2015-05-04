@@ -1377,7 +1377,7 @@ proc extF(list l,list #)
 
   for(i=1;i<=size(L);i++)
   {
-    L[i]=eliminate(L[i]+ideal(pp),a);
+    L[i]=eliminate(L[i]+ideal(pp),@a);
   }
   i=0;
   int j;
