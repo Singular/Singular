@@ -877,6 +877,8 @@ BOOLEAN newstruct_set_proc(const char *bbname,const char *func, int args,procinf
         tt=CMD_1; /* ++,--,= */
       else if (t=='(') /* proc call */
         tt=CMD_M;
+      else if (t=='-') /* unary and binary - */
+        tt=CMD_12;
     }
     else
     {
