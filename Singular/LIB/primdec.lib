@@ -1017,7 +1017,7 @@ EXAMPLE: example zero_decomp; shows an example
     primary=splitPrimary(primary,ser,@wr,act);
   }
 
-  if((voice>=7)&&(char(basering)<=181))
+  if((voice>=7)&&(char(basering)<=181)&&(@wr==1))
   {
     primary=splitCharp(primary);
   }
@@ -1349,10 +1349,10 @@ proc extF(list l,list #)
   }
   if(size(peek)==0){return(peek1);}
 
-  string gnir="ring RH=("+string(p)+"^"+string(ex)+",a),("+varstr(R)+"),lp;";
+  string gnir="ring RH=("+string(p)+"^"+string(ex)+",@a),("+varstr(R)+"),lp;";
   execute(gnir);
   string mp="minpoly="+string(minpoly)+";";
-  gnir="ring RL=("+string(p)+",a),("+varstr(R)+"),lp;";
+  gnir="ring RL=("+string(p)+",@a),("+varstr(R)+"),lp;";
   execute(gnir);
   execute(mp);
   list L=imap(R,peek);
@@ -1370,7 +1370,7 @@ proc extF(list l,list #)
   }
   mp="poly pp="+string(minpoly)+";";
 
-  string gnir1="ring RS="+string(p)+",("+varstr(R)+",a),lp;";
+  string gnir1="ring RS="+string(p)+",("+varstr(R)+",@a),lp;";
   execute(gnir1);
   execute(mp);
   list L=imap(RL,keep);
