@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/select.h>
 
 #include <unistd.h>
 #include <sys/uio.h>
