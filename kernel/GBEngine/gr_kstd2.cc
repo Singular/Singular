@@ -371,6 +371,8 @@ int redGrRatGB (LObject* h,kStrategy strat)
 *  reduction procedure for the homogeneous case
 *  and the case of a degree-ordering
 */
+#if 0
+// currently unused
 static int nc_redHomog (LObject* h,kStrategy strat)
 {
   if (strat->tl<0)
@@ -430,6 +432,7 @@ static int nc_redHomog (LObject* h,kStrategy strat)
     }
   }
 }
+#endif
 
 #if 0
 /*2

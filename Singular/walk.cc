@@ -510,7 +510,7 @@ static void ivString(intvec* iv, const char* ch)
 }
 
 //unused
-//#if 0
+#if 0
 static void MivString(intvec* iva, intvec* ivb, intvec* ivc)
 {
   int nV = iva->length()-1;
@@ -533,7 +533,7 @@ static void MivString(intvec* iva, intvec* ivb, intvec* ivc)
   }
   Print("%d)", (*ivc)[nV]);
 }
-//#endif
+#endif
 
 /********************************************************************
  * returns gcd of integers a and b                                  *
@@ -2273,6 +2273,8 @@ intvec* MkInterRedNextWeight(intvec* iva, intvec* ivb, ideal G)
 /**************************************************************
  * define and execute a new ring which order is (a(vb),a(va),lp,C)  *
  * ************************************************************/
+#if 0
+// unused
 static void VMrHomogeneous(intvec* va, intvec* vb)
 {
 
@@ -2350,7 +2352,7 @@ static void VMrHomogeneous(intvec* va, intvec* vb)
 
   rChangeCurrRing(r);
 }
-
+#endif
 
 /**************************************************************
  * define and execute a new ring which order is (a(va),lp,C)  *
@@ -2957,7 +2959,7 @@ static void DefRingParlp(void)
 /**************************************************************
  * check wheather one or more components of a vector are zero *
  **************************************************************/
-//#if 0
+#if 0
 static int isNolVector(intvec* hilb)
 {
   int i;
@@ -2970,7 +2972,7 @@ static int isNolVector(intvec* hilb)
   }
   return 0;
 }
-//#endif
+#endif
 
 /******************************  Februar 2002  ****************************
  * G is a Groebner basis w.r.t. (a(curr_weight),lp) and                   *
