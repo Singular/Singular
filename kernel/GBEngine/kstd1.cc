@@ -334,7 +334,7 @@ int redEcart (LObject* h,kStrategy strat)
     {
       Print(".%ld",d);mflush();
       reddeg = d+1;
-      if (h->pTotalDeg()+h->ecart >= strat->tailRing->bitmask)
+      if (h->pTotalDeg()+h->ecart >= (int)strat->tailRing->bitmask)
       {
         strat->overflow=TRUE;
         //Print("OVERFLOW in redEcart d=%ld, max=%ld",d,strat->tailRing->bitmask);
@@ -553,7 +553,7 @@ int redRiloc (LObject* h,kStrategy strat)
     {
       Print(".%ld",d);mflush();
       reddeg = d+1;
-      if (h->pTotalDeg()+h->ecart >= strat->tailRing->bitmask)
+      if (h->pTotalDeg()+h->ecart >= (int)strat->tailRing->bitmask)
       {
         strat->overflow=TRUE;
         //Print("OVERFLOW in redEcart d=%ld, max=%ld",d,strat->tailRing->bitmask);
@@ -685,7 +685,7 @@ int redFirst (LObject* h,kStrategy strat)
       {
         reddeg = d+1;
         Print(".%ld",d);mflush();
-        if (h->pTotalDeg()+h->ecart >= strat->tailRing->bitmask)
+        if (h->pTotalDeg()+h->ecart >= (int)strat->tailRing->bitmask)
         {
           strat->overflow=TRUE;
           //Print("OVERFLOW in redFirst d=%ld, max=%ld",d,strat->tailRing->bitmask);

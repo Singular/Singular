@@ -34,7 +34,7 @@ void rChangeCurrRing(ring r);
 #define pGetOrder(p)        p_GetOrder(p, currRing)
 
 /// Component
-#define pGetComp(p)         __p_GetComp(p, currRing)
+#define pGetComp(p)         (int)__p_GetComp(p, currRing)
 #define pSetComp(p,v)       p_SetComp(p,v, currRing)
 
 /// Exponent

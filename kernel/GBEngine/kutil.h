@@ -311,7 +311,7 @@ public:
                 // syzygy of component i comes up
                 // important for signature-based algorithms
   unsigned sbaOrder;
-  unsigned long currIdx;
+  int currIdx;
   int max_lower_index;
   intset lenS;
   wlen_set lenSw; /* for tgb.ccc */

@@ -116,7 +116,7 @@ static void syCreateNewPairs_Hilb(syStrategy syzstr, int index,
       for (i=0; i<r1;i++)
       {
         if (((syzstr->resPairs[index])[i].p!=NULL) &&
-            (pGetComp((syzstr->resPairs[index])[i].p)==(unsigned)tc))
+            (pGetComp((syzstr->resPairs[index])[i].p)==tc))
         {
 #ifdef USE_CHAINCRIT
           tcp = cp;

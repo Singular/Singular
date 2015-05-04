@@ -3451,7 +3451,7 @@ ideal createG0()
 */
 void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
 {
-  const unsigned long iCompH = pGetComp(h);
+  const int iCompH = pGetComp(h);
   if (!nIsOne(pGetCoeff(h)))
   {
     int j;
@@ -4408,7 +4408,7 @@ int posInT17_c (const TSet set,const int length,LObject &p)
   int cc = (-1+2*currRing->order[0]==ringorder_c);
   /* cc==1 for (c,..), cc==-1 for (C,..) */
   int o = p.GetpFDeg() + p.ecart;
-  unsigned long c = pGetComp(p.p)*cc;
+  int c = pGetComp(p.p)*cc;
 
   if (pGetComp(set[length].p)*cc < c)
     return length+1;

@@ -1464,7 +1464,7 @@ static void procedeNextGenerators(ideal temp_generators,ideal /*temp_repr*/,
                 crit_comp);
       if (next_p!=NULL)
       {
-        if (pGetComp(next_p)<=(unsigned)crit_comp)
+        if (pGetComp(next_p)<=crit_comp)
         {
           pDelete(&next_p);
           //if (TEST_OPT_PROT) Print("u(%d)",index);
