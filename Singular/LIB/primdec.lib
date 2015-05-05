@@ -7863,7 +7863,7 @@ EXAMPLE: example newDecompStep; shows an example
   {
     list fac=factor(@j[1]);
     list gprimary;
-    poly generator;
+    poly generator=1;
     ideal gIntersection;
     for(@k=1;@k<=size(fac[1]);@k++)
     {
