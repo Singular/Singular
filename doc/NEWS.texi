@@ -25,6 +25,9 @@
 @item renamed algemodstd_lib to @nref{nfmodstd_lib}
 @item renamed derham_lib to @nref{deRhamlib}
 @item new library: graal_lib
+@item new library: deflation.lib
+@item new library:   maxlike.lib
+@item new library:   recover.lib
 @end itemize
 
 @heading News for version 4-0-2
