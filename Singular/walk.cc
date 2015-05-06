@@ -5090,8 +5090,8 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M,
     newRing = VMatrDefault(orig_M);
   }
   rChangeCurrRing(newRing);
-  //ideal G = MstdCC(idrMoveR(Go,baseRing,currRing));
-  ideal G = idrMoveR(Go,baseRing,currRing);
+  ideal G = MstdCC(idrMoveR(Go,baseRing,currRing));
+  //ideal G = idrMoveR(Go,baseRing,currRing);
   baseRing = currRing;
 #ifdef TIME_TEST
   tostd = clock()-to;
@@ -5412,8 +5412,8 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
     newRing = VMatrDefault(orig_M);
   }
   rChangeCurrRing(newRing);
-  //ideal G = MstdCC(idrMoveR(Go,baseRing,currRing));
-  ideal G = idrMoveR(Go,baseRing,currRing);
+  ideal G = MstdCC(idrMoveR(Go,baseRing,currRing));
+  //ideal G = idrMoveR(Go,baseRing,currRing);
   baseRing = currRing;
 #ifdef TIME_TEST
   tostd = clock()-to;
