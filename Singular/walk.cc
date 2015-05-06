@@ -1105,7 +1105,7 @@ intvec* MPertVectors(ideal G, intvec* ivtarget, int pdeg)
   // Check that the perturbed degree is valid
   if(pdeg > nV || pdeg <= 0)
   {
-    WerrorS("//** The perturbed degree is wrong!!");
+    WerrorS("//**MPertVectors: The perturbed degree is wrong!!");
     return v_null;
   }
   delete v_null;
@@ -1115,14 +1115,13 @@ intvec* MPertVectors(ideal G, intvec* ivtarget, int pdeg)
     return ivtarget;
   }
   mpz_t *pert_vector = (mpz_t*)omAlloc(nV*sizeof(mpz_t));
-  //mpz_t *pert_vector1 = (mpz_t*)omAlloc(nV*sizeof(mpz_t));
 
   for(i=0; i<nV; i++)
   {
     mpz_init_set_si(pert_vector[i], (*ivtarget)[i]);
    // mpz_init_set_si(pert_vector1[i], (*ivtarget)[i]);
   }
-  // Calculate max1 = Max(A2)+Max(A3)+...+Max(Apdeg),
+  // Compute max1 = Max(A2)+Max(A3)+...+Max(Apdeg),
   // where the Ai are the i-te rows of the matrix target_ord.
   int ntemp, maxAi, maxA=0;
   for(i=1; i<pdeg; i++)
@@ -1147,7 +1146,7 @@ intvec* MPertVectors(ideal G, intvec* ivtarget, int pdeg)
     maxA += maxAi;
   }
 
-  // Calculate inveps = 1/eps, where 1/eps > totaldeg(p)*max1 for all p in G.
+  // Compute inveps = 1/eps, where 1/eps > totaldeg(p)*max1 for all p in G.
 
   intvec* ivUnit = Mivdp(nV);
 
@@ -1179,7 +1178,7 @@ intvec* MPertVectors(ideal G, intvec* ivtarget, int pdeg)
     // mpz_out_str(stdout, 10, inveps);
   }
 #else
-  // PrintS("\n// the \"big\" inverse epsilon: ");
+  PrintS("\n //**MPertVectors: the \"big\" inverse epsilon:");
   mpz_out_str(stdout, 10, inveps);
 #endif
 
@@ -1233,30 +1232,26 @@ intvec* MPertVectors(ideal G, intvec* ivtarget, int pdeg)
   }
   if(j > nV - 1)
   {
-    // Print("\n//  MPertVectors: geaenderter vector gleich Null! \n");
+    //perturbed vector equals zero
     delete pert_vector1;
     goto CHECK_OVERFLOW;
   }
 
-// check that the perturbed weight vector lies in the Groebner cone
+  // check that the perturbed weight vector lies in the Groebner cone
   if(test_w_in_ConeCC(G,pert_vector1) != 0)
   {
-    // Print("\n//  MPertVectors: geaenderter vector liegt in Groebnerkegel! \n");
     for(i=0; i<nV; i++)
     {
       mpz_set_si(pert_vector[i], (*pert_vector1)[i]);
     }
   }
-  else
-  {
-    //Print("\n// MpertVectors: geaenderter vector liegt nicht in Groebnerkegel! \n");
-  }
+
   delete pert_vector1;
 
   CHECK_OVERFLOW:
   intvec* result = new intvec(nV);
 
-  /* 2147483647 is max. integer representation in SINGULAR */
+  // 2147483647 is max. integer representation in SINGULAR
   mpz_t sing_int;
   mpz_init_set_ui(sing_int,  2147483647);
 
@@ -1643,43 +1638,24 @@ intvec* Mfpertvector(ideal G, intvec* ivtarget)
   for(i=0; i<niv; i++)
   {
     mpz_divexact(pert_vector[i], pert_vector[i], ztmp);
-    (* result)[i] = mpz_get_si(pert_vector[i]);
-  }
-
-  j = 0;
-  for(i=0; i<nV; i++)
-  {
     (* result1)[i] = mpz_get_si(pert_vector[i]);
-    (* result1)[i] = 0.1*(* result1)[i];
-    (* result1)[i] = floor((* result1)[i] + 0.5);
-    if((* result1)[i] == 0)
-    {
-      j++;
-    }
   }
-  if(j > nV - 1)
+  j = 0;
+  while(test_w_in_ConeCC(G,result1) && j<nV)
   {
-    // Print("\n//  MfPertwalk: geaenderter vector gleich Null! \n");
-    delete result1;
-    goto CHECK_OVERFLOW;
-  }
-
-// check that the perturbed weight vector lies in the Groebner cone
-  if(test_w_in_ConeCC(G,result1) != 0)
-  {
-    // Print("\n//  MfPertwalk: geaenderter vector liegt in Groebnerkegel! \n");
-    delete result;
-    result = result1;
+    j = 0;
     for(i=0; i<nV; i++)
     {
+      (* result)[i] = (* result1)[i];
       mpz_set_si(pert_vector[i], (*result1)[i]);
+      (* result1)[i] = floor(0.1*(mpz_get_si(pert_vector[i])) + 0.5);
+      if((* result1)[i] == 0)
+      {
+        j++;
+      }
     }
   }
-  else
-  {
-    delete result1;
-    // Print("\n// Mfpertwalk: geaenderter vector liegt nicht in Groebnerkegel! \n");
-  }
+  delete result1;
 
   CHECK_OVERFLOW:
 
@@ -4342,42 +4318,52 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
 {
   assume(currRing != NULL && curr_weight != NULL &&
          target_weight != NULL && G->m[0] != NULL);
-
-  int i,weight_norm,nV = currRing->N;
+  //PrintS("\n //**MWalkRandomNextWeight: Anfang ok!\n");
+  int i,k,nV = currRing->N;
+  long weight_norm;
   intvec* next_weight2;
-  intvec* next_weight22 = new intvec(nV);
+  //intvec* next_weight22 = new intvec(nV);
   intvec* result = new intvec(nV);
+  ideal G_test;
+  ideal G_test2;
+  BOOLEAN random = FALSE;
 
   intvec* next_weight1 =MkInterRedNextWeight(curr_weight,target_weight,G);
   //compute a random next weight vector "next_weight2"
-  while(1)
+  k = 1;
+  while(k<4)
   {
+    k++;
     weight_norm = 0;
+    intvec* next_weight22 = new intvec(nV);
     while(weight_norm == 0)
     {
-
+      //PrintS("\nWhile WeightNorm\n");
       for(i=0; i<nV; i++)
       {
-        (*next_weight22)[i] = rand() % 60000 - 30000;
+        (*next_weight22)[i] = rand() % 60000 ;
         weight_norm = weight_norm + (*next_weight22)[i]*(*next_weight22)[i];
       }
+      //Print("\n// weight_norm vor Wurzel = %d\n", weight_norm);
       weight_norm = 1 + floor(sqrt(weight_norm));
+      
     }
-
+//Print("\n// weight_norm nach Wurzel = %d\n", weight_norm);
     for(i=0; i<nV; i++)
     {
       if((*next_weight22)[i] < 0)
       {
-        (*next_weight22)[i] = 1 + (*curr_weight)[i] + floor(weight_rad*(*next_weight22)[i]/weight_norm);
+        (*next_weight22)[i] = 1 + (*curr_weight)[i] + floor((weight_rad)*(*next_weight22)[i]/weight_norm);
       }
       else
       {
-        (*next_weight22)[i] = (*curr_weight)[i] + floor(weight_rad*(*next_weight22)[i]/weight_norm);
+        (*next_weight22)[i] = (*curr_weight)[i] + floor((weight_rad)*(*next_weight22)[i]/weight_norm);
       }
     }
 
     if(test_w_in_ConeCC(G, next_weight22) == 1)
     {
+      //PrintS("\n //** MWalkRandomNextWeight: test ob in Kegel.\n");
       next_weight2 = MkInterRedNextWeight(next_weight22,target_weight,G);
       if(MivAbsMax(next_weight2)>1147483647)
       {
@@ -4394,25 +4380,30 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
           (*next_weight22)[i] = floor(0.1*(*next_weight22)[i] + 0.5);
         }
       }
-      delete next_weight22;
+      random = TRUE;
       break;
     }
+    delete next_weight22;
   }
-  
+  //PrintS("\n //**MWalkRandomNextWeight: Ende while-Schleife!\n");
+
   // compute "usual" next weight vector
   intvec* next_weight = MwalkNextWeightCC(curr_weight,target_weight, G);
-  ideal G_test = MwalkInitialForm(G, next_weight);
-  ideal G_test2 = MwalkInitialForm(G, next_weight2);
-
+  G_test = MwalkInitialForm(G, next_weight);
+  if(random == TRUE)
+  {
+    G_test2 = MwalkInitialForm(G, next_weight2);
+  }
   // compare next weights
   if(Overflow_Error == FALSE)
   {
     ideal G_test1 = MwalkInitialForm(G, next_weight1);
-    if(G_test1->m[0] != NULL && maxlengthpoly(G_test1) < maxlengthpoly(G_test))//if(IDELEMS(G_test1) < IDELEMS(G_test))
+    if(G_test1->m[0] != NULL && maxlengthpoly(G_test1) < maxlengthpoly(G_test))
     {
-      if(G_test2->m[0] != NULL && maxlengthpoly(G_test2) < maxlengthpoly(G_test1)) //if(IDELEMS(G_test2) < IDELEMS(G_test1))
+      if(random == TRUE &&
+         G_test2->m[0] != NULL &&
+         maxlengthpoly(G_test2) < maxlengthpoly(G_test1))
       {
-        // |G_test2| < |G_test1| < |G_test|
         for(i=0; i<nV; i++)
         {
           (*result)[i] = (*next_weight2)[i];
@@ -4420,7 +4411,6 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
       }
       else
       {
-        // |G_test1| < |G_test|, |G_test1| <= |G_test2|
         for(i=0; i<nV; i++)
         {
           (*result)[i] = (*next_weight1)[i];
@@ -4429,7 +4419,9 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
     }
     else
     {
-      if(G_test2->m[0] != NULL && maxlengthpoly(G_test2) < maxlengthpoly(G_test))//if(IDELEMS(G_test2) < IDELEMS(G_test)) // |G_test2| < |G_test| <= |G_test1|
+      if(random == TRUE &&
+         G_test2->m[0] != NULL &&
+         maxlengthpoly(G_test2) <= maxlengthpoly(G_test))
       {
         for(i=0; i<nV; i++)
         {
@@ -4438,7 +4430,6 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
       }
       else
       {
-        // |G_test| < |G_test1|, |G_test| <= |G_test2|
         for(i=0; i<nV; i++)
         {
           (*result)[i] = (*next_weight)[i];
@@ -4450,7 +4441,9 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
   else
   {
     Overflow_Error = FALSE;
-    if(G_test2->m[0] != NULL && maxlengthpoly(G_test2) < maxlengthpoly(G_test))//if(IDELEMS(G_test2) < IDELEMS(G_test))
+    if(random == TRUE && 
+       G_test2->m[0] != NULL &&
+       maxlengthpoly(G_test2) <= maxlengthpoly(G_test))
     {
       for(i=1; i<nV; i++)
       {
@@ -4465,12 +4458,18 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
       }
     }
   }
-  PrintS("\n MWalkRandomNextWeight: Ende ok!\n");
+  //PrintS("\n MWalkRandomNextWeight: Ende ok!\n");
   idDelete(&G_test);
-  idDelete(&G_test2);
+  if(random == TRUE)
+  {
+    idDelete(&G_test2);
+  }
   if(test_w_in_ConeCC(G, result) == 1)
   {
-    delete next_weight2;
+    if(random == TRUE)
+    {
+      delete next_weight2;
+    }
     delete next_weight;
     delete next_weight1;
     return result;
@@ -4478,7 +4477,10 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
   else
   {
     delete result;
-    delete next_weight2;
+    if(random == TRUE)
+    {
+      delete next_weight2;
+    }
     delete next_weight1;
     return next_weight;
   }
@@ -5994,16 +5996,17 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
        Gomega is a reduced Groebner basis w.r.t. the current ring */
     F = MLifttwoIdeal(Gomega2, M1, G);
     if(endwalks != 1)
+    {
       tlift = tlift+clock()-to;
+    }
     else
+    {
       xtlift=clock()-to;
-
-//#ifdef CHECK_IDEAL_MWALK
+    }
     if(printout > 2)
     {
       idString(F,"//** Mpwalk: F");
     }
-//#endif
 
     idDelete(&M1);
     idDelete(&Gomega2);
@@ -6012,15 +6015,20 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
     // change the ring to newRing
     rChangeCurrRing(newRing);
     F1 = idrMoveR(F, oldRing,currRing);
-    //G = idrMoveR(F,oldRing,currRing);
     to=clock();
-    PrintS("\n //** Mpwalk: reduce the Groebner basis.\n");
+    if(printout > 0)
+    {
+      PrintS("\n //** Mpwalk: reduce the Groebner basis.\n");
+    }
     G = kInterRedCC(F1, NULL);
     if(endwalks != 1)
+    {
       tred = tred+clock()-to;
+    }
     else
+    {
       xtred=clock()-to;
-
+    }
     idDelete(&F1);
 
     if(endwalks == 1)
@@ -6028,36 +6036,37 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
 
     to=clock();
     // compute a next weight vector
+    //next_weight = MwalkNextWeightCC(curr_weight,target_weight,G);
     next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
     tnw=tnw+clock()-to;
-//#ifdef PRINT_VECTORS
+
     if(printout > 0)
     {
       MivString(curr_weight, target_weight, next_weight);
     }
-//#endif
+
 
     if(Overflow_Error == TRUE)
     {
       ntwC = 0;
-      //ntestomega = 1;
-      //Print("\n// ring r%d = %s;\n", nstep, rString(currRing));
-      //idElements(G, "G");
       delete next_weight;
-      goto FINISH_160302;
+      break;
+      //goto FINISH_160302;
     }
-    if(MivComp(next_weight, ivNull) == 1){
+    if(MivComp(next_weight, ivNull) == 1)
+    {
       newRing = currRing;
       delete next_weight;
-      //Print("\n// ring r%d = %s;\n", nstep, rString(currRing));
       break;
     }
-    if(MivComp(next_weight, target_weight) == 1)
+    if(MivComp(next_weight, target_weight) == 1 || test_w_in_ConeCC(G, target_weight)==1) //AENDERUNG!!
+    {
       endwalks = 1;
-
+    }
     for(i=nV-1; i>=0; i--)
+    {
       (*curr_weight)[i] = (*next_weight)[i];
-
+    }
     delete next_weight;
   }//end of while-loop
 
@@ -6081,7 +6090,6 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
       headidString(G, "G");
 #endif
 
-
     // check whether the pertubed target vector stays in the correct cone
     if(ntwC != 0){
       ntestw = test_w_in_ConeCC(F1, pert_target_vector);
@@ -6089,52 +6097,74 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
 
     if( ntestw != 1 || ntwC == 0)
     {
-      /*
-      if(ntestw != 1){
-        ivString(pert_target_vector, "tau");
-        PrintS("\n// ** perturbed target vector doesn't stay in cone!!");
-        Print("\n// ring r%d = %s;\n", nstep, rString(currRing));
-        idElements(F1, "G");
+      if(printout > 0)
+      {
+        if(printout > 1)
+        {
+          ivString(pert_target_vector, "tau");
+        }
+        PrintS("\n //** Mpwalk: perturbed target vector doesn't stay in cone. \n");
+        if(printout > 2)
+        {
+          Print("\n// ring r%d = %s;\n", nstep, rString(currRing));
+          //idElements(F1, "G");
+        }
       }
-      */
+
       // LastGB is "better" than the kStd subroutine
       to=clock();
       ideal eF1;
-      if(nP == 0 || tp_deg == 1 || MivSame(orig_target, exivlp) != 1){
-        // PrintS("\n// ** calls \"std\" to compute a GB");
+      if(nP == 0 || tp_deg == 1 || MivSame(orig_target, exivlp) != 1)
+      {
+        if(printout > 1)
+        {
+          PrintS("\n //** Mpwalk: call \"std\" to compute a GB.\n");
+        }
         eF1 = MstdCC(F1);
         idDelete(&F1);
       }
-      else {
-        // PrintS("\n// ** calls \"LastGB\" to compute a GB");
+      else
+      {
+        if(printout > 1)
+        {
+          PrintS("\n //** Mpwalk: call \"LastGB\" to compute a GB.\n");
+        }
         rChangeCurrRing(newRing);
         ideal F2 = idrMoveR(F1, TargetRing,currRing);
         eF1 = LastGB(F2, curr_weight, tp_deg-1);
-        F2=NULL;
+        idDelete(&F2);
+        //F2=NULL;
       }
       xtextra=clock()-to;
       ring exTargetRing = currRing;
 
       rChangeCurrRing(XXRing);
       Eresult = idrMoveR(eF1, exTargetRing,currRing);
+      idDelete(&eF1);
     }
-    else{
+    else
+    {
       rChangeCurrRing(XXRing);
       Eresult = idrMoveR(F1, TargetRing,currRing);
+      idDelete(&F1);
     }
   }
-  else {
+  else
+  {
     rChangeCurrRing(XXRing);
     Eresult = idrMoveR(G, newRing,currRing);
+    idDelete(&G);
   }
   si_opt_1 = save1; //set original options, e. g. option(RedSB)
   delete ivNull;
   if(tp_deg != 1)
+  {
     delete target_weight;
-
+  }
   if(op_deg != 1 )
+  {
     delete curr_weight;
-
+  }
   delete exivlp;
   delete last_omega;
 
@@ -6160,7 +6190,6 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
   {
     si_opt_1 &= (~Sy_bit(OPT_REDSB)); // no reduced Groebner basis
     //si_opt_1 &= (~Sy_bit(OPT_REDTAIL)); // not tail reductions
-    //si_opt_1|=(Sy_bit(OPT_REDTAIL)|Sy_bit(OPT_REDSB));
   }
   Set_Error(FALSE);
   Overflow_Error = FALSE;
@@ -7094,7 +7123,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
       */
       delete next_vect;
       next_vect = MWalkRandomNextWeight(G,omega,omega2,weight_rad,nlev);
-      if(isNegNolVector(next_vect)==1)
+      if(isNegNolVector(next_vect)==1 || MivSame(omega,next_vect) == 1)
       {
         delete next_vect;
         next_vect = MkInterRedNextWeight(omega,omega2,G);
@@ -7179,7 +7208,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
           */
           delete next_vect;
           next_vect = MWalkRandomNextWeight(G,omega,omega2,weight_rad,nlev);
-          if(isNegNolVector(next_vect)==1)
+          if(isNegNolVector(next_vect)==1 || MivSame(omega,next_vect) == 1)
           {
             delete next_vect;
             next_vect = MkInterRedNextWeight(omega,omega2,G);
@@ -7238,7 +7267,10 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
       {
         Print("\n//** rec_r_fractal_call: Leaving the %d-th recursion with %d steps.\n",
               nlev, nwalks);
-        //Print(" ** Overflow_Error? (%d)", Overflow_Error);
+      /*
+        Print(" ** Overflow_Error? (%d)", Overflow_Error);
+        idString(G1,"//** rec_r_fractal_call: G1");
+      */
       }
       nnflow ++;
       Overflow_Error = FALSE;
@@ -7278,7 +7310,10 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
         {
           Print("\n//** rec_r_fractal_call: Leaving the %d-th recursion with %d steps.\n",
                 nlev, nwalks);
-          //Print(" ** Overflow_Error? (%d)", Overflow_Error);
+        /*
+          Print(" ** Overflow_Error? (%d)", Overflow_Error);
+          idString(Gt,"//** rec_r_fractal_call: Gt");
+        */
         }
         return (Gt);
       }
@@ -7381,7 +7416,10 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
         {
           Print("\n//** rec_r_fractal_call: Leaving the %d-th recursion with %d steps.\n",
                 nlev,nwalks);
-          //Print(" ** Overflow_Error? (%d)", Overflow_Error);
+         /*
+          Print(" ** Overflow_Error? (%d)", Overflow_Error);
+          idString(G,"//** rec_r_fractal_call: G");
+         */
         }
         if(Overflow_Error == TRUE)
           nnflow ++;
