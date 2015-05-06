@@ -250,7 +250,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
         s_exp = s_exp - 2;
       }
       p_SetExp(lead_mult, i, p_GetExp(p, i,leadRing) - s_exp, tailRing);
-      for (unsigned long j = 1; j <= s_exp; j++)
+      for (int j = 1; j <= s_exp; j++)
       {
         tmp1 = nInit(j);
         tmp2 = p_ISet(1, tailRing);
@@ -376,9 +376,9 @@ int redRing (LObject* h,kStrategy strat)
     }
     if (d != reddeg)
     {
-      if (d >= strat->tailRing->bitmask)
+      if (d >= (long)strat->tailRing->bitmask)
       {
-        if (h->pTotalDeg() >= strat->tailRing->bitmask)
+        if (h->pTotalDeg() >= (long)strat->tailRing->bitmask)
         {
           strat->overflow=TRUE;
           //Print("OVERFLOW in redRing d=%ld, max=%ld\n",d,strat->tailRing->bitmask);
@@ -975,9 +975,9 @@ int redLazy (LObject* h,kStrategy strat)
     }
     else if (d != reddeg)
     {
-      if (d>=strat->tailRing->bitmask)
+      if (d>=(long)strat->tailRing->bitmask)
       {
-        if (h->pTotalDeg() >= strat->tailRing->bitmask)
+        if (h->pTotalDeg() >= (long)strat->tailRing->bitmask)
         {
           strat->overflow=TRUE;
           //Print("OVERFLOW in redLazy d=%ld, max=%ld\n",d,strat->tailRing->bitmask);
@@ -1159,9 +1159,9 @@ int redHoney (LObject* h, kStrategy strat)
     }
     else if (d > reddeg)
     {
-      if (d>=strat->tailRing->bitmask)
+      if (d>=(long)strat->tailRing->bitmask)
       {
-        if (h->pTotalDeg()+h->ecart >= strat->tailRing->bitmask)
+        if (h->pTotalDeg()+h->ecart >= (long)strat->tailRing->bitmask)
         {
           strat->overflow=TRUE;
           //Print("OVERFLOW in redHoney d=%ld, max=%ld\n",d,strat->tailRing->bitmask);

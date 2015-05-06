@@ -1,0 +1,1123 @@
+//////////////////////////////////////////////////////////////////////////////
+version="version maxlike.lib 4.0.2.0 30.03.2015 "; //$Id$
+category="Algebraic Statistics";
+info="
+LIBRARY:  maxlike.lib  Procedures to compute maximum likelihood estimates
+AUTHOR:  Adrian Koch (kocha at rhrk.uni-kl.de)
+
+REFERENCES:
+  Lior Pachter, Bernd Sturmfels; Algebraic Statistics for Computational Biology;
+    published by Cambridge University Press
+
+PROCEDURES:
+ likeIdeal(I,u);                the likelihood ideal with respect to I and u
+ logHessian(I,u);               modified Hessian of the loglikelihood function
+ getMaxPoints(Iu,H,prec,[..]);  maximum likelihood estimates
+ maxPoints(I,u,prec,[..]);      maximum likelihood estimates,combines the procedures above
+ maxPointsProb(I,u,prec,[..]);  maximum likelihood estimates and probability distributions
+
+KEYWORDS: algebraic statistics; likelihood ideal; maximum likelihood estimate
+";
+
+LIB "presolve.lib";
+LIB "solve.lib";//already loads the matrix.lib
+LIB "sing.lib";
+
+static proc onesmat(n,m)
+{//returns an nxm matrix filled with ones
+  matrix M[n][m];
+  int i,j;
+  for(i=1; i<=n; i++)
+  {
+    for(j=1; j<=m; j++)
+    {
+      M[i,j]=1;
+    }
+  }
+  return(M);
+}
+
+proc likeIdeal(ideal I, intvec u)
+"USAGE:   likeIdeal(I,u); ideal I, intvec u
+         I represents the algebraic statistical model and u is the data vector under
+         considerarion.
+RETURN:  ideal: the likelihood ideal with respect to I and u
+EXAMPLE: example likeIdeal; shows an example
+"
+{//I contains the polys f_i giving the alg.stat.model: theta -> (f1(theta),...,fm(theta))
+  //this is an implementation of the first part of 3.3 MLE, namely pages 102-104
+  //i.e. it computes an ideal Iu such that V(Iu) contains all critical points
+  //of the parameter-log-likelihood-function given by the polys in I
+  //(more precisely, V(Iu) is the smallest
+  //variety with that property) (cf. elimination theory)
+  //(I must have the same number of elements as u)
+  def r=basering;
+  int n=nvars(basering);
+  int m=size(I);
+  ring bigring = 0, (t(1..n),z(1..m)), dp;
+  ideal I=fetch(r,I);
+
+  // here we generate the zf(theta)-part of Ju
+  matrix Z=diag(ideal(z(1..m)));
+  matrix F=diag(I);
+  matrix ZF1=Z*F-diag(1,m);
+  ideal J1=ideal(ZF1);
+
+  //here we generate the theta-part of Ju
+  matrix O=onesmat(m,m);
+  matrix U=diag(u);
+  matrix UZ=O*U*Z;
+  //compute the derivatives, but take only the submatrix corresponding to the variables
+  //in the original ring (other entries are 0)
+  matrix D=jacob(I);
+  intvec rD=1..nrows(D);
+  intvec cD=1..n;
+  matrix Dsub=submat(D,rD,cD);
+  matrix S=UZ*Dsub;
+  ideal J2=ideal(S);
+
+  // put the two parts together
+  ideal Ju=J1+J2;
+  poly el=1;
+  int i;
+  for(i=1; i<=m; i++)
+  {
+    el=el*z(i);
+  }
+  ideal Iu=eliminate(Ju,el);
+  setring r;
+  ideal Iu=fetch(bigring,Iu);
+  return(Iu);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r = 0,(x,y),dp;
+  poly pA = -10x+2y+25;
+  poly pC = 8x-y+25;
+  poly pG = 11x-2y+25;
+  poly pT = -9x+y+25;
+  intvec u = 10,14,15,10;
+  ideal I = pA,pC,pG,pT;
+  ideal L = likeIdeal(I,u); L;
+}
+
+static proc prodideal(ideal I)
+{//returns the product over all polys in I
+  int n=size(I);
+  int i;
+  poly f=I[1];
+  for(i=2; i<=n; i++)
+  {
+    f=f*I[i];
+  }
+  return(f);
+}
+
+proc logHessian(ideal I, intvec u)
+"USAGE:   logHessian(I,u); ideal I, intvec u
+         I represents the algebraic statistical model and u is the data vector under
+         considerarion.
+RETURN:  matrix: a modified version of the Hessian matrix of the loglikelihood function
+         defined by u and (the given generators of) I.
+NOTE:    This matrix has the following property: if it is negative definite at a point,
+         then the actual Hessian is also negative definite at that point. The same holds
+         for positive definiteness.
+EXAMPLE: example logHessian; shows an example
+"
+{//computes the "Hessian" of the loglikelihoodfunction defined by I and u
+  //first we compute the products Fj=prod(f1,...,fm)/fj
+  int m=size(I);
+  int n=nvars(basering);
+  poly F=prodideal(I);
+  ideal Fj;
+  int j;
+  for(j=1; j<=m; j++)
+  {
+    Fj=Fj+ideal(F/I[j]);
+  }
+
+  //now, we compute the products of the first partial derivatives for each fj
+  matrix J=jacob(I);
+  matrix P[n][n];
+  list Jprod;
+  int i,k;
+  poly f;
+  for(j=1; j<=m; j++)
+  {
+    for(i=1; i<=n; i++)
+    {
+      for(k=i; k<=n; k++)
+      {
+        f=J[j,i]*J[j,k];
+        P[i,k]=f;
+        P[k,i]=f;
+      }
+    }
+    Jprod=Jprod+list(P);
+  }
+
+  //here, we compute the second partial derivatives
+  list secondJ=jacob(jacob(I[1]));
+  for(j=2; j<=m; j++)
+  {
+    secondJ=secondJ+list(jacob(jacob(I[j])));
+  }
+
+  //finally, we put everything together to get the "Hessian"
+  matrix H[n][n];
+  f=0;
+  for(i=1; i<=n; i++)
+  {
+    for(k=i; k<=n; k++)
+    {
+      for(j=1; j<=m; j++)
+      {
+        f=f+u[j]*Fj[j]*(secondJ[j][i,k]*I[j]-Jprod[j][i,k]);
+      }
+      H[i,k]=f;
+      H[k,i]=f;
+      f=0;
+    }
+  }
+  return(H);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r = 0,(x,y),dp;
+  poly pA = -10x+2y+25;
+  poly pC = 8x-y+25;
+  poly pG = 11x-2y+25;
+  poly pT = -9x+y+25;
+  intvec u = 10,14,15,10;
+  ideal I = pA,pC,pG,pT;
+  matrix H = logHessian(I,u); H;
+}
+
+static proc is_neg_def(matrix H)
+{//determines whether the given matrix is negative definite
+   //returns 1 if it is, 0 if it isnt
+  matrix M=H-diag(var(1),ncols(H));
+  poly f=det(M);
+  list S=laguerre_solve(f);
+  //this computes the eigenvalues of H. below, they are checked for neg. definiteness
+  int k;
+
+  //we now check, whether H is negative definite
+  //if it is, then we will go through the for-loop completely and return 1 at the end
+  //otherwise we return 0
+  for(k=1; k<=size(S); k++)
+  {
+    if(S[k] >= 0)
+    {
+      return(0);
+    }
+  }
+  return(1);
+}
+
+
+
+proc getMaxPoints(ideal Iu, matrix H, int prec, list #)
+"USAGE:   getMaxPoints(Iu, H, prec [, \"nodisplay\"]); ideal Iu, matrix H, int prec, int k
+         Iu the likelihood ideal, H the (modified) Hessian of the considered algebraic
+         statistical model, prec the precision with which to compute the maximum
+         likelihood estimates
+RETURN:  ring: a complex ring R in which you can find the following two lists:
+           - MPOINTS, points in which the loglikelihood function has a local maximum, and
+           - LHESSIANS, the (modified) Hessians at those points
+         also prints out the points in MPOINTS, unless a fourth argument is given
+NOTE:    it is assumed that the likelihood ideal is 0-dimensional
+EXAMPLE: example getMaxPoints; shows an example
+"
+{//goes through the solutions computed by solve and keeps only those which have only
+  //(non-negative) real components
+  //then it plugs the solutions into the "Hessian" and checks whether or not it is
+  //negative definite
+  ideal G=groebner(Iu);
+  def r=basering;
+  int n=nvars(r);
+  def s=solve(G,prec,"nodisplay");
+  setring s;
+  list L;
+  list entk;//the k-th entry of SOL
+  int c; //will be 1 if we want the entry in our list L, 0 otherwise
+  int k,l;
+  for(k=1; k<=size(SOL); k++)
+  {
+    c=1;
+    entk=SOL[k];
+    for(l=1; l<=size(entk); l++)
+    {
+      if(impart(entk[l]) != 0)//throw away those with non-zero imaginary part
+      {
+        c=0;
+        break;
+      }
+      if(entk[l] < 0)//and those wich are negative
+      {
+        c=0;
+        break;
+      }
+    }
+    if(c == 1)//is 1 iff all components are real and non-negative
+    {
+      L=L+list(entk);
+    }
+  }
+
+  ring R=(complex,prec,i),x(1..n),dp;
+  ideal Iu=fetch(r,Iu);
+  list L=fetch(s,L);
+  list Lk;//k-th entry of L
+  matrix H=fetch(r,H);
+  matrix Hsubst;
+  list hessi;//contains the Hessians with solutions plugged in
+  for(k=1; k<=size(L); k++)
+  {
+    Lk=L[k];
+    Hsubst=H;
+    for(l=1; l<=size(Lk); l++)
+    {
+      Hsubst=subst(Hsubst,x(l),Lk[l]);
+    }
+    hessi=hessi+list(Hsubst);
+  }
+
+  //now check all elements of hessi and only keep those which are negative definite
+  //also do the respective changes in the list of solutions L
+  list hessi2;
+  list L2;
+  for(k=1; k<=size(L); k++)
+  {
+    if(1)
+    {
+      if(is_neg_def(hessi[k]) == 1)
+      {
+        hessi2=hessi2+list(hessi[k]);
+        L2=L2+list(L[k]);
+      }
+    }
+  }
+
+   //execute("ring outR =(complex,"+string(prec)+"),(x(1.."+string(n)+")),dp;");
+  ring outR=(complex,prec),x(1..n),dp;
+  list MPOINTS = imap(R,L2);
+  list LHESSIANS = imap(R,hessi2);
+  export MPOINTS;
+  export LHESSIANS;
+  string display="
+// In the ring created by getmaxpoints you can find the lists
+//   MPOINTS, containing points in which the loglikelihood function has a local maximum, and
+//   LHESSIANS, containing the (modified) Hessians at those points.
+";
+  if(size(#)==0) { print(MPOINTS); print(display); }
+  return(outR);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r = 0,(x,y),dp;
+  poly pA = -10x+2y+25;
+  poly pC = 8x-y+25;
+  poly pG = 11x-2y+25;
+  poly pT = -9x+y+25;
+  intvec u = 10,14,15,10;
+  ideal I = pA,pC,pG,pT;
+  ideal L = likeIdeal(I,u);
+  matrix H = logHessian(I,u);
+  def R = getMaxPoints(L, H, 50);
+  setring R;
+  MPOINTS;
+  LHESSIANS;
+}
+
+
+
+proc maxPoints(ideal I, intvec u, int prec, list #)
+"USAGE:   maxPoints(I,u,prec [, \"nodisplay\"]); ideal I, intvec u, int prec
+         I represents the algebraic statistical model, u is the data vector under
+         considerarion, and prec is the precision to be used in the computations
+RETURN:  ring: a complex ring R in which you can find the following two lists:
+           - MPOINTS, points in which the loglikelihood function has a local maximum, and
+           - LHESSIANS, the (modified) Hessians at those points
+         also prints out the points in MPOINTS, unless a fourth argument is given
+NOTE:    Just uses likeideal, loghessian and getmaxpoints.
+EXAMPLE: example maxPoints; shows an example
+"
+{
+  ideal Iu=likeIdeal(I,u);
+  return(getMaxPoints(Iu,logHessian(I,u),prec,#));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r = 0,(x,y),dp;
+  poly pA = -10x+2y+25;
+  poly pC = 8x-y+25;
+  poly pG = 11x-2y+25;
+  poly pT = -9x+y+25;
+  intvec u = 10,14,15,10;
+  ideal I = pA,pC,pG,pT;
+  def R = maxPoints(I, u, 50);
+  setring R;
+  MPOINTS;
+  LHESSIANS;
+}
+
+
+proc maxPointsProb(ideal I, intvec u, int prec, list #)
+"USAGE:   maxPointsProb(I,u,prec [, \"nodisplay\"]); ideal I, intvec u, int prec
+         I represents the algebraic statistical model, u is the data vector under
+         considerarion, and prec is the precision to be used in the computations
+RETURN:  ring: a complex ring R in which you can find the following two lists:
+           - MPOINTS, points in which the loglikelihood function has a local maximum,
+           - LHESSIANS, the (modified) Hessians at those points, and
+           - VALS, the resulting probability distributions (that is, the values of the
+             polynomials given by I at the points in MPOINTS).
+         Also prints out the points in MPOINTS, unless a fourth argument is given.
+NOTE:    Does not compute the likelihood ideal via elimination, but rather computes
+         the critical points by projection.
+EXAMPLE: example maxPointsProb; shows an example
+"
+{//as opposed to (get)maxpoints, which first eliminates and then solves, this procedure
+   //solves and then projects
+   //furthermore, it also creates a list of the values the generators of I have at the
+   //points in MPOINTS (that is, a list of the probability distributions)
+  matrix H=logHessian(I,u);
+  def r=basering;
+  int n=nvars(basering);
+  int m=size(I);
+  ring bigring = 0, (t(1..n),z(1..m)), dp;
+  ideal I=fetch(r,I);
+
+  // here we generate the zf(theta)-part of Ju
+  matrix Z=diag(ideal(z(1..m)));
+  matrix F=diag(I);
+  matrix ZF1=Z*F-diag(1,m);
+  ideal J1=ideal(ZF1);
+
+  //here we generate the theta-part of Ju
+  matrix O=onesmat(m,m);
+  matrix U=diag(u);
+  matrix UZ=O*U*Z;
+  //compute the derivatives, but take only the submatrix corresponding to the variables
+  //in the original ring (other entries are 0)
+  matrix D=jacob(I);
+  intvec rD=1..nrows(D);
+  intvec cD=1..n;
+  matrix Dsub=submat(D,rD,cD);
+  matrix S=UZ*Dsub;
+  ideal J2=ideal(S);
+
+  // put the two parts together
+  ideal Ju=J1+J2;
+  def s=solve(Ju,prec,"nodisplay");
+
+  setring s;
+  list L;
+  list entk;//the k-th entry of SOL
+  int c; //will be 1 if we want the entry in our list L, 0 otherwise
+  int k,l;
+  for(k=1; k<=size(SOL); k++)
+  {
+    c=1;
+    entk=SOL[k];
+    entk=entk[1..n];
+    for(l=1; l<=size(entk); l++)
+    {
+      if(impart(entk[l]) != 0)//throw away those with non-zero imaginary part
+      {
+        c=0;
+        break;
+      }
+      if(entk[l] < 0)//and those wich are negative
+      {
+        c=0;
+        break;
+      }
+    }
+    if(c == 1)//is 1 iff all components are real and non-negative
+    {
+      L=L+list(entk);
+    }
+  }
+
+  ring R=(complex,prec,i),x(1..n),dp;
+  list L=fetch(s,L);
+  list Lk;//k-th entry of L
+  matrix H=fetch(r,H);
+  matrix Hsubst;
+  list hessi;//contains the Hessians with solutions plugged in
+  for(k=1; k<=size(L); k++)
+  {
+    Lk=L[k];
+    Hsubst=H;
+    for(l=1; l<=size(Lk); l++)
+    {
+      Hsubst=subst(Hsubst,x(l),Lk[l]);
+    }
+    hessi=hessi+list(Hsubst);
+  }
+
+
+  //now check all elements of hessi and only keep those which are neg def
+  //also do the respective changes in the list of solutions L
+  list hessi2;
+  list L2;
+  for(k=1; k<=size(L); k++)
+  {
+    if(1)
+    {
+      if(is_neg_def(hessi[k]) == 1)
+      {
+        hessi2=hessi2+list(hessi[k]);
+        L2=L2+list(L[k]);
+      }
+    }
+  }
+
+
+  //Output
+  ideal I=fetch(r,I);
+  list p, vals, VAL;
+  int j;
+  poly f;
+  for(l=1; l<=size(L2); l++)
+  {
+    p=L2[l];
+    for(j=1; j<=size(I); j++)
+    {
+      f=I[j];
+      for(k=1; k<=nvars(basering); k++)
+      {
+        f=subst(f,var(k),p[k]);
+      }
+      vals=vals+list(f);
+    }
+    VAL=VAL+list(vals);
+    vals=list();
+  }
+
+  //execute("ring outR =(complex,"+string(prec)+"),(x(1.."+string(n)+")),dp;");
+  ring outR=(complex,prec),x(1..n),dp;
+  list MPOINTS = imap(R,L2);
+  list LHESSIANS = imap(R,hessi2);
+  list VALS = imap(R,VAL);
+  export MPOINTS;
+  export LHESSIANS;
+  export VALS;
+  string display="
+// In the ring created by getmaxpoints you can find the lists
+//   MPOINTS, containing points in which the loglikelihood function has a local maximum,
+//   LHESSIANS, containing the (modified) Hessians at those points, and
+//   VALS, containing the probability distributions at those points.
+";
+   if(size(#)==0) { print(MPOINTS); print(display); }
+   return(outR);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r = 0,(x,y),dp;
+  poly pA = -10x+2y+25;
+  poly pC = 8x-y+25;
+  poly pG = 11x-2y+25;
+  poly pT = -9x+y+25;
+  intvec u = 10,14,15,10;
+  ideal I = pA,pC,pG,pT;
+  def R = maxPointsProb(I, u, 50);
+  setring R;
+  MPOINTS;
+  LHESSIANS;
+  VALS;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////    a few more examples   /////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+proc bad_seq_gen_example()
+{
+   ring R = 0,(mu1,mu2,mu3),dp;
+   poly f1 = mu1*mu2*mu3 + 3*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+   poly f2 = 6*mu1*1/3*(1-mu2)*1/3*(1-mu3) + 6*1/3*(1-mu1)*mu2*1/3*(1-mu3) +
+    6*1/3*(1-mu1)*1/3*(1-mu2)*mu3 + 6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+   poly f3 = 3*mu1*mu2*1/3*(1-mu3) + 3*1/3*(1-mu1)*1/3*(1-mu2)*mu3 +
+    6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+   poly f4 = 3*mu1*1/3*(1-mu2)*mu3 + 3*1/3*(1-mu1)*mu2*1/3*(1-mu3) +
+    6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+   poly f5 = 3*1/3*(1-mu1)*mu2*mu3 + 3*mu1*1/3*(1-mu2)*1/3*(1-mu3) +
+    6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+   ideal I = f1,f2,f3,f4,f5;
+   write(":w ThreeTaxonClaw.tree",
+         "(Taxon1:0.6074796219,Taxon2:4.7911951859,Taxon3:0.5522879636);");
+   int i=system("sh",
+      "seq-gen -mHKY -l7647 -n1 -z28503 -q  < ThreeTaxonClaw.tree > ThreeTaxonClaw.dat");
+   intvec u=getintvec("ThreeTaxonClaw.dat");
+   maxPoints(I,u,50);
+}
+
+proc bad_seq_gen_example2()
+{//same example, but a different method of computing the local maxima
+   ring bigring = 0,(mu1,mu2,mu3,z1,z2,z3,z4,z5),dp;
+   poly f1 = mu1*mu2*mu3 + 3*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+   poly f2 = 6*mu1*1/3*(1-mu2)*1/3*(1-mu3) + 6*1/3*(1-mu1)*mu2*1/3*(1-mu3) +
+    6*1/3*(1-mu1)*1/3*(1-mu2)*mu3 + 6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+   poly f3 = 3*mu1*mu2*1/3*(1-mu3) + 3*1/3*(1-mu1)*1/3*(1-mu2)*mu3 +
+    6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+   poly f4 = 3*mu1*1/3*(1-mu2)*mu3 + 3*1/3*(1-mu1)*mu2*1/3*(1-mu3) +
+    6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+   poly f5 = 3*1/3*(1-mu1)*mu2*mu3 + 3*mu1*1/3*(1-mu2)*1/3*(1-mu3) +
+    6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+   ideal I = f1,f2,f3,f4,f5;
+   intvec u=770,2234,1156,2331,1156;
+
+   ideal Ju = z1*f1-1, z2*f2-1, z3*f3-1, z4*f4-1, z5*f5-1,
+   u[1]*z1*diff(f1,mu1) + u[2]*z2*diff(f2,mu1) + u[3]*z3*diff(f3,mu1)
+       + u[4]*z4*diff(f4,mu1) + u[5]*z5*diff(f5,mu1),
+   u[1]*z1*diff(f1,mu2) + u[2]*z2*diff(f2,mu2) + u[3]*z3*diff(f3,mu2)
+       + u[4]*z4*diff(f4,mu2) + u[5]*z5*diff(f5,mu2),
+   u[1]*z1*diff(f1,mu3) + u[2]*z2*diff(f2,mu3) + u[3]*z3*diff(f3,mu3)
+       + u[4]*z4*diff(f4,mu3) + u[5]*z5*diff(f5,mu3);
+   ideal Iu = eliminate( Ju, z1*z2*z3*z4*z5 );
+
+   ring smallring = 0,(mu1,mu2,mu3),dp;
+   ideal Iu=imap(bigring,Iu);
+   ideal G=groebner(Iu);
+   solve(G,20);
+
+   ideal I = imap(bigring,I);
+   matrix H = logHessian(I,u);
+   ring complexring=(complex,20),(mu1,mu2,mu3),dp;
+   matrix H = imap(smallring,H);
+   H = subst(H,mu1,0.59152696273711385658);
+   H = subst(H,mu2,0.2529957197544537399);
+   H = subst(H,mu3,0.59152696273711385658);
+   H;
+   matrix M = H-diag(var(1),ncols(H));
+   laguerre_solve(det(M));
+
+   H = imap(smallring,H);
+   H = subst(H,mu1,0.55724214001951940648);
+   H = subst(H,mu2,0.25295468429185774898);
+   H = subst(H,mu3,0.62963746147721704588);
+   H;
+   M = H-diag(var(1),ncols(H));
+   laguerre_solve(det(M));
+
+   H = imap(smallring,H);
+   H = subst(H,mu1,0.62963746147721704588);
+   H = subst(H,mu2,0.25295468429185774898);
+   H = subst(H,mu3,0.55724214001951940648);
+   H;
+   M = H-diag(var(1),ncols(H));
+   laguerre_solve(det(M));
+}
+*/
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//These are some of the procedures I used to generate and test examples for my Master
+//thesis. To use the ones incorporating Seq-Gen, you may have to adjust the shell command
+//with which Singular calls Seq-Gen. Furthermore, as the names of the procedures suggest,
+//we always use the Jukes-Cantor model.
+
+/*
+proc getguaranteedmaxPoints(ideal Iu, matrix H, list #)
+{//an older version of the procedures above
+  ideal G=groebner(Iu);
+  def r=basering;
+  int n=nvars(r);
+  def s=solve(G,50,"nodisplay");
+  setring s;
+  list L;
+  list entk;//the k-th entry of SOL
+  int c; //will be 1 if we want the entry in our list L, 0 otherwise
+  int k,l;
+  for(k=1; k<=size(SOL); k++)
+  {
+    c=1;
+    entk=SOL[k];
+    for(l=1; l<=size(entk); l++)
+    {
+      if(impart(entk[l]) != 0)//throw away those with non-zero imaginary part
+      {
+        c=0;
+        break;
+      }
+      if(entk[l] < 0)//and those wich are negative
+      {
+        c=0;
+        break;
+      }
+    }
+    if(c == 1)//is 1 iff all components are real and non-negative
+    {
+      L=L+list(entk);
+    }
+  }
+
+  ring R=(complex,50,i),x(1..n),dp;
+  ideal Iu=fetch(r,Iu);
+  list L=fetch(s,L);
+  list Lk;//k-th entry of L
+  matrix H=fetch(r,H);
+  matrix Hsubst;
+  list hessi;//contains the Hessians with solutions plugged in
+  for(k=1; k<=size(L); k++)
+  {
+    Lk=L[k];
+    Hsubst=H;
+    for(l=1; l<=size(Lk); l++)
+    {
+      Hsubst=subst(Hsubst,x(l),Lk[l]);
+    }
+    hessi=hessi+list(Hsubst);
+  }
+
+  //now check all elements of hessi and only keep those which arent neg def or indef
+  //also do the respective changes in the list of solutions L
+  list hessi2;
+  list L2;
+  for(k=1; k<=size(L); k++)
+  {
+    if(1)
+    {
+       if(is_neg_def(hessi[k]) == 1)
+       {
+         hessi2=hessi2+list(hessi[k]);
+         L2=L2+list(L[k]);
+      }
+    }
+  }
+
+  if(size(#)>0)
+  {
+    list L2k;
+    c=0;//counts the number of biologically meaningful parameter vectors
+    int constrhold=1;//will be set to 0 temporarily if the constraints don't hold
+    for(k=1; k<=size(L2); k++)
+    {
+      L2k=L2[k];
+      for(l=1; l<=size(L2k); l++)
+      {
+        if(L2k[l] <= 1/4)
+        {
+          constrhold=0;
+          break;
+        }
+        if(L2k[l] > 1)
+        {
+          constrhold=0;
+          break;
+        }
+      }
+
+      if(constrhold == 1)
+      {
+        c++;
+      }
+      constrhold=1;
+    }
+    return(c);
+  }
+  print(L2);
+}
+
+proc getintvec(string linkstr)
+{
+  //compares the sequences generated by seq-gen and outputs the frequencies
+  //u123, udis, u12, u13 and u23 (so only helpful, when we are considering three taxons)
+  //(distinguishes between the non-sequence-lines of the seq-gen-outputfile and those
+  //with sequences in them by the length of the lines, so use
+  //sequences with at least 20 nucleotides)
+  string st=read(linkstr);
+  string taxon, tax;
+  int i,j;
+  list taxons;
+
+  //first, get the DNA sequences as strings and store them in the list taxons
+  for (i=1; i<=size(st); i=i+1)
+  {
+    while (st[i]!=newline and i<=size(st))
+    {
+      taxon=taxon+st[i];
+      i=i+1;
+    }
+    if (size(taxon)>=20)
+    {
+      for(j=2; j<=size(taxon); j++)
+      {
+        if( (taxon[j-1] == " ") and (taxon[j] != " ") )
+        {
+          break;
+        }
+      }
+      tax=taxon[j..size(taxon)];//removes the part of the line containing the name
+      //of the taxon: in the textfile generated by seq-gen there are a few spaces
+      //between the name of the taxon and the corresponding sequence
+      taxons=taxons+list(tax);
+    }
+    taxon="";
+  }
+
+  //then compare the strings in the list taxons, store the frequencies in the intvec u
+  intvec u=0,0,0,0,0;//u123,udis,u12,u13,u23
+  for(i=1; i<=size(taxons[1]); i++)
+  {
+    if((taxons[1][i] == taxons[2][i]) and (taxons[2][i] == taxons[3][i]))
+    {
+      u[1]=u[1]+1;
+      i++;
+      continue;//continue does not execute the increment statement of the loop
+    }
+
+    if(taxons[1][i] == taxons[2][i])
+    {
+      u[3]=u[3]+1;
+      i++;
+      continue;
+    }
+
+    if(taxons[1][i] == taxons[3][i])
+    {
+      u[4]=u[4]+1;
+      i++;
+      continue;
+    }
+
+    if(taxons[2][i] == taxons[3][i])
+    {
+      u[5]=u[5]+1;
+      i++;
+      continue;
+    }
+
+    u[2]=u[2]+1;
+  }
+  return(u);
+}
+
+proc randintvec(int s, int a)
+{//s the length of the intvecs, a the upper bound of the entries:
+//computes intvecs of length s and entries between 1 and a
+  intvec u;
+  int i;
+  for(i=1; i<=s; i++)
+  {
+    u[i]=random(1,a);
+  }
+  return(u);
+}
+
+proc checkrandomJC69run(int a, int sta, int up)
+{//a number of random intvecs to be considered, sta the starting point of random,
+//up the upper bound of the entries of the intvecs
+  ring r=0,(mu1,mu2,mu3),dp;
+  poly f1=mu1*mu2*mu3+3*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+  poly f2=6*mu1*1/3*(1-mu2)*1/3*(1-mu3)+6*1/3*(1-mu1)*mu2*1/3*(1-mu3)+
+       6*1/3*(1-mu1)*1/3*(1-mu2)*mu3+6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+  poly f3=3*mu1*mu2*1/3*(1-mu3)+3*1/3*(1-mu1)*1/3*(1-mu2)*mu3+
+       6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+  poly f4=3*mu1*1/3*(1-mu2)*mu3+3*1/3*(1-mu1)*mu2*1/3*(1-mu3)+
+       6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+  poly f5=3*1/3*(1-mu1)*mu2*mu3+3*mu1*1/3*(1-mu2)*1/3*(1-mu3)+
+       6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+  ideal I=f1,f2,f3,f4,f5;
+
+  link lu=":a UsedIntvecsJC69rand.txt";
+  link lf=":a FailedJC69rand.txt";
+
+  system("random",sta);
+  ideal Iu,G;
+  int d, nzd, num;
+  int i;
+  intvec u;
+  int eatoutput;
+  string display, writestr;
+  writestr=newline+newline+"number of random intvecs: "+string(a)+"; random seed: ";
+  writestr=writestr+string(sta)+"; upper bound:"+string(up)+newline;
+  write(lu,writestr);
+  write(lf,writestr);
+  for(i=1; i<=a; i++)
+  {
+    u=randintvec(5,up);
+    writestr=string(u);
+    write(lu,writestr);
+
+    Iu=likeIdeal(I,u);
+
+
+    Iu=std(Iu);
+    //Iu=groebner(Iu);
+    d=dim(Iu);
+    if(d != 0)
+    {
+       nzd++;
+       display="-*-*-*- not 0-dim. for u= "+string(u)+", i= "+string(i)+" -*-*-*-";
+       print(display);
+       write(lf,display);
+       i++;
+       continue;
+    }
+
+    eatoutput=getguaranteedmaxPoints(Iu,logHessian(I,u),1);
+
+    if(eatoutput >= 2)
+    {
+       num++;
+      write(lf,writestr+"; number: "+string(eatoutput));
+      display="-*-*-*- Failed for u= "+string(u)+", i= "+string(i)+" -*-*-*-";
+      print(display);
+      display="";
+    }
+  }
+
+  display="-------------- i = "+string(i)+" --------------";
+  display=display+newline+"not zero-dimensional in "+string(nzd)+" cases"+newline;
+  display=display+"no unique maximum in "+string(num)+" cases"+newline;
+  print(display);
+  write(lf,display);
+
+  close(lu);
+  close(lf);
+
+  return(nzd,num);
+}
+
+proc checkseqgenJC69run(int a, int sd, int len)
+{//a number of random intvecs to be considered, sd the random seed for seq-gen,
+//up the upper bound of the entries of the intvecs
+  ring r=0,(mu1,mu2,mu3),dp;
+  poly f1=mu1*mu2*mu3+3*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+  poly f2=6*mu1*1/3*(1-mu2)*1/3*(1-mu3)+6*1/3*(1-mu1)*mu2*1/3*(1-mu3)+
+       6*1/3*(1-mu1)*1/3*(1-mu2)*mu3+6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+  poly f3=3*mu1*mu2*1/3*(1-mu3)+3*1/3*(1-mu1)*1/3*(1-mu2)*mu3+
+       6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+  poly f4=3*mu1*1/3*(1-mu2)*mu3+3*1/3*(1-mu1)*mu2*1/3*(1-mu3)+
+       6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+  poly f5=3*1/3*(1-mu1)*mu2*mu3+3*mu1*1/3*(1-mu2)*1/3*(1-mu3)+
+       6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
+  ideal I=f1,f2,f3,f4,f5;
+
+
+  link lu=":a UsedIntvecsJC69seqgen.txt";
+   link lf=":a FailedJC69seqgen.txt";
+
+  string readstr="ThreeTaxonClaw.dat";
+  ideal Iu,G;
+  int d, nzd, num;
+  int i;
+  intvec u;
+  int eatoutput;
+  string display, writestr, shcmd;
+  writestr=newline+newline+"number of seqgened intvecs: "+string(a)+"; random seed: ";
+  writestr=writestr+string(sd)+"; sequence length: "+string(len)+newline;
+  write(lu,writestr);
+  write(lf,writestr);
+  for(i=1; i<=a; i++)
+  {
+    shcmd="seq-gen ";
+     shcmd=shcmd+"-mHKY -l"+string(len)+" -n1 -z"+string(sd);
+     shcmd=shcmd+" -q  < ThreeTaxonClaw.tree > ThreeTaxonClaw.dat";
+     sd++;
+    eatoutput=system("sh",shcmd);
+    u=getintvec(readstr);
+    writestr=string(u);
+    write(lu,writestr);
+
+    Iu=likeIdeal(I,u);
+
+
+    Iu=std(Iu);
+    //Iu=groebner(Iu);
+    d=dim(Iu);
+    if(d != 0)
+    {
+       nzd++;
+       display="-*-*-*- not 0-dim. for u= "+string(u)+", i= "+string(i)+" -*-*-*-";
+       print(display);
+       write(lf,display);
+       i++;
+       continue;
+    }
+
+
+    eatoutput=getguaranteedmaxPoints(Iu,logHessian(I,u),1);
+
+    if(eatoutput >= 2)
+    {
+       num++;
+      write(lf,writestr+"; number: "+string(eatoutput));
+      display="-*-*-*- no unique maximum for u= "+
+           string(u)+", i= "+string(i)+" -*-*-*-";
+      print(display);
+      display="";
+    }
+  }
+
+
+  display="-------------- i = "+string(i)+" --------------";
+   display=display+newline+"not zero-dimensional in "+string(nzd)+" cases"+newline;
+   display=display+"no unique maximum in "+string(num)+" cases"+newline;
+   print(display);
+   write(lf,display);
+
+   close(lu);
+  close(lf);
+
+   return(nzd,num);
+}
+
+proc randclawtree(int a)
+{
+   ring r=(complex,10),x,dp;
+   number n1,n2,n3;
+   int n;
+   int i;
+   for(i=1; i<=a; i++)
+   {
+      n=random(1,1000000);
+      n1=number(n)/1000000;
+      n2=number(random(1,1000000-n))/1000000;
+      n3=1-n1-n2;
+      print("(Taxon1:"+string(n1)+",Taxon2:"+string(n2)+",Taxon3:"+string(n3)+");");
+   }
+}
+
+proc checkrandomJC69writebeginning(int r, int a, int sta, int up)
+{
+   string writestr=newline+newline+newline+newline+newline+newline;
+   writestr=writestr+"*****************************************************"+newline;
+   writestr=writestr+"starting new loop with the following parameters"+newline;
+   writestr=writestr+"number of runs: "+string(r)+newline;
+   writestr=writestr+"number of intvecs per run: "+string(a)+newline;
+   writestr=writestr+"starting random seed: "+string(sta)+newline;
+   writestr=writestr+"upper bound for the entries of the intvecs: "+string(up)+newline;
+   writestr=writestr+"*****************************************************";
+
+   link lu=":a UsedIntvecsJC69rand.txt";
+   link lf=":a FailedJC69rand.txt";
+   write(lu,writestr);
+  write(lf,writestr);
+  close(lu);
+  close(lf);
+}
+
+proc checkrandomJC69writeend(int r, int a, int sta, int up, int s, int t)
+{
+   writestr=newline+newline+newline;
+   writestr=writestr+"*****************************************************"+newline;
+   writestr=writestr+"ending loop with the following parameters"+newline;
+   writestr=writestr+"number of runs: "+string(r)+newline;
+   writestr=writestr+"number of intvecs per run: "+string(a)+newline;
+   writestr=writestr+"starting random seed: "+string(sta)+newline;
+   writestr=writestr+"upper bound for the entries of the intvecs: "+string(up)+newline;
+   writestr=writestr+newline+"in the whole loop, there were a total of"+newline;
+   writestr=writestr+"   "+string(s)+" examples with non-zero-dim. likeideal"+newline;
+   writestr=writestr+"   "+string(t)+
+      " examples with more than one biol. meaningful local maximum";
+   writestr=writestr+newline+"*****************************************************";
+
+
+   write(lu,writestr);
+  write(lf,writestr);
+  close(lu);
+  close(lf);
+}
+
+proc checkrandomJC69loop(int r, int a, int sta, int up, int s, int t)
+{
+   //r the number of runs, a the number of intvecs per run, sta the starting random
+   //seed, up the upper bound for the entries of the intvecs
+  checkrandomJC69writebeginning(r,a,sta,up);
+
+   int nzd, num, i, s, t;
+   for(i=1; i<=r; i++)
+   {
+      (nzd,num)=checkrandomJC69run(a,sta,up);
+      sta++;
+      s=s+nzd;
+      t=t+num;
+   }
+
+   checkrandomJC69writeend(r,a,sta,up,s,t);
+}
+
+
+proc checkseqgenJC69writebeginning(int r, int a, int sd, int sta, int len, int p)
+{
+   string writestr=newline+newline+newline+newline+newline+newline;
+   writestr=writestr+"*****************************************************"+newline;
+   writestr=writestr+"starting new loop with the following parameters"+newline;
+   writestr=writestr+"number of runs: "+string(r)+newline;
+   writestr=writestr+"number of intvecs per run: "+string(a)+newline;
+   writestr=writestr+"starting random seed for seqgen: "+string(sd)+newline;
+   writestr=writestr+"starting random seed for random: "+string(sta)+newline;
+   writestr=writestr+"starting length of the generated sequences: "+string(len)+newline;
+   writestr=writestr+"*****************************************************";
+
+   link lu=":a UsedIntvecsJC69seqgen.txt";
+   link lf=":a FailedJC69seqgen.txt";
+   write(lu,writestr);
+  write(lf,writestr);
+  close(lu);
+  close(lf);
+}
+
+
+proc checkseqgenJC69writeend(int r, int a, int sd, int sta,
+       int len, int p, int s, int t, intvec ls)
+{
+   writestr=newline+newline+newline;
+   writestr=writestr+"*****************************************************"+newline;
+   writestr=writestr+"ending loop with the following parameters"+newline;
+   writestr=writestr+"number of runs: "+string(r)+newline;
+   writestr=writestr+"number of intvecs per run: "+string(a)+newline;
+   writestr=writestr+"starting random seed for seqgen: "+string(sd)+newline;
+   writestr=writestr+"starting random seed for random: "+string(sta)+newline;
+   writestr=writestr+"length of the generated sequences: "+string(len)+newline;
+   writestr=writestr+newline+"in the whole loop, there were a total of"+newline;
+   writestr=writestr+"   "+string(s)+" examples with non-zero-dim. likeideal"+newline;
+   writestr=writestr+"   "+string(t)+
+        " examples with more than one biol. meaningful local maximum";
+   writestr=writestr+newline+"*****************************************************";
+   writestr=writestr+"used lengths:"+newline+string(ls);
+   writestr=writestr+newline+"*****************************************************";
+
+
+   write(lu,writestr);
+  write(lf,writestr);
+  close(lu);
+  close(lf);
+}
+
+
+proc checkseqgenJC69loop(int r, int a, int sd, int sta, int len, int p)
+{
+   //r the number of runs, a the number of intvecs per run, sd the starting random
+   //seed, len the starting length, p the amount len will increase (on average)
+   //after each run (via + random(1,2*p-1))
+   //sta the random seed for random
+
+   checkseqgenJC69writebeginning(r,a,sd,sta,len,p);
+
+   system("random",sta);
+   intvec ls;
+   int nzd, num, i, s, t;
+   for(i=1; i<=r; i++)
+   {
+      (nzd,num)=checkseqgenJC69run(a,sd,len);
+      sd++;
+      ls[i]=len;
+      len=len+random(1,2*p-1);
+      s=s+nzd;
+      t=t+num;
+   }
+
+   checkseqgenJC69writeend(r,a,sd,sta,len,p,s,t,ls);
+}
+*/

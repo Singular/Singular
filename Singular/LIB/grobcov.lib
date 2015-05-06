@@ -114,9 +114,6 @@ setglobalrings();  Generates the global rings @R, @P and @PR that
              x=variables) It is called inside each of the fundamental
              routines of the library: grobcov, cgsdr, locus, locusdg and
              killed before the output.
-             If the user want to use some other internal routine,
-             then setglobalrings() is to be called before, as most of
-             them use these rings.
 
 pdivi(f,F); Performs a pseudodivision of a parametric polynomial
              by a parametric ideal.
@@ -1518,8 +1515,7 @@ proc Prep(ideal N, ideal M)
     }
   }
   if (size(prep)==0){prep=list(list(ideal(1),list(ideal(1))));}
-  def Lout=CompleteA(prep,prep);
-  return(Lout);
+  return(prep);
 }
 example
 {
@@ -3083,7 +3079,7 @@ static proc searchinlist(intvec c,list L)
 // Output: S=(w_1,..,w_j)
 //    where the w_l=(n_l1,..,n_ls) are intvec of length size(L), where
 //    n_lt fixes which element of (v_t1,..,v_tk_t) is to be
-//    chosen to form the tth (Q,P) for the lth element of the sheaf
+//    choosen to form the tth (Q,P) for the lth element of the sheaf
 //    representing the I-regular function.
 // The selection is done to obtian the minimal number of elements
 //    of the sheaf that specializes to non-null everywhere.
@@ -4415,7 +4411,7 @@ RETURN: The locus. The output is a list of the components ( C_1,.. C_n ) where
         whose antiimage is not-zero-diemansional.
         The components are given in canonical P-representation.
         The levels of a class of locus are 1,
-	because they represent locally closed. sets.
+        because they represent locally closed. sets.
 NOTE: It can only be called after computing the grobcov of the
       parametrical ideal in generic representation ('ext',0),
       which is the default.

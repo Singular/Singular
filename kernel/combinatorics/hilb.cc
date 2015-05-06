@@ -372,7 +372,6 @@ static ideal SortByDeg(ideal I)
     {
         return(I);
     }
-    idSkipZeroes(I);
     int i;
     ideal res;
     idSkipZeroes(I);
@@ -427,21 +426,21 @@ ideal idQuotMon(ideal Iorig, ideal p)
         p_Setm(res->m[i], currRing);
         if(DegMon(res->m[i]) == DegMon(I->m[i]))
         {
-            res->m[i] = NULL;
+            res->m[i] = NULL; // pDelete
         }
         else
         {
-            I->m[i] = NULL;
+            I->m[i] = NULL; // pDelete
         }
     }
     idSkipZeroes(res);
     idSkipZeroes(I);
     if(!idIs0(res))
     {
-    for(i = 0; i<=IDELEMS(res)-1; i++)
-    {
+      for(i = 0; i<=IDELEMS(res)-1; i++)
+      {
         I = SortByDeg_p(I,res->m[i]);
-    }
+      }
     }
     //idDegSortTest(I);
     return(I);

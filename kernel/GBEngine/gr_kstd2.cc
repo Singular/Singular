@@ -371,6 +371,8 @@ int redGrRatGB (LObject* h,kStrategy strat)
 *  reduction procedure for the homogeneous case
 *  and the case of a degree-ordering
 */
+#if 0
+// currently unused
 static int nc_redHomog (LObject* h,kStrategy strat)
 {
   if (strat->tl<0)
@@ -430,6 +432,7 @@ static int nc_redHomog (LObject* h,kStrategy strat)
     }
   }
 }
+#endif
 
 #if 0
 /*2
@@ -1049,7 +1052,7 @@ void nc_gr_initBba(ideal, kStrategy strat)
 
 #define MYTEST 0
 
-ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
+ideal k_gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
 {
   const ring save = currRing; if( currRing != _currRing ) rChangeCurrRing(_currRing);
 
@@ -1311,7 +1314,7 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   return (strat->Shdl);
 }
 
-ideal gnc_gr_mora(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
+ideal k_gnc_gr_mora(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
 {
 #ifndef SING_NDEBUG
   // Not yet!

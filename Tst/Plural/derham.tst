@@ -1,5 +1,5 @@
 LIB "tst.lib"; tst_init(); tst_ignore("// ** loaded "); tst_ignore("// ** _ is no standard basis");
-LIB "derham.lib";
+LIB "deRham.lib";
 
 //----------------------------------------
 //EXAMPLE 1

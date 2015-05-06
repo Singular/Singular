@@ -1,0 +1,2623 @@
+//////////////////////////////////////////////////////////////////////////////
+version="version recover.lib 4.0.2.0 30.03.2015 "; // $Id$
+category="Algebraic Geometry";
+info="
+LIBRARY:  recover.lib  Hybrid numerical/symbolical algorithms for algebraic geometry
+AUTHOR:  Adrian Koch (kocha at rhrk.uni-kl.de)
+
+OVERVIEW: In this library you'll find implementations of some of the algorithms presented
+          in the paper listed below: Bertini is used to compute a witness set of a given
+          ideal I. Then a lattice basis reduction algorithm is used to recover exact
+          results from the inexact numerical data. More precisely, we obtain elements
+          of prime components of I, the radical of I, or an elimination ideal of I.
+
+          NOTE that Bertini may create quite a lot of files in the current directory
+          (or overwrite files which have the same names as the files it wants to create).
+          It also prints information to the screen.
+
+          The usefulness of the results of the exactness recovery algorithms heavily
+          depends on the quality of the witness set and the quality of the lattice basis
+          reduction algorithm.
+          The procedures requiring a witness set as part of their input use a simple,
+          unsofisticated version of the LLL algorithm.
+
+REFERENCES:
+ Daniel Bates, Jonathan Hauenstein, Timothy McCoy, Chris Peterson, and Andrew Sommese;
+   Recovering exact results from inexact numerical data in algebraic geometry;
+   Published in Experimental Mathematics 22(1) on pages 38-50 in 2013
+
+KEYWORDS: numerical algebraic geometry; hybrid algorithms; exactness recovery
+
+PROCEDURES:
+ substAll(v,p);           poly: ring variables in v substituted by elements of p
+ veronese(d,p);           ideal: image of p under the degree d Veronese embedding
+ getRelations(p,..);      list of ideals: homogeneous polynomial relations between
+                          components of p
+ getRelationsRadical(p,..); modified version of getRelations
+ gaussRowWithoutPerm(M);  matrix: a row-reduced form of M
+ gaussColWithoutPerm(M);  matrix: a column-reduced form of M
+ getWitnessSet();         extracts the witness set from the file \"main_data\" produced
+                          by Bertini
+ writeBertiniInput(J);    writes the input-file for bertini with the polynomials in J
+                          as functions
+ num_prime_decom(I,..);   is supposed to compute a prime decomposition of the radical of I
+ num_prime_decom1(P,..);  is supposed to compute a prime decomposition for the ideal
+                          represented by the witness point set P
+ num_radical_via_decom(I,..);
+                          compute elements of the radical of I by using num_prime_decom
+ num_radical_via_randlincom(I,..);
+                        computes elements of the radical of I by using a different method
+ num_radical1(P,..);      computes elements of the radical via num_prime_decom1
+ num_radical2(P,..);      computes elements of the radical using a different method
+ num_elim(I,f,..);        computes elements of the elimination ideal of I w.r.t. the
+                          variables specified by f
+ num_elim1(P,..,v);       computes elements of the elimination ideal of the ideal
+                          represented by the witness point set P (w.r.t. the variables
+                          specified in v)
+ realLLL(M);              simple version of the LLL-algorithm;works only over real numbers
+";
+
+
+LIB "matrix.lib";
+LIB "linalg.lib";
+LIB "inout.lib";
+LIB "atkins.lib";
+
+/////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////    static procs for rounding      ///////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+static proc getposi(string s)
+{//returns the position of the . in a complex number, or 0 if there is no . in s
+   int i;
+   for(i=1; i<=size(s); i++)
+   {
+      if(s[i] == "."){return(i);}
+   }
+   return(0);
+}
+
+static proc string2digit(string ti)
+{
+   intvec v=0,1,2,3,4,5,6,7,8,9;
+   int i;
+   for(i=1; i<=size(v); i++)
+   {
+      if( ti == string(v[i]) )
+      {
+         return(poly(v[i]));
+      }
+   }
+}
+
+static proc string2poly(string t)
+{
+   poly r=string2digit(t[1]);
+   int i;
+   for(i=2; i<=size(t); i++)
+   {
+      r=r*10+string2digit(t[i]);
+   }
+   return(r);
+}
+
+static proc roundstringpoly(string s, int posi)
+{//returns the
+   string t;
+   //first check, whether s is negative or not
+   int e=0;
+   if(s[1]=="-")
+   {
+      e=1;
+      t=s[2..(posi-1)];//start at the second symbol (to drop the minus)
+   }
+   else
+   {
+      t=s[1..(posi-1)];
+   }
+
+   poly r=string2poly(t);//this is always the rounded-down version of the absolute value
+   //of r
+   //we have to check now, whether we should have rounded up
+   //for that, we check the digit after the .
+   if(string2digit(s[posi+1]) >= 5)
+   {
+      r=r+1;
+   }
+
+   if(e == 1)
+   {//readjust the sign, if needed
+      r=-r;
+   }
+   return(r);
+}
+
+static proc roundpoly(poly r)
+{
+   string s=string(r);
+   int posi=getposi(s);
+   if(posi == 0)
+   {//there is no . in r, so r is an integer
+      return(r);
+   }
+   return(roundstringpoly(s, posi));
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////      Veronese embedding        ////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+proc substAll(poly v, list p)
+"USAGE:   substAll(v,p); poly v, list p
+RETURN:  poly: the polynomial obtained from v by substituting the elements of p for the
+               ring variables
+NOTE:    The list p should have as many elements as there are ring variables.
+EXAMPLE: example substAll; shows an example
+"
+{//substitutes the elements of p for the ring variables
+   //used to obtain the value of the veronese map
+   int i;
+   poly f=v;
+   for(i=1; i<=nvars(basering); i++)
+   {
+      f=subst(f,var(i),p[i]);
+   }
+   return(f);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x,y,z),dp;
+  poly v=x+y+z;
+  list p=7/11,5/11,-1/11;
+  poly f=substAll(v,p);
+  f;
+}
+
+proc veronese(int d, list p)
+"USAGE:   veronese(d,p); int d, list p
+RETURN:  ideal: the image of the point p under the degree d Veronese embedding
+NOTE:    The list p should have as many elements as there are ring variables.
+         The order of the points in the returned ideal corresponds to the order of the
+         monomials in maxideal(d).
+SEE ALSO: maxideal
+EXAMPLE: example veronese; shows an example
+"
+{//image of p under the degree d Veronese embedding
+   ideal V=maxideal(d);
+   int i;
+   poly v;
+   int len=size(V);
+   for(i=1; i <= len; i++)
+   {
+      v=V[i];
+      v=substAll(v,p);
+      V[i]=v;
+   }
+   return(V);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y,z),dp;
+  list p=2,3,5;
+  ideal V=veronese(1,p);
+  V;
+  V=veronese(2,p);
+  V;
+}
+
+static proc veronese_radical(int d, list P)
+{//returns a random linear combination of the images of the points in P under the
+   //degree d Veronese embedding
+   list p;//one of the points in P
+   ideal Vp;//the Veronese embedding of p
+   int i;
+   for(i=1; i<=size(P); i++)
+   {
+      p=P[i];
+      Vp=veronese(d,p);
+      P[i]=Vp;
+   }
+   //so we've replaced the points p with their images under the Veronese embedding
+   //now we do a random linear combination of all these images
+
+   //first, we rand some factors
+   int di=10**7;
+   int de=1;
+   ideal F=poly(random(de,di))/di;
+   poly f;
+   for(i=2; i<=size(P); i++)
+   {
+      f=poly(random(de,di))/di;
+      F=F,f;
+   }
+
+   //then we compute the linear combination
+   poly v;
+   int j;
+   for(j=1; j<=size(P); j++)
+   {
+      Vp=P[j];
+      v=v+F[j]*Vp[1];
+   }
+   ideal V=v;
+   int len=size(maxideal(d));
+   for(i=2; i<=len; i++)
+   {
+      v=0;
+      for(j=1; j<=size(P); j++)
+      {
+         Vp=P[j];
+         v=v+F[j]*Vp[i];
+      }
+      V=V,v;
+   }
+
+   return(V);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////          some static procs          //////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+static proc randlincom(ideal V, int len)
+{//produces a random linear combination of the real vectors defined by the real and the
+   //imaginary part of V, respectively
+   //(V is the image of a complex point p under a veronese embedding)
+   poly randre,randim;
+   int di=10**9;
+   int de=1;
+   //we get one of 2(di-de) numbers between (-)de/di and (-)1
+   randre=(-1)**random(1,2)*poly(random(de,di))/di;
+   randim=(-1)**random(1,2)*poly(random(de,di))/di;
+
+   ideal lincom=randre*repart(leadcoef(V[1]))+randim*impart(leadcoef(V[1]));
+
+   int i;
+   for(i=2; i<=len; i++)
+   {
+      lincom=lincom,randre*repart(leadcoef(V[i]))+randim*impart(leadcoef(V[i]));
+   }
+   return(lincom);
+}
+
+static proc getmatrix(ideal V, bigint C, int len)
+{//constructs the stacked matrix, but with randlincom(V,len) instead of V
+   ideal rl=randlincom(V,len);
+   matrix v=transpose(matrix(rl));
+   matrix E=diag(1,len);
+   v=C*v;
+   E=concat(E,v);
+   E=transpose(E);
+   return(E);
+}
+
+static proc getpolys(matrix B, int d)
+{//takes the integer parts* of the columns of B and uses them as coefficients in a
+   //homogeneous poly of degree d
+   //i.e. the first nrows-1 entries
+   ideal V=maxideal(d);
+   poly r=0;//will be one of the relation-polys
+   ideal R;//will contain all the relations
+   intvec rM=1..(nrows(B)-1);
+   intvec cM=1..ncols(B);
+   matrix M=submat(B,rM,cM);//B without the last row
+   //poly nu=poly(10)**(2*d);
+   int i,j;
+   for(i=1; i<=ncols(M); i++)
+   {
+      if(absValue(B[nrows(B),i]) < 10)//if(is_almost_zero(B,i,d))
+      {//we should check first, if the value of the generated poly in p (i.e. the last
+         //entry of the respective column in B) is "almost" 0
+         if(1)
+         {
+            for(j=1; j<=size(V); j++)
+            {
+               r=r+M[j,i]*V[j];
+            }
+            R=R,r;
+            r=0;
+         }
+      }
+   }
+   R=simplify(R,2);//gets rid of the zeroes
+   return(R);
+}
+
+static proc getD(ideal J)
+{
+   //computes the maximal degree among elements of J
+   int maxdeg,c,i;
+   poly g;
+   for(i=1; i<=size(J); i++)
+   {
+      g=J[i];
+      c=deg(g);
+      if(c > maxdeg)
+      {
+         maxdeg=c;
+      }
+   }
+   return(maxdeg);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////      use_LLL procedures     //////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+static proc mat2list(bigintmat B)
+{
+   list c;//column of B
+   list M;//the matrix: list of column-lists
+
+   int i,j;
+   for(i=1; i<=ncols(B); i++)
+   {
+      for(j=1; j<=nrows(B); j++)
+      {
+         c=c+list(B[j,i]);
+      }
+      M=M+list(c);
+      c=list();
+   }
+
+   return(M);
+}
+
+static proc list2bigintmat(list L);
+{
+   int c=size(L);
+   int r=size(L[1]);
+   bigintmat B[r][c];
+   list Li;
+   int i,j;
+   for(i=1; i<=c; i++)
+   {
+      Li=L[i];
+      for(j=1; j<=r; j++)
+      {
+         B[j,i]=Li[j];
+      }
+   }
+
+   return(B);
+}
+
+static proc bigint2poly(bigint b)
+{
+   poly p;
+   string bs=string(b);
+
+   int st=1;
+   int c;
+   if(bs[1] == "-")
+   {
+      st=2;
+      c=1;
+   }
+
+
+   int i;
+   for(i=st; i<=size(bs); i++)
+   {
+      p=p*10+string2intdigit(bs[i]);
+   }
+
+
+   if(c == 1)
+   {
+      return(-p);
+   }
+
+   return(p);
+}
+
+static proc bigintmat2matrix(bigintmat B)
+{//type conversion via matrix(B) does not work
+   int r=nrows(B);
+   int c=ncols(B);
+   matrix M[r][c];
+
+   int i,j;
+   for(i=1; i<=r; i++)
+   {
+      for(j=1; j<=c; j++)
+      {
+         M[i,j]=bigint2poly(B[i,j]);
+      }
+   }
+
+   return(M);
+}
+
+static proc use_LLL(matrix A)
+{
+   //first, we round the entries in the last row of A
+   int r=nrows(A);
+   int c=ncols(A);
+   int i;
+   for(i=1; i<=c; i++)
+   {
+      A[r,i]=roundpoly(A[r,i]);
+   }
+
+   //now, all entries of A are integers, but still have type poly
+   //so we convert A to a bigintmat B
+   bigintmat B=mat2bigintmat(A);
+
+   //apply LLL
+   list M=mat2list(B);
+   list L=LLL(M);
+   B=list2bigintmat(L);
+
+   return(bigintmat2matrix(B));
+}
+
+
+static proc use_LLL_bigintmat(matrix A)
+{//returns a bigintmat instead of a matrix
+   //first, we round the entries in the last row of A
+   int r=nrows(A);
+   int c=ncols(A);
+   int i;
+   for(i=1; i<=c; i++)
+   {
+      A[r,i]=roundpoly(A[r,i]);
+   }
+
+   //now, all entries of A are integers, but still have type poly
+   //so we convert A to a bigintmat B
+   bigintmat B=mat2bigintmat(A);
+
+   //apply LLL
+   list M=mat2list(B);
+   list L=LLL(M);
+   B=list2bigintmat(L);
+
+   return(B);
+}
+
+static proc use_FLINT_LLL(matrix A)
+{
+   //first, we round the entries in the last row of A
+   int r=nrows(A);
+   int c=ncols(A);
+   int i;
+   for(i=1; i<=c; i++)
+   {
+      A[r,i]=roundpoly(A[r,i]);
+   }
+
+   //now, all entries of A are integers, but still have type poly
+   //so we convert A to a bigintmat B
+   bigintmat B=mat2bigintmat(A);
+
+   //apply LLL
+   bigintmat BB=system("LLL_Flint",B);
+
+   return(BB);
+}
+
+static proc use_NTL_LLL(matrix A)
+{
+   //first, we round the entries in the last row of A
+   int r=nrows(A);
+   int c=ncols(A);
+   int i;
+   for(i=1; i<=c; i++)
+   {
+      A[r,i]=roundpoly(A[r,i]);
+   }
+
+
+   //now, all entries of A are integers, but still have type poly
+   //so we convert A to a bigintmat B
+   bigintmat B=mat2bigintmat(A);
+
+   def br=basering;
+   ring newr=0,x,dp;
+   matrix A=bigintmat2matrix(B);
+
+   //NTL wants the lattice-vectors as row-vectors and returns a matrix of row-vectors
+   A=transpose(A);
+   matrix AA=system("LLL",A);
+   AA=transpose(AA);
+   bigintmat BB=mat2bigintmat(AA);
+   setring br;
+
+   return(BB);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////    the main procedure(s)    //////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+proc getRelations(list p, int D, bigint C)
+"USAGE:    getRelations(p,D,C); list p, int D, bigint C
+RETURN:   list K: a list of ideals; the ideals contain homogeneous polynomial relations of
+          degree <=D between the components of the point p
+NOTE:     This procedure uses only the images of the one point p under the Veronese
+          embeddings to find homogeneous polynomial relations.
+SEE ALSO: getRelationsRadical
+EXAMPLE:  example getRelations; shows an example
+"
+{//uses degree d Veronese embeddings (for all d<=D) and LLL-algorithm to find
+   //(homogeneous) polynomial relations between the entries of p
+   //C is the Value with which the Veronese embedding is being multiplied (cf getmatrix)
+
+   if(nvars(basering) != size(p) )
+   {
+      ERROR("Number of variables not equal to the number of components of p.");
+   }
+
+   //get the precision
+   list RL=ringlist(basering);
+   RL=RL[1];
+   RL=RL[2];
+   int Prec=RL[2];
+
+   list P=list(p);
+
+   int d,i,len;
+   intvec rm;
+   ideal vd,Kd;
+   list K;
+   matrix A,B;
+   for(d=1; d<=D; d++)
+   {
+      vd=veronese(d,p);
+      len=size(maxideal(d));
+      A=getmatrix(vd,C,len);
+      B=realLLL(A);
+
+      Kd=getpolys(B,d);
+
+      if(size(Kd) == 0)//i.e. Kd has only zero-entries
+      {//then dont add Kd to the list of relations
+         d++;
+         continue;
+      }
+
+
+      rm=check_is_zero_lincomradical(Prec,Kd,P);
+      for(i=1; i<=size(rm); i++)
+      {
+         if( rm[i] == 1 )
+         {
+              Kd[i] = 0;
+         }
+      }
+
+      Kd=simplify(Kd,2);
+
+
+      if(size(Kd) == 0)//i.e. Kd has only zero-entries
+      {//then dont add Kd to the list of relations
+         d++;
+         continue;
+      }
+
+      K=K+list(Kd);
+   }
+   return(K);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=(complex,50),(x,y,z),dp;
+  list p=1,-1,0.5;
+  getRelations(p,2,10000);
+}
+
+proc getRelationsRadical(list P, int D, bigint C)
+"USAGE:    getRelationsRadical(P,D,C); list P, int D, bigint C
+RETURN:   list K: a list of ideals; the ideals contain homogeneous polynomial relations of
+          degree <=D between the components of the points in P
+NOTE:     This procedure uses random linear combination of the Veronese embeddings of all
+          points in P to find homogeneous polynomial relations.
+SEE ALSO: getRelations
+EXAMPLE:  example getRelationsRadical; shows an example
+"
+{//here we compute random linear combinations of the degree d Veronese embeddings of the
+   //points in P and then proceed as in getRelations to get homogeneous polynomials
+   //which vanish on all points in P (with high probability)
+
+   if(nvars(basering) != size(P[1]) )
+   {
+      ERROR("Number of variables not equal to the number of components of P[1].");
+   }
+
+   //get the precision
+   list RL=ringlist(basering);
+   RL=RL[1];
+   RL=RL[2];
+   int Prec=RL[2];
+
+   int d,i,len;
+   intvec rm;
+   ideal vd,Kd;
+   list K;
+   matrix A,B;
+   for(d=1; d<=D; d++)
+   {
+      vd=veronese_radical(d,P);
+      len=size(maxideal(d));
+      A=getmatrix(vd,C,len);
+      B=realLLL(A);
+      Kd=getpolys(B,d);
+
+      if(size(Kd) == 0)//i.e. Kd has only zero-entries
+      {//then dont add Kd to the list of relations
+         d++;
+         continue;
+      }
+
+
+      rm=check_is_zero_lincomradical(Prec,Kd,P);
+      for(i=1; i<=size(rm); i++)
+      {
+         if( rm[i] == 1 )
+         {
+              Kd[i] = 0;
+         }
+      }
+
+      Kd=simplify(Kd,2);
+
+
+      if(size(Kd) == 0)//i.e. Kd has only zero-entries
+      {//then dont add Kd to the list of relations
+         d++;
+         continue;
+      }
+
+      K=K+list(Kd);
+   }
+   return(K);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=(complex,50),(x,y,z),dp;
+  list p1=1,-1,0.5;
+  list p2=1,0,-1;
+  list P=list(p1)+list(p2);
+  getRelationsRadical(P,2,10**5);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////       Gauss reduction       //////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+static proc find_unused_nonzero(matrix M, int j, intvec used)
+{//look in column j of M for a non-zero entry in an unused row
+   //if there is one, return its row index
+   //if there isn't, return 0
+   int i;
+   int r=nrows(M);
+   for(i=1; i<=r; i++)
+   {
+      if(used[i] == 0)
+      {
+         if(M[i,j] != 0)
+         {
+            return(i);
+         }
+      }
+   }
+   return(0);
+}
+
+proc gaussRowWithoutPerm(matrix M)
+"USAGE:   gaussRowWithoutPerm(M); M a matrix of constant polynomials
+RETURN:  matrix: basic Gaussian row reduction of M, just without permuting the rows
+EXAMPLE: example gaussRowWithoutPerm; shows an example
+"
+{//M a matrix of constant polys
+   int n=ncols(M);
+   int r=nrows(M);
+   int i,j,k;
+   intvec used;//the rows we already used to make entries in other rows 0
+   used[r]=0;//makes it a zero-intvec of length r
+   //we dont want to change these used rows anymore and we dont want to use them again
+   //entry i will be set to 1 if we used row i already
+   for(j=1; j<=n; j++)//go through all columns of M
+   {
+      //find the first non-zero entry
+      i=find_unused_nonzero(M,j,used);
+      if(i != 0)
+      {//and use it to make all non-pivot entries in the column equal to 0
+         used[i]=1;
+         for(k=1; k<=r; k++)
+         {
+            if(used[k] == 0)
+            {
+               if(M[k,j] != 0)
+               {
+                  M=addrow(M,i,-M[k,j]/M[i,j],k);
+               }
+            }
+         }
+      }
+   }
+   return(M);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,x,dp;
+  matrix M[5][4]=0,0,2,1,4,5,1,3,0,9,2,0,8,1,0,6,0,9,4,1;
+  print(M);
+  print(gaussRowWithoutPerm(M));
+}
+
+proc gaussColWithoutPerm(matrix M)
+"USAGE:   gaussColWithoutPerm(M); M a matrix of constant polynomials
+RETURN:  matrix: basic Gaussian column reduction of M, just without permuting the columns
+EXAMPLE: example gaussColWithoutPerm; shows an example
+"
+{
+   matrix T=transpose(M);
+   matrix G=gaussRowWithoutPerm(T);
+   return(transpose(G));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,x,dp;
+  matrix M[3][4]=0,1,0,2,1,2,3,4,1,0,5,0;
+  print(M);
+  print(gaussColWithoutPerm(M));
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////   static procs needed for minrelations      //////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+static proc multwithmaxideal(ideal I, int a)
+{//returns the ideal IM containing all products of elements of I and maxideal(a)
+   ideal M=maxideal(a);
+   int sM=size(M);
+   ideal IM=I*M[1];
+
+   int i;
+   for(i=2; i<=sM; i++)
+   {
+      IM=IM,I*M[i];
+   }
+   return(IM);
+}
+
+static proc prodofallringvars(int dummy)
+{//returns the product of all ring variables
+   poly f=1;
+   int i;
+   for(i=1; i<=nvars(basering); i++)
+   {
+      f=f*var(i);
+   }
+   return(f);
+}
+
+static proc getcoefmat(ideal IM, int m)
+{//computes the matrix of coefficients of the elements of IM
+   //the order of the coefficients in each column corresponds to the order of the
+   //monomials in maxideal(m);
+   matrix Co;
+   ideal M=maxideal(m);
+   int sM=size(M);
+   matrix C[sM][1];//the coeff vector of an element of IM with the coeffs placed at
+   //the appropriate positions
+   IM=simplify(IM,2);//be sure that size(IM) is the right thing -> get rid of zeroes
+   int sIM=size(IM);
+   matrix B;
+   poly pr=prodofallringvars(1);
+   poly g, Coj;
+   int i,j,k;
+   for(i=1; i<=sIM; i++)
+   {
+      g=IM[i];
+      Co=coef(g,pr);
+
+      //we now have to put the coeffs in the appropriate places (corresponding to the
+      //position of the respective monomial in maxideal)
+      for(j=1; j<=ncols(Co); j++)
+      {
+         Coj=Co[1,j];//arranged as row vectors
+         //compare the monomials of g with the elements of maxideal(m)
+         //and when we find a match, place the coef at the appropriate place in C
+         for(k=1; k<=sM; k++)
+         {
+            if(M[k] == Coj)
+            {
+               C[k,1]=Co[2,j];
+               break;//we dont need to check any other elements of M
+               //since theyre all different
+            }
+         }
+      }
+
+      if(i==1)
+      {
+         B=C;
+         C=0;
+         i++;
+         continue;
+      }
+      B=concat(B,C);
+      C=0;//reset C to the zero vector
+   }
+   return(B);
+}
+
+static proc getconcatcoefmats(list L)
+{//L the first size(L) entries of K
+   //returns the concatenated coef matrices
+   //more precisely: let m be the degree of the elements of L[size(L)], then we want
+   //to know, which homogenous polynomials of degree m can be written as a combination
+   //of polynomials in the ideals contained in L. In particular, we want to know which
+   //of the elements of L[size(L)] can be written as a combination of other polys
+   //in L and are thereby superfluous (cf superfluousL)
+   //what we do here is, we multiply each polynomial (of degree, say, d) in L with a
+   //monomial of degree m-d and then store the coefficients of the resulting poly
+   //in a matrix
+   //(this is rather cumbersome and can probably be improved upon significantly)
+
+   matrix B,C;
+   ideal IM,I;
+   int i,d,m;
+   poly l;
+   int sL=size(L);
+
+   l=L[sL][1];//the polys are homogeneous; deg rising along L; deg same in L[j]
+   //for all j
+   m=deg(l);//the max degree
+
+   if(sL == 1)
+   {//then we only consider polys of one certain degree, so we don't have to
+      //multiply any of the ideals with any maxideal
+      C=getcoefmat(L[1],m);
+      return(C);//we dont concatenate anything here, so the initialization of
+      //C as the 1x1-zero-matrix is not an issue
+   }
+
+   for(i=1; i<sL; i++)
+   {
+      I=L[i];
+      d=deg(I[1]);
+      IM=multwithmaxideal(I,m-d);
+      B=getcoefmat(IM,m);
+      C=concat(C,B);//will again have as first column the zero vector
+   }
+
+   //if i=sL, the polys in L[i] already have the degree m, so we dont need to multiply
+   B=getcoefmat(L[sL],m);
+   C=concat(C,B);
+
+   //C will contain a zero-column at the beginning, because of the
+   //initialization of B as the 1x1-mat with single entry 0 + the way
+   //concat handles that situation
+   return( submat(C,1..nrows(C),2..ncols(C)) );
+}
+
+static proc string2intdigit(string ti)
+{//ti a string of size 1, containing an integer digit
+   //return the digit
+   intvec v=0,1,2,3,4,5,6,7,8,9;
+   int i;
+   for(i=1; i<=size(v); i++)
+   {
+      if( ti == string(v[i]) )
+      {
+         return(v[i]);
+      }
+   }
+}
+
+static proc string2bigint(string s)
+{
+   string t=s;
+   int e=0;
+   if(s[1]=="-")
+   {
+      e=1;
+      t=s[2..size(s)];//start at the second symbol (to drop the minus)
+   }
+   bigint r=string2intdigit(t[1]);
+   int i;
+   for(i=2; i<=size(t); i++)
+   {
+      r=r*10+string2intdigit(t[i]);
+   }
+
+   if(e == 1)
+   {//readjust the sign, if needed
+      r=-r;
+   }
+
+   return(r);
+}
+
+static proc mat2bigintmat(matrix M)
+{//M a matrix filled with constant polys of integer value
+   //return the corresponding bigintmat
+   int c=ncols(M);
+   int r=nrows(M);
+   bigintmat intM[r][c];
+   int i,j;
+   for(i=1; i<=r; i++)
+   {
+      for(j=1; j<=c; j++)
+      {
+         intM[i,j]=string2bigint(string(M[i,j]));
+      }
+   }
+   return(intM);
+}
+
+static proc findnonzero(matrix M, int j)
+{//look in column j of M for a non-zero entry
+   //if there is one, return its row index
+   //if there isn't, return 0
+   int i;
+   int r=nrows(M);
+   for(i=1; i<=r; i++)
+   {
+      if(M[i,j] != 0)
+      {
+         return(i);
+      }
+   }
+   return(0);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////      minrelations      ///////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+static proc superfluousL(list L)
+{//returns an intvec containing the indices of the elements (of the ideal with highest
+   //degree in L) which can be dropped
+   intvec sprfls;
+   matrix C=getconcatcoefmats(L);
+   bigintmat intC=mat2bigintmat(C);
+   int l=size(L[size(L)]);
+
+   ring ratr=0,x,dp;
+   matrix M=bigintmat2matrix(intC);
+   M=gaussColWithoutPerm(M);
+   int i;
+   int c=1;//counts the number of elements (+1) of sprfls
+   int k=ncols(M)-l;//the number of cols in M which correspond to polys of lower degree
+   //is = ncols(M) - number of elements in L[size(L)]
+   for(i=k+1; i<=ncols(M); i++)
+   {
+      if( findnonzero(M,i) == 0 )
+      {
+         sprfls[c]=i-k;
+         c++;
+      }
+   }
+   return(sprfls);
+}
+
+static proc minrelations(list K)
+{//K a list of homogeneous ideals - all individually of "pure degree d" -
+   //ordered from d=1 up to D
+
+   list L;
+   intvec sprfls;
+   int sj;
+
+   int i,j;
+   ideal Ki;
+   for(i=1; i<=size(K); i++)
+   {
+      L=K[1..i];//will give the list with one ideal as the only entry, when i=1
+      //i=1 would make trouble, if K was a list of lists: then L would be the first
+      //list in K
+
+      sprfls=superfluousL(L);
+
+      if(sprfls[1] == 0)
+      {//then sprfls returned the intvec v=0; so there are no superfluous elements
+         i++;
+         continue;
+      }
+
+      Ki=K[i];
+      for(j=1; j<=size(sprfls); j++)
+      {
+         sj=sprfls[j];
+         Ki[sj]=0;
+      }
+      Ki=simplify(Ki,2);
+
+      if( size(Ki) == 0 )
+      {//then all polys in K[i] can be generated by polys in the K[<i], so we can delete
+         //K[i] from the list
+
+         K=delete(K,i);
+         continue;
+
+         //but we dont want to change i
+         //size(K) adjusts itself, so we're fine there
+      }
+
+      K[i]=Ki;
+   }
+
+   return(K);
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+////////////////   Procs for Bertini-Singular-Conversation   /////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+
+proc getWitnessSet()
+"USAGE:   getWitnessSet();
+ASSUME:  There is a text-document \"main_data\" in the current directory which was
+         produced by Bertini.
+         The basefield is the field of real numbers or the field of complex numbers.
+RETURN:  list; a list P of lists p_i of numbers: P a set of witness points
+NOTE:    Reads the file \"main_data\", searches the strings containing the witness points,
+         and converts them into floating point numbers.
+EXAMPLE: example getWitnessSet; shows an example
+"
+{//goes through the file main_data generated by bertini and returns the witness points
+   //as a list of complex numbers
+   //(the precision specified in the definition of the basering should* be at least as
+   //high as the precision used by/to be expected from bertini)
+   string r;
+   list P,p;
+   int i, j;
+   r=read("main_data");
+   intvec posi=find_string("Estimated",r);
+   intvec endpos=find_string("Multiplicity",r);
+   for(i=1; i<=size(posi); i++)
+   {
+      p=read_point(r,posi[i],endpos[i]);
+
+      if( size(p) == 0 )
+      {
+         ERROR("Bertini nicht erfolgreich");
+      }
+
+      P=P+list( convert_p(p) );
+   }
+
+   return(P);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  //First, we write the input file for bertini, then run bertini
+  ring r=0,(x,y,z),dp;
+  ideal I=(x-y)*(y-z)*(x-z);
+  writeBertiniInput(I,40);
+  system("sh","bertini input");
+
+  //Then we change the ring and extract the witness set from main_data
+  ring R=(complex,40,i),(x,y,z),dp;
+  list P=getWitnessSet();
+  P;
+}
+
+
+static proc get_hom_var_group_str(int dummy)
+{
+   string vg=varstr(basering);
+   int i;
+   for(i=1; i<size(vg); i++)
+   {
+      if(vg[i]==",")
+      {
+         vg=vg[1,i]+" "+vg[(i+1),size(vg)-i];
+      }
+
+      if( vg[i] == "(" )
+      {
+         vg=vg[1,i-1]+vg[(i+1),size(vg)-i];
+         continue;
+      }
+
+      if( vg[i] == ")" )
+      {
+         vg=vg[1,(i-1)]+vg[(i+1),size(vg)-i];
+         continue;
+      }
+   }
+
+   i=size(vg);
+   if(vg[i]==",")
+   {
+      vg=vg[1,i];
+   }
+
+   if( vg[i] == "(" )
+   {
+      vg=vg[1,i-1];
+   }
+
+   if( vg[i] == ")" )
+   {
+      vg=vg[1,(i-1)];
+   }
+
+   vg="hom_variable_group "+vg+";"+newline;
+
+   return(vg);
+}
+
+static proc get_declare_function_str(ideal J)
+{
+   string dfs;
+   int i;
+   for(i=1; i<=size(J); i++)
+   {
+      if(size(dfs) > 0)
+      {
+         dfs=dfs+", f"+string(i);
+      }
+      else
+      {
+         dfs=dfs+"f"+string(i);
+      }
+   }
+
+   dfs="function "+dfs+";"+newline;
+
+   return(dfs);
+}
+
+static proc remove_brackets(string vg)
+{//removes any round brackets from a string
+   int i;
+   for(i=1; i<size(vg); i++)
+   {
+      if( vg[i] == "(" )
+      {
+         vg=vg[1,i-1]+vg[(i+1),size(vg)-i];
+         continue;
+      }
+
+      if( vg[i] == ")" )
+      {
+         vg=vg[1,(i-1)]+vg[(i+1),size(vg)-i];
+         continue;
+      }
+   }
+
+   i=size(vg);
+
+   if( vg[i] == "(" )
+   {
+      vg=vg[1,i-1];
+   }
+   if( vg[i] == ")" )
+   {
+      vg=vg[1,(i-1)];
+   }
+   return(vg);
+}
+
+static proc get_function_str(ideal J)
+{
+   string fs, m;
+   matrix C;
+   poly fi;
+   int i,j,k;
+   string s;
+   for(i=1; i<=size(J); i++)
+   {
+      fs=fs+"f"+string(i)+" = ";
+      fi=J[i];
+
+      s=string(fi);
+      s=remove_brackets(s);
+
+      fs=fs+s;
+
+      fs=fs+";"+newline;
+   }
+   return(fs);
+}
+
+static proc get_coef_bound_poly(poly f)
+{
+   poly pr=prodofallringvars(1);
+   matrix C=coef(f,pr);
+   int c=ncols(C);
+   poly b;
+   int i;
+   for(i=1; i<=c; i++)
+   {
+      b=b+absValue(C[2,i]);
+   }
+   return(b);
+}
+
+static proc get_coef_bound_ideal(ideal J)
+{//is supposed to compute the maximum among the sums of coefficients in each individual
+   //polynomial in J
+   if(size(J) == 0){ return(1); }
+
+   J=simplify(J,2);
+   poly b=get_coef_bound_poly(J[1]);
+   poly a;
+   int i;
+   for(i=2; i<=size(J); i++)
+   {
+      a=get_coef_bound_poly(J[i]);
+      if(a > b)
+      {
+         b=a;
+      }
+   }
+   return(string(b));
+}
+
+static proc get_prec_in_bits(int Prec)
+{//log_10(2) is approximately 3,3219281
+
+   //conversion from decimal digits to bits, rounded up
+   int pb = (3322*Prec div 1000) + 1;
+
+   int upb=3328;//upper bound on the precision
+   if( pb > upb )
+   {//bertini allows a maximum of 3328 bits of precision
+      return(upb);
+   }
+
+   int lowb=64;//lower bound
+   if( pb < lowb)
+   {//bertini requires a minimum of 64 bits of precision
+      //however, using such a low precision is not recommended, since it will
+      //probably not yield any useful results
+      return(lowb);
+   }
+
+   //bertini wants the precision to be a multiple of 32
+   pb = pb + 32 - (pb mod 32);
+   return(pb);
+}
+
+
+proc writeBertiniInput(ideal J, int Prec)
+"USAGE:   writeBertiniInput(J); ideal J
+RETURN:  none; writes the input-file for bertini using the polynomials given by J as
+         functions
+NOTE:    Either creates a file named input in the current directory or overwrites the
+         existing one.
+         If you want to pass different parameters to bertini, you can edit the produced
+         input file or redefine this procedure.
+EXAMPLE: example writeBertiniInput; shows an example
+"
+{//writes the input-file for bertini
+
+   //we change the ring so that the names of the ring variables are convenient for us
+   def br=basering;
+   int nv=nvars(br);
+   ring r=0,x(1..nv),dp;
+   ideal J=fetch(br,J);
+
+
+   link l=":w ./input";
+   write(l,"CONFIG");
+   write(l,"");
+   write(l,"TRACKTYPE: 1;");
+   write(l,"TRACKTOLBEFOREEG: 1e-8;");
+   write(l,"TRACKTOLDURINGEG: 1e-11;");
+   write(l,"FINALTOL: 1e-14;");
+   write(l,"");
+   write(l,"");
+   write(l,"PrintPathProgress: 1;");
+   write(l,"MPTYPE: 2;");
+
+   int pb=get_prec_in_bits(Prec);
+   write(l,"AMPMaxPrec: "+string(pb)+";");
+
+   string cb=get_coef_bound_ideal(J);
+   write(l,"COEFFBOUND: "+cb+";");
+
+   string db=string(getD(J));
+   write(l,"DEGREEBOUND: "+db+";");
+   write(l,"");
+   write(l,"SHARPENDIGITS: "+string(Prec)+";");
+
+   write(l,"END;");
+   write(l,"");
+   write(l,"");
+
+
+   write(l,"INPUT"+newline);
+
+   string vg=get_hom_var_group_str(1);
+   write(l,vg);
+
+   string dfs=get_declare_function_str(J);
+   write(l,dfs);
+
+   string fs=get_function_str(J);
+   write(l,fs);
+
+   write(l,"END;");
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x,y,z),dp;
+  poly f1=x+y+z;
+  poly f2=x2+xy+y2;
+  ideal I=f1,f2;
+  writeBertiniInput(I,300);
+}
+
+static proc find_string(string F, string S)
+{//search in string S for the string F
+   //output all the positions in an intvec v
+   string s;
+   intvec v;
+   int c=1;//counts the number of elements of v
+
+   int i;
+   int a=size(S);
+   int len=size(F);
+   for(i=1; i<=a; i++)
+   {
+      s=S[i,len];
+      if(F==s)
+      {
+         v[c]=i;
+         c++;
+      }
+   }
+
+   return(v);
+}
+
+static proc read_point(string r, int po, int endpo)
+{//reads out a single point from main_data
+   //return as string representing a floating point number split into real and imaginary
+   //part
+   int i, b;
+   for(i=po; i<=size(r); i++)
+   {
+      if(r[i] == newline)
+      {
+         b=i+1;//b is the first character in the line containing components of the point
+         break;
+      }
+   }
+
+   list p;
+   string pj;
+   int len, strt;
+   strt=b;
+   for(i=b; i<=endpo; i++)
+   {
+      if(r[i] == newline)
+      {
+         len=i-strt;
+         pj=r[strt,len];
+         p=p+list(pj);
+         strt=i+1;
+      }
+   }
+
+   return(p);
+}
+
+static proc string2num(string numstr)
+{
+   number n=0;
+
+   int c=0;
+   if(numstr[1] == "-")
+   {
+      numstr=numstr[2,size(numstr)-1];
+      c=1;
+   }
+
+   int i;
+   for(i=size(numstr); i>=3; i--)
+   {
+      n=n/10+string2intdigit(numstr[i]);
+   }
+   n=n/10+string2intdigit(numstr[1]);
+
+   if(c==1)
+   {
+      n=-n;
+   }
+
+   return(n);
+}
+
+static proc string2e(string estr)
+{//compute the exponent from the scientific notation
+   int e=0;
+   int c=0;
+   if(estr[1] == "-")
+   {
+      c=1;
+   }
+   else
+   {
+      if(estr[1] != "+")
+      {
+         estr="+"+estr;
+         return(string2e(estr));
+      }
+   }
+
+   estr=estr[2,size(estr)-1];
+
+   int i;
+   for(i=1; i<=size(estr); i++)
+   {
+      e=e*10+string2intdigit(estr[i]);
+   }
+
+   if(c==1)
+   {
+      e=-e;
+   }
+
+   return(e);
+}
+
+static proc dismantle_string(string si)
+{//cuts the string into the real/imaginary parts and their exponents
+   //example of a string si:
+   //1.124564280901713e+00 -2.550064206873323e-01
+   int e1,e2;
+   number im,re;
+   string prt;//the currently considered part of the string
+   int i, len;
+   int strt=1;
+   for(i=1; i<=size(si); i++)
+   {
+      if( si[i] == "e" )
+      {
+         len=i-strt;
+         prt=si[strt,len];
+         re=string2num(prt);
+         break;
+      }
+   }
+
+   strt=i+1;//start at the character coming after "e"
+   for(i=strt; i<=size(si); i++)
+   {
+      if( si[i] == " " )
+      {
+         len=i-strt;
+         prt=si[strt,len];
+         e1=string2e(prt);
+         break;
+      }
+   }
+
+   strt=i+1;//start at the character coming after " "
+   for(i=strt; i<=size(si); i++)
+   {
+      if( si[i] == "e" )
+      {
+         len=i-strt;
+         prt=si[strt,len];
+         im=string2num(prt);
+         break;
+      }
+   }
+
+   strt=i+1;//start at the character coming after "e"
+   len=size(si)-strt+1;
+   prt=si[strt,len];
+   e2=string2e(prt);
+
+   number ten=10;
+   if(0)//e1 < -1000
+   {
+      re=0;
+   }
+   else
+   {
+      re=re*(ten^e1);
+   }
+
+   if(0)//e2 < -1000
+   {
+      im=0;
+   }
+   else
+   {
+      im=im*(ten^e2);
+   }
+   number n=re + IUnit*im;
+
+   return(n);
+}
+
+
+static proc convert_p(list p)
+{//p a list of strings representing the components of the point p
+   //converts the list of strings to a list of numbers
+
+   //interesting: apparently, since p is a list of strings to begin with, it is not
+   //bound to the basering, so it will exist in the ring r, as well. But, as we change
+   //the entries of p from type string to type number/poly, it gets bound to the ring r,
+   //so it doesnt exist in br anymore. Hence, we have do define list p=fetch.
+
+
+   //we change the ring, so that we know, what the imaginary unit is called, define the
+   //points over that ring and then fetch them to the original ring
+   def br=basering;
+   list l=ringlist(br);
+   l[1][3]="IUnit";
+   def r=ring(l);
+   setring r;
+
+   string si;
+   number pi;
+   int i;
+   for(i=1; i<=size(p); i++)
+   {
+      pi=dismantle_string(p[i]);
+      p[i]=pi;
+   }
+
+   setring br;
+   list p=fetch(r,p);
+
+   return(p);
+}
+
+
+static proc getP_plus_posis(int dummy)
+{//goes through the file main_data generated by bertini and returns the witness points
+   //as a list of complex numbers
+   //(the precision specified in the definition of the basering should* be at least as
+   //high as the precision used by/to be expected from bertini)
+   string r;
+   list P,p;
+   int i, j;
+   r=read("main_data");
+   intvec posi=find_string("Estimated",r);
+   intvec endpos=find_string("Multiplicity",r);
+   for(i=1; i<=size(posi); i++)
+   {
+      p=read_point(r,posi[i],endpos[i]);
+
+      if( size(p) == 0 )
+      {
+         ERROR("Bertini nicht erfolgreich");
+      }
+
+      P=P+list( convert_p(p) );
+   }
+   return(posi, endpos, P);
+}
+
+
+static proc getPi_from_main_data(int i, intvec posi, intvec endpos)
+{//gets only the i-th point in main_data; is used by check_is_zero
+   string r;
+   list P,p;
+   int j;
+   r=read("main_data");
+   p=read_point(r,posi[i],endpos[i]);
+
+   if( size(p) == 0 )
+   {
+      ERROR("Bertini nicht erfolgreich");
+   }
+
+   P=P+list( convert_p(p) );
+
+   return(P);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////       Applications       //////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////  static procs to get the relations from the  //////////////////////////
+//////////////////       complex to the rational numbers        //////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+static proc get_relations_as_bigintmats(list p, int D, bigint C)
+{//uses degree d Veronese embeddings (for all d<=D) and LLL-algorithm to find
+   //(homogeneous) polynomial relations between the entries of p
+   //C is the Value with which the Veronese embedding is being multiplied (cf getmatrix)
+
+   //returns the list of the bigintmats computed by the LLL-algorithm
+   //these are then processed further by get_relations_over_rationals after a switch
+   //of rings in the level above
+
+   if(nvars(basering) != size(p) )
+   {
+      ERROR("Number of variables not equal to the number of components of p.");
+   }
+
+   int d,len;
+   list mats;
+   ideal vd;
+   matrix A;
+   bigintmat B;
+   for(d=1; d<=D; d++)
+   {
+      vd=veronese(d,p);
+      len=size(maxideal(d));
+      A=getmatrix(vd,C,len);
+      //B=use_FLINT_LLL(A);
+      B=use_NTL_LLL(A);
+      //B=use_LLL_bigintmat(A);
+
+      mats=mats+list(B);
+   }
+   return(mats);
+}
+
+static proc get_relations_radical_as_bigintmats(list P, int D, bigint C)
+{//is to get_relations_as_bigintmats what get_relationsRadical is to get_relations
+   //ie uses a random linear combination of the Veronese embeddings of all points in P
+   //in order to get polynomials which vanish over all points simultaneously
+
+   int d,len;
+   list mats;
+   ideal vd;
+   matrix A;
+   bigintmat B;
+   for(d=1; d<=D; d++)
+   {
+      vd=veronese_radical(d,P);
+      len=size(maxideal(d));
+      A=getmatrix(vd,C,len);
+      //B=use_FLINT_LLL(A);
+      B=use_NTL_LLL(A);
+      //B=use_LLL_bigintmat(A);
+
+      mats=mats+list(B);
+   }
+   return(mats);
+}
+
+static proc check_is_zero(int Prec, ideal Kd, intvec posi, intvec endpos, int k)
+{
+   def br=basering;
+   int n=nvars(basering);
+   ring R=(complex,Prec,IUnit),x(1..n),dp;
+   ideal I=fetch(br,Kd);
+   list P=getPi_from_main_data(k, posi, endpos);
+   list p;
+   poly v;
+   number eps=number(10)**(5-Prec);
+   number a;
+   int i,j,c;
+   int len = size(I);
+   intvec rm;
+   rm[len]=0;
+   for(i=1; i<=len; i++)
+   {
+      for(j=1;j<=size(P); j++)
+      {
+         p=P[j];
+         v=substAll(I[i],p);
+         a=number(v);
+         a=absValue(repart(a))+absValue(impart(a));
+         //v=v*( poly(10)**(Prec-10) );
+         if( a > eps)
+         {
+            rm[i] = 1;
+            break;
+         }
+      }
+   }
+   return(rm);
+}
+
+
+static proc get_relations_over_rationals(int D, int Prec, list mats, intvec posi,
+     intvec endpos, int k)
+{//finds the relations by passing the bigintmats to getpolys
+   //returns a list of ideals containing the corresponding polynomials
+   bigintmat B;
+   int d;
+   list K;
+   ideal Kd;
+   intvec rm;
+   int i;
+
+   for(d=1; d<=D; d++)
+   {
+      B=mats[d];
+      Kd=getpolys(bigintmat2matrix(B),d);
+      if(size(Kd) != 0)
+      {
+         rm=check_is_zero(Prec,Kd,posi,endpos,k);
+
+         for(i=1; i<=size(rm); i++)
+         {
+            if( rm[i] == 1 )
+            {
+                 Kd[i] = 0;
+            }
+         }
+         Kd=simplify(Kd,2);
+      }
+
+      if(size(Kd) == 0)//i.e. Kd has only zero-entries
+      {//then dont add Kd to the list of relations
+         d++;
+         continue;
+      }
+      K=K+list(Kd);
+   }
+   return(K);
+}
+
+
+static proc getP_from_known_posis(intvec posi, intvec endpos)
+{//goes through the file main_data generated by bertini and returns the witness points
+   //as a list of complex numbers
+   //(the precision specified in the definition of the basering should* be at least as
+   //high as the precision used by/to be expected from bertini)
+   string r;
+   list P,p;
+   int i, j;
+   r=read("main_data");
+   for(i=1; i<=size(posi); i++)
+   {
+      p=read_point(r,posi[i],endpos[i]);
+
+      if( size(p) == 0 )
+      {
+         ERROR("Bertini nicht erfolgreich");
+      }
+
+      P=P+list( convert_p(p) );
+   }
+   return(P);
+}
+
+static proc check_is_zero_lincomradical(int Prec, ideal I, list P)
+{
+   //altered ckeck_is_zero for the linear-combination-of-Veronese-embeddings version
+   //of the procedures
+   list p;
+   poly v;
+   number eps=number(10)**(5-Prec);
+   number a;
+   int i,j,c;
+   int len = size(I);
+   intvec rm;
+   rm[len]=0;
+   for(i=1; i<=len; i++)
+   {
+      for(j=1;j<=size(P); j++)
+      {
+         p=P[j];
+         v=substAll(I[i],p);
+         a=number(v);
+         a=absValue(repart(a))+absValue(impart(a));
+         //v=v*( poly(10)**(Prec-10) );
+         if( a > eps)
+         {
+            rm[i] = 1;
+            break;
+         }
+      }
+   }
+   return(rm);
+}
+
+
+static proc get_relations_lincomradical_over_rationals(int D, int Prec, list mats,
+       intvec posi, intvec endpos)
+{//finds the relations by passing the bigintmats to getpolys
+   //returns a list of ideals containing the corresponding polynomials
+   bigintmat B;
+   int d;
+   list K;
+   ideal Kd;
+   intvec rm;
+   int i;
+
+
+   //set up the ring to check whether the supposed relations have value zero at
+   //all the witness points
+   def br=basering;
+   int n=nvars(br);
+   ring cr=(complex,Prec,IUnit),x(1..n),dp;
+   list P=getP_from_known_posis(posi, endpos);
+   ideal I;
+   int le;
+
+   setring br;
+   for(d=1; d<=D; d++)
+   {
+      B=mats[d];
+      Kd=getpolys(bigintmat2matrix(B),d);
+
+      //go to the complex ring to see which candidate relations should be removed
+      setring cr;
+      I=fetch(br,Kd);
+      le=size(I);
+      if(le != 0)
+      {
+         rm=check_is_zero_lincomradical(Prec,I,P);
+      }
+
+      //remove from the ideal over the rational numbers
+      setring br;
+
+      if(le != 0)
+      {
+         for(i=1; i<=size(rm); i++)
+         {
+            if( rm[i] == 1 )
+            {
+                 Kd[i] = 0;
+            }
+         }
+         Kd=simplify(Kd,2);
+      }
+
+      if(size(Kd) == 0)//i.e. Kd has only zero-entries
+      {//then dont add Kd to the list of relations
+         d++;
+         continue;
+      }
+      K=K+list(Kd);
+   }
+   return(K);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////      num_prime_decom      /////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+proc num_prime_decom(ideal I, int D, int Prec)
+"USAGE:   num_prime_decom(I,D); ideal I, int D
+         D a bound to the degree of the elements of the components of a prime
+           decomposition of I.
+RETURN:  list of ideals: each of the ideals a prime component of the radical of I
+REMARKS: Uses Bertini.
+NOTE:    Should only be called from a ring over the rational numbers.
+EXAMPLE: example num_prime_decom; shows an example
+"
+{//App. 3.1: computes a prime decomposition of the radical of I
+   //returns a list of ideals, each of them a prime component
+   def br=basering;
+   int n=nvars(br);
+   list K;//will contain the relations over the basering
+   list Q;//will contain the components
+   ideal M;
+
+   writeBertiniInput(I,Prec);
+
+   //move to a ring over the complex numbers to get the points computed by bertini
+   ring Ri=(complex,Prec,IUnit),x(1..n),dp;
+   system("sh","bertini input");
+   list P;
+   intvec posi, endpos;
+   (posi, endpos, P)=getP_plus_posis(1);
+   int sP=size(P);
+
+
+   bigint C=bigint(10)**Prec;//digits of precision
+   list p, mats;
+   int i,j;
+   for(i=1; i<=sP; i++)
+   {
+      setring Ri;
+
+      //compute the relations (with LLL, NTL_LLL or FLINT_LLL) in the form of bigintmats
+      p=P[i];
+      mats=get_relations_as_bigintmats(p,D,C);
+
+
+      //move to br again to obtain the relation-polynomials over the rational numbers
+      setring br;
+      K=get_relations_over_rationals(D, Prec, mats, posi, endpos, i);
+
+      if(size(K) == 0)//ie K the empty list
+      {
+         i++;
+         continue;
+      }
+
+      K=minrelations(K);
+      //K is now the list of ideals containing min gens in the respective degrees
+      //now, we put these min gens in one ideal
+      M=K[1];
+      for(j=2; j<=size(K); j++)
+      {
+         M=M+K[j];
+      }
+
+      Q=Q+list(M);
+   }
+
+   return(Q);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y,z),dp;
+  ideal I=(x+y)*(y+2z), (x+y)*(x-3z);
+  int D=2;
+  int Prec=300;
+  num_prime_decom(I,D,Prec);
+
+  //Let us compare that to the result of primdecSY:
+  primdecSY(I);
+}
+
+proc num_prime_decom1(list P, int D, bigint C)
+"USAGE:   num_prime_decom1(P,D,C); list P, int D, bigint C
+         P a list of lists representing a witness point set representing an ideal I
+         D should be a bound to the degree of the elements of the components of the
+           prime decomposition of I
+         C the number with which the images of the Veronese embeddings are multiplied
+RETURN:  list of ideals: each of the ideals a prime component of the radical of I
+NOTE:    Should only be called from a ring over the complex numbers.
+EXAMPLE: example num_prime_decom1; shows an example
+"
+{//P a list of lists containing the witness points
+   //returns (or is supposed to return) a list containing the prime components
+   //of the radical of the ideal which is represented by the witness points in P
+   list p,K,Q;
+   int i,j;
+   ideal M;
+   for(i=1; i<=size(P); i++)
+   {
+      p=P[i];
+      K=getRelations(p,D,C);
+
+      if(size(K) == 0)//ie K the empty list
+      {
+         i++;
+         continue;
+      }
+
+      K=minrelations(K);
+      //K is now the list of ideals containing min gens in the respective degrees
+      //now, we put these min gens in one ideal
+      M=K[1];
+      for(j=2; j<=size(K); j++)
+      {
+         M=M+K[j];
+      }
+
+      Q=Q+list(M);
+   }
+   return(Q);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  //First, we compute a prime decomposition of the ideal I=x+y;
+  ring R1=(complex,300,IUnit),(x,y),dp;
+  list p1=1,-1;
+  list P=list(p1);
+  int D=2;
+  bigint C=bigint(10)**300;
+  num_prime_decom1(P,D,C);
+
+
+  //Now, we try to obtain a prime decomposition of the ideal I=(x+y)*(y+2z), (x+y)*(x-3z);
+  ring R2=(complex,20,IUnit),(x,y,z),dp;
+  p1=1.7381623928,-1.7381623928,0.2819238763;
+  list p2=-3.578512854,2.385675236,-1.192837618;
+  P=p1,p2;
+  num_prime_decom1(P,D,10000);
+
+  //Now, we look at the result of a purely symbolic algorithm
+  ring r2=0,(x,y,z),dp;
+  ideal I=(x+y)*(y+2z), (x+y)*(x-3z);
+  primdecSY(I);
+
+  //If you compare the results, you may find that they don't match.
+  //Most likely, the hybrid algorithm got the second component wrong. This is due to the
+  //way the algorithm looks for homogeneous polynomial relations, and the specific version
+  //of the LLL algorithm used here (an implementation into Singular of a rather simple
+  //version which allows real input). It looks in degree 1, finds one relation and is
+  //thereafter unable to see a second one. Then it moves on to degree 2 and finds
+  //relations containing degree-1 relations as a factor.
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////      num_radical      ///////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+proc num_radical_via_decom(ideal I, int D, int Prec)
+"USAGE:   num_radical_via_decom(I,D); ideal I, int D
+         D a bound to the degree of the elements of the components.
+RETURN:  ideal: the radical of I
+REMARKS: Uses Bertini.
+         This procedure merely calls num_prime_decom with the same input and then
+         intersects the returned components.
+NOTE:    Should only be called from a ring over the rational numbers.
+SEE ALSO: num_prime_decom, num_radical_via_randlincom
+EXAMPLE: example num_radical_via_decom; shows an example
+"
+{//check p.14/15, App. 3.2
+   list Q=num_prime_decom(I,D,Prec);
+   ideal interQ=1;
+   int i;
+   for(i=1; i<=size(Q); i++)
+   {
+      interQ=intersect(interQ,Q[i]);
+   }
+   return(interQ);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  //First, we attempt to compute the radical via the hybrid algorithm.
+  ring R=0,(x,y,z),dp;
+  ideal I=(x+y)^2*(y+2z)^3, (x+y)^3*(x-3z)^2;
+  int D=2;
+  int Prec=300;
+  ideal numRad=num_radical_via_decom(I,D,Prec);
+  numRad;
+
+  //Then we compute the radical symbolically and compare the results.
+  ideal Rad=radical(I);
+  Rad;
+
+  reduce(Rad,std(numRad));
+
+  reduce(numRad,std(Rad));
+}
+
+proc num_radical_via_randlincom(ideal I, int D, int Prec)
+"USAGE:   num_radical_via_randlincom(I,D); ideal I, int D
+         D a bound to the degree of the elements of the components.
+RETURN:  ideal: the radical of I
+REMARKS: Uses Bertini.
+         Instead of using the images of the Veronese embeddings of each individual witness
+         point, this procedure first computes a random linear combination of those images
+         and searches for homogeneous polynomial relations for this linear combination.
+NOTE:    Should only be called from a ring over the rational numbers.
+SEE ALSO: num_radical_via_decom
+EXAMPLE: example num_radical_via_randlincom; shows an example
+"
+{//check p.14/15, App. 3.2
+
+   bigint C=bigint(10)**Prec;//digits of precision
+   def br=basering;
+   int n=nvars(br);
+
+   writeBertiniInput(I,Prec);
+
+   //move to a ring over the complex numbers to get the points computed by bertini
+   ring Ri=(complex,Prec,IUnit),x(1..n),dp;
+   system("sh","bertini input");
+   list P;
+   intvec posi, endpos;
+   (posi, endpos, P)=getP_plus_posis(1);
+   list mats=get_relations_radical_as_bigintmats(P,D,C);
+
+   setring br;
+   list K=get_relations_lincomradical_over_rationals(D,Prec,mats,posi,endpos);
+
+   ideal Q;
+
+   if(size(K) > 0)
+   {
+      K=minrelations(K);
+      Q=K[1];
+      int i;
+      for(i=2; i<=size(K); i++)
+      {
+         Q=Q,K[i];
+      }
+   }
+
+   return(Q);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  //First, we attempt to compute the radical via the hybrid algorithm.
+  ring R=0,(x,y,z),dp;
+  ideal I=(x+y)^2*(y+2z)^3, (x+y)^3*(x-3z)^2;
+  int D=2;
+  int Prec=300;
+  ideal numRad=num_radical_via_randlincom(I,D,Prec);
+  numRad;
+
+  //Then we compute the radical symbolically and compare the results.
+  ideal Rad=radical(I);
+  Rad;
+
+  reduce(Rad,std(numRad));
+
+  reduce(numRad,std(Rad));
+}
+
+proc num_radical1(list P, int D, bigint C)
+"USAGE:   num_radical1(P,D,C); list P, int D, bigint C
+         P a list of lists representing a witness point set representing an ideal I
+         D should be a bound to the degree of the elements of the components
+         C the number with which the images of the Veronese embeddings are multiplied
+RETURN:  list of ideals: each of the ideals a prime component of the radical of I
+REMARKS: This procedure merely calls num_prime_decom1 with the same input and then
+         intersects the returned components.
+NOTE:    Should only be called from a ring over the complex numbers.
+SEE ALSO: num_prime_decom1, num_radical2
+EXAMPLE: example num_radical1; shows an example
+"
+{//computes the radical via num_prime_decom (intersecting the obtained prime decom)
+   list Q=num_prime_decom1(P,D,C);
+   ideal interQ=1;
+   int i;
+   for(i=1; i<=size(Q); i++)
+   {
+      interQ=intersect(interQ,Q[i]);
+   }
+   return(interQ);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  //First, we write the input file for bertini and compute the radical symbolically.
+  ring r=0,(x,y,z),dp;
+  ideal I=4xy2-4z3,-2x2y+5xz2;
+  ideal Rad=radical(I);
+  writeBertiniInput(I,100);
+
+  //Then we attempt to compute the radical via the hybrid algorithm.
+  ring R=(complex,100,i),(x,y,z),dp;
+  system("sh","bertini input");
+  list P=getWitnessSet();
+  int D=2;
+  bigint C=bigint(10)**30;
+  ideal Rad1=num_radical1(P,D,C);
+
+  //Lastly, we compare the results.
+  Rad1;
+
+  ideal Rad=fetch(r,Rad);
+  Rad;
+
+  reduce(Rad,std(Rad1));
+
+  reduce(Rad1,std(Rad));
+}
+
+proc num_radical2(list P, int D, bigint C)
+"USAGE:   num_radical2(P,D,C); list P, int D, bigint C
+         P a list of lists representing a witness point set representing an ideal I
+         D should be a bound to the degree of the elements of the components
+         C the number with which the images of the Veronese embeddings are multiplied
+RETURN:  list of ideals: each of the ideals a prime component of the radical of I
+REMARKS: Instead of using the images of the Veronese embeddings of each individual witness
+         point, this procedure first computes a random linear combination of those images
+         and searches for homogeneous polynomial relations for this linear combination.
+NOTE:    Should only be called from a ring over the complex numbers.
+SEE ALSO: num_radical1
+EXAMPLE: example num_radical2; shows an example
+"
+{//computes the radical via getRelationsRadical
+   list K=getRelationsRadical(P,D,C);
+   K=minrelations(K);
+   K;
+   //unite the elements of K into one ideal
+   ideal Q=K[1];
+   int i;
+   for(i=2; i<=size(K); i++)
+   {
+      Q=Q,K[i];
+   }
+
+   return(Q);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  //First, we write the input file for bertini and compute the radical symbolically.
+  ring r=0,(x,y,z),dp;
+  ideal I=4xy2-4z3,-2x2y+5xz2;
+  ideal Rad=radical(I);
+  writeBertiniInput(I,100);
+
+  //Then we attempt to compute the radical via the hybrid algorithm.
+  ring R=(complex,100,i),(x,y,z),dp;
+  system("sh","bertini input");
+  list P=getWitnessSet();
+  int D=2;
+  bigint C=bigint(10)**30;
+  ideal Rad2=num_radical2(P,D,C);
+
+  //Lastly, we compare the results.
+  Rad2;
+
+  ideal Rad=fetch(r,Rad);
+  Rad;
+
+  reduce(Rad,std(Rad2));
+
+  reduce(Rad2,std(Rad));
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////      num_elim      /////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+static proc project_p(list p, intvec projvec)
+{//projects a single point p onto the components specified in projvec
+   list pr;//the projection
+   int i,k;
+   for(i=1; i<=size(projvec); i++)
+   {
+      k=projvec[i];
+      pr=pr+list(p[k]);
+   }
+   return(pr);
+}
+
+static proc project_P(list P, intvec projvec)
+{//projects the points in P onto the components specified in projvec
+   list p;//elements of P
+   list Pr;//the list of projections
+   list pr;//projection of a point p
+
+   int i;
+   for(i=1; i<=size(P); i++)
+   {
+      p=P[i];
+      pr=project_p(p,projvec);
+      Pr=Pr+list(pr);
+   }
+   return(Pr);
+}
+
+static proc get_projection_intvec(intvec elvec)
+{//computes the intvec containing the indices of the variables which are not to be
+   //eliminated
+   int nv=nvars(basering);
+   intvec projvec;
+   int i,j,c,count;//count counts the elements of projvec
+   for(i=1; i<=nv; i++)
+   {
+      c=1;
+      for(j=1; j<=size(elvec); j++)
+      {
+         if(i == elvec[j])
+         {
+            c=0;
+            break;
+         }
+      }
+
+      //if i is not among the elements of elvec, store it in projvec
+      if(c == 1)
+      {
+         count++;
+         projvec[count]=i;
+      }
+   }
+   return(projvec);
+}
+
+static proc get_elvec(poly f)
+{//computes the elimination intvec from a product of ring variables
+   if(size(f) != 1)
+   {
+      ERROR("f must be a product of ringvariables, i.e. a monomial.");
+   }
+
+   int n=nvars(basering);
+   intvec elvec;
+   int i, c;
+   for(i=1; i<=n; i++)
+   {
+      if( f/var(i) != 0)
+      {
+         c++;
+         elvec[c]=i;
+      }
+   }
+   return(elvec);
+}
+
+proc num_elim(ideal I, poly f, int D, int Prec)
+"USAGE:   num_elim(I,f,D); ideal I, poly f, int D
+         f the product of the ring variables you want to eliminate
+         D a bound to the degree of the elements of the components
+RETURN:  ideal: the ideal obtained from I by eliminating the variables specified in f
+REMARKS: This procedure uses Bertini to compute a set of witness points for I, projects
+         them onto the components corresponding to the variables specified in f and then
+         proceeds as num_radical_via_randlincom.
+NOTE:    Should only be called from a ring over the rational numbers.
+EXAMPLE: example num_elim; shows an example
+"
+{//App. 3.3
+   bigint C=bigint(10)**Prec;//digits of precision
+
+   //first, get elvec and projvec
+   intvec elvec=get_elvec(f);
+   intvec projvec=get_projection_intvec(elvec);
+   writeBertiniInput(I,Prec);
+
+   //define the ring with eliminated variables
+   //we have to compute the relations over this ring, since the number of variables
+   //must be the same as the number of components of the projected point
+   def br=basering;
+   list l=ringlist(br);
+
+   int i;
+   for(i=size(elvec); i>=1; i--)
+   {
+      l[2]=delete(l[2],elvec[i]);
+   }
+
+   def brel=ring(l);
+   int n=nvars(brel);
+
+   //move to a ring over the complex numbers to get the points computed by bertini
+   ring Ri=(complex,Prec,IUnit),x(1..n),dp;
+   system("sh","bertini input");
+   list P;
+   intvec posi, endpos;
+   (posi, endpos, P)=getP_plus_posis(1);
+   list Pr=project_P(P,projvec);
+   list mats=get_relations_radical_as_bigintmats(Pr,D,C);
+
+   setring brel;
+   list K=get_relations_lincomradical_over_rationals(D,Prec,mats,posi,endpos);
+
+   ideal R;
+   if(size(K) > 0)
+   {
+      K=minrelations(K);
+      R=K[1];
+      for(i=2; i<=size(K); i++)
+      {
+         R=R,K[i];
+      }
+   }
+
+   setring br;
+   ideal R=imap(brel,R);
+
+   return(R);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x,y,z),dp;
+  poly f1=x-y;
+  poly f2=z*(x+3y);
+  poly f3=z*(x2+y2);
+  ideal I=f1,f2,f3;
+
+  //First, we attempt to compute the elimination ideal with the hybrid algorithm.
+  ideal E1=num_elim(I,z,3,200);
+
+  //Now, we compute the elimination ideal symbolically.
+  ideal E2=elim(I,z);
+
+  //Lastly, we compare the results.
+  E1;
+  E2;
+}
+
+proc num_elim1(list P, int D, bigint C, intvec elvec)
+"USAGE:   num_elim1(P,D,C,v); list P, int D, bigint C, intvec v
+         P a list of lists representing a witness point set representing an ideal J
+         D should be a bound to the degree of the elements of the components
+         C the number with which the images of the Veronese embeddings are multiplied
+         v an intvec specifying the numbers/positions of the variables to be eliminated
+RETURN:  ideal: the ideal obtained from J by eliminating the variables specified in v
+REMARKS: This procedure just canonically projects the witness points onto the components
+         specified in the intvec v and then applies num_radical1 to the resulting points.
+NOTE:    Should only be called from a ring over the complex numbers.
+EXAMPLE: example num_elim1; shows an example
+"
+{//let J be the ideal represented by the witness points in P
+   //returns (or is supposed to return) the prime decomposition of the radical of the
+   //elimination ideal of J
+   //(where we eliminate the variables with the indices specified in elvec)
+
+   //Note that, since we are in a homogeneous setting eliminating all variables
+   //is quite simple, since we only have to decide, whether its the 0-ideal or the
+   //whole ring. This procedure won't work in that case.
+
+   intvec projvec=get_projection_intvec(elvec);
+   list Pr=project_P(P,projvec);
+
+   //We now have to change the ring we work over: we delete the variables which are
+   //to be eliminated. -> The number of variables and the number of components in
+   //the projected point are the same. Then we can apply our procedure and imap the
+   //results to our original ring, since we didnt change the names of the variables.
+   def br=basering;
+   list l=ringlist(br);
+
+   int i;
+   for(i=size(elvec); i>=1; i--)
+   {
+      l[2]=delete(l[2],elvec[i]);
+   }
+
+   def r=ring(l);
+   setring r;
+   list Pr=fetch(br,Pr);
+
+   ideal R=num_radical1(Pr,D,C);
+
+   setring br;
+   ideal R=imap(r,R);
+
+   return(R);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  //First, we write the input file for bertini and compute the elimination ideal
+  //symbolically.
+  ring r=0,(x,y,z),dp;
+  poly f1=x-y;
+  poly f2=z*(x+3y);
+  poly f3=z*(x2+y2);
+  ideal J=f1,f2,f3;
+  ideal E2=elim(J,z);
+  writeBertiniInput(J,100);
+
+  //Then we attempt to compute the elimination ideal via the hybrid algorithm.
+  ring R=(complex,100,i),(x,y,z),dp;
+  system("sh","bertini input");
+  list P=getWitnessSet();
+  intvec v=3;
+  bigint C=bigint(10)**25;
+  ideal E1=num_elim1(P,2,C,v);
+
+  //Lastly, we compare the results.
+  E1;
+  setring r;
+  E2;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////   lattice basis reduction   //////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+//An implementation of a simple LLL algorithm
+//Works with real numbers
+//Is only used by those procedures which require the user to provide a witness set,
+//  instead of calling Bertini to compute one.
+
+static proc eucl(int m, vector u)
+{//the square of the Euclidean norm of u
+   poly e=inner_product(u,u);
+   return(e);
+}
+
+static proc red(int i, module B, module U)
+{
+   int j;
+   poly r;
+   for(j=i-1; j>=1; j--)
+   {
+      r=roundpoly(U[i][j]);
+      B[i]=B[i]-r*B[j];
+      U[i]=U[i]-r*U[j];
+   }
+   return(B,matrix(U));
+}
+
+static proc initBBsU(matrix M)
+{//the columns of M a basis of a lattice over R
+   int m=nrows(M);
+   int c=ncols(M);
+   module B=M;
+   module Bs=M;
+   poly f,k,u;
+   matrix U=diag(1,c);
+   int i,j;
+   for(i=1; i<=c; i++)
+   {
+      for(j=1; j<=i-1; j++)
+      {
+         f=inner_product(B[i],Bs[j]);
+         k=inner_product(Bs[j],Bs[j]);
+         u=f/k;
+         U[j,i]=u;
+         Bs[i]=Bs[i]-u*Bs[j];
+      }
+      (B,U)=red(i,B,U);
+   }
+   return(B,Bs,U);
+}
+
+static proc mymax(int i, int k)
+{
+   if(i >= k)
+   {
+      return(i);
+   }
+   return(k);
+}
+
+proc realLLL(matrix M)
+"USAGE:   realLLL(M); matrix M
+ASSUME:  The columns of M represent a basis of a lattice.
+         The groundfield is the field of real number or the field of complex numbers, the
+         elements of M are real numbers.
+RETURN:  matrix: the columns representing an LLL-reduced basis of the lattice given by M
+EXAMPLE: example realLLL; shows an example
+"
+{
+   int n=ncols(M);
+   int m=nrows(M);
+   matrix U;
+   module B,Bs;
+   poly f,k,u;
+   (B,Bs,U)=initBBsU(M);
+   int i=1;
+   int j;
+   while(i<n)
+   {
+      //check whether there is an i sth eucl(Bs[i,i]) <= 4/3*euclid(Bs[i+1,i])
+      //if so, thats fine
+      //if not, b_i and b_i+1 are swapped + we do the necessary changes in Bs and U
+      if(inner_product(B[i],B[i]) <= (301/300)*inner_product(B[i+1],B[i+1]))
+      {
+         i++;
+      }
+      else
+      {
+         Bs[i+1]=Bs[i+1]+U[i,i+1]*Bs[i];
+         f=inner_product(B[i],Bs[i+1]);
+         k=inner_product(Bs[i+1],Bs[i+1]);
+         u=f/k;
+         U[i,i]=u;
+         U[i+1,i]=1;
+         U[i,i+1]=1;
+         U[i+1,i+1]=0;
+         Bs[i]=Bs[i]-U[i,i]*Bs[i+1];
+         U=permcol(U,i,i+1);
+         Bs=permcol(Bs,i,i+1);
+         B=permcol(B,i,i+1);
+
+         for(j=i+2; j<=n; j++)
+         {
+            f=inner_product(B[j],Bs[i]);
+            k=inner_product(Bs[i],Bs[i]);
+            u=f/k;
+            U[i,j]=u;
+
+            f=inner_product(B[j],Bs[i+1]);
+            k=inner_product(Bs[i+1],Bs[i+1]);
+            u=f/k;
+            U[i+1,j]=u;
+         }
+
+         if(absValue(U[i,i+1]) > 1/2)
+         {
+            (B,U)=red(i+1,B,U);
+         }
+         i=mymax(i-1,1);
+      }
+   }
+   return(B);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=(real,50),x,dp;
+  matrix M[5][4]=
+  1,0,0,0,
+  0,1,0,0,
+  0,0,1,0,
+  0,0,0,1,
+  5*81726716.91827716, 817267.1691827716, poly(10)**30, 13*81726716.91827716;
+  matrix L=realLLL(M);
+  print(L);
+}

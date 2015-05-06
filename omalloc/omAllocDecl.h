@@ -33,10 +33,10 @@
 #define omAllocBin(bin)                         _omDebugAlloc(bin,OM_FBIN|_OM_FKEEP,OM_CTFL)
 #define omAlloc0Bin(bin)                        _omDebugAlloc(bin,OM_FBIN|OM_FZERO|_OM_FKEEP,OM_CTFL)
 
-#define omTypeAlloc(type,addr,size)             addr=(type)_omDebugAlloc((void*)(size),OM_FSIZE|_OM_FKEEP,OM_CTFL)
-#define omTypeAlloc0(type,addr,size)            addr=(type)_omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO|_OM_FKEEP,OM_CTFL)
-#define omAlloc(size)                           _omDebugAlloc((void*)(size),OM_FSIZE|_OM_FKEEP,OM_CTFL)
-#define omAlloc0(size)                          _omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO|_OM_FKEEP,OM_CTFL)
+#define omTypeAlloc(type,addr,size)             addr=(type)_omDebugAlloc((void*)(long)(size),OM_FSIZE|_OM_FKEEP,OM_CTFL)
+#define omTypeAlloc0(type,addr,size)            addr=(type)_omDebugAlloc((void*)(long)(size),OM_FSIZE|OM_FZERO|_OM_FKEEP,OM_CTFL)
+#define omAlloc(size)                           _omDebugAlloc((void*)(long)(size),OM_FSIZE|_OM_FKEEP,OM_CTFL)
+#define omAlloc0(size)                          _omDebugAlloc((void*)(long)(size),OM_FSIZE|OM_FZERO|_OM_FKEEP,OM_CTFL)
 
 #define omalloc(size)   _omDebugAlloc((void*)(size),OM_FSIZE|OM_FSLOPPY|OM_FALIGN|_OM_FKEEP,OM_CTFL)
 #define omalloc0(size)  _omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO|OM_FSLOPPY|OM_FALIGN|_OM_FKEEP,OM_CTFL)

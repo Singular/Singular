@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version primdec.lib 4.0.1.2 Jan_2015 "; // $Id$
+version="version primdec.lib 4.0.2.0 Apr_2015 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -1017,7 +1017,7 @@ EXAMPLE: example zero_decomp; shows an example
     primary=splitPrimary(primary,ser,@wr,act);
   }
 
-  if((voice>=7)&&(char(basering)<=181))
+  if((voice>=7)&&(char(basering)<=181)&&(@wr==1))
   {
     primary=splitCharp(primary);
   }
@@ -1349,10 +1349,10 @@ proc extF(list l,list #)
   }
   if(size(peek)==0){return(peek1);}
 
-  string gnir="ring RH=("+string(p)+"^"+string(ex)+",a),("+varstr(R)+"),lp;";
+  string gnir="ring RH=("+string(p)+"^"+string(ex)+",@a),("+varstr(R)+"),lp;";
   execute(gnir);
   string mp="minpoly="+string(minpoly)+";";
-  gnir="ring RL=("+string(p)+",a),("+varstr(R)+"),lp;";
+  gnir="ring RL=("+string(p)+",@a),("+varstr(R)+"),lp;";
   execute(gnir);
   execute(mp);
   list L=imap(R,peek);
@@ -1370,14 +1370,14 @@ proc extF(list l,list #)
   }
   mp="poly pp="+string(minpoly)+";";
 
-  string gnir1="ring RS="+string(p)+",("+varstr(R)+",a),lp;";
+  string gnir1="ring RS="+string(p)+",("+varstr(R)+",@a),lp;";
   execute(gnir1);
   execute(mp);
   list L=imap(RL,keep);
 
   for(i=1;i<=size(L);i++)
   {
-    L[i]=eliminate(L[i]+ideal(pp),a);
+    L[i]=eliminate(L[i]+ideal(pp),@a);
   }
   i=0;
   int j;
@@ -6501,10 +6501,6 @@ EXAMPLE: example radical; shows an example
   ASSUME(0, not isQuotientRing(basering) ) ;
   dbprint(printlevel - voice, "Radical, version 2006.05.08");
   if(size(i) == 0){return(ideal(0));}
-  if(hasAlgExtensionCoefficient(basering))
-  {
-    return(algeRad(i));
-  }
   if(attrib(basering,"global")!=1)
   {
 // algorithms only work in global case!
@@ -6518,6 +6514,10 @@ EXAMPLE: example radical; shows an example
       setring r;
       def j=imap(s,j);
       return(j);
+  }
+  if(hasAlgExtensionCoefficient(basering))
+  {
+    return(algeRad(i));
   }
   int j;
   def P0 = basering;
@@ -6823,7 +6823,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
   int @wr, @n, @m, lauf, di;
   ideal fac, @h, collectrad, lsau;
   poly @q;
-  string @va; def quotring;
+  string @va;
 
   def @P = basering;
   int jdim = dim(I);               // Computes the dimension of I
@@ -6932,7 +6932,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
     // and the map phi:K[var(1),...,var(nva)] ----->
     // K(var(nnpr+1),..,var(nva))[..the rest..]
     //------------------------------------------------------------------------
-    quotring = prepareQuotientring(nvars(basering) - indep[@m][3],"dp");
+    def quotring = prepareQuotientring(nvars(basering) - indep[@m][3],"dp");
     //------------------------------------------------------------------------
     // We pass to the quotientring   K(var(nnp+1),..,var(nva))[..the rest..]
     //------------------------------------------------------------------------
@@ -7863,7 +7863,7 @@ EXAMPLE: example newDecompStep; shows an example
   {
     list fac=factor(@j[1]);
     list gprimary;
-    poly generator;
+    poly generator=1;
     ideal gIntersection;
     for(@k=1;@k<=size(fac[1]);@k++)
     {
@@ -8229,7 +8229,7 @@ EXAMPLE: example newDecompStep; shows an example
            //--->K(var(nnpr+1),..,var(nva))[..the rest..]
            //------------------------------------------------------------------
 
-           quotring=prepareQuotientring(nvars(basering)-restindep[@m][3],"lp");
+           def quotring=prepareQuotientring(nvars(basering)-restindep[@m][3],"lp");
 
            //------------------------------------------------------------------
            //we pass to the quotientring  K(var(nnp+1),..,var(nva))[..rest..]

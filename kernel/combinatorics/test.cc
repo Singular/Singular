@@ -24,10 +24,6 @@
 #define PLURAL_INTERNAL_DECLARATIONS
 #endif
 
-#ifndef PLURAL_INTERNAL_DECLARATIONS_GB_HACK
-#define PLURAL_INTERNAL_DECLARATIONS_GB_HACK
-#endif
-
 #include <polys/nc/gb_hack.h>
 #include <polys/nc/nc.h>
 #include <polys/nc/ncSACache.h>

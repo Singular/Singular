@@ -24,6 +24,9 @@
 
 #include <factory/factoryconf.h>
 #include <stdint.h>
+#ifdef HAVE_OMALLOC
+#include <omalloc/omallocClass.h>
+#endif
 
 #ifndef NOSTREAMIO
 #  ifdef HAVE_IOSTREAM

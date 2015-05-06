@@ -926,7 +926,7 @@ static BOOLEAN jiA_PACKAGE(leftv res, leftv a, Subexpr)
   jiAssignAttr(res,a);
   return FALSE;
 }
-static BOOLEAN jiA_DEF(leftv res, leftv a, Subexpr e)
+static BOOLEAN jiA_DEF(leftv res, leftv, Subexpr)
 {
   res->data=(void *)0;
   return FALSE;

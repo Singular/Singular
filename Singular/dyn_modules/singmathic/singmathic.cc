@@ -481,6 +481,7 @@ BOOLEAN mathicgb(leftv result, leftv arg)
   const int varCount = currRing->N;
   const ideal I=(ideal) arg->Data();
   mgb::GroebnerConfiguration conf(characteristic, varCount,I->rank);
+  conf.setMaxThreadCount(0); // default number of cores
   if (!setOrder(currRing, conf))
     return TRUE;
   if (TEST_OPT_PROT)
@@ -521,7 +522,7 @@ template class std::vector<Exponent>;
 template void mgb::computeGroebnerBasis<MathicToSingStream>
   (mgb::GroebnerInputIdealStream&, MathicToSingStream&);
 
-int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
+extern "C" int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
 {
   PrintS("Initializing Singular-Mathic interface Singmathic.\n");
   psModulFunctions->iiAddCproc(
@@ -552,4 +553,20 @@ int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
 }
 */
 
+/* ressources: ------------------------------------------------------------
+
+http://stackoverflow.com/questions/3786408/number-of-threads-used-by-intel-tbb
+When you create the scheduler, you can specify the number of threads as
+tbb::task_scheduler_init init(nthread);
+
+    How do I know how many threads are available?
+
+    Do not ask!
+
+        Not even the scheduler knows how many threads really are available
+        There may be other processes running on the machine
+        Routine may be nested inside other parallel routines
+
+  conf.setMaxThreadCount(0); // default number of cores
+*/
 #endif /* HAVE_MATHICGB */

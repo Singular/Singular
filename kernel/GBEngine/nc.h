@@ -30,7 +30,7 @@ static inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const i
   assume(rIsPluralRing(r));
   assume(r->GetNC()->p_Procs.GB!=NULL);
 
-  GB_Proc_Ptr gb = cast_A_to_B<void*, GB_Proc_Ptr>(r->GetNC()->p_Procs.GB);
+  BBA_Proc gb = cast_A_to_B<void*, BBA_Proc>(r->GetNC()->p_Procs.GB);
 
   // NOTE: the following code block is a hack in order to make a linker to
   // believe in these functions but in reallity it should not be used.

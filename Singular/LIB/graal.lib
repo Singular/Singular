@@ -1,0 +1,1371 @@
+////////////////////////////////////////////////////////////////////////////
+version="version graal.lib 4.0.2.0 Apr_2015 "; // $Id$
+category="Commutative Algebra";
+info="
+LIBRARY:  graal.lib          localization at prime ideals and their associated graded rings
+AUTHOR:   Magdaleen Marais,  magdaleen@aims.ac.za
+          Yue Ren,           ren@mathematik.uni-kl.de
+
+OVERVIEW:
+This library is on a computational treatment of localizations at prime ideals and their associated graded rings based on a work of Mora. Not only does it construct a ring isomorphic to the localization of an affine coordinate ring at a prime ideal, the algorithms in this library aim to exploit the topology in the localization by computing first and foremost in the associated graded ring and lifting the result to the localization afterwards. Features include a check for regularity and the resolution of ideals.
+
+REFERENCES:
+Mora, Teo: La queste del Saint Gr_a(A_L): A computational approach to local algebra
+Marais, Magdaleen and Ren, Yue: Mora's holy grail, algorithms for computing in localizations at prime ideals
+
+PROCEDURES:
+graalMixed(ideal L);
+graalMixed(ideal L, int t);
+yinitial(poly f);
+yinitial(poly f, int s);
+yinitial(ideal I);
+yinitial(ideal I, int s);
+dimensionOfLocalization(ideal J);
+dimensionOfLocalization(graalBearer Gr);
+systemOfParametersOfLocalization(ideal L);
+systemOfParametersOfLocalization(graalBearer L);
+isLocalizationRegular(ideal L);
+isLocalizationRegular(graalBearer L);
+warkedPreimageStd(warkedModule wM);
+resolutionInLocalization(ideal I, ideal L);
+resolutionInLocalization(ideal I, graalBearer Gr);
+";
+
+LIB "general.lib";  // for watchdog
+LIB "poly.lib";     // for hilbPoly
+LIB "standard.lib"; // for res
+
+proc mod_init()
+{
+  /***
+   * graalBearer is a structure that contains those objects
+   * of the intermediate steps to computing the associated graded algebra
+   * that are worth saving for future computations. These are:
+   *
+   * ring A      affine coordinate ring
+   * ideal L     ideal cutting out the subvariety
+   * int s       number of generators of L
+   * ring Q      polynomial ring of the ambient space
+   * ideal H     ideal such that A=Q/H
+   * ideal J     preimage of L
+   * qring Q0y   Q^0[Y1,...,Ys]
+   * ideal scriptI <Y1-f1,...,Ys-fs>, where f1,...,fs are the generators of L
+   * qring Al    the ring A_L = Q0y/scriptI
+   * qring Ky    K[Y1,...,Ys], where K quotient field of A/L
+   * ideal scriptIin I_in
+   * qring Graal associated graded ring, isomorphic to Ky/scriptIin
+   * map ina     Al -> Graal, maps standard basis of ideals
+   *               to standard basis of their respective initial ideals
+   **/
+  newstruct("graalBearer","int s, qring A, ideal L, ring Q, ideal H, ideal J, ring Q0, ideal J0, ring Q0y, ideal scriptI, qring Al, qring Ky, ideal scriptIin, map Q0yToKy, qring Graal, map ina");
+  system("install","graalBearer","print",graalBearer_print,1);
+
+  /***
+   * warkedModule is a structure built to hold two corresponding modules in Ay and Ky respectively.
+   * More precisely, it contains space for:
+   * graalBearer Gr   a graalBearer containing all relevant global structures
+   * module modQ0y      a module M over Q0y
+   * module stdmodQ0y   a standard basis of M with respect to the weight w
+   * matrix qQ0y        a transformation matrix over Q0y such that
+   *                      stdmodAy = qQ0y*modQ0y
+   * module modKy       a module M_in over Ky
+   * module stdmodKy    a standard basis of M_in
+   * matrix qKy         a transformation Matrix over Ky such that
+   *                      stdmodKy = qKy*modKy
+   * intvec w           an intvec containing the weights on M
+   * Note: "wark" is a scots noun for building
+   **/
+  newstruct("warkedModule","graalBearer Gr, module modQ0y, module stdmodQ0y, matrix qQ0y, module modKy, module stdmodKy, matrix qKy, intvec w");
+  system("install","warkedModule","print",warkedModule_print,1);
+
+  /***
+   * markedResolution is a structure built to hold two corresponding resolutions in Al and Graal respectively.
+   * More precisely, it contains space for:
+   * graalBearer Gr      a graalBearer containing all relevant global structures
+   * ideal idealAl         a standard basis of an ideal I in Al
+   * resolution resAl      a resolution of I over Al
+   * resolution resGraal   a resolution of inI, the initial ideal of I over Graal
+   * list weight           a list containing weights on the modules in resAl
+   **/
+  newstruct("markedResolution","graalBearer Gr, ideal idealAl, resolution resAl, resolution resGraal, list weight");
+  system("install","markedResolution","print",markedResolution_print,1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+/***
+ * returns the number of Y, each of them corresponding to a generator of J.
+ * we assume that the Ys are written in the first non-"c" block of our ordering,
+ * for example (Y(1..s),X(1..n)),(c,ds(s),dp(n))
+ * or (Y(1..s),X(1..n)),(ds(s),c,dp(n))
+ * but not (X(1..n),Y(1..s)),(c,dp(s),ds(n)).
+ **/
+static proc numberOfYs()
+{
+  list L = ringlist(basering);
+  if (L[3][1][1]!="c")
+  {
+    return(size(ringlist(basering)[3][1][2]));
+  }
+  else
+  {
+    return(size(ringlist(basering)[3][2][2]));
+  }
+}
+
+
+proc yinitial(def F, list #)
+"
+USAGE:    yinitial(F,s); F polynomial or ideal, s int (optional)
+RETURN:   if F polynomial, returns the sum over all terms of lowest degree in Y.
+          if F ideal, returns the yinitials of all its generators.
+          if s is specified, assumes that there are s variables in Y, Y(1),...,Y(s).
+NOTE:     assumes that the Y are the first variables in the basering and,
+          if s unspecified, that they have their own block in the ordering.
+EXAMPLE:  example yinitial; shows an example
+"
+{
+  int s;
+  if (size(#)>0 && typeof(#[1])=="int")
+    { s = #[1]; }
+  else
+    { s = numberOfYs(); }
+  if (typeof(F)=="poly")
+  {
+    int k = size(F);
+    poly inF = F[1];
+    intvec expv = leadexp(F);
+    int d = sum(intvec(expv[1..s]));
+    for (int i=2; i<=k; i++)
+    {
+      expv = leadexp(F[i]);
+      if (sum(intvec(expv[1..s])) == d)
+        { inF = inF + F[i]; }
+      else
+        { break; }
+    }
+    return(inF);
+  }
+  if (typeof(F)=="ideal")
+  {
+    int k = size(F);
+    ideal inF = yinitial(F[1]);
+    for (int i=2; i<=k; i++)
+      { inF[i] = yinitial(F[i],s); }
+    return(inF);
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  // todo
+}
+
+
+/***
+ * suppose X(1),...,X(n) are the variables in the ring containing g,
+ * checks whether g contains the variables X(1),...,X(n-1).
+ **/
+static proc containsVariablesApartFromLast(poly g)
+{
+  intvec expv; int d; int s = nvars(basering)-1;
+  int i,j;
+  for (j=1; j<=size(g); j++)
+  {
+    expv = leadexp(g[j]);
+    for (i=1; i<=s; i++)
+    {
+      if (expv[i] > 0)
+        { return(i); }
+    }
+  }
+  return(0);
+}
+
+
+/***
+ * assuming that the ordering is lexicographical,
+ * checks whether m is in general position with repect to it.
+ **/
+static proc isInGeneralPosition(ideal m)
+{
+  int n = nvars(basering);
+  if (n == 1)
+    { return(1); }
+
+  int k = size(m);
+  if (k == n)
+  {
+    m = sort(m)[1]; poly g;
+    for (int i=2; i<=k; i++)
+    {
+      g = m[i];
+      if (leadmonom(g)!=var(k-i+1) || containsVariablesApartFromLast(g-lead(g)))
+        { return(0); }
+    }
+    g = m[1];
+    if (containsVariablesApartFromLast(g))
+      { return(0); }
+    return(1);
+  }
+  return(0);
+}
+
+
+/***
+ * finds a transformation of the last variable
+ * which maps m into general position with respect to the lexicographical ordering lp.
+ * returns the image of the last variable under the transformation and the image of m.
+ **/
+static proc findGeneralPosition(ideal m)
+{
+  list L = ringlist(basering);
+  int newRing = 0;
+  if (L[3][1][1]!="lp" || L[3][1][2]!=nvars(basering))
+  {
+    def origin = basering;
+    execute("ring ringForGeneralPosition = ("+charstr(basering)+"),("+varstr(basering)+"),lp;");
+    ideal m = fetch(origin,m);
+    newRing = 1;
+  }
+  ideal mGeneralPosition = std(m);
+  int n = nvars(basering); poly p = var(n);
+  while (!isInGeneralPosition(mGeneralPosition))
+  { // apply generic coordinate change to the last variable,
+    //   m -> mGeneralPosition, X_n |-> p
+    // until mGeneraliPosition is indeed in general position.
+    p = randomLast(5)[n];
+    mGeneralPosition = subst(m,var(n),p);
+    mGeneralPosition = std(mGeneralPosition);
+  }
+  if (newRing == 1)
+  {
+    setring origin;
+    ideal mGeneralPosition = fetch(ringForGeneralPosition,mGeneralPosition);
+    poly p = fetch(ringForGeneralPosition,p);
+  }
+  return(p,mGeneralPosition);
+}
+
+
+/***
+ * tries for t seconds to find a transformation of the last variable,
+ * which maps m into general position with respect to the lexicographical ordering lp.
+ * if successful, returns the image of the last variable as well as the image of m.
+ * if unsuccessful, returns (0,0) instead.
+ **/
+static proc tryFindingGeneralPosition(ideal m, int t)
+{
+  def p, mgp;
+  p, mgp = watchdog(t,"findGeneralPosition(ideal("+string(m)+"))");
+  if (typeof(p)=="string")
+    { return(0,0); }
+  return(p,mgp);
+}
+
+
+/***
+ * if mgp is in general position with respect to the lexicographical ordering lp,
+ * sorts the generators such that their order is
+ * X(1) - g(1)
+ * X(2) - g(2)
+ * ...
+ * X(n-1) - g(n-1)
+ * g(n),
+ * where g(1),...,g(n-1) are polynomials in X(n).
+ **/
+static proc sortIdealInGeneralPosition(ideal mgp)
+{
+  int k = size(mgp);
+  ideal sortedMgp; sortedMgp[k]=0;
+  ASSUME(1,size(mgp)==nvars(basering));
+  for (int i=1; i<=k; i++)
+  {
+    poly g = mgp[i];
+    int j = containsVariablesApartFromLast(g);
+    if (j>0)
+      { sortedMgp[j] = g; }
+    else
+      { sortedMgp[k] = g; }
+    kill g;
+    kill j;
+  }
+  return(sortedMgp);
+}
+
+
+/***
+ * if mgp is in general position with respect to the lexicographical ordering lp,
+ * and sorted (see above), returns g(1),...,g(n-1).
+ **/
+static proc getImagesOfPreviousX(ideal mgp)
+{
+  def origin = basering;
+  def getImagesRing = changeord(list(list("lp",nvars(basering))));
+  setring getImagesRing;
+
+  ideal mgp = fetch(origin,mgp);
+  int k = size(mgp);
+  ideal imagesOfPreviousX; imagesOfPreviousX[k]=0;
+
+  for (int i=1; i<=k; i++)
+  {
+    poly g = mgp[i];
+    ASSUME(1,leadexp(g)[i]==1);
+    if (g!=0)
+      { g = (lead(g)-g)/leadcoef(g); }
+    imagesOfPreviousX[i] = g;
+    kill g;
+  }
+
+  setring origin;
+  ideal imagesOfPreviousX = fetch(getImagesRing,imagesOfPreviousX);
+  return (imagesOfPreviousX);
+}
+
+
+proc graalMixed(ideal L, list #)
+"
+USAGE:    graalMixed(L,t); L ideal, t int (optional)
+RETURN:   graalBearer with all the necessary structures for our machinery
+          if t specified and t>0, puts an upper time limit
+            on finding a necessary transformation to map an intermediate ideal into general position.
+NOTE:     assumes that the current basering is a domain and that L is a prime ideal.
+EXAMPLE:  example graalMixed; shows an example
+"
+{
+  graalBearer Gr;
+
+  /***
+   * store ring A and ideal L
+   **/
+  Gr.A = qring(basering); Gr.L = L;
+  int s = size(L); Gr.s = s;
+
+  /***
+   * construct ring Q and ideals H,J
+   **/
+  ideal H = ringlist(Gr.A)[4];
+  execute("ring Q = "+string(Gr.A)+";");
+  ideal H = fetch(Gr.A,H); H = sort(std(H))[1];
+  ideal J = fetch(Gr.A,L) + H; J = sort(std(J))[1];
+  Gr.Q = Q; Gr.H = H; Gr.J = J;
+
+  /***
+   * construct ring Q0 and ideal J0
+   **/
+  intvec maxIndepSet = indepSet(std(J));
+  int trdeg = sum(maxIndepSet);
+  int i; int n = nvars(Q);
+  if (trdeg > 0)
+  {
+    string pars = ","; string vars;
+    for (i=1; i<=n; i++)
+    {
+      if (maxIndepSet[i]>0)
+        { pars = pars + string(var(i)) + ","; }
+      else
+        { vars = vars + string(var(i)) + ","; }
+    }
+    pars = pars[1..size(pars)-1];
+    vars = vars[1..size(vars)-1];
+  }
+  else
+    { string pars; string vars = varstr(basering); }
+  execute("ring Q0 = ("+charstr(basering)+pars+"),("+vars+"),dp;");
+  ideal J0 = imap(Q,J);
+  Gr.Q0 = Q0;
+  Gr.J0 = J0;
+
+  /***
+   * push J0 into general position
+   **/
+  if (size(#)==0)
+  {
+    poly p; ideal mgp;
+    p, mgp = findGeneralPosition(J0);
+  }
+  else
+  {
+    if ((#[1]==1) && (typeof(#[1])=="int"))
+    {
+      polg p; ideal mgp;
+      p, mgp = tryFindingGeneralPosition(J0,#[1]);
+      if (p == 0)
+      {
+        ERROR("timeout during computation of minimal polynomial");
+        return(Gr);
+      }
+    }
+    else
+    {
+      ERROR("graal: unexpected optional paramemters");
+      return(Gr);
+    }
+  }
+  n = nvars(Q0);
+  mgp = sortIdealInGeneralPosition(mgp);
+  ideal imageOfX = getImagesOfPreviousX(mgp);
+  imageOfX[n] = p;
+  for (i=1; i<n; i++)
+  {
+    imageOfX[n] = subst(imageOfX[n],var(i),imageOfX[i]);
+  }
+  poly g(n) = mgp[n];
+
+  /***
+   * construct Q0y, scriptI and Al
+   **/
+  string ostring = ordstr(basering);
+  ostring = ostring[1..size(ostring)-2];
+  execute("ring Q0y = ("+charstr(basering)+"),(Y(1..s),"+varstr(basering)+"),(ds(s),c,"+ostring+")");
+  setring Q0y;
+  ideal H = imap(Gr.A,H);
+  ideal J = imap(Gr.A,L);
+  ideal scriptI = H;
+  for (i=1; i<=s; i++)
+    { scriptI = scriptI + poly(J[i]-Y(i)); }
+  scriptI = std(scriptI);
+  Gr.Q0y = Q0y;
+  Gr.scriptI = scriptI;
+  ideal inI = yinitial(scriptI,s);
+  attrib(inI,"isSB",1);
+  qring Al = scriptI;
+  Gr.Al = Al;
+
+  /***
+   * construct Ky and sigmainI
+   **/
+  execute("ring KKy = ("+charstr(Q0)+"),(Y(1..s),"+varstr(Q0,nvars(Q0))+"),(c,dp(s),dp(1));");
+  poly minpolyOfK = imap(Q0,g(n));
+  qring Ky = std(minpolyOfK);
+
+  ideal G = Y(1..s); ideal imageOfX = imap(Q0,imageOfX);
+  int j1=1;
+  for (i=1; i<=nvars(Q); i++)
+  {
+    if (maxIndepSet[i]==0)
+      { G = G, imageOfX[j1]; j1++; }
+    // if (maxIndepSet[i]>0)
+    //   { G = G, par(j2); j2++; }
+    // else
+    //   { G = G, imageOfX[j1]; j1++; }
+  }
+  map Q0yToKy = Q0y,G;
+  Gr.Q0yToKy = Q0yToKy;
+  ideal scriptIin = Q0yToKy(inI);
+  ASSUME(2,isStandardBasis(scriptIin));
+  scriptIin = std(scriptIin);
+  Gr.Ky = qring(Ky);
+  Gr.scriptIin = scriptIin;
+
+  /***
+   * construct Graal
+   **/
+  qring Graal = scriptIin;
+  Gr.Graal = qring(Graal);
+  map in_a = Al,imap(Ky,G);
+  Gr.ina = in_a;
+
+  return(Gr);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  // see [Mora] Example 6.5
+  ring Q = 0,(x,y,z),dp;
+  ideal H = y2-xz;
+  qring A = std(H);
+  ideal L = x3-yz,x2y-z2;
+  graalBearer Gr = graalMixed(L); Gr;
+}
+
+/***
+ * a print routine for graalBearers,
+ * will overwrite the default print routine for newstructs
+ **/
+proc graalBearer_print(graalBearer Gr)
+{
+  def A=Gr.A; setring A;
+  "affine coordinate ring: ";
+  "   "+string(Gr.A);
+  ideal quotientIdeal = ringlist(Gr.A)[4];
+  if (quotientIdeal != 0)
+    { "     mod <"+string(quotientIdeal)+">"; }
+  "";
+  "ideal defining the subvariety: ";
+  "   <"+string(Gr.L)+">";"";
+  def Al = Gr.Al; setring Al;
+  "Al: ";
+  "   "+string(Gr.Al);
+  ideal quotientIdeal = ringlist(basering)[4];
+  if (quotientIdeal != 0)
+    { "     mod <"+string(quotientIdeal)+">"; }
+  kill quotientIdeal;
+  def Graal = Gr.Graal; setring Graal;
+  "graal: ";
+  "   "+string(Gr.Graal);
+  ideal quotientIdeal = ringlist(basering)[4];
+  if (quotientIdeal != 0)
+    { "     mod <"+string(quotientIdeal)+">"; }
+  kill quotientIdeal;
+  "   where ";
+  setring Gr.A;
+  for (int i=1; i<=Gr.s; i++)
+  { "     Y("+string(i)+") represents generator "+string(Gr.L[i]); }
+  setring Al;
+  list L = ringlist(basering);
+  int yEnd = size(L[3][1][2]);
+  ideal xAll; int n = nvars(basering);
+  for (i=1; yEnd+i<=n; i++)
+    { xAll[i] = var(yEnd+i); }
+  string inaPrint = "   and "+string(xAll)+" in Al are mapped to ";
+  kill L;
+  kill xAll;
+  setring Graal;
+  map ina = Gr.ina;
+  ideal xAllImages;
+  for (i=1; yEnd+i<=n; i++)
+    { xAllImages[i] = ina[yEnd+i]; }
+  inaPrint + string(xAllImages)+" in Graal";
+  kill ina;
+  kill xAllImages;
+}
+
+/***
+ * a print routine for warkedModules,
+ * will overwrite the default print routine for newstructs
+ **/
+proc warkedModule_print(warkedModule wM)
+{
+  graalBearer Gr = wM.Gr;
+  def Q0y = Gr.Q0y; setring Q0y;
+  ideal quotientIdeal = ringlist(basering)[4];
+  "module over Q^0[Y] = "+string(basering)+" / <"+string(quotientIdeal)+">:";
+  print(matrix(wM.modQ0y));
+  "standard basis:";
+  print(matrix(wM.stdmodQ0y));
+  def Ky = Gr.Ky; setring Ky;
+  ideal quotientIdeal = ringlist(basering)[4];
+  "module over K[Y] = "+string(basering)+" / <"+string(quotientIdeal)+">:";
+  print(matrix(wM.modKy));
+  "weights on the unit vectors: "+string(wM.w);
+}
+
+/***
+ * a print routine for markedModules,
+ * will overwrite the default print routine for newstructs
+ **/
+proc markedModule_print(markedModule M)
+{
+  graalBearer Gr = M.Gr;
+  def Ay = Gr.Ky; setring Ay;
+  module G = M.G;
+  "module over Ay:";
+  print(G);
+  def Ky = Gr.Graal; setring Ky;
+  module H = M.H;
+  "module over Ky:";
+  print(H);
+}
+
+
+proc dimensionOfLocalization(def L)
+"
+USAGE:    dimensionOfLocalization(L); L ideal or graalBearer
+RETURN:   int, the dimension of the localization A_L of A at L.
+EXAMPLE:  example dimensionOfLocalization; shows an example
+"
+{
+  if (typeof(L)=="ideal")
+  {
+    graalBearer Gr = graalMixed(L);
+    return(dimensionOfLocalization(Gr));
+  }
+  if (typeof(L)=="graalBearer")
+  {
+    graalBearer Gr = L;
+    def Ky = Gr.Ky; setring Ky;
+    ideal scriptIin = Gr.scriptIin;
+    return(dim(scriptIin));
+  }
+  ERROR("dimensionOfLocalization: unexpected parameters");
+  return(0);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring Q = 0,(X(1),X(2)),dp;
+  ideal H = X(2)^2-(X(1)-1)*X(1)*(X(1)+1);
+  ideal J = std(X(1),X(2));
+  qring A = std(H);
+  ideal L = fetch(Q,J);
+  graalBearer Gr = graalMixed(L);
+  // def fA = Gr.fA; setring fA;
+  dimensionOfLocalization(Gr); // = 1
+}
+
+proc systemOfParametersOfLocalization(def L)
+"
+USAGE:    systemOfParametersOfLocalization(def L); L ideal or graalBearer
+RETURN:   ideal, a system of parameter of the localization A_L of A at L.
+EXAMPLE:  example systemOfParameterOfLocalization; shows an example
+"
+{
+  if (typeof(L)=="ideal")
+  {
+    graalBearer Gr = graalMixed(L);
+    return(systemOfParametersOfIdealInLocalization(I, Gr));
+  }
+  if (typeof(L)=="graalBearer")
+  {
+    graalBearer Gr = L;
+    def Ky = Gr.Ky; setring Ky;
+    int delta = dimensionOfLocalization(Gr);
+    int s = Gr.s;
+    int i,j;
+    ideal H1 = Gr.scriptIin;
+    for (i=1; i<=delta; i++)
+    {
+      poly lambda(i);
+      for (j=1; j<=s; j++)
+      {
+        int c(i)(j) = random(0,10000);
+        lambda(i) = lambda(i) + c(i)(j)*Y(j);
+      }
+      H1 = H1 + lambda(i);
+    }
+    H1 = std(H1);
+    while (dim(H1) != 0)
+    {
+      H1 = Gr.scriptIin;
+      for (i=1; i<=delta; i++)
+      {
+        for (j=1; j<=s; j++)
+        {
+          c(i)(j) = random(0,10000);
+          lambda(i) = lambda(i) + c(i)(j)*Y(j);
+        }
+        H1 = H1 + lambda(i);
+      }
+      H1 = std(H1);
+    }
+    def Q = Gr.Q; setring Q;
+    ideal J = Gr.J; ideal ret;
+    for (i=1; i<=delta; i++)
+    {
+      poly a(i);
+      for (j=1; j<=s; j++)
+        { a(i) = a(i)+c(i)(j)*J[i]; }
+      ret = ret + a(i);
+    }
+    def A = Gr.A; setring A;
+    return(std(fetch(Q,ret)));
+  }
+  ERROR("systemOfParametersOfLocalization: unexpected parameters");
+  return(0);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring Q = 0,(X(1),X(2)),dp;
+  ideal H = X(2)^2-(X(1)-1)*X(1)*(X(1)+1);
+  ideal J = X(1),X(2);
+  qring A = std(H);
+  ideal L = fetch(Q,J);
+  graalBearer Gr = graalMixed(L);
+  systemOfParametersOfLocalization(Gr); // = 1
+}
+
+
+/***
+ * returns true, if g only contains the last variuable.
+ * returns false otherwise.
+ **/
+static proc isPolyInLastVariable(poly g)
+{
+  int k = size(g);
+  int n = nvars(basering);
+  for (int i=1; i<=k; i++)
+  {
+    intvec v = leadexp(g[i]);
+    v = v[1..n-1];
+    if (sum(v)>0)
+    {
+      return (0);
+    }
+  }
+  return (1);
+}
+
+proc isLocalizationRegular(def L)
+"
+USAGE:    isLocalizationRegular(def L); L ideal or graalBearer
+RETURN:   int, 1 if the localization A_L of A at L is regular,
+               0 otherwise.
+EXAMPLE:  example isLocalizationRegular; shows an example
+"
+{
+  if (typeof(L)=="ideal")
+  {
+    graalBearer Gr = graalMixed(L);
+    return(isLocalizationRegular(Gr));
+  }
+  if (typeof(L)=="graalBearer")
+  {
+    graalBearer Gr = L;
+    def Ky = Gr.Ky; setring Ky;
+    ideal sscriptIin = Gr.scriptIin;
+    option(redSB);
+    sscriptIin = std(sscriptIin);
+    option(noredSB);
+    int i,j; poly gi; intvec expv;
+    int s = Gr.s;
+    for (i=1; i<=size(sscriptIin); i++)
+    {
+      gi = sscriptIin[i];
+      if (!isPolyInLastVariable(gi))
+      {
+        for (j=1; j<=size(gi); j++)
+        {
+          expv = leadexp(gi[i]);
+          if (sum(intvec(expv[1..s])) != 1)
+          { return(0); }
+        }
+      }
+    }
+    return(1);
+  }
+  ERROR("isLocalizationRegular: unexpected parameters");
+  return(0);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring Q = 0,(X(1),X(2)),dp;
+  ideal H = X(2)^2-(X(1)-1)*X(1)*(X(1)+1);
+  ideal J = X(1),X(2);
+  qring A = std(H);
+  ideal L = fetch(Q,J);
+  graalBearer Gr = graalMixed(L);
+  isLocalizationRegular(Gr); // = 1
+}
+
+
+/***
+ * returns the degree in Y
+ **/
+static proc yDeg(poly g, list #)
+{
+  int s;
+  if (size(#)>0 && typeof(#[1])=="int")
+    { s = #[1]; }
+  else
+    { s = numberOfYs(); }
+
+  intvec v = leadexp(g);
+  int d = 0;
+  for (int i=1; i<=s; i++)
+    { d = d+v[i]; }
+  return (d);
+}
+
+
+/***
+ * normalizes g such that LT_>(g)=Y^\alpha for some \alpha\in\NN^n.
+ **/
+proc normalizeInY(vector g, graalBearer Gr, list #)
+{
+  def origin = basering;
+  int s;
+  if (size(#)>0 && typeof(#[1])=="int")
+    { s = #[1]; }
+  else
+    { s = numberOfYs(); }
+
+  // get the coefficient before Y in the leading term
+  // first isolate the first non-zero component and computes its degree in Y
+  poly cg;
+  for (int i = 1; i<=nrows(g); i++)
+  {
+    if (g[i]!=0)
+    {
+      cg = g[i];
+      break;
+    }
+  }
+  int d = yDeg(cg,s);
+  // next, sum all terms with the same degree in Y
+  poly c = cg[1];
+  for (i = 2; i<=size(g); i++)
+  {
+    if (yDeg(cg[i],s)==d)
+      { c = c+cg[i]; }
+  }
+  // and substitute all Y with 1
+  for (i=1; i<=s; i++)
+    { c = subst(c,var(i),1); }
+
+  def Q0 = Gr.Q0;
+  setring Q0;
+  ideal J0 = Gr.J0;
+  ideal J0withC = imap(origin,c), J0;
+  list L = division(1,J0withC);
+
+  ASSUME(1,L[2]==0);
+  poly a = L[1][1,1];
+
+  kill J0;
+  kill J0withC;
+  kill L;
+  setring origin;
+  poly a = imap(Q0,a);
+
+  ideal scriptI = Gr.scriptI;
+  g = reduce(a*g,scriptI);
+
+  return (a,g);
+}
+
+
+/***
+ * removes all zero columns in matrix(G),
+ * and removes the corresponding columns in Q, if they exist.
+ **/
+static proc removeZeroColumns(module G, matrix Q)
+{
+  ASSUME(1,ncols(G)>ncols(Q));
+  module Gprime;
+  matrix Qprime[nrows(Q)][ncols(Q)];
+  int newSizeG = 0;
+  int newSizeQ = 0;
+
+  for (int i=1; i<=ncols(G); i++)
+  {
+    if (G[i]!=0)
+    {
+      newSizeG++;
+      Gprime[newSizeG] = G[i];
+      if (i<=ncols(Q))
+      {
+        newSizeQ++;
+        Qprime[1..nrows(Q),newSizeQ] = Q[1..nrows(Q),i];
+      }
+    }
+  }
+  matrix QQprime[nrows(Q)][newSizeQ] = Qprime[1..nrows(Q),1..newSizeQ];
+  return (Gprime,QQprime);
+}
+
+
+proc warkedPreimageStd(warkedModule wM)
+"
+USAGE:    warkedPreimageStd(wM); M warkedModule
+RETURN:   given wM consisting of:
+          - wM.Gr        a graalBearer containing all relevant global structures
+          - wM.modQ0y      generating set G of a module M over Q0y
+          - wM.stdmodQ0y   empty
+          - wM.qQ0y        empty
+          - wM.modKy       corresponding generating set H of M_in over Ky
+          - wM.stdmodKy    empty
+          - wM.qKy         empty
+          - wM.w           weights on M
+          returns the same warkedModule, except following differences:
+          - wM.stdmodQ0y   contains a subset G such that for any standard basis L of the kernel
+                           G + L is a standard basis of modQ0y + kernel
+          - wM.qQ0y        contains a transformation matrix such that
+                             stdmodAy = QAy*modQ0y
+          - wM.stdmodKy    contains a standardbasis of modKy
+          - wM.qKy         contains a transformation matrix such that
+                             stdmodKy = QKy*modKy
+NOTE:     the standard basis of modAy is computed by lifting a corresponding
+          Groebner basis of modKy
+EXAMPLE:  example warkedPreimageStd; shows an example
+"
+{
+  ASSUME(1,checkCorrespondence(wM));
+
+  graalBearer Gr = wM.Gr;
+  // intvec w = wM.w;
+
+  def Ky = Gr.Ky; setring Ky;
+  module H = wM.modKy;
+
+  /* add generators of the kernel to H */
+  int l = ncols(H);
+  int k = nrows(H);
+  int i,j;
+  ideal scriptIin = Gr.scriptIin;
+  H = H+freemodule(k)*scriptIin;
+
+  /* compute a standard basis of H
+   * and a corresponding transformation matrix */
+  matrix Qdash;
+  module Hdash = liftstd(H,Qdash);
+
+  /* drop factors before elements of scriptIin
+   * and single out all elements of Hdash
+   * whose leading monomial does not lie in scriptIin */
+  matrix QQ[l][size(Hdash)];
+  int ncolsQQ = 0;
+  module redLHdash = reduce(lead(Hdash),lead(scriptIin));
+  for (i=1; i<=size(Hdash); i++)
+  {
+    if (redLHdash[i] != 0)
+    {
+      ncolsQQ++;
+      QQ[1..l,ncolsQQ] = Qdash[1..l,i];
+    }
+  }
+  matrix Q[l][ncolsQQ] = QQ[1..l,1..ncolsQQ];
+  wM.qKy = Q;
+  wM.stdmodKy = Hdash;
+
+  def Q0y = Gr.Q0y; setring Q0y;
+  module G = wM.modQ0y;
+  matrix Q = imap(Ky,Q);
+  ideal scriptI = Gr.scriptI;
+  module Gdash = reduce(matrix(G)*Q,scriptI);
+  poly a;
+  for (i=1; i<=size(Gdash); i++)
+  {
+    a,Gdash[i] = normalizeInY(Gdash[i],Gr);
+    Q[1..l,i] = a*Q[1..l,i];
+  }
+  ASSUME(1,isStandardBases(Gdash));
+  Gdash = Gdash + freemodule(k)*scriptI;
+
+  Gdash = simplify(Gdash,32);
+  Gdash,Q = removeZeroColumns(Gdash,Q);
+
+
+  wM.qQ0y = Q;
+  wM.stdmodQ0y = Gdash;
+
+  return(wM);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring Q = 0,(x,y,z),dp;
+  ideal H = y2-xz;
+  qring A = std(H);
+  ideal L = x3-yz,x2y-z2;
+  graalBearer Gr = graalMixed(L);
+  def Q0y = Gr.Q0y; setring Q0y;
+
+  module M = (Y(1)*y+y^2-1)*gen(1)+(Y(2)*z+z^2-1)*gen(2), Y(1)*y*gen(1)+Y(2)*z*gen(2);
+  /* This is M: */
+  print(matrix(M));
+  intvec w = 1,1,1;
+  warkedModule wM;
+  wM.Gr = Gr;
+  wM.modQ0y = M;
+  wM.w = w;
+
+  def Ky = Gr.Ky; setring Ky;
+  module Min = (y^2-1)*gen(1)+(z^2-1)*gen(2),Y(1)*y*gen(1)+Y(2)*z*gen(2);
+  /* This is M_in: */
+  print(matrix(Min));
+  wM.modKy = Min;
+
+  /* warkedPreimageStd yields the same standard basis as std: */
+  warkedModule wN = warkedPreimageStd(wM); wN;
+  setring Q0y;
+  module stdM = std(M);
+  print(matrix(stdM));
+}
+
+proc markedResolution_print(markedResolution mr)
+{
+  graalBearer Gr = mr.Gr;
+
+  "resolution over Al:";
+  def Al = Gr.Al; setring Al;
+  resolution resAl = mr.resAl;
+  resAl;
+  for (int i=1; i<=ressize(resAl); i++)
+  {
+    "k="+string(i);
+    print(module(resAl[i]));
+    "";
+  }
+
+  "resolution over Graal:";
+  def Graal = Gr.Graal; setring Graal;
+  resolution resGraal = mr.resGraal;
+  resGraal;
+  for (i=1; i<=ressize(resGraal); i++)
+  {
+    "k="+string(i);
+    print(module(resGraal[i]));
+    "";
+  }
+}
+
+
+/***
+ * returns the size of a resolution.
+ **/
+static proc ressize(resolution res)
+{
+  for (int i=1; i<=size(res); i++)
+  {
+    if (res[i]==0)
+    {
+      return (i-1);
+    }
+  }
+  return (size(res));
+}
+
+
+/***
+ * given rh consisting of:
+ *  - rh.Gr          a graalBearer containing all relevant global structures
+ *  - rh.idealAl     a standard basis of an ideal I in Al
+ *  - rh.resAl       a resolution with only a single entry,
+ *                     generators of I corresponding to the generators of inI
+ *  - rh.resGraal    a resolution of inI, the initial ideal inI of I over Graal
+ *  - rh.weights     an empty list of weights for the modules in resAl
+ * liftRes lifts the given resolution of inI to a resolution of I
+ **/
+static proc liftRes(markedResolution rh)
+{
+  graalBearer Gr = rh.Gr;
+
+  /* before anything initiate a list with the generators of I
+     for the resolution over Al
+     and read out the resolution over Graal */
+  def Al = Gr.Al; setring Al;
+  ideal I = rh.idealAl;
+  list resAl = I;
+
+  def Graal = Gr.Graal; setring Graal;
+  resolution resGraal = rh.resGraal;
+  int k = ressize(resGraal);
+  ideal inI = resGraal[1];
+
+  /* before lifting the first segment of the resolution,
+     find suitable preimages of the generators of I and inI */
+  int i = 1;
+  def Ky = Gr.Ky; setring Ky;
+  ideal scriptIin = Gr.scriptIin;
+  ASSUME(1,reduce(std(scriptIin),scriptIin)==0); // check whether it is standard basis
+  attrib(scriptIin,"isSB",1);                    // and set corresponding flag to 1
+  ideal H(i) = imap(Graal,inI);
+  ASSUME(1,lead(H(i))==lead(reduce(H(i),scriptIin))); // H(i) should already be in reduced form,
+                                                      // since inI was a standard basis
+
+  def Q0y = Gr.Q0y; setring Q0y;
+  ideal scriptI = Gr.scriptI;
+  ASSUME(1,reduce(std(scriptI),scriptI)==0); // check whether it is standard basis
+  attrib(scriptI,"isSB",1);                  // and set corresponding flag to 1
+  ideal G(i) = imap(Al,I);
+  ASSUME(1,lead(G(i))==lead(reduce(G(i),scriptI))); // G(i) should already be in reduced form,
+                                                    // since I was a standard basis
+
+  /* lifting the first segment of the resolution,
+   * i.e. syzygies of the generators Theta of inI to
+   * syzygies of the generators Delta of I */
+
+  /* note that I already is already in standard bases form,
+   * which is why G(i)+scriptI is a standard bases */
+  /* next, we need a standard basis of the preimage of I */
+  setring Q0y;
+  ideal Gdash(i) = G(i) + scriptI;
+  ASSUME(2,isStandardBasis(Gdash(i)));
+  attrib(Gdash(i),"isSB",1);
+  matrix Q(i)[size(G(i))][size(Gdash(i))];
+  for (int j=1; j<=size(G(i)); j++)
+    { Q(i)[j,j]=1; }
+
+  for (i=2; i<=k; i++)
+  {
+    setring Graal;
+    module syzTheta = resGraal[i];
+
+    // pick homogeneous representatives of hs eta in syzTheta
+    setring Ky;
+    module H(i) = imap(Graal,syzTheta);
+    H(i) = reduce(H(i),scriptIin);
+
+    // lift them to gs in Q0y, substitute elements of G for the unit vectors
+    // and reduce the result
+    setring Q0y;
+    module G(i) = imap(Ky,H(i));
+    module R = matrix(G(i-1))*matrix(G(i));
+    R = reduce(R,scriptI);
+
+    // compute a standard representation of the remainder
+    // with respect to G'
+    list L = division(R,Gdash(i-1));
+    matrix D = L[1];
+    ASSUME(1,L[2]==0);
+    ASSUME(1,isDiagonalMatrixOfOnes(L[3]));
+
+    // correct the gs by our result
+    matrix QD = Q(i-1)*D;
+    G(i) = module(matrix(G(i))-QD);
+    setring Al;
+    resAl[i] = imap(Q0y,G(i));
+
+    // extend it to standard basis GDash(i)
+    // and transformation matrix for next step
+    warkedModule wM;
+    wM.Gr = Gr;
+
+    setring Ky;
+    wM.modKy = H(i);
+
+    setring Q0y;
+    wM.modQ0y = G(i);
+
+    wM = warkedPreimageStd(wM);
+    matrix Q(i) = wM.qQ0y;
+    module Gdash(i) = wM.modQ0y;
+
+    // cleanup
+    setring Graal;
+    kill syzTheta;
+    setring Q0y;
+    kill R;
+    kill L;
+    kill D;
+    kill QD;
+  }
+
+  setring Al;
+  rh.resAl = resolution(resAl);
+  return(rh);
+}
+
+
+/***
+ * Given two ideals with the same generators modulo ordering
+ * returns an intvec that respresents a permutation of the generators
+ **/
+static proc getPermutation(ideal I1, ideal I2)
+{
+  ASSUME(1,size(I1)==size(I2));
+  int i,j;
+  intvec perm;
+  for (i=1; i<=size(I1); i++)
+  {
+    for (j=1; j<=size(I2); j++)
+    {
+      if (I1[i]==I2[j])
+      {
+        perm[i] = j;
+      }
+    }
+  }
+  for (i=1; i<=size(perm); i++)
+  {
+    ASSUME(1,perm[i]>0);
+  }
+  return(perm);
+}
+
+
+/***
+ * Given an intvec representing a permutation,
+ * permutes the generators of the ideal.
+ **/
+static proc permuteGenerators(ideal I, intvec perm)
+{
+  ASSUME(1,size(I)==size(perm));
+  ideal J;
+  for (int i=1; i<=size(perm); i++)
+  {
+    J[i]=I[perm[i]];
+  }
+  return (J);
+}
+
+
+proc resolutionInLocalization(ideal I, def L)
+"
+USAGE:    resolutionInLocalization(I,L); I ideal, L ideal or graalBearer
+RETURN:   the resolution of I*A_L, where
+            A_L is the localization of the current basering (possibly a quotient ring)
+            at a prime ideal L.
+EXAMPLE:  example resolutionInLocalization; shows an example
+"
+{
+  if (typeof(L)=="ideal")
+  {
+    graalBearer Gr = graalMixed(L);
+    return(resolutionInLocalization(I,Gr));
+  }
+  if (typeof(L)=="graalBearer")
+  {
+    graalBearer Gr = L;
+    def origin = basering;
+    def Al = Gr.Al; setring Al;
+    ideal I = imap(origin,I);
+    I = std(I);
+    int s = Gr.s;
+    markedResolution mr;
+    mr.idealAl = I;
+    ideal inI = yinitial(I,s);
+    def Graal = Gr.Graal;
+    setring Graal;
+    ideal inI = Gr.ina(inI);
+    ASSUME(1,isStandardBasis(inI));
+    attrib(inI,"isSB",1);
+    resolution resInI = res(inI,0);
+    resInI = minres(resInI);
+    mr.Gr = Gr;
+    mr.resGraal = resInI;
+    ideal inJ = resInI[1];
+    intvec perm = getPermutation(inI,inJ);
+    setring Al;
+    mr.idealAl = permuteGenerators(I,perm);
+    mr = liftRes(mr);
+    return(mr);
+  }
+  ERROR("resolutionInLocalization: unexpected parameters");
+  return(0);
+}
+example
+{
+  ring Q = 0,(x,y,z,w),dp;
+  ideal circle = (x-1)^2+y^2-3,z;
+  ideal twistedCubic = xz-y2,yw-z2,xw-yz,z;
+  ideal I = std(intersect(circle,twistedCubic));
+
+  // the resolution is more complicated due to the twisted cubic
+  res(I,0);
+
+  // however if we localize outside of the twisted cubic,
+  // it should become very easy again.
+  ideal L = std(I+ideal(x-1));
+  graalBearer Gr = graalMixed(L); Gr;
+  markedResolution mr = resolutionInLocalization(I,Gr);
+  mr;
+}
+
+
+/***
+ * debug code
+ **/
+static proc isConstantUnit(poly p)
+{
+  return(cleardenom(p)==1);
+}
+static proc isConstantMultiple(vector v, vector w)
+{
+  module M = v,w;
+  M = simplify(M,8);
+  if (M[2]!=0)
+    { return(0); }
+  return(1);
+}
+static proc checkColumnsUpToUnits(matrix M, matrix N)
+{
+  if ((ncols(M)!=ncols(N)) && (nrows(M)!=nrows(N)))
+    { return(0); }
+  if (nrows(M)==0)
+    { return(1); }
+  int i,j;
+  vector v,w;
+  poly p,q;
+  for (i=ncols(M); i>0; i--)
+  {
+    v = M[i];
+    w = N[i];
+    if (!isConstantMultiple(v,w))
+      { return(0); }
+  }
+  return(1);
+}
+/***
+ * returns 1, if wM.modAy and wM.modKy correspond to each other
+ *   and wm.stdmodAy and wm.stdmodKy correspond to each other.
+ * returns 0 otherwise.
+ **/
+static proc checkCorrespondence(warkedModule wM)
+{
+  return (1);
+  graalBearer Gr = wM.Gr;
+  intvec w = wM.w;
+  def Ky = Gr.Ky;
+  setring Ky;
+  map Q0yToKy = Gr.Q0yToKy;
+  def Q0y = Gr.Q0y;
+  setring Q0y;
+
+  module G1 = wM.modQ0y;
+  if (G1 != 0)
+  {
+    G1 = vectorInitial(G1,w);
+    setring Ky;
+    module H10 = wM.modKy;
+    if (H10 != 0)
+    {
+      module H11 = Q0yToKy(G1);
+      if (matrix(H10)!=matrix(H11))
+      { return(0); }
+    }
+    setring Q0y;
+  }
+
+  module G2 = wM.stdmodQ0y;
+  if (G2 != 0)
+  {
+    G2 = vectorInitial(G2,w);
+    setring Ky;
+    module H20 = wM.stdmodKy;
+    if (H20 != 0)
+    {
+      module H21 = Q0yToKy(G2);
+      if (matrix(H20)!=matrix(H21))
+      { return(0); }
+    }
+  }
+
+  return(1);
+}
+/***
+ * checks whether U is a diagonal matrix consisting of 1's
+ **/
+static proc isDiagonalMatrixOfOnes(matrix U)
+{
+  if (nrows(U)!=ncols(U))
+    { return(0); }
+  int j,j;
+  for (i=1; i<=nrows(U); i++)
+  {
+    for (j=1; j<=ncols(U); j++)
+    {
+      if (i==j && U[i,j]!=number(1))
+        { return(0); }
+      if (i!=j && U[i,j]!=number(0))
+        { return(0); }
+    }
+  }
+  return(1);
+}
+/***
+ * returns 1 if I is a standard basis, returns 0 otherwise,
+ **/
+static proc isStandardBasis(ideal I)
+{
+  ideal LI = lead(std(I));
+  attrib(LI,"isSB",1);
+  ideal LII = lead(I);
+  attrib(LII,"isSB",1);
+  /* checks whether lead(I) generates the leading ideal */
+  if (simplify(reduce(LI,LII),2)!=0)
+  {
+    ERROR("isStandardBasis: input ideal no standard basis!");
+    return(0);
+  }
+  /* the following case should never happen mathematically,
+   * left the check for sake of completeness */
+  if (simplify(reduce(LII,LI),2)!=0)
+  {
+    ERROR("isStandardBasis: input ideal no standard basis!");
+    return(0);
+  }
+  return(1);
+}

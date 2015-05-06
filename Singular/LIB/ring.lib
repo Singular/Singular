@@ -982,9 +982,10 @@ static proc testIsQuotientRing()
 
 proc hasFieldCoefficient(def rng )
 "USAGE: hasFieldCoefficient ( rng );
-RETURN:  1 if the coeffcients form a field, 0 otherwise.
+RETURN:  1 if the coefficients form  (and are considered to be) a field, 0 otherwise.
 KEYWORDS: ring coefficients
 EXAMPLE: example hasFieldCoefficient; shows an example
+SEE ALSO: attrib
 "
 {
   return (attrib(rng,"ring_cf")==0);

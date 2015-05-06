@@ -20,6 +20,17 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+
+@itemize
+@item renamed algemodstd_lib to @nref{nfmodstd_lib}
+@item renamed derham_lib to @nref{deRhamlib}
+@item new library: graal_lib
+@item new library: deflation.lib
+@item new library:   maxlike.lib
+@item new library:   recover.lib
+@end itemize
+
+@heading News for version 4-0-2
 New commands:
 @itemize
 @item align (@nref{align})
@@ -35,7 +46,7 @@ Change in ring handling:
 New libraries:
 @itemize
 @item algemodstd.lib:  Groebner bases of ideals in polynomial rings
-      over algebraic number fields(@nref{algemodstd_lib})
+      over algebraic number fields(renamed to @nref{nfmodstd_lib})
 @item arr.lib: arrangements of hyperplanes (@nref{arr_lib})
 @item brillnoether.lib: Riemann-Roch spaces of divisors on curve (@nref{brillnoether_lib})
 @item hess.lib: Riemann-Roch space of divisors
@@ -81,7 +92,7 @@ improvements further extends that of the 3-1-6/7 prerelease series.
 New functionality
 
 @itemize
-@item de Rham cohomology of complements of algebraic varieties (@nref{derham_lib})
+@item de Rham cohomology of complements of algebraic varieties (@nref{deRham_lib})
 @item Gromov-Witten numbers of elliptic curves (@nref{ellipticcovers_lib})
 @item classification of isolated complete intersection singularities in characteristic 0 (@nref{classifyci_lib})
 @item parametrization of orbits of unipotent actions (@nref{orbitparam_lib})

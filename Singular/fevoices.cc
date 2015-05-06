@@ -34,6 +34,7 @@
 
 
 char fe_promptstr[] ="  ";
+FILE *File_Profiling=NULL;
 
 // output/print buffer:
 #define INITIAL_PRINT_BUFFER 24*1024L
@@ -457,6 +458,20 @@ static int fePrintEcho(char *anf, char */*b*/)
   {
     Print("{%d}",yylineno);
     mflush();
+  }
+  else if (traceit&TRACE_PROFILING)
+  {
+    if (File_Profiling==NULL)
+      File_Profiling=fopen("smon.out","a");
+    if (File_Profiling==NULL)
+      traceit &= (~TRACE_PROFILING);
+    else
+    {
+      if (currentVoice->filename==NULL)
+        fprintf(File_Profiling,"(none) %d\n",yylineno);
+      else
+        fprintf(File_Profiling,"%s %d\n",currentVoice->filename,yylineno);
+    }
   }
 #ifdef HAVE_SDB
   if ((blocknest==0)

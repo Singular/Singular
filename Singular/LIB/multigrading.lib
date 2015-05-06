@@ -3176,7 +3176,7 @@ EXAMPLE: example graver4ti2; shows an example
 //----------------------------------------------------------------------
 
 
-   j=system("sh","hilbert -q -n sing4ti2 >/dev/null 2>&1"); ////////// be quiet + no loggin!!!
+   j=system("sh","hilbert -q sing4ti2 >/dev/null 2>&1"); ////////// be quiet + no loggin!!!
 
    j=system("sh", "awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.hil " +
                 "| sed s/[\\\ \\\t\\\v\\\f]/,/g " +

@@ -98,7 +98,7 @@ void addLObject(LObject& h, kStrategy& strat)
 }
 
 
-ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
+ideal k_sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
 {
   const ring save = currRing;
   if( currRing != _currRing ) rChangeCurrRing(_currRing);
@@ -372,7 +372,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 ///////////////////////////////////////////////////////////////////////////////////////
 
 // Under development!!!
-ideal sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec * /*hilb*/, kStrategy strat, const ring _currRing)
+ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec * /*hilb*/, kStrategy strat, const ring _currRing)
 {
   const ring save = currRing;
   if( currRing != _currRing ) rChangeCurrRing(_currRing);
@@ -896,7 +896,7 @@ static int sca_mora_loop_count;
 #endif
 
 // ideal sca_mora (ideal F, ideal Q, intvec *w, intvec *, kStrategy strat)
-ideal sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec *, kStrategy strat, const ring _currRing)
+ideal k_sca_mora(const ideal F, const ideal Q, const intvec */*w*/, const intvec *, kStrategy strat, const ring _currRing)
 {
   const ring save = currRing;
   if( currRing != _currRing ) rChangeCurrRing(_currRing);

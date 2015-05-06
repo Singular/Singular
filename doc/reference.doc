@@ -307,6 +307,7 @@ considerably speed up computations.
 @cindex isSB
 @cindex isHomg
 @cindex rank
+@cindex ring_cf
 @cindex isCI
 @cindex isCM
 @cindex withSB
@@ -314,7 +315,7 @@ considerably speed up computations.
 @cindex withRes
 @cindex withDim
 @cindex withMult
-(isSB, isHomog, rank are used by the kernel, the other are used by libraries)
+(isSB, isHomog, rank, ring_cf are used by the kernel, the other are used by libraries)
 @table @code
 @item isSB
 the standard basis property is set by all commands computing a standard
@@ -329,6 +330,8 @@ complete intersection property
 Cohen-Macaulay property
 @item rank
 set/get the rank of a module (see @ref{nrows})
+@item ring_cf
+the coefficients of the polynomial ring are considered to be a ring
 @item withSB
 value of type ideal, resp.@: module, is std
 @item withHilb
@@ -5151,7 +5154,7 @@ simplifies modulo the current @code{qring} in all assignments.
 @cindex redSB, option
 @cindex reduced standard basis
 computes a reduced standard basis in any standard basis computation
-(in rings with global ior local orderings, See @ref{intered} for the discussion
+(in rings with global ior local orderings, See @ref{interred} for the discussion
 of reduced for local orderings))
 @c ---------
 @item @code{redTail}

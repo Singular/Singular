@@ -20,6 +20,7 @@ bug_tr627
 bug_tr630
 bug_tr634
 bug_tr640
+bug_tr641
 bug_tr650
 bug_tr657
 bug_tr659
@@ -39,7 +40,11 @@ bug_tr686
 bug_tr690
 bug_tr696
 bug_tr703
+bug_tr704
+bug_tr707
+bug_tr709
 bug_genus_etc
+conv_bi
 facstd
 fermat_gcd_1var
 fermat_gcd_2var

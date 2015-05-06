@@ -1,0 +1,872 @@
+//////////////////////////////////////////////////////////////////////////////
+version="version deflation.lib 4.0.2.0 30.03.2015 "; // $Id$
+category="Numerical Analysis";
+info="
+LIBRARY:  deflation.lib  Various deflation methods
+AUTHOR:  Adrian Koch (kocha at rhrk.uni-kl.de)
+
+REFERENCES:
+ - Jonathan Hauenstein, Bernard Mourrain, Agnes Szanto; Certifying isolated singular
+     points and their multiplicity structure
+ - Jonathan Hauenstein, Charles Wampler; Isosingular Sets and Deflation; published in
+     Foundations of Computational Mathematics, Volume 13, Issue 3, 2013, on pages 371-403
+ - Anton Leykin, Jan Verschelde, Ailing Zhao; Newtons method with deflation for isolated
+     singularities of polynomial systems; published in Theoretical Computer Science,
+     Volume 359, 2006, on pages 111-122
+
+PROCEDURES:
+ deflateHMS(F,ro,co,[..]);  deflation algorithm by Hauenstein, Mourrain, and Szanto
+ deflateHW1(F,ro,co);       isosingular deflation: uses determinants - by Hauenstein and Wampler
+ deflateHW2(F,rk,[..]);     isosingular deflation: strong, intrinsic - by Hauenstein and Wampler
+ deflateLVZ(F,rk,[..]);     deflation algorithm by Leykin, Verschelde, and Zhao
+
+KEYWORDS: deflation
+";
+
+
+LIB "linalg.lib";
+LIB "primdec.lib";
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////   Method C   //////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+static proc getLambda(matrix A, matrix B)
+{
+   //computes the composite matrix whose columns we use to augment the original
+   //polynomial system
+
+   matrix C=-adjoint(A)*B;
+   int c=ncols(C);
+   matrix L=transpose(C);
+   L=concat(L,diag(1,c));
+   return(transpose(L));
+}
+
+static proc process_choice_for_i(int a, int c)
+{
+   //a contains the choice, c is the maximum element of the set i = 1,...,c
+   //if a is -1, returns random value between 1 and c
+   //if a is  0, returns c
+   //if a  >  c, returns c
+   //if 1< a <c, returns a
+
+
+   if(a == -1)
+   {
+      return(random(1,c));
+   }
+
+   if(a == 0)
+   {
+      return(c);
+   }
+
+   if(a <= c)
+   {
+      if(a >= 1)
+      {
+         return(a);
+      }
+   }
+
+   if(a > c)
+   {
+      return(c);
+   }
+
+   ERROR("Input (to control the choice of which element of i to use) invalid." +
+   " Must be an integer >= -1");
+}
+
+static proc append_var_list(int nv, list RL, list VN)
+{
+   //nv the number of new variables, RL the ringlist, VN the new variable names and,
+   //possibly, the no brackets option
+
+   int nb;
+   if(VN[1] == "no parentheses")
+   {
+      nb=1;
+      VN=delete(VN,1);
+   }
+
+   int i;
+   list vl;
+
+   if(size(VN) < nv)
+   {
+      string st=VN[1];
+
+      if(nb == 0)
+      {
+         for(i=1; i<=nv; i++)
+         {
+            vl=vl+list(st+"("+string(i)+")");
+         }
+      }
+      if(nb == 1)
+      {
+         for(i=1; i<=nv; i++)
+         {
+            vl=vl+list(st+string(i));
+         }
+      }
+   }
+
+
+   if(size(VN) >= nv)
+   {
+      for(i=1; i<=nv; i++)
+      {
+         vl=vl+list(VN[i]);
+      }
+   }
+
+   RL[2]=RL[2]+vl;
+   return(RL);
+}
+
+static proc remove_constants(ideal H);
+{
+   //remove contants and scalar multiples from H
+   H=1,H;
+   H=simplify(H,2+4+8);
+   H=H[2..size(H)];
+   return(H);
+}
+
+static proc exhaust_options(ideal F, int a, matrix la, matrix J)
+{
+   int i;
+   int c=ncols(la);
+   matrix N[nrows(la)][1];
+   ideal H;
+   int sF=size(F);
+   for(i=1; i<=c; i++)
+   {
+      if(i == a)
+      {
+         //we already checked that one
+         i++;
+         continue;
+      }
+      N=submat(la,1..nrows(la),i);
+      H=ideal(J*N);
+      H=remove_constants(H);
+      F=F,H;
+      F=simplify(F,14);
+      if(size(F) > sF){ return(F); }
+   }
+   print("Deflation unsuccessful: return value is the (possibly simplified) original system.");
+   return(F);
+}
+
+proc deflateHMS(ideal F, intvec ro, intvec co, list #)
+"USAGE:   deflateHMS(F, ro, co [, m [, S ]]);
+         ideal F: system of polynomial equations
+         intvecs ro and co: contain the row (respectively column) indices of a full
+           rank submatrix of the Jacobian of F at the point at which you want to deflate F
+           (if the rank is 0, make ro and co equal to the intvec containing only 0)
+         integer m: parameter influencing a choice made in the algorithm
+         string (or list of strings) S: parameter(s) influencing the output
+RETURN:  ring: a ring containing the ideal AUGF, representing the augmented system
+REMARK:  This deflation method augments the given polynomial system to a system which is
+         defined in the original ring. However, if the rank is 0, we add additional
+         variables representing the entries of a random column vector L of length nv,
+         where nv is the number of variables of the original polynomial ring. The system F
+         is then augmented by the entries of J*L, where J is the Jacobian of F.
+         We use these additional variables, instead of just choosing some random numbers,
+         so that the user would have full control over the type of random numbers: one
+         can just substitute the variables later on.
+         For more information about this deflation method see
+         section 3 of Jonathan Hauenstein, Bernard Mourrain, Agnes Szanto; Certifying
+            isolated singular points and their multiplicity structure.
+         We use the integer c as defined in that paper. During the algorithm, we have to
+         choose a subset of {1,...,c}, which is then used to generate the augmentation
+         of F. In this implementation, we only use subsets containing exactly one element.
+         The choice can be controlled by the optional argument m.
+
+NOTE:    The optional argument m controls which element of {1,...,c} will be chosen during
+         the procedure:
+           if m is -1, the procedure chooses a random value between 1 and c
+           if m is  0, the procedure chooses c
+           if m  >  c, the procedure chooses c
+           if 1< m <c, the procedure chooses m
+         If no optional argument is given, the procedure chooses a random value.
+         if the given m leads the procedure to adding only polynomials which are 0 or
+         scalar multiples of the polynomials in the original system, the procedure
+         automatically goes through 1,...,c until something useful is added (or returns
+         the original system and prints a message if the deflation was unsuccessful).
+
+         With the optional argument S you can influence the names that will be given to
+         the additional variables.
+         If S is of type string, say \"L\", then the variable names will be L(1),...,L(nv).
+         If S is a list of strings, it should be of the following form:
+         [\"no parentheses\",] s_1 [,...,s_n]. If the list consists of two
+         elements \"no parentheses\" and \"L\", the variables are named as
+         above, but without the parentheses. If the list contains enough strings, that is
+         if you specify strings s_1,...,s_nv, then exactly these strings will be used as
+         the names of the variables. (If you specify less than nv names, only s_1 is used.
+         If you specify more than nv, only s_1,...,s_nv are used.)
+
+         The procedure does not check for naming conflicts prior to defining the
+         extended ring, so please make sure that there are none.
+
+         You should only specify an S if you have also specified an m.
+         If no S is given, the added variables are named L(1),...,L(nv).
+EXAMPLE: example deflateHMS; shows an example
+"
+{
+   int chi=-1;
+   if(size(#) > 0)
+   {
+      chi=#[1];
+   }
+   if(size(#) <= 1)
+   {
+      list VN="L";
+   }
+   if(size(#) == 2)
+   {
+      list VN=#[2];
+   }
+   if(size(#) > 2)
+   {
+      list VN=delete(#,1);
+   }
+
+   F=simplify(F,2+4+8);
+   matrix J=jacob(F);
+
+   int nv=nvars(basering);
+   def br=basering;
+   list RL=ringlist(br);
+
+   if( ro[1]*co[1] == 0 )
+   {
+      //ie if the rank is 0
+      //then we need a random vector
+      //so we construct a ring with additional variables, such that the random values
+      //can be chosen later on and substituted for these variables
+
+      RL=append_var_list(nv,RL,VN);
+      def bigR=ring(RL);
+      setring bigR;
+
+
+      matrix N[nv][1];
+      int i;
+      for(i=1; i<=nv; i++)
+      {
+         N[i,1]=var(nv+i);
+      }
+
+      matrix J=imap(br,J);
+      J=J*N;
+      ideal AUGF=imap(br,F);
+      AUGF=AUGF,ideal(J);
+      //int CHNG=nv;
+      export(AUGF);
+      //export(CHNG);
+      return(bigR);
+   }
+   else
+   {
+      intvec cc=complementary_ro_co_vecs(co,ncols(J));
+      matrix A=submat(J,ro,co);
+      matrix B=submat(J,ro,cc);
+      matrix la=getLambda(A,B);
+      int i=process_choice_for_i(chi,ncols(la));
+      matrix N[nrows(la)][1]=submat(la,1..nrows(la),i);
+
+      ideal H=ideal(J*N);
+      H=remove_constants(H);
+      int sF=size(F);
+      F=F,H;
+      F=simplify(F,14);
+      //gets rid of zero generators and copies of earlier listed generators
+      //and polys which are scalar multiples of earlier listed polys
+
+      if(size(F) == sF)
+      {
+         //we did not add a polynomial which is not 0 and not a scalar multiple
+         //of an earlier listed polynomial
+         F=exhaust_options(F,i,la,J);
+      }
+      def outR=ring(RL);
+      setring outR;
+      ideal AUGF=imap(br,F);
+      //int CHNG=0;
+      export(AUGF);
+      //export(CHNG);
+      return(outR);
+   }
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring ojika3=0,(x,y,z),dp;
+  ideal F=x+y+z-1, 2x3+5y2-10z+5z3+5, 2x+2y+z2-1;
+  intvec ro=1,2;
+  intvec co=1,3;
+  def R1=deflateHMS(F,ro,co);
+  R1;
+  setring R1;
+  AUGF;
+
+  ring cbms1=0,(x,y,z),dp;
+  ideal F=x3-yz, y3-xz, z3-xy;
+  ro=0;
+  co=0;
+  int m=-1;
+  def R2=deflateHMS(F,ro,co,m,"L");
+  R2;
+  setring R2;
+  AUGF;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////   Method B   //////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+static proc complementary_ro_co_vecs(intvec v, int m)
+{
+   intvec c;
+   intvec b;
+   int j;
+   b[m]=0;
+   int i;
+   for(i=1; i<=size(v); i++)
+   {
+      b[v[i]]=1;
+   }
+   for(i=1; i<=m; i++)
+   {
+      if(b[i] == 0)
+      {
+         j++;
+         c[j]=i;
+      }
+   }
+   return(c);
+}
+
+static proc certain_submats(matrix M, intvec ro, intvec co)
+{
+   //ro and co the row ,respectively column, indices of the matrix we want to have as
+   //part of the returned submatrices
+
+   list S;
+   intvec rn, cn;//the row and column indices used to obtain the next submatrix
+   intvec rc=complementary_ro_co_vecs(ro,nrows(M));
+   intvec cc=complementary_ro_co_vecs(co,ncols(M));
+   int sr=size(ro)+1;
+   int sc=size(co)+1;
+   int i,j;
+   for(i=1; i<=size(rc); i++)
+   {
+      rn=ro;
+      rn[sr]=rc[i];
+      for(j=1; j<=size(cc); j++)
+      {
+         cn=co;
+         cn[sc]=cc[j];
+         S = S + list(submat(M,rn,cn));
+      }
+   }
+   return(S);
+}
+
+static proc det_augment(ideal F, intvec ro, intvec co)
+{
+   //returns the polynomials with which we want to augment F
+   //namely the determinants of all r+1 x r+1 submatrices of the Jacobian of F
+   //containing the r x r submatrix specified by ro and co
+   matrix J=jacob(F);
+
+   if(ro[1]*co[1] == 0)
+   {
+      //meaning the rank is 0
+      //then return the 1x1 minors, that is the entries of J
+      return(ideal(J));
+   }
+
+   list S=certain_submats(J,ro,co);
+
+   ideal A=det(S[1]);
+   int i;
+   for(i=2; i<=size(S); i++)
+   {
+      A=A,det(S[i]);
+   }
+   return(A);
+}
+
+proc deflateHW1(ideal F, intvec ro, intvec co)
+"USAGE:   deflateHW1(F, ro, co);
+         ideal F: system of polynomial equations
+         intvecs ro and co: contain the row (respectively column) indices of a full
+           rank submatrix of the Jacobian of F at the point at which you want to deflate F
+           (if the rank is 0, make ro and co equal to the intvec containing only 0)
+RETURN:  ideal: an augmented polynomial system
+ASSUME:  ro and co have the same number of elements, say rk.
+REMARK:  This deflation method adds to F the determinants of the (rk+1) x (rk+1)
+         submatrices of the Jacobian of F containing the rows and columns specified in
+         ro and co
+EXAMPLE: example deflateHW1; shows an example
+"
+{
+   //does one iteration of deflation, then returns the augmented system
+   //ro and co the row, respectively column, indices of the matrix we want to have as
+   //part of the submatrices we use to augment F
+
+   ideal A=det_augment(F,ro,co);
+   F=F,A;
+   F=simplify(F,2+4+8);//erases the zeroes, copies, scalar multiples
+   return(F);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring ojika3=0,(x,y,z),dp;
+  ideal F=x+y+z-1, 2x3+5y2-10z+5z3+5, 2x+2y+z2-1;
+  intvec ro=1,2;//number of elements is rk=2
+  intvec co=1,3;
+  ideal AUGF=deflateHW1(F,ro,co);//considers 3x3 submatrices of the Jacobian J of F,
+  //that is J itself
+
+  AUGF;
+
+  //the only polynomial we added is the determinant of J
+  det(jacob(F));
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////   strong intrinsic deflation   /////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+static proc makeB(int N, int d)
+{
+   //fills an NxN matrix with newly added variables
+   //column by column, from left to right, each column from top to bottom
+
+   matrix B[N][N];
+   int i,j;
+   for(j=1; j<=N; j++)
+   {
+      for(i=1; i<=N; i++)
+      {
+         B[i,j]=var(N+(N-d)*d+(j-1)*N+i);
+      }
+   }
+   return(B);
+}
+
+static proc makeIX(int N, int d)
+{
+   //constructs the composite matrix which has the identity matrix on top and
+   //Xi on the bottom. Xi is filled with the newly added variables; column by column,
+   //from left to right, each column from top to bottom
+
+   matrix I=diag(1,d);
+   matrix X[N-d][d];
+   int i,j;
+   for(j=1; j<=d; j++)
+   {
+      for(i=1; i<=N-d; i++)
+      {
+         X[i,j]=var(N+(j-1)*(N-d)+i);
+      }
+   }
+   I=concat(I,transpose(X));
+   I=transpose(I);
+   return(I);
+}
+
+proc deflateHW2(ideal F, int rk, list #)
+"USAGE:   deflateHW2(F, rk [, SXi, SB]);
+         ideal F: system of polynomial equations
+         int rk: the rank of the Jacobian of F at the point at which you want to deflate
+         strings (or lists of strings) SXi, SB: parameters influencing the output
+
+RETURN:  ring: a ring containing the ideal AUGF, representing the augmented system
+
+REMARK:  This deflation method augments the given polynomial system to a system which is
+         defined in the original ring if rk = 0.
+         If rk > 0, the augmented system is defined in an extended ring and a random
+         matrix B is used in the computations. More precisely:
+         - rk*(nv-rk) new variables are added to the original ring
+         - the random matrix B has dimensions nv*nv
+
+NOTE:    If rk = 0: the returned ring R is the same as the basering.
+         If rk > 0: the returned ring R is the basering plus additional variables.
+         More precisely, we add rk*(nv-rk) + nv*nv variables, where nv is the number of
+         variables in the basering. They have the following purpose:
+         - the first rk*(nv-rk) correspond to the new variables of the extended ring
+           ( lets say that these variables are called Xi_1,...,Xi_(rk*(nv-rk)) )
+         - the last nv*nv variables correspond to the entries of the random matrix B
+         This way, you have more options: you can substitute the variables corresponding
+         to the entries of B by random numbers you generated yourself.
+
+         With the optional arguments you can influence the names that will be given to the
+         additional variables. If you give any optional arguments, you should give exactly
+         two of them. The first controls the names of the Xi_j, the second the names
+         of the entries of B.
+         If an optional argument is of type string, say \"X\", then the variable names
+         controlled by this argument will be X(1),...,X(# of variables).
+         If an optional argument is given as a list of strings, it should be of the
+         following form: [\"no parentheses\",] s_1 [,...,s_n]. If the list consists of two
+         elements \"no parentheses\" and \"X\", the variables are named as
+         above, but without the parentheses. If the list contains enough strings, that is
+         if you specify strings s_1,...,s_n with n=rk*(nv-rk) or n=nv*nv (depending on
+         which of the variable names are being controlled), then exactly these strings
+         will be used as the names of the variables. (If you specify less than n names,
+         only s_1 is used. If you specify more than n, only s_1,...,s_n are used.)
+
+         The procedure does not check for naming conflicts prior to defining the
+         extended ring, so please make sure that there are none.
+
+         If no optional arguments are given, the new variables are named X(1),...,X(rk+1),
+         the entries of B are named B(1),...,B(nv*(rk+1)).
+
+         As for the order in which B is filled with variables:
+         - B is filled with variables column by column, from left to right, filling the
+           columns from top to bottom
+
+EXAMPLE: example deflateHW2; shows an example
+"
+{
+   list vnb="B";
+   list vnxi="X";
+   if(size(#) > 0)
+   {
+      if(size(#) > 2)
+      {
+         ERROR("Too many optional arguments (there should be exactly two, if any).");
+      }
+      if(size(#) == 1)
+      {
+         ERROR("Too few optional arguments (there should be exactly two, if any).");
+      }
+
+      if(typeof(#[1]) != typeof(#[2]))
+      {
+         //ERROR("The optional arguments must be of the same type.");
+      }
+
+      vnb=#[2];
+      vnxi=#[1];
+   }
+
+   matrix J=jacob(F);
+   int N=ncols(J);//number of variables
+   int d=N-rk;
+
+   int nv=nvars(basering);
+   def br=basering;
+   list RL=ringlist(br);
+
+   if( rk > 0 )
+   {
+      RL=append_var_list((N-d)*d,RL,vnxi);
+      RL=append_var_list(N*N,RL,vnb);
+
+      def bigR=ring(RL);
+      setring bigR;
+
+      matrix J=imap(br,J);
+      matrix B=makeB(N,d);
+      matrix IX=makeIX(N,d);
+      J=J*B*IX;
+
+      ideal AUGF=imap(br,F);
+      AUGF=AUGF,ideal(J);
+      AUGF=simplify(AUGF,2+4+8);//remove zeroes, copies, scalar multiples
+      export(AUGF);
+      return(bigR);
+   }
+
+   if( rk == 0 )
+   {
+      def outR=ring(RL);
+      setring outR;
+
+      matrix J=imap(br,J);
+      ideal AUGF=imap(br,F);
+      AUGF=AUGF,ideal(J);
+      AUGF=simplify(AUGF,2+4+8);
+      export(AUGF);
+      return(outR);
+   }
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring ojika3=0,(x,y,z),dp;
+  ideal F=x+y+z-1, 2x3+5y2-10z+5z3+5, 2x+2y+z2-1;
+  int rk=2;
+  list L="X",list("no parentheses", "B");
+  def R=deflateHW2(F,rk,L);
+  R;
+  setring R;
+  AUGF;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////   Method A   //////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+proc deflateLVZ(ideal F, int rk, list #)
+"USAGE:   deflateLVZ(F, rk [, Sl, SB, Sh]);
+         ideal F: system of polynomial equations
+         int rk: the rank of the Jacobian of F at the point at which you want to deflate
+         strings (or lists of strings) Sl, SB, Sh: parameters influencing the output
+
+RETURN:  ring: a ring containing the ideal AUGF, representing the augmented system
+
+REMARK:  This deflation method augments the given polynomial system to a system defined
+         in an extended polynomial ring (new variables: lambda_i), and uses two random
+         elements in its computations: a matrix B and a (column) vector h.
+         More precisely:
+         - the original polynomial ring is extended by rk+1 variables
+         - the random matrix B has dimensions nv x rk+1, where nv is the number of
+           variables in the original ring
+         - the random vector h has length rk+1
+
+NOTE:    The returned ring R is the same as the basering plus additional variables.
+         More precisely, we add (nv+2)*(rk+1) variables, where nv is the number of
+         variables in the basering. They have the following purpose:
+         - the first rk+1 correspond to the variables lambda_i of the extended ring
+         - the next nv*(rk+1) variables correspond to the entries of the random matrix B
+         - the last rk+1 variables correspond to the entries of the random vector h
+         This way, the user has more options: he can substitute the variables
+         corresponding to the random elements by random numbers he generated himself.
+
+         With the optional arguments you can influence the names that will be given to the
+         additional variables. If you give any optional arguments, you should give exactly
+         three of them. The first controls the names of the lambda_i, the second the names
+         of the entries of B, and the third controls the names given to the entries of h.
+         If an optional argument is of type string, say \"X\", then the variable names
+         controlled by this argument will be X(1),...,X(# of variables).
+         If an optional argument is given as a list of strings, it should be of the
+         following form: [\"no parentheses\",] s_1 [,...,s_n]. If the list consists of two
+         elements \"no parentheses\" and \"X\", the variables are named as
+         above, but without the parentheses. If the list contains enough strings, that is
+         if you specify strings s_1,...,s_n with n=rk+1 or n=nv*(rk+1) (depending on which
+         of the variable names are being controlled), then exactly these strings will be
+         used as the names of the variables. (If you specify less than n names, only s_1
+         is used. If you specify more than n, only s_1,...,s_n are used.)
+
+         The procedure does not check for naming conflicts prior to defining the
+         extended ring, so please make sure that there are none.
+
+         If no optional arguments are given, the new variables are named l(1),...,l(rk+1),
+         the entries of B are named B(1),...,B(nv*(rk+1)), and the entries of h are named
+         h(1),...,h(rk+1).
+
+         As for the order in which B and h are filled with variables:
+         - B is filled with variables column by column, from left to right, filling the
+           columns from top to bottom
+         - the column vector h is filled from top to bottom
+
+EXAMPLE: example deflateLVZ; shows an example
+"
+{
+   if(size(#) != 3)
+   {
+      if(size(#) != 0)
+      {
+         ERROR("If any optional arguments are given, there have to be exactly three of them.");
+      }
+      list Vl="l";
+      list VB="B";
+      list Vh="h";
+   }
+
+   if(size(#) == 3)
+   {
+      list Vl=#[1];
+      list VB=#[2];
+      list Vh=#[3];
+   }
+
+
+
+   matrix J=jacob(F);
+
+   def br=basering;
+   list RL=ringlist(basering);
+   int nv=nvars(basering);
+   RL=append_var_list(rk+1,RL,Vl);
+   RL=append_var_list( nv*(rk+1) ,RL,VB);
+   RL=append_var_list(rk+1,RL,Vh);
+
+   def outr=ring(RL);
+   setring outr;
+   matrix J=imap(br,J);
+   ideal F=imap(br,F);
+
+   matrix B[nv][rk+1];
+   int ii,jj;
+   for(jj=1; jj<=rk+1; jj++)
+   {
+      for(ii=1; ii<=nv; ii++)
+      {
+         B[ii,jj]=var( nv+rk+1 + (jj - 1)*(rk+1) + ii );
+      }
+   }
+
+   matrix la[rk+1][1];
+   for(ii=1; ii<=rk+1; ii++)
+   {
+      la[ii,1]=var( nv + ii );
+   }
+
+   matrix h[rk+1][1];
+   for(ii=1; ii<=rk+1; ii++)
+   {
+      h[ii,1]=var( nv+rk+1 + nv*(rk+1) + ii );
+   }
+
+   matrix C=J*B;
+   ideal G=ideal(C*la);
+   matrix H=transpose(la)*h;
+   kill h;
+   poly h=H[1,1]-1;
+
+   ideal AUGF=F,G,h;
+   export(AUGF);
+   return(outr);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring ojika3=0,(x,y,z),dp;
+  ideal F=x+y+z-1, 2x3+5y2-10z+5z3+5, 2x+2y+z2-1;
+  int rk=2;
+  list L="l",list("no parentheses", "B"), list("ha","he","ho");
+  def R=deflateLVZ(F,rk,L);
+  R;
+  setring R;
+  AUGF;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////   Examples   //////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//These are some benchmark-examples. You can find most of them in the literature listed
+//under references.
+//Every examples listed consists of a polynomial system of equations and one ore two
+//points at which we want to deflate the system. The examples which are given
+//exactly can be handled with Singular (that is, symbolically). However, the purpose of
+//the procedures in this library is to use information which was computed numerically
+//- such as the (numerical) rank of the Jacobian of the polynomial system at a certain
+//point -
+//and then do symbolical manipulations of the polynomial system in order to deflate it.
+//For the Cyclic-9 problem, for example, you will probably want to compute the necessary
+//information numerically.
+/*
+
+ring cbms1=0,(x,y,z),dp;
+list p=0,0,0;
+ideal F=x3-yz, y3-xz, z3-xy;
+
+
+ring cbms2=0,(x,y,z),dp;
+list p=0,0,0;
+ideal F=x3-3x2y+3xy2-y3-z2, z3-3z2x+3zx2-x3-y2, y3-3y2z+3yz2-z3-x2;
+
+
+ring mth191=0,(x,y,z),dp;
+list p=0,1,0;
+ideal F=x3+y2+z2-1, x2+y3+z2-1, x2+y2+z3-1;
+
+
+ring decker2=0,(x,y),dp;
+list p=0,0;
+ideal F=x+y3, x2y-y4;
+
+
+ring ojika2=0,(x,y,z),dp;
+list p=0,0,1;
+list q=1,0,0;
+ideal F=x2+y+z-1, x+y2+z-1, x+y+z2-1;
+
+
+ring ojika3=0,(x,y,z),dp;
+list p=0,0,1;
+list q=poly(-5)/2,poly(5)/2,1;
+ideal F=x+y+z-1, 2x3+5y2-10z+5z3+5, 2x+2y+z2-1;
+
+
+ring caprasse=(0,a),(x,y,z,w),dp;
+minpoly=a2+3;
+list p=2,-a,2,a;
+ideal F=-x3z + 4xy2z + 4x2yw + 2y3w + 4x2 - 10y2 + 4xz - 10yw + 2,
+-xz3 + 4yz2w + 4xzw2 + 2yw3 + 4xz + 4z2 - 10yw - 10w2 + 2,
+y2z + 2xyw - 2x - z, 2yzw + xw2 - x - 2z;
+
+
+ring KSS=0,x(1..5),dp;
+int i; ideal F; poly f;
+poly g=sum(maxideal(1));
+for(i=1; i<=5; i++)
+{
+   f=var(i)^2 + g - 2*var(i) - 4;
+   F=F,f;
+}
+F=simplify(F,2);
+list p=1,1,1,1,1;
+
+
+
+ring C9=(0,I),(x0,x1,x2,x3,x4,x5,x6,x7,x8),dp;
+ideal F=x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8,
+
+  x0*x1 + x1*x2 + x2*x3 + x3*x4 + x4*x5 + x5*x6 + x6*x7 + x7*x8 + x8*x0,
+
+  x0*x1*x2 + x1*x2*x3 + x2*x3*x4 + x3*x4*x5 + x4*x5*x6 + x5*x6*x7
++ x6*x7*x8 + x7*x8*x0 + x8*x0*x1,
+
+  x0*x1*x2*x3 + x1*x2*x3*x4 + x2*x3*x4*x5 + x3*x4*x5*x6 + x4*x5*x6*x7
++ x5*x6*x7*x8 + x6*x7*x8*x0 + x7*x8*x0*x1 + x8*x0*x1*x2,
+
+  x0*x1*x2*x3*x4 + x1*x2*x3*x4*x5 + x2*x3*x4*x5*x6 + x3*x4*x5*x6*x7
++ x4*x5*x6*x7*x8 + x5*x6*x7*x8*x0 + x6*x7*x8*x0*x1 + x7*x8*x0*x1*x2
++ x8*x0*x1*x2*x3,
+
+  x0*x1*x2*x3*x4*x5 + x1*x2*x3*x4*x5*x6 + x2*x3*x4*x5*x6*x7 + x3*x4*x5*x6*x7*x8
++ x4*x5*x6*x7*x8*x0 + x5*x6*x7*x8*x0*x1 + x6*x7*x8*x0*x1*x2 + x7*x8*x0*x1*x2*x3
++ x8*x0*x1*x2*x3*x4,
+
+  x0*x1*x2*x3*x4*x5*x6 + x1*x2*x3*x4*x5*x6*x7 + x2*x3*x4*x5*x6*x7*x8
++ x3*x4*x5*x6*x7*x8*x0 + x4*x5*x6*x7*x8*x0*x1 + x5*x6*x7*x8*x0*x1*x2
++ x6*x7*x8*x0*x1*x2*x3 + x7*x8*x0*x1*x2*x3*x4 + x8*x0*x1*x2*x3*x4*x5,
+
+  x0*x1*x2*x3*x4*x5*x6*x7 + x1*x2*x3*x4*x5*x6*x7*x8 + x2*x3*x4*x5*x6*x7*x8*x0
++ x3*x4*x5*x6*x7*x8*x0*x1 + x4*x5*x6*x7*x8*x0*x1*x2 + x5*x6*x7*x8*x0*x1*x2*x3
++ x6*x7*x8*x0*x1*x2*x3*x4 + x7*x8*x0*x1*x2*x3*x4*x5 + x8*x0*x1*x2*x3*x4*x5*x6,
+
+  x0*x1*x2*x3*x4*x5*x6*x7*x8 - 1;
+poly z0= poly(-9396926) - 3520201*I; z0=z0/10000000;
+poly z1=poly(-24601472) - 8954204*I; z1=z1/10000000;
+poly z2= poly(-3589306) - 1306401*I; z2=z2/10000000;
+list p=z0,z1,z2,z0,-z2,-z1,z0,-z2,-z1;
+
+
+ring DZ1=0,(x,y,z,w),dp;
+list p=0,0,0,0;
+ideal F=x4-yzw, y4-xzw, z4-xyw, w4-xyz;
+
+
+ring DZ2=0,(x,y,z),dp;
+list p=0,0,-1;
+ideal F=x4, x2y+y4, z+z2-7x3-8x2;
+
+*/

@@ -9,6 +9,7 @@
 // #include <kernel/mod2.h>
 #include <coeffs/numbers.h>
 #include <polys/monomials/p_polys.h>
+#include <omalloc/omallocClass.h>
 //#include "tgb_internal.h"
 
 class slimgb_alg;
@@ -38,7 +39,8 @@ class tgb_matrix{
   int non_zero_entries(int row);
 };
 
-class mac_poly_r{
+class mac_poly_r :public omallocClass
+{
 public:
   number coef;
   mac_poly_r* next;

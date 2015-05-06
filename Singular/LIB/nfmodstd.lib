@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="version algemodstd.lib 4.0.1.0 Sep_2014 ";  // $Id$
+version="version nfmodstd.lib 4.0.1.0 Sep_2014 ";  // $Id$
 category="Commutative Algebra";
 info="
 
-LIBRARY:   algemodstd.lib  Groebner bases of ideals in polynomial rings
+LIBRARY:   nfmodstd.lib  Groebner bases of ideals in polynomial rings
                            over algebraic number fields
 AUTHORS:   D.K. Boku       boku@mathematik.uni-kl.de
 @*         W. Decker       decker@mathematik.uni-kl.de
@@ -32,7 +32,7 @@ REFERENCES:
 
 PROCEDURES:
   chinrempoly(l,m);       chinese remaindering for polynomials
-  algemodStd(I);          standard basis of I over algebraic number field using modular methods
+  nfmodStd(I);          standard basis of I over algebraic number field using modular methods
 ";
 
 LIB "modstd.lib";
@@ -442,7 +442,7 @@ static proc modStdparallelized(ideal I)
     /* save options */
     intvec opt = option(get);
     option(redSB);
-    I = modular("Algemodstd::LiftPolyCRT", list(I), PrimeTestTask, Modstd::deleteUnluckyPrimes_std,
+    I = modular("Nfmodstd::LiftPolyCRT", list(I), PrimeTestTask, Modstd::deleteUnluckyPrimes_std,
               PtestStd, Modstd::finalTest_std,536870909);
     attrib(I, "isSB", 1);
     option(set,opt);
@@ -451,14 +451,14 @@ static proc modStdparallelized(ideal I)
 
 ////////////////////////////////////////////////////////////////////////////////
 /* main procedure */
-proc algemodStd(ideal I, list #)
-"USAGE:  algemodStd(I, #); I ideal, # optional parameters
+proc nfmodStd(ideal I, list #)
+"USAGE:  nfmodStd(I, #); I ideal, # optional parameters
 RETURN:  standard basis of I over algebraic number field
 NOTE: The procedure passes to @ref{modStd} if the ground field has no
       parameter. In this case, the optional parameters # (if given)
       are directly passed to @ref{modStd}.
 SEE ALSO: modStd
-EXAMPLE: example algemodStd; shows an example
+EXAMPLE: example nfmodStd; shows an example
 "
 {
     list L=#;
@@ -511,15 +511,15 @@ example
     ring r1 =(0,a),(x,y),dp;
     minpoly =a^2+1;
     ideal k=(a/2+1)*x^2+2/3y, 3*x-a*y+ a/7+2;
-    ideal I=algemodStd(k);
+    ideal I=nfmodStd(k);
     I;
     ring r2 =(0,a),(x,y,z),dp;
     minpoly =a^3 +2;
     ideal k=(a^2+a/2)*x^2+(a^2 -2/3*a)*yz, (3*a^2+1)*zx-(a+4/7)*y+ a+2/5;
-    ideal IJ=algemodStd(k);
+    ideal IJ=nfmodStd(k);
     IJ;
     ring r3=0,(x,y),dp;// ring without parameter
     ideal I = x2 + y, xy - 7y + 2x;
-    I=algemodStd(I);
+    I=nfmodStd(I);
     I;
 }

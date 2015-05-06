@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////
-version="version gitfan.lib 4.0.0.0 Jun_2013 ";  // $Id$
+version="version gitfan.lib 4.0.2.0 Apr_2015 ";  // $Id$
 category="Algebraic Geometry";
 info="
 LIBRARY:  gitfan.lib       Compute GIT-fans.
@@ -39,8 +39,10 @@ static proc int2face(int n, int r)
   intvec v;
   int n0 = n;
 
-  while(n0 > 0){
-    while(2^k > n0){
+  while(n0 > 0)
+  {
+    while(2^k > n0)
+    {
       k--;
       //v[size(v)+1] = 0;
     }
@@ -68,15 +70,18 @@ EXAMPLE: example isaface; shows an example
   poly pz;
 
   // special case: gam0 is the zero-cone:
-  if (size(gam0) == 1 and gam0[1] == 0){
+  if (size(gam0) == 1 and gam0[1] == 0)
+  {
     ideal G;
 
     // is an a-face if and only if RL0(0,...,0) = const
     // set all entries to 0:
     int i;
-    for (int k = 1; k <= size(a); k++) {
+    for (int k = 1; k <= ncols(a); k++)
+    {
       pz = subst(a[k], var(1), 0);
-      for (i = 2; i <= nvars(basering); i++) {
+      for (i = 2; i <= nvars(basering); i++)
+      {
         pz = subst(pz, var(i), 0);
       }
       G = G, pz;
@@ -85,7 +90,8 @@ EXAMPLE: example isaface; shows an example
     G = std(G);
 
     // monomial inside?:
-    if(1 == G){
+    if(1 == G)
+    {
       return(0);
     }
 
@@ -94,29 +100,31 @@ EXAMPLE: example isaface; shows an example
 
 
   // ring is too big: Switch to KK[T_i; e_i\in gam0] instead:
+  def R = basering;
   string initNewRing = "ring Rgam0 = 0,(";
-
-  for (int i=1; i<size(gam0); i++){
+  for (int i=1; i<size(gam0); i++)
+  {
     initNewRing = initNewRing + string(var(gam0[i])) + ",";
   }
-
   initNewRing = initNewRing + string(var(gam0[size(gam0)])) + "),dp;";
-  def R = basering;
   execute(initNewRing);
+  kill i;
 
   ideal agam0 = imap(R,a);
 
   poly p = var(1); // first entry of g; p = prod T_i with i element of g
-  for ( i = 2; i <= nvars(basering); i++ ) {
-      p = p * var(i);
-    }
+  for (int i = 2; i <= nvars(basering); i++ )
+  {
+    p = p * var(i);
+  }
   // p is now the product over all T_i, with e_i in gam0
 
   agam0 = agam0, p - 1; // rad-membership
   ideal G = std(agam0);
 
   // does G contain 1?, i.e. is G = 1?
-  if(G <> 1) {
+  if(G <> 1)
+  {
     return(1); // true
   }
 
@@ -139,25 +147,29 @@ example
 
 ////////////////////////////////////////////////////
 
-proc afacesPart(ideal a, int d, int start, int end, int r){
+proc afacesPart(ideal a, int d, int start, int end, int r)
+{
   intvec gam0;
   int i;
   list AF;
 
-  for(i = start; i <= end; i++){
-    if(i < 2^r){
+  for(i = start; i <= end; i++)
+  {
+    if(i < 2^r)
+    {
       gam0 = int2face(i,r);
 
       // take gam0 only if it has
       // at least d rays:
-      if(size(gam0) >= d){
-        if (isAface(a,gam0)){
+      if(size(gam0) >= d)
+      {
+        if (isAface(a,gam0))
+        {
           AF[size(AF) + 1] = gam0;
         }
       }
     }
   }
-
   return(AF);
 }
 
@@ -177,11 +189,13 @@ EXAMPLE: example afaces; shows an example
   int d = 1;
   int ncores = 1;
 
-  if ((size(#) > 0) and (typeof(#[1]) == "int")){
+  if ((size(#) > 0) and (typeof(#[1]) == "int"))
+  {
     d = #[1];
   }
 
-  if ((size(#) > 1) and (typeof(#[2]) == "int")){
+  if ((size(#) > 1) and (typeof(#[2]) == "int"))
+  {
     ncores = #[2];
   }
 
@@ -191,7 +205,8 @@ EXAMPLE: example afaces; shows an example
 
   // check if 0 is an a-face:
   gam0 = 0;
-  if (isAface(a,gam0)){
+  if (isAface(a,gam0))
+  {
       AF[size(AF) + 1] = gam0;
   }
 
@@ -201,7 +216,8 @@ EXAMPLE: example afaces; shows an example
   int i;
 
   list args;
-  for(int k = 0; k < ncores; k++){
+  for(int k = 0; k < ncores; k++)
+  {
     args[size(args) + 1] = list(a, d, k * step + 1, (k+1) * step, r);
   }
 
@@ -209,21 +225,25 @@ EXAMPLE: example afaces; shows an example
   list out = parallelWaitAll(command, args);
 
   // do remaining ones:
-  for(i = ncores * step +1; i < 2^r; i++){
+  for(i = ncores * step +1; i < 2^r; i++)
+  {
     "another one needed";
     gam0 = int2face(i,r);
 
     // take gam0 only if it has
     // at least d rays:
-    if(size(gam0) >= d){
-      if (isAface(a,gam0)){
+    if(size(gam0) >= d)
+    {
+      if (isAface(a,gam0))
+      {
         AF[size(AF) + 1] = gam0;
       }
     }
   }
 
   // read out afaces of out into AF:
-  for(i = 1; i <= size(out); i++){
+  for(i = 1; i <= size(out); i++)
+  {
     AF = AF + out[i];
   }
 
@@ -302,15 +322,18 @@ EXAMPLE: example orbitCones; shows an example
 {
   list AF;
 
-  if((size(#) > 1) and (typeof(#[2]) == "int")){
+  if((size(#) > 1) and (typeof(#[2]) == "int"))
+  {
     AF = afaces(a, nrows(Q), #[2]);
-  } else
+  }
+  else
   {
     AF = afaces(a, nrows(Q));
   }
 
   int dimensionBound = 0;
-  if((size(#) > 0) and (typeof(#[1]) == "int")){
+  if((size(#) > 0) and (typeof(#[1]) == "int"))
+  {
     dimensionBound = #[1];
   }
 
@@ -318,20 +341,26 @@ EXAMPLE: example orbitCones; shows an example
   intvec gam0;
   int j;
 
-  for(int i = 1; i <= size(AF); i++){
+  for(int i = 1; i <= size(AF); i++)
+  {
     gam0 = AF[i];
 
-    if(gam0 == 0){
+    if(gam0 == 0)
+    {
       bigintmat M[1][nrows(Q)];
-    } else {
+    }
+    else
+    {
       bigintmat M[size(gam0)][nrows(Q)];
-      for (j = 1; j <= size(gam0); j++){
+      for (j = 1; j <= size(gam0); j++)
+      {
         M[j,1..ncols(M)] = Q[1..nrows(Q),gam0[j]];
       }
     }
     cone c = coneViaPoints(M);
 
-    if((dimension(c) >= dimensionBound) and (!(listContainsCone(OC, c)))){
+    if((dimension(c) >= dimensionBound) and (!(listContainsCone(OC, c))))
+    {
       OC[size(OC)+1] = c;
     }
 
@@ -368,10 +397,12 @@ EXAMPLE: example gitCone; shows an example
   list OC =  orbitCones(a, Q);
   cone lambda = nrows(Q);
 
-  for(int i = 1; i <= size(OC); i++){
+  for(int i = 1; i <= size(OC); i++)
+  {
     cone c = OC[i];
 
-    if(containsInSupport(c, w)){
+    if(containsInSupport(c, w))
+    {
       lambda = convexIntersection(lambda, c);
     }
 
@@ -516,28 +547,33 @@ example
 // Computes all simplicial orbit cones
 // w.r.t. the 0-ideal:
 
-static proc simplicialToricOrbitCones(bigintmat Q){
+static proc simplicialToricOrbitCones(bigintmat Q)
+{
   intvec gam0;
   list OC;
   cone c;
   int r = ncols(Q);
   int j;
 
-  for(int i = 1; i < 2^r; i++ ){
+  for(int i = 1; i < 2^r; i++ )
+  {
     gam0 = int2face(i,r);
 
     // each simplicial cone is generated by
     // exactly nrows(Q) many columns of Q:
-    if(size(gam0) == nrows(Q)){
+    if(size(gam0) == nrows(Q))
+    {
       bigintmat M[size(gam0)][nrows(Q)];
 
-      for(j = 1; j <= size(gam0); j++){
+      for(j = 1; j <= size(gam0); j++)
+      {
         M[j,1..ncols(M)] = Q[1..nrows(Q),gam0[j]];
       }
 
       c = coneViaPoints(M);
 
-      if((dimension(c) == nrows(Q)) and (!(listContainsCone(OC, c)))){
+      if((dimension(c) == nrows(Q)) and (!(listContainsCone(OC, c))))
+      {
         OC[size(OC)+1] = c;
       }
 

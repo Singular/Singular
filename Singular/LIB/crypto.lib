@@ -3,7 +3,8 @@ version="version crypto.lib 4.0.0.1 Aug_2014 "; // $Id$
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
-AUTHOR:                  Gerhard Pfister, pfister@mathematik.uni-kl.de
+AUTHORS:                 Gerhard Pfister, pfister@mathematik.uni-kl.de
+@*                       David Brittinger, dativ@gmx.net
 
 OVERVIEW:
      The library contains procedures to compute the discrete logarithm,
@@ -47,11 +48,41 @@ PROCEDURES:
  generateG(a,b,m)           m-th division polynomial of y^2=x^3+a*x+b  over Z/N
  factorLenstraECM(N,S,B,[]) Lenstra's factorization
  ECPP(N)                    primaly-test of Goldwasser-Kilian
+ calculate_ordering(num1, primitive, mod1)    Calculates x so that primitive^x == num1 mod mod1
+  is_primitive_root(primitive, mod1) Checks if primitive is a primitive root modulo mod1
+  find_first_primitive_root(mod1) Returns the first primitive root modulo mod1, starting with 1
+  binary_add(binary_list)         Adds a 1 to a binary encoded list
+  inverse_modulus(num,mod1)       Finds a t so that t*num = 1 mod mod1
+  is_prime(n)                     Checks if n is prime
+  proc find_biggest_index(a)      Returns the index of the biggest element of a
+  find_index(a,e)                 Returns the list index of element e in list a. Returns 0 if e is not in a
+  subset_sum01(list knapsack, int solution)                          solves the subset-sum-knapsack-problem by calculating all subsets and choosing the right solution
+  subset_sum02(list knapsack, int sol)                            solves the subset-sum-knapsack-problem with a naive greedy algorithm
+  unbounded_knapsack(list knapsack, list profit, int capacity)                solves the unbounded_knapsack-problem, needing a list of knapsack weights, a list of profits and a capacity
+  multidimensional_knapsack(matrix m, list capacities, list profits)              solves the multidimensional_knapsack-problem by using the PECH algorithm, needing a weight matrix m, a list of capacities and a list of profits
+  naccache_stern_generation(int key, int primenum)                      generates a hard knapsack for the Naccache-Stern Kryptosystem for given key and prime modulus
+  naccache_stern_encryption(list knapsack, list message, int primenum)            encrypts a message with the Naccache-Stern Kryptosystem, using a hard knapsack, a message encoded as binary list and a prime modulus
+  naccache_stern_decryption(list knapsack, int key, int primenum, int message)        decrypts a message with the Naccache-Stern Kryptosystem, using the easy knapsack, the key, the prime modulus and the message encoded as integer
+  m_merkle_hellman_transformation(list knapsack, int primitive, int mod1)            generates a hard knapsack for the multiplicative Merkle-Hellman Kryptosystem for a given easy knapsack and a primitive root for a modulus mod1
+  m_merkle_hellman_encryption(list knapsack, list message)                  encrypts a message with the multiplicative Merkle-Hellman Kryptosystem, using a hard knapsack and a message encoded as binary list
+  m_merkle_hellman_decryption(list knapsack, bigint primitive, bigint mod1, int message)    decrypts a message with the multiplicative Merkle-Hellman Kryptosystem, using the easy knapsack, the key given by the primitive root, the modulus mod1 and the message encoded as integer
+  merkle_hellman_transformation(list knapsack, int key, int mod1                generates a hard knapsack for the  Merkle-Hellman Kryptosystem for a given easy knapsack , a multiplicator key and a modulus mod1
+  merkle_hellman_encryption(list knapsack, list message)                    encrypts a message with the Merkle-Hellman Kryptosystem, using a hard knapsack and a message encoded as binary list
+  merkle_hellman_decryption(list knapsack, int key, int mod1, int message)          decrypts a message with the multiplicative Merkle-Hellman Kryptosystem, using the hard knapsack, the key, the modulus mod1 and the message encoded as integer   
+  super_increasing_knapsack(int ksize)                            Creates the smallest super-increasing knapsack of given size ksize
+  h_increasing_knapsack(int ksize, int h)                            Creates the smallest h-increasing knapsack of given size ksize and h
+  injective_knapsack(int ksize, int kmaxelement)                        Creates all list of all injective knapsacks of given size ksize and maximal element kmaxelement
+  calculate_max_sum(list a)                                  Calculates the maximal sum of a given knapsack a
+  set_is_injective(list a)                                    Checks if knapsack a is injective
+  is_h_injective(list a, int h)                                Checks if knapsack a is h-injective
+  is_fix_injective(list a)                                  Checks if knapsack a is fix-injective
+  three_elements(list out, int iterations)                          Creates the smallest injective knapsack with a given injective_knapsack by using the three-elements-algorithm with a given number of iterations
 
               [parameters in square brackets are optional]
 ";
 
 LIB "poly.lib";
+LIB "atkins.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -2069,7 +2100,1500 @@ s="78638618599886548153321853785991541374544958648147340831959482696082179852616
   string t=decodeString(s);
   t;
 }
+/*----------------------------------------------------------------------------
+ * set stuff
+ * -------------------------------------------------------------------------*/
+static proc set_multiply_list_content(list h)
+"USAGE:   set_multiply_list_content(h)
+RETURN:  An integer c als product of all elements in h
+EXAMPLE: example set_multiply_list_content; shows an example;
+"
+{
+  int c = 1;
+  for (int i=1;i<=size(h);i++)
+  {
+    c = c*h[i];
+  }
+  return(c);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list h=2,4,5;
+  set_multiply_list_content(h);
+}
 
+static proc set_delete_certain_element(list a, int e)
+"USAGE:   set_delete_certain_element(a,e)
+RETURN:  A list a without element e. If e was not in the list before, a will not be changed
+EXAMPLE: example set_delete_certain_element; shows an example.
+"
+{
+  list output_list = a;
+  for (int i=1;i<=size(a);i++)
+  {
+    if (a[i]==e)
+    {
+      output_list = delete(output_list,i);
+    }
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list h=2,4,5;
+  set_delete_certain_element(h,4);
+  set_delete_certain_element(h,10);
+}
+
+static proc set_bubblesort_int(list output_list)
+"USAGE:   set_bubblesort_int(output_list)
+RETURN:  An ascending sorted list with integer values.
+EXAMPLE: set_bubblesort_int; shows an example.
+"
+{
+  output_list = bubblesort(output_list);
+  //Cast every value into an integer
+  for (int i=1; i<=size(output_list);i++)
+  {
+    output_list[i] = int(output_list[i]);
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list output_list=10,4,5,24,9;
+  set_bubblesort_int(output_list);
+}
+
+static proc set_is_set(list a)
+"USAGE:   set_is_set(a)
+RETURN:  1 if the list is a set, 0 the list contains any duplicated elements
+EXAMPLE: set_is_set; shows an example.
+"
+{
+  int i,v;
+  for (v=1; v<=size(a); v++)
+  {
+    for (i=v+1; i<=size(a); i++)
+    {
+      if (a[i]==a[v])
+      {
+        return(0);
+      }
+    }
+  }
+  return(1);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list set = 1,5,10,2;
+  list noset = 1,5,10,2,5;
+  set_is_set(set);
+  set_is_set(noset);
+}
+
+static proc set_contains(list a, int e)
+"USAGE:   set_contains(a,e)
+RETURN:  1 if the list contains e, 0 otherwise
+EXAMPLE: set_contains; shows an example.
+"
+{
+  for (int v=1; v<=size(a); v++)
+  {
+    if (a[v]==e)
+    {
+      return(1);
+    }
+  }
+  return(0);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list set = 1,5,10,2;
+  set_contains(set,5);
+  set_contains(set,40);
+}
+
+static proc set_delete_duplicates(list a)
+"USAGE:   set_delete_duplicates(a)
+RETURN:  a list a without any duplicated elements
+EXAMPLE: set_delete_duplicates; shows an example.
+"
+{
+  int i;
+  list output_list = a[1];
+  for (i=1; i<=size(a); i++)
+  {
+    if (set_contains(output_list,a[i])==0)
+    {
+      output_list = insert(output_list,a[i]);
+    }
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list set = 1,5,10,2,10,5;
+  set_delete_duplicates(set);
+}
+
+static proc set_equals(list a,list b)
+"USAGE:   set_equals(a, b)
+RETURN:  1 if the lists are equal from a set-structure standpoint, 0 otherwise
+EXAMPLE: set_equals; shows an example.
+"
+{
+  //Checks if the lists have the same length
+  if (size(a)!=size(b))
+  {
+    return(0);
+  }
+
+  //Sorts the lists
+  a = set_bubblesort_int(a);
+  b = set_bubblesort_int(b);
+
+  //Checks every single element of both lists
+  for (int i=1; i<=size(a); i++)
+  {
+    if (a[i]!=b[i])
+    {
+      return(0);
+    }
+  }
+  return(1);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list set1 = 1,5,10,2;
+  list set2 = 10,2,5,1;
+  list set3 = 1,5,9,2;
+  set_equals(set1,set2);
+  set_equals(set1,set3);
+}
+
+static proc set_insert(list a, int e)
+"USAGE:   set_insert(a,e)
+RETURN:  list a containing element e
+EXAMPLE: set_insert; shows an example.
+"
+{
+  if(set_contains(a,e))
+  {
+    return(a);
+  }
+  else
+  {
+    a=insert(a,e);
+    return(a);
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list set = 1,5,10,2;
+  set_insert(set,5);
+  set_insert(set,22);
+}
+
+static proc set_union(list a, list b)
+"USAGE:   set_union(a, b)
+RETURN:  list a as union of a and b
+EXAMPLE: set_union; shows an example.
+"
+{
+  for (int i=1; i<=size(b); i++)
+  {
+    if (set_contains(a,b[i])==0)
+    {
+      a = insert(a,b[i]);
+    }
+  }
+  return(a);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list set1 = 1,5,10,2;
+  list set2 = 5,10,93,58,29;
+  set_union(set1,set2);
+}
+
+static proc set_section(list a, list b)
+"USAGE:   set_section(a, b)
+RETURN:  list output_list as intersection of a and b
+EXAMPLE: set_section; shows an example.
+"
+{
+  list output_list;
+  for (int i=1; i<=size(a); i++)
+  {
+    if (set_contains(b,a[i])==1)
+    {
+      output_list = insert(output_list,a[i]);
+    }
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list set1 = 1,5,10,2;
+  list set2 = 5,10,93,58,29;
+  set_section(set1,set2);
+}
+
+static proc set_list_delete_duplicates(list a)
+"USAGE:   set_list_delete_duplicates(a)
+RETURN:  list output_list with no duplicated lists
+EXAMPLE: set_list_delete_duplicates; shows an example.
+"
+{
+  int v;
+  int i;
+  int counter;
+  int out_size;
+  list output_list=insert(output_list,a[1]);
+  //Create a new list and try to insert every list element from a into that list. If a list is already inserted into the
+  //new list, do nothing.
+  for (i=2; i<=size(a); i++)
+  {
+    out_size = size(output_list);
+    counter = 0;
+
+    for (v=1; v<=out_size; v++)
+    {
+      if (set_equals(output_list[v],a[i])==1)
+      {
+        counter++;
+      }
+    }
+    if (counter==0)
+    {
+      output_list = insert(output_list,a[i]);
+    }
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list set1 = 1,5,10,2;
+  list set2 = 1,10,2,5;
+  list set3 = 1,2,3;
+  list superset = set1,set2,set3;
+  set_list_delete_duplicates(superset);
+}
+
+static proc set_construct_increasing_set(int maxelement)
+"USAGE:   set_construct_increasing_set(maxelement)
+RETURN:  list output_list with increasing elements from 1 to maxelement
+EXAMPLE: set_construct_increasing_set; shows an example.
+"
+{
+  list output_list;
+  for (int i=1; i<=maxelement; i++)
+  {
+    output_list = insert(output_list, i);
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  set_construct_increasing_set(10);
+}
+
+static proc set_addtoall(list a, int element)
+"USAGE:   set_addtoall(a,alement)
+RETURN:  Transformed list with e_i+element for every element e_i in list a
+EXAMPLE: set_addtoall; shows an example.
+"
+{
+  list output_list;
+  int c;
+  for (int i=1; i<=size(a); i++)
+  {
+    c = a[i]+element;
+    output_list = insert(output_list,c);
+  }
+  return(set_turn(output_list));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list set = 1,5,10,2;
+  set_addtoall(set,5);
+}
+
+static proc set_turn(list a)
+"USAGE:   set_turn(a)
+RETURN:  Turned list a
+EXAMPLE: set_turn; shows an example.
+"
+{
+  list output_list;
+  for (int i=1; i<=size(a); i++)
+  {
+    output_list[size(a)+1-i] = a[i];
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list set = 1,5,10;
+  set_turn(set);
+}
+
+static proc set_subset_set(list a)
+"USAGE:   set_subset_set(a)
+RETURN:  Set of subsets
+EXAMPLE: set_subset_set; shows an example.
+"
+{
+  int v;
+  int choice;
+  list output_list;
+  list start = a[1];
+  list insertion_list;
+  int output_length;
+  output_list = insert(output_list,start);
+
+  for (int i=2; i<=size(a); i++)
+  {
+    choice = 0;
+    start = a[i];
+    output_list = insert(output_list,start);
+    output_length = size(output_list);
+    for (v=2; v<=output_length; v++)
+    {
+      insertion_list = set_insert(output_list[v],a[i]);
+      output_list = insert(output_list, insertion_list,size(output_list));
+    }
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list set = 1,5,10;
+  set_subset_set(set);
+}
+/* -----------------------------------------------------------------
+ * knapsack_utilities: Utility functions needed for knapsack
+ * -----------------------------------------------------------------*/
+proc calculate_ordering(bigint num1, bigint primitive, bigint mod1)
+"USAGE:   calculate_ordering(num1, primitive, mod1)
+RETURN:  x so that primitive^x == num1 mod mod1
+EXAMPLE: example calculate_ordering; shows an example;
+"
+{
+  for (int i=1;i<=int((mod1-2));i++)
+  {
+    if ((primitive^i%mod1)==num1)
+    {
+      return(i);
+    }
+  }
+  return(0);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  bigint mod1 = 33;
+  bigint primitive = 14;
+  bigint num1 = 5;
+  calculate_ordering(num1,primitive,mod1);
+}
+
+proc is_primitive_root(bigint primitive, bigint mod1)
+"USAGE:   is_primitive_root(primitive, mod1)
+RETURN:  1 if primitive is a primitive root modulo mod1, 0 otherwise
+EXAMPLE: example is_primitive_root; shows an example;
+"
+{
+  list output_list;
+  for (int i=1;i<=int((mod1-1));i++)
+  {
+    output_list = set_insert(output_list,int((primitive^i%mod1)));
+  }
+  if (bigint(size(output_list))==bigint(mod1-1))
+  {
+    return(1);
+  }
+  else
+  {
+    return(0);
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  is_primitive_root(3,7);
+  is_primitive_root(2,7);
+}
+
+proc find_first_primitive_root(bigint mod1)
+"USAGE:   find_first_primitive_root(mod1)
+RETURN:  First primitive root modulo mod1, 0 if no root can be found.
+EXAMPLE: example find_first_primitive_root; shows an example;
+"
+{
+  for (int i=0;i<=int(mod1-1);i++)
+  {
+    if (is_primitive_root(bigint(i),mod1)==1)
+    {
+      return(i);
+    }
+  }
+  return(0);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,x,lp;
+  find_first_primitive_root(7);
+  find_first_primitive_root(557);
+}
+
+proc binary_add(list binary_list)
+"USAGE:   binary_add(binary_list)
+RETURN:  binary encoded list, increased by 1
+EXAMPLE: example binary_add; shows an example;
+"
+{
+  int residual=1;
+  int position = size(binary_list);
+  while((residual==1)&&(position!=0))
+  {
+    if(binary_list[position]==0)
+    {
+      binary_list[position]=1;
+      residual=0;
+    }
+    else
+    {
+      binary_list[position]=0;
+      position--;
+    }
+  }
+  if (position==0)
+  {
+    binary_list = insert(binary_list,1);
+  }
+  return(binary_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,x,lp;
+  list binary_list = 1,0,1,1,1;
+  binary_add(binary_list);
+}
+
+proc inverse_modulus(int num, int mod1)
+"USAGE:   inverse_modulus(num, mod1)
+RETURN:  inverse element of num modulo mod1
+EXAMPLE: example inverse_modulus; shows an example;
+"
+{
+  if (num>=mod1)
+  {
+    return(0);
+  }
+  else
+  {
+    for (int i=1;i<mod1;i++)
+    {
+      if ((i*num%mod1)==1)
+      {
+        return(i);
+      }
+    }
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,x,lp;
+  int mod1 = 13;
+  int num = 5;
+  inverse_modulus(num,mod1);
+}
+
+proc is_prime(int n)
+"USAGE:   is_prime(n)
+RETURN:  1 if n is prime, 0 otherwise
+EXAMPLE: example is_prime; shows an example;
+"
+{
+  int prime1 = 1;
+  for (int i=n-1;i>1;i--)
+  {
+    if(n%i==0)
+    {
+        prime1 = 0;
+    }
+  }
+  return(prime1);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,x,lp;
+  is_prime(10);
+  is_prime(7);
+}
+
+proc find_biggest_index(list a)
+"USAGE:   find_biggest_index( a)
+RETURN:  Returns the index of the biggest element of a
+EXAMPLE: example find_biggest_index; shows an example;
+"
+{
+  list sortedlist = bubblesort(a);
+  return(find_index(a,sortedlist[1]));
+}
+
+proc find_index(list a, bigint e)
+"USAGE:   find_index(a, e)
+RETURN:  Returns the list index of element e in list a. Returns 0 if e is not in a
+EXAMPLE: example find_index; shows an example;
+"
+{
+  for(int i=1;i<=size(a);i++)
+  {
+    if (bigint(a[i])==e)
+    {
+      return(i);
+    }
+  }
+  return(0);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list a = 1,5,20,6,37;
+  find_index(a,20);
+  find_index(a,6);
+  find_index(a,100);
+}
+/* ------------------------------------------------------------------
+ * Knapsack Algorithmus such as solving several knapsack problems,
+ * kryptographic algorithms and algorithms for creatings suitable knapsacks
+ * ---------------------------------------------------------------- */
+proc subset_sum01(list knapsack, int solution)
+"USAGE:   subset_sum01(knapsack,solution)
+RETURN:  binary list of the positions of the elements included in the subset sum or 0 if no solution exists
+NOTE: This will return the first solution of the ssk-problem, given be the smallest binary encoding. It wont return several solutions if they exist
+EXAMPLE: example subset_sum01; shows an example;
+"
+{
+  int i;
+  int v;
+  int comparable;
+  //Check if the knapsack is a set
+  if (set_is_set(knapsack)==1)
+  {
+    //Create a binary list full of zeroes
+    list binary_list;
+    for (i=1;i<=size(knapsack);i++)
+    {
+      binary_list = insert(binary_list,0);
+    }
+    binary_list = binary_add(binary_list);
+
+    for(i=1;i<=2^(size(knapsack));i++)
+    {
+      comparable = 0;
+      //Create the Subset-Sum for the actual binary coding of binary_list
+      for (v=1;v<=size(knapsack);v++)
+      {
+        comparable = comparable+knapsack[v]*binary_list[v];
+      }
+      //Check if the sum equals the solution
+      if (comparable==solution)
+      {
+        return(binary_list);
+      }
+      else
+      {
+        binary_list = binary_add(binary_list);
+      }
+    }
+    return(0);
+  }
+  else
+  {
+    return(0);
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list h=1,4,7,32;
+  subset_sum01(h,20);
+  subset_sum01(h,11);
+  subset_sum01(h,33);
+}
+
+proc subset_sum02(list knapsack, int sol)
+"USAGE:   subset_sum02(knapsack,sol)
+RETURN:  binary list of the positions of the elements included in the subset sum or 0 if no solution exists
+EXAMPLE: example subset_sum02; shows an example;
+"
+{
+  list summands;
+  int calcu;
+  int i;
+  //Create a sorted copy of the knapsack, calling it worksack
+  list worksack = set_bubblesort_int(knapsack);
+  int counter = 1;
+  while((counter<=size(worksack))&&(sol>0))
+  {
+    //Try to substract an element of the knapsack from the capacity. Create a list with all the summands used
+    calcu = sol-worksack[counter];
+    if (calcu>=0)
+    {
+      sol = sol-worksack[counter];
+      summands = insert(summands,int(worksack[counter]));
+    }
+    counter++;
+  }
+  if(sol>0)
+  {
+    return(0);
+  }
+
+  //Get the index of the summands of the original knapsack and change the bits in the binary list wich will be the solution
+  list binary_list;
+  for (i=1;i<=size(knapsack);i++)
+  {
+    binary_list = insert(binary_list,0);
+  }
+
+  for (i=1; i<=size(knapsack);i++)
+  {
+    if (set_contains(summands,knapsack[i])==1)
+    {
+      binary_list[i]=1;
+    }
+  }
+  return(binary_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list h=1,4,7,32;
+  subset_sum02(h,20);
+  subset_sum02(h,11);
+  subset_sum02(h,33);
+}
+
+proc unbounded_knapsack(list knapsack, list profit, int capacity)
+"USAGE:   unbounded_knapsack(knapsack,profit,capacity)
+RETURN:  list of maximum profit of each iteration. For example, output_list[2] contains the maximum profit that can be achieved if the knapsack has capacity 2.
+EXAMPLE: unbounded_knapsack; shows an example;
+"
+{
+  int i;
+  int v;
+  list output_list;
+  for (i=1;i<=capacity+1;i++)
+  {
+    output_list = insert(output_list,0);
+  }
+  for (i=1;i<=capacity+1;i++)
+  {
+    for(v=1;v<=size(knapsack);v++)
+    {
+      if (knapsack[v]<i)
+      {
+        if(output_list[i]<(output_list[i-knapsack[v]]+profit[v]))
+        {
+          output_list[i] = output_list[i-knapsack[v]]+profit[v];
+        }
+      }
+    }
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list h=1,4,7,32;
+  list knapsack = 5,2;
+  list profit = 10,3;
+  int capacity = 5;
+  unbounded_knapsack(knapsack,profit,capacity);
+}
+
+proc multidimensional_knapsack(matrix m, list capacities, list profits)
+"USAGE:   multidimensional_knapsack(m,capacities,profits)
+RETURN:  binary list of the positions of the elements included in the optimal selection
+EXAMPLE: example multidimensional_knapsack; shows an example;
+"
+{
+  int index;
+  list output_list;
+  list nolist;
+  list y_list;
+  list minmax_list;
+  int i;
+  int v;
+  int checkint;
+  //create the output_list full of zeroes with the length of all given selections
+  for (i=1;i<=size(profits);i++)
+  {
+    output_list = insert(output_list,0);
+  }
+
+  //Create the List E with all indices of the output_list that haven't been used yet.
+  list E = set_turn(set_construct_increasing_set(size(profits)));
+
+  //Repeat till every index in E is used.
+  while(size(E)>0)
+  {
+    y_list = nolist;
+    for (i=1;i<=size(E);i++)
+    {
+      //Create all possible elements of y_i (y_list). minimax_list will be replaced of an empty list in each iteration
+      minmax_list = nolist;
+      for (v=1; v<=size(capacities);v++)
+      {
+        if (set_contains(E,v)==1)
+        {
+        minmax_list = insert(minmax_list, bigint(capacities[v])/bigint(m[v,E[i]]));
+        }
+      }
+      //Sort the elements so that it is easy to pick the smallest one
+      minmax_list = bubblesort(minmax_list);
+
+      //insert Element y_i into y_list, wich is the smallest of (b_i/w_ij) like in the PECH algorithm description.
+      y_list = insert(y_list,minmax_list[size(minmax_list)],size(y_list));
+
+
+    }
+
+    //Check if all y_i in y_list are smaller than 1. If so, every additional selection will exceed the capacity and the algorithm stops.
+    checkint=0;
+    for(i=1;i<=size(y_list);i++)
+    {
+      if (y_list[i]>=1)
+      {
+        checkint=1;
+      }
+    }
+    if (checkint==0)
+    {
+      return(output_list);
+    }
+
+
+    //Find the index of the selection and update the binary output_list
+    minmax_list = nolist;
+    for (i=1;i<=size(E);i++)
+    {
+      minmax_list = insert(minmax_list, profits[E[i]]*y_list[i],size(minmax_list));
+    }
+    index = find_biggest_index(minmax_list);
+
+    output_list[E[index]]=1;
+
+    //Update the capacities by substracting the weights of the selection
+    for (i=1;i<=size(capacities);i++)
+    {
+      capacities[i] = capacities[i]- m[i,E[index]];
+    }
+    E = set_delete_certain_element(E,index);
+
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,x,lp;
+  matrix m[3][3] = 1,4,10,7,8,3,1,9,7;
+  list c = 12,17,10;
+  list p = 3,2,5;
+  multidimensional_knapsack(m,c,p);
+}
+
+proc naccache_stern_generation(int key, int primenum)
+"USAGE:   naccache_stern_generation(key, primenum)
+RETURN:  a hard knapsack list
+EXAMPLE: example naccache_stern_generation; shows an example;
+"
+{
+  //Check if primenum is a prime and the gcd-Condition holds
+  if ((is_prime(primenum)==0)||(gcd(key,(primenum-1))!=1))
+  {
+    return(0);
+  }
+  else
+  {
+    int i;
+    int p;
+    list primelist;
+    int primecounter=2;
+    //Generate the knapsack containing the smallest prime numbers so that primenum exceeds the product of all of them
+    while(set_multiply_list_content(primelist)<primenum)
+    {
+      if (is_prime(primecounter)==1)
+      {
+      primelist = insert(primelist,primecounter);
+      }
+      primecounter++;
+    }
+    primelist = delete(primelist,1);
+
+
+    //Generate the hard knapsack of the length of the prime numbers containing zeroes.
+    list hardknapsack;
+    for (i=1;i<=size(primelist);i++)
+    {
+      hardknapsack = insert(hardknapsack,0);
+    }
+
+    //Create the elements of the hard knapsack
+    primecounter = 1;
+    bigint calcu;
+    i=0;
+    while (i<size(primelist))
+    {
+      //Create some v_i^key%primenum and store it in calcu
+      calcu = bigint(primecounter)^key%bigint(primenum);
+
+      //If calcu is one of the prime numbers in the knapsack, find the index and insert v_i in the hard knapsack at that given index
+      if(set_contains(primelist,int(calcu))==1)
+      {
+        p=find_index(primelist,int(calcu));
+        hardknapsack[p] = primecounter;
+        i++;
+      }
+      primecounter++;
+    }
+  return(hardknapsack);
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  naccache_stern_generation(5,292);
+  naccache_stern_generation(5,293);
+}
+
+proc naccache_stern_encryption(list knapsack, list message, int primenum)
+"USAGE:   naccache_stern_encryption(knapsack, message, primenum)
+RETURN:  an encrypted message as integer
+EXAMPLE: example naccache_stern_encryption; shows an example;
+"
+{
+  bigint solution = 1;
+  if (size(knapsack)==size(message))
+  {
+    for(int i=1;i<=size(knapsack);i++)
+    {
+      solution = solution*((bigint(knapsack[i])^message[i])%bigint(primenum));
+    }
+    return(solution);
+  }
+  else
+  {
+    return(0);
+  }
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  //Please note that the values for primenum and hardknapsack have been obtained from the example of naccache_stern_generation!
+  list hardknapsack = 85,164,117,44;
+  int primenum = 293;
+  list message = 1,0,1,0;
+  naccache_stern_encryption(hardknapsack,message,primenum);
+}
+
+proc naccache_stern_decryption(list knapsack, int key, int primenum, int message)
+"USAGE:   naccache_stern_decryption(knapsack, key, primenum, message)
+RETURN:  decrypted binary list
+EXAMPLE: example naccache_stern_decryption; shows an example;
+"
+{
+  //create a binary list with the length of the knapsack containing zeros
+  int k = int(bigint(message)^key%bigint(primenum));
+  int i;
+  list binary_list;
+  for (i=1;i<=size(knapsack);i++)
+  {
+    binary_list = insert(binary_list,0);
+  }
+
+  //create primelist like in int naccache_stern_generation process
+  list primelist;
+  int primecounter=2;
+  while(size(primelist)<size(knapsack))
+  {
+    if (is_prime(primecounter)==1)
+    {
+      primelist = insert(primelist,primecounter);
+    }
+      primecounter++;
+  }
+
+  //find divisors of k and update the binarylist in a way that the positions of the divisors in primelist are marked
+  for (i=1;i<=size(primelist);i++)
+  {
+    if(k%primelist[i]==0)
+    {
+      binary_list[i]=1;
+    }
+  }
+  return(binary_list);
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  //Please note that the values have been obtained from the example of naccache_stern_generation and naccache_stern_encryption!
+  int primenum = 293;
+  int message = 9945;
+  int key = 5;
+  list hardknapsack = 85,164,117,44;
+  naccache_stern_decryption(hardknapsack,key,primenum,message);
+}
+
+proc m_merkle_hellman_transformation(list knapsack, int primitive, int mod1)
+"USAGE:   m_merkle_hellman_transformation(knapsack, primitive, mod1)
+RETURN:  list containing a hard knapsack
+EXAMPLE: example m_merkle_hellman_transformation; shows an example;
+"
+{
+  bigint new_element;
+  list output_list;
+  //calculate the primitiv root of every element in knapsack and insert it into a new knapsack
+  for (int i=size(knapsack);i>=1;i--)
+  {
+    new_element = calculate_ordering(knapsack[i],primitive,mod1);
+    output_list = insert(output_list,int(new_element));
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  //Please note that the values for primenum and hardknapsack have been obtained from the example of naccache_stern_generation and naccache_stern_encryption!
+  list knapsack = 2,3,5,7;
+  int mod1 = 211;
+  int primitive = 2;
+  m_merkle_hellman_transformation(knapsack,primitive,mod1);
+}
+
+proc m_merkle_hellman_encryption(list knapsack, list message)
+"USAGE:    m_merkle_hellman_encryption(knapsack, message)
+RETURN:  an encrypted message as integer
+NOTE: This works in the same way as merkle_hellman_encryption. The additional function is created to keep consistency with the needed functions for every kryptosystem.
+EXAMPLE: example m_merkle_hellman_encryption; shows an example;
+"
+{
+  return(merkle_hellman_encryption(knapsack,message));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  //Please note that the values for primenum and hardknapsack have been obtained from the example of m_merkle_hellman_transformation!
+  list knapsack = 1,43,132,139;
+  list message = 1,0,0,1;
+  m_merkle_hellman_encryption(knapsack,message);
+}
+
+proc m_merkle_hellman_decryption(list knapsack, bigint primitive, bigint mod1, int message)
+"USAGE:  m_merkle_hellman_decryption(knapsack, primitive, mod1, message)
+RETURN:  decrypted binary list
+EXAMPLE: example merkle_hellman_decryption; shows an example;
+"
+{
+  //Convert message
+  int factorizing = int((primitive^message)%mod1);
+  int i;
+
+  //Create binary list of length of the knapsack, containing zeroes.
+  list binary_list;
+  for (i=1;i<=size(knapsack);i++)
+  {
+    binary_list = insert(binary_list,0);
+  }
+
+  //factorize the converted message, mark the factor positions in knapsack as bits in binary_list
+  for (i=1;i<=size(knapsack);i++)
+  {
+    if(factorizing%knapsack[i]==0)
+    {
+      binary_list[i]=1;
+    }
+  }
+  return(binary_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  //Please note that the values  have been obtained from the example of m_merkle_hellman_encryption and m_merkle_hellman_transformation!
+  list knapsack = 2,3,5,7;
+  int message = 140;
+  bigint primitive = 2;
+  bigint mod1 = 211;
+  m_merkle_hellman_decryption(knapsack,primitive,mod1,message);
+}
+
+proc merkle_hellman_transformation(list knapsack, int key, int mod1)
+"USAGE:   merkle_hellman_transformation(knapsack, key, mod1)
+RETURN:  hard knapsack
+EXAMPLE: example merkle_hellman_transformation; shows an example;
+"
+{
+  list output_list;
+  int new_element;
+  //transform every element in the knapsack with normal strong modular multiplication
+  for (int i=size(knapsack);i>=1;i--)
+  {
+    new_element=knapsack[i]*key%mod1;
+    output_list = insert(output_list,new_element);
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list knapsack = 1,3,5,12;
+  int key = 3;
+  int mod1 = 23;
+  merkle_hellman_transformation(knapsack,key,mod1);
+}
+
+proc merkle_hellman_encryption(list knapsack, list message)
+"USAGE:   merkle_hellman_encryption(knapsack, message)
+RETURN:  encrypted integer
+EXAMPLE: example merkle_hellman_encryption; shows an example;
+"
+{
+  int solution = 0;
+  if (size(knapsack)!=size(message)||(set_is_set(knapsack)==0))
+  {
+    return(0);
+  }
+  else
+  {
+    for (int i=1;i<=size(knapsack);i++)
+    {
+      solution = solution+knapsack[i]*message[i];
+    }
+    return(solution);
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  //Please note that the values  have been obtained from the example of merkle_hellman_transformation!
+  list hardknapsack =3,9,15,13;
+  list message = 0,1,0,1;
+  merkle_hellman_encryption(hardknapsack,message);
+}
+
+proc merkle_hellman_decryption(list knapsack, int key, int mod1, int message)
+"USAGE:   merkle_hellman_decryption(knapsack, key, mod1, message)
+RETURN:  decrypted binary list
+EXAMPLE: example merkle_hellman_decryption; shows an example;
+"
+{
+  int new_element;
+  int t = inverse_modulus(key,mod1);
+  int transformed_message;
+  list binary_list;
+  if ((set_is_set(knapsack)==1)&&(key<mod1))
+  {
+    //reconstruct easy knapsack be multiplying with the inverse modulus t
+    list easy_knapsack;
+    for (int i=size(knapsack);i>=1;i--)
+    {
+      new_element=knapsack[i]*t%mod1;
+      easy_knapsack = insert(easy_knapsack,new_element);
+    }
+
+    //solve the easy knapsack problem with subset_sum01 or subset_sum02
+    transformed_message = (message*t)%mod1;
+    transformed_message;
+    binary_list = subset_sum01(easy_knapsack,transformed_message);
+    return(binary_list)
+  }
+  else
+  {
+    return(0)
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  //Please note that the values  have been obtained from the example of merkle_hellman_decryption and merkle_hellman_transformation!
+  list hardknapsack =3,9,15,13;
+  int key = 3;
+  int message = 22;
+  int mod1 = 23;
+  merkle_hellman_decryption(hardknapsack, key, mod1, message);
+}
+
+proc super_increasing_knapsack(int ksize)
+"USAGE:   super_increasing_knapsack(ksize)
+RETURN:  super-increasing knapsack list
+EXAMPLE: super_increasing_knapsack; shows an example;
+"
+{
+  list output_list = insert(output_list,1);
+  int next_element;
+
+  for (int i=2; i<=ksize; i++)
+  {
+    next_element = calculate_max_sum(output_list)+1;
+    output_list = insert(output_list,next_element);
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  super_increasing_knapsack(10);
+}
+
+proc h_increasing_knapsack(int ksize, int h)
+"USAGE:   h_increasing_knapsack(ksize, h)
+RETURN:  h-increasing knapsack list
+EXAMPLE: h_increasing_knapsack; shows an example;
+"
+{
+  int v;
+  if (ksize<=h+1)
+  {
+    return(set_turn(super_increasing_knapsack(ksize)))
+  }
+  else
+  {
+    list out = set_turn(super_increasing_knapsack(h+1));
+    int next_element;
+    for (int i=h+2; i<=ksize; i++)
+    {
+      next_element = 0;
+      for (v=i-h; v<=i-1; v++)
+      {
+        next_element = next_element+out[v];
+      }
+      next_element++;
+      out = insert(out,next_element,size(out));
+    }
+    return(out);
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  h_increasing_knapsack(10,5);
+}
+
+proc injective_knapsack(int ksize, int kmaxelement)
+"USAGE:   injective_knapsack(ksize, kmaxelement)
+RETURN:  list of injective knapsacks with maximal element kmaxelement and size ksize
+EXAMPLE: injective_knapsack; shows an example;
+"
+{
+  //Create a List of size ksize with the greatest possible elements keeping the set structure
+  list list_of_lists;
+  list A = insert(A,kmaxelement);
+  int i;
+  for (i=2;i<=ksize;i++)
+  {
+    A = insert(A,kmaxelement-(i-1));
+  }
+  A = set_turn(A);
+  list_of_lists = insert(list_of_lists,A);
+
+  //Create all possible sets containing the possible elements of A
+  int residual;
+  int position;
+  while(A[1]==kmaxelement)
+  {
+    residual=3;
+    position = ksize;
+    while((residual!=0))
+    {
+      if(A[position]==1)
+      {
+        A[position]=kmaxelement-position+1;
+        residual=1;
+        position--;
+      }
+      else
+      {
+        A[position]=A[position]-1;
+        residual=0;
+      }
+    }
+    //Insert the list into the overall list if its a set
+    if (set_is_set(A)==1)
+    {
+      list_of_lists = insert(list_of_lists,A);
+    }
+  }
+  //delete the first element since it is smaller than kmaxelement
+  list_of_lists = delete(list_of_lists,1);
+  //delete duplicates
+  list_of_lists = set_list_delete_duplicates(list_of_lists);
+
+  //Check if the remaining knapsacks are injective
+  list output_list;
+  for(i=1;i<=size(list_of_lists);i++)
+  {
+    if (set_is_injective(list_of_lists[i])==1)
+    {
+      output_list=insert(output_list,list_of_lists[i]);
+    }
+  }
+  return(output_list);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  injective_knapsack(3,9);
+}
+
+proc calculate_max_sum(list a)
+"USAGE:   calculate_max_sum(a)
+RETURN:  sum of all elements in a
+EXAMPLE: calculate_max_sum; shows an example;
+"
+{
+  int sum = a[1];
+  for (int i=2; i<=size(a);i++)
+  {
+    sum = sum+a[i];
+  }
+  return(sum);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list a = 1,5,3,2,12;
+  calculate_max_sum(a);
+}
+
+proc set_is_injective(list a)
+"USAGE:   set_is_injective(a)
+RETURN:  1 if a is injective, 0 otherwise
+EXAMPLE: set_is_injective; shows an example;
+"
+{
+  //Create all subsets of the set a
+  list subsum = set_subset_set(a);
+  list checklist=calculate_max_sum(subsum[1]);
+  int calculator;
+  for (int i=2; i<=size(subsum);i++)
+  {
+    //calculate the maximal subset_sum for every subset. Check if there are duplicated subset_sums. If so, a is not injective
+    calculator = calculate_max_sum(subsum[i]);
+    if (set_contains(checklist, calculator))
+    {
+      return(0);
+    }
+    else
+    {
+      checklist = insert(checklist,calculator);
+    }
+  }
+  return(1);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list inj = 1,5,7,41;
+  list non_inj = 1,2,3,4;
+  set_is_injective(inj);
+  set_is_injective(non_inj);
+}
+
+proc is_h_injective(list a, int h)
+"USAGE:   is_h_injective(a, h)
+RETURN:  1 if a is h-injective, 0 otherwise
+EXAMPLE: is_h_injective; shows an example;
+"
+{
+  //Create all sets of subsets
+  list subsetlist = set_subset_set(a);
+  list h_subsetlist;
+  //delete every list with elements more than h+1 since they are not needed to check h-injectivity
+  for (int i=1; i<=size(subsetlist); i++)
+  {
+    if(size(subsetlist[i])<=h)
+    {
+      h_subsetlist = insert(h_subsetlist,subsetlist[i]);
+    }
+  }
+
+  //Check if the remaining max_sums do not occure more than once
+  list checklist=calculate_max_sum(h_subsetlist[1]);
+  int calculator;
+  for (i=2; i<=size(h_subsetlist);i++)
+  {
+    calculator = calculate_max_sum(h_subsetlist[i]);
+    if (set_contains(checklist, calculator)==1)
+    {
+      return(0);
+    }
+    else
+    {
+      checklist = insert(checklist,calculator);
+    }
+  }
+  return(1);
+
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list h_inj = 1,2,4,10,17;
+  is_h_injective(h_inj,3);
+  //1+2+4+10=17
+  is_h_injective(h_inj,4);
+}
+
+proc is_fix_injective(list a)
+"USAGE:   is_fix_injective(a)
+RETURN:  1 if a is fix-injective, 0 otherwise
+EXAMPLE: is_fix_injective; shows an example;
+"
+{
+  //Generation of the list-list-list
+  list subsetlist = set_subset_set(a);
+  list alreadycreatedlist;
+  list listoflists;
+  list emptylist1;
+  list worklist;
+  int i;
+  int v;
+  list checklist;
+  int calculator;
+
+  int set_destination;
+
+  //create list of lists wich contain the lists of a certain length as elements
+  for (i = 1; i<= size(subsetlist); i++)
+  {
+    //Determine the size of the acutal list to choose where to insert it in the listoflists
+    set_destination = size(subsetlist[i]);
+    if (set_contains(alreadycreatedlist,set_destination)==1)
+    {
+      //There is already an element with the same set size, so just insert it
+      listoflists[set_destination] = insert(listoflists[set_destination],subsetlist[i]);
+    }
+    else
+    {
+      //There is not yet an element with the same set size, so create a new one
+      listoflists[set_destination] = insert(emptylist1,subsetlist[i]);
+      alreadycreatedlist = set_insert(alreadycreatedlist,set_destination );
+    }
+  }
+
+  //Check for injectivity of each seperate list. Works as in injectivity or h-injectivity
+  for (v=1; v<=size(listoflists); v++)
+  {
+    worklist = listoflists[v];
+
+    checklist=calculate_max_sum(worklist[1]);
+    for (i=2; i<=size(worklist); i++)
+    {
+      calculator = calculate_max_sum(worklist[i]);
+      if (set_contains(checklist, calculator)==1)
+      {
+        return(0);
+      }
+      else
+      {
+        checklist = insert(checklist,calculator);
+      }
+    }
+  }
+  return(1);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  //this is fix-injective because 17=10+2+4+1 with different numbers of addens.
+  list fix_inj = 1,2,4,10,17;
+  //this is not fix-injective because 4+1=2+3.
+  list not_fix_inj = 1,2,3,4;
+  is_fix_injective(fix_inj);
+  is_fix_injective(not_fix_inj);
+}
+
+proc three_elements(list out, int iterations)
+"USAGE:   three_elements(out, iterations)
+RETURN:  Injective_knapsack created with the three elements method
+EXAMPLE: three_elements; shows an example;
+"
+{
+  int a;
+  int b;
+  int c;
+  int subsum;
+  int adden = 1;
+  int condition = 0;
+  out = set_turn(out);
+  if (set_is_injective(out)==0)
+  {
+    return(0);
+  }
+  else
+  {
+    for (int i=1; i<=iterations; i++)
+    {
+      while(condition==0)
+      {
+        subsum = calculate_max_sum(out);
+        a = 2*subsum+adden;
+        b = a+subsum+adden;
+        c = b+subsum+1;
+        if ((a+b)>(c+subsum))
+        {
+          condition=1;
+        }
+        else
+        {
+          adden++;
+        }
+      }
+      adden =1;
+      condition=0;
+      out=set_insert(out, a);
+      out=set_insert(out, b);
+      out=set_insert(out, c);
+    }
+    return(out);
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  //this is fix-injective because 17=10+2+4+1 with different numbers of addens.
+  list super_increasing = 1,2,4,10,20;
+  list a = three_elements(super_increasing,2);
+  a;
+  set_is_injective(a);
+}
 /*
 //===============================================================
 //=======  Example for DSA  =====================================

@@ -1,16 +1,22 @@
+#ifndef OMALLOCCLASS_H
+#define OMALLOCCLASS_H
+
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
 * ABSTRACT: standard version of C++-memory management alloc func
 */
-#include <kernel/mod2.h>
 
-#include <omalloc/omalloc.h>
+#ifdef __cplusplus
 
 #include <new>
 #include <stdlib.h>
+#include <omalloc/omalloc.h>
 
+class omallocClass
+{
+public:
 /* We define those, so that our values of
    OM_TRACK and OM_CHECK are used  */
 void* operator new ( size_t size )
@@ -19,7 +25,6 @@ throw (std::bad_alloc)
 #endif
 {
   void* addr;
-  if (size==(size_t)0) size = 1;
   omTypeAlloc(void*, addr, size);
   return addr;
 }
@@ -29,27 +34,21 @@ void operator delete ( void* block )
 throw ()
 #endif
 {
-  omfree( block );
+  omFree( block );
 }
+
 
 void* operator new[] ( size_t size )
 #ifndef __GNUC__
 throw (std::bad_alloc)
 #endif
-{
-  void* addr;
-  if (size==(size_t)0) size = (size_t)1;
-  omTypeAlloc(void*, addr, size);
-  return addr;
-}
+;
 
 void operator delete[] ( void* block )
 #ifndef __GNUC__
 throw ()
 #endif
-{
-  omfree( block );
-}
+;
 
 // The C++ standard has ratified a change to the new operator.
 //
@@ -70,18 +69,9 @@ throw ()
 // Most operating systems will have slowed to be unusable
 // long before the exception gets thrown.
 
-void * operator new(size_t size, const std::nothrow_t &) throw()
-{
-  void* addr;
-  if (size==(size_t)0) size = (size_t)1;
-  omTypeAlloc(void*, addr, size);
-  return addr;
-}
+void * operator new(size_t size, const std::nothrow_t &) throw();
 
-void * operator new[](size_t size, const std::nothrow_t &) throw()
-{
-  void* addr;
-  if (size==(size_t)0) size = (size_t)1;
-  omTypeAlloc(void*, addr, size);
-  return addr;
-}
+void * operator new[](size_t size, const std::nothrow_t &) throw();
+};
+#endif
+#endif

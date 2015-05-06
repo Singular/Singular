@@ -357,8 +357,8 @@ private:
     }
 
     sleftv tmp;
-    BOOLEAN newstruct_equal(int, leftv, leftv); // declaring overloaded '='
-    if (!newstruct_equal(PythonInterpreter::id(), &tmp, value))
+    BOOLEAN newstruct_Assign_user(int, leftv, leftv); // declaring overloaded '='
+    if (!newstruct_Assign_user(PythonInterpreter::id(), &tmp, value))
       return PythonCastStatic<>(&tmp);
 
     if (typeId > MAX_TOK)       // custom types

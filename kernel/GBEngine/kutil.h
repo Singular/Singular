@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include <omalloc/omalloc.h>
+#include <omalloc/omallocClass.h>
 #include <misc/mylimits.h>
 
 
@@ -268,9 +269,7 @@ public:
 
 extern int HCord;
 
-class skStrategy;
-typedef skStrategy * kStrategy;
-class skStrategy
+class skStrategy : public omallocClass
 {
 public:
   kStrategy next;
@@ -282,7 +281,7 @@ public:
                 LObject* L,const kStrategy strat);
   int (*posInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
-  void (*enterS)(LObject h, int pos,kStrategy strat, int atR/* =-1*/ );
+  void (*enterS)(LObject &h, int pos,kStrategy strat, int atR/* =-1*/ );
   void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
   int (*posInLOld)(const LSet Ls,const int Ll,
                    LObject* Lo,const kStrategy strat);
@@ -312,7 +311,7 @@ public:
                 // syzygy of component i comes up
                 // important for signature-based algorithms
   unsigned sbaOrder;
-  unsigned long currIdx;
+  int currIdx;
   int max_lower_index;
   intset lenS;
   wlen_set lenSw; /* for tgb.ccc */
@@ -417,8 +416,8 @@ static inline LSet initL (int nr=setmaxL)
 { return (LSet)omAlloc(nr*sizeof(LObject)); }
 void deleteInL(LSet set, int *length, int j,kStrategy strat);
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at);
-void enterSBba (LObject p,int atS,kStrategy strat, int atR = -1);
-void enterSSba (LObject p,int atS,kStrategy strat, int atR = -1);
+void enterSBba (LObject &p,int atS,kStrategy strat, int atR = -1);
+void enterSSba (LObject &p,int atS,kStrategy strat, int atR = -1);
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 int posInS (const kStrategy strat, const int length, const poly p,
@@ -522,8 +521,8 @@ void initSLSba (ideal F, ideal Q,kStrategy strat);
  ***********************************************/
 void initSyzRules (kStrategy strat);
 void updateS(BOOLEAN toT,kStrategy strat);
-void enterSyz (LObject p,kStrategy strat, int atT);
-void enterT (LObject p,kStrategy strat, int atT = -1);
+void enterSyz (LObject &p,kStrategy strat, int atT);
+void enterT (LObject &p,kStrategy strat, int atT = -1);
 void cancelunit (LObject* p,BOOLEAN inNF=FALSE);
 void HEckeTest (poly pp,kStrategy strat);
 void initBuchMoraCrit(kStrategy strat);

@@ -1450,7 +1450,7 @@ division by int (component-wise)
 modulo (component-wise)
 
 @item  @code{<>}, @code{==}, @code{<=}, @code{>=}, @code{>}, @code{<}
-comparison (done lexicographically)
+comparison (done lexicographically, different length will be filled with 0 at th right)
 
 @item intvec_expression @code{[} int_expression @code{]}
 is an element of the intvec; the first element has index one.
@@ -4498,6 +4498,9 @@ operator @code{.} to access the elements
 @subsection Access to elements of a user defined type
 @cindex Access to elements of a user defined type
 
+Access to elements of a user defined type via @code{.}:
+<object>.<element_name>. The <element_names> are from the definition of the type. Additional, all (potentially) ring dependent elements have an additional
+entry @code{r_}<element_name> for the corresponding ring.
 @*@strong{Example:}
 @smallexample
 @c example
@@ -4508,6 +4511,7 @@ operator @code{.} to access the elements
   ring r;
   A.b=poly(1); // assignment: expression must be of the given type
   A;
+  A.r_b;
 @c example
 @end smallexample
 @c ------------------------------
@@ -4602,7 +4606,8 @@ By default, only objects of the same (user defined) type can be assigned,
 there is no automatic type conversion as for the kernel data types.
 
 But the operator @code{=} can be overidden in oder to write custom
-constructors:
+constructors (the custom contructor does not apply to assignments
+of the same type):
 via @code{system("install",} user_type @code{,"="} @code{,p,1);}.
 The user_type has to be given as a string.
 
@@ -4625,6 +4630,9 @@ The user_type has to be given as a string.
   w;
 @c example
 @end smallexample
+
+The user defined procedure for @code{=} provides also generic type conversions:
+@code{hh A=hh(b);} is equivalent to @code{hh tmp=b; hh A=tmp; kill tmp;}.
 
 @c ------------------------------
 @include cones.tex

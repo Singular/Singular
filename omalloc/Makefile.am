@@ -5,7 +5,7 @@ lib_LTLIBRARIES=libomalloc.la
 libomalloc_includedir=$(includedir)/omalloc
 
 libomalloc_include_HEADERS = \
-omalloc.h		omDerivedConfig.h	\
+omalloc.h		omallocClass.h          omDerivedConfig.h	\
 omError.h		omStructs.h		omAllocDecl.h		\
 omInlineDecl.h		omBin.h			omMemOps.h		\
 omList.h		omGetBackTrace.h	\
@@ -22,7 +22,7 @@ omBinPage.c       omList.c         omAllocEmulate.c omDebug.c        \
 om_Alloc.c        omDebugCheck.c   omOpts.c         omGetBackTrace.c \
 omAllocSystem.c   omError.c        omStats.c	    omRet2Info.c     \
 omBin.c           omDebugTrack.c   		     \
-omalloc_provide.c omAllocFunc.c
+omalloc_provide.c omAllocFunc.c    omallocClass.cc
 
 EXTRA_DIST = omalloc.c omtTestAlloc.c omtTest.h omMmap.c
 

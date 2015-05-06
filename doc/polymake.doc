@@ -546,7 +546,7 @@ int
 1 if c, f or p is smooth, 0 otherwise.
 @item @strong{Example:}
 @smallexample
-@c example
+@c example no_comp
   LIB"polymake.lib";
   intmat M[2][2]=1,0, 0,1;
   cone c1 = coneViaPoints(M);

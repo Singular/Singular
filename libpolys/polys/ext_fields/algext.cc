@@ -1053,7 +1053,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
       return naMapZ0;                            /// Z     -->  Q(a)
     if (nCoeff_is_Zp(src) && nCoeff_is_Q(bDst))
       return naMapP0;                            /// Z/p   -->  Q(a)
-    if (nCoeff_is_Q(src) && nCoeff_is_Zp(bDst))
+    if (nCoeff_is_Q_or_BI(src) && nCoeff_is_Zp(bDst))
       return naMap0P;                            /// Q      --> Z/p(a)
     if ((src->rep==n_rep_gap_gmp) && nCoeff_is_Zp(bDst))
       return naMapZ0;                            /// Z     -->  Z/p(a)
@@ -1065,7 +1065,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
   }
   if (h != 1) return NULL;
   if ((!nCoeff_is_Zp(bDst)) && (!nCoeff_is_Q(bDst))) return NULL;
-  if ((!nCoeff_is_Zp(bSrc)) && (!nCoeff_is_Q(bSrc))) return NULL;
+  if ((!nCoeff_is_Zp(bSrc)) && (!nCoeff_is_Q_or_BI(bSrc))) return NULL;
 
   nMapFunc nMap=n_SetMap(src->extRing->cf,dst->extRing->cf);
   if (rSamePolyRep(src->extRing, dst->extRing) && (strcmp(rRingVar(0, src->extRing), rRingVar(0, dst->extRing)) == 0))

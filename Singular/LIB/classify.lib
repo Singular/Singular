@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version classify.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version classify.lib 4.0.2.0 Apr_2015 "; // $Id$
 category="Singularities";
 info="
 LIBRARY:  classify.lib  Arnold Classifier of Singularities
@@ -45,7 +45,8 @@ proc classify_init
   string s;
   link l="DBM:r NFlist";
   s = read(l,"VERSION");
-  if (s == "" ) {
+  if (s == "" )
+  {
     if (printlevel > 0)
     {
       "(classify.lib): Need to create database...";
@@ -84,7 +85,7 @@ EXAMPLE:  example classify; shows an example"
   def ring_ext = basering;
 
   // Namespaces:
-  if(defined(A_Z)==0) { proc A_Z = general_lib::A_Z; export A_Z; }
+  if(defined(A_Z)==0) { proc A_Z = General::A_Z; export A_Z; }
   init_debug();                    // initialize trace/debug mode
   if(checkring()) { return(f_in); }
   n = nvars(basering);
@@ -100,22 +101,26 @@ EXAMPLE:  example classify; shows an example"
   export @ringdisplay;
 
   v = Klassifiziere(conv_ext2top(f_in));
-  if(typeof(v[1])=="poly") {
+  if(typeof(v[1])=="poly")
+  {
      poly f_out = v[1];
      s2 = v[2];          // s2: Typ des Polynoms f z.b: E[18]
      corank = v[3];
   }
-  else {
+  else
+  {
      s2="NoClass";
   }
 
 //---------------- collect results and create return-value --------------------
-  if( s2=="error!" || s2=="NoClass") {
+  if( s2=="error!" || s2=="NoClass")
+  {
       setring ring_ext;
       return(f_in);
   }
 
-  if(show_nf==1) {
+  if(show_nf==1)
+  {
     poly f_nf = normalform(s2);
     for(i=corank+1;i<=n;i=i+1) { f_nf = f_nf + x(i)^2; }
     debug_log(2, "Normal form NF(f)=", f_nf);
@@ -232,7 +237,8 @@ static proc Funktion1bis (poly f, list cstn)
    n = nvars(basering);
 
 //-------------------- apply morsesplit if n>corank ---------------------------
-   if( n > corank) {
+   if( n > corank)
+   {
      debug_log(0,
       "I have to apply the splitting lemma. This will take some time....:-)");
      v_res = Morse(f, K, corank, 0);
@@ -255,7 +261,8 @@ static proc Funktion1bis (poly f, list cstn)
      export RingB;
      setring ring_rest;
    }
-   else {
+   else
+   {
      ring ring_rest=char(basering),(x(1..corank)),(c,ds);
      map  PhiG=ring_top,maxideal(1);
      poly G = PhiG(f);
@@ -265,14 +272,13 @@ static proc Funktion1bis (poly f, list cstn)
     map phi = ring_rest,maxideal(1);
     cstn[4] = phi;
     if(corank == 2) { v_class = Funktion3(G, cstn); }
-    else {
+    else
+    {
       if(corank == 3) { v_class = Funktion50(G, cstn); }
       else { v_class = printresult(1, f, "error!", cstn, -1); }
     }
 //-------------------------- classification done ------------------------------
-    if(typeof(v_class[1])!="poly") {
-       return(v);
-    }
+    if(typeof(v_class[1])!="poly") { return(v); }
     poly f_result = v_class[1];
     v[2] = v_class[2];
     v[3] = v_class[3];
@@ -303,7 +309,8 @@ static proc Funktion3 (poly f, list cstn)
 
     Mult = mult(Jf);
     Mu = cstn[2];
-    if(Dim == 1) {
+    if(Dim == 1)
+    {
       if( Mult == 1) { return(printresult(5,f,"D["+string(Mu)+"]", cstn, 0)); }
       if( Mult == 2) { return(Funktion6(f, cstn));}         // series E,J
       debug_log(0, "dimension 1 und deg != 1, 2 => error, ",
@@ -342,26 +349,31 @@ static proc Funktion6 (poly f, list cstn)
     cstn[4] = PhiG;
 
 //---------------------------- begin of loop ----------------------------------
-    while( (6*k) <= Mu ) {
+    while( (6*k) <= Mu )
+    {
       JetId = x(1)^3+x(2)^(3*k);
       fk    = jet(f, 3*k, weight(JetId));
       //--------------------------- step 6(k) ---------------------------------
-      if( fk == Coeff(fk,x(1), x(1)^3)*x(1)^3 ) {
+      if( fk == Coeff(fk,x(1), x(1)^3)*x(1)^3 )
+      {
         JetId = x(1)^3+x(2)^(3*k+1);           // check jet x3,y3k+1  : E[6k]
         fk    = jet(f, 3*(3*k+1), weight(JetId));
-        if( Coeff(fk,x(2),x(2)^(3*k+1)) != 0 ) {
+        if( Coeff(fk,x(2),x(2)^(3*k+1)) != 0 )
+        {
           return(printresult(7, f, "E["+string(6*k)+"]", cstn, k-1));
         }
 
         JetId = x(1)^3+x(1)*x(2)^(2*k+1);      // check jet x3,xy2k+1 : E[6k+1]
         fk    = jet(f, 3*(2*k+1), weight(JetId));
-        if( Coeff(fk, x(1)*x(2), x(1)*x(2)^(2*k+1)) != 0 ) {
+        if( Coeff(fk, x(1)*x(2), x(1)*x(2)^(2*k+1)) != 0 )
+        {
           return(printresult(8, f,"E["+string(6*k+1)+"]", cstn, k-1));
         }
 
         JetId = x(1)^3+x(2)^(3*k+2);           // check jet x3,y3k+1  : E[6k+2]
         fk    = jet(f, 3*(3*k+2), weight(JetId));
-        if( Coeff(fk,x(2),x(2)^(3*k+2)) != 0 ) {
+        if( Coeff(fk,x(2),x(2)^(3*k+2)) != 0 )
+        {
           return(printresult(9, f,"E["+string(6*k+2)+"]", cstn, k-1));
         }
 
@@ -374,12 +386,15 @@ static proc Funktion6 (poly f, list cstn)
 
         if(Dim==0) { return(printresult(11,f,"J["+string(k)+",0]",cstn,k-1)); }
         Mult = mult(Jf);
-        if( Dim ==1  && Mult==1) {
+        if( Dim ==1  && Mult==1)
+        {
           return(printresult(12,f,"J["+string(k)+","+string(Mu - 6*k +2)+"]",
                  cstn, k-1));
         }
-        if( Dim == 1  && Mult == 2) {
-          if(Coeff(fk, x(2), x(2)^(3*k)) != 0) {
+        if( Dim == 1  && Mult == 2)
+        {
+          if(Coeff(fk, x(2), x(2)^(3*k)) != 0)
+          {
             v    = Faktorisiere(f, fk, 3, k, RFlg);
             f    = v[1];
             Phi  = v[2];
@@ -412,12 +427,15 @@ static proc Funktion13 (poly f, list cstn)
 
     if(Dim==0) { return(printresult(14,f,"X[9] = X[1,0] = T[2,4,4]",cstn,1)); }
     Mult = mult(Jf);
-    if( Dim == 1) {
-      if( Mult == 1 ) {
+    if( Dim == 1)
+    {
+      if( Mult == 1 )
+      {
         return(printresult(15, f,
               "X[1,"+string(Mu-9)+"] = T[2,4,"+string(Mu-5)+"]", cstn, 1));
       }
-      if( Mult == 2 ) {
+      if( Mult == 2 )
+      {
         Jf = Jf, jacob(Jf);
         Jf = std(Jf);
         Dim = dim(Jf);
@@ -448,33 +466,38 @@ static proc Funktion17 (poly f, list cstn)
     p    = 1;
 
 //---------------------------- begin of loop ----------------------------------
-    while( 3*p<= Mu) {
+    while( 3*p<= Mu)
+    {
       debug_log(1, "         Step 18("+string(p)+")");
       v   = Isomorphie_s17(f, fk, p, 1);
       f, Phi  = v[1..2];
       PhiG    = Phi(PhiG);
       cstn[4] = PhiG;
 
-      if ( p>1) {
+      if ( p>1)
+      {
         JetId = x(1)^3*x(2) + x(2)^(3*p);
         fk = jet(f, 3*p, weight(JetId));
       }
       //--------------------------- step 18(p) --------------------------------
       JetId = x(1)^3*x(2) + x(2)^(3*p+2);     // check jet x3y,y3k+2  : Z[6p+5]
       fk = jet(f, 3*(3*p+2), weight(JetId));
-      if( Coeff(fk, x(2), x(2)^(3*p+2)) != 0) {
+      if( Coeff(fk, x(2), x(2)^(3*p+2)) != 0)
+      {
         return(printresult(19,f, "Z["+string(6*p+5)+"]", cstn, p));
       }
 
       JetId = x(1)^3*x(2)+x(1)*x(2)^(2*p+2);  // check jet x3y,xy2k+2 : Z[6p+6]
       fk = jet(f, 2*(3*p+2)+1, weight(JetId));
-      if( Coeff(fk, x(1)*x(2), x(1)*x(2)^(2*p+2)) != 0) {
+      if( Coeff(fk, x(1)*x(2), x(1)*x(2)^(2*p+2)) != 0)
+      {
         return(printresult(20, f, "Z["+string(6*p+6)+"]", cstn, p));
       }
 
       JetId = x(1)^3*x(2) + x(2)^(3*p+3);     // check jet x3y,y3k+3  : Z[6p+7]
       fk = jet(f, 3*(3*p+3), weight(JetId));
-      if( Coeff(fk, x(2), x(2)^(3*p+3)) != 0) {
+      if( Coeff(fk, x(2), x(2)^(3*p+3)) != 0)
+      {
         return(printresult(21, f, "Z["+string(6*p+7)+"]", cstn, p));
       }
 
@@ -487,7 +510,8 @@ static proc Funktion17 (poly f, list cstn)
       Dim  = dim(Jf);
       Mult = mult(Jf);
       if(Dim==0) { return(printresult(23,f,"Z["+string(p-1)+",0]", cstn, p)); }
-      if( Mult == 1 ) {
+      if( Mult == 1 )
+      {
          return(printresult(24, f, "Z["+string(p-1)+","+string(Mu-3-6*p)+"]",
                 cstn, p));
       }
@@ -516,7 +540,8 @@ static proc Funktion25 (poly f, list cstn)
     RFlg = GetRf(f, 2);
 
 //---------------------------- begin of loop ----------------------------------
-    while (k<Mu) {
+    while (k<Mu)
+    {
       v    =  Faktorisiere(f, fk, 4 , k, RFlg);
       f, Phi  = v[1..2];
       PhiG    = Phi(PhiG);
@@ -525,35 +550,41 @@ static proc Funktion25 (poly f, list cstn)
       //--------------------------- step 26(k) --------------------------------
       JetId = x(1)^4 + x(2)^(4*k+1);          // check jet x4,y4k+1  : W[12k]
       fk    = jet(f, 4*(4*k+1), weight(JetId));
-      if( Coeff(fk, x(2), x(2)^(4*k+1)) != 0) {
+      if( Coeff(fk, x(2), x(2)^(4*k+1)) != 0)
+      {
         return(printresult(27, f, "W["+string(12*k)+"]", cstn, 3*k-2));
       }
 
       JetId = x(1)^4 + x(1)*x(2)^(3*k+1);     // check jet x4,xy3k+1 : W[12k+1]
       fk    = jet(f, 4*(3*k+1), weight(JetId));
-      if( Coeff(fk, x(1)*x(2), x(1)*x(2)^(3*k+1)) != 0) {
+      if( Coeff(fk, x(1)*x(2), x(1)*x(2)^(3*k+1)) != 0)
+      {
         return(printresult(28, f, "W["+string(12*k+1)+"]", cstn, 3*k-2));
       }
 
       //--------------------------- step 29(k) --------------------------------
       JetId = x(1)^4 + x(2)^(4*k+2);
       fk    = jet(f, 2*(4*k+2), weight(JetId));
-      if( Coeff(fk, x(2), x(2)^(4*k+2)) != 0) {
+      if( Coeff(fk, x(2), x(2)^(4*k+2)) != 0)
+      {
         Jf  = std(jacob(fk));
         Dim = dim(Jf);
         if(Dim==0) {return(printresult(30,f,"W["+string(k)+",0]",cstn,3*k-1));}
-        if(Dim==1) {
+        if(Dim==1)
+        {
            return(printresult(32, f,
                   "W#["+string(k)+","+string(Mu-12*k-3)+"]", cstn, 3*k-1));
         }
         return(printresult(29, f, "error!", cstn, -1));
       }
-      else {
+      else
+      {
         // x^4 oder x^2(x^2+x(2)^2k+1)
         ft  = Teile(fk, x(1)^2);
         Jf  = std(jacob(ft));
         Dim = dim(Jf);
-        if( Dim == 0 ) {
+        if( Dim == 0 )
+        {
            return(printresult(31, f, "W["+string(k)+","+string(Mu-12*k-3)+"]",
                   cstn, 3*k-1));
         }
@@ -562,13 +593,15 @@ static proc Funktion25 (poly f, list cstn)
         //-------------------------- step 33(k) -------------------------------
         JetId = x(1)^4 + x(1)*x(2)^(3*k+2);   // check jet x4,xy3k+2 : W[12k+5]
         fk    = jet(f, 4*(3*k+2), weight(JetId));
-        if( Coeff(fk, x(1)*x(2), x(1)*x(2)^(3*k+2)) != 0) {
+        if( Coeff(fk, x(1)*x(2), x(1)*x(2)^(3*k+2)) != 0)
+        {
           return(printresult(34, f,"W["+string(12*k+5)+"]", cstn, 3*k-1));
         }
 
         JetId = x(1)^4 + x(2)^(4*k+3);        // check jet x4,y4k+3  : W[12k+6]
         fk    = jet(f, 4*(4*k+3), weight(JetId));
-        if( Coeff(fk, x(2), x(2)^(4*k+3)) != 0){
+        if( Coeff(fk, x(2), x(2)^(4*k+3)) != 0)
+        {
           return(printresult(35, f,"W["+string(12*k+6)+"]", cstn, 3*k-1));
         }
 
@@ -580,21 +613,26 @@ static proc Funktion25 (poly f, list cstn)
         Dim   = dim(Jf);
         Mult  = mult(Jf);
         if(Dim==0) {return(printresult(37,f,"X["+string(k)+",0]",cstn,3*k-1));}
-        if(Dim==1) {
-          if(Mult==1) {
+        if(Dim==1)
+        {
+          if(Mult==1)
+          {
              return(printresult(38, f,"X["+string(k)+","+string(Mu-12*k+3)+"]",
                     cstn, 3*k-1));
           }
-          if(Mult==2) {
+          if(Mult==2)
+          {
             ft  = Teile(fk, x(1)^2);
             Jf  = std(jacob(ft));
             Dim = dim(Jf);
             if( Dim == 0) { return(Funktion40(f, cstn, k)); }
-            if( Dim == 1) {
+            if( Dim == 1)
+            {
                return(printresult(39, f, "Y["+string(k)+",r,s]", cstn,3*k-1));
             }
           }
-          if(Mult!=3) {
+          if(Mult!=3)
+          {
             return(printresult(36, f, "error!", cstn, -1)); }
         }
         else { return(printresult(36, f, "error!", cstn, -1)); }
@@ -637,23 +675,28 @@ static proc Funktion40 (poly f, list cstn, int k)
     Typ, kr, rr, sr = v2[1..4];
     r   = kr-k;
     setring ring_top;
-    if( Typ == "E[6k]" ) {
+    if( Typ == "E[6k]" )
+    {
        return(printresult(42, f, "Z["+string(k)+","+string(12*k+6*r-1)+"]",
               cstn, 3*k+r-2));
     }
-    if( Typ == "E[6k+1]" ) {
+    if( Typ == "E[6k+1]" )
+    {
        return(printresult(43, f, "Z["+string(k)+","+string(12*k+6*r)+"]",
               cstn, 3*k+r-2));
     }
-    if( Typ == "E[6k+2]" ) {
+    if( Typ == "E[6k+2]" )
+    {
        return(printresult(44, f, "Z["+string(k)+","+string(12*k+6*r+1)+"]",
               cstn, 3*k+r-2));
     }
-    if( Typ == "J[k,0]" ) {
+    if( Typ == "J[k,0]" )
+    {
        return(printresult(45, f, "Z["+string(k)+","+string(r)+",0]",
               cstn, 3*k+r-2));
     }
-    if( Typ == "J[k,r]" ) {
+    if( Typ == "J[k,r]" )
+    {
        return(printresult(46,f,"Z["+string(k)+","+string(r)+","+string(rr)+"]",
               cstn, 3*k+r-2));
     }
@@ -680,22 +723,27 @@ static proc Funktion50 (poly f, list cstn)
     Mult = mult(Jf);
     Mu   = cstn[2];
 
-    if(Dim == 0) {
+    if(Dim == 0)
+    {
        return(printresult(51, f, "P[8] = T[3,3,3]", cstn, 1));
     } // x3 + y3 + z3 + axyz
-    if(Dim == 1) {
-      if (Mult == 1) {
+    if(Dim == 1)
+    {
+      if (Mult == 1)
+      {
         return(printresult(52, f,"P["+string(Mu)+"] = T[3,3,"+string(Mu-5)+"]",
                cstn, 1));
       } // x3 + y3 + xyz
-      if(Mult == 2) {
+      if(Mult == 2)
+      {
         Jf2 = wedge(jacob(Jf1),3-Dim), Jf1;
         Jf2 = std(Jf2);
         Dim = dim(Jf2);
         if (Dim==0) { return(printresult(54,f,"R[p,q] = T[3,p,q]", cstn, 1)); }
         if (Dim==1) { return(Funktion58(f, cstn)); }  // x3 + yz2
       }
-      if(Mult == 3) {
+      if(Mult == 3)
+      {
         Jf2 = wedge(jacob(Jf1),3-Dim), Jf1;
         Jf2 = std(Jf2);
         Dim = dim(Jf2);
@@ -704,7 +752,8 @@ static proc Funktion50 (poly f, list cstn)
       }
       if(Mult == 4) { return(Funktion82(f, cstn)); }    // x3 + xz2
     }
-    if(Dim == 2) {
+    if(Dim == 2)
+    {
       if(Mult == 1) { return(Funktion97(f, cstn)); }    // x2y
       if(Mult == 2) { return(printresult(103,f,"NoClass", cstn, -1));}
     }
@@ -757,17 +806,22 @@ static proc Funktion58 (poly fin, list cstn)
     b3 = D[3,1];
 
     debug_log(6, "f3,s1=", Show(f3));
-    if( b1 != 0) {
+    if( b1 != 0)
+    {
       VERT=ring_top,-1*b1*x(1), -1*b2*x(1)+x(2), -1*b3*x(1) + x(3);
       kx=1; ky=2; kz=3;
     }
-    else {
-      if( b2 != 0) {
+    else
+    {
+      if( b2 != 0)
+      {
         VERT=ring_top, x(1) + -1*b1*x(2), -1*b2*x(2), -1*b3*x(2) + x(3);
         kx=2; ky=1; kz=3;
       }
-      else {
-        if( b3 != 0) {
+      else
+      {
+        if( b3 != 0)
+        {
           VERT=ring_top,x(1) + -1*b1*x(3), x(2) + -1*b2*x(3), -1*b3*x(3);
           kx=3; ky=1; kz=2;
         }
@@ -785,16 +839,19 @@ static proc Funktion58 (poly fin, list cstn)
     matrix C = Coeffs(f3, x(kx));
     fb=C[2,1];  // Coeff von x^1
     fc=C[1,1];  // Coeff von x^0
-    if(diff(fb, x(ky)) != 0) {
+    if(diff(fb, x(ky)) != 0)
+    {
       Jfsyz = fb, diff(fb, x(ky));
       matrix Mat = matrix(syz(Jfsyz));
       B = maxideal(1);     // setze Abbildungs-ideal
-      if( nrows(Mat) == 2) {
+      if( nrows(Mat) == 2)
+      {
         poly Relation = -2 * Mat[2,1] / Mat[1,1];
         b = Coeff(Relation, x(kz), x(kz));
         B[rvar(x(ky))] = x(ky)-b*x(kz);
       }
-      else {
+      else
+      {
         Jfsyz = fb, diff(fb, x(kz));
         Mat = matrix(syz(Jfsyz));
         poly Relation = -2 * Mat[2,1];
@@ -826,7 +883,8 @@ static proc Funktion58 (poly fin, list cstn)
     fb = (f3 - 1*(Coeffs(f3, x(kz))[4,1])*x(kz)^3)/(x(ky)^2);
     fc=(x(kx)-1*(Coeffs(fb,x(ky))[2,1])*x(ky)-1*(Coeffs(fb,x(kz))[2,1])*x(kz));
     fa = Coeffs(fb, x(kx))[2,1];
-    if ( fa != 0 ) {
+    if ( fa != 0 )
+    {
       B = maxideal(1);
       B[rvar(x(kx))] = fc / fa;
       VERT = ring_top, B;
@@ -837,18 +895,22 @@ static proc Funktion58 (poly fin, list cstn)
     }
 
     //--------------------- permutation of x,y,z  -----------------------------
-    if(Coeffs(f3, x(1))[4,1]!=0) {
+    if(Coeffs(f3, x(1))[4,1]!=0)
+    {
       kx=1;
       if(Coeffs(f3, x(2))[3,1]==0) { ky=2; kz=3; }
       else { ky=3; kz=2; }
     }
-    else {
-      if(Coeffs(f3, x(2))[4,1]!=0) {
+    else
+    {
+      if(Coeffs(f3, x(2))[4,1]!=0)
+      {
         kx=2;
         if(Coeffs(f3, x(3))[3,1]==0) { ky=3; kz=1; }
         else { ky=1; kz=3; }
       }
-      else {
+      else
+      {
         kx=3;
         if(Coeffs(f3, x(1))[3,1]==0) { ky=1; kz=2; }
         else { ky=2; kz=1; }
@@ -891,7 +953,8 @@ static proc Funktion59 (poly f, list cstn)
     debug_log(3, "beta = ", Show(beta));
 
 //---------------------------- begin of loop ----------------------------------
-    while(6*p<Mu) {
+    while(6*p<Mu)
+    {
       JetId = x(2)^(3*p+1);
       JetId = phi + x(2)^(3*p+1);
       //--------------------------- step 59(k) --------------------------------
@@ -918,12 +981,15 @@ static proc Funktion59 (poly f, list cstn)
       Dim   = dim(JetId);
       Mult  = mult(JetId);
       if(Dim==0) { return(printresult(64, f, "Q["+string(p)+",0]", cstn, p)); }
-      if(Dim==1) {
-        if(Mult == 1) {
+      if(Dim==1)
+      {
+        if(Mult == 1)
+        {
            return(printresult(65, f, "Q["+string(p)+","+string(Mu-(6*p+2))+"]",
                   cstn, p));
         }
-        if(Mult == 2) {
+        if(Mult == 2)
+        {
           fk    = jet(fr, 3*w[1], w);
           f_tmp = Coeffs(phi, x(1))[4,1] *x(1)^3+fk;
           v    = Faktorisiere(f, f_tmp, 3 , p, RFlg);
@@ -996,19 +1062,23 @@ static proc Funktion82 (poly f, list cstn)
     if (diff(f3, x(2)) == 0) {  }
     if (diff(f3, x(3)) == 0) { kz, ky = swap(kz, ky); }
     if ( (diff(f3, x(1)) != 0) && (diff(f3, x(2)) != 0) &&
-          (diff(f3, x(3)) != 0) ) {
+          (diff(f3, x(3)) != 0) )
+    {
       Mat = matrix(syz(Jfsyz));
       b1  = Mat[1,1];
       b2  = Mat[2,1];
       b3  = Mat[3,1];
 
-      if( b1 != 0) {
+      if( b1 != 0)
+      {
         VERT = ring_top,b1*x(kx), b2*x(kx)+x(ky), b3*x(kx) + x(kz);
         kx, ky = swap(kx, ky);
       }
-      else {
+      else
+      {
         if(b2!=0) { VERT = ring_top,x(kx)+b1*x(ky),b2*x(ky),b3*x(ky)+x(kz); }
-        else {
+        else
+        {
           if(b3!=0) { VERT = ring_top,x(kx)+b1*x(kz),x(ky)+b2*x(kz),b3*x(kz); }
           else { VERT = ring_top,B; }
         }
@@ -1034,14 +1104,17 @@ static proc Funktion82 (poly f, list cstn)
     if(C[1,1] == 0 && C[3,1] != 0 ) { Fall = 2; }
     if(C[1,1] != 0 && C[3,1] == 0 ) { Fall = 2; kx,kz=swap(kx, kz); }
 
-    if(Fall == 1) {
+    if(Fall == 1)
+    {
       VERT=ring_top,x(kx),x(ky),x(kz);
     }
-    if(Fall == 2) {
+    if(Fall == 2)
+    {
        v = tschirnhaus(f3/x(kz), x(kx));
        b1, VERT = v[1..2];
     }
-    if(Fall == 3) {
+    if(Fall == 3)
+    {
       v = tschirnhaus(f3/x(kx), x(kx));
       b1, VERT = [1..2];
       debug_log(2, "B1=", Show(jet(VERT(f),3)));
@@ -1056,7 +1129,8 @@ static proc Funktion82 (poly f, list cstn)
 
 //------------- if f3 ~ x3+xz2 then continue with classification  -------------
     C = coeffs(f3, x(1));
-    if( C[1,1] == 0 && C[2,1] != 0 && C[3,1] == 0 && C[4,1] != 0 ) {
+    if( C[1,1] == 0 && C[2,1] != 0 && C[3,1] == 0 && C[4,1] != 0 )
+    {
       return(Funktion83(f, cstn));
     }
     return(printresult(82, f, "error!", cstn, -1));
@@ -1134,7 +1208,8 @@ static proc Funktion83 (poly f, list cstn)
     k    = 1;
     PhiG = cstn[4];
 //---------------------------- begin of loop ----------------------------------
-    while(k<10) {
+    while(k<10)
+    {
       phi   = jet(f, 3);
       //--------------------------- step 83(k) --------------------------------
       JetId = x(1)^3 + x(3)^3 + x(2)^(3*k+1);
@@ -1144,7 +1219,8 @@ static proc Funktion83 (poly f, list cstn)
       JetId = x(1)^3 + x(3)^3 + x(1)*x(2)^(2*k+1);
       fk    = jet(f, 3*w[1], weight(JetId)) ;
       //--------------------------- step 85(k) --------------------------------
-      if ( fk != phi ) {
+      if ( fk != phi )
+      {
         Jf   = std(jacob(fk));
         Dim  = dim(Jf);
         if(Dim==0) {return(printresult(86,f,"U["+string(k)+",0]",cstn,4*k-2));}
@@ -1164,20 +1240,27 @@ static proc Funktion83 (poly f, list cstn)
       Dim   = dim(Jf);
       Mult  = mult(Jf);
       if ( Dim == 0 ) { return(printresult(83, f, "NoClass", cstn, -1)); }
-      if ( Dim == 1 ) {
-        if ( Mult == 4 ) {
-          if( fk - phi != 0) { // b!=0  und/oder b'!=0
-            if( Coeff(fk,x(1)*x(2), x(1)^2*x(2)^k) == 0 ) { // b=0 und b'!=0
+      if ( Dim == 1 )
+      {
+        if ( Mult == 4 )
+        {
+          if( fk - phi != 0)
+          { // b!=0  und/oder b'!=0
+            if( Coeff(fk,x(1)*x(2), x(1)^2*x(2)^k) == 0 )
+            { // b=0 und b'!=0
               a    = (fk - Coeff(fk, x(1), x(1)^3)*x(1)^3) / x(1);
               v    = Isomorphie_s82_z(f, a, k);
             }
-            else {
-              if( Coeff(fk,x(1)*x(2)*x(3), x(1)*x(2)^k*x(3)) == 0 ){
+            else
+            {
+              if( Coeff(fk,x(1)*x(2)*x(3), x(1)*x(2)^k*x(3)) == 0 )
+              {
                         // b!=0 und b'=0
                 a    = subst(fk, x(3), 0);
                 v    = Isomorphie_s82_x(f, a, k);
               }
-              else {
+              else
+              {
                 a = Coeff(fk,x(1)*x(2)*x(3), x(1)*x(2)^k*x(3));
                 b = Coeff(fk,x(2)*x(3), x(2)^(2*k)*x(3));
                 B = maxideal(1);
@@ -1227,7 +1310,8 @@ static proc Funktion97 (poly f, list cstn)
 
 //--------------------------- compute f3 ~ x2y --------------------------------
     // vertausche 2 Koordinaten sodass d2f/dx2 <>0 ist.
-    for(i=1;i<4;i=i+1) {
+    for(i=1;i<4;i=i+1)
+    {
       if(diff(diff(f3, x(i)), x(i)) != 0) { kx = i; i=4; }
     }
     if(kx == 2) { ky = 1; kz = 3; }
@@ -1236,7 +1320,8 @@ static proc Funktion97 (poly f, list cstn)
     f3    = jet(f, 3);
     Jfsyz = f3, diff(f3, x(kx));
     Mat   = matrix(syz(Jfsyz));
-    if(deg(Mat[2,1])>1) {
+    if(deg(Mat[2,1])>1)
+    {
       Jfsyz = f3, Mat[2,1];
       Mat   = matrix(syz(Jfsyz));
 
@@ -1279,7 +1364,8 @@ static proc Funktion97 (poly f, list cstn)
     Dim   = dim(Jf);
     Mult  = mult(Jf);
     if( Dim == 0) { return(printresult(99, f, "V[1,0]", cstn, 3)); }
-    if( Dim == 1) {
+    if( Dim == 1)
+    {
       if(Mult==1) {return(printresult(100,f,"V[1,"+string(Mu-15)+"]",cstn,3));}
       if(Mult==2){return(printresult(101,f,"V#[1,"+string(Mu-15)+"]",cstn,3));}
     }
@@ -1339,7 +1425,8 @@ static proc Isomorphie_s17 (poly f, poly fk, int k, int ct, list #)
     debug_log(2, "Isomorphie_s17:");
     debug_log(2, "Faktor: f=",Show(f)," Jet=",Show(fk)," k=",k, "cnt=", ct);
 
-    if( k == 1) {
+    if( k == 1)
+    {
       Jfsyz = fk, diff(fk, x(1));
       Matx  = matrix(syz(Jfsyz));
       Jfsyz = fk, diff(fk, x(2));
@@ -1350,15 +1437,16 @@ static proc Isomorphie_s17 (poly f, poly fk, int k, int ct, list #)
       c = Coeff(fk, x(1)*x(2), x(1)^3*x(2));
       d = Coeff(fk, x(1)*x(2), x(1)*x(2)^3);
 
-      if( (a != 0) && (b != 0) ) {
+      if( (a != 0) && (b != 0) )
+      {
         B = -int(Coeff(Matx[1,1], x(2), x(2)));
         C = -int(Coeff(Maty[1,1], x(1), x(1)));
         alpha = int(Coeff(Matx[2,1], x(1), x(1)^2));
         beta  = int(Coeff(Matx[2,1], x(1)*x(2), x(1)*x(2)));
         gamma = int(Coeff(Matx[2,1], x(2), x(2)^2));
 
-        bb[rvar(x(1))] = x(1) - (2*gamma / (B - beta))*x(2);
-        bb[rvar(x(2))] = x(2) - ((C - beta) / (2*gamma))*x(1);
+        bb[rvar(x(1))] = x(1) - (2*number(gamma) / (B - beta))*x(2);
+        bb[rvar(x(2))] = x(2) - ((C - number(beta)) / (2*gamma))*x(1);
         VERT     = ring_top,bb;
         Relation = VERT(f);
         fk       = jet(Relation, 4);
@@ -1380,29 +1468,36 @@ static proc Isomorphie_s17 (poly f, poly fk, int k, int ct, list #)
         Maty  = matrix(syz(Jfsyz));
       }
 
-      if( (a == 0) || (b == 0) ) {
-        if( a == 0) {
-          if( c == 0) { // y3(ax+by)
+      if( (a == 0) || (b == 0) )
+      {
+        if( a == 0)
+        {
+          if( c == 0)
+          { // y3(ax+by)
             Relation = - Matx[2,1] / Matx[1,1];
             a = Coeff(Relation, x(1), x(1));
             b = Coeff(Relation, x(2), x(2));
             VERT=ring_top,a*x(2)^k - b*x(1), x(1);
           }
-          else { // (ax+by)^3y
+          else
+          { // (ax+by)^3y
             Relation = - 3*Matx[2,1] / Matx[1,1];
             a = Coeff(Relation, x(1), x(1));
             b = Coeff(Relation, x(2), x(2));
             VERT=ring_top,a*x(1) - b*x(2), x(2);
           }
         }
-        else {
-          if( d == 0) { // x3(ax+by)
+        else
+        {
+          if( d == 0)
+          { // x3(ax+by)
             Relation = - Maty[2,1] / Maty[1,1];
             a = Coeff(Relation, x(1), x(1));
             b = Coeff(Relation, x(2), x(2));
             VERT=ring_top,x(1), b*x(2)^k - a*x(1);
           }
-          else { // x(ax+by)^3
+          else
+          { // x(ax+by)^3
             Relation = - 3*Maty[2,1] / Maty[1,1];
             a = Coeff(Relation, x(1), x(1));
             b = Coeff(Relation, x(2), x(2));
@@ -1412,13 +1507,15 @@ static proc Isomorphie_s17 (poly f, poly fk, int k, int ct, list #)
         f    = VERT(f);
         PhiG = VERT(PhiG);
       }
-      else {  //      "Weder b noch a sind 0";
+      else
+      {  //      "Weder b noch a sind 0";
         if(ct > 5) { v[1]=f; v[2]=PhiG; return(v); }
         fk = jet(f, 4);
         return(Isomorphie_s17(f, fk, k, ct+1, PhiG));
       }
     }
-    else {  // k >1
+    else
+    {  // k >1
       a     = fk/x(2);
       Jfsyz = a, diff(a, x(1));
       Matx  = matrix(syz(Jfsyz));
@@ -1762,7 +1859,7 @@ static proc Coeff(poly f, list #)
 
   while( (i<=ncols(K)) && (K[1,i] != term) )
   { i++;
-    if(i>ncols(K)) { break; }
+    if(i>ncols(K)) break;
   }
   if(i<=ncols(K)) { a = K[2,i]; }
   if(i>ncols(K)) { a = 0; }
@@ -1811,16 +1908,19 @@ EXAMPLE:  example quickclass; shows an example"
   def ring_top=basering;
   // check basic condition on the basering.
   if(checkring()) { return(f); }
-  if( f==0 ) {
+  if( f==0 )
+  {
     "Normal form : 0";
     return(f);
   }
-  if( jet(f,0)!=0 ) {
+  if( jet(f,0)!=0 )
+  {
     "Normal form : 1";
     return(f);
   }
   K, Mu, corank = basicinvariants(f);
-  if(Mu<0) {
+  if(Mu<0)
+  {
     debug_log(0, "The Milnor number of the function is infinite.");
     return(f);
   }
@@ -1831,11 +1931,13 @@ EXAMPLE:  example quickclass; shows an example"
   v = HKclass(milnorcode(f));
   Typ, cnt = v[1..2];
   "Singularity R-equivalent to :",Typ;
-  if(cnt==0) {
+  if(cnt==0)
+  {
     "Hilbert polynomial not recognised. Milnor code = ", milnorcode(f);
     return();
   }
-  if(cnt==1) {
+  if(cnt==1)
+  {
     debug_log(1,"Getting normal form from database.");
     "normal form :",A_L(Typ);
     return(A_L(Typ));
@@ -1938,15 +2040,18 @@ static proc Cubic (poly f)
   Mult = mult(Jf);
 
   if(Dim == 0) { return("P[8]:smooth cubic"); } // x3 + y3 + z3 + axyz
-  if(Dim == 1) {
-    if(Mult == 2) {
+  if(Dim == 1)
+  {
+    if(Mult == 2)
+    {
       Jf2  = wedge(jacob(Jf1),3-Dim), Jf1;
       Jf2  = std(Jf2);
       Dim  = dim(Jf2);
       if (Dim == 0) { return("R:conic + line"); }       // x3 + xyz
       if (Dim == 1) { return("Q:cuspidal cubic"); }  // x3 + yz2
     }
-    if(Mult == 3) {
+    if(Mult == 3)
+    {
       Jf2 = wedge(jacob(Jf1),3-Dim), Jf1;
       Jf2 = std(Jf2);
       Dim = dim(Jf2);
@@ -1955,7 +2060,8 @@ static proc Cubic (poly f)
     }
     if(Mult == 4) { return("U:three concurrent lines"); }       // x3 + xz2
   }
-  if(Dim == 2) {
+  if(Dim == 2)
+  {
     if(Mult == 1) { return("V:doubleline + line"); }    // x2y
     if(Mult == 2) { return("V': tripple line"); }       // x3
   }
@@ -2011,24 +2117,33 @@ static proc HKclass3_teil_1 (intvec sg, string SG_Typ, int cnt)
 
   debug_log(2, "entering HKclass3_teil_1", sg);
   if(sg[2]==1) { SG_Typ=SG_Typ+" D[k]=D["+string(sg[3]+3)+"]";cnt++;} // D[k]
-  if(sg[2]>=1) {
-    if( parity(sg[2])) { // sg[2] ist ungerade
-      if(sg[2]<=sg[3]) {
+  if(sg[2]>=1)
+  {
+    if( parity(sg[2]))
+    { // sg[2] ist ungerade
+      if(sg[2]<=sg[3])
+      {
         k = (sg[2]+1) div 2;
-        if(k>1) {
+        if(k>1)
+        {
           cnt++;
           SG_Typ=SG_Typ+" J[k,r]=J["+string(k)+","+string(sg[3]+1-2*k)+"]";
         }// J[k,r]
       }
-      if(sg[2]==sg[3]+2) {                              // E[6k+2]
+      if(sg[2]==sg[3]+2)
+      {                              // E[6k+2]
         k = (sg[2]-1) div 2;
         if(k>0) {cnt++; SG_Typ=SG_Typ+" E[6k+2]=E[" + string(6*k+2) + "]"; }
       }
     }
-    else {              // sg[2] ist gerade
-      if( sg[2] == sg[3]+1) {                           // E[6k]
-        k = sg[2] div 2; cnt++; SG_Typ=SG_Typ + " E[6k]=E[" + string(6*k) + "]"; }
-      if( sg[2] == sg[3]) {                             // E[6k+1]
+    else
+    {              // sg[2] ist gerade
+      if( sg[2] == sg[3]+1)
+      {                           // E[6k]
+        k = sg[2] div 2; cnt++; SG_Typ=SG_Typ + " E[6k]=E[" + string(6*k) + "]";
+      }
+      if( sg[2] == sg[3])
+      {                             // E[6k+1]
         k=sg[2] div 2; cnt++; SG_Typ=SG_Typ+" E[6k+1]=E["+string(6*k+1)+"]"; }
     }
   }
@@ -2057,62 +2172,79 @@ static proc HKclass5_teil_1 (intvec sg, string SG_Typ, int cnt)
   list v;
 
   debug_log(2, "entering HKclass5_teil_1", sg);
-  if(parity(sg[3])) {  // Dritte Stelle soll ungerade sein
+  if(parity(sg[3]))
+  {  // Dritte Stelle soll ungerade sein
     k = (sg[3]+1) div 2;
-    if(sg[3] > sg[4]) {
+    if(sg[3] > sg[4])
+    {
       k--;
-      if( (sg[4]==sg[5]) && (sg[3] == sg[4]+1) && k>0 ) { // W[12k+6]
+      if( (sg[4]==sg[5]) && (sg[3] == sg[4]+1) && k>0 )
+      { // W[12k+6]
         SG_Typ = SG_Typ + " W[12k+6]=W["+string(12*k+6)+"]"; cnt++;
       }
-      if( (sg[3]==sg[5]) && (sg[3] == sg[4]+2) && k>0 ) { // W[12k+5]
+      if( (sg[3]==sg[5]) && (sg[3] == sg[4]+2) && k>0 )
+      { // W[12k+5]
         SG_Typ = SG_Typ + " W[12k+5]=W["+string(12*k+5)+"]"; cnt++;
       }
     }
-    else {  // sg[3] <= sg[4]
-      if( (sg[3]==sg[4]) && (sg[5] >= sg[3]) ) {
+    else
+    {  // sg[3] <= sg[4]
+      if( (sg[3]==sg[4]) && (sg[5] >= sg[3]) )
+      {
         r = sg[5] - sg[4];
         SG_Typ=SG_Typ +" X[k,r]=X["+string(k)+","+string(r)+"]"; cnt++;
       }
-      if( (sg[3]==1) && (sg[4]==3) && (sg[5]>=sg[4])){    // Z[1,r]
+      if( (sg[3]==1) && (sg[4]==3) && (sg[5]>=sg[4]))
+      {    // Z[1,r]
         r = sg[5] - sg[4];
         SG_Typ = SG_Typ + " Z[1,r]=Z[1,"+string(r)+"]"; cnt++;
       }
 
-      if( sg[4] == sg[5]) {
-        if(parity(sg[4])) {                                  // Z[k,r,0]
+      if( sg[4] == sg[5])
+      {
+        if(parity(sg[4]))
+        {                                  // Z[k,r,0]
           r = (sg[4] - sg[3]) div 2;
-          if( r>0 ) { cnt++;
+          if( r>0 )
+          { cnt++;
             SG_Typ = SG_Typ + " Z[k,r,0]=Z["+string(k)+","+string(r)+",0]";
           }
         }
-        else {                                                // Z[k,12k+6r]
+        else
+        {                                                // Z[k,12k+6r]
           r = (sg[4] - 2*k) div 2; cnt++;
           SG_Typ = SG_Typ+" Z[k,12k+6r]=Z["+string(k)+","+string(12*k+6*r)+"]";
         }
       }
 
-      if( parity(sg[4]) ) {  // 4. Stelle ist ungerade
-        if(sg[4] == sg[5]+2) {                              // Z[k,12k+6r+1]
+      if( parity(sg[4]) )
+      {  // 4. Stelle ist ungerade
+        if(sg[4] == sg[5]+2)
+        {                              // Z[k,12k+6r+1]
           r = (sg[4]-2*k-1) div 2; cnt++;
           SG_Typ=SG_Typ+" Z[k,12k+6r+1]=Z["+string(k)+",";
           SG_Typ=SG_Typ+string(12*k+6*r+1)+"]";
        }
-       if( (sg[5]>sg[4]) && (sg[4]>sg[3]) ) {           // Z[k,r,s]
+       if( (sg[5]>sg[4]) && (sg[4]>sg[3]) )
+       {           // Z[k,r,s]
           r = (sg[4] - sg[3]) div 2; cnt++;
           s = sg[5] - sg[4];
           SG_Typ = SG_Typ + " Z[k,r,s]=";
           SG_Typ = SG_Typ + "Z["+string(k)+","+string(r)+","+string(s)+"]";
         }
       }
-      else {  // 4. Stelle ist gerade
-        if( sg[4] == sg[5]+1) {                             // Z[k,12k+6r-1]
+      else
+      {  // 4. Stelle ist gerade
+        if( sg[4] == sg[5]+1)
+        {                             // Z[k,12k+6r-1]
           r = (sg[4] - 2*k) div 2; cnt++;
           SG_Typ=SG_Typ+" Z[k,12k+6r-1]=Z["+string(k)+",";
           SG_Typ=SG_Typ+string(12*k+6*r-1)+"]";
         }
       }
 
-      if(sg[4]>sg[3]) {                                     // Y[k,r,s]
+      if(sg[4]>sg[3])
+      {                                     // Y[k,r,s]
         r = sg[4] - sg[3];
         s = sg[5] - sg[3] + r;
         if( s<0 ) { s = -s; }
@@ -2121,25 +2253,32 @@ static proc HKclass5_teil_1 (intvec sg, string SG_Typ, int cnt)
       }
     }
   }
-  else {  // Dritte Stelle soll gerade sein
+  else
+  {  // Dritte Stelle soll gerade sein
     k = sg[3] div 2;
     // sortiere verschiedene W's
-    if(k>0) {
-      if( (sg[4]==2*k-1) && (sg[4]==sg[5]) ) {  // W[12k]
+    if(k>0)
+    {
+      if( (sg[4]==2*k-1) && (sg[4]==sg[5]) )
+      {  // W[12k]
         SG_Typ = SG_Typ + " W[12k]=W["+string(12*k)+"]"; cnt++;
       }
-      if( (sg[4]==2*k-1) && (sg[3]==sg[5]) ) {  // W[12k+1]
+      if( (sg[4]==2*k-1) && (sg[3]==sg[5]) )
+      {  // W[12k+1]
         SG_Typ = SG_Typ + " W[12k+1]=W["+string(12*k+1)+"]"; cnt++;
       }
-      if( (sg[4]==2*k) && (sg[5]>=sg[4]) ) {    // W[k,r]
+      if( (sg[4]==2*k) && (sg[5]>=sg[4]) )
+      {    // W[k,r]
         r = sg[5] - sg[4];
         SG_Typ=SG_Typ+" W[k,r]=W["+string(k)+","+string(r)+"]"; cnt++;
       }
-      if( (sg[5]==2*k-1) && (sg[4]>sg[3]) ) {  // W#[k,2r-1]
+      if( (sg[5]==2*k-1) && (sg[4]>sg[3]) )
+      {  // W#[k,2r-1]
         r = sg[4] - sg[3]; cnt++;
         SG_Typ = SG_Typ + " W#[k,2r-1]=W["+string(k)+","+string(2*r-1)+"]";
       }
-      if( (sg[5]==2*k) && (sg[4]>sg[3]) ) {  // W#[k,2r]
+      if( (sg[5]==2*k) && (sg[4]>sg[3]) )
+      {  // W#[k,2r]
         r = sg[4] - sg[3]; cnt++;
         SG_Typ = SG_Typ + " W#[k,2r]=W["+string(k)+","+string(2*r)+"]";
       }
@@ -2162,62 +2301,81 @@ static proc HKclass5_teil_2 (intvec sg, string SG_Typ, int cnt)
   k = sg[3] + 1;
   r = sg[4] + k;
   s = sg[5] + r - 1;
-  if(k>2 && r>2 && s>2) {                               // T[k,r,s]
+  if(k>2 && r>2 && s>2)
+  {                               // T[k,r,s]
     cnt++;
     SG_Typ = SG_Typ + " T[k,r,s]=T["+string(k)+","+string(r)+","+string(s)+"]";
   }
 
   // finde weitere Moeglicjkeiten.
-  if(sg[3]==2) {  // Q[...]
-    if(parity(sg[4])) { // 4. Stelle ist ungerade.
-      if(sg[4]==sg[5]) {                                // Q[6k+4]
+  if(sg[3]==2)
+  {  // Q[...]
+    if(parity(sg[4]))
+    { // 4. Stelle ist ungerade.
+      if(sg[4]==sg[5])
+      {                                // Q[6k+4]
         k=(sg[4]+1) div 2; cnt++; SG_Typ=SG_Typ+" Q[6k+4]=Q["+string(6*k+4)+"]";
       }
-      if(sg[4]+1==sg[5]) {                      // Q[6k+5]
+      if(sg[4]+1==sg[5])
+      {                      // Q[6k+5]
         k=sg[5] div 2; cnt++; SG_Typ=SG_Typ+" Q[6k+5]=Q["+string(6*k+5)+"]";
       }
     }
-    else { // 4. Stelle ist gerade.
-      if(sg[4]==sg[5]+1) {                      // Q[6k+6]
+    else
+    { // 4. Stelle ist gerade.
+      if(sg[4]==sg[5]+1)
+      {                      // Q[6k+6]
         k=sg[4] div 2; cnt++; SG_Typ=SG_Typ+" Q[6k+6]=Q["+string(6*k+6)+"]";
       }
-      if(sg[4]<sg[5]) {                 // Q[k,r]
+      if(sg[4]<sg[5])
+      {                 // Q[k,r]
         k = (sg[4]+2) div 2;
-        if(k>=2) {
+        if(k>=2)
+        {
           r=sg[5]+1-2*k; cnt++;
           SG_Typ=SG_Typ+" Q[k,r]=Q["+string(k)+","+string(r)+"]";
         }
       }
     }
   }
-  else {           // S[...]
-    if(parity(sg[3])) {  // 3. Stelle ist ungerade.
+  else
+  {           // S[...]
+    if(parity(sg[3]))
+    {  // 3. Stelle ist ungerade.
       k = (sg[3]-1) div 2;
-      if(sg[3]==sg[4]+3 && sg[3]==sg[5]+2) {    // S[12k-1]
+      if(sg[3]==sg[4]+3 && sg[3]==sg[5]+2)
+      {    // S[12k-1]
         cnt++; SG_Typ = SG_Typ + " S[12k-1]=S["+string(12*k-1)+"]";
       }
-      if(sg[3]==sg[4]+3 && sg[3]==sg[5]+1) {    // s[12k]
+      if(sg[3]==sg[4]+3 && sg[3]==sg[5]+1)
+      {    // s[12k]
         cnt++; SG_Typ = SG_Typ + " S[12k]=S["+string(12*k)+"]";
       }
-      if(sg[3]==sg[4]+2 && sg[5]>=sg[4]+1) {    // S[k,r]
+      if(sg[3]==sg[4]+2 && sg[5]>=sg[4]+1)
+      {    // S[k,r]
         r = sg[5] - 2*k; cnt++;
         SG_Typ = SG_Typ + " S[k,r]=S["+string(k)+","+string(r)+"]";
       }
-      if(sg[3]==sg[5]+2 && sg[4]>=sg[5]) {              // S#[k,2r-1]
+      if(sg[3]==sg[5]+2 && sg[4]>=sg[5])
+      {              // S#[k,2r-1]
         r = sg[4] - 2*k + 1; cnt++;
         SG_Typ = SG_Typ + " S#[k,2r-1]=S#["+string(k)+","+string(2*r-1)+"]";
       }
-      if(sg[3]==sg[5]+1 && sg[4]>=sg[5]) {              // S#[k,2r]
+      if(sg[3]==sg[5]+1 && sg[4]>=sg[5])
+      {              // S#[k,2r]
         r = sg[4] - 2*k + 1; cnt++;
         SG_Typ = SG_Typ + " S#[k,2r]=S#["+string(k)+","+string(2*r)+"]";
       }
     }
-    else { // 3. Stelle ist gerade.
-      if(sg[3]==sg[5]+1 && sg[5]==sg[4]+3) {    // S[12k+4]
+    else
+    { // 3. Stelle ist gerade.
+      if(sg[3]==sg[5]+1 && sg[5]==sg[4]+3)
+      {    // S[12k+4]
         k = (sg[3]-2) div 2; cnt++;
         SG_Typ = SG_Typ + " S[12k+4]=S["+string(12*k+4)+"]";
       }
-      if(sg[3]==sg[5]+2 && sg[5]==sg[4]+1) {    // S[12k+5]
+      if(sg[3]==sg[5]+2 && sg[5]==sg[4]+1)
+      {    // S[12k+5]
         k = (sg[3]-2) div 2; cnt++;
         SG_Typ = SG_Typ + " S[12k+5]=S["+string(12*k+5)+"]";
       }
@@ -2234,10 +2392,12 @@ static proc HKclass7 (intvec sg, string SG_Typ, int cnt)
 {
   list v;
 
-  if(sg[1]==1 && sg[2]==0 && sg[3]==1) {
+  if(sg[1]==1 && sg[2]==0 && sg[3]==1)
+  {
       v=HKclass7_teil_1(sg, SG_Typ, cnt);
   }
-  else {
+  else
+  {
       v[1]="not in list";
       v[2]=0;
   }
@@ -2252,30 +2412,38 @@ static proc HKclass7_teil_1 (intvec sg, string SG_Typ, int cnt)
   list v;
 
   debug_log(2, "entering HKclass7_teil_1", sg);
-  if(sg[4] == 2) {                                      // V[...]
-    if(sg[5] == 0 && sg[6] == 1 && sg[7]>0) {   // V[1,r]
+  if(sg[4] == 2)
+  {                                      // V[...]
+    if(sg[5] == 0 && sg[6] == 1 && sg[7]>0)
+    {   // V[1,r]
       r = sg[7] - 1; cnt++; SG_Typ = SG_Typ + " V[1,r]=V[1,"+string(r)+"]";
     }
-    if(sg[5] == 1 && sg[7] == 1) {                      // V#[1,2r-1]
+    if(sg[5] == 1 && sg[7] == 1)
+    {                      // V#[1,2r-1]
       r=sg[6]+1; cnt++; SG_Typ=SG_Typ+" V#[1,2r-1]=V#[1,"+string(2*r-1)+"]";
     }
-    if(sg[5] == 1 && sg[7] == 2) {                      // V#[1,2r]
+    if(sg[5] == 1 && sg[7] == 2)
+    {                      // V#[1,2r]
       r=sg[6]+1; cnt++; SG_Typ=SG_Typ+" V#[1,2r]=V#[1,"+string(2*r)+"]";
     }
   }
   //            Moegliche U[...]'s
   k = sg[4];
-  if(sg[5]==2*k-1 && sg[6]==0 && sg[7]==sg[5]) {        // U[12k]
+  if(sg[5]==2*k-1 && sg[6]==0 && sg[7]==sg[5])
+  {        // U[12k]
     cnt++;SG_Typ = SG_Typ + " U[12k]=U["+string(12*k)+"]";
   }
-  if(sg[5]==2*k && sg[6]==0 && sg[7]==sg[5]) {  // U[12k+4]
+  if(sg[5]==2*k && sg[6]==0 && sg[7]==sg[5])
+  {  // U[12k+4]
     cnt++;SG_Typ = SG_Typ + " U[12k+4]=U["+string(12*k+4)+"]";
   }
-  if(sg[5]==2*k-1 && sg[6]>0 && sg[7]==sg[5]) { // U[k,2r-1]
+  if(sg[5]==2*k-1 && sg[6]>0 && sg[7]==sg[5])
+  { // U[k,2r-1]
     r=sg[6]-1; cnt++;
     SG_Typ=SG_Typ+" U[k,2r-1]=U["+string(k)+","+string(2*r-1)+"]";
   }
-  if(sg[5]==2*k-1 && sg[6]>0 && sg[7]==2*k) {   // U[k,2r]
+  if(sg[5]==2*k-1 && sg[6]>0 && sg[7]==2*k)
+  {   // U[k,2r]
     r = sg[6]; cnt++;
     SG_Typ = SG_Typ + " U[k,2r]=U["+string(k)+","+string(2*r)+"]";
   }
@@ -2311,7 +2479,8 @@ EXAMPLE:  example singularity; shows an example"
   else { r = 0; }
   if(len>=3) { s = #[3]; }
   else { s = 0; }
-  if( k<0 || r<0 || s<0) {
+  if( k<0 || r<0 || s<0)
+  {
     "Initial condition failed: k>=0; r>=0; s>=0";
     "k="+string(k)+" r="+string(r)+"   s="+string(s);
     return(ret);
@@ -2374,7 +2543,8 @@ static proc Singularitaet (string typ,int k,int r,int s,poly a,poly b,poly c,pol
   debug_log(2, "Opening Singalarity-database: ", newline, Database);
   Tp = read(dbmLink, typ);
   debug_log(2,"DBMread(", typ, ")=", Tp, ".");
-  if( Tp != "(null)" && Tp !="" ) {
+  if( Tp != "(null)" && Tp !="" )
+  {
     string Key = "I_", typ;
     S = "f = ", Tp, ";";
     debug_log(2,"S=", S, " Tp=", Tp, "Key=", Key);
@@ -2384,7 +2554,8 @@ static proc Singularitaet (string typ,int k,int r,int s,poly a,poly b,poly c,pol
                 " MlnCd=", MlnCd);
     v = f, crk, Mu, MlnCd;
   }
-  else {
+  else
+  {
     v = 0, 0, 0, 0;
   }
   close(dbmLink);
@@ -2427,15 +2598,19 @@ proc RandomPolyK (int M, string Typ)
   B = maxideal(1);
 
   r=1;
-  for(i=n; i>0; i--,r++) {
+  for(i=n; i>0; i--,r++)
+  {
 //  for(i=1; i<=n; i=i+1)
     B[rvar(x(r))] = x(i);
     if(i>2 && random(1,10)<3) { B[rvar(x(r))] = B[rvar(x(r))] + x(i-1); }
 //    if(i==1 && random(1,10)<4) { B[rvar(x(r))] = B[rvar(x(r))]- x(n); }
-    if(i>0) {
-      for(b=3; b<5; b=b+1) {
+    if(i>0)
+    {
+      for(b=3; b<5; b=b+1)
+      {
         // B[rvar(x(r))] = B[rvar(x(r))] + random(0,9) * x(i)^(b+2);
-        if(random(1,20)<3) {
+        if(random(1,20)<3)
+        {
           B[rvar(x(r))] = B[rvar(x(r))] - random(-2,2)*x(b)^2;
         }
       }
@@ -2460,12 +2635,14 @@ SEE ALSO: init_debug
 {
    int len = size(#);
 //   int printresult = printlevel - level +1;
-//   if(level>1) {
+//   if(level>1)
+//   {
 //     dbprint(printresult, "Debug:("+ string(level)+ "): ", #[2..len]);
 //   }
 //   else { dbprint(printresult, #[1..len]); }
    if( defined(@DeBug) == 0 ) { init_debug(); }
-   if(@DeBug>=level) {
+   if(@DeBug>=level)
+   {
       if(level>1) { "Debug:("+ string(level)+ "): ", #[1..len]; }
       else { #[1..len]; }
    }
@@ -2489,28 +2666,35 @@ EXAMPLE:  example init_debug; shows an example"
   int newDebug=0;
   if( defined(@DeBug) != 0 ) { newDebug = @DeBug; }
 
-  if( size(#) > 0 ) {
+  if( size(#) > 0 )
+  {
     newDebug=#[1];
   }
-  else {
+  else
+  {
     string s=system("getenv", "SG_DEBUG");
-    if( s != "" && defined(@DeBug)==0) {
+    if( s != "" && defined(@DeBug)==0)
+    {
       s="newDebug="+s;
       execute(s);
     }
   }
-  if( defined(@DeBug) == 0) {
+  if( defined(@DeBug) == 0)
+  {
     int @DeBug = newDebug;
     export @DeBug;
     if(@DeBug>0) { "Debugging level is set to ", @DeBug; }
   }
-  else {
+  else
+  {
     if( (size(#) == 0) && (newDebug < @DeBug) ) { return(); }
-    if( @DeBug != newDebug) {
+    if( @DeBug != newDebug)
+    {
       int oldDebug = @DeBug;
       @DeBug = newDebug;
       if(@DeBug>0) { "Debugging level change from ", oldDebug, " to ",@DeBug; }
-      else {
+      else
+      {
         if( @DeBug==0 && oldDebug>0 ) { "Debugging switched off."; }
       }
     }
@@ -2588,7 +2772,8 @@ static proc Faktorisiere(poly f, poly fk, int pt, int k, intvec RFlg)
 //----------------------- compute role of x and y -----------------------------
   Jfsyz = fk, diff(fk, x(1));
   Mat   = matrix(syz(Jfsyz));
-  if( (fk-subst(fk,x(1),0)) != 0  &&  (fk-subst(fk,x(2),0)) != 0 ) {
+  if( (fk-subst(fk,x(1),0)) != 0  &&  (fk-subst(fk,x(2),0)) != 0 )
+  {
     // Wenn k>0 ist die Wahl fuer x & y bereits getroffen
     // sonst bestimmen x und y
     Jfsyz    = fk, diff(fk, x(1));
@@ -2605,9 +2790,11 @@ static proc Faktorisiere(poly f, poly fk, int pt, int k, intvec RFlg)
   }
 
 //------------------- permutation of x and y, if needed -----------------------
-  if( k==1 ) {
+  if( k==1 )
+  {
     debug_log(2, "Fak-7:",Show(f)," jet=",Show(fk));
-    if(Coeff(jet(f, pt), x(1), x(1)^pt) == 0) {
+    if(Coeff(jet(f, pt), x(1), x(1)^pt) == 0)
+    {
       VERT = basering,x(2),x(1);
       f    = VERT(f);
       PhiG = VERT(PhiG);
@@ -2642,12 +2829,14 @@ static proc GetRf (poly fi, int n)
   RFlg[n] = 0;
   intvec Haeufigkeit = RFlg;
 
-  for( j=1; j<=n ; j=j+1) {
+  for( j=1; j<=n ; j=j+1)
+  {
     Koef = coef(fi, x(j));
     Haeufigkeit[j] = ncols(Koef);
     if(Coeff(fi, x(j),0) == 0) { Haeufigkeit[j] = Haeufigkeit[j] + 1;}
   }
-  for( j=n; j>0 ; j=j-1) {
+  for( j=n; j>0 ; j=j-1)
+  {
     l1  = 0;
     l1w = 0;
     for(k=1;k<=n;k=k+1) { if(Haeufigkeit[k]>l1w) { l1=k; l1w=Haeufigkeit[k];}}
@@ -2675,7 +2864,8 @@ static proc Show(poly g)
 static proc checkring
 {
   int CH = char(basering);
-  if(CH >= 2 && CH<=13) {
+  if(CH >= 2 && CH<=13)
+  {
     "Ring has characteristic ",CH;
     "Characteristic other than 0 or 0<char<13 is not yet implemented";
     return(1);
@@ -2709,7 +2899,8 @@ static proc DecodeNormalFormString (string S_in)
   s1  = s_in[a..b];
   debug_log(6, "Suche Type:", Typ);
   //---------------------- decode between brackets ----------------------------
-  if( find(s1, ",") == 0) {
+  if( find(s1, ",") == 0)
+  {
     debug_log(8, "  Number of columns: 0");
     s2 = "k = "+s1+";";
     execute(s2);
@@ -2719,24 +2910,28 @@ static proc DecodeNormalFormString (string S_in)
     if( Typ == "Q[") { t = 6; }
     if( Typ == "Z[") { t = 6; }
     if( Typ == "U[") { t = 12; }
-    if( t > 1 ) {
+    if( t > 1 )
+    {
       i = k;
       k = k div t;
       b = i - t*k;
       if( (s1 == "Q[") && (b==0) ) { k=k-1; b=6; }
-      if(Typ == "Z[") {
+      if(Typ == "Z[")
+      {
         if(b==0) { k=k-1; b=6; }
         if(b==1) { k=k-1; b=7; }
       }
       if( b == 0 ) { s3 = string(t)+"k"; }
       else { s3 = string(t)+"k+"+string(b); }
     }
-    if( Typ == "S[") {
+    if( Typ == "S[")
+    {
       i = k+1;
       k = i/12;
       b = i - 12*k;
       if( b == 1 ) { s3 = "k"; }
-      else {
+      else
+      {
         if(b==0) { s3 = "12k"+string(b-1); }
         else { s3 = "12k+"+string(b-1); }
       }
@@ -2744,12 +2939,14 @@ static proc DecodeNormalFormString (string S_in)
     s2 = Typ + s3 +"]";
   }  // es kommt mindestens ein komma vor...
   //----------------------- more than 1 parameter -----------------------------
-  else {
+  else
+  {
     b  = find(s1, ",");
     s2 = "k = ",s1[1..b-1],";";
     execute(s2);
     s1 = s1[b+1..size(s1)];
-    if(find(s1, ",") == 0) {
+    if(find(s1, ",") == 0)
+    {
       debug_log(8, "  Number of columns 1");
       s2 = "r = "+s1+";";
       execute(s2);
@@ -2757,7 +2954,8 @@ static proc DecodeNormalFormString (string S_in)
       s3 = "k";
       if(r==0) { s4 = string(0); }
       if(k==0 && Typ=="Z[") { s3 = string(1); }
-      if(Typ[2] == "#") {
+      if(Typ[2] == "#")
+      {
         i = r+1;
         r = i div 2;
         b = i - 2*r;
@@ -2767,14 +2965,15 @@ static proc DecodeNormalFormString (string S_in)
       s2 = Typ + s3 + "," + s4 +"]";
     }  // es kommt mindestens zwei komma vor...
     //----------------------- get third parameter -----------------------------
-    else {
+    else
+    {
       debug_log(8, "  Number of columns >=2");
       debug_log(2, "Y[k,r,s] / Z[k,r,s] / T[k,r,s]");
       b  = find(s1, ",");
       s2 = "r = ",s1[1..b-1],";";
-      execute(s2);
+      if ((s2[5]>"0") && (s2[5]<="9")) { execute(s2); }
       s2 = "s = ",s1[b+1..size(s1)],";";
-      execute(s2);
+      if ((s2[5]>"0") && (s2[5]<="9")) { execute(s2); }
       if(Typ=="Y[") { s2 = "Y[k,r,s]"; }
       if(Typ=="Z[") { s2 = "Z[k,r,s]"; }
       if(Typ=="T[") { s2 = "T[k,r,s]"; }
@@ -2801,11 +3000,13 @@ EXAMPLE:  example A_L; shows an example"
   // if trace/debug mode not set, do it!
   init_debug();
 
-  if( typeof(#[1]) == "string" ) {
+  if( typeof(#[1]) == "string" )
+  {
     if(checkring()) { return(#[1]); }
     return(normalform(#[1]));
   }
-  if( typeof(#[1]) == "poly" ) {
+  if( typeof(#[1]) == "poly" )
+  {
     if(checkring()) { return(#[1]); }
     return(quickclass(#[1]));
   }
@@ -2835,7 +3036,8 @@ EXAMPLE:  example normalform; shows an example."
   ring ring_top=char(basering),(x(1..n)),(c,ds);
 
   if(checkring()) { return(s_in); }
-  if(nvars(basering)<=1) {
+  if(nvars(basering)<=1)
+  {
     "We need at least 2 variables in basering, you have",nvars(basering),".";
     return();
   }
