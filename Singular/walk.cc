@@ -4421,7 +4421,7 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
     {
       if(random == TRUE &&
          G_test2->m[0] != NULL &&
-         maxlengthpoly(G_test2) <= maxlengthpoly(G_test))
+         maxlengthpoly(G_test2) < maxlengthpoly(G_test))
       {
         for(i=0; i<nV; i++)
         {
@@ -4443,7 +4443,7 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
     Overflow_Error = FALSE;
     if(random == TRUE && 
        G_test2->m[0] != NULL &&
-       maxlengthpoly(G_test2) <= maxlengthpoly(G_test))
+       maxlengthpoly(G_test2) < maxlengthpoly(G_test))
     {
       for(i=1; i<nV; i++)
       {
