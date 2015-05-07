@@ -81,7 +81,7 @@ static proc grsumstr(string R, intvec v)
 
   int n = size(v);
 
-  if (n == 0) { return (R); }
+  if (n == 0) { return ("0"); }
 
   ASSUME(0, n > 0 );
   
@@ -179,7 +179,7 @@ EXAMPLE: example grview; shows an example
 
   if( typeof( N ) == "list" )
   {
-    msg = msg + " resolution"; 
+    msg = msg + " resolution";  // TODO: what about chain maps?
     if( size(R) >= 2 )
     {
       msg = msg + "(let R:="+R+")";
@@ -211,45 +211,27 @@ EXAMPLE: example grview; shows an example
 
 //  typeof( N ) ;  attrib( N );  grrange(N);
 
-  ASSUME(1, grtest(N) ); 
-
-  intvec G = grdeg(N);
-  matrix M = module(N);
-
-  int nc = ncols(M); int nr = nrows(M);
-  int r,c;
-  int d = 1; // number of extra cols/rows for extra info around the central degree(N) block in D
-  intmat D[nr+2*d][nc+2*d];
-
-  for( c = nc; c > 0; c-- )
-  {
-    D[1, c+d] = c; // top row indeces
-    D[nr+2*d, c+d] = G[c]; // deg(v) + gr[ leadexp(v)[m] ]; // bottom row with computed column induced degrees
-  }
-
-  intvec gr = grrange(N); // grading weights?
-
-  for( r = nr; r > 0; r-- )
-  {
-    D[r+d, 1] = gr[r]; // left-most column with grading data
-    for( c = nc; c > 0; c-- )
-    {
-      D[r+d, c+d] = deg(M[r, c]); // central block with degrees (-1 means zero entry)
-    }
-    D[r+d, nc+2*d] = r; // right-most block with indeces
-  }
-
+  ASSUME(1, grtest(N) );
+  
   msg = msg + " homomorphism";
   if( size(R) >= 2 )
   {
     msg = msg + "(let R:="+R+")" ;
     R = "R";
   }
-    
+
   msg = msg + ": ";
 
+  intvec gr = grrange(N); // grading weights?
   string dst = grsumstr(R, gr);
+  
+  intvec G = grdeg(N);
   string src = grsumstr(R, G);
+  
+  if( ncols(N) == 0 )
+  {
+    src = "0";
+  } 
 
   lst = msg;
 
@@ -274,6 +256,9 @@ EXAMPLE: example grview; shows an example
   msg = msg + ", given by ";
 //  lst = lst + ", given by ";
 
+  
+  int nc = ncols(N); int nr = nrows(N);
+
   if( size(N) == 0 )
   {
     msg = msg + "zero ("+ string(nr);
@@ -281,6 +266,30 @@ EXAMPLE: example grview; shows an example
     print( msg+") matrix." );
   } else
   {
+    ASSUME(0, nc > 0);
+    
+    matrix M = module(N);
+    
+    int r,c;
+    int d = 1; // number of extra cols/rows for extra info around the central degree(N) block in D
+    intmat D[nr+2*d][nc+2*d];
+
+    for( c = nc; c > 0; c-- )
+    {
+      D[1, c+d] = c; // top row indeces
+      D[nr+2*d, c+d] = G[c]; // deg(v) + gr[ leadexp(v)[m] ]; // bottom row with computed column induced degrees
+    }
+
+    for( r = nr; r > 0; r-- )
+    {
+      D[r+d, 1] = gr[r]; // left-most column with grading data
+      for( c = nc; c > 0; c-- )
+      {
+        D[r+d, c+d] = deg(M[r, c]); // central block with degrees (-1 means zero entry)
+      }
+      D[r+d, nc+2*d] = r; // right-most block with indeces
+    }
+
     if( nr == nc) // square matrix // detect diagonal?
     {
       for (c = nr; c > 0; c-- )
@@ -300,8 +309,8 @@ EXAMPLE: example grview; shows an example
     { 
       msg = msg + "a matrix";
     }
-    
-    print(msg + ", with degrees: " );
+
+    print(msg + ", with degrees: " );    
     draw(D, d); // print it nicely!    
   }
 }
@@ -407,15 +416,19 @@ NOTE:    if M has zero cols it shoud have attrib(M,'degHomog') set.
 EXAMPLE: example grdeg; shows an example
 "
 {
-  ASSUME(1, grtest(M) );
-
+  ASSUME(1, grtest(M) ); 
+  
   if ( typeof(attrib(M, "degHomog")) == "intvec" )
   {
-    intvec t = attrib(M, "degHomog"); // graded degrees
-    ASSUME(0, ncols(M) == size(t) );
+    def t = attrib(M, "degHomog"); // graded degrees
 
+    if( ncols(M) == 0 )    {     return (t);    } // for now
+    
+    ASSUME(0, ncols(M) == size(t) );
     return (t);
   }
+  
+  ASSUME(0, ncols(M) > 0);
 
   ASSUME(0, ncols(M) == size(M) );
 
@@ -955,6 +968,15 @@ PURPOSE: create a valid graded object with a given matrix presentation, weightin
 EXAMPLE: example grobj; shows an example
 "
 {
+  if( ncols(A) == 0 )
+  {
+    ASSUME(0, size(w) == nrows(A) );
+    attrib(A, "isHomog", w);
+    attrib(A, "degHomog", intvec(0)); // FIXME: just for now: no intvec of 0-size :(
+    ASSUME(0, grtest(A) );
+    return (A);
+  }
+  
   module M = module(A);
   ASSUME(0, size(w) >= nrows(M) );
 
@@ -981,20 +1003,25 @@ example
 
   ring r=32003,(x,y,z),dp;
 
-  module A = grobj( module([x+y, x, 0, 0], [0, x+y, y, 0]), intvec(0,0,0,1) );
+  def A = grobj( module([x+y, x, 0, 0], [0, x+y, y, 0]), intvec(0,0,0,1) );
   grview(A);
 
-  module F = grobj( module([x,y,0]), intvec(1,1,5) );
+  def F = grobj( module([x,y,0]), intvec(1,1,5) );
   grview(F);
 
   int d = 666; // zero can have any degree...
-  module Z = grobj( module([x,0], [0,0,0], [0, y]), intvec(1,2,3), intvec(2, d, 3) );
+  def Z = grobj( module([x,0], [0,0,0], [0, y]), intvec(1,2,3), intvec(2, d, 3) );
   grview(Z);
 
   print(Z);
   attrib(Z);
   grrange(Z); // module weights
   attrib(Z, "degHomog"); // total degrees
+
+  // Zero object:
+  matrix z[3][0];
+  def zz = grobj( z, intvec(1,2,3) ); // intvec() ??
+  grview(zz);  
 
 }
 
@@ -1016,7 +1043,7 @@ EXAMPLE: example grtest; shows an example
     return (0);
   };
 
-  if ( typeof(grrange(N)) != "intvec" )
+  if ( typeof(attrib(N,"isHomog")) != "intvec" )
   {
     if(b) { type(N); attrib(N); "   ? grtest: Input must be graded!";  };
     return (0);
@@ -1029,6 +1056,11 @@ EXAMPLE: example grtest; shows an example
     return (0);
   };
 
+  if( ncols(N) == 0 ) // zero-column matrix?
+  {
+    return(1);
+  }
+  
 //  if( attrib(N, "rank") != size(gr) ){ return (0); } // wrong rank :(
 
   if ( typeof(attrib(N, "degHomog")) == "intvec" )
@@ -1101,10 +1133,28 @@ static proc align( def A, int d)
  Note that this proc does not care about any attributes (of A)
 "
 {
+  ASSUME(0, d >= 0 );
+  
+  if( d == 0 ) { return (A); }
+  
+  if( ncols(A) == 0 )
+  {
+    matrix B[nrows(A) + d][0];
+    return (B);    
+  }
+
+  
   module T; T[d] = 0;
   T = T, module(transpose(A));
   return( module(transpose(T)) );
 }
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r;
+  matrix m[1][0];
+  align(m, 3);
+}  
+
 
 proc grgroebner(A)
 "USAGE:  grgroebner(M), graded object M
