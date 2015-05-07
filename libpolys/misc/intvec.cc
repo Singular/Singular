@@ -124,8 +124,22 @@ char * intvec::ivString(int not_mat,int spaces, int dim) const
 
 void intvec::resize(int new_length)
 {
-  assume(new_length > 0 && col == 1);
-  v = (int*) omRealloc0Size(v, row*sizeof(int), new_length*sizeof(int));
+  assume(new_length >= 0 && col == 1);
+  if (new_length==0)
+  {
+    if (v!=NULL)
+    {
+      omFreeSize(v, row*sizeof(int));
+      v=NULL;
+    }
+  }
+  else
+  {
+    if (v!=NULL)
+      v = (int*) omRealloc0Size(v, row*sizeof(int), new_length*sizeof(int));
+    else
+      v = (int*) omAlloc0(new_length*sizeof(int));
+  }
   row = new_length;
 }
 

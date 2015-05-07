@@ -343,7 +343,7 @@ static BOOLEAN jjOP_I_IM(leftv res, leftv u, leftv v)
 static BOOLEAN jjCOLON(leftv res, leftv u, leftv v)
 {
   int l=(int)(long)v->Data();
-  if (l>0)
+  if (l>=0)
   {
     int d=(int)(long)u->Data();
     intvec *vv=new intvec(l);
@@ -351,7 +351,7 @@ static BOOLEAN jjCOLON(leftv res, leftv u, leftv v)
     for(i=l-1;i>=0;i--) { (*vv)[i]=d; }
     res->data=(char *)vv;
   }
-  return (l<=0);
+  return (l<0);
 }
 static BOOLEAN jjDOTDOT(leftv res, leftv u, leftv v)
 {
