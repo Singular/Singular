@@ -6722,7 +6722,8 @@ int Xngleich;
 /***********************************************************************
  * Perturb the start weight vector at the top level, i.e. nlev = 1     *
  ***********************************************************************/
-static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget, int printout)
+static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
+             int reduction, int printout)
 {
   Overflow_Error =  FALSE;
   //Print("\n\n// Entering the %d-th recursion:", nlev);
@@ -6730,7 +6731,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget, int printout)
   int i, nV = currRing->N;
   ring new_ring, testring;
   //ring extoRing;
-  ideal Gomega, Gomega1, Gomega2, F, F1, Gresult, Gresult1, G1, Gt;
+  ideal Gomega, Gomega1, Gomega2, FF, F, F1, Gresult, Gresult1, G1, Gt;
   int nwalks = 0;
   intvec* Mwlp;
 #ifndef BUCHBERGER_ALG
@@ -7069,6 +7070,22 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget, int printout)
     {
       idString(Gomega,"//** rec_fractal_call: Gomega");
     }
+
+    if(reduction == 0)
+    {
+      /* Check whether the intermediate weight vector lies in the interior of the cone.
+       * If so, only perform reductions. Otherwise apply Buchberger's algorithm. */
+      FF = middleOfCone(G,Gomega);
+      if( FF != NULL)
+      {
+        idDelete(&G);
+	G = idCopy(FF);
+	idDelete(&FF);
+        /* Compue next vector. */
+        goto NEXT_VECTOR_FRACTAL;
+      }	
+    }
+
 #ifndef  BUCHBERGER_ALG
     if(isNolVector(omega) == 0)
       hilb_func = hFirstSeries(Gomega,NULL,NULL,omega,currRing);
@@ -7107,7 +7124,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget, int printout)
     {
       rChangeCurrRing(oRing);
       Gomega1 = idrMoveR(Gomega1, oRing,currRing);
-      Gresult = rec_fractal_call(idCopy(Gomega1),nlev+1,omega,printout);
+      Gresult = rec_fractal_call(idCopy(Gomega1),nlev+1,omega,reduction,printout);
     }
     if(printout > 2)
     {
@@ -7538,29 +7555,20 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
       idString(Gomega,"//** rec_r_fractal_call: Gomega");
     }
 
-
-//////////////////////////////////// hier neu!!
-
-
-   if(reduction == 0)
+    if(reduction == 0)
     {
-      //PrintS("\n//** rec_r_fractal_call: test middle of cone!\n");
+      /* Check whether the intermediate weight vector lies in the interior of the cone.
+       * If so, only perform reductions. Otherwise apply Buchberger's algorithm. */
       FF = middleOfCone(G,Gomega);
-      //PrintS("\n//** rec_r_fractal_call: Test F!\n");
       if( FF != NULL)
       {
         idDelete(&G);
 	G = idCopy(FF);
 	idDelete(&FF);
-        PrintS("\n//** rec_r_fractal_call: FF nicht NULL! Compue next vector.\n");
+        /* Compue next vector. */
         goto NEXT_VECTOR_FRACTAL;
       }	
     }
-
-
-
-///////////////////////////////////////////////////
-
 
 #ifndef  BUCHBERGER_ALG
     if(isNolVector(omega) == 0)
@@ -7778,7 +7786,7 @@ ideal Mfwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   ideal resF;
   ring helpRing = currRing;
 
-  J = rec_fractal_call(J,1,ivtarget,printout);
+  J = rec_fractal_call(J,1,ivtarget,reduction,printout);
 
   rChangeCurrRing(oldRing);
   resF = idrMoveR(J, helpRing,currRing);
