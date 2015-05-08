@@ -195,7 +195,7 @@ example
 
 static proc is_neg_def(matrix H)
 {//determines whether the given matrix is negative definite
-   //returns 1 if it is, 0 if it isnt
+  //returns 1 if it is, 0 if it isnt
   matrix M=H-diag(var(1),ncols(H));
   poly f=det(M);
   list S=laguerre_solve(f);
@@ -299,7 +299,7 @@ EXAMPLE: example getMaxPoints; shows an example
     }
   }
 
-   //execute("ring outR =(complex,"+string(prec)+"),(x(1.."+string(n)+")),dp;");
+  //execute("ring outR =(complex,"+string(prec)+"),(x(1.."+string(n)+")),dp;");
   ring outR=(complex,prec),x(1..n),dp;
   list MPOINTS = imap(R,L2);
   list LHESSIANS = imap(R,hessi2);
@@ -378,9 +378,9 @@ NOTE:    Does not compute the likelihood ideal via elimination, but rather compu
 EXAMPLE: example maxPointsProb; shows an example
 "
 {//as opposed to (get)maxpoints, which first eliminates and then solves, this procedure
-   //solves and then projects
-   //furthermore, it also creates a list of the values the generators of I have at the
-   //points in MPOINTS (that is, a list of the probability distributions)
+  //solves and then projects
+  //furthermore, it also creates a list of the values the generators of I have at the
+  //points in MPOINTS (that is, a list of the probability distributions)
   matrix H=logHessian(I,u);
   def r=basering;
   int n=nvars(basering);
@@ -510,8 +510,8 @@ EXAMPLE: example maxPointsProb; shows an example
 //   LHESSIANS, containing the (modified) Hessians at those points, and
 //   VALS, containing the probability distributions at those points.
 ";
-   if(size(#)==0) { print(MPOINTS); print(display); }
-   return(outR);
+  if(size(#)==0) { print(MPOINTS); print(display); }
+  return(outR);
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -534,6 +534,21 @@ example
 ///////////////////////////    a few more examples   /////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
+//Here, we present an example of a data vector for which the likelihood function has more
+//than one biologically meaningful local maximum.
+//You can generate DNA sequence data, which has this data vector, using Seq-Gen with the
+//following input:
+//Tree: (Taxon1:0.6074796219,Taxon2:4.7911951859,Taxon3:0.5522879636);
+//Seq-Gen options: -mHKY -l7647 -n1 -z28503
+//You can find Seq-Gen at http://tree.bio.ed.ac.uk/software/seqgen/
+//
+//-   write(":w ThreeTaxonClaw.tree",
+//-         "(Taxon1:0.6074796219,Taxon2:4.7911951859,Taxon3:0.5522879636);");
+//-   int i=system("sh",
+//-      "seq-gen -mHKY -l7647 -n1 -z28503 -q  < ThreeTaxonClaw.tree > ThreeTaxonC
+//law.dat");
+//-   intvec u=getintvec("ThreeTaxonClaw.dat");
+//
 
 /*
 proc bad_seq_gen_example()
@@ -549,13 +564,10 @@ proc bad_seq_gen_example()
    poly f5 = 3*1/3*(1-mu1)*mu2*mu3 + 3*mu1*1/3*(1-mu2)*1/3*(1-mu3) +
     6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
    ideal I = f1,f2,f3,f4,f5;
-   write(":w ThreeTaxonClaw.tree",
-         "(Taxon1:0.6074796219,Taxon2:4.7911951859,Taxon3:0.5522879636);");
-   int i=system("sh",
-      "seq-gen -mHKY -l7647 -n1 -z28503 -q  < ThreeTaxonClaw.tree > ThreeTaxonClaw.dat");
-   intvec u=getintvec("ThreeTaxonClaw.dat");
+   intvec u = 770,2234,1156,2331,1156;
    maxPoints(I,u,50);
 }
+
 
 proc bad_seq_gen_example2()
 {//same example, but a different method of computing the local maxima
@@ -615,6 +627,7 @@ proc bad_seq_gen_example2()
 }
 */
 
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -622,8 +635,10 @@ proc bad_seq_gen_example2()
 //////////////////////////////////////////////////////////////////////////////////////////
 //These are some of the procedures I used to generate and test examples for my Master
 //thesis. To use the ones incorporating Seq-Gen, you may have to adjust the shell command
-//with which Singular calls Seq-Gen. Furthermore, as the names of the procedures suggest,
-//we always use the Jukes-Cantor model.
+//with which Singular calls Seq-Gen. You can find Seq-Gen at
+//http://tree.bio.ed.ac.uk/software/seqgen/
+//As the names of the procedures suggest, we always use the Jukes-Cantor model.
+//They also tell you which of them use Seq-Gen.
 
 /*
 proc getguaranteedmaxPoints(ideal Iu, matrix H, list #)
@@ -686,10 +701,10 @@ proc getguaranteedmaxPoints(ideal Iu, matrix H, list #)
   {
     if(1)
     {
-       if(is_neg_def(hessi[k]) == 1)
-       {
-         hessi2=hessi2+list(hessi[k]);
-         L2=L2+list(L[k]);
+      if(is_neg_def(hessi[k]) == 1)
+      {
+        hessi2=hessi2+list(hessi[k]);
+        L2=L2+list(L[k]);
       }
     }
   }
@@ -724,8 +739,10 @@ proc getguaranteedmaxPoints(ideal Iu, matrix H, list #)
     }
     return(c);
   }
+
   print(L2);
 }
+
 
 proc getintvec(string linkstr)
 {
@@ -768,36 +785,37 @@ proc getintvec(string linkstr)
   intvec u=0,0,0,0,0;//u123,udis,u12,u13,u23
   for(i=1; i<=size(taxons[1]); i++)
   {
-    if((taxons[1][i] == taxons[2][i]) and (taxons[2][i] == taxons[3][i]))
-    {
-      u[1]=u[1]+1;
-      i++;
-      continue;//continue does not execute the increment statement of the loop
-    }
+     if((taxons[1][i] == taxons[2][i]) and (taxons[2][i] == taxons[3][i]))
+     {
+        u[1]=u[1]+1;
+        i++;
+        continue;//continue does not execute the increment statement of the loop
+     }
 
-    if(taxons[1][i] == taxons[2][i])
-    {
-      u[3]=u[3]+1;
-      i++;
-      continue;
-    }
+     if(taxons[1][i] == taxons[2][i])
+     {
+        u[3]=u[3]+1;
+        i++;
+        continue;
+     }
 
-    if(taxons[1][i] == taxons[3][i])
-    {
-      u[4]=u[4]+1;
-      i++;
-      continue;
-    }
+     if(taxons[1][i] == taxons[3][i])
+     {
+        u[4]=u[4]+1;
+        i++;
+        continue;
+     }
 
-    if(taxons[2][i] == taxons[3][i])
-    {
-      u[5]=u[5]+1;
-      i++;
-      continue;
-    }
+     if(taxons[2][i] == taxons[3][i])
+     {
+        u[5]=u[5]+1;
+        i++;
+        continue;
+     }
 
-    u[2]=u[2]+1;
+     u[2]=u[2]+1;
   }
+
   return(u);
 }
 
@@ -850,25 +868,24 @@ proc checkrandomJC69run(int a, int sta, int up)
 
     Iu=likeIdeal(I,u);
 
-
     Iu=std(Iu);
     //Iu=groebner(Iu);
     d=dim(Iu);
     if(d != 0)
     {
-       nzd++;
-       display="-*-*-*- not 0-dim. for u= "+string(u)+", i= "+string(i)+" -*-*-*-";
-       print(display);
-       write(lf,display);
-       i++;
-       continue;
+      nzd++;
+      display="-*-*-*- not 0-dim. for u= "+string(u)+", i= "+string(i)+" -*-*-*-";
+      print(display);
+      write(lf,display);
+      i++;
+      continue;
     }
 
     eatoutput=getguaranteedmaxPoints(Iu,logHessian(I,u),1);
 
     if(eatoutput >= 2)
     {
-       num++;
+      num++;
       write(lf,writestr+"; number: "+string(eatoutput));
       display="-*-*-*- Failed for u= "+string(u)+", i= "+string(i)+" -*-*-*-";
       print(display);
@@ -903,9 +920,8 @@ proc checkseqgenJC69run(int a, int sd, int len)
        6*1/3*(1-mu1)*1/3*(1-mu2)*1/3*(1-mu3);
   ideal I=f1,f2,f3,f4,f5;
 
-
   link lu=":a UsedIntvecsJC69seqgen.txt";
-   link lf=":a FailedJC69seqgen.txt";
+  link lf=":a FailedJC69seqgen.txt";
 
   string readstr="ThreeTaxonClaw.dat";
   ideal Iu,G;
@@ -921,9 +937,9 @@ proc checkseqgenJC69run(int a, int sd, int len)
   for(i=1; i<=a; i++)
   {
     shcmd="seq-gen ";
-     shcmd=shcmd+"-mHKY -l"+string(len)+" -n1 -z"+string(sd);
-     shcmd=shcmd+" -q  < ThreeTaxonClaw.tree > ThreeTaxonClaw.dat";
-     sd++;
+    shcmd=shcmd+"-mHKY -l"+string(len)+" -n1 -z"+string(sd);
+    shcmd=shcmd+" -q  < ThreeTaxonClaw.tree > ThreeTaxonClaw.dat";
+    sd++;
     eatoutput=system("sh",shcmd);
     u=getintvec(readstr);
     writestr=string(u);
@@ -931,77 +947,74 @@ proc checkseqgenJC69run(int a, int sd, int len)
 
     Iu=likeIdeal(I,u);
 
-
     Iu=std(Iu);
     //Iu=groebner(Iu);
     d=dim(Iu);
     if(d != 0)
     {
-       nzd++;
-       display="-*-*-*- not 0-dim. for u= "+string(u)+", i= "+string(i)+" -*-*-*-";
-       print(display);
-       write(lf,display);
-       i++;
-       continue;
+      nzd++;
+      display="-*-*-*- not 0-dim. for u= "+string(u)+", i= "+string(i)+" -*-*-*-";
+      print(display);
+      write(lf,display);
+      i++;
+      continue;
     }
-
 
     eatoutput=getguaranteedmaxPoints(Iu,logHessian(I,u),1);
 
     if(eatoutput >= 2)
     {
-       num++;
+      num++;
       write(lf,writestr+"; number: "+string(eatoutput));
       display="-*-*-*- no unique maximum for u= "+
-           string(u)+", i= "+string(i)+" -*-*-*-";
+      string(u)+", i= "+string(i)+" -*-*-*-";
       print(display);
       display="";
     }
   }
 
-
   display="-------------- i = "+string(i)+" --------------";
-   display=display+newline+"not zero-dimensional in "+string(nzd)+" cases"+newline;
-   display=display+"no unique maximum in "+string(num)+" cases"+newline;
-   print(display);
-   write(lf,display);
+  display=display+newline+"not zero-dimensional in "+string(nzd)+" cases"+newline;
+  display=display+"no unique maximum in "+string(num)+" cases"+newline;
+  print(display);
+  write(lf,display);
 
-   close(lu);
+  close(lu);
   close(lf);
 
-   return(nzd,num);
+  return(nzd,num);
 }
 
 proc randclawtree(int a)
 {
-   ring r=(complex,10),x,dp;
-   number n1,n2,n3;
-   int n;
-   int i;
-   for(i=1; i<=a; i++)
-   {
-      n=random(1,1000000);
-      n1=number(n)/1000000;
-      n2=number(random(1,1000000-n))/1000000;
-      n3=1-n1-n2;
-      print("(Taxon1:"+string(n1)+",Taxon2:"+string(n2)+",Taxon3:"+string(n3)+");");
-   }
+  ring r=(complex,10),x,dp;
+  number n1,n2,n3;
+  int n;
+  int i;
+  for(i=1; i<=a; i++)
+  {
+    n=random(1,1000000);
+    n1=number(n)/1000000;
+    n2=number(random(1,1000000-n))/1000000;
+    n3=1-n1-n2;
+    print("(Taxon1:"+string(n1)+",Taxon2:"+string(n2)+",Taxon3:"+string(n3)+");");
+  }
 }
 
 proc checkrandomJC69writebeginning(int r, int a, int sta, int up)
 {
-   string writestr=newline+newline+newline+newline+newline+newline;
-   writestr=writestr+"*****************************************************"+newline;
-   writestr=writestr+"starting new loop with the following parameters"+newline;
-   writestr=writestr+"number of runs: "+string(r)+newline;
-   writestr=writestr+"number of intvecs per run: "+string(a)+newline;
-   writestr=writestr+"starting random seed: "+string(sta)+newline;
-   writestr=writestr+"upper bound for the entries of the intvecs: "+string(up)+newline;
-   writestr=writestr+"*****************************************************";
+  string writestr=newline+newline+newline+newline+newline+newline;
+  writestr=writestr+"*****************************************************"+newline;
+  writestr=writestr+"starting new loop with the following parameters"+newline;
+  writestr=writestr+"number of runs: "+string(r)+newline;
+  writestr=writestr+"number of intvecs per run: "+string(a)+newline;
+  writestr=writestr+"starting random seed: "+string(sta)+newline;
+  writestr=writestr+"upper bound for the entries of the intvecs: "+string(up)+newline;
+  writestr=writestr+"*****************************************************";
 
-   link lu=":a UsedIntvecsJC69rand.txt";
-   link lf=":a FailedJC69rand.txt";
-   write(lu,writestr);
+  link lu=":a UsedIntvecsJC69rand.txt";
+  link lf=":a FailedJC69rand.txt";
+  write(lu,writestr);
   write(lf,writestr);
   close(lu);
   close(lf);
@@ -1009,21 +1022,21 @@ proc checkrandomJC69writebeginning(int r, int a, int sta, int up)
 
 proc checkrandomJC69writeend(int r, int a, int sta, int up, int s, int t)
 {
-   writestr=newline+newline+newline;
-   writestr=writestr+"*****************************************************"+newline;
-   writestr=writestr+"ending loop with the following parameters"+newline;
-   writestr=writestr+"number of runs: "+string(r)+newline;
-   writestr=writestr+"number of intvecs per run: "+string(a)+newline;
-   writestr=writestr+"starting random seed: "+string(sta)+newline;
-   writestr=writestr+"upper bound for the entries of the intvecs: "+string(up)+newline;
-   writestr=writestr+newline+"in the whole loop, there were a total of"+newline;
-   writestr=writestr+"   "+string(s)+" examples with non-zero-dim. likeideal"+newline;
-   writestr=writestr+"   "+string(t)+
+  writestr=newline+newline+newline;
+  writestr=writestr+"*****************************************************"+newline;
+  writestr=writestr+"ending loop with the following parameters"+newline;
+  writestr=writestr+"number of runs: "+string(r)+newline;
+  writestr=writestr+"number of intvecs per run: "+string(a)+newline;
+  writestr=writestr+"starting random seed: "+string(sta)+newline;
+  writestr=writestr+"upper bound for the entries of the intvecs: "+string(up)+newline;
+  writestr=writestr+newline+"in the whole loop, there were a total of"+newline;
+  writestr=writestr+"   "+string(s)+" examples with non-zero-dim. likeideal"+newline;
+  writestr=writestr+"   "+string(t)+
       " examples with more than one biol. meaningful local maximum";
-   writestr=writestr+newline+"*****************************************************";
+  writestr=writestr+newline+"*****************************************************";
 
 
-   write(lu,writestr);
+  write(lu,writestr);
   write(lf,writestr);
   close(lu);
   close(lf);
@@ -1033,7 +1046,7 @@ proc checkrandomJC69loop(int r, int a, int sta, int up, int s, int t)
 {
    //r the number of runs, a the number of intvecs per run, sta the starting random
    //seed, up the upper bound for the entries of the intvecs
-  checkrandomJC69writebeginning(r,a,sta,up);
+   checkrandomJC69writebeginning(r,a,sta,up);
 
    int nzd, num, i, s, t;
    for(i=1; i<=r; i++)
@@ -1063,61 +1076,59 @@ proc checkseqgenJC69writebeginning(int r, int a, int sd, int sta, int len, int p
    link lu=":a UsedIntvecsJC69seqgen.txt";
    link lf=":a FailedJC69seqgen.txt";
    write(lu,writestr);
-  write(lf,writestr);
-  close(lu);
-  close(lf);
+   write(lf,writestr);
+   close(lu);
+   close(lf);
 }
 
 
 proc checkseqgenJC69writeend(int r, int a, int sd, int sta,
        int len, int p, int s, int t, intvec ls)
 {
-   writestr=newline+newline+newline;
-   writestr=writestr+"*****************************************************"+newline;
-   writestr=writestr+"ending loop with the following parameters"+newline;
-   writestr=writestr+"number of runs: "+string(r)+newline;
-   writestr=writestr+"number of intvecs per run: "+string(a)+newline;
-   writestr=writestr+"starting random seed for seqgen: "+string(sd)+newline;
-   writestr=writestr+"starting random seed for random: "+string(sta)+newline;
-   writestr=writestr+"length of the generated sequences: "+string(len)+newline;
-   writestr=writestr+newline+"in the whole loop, there were a total of"+newline;
-   writestr=writestr+"   "+string(s)+" examples with non-zero-dim. likeideal"+newline;
-   writestr=writestr+"   "+string(t)+
+  writestr=newline+newline+newline;
+  writestr=writestr+"*****************************************************"+newline;
+  writestr=writestr+"ending loop with the following parameters"+newline;
+  writestr=writestr+"number of runs: "+string(r)+newline;
+  writestr=writestr+"number of intvecs per run: "+string(a)+newline;
+  writestr=writestr+"starting random seed for seqgen: "+string(sd)+newline;
+  writestr=writestr+"starting random seed for random: "+string(sta)+newline;
+  writestr=writestr+"length of the generated sequences: "+string(len)+newline;
+  writestr=writestr+newline+"in the whole loop, there were a total of"+newline;
+  writestr=writestr+"   "+string(s)+" examples with non-zero-dim. likeideal"+newline;
+  writestr=writestr+"   "+string(t)+
         " examples with more than one biol. meaningful local maximum";
-   writestr=writestr+newline+"*****************************************************";
-   writestr=writestr+"used lengths:"+newline+string(ls);
-   writestr=writestr+newline+"*****************************************************";
+  writestr=writestr+newline+"*****************************************************";
+  writestr=writestr+"used lengths:"+newline+string(ls);
+  writestr=writestr+newline+"*****************************************************";
 
-
-   write(lu,writestr);
+  write(lu,writestr);
   write(lf,writestr);
   close(lu);
   close(lf);
 }
 
-
 proc checkseqgenJC69loop(int r, int a, int sd, int sta, int len, int p)
 {
-   //r the number of runs, a the number of intvecs per run, sd the starting random
-   //seed, len the starting length, p the amount len will increase (on average)
-   //after each run (via + random(1,2*p-1))
-   //sta the random seed for random
+  //r the number of runs, a the number of intvecs per run, sd the starting random
+  //seed, len the starting length, p the amount len will increase (on average)
+  //after each run (via + random(1,2*p-1))
+  //sta the random seed for random
 
-   checkseqgenJC69writebeginning(r,a,sd,sta,len,p);
+  checkseqgenJC69writebeginning(r,a,sd,sta,len,p);
 
-   system("random",sta);
-   intvec ls;
-   int nzd, num, i, s, t;
-   for(i=1; i<=r; i++)
-   {
-      (nzd,num)=checkseqgenJC69run(a,sd,len);
-      sd++;
-      ls[i]=len;
-      len=len+random(1,2*p-1);
-      s=s+nzd;
-      t=t+num;
-   }
+  system("random",sta);
+  intvec ls;
+  int nzd, num, i, s, t;
+  for(i=1; i<=r; i++)
+  {
+    (nzd,num)=checkseqgenJC69run(a,sd,len);
+    sd++;
+    ls[i]=len;
+    len=len+random(1,2*p-1);
+    s=s+nzd;
+    t=t+num;
+  }
 
-   checkseqgenJC69writeend(r,a,sd,sta,len,p,s,t,ls);
+  checkseqgenJC69writeend(r,a,sd,sta,len,p,s,t,ls);
 }
 */
