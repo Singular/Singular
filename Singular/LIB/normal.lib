@@ -4703,7 +4703,7 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
 
   def R = basering;
   poly c = D;
-  ideal U;
+  ideal U,UU;
   ideal cJ;
   list testOut;                 // Output of proc testIdeal
                                 // (the test ideal and the ring structure)
@@ -4778,10 +4778,23 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
     setring R;
     U = imap(Q, U);
     c = imap(Q, c);
+    UU=0;
+    for(i=1;i<=size(U);i++)
+    {
+       if(U[i]!=c){UU[size(UU)+1]=U[i];}
+    }
+    UU=interred(UU);
+    attrib(UU,"isSB",1);
+    U=c,UU;
+    for(i=2;i<=size(U);i++)
+    {
+       U[i]=lead(U[i])+reduce(U[i]-lead(U[i]),UU);
+    }
     testOut = testIdeal(I, U, origJ, c, D);
     cJ = testOut[1];
 
     setring Q;
+    U=imap(R,U);
     cJ = imap(R, cJ);
     cJ = groebner(cJ);
 
