@@ -22,6 +22,12 @@ struct sip_sideal
   #define MATELEM(mat,i,j) ((mat)->m)[MATCOLS((mat)) * ((i)-1) + (j)-1]
 
 };
+/* the settings of rank, nrows, ncols, m ,   entries:
+ * for IDEAL_CMD:     1    1    n    size n   poly              (n>=0)
+ * for MODUL_CMD:     r    1    n    size n   vector of rank<=r (n>=0, r>=0)
+ * for MATRIX_CMD     r    r    c    size r*c poly              (r>=0, c>=0)
+ * for MAP_CMD:    char*   1    n    size n   poly              (n>=0)
+ */
 
 struct sip_smap
 {
