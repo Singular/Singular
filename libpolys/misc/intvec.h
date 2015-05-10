@@ -23,8 +23,9 @@ public:
 
   inline intvec(int l = 1)
   {
-    assume(l > 0);
-    v = (int *)omAlloc0(sizeof(int)*l);
+    assume(l >= 0);
+    if (l>0) v = (int *)omAlloc0(sizeof(int)*l);
+    else     v = NULL;
     row = l;
     col = 1;
   }
@@ -35,7 +36,7 @@ public:
     assume( iv != NULL );
     row = iv->rows();
     col = iv->cols();
-    assume(row > 0);
+    assume(row >= 0);
     assume(col > 0);
     if (row*col>0)
     {
@@ -104,12 +105,16 @@ public:
     }
   inline void ivTEST() const
     {
-      omCheckAddrSize((ADDRESS)v,sizeof(int)*row*col);
+      if (row>0) omCheckAddrSize((ADDRESS)v,sizeof(int)*row*col);
     }
   inline int min_in()
   {
-    int m=v[0];
-    for (int i=row*col-1; i>0; i--) if (v[i]<m) m=v[i];
+    int m=0;
+    if (row>0)
+    {
+      m=v[0];
+      for (int i=row*col-1; i>0; i--) if (v[i]<m) m=v[i];
+    }
     return m;
   }
 #if 0
