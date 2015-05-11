@@ -5248,7 +5248,7 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M,
       MivString(curr_weight, target_weight, next_weight);
     }
 //#endif
-    if(MivComp(next_weight, ivNull) == 1 || MivComp(target_weight,curr_weight) == 1 || test_w_in_ConeCC(G, target_weight) == 1)
+    if(MivComp(next_weight, ivNull) == 1 || MivComp(target_weight,curr_weight) == 1)
     {
 //#ifdef CHECK_IDEAL_MWALK
       if(printout > 0)
@@ -5580,7 +5580,7 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
       MivString(curr_weight, target_weight, next_weight);
     }
 //#endif
-    if(MivComp(next_weight, ivNull) == 1 || MivComp(target_weight,curr_weight) == 1 || test_w_in_ConeCC(G, target_weight) == 1)
+    if(MivComp(next_weight, ivNull) == 1 || MivComp(target_weight,curr_weight) == 1)
     {
 //#ifdef CHECK_IDEAL_MWALK
       if(printout > 0)
