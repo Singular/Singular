@@ -39,7 +39,7 @@ static int idpowerpoint;
 */
 ideal idInit(int idsize, int rank)
 {
-  /*- initialise an ideal -*/
+  /*- initialise an ideal/module -*/
   ideal hh = (ideal )omAllocBin(sip_sideal_bin);
   hh->nrows = 1;
   hh->rank = rank;
@@ -55,6 +55,7 @@ ideal idInit(int idsize, int rank)
 
 #ifdef PDEBUG
 // this is only for outputting an ideal within the debugger
+// therefor it accept the otherwise illegal id==NULL
 void idShow(const ideal id, const ring lmRing, const ring tailRing, const int debugPrint)
 {
   assume( debugPrint >= 0 );
@@ -398,20 +399,9 @@ BOOLEAN id_IsConstant(ideal id, const ring r)
 ideal id_Copy(ideal h1, const ring r)
 {
   int i;
-  ideal h2;
-
-//#ifdef TEST
-  if (h1 == NULL)
-  {
-    h2=idInit(1,1);
-  }
-  else
-//#endif
-  {
-    h2=idInit(IDELEMS(h1),h1->rank);
-    for (i=IDELEMS(h1)-1; i>=0; i--)
-      h2->m[i] = p_Copy(h1->m[i],r);
-  }
+  ideal h2 =idInit(IDELEMS(h1),h1->rank);
+  for (i=IDELEMS(h1)-1; i>=0; i--)
+    h2->m[i] = p_Copy(h1->m[i],r);
   return h2;
 }
 
@@ -439,6 +429,8 @@ void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r, con
       h1->rank=new_rk;
     }
   }
+  else
+    Print("error: ideal==NULL in %s:%d\n",f,l);
 }
 #endif
 
@@ -577,8 +569,6 @@ ideal id_SimpleAdd (ideal h1,ideal h2, const ring R)
   int i,j,r,l;
   ideal result;
 
-  if (h1==NULL) return id_Copy(h2,R);
-  if (h2==NULL) return id_Copy(h1,R);
   j = IDELEMS(h1)-1;
   while ((j >= 0) && (h1->m[j] == NULL)) j--;
   i = IDELEMS(h2)-1;
@@ -710,7 +700,6 @@ BOOLEAN idIs0 (ideal h)
 {
   int i;
 
-  if (h == NULL) return TRUE;
   i = IDELEMS(h)-1;
   while ((i >= 0) && (h->m[i] == NULL))
   {
@@ -727,31 +716,27 @@ BOOLEAN idIs0 (ideal h)
 */
 long id_RankFreeModule (ideal s, ring lmRing, ring tailRing)
 {
-  if (s!=NULL)
-  {
-    long  j=0;
+  long  j=0;
 
-    if (rRing_has_Comp(tailRing) && rRing_has_Comp(lmRing))
+  if (rRing_has_Comp(tailRing) && rRing_has_Comp(lmRing))
+  {
+    poly *p=s->m;
+    for (unsigned int l=IDELEMS(s); l > 0; --l, ++p)
     {
-      poly *p=s->m;
-      for (unsigned int l=IDELEMS(s); l != 0; --l, ++p)
+      if (*p!=NULL)
       {
-        if (*p!=NULL)
-        {
-          pp_Test(*p, lmRing, tailRing);
-          const long k = p_MaxComp(*p, lmRing, tailRing);
-          if (k>j) j = k;
-        }
+        pp_Test(*p, lmRing, tailRing);
+        const long k = p_MaxComp(*p, lmRing, tailRing);
+        if (k>j) j = k;
       }
     }
-    return j;
   }
-  return -1;
+  return j;
 }
 
 BOOLEAN idIsModule(ideal id, ring r)
 {
-  if (id != NULL && rRing_has_Comp(r))
+  if (rRing_has_Comp(r))
   {
     int j, l = IDELEMS(id);
     for (j=0; j<l; j++)
@@ -769,8 +754,7 @@ BOOLEAN idIsModule(ideal id, ring r)
 BOOLEAN id_HomIdeal (ideal id, ideal Q, const ring r)
 {
   int i;
-  BOOLEAN     b;
-  if ((id == NULL) || (IDELEMS(id) == 0)) return TRUE;
+  BOOLEAN b;
   i = 0;
   b = TRUE;
   while ((i < IDELEMS(id)) && b)
@@ -1115,7 +1099,7 @@ ideal id_Matrix2Module(matrix mat, const ring R)
 {
   int mc=MATCOLS(mat);
   int mr=MATROWS(mat);
-  ideal result = idInit(si_max(mc,1),si_max(mr,1));
+  ideal result = idInit(mc,mr);
   int i,j,l;
   poly h;
   sBucket_pt bucket = sBucketCreate(R);

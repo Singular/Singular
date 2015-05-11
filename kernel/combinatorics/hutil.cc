@@ -34,7 +34,7 @@ static scfmon hsecure= NULL;
 scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
 {
   id_TestTail(S, currRing, tailRing);
-  id_TestTail(Q, currRing, tailRing);
+  if (Q!=NULL) id_TestTail(Q, currRing, tailRing);
 
 //   if (tailRing != currRing)
     hisModule = id_RankFreeModule(S, currRing, tailRing);

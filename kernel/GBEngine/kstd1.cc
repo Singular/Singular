@@ -2138,7 +2138,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   strat->homog=h;
 #ifdef KDEBUG
   idTest(F);
-  idTest(Q);
+  if (Q!=NULL) idTest(Q);
 
 #if MYTEST
   if (TEST_OPT_DEBUG)

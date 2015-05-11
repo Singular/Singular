@@ -3512,12 +3512,20 @@ void pEnlargeSet(poly* *p, int l, int increment)
 {
   poly* h;
 
-  h=(poly*)omReallocSize((poly*)*p,l*sizeof(poly),(l+increment)*sizeof(poly));
-  if (increment>0)
+  if (*p==NULL)
   {
-    //for (i=l; i<l+increment; i++)
-    //  h[i]=NULL;
-    memset(&(h[l]),0,increment*sizeof(poly));
+    if (increment==0) return;
+    h=(poly*)omAlloc0(increment*sizeof(poly));
+  }
+  else
+  {
+    h=(poly*)omReallocSize((poly*)*p,l*sizeof(poly),(l+increment)*sizeof(poly));
+    if (increment>0)
+    {
+      //for (i=l; i<l+increment; i++)
+      //  h[i]=NULL;
+      memset(&(h[l]),0,increment*sizeof(poly));
+    }
   }
   *p=h;
 }
