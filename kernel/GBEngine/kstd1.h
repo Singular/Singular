@@ -11,6 +11,8 @@
 
 ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 
+typedef BOOLEAN (*s_poly_proc_t)(kStrategy strat);
+
 // lazy_reduce flags: can be combined by |
 #define KSTD_NF_LAZY   1
   // do only a reduction of the leading term
@@ -31,7 +33,7 @@ ideal kSba(ideal F,ideal Q, tHomog h, intvec ** mw, int incremental=0, int arri=
           int syzComp=0,int newIdeal=0, intvec *vw=NULL);
 
 ideal kStd(ideal F, ideal Q, tHomog h, intvec ** mw,intvec *hilb=NULL,
-          int syzComp=0,int newIdeal=0, intvec *vw=NULL);
+          int syzComp=0,int newIdeal=0, intvec *vw=NULL, s_poly_proc_t sp=NULL);
 
 ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 		int newIdeal, intvec *vw, int uptodeg, int lVblock);

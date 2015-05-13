@@ -19,6 +19,7 @@
 #include <polys/operations/pShallowCopyDelete.h>
 
 #include <kernel/structs.h>
+#include <kernel/GBEngine/kstd1.h>   /* for s_poly_proc_t */
 
 // define if tailrings should be used
 #define HAVE_TAIL_RING
@@ -295,6 +296,7 @@ public:
   pLDegProc pOrigLDeg;
   pFDegProc pOrigFDeg_TailRing;
   pLDegProc pOrigLDeg_TailRing;
+  s_poly_proc_t s_poly;
 
   LObject P;
   ideal Shdl;
