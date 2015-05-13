@@ -22,7 +22,6 @@ REFERENCES:
 PROCEDURES:
     grobj(M,w[,d])  construct a graded object (map) given by matrix M
     grtest(A)       check whether A is a valid graded object
-    grisequal(A,B)  check whether A is exactly eqal to B? TODO: isomorphic!
     grdeg(M)        compute graded degrees of columns of the map M
     grview(M)       view the graded structure of map M
     grshift(M,d)    shift graded module coker(M) by +d
@@ -56,6 +55,8 @@ PROCEDURES:
     grneg(A)           graded object given by -A
     matrixpres(a)      matrix presentation of direct sum of Omega^{a[i]}(i)
 ";
+    
+//    grisequal(A,B)  check whether A is exactly eqal to B? TODO: isomorphic!
 
 LIB "matrix.lib"; // ?
 
@@ -72,6 +73,10 @@ static proc mstring( int m, string c){ if( m < 0 ) { return (c); }; return (stri
 static proc grsumstr(string R, intvec v)
 "direct sum_i=1^size R(-v[i]), for source and targets of graded objects"
 {
+  int n = size(v);
+  if (n == 0) { return ("0"); }
+  ASSUME(0, n > 0 );
+
   if (R == "")
   {
     R = nameof(basering);
@@ -79,12 +84,6 @@ static proc grsumstr(string R, intvec v)
 
   ASSUME(0, defined(R) && (R != "") );
 
-  int n = size(v);
-
-  if (n == 0) { return ("0"); }
-
-  ASSUME(0, n > 0 );
-  
   v = -v; // NOTE: due to Mathematical meanings of Singular data
   
 
@@ -177,33 +176,89 @@ EXAMPLE: example grview; shows an example
   string arrow = " <- ";
   string R = nameof(basering);
 
-  if( typeof( N ) == "list" )
+  if( typeof( N ) == "list" ) // TODO: find a better DS for graded resolutions / chain map !?
   {
-    msg = msg + " resolution";  // TODO: what about chain maps?
+    int n = size(N); ASSUME(0, n > 0);
+    
+    string msg1 = "";
     if( size(R) >= 2 )
     {
-      msg = msg + "(let R:="+R+")";
-      R = "R";
-    }
+      msg1 = msg1 + "(let R:="+R+")";
+      R = "R"; // !!!
+    }    
+    msg1 = msg1 + ": " ;
 
-
-    int i = 1;  int n = size(N);
-    string dst;
     
-    msg = msg + ": " + newline + grsumstr(R, grrange(N[i])) + " <-- d_" + string(i) + " -- " ;
-    for( ; i < n; i++ )
-    { 
-      dst = grsumstr(R, grdeg(N[i])) +  " <-- d_" + string(i+1) + " --";
-      msg = msg + newline + dst; 
+
+    list arr; arr[n] = list();
+    int exact = (1==1);
+    
+    int i = 1;
+    
+    ASSUME(1, grtest(N[i]));
+    
+    string dst = grsumstr(R, grrange(N[i]));
+    string src = grsumstr(R, grdeg(N[i]));
+    
+    arr[i] = list(dst,  src);
+
+    i = i + 1;
+    
+    while( i <= n )
+    {
+      ASSUME(1, grtest(N[i]));
+      
+      dst = grsumstr(R, grrange(N[i]));
+      
+      if( exact && (src != dst) )
+      {
+//        "src: [" + src+ "] != [" + dst + "] :(!!";
+        exact = (1==0);
+      }
+
+      src = grsumstr(R, grdeg(N[i]));
+      
+      arr[i] = list(dst,  src);
+
+      i = i + 1;
     };
 
-    msg = msg + newline + grsumstr(R, grdeg(N[i])) + ", given by maps: "; 
+    string o = "";
+
+    if( exact )
+    { // complex?
+      msg = msg + " resolution" + msg1;
+
+      o = "d";
+
+      for( i = 1; i <= n; i++ )
+      {
+        msg = msg + newline + arr[i][1] + " <-- "+o+"_" + string(i) + " --";
+      };
+      
+      msg =  msg + newline + arr[n][2];
+      msg = msg + ", given by maps: "; 
+    } else
+    {
+//      print(arr);
+
+      msg = msg + "-object collection";      
+      o = "o";
+      
+//      for( i = 1; i <= n; i++ )
+//      {
+//        msg = msg + newline + arr[i][1] + " <-- "+o+"_" + string(i) + " -- " + arr[i][2];
+//      };      
+      msg = msg + ", given by the following maps (named here as "+o+"_[1 .. "+string(n)+"]): "; 
+    }
+
 
     print(msg);
 
     for( i = 1; i <= size(N); i++ )
     { 
-      "d_" + string(i) + " :"; grview(N[i]); 
+      print( o+"_" + string(i) + " :" );
+      grview( N[i] ); 
     };
 
     return ();
@@ -392,25 +447,15 @@ TODO: replace with some kernel function if this turns out to be inefficient!!
     }
   }
 
-/*
-  if( flag ) // output details in case of non-identical permutation?
-  {
-    // grades & ordering permutation : gr[pivot] should be sorted:
-    "s: ", s;
-    "gr: ", gr;
-    "pivot: ",    pivot;
-  }
-*/
   ASSUME(1, issorted(intvec(gr[pivot]), 1));
 
   return (pivot);
 }
 
-// Q@Wolfram: what should be done with zero gens!?
 proc grdeg(M)
 "USAGE:  grdeg(M), graded object M
 RETURN:  intvec of degrees
-PURPOSE: graded degrees of columns (generators) of M
+PURPOSE: graded degrees of columns (generators) of M, describing the source of M
 ASSUME:  M must be a graded object (matrix/module/ideal/mapping)
 NOTE:    if M has zero cols it shoud have attrib(M,'degHomog') set.
 EXAMPLE: example grdeg; shows an example
@@ -422,14 +467,15 @@ EXAMPLE: example grdeg; shows an example
   {
     def t = attrib(M, "degHomog"); // graded degrees
 
-    if( ncols(M) == 0 )    {     return (t);    } // for now
+    if( size(t) == 0 ){ return (t); } // ZERO!
     
-    ASSUME(0, ncols(M) == size(t) );
+    ASSUME(2, ncols(M) == size(t) );
     return (t);
   }
-  
-  ASSUME(0, ncols(M) > 0);
 
+  if( ncols(M) == 0 ) { return (0:0); } // FIXME: Why???
+
+  ASSUME(0, ncols(M) > 0);
   ASSUME(0, ncols(M) == size(M) );
 
   def w = grrange(M); // grading weights?
@@ -746,7 +792,6 @@ example
 
 /////////////////////////////////////////////////////////
 
-// Q@Woflram?
 proc grzero()
 "USAGE:  grzero()
 RETURN:  graded object representing S(0)^1
@@ -754,18 +799,62 @@ PURPOSE: compute presentation of S(0)^1
 EXAMPLE: example grzero; shows an example
 "
 {
- return ( grobj(module([0]), intvec(0), intvec(0)) );
+ return ( grobj(freemodule(0), intvec(0:0), intvec(0:0)) );
 }
 example
 { "EXAMPLE:"; echo = 2;
 
   ring r=32003,(x,y,z),dp;
 
-  def M = grpower( grshift( grzero(), 10), 5 );
 
-  print(M);
+  grview( grobj(freemodule(0), intvec(0:0), intvec(0:0)) );
+  grview( grobj(freemodule(0), intvec(0:0)) );
 
-  grview(M);
+  grview( grzero() );
+
+//  def M = grpower( grshift( grzero(), 3), 2 ); grview(M);
+}
+
+proc grtwists(intvec v)
+"USAGE:  grtwists(v), intvec v
+RETURN:  graded object representing S(v[1]) + ... + S(v[size(v)])
+PURPOSE: compute presentation of S(v[1]) + ... + S(v[size(v)])
+EXAMPLE: example grtwists; shows an example
+"
+{
+  matrix m[size(v)][0];
+  return( grobj(m, -v) ); // will set the rank as well
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+  
+  grview( grtwists ( intvec(-4, 1, 6 )) );
+
+  grview( grtwists ( intvec(0:0) ) );
+}
+
+proc grtwist(int a, int d)
+"USAGE:  grtwist(a,d), int a, d
+RETURN:  graded object representing S(d)^a
+PURPOSE: compute presentation of S(d)^a
+EXAMPLE: example grtwist; shows an example
+"
+{
+  ASSUME(0, a > 0);  
+  def Z = grtwists( intvec(d:a) ); // will set the rank as well
+//  ASSUME(2, grisequal(Z, grpower( grshift(grzero(), d), a ) )); // optional check
+  return(Z);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+
+//  grview(grpower( grshift(grzero(), 10), 5 ) );
+
+  grview( grtwist (5, 10) );
 }
 
 proc grpower(def A, int p)
@@ -826,16 +915,28 @@ EXAMPLE: example grsum; shows an example
   intvec a = grrange(A);
   intvec b = grrange(B);
   intvec c = a,b;
-  int r = nrows(A);
 
-  module T = align(module(B), r); //  T;  print(T);  nrows(T); // BUG!!!!
-  module S = module(A), T;
+  if( (ncols(B)>0) && (size(B)>0) )
+  {
+    int r = nrows(A);
+    module T = align(module(B), r); //  T;  print(T);  nrows(T); // BUG!!!!
+    module S = module(A), T;
+  }
+  else { def S = A; }
 
   intvec da = grdeg(A);
   intvec db = grdeg(B);
   intvec dc = da, db;
 
-  return(grobj(S, c, dc));
+
+  def SS = grobj(S, c, dc);
+  
+  ASSUME(0, size( grrange(SS) ) == (size(a) + size(b)) );
+  ASSUME(0, size( grdeg(SS) ) == (size(da) + size(db)) );
+  ASSUME(0, ncols( SS ) == size( grdeg(SS) ) );
+  ASSUME(0, nrows( SS ) == size( grrange(SS) ) );
+  
+  return(SS);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -882,11 +983,19 @@ EXAMPLE: example grshift; shows an example
 "
 {
   ASSUME(1, grtest(M) );
+           
+           
 
   intvec a = grrange(M);
-  a = a - intvec(d:size(a));
+  intvec t = grdeg(M);
 
-  intvec t = attrib(M, "degHomog");
+  if( size(a) == 0 && size(t) == 0 )
+  {
+    "!! Warning: shifting '0 <- 0' leaves it as it unchanged!";
+    return (M);    
+  }
+  
+  a = a - intvec(d:size(a));
   t = t - intvec(d:size(t));
 
   return (grobj(M, a, t));
@@ -903,6 +1012,8 @@ example
   module S = grshift( A,  6);
 
   grview(S);
+
+  grview( grshift( grzero(), 100 ) ); // does nothing...
 }
 
 
@@ -933,32 +1044,7 @@ EXAMPLE: example grisequal; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-  TODO
-}
-
-proc grtwist(int a, int d)
-"USAGE:  grtwist(a,d), int a, d
-RETURN:  graded object representing S(d)^a
-PURPOSE: compute presentation of S(d)^a
-EXAMPLE: example grtwist; shows an example
-"
-{
-  ASSUME(0, a > 0);
-
-  module Z; Z[a] = [0];
-  intvec w = -intvec(d:a);
-  Z = grobj(Z, w, w); // will set the rank as well
-  ASSUME(2, grisequal(Z, grpower( grshift(grzero(), d), a ) )); // optional check
-  return(Z);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-
-  ring r=32003,(x,y,z),dp;
-
-  grview(grpower( grshift(grzero(), 10), 5 ) );
-
-  grview( grtwist (5, 10) );
+//  TODO
 }
 
 proc grobj(def A, intvec w, list #)
@@ -968,32 +1054,55 @@ PURPOSE: create a valid graded object with a given matrix presentation, weightin
 EXAMPLE: example grobj; shows an example
 "
 {
-  if( ncols(A) == 0 )
-  {
-    ASSUME(0, size(w) == nrows(A) );
-    attrib(A, "isHomog", w);
-    attrib(A, "degHomog", intvec(0)); // FIXME: just for now: no intvec of 0-size :(
-    ASSUME(0, grtest(A) );
-    return (A);
-  }
+  ASSUME(0, size(w) >= nrows(A) );
   
   module M = module(A);
-  ASSUME(0, size(w) >= nrows(M) );
 
   attrib( M, "rank", size(w) );
   attrib( M, "isHomog", w );
 
+  intvec @ww = 0:0;
+  
   if( size(#) > 0 )
   {
     ASSUME(0, typeof(#[1]) == "intvec" );
-    ASSUME(0, size(#[1]) == ncols(M) );
-    attrib(M, "degHomog", #[1]);
+    
+    @ww = intvec( #[1] );
+
+    if( size(@ww) != ncols(M) )
+    {
+      if( (size(M) == 0) && (ncols(M) <= 1) && (size(w) == 0) && (size(@ww) > 0) )
+      {
+        matrix m[size(w)][size(@ww)]; M = module(m); attrib( M, "isHomog", w );
+      }
+    }
+    
+    ASSUME(0, size(@ww) == ncols(M) );
   }
   else
   {
-    ASSUME(0, /* no zero cols please! */ size(M) == ncols(M) );
-    attrib(M, "degHomog", grdeg(M));
+    if( size(M) == ncols(M) ) /* no zero cols? */
+    {
+      @ww = grdeg(M); // let us compute them all :)
+    } else
+    {
+      if( (ncols(M) == 1) && (size(M) == 0) )
+      {
+        M = freemodule(0);
+      }
+      
+      attrib( M, "rank", size(w) );
+      attrib( M, "isHomog", w );
+      
+//      ASSUME(0, /* PROBLEM WITH ZERO COLUMNS / THEIR DEGREES! */ (ncols(M) == 0) );
+    }
   }
+  
+//  type(@ww);  type(M);
+  
+  ASSUME(0, size(@ww) == ncols(M) ); // ?!
+  
+  attrib(M, "degHomog", @ww);
 
   ASSUME(0, grtest(M) );
   return (M);
@@ -1019,9 +1128,16 @@ example
   attrib(Z, "degHomog"); // total degrees
 
   // Zero object:
-  matrix z[3][0];
-  def zz = grobj( z, intvec(1,2,3) ); // intvec() ??
-  grview(zz);  
+  matrix z[3][0];  grview( grobj( z, intvec(1,2,3) ) );
+  grview( grobj( freemodule(0), intvec(1,2,3) ) );
+
+  matrix z1[0][3]; grview( grobj( z1, 0:0, intvec(1,2,3) ) ); 
+  grview( grobj( freemodule(0), 0:0, intvec(1,2,3) ) );
+
+  matrix z0[0][0]; grview( grobj( z0, 0:0 ) );
+  grview( grobj( freemodule(0), 0:0 ) );
+  
+  
 
 }
 
@@ -1066,6 +1182,12 @@ EXAMPLE: example grtest; shows an example
   if ( typeof(attrib(N, "degHomog")) == "intvec" )
   {
     intvec T = attrib(N, "degHomog"); // graded degrees
+
+    if( (ncols(N) == 1) && (size(T) == 0) && (size(N) == 0) )
+    {
+      //  if(b) { "Input seems to be a valid graded ZERO-arrow!"; };
+      return (1);
+    }
     
     if ( ncols(N) != size(T) )
     {
@@ -1119,9 +1241,11 @@ example
 
   // the following calls will fail due to tests in grtest:
 
+ grobj( module([x+y, x, 0, 0], [0, x+y, y, 0]), intvec(0,0,0,0) ); // enough row weights
 // grobj( module([x+y, x, 0, 0], [0, x+y, y, 0]), intvec(0,0) ); // not enough row weights
 // grobj( module([x,0], [0,0,0], [0, y]), intvec(1,2,3) ); // zero column needs (otherwise optional) total degrees
-// grobj( module([x,0], [0,0,0], [0, y]), intvec(1,2,3), intvec(1, 1, 1) ); // incompatible total degrees (on non-zero columns)
+ grobj( module([x,0], [0,0,0], [0, y]), intvec(1,2,3), intvec(2, 10, 3) ); // compatible total degrees (on non-zero columns)
+// grobj( module([x,0], [0,0,0], [0, y]), intvec(1,2,3), intvec(2-1, 10, 3+1) ); // incompatible total degrees (on both non-zero columns)
 
 }
 
@@ -1142,7 +1266,6 @@ static proc align( def A, int d)
     matrix B[nrows(A) + d][0];
     return (B);    
   }
-
   
   module T; T[d] = 0;
   T = T, module(transpose(A));
@@ -1150,9 +1273,13 @@ static proc align( def A, int d)
 }
 example
 { "EXAMPLE:"; echo = 2;
+
   ring r;
-  matrix m[1][0];
-  align(m, 3);
+  matrix m[2][0];
+  type( align(m, 3) );
+
+  matrix m[0][2];
+  type( align(m, 3) );
 }  
 
 
@@ -1179,28 +1306,6 @@ example
   grview(B);
 }
 
-
-proc grtwists(intvec v)
-"USAGE:  grtwists(v), intvec v
-RETURN:  graded object representing S(v[1]) + ... + S(v[size(v)])
-PURPOSE: compute presentation of S(v[1]) + ... + S(v[size(v)])
-EXAMPLE: example grtwists; shows an example
-"
-{
-  int l = size(v);
-  module Z; Z[l] = [0];
-  Z = grobj(Z, -v, -v); // will set the rank as well
-  return(Z);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-
-  ring r=32003,(x,y,z),dp;
-  
-  grview( grtwists ( intvec(-4, 1, 6 )) );
-}
-
-
 proc grsyz(A)
 "USAGE:  grsyz(M), graded object M
 RETURN:  graded object
@@ -1209,31 +1314,27 @@ EXAMPLE: example grsyz; shows an example
 "
 {
   ASSUME(1, grtest(A));
-  intvec v = grdeg(A);
+  return( grobj( syz(A), grdeg(A) ) );
 
-//  grrange(A);
-  
-  module M = syz(A); 
-//  print(M);
-  
-  if( size(M) > 0 ) { return( grobj( M, v ) ); }
-
-  // zero syzygy?
-  return( grtwists(-v) ); // ???
+//   if( size(syz(A)) == 0 ) : zero syzygy? //  return( grtwists( -grdeg(A) ) );
 }
 example
 { "EXAMPLE:"; echo = 2;
 
   ring r=32003,(x,y,z),dp;
 
-  module A = grobj( module([x+y, x, 0, 3], [0, x+y, y, 2], [y, y, z, 1]), intvec(0,0,0,1) ); 
+  module A = grgroebner( grobj( module([x+y, x, 0, 3], [0, x+y, y, 2], [y, y, z, 1]), intvec(0,0,0,1) ) ); 
   grview(A);
   
-  module B = grgroebner(A);
-  grview(B);
+  grview(grsyz(A));
+  
+  module X = grgroebner( grobj( module([x]), intvec(2) ) ); 
+  grview(X);
 
-  module C = grsyz(B);  
-  grview(C);
+  // syzygy module should be zero!
+  grview(grsyz(X));
+  
+  
 }
 
 
@@ -1247,7 +1348,10 @@ EXAMPLE: example grprod; shows an example
   ASSUME(1, grtest(A));
   ASSUME(1, grtest(B));
 
-  // TODO: ASSUME(0, grdeg() == grrange());!!! 
+  intvec a = grdeg(A);
+  intvec b = grrange(B);
+  
+  ASSUME(0, (size(a) == size(b)) && (a == b));  // == for intvec :(
 
   return ( grobj( A*B, grrange(A), grdeg(B) ) );
 }
@@ -1275,6 +1379,7 @@ example
 
 
 
+// TODO: think about a proper data structure for a graded resolution!?
 proc grres(def A, int l, list #)
 "USAGE:  grres(M, l[, b]), graded object M, int l, int b
 RETURN:  graded resolution = list of graded objects
@@ -1290,18 +1395,22 @@ EXAMPLE: example grres; shows an example
   int b = (size(#) > 0);
   if(b) { list r = res(A, l, #[1]); } else { list r = res(A, l); }
 
-//  r;  v;
-
   l = size(r);
   
-  int i; module m;
+  int i;
   
   for ( i = 1; i <= l; i++ )
   {
-    if( size(r[i]) == 0 ){ r[i] = grtwists(-v); i++; break;   }
+    if( size(r[i]) == 0 )
+    {
+      r[i] = grobj(freemodule(0), v); // grtwists(-v);
+      i++;
+      break;
+    }
 
     r[i] = grobj(r[i], v); v = grdeg(r[i]);
   }
+  
   i = i-1;
 
   return( list(r[1..i]) );
@@ -1325,8 +1434,7 @@ example
 }
 
 proc grtranspose(def M)
-"
-USAGE:   grtranspose(M), graded object M
+"USAGE:   grtranspose(M), graded object M
 RETURN:  graded object
 PURPOSE: graded transpose of M
 NOTE:    no reordering is performend by this procedure   
@@ -1350,25 +1458,29 @@ example
   module K = grsyz( L ); grview(K);
   
 
-  module A = grobj( module([x+y, x, 0, 3], [0, x+y, y, 2], [y, y, z, 1]), intvec(0,0,0,1) ); A = grgroebner(A); grview(A);
+  // Corner cases: 0 <- 0!
+  module Z = grzero(); grview(Z);
+  grview( grtranspose( Z ) );
 
-  "graded transpose: "; module B = grtranspose(A); grview( B ); print(B); 
+  
+  // Corner cases: * <- 0
+  matrix M1[3][0];
+  
+  module Z1 = grobj( M1, intvec(-1, 0, 1) ); grview(Z1);
+  grview( grtranspose( Z1 ) );
+  
+  
+  // Corner cases: 0 <- *
+  matrix M2[0][3];
 
-  "... syzygy: "; module C = grsyz(B); grview(C);
-
-  "... transposed: "; module D = grtranspose(C); grview( D ); print (D);
-
-  "... and back to presentation: "; module E = grsyz( D ); grview(E); print(E);
-
-  module F = grgens( E ); grview(F); print(F);
- 
-  module G = grpres( F ); grview(G); print(G);
+  module Z2 = grobj( M2, 0:0, intvec(-1, 0, 1) ); grview(Z2);
+  grview( grtranspose( Z2 ) );
+  
 }
 
 
 proc grgens(def M)
-"
-USAGE:   grgens(M), graded object M (map)
+"USAGE:   grgens(M), graded object M (map)
 RETURN:  graded object  
 PURPOSE: try compute graded generators of coker(M) and return them as columns
          of a graded map.
@@ -1403,13 +1515,14 @@ example
   module B = grgens(A);
 
   grview( B ); print(B); // Ups :( != A
+
+  grview( grgens( grzero() ) );
   
 }
 
 
 proc grpres(def M)
-"
-USAGE:   grpres(M), graded object M (submodule gens)
+"USAGE:   grpres(M), graded object M (submodule gens)
 RETURN:  graded module (via coker)
 PURPOSE: compute graded presentation matrix of submodule generated by columns of M
 EXAMPLE: example grpres; shows an example
@@ -1417,7 +1530,7 @@ EXAMPLE: example grpres; shows an example
 {
   ASSUME(1, grtest(M) );
 
-  module N = grsyz(M);
+  def N = grsyz(M);
 
 //  ASSUME(3, grisequal( M, grgens( N ) ) );
   
@@ -1428,20 +1541,26 @@ example
 
   ring r=32003,(x,y,z),dp;
 
-  module M = grtwists( intvec(-2, 0, 4, 4) ); grview(M);
+  def A = grgroebner( grobj( module([x+y, x, 0, 3], [0, x+y, y, 2], [y, y, z, 1]), intvec(0,0,0,1) ) );
+  grview(A);
 
-  module N = grgens(M); grview( N ); print(N);
+  "graded transpose: "; def B = grtranspose(A); grview( B ); print(B); 
 
-  module L = grpres( N ); grview( L ); print(L);
+  "... syzygy: "; def C = grsyz(B); grview(C);
+
+  "... transposed: "; def D = grtranspose(C); grview( D ); print (D);
+
+  "... and back to presentation: "; def E = grsyz( D ); grview(E); print(E);
+
+  def F = grgens( E ); grview(F); print(F); 
+  def G = grpres( F ); grview(G); print(G);
 
 
-  module A = grobj( module([x+y, x, 0, 3], [0, x+y, y, 2], [y, y, z, 1]), intvec(0,0,0,1) ); 
-
-  A = grgroebner(A); grview(A);
-
-  module B = grgens(A); grview( B ); print(B);
-
-  module C = grpres( B ); grview( C ); print(C);
+  def M = grtwists( intvec(-2, 0, 4, 4) ); grview(M);
+  
+  def N = grgens(M); grview( N ); print(N);
+  
+  def L = grpres( N ); grview( L ); print(L);  
 }
 
 
@@ -1503,11 +1622,9 @@ example
   print( grrndmat( intvec(0, 1), intvec(1, 2, 3) ) );
 }
 
-//
-
-
+// TODO: remove the following?
 proc KeneshlouMatrixPresentation(intvec a)
-"USAGE:  intvec a.
+"USAGE: KeneshlouMatrixPresentation(intvec a), intvec a.
 RETURN: graded object
 PURPOSE: matrix presentation for direct sum of omega^a[i](i) in form of a graded object
 EXAMPLE: example KeneshlouMatrixPresentation; shows an example
@@ -1674,13 +1791,38 @@ example
 }
 
 proc grrange(M)
+"USAGE: grrange(M), graded object M
+RETURN: intvec
+PURPOSE: get weights of module units, thus describing the target of M
+EXAMPLE: example grrange; shows an example
+"
 {
 //  ASSUME(1, grtest(M)); // Leads to recursive call due to grtest...
   return( attrib(M, "isHomog") );
 }
+example
+{ "EXAMPLE:"; echo = 2;
+
+  ring r=32003,(x,y,z),dp;
+
+  module Z = grobj(freemodule(0),intvec(0:0),intvec(0:0));
+  
+  grrange(Z);
+  grdeg(Z);
+  
+  grview(Z);
+
+  module P=grobj(module([xy,0,xz]),intvec(0,1,0));
+
+  grrange(P);
+  grdeg(P);
+
+  grview(P);
+}
 
 proc grlift0(M, N, alpha1)
-"PURPOSE: generic random alpha0 : coker(M) -> coker(N) from random alpha1
+"USAGE: grlift0(M, N, alpha1) TODO!
+PURPOSE: generic random alpha0 : coker(M) -> coker(N) from random alpha1
 NOTE: this proc can work only if some assumptions are fulfilled (due
 to Wolfram)! e.g. at the end of a resolution for the source module...
 "
@@ -1732,7 +1874,7 @@ example
 
 
 proc grlifting(M,N)
-"USAGE:  graded objects M and N
+"USAGE: grlifting(M,N), graded objects M and N
 RETURN: map of chain complexes (as a list)
 PURPOSE: construct a map of chain complexes between free resolutions of Img(M) and Img(N).
 EXAMPLE: example grlifting; shows an example
@@ -1822,7 +1964,7 @@ example
 }
 
 proc mappingcone(M,N)
-"USAGE:M,N graded objects
+"USAGE: mappingcone(M,N), M,N graded objects
 RETURN: chain complex (as a list) 
 PURPOSE: construct a free resolution of the cokernel of a random map between Img(M), and Img(N).
 EXAMPLE: example mappingcone; shows an example
@@ -1884,7 +2026,7 @@ print(betti(GI),"betti");
 
 // correct
 proc grrndmap(def S, def D, list #) 
-"USAGE: (S,D), graded objects S and D
+"USAGE: grrndmap(S,D), graded objects S and D
 RETURN: graded object
 PURPOSE: construct a random 0-deg graded homomorphism src(S) -> src(D)
 EXAMPLE: example grrndmap; shows an example
@@ -1918,7 +2060,7 @@ example
 }
 
 proc grrndmap2(def D, def S, list #)
-"USAGE: (D,S), graded objects S and D
+"USAGE: grrndmap2(D,S), graded objects S and D
 RETURN: graded object
 PURPOSE: construct a random 0-deg graded homomorphism between target of D and S.
 EXAMPLE: example grrndmap2; shows an example
@@ -1954,7 +2096,7 @@ example
 //                B(g1)      g2     g3
 // 
 proc grlifting2(A,B)
-"USAGE: (A,B), graded objects A and B (matrices defining maps)
+"USAGE: grlifting2(A,B), graded objects A and B (matrices defining maps)
 RETURN: map of chain complexes (as a list) 
 PURPOSE: construct a map of chain complexes between free resolution of
 M=coker(A) and N=coker(B).
@@ -2027,7 +2169,7 @@ def T=grlifting2(DD,PP); T;
 //   (p1 g1)     p2 g2       p3 g3
 // G0<-----F0+G1<------F1+G2<-------F2+G3<-----
 proc mappingcone2(A,B)
-"USAGE: (A,B), graded objects A and B (matrices defining maps)
+"USAGE: mappingcone2(A,B), graded objects A and B (matrices defining maps)
 RETURN: chain complex (as a list) 
 PURPOSE: construct the free resolution of a cokernel of a random map between M=coker(A), and N=coker(B)
 EXAMPLE: example mappingcone2;
@@ -2197,7 +2339,7 @@ example
 //  (p1 g1)     p2 g2        p3 g3
 //G0<-----F0+G1<------F1+G2<-------F2+G3<-----
 proc mappingcone3(A,B)
-"USAGE: (A,B), graded objects A and B (matrices defining maps)
+"USAGE: mappingcone3(A,B), graded objects A and B (matrices defining maps)
 RETURN: chain complex (as a list) 
 PURPOSE: construct a free resolution of the cokernel of a random map between M=coker(A), and N=coker(B)
 EXAMPLE: example mappingcone3; shows an example
@@ -2289,7 +2431,7 @@ def J=KeneshlouMatrixPresentation(intvec(4,0,1,2,1));
 
 // TODO: Please decide between KeneshlouMatrixPresentation and matrixpres, and replace one with the other!
 proc matrixpres(intvec a)
-"USAGE:  intvec a
+"USAGE:  matrixpres(a), intvec a
 RETURN:  graded object
 PURPOSE: matrix presentation for direct sum of omega^a[i](i) in form of a graded object
 EXAMPLE: example matrixpres; shows an example
