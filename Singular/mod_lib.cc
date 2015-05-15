@@ -1,6 +1,7 @@
 #include <kernel/mod2.h>
 
 #include <resources/feFopen.h>
+#include <reporter/reporter.h>
 #include <polys/mod_raw.h>
 
 #include <Singular/mod_lib.h>
@@ -30,6 +31,10 @@ lib_types type_of_LIB(const char *newlib, char *libnamebuf)
 
   const unsigned char mach_FAT[]={0xca,0xfe,0xba,0xbe,0};
   const unsigned char mach_fat[]={0xbe,0xba,0xfe,0xca,0};
+
+  const unsigned char utf16be[]={0xfe,0xff,0};
+  const unsigned char utf16le[]={0xff,0xfe,0};
+  const unsigned char utf8ms[]={0xEF,0xBB,0xBF,0};
 
   int i=0;
   while(si_builtin_libs[i]!=NULL)
@@ -110,6 +115,19 @@ lib_types type_of_LIB(const char *newlib, char *libnamebuf)
     LT = LT_HPUX;
     //omFree(newlib);
     //newlib = omStrDup(libnamebuf);
+    goto lib_type_end;
+  }
+  if ((strncmp(buf,(const char *)utf16be,2)==0)
+  ||(strncmp(buf,(const char *)utf16le,2)==0))
+  {
+    WerrorS("UTF-16 not supported");
+    LT=LT_NOTFOUND;
+    goto lib_type_end;
+  }
+  if (strncmp(buf,(const char *)utf8ms,3)==0)
+  {
+    WarnS("UTF-8 detected - may not work");
+    LT=LT_SINGULAR;
     goto lib_type_end;
   }
   if(isprint(buf[0]) || buf[0]=='\n')
