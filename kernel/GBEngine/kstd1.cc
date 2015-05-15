@@ -2069,7 +2069,7 @@ long kHomModDeg(poly p, ring r)
 }
 
 ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
-          int newIdeal, intvec *vw)
+          int newIdeal, intvec *vw, s_poly_proc_t sp)
 {
   if(idIs0(F))
     return idInit(1,F->rank);
@@ -2079,6 +2079,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   BOOLEAN delete_w=(w==NULL);
   kStrategy strat=new skStrategy;
 
+  strat->s_poly=sp;
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
   if (TEST_OPT_SB_1
@@ -2138,7 +2139,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   strat->homog=h;
 #ifdef KDEBUG
   idTest(F);
-  idTest(Q);
+  if (Q!=NULL) idTest(Q);
 
 #if MYTEST
   if (TEST_OPT_DEBUG)

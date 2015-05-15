@@ -5,10 +5,6 @@
 * ABSTRACT: resolutions
 */
 
-
-
-
-
 #include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
@@ -917,7 +913,7 @@ static void syReOrdResult_Hilb(syStrategy syzstr,int maxindex,int maxdeg)
   (*syzstr->betti)[0] = 1;
   for (i=1;i<=syzstr->length;i++)
   {
-    if (!idIs0(syzstr->orderedRes[i]))
+    if ((syzstr->orderedRes[i]!=NULL) && !idIs0(syzstr->orderedRes[i]))
     {
       toreor = syzstr->orderedRes[i];
       k = IDELEMS(toreor);

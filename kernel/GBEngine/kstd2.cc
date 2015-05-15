@@ -1330,17 +1330,10 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
   }
 }
 
-#ifdef KDEBUG
-static int bba_count = 0;
-#endif /* KDEBUG */
 void kDebugPrint(kStrategy strat);
 
 ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
-#ifdef KDEBUG
-  bba_count++;
-  int loop_count = 0;
-#endif /* KDEBUG */
   int   red_result = 1;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
@@ -1399,7 +1392,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   while (strat->Ll >= 0)
   {
     #ifdef KDEBUG
-      loop_count++;
       if (TEST_OPT_DEBUG) messageSets(strat);
     #endif
     if (strat->Ll== 0) strat->interpt=TRUE;
@@ -1576,6 +1568,11 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         }
 #endif
       }
+      if (strat->s_poly!=NULL)
+      {
+        strat->s_poly(strat);
+      }
+
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
       if (strat->P.lcm!=NULL)
@@ -1725,10 +1722,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   printf("ordSgn = %d\n",currRing->OrdSgn);
   printf("\n");
 #endif
-#ifdef KDEBUG
-  bba_count++;
-  int loop_count = 0;
-#endif /* KDEBUG */
   int   srmax,lrmax, red_result = 1;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
@@ -1792,7 +1785,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     #ifdef KDEBUG
-      loop_count++;
       if (TEST_OPT_DEBUG) messageSets(strat);
     #endif
     if (strat->Ll== 0) strat->interpt=TRUE;
@@ -2867,10 +2859,6 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 
 ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int uptodeg, int lV)
 {
-#ifdef KDEBUG
-  bba_count++;
-  int loop_count = 0;
-#endif
   int   red_result = 1;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
@@ -2908,7 +2896,6 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   while (strat->Ll >= 0)
   {
 #ifdef KDEBUG
-    loop_count++;
     if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
     if (strat->Ll== 0) strat->interpt=TRUE;

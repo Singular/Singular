@@ -270,7 +270,7 @@ void TestGBEngine()
 
  ////
 
-  idDelete( &I, R);
+  id_Delete( &I, R);
   rDelete(R); // should cleanup every belonging polynomial, right!?
 
 }

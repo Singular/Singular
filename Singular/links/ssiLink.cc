@@ -1140,8 +1140,9 @@ BOOLEAN ssiClose(si_link l)
         fflush(d->f_write);
       }
       if (d->r!=NULL) rKill(d->r);
+      si_waitpid(d->pid,NULL,WNOHANG);
       if ((d->pid!=0)
-      && (si_waitpid(d->pid,NULL,WNOHANG)==0))
+      && (kill(d->pid,0)==0)) // child is still running
       {
         struct timespec t;
         t.tv_sec=0;
@@ -1154,7 +1155,7 @@ BOOLEAN ssiClose(si_link l)
           t = rem;
         } while ((r < 0) && (errno == EINTR)
             && (si_waitpid(d->pid,NULL,WNOHANG) == 0));
-        if ((r == 0) && (si_waitpid(d->pid,NULL,WNOHANG) == 0))
+        if ((r == 0) && (kill(d->pid,0) == 0))
         {
           kill(d->pid,15);
           t.tv_sec=5; // <=5s
@@ -1165,7 +1166,7 @@ BOOLEAN ssiClose(si_link l)
             t = rem;
           } while ((r < 0) && (errno == EINTR)
               && (si_waitpid(d->pid,NULL,WNOHANG) == 0));
-          if ((r == 0) && (si_waitpid(d->pid,NULL,WNOHANG) == 0))
+          if ((r == 0) && (kill(d->pid,0) == 0))
           {
             kill(d->pid,9); // just to be sure
             si_waitpid(d->pid,NULL,0);

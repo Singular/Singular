@@ -5340,6 +5340,7 @@ poly redtail (LObject* L, int pos, kStrategy strat)
   poly h, hn;
   strat->redTailChange=FALSE;
 
+  L->GetP();
   poly p = L->p;
   if (strat->noTailReduction || pNext(p) == NULL)
     return p;
@@ -7588,6 +7589,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   /*- init local data struct.---------------------------------------- -*/
   strat->P.ecart=0;
   strat->P.length=0;
+  strat->P.pLength=0;
   if (rHasLocalOrMixedOrdering(currRing))
   {
     if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);

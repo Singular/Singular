@@ -19,18 +19,18 @@ extern ring currRing;
 //typedef struct sip_smap *          map;
 typedef ideal *            resolvente;
 
-inline ideal idCopyFirstK (const ideal ide, const int k, ring R = currRing)
+inline ideal idCopyFirstK (const ideal ide, const int k)
 {
-  return id_CopyFirstK(ide, k, R);
+  return id_CopyFirstK(ide, k, currRing);
 }
 
 void idKeepFirstK(ideal ide, const int k);
 void idDelEquals(ideal id);
 
 /// delete an ideal
-inline void idDelete (ideal* h, ring r = currRing)
+inline void idDelete (ideal* h)
 {
-  id_Delete(h, r);
+  id_Delete(h, currRing);
 }
 
 /// initialise the maximal ideal (at 0)
@@ -68,37 +68,37 @@ ideal id_Copy (ideal h1, const ring r);
 ideal idDBCopy(ideal h1,const char *f,int l,const ring r);
 #define id_DBCopy(A,r) idDBCopy(A,__FILE__,__LINE__,r)
 
-inline ideal idCopy(ideal A, const ring R = currRing)
+inline ideal idCopy(ideal A)
 {
-  return id_DBCopy(A,R); // well, just for now... ok? Macros can't  have default args values :(
+  return id_DBCopy(A,currRing); // well, just for now... ok? Macros can't  have default args values :(
 }
 #else
-inline ideal idCopy(ideal A, const ring R = currRing)
+inline ideal idCopy(ideal A)
 {
-  return id_Copy(A, R);
+  return id_Copy(A, currRing);
 }
 #endif
 
 
 /// h1 + h2
-inline ideal idAdd (ideal h1, ideal h2, const ring R = currRing)
+inline ideal idAdd (ideal h1, ideal h2)
 {
-  return id_Add(h1, h2, R);
+  return id_Add(h1, h2, currRing);
 }
 
 BOOLEAN idInsertPoly (ideal h1,poly h2);  /* h1 + h2 */
-inline BOOLEAN idInsertPolyWithTests (ideal h1, const int validEntries, const poly h2, const bool zeroOk, const bool duplicateOk, const ring R = currRing)
+inline BOOLEAN idInsertPolyWithTests (ideal h1, const int validEntries, const poly h2, const bool zeroOk, const bool duplicateOk)
 {
-  return id_InsertPolyWithTests (h1, validEntries, h2, zeroOk, duplicateOk, R);
+  return id_InsertPolyWithTests (h1, validEntries, h2, zeroOk, duplicateOk, currRing);
 }
 
 
 /* h1 + h2 */
 
 /// hh := h1 * h2
-inline ideal idMult (ideal h1, ideal h2, const ring R = currRing)
+inline ideal idMult (ideal h1, ideal h2)
 {
-  return id_Mult(h1, h2, R);
+  return id_Mult(h1, h2, currRing);
 }
 
 BOOLEAN idIs0 (ideal h);
@@ -106,14 +106,14 @@ BOOLEAN idIs0 (ideal h);
 // returns TRUE, if idRankFreeModule(m) > 0
 BOOLEAN idIsModule(ideal m, const ring r);
 
-inline BOOLEAN idHomIdeal (ideal id, ideal Q=NULL, const ring R = currRing)
+inline BOOLEAN idHomIdeal (ideal id, ideal Q=NULL)
 {
-  return id_HomIdeal(id, Q, R);
+  return id_HomIdeal(id, Q, currRing);
 }
 
-inline BOOLEAN idHomModule(ideal m, ideal Q,intvec **w, const ring R = currRing)
+inline BOOLEAN idHomModule(ideal m, ideal Q,intvec **w)
 {
-   return id_HomModule(m, Q, w, R);
+   return id_HomModule(m, Q, w, currRing);
 }
 
 BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w);
@@ -126,9 +126,9 @@ int     idGetNumberOfChoise(int t, int d, int begin, int end, int * choise);
 
 int     binom (int n,int r);
 
-inline ideal idFreeModule (int i, const ring R = currRing)
+inline ideal idFreeModule (int i)
 {
-  return id_FreeModule (i, R);
+  return id_FreeModule (i, currRing);
 }
 
 
@@ -169,33 +169,33 @@ ideal   idHead(ideal h);
 
 BOOLEAN idIsSubModule(ideal id1,ideal id2);
 
-inline ideal idVec2Ideal(poly vec, const ring R = currRing)
+inline ideal idVec2Ideal(poly vec)
 {
-  return id_Vec2Ideal(vec, R);
+  return id_Vec2Ideal(vec, currRing);
 }
 
 ideal   idSeries(int n,ideal M,matrix U=NULL,intvec *w=NULL);
 
-inline BOOLEAN idIsZeroDim(ideal i, const ring R = currRing)
+inline BOOLEAN idIsZeroDim(ideal i)
 {
-  return id_IsZeroDim(i, R);
+  return id_IsZeroDim(i, currRing);
 }
 
 matrix  idDiff(matrix i, int k);
 matrix  idDiffOp(ideal I, ideal J,BOOLEAN multiply=TRUE);
 
-inline intvec *idSort(ideal id,BOOLEAN nolex=TRUE, const ring R = currRing)
+inline intvec *idSort(ideal id,BOOLEAN nolex=TRUE)
 {
-  return id_Sort(id, nolex, R);
+  return id_Sort(id, nolex, currRing);
 }
 
 ideal   idModulo (ideal h1,ideal h2, tHomog h=testHomog, intvec ** w=NULL);
 matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
 
 /// transpose a module
-inline ideal   idTransp(ideal a, const ring R = currRing)
+inline ideal   idTransp(ideal a)
 {
-  return id_Transp(a, R);
+  return id_Transp(a, currRing);
 }
 
 // intvec *idQHomWeight(ideal id);

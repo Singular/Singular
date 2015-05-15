@@ -908,7 +908,7 @@ static resolvente iiCopyRes(resolvente r, int l)
   resolvente res=(ideal *)omAlloc0((l+1)*sizeof(ideal));
 
   for (i=0; i<l; i++)
-    res[i]=idCopy(r[i]);
+    if (r[i]!=NULL) res[i]=idCopy(r[i]);
   return res;
 }
 

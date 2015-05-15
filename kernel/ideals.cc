@@ -1058,7 +1058,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
       pNeg(s_result->m[j]);
     }
   }
-  if ((lsmod==0) && (!idIs0(s_rest)))
+  if ((lsmod==0) && (s_rest!=NULL))
   {
     for (j=IDELEMS(s_rest);j>0;j--)
     {

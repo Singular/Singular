@@ -272,7 +272,7 @@ void TestGBEngine()
     idShow(G, R, R, 0);
 #endif
 
-    idDelete( &G, R);
+    id_Delete( &G, R);
   }
 
   {
@@ -284,7 +284,7 @@ void TestGBEngine()
     idShow(SYZ, R, R, 0);
 #endif
 
-    idDelete(&SYZ, R);
+    id_Delete(&SYZ, R);
     if (weights!=NULL) { PrintS("weights: "); weights->show(); delete weights; }
   }
 
@@ -406,7 +406,7 @@ void TestGBEngine()
 
 
 
-  idDelete( &I, R);
+  id_Delete( &I, R);
   rDelete(R); // should cleanup every belonging polynomial, right!?
 
 }
