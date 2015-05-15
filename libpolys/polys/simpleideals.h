@@ -10,6 +10,11 @@
 #include <polys/monomials/ring.h>
 #include <polys/matpol.h>
 
+/// The following sip_sideal structure has many different uses
+/// thoughout Singular. Basic use-cases for it are:
+/// * ideal/module: nrows = 1, ncols >=0 and rank:1 for ideals, rank>=0 for modules
+/// * matrix: nrows, ncols >=0, rank == nrows! see mp_* procedures 
+/// NOTE: the m member point to memory chunk of size (ncols*nrows*sizeof(poly)) or is NULL
 struct sip_sideal
 {
   poly*  m;
@@ -51,7 +56,7 @@ struct sideal_list
 
 extern omBin sip_sideal_bin;
 
-/*- creates an ideal -*/
+/// creates an ideal / module
 ideal idInit (int size, int rank=1);
 
 /*- deletes an ideal -*/
@@ -90,8 +95,7 @@ BOOLEAN idIs0 (ideal h);
 long id_RankFreeModule(ideal m, ring lmRing, ring tailRing);
 static inline long id_RankFreeModule(ideal m, ring r)
 {return id_RankFreeModule(m, r, r);}
-// returns TRUE, if idRankFreeModule(m) > 0
-BOOLEAN id_IsModule(ideal m, ring r);
+
 ideal   id_FreeModule (int i, const ring r);
 int     idElem(const ideal F);
 int id_PosConstant(ideal id, const ring r);
