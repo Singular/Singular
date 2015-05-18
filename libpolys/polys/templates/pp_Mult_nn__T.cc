@@ -16,7 +16,7 @@
  ***************************************************************/
 LINKAGE poly pp_Mult_nn__T(poly p, const number n, const ring r)
 {
-  pAssume(!n_IsZero__T(n,r));
+  pAssume(!n_IsZero__T(n,r->cf));
   p_Test(p, r);
   if (p == NULL) return NULL;
   spolyrec rp;
@@ -33,12 +33,12 @@ LINKAGE poly pp_Mult_nn__T(poly p, const number n, const ring r)
     p_AllocBin(pNext(q), bin, r);
     pIter(q);
     number nc = pGetCoeff(p);
-    pSetCoeff0(q, n_Mult__T(n, nc, r));
+    pSetCoeff0(q, n_Mult__T(n, nc, r->cf));
     p_MemCopy__T(q->exp, p->exp, length);
 #else
     number nc = pGetCoeff(p);
-    number tmp = n_Mult__T(n, nc, r);
-    if (! n_IsZero__T(tmp,r))
+    number tmp = n_Mult__T(n, nc, r->cf);
+    if (! n_IsZero__T(tmp,r->cf))
     {
       p_AllocBin(pNext(q), bin, r);
       pIter(q);
@@ -46,7 +46,7 @@ LINKAGE poly pp_Mult_nn__T(poly p, const number n, const ring r)
       p_MemCopy__T(q->exp, p->exp, length);
     }
     else
-      n_Delete__T(&tmp,r);
+      n_Delete__T(&tmp,r->cf);
 #endif
     pIter(p);
   }

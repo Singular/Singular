@@ -24,7 +24,7 @@ LINKAGE poly pp_Mult_Coeff_mm_DivSelectMult__T(poly p,const poly m, const poly a
   if (p == NULL) return NULL;
   number n = pGetCoeff(m);
   number nc;
-  pAssume(!n_IsZero__T(n,r));
+  pAssume(!n_IsZero__T(n,r->cf));
 
   spolyrec rp;
   omBin bin = r->PolyBin;
@@ -58,7 +58,7 @@ LINKAGE poly pp_Mult_Coeff_mm_DivSelectMult__T(poly p,const poly m, const poly a
     p_AllocBin(pNext(q), bin, r);
     q = pNext(q);
     nc = pGetCoeff(p);
-    pSetCoeff0(q, n_Mult__T(n, nc, r));
+    pSetCoeff0(q, n_Mult__T(n, nc, r->cf));
     p_MemSum__T(q->exp, p->exp, ab_e, length);
 
     Iter:
