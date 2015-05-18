@@ -40,8 +40,8 @@ number  nAEQCopy        (number a, number b, const coeffs r); // nachgicken
 number  nAEQRePart      (number a, number b, const coeffs r); // nachgicken
 number  nAEQImPart      (number a, number b, const coeffs r); // nachgicken
 
-void    nAEQWriteLong   (number &a, const coeffs r);//
-void    nAEQWriteShort  (number &a, const coeffs r);//
+void    nAEQWriteLong   (number a, const coeffs r);//
+void    nAEQWriteShort  (number a, const coeffs r);//
 
 
 const char *  nAEQRead  (const char *s, number *a, const coeffs r);
@@ -186,12 +186,12 @@ number nAEQImPart(number c, const coeffs)
     return (number) c;
 }
 
-void    nAEQWriteLong   (number &, const coeffs)
+void    nAEQWriteLong   (number , const coeffs)
 {
     return;
 }
 
-void    nAEQWriteShort  (number &, const coeffs)
+void    nAEQWriteShort  (number , const coeffs)
 {
     return ;
 }

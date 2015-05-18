@@ -40,8 +40,8 @@ number  nAECopy        (number a, number b, const coeffs r); // nachgicken
 number  nAERePart      (number a, number b, const coeffs r); // nachgicken
 number  nAEImPart      (number a, number b, const coeffs r); // nachgicken
 
-void    nAEWriteLong   (number &a, const coeffs r);//
-void    nAEWriteShort  (number &a, const coeffs r);//
+void    nAEWriteLong   (number a, const coeffs r);//
+void    nAEWriteShort  (number a, const coeffs r);//
 
 
 const char *  nAERead  (const char *s, number *a, const coeffs r);
@@ -191,14 +191,14 @@ number nAEImPart(number c, const coeffs)
     return (number) c;
 }
 
-void    nAEWriteLong   (number &a, const coeffs)
+void    nAEWriteLong   (number a, const coeffs)
 {
     int_poly* f=reinterpret_cast <int_poly*>(a);
     f->poly_print();
     return ;
 }
 
-void    nAEWriteShort  (number &a, const coeffs)
+void    nAEWriteShort  (number a, const coeffs)
 {
     int_poly* f=reinterpret_cast <int_poly*>(a);
     f->poly_print();
