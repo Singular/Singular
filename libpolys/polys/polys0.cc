@@ -142,6 +142,7 @@ void p_String0(poly p, ring lmRing, ring tailRing)
     StringAppendS("0");
     return;
   }
+  p_Normalize(p,lmRing);
   if ((p_GetComp(p, lmRing) == 0) || (!lmRing->VectorOut))
   {
     writemon(p,0, lmRing);
