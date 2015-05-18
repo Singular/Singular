@@ -2,7 +2,7 @@
 version="version derham.lib 4.0.0.0 Jun_2013 ";
 category="Noncommutative";
 info="
-LIBRARY:  derham.lib      Computation of deRham cohomology
+LIBRARY:  deRham.lib      Computation of deRham cohomology
 
 AUTHORS:  Cornelia Rottner, rottner@mathematik.uni-kl.de
 
