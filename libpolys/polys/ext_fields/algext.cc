@@ -96,8 +96,8 @@ number   naMult(number a, number b, const coeffs cf);
 number   naDiv(number a, number b, const coeffs cf);
 void     naPower(number a, int exp, number *b, const coeffs cf);
 number   naCopy(number a, const coeffs cf);
-void     naWriteLong(number &a, const coeffs cf);
-void     naWriteShort(number &a, const coeffs cf);
+void     naWriteLong(number a, const coeffs cf);
+void     naWriteShort(number a, const coeffs cf);
 number   naGetDenom(number &a, const coeffs cf);
 number   naGetNumerator(number &a, const coeffs cf);
 number   naGcd(number a, number b, const coeffs cf);
@@ -581,7 +581,7 @@ void heuristicReduce(poly &p, poly reducer, const coeffs cf)
     definiteReduce(p, reducer, cf);
 }
 
-void naWriteLong(number &a, const coeffs cf)
+void naWriteLong(number a, const coeffs cf)
 {
   naTest(a);
   if (a == NULL)
@@ -599,7 +599,7 @@ void naWriteLong(number &a, const coeffs cf)
   }
 }
 
-void naWriteShort(number &a, const coeffs cf)
+void naWriteShort(number a, const coeffs cf)
 {
   naTest(a);
   if (a == NULL)

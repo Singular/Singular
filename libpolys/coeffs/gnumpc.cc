@@ -52,7 +52,7 @@ void     ngcPower(number x, int exp, number *lu, const coeffs r);
 number   ngcCopy(number a, const coeffs r);
 number   ngc_Copy(number a, coeffs r);
 const char * ngcRead (const char *s, number *a, const coeffs r);
-void     ngcWrite(number &a, const coeffs r);
+void     ngcWrite(number a, const coeffs r);
 number   ngcRePart(number a, const coeffs r);
 number   ngcImPart(number a, const coeffs r);
 
@@ -402,7 +402,7 @@ const char * ngcRead (const char * s, number * a, const coeffs r)
 /*2
 * write a floating point number
 */
-void ngcWrite (number &a, const coeffs r)
+void ngcWrite (number a, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 
