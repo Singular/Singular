@@ -713,6 +713,7 @@ static BOOLEAN jiA_RESOLUTION(leftv res, leftv a, Subexpr)
   return FALSE;
 }
 static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr)
+/* module = poly */
 {
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   ideal I=idInit(1,1);
@@ -1879,7 +1880,7 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
     {
       sleftv t;
       matrix olm = (matrix)l->Data();
-      int rk=olm->rank;
+      int rk;
       char *pr=((map)olm)->preimage;
       BOOLEAN module_assign=(/*l->Typ()*/ lt==MODUL_CMD);
       matrix lm ;
@@ -1891,7 +1892,8 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
 
       if (lt /*l->Typ()*/==MATRIX_CMD)
       {
-        num=olm->cols()*olm->rows();
+        rk=olm->rows();
+        num=olm->cols()*rk /*olm->rows()*/;
         lm=mpNew(olm->rows(),olm->cols());
         int el;
         if ((traceit&TRACE_ASSIGN) && (num!=(el=exprlist_length(hh))))
@@ -1903,12 +1905,14 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
       {
         num=exprlist_length(hh);
         lm=(matrix)idInit(num,1);
-        rk=1;
         if (module_assign)
         {
+	  rk=0;
           mtyp=MODUL_CMD;
           etyp=VECTOR_CMD;
         }
+	else
+	  rk=1;
       }
 
       int ht;
