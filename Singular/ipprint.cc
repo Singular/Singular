@@ -180,6 +180,7 @@ static void ipPrint_MA0(matrix m, const char *name)
     omFreeSize((ADDRESS)s,MATCOLS(m)*MATROWS(m)*sizeof(char*));
     omFreeSize((ADDRESS)l,MATCOLS(m)*sizeof(int));
   }
+  else Print("%d x %d zero matrix\n",MATROWS(m),MATCOLS(m));
 }
 
 /*2
