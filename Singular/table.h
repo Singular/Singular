@@ -1220,6 +1220,8 @@ struct sValAssign dAssign[]=
 #ifdef SINGULAR_4_1
 ,{D(jiA_BIGINTMAT),CMATRIX_CMD,    CMATRIX_CMD}
 ,{D(jiA_NUMBER2),  CNUMBER_CMD,    CNUMBER_CMD }
+,{D(jiA_NUMBER2_I),CNUMBER_CMD,    INT_CMD }
+,{D(jiA_NUMBER2_N),CNUMBER_CMD,    NUMBER_CMD }
 ,{D(jiA_CRING),    CRING_CMD,      CRING_CMD }
 #endif
 ,{NULL_VAL,        0,              0 }

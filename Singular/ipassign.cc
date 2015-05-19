@@ -459,6 +459,117 @@ static BOOLEAN jiA_NUMBER2(leftv res, leftv a, Subexpr e)
   jiAssignAttr(res,a);
   return FALSE;
 }
+static BOOLEAN jiA_NUMBER2_I(leftv res, leftv a, Subexpr e)
+{
+  if (e==NULL)
+  {
+    if (res->data!=NULL)
+    {
+      number2 nn=(number2)res->data;
+      number2 n=n2Init((long)a->Data(),nn->cf);
+      n2Delete(nn);
+      res->data=(void *)n;
+    }
+    else
+    {
+      WerrorS("no (c)ring avialable for conversion from int");
+      return TRUE;
+    }
+  }
+  else
+  {
+    int i=e->start-1;
+    if (i<0)
+    {
+      Werror("index[%d] must be positive",i+1);
+      return TRUE;
+    }
+    bigintmat *iv=(bigintmat *)res->data;
+    if (e->next==NULL)
+    {
+      WerrorS("only one index given");
+      return TRUE;
+    }
+    else
+    {
+      int c=e->next->start;
+      if ((i>=iv->rows())||(c<1)||(c>iv->cols()))
+      {
+        Werror("wrong range [%d,%d] in cmatrix %s(%d,%d)",i+1,c,res->Name(),iv->rows(),iv->cols());
+        return TRUE;
+      }
+      else
+      {
+        n_Delete((number *)&BIMATELEM(*iv,i+1,c),iv->basecoeffs());
+        BIMATELEM(*iv,i+1,c) = n_Init((long)a->Data(),iv->basecoeffs());
+      }
+    }
+  }
+  return FALSE;
+}
+static BOOLEAN jiA_NUMBER2_N(leftv res, leftv a, Subexpr e)
+{
+  if (e==NULL)
+  {
+    if (res->data!=NULL)
+    {
+      number2 nn=(number2)res->data;
+      if (currRing->cf==nn->cf)
+      {
+        number2 n=(number2)omAlloc(sizeof(*n));
+        n->cf=currRing->cf; n->cf++;
+        n->n=(number)a->CopyD(NUMBER_CMD);
+        n2Delete(nn);
+        res->data=(void *)n;
+      }
+      else
+      {
+        WerrorS("different base");
+        return TRUE;
+      }
+    }
+    else
+    {
+      WerrorS("no (c)ring avialable for conversion from number");
+      return TRUE;
+    }
+  }
+  else
+  {
+    int i=e->start-1;
+    if (i<0)
+    {
+      Werror("index[%d] must be positive",i+1);
+      return TRUE;
+    }
+    bigintmat *iv=(bigintmat *)res->data;
+    if (e->next==NULL)
+    {
+      WerrorS("only one index given");
+      return TRUE;
+    }
+    else
+    {
+      int c=e->next->start;
+      if ((i>=iv->rows())||(c<1)||(c>iv->cols()))
+      {
+        Werror("wrong range [%d,%d] in cmatrix %s(%d,%d)",i+1,c,res->Name(),iv->rows(),iv->cols());
+        return TRUE;
+      }
+      else if (iv->basecoeffs()==currRing->cf)
+      {
+        n_Delete((number *)&BIMATELEM(*iv,i+1,c),iv->basecoeffs());
+        BIMATELEM(*iv,i+1,c) = (number)(a->CopyD(NUMBER_CMD));
+      }
+      else
+      {
+        WerrorS("different base");
+        return TRUE;
+      }
+    }
+  }
+  return FALSE;
+}
 #endif
 static BOOLEAN jiA_BIGINT(leftv res, leftv a, Subexpr e)
 {
@@ -1907,12 +2018,12 @@ BOOLEAN iiAssign(leftv l, leftv r, BOOLEAN toplevel)
         lm=(matrix)idInit(num,1);
         if (module_assign)
         {
-	  rk=0;
+          rk=0;
           mtyp=MODUL_CMD;
           etyp=VECTOR_CMD;
         }
-	else
-	  rk=1;
+        else
+          rk=1;
       }
 
       int ht;
