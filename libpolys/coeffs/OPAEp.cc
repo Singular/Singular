@@ -194,7 +194,7 @@ number nAEpImPart(number c, const coeffs)
     return  c;
 }
 
-void    nAEpWriteLong   (number &a, const coeffs)
+void    nAEpWriteLong   (number a, const coeffs)
 {
     p_poly* f=reinterpret_cast <p_poly*>(a);
     f->p_poly_print();
@@ -202,7 +202,7 @@ void    nAEpWriteLong   (number &a, const coeffs)
     return;
 }
 
-void    nAEpWriteShort  (number &a, const coeffs)
+void    nAEpWriteShort  (number a, const coeffs)
 {
     p_poly* f=reinterpret_cast <p_poly*>(a);
     f->p_poly_print();
