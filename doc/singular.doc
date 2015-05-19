@@ -539,6 +539,8 @@ LIB "all.lib";
 @cindex Algebraic geometry
 
 @menu
+* numerAlg_lib:: Numerical Algebraic Algorithms
+* numerDecom_lib:: Bertini interface
 * orbitparam_lib:: Parametrizing unipotent orbits
 * paraplanecurves_lib:: Rational parametrization of rational plane curves
 * resbinomial_lib:: Resolution of singularities of binomial ideals
@@ -552,6 +554,30 @@ LIB "all.lib";
 @end menu
 
 @c ----------------------------------------------------------
+@node numerAlg_lib
+@subsection numerAlg_lib
+
+Todos/Issues:
+@itemize
+@item does not follow the naming convention
+@item syntax errors in examples
+@item no test suite
+@end itemize
+
+@c lib numerAlg.lib no_ex
+@c ----------------------------------------------------------
+@node numerDecom_lib
+@subsection numerDecom_lib
+
+Todos/Issues:
+@itemize
+@item does not follow the naming convention
+@item syntax errors in examples
+@item no test suite
+@end itemize
+
+@c lib numerDecom.lib no_ex
+@c ----------------------------------------------------------
 @node orbitparam_lib
 @subsection orbitparam_lib
 @c lib orbitparam.lib
@@ -560,7 +586,7 @@ LIB "all.lib";
 @subsection paraplanecurves_lib
 @c lib paraplanecurves.lib
 @c ---------------------------------------------------------
-@node resbinomial_lib, resgraph_lib, paraplanecurves_lib, Algebraic geometry
+@node resbinomial_lib
 @subsection resbinomial_lib
 
 Todos/Issues:
@@ -574,31 +600,31 @@ iniD, reslist, sumlist, dividelist, createlist
 
 @c lib resbinomial.lib
 @c ---------------------------------------------------------
-@node resgraph_lib, resjung_lib, resbinomial_lib, Algebraic geometry
+@node resgraph_lib
 @subsection resgraph_lib
 @c lib resgraph.lib
 @c ---------------------------------------------------------
-@node resjung_lib, resolve_lib, resgraph_lib, Algebraic geometry
+@node resjung_lib
 @subsection resjung_lib
 @c lib resjung.lib
 @c ---------------------------------------------------------
-@node resolve_lib, reszeta_lib, resjung_lib, Algebraic geometry
+@node resolve_lib
 @subsection resolve_lib
 @c lib resolve.lib
 @c ---------------------------------------------------------
-@node reszeta_lib, sheafcoh_lib, resolve_lib, Algebraic geometry
+@node reszeta_lib
 @subsection reszeta_lib
 @c lib reszeta.lib
 @c ---------------------------------------------------------
-@node sheafcoh_lib, JMBTest_lib, reszeta_lib, Algebraic geometry
+@node sheafcoh_lib
 @subsection sheafcoh_lib
 @c lib sheafcoh.lib tag:memory
 @c ----------------------------------------------------------
-@node JMBTest_lib, JMSConst_lib, sheafcoh_lib, Algebraic geometry
+@node JMBTest_lib
 @subsection JMBTest_lib
 @c lib JMBTest.lib
 @c ----------------------------------------------------------
-@node JMSConst_lib, , JMBTest_lib, Algebraic geometry
+@node JMSConst_lib
 @subsection JMSConst_lib
 @c lib JMSConst.lib
 @c ----------------------------------------------------------------------------
@@ -1021,8 +1047,6 @@ Comments should be send to the author of the library directly.
 * hess_lib:: Riemann-Roch space of divisors on function fields and curves
 * multigrading_lib:: Multigradings and related computations
 * nfmodstd_lib:: Groebner bases of ideals in rings over algebraic number fields
-* numerAlg_lib::  Numerical Algebraic Algorithms
-* numerDecom_lib:: Bertini interface
 * realclassify_lib:: Classification of real singularities
 * deRham_lib:: Computation of deRham cohomology
 @end menu
@@ -1087,30 +1111,6 @@ Todos/Issues:
 @subsection nfmodstd_lib
 
 @c lib nfmodstd.lib
-@c ----------------------------------------------------------
-@node numerAlg_lib
-@subsection numerAlg_lib
-
-Todos/Issues:
-@itemize
-@item does not follow the naming convention
-@item syntax errors in examples
-@item no test suite
-@end itemize
-
-@c lib numerAlg.lib no_ex
-@c ----------------------------------------------------------
-@node numerDecom_lib
-@subsection numerDecom_lib
-
-Todos/Issues:
-@itemize
-@item does not follow the naming convention
-@item syntax errors in examples
-@item no test suite
-@end itemize
-
-@c lib numerDecom.lib no_ex
 @c ----------------------------------------------------------
 @node realclassify_lib
 @subsection realclassify_lib
