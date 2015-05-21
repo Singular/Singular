@@ -78,6 +78,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
 */
 /// load lib/module given in v
 BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport = FALSE);
+BOOLEAN jjLOAD_TRY(const char *s);
 BOOLEAN iiLocateLib(const char* lib, char* where);
 leftv   iiMap(map theMap, const char * what);
 void    iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
