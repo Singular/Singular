@@ -59,10 +59,11 @@
 #include <sys/wait.h>
 #include <time.h>
 
-#define SSI_VERSION 8
+#define SSI_VERSION 9
 // 5->6: changed newstruct representation
 // 6->7: attributes
 // 7->8: qring
+// 8->9: module: added rank
 
 #define SSI_BASE 16
 typedef struct
@@ -1272,7 +1273,12 @@ leftv ssiRead1(si_link l)
            break;
     case 10:res->rtyp=MODUL_CMD;
            if (d->r==NULL) goto no_ring;
-           res->data=(char*)ssiReadIdeal(d);
+           {
+             int rk=s_readint(d->f_read);
+             ideal M=ssiReadIdeal(d);
+             M->rank=rk;
+             res->data=(char*)M;
+           }
            break;
     case 11:
            {
@@ -1453,7 +1459,11 @@ BOOLEAN ssiWrite(si_link l, leftv data)
                         }
                         if(tt==IDEAL_CMD)       fputs("7 ",d->f_write);
                         else if(tt==MATRIX_CMD) fputs("8 ",d->f_write);
-                        else                    fputs("10 ",d->f_write);
+                        else
+                        {
+                          ideal M=(ideal)dd;
+                          fprintf(d->f_write,"10 %d ",M->rank);
+                        }
                         ssiWriteIdeal(d,tt,(ideal)dd);
                         break;
           case COMMAND:
