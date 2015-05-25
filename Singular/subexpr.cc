@@ -222,6 +222,12 @@ void sleftv::Print(leftv store, int spaces)
           }
         case NUMBER_CMD:
         case BIGINT_CMD:
+          if (t==NUMBER_CMD)
+          {
+            number n=(number)d;
+            nNormalize(n);
+            d=n;
+          }
           s=String(d);
           if (s==NULL) return;
           PrintNSpaces(spaces);

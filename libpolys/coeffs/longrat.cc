@@ -68,7 +68,7 @@ number   nlIntDiv(number a, number b, const coeffs r);
 number   nlIntMod(number a, number b, const coeffs r);
 void     nlPower(number x, int exp, number *lu, const coeffs r);
 const char *   nlRead (const char *s, number *a, const coeffs r);
-void     nlWrite(number &a, const coeffs r);
+void     nlWrite(number a, const coeffs r);
 
 number   nlGetDenom(number &n, const coeffs r);
 number   nlGetNumerator(number &n, const coeffs r);

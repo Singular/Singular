@@ -17,6 +17,7 @@
 #include <kernel/GBEngine/tgb.h>
 #include <polys/sparsmat.h>
 
+#include <Singular/mod_lib.h>
 #include <Singular/subexpr.h>
 #include <Singular/tok.h>
 #include <Singular/grammar.h>

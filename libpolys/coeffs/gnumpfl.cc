@@ -50,7 +50,7 @@ number   ngfDiv(number a, number b, const coeffs r);
 void     ngfPower(number x, int exp, number *lu, const coeffs r);
 number   ngfCopy(number a, const coeffs r);
 number   ngf_Copy(number a, coeffs r);
-void     ngfWrite(number &a, const coeffs r);
+void     ngfWrite(number a, const coeffs r);
 void     ngfCoeffWrite(const coeffs r, BOOLEAN details);
 
 void     ngfDelete(number *a, const coeffs r);
@@ -397,7 +397,7 @@ const char * ngfRead (const char * start, number * a, const coeffs r)
 /*2
 * write a floating point number
 */
-void ngfWrite (number &a, const coeffs r)
+void ngfWrite (number a, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 

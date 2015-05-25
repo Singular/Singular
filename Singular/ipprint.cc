@@ -62,7 +62,7 @@ static BOOLEAN ipPrint_INTMAT(leftv u)
 */
 static void ipPrint_MA0(matrix m, const char *name)
 {
-  if (MATCOLS(m)>0)
+  if ((MATCOLS(m)>0)&&(MATROWS(m)>0))
   {
     char **s=(char **)omAlloc(MATCOLS(m)*MATROWS(m)*sizeof(char*));
     char *ss;
@@ -180,6 +180,7 @@ static void ipPrint_MA0(matrix m, const char *name)
     omFreeSize((ADDRESS)s,MATCOLS(m)*MATROWS(m)*sizeof(char*));
     omFreeSize((ADDRESS)l,MATCOLS(m)*sizeof(int));
   }
+  else Print("%d x %d zero matrix\n",MATROWS(m),MATCOLS(m));
 }
 
 /*2

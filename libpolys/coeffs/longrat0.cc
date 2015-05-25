@@ -114,7 +114,7 @@ const char * nlRead (const char *s, number *a, const coeffs r)
 /*2
 * write a rational number
 */
-void nlWrite (number &a, const coeffs r)
+void nlWrite (number a, const coeffs r)
 {
   char *s,*z;
   if (SR_HDL(a) & SR_INT)

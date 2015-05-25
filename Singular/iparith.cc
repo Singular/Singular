@@ -2666,8 +2666,10 @@ static BOOLEAN jjLOAD_E(leftv /*res*/, leftv v, leftv u)
   char * s=(char *)u->Data();
   if(strcmp(s, "with")==0)
     return jjLOAD((char*)v->Data(), TRUE);
+  if (strcmp(s,"try")==0)
+    return jjLOAD_TRY((char*)v->Data());
   WerrorS("invalid second argument");
-  WerrorS("load(\"libname\" [,\"with\"]);");
+  WerrorS("load(\"libname\" [,option]);");
   return TRUE;
 }
 static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
@@ -5325,6 +5327,11 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
         break;
 #endif /* HAVE_DYNAMIC_LOADING */
   }
+  return TRUE;
+}
+BOOLEAN jjLOAD_TRY(const char *s)
+{
+  WerrorS("not yet");
   return TRUE;
 }
 

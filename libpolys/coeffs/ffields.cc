@@ -423,7 +423,7 @@ BOOLEAN nfEqual (number a,number b, const coeffs r)
 /*2
 * write via StringAppend
 */
-static void nfWriteLong (number &a, const coeffs r)
+static void nfWriteLong (number a, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a, r);
@@ -445,7 +445,7 @@ static void nfWriteLong (number &a, const coeffs r)
 /*2
 * write (shortert output) via StringAppend
 */
-static void nfWriteShort (number &a, const coeffs r)
+static void nfWriteShort (number a, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a, r);

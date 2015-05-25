@@ -23,7 +23,7 @@
 
 @itemize
 @item renamed algemodstd_lib to @nref{nfmodstd_lib}
-@item renamed derham_lib to @nref{deRhamlib}
+@item renamed derham_lib to @nref{deRham_lib}
 @item new library: graal_lib
 @item new library: deflation.lib
 @item new library:   maxlike.lib

@@ -2,7 +2,7 @@
 version="version derham.lib 4.0.0.0 Jun_2013 ";
 category="Noncommutative";
 info="
-LIBRARY:  derham.lib      Computation of deRham cohomology
+LIBRARY:  deRham.lib      Computation of deRham cohomology
 
 AUTHORS:  Cornelia Rottner, rottner@mathematik.uni-kl.de
 
@@ -15,12 +15,12 @@ REFERENCES:
 [OT] Oaku, T.; Takayama, N.: Algorithms of D-modules - restriction, tensor product,
      localzation, and local cohomology groups}, J. Pure Appl. Algebra 156, 267-308
      (2001)
-[R]  Rottner, C.: Computing de Rham Cohomology,diploma thesis (2012)
+[R]  Rottner, C.: Computing de Rham Cohomology,diploma thesis (2012)@*
 [W1] Walther, U.: Algorithmic computation of local cohomology modules and the local
      cohomological dimension of algebraic varieties}, J. Pure Appl. Algebra 139,
-     303-321 (1999)
+     303-321 (1999)@*
 [W2] Walther, U.: Algorithmic computation of de Rham Cohomology of Complements of
-     Complex Affine Varieties}, J. Symbolic Computation 29, 796-839 (2000)
+     Complex Affine Varieties}, J. Symbolic Computation 29, 796-839 (2000)@*
 [W3] Walther, U.: Computing the cup product structure for complements of complex
      affine varieties, J. Pure Appl. Algebra 164, 247-273 (2001)
 

@@ -19,7 +19,7 @@ LINKAGE poly pp_Mult_Coeff_mm_DivSelect__T(poly p, const poly m, int &shorter,
                                         const ring r)
 {
   number n = pGetCoeff(m);
-  pAssume(!n_IsZero__T(n,r));
+  pAssume(!n_IsZero__T(n,r->cf));
   p_Test(p, r);
   if (p == NULL) return NULL;
   spolyrec rp;
@@ -35,7 +35,7 @@ LINKAGE poly pp_Mult_Coeff_mm_DivSelect__T(poly p, const poly m, int &shorter,
       p_AllocBin(pNext(q), bin, r);
       q = pNext(q);
       number nc = pGetCoeff(p);
-      pSetCoeff0(q, n_Mult__T(n, nc, r));
+      pSetCoeff0(q, n_Mult__T(n, nc, r->cf));
       p_MemCopy__T(q->exp, p->exp, length);
     }
     else

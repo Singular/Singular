@@ -6792,7 +6792,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
 
     // We only perturb the current target vector at the recursion level 1
     if(Xngleich == 0 && nlev == 1) //(ngleich == 0) important, e.g. ex2, ex3
-      if (MivComp(next_vect, omega2) == 1)
+      if (MivComp(next_vect, omega2) != 1)
       {
         // to dispense with taking initial (and lifting/interreducing
         // after the call of recursion

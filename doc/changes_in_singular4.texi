@@ -101,11 +101,11 @@ result of various computations (in particular Groebner bases).
 In Singular 4 there several new features are implemented within a
 dynamic module @code{syzextra.so}, not available in Singular 3.
 It implements the low-level functions for Schreyer resolutions and many auxiliary functions.
-The following new libraries @ref{derham_lib}, @ref{schreyer_lib} depend on it:
+The following new libraries @ref{deRham_lib}, @ref{schreyer_lib} depend on it:
 
 @c table @asis
 @itemize @bullet
-@item @ref{derham_lib} - computes de Rham cohomology
+@item @ref{deRham_lib} - computes de Rham cohomology
 @item @ref{schreyer_lib} - computes Schreyer resolution via several approaches. It also serves as a high-level wrapper to the dynamic module @code{syzextra.so}
 @end itemize
 @c @end table

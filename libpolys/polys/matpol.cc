@@ -47,8 +47,9 @@ static poly mp_Select (poly fro, poly what, const ring);
 /// create a r x c zero-matrix
 matrix mpNew(int r, int c)
 {
-  if (r<=0) r=1;
-  if ( (((int)(MAX_INT_VAL/sizeof(poly))) / r) <= c)
+  int rr=r;
+  if (rr<=0) rr=1;
+  if ( (((int)(MAX_INT_VAL/sizeof(poly))) / rr) <= c)
   {
     Werror("internal error: creating matrix[%d][%d]",r,c);
     return NULL;
@@ -57,7 +58,7 @@ matrix mpNew(int r, int c)
   rc->nrows = r;
   rc->ncols = c;
   rc->rank = r;
-  if (c != 0)
+  if ((c != 0)&&(r!=0))
   {
     int s=r*c*sizeof(poly);
     rc->m = (poly*)omAlloc0(s);

@@ -59,10 +59,11 @@
 #include <sys/wait.h>
 #include <time.h>
 
-#define SSI_VERSION 8
+#define SSI_VERSION 9
 // 5->6: changed newstruct representation
 // 6->7: attributes
 // 7->8: qring
+// 8->9: module: added rank
 
 #define SSI_BASE 16
 typedef struct
@@ -1138,6 +1139,8 @@ BOOLEAN ssiClose(si_link l)
       {
         fputs("99\n",d->f_write);
         fflush(d->f_write);
+        if (d->f_read!=NULL) { s_close(d->f_read);s_free(d->f_read);}
+        if (d->f_write!=NULL) { fclose(d->f_write); d->f_write=NULL; }
       }
       if (d->r!=NULL) rKill(d->r);
       si_waitpid(d->pid,NULL,WNOHANG);
@@ -1149,33 +1152,38 @@ BOOLEAN ssiClose(si_link l)
         t.tv_nsec=100000000; // <=100 ms
         struct timespec rem;
         int r;
-        do
+        loop
         {
           r = nanosleep(&t, &rem);
           t = rem;
-        } while ((r < 0) && (errno == EINTR)
-            && (si_waitpid(d->pid,NULL,WNOHANG) == 0));
-        if ((r == 0) && (kill(d->pid,0) == 0))
+          // child finished:
+          if (si_waitpid(d->pid,NULL,WNOHANG) != 0) break;
+          // other signal, waited s>= 100 ms:
+          if ((r==0) || (errno != EINTR)) break;
+        }
+        if (kill(d->pid,0) == 0)
         {
           kill(d->pid,15);
           t.tv_sec=5; // <=5s
           t.tv_nsec=0;
-          do
+          loop
           {
             r = nanosleep(&t, &rem);
             t = rem;
-          } while ((r < 0) && (errno == EINTR)
-              && (si_waitpid(d->pid,NULL,WNOHANG) == 0));
-          if ((r == 0) && (kill(d->pid,0) == 0))
+            // child finished:
+            if (si_waitpid(d->pid,NULL,WNOHANG) != 0) break;
+            // other signal, waited s>= 100 ms:
+            if ((r==0) || (errno != EINTR)) break;
+          }
+          if (kill(d->pid,0) == 0)
           {
             kill(d->pid,9); // just to be sure
             si_waitpid(d->pid,NULL,0);
           }
         }
       }
-      if (d->f_read!=NULL) s_close(d->f_read);
-      if (d->f_read!=NULL) s_free(d->f_read);
-      if (d->f_write!=NULL) fclose(d->f_write);
+      if (d->f_read!=NULL) { s_close(d->f_read);s_free(d->f_read);}
+      if (d->f_write!=NULL) { fclose(d->f_write); d->f_write=NULL; }
       if ((strcmp(l->mode,"tcp")==0)
       || (strcmp(l->mode,"fork")==0))
       {
@@ -1265,7 +1273,12 @@ leftv ssiRead1(si_link l)
            break;
     case 10:res->rtyp=MODUL_CMD;
            if (d->r==NULL) goto no_ring;
-           res->data=(char*)ssiReadIdeal(d);
+           {
+             int rk=s_readint(d->f_read);
+             ideal M=ssiReadIdeal(d);
+             M->rank=rk;
+             res->data=(char*)M;
+           }
            break;
     case 11:
            {
@@ -1446,7 +1459,11 @@ BOOLEAN ssiWrite(si_link l, leftv data)
                         }
                         if(tt==IDEAL_CMD)       fputs("7 ",d->f_write);
                         else if(tt==MATRIX_CMD) fputs("8 ",d->f_write);
-                        else                    fputs("10 ",d->f_write);
+                        else
+                        {
+                          ideal M=(ideal)dd;
+                          fprintf(d->f_write,"10 %d ",M->rank);
+                        }
                         ssiWriteIdeal(d,tt,(ideal)dd);
                         break;
           case COMMAND:
