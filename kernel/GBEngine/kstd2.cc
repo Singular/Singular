@@ -1570,7 +1570,21 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
       if (strat->s_poly!=NULL)
       {
-        strat->s_poly(strat);
+        if (strat->s_poly(strat))
+        {
+          // we are called AFTER enterS, i.e. if we change P
+          // we have it also to S/T
+          // and add pairs
+          int pos==posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
+          enterT(strat->P, strat);
+          #ifdef HAVE_RINGS
+          if (rField_is_Ring(currRing))
+            superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+          else
+          #endif
+            enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+          strat->enterS(strat->P, pos, strat, strat->tl);
+        }
       }
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
