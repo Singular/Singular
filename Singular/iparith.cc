@@ -5329,10 +5329,21 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
   }
   return TRUE;
 }
+static int WerrorS_dummy_cnt=0;
+static void WerrorS_dummy(const char *s)
+{
+  WerrorS_dummy_cnt++;
+}
 BOOLEAN jjLOAD_TRY(const char *s)
 {
-  WerrorS("not yet");
-  return TRUE;
+  void (*WerrorS_save)(const char *s) = WerrorS_callback;
+  WerrorS_callback=WerrorS_dummy;
+  WerrorS_dummy_cnt=0;
+  BOOLEAN bo=jjLOAD(s,TRUE);
+  if (WerrorS_dummy_cnt>0) Print("loading of >%s< failed\n",s);
+  WerrorS_callback=WerrorS_save;
+  errorreported=0;
+  return FALSE;
 }
 
 static BOOLEAN jjstrlen(leftv res, leftv v)
