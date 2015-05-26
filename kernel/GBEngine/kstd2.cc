@@ -1575,7 +1575,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           // we are called AFTER enterS, i.e. if we change P
           // we have it also to S/T
           // and add pairs
-          int pos==posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
+          int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
           enterT(strat->P, strat);
           #ifdef HAVE_RINGS
           if (rField_is_Ring(currRing))
