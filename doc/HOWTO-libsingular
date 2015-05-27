@@ -69,9 +69,9 @@ main()
     printf("datetime not found\n");
   else
   {
-    leftv res=iiMake_proc(datetime,NULL,NULL);
-    if (res==NULL) { printf("datetime return an error\n"); errorreported = 0; }
-    else           printf("datetime returned type %d, >>%s<<\n",res->Typ(),(char *)res->Data());
+    BOOLEAN res=iiMake_proc(datetime,NULL,NULL);
+    if (res) { printf("datetime return an error\n"); errorreported = 0; }
+    else      printf("datetime returned type %d, >>%s<<\n",iiRETURNEXPR.Typ(),(char *)iiRETURNEXPR.Data());
   }
 
   // changing a ring for the interpreter
