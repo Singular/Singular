@@ -42,6 +42,8 @@ struct sip_smap
   int ncols;
 };
 
+typedef struct sip_smap *         map;
+
 struct sideal_list;
 typedef struct sideal_list *      ideal_list;
 

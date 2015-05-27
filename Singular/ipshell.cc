@@ -67,6 +67,7 @@
 
 #include <math.h>
 #include <ctype.h>
+#include <algorithm>
 
 // define this if you want to use the fast_map routine for mapping ideals
 #define FAST_MAP
@@ -780,7 +781,13 @@ leftv iiMap(map theMap, const char * what)
         )
         {
           v->rtyp=IDEAL_CMD;
-          v->data=fast_map(IDIDEAL(w), src_ring, (ideal)theMap, currRing);
+          
+          char *tmp = (char*)1;
+          std::swap(tmp, theMap->preimage); // map gets 1 as its rank (as an ideal)
+          v->data=fast_map(IDIDEAL(w), src_ring, (ideal)theMap, currRing); // FIXME: this dirty hack from original Singular!
+          std::swap(tmp, theMap->preimage); // map gets its preimage back
+          assume( tmp == (char*)1 );
+          
         }
         else
 #endif

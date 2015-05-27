@@ -43,6 +43,7 @@
 #include <polys/monomials/maps.h>
 #endif
 
+#include <algorithm>
 
 /*2
 * maps the expression w to res,
@@ -390,7 +391,13 @@ poly pSubstPoly(poly p, int var, poly image)
   {
     ideal src_id=idInit(1,1);
     src_id->m[0]=p;
-    ideal res_id=fast_map(src_id,currRing,(ideal)theMap,currRing);
+    
+    char *tmp = (char*)1;
+    std::swap(tmp, theMap->preimage); // map gets 1 as its rank (as an ideal)
+    ideal res_id=fast_map(src_id,currRing,(ideal)theMap,currRing); // FIXME: this dirty hack from original Singular!
+    std::swap(tmp, theMap->preimage); // map gets its preimage back
+    assume( tmp == (char*)1 );
+    
     res=res_id->m[0];
     res_id->m[0]=NULL; idDelete(&res_id);
     src_id->m[0]=NULL; idDelete(&src_id);
