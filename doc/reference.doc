@@ -7050,6 +7050,23 @@ returns (depending on the type of the link and its status)
 @item @code{"exists"}
 returns @code{"yes"} or @code{"no"}: existence of the filename for ASCII/ssi links
 @end table
+@item @strong{Syntax:}
+@code{status (} list_expression@code{,} int_expression@code @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+the list should be a list L of links, the second argument a timeout in 1/10 seconds.
+Returns
+@table @code
+@item @code{-2}
+select returns an error
+@item @code{-1}
+all links are closed/at eof
+@item{0}
+timeout
+@item{>0}
+(at least) L[i] is ready
+@end table
 @item @strong{Example:}
 @smallexample
 @c example
