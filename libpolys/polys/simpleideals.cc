@@ -38,19 +38,19 @@ static int idpowerpoint;
 ideal idInit(int idsize, int rank)
 {
   assume( idsize >= 0 && rank >= 0 );
-  
+
   ideal hh = (ideal)omAllocBin(sip_sideal_bin);
 
   IDELEMS(hh) = idsize; // ncols
   hh->nrows = 1; // ideal/module!
 
-  hh->rank = rank; // ideal: 1, module: >= 0! 
-  
+  hh->rank = rank; // ideal: 1, module: >= 0!
+
   if (idsize>0)
     hh->m = (poly *)omAlloc0(idsize*sizeof(poly));
   else
     hh->m = NULL;
-  
+
   return hh;
 }
 
@@ -100,9 +100,8 @@ int id_PosConstant(ideal id, const ring r)
 /// initialise the maximal ideal (at 0)
 ideal id_MaxIdeal (const ring r)
 {
-  const int N = rVar(r);
-  ideal hh = idInit(N, 1);
-  for (int l=0; l < N; l++)
+  ideal hh = idInit(rVar(r), 1);
+  for (int l=rVar(r)-1; l>=0; l--)
   {
     hh->m[l] = p_One(r);
     p_SetExp(hh->m[l],l+1,1,r);
@@ -119,13 +118,13 @@ void id_Delete (ideal * h, ring r)
     return;
 
   id_Test(*h, r);
-  
+
   const int elems = (*h)->nrows * (*h)->ncols;
 
   if ( elems > 0 )
   {
     assume( (*h)->m != NULL );
-    
+
     int j = elems;
     do
     {
@@ -133,11 +132,11 @@ void id_Delete (ideal * h, ring r)
       poly pp=((*h)->m[j]);
       if (pp!=NULL) p_Delete(&pp, r);
     }
-    while (j>0);    
-    
+    while (j>0);
+
     omFreeSize((ADDRESS)((*h)->m),sizeof(poly)*elems);
   }
-  
+
   omFreeBin((ADDRESS)*h, sip_sideal_bin);
   *h=NULL;
 }
@@ -147,10 +146,10 @@ void id_Delete (ideal * h, ring r)
 void id_ShallowDelete (ideal *h, ring r)
 {
   id_Test(*h, r);
-  
+
   if (*h == NULL)
     return;
-  
+
   int j,elems;
   elems=j=(*h)->nrows*(*h)->ncols;
   if (j>0)
@@ -171,11 +170,11 @@ void id_ShallowDelete (ideal *h, ring r)
 void idSkipZeroes (ideal ide)
 {
   assume (ide != NULL);
-  
+
   int k;
   int j = -1;
-  BOOLEAN change=FALSE;  
-  
+  BOOLEAN change=FALSE;
+
   for (k=0; k<IDELEMS(ide); k++)
   {
     if (ide->m[k] != NULL)
@@ -209,7 +208,7 @@ void idSkipZeroes (ideal ide)
 int idElem(const ideal F)
 {
   assume (F != NULL);
-  
+
   int i=0,j=IDELEMS(F)-1;
 
   while(j>=0)
@@ -226,15 +225,15 @@ int idElem(const ideal F)
 ideal id_CopyFirstK (const ideal ide, const int k,const ring r)
 {
   id_Test(ide, r);
-  
+
   assume( ide != NULL );
   assume( k <= IDELEMS(ide) );
-  
+
   ideal newI = idInit(k, ide->rank);
-  
+
   for (int i = 0; i < k; i++)
     newI->m[i] = p_Copy(ide->m[i],r);
-  
+
   return newI;
 }
 
@@ -346,7 +345,7 @@ void id_DelLmEquals(ideal id, const ring r)
 void id_DelDiv(ideal id, const ring r)
 {
   id_Test(id, r);
-  
+
   int i, j;
   int k = IDELEMS(id)-1;
   for (i=k; i>=0; i--)
@@ -397,7 +396,7 @@ void id_DelDiv(ideal id, const ring r)
 BOOLEAN id_IsConstant(ideal id, const ring r)
 {
   id_Test(id, r);
-  
+
   for (int k = IDELEMS(id)-1; k>=0; k--)
   {
     if (!p_IsConstantPoly(id->m[k],r))
@@ -422,13 +421,13 @@ ideal id_Copy(ideal h1, const ring r)
 void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r, const ring tailRing)
 {
   if (h1 != NULL)
-  {  
+  {
     // assume(IDELEMS(h1) > 0); for ideal/module, does not apply to matrix
     omCheckAddrSize(h1,sizeof(*h1));
 
     assume( h1->ncols >= 0 );
     assume( h1->nrows >= 0 ); // matrix case!
-    
+
     assume( h1->rank >= 0 );
 
     const int n = (h1->ncols * h1->nrows);
@@ -437,7 +436,7 @@ void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r, con
 
     if( h1->m != NULL && n > 0 )
       omdebugAddrSize(h1->m, n * sizeof(poly));
-    
+
     long new_rk = 0; // inlining id_RankFreeModule(h1, r, tailRing);
 
     /* to be able to test matrices: */
@@ -450,8 +449,8 @@ void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r, con
 
     // dense matrices only contain polynomials:
     // h1->nrows == h1->rank > 1 && new_rk == 0!
-    assume( !( h1->nrows == h1->rank && h1->nrows > 1 && new_rk > 0 ) ); // 
-    
+    assume( !( h1->nrows == h1->rank && h1->nrows > 1 && new_rk > 0 ) ); //
+
     if(new_rk > h1->rank)
     {
       dReportError("wrong rank %d (should be %d) in %s:%d\n",
@@ -602,29 +601,29 @@ ideal id_SimpleAdd (ideal h1,ideal h2, const ring R)
 {
   id_Test(h1, R);
   id_Test(h2, R);
-  
+
   if ( idIs0(h1) ) return id_Copy(h2,R);
   if ( idIs0(h2) ) return id_Copy(h1,R);
 
   int j = IDELEMS(h1)-1;
   while ((j >= 0) && (h1->m[j] == NULL)) j--;
-  
+
   int i = IDELEMS(h2)-1;
   while ((i >= 0) && (h2->m[i] == NULL)) i--;
-  
+
   const int r = si_max(h1->rank, h2->rank);
-  
+
   ideal result = idInit(i+j+2,r);
 
   int l;
-  
+
   for (l=j; l>=0; l--)
     result->m[l] = p_Copy(h1->m[l],R);
-  
+
   j = i+j+1;
   for (l=i; l>=0; l--, j--)
     result->m[j] = p_Copy(h2->m[l],R);
-  
+
   return result;
 }
 
@@ -634,9 +633,9 @@ BOOLEAN idInsertPoly (ideal h1, poly h2)
 {
   if (h2==NULL) return FALSE;
   assume (h1 != NULL);
-  
+
   int j = IDELEMS(h1) - 1;
-  
+
   while ((j >= 0) && (h1->m[j] == NULL)) j--;
   j++;
   if (j==IDELEMS(h1))
@@ -694,27 +693,28 @@ ideal id_Add (ideal h1,ideal h2, const ring r)
 }
 
 /// h1 * h2
-/// h1 must be an ideal (with at least one column)
-/// h2 may be a module (with no columns at all)
-ideal  id_Mult (ideal h1,ideal  h2, const ring r)
+/// one h_i must be an ideal (with at least one column)
+/// the other h_i may be a module (with no columns at all)
+ideal  id_Mult (ideal h1,ideal  h2, const ring R)
 {
-  id_Test(h1, r);
-  id_Test(h2, r);
-
-  assume( h1->rank == 1 );
+  id_Test(h1, R);
+  id_Test(h2, R);
 
   int j = IDELEMS(h1);
   while ((j > 0) && (h1->m[j-1] == NULL)) j--;
-  
+
   int i = IDELEMS(h2);
   while ((i > 0) && (h2->m[i-1] == NULL)) i--;
 
-  j = j * i;
-  
-  ideal  hh = idInit(j, si_max( h2->rank, h1->rank ));
-  
-  if (j==0) return hh;
-  
+  j *= i;
+  int r = si_max( h2->rank, h1->rank );
+  if (j==0)
+  {
+    if ((IDELEMS(h1)>0) && (IDELEMS(h2)>0)) j=1;
+    return idInit(j, r);
+  }
+  ideal  hh = idInit(j, r);
+
   int k = 0;
   for (i=0; i<IDELEMS(h1); i++)
   {
@@ -724,14 +724,14 @@ ideal  id_Mult (ideal h1,ideal  h2, const ring r)
       {
         if (h2->m[j] != NULL)
         {
-          hh->m[k] = pp_Mult_qq(h1->m[i],h2->m[j],r);
+          hh->m[k] = pp_Mult_qq(h1->m[i],h2->m[j],R);
           k++;
         }
       }
     }
   }
-  
-  id_Compactify(hh,r);
+
+  id_Compactify(hh,R);
   return hh;
 }
 
@@ -740,8 +740,8 @@ BOOLEAN idIs0 (ideal h)
 {
   assume (h != NULL); // will fail :(
 //  if (h == NULL) return TRUE;
-  
-  for( int i = IDELEMS(h)-1; i >= 0; i-- )    
+
+  for( int i = IDELEMS(h)-1; i >= 0; i-- )
     if(h->m[i] != NULL)
       return FALSE;
 
@@ -753,7 +753,7 @@ BOOLEAN idIs0 (ideal h)
 long id_RankFreeModule (ideal s, ring lmRing, ring tailRing)
 {
   id_TestTail(s, lmRing, tailRing);
-  
+
   long j = 0;
 
   if (rRing_has_Comp(tailRing) && rRing_has_Comp(lmRing))
@@ -767,7 +767,7 @@ long id_RankFreeModule (ideal s, ring lmRing, ring tailRing)
         if (k>j) j = k;
       }
   }
-  
+
   return j; //  return -1;
 }
 
@@ -907,14 +907,14 @@ ideal id_FreeModule (int i, const ring r)
 {
   assume(i >= 0);
   ideal h = idInit(i, i);
-  
+
   for (int j=0; j<i; j++)
   {
     h->m[j] = p_One(r);
     p_SetComp(h->m[j],j+1,r);
     p_SetmComp(h->m[j],r);
   }
-  
+
   return h;
 }
 
@@ -1086,7 +1086,7 @@ ideal id_Head(ideal h,const ring r)
   for (int i=IDELEMS(h)-1;i>=0; i--)
     if (h->m[i]!=NULL)
       m->m[i]=p_Head(h->m[i],r);
-  
+
   return m;
 }
 
@@ -1374,10 +1374,10 @@ ideal id_Jet(ideal i,int d, const ring R)
   r->nrows = i-> nrows;
   r->ncols = i-> ncols;
   //r->rank = i-> rank;
-  
+
   for(int k=(i->nrows)*(i->ncols)-1;k>=0; k--)
     r->m[k]=pp_Jet(i->m[k],d,R);
-  
+
   return r;
 }
 
@@ -1742,11 +1742,11 @@ void id_Shift(ideal M, int s, const ring r)
 //  id_Test( M, r );
 
 //  assume( s >= 0 ); // negative is also possible // TODO: verify input ideal in such a case!?
-  
+
   for(int i=IDELEMS(M)-1; i>=0;i--)
     p_Shift(&(M->m[i]),s,r);
-  
+
   M->rank += s;
-  
+
 //  id_Test( M, r );
 }
