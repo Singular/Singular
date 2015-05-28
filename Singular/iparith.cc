@@ -1093,7 +1093,7 @@ static BOOLEAN jjTIMES_MA(leftv res, leftv u, leftv v)
   res->data = (char *)mp_Mult(A,B,currRing);
   if (res->data==NULL)
   {
-     Werror("matrix size not compatible(%dx%d, %dx%d)",
+     Werror("matrix size not compatible(%dx%d, %dx%d) in *",
              MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
      return TRUE;
   }
@@ -1481,7 +1481,7 @@ static BOOLEAN jjINDEX_V(leftv res, leftv u, leftv v)
   poly p=(poly)u->CopyD(VECTOR_CMD);
   poly r=p; // pointer to the beginning of component i
   poly o=NULL;
-  unsigned i=(unsigned)(long)v->Data();
+  int i=(int)(long)v->Data();
   while (p!=NULL)
   {
     if (pGetComp(p)!=i)
@@ -5330,7 +5330,7 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
   return TRUE;
 }
 static int WerrorS_dummy_cnt=0;
-static void WerrorS_dummy(const char *s)
+static void WerrorS_dummy(const char *)
 {
   WerrorS_dummy_cnt++;
 }
@@ -5340,7 +5340,7 @@ BOOLEAN jjLOAD_TRY(const char *s)
   WerrorS_callback=WerrorS_dummy;
   WerrorS_dummy_cnt=0;
   BOOLEAN bo=jjLOAD(s,TRUE);
-  if (WerrorS_dummy_cnt>0) Print("loading of >%s< failed\n",s);
+  if (bo || (WerrorS_dummy_cnt>0)) Print("loading of >%s< failed\n",s);
   WerrorS_callback=WerrorS_save;
   errorreported=0;
   return FALSE;
@@ -8124,7 +8124,6 @@ BOOLEAN iiExprArith2Tab(leftv res, leftv a, int op,
 BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 {
   memset(res,0,sizeof(sleftv));
-  BOOLEAN call_failed=FALSE;
 
   if (!errorreported)
   {
@@ -8312,7 +8311,6 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dA1, int at
 BOOLEAN iiExprArith1(leftv res, leftv a, int op)
 {
   memset(res,0,sizeof(sleftv));
-  BOOLEAN call_failed=FALSE;
 
   if (!errorreported)
   {
@@ -8356,7 +8354,6 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       else          return TRUE;
     }
 
-    BOOLEAN failed=FALSE;
     iiOp=op;
     int i=iiTabIndex(dArithTab1,JJTAB1LEN,op);
     return iiExprArith1Tab(res,a,op, dArith1+i,at,dConvertTypes);
