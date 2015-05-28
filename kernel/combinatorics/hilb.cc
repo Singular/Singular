@@ -1298,9 +1298,9 @@ intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree, ideal Q, rin
 
 intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring tailRing)
 {
-  id_TestTail(S, currRing, tailRing);  
+  id_TestTail(S, currRing, tailRing);
   if (Q!= NULL) id_TestTail(Q, currRing, tailRing);
-  
+
   return hSeries(S, modulweight, 1, wdegree, Q, tailRing);
 }
 

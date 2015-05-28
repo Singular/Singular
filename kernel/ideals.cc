@@ -1787,33 +1787,33 @@ ideal idMinors(matrix a, int ar, ideal R)
 /// the elements of the result are not in R (if R!=NULL)
 ideal idMinors(matrix a, int ar, ideal R)
 {
- 
+
   const ring origR=currRing;
   id_Test((ideal)a, origR);
 
   const int r = a->nrows;
   const int c = a->ncols;
-  
+
   if((ar<=0) || (ar>r) || (ar>c))
   {
     Werror("%d-th minor, matrix is %dx%d",ar,r,c);
     return NULL;
   }
-  
-  ideal h = id_Matrix2Module(mp_Copy(a,origR),origR);  
+
+  ideal h = id_Matrix2Module(mp_Copy(a,origR),origR);
   long bound = sm_ExpBound(h,c,r,ar,origR);
   id_Delete(&h, origR);
-  
+
   ring tmpR = sm_RingChange(origR,bound);
-  
+
   matrix b = mpNew(r,c);
-  
+
   for (int i=r*c-1;i>=0;i--)
     if (a->m[i] != NULL)
       b->m[i] = prCopyR(a->m[i],origR,tmpR);
-  
+
   id_Test( (ideal)b, tmpR);
-  
+
   if (R!=NULL)
   {
     R = idrCopyR(R,origR,tmpR); // TODO: overwrites R? memory leak?
@@ -1825,23 +1825,23 @@ ideal idMinors(matrix a, int ar, ideal R)
     //}
     id_Test( R, tmpR);
   }
-  
-  
+
+
   ideal result = idInit(32,1);
 
   int elems = 0;
-  
+
   if(ar>1)
     mp_RecMin(ar-1,result,elems,b,r,c,NULL,R,tmpR);
   else
     mp_MinorToResult(result,elems,b,r,c,R,tmpR);
-  
+
   id_Test( (ideal)b, tmpR);
-  
+
   id_Delete((ideal *)&b, tmpR);
-  
+
   if (R!=NULL) idDelete(&R);
-  
+
   idSkipZeroes(result);
   rChangeCurrRing(origR);
   result = idrMoveR(result,tmpR,origR);
