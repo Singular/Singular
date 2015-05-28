@@ -602,8 +602,18 @@ ideal id_SimpleAdd (ideal h1,ideal h2, const ring R)
   id_Test(h1, R);
   id_Test(h2, R);
 
-  if ( idIs0(h1) ) return id_Copy(h2,R);
-  if ( idIs0(h2) ) return id_Copy(h1,R);
+  if ( idIs0(h1) )
+  {
+    ideal res=id_Copy(h2,R);
+    if (res->rank<h1->rank) res->rank=h1->rank;
+    return res;
+  }
+  if ( idIs0(h2) )
+  {
+    ideal res=id_Copy(h1,R);
+    if (res->rank<h2->rank) res->rank=h2->rank;
+    return res;
+  }
 
   int j = IDELEMS(h1)-1;
   while ((j >= 0) && (h1->m[j] == NULL)) j--;
