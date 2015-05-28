@@ -865,15 +865,19 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
       q = prMoveR( s_h2->m[j], syz_ring,orig_ring);
       s_h2->m[j] = NULL;
 
-      while (q != NULL)
+      if (q!=NULL)
       {
-        p = q;
-        pIter(q);
-        pNext(p) = NULL;
-        t=pGetComp(p);
-        pSetComp(p,0);
-        pSetmComp(p);
-        MATELEM(*ma,t-k,i) = pAdd(MATELEM(*ma,t-k,i),p);
+        q=pReverse(q);
+        while (q != NULL)
+        {
+          p = q;
+          pIter(q);
+          pNext(p) = NULL;
+          t=pGetComp(p);
+          pSetComp(p,0);
+          pSetmComp(p);
+          MATELEM(*ma,t-k,i) = pAdd(MATELEM(*ma,t-k,i),p);
+        }
       }
       i++;
     }
