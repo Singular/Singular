@@ -7051,7 +7051,7 @@ returns (depending on the type of the link and its status)
 returns @code{"yes"} or @code{"no"}: existence of the filename for ASCII/ssi links
 @end table
 @item @strong{Syntax:}
-@code{status (} list_expression@code{,} int_expression@code @code{)}
+@code{status (} list_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
