@@ -103,14 +103,15 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
   unsigned long not_sev = ~L->sev;
   int j = start;
 
-  pAssume(~not_sev == p_GetShortExpVector(p, r));
-
   const TSet T=strat->T;
   const unsigned long* sevT=strat->sevT;
   if (L->p!=NULL)
   {
     const ring r=currRing;
     const poly p=L->p;
+     
+    pAssume(~not_sev == p_GetShortExpVector(p, r));
+
     loop
     {
       if (j > strat->tl) return -1;
