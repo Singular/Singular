@@ -5439,6 +5439,17 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
   {
     loop
     {
+      if (TEST_OPT_IDLIFT)
+      {
+        if (Ln.p!=NULL)
+        {
+          if (p_GetComp(Ln.p,currRing)> strat->syzComp) break;
+        }
+        else
+        {
+          if (p_GetComp(Ln.t_p,strat->tailRing)> strat->syzComp) break;
+        }
+      }
       Ln.SetShortExpVector();
       if (withT)
       {

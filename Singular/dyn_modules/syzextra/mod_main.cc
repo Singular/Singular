@@ -1847,7 +1847,8 @@ static BOOLEAN idPrepare(leftv res, leftv h)
   if ( (h!=NULL) && (h->Typ()==INT_CMD) )
   {
     iComp = (int)((long)(h->Data()));
-  } else
+  }
+  else
   {
       if( (!isSyz) && (-1 == posIS) )
       {
