@@ -3755,16 +3755,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         // get the argument:
         bigintmat *b=(bigintmat *)h->Data();
         // just for tests: simply transpose
-	bigintmat *bb=b->transpose();
-	// return the result:
+        bigintmat *bb=b->transpose();
+        // return the result:
         res->rtyp=CMATRIX_CMD;
-	res->data=(char*)bb;
+        res->data=(char*)bb;
         return FALSE;
       }
       else
       {
         WerrorS("system(\"LU\",<cmatrix>) expected");
-	return TRUE;
+        return TRUE;
       }
     }
     else

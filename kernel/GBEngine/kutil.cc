@@ -5443,7 +5443,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
       if (withT)
       {
         int j;
-        j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
+        j = kFindDivisibleByInT(strat, &Ln);
         if (j < 0) break;
         With = &(strat->T[j]);
       }
@@ -9756,7 +9756,7 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
       if (withT)
       {
         int j;
-        j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
+        j = kFindDivisibleByInT(strat, &Ln);
         if (j < 0) break;
         With = &(strat->T[j]);
       }
