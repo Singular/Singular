@@ -376,7 +376,6 @@ public:
   BOOLEAN update;
   BOOLEAN posInLOldFlag;
   BOOLEAN use_buckets;
-  BOOLEAN interred_flag;
   // if set, pLDeg(p, l) == (pFDeg(pLast(p), pLength)
   BOOLEAN LDegLast;
   // if set, then L.length == L.pLength
@@ -540,6 +539,7 @@ void updateResult(ideal r,ideal Q,kStrategy strat);
 void completeReduce (kStrategy strat, BOOLEAN withT=FALSE);
 void kFreeStrat(kStrategy strat);
 void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
+void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
 void enterOnePairSig (int i,poly p,poly pSig,int ecart, int isFromQ,kStrategy strat, int atR);
 void chainCritNormal (poly p,int ecart,kStrategy strat);
 void chainCritSig (poly p,int ecart,kStrategy strat);
