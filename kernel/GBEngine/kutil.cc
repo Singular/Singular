@@ -7578,7 +7578,7 @@ void initBuchMoraCrit(kStrategy strat)
   }
 #endif
   if (TEST_OPT_IDLIFT  /* i.e. also strat->syzComp==1 */
-  && (!rIsPluralRing(currRing))
+  && (!rIsPluralRing(currRing)))
     strat->enterOnePair=enterOnePairLift;
 
 
