@@ -184,7 +184,13 @@ class sLObject : public sTObject
 
 public:
   unsigned long sev;
-  unsigned long checked; // this is the index of S up to which
+  poly  p1,p2; /*- the pair p comes from,
+                 lm(pi) in currRing, tail(pi) in tailring -*/
+
+  poly  lcm;   /*- the lcm of p1,p2 -*/
+  kBucket_pt bucket;
+  int   i_r1, i_r2;
+  unsigned checked; // this is the index of S up to which
                       // the corresponding LObject was already checked in
                       // critical pair creation => when entering the
                       // reduction process it is enough to start a second
@@ -193,12 +199,6 @@ public:
                       // NOTE: If prod_crit = TRUE then the corresponding pair is
                       // detected by Buchberger's Product Criterion and can be
                       // deleted
-  poly  p1,p2; /*- the pair p comes from,
-                 lm(pi) in currRing, tail(pi) in tailring -*/
-
-  poly  lcm;   /*- the lcm of p1,p2 -*/
-  kBucket_pt bucket;
-  int   i_r1, i_r2;
 
   // initialization
   KINLINE void Init(ring tailRing = currRing);

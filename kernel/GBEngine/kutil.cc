@@ -1506,8 +1506,10 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
 #ifndef HAVE_RATGRING
   pLcm(p,strat->S[i],Lp.lcm);
 #elif defined(HAVE_RATGRING)
-  //  if (rIsRatGRing(currRing))
+  if (rIsRatGRing(currRing))
   pLcmRat(p,strat->S[i],Lp.lcm, currRing->real_var_start); // int rat_shift
+  else
+  pLcm(p,strat->S[i],Lp.lcm);
 #endif
   pSetm(Lp.lcm);
 
