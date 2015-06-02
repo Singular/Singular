@@ -1124,6 +1124,25 @@ int redHoney (LObject* h, kStrategy strat)
       #endif
       return 0;
     }
+    if (TEST_OPT_IDLIFT)
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+	{
+	  h->Delete();
+	  return 0;
+	}
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+	{
+	  h->Delete();
+	  return 0;
+	}
+      }
+    }
     h->SetShortExpVector();
     not_sev = ~ h->sev;
     h_d = h->SetpFDeg();
@@ -1474,7 +1493,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
     if (strat->overflow)
     {
-        if (!kStratChangeTailRing(strat)) { Werror("OVERFLOW.."); break;}
+      if (!kStratChangeTailRing(strat)) { Werror("OVERFLOW.."); break;}
     }
 
     // reduction to non-zero new poly
