@@ -184,7 +184,13 @@ class sLObject : public sTObject
 
 public:
   unsigned long sev;
-  unsigned long checked; // this is the index of S up to which
+  poly  p1,p2; /*- the pair p comes from,
+                 lm(pi) in currRing, tail(pi) in tailring -*/
+
+  poly  lcm;   /*- the lcm of p1,p2 -*/
+  kBucket_pt bucket;
+  int   i_r1, i_r2;
+  unsigned checked; // this is the index of S up to which
                       // the corresponding LObject was already checked in
                       // critical pair creation => when entering the
                       // reduction process it is enough to start a second
@@ -193,12 +199,6 @@ public:
                       // NOTE: If prod_crit = TRUE then the corresponding pair is
                       // detected by Buchberger's Product Criterion and can be
                       // deleted
-  poly  p1,p2; /*- the pair p comes from,
-                 lm(pi) in currRing, tail(pi) in tailring -*/
-
-  poly  lcm;   /*- the lcm of p1,p2 -*/
-  kBucket_pt bucket;
-  int   i_r1, i_r2;
 
   // initialization
   KINLINE void Init(ring tailRing = currRing);
@@ -376,7 +376,6 @@ public:
   BOOLEAN update;
   BOOLEAN posInLOldFlag;
   BOOLEAN use_buckets;
-  BOOLEAN interred_flag;
   // if set, pLDeg(p, l) == (pFDeg(pLast(p), pLength)
   BOOLEAN LDegLast;
   // if set, then L.length == L.pLength
@@ -540,6 +539,7 @@ void updateResult(ideal r,ideal Q,kStrategy strat);
 void completeReduce (kStrategy strat, BOOLEAN withT=FALSE);
 void kFreeStrat(kStrategy strat);
 void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
+void enterOnePairLift (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
 void enterOnePairSig (int i,poly p,poly pSig,int ecart, int isFromQ,kStrategy strat, int atR);
 void chainCritNormal (poly p,int ecart,kStrategy strat);
 void chainCritSig (poly p,int ecart,kStrategy strat);
@@ -558,8 +558,7 @@ int kFindInT(poly p, TSet T, int tlength);
 
 /// return -1 if no divisor is found
 ///        number of first divisor in T, otherwise
-int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
-                        const int tl, const LObject* L, const int start=0);
+int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start=0);
 
 /// return -1 if no divisor is found
 ///        number of first divisor in S, otherwise

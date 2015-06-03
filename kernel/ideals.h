@@ -103,9 +103,6 @@ inline ideal idMult (ideal h1, ideal h2)
 
 BOOLEAN idIs0 (ideal h);
 
-// returns TRUE, if idRankFreeModule(m) > 0
-BOOLEAN idIsModule(ideal m, const ring r);
-
 inline BOOLEAN idHomIdeal (ideal id, ideal Q=NULL)
 {
   return id_HomIdeal(id, Q, currRing);

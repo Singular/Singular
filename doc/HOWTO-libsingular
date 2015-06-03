@@ -69,9 +69,9 @@ main()
     printf("datetime not found\n");
   else
   {
-    leftv res=iiMake_proc(datetime,NULL,NULL);
-    if (res==NULL) { printf("datetime return an error\n"); errorreported = 0; }
-    else           printf("datetime returned type %d, >>%s<<\n",res->Typ(),(char *)res->Data());
+    BOOLEAN res=iiMake_proc(datetime,NULL,NULL);
+    if (res) { printf("datetime return an error\n"); errorreported = 0; }
+    else      printf("datetime returned type %d, >>%s<<\n",iiRETURNEXPR.Typ(),(char *)iiRETURNEXPR.Data());
   }
 
   // changing a ring for the interpreter
@@ -85,7 +85,8 @@ main()
    IDRING(newRingHdl)=R;
    // make R the default ring (include rChangeCurrRing):
    rSetHdl(newRingHdl);
-   err=iiAllStart(NULL,"poly p=x;listvar();return();\n"),BT_Proc,0);
+   myynest=1; /* <=0: interactive at eof/ >=1: non-interactive */
+   err=iiAllStart(NULL,"poly p=x;listvar();return();\n",BT_proc,0);
 
   // calling a kernel function via the interpreter interface
   sleftv r1; memset(&r1,0,sizeof(r1));

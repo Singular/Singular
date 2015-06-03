@@ -4528,8 +4528,8 @@ void p_Shift (poly * p,int i, const ring r)
  ***************************************************************/
 
 
-static inline unsigned long GetBitFields(long e,
-                                         unsigned int s, unsigned int n)
+static inline unsigned long GetBitFields(const long e,
+                                         const unsigned int s, const unsigned int n)
 {
 #define Sy_bit_L(x)     (((unsigned long)1L)<<(x))
   unsigned int i = 0;
@@ -4561,7 +4561,7 @@ static inline unsigned long GetBitFields(long e,
 // This way, we have:
 // exp1 / exp2 ==> (ev1 & ~ev2) == 0, i.e.,
 // if (ev1 & ~ev2) then exp1 does not divide exp2
-unsigned long p_GetShortExpVector(poly p, const ring r)
+unsigned long p_GetShortExpVector(const poly p, const ring r)
 {
   assume(p != NULL);
   if (p == NULL) return 0;
