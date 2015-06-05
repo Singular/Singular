@@ -72,8 +72,8 @@ struct fractionObject
 typedef struct fractionObject * fraction;
 
 
-#define NUM(f) (((fraction)f)->numerator)
-#define DEN(f) (((fraction)f)->denominator)
+#define NUM(f) ((f)->numerator)
+#define DEN(f) ((f)->denominator)
 
 /* some useful accessors for fractions: */
 #define IS0(f) (f == NULL)

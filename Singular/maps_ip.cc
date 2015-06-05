@@ -263,13 +263,13 @@ poly pSubstPar(poly p, int par, poly image)
       memset(v,0,sizeof(sleftv));
 
       number d = n_GetDenom(p_GetCoeff(p, currRing), currRing);
-      p_Test((poly)NUM(d), R);
+      p_Test((poly)NUM((fraction)d), R);
 
       if ( n_IsOne (d, currRing->cf) )
       {
         n_Delete(&d, currRing); d = NULL;
       }
-      else if (!p_IsConstant((poly)NUM(d), R))
+       else if (!p_IsConstant((poly)NUM((fraction)d), R))
       {
         WarnS("ignoring denominators of coefficients...");
         n_Delete(&d, currRing); d = NULL;
@@ -278,11 +278,11 @@ poly pSubstPar(poly p, int par, poly image)
       number num = n_GetNumerator(p_GetCoeff(p, currRing), currRing);
       memset(&tmpW,0,sizeof(sleftv));
       tmpW.rtyp = POLY_CMD;
-      p_Test((poly)NUM(num), R);
+      p_Test((poly)NUM((fraction)num), R);
 
-      tmpW.data = NUM (num); // a copy of this poly will be used
+      tmpW.data = NUM ((fraction)num); // a copy of this poly will be used
 
-      p_Normalize(NUM(num),R);
+      p_Normalize(NUM((fraction)num),R);
       if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,R,NULL,NULL,0,nMap))
       {
         WerrorS("map failed");
