@@ -2531,6 +2531,10 @@ example par2varRing;
 */
 static proc mod_init()
 {
+  if(!defined(Singmathic))
+  {
+    load("singmathic.so","try");
+  }
   //int pagelength=24;
   //exportto(Top,pagelength);
 }
