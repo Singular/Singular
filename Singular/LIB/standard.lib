@@ -803,13 +803,10 @@ example
 proc groebner(def i_par, list #)
 "SYNTAX: @code{groebner (} ideal_expression @code{)} @*
          @code{groebner (} module_expression @code{)} @*
-         @code{groebner (} ideal_expression@code{,} int_expression @code{)} @*
-         @code{groebner (} module_expression@code{,} int_expression @code{)} @*
          @code{groebner (} ideal_expression@code{,} list of string_expressions
                @code{)} @*
          @code{groebner (} ideal_expression@code{,} list of string_expressions
-               and int_expression @code{)} @*
-         @code{groebner (} ideal_expression@code{,} int_expression @code{)}
+               and int_expression @code{)}
 TYPE:    type of the first argument
 PURPOSE: computes a standard basis of the first argument @code{I}
          (ideal or module) by a heuristically chosen method (default)
@@ -828,13 +825,6 @@ PURPOSE: computes a standard basis of the first argument @code{I}
          block of variables before a Groebner basis computation (and
          afterwards back).
          @code{option(prot)} informs about the chosen method.
-NOTE:    If an additional argument, say @code{wait}, of type int is given,
-         then the computation runs for at most @code{wait} seconds.
-         That is, if no result could be computed in @code{wait} seconds,
-         then the computation is interrupted, 0 is returned, a warning
-         message is displayed, and the global variable
-         @code{Standard::groebner_error} is defined.
-         This feature uses MP and hence it is available on UNIX platforms, only.
 HINT:    Since there exists no uniform best method for computing standard
          bases, and since the difference in performance of a method on
          different examples can be huge, it is recommended to test, for hard
@@ -842,7 +832,7 @@ HINT:    Since there exists no uniform best method for computing standard
          characteristic 32003 instead of 0 or substitute a subset of
          parameters/variables by integers, etc.). @*
 SEE ALSO: stdhilb, stdfglm, std, slimgb
-KEYWORDS: time limit on computations; MP, groebner basis computations
+KEYWORDS: groebner basis computations
 EXAMPLE: example groebner;  shows an example"
 
 {
@@ -903,89 +893,12 @@ EXAMPLE: example groebner;  shows an example"
   int k;
   for (k=1; k<=size(#); k++)
   {
-     if (typeof(#[k]) == "int")
-     {
-       int wait = #[k];
-     }
      if (typeof(#[k]) == "string")
      {
        method = method + "," + #[k];
        Method = Method + list(#[k]);
      }
   }
-
- //======= we have an argument of type int -- try to use MPfork links =======
-  if ( defined(wait) == voice )
-  {
-    if ( system("with", "MP") )
-    {
-        int j = 10;
-        string bs = nameof(basering);
-        link l_fork = "MPtcp:fork";
-        open(l_fork);
-        write(l_fork, quote(system("pid")));
-        int pid = read(l_fork);
-//        write(l_fork, quote(groebner(eval(i))));
-        write(l_fork, quote(groebner(eval(i),eval(Method))));
-//###Fehlermeldung:
-// ***dError: undef. ringorder used
-// occured at:
-
-        // sleep in small intervalls for appr. one second
-        if (wait > 0)
-        {
-          while(j < 1000000)
-          {
-            if (status(l_fork, "read", "ready", j)) {break;}
-            j = j + j;
-          }
-        }
-
-        // sleep in intervalls of one second from now on
-        j = 1;
-        while (j < wait)
-        {
-          if (status(l_fork, "read", "ready", 1000000)) {break;}
-          j = j + 1;
-        }
-
-        if (status(l_fork, "read", "ready"))
-        {
-          def result = read(l_fork);
-          if (bs != nameof(basering))
-          {
-            def PP = basering;
-            setring P;
-            def result = imap(PP, result);
-            kill PP;
-          }
-          if (defined(groebner_error)==1)
-          {
-            kill groebner_error;
-          }
-          kill l_fork;
-        }
-        else
-        {
-          ideal result;
-          if (! defined(groebner_error))
-          {
-            int groebner_error = 1;
-            export groebner_error;
-          }
-          "** groebner did not finish";
-          j = system("sh", "kill " + string(pid));
-        }
-        return (result);
-    }
-    else
-    {
-      "** groebner with a time limit on computation is not supported
-          in this configuration";
-    }
-  }
-
- //=========== we are still here -- do the actual computation =============
 
 //--------------------- save data from basering ---------------------------
   string @Minpoly = string(minpoly);      //minimal polynomial
@@ -1064,19 +977,19 @@ EXAMPLE: example groebner;  shows an example"
   //define conversion:
   if( find(method,"hilb") && !find(method,"fglm") )
   {
-     conversion = "hilb"; // $Id$
+     conversion = "hilb";
   }
   if( find(method,"fglm") && !find(method,"hilb") )
   {
-    conversion = "fglm"; // $Id$
+    conversion = "fglm";
   }
   if( find(method,"fglm") && find(method,"hilb") )
   {
-    conversion = "hilborfglm"; // $Id$
+    conversion = "hilborfglm";
   }
   if( !find(method,"fglm") && !find(method,"hilb") )
   {
-    conversion = "no"; // $Id$
+    conversion = "no";
   }
 
   //define partovar:
