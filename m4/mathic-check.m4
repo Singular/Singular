@@ -13,6 +13,7 @@ AC_DEFUN([LB_CHECK_MATHICGB],
  # MathicGB
  dnl Checking these pre-requisites and adding them to libs is necessary
  dnl for some reason, at least on Cygwin.
+ BACKUP_LIBS=${LIBS}
  AS_IF( [test "x$with_mathicgb" = xyes],
  [
   AC_LANG_PUSH([C++])
@@ -24,8 +25,11 @@ AC_DEFUN([LB_CHECK_MATHICGB],
     [AC_MSG_ERROR([Cannot find the MathicGB library.])])
   AC_CHECK_HEADER([mathicgb.h])
   AC_LANG_POP([C++])
+  MATHIiC_LIBS=${LIBS}
+  AC_SUBST(MATHIiC_LIBS)
   AC_DEFINE(HAVE_MATHICGB,1,[Define if mathicgb is to be used])
 #  AC_SUBST(HAVE_MATHICGB_VALUE, 1)
  ])
  #
 ])
+ LIBS=${BACKUP_LIBS}
