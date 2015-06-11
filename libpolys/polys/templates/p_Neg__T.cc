@@ -19,7 +19,7 @@ LINKAGE poly p_Neg__T(poly p, const ring r)
   poly q = p;
   while (p != NULL)
   {
-    pSetCoeff0(p, n_Neg__T(pGetCoeff(p), r));
+    pSetCoeff0(p, n_Neg__T(pGetCoeff(p), r->cf));
     pIter(p);
   }
   return q;

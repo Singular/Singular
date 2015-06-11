@@ -26,7 +26,7 @@ LINKAGE poly p_Mult_mm__T(poly p, const poly m, const ring ri)
   number pn;
   DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);
   const unsigned long* m_e = m->exp;
-  pAssume(!n_IsZero__T(ln,ri));
+  pAssume(!n_IsZero__T(ln,ri->cf));
 
 #ifdef HAVE_ZERODIVISORS
   poly before = p;
@@ -34,11 +34,11 @@ LINKAGE poly p_Mult_mm__T(poly p, const poly m, const ring ri)
   while (p != NULL)
   {
     pn = pGetCoeff(p);
-    number tmp = n_Mult__T(ln, pn, ri);
+    number tmp = n_Mult__T(ln, pn, ri->cf);
 #ifdef HAVE_ZERODIVISORS
-    if (n_IsZero__T(tmp, ri))
+    if (n_IsZero__T(tmp, ri->cf))
     {
-      n_Delete__T(&tmp, ri);
+      n_Delete__T(&tmp, ri->cf);
       if (before == p)
       {
         p = p_LmDeleteAndNext(p, ri);
@@ -55,7 +55,7 @@ LINKAGE poly p_Mult_mm__T(poly p, const poly m, const ring ri)
 #endif
     {
       pSetCoeff0(p, tmp);
-      n_Delete__T(&pn, ri);
+      n_Delete__T(&pn, ri->cf);
       p_MemAdd__T(p->exp, m_e, length);
       p_MemAddAdjust__T(p, ri);
 #ifdef HAVE_ZERODIVISORS

@@ -185,7 +185,7 @@ int redEcart (LObject* h,kStrategy strat)
   h->SetShortExpVector();
   loop
   {
-    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    j = kFindDivisibleByInT(strat, h);
     if (j < 0)
     {
       if (strat->honey) h->SetLength(strat->length_pLength);
@@ -213,7 +213,7 @@ int redEcart (LObject* h,kStrategy strat)
             &&
             p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], h->GetLmTailRing(), ~h->sev, strat->tailRing))
 #else
-          j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h, i);
+          j = kFindDivisibleByInT(strat, h, i);
         if (j < 0) break;
         i = j;
         if (strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
@@ -386,7 +386,7 @@ int redRiloc (LObject* h,kStrategy strat)
 #endif
   loop
   {
-    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    j = kFindDivisibleByInT(strat, h);
 #if ADIDEBUG_NF
     if(j != -1)
     {
@@ -429,7 +429,7 @@ int redRiloc (LObject* h,kStrategy strat)
             &&
             p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], h->GetLmTailRing(), ~h->sev, strat->tailRing))
 #else
-          j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h, i);
+          j = kFindDivisibleByInT(strat, h, i);
         if (j < 0) break;
         i = j;
         if (strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
@@ -588,7 +588,7 @@ int redFirst (LObject* h,kStrategy strat)
   h->SetShortExpVector();
   loop
   {
-    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    j = kFindDivisibleByInT(strat, h);
     if (j < 0)
     {
       h->SetDegStuffReturnLDeg(strat->LDegLast);
@@ -1642,7 +1642,7 @@ loop_count = 1;
       if (strat->P.p==NULL)
       {
         WerrorS("expoent overflow - wrong ordering");
-	return(idInit(1,1));
+        return(idInit(1,1));
       }
       // set ecart -- might have changed because of tail reductions
       if ((!strat->noTailReduction) && (!strat->honey))
@@ -2093,8 +2093,6 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   else
     strat->LazyPass=2;
   strat->LazyDegree = 1;
-  strat->enterOnePair=enterOnePairNormal;
-  strat->chainCrit=chainCritNormal;
   strat->ak = id_RankFreeModule(F,currRing);
   strat->kModW=kModW=NULL;
   strat->kHomW=kHomW=NULL;

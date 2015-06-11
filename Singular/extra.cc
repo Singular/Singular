@@ -64,7 +64,7 @@
 #include <polys/prCopy.h>
 #include <polys/weight.h>
 
-
+#include <coeffs/bigintmat.h>
 #include <kernel/fast_mult.h>
 #include <kernel/digitech.h>
 #include <kernel/combinatorics/stairc.h>
@@ -3771,6 +3771,29 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+/*==================== LU for bigintmat =================*/
+#ifdef SINGULAR_4_1
+    if(strcmp(sys_cmd,"LU")==0)
+    {
+      if ((h!=NULL) && (h->Typ()==CMATRIX_CMD))
+      {
+        // get the argument:
+        bigintmat *b=(bigintmat *)h->Data();
+        // just for tests: simply transpose
+        bigintmat *bb=b->transpose();
+        // return the result:
+        res->rtyp=CMATRIX_CMD;
+        res->data=(char*)bb;
+        return FALSE;
+      }
+      else
+      {
+        WerrorS("system(\"LU\",<cmatrix>) expected");
+        return TRUE;
+      }
+    }
+    else
+#endif    
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

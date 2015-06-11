@@ -54,9 +54,9 @@ LINKAGE void p_kBucketSetLm__T(kBucket_pt bucket)
 
         Greater:
         {
-          if (n_IsZero__T(pGetCoeff(p), r))
+          if (n_IsZero__T(pGetCoeff(p), r->cf))
           {
-            n_Delete__T(&pGetCoeff(p), r);
+            n_Delete__T(&pGetCoeff(p), r->cf);
             pIter(bucket->buckets[j]);
             p_FreeBinAddr(p, r);
             (bucket->buckets_length[j])--;
@@ -70,15 +70,15 @@ LINKAGE void p_kBucketSetLm__T(kBucket_pt bucket)
           MULTIPLY_BUCKET(bucket,i);
           number tn = pGetCoeff(p);
           #if 0
-          pSetCoeff0(p, n_Add__T(pGetCoeff(bucket->buckets[i]), tn, r));
-          n_Delete__T(&tn, r);
+          pSetCoeff0(p, n_Add__T(pGetCoeff(bucket->buckets[i]), tn, r->cf));
+          n_Delete__T(&tn, r->cf);
           #else
-          n_InpAdd__T(tn,pGetCoeff(bucket->buckets[i]), r);
+          n_InpAdd__T(tn,pGetCoeff(bucket->buckets[i]), r->cf);
           pSetCoeff0(p, tn);
           #endif
           p = bucket->buckets[i];
           pIter(bucket->buckets[i]);
-          n_Delete__T(&pGetCoeff(p), r);
+          n_Delete__T(&pGetCoeff(p), r->cf);
           p_FreeBinAddr(p, r);
           (bucket->buckets_length[i])--;
         }
@@ -87,9 +87,9 @@ LINKAGE void p_kBucketSetLm__T(kBucket_pt bucket)
       }
     }
     p = bucket->buckets[j];
-    if (j > 0 && n_IsZero__T(pGetCoeff(p), r))
+    if (j > 0 && n_IsZero__T(pGetCoeff(p), r->cf))
     {
-      n_Delete__T(&pGetCoeff(p), r);
+      n_Delete__T(&pGetCoeff(p), r->cf);
       pIter(bucket->buckets[j]);
       p_FreeBinAddr(p, r);
       (bucket->buckets_length[j])--;

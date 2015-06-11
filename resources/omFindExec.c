@@ -125,8 +125,8 @@ static char * omFindExec_link (const char *name, char* executable)
         if (tbuf[strlen(tbuf)-1] != '/') strcat(tbuf, "/");
         strcat (tbuf, name);
 
-        /* If we can execute the named file, then return it. */
-        if (! access (tbuf, X_OK))
+        /* If the named file exists, then return it. */
+        if (! access (tbuf, F_OK))
         {
 #ifdef WINNT
           if (extra != NULL)

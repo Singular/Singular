@@ -1093,7 +1093,7 @@ static BOOLEAN jjTIMES_MA(leftv res, leftv u, leftv v)
   res->data = (char *)mp_Mult(A,B,currRing);
   if (res->data==NULL)
   {
-     Werror("matrix size not compatible(%dx%d, %dx%d)",
+     Werror("matrix size not compatible(%dx%d, %dx%d) in *",
              MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
      return TRUE;
   }
@@ -1481,7 +1481,7 @@ static BOOLEAN jjINDEX_V(leftv res, leftv u, leftv v)
   poly p=(poly)u->CopyD(VECTOR_CMD);
   poly r=p; // pointer to the beginning of component i
   poly o=NULL;
-  unsigned i=(unsigned)(long)v->Data();
+  int i=(int)(long)v->Data();
   while (p!=NULL)
   {
     if (pGetComp(p)!=i)
@@ -2666,8 +2666,10 @@ static BOOLEAN jjLOAD_E(leftv /*res*/, leftv v, leftv u)
   char * s=(char *)u->Data();
   if(strcmp(s, "with")==0)
     return jjLOAD((char*)v->Data(), TRUE);
+  if (strcmp(s,"try")==0)
+    return jjLOAD_TRY((char*)v->Data());
   WerrorS("invalid second argument");
-  WerrorS("load(\"libname\" [,\"with\"]);");
+  WerrorS("load(\"libname\" [,option]);");
   return TRUE;
 }
 static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
@@ -5326,6 +5328,23 @@ BOOLEAN jjLOAD(const char *s, BOOLEAN autoexport)
 #endif /* HAVE_DYNAMIC_LOADING */
   }
   return TRUE;
+}
+static int WerrorS_dummy_cnt=0;
+static void WerrorS_dummy(const char *)
+{
+  WerrorS_dummy_cnt++;
+}
+BOOLEAN jjLOAD_TRY(const char *s)
+{
+  void (*WerrorS_save)(const char *s) = WerrorS_callback;
+  WerrorS_callback=WerrorS_dummy;
+  WerrorS_dummy_cnt=0;
+  BOOLEAN bo=jjLOAD(s,TRUE);
+  if (TEST_OPT_PROT && (bo || (WerrorS_dummy_cnt>0)))
+    Print("loading of >%s< failed\n",s);
+  WerrorS_callback=WerrorS_save;
+  errorreported=0;
+  return FALSE;
 }
 
 static BOOLEAN jjstrlen(leftv res, leftv v)
@@ -8106,7 +8125,6 @@ BOOLEAN iiExprArith2Tab(leftv res, leftv a, int op,
 BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 {
   memset(res,0,sizeof(sleftv));
-  BOOLEAN call_failed=FALSE;
 
   if (!errorreported)
   {
@@ -8294,7 +8312,6 @@ BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dA1, int at
 BOOLEAN iiExprArith1(leftv res, leftv a, int op)
 {
   memset(res,0,sizeof(sleftv));
-  BOOLEAN call_failed=FALSE;
 
   if (!errorreported)
   {
@@ -8338,7 +8355,6 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       else          return TRUE;
     }
 
-    BOOLEAN failed=FALSE;
     iiOp=op;
     int i=iiTabIndex(dArithTab1,JJTAB1LEN,op);
     return iiExprArith1Tab(res,a,op, dArith1+i,at,dConvertTypes);

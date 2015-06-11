@@ -43,7 +43,7 @@ number  nrNeg         (number c, const coeffs r);
 number  nrInvers      (number c, const coeffs r);
 BOOLEAN nrGreater     (number a, number b, const coeffs r);
 BOOLEAN nrEqual       (number a, number b, const coeffs r);
-void    nrWrite       (number &a, const coeffs r);
+void    nrWrite       (number a, const coeffs r);
 const char *  nrRead  (const char *s, number *a, const coeffs r);
 
 #ifdef LDEBUG
@@ -279,7 +279,7 @@ BOOLEAN nrEqual (number a,number b, const coeffs r)
   return nf(x).F() == nf((float)0.0).F();
 }
 
-void nrWrite (number &a, const coeffs r)
+void nrWrite (number a, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 

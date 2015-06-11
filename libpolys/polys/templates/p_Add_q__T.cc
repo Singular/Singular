@@ -42,19 +42,19 @@ LINKAGE poly p_Add_q__T(poly p, poly q, int &Shorter, const ring r)
   n1 = pGetCoeff(p);
   n2 = pGetCoeff(q);
   #if 0
-  t = n_Add__T(n1,n2, r);
-  n_Delete__T(&n1, r);
+  t = n_Add__T(n1,n2, r->cf);
+  n_Delete__T(&n1, r->cf);
   #else
-  n_InpAdd__T(n1,n2,r);
+  n_InpAdd__T(n1,n2,r->cf);
   t = n1;
   #endif
-  n_Delete__T(&n2, r);
+  n_Delete__T(&n2, r->cf);
   q = p_LmFreeAndNext(q, r);
 
-  if (n_IsZero__T(t, r))
+  if (n_IsZero__T(t, r->cf))
   {
     shorter += 2;
-    n_Delete__T(&t, r);
+    n_Delete__T(&t, r->cf);
     p = p_LmFreeAndNext(p, r);
   }
   else

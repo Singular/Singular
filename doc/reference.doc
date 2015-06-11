@@ -7050,6 +7050,23 @@ returns (depending on the type of the link and its status)
 @item @code{"exists"}
 returns @code{"yes"} or @code{"no"}: existence of the filename for ASCII/ssi links
 @end table
+@item @strong{Syntax:}
+@code{status (} list_expression@code{,} int_expression @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+the list should be a list L of links, the second argument a timeout in 1/10 seconds.
+Returns
+@table @code
+@item @code{-2}
+select returns an error
+@item @code{-1}
+all links are closed/at eof
+@item{0}
+timeout
+@item{>0}
+(at least) L[i] is ready
+@end table
 @item @strong{Example:}
 @smallexample
 @c example
@@ -8712,6 +8729,7 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{load(} string_expression @code{);}
+@*@code{load(} string_expression @code{,} string_expression @code{);}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -8738,8 +8756,12 @@ You can view the search path which @sc{Singular} uses to locate its
 libraries, by starting up @sc{Singular} with the option @code{-v},
 or by issuing the command @code{system("with");}.
 
+The second string selections options for loading.
+
 @item @strong{Note:} @code{load(<string_expr>,"with")} is equivalent to
 @code{LIB <string_expr>}.
+@item @strong{Note:} @code{load(<string_expr>,"try")} is equivalent to
+@code{LIB <string_expr>} which never fails - test the package name to distiguish.
 @end table
 
 All loaded libraries are displayed by the @code{listvar(package);}
@@ -8751,6 +8773,11 @@ command:
   listvar(package);
                      // the names of the procedures of inout.lib
   load("inout.lib"); // are now known to Singular
+  listvar(package);
+  load("blabla.lib","try");
+  listvar(package);
+  option(noloadLib);   // do not show loading of libraries;
+  load("matrix.lib","try");
   listvar(package);
 @c example
 @end smallexample

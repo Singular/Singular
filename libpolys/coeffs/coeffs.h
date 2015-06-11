@@ -200,11 +200,11 @@ struct n_Procs_s
    number  (*cfImPart)(number a, const coeffs r);
 
    /// print a given number (long format)
-   void    (*cfWriteLong)(number &a, const coeffs r);
+   void    (*cfWriteLong)(number a, const coeffs r);
 
    /// print a given number in a shorter way, if possible
    /// e.g. in K(a): a2 instead of a^2
-   void    (*cfWriteShort)(number &a, const coeffs r);
+   void    (*cfWriteShort)(number a, const coeffs r);
 
    // it is legal, but not always useful to have cfRead(s, a, r)
    //   just return s again.

@@ -36,7 +36,7 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
 
 
   number tm = pGetCoeff(m),           // coefficient of m
-    tneg = n_Neg__T(n_Copy__T(tm, r), r),    // - (coefficient of m)
+    tneg = n_Neg__T(n_Copy__T(tm, r->cf), r->cf),    // - (coefficient of m)
     tb,                            // used for tm*coeff(a1)
     tc;                            // used as intermediate number
 
@@ -63,16 +63,16 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
   p_MemCmp__T(qm->exp, p->exp, length, ordsgn, goto Equal, goto Greater, goto Smaller );
 
   Equal:   // qm equals p
-  tb = n_Mult__T(pGetCoeff(q), tm, r);
+  tb = n_Mult__T(pGetCoeff(q), tm, r->cf);
 #ifdef HAVE_ZERODIVISORS
-  if (!n_IsZero__T(tb,r)) {
+  if (!n_IsZero__T(tb,r->cf)) {
 #endif
   tc = pGetCoeff(p);
-  if (!n_Equal__T(tc, tb, r))
+  if (!n_Equal__T(tc, tb, r->cf))
   {
     shorter++;
-    tc = n_Sub__T(tc, tb, r);
-    n_Delete__T(&(pGetCoeff(p)), r);
+    tc = n_Sub__T(tc, tb, r->cf);
+    n_Delete__T(&(pGetCoeff(p)), r->cf);
     pSetCoeff0(p,tc); // adjust coeff of p
     a = pNext(a) = p; // append p to result and advance p
     pIter(p);
@@ -80,7 +80,7 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
   else
   { // coeffs are equal, so their difference is 0:
     shorter += 2;
-    n_Delete__T(&tc, r);
+    n_Delete__T(&tc, r->cf);
     p = p_LmFreeAndNext(p, r);
   }
 #ifdef HAVE_ZERODIVISORS
@@ -90,7 +90,7 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
     shorter += 1;
   }
 #endif
-  n_Delete__T(&tb, r);
+  n_Delete__T(&tb, r->cf);
   pIter(q);
   if (q == NULL || p == NULL) goto Finish; // are we done ?
   // no, so update qm
@@ -99,11 +99,11 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
 
   Greater:
 #ifdef HAVE_ZERODIVISORS
-  tb = n_Mult__T(pGetCoeff(q), tneg, r);
-  if (!n_IsZero__T(tb,r))
+  tb = n_Mult__T(pGetCoeff(q), tneg, r->cf);
+  if (!n_IsZero__T(tb,r->cf))
   {
 #endif
-    pSetCoeff0(qm, n_Mult__T(pGetCoeff(q), tneg, r));
+    pSetCoeff0(qm, n_Mult__T(pGetCoeff(q), tneg, r->cf));
     a = pNext(a) = qm;       // append qm to result and advance q
 #ifdef HAVE_ZERODIVISORS
   }
@@ -111,7 +111,7 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
   {
     shorter++;
   }
-  n_Delete__T(&tb, r);
+  n_Delete__T(&tb, r->cf);
 #endif
   pIter(q);
   if (q == NULL) // are we done?
@@ -156,7 +156,7 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
     pSetCoeff0(m, tm);
   }
 
-  n_Delete__T(&tneg, r);
+  n_Delete__T(&tneg, r->cf);
   if (qm != NULL) p_FreeBinAddr(qm, r);
   Shorter = shorter;
   p_Test(pNext(&rp), r);

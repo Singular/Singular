@@ -3840,15 +3840,15 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
   {
     assume( !IS0(z) );
 
-    zz = NUM(z);
+    zz = NUM((fraction)z);
     p_Test (zz, srcExtRing);
 
     if( zz == NULL ) return NULL;
-    if( !DENIS1(z) )
+    if( !DENIS1((fraction)z) )
     {
-      if (p_IsConstant(DEN(z),srcExtRing))
+      if (p_IsConstant(DEN((fraction)z),srcExtRing))
       {
-        number n=pGetCoeff(DEN(z));
+        number n=pGetCoeff(DEN((fraction)z));
         zz=p_Div_nn(zz,n,srcExtRing);
         p_Normalize(zz,srcExtRing);
       }
@@ -4010,7 +4010,7 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
               if( nCoeff_is_algExt(C) )
                  pcn = (poly) c;
                else //            nCoeff_is_transExt(C)
-                 pcn = NUM(c);
+                 pcn = NUM((fraction)c);
 
               if (pNext(pcn) == NULL) // c->z
                 p_AddExp(pcn, -perm[i], e, R);
@@ -4528,8 +4528,8 @@ void p_Shift (poly * p,int i, const ring r)
  ***************************************************************/
 
 
-static inline unsigned long GetBitFields(long e,
-                                         unsigned int s, unsigned int n)
+static inline unsigned long GetBitFields(const long e,
+                                         const unsigned int s, const unsigned int n)
 {
 #define Sy_bit_L(x)     (((unsigned long)1L)<<(x))
   unsigned int i = 0;
@@ -4561,7 +4561,7 @@ static inline unsigned long GetBitFields(long e,
 // This way, we have:
 // exp1 / exp2 ==> (ev1 & ~ev2) == 0, i.e.,
 // if (ev1 & ~ev2) then exp1 does not divide exp2
-unsigned long p_GetShortExpVector(poly p, const ring r)
+unsigned long p_GetShortExpVector(const poly p, const ring r)
 {
   assume(p != NULL);
   if (p == NULL) return 0;

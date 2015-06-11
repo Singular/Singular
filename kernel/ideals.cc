@@ -865,15 +865,19 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
       q = prMoveR( s_h2->m[j], syz_ring,orig_ring);
       s_h2->m[j] = NULL;
 
-      while (q != NULL)
+      if (q!=NULL)
       {
-        p = q;
-        pIter(q);
-        pNext(p) = NULL;
-        t=pGetComp(p);
-        pSetComp(p,0);
-        pSetmComp(p);
-        MATELEM(*ma,t-k,i) = pAdd(MATELEM(*ma,t-k,i),p);
+        q=pReverse(q);
+        while (q != NULL)
+        {
+          p = q;
+          pIter(q);
+          pNext(p) = NULL;
+          t=pGetComp(p);
+          pSetComp(p,0);
+          pSetmComp(p);
+          MATELEM(*ma,t-k,i) = pAdd(MATELEM(*ma,t-k,i),p);
+        }
       }
       i++;
     }
@@ -1780,52 +1784,68 @@ ideal idMinors(matrix a, int ar, ideal R)
   return (result);
 }
 #else
-/*2
-* compute all ar-minors of the matrix a
-* the caller of mpRecMin
-* the elements of the result are not in R (if R!=NULL)
-*/
+
+
+/// compute all ar-minors of the matrix a
+/// the caller of mpRecMin
+/// the elements of the result are not in R (if R!=NULL)
 ideal idMinors(matrix a, int ar, ideal R)
 {
-  int elems=0;
-  int r=a->nrows,c=a->ncols;
-  int i;
-  matrix b;
-  ideal result,h;
-  ring origR=currRing;
-  ring tmpR;
-  long bound;
+
+  const ring origR=currRing;
+  id_Test((ideal)a, origR);
+
+  const int r = a->nrows;
+  const int c = a->ncols;
 
   if((ar<=0) || (ar>r) || (ar>c))
   {
     Werror("%d-th minor, matrix is %dx%d",ar,r,c);
     return NULL;
   }
-  h = id_Matrix2Module(mp_Copy(a,origR),origR);
-  bound = sm_ExpBound(h,c,r,ar,origR);
-  idDelete(&h);
-  tmpR=sm_RingChange(origR,bound);
-  b = mpNew(r,c);
-  for (i=r*c-1;i>=0;i--)
-  {
-    if (a->m[i])
+
+  ideal h = id_Matrix2Module(mp_Copy(a,origR),origR);
+  long bound = sm_ExpBound(h,c,r,ar,origR);
+  id_Delete(&h, origR);
+
+  ring tmpR = sm_RingChange(origR,bound);
+
+  matrix b = mpNew(r,c);
+
+  for (int i=r*c-1;i>=0;i--)
+    if (a->m[i] != NULL)
       b->m[i] = prCopyR(a->m[i],origR,tmpR);
-  }
+
+  id_Test( (ideal)b, tmpR);
+
   if (R!=NULL)
   {
-    R = idrCopyR(R,origR,tmpR);
+    R = idrCopyR(R,origR,tmpR); // TODO: overwrites R? memory leak?
     //if (ar>1) // otherwise done in mpMinorToResult
     //{
     //  matrix bb=(matrix)kNF(R,currRing->qideal,(ideal)b);
     //  bb->rank=b->rank; bb->nrows=b->nrows; bb->ncols=b->ncols;
     //  idDelete((ideal*)&b); b=bb;
     //}
+    id_Test( R, tmpR);
   }
-  result=idInit(32,1);
-  if(ar>1) mp_RecMin(ar-1,result,elems,b,r,c,NULL,R,tmpR);
-  else mp_MinorToResult(result,elems,b,r,c,R,tmpR);
-  idDelete((ideal *)&b);
+
+
+  ideal result = idInit(32,1);
+
+  int elems = 0;
+
+  if(ar>1)
+    mp_RecMin(ar-1,result,elems,b,r,c,NULL,R,tmpR);
+  else
+    mp_MinorToResult(result,elems,b,r,c,R,tmpR);
+
+  id_Test( (ideal)b, tmpR);
+
+  id_Delete((ideal *)&b, tmpR);
+
   if (R!=NULL) idDelete(&R);
+
   idSkipZeroes(result);
   rChangeCurrRing(origR);
   result = idrMoveR(result,tmpR,origR);

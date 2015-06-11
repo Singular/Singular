@@ -8,10 +8,6 @@
 */
 #include <coeffs/coeffs.h>
 #include <polys/monomials/ring.h>
-//#include <kernel/ideals.h>
-
-struct sip_smap;
-typedef struct sip_smap *         map;
 
 // poly maEval(map theMap, poly p, ring dst_ring, nMapFunc nMap, ideal s=NULL);
 poly maEval(map theMap, poly p,ring preimage_r,nMapFunc nMap, ideal s, const ring dst_r);
@@ -29,4 +25,5 @@ ideal  idSubstPoly(ideal id, int n, poly e);
 poly p_MinPolyNormalize(poly p, const ring r);
 int maMaxDeg_P(poly p,ring preimage_r);
 int maMaxDeg_Ma(ideal a,ring preimage_r);
+
 #endif

@@ -98,22 +98,23 @@ long sba_interreduction_operations;
 
 // return -1 if no divisor is found
 //        number of first divisor, otherwise
-int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
-                        const int tl, const LObject* L, const int start)
+int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start)
 {
   unsigned long not_sev = ~L->sev;
   int j = start;
-  poly p=L->p;
-  ring r=currRing;
-  L->GetLm(p, r);
 
-  pAssume(~not_sev == p_GetShortExpVector(p, r));
-
-  if (r == currRing)
+  const TSet T=strat->T;
+  const unsigned long* sevT=strat->sevT;
+  if (L->p!=NULL)
   {
+    const ring r=currRing;
+    const poly p=L->p;
+     
+    pAssume(~not_sev == p_GetShortExpVector(p, r));
+
     loop
     {
-      if (j > tl) return -1;
+      if (j > strat->tl) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(T[j].p, sevT[j],
                                p, not_sev, r))
@@ -128,9 +129,11 @@ int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
   }
   else
   {
+    const poly p=L->t_p;
+    const ring r=strat->tailRing;
     loop
     {
-      if (j > tl) return -1;
+      if (j > strat->tl) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
                                p, not_sev, r))
@@ -340,7 +343,7 @@ int redRing (LObject* h,kStrategy strat)
   h->SetShortExpVector();
   loop
   {
-    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    j = kFindDivisibleByInT(strat, h);
     if (j < 0) return 1;
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat); // with debug output
 
@@ -422,7 +425,7 @@ int redHomog (LObject* h,kStrategy strat)
   not_sev = ~ h->sev;
   loop
   {
-    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    j = kFindDivisibleByInT(strat, h);
     if (j < 0) return 1;
 
     li = strat->T[j].pLength;
@@ -594,7 +597,7 @@ int redSig (LObject* h,kStrategy strat)
   not_sev = ~ h->sev;
   loop
   {
-    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h, start);
+    j = kFindDivisibleByInT(strat, h, start);
     if (j < 0)
     {
       return 1;
@@ -764,7 +767,7 @@ poly redtailSba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
       if (withT)
       {
         int j;
-        j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
+        j = kFindDivisibleByInT(strat, &Ln);
         if (j < 0) break;
         With = &(strat->T[j]);
       }
@@ -857,7 +860,7 @@ int redLazy (LObject* h,kStrategy strat)
   not_sev = ~ h->sev;
   loop
   {
-    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    j = kFindDivisibleByInT(strat, h);
     if (j < 0) return 1;
 
     li = strat->T[j].pLength;
@@ -1021,7 +1024,7 @@ int redHoney (LObject* h, kStrategy strat)
   h->PrepareRed(strat->use_buckets);
   loop
   {
-    j=kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    j=kFindDivisibleByInT(strat, h);
     if (j < 0) return 1;
 
     ei = strat->T[j].ecart;
@@ -1120,6 +1123,25 @@ int redHoney (LObject* h, kStrategy strat)
       h->lcm=NULL;
       #endif
       return 0;
+    }
+    if (TEST_OPT_IDLIFT)
+    {
+      if (h->p!=NULL)
+      {
+        if(p_GetComp(h->p,currRing)>strat->syzComp)
+	{
+	  h->Delete();
+	  return 0;
+	}
+      }
+      else if (h->t_p!=NULL)
+      {
+        if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
+	{
+	  h->Delete();
+	  return 0;
+	}
+      }
     }
     h->SetShortExpVector();
     not_sev = ~ h->sev;
@@ -1471,7 +1493,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
     if (strat->overflow)
     {
-        if (!kStratChangeTailRing(strat)) { Werror("OVERFLOW.."); break;}
+      if (!kStratChangeTailRing(strat)) { Werror("OVERFLOW.."); break;}
     }
 
     // reduction to non-zero new poly
@@ -1570,7 +1592,21 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
       if (strat->s_poly!=NULL)
       {
-        strat->s_poly(strat);
+        if (strat->s_poly(strat))
+        {
+          // we are called AFTER enterS, i.e. if we change P
+          // we have it also to S/T
+          // and add pairs
+          int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
+          enterT(strat->P, strat);
+          #ifdef HAVE_RINGS
+          if (rField_is_Ring(currRing))
+            superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+          else
+          #endif
+            enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+          strat->enterS(strat->P, pos, strat, strat->tl);
+        }
       }
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
@@ -3145,13 +3181,13 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 //       }
       LObject Ln (strat->S[k],currRing, strat->tailRing);
       Ln.SetShortExpVector();
-      j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln, j+1);
+      j = kFindDivisibleByInT(strat, &Ln, j+1);
       if (j<0) {  k++; j=-1;}
       else
       {
         if ( pLmCmp(strat->S[k],strat->T[j].p) == 0)
         {
-          j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln, j+1);
+          j = kFindDivisibleByInT(strat, &Ln, j+1);
           if (j<0) {  k++; j=-1;}
           else
           {
@@ -3248,7 +3284,7 @@ int redFirstShift (LObject* h,kStrategy strat)
   h->SetShortExpVector();
   loop
   {
-    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    j = kFindDivisibleByInT(strat, h);
     if (j < 0)
     {
       h->SetDegStuffReturnLDeg(strat->LDegLast);
@@ -3337,9 +3373,10 @@ int redFirstShift (LObject* h,kStrategy strat)
         at = strat->posInL(strat->L,strat->Ll,h,strat);
         if (at <= strat->Ll)
         {
-          int dummy=strat->sl;
+          //int dummy=strat->sl;
           /*          if (kFindDivisibleByInS(strat,&dummy, h) < 0) */
-          if (kFindDivisibleByInT(strat->T,strat->sevT, dummy, h) < 0)
+          //if (kFindDivisibleByInT(strat->T,strat->sevT, dummy, h) < 0)
+          if (kFindDivisibleByInT(strat, h) < 0)
             return 1;
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG

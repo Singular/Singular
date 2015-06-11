@@ -20,9 +20,7 @@
 *           in the *.h file). Whenever the resulting complexity exceeds a
 *           certain threshold (see constant in the *.h file), then the
 *           cancellation heuristic will call 'factory' to compute the gcd
-*           and cancel it out in the given number. (This definite cancel-
-*           lation will also be performed at the beginning of ntWrite,
-*           ensuring that any output is free of common factors.
+*           and cancel it out in the given number.
 *           For the special case of K = Q (i.e., when computing over the
 *           rationals), this definite cancellation procedure will also take
 *           care of nested fractions: If there are fractional coefficients
@@ -112,8 +110,8 @@ number   ntMult(number a, number b, const coeffs cf);
 number   ntDiv(number a, number b, const coeffs cf);
 void     ntPower(number a, int exp, number *b, const coeffs cf);
 number   ntCopy(number a, const coeffs cf);
-void     ntWriteLong(number &a, const coeffs cf);
-void     ntWriteShort(number &a, const coeffs cf);
+void     ntWriteLong(number a, const coeffs cf);
+void     ntWriteShort(number a, const coeffs cf);
 number   ntRePart(number a, const coeffs cf);
 number   ntImPart(number a, const coeffs cf);
 number   ntGetDenom(number &a, const coeffs cf);
@@ -1390,11 +1388,9 @@ void definiteGcdCancellation(number a, const coeffs cf,
   ntTest(a); // !!!!
 }
 
-// NOTE: modifies a
-void ntWriteLong(number &a, const coeffs cf)
+void ntWriteLong(number a, const coeffs cf)
 {
   ntTest(a);
-  definiteGcdCancellation(a, cf, FALSE);
   if (IS0(a))
     StringAppendS("0");
   else
@@ -1417,11 +1413,9 @@ void ntWriteLong(number &a, const coeffs cf)
   ntTest(a); // !!!!
 }
 
-// NOTE: modifies a
-void ntWriteShort(number &a, const coeffs cf)
+void ntWriteShort(number a, const coeffs cf)
 {
   ntTest(a);
-  definiteGcdCancellation(a, cf, FALSE);
   if (IS0(a))
     StringAppendS("0");
   else
@@ -1460,11 +1454,13 @@ void ntNormalize (number &a, const coeffs cf)
     //PrintS("num=");p_wrp(NUM(a),ntRing);
     //PrintS(" den=");p_wrp(DEN(a),ntRing);PrintLn();
     definiteGcdCancellation(a, cf, FALSE);
-    if ((DEN(a)!=NULL)
-    &&(!n_GreaterZero(pGetCoeff(DEN(a)),ntCoeffs)))
+    fraction f=(fraction)a;
+    if ((DEN(f)!=NULL)
+    &&(!n_GreaterZero(pGetCoeff(DEN(f)),ntCoeffs)))
     {
-      NUM(a)=p_Neg(NUM(a),ntRing);
-      DEN(a)=p_Neg(DEN(a),ntRing);
+      NUM(f)=p_Neg(NUM(f),ntRing);
+      DEN(f)=p_Neg(DEN(f),ntRing);
+      a=(number)f;
     }
   }
   ntTest(a); // !!!!
@@ -2325,7 +2321,7 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
       assume( DEN(f) == NULL );
     }
 
-    NUM(c) = p_Mult_nn(NUM(c), d, R);
+    NUM((fraction)c) = p_Mult_nn(NUM((fraction)c), d, R);
     n_Delete(&d, Q);
   }
 

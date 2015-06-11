@@ -780,7 +780,11 @@ leftv iiMap(map theMap, const char * what)
         )
         {
           v->rtyp=IDEAL_CMD;
+          char *tmp = theMap->preimage;
+	  theMap->preimage=(char*)1L;
+          // map gets 1 as its rank (as an ideal)
           v->data=fast_map(IDIDEAL(w), src_ring, (ideal)theMap, currRing);
+          theMap->preimage=tmp; // map gets its preimage back
         }
         else
 #endif

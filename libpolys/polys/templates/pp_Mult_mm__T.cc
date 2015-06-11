@@ -31,15 +31,15 @@ LINKAGE poly pp_Mult_mm__T(poly p, const poly m, const ring ri)
   omBin bin = ri->PolyBin;
   DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);
   const unsigned long* m_e = m->exp;
-  pAssume(!n_IsZero__T(ln,ri));
+  pAssume(!n_IsZero__T(ln,ri->cf));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
   number tmp;
 
   do
   {
-    tmp = n_Mult__T(ln, pGetCoeff(p), ri);
+    tmp = n_Mult__T(ln, pGetCoeff(p), ri->cf);
 #ifdef HAVE_ZERODIVISORS
-    if (! n_IsZero__T(tmp, ri))
+    if (! n_IsZero__T(tmp, ri->cf))
     {
 #endif
       p_AllocBin( pNext(q), bin, ri);
@@ -49,7 +49,7 @@ LINKAGE poly pp_Mult_mm__T(poly p, const poly m, const ring ri)
       p_MemAddAdjust__T(q, ri);
 #ifdef HAVE_ZERODIVISORS
     }
-    else n_Delete__T(&tmp, ri);
+    else n_Delete__T(&tmp, ri->cf);
 #endif
     p = pNext(p);
   }

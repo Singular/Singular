@@ -66,6 +66,31 @@ USING_NAMESPACE( SINGULARXXNAME :: SYZEXTRA )
 
 BEGIN_NAMESPACE_NONAME
 
+// returns TRUE, if idRankFreeModule(m) > 0 ???
+/// test whether this input has vectors among entries or no enties
+/// result must be FALSE for only 0-entries
+static BOOLEAN id_IsModule(ideal id, ring r)
+{
+  id_Test(id, r);
+
+  if( id->rank != 1 ) return TRUE;
+
+  if (rRing_has_Comp(r))
+  {
+    const int l = IDELEMS(id);
+
+    for (int j=0; j<l; j++)
+      if (id->m[j] != NULL && p_GetComp(id->m[j], r) > 0)
+        return TRUE;    
+
+    return FALSE; // rank: 1, only zero or no entries? can be an ideal OR module... BUT in the use-case should better be an ideal!
+  }
+
+  return FALSE;
+}
+
+
+   
 
 static inline void NoReturn(leftv& res)
 {
@@ -1524,9 +1549,8 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
 
   const int iLimit = r->typ[pos].data.is.limit;
   const ideal F = r->typ[pos].data.is.F;
+  
   ideal FF = id_Copy(F, r);
-
-
 
   lists l=(lists)omAllocBin(slists_bin);
   l->Init(2);
@@ -1537,7 +1561,7 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
 
   //        l->m[1].rtyp = MODUL_CMD;
 
-  if( idIsModule(FF, r) )
+  if( id_IsModule(FF, r) ) // ???
   {
     l->m[1].rtyp = MODUL_CMD;
 
@@ -1823,7 +1847,8 @@ static BOOLEAN idPrepare(leftv res, leftv h)
   if ( (h!=NULL) && (h->Typ()==INT_CMD) )
   {
     iComp = (int)((long)(h->Data()));
-  } else
+  }
+  else
   {
       if( (!isSyz) && (-1 == posIS) )
       {

@@ -50,7 +50,7 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, CFArray &inv_cach
  * pDivisbleBy
  *
  ***************************************************************/
-unsigned long p_GetShortExpVector(poly a, const ring r);
+unsigned long p_GetShortExpVector(const poly a, const ring r);
 
 /// p_GetShortExpVector of p * pp
 unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r);

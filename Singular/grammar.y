@@ -950,10 +950,6 @@ declare_ip_variable:
           {
             int r; TESTSETINT($4,r);
             int c; TESTSETINT($7,c);
-            if (r < 1)
-              MYYERROR("rows must be greater than 0");
-            if (c < 0)
-              MYYERROR("cols must be greater than -1");
             leftv v;
             idhdl h;
             if ($1 == MATRIX_CMD)

@@ -19,7 +19,7 @@ static char* CoeffString(const coeffs r)
 {
   return ((nforder *)r->data)->String();
 }
-static void EltWrite(number &a, const coeffs r)
+static void EltWrite(number a, const coeffs r)
 {
   bigintmat * b = (bigintmat*)a;
   if (a) {
