@@ -967,7 +967,7 @@ EXAMPLE: example groebner;  shows an example"
       algorithm = "mathicgb"; // make it default for any appropriate setting... if mathicgb is available...
     } else
     {
-      if( p_opt ) { "Sorry Singmathic::mathicgb is not available!"; }
+      if( p_opt && find(method,"mathicgb")  ) { "Sorry Singmathic::mathicgb is not available!"; }
     }
   }
   if( find(method,"std") && !find(method,"slimgb") )
