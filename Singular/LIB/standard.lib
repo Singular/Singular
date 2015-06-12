@@ -1028,7 +1028,10 @@ EXAMPLE: example groebner;  shows an example"
         (order=="simple" && (method==",par2var" && npars_P==0 )) ||
          (conversion=="no" && partovar=="no" &&
            (algorithm=="std" || algorithm=="slimgb" || algorithm=="mathicgb" ||
-            (find(method,"std") || find(method,"slimgb") || find(method,"mathicgb")) ) ) )
+            (find(method,"std") && find(method,"slimgb"))
+           )
+         )
+     )
   {
     direct = "yes";
   }
