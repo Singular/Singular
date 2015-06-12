@@ -1454,11 +1454,13 @@ void ntNormalize (number &a, const coeffs cf)
     //PrintS("num=");p_wrp(NUM(a),ntRing);
     //PrintS(" den=");p_wrp(DEN(a),ntRing);PrintLn();
     definiteGcdCancellation(a, cf, FALSE);
-    if ((DEN(a)!=NULL)
-    &&(!n_GreaterZero(pGetCoeff(DEN(a)),ntCoeffs)))
+    fraction f=(fraction)a;
+    if ((DEN(f)!=NULL)
+    &&(!n_GreaterZero(pGetCoeff(DEN(f)),ntCoeffs)))
     {
-      NUM(a)=p_Neg(NUM(a),ntRing);
-      DEN(a)=p_Neg(DEN(a),ntRing);
+      NUM(f)=p_Neg(NUM(f),ntRing);
+      DEN(f)=p_Neg(DEN(f),ntRing);
+      a=(number)f;
     }
   }
   ntTest(a); // !!!!
@@ -2319,7 +2321,7 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
       assume( DEN(f) == NULL );
     }
 
-    NUM(c) = p_Mult_nn(NUM(c), d, R);
+    NUM((fraction)c) = p_Mult_nn(NUM((fraction)c), d, R);
     n_Delete(&d, Q);
   }
 

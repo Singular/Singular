@@ -8760,6 +8760,8 @@ The second string selections options for loading.
 
 @item @strong{Note:} @code{load(<string_expr>,"with")} is equivalent to
 @code{LIB <string_expr>}.
+@item @strong{Note:} @code{load(<string_expr>,"try")} is equivalent to
+@code{LIB <string_expr>} which never fails - test the package name to distiguish.
 @end table
 
 All loaded libraries are displayed by the @code{listvar(package);}
@@ -8771,6 +8773,11 @@ command:
   listvar(package);
                      // the names of the procedures of inout.lib
   load("inout.lib"); // are now known to Singular
+  listvar(package);
+  load("blabla.lib","try");
+  listvar(package);
+  option(noloadLib);   // do not show loading of libraries;
+  load("matrix.lib","try");
   listvar(package);
 @c example
 @end smallexample

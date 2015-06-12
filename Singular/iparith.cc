@@ -5340,7 +5340,8 @@ BOOLEAN jjLOAD_TRY(const char *s)
   WerrorS_callback=WerrorS_dummy;
   WerrorS_dummy_cnt=0;
   BOOLEAN bo=jjLOAD(s,TRUE);
-  if (bo || (WerrorS_dummy_cnt>0)) Print("loading of >%s< failed\n",s);
+  if (TEST_OPT_PROT && (bo || (WerrorS_dummy_cnt>0)))
+    Print("loading of >%s< failed\n",s);
   WerrorS_callback=WerrorS_save;
   errorreported=0;
   return FALSE;
