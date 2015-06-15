@@ -350,7 +350,7 @@ void p_Setm_General(poly p, const ring r)
 
 #ifndef SING_NDEBUG
 #if MYTEST
-          Print("p_Setm_General: ro_isTemp ord: pos: %d, p: ", pos);  p_DebugPrint(p, r, r, 1);
+          Print("p_Setm_General: ro_isTemp ord: pos: %d, p: ", pos);  p_wrp(p, r);
 #endif
 #endif
           int c = p_GetComp(p, r);
@@ -387,7 +387,7 @@ void p_Setm_General(poly p, const ring r)
           }
 #if MYTEST
 //          if( p->exp[o->data.isTemp.start] > 0 )
-            PrintS("after Values: "); p_DebugPrint(p, r, r, 1);
+            PrintS("after Values: "); p_wrp(p, r);
 #endif
 #endif
           break;
@@ -398,7 +398,7 @@ void p_Setm_General(poly p, const ring r)
         {
 #ifndef SING_NDEBUG
 #if MYTEST
-          Print("p_Setm_General: ro_is ord: pos: %d, p: ", pos);  p_DebugPrint(p, r, r, 1);
+          Print("p_Setm_General: ro_is ord: pos: %d, p: ", pos);  p_wrp(p, r);
 #endif
 #endif
 
@@ -416,9 +416,9 @@ void p_Setm_General(poly p, const ring r)
           {
 #ifndef SING_NDEBUG
 #if MYTEST
-            Print("p_Setm_General: ro_is : in rSetm: pos: %d, c: %d >  limit: %d\n", c, pos, limit); // p_DebugPrint(p, r, r, 1);
+            Print("p_Setm_General: ro_is : in rSetm: pos: %d, c: %d >  limit: %d\n", c, pos, limit);
             PrintS("preComputed Values: ");
-            p_DebugPrint(p, r, r, 1);
+            p_wrp(p, r);
 #endif
 #endif
 //          if( c > limit ) // BUG???
@@ -446,7 +446,7 @@ void p_Setm_General(poly p, const ring r)
 #ifndef SING_NDEBUG
 #if MYTEST
             Print("Respective F[c - %d: %d] pp: ", limit, c);
-            p_DebugPrint(pp, r, r, 1);
+            p_wrp(pp, r);
 #endif
 #endif
 
@@ -491,7 +491,7 @@ void p_Setm_General(poly p, const ring r)
             }
             // TODO: how to check this for computed values???
 #if MYTEST
-            PrintS("Computed Values: "); p_DebugPrint(p, r, r, 1);
+            PrintS("Computed Values: "); p_wrp(p, r);
 #endif
 #endif
           } else
@@ -510,7 +510,7 @@ void p_Setm_General(poly p, const ring r)
 #ifndef SING_NDEBUG
 #if MYTEST
             Print("ELSE p_Setm_General: ro_is :: c: %d <= limit: %d, vo: %d, exp: %d\n", c, limit, vo, p->exp[vo]);
-            p_DebugPrint(p, r, r, 1);
+            p_wrp(p, r);
 #endif
 #endif
           }
