@@ -79,7 +79,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         res->data= (void *) n_PermNumber((number)data, par_perm, P, preimage_r, currRing);
 #endif
         res->rtyp=POLY_CMD;
-        if (nCoeff_is_Extension(currRing->cf))
+        if (nCoeff_is_algExt(currRing->cf))
           res->data=(void *)p_MinPolyNormalize((poly)res->data, currRing);
         pTest((poly) res->data);
       }
@@ -88,11 +88,9 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         assume( nMap != NULL );
 
         number a = nMap((number)data, preimage_r->cf, currRing->cf);
-
-
         if (nCoeff_is_Extension(currRing->cf))
         {
-          n_Normalize(a, currRing->cf); // ???
+          n_Normalize(a, currRing->cf);
 /*
           number a = (number)res->data;
           number one = nInit(1);
@@ -269,7 +267,7 @@ poly pSubstPar(poly p, int par, poly image)
       {
         n_Delete(&d, currRing); d = NULL;
       }
-       else if (!p_IsConstant((poly)NUM((fraction)d), R))
+      else if (!p_IsConstant((poly)NUM((fraction)d), R))
       {
         WarnS("ignoring denominators of coefficients...");
         n_Delete(&d, currRing); d = NULL;
