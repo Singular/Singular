@@ -4360,12 +4360,19 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
   assume(currRing != NULL && curr_weight != NULL &&
          target_weight != NULL && G->m[0] != NULL);
 
+  intvec* next_weight1 = MkInterRedNextWeight(curr_weight,target_weight,G);
+  if(weight_rad == 0)
+  {
+    return(next_weight1);
+  }
+
   int i,weight_norm,nV = currRing->N;
-  intvec* next_weight2;
+  intvec* next_weight2 = new intvec(nV);
   intvec* next_weight22 = new intvec(nV);
   intvec* result = new intvec(nV);
 
-  intvec* next_weight1 =MkInterRedNextWeight(curr_weight,target_weight,G);
+  ideal G_test, G_test2;
+
   //compute a random next weight vector "next_weight2"
   while(1)
   {
@@ -4375,27 +4382,35 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
 
       for(i=0; i<nV; i++)
       {
-        (*next_weight22)[i] = rand() % 60000 - 30000;
-        weight_norm = weight_norm + (*next_weight22)[i]*(*next_weight22)[i];
+        (*next_weight2)[i] = rand() % 60000 - 30000;
+        weight_norm = weight_norm + (*next_weight2)[i]*(*next_weight2)[i];
       }
       weight_norm = 1 + floor(sqrt(weight_norm));
     }
 
     for(i=0; i<nV; i++)
     {
-      if((*next_weight22)[i] < 0)
+      if((*next_weight2)[i] < 0)
       {
-        (*next_weight22)[i] = 1 + (*curr_weight)[i] + floor(weight_rad*(*next_weight22)[i]/weight_norm);
+        (*next_weight2)[i] = 1 + (*curr_weight)[i] + floor(weight_rad*(*next_weight2)[i]/weight_norm);
       }
       else
       {
-        (*next_weight22)[i] = (*curr_weight)[i] + floor(weight_rad*(*next_weight22)[i]/weight_norm);
+        (*next_weight2)[i] = (*curr_weight)[i] + floor(weight_rad*(*next_weight2)[i]/weight_norm);
       }
     }
-
-    if(test_w_in_ConeCC(G, next_weight22) == 1)
+    
+    if(test_w_in_ConeCC(G, next_weight2) == 1)
     {
-      next_weight2 = MkInterRedNextWeight(next_weight22,target_weight,G);
+      PrintS("\n Hier 1\n");
+      G_test2 = MwalkInitialForm(G, next_weight2);
+      PrintS("\n Hier 2\n");
+      if(maxlengthpoly(G_test2) <= 1)
+      {
+        next_weight2 = MkInterRedNextWeight(next_weight2,target_weight,G);
+      }
+      idDelete(&G_test2);
+
       if(MivAbsMax(next_weight2)>1147483647)
       {
         for(i=0; i<nV; i++)
@@ -4403,31 +4418,32 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
           (*next_weight22)[i] = (*next_weight2)[i];
         }
         i = 0;
-        /* reduce the size of the maximal entry of the vector*/
-        while(test_w_in_ConeCC(G,next_weight22))
+        // reduce the size of the maximal entry of the vector
+        while(test_w_in_ConeCC(G,next_weight22) == 1)
         {
           (*next_weight2)[i] = (*next_weight22)[i];
           i = MivAbsMaxArg(next_weight22);
           (*next_weight22)[i] = floor(0.1*(*next_weight22)[i] + 0.5);
         }
+        delete next_weight22;
       }
-      delete next_weight22;
       break;
     }
+    weight_rad++;
   }
   
   // compute "usual" next weight vector
   intvec* next_weight = MwalkNextWeightCC(curr_weight,target_weight, G);
-  ideal G_test = MwalkInitialForm(G, next_weight);
-  ideal G_test2 = MwalkInitialForm(G, next_weight2);
+  G_test = MwalkInitialForm(G, next_weight);
+  G_test2 = MwalkInitialForm(G, next_weight2);
 
   // compare next weights
   if(Overflow_Error == FALSE)
   {
     ideal G_test1 = MwalkInitialForm(G, next_weight1);
-    if(G_test1->m[0] != NULL && maxlengthpoly(G_test1) < maxlengthpoly(G_test))//if(IDELEMS(G_test1) < IDELEMS(G_test))
+    if(G_test1->m[0] != NULL && maxlengthpoly(G_test1) < maxlengthpoly(G_test))
     {
-      if(G_test2->m[0] != NULL && maxlengthpoly(G_test2) < maxlengthpoly(G_test1))//if(IDELEMS(G_test2) < IDELEMS(G_test1))
+      if(G_test2->m[0] != NULL && maxlengthpoly(G_test2) < maxlengthpoly(G_test1))
       {
         for(i=0; i<nV; i++)
         {
@@ -4444,7 +4460,7 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
     }
     else
     {
-      if(G_test2->m[0] != NULL && maxlengthpoly(G_test2) < maxlengthpoly(G_test))//if(IDELEMS(G_test2) < IDELEMS(G_test)) // |G_test2| < |G_test| <= |G_test1|
+      if(G_test2->m[0] != NULL && maxlengthpoly(G_test2) < maxlengthpoly(G_test))
       {
         for(i=0; i<nV; i++)
         {
@@ -4464,7 +4480,7 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
   else
   {
     Overflow_Error = FALSE;
-    if(G_test2->m[0] != NULL && maxlengthpoly(G_test2) < maxlengthpoly(G_test))//if(IDELEMS(G_test2) < IDELEMS(G_test))
+    if(G_test2->m[0] != NULL && maxlengthpoly(G_test2) < maxlengthpoly(G_test))
     {
       for(i=1; i<nV; i++)
       {
@@ -4479,7 +4495,7 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* curr_weight,
       }
     }
   }
-  //PrintS("\n MWalkRandomNextWeight: Ende ok!\n");
+
   idDelete(&G_test);
   idDelete(&G_test2);
   if(test_w_in_ConeCC(G, result) == 1)
@@ -5402,7 +5418,7 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
   }
   Set_Error(FALSE);
   Overflow_Error = FALSE;
-  //BOOLEAN endwalks = FALSE;
+  BOOLEAN endwalks = FALSE;
 #ifdef TIME_TEST
   clock_t tinput, tostd, tif=0, tstd=0, tlift=0, tred=0, tnw=0;
   xtif=0; xtstd=0; xtlift=0; xtred=0; xtnw=0;
@@ -5421,15 +5437,8 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
   intvec* ivNull = new intvec(nV);
   intvec* curr_weight = new intvec(nV);
   intvec* target_weight = new intvec(nV);
-  intvec* exivlp = Mivlp(nV);
   intvec* next_weight= new intvec(nV);
-/*
-  intvec* tmp_weight = new intvec(nV);
-  for(i=0; i<nV; i++)
-  {
-    (*tmp_weight)[i] = (*target_M)[i];
-  }
-*/
+
   for(i=0; i<nV; i++)
   {
     (*curr_weight)[i] = (*orig_M)[i];
@@ -5475,36 +5484,26 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
 #endif
 
   nwalk = 0;
+
+#ifdef TIME_TEST
+  to = clock();
+#endif
+  Gomega = MwalkInitialForm(G, curr_weight); // compute an initial form ideal of <G> w.r.t. "curr_vector"
+#ifdef TIME_TEST
+  tif = tif + clock()-to; //time for computing initial form ideal
+#endif
+
   while(1)
   {
     nwalk ++;
     nstep ++;
-#ifdef TIME_TEST
-    to = clock();
-#endif
-
-    Gomega = MwalkInitialForm(G, curr_weight); // compute an initial form ideal of <G> w.r.t. "curr_vector"
-    //polylength = 1 if there is a polynomial in Gomega with at least 3 monomials and 0 otherwise
-    polylength = lengthpoly(Gomega);
-#ifdef TIME_TEST
-    tif = tif + clock()-to; //time for computing initial form ideal
-#endif
-//#ifdef CHECK_IDEAL_MWALK
     if(printout > 1)
     {
       idString(Gomega,"//** Mrwalk: Gomega");
     }
-//#endif
-    // test whether target cone is reached
-/*    if(test_w_in_ConeCC(G,target_weight) == 1)
-    {
-      endwalks = TRUE;
-    }*/
     if(reduction == 0)
     {
-      
       FF = middleOfCone(G,Gomega);
-      
       if(FF != NULL)
       {
         idDelete(&G);
@@ -5540,7 +5539,6 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
      if(target_M->length() == nV)
      {
        newRing = VMrDefault(curr_weight); // define a new ring with ordering "(a(curr_weight),lp)
-       //newRing = VMrRefine(curr_weight,target_weight); //define a new ring with ordering "(a(curr_weight),Wp(target_weight))"
      }
      else
      {
@@ -5611,6 +5609,7 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
 
     rChangeCurrRing(targetRing);
     G = idrMoveR(G,newRing,currRing);
+
     // test whether target cone is reached
     if(reduction !=0 && test_w_in_ConeCC(G,curr_weight) == 1)
     {
@@ -5622,101 +5621,64 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
     G = idrMoveR(G,targetRing,currRing);
     baseRing = currRing;
 
-
     NEXT_VECTOR:
 #ifdef TIME_TEST
     to = clock();
 #endif
     next_weight = MwalkNextWeightCC(curr_weight,target_weight,G);
+#ifdef TIME_TEST
+    tnw = tnw + clock() - to;
+#endif
+
+#ifdef TIME_TEST
+    to = clock();
+#endif
+    Gomega = MwalkInitialForm(G, next_weight); // compute an initial form ideal of <G> w.r.t. "curr_vector"
+#ifdef TIME_TEST
+    tif = tif + clock()-to; //time for computing initial form ideal
+#endif
+
+    //polylength = 1 if there is a polynomial in Gomega with at least 3 monomials and 0 otherwise
+    polylength = lengthpoly(Gomega);
     if(polylength > 0)
     {
       //there is a polynomial in Gomega with at least 3 monomials,
       //low-dimensional facet of the cone
       delete next_weight;
+#ifdef TIME_TEST
+    to = clock();
+#endif
       next_weight = MWalkRandomNextWeight(G, curr_weight, target_weight, weight_rad, pert_deg);
-    }
 #ifdef TIME_TEST
     tnw = tnw + clock() - to;
 #endif
+      idDelete(&Gomega);
+#ifdef TIME_TEST
+    to = clock();
+#endif
+      Gomega = MwalkInitialForm(G, next_weight);
+#ifdef TIME_TEST
+    tif = tif + clock()-to; //time for computing initial form ideal
+#endif
+    }
+
+    // test whether target weight vector is reached
+    if(MivComp(next_weight, ivNull) == 1 || MivComp(target_weight,curr_weight) == 1)
+    {
+      baseRing = currRing;
+      delete next_weight;
+      break;
+    }
+
 //#ifdef PRINT_VECTORS
     if(printout > 0)
     {
       MivString(curr_weight, target_weight, next_weight);
     }
 //#endif
-    if(MivComp(next_weight, ivNull) == 1 || MivComp(target_weight,curr_weight) == 1)// || endwalks == TRUE)
-    {/*
-//#ifdef CHECK_IDEAL_MWALK
-      if(printout > 0)
-      {
-        PrintS("\n//** Mrwalk: entering last cone.\n");
-      }
-//#endif
-
-      Gomega = MwalkInitialForm(G, curr_weight); // compute an initial form ideal of <G> w.r.t. "curr_vector"
-      if(target_M->length() == nV)
-      {
-        newRing = VMrDefault(target_weight); // define a new ring with ordering "(a(curr_weight),lp)
-      }
-      else
-      {
-        newRing = VMatrDefault(target_M);
-      }
-      rChangeCurrRing(newRing);
-      Gomega1 = idrMoveR(Gomega, baseRing,currRing);
-      idDelete(&Gomega);
-//#ifdef CHECK_IDEAL_MWALK
-      if(printout > 1)
-      {
-        idString(Gomega1, "//** Mrwalk: Gomega");
-      }
-      PrintS("\n //** Mrwalk: kStd(Gomega)");
-//#endif
-      M = kStd(Gomega1,NULL,testHomog,NULL,NULL,0,0,NULL);
-//#ifdef CHECK_IDEAL_MWALK
-      if(printout > 1)
-      {
-        idString(M,"//** Mrwalk: M");
-      }
-//#endif
-      rChangeCurrRing(baseRing);
-      M1 =  idrMoveR(M, newRing,currRing);
-      idDelete(&M);
-      Gomega2 = idrMoveR(Gomega1, newRing,currRing);
-      idDelete(&Gomega1);
-      //PrintS("\n //** Mrwalk: MLifttwoIdeal");
-      F = MLifttwoIdeal(Gomega2, M1, G);
-//#ifdef CHECK_IDEAL_MWALK
-      if(printout > 2)
-      {
-        idString(F,"//** Mrwalk: F");
-      }
-//#endif
-      idDelete(&Gomega2);
-      idDelete(&M1);
-      rChangeCurrRing(newRing); // change the ring to newRing
-      G = idrMoveR(F,baseRing,currRing);
-      idDelete(&F);
-      baseRing = currRing;
-      si_opt_1 = save1; //set original options, e. g. option(RedSB)
-      idSkipZeroes(G);
-#ifdef TIME_TEST
-      to = clock();
-#endif
-      //PrintS("\n //**Mrwalk: Interreduce");
-      //interreduce the Groebner basis <G> w.r.t. currRing
-      //G = kInterRedCC(G,NULL);
-#ifdef TIME_TEST
-      tred = tred + clock() - to;
-#endif
-      idSkipZeroes(G);
-      delete next_weight;*/
-      break;
-    }
 
     for(i=nV-1; i>=0; i--)
     {
-      //(*tmp_weight)[i] = (*curr_weight)[i];
       (*curr_weight)[i] = (*next_weight)[i];
     }
     delete next_weight;
@@ -5726,9 +5688,7 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
   ideal result = idrMoveR(G,baseRing,currRing);
   idDelete(&G);
   si_opt_1 = save1; //set original options, e. g. option(RedSB)
-  //delete tmp_weight;
   delete ivNull;
-  delete exivlp;
 #ifndef BUCHBERGER_ALG
   delete last_omega;
 #endif
@@ -6006,6 +5966,7 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
 //#endif
     if(reduction == 0 && nstep > 1)
     {
+/*
       // check whether weight vector is in the interior of the cone
       while(1)
       {
@@ -6034,6 +5995,15 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
         {
           idString(Gomega,"//** Mpwalk: Gomega");
         }
+      }
+*/
+      FF = middleOfCone(G,Gomega);
+      if(FF != NULL)
+      {
+        idDelete(&G);
+	G = idCopy(FF);
+	idDelete(&FF); 
+        goto NEXT_VECTOR;
       }
     }
 
@@ -6156,6 +6126,7 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
     if(endwalks == TRUE)
       break;
 
+    NEXT_VECTOR:
     to=clock();
     // compute a next weight vector
     next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
@@ -6288,8 +6259,7 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
   if(reduction == 0)
   {
     si_opt_1 &= (~Sy_bit(OPT_REDSB)); // no reduced Groebner basis
-    //si_opt_1 &= (~Sy_bit(OPT_REDTAIL)); // not tail reductions
-    //si_opt_1|=(Sy_bit(OPT_REDTAIL)|Sy_bit(OPT_REDSB));
+    si_opt_1 &= (~Sy_bit(OPT_REDTAIL)); // not tail reductions
   }
   Set_Error(FALSE);
   Overflow_Error = FALSE;
@@ -6428,14 +6398,23 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
     ivString(curr_weight, "//** Mprwalk: new current weight");
     ivString(target_weight, "//** Mprwalk: new target weight");
   }
+
+#ifdef TIME_TEST
+  to = clock();
+#endif
+  Gomega = MwalkInitialForm(G, curr_weight); // compute an initial form ideal of <G> w.r.t. "curr_vector"
+#ifdef TIME_TEST
+  tif = tif + clock()-to; //time for computing initial form ideal
+#endif
+
   while(1)
   {
     nstep ++;
     to = clock();
-    // compute an initial form ideal of <G> w.r.t. the weight vector
-    // "curr_weight"
-    Gomega = MwalkInitialForm(G, curr_weight);
+    // compute an initial form ideal of G w.r.t. the weight vector "curr_weight"
+/*    Gomega = MwalkInitialForm(G, curr_weight);
     polylength = lengthpoly(Gomega);
+*/
 //#ifdef CHECK_IDEAL_MWALK
     if(printout > 1)
     {
@@ -6445,6 +6424,7 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
 
     if(reduction == 0 && nstep > 1)
     {
+/*
       // check whether weight vector is in the interior of the cone
       while(1)
       {
@@ -6474,6 +6454,15 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
           idString(Gomega,"//** Mprwalk: Gomega");
         }
       }
+*/
+      FF = middleOfCone(G,Gomega);
+      if(FF != NULL)
+      {
+        idDelete(&G);
+	G = idCopy(FF);
+	idDelete(&FF); 
+        goto NEXT_VECTOR;
+      }	
     }
 
 #ifdef ENDWALKS
@@ -6484,8 +6473,6 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
       headidString(G, "G");
     }
 #endif
-
-    tif = tif + clock()-to;
 
 #ifndef  BUCHBERGER_ALG
     if(isNolVector(curr_weight) == 0)
@@ -6602,8 +6589,50 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
     if(endwalks == TRUE)
       break;
 
-    to=clock();
+Print("\n Next weight");
+    NEXT_VECTOR:
+#ifdef TIME_TEST
+    to = clock();
+#endif
+    next_weight = next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
+#ifdef TIME_TEST
+    tnw = tnw + clock() - to;
+#endif
 
+#ifdef TIME_TEST
+    to = clock();
+#endif
+    Gomega = MwalkInitialForm(G, next_weight); // compute an initial form ideal of <G> w.r.t. "curr_vector"
+#ifdef TIME_TEST
+    tif = tif + clock()-to; //time for computing initial form ideal
+#endif
+
+    //polylength = 1 if there is a polynomial in Gomega with at least 3 monomials and 0 otherwise
+    polylength = lengthpoly(Gomega);
+    if(polylength > 0)
+    {
+      Print("\n there is a polynomial in Gomega with at least 3 monomials");
+      //low-dimensional facet of the cone
+      delete next_weight;
+#ifdef TIME_TEST
+      to = clock();
+#endif
+      next_weight = MWalkRandomNextWeight(G, curr_weight, target_weight, weight_rad, op_deg);
+#ifdef TIME_TEST
+      tnw = tnw + clock() - to;
+#endif
+      idDelete(&Gomega);
+#ifdef TIME_TEST
+      to = clock();
+#endif
+      Gomega = MwalkInitialForm(G, next_weight);
+#ifdef TIME_TEST
+      tif = tif + clock()-to; //time for computing initial form ideal
+#endif
+    }
+
+/*
+    to=clock();
     next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
     if(polylength > 0)
     {
@@ -6615,6 +6644,7 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
       next_weight = MWalkRandomNextWeight(G, curr_weight, target_weight, weight_rad, op_deg);
     }
     tnw=tnw+clock()-to;
+*/
 //#ifdef PRINT_VECTORS
     if(printout > 0)
     {
@@ -6625,7 +6655,6 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
     if(Overflow_Error == TRUE)
     {
       ntwC = 0;
-      //ntestomega = 1;
       //Print("\n// ring r%d = %s;\n", nstep, rString(currRing));
       //idElements(G, "G");
       delete next_weight;
@@ -6715,12 +6744,14 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
       rChangeCurrRing(XXRing);
       Eresult = idrMoveR(eF1, exTargetRing,currRing);
     }
-    else{
+    else
+    {
       rChangeCurrRing(XXRing);
       Eresult = idrMoveR(F1, TargetRing,currRing);
     }
   }
-  else {
+  else
+  {
     rChangeCurrRing(XXRing);
     Eresult = idrMoveR(G, newRing,currRing);
   }
@@ -7286,12 +7317,13 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
     next_vect = MkInterRedNextWeight(omega,omega2,G);
     if(polylength > 0 && G->m[0] != NULL)
     {
-      
-      PrintS("\n**// rec_r_fractal_call: there is a polynomial in Gomega with at least 3 monomials, low-dimensional facet of the cone.\n");
-      
+      if(printout > 0)
+      {
+        PrintS("\n**// rec_r_fractal_call: there is a polynomial in Gomega with at least 3 monomials, low-dimensional facet of the cone.\n");
+      }
       delete next_vect;
       next_vect = MWalkRandomNextWeight(G,omega,omega2,weight_rad,nlev);
-      if(isNegNolVector(next_vect)==1)
+      if(isNegNolVector(next_vect) == 1)
       {
         delete next_vect;
         next_vect = MkInterRedNextWeight(omega,omega2,G);
@@ -7375,7 +7407,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
           
           delete next_vect;
           next_vect = MWalkRandomNextWeight(G,omega,omega2,weight_rad,nlev);
-          if(isNegNolVector(next_vect)==1)
+          if(isNegNolVector(next_vect) == 1)
           {
             delete next_vect;
             next_vect = MkInterRedNextWeight(omega,omega2,G);
