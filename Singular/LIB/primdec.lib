@@ -806,8 +806,7 @@ static proc splitCharp(list l)
         }
         if((size(sact)==1)&&(m==2))
         {
-          l[2*i]=l[2*i-1];
-          attrib(l[2*i],"isSB",1);
+          l[2*i]=std(l[2*i-1],sact[1]);
         }
         if((size(sact)==1)&&(m>2))
         {
