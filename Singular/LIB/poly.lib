@@ -894,7 +894,14 @@ EXAMPLE: example content; shows an example
 "
 {
   if (f==0) { return(number(1)); }
-  return(leadcoef(f)/leadcoef(cleardenom(f)));
+  if (attrib(basering,"ring_cf"))
+  {
+    "not yet implemented";
+  }
+  else
+  {
+    return(leadcoef(f)/leadcoef(cleardenom(f)));
+  }
 }
 example
 { "EXAMPLE:"; echo = 2;
