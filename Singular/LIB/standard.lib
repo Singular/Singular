@@ -953,13 +953,23 @@ EXAMPLE: example groebner;  shows an example"
 //The interesting cases start now.
 
  //------------------ classify the possible settings ---------------------
-  string algorithm;       //possibilities: std, slimgb, stdorslimgb
+  string algorithm;       //possibilities: std, slimgb, stdorslimgb, mathicgb
   string conversion;      //possibilities: hilb, fglm, hilborfglm, no
   string partovar;        //possibilities: yes, no
   string order;           //possibilities: simple, !simple
   string direct;          //possibilities: yes, no
 
   //define algorithm:
+  if( (was_minpoly == 0) && (npars_P == 0) && (was_qring == 0) && (attrib (P,"global") == 1) && (char(P) > 0) && (size(BRlist)<=4) )
+  {
+    if( defined(Singmathic) )
+    {
+      algorithm = "mathicgb"; // make it default for any appropriate setting... if mathicgb is available...
+    } else
+    {
+      if( p_opt && find(method,"mathicgb")  ) { "Sorry Singmathic::mathicgb is not available!"; }
+    }
+  }
   if( find(method,"std") && !find(method,"slimgb") )
   {
     algorithm = "std";
@@ -1017,8 +1027,11 @@ EXAMPLE: example groebner;  shows an example"
        (size(BRlist)>4) ||
         (order=="simple" && (method==",par2var" && npars_P==0 )) ||
          (conversion=="no" && partovar=="no" &&
-           (algorithm=="std" || algorithm=="slimgb" ||
-            (find(method,"std") && find(method,"slimgb")) ) ) )
+           (algorithm=="std" || algorithm=="slimgb" || algorithm=="mathicgb" ||
+            (find(method,"std") && find(method,"slimgb"))
+           )
+         )
+     )
   {
     direct = "yes";
   }
@@ -1039,6 +1052,11 @@ EXAMPLE: example groebner;  shows an example"
   //not be made to variables
   //BRlist (=ringlist of basering) > 4 if the basering is non-commutative
 //---------------------------- direct methods -----------------------------
+  if ( algorithm=="mathicgb" )
+  {
+    if (p_opt) { algorithm + " in " + string(P); }
+    return( mathicgb(i) );
+  }
   if ( direct == "yes" )
   {
   //if ( algorithm=="std" || (algorithm=="stdorslimgb" && char(P)>0) )   //V1

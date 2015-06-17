@@ -72,7 +72,7 @@ void idShow(const ideal id, const ring lmRing, const ring tailRing, const int de
     while ((j > 0) && (id->m[j]==NULL)) j--;
     for (int i = 0; i <= j; i++)
     {
-      Print("generator %d: ",i); p_DebugPrint(id->m[i], lmRing, tailRing, debugPrint);
+      Print("generator %d: ",i); p_wrp(id->m[i], lmRing, tailRing);
     }
   }
 }
