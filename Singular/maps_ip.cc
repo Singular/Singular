@@ -72,12 +72,8 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
     case NUMBER_CMD:
       if (P!=0)
       {
-//        WerrorS("Sorry 'napPermNumber' was lost in the refactoring process (due to Frank): needs to be fixed");
-//        return TRUE;
-#if 1
 // poly n_PermNumber(const number z, const int *par_perm, const int OldPar, const ring src, const ring dst);
         res->data= (void *) n_PermNumber((number)data, par_perm, P, preimage_r, currRing);
-#endif
         res->rtyp=POLY_CMD;
         if (nCoeff_is_algExt(currRing->cf))
           res->data=(void *)p_MinPolyNormalize((poly)res->data, currRing);
@@ -169,7 +165,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         }
         idDelete((ideal *)&s);
       }
-      if (nCoeff_is_Extension(currRing->cf))
+      if (nCoeff_is_algExt(currRing->cf))
       {
         for (i=R*C-1;i>=0;i--)
         {

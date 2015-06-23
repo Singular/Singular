@@ -29,10 +29,7 @@ static void writemon(poly p, int ko, const ring r)
   BOOLEAN wroteCoef=FALSE,writeGen=FALSE;
   const BOOLEAN bNotShortOut = (rShortOut(r) == FALSE);
 
-  if (pGetCoeff(p)!=NULL)
-    n_Normalize(pGetCoeff(p),C);
-
-  if (((p_GetComp(p,r) == (short)ko)
+  if (((p_GetComp(p,r) == ko)
     &&(p_LmIsConstantComp(p, r)))
   || ((!n_IsOne(pGetCoeff(p),C))
     && (!n_IsMOne(pGetCoeff(p),C))
@@ -122,6 +119,7 @@ void p_String0Long(const poly p, ring lmRing, ring tailRing)
   // (changing naRing->ShortOut for a while) is due to Hans!
   // Just think of other ring using the VERY SAME naRing and possible
   // side-effects...
+  // but this is not a problem: i/o is not thread-safe anyway.
   const BOOLEAN bLMShortOut = rShortOut(lmRing);
   const BOOLEAN bTAILShortOut = rShortOut(tailRing);
 
@@ -143,6 +141,7 @@ void p_String0(poly p, ring lmRing, ring tailRing)
     return;
   }
   p_Normalize(p,lmRing);
+  p_Normalize(p,lmRing); /* Manual/absfact.tst */
   if ((p_GetComp(p, lmRing) == 0) || (!lmRing->VectorOut))
   {
     writemon(p,0, lmRing);
@@ -243,7 +242,7 @@ void p_wrp(poly p, ring lmRing, ring tailRing)
   {
     r = pNext(pNext(p));
     pNext(pNext(p)) = NULL;
-    p_Write0(p, lmRing, tailRing);
+    p_Write0(p, tailRing);
     if (r!=NULL)
     {
       PrintS("+...");
