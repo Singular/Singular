@@ -141,7 +141,9 @@ void p_String0(poly p, ring lmRing, ring tailRing)
     return;
   }
   p_Normalize(p,lmRing);
-  p_Normalize(p,lmRing); /* Manual/absfact.tst */
+  if ((n_GetChar(lmRing->cf) == 0)
+  && (nCoeff_is_transExt(lmRing->cf)))
+    p_Normalize(p,lmRing); /* Manual/absfact.tst */
   if ((p_GetComp(p, lmRing) == 0) || (!lmRing->VectorOut))
   {
     writemon(p,0, lmRing);
