@@ -82,7 +82,6 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       else
       {
         assume( nMap != NULL );
-
         number a = nMap((number)data, preimage_r->cf, currRing->cf);
         if (nCoeff_is_Extension(currRing->cf))
         {
@@ -146,7 +145,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         }
       }
       else
-      if ( (what==IMAP_CMD) || /*(*/ (what==FETCH_CMD) /*)*/) /* && (nMap!=nCopy)*/
+      if ((what==IMAP_CMD) || ((what==FETCH_CMD)  && (nMap!=ndCopyMap)))
       {
         for (i=R*C-1;i>=0;i--)
         {

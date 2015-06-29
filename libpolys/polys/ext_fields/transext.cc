@@ -192,24 +192,20 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
   if (den != NULL) // !DENIS1(f)
   {
     p_Test(den, ntRing);
-
     if(p_IsConstant(den, ntRing) && (n_IsOne(pGetCoeff(den), ntCoeffs)))
     {
       Print("?/1 in %s:%d\n",f,l);
       return FALSE;
     }
-
     if( !n_GreaterZero(pGetCoeff(den), ntCoeffs) )
     {
       Print("negative sign of DEN. of a fraction in %s:%d\n",f,l);
       return FALSE;
     }
-
     // test that den is over integers!?
-
-  } else
+  }
+  else
   {  // num != NULL // den == NULL
-
 //    if( COM(t) != 0 )
 //    {
 //      Print("?//NULL with non-zero complexity: %d in %s:%d\n", COM(t), f, l);
@@ -342,11 +338,12 @@ number ntCopy(number a, const coeffs cf)
   ntTest(a); // !!!
   if (IS0(a)) return NULL;
   fraction f = (fraction)a;
-  poly g = p_Copy(NUM(f), ntRing);
-  poly h = NULL; if (!DENIS1(f)) h = p_Copy(DEN(f), ntRing);
-  fraction result = (fraction)omAllocBin(fractionObjectBin);
-  NUM(result) = g;
-  DEN(result) = h;
+  poly g = NUM(f);
+  poly h = NULL;
+  h =DEN(f);
+  fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
+  NUM(result) = p_Copy(g,cf->extRing);
+  DEN(result) = p_Copy(h,cf->extRing);
   COM(result) = COM(f);
   ntTest((number)result);
   return (number)result;
@@ -383,7 +380,7 @@ number ntGetNumerator(number &a, const coeffs cf)
 
     if( !n_GreaterZero(g, ntCoeffs) )
     {
-      NUM (f) = p_Neg(NUM (f), ntRing); // Ugly :(((
+      NUM (f) = p_Neg(NUM (f), ntRing);
       g = n_InpNeg(g, ntCoeffs);
     }
 
@@ -392,7 +389,7 @@ number ntGetNumerator(number &a, const coeffs cf)
 
     if( !n_IsOne(g, ntCoeffs) )
     {
-      DEN (f) = p_NSet(g, ntRing); // update COM(f)???
+      DEN (f) = p_NSet(g, ntRing);
       COM (f) ++;
       assume( DEN (f) != NULL );
     }
@@ -1249,9 +1246,9 @@ void definiteGcdCancellation(number a, const coeffs cf,
   fraction f = (fraction)a;
 
   if (IS0(a)) return;
+  if (DENIS1(f) || NUMIS1(f)) { COM(f) = 0; return; }
   if (!simpleTestsHaveAlreadyBeenPerformed)
   {
-    if (DENIS1(f) || NUMIS1(f)) { COM(f) = 0; return; }
 
     /* check whether NUM(f) = DEN(f), and - if so - replace 'a' by 1 */
     if (p_EqualPolys(NUM(f), DEN(f), ntRing))
@@ -1259,7 +1256,7 @@ void definiteGcdCancellation(number a, const coeffs cf,
       p_Delete(&NUM(f), ntRing); NUM(f) = p_ISet(1, ntRing);
       p_Delete(&DEN(f), ntRing); DEN(f) = NULL;
       COM(f) = 0;
-      ntTest(a); // !!!!
+      ntTest(a);
       return;
     }
   }
@@ -1454,13 +1451,11 @@ void ntNormalize (number &a, const coeffs cf)
     //PrintS("num=");p_wrp(NUM(a),ntRing);
     //PrintS(" den=");p_wrp(DEN(a),ntRing);PrintLn();
     definiteGcdCancellation(a, cf, FALSE);
-    fraction f=(fraction)a;
-    if ((DEN(f)!=NULL)
-    &&(!n_GreaterZero(pGetCoeff(DEN(f)),ntCoeffs)))
+    if ((DEN((fraction)a)!=NULL)
+    &&(!n_GreaterZero(pGetCoeff(DEN((fraction)a)),ntCoeffs)))
     {
-      NUM(f)=p_Neg(NUM(f),ntRing);
-      DEN(f)=p_Neg(DEN(f),ntRing);
-      a=(number)f;
+      NUM((fraction)a)=p_Neg(NUM((fraction)a),ntRing);
+      DEN((fraction)a)=p_Neg(DEN((fraction)a),ntRing);
     }
   }
   ntTest(a); // !!!!
@@ -1842,11 +1837,63 @@ number ntGenMap(number a, const coeffs cf, const coeffs dst)
   const nMapFunc nMap=n_SetMap(rSrc->cf,rDst->cf);
   fraction f = (fraction)a;
   poly g = prMapR(NUM(f), nMap, rSrc, rDst);
+  /* g may contain summands with coeff 0 */
+  poly hh=g;
+  poly prev=NULL;
+  while(hh!=NULL)
+  {
+    if (n_IsZero(pGetCoeff(hh),rDst->cf))
+    {
+      if (prev==NULL)
+      {
+        g=p_LmFreeAndNext(g,rDst);
+        hh=g;
+      }
+      else
+      {
+        prev->next=p_LmFreeAndNext(prev->next,rDst);
+        hh=prev->next;
+      }
+    }
+    else
+    {
+      prev=hh;
+      pIter(hh);
+    }
+  }
+  if (g==NULL) return NULL;
 
   poly h = NULL;
 
   if (!DENIS1(f))
+  {
      h = prMapR(DEN(f), nMap, rSrc, rDst);
+     /* h may contain summands with coeff 0 */
+    hh=h;
+    prev=NULL;
+    while(hh!=NULL)
+    {
+      if (n_IsZero(pGetCoeff(hh),rDst->cf))
+      {
+        if (prev==NULL)
+        {
+          h=p_LmFreeAndNext(h,rDst);
+          hh=h;
+        }
+        else
+        {
+          prev->next=p_LmFreeAndNext(prev->next,rDst);
+          hh=prev->next;
+        }
+      }
+      else
+      {
+        prev=hh;
+        pIter(hh);
+      }
+    }
+    if (h==NULL) WerrorS("mapping to */0");
+  }
 
   fraction result = (fraction)omAllocBin(fractionObjectBin);
 

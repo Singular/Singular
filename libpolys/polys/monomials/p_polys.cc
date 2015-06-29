@@ -3904,16 +3904,13 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
     p_Test(p, oldRing);
     PrintS("\np_PermPoly::p: "); p_Write(p, oldRing, oldRing); PrintLn();
 #endif
-
   const int OldpVariables = rVar(oldRing);
   poly result = NULL;
   poly result_last = NULL;
   poly aq = NULL; /* the map coefficient */
   poly qq; /* the mapped monomial */
-
   assume(dst != NULL);
   assume(dst->cf != NULL);
-
   while (p != NULL)
   {
     // map the coefficient
@@ -3921,40 +3918,27 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
     {
       qq = p_Init(dst);
       assume( nMap != NULL );
-
       number n = nMap(p_GetCoeff(p, oldRing), oldRing->cf, dst->cf);
-
       n_Test (n,dst->cf);
-
       if ( nCoeff_is_algExt(dst->cf) )
         n_Normalize(n, dst->cf);
-
       p_GetCoeff(qq, dst) = n;// Note: n can be a ZERO!!!
-      // coef may be zero:
-//      p_Test(qq, dst);
     }
     else
     {
       qq = p_One(dst);
-
 //      aq = naPermNumber(p_GetCoeff(p, oldRing), par_perm, OldPar, oldRing); // no dst???
 //      poly    n_PermNumber(const number z, const int *par_perm, const int P, const ring src, const ring dst)
       aq = n_PermNumber(p_GetCoeff(p, oldRing), par_perm, OldPar, oldRing, dst);
-
       p_Test(aq, dst);
-
       if ( nCoeff_is_algExt(dst->cf) )
         p_Normalize(aq,dst);
-
       if (aq == NULL)
         p_SetCoeff(qq, n_Init(0, dst->cf),dst); // Very dirty trick!!!
-
       p_Test(aq, dst);
     }
-
     if (rRing_has_Comp(dst))
        p_SetComp(qq, p_GetComp(p, oldRing), dst);
-
     if ( n_IsZero(pGetCoeff(qq), dst->cf) )
     {
       p_LmDelete(&qq,dst);
@@ -3980,10 +3964,8 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
             {
               assume( dst->cf->extRing == NULL );
               number ee = n_Param(1, dst);
-
               number eee;
               n_Power(ee, e, &eee, dst->cf); //nfDelete(ee,dst);
-
               ee = n_Mult(c, eee, dst->cf);
               //nfDelete(c,dst);nfDelete(eee,dst);
               pSetCoeff0(qq,ee);
@@ -3992,26 +3974,19 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
             {
               const int par = -perm[i];
               assume( par > 0 );
-
 //              WarnS("longalg missing 3");
 #if 1
               const coeffs C = dst->cf;
               assume( C != NULL );
-
               const ring R = C->extRing;
               assume( R != NULL );
-
               assume( par <= rVar(R) );
-
               poly pcn; // = (number)c
-
               assume( !n_IsZero(c, C) );
-
               if( nCoeff_is_algExt(C) )
                  pcn = (poly) c;
                else //            nCoeff_is_transExt(C)
                  pcn = NUM((fraction)c);
-
               if (pNext(pcn) == NULL) // c->z
                 p_AddExp(pcn, -perm[i], e, R);
               else /* more difficult: we have really to multiply: */
@@ -4019,19 +3994,16 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
                 poly mmc = p_ISet(1, R);
                 p_SetExp(mmc, -perm[i], e, R);
                 p_Setm(mmc, R);
-
                 number nnc;
                 // convert back to a number: number nnc = mmc;
                 if( nCoeff_is_algExt(C) )
                    nnc = (number) mmc;
                 else //            nCoeff_is_transExt(C)
                   nnc = ntInit(mmc, C);
-
                 p_GetCoeff(qq, dst) = n_Mult((number)c, nnc, C);
                 n_Delete((number *)&c, C);
                 n_Delete((number *)&nnc, C);
               }
-
               mapped_to_par=1;
 #endif
             }
@@ -4074,11 +4046,8 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
 
       if (aq!=NULL)
          qq=p_Mult_q(aq,qq,dst);
-
       aq = qq;
-
       while (pNext(aq) != NULL) pIter(aq);
-
       if (result_last==NULL)
       {
         result=qq;
@@ -4095,7 +4064,6 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
       p_Delete(&aq,dst);
     }
   }
-
   result=p_SortAdd(result,dst);
 #else
   //  if (qq!=NULL)
@@ -4126,7 +4094,6 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
   //}
 #endif
   p_Test(result,dst);
-
 #if 0
   p_Test(result,dst);
   PrintS("\nresult: "); p_Write(result,dst,dst); PrintLn();
