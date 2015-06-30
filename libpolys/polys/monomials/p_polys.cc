@@ -3846,13 +3846,7 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
     if( zz == NULL ) return NULL;
     if( !DENIS1((fraction)z) )
     {
-      if (p_IsConstant(DEN((fraction)z),srcExtRing))
-      {
-        number n=pGetCoeff(DEN((fraction)z));
-        zz=p_Div_nn(zz,n,srcExtRing);
-        p_Normalize(zz,srcExtRing);
-      }
-      else
+      if (!p_IsConstant(DEN((fraction)z),srcExtRing))
         WarnS("Not defined: Cannot map a rational fraction and make a polynomial out of it! Ignoring the denumerator.");
     }
   }
@@ -3884,11 +3878,16 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
   else
     qq = p_PermPoly(zz, par_perm-1, srcExtRing, dst, nMap, NULL, rVar (srcExtRing)-1);
 
+  if(nCoeff_is_transExt(srcCf)
+  && (!DENIS1((fraction)z))
+  && p_IsConstant(DEN((fraction)z),srcExtRing))
+  {
+    number n=nMap(pGetCoeff(DEN((fraction)z)),srcExtRing->cf, dstCf);
+    qq=p_Div_nn(qq,n,dst);
+    n_Delete(&n,dstCf);
+    p_Normalize(qq,dst);
+  }
   p_Test (qq, dst);
-
-//       poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst, nMapFunc nMap, int *par_perm, int OldPar)
-
-//  assume( FALSE );  WarnS("longalg missing 2");
 
   return qq;
 }
