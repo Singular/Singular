@@ -227,7 +227,8 @@ static void ndClearDenominators(ICoeffsEnumerator& /*numberCollectionEnumerator*
 static number ndCopy(number a, const coeffs) { return a; }
 number ndCopyMap(number a, const coeffs aRing, const coeffs r)
 {
-  assume( getCoeffType(r) == getCoeffType(aRing) );
+  // aRing and r need not be the same, but must be the same representation
+  assume(aRing->rep==r->rep);
   if ( nCoeff_has_simple_Alloc(r) && nCoeff_has_simple_Alloc(aRing) )
     return a;
   else

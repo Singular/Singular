@@ -144,8 +144,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
           pTest(m->m[i]);
         }
       }
-      else
-      if ((what==IMAP_CMD) || ((what==FETCH_CMD)  && (nMap!=ndCopyMap)))
+      else if ((what==IMAP_CMD) || (what==FETCH_CMD))
       {
         for (i=R*C-1;i>=0;i--)
         {
@@ -154,8 +153,9 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
           pTest(m->m[i]);
         }
       }
-      else /* if(what==MAP_CMD) */
+      else /* (what==MAP_CMD) */
       {
+        assume(what==MAP_CMD);
         matrix s=mpNew(N,maMaxDeg_Ma((ideal)data,preimage_r));
         for (i=R*C-1;i>=0;i--)
         {

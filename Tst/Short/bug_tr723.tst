@@ -30,5 +30,12 @@ tst_init();
  m;
  m2;
  kill r2;
+ //-------------------------------------------
+ ring S = (integer, 103),x,dp;
+
+ ideal I = x;
+ ring R = integer,y,dp;
+ fetch (S,I);
+ kill R; kill S;
 
 tst_status(1);$
