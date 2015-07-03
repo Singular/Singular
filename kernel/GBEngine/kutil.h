@@ -200,6 +200,8 @@ public:
                       // detected by Buchberger's Product Criterion and can be
                       // deleted
 
+  bool strong;
+
   // initialization
   KINLINE void Init(ring tailRing = currRing);
   KINLINE sLObject(ring tailRing = currRing);
@@ -447,10 +449,14 @@ int posInLF5C (const LSet set, const int length,
                LObject* L,const kStrategy strat);
 int posInLSig (const LSet set, const int length,
                LObject* L,const kStrategy strat);
+int posInLRing (const LSet set, const int length,
+               LObject* L,const kStrategy strat);
 int posInSyz (const kStrategy strat, const poly sig);
 int posInL0 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL11 (const LSet set, const int length,
+             LObject* L,const kStrategy strat);
+int posInL11Ring (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL13 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
@@ -733,6 +739,9 @@ BOOLEAN kCheckSpolyCreation(LObject* L, kStrategy strat, poly &m1, poly &m2);
 //             exponent bound of strat->tailRing
 //      FALSE, otherwise
 BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat);
+poly preIntegerCheck(ideal F, ideal Q);
+void postReduceByMon(LObject* h, kStrategy strat);
+void finalReduceByMon(kStrategy &strat);
 #endif
 // change strat->tailRing and adjust all data in strat, L, and T:
 // new tailRing has larger exponent bound
