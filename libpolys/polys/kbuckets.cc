@@ -13,7 +13,6 @@
 //#include <kernel/pShallowCopyDelete.h>
 #include <coeffs/coeffs.h>
 #include <polys/monomials/ring.h>
-//#include <libpolys/polys/templates/p_Procs.h>
 //#include <kernel/GBEngine/kutil.h>
 #include <polys/kbuckets.h>
 
