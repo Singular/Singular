@@ -68,7 +68,7 @@ PROCEDURES:
   m_merkle_hellman_decryption(list knapsack, bigint primitive, bigint mod1, int message)    decrypts a message with the multiplicative Merkle-Hellman Kryptosystem, using the easy knapsack, the key given by the primitive root, the modulus mod1 and the message encoded as integer
   merkle_hellman_transformation(list knapsack, int key, int mod1                generates a hard knapsack for the  Merkle-Hellman Kryptosystem for a given easy knapsack , a multiplicator key and a modulus mod1
   merkle_hellman_encryption(list knapsack, list message)                    encrypts a message with the Merkle-Hellman Kryptosystem, using a hard knapsack and a message encoded as binary list
-  merkle_hellman_decryption(list knapsack, int key, int mod1, int message)          decrypts a message with the multiplicative Merkle-Hellman Kryptosystem, using the hard knapsack, the key, the modulus mod1 and the message encoded as integer   
+  merkle_hellman_decryption(list knapsack, int key, int mod1, int message)          decrypts a message with the multiplicative Merkle-Hellman Kryptosystem, using the hard knapsack, the key, the modulus mod1 and the message encoded as integer
   super_increasing_knapsack(int ksize)                            Creates the smallest super-increasing knapsack of given size ksize
   h_increasing_knapsack(int ksize, int h)                            Creates the smallest h-increasing knapsack of given size ksize and h
   injective_knapsack(int ksize, int kmaxelement)                        Creates all list of all injective knapsacks of given size ksize and maximal element kmaxelement
@@ -1271,7 +1271,7 @@ EXAMPLE:example ellipticMult; shows an example
    }
    if((k mod 2)==0)
    {
-      resu=ellipticMult(N,a,b,P,k/2);
+      resu=ellipticMult(N,a,b,P,k div 2);
       return(ellipticAdd(N,a,b,resu,resu));
    }
    resu=ellipticMult(N,a,b,P,k-1);
