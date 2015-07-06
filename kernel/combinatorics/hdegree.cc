@@ -1030,6 +1030,7 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
     hComp(hexist, hNexist, k, hexist, &hNstc);
   else
     hNstc = hNexist;
+  assume(hNexist > 0);
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc((hNvar + 1) * sizeof(int));
   hpure = (scmon)omAlloc((1 + (hNvar * hNvar)) * sizeof(int));
