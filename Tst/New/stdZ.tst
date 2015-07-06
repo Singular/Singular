@@ -1,5 +1,4 @@
 LIB "tst.lib"; tst_init();
-
 ring r = integer,(v,w,t),dp; r;
 
 
@@ -14,7 +13,7 @@ NF( w*v, _);
 groebner(J);
 NF( w*v, _);
 
-// BUG: (w*v) is missing  S( wt, vt-3v) = 3wv
+// fixed BUG: (w*v) is missing  S( wt, vt-3v) = 3wv
 
 tst_status(1);$
 
