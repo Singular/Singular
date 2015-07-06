@@ -200,8 +200,6 @@ public:
                       // detected by Buchberger's Product Criterion and can be
                       // deleted
 
-  bool strong;
-
   // initialization
   KINLINE void Init(ring tailRing = currRing);
   KINLINE sLObject(ring tailRing = currRing);

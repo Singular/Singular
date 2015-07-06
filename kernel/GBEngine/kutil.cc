@@ -35,7 +35,6 @@
 #ifdef HAVE_RINGS
 #include <kernel/ideals.h>
 #endif
-#include <gmp.h>
 
 // define if enterL, enterT should use memmove instead of doing it manually
 // on topgun, this is slightly faster (see monodromy_l.tst, homog_gonnet.sing)
@@ -5030,7 +5029,6 @@ int posInL11Ring (const LSet set, const int length,
 {
 #if 0
   if (length < 0) return 0;
-  //if(pIsConstant(pHead(p->p))) return length+1;
   if (pLmCmp(set[length].p, p->p) == 1)
       return length+1;
   if (pLmCmp(set[0].p, p->p) == -1)
@@ -5040,22 +5038,8 @@ int posInL11Ring (const LSet set, const int length,
   int an = 0;
   int en = length+1;
   bool isFromF = (p->p1 == NULL) && (p->p2 == NULL);
-  #if 0
-  printf("\nThis is L:\n");
-  for(int ii=0; ii<=strat->Ll; ii++)
-  {
-        printf("\nL[%i]: grad  = %i, length = %i\n", ii,set[ii].FDeg,set[ii].length);
-        pWrite(set[ii].p);
-        pWrite(set[ii].p1);
-        pWrite(set[ii].p2);
-        pWrite(pHead(set[ii].p));
-        printf("\nlmcmp = %i\n",pLmCmp(pHead(set[ii].p), pHead(p->p)));
-  }
-  printf("\nThis is P:\n");pWrite(p->p);pWrite(p->p1);pWrite(p->p2);
-  #endif
   if(isFromF)
   {
-    //printf("\nisFromF\n");
     i = 0;
     while(i<=length && pLmCmp(set[i].p, p->p)==1)
       i++;
@@ -5069,24 +5053,17 @@ int posInL11Ring (const LSet set, const int length,
   }
   else
   {
-    //printf("\nis not FromF\n");
     i = 0;
     while(i<= length && pLmCmp(set[i].p, p->p) == 1)
       i++;
     an = i;
-    //printf("\nan = %i\n",an);
     i = length;
-    //printf("\ni = %i\n", i);
     while(i>=0 && pLmCmp(set[i].p, p->p)==-1)
       i--;
-    //printf("\ni2 = %i\n", i);
     while(i<= length && ((set[i].p1 == NULL) && (set[i].p2 == NULL)) && (pLmCmp(set[i].p,p->p) == 0) && (i > an))
       i--;
     en = i+1;
-    //printf("\nen = %i\n",en);
   }
-  //printf("\nan = %i\n en = %i\n",an,en);
-  //getchar();
   loop
   {
     if(an > length)
@@ -5120,7 +5097,7 @@ int posInL11Ring (const LSet set, const int length,
         en = i;
     }                                  
   }
-  #else
+#else
   if (length < 0) return 0;
   if(pIsConstant(p->p)) return length+1;
   int i,an,en;
@@ -5137,93 +5114,79 @@ int posInL11Ring (const LSet set, const int length,
   if (set[0].FDeg < p->FDeg)
   return 0;
 
-bool isFromF = (p->p1 == NULL) && (p->p2 == NULL);
-#if 0
-//printf("\nThis is L:\n");
-/*for(int ii=0; ii<=strat->Ll; ii++)
-{
-printf("\nL[%i]: grad = %i, length = %i\n", ii,set[ii].FDeg,set[ii].length);
-pWrite(set[ii].p);
-pWrite(set[ii].p1);
-pWrite(set[ii].p2);
-}*/
-printf("\nThis is P:\n");pWrite(p->p);pWrite(p->p1);pWrite(p->p2);
-#endif
-if(isFromF)
-{
-//printf("\nisFromF\n");
-i = 0;
- while(i<= length && set[i].FDeg > p->FDeg && !pIsConstant(set[i].p))
-i++;
- while(i<= length && ((set[i].p1 != NULL) || (set[i].p2 != NULL)) && (set[i].FDeg == p->FDeg) && !pIsConstant(set[i].p))
-i++;
-an = i;
-if(pIsConstant(set[length].p))
-  i = length-1;
-else
-  i = length;
- while(i>=0 && set[i].FDeg < p->FDeg)
-i--;
-en = i+1;
-}
-else
-{
-//printf("\nis not FromF\n");
-i = 0;
- while(i<= length && set[i].FDeg > p->FDeg && !pIsConstant(set[i].p))
-i++;
-an = i;
-//printf("\nan = %i\n",an);
-if(pIsConstant(set[length].p))
-  i = length-1;
-else
-  i = length;
-//printf("\ni = %i\n", i);
- while(i>= 0 && set[i].FDeg < p->FDeg)
-i--;
-//printf("\ni2 = %i\n", i);
- while(i>=0 && ((set[i].p1 == NULL) && (set[i].p2 == NULL)) && (set[i].FDeg == p->FDeg) && (i > an))
-i--;
-en = i+1;
-//printf("\nen = %i\n",en);
-}
-//printf("\nan = %i\n en = %i\n",an,en);
-//getchar();
-loop
-{
-  if(an > length)
-    return length+1;
-  if (an >= en-1)
+  bool isFromF = (p->p1 == NULL) && (p->p2 == NULL);
+
+  if(isFromF)
   {
-    if(an == en)
-      return en;
-    if (pLmCmp(set[an].p, p->p) == 1)
-      return en;
-    if (pLmCmp(set[an].p, p->p) == -1)
-      return an;
+    i = 0;
+    while(i<= length && set[i].FDeg > p->FDeg && !pIsConstant(set[i].p))
+      i++;
+    while(i<= length && ((set[i].p1 != NULL) || (set[i].p2 != NULL)) && 
+         (set[i].FDeg == p->FDeg) && !pIsConstant(set[i].p))
+      i++;
+    an = i;
+    if(pIsConstant(set[length].p))
+      i = length-1;
+    else
+      i = length;
+    while(i>=0 && set[i].FDeg < p->FDeg)
+      i--;
+    en = i+1;
+  }
+  else
+  {
+    i = 0;
+    while(i<= length && set[i].FDeg > p->FDeg && !pIsConstant(set[i].p))
+      i++;
+    an = i;
+    if(pIsConstant(set[length].p))
+      i = length-1;
+    else
+      i = length;
+    while(i>= 0 && set[i].FDeg < p->FDeg)
+      i--;
+    while(i>=0 && ((set[i].p1 == NULL) && (set[i].p2 == NULL)) && 
+         (set[i].FDeg == p->FDeg) && (i > an))
+      i--;
+    en = i+1;
+  }
+  loop
+  {
+    if(an > length)
+      return length+1;
+    if (an >= en-1)
+    {
+      if(an == en)
+        return en;
+      if (pLmCmp(set[an].p, p->p) == 1)
+        return en;
+      if (pLmCmp(set[an].p, p->p) == -1)
+        return an;
+      if (pLmCmp(set[i].p, p->p) == 0)
+      {
+        if(nGreater(set[an].p->coef, p->p->coef))
+          return en;
+        else
+          return an;
+      }
+    }
+    i=(an+en) / 2;
+    if (pLmCmp(set[i].p, p->p) == 1)
+      an=i;
+    if (pLmCmp(set[i].p, p->p) == -1)
+      en=i;
     if (pLmCmp(set[i].p, p->p) == 0)
     {
-      if(nGreater(set[an].p->coef, p->p->coef))
-        return en;
+      if(nGreater(set[i].p->coef, p->p->coef))
+        an = i;
       else
-        return an;
+        en = i;
     }
   }
-  i=(an+en) / 2;
-  if (pLmCmp(set[i].p, p->p) == 1)
-    an=i;
-  if (pLmCmp(set[i].p, p->p) == -1)
-    en=i;
-  if (pLmCmp(set[i].p, p->p) == 0)
-  {
-    if(nGreater(set[i].p->coef, p->p->coef))
-      an = i;
-    else
-      en = i;
-  }
-}
 #endif
 }
+
+
 /*2 Position for rings L: Here I am
 * looks up the position of polynomial p in set
 * e is the ecart of p
@@ -8803,25 +8766,18 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
             return pmon;
         }
     }
-    ring QQ_ring = rCopy(currRing);
-    rUnComplete(QQ_ring);
-    QQ_ring->cf->ref--;
+    ring QQ_ring = rCopy0(currRing,FALSE);
+    nKillChar(QQ_ring->cf);
     QQ_ring->cf = nInitChar(n_Q, NULL);
-    if(Q!= NULL)
-        QQ_ring->qideal = NULL;
     rComplete(QQ_ring,1);
     QQ_ring = rAssure_c_dp(QQ_ring);
     rChangeCurrRing(QQ_ring);
     nMapFunc nMap = n_SetMap(origR->cf, QQ_ring->cf);
     ideal II = idInit(IDELEMS(F)+idelemQ+2,id_RankFreeModule(F, origR));
-    int *perm = (int *)omAlloc0((QQ_ring->N+1)*sizeof(int));
-    for(int i=QQ_ring->N;i>0;i--) 
-        perm[i]=i;
     for(int i = 0, j = 0; i<IDELEMS(F); i++)
-        II->m[j++] = p_PermPoly(F->m[i], perm, origR, QQ_ring, nMap, NULL, 0);
+        II->m[j++] = prMapR(F->m[i], nMap, origR, QQ_ring);
     for(int i = 0, j = IDELEMS(F); i<idelemQ; i++)
-        II->m[j++] = p_PermPoly(Q->m[i], perm, origR, QQ_ring, nMap, NULL, 0);
-    //rWrite(currRing);
+        II->m[j++] = prMapR(Q->m[i], nMap, origR, QQ_ring);
     ideal one = kStd(II, NULL, isNotHomog, NULL);
     idSkipZeroes(one);
     if(idIsConstant(one))
@@ -8837,9 +8793,9 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
         {
             if(pGetComp(syz->m[i]) == 1)
             {
-                if(p_Deg(pHead(syz->m[i]), currRing) == 0)
+                if(pIsConstant(syz->m[i]))
                 {
-                    integer = pCopy(pHead(syz->m[i]));
+                    integer = pHead(syz->m[i]);
                     pSetComp(integer, 0);
                     break;
                 }
@@ -8847,7 +8803,8 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
         }
         rChangeCurrRing(origR);
         nMapFunc nMap2 = n_SetMap(QQ_ring->cf, origR->cf);
-        pmon = p_PermPoly(integer, perm, QQ_ring, origR, nMap2, NULL, 0);
+        pmon = prMapR(integer, nMap2, QQ_ring, origR);
+        rDelete(QQ_ring);
         return pmon;
     }
     else
@@ -8880,7 +8837,7 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
             {
                 if(pGetComp(syz->m[i]) == 1)
                 {
-                    if(p_Deg(pHead(syz->m[i]), currRing) == 0)
+                    if(pIsConstant(syz->m[i]))
                     {
                         pSetCoeff(mindegmon, syz->m[i]->coef);
                         found = TRUE;
@@ -8891,11 +8848,13 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
             if (found == FALSE)
             {
                 rChangeCurrRing(origR);
+                rDelete(QQ_ring);
                 return NULL;
             }
             rChangeCurrRing(origR);
             nMapFunc nMap2 = n_SetMap(QQ_ring->cf, origR->cf);
-            pmon = p_PermPoly(mindegmon, perm, QQ_ring, origR, nMap2, NULL, 0);
+            pmon = prMapR(mindegmon, nMap2, QQ_ring, origR);
+            rDelete(QQ_ring);
             return pmon;
         }
         else
@@ -8904,6 +8863,7 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
       else
         rChangeCurrRing(origR);
     }
+    rDelete(QQ_ring);
     return NULL;
   }
 }
@@ -8929,6 +8889,7 @@ void postReduceByMon(LObject* h, kStrategy strat)
       {
         if(pLmDivisibleBy(strat->S[i], p))
         {
+          nDelete(&(p->coef));
           p->coef = currRing->cf->cfIntMod(p->coef, strat->S[i]->coef, currRing->cf);
         }
         if(nIsZero(p->coef))
@@ -8946,6 +8907,7 @@ void postReduceByMon(LObject* h, kStrategy strat)
       {
         if(pLmDivisibleBy(strat->S[i], pp))
         {
+          nDelete(&(pp->coef));
           pp->coef = currRing->cf->cfIntMod(pp->coef, strat->S[i]->coef, currRing->cf);
           if(nIsZero(pp->coef))
           {
@@ -8965,10 +8927,8 @@ void postReduceByMon(LObject* h, kStrategy strat)
           pp = pNext(p);
         }
       }
-      //printf("\nAfter\n");pWrite(pH);
     }
   }
-  //printf("\nFinal\n");pWrite(pH);getchar();
   h->SetLmCurrRing();
   if(deleted)
     strat->initEcart(h);
@@ -8979,7 +8939,7 @@ void postReduceByMon(LObject* h, kStrategy strat)
   background: any known constant element of ideal suppresses 
               intermediate coefficient swell and beautifies output
 */
-void finalReduceByMon(kStrategy &strat)
+void finalReduceByMon(kStrategy strat)
 {
   if(!nCoeff_is_Ring_Z(currRing->cf))
       return;
@@ -8995,13 +8955,13 @@ void finalReduceByMon(kStrategy &strat)
           p = strat->S[i];
           if(pLmDivisibleBy(strat->S[j], p))
           {
+            nDelete(&(p->coef));
             p->coef = currRing->cf->cfIntMod(p->coef, strat->S[j]->coef, currRing->cf);
           }
           pp = pNext(p); 
           if((pp == NULL) && (nIsZero(p->coef)))
           {
-            strat->S[i] = NULL;
-            //deleteInS(i, strat);
+            deleteInS(i, strat);
           }
           else
           {
@@ -9009,6 +8969,7 @@ void finalReduceByMon(kStrategy &strat)
               {
                 if(pLmDivisibleBy(strat->S[j], pp))
                 {
+                  nDelete(&(pp->coef));
                   pp->coef = currRing->cf->cfIntMod(pp->coef, strat->S[j]->coef, currRing->cf);
                   if(nIsZero(pp->coef))
                   {
