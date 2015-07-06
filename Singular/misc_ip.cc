@@ -1094,6 +1094,7 @@ void m2_end(int i)
     }
 #endif   // HAVE_SIMPLEIPC
     fe_reset_input_mode();
+    monitor(NULL,0);
 #ifdef PAGE_TEST
     mmEndStat();
 #endif
