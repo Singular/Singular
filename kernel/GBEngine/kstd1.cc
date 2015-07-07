@@ -368,13 +368,15 @@ int redRiloc (LObject* h,kStrategy strat)
   PrintLn();
   PrintS("    The actual reducer T is: ");
   if(strat->tl<0)
-    {PrintS(" Empty.\n");
+    {PrintS(" Empty.\n");}
   else
-  for (iii=0;iii<=strat->tl;iii++)
   {
-    PrintLn();
-    Print("      T[%i] = ",iii);p_Write(strat->T[iii].p,strat->tailRing);
-    PrintLn();
+    for (iii=0;iii<=strat->tl;iii++)
+    {
+      PrintLn();
+      Print("      T[%i] = ",iii);p_Write(strat->T[iii].p,strat->tailRing);
+      PrintLn();
+    }
   }
 #endif /* ADIDEBUG_NF */
 
@@ -403,6 +405,19 @@ int redRiloc (LObject* h,kStrategy strat)
     if (j < 0)
     {
       if (strat->honey) h->SetLength(strat->length_pLength);
+      // over ZZ: cleanup coefficients by complete reduction with monomials
+      postReduceByMon(h, strat);
+      if(nIsZero(pGetCoeff(h->p)) || h->p == NULL) return 2;
+      if(strat->tl >= 0)
+          h->i_r1 = strat->tl;
+      else
+          h->i_r1 = -1;
+      if (h->GetLmTailRing() == NULL)
+      {
+        if (h->lcm!=NULL) pLmDelete(h->lcm);
+        h->Clear();
+        return 0;
+      }
       return 1;
     }
 
@@ -427,7 +442,7 @@ int redRiloc (LObject* h,kStrategy strat)
         if ((strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
                                         strat->T[i].length < li))
             &&
-            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], h->GetLmTailRing(), ~h->sev, strat->tailRing))
+            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], h->GetLmTailRing(), ~h->sev, strat->tailRing) && n_DivBy(h->p->coef,strat->T[i].p->coef,strat->tailRing))
 #else
           j = kFindDivisibleByInT(strat, h, i);
         if (j < 0) break;
@@ -472,7 +487,7 @@ int redRiloc (LObject* h,kStrategy strat)
           h->SetLength(strat->length_pLength);
         assume(h->FDeg == h->pFDeg());
         at = strat->posInL(strat->L,strat->Ll,h,strat);
-        if (at <= strat->Ll)
+        if (at <= strat->Ll && pLmCmp(h->p, strat->L[strat->Ll].p) != 0 && !nEqual(h->p->coef, strat->L[strat->Ll].p->coef))
         {
           /*- h will not become the next element to reduce -*/
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
