@@ -424,9 +424,36 @@ int redRing (LObject* h,kStrategy strat)
   h->SetShortExpVector();
   loop
   {
-    j = kFindDivisibleByInT(strat, h);
-    if (j < 0) return 1;
+    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    if (j < 0) 
+    {
+        // over ZZ: cleanup coefficients by complete reduction with monomials
+        postReduceByMon(h, strat);
+        if(nIsZero(pGetCoeff(h->p))) return 2;
+        j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+        if(j < 0)
+        {
+          if(strat->tl >= 0)
+              h->i_r1 = strat->tl;
+          else
+              h->i_r1 = -1;
+          if (h->GetLmTailRing() == NULL)
+          {
+            if (h->lcm!=NULL) pLmDelete(h->lcm);
+            h->Clear();
+            return 0;
+          }
+          return 1;
+        }
+    }
+    #if ADIDEBUG
+    pWrite(h->p);
+    printf("\nFound j = %i\n",j);pWrite(strat->T[j].p);
+    #endif
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat); // with debug output
+    #if ADIDEBUG
+    printf("\nand after reduce: \n");pWrite(h->p);
+    #endif
 
     if (h->GetLmTailRing() == NULL)
     {
