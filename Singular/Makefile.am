@@ -97,7 +97,6 @@ SingularHEADERS = \
    misc_ip.h \
    mmalloc.h \
    mod_lib.h \
-   omSingularConfig.h \
    links/ndbm.h \
    newstruct.h \
    number2.h \

@@ -193,7 +193,6 @@
 #include <Singular/misc_ip.h>
 #include <Singular/links/ndbm.h>
 #include <Singular/newstruct.h>
-#include <Singular/omSingularConfig.h>
 #include <Singular/pcv.h>
 #include <Singular/links/pipeLink.h>
 #include <Singular/run.h>
