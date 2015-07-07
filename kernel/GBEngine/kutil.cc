@@ -1682,12 +1682,26 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
   else
     posx = strat->posInL(strat->L,strat->Ll,&h,strat);
   h.sev = pGetShortExpVector(h.p);
+  h.i_r1 = -1;h.i_r2 = -1;
   if (currRing!=strat->tailRing)
-  {
-    if (h.t_p==NULL) /* may already been set by pLdeg() in initEcart */
-      h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
-  }
+    h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+  #if 1
+  h.p1 = p;h.p2 = strat->S[i];
+  #endif
+  if (atR >= 0)
+    {
+      h.i_r2 = strat->S_2_R[i];
+      h.i_r1 = atR;
+    }
+    else
+    {
+      h.i_r1 = -1;
+      h.i_r2 = -1;
+    }
   enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
+  #if ADIDEBUG
+  printf("\nThis strong poly was added to L:\n");pWrite(h.p);pWrite(h.p1);pWrite(h.p2);printf("\ni_r1 = %i, i_r2 = %i\n",h.i_r1, h.i_r2);pWrite(strat->T[h.i_r1].p);pWrite(strat->T[h.i_r2].p);
+  #endif
   return TRUE;
 }
 #endif
