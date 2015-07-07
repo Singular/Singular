@@ -739,7 +739,7 @@ BOOLEAN kCheckSpolyCreation(LObject* L, kStrategy strat, poly &m1, poly &m2);
 BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat);
 poly preIntegerCheck(ideal F, ideal Q);
 void postReduceByMon(LObject* h, kStrategy strat);
-void finalReduceByMon(kStrategy &strat);
+void finalReduceByMon(kStrategy strat);
 #endif
 // change strat->tailRing and adjust all data in strat, L, and T:
 // new tailRing has larger exponent bound
