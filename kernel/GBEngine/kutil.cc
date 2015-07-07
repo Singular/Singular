@@ -1171,7 +1171,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   assume(i<=strat->sl);
     int      l,j,compare,compareCoeff;
     LObject  Lp;
-  omTestMemory(1);
     if (strat->interred_flag) return;
   #ifdef KDEBUG
     Lp.ecart=0; Lp.length=0;
@@ -1198,7 +1197,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
         pLmDelete(Lp.lcm);
         return;
     }
-    omTestMemory(1);
     // basic product criterion
     pLcm(p,strat->S[i],Lp.lcm);
   
@@ -1223,7 +1221,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
         return;
     }
     assume(!strat->fromT);
-    omTestMemory(1);
     /*
     *the set B collects the pairs of type (S[j],p)
     *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p) != lcm(r,p)
@@ -1318,7 +1315,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
         }
       }
     }
-    omTestMemory(1);
     /*
     *the pair (S[i],p) enters B if the spoly != 0
     */
@@ -1345,7 +1341,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     {
       Lp.p = ksCreateShortSpoly(strat->S[i], p, strat->tailRing);
     }
-    omTestMemory(1);
     if (Lp.p == NULL)
     {
   #ifdef KDEBUG
@@ -1369,7 +1364,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       *the first case is handeled in chainCrit
       */
       pLmDelete(Lp.lcm);
-      printf("\nsdkjhggh\n");
     }
     else
     {
@@ -1384,17 +1378,11 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
         Lp.i_r2 = atR;
         Lp.i_r1 = strat->S_2_R[i];
       }
-      omTestMemory(1);
       strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
-      omTestMemory(1);
       l = strat->posInL(strat->L,strat->Ll,&Lp,strat);
-      omTestMemory(1);
       enterL(&strat->L,&strat->Ll,&strat->Lmax,Lp,l);
-      omTestMemory(1);
-      printf("\nJust printed and retuirned:\n");
     }
   #else
-  number s, t;
   assume(i<=strat->sl);
   assume(atR >= 0);
   assume(i<=strat->sl);
@@ -1414,6 +1402,8 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       pLmDelete(h.lcm);
       return;
   }
+  //This is commented out since it is buggy over ZZ 
+  //(check theory with Gerhard, Anne and Christian)
   #if 0
   // basic chain criterion
   pLcm(p,strat->S[i],h.lcm);
@@ -1424,13 +1414,15 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
   *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
   */
-  #if 0
+  
+  #if ADIDEBUG
   idPrint(strat->Shdl);
   for(int ii=0; ii<=strat->Ll; ii++)
   {printf("\nL[%i]\n",ii);pWrite(strat->L[ii].p);pWrite(strat->L[ii].p1);pWrite(strat->L[ii].p2);pWrite(strat->L[ii].lcm);}
   for(int ii=0; ii<=strat->Bl; ii++)
   {printf("\nB[%i]\n",ii);pWrite(strat->B[ii].p);pWrite(strat->B[ii].p1);pWrite(strat->B[ii].p2);pWrite(strat->B[ii].lcm);}
   #endif
+  
   for(j = strat->Bl;j>=0;j--)
   {
     compare=pDivCompRing(strat->B[j].lcm,h.lcm);
@@ -1507,8 +1499,8 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     }
   }
   #endif
+  number s, t;
   poly m1, m2, gcd;
-  //#if 1
   #if ADIDEBUG
   printf("\nTrying to add spair S[%i] und p\n",i);pWrite(strat->S[i]);pWrite(p);
   #endif
@@ -1524,15 +1516,25 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   poly si = pCopy(strat->S[i]);
   poly pm1 = pp_Mult_mm(pNext(p), m1, strat->tailRing);
   poly sim2 = pp_Mult_mm(pNext(si), m2, strat->tailRing);
+  pDelete(&si);
   if(sim2 == NULL)
   {
     if(pm1 == NULL)
     {
+      pDelete(&sim2);
+      pDelete(&pm1);
+      pDelete(&gcd);
+      pDelete(&m1);
+      pDelete(&m2);
       return;
     }
     else
     {
       gcd = pCopy(pm1);
+      pDelete(&pm1);
+      pDelete(&sim2);
+      pDelete(&m1);
+      pDelete(&m2);
     }
   }
   else
@@ -1563,11 +1565,9 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   h.tailRing = strat->tailRing;
   int posx;
   h.pCleardenom();
-  //printf("\nThis is our new achieved polynomial:\n");pWrite(gcd);
   if(h.p == NULL)
     return;
   pSetm(h.p);
-  //#if 1
   #if ADIDEBUG
   printf("\nThis is afterwards:\n");
   pWrite(h.p);
@@ -1593,18 +1593,9 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   if (currRing!=strat->tailRing)
     h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
   #if ADIDEBUG
-  printf("\nThis s-poly was added to L:\n");pWrite(h.p);pWrite(h.p1);pWrite(h.p2);printf("\ni_r1 = %i, i_r2 = %i\n",h.i_r1, h.i_r2);pWrite(strat->T[h.i_r1].p);pWrite(strat->T[h.i_r2].p);
+  printf("\nThis s-poly was added to B:\n");pWrite(h.p);pWrite(h.p1);pWrite(h.p2);printf("\ni_r1 = %i, i_r2 = %i\n",h.i_r1, h.i_r2);pWrite(strat->T[h.i_r1].p);pWrite(strat->T[h.i_r2].p);
   #endif
   enterL(&strat->B,&strat->Bl,&strat->Bmax,h,posx);
-  #if 0
-  for(int i=0; i<=strat->Bl; i++)
-  {
-    printf("\n    B[%i]\n",i);
-    p_Write(strat->B[i].p, strat->B[i].tailRing);
-    p_Write(strat->B[i].p1, strat->B[i].tailRing);
-    p_Write(strat->B[i].p2, strat->B[i].tailRing);
-  }
-  #endif
   kTest_TS(strat);
 }
 
