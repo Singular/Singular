@@ -3227,7 +3227,7 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
         for (j=0; j<=k; j++)
         {
           #if ADIDEBUG
-          PrintS("\n initenterpairs: \n");
+          PrintS("\n Trying to add spoly : \n");
           PrintS("                ");p_Write(h, strat->tailRing);
           PrintS("                ");p_Write(strat->S[j],strat->tailRing);
           #endif
@@ -3249,17 +3249,21 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
         }
       }
     }
+    #if 1
 
     if (new_pair)
     {
-#ifdef HAVE_RATGRING
+    #ifdef HAVE_RATGRING
       if (currRing->real_var_start>0)
         chainCritPart(h,ecart,strat);
       else
-#endif
+    #endif
       strat->chainCrit(h,ecart,strat);
     }
+    #else
+    kMergeBintoL(strat);
   }
+  #endif
 }
 
 /*2
@@ -8405,8 +8409,9 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   {
     updateS(TRUE,strat);
   }
-  if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
-  strat->fromQ=NULL;
+  //if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
+  //strat->fromQ=NULL;
+  assume(kTest_TS(strat));
 }
 
 void exitBuchMora (kStrategy strat)
