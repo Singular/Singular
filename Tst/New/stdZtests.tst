@@ -20,26 +20,15 @@ std(inI);
  
 
 ring rng = (integer),(x,y,z),(ls(3),C);
-int trial = 3;
-//option(redSB);
-system("random", 820791554);
-ideal I = 1+7yz3,-4x+2xz+14x2,-9-10z2+8xz;
 ideal J = -2xz3+x2yz,3z-2xy-3xy2;
-// ideal gI = std(I);
-// ideal ggI = std(gI);
 ideal gJ = std(J);
 "Zweite:";
 ideal ggJ = std(gJ);
-//ASSUME(0, 0== size( std(reduce (I,gI ) )) );
-//ASSUME(0, 0== size( std(reduce (J,gJ ) )) );
-//idealsEqual(gI,ggI );
 gJ;ggJ;
 
 
 
 //Github Adi #32
-
-option(redSB);
 
 ring rng = (integer),(x,y,z),dp;
 ideal I = -25*x^3+104*x*y^3-23*y^2*z-128;
@@ -53,12 +42,9 @@ option(redSB);
 
 
 ring rng = (integer),(x,y,z),(dp(3),C);
-int trial = 0;
-system("random", 912758297);
 ideal I = -27*x+25*z,-46*x*z+35*x,21*x-42;
-       ideal gI =  std(I);
-       ideal ggI =  std(gI);
-
+ideal gI =  std(I);
+ideal ggI =  std(gI);
 reduce (I,gI );
 
 
@@ -98,19 +84,15 @@ option(redSB);
 
 
 ring rng = (integer),(x,y,z),(dp(3),C);
-int trial = 0;
-system("random", 784341798);
 ideal I = -49*y^2+40*z^2+17,-34*z^2-3,-25*y*z-28*z;
-       ideal gI =  std(I);
-       ideal ggI =  std(gI);
+ideal gI =  std(I);
+ideal ggI =  std(gI);
 gI;
 ggI;
 
 //Github Adi #36
 
 ring rng = (0),(x,y,z),(ls(3),C);
-
-system("random", 157161605);
 ideal I =
 (68/23)*z-(142/133)*y*z-(64/37)*x*y+(65/71)*x*y*z^2+(1/3)*x^2*y*z,(-2/7)*x*y*z-(61/91)*x*y^2*z;
 ideal J = (3/53)*x*z+(47/44)*x*y^2*z,(-40/107)*x*z^2+22*x*z^3;
@@ -140,14 +122,12 @@ option(redSB);
 
 
 ring rng = (integer),(x,y,z),(ls(3),C);
-int trial = 3;
-system("random", 820791554);
 ideal I = 1+7*y*z^3,-4*x+2*x*z+14*x^2,-9-10*z^2+8*x*z;
 ideal J = -14*x*z^3+5*x^2*y*z,15*z-7*x*y+12*x*y*z^2-11*x*y^2;
-       ideal gI =  std(I);
-       ideal ggI =  std(gI);
-       ideal gJ =  std(J);
-       ideal ggJ =  std(gJ);
+ideal gI =  std(I);
+ideal ggI =  std(gI);
+ideal gJ =  std(J);
+ideal ggJ =  std(gJ);
 0== size( std(reduce (I,gI ) )  );
 0== size( std(reduce (J,gJ ) )  );
 idealsEqual(gI,ggI );
@@ -162,7 +142,6 @@ idealsEqual(gJ,ggJ );
 ring rng = (integer),(x,y,z),(ls(3),C);
 option("redTail");
 option(redSB);
-system("random", 1022116625);
 ideal I = -14*y*z^2+7*x-11*x*y,-15*x*y,-8*y^2*z^2+5*x*y*z,5*y*z^2-15*y^2*z+8*x^2*z^2+3*x^2*y^2;
 ideal gI =  std(I);
 ideal ggI =  std(gI);
@@ -171,25 +150,16 @@ gI;
 
 
 //Github Adi #40
-option(redSB);
 
 ring rng = (integer),(x,y,z),(ls(3),C);
-int trial = 3;
-system("random", 158291770);
 ideal I = -10*x*y*z,12*z^2-8*y-14*x*z+14*x^2*y*z,-7*y^4+4*x^2+9*x^2*y;
 ideal J = -1+7*y^3*z,-15+14*x+14*x*y*z,15*z+7*x-10*x*z+5*x*y^2;
-       ideal gI =  std(I);
+ideal gI =  std(I);
        
- ring rng = (integer),(x,y,z),(ls(3),C);
- intvec op = 67108866,16787537;
-  option() ;
-//options: intStrategy redefine loadLib usage prompt
-  option(set, op) ;
- int trial = 53;
- system("random", 1792192072);
- ideal I = 7*x*z+3*x*z^2-x^2,4*z+6*z^2+2*y;
- ideal J = 5-5*z^2+3*y^2*z;
- ideal gI =  std(I);
+ring rng = (integer),(x,y,z),(ls(3),C);
+ideal I = 7*x*z+3*x*z^2-x^2,4*z+6*z^2+2*y;
+ideal J = 5-5*z^2+3*y^2*z;
+ideal gI =  std(I);
        
 
 
@@ -201,33 +171,23 @@ ideal I  = 12*y(3)*y(4)+19*y(1)+6*y(4),2*x(3)*y(4)-2*y(1)+7,2*y(1)*y(3)+y(1)-7*y
 ideal J  = std(I);
 
 
-
-
 //Github Adi #20
+
 ring rng = (integer),(xw,xq,xk),(lp(2),lp(1),C);
 ideal I = -4*xk+10;
 ideal J = -7*xw+4*xk,-13;
 idealsEqual( intersect(I,J) , intersect(std(I),std(J) ) );
 
 
-
-
-
-
-
 //Github Adi #42
+
 ring rng = (integer),(x,y,z),(dp(1),dp(2),C);
-intvec op = 100663296,16787537;
- option() ;
- option(set, op) ;
-int trial = 0;
-system("random", 1310165262);
 ideal I = 20*x*z+7*y^2;
 ideal J = 6*x*y+20*z+6,-5*x-16*y-11,8*x*y+2*y^2;
-       ideal gI =  std(I);
-       ideal ggI =  std(gI);
-       ideal gJ =  std(J);
-       ideal ggJ =  std(gJ);
+ideal gI =  std(I);
+ideal ggI =  std(gI);
+ideal gJ =  std(J);
+ideal ggJ =  std(gJ);
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
 size(gJ)== size(ggJ );
@@ -237,131 +197,73 @@ size(gJ)== size(ggJ );
 
 
 //Github Adi #38
-  ring rng =  (integer),(x(1),x(3),x(4),x(5)),(dp(4),C);
+
+ring rng =  (integer),(x(1),x(3),x(4),x(5)),(dp(4),C);
 ideal Q = x(4)^2-x(3)*x(5),
 x(3)*x(4)-x(5),
 x(3)^2-x(4),
 x(1)^2-121*x(5)^2-11*x(5)-1;
-
 Q = std(Q);
-Q;
 qring qr = Q;
-
- ideal a = x(5)-2;
- ideal j = 6,x(5)-2,x(4)+2,x(3)-2,x(1)+3;
- ideal aJJ = quotient(a*j,j); // ?
- aJJ;
- std(aJJ);
- aJJ;
-
-option(redSB);
+ideal a = x(5)-2;
+ideal j = 6,x(5)-2,x(4)+2,x(3)-2,x(1)+3;
+ideal aJJ = quotient(a*j,j); // ?
+aJJ;
+std(aJJ);
+aJJ;
 
 //segfaults
-
-
-//# segfaults
-
 //ok mit neue posinL11Ring
 
 ring rng = (integer),(x(1),x(2),x(3)),(ls(3),C);
-short = 0 ;
-minpoly = 0;
-intvec op = 67108864,16787537;
- option(set, op) ;
- option() ;
- // option() ;//options: intStrategy redefine loadLib usage prompt warn
-int trial = 96;
-system("random", 970755877);
 ideal I = -3*x(1)-10*x(1)*x(3);
 ideal J = -9*x(2)+9*x(1)*x(2),-3*x(2)*x(3)^2+10*x(1)*x(3)^2+10*x(1)^2*x(2);
-       ideal gI =  std(I);
-       ideal ggI =  std(gI);
-       ideal gJ =  std(J);
-       ideal ggJ =  std(gJ);
+ideal gI =  std(I);
+ideal ggI =  std(gI);
+ideal gJ =  std(J);
+ideal ggJ =  std(gJ);
 
 
 //ok now
+
 ring rng = (integer),(x(1),x(2)),(ls(2),C);
-short = 0 ;
-minpoly = 0;
-intvec op = 67108864,16787537;
- option(set, op) ;
- option() ;
- // option() ;//options: intStrategy redefine loadLib usage prompt warn
-int trial = 4;
-system("random", 960625435);
 ideal I = -41*x(1)-10*x(1)^3*x(2),-22*x(2)^2-12*x(1)^3;
 ideal J = 14,35*x(1)*x(2)+12*x(1)*x(2)^3;
-       ideal gI =  std(I);
-       ideal ggI =  std(gI);
-       ideal gJ =  std(J);
+ideal gI =  std(I);
+ideal ggI =  std(gI);
+ideal gJ =  std(J);
 
 //ok now
 
 ring rng = (integer),(x(1),x(2)),(ls(2),C);
-short = 0 ;
-minpoly = 0;
-intvec op = 67108864,16787537;
- option(set, op) ;
- option() ;
- // option() ;//options: intStrategy redefine loadLib usage prompt warn
-int trial = 29;
-system("random", 550741380);
 ideal I = -22-24*x(1)^3,4*x(1)*x(2)^2-19*x(1)^2*x(2);
 ideal J = 16*x(1)*x(2),12-31*x(1)-43*x(1)*x(2);
-       ideal gI =  std(I);
-       ideal ggI =  std(gI);
-       ideal gJ =  std(J);
+ideal gI =  std(I);
+ideal ggI =  std(gI);
+ideal gJ =  std(J);
 
-//in the new posinL11Ring works smooth, in the opther one takes forever
+//in the new posinL11Ring works smooth, in the other one takes forever
 
 ring rng = (integer),(x(1),x(2)),(ls(2),C);
-short = 0 ;
-minpoly = 0;
-intvec op = 67108864,16787537;
- option(set, op) ;
- option() ;
- // option() ;//options: intStrategy redefine loadLib usage prompt warn
-int trial = 15;
-system("random", 1976068534);
 ideal I = -11*x(2),3*x(2)^2+8*x(1)*x(2)+3*x(1)*x(2)^2+12*x(1)^3,8*x(1)*x(2)^2-15*x(1)^3;
 ideal J = -2*x(1)-11*x(1)^2+10*x(1)^2*x(2),-13*x(1)*x(2)-10*x(1)^3;
-       ideal gI =  std(I);
+ideal gI =  std(I);
 
 //ok now
 
 ring rng = (integer),(x(1),x(2)),(ls(2),C);
-short = 0 ;
-minpoly = 0;
-intvec op = 67108864,16787537;
- option(set, op) ;
- option() ;
- // option() ;//options: intStrategy redefine loadLib usage prompt warn
-int trial = 68;
-system("random", 1702067426);
 ideal I = -10,15*x(1)*x(2)+8*x(1)*x(2)^2;
 ideal J = 2*x(1)^2*x(2),-3+2*x(1)*x(2);
-       ideal gI =  std(I);
-
+ideal gI =  std(I);
 
 //ok now
 
 ring rng = (integer),(x(1)),(ls(1),C);
-short = 0 ;
-minpoly = 0;
-intvec op = 67108864,16787537;
- option(set, op) ;
- option() ;
- // option() ;//options: intStrategy redefine loadLib usage prompt warn
-int trial = 65;
-system("random", 907801360);
 ideal I = -12+2*x(1)^2;
 ideal J = -6*x(1)^2+11*x(1)^4,-15;
-       ideal gI =  std(I);
-       ideal ggI =  std(gI);
-       ideal gJ =  std(J);
-
-
+ideal gI =  std(I);
+ideal ggI =  std(gI);
+ideal gJ =  std(J);
 
 //Github Adi #47
 
@@ -371,12 +273,9 @@ reduce(x,std(2*x));
 ring S = integer,x,ls;
 reduce(x,std(2*x));
 
-
-
 //Github Adi #46
 
 ring rng = integer,x,ds;
-short = 0 ;
 ideal J = -7, -3-15*x^2, -6+18*x-x^2;
 ideal gJ =  std(J);
 
@@ -458,7 +357,6 @@ gJ;
 ggJ;
 
 ring rng = integer,x,lp;
-short = 0 ;
 option(noredSB) ;
 option(noredTail) ;
 ideal I   = -8*x^3+7*x^2-7*x, 8*x^2+10*x-2;
