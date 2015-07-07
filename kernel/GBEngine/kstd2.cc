@@ -71,6 +71,8 @@ long sba_interreduction_operations;
 /***********************************************
  * SBA stuff -- done
 ***********************************************/
+#define ADIDEBUG 0
+#define ADIDEBUG_COUNT 0
 
 #include <kernel/GBEngine/kutil.h>
 #include <misc/options.h>
@@ -116,13 +118,36 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
     {
       if (j > strat->tl) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
-      if (p_LmShortDivisibleBy(T[j].p, sevT[j],
-                               p, not_sev, r))
-        return j;
+      if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
+        {
+#ifdef HAVE_RINGS
+            if(rField_is_Ring(r))
+                {if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r))
+                    return j;}
+            else {
+                return j;
+                }
+#else
+            return j;
+#endif
+
+        }
 #else
       if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].p, p, r))
-        return j;
+        {
+#ifdef HAVE_RINGS
+            if(rField_is_Ring(r))
+                {if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r))
+                    return j;}
+            else {
+                return j;
+                }
+#else
+            return j;
+#endif
+            
+        }
 #endif
       j++;
     }
@@ -137,11 +162,35 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
                                p, not_sev, r))
-        return j;
+        {
+#ifdef HAVE_RINGS
+            if(rField_is_Ring(r))
+                {if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r))
+                    return j;}
+            else {
+                return j;
+            }
+#else
+            return j;
+#endif
+
+        }
 #else
       if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].t_p, p, r))
-        return j;
+        {
+#ifdef HAVE_RINGS
+            if(rField_is_Ring(r))
+                {if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r))
+                    return j;}
+            else {
+                return j;
+            }
+#else
+            return j;
+#endif
+
+        }
 #endif
       j++;
     }
@@ -171,11 +220,27 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
     if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
                              p, not_sev, currRing))
-        return j;
+        {
+#ifdef HAVE_RINGS
+            if(rField_is_Ring(currRing))
+                {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
+                    return j;}
+            else
+#endif
+            return j;
+        }
 #else
     if ( !(strat->sevS[j] & not_sev) &&
          p_LmDivisibleBy(strat->S[j], p, currRing))
-      return j;
+        {
+#ifdef HAVE_RINGS
+            if(rField_is_Ring(currRing))
+                {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
+                    return j;}
+            else
+#endif
+            return j;
+        }
 #endif
     j++;
   }
@@ -199,11 +264,27 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
     if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
                              p, not_sev, currRing))
-        return j;
+        {
+#ifdef HAVE_RINGS
+            if(rField_is_Ring(currRing))
+                {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
+                    return j;}
+            else
+#endif
+            return j;
+        }
 #else
     if ( !(strat->sevS[j] & not_sev) &&
          p_LmDivisibleBy(strat->S[j], p, currRing))
-      return j;
+        {
+#ifdef HAVE_RINGS
+            if(rField_is_Ring(currRing))
+                {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
+                    return j;}
+            else
+#endif
+            return j;
+        }
 #endif
     j++;
   }
@@ -1413,6 +1494,44 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
+    #if ADIDEBUG
+    printf("\n      ------------------------NEW LOOP\n");
+    printf("\nShdl = \n");
+    #if 0
+    idPrint(strat->Shdl);
+    #else
+    for(int ii = 0; ii<=strat->sl;ii++)
+        p_Write(strat->S[ii],strat->tailRing);
+    #endif
+    printf("\n   list   L\n");
+    int iii;
+    #if 1
+    for(iii = 0; iii<= strat->Ll; iii++)
+    {
+        printf("L[%i]:",iii);
+        p_Write(strat->L[iii].p, /*strat->tailRing*/currRing);
+        p_Write(strat->L[iii].p1, /*strat->tailRing*/currRing);
+        p_Write(strat->L[iii].p2, strat->tailRing);
+    }
+    #else
+    {
+        printf("L[%i]:",strat->Ll);
+        p_Write(strat->L[strat->Ll].p, strat->tailRing);
+        p_Write(strat->L[strat->Ll].p1, strat->tailRing);
+        p_Write(strat->L[strat->Ll].p2, strat->tailRing);
+    }
+    #endif
+    #if 1
+    for(iii = 0; iii<= strat->Bl; iii++)
+    {
+        printf("B[%i]:",iii);
+        p_Write(strat->B[iii].p, /*strat->tailRing*/currRing);
+        p_Write(strat->B[iii].p1, /*strat->tailRing*/currRing);
+        p_Write(strat->B[iii].p2, strat->tailRing);
+    }
+    #endif
+    //getchar();
+    #endif
     #ifdef KDEBUG
       if (TEST_OPT_DEBUG) messageSets(strat);
     #endif
@@ -1487,7 +1606,13 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
                 &olddeg,&reduc,strat, red_result);
 
       /* reduction of the element chosen from L */
+      #if ADIDEBUG
+      printf("\nBefore \n");pWrite(strat->P.p);
+      #endif
       red_result = strat->red(&strat->P,strat);
+      #if ADIDEBUG
+      printf("\nAfter \n");pWrite(strat->P.p);
+      #endif
       if (errorreported)  break;
     }
 
@@ -1575,6 +1700,10 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
           enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         // posInS only depends on the leading term
+        #if ADIDEBUG
+        printf("\nThis element is added to S\n");
+        p_Write(strat->P.p, strat->tailRing);p_Write(strat->P.p1, strat->tailRing);p_Write(strat->P.p2, strat->tailRing);
+        #endif
         strat->enterS(strat->P, pos, strat, strat->tl);
 #if 0
         int pl=pLength(strat->P.p);
@@ -1673,9 +1802,12 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       completeReduce(strat);
     }
 #endif
+    #ifdef HAVE_RINGS
+    if(nCoeff_is_Ring_Z(currRing->cf))
+      finalReduceByMon(strat);
+    #endif
   }
   else if (TEST_OPT_PROT) PrintLn();
-
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
 //  if (TEST_OPT_WEIGHTM)
