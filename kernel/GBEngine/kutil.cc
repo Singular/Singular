@@ -8604,17 +8604,22 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
           if ((Q->m[q]!=NULL)
           &&(pLmDivisibleBy(Q->m[q],r->m[l])))
           {
-            if (TEST_OPT_REDSB)
+            #if HAVE_RINGS
+            if(!rField_is_Ring(currRing) || n_DivBy(r->m[l]->coef, Q->m[q]->coef, currRing)))
+            #endif
             {
-              p=r->m[l];
-              r->m[l]=kNF(Q,NULL,p);
-              pDelete(&p);
+                if (TEST_OPT_REDSB)
+                {
+                  p=r->m[l];
+                  r->m[l]=kNF(Q,NULL,p);
+                  pDelete(&p);
+                }
+                else
+                {
+                  pDelete(&r->m[l]); // and set it to NULL
+                }
+                break;
             }
-            else
-            {
-              pDelete(&r->m[l]); // and set it to NULL
-            }
-            break;
           }
         }
       }
@@ -8662,21 +8667,23 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
         {
           for(q=IDELEMS(Q)-1; q>=0;q--)
           {
-            if ((Q->m[q]!=NULL)&&(pLmEqual(Q->m[q],r->m[l]))
-            && pDivisibleBy(Q->m[q],r->m[l]))
+            if(!rField_is_Ring(currRing) || n_DivBy(r->m[l]->coef, Q->m[q]->coef, currRing))
             {
-              if (TEST_OPT_REDSB)
-              {
-                p=r->m[l];
-                r->m[l]=kNF(Q,NULL,p);
-                pDelete(&p);
-                reduction_found=TRUE;
-              }
-              else
-              {
-                pDelete(&r->m[l]); // and set it to NULL
-              }
+                if ((Q->m[q]!=NULL)&&(pLmEqual(Q->m[q],r->m[l])) && pDivisibleBy(Q->m[q],r->m[l]))
+                {
+                  if (TEST_OPT_REDSB)
+                  {
+                    p=r->m[l];
+                    r->m[l]=kNF(Q,NULL,p);
+                    pDelete(&p);
+                    reduction_found=TRUE;
+                  }
+                  else
+                  {
+                    pDelete(&r->m[l]); // and set it to NULL
+                  }
               break;
+              }
             }
           }
         }
@@ -8695,7 +8702,11 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
             && (r->m[q]!=NULL)
             &&(pLmDivisibleBy(r->m[l],r->m[q])))
             {
-              pDelete(&r->m[q]);
+                #if HAVE_RINGS
+                if(!rField_is_Ring(currRing) ||
+                   n_DivBy(r->m[q]->coef, r->m[l]->coef, currRing))
+                #endif
+                  pDelete(&r->m[q]);
             }
           }
         }
