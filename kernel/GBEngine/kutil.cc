@@ -1597,6 +1597,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   #endif
   enterL(&strat->B,&strat->Bl,&strat->Bmax,h,posx);
   kTest_TS(strat);
+  #endif
 }
 
 
@@ -3250,7 +3251,6 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
       }
     }
     #if 1
-
     if (new_pair)
     {
     #ifdef HAVE_RATGRING
@@ -3262,8 +3262,8 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
     }
     #else
     kMergeBintoL(strat);
+    #endif
   }
-  #endif
 }
 
 /*2
@@ -8668,7 +8668,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
           &&(pLmDivisibleBy(Q->m[q],r->m[l])))
           {
             #if HAVE_RINGS
-            if(!rField_is_Ring(currRing) || n_DivBy(r->m[l]->coef, Q->m[q]->coef, currRing)))
+            if(!rField_is_Ring(currRing) || n_DivBy(r->m[l]->coef, Q->m[q]->coef, currRing))
             #endif
             {
                 if (TEST_OPT_REDSB)

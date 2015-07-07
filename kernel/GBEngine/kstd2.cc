@@ -424,13 +424,13 @@ int redRing (LObject* h,kStrategy strat)
   h->SetShortExpVector();
   loop
   {
-    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    j = kFindDivisibleByInT(strat, h);
     if (j < 0) 
     {
         // over ZZ: cleanup coefficients by complete reduction with monomials
         postReduceByMon(h, strat);
         if(nIsZero(pGetCoeff(h->p))) return 2;
-        j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+        j = kFindDivisibleByInT(strat, h);
         if(j < 0)
         {
           if(strat->tl >= 0)
