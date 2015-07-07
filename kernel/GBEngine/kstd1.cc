@@ -742,13 +742,24 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
       if (kModDeg(H.p)>Kstd1_deg) pLmDelete(&H.p);
       if (H.p==NULL) return NULL;
     }
-    if (p_LmShortDivisibleBy(strat->T[j].GetLmTailRing(), strat->sevT[j], H.GetLmTailRing(), not_sev, strat->tailRing))
+    #if ADIDEBUG_NF
+    printf("\nSearching for a reducer...\n");
+    #endif
+    if (p_LmShortDivisibleBy(strat->T[j].GetLmTailRing(), strat->sevT[j], H.GetLmTailRing(), not_sev, strat->tailRing)
+        #ifdef HAVE_RINGS
+        && (!rField_is_Ring(strat->tailRing) ||
+            n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing))
+        #endif
+        )
     {
       /*- remember the found T-poly -*/
       // poly pi = strat->T[j].p;
       int ei = strat->T[j].ecart;
       int li = strat->T[j].length;
       int ii = j;
+      #if ADIDEBUG_NF
+      printf("\nFound: j = %i, ecart = %i\nTrying to find a better one...\n",j,ei);pWrite(strat->T[j].p);
+      #endif
       /*
       * the polynomial to reduce with (up to the moment) is;
       * pi with ecart ei and length li
@@ -761,8 +772,14 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         if (j > strat->tl) break;
         if (ei <= H.ecart) break;
         if (((strat->T[j].ecart < ei)
-          || ((strat->T[j].ecart == ei) && (strat->T[j].length < li)))
-        && pLmShortDivisibleBy(strat->T[j].p,strat->sevT[j], H.p, not_sev))
+          || ((strat->T[j].ecart == ei)
+        && (strat->T[j].length < li)))
+        && pLmShortDivisibleBy(strat->T[j].p,strat->sevT[j], H.p, not_sev) 
+        #ifdef HAVE_RINGS
+        && (!rField_is_Ring(strat->tailRing) ||
+            n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing))
+        #endif
+        )
         {
           /*
           * the polynomial to reduce with is now;
@@ -771,6 +788,10 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
           ei = strat->T[j].ecart;
           li = strat->T[j].length;
           ii = j;
+          #if ADIDEBUG_NF
+          printf("\nFound a better one: j = %i, ecart = %i\nTrying to find a better one...\n",j,ei);
+          pWrite(strat->T[j].p);
+          #endif
         }
       }
       /*
@@ -801,6 +822,10 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         if (H.p == NULL)
           return NULL;
       }
+      #if ADIDEBUG_NF
+      printf("\nAfter the small reduction it looks like this:\n");pWrite(H.p);
+      getchar();
+      #endif
       /*- try to reduce the s-polynomial -*/
       o = H.SetpFDeg();
       if ((flag &2 ) == 0) cancelunit(&H,TRUE);
