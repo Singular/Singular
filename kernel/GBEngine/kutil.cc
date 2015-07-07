@@ -1523,7 +1523,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     {
       pDelete(&sim2);
       pDelete(&pm1);
-      pDelete(&gcd);
       pDelete(&m1);
       pDelete(&m2);
       return;
@@ -1548,8 +1547,8 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     gcd = p_Add_q(pm1, sim2, strat->tailRing);
   }
   p_Test(gcd, strat->tailRing);
-  p_LmDelete(m1, strat->tailRing);
-  p_LmDelete(m2, strat->tailRing);
+  //p_LmDelete(m1, strat->tailRing);
+  //p_LmDelete(m2, strat->tailRing);
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
@@ -9215,8 +9214,8 @@ void postReduceByMon(LObject* h, kStrategy strat)
       {
         if(pLmDivisibleBy(strat->S[i], p))
         {
-          nDelete(&(p->coef));
-          p->coef = currRing->cf->cfIntMod(p->coef, strat->S[i]->coef, currRing->cf);
+          number c = currRing->cf->cfIntMod(p->coef, strat->S[i]->coef, currRing->cf);
+          pSetCoeff(p,c);
         }
         if(nIsZero(p->coef))
         {
@@ -9233,8 +9232,8 @@ void postReduceByMon(LObject* h, kStrategy strat)
       {
         if(pLmDivisibleBy(strat->S[i], pp))
         {
-          nDelete(&(pp->coef));
-          pp->coef = currRing->cf->cfIntMod(pp->coef, strat->S[i]->coef, currRing->cf);
+          number c = currRing->cf->cfIntMod(pp->coef, strat->S[i]->coef, currRing->cf);
+          pSetCoeff(pp,c);
           if(nIsZero(pp->coef))
           {
             pLmDelete(&pNext(p));
