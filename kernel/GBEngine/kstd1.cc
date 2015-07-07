@@ -1666,7 +1666,15 @@ loop_count = 1;
       if (TEST_OPT_PROT)
         message(strat->P.ecart+strat->P.GetpFDeg(),&olddeg,&reduc,strat, red_result);
       // reduce
+      #if ADIDEBUG
+      printf("\nThis is P vor red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
+      printf("\nBefore Ll = %i\n", strat->Ll);
+      #endif
       red_result = strat->red(&strat->P,strat);
+      #if ADIDEBUG
+      printf("\nThis is P nach red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
+      printf("\nBefore Ll = %i\n", strat->Ll);
+      #endif
     }
 
     if (! strat->P.IsNull())
@@ -1716,9 +1724,26 @@ loop_count = 1;
 #endif
       enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
       // put in S
+
+        #if ADIDEBUG
+        Print("\n    The new pair list L -- after superenterpairs in loop %d -- is:\n",loop_count);
+        for(int iii=0;iii<=strat->Ll;iii++)
+        {
+          printf("\n    L[%d]:\n",iii);
+          PrintS("         ");p_Write(strat->L[iii].p,strat->tailRing);
+          PrintS("         ");p_Write(strat->L[iii].p1,strat->tailRing);
+          PrintS("         ");p_Write(strat->L[iii].p2,strat->tailRing);
+        }
+        #endif
       strat->enterS(strat->P,
                     posInS(strat,strat->sl,strat->P.p, strat->P.ecart),
                     strat, strat->tl);
+      #if ADIDEBUG
+      printf("\nThis pair has been added to S:\n");
+      pWrite(strat->P.p);
+      pWrite(strat->P.p1);
+      pWrite(strat->P.p2);
+      #endif
 
       // apply hilbert criterion
       if (hilb!=NULL)
@@ -1765,7 +1790,7 @@ loop_count = 1;
     Print("\n    The new reducer list T -- at the end of loop %d -- is\n",loop_count);
     for(int iii=0;iii<=strat->tl;iii++)
     {
-      PrintS("\n    T[%d]:",iii);
+      printf("\n    T[%d]:",iii);
       p_Write(strat->T[iii].p,strat->tailRing);
     }
     PrintLn();
@@ -1801,6 +1826,10 @@ loop_count = 1;
 //      ecartWeights=NULL;
 //    }
 //  }
+#ifdef HAVE_RINGS
+  if(nCoeff_is_Ring_Z(currRing->cf))
+    finalReduceByMon(strat);
+#endif
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
   SI_RESTORE_OPT1(save1);
   idTest(strat->Shdl);
