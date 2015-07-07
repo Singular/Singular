@@ -1254,6 +1254,10 @@ void firstUpdate(kStrategy strat)
 void enterSMora (LObject &p,int atS,kStrategy strat, int atR = -1)
 {
   enterSBba(p, atS, strat, atR);
+  #ifdef HAVE_RINGS
+    if (rField_is_Ring(currRing))
+      return;
+  #endif
   #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
@@ -1562,6 +1566,32 @@ loop_count = 1;
 
   while (strat->Ll >= 0)
   {
+    #if ADIDEBUG
+    printf("\n      ------------------------NEW LOOP\n");
+    printf("\nShdl = \n");
+    for(int iii = 0; iii<= strat->sl; iii++)
+    {
+        printf("S[%i]:",iii);
+        p_Write(strat->S[iii], strat->tailRing);
+    }
+    printf("\n   list   L has %i\n", strat->Ll);
+    int iii;
+    #if ADIDEBUG
+    for(iii = 0; iii<= strat->Ll; iii++)
+    {
+        printf("L[%i]:",iii);
+        #if 0
+        p_Write(strat->L[iii].p, strat->tailRing);
+        p_Write(strat->L[iii].p1, strat->tailRing);
+        p_Write(strat->L[iii].p2, strat->tailRing);
+        #else
+        pWrite(strat->L[iii].p);
+        pWrite(strat->L[iii].p1);
+        pWrite(strat->L[iii].p2);
+        #endif
+    }
+    #endif
+    #endif
     #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
     #endif
@@ -1587,46 +1617,10 @@ loop_count = 1;
       if (strat->Ll<0) break;
       else strat->noClearS=TRUE;
     }
-
-#if ADIDEBUG
-#ifdef KDEBUG
-    Print("\n-------------------------------- LOOP %d ---------------------------------------\n",loop_count);
-    //print the list L: (p1,p2,p)
-    Print("\n    The pair list L -- in loop %d  -- is:\n",loop_count);
-    for(int iii=0;iii<=strat->Ll;iii++)
-    {
-      Print("\n    L[%d]:\n",iii);
-      PrintS("        ");p_Write(strat->L[iii].p1,strat->tailRing);
-      PrintS("        ");p_Write(strat->L[iii].p2,strat->tailRing);
-      PrintS("        ");p_Write(strat->L[iii].p,strat->tailRing);
-    }
-    PrintLn();
-#endif
-#endif
-
     strat->P = strat->L[strat->Ll];/*- picks the last element from the lazyset L -*/
     if (strat->Ll==0) strat->interpt=TRUE;
     strat->Ll--;
-
-#if ADIDEBUG
-#ifdef KDEBUG
-    PrintS("    My new pair P = (p1,p2,p) is:\n");
-    PrintS("      p1 = "); p_Write(strat->P.p1,strat->tailRing);PrintLn();
-    PrintS("      p2 = "); p_Write(strat->P.p2,strat->tailRing);PrintLn();
-    PrintS("      p = "); p_Write(strat->P.p,strat->tailRing); PrintLn();
-    Print("\n    The old reducer list T -- at the beg of loop %d -- is :",loop_count);
-    if(strat->tl<0)
-    {PrintS(" Empty.\n");}
-    else
-    for(int iii=0;iii<=strat->tl;iii++)
-    {
-      Print("\n    T[%d]:",iii);
-      p_Write(strat->T[iii].p,strat->T->tailRing);
-    }
-    PrintLn();
-#endif /* ADIDEBUG */
-#endif
-
+    //printf("\nThis is P:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
     // create the real Spoly
     if (pNext(strat->P.p) == strat->tail)
     {
@@ -1708,17 +1702,6 @@ loop_count = 1;
       if (rField_is_Ring(currRing))
       {
         superenterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
-
-#if ADIDEBUG
-        Print("\n    The new pair list L -- after superenterpairs in loop %d -- is:\n",loop_count);
-        for(int iii=0;iii<=strat->Ll;iii++)
-        {
-          PrintS("\n    L[%d]:\n",iii);
-          PrintS("         ");p_Write(strat->L[iii].p1,strat->tailRing);
-          PrintS("         ");p_Write(strat->L[iii].p2,strat->tailRing);
-          PrintS("         ");p_Write(strat->L[iii].p,strat->tailRing);
-        }
-#endif
       }
       else
 #endif
@@ -2232,10 +2215,64 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    if(rHasLocalOrMixedOrdering(currRing))
-      r=mora(F,Q,NULL,hilb,strat);
-    else
-      r=bba(F,Q,NULL,hilb,strat);
+    if(nCoeff_is_Ring_Z(currRing->cf))
+    {
+        #if 0        
+        if(nCoeff_is_Ring_Z(currRing->cf))
+        {
+            ideal FCopy = idCopy(F);
+            poly pFmon = preIntegerCheck(FCopy, Q);
+            if(pFmon != NULL)
+            {    
+              idInsertPoly(FCopy, pFmon);
+              printf("\nPreintegerCheck found this constant:\n");pWrite(pFmon);
+            }
+            strat->kModW=kModW=NULL;
+            if (h==testHomog)
+            {
+                if (strat->ak == 0)
+                {
+                  h = (tHomog)idHomIdeal(FCopy,Q);
+                  w=NULL;
+                }
+                else if (!TEST_OPT_DEGBOUND)
+                {
+                    h = (tHomog)idHomModule(FCopy,Q,w);
+                }
+            }
+            currRing->pLexOrder=b;
+            if (h==isHomog)
+            {
+                if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
+                {
+                  strat->kModW = kModW = *w;
+                  if (vw == NULL)
+                  {
+                    strat->pOrigFDeg = currRing->pFDeg;
+                    strat->pOrigLDeg = currRing->pLDeg;
+                    pSetDegProcs(currRing,kModDeg);
+                    toReset = TRUE;
+                  }
+                }
+                currRing->pLexOrder = TRUE;
+                if (hilb==NULL) strat->LazyPass*=2;
+            }
+            strat->homog=h;
+            omTestMemory(1);
+            if(currRing->OrdSgn == -1)
+                r=mora(FCopy,Q,NULL,hilb,strat);
+            else
+                r=bba(FCopy,Q,NULL,hilb,strat);
+        }
+        else
+#endif
+        {
+            if(currRing->OrdSgn == -1)
+                r=mora(F,Q,NULL,hilb,strat);
+            else
+                r=bba(F,Q,NULL,hilb,strat);
+        }
+    }
   }
   else
 #endif
