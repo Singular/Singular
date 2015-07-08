@@ -102,23 +102,9 @@ static FORCE_INLINE BOOLEAN nlIsInteger(number q, const coeffs r)
   n_Test(q, r);
   
   if (SR_HDL(q) & SR_INT)
-    return 1; // immidiate int
+    return TRUE; // immidiate int
   
-  if( q->s == 3 )
-  {
-    assume( q->n == NULL );
-    return 1; // integer with n==NULL
-  }
-
-  number qq = n_Copy(q, r);
-  number nn = n_GetDenom(qq, r);
-
-  const BOOLEAN ret = n_IsOne(nn, r);
-
-  n_Delete( &nn, r);
-  n_Delete( &qq, r);
-
-  return ret;
+  return ( q->s == 3 );
 }
 
 number nlModP(number q, const coeffs Q, const coeffs Zp);
