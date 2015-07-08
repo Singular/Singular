@@ -71,11 +71,10 @@
 
 
 #ifdef LDEBUG
-#define ntTest(a) ntDBTest(a,__FILE__,__LINE__,cf)
 BOOLEAN  ntDBTest(number a, const char *f, const int l, const coeffs r);
-#else
-#define ntTest(a) do {} while (0)
 #endif
+
+#define ntTest(a) n_Test(a, cf)
 
 /// Our own type!
 static const n_coeffType ID = n_transExt;
@@ -183,15 +182,61 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
 
   //check_N(a,cf);
   const poly num = NUM(t);
-  assume(num != NULL);   /**< t != 0 ==> numerator(t) != 0 */
+  assume(num != NULL);   ///< t != 0 ==> numerator(t) != 0
 
   p_Test(num, ntRing);
+
+  if (getCoeffType(ntCoeffs)==n_Q)
+    for( poly p = num; p != NULL; pIter(p) )
+      if (! nlIsInteger( p_GetCoeff(p, ntRing), ntCoeffs) )
+      {
+        Print("ERROR: non-integer Q coeff in num. poly in %s:%d\n",f,l);        
+        return FALSE;      
+      }
 
   const poly den = DEN(t);
 
   if (den != NULL) // !DENIS1(f)
   {
     p_Test(den, ntRing);
+
+    if (getCoeffType(ntCoeffs)==n_Q)
+      for( poly p = den; p != NULL; pIter(p) )
+        if (! nlIsInteger( p_GetCoeff(p, ntRing), ntCoeffs) )
+        {
+          Print("ERROR: non-integer Q coeff in den. poly in %s:%d\n",f,l);        
+          return FALSE;      
+        }
+
+    if (getCoeffType(ntCoeffs)==n_Zp)
+    {
+      if( p_IsConstant(den, ntRing) )
+      {
+        Print("ERROR: constant den. poly / Zp in %s:%d\n",f,l);        
+        return FALSE;
+      }
+         
+      if( !n_IsOne(pGetCoeff(den), ntCoeffs) )
+      {       
+        Print("ERROR: non-monic den. poly / Zp in %s:%d\n",f,l);        
+        return FALSE;
+      }
+    }
+    
+    poly gcd = singclap_gcd_r( num, den, ntRing );
+
+    if( !(p_IsConstant(gcd, ntRing) && (n_IsOne(pGetCoeff(gcd), ntCoeffs))) )
+    {
+      Print("ERROR: 1 != GCD between num. & den. poly in %s:%d\n",f,l);        
+      return FALSE;
+    }
+
+    p_Delete( &gcd, ntRing );
+
+    return TRUE;
+    
+
+    
     if(p_IsConstant(den, ntRing) && (n_IsOne(pGetCoeff(den), ntCoeffs)))
     {
       Print("?/1 in %s:%d\n",f,l);
@@ -205,7 +250,10 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
     // test that den is over integers!?
   }
   else
-  {  // num != NULL // den == NULL
+  {
+    return TRUE;
+
+    // num != NULL // den == NULL
 //    if( COM(t) != 0 )
 //    {
 //      Print("?//NULL with non-zero complexity: %d in %s:%d\n", COM(t), f, l);
@@ -278,6 +326,7 @@ void ntDelete(number * a, const coeffs cf)
 {
   //check_N(*a,cf);
   ntTest(*a); // !!!
+  
   fraction f = (fraction)(*a);
   if (IS0(f)) return;
   p_Delete(&NUM(f), ntRing);
@@ -579,6 +628,7 @@ number ntInit(poly p, const coeffs cf)
 {
   if (p == NULL) return NULL;
 
+  p_Test( p, ntRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
 
   if (nCoeff_is_Q(ntCoeffs))
@@ -791,6 +841,7 @@ number ntDiff(number a, number d, const coeffs cf)
      }
      COM(result) = COM(fa);
      //check_N((number)result,cf);
+     ntTest((number)result);
      return (number)result;
   }
 
@@ -803,6 +854,7 @@ number ntDiff(number a, number d, const coeffs cf)
   heuristicGcdCancellation((number)result, cf);
 
   //check_N((number)result,cf);
+  ntTest((number)result);
   return (number)result;
 }
 
@@ -844,6 +896,7 @@ number ntAdd(number a, number b, const coeffs cf)
 //  ntTest((number)result);
 
   //check_N((number)result,cf);
+  ntTest((number)result);
   return (number)result;
 }
 
@@ -882,6 +935,7 @@ number ntSub(number a, number b, const coeffs cf)
   heuristicGcdCancellation((number)result, cf);
 //  ntTest((number)result);
   //check_N((number)result,cf);
+  ntTest((number)result);
   return (number)result;
 }
 
@@ -952,6 +1006,7 @@ number ntMult(number a, number b, const coeffs cf)
 //  ntTest((number)result);
 
   //check_N((number)result,cf);
+  ntTest((number)result);
   return (number)result;
 }
 
@@ -991,6 +1046,7 @@ number ntDiv(number a, number b, const coeffs cf)
   heuristicGcdCancellation((number)result, cf);
 //  ntTest((number)result);
   //check_N((number)result,cf);
+  ntTest((number)result);
   return (number)result;
 }
 
@@ -1241,12 +1297,12 @@ void heuristicGcdCancellation(number a, const coeffs cf)
 void definiteGcdCancellation(number a, const coeffs cf,
                              BOOLEAN simpleTestsHaveAlreadyBeenPerformed)
 {
-  ntTest(a); // !!!!
+//  ntTest(a); // !!!!
 
   fraction f = (fraction)a;
 
   if (IS0(a)) return;
-  if (DENIS1(f) || NUMIS1(f)) { COM(f) = 0; return; }
+  if (DENIS1(f) || NUMIS1(f)) { COM(f) = 0; ntTest(a); return; }
   if (!simpleTestsHaveAlreadyBeenPerformed)
   {
 
@@ -1441,6 +1497,7 @@ const char * ntRead(const char *s, number *a, const coeffs cf)
   const char * result = p_Read(s, p, ntRing);
   if (p == NULL) *a = NULL;
   else *a = ntInit(p, cf);
+  ntTest(*a);
   return result;
 }
 
@@ -1569,7 +1626,7 @@ number ntNormalizeHelper(number a, number b, const coeffs cf)
     ntTest((number)result); // !!!!
     return (number)result;
 
-  return NULL;
+    return NULL;
 }
 
 number ntGcd(number a, number b, const coeffs cf)
@@ -1747,13 +1804,14 @@ number ntInvers(number a, const coeffs cf)
 /* assumes that src = Q or Z, dst = Q(t_1, ..., t_s) */
 number ntMap00(number a, const coeffs src, const coeffs dst)
 {
-  if (n_IsZero(a, src)) return NULL;
   n_Test(a, src);
+  
+  if (n_IsZero(a, src)) return NULL;
   assume(src->rep == dst->extRing->cf->rep);
   if ((SR_HDL(a) & SR_INT) || (a->s==3))
   {
     number res=ntInit(p_NSet(n_Copy(a, src), dst->extRing), dst);
-    n_Test(res,dst);
+    n_Test(res, dst);
     return res;
   }
   number nn=n_GetDenom(a,src);
@@ -1762,6 +1820,7 @@ number ntMap00(number a, const coeffs src, const coeffs dst)
   fraction ff=(fraction)res;
   if (n_IsOne(nn,src)) DEN(ff)=NULL;
   else                 DEN(ff)=p_NSet(nn,dst->extRing);
+  
   n_Test((number)ff,dst);
   //check_N((number)ff,dst);
   return (number)ff;
@@ -1769,8 +1828,8 @@ number ntMap00(number a, const coeffs src, const coeffs dst)
 
 number ntMapZ0(number a, const coeffs src, const coeffs dst)
 {
-  if (n_IsZero(a, src)) return NULL;
   n_Test(a, src);
+  if (n_IsZero(a, src)) return NULL;
   nMapFunc nMap=n_SetMap(src,dst->extRing->cf);
   poly p=p_NSet(nMap(a, src,dst->extRing->cf), dst->extRing);
   if (n_IsZero(pGetCoeff(p),dst->extRing->cf))
@@ -1783,8 +1842,8 @@ number ntMapZ0(number a, const coeffs src, const coeffs dst)
 /* assumes that src = Z/p, dst = Q(t_1, ..., t_s) */
 number ntMapP0(number a, const coeffs src, const coeffs dst)
 {
-  if (n_IsZero(a, src)) return NULL;
   n_Test(a, src);
+  if (n_IsZero(a, src)) return NULL;
   /* mapping via intermediate int: */
   int n = n_Int(a, src);
   number q = n_Init(n, dst->extRing->cf);
@@ -2379,10 +2438,11 @@ static void ntClearDenominators(ICoeffsEnumerator& numberCollectionEnumerator, n
 number  ntChineseRemainder(number *x, number *q,int rl, BOOLEAN sym,CFArray &inv_cache,const coeffs cf)
 {
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  int i;
 
   poly *P=(poly*)omAlloc(rl*sizeof(poly*));
   number *X=(number *)omAlloc(rl*sizeof(number));
+
+  int i;
 
   for(i=0;i<rl;i++) P[i]=p_Copy(NUM((fraction)(x[i])),cf->extRing);
   NUM(result)=p_ChineseRemainder(P,X,q,rl,inv_cache,cf->extRing);
@@ -2401,6 +2461,7 @@ number  ntChineseRemainder(number *x, number *q,int rl, BOOLEAN sym,CFArray &inv
   {
     p_Delete(&DEN(result),ntRing);
   }
+  ntTest((number)result);
   return ((number)result);
 }
 
@@ -2410,6 +2471,7 @@ number  ntFarey(number p, number n, const coeffs cf)
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   NUM(result)=p_Farey(p_Copy(NUM((fraction)p),cf->extRing),n,cf->extRing);
   DEN(result)=p_Farey(p_Copy(DEN((fraction)p),cf->extRing),n,cf->extRing);
+  ntTest((number)result);
   return ((number)result);
 }
 
