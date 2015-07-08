@@ -190,7 +190,8 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
     for( poly p = num; p != NULL; pIter(p) )
       if (! nlIsInteger( p_GetCoeff(p, ntRing), ntCoeffs) )
       {
-        Print("ERROR: non-integer Q coeff in num. poly in %s:%d\n",f,l);        
+        Print("ERROR in %s:%d: non-integer Q coeff in num. poly\n",f,l);
+        Print("TERM: ");  p_wrp(p, ntRing); PrintLn();
         return FALSE;      
       }
 
@@ -204,7 +205,8 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
       for( poly p = den; p != NULL; pIter(p) )
         if (! nlIsInteger( p_GetCoeff(p, ntRing), ntCoeffs) )
         {
-          Print("ERROR: non-integer Q coeff in den. poly in %s:%d\n",f,l);        
+          Print("ERROR in %s:%d: non-integer Q coeff in den. poly\n",f,l);        
+          Print("TERM: "); p_wrp(p, ntRing);  PrintLn();
           return FALSE;      
         }
 
@@ -212,22 +214,29 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
     {
       if( p_IsConstant(den, ntRing) )
       {
-        Print("ERROR: constant den. poly / Zp in %s:%d\n",f,l);        
+        Print("ERROR in %s:%d: constant den. poly / Zp\n",f,l);
+        Print("NUM: ");  p_Write(num, ntRing);
+        Print("DEN: ");  p_Write(den, ntRing);
         return FALSE;
       }
          
       if( !n_IsOne(pGetCoeff(den), ntCoeffs) )
       {       
-        Print("ERROR: non-monic den. poly / Zp in %s:%d\n",f,l);        
+        Print("ERROR in %s:%d: non-monic den. poly / Zp\n",f,l);        
+        Print("NUM: ");  p_Write(num, ntRing);
+        Print("DEN: ");  p_Write(den, ntRing);
         return FALSE;
       }
     }
     
     poly gcd = singclap_gcd_r( num, den, ntRing );
 
-    if( !(p_IsConstant(gcd, ntRing) && (n_IsOne(pGetCoeff(gcd), ntCoeffs))) )
+    if( !p_IsOne(gcd, ntRing) )
     {
-      Print("ERROR: 1 != GCD between num. & den. poly in %s:%d\n",f,l);        
+      Print("ERROR in %s:%d: 1 != GCD between num. & den. poly\n",f,l);
+      Print("GCD: ");  p_Write(gcd, ntRing);
+      Print("NUM: ");  p_Write(num, ntRing);
+      Print("DEN: ");  p_Write(den, ntRing);
       return FALSE;
     }
 
