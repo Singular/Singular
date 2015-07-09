@@ -13,7 +13,7 @@
 
 #define MYTEST 0
 
-#define ADIDEBUG 1
+#define ADIDEBUG 0
 #define ADIDEBUG_NF 0
 
 #include <kernel/mod2.h>
@@ -1556,7 +1556,8 @@ loop_count = 1;
 
 #ifdef HAVE_TAIL_RING
   if (strat->homog && strat->red == redFirst)
-    kStratInitChangeTailRing(strat); 
+    if(!idIs0(F) &&(!rField_is_Ring(currRing)))
+      kStratInitChangeTailRing(strat); 
 #endif
 
   if (BVERBOSE(23))
@@ -2218,7 +2219,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   {
     if(nCoeff_is_Ring_Z(currRing->cf))
     {
-        #if 1
+        #if 0
         if(nCoeff_is_Ring_Z(currRing->cf))
         {
             ideal FCopy = idCopy(F);

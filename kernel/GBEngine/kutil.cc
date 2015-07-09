@@ -1331,8 +1331,8 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     gcd = p_Add_q(pm1, sim2, strat->tailRing);
   }
   p_Test(gcd, strat->tailRing);
-  p_LmDelete(m1, strat->tailRing);
-  p_LmDelete(m2, strat->tailRing);
+  //p_LmDelete(m1, strat->tailRing);
+  //p_LmDelete(m2, strat->tailRing);
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
@@ -1380,7 +1380,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   #endif
   enterL(&strat->B,&strat->Bl,&strat->Bmax,h,posx);
   kTest_TS(strat);
-  #endif
 }
 
 
@@ -8791,6 +8790,7 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
               II->m[i+1] = II->m[i];
       II->m[0] = pOne();
       ideal syz = idSyzygies(II, isNotHomog, NULL); 
+      //idPrint(syz);
       poly integer = NULL;
       for(int i = IDELEMS(syz)-1;i>=0; i--)
       {
