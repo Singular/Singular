@@ -1555,8 +1555,8 @@ loop_count = 1;
   /*- compute-------------------------------------------*/
 
 #ifdef HAVE_TAIL_RING
-//  if (strat->homog && strat->red == redFirst)
-  kStratInitChangeTailRing(strat);
+  if (strat->homog && strat->red == redFirst)
+    kStratInitChangeTailRing(strat); 
 #endif
 
   if (BVERBOSE(23))
@@ -2262,7 +2262,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
             }
             strat->homog=h;
             omTestMemory(1);
-            if(currRing->OrdSgn == -1)
+            if(rHasLocalOrMixedOrdering(currRing))
                 r=mora(FCopy,Q,NULL,hilb,strat);
             else
                 r=bba(FCopy,Q,NULL,hilb,strat);
@@ -2270,7 +2270,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
         else
 #endif
         {
-            if(currRing->OrdSgn == -1)
+            if(rHasLocalOrMixedOrdering(currRing))
                 r=mora(F,Q,NULL,hilb,strat);
             else
                 r=bba(F,Q,NULL,hilb,strat);
