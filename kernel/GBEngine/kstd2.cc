@@ -1536,9 +1536,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     for(iii = 0; iii<= strat->Ll; iii++)
     {
         printf("L[%i]:",iii);
-        p_Write(strat->L[iii].p, /*strat->tailRing*/currRing);
-        p_Write(strat->L[iii].p1, /*strat->tailRing*/currRing);
-        p_Write(strat->L[iii].p2, strat->tailRing);
+        p_Write(strat->L[iii].p, currRing);
+        p_Write(strat->L[iii].p1, currRing);
+        p_Write(strat->L[iii].p2, currRing);
     }
     #else
     {
@@ -1557,7 +1557,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         p_Write(strat->B[iii].p2, strat->tailRing);
     }
     #endif
-    //getchar();
+    getchar();
     #endif
     #ifdef KDEBUG
       if (TEST_OPT_DEBUG) messageSets(strat);
@@ -1829,13 +1829,13 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       completeReduce(strat);
     }
 #endif
-    #ifdef HAVE_RINGS
-    if(nCoeff_is_Ring_Z(currRing->cf))
-      finalReduceByMon(strat);
-    #endif
   }
   else if (TEST_OPT_PROT) PrintLn();
   /* release temp data-------------------------------- */
+  #ifdef HAVE_RINGS
+  if(nCoeff_is_Ring_Z(currRing->cf))
+    finalReduceByMon(strat);
+  #endif
   exitBuchMora(strat);
 //  if (TEST_OPT_WEIGHTM)
 //  {

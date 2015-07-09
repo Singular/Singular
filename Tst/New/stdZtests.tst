@@ -61,16 +61,6 @@ gI;
 ggI;
 
 
-
-ring rng = (integer),(x,y,z),(dp(3),C);
-option(redSB);
-option(redTail);
-ideal I = -5*x*z^2-73*y*z^2, 2*x^3*y*z-129*x*z^2+8, 11*y^3*z^2+85*x^2*y*z;
-ideal gI =  std(I);
-ideal ggI =  std(gI);
-size(gI)==size(ggI);
-
-
 ring rng = (integer),(x,y,z),(dp(3),C);
 option(redSB);
 option(redTail);
@@ -176,7 +166,10 @@ ideal J  = std(I);
 ring rng = (integer),(xw,xq,xk),(lp(2),lp(1),C);
 ideal I = -4*xk+10;
 ideal J = -7*xw+4*xk,-13;
-idealsEqual( intersect(I,J) , intersect(std(I),std(J) ) );
+ideal IJ = intersect(I,J);
+ideal stdIstdJ = intersect(std(I),std(J) ) );
+reduce(IJ,stdIstdJ);
+reduce(stdIstdJ,IJ);
 
 
 //Github Adi #42
@@ -285,6 +278,7 @@ ring rng = (integer),(x,y,z),(dp(3),C);
 ideal Q = x,yz2+5;
 qring QR = std(Q);
 poly a = z;
+std(a);
 ideal J = 5,z,x;
 ideal aJJ =  quotient( a*J, J );
 aJJ;

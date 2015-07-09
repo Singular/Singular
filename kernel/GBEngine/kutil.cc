@@ -1511,8 +1511,8 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   pSetCoeff0(m1, s);
   pSetCoeff0(m2, t);
   pNeg(m2);
-  p_Test(m1,strat->tailRing);
-  p_Test(m2,strat->tailRing);
+  p_Test(m1, strat->tailRing);
+  p_Test(m2, strat->tailRing);
   poly si = pCopy(strat->S[i]);
   poly pm1 = pp_Mult_mm(pNext(p), m1, strat->tailRing);
   poly sim2 = pp_Mult_mm(pNext(si), m2, strat->tailRing);
@@ -1529,7 +1529,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     }
     else
     {
-      gcd = pCopy(pm1);
+      gcd = p_Copy(pm1, strat->tailRing);
       pDelete(&pm1);
       pDelete(&sim2);
       pDelete(&m1);
@@ -4047,70 +4047,11 @@ void clearSbatch (poly h,int k,int pos,kStrategy strat)
 */
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
-#if ADIDEBUG
-  PrintS("\nEnter superenterpairs\n");
-  int iii = strat->Ll;
-#endif
   assume (rField_is_Ring(currRing));
   // enter also zero divisor * poly, if this is non zero and of smaller degree
   if (!(rField_is_Domain(currRing))) enterExtendedSpoly(h, strat);
-#if ADIDEBUG
-  if(iii==strat->Ll)
-  {
-    PrintS("\n                enterExtendedSpoly has not changed the list L.\n");
-  }
-  else
-  {
-    PrintLn();
-    PrintS("\n                enterExtendedSpoly changed the list L:\n");
-    for(iii=0;iii<=strat->Ll;iii++)
-    {
-      Print("\n                L[%d]:\n",iii);
-      PrintS("                     ");p_Write(strat->L[iii].p1,strat->tailRing);
-      PrintS("                     ");p_Write(strat->L[iii].p2,strat->tailRing);
-      PrintS("                     ");p_Write(strat->L[iii].p,strat->tailRing);
-    }
-  }
-  iii = strat->Ll;
-#endif
   initenterpairs(h, k, ecart, 0, strat, atR);
-#if ADIDEBUG
-  if(iii==strat->Ll)
-  {
-    PrintS("\n                initenterpairs has not changed the list L.\n");
-  }
-  else
-  {
-    PrintS("\n                initenterpairs changed the list L:\n");
-    for(iii=0;iii<=strat->Ll;iii++)
-    {
-      Print("\n                L[%d]:\n",iii);
-      PrintS("                     ");p_Write(strat->L[iii].p1,strat->tailRing);
-      PrintS("                     ");p_Write(strat->L[iii].p2,strat->tailRing);
-      PrintS("                     ");p_Write(strat->L[iii].p,strat->tailRing);
-    }
-  }
-  iii = strat->Ll;
-#endif
   initenterstrongPairs(h, k, ecart, 0, strat, atR);
-#if ADIDEBUG
-  if(iii==strat->Ll)
-  {
-    PrintS("\n                initenterstrongPairs has not changed the list L.\n");
-  }
-  else
-  {
-    PrintS("\n                initenterstrongPairs changed the list L:\n");
-    for(iii=0;iii<=strat->Ll;iii++)
-    {
-      Print("\n                L[%d]:\n",iii);
-      PrintS("                     ");p_Write(strat->L[iii].p1,strat->tailRing);
-      PrintS("                     ");p_Write(strat->L[iii].p2,strat->tailRing);
-      PrintS("                     ");p_Write(strat->L[iii].p,strat->tailRing);
-    }
-  }
-  PrintS("\nEnd of superenterpairs\n");
-#endif
   clearSbatch(h, k, pos, strat);
 }
 #endif
@@ -4126,30 +4067,7 @@ void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 #ifdef HAVE_RINGS
   assume (!rField_is_Ring(currRing));
 #endif
-  #if ADIDEBUG
-        Print("\n    Vor initenterpairs: The new pair list L -- after superenterpairs in loop\n");
-        for(int iii=0;iii<=strat->Ll;iii++)
-        {
-          printf("\n    L[%d]:\n",iii);
-          PrintS("         ");p_Write(strat->L[iii].p,strat->tailRing);
-          PrintS("         ");p_Write(strat->L[iii].p1,strat->tailRing);
-          PrintS("         ");p_Write(strat->L[iii].p2,strat->tailRing);
-        }
-        #endif
-
   initenterpairs(h,k,ecart,0,strat, atR);
-
-      #if ADIDEBUG
-        Print("\n    Nach initenterpairs: The new pair list L -- after superenterpairs in loop \n");
-        for(int iii=0;iii<=strat->Ll;iii++)
-        {
-          printf("\n    L[%d]:\n",iii);
-          PrintS("         ");p_Write(strat->L[iii].p,strat->tailRing);
-          PrintS("         ");p_Write(strat->L[iii].p1,strat->tailRing);
-          PrintS("         ");p_Write(strat->L[iii].p2,strat->tailRing);
-        }
-        #endif
-
   if ( (!strat->fromT)
   && ((strat->syzComp==0)
     ||(pGetComp(h)<=strat->syzComp)))
@@ -4162,9 +4080,7 @@ void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
       clearS(h,h_sev, &j,&k,strat);
       j++;
     }
-    //Print("end clearS sl=%d\n",strat->sl);
   }
- // PrintS("end enterpairs\n");
 }
 
 /*2
@@ -9042,10 +8958,10 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
   int posconst = idPosConstant(F);
   if((posconst != -1) && (!nIsZero(F->m[posconst]->coef)))
   {
-      pmon = pCopy(F->m[posconst]);
+      //pDelete(&pmon);
       idDelete(&F);
-      idDelete(&monred);
-      return pmon;
+      //idDelete(&monred);
+      return NULL;
   }
   int idelemQ = 0;
   if(Q!=NULL)
@@ -9061,10 +8977,9 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
       //the constant, if found, will be from Q 
       if((posconst != -1) && (!nIsZero(monred->m[posconst]->coef)))
       {
-          pmon = pCopy(monred->m[posconst]);
           idDelete(&F);
           idDelete(&monred);
-          return pmon;
+          return NULL;
       }
   }
   ring QQ_ring = rCopy0(currRing,FALSE);
@@ -9088,16 +9003,16 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
           if(II->m[i] != NULL)
               II->m[i+1] = II->m[i];
       II->m[0] = pOne();
-      ideal syz = idSyzygies(II, isNotHomog, NULL);     
+      ideal syz = idSyzygies(II, isNotHomog, NULL); 
       poly integer = NULL;
       for(int i = IDELEMS(syz)-1;i>=0; i--)
       {
           if(pGetComp(syz->m[i]) == 1)
           {
-              if(pIsConstant(syz->m[i]))
+              integer = pHead(syz->m[i]);
+              pSetComp(integer,0);
+              if(pIsConstant(integer))
               {
-                  integer = pHead(syz->m[i]);
-                  pSetComp(integer, 0);
                   break;
               }
           }
@@ -9106,11 +9021,11 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
       nMapFunc nMap2 = n_SetMap(QQ_ring->cf, origR->cf);
       pmon = prMapR(integer, nMap2, QQ_ring, origR);
       idDelete(&F);
-      idDelete(&monred);
-      idDelete(&II);
-      idDelete(&one);
-      idDelete(&syz);
-      pDelete(&integer);
+      //idDelete(&monred);
+      //idDelete(&II);
+      //idDelete(&one);
+      //idDelete(&syz);
+      //pDelete(&integer);
       rDelete(QQ_ring);
       return pmon;
   }
@@ -9185,10 +9100,10 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
       rChangeCurrRing(origR);
   }
   idDelete(&F);
-  idDelete(&monred);
-  idDelete(&II);
-  idDelete(&one);
-  pDelete(&pmon);
+  //idDelete(&monred);
+  //idDelete(&II);
+  //idDelete(&one);
+  //pDelete(&pmon);
   rDelete(QQ_ring);
   return NULL;
 }
@@ -9280,8 +9195,8 @@ void finalReduceByMon(kStrategy strat)
           p = strat->S[i];
           if(pLmDivisibleBy(strat->S[j], p))
           {
-            nDelete(&(p->coef));
-            p->coef = currRing->cf->cfIntMod(p->coef, strat->S[j]->coef, currRing->cf);
+            number n = currRing->cf->cfIntMod(p->coef, strat->S[j]->coef, currRing->cf);
+            pSetCoeff(p,n);
           }
           pp = pNext(p); 
           if((pp == NULL) && (nIsZero(p->coef)))
@@ -9294,8 +9209,8 @@ void finalReduceByMon(kStrategy strat)
               {
                 if(pLmDivisibleBy(strat->S[j], pp))
                 {
-                  nDelete(&(pp->coef));
-                  pp->coef = currRing->cf->cfIntMod(pp->coef, strat->S[j]->coef, currRing->cf);
+                  number n = currRing->cf->cfIntMod(pp->coef, strat->S[j]->coef, currRing->cf);
+                  pSetCoeff(pp,n);
                   if(nIsZero(pp->coef))
                   {
                     pLmDelete(&pNext(p));

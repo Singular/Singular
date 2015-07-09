@@ -13,7 +13,7 @@
 
 #define MYTEST 0
 
-#define ADIDEBUG 0
+#define ADIDEBUG 1
 #define ADIDEBUG_NF 0
 
 #include <kernel/mod2.h>
@@ -1591,6 +1591,7 @@ loop_count = 1;
         #endif
     }
     #endif
+    getchar();
     #endif
     #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
@@ -2217,7 +2218,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   {
     if(nCoeff_is_Ring_Z(currRing->cf))
     {
-        #if 0        
+        #if 1
         if(nCoeff_is_Ring_Z(currRing->cf))
         {
             ideal FCopy = idCopy(F);
@@ -2225,7 +2226,9 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
             if(pFmon != NULL)
             {    
               idInsertPoly(FCopy, pFmon);
+              #if ADIDEBUG
               printf("\nPreintegerCheck found this constant:\n");pWrite(pFmon);
+              #endif
             }
             strat->kModW=kModW=NULL;
             if (h==testHomog)
