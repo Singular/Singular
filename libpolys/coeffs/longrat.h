@@ -100,10 +100,10 @@ static FORCE_INLINE BOOLEAN nlIsInteger(number q, const coeffs r)
 {
   assume( nCoeff_is_Q (r) );
   n_Test(q, r);
-  
+
   if (SR_HDL(q) & SR_INT)
     return TRUE; // immidiate int
-  
+
   return ( q->s == 3 );
 }
 

@@ -3768,7 +3768,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
     }
     else
-#endif    
+#endif
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

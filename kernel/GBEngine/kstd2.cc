@@ -109,7 +109,7 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
   {
     const ring r=currRing;
     const poly p=L->p;
-     
+
     pAssume(~not_sev == p_GetShortExpVector(p, r));
 
     loop

@@ -192,7 +192,7 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
       {
         Print("ERROR in %s:%d: non-integer Q coeff in num. poly\n",f,l);
         Print("TERM: ");  p_wrp(p, ntRing); PrintLn();
-        return FALSE;      
+        return FALSE;
       }
 
   const poly den = DEN(t);
@@ -205,9 +205,9 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
       for( poly p = den; p != NULL; pIter(p) )
         if (! nlIsInteger( p_GetCoeff(p, ntRing), ntCoeffs) )
         {
-          Print("ERROR in %s:%d: non-integer Q coeff in den. poly\n",f,l);        
+          Print("ERROR in %s:%d: non-integer Q coeff in den. poly\n",f,l);
           Print("TERM: "); p_wrp(p, ntRing);  PrintLn();
-          return FALSE;      
+          return FALSE;
         }
 
     if (getCoeffType(ntCoeffs)==n_Zp)
@@ -219,16 +219,16 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
         Print("DEN: ");  p_Write(den, ntRing);
         return FALSE;
       }
-         
+
       if( !n_IsOne(pGetCoeff(den), ntCoeffs) )
-      {       
-        Print("ERROR in %s:%d: non-monic den. poly / Zp\n",f,l);        
+      {
+        Print("ERROR in %s:%d: non-monic den. poly / Zp\n",f,l);
         Print("NUM: ");  p_Write(num, ntRing);
         Print("DEN: ");  p_Write(den, ntRing);
         return FALSE;
       }
     }
-    
+
     poly gcd = singclap_gcd_r( num, den, ntRing );
 
     if( !p_IsOne(gcd, ntRing) )
@@ -243,9 +243,9 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
     p_Delete( &gcd, ntRing );
 
     return TRUE;
-    
 
-    
+
+
     if(p_IsConstant(den, ntRing) && (n_IsOne(pGetCoeff(den), ntCoeffs)))
     {
       Print("?/1 in %s:%d\n",f,l);
@@ -335,7 +335,7 @@ void ntDelete(number * a, const coeffs cf)
 {
   //check_N(*a,cf);
   ntTest(*a); // !!!
-  
+
   fraction f = (fraction)(*a);
   if (IS0(f)) return;
   p_Delete(&NUM(f), ntRing);
@@ -1814,7 +1814,7 @@ number ntInvers(number a, const coeffs cf)
 number ntMap00(number a, const coeffs src, const coeffs dst)
 {
   n_Test(a, src);
-  
+
   if (n_IsZero(a, src)) return NULL;
   assume(src->rep == dst->extRing->cf->rep);
   if ((SR_HDL(a) & SR_INT) || (a->s==3))
@@ -1829,7 +1829,7 @@ number ntMap00(number a, const coeffs src, const coeffs dst)
   fraction ff=(fraction)res;
   if (n_IsOne(nn,src)) DEN(ff)=NULL;
   else                 DEN(ff)=p_NSet(nn,dst->extRing);
-  
+
   n_Test((number)ff,dst);
   //check_N((number)ff,dst);
   return (number)ff;

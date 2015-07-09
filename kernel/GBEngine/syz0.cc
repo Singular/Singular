@@ -659,20 +659,20 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
             }
             else
             {
-              pDelete(&toRed); 
-              
+              pDelete(&toRed);
+
               pDelete(&syz);
               for(k=j;k<Fl;k++) pDelete(&(pairs[k]));
               omFreeSize((ADDRESS)pairs,(Fl + gencQ)*sizeof(poly));
 
-              
+
               for(k=0;k<IDELEMS(result);k++) pDelete(&((*Shdl)[k]));
 
               kBucketDestroy(&(sy0buck));
 
               //no polynom for reduction
               WerrorS("ideal not a standard basis");
-              
+
               return result;
             }
           }
@@ -902,7 +902,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
         res[syzIndex+1] = sySchreyersSyzygiesFB(res[syzIndex],&modcomp,mW);
 
       if (errorreported)
-      {        
+      {
         for (j=0;j<*length;j++) idDelete( &res[j] );
         omFreeSize((ADDRESS)res,*length*sizeof(ideal));
         return NULL;
@@ -946,7 +946,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       if (syzIndex==0) syInitSort(res[0],&modcomp);
       res[syzIndex+1] = sySchreyersSyzygiesFM(res[syzIndex],&modcomp);
       if (errorreported)
-      {        
+      {
         for (j=0;j<*length;j++) idDelete( &res[j] );
         omFreeSize((ADDRESS)res,*length*sizeof(ideal));
         return NULL;
