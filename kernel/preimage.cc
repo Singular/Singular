@@ -84,7 +84,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id, const ring dst_r)
   int N = rVar(dst_r)+imagepvariables;
 
   ring tmpR;
-  if (rSumInternal(theImageRing,sourcering,tmpR,FALSE,TRUE)!=1)
+  if (rSumInternal(theImageRing,sourcering,tmpR,FALSE,2)!=1)
   {
      WerrorS("error in rSumInternal");
      return NULL;

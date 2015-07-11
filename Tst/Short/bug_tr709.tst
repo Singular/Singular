@@ -8,7 +8,7 @@ system("random",1426357199);
 def L2 = primdecGTZ(I);
 
 //here is the problem
-idealsEqual( radical( L2[2][1] ),  L2[2][2]  ); // 0 
+idealsEqual( radical( L2[2][1] ),  L2[2][2]  ); // 0
 L2[2][2] ;
 radical( L2[2][1] );
 std(L2[2][2]);

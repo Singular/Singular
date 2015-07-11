@@ -6,7 +6,7 @@ ring rng = (7,v),(x,y,z,u),(dp,C);
 minpoly = v^2+v+3;
 ideal I = (2*v+3)*y^2*z+(2*v+1)*y^2+(v-2),(-3*v-1)*x*z^2+(v)*x^2+(-3*v-1)*z^2,(3*v)*x^3+(-v);
 def L1 = primdecSY (I);
-def L2 = primdecSY ( std(I) ); 
+def L2 = primdecSY ( std(I) );
 size(L1);
 size(L2);
 

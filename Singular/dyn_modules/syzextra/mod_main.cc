@@ -81,7 +81,7 @@ static BOOLEAN id_IsModule(ideal id, ring r)
 
     for (int j=0; j<l; j++)
       if (id->m[j] != NULL && p_GetComp(id->m[j], r) > 0)
-        return TRUE;    
+        return TRUE;
 
     return FALSE; // rank: 1, only zero or no entries? can be an ideal OR module... BUT in the use-case should better be an ideal!
   }
@@ -90,7 +90,7 @@ static BOOLEAN id_IsModule(ideal id, ring r)
 }
 
 
-   
+
 
 static inline void NoReturn(leftv& res)
 {
@@ -1549,7 +1549,7 @@ static BOOLEAN GetInducedData(leftv res, leftv h)
 
   const int iLimit = r->typ[pos].data.is.limit;
   const ideal F = r->typ[pos].data.is.F;
-  
+
   ideal FF = id_Copy(F, r);
 
   lists l=(lists)omAllocBin(slists_bin);

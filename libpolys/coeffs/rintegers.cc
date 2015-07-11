@@ -338,7 +338,13 @@ number nrzMapQ(number from, const coeffs src, const coeffs /*dst*/)
 nMapFunc nrzSetMap(const coeffs src, const coeffs /*dst*/)
 {
   /* dst = currRing */
-  if (nCoeff_is_Ring_Z(src) || nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src))
+  /* dst = nrn */
+  if ((src->rep==n_rep_gmp)
+  && (nCoeff_is_Ring_Z(src) || nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src)))
+  {
+    return ndCopyMap; //nrzCopyMap;
+  }
+  if ((src->rep==n_rep_gap_gmp) /*&& nCoeff_is_Ring_Z(src)*/)
   {
     return ndCopyMap; //nrzCopyMap;
   }

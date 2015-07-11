@@ -3846,13 +3846,7 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
     if( zz == NULL ) return NULL;
     if( !DENIS1((fraction)z) )
     {
-      if (p_IsConstant(DEN((fraction)z),srcExtRing))
-      {
-        number n=pGetCoeff(DEN((fraction)z));
-        zz=p_Div_nn(zz,n,srcExtRing);
-        p_Normalize(zz,srcExtRing);
-      }
-      else
+      if (!p_IsConstant(DEN((fraction)z),srcExtRing))
         WarnS("Not defined: Cannot map a rational fraction and make a polynomial out of it! Ignoring the denumerator.");
     }
   }
@@ -3884,11 +3878,16 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
   else
     qq = p_PermPoly(zz, par_perm-1, srcExtRing, dst, nMap, NULL, rVar (srcExtRing)-1);
 
+  if(nCoeff_is_transExt(srcCf)
+  && (!DENIS1((fraction)z))
+  && p_IsConstant(DEN((fraction)z),srcExtRing))
+  {
+    number n=nMap(pGetCoeff(DEN((fraction)z)),srcExtRing->cf, dstCf);
+    qq=p_Div_nn(qq,n,dst);
+    n_Delete(&n,dstCf);
+    p_Normalize(qq,dst);
+  }
   p_Test (qq, dst);
-
-//       poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst, nMapFunc nMap, int *par_perm, int OldPar)
-
-//  assume( FALSE );  WarnS("longalg missing 2");
 
   return qq;
 }
@@ -3904,16 +3903,13 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
     p_Test(p, oldRing);
     PrintS("\np_PermPoly::p: "); p_Write(p, oldRing, oldRing); PrintLn();
 #endif
-
   const int OldpVariables = rVar(oldRing);
   poly result = NULL;
   poly result_last = NULL;
   poly aq = NULL; /* the map coefficient */
   poly qq; /* the mapped monomial */
-
   assume(dst != NULL);
   assume(dst->cf != NULL);
-
   while (p != NULL)
   {
     // map the coefficient
@@ -3921,40 +3917,27 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
     {
       qq = p_Init(dst);
       assume( nMap != NULL );
-
       number n = nMap(p_GetCoeff(p, oldRing), oldRing->cf, dst->cf);
-
       n_Test (n,dst->cf);
-
       if ( nCoeff_is_algExt(dst->cf) )
         n_Normalize(n, dst->cf);
-
       p_GetCoeff(qq, dst) = n;// Note: n can be a ZERO!!!
-      // coef may be zero:
-//      p_Test(qq, dst);
     }
     else
     {
       qq = p_One(dst);
-
 //      aq = naPermNumber(p_GetCoeff(p, oldRing), par_perm, OldPar, oldRing); // no dst???
 //      poly    n_PermNumber(const number z, const int *par_perm, const int P, const ring src, const ring dst)
       aq = n_PermNumber(p_GetCoeff(p, oldRing), par_perm, OldPar, oldRing, dst);
-
       p_Test(aq, dst);
-
       if ( nCoeff_is_algExt(dst->cf) )
         p_Normalize(aq,dst);
-
       if (aq == NULL)
         p_SetCoeff(qq, n_Init(0, dst->cf),dst); // Very dirty trick!!!
-
       p_Test(aq, dst);
     }
-
     if (rRing_has_Comp(dst))
        p_SetComp(qq, p_GetComp(p, oldRing), dst);
-
     if ( n_IsZero(pGetCoeff(qq), dst->cf) )
     {
       p_LmDelete(&qq,dst);
@@ -3980,10 +3963,8 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
             {
               assume( dst->cf->extRing == NULL );
               number ee = n_Param(1, dst);
-
               number eee;
               n_Power(ee, e, &eee, dst->cf); //nfDelete(ee,dst);
-
               ee = n_Mult(c, eee, dst->cf);
               //nfDelete(c,dst);nfDelete(eee,dst);
               pSetCoeff0(qq,ee);
@@ -3992,26 +3973,19 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
             {
               const int par = -perm[i];
               assume( par > 0 );
-
 //              WarnS("longalg missing 3");
 #if 1
               const coeffs C = dst->cf;
               assume( C != NULL );
-
               const ring R = C->extRing;
               assume( R != NULL );
-
               assume( par <= rVar(R) );
-
               poly pcn; // = (number)c
-
               assume( !n_IsZero(c, C) );
-
               if( nCoeff_is_algExt(C) )
                  pcn = (poly) c;
                else //            nCoeff_is_transExt(C)
                  pcn = NUM((fraction)c);
-
               if (pNext(pcn) == NULL) // c->z
                 p_AddExp(pcn, -perm[i], e, R);
               else /* more difficult: we have really to multiply: */
@@ -4019,19 +3993,16 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
                 poly mmc = p_ISet(1, R);
                 p_SetExp(mmc, -perm[i], e, R);
                 p_Setm(mmc, R);
-
                 number nnc;
                 // convert back to a number: number nnc = mmc;
                 if( nCoeff_is_algExt(C) )
                    nnc = (number) mmc;
                 else //            nCoeff_is_transExt(C)
                   nnc = ntInit(mmc, C);
-
                 p_GetCoeff(qq, dst) = n_Mult((number)c, nnc, C);
                 n_Delete((number *)&c, C);
                 n_Delete((number *)&nnc, C);
               }
-
               mapped_to_par=1;
 #endif
             }
@@ -4074,11 +4045,8 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
 
       if (aq!=NULL)
          qq=p_Mult_q(aq,qq,dst);
-
       aq = qq;
-
       while (pNext(aq) != NULL) pIter(aq);
-
       if (result_last==NULL)
       {
         result=qq;
@@ -4095,7 +4063,6 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
       p_Delete(&aq,dst);
     }
   }
-
   result=p_SortAdd(result,dst);
 #else
   //  if (qq!=NULL)
@@ -4126,7 +4093,6 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
   //}
 #endif
   p_Test(result,dst);
-
 #if 0
   p_Test(result,dst);
   PrintS("\nresult: "); p_Write(result,dst,dst); PrintLn();
@@ -4564,11 +4530,10 @@ static inline unsigned long GetBitFields(const long e,
 unsigned long p_GetShortExpVector(const poly p, const ring r)
 {
   assume(p != NULL);
-  if (p == NULL) return 0;
   unsigned long ev = 0; // short exponent vector
   unsigned int n = BIT_SIZEOF_LONG / r->N; // number of bits per exp
   unsigned int m1; // highest bit which is filled with (n+1)
-  unsigned int i = 0, j=1;
+  int i=0,j=1;
 
   if (n == 0)
   {
@@ -4579,13 +4544,13 @@ unsigned long p_GetShortExpVector(const poly p, const ring r)
     }
     else
     {
-      for (; j<=(unsigned long) r->N; j++)
+      for (; j<=r->N; j++)
       {
         if (p_GetExp(p,j,r) > 0) i++;
         if (i == BIT_SIZEOF_LONG) break;
       }
       if (i>0)
-        ev = ~((unsigned long)0) >> ((unsigned long) (BIT_SIZEOF_LONG - i));
+        ev = ~(0UL) >> (BIT_SIZEOF_LONG - i);
       return ev;
     }
   }
@@ -4613,16 +4578,17 @@ unsigned long p_GetShortExpVector(const poly p, const ring r)
 }
 
 
+///  p_GetShortExpVector of p * pp
 unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r)
 {
   assume(p != NULL);
   assume(pp != NULL);
-  if (p == NULL || pp == NULL) return 0;
 
   unsigned long ev = 0; // short exponent vector
   unsigned int n = BIT_SIZEOF_LONG / r->N; // number of bits per exp
   unsigned int m1; // highest bit which is filled with (n+1)
-  unsigned int i = 0, j=1;
+  int j=1;
+  unsigned long i = 0L;
 
   if (n == 0)
   {
@@ -4633,13 +4599,13 @@ unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r)
     }
     else
     {
-      for (; j<=(unsigned long) r->N; j++)
+      for (; j<=r->N; j++)
       {
         if (p_GetExp(p,j,r) > 0 || p_GetExp(pp,j,r) > 0) i++;
         if (i == BIT_SIZEOF_LONG) break;
       }
       if (i>0)
-        ev = ~((unsigned long)0) >> ((unsigned long) (BIT_SIZEOF_LONG - i));
+        ev = ~(0UL) >> (BIT_SIZEOF_LONG - i);
       return ev;
     }
   }

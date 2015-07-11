@@ -715,7 +715,9 @@ ring nc_rCreateNCcomm_rCopy(ring r)
  *         1 for compatible (and sum)
  */
 /* vartest: test for variable/paramter names
-* dp_dp: for comm. rings: use block order dp + dp/ds/wp
+* dp_dp: 0:block ordering
+*        1:for comm. rings: use block order dp + dp/ds/wp
+*        2:order aa(..),dp
 */
 int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 {
@@ -888,7 +890,32 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
   tmpR.names=names;
   /* ordering *======================================================== */
   tmpR.OrdSgn=1;
-  if (dp_dp
+  if ((dp_dp==2)
+  && (r1->OrdSgn==1)
+  && (r2->OrdSgn==1)
+#ifdef HAVE_PLURAL
+      && !rIsPluralRing(r1) && !rIsPluralRing(r2)
+#endif
+     )
+  {
+    tmpR.order=(int*)omAlloc0(4*sizeof(int));
+    tmpR.block0=(int*)omAlloc0(4*sizeof(int));
+    tmpR.block1=(int*)omAlloc0(4*sizeof(int));
+    tmpR.wvhdl=(int**) omAlloc0(4*sizeof(int**));
+    // ----
+    tmpR.block0[0] = 1;
+    tmpR.block1[0] = rVar(r1)+rVar(r2);
+    tmpR.order[0] = ringorder_aa;
+    tmpR.wvhdl[0]=(int*)omAlloc0((rVar(r1)+rVar(r2) + 1)*sizeof(int));
+    for(int i=0;i<rVar(r1);i++) tmpR.wvhdl[0][i]=1;
+    // ----
+    tmpR.block0[1] = 1;
+    tmpR.block1[1] = rVar(r1)+rVar(r2);
+    tmpR.order[1] = ringorder_dp;
+    // ----
+    tmpR.order[2] = ringorder_C;
+  }
+  else if (dp_dp
 #ifdef HAVE_PLURAL
       && !rIsPluralRing(r1) && !rIsPluralRing(r2)
 #endif
@@ -908,13 +935,13 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       && ((r2->order[0]==ringorder_wp)
         || (r2->order[0]==ringorder_Wp)
         || (r2->order[0]==ringorder_Dp))
-     )
-     {
-       tmpR.order[1]=r2->order[0];
-       if (r2->wvhdl[0]!=NULL)
-         tmpR.wvhdl[1]=(int *)omMemDup(r2->wvhdl[0]);
-     }
-     else
+      )
+      {
+        tmpR.order[1]=r2->order[0];
+        if (r2->wvhdl[0]!=NULL)
+          tmpR.wvhdl[1]=(int *)omMemDup(r2->wvhdl[0]);
+      }
+      else
         tmpR.order[1]=ringorder_dp;
     }
     else
@@ -1244,7 +1271,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
     omFree((ADDRESS)perm2);
   }
-  if (Q1!=NULL) 
+  if (Q1!=NULL)
   {
     if ( Q2!=NULL)
       Q = id_SimpleAdd(Q1,Q2,sum);

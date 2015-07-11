@@ -27,15 +27,15 @@ int GradedModules::assumeLevel = 5;
 
   example grgroebner;
   example grsyz;
-  
+
   example grprod;
   example grres;
-  
+
   example grtwists;
 
 
   example grtranspose;
   example grgens;
   example grpres;
-  
+
 tst_status(1);$
