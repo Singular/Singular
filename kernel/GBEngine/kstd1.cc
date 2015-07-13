@@ -2269,13 +2269,20 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
                 r=bba(FCopy,Q,NULL,hilb,strat);
         }
         else
-#endif
+        #endif
         {
             if(rHasLocalOrMixedOrdering(currRing))
                 r=mora(F,Q,NULL,hilb,strat);
             else
                 r=bba(F,Q,NULL,hilb,strat);
         }
+    }
+    else
+    {
+      if(rHasLocalOrMixedOrdering(currRing))
+        r=mora(F,Q,NULL,hilb,strat);
+      else
+        r=bba(F,Q,NULL,hilb,strat);
     }
   }
   else
