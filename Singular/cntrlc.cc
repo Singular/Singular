@@ -365,6 +365,9 @@ void sigint_handler(int /*sig*/)
                   sigint_handler_cnt++;
                   fputs("** Warning: Singular should be restarted as soon as possible **\n",stderr);
                   fflush(stderr);
+                  extern void my_yy_flush();
+                  my_yy_flush();
+                  currentVoice=feInitStdin(NULL);
                   longjmp(si_start_jmpbuf,1);
                 }
                 else

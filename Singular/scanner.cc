@@ -2329,3 +2329,6 @@ void myyoldbuffer(void * oldb)
   yy_switch_to_buffer((YY_BUFFER_STATE)oldb);
   //yy_flush_buffer((YY_BUFFER_STATE)oldb);
 }
+
+void my_yy_flush() { YY_FLUSH_BUFFER;BEGIN(0); }
+
