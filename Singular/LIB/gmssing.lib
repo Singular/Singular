@@ -109,7 +109,7 @@ static proc stdtrans(ideal I)
   }
 
   M=transpose(simplify(M,2));
-  I=M[1];
+  I=ideal(M[1]);
   attrib(I,"isSB",1);
   M=M[2..ncols(M)];
   module U=transpose(M);

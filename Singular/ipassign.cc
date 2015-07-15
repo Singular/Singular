@@ -843,6 +843,9 @@ static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr)
 {
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   matrix m=(matrix)a->CopyD(MATRIX_CMD);
+  if (TEST_V_ALLWARN)
+    if (MATROWS(m)>1)
+      Warn("assign matrix with %d rows to an ideal in >>%s<<",MATROWS(m),my_yylinebuf);
   IDELEMS((ideal)m)=MATROWS(m)*MATCOLS(m);
   ((ideal)m)->rank=1;
   MATROWS(m)=1;

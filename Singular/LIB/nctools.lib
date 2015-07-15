@@ -1596,7 +1596,7 @@ EXAMPLE: example isWeyl; shows an example
   matrix D = L[6];
   matrix U = UpOneMatrix(N);
   if (size(ideal(C-U)) <> 0) { return(notW); } // lt(xy)<>lt(yx)
-  ideal I = D;
+  ideal I = ideal(D);
   if (size(I) <> n) { return(notW); } // not n entries<>0
   I = simplify(I,4+2);
   int sI = size(I);

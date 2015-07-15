@@ -36,7 +36,7 @@
   // simplify(...,2); deletes 0-columns
   matrix jac = simplify(jacob(F),2);
   ideal T = x,y;
-  ideal J = jac*transpose(T);
+  ideal J = ideal(jac*transpose(T)); // use ideal(..) for flattening
   ideal H = M[5..9];
   ideal i = matrix(H)-J;         // this is tricky: difference between two
                          // ideals is not defined, but between two
