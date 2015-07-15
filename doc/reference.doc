@@ -7062,9 +7062,9 @@ Returns
 select returns an error
 @item @code{-1}
 all links are closed/at eof
-@item{0}
+@item @code{0}
 timeout
-@item{>0}
+@item @code{>0}
 (at least) L[i] is ready
 @end table
 @item @strong{Example:}
