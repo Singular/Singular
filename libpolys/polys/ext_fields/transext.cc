@@ -1052,6 +1052,7 @@ number ntDiv(number a, number b, const coeffs cf)
     DEN(result) = f;
   }
   COM(result) = COM(fa) + COM(fb) + MULT_COMPLEXITY;
+//  definiteGcdCancellation((number)result, cf,FALSE);
   heuristicGcdCancellation((number)result, cf);
 //  ntTest((number)result);
   //check_N((number)result,cf);
@@ -1250,9 +1251,9 @@ void handleNestedFractionsOverQ(fraction f, const coeffs cf)
 }
 
 /* modifies a */
+/* this is an intermediate simplification routine - not a comple "normalize" */
 void heuristicGcdCancellation(number a, const coeffs cf)
 {
-//  ntTest(a); // !!!!????
   if (IS0(a)) return;
 
   fraction f = (fraction)a;
@@ -1296,10 +1297,35 @@ void heuristicGcdCancellation(number a, const coeffs cf)
           COM(f)=0;
         }
       }
+      if ((DEN(f)!=NULL)
+      && (pNext(DEN(f))==NULL))
+      {
+        poly den_f=DEN(f);
+        poly h=NUM(f);
+        loop
+        {
+          if (h==NULL)
+          {
+            h=NUM(f);
+            do
+            {
+              p_ExpVectorDiff(h,h,den_f,ntRing);
+              pIter(h);
+            } while(h!=NULL);
+	    p_ExpVectorDiff(den_f,den_f,den_f,ntRing);
+            break;
+          }
+          int i=0;
+          do
+          {
+            i++;
+            if (p_GetExp(den_f,i,ntRing) > p_GetExp(h,i,ntRing)) return;
+          } while(i<ntRing->N);
+          pIter(h);
+        }
+      }
     }
   }
-
-  ntTest(a);
 }
 
 /// modifies a
