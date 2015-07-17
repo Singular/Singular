@@ -1233,7 +1233,6 @@ setNmzDataPath.tst
 setNmzExecPath.tst
 setNmzFilename.tst
 setNmzOption.tst
-setglobalrings.tst
 setinitials.tst
 setring.tst
 sheafCoh.tst
