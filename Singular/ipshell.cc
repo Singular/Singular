@@ -64,6 +64,7 @@
 #include <Singular/ipid.h>
 #include <Singular/subexpr.h>
 #include <Singular/fevoices.h>
+#include <Singular/sdb.h>
 
 #include <math.h>
 #include <ctype.h>
@@ -1028,6 +1029,9 @@ BOOLEAN iiDebugMarker=TRUE;
 #define BREAK_LINE_LENGTH 80
 void iiDebug()
 {
+#ifdef HAVE_SDB
+  sdb_flags=1;
+#endif
   Print("\n-- break point in %s --\n",VoiceName());
   if (iiDebugMarker) VoiceBackTrack();
   char * s;
