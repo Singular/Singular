@@ -1738,7 +1738,52 @@ std::pair<gfan::ZMatrix,gfan::ZMatrix> interiorPointsAndNormalsOfFacets(const gf
   return std::make_pair(relativeInteriorPoints,outerFacetNormals);
 }
 
-
+#if 0
+BOOLEAN bbcone_serialize(blackbox *b, void *d, si_link f)
+{
+  ssiInfo *dd = (ssiInfo *)f->data;
+  sleftv l;
+  memset(&l,0,sizeof(l));
+  l.rtyp=STRING_CMD;
+  l.data=(void*)"cone";
+  f->m->Write(f, &l);
+  gfan::ZCone *Z=((gfan::ZCone*) d;
+  /* AMBIENT_DIM */ fprintf(dd->f_write("%d ",Z->ambientDimension());
+  /* FACETS or INEQUALITIES */ fprintf(dd->f_write("%d ",Z->areFacetsKnown());
+  gfan::ZMatrix i=Z->getInequalities();
+....
+  /* LINEAR_SPAN or EQUATIONS */ fprintf(dd->f_write("%d ",Z->areImpliedEquationsKnown());
+  gfan::ZMatrix e=Z->getEquations();
+....
+  /* RAYS */
+  gfan::ZMatrix r=Z->extremeRays();
+....
+  /* LINEALITY_SPACE */
+  gfan::ZMatrix l=Z->generatorsOfLinealitySpace();
+....
+  return FALSE;
+}
+BOOLEAN bbcone_deserialize(blackbox **b, void **d, si_link f)
+{
+  ssiInfo *dd = (ssiInfo *)f->data;
+  gfan::ZCone *Z;
+  /* AMBIENT_DIM */ = s_readint(dd->f_read);
+  /* areFacetsKnown: */ = s_readint(dd->f_read);
+  if (areFacetsKnown)
+  ....FACETS
+  else
+  ....INEQUALITIES
+  /* areImpliedEquationsKnown*/ = s_readint(dd->f_read);
+  if(areImpliedEquationsKnown)
+  ....EQUATIONS
+  else
+  ...LINEAR_SPAN
+  ...RAYS
+  ...LINEALITY_SPACE
+  *d=Z;
+  return FALSE;
+}
+#endif
 void bbcone_setup(SModulFunctions* p)
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -1752,6 +1797,8 @@ void bbcone_setup(SModulFunctions* p)
   b->blackbox_Copy=bbcone_Copy;
   b->blackbox_Assign=bbcone_Assign;
   b->blackbox_Op2=bbcone_Op2;
+  //b->blackbox_serialize=bbcone_serialize;
+  //b->blackbox_deserialize=bbcone_deserialize;
   p->iiAddCproc("","coneViaInequalities",FALSE,coneViaNormals);
   p->iiAddCproc("","coneViaPoints",FALSE,coneViaRays);
 
