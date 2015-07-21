@@ -8938,6 +8938,7 @@ lines of @sc{Singular} commands. The line length cannot exceed 80
 characters.
 @sc{Singular} proceeds with the execution of the command following @code{~;}
 as soon as it receives an empty line.
+@*Furthermore, the debug mode will be activated: @xref{Source code debugger}.
 @item @strong{Example:}
 @smallexample
 proc t
