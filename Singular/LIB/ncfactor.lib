@@ -6497,7 +6497,7 @@ SEE ALSO: facFirstWeyl, testNCfac, facFirstShift
     ring firstweyl = 0,(var(varnumD),var(varnumX)),dp;
     def Firstweyl = nc_algebra(1,1);
     setring Firstweyl;
-    ideal M = 0:nvars(@r);
+    ideal M = ideal(0:nvars(@r));
     M[varnumX]=var(2);
     M[varnumD]=var(1);
     map Q = @r,M;

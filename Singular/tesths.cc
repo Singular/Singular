@@ -145,9 +145,6 @@ int main(          /* main entry to Singular */
   else
   {
     if (feOptValue(FE_OPT_SORT)) On(SW_USE_NTL_SORT);
-#ifdef HAVE_SDB
-    sdb_flags = 0;
-#endif
     dup2(1,2);
     /* alternative:
     *    memcpy(stderr,stdout,sizeof(FILE));

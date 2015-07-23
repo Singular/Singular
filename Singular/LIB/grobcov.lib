@@ -1,5 +1,6 @@
 //
-version="version grobcov.lib 4.0.1.2 Jan_2015 "; // $Id$
+version="version grobcov.lib 4.0.2.0 Jul_2015 "; // $Id$
+           // version L;  July_2015;
 category="General purpose";
 info="
 LIBRARY:  grobcov.lib   Groebner Cover for parametric ideals.
@@ -53,6 +54,16 @@ OVERVIEW:
             The library has evolved to include new applications of the
             Groebner Cover, and new theoretical developments have been done.
 
+            The actual version also includes a routine (ConsLevels)
+            for computing the canonical form of a constructible set, given as a
+            union of locally closed sets. It is used in the new version for the
+            computation of loci and envelops. It determines the canonical locally closed
+            level sets of a constructuble. They will be described in a forthcoming paper:
+
+             J.M. Brunat, A. Montes,
+            \"Computing the canonical representation of constructible sets\".
+            Submited to Mathematics in Computer Science. July 2015.
+
             A new set of routines (locus, locusdg, locusto) has been included to
             compute loci of points. The routines are used in the Dynamic
             Geometry software Geogebra. They are described in:
@@ -68,31 +79,18 @@ OVERVIEW:
              Abanades, Botana, Montes, Recio:
              \''Envelops in Dynamic Geometry using the Groebner cover\''.
 
-            The actual version also includes two routines (AddCons and AddconsP)
-            for computing the canonical form of a constructible set, given as a
-            union of locally closed sets. They are used in the new version for the
-            computation of loci and envelops. It determines the canonical locally closed
-            level sets of a constructuble. They will be described in a forthcoming paper:
 
-            A. Montes, J.M. Brunat,
-            \"Canonical representations of constructible sets\".
-
-            This version was finished on 31/01/2015
+            This version was finished on 31/07/2015
 
 NOTATIONS: All given and determined polynomials and ideals are in the
 @*         basering Q[a][x]; (a=parameters, x=variables)
 @*         After defining the ring, the main routines
 @*         grobcov, cgsdr,
 @*         generate the global rings
-@*         Grobcov::@R   (Q[a][x]),
-@*         Grobcov::@P   (Q[a]),
-@*         Grobcov::@RP  (Q[x,a])
+@*         @R   (Q[a][x]),
+@*         @P   (Q[a]),
+@*         @RP  (Q[x,a])
 @*         that are used inside and killed before the output.
-@*         If you want to use some internal routine you must
-@*         create before the above rings by calling setglobalrings();
-@*         because some of the internal routines use these rings.
-@*         The call to the basic routines grobcov, cgsdr will
-@*         kill these rings.
 
 PROCEDURES:
 grobcov(F);  Is the basic routine giving the canonical
@@ -108,12 +106,6 @@ cgsdr(F); Is the procedure for obtaining a first disjoint,
              It is a more efficient routine than buildtree
              (the own routine of 2010 that is no more used).
              Now, KSW algorithm is used.
-
-setglobalrings();  Generates the global rings @R, @P and @PR that
-              are respectively the rings Q[a][x], Q[a], Q[x,a].  (a=parameters,
-             x=variables) It is called inside each of the fundamental
-             routines of the library: grobcov, cgsdr, locus, locusdg and
-             killed before the output.
 
 pdivi(f,F); Performs a pseudodivision of a parametric polynomial
              by a parametric ideal.
@@ -137,6 +129,14 @@ extend(GC);  When the grobcov of an ideal has been computed
              option ('ext',0) only the generic representation of
              the bases are computed, and one can obtain the full
              representation using extend.
+
+ConsLevels(L); Given a list L of locally closed sets, it returns the canonical levels
+             of the constructible set of the union of them, as well as the levels
+             of the complement. It is described in the paper
+
+             J.M. Brunat, A. Montes,
+            \"Computing the canonical representation of constructible sets\".
+            Submited to Mathematics in Computer Science. July 2015.
 
 locus(G);    Special routine for determining the geometrical locus of points
              verifying given conditions. Given a parametric ideal J with
@@ -177,29 +177,13 @@ envelop(F,C); Special routine for determining the envelop of a family of curves
              Abanades, Botana, Montes, Recio:
              \''Envelops in Dynamic Geometry using the Gr\"obner cover\''.
 
-
 envelopdg(ev); Is a special routine to determine the 'Relevant' components
              of the envelop of a family of curves to be used in Dynamic Geometry.
              It must be called to the output of envelop(F,C).
 
-locusto(L); Transforms the output of locus, locusdg, envelop and  envelopdg
+locusto(L); Transforms the output of locus, locusdg, envelop and envelopdg
              into a string that can be reed from different computational systems.
 
-AddCons(L); Uses the routine AddConsP. Given a set of locally closed sets as
-             difference of of varieties (does not need to be in C-representation)
-             it returns the canonical P-representation of the constructible set
-             formed by the union of them. The result is formed by a set of embedded,
-             disjoint, locally closed sets (levels).
-
-AddConsP(L);  Given a set of locally closed P-components, it returns the
-             canonical P-representation of the constructible set
-             formed by the union of them, consisting of a set of embedded,
-             disjoint locally closed sets (levels).
-             The routines AddCons and AddConsP and the canonical structure
-             of the constructible sets will be described in a forthcoming paper.
-
-             A. Montes, J.M. Brunat,
-             \"Canonical representations of constructible sets\".
 
 SEE ALSO: compregb_lib
 ";
@@ -227,12 +211,11 @@ LIB "qhmoduli.lib";
 // Initial data: 4-9-2012
 // Uses KSW algorithm for cgsdr
 // Final data: 21-11-2013
-// Release K: (public)
-// Updated locus: 8-1-2015
-// Updated AddConsP and AddCons: 8-1-2015
-// Reformed many routines, examples and helps: 8-1-2015
+// Release L: (public)
+// New routine ConsLevels: 10-7-2015
+// Updated locus: 10-7-2015 (uses Conslevels)
 // New routines for computing the envelop of a family of curves: 22-1-2015
-// Final data: 22-1-2015
+// Final data: 22-7-2015
 
 //*************Auxiliary routines**************
 
@@ -296,23 +279,16 @@ static proc elimfromlist(l, int i)
   if((size(l)==0) or (size(l)==1 and i!=1)){return(l);}
   if (size(l)==1 and i==1){return(L);}
   // L=l[1];
-  if(i==1)
-  {
-    for(j=2;j<=size(l);j++)
-    {
-      L[j-1]=l[j];
-    }
-  }
-  else
+  if(i>1)
   {
     for(j=1;j<=i-1;j++)
     {
-      L[j]=l[j];
+      L[size(L)+1]=l[j];
     }
-    for(j=i+1;j<=size(l);j++)
-    {
-      L[j-1]=l[j];
-    }
+  }
+  for(j=i+1;j<=size(l);j++)
+  {
+    L[size(L)+1]=l[j];
   }
   return(L);
 }
@@ -772,21 +748,22 @@ static proc subset(J,K)
 //  subset(J,K);
 //}
 
-proc setglobalrings()
-"USAGE:   setglobalrings();
-          No arguments
-RETURN:   After its call the rings @R=Q[a][x], @P=Q[a], @RP=Q[x,a] are
-          defined as global variables.  (a=parameters, x=variables)
-NOTE: It is called internally by many basic routines of the
-          library grobcov, cgsdr, extend, pdivi, pnormalf, locus, locusdg,
-          envelop, envelopdg, and killed before the output.
-          The user does not need to call it, except when it is interested
-          in using some internal routine of the library that
-          uses these rings.
-          The basering R, must be of the form Q[a][x], (a=parameters,
-          x=variables), and should be defined previously.
-KEYWORDS: ring, rings
-EXAMPLE:  setglobalrings; shows an example"
+static proc setglobalrings()
+// "USAGE:   setglobalrings();
+//           No arguments
+// RETURN: After its call the rings Grobcov::@R=Q[a][x], Grobcov::@P=Q[a],
+//           Grobcov::@RP=Q[x,a] are defined as global variables.
+//           (a=parameters, x=variables)
+// NOTE: It is called internally by many basic routines of the
+//           library grobcov, cgsdr, extend, pdivi, pnormalf, locus, locusdg,
+//           envelop, envelopdg, and killed before the output.
+//           The user does not need to call it, except when it is interested
+//           in using some internal routine of the library that
+//           uses these rings.
+//           The basering R, must be of the form Q[a][x], (a=parameters,
+//           x=variables), and should be defined previously.
+// KEYWORDS: ring, rings
+// EXAMPLE:  setglobalrings; shows an example"
 {
   if (defined(@P))
   {
@@ -809,19 +786,19 @@ EXAMPLE:  setglobalrings; shows an example"
   export(@RP);     // global ring K[x,a] with product order
   setring(RR);
 };
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring R=(0,a,b),(x,y,z),dp;
-  setglobalrings();
-  R;
-  Grobcov::@R;
-  Grobcov::@P;
-  Grobcov::@RP;
-  ringlist(Grobcov::@R);
-  ringlist(Grobcov::@P);
-  ringlist(Grobcov::@RP);
-}
+// example
+// {
+//   "EXAMPLE:"; echo = 2;
+//   ring R=(0,a,b),(x,y,z),dp;
+//   setglobalrings();
+//   " ";"R=";R;
+//   " ";"Grobcov::@R=";Grobcov::@R;
+//   " ";"Grobcov::@P=";Grobcov::@P;
+//   " ";"Grobcov::@RP=";Grobcov::@RP;
+//  " "; "ringlist(Grobcov::@R)=";  ringlist(Grobcov::@R);
+//  " "; "ringlist(Grobcov::@P)=";  ringlist(Grobcov::@P);
+//  " "; "ringlist(Grobcov::@RP)=";  ringlist(Grobcov::@RP);
+// }
 
 // cld : clears denominators of an ideal and normalizes to content 1
 //        can be used in @R or @P or @RP
@@ -1514,7 +1491,11 @@ proc Prep(ideal N, ideal M)
         prep[size(prep)+1]=list(Ni[i],Mij);
     }
   }
+  //"T_abans="; prep;
   if (size(prep)==0){prep=list(list(ideal(1),list(ideal(1))));}
+  //"T_Prep="; prep;
+  //def Lout=CompleteA(prep,prep);
+  //"T_Lout="; Lout;
   return(prep);
 }
 example
@@ -3934,6 +3915,270 @@ static proc groupKSWsegments(list T)
 
 //********************* End KapurSunWang *************************
 
+//********************* Begin ConsLevels ***************************
+
+static proc zeroone(int n)
+{
+  list L; list L2;
+  intvec e; intvec e2; intvec e3;
+  int j;
+  if(n==1)
+  {
+    e[1]=0;
+    L[1]=e;
+    e[1]=1;
+    L[2]=e;
+    return(L);
+  }
+  if(n>1)
+  {
+    L=zeroone(n-1);
+    for(j=1;j<=size(L);j++)
+    {
+      e2=L[j];
+      e3=e2;
+      e3[size(e3)+1]=0;
+      L2[size(L2)+1]=e3;
+      e3=e2;
+      e3[size(e3)+1]=1;
+      L2[size(L2)+1]=e3;
+    }
+  }
+  return(L2);
+}
+
+// Auxiliary routine
+// subsets: the list of subsets of (1,..n)
+static proc subsets(int n)
+{
+  list L; list L1;
+  int i; int j;
+  L=zeroone(n);
+  intvec e; intvec e1;
+  for(i=1;i<=size(L);i++)
+  {
+    e=L[i];
+    kill e1; intvec e1;
+    for(j=1;j<=n;j++)
+    {
+      if(e[n+1-j]==1)
+      {
+        if(e1==intvec(0)){e1[1]=j;}
+        else{e1[size(e1)+1]=j};
+      }
+    }
+    L1[i]=e1;
+  }
+  return(L1);
+}
+
+// Input a list A of locally closed sets in C-rep
+// Output a list B of a simplified list of A
+static proc SimplifyUnion(list A)
+{
+  int i; int j;
+  list L=A;
+  int n=size(L);
+  if(n<2){return(A);}
+  for(i=1;i<=size(L);i++)
+  {
+    for(j=1;j<=size(L);j++)
+    {
+      if(i != j)
+      {
+        if(equalideals(L[i][2],L[j][1])==1)
+        {
+          L[i][2]=L[j][2];
+        }
+      }
+    }
+  }
+  ideal T=ideal(1);
+  intvec v;
+  for(i=1;i<=size(L);i++)
+  {
+    if(equalideals(L[i][2],ideal(1)))
+    {
+      v[size(v)+1]=i;
+      T=intersect(T,L[i][1]);
+    }
+  }
+  if(size(v)>0)
+  {
+    for(i=1; i<=size(v);i++)
+    {
+      j=v[size(v)+1-i];
+      L=elimfromlist(L, j);
+    }
+  }
+  if(equalideals(T,ideal(1))==0){L[size(L)+1]=list(std(T),ideal(1))};
+  //string("T_n=",n," new n0",size(L));
+  return(L);
+}
+
+// Input: list(A)
+//          A is a list of locally closed sets in Crep. A=[[P1,Q1],[P2,Q2],..,[Pr,Qr]]
+//          whose union is a constructible set from
+// Output list [Lev,C]:
+//          where Lev is the Crep of the canonical first level of A, and
+//          C is the complement of the first level Lev wrt to the closure of A. The elements are given in Crep,
+static proc FirstLevel(list A)
+{
+  int n=size(A);
+  list T=zeroone(n);
+  ideal P; ideal Q;
+  list Cb;  ideal Cc=ideal(1);
+  int i; int j;
+  intvec t;
+  ideal Z=ideal(1);
+  list C;
+  for(i=1;i<=size(A);i++)
+  {
+    Z=intersect(Z,A[i][1]);
+  }
+  for(i=2; i<=size(T);i++)
+  {
+    t=T[i];
+    P=ideal(1); Q=ideal(0);
+    for(j=1;j<=n;j++)
+    {
+      if(t[n+1-j]==1)
+      {
+        Q=Q+A[j][2];
+      }
+      else
+      {
+        P=intersect(P,A[j][1]);
+      }
+    }
+    //"T_Q="; Q; "T_P="; P;
+    Cb=Crep(Q,P);
+    //"T_Cb="; Cb;
+    if(Cb[1][1]<>1)
+    {
+      C[size(C)+1]=Cb;
+      Cc=intersect(Cc,Cb[1]);
+    }
+  }
+  list Lev=list(Z,Cc);                //Crep(Z,Cc);
+  if(size(C)>1){C=SimplifyUnion(C);}
+  return(list(Lev,C));
+}
+
+// Input: list(A)
+//          A is a list of locally closed sets in Crep. A=[[P1,Q1],[P2,Q2],..,[Pr,Qr]]
+//          whose union is a constructible set from which the algorithm computes its canonical form.
+// Output:
+//     list [L,C] where
+//          where L is the list of canonical levels of A,
+//          and C is the list of canonical levels of the complement of A wrt to the closure of A.
+//          All locally closed sets are given in Crep.
+//          L=[[1,[p1,p2],[3,[p3,p4],..,[2r-1,[p_{2r-1},p_2r]]]] is the list of levels of A in Crep.
+//          C=[[2,p2,p3],[4,[p4,p5],..,[2s,[p_{2s},p_{2s+1}]]]  is the list of levels of C,
+//                                              the complement of S wrt the closure of A, in Crep.
+proc ConsLevels(list A)
+"USAGE:   ConsLevels(A);
+          A is a list of locally closed sets in Crep. A=[[P1,Q1],[P2,Q2],..,[Pr,Qr]]
+          whose union is a constructible set from which the algorithm computes its
+          canonical form.
+RETURN: A list with two elements: [L,C]
+          where L is the list of canonical levels of A, and C is the list of canonical
+          levels of the
+          complement of A wrt to the closure of A.
+          All locally closed sets are given in Crep.
+          L=[[1,[p1,p2],[3,[p3,p4],..,[2r-1,[p_{2r-1},p_2r]]]]
+          C=[[2,p2,p3],[4,[p4,p5],..,[2s,[p_{2s},p_{2s+1}]]]
+NOTE: The basering R, must be of the form Q[a]
+KEYWORDS: locally closed set, constructible set
+EXAMPLE:  ConsLevels; shows an example"
+{
+  list L; list C; int i;
+  list B; list T;
+  for(i=1; i<=size(A);i++)
+  {
+    T=Crep(A[i][1],A[i][2]);
+    B[size(B)+1]=T;
+  }
+  int level=0;
+  list K;
+  while(size(B)>0)
+  {
+    level++;
+    K=FirstLevel(B);
+    if(level mod 2==1){L[size(L)+1]=list(level,K[1]);}
+    else{C[size(C)+1]=list(level,K[1]);}
+    //"T_L="; L;
+    //"T_C="; C;
+    B=K[2];
+    //"T_size(B)="; size(B);
+  }
+  return(list(L,C));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+// Example of ConsLevels with nice geometrical interpretetion and 2 levels
+
+if (defined(R)){kill R;}
+if (defined(@P)){kill @P; kill @R; kill @RP;}
+
+  ring R=0,(x,y,z),lp;
+  short=0;
+  ideal P1=x*(x^2+y^2+z^2-1);
+  ideal Q1=z,x^2+y^2-1;
+  ideal P2=y,x^2+z^2-1;
+  ideal Q2=z*(z+1),y,x*(x+1);
+
+  list Cr1=Crep(P1,Q1);
+  list Cr2=Crep(P2,Q2);
+
+  list L=list(Cr1,Cr2);
+  L;
+  // ConsLevels(L)=
+  ConsLevels(L);
+
+//----------------------------------------------------------------------
+// Begin Problem S93
+// Automatic theorem proving
+// Generalized Steiner-Lehmus Theorem
+// A.Montes, T.Recio
+
+// Bisector of A(-1,0) = Bisector of B(1,0) varying C(a,b)
+
+if(defined(R1)){kill R1;}
+ring R1=(0,a,b),(x1,y1,x2,y2,p,r),dp;
+ideal S93=(a+1)^2+b^2-(p+1)^2,
+                    (a-1)^2+b^2-(1-r)^2,
+                    a*y1-b*x1-y1+b,
+                    a*y2-b*x2+y2-b,
+                    -2*y1+b*x1-(a+p)*y1+b,
+                    2*y2+b*x2-(a+r)*y2-b,
+                    (x1+1)^2+y1^2-(x2-1)^2-y2^2;
+
+short=0;
+def GC93=grobcov(S93,"nonnull",ideal(b),"rep",1);
+//"grobcov(S93,'nonnull',ideal(b),"rep",1)="; GC93;
+
+list L0;
+for(int i=1;i<=size(GC93);i++)
+{
+   L0[size(L0)+1]=GC93[i][3];
+}
+
+def GC93ab=grobcov(S93,"nonnull",ideal(a*b),"rep",1);
+
+ring RR=0,(a,b),lp;
+
+list L1;
+L1=imap(R1,L0);
+// L1=Total elements of the grobcov(S93,'nonnull',ideal(b),'rep',1) to be added=
+L1;
+
+// Adding all the elements of grobcov(S93,'nonnull',ideal(b),'rep',1)=
+ConsLevels(L1);
+}
+
+//**************************** End ConsLevels ******************
+
 //******************** Begin locus ******************************
 
 // indepparameters
@@ -4521,7 +4766,7 @@ example
   S;
   locus(grobcov(S));
   kill R;
-  "********************************************";
+  //********************************************
 
   ring R=(0,x,y),(x1,x2),dp;
   short=0;
@@ -4610,7 +4855,7 @@ example
   locus(grobcov(S96));
   locusdg(locus(grobcov(S96)));
   kill R;
-  "********************************************";
+  //********************************************
   ring R=(0,a,b),(x4,x3,x2,x1),dp;
   ideal S=(x1-3)^2+(x2-1)^2-9,
                (4-x2)*(x3-3)+(x1-3)*(x4-1),
@@ -4621,7 +4866,7 @@ example
   locus(grobcov(S));
   locusdg(locus(grobcov(S)));
   kill R;
-  "********************************************";
+  //********************************************
 
   ring R=(0,x,y),(x1,x2),dp;
   short=0;
@@ -4632,8 +4877,8 @@ example
   locusdg(locus(grobcov(S)));
 }
 
-// locusto: Transforms the output of locus to a string that
-//      can be read by different computational systems.
+// locusto: Transforms the output of locus, locusdg, envelop and envelopdg
+//             into a string that can be reed from different computational systems.
 // input:
 //     list L: The output of locus
 // output:
@@ -4716,7 +4961,7 @@ example
   locusto(locus(grobcov(S)));
   locusto(locusdg(locus(grobcov(S))));
   kill R;
-  "********************************************";
+  //********************************************
 
   // 1. Take a fixed line l: x1-y1=0  and consider
   //    the family F of a lines parallel to l passing through the mover point M
@@ -4736,7 +4981,7 @@ example
   locusto(envelop(F,C));
   locusto(envelopdg(envelop(F,C)));
   kill R;
-  "********************************************";
+  //********************************************
 
   // Steiner Deltoid
   // 1. Consider the circle x1^2+y1^2-1=0, and a mover point M(x1,y1) on it.
@@ -4804,80 +5049,6 @@ static proc locusdim(ideal B, list #)
   return(d);
 }
 
-// // locusdgto: Transforms the output of locusdg to a string that
-// //      can be read by different computational systems.
-// // input:
-// //     list L: The output of locus
-// // output:
-// //     string s: The output of locus converted to a string readable by other programs
-// //                   Outputs only the relevant dynamical geometry components.
-// //                   Without unnecessary parenthesis
-// proc locusdgto(list LL)
-// "USAGE: locusdgto(L);
-//           The argument must be the output of locusdg of a parametrical ideal
-//           It transforms the output into a string in standard form
-//           readable in many languages (Geogebra).
-// RETURN: The locusdg in string standard form
-// NOTE: It can only be called after computing the locusdg(grobcov(F)) of the
-//           parametrical ideal.
-//           The basering R, must be of the form Q[a,b,..][x,y,..].
-// KEYWORDS: geometrical locus, locus, loci.
-// EXAMPLE:  locusdgto; shows an example"
-// {
-//   int i; int j; int k; int short0=short; int ojo;
-//   int te=0;
-//   short=0;
-//   if(size(LL)==0){ojo=1; list L;}
-//   else
-//   {
-//     def L=LL;
-//   }
-//   string s="["; string sf="]"; string st=s+sf;
-//   if(size(L)==0){return(st);}
-//   ideal p;
-//   ideal q;
-//   for(i=1;i<=size(L);i++)
-//   {
-//     if(L[i][3]=="Relevant")
-//     {
-//       s=string(s,"[[");
-//       for (j=1;j<=size(L[i][1]);j++)
-//       {
-//         s=string(s,L[i][1][j],",");
-//       }
-//       s[size(s)]="]";
-//       s=string(s,",[");
-//       for(j=1;j<=size(L[i][2]);j++)
-//       {
-//         s=string(s,"[");
-//         for(k=1;k<=size(L[i][2][j]);k++)
-//         {
-//           s=string(s,L[i][2][j][k],",");
-//         }
-//         s[size(s)]="]";
-//         s=string(s,",");
-//       }
-//       s[size(s)]="]";
-//       s=string(s,"]");
-//       s[size(s)]="]";
-//       s=string(s,",");
-//     }
-//   }
-//   if(s=="["){s="[]";}
-//   else{s[size(s)]="]";}
-//   short=short0;
-//   return(s);
-// }
-// example
-// {"EXAMPLE:"; echo = 2;
-//   ring R=(0,a,b),(x,y),dp;
-//   short=0;
-//   ideal S96=x^2+y^2-4,(b-2)*x-a*y+2*a,(a-x)^2+(b-y)^2-1;
-//   "System="; S96; " ";
-//   "locusdgto(locusdg(grobcov(S96)))=";
-//   locusdgto(locusdg(grobcov(S96)));
-// }
-
 static proc norspec(ideal F)
 {
   def RR=basering;
@@ -4897,7 +5068,6 @@ static proc norspec(ideal F)
   exportto(Top,@P);      // global ring Q[a]
   exportto(Top,@RP);     // global ring K[x,a] with product order
   setring(RR);
-
 }
 
 // envelop
@@ -5058,315 +5228,6 @@ example
   envelopdg(envelop(F,C));
 }
 
-//********************* End locus ****************************
-
-//********************* Begin AddCons **********************
-
-// Input: L1,L2: lists of components with common top
-// Output L: list of the union of L1 and L2.
-static proc Add2ComWithCommonTop(list L1, list L2)
-{
-  int i; int j; ideal pij; list L; list Lp; list PR; int k;
-  for(i=1;i<=size(L1[2]);i++)
-  {
-    for(j=1;j<=size(L2[2]);j++)
-    {
-      pij=std(L1[2][i]+L2[2][j]);
-      PR=minGTZ(pij);
-      for(k=1;k<=size(PR);k++)
-      {
-        Lp[size(Lp)+1]=PR[k];
-      }
-    }
-  }
-  for(i=1; i<=size(Lp);i++)
-  {
-    for(j=i+1;j<=size(Lp);j++)
-    {
-      if(idcontains(Lp[i],Lp[j])) {Lp=delete(Lp,j);}
-    }
-    for(j=1;j<i;j++)
-    {
-      if(idcontains(Lp[i],Lp[j])){Lp=delete(Lp,j); j=j-1; i=i-1;}
-    }
-  }
-  L[1]=L1[1];
-  L[2]=Lp;
-  return(L);
-}
-
-// Input: L list od P-rep of components to be added. L[i]=[p_i,[p_{i1},...p_{ir_i}]]
-// Output: lists A,B,L
-//       where no top in the lists are repeated
-//       A: list of components with higher tops
-//       B: list of components with lower tops
-//       L1: A,B
-static proc SepareAB(list L)
-{
-  int i;  int j; list Ln=L;
-  for(i=1;i<=size(Ln);i++)
-  {
-    for(j=i+1;j<=size(Ln);j++)
-    {
-      if (equalideals(Ln[j][1],Ln[i][1]))
-      {
-        Ln[i]=Add2ComWithCommonTop(Ln[i],Ln[j]);
-        Ln=delete(Ln,j);
-        j=j-1;
-      }
-    }
-  }
-  list A; list B; int clas; list T; list L1;
-  for(i=1;i<=size(Ln);i++)
-  {
-    j=1;
-    clas=0;
-    while((clas==0) and  (j<=size(Ln)))
-    {
-      if(j!=i)
-      {
-        if(idcontains(Ln[i][1],Ln[j][1]) ) {B[size(B)+1]=Ln[i]; clas=1;}
-      }
-      j++;
-    }
-    if(clas==0) {A[size(A)+1]=Ln[i];}
-  }
-  L1=A; for(j=1;j<=size(B);j++){L1[size(L1)+1]=B[j];}
-  T[1]=A; T[2]=B; T[3]=L1;
-  return(T);
-}
-
-// Input:
-//  A1: list of high set of P-reps to be completed by the remaining P-reps
-//  L1: the list A1, completed with the list of lower P-reps.
-// Output:
-//  A: list A1 completed with all possible parts of the remaining parts of L1 with the
-//      condition of building locally closed sets.
-static proc CompleteA(list A1,list L1)
-{
-  int modif; int i; int j; int k; int l;
-  ideal pij; ideal pk; ideal pijkl; ideal pkl;
-  int n; list nl; int te; int clas; list vvv; list AAA;
-  list Lp; int m; ideal Pij;
-  list A0;
-  modif=1;
-  list A=A1;
-  while(modif==1)
-  {
-      modif=0;
-      A0=A;
-      for(i=1;i<=size(A);i++)
-      {
-          for(j=1;j<=size(A[i][2]); j++)
-          {
-              pij=A[i][2][j];
-             for(k=1;k<=size(L1);k++)
-             {
-                 if(k!=i)
-                 {
-                     pk=L1[k][1];
-                     if(idcontains(pij,pk)==1)
-                     {
-                         te=0;
-                         kill nl;
-                         list nl; l=1;
-                         while((te==0) and (l<=size(L1[k][2])))
-                         {
-                              pkl=L1[k][2][l];
-                              if((equalideals(pij,pkl)==1) or (idcontains(pij,pkl)==1)) {te=1;}
-                              l++;
-                         }   // end while ((te=0) and (l>...
-                         //"T_te="; te; pause();
-                         if(te==0)
-                         {
-                           modif=1;
-                           kill Pij; ideal Pij=1;
-                           for(l=1; l<=size(L1[k][2]);l++)
-                           {
-                             pkl=L1[k][2][l];
-                             pijkl=std(pij+pkl);
-                             Pij=intersect(Pij,pijkl);
-                           }
-                           kill Lp; list Lp;
-                           Lp=minGTZ(Pij);
-                           for(m=1;m<=size(Lp);m++)
-                            {
-                               nl[size(nl)+1]=Lp[m];
-                            }
-                            A[i][2]=delete(A[i][2], j);
-                            for(n=1;n<=size(nl);n++)
-                            {
-                              A[i][2][size(A[i][2])+1]=nl[n];
-                            }
-                          } // end if(te==0)
-                     } // end if(idcontains(pij,pk)==1)
-                 }  // end if (k!=i)
-             } // end for k
-         }  // end for j
-         kill vvv; list vvv;
-         if(modif==1)
-         // Select the maximal ideals of the set A[I][2][j]
-         {
-             kill nl; list nl;
-             nl=selectminideals(A[i][2]);
-             kill AAA; list AAA;
-             for(j=1;j<=size(nl);j++)
-             {
-               AAA[size(AAA)+1]=A[i][2][nl[j]];
-             }
-             A[i][2]=AAA;
-         } // end if(modif=1)
-      }  // end for i
-      modif=1-equallistsAall(A,A0);
-  } // end while(modif==1)
-  return(A);
-}
-
-// Input:
-//   A: list of the top P-reps of one level
-//   B: list of remaining lower P-reps that have not yeen be possible to add
-// Output:
-//   Bn: list B where the elements that are completely included in A are removed and the parts that are
-//         included in A also.
-static proc ReduceB(list A,list B)
-{
-     int i; int j; list nl; list Bn; int te; int k; int elim;
-     ideal pC; ideal pD; ideal pCD; ideal pBC; list nB; int j0;
-     for(i=1;i<=size(B);i++)
-     {
-         j=1; te=0;
-         while((te==0) and (j<=size(A)))
-         {
-             if(idcontains(B[i][1],A[j][1])){te=1; j0=j;}
-             else{j++;}
-         }
-         pD=B[i][2][1];
-         for(k=2;k<=size(B[i][2]);k++){pD=intersect(pD,B[i][2][k]);}
-         pC=A[j0][2][1];
-         for(k=2;k<=size(A[j0][2]);k++) {pC=intersect(pC,A[j0][2][k]);}
-         pCD=std(pD+pC);
-         pBC=std(B[i][1]+pC);
-         elim=0;
-         if(idcontains(pBC,pCD)){elim=1;}   // B=delfromlist(B,i);i=i-1;
-         else
-         {
-              nB=Prep(pBC,pCD);
-              if(equalideals(nB[1][1],ideal(1))==0)
-              {
-                  for(k=1;k<=size(nB);k++){Bn[size(Bn)+1]=nB[k];}
-              }
-         }
-    }   // end for i
-    return(Bn);
-}
-
-// AddConsP: given a set of components of locally closed sets in P-representation, it builds the
-//       canonical P-representation of the corresponding constructible set, of its union,
-//       including levels it they are.
-proc AddConsP(list L)
-"USAGE:   AddConsP(L)
-      Input L: list of components in P-rep to be added
-      [  [[p_1,[p_11,..,p_1,r1]],..[p_k,[p_k1,..,p_kr_k]]  ]
-RETURN:
-     list of lists of levels of the different locally closed sets of
-     the canonical P-rep of the constructible.
-     [  [level_1,[ [Comp_11,..Comp_1r_1] ] ], .. ,
-        [level_s,[ [Comp_s1,..Comp_sr_1] ]
-     ]
-     where level_i=i,   Comp_ij=[ p_i,[p_i1,..,p_it_i] ] is a prime component.
-NOTE:     Operates in a ring R=Q[u_1,..,u_m]
-KEYWORDS: Constructible set, Canoncial form
-EXAMPLE:  AddConsP; shows an example"
-{
-  list LL; list A; list B; list L1; list T; int level=0; list h;
-  LL=L; int i;
-  while(size(LL)!=0)
-  {
-    level++;
-    L1=SepareAB(LL);
-    A=L1[1]; B=L1[2]; LL=L1[3];
-    A=CompleteA(A,LL);
-    for(i=1;i<=size(A);i++)
-    {
-      LL[i]=A[i];
-    }
-    h[1]=level; h[2]=A;
-    T[size(T)+1]=h;
-    LL=ReduceB(A,B);
-  }
-  return(T);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  if (defined(Grobcov::@P)){kill Grobcov::@P; kill Grobcov::@R; kill Grobcov::@RP;}
-  ring R=0,(x,y,z),lp;
-  short=0;
-
-  ideal P1=x;
-  ideal Q1=x,y;
-  ideal P2=y;
-  ideal Q2=y,z;
-
-  list L=list(Prep(P1,Q1)[1],Prep(P2,Q2)[1]);
-  L;
-  AddConsP(L);
-}
-
-// AddCons:  given a set of  locally closed sets by pairs of ideal, it builds the
-//       canonical P-representation of the corresponding constructible set, of its union,
-//       including levels it they are.
-//       It makes a call to AddConsP after transforming the input.
-// Input list of lists of pairs of ideals representing locally colsed sets:
-//     L=  [ [E1,N1], .. , [E_s,N_s] ]
-// Output: The canonical frepresentation of the constructible set union of the V(E_i) \ V(N_i)
-//     T=[  [level_1,[ [p_1,[p_11,..,p_1s_1]],.., [p_k,[p_k1,..,p_ks_k]] ]],, .. , [level_r,[..       ]]  ]
-proc AddCons(list L)
-"USAGE:   AddCons(L)
-      Calls internally AddConsP and allows a different input.
-      Input L: list of pairs of of ideals [ [P_1,Q_1], .., [Pr,Qr] ]
-      representing a set of locally closed setsV(P_i) \ V(Q_i)
-      to be added.
-RETURN:
-      list of lists of levels of the different locally closed sets of
-      the canonical P-rep of the constructible.
-      [  [level_1,[ [Comp_11,..Comp_1r_1] ] ], .. ,
-         [level_s,[ [Comp_s1,..Comp_sr_1] ]
-      ]
-      where level_i=i,   Comp_ij=[ p_i,[p_i1,..,p_it_i] ] is a prime component.
-NOTE: Operates in a ring R=Q[u_1,..,u_m]
-KEYWORDS: Constructible set, Canoncial form
-EXAMPLE: AddCons; shows an example"
-{
-  int i; list H; list P; int j;
-  for(i=1;i<=size(L);i++)
-  {
-    P=Prep(L[i][1],L[i][2]);
-    for(j=1;j<=size(P);j++)
-    {
-      H[size(H)+1]=P[j];
-    }
-  }
-  return(AddConsP(H));
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  if (defined(Grobcov::@P)){kill Grobcov::@P; kill Grobcov::@R; kill Grobcov::@RP;}
-  ring R=0,(x,y,z),lp;
-  short=0;
-
-  ideal P1=x;
-  ideal Q1=x,y;
-  ideal P2=y;
-  ideal Q2=y,z;
-
-  list L=list(list(P1,Q1), list(P2,Q2) );
-  L;
-
-  AddCons(L);
-}
-
 // AddLocus: auxilliary routine for locus0 that computes the components of the constructible:
 // Input:  the list of locally closed sets to be added, each with its type as third argument
 //     L=[ [LC[11],,,LC[1k_1],  .., [LC[r1],,,LC[rk_r] ] where
@@ -5396,7 +5257,7 @@ static proc AddLocus(list L)
       L2[size(L2)+1]=l2;
     }
   }
-  L3=AddConsP(L1);
+  L3=LocusConsLevels(L1);
   list L4; int level;
   ideal p1; ideal pp1; int t; int k; int k0; string typ; list l4;
   for(i=1;i<=size(L3);i++)
@@ -5425,5 +5286,37 @@ static proc AddLocus(list L)
   return(L4);
 }
 
-//********************* End AddCons **********************
-;
+// Input L: list of components in P-rep to be added
+//         [  [[p_1,[p_11,..,p_1,r1]],..[p_k,[p_k1,..,p_kr_k]]  ]
+// Output:
+//          list of lists of levels of the different locally closed sets of
+//          the canonical P-rep of the constructible.
+//          [  [level_1,[ [Comp_11,..Comp_1r_1] ] ], .. ,
+//             [level_s,[ [Comp_s1,..Comp_sr_1] ]
+//          ]
+//          where level_i=i,   Comp_ij=[ p_i,[p_i1,..,p_it_i] ] is a prime component.
+// LocusConsLevels: given a set of components of locally closed sets in P-representation, it builds the
+//       canonical P-representation of the corresponding constructible set of its union,
+//       including levels it they are.
+static proc LocusConsLevels(list L)
+{
+  list Lc; list Sc;
+  int i;
+  for(i=1;i<=size(L);i++)
+  {
+    Sc=PtoCrep(list(L[i]));
+    Lc[size(Lc)+1]=Sc;
+  }
+  list S=ConsLevels(Lc)[1];
+  list Sout;
+  list Lev;
+  for(i=1;i<=size(S);i++)
+  {
+    Lev=list(i,Prep(S[i][2][1],S[i][2][2]));
+    Sout[size(Sout)+1]=Lev;
+  }
+  return(Sout);
+}
+
+//********************* End locus ****************************
+

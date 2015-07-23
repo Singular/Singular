@@ -226,7 +226,7 @@ square brackets are used to denote parts of syntax descriptions which
 are optional:
 
 @itemize @asis
-[optional_text] required_text
+@item [optional_text] required_text
 @end itemize
 
 @item

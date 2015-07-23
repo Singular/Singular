@@ -243,6 +243,7 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
           "n - execute current line, break at next line\n"
           "p <var> - display type and value of the variable <var>\n"
           "q <flags> - quit debugger, set debugger flags(0,1,2)\n"
+	  "   0: stop debug, 1:continue, 2: throw an error, return to toplevel\n"
           "Q - quit Singular\n");
           int i;
           for(i=0;i<7;i++)

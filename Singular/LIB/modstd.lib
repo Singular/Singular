@@ -282,7 +282,7 @@ static proc finalTest_std(string command, alias list args, ideal result)
  *        0, otherwise
  * (same as size(reduce(I_reduce, G_reduce))).
  * Uses parallelization. */
-static proc reduce_parallel(ideal I_reduce, ideal G_reduce)
+static proc reduce_parallel(def I_reduce, def G_reduce)
 {
     exportto(Modstd, I_reduce);
     exportto(Modstd, G_reduce);

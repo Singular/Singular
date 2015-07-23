@@ -298,7 +298,7 @@ with the @code{--no-stdlib} command line option (see
 @end menu
 
 @c ----------------------------------------------------------
-@node all_lib, compregb_lib, General purpose, General purpose
+@node all_lib
 @subsection all_lib
 @cindex all_lib
 @cindex all.lib
@@ -314,15 +314,15 @@ LIB "all.lib";
 @c example
 @end smallexample
 @c ----------------------------------------------------------
-@node compregb_lib, general_lib, all_lib, General purpose
+@node compregb_lib
 @subsection compregb_lib
 @c lib compregb.lib
 @c ----------------------------------------------------------
-@node general_lib, grobcov_lib, compregb_lib, General purpose
+@node general_lib
 @subsection general_lib
 @c lib general.lib
 @c ----------------------------------------------------------
-@node grobcov_lib, inout_lib, general_lib, General purpose
+@node grobcov_lib
 @subsection grobcov_lib
 @c lib grobcov.lib
 @c ----------------------------------------------------------
@@ -372,11 +372,11 @@ LIB "all.lib";
 @end menu
 
 @c ----------------------------------------------------------
-@node matrix_lib, linalg_lib,  Linear algebra, Linear algebra
+@node matrix_lib
 @subsection matrix_lib
 @c lib matrix.lib
 @c ---------------------------------------------------------
-@node linalg_lib, , matrix_lib, Linear algebra
+@node linalg_lib
 @subsection linalg_lib
 @c lib linalg.lib
 @c ----------------------------------------------------------------------------
@@ -417,19 +417,19 @@ LIB "all.lib";
 @end menu
 
 @c ---------------------------------------------------------
-@node absfact_lib, algebra_lib, Commutative algebra, Commutative algebra
+@node absfact_lib
 @subsection absfact_lib
 @c lib absfact.lib
 @c ---------------------------------------------------------
-@node algebra_lib, assprimeszerodim_lib, absfact_lib, Commutative algebra
+@node algebra_lib
 @subsection algebra_lib
 @c lib algebra.lib
 @c ---------------------------------------------------------
-@node assprimeszerodim_lib, cisimplicial_lib, algebra_lib, Commutative algebra
+@node assprimeszerodim_lib
 @subsection assprimeszerodim_lib
 @c lib assprimeszerodim.lib
 @c ---------------------------------------------------------
-@node cisimplicial_lib, elim_lib, assprimeszerodim_lib, Commutative algebra
+@node cisimplicial_lib
 @subsection cisimplicial_lib
 @c lib cisimplicial.lib
 @c ----------------------------------------------------------
@@ -446,91 +446,91 @@ LIB "all.lib";
 @subsection grwalk_lib
 @c lib grwalk.lib
 @c ----------------------------------------------------------
-@node homolog_lib, integralbasis_lib, grwalk_lib, Commutative algebra
+@node homolog_lib
 @subsection homolog_lib
 @c lib homolog.lib
 @c ----------------------------------------------------------
-@node integralbasis_lib, intprog_lib, homolog_lib, Commutative algebra
+@node integralbasis_lib
 @subsection integralbasis_lib
 @c lib integralbasis.lib
 @c ----------------------------------------------------------
-@node intprog_lib, locnormal_lib, integralbasis_lib, Commutative algebra
+@node intprog_lib
 @subsection intprog_lib
 @c lib intprog.lib
 @c ----------------------------------------------------------
-@node locnormal_lib, modnormal_lib, intprog_lib,  Commutative algebra
+@node locnormal_lib
 @subsection locnormal_lib
 @c lib locnormal.lib
 @c ----------------------------------------------------------
-@node modnormal_lib, modstd_lib, locnormal_lib,  Commutative algebra
+@node modnormal_lib
 @subsection modnormal_lib
 @c lib modnormal.lib
 @c ---------------------------------------------------------
-@node modstd_lib, monomialideal_lib, modnormal_lib, Commutative algebra
+@node modstd_lib
 @subsection modstd_lib
 @c lib modstd.lib
 @c ---------------------------------------------------------
-@node monomialideal_lib, mprimdec_lib, modstd_lib, Commutative algebra
+@node monomialideal_lib
 @subsection monomialideal_lib
 @c lib monomialideal.lib
 @c ---------------------------------------------------------
-@node mprimdec_lib, mregular_lib, monomialideal_lib, Commutative algebra
+@node mprimdec_lib
 @subsection mprimdec_lib
 @c lib mprimdec.lib
 @c ----------------------------------------------------------
-@node mregular_lib, noether_lib, mprimdec_lib, Commutative algebra
+@node mregular_lib
 @subsection mregular_lib
 @c lib mregular.lib
 @c ----------------------------------------------------------
-@node noether_lib, normal_lib, mregular_lib, Commutative algebra
+@node noether_lib
 @subsection noether_lib
 @c lib noether.lib
 @c ---------------------------------------------------------
-@node normal_lib, normaliz_lib, noether_lib, Commutative algebra
+@node normal_lib
 @subsection normal_lib
 @c lib normal.lib
 @c ---------------------------------------------------------
-@node normaliz_lib, pointid_lib, normal_lib, Commutative algebra
+@node normaliz_lib
 @subsection normaliz_lib
 @c lib normaliz.lib tag:normaliz
 @c ----------------------------------------------------------
-@node pointid_lib, primdec_lib, normaliz_lib, Commutative algebra
+@node pointid_lib
 @subsection pointid_lib
 @c lib pointid.lib
 @c ----------------------------------------------------------
-@node primdec_lib, primdecint_lib, pointid_lib, Commutative algebra
+@node primdec_lib
 @subsection primdec_lib
 @c lib primdec.lib
 @c ---------------------------------------------------------
-@node primdecint_lib, primitiv_lib, primdec_lib, Commutative algebra
+@node primdecint_lib
 @subsection primdecint_lib
 @c lib primdecint.lib
 @c ---------------------------------------------------------
-@node primitiv_lib, realrad_lib, primdecint_lib, Commutative algebra
+@node primitiv_lib
 @subsection primitiv_lib
 @c lib primitiv.lib
 @c ---------------------------------------------------------
-@node realrad_lib, reesclos_lib, primitiv_lib, Commutative algebra
+@node realrad_lib
 @subsection realrad_lib
 @c lib realrad.lib
 @c ---------------------------------------------------------
-@node reesclos_lib, sagbi_lib, realrad_lib, Commutative algebra
+@node reesclos_lib
 @subsection reesclos_lib
 @c lib reesclos.lib
 @c ---------------------------------------------------------
-@node sagbi_lib, sing4ti2_lib, reesclos_lib, Commutative algebra
+@node sagbi_lib
 @subsection sagbi_lib
 @c lib sagbi.lib
 @c ---------------------------------------------------------
-@node sing4ti2_lib, symodstd_lib, sagbi_lib, Commutative algebra
+@node sing4ti2_lib
 @subsection sing4ti2_lib
 @c lib sing4ti2.lib tag:sing4ti2
 @c ----------------------------------------------------------
-@node symodstd_lib,toric_lib,sing4ti2_lib, Commutative algebra
+@node symodstd_lib
 @subsection symodstd_lib
 @c lib symodstd.lib
 @c ---------------------------------------------------------
-@node toric_lib, , symodstd_lib, Commutative algebra
+@node toric_lib
 @subsection toric_lib
 @c lib toric.lib
 @c ---------------------------------------------------------
@@ -654,11 +654,11 @@ iniD, reslist, sumlist, dividelist, createlist
 @end menu
 
 @c ---------------------------------------------------------
-@node alexpoly_lib, arcpoint_lib, Singularities, Singularities
+@node alexpoly_lib
 @subsection alexpoly_lib
 @c lib alexpoly.lib
 @c ---------------------------------------------------------
-@node arcpoint_lib, classify_lib, alexpoly_lib, Singularities
+@node arcpoint_lib
 @subsection arcpoint_lib
 @c lib arcpoint.lib
 @c ---------------------------------------------------------
@@ -680,51 +680,51 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection curvepar_lib
 @c lib curvepar.lib
 @c ----------------------------------------------------------
-@node deform_lib, equising_lib, curvepar_lib, Singularities
+@node deform_lib
 @subsection deform_lib
 @c lib deform.lib
 @c ----------------------------------------------------------
-@node equising_lib, gmssing_lib, deform_lib, Singularities
+@node equising_lib
 @subsection equising_lib
 @c lib equising.lib
 @c ----------------------------------------------------------
-@node gmssing_lib, gmspoly_lib, equising_lib, Singularities
+@node gmssing_lib
 @subsection gmssing_lib
 @c lib gmssing.lib
 @c ----------------------------------------------------------
-@node gmspoly_lib, hnoether_lib, gmssing_lib, Singularities
+@node gmspoly_lib
 @subsection gmspoly_lib
 @c lib gmspoly.lib
 @c ---------------------------------------------------------
-@node hnoether_lib, kskernel_lib, gmspoly_lib, Singularities
+@node hnoether_lib
 @subsection hnoether_lib
 @c lib hnoether.lib
 @c ---------------------------------------------------------
-@node kskernel_lib, mondromy_lib, hnoether_lib, Singularities
+@node kskernel_lib
 @subsection kskernel_lib
 @c lib kskernel.lib
 @c ---------------------------------------------------------
-@node mondromy_lib, qhmoduli_lib, kskernel_lib, Singularities
+@node mondromy_lib
 @subsection mondromy_lib
 @c lib mondromy.lib
 @c ---------------------------------------------------------
-@node qhmoduli_lib, sing_lib, mondromy_lib, Singularities
+@node qhmoduli_lib
 @subsection qhmoduli_lib
 @c lib qhmoduli.lib
 @c ----------------------------------------------------------
-@node sing_lib, spcurve_lib, qhmoduli_lib, Singularities
+@node sing_lib
 @subsection sing_lib
 @c lib sing.lib
 @c ---------------------------------------------------------
-@node spcurve_lib, spectrum_lib, sing_lib, Singularities
+@node spcurve_lib
 @subsection spcurve_lib
 @c lib spcurve.lib
 @c ---------------------------------------------------------
-@node spectrum_lib, surfacesignature_lib, spcurve_lib, Singularities
+@node spectrum_lib
 @subsection spectrum_lib
 @c lib spectrum.lib
 @c ---------------------------------------------------------
-@node surfacesignature_lib, , spectrum_lib, Singularities
+@node surfacesignature_lib
 @subsection surfacesignature_lib
 @c lib surfacesignature.lib
 @c ----------------------------------------------------------------------------
@@ -740,19 +740,19 @@ iniD, reslist, sumlist, dividelist, createlist
 @end menu
 
 @c ----------------------------------------------------------
-@node finvar_lib, ainvar_lib, Invariant theory, Invariant theory
+@node finvar_lib
 @subsection finvar_lib
 @c lib finvar.lib
 @c ----------------------------------------------------------
-@node ainvar_lib, rinvar_lib, finvar_lib, Invariant theory
+@node ainvar_lib
 @subsection ainvar_lib
 @c lib ainvar.lib
 @c ----------------------------------------------------------
-@node rinvar_lib, stratify_lib, ainvar_lib, Invariant theory
+@node rinvar_lib
 @subsection rinvar_lib
 @c lib rinvar.lib
 @c ----------------------------------------------------------
-@node stratify_lib, ,rinvar_lib, Invariant theory
+@node stratify_lib
 @subsection stratify_lib
 @c lib stratify.lib
 @c ----------------------------------------------------------------------------
@@ -771,31 +771,31 @@ iniD, reslist, sumlist, dividelist, createlist
 @end menu
 
 @c ---------------------------------------------------------
-@node ffsolve_lib, presolve_lib, Symbolic-numerical solving, Symbolic-numerical solving
+@node ffsolve_lib
 @subsection ffsolve_lib
 @c lib ffsolve.lib
 @c ---------------------------------------------------------
-@node presolve_lib, solve_lib, ffsolve_lib, Symbolic-numerical solving
+@node presolve_lib
 @subsection presolve_lib
 @c lib presolve.lib
 @c ---------------------------------------------------------
-@node solve_lib, triang_lib, presolve_lib, Symbolic-numerical solving
+@node solve_lib
 @subsection solve_lib
 @c lib solve.lib
 @c ---------------------------------------------------------
-@node triang_lib, ntsolve_lib,  solve_lib, Symbolic-numerical solving
+@node triang_lib
 @subsection triang_lib
 @c lib triang.lib
 @c ---------------------------------------------------------
-@node ntsolve_lib, zeroset_lib, triang_lib, Symbolic-numerical solving
+@node ntsolve_lib
 @subsection ntsolve_lib
 @c lib ntsolve.lib
 @c ---------------------------------------------------------
-@node zeroset_lib,signcond_lib, ntsolve_lib, Symbolic-numerical solving
+@node zeroset_lib
 @subsection zeroset_lib
 @c lib zeroset.lib
 @c ---------------------------------------------------------
-@node signcond_lib, , zeroset_lib, Symbolic-numerical solving
+@node signcond_lib
 @subsection signcond_lib
 @c lib signcond.lib
 @c ---------------------------------------------------------
@@ -811,19 +811,19 @@ iniD, reslist, sumlist, dividelist, createlist
 @end menu
 
 @c ---------------------------------------------------------
-@node graphics_lib, latex_lib, Visualization, Visualization
+@node graphics_lib
 @subsection graphics_lib
 @c lib graphics.lib
 @c ---------------------------------------------------------
-@node latex_lib, surf_lib, graphics_lib, Visualization
+@node latex_lib
 @subsection latex_lib
 @c lib latex.lib
 @c ---------------------------------------------------------
-@node surf_lib,surfex_lib, latex_lib, Visualization
+@node surf_lib
 @subsection surf_lib
 @c lib surf.lib no_ex
 @c ---------------------------------------------------------
-@node surfex_lib,, surf_lib, Visualization
+@node surfex_lib
 @subsection surfex_lib
 @c lib surfex.lib no_ex
 @c ----------------------------------------------------------------------------
@@ -837,11 +837,11 @@ iniD, reslist, sumlist, dividelist, createlist
 @end menu
 
 @c ---------------------------------------------------------
-@node brnoeth_lib, decodegb_lib, , Coding theory
+@node brnoeth_lib
 @subsection brnoeth_lib
 @c lib brnoeth.lib
 @c ---------------------------------------------------------
-@node decodegb_lib, ,brnoeth_lib, Coding theory
+@node decodegb_lib
 @subsection decodegb_lib
 @c lib decodegb.lib
 
@@ -907,17 +907,17 @@ from the outside. Again, the property can be refined in terms
 of autonomy degrees.
 
 @c ---------------------------------------------------------
-@node control_lib, jacobson_lib, Control theory background, System and Control theory
+@node control_lib
 @subsection control_lib
 @c lib control.lib
 
 @c ---------------------------------------------------------
-@node jacobson_lib, findifs_lib, control_lib, System and Control theory
+@node jacobson_lib
 @subsection jacobson_lib
 @c lib jacobson.lib
 
 @c ----------------------------------------------------------
-@node findifs_lib, , jacobson_lib, System and Control theory
+@node findifs_lib
 @subsection findifs_lib
 @c lib findifs.lib
 @c ----------------------------------------------------------------------------
@@ -939,42 +939,42 @@ but not for serious computations.
 * rootsur_lib:: counting number of real roots of univariate polynomial
 @end menu
 @c ---------------------------------------------------------
-@node aksaka_lib, atkins_lib, Teaching, Teaching
+@node aksaka_lib
 @subsection aksaka_lib
 @c lib aksaka.lib
 
 @c ---------------------------------------------------------
-@node atkins_lib, crypto_lib, aksaka_lib, Teaching
+@node atkins_lib
 @subsection atkins_lib
 @c lib atkins.lib
 
 @c ---------------------------------------------------------
-@node crypto_lib, hyperel_lib, atkins_lib, Teaching
+@node crypto_lib
 @subsection crypto_lib
 @c lib crypto.lib
 
 @c ---------------------------------------------------------
-@node hyperel_lib, teachstd_lib, crypto_lib, Teaching
+@node hyperel_lib
 @subsection hyperel_lib
 @c lib hyperel.lib
 
 @c ---------------------------------------------------------
-@node teachstd_lib, weierstr_lib, hyperel_lib, Teaching
+@node teachstd_lib
 @subsection teachstd_lib
 @c lib teachstd.lib
 
 @c ---------------------------------------------------------
-@node weierstr_lib,rootsmr_lib, teachstd_lib, Teaching
+@node weierstr_lib
 @subsection weierstr_lib
 @c lib weierstr.lib
 
 @c ---------------------------------------------------------
-@node rootsmr_lib,rootsur_lib, weierstr_lib, Teaching
+@node rootsmr_lib
 @subsection rootsmr_lib
 @c lib rootsmr.lib
 
 @c ---------------------------------------------------------
-@node rootsur_lib,,rootsmr_lib, Teaching
+@node rootsur_lib
 @subsection rootsur_lib
 @c lib rootsur.lib
 
@@ -989,16 +989,16 @@ but not for serious computations.
 * tropical_lib:: interface to gfan
 @end menu
 @c ----------------------------------------------------------
-@node polymake_lib,realizationMatroids_lib,Tropical Geometry, Tropical Geometry
+@node polymake_lib
 @subsection polymake_lib
 @c lib polymake.lib no_ex
 
 @c ----------------------------------------------------------
-@node realizationMatroids_lib,tropical_lib,polymake_lib, Tropical Geometry
+@node realizationMatroids_lib
 @subsection realizationMatroids_lib
 @c lib realizationMatroids.lib
 @c ----------------------------------------------------------
-@node tropical_lib,, realizationMatroids_lib, Tropical Geometry
+@node tropical_lib
 @subsection tropical_lib
 
 @c lib tropical.lib no_ex
@@ -1013,13 +1013,13 @@ but not for serious computations.
 * polybori_lib::
 @end menu
 @c ----------------------------------------------------------
-@node phindex_lib,polybori_lib,, Miscellaneous libraries
+@node phindex_lib
 @subsection phindex_lib
 
 @c lib phindex.lib
 
 @c ----------------------------------------------------------
-@node polybori_lib,,phindex_lib, Miscellaneous libraries
+@node polybori_lib
 @subsection polybori_lib
 
 @c lib polybori.lib tag:pyobject
@@ -1084,11 +1084,11 @@ Issues:
 @c lib finitediff.lib
 
 @c ----------------------------------------------------------
-@node gitfan_lib,gradedModules_lib, finitediff_lib, Experimental libraries
+@node gitfan_lib
 @subsection gitfan_lib
 @c lib gitfan.lib
 @c ----------------------------------------------------------
-@node gradedModules_lib,hess_lib, gitfan_lib, Experimental libraries
+@node gradedModules_lib
 @subsection gradedModules_lib
 
 @c lib gradedModules.lib

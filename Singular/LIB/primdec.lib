@@ -3412,7 +3412,7 @@ static proc decomp_i(int patchPrimaryDecomposition, ideal i,list #)
   }
 
   ideal jkeep=@j;
-  if(ordstr(@P)[1]=="w")
+  if((ordstr(@P)[1]=="w")&&(size(ringlist(@P)[3])==2)) // weighted ordering
   {
     list gnir_l=ringlist(gnir);
     list @P_l=ringlist(@P);
