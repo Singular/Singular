@@ -98,7 +98,7 @@ string(stry); // incorrectly converted, fall back to default
 // try dumb things:
 newstruct("TBoom",        "TUndefined boom , int something");
 newstruct("TWrong",       "int value, TUndefined undefined");
- 
+
 TWrong f;
 type(f.undefined);
 TBoom g;

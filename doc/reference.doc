@@ -7062,9 +7062,9 @@ Returns
 select returns an error
 @item @code{-1}
 all links are closed/at eof
-@item{0}
+@item @code{0}
 timeout
-@item{>0}
+@item @code{>0}
 (at least) L[i] is ready
 @end table
 @item @strong{Example:}
@@ -8938,6 +8938,7 @@ lines of @sc{Singular} commands. The line length cannot exceed 80
 characters.
 @sc{Singular} proceeds with the execution of the command following @code{~;}
 as soon as it receives an empty line.
+@*Furthermore, the debug mode will be activated: @xref{Source code debugger}.
 @item @strong{Example:}
 @smallexample
 proc t
@@ -9293,6 +9294,16 @@ line numbers are displayed.
 @item @code{TRACE=4}
 Each line is echoed and the interpretation of commands
 in this line is suspended until the user presses @code{RETURN}.
+@item @code{TRACE=8}
+(debug version only:) show basering for all levels
+@item @code{TRACE=128}
+show all calls to kernel routines
+@item @code{TRACE=256}
+show all assigns
+@item @code{TRACE=512}
+show all automtic type conversions
+@item @code{TRACE=1024}
+profiling: print line numbers to smon.out
 @end table
 @*@code{TRACE} is defaulted to 0.
 @*@code{TRACE} does not affect the output of commands.

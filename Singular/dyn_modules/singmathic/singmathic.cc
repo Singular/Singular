@@ -467,7 +467,7 @@ BOOLEAN mathicgb(leftv result, leftv arg)
 {
   result->rtyp=NONE;
 
-  if (arg == NULL || arg->next != NULL || 
+  if (arg == NULL || arg->next != NULL ||
   ((arg->Typ() != IDEAL_CMD) &&(arg->Typ() != MODUL_CMD))){
     WerrorS("Syntax: mathicgb(<ideal>/<module>)");
     return TRUE;

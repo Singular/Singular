@@ -4,12 +4,15 @@
 /*
 * ABSTRACT - interupt handling
 */
-#include <kernel/mod2.h>
+#include <stdio.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <strings.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
-/* includes */
-#ifdef DecAlpha_OSF1
-#define _XOPEN_SOURCE_EXTENDED
-#endif /* MP3-Y2 0.022UF */
+#include <kernel/mod2.h>
 
 #include <omalloc/omalloc.h>
 
@@ -18,20 +21,11 @@
 
 #include <Singular/tok.h>
 #include <Singular/ipshell.h>
-void sig_chld_hdl(int sig); /*#include <Singular/links/ssiLink.h>*/
 #include <Singular/cntrlc.h>
 #include <Singular/feOpt.h>
 #include <Singular/misc_ip.h>
 #include <Singular/links/silink.h>
 #include <Singular/links/ssiLink.h>
-
-#include <stdio.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <strings.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
 /* undef, if you don't want GDB to come up on error */
 
@@ -351,7 +345,8 @@ void sigint_handler(int /*sig*/)
         Tok2Cmdname(iiOp),my_yylinebuf);
       if (feOptValue(FE_OPT_EMACS) == NULL)
       {
-        fputs("abort after this command(a), abort immediately(r), print backtrace(b), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
+        fputs("abort after this command(a), abort immediately(r), print backtrace(b), continue(c) or quit Singular(q) ?",stderr);
+        fflush(stderr);fflush(stdin);
         c = fgetc(stdin);
       }
       else
@@ -370,6 +365,9 @@ void sigint_handler(int /*sig*/)
                   sigint_handler_cnt++;
                   fputs("** Warning: Singular should be restarted as soon as possible **\n",stderr);
                   fflush(stderr);
+                  extern void my_yy_flush();
+                  my_yy_flush();
+                  currentVoice=feInitStdin(NULL);
                   longjmp(si_start_jmpbuf,1);
                 }
                 else

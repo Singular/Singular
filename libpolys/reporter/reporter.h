@@ -28,7 +28,7 @@ extern int  traceit ;
 #define TRACE_SHOW_LINENO 2
 // show current line and wait for <RET>:
 #define TRACE_SHOW_LINE   4
-// show basering for all lveles of the proc-stack at enteringing/leaving proc,
+// show basering for all levels of the proc-stack at enteringing/leaving proc,
 // requires RDEBUG to be defined:
 #define TRACE_SHOW_RINGS  8
 // show current line and do not wait for <RET>:
@@ -41,7 +41,7 @@ extern int  traceit ;
 #define TRACE_CALL       128
 // show all assigns (via ipassign):
 #define TRACE_ASSIGN     256
-// show all automitc type conversions (via ipconv):
+// show all automtic type conversions (via ipconv):
 #define TRACE_CONV       512
 // profiling: print line-no to smon.out:
 #define TRACE_PROFILING 1024

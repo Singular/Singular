@@ -401,6 +401,9 @@ int    rChar(ring r);
 char * rParStr(ring r);
 
 int    rSum(ring r1, ring r2, ring &sum);
+/// returns -1 for not compatible, 1 for compatible (and sum)
+/// dp_dp:0: block ordering, 1: dp,dp, 2: aa(...),dp
+/// vartest: check for name conflicts
 int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp);
 
 /// returns TRUE, if r1 equals r2 FALSE, otherwise Equality is

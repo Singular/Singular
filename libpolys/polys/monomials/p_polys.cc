@@ -4530,11 +4530,10 @@ static inline unsigned long GetBitFields(const long e,
 unsigned long p_GetShortExpVector(const poly p, const ring r)
 {
   assume(p != NULL);
-  if (p == NULL) return 0;
   unsigned long ev = 0; // short exponent vector
   unsigned int n = BIT_SIZEOF_LONG / r->N; // number of bits per exp
   unsigned int m1; // highest bit which is filled with (n+1)
-  unsigned int i = 0, j=1;
+  int i=0,j=1;
 
   if (n == 0)
   {
@@ -4545,13 +4544,13 @@ unsigned long p_GetShortExpVector(const poly p, const ring r)
     }
     else
     {
-      for (; j<=(unsigned long) r->N; j++)
+      for (; j<=r->N; j++)
       {
         if (p_GetExp(p,j,r) > 0) i++;
         if (i == BIT_SIZEOF_LONG) break;
       }
       if (i>0)
-        ev = ~((unsigned long)0) >> ((unsigned long) (BIT_SIZEOF_LONG - i));
+        ev = ~(0UL) >> (BIT_SIZEOF_LONG - i);
       return ev;
     }
   }
@@ -4579,16 +4578,17 @@ unsigned long p_GetShortExpVector(const poly p, const ring r)
 }
 
 
+///  p_GetShortExpVector of p * pp
 unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r)
 {
   assume(p != NULL);
   assume(pp != NULL);
-  if (p == NULL || pp == NULL) return 0;
 
   unsigned long ev = 0; // short exponent vector
   unsigned int n = BIT_SIZEOF_LONG / r->N; // number of bits per exp
   unsigned int m1; // highest bit which is filled with (n+1)
-  unsigned int i = 0, j=1;
+  int j=1;
+  unsigned long i = 0L;
 
   if (n == 0)
   {
@@ -4599,13 +4599,13 @@ unsigned long p_GetShortExpVector(const poly p, const poly pp, const ring r)
     }
     else
     {
-      for (; j<=(unsigned long) r->N; j++)
+      for (; j<=r->N; j++)
       {
         if (p_GetExp(p,j,r) > 0 || p_GetExp(pp,j,r) > 0) i++;
         if (i == BIT_SIZEOF_LONG) break;
       }
       if (i>0)
-        ev = ~((unsigned long)0) >> ((unsigned long) (BIT_SIZEOF_LONG - i));
+        ev = ~(0UL) >> (BIT_SIZEOF_LONG - i);
       return ev;
     }
   }

@@ -9,51 +9,51 @@ proc tst_test_nfmodstd(ideal I)
 
 ring r=(0,a),(x,y,z,w,u),dp;
 minpoly = a^2+1;
-ideal HJa=[(2*a+3)*x*y^4*z^2 + (a+2)*x^2*y^3*z*w-x^2*y^3*z*w + 2*x*y*z^2*w^3 + (7*a-1)*y^3*w^4,
+ideal HJa=(2*a+3)*x*y^4*z^2 + (a+2)*x^2*y^3*z*w-x^2*y^3*z*w + 2*x*y*z^2*w^3 + (7*a-1)*y^3*w^4,
 	  2*x^2*y^4*z + x^2*y*z^2*w^2-a*x*y^2*z^2*w^2 + (a+11)*x^2*y*z*w^3 -12*x*w^6 + 12*y*w^6,
 	  2*y^5*z + x^2*y^2*z*w-x*y^3*z*w -x*y^3*w^2 +a*y^4*w^2 + 2*y^2*z*w^3,
 	  3*x*y^4*z^3 + x^2*y^2*z*w^3-x*y^3*z*w^3 +(4+a)*y^3*z^2*w^3 +3*x*y*z^3*w^3 +4*a*z^2*w^6
-	  -x*w^7+y*w^7];
+	  -x*w^7+y*w^7;
 
  tst_test_nfmodstd(HJa);
 kill r;
 ring r=(0,a),(x,y,z,w,u,v,n),dp;
 minpoly = a^4+a^3+a^2+a+1;
-ideal I1=[(8/a^2)*x^2*y^2+5*x*y^3+(3-a^2)*x^3*z + x^2*y*z,
+ideal I1=(8/a^2)*x^2*y^2+5*x*y^3+(3-a^2)*x^3*z + x^2*y*z,
 	  x^5+ 2*y^3*z^2+ 13*y^2*z^3+ 5*y*z^4,
 	  8*x^3+(12*a+a^2)*y^3 +x*z^2+3,
-	  (7*a^2-a)*x^2*y^4+18*y^3*z^2+y^3*z^3];
+	  (7*a^2-a)*x^2*y^4+18*y^3*z^2+y^3*z^3;
 tst_test_nfmodstd(I1);
 
-ideal HUa = [a*x+(a-1)*y+(a+2)*w+u,x*y+(a-1)*y*z+z*w + (a+2)*x*w+a*w*u,
+ideal HUa = a*x+(a-1)*y+(a+2)*w+u,x*y+(a-1)*y*z+z*w + (a+2)*x*w+a*w*u,
 	    a*x*y*z+(a+5)*y*z*w+a*x*y*u+(a+2)*x*w*u+a*z*w*u,(a-11)*x*y*z*w+(a+5)*x*y*z*u+a*x*y*w*u +
-	    a*x*z*w*u+a*y*z*w*u,(a + 3)*x*y*z*w*u -(a+23)*v^5];
+	    a*x*z*w*u+a*y*z*w*u,(a + 3)*x*y*z*w*u -(a+23)*v^5;
 tst_test_nfmodstd(HUa);
 kill r;
 ring r=(0,a),(x,y,z,w,u,v,n),dp;
 minpoly = a^3 + 5a + 7;
-ideal I6a=[a*x+(a+2)*y+z+w+u+v,x*y+y*z+z*w+w*u+(a+3)*x*v+u*v,x*y*z+y*z*w
+ideal I6a=a*x+(a+2)*y+z+w+u+v,x*y+y*z+z*w+w*u+(a+3)*x*v+u*v,x*y*z+y*z*w
 	  + (a+1)*z*w*u+x*y*v+x*u*v+w*u*v,(a-1)*x*y*z*w + y*z*w*u +x*y*z*v +x*y*u*v+ x*w*u*v+ z*w*u*v,
-	  x*y*z*w*u+(a+1)*x*y*z*w*v+x*y*z*u*v+x*y*w*u*v+x*z*w*u*v+y*z*w*u*v,x*y*z*w*u*v-a+2];
+	  x*y*z*w*u+(a+1)*x*y*z*w*v+x*y*z*u*v+x*y*w*u*v+x*z*w*u*v+y*z*w*u*v,x*y*z*w*u*v-a+2;
 tst_test_nfmodstd(I6a);
 kill r;
 ring r=(0,a),(x,y,z,w,u,v,n),dp;
 minpoly = a^3+2;
-ideal I= [(2*w*y-2*a+3)*x-z*y^2-z,2*z*x^3 + (4*w*y + 5)*x^2 + (4*z*y^2 + 4*z)*x +
+ideal I= (2*w*y-2*a+3)*x-z*y^2-z,2*z*x^3 + (4*w*y + 5)*x^2 + (4*z*y^2 + 4*z)*x +
 	    2*w*y^3-10*y^2 - 10*w*y,(w^2-a^2+2*a)*x + 11*w*y*z-2*z, (-z^2 + 4*w^2+a^2+2)*x*z
-	    + (4*w*z^2 + 2*w^3-10*w)*y + 4*z^2-10*w^2 + a^2+a];
+	    + (4*w*z^2 + 2*w^3-10*w)*y + 4*z^2-10*w^2 + a^2+a;
 tst_test_nfmodstd(I);
-ideal I1= [(2*w*y-(2*a+3)*z^2)*x-z*y^2-z^2*x,
+ideal I1= (2*w*y-(2*a+3)*z^2)*x-z*y^2-z^2*x,
             2*z*x^2*w + (4*w*y + 5*z^2)*x^2 + (4*z*y^2 + 4*z^2*w)*x + 2*w*y^3-10*x^2*y^2 - 10*x*w*y*z,
             (w^2-(a^2+a)*y*z)*x + 11*w*y*z-2*z^3,
-            (-z^2 + 4*w^2 + (a^2+2)*y^2)*x*z + (4*w*z^2 + 2*w^3-10*w^3)*y + 4*z^2*x*y-10*w^2*x*z + (a^2+2)*y^3*w];
+            (-z^2 + 4*w^2 + (a^2+2)*y^2)*x*z + (4*w*z^2 + 2*w^3-10*w^3)*y + 4*z^2*x*y-10*w^2*x*z + (a^2+2)*y^3*w;
             tst_test_nfmodstd(I1);
 kill r;
 ring r=(0,a),(x,y,z,w,u),dp;
 minpoly = a^3 + 2a + 11;
-ideal Ua = [(a-x)^2 + (a-1)^2*y + z + (a+2)*w + u,x*y + (a-1)*y*z + z*w +
+ideal Ua = (a-x)^2 + (a-1)^2*y + z + (a+2)*w + u,x*y + (a-1)*y*z + z*w +
 	  (a + 2)*x*w + a*w*u,a*x*y*z + (a + 5)*y*z*w + a*x*y*u + (a+2)*x*w*u + a*z*w*u,
-	  (a-11)*x*y*z*w + (a + 5)*x*y*z*u + a*x*y*w*u + a*x*z*w*u + a*y*z*w*u,(a + 3)*x*y*z*w*u + a+23];
+	  (a-11)*x*y*z*w + (a + 5)*x*y*z*u + a*x*y*w*u + a*x*z*w*u + a*y*z*w*u,(a + 3)*x*y*z*w*u + a+23;
 tst_test_nfmodstd(Ua);
 kill r;
 

@@ -501,7 +501,7 @@ convertZZ2CF (const ZZ & a)
     return CanonicalForm(coeff_long);
   }
   else
-  { 
+  {
     const long * rep =
 #if NTL_MAJOR_VERSION <= 6
       static_cast<long *>( a.rep );

@@ -53,11 +53,13 @@ void *blackbox_default_Init(blackbox */*b*/)
 
 BOOLEAN blackbox_default_serialize(blackbox */*b*/, void */*d*/, si_link /*f*/)
 {
+  WerrorS("blackbox_serialize is not implemented");
   return TRUE;
 }
 
 BOOLEAN blackbox_default_deserialize(blackbox **/*b*/, void **/*d*/, si_link /*f*/)
 {
+  WerrorS("blackbox_deserialize is not implemented");
   return TRUE;
 }
 

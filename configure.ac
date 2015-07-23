@@ -132,9 +132,6 @@ SING_CHECK_PLURAL
 
 SING_BUILTIN_MODULES
 
-### the following is needed due to the use of om_sing_opt_show_mem in misc_ip.cc...
-#ac_configure_args="$ac_configure_args --with-external-config_h=../Singular/omSingularConfig.h"
-
 AC_ARG_ENABLE(countedref, AS_HELP_STRING([--enable-countedref], [Enable autoloading of reference counted types]),
 [if test "x$enableval" = "xyes"; then
 ENABLE_COUNTEDREF_AUTOLOAD=yes

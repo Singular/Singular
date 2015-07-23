@@ -16,6 +16,7 @@
 #include <Singular/fevoices.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipshell.h>
+#include <Singular/sdb.h>
 
 #include <stdlib.h>
 #include <stdio.h>

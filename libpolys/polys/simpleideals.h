@@ -13,7 +13,7 @@
 /// The following sip_sideal structure has many different uses
 /// thoughout Singular. Basic use-cases for it are:
 /// * ideal/module: nrows = 1, ncols >=0 and rank:1 for ideals, rank>=0 for modules
-/// * matrix: nrows, ncols >=0, rank == nrows! see mp_* procedures 
+/// * matrix: nrows, ncols >=0, rank == nrows! see mp_* procedures
 /// NOTE: the m member point to memory chunk of size (ncols*nrows*sizeof(poly)) or is NULL
 struct sip_sideal
 {

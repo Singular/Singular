@@ -71,7 +71,7 @@ struct snumber
 BOOLEAN nlInitChar(coeffs, void*);
 
 /// only used by slimgb (tgb.cc)
-static inline int nlQlogSize (number n, const coeffs r)
+static  FORCE_INLINE int nlQlogSize (number n, const coeffs r)
 {
   assume( nCoeff_is_Q (r) );
 
@@ -95,6 +95,17 @@ static inline int nlQlogSize (number n, const coeffs r)
   return mpz_sizeinbase (nn->z, 2);
 }
 
+
+static FORCE_INLINE BOOLEAN nlIsInteger(number q, const coeffs r)
+{
+  assume( nCoeff_is_Q (r) );
+  n_Test(q, r);
+
+  if (SR_HDL(q) & SR_INT)
+    return TRUE; // immidiate int
+
+  return ( q->s == 3 );
+}
 
 number nlModP(number q, const coeffs Q, const coeffs Zp);
 void   nlNormalize(number &x, const coeffs r);

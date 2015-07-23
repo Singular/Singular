@@ -523,3 +523,148 @@ example
     I=nfmodStd(I);
     I;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+
+/*
+Benchmark Problems from
+
+Boku, Decker, Fieker, Steenpass: Groebner Bases over Algebraic Number
+Fields.
+
+// 1
+ring R = (0,a), (x,y,z), dp;
+minpoly = (a^2+1);
+poly f1 = (a+8)*x^2*y^2+5*x*y^3+(-a+3)*x^3*z
+          +x^2*y*z;
+poly f2 = x^5+2*y^3*z^2+13*y^2*z^3+5*y*z^4;
+poly f3 = 8*x^3+(a+12)*y^3+x*z^2+3;
+poly f4 = (-a+7)*x^2*y^4+y^3*z^3+18*y^3*z^2;
+ideal I1 = f1,f2,f3,f4;
+
+// 2
+ring R = (0,a), (x,y,z), dp;
+minpoly = (a^5+a^2+2);
+poly f1 = 2*x*y^4*z^2+(a-1)*x^2*y^3*z
+          +(2*a)*x*y*z^2+7*y^3+(7*a+1);
+poly f2 = 2*x^2*y^4*z+(a)*x^2*y*z^2-x*y^2*z^2
+          +(2*a+3)*x^2*y*z-12*x+(12*a)*y;
+poly f3 = (2*a)*y^5*z+x^2*y^2*z-x*y^3*z
+          +(-a)*x*y^3+y^4+2*y^2*z;
+poly f4 = (3*a)*x*y^4*z^3+(a+1)*x^2*y^2*z
+          -x*y^3*z+4*y^3*z^2+(3*a)*x*y*z^3
+          +4*z^2-x+(a)*y;
+ideal I2 = f1,f2,f3,f4;
+
+// 3a
+ring R = (0,a), (v,w,x,y,z), dp;
+minpoly = (a^7-7*a+3);
+poly f1 = (a)*v+(a-1)*w+x+(a+2)*y+z;
+poly f2 = v*w+(a-1)*w*x+(a+2)*v*y+x*y+(a)*y*z;
+poly f3 = (a)*v*w*x+(a+5)*w*x*y+(a)*v*w*z
+          +(a+2)*v*y*z+(a)*x*y*z;
+poly f4 = (a-11)*v*w*x*y+(a+5)*v*w*x*z
+          +(a)*v*w*y*z+(a)*v*x*y*z
+          +(a)*w*x*y*z;
+poly f5 = (a+3)*v*w*x*y*z+(a+23);
+ideal I3a = f1,f2,f3,f4,f5;
+
+// 3b
+ring R = (0,a), (u,v,w,x,y,z), dp;
+minpoly = (a^7-7*a+3);
+poly f1 = (a)*u+(a+2)*v+w+x+y+z;
+poly f2 = u*v+v*w+w*x+x*y+(a+3)*u*z+y*z;
+poly f3 = u*v*w+v*w*x+(a+1)*w*x*y+u*v*z+u*y*z
+          +x*y*z;
+poly f4 = (a-1)*u*v*w*x+v*w*x*y+u*v*w*z
+          +u*v*y*z+u*x*y*z+w*x*y*z;
+poly f5 = u*v*w*x*y+(a+1)*u*v*w*x*z+u*v*w*y*z
+          +u*v*x*y*z+u*w*x*y*z+v*w*x*y*z;
+poly f6 = u*v*w*x*y*z+(-a+2);
+ideal I3b = f1,f2,f3,f4,f5,f6;
+
+// 4
+ring R = (0,a), (w,x,y,z), dp;
+minpoly = (a^6+a^5+a^4+a^3+a^2+a+1);
+poly f1 = (a+5)*w^3*x^2*y+(a-3)*w^2*x^3*y
+          +(a+7)*w*x^2*y^2;
+poly f2 = (a)*w^5+(a+3)*w*x^2*y^2
+          +(a^2+11)*x^2*y^2*z;
+poly f3 = (a+7)*w^3+12*x^3+4*w*x*y+(a)*z^3;
+poly f4 = 3*w^3+(a-4)*x^3+x*y^2;
+ideal I4 = f1,f2,f3,f4;
+
+// 5
+ring R = (0,a), (w,x,y,z), dp;
+minpoly = (a^12-5*a^11+24*a^10-115*a^9+551*a^8
+          -2640*a^7+12649*a^6-2640*a^5+551*a^4
+          -115*a^3+24*a^2-5*a+1);
+poly f1 = (2*a+3)*w*x^4*y^2+(a+1)*w^2*x^3*y*z
+          +2*w*x*y^2*z^3+(7*a-1)*x^3*z^4;
+poly f2 = 2*w^2*x^4*y+w^2*x*y^2*z^2
+          +(-a)*w*x^2*y^2*z^2
+          +(a+11)*w^2*x*y*z^3-12*w*z^6
+          +12*x*z^6;
+poly f3 = 2*x^5*y+w^2*x^2*y*z-w*x^3*y*z
+          -w*x^3*z^2+(a)*x^4*z^2+2*x^2*y*z^3;
+poly f4 = 3*w*x^4*y^3+w^2*x^2*y*z^3
+          -w*x^3*y*z^3+(a+4)*x^3*y^2*z^3
+          +3*w*x*y^3*z^3+(4*a)*y^2*z^6-w*z^7
+          +x*z^7;
+ideal I5 = f1,f2,f3,f4;
+
+// 6
+ring R = (0,a), (u,v,w,x,y,z), dp;
+minpoly = (a^2+5*a+1);
+poly f1 = u+v+w+x+y+z+(a);
+poly f2 = u*v+v*w+w*x+x*y+y*z+(a)*u+(a)*z;
+poly f3 = u*v*w+v*w*x+w*x*y+x*y*z+(a)*u*v
+          +(a)*u*z+(a)*y*z;
+poly f4 = u*v*w*x+v*w*x*y+w*x*y*z+(a)*u*v*w
+          +(a)*u*v*z+(a)*u*y*z+(a)*x*y*z;
+poly f5 = u*v*w*x*y+v*w*x*y*z+(a)*u*v*w*x
+          +(a)*u*v*w*z+(a)*u*v*y*z+(a)*u*x*y*z
+          +(a)*w*x*y*z;
+poly f6 = u*v*w*x*y*z+(a)*u*v*w*x*y
+          +(a)*u*v*w*x*z+(a)*u*v*w*y*z
+          +(a)*u*v*x*y*z+(a)*u*w*x*y*z
+          +(a)*v*w*x*y*z;
+poly f7 = (a)*u*v*w*x*y*z-1;
+ideal I6 = f1,f2,f3,f4,f5,f6,f7;
+
+// 7
+ring R = (0,a), (w,x,y,z), dp;
+minpoly = (a^8-16*a^7+19*a^6-a^5-5*a^4+13*a^3
+          -9*a^2+13*a+17);
+poly f1 = (-a^2-1)*x^2*y+2*w*x*z-2*w
+          +(a^2+1)*y;
+poly f2 = (a^3-a-3)*w^3*y+4*w*x^2*y+4*w^2*x*z
+          +2*x^3*z+(a)*w^2-10*x^2+4*w*y-10*x*z
+          +(2*a^2+a);
+poly f3 = (a^2+a+11)*x*y*z+w*z^2-w-2*y;
+poly f4 = -w*y^3+4*x*y^2*z+4*w*y*z^2+2*x*z^3
+          +(2*a^3+a^2)*w*y+4*y^2-10*x*z-10*z^2
+          +(3*a^2+5);
+ideal I7 = f1,f2,f3,f4;
+
+// 8
+ring R = (0,a), (t,u,v,w,x,y,z), dp;
+minpoly = (a^7+10*a^5+5*a^3+10*a+1);
+poly f1 = v*x+w*y-x*z-w-y;
+poly f2 = v*w-u*x+x*y-w*z+v+x+z;
+poly f3 = t*w-w^2+x^2-t;
+poly f4 = (-a)*v^2-u*y+y^2-v*z-z^2+u;
+poly f5 = t*v+v*w+(-a^2-a-5)*x*y-t*z+w*z+v+x+z
+          +(a+1);
+poly f6 = t*u+u*w+(-a-11)*v*x-t*y+w*y-x*z-t-u
+          +w+y;
+poly f7 = w^2*y^3-w*x*y^3+x^2*y^3+w^2*y^2*z
+          -w*x*y^2*z+x^2*y^2*z+w^2*y*z^2
+          -w*x*y*z^2+x^2*y*z^2+w^2*z^3-w*x*z^3
+          +x^2*z^3;
+poly f8 = t^2*u^3+t^2*u^2*v+t^2*u*v^2+t^2*v^3
+          -t*u^3*x-t*u^2*v*x-t*u*v^2*x-t*v^3*x
+          +u^3*x^2+u^2*v*x^2+u*v^2*x^2
+          +v^3*x^2;
+ideal I8 = f1,f2,f3,f4,f5,f6,f7,f8;
+*/
