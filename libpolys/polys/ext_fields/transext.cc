@@ -229,19 +229,19 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
       }
     }
 
-    poly gcd = singclap_gcd_r( num, den, ntRing );
-
-    if( !p_IsOne(gcd, ntRing) )
+    if (COM(t)==0)
     {
-      Print("ERROR in %s:%d: 1 != GCD between num. & den. poly\n",f,l);
-      Print("GCD: ");  p_Write(gcd, ntRing);
-      Print("NUM: ");  p_Write(num, ntRing);
-      Print("DEN: ");  p_Write(den, ntRing);
-      return FALSE;
+      poly gcd = singclap_gcd_r( num, den, ntRing );
+      if( !p_IsOne(gcd, ntRing) )
+      {
+        Print("ERROR in %s:%d: 1 != GCD between num. & den. poly\n",f,l);
+        Print("GCD: ");  p_Write(gcd, ntRing);
+        Print("NUM: ");  p_Write(num, ntRing);
+        Print("DEN: ");  p_Write(den, ntRing);
+        return FALSE;
+      }
+      p_Delete( &gcd, ntRing );
     }
-
-    p_Delete( &gcd, ntRing );
-
     return TRUE;
 
 
@@ -1312,7 +1312,7 @@ void heuristicGcdCancellation(number a, const coeffs cf)
               p_ExpVectorDiff(h,h,den_f,ntRing);
               pIter(h);
             } while(h!=NULL);
-	    p_ExpVectorDiff(den_f,den_f,den_f,ntRing);
+            p_ExpVectorDiff(den_f,den_f,den_f,ntRing);
             break;
           }
           int i=0;
@@ -1434,7 +1434,7 @@ void definiteGcdCancellation(number a, const coeffs cf,
   { /* We divide both NUM(f) and DEN(f) by the gcd which is known
        to be != 1. */
     if (p_IsConstant(DEN(f), ntRing) &&
-        n_IsOne(p_GetCoeff(DEN(f), ntRing), ntCoeffs))
+      n_IsOne(p_GetCoeff(DEN(f), ntRing), ntCoeffs))
     {
       /* DEN(f) = 1 needs to be represented by NULL! */
       p_Delete(&DEN(f), ntRing);
@@ -1457,10 +1457,11 @@ void definiteGcdCancellation(number a, const coeffs cf,
       }
     }
   }
-  COM(f) = 0;
   p_Delete(&pGcd, ntRing);
+  COM(f) = 0;
 
   if( DEN(f) != NULL )
+  {
     if( !n_GreaterZero(pGetCoeff(DEN(f)), ntCoeffs) )
     {
       NUM(f) = p_Neg(NUM(f), ntRing);
@@ -1473,6 +1474,7 @@ void definiteGcdCancellation(number a, const coeffs cf,
         DEN (f) = NULL;
       }
     }
+  }
   ntTest(a); // !!!!
 }
 
