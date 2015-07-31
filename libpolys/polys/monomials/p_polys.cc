@@ -115,7 +115,7 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, CFArray &inv_cach
     for(j=rl-1;j>=0;j--)
     {
       hh=xx[j];
-      if ((hh!=NULL) && (p_LmCmp(r,hh,R)==0))
+      if ((hh!=NULL) && (p_LmCmp(h,hh,R)==0))
       {
         x[j]=pGetCoeff(hh);
         hh=p_LmFreeAndNext(hh,R);
