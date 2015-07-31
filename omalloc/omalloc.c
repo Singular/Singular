@@ -46,13 +46,7 @@ void* valloc(size_t size)
   return NULL;
 }
 
-#if defined(sgi)
 void* memalign(size_t size_1, size_t size_2)
-#elif (defined(__sun) && (defined(__sparc) || defined(__i386) || defined(__x86_64)) || defined(__CYGWIN__))
-void* memalign(size_t size_1, size_t size_2)
-#else
-void* memalign(void* alignment, size_t size)
-#endif
 {
   fprintf(stderr, "omalloc Warning: memalign not yet implemented\n");
   fflush(NULL);
