@@ -47,7 +47,7 @@ Return STRING on `system("\-\-user\-option")'
 Print extended version and configuration info
 .TP
 \fB\-\-allow\-net\fR
-Allow to fetch (html) help pages from the net
+Allow one to fetch (html) help pages from the net
 .TP
 \fB\-\-browser\fR=\fIBROWSER\fR
 Display help in BROWSER ([x,tk]info, firefox, ...)
