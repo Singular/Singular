@@ -1720,24 +1720,40 @@ ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing)
 
 ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring r)
 {
-  int cnt=IDELEMS(xx[0])*xx[0]->nrows;
-  ideal result=idInit(cnt,xx[0]->rank);
-  result->nrows=xx[0]->nrows; // for lifting matrices
-  result->ncols=xx[0]->ncols; // for lifting matrices
+  int cnt=0;int rw=0; int cl=0;
   int i,j;
+  // find max. size of xx[.]:
+  for(j=rl-1;j>=0;j--)
+  {
+    i=IDELEMS(xx[j])*xx[j]->nrows;
+    if (i>cnt) cnt=i;
+    if (xx[j]->nrows >rw) rw=xx[j]->nrows; // for lifting matrices
+    if (xx[j]->ncols >cl) cl=xx[j]->ncols; // for lifting matrices
+  }
+  if (rw*cl !=cnt)
+  {
+    WerrorS("format mismatch in CRT");
+    return NULL;
+  }
+  ideal result=idInit(cnt,xx[0]->rank);
+  result->nrows=rw; // for lifting matrices
+  result->ncols=cl; // for lifting matrices
   number *x=(number *)omAlloc(rl*sizeof(number));
   poly *p=(poly *)omAlloc(rl*sizeof(poly));
-  CFArray inv_cache(rl);;
+  CFArray inv_cache(rl);
   for(i=cnt-1;i>=0;i--)
   {
     for(j=rl-1;j>=0;j--)
     {
-      p[j]=xx[j]->m[i];
+      if(i>=IDELEMS(xx[j])*xx[j]->nrows) // out of range of this ideal
+        p[j]=NULL;
+      else
+        p[j]=xx[j]->m[i];
     }
     result->m[i]=p_ChineseRemainder(p,x,q,rl,inv_cache,r);
     for(j=rl-1;j>=0;j--)
     {
-      xx[j]->m[i]=p[j];
+      if(i<IDELEMS(xx[j])*xx[j]->nrows) xx[j]->m[i]=p[j];
     }
   }
   omFreeSize(p,rl*sizeof(poly));
