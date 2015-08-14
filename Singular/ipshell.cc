@@ -165,6 +165,7 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
   ipListFlag(h);
   switch(IDTYP(h))
   {
+    case ALIAS_CMD: Print(" for %s",IDID((idhdl)IDDATA(h))); break;
     case INT_CMD:   Print(" %d",IDINT(h)); break;
     case INTVEC_CMD:Print(" (%d)",IDINTVEC(h)->length()); break;
     case INTMAT_CMD:Print(" %d x %d",IDINTVEC(h)->rows(),IDINTVEC(h)->cols());
@@ -782,7 +783,7 @@ leftv iiMap(map theMap, const char * what)
         {
           v->rtyp=IDEAL_CMD;
           char *tmp = theMap->preimage;
-	  theMap->preimage=(char*)1L;
+          theMap->preimage=(char*)1L;
           // map gets 1 as its rank (as an ideal)
           v->data=fast_map(IDIDEAL(w), src_ring, (ideal)theMap, currRing);
           theMap->preimage=tmp; // map gets its preimage back
@@ -1325,83 +1326,6 @@ BOOLEAN iiParameter(leftv p)
   omFreeBin((ADDRESS)h, sleftv_bin);
   return res;
 }
-BOOLEAN iiAlias(leftv p)
-{
-  if (iiCurrArgs==NULL)
-  {
-    Werror("not enough arguments for proc %s",VoiceName());
-    p->CleanUp();
-    return TRUE;
-  }
-  leftv h=iiCurrArgs;
-  iiCurrArgs=h->next;
-  h->next=NULL;
-  if (h->rtyp!=IDHDL)
-  {
-    BOOLEAN res=iiAssign(p,h);
-    h->CleanUp();
-    omFreeBin((ADDRESS)h, sleftv_bin);
-    return res;
-  }
-  if (h->Typ()!=p->Typ())
-  {
-    WerrorS("type mismatch");
-    return TRUE;
-  }
-  idhdl pp=(idhdl)p->data;
-  switch(pp->typ)
-  {
-#ifdef SINGULAR_4_1
-      case CRING_CMD:
-        nKillChar((coeffs)pp);
-        break;
-#endif
-      case INT_CMD:
-        break;
-      case INTVEC_CMD:
-      case INTMAT_CMD:
-         delete IDINTVEC(pp);
-         break;
-      case NUMBER_CMD:
-         nDelete(&IDNUMBER(pp));
-         break;
-      case BIGINT_CMD:
-         n_Delete(&IDNUMBER(pp),coeffs_BIGINT);
-         break;
-      case MAP_CMD:
-         {
-           map im = IDMAP(pp);
-           omFree((ADDRESS)im->preimage);
-         }
-         // continue as ideal:
-      case IDEAL_CMD:
-      case MODUL_CMD:
-      case MATRIX_CMD:
-          idDelete(&IDIDEAL(pp));
-         break;
-      case PROC_CMD:
-      case RESOLUTION_CMD:
-      case STRING_CMD:
-         omFree((ADDRESS)IDSTRING(pp));
-         break;
-      case LIST_CMD:
-         IDLIST(pp)->Clean();
-         break;
-      case LINK_CMD:
-         omFreeBin(IDLINK(pp),sip_link_bin);
-         break;
-       // case ring: cannot happen
-       default:
-         Werror("unknown type %d",p->Typ());
-         return TRUE;
-  }
-  pp->typ=ALIAS_CMD;
-  IDDATA(pp)=(char*)h->data;
-  h->CleanUp();
-  omFreeBin((ADDRESS)h, sleftv_bin);
-  return FALSE;
-}
-
 static BOOLEAN iiInternalExport (leftv v, int toLev)
 {
   idhdl h=(idhdl)v->data;
