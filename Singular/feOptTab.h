@@ -107,7 +107,7 @@ struct fe_option feOptSpec[] =
 
 
   {"allow-net",         no_argument,        LONG_OPTION_RETURN,
-   0,          "Allow to fetch (html) help pages from the net",                feOptBool,    0,      0},
+   0,          "Allow one to fetch (html) help pages from the net",    feOptBool,    0,      0},
 
   {"browser",           required_argument,  LONG_OPTION_RETURN,
    "BROWSER",  "Display help in BROWSER (see help.cnf)",       feOptString, 0,   0},

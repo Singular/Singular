@@ -738,3 +738,88 @@ idhdl packFindHdl(package r)
   }
   return NULL;
 }
+
+BOOLEAN iiAlias(leftv p)
+{
+  if (iiCurrArgs==NULL)
+  {
+    Werror("not enough arguments for proc %s",VoiceName());
+    p->CleanUp();
+    return TRUE;
+  }
+  leftv h=iiCurrArgs;
+  iiCurrArgs=h->next;
+  h->next=NULL;
+  if (h->rtyp!=IDHDL)
+  {
+    BOOLEAN res=iiAssign(p,h);
+    h->CleanUp();
+    omFreeBin((ADDRESS)h, sleftv_bin);
+    return res;
+  }
+  if ((h->Typ()!=p->Typ()) &&(p->Typ()!=DEF_CMD))
+  {
+    WerrorS("type mismatch");
+    return TRUE;
+  }
+  idhdl pp=(idhdl)p->data;
+  switch(pp->typ)
+  {
+#ifdef SINGULAR_4_1
+      case CRING_CMD:
+        nKillChar((coeffs)pp);
+        break;
+#endif
+      case DEF_CMD:
+      case INT_CMD:
+        break;
+      case INTVEC_CMD:
+      case INTMAT_CMD:
+         delete IDINTVEC(pp);
+         break;
+      case NUMBER_CMD:
+         nDelete(&IDNUMBER(pp));
+         break;
+      case BIGINT_CMD:
+         n_Delete(&IDNUMBER(pp),coeffs_BIGINT);
+         break;
+      case MAP_CMD:
+         {
+           map im = IDMAP(pp);
+           omFree((ADDRESS)im->preimage);
+         }
+         // continue as ideal:
+      case IDEAL_CMD:
+      case MODUL_CMD:
+      case MATRIX_CMD:
+          idDelete(&IDIDEAL(pp));
+         break;
+      case PROC_CMD:
+      case RESOLUTION_CMD:
+      case STRING_CMD:
+         omFree((ADDRESS)IDSTRING(pp));
+         break;
+      case LIST_CMD:
+         IDLIST(pp)->Clean();
+         break;
+      case LINK_CMD:
+         omFreeBin(IDLINK(pp),sip_link_bin);
+         break;
+       // case ring: cannot happen
+       default:
+         Werror("unknown type %d",p->Typ());
+         return TRUE;
+  }
+  pp->typ=ALIAS_CMD;
+  IDDATA(pp)=(char*)h->data;
+  int eff_typ=h->Typ();
+  if ((RingDependend(eff_typ))
+  || ((eff_typ==LIST_CMD) && (lRingDependend((lists)h->Data()))))
+  {
+    ipSwapId(pp,IDROOT,currRing->idroot);
+  }
+  h->CleanUp();
+  omFreeBin((ADDRESS)h, sleftv_bin);
+  return FALSE;
+}
+

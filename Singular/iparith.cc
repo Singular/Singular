@@ -1827,12 +1827,12 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   else
   {
-    xx=(number *)omAlloc(rl*sizeof(number));
     if (nMap==NULL)
     {
       Werror("not implemented: map bigint -> %s", nCoeffString(cf));
       return TRUE;
     }
+    xx=(number *)omAlloc(rl*sizeof(number));
     for(i=rl-1;i>=0;i--)
     {
       if (c->m[i].Typ()==INT_CMD)
@@ -1897,7 +1897,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     result=id_ChineseRemainder(x,q,rl,currRing);
     // deletes also x
     c->Clean();
-    if (return_type==POLY_CMD)
+    if ((return_type==POLY_CMD) &&(result!=NULL))
     {
       res->data=(char *)result->m[0];
       result->m[0]=NULL;
@@ -1912,7 +1912,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   omFree(q);
   res->rtyp=return_type;
-  return FALSE;
+  return result==NULL;
 }
 static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
 {
