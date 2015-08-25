@@ -3275,7 +3275,7 @@ static proc getMonomByExponent(intvec exp)
 
 /******************************************************/
 proc multiDegBasis(intvec d)
-"USAGE: multidegree d
+"USAGE: multiDegBasis(d), multidegree: intvec d
 ASSUME: current ring is multigraded, monomial ordering is global
 PURPOSE: compute all monomials of multidegree d
 EXAMPLE: example multiDegBasis; shows an example
