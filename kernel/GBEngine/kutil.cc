@@ -9077,6 +9077,10 @@ void kDebugPrint(kStrategy strat)
     if (strat->initEcartPair==initEcartPairBba) PrintS("initEcartPairBba\n");
     else if (strat->initEcartPair==initEcartPairMora) PrintS("initEcartPairMora\n");
     else  Print("%p\n",(void*)strat->initEcartPair);
+  Print("homog=%d, LazyDegree=%d, LazyPass=%d, ak=%d,\n",
+    strat->homog, strat->LazyDegree,strat->LazyPass, strat->ak);
+  Print("honey=%d, sugarCrit=%d, Gebauer=%d, noTailReduction=%d, use_buckets=%d\n",
+    strat->honey,strat->sugarCrit,strat->Gebauer,strat->noTailReduction,strat->use_buckets);
   PrintS("chainCrit: ");
     if (strat->chainCrit==chainCritNormal) PrintS("chainCritNormal\n");
     else if (strat->chainCrit==chainCritOpt_1) PrintS("chainCritOpt_1\n");
