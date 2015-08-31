@@ -312,12 +312,14 @@ static proc deleteUnluckyPrimes_default(alias list modresults)
     return(list());
 }
 
-static proc pTest_default(string command, alias list args, def result, int p)
+static proc pTest_default(string command, alias list args, alias def result,
+    int p)
 {
     return(1);
 }
 
-static proc finalTest_default(string command, alias list args, def result)
+static proc finalTest_default(string command, alias list args,
+    alias def result)
 {
     return(1);
 }
