@@ -1227,15 +1227,15 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
   BOOLEAN is_ring = rField_is_Ring(currRing);
 #endif
 #ifdef KDEBUG
-  if (TEST_OPT_DEBUG)
-  {
-    PrintS("redNF: starting S: ");
-    for( j = 0; j <= max_ind; j++ )
-    {
-      Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
-      pWrite(strat->S[j]);
-    }
-  };
+//  if (TEST_OPT_DEBUG)
+//  {
+//    PrintS("redNF: starting S:\n");
+//    for( j = 0; j <= max_ind; j++ )
+//    {
+//      Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
+//      pWrite(strat->S[j]);
+//    }
+//  };
 #endif
 
   loop
@@ -1303,15 +1303,15 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
         kBucketDestroy(&P.bucket);
 
 #ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-        {
-          PrintS("redNF: starting S: ");
-          for( j = 0; j <= max_ind; j++ )
-          {
-            Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
-            pWrite(strat->S[j]);
-          }
-        };
+//        if (TEST_OPT_DEBUG)
+//        {
+//          PrintS("redNF: starting S:\n");
+//          for( j = 0; j <= max_ind; j++ )
+//          {
+//            Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
+//            pWrite(strat->S[j]);
+//          }
+//        };
 #endif
 
         return NULL;
@@ -1336,15 +1336,15 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
       pNormalize(P.p);
 
 #ifdef KDEBUG
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("redNF: starting S: ");
-        for( j = 0; j <= max_ind; j++ )
-        {
-          Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
-          pWrite(strat->S[j]);
-        }
-      };
+//      if (TEST_OPT_DEBUG)
+//      {
+//        PrintS("redNF: starting S:\n");
+//        for( j = 0; j <= max_ind; j++ )
+//        {
+//          Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
+//          pWrite(strat->S[j]);
+//        }
+//      };
 #endif
 
       return P.p;
@@ -1687,7 +1687,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 //      ecartWeights=NULL;
 //    }
 //  }
-  if (TEST_OPT_PROT) messageStat(hilbcount,strat);
+  if ((TEST_OPT_PROT) || (TEST_OPT_DEBUG)) messageStat(hilbcount,strat);
   SI_RESTORE_OPT1(save);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
 

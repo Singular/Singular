@@ -2299,23 +2299,6 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   Lp.lcm = pInit();
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
-  for(j = strat->Ll;j>=0;j--)
-  {
-    compare=pDivComp(strat->L[j].lcm,Lp.lcm);
-    if ((compare==1) || (pLmEqual(strat->L[j].lcm,Lp.lcm)))
-    {
-      //PrintS("c3-crit\n");
-      strat->c3++;
-      pLmFree(Lp.lcm);
-      return;
-    }
-    else if (compare ==-1)
-    {
-      //Print("c3-crit with L[%d]\n",j);
-      deleteInL(strat->L,&strat->Ll,j,strat);
-      strat->c3++;
-    }
-  }
   /*-  compute the short s-polynomial -*/
 
   #ifdef HAVE_PLURAL
@@ -2619,6 +2602,22 @@ void chainCritNormal (poly p,int ecart,kStrategy strat)
       j--;
     }
   }
+}
+/*2
+*the pairset B of pairs of type (s[i],p) is complete now. It will be updated
+*without the chain-criterion in B and L and enters B to L
+*/
+void chainCritOpt_1 (poly,int,kStrategy strat)
+{
+  if (strat->pairtest!=NULL)
+  {
+    omFreeSize(strat->pairtest,(strat->sl+2)*sizeof(BOOLEAN));
+    strat->pairtest=NULL;
+  }
+  /*
+  *the elements of B enter L
+  */
+  kMergeBintoL(strat);
 }
 /*2
 *the pairset B of pairs of type (s[i],p) is complete now. It will be updated
@@ -7563,6 +7562,8 @@ void initBuchMoraCrit(kStrategy strat)
 {
   strat->enterOnePair=enterOnePairNormal;
   strat->chainCrit=chainCritNormal;
+  if (TEST_OPT_SB_1)
+    strat->chainCrit=chainCritOpt_1;
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
@@ -9077,9 +9078,13 @@ void kDebugPrint(kStrategy strat)
     else if (strat->initEcartPair==initEcartPairMora) PrintS("initEcartPairMora\n");
     else  Print("%p\n",(void*)strat->initEcartPair);
   Print("homog=%d, LazyDegree=%d, LazyPass=%d, ak=%d,\n",
-         strat->homog, strat->LazyDegree,strat->LazyPass, strat->ak);
+    strat->homog, strat->LazyDegree,strat->LazyPass, strat->ak);
   Print("honey=%d, sugarCrit=%d, Gebauer=%d, noTailReduction=%d, use_buckets=%d\n",
-         strat->honey,strat->sugarCrit,strat->Gebauer,strat->noTailReduction,strat->use_buckets);
+    strat->honey,strat->sugarCrit,strat->Gebauer,strat->noTailReduction,strat->use_buckets);
+  PrintS("chainCrit: ");
+    if (strat->chainCrit==chainCritNormal) PrintS("chainCritNormal\n");
+    else if (strat->chainCrit==chainCritOpt_1) PrintS("chainCritOpt_1\n");
+    else  Print("%p\n",(void*)strat->chainCrit);
   Print("posInLDependsOnLength=%d\n",
          strat->posInLDependsOnLength);
   PrintS(showOption());PrintLn();

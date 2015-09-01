@@ -53,17 +53,18 @@ poly prMapR(poly src, nMapFunc nMap, ring src_r, ring dest_r)
 
   poly dest = &dest_s;
 
+  poly prev;
   while (src != NULL)
   {
-    poly prev=dest;
-    pNext(dest) = (poly) p_Init(dest_r); pIter(dest);
+    pNext(dest) = (poly) p_Init(dest_r);
+    prev = dest;
+    pIter(dest);
 
     pSetCoeff0(dest, nMap(pGetCoeff(src),src_r->cf,dest_r->cf));
     prCopyEvector(dest, dest_r, src, src_r, _min);
     if (n_IsZero(pGetCoeff(dest),dest_r->cf))
     {
-      p_LmDelete(pNext(prev),dest_r);
-      dest=pNext(prev);
+      p_LmDelete(&pNext(prev),dest_r);
     }
     pIter(src);
   }

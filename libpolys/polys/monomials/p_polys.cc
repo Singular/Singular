@@ -3094,6 +3094,8 @@ number p_GetAllDenom(poly ph, const ring r)
 int p_Size(poly p, const ring r)
 {
   int count = 0;
+  if (r->cf->has_simple_Alloc)
+    return pLength(p);
   while ( p != NULL )
   {
     count+= n_Size( pGetCoeff( p ), r->cf );
