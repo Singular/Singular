@@ -1751,7 +1751,7 @@ loop_count = 1;
   strat->lastAxis = 0; //???
   pDelete(&strat->kNoether);
   omFreeSize((ADDRESS)strat->NotUsedAxis,((currRing->N)+1)*sizeof(BOOLEAN));
-  if (TEST_OPT_PROT) messageStat(hilbcount,strat);
+  if ((TEST_OPT_PROT)||(TEST_OPT_DEBUG))  messageStat(hilbcount,strat);
 //  if (TEST_OPT_WEIGHTM)
 //  {
 //    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
@@ -2240,6 +2240,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
   strat->LazyDegree = 1;
   strat->enterOnePair=enterOnePairNormal;
   strat->chainCrit=chainCritNormal;
+  if (TEST_OPT_SB_1) strat->chainCrit=chainCritOpt_1;
   strat->ak = id_RankFreeModule(F,currRing);
   strat->kModW=kModW=NULL;
   strat->kHomW=kHomW=NULL;

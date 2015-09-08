@@ -26,8 +26,9 @@
 @item renamed derham_lib to @nref{deRham_lib}
 @item new library: graal_lib
 @item new library: deflation.lib
-@item new library:   maxlike.lib
-@item new library:   recover.lib
+@item new library: maxlike.lib
+@item new library: recover.lib
+@item new library: chern.lib
 @item grobcov.lib (grobcovK) (@nref{grobcov_lib}) with new routine
    ConsLevels (@nref{ConsLevels}), removed AddCons  AddConsP.
 @end itemize

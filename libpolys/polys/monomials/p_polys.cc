@@ -115,7 +115,7 @@ poly p_ChineseRemainder(poly *xx, number *x,number *q, int rl, CFArray &inv_cach
     for(j=rl-1;j>=0;j--)
     {
       hh=xx[j];
-      if ((hh!=NULL) && (p_LmCmp(r,hh,R)==0))
+      if ((hh!=NULL) && (p_LmCmp(h,hh,R)==0))
       {
         x[j]=pGetCoeff(hh);
         hh=p_LmFreeAndNext(hh,R);
@@ -3094,6 +3094,8 @@ number p_GetAllDenom(poly ph, const ring r)
 int p_Size(poly p, const ring r)
 {
   int count = 0;
+  if (r->cf->has_simple_Alloc)
+    return pLength(p);
   while ( p != NULL )
   {
     count+= n_Size( pGetCoeff( p ), r->cf );

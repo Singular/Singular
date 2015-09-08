@@ -7996,7 +7996,7 @@ EXAMPLE: example newDecompStep; shows an example
   }
 
   ideal jkeep=@j;
-  if(ordstr(@P)[1]=="w")
+  if((ordstr(@P)[1]=="w")&&(size(ringlist(@P)[3])==2)) // weighted ordering
   {
     def @Phelp=ring(ringlist(gnir));
     setring @Phelp;

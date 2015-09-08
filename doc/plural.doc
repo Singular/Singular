@@ -111,7 +111,6 @@ Unless stated otherwise, a @code{module} as understood by @sc{Plural}, is
 @item @code{qring} BR_PLURAL_BR
 
 In @sc{Plural} it is only possible to build factor-algebras modulo @strong{two-sided} ideals (see @ref{qring BR_PLURAL_BR}).
-@end itemize
 @end table
 
 @c ----------------------------------------------------------------------------

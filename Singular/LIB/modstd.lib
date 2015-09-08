@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="version modstd.lib 4.0.0.0 May_2014 "; // $Id$
+version="version modstd.lib 4.0.2.0 Aug_2015 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  modstd.lib      Groebner bases of ideals using modular methods
@@ -218,7 +218,8 @@ static proc deleteUnluckyPrimes_std(alias list modresults)
 
 /* test if 'command' applied to 'args' in characteristic p is the same as
    'result' mapped to characteristic p */
-static proc pTest_std(string command, list args, ideal result, int p)
+static proc pTest_std(string command, alias list args, alias ideal result,
+    int p)
 {
     /* change to characteristic p */
     def br = basering;

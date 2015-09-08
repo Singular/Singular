@@ -524,7 +524,6 @@ template void mgb::computeGroebnerBasis<MathicToSingStream>
 
 extern "C" int SI_MOD_INIT(singmathic)(SModulFunctions* psModulFunctions)
 {
-  PrintS("Initializing Singular-Mathic interface Singmathic.\n");
   psModulFunctions->iiAddCproc(
     (currPack->libname ? currPack->libname : ""),
     "mathicgb",

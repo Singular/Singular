@@ -1,0 +1,2 @@
+gcc -shared -DDYNAMIC_VERSION -fPIC -I /tmp/wawa-i/include/singular -I /tmp/wawa-i/include partition.cc -o partition.so
+

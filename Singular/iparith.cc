@@ -1827,12 +1827,12 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   else
   {
-    xx=(number *)omAlloc(rl*sizeof(number));
     if (nMap==NULL)
     {
       Werror("not implemented: map bigint -> %s", nCoeffString(cf));
       return TRUE;
     }
+    xx=(number *)omAlloc(rl*sizeof(number));
     for(i=rl-1;i>=0;i--)
     {
       if (c->m[i].Typ()==INT_CMD)
@@ -1897,7 +1897,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     result=id_ChineseRemainder(x,q,rl,currRing);
     // deletes also x
     c->Clean();
-    if (return_type==POLY_CMD)
+    if ((return_type==POLY_CMD) &&(result!=NULL))
     {
       res->data=(char *)result->m[0];
       result->m[0]=NULL;
@@ -1912,7 +1912,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   omFree(q);
   res->rtyp=return_type;
-  return FALSE;
+  return result==NULL;
 }
 static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
 {
@@ -3478,48 +3478,6 @@ static BOOLEAN jjSTD_HILB(leftv res, leftv u, leftv v)
   if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
   return FALSE;
 }
-static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v);
-static void jjSTD_1_ID(leftv res, ideal i0, int t0, ideal p0, attr a)
-/* destroys i0, p0 */
-/* result (with attributes) in res */
-/* i0: SB*/
-/* t0: type of p0*/
-/* p0 new elements*/
-/* a attributes of i0*/
-{
-  int tp;
-  if (t0==IDEAL_CMD) tp=POLY_CMD;
-  else               tp=VECTOR_CMD;
-  for (int i=IDELEMS(p0)-1; i>=0; i--)
-  {
-    poly p=p0->m[i];
-    p0->m[i]=NULL;
-    if (p!=NULL)
-    {
-      sleftv u0,v0;
-      memset(&u0,0,sizeof(sleftv));
-      memset(&v0,0,sizeof(sleftv));
-      v0.rtyp=tp;
-      v0.data=(void*)p;
-      u0.rtyp=t0;
-      u0.data=i0;
-      u0.attribute=a;
-      setFlag(&u0,FLAG_STD);
-      jjSTD_1(res,&u0,&v0);
-      i0=(ideal)res->data;
-      res->data=NULL;
-      a=res->attribute;
-      res->attribute=NULL;
-      u0.CleanUp();
-      v0.CleanUp();
-      res->CleanUp();
-    }
-  }
-  idDelete(&p0);
-  res->attribute=a;
-  res->data=(void *)i0;
-  res->rtyp=t0;
-}
 static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
 {
   ideal result;
@@ -3566,10 +3524,46 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   }
   else /*IDEAL/MODULE*/
   {
-    attr *aa=u->Attribute();
-    attr a=NULL;
-    if ((aa!=NULL)&&(*aa!=NULL)) a=(*aa)->Copy();
-    jjSTD_1_ID(res,(ideal)u->CopyD(),r,(ideal)v->CopyD(),a);
+    i0=(ideal)v->CopyD();
+    int ii0=idElem(i0); /* size of i0 */
+    i1=idSimpleAdd(i1,i0); //
+    memset(i0->m,0,sizeof(poly)*IDELEMS(i0));
+    idDelete(&i0);
+    intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
+    tHomog hom=testHomog;
+
+    if (w!=NULL)
+    {
+      if (!idTestHomModule(i1,currRing->qideal,w))
+      {
+        // no warnung: this is legal, if i in std(i,p)
+        // is homogeneous, but p not
+        w=NULL;
+      }
+      else
+      {
+        w=ivCopy(w);
+        hom=isHomog;
+      }
+    }
+    if (ii0*4 >= 3*IDELEMS(i1)) // MAGIC: add few poly to large SB: 3/4
+    {
+      BITSET save1;
+      SI_SAVE_OPT1(save1);
+      si_opt_1|=Sy_bit(OPT_SB_1);
+      /* ii0 appears to be the position of the first element of il that
+       does not belong to the old SB ideal */
+      result=kStd(i1,currRing->qideal,hom,&w,NULL,0,ii0);
+      SI_RESTORE_OPT1(save1);
+    }
+    else
+    {
+      result=kStd(i1,currRing->qideal,hom,&w);
+    }
+    idDelete(&i1);
+    idSkipZeroes(result);
+    if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
+    res->data = (char *)result;
   }
   if(!TEST_OPT_DEGBOUND) setFlag(res,FLAG_STD);
   return FALSE;

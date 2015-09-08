@@ -63,7 +63,6 @@ bfctBound(I,f[,primdec]); computes multiple of b-function for f^s*u
 annRatSyz(f,g[,db,eng]);  computes part of annihilator of rational function g/f
 
 dmodGeneralAssumptionCheck();   check general assumptions
-safeVarName(s);    finds a free name to use for a new variable
 extendWeyl(S);     extends basering (Weyl algebra) by given vars
 polyVars(f,v);     checks whether f contains only variables indexed by v
 monomialInIdeal(I);    computes all monomials appearing in generators of ideal
@@ -187,7 +186,7 @@ example
 }
 
 
-proc safeVarName (string s)
+static proc safeVarName (string s)
 "
 USAGE:    safeVarName(s);  s string
 RETURN:   string, returns s if s is not the name of a par/var of basering

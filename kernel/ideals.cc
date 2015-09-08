@@ -927,6 +927,7 @@ static void idPrepareStd(ideal s_temp, int k)
       pNext(p) = q;
     }
   }
+  s_temp->rank += k;
 }
 
 /*2
@@ -1023,6 +1024,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
         p = pNeg(p);
       }
     }
+    s_temp->rank += k;
   }
   ideal s_result = kNF(s_h3,currRing->qideal,s_temp,k);
   s_result->rank = s_h3->rank;
