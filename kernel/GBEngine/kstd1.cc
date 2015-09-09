@@ -13,8 +13,8 @@
 
 #define MYTEST 0
 
-#define ADIDEBUG 0
-#define ADIDEBUG_NF 0
+#define ADIDEBUG 1
+#define ADIDEBUG_NF 1
 
 #include <kernel/mod2.h>
 
@@ -401,6 +401,7 @@ int redRiloc (LObject* h,kStrategy strat)
     {
       PrintS("\n    No poly in T divides h.\n");
     }
+    //getchar();
 #endif
     if (j < 0)
     {
@@ -733,6 +734,14 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
   unsigned long not_sev = ~ H.sev;
   loop
   {
+    #if ADIDEBUG_NF
+    for(int ii=0;ii<=strat->tl;ii++)
+    {
+      printf("\nT[%i]:\nt^%i ",ii,strat->T[ii].ecart);
+      pWrite(strat->T[ii].p);
+    }
+    //getchar();
+    #endif
     if (j > strat->tl)
     {
       return H.p;
@@ -812,6 +821,31 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         doRed(&H,&(strat->T[ii]),TRUE,strat);
         if (H.p == NULL)
           return NULL;
+        #if 0
+        //kürzeste=1, kleinste ecart = 0
+        int dummy=0;
+        int z=-1;
+        for(int ii=0; ii<=strat->tl;ii++)
+        {
+          if(pLmIsConstant(strat->T[ii].p))
+          {
+            printf("\nFound one:\n");pWrite(strat->T[ii].p);
+            if(dummy==0 && strat->T[ii].ecart < strat->T[z].ecart)
+            {
+              z = ii;
+            }
+            if(dummy == 1 && strat->T[ii].length < strat->T[z].length)
+            {
+              z = ii;
+            }
+          }
+        }
+        printf("\n!!!!!!!!!!!!!!!!!   z = %i\n",z);
+        if(z!=-1)
+        {
+          enterOneStrongPoly(z,H.p,H.ecart,0,strat,-1 , TRUE);
+        }
+        #endif
       }
       else
       {
@@ -824,7 +858,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
       }
       #if ADIDEBUG_NF
       printf("\nAfter the small reduction it looks like this:\n");pWrite(H.p);
-      getchar();
+      //getchar();
       #endif
       /*- try to reduce the s-polynomial -*/
       o = H.SetpFDeg();
@@ -1592,7 +1626,7 @@ loop_count = 1;
         #endif
     }
     #endif
-    getchar();
+    //getchar();
     #endif
     #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
