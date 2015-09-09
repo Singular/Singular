@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="version latex.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version latex.lib 4.0.2.0 Sep_2015 "; // $Id$
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
@@ -1470,6 +1470,7 @@ EXAMPLE: example texpoly; shows an example
      if(realT) { monomt,msz = parsr(cfmt);}
      if (galT) { monomt,msz = parsg(cfmt);}
      b = find(cfmt,"/(");                     // look if fraction  // 31.5.07
+     if (b==0) { b = -find(cfmt,")/"); }  // 1.9.15
      b2 = find(cfmt,"/");
      // if (b) {b++;}                         // 31.5.07
      n = size(cfmt);
@@ -1557,7 +1558,7 @@ example
   poly f = (-2a2 +b3 -2)/a * x2y4z5 + (a2+1)*x + a+1;
   f;
   texpoly("",f);
-  texpoly("",1/(a2+2)*x+2/b);
+  texpoly("",1/(a2+2)*x2+2/b*x+(a+1)/3);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1570,8 +1571,16 @@ static proc parsp(string cfmt, int b)
     if (fl1) { mt = "(" + mt + ")"; msz = msz +1; }
   }
   else
-  { nom,fl1 = parst(cfmt[1,b-1],1);
-    denom,fl2 = parst(cfmt[b+1,size(cfmt)-b],1);
+  {
+    if (b>0) {
+     nom,fl1 = parst(cfmt[1,b-1],1);
+     denom,fl2 = parst(cfmt[b+1,size(cfmt)-b],1);
+    }
+    else {
+     b = -b;
+     nom,fl1 = parst(cfmt[1,b],1);
+     denom,fl2 = parst(cfmt[b+2,size(cfmt)-b-1],1);
+    }
     if (defined(TeXnofrac))
     { if(fl1) { nom = "(" + nom + ")"; sz1++;}
       if(fl2) {denom = "(" + denom + ")"; sz2++;}

@@ -545,8 +545,8 @@ irredAS (CFList & AS, int & indexRed, CanonicalForm & reducible)
         {  // search for a non linear elem
           qs= facAlgFunc2 (i.getItem(), as);
           if (qs.length() > 0)
-	  {
-	    if (qs.getFirst().factor().inCoeffDomain())
+          {
+            if (qs.getFirst().factor().inCoeffDomain())
               qs.removeFirst();
             if (qs.length() > 1 || qs.getFirst().exp() > 1)
             { //found elem is reducible
@@ -554,7 +554,7 @@ irredAS (CFList & AS, int & indexRed, CanonicalForm & reducible)
               indexRed= nr + 1;
               break;
             }
-	  }
+          }
         }
       }
     }

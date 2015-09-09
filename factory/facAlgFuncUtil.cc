@@ -202,25 +202,16 @@ void deflateDegree (const CanonicalForm & F, int & pExp, int n)
   if (F.level() == n)
   {
     ASSERT (F.deriv().isZero(), "derivative of F is not zero");
-    int termCount=0;
     CFIterator i= F;
+    int g= 0;
     for (; i.hasTerms(); i++)
-    {
-      if (i.exp() != 0)
-        termCount++;
-    }
+        g= igcd (g, i.exp());
 
-    int j= 1;
-    i= F;
-    for (;j < termCount; j++, i++)
-      ;
-
-    int exp= i.exp();
     int count= 0;
     int p= getCharacteristic();
-    while ((exp >= p) && (exp != 0) && (exp % p == 0))
+    while ((g >= p) && (g != 0) && (g % p == 0))
     {
-      exp /= p;
+      g /= p;
       count++;
     }
     pExp= count;
