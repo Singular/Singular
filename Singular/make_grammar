@@ -9,7 +9,7 @@ then
   if diff -w grammar.cc.h grammar.h >/dev/null
   then
     echo grammar.h was okay
-    /bin/rm grammar.cc.h
+    command rm grammar.cc.h
   else
     echo generating new grammar.h
     mv grammar.cc.h grammar.h

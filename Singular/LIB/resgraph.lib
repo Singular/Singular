@@ -103,7 +103,7 @@ EXAMPLE: not available (for technical reasons)
   if((size(#)==0)&&(find(@filename,"/tmp/")))
   {
 //--- do not leave any garbage in the public directories
-    j=system("sh","/bin/rm " + outfile + " " + @filename);
+    j=system("sh","commnd rm " + outfile + " " + @filename);
   }
   return();
 }
@@ -289,7 +289,7 @@ EXAMPLE: not available (for technical reasons)
   if(find(@filename,"/tmp/"))
   {
 //--- do not leave any garbage in the public directories
-    j=system("sh","/bin/rm " + @filename + ".jpg "+ @filename);
+    j=system("sh","commnd rm " + @filename + ".jpg "+ @filename);
   }
   return();
 }

@@ -1802,7 +1802,7 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
   {
     int rdnum=random(1000,9999);
     write(":w /tmp/tropicalcurve"+string(rdnum)+".tex",TEXBILD);
-    system("sh","cd /tmp; latex /tmp/tropicalcurve"+string(rdnum)+".tex; dvips /tmp/tropicalcurve"+string(rdnum)+".dvi -o; /bin/rm tropicalcurve"+string(rdnum)+".log;  /bin/rm tropicalcurve"+string(rdnum)+".aux;  /bin/rm tropicalcurve"+string(rdnum)+".ps?;  /bin/rm tropicalcurve"+string(rdnum)+".dvi; kghostview tropicalcurve"+string(rdnum)+".ps &");
+    system("sh","cd /tmp; latex /tmp/tropicalcurve"+string(rdnum)+".tex; dvips /tmp/tropicalcurve"+string(rdnum)+".dvi -o; command rm tropicalcurve"+string(rdnum)+".log;  command rm tropicalcurve"+string(rdnum)+".aux;  command rm tropicalcurve"+string(rdnum)+".ps?;  command rm tropicalcurve"+string(rdnum)+".dvi; kghostview tropicalcurve"+string(rdnum)+".ps &");
   }
   else
   {
@@ -1900,7 +1900,7 @@ EXAMPLE:     example drawNewtonSubdivision;   shows an example"
 \\end{document}";
   int rdnum=random(1000,9999);
   write(":w /tmp/newtonsubdivision"+string(rdnum)+".tex",TEXBILD);
-  system("sh","cd /tmp; latex /tmp/newtonsubdivision"+string(rdnum)+".tex; dvips /tmp/newtonsubdivision"+string(rdnum)+".dvi -o; /bin/rm newtonsubdivision"+string(rdnum)+".log;  /bin/rm newtonsubdivision"+string(rdnum)+".aux;  /bin/rm newtonsubdivision"+string(rdnum)+".ps?;  /bin/rm newtonsubdivision"+string(rdnum)+".dvi; kghostview newtonsubdivision"+string(rdnum)+".ps &");
+  system("sh","cd /tmp; latex /tmp/newtonsubdivision"+string(rdnum)+".tex; dvips /tmp/newtonsubdivision"+string(rdnum)+".dvi -o; command rm newtonsubdivision"+string(rdnum)+".log;  command rm newtonsubdivision"+string(rdnum)+".aux;  command rm newtonsubdivision"+string(rdnum)+".ps?;  command rm newtonsubdivision"+string(rdnum)+".dvi; kghostview newtonsubdivision"+string(rdnum)+".ps &");
 //  return(TEXBILD);
 }
 example
@@ -3883,7 +3883,7 @@ PURPOSE: some procedures create latex and ps-files in the directory /tmp;
          in order to remove them simply call cleanTmp();
 RETURN:  none"
 {
-  system("sh","cd /tmp; /bin/rm -f tropicalcurve*; /bin/rm -f tropicalnewtonsubdivision*");
+  system("sh","cd /tmp; command rm -f tropicalcurve*; command rm -f tropicalnewtonsubdivision*");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -4832,7 +4832,7 @@ NOTE:    - the procedure is also called recursively by itself, and
     export(PARA);
   }
   // kill the gfan files in /tmp
-  system("sh","cd /tmp; /usr/bin/touch gfaninput; /usr/bin/touch gfanoutput; /bin/rm gfaninput; /bin/rm gfanoutput");
+  system("sh","cd /tmp; /usr/bin/touch gfaninput; /usr/bin/touch gfanoutput; command rm gfaninput; command rm gfanoutput");
   // we return a list which contains the
   // parametrisation ring (with the parametrisation ideal)
   // and the string representing the maximal ideal
@@ -5952,7 +5952,7 @@ NOTE:    - the procedure is also called recursively by itself, and
   if (nogfan!=1)
   {
     // kill the gfan files in /tmp
-    system("sh","cd /tmp; /usr/bin/touch gfaninput; /usr/bin/touch gfanoutput; /bin/rm gfaninput; /bin/rm gfanoutput");
+    system("sh","cd /tmp; /usr/bin/touch gfaninput; /usr/bin/touch gfanoutput; command rm gfaninput; command rm gfanoutput");
   }
   // we return a list which contains lists of the parametrisation
   // rings (with the parametrisation ideal)
@@ -8397,7 +8397,7 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
   {
     int rdnum=random(1000,9999);
     write(":w /tmp/tropicalcurve"+string(rdnum)+".tex",TEXBILD);
-    system("sh","cd /tmp; latex /tmp/tropicalcurve"+string(rdnum)+".tex; dvips /tmp/tropicalcurve"+string(rdnum)+".dvi -o; /bin/rm tropicalcurve"+string(rdnum)+".log;  /bin/rm tropicalcurve"+string(rdnum)+".aux;  /bin/rm tropicalcurve"+string(rdnum)+".ps?;  /bin/rm tropicalcurve"+string(rdnum)+".dvi; kghostview tropicalcurve"+string(rdnum)+".ps &");
+    system("sh","cd /tmp; latex /tmp/tropicalcurve"+string(rdnum)+".tex; dvips /tmp/tropicalcurve"+string(rdnum)+".dvi -o; command rm tropicalcurve"+string(rdnum)+".log;  command rm tropicalcurve"+string(rdnum)+".aux;  command rm tropicalcurve"+string(rdnum)+".ps?;  command rm tropicalcurve"+string(rdnum)+".dvi; kghostview tropicalcurve"+string(rdnum)+".ps &");
   }
   else
   {

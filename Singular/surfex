@@ -11,6 +11,6 @@ else
 fi
 echo "$PWD" | sed -e 's/ /\\ /g' > $tmp_dir/tmp.$$.txt
 read surfexstartdir <$tmp_dir/tmp.$$.txt
-/bin/rm $tmp_dir/tmp.$$.txt
+command rm $tmp_dir/tmp.$$.txt
 cd "$surfex_dir"
 java -jar surfex.jar -d "$surfexstartdir" -t "$tmp_dir" $allargs

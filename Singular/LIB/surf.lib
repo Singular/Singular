@@ -156,7 +156,7 @@ EXAMPLE: example plot; shows an example
       surf_call = "((xwin -multiwindow -clipboard -silent-dup-error";
       surf_call = surf_call + " >/dev/null 2>&1 &) && sleep 5 && (sinngularsurf ";
       surf_call = surf_call + l + ">/dev/null 2>&1))";
-      surf_call = surf_call + "&& /bin/rm " + l;
+      surf_call = surf_call + "&& command rm " + l;
       "Press q to exit from `surf`.";
         " (You may leave the XServer running for further" + newline
       + "  invocations of `plot`.)";
@@ -189,7 +189,7 @@ EXAMPLE: example plot; shows an example
       ERROR(err_mes);
     }
   }
-  system("sh", "/bin/rm " + l);
+  system("sh", "command rm " + l);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -327,7 +327,7 @@ EXAMPLE: example surfer; shows an example
 
 
   }
-  system("sh", "/bin/rm " + l);
+  system("sh", "command rm " + l);
 
   if (i != 0)
   {
@@ -406,7 +406,7 @@ static proc getShellOutput(string shellCommand)
    string r1 = read(tempFilename);
    s = size(r1) - 1;
    string r2 = r1[1..s];
-   s = system("sh", "/bin/rm " + tempFilename);
+   s = system("sh", "command rm " + tempFilename);
    return (r2);
 }
 

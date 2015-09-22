@@ -1230,8 +1230,8 @@ EXAMPLE: example rmx; shows an example
    }
    retval = system("sh","rm " + fname + ".aux");
    retval = system("sh","rm " + fname + ".log");
-   if (suffix==2) {retval = system("sh","/bin/rm -i " + fname +".tex");}
-   if (suffix>=1) {retval = system("sh","/bin/rm -i " + fname +".dvi");}
+   if (suffix==2) {retval = system("sh","command rm -i " + fname +".tex");}
+   if (suffix>=1) {retval = system("sh","command rm -i " + fname +".dvi");}
   }
   else
   {" -- Need a filename ";
