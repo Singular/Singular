@@ -21,20 +21,8 @@ $ rpm -i x86_64/singular-4.0.0-1.x86_64.rpm noarch/singular-common-4.0.0-1.noarc
 
 Gentoo
 ======
-to install from the main tree,
+install from the main tree:
 
 emerge singular
 
 is sufficient.
- 
-To get the very latest, slightly more experimental package add the "science overlay" first (if you have not already)
-
- layman -a science
-
-then unmask sci-mathematics/singular, for example by
-
- echo "sci-mathematics/singular" >> /etc/portage/package.keywords/singular
-
-and install:
-
- emerge singularp

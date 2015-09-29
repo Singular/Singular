@@ -267,6 +267,12 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
         case 'D':
           sdb_show_bp();
           break;
+	case 'l':
+	{
+	  extern void listall(int showproc);
+	  listall(FALSE);
+	  break;
+	}
         case 'n':
           currentVoice->pi->trace_flag|= 1;
           return;
@@ -279,7 +285,8 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
         case 'p':
         {
           p=sdb_find_arg(p);
-          Print("variable `%s`",p);
+	  extern int myynest;
+          Print("variable `%s`at level %d",p,myynest);
           idhdl h=ggetid(p);
           if (h==NULL)
             PrintS(" not found\n");
