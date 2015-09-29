@@ -267,12 +267,14 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
         case 'D':
           sdb_show_bp();
           break;
+	#if 0
 	case 'l':
 	{
 	  extern void listall(int showproc);
 	  listall(FALSE);
 	  break;
 	}
+	#endif
         case 'n':
           currentVoice->pi->trace_flag|= 1;
           return;
