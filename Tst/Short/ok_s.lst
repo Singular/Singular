@@ -9,6 +9,7 @@ bug_ringlist
 bug_tr237
 ; do not try bug_tr276 without 2.2 GB RAM free
 ; bug_tr276
+bug_tr339
 bug_tr488
 bug_tr501
 ; bug_554 ;ehv.lib depr.
