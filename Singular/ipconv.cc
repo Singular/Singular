@@ -213,14 +213,6 @@ static void * iiIm2Bim(void *data)
   return r;
 }
 
-static void * iiBim2Im(void *data)
-{
-  bigintmat *b=(bigintmat*)data;
-  void *r=(void *)bim2iv(b);
-  delete b;
-  return r;
-}
-
 static void * iiN2P(void *data)
 {
   poly p=NULL;

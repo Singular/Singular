@@ -3786,6 +3786,12 @@ static BOOLEAN jjBI2N(leftv res, leftv u)
   n_Delete(&n,coeffs_BIGINT);
   return bo;
 }
+static BOOLEAN jjBI2IM(leftv res, leftv u)
+{
+  bigintmat *b=(bigintmat*)u->Data();
+  res->data=(void *)bim2iv(b);
+  return FALSE;
+}
 static BOOLEAN jjBI2P(leftv res, leftv u)
 {
   sleftv tmp;
