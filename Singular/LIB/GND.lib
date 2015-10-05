@@ -1,14 +1,19 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 version="version desingularization.lib 4.0.0.0 Mai_2015";
 category="Commutative Algebra";
+
 info="
 LIBRARY   :  GND.lib
 AUTHOR    :  Adrian Popescu, popescu@mathematik.uni-kl.de
-OVERVIEW  :  
+
+OVERVIEW  :
 A method to compute the General Neron Desingularization in the frame of
 one dimensional local domains
 
-SEE ALSO  : A. Popescu and D. Popescu, "A method to compute the General Neron Desingularization in the frame of one dimensional local domains",  http://arxiv.org/abs/1508.05511
+REFERENCES:
+@* [1] A. Popescu, D. Popescu, \"A method to compute the General Neron Desingularization in the frame of one dimensional local domains\",  arxiv.org/abs/1508.05511
+
+KEYWORDS: desingularization; general neron.
 
 PROCEDURES:
  desingularization()
@@ -108,26 +113,6 @@ static proc H(ideal I, int howmanyy,ideal xid)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-static proc finde(ideal i,poly d)
-"USAGE: Finds smallest e>0 s.t. (0):(d^e) will become stationary"
-{
-  ring BASE = basering;
-  qring r = i;
-  int e = 2;
-  poly d = imap(BASE,d);
-  ideal i1 = std(quotient(ideal(0),ideal(d^(e-1))));
-  ideal i2 = std(quotient(ideal(0),ideal(d^(e))));
-  while(reduce(i2,i1)!= 0)
-  {
-    e = e+1;
-    i1 = i2;
-    i2 = std(quotient(ideal(0),ideal(d^(e))));
-  }
-  setring(BASE);
-  return(e-1);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
 
 static proc extractP(list wP, ideal I)
 "USAGE: choose P from wP and save it's properties"
@@ -293,7 +278,7 @@ static proc finddz(poly vp,int nra,int nrx)
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 static proc inY(poly p,int nrx,int nry)
-"USAGE: tests if poly is just in the Y variables"
+"USAGE: tests if poly p contains just the variables var(nrx+1),...,var(nry)"
 {
   int i;
   ideal y;
@@ -312,17 +297,17 @@ static proc inY(poly p,int nrx,int nry)
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 static proc myjet(ideal p, int bound,string param,string variab)
-"USAGE: computes the jet in the right ring (instead of switching on and on)"
+"USAGE: computes the jet in the right ring (instead of switching it on and on)"
 {
     def r = basering;
-    if(param != "")
-    {
-      execute("ring R2 = (0,"+param+"),("+variab+"),ds;");
-    }
-    else
-    {
-      execute("ring R2 = 0,("+variab+"),ds;");
-    }
+    list l;
+    l[1] = list(0,param,list(list("lp",1)),ideal(0));
+    l[2] = variab;
+    l[3] = ringlist(r)[3];
+    l[3][1][1] = "ds";
+    l[4] = ideal(0);
+    def R2 = ring(l);
+    setring(R2);
     ideal p = imap(r,p);
     for(int i=1;i<=ncols(p);i++)
     {
@@ -334,18 +319,18 @@ static proc myjet(ideal p, int bound,string param,string variab)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-proc invp(poly p, int bound,string param,string variab)
+proc invp(poly p, int bound,list param,list variab)
 "USAGE: computes the inverse in Q(param)[variab]"
 {
     def r = basering;
-    if(param != "")
-    {
-      execute("ring R2 = (0,"+param+"),("+variab+"),ds;");
-    }
-    else
-    {
-      execute("ring R2 = 0,("+variab+"),ds;");
-    }
+    list l;
+    l[1] = list(0,param,list(list("lp",1)),ideal(0));
+    l[2] = variab;
+    l[3] = ringlist(r)[3];
+    l[3][1][1] = "ds";
+    l[4] = ideal(0);
+    def R2 = ring(l);
+    setring(R2);
     poly p = imap(r,p);
     if(bound<=0)
         {
@@ -355,14 +340,14 @@ proc invp(poly p, int bound,string param,string variab)
 	    {
 	        ERROR("My inverse : p is 0");
 	    }
-	poly original;
+	  poly original,res;
     original = p;
-    if(leadcoef(p) == 0)
+    if(ord(p) != 0)
         {
             ERROR("My inverse : the power series is not a unit.");
         }
     poly q = 1/p[1];
-    poly res = q;
+    res = q;
     p = q * (p[1] - jet(p,bound));
     poly s = p;
     while(p != 0)
@@ -370,6 +355,8 @@ proc invp(poly p, int bound,string param,string variab)
         res = res + q * p;
         p = jet(p*s,bound);
     }
+    //res = division(poly(1),p,bound);
+    
     //TEST
     if(jet(original*res,bound) != poly(1))
         {
@@ -413,11 +400,15 @@ static proc findminor(int y, poly mr, ideal f)
   {
     if(total2[i][n] <= n)
     {
-      execute("resf[size(resf)+1] = intvec("+string(total2[i])+");");
+      def dummy = total2[i];
+      resf[size(resf)+1] = intvec(dummy[1..size(total2[i])]);
+      kill dummy;
     }
     if(total2[i][n] <= y)
     {
-      execute("resy[size(resy)+1] = intvec("+string(total2[i])+");");
+      def dummy = total2[i];
+      resy[size(resy)+1] = intvec(dummy[1..size(total2[i])]);
+      kill dummy;
     }
     i = i+1;
   }
@@ -438,65 +429,39 @@ static proc findminor(int y, poly mr, ideal f)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-static proc mymin(a,b)
-"USAGE: finds minimium between a and b"
-{
-  if(a<b)
-  {
-    return(a);
-  }
-  else
-  {
-    return(b);
-  }
-}
 
-///////////////////////////////////////////////////////////////////////////////////////////
-
-static proc findnewvar(string Z)
+proc findnewvar(string Z)
 "USAGE: Finds new unused variable Z,Z1,Z2,..."
 {
-  int i,j;
-  int exists = 0;
-  for(i=1;i<=nvars(basering) && exists==0;i++)
+  string S = "," + charstr(basering) + "," + varstr(basering) + ",";
+  Z = "," + Z + ",";
+  if(find(S,Z) == 0)
   {
-    if(string(var(i)) == Z)
-    {
-      exists=1;
-    }
+    return(Z[2..size(Z)-1]);
   }
-  if(exists==0)
+  int i=1;
+  while(find(S,Z+"("+string(i)+")") == 1)
   {
-    return(Z);
+    i++;
   }
-  string newvar;
-  while(1)
-  {
-    j = j+1;
-    newvar = Z+"("+string(j)+")";
-    exists=0;
-    for(i=1;i<=nvars(basering) && exists==0;i++)
-    {
-      if(string(var(i)) == newvar)
-      {
-        exists=1;
-      }
-    }
-    if(exists==0)
-    {
-      return(newvar);
-    }    
-  }
+  Z = string(Z[2..size(Z)-1])+"("+string(i)+")";
+  return(Z);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-static proc mylcm(ideal id,string as)
+static proc mylcm(ideal id,list asl)
 "USAGE: computes the lcm of these numbers"
 {
   int i;
   def r1 = basering;
-  execute("ring r2 = 0,("+as+"),dp;");
+  list l;
+  l[1] = 0;
+  l[2] = asl;
+  l[3] = list(list("dp",1),list("C",0));
+  l[4] = ideal(0);
+  def r2 = ring(l);
+  setring(r2);
   ideal id = imap(r1,id);
   poly lcmi=1;
   for(i=1;i<=size(id);i++)
@@ -558,6 +523,26 @@ static proc mysubst(ideal i,int which,poly what,list #)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
+static proc crl(list param, list variab, string order)
+"USAGE: construct the desired ringlist"
+{
+  list l;
+  if(size(param)==0)
+  {
+    l[1] = 0;
+  }
+  else
+  {  
+    l[1] = list(0,param,list(list("lp",1)),ideal(0));
+  }
+  l[2] = variab;
+  l[3] = list(list(order,1),list("C",0));
+  l[4] = ideal(0);
+  return(l);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
 proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ideal aid, ideal f,
                         list #)
 "USAGE : Returns as output a General Neron Desingularization as in the Paper http://arxiv.org/abs/1508.05511"
@@ -585,16 +570,19 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
     }
   }
   string as,xs,ys;
+  list asl,xsl,ysl;
   ideal a,x,y;
   int i,j,k;
   if(nra != 0)
   {
     as = string(var(1));
+    asl[1] = string(var(1));
     a[1] = var(1);
     for(i=2;i<=nra;i++)
     {
       as = as+","+string(var(i));
       a[ncols(a)+1] = var(i);
+      asl[size(asl)+1] = string(var(i));
     }
   }
   //as; 
@@ -602,10 +590,12 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   {
     xs = string(var(nra+1));
     x[1] = var(nra+1);
+    xsl[1] = string(var(nra+1));
     for(i=nra+2;i<=nra+nrx;i++)
     {
       xs = xs+","+string(var(i));
       x[ncols(x)+1] = var(i);
+      xsl[size(xsl)+1] = string(var(i));
     }
   } 
   //xs;
@@ -613,16 +603,20 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   {
     ys = string(var(nra+nrx+1));
     y[1] = var(nra+nrx+1);
+    ysl[1] = string(var(nra+nrx+1));
     for(i=nra+nrx+2;i<=nra+nrx+nry;i++)
     {
       ys = ys+","+string(var(i));
       y[ncols(y)+1] = var(i);
+      ysl[size(ysl)+1] = string(var(i));
     }
   } 
   //ys;
-  execute("ring Abase = 0,("+xs+"),dp;");
+  def Abase = ring(crl(list(),xsl,"dp"));
+  setring Abase;
   qring A = std(imap(all,xid));
-  execute("ring Bbase = (0,"+xs+"),("+ys+"),dp;");
+  def Bbase = ring(crl(xsl,ysl,"dp"));
+  setring Bbase;
   ideal yid = imap(all, yid);
   i = ncols(yid);
   yid = std(yid);
@@ -636,17 +630,20 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
     }
   }
   qring B = yid;
-  execute("ring Bfalsebase = 0,("+xs+","+ys+"),dp;");
+  def Bfalsebase = ring(crl(list(),xsl+ysl,"dp"));
+  setring(Bfalsebase);
   qring Bfalse = std(imap(all,yid));
   if(nra!=0)
   {
-    execute("ring Apreal = (0,"+as+"),("+xs+"),dp;");
-    execute("ring Apbase = 0,("+as+","+xs+"),dp;");
+    def Apreal = ring(crl(asl,xsl,"dp"));
+    def Apbase = ring(crl(list(),asl+xsl,"dp"));
+    setring Apbase;
     qring Ap = std(imap(all,xid)+imap(all,aid));
   }
   else 
   {
-    execute("ring Apbase = 0,("+xs+"),dp;");
+    def Apbase = ring(crl(list(),xsl,"dp"));
+    setring Apbase;
     qring Ap = std(imap(all,xid));
   }
   ideal vid;
@@ -733,7 +730,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
     map v = basering,ff;
     // It should be enough to consider the minor I have found. 
     int found = 0;
-    //ideal mino = minor(jacob(yid),mymin(nrows(jacob(yid)),ncols(jacob(yid))));
+    //ideal mino = minor(jacob(yid),min(nrows(jacob(yid)),ncols(jacob(yid))));
     //mino;~;
     //for(k = 1;size(mino);i++)
     //{
@@ -748,7 +745,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
             dz[1] = a[1]^i;
             dz[2] = v(M) /dz[1];
             //z is actually 1/z so we have to construct it's invers
-            dz[2] = 1/leadcoef(dz[2])*invp(dz[2]/leadcoef(dz[2]),3*i,as,xs);
+            dz[2] = 1/leadcoef(dz[2])*invp(dz[2]/leadcoef(dz[2]),3*i,asl,xsl);
             found = 1;
           }
         }
@@ -780,17 +777,19 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   {
     denz[size(denz)+1] = denominator(leadcoef(z[i]));
   }
-  def den = mylcm(denz,as);
+  def den = mylcm(denz,asl);
   z = z * den;
   int newAptest = 0;
   if(den != 1)
   {
     newAptest = 1;
     string aa = "a";
-    def newpar = findnewvar(aa);
-    as = as + "," + newpar;
+    list newpar;
+    newpar[1] = string(findnewvar(aa));
+    as = as + "," + findnewvar(aa);
     nra = nra + 1;
-    execute("ring newApbase = 0,("+as+","+xs+"),dp;");
+    def newApbase = ring(crl(list(),asl+xsl,"dp"));
+    setring newApbase;
     poly p = var(nra)*imap(Apreal,den)-1;
     qring newAp = std(imap(all,xid)+imap(all,aid)+p);
     def d = imap(Apreal,d);
@@ -802,12 +801,14 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
     def vid = imap(Ap,vid);
     Apbase = newApbase;
     Ap = newAp;
-    execute("ring newApreal = (0,"+as+"),("+xs+"),dp;");
+    def newApreal = ring(crl(asl,xsl,"dp"));
+    setring newApreal;
     def z = imap(Ap,z);
     def d = imap(Apreal,d);
     def den = imap(Apreal,den);
     Apreal = newApreal;
-    execute("ring newaring = 0,"+newpar+",dp;");
+    def newaring = ring(crl(list(),newpar,"dp"));
+    setring newaring;
   }
   else
   {
@@ -820,8 +821,9 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
 //            Construct B1 = B[Z]/d-pz and the maps
 
   string Z = "Z";
-  def newvar = findnewvar(Z);
-  execute("ring newvarring = 0,"+newvar+",dp;");
+  list newvar;
+  newvar[1] = string(findnewvar(Z));
+  def newvarring = ring(crl(list(),newvar,"dp"));
   def B1base = Bbase+newvarring;
   def B1 = B+newvarring;
   def B1falsebase = Bfalsebase + newvarring;
@@ -835,7 +837,8 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   vid[ncols(vid)+1] = z;
   setring B1false;
   //If P is constant (i.e. no Y), than I can work with d = d' = P = P'
-  execute("poly Pconst = reduce(imap(Bfalse,Pprim),ideal("+ys+"));");
+  poly Pconst = reduce(imap(Bfalse,Pprim),imap(all,y));
+  
   if(Pconst == imap(Bfalse,Pprim))
   {
     poly P =Pconst;
@@ -906,23 +909,23 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   }
   setring Ap;
   def lam = imap(Apreal,lam);
-  string newas;
+  list newas;
   int howmanyfinala;
   if(size(lam) == 0)
   {
-    newas = "";
-    execute("ring Cbase = 0,("+xs+"),dp;");
+    def Cbase = ring(crl(list(),xsl,"dp"));
+    setring Cbase;
   }
   else
   {
     ideal varlam = variables(lam);
     howmanyfinala = ncols(varlam);
-    newas = string(varlam[1]);
-    for(i=2;i<=ncols(varlam);i++)
+    for(i=1;i<=ncols(varlam);i++)
     {
-      newas = newas + "," + string(varlam[i]);
+      newas[size(newas)+1] = string(varlam[i]);
     }
-    execute("ring Cbase = 0,("+newas+","+xs+"),dp;");
+    def Cbase = ring(crl(list(),newas+xsl,"dp"));
+    setring Cbase;
   }
   setring Ap;
   def aid = imap(all,aid);
@@ -982,7 +985,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   PM = jacob(PMf);
   matrix adj = adjoint(PM);
   matrix G = imap(Bfalse,Plist)[2]*var(nvars(B1))^2*adj;
-  execute("ring seeGring = 0,"+string(ys[1])+string(nvars(B1))+",dp;");
+  def seeGring = ring(crl(list(),list(string(ys[1])+string(nvars(B1))),"dp"));
   def seeG = B1 + seeGring;
   setring seeG;
   matrix G =  imap(Bfalse,Plist)[2]*var(nvars(seeG))^2*imap(B1,adj);
@@ -1031,16 +1034,16 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   
 //            Start constructing E
   
-  string ts,yz;
-  yz = ys + "," + string(ys[1]) + string(nry+1);
+  list ts,yz;
+  yz = ysl + list(string(ys[1]) + string(nry+1));
   string t = "T";
   def newvart = findnewvar(t);
   for(i=1;i<=nry+1;i++)
   {
-    ts = ts + newvart + string(i) + ",";
+    ts[size(ts)+1] = newvart + string(i);
   }
-  ts = ts[1..size(ts)-1];
-  execute("ring Efalsebase = 0,("+varstr(D)+","+yz+","+ts+"),dp;");
+  def Efalsebase = ring(crl(list(),newas+xsl+yz+ts,"dp"));
+  setring Efalsebase;
   qring Efalse = std(imap(D,dquot));
   def f = imap(Bfalse,Plist)[4];
   f[size(f)+1] = -imap(Apreal,dprim)+imap(Bfalse,Pprim)*var(nvars(Efalsebase)-nry-1);
@@ -1066,7 +1069,8 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   {
       "This is cc";cc;
   }
-  execute("ring E = (0,"+varstr(D)+"),("+yz+","+ts+"),dp;");
+  def E = ring(crl(newas+xsl,yz+ts,"dp"));
+  setring E;
   def d = imap(D,d); 
   number ss = leadcoef(imap(D,ss)); 
   def G = imap(seeG,G);
@@ -1074,8 +1078,8 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   def vidjet = imap(Apreal,vidjet);
   map mapvidjet = E,vidjet[nrx+1..ncols(vidjet)];
   G = mapvidjet(G);
-  execute("matrix T["+string(nry+1)+"][1] = "+ts+";");
-  execute("ideal tid = "+ts+";");
+  execute("matrix T[nry+1][1] = "+string(ts)+";");
+  execute("ideal tid = "+string(ts)+";");
   matrix ymy[nry+1][1];
   for(i=1;i<=nry+1;i++)
   {
@@ -1302,7 +1306,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
     {
       "And this is the map:";
     }
-    execute("ideal themap = vidjet[nrx+1..size(vidjet)],"+t+",invssp;");
+    //execute("ideal themap = vidjet[nrx+1..size(vidjet)],"+t+",invssp;");
     invssp = 1/invssp;
     if(debug)
     {
@@ -1310,7 +1314,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
     }
     string zz = "Z";
     def newvar2 = findnewvar(zz);
-    execute("ring Efinalbase = (0,"+parstr(E)+"),("+varstr(E)+","+newvar2+"),dp;");
+    //execute("ring Efinalbase = (0,"+parstr(E)+"),("+varstr(E)+","+newvar2+"),dp;");
     def q = imap(E,e2);
     poly teta = var(nvars(Efinalbase)) * imap(E,ss)*imap(E,ssp) - 1;
     qring Efinal = std(q,teta);
@@ -1359,21 +1363,19 @@ example
   y3 = 1+a1*x2+a1*x2^2+a3*x1*x2^4+a4*x1*x2^6;
   y4 = 1+a4*x2+(a2^2+a3)*x2^10+(a1+a2+a3+a4)*x1*x2^11;
   
-  string as,xs;
+  list as,xs;
   if(nra != 0)
   {
-    as = string(var(1));
-    for( int i=2;i<=nra;i++)
+    for(int i=1;i<=nra;i++)
     {
-      as = as+","+string(var(i));
+      as[size(as)+1] = string(var(i));
     }
   }
   if(nrx!=0)
   {
-    xs = string(var(nra+1));
-    for(int i=nra+2;i<=nra+nrx;i++)
+    for(int i=nra+1;i<=nra+nrx;i++)
     {
-      xs = xs+","+string(var(i));
+      xs[size(xs)+1] = string(var(i));
     }
   }
   y1 = y3^3*invp(y4^2,12,as,xs);
