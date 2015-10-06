@@ -1187,9 +1187,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       pLmDelete(h.lcm);
       return;
   }
-  //This is commented out since it is buggy over ZZ 
-  //(check theory with Gerhard, Anne and Christian)
-  #if 0
+  #if 1
   // basic chain criterion
   pLcm(p,strat->S[i],h.lcm);
   pSetm(h.lcm);
@@ -1216,15 +1214,21 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     {
       if (compare == 1)
       {
-        strat->c3++;
-        /*PrintS("--- chain criterion type 1\n");
-          PrintS("strat->B[j]:");
-          wrp(strat->B[j].lcm);
-          PrintS("  h.lcm:");
-          wrp(h.lcm);
-          PrintLn();*/
-        if ((n_DivBy(h.lcm->coef,strat->B[j].lcm->coef,  currRing->cf) == 0) && ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0)))
+#if ADIDEBUG
+              printf("\nChainCrit1 in enteronepairring\n");
+              printf("\nB[j]\n");
+              pWrite(strat->B[j].p);
+              pWrite(strat->B[j].p1);
+              pWrite(strat->B[j].p2);
+              printf("\nh - neue Paar\n");
+              pWrite(h.p);
+              pWrite(p);
+              pWrite(strat->S[i]);
+              pWrite(h.lcm);
+              #endif
+        if ((n_DivBy(strat->B[j].lcm->coef, h.lcm->coef, currRing->cf) == 0) && ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0)))
         {
+          strat->c3++;
           pLmDelete(h.lcm);
           return;
         }
@@ -1232,15 +1236,23 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       }
       else if (compare == -1)
       {
-          /*
-          PrintS("--- chain criterion type 2\n");
-          Print("strat->B[%d].lcm:",j);
-          wrp(strat->B[j].lcm);
-          PrintS("  h.lcm:");
-          wrp(h.lcm);
-          PrintLn();*/
-          if(n_DivBy(strat->B[j].lcm->coef, h.lcm->coef, currRing->cf) == 0)
+#if ADIDEBUG
+              printf("\nChainCrit2 in enteronepairring\n");
+              printf("\nB[j]\n");
+              pWrite(strat->B[j].p);
+              pWrite(strat->B[j].p1);
+              pWrite(strat->B[j].p2);
+              printf("\nh - neue Paar\n");
+              pWrite(h.p);
+              pWrite(p);
+              pWrite(strat->S[i]);
+              pWrite(h.lcm);
+              #endif
+          if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef, currRing->cf) == 0)
           {
+          #if ADIDEBUG
+                        printf("\nGelöscht: B[j]\n");
+          #endif
             deleteInL(strat->B,&strat->Bl,j,strat);
             strat->c3++;
           }
@@ -1250,15 +1262,23 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     {
       if (compareCoeff == pDivComp_LESS)
       {
-        /*PrintS("--- chain criterion type 3\n");
-          Print("strat->B[%d].lcm:", j);
-          wrp(strat->B[j].lcm);
-          PrintS("  h.lcm:");
-          wrp(h.lcm);
-          PrintLn();*/
-        strat->c3++;
-        if ((n_DivBy(h.lcm->coef,strat->B[j].lcm->coef,  currRing->cf) == 0) && (strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
+#if ADIDEBUG
+              printf("\nChainCrit3 in enteronepairring\n");
+              printf("\nB[j]\n");
+              pWrite(strat->B[j].p);
+              pWrite(strat->B[j].p1);
+              pWrite(strat->B[j].p2);
+              printf("\nh - neue Paar\n");
+              pWrite(h.p);
+              pWrite(p);
+              pWrite(strat->S[i]);
+              #endif
+        if ((n_DivBy(strat->B[j].lcm->coef, h.lcm->coef, currRing->cf) == 0) && (strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
         {
+          #if ADIDEBUG
+          printf("\nGelöscht h\n");
+          #endif
+          strat->c3++;
           pLmDelete(h.lcm);
           return;
         }
@@ -1268,15 +1288,22 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       // Add hint for same LM and LC (later) (TODO Oliver)
       // if (compareCoeff == pDivComp_GREATER)
       {
-        /*PrintS("--- chain criterion type 4\n");
-          Print("strat->B[%d].lcm:", j);
-          wrp(strat->B[j].lcm);
-          PrintS("  h.lcm:");
-          wrp(h.lcm);
-          PrintLn();
-          printf("\ndivby = %i\n", n_DivBy(strat->B[j].lcm->coef, h.lcm->coef, currRing->cf));*/
-        if(n_DivBy(strat->B[j].lcm->coef, h.lcm->coef, currRing->cf) == 0)
+        #if ADIDEBUG
+              printf("\nChainCrit3 in enteronepairring\n");
+              printf("\nB[j]\n");
+              pWrite(strat->B[j].p);
+              pWrite(strat->B[j].p1);
+              pWrite(strat->B[j].p2);
+              printf("\nh - neue Paar\n");
+              pWrite(h.p);
+              pWrite(p);
+              pWrite(strat->S[i]);
+              #endif
+        if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef,currRing->cf) == 0)
         {
+          #if ADIDEBUG
+          printf("\nGelöscht B[j]\n");
+          #endif
           deleteInL(strat->B,&strat->Bl,j,strat);
           strat->c3++;
         }
@@ -3151,6 +3178,12 @@ void chainCritRing (poly p,int, kStrategy strat)
                 PrintLn();
               }
 #endif
+              #if ADIDEBUG
+              printf("\nChainCrit\n");
+              pWrite(strat->B[i].p);
+              pWrite(strat->B[i].p1);
+              pWrite(strat->B[i].p2);
+              #endif
               deleteInL(strat->B,&strat->Bl,i,strat);
               strat->c3++;
             }
@@ -3170,6 +3203,12 @@ void chainCritRing (poly p,int, kStrategy strat)
       {
         if ((pNext(strat->L[j].p) == strat->tail) || (rHasGlobalOrdering(currRing)))
         {
+          #if ADIDEBUG
+          printf("\nChainCrit\n");
+          pWrite(strat->B[i].p);
+          pWrite(strat->B[i].p1);
+          pWrite(strat->B[i].p2);
+          #endif
           deleteInL(strat->L,&strat->Ll,j,strat);
           strat->c3++;
 #ifdef KDEBUG
@@ -3233,6 +3272,12 @@ void chainCritRing (poly p,int, kStrategy strat)
             PrintLn();
           }
 #endif
+              #if ADIDEBUG
+              printf("\nChainCrit\n");
+              pWrite(strat->B[i].p);
+              pWrite(strat->B[i].p1);
+              pWrite(strat->B[i].p2);
+              #endif
           if (isInPairsetL(i-1,strat->L[j].p1,strat->L[i].p1,&l,strat)
           && (pNext(strat->L[l].p) == strat->tail)
           && (!pLmEqual(strat->L[i].p,strat->L[l].p))

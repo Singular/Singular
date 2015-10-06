@@ -1557,7 +1557,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         p_Write(strat->B[iii].p2, strat->tailRing);
     }
     #endif
-    getchar();
+    //getchar();
     #endif
     #ifdef KDEBUG
       if (TEST_OPT_DEBUG) messageSets(strat);
