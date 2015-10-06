@@ -95,6 +95,7 @@ static proc H(ideal I, int howmanyy,ideal xid)
     if((size(f)<=(howmanyy)) && found == 1)
     {
       list term;
+      attrib(xid,"isSB",1);
       term[1] = reduce(quotient(f+xid,I),xid);
       term[2] = deltaf(f,size(f),howmanyy);
       term[3] = f;
@@ -176,7 +177,7 @@ static proc findmc(ideal I,ideal m)
   int i=1;
   while(1)
   {
-    if(std(reduce(I,m^i)) != 0)
+    if(std(reduce(I,std(m^i))) != 0)
     {
       return(i-1);
     }
@@ -300,13 +301,7 @@ static proc myjet(ideal p, int bound,string param,string variab)
 "USAGE: computes the jet in the right ring (instead of switching it on and on)"
 {
     def r = basering;
-    list l;
-    l[1] = list(0,param,list(list("lp",1)),ideal(0));
-    l[2] = variab;
-    l[3] = ringlist(r)[3];
-    l[3][1][1] = "ds";
-    l[4] = ideal(0);
-    def R2 = ring(l);
+    def R2 = ring(crl(param,variab,"ds"));
     setring(R2);
     ideal p = imap(r,p);
     for(int i=1;i<=ncols(p);i++)
@@ -323,13 +318,7 @@ proc invp(poly p, int bound,list param,list variab)
 "USAGE: computes the inverse in Q(param)[variab]"
 {
     def r = basering;
-    list l;
-    l[1] = list(0,param,list(list("lp",1)),ideal(0));
-    l[2] = variab;
-    l[3] = ringlist(r)[3];
-    l[3][1][1] = "ds";
-    l[4] = ideal(0);
-    def R2 = ring(l);
+    def R2 = ring(crl(param,variab,"ds"));
     setring(R2);
     poly p = imap(r,p);
     if(bound<=0)
@@ -455,12 +444,7 @@ static proc mylcm(ideal id,list asl)
 {
   int i;
   def r1 = basering;
-  list l;
-  l[1] = 0;
-  l[2] = asl;
-  l[3] = list(list("dp",1),list("C",0));
-  l[4] = ideal(0);
-  def r2 = ring(l);
+  def r2 = ring(crl(list(),asl,"dp"));
   setring(r2);
   ideal id = imap(r1,id);
   poly lcmi=1;
@@ -550,8 +534,8 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
 
 //            First we construct everything
 
-  def oldoption = option(get);
-  option(notWarnSB);
+  //def oldoption = option(get);
+  //option(notWarnSB);
   if(ncols(f)!=nry || nra<0 || nrx<0 || nry<0 || nra+nrx+nry!=nvars(all))
   {
     ERROR("Input is wrong");
@@ -755,7 +739,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   poly d = dz[1];
   poly z = dz[2];
   // We have to truncate it:
-  z  = reduce(jet(z,deg(d^3)),reduce(d^3, imap(all,xid)));
+  z  = reduce(jet(z,deg(d^3)),std(reduce(d^3, std(imap(all,xid)))));
   if(secondstrategy == 1)
   {
     setring Apreal;
@@ -837,7 +821,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   vid[ncols(vid)+1] = z;
   setring B1false;
   //If P is constant (i.e. no Y), than I can work with d = d' = P = P'
-  poly Pconst = reduce(imap(Bfalse,Pprim),imap(all,y));
+  poly Pconst = reduce(imap(Bfalse,Pprim),std(imap(all,y)));
   
   if(Pconst == imap(Bfalse,Pprim))
   {
@@ -876,7 +860,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   }
   for(i=1;i<=ncols(vid);i++)
   {
-    vidjet[size(vidjet)+1] = reduce(jet(vid[i],s),reduce(d^3, imap(all,xid)));
+    vidjet[size(vidjet)+1] = reduce(jet(vid[i],s),std(reduce(d^3, std(imap(all,xid)))));
   }
   if(debug)
   {
@@ -931,11 +915,11 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   def aid = imap(all,aid);
   if(newAptest == 1)
   {
-      ideal newaid = reduce(aid+imap(newApbase,p),varlam);
+      ideal newaid = reduce(aid+imap(newApbase,p),std(varlam));
   }
   else
   {
-    ideal newaid = reduce(aid,varlam);
+    ideal newaid = reduce(aid,std(varlam));
   }
   for(i=1;i<=ncols(newaid)-1;i++)
   {
@@ -946,7 +930,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   }
   if(newAptest == 1)
   {
-    newaid[size(newaid)] = imap(newApbase,p);
+    newaid[size(newaid)+1] = imap(newApbase,p);
   }
   newaid = newaid+0;
   setring Cbase;
@@ -978,7 +962,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   {
     wy[size(wy)+1] = var(whichminor[2][i]);
   }
-  wy = reduce(std(reduce(maxideal(1),var(nvars(B1)))),wy)+0;
+  wy = reduce(std(reduce(maxideal(1),std(var(nvars(B1))))),std(wy))+0;
   poly frp1 = -imap(Apreal,d)+imap(Bfalse,Pprim)*var(nvars(B1));
   ideal PMf = wf + wy + frp1;
   matrix PM[size(PMf)][nvars(B1)];
@@ -1022,7 +1006,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
   {
     if(newAptest == 1)
     {
-      "s =",reduce(ss, var(nvars(basering)-nrx)*imap(Apreal, den)-1);
+      "s =",reduce(ss, std(var(nvars(basering)-nrx)*imap(Apreal, den)-1));
       //"s =",subst(ss, imap(Apreal, z),1/imap(Apreal, den));
     }
     else
@@ -1192,6 +1176,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
       fd = mapvidjet(fd);
       ffx = ffx - (ssm)*(var(j)-vidjet[j+nrx])*fd;
     }
+    attrib(h,"isSB",1);
     ffx = reduce(ffx,h);
     QT[i] = ffx / ssmd2;
   }
@@ -1324,7 +1309,7 @@ proc desingularization(all, int nra, int nrx, int nry, ideal xid, ideal yid, ide
       basering;
     }
   }
-  option(set,oldoption);
+  //option(set,oldoption);
 }
 example
 { "EXAMPLE:"; echo = 2;
