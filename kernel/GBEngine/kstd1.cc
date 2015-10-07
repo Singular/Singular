@@ -1701,9 +1701,7 @@ loop_count = 1;
       printf("\nBefore Ll = %i\n", strat->Ll);
       #endif
       int inittl = strat->tl;
-      printf("\nReduce!!\n");
       red_result = strat->red(&strat->P,strat);
-      printf("\nEnded :)\n");
       strat->tl = inittl;
       #if ADIDEBUG
       printf("\nThis is P nach red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);

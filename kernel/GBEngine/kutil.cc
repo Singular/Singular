@@ -1718,7 +1718,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
   }
   else
   {
-    enterT(h, strat,strat->tl+1);
+    enterT_strong(h, strat,strat->tl+1);
   }
   //#if 1
   #if ADIDEBUG
@@ -8022,7 +8022,7 @@ void enterT(LObject &p, kStrategy strat, int atT)
   printf("\nenterT: add in position %i\n",atT);
   pWrite(p.p);
   #endif
-  printf("\nenterT: neue hingefügt: länge = %i, ecart = %i\n",p.length,p.ecart);
+  //printf("\nenterT: neue hingefügt: länge = %i, ecart = %i\n",p.length,p.ecart);
 
   if (strat->tailRing != currRing && pNext(p.p) != NULL)
     strat->T[atT].max = p_GetMaxExpP(pNext(p.p), strat->tailRing);
@@ -8059,6 +8059,117 @@ void enterT(LObject &p, kStrategy strat, int atT)
   }
   //getchar();*/
 #endif
+  kTest_T(&(strat->T[atT]));
+}
+
+/*2
+* puts p to the set T at position atT
+*/
+void enterT_strong(LObject &p, kStrategy strat, int atT)
+{
+  int i;
+
+  pp_Test(p.p, currRing, p.tailRing);
+  assume(strat->tailRing == p.tailRing);
+  // redMoraNF complains about this -- but, we don't really
+  // neeed this so far
+  assume(p.pLength == 0 || pLength(p.p) == p.pLength || rIsSyzIndexRing(currRing)); // modulo syzring
+  assume(p.FDeg == p.pFDeg());
+  assume(!p.is_normalized || nIsOne(pGetCoeff(p.p)));
+
+#ifdef KDEBUG
+  // do not put an LObject twice into T:
+  for(i=strat->tl;i>=0;i--)
+  {
+    if (p.p==strat->T[i].p)
+    {
+      printf("already in T at pos %d of %d, atT=%d\n",i,strat->tl,atT);
+      return;
+    }
+  }
+#endif
+
+#ifdef HAVE_TAIL_RING
+  if (currRing!=strat->tailRing)
+  {
+    p.t_p=p.GetLmTailRing();
+  }
+#endif
+  strat->newt = TRUE;
+  if (atT < 0)
+    atT = strat->posInT(strat->T, strat->tl, p);
+  if (strat->tl == strat->tmax-1)
+    enlargeT(strat->T,strat->R,strat->sevT,strat->tmax,setmaxTinc);
+  if (atT <= strat->tl)
+  {
+#ifdef ENTER_USE_MEMMOVE
+    memmove(&(strat->T[atT+1]), &(strat->T[atT]),
+            (strat->tl-atT+1)*sizeof(TObject));
+    memmove(&(strat->sevT[atT+1]), &(strat->sevT[atT]),
+            (strat->tl-atT+1)*sizeof(unsigned long));
+#endif
+    for (i=strat->tl+1; i>=atT+1; i--)
+    {
+#ifndef ENTER_USE_MEMMOVE
+      strat->T[i] = strat->T[i-1];
+      strat->sevT[i] = strat->sevT[i-1];
+#endif
+      strat->R[strat->T[i].i_r] = &(strat->T[i]);
+    }
+  }
+
+  if ((strat->tailBin != NULL) && (pNext(p.p) != NULL))
+  {
+    pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
+                                   (strat->tailRing != NULL ?
+                                    strat->tailRing : currRing),
+                                   strat->tailBin);
+    if (p.t_p != NULL) pNext(p.t_p) = pNext(p.p);
+  }
+  strat->T[atT] = (TObject) p;
+  #if ADIDEBUG
+  printf("\nenterT_strong: add in position %i\n",atT);
+  pWrite(p.p);
+  #endif
+  //printf("\nenterT_strong: neue hingefügt: länge = %i, ecart = %i\n",p.length,p.ecart);
+
+  if (strat->tailRing != currRing && pNext(p.p) != NULL)
+    strat->T[atT].max = p_GetMaxExpP(pNext(p.p), strat->tailRing);
+  else
+    strat->T[atT].max = NULL;
+
+  strat->tl++;
+  strat->R[strat->tl] = &(strat->T[atT]);
+  strat->T[atT].i_r = strat->tl;
+  assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
+  strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
+  #if 0
+  #ifdef HAVE_RINGS
+  if(rField_is_Ring(currRing) && !n_IsUnit(p.p->coef, currRing->cf))
+  {
+    #if ADIDEBUG_NF
+    printf("\nDas ist p:\n");pWrite(p.p);
+    #endif
+    for(i=strat->tl;i>=0;i--)
+    {
+      if(strat->T[i].ecart <= p.ecart && pLmDivisibleBy(strat->T[i].p,p.p))
+      {
+        #if ADIDEBUG_NF
+        printf("\nFound one: %i\n",i);pWrite(strat->T[i].p);
+        #endif
+        enterOneStrongPoly(i,p.p,p.ecart,0,strat,0 , TRUE);
+      }
+    }
+  }
+  /*
+  printf("\nThis is T:\n");
+  for(i=strat->tl;i>=0;i--)
+  {
+    pWrite(strat->T[i].p);
+  }
+  //getchar();*/
+  #endif
+  #endif
   kTest_T(&(strat->T[atT]));
 }
 
