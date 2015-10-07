@@ -502,6 +502,7 @@ void enterpairsSig (poly h, poly hSig, int from, int k, int ec, int pos,kStrateg
 void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void entersets (LObject h);
 void pairs ();
+BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR = -1, bool redMoraNF = FALSE);
 void message (int i,int* reduc,int* olddeg,kStrategy strat,int red_result);
 void messageStat (int hilbcount,kStrategy strat);
 #ifdef KDEBUG
@@ -528,6 +529,7 @@ void initSyzRules (kStrategy strat);
 void updateS(BOOLEAN toT,kStrategy strat);
 void enterSyz (LObject &p,kStrategy strat, int atT);
 void enterT (LObject &p,kStrategy strat, int atT = -1);
+void enterT_strong (LObject &p,kStrategy strat, int atT = -1);
 void cancelunit (LObject* p,BOOLEAN inNF=FALSE);
 void HEckeTest (poly pp,kStrategy strat);
 void initBuchMoraCrit(kStrategy strat);
