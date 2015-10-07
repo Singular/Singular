@@ -13,8 +13,8 @@
 
 #define MYTEST 0
 
-#define ADIDEBUG 1
-#define ADIDEBUG_NF 1
+#define ADIDEBUG 0
+#define ADIDEBUG_NF 0
 
 #include <kernel/mod2.h>
 
@@ -1700,7 +1700,11 @@ loop_count = 1;
       printf("\nThis is P vor red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
       printf("\nBefore Ll = %i\n", strat->Ll);
       #endif
+      int inittl = strat->tl;
+      printf("\nReduce!!\n");
       red_result = strat->red(&strat->P,strat);
+      printf("\nEnded :)\n");
+      strat->tl = inittl;
       #if ADIDEBUG
       printf("\nThis is P nach red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
       printf("\nBefore Ll = %i\n", strat->Ll);
@@ -1732,7 +1736,9 @@ loop_count = 1;
         strat->P.pCleardenom();
 
       // put in T
+      int inittl = strat->tl;
       enterT(strat->P,strat);
+      strat->tl = inittl+1;
       // build new pairs
 #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))

@@ -76,7 +76,7 @@
 #define DEBUGF5 2
 #endif
 
-#define ADIDEBUG 1
+#define ADIDEBUG 0
 
 denominator_list DENOMINATOR_LIST=NULL;
 
@@ -1635,7 +1635,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
   k_GetStrongLeadTerms(p, si, currRing, m1, m2, gcd, strat->tailRing);
   //p_Test(m1,strat->tailRing);
   //p_Test(m2,strat->tailRing);
-  if(!redMoraNF)
+  /*if(!redMoraNF)
   {
     while (! kCheckStrongCreation(atR, m1, i, m2, strat) )
     {
@@ -1647,7 +1647,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
       p_LmFree(gcd, currRing);
       k_GetStrongLeadTerms(p, si, currRing, m1, m2, gcd, strat->tailRing);
     }
-  }
+  }*/
   pSetCoeff0(m1, s);
   pSetCoeff0(m2, t);
   pSetCoeff0(gcd, d);
@@ -1718,7 +1718,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
   }
   else
   {
-    enterT(h, strat);
+    enterT(h, strat,strat->tl+1);
   }
   //#if 1
   #if ADIDEBUG
@@ -4073,6 +4073,7 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 #if ADIDEBUG
   PrintS("\nEnter superenterpairs\n");
   int iii = strat->Ll;
+  printf("\nstrat->tl = %i\n",strat->tl);
 #endif
   assume (rField_is_Ring(currRing));
   // enter also zero divisor * poly, if this is non zero and of smaller degree
@@ -4094,6 +4095,7 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
       PrintS("                     ");p_Write(strat->L[iii].p,strat->tailRing);
     }
   }
+  printf("\nstrat->tl = %i\n",strat->tl);
   iii = strat->Ll;
 #endif
   initenterpairs(h, k, ecart, 0, strat, atR);
@@ -4113,6 +4115,7 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
       PrintS("                     ");p_Write(strat->L[iii].p,strat->tailRing);
     }
   }
+  printf("\nstrat->tl = %i\n",strat->tl);
   iii = strat->Ll;
 #endif
   initenterstrongPairs(h, k, ecart, 0, strat, atR);
@@ -4132,9 +4135,13 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
       PrintS("                     ");p_Write(strat->L[iii].p,strat->tailRing);
     }
   }
+  printf("\nstrat->tl = %i\n",strat->tl);
   PrintS("\nEnd of superenterpairs\n");
 #endif
   clearSbatch(h, k, pos, strat);
+#if ADIDEBUG
+  printf("\nstrat->tl = %i\n",strat->tl);
+#endif
 }
 #endif
 
@@ -7972,31 +7979,7 @@ void enterT(LObject &p, kStrategy strat, int atT)
     }
   }
 #endif
-#ifdef HAVE_RINGS
-  if(rField_is_Ring(currRing) && !n_IsUnit(p.p->coef, currRing->cf))
-  {
-    #if ADIDEBUG_NF
-    printf("\nDas ist p:\n");pWrite(p.p);
-    #endif
-    for(i=strat->tl;i>=0;i--)
-    {
-      if(strat->T[i].ecart <= p.ecart && pLmDivisibleBy(strat->T[i].p,p.p))
-      {
-        #if ADIDEBUG_NF
-        printf("\nFound one: %i\n",i);pWrite(strat->T[i].p);
-        #endif
-        enterOneStrongPoly(i,p.p,p.ecart,0,strat,0 , TRUE);
-      }
-    }
-  }
-  /*
-  printf("\nThis is T:\n");
-  for(i=strat->tl;i>=0;i--)
-  {
-    pWrite(strat->T[i].p);
-  }
-  //getchar();*/
-#endif
+
 #ifdef HAVE_TAIL_RING
   if (currRing!=strat->tailRing)
   {
@@ -8035,6 +8018,11 @@ void enterT(LObject &p, kStrategy strat, int atT)
     if (p.t_p != NULL) pNext(p.t_p) = pNext(p.p);
   }
   strat->T[atT] = (TObject) p;
+  #if ADIDEBUG
+  printf("\nenterT: add in position %i\n",atT);
+  pWrite(p.p);
+  #endif
+  printf("\nenterT: neue hingefügt: länge = %i, ecart = %i\n",p.length,p.ecart);
 
   if (strat->tailRing != currRing && pNext(p.p) != NULL)
     strat->T[atT].max = p_GetMaxExpP(pNext(p.p), strat->tailRing);
@@ -8046,6 +8034,31 @@ void enterT(LObject &p, kStrategy strat, int atT)
   strat->T[atT].i_r = strat->tl;
   assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
   strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
+  #ifdef HAVE_RINGS
+  if(rField_is_Ring(currRing) && !n_IsUnit(p.p->coef, currRing->cf))
+  {
+    #if ADIDEBUG_NF
+    printf("\nDas ist p:\n");pWrite(p.p);
+    #endif
+    for(i=strat->tl;i>=0;i--)
+    {
+      if(strat->T[i].ecart <= p.ecart && pLmDivisibleBy(strat->T[i].p,p.p))
+      {
+        #if ADIDEBUG_NF
+        printf("\nFound one: %i\n",i);pWrite(strat->T[i].p);
+        #endif
+        enterOneStrongPoly(i,p.p,p.ecart,0,strat,0 , TRUE);
+      }
+    }
+  }
+  /*
+  printf("\nThis is T:\n");
+  for(i=strat->tl;i>=0;i--)
+  {
+    pWrite(strat->T[i].p);
+  }
+  //getchar();*/
+#endif
   kTest_T(&(strat->T[atT]));
 }
 
