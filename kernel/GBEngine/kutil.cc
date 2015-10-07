@@ -8035,7 +8035,8 @@ void enterT(LObject &p, kStrategy strat, int atT)
   assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
   strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
   #ifdef HAVE_RINGS
-  if(rField_is_Ring(currRing) && !n_IsUnit(p.p->coef, currRing->cf))
+  if(rField_is_Ring(currRing) && 
+  rHasLocalOrMixedOrdering(currRing) && !n_IsUnit(p.p->coef, currRing->cf))
   {
     #if ADIDEBUG_NF
     printf("\nDas ist p:\n");pWrite(p.p);
@@ -9382,8 +9383,8 @@ void postReduceByMon(LObject* h, kStrategy strat)
     p = pH;
     if(pNext(strat->S[i]) == NULL)
     {
-      pWrite(p);
-      pWrite(strat->S[i]);
+      //pWrite(p);
+      //pWrite(strat->S[i]);
       while(ok == FALSE)
       {
         if(pLmDivisibleBy(strat->S[i], p))

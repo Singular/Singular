@@ -1626,7 +1626,7 @@ loop_count = 1;
         #endif
     }
     #endif
-    //getchar();
+    getchar();
     #endif
     #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
@@ -1700,9 +1700,16 @@ loop_count = 1;
       printf("\nThis is P vor red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
       printf("\nBefore Ll = %i\n", strat->Ll);
       #endif
-      int inittl = strat->tl;
-      red_result = strat->red(&strat->P,strat);
-      strat->tl = inittl;
+      #ifdef HAVE_RINGS
+      if(rField_is_Ring(strat->tailRing) && rHasLocalOrMixedOrdering(currRing))
+      {
+        int inittl = strat->tl;
+        red_result = strat->red(&strat->P,strat);
+        strat->tl = inittl;
+      }
+      else
+      #endif
+        red_result = strat->red(&strat->P,strat);
       #if ADIDEBUG
       printf("\nThis is P nach red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
       printf("\nBefore Ll = %i\n", strat->Ll);
@@ -1734,9 +1741,16 @@ loop_count = 1;
         strat->P.pCleardenom();
 
       // put in T
-      int inittl = strat->tl;
-      enterT(strat->P,strat);
-      strat->tl = inittl+1;
+      #ifdef HAVE_RINGS
+      if(rField_is_Ring(strat->tailRing) && rHasLocalOrMixedOrdering(currRing))
+      {
+        int inittl = strat->tl;
+        enterT(strat->P,strat);
+        strat->tl = inittl+1;
+      }
+      else
+        enterT(strat->P,strat);
+      #endif
       // build new pairs
 #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
