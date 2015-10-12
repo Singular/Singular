@@ -192,7 +192,7 @@ public:
 };
 
 #ifndef HAVE_PSEUDO_BUCKETS
-inline void kBucketAdjustBucketsUsed(kBucket_pt bucket)
+static inline void kBucketAdjustBucketsUsed(kBucket_pt bucket)
 {
   while ( bucket->buckets_used > 0 &&
           bucket->buckets[bucket->buckets_used] == NULL)
