@@ -1413,7 +1413,8 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
   */
   
-  #if ADIDEBUG
+  //#if ADIDEBUG
+  #if 0
   idPrint(strat->Shdl);
   for(int ii=0; ii<=strat->Ll; ii++)
   {printf("\nL[%i]\n",ii);pWrite(strat->L[ii].p);pWrite(strat->L[ii].p1);pWrite(strat->L[ii].p2);pWrite(strat->L[ii].lcm);}
@@ -1745,7 +1746,12 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
   }
   else
   {
-    enterT_strong(h, strat,strat->tl+1);
+    if(h.IsNull()) return FALSE;
+    int red_result;
+    if(strat->L != NULL)
+    red_result = strat->red(&h,strat);
+    if(!h.IsNull())
+      enterT_strong(h, strat,-1);
   }
   //#if 1
   #if ADIDEBUG
@@ -3298,8 +3304,6 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
         }
       }
     }
-    #if 1
-
     if (new_pair)
     {
     #ifdef HAVE_RATGRING
@@ -3309,9 +3313,7 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
     #endif
       strat->chainCrit(h,ecart,strat);
     }
-    #else
     kMergeBintoL(strat);
-    #endif
   }
 }
 
@@ -4123,7 +4125,8 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
   assume (rField_is_Ring(currRing));
   // enter also zero divisor * poly, if this is non zero and of smaller degree
   if (!(rField_is_Domain(currRing))) enterExtendedSpoly(h, strat);
-#if ADIDEBUG
+//#if ADIDEBUG
+  #if 0
   if(iii==strat->Ll)
   {
     PrintS("\n                enterExtendedSpoly has not changed the list L.\n");
@@ -4135,16 +4138,17 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
     for(iii=0;iii<=strat->Ll;iii++)
     {
       Print("\n                L[%d]:\n",iii);
+      PrintS("                     ");p_Write(strat->L[iii].p,strat->tailRing);
       PrintS("                     ");p_Write(strat->L[iii].p1,strat->tailRing);
       PrintS("                     ");p_Write(strat->L[iii].p2,strat->tailRing);
-      PrintS("                     ");p_Write(strat->L[iii].p,strat->tailRing);
     }
   }
   printf("\nstrat->tl = %i\n",strat->tl);
   iii = strat->Ll;
 #endif
   initenterpairs(h, k, ecart, 0, strat, atR);
-#if ADIDEBUG
+//#if ADIDEBUG
+  #if 0
   if(iii==strat->Ll)
   {
     PrintS("\n                initenterpairs has not changed the list L.\n");
@@ -4164,7 +4168,8 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
   iii = strat->Ll;
 #endif
   initenterstrongPairs(h, k, ecart, 0, strat, atR);
-#if ADIDEBUG
+//#if ADIDEBUG
+  #if 0
   if(iii==strat->Ll)
   {
     PrintS("\n                initenterstrongPairs has not changed the list L.\n");
@@ -4201,7 +4206,8 @@ void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 #ifdef HAVE_RINGS
   assume (!rField_is_Ring(currRing));
 #endif
-  #if ADIDEBUG
+  //#if ADIDEBUG
+  #if 0
         Print("\n    Vor initenterpairs: The new pair list L -- after superenterpairs in loop\n");
         for(int iii=0;iii<=strat->Ll;iii++)
         {
@@ -4214,7 +4220,8 @@ void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 
   initenterpairs(h,k,ecart,0,strat, atR);
 
-      #if ADIDEBUG
+      //#if ADIDEBUG
+      #if 0
         Print("\n    Nach initenterpairs: The new pair list L -- after superenterpairs in loop \n");
         for(int iii=0;iii<=strat->Ll;iii++)
         {
@@ -5350,77 +5357,6 @@ int posInL11 (const LSet set, const int length,
 int posInL11Ring (const LSet set, const int length,
               LObject* p,const kStrategy strat)
 {
-#if 0
-  if (length < 0) return 0;
-  if (pLmCmp(set[length].p, p->p) == 1)
-      return length+1;
-  if (pLmCmp(set[0].p, p->p) == -1)
-      return 0;
-  
-  int i;
-  int an = 0;
-  int en = length+1;
-  bool isFromF = (p->p1 == NULL) && (p->p2 == NULL);
-  if(isFromF)
-  {
-    i = 0;
-    while(i<=length && pLmCmp(set[i].p, p->p)==1)
-      i++;
-    while((i<=length) && ((set[i].p1 != NULL) || (set[i].p2 != NULL)) && (pLmCmp(set[i].p, p->p) == 0))
-      i++;
-    an = i;
-    i = length;
-    while(i>=0 && pLmCmp(set[i].p, p->p) == -1)
-      i--;
-    en = i+1;
-  }
-  else
-  {
-    i = 0;
-    while(i<= length && pLmCmp(set[i].p, p->p) == 1)
-      i++;
-    an = i;
-    i = length;
-    while(i>=0 && pLmCmp(set[i].p, p->p)==-1)
-      i--;
-    while(i<= length && ((set[i].p1 == NULL) && (set[i].p2 == NULL)) && (pLmCmp(set[i].p,p->p) == 0) && (i > an))
-      i--;
-    en = i+1;
-  }
-  loop
-  {
-    if(an > length)
-        return length+1;
-    if (an >= en-1)
-    {
-      if(an == en)
-        return en;
-      if (pLmCmp(set[an].p, p->p) == 1) 
-        return en;
-      if (pLmCmp(set[an].p, p->p) == -1) 
-        return an;
-      if (pLmCmp(set[i].p, p->p) == 0)
-      {
-        if(nGreater(set[an].p->coef, p->p->coef))
-          return en;
-        else
-          return an;
-      }
-    }
-    i=(an+en) / 2;
-    if (pLmCmp(set[i].p, p->p) == 1)
-      an=i;
-    if (pLmCmp(set[i].p, p->p) == -1)
-      en=i;
-    if (pLmCmp(set[i].p, p->p) == 0)
-    {
-      if(nGreater(set[i].p->coef, p->p->coef))
-        an = i;
-      else
-        en = i;
-    }                                  
-  }
-#else
   if (length < 0) return 0;
   if(pIsConstant(p->p)) return length+1;
   int i,an,en;
@@ -5506,7 +5442,6 @@ int posInL11Ring (const LSet set, const int length,
         en = i;
     }
   }
-#endif
 }
 
 
@@ -8079,6 +8014,7 @@ void enterT(LObject &p, kStrategy strat, int atT)
   strat->T[atT].i_r = strat->tl;
   assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
   strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
+  #if 1
   #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing) && 
   rHasLocalOrMixedOrdering(currRing) && !n_IsUnit(p.p->coef, currRing->cf))
@@ -8104,6 +8040,7 @@ void enterT(LObject &p, kStrategy strat, int atT)
     pWrite(strat->T[i].p);
   }
   //getchar();*/
+#endif
 #endif
   kTest_T(&(strat->T[atT]));
 }
@@ -8543,7 +8480,7 @@ void initBuchMoraPos (kStrategy strat)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    strat->posInL = posInL11;
+    strat->posInL = posInL11Ring;
     strat->posInT = posInT11;
   }
 #endif

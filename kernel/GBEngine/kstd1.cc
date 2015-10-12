@@ -405,6 +405,9 @@ int redRiloc (LObject* h,kStrategy strat)
 #endif
     if (j < 0)
     {
+      #if ADIDEBUG_NF
+      printf("\nNone was found. Exit\n");
+      #endif
       if (strat->honey) h->SetLength(strat->length_pLength);
       // over ZZ: cleanup coefficients by complete reduction with monomials
       postReduceByMon(h, strat);
@@ -443,7 +446,9 @@ int redRiloc (LObject* h,kStrategy strat)
         if ((strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
                                         strat->T[i].length < li))
             &&
-            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], h->GetLmTailRing(), ~h->sev, strat->tailRing) && n_DivBy(h->p->coef,strat->T[i].p->coef,strat->tailRing))
+            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], h->GetLmTailRing(), ~h->sev, strat->tailRing) 
+            && 
+            n_DivBy(h->p->coef,strat->T[i].p->coef,strat->tailRing))
 #else
           j = kFindDivisibleByInT(strat, h, i);
         if (j < 0) break;
@@ -453,6 +458,10 @@ int redRiloc (LObject* h,kStrategy strat)
 #endif
         {
           // the polynomial to reduce with is now
+          #if ADIDEBUG_NF
+          printf("\n    Intermidiate one, h.ecart = %i < ecart = %i < ei = %i: ",h->ecart,strat->T[i].ecart, ei);
+          pWrite(strat->T[i].p);
+          #endif
           ii = i;
           ei = strat->T[i].ecart;
           if (ei <= h->ecart) break;
@@ -477,6 +486,9 @@ int redRiloc (LObject* h,kStrategy strat)
     // end of search: have to reduce with pi
     if (ei > h->ecart)
     {
+      #if ADIDEBUG_NF
+      printf("\nHAD TO REDUCE WITH BIGGER ECART!!!\n");
+      #endif
       // It is not possible to reduce h with smaller ecart;
       // if possible h goes to the lazy-set L,i.e
       // if its position in L would be not the last one
@@ -490,6 +502,7 @@ int redRiloc (LObject* h,kStrategy strat)
         at = strat->posInL(strat->L,strat->Ll,h,strat);
         if (at <= strat->Ll && pLmCmp(h->p, strat->L[strat->Ll].p) != 0 && !nEqual(h->p->coef, strat->L[strat->Ll].p->coef))
         {
+        #if 1
           /*- h will not become the next element to reduce -*/
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG
@@ -498,21 +511,56 @@ int redRiloc (LObject* h,kStrategy strat)
           h->Clear();
           strat->fromT = FALSE;
           return -1;
+        #else
+        
+        LObject* h2;
+        pWrite(h->p);
+        h2->tailRing = h->tailRing;
+        h2->p = pCopy(h->p);
+        pWrite(h2->p);
+        strat->initEcart(h2);
+        h2->sev = h->sev;
+        doRed(h,&(strat->T[ii]),strat->fromT,strat);
+        #if ADIDEBUG_NF
+        printf("\nPartial reduced (ecart = %i) h: ",h->ecart);pWrite(h->p);
+        #endif
+        if(h->IsNull())
+        {
+          if (h->lcm!=NULL) 
+          {
+            pLmDelete(h->lcm);
+          }
+          h->Clear();
+          h2->Clear();
+          return 0;
+        }
+        strat->initEcart(h);
+        h->sev = pGetShortExpVector(h->p);
+        at = strat->posInL(strat->L,strat->Ll,h,strat);
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+        #if ADIDEBUG_NF
+        printf("\nThis was reduced and went to L: ");pWrite(h->p);
+        #endif
+        at = strat->posInL(strat->L,strat->Ll,h2,strat);
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,*h2,at);
+        #if ADIDEBUG_NF
+        printf("\nThis was reduced and went to L: ");pWrite(h2->p);
+        #endif
+        //This means the pair won't go into T
+        return 3;
+        #endif
         }
       }
     }
-
     // now we finally can reduce
     doRed(h,&(strat->T[ii]),strat->fromT,strat);
-    #if ADIDEBUG_NF
-    PrintS("\n  Partial Reduced h = ");p_Write(h->p,strat->tailRing);
-    PrintLn();
-    #endif
     strat->fromT=FALSE;
-
     // are we done ???
     if (h->IsNull())
     {
+      #if ADIDEBUG_NF
+      printf("\nReduced to 0. Exit\n");
+      #endif
       if (h->lcm!=NULL) pLmDelete(h->lcm);
       h->Clear();
       return 0;
@@ -531,7 +579,10 @@ int redRiloc (LObject* h,kStrategy strat)
     else
       // this has the side effect of setting h->length
       h->ecart = h->pLDeg(strat->LDegLast) - h->GetpFDeg();
-
+    #if ADIDEBUG_NF
+    printf("\n  Partial Reduced (ecart %i) h = ",h->ecart);p_Write(h->p,strat->tailRing);
+    PrintLn();
+    #endif
     /*- try to reduce the s-polynomial -*/
     pass++;
     d = h->GetpFDeg()+h->ecart;
@@ -1288,10 +1339,10 @@ void firstUpdate(kStrategy strat)
 void enterSMora (LObject &p,int atS,kStrategy strat, int atR = -1)
 {
   enterSBba(p, atS, strat, atR);
-  #ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing))
-      return;
-  #endif
+  //#ifdef HAVE_RINGS
+  //  if (rField_is_Ring(currRing))
+  //    return;
+  //#endif
   #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
@@ -1623,6 +1674,7 @@ loop_count = 1;
         pWrite(strat->L[iii].p);
         pWrite(strat->L[iii].p1);
         pWrite(strat->L[iii].p2);
+        pWrite(strat->L[iii].lcm);
         #endif
     }
     #endif
@@ -1703,16 +1755,16 @@ loop_count = 1;
       #ifdef HAVE_RINGS
       if(rField_is_Ring(strat->tailRing) && rHasLocalOrMixedOrdering(currRing))
       {
-        int inittl = strat->tl;
+        //int inittl = strat->tl;
         red_result = strat->red(&strat->P,strat);
-        strat->tl = inittl;
+        //strat->tl = inittl;
       }
       else
       #endif
         red_result = strat->red(&strat->P,strat);
       #if ADIDEBUG
       printf("\nThis is P nach red:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
-      printf("\nBefore Ll = %i\n", strat->Ll);
+      printf("\nAfter Ll = %i\n", strat->Ll);
       #endif
     }
 
@@ -1741,16 +1793,21 @@ loop_count = 1;
         strat->P.pCleardenom();
 
       // put in T
-      #ifdef HAVE_RINGS
-      if(rField_is_Ring(strat->tailRing) && rHasLocalOrMixedOrdering(currRing))
+      //if(red_result!=3)
       {
-        int inittl = strat->tl;
-        enterT(strat->P,strat);
-        strat->tl = inittl+1;
+        #ifdef HAVE_RINGS
+        if(rField_is_Ring(strat->tailRing) && rHasLocalOrMixedOrdering(currRing))
+        {
+            //int inittl = strat->tl;
+          //enterT(strat->P,strat);
+          enterT_strong(strat->P,strat);
+          //strat->tl = inittl+1;
+        }
+        else
+        #endif
+          enterT(strat->P,strat);
+          //enterT_strong(strat->P,strat);
       }
-      else
-        enterT(strat->P,strat);
-      #endif
       // build new pairs
 #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
@@ -1772,6 +1829,7 @@ loop_count = 1;
           PrintS("         ");p_Write(strat->L[iii].p2,strat->tailRing);
         }
         #endif
+        //if(red_result!=3)
       strat->enterS(strat->P,
                     posInS(strat,strat->sl,strat->P.p, strat->P.ecart),
                     strat, strat->tl);
