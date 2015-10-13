@@ -847,8 +847,8 @@ Sub-procedure: asking for and reading your input
       B[l] = A[l1];
       if(flag) { C[l]=D[l1];}
     }
-    A = matrix(B,nrows(A),size(B));
-    D = matrix(C,nrows(D),size(C));
+    A = matrix(B,nrows(A),ncols(B));
+    D = matrix(C,nrows(D),ncols(C));
   }
   return(A,D,t1);
 }
