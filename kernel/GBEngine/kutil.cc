@@ -11,6 +11,8 @@
 
 #define MYTEST 0
 
+#define ADIDEBUG 0
+
 #include <kernel/mod2.h>
 
 #include <misc/mylimits.h>
@@ -75,8 +77,6 @@
 #undef DEBUGF5
 #define DEBUGF5 2
 #endif
-
-#define ADIDEBUG 0
 
 denominator_list DENOMINATOR_LIST=NULL;
 
@@ -337,7 +337,10 @@ void cancelunit (LObject* L,BOOLEAN inNF)
     if (rField_is_Ring(r) /*&& (rHasLocalOrMixedOrdering(r))*/)
       lc = pGetCoeff(p);
 #endif
-
+    #if ADIDEBUG
+    printf("\n        cancelunit\n");
+    pWrite(p);
+    #endif
 #ifdef HAVE_RINGS
   // Leading coef have to be a unit
   // example 2x+4x2 should be simplified to 2x*(1+2x)
@@ -402,9 +405,19 @@ void cancelunit (LObject* L,BOOLEAN inNF)
     #ifdef HAVE_RINGS
     // Note: As long as qring j forbidden if j contains integer (i.e. ground rings are
     //       domains), no zerodivisor test needed  CAUTION
-    if (rField_is_Ring(r) /*&&(rHasLocalOrMixedOrdering(r)) */)
-      if(n_DivBy(pGetCoeff(h),lc,r->cf) == 0)
-        return;
+    #if ADIDEBUG
+    pWrite(h);
+    #endif
+    if (rField_is_Ring(r) && !n_DivBy(pGetCoeff(h),lc,r->cf))
+    {
+      #if ADIDEBUG
+      printf("\nDoes not divide\n");
+      #endif
+      return;
+    }
+    #if ADIDEBUG
+    printf("\nDivides. Go On\n");
+    #endif
     #endif
     pIter(h);
   }
@@ -1442,7 +1455,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
               pWrite(strat->S[i]);
               pWrite(h.lcm);
               #endif
-        if ((n_DivBy(strat->B[j].lcm->coef, h.lcm->coef, currRing->cf) == 0) && ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0)))
+        if ((n_DivBy(strat->B[j].lcm->coef, h.lcm->coef, currRing->cf)) && ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0)))
         {
           strat->c3++;
           pLmDelete(h.lcm);
@@ -1464,7 +1477,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
               pWrite(strat->S[i]);
               pWrite(h.lcm);
               #endif
-          if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef, currRing->cf) == 0)
+          if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef, currRing->cf))
           {
           #if ADIDEBUG
                         printf("\nGelöscht: B[j]\n");
@@ -1489,7 +1502,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
               pWrite(p);
               pWrite(strat->S[i]);
               #endif
-        if ((n_DivBy(strat->B[j].lcm->coef, h.lcm->coef, currRing->cf) == 0) && (strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
+        if ((n_DivBy(strat->B[j].lcm->coef, h.lcm->coef, currRing->cf)) && (strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
         {
           #if ADIDEBUG
           printf("\nGelöscht h\n");
@@ -1510,12 +1523,14 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
               pWrite(strat->B[j].p);
               pWrite(strat->B[j].p1);
               pWrite(strat->B[j].p2);
+              pWrite(strat->B[j].lcm);
               printf("\nh - neue Paar\n");
               pWrite(h.p);
               pWrite(p);
               pWrite(strat->S[i]);
+              pWrite(h.lcm);
               #endif
-        if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef,currRing->cf) == 0)
+        if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef,currRing->cf))
         {
           #if ADIDEBUG
           printf("\nGelöscht B[j]\n");
@@ -1748,10 +1763,10 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
   {
     if(h.IsNull()) return FALSE;
     int red_result;
-    if(strat->L != NULL)
-    red_result = strat->red(&h,strat);
+    //if(strat->L != NULL)
+      red_result = strat->red(&h,strat);
     if(!h.IsNull())
-      enterT_strong(h, strat,-1);
+      enterT(h, strat,-1);
   }
   //#if 1
   #if ADIDEBUG
@@ -8014,34 +8029,6 @@ void enterT(LObject &p, kStrategy strat, int atT)
   strat->T[atT].i_r = strat->tl;
   assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
   strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
-  #if 1
-  #ifdef HAVE_RINGS
-  if(rField_is_Ring(currRing) && 
-  rHasLocalOrMixedOrdering(currRing) && !n_IsUnit(p.p->coef, currRing->cf))
-  {
-    #if ADIDEBUG_NF
-    printf("\nDas ist p:\n");pWrite(p.p);
-    #endif
-    for(i=strat->tl;i>=0;i--)
-    {
-      if(strat->T[i].ecart <= p.ecart && pLmDivisibleBy(strat->T[i].p,p.p))
-      {
-        #if ADIDEBUG_NF
-        printf("\nFound one: %i\n",i);pWrite(strat->T[i].p);
-        #endif
-        enterOneStrongPoly(i,p.p,p.ecart,0,strat,0 , TRUE);
-      }
-    }
-  }
-  /*
-  printf("\nThis is T:\n");
-  for(i=strat->tl;i>=0;i--)
-  {
-    pWrite(strat->T[i].p);
-  }
-  //getchar();*/
-#endif
-#endif
   kTest_T(&(strat->T[atT]));
 }
 
@@ -8126,18 +8113,18 @@ void enterT_strong(LObject &p, kStrategy strat, int atT)
   strat->T[atT].i_r = strat->tl;
   assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
   strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
-  #if 0
+  #if 1
   #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing) && !n_IsUnit(p.p->coef, currRing->cf))
   {
-    #if ADIDEBUG_NF
+    #if ADIDEBUG
     printf("\nDas ist p:\n");pWrite(p.p);
     #endif
     for(i=strat->tl;i>=0;i--)
     {
       if(strat->T[i].ecart <= p.ecart && pLmDivisibleBy(strat->T[i].p,p.p))
       {
-        #if ADIDEBUG_NF
+        #if ADIDEBUG
         printf("\nFound one: %i\n",i);pWrite(strat->T[i].p);
         #endif
         enterOneStrongPoly(i,p.p,p.ecart,0,strat,0 , TRUE);

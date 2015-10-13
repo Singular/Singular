@@ -346,9 +346,6 @@ ideal J = -10*x^2-9*x,-8*x^2-4;
        ideal gJ =  std(J);
        ideal ggJ =  std(gJ);
 ASSUME(0, 0== size( std(reduce (J,gJ ) ))  );
-ASSUME(0, idealsEqual(gJ,ggJ ));
-gJ;
-ggJ;
 
 ring rng = integer,x,lp;
 option(noredSB) ;
@@ -385,8 +382,17 @@ ideal I = 6yz-6,6xy-6yz-8y;
 ideal gI =std(I);
 I;gI;
 
+//Yue's Bug
 
- 
+ ring r = 0,(t,x(1..4)),ws(1,-1,-1,-1,-1);
+ ideal I =
+ 2*x(1)^2+3*x(1)*x(2)+24*x(3)*x(4),
+ 8*x(1)^3+x(2)*x(3)*x(4)+18*x(3)^2*x(4);
+ I = std(I);
+ ring s = integer,(t,x(1..4)),ws(1,-1,-1,-1,-1);
+ ideal I = fetch(r,I);
+ ideal J = I,2-t;
+ std(J);
        
 tst_status(1);$;      
 
