@@ -2257,7 +2257,7 @@ void p_Content(poly ph, const ring r)
 
     n_Normalize(pGetCoeff(ph),r->cf);
     if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
-    if (rField_is_Q(r)) // should not be used anymore if CLEARENUMERATORS is 1
+    if (rField_is_Q(r)||(getCoeffType(r->cf)==n_transExt)) // should not be used anymore if CLEARENUMERATORS is 1
     {
       h=p_InitContent(ph,r);
       p=ph;
@@ -2447,7 +2447,7 @@ void p_SimpleContent(poly ph, int smax, const ring r)
 #endif
 
 static number p_InitContent(poly ph, const ring r)
-// only for coefficients in Q
+// only for coefficients in Q and rational functions
 #if 0
 {
   assume(!TEST_OPT_CONTENTSB);
@@ -2498,10 +2498,16 @@ static number p_InitContent(poly ph, const ring r)
 #else
 {
   number d=pGetCoeff(ph);
-  if(SR_HDL(d)&SR_INT) return d;
-  int s=mpz_size1(d->z);
+  int s;
   int s2=-1;
-  number d2;
+  if(rField_is_Q(r))
+  {
+    if  (SR_HDL(d)&SR_INT) return d;
+    s=mpz_size1(d->z);
+  }
+  else
+    s=n_Size(d,r);
+  number d2=d;
   loop
   {
     pIter(ph);
@@ -2510,24 +2516,45 @@ static number p_InitContent(poly ph, const ring r)
       if (s2==-1) return n_Copy(d,r->cf);
       break;
     }
-    if (SR_HDL(pGetCoeff(ph))&SR_INT)
+    if (rField_is_Q(r))
     {
-      s2=s;
-      d2=d;
-      s=0;
-      d=pGetCoeff(ph);
-      if (s2==0) break;
+      if (SR_HDL(pGetCoeff(ph))&SR_INT)
+      {
+        s2=s;
+        d2=d;
+        s=0;
+        d=pGetCoeff(ph);
+        if (s2==0) break;
+      }
+      else if (mpz_size1((pGetCoeff(ph)->z))<=s)
+      {
+        s2=s;
+        d2=d;
+        d=pGetCoeff(ph);
+        s=mpz_size1(d->z);
+      }
     }
     else
-    if (mpz_size1((pGetCoeff(ph)->z))<=s)
     {
-      s2=s;
-      d2=d;
-      d=pGetCoeff(ph);
-      s=mpz_size1(d->z);
+      int ns=n_Size(pGetCoeff(ph),r);
+      if (ns<=3)
+      {
+        s2=s;
+        d2=d;
+        d=pGetCoeff(ph);
+        s=ns;
+	if (s2<=3) break;
+      }
+      else if (ns<s)
+      {
+        s2=s;
+        d2=d;
+        d=pGetCoeff(ph);
+        s=ns;
+      }
     }
   }
-  return n_Gcd(d,d2,r->cf);
+  return n_SubringGcd(d,d2,r->cf);
 }
 #endif
 
