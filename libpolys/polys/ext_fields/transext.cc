@@ -1754,28 +1754,16 @@ int ntSize(number a, const coeffs cf)
   poly p = NUM(f);
   int noOfTerms = 0;
   int numDegree = 0;
-  while (p != NULL)
+  if (p!=NULL)
   {
-    noOfTerms++;
-    int d = 0;
-    for (int i = 1; i <= rVar(ntRing); i++)
-      d += p_GetExp(p, i, ntRing);
-    if (d > numDegree) numDegree = d;
-    pIter(p);
+    numDegree = p_Totaldegree(p,ntRing);
+    noOfTerms = pLength(p);
   }
   int denDegree = 0;
   if (!DENIS1(f))
   {
-    p = DEN(f);
-    while (p != NULL)
-    {
-      noOfTerms++;
-      int d = 0;
-      for (int i = 1; i <= rVar(ntRing); i++)
-        d += p_GetExp(p, i, ntRing);
-      if (d > denDegree) denDegree = d;
-      pIter(p);
-    }
+    denDegree =  p_Totaldegree(DEN(f),ntRing);
+    noOfTerms += pLength(DEN(f));
   }
   ntTest(a); // !!!!
   return numDegree + denDegree + noOfTerms;
