@@ -15,7 +15,7 @@ mre
 mre_nonhom
 ncfactor_lee_l
 ;;ncfactor_counterExOld_l ;; too long
-paraplan
+paraplan ;; 3019 sec on nepomuck
 pAdd0L_l
 pAdd0_l
 pAddL_l

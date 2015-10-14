@@ -9,6 +9,8 @@ bug_ringlist
 bug_tr237
 ; do not try bug_tr276 without 2.2 GB RAM free
 ; bug_tr276
+bug_tr339
+bug_tr393
 bug_tr488
 bug_tr501
 ; bug_554 ;ehv.lib depr.
@@ -48,7 +50,9 @@ bug_tr723
 bug_tr724
 bug_732
 bug_tr735
+bug_tr738
 bug_tr739
+bug_tr745
 bug_genus_etc
 conv_bi
 facstd

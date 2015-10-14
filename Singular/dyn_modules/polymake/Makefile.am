@@ -28,7 +28,9 @@ if SING_HAVE_POLYMAKE
  polymake_la_LIBADD= ${PM_LIBS}
 endif
 
-SOURCES = polymake_conversion.cc polymake_documentation.cc polymake_wrapper.cc
+SOURCES = polymake_conversion.h polymake_conversion.cc \
+          polymake_documentation.h polymake_documentation.cc \
+	  polymake_wrapper.cc
 
 polymake_la_SOURCES = $(SOURCES)
 

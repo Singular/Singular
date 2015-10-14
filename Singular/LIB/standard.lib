@@ -2063,6 +2063,7 @@ static proc widkbase(int dd)
 //    mm     - the candidate
 static proc weightmon(int va, int drest, poly mm)
 {
+  if(va==0){return();}
   while(wwtop[va]>drest)
   {
     va--;

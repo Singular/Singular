@@ -62,7 +62,7 @@ static void simplify_poly (poly p, ring r)
   if(!rField_is_Zp (r))
   {
     p_Cleardenom (p, r);
-    //p_Content(p,r); //is a duplicate call, but belongs here
+    //includes p_Content(p,r);
   }
   else
     pNorm (p);
@@ -984,9 +984,7 @@ add_to_reductors (slimgb_alg * c, poly h, int len, int ecart,
   {
     if(!rField_is_Zp (c->r))
     {
-      p_Cleardenom (P.p, c->r);
-      //p_Content(P.p,c->r ); //is a duplicate call, but belongs here
-
+      p_Cleardenom (P.p, c->r); //includes p_Content(P.p,c->r );
     }
     else
       pNorm (P.p);
@@ -1508,8 +1506,7 @@ sorted_pair_node **add_to_basis_ideal_quotient (poly h, slimgb_alg * c,
 
   if(!rField_is_Zp (c->r))
   {
-    p_Cleardenom (h, c->r);
-    //p_Content(h,c->r); //is a duplicate call, but belongs here
+    p_Cleardenom (h, c->r); //includes p_Content(h,c->r);
   }
   else
     pNorm (h);
@@ -3814,8 +3811,7 @@ void slimgb_alg::cleanDegs (int lower, int upper)
         h = redNFTail (h, strat->sl, strat, lengths[i]);
         if(!rField_is_Zp (r))
         {
-          p_Cleardenom (h, r);
-          //p_Content(h,r);
+          p_Cleardenom (h, r); //includes p_Content(h,r);
         }
         else
           pNorm (h);
@@ -4405,7 +4401,7 @@ multi_reduction_lls_trick (red_object * los, int /*losl*/, slimgb_alg * c,
     if(!rField_is_Zp (c->r))
     {
       p_Cleardenom (clear_into, c->r);  //should be unnecessary
-      //p_Content(clear_into, c->r);
+      //includes p_Content(clear_into, c->r);
     }
     else
       pNorm (clear_into);
@@ -4954,7 +4950,7 @@ void multi_reduce_step (find_erg & erg, red_object * r, slimgb_alg * c)
     if(!rField_is_Zp (c->r))
     {
       p_Cleardenom (red, c->r); //should be unnecessary
-      //p_Content(red, c->r);
+      //includes p_Content(red, c->r);
     }
     pNormalize (red);
 

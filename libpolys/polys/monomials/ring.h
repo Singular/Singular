@@ -721,6 +721,7 @@ void   rSetSyzComp(int k, const ring r);
 
 // Ring Manipulations
 ring   rAssure_HasComp(const ring r);
+ring   rAssure_SyzOrder(const ring r, BOOLEAN complete);
 ring   rAssure_SyzComp(const ring r, BOOLEAN complete = TRUE);
 
 ring   rAssure_dp_S(const ring r);

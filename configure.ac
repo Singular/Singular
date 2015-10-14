@@ -259,8 +259,8 @@ AC_CONFIG_FILES([libsingular-config Singular.pc])
 
 AC_CONFIG_FILES([emacs/Makefile])
 
+AC_CONFIG_FILES([redhat/Makefile])
+AC_CONFIG_FILES([redhat/singular.spec])
 AC_CONFIG_FILES([desktop/Makefile desktop/Singular.desktop desktop/Singular-manual.desktop])
-
-AC_CONFIG_FILES([singular.spec])
 
 AC_OUTPUT
