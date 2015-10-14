@@ -24,7 +24,7 @@ omAllocSystem.c   omError.c        omStats.c	    omRet2Info.c     \
 omBin.c           omDebugTrack.c   		     \
 omalloc_provide.c omAllocFunc.c    omallocClass.cc
 
-EXTRA_DIST = omalloc.c omtTestAlloc.c omtTest.h omMmap.c
+EXTRA_DIST = omalloc_debug.c omalloc.c omtTestAlloc.c omtTest.h omMmap.c
 
 AM_CPPFLAGS =-I${top_srcdir}/.. -I${top_builddir}/..
 

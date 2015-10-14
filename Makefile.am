@@ -9,7 +9,7 @@ libpolys gfanlib IntegerProgramming \
 kernel Singular \
 dox emacs redhat desktop
 
-EXTRA_DIST = README README.md README.pkg autogen.sh git-version-gen doxy redhat/singular.spec.in redhat/singular.spec
+EXTRA_DIST = README README.md README.pkg autogen.sh git-version-gen doxy redhat/singular.spec.in GPL2 GPL3
 
 bin_SCRIPTS = libsingular-config
 
