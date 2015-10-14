@@ -448,6 +448,14 @@ reduce(I,gI);
  J2;
  reduce(J,J2);
  std(J2);
+ 
+//Infinite reduction small example
+
+  ring r = integer,(t,x,y),(dp(1),ds);
+  ideal i = 6+y+x2,4+x;
+  ideal gi = std(i);
+  gi;
+  reduce(i,gi);
        
 tst_status(1);$;      
 

@@ -126,7 +126,7 @@ static void kOptimizeLDeg(pLDegProc ldeg, kStrategy strat)
 }
 
 
-static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
+static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat, bool redMoraNF)
 {
   int ret;
 #if KDEBUG > 0
@@ -159,7 +159,10 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
                              pGetShallowCopyDeleteProc(h->tailRing,
                                                        strat->tailRing));
     }
-    enterT(*h,strat);
+    if(redMoraNF)
+      enterT_strong(*h,strat);
+    else
+      enterT(*h,strat);
     *h = L;
   }
   else
@@ -258,7 +261,7 @@ int redEcart (LObject* h,kStrategy strat)
     }
 
     // now we finally can reduce
-    doRed(h,&(strat->T[ii]),strat->fromT,strat);
+    doRed(h,&(strat->T[ii]),strat->fromT,strat,FALSE);
     strat->fromT=FALSE;
 
     // are we done ???
@@ -526,7 +529,7 @@ int redRiloc (LObject* h,kStrategy strat)
           pWrite(h2->p);
           strat->initEcart(h2);
           h2->sev = h->sev;
-          doRed(h,&(strat->T[ii]),FALSE,strat);
+          doRed(h,&(strat->T[ii]),FALSE,strat,FALSE);
           #if ADIDEBUG_NF
           printf("\nPartial reduced (ecart = %i) h: ",h->ecart);pWrite(h->p);
           #endif
@@ -559,7 +562,7 @@ int redRiloc (LObject* h,kStrategy strat)
       }
     }
     // now we finally can reduce
-    doRed(h,&(strat->T[ii]),strat->fromT,strat);
+    doRed(h,&(strat->T[ii]),strat->fromT,strat,FALSE);
     strat->fromT=FALSE;
     // are we done ???
     if (h->IsNull())
@@ -878,7 +881,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         #if ADIDEBUG_NF
         printf("\nHAVE TO REDUCE IT WITH BIGGER ECART\n");
         #endif
-        doRed(&H,&(strat->T[ii]),TRUE,strat);
+        doRed(&H,&(strat->T[ii]),TRUE,strat,TRUE);
         if (H.p == NULL)
           return NULL;
         #if 0
@@ -912,7 +915,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         /*
         * we reduce with good ecart, h need not to be put to T
         */
-        doRed(&H,&(strat->T[ii]),FALSE,strat);
+        doRed(&H,&(strat->T[ii]),FALSE,strat,TRUE);
         if (H.p == NULL)
           return NULL;
       }

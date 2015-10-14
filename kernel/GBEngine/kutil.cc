@@ -1648,12 +1648,12 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
 * put the  lcm(s[i],p)  into the set B
 */
 
-BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR, bool redMoraNF)
+BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR, bool enterTstrong)
 {
   number d, s, t;
   assume(atR >= 0);
   poly m1, m2, gcd,si;
-  if(!redMoraNF)
+  if(!enterTstrong)
   {
     assume(i<=strat->sl);
     si = strat->S[i];
@@ -1678,7 +1678,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
   k_GetStrongLeadTerms(p, si, currRing, m1, m2, gcd, strat->tailRing);
   //p_Test(m1,strat->tailRing);
   //p_Test(m2,strat->tailRing);
-  /*if(!redMoraNF)
+  /*if(!enterTstrong)
   {
     while (! kCheckStrongCreation(atR, m1, i, m2, strat) )
     {
@@ -1738,7 +1738,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
   h.i_r1 = -1;h.i_r2 = -1;
   if (currRing!=strat->tailRing)
     h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
-  if(!redMoraNF)
+  if(!enterTstrong)
   {
     #if 1
     h.p1 = p;h.p2 = strat->S[i];
@@ -1763,7 +1763,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
   {
     if(h.IsNull()) return FALSE;
     int red_result;
-    //if(strat->L != NULL)
+    if(strat->L != NULL)
       red_result = strat->red(&h,strat);
     if(!h.IsNull())
       enterT(h, strat,-1);
