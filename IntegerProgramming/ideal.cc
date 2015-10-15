@@ -351,7 +351,7 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
       "lexicographical \nwith positive weights"<<endl;
 
   w=_w;
-  // The argument term_ordering should be given by a homogenous grading.
+  // The argument term_ordering should be given by a homogeneous grading.
 
   if(A._kernel_dimension==-2)
     // kernel of A not yet computed, do this now
@@ -432,7 +432,7 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
     if(w.weight(generator)!=0)
       cerr<<"\nWARNING: ideal& ideal::Hosten_Sturmfels_ideal(matrix&, "
         "const term_ordering&):\nInvalid row space vector does not induce "
-        "homogenous grading."<<endl;
+        "homogeneous grading."<<endl;
 
     binomial* bin=new binomial(A.columns,generator,w);
     add_generator(*bin);
@@ -575,7 +575,7 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
       "reverse lexicographical \nwith positive weights"<<endl;
 
   w=_w;
-  // The argument term_ordering should be given by a homogenous grading.
+  // The argument term_ordering should be given by a homogeneous grading.
 
   if(A._kernel_dimension==-2)
     // kernel of A not yet computed, do this now
@@ -684,7 +684,7 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
     if(w.weight(generator)!=0)
       cerr<<"\nWARNING: ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix&, "
         "const term_ordering&):\nInvalid row space vector does not induce "
-        "homogenous grading."<<endl;
+        "homogeneous grading."<<endl;
 
     binomial* bin=new binomial(A.columns+1,generator,w);
     add_generator(*bin);
