@@ -374,7 +374,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
         {
           pSetCoeff(L->p,eins);
           if (L->t_p != NULL)
-            pSetCoeff0(L->t_p,eins);
+            pSetCoeff(L->t_p,eins);
         }
         else
           pSetCoeff(L->t_p,eins);
@@ -1396,9 +1396,9 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       enterL(&strat->L,&strat->Ll,&strat->Lmax,Lp,l);
     }
   #else
-  assume(i<=strat->sl);
   assume(atR >= 0);
   assume(i<=strat->sl);
+  assume(p!=NULL);
   int      l,j,compare,compareCoeff;
   LObject  h;
 
@@ -1543,7 +1543,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   }
   #endif
   number s, t;
-  poly m1, m2, gcd;
+  poly m1, m2, gcd = NULL;
   #if ADIDEBUG
   printf("\nTrying to add spair S[%i] und p\n",i);pWrite(strat->S[i]);pWrite(p);
   #endif
@@ -1553,7 +1553,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   ksCheckCoeff(&s, &t, currRing->cf);
   pSetCoeff0(m1, s);
   pSetCoeff0(m2, t);
-  pNeg(m2);
+  m2 = pNeg(m2);
   p_Test(m1,strat->tailRing);
   p_Test(m2,strat->tailRing);
   poly si = pCopy(strat->S[i]);
@@ -1562,22 +1562,16 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   pDelete(&si);
   if(sim2 == NULL)
   {
+    pDelete(&m1);
+    pDelete(&m2);
     if(pm1 == NULL)
     {
-      //pDelete(&sim2);
-      //pDelete(&pm1);
-      //pDelete(&gcd);
-      //pDelete(&m1);
-      //pDelete(&m2);
       return;
     }
     else
     {
-      gcd = pCopy(pm1);
-      pDelete(&pm1);
-      pDelete(&sim2);
-      pDelete(&m1);
-      pDelete(&m2);
+      gcd = pm1;
+      pm1 = NULL;
     }
   }
   else
@@ -2370,7 +2364,12 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
     // pSig = sSig, delete element due to Rewritten Criterion
     pDelete(&pSigMult);
     pDelete(&sSigMult);
-    pLmFree(Lp.lcm);
+    #ifdef HAVE_RINGS
+    if (rField_is_Ring(currRing))
+      pLmDelete(Lp.lcm);
+    else
+    #endif
+      pLmFree(Lp.lcm);
     Lp.lcm=NULL;
     pDelete (&m1);
     pDelete (&m2);
@@ -2386,7 +2385,12 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   {
     pDelete(&pSigMult);
     pDelete(&sSigMult);
-    pLmFree(Lp.lcm);
+    #ifdef HAVE_RINGS
+    if (rField_is_Ring(currRing))
+      pLmDelete(Lp.lcm);
+    else
+    #endif
+      pLmFree(Lp.lcm);
     Lp.lcm=NULL;
     pDelete (&m1);
     pDelete (&m2);
@@ -9099,7 +9103,12 @@ BOOLEAN newHEdge(kStrategy strat)
 
     return TRUE;
   }
-  pLmFree(newNoether);
+  #ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
+    pLmDelete(newNoether);
+  else
+  #endif
+    pLmFree(newNoether);
   return FALSE;
 }
 
@@ -9358,11 +9367,12 @@ void postReduceByMon(LObject* h, kStrategy strat)
       {
         if(pLmDivisibleBy(strat->S[i], p))
         {
-          p->coef = currRing->cf->cfIntMod(p->coef, strat->S[i]->coef, currRing->cf);
+          number dummy = n_IntMod(p->coef, strat->S[i]->coef, currRing->cf);
+          p_SetCoeff(p,dummy,currRing);
         }
         if(nIsZero(p->coef))
         {
-          pLmDelete(&pNext(p));
+          pLmDelete(&p);
           deleted = TRUE;
         }
         else
@@ -9375,7 +9385,8 @@ void postReduceByMon(LObject* h, kStrategy strat)
       {
         if(pLmDivisibleBy(strat->S[i], pp))
         {
-          pp->coef = currRing->cf->cfIntMod(pp->coef, strat->S[i]->coef, currRing->cf);
+          number dummy = n_IntMod(pp->coef, strat->S[i]->coef, currRing->cf);
+          p_SetCoeff(pp,dummy,currRing);
           if(nIsZero(pp->coef))
           {
             pLmDelete(&pNext(p));
@@ -9422,8 +9433,8 @@ void finalReduceByMon(kStrategy strat)
           p = strat->S[i];
           if(pLmDivisibleBy(strat->S[j], p))
           {
-            //nDelete(&(p->coef));
-            p->coef = currRing->cf->cfIntMod(p->coef, strat->S[j]->coef, currRing->cf);
+            number dummy = n_IntMod(p->coef, strat->S[j]->coef, currRing->cf);
+            p_SetCoeff(p,dummy,currRing);
           }
           pp = pNext(p); 
           if((pp == NULL) && (nIsZero(p->coef)))
@@ -9436,8 +9447,8 @@ void finalReduceByMon(kStrategy strat)
               {
                 if(pLmDivisibleBy(strat->S[j], pp))
                 {
-                  //nDelete(&(pp->coef));
-                  pp->coef = currRing->cf->cfIntMod(pp->coef, strat->S[j]->coef, currRing->cf);
+                  number dummy = n_IntMod(pp->coef, strat->S[j]->coef, currRing->cf);
+                  p_SetCoeff(pp,dummy,currRing);
                   if(nIsZero(pp->coef))
                   {
                     pLmDelete(&pNext(p));

@@ -414,7 +414,12 @@ int redRiloc (LObject* h,kStrategy strat)
       if (strat->honey) h->SetLength(strat->length_pLength);
       // over ZZ: cleanup coefficients by complete reduction with monomials
       postReduceByMon(h, strat);
-      if(nIsZero(pGetCoeff(h->p)) || h->p == NULL) return 2;
+      if(h->p == NULL) 
+      {
+        if (h->lcm!=NULL) pLmDelete(h->lcm);
+        h->Clear();
+        return 0;
+      }
       if(strat->tl >= 0)
           h->i_r1 = strat->tl;
       else
@@ -1199,12 +1204,22 @@ void updateLHC(kStrategy strat)
        /*- deletes the int spoly and computes -*/
       if (pLmCmp(strat->L[i].p,strat->kNoether) == -1)
       {
-        pLmFree(strat->L[i].p);
+        #ifdef HAVE_RINGS
+        if (rField_is_Ring(currRing))
+          pLmDelete(strat->L[i].p);
+        else
+        #endif
+          pLmFree(strat->L[i].p);
         strat->L[i].p = NULL;
       }
       else
       {
-        pLmFree(strat->L[i].p);
+        #ifdef HAVE_RINGS
+        if (rField_is_Ring(currRing))
+          pLmDelete(strat->L[i].p);
+        else
+        #endif
+          pLmFree(strat->L[i].p);
         strat->L[i].p = NULL;
         poly m1 = NULL, m2 = NULL;
         // check that spoly creation is ok
