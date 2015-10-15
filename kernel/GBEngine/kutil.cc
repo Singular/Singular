@@ -3433,7 +3433,7 @@ void chainCritRing (poly p,int, kStrategy strat)
               }
 #endif
               #if ADIDEBUG
-              printf("\nChainCrit\n");
+              printf("\nChainCrit1\n");
               pWrite(strat->B[i].p);
               pWrite(strat->B[i].p1);
               pWrite(strat->B[i].p2);
@@ -3458,10 +3458,10 @@ void chainCritRing (poly p,int, kStrategy strat)
         if ((pNext(strat->L[j].p) == strat->tail) || (rHasGlobalOrdering(currRing)))
         {
           #if ADIDEBUG
-          printf("\nChainCrit\n");
-          pWrite(strat->B[i].p);
-          pWrite(strat->B[i].p1);
-          pWrite(strat->B[i].p2);
+          printf("\nChainCrit2\n");
+          pWrite(strat->L[j].p);
+          pWrite(strat->L[j].p1);
+          pWrite(strat->L[j].p2);
           #endif
           deleteInL(strat->L,&strat->Ll,j,strat);
           strat->c3++;
@@ -3527,10 +3527,10 @@ void chainCritRing (poly p,int, kStrategy strat)
           }
 #endif
               #if ADIDEBUG
-              printf("\nChainCrit\n");
-              pWrite(strat->B[i].p);
-              pWrite(strat->B[i].p1);
-              pWrite(strat->B[i].p2);
+              printf("\nChainCrit3\n");
+              pWrite(strat->L[j].p);
+              pWrite(strat->L[j].p1);
+              pWrite(strat->L[j].p2);
               #endif
           if (isInPairsetL(i-1,strat->L[j].p1,strat->L[i].p1,&l,strat)
           && (pNext(strat->L[l].p) == strat->tail)
