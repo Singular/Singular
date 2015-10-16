@@ -374,7 +374,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
         {
           pSetCoeff(L->p,eins);
           if (L->t_p != NULL)
-            pSetCoeff(L->t_p,eins);
+            pSetCoeff0(L->t_p,eins);
         }
         else
           pSetCoeff(L->t_p,eins);
@@ -8120,7 +8120,7 @@ void enterT_strong(LObject &p, kStrategy strat, int atT)
   strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
   #if 1
   #ifdef HAVE_RINGS
-  if(rField_is_Ring(currRing) && !n_IsUnit(p.p->coef, currRing->cf))
+  if(rField_is_Ring(currRing) && rHasLocalOrMixedOrdering(currRing) && !n_IsUnit(p.p->coef, currRing->cf))
   {
     #if ADIDEBUG
     printf("\nDas ist p:\n");pWrite(p.p);
