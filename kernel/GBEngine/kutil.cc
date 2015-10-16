@@ -1408,7 +1408,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   /*- computes the lcm(s[i],p) -*/
   h.lcm = pInit();
   pSetCoeff0(h.lcm, n_Lcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing->cf));
-
   if (nIsZero(pGetCoeff(h.lcm)))
   {
       strat->cp++;
@@ -1566,6 +1565,9 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     pDelete(&m2);
     if(pm1 == NULL)
     {
+      if(h.lcm != NULL)
+        pDelete(&h.lcm);
+      h.Clear();
       return;
     }
     else
@@ -1594,7 +1596,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     PrintLn();
   }
 #endif
-  //LObject h;
   h.p = gcd;
   h.i_r = -1;
   if(h.p == NULL)

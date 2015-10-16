@@ -569,6 +569,20 @@ reduce(I,gI);
   Gstd;
   reduce(h,Gstd);
   reduce(G,Gstd);
+  
+// Memory leak
+
+  ring r=integer,t,ds;
+  ideal I = 2,3-t;
+  int i;
+  bigint m=memory(0);
+  for(i=1; i<100; i++)
+  {
+    ideal II = std(I);
+    II = reduce(I,II);
+    kill II;
+  }
+  m-memory(0); //  should be 0
        
 tst_status(1);$;      
 
