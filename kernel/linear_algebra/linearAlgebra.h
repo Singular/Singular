@@ -456,7 +456,7 @@ bool realSqrt(
  * The algorithm relies on computing square roots of floating point numbers.
  * These will be combuted by Heron's iteration formula, with iteration
  * stopping when two successive approximations of the square root differ by
- * no more than the given tolerance, which is assumed to be a positve real
+ * no more than the given tolerance, which is assumed to be a positive real
  * number.
  **/
 void hessenberg(
