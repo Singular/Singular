@@ -1392,8 +1392,8 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
         Lp.i_r1 = strat->S_2_R[i];
       }
       strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
-      l = strat->posInL(strat->L,strat->Ll,&Lp,strat);
-      enterL(&strat->L,&strat->Ll,&strat->Lmax,Lp,l);
+      l = strat->posInL(strat->B,strat->Bl,&Lp,strat);
+      enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
     }
   #else
   assume(atR >= 0);
@@ -1448,14 +1448,18 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
               pWrite(strat->B[j].p);
               pWrite(strat->B[j].p1);
               pWrite(strat->B[j].p2);
+              pWrite(strat->B[j].lcm);
               printf("\nh - neue Paar\n");
               pWrite(h.p);
               pWrite(p);
               pWrite(strat->S[i]);
               pWrite(h.lcm);
               #endif
-        if ((n_DivBy(strat->B[j].lcm->coef, h.lcm->coef, currRing->cf)) && ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0)))
+        if ((n_DivBy(h.lcm->coef, strat->B[j].lcm->coef,  currRing->cf)) && ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0)))
         {
+          #if ADIDEBUG
+          printf("\nGelöscht neue h\n");
+          #endif
           strat->c3++;
           pLmDelete(h.lcm);
           return;
@@ -1470,20 +1474,22 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
               pWrite(strat->B[j].p);
               pWrite(strat->B[j].p1);
               pWrite(strat->B[j].p2);
+              pWrite(strat->B[j].lcm);
               printf("\nh - neue Paar\n");
               pWrite(h.p);
               pWrite(p);
               pWrite(strat->S[i]);
               pWrite(h.lcm);
               #endif
-          if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef, currRing->cf))
-          {
+          //Ist schon im coeffCompare
+          //if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef, currRing->cf))
+          //{
           #if ADIDEBUG
                         printf("\nGelöscht: B[j]\n");
           #endif
             deleteInL(strat->B,&strat->Bl,j,strat);
             strat->c3++;
-          }
+          //}
       }
     }
     if ((compare == pDivComp_EQUAL) && (compareCoeff != 2))
@@ -1496,6 +1502,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
               pWrite(strat->B[j].p);
               pWrite(strat->B[j].p1);
               pWrite(strat->B[j].p2);
+              pWrite(strat->B[j].lcm);
               printf("\nh - neue Paar\n");
               pWrite(h.p);
               pWrite(p);
@@ -1529,14 +1536,14 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
               pWrite(strat->S[i]);
               pWrite(h.lcm);
               #endif
-        if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef,currRing->cf))
-        {
+        //if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef,currRing->cf))
+        //{
           #if ADIDEBUG
           printf("\nGelöscht B[j]\n");
           #endif
           deleteInL(strat->B,&strat->Bl,j,strat);
           strat->c3++;
-        }
+        //}
       }
     }
   }
@@ -1568,6 +1575,9 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       if(h.lcm != NULL)
         pDelete(&h.lcm);
       h.Clear();
+      if (strat->pairtest==NULL) initPairtest(strat);
+      strat->pairtest[i] = TRUE;
+      strat->pairtest[strat->sl+1] = TRUE;
       return;
     }
     else
@@ -1599,13 +1609,16 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   h.p = gcd;
   h.i_r = -1;
   if(h.p == NULL)
+  {  
+    if (strat->pairtest==NULL) initPairtest(strat);
+    strat->pairtest[i] = TRUE;
+    strat->pairtest[strat->sl+1] = TRUE;
     return;
+  }
   h.tailRing = strat->tailRing;
   int posx;
-  h.pCleardenom();
-  if(h.p == NULL)
-    return;
-  pSetm(h.p);
+  //h.pCleardenom();
+  //pSetm(h.p);
   #if ADIDEBUG
   printf("\nThis is afterwards:\n");
   pWrite(h.p);
@@ -1748,11 +1761,11 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
       h.i_r1 = -1;
       h.i_r2 = -1;
     }
-    if (strat->Ll==-1)
+    if (strat->Bl==-1)
       posx =0;
     else
-      posx = strat->posInL(strat->L,strat->Ll,&h,strat);
-    enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
+      posx = strat->posInL(strat->B,strat->Bl,&h,strat);
+    enterL(&strat->B,&strat->Bl,&strat->Bmax,h,posx);
   }
   else
   {
@@ -3433,6 +3446,10 @@ void chainCritRing (poly p,int, kStrategy strat)
                 PrintS("strat->S[j]:");
                 wrp(strat->S[j]);
                 PrintS("  strat->B[i].lcm:");
+                wrp(strat->B[i].lcm);PrintLn();
+                pWrite(strat->B[i].p);
+                pWrite(strat->B[i].p1);
+                pWrite(strat->B[i].p2);
                 wrp(strat->B[i].lcm);
                 PrintLn();
               }
