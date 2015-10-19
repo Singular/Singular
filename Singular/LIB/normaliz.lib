@@ -1,6 +1,6 @@
 //// Singular library normaliz.lib
 
-version="version normaliz.lib 4.0.2.0 Sept_2015 "; // $Id$
+version="version normaliz.lib 4.0.2.1 Sept_2015 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY: normaliz.lib  Provides an interface for the use of Normaliz 2.11 or
@@ -789,9 +789,9 @@ The Normaliz options are accessible via the following names:
 @* @code{-B:  bigint} Use GMP for arbitrary precision integers
 @* @code{-x=N:  threads} In this case the int parameter is used to set the
                          number of threads N, 0 means no explicit limiting.
-                         
+
             In the next version of this library the options will be accessible
-            via their standard Normaliz 3.0 names. 
+            via their standard Normaliz 3.0 names.
 
 SEE ALSO: showNmzOptions
 EXAMPLE:  example setNmzOption; shows an example
@@ -910,14 +910,14 @@ proc normaliz(intmat sgr,int nmz_mode, list #)
           normaliz(intmat sgr, int nmz_mode, intmat sgr2, int nmz_mode2, ...);
 RETURN:   The function applies Normaliz to the parameter sgr in the mode set
           by nmz_mode. The function returns the intmat defined by the file
-          with suffix gen.           
-          
-          It is also possible to give more than one pair of matrix and mode.          
-          In this case all matrices and modes are used. 
-          
+          with suffix gen.
+
+          It is also possible to give more than one pair of matrix and mode.
+          In this case all matrices and modes are used.
+
           In this version one must use the old numerical types of input matrices
           according to the following table:
-          
+
 @* @code{0:  cone}
 @* @code{1:  cone_and_lattice}
 @* @code{2:  polytope}
@@ -928,9 +928,9 @@ RETURN:   The function applies Normaliz to the parameter sgr in the mode set
 @* @code{10:  lattice_ideal}
 @* @code{20:  grading}
 
-          In the next vfersion all input types of Normaliz 3.0 will be accessible
+          In the next version all input types of Normaliz 3.0 will be accessible
           via their names. See the Normaliz manual for more information.
-          
+
 NOTE:     You will find procedures for many applications of Normaliz in this
           library, so the explicit call of this procedure may not be necessary.
 SEE ALSO: intclToricRing, normalToricRing, ehrhartRing, intclMonIdeal,
