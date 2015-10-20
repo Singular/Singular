@@ -1536,7 +1536,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
               pWrite(strat->S[i]);
               pWrite(h.lcm);
               #endif
-        if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef,currRing->cf))
+        //if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef,currRing->cf))
         {
           #if ADIDEBUG
           printf("\nGelöscht B[j]\n");
@@ -5394,9 +5394,11 @@ int posInL11 (const LSet set, const int length,
 int posInL11Ring (const LSet set, const int length,
               LObject* p,const kStrategy strat)
 {
+  #if 0
   if (length < 0) return 0;
   if(pIsConstant(p->p)) return length+1;
   int i,an,en;
+  #if 1
   if(pIsConstant(set[length].p) && length > 0)
   {   
     if (set[length-1].FDeg > p->FDeg)
@@ -5446,6 +5448,15 @@ int posInL11Ring (const LSet set, const int length,
       i--;
     en = i+1;
   }
+  #else
+  an = 0;
+  en = length;
+  while(en>=an && (set[en].p == NULL || pIsConstant(set[en].p)))
+    en--;
+  if(en == 0)
+    return 0;
+  en++;
+  #endif
   loop
   {
     if(an > length)
@@ -5472,6 +5483,95 @@ int posInL11Ring (const LSet set, const int length,
     if (pLmCmp(set[i].p, p->p) == -1)
       en=i;
     if (pLmCmp(set[i].p, p->p) == 0)
+    {
+      if(nGreater(set[i].p->coef, p->p->coef))
+        an = i;
+      else
+        en = i;
+    }
+  }
+  #else
+  if (length < 0) return 0;
+  int an,en,i;
+  an = 0;
+  en = length+1;
+  #if 0
+  printf("\n----------------------\n");
+  for(i=0;i<=length;i++)
+    pWrite(set[i].p);
+  printf("\n----------------------\n");
+  #endif
+  loop
+  {
+    if (an >= en-1)
+    {
+      if(an == en)
+        return en;
+      if (pLmCmp(set[an].p, p->p) == 1)
+        return en;
+      if (pLmCmp(set[an].p, p->p) == -1)
+        return an;
+      if (pLmCmp(set[an].p, p->p) == 0)
+      {
+        if(nGreater(set[an].p->coef, p->p->coef))
+          return en;
+        else
+          return an;
+      }
+    }
+    i=(an+en) / 2;
+    if (pLmCmp(set[i].p, p->p) == 1)
+      an=i;
+    if (pLmCmp(set[i].p, p->p) == -1)
+      en=i;
+    if (pLmCmp(set[i].p, p->p) == 0)
+    {
+      if(nGreater(set[i].p->coef, p->p->coef))
+        an = i;
+      else
+        en = i;
+    }
+  }
+  #endif
+}
+
+int posInL11Ringls (const LSet set, const int length,
+              LObject* p,const kStrategy strat)
+{
+  if (length < 0) return 0;
+  int an,en,i;
+  an = 0;
+  en = length+1;
+  #if 0
+  printf("\n----------------------\n");
+  for(i=0;i<=length;i++)
+    pWrite(set[i].p);
+  printf("\n----------------------\n");
+  #endif
+  loop
+  {
+    if (an >= en-1)
+    {
+      if(an == en)
+        return en;
+      if (set[an].FDeg > p->FDeg)
+        return en;
+      if (set[an].FDeg < p->FDeg)
+        return an;
+      if (set[an].FDeg == p->FDeg)
+      {
+        if(nGreater(set[an].p->coef, p->p->coef))
+          return en;
+        else
+          return an;
+      }
+    }
+    i=(an+en) / 2;
+    if (set[i].FDeg > p->FDeg)
+      an=i;
+    if (set[i].FDeg < p->FDeg)
+      en=i;
+    if (set[i].FDeg == p->FDeg)
     {
       if(nGreater(set[i].p->coef, p->p->coef))
         an = i;
@@ -8490,6 +8590,8 @@ void initBuchMoraPos (kStrategy strat)
   if (rField_is_Ring(currRing))
   {
     strat->posInL = posInL11Ring;
+    if(rHasLocalOrMixedOrdering(currRing) && currRing->pLexOrder == TRUE)
+      strat->posInL = posInL11Ringls;
     strat->posInT = posInT11;
   }
 #endif
@@ -8681,6 +8783,8 @@ void initSbaPos (kStrategy strat)
   if (rField_is_Ring(currRing))
   {
     strat->posInL = posInL11Ring;
+    if(rHasLocalOrMixedOrdering(currRing) && currRing->pLexOrder == TRUE)
+      strat->posInL = posInL11Ringls;
     strat->posInT = posInT11;
   }
 #endif
