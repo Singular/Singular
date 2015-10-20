@@ -1813,7 +1813,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
     }
   }
-
   /* complete reduction of the standard basis--------- */
   if (TEST_OPT_REDSB)
   {
@@ -1832,11 +1831,21 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
   }
   else if (TEST_OPT_PROT) PrintLn();
-  /* release temp data-------------------------------- */
   #ifdef HAVE_RINGS
   if(nCoeff_is_Ring_Z(currRing->cf))
     finalReduceByMon(strat);
+  if(rField_is_Ring(currRing))
+  {
+    for(int i = 0;i<=strat->sl;i++)
+    {
+      if(!nGreaterZero(pGetCoeff(strat->S[i])))
+      {
+        strat->S[i] = pNeg(strat->S[i]);
+      }
+    }
+  }
   #endif
+  /* release temp data-------------------------------- */
   exitBuchMora(strat);
 //  if (TEST_OPT_WEIGHTM)
 //  {

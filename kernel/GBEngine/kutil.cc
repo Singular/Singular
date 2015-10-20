@@ -1521,10 +1521,10 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       }
       else
       // Add hint for same LM and LC (later) (TODO Oliver)
-      // if (compareCoeff == pDivComp_GREATER)
+      if (compareCoeff == pDivComp_GREATER)
       {
         #if ADIDEBUG
-              printf("\nChainCrit3 in enteronepairring\n");
+              printf("\nChainCrit4 in enteronepairring\n");
               printf("\nB[j]\n");
               pWrite(strat->B[j].p);
               pWrite(strat->B[j].p1);
@@ -1536,14 +1536,14 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
               pWrite(strat->S[i]);
               pWrite(h.lcm);
               #endif
-        //if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef,currRing->cf))
-        //{
+        if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef,currRing->cf))
+        {
           #if ADIDEBUG
           printf("\nGelöscht B[j]\n");
           #endif
           deleteInL(strat->B,&strat->Bl,j,strat);
           strat->c3++;
-        //}
+        }
       }
     }
   }
@@ -1761,11 +1761,11 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
       h.i_r1 = -1;
       h.i_r2 = -1;
     }
-    if (strat->Bl==-1)
+    if (strat->Ll==-1)
       posx =0;
     else
-      posx = strat->posInL(strat->B,strat->Bl,&h,strat);
-    enterL(&strat->B,&strat->Bl,&strat->Bmax,h,posx);
+      posx = strat->posInL(strat->L,strat->Ll,&h,strat);
+    enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
   }
   else
   {
@@ -8926,12 +8926,27 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
           {
             if ((l!=q)
             && (r->m[q]!=NULL)
-            &&(pLmDivisibleBy(r->m[l],r->m[q])))
+            &&(pLmDivisibleBy(r->m[l],r->m[q]))
+            #if HAVE_RINGS
+            && (!rField_is_Ring(currRing) ||
+                n_DivBy(r->m[q]->coef, r->m[l]->coef, currRing))
+            #endif
+            )
             {
-                #if HAVE_RINGS
-                if(!rField_is_Ring(currRing) ||
-                   n_DivBy(r->m[q]->coef, r->m[l]->coef, currRing))
+                //If they are equal then take the one with the smallest length
+                if(pLmDivisibleBy(r->m[q],r->m[l])
+                #ifdef HAVE_RINGS
+                && ((rField_is_Ring(currRing) 
+                && n_DivBy(r->m[q]->coef, r->m[l]->coef, currRing))
+                || !(rField_is_Ring(currRing)))
                 #endif
+                && (pLength(r->m[q]) < pLength(r->m[l]) || 
+                (pLength(r->m[q]) == pLength(r->m[l]) && nGreaterZero(r->m[q]->coef))))
+                {
+                  pDelete(&r->m[l]);
+                  break;
+                }
+                else
                   pDelete(&r->m[q]);
             }
           }
