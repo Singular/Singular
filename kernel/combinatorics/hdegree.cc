@@ -1009,27 +1009,39 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
 
   int  i;
   int  k = ak;
-
   #if HAVE_RINGS
   if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
   {
-  //consider just monic generators (over rings with zero-divisors)
-  ideal SS=id_Copy(S,tailRing);
-  for(i=0;i<=idElem(SS);i++)
-  	{
-  	if(pIsPurePower(SS->m[i])==0)
-  		p_Delete(&SS->m[i],tailRing);
+    //consider just monic generators (over rings with zero-divisors)
+    ideal SS=id_Copy(S,tailRing); 
+    for(i=0;i<=idElem(S);i++)
+    {
+    	if(p_IsPurePower(SS->m[i],tailRing)==0)
+  		{  
+  		  p_Delete(&SS->m[i],tailRing);
+  		}
   	}
   	S=id_Copy(SS,tailRing);
+  	idSkipZeroes(S);
   }
+  #if 0
+  printf("\nThis is HC:\n");
+  for(int ii=0;ii<=idElem(S);ii++)
+  {
+    pWrite(S->m[ii]);
+  }
+  //getchar();
   #endif
-
+  #endif
+  if(idElem(S) == 0)
+    return;
   hNvar = (currRing->N);
   hexist = hInit(S, Q, &hNexist, tailRing); // tailRing?
   if (k!=0)
     hComp(hexist, hNexist, k, hexist, &hNstc);
   else
     hNstc = hNexist;
+  assume(hNexist > 0);
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc((hNvar + 1) * sizeof(int));
   hpure = (scmon)omAlloc((1 + (hNvar * hNvar)) * sizeof(int));
