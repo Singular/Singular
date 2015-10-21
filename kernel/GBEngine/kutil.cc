@@ -1180,222 +1180,6 @@ static inline BOOLEAN sugarDivisibleBy(int ecart1, int ecart2)
 */
 void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
 {
-  #if 0
-  assume(i<=strat->sl);
-    int      l,j,compare,compareCoeff;
-    LObject  Lp;
-    if (strat->interred_flag) return;
-  #ifdef KDEBUG
-    Lp.ecart=0; Lp.length=0;
-  #endif
-    /*- computes the lcm(s[i],p) -*/
-    Lp.lcm = pInit();
-    pSetCoeff0(Lp.lcm, n_Lcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing->cf));
-  
-    // Lp.lcm == 0
-    if (nIsZero(pGetCoeff(Lp.lcm)))
-    {
-  #ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-        {
-          PrintS("--- Lp.lcm == 0\n");
-          PrintS("p:");
-          wrp(p);
-          Print("  strat->S[%d]:", i);
-          wrp(strat->S[i]);
-          PrintLn();
-        }
-  #endif
-        strat->cp++;
-        pLmDelete(Lp.lcm);
-        return;
-    }
-    // basic product criterion
-    pLcm(p,strat->S[i],Lp.lcm);
-  
-    pSetm(Lp.lcm);
-    assume(!strat->sugarCrit);
-    if (pHasNotCF(p,strat->S[i]) && n_IsUnit(pGetCoeff(p),currRing->cf)
-        && n_IsUnit(pGetCoeff(strat->S[i]),currRing->cf))
-    {
-  #ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-        {
-          PrintS("--- product criterion func enterOnePairRing type 1\n");
-          PrintS("p:");
-          wrp(p);
-          Print("  strat->S[%d]:", i);
-          wrp(strat->S[i]);
-          PrintLn();
-        }
-  #endif
-        strat->cp++;
-        pLmDelete(Lp.lcm);
-        return;
-    }
-    assume(!strat->fromT);
-    /*
-    *the set B collects the pairs of type (S[j],p)
-    *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p) != lcm(r,p)
-    *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-    *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
-    */
-    for(j = strat->Bl;j>=0;j--)
-    {
-      compare=pDivCompRing(strat->B[j].lcm,Lp.lcm);
-      compareCoeff = n_DivComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(Lp.lcm), currRing->cf);
-      if ((compareCoeff == pDivComp_EQUAL) || (compare == compareCoeff))
-      {
-        if (compare == 1)
-        {
-          strat->c3++;
-  #ifdef KDEBUG
-          if (TEST_OPT_DEBUG)
-          {
-            PrintS("--- chain criterion type 1\n");
-            PrintS("strat->B[j]:");
-            wrp(strat->B[j].lcm);
-            PrintS("  Lp.lcm:");
-            wrp(Lp.lcm);
-            PrintLn();
-          }
-  #endif
-          if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
-          {
-            pLmDelete(Lp.lcm);
-            return;
-          }
-          break;
-        }
-        else
-        if (compare == -1)
-        {
-  #ifdef KDEBUG
-          if (TEST_OPT_DEBUG)
-          {
-            PrintS("--- chain criterion type 2\n");
-            Print("strat->B[%d].lcm:",j);
-            wrp(strat->B[j].lcm);
-            PrintS("  Lp.lcm:");
-            wrp(Lp.lcm);
-            PrintLn();
-          }
-  #endif
-          deleteInL(strat->B,&strat->Bl,j,strat);
-          strat->c3++;
-        }
-      }
-      if ((compare == pDivComp_EQUAL) && (compareCoeff != 2))
-      {
-        if (compareCoeff == pDivComp_LESS)
-        {
-  #ifdef KDEBUG
-          if (TEST_OPT_DEBUG)
-          {
-            PrintS("--- chain criterion type 3\n");
-            Print("strat->B[%d].lcm:", j);
-            wrp(strat->B[j].lcm);
-            PrintS("  Lp.lcm:");
-            wrp(Lp.lcm);
-            PrintLn();
-          }
-  #endif
-          strat->c3++;
-          if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
-          {
-            pLmDelete(Lp.lcm);
-            return;
-          }
-          break;
-        }
-        else
-        // Add hint for same LM and LC (later) (TODO Oliver)
-        // if (compareCoeff == pDivComp_GREATER)
-        {
-  #ifdef KDEBUG
-          if (TEST_OPT_DEBUG)
-          {
-            PrintS("--- chain criterion type 4\n");
-            Print("strat->B[%d].lcm:", j);
-            wrp(strat->B[j].lcm);
-            PrintS("  Lp.lcm:");
-            wrp(Lp.lcm);
-            PrintLn();
-          }
-  #endif
-          deleteInL(strat->B,&strat->Bl,j,strat);
-          strat->c3++;
-        }
-      }
-    }
-    /*
-    *the pair (S[i],p) enters B if the spoly != 0
-    */
-    /*-  compute the short s-polynomial -*/
-    if ((strat->S[i]==NULL) || (p==NULL))
-    {
-  #ifdef KDEBUG
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("--- spoly = NULL\n");
-      }
-  #endif
-      pLmDelete(Lp.lcm);
-      return;
-    }
-    if ((strat->fromQ!=NULL) && (isFromQ!=0) && (strat->fromQ[i]!=0))
-    {
-      // Is from a previous computed GB, therefore we know that spoly will
-      // reduce to zero. Oliver.
-      WarnS("Could we come here? 8738947389");
-      Lp.p=NULL;
-    }
-    else
-    {
-      Lp.p = ksCreateShortSpoly(strat->S[i], p, strat->tailRing);
-    }
-    if (Lp.p == NULL)
-    {
-  #ifdef KDEBUG
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("--- spoly = NULL\n");
-      }
-  #endif
-      /*- the case that the s-poly is 0 -*/
-      if (strat->pairtest==NULL) initPairtest(strat);
-      strat->pairtest[i] = TRUE;/*- hint for spoly(S^[i],p)=0 -*/
-      strat->pairtest[strat->sl+1] = TRUE;
-      /*hint for spoly(S[i],p) == 0 for some i,0 <= i <= sl*/
-      /*
-      *suppose we have (s,r),(r,p),(s,p) and spoly(s,p) == 0 and (r,p) is
-      *still in B (i.e. lcm(r,p) == lcm(s,p) or the leading term of s does not
-      *devide lcm(r,p)). In the last case (s,r) can be canceled if the leading
-      *term of p devides the lcm(s,r)
-      *(this canceling should be done here because
-      *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
-      *the first case is handeled in chainCrit
-      */
-      pLmDelete(Lp.lcm);
-    }
-    else
-    {
-      /*- the pair (S[i],p) enters B -*/
-      Lp.p1 = strat->S[i];
-      Lp.p2 = p;
-  
-      pNext(Lp.p) = strat->tail;
-  
-      if (atR >= 0)
-      {
-        Lp.i_r2 = atR;
-        Lp.i_r1 = strat->S_2_R[i];
-      }
-      strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
-      l = strat->posInL(strat->B,strat->Bl,&Lp,strat);
-      enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
-    }
-  #else
   assume(atR >= 0);
   assume(i<=strat->sl);
   assume(p!=NULL);
@@ -1414,7 +1198,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       pLmDelete(h.lcm);
       return;
   }
-  #if 1
   // basic chain criterion
   pLcm(p,strat->S[i],h.lcm);
   pSetm(h.lcm);
@@ -1425,90 +1208,30 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
   */
   
-  //#if ADIDEBUG
-  #if 0
-  idPrint(strat->Shdl);
-  for(int ii=0; ii<=strat->Ll; ii++)
-  {printf("\nL[%i]\n",ii);pWrite(strat->L[ii].p);pWrite(strat->L[ii].p1);pWrite(strat->L[ii].p2);pWrite(strat->L[ii].lcm);}
-  for(int ii=0; ii<=strat->Bl; ii++)
-  {printf("\nB[%i]\n",ii);pWrite(strat->B[ii].p);pWrite(strat->B[ii].p1);pWrite(strat->B[ii].p2);pWrite(strat->B[ii].lcm);}
-  #endif
-  
   for(j = strat->Bl;j>=0;j--)
   {
     compare=pDivCompRing(strat->B[j].lcm,h.lcm);
     compareCoeff = n_DivComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(h.lcm), currRing->cf);
-    if ((compareCoeff == pDivComp_EQUAL) || (compare == compareCoeff))
+    #if ADIDEBUG
+    printf("\nChainCrit in enteronepairring\n");
+    printf("\nB[j]\n");
+    pWrite(strat->B[j].p);
+    pWrite(strat->B[j].p1);
+    pWrite(strat->B[j].p2);
+    pWrite(strat->B[j].lcm);
+    printf("\nh - neue Paar\n");
+    pWrite(h.p);
+    pWrite(p);
+    pWrite(strat->S[i]);
+    pWrite(h.lcm);
+    printf("\ncompare = %i\ncompareCoeff = %i\n",compare,compareCoeff);
+    #endif
+    if(compare == pDivComp_EQUAL)
     {
-      if (compare == 1)
+      //They have the same LM
+      if(compareCoeff == pDivComp_LESS)
       {
-#if ADIDEBUG
-              printf("\nChainCrit1 in enteronepairring\n");
-              printf("\nB[j]\n");
-              pWrite(strat->B[j].p);
-              pWrite(strat->B[j].p1);
-              pWrite(strat->B[j].p2);
-              pWrite(strat->B[j].lcm);
-              printf("\nh - neue Paar\n");
-              pWrite(h.p);
-              pWrite(p);
-              pWrite(strat->S[i]);
-              pWrite(h.lcm);
-              #endif
-        if ((n_DivBy(h.lcm->coef, strat->B[j].lcm->coef,  currRing->cf)) && ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0)))
-        {
-          #if ADIDEBUG
-          printf("\nGelöscht neue h\n");
-          #endif
-          strat->c3++;
-          pLmDelete(h.lcm);
-          return;
-        }
-        break;
-      }
-      else if (compare == -1)
-      {
-#if ADIDEBUG
-              printf("\nChainCrit2 in enteronepairring\n");
-              printf("\nB[j]\n");
-              pWrite(strat->B[j].p);
-              pWrite(strat->B[j].p1);
-              pWrite(strat->B[j].p2);
-              pWrite(strat->B[j].lcm);
-              printf("\nh - neue Paar\n");
-              pWrite(h.p);
-              pWrite(p);
-              pWrite(strat->S[i]);
-              pWrite(h.lcm);
-              #endif
-          //Ist schon im coeffCompare
-          //if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef, currRing->cf))
-          //{
-          #if ADIDEBUG
-                        printf("\nGelöscht: B[j]\n");
-          #endif
-            deleteInL(strat->B,&strat->Bl,j,strat);
-            strat->c3++;
-          //}
-      }
-    }
-    if ((compare == pDivComp_EQUAL) && (compareCoeff != 2))
-    {
-      if (compareCoeff == pDivComp_LESS)
-      {
-#if ADIDEBUG
-              printf("\nChainCrit3 in enteronepairring\n");
-              printf("\nB[j]\n");
-              pWrite(strat->B[j].p);
-              pWrite(strat->B[j].p1);
-              pWrite(strat->B[j].p2);
-              pWrite(strat->B[j].lcm);
-              printf("\nh - neue Paar\n");
-              pWrite(h.p);
-              pWrite(p);
-              pWrite(strat->S[i]);
-              #endif
-        if ((n_DivBy(strat->B[j].lcm->coef, h.lcm->coef, currRing->cf)) && (strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
+        if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
         {
           #if ADIDEBUG
           printf("\nGelöscht h\n");
@@ -1519,35 +1242,53 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
         }
         break;
       }
-      else
-      // Add hint for same LM and LC (later) (TODO Oliver)
-      if (compareCoeff == pDivComp_GREATER)
+      if(compareCoeff == pDivComp_GREATER)
       {
-        #if ADIDEBUG
-              printf("\nChainCrit4 in enteronepairring\n");
-              printf("\nB[j]\n");
-              pWrite(strat->B[j].p);
-              pWrite(strat->B[j].p1);
-              pWrite(strat->B[j].p2);
-              pWrite(strat->B[j].lcm);
-              printf("\nh - neue Paar\n");
-              pWrite(h.p);
-              pWrite(p);
-              pWrite(strat->S[i]);
-              pWrite(h.lcm);
-              #endif
-        //if(n_DivBy( h.lcm->coef, strat->B[j].lcm->coef,currRing->cf))
-        {
           #if ADIDEBUG
-          printf("\nGelöscht B[j]\n");
+          printf("\nGelöscht: B[j]\n");
           #endif
           deleteInL(strat->B,&strat->Bl,j,strat);
           strat->c3++;
+      }
+      if(compareCoeff == pDivComp_EQUAL)
+      {
+        if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
+        {
+          #if ADIDEBUG
+          printf("\nGelöscht h\n");
+          #endif
+          strat->c3++;
+          pLmDelete(h.lcm);
+          return;
         }
+        break;
+      }
+    }
+    if(compareCoeff == compare || compareCoeff == pDivComp_EQUAL)
+    {
+      if(compare == pDivComp_LESS)
+      {
+        if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
+        {
+          #if ADIDEBUG
+          printf("\nGelöscht h\n");
+          #endif
+          strat->c3++;
+          pLmDelete(h.lcm);
+          return;
+        }
+        break;
+      }
+      if(compare == pDivComp_GREATER)
+      {
+          #if ADIDEBUG
+          printf("\nGelöscht: B[j]\n");
+          #endif
+          deleteInL(strat->B,&strat->Bl,j,strat);
+          strat->c3++;
       }
     }
   }
-  #endif
   number s, t;
   poly m1, m2, gcd = NULL;
   #if ADIDEBUG
@@ -1648,7 +1389,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   #endif
   enterL(&strat->B,&strat->Bl,&strat->Bmax,h,posx);
   kTest_TS(strat);
-  #endif
 }
 
 
@@ -5394,103 +5134,6 @@ int posInL11 (const LSet set, const int length,
 int posInL11Ring (const LSet set, const int length,
               LObject* p,const kStrategy strat)
 {
-  #if 0
-  if (length < 0) return 0;
-  if(pIsConstant(p->p)) return length+1;
-  int i,an,en;
-  #if 1
-  if(pIsConstant(set[length].p) && length > 0)
-  {   
-    if (set[length-1].FDeg > p->FDeg)
-      return length;
-  }
-  else
-  {
-    if (set[length].FDeg > p->FDeg)
-      return length+1;
-  }
-  if (set[0].FDeg < p->FDeg)
-  return 0;
-
-  bool isFromF = (p->p1 == NULL) && (p->p2 == NULL);
-
-  if(isFromF)
-  {
-    i = 0;
-    while(i<= length && set[i].FDeg > p->FDeg && !pIsConstant(set[i].p))
-      i++;
-    while(i<= length && ((set[i].p1 != NULL) || (set[i].p2 != NULL)) && 
-         (set[i].FDeg == p->FDeg) && !pIsConstant(set[i].p))
-      i++;
-    an = i;
-    if(pIsConstant(set[length].p))
-      i = length-1;
-    else
-      i = length;
-    while(i>=0 && set[i].FDeg < p->FDeg)
-      i--;
-    en = i+1;
-  }
-  else
-  {
-    i = 0;
-    while(i<= length && set[i].FDeg > p->FDeg && !pIsConstant(set[i].p))
-      i++;
-    an = i;
-    if(pIsConstant(set[length].p))
-      i = length-1;
-    else
-      i = length;
-    while(i>= 0 && set[i].FDeg < p->FDeg)
-      i--;
-    while(i>=0 && ((set[i].p1 == NULL) && (set[i].p2 == NULL)) && 
-         (set[i].FDeg == p->FDeg) && (i > an))
-      i--;
-    en = i+1;
-  }
-  #else
-  an = 0;
-  en = length;
-  while(en>=an && (set[en].p == NULL || pIsConstant(set[en].p)))
-    en--;
-  if(en == 0)
-    return 0;
-  en++;
-  #endif
-  loop
-  {
-    if(an > length)
-      return length+1;
-    if (an >= en-1)
-    {
-      if(an == en)
-        return en;
-      if (pLmCmp(set[an].p, p->p) == 1)
-        return en;
-      if (pLmCmp(set[an].p, p->p) == -1)
-        return an;
-      if (pLmCmp(set[i].p, p->p) == 0)
-      {
-        if(nGreater(set[an].p->coef, p->p->coef))
-          return en;
-        else
-          return an;
-      }
-    }
-    i=(an+en) / 2;
-    if (pLmCmp(set[i].p, p->p) == 1)
-      an=i;
-    if (pLmCmp(set[i].p, p->p) == -1)
-      en=i;
-    if (pLmCmp(set[i].p, p->p) == 0)
-    {
-      if(nGreater(set[i].p->coef, p->p->coef))
-        an = i;
-      else
-        en = i;
-    }
-  }
-  #else
   if (length < 0) return 0;
   int an,en,i;
   an = 0;
@@ -5513,10 +5156,25 @@ int posInL11Ring (const LSet set, const int length,
         return an;
       if (pLmCmp(set[an].p, p->p) == 0)
       {
-        if(nGreater(set[an].p->coef, p->p->coef))
+        number lcset,lcp;
+        lcset = nCopy(set[an].p->coef);
+        lcp = nCopy(p->p->coef);
+        if(!nGreaterZero(lcset))
+          lcset = nInpNeg(lcset);
+        if(!nGreaterZero(lcp))
+          lcp = nInpNeg(lcp);
+        if(nGreater(lcset, lcp))
+        {
+          nDelete(&lcset);
+          nDelete(&lcp);
           return en;
+        }
         else
+        {
+          nDelete(&lcset);
+          nDelete(&lcp);
           return an;
+        }
       }
     }
     i=(an+en) / 2;
@@ -5526,13 +5184,27 @@ int posInL11Ring (const LSet set, const int length,
       en=i;
     if (pLmCmp(set[i].p, p->p) == 0)
     {
-      if(nGreater(set[i].p->coef, p->p->coef))
+      number lcset,lcp;
+      lcset = nCopy(set[i].p->coef);
+      lcp = nCopy(p->p->coef);
+      if(!nGreaterZero(lcset))
+        lcset = nInpNeg(lcset);
+      if(!nGreaterZero(lcp))
+        lcp = nInpNeg(lcp);
+      if(nGreater(lcset, lcp))
+      {
+        nDelete(&lcset);
+        nDelete(&lcp);
         an = i;
+      }
       else
+      {
+        nDelete(&lcset);
+        nDelete(&lcp);
         en = i;
+      }
     }
   }
-  #endif
 }
 
 int posInL11Ringls (const LSet set, const int length,
@@ -5560,10 +5232,25 @@ int posInL11Ringls (const LSet set, const int length,
         return an;
       if (set[an].FDeg == p->FDeg)
       {
-        if(nGreater(set[an].p->coef, p->p->coef))
+        number lcset,lcp;
+        lcset = nCopy(set[an].p->coef);
+        lcp = nCopy(p->p->coef);
+        if(!nGreaterZero(lcset))
+          lcset = nInpNeg(lcset);
+        if(!nGreaterZero(lcp))
+          lcp = nInpNeg(lcp);
+        if(nGreater(lcset, lcp))
+        {
+          nDelete(&lcset);
+          nDelete(&lcp);
           return en;
+        }
         else
+        {
+          nDelete(&lcset);
+          nDelete(&lcp);
           return an;
+        }
       }
     }
     i=(an+en) / 2;
@@ -5573,10 +5260,25 @@ int posInL11Ringls (const LSet set, const int length,
       en=i;
     if (set[i].FDeg == p->FDeg)
     {
-      if(nGreater(set[i].p->coef, p->p->coef))
+      number lcset,lcp;
+      lcset = nCopy(set[an].p->coef);
+      lcp = nCopy(p->p->coef);
+      if(!nGreaterZero(lcset))
+        lcset = nInpNeg(lcset);
+      if(!nGreaterZero(lcp))
+        lcp = nInpNeg(lcp);
+      if(nGreater(lcset, lcp))
+      {
+        nDelete(&lcset);
+        nDelete(&lcp);
         an = i;
+      }
       else
+      {
+        nDelete(&lcset);
+        nDelete(&lcp);
         en = i;
+      }
     }
   }
 }
