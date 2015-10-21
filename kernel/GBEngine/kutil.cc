@@ -1207,7 +1207,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
   *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
   */
-  
+
   for(j = strat->Bl;j>=0;j--)
   {
     compare=pDivCompRing(strat->B[j].lcm,h.lcm);
@@ -1350,7 +1350,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   h.p = gcd;
   h.i_r = -1;
   if(h.p == NULL)
-  {  
+  {
     if (strat->pairtest==NULL) initPairtest(strat);
     strat->pairtest[i] = TRUE;
     strat->pairtest[strat->sl+1] = TRUE;
@@ -1464,7 +1464,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
     PrintS(" ---> ");
   }
 #endif
-  
+
   pNext(gcd) = p_Add_q(pp_Mult_mm(pNext(p), m1, strat->tailRing), pp_Mult_mm(pNext(si), m2, strat->tailRing), strat->tailRing);
   p_LmDelete(m1, strat->tailRing);
   p_LmDelete(m2, strat->tailRing);
@@ -4958,7 +4958,7 @@ int posInLRing (const LSet set, const int length,
   if (set[length].FDeg > p->FDeg)
         return length+1;
   if (set[length].FDeg == p->FDeg)
-    if(set[length].GetpLength() > p->GetpLength()) 
+    if(set[length].GetpLength() > p->GetpLength())
           return length+1;
   int i;
   int an = 0;
@@ -4969,11 +4969,11 @@ int posInLRing (const LSet set, const int length,
     {
       if(an == en)
         return en;
-      if (set[an].FDeg > p->FDeg) 
+      if (set[an].FDeg > p->FDeg)
         return en;
       if(set[an].FDeg == p->FDeg)
       {
-        if(set[an].GetpLength() > p->GetpLength()) 
+        if(set[an].GetpLength() > p->GetpLength())
           {return en;}
         else
           {
@@ -5007,10 +5007,10 @@ int posInLRing (const LSet set, const int length,
             if(set[i].GetpLength() > p->GetpLength())
                 an=i;
             else
-            {    
+            {
                 if(set[i].GetpLength() == p->GetpLength())
                 {
-                    if(nGreater(set[i].p->coef, p->p->coef))  
+                    if(nGreater(set[i].p->coef, p->p->coef))
                     {
                         an = i;
                     }
@@ -5027,7 +5027,7 @@ int posInLRing (const LSet set, const int length,
         }
         else
             en=i;
-    }                                      
+    }
   }
 }
 
@@ -5127,7 +5127,7 @@ int posInL11 (const LSet set, const int length,
 * looks up the position of polynomial p in set
 * set[length] is the smallest element in set with respect
 * to the ordering-procedure pLmCmp,totaldegree,coefficient
-* For the same totaldegree, original pairs (from F) will 
+* For the same totaldegree, original pairs (from F) will
 * be put at the end and smalles coefficents
 */
 int posInL11Ring (const LSet set, const int length,
@@ -5156,22 +5156,28 @@ int posInL11Ring (const LSet set, const int length,
       if (pLmCmp(set[an].p, p->p) == 0)
       {
         number lcset,lcp;
-        lcset = nCopy(set[an].p->coef);
-        lcp = nCopy(p->p->coef);
+        lcset = pGetCoeff(set[an].p);
+        lcp = pGetCoeff(p->p);
         if(!nGreaterZero(lcset))
-          lcset = nInpNeg(lcset);
+        {
+          set[an].p=p_Neg(set[an].p,currRing);
+          if (set[an].t_p!=NULL)
+            pSetCoeff0(set[an].t_p,pGetCoeff(set[an].p));
+          lcset=pGetCoeff(set[an].p);
+        }
         if(!nGreaterZero(lcp))
-          lcp = nInpNeg(lcp);
+        {
+          p->p=p_Neg(p->p,currRing);
+          if (p->t_p!=NULL)
+            pSetCoeff0(p->t_p,pGetCoeff(p->p));
+          lcp=pGetCoeff(p->p);
+        }
         if(nGreater(lcset, lcp))
         {
-          nDelete(&lcset);
-          nDelete(&lcp);
           return en;
         }
         else
         {
-          nDelete(&lcset);
-          nDelete(&lcp);
           return an;
         }
       }
@@ -5184,22 +5190,28 @@ int posInL11Ring (const LSet set, const int length,
     if (pLmCmp(set[i].p, p->p) == 0)
     {
       number lcset,lcp;
-      lcset = nCopy(set[i].p->coef);
-      lcp = nCopy(p->p->coef);
+      lcset = pGetCoeff(set[i].p);
+      lcp = pGetCoeff(p->p);
       if(!nGreaterZero(lcset))
-        lcset = nInpNeg(lcset);
+      {
+        set[i].p=p_Neg(set[i].p,currRing);
+        if (set[i].t_p!=NULL)
+          pSetCoeff0(set[i].t_p,pGetCoeff(set[i].p));
+        lcset=pGetCoeff(set[i].p);
+      }
       if(!nGreaterZero(lcp))
-        lcp = nInpNeg(lcp);
+      {
+        p->p=p_Neg(p->p,currRing);
+        if (p->t_p!=NULL)
+          pSetCoeff0(p->t_p,pGetCoeff(p->p));
+        lcp=pGetCoeff(p->p);
+      }
       if(nGreater(lcset, lcp))
       {
-        nDelete(&lcset);
-        nDelete(&lcp);
         an = i;
       }
       else
       {
-        nDelete(&lcset);
-        nDelete(&lcp);
         en = i;
       }
     }
@@ -5232,22 +5244,28 @@ int posInL11Ringls (const LSet set, const int length,
       if (set[an].FDeg == p->FDeg)
       {
         number lcset,lcp;
-        lcset = nCopy(set[an].p->coef);
-        lcp = nCopy(p->p->coef);
+        lcset = pGetCoeff(set[an].p);
+        lcp = pGetCoeff(p->p);
         if(!nGreaterZero(lcset))
-          lcset = nInpNeg(lcset);
+        {
+          set[an].p=p_Neg(set[an].p,currRing);
+          if (set[an].t_p!=NULL)
+            pSetCoeff0(set[an].t_p,pGetCoeff(set[an].p));
+          lcset=pGetCoeff(set[an].p);
+        }
         if(!nGreaterZero(lcp))
-          lcp = nInpNeg(lcp);
+        {
+          p->p=p_Neg(p->p,currRing);
+          if (p->t_p!=NULL)
+            pSetCoeff0(p->t_p,pGetCoeff(p->p));
+          lcp=pGetCoeff(p->p);
+        }
         if(nGreater(lcset, lcp))
         {
-          nDelete(&lcset);
-          nDelete(&lcp);
           return en;
         }
         else
         {
-          nDelete(&lcset);
-          nDelete(&lcp);
           return an;
         }
       }
@@ -5260,22 +5278,28 @@ int posInL11Ringls (const LSet set, const int length,
     if (set[i].FDeg == p->FDeg)
     {
       number lcset,lcp;
-      lcset = nCopy(set[an].p->coef);
-      lcp = nCopy(p->p->coef);
+      lcset = pGetCoeff(set[i].p);
+      lcp = pGetCoeff(p->p);
       if(!nGreaterZero(lcset))
-        lcset = nInpNeg(lcset);
+      {
+        set[i].p=p_Neg(set[i].p,currRing);
+        if (set[i].t_p!=NULL)
+          pSetCoeff0(set[i].t_p,pGetCoeff(set[i].p));
+        lcset=pGetCoeff(set[i].p);
+      }
       if(!nGreaterZero(lcp))
-        lcp = nInpNeg(lcp);
+      {
+        p->p=p_Neg(p->p,currRing);
+        if (p->t_p!=NULL)
+          pSetCoeff0(p->t_p,pGetCoeff(p->p));
+        lcp=pGetCoeff(p->p);
+      }
       if(nGreater(lcset, lcp))
       {
-        nDelete(&lcset);
-        nDelete(&lcp);
         an = i;
       }
       else
       {
-        nDelete(&lcset);
-        nDelete(&lcp);
         en = i;
       }
     }
@@ -8743,11 +8767,11 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
                 //If they are equal then take the one with the smallest length
                 if(pLmDivisibleBy(r->m[q],r->m[l])
                 #ifdef HAVE_RINGS
-                && ((rField_is_Ring(currRing) 
+                && ((rField_is_Ring(currRing)
                 && n_DivBy(r->m[q]->coef, r->m[l]->coef, currRing))
                 || !(rField_is_Ring(currRing)))
                 #endif
-                && (pLength(r->m[q]) < pLength(r->m[l]) || 
+                && (pLength(r->m[q]) < pLength(r->m[l]) ||
                 (pLength(r->m[q]) == pLength(r->m[l]) && nGreaterZero(r->m[q]->coef))))
                 {
                   pDelete(&r->m[l]);
@@ -9012,11 +9036,11 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
 }
 /*!
   used for GB over ZZ: look for constant and monomial elements in the ideal
-  background: any known constant element of ideal suppresses 
+  background: any known constant element of ideal suppresses
               intermediate coefficient swell
 */
 poly preIntegerCheck(ideal FOrig, ideal Q)
-{  
+{
   assume(nCoeff_is_Ring_Z(currRing->cf));
   if(!nCoeff_is_Ring_Z(currRing->cf))
     return NULL;
@@ -9049,7 +9073,7 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
       }
       idSkipZeroes(monred);
       posconst = idPosConstant(monred);
-      //the constant, if found, will be from Q 
+      //the constant, if found, will be from Q
       if((posconst != -1) && (!nIsZero(monred->m[posconst]->coef)))
       {
           pmon = pCopy(monred->m[posconst]);
@@ -9079,7 +9103,7 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
           if(II->m[i] != NULL)
               II->m[i+1] = II->m[i];
       II->m[0] = pOne();
-      ideal syz = idSyzygies(II, isNotHomog, NULL);     
+      ideal syz = idSyzygies(II, isNotHomog, NULL);
       poly integer = NULL;
       for(int i = IDELEMS(syz)-1;i>=0; i--)
       {
@@ -9108,7 +9132,7 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
   else
   {
     if(idIs0(monred))
-    {  
+    {
       poly mindegmon = NULL;
       for(int i = 0; i<IDELEMS(one); i++)
       {
@@ -9126,7 +9150,7 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
       if(mindegmon != NULL)
       {
           for(int i = IDELEMS(II)-1; i>=0; i--)
-              if(II->m[i] != NULL) 
+              if(II->m[i] != NULL)
                   II->m[i+1] = II->m[i];
           II->m[0] = mindegmon;
           ideal syz = idSyzygies(II, isNotHomog, NULL);
@@ -9185,7 +9209,7 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
 }
 /*!
   used for GB over ZZ: intermediate reduction by monomial elements
-  background: any known constant element of ideal suppresses 
+  background: any known constant element of ideal suppresses
               intermediate coefficient swell
 */
 void postReduceByMon(LObject* h, kStrategy strat)
@@ -9218,7 +9242,7 @@ void postReduceByMon(LObject* h, kStrategy strat)
         else
         {
           ok = TRUE;
-        }  
+        }
       }
       pp = pNext(p);
       while(pp != NULL)
@@ -9254,7 +9278,7 @@ void postReduceByMon(LObject* h, kStrategy strat)
 
 /*!
   used for GB over ZZ: final reduction by constant elements
-  background: any known constant element of ideal suppresses 
+  background: any known constant element of ideal suppresses
               intermediate coefficient swell and beautifies output
 */
 void finalReduceByMon(kStrategy strat)
@@ -9276,7 +9300,7 @@ void finalReduceByMon(kStrategy strat)
             number dummy = n_IntMod(p->coef, strat->S[j]->coef, currRing->cf);
             p_SetCoeff(p,dummy,currRing);
           }
-          pp = pNext(p); 
+          pp = pNext(p);
           if((pp == NULL) && (nIsZero(p->coef)))
           {
             deleteInS(i, strat);

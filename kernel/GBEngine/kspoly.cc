@@ -160,7 +160,7 @@ int ksReducePoly(LObject* PR,
   if (TEST_OPT_DEBUG)
   {
     Print(" to: "); PR->wrp(); Print("\n");
-    //printf("\nt^%i ", PR->ecart);pWrite(pHead(PR->p)); 
+    //printf("\nt^%i ", PR->ecart);pWrite(pHead(PR->p));
   }
 #endif
   return ret;

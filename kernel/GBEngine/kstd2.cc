@@ -147,7 +147,7 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 #else
             return j;
 #endif
-            
+
         }
 #endif
       j++;
@@ -426,26 +426,26 @@ int redRing (LObject* h,kStrategy strat)
   loop
   {
     j = kFindDivisibleByInT(strat, h);
-    if (j < 0) 
+    if (j < 0)
     {
-        // over ZZ: cleanup coefficients by complete reduction with monomials
-        postReduceByMon(h, strat);
-        if(nIsZero(pGetCoeff(h->p))) return 2;
-        j = kFindDivisibleByInT(strat, h);
-        if(j < 0)
+      // over ZZ: cleanup coefficients by complete reduction with monomials
+      postReduceByMon(h, strat);
+      if(nIsZero(pGetCoeff(h->p))) return 2;
+      j = kFindDivisibleByInT(strat, h);
+      if(j < 0)
+      {
+        if(strat->tl >= 0)
+            h->i_r1 = strat->tl;
+        else
+            h->i_r1 = -1;
+        if (h->GetLmTailRing() == NULL)
         {
-          if(strat->tl >= 0)
-              h->i_r1 = strat->tl;
-          else
-              h->i_r1 = -1;
-          if (h->GetLmTailRing() == NULL)
-          {
-            if (h->lcm!=NULL) pLmDelete(h->lcm);
-            h->Clear();
-            return 0;
-          }
-          return 1;
+          if (h->lcm!=NULL) pLmDelete(h->lcm);
+          h->Clear();
+          return 0;
         }
+        return 1;
+      }
     }
     #if ADIDEBUG
     pWrite(h->p);
@@ -1238,18 +1238,18 @@ int redHoney (LObject* h, kStrategy strat)
       if (h->p!=NULL)
       {
         if(p_GetComp(h->p,currRing)>strat->syzComp)
-	{
-	  h->Delete();
-	  return 0;
-	}
+        {
+          h->Delete();
+          return 0;
+        }
       }
       else if (h->t_p!=NULL)
       {
         if(p_GetComp(h->t_p,strat->tailRing)>strat->syzComp)
-	{
-	  h->Delete();
-	  return 0;
-	}
+        {
+          h->Delete();
+          return 0;
+        }
       }
     }
     h->SetShortExpVector();

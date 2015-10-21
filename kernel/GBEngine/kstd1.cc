@@ -361,24 +361,19 @@ int redRiloc (LObject* h,kStrategy strat)
 
 #if ADIDEBUG_NF
   int iii;
-  PrintLn();
-  PrintS("---------------------------- NEW REDRILOC COMPUTATION ----------------------------");
-  PrintLn();
-  PrintS("    The pair h : "); PrintLn(); PrintLn();
-  PrintS("      p1 = "); p_Write(h->p1,strat->tailRing); PrintLn();
-  PrintS("      p2 = "); p_Write(h->p2,strat->tailRing); PrintLn();
-  PrintS("      p  = "); p_Write(h->p,strat->tailRing); PrintLn();
-  PrintLn();
-  PrintS("    The actual reducer T is: ");
+  PrintS("\n---------------------------- NEW REDRILOC COMPUTATION ----------------------------\n");
+  PrintS("    The pair h :\n");
+  PrintS("\n      p1 = "); p_Write(h->p1,strat->tailRing);
+  PrintS("\n      p2 = "); p_Write(h->p2,strat->tailRing);
+  PrintS("\n      p  = "); p_Write(h->p,strat->tailRing);
+  PrintS("\n    The actual reducer T is: ");
   if(strat->tl<0)
     {PrintS(" Empty.\n");}
   else
   {
     for (iii=0;iii<=strat->tl;iii++)
     {
-      PrintLn();
-      Print("      T[%i] = ",iii);p_Write(strat->T[iii].p,strat->tailRing);
-      PrintLn();
+      Print("\n      T[%i] = ",iii);p_Write(strat->T[iii].p,strat->tailRing);
     }
   }
 #endif /* ADIDEBUG_NF */
@@ -408,18 +403,15 @@ int redRiloc (LObject* h,kStrategy strat)
 #endif
     if (j < 0)
     {
-      #if ADIDEBUG_NF
-      printf("\nNone was found. Exit\n");
-      #endif
-      if (strat->honey) h->SetLength(strat->length_pLength);
       // over ZZ: cleanup coefficients by complete reduction with monomials
       postReduceByMon(h, strat);
-      if(h->p == NULL) 
+      if(h->p == NULL)
       {
         if (h->lcm!=NULL) pLmDelete(h->lcm);
         h->Clear();
         return 0;
       }
+      if (strat->honey) h->SetLength(strat->length_pLength);
       if(strat->tl >= 0)
           h->i_r1 = strat->tl;
       else
@@ -454,8 +446,8 @@ int redRiloc (LObject* h,kStrategy strat)
         if ((strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
                                         strat->T[i].length < li))
             &&
-            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], h->GetLmTailRing(), ~h->sev, strat->tailRing) 
-            && 
+            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], h->GetLmTailRing(), ~h->sev, strat->tailRing)
+            &&
             n_DivBy(h->p->coef,strat->T[i].p->coef,strat->tailRing))
 #else
           j = kFindDivisibleByInT(strat, h, i);
@@ -524,9 +516,9 @@ int redRiloc (LObject* h,kStrategy strat)
           h->Clear();
           strat->fromT = FALSE;
           return -1;
-          
+
         #else
-        
+
           LObject* h2;
           pWrite(h->p);
           h2->tailRing = h->tailRing;
@@ -540,7 +532,7 @@ int redRiloc (LObject* h,kStrategy strat)
           #endif
           if(h->IsNull())
           {
-            if (h->lcm!=NULL) 
+            if (h->lcm!=NULL)
             {
               pLmDelete(h->lcm);
             }
@@ -848,7 +840,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         if (((strat->T[j].ecart < ei)
           || ((strat->T[j].ecart == ei)
         && (strat->T[j].length < li)))
-        && pLmShortDivisibleBy(strat->T[j].p,strat->sevT[j], H.p, not_sev) 
+        && pLmShortDivisibleBy(strat->T[j].p,strat->sevT[j], H.p, not_sev)
         #ifdef HAVE_RINGS
         && (!rField_is_Ring(strat->tailRing) ||
             n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing))
@@ -1665,7 +1657,7 @@ loop_count = 1;
 #ifdef HAVE_TAIL_RING
   if (strat->homog && strat->red == redFirst)
     if(!idIs0(F) &&(!rField_is_Ring(currRing)))
-      kStratInitChangeTailRing(strat); 
+      kStratInitChangeTailRing(strat);
 #endif
 
   if (BVERBOSE(23))
@@ -2363,7 +2355,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
             ideal FCopy = idCopy(F);
             poly pFmon = preIntegerCheck(FCopy, Q);
             if(pFmon != NULL)
-            {    
+            {
               idInsertPoly(FCopy, pFmon);
               #if ADIDEBUG
               printf("\nPreintegerCheck found this constant:\n");pWrite(pFmon);

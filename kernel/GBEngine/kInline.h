@@ -455,18 +455,18 @@ KINLINE void  sTObject::pCleardenom()
   else
     {
       if (t_p != NULL)
-	{
-	  p_ProjectiveUnique(t_p, tailRing);
-	  pSetCoeff0(p, pGetCoeff(t_p));
-	}
+      {
+        p_ProjectiveUnique(t_p, tailRing);
+        pSetCoeff0(p, pGetCoeff(t_p));
+      }
       else
-	{
+      {
 #ifdef HAVE_RATGRING
-          p_ProjectiveUnique(p, currRing);
+        p_ProjectiveUnique(p, currRing);
 #else
-          p_ProjectiveUnique(p, currRing);
+        p_ProjectiveUnique(p, currRing);
 #endif
-	}
+      }
     }
 }
 
