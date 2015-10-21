@@ -1,8 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB("primdec.lib");
-
+LIB "primdec.lib";
 
 //Singular Trac #636
 
@@ -15,9 +14,9 @@ df+2cg+aj,
 de+2bg+ai,
 ce+2bf+ah;
 std(inI);
+kill r;
 
 //Github Adi #39
- 
 
 ring rng = (integer),(x,y,z),(ls(3),C);
 ideal J = -2xz3+x2yz,3z-2xy-3xy2;
@@ -26,8 +25,7 @@ ideal gJ = std(J);
 ideal ggJ = std(gJ);
 gJ;ggJ;
 reduce(J,gJ);
-
-
+kill rng;
 
 //Github Adi #32
 
@@ -38,6 +36,8 @@ ideal gI =  std(I);
 ideal gJ =  std(J);
 reduce (I,gI );
 reduce (J,gJ );
+kill rng;
+
 
 option(redSB);
 
@@ -47,10 +47,9 @@ ideal I = -27*x+25*z,-46*x*z+35*x,21*x-42;
 ideal gI =  std(I);
 ideal ggI =  std(gI);
 reduce (I,gI );
-
+kill rng;
 
 //Github Adi #33
-
 
 ring rng = (integer),(x,y,z),dp;
 option(redSB);
@@ -61,6 +60,7 @@ ideal ggI =  std(gI);
 gI;
 ggI;
 reduce(I,gI);
+kill rng;
 
 
 ring rng = (integer),(x,y,z),(dp(3),C);
@@ -72,10 +72,9 @@ ideal ggI =  std(gI);
 gI;
 ggI;
 reduce(I,gI);
-
+kill rng;
 
 option(redSB);
-
 
 ring rng = (integer),(x,y,z),(dp(3),C);
 ideal I = -49*y^2+40*z^2+17,-34*z^2-3,-25*y*z-28*z;
@@ -84,6 +83,7 @@ ideal ggI =  std(gI);
 gI;
 ggI;
 reduce(I,gI);
+kill rng;
 
 //Github Adi #36
 
@@ -98,7 +98,7 @@ ideal ggJ = std(gJ);
 gI;ggI;gJ;ggJ;
 reduce (I,gI );
 reduce (J,gJ );
-
+kill rng;
 
 //Github Adi #37
 
@@ -108,8 +108,7 @@ ideal gI =  std(i);
 ideal ggI =  std(gI);
 gI;ggI;
 reduce(i,gI);
-
-
+kill rng;
 
 //Github Adi #39
 //Problem mit ls aber kein problem mit ds,Ds,lp,dp
@@ -129,8 +128,7 @@ reduce (I,gI );
 reduce (J,gJ );
 idealsEqual(gI,ggI );
 idealsEqual(gJ,ggJ );
-
-
+kill rng;
 
 //Github Adi #39
 //redtail hat Problemen wenn man im posinL11Ring pLmCmp nimmt statt FDeg
@@ -145,6 +143,7 @@ ideal ggI =  std(gI);
 reduce(I,gI);
 idealsEqual(gI,ggI );
 gI;
+kill rng;
 
 
 //Github Adi #40
@@ -158,6 +157,7 @@ reduce(I,gI);
 ideal gJ =  std(J);
 gJ;
 reduce(J,gJ);
+kill rng;
        
 ring rng = (integer),(x,y,z),(ls(3),C);
 ideal I = 7*x*z+3*x*z^2-x^2,4*z+6*z^2+2*y;
@@ -168,8 +168,7 @@ reduce(I,gI);
 ideal gJ =  std(J);
 gJ;
 reduce(J,gJ);     
-
-
+kill rng;
 
 //Github Adi #27
 
@@ -178,7 +177,7 @@ ideal I  = 12*y(3)*y(4)+19*y(1)+6*y(4),2*x(3)*y(4)-2*y(1)+7,2*y(1)*y(3)+y(1)-7*y
 ideal J  = std(I);
 J;
 reduce(I,J);
-
+kill rng;
 
 //Github Adi #20
 
@@ -189,7 +188,7 @@ ideal IJ = intersect(I,J);
 ideal stdIstdJ = intersect(std(I),std(J) );
 reduce(IJ,stdIstdJ);
 reduce(stdIstdJ,IJ);
-
+kill rng;
 
 //Github Adi #42
 
@@ -205,10 +204,7 @@ ideal ggJ =  std(gJ);
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
 size(gJ)== size(ggJ );
-   
-
-
-
+kill rng;
 
 //Github Adi #38
 
@@ -225,6 +221,7 @@ ideal aJJ = quotient(a*j,j); // ?
 aJJ;
 std(aJJ);
 aJJ;
+kill rng;
 
 //segfaults
 //ok mit neue posinL11Ring
@@ -240,8 +237,7 @@ gI;
 gJ;
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
-
-
+kill rng;
 
 //ok now
 
@@ -255,6 +251,7 @@ gI;
 gJ;
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
+kill rng;
 
 //ok now
 
@@ -268,6 +265,8 @@ gI;
 gJ;
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
+kill rng;
+
 
 //in the new posinL11Ring works smooth, in the other one takes forever
 
@@ -281,6 +280,7 @@ gI;
 gJ;
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
+kill rng;
 
 //ok now
 
@@ -293,6 +293,7 @@ gI;
 gJ;
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
+kill rng;
 
 //ok now
 
@@ -305,6 +306,7 @@ gI;
 gJ;
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
+kill rng;
 
 //Github Adi #47
 
@@ -313,6 +315,7 @@ reduce(x,std(2*x));
 
 ring S = integer,x,ls;
 reduce(x,std(2*x));
+kill R,S;
 
 //Github Adi #46
 
@@ -320,6 +323,7 @@ ring rng = integer,x,ds;
 ideal J = -7, -3-15*x^2, -6+18*x-x^2;
 ideal gJ =  std(J);
 reduce(J,gJ);
+kill rng;
 
 //Github Adi #49
 
@@ -331,6 +335,8 @@ std(a);
 ideal J = 5,z,x;
 ideal aJJ =  quotient( a*J, J );
 aJJ;
+kill rng;
+kill QR;
 
 //Github Adi #50
 
@@ -339,6 +345,7 @@ ideal I = 4*x(1)^3+35*x(1)^2+24*x(1),45*x(1),35;
 ideal J = 18*x(1)^3+43*x(1)^2,-7*x(1)-10,-12*x(1)^2-20*x(1)+13;
 ideal I_J =  intersect(I,J);
 size(I_J);
+kill rng;
 
 //Github Adi #21
 
@@ -351,21 +358,26 @@ ring rng = (integer),(x,y,z),(ws(-1,-1,-1),C);
 ideal I  = 6yz-6,6xy-6yz-8y;
 ideal gI  =std(I);
 reduce(I,gI);
+kill rng;
 ///
 ring rng = (integer),(x,y,z),(ws(-1,-1,-1),C);
 ideal I  = -10x+15y,4y-7;
 ideal gI  =std(I);
 reduce(I,gI);
+kill rng;
 ///
 ring rng = (integer),(x,y,z),(ws(-1,-1,-1),C);
 ideal I  = 9x-14y,15z-2;
 ideal gI  =std(I);
 reduce(I,gI);
+kill rng;
 ///
 ring rng = (integer),(x,y),(ws(-1,-1),C);
 ideal I  = 8x+7,-6x-13y;
 ideal gI  =std(I);
 reduce(I,gI);
+kill rng;
+kill r;
 
 // Singular bug #648
 
@@ -381,6 +393,7 @@ ideal J =
  t*x(3)*x(4)-3*t^2*x(3)*x(4)-t*x(1)*x(2)-2*x(1)^2,
  3-t;
 reduce(inJ,J);
+kill r;
 
 //Github Adi #48
 
@@ -390,6 +403,7 @@ ideal gI =  std(I);
 gI;
 std(gI);
 reduce(I,gI);
+kill rng;
 
 //Github Adi #43
 
@@ -399,6 +413,7 @@ ideal J = -10*x^2-9*x,-8*x^2-4;
        ideal gJ =  std(J);
        ideal ggJ =  std(gJ);
 reduce (J,gJ );
+kill rng;
 
 ring rng = integer,x,lp;
 option(noredSB) ;
@@ -409,6 +424,7 @@ ideal ggI =  std(gI);
 reduce (I,gI ); // <>0 !!
 gI;
 ggI;
+kill rng;
 
 ring rng = integer,x,lp;
 short = 0 ;
@@ -419,6 +435,7 @@ reduce (I,gI );
 size(gI)== size(ggI) ;
 gI;
 ggI;
+kill rng;
 
 //Github Adi #25
 
@@ -427,162 +444,175 @@ ideal inI= gh+2i, dh+j, d+2g+aj, d+2g+ai;
 ideal g= std(inI);
 g;
 reduce(inI,g);
+kill r;
 
 ring rng = (integer),(x,y,z),(ws(-1,-1,-1),C);
 ideal I = 6yz-6,6xy-6yz-8y;
 ideal gI =std(I);
 I;gI;
 reduce(I,gI);
+kill rng;
 
 //  Yue's Bug
 
- ring r = 0,(t,x(1..4)),ws(1,-1,-1,-1,-1);
- ideal I =
- 2*x(1)^2+3*x(1)*x(2)+24*x(3)*x(4),
- 8*x(1)^3+x(2)*x(3)*x(4)+18*x(3)^2*x(4);
- I = std(I);
- ring s = integer,(t,x(1..4)),ws(1,-1,-1,-1,-1);
- ideal I = fetch(r,I);
- ideal J = I,2-t;
- ideal J2 = std(J);
- J2;
- reduce(J,J2);
- std(J2);
+ring r = 0,(t,x(1..4)),ws(1,-1,-1,-1,-1);
+ideal I =
+2*x(1)^2+3*x(1)*x(2)+24*x(3)*x(4),
+8*x(1)^3+x(2)*x(3)*x(4)+18*x(3)^2*x(4);
+I = std(I);
+ring s = integer,(t,x(1..4)),ws(1,-1,-1,-1,-1);
+ideal I = fetch(r,I);
+ideal J = I,2-t;
+ideal J2 = std(J);
+J2;
+reduce(J,J2);
+std(J2);
+kill r;
  
 //  Infinite reduction small example
 
-  ring r = integer,(t,x,y),(dp(1),ds);
-  ideal i = 6+y+x2,4+x;
-  ideal gi = std(i);
-  gi;
-  reduce(i,gi);
-  
+ring r = integer,(t,x,y),(dp(1),ds);
+ideal i = 6+y+x2,4+x;
+ideal gi = std(i);
+gi;
+reduce(i,gi);
+kill r;  
+
 //  Intersect with the elimination takes for ever. With the module is immediate
 
-  ring rng = integer,(x),dp;
-  ideal I = -3*x^2-8;
-  ideal J = 9,5*x^2+8;
-  option(interedSyz);
-  ideal I_J =  intersect(I,J);
-  I_J;
+ring rng = integer,(x),dp;
+ideal I = -3*x^2-8;
+ideal J = 9,5*x^2+8;
+option(intersectSyz);
+ideal I_J =  intersect(I,J);
+I_J;
+kill rng;
   
 //  Github Adi #61
 
-  ring rng = integer,x,lp;
-  ideal  QQQ = 42*x^2;
-  qring QR = QQQ;
-  ideal I = 41,-36*x1;
-  def syzI = syz (I); 
-  print(syzI);
-  
+ring rng = integer,x,lp;
+ideal  QQQ = 42*x^2;
+qring QR = QQQ;
+ideal I = 41,-36*x1;
+module syzI = syz (I); 
+print(syzI);
+kill rng,QR;  
+
 //  Github Adi #60
 
-  ring rng = integer,x,dp;
-  ideal  QQQ = 4*x;
-  qring QR = QQQ;
-  ideal I = 13;
-  ideal J = -7;
-  ideal gJ = std(J);
-  ideal I_J =  intersect(I,J);
-  ideal IGJ = I+gJ;
-  intersect(I_J, IGJ) ;
+ring rng = integer,x,dp;
+ideal  QQQ = 4*x;
+qring QR = QQQ;
+ideal I = 13;
+ideal J = -7;
+ideal gJ = std(J);
+ideal I_J =  intersect(I,J);
+ideal IGJ = I+gJ;
+intersect(I_J, IGJ) ;
+kill rng,QR;  
   
 //  Github Adi #59
 
-  ring rng = integer,(x,y),lp;
-  ideal I = -2*y^2+11,14*x^2+5*y;
-  ideal J = x^2-3*x,9*x*y+2*y^2;
-  ideal I_J =  intersect(I,J);
-  I_J;
-  reduce(I_J,std(I));
-  reduce(I_J,std(J));
-  
+ring rng = integer,(x,y),lp;
+ideal I = -2*y^2+11,14*x^2+5*y;
+ideal J = x^2-3*x,9*x*y+2*y^2;
+ideal I_J =  intersect(I,J);
+I_J;
+reduce(I_J,std(I));
+reduce(I_J,std(J));
+kill rng;
+
 //  Github Adi #58
 
-  ring rng = (integer),(x(1)),(lp(1),C);
-  short = 0 ;
-  ideal  QQQ = 4*x(1);
-  qring QR = QQQ;
-  ideal I = 13;
-  ideal J = -7;
-  ideal gI = std(I);
-  ideal gJ = std(J);
-  ideal I_J =  intersect(I,J);
-  intersect(I_J,  I+gJ);
+ring rng = (integer),(x(1)),(lp(1),C);
+short = 0 ;
+ideal  QQQ = 4*x(1);
+qring QR = QQQ;
+ideal I = 13;
+ideal J = -7;
+ideal gI = std(I);
+ideal gJ = std(J);
+ideal I_J =  intersect(I,J);
+intersect(I_J,  I+gJ);
+kill rng;
   
 //  Github Adi #56
 
-  ring rng = (integer),(x,y),(ls(2),C);
-  ideal I = -8-y^2+13*x^2*y,-12+2*x-9*x^2*y;
-  ideal gI =  std(I);
-  gI;
-  reduce(I,gI);
-  
-//  Github Adi #55
+ring rng = (integer),(x,y),(ls(2),C);
+ideal I = -8-y^2+13*x^2*y,-12+2*x-9*x^2*y;
+ideal gI =  std(I);
+gI;
+reduce(I,gI);
+kill rng;
 
-  ring rng = (integer),(x,y,z),(dp(3),C);
-  ideal I = -10*y^2*z^2-7*x*y-2*x+2, 7*x*y^3+11, 15*x*y^2*z-8*y*z-11;
-  ideal gI =  std(I);
-  reduce(I,gI);
-  I = 8*y^2*z+3*x*z, -3*x^2*z-9*y^2*z+3, 5*x*z^2-9*y*z+2*z;
-  gI =  std(I);
-  reduce(I,gI);
+ring rng = (integer),(x,y,z),(dp(3),C);
+ideal I = -10*y^2*z^2-7*x*y-2*x+2, 7*x*y^3+11, 15*x*y^2*z-8*y*z-11;
+ideal gI =  std(I);
+reduce(I,gI);
+I = 8*y^2*z+3*x*z, -3*x^2*z-9*y^2*z+3, 5*x*z^2-9*y*z+2*z;
+gI =  std(I);
+reduce(I,gI);
+kill rng;
 
 // Github Adi #51
 
-  ring rng = (integer),(x(1),x(2)),(ls(1),ls(1),C);
-  ideal I = -36+26*x(1)-29*x(1)^3,26+6*x(2)-13*x(1);
-  ideal J = 44+28*x(1)*x(2);
-  ideal gI =  std(I);
-  ideal gJ =  std(J);
-  gI;
-  gJ;
-  std(gI);
-  reduce(I,gI);
-  reduce(J,gJ);
-  
-  ring rng = (integer),(x,y,z),(Ds(1),Ds(2),C);
-  option(redSB);
-  ideal J = -3+4*z-x,-2*z+y^2-3*z^3;
-  ideal gJ =  std(J);
-  J;
-  gJ;
-  reduce (J,gJ ) ;
-  
-  ring rng = (integer),(x(1),x(2),x(3)),(rs(2),rs(1),C);
-  ideal I = 2*x(3)+15*x(3)^3+x(1),-15+13*x(3)+6*x(1);
-  ideal gI =  std(I);
-  gI;
-  reduce (I,gI );
+ring rng = (integer),(x(1),x(2)),(ls(1),ls(1),C);
+ideal I = -36+26*x(1)-29*x(1)^3,26+6*x(2)-13*x(1);
+ideal J = 44+28*x(1)*x(2);
+ideal gI =  std(I);
+ideal gJ =  std(J);
+gI;
+gJ;
+std(gI);
+reduce(I,gI);
+reduce(J,gJ);
+kill rng;
+
+ring rng = (integer),(x,y,z),(Ds(1),Ds(2),C);
+option(redSB);
+ideal J = -3+4*z-x,-2*z+y^2-3*z^3;
+ideal gJ =  std(J);
+J;
+gJ;
+reduce (J,gJ ) ;
+kill rng;
+
+ring rng = (integer),(x(1),x(2),x(3)),(rs(2),rs(1),C);
+ideal I = 2*x(3)+15*x(3)^3+x(1),-15+13*x(3)+6*x(1);
+ideal gI =  std(I);
+gI;
+reduce (I,gI );
+kill rng;
   
 //  Singular Trac: #719
 
-  ring r = integer,(t,x(1..5)),ws(1,-1,-1,-1,-1,-1);
-  poly h = 3*t*x(2)*x(4)-21*t*x(1)*x(5)-12*t^2*x(1)*x(2)-2*t^2*x(1)*x(3)-6*t^2*x(1)*x(4);
-  ideal G = 
-  x(2)+6*x(4)+7*x(5)+4*t*x(2),
-  x(2)+8*x(3)+7*x(5)+t*x(2),
-  t*x(1)+3*t*x(2)+t^2*x(1),
-  t*x(4)+21*t*x(5)+12*t^2*x(2)+2*t^2*x(3)+7*t^2*x(4),
-  2-t;
-  ideal Gstd = std(G);
-  Gstd;
-  reduce(h,Gstd);
-  reduce(G,Gstd);
+ring r = integer,(t,x(1..5)),ws(1,-1,-1,-1,-1,-1);
+poly h = 3*t*x(2)*x(4)-21*t*x(1)*x(5)-12*t^2*x(1)*x(2)-2*t^2*x(1)*x(3)-6*t^2*x(1)*x(4);
+ideal G = 
+x(2)+6*x(4)+7*x(5)+4*t*x(2),
+x(2)+8*x(3)+7*x(5)+t*x(2),
+t*x(1)+3*t*x(2)+t^2*x(1),
+t*x(4)+21*t*x(5)+12*t^2*x(2)+2*t^2*x(3)+7*t^2*x(4),
+2-t;
+ideal Gstd = std(G);
+Gstd;
+reduce(h,Gstd);
+reduce(G,Gstd);
+kill r;
   
 // Memory leak
 
-  ring r=integer,t,ds;
-  ideal I = 2,3-t;
-  int i;
-  bigint m=memory(0);
-  for(i=1; i<100; i++)
-  {
-    ideal II = std(I);
-    II = reduce(I,II);
-    kill II;
-  }
-  m-memory(0); //  should be 0
+ring r=integer,t,ds;
+ideal I = 2,3-t;
+int i;
+bigint m=memory(0);
+for(i=1; i<100; i++)
+{
+  ideal II = std(I);
+  II = reduce(I,II);
+  kill II;
+}
+m-memory(0); //  should be 0
        
 tst_status(1);$;      
 
