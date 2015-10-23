@@ -512,13 +512,16 @@ static FORCE_INLINE BOOLEAN n_GreaterZero(number n, const coeffs r)
 static FORCE_INLINE BOOLEAN n_Greater(number a, number b, const coeffs r)
 { STATISTIC(n_Greater); assume(r != NULL); assume(r->cfGreater!=NULL); return r->cfGreater(a,b,r); }
 
-#ifdef HAVE_RINGS
-static FORCE_INLINE int n_DivComp(number a, number b, const coeffs r)
-{ STATISTIC(n_DivComp); assume(r != NULL); assume(r->cfDivComp!=NULL); return r->cfDivComp (a,b,r); }
-
 /// TRUE iff n has a multiplicative inverse in the given coeff field/ring r
 static FORCE_INLINE BOOLEAN n_IsUnit(number n, const coeffs r)
 { STATISTIC(n_IsUnit); assume(r != NULL); assume(r->cfIsUnit!=NULL); return r->cfIsUnit(n,r); }
+
+static FORCE_INLINE coeffs n_CoeffRingQuot1(number c, const coeffs r)
+{ STATISTIC(n_CoeffRingQuot1); assume(r != NULL); assume(r->cfQuot1 != NULL); return r->cfQuot1(c, r); }
+
+#ifdef HAVE_RINGS
+static FORCE_INLINE int n_DivComp(number a, number b, const coeffs r)
+{ STATISTIC(n_DivComp); assume(r != NULL); assume(r->cfDivComp!=NULL); return r->cfDivComp (a,b,r); }
 
 /// in Z: 1
 /// in Z/kZ (where k is not a prime): largest divisor of n (taken in Z) that
@@ -530,8 +533,6 @@ static FORCE_INLINE BOOLEAN n_IsUnit(number n, const coeffs r)
 static FORCE_INLINE number n_GetUnit(number n, const coeffs r)
 { STATISTIC(n_GetUnit); assume(r != NULL); assume(r->cfGetUnit!=NULL); return r->cfGetUnit(n,r); }
 
-static FORCE_INLINE coeffs n_CoeffRingQuot1(number c, const coeffs r)
-{ STATISTIC(n_CoeffRingQuot1); assume(r != NULL); assume(r->cfQuot1 != NULL); return r->cfQuot1(c, r); }
 #endif
 
 /// a number representing i in the given coeff field/ring r

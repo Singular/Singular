@@ -915,7 +915,6 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   assume(res->Data()==NULL);
 
   coeffs newcf = currRing->cf;
-#ifdef HAVE_RINGS
   ideal id = (ideal)a->Data(); //?
   const int cpos = idPosConstant(id);
   if(rField_is_Ring(currRing))
@@ -925,7 +924,6 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
         if(newcf == NULL)
           return TRUE;
     }
-#endif
   //qr=(ring)res->Data();
   //if (qr!=NULL) omFreeBin((ADDRESS)qr, ip_sring_bin);
   ring qr = rCopy(currRing);

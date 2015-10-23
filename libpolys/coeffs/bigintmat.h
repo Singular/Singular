@@ -283,11 +283,13 @@ class bigintmat
     void hnf(); ///< transforms INPLACE to HNF
     void howell(); ///<dito, but Howell form (only different for zero-divsors)
     void swapMatrix(bigintmat * a);
+    #ifdef HAVE_RINGS
     bigintmat * modhnf(number p, coeffs c); ///< computes HNF(this | p*I)
+    #endif
     bigintmat * modgauss(number p, coeffs c);
     void skaldiv(number b); ///< Macht Ganzzahldivision aller Matrixeinträge mit b
     void colskaldiv(int j, number b); ///< Macht Ganzzahldivision aller j-ten Spalteneinträge mit b
-    void mod(number p, coeffs c); ///< Reduziert komplette Matrix modulo p
+    void mod(number p); ///< Reduziert komplette Matrix modulo p
     bigintmat* inpmod(number p, coeffs c); ///< Liefert Kopie der Matrix zurück, allerdings im Ring Z modulo p
     number content(); ///<the content, the gcd of all entries. Only makes sense for Euclidean rings (or possibly constructive PIR)
     void simplifyContentDen(number *den); ///< ensures that Gcd(den, content)=1

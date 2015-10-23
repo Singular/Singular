@@ -351,6 +351,7 @@ int redEcart (LObject* h,kStrategy strat)
   }
 }
 
+#ifdef HAVE_RINGS
 int redRiloc (LObject* h,kStrategy strat)
 {
   int i,at,ei,li,ii;
@@ -639,6 +640,7 @@ int redRiloc (LObject* h,kStrategy strat)
     }
   }
 }
+#endif
 
 /*2
 *reduces h with elements from T choosing  the first possible

@@ -97,6 +97,7 @@ nforder_ideal::~nforder_ideal() {
   }
 }
 
+#ifdef HAVE_RINGS
 nforder_ideal * nf_idAdd(nforder_ideal *A, nforder_ideal *B)
 {
   assume(A->order() == B->order());
@@ -163,8 +164,9 @@ nforder_ideal * nf_idAdd(nforder_ideal *A, nforder_ideal *B)
   delete t2;
   return D;
 }
+#endif
 
-
+#ifdef HAVE_RINGS
 nforder_ideal * nf_idMult(nforder_ideal *A, nforder_ideal *B)
 {
   assume(A->order() == B->order());
@@ -234,6 +236,7 @@ nforder_ideal * nf_idMult(nforder_ideal *A, nforder_ideal *B)
   delete t1;
   return D;
 }
+#endif
 
 nforder_ideal* nf_idMult(nforder_ideal * A, number b)
 {

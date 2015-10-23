@@ -17,6 +17,7 @@
 #include <math.h>
 #include <string.h>
 
+#ifdef HAVE_RINGS
 ///create Z/nA of type n_Zn
 static coeffs numbercoeffs(number n, coeffs c) // TODO: FIXME: replace with n_CoeffRingQuot1
 {
@@ -30,6 +31,7 @@ static coeffs numbercoeffs(number n, coeffs c) // TODO: FIXME: replace with n_Co
   delete pp;
   return nc;
 }
+#endif
 
 //#define BIMATELEM(M,I,J) (M)[ (M).index(I,J) ]
 
@@ -1583,25 +1585,33 @@ void bigintmat::hnf()
   number co1, co2, co3, co4;
   number ggt = n_Init(0, basecoeffs());
 
-  while ((i>0) && (j>0)) {
+  while ((i>0) && (j>0))
+  {
     // Falls erstes Nicht-Null-Element in Zeile i nicht existiert, oder hinter Spalte j vorkommt, gehe in nächste Zeile
-    if ((findnonzero(i)==0) || (findnonzero(i)>j)) {
+    if ((findnonzero(i)==0) || (findnonzero(i)>j))
+    {
       i--;
-    } else {
+    }
+    else
+    {
       // Laufe von links nach rechts durch die Zeile:
-      for (int l=1; l<=j-1; l++) {
+      for (int l=1; l<=j-1; l++)
+      {
         n_Delete(&tmp1, basecoeffs());
         tmp1 = get(i, l);
         // Falls Eintrag (im folgenden x genannt) gleich 0, gehe eine Spalte weiter. Ansonsten...
-        if (!n_IsZero(tmp1, basecoeffs())) {
+        if (!n_IsZero(tmp1, basecoeffs()))
+        {
           n_Delete(&tmp2, basecoeffs());
           tmp2 = get(i, l+1);
           // Falls Eintrag (i.f. y g.) rechts daneben gleich 0, tausche beide Spalten, sonst...
-          if (!n_IsZero(tmp2, basecoeffs())) {
+          if (!n_IsZero(tmp2, basecoeffs()))
+          {
             n_Delete(&ggt, basecoeffs());
             ggt = n_XExtGcd(tmp1, tmp2, &co1, &co2, &co3, &co4, basecoeffs());
             // Falls x=ggT(x, y), tausche die beiden Spalten und ziehe die (neue) rechte Spalte so häufig von der linken ab, dass an der ehemaligen Stelle von x nun eine 0 steht. Dazu:
-            if (n_Equal(tmp1, ggt, basecoeffs())) {
+            if (n_Equal(tmp1, ggt, basecoeffs()))
+            {
               swap(l, l+1);
               n_Delete(&q, basecoeffs());
               q = n_Div(tmp2, ggt, basecoeffs());
@@ -1611,7 +1621,8 @@ void bigintmat::hnf()
               addcol(l, l+1, q, basecoeffs());
               n_Delete(&q, basecoeffs());
             }
-            else if (n_Equal(tmp1, minusone, basecoeffs())) {
+            else if (n_Equal(tmp1, minusone, basecoeffs()))
+            {
               // Falls x=-1, so ist x=-ggt(x, y). Dann gehe wie oben vor, multipliziere aber zuerst die neue rechte Spalte (die mit x) mit -1
               // Die Berechnung von q (=y/ggt) entfällt, da ggt=1
               swap(l, l+1);
@@ -1619,7 +1630,8 @@ void bigintmat::hnf()
               tmp2 = n_InpNeg(tmp2, basecoeffs());
               addcol(l, l+1, tmp2, basecoeffs());
             }
-            else {
+            else
+            {
               // CF: use the 2x2 matrix (co1, co2)(co3, co4) to
               // get the gcd in position and the 0 in the other:
 #ifdef CF_DEB
@@ -1644,23 +1656,29 @@ void bigintmat::hnf()
             n_Delete(&co3, basecoeffs());
             n_Delete(&co4, basecoeffs());
           }
-          else {
+          else
+          {
             swap(l, l+1);
           }
           // Dann betrachte die vormals rechte Spalte als neue linke, und die rechts daneben als neue rechte.
         }
       }
 
+      #ifdef HAVE_RINGS
       // normalize by units:
-      if (!n_IsZero(view(i, j), basecoeffs())) {
+      if (!n_IsZero(view(i, j), basecoeffs()))
+      {
         number u = n_GetUnit(view(i, j), basecoeffs());
-        if (!n_IsOne(u, basecoeffs())) {
+        if (!n_IsOne(u, basecoeffs()))
+        {
           colskaldiv(j, u);
         }
         n_Delete(&u, basecoeffs());
       }
+      #endif
       // Zum Schluss mache alle Einträge rechts vom Diagonalelement betragsmäßig kleiner als dieses
-      for (int l=j+1; l<=col; l++) {
+      for (int l=j+1; l<=col; l++)
+      {
         n_Delete(&q, basecoeffs());
         q = n_QuotRem(view(i, l), view(i, j), NULL, basecoeffs());
         q = n_InpNeg(q, basecoeffs());
@@ -1708,6 +1726,7 @@ bigintmat * bimChangeCoeff(bigintmat *a, coeffs cnew)
   return b;
 }
 
+#ifdef HAVE_RINGS
 //OK: a HNF of (this | p*I)
 //so the result will always have FULL rank!!!!
 //(This is different form a lift of the HNF mod p: consider the matrix (p)
@@ -1721,10 +1740,14 @@ bigintmat * bigintmat::modhnf(number p, coeffs R)
   delete m;
   bigintmat *C = new bigintmat(rows(), rows(), R);
   int piv = rows(), i = a->cols();
-  while (piv) {
-    if (!i || n_IsZero(a->view(piv, i), R)) {
+  while (piv)
+  {
+    if (!i || n_IsZero(a->view(piv, i), R))
+    {
       C->set(piv, piv, p, R);
-    } else {
+    }
+    else
+    {
       C->copySubmatInto(a, 1, i, rows(), 1, 1, piv);
       i--;
     }
@@ -1733,6 +1756,7 @@ bigintmat * bigintmat::modhnf(number p, coeffs R)
   delete a;
   return C;
 }
+#endif
 
 
 //exactly divide matrix by b
@@ -1791,28 +1815,20 @@ void bigintmat::coltransform(int j, int k, number a, number b, number c, number 
 
 
 //reduce all entries mod p. Does NOT change the coeffs type
-void bigintmat::mod(number p, coeffs c)
+void bigintmat::mod(number p)
 {
   // produce the matrix in Z/pZ
-  // CF: TODO rewrite using QuotRem and not the map
-  coeffs coe = numbercoeffs(p, c);
-  nMapFunc f1 = n_SetMap(basecoeffs(), coe);
-  nMapFunc f2 = n_SetMap(coe, basecoeffs());
   number tmp1, tmp2;
   for (int i=1; i<=row; i++)
   {
     for (int j=1; j<=col; j++)
     {
       tmp1 = get(i, j);
-      tmp2 = f1(tmp1, basecoeffs(), coe);
+      tmp2 = n_IntMod(tmp1, p, basecoeffs());
       n_Delete(&tmp1, basecoeffs());
-      tmp1 = f2(tmp2, coe, basecoeffs());
-      set(i, j, tmp1);
-      n_Delete(&tmp1, basecoeffs());
-      n_Delete(&tmp2, coe);
+      set(i, j, tmp2);
     }
   }
-  nKillChar(coe);
 }
 
 void bimMult(bigintmat *a, bigintmat *b, bigintmat *c)
@@ -1970,6 +1986,7 @@ static number bimFarey(bigintmat *A, number N, bigintmat *L) {
   return den;
 }
 
+#ifdef HAVE_RINGS
 static number solveAx_dixon(bigintmat *A, bigintmat *B, bigintmat *x, bigintmat *kern) {
   coeffs R = A->basecoeffs();
 
@@ -2145,6 +2162,7 @@ static number solveAx_dixon(bigintmat *A, bigintmat *B, bigintmat *x, bigintmat 
   nKillChar(Rp);
   return NULL;
 }
+#endif
 
 //TODO: re-write using reduce_mod_howell
 static number solveAx_howell(bigintmat *A, bigintmat *b, bigintmat *x, bigintmat *kern) {
@@ -2276,13 +2294,16 @@ number solveAx(bigintmat *A, bigintmat *b, bigintmat *x) {
   assume (R == x->basecoeffs());
   assume ((x->cols() == b->cols()) && (x->rows() == A->cols()) && (A->rows() == b->rows()));
 
-  switch (getCoeffType(R)) {
+  switch (getCoeffType(R))
+  {
+  #ifdef HAVE_RINGS
     case n_Z:
       return solveAx_dixon(A, b, x, NULL);
     case n_Zn:
     case n_Znm:
     case n_Z2m:
       return solveAx_howell(A, b, x, NULL);
+  #endif
     case n_Zp:
     case n_Q:
     case n_GF:
@@ -2290,7 +2311,8 @@ number solveAx(bigintmat *A, bigintmat *b, bigintmat *x) {
     case n_transExt:
       Warn("have field, should use Gauss or better");
     default:
-      if (R->cfXExtGcd && R->cfAnn) { //assume it's Euclidean
+      if (R->cfXExtGcd && R->cfAnn)
+      { //assume it's Euclidean
         return solveAx_howell(A, b, x, NULL);
       }
       Werror("have no solve algorithm");
@@ -2399,6 +2421,7 @@ void diagonalForm(bigintmat *A, bigintmat ** S, bigintmat ** T)
   A->copy(a);
 }
 
+#ifdef HAVE_RINGS
 //a "q-base" for the kernel of a.
 //Should be re-done to use Howell rather than smith.
 //can be done using solveAx now.
@@ -2444,6 +2467,7 @@ int kernbase (bigintmat *a, bigintmat *c, number p, coeffs q) {
   c->copy(bimChangeCoeff(k, q));
   return c->cols();
 }
+#endif
 
 
 bool nCoeffs_are_equal(coeffs r, coeffs s) {
