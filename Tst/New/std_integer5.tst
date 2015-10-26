@@ -1,7 +1,7 @@
 LIB "tst.lib"; tst_init();
 
 
-// Example 5
+// Example 5, tr. #629
 ring rng = integer,(x,y,z),lp;
 ideal  IJ= 13xyz+6xy+78xz+36x-11y2z-66yz,
 168xyz+84xy+1008xz+504x+12y3-154y2z+72y2-924yz,
