@@ -507,7 +507,6 @@ int redRiloc (LObject* h,kStrategy strat)
         #endif
         if (at <= strat->Ll && pLmCmp(h->p, strat->L[strat->Ll].p) != 0 && !nEqual(h->p->coef, strat->L[strat->Ll].p->coef))
         {
-        #if 1
           /*- h will not become the next element to reduce -*/
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           #ifdef KDEBUG
@@ -516,50 +515,15 @@ int redRiloc (LObject* h,kStrategy strat)
           h->Clear();
           strat->fromT = FALSE;
           return -1;
-
-        #else
-
-          LObject* h2;
-          pWrite(h->p);
-          h2->tailRing = h->tailRing;
-          h2->p = pCopy(h->p);
-          pWrite(h2->p);
-          strat->initEcart(h2);
-          h2->sev = h->sev;
-          doRed(h,&(strat->T[ii]),FALSE,strat,FALSE);
-          #if ADIDEBUG_NF
-          printf("\nPartial reduced (ecart = %i) h: ",h->ecart);pWrite(h->p);
-          #endif
-          if(h->IsNull())
-          {
-            if (h->lcm!=NULL)
-            {
-              pLmDelete(h->lcm);
-            }
-            h->Clear();
-            h2->Clear();
-            return 0;
-          }
-          strat->initEcart(h);
-          h->sev = pGetShortExpVector(h->p);
-          at = strat->posInL(strat->L,strat->Ll,h,strat);
-          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-          #if ADIDEBUG_NF
-          printf("\nThis was reduced and went to L: ");pWrite(h->p);
-          #endif
-          at = strat->posInL(strat->L,strat->Ll,h2,strat);
-          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h2,at);
-          #if ADIDEBUG_NF
-          printf("\nThis was reduced and went to L: ");pWrite(h2->p);
-          #endif
-          //This means the pair won't go into T
-          return 3;
-        #endif
         }
       }
+      doRed(h,&(strat->T[ii]),TRUE,strat,TRUE);
     }
-    // now we finally can reduce
-    doRed(h,&(strat->T[ii]),strat->fromT,strat,FALSE);
+    else
+    {
+      // now we finally can reduce
+      doRed(h,&(strat->T[ii]),strat->fromT,strat,FALSE);
+    }
     strat->fromT=FALSE;
     // are we done ???
     if (h->IsNull())
