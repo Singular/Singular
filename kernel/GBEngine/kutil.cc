@@ -1510,11 +1510,16 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
   else
   {
     if(h.IsNull()) return FALSE;
-    int red_result;
-    if(strat->L != NULL)
-      red_result = strat->red(&h,strat);
+    //int red_result;
+    //reduzieren ist teur!!!
+    //if(strat->L != NULL)
+      //red_result = strat->red(&h,strat);
     if(!h.IsNull())
+    {
       enterT(h, strat,-1);
+      //int pos = posInS(strat,strat->sl,h.p,h.ecart);
+      //strat->enterS(h,pos,strat,-1);
+    }
   }
   //#if 1
   #if ADIDEBUG
