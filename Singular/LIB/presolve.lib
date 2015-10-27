@@ -190,7 +190,6 @@ EXAMPLE: example elimlinearpart; shows an example
    n = nvars(BAS);
    list gnirlist = ringlist(basering);
    list g3 = gnirlist[3];
-   list g32 = g3[size(g3)];
 
 //---------------------------------- start ------------------------------------
    if ( size(#)!=0 ) {  n=#[1]; }
@@ -217,7 +216,7 @@ EXAMPLE: example elimlinearpart; shows an example
       ringchange = 1;                         //remember change of ring
       intvec V;
       V[n]=0; V=V+1;                          //weights for dp ordering
-      gnirlist[3] = list("dp",V), g32;
+      gnirlist[3] = list("dp",V), list("C",0);
       def newBAS = ring(gnirlist);            //change of ring to dp ordering
       setring newBAS;
       ideal rest = imap(BAS,rest);
