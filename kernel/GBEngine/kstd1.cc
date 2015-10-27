@@ -517,7 +517,7 @@ int redRiloc (LObject* h,kStrategy strat)
           return -1;
         }
       }
-      doRed(h,&(strat->T[ii]),TRUE,strat,TRUE);
+      doRed(h,&(strat->T[ii]),strat->fromT,strat,TRUE);
     }
     else
     {

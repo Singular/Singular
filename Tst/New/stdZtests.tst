@@ -613,6 +613,16 @@ for(i=1; i<100; i++)
   kill II;
 }
 m-memory(0); //  should be 0
+
+// Singular Trac: #747
+
+ring rng = (integer),(x,y),(Ds(2),C);
+intvec op = 67108864,16787537;
+ideal I = 6-x^2*y, -2-3*x+2*y;
+ideal gI =  std(I);
+gI;
+std(gI);
+reduce(I,gI);
        
 tst_status(1);$;      
 
