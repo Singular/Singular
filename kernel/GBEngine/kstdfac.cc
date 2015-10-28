@@ -24,10 +24,7 @@
 #include <kernel/ideals.h>
 #include <kernel/GBEngine/kstdfac.h>
 
-#ifndef SING_NDEBUG
 int strat_nr=0;
-int strat_fac_debug=0;
-#endif
 /*3
 * copy o->T to n->T, assumes that n->S is already copied
 */
@@ -258,13 +255,10 @@ BOOLEAN k_factorize(poly p,ideal &rfac, ideal &fac_copy)
   {
     if (TEST_OPT_DEBUG)
     {
-      Print("-> %d factors\n",fac_elems);
-      if (fac_elems!=1)
-      {
-        pWrite(p); PrintS(" ->\n");
-        int ii=fac_elems;
-        while(ii>0) { ii--;pWrite(fac->m[ii]); }
-      }
+      Print("%d factors:\n",fac_elems);
+      pWrite(p); PrintS(" ->\n");
+      int ii=fac_elems;
+      while(ii>0) { ii--;pWrite(fac->m[ii]); }
     }
     else if (TEST_OPT_PROT)
     {
@@ -274,18 +268,6 @@ BOOLEAN k_factorize(poly p,ideal &rfac, ideal &fac_copy)
         while(ii>0) { PrintS("F"); ii--; }
       }
     }
-#ifndef SING_NDEBUG
-    else if (strat_fac_debug)
-    {
-      pWrite(p);
-      Print("-> %d factors\n",fac_elems);
-      if (fac_elems!=1)
-      {
-        int ii=fac_elems;
-        while(ii>0) { ii--;pWrite(fac->m[ii]); }
-      }
-    }
-#endif
     return TRUE;
   }
   else
@@ -375,9 +357,8 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
       n->P.pLength=0;
       if (TEST_OPT_DEBUG)
       {
-        PrintS("new s:");
-        wrp(n->P.p);
-        PrintLn();
+        Print("new s(%d)->S:",n->nr);
+        pWrite(n->P.p);
       }
       enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
       enterT(n->P,n);
@@ -400,27 +381,11 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
         }
         if (TEST_OPT_DEBUG)
         {
-          PrintS("new D:\n");
+          Print("new s(%d)->D:\n",n->nr);
           iiWriteMatrix((matrix)n->D,"D",1,currRing,0);
           PrintLn();
         }
       }
-#ifndef SING_NDEBUG
-      if(strat_fac_debug)
-      {
-        int ii;
-        Print("---------------------------------------------------------------\ns(%d), set S\n",n->nr);
-        for(ii=0;ii<n->sl;ii++)
-        { Print("s(%d->S[%d]= ",n->nr,ii);pWrite(n->S[ii]);}
-        Print("s(%d), set D\n",n->nr);
-        if (n->D!=NULL)
-        {
-          for(ii=0;ii<IDELEMS(n->D);ii++)
-          { Print("s(%d->D[%d]= ",n->nr,ii);pWrite(n->D->m[ii]);}
-        }
-        else PrintS(" empty\n");
-      }
-#endif
 
       fac_copy->m[i]=pCopy(fac->m[i]);
       fac->m[i]=NULL;
@@ -436,19 +401,10 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
             poly r=kNF(n->Shdl,NULL,n->D->m[j],0,KSTD_NF_LAZY | KSTD_NF_NONORM);
             if (r==NULL)
             {
-#ifndef SING_NDEBUG
-              if(strat_fac_debug)
-              {
-                Print("empty set s(%d) because: D[%d] -> 0\n",
-                       n->nr, j);
-                Print("s(%d)->D[%d]= ",n->nr,j);pWrite(n->D->m[j]);
-              }
-#endif
               if (TEST_OPT_DEBUG)
               {
-                PrintS("empty set because:");
-                wrp(n->D->m[j]);
-                PrintLn();
+                Print("empty set s(%d) because D[%d]:",n->nr,j);
+                pWrite(n->D->m[j]);
                 messageSets(n);
               }
               while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
@@ -488,19 +444,12 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
           if ((n->sl>=0)&&(n->S[0]!=NULL))
           {
             ideal r=kNF(n->Shdl,NULL,Lj->d,0,KSTD_NF_LAZY | KSTD_NF_NONORM);
-#ifndef SING_NDEBUG
-              if(strat_fac_debug)
-              {
-                Print("empty set s(%d) because:L[%d]\n",n->nr,Lj->nr);
-                PrintS("L:\n");
-                iiWriteMatrix((matrix)Lj->d,"L",1,currRing,0);
-              }
-#endif
             if (idIs0(r))
             {
               if (TEST_OPT_DEBUG)
               {
                 Print("empty set because:L[%p]\n",(void *)Lj);
+                iiWriteMatrix((matrix)Lj->d,"L",1,currRing,0);
               }
               while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
               while (n->tl >= 0)
@@ -724,22 +673,6 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
             PrintLn();
           }
         }
-#ifndef SING_NDEBUG
-        if(strat_fac_debug)
-        {
-          int ii;
-          Print("-------------------------------------------------------------\ns(%d), set S\n",n->nr);
-          for(ii=0;ii<n->sl;ii++)
-          { Print("s(%d->S[%d]= ",n->nr,ii);pWrite(n->S[ii]);}
-          Print("s(%d), set D\n",n->nr);
-          if (n->D!=NULL)
-          {
-            for(ii=0;ii<IDELEMS(n->D);ii++)
-            { Print("s(%d->D[%d]= ",n->nr,ii);pWrite(n->D->m[ii]);}
-          }
-          else PrintS(" empty\n");
-        }
-#endif
 
         fac_copy->m[i]=pCopy(fac->m[i]);
         fac->m[i]=NULL;
@@ -755,19 +688,10 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
               poly r=kNF(n->Shdl,NULL,n->D->m[j],0,KSTD_NF_LAZY | KSTD_NF_NONORM);
               if (r==NULL)
               {
-#ifndef SING_NDEBUG
-                if(strat_fac_debug)
-                {
-                  Print("empty set s(%d) because: D[%d] -> 0\n",
-                       n->nr, j);
-                  Print("s(%d)->D[%d]= ",n->nr,j);pWrite(n->D->m[j]);
-                }
-#endif
                 if (TEST_OPT_DEBUG)
                 {
-                  PrintS("empty set because:");
-                  wrp(n->D->m[j]);
-                  PrintLn();
+                  Print("empty set s(%d) because: D[%d]:", n->nr,j);
+                  pWrite(n->D->m[j]);
                   messageSets(n);
                 }
                 //if (n->Ll >=0) Print("Ll:%d|",n->Ll);
@@ -811,17 +735,14 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
               ideal r=kNF(n->Shdl,NULL,Lj->d,0,KSTD_NF_LAZY | KSTD_NF_NONORM);
               if (idIs0(r))
               {
-#ifndef SING_NDEBUG
-                if(strat_fac_debug)
-                {
-                  Print("empty set s(%d) because:L[%d]\n",n->nr,Lj->nr);
-                  PrintS("L:\n");
-                  iiWriteMatrix((matrix)Lj->d,"L",1,currRing,0);
-                }
-#endif
                 if (TEST_OPT_DEBUG)
                 {
-                  Print("empty set because:L[%p]\n",(void*)Lj);
+                  #ifdef KDEBUG
+                  Print("empty set s(%d) because:L[%d]\n",n->nr,Lj->nr);
+                  #else
+                  Print("empty set s(%d) because:\n",n->nr);
+                  #endif
+                  iiWriteMatrix((matrix)Lj->d,"L",1,currRing,0);
                 }
                 while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
                 while (n->tl >= 0)
@@ -864,7 +785,9 @@ ideal bbafac (ideal /*F*/, ideal Q,intvec */*w*/,kStrategy strat, ideal_list FL)
     }
     kTest_TS(strat);
   }
+#ifdef KDEBUG
   if (TEST_OPT_DEBUG) messageSets(strat);
+#endif
   /* complete reduction of the standard basis--------- */
   /* release temp data-------------------------------- */
   if (TEST_OPT_WEIGHTM)
@@ -980,16 +903,12 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
         ideal r=kNF(Lj->d,NULL,Li->d,0,KSTD_NF_LAZY | KSTD_NF_NONORM);
         if (idIs0(r))
         {
-#ifndef SING_NDEBUG
-          if(strat_fac_debug)
-          {
-            Print("empty set L(%d) because:L(%d)\n",Lj->nr,Li->nr);
-          }
-#endif
+#ifdef KDEBUG
           if (TEST_OPT_DEBUG)
           {
             Print("empty set L[%p] because:L[%p]\n",(void*)Lj,(void*)Li);
           }
+#endif
           // delete L[j],
           Li=L;
           if (Lj_prev!=NULL)

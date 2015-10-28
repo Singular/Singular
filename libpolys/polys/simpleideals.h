@@ -51,7 +51,7 @@ struct sideal_list
 {
   ideal_list next;
   ideal      d;
-#ifndef SING_NDEBUG
+#ifdef KDEBUG
   int nr;
 #endif
 };

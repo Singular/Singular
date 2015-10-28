@@ -174,10 +174,7 @@ public:
 #endif
 };
 
-#ifndef SING_NDEBUG
 extern int strat_nr;
-extern int strat_fac_debug;
-#endif
 
 class sLObject : public sTObject
 {
@@ -344,11 +341,8 @@ public:
   ring tailRing;
   omBin lmBin;
   omBin tailBin;
-#ifndef SING_NDEBUG
   int nr;
-#endif
   int cp,c3;
-  int cv; // in shift bases: counting V criterion
   int sl,mu;
   int syzl,syzmax,syzidxmax;
   int tl,tmax;
@@ -362,6 +356,7 @@ public:
   int minim;
   #ifdef HAVE_SHIFTBBA
   int lV;
+  int cv; // in shift bases: counting V criterion
   #endif
   BOOLEAN interpt;
   BOOLEAN homog;

@@ -9709,11 +9709,8 @@ ring sbaRing (kStrategy strat, const ring r, BOOLEAN /*complete*/, int /*sgn*/)
 skStrategy::skStrategy()
 {
   memset(this, 0, sizeof(skStrategy));
-#ifndef SING_NDEBUG
   strat_nr++;
   nr=strat_nr;
-  if (strat_fac_debug) Print("s(%d) created\n",nr);
-#endif
   tailRing = currRing;
   P.tailRing = currRing;
   tl = -1;
