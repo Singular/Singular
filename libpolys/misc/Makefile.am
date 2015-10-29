@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I ../../m4
 
 AM_CPPFLAGS = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. \
-$(FACTORY_INCLUDES) ${GMP_CFLAGS}
+$(FACTORY_INCLUDES)
 
 noinst_LTLIBRARIES = libmisc.la
 ##### libmiscdir = $(libdir)/singular

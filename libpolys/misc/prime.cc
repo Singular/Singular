@@ -7,7 +7,7 @@
 
 #include <math.h>
 #include <misc/prime.h>
-#include <factory/factory.h>
+#include <factory/cf_primes.h>
 
 static int iiIsPrime0(unsigned p)  /* brute force !!!! */
 {
