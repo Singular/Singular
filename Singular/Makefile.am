@@ -266,3 +266,7 @@ MOD:
 	if [ -d "${top_builddir}/libpolys/polys/.libs" ]; then \
 	  ln -snf ${top_builddir}/libpolys/polys/.libs/ ${abs_builddir}/MOD; \
 	fi
+
+echoLIBS:
+	@echo ${SLIB0} ${SLIB1} ${SLIB2} ${PLIBS}
+
