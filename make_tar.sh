@@ -5,15 +5,9 @@ export VERSION
 git archive --prefix=singular-$VERSION/ HEAD |tar xf -
 mkdir singular-$VERSION/doc
 cp doc/*.man singular-$VERSION/doc/.
-if test -e doc/html
+if test -e doc/doc.tbz2
 then
-  mkdir singular-$VERSION/doc/html
-  cp doc/html/* singular-$VERSION/doc/html/.
-fi
-if test -e doc/singular.idx
-then
-  cp doc/singular.idx singular-$VERSION/doc/.
-  cp doc/singular.hlp singular-$VERSION/doc/.
+  cp doc/doc.tbz2 singular-$VERSION/doc/.
 fi
 
 command rm singular-$VERSION/.gdbinit singular-$VERSION/*/.gdbinit singular-$VERSION/*/*/.gdbinit singular-$VERSION/*/*/*/.gdbinit

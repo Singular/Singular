@@ -84,7 +84,7 @@ feResourceConfig_s feResourceConfigs[] =
   {"DataDir",   'D',    feResDir,   "SINGULAR_DATA_DIR",    "%b/../share/",          (char *)""},
   {"DefaultDir",'d',    feResDir,   "SINGULAR_DEFAULT_DIR",  SINGULAR_DEFAULT_DIR,  (char *)""},
   {"InfoFile",  'i',    feResFile,  "SINGULAR_INFO_FILE",   "%D/info/singular.hlp", (char *)""},
-  {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%D/doc/singular.idx",  (char *)""},
+  {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%D/singular/singular.idx",  (char *)""},
   {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%D/singular/html",              (char *)""},
   {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/Manual/",    (char *)""},
   {"ExDir",     'm',    feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",          (char *)""},
