@@ -4497,7 +4497,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   // We first check if a conductor ideal was computed. If not, we don't
   // compute a universal denominator.
   ideal Id1;
-  if(J != 0)
+  if(size(J) != 0)
   {
     if(denomOption == 0)
     {

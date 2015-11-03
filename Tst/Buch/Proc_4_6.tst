@@ -82,7 +82,7 @@ NOTE:    algorithm of Gianni/Trager/Zacharias
      prim=PrimaryTest(primary,fac[1][k]);
 //---test whether all ideals were primary and in general
 //   position
-     if(prim==0)
+     if(size(prim)==0)
      {
        rest[size(rest)+1]=i+invphi(p);
      }

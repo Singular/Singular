@@ -818,7 +818,7 @@ EXAMPLE: example noetherNormal; shows an example
 "
 {
    i=simplify(i,2);
-   if ( i== 0)
+   if (size(i)== 0)
    {
      list l = maxideal(1),maxideal(1);
      return( l );
