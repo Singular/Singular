@@ -2824,10 +2824,7 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
     if( minres != NULL && syzstr->minres == NULL )
       syzstr->minres = minres;
   }
-
   return li;
-
-
 }
 
 /*3

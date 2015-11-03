@@ -4431,7 +4431,7 @@ static BOOLEAN jjDIFF_COEF(leftv res, leftv u, leftv v)
 static BOOLEAN jjJACOB_M(leftv res, leftv a)
 {
   ideal id = (ideal)a->Data();
-  id = idTransp(id);
+  id = id_Transp(id,currRing);
   int W = IDELEMS(id);
 
   ideal result = idInit(W * currRing->N, id->rank);
@@ -5453,7 +5453,7 @@ static BOOLEAN jjDIM_R(leftv res, leftv v)
 }
 static BOOLEAN jjidTransp(leftv res, leftv v)
 {
-  res->data = (char *)idTransp((ideal)v->Data());
+  res->data = (char *)id_Transp((ideal)v->Data(),currRing);
   return FALSE;
 }
 static BOOLEAN jjnInt(leftv res, leftv u)

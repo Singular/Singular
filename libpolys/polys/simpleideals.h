@@ -116,7 +116,9 @@ BOOLEAN id_IsConstant(ideal id, const ring r);
 /// uses lex-ordering when nolex = FALSE
 intvec *id_Sort(const ideal id, const BOOLEAN nolex, const ring r);
 
+/// transpose a module
 ideal id_Transp(ideal a, const ring rRing);
+
 void id_Compactify(ideal id, const ring r);
 ideal  id_Mult (ideal h1,ideal  h2, const ring r);
 ideal id_Homogen(ideal h, int varnum,const ring r);
