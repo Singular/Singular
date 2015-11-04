@@ -9,7 +9,7 @@ proc testMinAssZero(method, I)
 {
   def result = method(I);
   ASSUME(0, size(result)==1);
-  ASSUME(0, result[1]==0 );
+  ASSUME(0, result[1][1]==0 );
 }
 
 
@@ -18,8 +18,8 @@ proc testPrimdecZero(method, I)
   def result = method(I);
   ASSUME(0, size(result)==1);
   ASSUME(0, size(result[1])==2 );
-  ASSUME(0, result[1][1]==0 );
-  ASSUME(0, result[1][2]==0 );
+  ASSUME(0, result[1][1][1]==0 );
+  ASSUME(0, result[1][2][1]==0 );
 }
 
 proc primdecGTZkeepKomp (I)          {    return ( primdecGTZ(I,"keep_comp") );    }

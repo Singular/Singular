@@ -270,7 +270,7 @@ EXAMPLE: example milnor; shows an example
   int l,q,m_nr;  ideal t;  intvec disc;
   int p = printlevel-voice+2;             // p=printlevel+1 (default: p=0)
 //---------------------------- hypersurface case ------------------------------
-  if( n==1 or i==0 )
+  if( n==1 or n==0 )
   {
      i = std(jacob(i[1]));
      m_nr = vdim(i);

@@ -1404,7 +1404,7 @@ EXAMPLE: example texpoly; shows an example
     if(size(#)){ sep = #[1];}
   }
 
-  if (I==0)
+  if (size(I)==0)
   { if (!(defined(NoDollars))){return("$0$");}
     else {return("0");}
   }

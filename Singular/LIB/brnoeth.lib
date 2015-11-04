@@ -57,7 +57,7 @@ EXAMPLE:    example closed_points; shows an example
 "
 {
   ideal II=std(I);
-  if (II==1)
+  if (II[1]==1)
   {
     return(list());
   }
@@ -498,7 +498,7 @@ static proc closed_points_deg (poly f,int d,ideal SL)
   {
     if (degree_P(L[i])==d)
     {
-      counter=counter+1;
+      counter++;
       LP[counter]=L[i];
     }
   }

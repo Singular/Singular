@@ -621,18 +621,18 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
   poly dhf = subst(f,var(3),1);
   int n = deg(f);
   if((choices[1]==1) || (choices[1]==3)) // no local analysis of singularities
-    {
-      ideal AI;
-      if (choices[1]==1)
-      { AI = adjointIdealIB(f,insert(choices,ideal(0),size(choices))); }
-      else
-      { AI = adjointIdealIQ(f,insert(choices,ideal(0),size(choices))); }
-      AI = homog(std(AI),var(3));
-      AI = sat(AI, maxideal(1))[1];
-      AI = minbase(AI);
-      setring Roriginal;
-      return(imap(RP2,AI));
-    }
+  {
+    ideal AI;
+    if (choices[1]==1)
+    { AI = adjointIdealIB(f,insert(choices,ideal(0),size(choices))); }
+    else
+    { AI = adjointIdealIQ(f,insert(choices,ideal(0),size(choices))); }
+    AI = homog(std(AI),var(3));
+    AI = sat(AI, maxideal(1))[1];
+    AI = minbase(AI);
+    setring Roriginal;
+    return(imap(RP2,AI));
+  }
   list LL = geomGenusLA(f);  // local analysis of singularities
   int sizeLL2 = size(LL[2]);
   int sizeLL3 = size(LL[3]);
@@ -640,11 +640,11 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
   ideal LL4 = LL[4];
   if((LL[1]!=0) && (find(choices[2],"rattestyes")))
   { ERROR("not a rational curve"); }
-  if((LL[2]==0) && (sizeLL3==0)  && (LL4==1))  // smooth case
-    {
-      setring Roriginal;
-      return(ideal(1));
-    }
+  if((LL[2]==0) && (sizeLL3==0)  && (LL4[1]==1))  // smooth case
+  {
+    setring Roriginal;
+    return(ideal(1));
+  }
   int j,k;
   list rl = ringlist(RP2);
   rl[2] = list(var(1), var(2));
@@ -655,77 +655,77 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
                                // (except possibly nodes)
   else                         // there are ordinary multiple points
                                // (other than nodes)
+  {
+    setring Rdummy;
+    list OMP = imap(RP2,LL3);
+    int ub;
+    for(k=1;k<=size(OMP);k++)
     {
-      setring Rdummy;
-      list OMP = imap(RP2,LL3);
-      int ub;
-      for(k=1;k<=size(OMP);k++)
+      if(OMP[k][1]>ub)
+      {
+        ub = OMP[k][1];
+      }
+    }
+    int lb = ub;
+    for(k=1;k<=size(OMP);k++)
+    {
+      if(OMP[k][1]<lb)
+      {
+        lb = OMP[k][1];
+      }
+    }
+    for(k=lb;k<=ub;k++)
+    {
+      ideal A(k) = 1;
+    }
+    for(k=1;k<=size(OMP);k++)
+    {
+      A(OMP[k][1]) = intersect(A(OMP[k][1]), OMP[k][2]);
+    }
+    int i = ub;
+    setring RP2;
+    for(k=lb;k<=ub;k++)
+    {
+      ideal A(k) = homog(std(fetch(Rdummy,A(k))),var(3));
+    }
+    B = maxideal(n-i);
+    ideal A;
+    while(i>=lb)
+    {
+      A = A(i)**(i-1);
+      j=1;
+      while(j<=ncols(A))
+      {
+        if(deg(A[j]>(n-2)))
         {
-          if(OMP[k][1]>ub)
-            {
-              ub = OMP[k][1];
-            }
+          A = sat(A, maxideal(1))[1];
+          break;
         }
-     int lb = ub;
-     for(k=1;k<=size(OMP);k++)
-        {
-          if(OMP[k][1]<lb)
-            {
-              lb = OMP[k][1];
-            }
-        }
-     for(k=lb;k<=ub;k++)
-       {
-         ideal A(k) = 1;
-       }
-     for(k=1;k<=size(OMP);k++)
-       {
-         A(OMP[k][1]) = intersect(A(OMP[k][1]), OMP[k][2]);
-       }
-     int i = ub;
-     setring RP2;
-     for(k=lb;k<=ub;k++)
-       {
-         ideal A(k) = homog(std(fetch(Rdummy,A(k))),var(3));
-       }
-     B = maxideal(n-i);
-     ideal A;
-     while(i>=lb)
-        {
-          A = A(i)**(i-1);
-          j=1;
-          while(j<=ncols(A))
-            {
-              if(deg(A[j]>(n-2)))
-                {
-                  A = sat(A, maxideal(1))[1];
-                  break;
-                 }
-              j = j+1;
-            }
-          B = intersect(B,A);
-          i = i-1;
-       }
-    }  //end else
+        j = j+1;
+      }
+      B = intersect(B,A);
+      i = i-1;
+    }
+  }  //end else
   B = intersect(B,homog(std(LL4),var(3)));  // add nodes and cusps
   if(sizeLL2==0)  // ordinary multiple points plus cusps only
-    {
-      ideal AI = sat(B, maxideal(1))[1];
-      AI = minbase(AI);
-      setring Roriginal;
-      return(imap(RP2,AI));
-    }
+  {
+    ideal AI = sat(B, maxideal(1))[1];
+    AI = minbase(AI);
+    setring Roriginal;
+    return(imap(RP2,AI));
+  }
   setring Rdummy;
   poly f = imap(RP2,dhf);
   ideal SL = jacob(f),f;
   SL = sat(SL, fetch(RP2,LL4))[1];
   if(sizeLL3!=0)
+  {
+    for(k=lb;k<=ub;k++)
     {
-      for(k=lb;k<=ub;k++)
-        {
-          SL = sat(SL, A(k))[1];
-        }
+      SL = sat(SL, A(k))[1];
     }
+  }
   list PD = primdecGTZ(SL);  // could be made faster -- see minAssGTZ
                              // in deltaLocMod -- only one PD needed
   int pd = size(PD);
@@ -733,14 +733,18 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
   list PD = imap(Rdummy,PD);
   ideal AI = 1;
   for(k=1;k<=pd;k++)
+  {
+    if (choices[1]==2)
     {
-      if (choices[1]==2)
-      { AI = intersect(AI,adjointIdealIB(f,insert(choices,PD[k][1],
-                                                 size(choices)))); }
-      else
-      { AI = intersect(AI,adjointIdealIQ(f,insert(choices,PD[k][1],
-                                                 size(choices)))); }
+      AI = intersect(AI,adjointIdealIB(f,insert(choices,PD[k][1],
+                                                 size(choices))));
     }
+    else
+    {
+      AI = intersect(AI,adjointIdealIQ(f,insert(choices,PD[k][1],
+                                                 size(choices))));
+    }
+  }
   AI = homog(std(AI),var(3));
   AI = intersect(AI,B);
   AI = sat(AI, maxideal(1))[1];
@@ -793,21 +797,21 @@ RETURN:  ideal containing the adjoint ideal of the curve defined by f. @*
   def QF = ring(rl);   // make var(1) transcendental
   list LIntB;
   if(DATA[1] <= 4)  // use normalization algorithm
-    {
-      LIntB = integralBasis(f, 2, list(list("inputC", DATA[3]),"isIrred"));
-    }
+  {
+    LIntB = integralBasis(f, 2, list(list("inputC", DATA[3]),"isIrred"));
+  }
   else                                 // use van Hoeij's algorithm
-    {
-      LIntB = integralBasisVH(f,DATA[3],2);  // van Hoeij in future version
-                                             // used when DATA[1] = 5
-    }
-  if(find(DATA[2],"rattestyes") && (DATA[3]==0))
-    {
-      setring Roriginal;
-      int gg = geomGenusIB(f,imap(Rdummy, LIntB));
-      if(gg!=0){ERROR("not a rational curve");}
-      setring Rdummy;
-    }
+  {
+    LIntB = integralBasisVH(f,DATA[3],2);  // van Hoeij in future version
+                                           // used when DATA[1] = 5
+  }
+  if(find(DATA[2],"rattestyes") && (size(DATA[3])==0))
+  {
+    setring Roriginal;
+    int gg = geomGenusIB(f,imap(Rdummy, LIntB));
+    if(gg!=0){ERROR("not a rational curve");}
+    setring Rdummy;
+  }
   int i,j,k,l;
   ideal IB = LIntB[1];
   poly d = LIntB[2];
@@ -831,35 +835,35 @@ RETURN:  ideal containing the adjoint ideal of the curve defined by f. @*
   list Iij, empty;
   matrix Gij[sL][sL];
   for(i = 1; i <= sL; i++)
-     {
-       for(j = i; j <= sL; j++)
-          {
-            setring Rred;
-            Gij = 0;
-            eiej = IB[i]*IB[j];
-            Iij=empty;
-            for(k = 1; k <= sL; k++)
-               {
-                  Iij[k] = reduce(eiej*IB[k],fred);
-               }
-            Gij = coeffs(ideal(Iij[1..sL]),var(1));
-            setring QF;
-            Gij = imap (Rred, Gij);
-            for(k = 1; k <= sL; k++)
-               {
-                  dummyvector = Gij[1..sL,k];
-                  LS = lusolve(LUM[1], LUM[2], LUM[3], dummyvector);
-                  Tr[i,j] = Tr[i,j] + 1/d^3*LS[2][k,1];
-               }
-          }
-     }
+  {
+    for(j = i; j <= sL; j++)
+    {
+      setring Rred;
+      Gij = 0;
+      eiej = IB[i]*IB[j];
+      Iij=empty;
+      for(k = 1; k <= sL; k++)
+      {
+        Iij[k] = reduce(eiej*IB[k],fred);
+      }
+      Gij = coeffs(ideal(Iij[1..sL]),var(1));
+      setring QF;
+      Gij = imap (Rred, Gij);
+      for(k = 1; k <= sL; k++)
+      {
+        dummyvector = Gij[1..sL,k];
+        LS = lusolve(LUM[1], LUM[2], LUM[3], dummyvector);
+        Tr[i,j] = Tr[i,j] + 1/d^3*LS[2][k,1];
+      }
+    }
+  }
   for(i = 1; i <= sL; i++)
-     {
-       for(j = 1; j < i; j++)
-          {
-             Tr[i,j] = Tr[j,i];
-          }
-     }
+  {
+    for(j = 1; j < i; j++)
+    {
+      Tr[i,j] = Tr[j,i];
+    }
+  }
   LUM = ludecomp(Tr);
   setring Rred;
   poly d2f = imap(Rdummy,d2f);

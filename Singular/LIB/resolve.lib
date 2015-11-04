@@ -1435,7 +1435,7 @@ EXAMPLE: internal procedure - no example available
 //-------------------------------------------------------------------------
   for(kk=1;kk<=count;kk++)
   {
-    if(size(monlist[kk]==0)) break;
+    if(size(monlist[kk])==0) break;
     kill comblist;
     list comblist;
 //--- transscribe the tuples from monomial notation to intvec notation

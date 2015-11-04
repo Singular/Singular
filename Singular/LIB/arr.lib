@@ -1909,7 +1909,7 @@ EXAMPLE:    example arrOrlikSolomon;"
     module M = fetch(startRing,M); //brings the module M to the Exterior Algebra
     ideal OSI = ideal(X*M);
 
-    if(OSI == 0){ // no relations among hyperplanes, I==0
+    if(size(OSI) == 0){ // no relations among hyperplanes, I==0
         export(I);
         return(basering);
     }
