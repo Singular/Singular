@@ -22,7 +22,6 @@ command rm -rf singular-$VERSION/*/autom4te.cache
 command rm -rf singular-$VERSION/*/*/autom4te.cache
 command rm -rf singular-$VERSION/omalloc/Misc
 command rm -rf singular-$VERSION/Singular/LIB/surfex
-command rm -rf singular-$VERSION/Singular/dyn_modules/*/test*sh
 command rm -rf singular-$VERSION/Singular/cnf2ideal.py
 command rm -rf singular-$VERSION/kernel/old singular-$VERSION/kernel/sample
 command rm -rf singular-$VERSION/dox/Doxyfile.html.all singular-$VERSION/dox/Doxyfile.in1 singular-$VERSION/dox/Doxyfile.latex.short singular-$VERSION/dox/readme
