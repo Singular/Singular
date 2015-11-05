@@ -60,9 +60,11 @@ DISTCLEANFILES = omConfig.h
 ####################################################
 ## Test program
 
-TESTS = omtTest-m omtTest-r
+TESTS = getlucky-omtTest-m getlucky-omtTest-r
 
-check_PROGRAMS = $(TESTS)
+check_PROGRAMS = omtTest-m omtTest-r
+
+check_SCRIPTS = $(TESTS)
 
 # EXTRA_PROGRAMS = omtTest-r
 
@@ -78,3 +80,12 @@ omtTest_r_LDADD    = libomalloc.la
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = omalloc.pc
 
+getlucky-omtTest-m: getlucky-omtTest-X.sh
+	$(LN_S) $< $@
+
+getlucky-omtTest-r: getlucky-omtTest-X.sh
+	$(LN_S) $< $@
+
+CLEANFILES += $(TESTS)
+
+EXTRA_DIST = getlucky-omtTest-X.sh
