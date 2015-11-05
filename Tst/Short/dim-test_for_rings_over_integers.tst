@@ -19,7 +19,7 @@ if ( not ( dim(i) == expectedDimension ) )
 {  ERROR ("dim() test: expected dim( ideal(-1) )="+string(expectedDimension)+" ,but got "+string(dim(i))+"for ring " + rngStr );      }
 
 i = -1;
-if (not (std(i)==1) )
+if (not (std(i)[1]==1) )
 {  ERROR ("dim() test: error : -1 not recognized as unit " );      }
 
 
