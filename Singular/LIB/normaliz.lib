@@ -1,16 +1,16 @@
 //// Singular library normaliz.lib
 
-version="version normaliz.lib 4.0.1.0 Jan_2015 "; // $Id$
+version="version normaliz.lib 4.0.2.1 Sept_2015 "; // $Id$
 category="Commutative Algebra";
 info="
-LIBRARY: normaliz.lib  Provides an interface for the use of Normaliz 2.8 or
+LIBRARY: normaliz.lib  Provides an interface for the use of Normaliz 2.11 or
          newer within SINGULAR.
 AUTHORS: Winfried Bruns, Winfried.Bruns@Uni-Osnabrueck.de
          Christof Soeger, Christof.Soeger@Uni-Osnabrueck.de
 
 OVERVIEW:
 @texinfo
-The library normaliz.lib provides an interface for the use of Normaliz 2.8 or
+The library normaliz.lib provides an interface for the use of Normaliz 2.11 or
 newer within SINGULAR. The exchange of data is via files.
 In addition to the top level
 functions that aim at objects of type ideal or ring, several other auxiliary
@@ -390,7 +390,7 @@ EXAMPLE:  example rmNmzFiles; shows an example
     }
 
     list suffixes="in","gen","out","cst","typ","egn","esp","inv","tri","ht1",
-                  "ext";
+                  "ext","dec", "lat", "mod";
     int i,dummy;
     string f;
 
@@ -604,10 +604,23 @@ static proc doWriteNmzData(list #)
                 write(outf,s);
             }
             if (n_mode == 20) {
-                write(outf,"grading");
-            } else {
-                write(outf,n_mode);
-            }
+                write(outf,"grading");}
+            if (n_mode == 0) {
+                write(outf,"integral_closure");}
+            if (n_mode == 1) {
+                write(outf,"normalization");}
+            if (n_mode == 2) {
+                write(outf,"polytope");}
+            if (n_mode == 3) {
+                write(outf,"rees_algebra");}
+            if (n_mode == 4) {
+                write(outf,"inequalities");}
+            if (n_mode == 5) {
+                write(outf,"equations");}
+            if (n_mode == 6) {
+                write(outf,"congruences");}
+            if (n_mode == 10) {
+                write(outf,"lattice_ideal");}
             write(outf,"");
         }
     }
@@ -777,6 +790,9 @@ The Normaliz options are accessible via the following names:
 @* @code{-x=N:  threads} In this case the int parameter is used to set the
                          number of threads N, 0 means no explicit limiting.
 
+            In the next version of this library the options will be accessible
+            via their standard Normaliz 3.0 names.
+
 SEE ALSO: showNmzOptions
 EXAMPLE:  example setNmzOption; shows an example
 "
@@ -896,10 +912,25 @@ RETURN:   The function applies Normaliz to the parameter sgr in the mode set
           by nmz_mode. The function returns the intmat defined by the file
           with suffix gen.
 
-          It is also possible to give more than one pair of matrix and mode. In
-          this case all matrices and modes are used. This can be used to
-          combine modes 4,5,6.
-          Use nmz_mode=20 to specify a grading.
+          It is also possible to give more than one pair of matrix and mode.
+          In this case all matrices and modes are used.
+
+          In this version one must use the old numerical types of input matrices
+          according to the following table:
+
+@* @code{0:  cone}
+@* @code{1:  cone_and_lattice}
+@* @code{2:  polytope}
+@* @code{3:  rees_algebra}
+@* @code{4:  inequalities}
+@* @code{5:  equations}
+@* @code{6:  congruences}
+@* @code{10:  lattice_ideal}
+@* @code{20:  grading}
+
+          In the next version all input types of Normaliz 3.0 will be accessible
+          via their names. See the Normaliz manual for more information.
+
 NOTE:     You will find procedures for many applications of Normaliz in this
           library, so the explicit call of this procedure may not be necessary.
 SEE ALSO: intclToricRing, normalToricRing, ehrhartRing, intclMonIdeal,
@@ -1061,7 +1092,6 @@ example
   nmz_hilbert_basis_elements;
   nmz_number_extreme_rays;
   nmz_rank;
-  nmz_index;
   nmz_number_support_hyperplanes;
   nmz_multiplicity;
   nmz_primary;

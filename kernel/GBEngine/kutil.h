@@ -174,10 +174,7 @@ public:
 #endif
 };
 
-#ifndef SING_NDEBUG
 extern int strat_nr;
-extern int strat_fac_debug;
-#endif
 
 class sLObject : public sTObject
 {
@@ -344,11 +341,8 @@ public:
   ring tailRing;
   omBin lmBin;
   omBin tailBin;
-#ifndef SING_NDEBUG
   int nr;
-#endif
   int cp,c3;
-  int cv; // in shift bases: counting V criterion
   int sl,mu;
   int syzl,syzmax,syzidxmax;
   int tl,tmax;
@@ -362,6 +356,7 @@ public:
   int minim;
   #ifdef HAVE_SHIFTBBA
   int lV;
+  int cv; // in shift bases: counting V criterion
   #endif
   BOOLEAN interpt;
   BOOLEAN homog;
@@ -447,10 +442,16 @@ int posInLF5C (const LSet set, const int length,
                LObject* L,const kStrategy strat);
 int posInLSig (const LSet set, const int length,
                LObject* L,const kStrategy strat);
+int posInLRing (const LSet set, const int length,
+               LObject* L,const kStrategy strat);
 int posInSyz (const kStrategy strat, const poly sig);
 int posInL0 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL11 (const LSet set, const int length,
+             LObject* L,const kStrategy strat);
+int posInL11Ring (const LSet set, const int length,
+             LObject* L,const kStrategy strat);
+int posInL11Ringls (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL13 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
@@ -498,6 +499,7 @@ void enterpairsSig (poly h, poly hSig, int from, int k, int ec, int pos,kStrateg
 void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void entersets (LObject h);
 void pairs ();
+BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR = -1, bool enterTstrong = FALSE);
 void message (int i,int* reduc,int* olddeg,kStrategy strat,int red_result);
 void messageStat (int hilbcount,kStrategy strat);
 #ifdef KDEBUG
@@ -524,6 +526,7 @@ void initSyzRules (kStrategy strat);
 void updateS(BOOLEAN toT,kStrategy strat);
 void enterSyz (LObject &p,kStrategy strat, int atT);
 void enterT (LObject &p,kStrategy strat, int atT = -1);
+void enterT_strong (LObject &p,kStrategy strat, int atT = -1);
 void cancelunit (LObject* p,BOOLEAN inNF=FALSE);
 void HEckeTest (poly pp,kStrategy strat);
 void initBuchMoraCrit(kStrategy strat);
@@ -734,6 +737,9 @@ BOOLEAN kCheckSpolyCreation(LObject* L, kStrategy strat, poly &m1, poly &m2);
 //             exponent bound of strat->tailRing
 //      FALSE, otherwise
 BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat);
+poly preIntegerCheck(ideal F, ideal Q);
+void postReduceByMon(LObject* h, kStrategy strat);
+void finalReduceByMon(kStrategy strat);
 #endif
 // change strat->tailRing and adjust all data in strat, L, and T:
 // new tailRing has larger exponent bound

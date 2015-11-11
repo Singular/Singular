@@ -16,7 +16,6 @@ EMACS = \
 
 dist_emacs_DATA = $(EMACS)
 
-# test.sing
 # TODO: remove this!
 #all-local:
 #	[ -d ${builddir} ] || ln -s ${srcdir} ${builddir}

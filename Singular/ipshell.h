@@ -61,8 +61,6 @@ const char *  Tok2Cmdname(int i);
 const char *  iiTwoOps(int t);
 int           iiOpsTwoChar(const char *s);
 
-int     IsPrime(int i);
-
 BOOLEAN iiWRITE(leftv res,leftv exprlist);
 BOOLEAN iiExport(leftv v, int toLev);
 BOOLEAN iiExport(leftv v, int toLev, package pack);

@@ -455,18 +455,18 @@ KINLINE void  sTObject::pCleardenom()
   else
     {
       if (t_p != NULL)
-	{
-	  p_ProjectiveUnique(t_p, tailRing);
-	  pSetCoeff0(p, pGetCoeff(t_p));
-	}
+      {
+        p_ProjectiveUnique(t_p, tailRing);
+        pSetCoeff0(p, pGetCoeff(t_p));
+      }
       else
-	{
+      {
 #ifdef HAVE_RATGRING
-          p_ProjectiveUnique(p, currRing);
+        p_ProjectiveUnique(p, currRing);
 #else
-          p_ProjectiveUnique(p, currRing);
+        p_ProjectiveUnique(p, currRing);
 #endif
-	}
+      }
     }
 }
 
@@ -1147,7 +1147,21 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
 {
   assume(p_sev == pGetShortExpVector(p));
   if (strat->noClearS) return;
-  if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at])) return;
+  #if HAVE_RINGS
+    if(rField_is_Ring(currRing))
+    {
+        if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at]))
+            return;
+        if(!n_DivBy(pGetCoeff(strat->S[*at]), pGetCoeff(p), currRing))
+            return;
+    }
+    else
+    {
+        if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at])) return;
+    }
+  #else
+    if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at])) return;
+  #endif
   deleteInS((*at),strat);
   (*at)--;
   (*k)--;

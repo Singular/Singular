@@ -1582,13 +1582,14 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, const ring r)
     }
     while (i>=0);
   }
-#ifdef HAVE_RINGS
+/*#ifdef HAVE_RINGS
   pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == n_DivBy(p_GetCoeff(b, r), p_GetCoeff(a, r), r->cf));
   return (!rField_is_Ring(r)) || n_DivBy(p_GetCoeff(b, r), p_GetCoeff(a, r), r->cf);
 #else
+*/
   pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == TRUE);
   return TRUE;
-#endif
+//#endif
 }
 
 static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, const ring r_a, poly b, const ring r_b)
@@ -1603,11 +1604,12 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, const ring r_a, poly b, con
     i--;
   }
   while (i);
-#ifdef HAVE_RINGS
+/*#ifdef HAVE_RINGS
   return n_DivBy(p_GetCoeff(b, r_b), p_GetCoeff(a, r_a), r_a->cf);
 #else
+*/
   return TRUE;
-#endif
+//#endif
 }
 
 #ifdef HAVE_RATGRING
@@ -1623,11 +1625,12 @@ static inline BOOLEAN _p_LmDivisibleByNoCompPart(poly a, const ring r_a, poly b,
     i--;
   }
   while (i>=start);
-#ifdef HAVE_RINGS
+/*#ifdef HAVE_RINGS
   return n_DivBy(p_GetCoeff(b, r_b), p_GetCoeff(a, r_a), r_a->cf);
 #else
+*/
   return TRUE;
-#endif
+//#endif
 }
 static inline BOOLEAN _p_LmDivisibleByPart(poly a, const ring r_a, poly b, const ring r_b,const int start, const int end)
 {

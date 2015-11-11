@@ -2772,7 +2772,7 @@ static proc islp()
 proc algeDecoE(ideal I, int w)
 {//reduces primery decomposition over algebraic extensions to
 //the other cases
-    return( algeDeco_i( 1, I, int w) );
+    return( algeDeco_i( 1, I, w) );
 }
 
 //w=0: GTZ
@@ -2782,7 +2782,7 @@ proc algeDecoE(ideal I, int w)
 proc algeDeco(ideal I, int w)
 {//reduces primery decomposition over algebraic extensions to
 //the other cases
-    return( algeDeco_i(0, I, int w));
+    return( algeDeco_i(0, I, w));
 }
 
 

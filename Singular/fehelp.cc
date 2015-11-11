@@ -442,8 +442,8 @@ static BOOLEAN heKey2Entry(char* filename, char* key, heEntry hentry)
           i++;
         }
         if (c == EOF) goto Failure;
-	if (hentry->node[0]=='\0')
-	  strcpy(hentry->node,hentry->key);
+        if (hentry->node[0]=='\0')
+          strcpy(hentry->node,hentry->key);
 
         // get url
         //hentry->node[i] = '\0';
@@ -902,29 +902,48 @@ static void heGenHelp(heEntry hentry, int br)
                      /* always defined */
                    if (hentry != NULL && *(hentry->url) != '\0')
                    #ifdef HAVE_VSNPRINTF
-                     snprintf(temp,256,"%s/%d-%d-%d/%s", htmldir,
+                   {
+                     if (*p=='H')
+                       snprintf(temp,256,"%s/%d-%d-%d/%s", htmldir,
                                   SINGULAR_VERSION/1000,
                                  (SINGULAR_VERSION % 1000)/100,
                                  (SINGULAR_VERSION % 100)/10,
-                     hentry->url);
+                       hentry->url);
+                     else
+                       snprintf(temp,256,"%s/%s", htmldir, hentry->url);
+                   }
                    else
-                     snprintf(temp,256,"%s/%d-%d-%d/index.htm", htmldir,
+                   {
+                     if (*p=='H')
+                       snprintf(temp,256,"%s/%d-%d-%d/index.htm", htmldir,
                                   SINGULAR_VERSION/1000,
                                  (SINGULAR_VERSION % 1000)/100,
                                  (SINGULAR_VERSION % 100)/10
-                     );
+                       );
+                     else
+                       snprintf(temp,256,"%s/index.htm", htmldir);
+                   }
                    #else
-                     sprintf(temp,"%s/%d-%d-%d/%s", htmldir,
+                   {
+                     if (*p=='H')
+                       sprintf(temp,"%s/%d-%d-%d/%s", htmldir,
                                   SINGULAR_VERSION/1000,
                                  (SINGULAR_VERSION % 1000)/100,
                                  (SINGULAR_VERSION % 100)/10,
-                     hentry->url);
+                       hentry->url);
+                     else
+                       sprintf(temp,"%s/%d-%d-%d/%s", htmldir, hentry->url);
+                   }
                    else
-                     sprintf(temp,"%s/%d-%d-%d/index.htm", htmldir,
+                     if (*p=='H')
+                       sprintf(temp,"%s/%d-%d-%d/index.htm", htmldir,
                                   SINGULAR_VERSION/1000,
                                  (SINGULAR_VERSION % 1000)/100,
                                  (SINGULAR_VERSION % 100)/10
-                     );
+                       );
+                     else
+                       sprintf(temp,"%s/index.htm", htmldir);
+                   }
                    #endif
                    strcat(sys,temp);
                    if ((*p)=='f')

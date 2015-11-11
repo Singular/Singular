@@ -60,4 +60,8 @@ PLIBS = bimodules.lib bfun.lib central.lib dmod.lib dmodapp.lib dmodvar.lib\
         purityfiltration.lib nchomolog.lib ratgb.lib \
 	ncall.lib
 
-
+# contributed libs, status not yet decided
+SLIB2 = KVequiv.lib arr.lib binresol.lib brillnoether.lib chern.lib \
+        cimonom.lib deflation.lib graal.lib hess.lib lejeune.lib \
+	mathml.lib maxlike.lib modwalk.lib recover.lib redcgs.lib \
+	rwalk.lib swalk.lib GND.lib

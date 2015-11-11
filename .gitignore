@@ -63,7 +63,6 @@ _config.h.in
 /omalloc/omConfig.h
 /omalloc/omConfig.h.in
 /omalloc/omExternalConfig.h
-/omalloc/omlimits.h
 /omalloc/omTables
 /omalloc/omTables.dSYM/*
 /omalloc/omTables.h

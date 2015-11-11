@@ -10,7 +10,7 @@
 #include <kernel/ideals.h>
 #include <kernel/combinatorics/stairc.h>
 #include <kernel/GBEngine/kstd1.h>
-#include <Singular/ipshell.h> // for isPrime(int i)
+#include <misc/prime.h> // for isPrime(int i)
 
 /***
  * Computes the dimension of an ideal I in ring r
@@ -25,7 +25,11 @@ int dim(ideal I, ring r)
   if (rField_is_Ring(currRing))
   {
     int i = idPosConstant(I);
-    if ((i != -1) && (n_IsUnit(p_GetCoeff(I->m[i],currRing->cf),currRing->cf)))
+    if ((i != -1)
+    #ifdef HAVE_RINGS
+    && (n_IsUnit(p_GetCoeff(I->m[i],currRing->cf),currRing->cf))
+    #endif
+    )
       return -1;
     ideal vv = id_Head(I,currRing);
     if (i != -1) pDelete(&vv->m[i]);

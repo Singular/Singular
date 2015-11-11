@@ -19,7 +19,7 @@ extern ring currRing;
 //typedef struct sip_smap *          map;
 typedef ideal *            resolvente;
 
-inline ideal idCopyFirstK (const ideal ide, const int k)
+static inline ideal idCopyFirstK (const ideal ide, const int k)
 {
   return id_CopyFirstK(ide, k, currRing);
 }
@@ -28,7 +28,7 @@ void idKeepFirstK(ideal ide, const int k);
 void idDelEquals(ideal id);
 
 /// delete an ideal
-inline void idDelete (ideal* h)
+static inline void idDelete (ideal* h)
 {
   id_Delete(h, currRing);
 }
@@ -166,14 +166,14 @@ ideal   idHead(ideal h);
 
 BOOLEAN idIsSubModule(ideal id1,ideal id2);
 
-inline ideal idVec2Ideal(poly vec)
+static inline ideal idVec2Ideal(poly vec)
 {
   return id_Vec2Ideal(vec, currRing);
 }
 
 ideal   idSeries(int n,ideal M,matrix U=NULL,intvec *w=NULL);
 
-inline BOOLEAN idIsZeroDim(ideal i)
+static inline BOOLEAN idIsZeroDim(ideal i)
 {
   return id_IsZeroDim(i, currRing);
 }
@@ -181,19 +181,13 @@ inline BOOLEAN idIsZeroDim(ideal i)
 matrix  idDiff(matrix i, int k);
 matrix  idDiffOp(ideal I, ideal J,BOOLEAN multiply=TRUE);
 
-inline intvec *idSort(ideal id,BOOLEAN nolex=TRUE)
+static inline intvec *idSort(ideal id,BOOLEAN nolex=TRUE)
 {
   return id_Sort(id, nolex, currRing);
 }
 
 ideal   idModulo (ideal h1,ideal h2, tHomog h=testHomog, intvec ** w=NULL);
 matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
-
-/// transpose a module
-inline ideal   idTransp(ideal a)
-{
-  return id_Transp(a, currRing);
-}
 
 // intvec *idQHomWeight(ideal id);
 

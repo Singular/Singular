@@ -64,7 +64,6 @@ AC_SEARCH_LIBS(sem_wait,[rt pthreads pthread],[],[
   AC_MSG_ERROR([sem_wait not found in rt,pthreads,pthread])
 ])
 
-#AC_CHECK_LIB(pthread,pthread_create)
 AX_PTHREAD([], [
   AC_MSG_ERROR([Pthread library not found. Please set PTHREAD_CFLAGS and PTHREAD_LIBS correctly for your setup])
 ])

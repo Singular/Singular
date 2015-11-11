@@ -727,6 +727,7 @@ ring   rAssure_SyzComp(const ring r, BOOLEAN complete = TRUE);
 ring   rAssure_dp_S(const ring r);
 ring   rAssure_dp_C(const ring r);
 ring   rAssure_C_dp(const ring r);
+ring   rAssure_c_dp(const ring r);
 
 /// makes sure that c/C ordering is last ordering
 ring   rAssure_CompLastBlock(const ring r, BOOLEAN complete = TRUE);

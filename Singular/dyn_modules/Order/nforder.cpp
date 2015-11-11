@@ -484,7 +484,7 @@ bigintmat *radicalmodpbase(nforder *o, number p, coeffs c) {
       klauf = n_Init(1, o->basecoeffs());
       for (; n_Greater(ex, klauf, o->basecoeffs());) {
         o->elMult(prod, bas);
-        prod->mod(p, c);
+        prod->mod(p);
         temp = n_Add(klauf, eins, o->basecoeffs());
         n_Delete(&klauf, o->basecoeffs());
         klauf = temp;
@@ -549,6 +549,7 @@ void rowhnf(bigintmat * b) {
   delete m;
 }
 
+#ifdef HAVE_RINGS
 number multring(bigintmat *nbase, nforder *o, number p) {
   coeffs R = o->basecoeffs();
   number divi;
@@ -601,7 +602,9 @@ number multring(bigintmat *nbase, nforder *o, number p) {
   n_Delete(&divi, o->basecoeffs());
   return divisor;
 }
+#endif
 
+#ifdef HAVE_RINGS
 nforder *onestep(nforder *o, number p, coeffs c) {
   // Berechne F_p-Basis von I_p/pI_p
   bigintmat *basis;
@@ -623,7 +626,9 @@ nforder *onestep(nforder *o, number p, coeffs c) {
   n_Delete(&divisor, c);
   return no;
 }
+#endif
 
+#ifdef HAVE_RINGS
 nforder *pmaximal(nforder *o, number p) {
   coeffs c = o->basecoeffs();
   nforder *no = o;
@@ -642,6 +647,7 @@ nforder *pmaximal(nforder *o, number p) {
   } while (1);
   return no;
 }
+#endif
 
 /*
 // Zum Round2 fehlt noch die Faktorisierung der Diskriminante. Daher auch noch nicht getestet

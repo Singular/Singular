@@ -2921,18 +2921,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         else
   #endif
   #endif
-  /*==================== facstd_debug ==================================*/
-  #if !defined(SING_NDEBUG)
-      if(strcmp(sys_cmd,"facstd")==0)
-      {
-        extern int strat_nr;
-        extern int strat_fac_debug;
-        strat_fac_debug=(int)(long)h->Data();
-        strat_nr=0;
-        return FALSE;
-      }
-      else
-  #endif
   #ifdef HAVE_RING2TOM
   /*==================== ring-GB ==================================*/
       if (strcmp(sys_cmd, "findZeroPoly")==0)

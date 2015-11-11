@@ -71,25 +71,36 @@ static void ndInpAdd(number &a, number b, const coeffs r)
 
 static void ndPower(number a, int i, number * res, const coeffs r)
 {
-  if (i==0) {
+  if (i==0)
+  {
     *res = r->cfInit(1, r);
-  } else if (i==1) {
+  }
+  else if (i==1)
+  {
     *res = r->cfCopy(a, r);
-  } else if (i==2) {
+  }
+  else if (i==2)
+  {
     *res = r->cfMult(a, a, r);
-  } else if (i<0) {
+  }
+  else if (i<0)
+  {
     number b = r->cfInvers(a, r);
     ndPower(b, -i, res, r);
     r->cfDelete(&b, r);
-  } else {
+  }
+  else
+  {
     ndPower(a, i/2, res, r);
     r->cfInpMult(*res, *res, r);
-    if (i&1) {
+    if (i&1)
+    {
       r->cfInpMult(*res, a, r);
     }
   }
 }
 
+static BOOLEAN ndIsUnit(number a, const coeffs r) { return !r->cfIsZero(a,r); }
 #ifdef LDEBUG
 // static void   nDBDummy1(number* d,char *, int) { *d=NULL; }
 static BOOLEAN ndDBTest(number, const char *, const int, const coeffs){ return TRUE; }
@@ -243,7 +254,6 @@ number nd_Copy(number a, const coeffs r) { return r->cfCopy(a, r); }
 #ifdef HAVE_RINGS
 static BOOLEAN ndDivBy(number, number, const coeffs) { return TRUE; } // assume a,b !=0
 static int ndDivComp(number, number, const coeffs) { return 2; }
-static BOOLEAN ndIsUnit(number a, const coeffs r) { return !r->cfIsZero(a,r); }
 static number  ndExtGcd (number, number, number *, number *, const coeffs r) { return r->cfInit(1,r); }
 #endif
 
@@ -364,10 +374,10 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfClearContent = ndClearContent;
     n->cfClearDenominators = ndClearDenominators;
 
+    n->cfIsUnit = ndIsUnit;
 #ifdef HAVE_RINGS
     n->cfDivComp = ndDivComp;
     n->cfDivBy = ndDivBy;
-    n->cfIsUnit = ndIsUnit;
     n->cfExtGcd = ndExtGcd;
     //n->cfGetUnit = (nMapFunc)NULL;
 #endif

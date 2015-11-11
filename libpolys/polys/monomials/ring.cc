@@ -4892,6 +4892,11 @@ ring rAssure_C_dp(const ring r)
   return rAssure_Global(ringorder_C, ringorder_dp, r);
 }
 
+ring rAssure_c_dp(const ring r)
+{
+  return rAssure_Global(ringorder_c, ringorder_dp, r);
+}
+
 
 
 /// Finds p^th IS ordering, and returns its position in r->typ[]

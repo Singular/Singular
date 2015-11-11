@@ -933,13 +933,13 @@ EXAMPLE: example isQuotientRing ; shows an example
 "
 {
     if ( defined(basering) )  {   def BAS=basering;  }
+    else { return (0); }
 
     //access to quotient ideal will fail, if basering and rng differs.
     setring rng;
     int result =  ( size(ideal(rng)) != 0);
 
-    if ( defined(BAS) )   {    setring BAS;   }
-
+    setring BAS;
     return (result);
 }
 example

@@ -129,7 +129,7 @@ int Conti_Traverso(INPUT_FILE MATRIX,
   if(variables<=0)
   {
     cerr<<"ERROR: int Conti_Traverso(INPUT_FILE, const BOOLEAN&):\n"
-      "number of variables / matrix columns must be positve"<<endl;
+      "number of variables / matrix columns must be positive"<<endl;
     return 0;
   }
 
@@ -210,7 +210,7 @@ int Conti_Traverso(INPUT_FILE MATRIX,
   if(constraints<=0)
   {
     cerr<<"ERROR: int Conti_Traverso(INPUT_FILE, const BOOLEAN&):\n"
-      "number of constraints / matrix rows must be positve"<<endl;
+      "number of constraints / matrix rows must be positive"<<endl;
     // Solving problems without constraints is possible, but not very
     // interesting (because trivial). To avoid the problems and the overhead
     // incurred by an "empty" matrix, such problems are refused.
@@ -417,7 +417,7 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
   if(variables<=0)
   {
     cerr<<"ERROR: int Positive_Conti_Traverso(INPUT_FILE, const BOOLEAN&):\n"
-      "number of variables / matrix columns must be positve"<<endl;
+      "number of variables / matrix columns must be positive"<<endl;
     return 0;
   }
 
@@ -498,7 +498,7 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
   if(constraints<=0)
   {
     cerr<<"ERROR: int Positive_Conti_Traverso(INPUT_FILE, const BOOLEAN&):\n"
-      "number of constraints / matrix rows must be positve"<<endl;
+      "number of constraints / matrix rows must be positive"<<endl;
     // Solving problems without constraints is possible, but not very
     // interesting (because trivial). To avoid the problems and the overhead
     // incurred by an "empty" matrix, such problems are refused.
@@ -714,7 +714,7 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
   if(variables<=0)
   {
     cerr<<"ERROR: int Elim_Conti_Traverso(INPUT_FILE, const BOOLEAN&):\n"
-      "number of variables / matrix columns must be positve"<<endl;
+      "number of variables / matrix columns must be positive"<<endl;
     return 0;
   }
 
@@ -795,7 +795,7 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
   if(constraints<=0)
   {
     cerr<<"ERROR: int Elim_Conti_Traverso(INPUT_FILE, const BOOLEAN&):\n"
-      "number of constraints / matrix rows must be positve"<<endl;
+      "number of constraints / matrix rows must be positive"<<endl;
     // Solving problems without constraints is possible, but not very
     // interesting (because trivial). To avoid the problems and the overhead
     // incurred by an "empty" matrix, such problems are refused.
@@ -1003,7 +1003,7 @@ int Pottier(INPUT_FILE MATRIX,
   if(variables<=0)
   {
     cerr<<"ERROR: int Pottier(INPUT_FILE, const BOOLEAN&):\n"
-      "number of variables / matrix columns must be positve"<<endl;
+      "number of variables / matrix columns must be positive"<<endl;
     return 0;
   }
 
@@ -1084,7 +1084,7 @@ int Pottier(INPUT_FILE MATRIX,
   if(constraints<=0)
   {
     cerr<<"ERROR: int Pottier(INPUT_FILE, const BOOLEAN&):\n"
-      "number of constraints / matrix rows must be positve"<<endl;
+      "number of constraints / matrix rows must be positive"<<endl;
     // Solving problems without constraints is possible, but not very
     // interesting (because trivial). To avoid the problems and the overhead
     // incurred by an "empty" matrix, such problems are refused.
@@ -1291,7 +1291,7 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
   if(variables<=0)
   {
     cerr<<"ERROR: int Hosten_Sturmfels(INPUT_FILE, const BOOLEAN&):\n"
-      "number of variables / matrix columns must be positve"<<endl;
+      "number of variables / matrix columns must be positive"<<endl;
     return 0;
   }
 
@@ -1372,7 +1372,7 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
   if(constraints<=0)
   {
     cerr<<"ERROR: int Hosten_Sturmfels(INPUT_FILE, const BOOLEAN&):\n"
-      "number of constraints / matrix rows must be positve"<<endl;
+      "number of constraints / matrix rows must be positive"<<endl;
     // Solving problems without constraints is possible, but not very
     // interesting (because trivial). To avoid the problems and the overhead
     // incurred by an "empty" matrix, such problems are refused.
@@ -1702,7 +1702,7 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
   if(variables<=0)
   {
     cerr<<"ERROR: int DiBiase_Urbanke(INPUT_FILE, const BOOLEAN&):\n"
-      "number of variables / matrix columns must be positve"<<endl;
+      "number of variables / matrix columns must be positive"<<endl;
     return 0;
   }
 
@@ -1783,7 +1783,7 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
   if(constraints<=0)
   {
     cerr<<"ERROR: int DiBiase_Urbanke(INPUT_FILE, const BOOLEAN&):\n"
-      "number of constraints / matrix rows must be positve"<<endl;
+      "number of constraints / matrix rows must be positive"<<endl;
     // Solving problems without constraints is possible, but not very
     // interesting (because trivial). To avoid the problems and the overhead
     // incurred by an "empty" matrix, such problems are refused.
@@ -2070,7 +2070,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
   if(variables<=0)
   {
     cerr<<"ERROR: int Bigatti_LaScala_Robbiano(INPUT_FILE, const BOOLEAN&):\n"
-      "number of variables / matrix columns must be positve"<<endl;
+      "number of variables / matrix columns must be positive"<<endl;
     return 0;
   }
 
@@ -2154,7 +2154,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
   if(constraints<=0)
   {
     cerr<<"ERROR: int Bigatti_LaScala_Robbiano(INPUT_FILE, const BOOLEAN&):\n"
-      "number of constraints / matrix rows must be positve"<<endl;
+      "number of constraints / matrix rows must be positive"<<endl;
     // Solving problems without constraints is possible, but not very
     // interesting (because trivial). To avoid the problems and the overhead
     // incurred by an "empty" matrix, such problems are refused.
@@ -3711,7 +3711,7 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
   if(new_variables<=0)
   {
     cerr<<"ERROR: int change_cost(INPUT_FILE, INPUT_FILE):\n"
-      "number of variables in second input file must be positve"<<endl;
+      "number of variables in second input file must be positive"<<endl;
     return 0;
   }
 

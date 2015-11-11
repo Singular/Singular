@@ -48,6 +48,8 @@ int ksReducePoly(LObject* PR,
   {
     Print("Red %d:", red_count); PR->wrp(); Print(" with:");
     PW->wrp();
+    //printf("\necart(PR)-ecart(PW): %i\n",PR->ecart-PW->ecart);
+    //pWrite(PR->p);
   }
 #endif
 #endif
@@ -158,6 +160,7 @@ int ksReducePoly(LObject* PR,
   if (TEST_OPT_DEBUG)
   {
     Print(" to: "); PR->wrp(); Print("\n");
+    //printf("\nt^%i ", PR->ecart);pWrite(pHead(PR->p));
   }
 #endif
   return ret;

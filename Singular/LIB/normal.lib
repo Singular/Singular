@@ -4435,7 +4435,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   // singular locus.
   ideal inputC = fetch(R, inputC);
   ideal inputJ = fetch(R, inputJ);
-  if((inputC == 0) && (inputJ == 0))
+  if((size(inputC) == 0) && (size(inputJ) == 0))
   {
     // We compute the radical of the ideal of minors modulo the original ideal.
     // This is done only in the first step.
@@ -4497,7 +4497,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   // We first check if a conductor ideal was computed. If not, we don't
   // compute a universal denominator.
   ideal Id1;
-  if(J != 0)
+  if(size(J) != 0)
   {
     if(denomOption == 0)
     {
@@ -4555,7 +4555,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   // ordering.
   setring R;
   // If a test ideal is given at the input, we use it.
-  if(inputJ == 0)
+  if(size(inputJ) == 0)
   {
     if(isGlobal == 1)
     {
