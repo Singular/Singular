@@ -709,7 +709,7 @@ EXAMPLE: example determinecenter; shows an example
     rs[i]=size(Coef[i]);
     if (rs[i]==2)
     {
-      for (j=1;j<=2;j++)i
+      for (j=1;j<=2;j++)
       {
         for (l=1;l<=n; l++)
         {
