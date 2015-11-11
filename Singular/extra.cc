@@ -2705,7 +2705,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           L->m[4].data=(void *)v;
           //---<>--degenerations---------
           int deg = r.deg;    // number of points
-          intvec* w = new intvec( r.speicher );  // necessary memeory
+          intvec* w = new intvec( r.speicher );  // necessary memory
           i=0;               // start copying
           do
           {
