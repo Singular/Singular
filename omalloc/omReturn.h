@@ -51,7 +51,11 @@
 #ifndef GET_RET_ADDR
 
 #if __GNUC__ > 1
+#ifdef OM_GET_RETURN_ADDR_WORKS
 #define GET_RET_ADDR(file) (file = __builtin_return_address(0))
+#else
+#define GET_RET_ADDR(file)	(file = 0)
+#endif
 #else
 #define GET_RET_ADDR(file)	(file = 0)
 #endif

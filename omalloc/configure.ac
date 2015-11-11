@@ -462,6 +462,7 @@ AC_MSG_CHECKING(whether GET_RET_ADDR works)
 AC_CACHE_VAL(ac_cv_get_return_addr_works,
 AC_TRY_RUN([
 #include <stdlib.h>
+#define OM_GET_RETURN_ADDR_WORKS 1
 #include "omReturn.h"
 int test_return_addr()
 {
@@ -519,6 +520,7 @@ AC_MSG_CHECKING(whether addr2line works)
 AC_CACHE_VAL(ac_cv_prog_addr2line_works,
 AC_TRY_RUN([
 #include <stdlib.h>
+#define OM_GET_RETURN_ADDR_WORKS 1
 #include "omReturn.h"
 #include "omStructs.h"
 /* #include "omGetBackTrace.h" */
