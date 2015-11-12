@@ -623,6 +623,28 @@ ideal gI =  std(I);
 gI;
 std(gI);
 reduce(I,gI);
+kill rng;
+
+//  Github Adi: #29
+
+ring rng = (integer),(x,y,z),lp;
+option(redSB);
+option(redTail);
+ideal I = -4*z+10;
+ideal J = -7*x+4*z,-13;
+ideal gI = std(I);
+ideal gJ = std(J);
+ideal IJ   = intersect(I,J) ;
+ideal gIJ = intersect( gI,gJ ); // falsch!
+ASSUME(0, idealsEqual(IJ , gIJ )   ) ;
+gI;
+gJ;
+IJ;
+gIJ;
+attrib(gI,"isSB",0);
+attrib(gJ,"isSB",0);
+ideal ngIJ = intersect(gI,gJ ); // wrong
+kill rng;
        
 tst_status(1);$;      
 

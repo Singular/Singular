@@ -451,6 +451,7 @@ int redRing (LObject* h,kStrategy strat)
     pWrite(h->p);
     printf("\nFound j = %i\n",j);pWrite(strat->T[j].p);
     #endif
+    //enterT(*h, strat);
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat); // with debug output
     #if ADIDEBUG
     printf("\nand after reduce: \n");pWrite(h->p);
@@ -1765,6 +1766,12 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           strat->enterS(strat->P, pos, strat, strat->tl);
         }
       }
+      #if ADIDEBUG
+      for(int iii = 0; iii<=strat->tl;iii++)
+      {
+        printf("\nT[%i] = ",iii);pWrite(strat->T[iii].p);
+      }
+      #endif
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
