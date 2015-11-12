@@ -7,12 +7,12 @@ Matrix<T>::Matrix( int nr, int nc ) : NR(nr), NC(nc)
 {
     ASSERT( (nr > 0 && nc > 0) || (nr == 0 && nc == 0), "illegal index" );
     if ( nr == 0 )
-	elems = 0;
+        elems = 0;
     else {
-	int i;
-	elems = new T_ptr[nr];
-	for ( i = 0; i < nr; i++ )
-	    elems[i] = new T[nc];
+        int i;
+        elems = new T_ptr[nr];
+        for ( i = 0; i < nr; i++ )
+            elems[i] = new T[nc];
     }
 }
 
@@ -20,15 +20,15 @@ template <class T>
 Matrix<T>::Matrix( const Matrix<T>& M ) : NR(M.NR), NC(M.NC)
 {
     if ( NR == 0 )
-	elems = 0;
+        elems = 0;
     else {
-	int i, j;
-	elems = new T_ptr[NR];
-	for ( i = 0; i < NR; i++ ) {
-	    elems[i] = new T[NC];
-	    for ( j = 0; j < NC; j++ )
-		elems[i][j] = M.elems[i][j];
-	}
+        int i, j;
+        elems = new T_ptr[NR];
+        for ( i = 0; i < NR; i++ ) {
+            elems[i] = new T[NC];
+            for ( j = 0; j < NC; j++ )
+                elems[i][j] = M.elems[i][j];
+        }
     }
 }
 
@@ -36,10 +36,10 @@ template <class T>
 Matrix<T>::~Matrix()
 {
     if ( elems != 0 ) {
-	int i;
-	for ( i = 0; i < NR; i++ )
-	    delete [] elems[i];
-	delete [] elems;
+        int i;
+        for ( i = 0; i < NR; i++ )
+            delete [] elems[i];
+        delete [] elems;
     }
 }
 
@@ -47,19 +47,19 @@ template <class T>
 Matrix<T>& Matrix<T>::operator= ( const Matrix<T>& M )
 {
     if ( this != &M ) {
-	int i, j;
-	if ( NR != M.NR || NC != M.NC ) {
-	    for ( i = 0; i < NR; i++ )
-		delete [] elems[i];
-	    delete elems;
-	    NR = M.NR; NC = M.NC;
-	    elems = new T_ptr[NR];
-	    for ( i = 0; i < NR; i++ )
-		elems[i] = new T[NC];
-	}
-	for ( i = 0; i < NR; i++ )
-	    for ( j = 0; j < NC; j++ )
-		elems[i][j] = M.elems[i][j];
+        int i, j;
+        if ( NR != M.NR || NC != M.NC ) {
+            for ( i = 0; i < NR; i++ )
+                delete [] elems[i];
+            delete elems;
+            NR = M.NR; NC = M.NC;
+            elems = new T_ptr[NR];
+            for ( i = 0; i < NR; i++ )
+                elems[i] = new T[NC];
+        }
+        for ( i = 0; i < NR; i++ )
+            for ( j = 0; j < NC; j++ )
+                elems[i][j] = M.elems[i][j];
     }
     return *this;
 }
@@ -111,10 +111,10 @@ void Matrix<T>::swapRow ( int i, int j )
 {
     ASSERT( i > 0 && i <= NR && j > 0 && j <= NR, "illegal index" );
     if ( i != j ) {
-	i--; j--;
-	T * h = elems[i];
-	elems[i] = elems[j];
-	elems[j] = h;
+        i--; j--;
+        T * h = elems[i];
+        elems[i] = elems[j];
+        elems[j] = h;
     }
 }
 
@@ -123,13 +123,13 @@ void Matrix<T>::swapColumn ( int i, int j )
 {
     ASSERT( i > 0 && i <= NC && j > 0 && j <= NC, "illegal index" );
     if ( i != j ) {
-	int k;
-	i--; j--;
-	for ( k = 0; k < NR; k++ ) {
-	    T h = elems[k][i];
-	    elems[k][i] = elems[k][j];
-	    elems[k][j] = h;
-	}
+        int k;
+        i--; j--;
+        for ( k = 0; k < NR; k++ ) {
+            T h = elems[k][i];
+            elems[k][i] = elems[k][j];
+            elems[k][j] = h;
+        }
     }
 }
 
@@ -139,7 +139,7 @@ void Matrix<T>::printrow ( OSTREAM & s, int i ) const
 {
     s << "( " << elems[i][0];
     for ( int j = 1; j < NC; j++ )
-	s << ", " << elems[i][j];
+        s << ", " << elems[i][j];
     s << " )";
 }
 
@@ -147,21 +147,21 @@ template <class T>
 void Matrix<T>::print( OSTREAM& s ) const
 {
     if ( NR == 0 )
-	s << "( )";
+        s << "( )";
     else if ( NR == 1 ) {
-	s << "( ";
-	printrow( s, 0 );
-	s << " )";
+        s << "( ";
+        printrow( s, 0 );
+        s << " )";
     }
     else {
-	int i;
-	s << "(\n";
-	printrow( s, 0 );
-	for ( i = 1; i < NR; i++ ) {
-	    s << ",\n";
-	    printrow( s, i );
-	}
-	s << "\n)";
+        int i;
+        s << "(\n";
+        printrow( s, 0 );
+        for ( i = 1; i < NR; i++ ) {
+            s << ",\n";
+            printrow( s, i );
+        }
+        s << "\n)";
     }
 }
 #endif /* NOSTREAMIO */
@@ -173,8 +173,8 @@ Matrix<T> operator+ ( const Matrix<T>& lhs, const Matrix<T>& rhs )
     Matrix<T> res( lhs.NR, rhs.NR );
     int i, j;
     for ( i = 0; i < lhs.NR; i++ )
-	for ( j = 0; j < lhs.NC; j++ )
-	    res.elems[i][j] = lhs.elems[i][j] + rhs.elems[i][j];
+        for ( j = 0; j < lhs.NC; j++ )
+            res.elems[i][j] = lhs.elems[i][j] + rhs.elems[i][j];
     return res;
 }
 
@@ -185,8 +185,8 @@ Matrix<T> operator- ( const Matrix<T>& lhs, const Matrix<T>& rhs )
     Matrix<T> res( lhs.NR, rhs.NR );
     int i, j;
     for ( i = 0; i < lhs.NR; i++ )
-	for ( j = 0; j < lhs.NC; j++ )
-	    res.elems[i][j] = lhs.elems[i][j] - rhs.elems[i][j];
+        for ( j = 0; j < lhs.NC; j++ )
+            res.elems[i][j] = lhs.elems[i][j] - rhs.elems[i][j];
     return res;
 }
 
@@ -196,8 +196,8 @@ Matrix<T> operator* ( const Matrix<T>& lhs, const T& rhs )
     Matrix<T> res( lhs.NR, lhs.NC );
     int i, j;
     for ( i = 0; i < lhs.NR; i++ )
-	for ( j = 0; j < lhs.NC; j++ )
-	    res.elems[i][j] = lhs.elems[i][j] * rhs;
+        for ( j = 0; j < lhs.NC; j++ )
+            res.elems[i][j] = lhs.elems[i][j] * rhs;
     return res;
 }
 
@@ -207,8 +207,8 @@ Matrix<T> operator* ( const T& lhs, const Matrix<T>& rhs )
     Matrix<T> res( rhs.NR, rhs.NC );
     int i, j;
     for ( i = 0; i < rhs.NR; i++ )
-	for ( j = 0; j < rhs.NC; j++ )
-	    res.elems[i][j] = rhs.elems[i][j] * lhs;
+        for ( j = 0; j < rhs.NC; j++ )
+            res.elems[i][j] = rhs.elems[i][j] * lhs;
     return res;
 }
 
@@ -219,11 +219,11 @@ Matrix<T> operator* ( const Matrix<T>& lhs, const Matrix<T>& rhs )
     Matrix<T> res( lhs.NR, rhs.NC );
     int i, j, k;
     for ( i = 0; i < lhs.NR; i++ )
-	for ( j = 0; j < rhs.NC; j++ ) {
-	    res[i][j] = 0;
-	    for ( k = 0; k < lhs.NC; k++ )
-		res[i][j]+= lhs.elems[i][k] * rhs.elems[k][j];
-	}
+        for ( j = 0; j < rhs.NC; j++ ) {
+            res[i][j] = 0;
+            for ( k = 0; k < lhs.NC; k++ )
+                res[i][j]+= lhs.elems[i][k] * rhs.elems[k][j];
+        }
     return res;
 }*/
 
@@ -238,10 +238,10 @@ SubMatrix<T>& SubMatrix<T>::operator= ( const Matrix<T>& S )
 {
     ASSERT( r_max - r_min + 1 == S.NR && c_max - c_min + 1 == S.NC, "incompatible matrices" );
     if ( M.elems != S.elems ) {
-	int i, j;
-	for ( i = 0; i < S.NR; i++ )
-	    for ( j = 0; j < S.NC; j++ )
-		M.elems[r_min+i-1][c_min+j-1] = S.elems[i][j];
+        int i, j;
+        for ( i = 0; i < S.NR; i++ )
+            for ( j = 0; j < S.NC; j++ )
+                M.elems[r_min+i-1][c_min+j-1] = S.elems[i][j];
     }
     return *this;
 }
@@ -254,31 +254,31 @@ SubMatrix<T>& SubMatrix<T>::operator= ( const SubMatrix<T>& S )
     n = r_max - r_min + 1;
     m = c_max - c_min + 1;
     if ( M.elems == S.M.elems ) {
-	if ( r_min < S.r_min ) {
-	    for ( i = 0; i < n; i++ )
-		for ( j = 0; j < m; j++ )
-		    M.elems[r_min+i-1][c_min+j-1] = S.M.elems[S.r_min+i-1][S.c_min+j-1];
-	}
-	else if ( r_min > S.r_min ) {
-	    for ( i = n-1; i >= 0; i-- )
-		for ( j = 0; j < m; j++ )
-		    M.elems[r_min+i-1][c_min+j-1] = S.M.elems[S.r_min+i-1][S.c_min+j-1];
-	}
-	else if ( c_min < S.c_min ) {
-	    for ( j = 0; j < m; j++ )
-		for ( i = 0; i < n; i++ )
-		    M.elems[r_min+i-1][c_min+j-1] = S.M.elems[S.r_min+i-1][S.c_min+j-1];
-	}
-	else if ( c_min > S.c_min ) {
-	    for ( j = m-1; j >= 0; j-- )
-		for ( i = 0; i < n; i++ )
-		    M.elems[r_min+i-1][c_min+j-1] = S.M.elems[S.r_min+i-1][S.c_min+j-1];
-	}
+        if ( r_min < S.r_min ) {
+            for ( i = 0; i < n; i++ )
+                for ( j = 0; j < m; j++ )
+                    M.elems[r_min+i-1][c_min+j-1] = S.M.elems[S.r_min+i-1][S.c_min+j-1];
+        }
+        else if ( r_min > S.r_min ) {
+            for ( i = n-1; i >= 0; i-- )
+                for ( j = 0; j < m; j++ )
+                    M.elems[r_min+i-1][c_min+j-1] = S.M.elems[S.r_min+i-1][S.c_min+j-1];
+        }
+        else if ( c_min < S.c_min ) {
+            for ( j = 0; j < m; j++ )
+                for ( i = 0; i < n; i++ )
+                    M.elems[r_min+i-1][c_min+j-1] = S.M.elems[S.r_min+i-1][S.c_min+j-1];
+        }
+        else if ( c_min > S.c_min ) {
+            for ( j = m-1; j >= 0; j-- )
+                for ( i = 0; i < n; i++ )
+                    M.elems[r_min+i-1][c_min+j-1] = S.M.elems[S.r_min+i-1][S.c_min+j-1];
+        }
     }
     else {
-	for ( i = 0; i < n; i++ )
-	    for ( j = 0; j < m; j++ )
-		M.elems[r_min+i-1][c_min+j-1] = S.M.elems[S.r_min+i-1][S.c_min+j-1];
+        for ( i = 0; i < n; i++ )
+            for ( j = 0; j < m; j++ )
+                M.elems[r_min+i-1][c_min+j-1] = S.M.elems[S.r_min+i-1][S.c_min+j-1];
     }
     return *this;
 }
@@ -290,8 +290,8 @@ SubMatrix<T>::operator Matrix<T>() const
     int i, j;
     int n = r_max - r_min + 1, m = c_max - c_min + 1;
     for ( i = 0; i < n; i++ )
-	for ( j = 0; j < m; j++ )
-	    res.elems[i][j] = M.elems[r_min+i-1][c_min+j-1];
+        for ( j = 0; j < m; j++ )
+            res.elems[i][j] = M.elems[r_min+i-1][c_min+j-1];
     return res;
 }
 

@@ -65,15 +65,15 @@ inline bool gf_isone ( long a )
 inline int gf_int2gf ( int i )
 {
     while ( i < 0 )
-	i += gf_p;
+        i += gf_p;
     while ( i >= gf_p )
-	i -= gf_p;
+        i -= gf_p;
     if ( i == 0 )
-	return gf_q;
+        return gf_q;
     int c = 0;
     while ( i > 1 ) {
-	c = gf_table[c];
-	i--;
+        c = gf_table[c];
+        i--;
     }
     return c;
 }
@@ -81,15 +81,15 @@ inline int gf_int2gf ( int i )
 inline long gf_int2gf ( long i )
 {
     while ( i < 0 )
-	i += gf_p;
+        i += gf_p;
     while ( i >= gf_p )
-	i -= gf_p;
+        i -= gf_p;
     if ( i == 0 )
-	return gf_q;
+        return gf_q;
     long c = 0;
     while ( i > 1 ) {
-	c = gf_table[c];
-	i--;
+        c = gf_table[c];
+        i--;
     }
     return c;
 }
@@ -113,9 +113,9 @@ inline
 int gf_sign ( int a )
 {
     if ( gf_iszero( a ) )
-	return 0;
+        return 0;
     else
-	return 1;
+        return 1;
 }
 //}}}
 
@@ -126,7 +126,7 @@ inline int gf_neg ( int a )
     if ( a == gf_q ) return a;
     int i = a + gf_m1;
     if ( i >= gf_q1 )
-	i -= gf_q1;
+        i -= gf_q1;
     return i;
 }
 
@@ -138,19 +138,19 @@ inline int gf_add ( int a, int b )
     if ( b == gf_q ) return a;
     int zb, zab, r;
     if ( a >= b ) {
-	zb = b;
-	zab = a - b;
+        zb = b;
+        zab = a - b;
     }
     else {
-	zb = a;
-	zab = b - a;
+        zb = a;
+        zab = b - a;
     }
     if ( gf_table[zab] == gf_q )
-	r = gf_q; /*if z^(a-b)+1 =0*/
+        r = gf_q; /*if z^(a-b)+1 =0*/
     else {
-	r= zb + gf_table[zab];
-	if ( r >= gf_q1 )
-	    r -= gf_q1;
+        r= zb + gf_table[zab];
+        if ( r >= gf_q1 )
+            r -= gf_q1;
     }
     return r;
 }
@@ -163,22 +163,22 @@ inline int gf_sub ( int a, int b )
 inline int gf_mul ( int a, int b )
 {
     if ( a == gf_q || b == gf_q )
-	return gf_q;
+        return gf_q;
     else {
-	int i = a + b;
-	if ( i >= gf_q1 ) i -= gf_q1;
-	return i;
+        int i = a + b;
+        if ( i >= gf_q1 ) i -= gf_q1;
+        return i;
     }
 }
 
 inline long gf_mul ( long a, int b )
 {
     if ( a == gf_q || b == gf_q )
-	return gf_q;
+        return gf_q;
     else {
-	long i = a + b;
-	if ( i >= gf_q1 ) i -= gf_q1;
-	return i;
+        long i = a + b;
+        if ( i >= gf_q1 ) i -= gf_q1;
+        return i;
     }
 }
 
@@ -186,12 +186,12 @@ inline int gf_div ( int a, int b )
 {
     ASSERT( b != gf_q, "divide by zero" );
     if ( a == gf_q )
-	return gf_q;
+        return gf_q;
     else {
-	int s = a - b;
-	if (s < 0)
-	    s += gf_q1;
-	return s;
+        int s = a - b;
+        if (s < 0)
+            s += gf_q1;
+        return s;
     }
 }
 
@@ -207,13 +207,13 @@ inline int gf_inv ( int a )
 inline void gf_print ( OSTREAM & os, int a )
 {
     if ( a == gf_q )
-	os << "0";
+        os << "0";
     else  if ( a == 0 )
-	os << "1";
+        os << "1";
     else  if ( a == 1 )
-	os << gf_name;
+        os << gf_name;
     else
-	os << gf_name << "^" << a;
+        os << gf_name << "^" << a;
 }
 #endif /* NOSTREAMIO */
 //}}}
@@ -222,21 +222,21 @@ inline void gf_print ( OSTREAM & os, int a )
 inline int gf_power ( int a, int n )
 {
     if ( n == 0 )
-	return 0;
+        return 0;
     else if ( n == 1 )
-	return a;
+        return a;
     else
-	return gf_mul( a, gf_power( a, n-1 ) );
+        return gf_mul( a, gf_power( a, n-1 ) );
 }
 
 inline long gf_power ( long a, int n )
 {
     if ( n == 0 )
-	return 0;
+        return 0;
     else if ( n == 1 )
-	return a;
+        return a;
     else
-	return gf_mul( a, gf_power( a, n-1 ) );
+        return gf_mul( a, gf_power( a, n-1 ) );
 }
 //}}}
 

@@ -43,8 +43,8 @@ public:
     ~Variable() {};
     Variable& operator= ( const Variable & v )
     {
-	_level = v._level;
-	return *this;
+        _level = v._level;
+        return *this;
     }
     int level() const { return _level; }
     char name() const;
@@ -52,27 +52,27 @@ public:
     Variable next() const { return Variable( _level+1 ); }
     friend bool operator == ( const Variable & lhs, const Variable & rhs )
     {
-	return lhs._level == rhs._level;
+        return lhs._level == rhs._level;
     }
     friend bool operator != ( const Variable & lhs, const Variable & rhs )
     {
-	return lhs._level != rhs._level;
+        return lhs._level != rhs._level;
     }
     friend bool operator > ( const Variable & lhs, const Variable & rhs )
     {
-	return lhs._level > rhs._level;
+        return lhs._level > rhs._level;
     }
     friend bool operator < ( const Variable & lhs, const Variable & rhs )
     {
-	return lhs._level < rhs._level;
+        return lhs._level < rhs._level;
     }
     friend bool operator >= ( const Variable & lhs, const Variable & rhs )
     {
-	return lhs._level >= rhs._level;
+        return lhs._level >= rhs._level;
     }
     friend bool operator <= ( const Variable & lhs, const Variable & rhs )
     {
-	return lhs._level <= rhs._level;
+        return lhs._level <= rhs._level;
     }
 #ifndef NOSTREAMIO
    friend OSTREAM & operator << ( OSTREAM & os, const Variable & v );

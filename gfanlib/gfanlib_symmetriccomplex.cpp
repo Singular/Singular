@@ -184,7 +184,7 @@ void SymmetricComplex::insert(Cone const &c)
 
 int SymmetricComplex::getLinDim()const
 {
-	return linealitySpace.getHeight();
+  return linealitySpace.getHeight();
 }
 
 int SymmetricComplex::getMaxDim()const

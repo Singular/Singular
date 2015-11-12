@@ -28,10 +28,10 @@
 #define SI_EINTR_SAVE_FUNC_TEMPLATE(return_type, newfunc, func, decl, args, err_domain) \
 static inline return_type newfunc decl   \
 {                                        \
-  int res = -1;	                         \
+  int res = -1;                                 \
   do                                     \
   {                                      \
-    res = func args;		         \
+    res = func args;                         \
   } while((res err_domain) && (errno == EINTR));\
   return res;                            \
 }
@@ -121,13 +121,13 @@ si_sleep(unsigned int seconds)
 SI_EINTR_SAVE_FUNC(int, dup, (int oldfd), (oldfd))
 SI_EINTR_SAVE_FUNC(int, dup2, (int oldfd, int newfd), (oldfd, newfd))
 //SI_EINTR_SAVE_FUNC(int, dup3, (int oldfd, int newfd, int flags),
-//		   (oldfd, newfd, flags))
+//                   (oldfd, newfd, flags))
 
 SI_EINTR_SAVE_FUNC(int, unlink, (const char *pathname), (pathname))
 
 SI_EINTR_SAVE_SCANF(int, vscanf,
-		   (const char *format, va_list ap),
-		   (format, ap))
+                   (const char *format, va_list ap),
+                   (format, ap))
 
 static inline
 int si_scanf(const char *format, ...)
@@ -140,8 +140,8 @@ int si_scanf(const char *format, ...)
 }
 
 SI_EINTR_SAVE_SCANF(int, vfscanf,
-		   (FILE *stream, const char *format, va_list ap),
-		   (stream, format, ap))
+                   (FILE *stream, const char *format, va_list ap),
+                   (stream, format, ap))
 
 static inline int
 si_fscanf(FILE *stream, const char *format, ...)
@@ -154,8 +154,8 @@ si_fscanf(FILE *stream, const char *format, ...)
 }
 
 SI_EINTR_SAVE_SCANF(int, vsscanf,
-		   (const char *str, const char *format, va_list ap),
-		   (str, format, ap))
+                   (const char *str, const char *format, va_list ap),
+                   (str, format, ap))
 
 static inline int
 si_sscanf(const char *str, const char *format, ...)

@@ -25,9 +25,9 @@ template <class T>
 void AFactor<T>::print ( OSTREAM& s ) const
 {
     if ( exp() == 1 )
-	s << "(" << factor() << ", " << minpoly() << ")";
+        s << "(" << factor() << ", " << minpoly() << ")";
     else
-	s << "((" << factor() << ")^" << exp() << ", " << minpoly() << ")";
+        s << "((" << factor() << ")^" << exp() << ", " << minpoly() << ")";
 }
 
 template <class T>

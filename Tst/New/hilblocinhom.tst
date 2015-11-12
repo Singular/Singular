@@ -8,10 +8,10 @@ ideal si=std(i);
 intvec v=hilb(si,1);
 ideal ss=std(i,v);
 for(int l=1;l<=size(si);l++)
-	{
-	if(si[l]!=ss[l])
-		{"false";}
-	}
+{
+  if(si[l]!=ss[l])
+  {"false";}
+}
 
 
 option(prot);
@@ -21,10 +21,10 @@ ideal si=std(i);
 intvec v=hilb(si,1);
 ideal ss=std(i,v);
 for(int l=1;l<=size(si);l++)
-	{
-	if(si[l]!=ss[l])
-		{"false";}
-	}
+{
+  if(si[l]!=ss[l])
+  {"false";}
+}
 
 
 tst_status(1);

@@ -11,17 +11,17 @@ template <class T>
 Array<T>::Array( const Array<T> & a )
 {
     if ( a._size > 0 ) {
-	_min = a._min;
-	_max = a._max;
-	_size = a._size;
-	data = new T[_size];
-	for ( int i = 0; i < _size; i++ )
-	    data[i] = a.data[i];
+        _min = a._min;
+        _max = a._max;
+        _size = a._size;
+        data = new T[_size];
+        for ( int i = 0; i < _size; i++ )
+            data[i] = a.data[i];
     }
     else {
-	data = 0;
-	_min = _size = 0;
-	_max = -1;
+        data = 0;
+        _min = _size = 0;
+        _max = -1;
     }
 }
 
@@ -32,24 +32,24 @@ Array<T>::Array( int i )
     _max = i-1;
     _size = i;
     if ( i == 0 )
-	data = 0;
+        data = 0;
     else
-	data = new T[_size];
+        data = new T[_size];
 }
 
 template <class T>
 Array<T>::Array( int min, int max )
 {
     if ( max < min ) {
-	_min = _size = 0;
-	_max = -1;
-	data = 0;
+        _min = _size = 0;
+        _max = -1;
+        data = 0;
     }
     else {
-	_min = min;
-	_max = max;
-	_size = _max - _min + 1;
-	data = new T[_size];
+        _min = min;
+        _max = max;
+        _size = _max - _min + 1;
+        data = new T[_size];
     }
 }
 
@@ -63,20 +63,20 @@ template <class T>
 Array<T>& Array<T>::operator= ( const Array<T> & a )
 {
     if ( this != &a ) {
-	delete [] data;
-	_min = a._min;
-	_max = a._max;
-	_size = a._size;
-	if ( a._size > 0 ) {
-	    _size = a._size;
-	    data = new T[_size];
-	    for ( int i = 0; i < _size; i++ )
-		data[i] = a.data[i];
-	}
-	else {
-	    data = 0;
-	    _size = 0;
-	}
+        delete [] data;
+        _min = a._min;
+        _max = a._max;
+        _size = a._size;
+        if ( a._size > 0 ) {
+            _size = a._size;
+            data = new T[_size];
+            for ( int i = 0; i < _size; i++ )
+                data[i] = a.data[i];
+        }
+        else {
+            data = 0;
+            _size = 0;
+        }
     }
     return *this;
 }
@@ -111,7 +111,7 @@ template <class T>
 Array<T>& Array<T>::operator*= ( const T & t )
 {
     for ( int i = 0; i < _size; i++ )
-	data[i] *= t;
+        data[i] *= t;
     return *this;
 }
 
@@ -119,7 +119,7 @@ template <class T>
 Array<T>& Array<T>::operator+= ( const T & t )
 {
     for ( int i = 0; i < _size; i++ )
-	data[i] += t;
+        data[i] += t;
     return *this;
 }
 
@@ -128,7 +128,7 @@ Array<T>& Array<T>::operator+= ( const Array<T> & a )
 {
     ASSERT ( _size == a._size, "warning: array size mismatch." );
     for ( int i = 0; i < _size; i++ )
-	data[i] += a.data[i];
+        data[i] += a.data[i];
     return *this;
 }
 */
@@ -138,12 +138,12 @@ template <class T>
 void Array<T>::print ( OSTREAM & os ) const
 {
     if ( _size == 0 )
-	os << "( )";
+        os << "( )";
     else {
-	os << "( " << data[0];
-	for ( int i = 1; i < _size; i++ )
-	    os << ", " << data[i];
-	os << " )";
+        os << "( " << data[0];
+        for ( int i = 1; i < _size; i++ )
+            os << ", " << data[i];
+        os << " )";
     }
 }
 

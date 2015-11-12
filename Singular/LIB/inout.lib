@@ -486,10 +486,10 @@ EXAMPLE: example show; shows an example
          list na@me@s=names(@id@);
          @@s = tab(@li@)+"// ring:"; @@s,s;
          @@s = tab(@li@)+"// minpoly ="; @@s,minpoly;
-	 if (size(ideal(@id@))>0)
-	 {
+         if (size(ideal(@id@))>0)
+         {
            @@s = tab(@li@)+"// quotient ring from ideal:"; @@s;ideal(@id@);
-	 }
+         }
          kill @id@;
          "// objects belonging to this ring:";
          listvar(poly);listvar(ideal);

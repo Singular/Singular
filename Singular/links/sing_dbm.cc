@@ -121,9 +121,9 @@ LINKAGE leftv dbRead2(si_link l, leftv key)
     //  if (strcmp(l->mode,"rw")==0) //rw-mode
     {
       if (!SI_LINK_CLOSE_P(l))
-	{
-	  if (!dbClose(l)) {Print("cannot close link!\n");}
-	}
+      {
+        if (!dbClose(l)) {Print("cannot close link!\n");}
+      }
       //(SI_LINK_CLOSE_P(l)) automatically
       if (dbOpen(l, SI_LINK_READ)) return NULL;
     }
@@ -159,7 +159,7 @@ LINKAGE leftv dbRead2(si_link l, leftv key)
     {
       if (db->actual.dptr==NULL)
       {
-	db->actual=gdbm_firstkey(db->db);
+        db->actual=gdbm_firstkey(db->db);
       }
       d_key = gdbm_nextkey(db->db,db->actual);
       db->actual=d_key;
@@ -214,13 +214,13 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
   else //rw-mode
     {
       if (!SI_LINK_W_OPEN_P(l)) //exceptions
-	{
-	  if (!SI_LINK_CLOSE_P(l))
-	    {
-	      if (!dbClose(l)) {Print("close error\n");};
-	    }
-	  if (!dbOpen(l,SI_LINK_WRITE)) {Print("open_for_write error\n");}
-	}
+      {
+        if (!SI_LINK_CLOSE_P(l))
+        {
+          if (!dbClose(l)) {Print("close error\n");};
+        }
+        if (!dbOpen(l,SI_LINK_WRITE)) {Print("open_for_write error\n");}
+      }
     }
 
   if((key!=NULL) && (key->Typ()==STRING_CMD) )
@@ -237,7 +237,7 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
         d_value.dsize = strlen(d_value.dptr)+1;
         ret  = gdbm_store(db->db, d_key, d_value, GDBM_REPLACE);
 //         db->actual=d_key;
-	if (ret==-1) {Print("reader calls gdbm_store!");}
+        if (ret==-1) {Print("reader calls gdbm_store!");}
         if (ret==0)
           { b=FALSE; }
         else
@@ -246,9 +246,9 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
           if (gdbm_errno != 0)
           {
             Werror("GDBM link I/O error: '%s' ", gdbm_errno);
-	    //            Print(gdbm_strerror(gdbm_errno));
+            //            Print(gdbm_strerror(gdbm_errno));
             //dbm_clearerr(db->db);
-	    //            gdbm_errno=0;
+            //            gdbm_errno=0;
           }
         }
       }

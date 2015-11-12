@@ -19,13 +19,13 @@ string toString(gfan::ZMatrix const &m, char *tab=0)
     {
       if(tab)s<<tab;
       for(int j=0;j<m.getWidth();j++)
-	{
-	  s<<m[i][j];
-	  if(i+1!=m.getHeight() || j+1!=m.getWidth())
-	    {
-	      s<<",";
-	    }
-	}
+      {
+        s<<m[i][j];
+        if(i+1!=m.getHeight() || j+1!=m.getWidth())
+          {
+            s<<",";
+          }
+      }
       s<<endl;
     }
   return s.str();
@@ -39,17 +39,17 @@ string toPrintString(gfan::ZMatrix const &m, int fieldWidth, char *tab=0)
     {
       if(tab)s<<tab;
       for(int j=0;j<m.getWidth();j++)
-	{
-	  stringstream temp;
-	  temp<<m[i][j];
-	  string temp2=temp.str();
-	  for(int k=temp2.size();k<fieldWidth;k++)s<<" ";
-	  s<<temp2;
-	  if(i+1!=m.getHeight() || j+1!=m.getWidth())
-	    {
-	      s<<" ";
-	    }
-	}
+      {
+        stringstream temp;
+        temp<<m[i][j];
+        string temp2=temp.str();
+        for(int k=temp2.size();k<fieldWidth;k++)s<<" ";
+        s<<temp2;
+        if(i+1!=m.getHeight() || j+1!=m.getWidth())
+          {
+            s<<" ";
+          }
+      }
       s<<endl;
     }
   return s.str();

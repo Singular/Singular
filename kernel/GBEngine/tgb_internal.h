@@ -1569,9 +1569,9 @@ public:
           for(i=start;i<=lastIndex;i++)
           {
             if (row_array[i]!=zero)
-	    { STATISTIC(n_Sub);
+            { STATISTIC(n_Sub);
               other_row_array[i]=F4mat_to_number_type(npSubM((number)(long) other_row_array[i], (number)(long) row_array[i],currRing->cf));
-	    }
+            }
 
           }
       }
@@ -1581,9 +1581,9 @@ public:
           for(i=start;i<=lastIndex;i++)
           {
             if (row_array[i]!=zero)
-	    { STATISTIC(n_Add);
+            { STATISTIC(n_Add);
               other_row_array[i]=F4mat_to_number_type(npAddM(npMult(coef2,(number)(long) row_array[i],currRing->cf),(number)(long) other_row_array[i],currRing->cf));
-	    }
+            }
 
           }
         }
@@ -1732,10 +1732,10 @@ public:
         for(i=start;i<=lastIndex;i++)
         {
           if (row_array[i]!=zero)
-	  {
-	    STATISTIC(n_Add);
+          {
+            STATISTIC(n_Add);
             other_row_array[i]=F4mat_to_number_type(npAddM(npMult(coef,(number)(long)row_array[i],currRing->cf),(number)(long)other_row_array[i],currRing->cf));
-	  }
+          }
         }
         updateLastReducibleIndex(other_row,r);
       }
@@ -1853,7 +1853,7 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
       if (srow->idx_array)
       {
         for(i=0;i<len;i++)
-	{
+        {
          int idx=old_to_new_indices[idx_array[i]];
          row[idx]=F4mat_to_number_type(coef_array[i]);
         }
@@ -1861,7 +1861,7 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
       else
       {
         for(i=0;i<len;i++)
-	{
+        {
           row[old_to_new_indices[i]]=F4mat_to_number_type(coef_array[i]);
         }
       }

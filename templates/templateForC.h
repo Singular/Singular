@@ -37,10 +37,10 @@ enum myEnum
  * The end!
  */
 int F1(
-	int a1,  /**< [in] some int.
-		  * aasas.
-		  * bbbb.
-		  */
+        int a1,  /**< [in] some int.
+                  * aasas.
+                  * bbbb.
+                  */
   int & r1 /**< [in,out] integer input and some resulting value */
        );
 

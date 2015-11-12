@@ -27,7 +27,7 @@ void* pyobject_autoload(blackbox* bbx)
 {
   assume(bbx != NULL);
   return (pyobject_load() || (bbx->blackbox_Init == pyobject_autoload)?
-	  NULL: bbx->blackbox_Init(bbx));
+    NULL: bbx->blackbox_Init(bbx));
 }
 
 void pyobject_default_destroy(blackbox  */*b*/, void */*d*/)

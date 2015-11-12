@@ -7,12 +7,12 @@ ideal gI =  std(I);
 gI;
 reduce(I,gI);
 ideal ggI = std(gI);
-size(gI);size(ggI); 
+size(gI);size(ggI);
 ideal gJ =  std(J);
 gJ;
 reduce(J,gJ);
 ideal ggJ = std(gJ);
-size(gJ);size(ggJ); 
+size(gJ);size(ggJ);
 
 tst_status(1);
 $
