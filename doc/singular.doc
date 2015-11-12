@@ -1111,15 +1111,7 @@ Issues:
 @c ----------------------------------------------------------
 @node GND_lib
 @subsection GND_lib
-
-Todos/Issues:
-@itemize
-@item example desingularization takes too much time (should only take some seconds)
-@item output of desingularization example is too large (should fit on a page)
-@item memory consumption of desingularization example is too large (should be << 1GB)
-@end itemize
-
-@c lib GND.lib no_ex
+@c lib GND.lib
 @c ----------------------------------------------------------
 @node gradedModules_lib
 @subsection gradedModules_lib
