@@ -612,7 +612,28 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-    /*======================= demon_list =====================*/
+  /*==================== std_syz =================*/
+    if (strcmp(sys_cmd, "std_syz") == 0)
+    {
+      ideal i1;
+      int i2;
+      if ((h!=NULL) && (h->Typ()==MODUL_CMD))
+      {
+        i1=(ideal)h->CopyD();
+        h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+        i2=(int)((long)h->Data());
+      }
+      else return TRUE;
+      res->rtyp=MODUL_CMD;
+      res->data=idXXX(i1,i2);
+      return FALSE;
+    }
+    else
+  /*======================= demon_list =====================*/
     if (strcmp(sys_cmd,"denom_list")==0)
     {
       res->rtyp=LIST_CMD;
@@ -2829,27 +2850,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==================== stdX =================*/
-      if (strcmp(sys_cmd, "std") == 0)
-      {
-        ideal i1;
-        int i2;
-        if ((h!=NULL) && (h->Typ()==MODUL_CMD))
-        {
-          i1=(ideal)h->CopyD();
-          h=h->next;
-        }
-        else return TRUE;
-        if ((h!=NULL) && (h->Typ()==INT_CMD))
-        {
-          i2=(int)((long)h->Data());
-        }
-        else return TRUE;
-        res->rtyp=MODUL_CMD;
-        res->data=idXXX(i1,i2);
-        return FALSE;
-      }
-      else
   /*==================== SVD =================*/
   #ifdef HAVE_SVD
        if (strcmp(sys_cmd, "svd") == 0)
@@ -2857,7 +2857,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             extern lists testsvd(matrix M);
               res->rtyp=LIST_CMD;
             res->data=(char*)(testsvd((matrix)h->Data()));
-            return FALSE;
+            eturn FALSE;
        }
        else
   #endif
