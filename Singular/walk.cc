@@ -28,7 +28,7 @@
 #define FIRST_STEP_FRACTAL // to define the first step of the fractal
 #define MSTDCC_FRACTAL // apply Buchberger alg to compute a red GB, if tau doesn't stay in the correct cone
 
-#define TIME_TEST // print the used time of each subroutine
+//#define TIME_TEST // print the used time of each subroutine
 //#define ENDWALKS //print the size of the last omega-homogenoues Groebner basis
 
 /* includes */
@@ -4673,63 +4673,45 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* orig_M, intvec* target_wei
   ideal G_test, G_test1, G_test2;
 
   //try to find a random next weight vector "next_weight2"
-  if(weight_rad > 0){ while(k<10)
+  if(weight_rad > 0)
   {
-    weight_norm = 0;
-    while(weight_norm == 0)
+    while(k<10)
     {
-
-      for(i=0; i<nV; i++)
-      {
-        (*next_weight2)[i] = rand() % 60000 - 30000;
-        weight_norm = weight_norm + (*next_weight2)[i]*(*next_weight2)[i];
-      }
-      weight_norm = 1 + floor(sqrt(weight_norm));
-    }
-
-    for(i=0; i<nV; i++)
-    {
-      if((*next_weight2)[i] < 0)
-      {
-        (*next_weight2)[i] = 1 + (*curr_weight)[i] + floor(weight_rad*(*next_weight2)[i]/weight_norm);
-      }
-      else
-      {
-        (*next_weight2)[i] = (*curr_weight)[i] + floor(weight_rad*(*next_weight2)[i]/weight_norm);
-      }
-    }
-    
-    if(test_w_in_ConeCC(G,next_weight2) == 1)
-    {
-      if(maxlengthpoly(MwalkInitialForm(G,next_weight2))<2)
-      {
-        next_weight2 = MkInterRedNextWeight(next_weight2,target_weight,G);
-      }
-/*
-      if(MivAbsMax(next_weight2)>1147483647)
+      weight_norm = 0;
+      while(weight_norm == 0)
       {
         for(i=0; i<nV; i++)
         {
-          (*next_weight22)[i] = (*next_weight2)[i];
+          (*next_weight2)[i] = rand() % 60000 - 30000;
+          weight_norm = weight_norm + (*next_weight2)[i]*(*next_weight2)[i];
         }
-        i = 0;
-        // reduce the size of the maximal entry of the vector
-        while(test_w_in_ConeCC(G,next_weight22) == 1)
-        {
-          (*next_weight2)[i] = (*next_weight22)[i];
-          i = MivAbsMaxArg(next_weight22);
-          (*next_weight22)[i] = floor(0.1*(*next_weight22)[i] + 0.5);
-        }
-        delete next_weight22;
+        weight_norm = 1 + floor(sqrt(weight_norm));
       }
-*/
-      G_test2 = MwalkInitialForm(G, next_weight2);
-      found_random_weight = TRUE;
-      break;
+      for(i=0; i<nV; i++)
+      {
+        if((*next_weight2)[i] < 0)
+        {
+          (*next_weight2)[i] = 1 + (*curr_weight)[i] + floor(weight_rad*(*next_weight2)[i]/weight_norm);
+        }
+        else
+        {
+          (*next_weight2)[i] = (*curr_weight)[i] + floor(weight_rad*(*next_weight2)[i]/weight_norm);
+        }
+      }
+      if(test_w_in_ConeCC(G,next_weight2) == 1)
+      {
+        if(maxlengthpoly(MwalkInitialForm(G,next_weight2))<2)
+        {
+          next_weight2 = MkInterRedNextWeight(next_weight2,target_weight,G);
+        }
+        G_test2 = MwalkInitialForm(G, next_weight2);
+        found_random_weight = TRUE;
+        break;
+      }
+      k++;
     }
-    k++;
-  }}
-Print("\n MWalkRandomNextWeight: compute perurbation...\n");
+  }
+  
   // compute "perturbed" next weight vector
   if(pert_deg > 1)
   {
@@ -4749,7 +4731,7 @@ Print("\n MWalkRandomNextWeight: compute perurbation...\n");
   }
   G_test=MwalkInitialForm(G,next_weight);
   G_test1=MwalkInitialForm(G,next_weight1);
-Print("\n MWalkRandomNextWeight: finished...\n");
+
   // compare next weights
   if(Overflow_Error == FALSE)
   {
@@ -4838,7 +4820,7 @@ Print("\n MWalkRandomNextWeight: finished...\n");
       }
     }
   }
- // delete curr_weight1;
+
   delete next_weight;
   delete next_weight2;
   idDelete(&G_test);
@@ -5676,7 +5658,10 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M,
   //Print("\n// pSetm_Error = (%d)", ErrorCheck());
   //Print("\n// Overflow_Error? (%d)\n", Overflow_Error);
 #endif
-  Print("\n//** Mwalk: Groebner Walk took %d steps.\n", nstep);
+  if(printout > 0)
+  {
+    Print("\n//** Mwalk: Groebner Walk took %d steps.\n", nstep);
+  }
   si_opt_1 = save1; //set original options
   return(result);
 }
@@ -5997,7 +5982,10 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
 #ifndef BUCHBERGER_ALG
   delete last_omega;
 #endif
-  Print("\n//** Mrwalk: Groebner Walk took %d steps.\n", nstep);
+  if(printout > 0)
+  {
+    Print("\n//** Mrwalk: Groebner Walk took %d steps.\n", nstep);
+  }
 #ifdef TIME_TEST
   TimeString(tinput, tostd, tif, tstd, tlift, tred, tnw, nstep);
   //Print("\n// pSetm_Error = (%d)", ErrorCheck());
@@ -6164,41 +6152,6 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
 #endif
     if(reduction == 0 && nstep > 1)
     {
-/*
-      // check whether weight vector is in the interior of the cone
-      while(1)
-      {
-        FF = middleOfCone(G,Gomega);
-        if(FF != NULL)
-        {
-          idDelete(&G);
-	  G = idCopy(FF);
-	  idDelete(&FF);
-          next_weight = MwalkNextWeightCC(curr_weight,target_weight,G);
-#ifdef PRINT_VECTORS
-          if(printout > 0)
-          {
-            MivString(curr_weight, target_weight, next_weight);
-          }
-#endif
-        }
-        else
-        {
-          break;
-        }
-        for(i=nV-1; i>=0; i--)
-        {
-          (*curr_weight)[i] = (*next_weight)[i];
-        }
-        Gomega = MwalkInitialForm(G, curr_weight);
-#ifdef CHECK_IDEAL_MWALK
-        if(printout > 1)
-        {
-          idString(Gomega,"//** Mpwalk: Gomega");
-        }
-#endif
-      }
-*/
       FF = middleOfCone(G,Gomega);
       if(FF != NULL)
       {
@@ -6212,11 +6165,12 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
 #ifdef ENDWALKS
     if(endwalks == TRUE)
     {
-      Print("\n// ring r%d = %s;\n", nstep, rString(currRing));
-/*
-      idElements(G, "G");
-      headidString(G, "G");
-*/
+      if(printout > 0)
+      {
+        Print("\n// ring r%d = %s;\n", nstep, rString(currRing));
+      }
+      //idElements(G, "G");
+      //headidString(G, "G");
     }
 #endif
 
@@ -6241,12 +6195,13 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
 #ifdef ENDWALKS
     if(endwalks==TRUE)
     {
-      Print("\n// ring r%d = %s;\n", nstep, rString(currRing));
-/*
-      idElements(Gomega1, "Gw");
-      headidString(Gomega1, "headGw");
-*/
-      PrintS("\n// compute a rGB of Gw:\n");
+      if(printout > 0)
+      {
+        Print("\n// ring r%d = %s;\n", nstep, rString(currRing));
+        //idElements(Gomega1, "Gw");
+        //headidString(Gomega1, "headGw");
+        PrintS("\n// compute a rGB of Gw:\n");
+      }
 #ifndef  BUCHBERGER_ALG
       ivString(hilb_func, "w");
 #endif
@@ -6270,8 +6225,11 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
       xtstd = xtstd+clock()-to;
 #endif
 #ifdef ENDWALKS
-      Print("\n// time for the last std(Gw)  = %.2f sec\n",
+      if(printout > 1)
+      {
+        Print("\n// time for the last std(Gw)  = %.2f sec\n",
             ((double) clock())/1000000 -((double)tim) /1000000);
+      }
 #endif
     }
     else
@@ -6466,7 +6424,10 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
   //Print("\n// pSetm_Error = (%d)", ErrorCheck());
   //Print("\n// It took %d steps and Overflow_Error? (%d)\n", nstep,  Overflow_Error);
 #endif
-  Print("\n//** Mpwalk: Perturbation Walk took %d steps.\n", nstep);
+  if(printout > 0)
+  {
+    Print("\n//** Mpwalk: Perturbation Walk took %d steps.\n", nstep);
+  }
   return(Eresult);
 }
 
@@ -6670,41 +6631,6 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
 
     if(reduction == 0 && nstep > 1)
     {
-/*
-      // check whether weight vector is in the interior of the cone
-      while(1)
-      {
-        FF = middleOfCone(G,Gomega);
-        if(FF != NULL)
-        {
-          idDelete(&G);
-	  G = idCopy(FF);
-	  idDelete(&FF);
-          next_weight = MwalkNextWeightCC(curr_weight,target_weight,G);
-#ifdef PRINT_VECTORS
-          if(printout > 0)
-          {
-            MivString(curr_weight, target_weight, next_weight);
-          }
-#endif
-        }
-        else
-        {
-          break;
-        }
-        for(i=nV-1; i>=0; i--)
-        {
-          (*curr_weight)[i] = (*next_weight)[i];
-        }
-        Gomega = MwalkInitialForm(G, curr_weight);
-#ifdef CHECK_IDEAL_MWALK
-        if(printout > 1)
-        {
-          idString(Gomega,"//** Mprwalk: Gomega");
-        }
-#endif
-      }
-*/
       FF = middleOfCone(G,Gomega);
       if(FF != NULL)
       {
@@ -6718,11 +6644,12 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
 #ifdef ENDWALKS
     if(endwalks == TRUE)
     {
-      Print("\n// ring r%d = %s;\n", nstep, rString(currRing));
-/*
-      idElements(G, "G");
-      headidString(G, "G");
-*/
+      if(printout > 0)
+      {
+        Print("\n// ring r%d = %s;\n", nstep, rString(currRing));
+        //idElements(G, "G");
+        //headidString(G, "G");
+      }
     }
 #endif
 
@@ -6752,13 +6679,15 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
 #ifdef ENDWALKS
     if(endwalks == TRUE)
     {
-      Print("\n// ring r%d = %s;\n", nstep, rString(currRing));
-/*
-      idElements(Gomega1, "Gw");
-      headidString(Gomega1, "headGw");
-*/
-      PrintS("\n// compute a rGB of Gw:\n");
+      if(printout > 0)
+      {
+        Print("\n// ring r%d = %s;\n", nstep, rString(currRing));
 
+        //idElements(Gomega1, "Gw");
+        //headidString(Gomega1, "headGw");
+      
+        PrintS("\n// compute a rGB of Gw:\n");
+      }
 #ifndef  BUCHBERGER_ALG
       ivString(hilb_func, "w");
 #endif
@@ -6871,7 +6800,10 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
     //lengthpoly(Gomega) = 1 if there is a polynomial in Gomega with at least 3 monomials and 0 otherwise
     if(lengthpoly(Gomega) > 0)
     {
-      Print("\n there is a polynomial in Gomega with at least 3 monomials,\n");
+      if(printout > 1)
+      {
+        Print("\n Mpwalk: there is a polynomial in Gomega with at least 3 monomials.\n");
+      }
       // low-dimensional facet of the cone
       delete next_weight;
       if(target_M->length() == nV)
@@ -6897,24 +6829,9 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
 #ifdef TIME_TEST
       tif = tif + clock()-to; //time for computing initial form ideal
 #endif
-  Print("delete\n");
       delete iv_M;
     }
 
-/*
-    to=clock();
-    next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
-    if(polylength > 0)
-    {
-      if(printout > 2)
-      {
-        Print("\n //**Mprwalk: there is a polynomial in Gomega with at least 3 monomials, low-dimensional facet of the cone.\n");
-      }
-      delete next_weight;
-      next_weight = MWalkRandomNextWeight(G, curr_weight, target_weight, weight_rad, op_deg);
-    }
-    tnw=tnw+clock()-to;
-*/
 #ifdef PRINT_VECTORS
     if(printout > 0)
     {
@@ -7046,13 +6963,19 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
   //Print("\n// pSetm_Error = (%d)", ErrorCheck());
   //Print("\n// It took %d steps and Overflow_Error? (%d)\n", nstep,  Overflow_Error);
 #endif
-  Print("\n//** Mprwalk: Perturbation Walk took %d steps.\n", nstep);
+
+  if(printout > 0)
+  {
+    Print("\n//** Mprwalk: Perturbation Walk took %d steps.\n", nstep);
+  }
   return(Eresult);
 }
 
 intvec* XivNull;
 
-// define a matrix (1 ... 1)
+/*****************************
+ * define a matrix (1 ... 1) *
+ *****************************/
 intvec* MMatrixone(int nV)
 {
   int i,j;
