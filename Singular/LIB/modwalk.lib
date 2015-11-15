@@ -52,16 +52,12 @@ EXAMPLE:  example modWalk; shows an example"
     intvec opt = option(get);
     option(redSB);
 
-    /* set additional parameters */
-    int reduction = 1;
-    int printout = 0;
-
     /* call modular() */
     if (size(#) > 0) {
-        I = modular("gwalk", list(I,reduction,printout,#));
+        I = modular("gwalk", list(I,#));
     }
     else {
-        I = modular("gwalk", list(I,reduction,printout));
+        I = modular("gwalk", list(I));
     }
 
     /* return the result */
@@ -109,16 +105,12 @@ EXAMPLE:  example modrWalk; shows an example"
     intvec opt = option(get);
     option(redSB);
 
-    /* set additional parameters */
-    int reduction = 1;
-    int printout = 0;
-
     /* call modular() */
     if (size(#) > 0) {
-        I = modular("rwalk", list(I,radius,pertdeg,reduction,printout,#));
+        I = modular("rwalk", list(I,radius,pertdeg,#));
     }
     else {
-        I = modular("rwalk", list(I,radius,pertdeg,reduction,printout));
+        I = modular("rwalk", list(I,radius,pertdeg));
     }
 
     /* return the result */
@@ -167,16 +159,12 @@ EXAMPLE:  example modfWalk; shows an example"
     intvec opt = option(get);
     option(redSB);
 
-    /* set additional parameters */
-    int reduction = 1;
-    int printout = 0;
-
     /* call modular() */
     if (size(#) > 0) {
-        I = modular("fwalk", list(I,reduction,printout,#));
+        I = modular("fwalk", list(I,#));
     }
     else {
-        I = modular("fwalk", list(I,reduction,printout));
+        I = modular("fwalk", list(I));
     }
 
     /* return the result */
@@ -223,16 +211,12 @@ EXAMPLE:  example modfrWalk; shows an example"
     intvec opt = option(get);
     option(redSB);
 
-    /* set additional parameters */
-    int reduction = 1;
-    int printout = 0;
-
     /* call modular() */
     if (size(#) > 0) {
-        I = modular("frandwalk", list(I,radius,reduction,printout,#));
+        I = modular("frandwalk", list(I,radius,#));
     }
     else {
-        I = modular("frandwalk", list(I,radius,reduction,printout));
+        I = modular("frandwalk", list(I,radius));
     }
 
     /* return the result */
