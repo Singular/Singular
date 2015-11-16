@@ -7,9 +7,14 @@ LIBRARY: rwalk.lib   Groebner Walk Conversion Algorithms
 AUTHOR: Stephan Oberfranz
 
 PROCEDURES:
+<<<<<<< HEAD
 prwalk(ideal,int,int[,intvec,intvec]);   standard basis of ideal via Random Perturbation Walk algorithm
 rwalk(ideal,int[,intvec,intvec]);       standard basis of ideal via Random Walk algorithm
 frandwalk(ideal,int[,intvec,intvec]);      standard basis of ideal via Random Fractal Walk algorithm
+=======
+rwalk(ideal,int[,intvec,intvec]);       standard basis of ideal via Random Perturbation Walk algorithm
+frwalk(ideal,int[,intvec,intvec]);      standard basis of ideal via Random Fractal Walk algorithm
+>>>>>>> 66b765e3f29eeafd84422812424a97ffb5ec7c22
 ";
 
 /***********************************

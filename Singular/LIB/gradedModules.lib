@@ -1654,14 +1654,14 @@ EXAMPLE: example KeneshlouMatrixPresentation; shows an example
   if(i>n)
     { // no middle part
       if(a[1]>0)
-	{
-	  N=grtwist(a[1],0);
+        {
+          N=grtwist(a[1],0);
 
-	  if(a[n+1]>0)
-	    { N=grsum(N,grtwist(a[n+1],-1));}
-	}
+          if(a[n+1]>0)
+            { N=grsum(N,grtwist(a[n+1],-1));}
+        }
       else
-	{ N=grtwist(a[n+1],-1);}
+        { N=grtwist(a[n+1],-1);}
 
       return (N); // grorder(N));
     }
@@ -1677,23 +1677,23 @@ EXAMPLE: example KeneshlouMatrixPresentation; shows an example
       i++;
 
       for(; i <= n; i++)
-	{
-	  if(a[i]==0) { i++; continue; }
-	  j = i - 1;
-	  S = grsum( S, grpower(grshift( grobj( kos[j+2], attrib(kos[j+2], "isHomog")), j), a[i])  );
-	}
+        {
+          if(a[i]==0) { i++; continue; }
+          j = i - 1;
+          S = grsum( S, grpower(grshift( grobj( kos[j+2], attrib(kos[j+2], "isHomog")), j), a[i])  );
+        }
 
       // S is the middle (non-zero) part
 
       if(a[1] > 0 )
-	{
-	  N=grsum(grtwist(a[1],0), S);
-	}
+        {
+          N=grsum(grtwist(a[1],0), S);
+        }
       else
-	{ N = S;}
+        { N = S;}
 
       if(a[n+1] > 0 )
-	{ N=grsum(N, grtwist(a[n+1],-1)); }
+        { N=grsum(N, grtwist(a[n+1],-1)); }
 
 
       return ((N)); //      return (grorder(N));
@@ -2460,14 +2460,14 @@ EXAMPLE: example matrixpres; shows an example
   if(i>n)
     { // no middle part
       if(a[1]>0)
-	{
-	  N=grtwist(a[1],-1);
+        {
+          N=grtwist(a[1],-1);
 
-	  if(a[n+1]>0)
-	    { N=grsum(N,grtwist(a[n+1],0));}
-	}
+          if(a[n+1]>0)
+            { N=grsum(N,grtwist(a[n+1],0));}
+        }
       else
-	{ N=grtwist(a[n+1],0);}
+        { N=grtwist(a[n+1],0);}
 
       return (N); // grorder(N));
     }
@@ -2485,23 +2485,23 @@ else // i <= n: middle part is present, a_i != 0
       i++;
 
       for(; i <= n; i++)
-	{
-	  if(a[i]==0) { i++; continue; }
+        {
+          if(a[i]==0) { i++; continue; }
           int j=size(a)-i;
-	  S = grsum( S, grpower(grshift( grobj( kos[j+2], attrib(kos[j+2], "isHomog")), j), a[i])  );
-	}
+          S = grsum( S, grpower(grshift( grobj( kos[j+2], attrib(kos[j+2], "isHomog")), j), a[i])  );
+        }
 
       // S is the middle (non-zero) part
 
       if(a[1] > 0 )
-	{
-	  N=grsum(grtwist(a[1],-1), S);
-	}
+        {
+          N=grsum(grtwist(a[1],-1), S);
+        }
       else
-	{ N = S;}
+        { N = S;}
 
       if(a[n+1] > 0 )
-	{ N=grsum(N, grtwist(a[n+1],0)); }
+        { N=grsum(N, grtwist(a[n+1],0)); }
 
 
       return ((N)); //      return (grorder(N));

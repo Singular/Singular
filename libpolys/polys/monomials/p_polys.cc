@@ -2543,7 +2543,7 @@ static number p_InitContent(poly ph, const ring r)
         d2=d;
         d=pGetCoeff(ph);
         s=ns;
-	if (s2<=3) break;
+        if (s2<=3) break;
       }
       else if (ns<s)
       {

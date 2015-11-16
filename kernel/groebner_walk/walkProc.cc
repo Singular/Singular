@@ -93,13 +93,13 @@ walkConsistency( ring sring, ring dring, int * vperm )
     if ( npar > 0 )
     {
         snames=sring->cf->extRing->names;
-	dnames=dring->cf->extRing->names;
+        dnames=dring->cf->extRing->names;
         pperm= (int *)omAlloc0( (npar+1)*sizeof( int ) );
     }
     else
     {
         snames=NULL;
-	dnames=NULL;
+        dnames=NULL;
         pperm= NULL;
     }
 
@@ -263,14 +263,14 @@ fractalWalkConsistency( ring sring, ring dring, int * vperm )
     if ( npar > 0 )
     {
         snames=sring->cf->extRing->names;
-	dnames=dring->cf->extRing->names;
+        dnames=dring->cf->extRing->names;
         pperm= (int *)omAlloc0( (npar+1)*sizeof( int ) );
     }
     else
     {
         pperm= NULL;
-	snames=NULL;
-	dnames=NULL;
+        snames=NULL;
+        dnames=NULL;
     }
 
     maFindPerm( sring->names, nvar, snames, npar,

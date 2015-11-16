@@ -29,7 +29,7 @@ class vandermonde
 {
 public:
   vandermonde( const long _cn, const long _n,
-	       const long _maxdeg, number *_p, const bool _homog = true );
+               const long _maxdeg, number *_p, const bool _homog = true );
   ~vandermonde();
 
   /** Solves the Vandermode linear system
@@ -71,8 +71,8 @@ public:
   ~rootContainer();
 
   void fillContainer( number *_coeffs, number *_ievpoint,
-		      const int _var, const int _tdg,
-		      const rootType _rt, const int _anz );
+                      const int _var, const int _tdg,
+                      const rootType _rt, const int _anz );
 
   bool solver( const int polishmode= PM_NONE );
 
@@ -152,8 +152,8 @@ public:
   friend lists listOfRoots( rootArranger*, const unsigned int oprec );
 
   rootArranger( rootContainer ** _roots,
-		rootContainer ** _mu,
-		const int _howclean = PM_CORRUPT );
+                rootContainer ** _mu,
+                const int _howclean = PM_CORRUPT );
   ~rootArranger() {}
 
   void solve_all();

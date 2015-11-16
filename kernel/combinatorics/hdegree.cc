@@ -1013,16 +1013,16 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
   if (rField_is_Ring(currRing) && (currRing->OrdSgn == -1))
   {
     //consider just monic generators (over rings with zero-divisors)
-    ideal SS=id_Copy(S,tailRing); 
+    ideal SS=id_Copy(S,tailRing);
     for(i=0;i<=idElem(S);i++)
     {
-    	if(p_IsPurePower(SS->m[i],tailRing)==0)
-  		{  
-  		  p_Delete(&SS->m[i],tailRing);
-  		}
-  	}
-  	S=id_Copy(SS,tailRing);
-  	idSkipZeroes(S);
+      if(p_IsPurePower(SS->m[i],tailRing)==0)
+      {
+        p_Delete(&SS->m[i],tailRing);
+      }
+    }
+    S=id_Copy(SS,tailRing);
+    idSkipZeroes(S);
   }
   #if 0
   printf("\nThis is HC:\n");

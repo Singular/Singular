@@ -196,9 +196,9 @@ public:
 
   std::string toString()const
   {
-	  std::stringstream f;
-	  f<<*this;
-	  return f.str();
+          std::stringstream f;
+          f<<*this;
+          return f.str();
   }
 
   /**

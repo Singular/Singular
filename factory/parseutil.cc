@@ -82,10 +82,10 @@ public:
     static PUtilBase * create( const Variable & v ) { return new PUtilVar( v ); }
     static PUtilBase * create( const char * str )
     {
-	if ( strlen( str ) < 9 )
-	    return new PUtilInt( atoi( str ) );
-	else
-	    return new PUtilCF( CanonicalForm( str ) );
+        if ( strlen( str ) < 9 )
+            return new PUtilInt( atoi( str ) );
+        else
+            return new PUtilCF( CanonicalForm( str ) );
     }
 };
 
@@ -122,8 +122,8 @@ ParseUtil::~ParseUtil()
 ParseUtil& ParseUtil::operator= ( const ParseUtil &pu )
 {
     if ( this != &pu ) {
-	delete value;
-	value = pu.value->copy();
+        delete value;
+        value = pu.value->copy();
     }
     return *this;
 }

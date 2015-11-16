@@ -22,33 +22,33 @@ RETURN:  poly, the inverse of the poly p in the power series ring till order bou
 "
 {
     if(bound<=1)
-        {
-            ERROR("My inverse : negative bound in the inverse");
-        }
+    {
+      ERROR("My inverse : negative bound in the inverse");
+    }
     if(p == 0)
-	    {
-	        ERROR("My inverse : p is 0");
-	    }
-	poly original;
+    {
+      ERROR("My inverse : p is 0");
+    }
+    poly original;
     original = p;
     if(leadcoef(p) == 0)
-        {
-            ERROR("My inverse : the power series is not a unit.");
-        }
+    {
+      ERROR("My inverse : the power series is not a unit.");
+    }
     poly q = 1/p[1];
     poly res = q;
     p = q * (p[1] - jet(p,bound));
     poly s = p;
     while(p != 0)
     {
-        res = res + q * p;
-        p = jet(p*s,bound);
+      res = res + q * p;
+      p = jet(p*s,bound);
     }
     //TEST
     if(jet(original*res,bound) != poly(1))
-        {
-            ERROR("Myinverse does not work properly.");
-        }
+    {
+      ERROR("Myinverse does not work properly.");
+    }
     return(res);
 }
 
@@ -59,13 +59,13 @@ RETURN:  poly, the Hilbert Series of M
 AASUME: the ring when called is R = 0,t,ds;
 "
 {
-    poly f;
-	int i;
-	for(i=0;i<size(v)-1;i++)
-	{
-		f=f+v[i+1]*t^i;
-	}
-	return(f);
+  poly f;
+  int i;
+  for(i=0;i<size(v)-1;i++)
+  {
+    f=f+v[i+1]*t^i;
+  }
+  return(f);
 }
 ///////////////////////////////////////////////////////////////////////////////////
 static proc positiv(poly f)
@@ -73,16 +73,16 @@ static proc positiv(poly f)
 RETURN:  int, 1 if all the coefficients of f are positive, 0 else
 "
 {
-    int pos=1;
-	while( (f!=0) && (pos==1) )
-	{
-		if(leadcoef(f)<0)
-		{
-			pos=0;
-		}
-		f=f-lead(f);
-	}
-	return(pos);
+  int pos=1;
+  while( (f!=0) && (pos==1) )
+  {
+    if(leadcoef(f)<0)
+    {
+      pos=0;
+    }
+    f=f-lead(f);
+  }
+  return(pos);
 }
 ///////////////////////////////////////////////////////////////////////////////////
 static proc sumcoef(poly f)
@@ -90,13 +90,13 @@ static proc sumcoef(poly f)
 RETURN:  number, the sum of the coefficients
 "
 {
-    number c;
-	while(f!=0)
-	    {
-    		c = c+leadcoef(f);
-	    	f=f-lead(f);
-    	}
-	return(int(c));
+  number c;
+  while(f!=0)
+  {
+    c = c+leadcoef(f);
+    f=f-lead(f);
+  }
+  return(int(c));
 }
 ///////////////////////////////////////////////////////////////////////////////////
 proc hdepth_p(poly g, int d, int debug)
@@ -104,51 +104,50 @@ proc hdepth_p(poly g, int d, int debug)
 RETURN:  int, the minimum number t <= d s.t. 1/g^t is positive
 "
 {
-    int dd = d;
-	if(debug == 0)
-	    {"G(t)=",g;}
-	if(positiv(g)==1)
-		{
-		    if(debug == 0)
-		        {return("hdepth =",dd);}
-		    else
-		        {return(dd);}
-		}
-	poly f=g;
-	number ag;
-	int c1;
-	int bound;
-	bound = deg(g);
-	while(dd >= 0)
-	{
-	   dd = dd-1;
-	   f = jet( g*myinverse( (1-t)^(d-dd),2*bound ) , bound );
-       if(positiv(f) == 1)
-       {
-		    if(debug == 0)
-		        {
-		            "G(t)/(1-t)^",d-dd,"=",f,"+...";
-    		        return("hdepth =",dd);
-		        }
-		    else
-            	{return(d);}
-       }
-    c1=sumcoef(f);
-	if(c1<0)
-       {
-      		while(c1<0)
-                {
-                    bound=bound+1;
-                    f=jet( g*myinverse( (1-t)^(d-dd),2*bound ) , bound );
-                    c1=sumcoef(f);
-                }
-        }
-        if(debug == 0)
-            {"G(t)/(1-t)^",d-dd,"=",f,"+...";}
+  int dd = d;
+  if(debug == 0)
+  {"G(t)=",g;}
+  if(positiv(g)==1)
+  {
+    if(debug == 0)
+    {return("hdepth =",dd);}
+    else
+    {return(dd);}
+  }
+  poly f=g;
+  number ag;
+  int c1;
+  int bound;
+  bound = deg(g);
+  while(dd >= 0)
+  {
+    dd = dd-1;
+    f = jet( g*myinverse( (1-t)^(d-dd),2*bound ) , bound );
+    if(positiv(f) == 1)
+    {
+      if(debug == 0)
+      {
+        "G(t)/(1-t)^",d-dd,"=",f,"+...";
+        return("hdepth =",dd);
+      }
+      else
+      {return(d);}
     }
-    ERROR("g was not a Hilbert Series since the coefficient sum is not > 0");
+    c1=sumcoef(f);
+    if(c1<0)
+    {
+      while(c1<0)
+      {
+        bound=bound+1;
+        f=jet( g*myinverse( (1-t)^(d-dd),2*bound ) , bound );
+        c1=sumcoef(f);
+      }
+    }
+    if(debug == 0)
+    {"G(t)/(1-t)^",d-dd,"=",f,"+...";}
+  }
+  ERROR("g was not a Hilbert Series since the coefficient sum is not > 0");
 }
-
 example
 {
   "EXAMPLE:";echo=2;
@@ -166,22 +165,22 @@ PURPOSE: compute the hdepth_1 of a module M
 EXAMPLE: example hdepth; shows examples
 "
 {
-    int debug;
-    if(size(#)>0)
-        {
-            if(typeof(#[1])=="int")
-                {debug = #[1];}
-        }
-    else
-        {debug = 1;}
-    M = std(M);
-    int d=nvars(basering)-dim(M);
-    intvec v=hilb(M,2);
-    ring R = 0,t,ds;
-    poly hp=hilbconstruct(v);
-    if(debug == 0)
-        {"dim =",d;}
-    return(hdepth_p(hp,d,debug));
+  int debug;
+  if(size(#)>0)
+  {
+    if(typeof(#[1])=="int")
+    {debug = #[1];}
+  }
+  else
+  {debug = 1;}
+  M = std(M);
+  int d=nvars(basering)-dim(M);
+  intvec v=hilb(M,2);
+  ring R = 0,t,ds;
+  poly hp=hilbconstruct(v);
+  if(debug == 0)
+  {"dim =",d;}
+  return(hdepth_p(hp,d,debug));
 }
 example
 {

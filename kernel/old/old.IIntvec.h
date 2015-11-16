@@ -5,8 +5,8 @@
 class Intvec: public std::vector<int>{
 public:
   Intvec(iterator first,
-	iterator last,
-	const allocator_type& __a = allocator_type()):
+        iterator last,
+        const allocator_type& __a = allocator_type()):
     std::vector<int>(first,last,__a){
   }
   Intvec(int n=0):std::vector<int>(n){}

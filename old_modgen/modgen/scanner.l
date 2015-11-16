@@ -152,7 +152,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 
 <COMMENT,COMMENTB,STRING,INITIAL><<EOF>>   {
           printf( "EOF encountered inside an action\n");
-	  printf("ERRRRROOOOORRR\n");
+          printf("ERRRRROOOOORRR\n");
                  }
 
 <INITIAL,SECT2,SECT3,SECT4>{
@@ -223,25 +223,25 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
         ^{WS}      push_state(YYSTATE, CODEBLOCK, "CODEBLOCK");
         ^"/*"      push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
         "//".*{NL} ++yylineno; ACTION_ECHO;
-	{BOOL}  { if(yyleng == 1) sscanf(yytext, "%d", &lvalp->i);
-	          else {
-		    if(strcasecmp(yytext, "yes")==0) lvalp->i = 1;
-		    else lvalp->i = 0;
+        {BOOL}  { if(yyleng == 1) sscanf(yytext, "%d", &lvalp->i);
+                  else {
+                    if(strcasecmp(yytext, "yes")==0) lvalp->i = 1;
+                    else lvalp->i = 0;
                   }
                   return BOOLTOK; }
-	^"%{".*{NL} {
-	        yylineno++;
-		push_state(YYSTATE, CODEBLOCK, "CODEBLOCK");
-		fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
-					  yylineno, module_def.filename);
-		}
-	^"%modinitial".*{NL} {
-	        yylineno++;
-		push_state(YYSTATE, MODINITIAL, "MODINITIAL");
-		fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
-	                               	  yylineno, module_def.filename);
-		}
-	{WS}            /* discard */
+        ^"%{".*{NL} {
+                yylineno++;
+                push_state(YYSTATE, CODEBLOCK, "CODEBLOCK");
+                fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
+                                          yylineno, module_def.filename);
+                }
+        ^"%modinitial".*{NL} {
+                yylineno++;
+                push_state(YYSTATE, MODINITIAL, "MODINITIAL");
+                fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
+                                                 yylineno, module_def.filename);
+                }
+        {WS}            /* discard */
         {NL}    { yylineno++; }
 
         {eq}    { return '='; }
@@ -253,42 +253,42 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
                   push_state(YYSTATE, STRING, "string");
                 }
 
-	^{NAME} {
-	          lvalp->name = strdup(yytext);
+        ^{NAME} {
+                  lvalp->name = strdup(yytext);
                   return NAME;
                 }
-	{FILENAME} {
-	          lvalp->name = strdup(yytext);
+        {FILENAME} {
+                  lvalp->name = strdup(yytext);
                   return FILENAME;
                 }
-	   }
+           }
 
 <CODEBLOCK>{
             ^"%}".*{NL} {
                    char * s, *t;
 
                    yylineno++;
-		   pop_state();
-		   s = t = lvalp->name = dupyytext();
-		   while (*yytext)
-		   {
-		     if (*yytext == '\\') yytext++;
-		     *s++ = *yytext++;
-		   }
-		   if(s-t>2 && *(s-1)=='}' && *(s-2)=='%') *(s-2)='\0';
-		   return MCCODETOK;
+                   pop_state();
+                   s = t = lvalp->name = dupyytext();
+                   while (*yytext)
+                   {
+                     if (*yytext == '\\') yytext++;
+                     *s++ = *yytext++;
+                   }
+                   if(s-t>2 && *(s-1)=='}' && *(s-2)=='%') *(s-2)='\0';
+                   return MCCODETOK;
                  }
          {NL}    { yylineno++; yymore(); }
          .       { yymore(); }
        }
 <MODINITIAL>{
            ^"%endinitial".*{NL} {
-	           yylineno++;
-		   pop_state();
+                   yylineno++;
+                   pop_state();
                  }
            .*{NL}  { yylineno++;
-	           lvalp->name = yytext;
-		   return CODEPART; }
+                   lvalp->name = yytext;
+                   return CODEPART; }
        }
 <STRING>{
           {NL}    { yylineno++; yymore(); }
@@ -298,29 +298,29 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
           ("\"")  {
                     char * s, *t;
                     pop_state();
-	            if(do_return) {
+                    if(do_return) {
                       s = t = lvalp->sv.string = dupyytext();
                       while (*yytext)
                       {
                         if (*yytext == '\\') yytext++;
                         *s++ = *yytext++;
                       }
-		      *s++ = *yytext++;
-		      do_return = 0;
-		      return MSTRINGTOK;
+                      *s++ = *yytext++;
+                      do_return = 0;
+                      return MSTRINGTOK;
                     } else {
-		      do_return = 0;
+                      do_return = 0;
                       yymore();
                     }
-		  }
-	}
+                  }
+        }
 
 <COMMENT>{
         "*/"            ACTION_ECHO; pop_state(); yymore();
         "*"           yymore();
         {NL}          { yylineno++; yymore(); }
         .             { yymore(); }
-	  }
+          }
 
 <SECT2>{
         {NL}    { yylineno++; }
@@ -332,20 +332,20 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
                   brace1 = 0; /* { */
                   brace2 = 0; /* ( */
                   brace3 = 0; /* [ */
-	          push_state(YYSTATE, PROCDECL, "PROCDECL");
-		  return PROCDECLTOK;
+                  push_state(YYSTATE, PROCDECL, "PROCDECL");
+                  return PROCDECLTOK;
                 }
         example {
 #if DEBUG > 1
-	          printf(">>>EXAMPLE\n");
+                  printf(">>>EXAMPLE\n");
 #endif
                   brace1 = 0; /* { */
                   brace2 = 0; /* ( */
                   brace3 = 0; /* [ */
-	            push_state(YYSTATE, EXAMPLE, "EXAMPLE");
-		        return EXAMPLETOK;
+                    push_state(YYSTATE, EXAMPLE, "EXAMPLE");
+                        return EXAMPLETOK;
                 }
- 	    static  { return STATICTOK; }
+             static  { return STATICTOK; }
         .       { printf("SG(%d) <<<'%s' ", yylineno, yytext); }
        }
 
@@ -357,37 +357,37 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
         "//".*{NL}  ++yylineno; ACTION_ECHO;
         example {
 #if DEBUG > 1
-	          printf(">>>EXAMPLE\n");
+                  printf(">>>EXAMPLE\n");
 #endif
                   brace1 = 0; /* { */
                   brace2 = 0; /* ( */
                   brace3 = 0; /* [ */
-	          push_state(YYSTATE, EXAMPLE, "EXAMPLE");
-		  return EXAMPLETOK;
+                  push_state(YYSTATE, EXAMPLE, "EXAMPLE");
+                  return EXAMPLETOK;
                 }
-	static  { return STATICTOK; }
-	{NAME}  {
-	           int i,tok;
+        static  { return STATICTOK; }
+        {NAME}  {
+                   int i,tok;
 #if DEBUG > 1
-	           printf("(%d) VAR: %s\n", yylineno, yytext);
+                   printf("(%d) VAR: %s\n", yylineno, yytext);
 #endif
-		   i = IsCmd(yytext, tok);
+                   i = IsCmd(yytext, tok);
 #if DEBUG > 1
-		   printf("Res=%d, %d => %s\n", i, tok,
-			  i ? "VARTYPETOK" : "NAME");
+                   printf("Res=%d, %d => %s\n", i, tok,
+                          i ? "VARTYPETOK" : "NAME");
 #endif
-		   if(i) {
-		     lvalp->tp.name = strdup(yytext);
-		     lvalp->tp.typ = tok;
-		     push_state(YYSTATE, PROCDECL, "PROCDECL");
-		     return VARTYPETOK;
-		   }
-		   else {
-		     //do_return++;
-		     lvalp->name = strdup(yytext);
-		     push_state(YYSTATE, PROCDECL, "PROCDECL");
-		     return NAME;
-		   }
+                   if(i) {
+                     lvalp->tp.name = strdup(yytext);
+                     lvalp->tp.typ = tok;
+                     push_state(YYSTATE, PROCDECL, "PROCDECL");
+                     return VARTYPETOK;
+                   }
+                   else {
+                     //do_return++;
+                     lvalp->name = strdup(yytext);
+                     push_state(YYSTATE, PROCDECL, "PROCDECL");
+                     return NAME;
+                   }
                  }
         .       { printf("PR(%d) <<<'%s' ", yylineno, yytext); }
        }
@@ -396,71 +396,71 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
         {NL}    { yylineno++; }
         {WS}    /* ignore */
         "{"     { brace1++;
-		  switch_state(YYSTATE, CODEBLOCK2, "CODEBLOCK2");
-		  return '{';
-		}
+                  switch_state(YYSTATE, CODEBLOCK2, "CODEBLOCK2");
+                  return '{';
+                }
         .       { printf("ERROR <<<'%s' ", yytext); }
 }
 
 <SECT4>{
         {NL}    { yylineno++; }
         .*(\n?) { lvalp->name = yytext;
-	          return CODEPART; }
+                  return CODEPART; }
 
         <<EOF>>  { sectnum = 0;
-	           iseof=1;
-		   lvalp->name = yytext;
-	           return SECT4END;
+                   iseof=1;
+                   lvalp->name = yytext;
+                   return SECT4END;
                    /* yyterminate(); */
                  }
        }
 
 <PROCDECL>{
          "{"     { brace1++;
-		   switch_state(YYSTATE, CODEBLOCK2, "CODEBLOCK2");
-		   return '{';
-		 }
+                   switch_state(YYSTATE, CODEBLOCK2, "CODEBLOCK2");
+                   return '{';
+                 }
          "/*"       push_state(YYSTATE, COMMENT, "COMMENT");yymore();
          "//".*{NL}  ++yylineno; ACTION_ECHO;
          "\""    { do_return++;
-	           lvalp->sv.lineno = yylineno;
+                   lvalp->sv.lineno = yylineno;
                    push_state(YYSTATE, STRING, "string");
                  }
-	 {BOOL}  { if(yyleng == 1) sscanf(yytext, "%d", &lvalp->i);
-	           else {
-		     if(strcasecmp(yytext, "yes")==0) lvalp->i = 1;
-		     else lvalp->i = 0;
+         {BOOL}  { if(yyleng == 1) sscanf(yytext, "%d", &lvalp->i);
+                   else {
+                     if(strcasecmp(yytext, "yes")==0) lvalp->i = 1;
+                     else lvalp->i = 0;
                    }
                    return BOOLTOK; }
-	 {NUMBER} { sscanf(yytext, "%d", &lvalp->i); return NUMTOK; }
-	 {NAME}  {
-	           int i,tok;
+         {NUMBER} { sscanf(yytext, "%d", &lvalp->i); return NUMTOK; }
+         {NAME}  {
+                   int i,tok;
 #if DEBUG > 1
-	           printf("(%d) VAR: %s\n", yylineno, yytext);
+                   printf("(%d) VAR: %s\n", yylineno, yytext);
 #endif
-		   i = IsCmd(yytext, tok);
+                   i = IsCmd(yytext, tok);
 #if DEBUG > 1
-		   printf("Res=%d, %d => %s\n", i, tok,
-			  i ? "VARTYPETOK" : "NAME");
+                   printf("Res=%d, %d => %s\n", i, tok,
+                          i ? "VARTYPETOK" : "NAME");
 #endif
-		   if(i) {
-		     lvalp->tp.name = strdup(yytext);
-		     lvalp->tp.typ = tok;
-		     return VARTYPETOK;
-		   }
-		   else {
-		     //do_return++;
-		     lvalp->name = strdup(yytext);
-		     return NAME;
-		   }
+                   if(i) {
+                     lvalp->tp.name = strdup(yytext);
+                     lvalp->tp.typ = tok;
+                     return VARTYPETOK;
+                   }
+                   else {
+                     //do_return++;
+                     lvalp->name = strdup(yytext);
+                     return NAME;
+                   }
                  }
          {NL}    { yylineno++; }
-	 "("     { return '('; }
-	 ")"     { return ')'; }
-	 ","     { return ','; }
-	 "#"     { return '#'; }
-	 "="     { return '='; }
-	 ";"     { return ';'; }
+         "("     { return '('; }
+         ")"     { return ')'; }
+         ","     { return ','; }
+         "#"     { return '#'; }
+         "="     { return '='; }
+         ";"     { return ';'; }
          .       { }
 
        }
@@ -470,46 +470,46 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
                         pop_state();
                         lvalp->name = yytext;
                         return CMTPART;
-                	yymore();
+                        yymore();
                       }
         "*"           yymore();
         {NL}          { yylineno++; yymore(); }
         .             { yymore(); }
-	  }
+          }
 
 <CODEBLOCK2>{
          "/*"      push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
          "//".*{NL} { yylineno++; lvalp->name = yytext; return CODEPART; }
          "\""    {
-	           lvalp->sv.lineno = yylineno;
+                   lvalp->sv.lineno = yylineno;
                    push_state(YYSTATE, STRING, "string"); yymore();}
          "{"     { brace1++; yymore();}
          "}"     { brace1--;
                    if(brace1<=0) {
                      char * s, *t;
 
-		     pop_state();
+                     pop_state();
 #if 0
-		     s = t = lvalp->name = dupyytext();
-		     while (*yytext)
-		     {
-		       if (*yytext == '\\') yytext++;
-		       *s++ = *yytext++;
-		     }
-		     if(s-t>2 && *(s-1)=='}' && *(s-2)=='%') *(s-2)='\0';
+                     s = t = lvalp->name = dupyytext();
+                     while (*yytext)
+                     {
+                       if (*yytext == '\\') yytext++;
+                       *s++ = *yytext++;
+                     }
+                     if(s-t>2 && *(s-1)=='}' && *(s-2)=='%') *(s-2)='\0';
 #else
                      lvalp->name = yytext;
 #endif
 #if DEBUG > 1
                      printf("2 BRACE DOWN=%d\n", brace1);
 #endif
-		     return MCODETOK;
+                     return MCODETOK;
                    } else {
                      yymore();
-		   }
+                   }
                  }
          {NL}    { yylineno++; lvalp->name = yytext; return CODEPART; }
-	 "%" { push_state(YYSTATE, PROCCMDBLOCK, "PROCCMDBLOCK");
+         "%" { push_state(YYSTATE, PROCCMDBLOCK, "PROCCMDBLOCK");
                procedure_decl.flags.start_of_code = 1;
                return '%'; }
          " " { yymore(); }
@@ -519,9 +519,9 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 
 <PROCCMDBLOCK>{
        {col}  { pop_state(); return ';'; }
-	"("   { return '('; }
-	")"   { return ')'; }
-	","   { return ','; }
+        "("   { return '('; }
+        ")"   { return ')'; }
+        ","   { return ','; }
        {WS}   /* ignore */
        {NAME} { lvalp->name = strdup(yytext); return NAME; }
        {NL}   { yylineno++; }

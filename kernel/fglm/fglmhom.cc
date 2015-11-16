@@ -71,17 +71,17 @@ public:
 #ifndef HAVE_EXPLICIT_CONSTR
     void initialize( poly m, int b, BOOLEAN ind )
     {
-	basis = b;
-	inDest = ind;
-	mon.dm = m;
-	mon.sm = NULL;
+        basis = b;
+        inDest = ind;
+        mon.dm = m;
+        mon.sm = NULL;
     }
     void initialize( const homogElem h )
     {
-	basis = h.basis;
-	inDest = h.inDest;
-	mon.dm = h.mon.dm;
-	mon.sm = h.mon.sm;
+        basis = h.basis;
+        inDest = h.inDest;
+        mon.dm = h.mon.dm;
+        mon.sm = h.mon.sm;
     }
 #endif
 };
@@ -166,29 +166,29 @@ generateMonoms( poly m, int var, int deg, homogData * dat )
             if ( dat->numMonoms == dat->monlistmax ) {
                 int k;
 #ifdef HAVE_EXPLICIT_CONSTR
-		// Expand array using Singulars ReAlloc function
+                // Expand array using Singulars ReAlloc function
                 dat->monlist=
-		    (homogElem * )omReallocSize( dat->monlist,
-					   (dat->monlistmax)*sizeof( homogElem ),
-					   (dat->monlistmax+dat->monlistblock) * sizeof( homogElem ) );
+                    (homogElem * )omReallocSize( dat->monlist,
+                                           (dat->monlistmax)*sizeof( homogElem ),
+                                           (dat->monlistmax+dat->monlistblock) * sizeof( homogElem ) );
                 for ( k= dat->monlistmax; k < (dat->monlistmax+dat->monlistblock); k++ )
                     dat->monlist[k].homogElem();
 #else
-		// Expand array by generating new one and copying
-		int newsize = dat->monlistmax  + dat->monlistblock;
-		homogElem * tempelem = new homogElem[ newsize ];
-		// Copy old elements
-		for ( k= dat->monlistmax - 1; k >= 0; k-- )
-		    tempelem[k].initialize( dat->monlist[k] );
-		delete [] homogElem;
-		homogElem = tempelem;
+                // Expand array by generating new one and copying
+                int newsize = dat->monlistmax  + dat->monlistblock;
+                homogElem * tempelem = new homogElem[ newsize ];
+                // Copy old elements
+                for ( k= dat->monlistmax - 1; k >= 0; k-- )
+                    tempelem[k].initialize( dat->monlist[k] );
+                delete [] homogElem;
+                homogElem = tempelem;
 #endif
                 dat->monlistmax+= dat->monlistblock;
             }
 #ifdef HAVE_EXPLICIT_CONSTR
             dat->monlist[dat->numMonoms]= homogElem( mon, basis, inDest );
 #else
-	    dat->monlist[dat->numMonoms].initialize( mon, basis, inDest );
+            dat->monlist[dat->numMonoms].initialize( mon, basis, inDest );
 #endif
             dat->numMonoms++;
             if ( inSource && ! inDest ) PROT( "\\" );
@@ -387,7 +387,7 @@ fglmhomog( ring sourceRing, ideal sourceIdeal, ring destRing, ideal & destIdeal 
         int j;
         for ( j= dat.monlistmax - 1; j >= 0; j-- ) dat.monlist[j].homogElem();
 #else
-	dat.monlist = new homogElem[ dat.monlistmax ];
+        dat.monlist = new homogElem[ dat.monlistmax ];
 #endif
         dat.numMonoms= 0;
         dat.basisSize= 0;
@@ -416,7 +416,7 @@ fglmhomog( ring sourceRing, ideal sourceIdeal, ring destRing, ideal & destIdeal 
 #ifdef HAVE_EXPLICIT_CONSTR
         omFreeSize( (ADDRESS)dat.monlist, dat.monlistmax*sizeof( homogElem ) );
 #else
-	delete [] dat.monlist;
+        delete [] dat.monlist;
 #endif
         PROT( "<\n" );
     }

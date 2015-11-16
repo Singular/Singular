@@ -504,39 +504,39 @@ class CGlobalMultiplier: public CMultiplier<poly>
 //////////////////////////////////////////////////////////////////////////
 class CCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
 {
-	public:
-		CCommutativeSpecialPairMultiplier(ring r, int i, int j);
-		virtual ~CCommutativeSpecialPairMultiplier();
+        public:
+                CCommutativeSpecialPairMultiplier(ring r, int i, int j);
+                virtual ~CCommutativeSpecialPairMultiplier();
 
-		// Exponent * Exponent
-		virtual poly MultiplyEE(const int expLeft, const int expRight);
+                // Exponent * Exponent
+                virtual poly MultiplyEE(const int expLeft, const int expRight);
 };
 
 //////////////////////////////////////////////////////////////////////////
 class CAntiCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
 {
-	public:
-		CAntiCommutativeSpecialPairMultiplier(ring r, int i, int j);
-		virtual ~CAntiCommutativeSpecialPairMultiplier();
+        public:
+                CAntiCommutativeSpecialPairMultiplier(ring r, int i, int j);
+                virtual ~CAntiCommutativeSpecialPairMultiplier();
 
-		// Exponent * Exponent
-		virtual poly MultiplyEE(const int expLeft, const int expRight);
+                // Exponent * Exponent
+                virtual poly MultiplyEE(const int expLeft, const int expRight);
 };
 
 
 //////////////////////////////////////////////////////////////////////////
 class CQuasiCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
 {
-	private:
-		const number m_q;
-		// TODO: make cache for some 'good' powers!?
+        private:
+                const number m_q;
+                // TODO: make cache for some 'good' powers!?
 
   public:
-		CQuasiCommutativeSpecialPairMultiplier(ring r, int i, int j, number q);
-		virtual ~CQuasiCommutativeSpecialPairMultiplier();
+                CQuasiCommutativeSpecialPairMultiplier(ring r, int i, int j, number q);
+                virtual ~CQuasiCommutativeSpecialPairMultiplier();
 
-		// Exponent * Exponent
-		virtual poly MultiplyEE(const int expLeft, const int expRight);
+                // Exponent * Exponent
+                virtual poly MultiplyEE(const int expLeft, const int expRight);
 };
 
 

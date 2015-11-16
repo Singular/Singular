@@ -7481,6 +7481,10 @@ or @code{system("spmul",} list, list, int @code{)}
 @cindex system, spmul
 computes from list of spectrum numbers the multiple of it.
 @c ..........................
+@item @code{system("std_syz",} module, int @code{)}
+@cindex system, std_syz
+compute a partial groebner base of a module, stopp after the given column
+@c ..........................
 @item @code{system("stest",} poly, i2, i3, i4 @code{)}
 @cindex system, stest
 internal for shift algebra (with i4 variables): shift the poly by i2, up to degree i3

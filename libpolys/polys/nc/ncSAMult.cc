@@ -553,11 +553,11 @@ poly CCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 CAntiCommutativeSpecialPairMultiplier::CAntiCommutativeSpecialPairMultiplier(ring r, int i, int j):
-		CSpecialPairMultiplier(r, i, j)
+                CSpecialPairMultiplier(r, i, j)
 {
 #if OUTPUT
-	Print("CAntiCommutativeSpecialPairMultiplier::CAntiCommutativeSpecialPairMultiplier(ring, i: %d, j: %d)!", i, j);
-	PrintLn();
+        Print("CAntiCommutativeSpecialPairMultiplier::CAntiCommutativeSpecialPairMultiplier(ring, i: %d, j: %d)!", i, j);
+        PrintLn();
 #endif
 }
 
@@ -565,8 +565,8 @@ CAntiCommutativeSpecialPairMultiplier::CAntiCommutativeSpecialPairMultiplier(rin
 CAntiCommutativeSpecialPairMultiplier::~CAntiCommutativeSpecialPairMultiplier()
 {
 #if OUTPUT
-	PrintS("CAntiCommutativeSpecialPairMultiplier::~CAntiCommutativeSpecialPairMultiplier()");
-	PrintLn();
+        PrintS("CAntiCommutativeSpecialPairMultiplier::~CAntiCommutativeSpecialPairMultiplier()");
+        PrintLn();
 #endif
 }
 
@@ -574,24 +574,24 @@ CAntiCommutativeSpecialPairMultiplier::~CAntiCommutativeSpecialPairMultiplier()
 poly CAntiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
 #if OUTPUT
-	Print("CAntiCommutativeSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);
-	PrintLn();
+        Print("CAntiCommutativeSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);
+        PrintLn();
 #endif
 
-	const ring r = GetBasering();
+        const ring r = GetBasering();
 
-	return CFormulaPowerMultiplier::ncSA_Mxy0x0y0(GetI(), GetJ(), expRight, expLeft, r);
+        return CFormulaPowerMultiplier::ncSA_Mxy0x0y0(GetI(), GetJ(), expRight, expLeft, r);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 CQuasiCommutativeSpecialPairMultiplier::CQuasiCommutativeSpecialPairMultiplier(ring r, int i, int j, number q):
-		CSpecialPairMultiplier(r, i, j), m_q(q)
+                CSpecialPairMultiplier(r, i, j), m_q(q)
 {
 #if OUTPUT
-	Print("CQuasiCommutativeSpecialPairMultiplier::CQuasiCommutativeSpecialPairMultiplier(ring, i: %d, j: %d, q)!", i, j);
-	PrintLn();
-	PrintS("Parameter q: ");
-	n_Write(q, r);
+        Print("CQuasiCommutativeSpecialPairMultiplier::CQuasiCommutativeSpecialPairMultiplier(ring, i: %d, j: %d, q)!", i, j);
+        PrintLn();
+        PrintS("Parameter q: ");
+        n_Write(q, r);
 #endif
 }
 
@@ -599,8 +599,8 @@ CQuasiCommutativeSpecialPairMultiplier::CQuasiCommutativeSpecialPairMultiplier(r
 CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier()
 {
 #if OUTPUT
-	PrintS("CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier()");
-	PrintLn();
+        PrintS("CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier()");
+        PrintLn();
 #endif
 }
 
@@ -608,13 +608,13 @@ CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier(
 poly CQuasiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
 #if OUTPUT
-	Print("CQuasiCommutativeSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);
-	PrintLn();
+        Print("CQuasiCommutativeSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);
+        PrintLn();
 #endif
 
-	const ring r = GetBasering();
+        const ring r = GetBasering();
 
-	return CFormulaPowerMultiplier::ncSA_Qxy0x0y0(GetI(), GetJ(), expRight, expLeft, m_q, r);
+        return CFormulaPowerMultiplier::ncSA_Qxy0x0y0(GetI(), GetJ(), expRight, expLeft, m_q, r);
 }
 
 

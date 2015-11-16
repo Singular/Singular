@@ -10,9 +10,9 @@ ideal IJ   = I+J;
 ideal gIJ  = std(IJ);
 ideal gI_J = std(gI,J);
 size( std(reduce (I,gI ) ));
-size( std(reduce (IJ,gIJ ) )); 
+size( std(reduce (IJ,gIJ ) ));
 size( std(reduce (IJ,gI_J ) ));
-size( std(reduce (gI_J, gIJ) )); 
+size( std(reduce (gI_J, gIJ) ));
 gI_J;
 gIJ;
 

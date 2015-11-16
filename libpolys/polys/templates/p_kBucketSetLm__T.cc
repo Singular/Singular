@@ -160,7 +160,7 @@ LINKAGE void p_kBucketSetLm__T(kBucket_pt bucket)
       if (bucket->buckets[i] != NULL)
       {
         if(p_LmEqual(bucket->buckets[i], copy,r))
-	{
+        {
           poly q=kBucketExtractLmOfBucket(bucket,i);
           assume(p!=q);
           p=p_Add_q(p, q,r);

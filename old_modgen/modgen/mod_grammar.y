@@ -140,10 +140,10 @@ initmod:
         {
           fprintf(module_def.fmtfp, "%s", $1);
           fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
-					  yylineno, module_def.filename);
+                                          yylineno, module_def.filename);
           free($1);
           write_mod_init(&module_def, module_def.fmtfp);
-	  initdone = 1;
+          initdone = 1;
         };
 
 sect1: expr ';'
@@ -153,11 +153,11 @@ sect1: expr ';'
 
 sect1end:
         codeline2 SECTEND
-	{
-	  memset(&procedure_decl, 0, sizeof(procdef));
-	  if(debug>2)printf("End of section 1 (new=%d)\n", sectnum);
-	}
-	| SECTEND
+        {
+          memset(&procedure_decl, 0, sizeof(procdef));
+          if(debug>2)printf("End of section 1 (new=%d)\n", sectnum);
+        }
+        | SECTEND
         {
           memset(&procedure_decl, 0, sizeof(procdef));
           if(debug>2)printf("End of section 1 (new=%d)\n", sectnum);
@@ -166,12 +166,12 @@ sect1end:
 
 codeline2: CODEPART
         {
-	  if(initdone == 0) {
-	    write_mod_init(&module_def, module_def.fmtfp);
-	    initdone = 1;
+          if(initdone == 0) {
+            write_mod_init(&module_def, module_def.fmtfp);
+            initdone = 1;
           }
-	  fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
-	                            yylineno, module_def.filename);
+          fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
+                                    yylineno, module_def.filename);
           fprintf(module_def.fmtfp, "%s", $1);
         }
         | codeline2 CODEPART
@@ -194,8 +194,8 @@ expr:   NAME '=' MSTRINGTOK
                     write_cmd(&module_def, vt, STRING_CMD, $1, $3.string);
                   if(vt==VAR_VERSION)
                     make_version($3.string, &module_def);
-		  if(vt==VAR_MODULE)
-		    make_module_name($3.string, &module_def);
+                  if(vt==VAR_MODULE)
+                    make_module_name($3.string, &module_def);
                 }
                 else {
                   rc=myyyerror("Line %d: Unknown variable '%s' in section %d\n",
@@ -348,8 +348,8 @@ procdefsg: procdeclsg proccode
         {
           if(debug>2)printf("SG-PROCDEF:\n");
           write_singular_end(&module_def, &procedure_decl, yylineno);
-	  setup_proc(&module_def, &procedure_decl);
-	  write_helpfile_help(&module_def, &procedure_decl);
+          setup_proc(&module_def, &procedure_decl);
+          write_helpfile_help(&module_def, &procedure_decl);
         }
         | procdeclsg proccode procdeclexample
         {
@@ -357,7 +357,7 @@ procdefsg: procdeclsg proccode
           fflush(module_def.fmtfp);
           write_singular_end(&module_def, &procedure_decl, yylineno);
           setup_proc(&module_def, &procedure_decl);
-	  write_helpfile_help(&module_def, &procedure_decl);
+          write_helpfile_help(&module_def, &procedure_decl);
         }
 ;
 
@@ -402,12 +402,12 @@ procdecl1: PROCDECLTOK NAME
 procdef: procdecl proccode
         {
           if(debug>2)printf("PROCDEF:\n");
-	  write_helpfile_help(&module_def, &procedure_decl);
+          write_helpfile_help(&module_def, &procedure_decl);
         }
         | procdecl proccode procdeclexample
         {
           if(debug>2)printf("PROCDEF mit example:\n");
-	  write_helpfile_help(&module_def, &procedure_decl);
+          write_helpfile_help(&module_def, &procedure_decl);
           fflush(module_def.fmtfp);
         }
         ;
@@ -716,12 +716,12 @@ sect4:  SECT4START codeline SECT4END
 codeline: CODEPART
         {
           fprintf(module_def.modfp, "#line %d \"%s\"\n",
-					  yylineno, module_def.filename);
+                                          yylineno, module_def.filename);
           fprintf(module_def.modfp, "%s", $1);
         }
         | codeline CODEPART
         {
-	  fprintf(module_def.modfp, "%s", $2);
+          fprintf(module_def.modfp, "%s", $2);
         }
         ;
 
