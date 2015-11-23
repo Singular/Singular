@@ -1955,7 +1955,7 @@ THEORY:  The asymmetric residue r of the division with remainder a mod b.
   {
     return(c+b);
   }
-return(c);
+  return(c);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

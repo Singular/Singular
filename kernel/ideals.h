@@ -28,10 +28,7 @@ void idKeepFirstK(ideal ide, const int k);
 void idDelEquals(ideal id);
 
 /// delete an ideal
-static inline void idDelete (ideal* h)
-{
-  id_Delete(h, currRing);
-}
+#define idDelete(H) id_Delete((H),currRing)
 
 /// initialise the maximal ideal (at 0)
 //ideal id_MaxIdeal(int deg, const ring r);

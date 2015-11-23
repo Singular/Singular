@@ -2801,8 +2801,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 
 
 #ifndef SING_NDEBUG
-  id_Test((ideal)CCC, curr);
-  id_Test((ideal)DDD, curr);
+  if (CCC!=NULL) id_Test((ideal)CCC, curr);
+  if (DDD!=NULL) id_Test((ideal)DDD, curr);
   p_Test(CCN, curr);
   p_Test(DDN, curr);
 #endif

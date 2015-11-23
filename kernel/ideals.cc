@@ -1744,7 +1744,7 @@ ideal idMinors(matrix a, int ar, ideal R)
           MATELEM(tmp,i,j) = MATELEM(a,rowchoise[i-1],colchoise[j-1]);
         }
       }
-      p = mp_DetBareiss(tmp,vcurrRing);
+      p = mp_DetBareiss(tmp,currRing);
       if (p!=NULL)
       {
         if (R!=NULL)
@@ -1846,7 +1846,7 @@ ideal idMinors(matrix a, int ar, ideal R)
 
   id_Delete((ideal *)&b, tmpR);
 
-  if (R!=NULL) idDelete(&R);
+  if (R!=NULL) id_Delete(&R,tmpR);
 
   idSkipZeroes(result);
   rChangeCurrRing(origR);
