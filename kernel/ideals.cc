@@ -927,7 +927,7 @@ static void idPrepareStd(ideal s_temp, int k)
       pNext(p) = q;
     }
   }
-  s_temp->rank += k;
+  s_temp->rank = k+IDELEMS(s_temp);
 }
 
 /*2
