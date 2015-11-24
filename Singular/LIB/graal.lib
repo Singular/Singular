@@ -14,7 +14,6 @@ Mora, Teo: La queste del Saint Gr_a(A_L): A computational approach to local alge
 Marais, Magdaleen and Ren, Yue: Mora's holy graal: Algorithms for computing in localizations at prime ideals
 
 PROCEDURES:
-graalMixed(ideal L);
 graalMixed(ideal L, int t);
 dimensionOfLocalization(def L);
 systemOfParametersOfLocalization(def L);
