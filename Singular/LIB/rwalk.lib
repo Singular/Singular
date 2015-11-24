@@ -283,6 +283,7 @@ EXAMPLE: example frandwalk; shows an example"
 {
    // we use ring with ordering (a(...),lp,C)
    list OSCTW    = OrderStringalp_NP("al", #);
+   int n=nvars(basering);
    if(size(#)>1)
    {
      if(size(#[2]) == n*n)

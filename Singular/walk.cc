@@ -2241,7 +2241,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
          target_weight != NULL && G != NULL);
 
   int nRing = currRing->N;
-  int checkRed, j, nG = IDELEMS(G);
+  int j, nG = IDELEMS(G);
   intvec* ivtemp;
 
   mpz_t t_zaehler, t_nenner;
@@ -2406,8 +2406,6 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
     goto FINISH;
   }
 
-   //checkRed = 0;
-
   SIMPLIFY_GCD:
 
   // simplify the vectors curr_weight and diff_weight (C-int)
@@ -2439,14 +2437,6 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
       (*curr_weight)[j] =  (*curr_weight)[j]/gcd_tmp;
       (*diff_weight)[j] =  (*diff_weight)[j]/gcd_tmp;
     }
-  }
-  if(checkRed > 0)
-  {
-    for (j=0; j<nRing; j++)
-    {
-      mpz_set_si(vec[j], (*diff_weight)[j]);
-    }
-    goto TEST_OVERFLOW;
   }
 
 #ifdef  NEXT_VECTORS_CC
@@ -2611,7 +2601,7 @@ intvec* MkInterRedNextWeight(intvec* iva, intvec* ivb, ideal G)
 /********************************************************************
  * define and execute a new ring which order is (a(vb),a(va),lp,C)  *
  * ******************************************************************/
-static void VMrHomogeneous(intvec* va, intvec* vb)
+/*static ring VMrHomogeneous(intvec* va, intvec* vb)
 {
 
   if ((currRing->ppNoether)!=NULL)
@@ -2644,9 +2634,9 @@ static void VMrHomogeneous(intvec* va, intvec* vb)
   //weights: entries for 3 blocks: NULL Made:???
   r->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
   r->wvhdl[0] = (int*) omAlloc(nv*sizeof(int));
-  r->wvhdl[1] = (int*) omAlloc((nv-1)*sizeof(int));
+  r->wvhdl[1] = (int*) omAlloc((nv)*sizeof(int));
 
-  for(i=0; i<nv-1; i++)
+  for(i=0; i<nv; i++)
   {
     r->wvhdl[1][i] = (*vb)[i];
     r->wvhdl[0][i] = (*va)[i];
@@ -2665,12 +2655,12 @@ static void VMrHomogeneous(intvec* va, intvec* vb)
 
  // ringorder a for the second block: var 2..nv
   r->order[1]  = ringorder_a;
-  r->block0[1] = 2;
+  r->block0[1] = 1;
   r->block1[1] = nv;
 
   // ringorder lp for the third block: var 2..nv
   r->order[2]  = ringorder_lp;
-  r->block0[2] = 2;
+  r->block0[2] = 1;
   r->block1[2] = nv;
 
   // ringorder C for the 4th block
@@ -2685,10 +2675,10 @@ static void VMrHomogeneous(intvec* va, intvec* vb)
   // complete ring intializations
 
   rComplete(r);
-
-  rChangeCurrRing(r);
+  return r;
+  //rChangeCurrRing(r);
 }
-
+*/
 
 /**************************************************************
  * define and execute a new ring which order is (a(va),lp,C)  *
@@ -2785,7 +2775,7 @@ static ring VMrRefine(intvec* va, intvec* vb)
   r->cf  = currRing->cf;
   r->N   = currRing->N;
   //int nb = nBlocks(currRing)  + 1;
-  int nb = 4;
+  int nb = 5;
 
   //names
   char* Q; // In order to avoid the corrupted memory, do not change.
@@ -2803,11 +2793,9 @@ static ring VMrRefine(intvec* va, intvec* vb)
 
   for(i=0; i<nv; i++)
   {
-    r->wvhdl[0][i] = (*va)[i];
-    r->wvhdl[1][i] = (*vb)[i];
+    r->wvhdl[0][i] = (*vb)[i];
+    r->wvhdl[1][i] = (*va)[i];
   }
-  r->wvhdl[2]=NULL;
-  r->wvhdl[3]=NULL;
 
   // order: (1..1),a,lp,C
   r->order = (int *) omAlloc(nb * sizeof(int *));
@@ -2820,12 +2808,12 @@ static ring VMrRefine(intvec* va, intvec* vb)
   r->block1[0] = nv;
 
  // ringorder Wp for the second block: var 1..nv
-  r->order[1]  = ringorder_Wp;
+  r->order[1]  = ringorder_a;
   r->block0[1] = 1;
   r->block1[1] = nv;
 
   // ringorder lp for the third block: var 1..nv
-  r->order[2]  = ringorder_C;
+  r->order[2]  = ringorder_lp;
   r->block0[2] = 1;
   r->block1[2] = nv;
 
@@ -2833,7 +2821,10 @@ static ring VMrRefine(intvec* va, intvec* vb)
   // it is very important within "idLift",
   // especially, by ring syz_ring=rCurrRingAssure_SyzComp();
   // therefore, nb  must be (nBlocks(currRing)  + 1)
-  r->order[3]  = 0;
+  r->order[3]  = ringorder_C;
+
+  // the last block: everything is 0
+  r->order[4]  = 0;
 
   // polynomial ring
   r->OrdSgn    = 1;
@@ -5449,14 +5440,18 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M,
   if(orig_M->length() == nV)
   {
     // define a new ring with ordering "(a(curr_weight),lp)
-    newRing = VMrDefault(curr_weight);
+    //newRing = VMrDefault(curr_weight);
+    newRing=VMrRefine(target_weight, curr_weight);
   }
   else
   {
-    newRing = VMatrDefault(orig_M);
+    newRing = VMatrRefine(target_M,curr_weight); //newRing = VMatrDefault(orig_M);
   }
   rChangeCurrRing(newRing);
-
+  if(printout > 2)
+  {
+    Print("\n//** Mrwalk: Current ring r = %s;\n", rString(currRing));
+  }
 #ifdef TIME_TEST
   to = clock();
 #endif
@@ -5517,11 +5512,12 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M,
       if(orig_M->length() == nV)
       {
         // define a new ring with ordering "(a(curr_weight),lp)
-        newRing = VMrDefault(curr_weight);
+        //newRing = VMrDefault(curr_weight);
+        newRing=VMrRefine(target_weight, curr_weight);
       }
       else
       {
-        newRing = VMatrDefault(orig_M);
+        newRing = VMatrRefine(target_M,curr_weight);//newRing = VMatrDefault(orig_M);
       }
     }
     else
@@ -5529,7 +5525,8 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M,
      if(target_M->length() == nV)
      {
        //define a new ring with ordering "(a(curr_weight),lp)"
-       newRing = VMrDefault(curr_weight);
+       //newRing = VMrDefault(curr_weight);
+       newRing=VMrRefine(target_weight, curr_weight);
      }
      else
      {
@@ -5538,6 +5535,10 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M,
      }
     }
     rChangeCurrRing(newRing);
+    if(printout > 2)
+    {
+      Print("\n// Current ring r = %s;\n", rString(currRing));
+    }
     Gomega1 = idrMoveR(Gomega, baseRing,currRing);
     idDelete(&Gomega);
     // compute a reduced Groebner basis of <Gomega> w.r.t. "newRing"
@@ -5743,11 +5744,12 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
   }
   if(orig_M->length() == nV)
   {
-    newRing = VMrDefault(curr_weight); // define a new ring with ordering "(a(curr_weight),lp)
+    //newRing = VMrDefault(curr_weight); // define a new ring with ordering "(a(curr_weight),lp)
+    newRing=VMrRefine(target_weight, curr_weight);
   }
   else
   {
-    newRing = VMatrDefault(orig_M);
+    newRing = VMatrRefine(target_M,curr_weight);//newRing = VMatrDefault(orig_M);
   }
   rChangeCurrRing(newRing);
 #ifdef TIME_TEST
@@ -5803,18 +5805,20 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
     {
       if(orig_M->length() == nV)
       {
-        newRing = VMrDefault(curr_weight); // define a new ring with ordering "(a(curr_weight),lp)
+        /*newRing = VMrDefault(curr_weight); // define a new ring with ordering "(a(curr_weight),lp)*/
+        newRing=VMrRefine(target_weight, curr_weight);
       }
       else
       {
-        newRing = VMatrDefault(orig_M);
+        newRing = VMatrRefine(target_M,curr_weight);//newRing = VMatrDefault(orig_M);
       }
     }
     else
     {
      if(target_M->length() == nV)
      {
-       newRing = VMrDefault(curr_weight); // define a new ring with ordering "(a(curr_weight),lp)
+       /*newRing = VMrDefault(curr_weight); // define a new ring with ordering "(a(curr_weight),lp)*/
+       newRing=VMrRefine(target_weight, curr_weight);
      }
      else
      {
@@ -5923,7 +5927,8 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
       delete next_weight;
       if(target_M->length() == nV)
       {
-        iv_M = MivMatrixOrder(curr_weight);
+        //iv_M = MivMatrixOrder(curr_weight);
+        iv_M = MivMatrixOrderRefine(curr_weight,target_M);
       }
       else
       {
@@ -6079,10 +6084,13 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
   else
   {
     //define ring order := (a(curr_weight),lp);
+/*
     if (rParameter(currRing) != NULL)
       DefRingPar(curr_weight);
     else
       rChangeCurrRing(VMrDefault(curr_weight));
+*/
+    rChangeCurrRing(VMrRefine(target_weight,curr_weight));
 
     G = idrMoveR(Go, XXRing,currRing);
     G = MstdCC(G);
@@ -6102,10 +6110,13 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
   // perturbs the target weight vector
   if(tp_deg > 1 && tp_deg <= nV)
   {
+/*
     if (rParameter(currRing) != NULL)
       DefRingPar(target_weight);
     else
       rChangeCurrRing(VMrDefault(target_weight));
+*/
+    rChangeCurrRing(VMrRefine(target_weight,curr_weight));
 
     TargetRing = currRing;
     ssG = idrMoveR(G,HelpRing,currRing);
@@ -6184,10 +6195,13 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
     oldRing = currRing;
 
     // define a new ring with ordering "(a(curr_weight),lp)
+/*
     if (rParameter(currRing) != NULL)
       DefRingPar(curr_weight);
     else
       rChangeCurrRing(VMrDefault(curr_weight));
+*/
+    rChangeCurrRing(VMrRefine(target_weight,curr_weight));
 
     newRing = currRing;
     Gomega1 = idrMoveR(Gomega, oldRing,currRing);
@@ -6343,17 +6357,17 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
   if(tp_deg != 1)
   {
   FINISH_160302:
-    if(MivSame(orig_target, exivlp) == 1)
-      if (rParameter(currRing) != NULL)
+    if(MivSame(orig_target, exivlp) == 1) {
+    /*  if (rParameter(currRing) != NULL)
         DefRingParlp();
       else
         VMrDefaultlp();
     else
       if (rParameter(currRing) != NULL)
         DefRingPar(orig_target);
-      else
+      else*/
         rChangeCurrRing(VMrDefault(orig_target));
-
+    }
     TargetRing=currRing;
     F1 = idrMoveR(G, newRing,currRing);
 /*
@@ -7018,7 +7032,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
   intvec* omtmp = new intvec(nV);
   //intvec* altomega = new intvec(nV);
 
-  for(i = nV -1; i>0; i--)
+  for(i = nV -1; i=0; i--)//Aenderung!!
   {
     (*omtmp)[i] = (*ivtarget)[i];
   }
@@ -7088,14 +7102,18 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
 
         if(ivtarget->length() == nV)
         {
+/*
           if (rParameter(currRing) != NULL)
             DefRingPar(omtmp);
           else
             rChangeCurrRing(VMrDefault(omtmp));
+*/
+          rChangeCurrRing(VMrRefine(ivtarget,omtmp));
         }
         else
         {
-          rChangeCurrRing(VMatrDefault(ivtarget));
+          //rChangeCurrRing(VMatrDefault(ivtarget));
+          rChangeCurrRing(VMatrRefine(ivtarget,omtmp));
         }
         testring = currRing;
         Gt = idrMoveR(G, oRing,currRing);
@@ -7152,14 +7170,18 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
       delete next_vect;
       if(ivtarget->length() == nV)
       {
+/*
         if (rParameter(currRing) != NULL)
           DefRingPar(omtmp);
         else
           rChangeCurrRing(VMrDefault(omtmp));
+*/
+        rChangeCurrRing(VMrRefine(ivtarget,omtmp));
       }
       else
       {
-        rChangeCurrRing(VMatrDefault(ivtarget));
+        //rChangeCurrRing(VMatrDefault(ivtarget));
+        rChangeCurrRing(VMatrRefine(ivtarget,omtmp));
       }
 #ifdef TEST_OVERFLOW
       Gt = idrMoveR(G, oRing,currRing);
@@ -7184,7 +7206,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
       //delete altomega;
       if(printout > 0)
       {
-        Print("\n//** rec_fractal_call: Overflow. Leaving the %d-th recursion with %d steps.\n",
+        Print("\n//** rec_fractal_call: Overflow. (4) Leaving the %d-th recursion with %d steps.\n",
               nlev, nwalks);
         //Print(" ** Overflow_Error? (%d)", Overflow_Error);
       }
@@ -7201,23 +7223,27 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
 
     /* the computed vector is equal to the origin vector, since
        t is not defined */
+
     if (MivComp(next_vect, XivNull) == 1)
     {
       if(ivtarget->length() == nV)
       {
+/*
         if (rParameter(currRing) != NULL)
           DefRingPar(omtmp);
         else
           rChangeCurrRing(VMrDefault(omtmp));
+*/
+        rChangeCurrRing(VMrRefine(ivtarget,omtmp));
       }
       else
       {
-        rChangeCurrRing(VMatrDefault(ivtarget));
+        //rChangeCurrRing(VMatrDefault(ivtarget));
+        rChangeCurrRing(VMatrRefine(ivtarget,omtmp));
       }
 
       testring = currRing;
       Gt = idrMoveR(G, oRing,currRing);
-
       if(test_w_in_ConeCC(Gt, omega2) == 1)
       {
         delete omega2;
@@ -7225,8 +7251,12 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
         //delete altomega;
         if(printout > 0)
         {
-          Print("\n//** rec_fractal_call: Correct cone. Leaving the %d-th recursion with %d steps.\n",
+          Print("\n//** rec_fractal_call: Correct cone. (5) Leaving the %d-th recursion with %d steps.\n",
               nlev, nwalks);
+        }
+        if(printout>2)
+        {
+          idString(Gt,"//** rec_fractal_call: Gt");
         }
         return (Gt);
       }
@@ -7292,6 +7322,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
         // update the original target vector w.r.t. the current GB
         if(ivtarget->length() == nV)
         {
+/*
           if(MivSame(Xivinput, Xivlp) == 1)
             if (rParameter(currRing) != NULL)
               DefRingParlp();
@@ -7302,6 +7333,8 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
               DefRingPar(Xivinput);
             else
               rChangeCurrRing(VMrDefault(Xivinput));
+*/
+          rChangeCurrRing(VMrRefine(ivtarget,Xivinput));
         }
         else
         {
@@ -7330,7 +7363,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
         //delete altomega;
         if(printout > 0)
         {
-          Print("\n//** rec_fractal_call: Vectors updated. Leaving the %d-th recursion with %d steps.\n",
+          Print("\n//** rec_fractal_call: Vectors updated. (6) Leaving the %d-th recursion with %d steps.\n",
               nlev, nwalks);
           //Print(" ** Overflow_Error? (%d)", Overflow_Error);
         }
@@ -7385,10 +7418,13 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
 
     if(ivtarget->length() == nV)
     {
+/*
       if (rParameter(currRing) != NULL)
         DefRingPar(omega);
       else
         rChangeCurrRing(VMrDefault(omega));
+*/
+      rChangeCurrRing(VMrRefine(ivtarget,omega));
     }
     else
     {
@@ -7497,7 +7533,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
 
   //BOOLEAN isnewtarget = FALSE;
 
-  for(i = nV -1; i>0; i--)
+  for(i = nV -1; i=0; i--)
   {
     (*omtmp)[i] = (*ivtarget)[i];
   }
@@ -7592,14 +7628,18 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
         nlev +=1;
         if(ivtarget->length() == nV)
         {
+/*
           if (rParameter(currRing) != NULL)
             DefRingPar(omtmp);
           else
             rChangeCurrRing(VMrDefault(omtmp));
+*/
+          rChangeCurrRing(VMrRefine(ivtarget,omtmp));
         }
         else
         {
-          rChangeCurrRing(VMatrDefault(ivtarget));
+          //rChangeCurrRing(VMatrDefault(ivtarget));
+          rChangeCurrRing(VMatrRefine(ivtarget,omtmp));
         }
         testring = currRing;
         Gt = idrMoveR(G, oRing,currRing);
@@ -7688,6 +7728,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
       delete next_vect;
       if(ivtarget->length() == nV)
       {
+/*
         if (rParameter(currRing) != NULL)
         {
           DefRingPar(omtmp);
@@ -7696,10 +7737,13 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
         {
           rChangeCurrRing(VMrDefault(omtmp));
         }
+*/
+        rChangeCurrRing(VMrRefine(ivtarget,omtmp));
       }
       else
       {
-        rChangeCurrRing(VMatrDefault(ivtarget));
+        //rChangeCurrRing(VMatrDefault(ivtarget));
+        rChangeCurrRing(VMatrRefine(ivtarget,omtmp));
       }
 #ifdef TEST_OVERFLOW
       Gt = idrMoveR(G, oRing,currRing);
@@ -7725,7 +7769,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
       delete altomega;
       if(printout > 0)
       {
-        Print("\n//** rec_r_fractal_call: Leaving the %d-th recursion with %d steps.\n",
+        Print("\n//** rec_r_fractal_call: (1) Leaving the %d-th recursion with %d steps.\n",
               nlev, nwalks);
         //Print(" ** Overflow_Error? (%d)", Overflow_Error);
       }
@@ -7746,14 +7790,18 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
       // because t is not defined
       if(ivtarget->length() == nV)
       {
+/*
         if (rParameter(currRing) != NULL)
           DefRingPar(omtmp);
         else
           rChangeCurrRing(VMrDefault(omtmp));
+*/
+        rChangeCurrRing(VMrRefine(ivtarget,omtmp));
       }
       else
       {
-        rChangeCurrRing(VMatrDefault(ivtarget));
+        //rChangeCurrRing(VMatrDefault(ivtarget));
+        rChangeCurrRing(VMatrRefine(ivtarget,omtmp));
       }
       testring = currRing;
       Gt = idrMoveR(G, oRing,currRing);
@@ -7765,7 +7813,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
         delete altomega;
         if(printout > 0)
         {
-          Print("\n//** rec_r_fractal_call: Leaving the %d-th recursion with %d steps.\n",
+          Print("\n//** rec_r_fractal_call: (2) Leaving the %d-th recursion with %d steps.\n",
                 nlev, nwalks);
           //Print(" ** Overflow_Error? (%d)", Overflow_Error);
         }
@@ -7843,6 +7891,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
         // update the original target vector w.r.t. the current GB
         if(ivtarget->length() == nV)
         {
+/*
           if(MivSame(Xivinput, Xivlp) == 1)
             if (rParameter(currRing) != NULL)
               DefRingParlp();
@@ -7853,6 +7902,8 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
               DefRingPar(Xivinput);
             else
               rChangeCurrRing(VMrDefault(Xivinput));
+*/
+          rChangeCurrRing(VMrRefine(ivtarget,Xivinput));
         }
         else
         {
@@ -7881,7 +7932,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
         delete altomega;
         if(printout > 0)
         {
-          Print("\n//** rec_r_fractal_call: Leaving the %d-th recursion with %d steps.\n",
+          Print("\n//** rec_r_fractal_call: (3) Leaving the %d-th recursion with %d steps.\n",
                 nlev,nwalks);
           //Print(" ** Overflow_Error? (%d)", Overflow_Error);
         }
@@ -7938,10 +7989,13 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
 #endif
     if(ivtarget->length() == nV)
     {
+/*
       if (rParameter(currRing) != NULL)
         DefRingPar(omega);
       else
         rChangeCurrRing(VMrDefault(omega));
+*/
+      rChangeCurrRing(VMrRefine(ivtarget,omega));
     }
     else
     {
@@ -8024,7 +8078,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
 /*******************************************************************************
  * The implementation of the fractal walk algorithm                            *
  *                                                                             *
- * The main procedur Mfwalk calls the recursive Subroutine                     *
+ * The main procedure Mfwalk calls the recursive Subroutine                    *
  * rec_fractal_call to compute the wanted Groebner basis.                      *
  * At the main procedur we compute the reduced Groebner basis w.r.t. a "fast"  *
  * order, e.g. "dp" and a sequence of weight vectors which are row vectors     *
@@ -8147,14 +8201,18 @@ ideal Mfwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   ring tRing = currRing;
   if(ivtarget->length() == nV)
   {
+/*
     if (rParameter(currRing) != NULL)
       DefRingPar(ivstart);
     else
       rChangeCurrRing(VMrDefault(ivstart));
+*/
+    rChangeCurrRing(VMrRefine(ivtarget,ivstart));
   }
   else
   {
-    rChangeCurrRing(VMatrDefault(ivstart));
+    //rChangeCurrRing(VMatrDefault(ivstart));
+    rChangeCurrRing(VMatrRefine(ivtarget,ivstart));
   }
 
   I = idrMoveR(I1,tRing,currRing);
@@ -8170,17 +8228,20 @@ ideal Mfwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   ring helpRing = currRing;
 
   J = rec_fractal_call(J,1,ivtarget,reduction,printout);
-
+  idString(J,"//** Mfwalk: J");
   rChangeCurrRing(oldRing);
+  Print("\n//Mfwalk: (2)\n");
   resF = idrMoveR(J, helpRing,currRing);
+  Print("\n//Mfwalk: (3)\n");
   idSkipZeroes(resF);
+  Print("\n//Mfwalk: (4)\n");
 
   si_opt_1 = save1; //set original options, e. g. option(RedSB)
   delete Xivlp;
   delete Xsigma;
   delete Xtau;
   delete XivNull;
-
+Print("\n//Mfwalk: (5)\n");
 #ifdef TIME_TEST
   TimeStringFractal(xftinput, xftostd, xtif, xtstd, xtextra,
                     xtlift, xtred, xtnw);
@@ -8190,8 +8251,9 @@ ideal Mfwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   Print("\n// Overflow_Error? (%d)\n", Overflow_Error);
   Print("\n// the numbers of Overflow_Error (%d)", nnflow);
 #endif
-
-  return(resF);
+Print("\n//Mfwalk: (6)\n");
+  idString(resF,"//** Mfwalk: resF");
+  return(idCopy(resF));
 }
 
 /*******************************************************************************
@@ -8326,14 +8388,18 @@ ideal Mfrwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   ring tRing = currRing;
   if(ivtarget->length() == nV)
   {
+/*
     if (rParameter(currRing) != NULL)
       DefRingPar(ivstart);
     else
       rChangeCurrRing(VMrDefault(ivstart));
+*/
+    rChangeCurrRing(VMrRefine(ivtarget,ivstart));
   }
   else
   {
-    rChangeCurrRing(VMatrDefault(ivstart));
+    //rChangeCurrRing(VMatrDefault(ivstart));
+    rChangeCurrRing(VMatrRefine(ivtarget,ivstart));
   }
 
   I = idrMoveR(I1,tRing,currRing);
@@ -8349,17 +8415,20 @@ ideal Mfrwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   ring helpRing = currRing;
 
   J = rec_r_fractal_call(J,1,ivtarget,weight_rad,reduction,printout);
-
+idString(J,"//*** Mfrwalk: J");
+Print("\n//** Mfrwalk hier (1)\n");
   rChangeCurrRing(oldRing);
+Print("\n//** Mfrwalk hier (2)\n");
   resF = idrMoveR(J, helpRing,currRing);
-  idSkipZeroes(resF);
-
+Print("\n//** Mfrwalk hier (3)\n");
+  //idSkipZeroes(resF);
+Print("\n//** Mfrwalk hier (4)\n");
   si_opt_1 = save1; //set original options, e. g. option(RedSB)
   delete Xivlp;
   delete Xsigma;
   delete Xtau;
   delete XivNull;
-
+Print("\n//** Mfrwalk hier (5)\n");
 #ifdef TIME_TEST
   TimeStringFractal(xftinput, xftostd, xtif, xtstd, xtextra,
                     xtlift, xtred, xtnw);
@@ -8369,7 +8438,9 @@ ideal Mfrwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   Print("\n// Overflow_Error? (%d)\n", Overflow_Error);
   Print("\n// the numbers of Overflow_Error (%d)", nnflow);
 #endif
-
+Print("\n//** Mfrwalk hier (6)\n");
+idString(resF,"resF");
+Print("\n//** Mfrwalk hier (7)\n");
   return(resF);
 }
 

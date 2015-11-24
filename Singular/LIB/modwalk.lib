@@ -54,10 +54,12 @@ EXAMPLE:  example modWalk; shows an example"
 
     /* call modular() */
     if (size(#) > 0) {
-        I = modular("gwalk", list(I,#));
+        I = modular("gwalk", list(I,#), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
     }
     else {
-        I = modular("gwalk", list(I));
+        I = modular("gwalk", list(I), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
     }
 
     /* return the result */
@@ -107,10 +109,11 @@ EXAMPLE:  example modrWalk; shows an example"
 
     /* call modular() */
     if (size(#) > 0) {
-        I = modular("rwalk", list(I,radius,pertdeg,#));
+        I = modular("rwalk", list(I,radius,pertdeg,#), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
     }
     else {
-        I = modular("rwalk", list(I,radius,pertdeg));
+        I = modular("rwalk", list(I,radius,pertdeg),primeTest_std,deleteUnluckyPrimes_std,pTest_std);
     }
 
     /* return the result */
@@ -161,10 +164,12 @@ EXAMPLE:  example modfWalk; shows an example"
 
     /* call modular() */
     if (size(#) > 0) {
-        I = modular("fwalk", list(I,#));
+        I = modular("fwalk", list(I,#), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
     }
     else {
-        I = modular("fwalk", list(I));
+        I = modular("fwalk", list(I), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
     }
 
     /* return the result */
@@ -213,10 +218,12 @@ EXAMPLE:  example modfrWalk; shows an example"
 
     /* call modular() */
     if (size(#) > 0) {
-        I = modular("frandwalk", list(I,radius,#));
+        I = modular("frandwalk", list(I,radius,#), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
     }
     else {
-        I = modular("frandwalk", list(I,radius));
+        I = modular("frandwalk", list(I,radius), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
     }
 
     /* return the result */
@@ -236,4 +243,240 @@ example
     int radius = 2;
     ideal J = modfrWalk(I,radius);
     J;
+}
+
+/* test if the prime p is suitable for the input, i.e. it does not divide
+ * the numerator or denominator of any of the coefficients */
+static proc primeTest_std(int p, alias list args)
+{
+    /* erase zero generators */
+    ideal I = simplify(args[1], 2);
+
+    /* clear denominators and count the terms */
+    ideal J;
+    ideal K;
+    int n = ncols(I);
+    intvec sizes;
+    number cnt;
+    int i;
+    for(i = n; i > 0; i--) {
+        J[i] = cleardenom(I[i]);
+        cnt = leadcoef(J[i])/leadcoef(I[i]);
+        K[i] = numerator(cnt)*var(1)+denominator(cnt);
+    }
+    sizes = size(J[1..n]);
+
+    /* change to characteristic p */
+    def br = basering;
+    list lbr = ringlist(br);
+    if (typeof(lbr[1]) == "int") {
+        lbr[1] = p;
+    }
+    else {
+        lbr[1][1] = p;
+    }
+    def rp = ring(lbr);
+    setring(rp);
+    ideal Jp = fetch(br, J);
+    ideal Kp = fetch(br, K);
+
+    /* test if any coefficient is missing */
+    if (intvec(size(Kp[1..n])) != 2:n) {
+        setring(br);
+        return(0);
+    }
+    if (intvec(size(Jp[1..n])) != sizes) {
+        setring(br);
+        return(0);
+    }
+    setring(br);
+    return(1);
+}
+
+/* find entries in modresults which come from unlucky primes.
+ * For this, sort the entries into categories depending on their leading
+ * ideal and return the indices in all but the biggest category. */
+static proc deleteUnluckyPrimes_std(alias list modresults)
+{
+    int size_modresults = size(modresults);
+
+    /* sort results into categories.
+     * each category is represented by three entries:
+     * - the corresponding leading ideal
+     * - the number of elements
+     * - the indices of the elements
+     */
+    list cat;
+    int size_cat;
+    ideal L;
+    int i;
+    int j;
+    for (i = 1; i <= size_modresults; i++) {
+        L = lead(modresults[i]);
+        attrib(L, "isSB", 1);
+        for (j = 1; j <= size_cat; j++) {
+            if (size(L) == size(cat[j][1])
+                && size(reduce(L, cat[j][1])) == 0
+                && size(reduce(cat[j][1], L)) == 0) {
+                cat[j][2] = cat[j][2]+1;
+                cat[j][3][cat[j][2]] = i;
+                break;
+            }
+        }
+        if (j > size_cat) {
+            size_cat++;
+            cat[size_cat] = list();
+            cat[size_cat][1] = L;
+            cat[size_cat][2] = 1;
+            cat[size_cat][3] = list(i);
+        }
+    }
+
+    /* find the biggest categories */
+    int cat_max = 1;
+    int max = cat[1][2];
+    for (i = 2; i <= size_cat; i++) {
+        if (cat[i][2] > max) {
+            cat_max = i;
+            max = cat[i][2];
+        }
+    }
+
+    /* return all other indices */
+    list unluckyIndices;
+    for (i = 1; i <= size_cat; i++) {
+        if (i != cat_max) {
+            unluckyIndices = unluckyIndices + cat[i][3];
+        }
+    }
+    return(unluckyIndices);
+}
+
+/* test if 'command' applied to 'args' in characteristic p is the same as
+   'result' mapped to characteristic p */
+static proc pTest_std(string command, alias list args, alias ideal result,
+    int p)
+{
+    /* change to characteristic p */
+    def br = basering;
+    list lbr = ringlist(br);
+    if (typeof(lbr[1]) == "int") {
+        lbr[1] = p;
+    }
+    else {
+        lbr[1][1] = p;
+    }
+    def rp = ring(lbr);
+    setring(rp);
+    ideal Ip = fetch(br, args)[1];
+    list Arg = fetch(br, args);
+    string exstr;
+    ideal Gp = fetch(br, result);
+    attrib(Gp, "isSB", 1);
+
+    /* test if Ip is in Gp */
+    int i;
+    for (i = ncols(Ip); i > 0; i--) {
+        if (reduce(Ip[i], Gp, 1) != 0) {
+            setring(br);
+            return(0);
+        }
+    }
+
+    /* compute command(args) */
+    exstr = "Ip = "+command+" (Ip";
+    exstr;
+    for(i=2; i<=size(Arg); i++) {
+      exstr = exstr+",Arg["+string(eval(i))+"]";
+      }
+    exstr = exstr+");";
+    exstr;
+    execute(exstr);
+    /*
+    if(size(Arg)==1) {
+      execute("Ip = "+command+"(Ip);");
+      }
+    if(size(Arg)==2) {
+         execute("Ip = "+command+"(Ip,Arg[2]);");
+      }
+    if(size(Arg)==3) {
+        execute("Ip = "+command+"(Ip,Arg[2],Arg[3]);");
+     }
+*/
+
+    /* test if Gp is in Ip */
+    for (i = ncols(Gp); i > 0; i--) {
+        if (reduce(Gp[i], Ip, 1) != 0) {
+            setring(br);
+            return(0);
+        }
+    }
+
+    setring(br);
+    return(1);
+}
+
+/* test if 'result' is a GB of the input ideal */
+static proc finalTest_std(string command, alias list args, ideal result)
+{
+    /* test if args[1] is in result */
+    attrib(result, "isSB", 1);
+    int i;
+    for (i = ncols(args[1]); i > 0; i--) {
+        if (reduce(args[1][i], result, 1) != 0) {
+            return(0);
+        }
+    }
+
+    /* test if result is a GB */
+    ideal G = std(result);
+    //if (reduce_parallel(G, result)) {
+    if(size(reduce(G, result))) {
+        return(0);
+    }
+    return(1);
+}
+
+/* return 1, if I_reduce is _not_ in G_reduce,
+ *        0, otherwise
+ * (same as size(reduce(I_reduce, G_reduce))).
+ * Uses parallelization. */
+static proc reduce_parallel(def I_reduce, def G_reduce)
+{
+    exportto(Modstd, I_reduce);
+    exportto(Modstd, G_reduce);
+    int size_I = ncols(I_reduce);
+    int chunks = Modular::par_range(size_I);
+    intvec range;
+    int i;
+    for (i = chunks; i > 0; i--) {
+        range = Modular::par_range(size_I, i);
+        task t(i) = "Modstd::reduce_task", list(range);
+    }
+    startTasks(t(1..chunks));
+    waitAllTasks(t(1..chunks));
+    int result = 0;
+    for (i = chunks; i > 0; i--) {
+        if (getResult(t(i))) {
+            result = 1;
+            break;
+        }
+    }
+    kill I_reduce;
+    kill G_reduce;
+    return(result);
+}
+
+/* compute a chunk of reductions for reduce_parallel */
+static proc reduce_task(intvec range)
+{
+    int result = 0;
+    int i;
+    for (i = range[1]; i <= range[2]; i++) {
+        if (reduce(I_reduce[i], G_reduce, 1) != 0) {
+            result = 1;
+            break;
+        }
+    }
+    return(result);
 }
