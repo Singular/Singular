@@ -1326,6 +1326,14 @@ void heuristicGcdCancellation(number a, const coeffs cf)
       }
     }
   }
+  if ((DEN(f)!=NULL)
+  && (pNext(DEN(f))==NULL)
+  && (p_LmIsConstantComp(DEN(f),ntRing))
+  && (n_IsOne(pGetCoeff(DEN(f)),ntCoeffs)))
+  {
+     p_Delete(&DEN(f),ntRing);
+     COM(f)=0;
+  }
 }
 
 /// modifies a
