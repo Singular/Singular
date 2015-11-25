@@ -7,19 +7,26 @@ AUTHOR:   Magdaleen Marais,  magdaleen@aims.ac.za
           Yue Ren,           ren@mathematik.uni-kl.de
 
 OVERVIEW:
-This library is on a computational treatment of localizations at prime ideals and their associated graded rings based on a work of Mora. Not only does it construct a ring isomorphic to the localization of an affine coordinate ring at a prime ideal, the algorithms in this library aim to exploit the topology in the localization by computing first and foremost in the associated graded ring and lifting the result to the localization afterwards. Features include a check for regularity and the resolution of ideals.
+This library is on a computational treatment of localizations at prime ideals
+and their associated graded rings based on a work of Mora.
+Not only does it construct a ring isomorphic to the localization of an affine
+coordinate ring at a prime ideal,
+the algorithms in this library aim to exploit the topology in the localization
+by computing first and foremost in the associated graded ring and lifting
+the result to the localization afterwards.
+Features include a check for regularity and the resolution of ideals.
 
 REFERENCES:
 Mora, Teo: La queste del Saint Gr_a(A_L): A computational approach to local algebra
 Marais, Magdaleen and Ren, Yue: Mora's holy graal: Algorithms for computing in localizations at prime ideals
 
 PROCEDURES:
-graalMixed(ideal L, int t);
-dimensionOfLocalization(def L);
-systemOfParametersOfLocalization(def L);
-isLocalizationRegular(def L);
-warkedPreimageStd(warkedModule wM);
-resolutionInLocalization(ideal I, def L);
+graalMixed(ideal L[,int t]);              contruct graalBearer
+dimensionOfLocalization(def L);           dimension of the localization A_L of A at L
+systemOfParametersOfLocalization(def L);  system of parameter of the localization A_L of A at L
+isLocalizationRegular(def L);             test if localization A_L of A at L is regular
+warkedPreimageStd(warkedModule wM);       std for warkedModule
+resolutionInLocalization(ideal I, def L); the resolution of I*A_L
 ";
 
 LIB "general.lib";  // for watchdog
