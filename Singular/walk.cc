@@ -19,7 +19,7 @@
 #define CHECK_IDEAL_MWALK //to print intermediate results
 
 //#define NEXT_VECTORS_CC
-#define PRINT_VECTORS //to print weight vectors
+//#define PRINT_VECTORS //to print weight vectors
 
 #define INVEPS_SMALL_IN_FRACTAL  //to choose the small invers of epsilon
 #define INVEPS_SMALL_IN_MPERTVECTOR  //to choose the small invers of epsilon
@@ -989,7 +989,7 @@ intvec* MivMatrixOrderRefine(intvec* iv, intvec* iw)
 {
   assume((iv->length())*(iv->length()) == iw->length());
   int i,j, nR = iv->length();
-  
+
   intvec* ivm = new intvec(nR*nR);
 
   for(i=0; i<nR; i++)
@@ -2150,7 +2150,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
     for(j=0; j<nRing; j++)
     {
       (*diff_weight)[j] = (*diff_weight1)[j];
-      mpz_set_si(vec[j], (*diff_weight)[j]);      
+      mpz_set_si(vec[j], (*diff_weight)[j]);
     }
     for(j=0; j<nRing; j++)
     {
@@ -2296,7 +2296,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
     {
       for(j=0; j<nRing; j++)
       {
-        (*curr_weight)[j] = (*diff_weight1)[j];  
+        (*curr_weight)[j] = (*diff_weight1)[j];
       }
       for(j=0; j<nRing; j++)
       {
@@ -2830,7 +2830,7 @@ static ring VMrRefine(intvec* va, intvec* vb)
   r->OrdSgn    = 1;
 
   // complete ring intializations
-  
+
   rComplete(r);
 
   //rChangeCurrRing(r);
@@ -3255,7 +3255,7 @@ static ideal middleOfCone(ideal G, ideal Gomega)
   poly p,lm,factor1,factor2;
 
   ideal Go = idCopy(G);
-  
+
   // check whether leading monomials of G and Gomega coincide
   // and return NULL if not
   for(i=0; i<N; i++)
@@ -3263,7 +3263,7 @@ static ideal middleOfCone(ideal G, ideal Gomega)
     if(!pIsConstant(pSub(pCopy(Gomega->m[i]),pCopy(pHead(G->m[i])))))
     {
       idDelete(&Go);
-      return NULL; 
+      return NULL;
     }
   }
   for(i=0; i<N; i++)
@@ -3273,7 +3273,7 @@ static ideal middleOfCone(ideal G, ideal Gomega)
       if(i!=j)
       {
         p = pCopy(Gomega->m[i]);
-	lm = pCopy(Gomega->m[j]);
+        lm = pCopy(Gomega->m[j]);
         pIter(p);
         while(p!=NULL)
         {
@@ -3282,7 +3282,7 @@ static ideal middleOfCone(ideal G, ideal Gomega)
             if(middle == FALSE)
             {
               middle = TRUE;
-	    }
+            }
             factor1 = singclap_pdivide(pHead(p),lm,currRing);
             factor2 = pMult(pCopy(factor1),pCopy(Go->m[j]));
             pDelete(&factor1);
@@ -3302,7 +3302,7 @@ static ideal middleOfCone(ideal G, ideal Gomega)
     return Go;
   }
   idDelete(&Go);
-  return NULL; 
+  return NULL;
 }
 
 /******************************  Februar 2002  ****************************
@@ -4253,10 +4253,9 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
     // compute a next weight vector
     next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
     xtnw=xtnw+clock()-to;
-/*#ifdef PRINT_VECTORS
+#ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
 #endif
-*/
     if(Overflow_Error == TRUE)
     {
       //PrintS("\n// ** The next vector does NOT stay in Cone!!\n");
@@ -4291,7 +4290,7 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
         // REC_LAST_GB_ALT2:
         //nOverflow_Error = Overflow_Error;
         tproc=tproc+clock()-tinput;
-        
+
         /*Print("\n// takes %d steps and calls \"Rec_LastGB\" (%d):",
         nwalk, tp_deg+1);
         */
@@ -4702,7 +4701,7 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* orig_M, intvec* target_wei
       k++;
     }
   }
-  
+
   // compute "perturbed" next weight vector
   if(pert_deg > 1)
   {
@@ -4715,7 +4714,7 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* orig_M, intvec* target_wei
     next_weight = MkInterRedNextWeight(curr_weight,target_weight,G);
   }
   if(MivSame(curr_weight,next_weight)==1 || Overflow_Error == TRUE)
-  { 
+  {
     Overflow_Error = FALSE;
     delete next_weight;
     next_weight = MkInterRedNextWeight(curr_weight,target_weight,G);
@@ -4744,7 +4743,7 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* orig_M, intvec* target_wei
           {
             (*result)[i] = (*next_weight1)[i];
           }
-        }    
+        }
       }
       else
       {
@@ -4821,7 +4820,7 @@ static intvec* MWalkRandomNextWeight(ideal G, intvec* orig_M, intvec* target_wei
     idDelete(&G_test2);
   }
   if(test_w_in_ConeCC(G, result) == 1 && MivSame(curr_weight,result)==0)
-  { 
+  {
     delete curr_weight;
     delete next_weight1;
     return result;
@@ -5490,17 +5489,17 @@ ideal Mwalk(ideal Go, intvec* orig_M, intvec* target_M,
       {
       PrintS("middle of Cone");
         idDelete(&G);
-	G = idCopy(FF);
-	idDelete(&FF);
+        G = idCopy(FF);
+        idDelete(&FF);
         goto NEXT_VECTOR;
-      }	
+      }
     }
 
 #ifndef  BUCHBERGER_ALG
     if(isNolVector(curr_weight) == 0)
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,curr_weight,currRing);
-    }	
+    }
     else
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,last_omega,currRing);
@@ -5786,16 +5785,16 @@ ideal Mrwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad, int per
       if(FF != NULL)
       {
         idDelete(&G);
-	G = idCopy(FF);
-	idDelete(&FF);
+        G = idCopy(FF);
+        idDelete(&FF);
         goto NEXT_VECTOR;
-      }	
+      }
     }
 #ifndef  BUCHBERGER_ALG
     if(isNolVector(curr_weight) == 0)
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,curr_weight,currRing);
-    }	
+    }
     else
     {
       hilb_func = hFirstSeries(Gomega,NULL,NULL,last_omega,currRing);
@@ -6167,8 +6166,8 @@ ideal Mpwalk(ideal Go, int op_deg, int tp_deg,intvec* curr_weight,
       if(FF != NULL)
       {
         idDelete(&G);
-	G = idCopy(FF);
-	idDelete(&FF); 
+        G = idCopy(FF);
+        idDelete(&FF);
         goto NEXT_VECTOR;
       }
     }
@@ -6649,10 +6648,10 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
       if(FF != NULL)
       {
         idDelete(&G);
-	G = idCopy(FF);
-	idDelete(&FF); 
+        G = idCopy(FF);
+        idDelete(&FF);
         goto NEXT_VECTOR;
-      }	
+      }
     }
 
 #ifdef ENDWALKS
@@ -6701,7 +6700,7 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
 
         //idElements(Gomega1, "Gw");
         //headidString(Gomega1, "headGw");
-      
+
         PrintS("\n// compute a rGB of Gw:\n");
       }
 #ifndef  BUCHBERGER_ALG
@@ -7404,11 +7403,11 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
       if( FF != NULL)
       {
         idDelete(&G);
-	G = idCopy(FF);
-	idDelete(&FF);
-        // Compue next vector. 
+        G = idCopy(FF);
+        idDelete(&FF);
+        // Compue next vector.
         goto NEXT_VECTOR_FRACTAL;
-      }	
+      }
     }
 
 #ifndef  BUCHBERGER_ALG
@@ -7823,7 +7822,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
         return (Gt);
       }
       else
-      { 
+      {
         if(printout > 0)
         {
           Print("\n//** rec_r_fractal_call: target weight doesn't stay in the correct cone.\n");
@@ -7977,11 +7976,11 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
       if( FF != NULL)
       {
         idDelete(&G);
-	G = idCopy(FF);
-	idDelete(&FF);
+        G = idCopy(FF);
+        idDelete(&FF);
         /* Compue next vector. */
         goto NEXT_VECTOR_FRACTAL;
-      }	
+      }
     }
 
 #ifndef  BUCHBERGER_ALG
@@ -8620,10 +8619,9 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
     // compute a next weight vector
     next_weight = MwalkNextWeightCC(curr_weight,target_weight, G);
     tnw=tnw+clock()-to;
-/*#ifdef PRINT_VECTORS
+#ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
 #endif
-*/
 
     /* check whether the computed intermediate weight vector is in
        the correct cone; sometimes it is very big e.g. s7, cyc7.
@@ -9831,10 +9829,9 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
     // compute a next weight vector
     next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
     xtnw=xtnw+clock()-to;
-/*#ifdef PRINT_VECTORS
+#ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
 #endif
-*/
     if(Overflow_Error == TRUE)
     {
       newRing = currRing;
