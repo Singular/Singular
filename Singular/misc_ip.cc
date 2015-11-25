@@ -1079,7 +1079,7 @@ void m2_end(int i)
     if (File_Profiling!=NULL) { fclose(File_Profiling); File_Profiling=NULL; }
     m2_end_called = TRUE;
 #ifdef HAVE_SIMPLEIPC
-    for (int j = SIPC_MAX_SEMAPHORES; j >= 0; j--)
+    for (int j = SIPC_MAX_SEMAPHORES-1; j >= 0; j--)
     {
       if (semaphore[j] != NULL)
       {

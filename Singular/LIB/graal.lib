@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version graal.lib 4.0.2.0 Apr_2015 "; // $Id$
+version="version graal.lib 4.0.2.1 26.03.2015 "; // $Id$
 category="Commutative Algebra";
 info="
 LIBRARY:  graal.lib          localization at prime ideals and their associated graded rings
@@ -11,24 +11,15 @@ This library is on a computational treatment of localizations at prime ideals an
 
 REFERENCES:
 Mora, Teo: La queste del Saint Gr_a(A_L): A computational approach to local algebra
-Marais, Magdaleen and Ren, Yue: Mora's holy grail, algorithms for computing in localizations at prime ideals
+Marais, Magdaleen and Ren, Yue: Mora's holy graal: Algorithms for computing in localizations at prime ideals
 
 PROCEDURES:
-graalMixed(ideal L);
 graalMixed(ideal L, int t);
-yinitial(poly f);
-yinitial(poly f, int s);
-yinitial(ideal I);
-yinitial(ideal I, int s);
-dimensionOfLocalization(ideal J);
-dimensionOfLocalization(graalBearer Gr);
-systemOfParametersOfLocalization(ideal L);
-systemOfParametersOfLocalization(graalBearer L);
-isLocalizationRegular(ideal L);
-isLocalizationRegular(graalBearer L);
+dimensionOfLocalization(def L);
+systemOfParametersOfLocalization(def L);
+isLocalizationRegular(def L);
 warkedPreimageStd(warkedModule wM);
-resolutionInLocalization(ideal I, ideal L);
-resolutionInLocalization(ideal I, graalBearer Gr);
+resolutionInLocalization(ideal I, def L);
 ";
 
 LIB "general.lib";  // for watchdog
@@ -115,16 +106,7 @@ static proc numberOfYs()
 }
 
 
-proc yinitial(def F, list #)
-"
-USAGE:    yinitial(F,s); F polynomial or ideal, s int (optional)
-RETURN:   if F polynomial, returns the sum over all terms of lowest degree in Y.
-          if F ideal, returns the yinitials of all its generators.
-          if s is specified, assumes that there are s variables in Y, Y(1),...,Y(s).
-NOTE:     assumes that the Y are the first variables in the basering and,
-          if s unspecified, that they have their own block in the ordering.
-EXAMPLE:  example yinitial; shows an example
-"
+static proc yinitial(def F, list #)
 {
   int s;
   if (size(#)>0 && typeof(#[1])=="int")
@@ -155,10 +137,6 @@ EXAMPLE:  example yinitial; shows an example
       { inF[i] = yinitial(F[i],s); }
     return(inF);
   }
-}
-example
-{ "EXAMPLE:"; echo = 2;
-  // todo
 }
 
 
@@ -773,7 +751,7 @@ static proc yDeg(poly g, list #)
 /***
  * normalizes g such that LT_>(g)=Y^\alpha for some \alpha\in\NN^n.
  **/
-proc normalizeInY(vector g, graalBearer Gr, list #)
+static proc normalizeInY(vector g, graalBearer Gr, list #)
 {
   def origin = basering;
   int s;
@@ -1227,7 +1205,7 @@ EXAMPLE:  example resolutionInLocalization; shows an example
   return(0);
 }
 example
-{
+{ "EXAMPLE:"; echo = 2;
   ring Q = 0,(x,y,z,w),dp;
   ideal circle = (x-1)^2+y^2-3,z;
   ideal twistedCubic = xz-y2,yw-z2,xw-yz,z;

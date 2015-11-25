@@ -3415,7 +3415,8 @@ BOOLEAN rOrd_is_MixedDegree_Ordering(ring r)
 {
   int i;
   poly p=p_One(r);
-  p_SetExp(p,1,1,r);p_Setm(p,r);
+  p_SetExp(p,1,1,r);
+  p_Setm(p,r);
   int vz=sign(p_FDeg(p,r));
   for(i=2;i<=rVar(r);i++)
   {
@@ -3804,10 +3805,9 @@ BOOLEAN rComplete(ring r, int force)
   {
     i++; j++;
   }
-  // No use of j anymore!!!????
 
   if (i==r->pCompIndex) i++;
-  r->pOrdIndex=i; // How came it is "i" here???!!!! exp[r->pOrdIndex] is order of a poly... This may be wrong!!! IS
+  r->pOrdIndex=i;
 
   // ----------------------------
   rSetDegStuff(r);

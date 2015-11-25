@@ -232,19 +232,20 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
     if (COM(t)==0)
     {
       poly gcd = singclap_gcd_r( num, den, ntRing );
-      if( !p_IsOne(gcd, ntRing) )
+      if(gcd!=NULL)
       {
-        Print("ERROR in %s:%d: 1 != GCD between num. & den. poly\n",f,l);
-        Print("GCD: ");  p_Write(gcd, ntRing);
-        Print("NUM: ");  p_Write(num, ntRing);
-        Print("DEN: ");  p_Write(den, ntRing);
-        return FALSE;
+        if((gcd!=NULL) && !p_IsOne(gcd, ntRing) )
+        {
+          Print("ERROR in %s:%d: 1 != GCD between num. & den. poly\n",f,l);
+          Print("GCD: ");  p_Write(gcd, ntRing);
+          Print("NUM: ");  p_Write(num, ntRing);
+          Print("DEN: ");  p_Write(den, ntRing);
+          return FALSE;
+        }
+        p_Delete( &gcd, ntRing );
       }
-      p_Delete( &gcd, ntRing );
     }
     return TRUE;
-
-
 
     if(p_IsConstant(den, ntRing) && (n_IsOne(pGetCoeff(den), ntCoeffs)))
     {
@@ -1325,6 +1326,14 @@ void heuristicGcdCancellation(number a, const coeffs cf)
         }
       }
     }
+  }
+  if ((DEN(f)!=NULL)
+  && (pNext(DEN(f))==NULL)
+  && (p_LmIsConstantComp(DEN(f),ntRing))
+  && (n_IsOne(pGetCoeff(DEN(f)),ntCoeffs)))
+  {
+     p_Delete(&DEN(f),ntRing);
+     COM(f)=0;
   }
 }
 
