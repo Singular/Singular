@@ -7488,6 +7488,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
       idString(F,"//** rec_fractal_call: F");
     }
 #endif
+    id_Normalize(F,currRing);
     idDelete(&Gresult1);
     idDelete(&Gomega2);
     idDelete(&G);
@@ -8055,6 +8056,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
       idString(F,"//** rec_r_fractal_call: F");
     }
 #endif
+    id_Normalize(F,currRing);
     idDelete(&Gresult1);
     idDelete(&Gomega2);
     idDelete(&G);
