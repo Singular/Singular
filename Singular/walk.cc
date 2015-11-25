@@ -6677,12 +6677,14 @@ ideal Mprwalk(ideal Go, intvec* orig_M, intvec* target_M, int weight_rad,
     oldRing = currRing;
 
     if(target_M->length() == nV)
-    {
+    {/*
       // define a new ring with ordering "(a(curr_weight),lp)
       if (rParameter(currRing) != NULL)
         DefRingPar(curr_weight);
       else
         rChangeCurrRing(VMrDefault(curr_weight));
+*/
+      rChangeCurrRing(VMrRefine(target_M,curr_weight));
     }
     else
     {
@@ -7032,7 +7034,7 @@ static ideal rec_fractal_call(ideal G, int nlev, intvec* ivtarget,
   intvec* omtmp = new intvec(nV);
   //intvec* altomega = new intvec(nV);
 
-  for(i = nV -1; i=0; i--)//Aenderung!!
+  for(i = nV -1; i>=0; i--)//Aenderung!!
   {
     (*omtmp)[i] = (*ivtarget)[i];
   }
@@ -7533,7 +7535,7 @@ static ideal rec_r_fractal_call(ideal G, int nlev, intvec* ivtarget,
 
   //BOOLEAN isnewtarget = FALSE;
 
-  for(i = nV -1; i=0; i--)
+  for(i = nV -1; i>=0; i--)
   {
     (*omtmp)[i] = (*ivtarget)[i];
   }
@@ -8228,20 +8230,20 @@ ideal Mfwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   ring helpRing = currRing;
 
   J = rec_fractal_call(J,1,ivtarget,reduction,printout);
-  idString(J,"//** Mfwalk: J");
+  //idString(J,"//** Mfwalk: J");
   rChangeCurrRing(oldRing);
-  Print("\n//Mfwalk: (2)\n");
+  //Print("\n//Mfwalk: (2)\n");
   resF = idrMoveR(J, helpRing,currRing);
-  Print("\n//Mfwalk: (3)\n");
+  //Print("\n//Mfwalk: (3)\n");
   idSkipZeroes(resF);
-  Print("\n//Mfwalk: (4)\n");
+  //Print("\n//Mfwalk: (4)\n");
 
   si_opt_1 = save1; //set original options, e. g. option(RedSB)
   delete Xivlp;
-  delete Xsigma;
+  //delete Xsigma;
   delete Xtau;
   delete XivNull;
-Print("\n//Mfwalk: (5)\n");
+  //Print("\n//Mfwalk: (5)\n");
 #ifdef TIME_TEST
   TimeStringFractal(xftinput, xftostd, xtif, xtstd, xtextra,
                     xtlift, xtred, xtnw);
@@ -8251,8 +8253,8 @@ Print("\n//Mfwalk: (5)\n");
   Print("\n// Overflow_Error? (%d)\n", Overflow_Error);
   Print("\n// the numbers of Overflow_Error (%d)", nnflow);
 #endif
-Print("\n//Mfwalk: (6)\n");
-  idString(resF,"//** Mfwalk: resF");
+  //Print("\n//Mfwalk: (6)\n");
+  //idString(resF,"//** Mfwalk: resF");
   return(idCopy(resF));
 }
 
@@ -8415,20 +8417,20 @@ ideal Mfrwalk(ideal G, intvec* ivstart, intvec* ivtarget,
   ring helpRing = currRing;
 
   J = rec_r_fractal_call(J,1,ivtarget,weight_rad,reduction,printout);
-idString(J,"//*** Mfrwalk: J");
-Print("\n//** Mfrwalk hier (1)\n");
+  //idString(J,"//*** Mfrwalk: J");
+  //Print("\n//** Mfrwalk hier (1)\n");
   rChangeCurrRing(oldRing);
-Print("\n//** Mfrwalk hier (2)\n");
+  //Print("\n//** Mfrwalk hier (2)\n");
   resF = idrMoveR(J, helpRing,currRing);
-Print("\n//** Mfrwalk hier (3)\n");
+  //Print("\n//** Mfrwalk hier (3)\n");
   //idSkipZeroes(resF);
-Print("\n//** Mfrwalk hier (4)\n");
+  //Print("\n//** Mfrwalk hier (4)\n");
   si_opt_1 = save1; //set original options, e. g. option(RedSB)
   delete Xivlp;
-  delete Xsigma;
+  //delete Xsigma;
   delete Xtau;
   delete XivNull;
-Print("\n//** Mfrwalk hier (5)\n");
+  //Print("\n//** Mfrwalk hier (5)\n");
 #ifdef TIME_TEST
   TimeStringFractal(xftinput, xftostd, xtif, xtstd, xtextra,
                     xtlift, xtred, xtnw);
@@ -8438,9 +8440,9 @@ Print("\n//** Mfrwalk hier (5)\n");
   Print("\n// Overflow_Error? (%d)\n", Overflow_Error);
   Print("\n// the numbers of Overflow_Error (%d)", nnflow);
 #endif
-Print("\n//** Mfrwalk hier (6)\n");
-idString(resF,"resF");
-Print("\n//** Mfrwalk hier (7)\n");
+  //Print("\n//** Mfrwalk hier (6)\n");
+  //idString(resF,"resF");
+  //Print("\n//** Mfrwalk hier (7)\n");
   return(resF);
 }
 

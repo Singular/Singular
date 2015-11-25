@@ -367,7 +367,7 @@ EXAMPLE: example fwalk; shows an example"
 
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
-   intvec target_weight =   OSCTW[4]; /* terget weight vector */
+   intvec target_weight =   OSCTW[4]; /* target weight vector */
    kill OSCTW;
    option(redSB);
    def xR = basering;

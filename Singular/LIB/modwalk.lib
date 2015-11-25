@@ -385,24 +385,13 @@ static proc pTest_std(string command, alias list args, alias ideal result,
 
     /* compute command(args) */
     exstr = "Ip = "+command+" (Ip";
-    exstr;
+
     for(i=2; i<=size(Arg); i++) {
       exstr = exstr+",Arg["+string(eval(i))+"]";
       }
     exstr = exstr+");";
-    exstr;
+
     execute(exstr);
-    /*
-    if(size(Arg)==1) {
-      execute("Ip = "+command+"(Ip);");
-      }
-    if(size(Arg)==2) {
-         execute("Ip = "+command+"(Ip,Arg[2]);");
-      }
-    if(size(Arg)==3) {
-        execute("Ip = "+command+"(Ip,Arg[2],Arg[3]);");
-     }
-*/
 
     /* test if Gp is in Ip */
     for (i = ncols(Gp); i > 0; i--) {

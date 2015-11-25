@@ -218,17 +218,6 @@ EXAMPLE: example prwalk; shows an example"
 {
 //--------------------  Initialize parameters  ------------------------
 list OSCTW = OrderStringalp_NP("al", #);
-if(size(#)>1)
-  {
-  if(size(#[2]) == n*n)
-    {
-    OSCTW= OrderStringalp_NP("M", #);
-    }
-  }
-else
-  {
-  OSCTW= OrderStringalp_NP("al", #);
-  }
 int nP = OSCTW[1];
 string ord_str = OSCTW[2];
 intvec curr_weight = OSCTW[3]; // original weight vector
@@ -273,28 +262,15 @@ proc frandwalk(ideal Go, int radius, list #)
 "SYNTAX: frwalk(ideal i, int radius);
          frwalk(ideal i, int radius, intvec v, intvec w);
 TYPE:    ideal
-PURPOSE: compute the standard basis of the ideal, calculated via
-         the Random Fractal walk algorithm  from the ordering
-         \"(a(v),lp)\", \"dp\", \"Dp\" or \"M\"
-         to the ordering  \"(a(w),lp)\", \"(a(1,0,...,0),lp)\" or \"M\".
+PURPOSE: compute the standard basis of the ideal w.r.t. the
+         lexicographical ordering or a weighted-lex ordering,
+         calculated via the Random Fractal walk algorithm.
 SEE ALSO: std, stdfglm, groebner, gwalk, pwalk, twalk, awalk1, awalk2
 KEYWORDS: The fractal walk algorithm
 EXAMPLE: example frandwalk; shows an example"
 {
    // we use ring with ordering (a(...),lp,C)
    list OSCTW    = OrderStringalp_NP("al", #);
-   int n=nvars(basering);
-   if(size(#)>1)
-   {
-     if(size(#[2]) == n*n)
-     {
-       OSCTW= OrderStringalp_NP("M", #);
-     }
-   }
-  else
-  {
-    OSCTW= OrderStringalp_NP("al", #);
-  }
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* current weight vector */
    intvec target_weight =   OSCTW[4]; /* target weight vector */
