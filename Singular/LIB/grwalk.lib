@@ -273,7 +273,7 @@ EXAMPLE: example gwalk; shows an example"
 
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
-   intvec target_weight =   OSCTW[4]; /* terget weight vector */
+   intvec target_weight =   OSCTW[4]; /* target weight vector */
    kill OSCTW;
    option(redSB);
    def xR = basering;
@@ -283,7 +283,9 @@ EXAMPLE: example gwalk; shows an example"
 
    //print("//** help ring = " + string(basering));
    ideal G = fetch(xR, Go);
-   G = system("Mwalk", G, curr_weight, target_weight,basering);
+   int reduction=1;
+   int printout=0;
+   G = system("Mwalk", G, curr_weight, target_weight,basering,reduction,printout);
 
    setring xR;
    //kill Go;
@@ -298,7 +300,11 @@ example
   "EXAMPLE:"; echo = 2;
   //** compute a Groebner basis of I w.r.t. lp.
   ring r = 32003,(z,y,x), lp;
-  ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
+  ideal I = zy2+yx2+yx+3,
+            z3x+y3+zyx-yx2-yx-3,
+            z2yx3-y5+z2yx2+y3x2+y2x3+y3x+y2x2+3z2x+3y2+3yx,
+            zyx5+y6-y4x2-y3x3+2zyx4-y4x-y3x2+zyx3-3z2yx+3zx3-3y3-3y2x+3zx2,
+            yx7-y7+y5x2+y4x3+3yx6+y5x+y4x2+3yx5-6zyx3+yx4+3x5+3y4+3y3x-6zyx2+6x4+3x3-9zx;
   gwalk(I);
 }
 
@@ -361,7 +367,7 @@ EXAMPLE: example fwalk; shows an example"
 
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
-   intvec target_weight =   OSCTW[4]; /* terget weight vector */
+   intvec target_weight =   OSCTW[4]; /* target weight vector */
    kill OSCTW;
    option(redSB);
    def xR = basering;
@@ -371,7 +377,9 @@ EXAMPLE: example fwalk; shows an example"
    //print("//** help ring = " + string(basering));
 
    ideal G = fetch(xR, Go);
-   G = system("Mfwalk", G, curr_weight, target_weight);
+   int reduction=1;
+   int printout=0;
+   G = system("Mfwalk", G, curr_weight, target_weight, reduction, printout);
 
    setring xR;
    //kill Go;
@@ -475,11 +483,12 @@ EXAMPLE: example pwalk; shows an example"
   def old_ring = basering;
 
   ideal G = fetch(xR, Go);
-
-  G = system("Mpwalk", G, n1, n2, curr_weight, target_weight,nP);
-
+  int reduction=1;
+  int printout=0;
+  G = system("Mpwalk",G,n1,n2,curr_weight,target_weight,nP,reduction,printout);
+ 
   setring xR;
-  //kill Go;
+  //kill Go; //unused
 
   keepring basering;
   ideal result = fetch(old_ring, G);
@@ -491,9 +500,6 @@ example
     "EXAMPLE:"; echo = 2;
     ring r = 32003,(z,y,x), lp;
     ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
-    //I = std(I);
-    //ring rr = 32003,(z,y,x),lp;
-    //ideal I = fetch(r,I);
     pwalk(I,2,2);
 }
 

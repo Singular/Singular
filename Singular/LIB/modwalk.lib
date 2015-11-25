@@ -15,990 +15,457 @@ OVERVIEW:
   Journal of Symbolic Computation 35, 403-419 (2003).
 
 PROCEDURES:
-modWalk(ideal,int,int[,int,int,int,int]);        standard basis conversion of I using modular methods (chinese remainder)
+
+modWalk(I,#);                   standard basis conversion of I by Groebner Walk using modular methods
+modrWalk(I,radius,pertdeg,#);   standard basis conversion of I by Random Walk using modular methods
+modfWalk(I,#);                  standard basis conversion of I by Fractal Walk using modular methods
+modfrWalk(I,radius,#);          standard basis conversion of I by Random Fractal Walk using modular methods
 ";
 
-LIB "poly.lib";
-LIB "ring.lib";
-LIB "parallel.lib";
 LIB "rwalk.lib";
 LIB "grwalk.lib";
-LIB "modstd.lib";
+LIB "modular.lib";
 
-
-////////////////////////////////////////////////////////////////////////////////
-
-static proc modpWalk(def II, int p, int variant, list #)
-"USAGE:  modpWalk(I,p,#); I ideal, p integer, variant integer
-ASSUME:  If size(#) > 0, then
-           #[1] is an intvec describing the current weight vector
-           #[2] is an intvec describing the target weight vector
-RETURN:  ideal - a standard basis of I mod p, integer - p
-NOTE:    The procedure computes a standard basis of the ideal I modulo p and
-         fetches the result to the basering.
-EXAMPLE: example modpWalk; shows an example
-"
+proc modWalk(ideal I, list #)
+"USAGE:   modWalk(I, [, v, w]); I ideal, v intvec, w intvec
+RETURN:   a standard basis of I
+NOTE:     The procedure computes a standard basis of I (over the rational
+          numbers) by using modular methods.
+SEE ALSO: modular
+EXAMPLE:  example modWalk; shows an example"
 {
-  option(redSB);
-  int k,nvar@r;
-  def R0 = basering;
-  string ordstr_R0 = ordstr(R0);
-  list rl = ringlist(R0);
-  int sizerl = size(rl);
-  int neg = 1 - attrib(R0,"global");
-  if(typeof(II) == "ideal")
-  {
-    ideal I = II;
+    /* read optional parameter */
+    if (size(#) > 0) {
+        if (size(#) == 1) {
+            intvec w = #[1];
+        }
+        if (size(#) == 2) {
+            intvec v = #[1];
+            intvec w = #[2];
+        }
+        if (size(#) > 2 || typeof(#[1]) != "intvec") {
+            ERROR("wrong optional parameter");
+        }
+    }
+
+    /* save options */
+    intvec opt = option(get);
+    option(redSB);
+
+    /* call modular() */
+    if (size(#) > 0) {
+        I = modular("gwalk", list(I,#), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
+    }
+    else {
+        I = modular("gwalk", list(I), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
+    }
+
+    /* return the result */
+    attrib(I, "isSB", 1);
+    option(set, opt);
+    return(I);
+}
+example
+{
+    "EXAMPLE:";
+    echo = 2;
+    ring R1 = 0, (x,y,z,t), dp;
+    ideal I = 3x3+x2+1, 11y5+y3+2, 5z4+z2+4;
+    I = std(I);
+    ring R2 = 0, (x,y,z,t), lp;
+    ideal I = fetch(R1, I);
+    ideal J = modWalk(I);
+    J;
+}
+
+proc modrWalk(ideal I, int radius, int pertdeg, list #)
+"USAGE:   modrWalk(I, radius, pertdeg[, v, w]);
+          I ideal, radius int, pertdeg int, v intvec, w intvec
+RETURN:   a standard basis of I
+NOTE:     The procedure computes a standard basis of I (over the rational
+          numbers) by using modular methods.
+SEE ALSO: modular
+EXAMPLE:  example modrWalk; shows an example"
+{
+    /* read optional parameter */
+    if (size(#) > 0) {
+        if (size(#) == 1) {
+            intvec w = #[1];
+        }
+        if (size(#) == 2) {
+            intvec v = #[1];
+            intvec w = #[2];
+        }
+        if (size(#) > 2 || typeof(#[1]) != "intvec") {
+            ERROR("wrong optional parameter");
+        }
+    }
+
+    /* save options */
+    intvec opt = option(get);
+    option(redSB);
+
+    /* call modular() */
+    if (size(#) > 0) {
+        I = modular("rwalk", list(I,radius,pertdeg,#), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
+    }
+    else {
+        I = modular("rwalk", list(I,radius,pertdeg),primeTest_std,deleteUnluckyPrimes_std,pTest_std);
+    }
+
+    /* return the result */
+    attrib(I, "isSB", 1);
+    option(set, opt);
+    return(I);
+}
+example
+{
+    "EXAMPLE:";
+    echo = 2;
+    ring R1 = 0, (x,y,z,t), dp;
+    ideal I = 3x3+x2+1, 11y5+y3+2, 5z4+z2+4;
+    I = std(I);
+    ring R2 = 0, (x,y,z,t), lp;
+    ideal I = fetch(R1, I);
     int radius = 2;
-    int pert_deg = 2;
-  }
-  if(typeof(II) == "list" && typeof(II[1]) == "ideal")
-  {
-    ideal I = II[1];
-    if(size(II) == 2)
-    {
-      int radius = II[2];
-      int pert_deg = 2;
-    }
-    if(size(II) == 3)
-    {
-      int radius = II[2];
-      int pert_deg = II[3];
-    }
-  }
-  rl[1] = p;
-  int h = homog(I);
-  def @r = ring(rl);
-  setring @r;
-  ideal i = fetch(R0,I);
-  string order;
-  if(system("nblocks") <= 2)
-  {
-    if(find(ordstr_R0, "M") + find(ordstr_R0, "lp") + find(ordstr_R0, "rp") <= 0)
-    {
-      order = "simple";
-    }
-  }
+    int pertdeg = 3;
+    ideal J = modrWalk(I,radius,pertdeg);
+    J;
+}
 
-//-------------------------  make i homogeneous  -----------------------------
-  if(!mixedTest() && !h)
-  {
-    if(!((find(ordstr_R0, "M") > 0) || (find(ordstr_R0, "a") > 0) || neg))
-    {
-      if(!((order == "simple") || (sizerl > 4)))
-      {
-        list rl@r = ringlist(@r);
-        nvar@r = nvars(@r);
-        intvec w;
-        for(k = 1; k <= nvar@r; k++)
-        {
-          w[k] = deg(var(k));
+proc modfWalk(ideal I, list #)
+"USAGE:   modfWalk(I, [, v, w]); I ideal, v intvec, w intvec
+RETURN:   a standard basis of I
+NOTE:     The procedure computes a standard basis of I (over the rational
+          numbers) by using modular methods.
+SEE ALSO: modular
+EXAMPLE:  example modfWalk; shows an example"
+{
+    /* read optional parameter */
+    if (size(#) > 0) {
+        if (size(#) == 1) {
+            intvec w = #[1];
         }
-        w[nvar@r + 1] = 1;
-        rl@r[2][nvar@r + 1] = "homvar";
-        rl@r[3][2][2] = w;
-        def HomR = ring(rl@r);
-        setring HomR;
-        ideal i = imap(@r, i);
-        i = homog(i, homvar);
-      }
+        if (size(#) == 2) {
+            intvec v = #[1];
+            intvec w = #[2];
+        }
+        if (size(#) > 2 || typeof(#[1]) != "intvec") {
+            ERROR("wrong optional parameter");
+        }
     }
-  }
 
-//-------------------------  compute a standard basis mod p  -----------------------------
+    /* save options */
+    intvec opt = option(get);
+    option(redSB);
 
-  if(variant == 1)
-  {
-    if(size(#)>0)
-    {
-      i = rwalk(i,radius,pert_deg,#);
-     // rwalk(i,radius,pert_deg,#); std(i);
+    /* call modular() */
+    if (size(#) > 0) {
+        I = modular("fwalk", list(I,#), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
     }
-    else
-    {
-      i = rwalk(i,radius,pert_deg);
+    else {
+        I = modular("fwalk", list(I), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
     }
-  }
-  if(variant == 2)
-  {
-    if(size(#) == 2)
-    {
-      i = gwalk(i,#);
-    }
-    else
-    {
-      i = gwalk(i);
-    }
-  }
-  if(variant == 3)
-  {
-    if(size(#) == 2)
-    {
-      i = frandwalk(i,radius,#);
-    }
-    else
-    {
-      i = frandwalk(i,radius);
-    }
-  }
-  if(variant == 4)
-  {
-    if(size(#) == 2)
-    {
-      i=fwalk(i,#);
-    }
-    else
-    {
-      i=fwalk(i);
-    }
-  }
-  if(variant == 5)
-  {
-    if(size(#) == 2)
-    {
-     i=prwalk(i,radius,pert_deg,pert_deg,#);
-    }
-    else
-    {
-      i=prwalk(i,radius,pert_deg,pert_deg);
-    }
-  }
-  if(variant == 6)
-  {
-    if(size(#) == 2)
-    {
-      i=pwalk(i,pert_deg,pert_deg,#);
-    }
-    else
-    {
-      i=pwalk(i,pert_deg,pert_deg);
-    }
-  }
 
-  if(!mixedTest() && !h)
-  {
-    if(!((find(ordstr_R0, "M") > 0) || (find(ordstr_R0, "a") > 0) || neg))
-    {
-      if(!((order == "simple") || (sizerl > 4)))
-      {
-        i = subst(i, homvar, 1);
-        i = simplify(i, 34);
-        setring @r;
-        i = imap(HomR, i);
-        i = interred(i);
-        kill HomR;
-      }
-    }
-  }
-  setring R0;
-  return(list(fetch(@r,i),p));
+    /* return the result */
+    attrib(I, "isSB", 1);
+    option(set, opt);
+    return(I);
 }
 example
 {
-  "EXAMPLE:"; echo = 2;
-  option(redSB);
-
-  int p = 181;
-  intvec a = 2,1,3,4;
-  intvec b = 1,9,1,1;
-  ring ra = 0,x(1..4),(a(a),lp);
-  ideal I = std(cyclic(4));
-  ring rb = 0,x(1..4),(a(b),lp);
-  ideal I = imap(ra,I);
-  modpWalk(I,p,1,a,b);
-  std(I);
+    "EXAMPLE:";
+    echo = 2;
+    ring R1 = 0, (x,y,z,t), dp;
+    ideal I = 3x3+x2+1, 11y5+y3+2, 5z4+z2+4;
+    I = std(I);
+    ring R2 = 0, (x,y,z,t), lp;
+    ideal I = fetch(R1, I);
+    ideal J = modfWalk(I);
+    J;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-proc modWalk(def II, int variant, list #)
-"USAGE:  modWalk(II); II ideal or list(ideal,int)
-ASSUME:  If variant =
-@*       - 1 the Random Walk algorithm with radius II[2] is applied
-           to II[1] if II = list(ideal, int). It is applied to II with radius 2
-           if II is an ideal.
-@*	 - 2, the Groebner Walk algorithm is applied to II[1] or to II, respectively.
-@*       - 3, the Fractal Walk algorithm with random element is applied to II[1] or II,
-           respectively.
-@*       - 4, the Fractal Walk algorithm is applied to II[1] or II, respectively.
-@*       - 5, the Perturbation Walk algorithm with random element is applied to II[1]
-           or II, respectively, with radius II[3] and perturbation degree II[2].
-@*	 - 6, the Perturbation Walk algorithm is applied to II[1] or II, respectively,
-	   with perturbation degree II[3].
-         If size(#) > 0, then # contains either 1, 2 or 4 integers such that
-@*       - #[1] is the number of available processors for the computation,
-@*       - #[2] is an optional parameter for the exactness of the computation,
-                if #[2] = 1, the procedure computes a standard basis for sure,
-@*       - #[3] is the number of primes until the first lifting,
-@*       - #[4] is the constant number of primes between two liftings until
-           the computation stops.
-RETURN:  a standard basis of I if no warning appears.
-NOTE:    The procedure converts a standard basis of I (over the rational
-         numbers) from the ordering \"a(v),lp\", "dp\" or \"Dp\" to the ordering
-         \"(a(w),lp\" or \"a(1,0,...,0),lp\" by using modular methods.
-         By default the procedure computes a standard basis of I for sure, but
-         if the optional parameter #[2] = 0, it computes a standard basis of I
-         with high probability.
-EXAMPLE: example modWalk; shows an example
-"
+proc modfrWalk(ideal I, int radius, list #)
+"USAGE:   modfrWalk(I, radius [, v, w]); I ideal, radius int, v intvec, w intvec
+RETURN:   a standard basis of I
+NOTE:     The procedure computes a standard basis of I (over the rational
+          numbers) by using modular methods.
+SEE ALSO: modular
+EXAMPLE:  example modfrWalk; shows an example"
 {
-  int TT = timer;
-  int RT = rtimer;
-  int i,j,pTest,sizeTest,weighted,n1;
-  bigint N;
-
-  def R0 = basering;
-  list rl = ringlist(R0);
-  if((npars(R0) > 0) || (rl[1] > 0))
-  {
-    ERROR("Characteristic of basering should be zero, basering should have no parameters.");
-  }
-
-  if(typeof(II) == "ideal")
-  {
-    ideal I = II;
-    kill II;
-    list II;
-    II[1] = I;
-    II[2] = 2;
-    II[3] = 2;
-  }
-  else
-  {
-    if(typeof(II) == "list" && typeof(II[1]) == "ideal")
-    {
-      ideal I = II[1];
-      if(size(II) == 1)
-      {
-        II[2] = 2;
-        II[3] = 2;
-      }
-      if(size(II) == 2)
-      {
-        II[3] = 2;
-      }
-
-    }
-    else
-    {
-      ERROR("Unexpected type of input.");
-    }
-  }
-
-//--------------------  Initialize optional parameters  ------------------------
-  n1 = system("--cpus");
-  if(size(#) == 0)
-  {
-    int exactness = 1;
-    int n2 = 10;
-    int n3 = 10;
-  }
-  else
-  {
-    if(size(#) == 1)
-    {
-      if(typeof(#[1]) == "int")
-      {
-        if(#[1] < n1)
-        {
-          n1 = #[1];
+    /* read optional parameter */
+    if (size(#) > 0) {
+        if (size(#) == 1) {
+            intvec w = #[1];
         }
-        int exactness = 1;
-        if(n1 >= 10)
-        {
-          int n2 = n1 + 1;
-          int n3 = n1;
+        if (size(#) == 2) {
+            intvec v = #[1];
+            intvec w = #[2];
         }
-        else
-        {
-          int n2 = 10;
-          int n3 = 10;
+        if (size(#) > 2 || typeof(#[1]) != "intvec") {
+            ERROR("wrong optional parameter");
         }
-      }
-      else
-      {
-        ERROR("Unexpected type of input.");
-      }
-    }
-    if(size(#) == 2)
-    {
-      if(typeof(#[1]) == "int" && typeof(#[2]) == "int")
-      {
-        if(#[1] < n1)
-        {
-          n1 = #[1];
-        }
-        int exactness = #[2];
-        if(n1 >= 10)
-        {
-          int n2 = n1 + 1;
-          int n3 = n1;
-        }
-        else
-        {
-          int n2 = 10;
-          int n3 = 10;
-        }
-      }
-      else
-      {
-        if(typeof(#[1]) == "intvec" && typeof(#[2]) == "intvec")
-        {
-          intvec curr_weight = #[1];
-          intvec target_weight = #[2];
-          weighted = 1;
-          int n2 = 10;
-          int n3 = 10;
-          int exactness = 1;
-        }
-        else
-        {
-          ERROR("Unexpected type of input.");
-        }
-      }
-    }
-    if(size(#) == 3)
-    {
-      if(typeof(#[1]) == "intvec" && typeof(#[2]) == "intvec" && typeof(#[3]) == "int")
-      {
-        intvec curr_weight = #[1];
-        intvec target_weight = #[2];
-        weighted = 1;
-        n1 = #[3];
-        int n2 = 10;
-        int n3 = 10;
-        int exactness = 1;
-      }
-      else
-      {
-        ERROR("Unexpected type of input.");
-      }
-    }
-    if(size(#) == 4)
-    {
-      if(typeof(#[1]) == "intvec" && typeof(#[2]) == "intvec" && typeof(#[3]) == "int"
-          && typeof(#[4]) == "int")
-      {
-        intvec curr_weight = #[1];
-        intvec target_weight = #[2];
-        weighted = 1;
-        if(#[1] < n1)
-        {
-          n1 = #[3];
-        }
-        int exactness = #[4];
-        if(n1 >= 10)
-        {
-          int n2 = n1 + 1;
-          int n3 = n1;
-        }
-        else
-        {
-          int n2 = 10;
-          int n3 = 10;
-        }
-      }
-      else
-      {
-        if(typeof(#[1]) == "int" && typeof(#[2]) == "int" && typeof(#[3]) == "int" && typeof(#[4]) == "int")
-        {
-          if(#[1] < n1)
-          {
-            n1 = #[1];
-          }
-          int exactness = #[2];
-          if(n1 >= #[3])
-          {
-            int n2 = n1 + 1;
-          }
-          else
-          {
-            int n2 = #[3];
-          }
-          if(n1 >= #[4])
-          {
-            int n3 = n1;
-          }
-          else
-          {
-            int n3 = #[4];
-          }
-        }
-        else
-        {
-          ERROR("Unexpected type of input.");
-        }
-      }
-    }
-    if(size(#) == 6)
-    {
-      if(typeof(#[1]) == "intvec" && typeof(#[2]) == "intvec" && typeof(#[3]) == "int" && typeof(#[4]) == "int" && typeof(#[5]) == "int" && typeof(#[6]) == "int")
-      {
-        intvec curr_weight = #[1];
-        intvec target_weight = #[2];
-        weighted = 1;
-        if(#[3] < n1)
-        {
-          n1 = #[3];
-        }
-        int exactness = #[4];
-        if(n1 >= #[5])
-        {
-          int n2 = n1 + 1;
-        }
-        else
-        {
-          int n2 = #[5];
-        }
-        if(n1 >= #[6])
-        {
-          int n3 = n1;
-        }
-        else
-        {
-          int n3 = #[6];
-        }
-      }
-      else
-      {
-        ERROR("Expected list(intvec,intvec,int,int,int,int) as optional parameter list.");
-      }
-    }
-    if(size(#) == 1 || size(#) == 5 || size(#) > 6)
-    {
-      ERROR("Expected 0,2,3,4 or 5 optional arguments.");
-    }
-  }
-  if(printlevel >= 10)
-  {
-  "n1 = "+string(n1)+", n2 = "+string(n2)+", n3 = "+string(n3)+", exactness = "+string(exactness);
-  }
-
-//-------------------------  Save current options  -----------------------------
-  intvec opt = option(get);
-  //option(redSB);
-
-//--------------------  Initialize the list of primes  -------------------------
-  int tt = timer;
-  int rt = rtimer;
-  int en = 2134567879;
-  int an = 1000000000;
-  intvec L = primeList(I,n2);
-  if(n2 > 4)
-  {
-  //  L[5] = prime(random(an,en));
-  }
-  if(printlevel >= 10)
-  {
-    "CPU-time for primeList: "+string(timer-tt)+" seconds.";
-    "Real-time for primeList: "+string(rtimer-rt)+" seconds.";
-  }
-  int h = homog(I);
-  list P,T1,T2,LL,Arguments,PP;
-  ideal J,K,H;
-
-//-------------------  parallelized Groebner Walk in positive characteristic  --------------------
-
-  if(weighted)
-  {
-    for(i=1; i<=size(L); i++)
-    {
-      Arguments[i] = list(II,L[i],variant,list(curr_weight,target_weight));
-    }
-  }
-  else
-  {
-    for(i=1; i<=size(L); i++)
-    {
-      Arguments[i] = list(II,L[i],variant);
-    }
-  }
-  P = parallelWaitAll("modpWalk",Arguments);
-  for(i=1; i<=size(P); i++)
-  {
-    T1[i] = P[i][1];
-    T2[i] = bigint(P[i][2]);
-  }
-
-  while(1)
-  {
-    LL = deleteUnluckyPrimes(T1,T2,h);
-    T1 = LL[1];
-    T2 = LL[2];
-//-------------------  Now all leading ideals are the same  --------------------
-//-------------------  Lift results to basering via farey  ---------------------
-
-    tt = timer; rt = rtimer;
-    N = T2[1];
-    for(i=2; i<=size(T2); i++)
-    {
-      N = N*T2[i];
-    }
-    H = chinrem(T1,T2);
-    J = parallelFarey(H,N,n1);
-    //J=farey(H,N);
-    if(printlevel >= 10)
-    {
-      "CPU-time for lifting-process is "+string(timer - tt)+" seconds.";
-      "Real-time for lifting-process is "+string(rtimer - rt)+" seconds.";
     }
 
-//----------------  Test if we already have a standard basis of I --------------
+    /* save options */
+    intvec opt = option(get);
+    option(redSB);
 
-    tt = timer; rt = rtimer;
-    pTest = pTestSB(I,J,L,variant);
-    //pTest = primeTestSB(I,J,L,variant);
-    if(printlevel >= 10)
-    {
-      "CPU-time for pTest is "+string(timer - tt)+" seconds.";
-      "Real-time for pTest is "+string(rtimer - rt)+" seconds.";
+    /* call modular() */
+    if (size(#) > 0) {
+        I = modular("frandwalk", list(I,radius,#), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
     }
-    if(pTest)
-    {
-      if(printlevel >= 10)
-      {
-        "CPU-time for computation without final tests is "+string(timer - TT)+" seconds.";
-        "Real-time for computation without final tests is "+string(rtimer - RT)+" seconds.";
-      }
-      attrib(J,"isSB",1);
-      if(exactness == 0)
-      {
-        option(set, opt);
-        return(J);
-      }
-      else
-      {
-        tt = timer;
-        rt = rtimer;
-        sizeTest = 1 - isIdealIncluded(I,J,n1);
-        if(printlevel >= 10)
-        {
-          "CPU-time for checking if I subset <G> is "+string(timer - tt)+" seconds.";
-          "Real-time for checking if I subset <G> is "+string(rtimer - rt)+" seconds.";
-        }
-        if(sizeTest == 0)
-        {
-          tt = timer;
-          rt = rtimer;
-          K = std(J);
-          if(printlevel >= 10)
-          {
-            "CPU-time for last std-computation is "+string(timer - tt)+" seconds.";
-            "Real-time for last std-computation is "+string(rtimer - rt)+" seconds.";
-          }
-          if(size(reduce(K,J)) == 0)
-          {
-            option(set, opt);
-            return(J);
-          }
-        }
-      }
+    else {
+        I = modular("frandwalk", list(I,radius), primeTest_std,
+            deleteUnluckyPrimes_std, pTest_std, finalTest_std);
     }
-//--------------  We do not already have a standard basis of I, therefore do the main computation for more primes  --------------
 
-    T1 = H;
-    T2 = N;
-    j = size(L)+1;
-    tt = timer; rt = rtimer;
-    L = primeList(I,n3,L,n1);
-    if(printlevel >= 10)
-    {
-      "CPU-time for primeList: "+string(timer-tt)+" seconds.";
-      "Real-time for primeList: "+string(rtimer-rt)+" seconds.";
-    }
-    Arguments = list();
-    PP = list();
-    if(weighted)
-    {
-      for(i=j; i<=size(L); i++)
-      {
-        //Arguments[i-j+1] = list(II,L[i],variant,list(curr_weight,target_weight));
-        Arguments[size(Arguments)+1] = list(II,L[i],variant,list(curr_weight,target_weight));
-      }
-    }
-    else
-    {
-      for(i=j; i<=size(L); i++)
-      {
-        //Arguments[i-j+1] = list(II,L[i],variant);
-        Arguments[size(Arguments)+1] = list(II,L[i],variant);
-      }
-    }
-    PP = parallelWaitAll("modpWalk",Arguments);
-    if(printlevel >= 10)
-    {
-      "parallel modpWalk";
-    }
-    for(i=1; i<=size(PP); i++)
-    {
-      //P[size(P) + 1] = PP[i];
-      T1[size(T1) + 1] = PP[i][1];
-      T2[size(T2) + 1] = bigint(PP[i][2]);
-    }
-  }
-  if(printlevel >= 10)
-  {
-    "CPU-time for computation with final tests is "+string(timer - TT)+" seconds.";
-    "Real-time for computation with final tests is "+string(rtimer - RT)+" seconds.";
-  }
+    /* return the result */
+    attrib(I, "isSB", 1);
+    option(set, opt);
+    return(I);
 }
-
 example
 {
-  "EXAMPLE:";
-  echo = 2;
-  ring R=0,(x,y,z),lp;
-  ideal I=-x+y2z-z,xz+1,x2+y2-1;
-  // I is a standard basis in dp
-  ideal J = modWalk(I,1);
-  J;
+    "EXAMPLE:";
+    echo = 2;
+    ring R1 = 0, (x,y,z,t), dp;
+    ideal I = 3x3+x2+1, 11y5+y3+2, 5z4+z2+4;
+    I = std(I);
+    ring R2 = 0, (x,y,z,t), lp;
+    ideal I = fetch(R1, I);
+    int radius = 2;
+    ideal J = modfrWalk(I,radius);
+    J;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-static proc isIdealIncluded(ideal I, ideal J, int n1)
-"USAGE:  isIdealIncluded(I,J,int n1); I ideal, J ideal, n1 integer
-"
+/* test if the prime p is suitable for the input, i.e. it does not divide
+ * the numerator or denominator of any of the coefficients */
+static proc primeTest_std(int p, alias list args)
 {
-  if(n1 > 1)
-  {
-    int k;
-    list args,results;
-    for(k=1; k<=size(I); k++)
-    {
-      args[k] = list(ideal(I[k]),J,1);
+    /* erase zero generators */
+    ideal I = simplify(args[1], 2);
+
+    /* clear denominators and count the terms */
+    ideal J;
+    ideal K;
+    int n = ncols(I);
+    intvec sizes;
+    number cnt;
+    int i;
+    for(i = n; i > 0; i--) {
+        J[i] = cleardenom(I[i]);
+        cnt = leadcoef(J[i])/leadcoef(I[i]);
+        K[i] = numerator(cnt)*var(1)+denominator(cnt);
     }
-    results = parallelWaitAll("reduce",args);
-    for(k=1; k<=size(results); k++)
-    {
-      if(results[k] == 0)
-      {
-        return(1);
-      }
+    sizes = size(J[1..n]);
+
+    /* change to characteristic p */
+    def br = basering;
+    list lbr = ringlist(br);
+    if (typeof(lbr[1]) == "int") {
+        lbr[1] = p;
     }
-    return(0);
-  }
-  else
-  {
-    if(reduce(I,J,1) == 0)
-    {
-      return(1);
+    else {
+        lbr[1][1] = p;
     }
-    else
-    {
-      return(0);
+    def rp = ring(lbr);
+    setring(rp);
+    ideal Jp = fetch(br, J);
+    ideal Kp = fetch(br, K);
+
+    /* test if any coefficient is missing */
+    if (intvec(size(Kp[1..n])) != 2:n) {
+        setring(br);
+        return(0);
     }
-  }
+    if (intvec(size(Jp[1..n])) != sizes) {
+        setring(br);
+        return(0);
+    }
+    setring(br);
+    return(1);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-static proc parallelChinrem(list T1, list T2, int n1)
-"USAGE:  parallelChinrem(T1,T2); T1 list of ideals, T2 list of primes, n1 integer"
+/* find entries in modresults which come from unlucky primes.
+ * For this, sort the entries into categories depending on their leading
+ * ideal and return the indices in all but the biggest category. */
+static proc deleteUnluckyPrimes_std(alias list modresults)
 {
-  int i,j,k;
+    int size_modresults = size(modresults);
 
-  ideal H,J;
-
-  list arguments_chinrem,results_chinrem;
-  for(i=1; i<=size(T1); i++)
-  {
-    J = ideal(T1[i]);
-    attrib(J,"isSB",1);
-    arguments_chinrem[size(arguments_chinrem)+1] = list(list(J),T2);
-  }
-  results_chinrem = parallelWaitAll("chinrem",arguments_chinrem);
-    for(j=1; j <= size(results_chinrem); j++)
-    {
-      J = results_chinrem[j];
-      attrib(J,"isSB",1);
-      if(isIdealIncluded(J,H,n1) == 0)
-      {
-        if(H == 0)
-        {
-          H = J;
-        }
-        else
-        {
-          H = H,J;
-        }
-      }
-    }
-  return(H);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-static proc parallelFarey(ideal H, bigint N, int n1)
-"USAGE:  parallelFarey(H,N,n1); H ideal, N bigint, n1 integer
-"
-{
-  int i,j;
-  int ii = 1;
-  list arguments_farey,results_farey;
-  for(i=1; i<=size(H); i++)
-  {
-    for(j=1; j<=size(H[i]); j++)
-    {
-      arguments_farey[size(arguments_farey)+1] = list(H[i][j],N);
-    }
-  }
-  results_farey = parallelWaitAll("farey",arguments_farey);
-  ideal J,K;
-  poly f_farey;
-  while(ii<=size(results_farey))
-  {
-    for(i=1; i<=size(H); i++)
-    {
-      f_farey = 0;
-      for(j=1; j<=size(H[i]); j++)
-      {
-        f_farey = f_farey + results_farey[ii][1];
-        ii++;
-      }
-      K = ideal(f_farey);
-      attrib(K,"isSB",1);
-      attrib(J,"isSB",1);
-      if(isIdealIncluded(K,J,n1) == 0)
-      {
-        if(J == 0)
-        {
-          J = K;
-        }
-        else
-        {
-          J = J,K;
-        }
-      }
-    }
-  }
-  return(J);
-}
-//////////////////////////////////////////////////////////////////////////////////
-static proc primeTestSB(def II, ideal J, list L, int variant, list #)
-"USAGE:  primeTestSB(I,J,L,variant,#); I,J ideals, L intvec of primes, variant int
-RETURN:  1 (resp. 0) if for a randomly chosen prime p that is not in L
-         J mod p is (resp. is not) a standard basis of I mod p
-EXAMPLE: example primeTestSB; shows an example
-"
-{
-if(typeof(II) == "ideal")
-  {
-  ideal I = II;
-  int radius = 2;
-  }
-if(typeof(II) == "list")
-  {
-  ideal I = II[1];
-  int radius = II[2];
-  }
-
-int i,j,k,p;
-def R = basering;
-list r = ringlist(R);
-
-while(!j)
-  {
-  j = 1;
-  p = prime(random(1000000000,2134567879));
-  for(i = 1; i <= size(L); i++)
-    {
-    if(p == L[i])
-      {
-      j = 0;
-      break;
-      }
-    }
-  if(j)
-    {
-    for(i = 1; i <= ncols(I); i++)
-      {
-      for(k = 2; k <= size(I[i]); k++)
-        {
-        if((denominator(leadcoef(I[i][k])) mod p) == 0)
-          {
-          j = 0;
-          break;
-          }
-        }
-      if(!j)
-        {
-        break;
-        }
-      }
-    }
-  if(j)
-    {
-    if(!primeTest(I,p))
-      {
-      j = 0;
-      }
-    }
-  }
-r[1] = p;
-def @R = ring(r);
-setring @R;
-ideal I = imap(R,I);
-ideal J = imap(R,J);
-attrib(J,"isSB",1);
-
-int t = timer;
-j = 1;
-if(isIncluded(I,J) == 0)
-  {
-  j = 0;
-  }
-if(printlevel >= 11)
-  {
-  "isIncluded(I,J) takes "+string(timer - t)+" seconds";
-  "j = "+string(j);
-  }
-t = timer;
-if(j)
-  {
-  if(size(#) > 0)
-    {
-    ideal K = modpWalk(I,p,variant,#)[1];
-    }
-  else
-    {
-    ideal K = modpWalk(I,p,variant)[1];
-    }
-  t = timer;
-  if(isIncluded(J,K) == 0)
-    {
-    j = 0;
-    }
-  if(printlevel >= 11)
-    {
-    "isIncluded(K,J) takes "+string(timer - t)+" seconds";
-    "j = "+string(j);
-    }
-  }
-setring R;
-
-return(j);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   intvec L = 2,3,5;
-   ring r = 0,(x,y,z),lp;
-   ideal I = x+1,x+y+1;
-   ideal J = x+1,y;
-   primeTestSB(I,I,L,1);
-   primeTestSB(I,J,L,1);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-static proc pTestSB(ideal I, ideal J, list L, int variant, list #)
-"USAGE:  pTestSB(I,J,L,variant,#); I,J ideals, L intvec of primes, variant int
-RETURN:  1 (resp. 0) if for a randomly chosen prime p that is not in L
-         J mod p is (resp. is not) a standard basis of I mod p
-EXAMPLE: example pTestSB; shows an example
-"
-{
-   int i,j,k,p;
-   def R = basering;
-   list r = ringlist(R);
-
-   while(!j)
-   {
-      j = 1;
-      p = prime(random(1000000000,2134567879));
-      for(i = 1; i <= size(L); i++)
-      {
-         if(p == L[i]) { j = 0; break; }
-      }
-      if(j)
-      {
-         for(i = 1; i <= ncols(I); i++)
-         {
-            for(k = 2; k <= size(I[i]); k++)
-            {
-               if((denominator(leadcoef(I[i][k])) mod p) == 0) { j = 0; break; }
+    /* sort results into categories.
+     * each category is represented by three entries:
+     * - the corresponding leading ideal
+     * - the number of elements
+     * - the indices of the elements
+     */
+    list cat;
+    int size_cat;
+    ideal L;
+    int i;
+    int j;
+    for (i = 1; i <= size_modresults; i++) {
+        L = lead(modresults[i]);
+        attrib(L, "isSB", 1);
+        for (j = 1; j <= size_cat; j++) {
+            if (size(L) == size(cat[j][1])
+                && size(reduce(L, cat[j][1])) == 0
+                && size(reduce(cat[j][1], L)) == 0) {
+                cat[j][2] = cat[j][2]+1;
+                cat[j][3][cat[j][2]] = i;
+                break;
             }
-            if(!j){ break; }
-         }
-      }
-      if(j)
-      {
-         if(!primeTest(I,p)) { j = 0; }
-      }
-   }
-   r[1] = p;
-   def @R = ring(r);
-   setring @R;
-   ideal I = imap(R,I);
-   ideal J = imap(R,J);
-   attrib(J,"isSB",1);
+        }
+        if (j > size_cat) {
+            size_cat++;
+            cat[size_cat] = list();
+            cat[size_cat][1] = L;
+            cat[size_cat][2] = 1;
+            cat[size_cat][3] = list(i);
+        }
+    }
 
-   int t = timer;
-   j = 1;
-   if(isIncluded(I,J) == 0) { j = 0; }
+    /* find the biggest categories */
+    int cat_max = 1;
+    int max = cat[1][2];
+    for (i = 2; i <= size_cat; i++) {
+        if (cat[i][2] > max) {
+            cat_max = i;
+            max = cat[i][2];
+        }
+    }
 
-   if(printlevel >= 11)
-   {
-      "isIncluded(I,J) takes "+string(timer - t)+" seconds";
-      "j = "+string(j);
-   }
-
-   t = timer;
-   if(j)
-   {
-      if(size(#) > 0)
-      {
-         ideal K = modpStd(I,p,variant,#[1])[1];
-      }
-      else
-      {
-         ideal K = groebner(I);
-      }
-      t = timer;
-      if(isIncluded(J,K) == 0) { j = 0; }
-
-      if(printlevel >= 11)
-      {
-         "isIncluded(J,K) takes "+string(timer - t)+" seconds";
-         "j = "+string(j);
-      }
-   }
-   setring R;
-   return(j);
+    /* return all other indices */
+    list unluckyIndices;
+    for (i = 1; i <= size_cat; i++) {
+        if (i != cat_max) {
+            unluckyIndices = unluckyIndices + cat[i][3];
+        }
+    }
+    return(unluckyIndices);
 }
-example
-{ "EXAMPLE:"; echo = 2;
-   intvec L = 2,3,5;
-   ring r = 0,(x,y,z),dp;
-   ideal I = x+1,x+y+1;
-   ideal J = x+1,y;
-   pTestSB(I,I,L,2);
-   pTestSB(I,J,L,2);
-}
-////////////////////////////////////////////////////////////////////////////////
-static proc mixedTest()
-"USAGE:  mixedTest();
-RETURN:  1 if ordering of basering is mixed, 0 else
-EXAMPLE: example mixedTest(); shows an example
-"
+
+/* test if 'command' applied to 'args' in characteristic p is the same as
+   'result' mapped to characteristic p */
+static proc pTest_std(string command, alias list args, alias ideal result,
+    int p)
 {
-   int i,p,m;
-   for(i = 1; i <= nvars(basering); i++)
-   {
-      if(var(i) > 1)
-      {
-         p++;
+    /* change to characteristic p */
+    def br = basering;
+    list lbr = ringlist(br);
+    if (typeof(lbr[1]) == "int") {
+        lbr[1] = p;
+    }
+    else {
+        lbr[1][1] = p;
+    }
+    def rp = ring(lbr);
+    setring(rp);
+    ideal Ip = fetch(br, args)[1];
+    list Arg = fetch(br, args);
+    string exstr;
+    ideal Gp = fetch(br, result);
+    attrib(Gp, "isSB", 1);
+
+    /* test if Ip is in Gp */
+    int i;
+    for (i = ncols(Ip); i > 0; i--) {
+        if (reduce(Ip[i], Gp, 1) != 0) {
+            setring(br);
+            return(0);
+        }
+    }
+
+    /* compute command(args) */
+    exstr = "Ip = "+command+" (Ip";
+
+    for(i=2; i<=size(Arg); i++) {
+      exstr = exstr+",Arg["+string(eval(i))+"]";
       }
-      else
-      {
-         m++;
-      }
-   }
-   if((p > 0) && (m > 0)) { return(1); }
-   return(0);
+    exstr = exstr+");";
+
+    execute(exstr);
+
+    /* test if Gp is in Ip */
+    for (i = ncols(Gp); i > 0; i--) {
+        if (reduce(Gp[i], Ip, 1) != 0) {
+            setring(br);
+            return(0);
+        }
+    }
+
+    setring(br);
+    return(1);
 }
-example
-{ "EXAMPLE:"; echo = 2;
-   ring R1 = 0,(x,y,z),dp;
-   mixedTest();
-   ring R2 = 31,(x(1..4),y(1..3)),(ds(4),lp(3));
-   mixedTest();
-   ring R3 = 181,x(1..9),(dp(5),lp(4));
-   mixedTest();
+
+/* test if 'result' is a GB of the input ideal */
+static proc finalTest_std(string command, alias list args, ideal result)
+{
+    /* test if args[1] is in result */
+    attrib(result, "isSB", 1);
+    int i;
+    for (i = ncols(args[1]); i > 0; i--) {
+        if (reduce(args[1][i], result, 1) != 0) {
+            return(0);
+        }
+    }
+
+    /* test if result is a GB */
+    ideal G = std(result);
+    //if (reduce_parallel(G, result)) {
+    if(size(reduce(G, result))) {
+        return(0);
+    }
+    return(1);
+}
+
+/* return 1, if I_reduce is _not_ in G_reduce,
+ *        0, otherwise
+ * (same as size(reduce(I_reduce, G_reduce))).
+ * Uses parallelization. */
+static proc reduce_parallel(def I_reduce, def G_reduce)
+{
+    exportto(Modstd, I_reduce);
+    exportto(Modstd, G_reduce);
+    int size_I = ncols(I_reduce);
+    int chunks = Modular::par_range(size_I);
+    intvec range;
+    int i;
+    for (i = chunks; i > 0; i--) {
+        range = Modular::par_range(size_I, i);
+        task t(i) = "Modstd::reduce_task", list(range);
+    }
+    startTasks(t(1..chunks));
+    waitAllTasks(t(1..chunks));
+    int result = 0;
+    for (i = chunks; i > 0; i--) {
+        if (getResult(t(i))) {
+            result = 1;
+            break;
+        }
+    }
+    kill I_reduce;
+    kill G_reduce;
+    return(result);
+}
+
+/* compute a chunk of reductions for reduce_parallel */
+static proc reduce_task(intvec range)
+{
+    int result = 0;
+    int i;
+    for (i = range[1]; i <= range[2]; i++) {
+        if (reduce(I_reduce[i], G_reduce, 1) != 0) {
+            result = 1;
+            break;
+        }
+    }
+    return(result);
 }
