@@ -2526,7 +2526,7 @@ static intvec* MwalkNextWeightCC(intvec* curr_weight, intvec* target_weight,
         PrintS("\n// ** OVERFLOW in \"MwalkNextWeightCC\": ");
         mpz_out_str( stdout, 10, vec[j]);
         PrintS(" is greater than 2147483647 (max. integer representation)\n");
-        Print("//  So vector[%d] := %d is wrong!!\n",j+1, vec[j]);// vec[j] is mpz_t
+        //Print("//  So vector[%d] := %d is wrong!!\n",j+1, vec[j]);// vec[j] is mpz_t
       }
     }
   }
@@ -4253,10 +4253,10 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
     // compute a next weight vector
     next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
     xtnw=xtnw+clock()-to;
-#ifdef PRINT_VECTORS
+/*#ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
 #endif
-
+*/
     if(Overflow_Error == TRUE)
     {
       //PrintS("\n// ** The next vector does NOT stay in Cone!!\n");
@@ -4292,9 +4292,9 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
         //nOverflow_Error = Overflow_Error;
         tproc=tproc+clock()-tinput;
         
-        Print("\n// takes %d steps and calls \"Rec_LastGB\" (%d):",
+        /*Print("\n// takes %d steps and calls \"Rec_LastGB\" (%d):",
         nwalk, tp_deg+1);
-        
+        */
         G = Rec_LastGB(G,curr_weight, orig_target_weight, tp_deg+1,nnwinC);
         newRing = currRing;
         delete next_weight;
@@ -4328,7 +4328,7 @@ static ideal Rec_LastGB(ideal G, intvec* curr_weight,
     if(nnwinC == 0 || test_w_in_ConeCC(F1, target_weight) != 1 )
     {
       // nOverflow_Error = Overflow_Error;
-      Print("\n//  takes %d steps and calls \"Rec_LastGB (%d):", tp_deg+1);
+      //Print("\n//  takes %d steps and calls \"Rec_LastGB (%d):", tp_deg+1);
       tproc=tproc+clock()-tinput;
       F1 = Rec_LastGB(F1,curr_weight, orig_target_weight, tp_deg+1,nnwinC);
     }
@@ -4606,7 +4606,7 @@ ideal MAltwalk2(ideal Go, intvec* curr_weight, intvec* target_weight)
 
   //Print("\n// pSetm_Error = (%d)", ErrorCheck());
   //Print("\n// Overflow_Error? (%d)", nOverflow_Error);
-  Print("\n// Awalk2 took %d steps!!", nstep);
+  //Print("\n// Awalk2 took %d steps!!", nstep);
 #endif
 
   return(G);
@@ -8620,10 +8620,10 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
     // compute a next weight vector
     next_weight = MwalkNextWeightCC(curr_weight,target_weight, G);
     tnw=tnw+clock()-to;
-#ifdef PRINT_VECTORS
+/*#ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
 #endif
-
+*/
 
     /* check whether the computed intermediate weight vector is in
        the correct cone; sometimes it is very big e.g. s7, cyc7.
@@ -8833,7 +8833,7 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
   delete next_weight;
   delete iv_lp;
   omFree(npert);
-
+/*
 #ifdef TIME_TEST
   Print("\n// Computation took %d steps and %.2f sec",
         nwalk, ((double) (clock()-mtim)/1000000));
@@ -8843,7 +8843,7 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
  // Print("\n// pSetm_Error = (%d)", ErrorCheck());
   Print("\n// Overflow_Error? (%d)\n", Overflow_Error);
 #endif
-
+*/
   return(G);
 }
 
@@ -9491,7 +9491,7 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
     }
     newRing = currRing;
     Gomega1 = idrMoveR(Gomega, oldRing,currRing);
-
+/*
 #ifdef ENDWALKS
     if(endwalks == 1)
     {
@@ -9500,7 +9500,7 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
       PrintS("\n//  compute a rGB of Gw:");
     }
 #endif
-
+*/
     to=clock();
     // compute a reduced Groebner basis of <Gomega> w.r.t. "newRing"
 #ifdef  BUCHBERGER_ALG
@@ -9600,7 +9600,7 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
 
   if( test_w_in_ConeCC(G1, target_weight) != 1 || ntestwinC == 0)
   {
-    PrintS("\n// The perturbed target vector doesn't STAY in the correct cone!!");
+    //PrintS("\n// The perturbed target vector doesn't STAY in the correct cone!!");
     if(tp_deg == 1)
     {
       //Print("\n// subroutine takes %d steps and applys \"std\"", nwalk);
@@ -9629,7 +9629,7 @@ static ideal Mpwalk_MAltwalk1(ideal Go, intvec* curr_weight, int tp_deg)
   delete target_weight;
 
   //Print("\n// \"Mpwalk\" (1,%d) took %d steps and %.2f sec. Overflow_Error (%d)", tp_deg, nwalk, ((double) clock()-tinput)/1000000, nOverflow_Error);
-  Print("\n// Mprwalk took %d steps. Ring= %s;\n", nwalk, rString(currRing));
+  //Print("\n// Mprwalk took %d steps. Ring= %s;\n", nwalk, rString(currRing));
   return(result);
 }
 
@@ -9831,10 +9831,10 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
     // compute a next weight vector
     next_weight = MkInterRedNextWeight(curr_weight,target_weight, G);
     xtnw=xtnw+clock()-to;
-#ifdef PRINT_VECTORS
+/*#ifdef PRINT_VECTORS
     MivString(curr_weight, target_weight, next_weight);
 #endif
-
+*/
     if(Overflow_Error == TRUE)
     {
       newRing = currRing;
@@ -9904,15 +9904,15 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
   }
   delete exivlp;
 #ifdef TIME_TEST
-
+/*
   Print("\n// \"Main procedure\"  took %d steps, %.2f sec. and Overflow_Error(%d)",
         nwalk, ((double) tproc)/1000000, nOverflow_Error);
 
   TimeStringFractal(xftinput, tostd, xtif, xtstd,xtextra, xtlift, xtred, xtnw);
-
+*/
  // Print("\n// pSetm_Error = (%d)", ErrorCheck());
-  Print("\n// Overflow_Error? (%d)", Overflow_Error);
-  Print("\n// Awalk1 took %d steps.\n", nstep);
+ // Print("\n// Overflow_Error? (%d)", Overflow_Error);
+ // Print("\n// Awalk1 took %d steps.\n", nstep);
 #endif
   return(result);
 }
