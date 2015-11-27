@@ -744,8 +744,8 @@ static poly MpolyInitialForm(poly g, intvec* curr_weight)
 
     if(mpz_cmp(maxtmp, max)>0)
     {
-      mpz_init_set(max, maxtmp);
-      pDelete(&in_w_g);
+      mpz_set(max, maxtmp);
+      if (in_w_g!=NULL) pDelete(&in_w_g);
       in_w_g = pHead(hg);
     }
     else
@@ -756,6 +756,8 @@ static poly MpolyInitialForm(poly g, intvec* curr_weight)
       }
     }
   }
+  mpz_clear(maxtmp);
+  mpz_clear(max);
   return in_w_g;
 }
 
