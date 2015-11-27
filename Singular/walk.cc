@@ -804,13 +804,12 @@ static int test_w_in_ConeCC(ideal G, intvec* iv)
 
   for(i=nG-1; i>=0; i--)
   {
-    mi = pHead(MpolyInitialForm(G->m[i], iv));
+    mi = MpolyInitialForm(G->m[i], iv);
     //Print("\n **// test_w_in_ConeCC: lm(initial)= %s \n",pString(mi));
-    gi = pHead(G->m[i]);
+    gi = G->m[i];
     //Print("\n **// test_w_in_ConeCC: lm(ideal)= %s \n",pString(gi));
     if(mi == NULL)
     {
-      pDelete(&mi);
       if(Overflow_Error == FALSE)
       {
         Overflow_Error = nError;
