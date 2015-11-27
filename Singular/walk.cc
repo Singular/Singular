@@ -2686,32 +2686,10 @@ intvec* MkInterRedNextWeight(intvec* iva, intvec* ivb, ideal G)
 static ring VMrDefault(intvec* va)
 {
 
-  if ((currRing->ppNoether)!=NULL)
-  {
-    pDelete(&(currRing->ppNoether));
-  }
-  if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING)) ||
-      ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
-  {
-    sLastPrinted.CleanUp();
-  }
-
-  ring r = (ring) omAlloc0Bin(sip_sring_bin);
+  ring r = rCopy0(currRing,FALSE,FALSE);
   int i, nv = currRing->N;
 
-  r->cf  = currRing->cf;
-  r->N   = currRing->N;
-
   int nb = 4;
-
-  //names
-  char* Q; // In order to avoid the corrupted memory, do not change.
-  r->names = (char **) omAlloc0(nv * sizeof(char_ptr));
-  for(i=0; i<nv; i++)
-  {
-    Q = currRing->names[i];
-    r->names[i]  = omStrDup(Q);
-  }
 
   /*weights: entries for 3 blocks: NULL Made:???*/
   r->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
@@ -2759,32 +2737,10 @@ static ring VMrDefault(intvec* va)
 static ring VMrRefine(intvec* va, intvec* vb)
 {
 
-  if ((currRing->ppNoether)!=NULL)
-  {
-    pDelete(&(currRing->ppNoether));
-  }
-  if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING)) ||
-      ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
-  {
-    sLastPrinted.CleanUp();
-  }
-
-  ring r = (ring) omAlloc0Bin(sip_sring_bin);
+  ring r = rCopy0(currRing,FALSE,FALSE);
   int i, nv = currRing->N;
 
-  r->cf  = currRing->cf;
-  r->N   = currRing->N;
-  //int nb = nBlocks(currRing)  + 1;
   int nb = 5;
-
-  //names
-  char* Q; // In order to avoid the corrupted memory, do not change.
-  r->names = (char **) omAlloc0(nv * sizeof(char_ptr));
-  for(i=0; i<nv; i++)
-  {
-    Q = currRing->names[i];
-    r->names[i]  = omStrDup(Q);
-  }
 
   //weights: entries for 3 blocks: NULL Made:???
   r->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
@@ -2826,9 +2782,6 @@ static ring VMrRefine(intvec* va, intvec* vb)
   // the last block: everything is 0
   r->order[4]  = 0;
 
-  // polynomial ring
-  r->OrdSgn    = 1;
-
   // complete ring intializations
 
   rComplete(r);
@@ -2843,32 +2796,10 @@ static ring VMrRefine(intvec* va, intvec* vb)
 static ring VMatrDefault(intvec* va)
 {
 
-  if ((currRing->ppNoether)!=NULL)
-  {
-    pDelete(&(currRing->ppNoether));
-  }
-  if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING)) ||
-      ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
-  {
-    sLastPrinted.CleanUp();
-  }
-
-  ring r = (ring) omAlloc0Bin(sip_sring_bin);
+  ring r = rCopy0(currRing,FALSE,FALSE);
   int i, nv = currRing->N;
 
-  r->cf  = currRing->cf;
-  r->N   = currRing->N;
-
   int nb = 4;
-
-  //names
-  char* Q; // In order to avoid the corrupted memory, do not change.
-  r->names = (char **) omAlloc0(nv * sizeof(char_ptr));
-  for(i=0; i<nv; i++)
-  {
-    Q = currRing->names[i];
-    r->names[i]  = omStrDup(Q);
-  }
 
   /*weights: entries for 3 blocks: NULL Made:???*/
   r->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
@@ -2894,18 +2825,13 @@ static ring VMatrDefault(intvec* va)
   r->block0[1] = 1;
   r->block1[1] = nv;
 
-
 // ringorder C for the third block: var 1..nv
   r->order[2]  = ringorder_C;
   r->block0[2] = 1;
   r->block1[2] = nv;
 
-
   // the last block: everything is 0
   r->order[3]  = 0;
-
-  // polynomial ring
-  r->OrdSgn    = 1;
 
   // complete ring intializations
 
@@ -2921,32 +2847,11 @@ static ring VMatrDefault(intvec* va)
 static ring VMatrRefine(intvec* va, intvec* vb)
 {
 
-  if ((currRing->ppNoether)!=NULL)
-  {
-    pDelete(&(currRing->ppNoether));
-  }
-  if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING)) ||
-      ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
-  {
-    sLastPrinted.CleanUp();
-  }
-
-  ring r = (ring) omAlloc0Bin(sip_sring_bin);
+  ring r = rCopy0(currRing,FALSE,FALSE);
   int i, nv = currRing->N;
   int nvs = nv*nv;
-  r->cf  = currRing->cf;
-  r->N   = currRing->N;
 
   int nb = 4;
-
-  //names
-  char* Q; // In order to avoid the corrupted memory, do not change.
-  r->names = (char **) omAlloc0(nv * sizeof(char_ptr));
-  for(i=0; i<nv; i++)
-  {
-    Q = currRing->names[i];
-    r->names[i]  = omStrDup(Q);
-  }
 
   /*weights: entries for 3 blocks: NULL Made:???*/
   r->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
@@ -2982,12 +2887,8 @@ static ring VMatrRefine(intvec* va, intvec* vb)
   r->block0[2] = 1;
   r->block1[2] = nv;
 
-
   // the last block: everything is 0
   r->order[3]  = 0;
-
-  // polynomial ring
-  r->OrdSgn    = 1;
 
   // complete ring intializations
 
@@ -3002,33 +2903,10 @@ static ring VMatrRefine(intvec* va, intvec* vb)
 ***********************************************************************/
 static void VMrDefaultlp(void)
 {
-
-  if ((currRing->ppNoether)!=NULL)
-  {
-    pDelete(&(currRing->ppNoether));
-  }
-  if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING)) ||
-      ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
-
-  {
-    sLastPrinted.CleanUp();
-  }
-
-  ring r = (ring) omAlloc0Bin(sip_sring_bin);
+  ring r = rCopy0(currRing,FALSE,FALSE);
   int i, nv = currRing->N;
 
-  r->cf  = currRing->cf;
-  r->N   = currRing->N;
   int nb = rBlocks(currRing) + 1;
-
-  // names
-  char* Q; // to avoid the corrupted memory, do not change!!
-  r->names = (char **) omAlloc0(nv * sizeof(char_ptr));
-  for(i=0; i<nv; i++)
-  {
-    Q = currRing->names[i];
-    r->names[i]  = omStrDup(Q);
-  }
 
   /*weights: entries for 3 blocks: NULL Made:???*/
 
@@ -3069,15 +2947,7 @@ static void DefRingPar(intvec* va)
   int i, nv = currRing->N;
   int nb = rBlocks(currRing) + 1;
 
-  ring res=(ring)omAllocBin(sip_sring_bin);
-
-  memcpy(res,currRing,sizeof(ip_sring));
-
-  res->VarOffset = NULL;
-  res->ref=0;
-
-  res->cf = currRing->cf; currRing->cf->ref++;
-
+  ring res=rCopy0(currRing,FALSE,FALSE);
 
   /*weights: entries for 3 blocks: NULL Made:???*/
   res->wvhdl = (int **)omAlloc0(nb * sizeof(int_ptr));
@@ -3114,52 +2984,20 @@ static void DefRingPar(intvec* va)
   res->OrdSgn    = 1;
 
 
-  res->names   = (char **)omAlloc0(nv * sizeof(char_ptr));
-  for (i=nv-1; i>=0; i--)
-  {
-    res->names[i] = omStrDup(currRing->names[i]);
-  }
   // complete ring intializations
   rComplete(res);
-
-  // clean up history
-  if (sLastPrinted.RingDependend())
-  {
-    sLastPrinted.CleanUp();
-  }
-
 
   // execute the created ring
   rChangeCurrRing(res);
 }
 
-
 static void DefRingParlp(void)
 {
   int i, nv = currRing->N;
 
-  ring r=(ring)omAllocBin(sip_sring_bin);
+  ring r=rCopy0(currRing,FALSE,FALSE);
 
-  memcpy(r,currRing,sizeof(ip_sring));
-
-  r->VarOffset = NULL;
-  r->ref=0;
-
-  r->cf = currRing->cf; currRing->cf->ref++;
-
-
-  r->cf  = currRing->cf;
-  r->N   = currRing->N;
   int nb = rBlocks(currRing) + 1;
-
-  // names
-  char* Q;
-  r->names = (char **) omAlloc0(nv * sizeof(char_ptr));
-  for(i=nv-1; i>=0; i--)
-  {
-    Q = currRing->names[i];
-    r->names[i]  = omStrDup(Q);
-  }
 
   /*weights: entries for 3 blocks: NULL Made:???*/
 
@@ -3200,12 +3038,6 @@ static void DefRingParlp(void)
   // complete ring intializations
 
   rComplete(r);
-
-  // clean up history
-  if (sLastPrinted.RingDependend())
-  {
-    sLastPrinted.CleanUp();
-  }
 
   // execute the created ring
   rChangeCurrRing(r);
