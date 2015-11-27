@@ -169,6 +169,16 @@ public:
     assert(0);
     return a;
   }
+  static Rational gcd(Rational const &a, Rational const /*&b*/)
+  {
+/*    mpz_t r;
+    mpz_init(r);
+    mpz_gcdext(r,s.value,t.value,a.value,b.value);
+    Integer ret(r);
+    mpz_clear(r);*/
+    assert(0);
+    return a;
+  }
   /**
    * Assigns the value to q. q must have been initialized as a gmp variable.
    */

@@ -299,10 +299,9 @@ public:
 
   typ gcd()const
   {
-    typ temp1,temp2;
     typ ret(1);
     for(unsigned i=0;i<size();i++)
-      ret=typ::gcd(ret,v[i],temp1,temp2);
+      ret=typ::gcd(ret,v[i]);
     return ret;
   }
   Vector normalized()const
