@@ -60,6 +60,9 @@ public:
   bool isZero()const{
     return mpz_sgn(value)==0;
   }
+  bool isOne()const{
+    return mpz_cmp_si(value,1);
+  }
   friend std::ostream &operator<<(std::ostream &f, Integer const &a)
   {
     void (*freefunc)(void *, size_t);
@@ -157,6 +160,17 @@ public:
     mpz_t r;
     mpz_init(r);
     mpz_gcdext(r,s.value,t.value,a.value,b.value);
+    Integer ret(r);
+    mpz_clear(r);
+    return ret;
+  }
+  static Integer gcd(Integer const &a, Integer const &b)
+  {
+    if (a.isOne() || b.isOne())
+      return Integer(1);	
+    mpz_t r;
+    mpz_init(r);
+    mpz_gcd(r,a.value,b.value);
     Integer ret(r);
     mpz_clear(r);
     return ret;
