@@ -9646,6 +9646,7 @@ ideal MAltwalk1(ideal Go, int op_deg, int tp_deg, intvec* curr_weight,
     // change the ring to newRing
     rChangeCurrRing(newRing);
     F1 = idrMoveR(F, oldRing,currRing);
+    rDelete(oldRing); oldRing=NULL;
 
     to=clock();
     // reduce the Groebner basis <G> w.r.t. new ring
