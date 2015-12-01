@@ -486,7 +486,7 @@ EXAMPLE: example pwalk; shows an example"
   int reduction=1;
   int printout=0;
   G = system("Mpwalk",G,n1,n2,curr_weight,target_weight,nP,reduction,printout);
- 
+
   setring xR;
   //kill Go; //unused
 

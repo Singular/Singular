@@ -80,8 +80,9 @@
 #include <Singular/newstruct.h>
 #include <Singular/ipshell.h>
 //#include <kernel/mpr_inout.h>
-
 #include <reporter/si_signals.h>
+
+#include <Singular/number2.h>
 
 
 #include <stdlib.h>
@@ -4844,6 +4845,15 @@ static BOOLEAN jjRINGLIST(leftv res, leftv v)
     res->data = (char *)rDecompose((ring)v->Data());
   return (r==NULL)||(res->data==NULL);
 }
+#ifdef SINGULAR_4_1
+static BOOLEAN jjRINGLIST_C(leftv res, leftv v)
+{
+  coeffs r=(coeffs)v->Data();
+  if (r!=NULL)
+    return rDecompose_CF(res,r);
+  return TRUE;
+}
+#endif
 static BOOLEAN jjROWS(leftv res, leftv v)
 {
   ideal i = (ideal)v->Data();
@@ -5142,7 +5152,9 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
   int t=(int)(long)v->data;
   switch (t)
   {
+    #ifdef SINGULAR_4_1
     case CRING_CMD:
+    #endif
     case INT_CMD:
     case POLY_CMD:
     case VECTOR_CMD:
@@ -6322,8 +6334,13 @@ static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
 static BOOLEAN jjRANDOM_CF(leftv res, leftv u, leftv v, leftv w)
 // <coeff>, par1, par2 -> number2
 {
-  coeffs cf=(coeffs)u->Data();
-  if ((cf!=NULL) && (cf->cfRandom!=NULL))
+  coeffs cf=(coeffs)w->Data();
+  if ((cf==NULL) ||(cf->cfRandom==NULL))
+  {
+    Werror("no random function defined for coeff %d",cf->type);
+    return TRUE;
+  }
+  else
   {
     number n= n_Random(siRand,(number)v->Data(),(number)w->Data(),cf);
     number2 nn=(number2)omAlloc(sizeof(*nn));
@@ -8857,7 +8874,9 @@ const char * Tok2Cmdname(int tok)
   //if (tok==OBJECT) return "object";
   //if (tok==PRINT_EXPR) return "print_expr";
   if (tok==IDHDL) return "identifier";
+  #ifdef SINGULAR_4_1
   if (tok==CRING_CMD) return "(c)ring";
+  #endif
   if (tok==QRING_CMD) return "ring";
   if (tok>MAX_TOK) return getBlackboxName(tok);
   int i;

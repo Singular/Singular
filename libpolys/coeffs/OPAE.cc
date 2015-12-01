@@ -330,7 +330,12 @@ BOOLEAN nAEClearDenominators  (number, const coeffs)
 
 static char * n_AECoeffName(const coeffs r)
 {
-  return (char *)"AE";
+  return (char*)("AE");
+}
+
+static char * nAECoeffString(const coeffs r)
+{
+  return omStrDup("AE");
 }
 
 //INITIALISIERUNG FÜR SINGULAR
@@ -379,6 +384,7 @@ BOOLEAN n_AEInitChar(coeffs r, void *)
     r->cfGcd  = nAEGcd;
     r->cfLcm  = nAELcm; // ZU BEARBEITEN
     r->cfDelete= nAEDelete;
+    r->cfCoeffString=nAECoeffString;
 
     r->cfSetMap = nAESetMap;
 

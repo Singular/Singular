@@ -35,6 +35,7 @@
 #include <Singular/links/silink.h>
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
+#include <Singular/number2.h>
 
 #ifdef SINGULAR_4_1
 #include <Singular/number2.h>
@@ -187,7 +188,9 @@ void *idrecDataInit(int t)
     case RESOLUTION_CMD:
       return  (void *)omAlloc0(sizeof(ssyStrategy));
     //other types: without init (int,script,poly,def,package)
+    #ifdef SINGULAR_4_1
     case CRING_CMD:
+    #endif
     case INT_CMD:
     case DEF_CMD:
     case POLY_CMD:
@@ -206,7 +209,7 @@ void *idrecDataInit(int t)
              return (void *)bb->blackbox_Init(bb);
         }
         else
-          Werror("unknown type %d",t);
+          Werror("unknown type in idrecDataInit:%d",t);
         break;
       }
   }

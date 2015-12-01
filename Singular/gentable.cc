@@ -141,7 +141,9 @@ const char * Tok2Cmdname(int tok)
   //if (tok==OBJECT) return "object";
   //if (tok==PRINT_EXPR) return "print_expr";
   if (tok==IDHDL) return "identifier";
+  #ifdef SINGULAR_4_1
   if (tok==CRING_CMD) return "(c)ring";
+  #endif
   // we do not blackbox objects during table generation:
   //if (tok>MAX_TOK) return getBlackboxName(tok);
   int i = 0;

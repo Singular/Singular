@@ -27,6 +27,7 @@
 #include <Singular/attrib.h>
 #include <polys/monomials/ring.h>
 #include <Singular/ipshell.h>
+#include <Singular/number2.h>
 #include <Singular/ipconv.h>
 
 typedef void *   (*iiConvertProc)(void * data);
@@ -174,6 +175,22 @@ static void * iiI2BI(void *data)
   return (void *)n;
 }
 
+#ifdef SINGULAR_4_1
+static void * iiI2NN(void *data)
+{
+  if (currRing==NULL)
+  {
+    WerrorS("missing basering while converting int to Number");
+    return NULL;
+  }
+  number n=nInit((int)(long)data);
+  number2 nn=(number2)omAlloc(sizeof*nn);
+  nn->cf=currRing->cf; nn->cf->ref++;
+  nn->n=n;
+  return (void *)nn;
+}
+#endif
+
 static void * iiBI2N(void *data)
 {
   if (currRing==NULL) return NULL;
@@ -187,6 +204,60 @@ static void * iiBI2N(void *data)
   n_Delete((number *)&data, coeffs_BIGINT);
   return (void*)n;
 }
+
+#ifdef SINGULAR_4_1
+static void * iiBI2NN(void *data)
+{
+  if (currRing==NULL)
+  {
+    WerrorS("missing basering while converting bigint to Number");
+    return NULL;
+  }
+  nMapFunc nMap=n_SetMap(coeffs_BIGINT,currRing->cf);
+  if (nMap==NULL)
+  {
+    Werror("no conversion from bigint to %s",currRing->cf->cfCoeffString(currRing->cf));
+    return NULL;
+  }
+  number n=nMap((number)data,coeffs_BIGINT,currRing->cf);
+  n_Delete((number *)&data, coeffs_BIGINT);
+  number2 nn=(number2)omAlloc(sizeof*nn);
+  nn->cf=currRing->cf; nn->cf->ref++;
+  return (void*)nn;
+}
+#endif
+
+#ifdef SINGULAR_4_1
+static void * iiNN2N(void *data)
+{
+  number2 d=(number2)data;
+  if ((currRing==NULL)
+  || (currRing->cf!=d->cf))
+  {
+    WerrorS("cannot convert: incompatible");
+    return NULL;
+  }
+  number n = n_Copy(d->n, d->cf);
+  n2Delete(d);
+  return (void*)n;
+}
+#endif
+
+#ifdef SINGULAR_4_1
+static void * iiNN2P(void *data)
+{
+  number2 d=(number2)data;
+  if ((currRing==NULL)
+  || (currRing->cf!=d->cf))
+  {
+    WerrorS("cannot convert: incompatible");
+    return NULL;
+  }
+  number n = n_Copy(d->n, d->cf);
+  n2Delete(d);
+  return (void*)p_NSet(n,currRing);
+}
+#endif
 
 static void * iiIm2Ma(void *data)
 {
@@ -361,7 +432,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
     }
     output->next=input->next;
     input->next=NULL;
-    return FALSE;
+    return errorreported;
   }
   if (index!=0) /* iiTestConvert does not returned 'failure' */
   {
@@ -394,6 +465,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
       {
         return TRUE;
       }
+      if (errorreported) return TRUE;
       output->next=input->next;
       input->next=NULL;
   //if (outputType==MATRIX_CMD) Print("convert %d -> matrix\n",inputType);
@@ -419,6 +491,8 @@ int iiTestConvert (int inputType, int outputType,struct sConvertTypes *dConvertT
 
   if ((currRing==NULL) && (outputType>BEGIN_RING) && (outputType<END_RING))
     return 0;
+  //if ((currRing==NULL) && (outputType==CNUMBER_CMD))
+  //  return 0;
 
   // search the list
   int i=0;
@@ -433,7 +507,7 @@ int iiTestConvert (int inputType, int outputType,struct sConvertTypes *dConvertT
     }
     i++;
   }
-  //Print("test convert %d to %d (%s -> %s):0\n",inputType,outputType,
-  // Tok2Cmdname(inputType), Tok2Cmdname(outputType));
+  //Print("test convert %d to %d (%s -> %s):0, tested:%d\n",inputType,outputType,
+  // Tok2Cmdname(inputType), Tok2Cmdname(outputType),i);
   return 0;
 }

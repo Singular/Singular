@@ -292,5 +292,8 @@ BOOLEAN iiCheckTypes(leftv args,/// < [in] argument list (may be NULL)
 
 BOOLEAN iiBranchTo(leftv r, leftv args);
 
+#ifdef SINGULAR_4_1
+BOOLEAN rDecompose_CF(leftv res,const coeffs C);
+#endif
 #endif
 

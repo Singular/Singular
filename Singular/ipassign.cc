@@ -54,9 +54,7 @@
 #include "links/silink.h"
 #include "ipshell.h"
 #include "blackbox.h"
-
-#include <Singular/number2.h>
-
+#include "Singular/number2.h"
 
 /*=================== proc =================*/
 static BOOLEAN jjECHO(leftv, leftv a)

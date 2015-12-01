@@ -167,7 +167,7 @@ public:
   static Integer gcd(Integer const &a, Integer const &b)
   {
     if (a.isOne() || b.isOne())
-      return Integer(1);	
+      return Integer(1);
     mpz_t r;
     mpz_init(r);
     mpz_gcd(r,a.value,b.value);

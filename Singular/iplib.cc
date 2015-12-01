@@ -766,7 +766,9 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
     if((LT = type_of_LIB(libname, libnamebuf)) > LT_NOTFOUND)
     {
       char *s=omStrDup(libname);
+      #ifdef HAVE_DYNAMIC_LOADING
       char libnamebuf[256];
+      #endif
 
       if (LT==LT_SINGULAR)
         LoadResult = iiLibCmd(s, FALSE, FALSE,TRUE);
