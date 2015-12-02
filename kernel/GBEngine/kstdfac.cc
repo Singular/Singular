@@ -847,7 +847,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   strat->homog=h;
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);
-  initBba(F,strat);
+  initBba(strat);
   initBuchMora(F, Q,strat);
   if (D!=NULL)
   {

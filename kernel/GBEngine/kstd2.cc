@@ -1476,7 +1476,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);
   initHilbCrit(F,Q,&hilb,strat);
-  initBba(F,strat);
+  initBba(strat);
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMora(F, Q,strat);
   if (strat->minim>0) strat->M=idInit(IDELEMS(F),F->rank);
@@ -3079,7 +3079,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit, NO CHANGES */
   initBuchMoraPos(strat); /*NO CHANGES YET: perhaps later*/
   initHilbCrit(F,Q,&hilb,strat); /*NO CHANGES*/
-  initBbaShift(F,strat); /* DONE */
+  initBbaShift(strat); /* DONE */
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMoraShift(F, Q,strat); /* updateS with no toT, i.e. no init for T */
   updateSShift(strat,uptodeg,lV); /* initializes T */
@@ -3571,7 +3571,7 @@ int redFirstShift (LObject* h,kStrategy strat)
   }
 }
 
-void initBbaShift(ideal /*F*/,kStrategy strat)
+void initBbaShift(kStrategy strat)
 {
  /* setting global variables ------------------- */
   strat->enterS = enterSBba; /* remains as is, we change enterT! */

@@ -1385,7 +1385,7 @@ void enterSMoraNF (LObject &p, int atS,kStrategy strat, int atR = -1)
     strat->kHEdgeFound = TRUE;
 }
 
-void initBba(ideal /*F*/,kStrategy strat)
+void initBba(kStrategy strat)
 {
  /* setting global variables ------------------- */
   strat->enterS = enterSBba;
@@ -3064,7 +3064,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
 
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);
-  initBba(F,strat);
+  initBba(strat);
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   strat->posInL=posInL0; /* ord according pComp */
 

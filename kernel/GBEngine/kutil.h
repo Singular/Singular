@@ -634,7 +634,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 ideal sba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 poly kNF2 (ideal F, ideal Q, poly q, kStrategy strat, int lazyReduce);
 ideal kNF2 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce);
-void initBba(ideal F,kStrategy strat);
+void initBba(kStrategy strat);
 void initSba(ideal F,kStrategy strat);
 void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
           int& hilbcount, int& srmax, int& lrmax, int& reduc, ideal Q,
@@ -790,7 +790,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ,kStrategy strat, in
 
 void updateSShift(kStrategy strat,int uptodeg,int lV);
 
-void initBbaShift(ideal F,kStrategy strat);
+void initBbaShift(kStrategy strat);
 
 poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN normalize);
 
