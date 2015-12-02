@@ -1893,7 +1893,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
            currRing->N);
         return TRUE;
       }
-      ideal arg1 = (ideal) h->Data();
+      ideal arg1 = (ideal) h->CopyD();
       intvec* arg2 = (intvec*) h->next->Data();
       intvec* arg3 = (intvec*) h->next->next->Data();
       ring arg4 = (ring) h->next->next->next->Data();
