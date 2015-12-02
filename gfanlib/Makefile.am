@@ -17,3 +17,4 @@ libgfan_include_HEADERS = gfanlib_z.h gfanlib_q.h gfanlib_vector.h gfanlib_matri
 
 DISTCLEANFILES =  config.h
 
+moduledir = $(libexecdir)/singular/MOD
