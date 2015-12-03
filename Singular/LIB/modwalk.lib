@@ -417,13 +417,27 @@ static proc finalTest_std(string command, alias list args, ideal result)
         }
     }
 
-    /* test if result is a GB */
-    ideal G = std(result);
-    //if (reduce_parallel(G, result)) {
-    if(size(reduce(G, result))) {
-        return(0);
-    }
-    return(1);
+    link l1="ssi:fork";
+    open(l1);
+    link l2="ssi:fork";
+    open(l2);
+    list l=list(l1,l2);
+    write(l1,quote(TestSBred(result)));
+    write(l2,quote(TestSBstd(result)));
+
+    i=waitfirst(l);
+
+    if(i==1) {
+      i=read(l1);
+      }
+    else {
+      i=read(l2);
+      }
+
+    close(l1);
+    close(l2);
+
+    return(i);
 }
 
 /* return 1, if I_reduce is _not_ in G_reduce,
@@ -468,4 +482,53 @@ static proc reduce_task(intvec range)
         }
     }
     return(result);
+}
+
+/* test if result is a GB with std*/
+static proc TestSBstd(ideal result)
+{
+  ideal G = std(result);
+  if(reduce_parallel(G,result)) {
+    return(0);
+    }
+  return(1);
+}
+
+/* test if result is a GB by reducing s-polynomials*/
+static proc TestSBred(ideal result)
+{
+  int i,j;
+  for(i=1; i<=size(result); i++) {
+    for(j=i; j<=size(result); j++) {
+      if(reduce(sPolynomial(result[i],result[j]),result)!=0) {
+        return(0);
+        }
+      }
+    }
+  return(1);
+}
+
+/* compute s-polynomial of f and g */
+static proc sPolynomial(poly f,poly g)
+{
+  int i;
+  poly lcmp = 1;
+
+  intvec lexpf = leadexp(f);
+  intvec lexpg = leadexp(g);
+
+  for(i=1; i<=nvars(basering); i++) {
+    if(lexpf[i]>=lexpg[i]) {
+      lcmp=lcmp*var(i)**lexpf[i];
+      }
+    else {
+      lcmp=lcmp*var(i)**lexpg[i];
+      }
+   }
+
+  poly fmult=lcmp/leadmonom(f);
+  poly gmult=lcmp/leadmonom(g);
+  poly result=leadcoef(g)*fmult*f-leadcoef(f)*gmult*g;
+
+  return(result);
 }
