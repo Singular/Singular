@@ -45,8 +45,6 @@ arcpoint.lib    Nadine Cremer
 atkins.lib      Stefan Steidel                  steidel@mathematik.uni-kl.de
 bfun.lib        Daniel Andres                   daniel.andres@math.rwth-aachen.de
                 Viktor Levandovskyy             levandov@math.rwth-aachen.de
-binresol.lib    R. Blanco                       rblanco@modulor.arq.uva.es
-                G. Pfister                      pfister@mathematik.uni-kl.de
 brnoeth.lib     Jose Ignacio Farran Martin      ignfar@eis.uva.es
                 Christoph Lossen                lossen@mathematik.uni-kl.de
 central.lib     Oleksandr Motsak                motsak at mathematik dot uni minus kl dot de
@@ -154,6 +152,8 @@ realrad.lib     Silke Spang
 redcgs.lib      Antonio Montes
                 Hans Schoenemann
 reesclos.lib    Tobias Hirsch                   hirsch@math.tu-cottbus.de
+resbinomial.lib R. Blanco                       rblanco@modulor.arq.uva.es
+                G. Pfister                      pfister@mathematik.uni-kl.de
 resgraph.lib    A. Fruehbis-Krueger             anne@mathematik.uni-kl.de
 resolve.lib     A. Fruehbis-Krueger             anne@mathematik.uni-kl.de
                 G. Pfister                      pfister@mathematik.uni-kl.de
