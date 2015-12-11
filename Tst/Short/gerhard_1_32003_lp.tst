@@ -8,4 +8,4 @@
     option(redSB);
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
-    tst_status(1);exit;
+    tst_status(1);$
