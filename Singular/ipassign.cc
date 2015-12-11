@@ -910,7 +910,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     WerrorS("qring_id expected");
     return TRUE;
   }
-  assume(res->Data()==NULL);
+  ring old_ring=(ring)res->Data();
 
   coeffs newcf = currRing->cf;
   ideal id = (ideal)a->Data(); //?
@@ -997,6 +997,10 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   #endif
   //rWrite(qr);
   rSetHdl((idhdl)res->data);
+  if (old_ring!=NULL)
+  {
+    rDelete(old_ring);
+  }
   return FALSE;
 }
 
