@@ -465,14 +465,13 @@ ideal idMultSect(resolvente arg, int length)
 static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
 {
   ideal   h2, h3;
-  int     i;
   int     j,k;
   poly    p,q;
 
   if (idIs0(h1)) return NULL;
   k = id_RankFreeModule(h1,currRing);
   h2=idCopy(h1);
-  i = IDELEMS(h2)-1;
+  int i = IDELEMS(h2);
   if (k == 0)
   {
     id_Shift(h2,1,currRing);
@@ -484,7 +483,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
     syzcomp = k;
     rSetSyzComp(k,currRing);
   }
-  h2->rank = syzcomp+i+1;
+  h2->rank = syzcomp+i;
 
   //if (hom==testHomog)
   //{
@@ -499,12 +498,11 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
   Print("Prepare::h2: ");
   idPrint(h2);
 
-  for(j=0;j<IDELEMS(h2);j++) pTest(h2->m[j]);
-
+  idTest(h2);
 #endif
 #endif
 
-  for (j=0; j<=i; j++)
+  for (j=0; j<i; j++)
   {
     p = h2->m[j];
     q = pOne();
@@ -542,10 +540,9 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
 #ifdef RDEBUG
   Print("Prepare::Output: ");
   idPrint(h3);
-  for(j=0;j<IDELEMS(h2);j++) pTest(h3->m[j]);
+  idpTest(h3);
 #endif
 #endif
-
 
   idDelete(&h2);
   return h3;
@@ -1024,7 +1021,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
         p = pNeg(p);
       }
     }
-    s_temp->rank += k;
+    s_temp->rank += (k+comps_to_add);
   }
   ideal s_result = kNF(s_h3,currRing->qideal,s_temp,k);
   s_result->rank = s_h3->rank;

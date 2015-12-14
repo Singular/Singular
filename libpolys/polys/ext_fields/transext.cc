@@ -1020,6 +1020,30 @@ number ntMult(number a, number b, const coeffs cf)
   return (number)result;
 }
 
+static void ntNormalizeDen(fraction result, const ring R)
+{
+  if ((nCoeff_has_simple_inverse(R->cf))
+  && (result!=NULL)
+  && (DEN(result)!=NULL))
+  {
+    poly n=DEN(result);
+    if (!n_IsOne(pGetCoeff(n),R->cf))
+    {
+      number inv=n_Invers(pGetCoeff(n),R->cf);
+      DEN(result)=p_Mult_nn(n,inv,R);
+      NUM(result)=p_Mult_nn(NUM(result),inv,R);
+      n_Delete(&inv,R->cf);
+      if (p_IsOne(DEN(result), R))
+      {
+        n=DEN(result);
+        DEN(result)=NULL;
+        COM(result) = 0;
+        p_Delete(&n,R);
+      }
+    }
+  }
+}
+
 number ntDiv(number a, number b, const coeffs cf)
 {
   //check_N(a,cf);
@@ -1057,6 +1081,7 @@ number ntDiv(number a, number b, const coeffs cf)
   heuristicGcdCancellation((number)result, cf);
 //  ntTest((number)result);
   //check_N((number)result,cf);
+  ntNormalizeDen(result,ntRing);
   ntTest((number)result);
   return (number)result;
 }
@@ -1561,6 +1586,7 @@ void ntNormalize (number &a, const coeffs cf)
       DEN((fraction)a)=p_Neg(DEN((fraction)a),ntRing);
     }
   }
+  ntNormalizeDen((fraction)a,ntRing);
   ntTest(a); // !!!!
 }
 
@@ -1830,6 +1856,7 @@ number ntInvers(number a, const coeffs cf)
   //  DEN(result) = NULL;
   //  COM(result) = 0;
   //}
+  ntNormalizeDen(result,ntRing);
   ntTest((number)result); // !!!!
   //check_N((number)result,cf);
   return (number)result;
