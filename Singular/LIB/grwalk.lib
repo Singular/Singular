@@ -18,97 +18,12 @@ PROCEDURES:
 
 //////////////////////////////////////////////////////////////////////////////
 
-static proc OrderStringalp(string Wpal,list #)
-{
-  int n= nvars(basering);
-  string order_str;
-  intvec curr_weight, target_weight;
-  curr_weight = system("Mivdp",n);
-  target_weight = system("Mivlp",n);
-
-   if(size(#) != 0)
-   {
-     if(size(#) == 1)
-     {
-       if(typeof(#[1]) == "intvec")
-       {
-         if(Wpal == "al"){
-           order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
-         }
-         else {
-           order_str = "(Wp("+string(#[1])+"),C)";
-         }
-         curr_weight = #[1];
-       }
-       else
-       {
-        if(typeof(#[1]) == "string")
-        {
-          if(#[1] == "Dp") {
-            order_str = "Dp";
-          }
-          else {
-            order_str = "dp";
-          }
-        }
-        else {
-          order_str = "dp";
-        }
-     }
-    }
-    else
-    {
-     if(size(#) == 2)
-     {
-       if(typeof(#[2]) == "intvec")
-       {
-         target_weight = #[2];
-       }
-       if(typeof(#[1]) == "intvec")
-       {
-         if(Wpal == "al"){
-           order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
-         }
-         else {
-           order_str = "(Wp("+string(#[1])+"),C)";
-         }
-         curr_weight = #[1];
-       }
-       else
-       {
-        if(typeof(#[1]) == "string")
-        {
-          if(#[1] == "Dp") {
-            order_str = "Dp";
-           }
-           else {
-              order_str = "dp";
-           }
-        }
-        else {
-           order_str = "dp";
-        }
-      }
-     }
-    }
-   }
-   else {
-     order_str = "dp";
-   }
-   list result;
-   result[1] = order_str;
-   result[2] = curr_weight;
-   result[3] = target_weight;
-   return(result);
-}
-
 static proc OrderStringalp_NP(string Wpal,list #)
 {
   int n= nvars(basering);
   string order_str = "dp";
-  //string order_str = "Dp";
 
-  int nP = 1;// call LatsGB to compute the wanted GB  by pwalk
+  int nP = 1;// in pwalk, call LastGB to compute the wanted GB
 
   //Default:
   // if size(#)=0, the Groebnerwalk algorithm and its developments compute
@@ -136,71 +51,107 @@ static proc OrderStringalp_NP(string Wpal,list #)
           nP = #[1];
         }
         else {
-          print("// ** the input must be \"(ideal, int)\" or ");
-          print("// **                   \"(ideal, intvec)\"");
-          print("// ** a lex. GB will be computed from \"dp\" to \"lp\"");
+          if(typeof(#[1]) == "string")
+          {
+            if(#[1] == "Dp") {
+              order_str = "Dp";
+             }
+             else {
+                order_str = "dp";
+             }
+          }
+          else {
+            print("// ** the input must be \"(ideal, intvec)\" or ");
+            print("// **                   \"(ideal, string)\" or ");
+            print("// **                   \"(ideal, string,intvec)\" or ");
+            print("// **                   \"(ideal, intvec,intvec)\".");
+            print("// ** a lex. GB will be computed from \"dp\" to \"lp\".");
+          }
         }
       }
     }
-    else
-    {
-     if(size(#) == 2)
-     {
-       if(typeof(#[1]) == "intvec" and typeof(#[2]) == "int"){
-         curr_weight = #[1];
-
-         if(Wpal == "al"){
-           order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
-         }
-         else {
-           order_str = "(Wp("+string(#[1])+"),C)";
-         }
-       }
-       else{
-         if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec"){
-           curr_weight = #[1];
-           target_weight = #[2];
-
-           if(Wpal == "al"){
-             order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
-           }
-           else {
-             order_str = "(Wp("+string(#[1])+"),C)";
-           }
-         }
-         else{
-           print("// ** the input  must be \"(ideal,intvec,int)\" or ");
-           print("// **                    \"(ideal,intvec,intvec)\"");
-           print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
-         }
-       }
-     }
-     else {
-       if(size(#) == 3) {
-         if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec" and
-            typeof(#[3]) == "int")
-         {
-           curr_weight = #[1];
-           target_weight = #[2];
-           nP = #[3];
-           if(Wpal == "al"){
-             order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
-           }
-           else {
-             order_str = "(Wp("+string(#[1])+"),C)";
-           }
-         }
-         else{
-           print("// ** the input must be \"(ideal,intvec,intvec,int)\"");
-           print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
-
-         }
-       }
-       else{
-         print("// ** The given input is wrong");
-         print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
-       }
-     }
+    else {
+      if(size(#) == 2) {
+        if(typeof(#[1]) == "intvec" and typeof(#[2]) == "int") {
+          curr_weight = #[1];
+          order_str = "(Wp("+string(#[1])+"),C)";
+          if(Wpal == "al") {
+            order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
+          }
+          if(Wpal == "M") {
+            order_str = "(M("+string(#[1])+"),C)";
+          }
+        }
+        else {
+          if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec") {
+            curr_weight = #[1];
+            target_weight = #[2];
+            order_str = "(Wp("+string(#[1])+"),C)";
+            if(Wpal == "al") {
+              order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
+            }
+            if(Wpal == "M"){
+              order_str = "(M("+string(#[1])+"),C)";
+            }
+          }
+          else {
+            if(typeof(#[1]) == "string" and typeof(#[2]) == "intvec") {
+              target_weight = #[2];
+              if(#[1] == "Dp") {
+                order_str = "Dp";
+               }
+               else {
+                 order_str = "dp";
+               }
+            }
+            else {
+              print("// ** the input must be \"(ideal, intvec)\" or ");
+              print("// **                   \"(ideal, string)\" or ");
+              print("// **                   \"(ideal, string,intvec)\" or ");
+              print("// **                   \"(ideal, intvec,intvec)\".");
+              print("// ** a lex. GB will be computed from \"dp\" to \"lp\".");
+            }
+          }
+        }
+      }
+      else {
+        if(size(#) == 3) {
+          if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec" and
+            typeof(#[3]) == "int") {
+            curr_weight = #[1];
+            target_weight = #[2];
+            nP = #[3];
+            order_str = "(Wp("+string(#[1])+"),C)";
+            if(Wpal == "al") {
+              order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
+            }
+            if(Wpal == "M") {
+              order_str = "(M("+string(#[1])+"),C)";
+            }
+          }
+          else {
+            if(typeof(#[1]) == "string" and typeof(#[2]) == "intvec" and
+            typeof(#[3]) == "int") {
+              target_weight = #[2];
+              nP = #[3];
+              if(#[1] == "Dp") {
+                order_str = "Dp";
+              }
+              else {
+                order_str = "dp";
+              }
+            }
+            else {
+              print("// ** the input must be \"(ideal,intvec,intvec,int)\"");
+              print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
+            }
+          }
+        }
+        else {
+          print("// ** The given input is wrong");
+          print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
+        }
+      }
     }
   }
 
@@ -209,7 +160,6 @@ static proc OrderStringalp_NP(string Wpal,list #)
   result[2] = order_str;
   result[3] = curr_weight;
   result[4] = target_weight;
-
   return(result);
 }
 
@@ -268,8 +218,7 @@ EXAMPLE: example gwalk; shows an example"
 {
 
    /* we use ring with ordering (a(...),lp,C) */
-   list OSCTW    = OrderStringalp_NP("al", #);//"dp"
-   //list OSCTW    = OrderStringalp("al", "Dp");//Dp
+   list OSCTW    = OrderStringalp_NP("al", #);
 
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
@@ -324,12 +273,11 @@ proc awalk1_tmp(ideal Go, int n2, list #)
    }
 
    /* we use ring with ordering (a(...),lp,C) */
-   list OSCTW    = OrderStringalp_NP("al", #);
-   //list OSCTW    = OrderStringalp("al", "Dp");
+   list OSCTW = OrderStringalp_NP("al", #);
 
-   string ord_str =   OSCTW[2];
-   intvec curr_weight   =   OSCTW[3]; /* original weight vector */
-   intvec target_weight =   OSCTW[4]; /* terget weight vector */
+   string ord_str = OSCTW[2];
+   intvec curr_weight = OSCTW[3]; /* original weight vector */
+   intvec target_weight = OSCTW[4]; /* terget weight vector */
    kill OSCTW;
    option(redSB);
 
@@ -413,7 +361,6 @@ EXAMPLE: example awalk2; shows an example"
 {
    /* we use ring with ordering (a(...),lp,C) */
    list OSCTW    = OrderStringalp_NP("al", #);//"dp"
-   //list OSCTW    = OrderStringalp("al", "Dp");//Dp
 
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
@@ -468,7 +415,7 @@ EXAMPLE: example pwalk; shows an example"
 
   /* we use ring with ordering (a(...),lp,C) */
   list OSCTW    = OrderStringalp_NP("al", #);
-  //list OSCTW    = OrderStringalp("al", "Dp");//Dp
+
   int nP = OSCTW[1];
 
   string ord_str =   OSCTW[2];

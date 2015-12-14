@@ -38,9 +38,6 @@ static proc OrderStringalp_NP(string Wpal,list #)
         if(Wpal == "al"){
           order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
         }
-        if(Wpal == "M"){
-          order_str = "(M("+string(#[1])+"),C)";
-        }
         else {
           order_str = "(Wp("+string(#[1])+"),C)";
         }
@@ -50,81 +47,107 @@ static proc OrderStringalp_NP(string Wpal,list #)
           nP = #[1];
         }
         else {
-          print("// ** the input must be \"(ideal, int)\" or ");
-          print("// **                   \"(ideal, intvec)\"");
-          print("// ** a lex. GB will be computed from \"dp\" to \"lp\"");
+          if(typeof(#[1]) == "string")
+          {
+            if(#[1] == "Dp") {
+              order_str = "Dp";
+             }
+             else {
+                order_str = "dp";
+             }
+          }
+          else {
+            print("// ** the input must be \"(ideal, intvec)\" or ");
+            print("// **                   \"(ideal, string)\" or ");
+            print("// **                   \"(ideal, string,intvec)\" or ");
+            print("// **                   \"(ideal, intvec,intvec)\".");
+            print("// ** a lex. GB will be computed from \"dp\" to \"lp\".");
+          }
         }
       }
     }
-    else
-    {
-     if(size(#) == 2)
-     {
-       if(typeof(#[1]) == "intvec" and typeof(#[2]) == "int"){
-         curr_weight = #[1];
-
-         if(Wpal == "al"){
-           order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
-         }
-         if(Wpal == "M"){
-          order_str = "(M("+string(#[1])+"),C)";
-         }
-         else {
-           order_str = "(Wp("+string(#[1])+"),C)";
-         }
-       }
-       else{
-         if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec"){
-           curr_weight = #[1];
-           target_weight = #[2];
-
-           if(Wpal == "al"){
-             order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
-           }
-           if(Wpal == "M"){
-             order_str = "(M("+string(#[1])+"),C)";
-           }
-           else {
-             order_str = "(Wp("+string(#[1])+"),C)";
-           //  order_str = "(a("+string(#[1])+"),C)";
-           }
-         }
-         else{
-           print("// ** the input  must be \"(ideal,intvec,int)\" or ");
-           print("// **                    \"(ideal,intvec,intvec)\"");
-           print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
-         }
-       }
-     }
-     else {
-       if(size(#) == 3) {
-         if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec" and
-            typeof(#[3]) == "int")
-         {
-           curr_weight = #[1];
-           target_weight = #[2];
-           nP = #[3];
-           if(Wpal == "al"){
-             order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
-           }
-           if(Wpal == "M"){
-             order_str = "(M("+string(#[1])+"),C)";
-           }
-           else {
-             order_str = "(Wp("+string(#[1])+"),C)";
-           }
-         }
-         else{
-           print("// ** the input must be \"(ideal,intvec,intvec,int)\"");
-           print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
-
-         }
-       }
-       else{
-         print("// ** The given input is wrong");
-         print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
-       }
-     }
+    else {
+      if(size(#) == 2) {
+        if(typeof(#[1]) == "intvec" and typeof(#[2]) == "int") {
+          curr_weight = #[1];
+          order_str = "(Wp("+string(#[1])+"),C)";
+          if(Wpal == "al") {
+            order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
+          }
+          if(Wpal == "M") {
+            order_str = "(M("+string(#[1])+"),C)";
+          }
+        }
+        else {
+          if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec") {
+            curr_weight = #[1];
+            target_weight = #[2];
+            order_str = "(Wp("+string(#[1])+"),C)";
+            if(Wpal == "al") {
+              order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
+            }
+            if(Wpal == "M"){
+              order_str = "(M("+string(#[1])+"),C)";
+            }
+          }
+          else {
+            if(typeof(#[1]) == "string" and typeof(#[2]) == "intvec") {
+              target_weight = #[2];
+              if(#[1] == "Dp") {
+                order_str = "Dp";
+              }
+              else {
+                order_str = "dp";
+              }
+            }
+            else {
+              print("// ** the input must be \"(ideal, intvec)\" or ");
+              print("// **                   \"(ideal, string)\" or ");
+              print("// **                   \"(ideal, string,intvec)\" or ");
+              print("// **                   \"(ideal, intvec,intvec)\".");
+              print("// ** a lex. GB will be computed from \"dp\" to \"lp\".");
+            }
+          }
+        }
+      }
+      else {
+        if(size(#) == 3) {
+          if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec" and
+            typeof(#[3]) == "int") {
+            curr_weight = #[1];
+            target_weight = #[2];
+            nP = #[3];
+            order_str = "(Wp("+string(#[1])+"),C)";
+            if(Wpal == "al") {
+              order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
+            }
+            if(Wpal == "M") {
+              order_str = "(M("+string(#[1])+"),C)";
+            }
+          }
+          else {
+            if(typeof(#[1]) == "string" and typeof(#[2]) == "intvec" and
+            typeof(#[3]) == "int") {
+              target_weight = #[2];
+              nP = #[3];
+              if(#[1] == "Dp") {
+                order_str = "Dp";
+              }
+              else {
+                order_str = "dp";
+              }
+            }
+            else {
+              print("// ** the input must be \"(ideal,intvec,intvec,int)\"");
+              print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
+            }
+          }
+        }
+        else {
+          print("// ** The given input is wrong");
+          print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
+        }
+      }
     }
   }
 

@@ -17,7 +17,7 @@ OVERVIEW:
 PROCEDURES:
 
 modWalk(I,#);                   standard basis conversion of I by Groebner Walk using modular methods
-modrWalk(I,radius,pertdeg,#);   standard basis conversion of I by Random Walk using modular methods
+modrWalk(I,radius,#);           standard basis conversion of I by Random Walk using modular methods
 modfWalk(I,#);                  standard basis conversion of I by Fractal Walk using modular methods
 modfrWalk(I,radius,#);          standard basis conversion of I by Random Fractal Walk using modular methods
 ";
@@ -27,27 +27,20 @@ LIB "grwalk.lib";
 LIB "modular.lib";
 
 proc modWalk(ideal I, list #)
-"USAGE:   modWalk(I, [, v, w]); I ideal, v intvec, w intvec
+"USAGE:   modWalk(I, [, v, w]); I ideal, v intvec or string, w intvec
+          If v intvec, then I is assumed to be a standard basis with respect to (a(v),lp).
+          If v string, then either v="dp" or v="Dp" and I is assumed to be a standard basis with
+          respect to dp or Dp, respectively.
+          If w is given, then a standard basis with respect to (a(w),lp) will be computed. Otherwise,
+          the output will be a standard basis with respect to lp.
+          If no optional argument is given, I is assumed to be a standard basis with respect to dp
+          and a standard basis with respect to lp will be computed.
 RETURN:   a standard basis of I
 NOTE:     The procedure computes a standard basis of I (over the rational
           numbers) by using modular methods.
 SEE ALSO: modular
 EXAMPLE:  example modWalk; shows an example"
 {
-    /* read optional parameter */
-    if (size(#) > 0) {
-        if (size(#) == 1) {
-            intvec w = #[1];
-        }
-        if (size(#) == 2) {
-            intvec v = #[1];
-            intvec w = #[2];
-        }
-        if (size(#) > 2 || typeof(#[1]) != "intvec") {
-            ERROR("wrong optional parameter");
-        }
-    }
-
     /* save options */
     intvec opt = option(get);
     option(redSB);
@@ -80,40 +73,34 @@ example
     J;
 }
 
-proc modrWalk(ideal I, int radius, int pertdeg, list #)
-"USAGE:   modrWalk(I, radius, pertdeg[, v, w]);
-          I ideal, radius int, pertdeg int, v intvec, w intvec
+proc modrWalk(ideal I, int radius, list #)
+"USAGE:   modrWalk(I, radius[, v, w]);
+          I ideal, radius int, pertdeg int, v intvec or string, w intvec
+          If v intvec, then I is assumed to be a standard basis with respect to (a(v),lp).
+          If v string, then either v="dp" or v="Dp" and I is assumed to be a standard basis with
+          respect to dp or Dp, respectively.
+          If w is given, then a standard basis with respect to (a(w),lp) will be computed. Otherwise,
+          the output will be a standard basis with respect to lp.
+          If no optional argument is given, I is assumed to be a standard basis with respect to dp
+          and a standard basis with respect to lp will be computed.
 RETURN:   a standard basis of I
 NOTE:     The procedure computes a standard basis of I (over the rational
           numbers) by using modular methods.
 SEE ALSO: modular
 EXAMPLE:  example modrWalk; shows an example"
 {
-    /* read optional parameter */
-    if (size(#) > 0) {
-        if (size(#) == 1) {
-            intvec w = #[1];
-        }
-        if (size(#) == 2) {
-            intvec v = #[1];
-            intvec w = #[2];
-        }
-        if (size(#) > 2 || typeof(#[1]) != "intvec") {
-            ERROR("wrong optional parameter");
-        }
-    }
-
     /* save options */
     intvec opt = option(get);
     option(redSB);
 
     /* call modular() */
     if (size(#) > 0) {
-        I = modular("rwalk", list(I,radius,pertdeg,#), primeTest_std,
+        I = modular("rwalk", list(I,radius,1,#), primeTest_std,
             deleteUnluckyPrimes_std, pTest_std, finalTest_std);
     }
     else {
-        I = modular("rwalk", list(I,radius,pertdeg),primeTest_std,deleteUnluckyPrimes_std,pTest_std);
+        I = modular("rwalk", list(I,radius,1), primeTest_std, deleteUnluckyPrimes_std,
+            pTest_std,final_Test_std);
     }
 
     /* return the result */
@@ -131,33 +118,25 @@ example
     ring R2 = 0, (x,y,z,t), lp;
     ideal I = fetch(R1, I);
     int radius = 2;
-    int pertdeg = 3;
-    ideal J = modrWalk(I,radius,pertdeg);
+    ideal J = modrWalk(I,radius);
     J;
 }
 
 proc modfWalk(ideal I, list #)
-"USAGE:   modfWalk(I, [, v, w]); I ideal, v intvec, w intvec
+"USAGE:   modfWalk(I, [, v, w]); I ideal, v intvec or string, w intvec
+          If v intvec, then I is assumed to be a standard basis with respect to (a(v),lp).
+          If v string, then either v="dp" or v="Dp" and I is assumed to be a standard basis with
+          respect to dp or Dp, respectively.
+          If w is given, then a standard basis with respect to (a(w),lp) will be computed. Otherwise,
+          the output will be a standard basis with respect to lp.
+          If no optional argument is given, I is assumed to be a standard basis with respect to dp
+          and a standard basis with respect to lp will be computed.
 RETURN:   a standard basis of I
 NOTE:     The procedure computes a standard basis of I (over the rational
           numbers) by using modular methods.
 SEE ALSO: modular
 EXAMPLE:  example modfWalk; shows an example"
 {
-    /* read optional parameter */
-    if (size(#) > 0) {
-        if (size(#) == 1) {
-            intvec w = #[1];
-        }
-        if (size(#) == 2) {
-            intvec v = #[1];
-            intvec w = #[2];
-        }
-        if (size(#) > 2 || typeof(#[1]) != "intvec") {
-            ERROR("wrong optional parameter");
-        }
-    }
-
     /* save options */
     intvec opt = option(get);
     option(redSB);
@@ -191,27 +170,20 @@ example
 }
 
 proc modfrWalk(ideal I, int radius, list #)
-"USAGE:   modfrWalk(I, radius [, v, w]); I ideal, radius int, v intvec, w intvec
+"USAGE:   modfrWalk(I, radius [, v, w]); I ideal, radius int, v intvec or string, w intvec
+          If v intvec, then I is assumed to be a standard basis with respect to (a(v),lp).
+          If v string, then either v="dp" or v="Dp" and I is assumed to be a standard basis with
+          respect to dp or Dp, respectively.
+          If w is given, then a standard basis with respect to (a(w),lp) will be computed. Otherwise,
+          the output will be a standard basis with respect to lp.
+          If no optional argument is given, I is assumed to be a standard basis with respect to dp
+          and a standard basis with respect to lp will be computed.
 RETURN:   a standard basis of I
 NOTE:     The procedure computes a standard basis of I (over the rational
           numbers) by using modular methods.
 SEE ALSO: modular
 EXAMPLE:  example modfrWalk; shows an example"
 {
-    /* read optional parameter */
-    if (size(#) > 0) {
-        if (size(#) == 1) {
-            intvec w = #[1];
-        }
-        if (size(#) == 2) {
-            intvec v = #[1];
-            intvec w = #[2];
-        }
-        if (size(#) > 2 || typeof(#[1]) != "intvec") {
-            ERROR("wrong optional parameter");
-        }
-    }
-
     /* save options */
     intvec opt = option(get);
     option(redSB);
@@ -417,6 +389,44 @@ static proc finalTest_std(string command, alias list args, ideal result)
         }
     }
 
+   /* test if result is in args[1].                      */
+   /* args[1] is given by a Groebner basis. Thus we may  */
+   /* reduce the result with respect to args[1].         */
+   int n=nvars(basering);
+   string ord_str = "dp";
+
+   for(i=2; i<=size(args); i++)
+   {
+     if(typeof(args[i]) == "list") {
+       if(typeof(args[i][1]) == "intvec") {
+         ord_str = "(a("+string(args[i][1])+"),lp("+string(n) + "),C)";
+         break;
+       }
+       if(typeof(args[i][1]) == "string") {
+         if(args[i][1] == "Dp") {
+           ord_str = "Dp";
+         }
+         break;
+       }
+     }
+   }
+   ideal xI = args[1];
+   ring xR = basering;
+   execute("ring yR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
+   ideal yI = fetch(xR,xI);
+   ideal yresult = fetch(xR,result);
+   attrib(yI, "isSB", 1);
+   for(i=size(yresult); i>0; i--)
+   {
+     if(reduce(yresult[i],yI) != 0)
+     {
+       return(0);
+     }
+   }
+   setring xR;
+   kill yR;
+
+   /* test if result is a Groebner basis */
     link l1="ssi:fork";
     open(l1);
     link l2="ssi:fork";
@@ -424,19 +434,15 @@ static proc finalTest_std(string command, alias list args, ideal result)
     list l=list(l1,l2);
     write(l1,quote(TestSBred(result)));
     write(l2,quote(TestSBstd(result)));
-
     i=waitfirst(l);
-
     if(i==1) {
       i=read(l1);
       }
     else {
       i=read(l2);
       }
-
     close(l1);
     close(l2);
-
     return(i);
 }
 
@@ -446,15 +452,15 @@ static proc finalTest_std(string command, alias list args, ideal result)
  * Uses parallelization. */
 static proc reduce_parallel(def I_reduce, def G_reduce)
 {
-    exportto(Modstd, I_reduce);
-    exportto(Modstd, G_reduce);
+    exportto(Modwalk, I_reduce);
+    exportto(Modwalk, G_reduce);
     int size_I = ncols(I_reduce);
     int chunks = Modular::par_range(size_I);
     intvec range;
     int i;
     for (i = chunks; i > 0; i--) {
         range = Modular::par_range(size_I, i);
-        task t(i) = "Modstd::reduce_task", list(range);
+        task t(i) = "Modwalk::reduce_task", list(range);
     }
     startTasks(t(1..chunks));
     waitAllTasks(t(1..chunks));
