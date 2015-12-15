@@ -23,6 +23,7 @@ PROCEDURES:
 ";
 
 LIB "sagbi.lib";
+LIB "atkins.lib";
 //////////////////////////////////////////////////////////////////////////////
 proc swalk(ideal Gox, list #)
 "USAGE:  swalk(i[,v,w]); i ideal, v,w int vectors
@@ -160,7 +161,7 @@ example
   "EXAMPLE:";echo = 2;
   ring r = 0,(x,y), lp;
   ideal I =x2,y2,xy+y,2xy2+y3;
-  swalk(I,2,2);
+  rswalk(I,2,2);
 }
 //////////////////////////////////////////////////////////////////////////////
 static proc inprod(vector v,vector w)
