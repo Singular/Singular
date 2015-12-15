@@ -301,6 +301,11 @@ void PrintS(const char *s)
   else if (feOut) /* do not print when option --no-out was given */
   {
 
+    if (PrintS_callback!=NULL)
+    {
+      PrintS_callback(s);
+    }
+    else
 #ifdef HAVE_TCL
     if (tclmode)
     {
