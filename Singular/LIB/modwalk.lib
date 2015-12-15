@@ -71,6 +71,22 @@ example
     ideal I = fetch(R1, I);
     ideal J = modWalk(I);
     J;
+    ring S1 = 0, (a,b,c,d), Dp;
+    ideal I = 5b2, ac2+9d3+3a2+5b, 2a2c+7abd+bcd+4a2, 2ad2+6b2d+7c3+8ad+4c;
+    I = std(I);
+    ring S2 = 0, (c,d,b,a), lp;
+    ideal I = fetch(S1,I);
+    // I is assumed to be a Dp-Groebner basis.
+    // We compute a lp-Groebner basis.
+    ideal J = modWalk(I,"Dp");
+    J;
+    intvec w = 3,2,1,2;
+    ring S3 = 0, (c,d,b,a), (a(w),lp);
+    ideal I = fetch(S1,I);
+    // I is assumed to be a Dp-Groebner basis.
+    // We compute a (a(w),lp)-Groebner basis.
+    ideal J = modWalk(I,"Dp",w);
+    J;
 }
 
 proc modrWalk(ideal I, int radius, list #)
@@ -100,7 +116,7 @@ EXAMPLE:  example modrWalk; shows an example"
     }
     else {
         I = modular("rwalk", list(I,radius,1), primeTest_std, deleteUnluckyPrimes_std,
-            pTest_std,final_Test_std);
+            pTest_std,finalTest_std);
     }
 
     /* return the result */
@@ -119,6 +135,22 @@ example
     ideal I = fetch(R1, I);
     int radius = 2;
     ideal J = modrWalk(I,radius);
+    J;
+    ring S1 = 0, (a,b,c,d), Dp;
+    ideal I = 5b2, ac2+9d3+3a2+5b, 2a2c+7abd+bcd+4a2, 2ad2+6b2d+7c3+8ad+4c;
+    I = std(I);
+    ring S2 = 0, (c,d,b,a), lp;
+    ideal I = fetch(S1,I);
+    // I is assumed to be a Dp-Groebner basis.
+    // We compute a lp-Groebner basis.
+    ideal J = modrWalk(I,radius,"Dp");
+    J;
+    intvec w = 3,2,1,2;
+    ring S3 = 0, (c,d,b,a), (a(w),lp);
+    ideal I = fetch(S1,I);
+    // I is assumed to be a Dp-Groebner basis.
+    // We compute a (a(w),lp)-Groebner basis.
+    ideal J = modrWalk(I,radius,"Dp",w);
     J;
 }
 
@@ -167,6 +199,22 @@ example
     ideal I = fetch(R1, I);
     ideal J = modfWalk(I);
     J;
+    ring S1 = 0, (a,b,c,d), Dp;
+    ideal I = 5b2, ac2+9d3+3a2+5b, 2a2c+7abd+bcd+4a2, 2ad2+6b2d+7c3+8ad+4c;
+    I = std(I);
+    ring S2 = 0, (c,d,b,a), lp;
+    ideal I = fetch(S1,I);
+    // I is assumed to be a Dp-Groebner basis.
+    // We compute a lp-Groebner basis.
+    ideal J = modfWalk(I,"Dp");
+    J;
+    intvec w = 3,2,1,2;
+    ring S3 = 0, (c,d,b,a), (a(w),lp);
+    ideal I = fetch(S1,I);
+    // I is assumed to be a Dp-Groebner basis.
+    // We compute a (a(w),lp)-Groebner basis.
+    ideal J = modfWalk(I,"Dp",w);
+    J;
 }
 
 proc modfrWalk(ideal I, int radius, list #)
@@ -214,6 +262,22 @@ example
     ideal I = fetch(R1, I);
     int radius = 2;
     ideal J = modfrWalk(I,radius);
+    J;
+    ring S1 = 0, (a,b,c,d), Dp;
+    ideal I = 5b2, ac2+9d3+3a2+5b, 2a2c+7abd+bcd+4a2, 2ad2+6b2d+7c3+8ad+4c;
+    I = std(I);
+    ring S2 = 0, (c,d,b,a), lp;
+    ideal I = fetch(S1,I);
+    // I is assumed to be a Dp-Groebner basis.
+    // We compute a lp-Groebner basis.
+    ideal J = modfrWalk(I,radius,"Dp");
+    J;
+    intvec w = 3,2,1,2;
+    ring S3 = 0, (c,d,b,a), (a(w),lp);
+    ideal I = fetch(S1,I);
+    // I is assumed to be a Dp-Groebner basis.
+    // We compute a (a(w),lp)-Groebner basis.
+    ideal J = modfrWalk(I,radius,"Dp",w);
     J;
 }
 
