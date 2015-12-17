@@ -5228,7 +5228,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
               last++;
               if (weights[last]==0) weights[last]=(*iv)[i]*typ;
             }
-            R->block1[n] = last;
+            R->block1[n] = si_min(last,R->N);
             break;
           case ringorder_ls:
           case ringorder_ds:
@@ -5242,14 +5242,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             R->block0[n] = last+1;
             if (iv->length() == 3) last+=(*iv)[2];
             else last += (*iv)[0];
-            R->block1[n] = last;
-            //if ((R->block0[n]>R->block1[n])
-            //|| (R->block1[n]>rVar(R)))
-            //{
-            //  R->block1[n]=rVar(R);
-            //  //WerrorS("ordering larger than number of variables");
-            //  break;
-            //}
+            R->block1[n] = si_min(last,R->N);
             if (rCheckIV(iv)) return TRUE;
             for(i=si_min(rVar(R),R->block1[n]);i>=R->block0[n];i--)
             {
@@ -5294,7 +5287,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_a:
           {
             R->block0[n] = last+1;
-            R->block1[n] = si_min(last+iv->length()-2 , rVar(R));
+            R->block1[n] = si_min(last+iv->length()-2 , R->N);
             R->wvhdl[n] = (int*)omAlloc((iv->length()-1)*sizeof(int));
             for (i=2; i<iv->length(); i++)
             {
@@ -5308,7 +5301,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_am:
           {
             R->block0[n] = last+1;
-            R->block1[n] = si_min(last+iv->length()-2 , rVar(R));
+            R->block1[n] = si_min(last+iv->length()-2 , R->N);
             R->wvhdl[n] = (int*)omAlloc(iv->length()*sizeof(int));
             if (R->block1[n]- R->block0[n]+2>=iv->length())
                WarnS("missing module weights");
@@ -5329,7 +5322,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_a64:
           {
             R->block0[n] = last+1;
-            R->block1[n] = si_min(last+iv->length()-2 , rVar(R));
+            R->block1[n] = si_min(last+iv->length()-2 , R->N);
             R->wvhdl[n] = (int*)omAlloc((iv->length()-1)*sizeof(int64));
             int64 *w=(int64 *)R->wvhdl[n];
             for (i=2; i<iv->length(); i++)
@@ -5353,8 +5346,8 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
 
             R->block0[n] = last+1;
             last += (int)sqrt((double)(iv->length()-2));
-            R->block1[n] = last;
-            for(i=si_min(rVar(R),R->block1[n]);i>=R->block0[n];i--)
+            R->block1[n] = si_min(last,R->N);
+            for(i=R->block1[n];i>=R->block0[n];i--)
             {
               if (weights[i]==0) weights[i]=typ;
             }
