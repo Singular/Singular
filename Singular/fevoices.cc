@@ -186,8 +186,16 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
   }
   else
   {
-    currentVoice->filename = omStrDup(currentVoice->prev->filename);
-    currentVoice->pi       = currentVoice->prev->pi;
+    if(currentVoice->prev!=NULL)
+    {
+      currentVoice->filename = omStrDup(currentVoice->prev->filename);
+      currentVoice->pi       = currentVoice->prev->pi;
+    }
+    else
+    {
+      currentVoice->filename = omStrDup("");
+      currentVoice->pi       = pi;
+    }
   }
   currentVoice->buffer   = s;
   currentVoice->sw       = BI_buffer;
