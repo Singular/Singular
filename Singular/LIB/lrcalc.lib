@@ -1,0 +1,526 @@
+////////////////////////////////////////////////////////////////
+version="version lrcalc.lib 0.91 Dec_2015 ";      //$Id$
+category="Littlewood-Richardson coefficients";
+info="
+LIBRARY:  lrcalc.lib    An interface to the Littlewood-Richardson Calculator by Anders Buch
+
+AUTHOR:  Oleksandr Iena,      oleksandr.iena@uni.lu,  yena@mathematik.uni-kl.de
+
+OVERVIEW:
+  An interface to the documented functions of the Littlewood-Richardson Calculator
+  by Anders Buch is implemented.
+  The library requires the Littlewood-Richardson Calculator by Anders Buch,
+  which is available at http://math.rutgers.edu/~asbuch/lrcalc/
+
+REFERENCES:
+  [1] http://math.rutgers.edu/~asbuch/lrcalc/
+      http://math.rutgers.edu/~asbuch/lrcalc/lrcalc-1.2/README
+
+PROCEDURES:
+  LRinstall()                  installs the Littlewood-Richardson Calculator
+  LRcoef(z, x, y);             Littlewood-Richardson coefficient c^z_{x, y}
+  LRskew(z, x)                 partitions y for which the Littlewood-Richardson coefficient
+                               c^z_{x,y} is non-zero together with that coefficient
+  LRmult(x, y)                 partitions z for which the Littlewood-Richardson coefficient
+                               c^z_{x,y} is non-zero together with that coefficient
+  LRcoprod(z)                  pairs of partitions x and y for which the Littlewood-Richardson
+                               coefficient c^z_{x,y} is non-zero together with that coefficient
+  LRschubmult(x, y)            expantion of a product of two Schubert polynomials
+                               in the basis of Schubert polynomials
+";
+//----------------------------------------------------------
+
+proc LRinstall()
+"USAGE:   LRinstall();
+RETURN:   int (exit status of the shell)
+PURPOSE:  installs the Littlewood-Richardson Calculator
+EXAMPLE:  example LRinstall; shows an example
+NOTE:
+"
+{
+  int i;
+  string s;
+  s = "wget math.rutgers.edu/~asbuch/lrcalc/lrcalc-1.2.tar.gz";
+  s = s + " && tar zxvf lrcalc-1.2.tar.gz && cd lrcalc-1.2";
+  s = s + " && ./configure && make && sudo make install";
+  i=system("sh", s);
+  return(i);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // In order to install the Littlewood-Richardson Calculator
+  // type "LRinstall();"
+  // This will execute the following commands:
+  // wget math.rutgers.edu/~asbuch/lrcalc/lrcalc-1.2.tar.gz
+  // tar zxvf lrcalc-1.2.tar.gz
+  // cd lrcalc-1.2
+  // ./configure
+  // make
+  // sudo make install
+}
+//----------------------------------------------------------
+
+proc LRcoef(list u, list l1, list l2)
+"USAGE:   LRcoef(z, x, y);  z, x, y lists of integers (partitions)
+RETURN:   bigint
+PURPOSE:  computes the Littlewood-Richardson coefficient c^z_{x, y}
+EXAMPLE:  example LRcoef; shows an example
+NOTE:
+"
+{
+  // construct a string with the required lrcalc command to be passed to shell
+  string s="lrcalc coef";
+  int i;
+  int sz;
+  sz=size(u);
+  for(i=1; i<=sz; i++)
+  {
+    s=s+" "+string(u[i]);
+  }
+  s=s+" -";
+  sz=size(l1);
+  for(i=1; i<=sz; i++)
+  {
+    s=s+" "+string(l1[i]);
+  }
+  s=s+" -";
+  sz=size(l2);
+  for(i=1; i<=sz; i++)
+  {
+    s=s+" "+string(l2[i]);
+  }
+  s=read("|: "+s); // execute the string in shell and return the output string back to Singular
+  return( string2int(s) ); // return the integer represented by this string
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // Compute the Littlewood-Richardson coefficient c^z_{x, y}
+  // for z= (3, 2, 1), x=(2, 1), y=(2, 1)
+  list z = 3, 2, 1;
+  list x = 2, 1;
+  list y = 2, 1;
+  LRcoef(z, x, y);
+}
+//----------------------------------------------------------
+
+proc LRskew(list I, list J, list #)
+"USAGE:   LRskew(z, x [,s, r]);  z, x lists of integers (partitions)
+          s string equal to 'r', r non-negative integer
+RETURN:   list of lists
+PURPOSE:  computes the partitions y for which the Littlewood-Richardson
+          coefficient c^z_{x,y} is non-zero together with that coefficient;
+          only partitions up to length r are computed
+          if the optional parameters age given
+EXAMPLE:  example LRskew; shows an example
+NOTE:
+"
+{
+  // construct a string with the required lrcalc command to be passed to shell
+  string s="lrcalc skew";
+  int sz;
+  // take care of the optional parameters
+  sz = size(#);
+  if(sz!=0) // if there are optional parameters
+  {
+    if(typeof(#[1])=="string") // if the first optional parameter is a string
+    {
+      if(#[1]=="r") // if it equals "r"
+      {
+        if(sz>1) // if there is a second optional parameter
+        {
+          if(typeof(#[2])=="int") // that is integer
+          {
+            if(#[2]>=0) // and non-negative
+            {
+              s=s+ " -r "+string(#[2]); // add the corresponding string to the lrcalc command
+            }
+          }
+        }
+      }
+    }
+  }
+  int i;
+  sz=size(I);
+  for(i=1; i<=sz; i++)
+  {
+    s=s+" "+string(I[i]);
+  }
+  s=s+" /";
+  sz=size(J);
+  for(i=1; i<=sz; i++)
+  {
+    s=s+" "+string(J[i]);
+  }
+  // execute the string in shell and return the output string back to Singular
+  link L="|: "+s+" && echo end";
+  list rez; // the result will be computed here
+  list T;
+  int next;
+  while(1)
+  {
+    s=read(L);
+    if(s=="end")
+    {
+      break;
+    }
+    i=1;
+    next=find(s," ",i);
+    if(next ==0){break;}
+    T=list(string2int(s[i,next-i]));
+    i=next+1;
+    next=find(s, "(", i);
+    i=next+1;
+    next=find(s, ")", i);
+    T= T+list( string2list(s[i,next-i]) );
+    rez=rez+ list(T);
+  }
+  close(L);
+  return( rez ); // return the result
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // Compute the partitions y for which the Littlewood-Richardson coefficient
+  // c^z_{x,y} is non-zero together with that coefficient
+  // for z= (3, 2, 1), x=(2, 1)
+  list z = 3, 2, 1;
+  list x = 2, 1;
+  LRskew(z, x);
+  // Now compute only the partitions with at most 2 entries
+  LRskew(z, x, "r", 2);
+}
+//----------------------------------------------------------
+
+proc LRmult(list I, list J, list #)
+"USAGE:   LRmult(x, y);  x, y lists of integers (partitions)
+          LRmult(x, y [, s, r]);  x, y lists of integers (partitions),
+          s string equal to 'r',  r integer
+          LRmult(x, y [, s, m, k]);  x, y lists of integers (partitions),
+          s string equal to 'q' or 'f',  m, k integers
+RETURN:   list of lists
+PURPOSE:  computes the partitions z for which the Littlewood-Richardson
+          coefficient c^z_{x,y} is non-zero together with that coefficient;
+          partitions up to length r
+EXAMPLE:  example LRmult; shows an example
+NOTE:
+"
+{
+  // construct a string with the required lrcalc command to be passed to shell
+  string s="lrcalc mult";
+  int i;
+  int sz;
+  // take care of the optional parameters
+  sz = size(#);
+  if(sz!=0) // if there are optional parameters
+  {
+    if(typeof(#[1])=="string") // if the first optional parameter is a string
+    {
+      if(#[1]=="r") // if the first optional parameter is "r"
+      {
+        if(sz>1) // if there is a second optional parameter
+        {
+          if(typeof(#[2])=="int") // which is an integer
+          {
+            if(#[2]>=0) // and non-negative
+            {
+              s=s+ " -r "+string(#[2]); // add the corresponding string to the lrcalc command
+            }
+          }
+        }
+      }
+      if( (#[1]=="q") || (#[1]=="f") ) // if the first optional parameter is "q" or "f"
+      {
+        if(sz>2) // if there are a second and a third parameters
+        {
+          if( ( typeof(#[2])=="int" ) && ( typeof(#[3])=="int" ) ) // that are integers
+          {
+            if( (#[2]>0)&&(#[3]>0) ) // and positive
+            {
+              // add the corresponding string to the lrcalc command
+              s=s+ " -"+#[1]+" "+string(#[2])+","+string(#[3]);
+            }
+          }
+        }
+      }
+    }
+  }
+  sz=size(I);
+  for(i=1; i<=sz; i++)
+  {
+    s=s+" "+string(I[i]);
+  }
+  s=s+" -";
+  sz=size(J);
+  for(i=1; i<=sz; i++)
+  {
+    s=s+" "+string(J[i]);
+  }
+  // execute the string in shell and return the output string back to Singular
+  link L="|: "+s+" && echo end";
+  list rez; // the result will be computed here
+  list T;
+  int next;
+  while(1)
+  {
+    s=read(L);
+    if(s=="end")
+    {
+      break;
+    }
+    i=1;
+    next=find(s," ",i);
+    if(next ==0){break;}
+    T=list(string2int(s[i,next-i]));
+    i=next+1;
+    next=find(s, "(", i);
+    i=next+1;
+    next=find(s, ")", i);
+    T= T+list( string2list(s[i,next-i]) );
+    rez=rez+ list(T);
+  }
+  close(L);
+  return( rez ); // return the result
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // Compute the partitions z for which the Littlewood-Richardson coefficient
+  // c^z_{x,y} is non-zero together with that coefficient
+  // for x= (2, 1), y=(2, 1)
+  list x = 2, 1;
+  list y = 2, 1;
+  LRmult(x, y);
+  // Now compute only the partitions with at most 2 entries
+  LRmult(x, y, "r", 2);
+  // Now compute the product in the quantum cohomology ring of the Grassmannian Gr(3,3+2).
+  LRmult(x, y, "q", 3, 2);
+  // Compute the same product with the output given in fusion ring notation
+  LRmult(x, y, "f", 3, 2);
+}
+//----------------------------------------------------------
+
+proc LRcoprod(list I)
+"USAGE:   LRcoprod(z);  z list of integers (partition)
+RETURN:   list of lists
+PURPOSE:  computes the pairs of partitions x and y for which
+          the Littlewood-Richardson coefficient c^z_{x,y} is non-zero
+          together with that coefficient
+EXAMPLE:  example LRcoprod; shows an example
+NOTE:
+"
+{
+  // construct a string with the required lrcalc command to be passed to shell
+  string s="lrcalc coprod";
+  int i;
+  int sz;
+  sz=size(I);
+  for(i=1; i<=sz; i++)
+  {
+    s=s+" "+string(I[i]);
+  }
+   // execute the string in shell and return the output string back to Singular
+  link L="|: "+s+" && echo end";
+  list rez; // the result will be computed here
+  list T;
+  int next;
+  while(1)
+  {
+    s=read(L);
+    if(s=="end")
+    {
+      break;
+    }
+    i=1;
+    next=find(s," ",i);
+    if(next ==0){break;}
+    T=list(string2int(s[i,next-i]));
+    i=next+1;
+    next=find(s, "(", i);
+    i=next+1;
+    next=find(s, ")", i);
+    T= T+list( string2list(s[i,next-i]) );
+    i=next+1;
+    next=find(s, "(", i);
+    i=next+1;
+    next=find(s, ")", i);
+    T= T+list( string2list(s[i,next-i]) );
+    rez=rez+ list(T);
+  }
+  close(L);
+  return( rez ); // return the result
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // Compute the pairs of partitions x and y for which the Littlewood-Richardson
+  // coefficient c^z_{x,y} is non-zero together with that coefficient
+  // for z= (3, 2, 1)
+  list z = 3, 2, 1;
+  LRcoprod(z);
+}
+//----------------------------------------------------------
+
+proc LRschubmult(list I, list J)
+"USAGE:   LRschubmult(x, y);  x, y lists of integers
+RETURN:   list of lists
+PURPOSE:  computes the expantion of a product
+          of two Schubert polynomials in the basis of Schubert polynomials
+EXAMPLE:  example LRschubmult; shows an example
+NOTE:
+"
+{
+  // construct a string with the required lrcalc command to be passed to shell
+  string s="schubmult";
+  int i;
+  int sz;
+  sz=size(I);
+  for(i=1; i<=sz; i++)
+  {
+    s=s+" "+string(I[i]);
+  }
+  s=s+" -";
+  sz=size(J);
+  for(i=1; i<=sz; i++)
+  {
+    s=s+" "+string(J[i]);
+  }
+  // execute the string in shell and return the output string back to Singular
+  link L="|: "+s+" && echo end";
+  list rez; // the result will be computed here
+  list T;
+  int next;
+  while(1)
+  {
+    s=read(L);
+    if(s=="end")
+    {
+      break;
+    }
+    i=1;
+    next=find(s," ",i);
+    if(next ==0){break;}
+    T=list(string2int(s[i,next-i]));
+    i=next+1;
+    next=find(s, "(", i);
+    i=next+1;
+    next=find(s, ")", i);
+    T= T+list( string2list(s[i,next-i]) );
+    rez=rez+ list(T);
+  }
+  close(L);
+  return( rez ); // return the result
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // Compute the expantion of a square of the Schubert polynomial
+  // corresponding to  (1 3 2) in the basis of Schubert polynomials
+  list x = 1, 3, 2;
+  LRschubmult(x, x);
+}
+//----------------------------------------------------------------------------------------
+// The procedures below are for the internal usage only
+//----------------------------------------------------------------------------------------
+
+static proc string2list(string s)
+"USAGE:   string2list(s);  s string
+RETURN:   list of integers
+PURPOSE:  converts a string representing integers separated by commas
+          into a list of integers
+EXAMPLE:  example string2list; shows an example
+NOTE:
+"
+{
+  list l; // the result will be computed here
+  if(size(s)==0) // if the string is empty
+  {
+    return(list(0)); // return zero
+  }
+  // otherwise form the corresponding list
+  execute("l="+s+";")
+  return(l); // return the result
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // Convert the string "3, 2, 1" into the corresponding list of integers
+  string s= "3, 2, 1";
+  string2list(s);
+}
+//----------------------------------------------------------
+
+static proc string2int(string s)
+"USAGE:   string2int(s);  s string
+RETURN:   biging
+PURPOSE:  converts a string representing a non-negative integer into integer
+EXAMPLE:  example string2int; shows an example
+NOTE:
+"
+{
+  bigint rez;
+  int sz=size(s);
+  if(sz==0) // if the string s is empty, return zero
+  {
+    return(bigint(0));
+  }
+  // read the first character of the string and transform it to the corresponding digit
+  while(1)
+  {
+    if(s[1]=="0")
+    {
+      rez=0; break;
+    }
+    if(s[1]=="1")
+    {
+      rez=1; break;
+    }
+    if(s[1]=="2")
+    {
+      rez=2; break;
+    }
+    if(s[1]=="3")
+    {
+      rez=3; break;
+    }
+    if(s[1]=="4")
+    {
+      rez=4; break;
+    }
+    if(s[1]=="5")
+    {
+      rez=5; break;
+    }
+    if(s[1]=="6")
+    {
+      rez=6; break;
+    }
+    if(s[1]=="7")
+    {
+      rez=7; break;
+    }
+    if(s[1]=="8")
+    {
+      rez=8; break;
+    }
+    if(s[1]=="9")
+    {
+      rez=9; break;
+    }
+  }
+  if(sz==1) // if the string is of length 1
+  {
+    return(bigint(rez)); // return the result
+  }
+  // otherwise compute the result recursively
+  return( rez*bigint(10)^(sz-1) + string2int(s[2,sz-1]) );
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // Convert the string "728" into the corresponding integer
+  string s= "728";
+  string2int(s);
+}
+//----------------------------------------------------------
