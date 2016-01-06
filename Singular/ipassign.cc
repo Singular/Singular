@@ -634,10 +634,15 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
   pNormalize(p);
   if (e==NULL)
   {
+    if ((p!=NULL) && TEST_V_QRING && (currRing->qideal!=NULL)
+    && (!hasFlag(a,FLAG_QRING)))
+    {
+      jjNormalizeQRingP(p);
+      setFlag(res,FLAG_QRING);
+    }
     if (res->data!=NULL) pDelete((poly*)&res->data);
     res->data=(void*)p;
     jiAssignAttr(res,a);
-    if (TEST_V_QRING && (currRing->qideal!=NULL) && (!hasFlag(res,FLAG_QRING))) jjNormalizeQRingP(res);
   }
   else
   {
@@ -668,6 +673,10 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
       // for matrices: indices are correct (see ipExprArith3(..,'['..) )
       j=e->next->start;
     }
+    if ((p!=NULL) && TEST_V_QRING && (currRing->qideal!=NULL))
+    {
+      jjNormalizeQRingP(p);
+    }
     pDelete(&MATELEM(m,i,j));
     MATELEM(m,i,j)=p;
     /* for module: update rank */
@@ -675,7 +684,6 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
     {
       m->rank=si_max(m->rank,pMaxComp(p));
     }
-    if (TEST_V_QRING) jjNormalizeQRingP(res);
   }
   return FALSE;
 }
@@ -2151,35 +2159,16 @@ void jjNormalizeQRingId(leftv I)
     }
   }
 }
-void jjNormalizeQRingP(leftv I)
+void jjNormalizeQRingP(poly &p)
 {
-  if ((currRing->qideal!=NULL) && (!hasFlag(I,FLAG_QRING)))
+  if((p!=NULL) && (currRing->qideal!=NULL))
   {
-    poly p=(poly)I->Data();
-    if ((I->e==NULL) && (p!=NULL))
-    {
-      ideal F=idInit(1,1);
-      poly II=kNF(F,currRing->qideal,p);
-      idDelete(&F);
-      if ((I->rtyp==POLY_CMD)
-      || (I->rtyp==VECTOR_CMD))
-      {
-        pDelete(&p);
-        I->data=II;
-      }
-      else if (I->rtyp==IDHDL)
-      {
-        pDelete(&p);
-        idhdl h=(idhdl)I->data;
-        IDPOLY(h)=II;
-        setFlag(h,FLAG_QRING);
-      }
-      else
-      {
-        pDelete(&II);
-      }
-    }
-    setFlag(I,FLAG_QRING);
+    ideal F=idInit(1,1);
+    poly p2=kNF(F,currRing->qideal,p);
+    pNormalize(p2);
+    idDelete(&F);
+    pDelete(&p);
+    p=p2;
   }
 }
 BOOLEAN jjIMPORTFROM(leftv, leftv u, leftv v)

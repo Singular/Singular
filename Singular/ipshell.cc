@@ -5364,6 +5364,12 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             return TRUE;
       }
     }
+    if (last>R->N)
+    {
+      Werror("mismatch of number of vars (%d) and ordering (>=%d vars)",
+             R->N,last);
+      return TRUE;
+    }
     sl=sl->next;
   }
 

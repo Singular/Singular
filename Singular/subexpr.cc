@@ -159,11 +159,25 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case POLY_CMD:
         case VECTOR_CMD:
-          if ((TEST_V_QRING)  &&(currRing->qideal!=NULL)
+          if ((e==NULL)
+          && (TEST_V_QRING)
+          &&(currRing->qideal!=NULL)
           &&(!hasFlag(this,FLAG_QRING)))
           {
-            jjNormalizeQRingP(this);
-            d=Data();
+            setFlag(this,FLAG_QRING);
+            poly p=(poly)d;
+            jjNormalizeQRingP(p);
+            if (p!=(poly)d)
+            {
+              d=(void*)p;
+              if ((rtyp==POLY_CMD)||(rtyp==VECTOR_CMD)) data=d;
+              else if (rtyp==IDHDL)
+              {
+                idhdl h=(idhdl)data;
+                IDPOLY(h)=p;
+                setFlag(h,FLAG_QRING);
+              }
+            }
           }
           PrintNSpaces(spaces);
           pWrite0((poly)d);

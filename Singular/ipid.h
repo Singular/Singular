@@ -101,8 +101,8 @@ lists ipNameListLev(idhdl root, int lev);
 void  ipMoveId(idhdl h);
 BOOLEAN checkPackage(package pack);
 idhdl packFindHdl(package r);
+void jjNormalizeQRingP(poly &p);
 void jjNormalizeQRingId(leftv I);
-void jjNormalizeQRingP(leftv I);
 void *idrecDataInit(int t);
 
 #define FLAG_STD   0

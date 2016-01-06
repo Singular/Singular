@@ -4,6 +4,7 @@ bug_ecart
 bug_misc
 bug_minpoly
 bug_newstruct
+bug_qring2
 bug_ring
 bug_ringlist
 bug_tr237
