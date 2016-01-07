@@ -171,7 +171,24 @@ EXAMPLE: example changevar; shows an example
       @newring = @newring+vars[1,size(vars)-2]+"(1.."+string(nvars(@r))+")";
    }
    else { @newring = @newring+vars; }
-   @newring = @newring+"),("+ordstr(@r)+");";
+   string ords=ordstr(@r);
+   int l=size(ords);
+   int l1,l2;
+   while(l>0)
+   {
+     if (ords[l]=="(") { l1=l; break; }
+     if (ords[l]==")") { l2=l; }
+     l--;
+   }
+   string last_ord=string(ords[l1-3..l1-1]);
+   if ((last_ord[1]!="w")
+   && (last_ord[1]!="W")
+   && (last_ord[2]!="M"))
+   {
+     if (l2==size(ords)) { ords=string(ords[1..l1-1]); }
+     else { ords=string(ords[1..l1-1])+string(ords[l2+1..size(ords)]); }
+   }
+   @newring = @newring+"),("+ords+");";
    execute("ring "+@newring);
    if( @q!=0 )
    {
