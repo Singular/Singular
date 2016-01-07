@@ -21,14 +21,19 @@
 
 @heading News for version @value{VERSION}
 
+New libraries:
+@itemize
+@item new library: brillnoether.lib: Riemann-Roch spaces of divisors on curves (@nref{brillnoether_lib})
+@item new library: chern.lib: Chern classes (@nref{chern_lib})
+@item new library: GND.lib: General Neron Desingularization (@nref{GND_lib})
+@item new library: graal.lib: localization at prime ideals (@nref{graal_lib})
+@item new library: hess.lib: Riemann-Roch space of divisors (@nref{hess_lib})
+@end itemize
+
+Changed libraries:
 @itemize
 @item renamed algemodstd_lib to @nref{nfmodstd_lib}
 @item renamed derham_lib to @nref{deRham_lib}
-@item new library: brillnoether.lib: Riemann-Roch spaces of divisors on curves (@nref{brillnoether_lib})
-@item new library: chern.lib: Chern classes (@nref{chern_lib})
-@item new library: hess.lib: Riemann-Roch space of divisors (@nref{hess_lib})
-@item new library: graal.lib: localization at prime ideals (@nref{graal_lib})
-@item new library: GND.lib: General Neron Desingularization (@nref{GND_lib})
 @item grobcov.lib (grobcovK): Groebner Cover for parametric ideals (@nref{grobcov_lib}) with new routine
    ConsLevels (@nref{ConsLevels}), removed AddCons  AddConsP.
 @end itemize
