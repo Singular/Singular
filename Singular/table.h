@@ -1083,6 +1083,9 @@ cmdnames cmds[] =
   { "RETURN",      0, END_GRAMMAR ,       RETURN},
   { "ring",        0, RING_CMD ,          RING_CMD},
   { "ringlist",    0, RINGLIST_CMD ,      CMD_1},
+  #ifdef SINGULAR_4_1
+  { "ring_list",   0, RING_LIST_CMD ,     CMD_1},
+  #endif
   { "rvar",        0, IS_RINGVAR ,        CMD_1},
   { "sba",         0, SBA_CMD ,           CMD_123},
   { "setring",     0, SETRING_CMD ,       SETRING_CMD},
