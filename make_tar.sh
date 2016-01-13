@@ -5,6 +5,7 @@ export VERSION
 git archive --prefix=singular-$VERSION/ HEAD |tar xf -
 mkdir singular-$VERSION/doc
 cp doc/*.man singular-$VERSION/doc/.
+cp doc/singular.idx singular-$VERSION/doc/.
 if test -e doc/doc.tbz2
 then
   cp doc/doc.tbz2 singular-$VERSION/doc/.
