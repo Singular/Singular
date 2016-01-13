@@ -210,7 +210,9 @@ singularlibrary = $(SLIB0:%=LIB/%) $(SLIB1:%=LIB/%) $(PLIBS:%=LIB/%) $(SLIB2:%=L
 nobase_dist_singularlibrary_DATA = LIB/tst.lib LIB/help.cnf ${singularlibrary}
 EXTRA_DIST = grammar.y libparse.ll make_alllib.sh LIB/all.lib.tmpl \
              singular-libs LIB/help.cnf LIB/.singularrc LIB/COPYING \
-	     links/slInit_Dynamic.cc
+	     links/slInit_Dynamic.cc ../doc/singular.idx
+
+dist_singularlibrary_DATA = ../doc/singular.idx
 
 singularalllibrarydir = ${datadir}/singular/LIB
 singularalllibrary = all.lib
