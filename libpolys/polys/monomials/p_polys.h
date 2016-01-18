@@ -163,18 +163,18 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level);
 
 #else // ! PDEBUG
 
-#define pIsMonomOf(p, q)        (TRUE)
-#define pHaveCommonMonoms(p, q) (TRUE)
-#define p_LmCheckIsFromRing(p,r)  do {} while (0)
-#define p_LmCheckPolyRing(p,r)    do {} while (0)
-#define p_CheckIsFromRing(p,r)  do {} while (0)
-#define p_CheckPolyRing(p,r)    do {} while (0)
-#define p_CheckRing(r)          do {} while (0)
-#define P_CheckIf(cond, check)  do {} while (0)
+#define pIsMonomOf(p, q)          (TRUE)
+#define pHaveCommonMonoms(p, q)   (TRUE)
+#define p_LmCheckIsFromRing(p,r)  (TRUE)
+#define p_LmCheckPolyRing(p,r)    (TRUE)
+#define p_CheckIsFromRing(p,r)    (TRUE)
+#define p_CheckPolyRing(p,r)      (TRUE)
+#define p_CheckRing(r)            (TRUE)
+#define P_CheckIf(cond, check)    (TRUE)
 
-#define p_Test(p,r)     do {} while (0)
-#define p_LmTest(p,r)   do {} while (0)
-#define pp_Test(p, lmRing, tailRing) do {} while (0)
+#define p_Test(p,r)               (TRUE)
+#define p_LmTest(p,r)             (TRUE)
+#define pp_Test(p, lmRing, tailRing) (TRUE)
 
 #endif
 
