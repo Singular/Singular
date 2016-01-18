@@ -1334,6 +1334,9 @@ ringcmd:
             rInit(&$4,            /* characteristik and list of parameters*/
                   &$6,            /* names of ringvariables */
                   &$8);            /* ordering */
+            $4.CleanUp();
+            $6.CleanUp();
+            $8.CleanUp();
             idhdl newRingHdl=NULL;
 
             if (b!=NULL)
