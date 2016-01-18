@@ -5590,20 +5590,22 @@ ring rInit(leftv pn, leftv rv, leftv ord)
   else if ((pn->name != NULL)
   && ((strcmp(pn->name,"real")==0) || (strcmp(pn->name,"complex")==0)))
   {
+    leftv pnn=pn->next;
     BOOLEAN complex_flag=(strcmp(pn->name,"complex")==0);
-    if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+    if ((pnn!=NULL) && (pnn->Typ()==INT_CMD))
     {
-      leftv pnn=pn->next;
       float_len=(int)(long)pnn->Data();
       float_len2=float_len;
-      if ((pnn->next!=NULL) && (pnn->next->Typ()==INT_CMD))
+      pnn=pnn->next;
+      if ((pnn!=NULL) && (pnn->Typ()==INT_CMD))
       {
-        float_len2=(int)(long)pnn->next->Data();
+        float_len2=(int)(long)pnn->Data();
+        pnn=pnn->next;
       }
     }
 
     if (!complex_flag)
-      complex_flag= pn->next != NULL;
+      complex_flag= (pnn!=NULL) && (pnn->name!=NULL);
     if( !complex_flag && (float_len2 <= (short)SHORT_REAL_LENGTH))
        cf=nInitChar(n_R, NULL);
     else // longR or longC?
@@ -5621,10 +5623,10 @@ ring rInit(leftv pn, leftv rv, leftv ord)
            param.float_len= SHORT_REAL_LENGTH;
            param.float_len2= SHORT_REAL_LENGTH;
          }
-         if (pn->next == NULL)
+         if ((pnn == NULL) || (pnn->name == NULL))
            param.par_name=(const char*)"i"; //default to i
          else
-           param.par_name = (const char*)pn->next->name;
+           param.par_name = (const char*)pnn->name;
        }
 
        cf = nInitChar(complex_flag ? n_long_C: n_long_R, (void*)&param);
