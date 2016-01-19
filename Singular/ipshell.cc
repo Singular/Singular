@@ -5374,6 +5374,11 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
     }
     sl=sl->next;
   }
+  // find OrdSgn:
+  R->OrdSgn = 1;
+  for(i=1;i<=R->N;i++)
+  { if (weights[i]<0) { R->OrdSgn=-1;break; }}
+  omFree(weights);
 
   // check for complete coverage
   while ( n >= 0 && (
@@ -5408,11 +5413,6 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
       return TRUE;
     }
   }
-  // find OrdSgn:
-  R->OrdSgn = 1;
-  for(i=1;i<=R->N;i++)
-  { if (weights[i]<0) { R->OrdSgn=-1;break; }}
-  omFree(weights);
   return FALSE;
 }
 
