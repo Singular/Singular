@@ -365,6 +365,16 @@ BOOLEAN exitVoice()
       myyoldbuffer(currentVoice->oldb);
       currentVoice->oldb=NULL;
     }
+    if (currentVoice->filename!=NULL)
+    {
+      omFree((ADDRESS)currentVoice->filename);
+      currentVoice->filename=NULL;
+    }
+    if (currentVoice->buffer!=NULL)
+    {
+      omFree((ADDRESS)currentVoice->buffer);
+      currentVoice->buffer=NULL;
+    }
     if ((currentVoice->prev==NULL)&&(currentVoice->sw==BI_file))
     {
       currentVoice->prev=feInitStdin(currentVoice);
@@ -385,16 +395,6 @@ BOOLEAN exitVoice()
       && (currentVoice->files!=NULL))
       {
         fclose(currentVoice->files);
-      }
-      if (currentVoice->filename!=NULL)
-      {
-        omFree((ADDRESS)currentVoice->filename);
-        currentVoice->filename=NULL;
-      }
-      if (currentVoice->buffer!=NULL)
-      {
-        omFree((ADDRESS)currentVoice->buffer);
-        currentVoice->buffer=NULL;
       }
       yylineno=currentVoice->prev->curr_lineno;
       currentVoice->prev->next=NULL;

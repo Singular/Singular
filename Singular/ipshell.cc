@@ -5421,26 +5421,31 @@ static BOOLEAN rSleftvList2StringArray(leftv sl, char** p)
 
   while(sl!=NULL)
   {
-    if (sl->Name() == sNoName)
+    if ((sl->rtyp == IDHDL)||(sl->rtyp==ALIAS_CMD))
     {
-      if (sl->Typ()==POLY_CMD)
+      *p = omStrDup(sl->Name());
+    }
+    else if (sl->name!=NULL)
+    {
+      *p = (char*)sl->name;
+      sl->name=NULL;
+    }
+    else if (sl->rtyp==POLY_CMD)
+    {
+      sleftv s_sl;
+      iiConvert(POLY_CMD,ANY_TYPE,-1,sl,&s_sl);
+      if (s_sl.name != NULL)
       {
-        sleftv s_sl;
-        iiConvert(POLY_CMD,ANY_TYPE,-1,sl,&s_sl);
-        if (s_sl.Name() != sNoName)
-          *p = omStrDup(s_sl.Name());
-        else
-          *p = NULL;
-        sl->next = s_sl.next;
-        s_sl.next = NULL;
-        s_sl.CleanUp();
-        if (*p == NULL) return TRUE;
+        *p = (char*)s_sl.name; s_sl.name=NULL;
       }
       else
-        return TRUE;
+        *p = NULL;
+      sl->next = s_sl.next;
+      s_sl.next = NULL;
+      s_sl.CleanUp();
+      if (*p == NULL) return TRUE;
     }
-    else
-      *p = omStrDup(sl->Name());
+    else return TRUE;
     p++;
     sl=sl->next;
   }
