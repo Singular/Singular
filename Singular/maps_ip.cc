@@ -36,13 +36,6 @@
 /* debug output: Tok2Cmdname in maApplyFetch*/
 #include "ipshell.h"
 
-// define this if you want to use the fast_map routine for mapping ideals
-//#define FAST_MAP
-
-#ifdef FAST_MAP
-#include <polys/monomials/maps.h>
-#endif
-
 /*2
 * maps the expression w to res,
 * switch what: MAP_CMD: use theMap for mapping, N for preimage ring
@@ -376,39 +369,19 @@ poly pSubstPoly(poly p, int var, poly image)
   pDelete(&(theMap->m[var-1]));
   theMap->m[var-1]=pCopy(image);
 
-  poly res=NULL;
-#ifdef FAST_MAP
-  if (pGetComp(p)==0)
+  sleftv tmpW;
+  memset(&tmpW,0,sizeof(sleftv));
+  tmpW.rtyp=POLY_CMD;
+  tmpW.data=p;
+  leftv v=(leftv)omAlloc0Bin(sleftv_bin);
+  if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing,NULL,NULL,0,
+                          n_SetMap(currRing->cf, currRing->cf)))
   {
-    ideal src_id=idInit(1,1);
-    src_id->m[0]=p;
-
-    char *tmp = theMap->preimage;
-    theMap->preimagei=(char*)1L; // map gets 1 as its rank (as an ideal)
-    ideal res_id=fast_map(src_id,currRing,(ideal)theMap,currRing);
-    theMap->preimage=tmp; // map gets its preimage back
-
-    res=res_id->m[0];
-    res_id->m[0]=NULL; idDelete(&res_id);
-    src_id->m[0]=NULL; idDelete(&src_id);
+    WerrorS("map failed");
+    v->data=NULL;
   }
-  else
-#endif
-  {
-    sleftv tmpW;
-    memset(&tmpW,0,sizeof(sleftv));
-    tmpW.rtyp=POLY_CMD;
-    tmpW.data=p;
-    leftv v=(leftv)omAlloc0Bin(sleftv_bin);
-    if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing,NULL,NULL,0,
-                            n_SetMap(currRing->cf, currRing->cf)))
-    {
-      WerrorS("map failed");
-      v->data=NULL;
-    }
-    res=(poly)(v->data);
-    omFreeBin((ADDRESS)v, sleftv_bin);
-  }
+  poly res=(poly)(v->data);
+  omFreeBin((ADDRESS)v, sleftv_bin);
   idDelete((ideal *)(&theMap));
   return res;
 }

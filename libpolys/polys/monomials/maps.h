@@ -25,5 +25,6 @@ ideal  idSubstPoly(ideal id, int n, poly e);
 poly p_MinPolyNormalize(poly p, const ring r);
 int maMaxDeg_P(poly p,ring preimage_r);
 int maMaxDeg_Ma(ideal a,ring preimage_r);
+poly maEvalVariable(poly p, int v,int pExp, ideal s, const ring dst_r);
 
 #endif

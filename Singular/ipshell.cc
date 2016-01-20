@@ -70,12 +70,7 @@
 #include <math.h>
 #include <ctype.h>
 
-// define this if you want to use the fast_map routine for mapping ideals
-#define FAST_MAP
-
-#ifdef FAST_MAP
-#include <kernel/maps/fast_maps.h>
-#endif
+#include <kernel/maps/gen_maps.h>
 
 #ifdef SINGULAR_4_1
 #include <Singular/number2.h>
@@ -724,22 +719,16 @@ leftv iiMap(map theMap, const char * what)
       else
 #endif
       {
-#ifdef FAST_MAP
-        if ((tmpW.rtyp==IDEAL_CMD) && (nMap == ndCopyMap)
-#ifdef HAVE_PLURAL
-        && (!rIsPluralRing(currRing))
-#endif
-        )
+        if (tmpW.rtyp==IDEAL_CMD)
         {
           v->rtyp=IDEAL_CMD;
           char *tmp = theMap->preimage;
           theMap->preimage=(char*)1L;
           // map gets 1 as its rank (as an ideal)
-          v->data=fast_map(IDIDEAL(w), src_ring, (ideal)theMap, currRing);
+          v->data=maMapIdeal(IDIDEAL(w), src_ring, (ideal)theMap, currRing,nMap);
           theMap->preimage=tmp; // map gets its preimage back
         }
-#endif
-        if (v->data==NULL)
+        if (v->data==NULL) /*i.e. not IDEAL_CMD */
         {
           if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,src_ring,NULL,NULL,0,nMap))
           {

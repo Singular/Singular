@@ -101,8 +101,7 @@ ideal maIdeal_2_Ideal(maideal ideal, ring dest_r);
 // main routine: map_id: the ideal to map
 //               map_r: the base ring for map_id
 //               image_id: the image of the variables
-//               image_r: the base ring for image_id
-ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r);
+ideal fast_map_common_subexp(const ideal map_id,const ring map_r,const ideal image_id,const ring image_r);
 
 #endif
 
