@@ -5,8 +5,6 @@
 #include <polys/monomials/maps.h>
 #include <kernel/maps/gen_maps.h>
 
-#if 0
-// prototype
 static poly p_SubstMon(poly p, int var, poly image, const ring preimage_r, const ring image_r, const nMapFunc nMap, matrix cache)
 {
   assume(!rIsPluralRing(image_r));
@@ -20,7 +18,7 @@ static poly p_SubstMon(poly p, int var, poly image, const ring preimage_r, const
     {
       p_SetExp(q,i,pExp,image_r);
     }
-    else
+    else if (pExp!=0)
     {
       h=maEvalVariable(image,var,pExp,(ideal)cache,image_r);
       if (h==NULL)
@@ -29,8 +27,13 @@ static poly p_SubstMon(poly p, int var, poly image, const ring preimage_r, const
         return NULL;
       }
     }
+    else
+      h=p_One(image_r);
   }
-  return p_Mult_mm(h,q,image_r);
+  p_Setm(q,image_r);
+  h=p_Mult_mm(h,q,image_r);
+  p_LmDelete(q,image_r);
+  return h;
 }
 
 poly p_SubstPoly (poly p, int var, poly image, const ring preimage_r, const ring image_r, const nMapFunc nMap, matrix cache)
@@ -58,10 +61,10 @@ poly p_SubstPoly (poly p, int var, poly image, const ring preimage_r, const ring
     if (q!=NULL) sBucket_Add_p(bucket,q,pLength(q));
   }
   int l_dummy;
-  sBucketClearAdd(bucket, &result, &l_dummy);
-  sBucketDestroy(&bucket);
+  sBucketDestroyAdd(bucket, &result, &l_dummy);
   return result;
 }
+
 ideal id_SubstPoly (ideal id, int var, poly image, const ring preimage_r, const ring image_r, const nMapFunc nMap)
 {
   matrix cache=mpNew(preimage_r->N,maMaxDeg_Ma(id, preimage_r));
@@ -74,4 +77,3 @@ ideal id_SubstPoly (ideal id, int var, poly image, const ring preimage_r, const 
   }
   return res;
 }
-#endif

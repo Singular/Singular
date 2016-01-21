@@ -12,6 +12,72 @@
 #include <polys/sbuckets.h>
 #include <kernel/maps/fast_maps.h>
 #include <kernel/maps/find_perm.h>
+#include <kernel/maps/gen_maps.h>
+
+static void find_subst_for_map(const ring preimage_r, const ring image_r, const ideal image, int &var,poly &p)
+{
+  p=NULL;
+  var=0;
+  int i,v;
+  for (i=si_min(IDELEMS(image),preimage_r->N)-1; i>=0; i--)
+  {
+    if (image->m[i]!=NULL)
+    {
+      if ((pNext(image->m[i])==NULL)
+      && (n_IsOne(pGetCoeff(image->m[i]),image_r)))
+      {
+        v=p_IsUnivariate(image->m[i],image_r);
+        if ((v<=0) /*not univariate */
+        || (v!=i+1) /* non-trivial */
+	|| (p_GetExp(image->m[i],v,image_r)!=1))
+        {
+          if (var==0)
+          {
+            var=i+1;
+            p=image->m[i];
+          }
+          else /* found second non-trivial entry */
+          {
+            goto non_trivial;
+          }
+        }
+      }
+      else
+      {
+        if (var==0)
+        {
+          var=i+1;
+          p=image->m[i];
+        }
+        else /* found second non-trivial entry */
+        {
+          goto non_trivial;
+        }
+      }
+    }
+    else
+    {
+        if (var==0)
+        {
+          var=i+1;
+          p=image->m[i];
+        }
+        else /* found second non-trivial entry */
+        {
+          goto non_trivial;
+        }
+    }
+  }
+  //Print("elms:%d, N:%d\n",IDELEMS(image),preimage_r->N);
+  //iiWriteMatrix((matrix)image,"_",1,image_r,0);
+  //PrintS("\npreimage:\n");rWrite(preimage_r);
+  //PrintS("image:\n");rWrite(image_r);
+  //Print("\nsusbt: v%d -> ",var);
+  //p_wrp(p,image_r,image_r);
+non_trivial:
+  var=0;
+  p=NULL;
+}
 
 // polynomial map for ideals/module/matrix
 // map_id: the ideal to map
@@ -30,6 +96,17 @@ ideal maMapIdeal(const ideal map_id, const ring preimage_r,const ideal image_id,
     {
       if (TEST_OPT_PROT) PrintS("map is a permutation\n");
       return (ideal)m;
+    }
+    // ----------------------------------------------------------
+    // is it a substitution of one variable ?
+    {
+      poly p;
+      int var;
+      find_subst_for_map(preimage_r,image_r,image_id,var,p);
+      if (var!=0)
+      {
+        return id_SubstPoly(map_id,var,p,preimage_r,image_r,nMap);
+      }
     }
     // ----------------------------------------------------------
     // long polys in the image ?: possiblity of many common subexpressions
