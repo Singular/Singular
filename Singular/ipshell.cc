@@ -698,7 +698,7 @@ leftv iiMap(map theMap, const char * what)
             }
           }
         }
-        omFree(degs,IDELEMS(id)*sizeof(long));
+        omFreeSize(degs,IDELEMS(id)*sizeof(long));
       }
       else if (tmpW.rtyp==POLY_CMD)
       {
