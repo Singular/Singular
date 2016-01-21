@@ -23,33 +23,35 @@ static int* find_perm_for_map(const ring preimage_r, const ring image_r, const i
   int *perm=(int *)omAlloc0((preimage_r->N+1)*sizeof(int));
   for (i=si_min(IDELEMS(image),preimage_r->N)-1; i>=0; i--)
   {
-    if ((image->m[i]!=NULL)
-    && (pNext(image->m[i])==NULL)
-    && (n_IsOne(pGetCoeff(image->m[i]),image_r)))
+    if (image->m[i]!=NULL)
     {
-      int v=p_IsUnivariate(image->m[i],image_r);
-      if (v<=0) /*not univariate */
+      if((pNext(image->m[i])==NULL)
+      && (n_IsOne(pGetCoeff(image->m[i]),image_r)))
       {
-        omFreeSize(perm,(preimage_r->N+1)*sizeof(int));
-        return NULL;
-      }
-      else if (v>0) /* image is univaritate */
-      {
-        if (p_GetExp(image->m[i],v,image_r)==1)
-        {
-          perm[i+1]=v; /* and of exp 1 */
-        }
-        else
+        int v=p_IsUnivariate(image->m[i],image_r);
+        if (v<=0) /*not univariate */
         {
           omFreeSize(perm,(preimage_r->N+1)*sizeof(int));
           return NULL;
         }
+        else if (v>0) /* image is univaritate */
+        {
+          if (p_GetExp(image->m[i],v,image_r)==1)
+          {
+            perm[i+1]=v; /* and of exp 1 */
+          }
+          else
+          {
+            omFreeSize(perm,(preimage_r->N+1)*sizeof(int));
+            return NULL;
+          }
+        }
       }
-    }
-    else /* image is not a monomial */
-    {
-      omFreeSize(perm,(preimage_r->N+1)*sizeof(int));
-      return NULL;
+      else /* image is not a monomial */
+      {
+        omFreeSize(perm,(preimage_r->N+1)*sizeof(int));
+        return NULL;
+      }
     }
   }
   //Print("elms:%d, N:%d\n",IDELEMS(image),preimage_r->N);
