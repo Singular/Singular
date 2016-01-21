@@ -708,8 +708,9 @@ leftv iiMap(map theMap, const char * what)
           {
             long deg_monexp=pTotaldegree(theMap->m[j]);
             poly p=(poly)tmpW.data;
-            if ((p!=NULL) && (p_Totaldegree(p,src_ring)!=0) &&
-            ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)p_Totaldegree(p,src_ring)/2)))
+            long deg=0;
+            if ((p!=NULL) && (deg=p_Totaldegree(p,src_ring)!=0) &&
+            ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)deg/2)))
             {
               overflow=TRUE;
               break;
