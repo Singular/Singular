@@ -23,6 +23,24 @@
 
 New libraries:
 @itemize
+@item 
+@end itemize
+
+Changed libraries:
+@itemize
+@item
+@end itemize
+
+Changes in the kernel:
+@itemize
+@item improved mapping of polynomials/idea;s/...
+@end itemize
+
+
+@heading News for version 4-0-3
+
+New libraries:
+@itemize
 @item new library: brillnoether.lib: Riemann-Roch spaces of divisors on curves (@nref{brillnoether_lib})
 @item new library: chern.lib: Chern classes (@nref{chern_lib})
 @item new library: GND.lib: General Neron Desingularization (@nref{GND_lib})
