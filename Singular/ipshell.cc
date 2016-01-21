@@ -673,16 +673,24 @@ leftv iiMap(map theMap, const char * what)
         || (tmpW.rtyp==MAP_CMD))
       {
         ideal id=(ideal)tmpW.data;
+        long *degs=(long*)omAlloc(IDELEMS(id)*sizeof(long));
+        for(int i=IDELEMS(id)-1;i>=0;i--)
+        {
+          poly p=id->m[i];
+          if (p!=NULL) degs[i]=p_Totaldegree(p,src_ring);
+          else         degs[i]=0;
+        }
         for(int j=IDELEMS(theMap)-1;j>=0 && !overflow;j--)
         {
           if (theMap->m[j]!=NULL)
           {
             long deg_monexp=pTotaldegree(theMap->m[j]);
+
             for(int i=IDELEMS(id)-1;i>=0;i--)
             {
               poly p=id->m[i];
-              if ((p!=NULL) && (p_Totaldegree(p,src_ring)!=0) &&
-              ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)p_Totaldegree(p,src_ring)/2)))
+              if ((p!=NULL) && (degs[i]!=0) &&
+              ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)degs[i]/2)))
               {
                 overflow=TRUE;
                 break;
@@ -690,6 +698,7 @@ leftv iiMap(map theMap, const char * what)
             }
           }
         }
+        omFree(degs,IDELEMS(id)*sizeof(long));
       }
       else if (tmpW.rtyp==POLY_CMD)
       {
