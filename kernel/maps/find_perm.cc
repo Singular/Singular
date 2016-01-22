@@ -84,6 +84,8 @@ matrix ma_ApplyPermForMap(const matrix to_map, const ring preimage_r,
       p_Test(m->m[i],image_r);
     }
   }
+  ideal ii=(ideal)m;
+  ii->rank=((ideal)to_map)->rank;
   omFreeSize(perm,(preimage_r->N+1)*sizeof(int));
   return m;
 }

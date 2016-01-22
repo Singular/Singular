@@ -690,7 +690,7 @@ leftv iiMap(map theMap, const char * what)
             {
               poly p=id->m[i];
               if ((p!=NULL) && (degs[i]!=0) &&
-              ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)degs[i]/2)))
+              ((unsigned long)deg_monexp > (currRing->bitmask / ((unsigned long)degs[i])/2)))
               {
                 overflow=TRUE;
                 break;
@@ -709,8 +709,8 @@ leftv iiMap(map theMap, const char * what)
             long deg_monexp=pTotaldegree(theMap->m[j]);
             poly p=(poly)tmpW.data;
             long deg=0;
-            if ((p!=NULL) && (deg=p_Totaldegree(p,src_ring)!=0) &&
-            ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)deg/2)))
+            if ((p!=NULL) && ((deg=p_Totaldegree(p,src_ring))!=0) &&
+            ((unsigned long)deg_monexp > (currRing->bitmask / ((unsigned long)deg)/2)))
             {
               overflow=TRUE;
               break;
@@ -729,16 +729,19 @@ leftv iiMap(map theMap, const char * what)
       else
 #endif
       {
-        if (tmpW.rtyp==IDEAL_CMD)
+        if ((tmpW.rtyp==IDEAL_CMD)
+        ||(tmpW.rtyp==MODUL_CMD)
+        ||(tmpW.rtyp==MATRIX_CMD)
+        ||(tmpW.rtyp==MAP_CMD))
         {
-          v->rtyp=IDEAL_CMD;
+          v->rtyp=tmpW.rtyp;
           char *tmp = theMap->preimage;
           theMap->preimage=(char*)1L;
           // map gets 1 as its rank (as an ideal)
           v->data=maMapIdeal(IDIDEAL(w), src_ring, (ideal)theMap, currRing,nMap);
           theMap->preimage=tmp; // map gets its preimage back
         }
-        if (v->data==NULL) /*i.e. not IDEAL_CMD */
+        if (v->data==NULL) /*i.e. not IDEAL_CMD/MODUL_CMD/MATRIX_CMD/MAP */
         {
           if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,src_ring,NULL,NULL,0,nMap))
           {
@@ -1172,7 +1175,7 @@ BOOLEAN iiDefaultParameter(leftv p)
   tmp.data=at->CopyA();
   return iiAssign(p,&tmp);
 }
-BOOLEAN iiBranchTo(leftv r, leftv args)
+BOOLEAN iiBranchTo(leftv, leftv args)
 {
   // <string1...stringN>,<proc>
   // known: args!=NULL, l>=1
@@ -6256,12 +6259,12 @@ BOOLEAN iiApplyINTVEC(leftv res, leftv a, int op, leftv proc)
   }
   return FALSE;
 }
-BOOLEAN iiApplyBIGINTMAT(leftv res, leftv a, int op, leftv proc)
+BOOLEAN iiApplyBIGINTMAT(leftv, leftv, int, leftv)
 {
   WerrorS("not implemented");
   return TRUE;
 }
-BOOLEAN iiApplyIDEAL(leftv res, leftv a, int op, leftv proc)
+BOOLEAN iiApplyIDEAL(leftv, leftv, int, leftv)
 {
   WerrorS("not implemented");
   return TRUE;

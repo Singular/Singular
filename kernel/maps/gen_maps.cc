@@ -110,7 +110,9 @@ ideal maMapIdeal(const ideal map_id, const ring preimage_r,const ideal image_id,
     }
     // ----------------------------------------------------------
     // long polys in the image ?: possiblity of many common subexpressions
-    if (nMap==ndCopyMap) /* and !rIsPluralRing(image_r) */
+    if ((nMap==ndCopyMap) /* and !rIsPluralRing(image_r) */
+    && (map_id->nrows==1) /* i.e. only for ideal/map */
+    && (map_id->rank==1))
     {
       int sz=IDELEMS(map_id);
       int sz_l=0;
@@ -136,7 +138,7 @@ ideal maMapIdeal(const ideal map_id, const ring preimage_r,const ideal image_id,
   // otherwise: try the generic method (generic map with cache)
   if (TEST_OPT_PROT) PrintS("map with cache\n");
   int C=((matrix)map_id)->cols();
-  int R=1; //((matrix)map_id)->rows();
+  int R=((matrix)map_id)->rows();
   matrix m=mpNew(R,C);
   int N = preimage_r->N;
   matrix cache=mpNew(N,maMaxDeg_Ma(map_id,preimage_r));
@@ -150,6 +152,8 @@ ideal maMapIdeal(const ideal map_id, const ring preimage_r,const ideal image_id,
     }
   }
   idDelete((ideal *)&cache);
+  ideal ii=(ideal)m;
+  ii->rank=((ideal)map_id)->rank;
   return (ideal)m;
 }
 
