@@ -400,7 +400,8 @@ BOOLEAN atATTRIB3(leftv /*res*/,leftv v,leftv b,leftv c)
       return TRUE;
     }
     ideal I=(ideal)v->Data();
-    I->rank=si_max((int)I->rank,(int)((long)c->Data()));
+    int rk=id_RankFreeModule(I,currRing);
+    I->rank=si_max(rk,(int)((long)c->Data()));
   }
   else if ((strcmp(name,"global")==0)
   &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
