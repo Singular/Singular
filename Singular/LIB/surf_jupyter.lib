@@ -26,7 +26,7 @@ PROCEDURES:
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
-proc num_of_vars(ideal I)
+static proc num_of_vars(ideal I)
 "USAGE: num_of_vars(ideal I)
 
 RETURN: an intvec containing one entry for each ring variable.
@@ -140,7 +140,7 @@ EXAMPLE: example plot; shows an example
   }
 
   string surf_call; i = 0;
-  
+
     surf_call = "singularsurf_jupyter ";
     surf_call = surf_call + l + " " + current_pid + " >/dev/null 2>&1";
     i = system("sh", surf_call);
