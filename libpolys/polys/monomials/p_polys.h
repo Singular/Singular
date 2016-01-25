@@ -904,8 +904,10 @@ static inline poly p_Mult_nn(poly p, number n, const ring r)
   if (n_IsOne(n, r->cf))
     return p;
   else if (n_IsZero(n, r->cf))
-    return NULL;
-  else
+  {
+    r->p_Procs->p_Delete(&p, r); // NOTE: without p_Delete - memory leak!
+    return NULL; 
+  } else
     return r->p_Procs->p_Mult_nn(p, n, r);
 }
 
