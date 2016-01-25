@@ -70,7 +70,8 @@ NOTE: requires the external program `surf` to be installed,
 EXAMPLE: example plot; shows an example
 "
 {
-  string l = "/tmp/surf" + string(system("pid"));
+  string current_pid = string(system("pid"));
+  string l = "/tmp/surf" + current_pid;
   string err_mes; // string containing error messages
   def base=basering;
   intvec v=num_of_vars(I);
@@ -141,7 +142,7 @@ EXAMPLE: example plot; shows an example
   string surf_call; i = 0;
   
     surf_call = "singularsurf_jupyter ";
-    surf_call = surf_call + l + " >/dev/null 2>&1";
+    surf_call = surf_call + l + " " + current_pid + " >/dev/null 2>&1";
     i = system("sh", surf_call);
     if (i != 0)
     {
@@ -150,8 +151,8 @@ EXAMPLE: example plot; shows an example
               + string(i) + ".";
       ERROR(err_mes);
     }
-  
-  system("sh", "command rm " + l);
+  i = system("sh", "command rm " + l);
+  return(l+".jpg");
 }
 example
 { "EXAMPLE:"; echo = 2;
