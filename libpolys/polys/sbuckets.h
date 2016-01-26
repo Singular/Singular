@@ -92,13 +92,13 @@ void sBucket_Add_p(sBucket_pt bucket, poly p, int lp);
 ///
 /// Sorts p with bucketSort: assumes all monomials of p are different
 ///
-poly sBucketSortMerge(poly p, ring r);
+poly sBucketSortMerge(poly p, const ring r);
 
 //////////////////////////////////////////////////////////////////////////
 ///
 /// Sorts p with bucketSort: p may have equal monomials
 ///
-poly sBucketSortAdd(poly p, ring r);
+poly sBucketSortAdd(poly p, const ring r);
 
 
 #endif // P_BUCKET_SORT
