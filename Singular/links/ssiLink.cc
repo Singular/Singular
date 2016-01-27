@@ -65,19 +65,6 @@
 // 7->8: qring
 // 8->9: module: added rank
 
-typedef struct
-{
-  s_buff f_read;
-  FILE *f_write;
-  ring r;
-  pid_t pid; /* only valid for fork/tcp mode*/
-  int fd_read,fd_write; /* only valid for fork/tcp mode*/
-  char level;
-  char send_quit_at_exit;
-  char quit_sent;
-
-} ssiInfo;
-
 link_list ssiToBeClosed=NULL;
 volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
 
