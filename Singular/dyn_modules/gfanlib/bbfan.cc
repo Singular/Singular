@@ -10,6 +10,8 @@
 #include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
 
+#include <Singular/links/ssiLink.h>
+
 #include <callgfanlib_conversion.h>
 #include <bbfan.h>
 #include <gfan.h>
@@ -1016,6 +1018,44 @@ BOOLEAN commonRefinement(leftv res, leftv args)
 //   }
 
 
+BOOLEAN bbfan_serialize(blackbox *b, void *d, si_link f)
+{
+  ssiInfo *dd = (ssiInfo *)f->data;
+
+  sleftv l;
+  memset(&l,0,sizeof(l));
+  l.rtyp=STRING_CMD;
+  l.data=(void*)"fan";
+  f->m->Write(f, &l);
+
+  gfan::ZFan* zf = (gfan::ZFan*) d;
+  std::string s = zf->toString(2+4+8+128);
+
+  fprintf(dd->f_write,"%d %s ",(int)s.size(),s.c_str());
+
+  return FALSE;
+}
+
+
+BOOLEAN bbfan_deserialize(blackbox **b, void **d, si_link f)
+{
+  ssiInfo *dd = (ssiInfo *)f->data;
+
+  int l = s_readint(dd->f_read);
+  char* buf = (char*) omAlloc0(l+1);
+  (void) s_getc(dd->f_read); // skip whitespace
+  (void) s_readbytes(buf,l,dd->f_read);
+  buf[l]='\0';
+
+  std::istringstream fanInString(std::string(buf,l));
+  gfan::ZFan* zf = new gfan::ZFan(fanInString);
+  *d=zf;
+
+  omFree(buf);
+  return FALSE;
+}
+
+
 void bbfan_setup(SModulFunctions* p)
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -1028,6 +1068,8 @@ void bbfan_setup(SModulFunctions* p)
   b->blackbox_Init=bbfan_Init;
   b->blackbox_Copy=bbfan_Copy;
   b->blackbox_Assign=bbfan_Assign;
+  b->blackbox_serialize=bbfan_serialize;
+  b->blackbox_deserialize=bbfan_deserialize;
   p->iiAddCproc("","emptyFan",FALSE,emptyFan);
   p->iiAddCproc("","fullFan",FALSE,fullFan);
   /* the following functions are implemented in bbcone.cc */
