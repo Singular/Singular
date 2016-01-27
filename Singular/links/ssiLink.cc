@@ -65,7 +65,6 @@
 // 7->8: qring
 // 8->9: module: added rank
 
-#define SSI_BASE 16
 typedef struct
 {
   s_buff f_read;

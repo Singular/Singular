@@ -2989,8 +2989,6 @@ static char* nlCoeffString(const coeffs r)
   else                 return omStrDup("integer");
 }
 
-#define SSI_BASE 16
-
 static void nlWriteFd(number n,FILE* f, const coeffs)
 {
   if(SR_HDL(n) & SR_INT)
