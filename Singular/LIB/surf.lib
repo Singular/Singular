@@ -27,7 +27,7 @@ PROCEDURES:
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
-proc num_of_vars(ideal I)
+static proc num_of_vars(ideal I)
 "USAGE: num_of_vars(ideal I)
 
 RETURN: an intvec containing one entry for each ring variable.
@@ -36,17 +36,13 @@ occuring in the ideal.
 An entry is zero if and only if the corresponding variable does not occur in the ideal.
 "
 {
+  ideal vv=variables(I);
   intvec v;
+  v[nvars(basering)]=0;
   int i;
-  poly p;
-  for(i=ncols(I);i>0;i--)
+  for(i=ncols(vv);i>0;i--)
   {
-    p=I[i];
-    while(p!=0)
-    {
-      v=v+leadexp(p);
-      p=p-lead(p);
-    }
+    v[univariate(vv[i])]=1; 
   }
   return(v);
 }
