@@ -182,7 +182,7 @@ ring rDefault(int ch, int N, char **n)
 //
 
 // check intvec, describing the ordering
-BOOLEAN rCheckIV(intvec *iv)
+BOOLEAN rCheckIV(const intvec *iv)
 {
   if ((iv->length()!=2)&&(iv->length()!=3))
   {
@@ -192,7 +192,7 @@ BOOLEAN rCheckIV(intvec *iv)
   return FALSE;
 }
 
-int rTypeOfMatrixOrder(intvec * order)
+int rTypeOfMatrixOrder(const intvec* order)
 {
   int i=0,j,typ=1;
   int sz = (int)sqrt((double)(order->length()-2));
@@ -4032,7 +4032,7 @@ static unsigned long rGetDivMask(int bits)
 }
 
 #ifdef RDEBUG
-void rDebugPrint(ring r)
+void rDebugPrint(const ring r)
 {
   if (r==NULL)
   {
@@ -5130,7 +5130,7 @@ n_coeffType rFieldType(ring r)
   return n_unknown;
 }
 
-int64 * rGetWeightVec(ring r)
+int64 * rGetWeightVec(const ring r)
 {
   assume(r!=NULL);
   assume(r->OrdSize>0);

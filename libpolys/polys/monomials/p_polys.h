@@ -224,8 +224,14 @@ poly      p_Homogen (poly p, int varnum, const ring r);
 
 BOOLEAN   p_IsHomogeneous (poly p, const ring r);
 
-static inline void p_Setm(poly p, const ring r);
-p_SetmProc p_GetSetmProc(ring r);
+// Setm
+static inline void p_Setm(poly p, const ring r)
+{
+  p_CheckRing2(r);
+  r->p_Setm(p, r);
+}
+
+p_SetmProc p_GetSetmProc(const ring r);
 
 poly      p_Subst(poly p, int n, poly e, const ring r);
 
@@ -430,13 +436,6 @@ static inline long p_GetOrder(poly p, ring r)
         return ((p)->exp[r->pOrdIndex]);
     }
   }
-}
-
-// Setm
-static inline void p_Setm(poly p, const ring r)
-{
-  p_CheckRing2(r);
-  r->p_Setm(p, r);
 }
 
 
@@ -906,7 +905,7 @@ static inline poly p_Mult_nn(poly p, number n, const ring r)
   else if (n_IsZero(n, r->cf))
   {
     r->p_Procs->p_Delete(&p, r); // NOTE: without p_Delete - memory leak!
-    return NULL; 
+    return NULL;
   } else
     return r->p_Procs->p_Mult_nn(p, n, r);
 }

@@ -556,7 +556,7 @@ void p_Setm_WFirstTotalDegree(poly p, const ring r)
   p->exp[r->pOrdIndex] = p_WFirstTotalDegree(p, r);
 }
 
-p_SetmProc p_GetSetmProc(ring r)
+p_SetmProc p_GetSetmProc(const ring r)
 {
   // covers lp, rp, ls,
   if (r->typ == NULL) return p_Setm_Dummy;
