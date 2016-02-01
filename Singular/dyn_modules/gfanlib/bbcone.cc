@@ -1783,6 +1783,7 @@ BOOLEAN bbcone_serialize(blackbox *b, void *d, si_link f)
   gfan::ZMatrix e=Z->getEquations();
   gfanZMatrixWriteFd(e,dd);
 
+  // assert(i.getWidth() == e.getWidth());
   return FALSE;
 }
 
@@ -1790,7 +1791,7 @@ static gfan::Integer gfanIntegerReadFd(ssiInfo* dd)
 {
   mpz_t tmp;
   mpz_init(tmp);
-  s_readmpz(dd->f_read,tmp);
+  s_readmpz_base(dd->f_read,tmp,SSI_BASE);
   gfan::Integer n(tmp);
   mpz_clear(tmp);
   return n;
@@ -1819,6 +1820,9 @@ BOOLEAN bbcone_deserialize(blackbox **b, void **d, si_link f)
 
   gfan::ZMatrix i = gfanZMatrixReadFd(dd);
   gfan::ZMatrix e = gfanZMatrixReadFd(dd);
+
+  // if (e.getHeight()==0) // why is e sometimes 0x0 and sometimex 0xn???
+  //   e = gfan::ZMatrix(0,i.getWidth());
 
   gfan::ZCone* Z = new gfan::ZCone(i,e,preassumptions);
 
