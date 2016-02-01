@@ -59,11 +59,12 @@
 #include <sys/wait.h>
 #include <time.h>
 
-#define SSI_VERSION 9
+#define SSI_VERSION 10
 // 5->6: changed newstruct representation
 // 6->7: attributes
 // 7->8: qring
 // 8->9: module: added rank
+// 9->10: tokens in grammar.h/tok.h reorganized
 
 link_list ssiToBeClosed=NULL;
 volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
