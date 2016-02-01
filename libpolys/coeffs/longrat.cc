@@ -1235,12 +1235,12 @@ number nlGcd(number a, number b, const coeffs r)
   else
   {
     result=ALLOC0_RNUMBER();
-    mpz_init(result->z);
-    mpz_gcd(result->z,a->z,b->z);
     result->s = 3;
   #ifdef LDEBUG
     result->debug=123456;
   #endif
+    mpz_init(result->z);
+    mpz_gcd(result->z,a->z,b->z);
     result=nlShort3(result);
   }
   nlTest(result, r);
@@ -2579,8 +2579,11 @@ static void nlMPZ(mpz_t m, number &n, const coeffs r)
 static number nlInitMPZ(mpz_t m, const coeffs)
 {
   number z = ALLOC_RNUMBER();
-  mpz_init_set(z->z, m);
   z->s = 3;
+  #ifdef LDEBUG
+  z->debug=123456;
+  #endif
+  mpz_init_set(z->z, m);
   return z;
 }
 
@@ -2717,6 +2720,11 @@ number nlExtGcd(number a, number b, number *s, number *t, const coeffs)
   mpz_init((*t)->z); (*t)->s=3;
   number g=ALLOC_RNUMBER();
   mpz_init(g->z); g->s=3;
+  #ifdef LDEBUG
+  g->debug=123456;
+  (*s)->debug=123456;
+  (*t)->debug=123456;
+  #endif
   if (SR_HDL(a) & SR_INT)
   {
     mpz_init_set_si(aa,SR_TO_INT(a));
