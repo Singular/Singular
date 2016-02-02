@@ -88,7 +88,7 @@ void nlInpIntDiv(number &a, number b, const coeffs r);
 
 #ifdef LDEBUG
 #define nlTest(a, r) nlDBTest(a,__FILE__,__LINE__, r)
-BOOLEAN nlDBTest(number a, char *f,int l, const coeffs r);
+BOOLEAN nlDBTest(number a, const char *f,int l, const coeffs r);
 #else
 #define nlTest(a, r) do {} while (0)
 #endif
@@ -112,7 +112,7 @@ BOOLEAN nlDBTest(number a, char *f,int l, const coeffs r);
 static inline number nlShort3(number x) // assume x->s==3
 {
   assume(x->s==3);
-  if (mpz_cmp_ui(x->z,(long)0)==0)
+  if (mpz_cmp_si(x->z,(long)0)==0)
   {
     mpz_clear(x->z);
     FREE_RNUMBER(x);
@@ -935,10 +935,7 @@ int nlDivComp(number a, number b, const coeffs r)
 
 number  nlGetUnit (number n, const coeffs r)
 {
-  if (nlGreaterZero(n, r))
-    return INT_TO_SR(1);
-  else
-    return INT_TO_SR(-1);
+  return INT_TO_SR(1);
 }
 
 coeffs nlQuot1(number c, const coeffs r)
@@ -2584,6 +2581,7 @@ static number nlInitMPZ(mpz_t m, const coeffs)
   z->debug=123456;
   #endif
   mpz_init_set(z->z, m);
+  z=nlShort3(z);
   return z;
 }
 
