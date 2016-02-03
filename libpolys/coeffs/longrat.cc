@@ -876,7 +876,10 @@ number nlIntMod (number a, number b, const coeffs r)
 #endif
     u->s = 3;
     mpz_init(u->z);
-    mpz_mod(u->z,aa,b->z);
+    mpz_t q;
+    mpz_init(q);
+    mpz_tdiv_qr(q,u->z, aa, b->z);
+    mpz_clear(q);
     mpz_clear(aa);
     u=nlShort3(u);
     nlTest(u,r);
@@ -894,7 +897,10 @@ number nlIntMod (number a, number b, const coeffs r)
 #endif
   mpz_init(u->z);
   u->s = 3;
-  mpz_mod(u->z,a->z,b->z);
+  mpz_t q;
+  mpz_init(q);
+  mpz_tdiv_qr(q, u->z, a->z, b->z);
+  mpz_clear(q);
   if (bb!=NULL)
   {
     mpz_clear(bb->z);
@@ -2711,7 +2717,7 @@ number nlFarey(number nN, number nP, const coeffs r)
 
 number nlExtGcd(number a, number b, number *s, number *t, const coeffs)
 {
-  mpz_t aa,bb;
+  mpz_ptr aa,bb;
   *s=ALLOC_RNUMBER();
   mpz_init((*s)->z); (*s)->s=3;
   (*t)=ALLOC_RNUMBER();
@@ -2725,26 +2731,36 @@ number nlExtGcd(number a, number b, number *s, number *t, const coeffs)
   #endif
   if (SR_HDL(a) & SR_INT)
   {
+    aa=(mpz_ptr)omAlloc(sizeof(mpz_t));
     mpz_init_set_si(aa,SR_TO_INT(a));
   }
   else
   {
-    mpz_init_set(aa,a->z);
+    aa=a->z;
   }
   if (SR_HDL(b) & SR_INT)
   {
+    bb=(mpz_ptr)omAlloc(sizeof(mpz_t));
     mpz_init_set_si(bb,SR_TO_INT(b));
   }
   else
   {
-    mpz_init_set(bb,b->z);
+    bb=b->z;
   }
   mpz_gcdext(g->z,(*s)->z,(*t)->z,aa,bb);
-  mpz_clear(aa);
-  mpz_clear(bb);
+  g=nlShort3(g);
   (*s)=nlShort3((*s));
   (*t)=nlShort3((*t));
-  g=nlShort3(g);
+  if (SR_HDL(a) & SR_INT)
+  {
+    mpz_clear(aa);
+    omFreeSize(aa, sizeof(mpz_t));
+  }
+  if (SR_HDL(b) & SR_INT)
+  {
+    mpz_clear(bb);
+    omFreeSize(bb, sizeof(mpz_t));
+  }
   return g;
 }
 
@@ -3119,7 +3135,7 @@ static number nlLcm(number a,number b,const coeffs r)
 {
   number g=nlGcd(a,b,r);
   number n1=nlMult(a,b,r);
-  number n2=nlDiv(n1,g,r);
+  number n2=nlIntDiv(n1,g,r);
   nlDelete(&g,r);
   nlDelete(&n1,r);
   return n2;
