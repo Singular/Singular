@@ -292,7 +292,10 @@ BOOLEAN iiCheckTypes(leftv args,/// < [in] argument list (may be NULL)
 
 BOOLEAN iiBranchTo(leftv r, leftv args);
 
+lists rDecompose(const ring r);
+
 #ifdef SINGULAR_4_1
+lists rDecompose_list_cf(const ring r);
 BOOLEAN rDecompose_CF(leftv res,const coeffs C);
 #endif
 #endif

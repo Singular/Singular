@@ -1689,7 +1689,7 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   // ----------------------------------------
 }
 #ifdef SINGULAR_4_1
-static void rDecomposeC(leftv h,const coeffs C)
+static void rDecomposeC_41(leftv h,const coeffs C)
 /* field is R or C */
 {
   lists L=(lists)omAlloc0Bin(slists_bin);
@@ -1723,7 +1723,7 @@ static void rDecomposeC(leftv h,const coeffs C)
   }
   // ----------------------------------------
 }
-#else
+#endif
 static void rDecomposeC(leftv h,const ring R)
 /* field is R or C */
 {
@@ -1758,11 +1758,10 @@ static void rDecomposeC(leftv h,const ring R)
   }
   // ----------------------------------------
 }
-#endif
 
 #ifdef SINGULAR_4_1
 #ifdef HAVE_RINGS
-void rDecomposeRing(leftv h,const coeffs C)
+void rDecomposeRing_41(leftv h,const coeffs C)
 /* field is R or C */
 {
   lists L=(lists)omAlloc0Bin(slists_bin);
@@ -1789,7 +1788,8 @@ void rDecomposeRing(leftv h,const coeffs C)
   L->m[1].data=(void *)LL;
 }
 #endif
-#else
+#endif
+
 #ifdef HAVE_RINGS
 void rDecomposeRing(leftv h,const ring R)
 /* field is R or C */
@@ -1818,7 +1818,6 @@ void rDecomposeRing(leftv h,const ring R)
   L->m[1].data=(void *)LL;
 }
 #endif
-#endif
 
 
 #ifdef SINGULAR_4_1
@@ -1834,12 +1833,12 @@ BOOLEAN rDecompose_CF(leftv res,const coeffs C)
   }
   if (nCoeff_is_numeric(C))
   {
-    rDecomposeC(res,C);
+    rDecomposeC_41(res,C);
   }
 #ifdef HAVE_RINGS
   else if (nCoeff_is_Ring(C))
   {
-    rDecomposeRing(res,C);
+    rDecomposeRing_41(res,C);
   }
 #endif
   else if ( C->extRing!=NULL )// nCoeff_is_algExt(r->cf))
@@ -1895,7 +1894,7 @@ BOOLEAN rDecompose_CF(leftv res,const coeffs C)
 #endif
 
 #ifdef SINGULAR_4_1
-lists rDecompose(const ring r)
+lists rDecompose_list_cf(const ring r)
 {
   assume( r != NULL );
   const coeffs C = r->cf;
@@ -2028,7 +2027,6 @@ lists rDecompose(const ring r)
 }
 #endif
 
-#ifndef SINGULAR_4_1
 lists rDecompose(const ring r)
 {
   assume( r != NULL );
@@ -2215,7 +2213,6 @@ lists rDecompose(const ring r)
 #endif
   return L;
 }
-#endif
 
 void rComposeC(lists L, ring R)
 /* field is R or C */

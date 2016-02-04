@@ -93,7 +93,6 @@
 #include <unistd.h>
 #include <vector>
 
-lists rDecompose(const ring r);
 ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
 
 
@@ -4852,6 +4851,13 @@ static BOOLEAN jjRINGLIST_C(leftv res, leftv v)
   if (r!=NULL)
     return rDecompose_CF(res,r);
   return TRUE;
+}
+static BOOLEAN jjRING_LIST(leftv res, leftv v)
+{
+  ring r=(ring)v->Data();
+  if (r!=NULL)
+    res->data = (char *)rDecompose_list_cf((ring)v->Data());
+  return (r==NULL)||(res->data==NULL);
 }
 #endif
 static BOOLEAN jjROWS(leftv res, leftv v)
