@@ -1589,6 +1589,29 @@ number _nlNeg_NoImm(number a)
   return a;
 }
 
+#define MIN_GCD_LEN 3
+#define GCD_NORM_COND(OLD,NEW) (mpz_size1(NEW->z)>mpz_size1(OLD->z))
+
+static void nlNormalize_Gcd(number &x)
+{
+  mpz_t gcd;
+  mpz_init(gcd);
+  mpz_gcd(gcd,x->z,x->n);
+  x->s=1;
+  if (mpz_cmp_si(gcd,(long)1)!=0)
+  {
+    MPZ_EXACTDIV(x->z,x->z,gcd);
+    MPZ_EXACTDIV(x->n,x->n,gcd);
+    if (mpz_cmp_si(x->n,(long)1)==0)
+    {
+      mpz_clear(x->n);
+      x->s=3;
+      x=nlShort3_noinline(x);
+    }
+  }
+  mpz_clear(gcd);
+}
+
 number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
 {
   number u=ALLOC_RNUMBER();
@@ -1627,7 +1650,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           return INT_TO_SR(1);
         }
         mpz_init_set(u->n,b->n);
-        u->s = 0;
+        if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
+        else u->s = 0;
         break;
       }
       case 3:
@@ -1683,7 +1707,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
                FREE_RNUMBER(u);
                return INT_TO_SR(1);
             }
-            u->s = 0;
+            if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
+            else u->s = 0;
             break;
           }
           case 3: /* a:1 b:3 */
@@ -1703,7 +1728,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
               return INT_TO_SR(1);
             }
             mpz_init_set(u->n,a->n);
-            u->s = 0;
+            if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
+            else u->s = 0;
             break;
           }
         } /*switch (b->s) */
@@ -1731,7 +1757,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
               return INT_TO_SR(1);
             }
             mpz_init_set(u->n,b->n);
-            u->s = 0;
+            if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
+            else u->s = 0;
             break;
           }
           case 3:
@@ -1769,8 +1796,7 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
         mpz_mul_si(x,a->n,SR_TO_INT(b));
         mpz_add(a->z,a->z,x);
         mpz_clear(x);
-        a->s = 0;
-        a=nlShort1(a);
+        nlNormalize_Gcd(a);
         break;
       }
       case 3:
@@ -1806,8 +1832,8 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
         mpz_clear(x);
         // result cannot be 0, if coeffs are normalized
         mpz_init_set(u->n,b->n);
-        u->s = 0;
-        u=nlShort1(u);
+        if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
+        else { u->s = 0; u=nlShort1(u); }
         break;
       }
       case 3:
@@ -1846,7 +1872,8 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
             mpz_clear(x);
             mpz_clear(y);
             mpz_mul(a->n,a->n,b->n);
-            a->s = 0;
+            if (GCD_NORM_COND(b,a)) { nlNormalize_Gcd(a); }
+            else { a->s = 0;a=nlShort1(a);}
             break;
           }
           case 3: /* a:1 b:3 */
@@ -1856,11 +1883,11 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
             mpz_mul(x,b->z,a->n);
             mpz_add(a->z,a->z,x);
             mpz_clear(x);
-            a->s = 0;
+            if (GCD_NORM_COND(b,a)) { nlNormalize_Gcd(a); }
+            else { a->s = 0; a=nlShort1(a);}
             break;
           }
         } /*switch (b->s) */
-        a=nlShort1(a);
         break;
       }
       case 3:
@@ -1876,8 +1903,8 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
             mpz_add(a->z,b->z,x);
             mpz_clear(x);
             mpz_init_set(a->n,b->n);
-            a->s = 0;
-            a=nlShort1(a);
+            if (GCD_NORM_COND(b,a)) { nlNormalize_Gcd(a); }
+            else { a->s = 0; a=nlShort1(a);}
             break;
           }
           case 3:
@@ -1926,7 +1953,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
           return INT_TO_SR(1);
         }
         mpz_init_set(u->n,b->n);
-        u->s = 0;
+        if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
+        else u->s = 0;
         break;
       }
       case 3:
@@ -1978,7 +2006,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
           return INT_TO_SR(1);
         }
         mpz_init_set(u->n,a->n);
-        u->s = 0;
+        if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
+        else u->s = 0;
         break;
       }
       case 3:
@@ -2039,7 +2068,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
               FREE_RNUMBER(u);
               return INT_TO_SR(1);
             }
-            u->s = 0;
+            if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
+            else u->s = 0;
             break;
           }
           case 3: /* a:1, b:3 */
@@ -2062,7 +2092,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
               return INT_TO_SR(1);
             }
             mpz_init_set(u->n,a->n);
-            u->s = 0;
+            if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
+            else u->s = 0;
             break;
           }
         }
@@ -2093,7 +2124,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
               return INT_TO_SR(1);
             }
             mpz_init_set(u->n,b->n);
-            u->s = 0;
+            if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
+            else u->s = 0;
             break;
           }
           case 3: /* a:3 , b:3 */
@@ -2176,6 +2208,7 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
         return INT_TO_SR(1);
       }
       mpz_init_set(u->n,b->n);
+      if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
     }
     else //u->s==3
     {
@@ -2201,6 +2234,7 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
           return INT_TO_SR(1);
         }
         mpz_init_set(u->n,b->n);
+        if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
       }
     }
     else
@@ -2214,6 +2248,7 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
           return INT_TO_SR(1);
         }
         mpz_init_set(u->n,a->n);
+        if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
       }
       else
       {
@@ -2226,6 +2261,7 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
           FREE_RNUMBER(u);
           return INT_TO_SR(1);
         }
+        if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
       }
     }
   }
