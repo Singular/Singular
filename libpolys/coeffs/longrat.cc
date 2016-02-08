@@ -1589,7 +1589,7 @@ number _nlNeg_NoImm(number a)
   return a;
 }
 
-#define MIN_GCD_LEN 3
+// conditio to use nlNormalize_Gcd in intermediate computations:
 #define GCD_NORM_COND(OLD,NEW) (mpz_size1(NEW->z)>mpz_size1(OLD->z))
 
 static void nlNormalize_Gcd(number &x)

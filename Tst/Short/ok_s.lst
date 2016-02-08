@@ -7,6 +7,7 @@ bug_newstruct
 bug_qring2
 bug_ring
 bug_ringlist
+bug_ssi_algring
 bug_tr237
 ; do not try bug_tr276 without 2.2 GB RAM free
 ; bug_tr276
