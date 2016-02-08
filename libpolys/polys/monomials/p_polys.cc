@@ -1377,7 +1377,7 @@ const char * p_Read(const char *st, poly &rc, const ring r)
     {
       const char *s_save=s;
       s = eati(s,&i);
-      if (((unsigned long)i) >  r->bitmask)
+      if (((unsigned long)i) >  r->bitmask/2)
       {
         // exponent to large: it is not a monomial
         p_LmDelete(&rc,r);
