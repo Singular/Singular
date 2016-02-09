@@ -514,8 +514,7 @@ libraries. Furthermore, redirect @code{stderr}
 (all error messages) to @code{stdout} (normal output channel).  This
 option should be used if @sc{Singular}'s output is redirected to a file.
 
-@item @code{-v}, @code{--verbose}
-@cindex --verbose
+@item @code{-v}
 @cindex -v
 Print extended information about the version and configuration of
 @sc{Singular}  (used optional parts, compilation date, start of random
