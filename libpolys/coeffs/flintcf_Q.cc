@@ -390,11 +390,9 @@ static BOOLEAN IsMOne (number k, const coeffs r)
 }
 static BOOLEAN GreaterZero (number k, const coeffs r)
 {
-  int l=fmpq_poly_length((fmpq_poly_ptr)k);
-  mpq_t m;
-  mpq_init(m);
-  fmpq_poly_get_coeff_mpq(m,(fmpq_poly_ptr)k,l);
-  return (mpq_cmp_si(m,0,1)>0);
+  // does it have a leading sign?
+  // no: 0 and 1 do not have, everything else is in (...)
+  return TRUE;
 }
 static void Power(number a, int i, number * result, const coeffs r)
 {
@@ -502,7 +500,7 @@ static CanonicalForm ConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs 
 }
 char * CoeffName(const coeffs r)
 {
-  return (char*)"flintQ[x]";
+  return (char*)"flint:Q[a]";
 }
 static char* CoeffString(const coeffs r)
 {
