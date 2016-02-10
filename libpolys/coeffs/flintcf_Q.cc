@@ -500,6 +500,14 @@ static CanonicalForm ConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs 
 {
   WerrorS("not yet: ConvSingNFactoryN");
 }
+char * CoeffName(const coeffs r)
+{
+  return (char*)"flintQ[x]";
+}
+static char* CoeffString(const coeffs r)
+{
+  return omStrDup(CoeffName(r));
+}
 #ifdef LDEBUG
 static BOOLEAN DBTest(number a, const char *f, const int l, const coeffs r)
 {
@@ -508,6 +516,8 @@ static BOOLEAN DBTest(number a, const char *f, const int l, const coeffs r)
 #endif
 BOOLEAN flintQ_InitChar(coeffs cf, void * infoStruct)
 {
+  cf->cfCoeffString  = CoeffString;
+  cf->cfCoeffName    = CoeffName;
   cf->cfCoeffWrite   = CoeffWrite;
   cf->nCoeffIsEqual  = CoeffIsEqual;
   cf->cfKillChar     = KillChar;
