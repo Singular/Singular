@@ -298,6 +298,7 @@ int iiTestConvert (int inputType, int outputType)
   {
     return -1;
   }
+  if (inputType==UNKNOWN) return 0;
 
   // search the list
   int i=0;

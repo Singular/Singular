@@ -488,6 +488,7 @@ int iiTestConvert (int inputType, int outputType,struct sConvertTypes *dConvertT
   {
     return -1;
   }
+  if (inputType==UNKNOWN) return 0;
 
   if ((currRing==NULL) && (outputType>BEGIN_RING) && (outputType<END_RING))
     return 0;
