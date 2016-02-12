@@ -385,7 +385,7 @@ static number nlConvFactoryNSingN( const CanonicalForm f, const coeffs r)
   }
   else
   {
-    number z = ALLOC_RNUMBER(); //Q!? // (number)omAllocBin(rnumber_bin);
+    number z = ALLOC_RNUMBER();
 #if defined(LDEBUG)
     z->debug=123456;
 #endif
@@ -398,8 +398,7 @@ static number nlConvFactoryNSingN( const CanonicalForm f, const coeffs r)
     else
     {
       gmp_denominator( f, z->n );
-      z->s = 0;
-      nlNormalize(z,r);
+      z->s = 1;
     }
     return z;
   }
