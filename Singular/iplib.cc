@@ -1125,7 +1125,7 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
       }
       else
       {
-        Warn("// ** loaded %s for a different version of Singular(expected: %d, got %d)",fullname,MAX_TOK,ver);
+        Warn("loaded %s for a different version of Singular(expected MAX_TOK: %d, got %d)",fullname,MAX_TOK,ver);
       }
       currPack->loaded=1;
       currPack=s;
