@@ -3366,7 +3366,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             res->data=(char *)singntl_HNF((intvec*)h->Data());
             return FALSE;
           }
-          else return TRUE;
+          else if (h->Typ()==INTMAT_CMD)
+          {
+            res->data=(char *)singntl_HNF((intvec*)h->Data());
+            return FALSE;
+          }
+          else
+	  {
+	    WerrorS("expected `system(\"HNF\",<matrix|intmat|bigintmat>)`");
+	    return TRUE;
+	  }
         }
         else return TRUE;
       }

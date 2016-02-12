@@ -50,6 +50,7 @@ ideal singclap_sqrfree ( poly f, intvec ** v , int with_exps, const ring r );
 
 matrix  singntl_HNF(matrix A, const ring r);
 intvec* singntl_HNF(intvec* A);
+bigintmat* singntl_HNF(bigintmat* A);
 matrix  singntl_LLL(matrix A, const ring r);
 intvec* singntl_LLL(intvec* A);
 
