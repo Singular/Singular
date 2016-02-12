@@ -391,13 +391,16 @@ static number nlConvFactoryNSingN( const CanonicalForm f, const coeffs r)
 #endif
     gmp_numerator( f, z->z );
     if ( f.den().isOne() )
+    {
       z->s = 3;
+      z=nlShort3(z);
+    }
     else
     {
       gmp_denominator( f, z->n );
       z->s = 0;
+      nlNormalize(z,r);
     }
-    nlNormalize(z,r);
     return z;
   }
 }
@@ -1249,6 +1252,49 @@ number nlGcd(number a, number b, const coeffs r)
   nlTest(result, r);
   return result;
 }
+static int int_extgcd(int a, int b, int * u, int* x, int * v, int* y)
+{
+  int q, r;
+  if (a==0)
+  {
+    *u = 0;
+    *v = 1;
+    *x = -1;
+    *y = 0;
+    return b;
+  }
+  if (b==0)
+  {
+    *u = 1;
+    *v = 0;
+    *x = 0;
+    *y = 1;
+    return a;
+  }
+  *u=1;
+  *v=0;
+  *x=0;
+  *y=1;
+  do
+  {
+    q = a/b;
+    r = a%b;
+    assume (q*b+r == a);
+    a = b;
+    b = r;
+
+    r = -(*v)*q+(*u);
+    (*u) =(*v);
+    (*v) = r;
+
+    r = -(*y)*q+(*x);
+    (*x) = (*y);
+    (*y) = r;
+  } while (b);
+
+  return a;
+}
+
 //number nlGcd_dummy(number a, number b, const coeffs r)
 //{
 //  extern char my_yylinebuf[80];
@@ -2627,6 +2673,110 @@ static number nlInitMPZ(mpz_t m, const coeffs)
   return z;
 }
 
+number  nlXExtGcd (number a, number b, number *s, number *t, number *u, number *v, const coeffs r)
+{
+  if (SR_HDL(a) & SR_HDL(b) & SR_INT)
+  {
+    int uu, vv, x, y;
+    int g = int_extgcd(SR_TO_INT(a), SR_TO_INT(b), &uu, &vv, &x, &y);
+    *s = INT_TO_SR(uu);
+    *t = INT_TO_SR(vv);
+    *u = INT_TO_SR(x);
+    *v = INT_TO_SR(y);
+    return INT_TO_SR(g);
+  }
+  else
+  {
+    mpz_t aa, bb;
+    if (SR_HDL(a) & SR_INT)
+    {
+      mpz_init_set_si(aa, SR_TO_INT(a));
+    }
+    else
+    {
+      mpz_init_set(aa, a->z);
+    }
+    if (SR_HDL(b) & SR_INT)
+    {
+      mpz_init_set_si(bb, SR_TO_INT(b));
+    }
+    else
+    {
+      mpz_init_set(bb, b->z);
+    }
+    mpz_t erg; mpz_t bs; mpz_t bt;
+    mpz_init(erg);
+    mpz_init(bs);
+    mpz_init(bt);
+
+    mpz_gcdext(erg, bs, bt, aa, bb);
+
+    mpz_div(aa, aa, erg);
+    *u=nlInitMPZ(bb,r);
+    *u=nlNeg(*u,r);
+    *v=nlInitMPZ(aa,r);
+
+    mpz_clear(aa);
+    mpz_clear(bb);
+
+    *s = nlInitMPZ(bs,r);
+    *t = nlInitMPZ(bt,r);
+    return nlInitMPZ(erg,r);
+  }
+}
+
+number nlQuotRem (number a, number b, number * r, const coeffs R)
+{
+  assume(SR_TO_INT(b)!=0);
+  if (SR_HDL(a) & SR_HDL(b) & SR_INT)
+  {
+    if (r!=NULL)
+      *r = INT_TO_SR(SR_TO_INT(a) % SR_TO_INT(b));
+    return INT_TO_SR(SR_TO_INT(a)/SR_TO_INT(b));
+  }
+  else if (SR_HDL(a) & SR_INT)
+  {
+    // -2^xx / 2^xx
+    if ((a==INT_TO_SR(-(POW_2_28)))&&(b==INT_TO_SR(-1L)))
+    {
+      if (r!=NULL) *r=INT_TO_SR(0);
+      return nlRInit(POW_2_28);
+    }
+    //a is small, b is not, so q=0, r=a
+    if (r!=NULL)
+      *r = a;
+    return INT_TO_SR(0);
+  }
+  else if (SR_HDL(b) & SR_INT)
+  {
+    unsigned long rr;
+    mpz_t qq;
+    mpz_init(qq);
+    mpz_t rrr;
+    mpz_init(rrr);
+    rr = mpz_divmod_ui(qq, rrr, a->z, (unsigned long)ABS(SR_TO_INT(b)));
+    mpz_clear(rrr);
+
+    if (r!=NULL)
+      *r = INT_TO_SR(rr);
+    if (SR_TO_INT(b)<0)
+    {
+      mpz_mul_si(qq, qq, -1);
+    }
+    return nlInitMPZ(qq,R);
+  }
+  mpz_t qq,rr;
+  mpz_init(qq);
+  mpz_init(rr);
+  mpz_divmod(qq, rr, a->z, b->z);
+  if (r!=NULL)
+    *r = nlInitMPZ(rr,R);
+  else
+  {
+    mpz_clear(rr);
+  }
+  return nlInitMPZ(qq,R);
+}
 
 void nlInpGcd(number &a, number b, const coeffs r)
 {
@@ -3228,6 +3378,8 @@ BOOLEAN nlInitChar(coeffs r, void*p)
     r->cfGetUnit = nlGetUnit;
     r->cfQuot1 = nlQuot1;
     r->cfLcm = nlLcm;
+    r->cfXExtGcd=nlXExtGcd;
+    r->cfQuotRem=nlQuotRem;
   }
   r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;

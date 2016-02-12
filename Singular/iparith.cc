@@ -3772,6 +3772,13 @@ static BOOLEAN jjBAREISS(leftv res, leftv v)
 //  res->data = (char *)m;
 //  return FALSE;
 //}
+static BOOLEAN jjBAREISS_BIM(leftv res, leftv v)
+{
+  bigintmat *b=(bigintmat*)v->CopyD(BIGINTMAT_CMD);
+  b->hnf();
+  res->data=(char*)b;
+  return FALSE;
+}
 static BOOLEAN jjBI2N(leftv res, leftv u)
 {
   BOOLEAN bo=FALSE;
