@@ -324,6 +324,11 @@ static const char* GetIdString(idhdl h)
         for (i=0; i<nl; i++)
           if (GetIdString((idhdl) &(l->m[i])) == NULL) return NULL;
       }
+      #ifdef SINGULAR_4_1
+      case CRING_CMD:
+      case CNUMBER_CMD:
+      case CMATRIX_CMD:
+      #endif
       case PACKAGE_CMD:
       case INT_CMD:
       case INTVEC_CMD:
@@ -338,17 +343,10 @@ static const char* GetIdString(idhdl h)
       case VECTOR_CMD:
       case MODUL_CMD:
       case MATRIX_CMD:
-      #ifdef SINGULAR_4_1
-      case CNUMBER_CMD:
-      case CMATRIX_CMD:
-      #endif
         return Tok2Cmdname(type);
 
       case MAP_CMD:
       case LINK_CMD:
-      #ifdef SINGULAR_4_1
-      case CRING_CMD:
-      #endif
         return NULL;
 
       default:
