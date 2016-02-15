@@ -128,16 +128,6 @@ ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
 
 static BOOLEAN check_valid(const int p, const int op);
 
-#ifdef SINGULAR_4_1
-// helper routine to catch all library/test parts which need to be changed
-// shall go away after the transition
-static void iiReWrite(const char *s)
-{
-  Print("please rewrite the use of >>%s<< in >>%s<<\n"
-        "%s is depreciated or changed in Singular 4-1\n",s,my_yylinebuf,s);
-}
-#endif
-
 /*=============== types =====================*/
 struct sValCmdTab
 {
@@ -4002,6 +3992,26 @@ static BOOLEAN jjDET_BI(leftv res, leftv v)
   }
   return FALSE;
 }
+#ifdef SINGULAR_4_1
+static BOOLEAN jjDET_N2(leftv res, leftv v)
+{
+  bigintmat * m=(bigintmat*)v->Data();
+  number2 r=(number2)omAlloc0(sizeof(*r));
+  int i,j;
+  i=m->rows();j=m->cols();
+  if(i==j)
+  {
+    r->n=m->det();
+    r->cf=m->basecoeffs();
+  }
+  else
+  {
+    Werror("det of %d x %d cmatrix",i,j);
+    return TRUE;
+  }
+  return FALSE;
+}
+#endif
 static BOOLEAN jjDET_I(leftv res, leftv v)
 {
   intvec * m=(intvec*)v->Data();
@@ -5400,9 +5410,6 @@ static BOOLEAN jjidVec2Ideal(leftv res, leftv v)
 }
 static BOOLEAN jjrCharStr(leftv res, leftv v)
 {
-#ifdef SINGULAR_4_1
-  iiReWrite("charstr");
-#endif
   res->data = rCharStr((ring)v->Data());
   return FALSE;
 }
@@ -5444,25 +5451,16 @@ static BOOLEAN jjmpTransp(leftv res, leftv v)
 }
 static BOOLEAN jjrOrdStr(leftv res, leftv v)
 {
-#ifdef SINGULAR_4_1
-  iiReWrite("ordstr");
-#endif
   res->data = rOrdStr((ring)v->Data());
   return FALSE;
 }
 static BOOLEAN jjrVarStr(leftv res, leftv v)
 {
-#ifdef SINGULAR_4_1
-  iiReWrite("varstr");
-#endif
   res->data = rVarStr((ring)v->Data());
   return FALSE;
 }
 static BOOLEAN jjrParStr(leftv res, leftv v)
 {
-#ifdef SINGULAR_4_1
-  iiReWrite("varstr");
-#endif
   res->data = rParStr((ring)v->Data());
   return FALSE;
 }
