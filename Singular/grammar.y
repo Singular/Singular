@@ -167,7 +167,6 @@ void yyerror(const char * fmt)
 #endif
   )
   {
-    //Werror("leaving %s (line %d)",VoiceName(), currentVoice->curr_lineno);
     Werror("leaving %s",VoiceName());
   }
 }
@@ -680,12 +679,13 @@ expr:   expr_arithmetic
           }
         | elemexpr       { $$ = $1; }
         | '(' exprlist ')'    { $$ = $2; }
-        | expr '[' exprlist ']'
+        | expr '[' expr ',' expr ']'
           {
-            ($1).next = (leftv)omAllocBin(sleftv_bin);
-            memcpy(($1).next,&($3),sizeof(sleftv));
-	    memset(&($3),0,sizeof(sleftv));
-            if(iiExprArithM(&$$,&$1,'[')) YYERROR;
+            if(iiExprArith3(&$$,'[',&$1,&$3,&$5)) YYERROR;
+          }
+        | expr '[' expr ']'
+          {
+            if(iiExprArith2(&$$,&$1,'[',&$3)) YYERROR;
           }
         | APPLY '('  expr ',' CMD_1 ')'
           {
