@@ -1447,7 +1447,7 @@ BOOLEAN ssiWrite(si_link l, leftv data)
                         else
                         {
                           ideal M=(ideal)dd;
-                          fprintf(d->f_write,"10 %d ",M->rank);
+                          fprintf(d->f_write,"10 %d ",(int)M->rank);
                         }
                         ssiWriteIdeal(d,tt,(ideal)dd);
                         break;
