@@ -7398,6 +7398,41 @@ static BOOLEAN jjJET4(leftv res, leftv u)
     return TRUE;
   }
 }
+static BOOLEAN jjBRACKET_PL(leftv res, leftv u)
+{
+  int ut=u->Typ();
+  leftv v=u->next; u->next=NULL;
+  leftv w=v->next; v->next=NULL;
+  if ((ut!=CRING_CMD)&&(ut!=RING_CMD))
+  {
+    BOOLEAN bo=TRUE;
+    if (w==NULL)
+    {
+      bo=iiExprArith2(res,u,'[',v);
+    }
+    else if (w->next==NULL)
+    {
+      bo=iiExprArith3(res,'[',u,v,w);
+    }
+    v->next=w;
+    u->next=v;
+    return bo;
+  }
+  v->next=w;
+  u->next=v;
+  #ifdef SINGULAR_4_1
+  // construct new rings:
+  while (u!=NULL)
+  {
+    Print("name: %s,\n",u->Name());
+    u=u->next;
+  }
+  #else
+  memset(res,0,sizeof(sleftv));
+  res->rtyp=NONE;
+  return TRUE;
+  #endif
+}
 static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
 {
   if ((yyInRingConstruction)

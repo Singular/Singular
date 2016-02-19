@@ -816,12 +816,13 @@ struct sValCmd3 dArith3[]=
 ,{NULL_VAL,            0,          0,          0,          0,          0        , NO_PLURAL |NO_RING}
 };
 /*=================== operations with many arg.: table =================*/
-/* number_of_args:  -1: any), -2: any >0, .. */
+/* number_of_args:  -1: any, -2: any >0, .. */
 struct sValCmdM dArithM[]=
 {
 // operations:
 // proc            cmd               res        number_of_args   context
  {D(jjKLAMMER_PL),  '(',           ANY_TYPE,           -2      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjBRACKET_PL),  '[',           ANY_TYPE,           -2      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBREAK0),    BREAKPOINT_CMD,  NONE,               0       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBREAK1),    BREAKPOINT_CMD,  NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(iiBranchTo),  BRANCHTO_CMD,    NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
