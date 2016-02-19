@@ -7398,6 +7398,43 @@ static BOOLEAN jjJET4(leftv res, leftv u)
     return TRUE;
   }
 }
+#if 0
+static BOOLEAN jjBRACKET_PL(leftv res, leftv u)
+{
+  int ut=u->Typ();
+  leftv v=u->next; u->next=NULL;
+  leftv w=v->next; v->next=NULL;
+  if ((ut!=CRING_CMD)&&(ut!=RING_CMD))
+  {
+    BOOLEAN bo=TRUE;
+    if (w==NULL)
+    {
+      bo=iiExprArith2(res,u,'[',v);
+    }
+    else if (w->next==NULL)
+    {
+      bo=iiExprArith3(res,'[',u,v,w);
+    }
+    v->next=w;
+    u->next=v;
+    return bo;
+  }
+  v->next=w;
+  u->next=v;
+  #ifdef SINGULAR_4_1
+  // construct new rings:
+  while (u!=NULL)
+  {
+    Print("name: %s,\n",u->Name());
+    u=u->next;
+  }
+  #else
+  memset(res,0,sizeof(sleftv));
+  res->rtyp=NONE;
+  return TRUE;
+  #endif
+}
+#endif
 static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
 {
   if ((yyInRingConstruction)
@@ -8696,7 +8733,6 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
       }
       else          return TRUE;
     }
-    BOOLEAN failed=FALSE;
     int args=0;
     if (a!=NULL) args=a->listLength();
 
@@ -8716,13 +8752,13 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
         }
         if (traceit&TRACE_CALL)
           Print("call %s(... (%d args))\n", iiTwoOps(op),args);
-        if ((failed=dArithM[i].p(res,a))==TRUE)
+        if (dArithM[i].p(res,a))
         {
           break;// leave loop, goto error handling
         }
         if (a!=NULL) a->CleanUp();
         //Print("op: %d,result typ:%d\n",op,res->rtyp);
-        return failed;
+        return FALSE;
       }
       i++;
     }
