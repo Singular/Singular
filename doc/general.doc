@@ -760,12 +760,11 @@ interactive customization of nearly all aspects of the user-interface.
 In order to use the @sc{Singular}-Emacs interface you need to have Emacs version
 20 or higher, or XEmacs
 version 20.3 or higher installed on your system. These
-editors can be downloaded for most hard- and software platforms
-(including Windows
-95/98/NT, but excluding the Macintosh), from either
-@uref{http://www.gnu.org/software/emacs/emacs.html} (Emacs), from
-@uref{http://www.xemacs.org} (XEmacs), or from our ftp site at
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}. The
+editors can be downloaded for most hard- and software platforms,
+sources from either
+@uref{http://www.gnu.org/software/emacs/emacs.html} (Emacs), or from
+@uref{http://www.xemacs.org} (XEmacs).
+(Download of binaries depend on your OS). The
 differences between Emacs and XEmacs w.r.t. the  @sc{Singular}-Emacs
 interface are marginal -- which editor to use is mainly a matter of personal
 preferences.
@@ -929,8 +928,7 @@ Emacs. Both ways are described in more detail below.
 Note: To properly run the Emacs interface, several files are needed
 which usually reside in the @code{emacs} subdirectory of your
 @sc{Singular} distribution. This directory is called
-singular-emacs-home-directory in the following. Under Windows, the full @sc{Singular}
-installation comes with (x)emacs and will create an ESingular startup icon on your desktop
+singular-emacs-home-directory in the following.
 
 @subheading Starting the interface using ESingular
 
