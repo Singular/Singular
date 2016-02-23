@@ -3521,7 +3521,7 @@ int main( int argc, char *argv[] )
   yylplex(argv[0], argv[0], &lib_style,NULL);
   if(yylp_errno)
   {
-    printf("ERROR occured: [%d] ", yylp_errno);
+    printf("ERROR occurred: [%d] ", yylp_errno);
     printf(yylp_errlist[yylp_errno], yylplineno);
     printf("\n");
   }

@@ -179,7 +179,7 @@ do                                                                            \
   omError_t _status = cond;                                                   \
   if (_status && (_status != omError_MaxError))                               \
   {                                                                           \
-    _omPrintAddrInfo(stderr, _status, addr, bin_size, flags, 10, "  occured for"); \
+    _omPrintAddrInfo(stderr, _status, addr, bin_size, flags, 10, "  occurred for"); \
     return _status;                                                           \
   }                                                                           \
 } while (0)

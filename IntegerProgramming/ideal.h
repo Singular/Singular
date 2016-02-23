@@ -118,7 +118,7 @@ private:
   // occurred:
   // -1 indicates a "semantic" error (which occurs e.g. if some constructor
   //    argument is out of range)
-  // -2 indicates an error occured when reading from a file
+  // -2 indicates an error occurred when reading from a file
   // -3 indicates an overflow of an integer type variable
 
 

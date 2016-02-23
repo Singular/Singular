@@ -185,7 +185,7 @@
 
        makes sure that all poly operations in your file are done with
        PDEBUG == 2
- To break after an error occured, set a debugger breakpoint on
+ To break after an error occurred, set a debugger breakpoint on
  dErrorBreak.
 */
 #ifndef PDEBUG
@@ -249,7 +249,7 @@
 
    Some tips on possible values of OM_TRACK, OM_CHECK, OM_KEEP:
    + To find out about an address that has been freed twice, first locate the
-     file(s) where the error occured, and then at the beginning of these files:
+     file(s) where the error occurred, and then at the beginning of these files:
        #define OM_CHECK 3
        #define OM_TRACK 5
        #define OM_KEEP  1
@@ -257,7 +257,7 @@
        #include <omalloc/omalloc.h>
      Under dynamic scope, do (e.g., from within the debugger):
        om_Opts.MinCheck = 3; om_Opts.MinTrack = 5; omOpts.Keep = LONG_MAX;
-   + to find out where "memory corruption" occured, increase value of
+   + to find out where "memory corruption" occurred, increase value of
      OM_CHECK - the higher this value is, the more consistency checks are
      done (However a value > 3 checks the entire memory each time an omalloc
      routine is used!)
@@ -279,7 +279,7 @@
    + if OM_CHECK and OM_TRACK are both undefined (or 0), or if OM_NDEBUG is
      defined, then the "real" alloc/realloc/free macros are used, and all
      omTest, omDebug and omCheck routines are undefined
-   + to break after an omError occured within a debugger,
+   + to break after an omError occurred within a debugger,
      set a breakpoint on dErrorBreak
    + to do checks from within the debugger, or to do checks with explicit
      check level, use omTest routines.

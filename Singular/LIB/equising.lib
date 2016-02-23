@@ -1765,9 +1765,9 @@ EXAMPLE: example esIdeal; shows examples.
   dbprint(i_print,"// finished");
   dbprint(i_print,"// ");
 
-  if (M[2]==1) // error occured during esStratum computation
+  if (M[2]==1) // error occurred during esStratum computation
   {
-    print("Some error has occured during the computation");
+    print("Some error has occurred during the computation");
     return(list(0,0));
   }
 
@@ -1914,14 +1914,14 @@ RETURN:  list l: either consisting of a list and an integer, where
   l[1][2]=ideal defining the part of the equisingularity stratum where all
           equimultiple sections through the non-nodes of the reduced total
           transform are trivial sections
-  l[2]=1 if some error has occured,  l[2]=0 otherwise;
+  l[2]=1 if some error has occurred,  l[2]=0 otherwise;
 @end format
 or consisting of a ring and an integer, where
 @format
   l[1]=ESSring is a ring extension of basering containing the ideal ES
         (describing the ES-stratum), the ideal ES_all_triv (describing the
         part with trival equimultiple sections) and the polynomial p_F=F,
-  l[2]=1 if some error has occured,  l[2]=0 otherwise.
+  l[2]=1 if some error has occurred,  l[2]=0 otherwise.
 @end format
 NOTE:    L is supposed to be the output of hnexpansion (with the given ordering
          of the variables appearing in f). @*

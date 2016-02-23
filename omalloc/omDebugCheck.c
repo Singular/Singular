@@ -409,7 +409,7 @@ omError_t omReportAddrError(omError_t error, omError_t report_error, void* addr,
   omReportError(error, report_error, OM_FLR_VAL, fmt, ap);
   om_CallErrorHook = 1;
 
-  _omPrintAddrInfo(stderr, error, addr, bin_size, flags, 10, " occured for");
+  _omPrintAddrInfo(stderr, error, addr, bin_size, flags, 10, " occurred for");
   om_Opts.ErrorHook();
 
   om_Opts.MaxCheck = max_check;

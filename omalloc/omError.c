@@ -114,7 +114,7 @@ omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,
     if (om_Opts.HowToReportErrors > 1)
     {
 #ifndef OM_NDEBUG
-      fprintf(stderr, "\n occured at: ");
+      fprintf(stderr, "\n occurred at: ");
       if (! _omPrintCurrentBackTrace(stderr, OM_FLR_VAL))
         fprintf(stderr, " ??");
 #endif

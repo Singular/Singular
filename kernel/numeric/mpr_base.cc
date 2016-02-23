@@ -301,7 +301,7 @@ private:
    * Linear Program finds the v-distance of the point in accords[].
    * The v-distance is the distance along the direction v to boundary of
    * Minkowski Sum of Qi (here vector v is represented by shift[]).
-   * Returns the v-distance or -1.0 if an error occured.
+   * Returns the v-distance or -1.0 if an error occurred.
    */
   mprfloat vDistance( Coord_t * acoords, int dim );
 

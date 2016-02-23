@@ -2881,7 +2881,7 @@ RETURN: list:  first entry = HNEring  (containing list hne, poly f)
                second entry = 0  if no change of base ring necessary
                               1  if change of base ring necessary
                third entry = numbers of conjugates ( if essential = 1 )
-        if some error has occured, the empty list is returned
+        if some error has occurred, the empty list is returned
 "
 {
  def altring = basering;

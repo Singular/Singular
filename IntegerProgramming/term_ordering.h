@@ -50,7 +50,7 @@ protected:
   // Also the "error flag", i.e. values <0 indicate an error:
   // -1 indicates a "semantic" error (arguments out of range, for example a
   //    negative number of variables);
-  // -2 indicates an error occured when reading from a file.
+  // -2 indicates an error occurred when reading from a file.
 
   short weighted_ordering;
   // the term ordering refining the weight on the weighted variables

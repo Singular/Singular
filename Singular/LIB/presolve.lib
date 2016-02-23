@@ -938,7 +938,7 @@ EXAMPLE: example tolessvars; shows an example
    n = size(L[1]);           // number of new variables
    if( n == 0 )
    {
-      dbprint( pr,"","// no variable occured in "+typeof(id)+", no change of ring!");
+      dbprint( pr,"","// no variable occurred in "+typeof(id)+", no change of ring!");
       return(id);
    }
    if( n == nvars(P) )

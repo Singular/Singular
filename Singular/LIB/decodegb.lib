@@ -859,7 +859,7 @@ proc errorInsert(matrix y, list pos, list val)
 "USAGE:  errorInsert(y,pos,val); y is matrix, pos,val are list of int's
 @format
         - y is a (code) word,
-        - pos = positions where errors occured,
+        - pos = positions where errors occurred,
         - val = their corresponding values
 @end format
 RETURN:  corresponding received word
