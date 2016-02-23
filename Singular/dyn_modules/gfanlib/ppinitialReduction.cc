@@ -672,7 +672,7 @@ bool ppreduceInitially(ideal &H, const number p, const ideal G, const ring r)
   {
     I->m[i]=H->m[i];
     if (pNext(I->m[i])!=NULL)
-      T.push_back(std::make_pair<int,int>(i,1));
+      T.push_back(std::pair<int,int>(i,1));
   }
 
   /***
