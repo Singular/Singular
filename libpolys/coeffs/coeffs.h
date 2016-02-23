@@ -612,6 +612,7 @@ static FORCE_INLINE number n_GetNumerator(number& n, const coeffs r)
 /// return the quotient of 'a' and 'b', i.e., a/b;
 /// raises an error if 'b' is not invertible in r
 /// exception in Z: raises an error if 'a' is not divisible by 'b'
+/// always: n_Div(a,b,r)*b+n_IntMod(a,b,r)==a
 static FORCE_INLINE number n_Div(number a, number b, const coeffs r)
 { STATISTIC(n_Div); assume(r != NULL); assume(r->cfDiv!=NULL); return r->cfDiv(a,b,r); }
 
@@ -623,7 +624,8 @@ static FORCE_INLINE number n_ExactDiv(number a, number b, const coeffs r)
 { STATISTIC(n_ExactDiv); assume(r != NULL); assume(r->cfExactDiv!=NULL); return r->cfExactDiv(a,b,r); }
 
 /// for r a field, return n_Init(0,r)
-/// otherwise: n_Div(a,b,r)*b+n_IntMod(a,b,r)==a
+/// always: n_Div(a,b,r)*b+n_IntMod(a,b,r)==a
+/// n_IntMod(a,b,r) >=0
 static FORCE_INLINE number n_IntMod(number a, number b, const coeffs r)
 { STATISTIC(n_IntMod); assume(r != NULL); return r->cfIntMod(a,b,r); }
 

@@ -159,8 +159,6 @@ static inline number nlShort3(number x) // assume x->s==3
 #define mpz_isNeg(A) ((A)->_mp_size<0)
 #define mpz_limb_size(A) ((A)->_mp_size)
 #define mpz_limb_d(A) ((A)->_mp_d)
-#define MPZ_DIV(A,B,C) mpz_tdiv_q((A),(B),(C))
-#define MPZ_EXACTDIV(A,B,C) mpz_divexact((A),(B),(C))
 
 void    _nlDelete_NoImm(number *a);
 
@@ -623,7 +621,7 @@ long nlInt(number &i, const coeffs r)
   mpz_t tmp;
   long ul;
   mpz_init(tmp);
-  MPZ_DIV(tmp,i->z,i->n);
+  mpz_tdiv_q(tmp,i->z,i->n);
   if(mpz_size1(tmp)>MP_SMALL) ul=0;
   else
   {
@@ -647,7 +645,7 @@ number nlBigInt(number &i, const coeffs r)
     return nlCopy(i,r);
   }
   number tmp=nlRInit(1);
-  MPZ_DIV(tmp->z,i->z,i->n);
+  mpz_tdiv_q(tmp->z,i->z,i->n);
   tmp=nlShort3(tmp);
   return tmp;
 }
@@ -768,7 +766,7 @@ number   nlExactDiv(number a, number b, const coeffs r)
   mpz_init(u->z);
   /* u=a/b */
   u->s = 3;
-  MPZ_EXACTDIV(u->z,a->z,b->z);
+  mpz_divexact(u->z,a->z,b->z);
   if (bb!=NULL)
   {
     mpz_clear(bb->z);
@@ -802,10 +800,14 @@ number nlIntDiv (number a, number b, const coeffs r)
     {
       return nlRInit(POW_2_28);
     }
-    long aa=SR_TO_INT(a);
-    long bb=SR_TO_INT(b);
-    return INT_TO_SR(aa/bb);
+    LONG aa=SR_TO_INT(a);
+    LONG bb=SR_TO_INT(b);
+    LONG rr=aa%bb;
+    if (rr<0) rr+=ABS(bb);
+    LONG cc=(aa-rr)/bb;
+    return INT_TO_SR(cc);
   }
+  number aa=NULL;
   if (SR_HDL(a) & SR_INT)
   {
     /* the small int -(1<<28) divided by 2^28 is 1   */
@@ -816,8 +818,8 @@ number nlIntDiv (number a, number b, const coeffs r)
         return INT_TO_SR(-1);
       }
     }
-    /* a is a small and b is a large int: -> 0 */
-    return INT_TO_SR(0);
+    aa=nlRInit(SR_TO_INT(a));
+    a=aa;
   }
   number bb=NULL;
   if (SR_HDL(b) & SR_INT)
@@ -834,7 +836,18 @@ number nlIntDiv (number a, number b, const coeffs r)
   mpz_init_set(u->z,a->z);
   /* u=u/b */
   u->s = 3;
-  MPZ_DIV(u->z,u->z,b->z);
+  number rr=nlIntMod(a,b,r);
+  if (SR_HDL(rr) &  SR_INT) mpz_sub_ui(u->z,u->z,SR_TO_INT(rr));
+  else                      mpz_sub(u->z,u->z,rr->z);
+  mpz_divexact(u->z,u->z,b->z);
+  if (aa!=NULL)
+  {
+    mpz_clear(aa->z);
+#if defined(LDEBUG)
+    aa->debug=654324;
+#endif
+    FREE_RNUMBER(aa);
+  }
   if (bb!=NULL)
   {
     mpz_clear(bb->z);
@@ -863,25 +876,24 @@ number nlIntMod (number a, number b, const coeffs r)
   number u;
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
+    LONG aa=SR_TO_INT(a);
     LONG bb=SR_TO_INT(b);
-    LONG c=SR_TO_INT(a) % bb;
+    LONG c=aa % bb;
+    if (c<0) c+=ABS(bb);
     return INT_TO_SR(c);
   }
   if (SR_HDL(a) & SR_INT)
   {
+    LONG ai=SR_TO_INT(a);
     mpz_t aa;
-    mpz_init(aa);
-    mpz_set_si(aa, SR_TO_INT(a));
+    mpz_init_set_si(aa, ai);
     u=ALLOC_RNUMBER();
 #if defined(LDEBUG)
     u->debug=123456;
 #endif
     u->s = 3;
     mpz_init(u->z);
-    mpz_t q;
-    mpz_init(q);
-    mpz_tdiv_qr(q,u->z, aa, b->z);
-    mpz_clear(q);
+    mpz_mod(u->z, aa, b->z);
     mpz_clear(aa);
     u=nlShort3(u);
     nlTest(u,r);
@@ -899,10 +911,7 @@ number nlIntMod (number a, number b, const coeffs r)
 #endif
   mpz_init(u->z);
   u->s = 3;
-  mpz_t q;
-  mpz_init(q);
-  mpz_tdiv_qr(q, u->z, a->z, b->z);
-  mpz_clear(q);
+  mpz_mod(u->z, a->z, b->z);
   if (bb!=NULL)
   {
     mpz_clear(bb->z);
@@ -1348,8 +1357,8 @@ void nlNormalize (number &x, const coeffs r)
       x->s=1;
       if (mpz_cmp_si(gcd,(long)1)!=0)
       {
-        MPZ_EXACTDIV(x->z,x->z,gcd);
-        MPZ_EXACTDIV(x->n,x->n,gcd);
+        mpz_divexact(x->z,x->z,gcd);
+        mpz_divexact(x->n,x->n,gcd);
         if (mpz_cmp_si(x->n,(long)1)==0)
         {
           mpz_clear(x->n);
@@ -1393,7 +1402,7 @@ number nlNormalizeHelper(number a, number b, const coeffs r)
   {
     mpz_t bt;
     mpz_init_set(bt,b->n);
-    MPZ_EXACTDIV(bt,bt,gcd);
+    mpz_divexact(bt,bt,gcd);
     if (SR_HDL(a) & SR_INT)
       mpz_mul_si(result->z,bt,SR_TO_INT(a));
     else
@@ -1645,8 +1654,8 @@ static void nlNormalize_Gcd(number &x)
   x->s=1;
   if (mpz_cmp_si(gcd,(long)1)!=0)
   {
-    MPZ_EXACTDIV(x->z,x->z,gcd);
-    MPZ_EXACTDIV(x->n,x->n,gcd);
+    mpz_divexact(x->z,x->z,gcd);
+    mpz_divexact(x->n,x->n,gcd);
     if (mpz_cmp_si(x->n,(long)1)==0)
     {
       mpz_clear(x->n);
@@ -2802,31 +2811,10 @@ void nlInpIntDiv(number &a, number b, const coeffs r)
   }
   else
   {
-    if (mpz_isNeg(a->z))
-    {
-      if (mpz_isNeg(b->z))
-      {
-        mpz_add(a->z,a->z,b->z);
-      }
-      else
-      {
-        mpz_sub(a->z,a->z,b->z);
-      }
-      mpz_add_ui(a->z,a->z,1);
-    }
-    else
-    {
-      if (mpz_isNeg(b->z))
-      {
-        mpz_sub(a->z,a->z,b->z);
-      }
-      else
-      {
-        mpz_add(a->z,a->z,b->z);
-      }
-      mpz_sub_ui(a->z,a->z,1);
-    }
-    MPZ_DIV(a->z,a->z,b->z);
+    number rr=nlIntMod(a,b,r);
+    if (SR_HDL(rr) &  SR_INT) mpz_sub_ui(a->z,a->z,SR_TO_INT(rr));
+    else                      mpz_sub(a->z,a->z,rr->z);
+    mpz_divexact(a->z,a->z,b->z);
     a=nlShort3_noinline(a);
   }
 }

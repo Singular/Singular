@@ -199,7 +199,7 @@ ASSUME: D<0, D kongruent 0 or 1 modulo 4 and |D|<4p
 EXAMPLE:example CornacchiaModified; shows an example
 "
 {
-  if((D>=0)||((D mod 4)==-2)||((D mod 4)==-1)||(absValue(D)>=4*p))
+  if((D>=0)||((D mod 4)==2)||((D mod 4)==3)||(absValue(D)>=4*p))
   {                                  // (0)[Test if assumptions well-defined]
     return(0);
     // ERROR("Parameters wrong selected!");
@@ -230,7 +230,7 @@ EXAMPLE:example CornacchiaModified; shows an example
       else
       {
         x(0)=squareRoot(D,p);        // (3)[Compute square root]
-        if((x(0) mod 2)!=(-(D mod 2))) // D is <0
+        if((x(0) mod 2)!=(D mod 2)) // D is <0
         {
           x(0)=p-x(0);
         }
@@ -247,6 +247,7 @@ EXAMPLE:example CornacchiaModified; shows an example
         bigint root_c=intRoot(c);
         if((((4*p-b^2) mod absValue(D))!=0)||(c!=root_c^2))
         {
+	"3";
           return(-1);
           // ERROR("The Diophantine equation has no solution!");
         }
