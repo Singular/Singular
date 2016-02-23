@@ -37,7 +37,7 @@ private:
   // Also used as error flag (values <0):
   // -1 indicates a "semantic" error (which occurs e.g. if some constructor
   //    argument is out of range)
-  // -2 indicates an error occured when reading from a file
+  // -2 indicates an error occurred when reading from a file
 
   Integer **coefficients;
   // the matrix entries
@@ -50,7 +50,7 @@ private:
   int _kernel_dimension;
   // the number of vectors stored in H (the size of these vectors is columns)
   // If _kernel_dimension==-2, no kernel basis has been computed yet.
-  // If _kernel_dimension==-1, an error has occured during the kernel basis
+  // If _kernel_dimension==-1, an error has occurred during the kernel basis
   // computation.
 
 

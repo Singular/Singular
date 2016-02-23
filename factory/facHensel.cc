@@ -771,7 +771,7 @@ diophantineHenselQa (const CanonicalForm & F, const CanonicalForm& G,
 
 /// solve \f$ 1=\sum_{i=1}^n{\delta_{i} \prod_{j\neq i}{f_j}} \f$ mod \f$p^k\f$
 /// over \f$ Q(\alpha) \f$ by first computing mod \f$p\f$ and if no zero divisor
-/// occured compute it mod \f$p^k\f$
+/// occurred compute it mod \f$p^k\f$
 CFList
 diophantineQa (const CanonicalForm& F, const CanonicalForm& G,
                const CFList& factors, modpk& b, const Variable& alpha)

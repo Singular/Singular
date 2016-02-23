@@ -467,7 +467,7 @@ NOTE:    P[1][3]*(P[1][1], P[1][2]) +...+ P[size(P)][3]*
          *(P[size(P)][1], P[size(P)][2]) - (*)infty=div(a(x)-b(x)y)
          if there is an optional parameter s!=0, then divisor additonally
          returns a parameter, which says, whether irreducible polynomials
-         occured during computations or not. Otherwise only warnings are
+         occurred during computations or not. Otherwise only warnings are
          displayed on the monitor. For s=0 nothing happens.
          Curve C: y^2+h(x)y=f(x) is defined over basering.
 EXAMPLE: example divisor; shows an example
@@ -664,7 +664,7 @@ EXAMPLE: example semidiv; shows an example
    D1,s1=divisor(D[1],0,h,f,1);
    D2,s2=divisor(D[2],1,h,f,1);
 
-   // Only if irreducible polynomials occured in D1 !and! D2 a warning
+   // Only if irreducible polynomials occurred in D1 !and! D2 a warning
    // is necessary.
    if (s1==1 and s2==1)
    {

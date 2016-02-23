@@ -87,7 +87,7 @@ void fePrintReportBug(char* msg, char* file, int line)
 {
   error("YOU HAVE FOUND A BUG IN SINGULAR.\n"
 "Please, email the following output to singular@mathematik.uni-kl.de\n"
-"Bug occured at %s:%d\n"
+"Bug occurred at %s:%d\n"
 "Message: %s\n"
 "Version: " S_UNAME VERSION __DATE__ __TIME__,
         file, line, msg);

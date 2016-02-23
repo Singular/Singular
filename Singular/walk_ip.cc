@@ -140,7 +140,7 @@ walkProc(leftv first, leftv second)
           break;
 
         case WalkOverFlowError:
-          Werror( "Overflow occured.\n");
+          Werror( "Overflow occurred.\n");
           destIdeal= NULL;
           break;
 
@@ -157,7 +157,7 @@ walkProc(leftv first, leftv second)
 //Description: The main function for the Fractalwalk-Algorithm.
 //Responsible for contact between user and walk64. Checks the
 //input-data, and calls fractalWalk64. Returns the new groebner
-//basis or something else if an error occured.
+//basis or something else if an error occurred.
 ///////////////////////////////////////////////////////////////////
 //Uses: omAlloc0,fractalWalkConsistency,omFreeSize,sizeof,IDIDEAL,
 //fractalWalk64,rSetHdl,idrMoveR,Werror,idInit
@@ -260,7 +260,7 @@ fractalWalkProc(leftv first, leftv second)
             break;
 
         case WalkOverFlowError:
-            Werror( "Overflow occured in ring %s.\n", first->Name() );
+            Werror( "Overflow occurred in ring %s.\n", first->Name() );
             rChangeCurrRing(destRing);
             destIdeal= NULL;
             return destIdeal;
