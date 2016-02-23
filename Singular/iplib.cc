@@ -918,7 +918,7 @@ BOOLEAN iiLoadLIB(FILE *fp, const char *libnamebuf, const char*newlib,
   yylplex(newlib, libnamebuf, &lib_style, pl, autoexport);
   if(yylp_errno)
   {
-    Werror("Library %s: ERROR occured: in line %d, %d.", newlib, yylplineno,
+    Werror("Library %s: ERROR occurred: in line %d, %d.", newlib, yylplineno,
          current_pos(0));
     if(yylp_errno==YYLP_BAD_CHAR)
     {

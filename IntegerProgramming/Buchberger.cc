@@ -1490,7 +1490,7 @@ ideal& ideal::minimalize_S_pairs()
 
     first_iter.set_to_list(aux_list);
     found=0;
-    // no reduction occured yet
+    // no reduction occurred yet
 
     while(first_iter.is_at_end()==FALSE)
     {
@@ -1606,7 +1606,7 @@ ideal& ideal::minimalize_new_generators()
   {
     first_iter.set_to_list(new_generators);
     found=0;
-    // no reduction occured yet
+    // no reduction occurred yet
 
     while(first_iter.element_is_marked_head_reduced()==FALSE)
       // only the first element is tested for this flag
@@ -2056,7 +2056,7 @@ ideal& ideal::minimalize()
   {
     first_iter.set_to_list(generators);
     found=0;
-    // no reduction occured yet
+    // no reduction occurred yet
 
     while(first_iter.element_is_marked_head_reduced()==FALSE)
       // only the first element is tested for this flag

@@ -272,7 +272,7 @@ class bigintmat
     ///append i zero-columns to the matrix
     void extendCols (int i);
 
-    bool add(bigintmat *b); ///< Addiert zur Matrix die Matrix b dazu. Return false => an error occured
+    bool add(bigintmat *b); ///< Addiert zur Matrix die Matrix b dazu. Return false => an error occurred
     bool sub(bigintmat *b); ///< Subtrahiert ...
     bool skalmult(number b, coeffs c); ///< Multipliziert zur Matrix den Skalar b hinzu
     bool addcol(int i, int j, number a, coeffs c); ///< addiert a-faches der j-ten Spalte zur i-ten dazu

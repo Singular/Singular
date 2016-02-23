@@ -632,7 +632,7 @@ const char * piProcinfo(procinfov pi, const char *request)
       case LANG_SINGULAR: return "singular"; break;
       case LANG_C:        return "object";   break;
       case LANG_NONE:     return "none";     break;
-      default:            return "unknow language";
+      default:            return "unknown language";
     }
   }
   else if (strcmp(request, "ref")      == 0)

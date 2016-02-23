@@ -3089,7 +3089,7 @@ bool nc_rCopy(ring res, const ring r, bool bSetupQuotient)
 {
   if (nc_CallPlural(r->GetNC()->C, r->GetNC()->D, NULL, NULL, res, bSetupQuotient, true, true, r))
   {
-    WarnS("Error occured while coping/setuping the NC structure!"); // No reaction!???
+    WarnS("Error occurred while coping/setuping the NC structure!"); // No reaction!???
     return true; // error
   }
 
