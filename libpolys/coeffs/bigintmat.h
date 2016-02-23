@@ -1,6 +1,25 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/*
+* ABSTRACT: class bigintmat: matrices of number
+*
+* Matrices are stored as 1-dim c-arrays but interpreted 2-dim as matrices.
+* Both modes of addressing are supported, note however, that the 1-dim
+* adressing starts at 0, the 2-dim at 1.
+*
+* Matrices are meant to represent column modules, thus the default
+* operations are always by column.
+*
+* While basic operations are supported over any ring (coeff), some more
+* advanced ones require more special rings: eg. echelon forms, solving
+* of linear equations is only effective over principal ideal or even
+* Euclidean rings.
+*
+* Be careful with the get/set/view/rawset functions to understand which
+* arguments are copied/ deleted or only assigned.
+*/
+
 #ifndef BIGINTMAT_H
 #define BIGINTMAT_H
 

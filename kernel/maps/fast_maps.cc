@@ -348,10 +348,10 @@ void maPoly_GetLength(mapoly mp, int &length)
 
 /*******************************************************************************
 **
-*F  fast_map  . . . . . . . . . . . . . . . . . . . . . . . . . .the real thing
+*F  fast_map_common_subexp   . . . . . . . . . . . . . . . . . .the real thing
 */
 
-ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
+ideal fast_map_common_subexp(const ideal map_id,const ring map_r,const ideal image_id,const ring image_r)
 {
   ring src_r, dest_r;
   ideal dest_id/*, res_id*/;

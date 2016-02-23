@@ -778,10 +778,10 @@ static inline BOOLEAN rOrd_is_Comp_dp(const ring r)
 }
 
 #ifdef RDEBUG
-#define rTest(r)    rDBTest(r, __FILE__, __LINE__)
+#define rTest(r)  rDBTest(r, __FILE__, __LINE__)
 extern BOOLEAN rDBTest(ring r, const char* fn, const int l);
 #else
-#define rTest(r)
+#define rTest(r) (TRUE)
 #endif
 
 ring rModifyRing(ring r, BOOLEAN omit_degree,
@@ -800,12 +800,12 @@ ring rModifyRing_Simple(ring r, BOOLEAN omit_degree, BOOLEAN omit_comp, unsigned
 void rKillModifiedRing_Simple(ring r);
 
 #ifdef RDEBUG
-void rDebugPrint(ring r);
+void rDebugPrint(const ring r);
 // void pDebugPrint(poly p);
 void p_DebugPrint(poly p, const ring r);
 #endif
 
-int64 * rGetWeightVec(ring r);
+int64 * rGetWeightVec(const ring r);
 void rSetWeightVec(ring r, int64 *wv);
 
 /////////////////////////////
@@ -821,8 +821,8 @@ BOOLEAN rSetISReference(const ring r, const ideal F, const int i = 0, const int 
 /// return the position of the p^th IS block order block in r->typ[]...
 int rGetISPos(const int p, const ring r);
 
-BOOLEAN rCheckIV(intvec *iv);
-int rTypeOfMatrixOrder(intvec * order);
+BOOLEAN rCheckIV(const intvec *iv);
+int rTypeOfMatrixOrder(const intvec *order);
 
 void rDelete(ring r); // To be used instead of rKill!
 

@@ -88,7 +88,7 @@ void nlInpIntDiv(number &a, number b, const coeffs r);
 
 #ifdef LDEBUG
 #define nlTest(a, r) nlDBTest(a,__FILE__,__LINE__, r)
-BOOLEAN nlDBTest(number a, char *f,int l, const coeffs r);
+BOOLEAN nlDBTest(number a, const char *f,int l, const coeffs r);
 #else
 #define nlTest(a, r) do {} while (0)
 #endif
@@ -112,7 +112,7 @@ BOOLEAN nlDBTest(number a, char *f,int l, const coeffs r);
 static inline number nlShort3(number x) // assume x->s==3
 {
   assume(x->s==3);
-  if (mpz_cmp_ui(x->z,(long)0)==0)
+  if (mpz_cmp_si(x->z,(long)0)==0)
   {
     mpz_clear(x->z);
     FREE_RNUMBER(x);
@@ -385,19 +385,21 @@ static number nlConvFactoryNSingN( const CanonicalForm f, const coeffs r)
   }
   else
   {
-    number z = ALLOC_RNUMBER(); //Q!? // (number)omAllocBin(rnumber_bin);
+    number z = ALLOC_RNUMBER();
 #if defined(LDEBUG)
     z->debug=123456;
 #endif
     gmp_numerator( f, z->z );
     if ( f.den().isOne() )
+    {
       z->s = 3;
+      z=nlShort3(z);
+    }
     else
     {
       gmp_denominator( f, z->n );
-      z->s = 0;
+      z->s = 1;
     }
-    nlNormalize(z,r);
     return z;
   }
 }
@@ -876,7 +878,10 @@ number nlIntMod (number a, number b, const coeffs r)
 #endif
     u->s = 3;
     mpz_init(u->z);
-    mpz_mod(u->z,aa,b->z);
+    mpz_t q;
+    mpz_init(q);
+    mpz_tdiv_qr(q,u->z, aa, b->z);
+    mpz_clear(q);
     mpz_clear(aa);
     u=nlShort3(u);
     nlTest(u,r);
@@ -894,7 +899,10 @@ number nlIntMod (number a, number b, const coeffs r)
 #endif
   mpz_init(u->z);
   u->s = 3;
-  mpz_mod(u->z,a->z,b->z);
+  mpz_t q;
+  mpz_init(q);
+  mpz_tdiv_qr(q, u->z, a->z, b->z);
+  mpz_clear(q);
   if (bb!=NULL)
   {
     mpz_clear(bb->z);
@@ -935,10 +943,7 @@ int nlDivComp(number a, number b, const coeffs r)
 
 number  nlGetUnit (number n, const coeffs r)
 {
-  if (nlGreaterZero(n, r))
-    return INT_TO_SR(1);
-  else
-    return INT_TO_SR(-1);
+  return INT_TO_SR(1);
 }
 
 coeffs nlQuot1(number c, const coeffs r)
@@ -1235,17 +1240,60 @@ number nlGcd(number a, number b, const coeffs r)
   else
   {
     result=ALLOC0_RNUMBER();
-    mpz_init(result->z);
-    mpz_gcd(result->z,a->z,b->z);
     result->s = 3;
   #ifdef LDEBUG
     result->debug=123456;
   #endif
+    mpz_init(result->z);
+    mpz_gcd(result->z,a->z,b->z);
     result=nlShort3(result);
   }
   nlTest(result, r);
   return result;
 }
+static int int_extgcd(int a, int b, int * u, int* x, int * v, int* y)
+{
+  int q, r;
+  if (a==0)
+  {
+    *u = 0;
+    *v = 1;
+    *x = -1;
+    *y = 0;
+    return b;
+  }
+  if (b==0)
+  {
+    *u = 1;
+    *v = 0;
+    *x = 0;
+    *y = 1;
+    return a;
+  }
+  *u=1;
+  *v=0;
+  *x=0;
+  *y=1;
+  do
+  {
+    q = a/b;
+    r = a%b;
+    assume (q*b+r == a);
+    a = b;
+    b = r;
+
+    r = -(*v)*q+(*u);
+    (*u) =(*v);
+    (*v) = r;
+
+    r = -(*y)*q+(*x);
+    (*x) = (*y);
+    (*y) = r;
+  } while (b);
+
+  return a;
+}
+
 //number nlGcd_dummy(number a, number b, const coeffs r)
 //{
 //  extern char my_yylinebuf[80];
@@ -1586,6 +1634,29 @@ number _nlNeg_NoImm(number a)
   return a;
 }
 
+// conditio to use nlNormalize_Gcd in intermediate computations:
+#define GCD_NORM_COND(OLD,NEW) (mpz_size1(NEW->z)>mpz_size1(OLD->z))
+
+static void nlNormalize_Gcd(number &x)
+{
+  mpz_t gcd;
+  mpz_init(gcd);
+  mpz_gcd(gcd,x->z,x->n);
+  x->s=1;
+  if (mpz_cmp_si(gcd,(long)1)!=0)
+  {
+    MPZ_EXACTDIV(x->z,x->z,gcd);
+    MPZ_EXACTDIV(x->n,x->n,gcd);
+    if (mpz_cmp_si(x->n,(long)1)==0)
+    {
+      mpz_clear(x->n);
+      x->s=3;
+      x=nlShort3_noinline(x);
+    }
+  }
+  mpz_clear(gcd);
+}
+
 number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
 {
   number u=ALLOC_RNUMBER();
@@ -1624,7 +1695,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           return INT_TO_SR(1);
         }
         mpz_init_set(u->n,b->n);
-        u->s = 0;
+        if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
+        else u->s = 0;
         break;
       }
       case 3:
@@ -1680,7 +1752,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
                FREE_RNUMBER(u);
                return INT_TO_SR(1);
             }
-            u->s = 0;
+            if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
+            else u->s = 0;
             break;
           }
           case 3: /* a:1 b:3 */
@@ -1700,7 +1773,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
               return INT_TO_SR(1);
             }
             mpz_init_set(u->n,a->n);
-            u->s = 0;
+            if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
+            else u->s = 0;
             break;
           }
         } /*switch (b->s) */
@@ -1728,7 +1802,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
               return INT_TO_SR(1);
             }
             mpz_init_set(u->n,b->n);
-            u->s = 0;
+            if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
+            else u->s = 0;
             break;
           }
           case 3:
@@ -1766,8 +1841,7 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
         mpz_mul_si(x,a->n,SR_TO_INT(b));
         mpz_add(a->z,a->z,x);
         mpz_clear(x);
-        a->s = 0;
-        a=nlShort1(a);
+        nlNormalize_Gcd(a);
         break;
       }
       case 3:
@@ -1803,8 +1877,8 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
         mpz_clear(x);
         // result cannot be 0, if coeffs are normalized
         mpz_init_set(u->n,b->n);
-        u->s = 0;
-        u=nlShort1(u);
+        if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
+        else { u->s = 0; u=nlShort1(u); }
         break;
       }
       case 3:
@@ -1843,7 +1917,8 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
             mpz_clear(x);
             mpz_clear(y);
             mpz_mul(a->n,a->n,b->n);
-            a->s = 0;
+            if (GCD_NORM_COND(b,a)) { nlNormalize_Gcd(a); }
+            else { a->s = 0;a=nlShort1(a);}
             break;
           }
           case 3: /* a:1 b:3 */
@@ -1853,11 +1928,11 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
             mpz_mul(x,b->z,a->n);
             mpz_add(a->z,a->z,x);
             mpz_clear(x);
-            a->s = 0;
+            if (GCD_NORM_COND(b,a)) { nlNormalize_Gcd(a); }
+            else { a->s = 0; a=nlShort1(a);}
             break;
           }
         } /*switch (b->s) */
-        a=nlShort1(a);
         break;
       }
       case 3:
@@ -1873,8 +1948,8 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
             mpz_add(a->z,b->z,x);
             mpz_clear(x);
             mpz_init_set(a->n,b->n);
-            a->s = 0;
-            a=nlShort1(a);
+            if (GCD_NORM_COND(b,a)) { nlNormalize_Gcd(a); }
+            else { a->s = 0; a=nlShort1(a);}
             break;
           }
           case 3:
@@ -1923,7 +1998,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
           return INT_TO_SR(1);
         }
         mpz_init_set(u->n,b->n);
-        u->s = 0;
+        if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
+        else u->s = 0;
         break;
       }
       case 3:
@@ -1975,7 +2051,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
           return INT_TO_SR(1);
         }
         mpz_init_set(u->n,a->n);
-        u->s = 0;
+        if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
+        else u->s = 0;
         break;
       }
       case 3:
@@ -2036,7 +2113,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
               FREE_RNUMBER(u);
               return INT_TO_SR(1);
             }
-            u->s = 0;
+            if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
+            else u->s = 0;
             break;
           }
           case 3: /* a:1, b:3 */
@@ -2059,7 +2137,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
               return INT_TO_SR(1);
             }
             mpz_init_set(u->n,a->n);
-            u->s = 0;
+            if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
+            else u->s = 0;
             break;
           }
         }
@@ -2090,7 +2169,8 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
               return INT_TO_SR(1);
             }
             mpz_init_set(u->n,b->n);
-            u->s = 0;
+            if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
+            else u->s = 0;
             break;
           }
           case 3: /* a:3 , b:3 */
@@ -2173,6 +2253,7 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
         return INT_TO_SR(1);
       }
       mpz_init_set(u->n,b->n);
+      if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
     }
     else //u->s==3
     {
@@ -2198,6 +2279,7 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
           return INT_TO_SR(1);
         }
         mpz_init_set(u->n,b->n);
+        if (GCD_NORM_COND(b,u)) { nlNormalize_Gcd(u); }
       }
     }
     else
@@ -2211,6 +2293,7 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
           return INT_TO_SR(1);
         }
         mpz_init_set(u->n,a->n);
+        if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
       }
       else
       {
@@ -2223,6 +2306,7 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
           FREE_RNUMBER(u);
           return INT_TO_SR(1);
         }
+        if (GCD_NORM_COND(a,u)) { nlNormalize_Gcd(u); }
       }
     }
   }
@@ -2579,11 +2663,119 @@ static void nlMPZ(mpz_t m, number &n, const coeffs r)
 static number nlInitMPZ(mpz_t m, const coeffs)
 {
   number z = ALLOC_RNUMBER();
-  mpz_init_set(z->z, m);
   z->s = 3;
+  #ifdef LDEBUG
+  z->debug=123456;
+  #endif
+  mpz_init_set(z->z, m);
+  z=nlShort3(z);
   return z;
 }
 
+number  nlXExtGcd (number a, number b, number *s, number *t, number *u, number *v, const coeffs r)
+{
+  if (SR_HDL(a) & SR_HDL(b) & SR_INT)
+  {
+    int uu, vv, x, y;
+    int g = int_extgcd(SR_TO_INT(a), SR_TO_INT(b), &uu, &vv, &x, &y);
+    *s = INT_TO_SR(uu);
+    *t = INT_TO_SR(vv);
+    *u = INT_TO_SR(x);
+    *v = INT_TO_SR(y);
+    return INT_TO_SR(g);
+  }
+  else
+  {
+    mpz_t aa, bb;
+    if (SR_HDL(a) & SR_INT)
+    {
+      mpz_init_set_si(aa, SR_TO_INT(a));
+    }
+    else
+    {
+      mpz_init_set(aa, a->z);
+    }
+    if (SR_HDL(b) & SR_INT)
+    {
+      mpz_init_set_si(bb, SR_TO_INT(b));
+    }
+    else
+    {
+      mpz_init_set(bb, b->z);
+    }
+    mpz_t erg; mpz_t bs; mpz_t bt;
+    mpz_init(erg);
+    mpz_init(bs);
+    mpz_init(bt);
+
+    mpz_gcdext(erg, bs, bt, aa, bb);
+
+    mpz_div(aa, aa, erg);
+    *u=nlInitMPZ(bb,r);
+    *u=nlNeg(*u,r);
+    *v=nlInitMPZ(aa,r);
+
+    mpz_clear(aa);
+    mpz_clear(bb);
+
+    *s = nlInitMPZ(bs,r);
+    *t = nlInitMPZ(bt,r);
+    return nlInitMPZ(erg,r);
+  }
+}
+
+number nlQuotRem (number a, number b, number * r, const coeffs R)
+{
+  assume(SR_TO_INT(b)!=0);
+  if (SR_HDL(a) & SR_HDL(b) & SR_INT)
+  {
+    if (r!=NULL)
+      *r = INT_TO_SR(SR_TO_INT(a) % SR_TO_INT(b));
+    return INT_TO_SR(SR_TO_INT(a)/SR_TO_INT(b));
+  }
+  else if (SR_HDL(a) & SR_INT)
+  {
+    // -2^xx / 2^xx
+    if ((a==INT_TO_SR(-(POW_2_28)))&&(b==INT_TO_SR(-1L)))
+    {
+      if (r!=NULL) *r=INT_TO_SR(0);
+      return nlRInit(POW_2_28);
+    }
+    //a is small, b is not, so q=0, r=a
+    if (r!=NULL)
+      *r = a;
+    return INT_TO_SR(0);
+  }
+  else if (SR_HDL(b) & SR_INT)
+  {
+    unsigned long rr;
+    mpz_t qq;
+    mpz_init(qq);
+    mpz_t rrr;
+    mpz_init(rrr);
+    rr = mpz_divmod_ui(qq, rrr, a->z, (unsigned long)ABS(SR_TO_INT(b)));
+    mpz_clear(rrr);
+
+    if (r!=NULL)
+      *r = INT_TO_SR(rr);
+    if (SR_TO_INT(b)<0)
+    {
+      mpz_mul_si(qq, qq, -1);
+    }
+    return nlInitMPZ(qq,R);
+  }
+  mpz_t qq,rr;
+  mpz_init(qq);
+  mpz_init(rr);
+  mpz_divmod(qq, rr, a->z, b->z);
+  if (r!=NULL)
+    *r = nlInitMPZ(rr,R);
+  else
+  {
+    mpz_clear(rr);
+  }
+  return nlInitMPZ(qq,R);
+}
 
 void nlInpGcd(number &a, number b, const coeffs r)
 {
@@ -2710,35 +2902,50 @@ number nlFarey(number nN, number nP, const coeffs r)
 
 number nlExtGcd(number a, number b, number *s, number *t, const coeffs)
 {
-  mpz_t aa,bb;
+  mpz_ptr aa,bb;
   *s=ALLOC_RNUMBER();
   mpz_init((*s)->z); (*s)->s=3;
   (*t)=ALLOC_RNUMBER();
   mpz_init((*t)->z); (*t)->s=3;
   number g=ALLOC_RNUMBER();
   mpz_init(g->z); g->s=3;
+  #ifdef LDEBUG
+  g->debug=123456;
+  (*s)->debug=123456;
+  (*t)->debug=123456;
+  #endif
   if (SR_HDL(a) & SR_INT)
   {
+    aa=(mpz_ptr)omAlloc(sizeof(mpz_t));
     mpz_init_set_si(aa,SR_TO_INT(a));
   }
   else
   {
-    mpz_init_set(aa,a->z);
+    aa=a->z;
   }
   if (SR_HDL(b) & SR_INT)
   {
+    bb=(mpz_ptr)omAlloc(sizeof(mpz_t));
     mpz_init_set_si(bb,SR_TO_INT(b));
   }
   else
   {
-    mpz_init_set(bb,b->z);
+    bb=b->z;
   }
   mpz_gcdext(g->z,(*s)->z,(*t)->z,aa,bb);
-  mpz_clear(aa);
-  mpz_clear(bb);
+  g=nlShort3(g);
   (*s)=nlShort3((*s));
   (*t)=nlShort3((*t));
-  g=nlShort3(g);
+  if (SR_HDL(a) & SR_INT)
+  {
+    mpz_clear(aa);
+    omFreeSize(aa, sizeof(mpz_t));
+  }
+  if (SR_HDL(b) & SR_INT)
+  {
+    mpz_clear(bb);
+    omFreeSize(bb, sizeof(mpz_t));
+  }
   return g;
 }
 
@@ -2989,8 +3196,6 @@ static char* nlCoeffString(const coeffs r)
   else                 return omStrDup("integer");
 }
 
-#define SSI_BASE 16
-
 static void nlWriteFd(number n,FILE* f, const coeffs)
 {
   if(SR_HDL(n) & SR_INT)
@@ -3115,7 +3320,7 @@ static number nlLcm(number a,number b,const coeffs r)
 {
   number g=nlGcd(a,b,r);
   number n1=nlMult(a,b,r);
-  number n2=nlDiv(n1,g,r);
+  number n2=nlIntDiv(n1,g,r);
   nlDelete(&g,r);
   nlDelete(&n1,r);
   return n2;
@@ -3172,6 +3377,8 @@ BOOLEAN nlInitChar(coeffs r, void*p)
     r->cfGetUnit = nlGetUnit;
     r->cfQuot1 = nlQuot1;
     r->cfLcm = nlLcm;
+    r->cfXExtGcd=nlXExtGcd;
+    r->cfQuotRem=nlQuotRem;
   }
   r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;

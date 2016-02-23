@@ -71,9 +71,6 @@ AC_ARG_WITH(
   inline,
   [ --without-inline   do not inline])
 AC_ARG_WITH(
-  debug,
-  [ --without-debug    disable all debugging facilities])
-AC_ARG_WITH(
   track,
   [ --without-track    disable debug tracking functionality])
 AC_ARG_WITH(
@@ -92,6 +89,9 @@ AC_ARG_WITH(
   internal_debug,
   [ --with-internal-debug
                        turn on internal debugging])
+AC_ARG_ENABLE(
+  debug,
+  [ --enable-debug    include backtrace stuff])
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler/make  config
 dnl
@@ -414,7 +414,7 @@ dnl debug and inline
 dnl
 save_cflags="$CFLAGS"
 AC_MSG_CHECKING(whether to disable debugging)
-if test "$with_debug" != no; then
+if test "$enable_debug" = yes; then
 AC_MSG_RESULT(no)
 CFLAGS="$CFLAGS -g"
 else
@@ -458,10 +458,12 @@ fi
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl backtrace business
 dnl
+if test "x$with_track" != xno; then
 AC_MSG_CHECKING(whether GET_RET_ADDR works)
 AC_CACHE_VAL(ac_cv_get_return_addr_works,
 AC_TRY_RUN([
 #include <stdlib.h>
+#define OM_GET_RETURN_ADDR_WORKS 1
 #include "omReturn.h"
 int test_return_addr()
 {
@@ -514,11 +516,20 @@ AC_MSG_RESULT($ac_cv_get_backtrace_works)
 if test "$ac_cv_get_backtrace_works" = yes; then
 AC_DEFINE(OM_GET_BACKTRACE_WORKS,1,"Whether omInitGetBackTrace () works")
 fi
+else
+   AC_MSG_CHECKING(whether GET_RET_ADDR works)
+   ac_cv_get_return_addr_works=no
+   AC_MSG_RESULT($ac_cv_get_return_addr_works)
+   AC_MSG_CHECKING(whether omGetBackTrace works)
+   ac_cv_get_backtrace_works=no
+   AC_MSG_RESULT($ac_cv_get_backtrace_works)
+fi
 
 AC_MSG_CHECKING(whether addr2line works)
 AC_CACHE_VAL(ac_cv_prog_addr2line_works,
 AC_TRY_RUN([
 #include <stdlib.h>
+#define OM_GET_RETURN_ADDR_WORKS 1
 #include "omReturn.h"
 #include "omStructs.h"
 /* #include "omGetBackTrace.h" */

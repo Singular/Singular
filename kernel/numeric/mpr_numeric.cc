@@ -935,7 +935,7 @@ void rootArranger::arrange()
         {
           WarnS("rootArranger::arrange: precision lost");
           mprec*=10;
-	}
+        }
       } while(!found);
 #if 0
       if ( !found )

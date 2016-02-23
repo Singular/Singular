@@ -194,7 +194,7 @@ BOOLEAN kbTest(kBucket_pt bucket)
 /// Creation/Destruction of buckets
 ///
 
-kBucket_pt kBucketCreate(ring bucket_ring)
+kBucket_pt kBucketCreate(const ring bucket_ring)
 {
   assume(bucket_ring != NULL);
   kBucket_pt bucket = (kBucket_pt) omAlloc0Bin(kBucket_bin);

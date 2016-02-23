@@ -12,6 +12,8 @@
 #include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
 
+#include <Singular/links/ssiLink.h>
+
 #include <callgfanlib_conversion.h>
 #include <sstream>
 
@@ -1738,52 +1740,96 @@ std::pair<gfan::ZMatrix,gfan::ZMatrix> interiorPointsAndNormalsOfFacets(const gf
   return std::make_pair(relativeInteriorPoints,outerFacetNormals);
 }
 
-#if 0
+
+static void gfanIntegerWriteFd(gfan::Integer n, ssiInfo* dd)
+{
+  mpz_t tmp;
+  mpz_init(tmp);
+  n.setGmp(tmp);
+  mpz_out_str (dd->f_write,SSI_BASE, tmp);
+  mpz_clear(tmp);
+  fputc(' ',dd->f_write);
+}
+
+static void gfanZMatrixWriteFd(gfan::ZMatrix M, ssiInfo* dd)
+{
+  fprintf(dd->f_write,"%d %d ",M.getHeight(),M.getWidth());
+
+  for (int i=0; i<M.getHeight(); i++)
+  {
+    for (int j=0; j<M.getWidth(); j++)
+    {
+      gfanIntegerWriteFd(M[i][j],dd);
+    }
+  }
+}
+
 BOOLEAN bbcone_serialize(blackbox *b, void *d, si_link f)
 {
   ssiInfo *dd = (ssiInfo *)f->data;
+
   sleftv l;
   memset(&l,0,sizeof(l));
   l.rtyp=STRING_CMD;
   l.data=(void*)"cone";
   f->m->Write(f, &l);
-  gfan::ZCone *Z=((gfan::ZCone*) d;
-  /* AMBIENT_DIM */ fprintf(dd->f_write("%d ",Z->ambientDimension());
-  /* FACETS or INEQUALITIES */ fprintf(dd->f_write("%d ",Z->areFacetsKnown());
+
+  gfan::ZCone *Z = (gfan::ZCone*) d;
+  fprintf(dd->f_write,"%d ",Z->areImpliedEquationsKnown()+Z->areFacetsKnown()*2);
+
   gfan::ZMatrix i=Z->getInequalities();
-....
-  /* LINEAR_SPAN or EQUATIONS */ fprintf(dd->f_write("%d ",Z->areImpliedEquationsKnown());
+  gfanZMatrixWriteFd(i,dd);
+
   gfan::ZMatrix e=Z->getEquations();
-....
-  /* RAYS */
-  gfan::ZMatrix r=Z->extremeRays();
-....
-  /* LINEALITY_SPACE */
-  gfan::ZMatrix l=Z->generatorsOfLinealitySpace();
-....
+  gfanZMatrixWriteFd(e,dd);
+
+  // assert(i.getWidth() == e.getWidth());
   return FALSE;
 }
+
+static gfan::Integer gfanIntegerReadFd(ssiInfo* dd)
+{
+  mpz_t tmp;
+  mpz_init(tmp);
+  s_readmpz_base(dd->f_read,tmp,SSI_BASE);
+  gfan::Integer n(tmp);
+  mpz_clear(tmp);
+  return n;
+}
+
+static gfan::ZMatrix gfanZMatrixReadFd(ssiInfo* dd)
+{
+  int r=s_readint(dd->f_read);
+  int c=s_readint(dd->f_read);
+
+  gfan::ZMatrix M(r,c);
+  for (int i=0; i<r; i++)
+  {
+    for (int j=0; j<c; j++)
+    {
+      M[i][j] = gfanIntegerReadFd(dd);
+    }
+  }
+  return M;
+}
+
 BOOLEAN bbcone_deserialize(blackbox **b, void **d, si_link f)
 {
   ssiInfo *dd = (ssiInfo *)f->data;
-  gfan::ZCone *Z;
-  /* AMBIENT_DIM */ = s_readint(dd->f_read);
-  /* areFacetsKnown: */ = s_readint(dd->f_read);
-  if (areFacetsKnown)
-  ....FACETS
-  else
-  ....INEQUALITIES
-  /* areImpliedEquationsKnown*/ = s_readint(dd->f_read);
-  if(areImpliedEquationsKnown)
-  ....EQUATIONS
-  else
-  ...LINEAR_SPAN
-  ...RAYS
-  ...LINEALITY_SPACE
+  int preassumptions = s_readint(dd->f_read);
+
+  gfan::ZMatrix i = gfanZMatrixReadFd(dd);
+  gfan::ZMatrix e = gfanZMatrixReadFd(dd);
+
+  // if (e.getHeight()==0) // why is e sometimes 0x0 and sometimex 0xn???
+  //   e = gfan::ZMatrix(0,i.getWidth());
+
+  gfan::ZCone* Z = new gfan::ZCone(i,e,preassumptions);
+
   *d=Z;
   return FALSE;
 }
-#endif
+
 void bbcone_setup(SModulFunctions* p)
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -1797,8 +1843,8 @@ void bbcone_setup(SModulFunctions* p)
   b->blackbox_Copy=bbcone_Copy;
   b->blackbox_Assign=bbcone_Assign;
   b->blackbox_Op2=bbcone_Op2;
-  //b->blackbox_serialize=bbcone_serialize;
-  //b->blackbox_deserialize=bbcone_deserialize;
+  b->blackbox_serialize=bbcone_serialize;
+  b->blackbox_deserialize=bbcone_deserialize;
   p->iiAddCproc("","coneViaInequalities",FALSE,coneViaNormals);
   p->iiAddCproc("","coneViaPoints",FALSE,coneViaRays);
 

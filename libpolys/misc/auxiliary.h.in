@@ -174,8 +174,8 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
 #define si_min(A,B) ((A) < (B) ? (A) : (B))
 #endif
 
+#define SSI_BASE 16
 
-// ---------------- end of Singular standard types etc.
 // ---------------- defines which depend on the settings above
 
 #ifndef HAVE_MULT_MOD

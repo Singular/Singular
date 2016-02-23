@@ -451,6 +451,7 @@ int redRing (LObject* h,kStrategy strat)
     pWrite(h->p);
     printf("\nFound j = %i\n",j);pWrite(strat->T[j].p);
     #endif
+    //enterT(*h, strat);
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat); // with debug output
     #if ADIDEBUG
     printf("\nand after reduce: \n");pWrite(h->p);
@@ -1475,7 +1476,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);
   initHilbCrit(F,Q,&hilb,strat);
-  initBba(F,strat);
+  initBba(strat);
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMora(F, Q,strat);
   if (strat->minim>0) strat->M=idInit(IDELEMS(F),F->rank);
@@ -1765,6 +1766,12 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           strat->enterS(strat->P, pos, strat, strat->tl);
         }
       }
+      #if ADIDEBUG
+      for(int iii = 0; iii<=strat->tl;iii++)
+      {
+        printf("\nT[%i] = ",iii);pWrite(strat->T[iii].p);
+      }
+      #endif
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
@@ -3072,7 +3079,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit, NO CHANGES */
   initBuchMoraPos(strat); /*NO CHANGES YET: perhaps later*/
   initHilbCrit(F,Q,&hilb,strat); /*NO CHANGES*/
-  initBbaShift(F,strat); /* DONE */
+  initBbaShift(strat); /* DONE */
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMoraShift(F, Q,strat); /* updateS with no toT, i.e. no init for T */
   updateSShift(strat,uptodeg,lV); /* initializes T */
@@ -3564,7 +3571,7 @@ int redFirstShift (LObject* h,kStrategy strat)
   }
 }
 
-void initBbaShift(ideal /*F*/,kStrategy strat)
+void initBbaShift(kStrategy strat)
 {
  /* setting global variables ------------------- */
   strat->enterS = enterSBba; /* remains as is, we change enterT! */

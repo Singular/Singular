@@ -62,7 +62,7 @@ nMapFunc nrnSetMap     (const coeffs src, const coeffs dst);
 // FIXME? TODO? // extern void    nrzWrite       (number &a, const coeffs r); // FIXME
 # define  nrnWrite      nrzWrite
 #else
-void nrnWrite (number &a, const coeffs);
+void nrnWrite (number a, const coeffs);
 #endif
 const char *  nrnRead  (const char *s, number *a, const coeffs r);
 void     nrnCoeffWrite (const coeffs r, BOOLEAN details);
@@ -796,7 +796,7 @@ number nrnMapZ(number from, const coeffs src, const coeffs dst)
 }
 #endif
 #if SI_INTEGER_VARIANT!=2
-void nrnWrite (number &a, const coeffs)
+void nrnWrite (number a, const coeffs)
 {
   char *s,*z;
   if (a==NULL)
@@ -924,7 +924,7 @@ void nrnInitExp(unsigned long m, coeffs r)
 {
   nrnSetExp(m, r);
   assume (r->modNumber != NULL);
-//CF: in geenral, the modulus is computed somewhere. I don't want to
+//CF: in general, the modulus is computed somewhere. I don't want to
 //  check it's size before I construct the best ring.
 //  if (mpz_cmp_ui(r->modNumber,2) <= 0)
 //    WarnS("nrnInitExp failed (m in Z/m too small)");

@@ -8,8 +8,8 @@
  - \ref maideal_s
 
  Main header(s) in `/kernel/maps/`:
+ - \ref kernel/maps/gen_maps.h
  - \ref kernel/maps/fast_maps.h
 
 */
-//  NOTE: seems quite obsolete... TODO: check!
 

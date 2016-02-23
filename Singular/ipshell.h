@@ -215,7 +215,7 @@ void checkall();
 #endif
 
 void rSetHdl(idhdl h);
-ring rInit(sleftv* pn, sleftv* rv, sleftv* ord);
+ring rInit(leftv pn, leftv rv, leftv ord);
 idhdl  rDefault(const char *s);
 
 idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n=NULL);
@@ -292,5 +292,11 @@ BOOLEAN iiCheckTypes(leftv args,/// < [in] argument list (may be NULL)
 
 BOOLEAN iiBranchTo(leftv r, leftv args);
 
+lists rDecompose(const ring r);
+
+#ifdef SINGULAR_4_1
+lists rDecompose_list_cf(const ring r);
+BOOLEAN rDecompose_CF(leftv res,const coeffs C);
+#endif
 #endif
 

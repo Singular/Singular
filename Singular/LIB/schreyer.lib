@@ -58,6 +58,9 @@ PROCEDURES:
   Sres(M,l)    helper for computing Schreyer resolution
   Ssyz(M)      helper for computing Schreyer resolution of module M of length 1
   Scontinue(l) helper for extending currently active resolution
+  SSres(M,l)    helper2 for computing Schreyer resolution
+  SSsyz(M)      helper2 for computing Schreyer resolution of module M of length 1
+  SScontinue(l) helper2 for extending currently active resolution
 
 SEE ALSO: syz, sres, lres, res
 ";
@@ -554,7 +557,8 @@ static proc MySort(def M)
 }
 
 
-static proc SSinit(def M)
+/* static */ 
+proc SSinit(def M)
 {
 //  rtimer, "***TIMESNAP0 for SSinit: on level: [",-1,"] :: t: ", timer, ", r: ", rtimer;
   if( (typeof(M) != "module") && (typeof(M) != "ideal") )
@@ -1840,7 +1844,8 @@ static proc SSComputeSyzygy(def L, def T)
 }
 
 // resolution/syzygy step:
-static proc SSstep()
+/* static */ 
+proc SSstep()
 {
 //  rtimer, "***TIMESNAP0 for SSstep(): on level: [",attrib(basering,"SYZNUMBER"),"] :: t: ", timer, ", r: ", rtimer;
 
@@ -1973,7 +1978,8 @@ static proc SSstep()
 //  rtimer, "***TIMESNAP1 for SSstep(): on level: [",attrib(basering,"SYZNUMBER"),"] :: t: ", timer, ", r: ", rtimer;
 }
 
-static proc SScontinue(int l)
+/* static */ 
+proc SScontinue(int l)
 "USAGE:  SScontinue(l)
 RETURN:  nothing, instead it changes RES and MRES variables in the current ring
 PURPOSE: computes further (at most l) syzygies
@@ -2011,7 +2017,8 @@ example
   RES; MRES;
 }
 
-static proc SSsyz(def M)
+/* static */ 
+proc SSsyz(def M)
 "USAGE:  SSsyz(M)
 RETURN:  ring, containing a list of modules RES and a module MRES
 PURPOSE: computes the first syzygy module of M (wrt some Schreyer ordering)?
@@ -2068,7 +2075,8 @@ example
   RES;
 }
 
-static proc SSres(def M, int l)
+/* static */ 
+proc SSres(def M, int l)
 "USAGE:  SSres(I, l)
 RETURN:  ring, containing a list of modules RES and a module MRES
 PURPOSE: computes (at most l) syzygy modules of M wrt the classical Schreyer
@@ -2539,7 +2547,8 @@ example
   print(betti(rs, 1), "betti"); //minimal betties
 }
 
-static proc s_res_bm(def I)
+/* static */ 
+proc s_res_bm(def I)
 {
   int @prot = (find(option(),"prot") != 0) && (defined(  Syzextra::NumberStatsInit)) && (defined(  Syzextra::NumberStatsPrint));
   def @save = basering;

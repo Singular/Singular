@@ -1209,7 +1209,7 @@ static proc esComputation (int typ, poly p_F, list #)
       // we change to the qring mod m^artin_bd
       // first, we have to check if we were in a qring when starting
       ideal qId = imap(myRing, qId);
-      if (qId == 0)
+      if (size(qId) == 0)
       {
          attrib(MM,"isSB",1);
          qring QQ=MM;

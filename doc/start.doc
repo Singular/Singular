@@ -697,6 +697,9 @@ specified types.  Finally, a procedure may return a value using the
 command @code{return}.
 
 We may e.g. define the following procedure called @code{Milnor}:
+(Here the parameter list is @code{(poly h)} meaning that @code{Milnor}
+must be called with one argument which can be assigned to the type @code{poly}
+and is refered to by the name @code{h}.)
 
 @smallexample
 proc Milnor (poly h)
@@ -724,13 +727,16 @@ see in the next chapter.
 
 The distribution of  @sc{Singular} contains  several libraries, each of
 which is a collection of useful procedures based on the kernel commands,
-which extend the functionality of @sc{Singular}. The command @code{help "all.lib";}
-lists all libraries together with a one-line explanation.
+which extend the functionality of @sc{Singular}.
+The command @code{listvar(package);} list all currently loaded libraries.
+@c The command @code{help "all.lib";}
+@c lists all libraries together with a one-line explanation.
 @c The command @code{help}
 @c library_name@code{;} lists all procedures of the library, @code{help}
 @c proc_name@code{;} shows an explanation of the procedure after the
-@c library has been loaded. The command @code{LIB "all.lib";} loads all
-@c libraries.
+@c library has been loaded.
+The command @code{LIB "all.lib";} loads all
+libraries.
 
 One of these libraries is @code{sing.lib} which already contains a
 procedure called @code{milnor} to calculate the Milnor number not only
@@ -773,20 +779,6 @@ help milnor;
 
 @smallexample
 example milnor;
-@c @expansion{} // proc milnor from lib sing.lib
-@c @expansion{} EXAMPLE:
-@c @expansion{}    int p      = printlevel;
-@c @expansion{}    printlevel = 1;
-@c @expansion{}    ring r     = 32003,(x,y,z),ds;
-@c @expansion{}    ideal j    = x5+y6+z6,x2+2y2+3z2,xyz+yx;
-@c @expansion{}    milnor(j);
-@c @expansion{} //sequence of discriminant numbers: 100,149,70
-@c @expansion{} 21
-@c @expansion{}    poly f     = x7+y7+(x-y)^2*x2y2+z2;
-@c @expansion{}    milnor(f);
-@c @expansion{} 28
-@c @expansion{}    printlevel = p;
-@c @expansion{}
 @end smallexample
 
 @noindent Likewise, the library itself has a help part, to show a list of

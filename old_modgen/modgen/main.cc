@@ -116,8 +116,8 @@ void usage(char *name)
                       long_options[i].name, "<destination-dir>");
                    break;
          default:
-	           printf("\t-%c (--%s) %s\n", long_options[i].val,
-		      long_options[i].name, "<argument>");
+                   printf("\t-%c (--%s) %s\n", long_options[i].val,
+                      long_options[i].name, "<argument>");
       }
     } else
     {
@@ -146,8 +146,8 @@ main( int argc, char *argv[] )
         case 'd' : debug++; break;
         case 'v' : trace=1; break;
         case 'm' : do_create_makefile = 0; break;
-	case 'i' : inst_dir=optarg; break;
-	case 's' : do_create_srcdir = 0; break;
+        case 'i' : inst_dir=optarg; break;
+        case 's' : do_create_srcdir = 0; break;
 
         case '?' : usage(argv[0]);
           return 0;

@@ -91,14 +91,15 @@ fglmReductionStep( poly * pptr, ideal source, int * w )
             }
         }
     }
-    if ( best > 0 ) {
+    if ( best > 0 )
+    {
         // OwnSPoly
         poly p2 = (source->m)[best-1];
         int i, diff;
 
         poly m = pOne();
         for ( i= (currRing->N); i > 0; i-- )
-	{
+        {
             diff= pGetExp( *pptr, i ) - pGetExp( p2, i );
             pSetExp( m, i, diff );
         }

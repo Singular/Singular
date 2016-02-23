@@ -275,7 +275,7 @@ static inline poly ncSA_1xy0x0y0(const int i, const int j, const int n, const in
 
   return p;
 
-} // 	return ncSA_1xy0x0y0(GetI(), GetJ(), expRight, expLeft, r);
+} //         return ncSA_1xy0x0y0(GetI(), GetJ(), expRight, expLeft, r);
 ///////////////////////////////////////////////////////////////////////////////////////////
 static inline poly ncSA_Mxy0x0y0(const int i, const int j, const int n, const int m, const ring r)
 {
@@ -295,7 +295,7 @@ static inline poly ncSA_Mxy0x0y0(const int i, const int j, const int n, const in
 
   return p;
 
-} // 	return ncSA_Mxy0x0y0(GetI(), GetJ(), expRight, expLeft, r);
+} //         return ncSA_Mxy0x0y0(GetI(), GetJ(), expRight, expLeft, r);
 ///////////////////////////////////////////////////////////////////////////////////////////
 static inline poly ncSA_Qxy0x0y0(const int i, const int j, const int n, const int m, const number m_q, const ring r)
 {
@@ -344,7 +344,7 @@ static inline poly ncSA_Qxy0x0y0(const int i, const int j, const int n, const in
 
   return p;
 
-} // 	return ncSA_Qxy0x0y0(GetI(), GetJ(), expRight, expLeft, m_q, r);
+} //         return ncSA_Qxy0x0y0(GetI(), GetJ(), expRight, expLeft, m_q, r);
 ///////////////////////////////////////////////////////////////////////////////////////////
 static inline poly ncSA_1xy0x0yG(const int i, const int j, const int n, const int m, const number m_g, const ring r)
 {

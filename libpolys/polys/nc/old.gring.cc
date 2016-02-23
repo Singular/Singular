@@ -2710,22 +2710,22 @@ BOOLEAN gnc_CheckOrdCondition(matrix D, ring r)
       p = nc_p_CopyGet(MATELEM(D,i,j),r);
       if ( p != NULL)
       {
-	 q = p_One(r);
-	 p_SetExp(q,i,1,r);
-	 p_SetExp(q,j,1,r);
-	 p_Setm(q,r);
-	 if (p_LmCmp(q,p,r) != 1) /* i.e. lm(p)==xy < lm(q)==D_ij  */
-	   {
-	      Werror("Bad ordering at %d,%d\n",i,j);
+         q = p_One(r);
+         p_SetExp(q,i,1,r);
+         p_SetExp(q,j,1,r);
+         p_Setm(q,r);
+         if (p_LmCmp(q,p,r) != 1) /* i.e. lm(p)==xy < lm(q)==D_ij  */
+           {
+              Werror("Bad ordering at %d,%d\n",i,j);
 #if 0 /*Singularg should not differ from Singular except in error case*/
       p_Write(p,r);
       p_Write(q,r);
 #endif
-	      report = 1;
-	   }
-	 p_Delete(&q,r);
-	 p_Delete(&p,r);
-	 p = NULL;
+              report = 1;
+           }
+         p_Delete(&q,r);
+         p_Delete(&p,r);
+         p = NULL;
       }
     }
   }
@@ -2801,8 +2801,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 
 
 #ifndef SING_NDEBUG
-  id_Test((ideal)CCC, curr);
-  id_Test((ideal)DDD, curr);
+  if (CCC!=NULL) id_Test((ideal)CCC, curr);
+  if (DDD!=NULL) id_Test((ideal)DDD, curr);
   p_Test(CCN, curr);
   p_Test(DDN, curr);
 #endif
@@ -2930,15 +2930,15 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
         if (MATELEM(CC,i,j) == NULL)
           qN = NULL;
         else
-	{
-	  if (!p_IsConstant(MATELEM(CC,i,j),curr))
+        {
+          if (!p_IsConstant(MATELEM(CC,i,j),curr))
           {
             Werror("Incorrect input : non-constants are not allowed as coefficients (first argument at [%d, %d])", i, j);
             return TRUE;
           }
-	  assume(p_IsConstant(MATELEM(CC,i,j),curr));
+          assume(p_IsConstant(MATELEM(CC,i,j),curr));
           qN = p_GetCoeff(MATELEM(CC,i,j),curr);
-	}
+        }
 
 
         if ( qN == NULL )   /* check the consistency: Cij!=0 */
@@ -3305,8 +3305,8 @@ poly nc_pSubst(poly p, int n, poly e, const ring r)
     {
       for (i=n+1; i<=rN; i++)
       {
-	 SUF[i] = PRE[i];
-	 PRE[i] = 0;
+         SUF[i] = PRE[i];
+         PRE[i] = 0;
       }
       res =  p_Power(p_Copy(e, r),pow, r);
       /* multiply with prefix */

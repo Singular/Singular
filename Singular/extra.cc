@@ -612,7 +612,28 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-    /*======================= demon_list =====================*/
+  /*==================== std_syz =================*/
+    if (strcmp(sys_cmd, "std_syz") == 0)
+    {
+      ideal i1;
+      int i2;
+      if ((h!=NULL) && (h->Typ()==MODUL_CMD))
+      {
+        i1=(ideal)h->CopyD();
+        h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+        i2=(int)((long)h->Data());
+      }
+      else return TRUE;
+      res->rtyp=MODUL_CMD;
+      res->data=idXXX(i1,i2);
+      return FALSE;
+    }
+    else
+  /*======================= demon_list =====================*/
     if (strcmp(sys_cmd,"denom_list")==0)
     {
       res->rtyp=LIST_CMD;
@@ -1863,7 +1884,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "Mwalk") == 0)
     {
-      const short t[]={4,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,RING_CMD};
+      const short t[]={6,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,RING_CMD,INT_CMD,INT_CMD};
       if (!iiCheckTypes(h,t,1)) return TRUE;
       if (((intvec*) h->next->Data())->length() != currRing->N &&
         ((intvec*) h->next->next->Data())->length() != currRing->N )
@@ -1872,11 +1893,13 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
            currRing->N);
         return TRUE;
       }
-      ideal arg1 = (ideal) h->Data();
+      ideal arg1 = (ideal) h->CopyD();
       intvec* arg2 = (intvec*) h->next->Data();
-      intvec* arg3   =  (intvec*) h->next->next->Data();
-      ring arg4   =  (ring) h->next->next->next->Data();
-      ideal result = (ideal) Mwalk(arg1, arg2, arg3,arg4);
+      intvec* arg3 = (intvec*) h->next->next->Data();
+      ring arg4 = (ring) h->next->next->next->Data();
+      int arg5 = (int) (long) h->next->next->next->next->Data();
+      int arg6 = (int) (long) h->next->next->next->next->next->Data();
+      ideal result = (ideal) Mwalk(arg1, arg2, arg3, arg4, arg5, arg6);
       res->rtyp = IDEAL_CMD;
       res->data =  result;
       return FALSE;
@@ -1912,7 +1935,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #else
     if (strcmp(sys_cmd, "Mpwalk") == 0)
     {
-      const short t[]={6,IDEAL_CMD,INT_CMD,INT_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD};
+      const short t[]={8,IDEAL_CMD,INT_CMD,INT_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD,INT_CMD};
       if (!iiCheckTypes(h,t,1)) return TRUE;
       if(((intvec*) h->next->next->next->Data())->length() != currRing->N &&
          ((intvec*) h->next->next->next->next->Data())->length()!=currRing->N)
@@ -1926,7 +1949,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       intvec* arg4 = (intvec*) h->next->next->next->Data();
       intvec* arg5 = (intvec*) h->next->next->next->next->Data();
       int arg6 = (int) (long) h->next->next->next->next->next->Data();
-      ideal result = (ideal) Mpwalk(arg1, arg2, arg3, arg4, arg5,arg6);
+      int arg7 = (int) (long) h->next->next->next->next->next->next->Data();
+      int arg8 = (int) (long) h->next->next->next->next->next->next->next->Data();
+      ideal result = (ideal) Mpwalk(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
       res->rtyp = IDEAL_CMD;
       res->data =  result;
       return FALSE;
@@ -1938,12 +1963,12 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "Mrwalk") == 0)
     {
-      const short t[]={6,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD,RING_CMD};
+      const short t[]={7,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD,INT_CMD,INT_CMD};
       if (!iiCheckTypes(h,t,1)) return TRUE;
-      if((((intvec*) h->next->Data())->length() != currRing->N &&
-         ((intvec*) h->next->next->Data())->length() != currRing->N ) &&
-         (((intvec*) h->next->Data())->length() != (currRing->N)*(currRing->N) &&
-         ((intvec*) h->next->next->Data())->length() != (currRing->N)*(currRing->N) ))
+      if(((intvec*) h->next->Data())->length() != currRing->N &&
+         ((intvec*) h->next->Data())->length() != (currRing->N)*(currRing->N) &&
+         ((intvec*) h->next->next->Data())->length() != currRing->N &&
+         ((intvec*) h->next->next->Data())->length() != (currRing->N)*(currRing->N) )
       {
         Werror("system(\"Mrwalk\" ...) intvecs not of length %d or %d\n",
                currRing->N,(currRing->N)*(currRing->N));
@@ -1954,8 +1979,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       intvec* arg3 =  (intvec*) h->next->next->Data();
       int arg4 = (int)(long) h->next->next->next->Data();
       int arg5 = (int)(long) h->next->next->next->next->Data();
-      ring arg6 = (ring) h->next->next->next->next->next->Data();
-      ideal result = (ideal) Mrwalk(arg1, arg2, arg3, arg4, arg5, arg6);
+      int arg6 = (int)(long) h->next->next->next->next->next->Data();
+      int arg7 = (int)(long) h->next->next->next->next->next->next->Data();
+      ideal result = (ideal) Mrwalk(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
       res->rtyp = IDEAL_CMD;
       res->data =  result;
       return FALSE;
@@ -2017,7 +2043,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "Mfwalk") == 0)
     {
-      const short t[]={3,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD};
+      const short t[]={5,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD};
       if (!iiCheckTypes(h,t,1)) return TRUE;
       if (((intvec*) h->next->Data())->length() != currRing->N &&
         ((intvec*) h->next->next->Data())->length() != currRing->N )
@@ -2028,8 +2054,10 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
       ideal arg1 = (ideal) h->Data();
       intvec* arg2 = (intvec*) h->next->Data();
-      intvec* arg3   =  (intvec*) h->next->next->Data();
-      ideal result = (ideal) Mfwalk(arg1, arg2, arg3);
+      intvec* arg3 = (intvec*) h->next->next->Data();
+      int arg4 = (int)(long) h->next->next->next->Data();
+      int arg5 = (int)(long) h->next->next->next->next->Data();
+      ideal result = (ideal) Mfwalk(arg1, arg2, arg3, arg4, arg5);
       res->rtyp = IDEAL_CMD;
       res->data =  result;
       return FALSE;
@@ -2040,19 +2068,33 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #ifdef HAVE_WALK
     if (strcmp(sys_cmd, "Mfrwalk") == 0)
     {
-      const short t[]={6,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD,RING_CMD};
+      const short t[]={6,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD,INT_CMD};
       if (!iiCheckTypes(h,t,1)) return TRUE;
+/*
       if (((intvec*) h->next->Data())->length() != currRing->N &&
           ((intvec*) h->next->next->Data())->length() != currRing->N)
       {
         Werror("system(\"Mfrwalk\" ...) intvecs not of length %d\n",currRing->N);
         return TRUE;
       }
+*/
+      if((((intvec*) h->next->Data())->length() != currRing->N &&
+         ((intvec*) h->next->next->Data())->length() != currRing->N ) &&
+         (((intvec*) h->next->Data())->length() != (currRing->N)*(currRing->N) &&
+         ((intvec*) h->next->next->Data())->length() != (currRing->N)*(currRing->N) ))
+      {
+        Werror("system(\"Mfrwalk\" ...) intvecs not of length %d or %d\n",
+               currRing->N,(currRing->N)*(currRing->N));
+        return TRUE;
+      }
+
       ideal arg1 = (ideal) h->Data();
       intvec* arg2 = (intvec*) h->next->Data();
       intvec* arg3 = (intvec*) h->next->next->Data();
       int arg4 = (int)(long) h->next->next->next->Data();
-      ideal result = (ideal) Mfrwalk(arg1, arg2, arg3, arg4);
+      int arg5 = (int)(long) h->next->next->next->next->Data();
+      int arg6 = (int)(long) h->next->next->next->next->next->Data();
+      ideal result = (ideal) Mfrwalk(arg1, arg2, arg3, arg4, arg5, arg6);
       res->rtyp = IDEAL_CMD;
       res->data =  result;
       return FALSE;
@@ -2061,13 +2103,15 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   /*==================== Mprwalk =================*/
     if (strcmp(sys_cmd, "Mprwalk") == 0)
     {
-      const short t[]={7,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD,INT_CMD,RING_CMD};
+      const short t[]={9,IDEAL_CMD,INTVEC_CMD,INTVEC_CMD,INT_CMD,INT_CMD,INT_CMD,INT_CMD,INT_CMD,INT_CMD};
       if (!iiCheckTypes(h,t,1)) return TRUE;
-      if (((intvec*) h->next->Data())->length() != currRing->N &&
-          ((intvec*) h->next->next->Data())->length() != currRing->N )
+      if((((intvec*) h->next->Data())->length() != currRing->N &&
+         ((intvec*) h->next->next->Data())->length() != currRing->N ) &&
+         (((intvec*) h->next->Data())->length() != (currRing->N)*(currRing->N) &&
+         ((intvec*) h->next->next->Data())->length() != (currRing->N)*(currRing->N) ))
       {
-        Werror("system(\"Mrwalk\" ...) intvecs not of length %d\n",
-               currRing->N);
+        Werror("system(\"Mrwalk\" ...) intvecs not of length %d or %d\n",
+               currRing->N,(currRing->N)*(currRing->N));
         return TRUE;
       }
       ideal arg1 = (ideal) h->Data();
@@ -2076,8 +2120,10 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       int arg4 = (int)(long) h->next->next->next->Data();
       int arg5 = (int)(long) h->next->next->next->next->Data();
       int arg6 = (int)(long) h->next->next->next->next->next->Data();
-      ring arg7 = (ring) h->next->next->next->next->next->next->Data();
-      ideal result = (ideal) Mprwalk(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+      int arg7 = (int)(long) h->next->next->next->next->next->next->Data();
+      int arg8 = (int)(long) h->next->next->next->next->next->next->next->Data();
+      int arg9 = (int)(long) h->next->next->next->next->next->next->next->next->Data();
+      ideal result = (ideal) Mprwalk(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
       res->rtyp = IDEAL_CMD;
       res->data =  result;
       return FALSE;
@@ -2705,7 +2751,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           L->m[4].data=(void *)v;
           //---<>--degenerations---------
           int deg = r.deg;    // number of points
-          intvec* w = new intvec( r.speicher );  // necessary memeory
+          intvec* w = new intvec( r.speicher );  // necessary memory
           i=0;               // start copying
           do
           {
@@ -2829,27 +2875,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
-  /*==================== stdX =================*/
-      if (strcmp(sys_cmd, "std") == 0)
-      {
-        ideal i1;
-        int i2;
-        if ((h!=NULL) && (h->Typ()==MODUL_CMD))
-        {
-          i1=(ideal)h->CopyD();
-          h=h->next;
-        }
-        else return TRUE;
-        if ((h!=NULL) && (h->Typ()==INT_CMD))
-        {
-          i2=(int)((long)h->Data());
-        }
-        else return TRUE;
-        res->rtyp=MODUL_CMD;
-        res->data=idXXX(i1,i2);
-        return FALSE;
-      }
-      else
   /*==================== SVD =================*/
   #ifdef HAVE_SVD
        if (strcmp(sys_cmd, "svd") == 0)
@@ -2857,7 +2882,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             extern lists testsvd(matrix M);
               res->rtyp=LIST_CMD;
             res->data=(char*)(testsvd((matrix)h->Data()));
-            return FALSE;
+            eturn FALSE;
        }
        else
   #endif
@@ -3341,7 +3366,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             res->data=(char *)singntl_HNF((intvec*)h->Data());
             return FALSE;
           }
-          else return TRUE;
+          else if (h->Typ()==INTMAT_CMD)
+          {
+            res->data=(char *)singntl_HNF((intvec*)h->Data());
+            return FALSE;
+          }
+          else
+	  {
+	    WerrorS("expected `system(\"HNF\",<matrix|intmat|bigintmat>)`");
+	    return TRUE;
+	  }
         }
         else return TRUE;
       }

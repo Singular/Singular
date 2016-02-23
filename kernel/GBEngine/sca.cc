@@ -447,7 +447,7 @@ ideal k_sca_bba (const ideal F, const ideal Q, const intvec */*w*/, const intvec
 //   initHilbCrit(F, Q, &hilb, strat);
 
 //  nc_gr_initBba(F,strat);
-  initBba(tempF, strat); // set enterS, red, initEcart, initEcartPair
+  initBba(strat); // set enterS, red, initEcart, initEcartPair
 
   // set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair
   // ?? set spSpolyShort, reduce ???

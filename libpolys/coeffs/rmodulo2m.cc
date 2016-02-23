@@ -701,23 +701,6 @@ number nr2mMapZp(number from, const coeffs /*src*/, const coeffs dst)
   return (number)nr2mMult((number)i, (number)j, dst);
 }
 
-number nr2mMapQ(number from, const coeffs src, const coeffs dst)
-{
-  mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
-  mpz_init(erg);
-  mpz_ptr k = (mpz_ptr)omAlloc(sizeof(mpz_t));
-  mpz_init_set_ui(k, dst->mod2mMask);
-
-  nlGMP(from, (number)erg, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
-  mpz_and(erg, erg, k);
-  number res = (number)mpz_get_ui(erg);
-
-  mpz_clear(erg); omFree((ADDRESS)erg);
-  mpz_clear(k);   omFree((ADDRESS)k);
-
-  return (number)res;
-}
-
 number nr2mMapGMP(number from, const coeffs /*src*/, const coeffs dst)
 {
   mpz_ptr erg = (mpz_ptr)omAllocBin(gmp_nrz_bin);
@@ -732,6 +715,16 @@ number nr2mMapGMP(number from, const coeffs /*src*/, const coeffs dst)
   mpz_clear(k);   omFree((ADDRESS)k);
 
   return (number)res;
+}
+
+number nr2mMapQ(number from, const coeffs src, const coeffs dst)
+{
+  mpz_ptr gmp = (mpz_ptr)omAllocBin(gmp_nrz_bin);
+  mpz_init(gmp);
+  nlGMP(from, (number)gmp, src); // FIXME? TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // to be replaced with n_MPZ(erg, from, src); // ?
+  number res=nr2mMapGMP((number)gmp,src,dst);
+  mpz_clear(gmp); omFree((ADDRESS)gmp);
+  return res;
 }
 
 number nr2mMapZ(number from, const coeffs src, const coeffs dst)
@@ -770,7 +763,7 @@ nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
   {
     return nr2mMapZ;
   }
-  if ((src->rep==n_rep_gap_rat) && nCoeff_is_Q(src))
+  if ((src->rep==n_rep_gap_rat) && (nCoeff_is_Q(src)||nCoeff_is_Ring_Z(src)))
   {
     return nr2mMapQ;
   }

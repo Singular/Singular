@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version presolve.lib 4.0.1.2 Jan_2015 "; // $Id$
+version="version presolve.lib 4.0.2.2 Jan_2016 "; // $Id$
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -1096,7 +1096,7 @@ EXAMPLE: example sortandmap; shows an example
       }
       else
       {
-         @o = @o+@L2[@ii div 2 -1]+"("+string(size(@l[@ii div 2]))+"),";
+         @o = @o+@L2[@ii div 2 -1]+"("+string(size(@l[@ii]))+"),";
       }
    }
    @o=@o[1..size(@o)-1];

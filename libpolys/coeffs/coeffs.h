@@ -733,6 +733,9 @@ static FORCE_INLINE BOOLEAN n_DBTest(number, const char*, const int, const coeff
 { STATISTIC(n_Test);  return TRUE; }
 #endif
 
+/// BOOLEAN n_Test(number a, const coeffs r)
+#define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
+
 /// output the coeff description
 static FORCE_INLINE void   n_CoeffWrite(const coeffs r, BOOLEAN details = TRUE)
 { STATISTIC(n_CoeffWrite); assume(r != NULL); assume(r->cfCoeffWrite != NULL); r->cfCoeffWrite(r, details); }
@@ -918,9 +921,6 @@ static FORCE_INLINE BOOLEAN nCoeff_is_Q_algext(const coeffs r)
 /// TRUE iff r represents a transcendental extension field
 static FORCE_INLINE BOOLEAN nCoeff_is_transExt(const coeffs r)
 { assume(r != NULL); return (getCoeffType(r)==n_transExt); }
-
-/// BOOLEAN n_Test(number a, const coeffs r)
-#define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
 
 /// Computes the content and (inplace) divides it out on a collection
 /// of numbers

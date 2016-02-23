@@ -61,7 +61,7 @@ at
 Release versions of @sc{Singular} are also available
 from our FTP site
 @display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/4-0-1/}.
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/4-0-3/}.
 @end display
 
 @c @include README_download.texi
@@ -104,7 +104,7 @@ Install flint 2.4:
 Install Singular
 @code{./configure --with-flint=$HOME/tmp --enable-gfanlib --prefix=$HOME/Singular4}
 @*@code{make && make install}
-@*(@code{$HOME/Singular4/bin/Singular} is the main execuatble)
+@*(@code{$prefix/bin/Singular} is the main execuatble)
 @item (optional)
 install 4ti2
 @item (optional)

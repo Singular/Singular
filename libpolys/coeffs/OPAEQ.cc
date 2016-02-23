@@ -321,7 +321,12 @@ BOOLEAN nAEQClearDenominators  (number, const coeffs)
 
 static char * n_QAECoeffName(const coeffs r)
 {
-  return (char *)"QAE";
+  return (char*)("QAE");
+}
+
+static char * n_QAECoeffString(const coeffs r)
+{
+  return omStrDup("QAE");
 }
 
 
@@ -344,6 +349,7 @@ BOOLEAN n_QAEInitChar(coeffs r, void *)
     r->cfSize  = nAEQSize;
     r->cfInt  = nAEQInt;
     r->cfCoeffName = n_QAECoeffName;
+    r->cfCoeffString = n_QAECoeffString;
 #ifdef HAVE_RINGS
     //r->cfDivComp = NULL; // only for ring stuff
     //r->cfIsUnit = NULL; // only for ring stuff

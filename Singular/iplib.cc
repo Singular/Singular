@@ -766,7 +766,9 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
     if((LT = type_of_LIB(libname, libnamebuf)) > LT_NOTFOUND)
     {
       char *s=omStrDup(libname);
+      #ifdef HAVE_DYNAMIC_LOADING
       char libnamebuf[256];
+      #endif
 
       if (LT==LT_SINGULAR)
         LoadResult = iiLibCmd(s, FALSE, FALSE,TRUE);
@@ -1123,7 +1125,7 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport)
       }
       else
       {
-        Warn("// ** loaded %s for a different version of Singular(expected: %d, got %d)",fullname,MAX_TOK,ver);
+        Warn("loaded %s for a different version of Singular(expected MAX_TOK: %d, got %d)",fullname,MAX_TOK,ver);
       }
       currPack->loaded=1;
       currPack=s;

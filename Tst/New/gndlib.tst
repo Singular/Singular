@@ -44,7 +44,7 @@ if(ex == 2)
   poly y1,y2,y3,y4;
   y3 = 1+a1*x2+a1*x2^2+a3*x1*x2^4+a4*x1*x2^6;
   y4 = 1+a4*x2+(a2^2+a3)*x2^10+(a1+a2+a3+a4)*x1*x2^11;
-  
+
   list as,xs;
   if(nra != 0)
   {
@@ -192,7 +192,7 @@ if(ex == 7)
   poly y1,y2,y3,y4;
   y3 = 1+a1*x2+(a2+a3+a4)*x2^2;
   y4 = 1+a2*x2^2;
-  
+
   list as,xs;
   if(nra != 0)
   {
@@ -230,7 +230,7 @@ if(ex == 8)
   poly y1,y2,y3,y4;
   y3 = 1+a1*x2;
   y4 = 1+a2*x2^2;
-  
+
   list as,xs;
   if(nra != 0)
   {

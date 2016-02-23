@@ -37,7 +37,7 @@ public:
     row = iv->rows();
     col = iv->cols();
     assume(row >= 0);
-    assume(col > 0);
+    assume(col >= 0);
     if (row*col>0)
     {
       v   = (int *)omAlloc(sizeof(int)*row*col);
@@ -97,6 +97,8 @@ public:
   char * ivString(int not_mat=1,int spaces=0, int dim=2) const;
   inline ~intvec()
     {
+      assume(row>=0);
+      assume(col>=0);
       if (v!=NULL)
       {
         omFreeSize((ADDRESS)v,sizeof(int)*row*col);
@@ -105,6 +107,8 @@ public:
     }
   inline void ivTEST() const
     {
+      assume(row>=0);
+      assume(col>=0);
       if (row>0) omCheckAddrSize((ADDRESS)v,sizeof(int)*row*col);
     }
   inline int min_in()

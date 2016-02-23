@@ -4,10 +4,10 @@ ${FACTORY_INCLUDES} $(OMALLOC_INCLUDES) $(RESOURCES_INCLUDES) \
 ${NTL_CFLAGS} $(FLINT_CFLAGS) ${GMP_CFLAGS}
 
 noinst_LTLIBRARIES=libmaps.la
-libmaps_la_SOURCES=fast_maps.cc
+libmaps_la_SOURCES=fast_maps.cc gen_maps.cc find_perm.cc subst_maps.cc
 
 libmaps_la_includedir=$(includedir)/singular/kernel/maps
-libmaps_la_include_HEADERS=fast_maps.h
+libmaps_la_include_HEADERS=fast_maps.h gen_maps.h find_perm.h
 
 
 

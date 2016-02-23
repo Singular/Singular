@@ -6,8 +6,8 @@ template <class T>
 Factor<T>& Factor<T>::operator= ( const Factor<T>& f )
 {
     if ( this != &f ) {
-	_factor = f._factor;
-	_exp = f._exp;
+        _factor = f._factor;
+        _exp = f._exp;
     }
     return *this;
 }
@@ -31,9 +31,9 @@ template <class T>
 void Factor<T>::print ( OSTREAM& s ) const
 {
     if ( exp() == 1 )
-	s << factor();
+        s << factor();
     else
-	s << "(" << factor() << ")^" << exp();
+        s << "(" << factor() << ")^" << exp();
 }
 
 template <class T>

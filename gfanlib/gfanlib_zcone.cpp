@@ -458,7 +458,7 @@ _L99:
     dd_MatrixPtr A=NULL;
     dd_ErrorType err=dd_NoError;
 
-	cddinitGmp();
+        cddinitGmp();
 
     A=ZMatrix2MatrixGmp(inequalities, equations, &err);
 
@@ -747,9 +747,9 @@ std::ostream &operator<<(std::ostream &f, ZCone const &c)
 
 std::string ZCone::toString()const
 {
-	std::stringstream f;
-	f<<*this;
-	return f.str();
+        std::stringstream f;
+        f<<*this;
+        return f.str();
 // =======
 //   std::stringstream s;
 //   s<<"AMBIENT_DIM"<<std::endl;
@@ -982,8 +982,8 @@ ZCone ZCone::givenByRays(ZMatrix const &generators, ZMatrix const &linealitySpac
       newGenerators[i]=QToZVectorPrimitive(l.canonicalize(ZToQVector(generators[i])));
   }
 */
-//	  ZCone dual(newGenerators,linealitySpace);
-	  ZCone dual(generators,linealitySpace);
+//          ZCone dual(newGenerators,linealitySpace);
+          ZCone dual(generators,linealitySpace);
 //  dual.findFacets();
 //  dual.canonicalize();
   ZMatrix inequalities=dual.extremeRays();

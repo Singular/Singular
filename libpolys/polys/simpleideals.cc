@@ -1598,7 +1598,8 @@ ideal id_Transp(ideal a, const ring rRing)
   int r = a->rank, c = IDELEMS(a);
   ideal b =  idInit(r,c);
 
-  for (int i=c; i>0; i--)
+  int i;
+  for (i=c; i>0; i--)
   {
     poly p=a->m[i-1];
     while(p!=NULL)
@@ -1607,14 +1608,21 @@ ideal id_Transp(ideal a, const ring rRing)
       int co=p_GetComp(h, rRing)-1;
       p_SetComp(h, i, rRing);
       p_Setm(h, rRing);
-      b->m[co] = p_Add_q(b->m[co], h, rRing);
+      h->next=b->m[co];
+      b->m[co]=h;
       pIter(p);
+    }
+  }
+  for (i=IDELEMS(b)-1; i>=0; i--)
+  {
+    poly p=b->m[i];
+    if(p!=NULL)
+    {
+      b->m[i]=p_SortMerge(p,rRing,TRUE);
     }
   }
   return b;
 }
-
-
 
 /*2
 * The following is needed to compute the image of certain map used in

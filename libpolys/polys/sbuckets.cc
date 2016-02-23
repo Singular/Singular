@@ -122,7 +122,7 @@ static inline int LOG2(int i)
 //////////////////////////////////////////////////////////////////////////
 // Creation/Destruction of buckets
 //
-sBucket_pt    sBucketCreate(ring r)
+sBucket_pt    sBucketCreate(const ring r)
 {
   sBucket_pt bucket = (sBucket_pt) omAlloc0Bin(sBucket_bin);
   bucket->bucket_ring = r;
@@ -329,7 +329,7 @@ done:
 // Sorts a poly using BucketSort
 //
 
-poly sBucketSortMerge(poly p, ring r)
+poly sBucketSortMerge(poly p, const ring r)
 {
 #ifdef HAVE_ASSUME
   int l_in = pLength(p);
@@ -366,7 +366,7 @@ poly sBucketSortMerge(poly p, ring r)
 // Sorts a poly using BucketSort
 //
 
-poly sBucketSortAdd(poly p, ring r)
+poly sBucketSortAdd(poly p, const ring r)
 {
 #ifdef HAVE_ASSUME
   int l_in = pLength(p);

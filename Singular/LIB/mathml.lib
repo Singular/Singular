@@ -28,39 +28,39 @@ LIB "matrix.lib";
 
 
 /*********************************************************
-**							**
-**			  TOOLs				**
-**							**
+**                                                        **
+**                          TOOLs                                **
+**                                                        **
 *********************************************************/
 
 static proc mathmlStringReplace(string s,string dummy,string origin)"USAGE: texStringReplace(s); where s is a string
 ASSUME: s is a string
-RETURN:	s including origin instead of dummy
+RETURN:        s including origin instead of dummy
 THEORY: if s contains dummy, these parts will be replaced by origin
 "{
-	int k,L;
-	string S;
-	S = s;
-	while(find(S,dummy)>0){
-		k = find(S,dummy);
-		L = size(dummy);
-		if(k+L<=size(S)){		
-			S = S[1,k-1] + origin +  S[k+L..size(S)];
-		}
-		else{S = S[1,k-1] + origin;}
-	}
+        int k,L;
+        string S;
+        S = s;
+        while(find(S,dummy)>0){
+                k = find(S,dummy);
+                L = size(dummy);
+                if(k+L<=size(S)){
+                        S = S[1,k-1] + origin +  S[k+L..size(S)];
+                }
+                else{S = S[1,k-1] + origin;}
+        }
 
 return(S);
 }
 
 
 proc mathmlRingType(){
-	string S 	= charstr(basering);
-	int i		= find(S,",");
+        string S         = charstr(basering);
+        int i                = find(S,",");
         int n;
-	if(i>0){S = S[1,i-1];}
-	if(S=="real" || S =="complex"){return(0)}
-	else{ if (npars(basering)>0) {
+        if(i>0){S = S[1,i-1];}
+        if(S=="real" || S =="complex"){return(0)}
+        else{ if (npars(basering)>0) {
                   n=ringlist(basering)[1][1];
                   if (n!=0 && prime(n)!=n) {return(2);}
                   else {return(1);}}
@@ -70,9 +70,9 @@ proc mathmlRingType(){
 
 
 /*********************************************************
-**							**
-**			  POLY				**
-**							**
+**                                                        **
+**                          POLY                                **
+**                                                        **
 *********************************************************/
 
 
@@ -84,7 +84,7 @@ if (s=="1"){return(t);}
 if (s=="-1"){return("<mo>-</mo>");}
  while (i<size(s)) {
    if (s[i]=="/")  {u=1;
-                    i=size(s);} 
+                    i=size(s);}
    i=i+1;
   }
 i=1;
@@ -94,7 +94,7 @@ if (u==1) {
    i=2;}
    t=t+"<mfrac> <mn>";
  while (i<=size(s)) {
-    if (s[i]=="/") {t=t+"</mn> <mn>";} 
+    if (s[i]=="/") {t=t+"</mn> <mn>";}
     else           {t=t+s[i];}
     i=i+1;
     }
@@ -104,17 +104,17 @@ if (u==0) {
   if (s[1]=="-") {t=t+"<mo>-</mo>";s=s[2,size(s)-1];}
   t=t+"<mn>"+s+"</mn>";}
 return(t);
-}  
+}
 
 proc mathmlVariablesEncoding(string s)  {
 string S;
 int p;
  if(s[size(s)]==")"){
-			p = find(s,"(");
-			S = S + "<msub><mi>"+s[1,p-1] + "</mi><mn>" + s[p+1,size(s)-p-1]+ "</mn></msub>";
-		}
-  else{   
-        if (size(s)>1)  { 
+                        p = find(s,"(");
+                        S = S + "<msub><mi>"+s[1,p-1] + "</mi><mn>" + s[p+1,size(s)-p-1]+ "</mn></msub>";
+                }
+  else{
+        if (size(s)>1)  {
                   S = S + "<msub><mi>"+s[1] + "</mi><mn>" + s[2,size(s)-1]+ "</mn></msub>";}
         else         {S="<mi>"+s+"</mi>";}
       }
@@ -135,7 +135,7 @@ for(int i=1;i<=size(d);i++)  {
   if (d[i]>1) {g=g+string(d[i]);}
   g=g+"</mn></msup>";
   k=k+1;}
-  }   
+  }
 return(g);
 }
 
@@ -185,28 +185,28 @@ return(n);
 }
 
 proc mathmlPolyGAL(poly p){
-	string S;
-	for(int i = 1;i<size(p);i++){
-		S = S + mathmlTermGAL(p[i]);
+        string S;
+        for(int i = 1;i<size(p);i++){
+                S = S + mathmlTermGAL(p[i]);
            if (string(leadcoef(p[i+1]))!="-1") {S=S+"<mo>+</mo>";}
-	}
-	S = S+ mathmlTermGAL(p[i]);
+        }
+        S = S+ mathmlTermGAL(p[i]);
 return(S);
 }
 
 proc mathmlTermGAL(poly p){
-	int b = 0;
-	int B = 0;	
-	string S,S1,C,Pname;
-	Pname = ringlist(basering)[1][2][1];
-	C = string(leadcoef(p));
-	
-	C = mathmlStringReplace(C,Pname,"");
+        int b = 0;
+        int B = 0;
+        string S,S1,C,Pname;
+        Pname = ringlist(basering)[1][2][1];
+        C = string(leadcoef(p));
+
+        C = mathmlStringReplace(C,Pname,"");
         C = mathmlStringReplace(C,"^","");
         if (p==-1 || p==1 || p==0) {return("<mn>"+string(p)+"</mn>");}
          else {
            if (C=="-1") {S=S+"<mo>-</mo>";}
-           else { 
+           else {
              if (C!="1") {S =S+ "<msup><mi>"+Pname+"</mi><mn>"+C +"</mi></msup>";}
               }
           S=S+mathmlMonomial(leadmonom(p));
@@ -219,16 +219,16 @@ proc mathmlTermGAL(poly p){
 
 proc mathmlPolyR(poly a) {
       string S;
-  
+
       def origin = basering;
-   
+
       if(npars(origin) == 0){
-		list l 		= ringlist(basering);
-		l[1][3] 	= "parTMP";
-		def ringCOMPLEX	= ring(l);
-		setring ringCOMPLEX;
-		poly a = fetch(origin,a);
-	}
+                list l                 = ringlist(basering);
+                l[1][3]         = "parTMP";
+                def ringCOMPLEX        = ring(l);
+                setring ringCOMPLEX;
+                poly a = fetch(origin,a);
+        }
     string S1;
     string S2;
     poly d;
@@ -242,7 +242,7 @@ proc mathmlPolyR(poly a) {
      else                        {S=S+"<mo>+</mo>";}
      S1=mathmlMonomial(leadmonom(d));
       if (leadcoef(d)==1) {
-       if (S1=="") {S=S+"<mn>1</mn>";} 
+       if (S1=="") {S=S+"<mn>1</mn>";}
    }
     else {
         s=string(leadcoef(d));
@@ -268,7 +268,7 @@ number d=leadcoef(a);
 list l12=ringlist(r);
 int n=npars(basering);
 
- if (n>0) { 
+ if (n>0) {
     if (SignumLeadcoef(numerator(d))) {
            g=g+"<mo>-</mo>";
            d=-d;
@@ -296,7 +296,7 @@ if (a!=0) {
  if (n==0) {if (poly(leadcoef(a))>0) {g=g+"<mo>+</mo>";}}
  else      {if (SignumLeadcoef(numerator(leadcoef(a)))==0) {g=g+"<mo>+</mo>";}}
   g=g+mathmlPolyN(a,r);
- } 
+ }
 return(g);
 }
 
@@ -316,9 +316,9 @@ return(g);
 example
 { "EXAMPLE:"; echo=2;
         string h;
-	ring r = (0,a),(x1,x2),dp;
-	h=h+mathmlPoly(x1+a2)+"<br>";
-	h=h+mathmlPoly(x1*x2^3)+"<br>";
+        ring r = (0,a),(x1,x2),dp;
+        h=h+mathmlPoly(x1+a2)+"<br>";
+        h=h+mathmlPoly(x1*x2^3)+"<br>";
         ring r=(0,a,b),(x(1..2)),lp;
         poly z=(3*a^2-12*b)*x(1)^2*x(2)+(3*a^3-1)*x(2)+x(1)^2-3/5*x(1)+1;
         h=h+mathmlPoly(z)+"<br>";
@@ -355,29 +355,29 @@ example
 
 
 /*********************************************************
-**							**
-**			ring				**
-**							**
+**                                                        **
+**                        ring                                **
+**                                                        **
 *********************************************************/
 
 proc mathmlRing(def r)
 "USAGE:  texRing(r); where r is a ring
 ASSUME:  r is a ring
 RETURN:  lateX-code for the ring r
-THEORY:        
+THEORY:
 KEYWORDS: ring, lateX, teX, tex, latex
 EXAMPLE:  example texRing; shows an example
 "
 {       setring r;
-	list l,l1,l2;
-	l 	= ringlist(r);
+        list l,l1,l2;
+        l         = ringlist(r);
         l2      = ringlist(r)[2];
 
-	string c,p,P,V,C,S,h;
-	
-	int i,b;
-	int bchar;
-        
+        string c,p,P,V,C,S,h;
+
+        int i,b;
+        int bchar;
+
 
         list l3=l;
         l3[4]=ideal(0);
@@ -385,36 +385,36 @@ EXAMPLE:  example texRing; shows an example
         setring w;
         list l=fetch(r,l);
         setring r;
-	
-      	
-	//characteristic
-	c  = charstr(r); 		
-	bchar = 0;
-	if(find(c,",") != 0){
-		c 	= c[1,find(c,",")-1];
-		b = 0;
-		if(typeof(l[1][2][1]) != "string" && b==0&& c =="integer"){bchar= 1;b = 1;}	
-		if(typeof(l[1][2][1]) != "string" && b==0){bchar  = 2;b=1;}
-		if(b==0){  if (mathmlRingType()==2) {bchar = 4;}
-                           else {bchar=3;} 
-                        }        
-	}	
-	
-	//minimalpolynom
-	p = string(minpoly);
-	
+
+
+        //characteristic
+        c  = charstr(r);
+        bchar = 0;
+        if(find(c,",") != 0){
+                c         = c[1,find(c,",")-1];
+                b = 0;
+                if(typeof(l[1][2][1]) != "string" && b==0&& c =="integer"){bchar= 1;b = 1;}
+                if(typeof(l[1][2][1]) != "string" && b==0){bchar  = 2;b=1;}
+                if(b==0){  if (mathmlRingType()==2) {bchar = 4;}
+                           else {bchar=3;}
+                        }
+        }
+
+        //minimalpolynom
+        p = string(minpoly);
 
 
 
-	//parameters
-	if(bchar==3){
-		if(p != "0"){P=P+"[";}						
-		else{P=P+"(";}
-			for(i=1;i<size(l[1][2]);i++){
-				P = P + mathmlVariablesEncoding(string(l[1][2][i])) +",";
-			}
-			P=P+mathmlVariablesEncoding(string(l[1][2][size(l[1][2])]));
-		if(p != "0"){
+
+        //parameters
+        if(bchar==3){
+                if(p != "0"){P=P+"[";}
+                else{P=P+"(";}
+                        for(i=1;i<size(l[1][2]);i++){
+                                P = P + mathmlVariablesEncoding(string(l[1][2][i])) +",";
+                        }
+                        P=P+mathmlVariablesEncoding(string(l[1][2][size(l[1][2])]));
+                if(p != "0"){
                         l3[1][4]=ideal(0);
                         w=ring(l3);
                         setring(w);
@@ -427,50 +427,50 @@ EXAMPLE:  example texRing; shows an example
                         P=P + "]/{"+h+"}";
                         setring(r);
                        }
-		else{P=P+")";}
-	}
+                else{P=P+")";}
+        }
 
 
-	//variables
-	V = V + "[";
-	for(i = 1;i<size(l2);i++){
-		V = V + mathmlVariablesEncoding((string(l2[i]))) + ",";	
-	}
-	V = V + mathmlVariablesEncoding((string(l2[size(l2)])));
-	V = V + "]";
+        //variables
+        V = V + "[";
+        for(i = 1;i<size(l2);i++){
+                V = V + mathmlVariablesEncoding((string(l2[i]))) + ",";
+        }
+        V = V + mathmlVariablesEncoding((string(l2[size(l2)])));
+        V = V + "]";
 
-	b = 0;
-	if(c == "integer" && b == 0){
-		if(bchar==1){							//Z/(p^k)
-			if(string(l[1][2][2])!="1"){
-			C=C+"<msub><mrow><mn>&integers;</mn></mrow><mrow><msup><mrow>"+string(l[1][2][1])+"</mrow><mrow>"+string(l[1][2][2])+"<mrow></msup></mrow></msub>";
-			}
-			else{C=C+"<msub><mn>&integers;</mn>"+"<mn>"+string(l[1][2][1])+"</mn></msub>";}
-			b = 1;
-		}
-		else{C = C + "<mn>&integers;</mn>";b=1;} 				//Z
-	}
-	if(c == "0" && b == 0){C = C + "<mn>&rationals;</mn>";b=1;}			//Q
-	if(c == "real" && b == 0){C = C + "<mn>&reals;</mn>";b=1;}			//R
-	if(c == "complex" && b == 0){
-		b=1;
-		if(typeof(l[1][3]) != "none"){
-			if(l[1][3]!="i"){C = C + "<mn>&reals;</mn>("+l[1][3]+")";}	//R(j)
-			else{C = C + "<mn>&complexes;</mn>";}
-		}
-		else{C = C + "<mn>&complexes;</mn";}					   //C
-	}
-	if(b == 0){ if (bchar==4) {C = C + "<msub><mn>F</mn>"+c+"</msub>";}                //F/p
+        b = 0;
+        if(c == "integer" && b == 0){
+                if(bchar==1){                                                        //Z/(p^k)
+                        if(string(l[1][2][2])!="1"){
+                        C=C+"<msub><mrow><mn>&integers;</mn></mrow><mrow><msup><mrow>"+string(l[1][2][1])+"</mrow><mrow>"+string(l[1][2][2])+"<mrow></msup></mrow></msub>";
+                        }
+                        else{C=C+"<msub><mn>&integers;</mn>"+"<mn>"+string(l[1][2][1])+"</mn></msub>";}
+                        b = 1;
+                }
+                else{C = C + "<mn>&integers;</mn>";b=1;}                                 //Z
+        }
+        if(c == "0" && b == 0){C = C + "<mn>&rationals;</mn>";b=1;}                        //Q
+        if(c == "real" && b == 0){C = C + "<mn>&reals;</mn>";b=1;}                        //R
+        if(c == "complex" && b == 0){
+                b=1;
+                if(typeof(l[1][3]) != "none"){
+                        if(l[1][3]!="i"){C = C + "<mn>&reals;</mn>("+l[1][3]+")";}        //R(j)
+                        else{C = C + "<mn>&complexes;</mn>";}
+                }
+                else{C = C + "<mn>&complexes;</mn";}                                           //C
+        }
+        if(b == 0){ if (bchar==4) {C = C + "<msub><mn>F</mn>"+c+"</msub>";}                //F/p
                     else          {C = C + "<msub><mn>&integers;</mn>"+c+"</msub>";b=1;}   //Z/p
-	
-	           }
-	//epic conclusion
-	if(size(P)!=0){S = S + C+P+V;}
-	else{S=S+C+V;}
-	
-       if (l[4]!=0) { 
+
+                   }
+        //epic conclusion
+        if(size(P)!=0){S = S + C+P+V;}
+        else{S=S+C+V;}
+
+       if (l[4]!=0) {
           setring w;
-           
+
           S=S+"<mo>/</mo><mo>(</mo>";
             for(int k=1;k<=size(l[4]);k++) {
              h=mathmlPoly(l[4][k]);
@@ -479,8 +479,8 @@ EXAMPLE:  example texRing; shows an example
              }
           S=S[1,size(S)-10]+"<mo>)</mo>";
         }
-        
-	S = "<math xmlns=http://www.w3.org/1998/Math/MathML>" + S + "</math>";
+
+        S = "<math xmlns=http://www.w3.org/1998/Math/MathML>" + S + "</math>";
 return(S);
 }
 
@@ -488,40 +488,40 @@ return(S);
 example
 { "EXAMPLE:"; echo=2;
         string h;
-	ring r = 32003,(x,y,z),dp;
-	h=h+mathmlRing(r)+"<br>";
-	ring r = 32003,(x(1..10)),dp;
-	h=h+mathmlRing(r)+"<br>";
-	ring r = 0,(a,b,c,d),lp;
-	h=h+mathmlRing(r)+"<br>";
-	ring r =7,(x,y,z),ds;
-	h=h+mathmlRing(r)+"<br>";
-	ring r = 7,(x(1..6)),(lp(3),dp);
-	h=h+mathmlRing(r)+"<br>";
-	ring r =0,(x,y,z),(c,wp(2,1,3));
-	h=h+mathmlRing(r)+"<br>";
-	ring r =(7,a,b,c),(x,y,z),Dp;
-	h=h+mathmlRing(r)+"<br>";
-	ring r =(7,a),(x,y,z),dp; minpoly = a^2+a+3;
-	h=h+mathmlRing(r)+"<br>";
-	ring r =real,(x,y,z),dp;
-	h=h+mathmlRing(r)+"<br>";
+        ring r = 32003,(x,y,z),dp;
+        h=h+mathmlRing(r)+"<br>";
+        ring r = 32003,(x(1..10)),dp;
+        h=h+mathmlRing(r)+"<br>";
+        ring r = 0,(a,b,c,d),lp;
+        h=h+mathmlRing(r)+"<br>";
+        ring r =7,(x,y,z),ds;
+        h=h+mathmlRing(r)+"<br>";
+        ring r = 7,(x(1..6)),(lp(3),dp);
+        h=h+mathmlRing(r)+"<br>";
+        ring r =0,(x,y,z),(c,wp(2,1,3));
+        h=h+mathmlRing(r)+"<br>";
+        ring r =(7,a,b,c),(x,y,z),Dp;
+        h=h+mathmlRing(r)+"<br>";
+        ring r =(7,a),(x,y,z),dp; minpoly = a^2+a+3;
+        h=h+mathmlRing(r)+"<br>";
+        ring r =real,(x,y,z),dp;
+        h=h+mathmlRing(r)+"<br>";
         ring r =(real,50),(x,y,z),dp;
-	h=h+mathmlRing(r)+"<br>";
-	ring r =(real,10,50),(x,y,z),dp;
-	h=h+mathmlRing(r)+"<br>";
-	ring r = (complex,30,j),(x,y,z),dp;
-	h=h+mathmlRing(r)+"<br>";
-	ring r =complex,(x,y,z),dp;
-	h=h+mathmlRing(r)+"<br>";
-	ring r =7,(x,y,z), dp;
-	h=h+mathmlRing(r)+"<br>";
-	ring r =integer,(x,y,z), dp;
-	h=h+mathmlRing(r)+"<br>";
-	ring r =(integer, 6, 3),(x,y,z), dp;
-	h=h+mathmlRing(r)+"<br>";
-	ring r =(integer, 100),(x,y,z), dp;
-	h=h+mathmlRing(r)+"<br>";
+        h=h+mathmlRing(r)+"<br>";
+        ring r =(real,10,50),(x,y,z),dp;
+        h=h+mathmlRing(r)+"<br>";
+        ring r = (complex,30,j),(x,y,z),dp;
+        h=h+mathmlRing(r)+"<br>";
+        ring r =complex,(x,y,z),dp;
+        h=h+mathmlRing(r)+"<br>";
+        ring r =7,(x,y,z), dp;
+        h=h+mathmlRing(r)+"<br>";
+        ring r =integer,(x,y,z), dp;
+        h=h+mathmlRing(r)+"<br>";
+        ring r =(integer, 6, 3),(x,y,z), dp;
+        h=h+mathmlRing(r)+"<br>";
+        ring r =(integer, 100),(x,y,z), dp;
+        h=h+mathmlRing(r)+"<br>";
         ring r=(121,a),x,lp;
         h=h+mathmlRing(r);
         viewMathml(h);
@@ -530,82 +530,82 @@ example
 
 
 /*********************************************************
-**							**
-**			map				**
-**							**
+**                                                        **
+**                        map                                **
+**                                                        **
 *********************************************************/
 
 
 proc mathmlMap(map f, list #)"USAGE:  texMap(f, #); #[1] source XOR texMap(f),if source == target
 ASSUME:  f is a map, #[1] ring or empty
 RETURN:  lateX-code for the map f
-THEORY:        
+THEORY:
 KEYWORDS: map, lateX, teX, tex, latex
 EXAMPLE:  example texMap; shows an example
 "
-{	
-	
-	// f: s--->r (rings) || f:s1--->s2 (string)
-	string s1,s2;
+{
+
+        // f: s--->r (rings) || f:s1--->s2 (string)
+        string s1,s2;
         string h1,h2;
-	string T,S; //variables, output string 
-	s2 = mathmlRing(basering);
-	s2 = s2[48,size(s2)-54];
-	int B = 0;
-	int b = 0;
-	if(nameof(basering)==nameof(preimage(f))){b=1;}
-	
-	def r = basering;
-	if(size(#)!=0){
-		if(typeof(#[1]) != "ring"){return("ERROR - wrong input. check texMap documentation." );}
-		def 	s;
-			s = #[1];
-		setring s;
-		s1	= mathmlRing(s);
-		s1 	= s1[48,size(s1)-54];	
-		list l1;		
-		for(int k=1;k<=nvars(s);k++){
-			l1[k] = mathmlVariablesEncoding(string(var(k)));
-		}
-		
-		setring r;
-		for(int i = 1;i<=nvars(s);i++){
+        string T,S; //variables, output string
+        s2 = mathmlRing(basering);
+        s2 = s2[48,size(s2)-54];
+        int B = 0;
+        int b = 0;
+        if(nameof(basering)==nameof(preimage(f))){b=1;}
+
+        def r = basering;
+        if(size(#)!=0){
+                if(typeof(#[1]) != "ring"){return("ERROR - wrong input. check texMap documentation." );}
+                def         s;
+                        s = #[1];
+                setring s;
+                s1        = mathmlRing(s);
+                s1         = s1[48,size(s1)-54];
+                list l1;
+                for(int k=1;k<=nvars(s);k++){
+                        l1[k] = mathmlVariablesEncoding(string(var(k)));
+                }
+
+                setring r;
+                for(int i = 1;i<=nvars(s);i++){
                         h1=mathmlPoly(f[i]);
                         h2=h1[48,size(h1)-54];
-			T =T+ "<mtr><mtd>"+l1[i]+"</mtd><mtd>"+"<mo>&mapsto;</mo>"+"</mtd><mtd>"+h2+"</mtd></mtr>";
-		}
-	}
-	else{
-		if(b==1){
-			mathmlMap(f,basering);
-			return();
-		}
-		else{
-			s1 = "'"+nameof(preimage(f))+"'";
-			print("For detailed information we need the source");
-			B = 1;
-		}
+                        T =T+ "<mtr><mtd>"+l1[i]+"</mtd><mtd>"+"<mo>&mapsto;</mo>"+"</mtd><mtd>"+h2+"</mtd></mtr>";
+                }
+        }
+        else{
+                if(b==1){
+                        mathmlMap(f,basering);
+                        return();
+                }
+                else{
+                        s1 = "'"+nameof(preimage(f))+"'";
+                        print("For detailed information we need the source");
+                        B = 1;
+                }
 
-	}
-	S = "<mtr><mtd>"+s1+"</mtd><mtd>" + "<mo>&rightarrow;</mo>" +"</mtd><mtd>"+ s2+"</mtd></mtr>"+T;
-	S = "<math xmlns=http://www.w3.org/1998/Math/MathML><mtable>" + S + "</mtable></math>";
-	
-	return(S);
+        }
+        S = "<mtr><mtd>"+s1+"</mtd><mtd>" + "<mo>&rightarrow;</mo>" +"</mtd><mtd>"+ s2+"</mtd></mtr>"+T;
+        S = "<math xmlns=http://www.w3.org/1998/Math/MathML><mtable>" + S + "</mtable></math>";
+
+        return(S);
 }
 example
 { "EXAMPLE:"; echo=2;
         string h;
-	ring U 	= 0,(x,y,z),lp;
-	ring M2 = real,(z(1..3)),lp;
-	setring M2;
-	map f	= U,z(1)*z(2)^3,z(1),-z(2);
-	h=h+mathmlMap(f)+"<br>";
-	//2nd
-	h=h+mathmlMap(f,U)+"<br>";
-	//3rd
-	ring R = real,(x,y,z),lp;
-	map f2 = R,x2,y2,z-x;
-	h=h+string(mathmlMap(f2));
+        ring U         = 0,(x,y,z),lp;
+        ring M2 = real,(z(1..3)),lp;
+        setring M2;
+        map f        = U,z(1)*z(2)^3,z(1),-z(2);
+        h=h+mathmlMap(f)+"<br>";
+        //2nd
+        h=h+mathmlMap(f,U)+"<br>";
+        //3rd
+        ring R = real,(x,y,z),lp;
+        map f2 = R,x2,y2,z-x;
+        h=h+string(mathmlMap(f2));
         viewMathml(h);}
 
 
@@ -616,109 +616,109 @@ example
 
 
 /*********************************************************
-**							**
-**			IDEAL				**
-**							**
+**                                                        **
+**                        IDEAL                                **
+**                                                        **
 *********************************************************/
 proc mathmlIdeal(ideal I)"USAGE: texIdeal(I), where I is an ideal
 ASSUME:  I is an ideal
 RETURN:  lateX-code for the ideal I
-THEORY: 
+THEORY:
 KEYWORDS: ideal, lateX, teX, tex, latex
 EXAMPLE:  example texIdeal; shows an example
 "{
-	string S = "";
-	for(int i = 1;i<size(I);i++){
-		S = S + mathmlPoly(I[i],"no$") + ",";
-	}
-	S = S + mathmlPoly(I[size(I)],"no$");
-	S = "<math xmlns=http://www.w3.org/1998/Math/MathML><mo>&lang;</mo>" + S + "<mo>&rang;</mo></math>";
-	return(S);
+        string S = "";
+        for(int i = 1;i<size(I);i++){
+                S = S + mathmlPoly(I[i],"no$") + ",";
+        }
+        S = S + mathmlPoly(I[size(I)],"no$");
+        S = "<math xmlns=http://www.w3.org/1998/Math/MathML><mo>&lang;</mo>" + S + "<mo>&rang;</mo></math>";
+        return(S);
 }
 example
 {"EXAMPLE: "; echo=2;
-	ring r = 0,(x,y,z),dp;
-	ideal I = x2,y3,z;
-	viewMathml(mathmlIdeal(I));
+        ring r = 0,(x,y,z),dp;
+        ideal I = x2,y3,z;
+        viewMathml(mathmlIdeal(I));
 }
 
 
 
 /*********************************************************
-**							**
-**			LIST				**
-**							**
+**                                                        **
+**                        LIST                                **
+**                                                        **
 *********************************************************/
 proc mathmlList(list l)"USAGE: texList(l), where l is a list
 ASSUME:  l is a list
 RETURN:  lateX-code for the list l
-THEORY: 
+THEORY:
 KEYWORDS: list, lateX, teX, tex, latex
 EXAMPLE:  example texList; shows an example
 "{
-	string tmp;
-	string S = "";
-	for(int i=1;i<size(l);i++){
-		tmp = mathml(l[i]);	
-		tmp = tmp[48,size(tmp)-54];
-		//S = S + tex(l[i]) + ";";
-		S = S + tmp + ";";	
-	}
-	//tmp = tex(l[size(l)]);	
-	tmp = mathml(l[size(l)]);
-	tmp = tmp[48,size(tmp)-54];
-	//S = S + tex(l[size(l)]);
-	S = S + tmp;	
-	S = "<math xmlns=http://www.w3.org/1998/Math/MathML><mo>{</mo>" + S + "<mo>}</mo></math>";;
-	return(S);
+        string tmp;
+        string S = "";
+        for(int i=1;i<size(l);i++){
+                tmp = mathml(l[i]);
+                tmp = tmp[48,size(tmp)-54];
+                //S = S + tex(l[i]) + ";";
+                S = S + tmp + ";";
+        }
+        //tmp = tex(l[size(l)]);
+        tmp = mathml(l[size(l)]);
+        tmp = tmp[48,size(tmp)-54];
+        //S = S + tex(l[size(l)]);
+        S = S + tmp;
+        S = "<math xmlns=http://www.w3.org/1998/Math/MathML><mo>{</mo>" + S + "<mo>}</mo></math>";;
+        return(S);
 }
 example
 {"EXAMPLE:"; echo=2;
         string h;
-	//int	
-	ring r = integer,(x,y,z),dp;
-	list l = 1,2,3;
-	h=h+mathmlList(l)+"<br>";
-	//ring	
-	ring r2 = real,(a,b,c),dp;
-	ring r3 = complex,(x(1..3)),dp;
-	list l2 = r,r2,r3;
-	h=h+mathmlList(l2)+"<br>";
-	//matrix
-	setring r;
-	matrix m1[2][2]=x2y,-xz3,0,17x3z2;
-	matrix m2[2][2]=1,2,3,4;
-	list l3 = m1,m2;
-	h=h+mathmlList(l3);
-	//poly
-	poly p  = x2-1;
-	poly p2 = x3-y+z;
-	poly p3 = y3-z7;
-	list l4 = p,p2,p3;
-	//mathmlList(l4);
+        //int
+        ring r = integer,(x,y,z),dp;
+        list l = 1,2,3;
+        h=h+mathmlList(l)+"<br>";
+        //ring
+        ring r2 = real,(a,b,c),dp;
+        ring r3 = complex,(x(1..3)),dp;
+        list l2 = r,r2,r3;
+        h=h+mathmlList(l2)+"<br>";
+        //matrix
+        setring r;
+        matrix m1[2][2]=x2y,-xz3,0,17x3z2;
+        matrix m2[2][2]=1,2,3,4;
+        list l3 = m1,m2;
+        h=h+mathmlList(l3);
+        //poly
+        poly p  = x2-1;
+        poly p2 = x3-y+z;
+        poly p3 = y3-z7;
+        list l4 = p,p2,p3;
+        //mathmlList(l4);
         viewMathml(h);
 }
 
 
 
 /*********************************************************
-**							**
-**			BIGINT,INT			**
-**							**
+**                                                        **
+**                        BIGINT,INT                        **
+**                                                        **
 *********************************************************/
 proc mathmlBigInt (bigint I){
-	return("<math xmlns=http://www.w3.org/1998/Math/MathML>"+string(I)+"</math>");
+        return("<math xmlns=http://www.w3.org/1998/Math/MathML>"+string(I)+"</math>");
 }
 
 proc mathmlInt(int I){
-	return(mathmlBigInt(I));
+        return(mathmlBigInt(I));
 }
 
 
 /*********************************************************
-**							**
-**			STRING				**
-**							**
+**                                                        **
+**                        STRING                                **
+**                                                        **
 *********************************************************/
 proc mathmlString(string m){
  return(m);
@@ -726,45 +726,45 @@ proc mathmlString(string m){
 
 
 /*********************************************************
-**							**
-**			NUMBER				**
-**							**
-**requires: mathmlPoly - since there might be a parameter 	**
+**                                                        **
+**                        NUMBER                                **
+**                                                        **
+**requires: mathmlPoly - since there might be a parameter         **
 *********************************************************/
 
 proc mathmlNumber(number n){
-	string S;
-	S = mathmlPoly(n);	
+        string S;
+        S = mathmlPoly(n);
 return(S);
 }
 
 /*********************************************************
-**							**
-**		VECTOR, INTVEC				**
-**		INTMAT, BIGINTMAT, MATRIX		**
-**							**
+**                                                        **
+**                VECTOR, INTVEC                                **
+**                INTMAT, BIGINTMAT, MATRIX                **
+**                                                        **
 *********************************************************/
 
 proc mathmlVector(vector v){
-	int L 		= size(v);
-	matrix m[L][1]	= v;
-	string S 	= mathmlMatrix(m);
+        int L                 = size(v);
+        matrix m[L][1]        = v;
+        string S         = mathmlMatrix(m);
 return(S);
 }
 
 proc mathmlIntvec(intvec v){
-	matrix m = v;
-	string S = mathmlMatrix(m);
+        matrix m = v;
+        string S = mathmlMatrix(m);
 return(S);
 }
 proc mathmlIntmat(intmat M){
-	matrix m = M;
-	string S = mathmlMatrix(m);
+        matrix m = M;
+        string S = mathmlMatrix(m);
 return(S);
 }
 proc mathmlBigintmat(bigintmat M){
-	matrix m = M;
-	string S = mathmlMatrix(m);
+        matrix m = M;
+        string S = mathmlMatrix(m);
 return(S);
 }
 
@@ -791,21 +791,21 @@ return(s);
 
 
 /*********************************************************
-**							**
-**			View			**
-**							**
+**                                                        **
+**                        View                        **
+**                                                        **
 *********************************************************/
 
 
 
 proc viewMathml(string s){
-	string p = "firefox";
-	string Sstart 	= "<!doctype html><html><head><meta charset=UTF-8><title>MathML Examples</title></head><body>";
-	string Send	= "</body></html> ";
-	string S = Sstart + s + Send;	
-	write(":w singular_mathml.html", S);
-	
-	system("sh",p+" singular_mathml.html");
+        string p = "firefox";
+        string Sstart         = "<!doctype html><html><head><meta charset=UTF-8><title>MathML Examples</title></head><body>";
+        string Send        = "</body></html> ";
+        string S = Sstart + s + Send;
+        write(":w singular_mathml.html", S);
+
+        system("sh",p+" singular_mathml.html");
 }
 
 

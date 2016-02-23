@@ -182,7 +182,7 @@ ring rDefault(int ch, int N, char **n)
 //
 
 // check intvec, describing the ordering
-BOOLEAN rCheckIV(intvec *iv)
+BOOLEAN rCheckIV(const intvec *iv)
 {
   if ((iv->length()!=2)&&(iv->length()!=3))
   {
@@ -192,7 +192,7 @@ BOOLEAN rCheckIV(intvec *iv)
   return FALSE;
 }
 
-int rTypeOfMatrixOrder(intvec * order)
+int rTypeOfMatrixOrder(const intvec* order)
 {
   int i=0,j,typ=1;
   int sz = (int)sqrt((double)(order->length()-2));
@@ -3415,7 +3415,8 @@ BOOLEAN rOrd_is_MixedDegree_Ordering(ring r)
 {
   int i;
   poly p=p_One(r);
-  p_SetExp(p,1,1,r);p_Setm(p,r);
+  p_SetExp(p,1,1,r);
+  p_Setm(p,r);
   int vz=sign(p_FDeg(p,r));
   for(i=2;i<=rVar(r);i++)
   {
@@ -3804,10 +3805,9 @@ BOOLEAN rComplete(ring r, int force)
   {
     i++; j++;
   }
-  // No use of j anymore!!!????
 
   if (i==r->pCompIndex) i++;
-  r->pOrdIndex=i; // How came it is "i" here???!!!! exp[r->pOrdIndex] is order of a poly... This may be wrong!!! IS
+  r->pOrdIndex=i;
 
   // ----------------------------
   rSetDegStuff(r);
@@ -4032,7 +4032,7 @@ static unsigned long rGetDivMask(int bits)
 }
 
 #ifdef RDEBUG
-void rDebugPrint(ring r)
+void rDebugPrint(const ring r)
 {
   if (r==NULL)
   {
@@ -5130,7 +5130,7 @@ n_coeffType rFieldType(ring r)
   return n_unknown;
 }
 
-int64 * rGetWeightVec(ring r)
+int64 * rGetWeightVec(const ring r)
 {
   assume(r!=NULL);
   assume(r->OrdSize>0);

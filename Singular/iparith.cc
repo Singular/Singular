@@ -80,8 +80,9 @@
 #include <Singular/newstruct.h>
 #include <Singular/ipshell.h>
 //#include <kernel/mpr_inout.h>
-
 #include <reporter/si_signals.h>
+
+#include <Singular/number2.h>
 
 
 #include <stdlib.h>
@@ -92,7 +93,6 @@
 #include <unistd.h>
 #include <vector>
 
-lists rDecompose(const ring r);
 ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
 
 
@@ -127,16 +127,6 @@ ring rCompose(const lists  L, const BOOLEAN check_comp=TRUE);
 #define WARN_RING        16
 
 static BOOLEAN check_valid(const int p, const int op);
-
-#ifdef SINGULAR_4_1
-// helper routine to catch all library/test parts which need to be changed
-// shall go away after the transition
-static void iiReWrite(const char *s)
-{
-  Print("please rewrite the use of >>%s<< in >>%s<<\n"
-        "%s is depreciated or changed in Singular 4-1\n",s,my_yylinebuf,s);
-}
-#endif
 
 /*=============== types =====================*/
 struct sValCmdTab
@@ -3772,6 +3762,13 @@ static BOOLEAN jjBAREISS(leftv res, leftv v)
 //  res->data = (char *)m;
 //  return FALSE;
 //}
+static BOOLEAN jjBAREISS_BIM(leftv res, leftv v)
+{
+  bigintmat *b=(bigintmat*)v->CopyD(BIGINTMAT_CMD);
+  b->hnf();
+  res->data=(char*)b;
+  return FALSE;
+}
 static BOOLEAN jjBI2N(leftv res, leftv u)
 {
   BOOLEAN bo=FALSE;
@@ -3995,6 +3992,26 @@ static BOOLEAN jjDET_BI(leftv res, leftv v)
   }
   return FALSE;
 }
+#ifdef SINGULAR_4_1
+static BOOLEAN jjDET_N2(leftv res, leftv v)
+{
+  bigintmat * m=(bigintmat*)v->Data();
+  number2 r=(number2)omAlloc0(sizeof(*r));
+  int i,j;
+  i=m->rows();j=m->cols();
+  if(i==j)
+  {
+    r->n=m->det();
+    r->cf=m->basecoeffs();
+  }
+  else
+  {
+    Werror("det of %d x %d cmatrix",i,j);
+    return TRUE;
+  }
+  return FALSE;
+}
+#endif
 static BOOLEAN jjDET_I(leftv res, leftv v)
 {
   intvec * m=(intvec*)v->Data();
@@ -4844,6 +4861,22 @@ static BOOLEAN jjRINGLIST(leftv res, leftv v)
     res->data = (char *)rDecompose((ring)v->Data());
   return (r==NULL)||(res->data==NULL);
 }
+#ifdef SINGULAR_4_1
+static BOOLEAN jjRINGLIST_C(leftv res, leftv v)
+{
+  coeffs r=(coeffs)v->Data();
+  if (r!=NULL)
+    return rDecompose_CF(res,r);
+  return TRUE;
+}
+static BOOLEAN jjRING_LIST(leftv res, leftv v)
+{
+  ring r=(ring)v->Data();
+  if (r!=NULL)
+    res->data = (char *)rDecompose_list_cf((ring)v->Data());
+  return (r==NULL)||(res->data==NULL);
+}
+#endif
 static BOOLEAN jjROWS(leftv res, leftv v)
 {
   ideal i = (ideal)v->Data();
@@ -5142,7 +5175,9 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
   int t=(int)(long)v->data;
   switch (t)
   {
+    #ifdef SINGULAR_4_1
     case CRING_CMD:
+    #endif
     case INT_CMD:
     case POLY_CMD:
     case VECTOR_CMD:
@@ -5375,9 +5410,6 @@ static BOOLEAN jjidVec2Ideal(leftv res, leftv v)
 }
 static BOOLEAN jjrCharStr(leftv res, leftv v)
 {
-#ifdef SINGULAR_4_1
-  iiReWrite("charstr");
-#endif
   res->data = rCharStr((ring)v->Data());
   return FALSE;
 }
@@ -5419,25 +5451,16 @@ static BOOLEAN jjmpTransp(leftv res, leftv v)
 }
 static BOOLEAN jjrOrdStr(leftv res, leftv v)
 {
-#ifdef SINGULAR_4_1
-  iiReWrite("ordstr");
-#endif
   res->data = rOrdStr((ring)v->Data());
   return FALSE;
 }
 static BOOLEAN jjrVarStr(leftv res, leftv v)
 {
-#ifdef SINGULAR_4_1
-  iiReWrite("varstr");
-#endif
   res->data = rVarStr((ring)v->Data());
   return FALSE;
 }
 static BOOLEAN jjrParStr(leftv res, leftv v)
 {
-#ifdef SINGULAR_4_1
-  iiReWrite("varstr");
-#endif
   res->data = rParStr((ring)v->Data());
   return FALSE;
 }
@@ -6322,8 +6345,13 @@ static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
 static BOOLEAN jjRANDOM_CF(leftv res, leftv u, leftv v, leftv w)
 // <coeff>, par1, par2 -> number2
 {
-  coeffs cf=(coeffs)u->Data();
-  if ((cf!=NULL) && (cf->cfRandom!=NULL))
+  coeffs cf=(coeffs)w->Data();
+  if ((cf==NULL) ||(cf->cfRandom==NULL))
+  {
+    Werror("no random function defined for coeff %d",cf->type);
+    return TRUE;
+  }
+  else
   {
     number n= n_Random(siRand,(number)v->Data(),(number)w->Data(),cf);
     number2 nn=(number2)omAlloc(sizeof(*nn));
@@ -7370,6 +7398,43 @@ static BOOLEAN jjJET4(leftv res, leftv u)
     return TRUE;
   }
 }
+#if 0
+static BOOLEAN jjBRACKET_PL(leftv res, leftv u)
+{
+  int ut=u->Typ();
+  leftv v=u->next; u->next=NULL;
+  leftv w=v->next; v->next=NULL;
+  if ((ut!=CRING_CMD)&&(ut!=RING_CMD))
+  {
+    BOOLEAN bo=TRUE;
+    if (w==NULL)
+    {
+      bo=iiExprArith2(res,u,'[',v);
+    }
+    else if (w->next==NULL)
+    {
+      bo=iiExprArith3(res,'[',u,v,w);
+    }
+    v->next=w;
+    u->next=v;
+    return bo;
+  }
+  v->next=w;
+  u->next=v;
+  #ifdef SINGULAR_4_1
+  // construct new rings:
+  while (u!=NULL)
+  {
+    Print("name: %s,\n",u->Name());
+    u=u->next;
+  }
+  #else
+  memset(res,0,sizeof(sleftv));
+  res->rtyp=NONE;
+  return TRUE;
+  #endif
+}
+#endif
 static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
 {
   if ((yyInRingConstruction)
@@ -8668,7 +8733,6 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
       }
       else          return TRUE;
     }
-    BOOLEAN failed=FALSE;
     int args=0;
     if (a!=NULL) args=a->listLength();
 
@@ -8688,13 +8752,13 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
         }
         if (traceit&TRACE_CALL)
           Print("call %s(... (%d args))\n", iiTwoOps(op),args);
-        if ((failed=dArithM[i].p(res,a))==TRUE)
+        if (dArithM[i].p(res,a))
         {
           break;// leave loop, goto error handling
         }
         if (a!=NULL) a->CleanUp();
         //Print("op: %d,result typ:%d\n",op,res->rtyp);
-        return failed;
+        return FALSE;
       }
       i++;
     }
@@ -8857,7 +8921,9 @@ const char * Tok2Cmdname(int tok)
   //if (tok==OBJECT) return "object";
   //if (tok==PRINT_EXPR) return "print_expr";
   if (tok==IDHDL) return "identifier";
+  #ifdef SINGULAR_4_1
   if (tok==CRING_CMD) return "(c)ring";
+  #endif
   if (tok==QRING_CMD) return "ring";
   if (tok>MAX_TOK) return getBlackboxName(tok);
   int i;

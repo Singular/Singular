@@ -208,66 +208,19 @@ void yyerror(const char * fmt)
 %token <i> VECTOR_CMD
 /* end types */
 
-/* ring dependent cmd:*/
+/* ring dependent cmd, with argumnts indep. of a ring*/
 %token <i> BETTI_CMD
-%token <i> COEFFS_CMD
-%token <i> COEF_CMD
-%token <i> CONTRACT_CMD
-%token <i> DEGREE_CMD
-%token <i> DEG_CMD
-%token <i> DIFF_CMD
-%token <i> DIM_CMD
-%token <i> DIVISION_CMD
-%token <i> ELIMINATION_CMD
 %token <i> E_CMD
-%token <i> FAREY_CMD
 %token <i> FETCH_CMD
 %token <i> FREEMODULE_CMD
 %token <i> KEEPRING_CMD
-%token <i> HILBERT_CMD
-%token <i> HOMOG_CMD
 %token <i> IMAP_CMD
-%token <i> INDEPSET_CMD
-%token <i> INTERRED_CMD
-%token <i> INTERSECT_CMD
-%token <i> JACOB_CMD
-%token <i> JET_CMD
-%token <i> KBASE_CMD
 %token <i> KOSZUL_CMD
-%token <i> LEADCOEF_CMD
-%token <i> LEADEXP_CMD
-%token <i> LEAD_CMD
-%token <i> LEADMONOM_CMD
-%token <i> LIFTSTD_CMD
-%token <i> LIFT_CMD
 %token <i> MAXID_CMD
-%token <i> MINBASE_CMD
-%token <i> MINOR_CMD
-%token <i> MINRES_CMD
-%token <i> MODULO_CMD
 %token <i> MONOM_CMD
-%token <i> MRES_CMD
-%token <i> MULTIPLICITY_CMD
-%token <i> ORD_CMD
 %token <i> PAR_CMD
-%token <i> PARDEG_CMD
 %token <i> PREIMAGE_CMD
-%token <i> QUOTIENT_CMD
-%token <i> QHWEIGHT_CMD
-%token <i> REDUCE_CMD
-%token <i> REGULARITY_CMD
-%token <i> RES_CMD
-%token <i> SBA_CMD
-%token <i> SIMPLIFY_CMD
-%token <i> SORTVEC_CMD
-%token <i> SRES_CMD
-%token <i> STD_CMD
-%token <i> SUBST_CMD
-%token <i> SYZYGY_CMD
 %token <i> VAR_CMD
-%token <i> VDIM_CMD
-%token <i> WEDGE_CMD
-%token <i> WEIGHT_CMD
 
 /*system variables in ring block*/
 %token <i> VALTVARS

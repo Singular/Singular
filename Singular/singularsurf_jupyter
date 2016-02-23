@@ -1,0 +1,9 @@
+#!/bin/sh
+echo "width=400;" >$1.pic
+echo "height=400;" >>$1.pic
+cat $1 >>$1.pic
+echo "color_file_format = jpg;">>$1.pic
+echo "filename = \"/tmp/surf${2}.jpg\";">>$1.pic
+echo "save_color_image;">>$1.pic
+surf $1.pic
+rm $1.pic

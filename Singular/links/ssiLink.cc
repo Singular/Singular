@@ -59,32 +59,19 @@
 #include <sys/wait.h>
 #include <time.h>
 
-#define SSI_VERSION 9
+#define SSI_VERSION 10
 // 5->6: changed newstruct representation
 // 6->7: attributes
 // 7->8: qring
 // 8->9: module: added rank
-
-#define SSI_BASE 16
-typedef struct
-{
-  s_buff f_read;
-  FILE *f_write;
-  ring r;
-  pid_t pid; /* only valid for fork/tcp mode*/
-  int fd_read,fd_write; /* only valid for fork/tcp mode*/
-  char level;
-  char send_quit_at_exit;
-  char quit_sent;
-
-} ssiInfo;
+// 9->10: tokens in grammar.h/tok.h reorganized
 
 link_list ssiToBeClosed=NULL;
 volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
 
 // forward declarations:
 void ssiWritePoly_R(const ssiInfo *d, int typ, poly p, const ring r);
-void ssiWriteIdeal(const ssiInfo *d, int typ,ideal I);
+void ssiWriteIdeal_R(const ssiInfo *d, int typ,const ideal I, const ring r);
 poly ssiReadPoly_R(const ssiInfo *D, const ring r);
 ideal ssiReadIdeal_R(const ssiInfo *d,const ring r);
 
@@ -219,16 +206,12 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
     if ((rFieldType(r)==n_transExt)
     || (rFieldType(r)==n_algExt))
     {
-      ssiWriteRing_R(d,r->cf->extRing);
-      if  (rFieldType(r)==n_algExt)
-      {
-        ssiWritePoly_R(d,POLY_CMD,r->cf->extRing->qideal->m[0],r->cf->extRing);
-      }
+      ssiWriteRing_R(d,r->cf->extRing); /* includes alg.ext if rFieldType(r)==n_algExt */
     }
     /* Q-ideal :*/
     if (r->qideal!=NULL)
     {
-      ssiWriteIdeal(d,IDEAL_CMD,r->qideal);
+      ssiWriteIdeal_R(d,IDEAL_CMD,r->qideal,r);
     }
     else
     {
@@ -280,7 +263,7 @@ void ssiWritePoly(const ssiInfo *d, int typ, poly p)
   ssiWritePoly_R(d,typ,p,d->r);
 }
 
-void ssiWriteIdeal(const ssiInfo *d, int typ,ideal I)
+void ssiWriteIdeal_R(const ssiInfo *d, int typ,const ideal I, const ring R)
 {
    // syntax: 7 # of elements <poly 1> <poly2>.....
    // syntax: 8 <rows> <cols> <poly 1> <poly2>.....
@@ -304,8 +287,12 @@ void ssiWriteIdeal(const ssiInfo *d, int typ,ideal I)
 
    for(i=0;i<mn;i++)
    {
-     ssiWritePoly(d,tt,I->m[i]);
+     ssiWritePoly_R(d,tt,I->m[i],R);
    }
+}
+void ssiWriteIdeal(const ssiInfo *d, int typ,const ideal I)
+{
+  ssiWriteIdeal_R(d,typ,I,d->r);
 }
 
 void ssiWriteCommand(si_link l, command D)
@@ -504,9 +491,7 @@ ring ssiReadRing(const ssiInfo *d)
     else if (ch==-2) /* alg ext. */
     {
       TransExtInfo T;
-      T.r=ssiReadRing(d);
-      T.r->qideal=idInit(1,1);
-      T.r->qideal->m[0]=ssiReadPoly_R(d,T.r);
+      T.r=ssiReadRing(d); /* includes qideal */
       coeffs cf=nInitChar(n_algExt,&T);
       r=rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
     }
@@ -526,7 +511,7 @@ poly ssiReadPoly_R(const ssiInfo *D, const ring r)
 {
 // < # of terms> < term1> < .....
   int n,i,l;
-  n=ssiReadInt(D->f_read);
+  n=ssiReadInt(D->f_read); // # of terms
   //Print("poly: terms:%d\n",n);
   poly p;
   poly ret=NULL;
@@ -1462,7 +1447,7 @@ BOOLEAN ssiWrite(si_link l, leftv data)
                         else
                         {
                           ideal M=(ideal)dd;
-                          fprintf(d->f_write,"10 %d ",M->rank);
+                          fprintf(d->f_write,"10 %d ",(int)M->rank);
                         }
                         ssiWriteIdeal(d,tt,(ideal)dd);
                         break;

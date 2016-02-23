@@ -1206,6 +1206,7 @@ EXAMPLE: example sagbiNF; show example "
   {
     rs = sagbiReduction(id,dom,k) ;
   }
+  if (typeof(id)=="poly") { return (rs[1]); }
   return(rs);
 }
 example

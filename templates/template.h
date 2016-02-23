@@ -59,9 +59,9 @@ public:
   /// @sa strcpy2
   ///
   int someMethod(
-	     int a, ///< [in] some int
-	     int &o ///< [in,out] integer input and resulting value
-	    );
+             int a, ///< [in] some int
+             int &o ///< [in,out] integer input and resulting value
+            );
 
   /// Example of Copy a string method.
   ///

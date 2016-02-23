@@ -12,5 +12,5 @@ ideal stdIJ = std(IJ);
 stdIJ;
 ideal stdstdIJ = std(stdIJ);
 stdstdIJ;
-  
+
 tst_status(1);$

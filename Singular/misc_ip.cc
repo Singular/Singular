@@ -26,6 +26,7 @@
 #include <coeffs/OPAE.h>
 #include <coeffs/OPAEQ.h>
 #include <coeffs/OPAEp.h>
+#include <coeffs/flintcf_Q.h>
 
 #include <polys/ext_fields/algext.h>
 #include <polys/ext_fields/transext.h>
@@ -1079,7 +1080,7 @@ void m2_end(int i)
     if (File_Profiling!=NULL) { fclose(File_Profiling); File_Profiling=NULL; }
     m2_end_called = TRUE;
 #ifdef HAVE_SIMPLEIPC
-    for (int j = SIPC_MAX_SEMAPHORES; j >= 0; j--)
+    for (int j = SIPC_MAX_SEMAPHORES-1; j >= 0; j--)
     {
       if (semaphore[j] != NULL)
       {
@@ -1307,6 +1308,14 @@ void siInit(char *name)
     {
       iiAddCproc("kernel","pAE",FALSE,ii_pAE_init);
     }
+    #ifdef HAVE_FLINT
+    t=nRegister(n_unknown,flintQ_InitChar);
+    if (t!=n_unknown)
+    {
+      h=enterid(omStrDup("flint_poly_Q"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
+      IDDATA(h)=(char*)nInitChar(t,NULL);
+    }
+    #endif
   }
 #endif
 // setting routines for PLURAL QRINGS:

@@ -70,12 +70,7 @@
 #include <math.h>
 #include <ctype.h>
 
-// define this if you want to use the fast_map routine for mapping ideals
-#define FAST_MAP
-
-#ifdef FAST_MAP
-#include <kernel/maps/fast_maps.h>
-#endif
+#include <kernel/maps/gen_maps.h>
 
 #ifdef SINGULAR_4_1
 #include <Singular/number2.h>
@@ -486,10 +481,17 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
     if ((all
       && (IDTYP(h)!=PROC_CMD)
       &&(IDTYP(h)!=PACKAGE_CMD)
-      && (IDTYP(h)!=CRING_CMD))
+      #ifdef SINGULAR_4_1
+      &&(IDTYP(h)!=CRING_CMD)
+      #endif
+      )
     || (typ == IDTYP(h))
-    || ((typ==RING_CMD) &&(IDTYP(h)==CRING_CMD))
-    || ((IDTYP(h)==QRING_CMD) && (typ==RING_CMD)))
+    #ifdef SINGULAR_4_1
+    || ((IDTYP(h)==CRING_CMD) && (typ==RING_CMD))
+    #else
+    || ((IDTYP(h)==QRING_CMD) && (typ==RING_CMD))
+    #endif
+    )
     {
       list1(prefix,h,start==currRingHdl, fullname);
       if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
@@ -671,16 +673,24 @@ leftv iiMap(map theMap, const char * what)
         || (tmpW.rtyp==MAP_CMD))
       {
         ideal id=(ideal)tmpW.data;
+        long *degs=(long*)omAlloc(IDELEMS(id)*sizeof(long));
+        for(int i=IDELEMS(id)-1;i>=0;i--)
+        {
+          poly p=id->m[i];
+          if (p!=NULL) degs[i]=p_Totaldegree(p,src_ring);
+          else         degs[i]=0;
+        }
         for(int j=IDELEMS(theMap)-1;j>=0 && !overflow;j--)
         {
           if (theMap->m[j]!=NULL)
           {
             long deg_monexp=pTotaldegree(theMap->m[j]);
+
             for(int i=IDELEMS(id)-1;i>=0;i--)
             {
               poly p=id->m[i];
-              if ((p!=NULL) && (p_Totaldegree(p,src_ring)!=0) &&
-              ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)p_Totaldegree(p,src_ring)/2)))
+              if ((p!=NULL) && (degs[i]!=0) &&
+              ((unsigned long)deg_monexp > (currRing->bitmask / ((unsigned long)degs[i])/2)))
               {
                 overflow=TRUE;
                 break;
@@ -688,6 +698,7 @@ leftv iiMap(map theMap, const char * what)
             }
           }
         }
+        omFreeSize(degs,IDELEMS(id)*sizeof(long));
       }
       else if (tmpW.rtyp==POLY_CMD)
       {
@@ -697,8 +708,9 @@ leftv iiMap(map theMap, const char * what)
           {
             long deg_monexp=pTotaldegree(theMap->m[j]);
             poly p=(poly)tmpW.data;
-            if ((p!=NULL) && (p_Totaldegree(p,src_ring)!=0) &&
-            ((unsigned long)deg_monexp > (currRing->bitmask / (unsigned long)p_Totaldegree(p,src_ring)/2)))
+            long deg=0;
+            if ((p!=NULL) && ((deg=p_Totaldegree(p,src_ring))!=0) &&
+            ((unsigned long)deg_monexp > (currRing->bitmask / ((unsigned long)deg)/2)))
             {
               overflow=TRUE;
               break;
@@ -717,28 +729,27 @@ leftv iiMap(map theMap, const char * what)
       else
 #endif
       {
-#ifdef FAST_MAP
-        if ((tmpW.rtyp==IDEAL_CMD) && (nMap == ndCopyMap)
-#ifdef HAVE_PLURAL
-        && (!rIsPluralRing(currRing))
-#endif
-        )
+        if ((tmpW.rtyp==IDEAL_CMD)
+        ||(tmpW.rtyp==MODUL_CMD)
+        ||(tmpW.rtyp==MATRIX_CMD)
+        ||(tmpW.rtyp==MAP_CMD))
         {
-          v->rtyp=IDEAL_CMD;
+          v->rtyp=tmpW.rtyp;
           char *tmp = theMap->preimage;
           theMap->preimage=(char*)1L;
           // map gets 1 as its rank (as an ideal)
-          v->data=fast_map(IDIDEAL(w), src_ring, (ideal)theMap, currRing);
+          v->data=maMapIdeal(IDIDEAL(w), src_ring, (ideal)theMap, currRing,nMap);
           theMap->preimage=tmp; // map gets its preimage back
         }
-        else
-#endif
-        if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,src_ring,NULL,NULL,0,nMap))
+        if (v->data==NULL) /*i.e. not IDEAL_CMD/MODUL_CMD/MATRIX_CMD/MAP */
         {
-          Werror("cannot map %s(%d)",Tok2Cmdname(w->typ),w->typ);
-          omFreeBin((ADDRESS)v, sleftv_bin);
-          if (save_r!=NULL) IDMAP(w)->preimage=save_r;
-          return NULL;
+          if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,src_ring,NULL,NULL,0,nMap))
+          {
+            Werror("cannot map %s(%d)",Tok2Cmdname(w->typ),w->typ);
+            omFreeBin((ADDRESS)v, sleftv_bin);
+            if (save_r!=NULL) IDMAP(w)->preimage=save_r;
+            return NULL;
+          }
         }
       }
       if (save_r!=NULL)
@@ -1164,7 +1175,7 @@ BOOLEAN iiDefaultParameter(leftv p)
   tmp.data=at->CopyA();
   return iiAssign(p,&tmp);
 }
-BOOLEAN iiBranchTo(leftv r, leftv args)
+BOOLEAN iiBranchTo(leftv, leftv args)
 {
   // <string1...stringN>,<proc>
   // known: args!=NULL, l>=1
@@ -1269,6 +1280,7 @@ BOOLEAN iiParameter(leftv p)
   omFreeBin((ADDRESS)h, sleftv_bin);
   return res;
 }
+
 static BOOLEAN iiInternalExport (leftv v, int toLev)
 {
   idhdl h=(idhdl)v->data;
@@ -1676,7 +1688,43 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   }
   // ----------------------------------------
 }
-void rDecomposeC(leftv h,const ring R)
+#ifdef SINGULAR_4_1
+static void rDecomposeC_41(leftv h,const coeffs C)
+/* field is R or C */
+{
+  lists L=(lists)omAlloc0Bin(slists_bin);
+  if (nCoeff_is_long_C(C)) L->Init(3);
+  else                     L->Init(2);
+  h->rtyp=LIST_CMD;
+  h->data=(void *)L;
+  // 0: char/ cf - ring
+  // 1: list (var)
+  // 2: list (ord)
+  // ----------------------------------------
+  // 0: char/ cf - ring
+  L->m[0].rtyp=INT_CMD;
+  L->m[0].data=(void *)0;
+  // ----------------------------------------
+  // 1:
+  lists LL=(lists)omAlloc0Bin(slists_bin);
+  LL->Init(2);
+    LL->m[0].rtyp=INT_CMD;
+    LL->m[0].data=(void *)(long)si_max(C->float_len,SHORT_REAL_LENGTH/2);
+    LL->m[1].rtyp=INT_CMD;
+    LL->m[1].data=(void *)(long)si_max(C->float_len2,SHORT_REAL_LENGTH);
+  L->m[1].rtyp=LIST_CMD;
+  L->m[1].data=(void *)LL;
+  // ----------------------------------------
+  // 2: list (par)
+  if (nCoeff_is_long_C(C))
+  {
+    L->m[2].rtyp=STRING_CMD;
+    L->m[2].data=(void *)omStrDup(*n_ParameterNames(C));
+  }
+  // ----------------------------------------
+}
+#endif
+static void rDecomposeC(leftv h,const ring R)
 /* field is R or C */
 {
   lists L=(lists)omAlloc0Bin(slists_bin);
@@ -1711,6 +1759,37 @@ void rDecomposeC(leftv h,const ring R)
   // ----------------------------------------
 }
 
+#ifdef SINGULAR_4_1
+#ifdef HAVE_RINGS
+void rDecomposeRing_41(leftv h,const coeffs C)
+/* field is R or C */
+{
+  lists L=(lists)omAlloc0Bin(slists_bin);
+  if (nCoeff_is_Ring(C)) L->Init(1);
+  else                   L->Init(2);
+  h->rtyp=LIST_CMD;
+  h->data=(void *)L;
+  // 0: char/ cf - ring
+  // 1: list (module)
+  // ----------------------------------------
+  // 0: char/ cf - ring
+  L->m[0].rtyp=STRING_CMD;
+  L->m[0].data=(void *)omStrDup("integer");
+  // ----------------------------------------
+  // 1: modulo
+  if (nCoeff_is_Ring_Z(C)) return;
+  lists LL=(lists)omAlloc0Bin(slists_bin);
+  LL->Init(2);
+  LL->m[0].rtyp=BIGINT_CMD;
+  LL->m[0].data=nlMapGMP((number) C->modBase, C, coeffs_BIGINT);
+  LL->m[1].rtyp=INT_CMD;
+  LL->m[1].data=(void *) C->modExponent;
+  L->m[1].rtyp=LIST_CMD;
+  L->m[1].data=(void *)LL;
+}
+#endif
+#endif
+
 #ifdef HAVE_RINGS
 void rDecomposeRing(leftv h,const ring R)
 /* field is R or C */
@@ -1740,6 +1819,213 @@ void rDecomposeRing(leftv h,const ring R)
 }
 #endif
 
+
+#ifdef SINGULAR_4_1
+BOOLEAN rDecompose_CF(leftv res,const coeffs C)
+{
+  assume( C != NULL );
+
+  // sanity check: require currRing==r for rings with polynomial data
+  if ( nCoeff_is_algExt(C) && (C != currRing->cf))
+  {
+    WerrorS("ring with polynomial data must be the base ring or compatible");
+    return TRUE;
+  }
+  if (nCoeff_is_numeric(C))
+  {
+    rDecomposeC_41(res,C);
+  }
+#ifdef HAVE_RINGS
+  else if (nCoeff_is_Ring(C))
+  {
+    rDecomposeRing_41(res,C);
+  }
+#endif
+  else if ( C->extRing!=NULL )// nCoeff_is_algExt(r->cf))
+  {
+    rDecomposeCF(res, C->extRing, currRing);
+  }
+  else if(nCoeff_is_GF(C))
+  {
+    lists Lc=(lists)omAlloc0Bin(slists_bin);
+    Lc->Init(4);
+    // char:
+    Lc->m[0].rtyp=INT_CMD;
+    Lc->m[0].data=(void*)(long)C->m_nfCharQ;
+    // var:
+    lists Lv=(lists)omAlloc0Bin(slists_bin);
+    Lv->Init(1);
+    Lv->m[0].rtyp=STRING_CMD;
+    Lv->m[0].data=(void *)omStrDup(*n_ParameterNames(C));
+    Lc->m[1].rtyp=LIST_CMD;
+    Lc->m[1].data=(void*)Lv;
+    // ord:
+    lists Lo=(lists)omAlloc0Bin(slists_bin);
+    Lo->Init(1);
+    lists Loo=(lists)omAlloc0Bin(slists_bin);
+    Loo->Init(2);
+    Loo->m[0].rtyp=STRING_CMD;
+    Loo->m[0].data=(void *)omStrDup(rSimpleOrdStr(ringorder_lp));
+
+    intvec *iv=new intvec(1); (*iv)[0]=1;
+    Loo->m[1].rtyp=INTVEC_CMD;
+    Loo->m[1].data=(void *)iv;
+
+    Lo->m[0].rtyp=LIST_CMD;
+    Lo->m[0].data=(void*)Loo;
+
+    Lc->m[2].rtyp=LIST_CMD;
+    Lc->m[2].data=(void*)Lo;
+    // q-ideal:
+    Lc->m[3].rtyp=IDEAL_CMD;
+    Lc->m[3].data=(void *)idInit(1,1);
+    // ----------------------
+    res->rtyp=LIST_CMD;
+    res->data=(void*)Lc;
+  }
+  else
+  {
+    res->rtyp=INT_CMD;
+    res->data=(void *)(long)C->ch;
+  }
+  // ----------------------------------------
+  return FALSE;
+}
+#endif
+
+#ifdef SINGULAR_4_1
+lists rDecompose_list_cf(const ring r)
+{
+  assume( r != NULL );
+  const coeffs C = r->cf;
+  assume( C != NULL );
+
+  // sanity check: require currRing==r for rings with polynomial data
+  if ( (r!=currRing) && (
+           (nCoeff_is_algExt(C) && (C != currRing->cf))
+        || (r->qideal != NULL)
+#ifdef HAVE_PLURAL
+        || (rIsPluralRing(r))
+#endif
+                        )
+     )
+  {
+    WerrorS("ring with polynomial data must be the base ring or compatible");
+    return NULL;
+  }
+  // 0: char/ cf - ring
+  // 1: list (var)
+  // 2: list (ord)
+  // 3: qideal
+  // possibly:
+  // 4: C
+  // 5: D
+  lists L=(lists)omAlloc0Bin(slists_bin);
+  if (rIsPluralRing(r))
+    L->Init(6);
+  else
+    L->Init(4);
+  // ----------------------------------------
+  // 0: char/ cf - ring
+  L->m[0].rtyp=CRING_CMD;
+  L->m[0].data=(char*)r->cf; r->cf->ref++;
+  // ----------------------------------------
+  // 1: list (var)
+  lists LL=(lists)omAlloc0Bin(slists_bin);
+  LL->Init(r->N);
+  int i;
+  for(i=0; i<r->N; i++)
+  {
+    LL->m[i].rtyp=STRING_CMD;
+    LL->m[i].data=(void *)omStrDup(r->names[i]);
+  }
+  L->m[1].rtyp=LIST_CMD;
+  L->m[1].data=(void *)LL;
+  // ----------------------------------------
+  // 2: list (ord)
+  LL=(lists)omAlloc0Bin(slists_bin);
+  i=rBlocks(r)-1;
+  LL->Init(i);
+  i--;
+  lists LLL;
+  for(; i>=0; i--)
+  {
+    intvec *iv;
+    int j;
+    LL->m[i].rtyp=LIST_CMD;
+    LLL=(lists)omAlloc0Bin(slists_bin);
+    LLL->Init(2);
+    LLL->m[0].rtyp=STRING_CMD;
+    LLL->m[0].data=(void *)omStrDup(rSimpleOrdStr(r->order[i]));
+
+    if(r->order[i] == ringorder_IS) //  || r->order[i] == ringorder_s || r->order[i] == ringorder_S)
+    {
+      assume( r->block0[i] == r->block1[i] );
+      const int s = r->block0[i];
+      assume( -2 < s && s < 2);
+
+      iv=new intvec(1);
+      (*iv)[0] = s;
+    }
+    else if (r->block1[i]-r->block0[i] >=0 )
+    {
+      int bl=j=r->block1[i]-r->block0[i];
+      if (r->order[i]==ringorder_M)
+      {
+        j=(j+1)*(j+1)-1;
+        bl=j+1;
+      }
+      else if (r->order[i]==ringorder_am)
+      {
+        j+=r->wvhdl[i][bl+1];
+      }
+      iv=new intvec(j+1);
+      if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
+      {
+        for(;j>=0; j--) (*iv)[j]=r->wvhdl[i][j+(j>bl)];
+      }
+      else switch (r->order[i])
+      {
+        case ringorder_dp:
+        case ringorder_Dp:
+        case ringorder_ds:
+        case ringorder_Ds:
+        case ringorder_lp:
+          for(;j>=0; j--) (*iv)[j]=1;
+          break;
+        default: /* do nothing */;
+      }
+    }
+    else
+    {
+      iv=new intvec(1);
+    }
+    LLL->m[1].rtyp=INTVEC_CMD;
+    LLL->m[1].data=(void *)iv;
+    LL->m[i].data=(void *)LLL;
+  }
+  L->m[2].rtyp=LIST_CMD;
+  L->m[2].data=(void *)LL;
+  // ----------------------------------------
+  // 3: qideal
+  L->m[3].rtyp=IDEAL_CMD;
+  if (r->qideal==NULL)
+    L->m[3].data=(void *)idInit(1,1);
+  else
+    L->m[3].data=(void *)idCopy(r->qideal);
+  // ----------------------------------------
+#ifdef HAVE_PLURAL // NC! in rDecompose
+  if (rIsPluralRing(r))
+  {
+    L->m[4].rtyp=MATRIX_CMD;
+    L->m[4].data=(void *)mp_Copy(r->GetNC()->C, r, r);
+    L->m[5].rtyp=MATRIX_CMD;
+    L->m[5].data=(void *)mp_Copy(r->GetNC()->D, r, r);
+  }
+#endif
+  return L;
+}
+#endif
 
 lists rDecompose(const ring r)
 {
@@ -1774,11 +2060,6 @@ lists rDecompose(const ring r)
     L->Init(4);
   // ----------------------------------------
   // 0: char/ cf - ring
-#ifdef SINGULAR_4_1
-  // 0: char/ cf - ring
-  L->m[0].rtyp=CRING_CMD;
-  L->m[0].data=(char*)r->cf; r->cf->ref++;
-#else
   if (rField_is_numeric(r))
   {
     rDecomposeC(&(L->m[0]),r);
@@ -1836,7 +2117,6 @@ lists rDecompose(const ring r)
     L->m[0].rtyp=INT_CMD;
     L->m[0].data=(void *)(long)r->cf->ch;
   }
-#endif
   // ----------------------------------------
   // 1: list (var)
   lists LL=(lists)omAlloc0Bin(slists_bin);
@@ -2238,6 +2518,13 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
       }
     }
   }
+  #ifdef SINGULAR_4_1
+  else if (L->m[0].Typ()==CRING_CMD)
+  {
+    R->cf=(coeffs)L->m[0].Data();
+    R->cf->ref++;
+  }
+  #endif
   else
   {
     WerrorS("coefficient field must be described by `int` or `list`");
@@ -4942,7 +5229,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
               last++;
               if (weights[last]==0) weights[last]=(*iv)[i]*typ;
             }
-            R->block1[n] = last;
+            R->block1[n] = si_min(last,R->N);
             break;
           case ringorder_ls:
           case ringorder_ds:
@@ -4956,14 +5243,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             R->block0[n] = last+1;
             if (iv->length() == 3) last+=(*iv)[2];
             else last += (*iv)[0];
-            R->block1[n] = last;
-            //if ((R->block0[n]>R->block1[n])
-            //|| (R->block1[n]>rVar(R)))
-            //{
-            //  R->block1[n]=rVar(R);
-            //  //WerrorS("ordering larger than number of variables");
-            //  break;
-            //}
+            R->block1[n] = si_min(last,R->N);
             if (rCheckIV(iv)) return TRUE;
             for(i=si_min(rVar(R),R->block1[n]);i>=R->block0[n];i--)
             {
@@ -5008,7 +5288,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_a:
           {
             R->block0[n] = last+1;
-            R->block1[n] = si_min(last+iv->length()-2 , rVar(R));
+            R->block1[n] = si_min(last+iv->length()-2 , R->N);
             R->wvhdl[n] = (int*)omAlloc((iv->length()-1)*sizeof(int));
             for (i=2; i<iv->length(); i++)
             {
@@ -5022,7 +5302,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_am:
           {
             R->block0[n] = last+1;
-            R->block1[n] = si_min(last+iv->length()-2 , rVar(R));
+            R->block1[n] = si_min(last+iv->length()-2 , R->N);
             R->wvhdl[n] = (int*)omAlloc(iv->length()*sizeof(int));
             if (R->block1[n]- R->block0[n]+2>=iv->length())
                WarnS("missing module weights");
@@ -5043,7 +5323,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_a64:
           {
             R->block0[n] = last+1;
-            R->block1[n] = si_min(last+iv->length()-2 , rVar(R));
+            R->block1[n] = si_min(last+iv->length()-2 , R->N);
             R->wvhdl[n] = (int*)omAlloc((iv->length()-1)*sizeof(int64));
             int64 *w=(int64 *)R->wvhdl[n];
             for (i=2; i<iv->length(); i++)
@@ -5067,8 +5347,8 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
 
             R->block0[n] = last+1;
             last += (int)sqrt((double)(iv->length()-2));
-            R->block1[n] = last;
-            for(i=si_min(rVar(R),R->block1[n]);i>=R->block0[n];i--)
+            R->block1[n] = si_min(last,R->N);
+            for(i=R->block1[n];i>=R->block0[n];i--)
             {
               if (weights[i]==0) weights[i]=typ;
             }
@@ -5085,8 +5365,19 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             return TRUE;
       }
     }
+    if (last>R->N)
+    {
+      Werror("mismatch of number of vars (%d) and ordering (>=%d vars)",
+             R->N,last);
+      return TRUE;
+    }
     sl=sl->next;
   }
+  // find OrdSgn:
+  R->OrdSgn = 1;
+  for(i=1;i<=R->N;i++)
+  { if (weights[i]<0) { R->OrdSgn=-1;break; }}
+  omFree(weights);
 
   // check for complete coverage
   while ( n >= 0 && (
@@ -5121,39 +5412,39 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
       return TRUE;
     }
   }
-  // find OrdSgn:
-  R->OrdSgn = 1;
-  for(i=1;i<=R->N;i++)
-  { if (weights[i]<0) { R->OrdSgn=-1;break; }}
-  omFree(weights);
   return FALSE;
 }
 
-BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
+static BOOLEAN rSleftvList2StringArray(leftv sl, char** p)
 {
 
   while(sl!=NULL)
   {
-    if (sl->Name() == sNoName)
+    if ((sl->rtyp == IDHDL)||(sl->rtyp==ALIAS_CMD))
     {
-      if (sl->Typ()==POLY_CMD)
+      *p = omStrDup(sl->Name());
+    }
+    else if (sl->name!=NULL)
+    {
+      *p = (char*)sl->name;
+      sl->name=NULL;
+    }
+    else if (sl->rtyp==POLY_CMD)
+    {
+      sleftv s_sl;
+      iiConvert(POLY_CMD,ANY_TYPE,-1,sl,&s_sl);
+      if (s_sl.name != NULL)
       {
-        sleftv s_sl;
-        iiConvert(POLY_CMD,ANY_TYPE,-1,sl,&s_sl);
-        if (s_sl.Name() != sNoName)
-          *p = omStrDup(s_sl.Name());
-        else
-          *p = NULL;
-        sl->next = s_sl.next;
-        s_sl.next = NULL;
-        s_sl.CleanUp();
-        if (*p == NULL) return TRUE;
+        *p = (char*)s_sl.name; s_sl.name=NULL;
       }
       else
-        return TRUE;
+        *p = NULL;
+      sl->next = s_sl.next;
+      s_sl.next = NULL;
+      s_sl.CleanUp();
+      if (*p == NULL) return TRUE;
     }
-    else
-      *p = omStrDup(sl->Name());
+    else return TRUE;
     p++;
     sl=sl->next;
   }
@@ -5166,14 +5457,13 @@ const short MAX_SHORT = 32767; // (1 << (sizeof(short)*8)) - 1;
 //
 // rInit itself:
 //
-// INPUT:  s: name, pn: ch & parameter (names), rv: variable (names)
-//         ord: ordering
+// INPUT:  pn: ch & parameter (names), rv: variable (names)
+//         ord: ordering (all !=NULL)
 // RETURN: currRingHdl on success
 //         NULL        on error
 // NOTE:   * makes new ring to current ring, on success
 //         * considers input sleftv's as read-only
-//idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord)
-ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
+ring rInit(leftv pn, leftv rv, leftv ord)
 {
 #ifdef HAVE_RINGS
   //unsigned int ringtype = 0;
@@ -5196,19 +5486,48 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   assume( pn != NULL );
   const int P = pn->listLength();
 
-  if ((pn->Typ()==CRING_CMD)&&(P==1))
+  #ifdef SINGULAR_4_1
+  if (pn->Typ()==CRING_CMD)
   {
     cf=(coeffs)pn->CopyD();
+    leftv pnn=pn;
+    if(P>1) /*parameter*/
+    {
+      pnn = pnn->next;
+      const int pars = pnn->listLength();
+      assume( pars > 0 );
+      char ** names = (char**)omAlloc0(pars * sizeof(char_ptr));
+
+      if (rSleftvList2StringArray(pnn, names))
+      {
+        WerrorS("parameter expected");
+        goto rInitError;
+      }
+
+      TransExtInfo extParam;
+
+      extParam.r = rDefault( cf, pars, names); // Q/Zp [ p_1, ... p_pars ]
+      for(int i=pars-1; i>=0;i--)
+      {
+        omFree(names[i]);
+      }
+      omFree(names);
+
+      cf = nInitChar(n_transExt, &extParam);
+    }
     assume( cf != NULL );
   }
-  else if (pn->Typ()==INT_CMD)
+  else
+  #endif
+  if (pn->Typ()==INT_CMD)
   {
     int ch = (int)(long)pn->Data();
+    leftv pnn=pn;
 
     /* parameter? -------------------------------------------------------*/
-    pn = pn->next;
+    pnn = pnn->next;
 
-    if (pn == NULL) // no params!?
+    if (pnn == NULL) // no params!?
     {
       if (ch!=0)
       {
@@ -5225,7 +5544,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     }
     else
     {
-      const int pars = pn->listLength();
+      const int pars = pnn->listLength();
 
       assume( pars > 0 );
 
@@ -5236,7 +5555,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 
         param.GFChar = ch;
         param.GFDegree = 1;
-        param.GFPar_name = pn->name;
+        param.GFPar_name = pnn->name;
 
         cf = nInitChar(n_GF, &param);
       }
@@ -5250,7 +5569,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 
         char ** names = (char**)omAlloc0(pars * sizeof(char_ptr));
 
-        if (rSleftvList2StringArray(pn, names))
+        if (rSleftvList2StringArray(pnn, names))
         {
           WerrorS("parameter expected");
           goto rInitError;
@@ -5275,21 +5594,22 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   else if ((pn->name != NULL)
   && ((strcmp(pn->name,"real")==0) || (strcmp(pn->name,"complex")==0)))
   {
+    leftv pnn=pn->next;
     BOOLEAN complex_flag=(strcmp(pn->name,"complex")==0);
-    if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+    if ((pnn!=NULL) && (pnn->Typ()==INT_CMD))
     {
-      float_len=(int)(long)pn->next->Data();
+      float_len=(int)(long)pnn->Data();
       float_len2=float_len;
-      pn=pn->next;
-      if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+      pnn=pnn->next;
+      if ((pnn!=NULL) && (pnn->Typ()==INT_CMD))
       {
-        float_len2=(int)(long)pn->next->Data();
-        pn=pn->next;
+        float_len2=(int)(long)pnn->Data();
+        pnn=pnn->next;
       }
     }
 
     if (!complex_flag)
-      complex_flag= pn->next != NULL;
+      complex_flag= (pnn!=NULL) && (pnn->name!=NULL);
     if( !complex_flag && (float_len2 <= (short)SHORT_REAL_LENGTH))
        cf=nInitChar(n_R, NULL);
     else // longR or longC?
@@ -5307,10 +5627,10 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
            param.float_len= SHORT_REAL_LENGTH;
            param.float_len2= SHORT_REAL_LENGTH;
          }
-         if (pn->next == NULL)
+         if ((pnn == NULL) || (pnn->name == NULL))
            param.par_name=(const char*)"i"; //default to i
          else
-           param.par_name = (const char*)pn->next->name;
+           param.par_name = (const char*)pnn->name;
        }
 
        cf = nInitChar(complex_flag ? n_long_C: n_long_R, (void*)&param);
@@ -5325,24 +5645,25 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     mpz_init_set_si(modBase, 0);
     if (pn->next!=NULL)
     {
-      if (pn->next->Typ()==INT_CMD)
+      leftv pnn=pn;
+      if (pnn->next->Typ()==INT_CMD)
       {
-        mpz_set_ui(modBase, (int)(long) pn->next->Data());
-        pn=pn->next;
-        if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+        pnn=pnn->next;
+        mpz_set_ui(modBase, (int)(long) pnn->Data());
+        if ((pnn->next!=NULL) && (pnn->next->Typ()==INT_CMD))
         {
-          modExponent = (long) pn->next->Data();
-          pn=pn->next;
+          pnn=pnn->next;
+          modExponent = (long) pnn->Data();
         }
-        while ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+        while ((pnn->next!=NULL) && (pnn->next->Typ()==INT_CMD))
         {
-          mpz_mul_ui(modBase, modBase, (int)(long) pn->next->Data());
-          pn=pn->next;
+          pnn=pnn->next;
+          mpz_mul_ui(modBase, modBase, (int)(long) pnn->Data());
         }
       }
-      else if (pn->next->Typ()==BIGINT_CMD)
+      else if (pnn->next->Typ()==BIGINT_CMD)
       {
-        number p=(number)pn->next->CopyD(); // FIXME: why CopyD() here if nlGMP should not overtake p!?
+        number p=(number)pnn->next->CopyD();
         nlGMP(p,(number)modBase,coeffs_BIGINT); // TODO? // extern void   nlGMP(number &i, number n, const coeffs r); // FIXME: n_MPZ( modBase, p, coeffs_BIGINT); ?
         n_Delete(&p,coeffs_BIGINT);
       }
@@ -5432,7 +5753,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #endif
     goto rInitError;
   }
-//  pn=pn->next;
 
   /*every entry in the new ring is initialized to 0*/
 
@@ -5501,9 +5821,9 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   // need to clean up sleftv here, before this ring can be set to
   // new currRing or currRing can be killed beacuse new ring has
   // same name
-  if (pn != NULL) pn->CleanUp();
-  if (rv != NULL) rv->CleanUp();
-  if (ord != NULL) ord->CleanUp();
+  pn->CleanUp();
+  rv->CleanUp();
+  ord->CleanUp();
   //if ((tmp = enterid(s, myynest, RING_CMD, &IDROOT))==NULL)
   //  goto rInitError;
 
@@ -5516,9 +5836,9 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   // error case:
   rInitError:
   if  ((R != NULL)&&(R->cf!=NULL)) rDelete(R);
-  if (pn != NULL) pn->CleanUp();
-  if (rv != NULL) rv->CleanUp();
-  if (ord != NULL) ord->CleanUp();
+  pn->CleanUp();
+  rv->CleanUp();
+  ord->CleanUp();
   return NULL;
 }
 
@@ -5936,12 +6256,12 @@ BOOLEAN iiApplyINTVEC(leftv res, leftv a, int op, leftv proc)
   }
   return FALSE;
 }
-BOOLEAN iiApplyBIGINTMAT(leftv res, leftv a, int op, leftv proc)
+BOOLEAN iiApplyBIGINTMAT(leftv, leftv, int, leftv)
 {
   WerrorS("not implemented");
   return TRUE;
 }
-BOOLEAN iiApplyIDEAL(leftv res, leftv a, int op, leftv proc)
+BOOLEAN iiApplyIDEAL(leftv, leftv, int, leftv)
 {
   WerrorS("not implemented");
   return TRUE;
@@ -6064,8 +6384,7 @@ BOOLEAN iiARROW(leftv r, char* a, char *s)
 BOOLEAN iiAssignCR(leftv r, leftv arg)
 {
   int t=arg->Typ();
-  char* ring_name=(char*)r->Name();
-  ring_name=omStrDup(ring_name);
+  char* ring_name=omStrDup((char*)r->Name());
   if ((t==RING_CMD) ||(t==QRING_CMD))
   {
     sleftv tmp;
@@ -6083,6 +6402,7 @@ BOOLEAN iiAssignCR(leftv r, leftv arg)
     else
       return TRUE;
   }
+  #ifdef SINGULAR_4_1
   else if (t==CRING_CMD)
   {
     sleftv tmp;
@@ -6095,6 +6415,9 @@ BOOLEAN iiAssignCR(leftv r, leftv arg)
     //Print("from %s(%d)\n",Tok2Cmdname(arg->Typ()),arg->Typ());
     return FALSE;
   }
+  #endif
+  //Print("create %s\n",r->Name());
+  //Print("from %s(%d)\n",Tok2Cmdname(arg->Typ()),arg->Typ());
   return TRUE;// not handled -> error for now
 }
 

@@ -22,7 +22,7 @@ struct ip_sring; typedef struct ip_sring* ring; typedef struct ip_sring const* c
 //////////////////////////////////////////////////////////////////////////
 // Creation/Destruction of buckets
 //
-kBucket_pt kBucketCreate(ring r);
+kBucket_pt kBucketCreate(const ring r);
 // only free memory allocated for bucket
 void kBucketDestroy(kBucket_pt *bucket);
 // frees polys/monomials in bucket and destroys bucket

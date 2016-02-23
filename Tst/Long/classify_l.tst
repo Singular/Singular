@@ -110,7 +110,7 @@ classify(f);
 f=x4+x3y2+x2y9+xy11+xy14+y16; // Z[2,36], step 43, k=2, i=2
 classify(f);
 
-f=(x+3y3)*(x3+xy18+y26); // Z[3,67], step 44, 	k=3, i=5
+f=(x+3y3)*(x3+xy18+y26); // Z[3,67], step 44, k=3, i=5
 classify(f);
 
 f=(x+3y4)*(x3+x2y6+xy13+y18);  // Z[4,2,0], step 45, k=4, i=2

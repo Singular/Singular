@@ -1703,6 +1703,37 @@ intvec* singntl_HNF(intvec*  m)
   return mm;
 }
 
+bigintmat* singntl_HNF(bigintmat*  b)
+{
+  int r=b->rows();
+  if (r!=b->cols())
+  {
+    Werror("HNF of %d x %d matrix",r,b->cols());
+    return NULL;
+  }
+  setCharacteristic( 0 );
+  CFMatrix M(r,r);
+  int i,j;
+  for(i=r;i>0;i--)
+  {
+    for(j=r;j>0;j--)
+    {
+      M(i,j)=n_convSingNFactoryN(BIMATELEM(*b,i,j),FALSE,b->basecoeffs());
+    }
+  }
+  CFMatrix *MM=cf_HNF(M);
+  bigintmat *mm=bimCopy(b);
+  for(i=r;i>0;i--)
+  {
+    for(j=r;j>0;j--)
+    {
+      BIMATELEM(*mm,i,j)=n_convFactoryNSingN((*MM)(i,j),b->basecoeffs());
+    }
+  }
+  delete MM;
+  return mm;
+}
+
 matrix singntl_LLL(matrix  m, const ring s )
 {
   int r=m->rows();
