@@ -559,7 +559,7 @@ BOOLEAN nrzDBTest (number x, const char *f, const int l, const coeffs);
 #define nrzTest(A)
 #endif
 
-#define CF_DEBUG 0
+#undef CF_DEBUG 
 static inline number nrz_short(number x)
 {
 #if CF_DEBUG
@@ -577,9 +577,9 @@ static inline number nrz_short(number x)
   }
   if (mpz_size1((mpz_ptr)x)<=MP_SMALL)
   {
-    int ui=mpz_get_si((mpz_ptr)x);
+    long ui=mpz_get_si((mpz_ptr)x);
     if ((((ui<<3)>>3)==ui)
-    && (mpz_cmp_si((mpz_ptr)x,(long)ui)==0))
+    && (mpz_cmp_si((mpz_ptr)x,ui)==0))
     {
       mpz_clear((mpz_ptr)x);
       omFreeBin(x, gmp_nrz_bin);
@@ -599,6 +599,7 @@ static inline number nrz_short(number x)
 int nrzSize(number a, const coeffs)
 {
   if (a == NULL) return 0;
+  if (a==INT_TO_SR(0)) return 0;
   if (n_Z_IS_SMALL(a)) return 1;
   return ((mpz_ptr)a)->_mp_alloc;
 }
@@ -680,9 +681,9 @@ number nrzMult (number a, number b, const coeffs R)
 }
 
 
-static int int_gcd(int a, int b)
+static long int_gcd(long a, long b)
 {
-  int r;
+  long r;
   a = ABS(a);
   b = ABS(b);
   if (!a) return b;
@@ -703,11 +704,13 @@ static int int_gcd(int a, int b)
  */
 number nrzLcm (number a, number b, const coeffs R)
 {
+  #ifdef CF_DEBUG
   PrintS("nrzLcm\n");
+  #endif
   mpz_ptr erg;
   if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
   {
-    int g = int_gcd(SR_TO_INT(a), SR_TO_INT(b));
+    long g = int_gcd(SR_TO_INT(a), SR_TO_INT(b));
     return nrzMult(a, INT_TO_SR(SR_TO_INT(b)/g), R);
   }
   else
@@ -742,7 +745,7 @@ number nrzGcd (number a,number b,const coeffs R)
 {
   if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
   {
-    int g = int_gcd(SR_TO_INT(a), SR_TO_INT(b));
+    long g = int_gcd(SR_TO_INT(a), SR_TO_INT(b));
     return INT_TO_SR(g);
   }
   else if (n_Z_IS_SMALL(a))
@@ -772,9 +775,9 @@ number nrzGcd (number a,number b,const coeffs R)
  * Give the largest non unit k, such that a = x * k, b = y * k has
  * a solution and r, s, s.t. k = s*a + t*b
  */
-static int int_extgcd(int a, int b, int * u, int* x, int * v, int* y)
+static long int_extgcd(long a, long b, long * u, long* x, long * v, long* y)
 {
-  int q, r;
+  long q, r;
   if (!a)
   {
     *u = 0;
@@ -819,8 +822,8 @@ number  nrzExtGcd (number a, number b, number *s, number *t, const coeffs)
 {
   if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
   {
-    int u, v, x, y;
-    int g = int_extgcd(SR_TO_INT(a), SR_TO_INT(b), &u, &v, &x, &y);
+    long u, v, x, y;
+    long g = int_extgcd(SR_TO_INT(a), SR_TO_INT(b), &u, &v, &x, &y);
     *s = INT_TO_SR(u);
     *t = INT_TO_SR(v);
     return INT_TO_SR(g);
@@ -890,8 +893,8 @@ number  nrzXExtGcd (number a, number b, number *s, number *t, number *u, number 
 {
   if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
   {
-    int uu, vv, x, y;
-    int g = int_extgcd(SR_TO_INT(a), SR_TO_INT(b), &uu, &vv, &x, &y);
+    long uu, vv, x, y;
+    long g = int_extgcd(SR_TO_INT(a), SR_TO_INT(b), &uu, &vv, &x, &y);
     *s = INT_TO_SR(uu);
     *t = INT_TO_SR(vv);
     *u = INT_TO_SR(x);
@@ -1065,13 +1068,6 @@ number nrzCopy(number a, const coeffs)
   return (number) erg;
 }
 
-int nrzSize(number a, const coeffs)
-{
-  if (a == NULL) return 0;
-  if (n_Z_IS_SMALL(a)) return 1;
-  return mpz_size1((mpz_ptr)a)+1;
-}
-
 /*
  * convert a number to int
  */
@@ -1103,7 +1099,7 @@ number nrzAdd (number a, number b, const coeffs )
 {
   if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
   {
-    int c = SR_TO_INT(a) + SR_TO_INT(b);
+    long c = SR_TO_INT(a) + SR_TO_INT(b);
     if (INT_IS_SMALL(c))
       return INT_TO_SR(c);
     mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
@@ -1145,7 +1141,7 @@ number nrzSub (number a, number b,  const coeffs )
 {
   if (n_Z_IS_SMALL(a) && n_Z_IS_SMALL(b))
   {
-    int c = SR_TO_INT(a) - SR_TO_INT(b);
+    long c = SR_TO_INT(a) - SR_TO_INT(b);
     if (INT_IS_SMALL(c))
       return INT_TO_SR(c);
     mpz_ptr erg = (mpz_ptr) omAllocBin(gmp_nrz_bin);
@@ -1209,7 +1205,7 @@ BOOLEAN nrzIsUnit (number a, const coeffs)
 
 BOOLEAN nrzIsZero (number  a, const coeffs)
 {
-  return a==INT_TO_SR(0);
+  return (a==NULL) || (a==INT_TO_SR(0));
 }
 
 BOOLEAN nrzIsOne (number a, const coeffs)
@@ -1562,9 +1558,9 @@ BOOLEAN nrzDBTest (number x, const char *f, const int l, const coeffs)
   }
   if (mpz_size1((mpz_ptr)x)<=MP_SMALL)
   {
-    int ui=mpz_get_si((mpz_ptr)x);
+    long ui=mpz_get_si((mpz_ptr)x);
     if ((((ui<<3)>>3)==ui)
-    && (mpz_cmp_si((mpz_ptr)x,(long)ui)==0))
+    && (mpz_cmp_si((mpz_ptr)x,ui)==0))
     {
       Print("gmp-small %s:%d\n",f,l);
       return FALSE;
@@ -1574,7 +1570,7 @@ BOOLEAN nrzDBTest (number x, const char *f, const int l, const coeffs)
 }
 #endif
 
-void nrzWrite (number &a, const coeffs)
+void nrzWrite (number a, const coeffs)
 {
   char *s,*z;
   if (a==NULL)
