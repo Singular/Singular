@@ -58,7 +58,7 @@ int dReportError(const char* fmt, ...)
   vfprintf(stderr, fmt, ap);
 #if !defined(OM_NDEBUG)
   #ifdef omPrintCurrentBackTraceMax
-  fprintf(stderr, " occured at: \n");
+  fprintf(stderr, " occurred at: \n");
   omPrintCurrentBackTraceMax(stderr, 8);
   #endif
 #endif

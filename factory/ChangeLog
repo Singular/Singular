@@ -919,7 +919,7 @@ Mon Sep 29 08:11:42 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 Fri Sep 26 12:54:41 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* cf_assert.h: prints the function now where the assrtion occured if
+	* cf_assert.h: prints the function now where the assrtion occurred if
 	  we are translating with gcc
 
 Thu Sep 25 13:51:01 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>

@@ -940,7 +940,7 @@ RETURN:  list l
          l[1] the ideal I. Te generators of I are the generators of the
          input ideal devided by the part of the content which have
          prime factors less then 32003.
-         l[2] contains the prime numbers which occured in the division
+         l[2] contains the prime numbers which occurred in the division
 EXAMPLE: example contentS; shows an example
 "
 

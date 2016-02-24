@@ -238,7 +238,7 @@ protected:
     PyObject *pType, *pMessage, *pTraceback;
     PyErr_Fetch(&pType, &pMessage, &pTraceback);
 
-    WerrorS("pyobject error occured");
+    WerrorS("pyobject error occurred");
     WerrorS(PyString_AsString(pMessage));
 
     Py_XDECREF(pType);

@@ -1224,7 +1224,7 @@ static void CheckColumnSequence () // checks if scheme of computations is as gen
      if (cur_result->n_generators!=generic_n_generators)
      {
 #ifdef writemsg
-        PrintS("wrong number of generators occured");
+        PrintS("wrong number of generators occurred");
 #else
         if (protocol) PrintS("ng");
 #endif
@@ -1250,7 +1250,7 @@ static void CheckColumnSequence () // checks if scheme of computations is as gen
          if (!EqualMon(cur_mon->mon,cur_gen->lt))
          {
 #ifdef writemsg
-            PrintS("wrong leading term occured");
+            PrintS("wrong leading term occurred");
 #else
             if (protocol) PrintS("lt");
 #endif
@@ -1265,7 +1265,7 @@ static void CheckColumnSequence () // checks if scheme of computations is as gen
          if (!EqualMon(generic_column_name[i],column_name[i]))
          {
 #ifdef writemsg
-            PrintS("wrong seq of cols occured");
+            PrintS("wrong seq of cols occurred");
 #else
             if (protocol) PrintS("sc");
 #endif

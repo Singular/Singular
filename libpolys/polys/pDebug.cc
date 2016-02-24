@@ -50,11 +50,11 @@ BOOLEAN dPolyReportError(poly p, ring r, const char* fmt, ...)
 
   fprintf(stderr, "\n// ***dPolyReportError: ");
   vfprintf(stderr, fmt, ap);
-  fprintf(stderr, "\n occured at\n");
+  fprintf(stderr, "\n occurred at\n");
   omPrintCurrentBackTraceMax(stderr, 8);
   if (p != NULL)
   {
-    fprintf(stderr, " occured for poly: ");
+    fprintf(stderr, " occurred for poly: ");
     p_wrp(p, r);
     omPrintAddrInfo(stderr, p, " ");
   }

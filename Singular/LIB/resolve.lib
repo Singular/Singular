@@ -3890,7 +3890,7 @@ COMPUTE: a resolution of J,
 RETURN:  a list l of 2 lists of rings
          l[1][i] is a ring containing a basic object BO, the result of the
          resolution.
-         l[2] contains all rings which occured during the resolution process
+         l[2] contains all rings which occurred during the resolution process
 NOTE:    result may be viewed in a human readable form using presentTree()
 EXAMPLE: example resolve;  shows an example
 "

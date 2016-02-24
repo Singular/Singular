@@ -596,7 +596,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
         // test now if the LIFT has the correct valuation !!!
         // note: it may happen, that when resubstituting PARA into
         //       the replacement rules
-        //       there occured some unexpected cancellation;
+        //       there occurred some unexpected cancellation;
         //       we only know that for SOME
         //       solution of the zero-dimensional reduction NO
         //       canellation will occur,
