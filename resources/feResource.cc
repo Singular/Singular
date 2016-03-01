@@ -90,9 +90,15 @@ feResourceConfig_s feResourceConfigs[] =
   {"ExDir",     'm',    feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",          (char *)""},
   {"Path",      'p',    feResPath,  NULL,                   "%b;%P;$PATH",             (char *)""},
 
+#ifdef __CYGWIN__
+  {"emacs",     'E',    feResBinary,"ESINGULAR_EMACS",      "%b/emacs.exe",             (char *)""},
+  {"xemacs",    'A',    feResBinary,"ESINGULAR_EMACS",      "%b/xemacs.exe",            (char *)""},
+  {"SingularEmacs",'M', feResBinary,"ESINGULAR_SINGULAR",   "%b/Singular.exe",          (char *)""},
+#else
   {"emacs",     'E',    feResBinary,"ESINGULAR_EMACS",      "%b/emacs",             (char *)""},
   {"xemacs",    'A',    feResBinary,"ESINGULAR_EMACS",      "%b/xemacs",            (char *)""},
   {"SingularEmacs",'M', feResBinary,"ESINGULAR_SINGULAR",   "%b/Singular",          (char *)""},
+#endif
   {"EmacsLoad", 'l',    feResFile,  "ESINGULAR_EMACS_LOAD", "%e/.emacs-singular",   (char *)""},
   {"EmacsDir",  'e',    feResDir,   "ESINGULAR_EMACS_DIR",  "%D/singular/emacs",             (char *)""},
   {"SingularXterm",'M', feResBinary,"TSINGULAR_SINGULAR",   "%b/Singular",          (char *)""},
