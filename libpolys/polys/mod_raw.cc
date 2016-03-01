@@ -49,12 +49,8 @@
 static BOOLEAN warn_handle = FALSE;
 static BOOLEAN warn_proc = FALSE;
 #ifndef DL_TAIL
-#ifdef SING_NDEBUG
-#define DL_TAIL ".so"
-#else
 #define DL_TAIL ".so"
 //#define DL_TAIL "_g.so"
-#endif
 #endif
 
 void* dynl_open_binary_warn(const char* binary_name, const char* msg)
