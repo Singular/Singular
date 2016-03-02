@@ -197,8 +197,6 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
       printf("#define DECLARE_LENGTH_2(what) what \n");
       printf("#define p_MemCmp_Bitmask_2 p_MemCmp_Bitmask_LengthGeneral\n");
     }
-
-
     printf("#undef p_MemAddAdjust__T\n");
     printf("#define p_MemAddAdjust__T(p, r) do {} while (0)\n");
   }
@@ -214,8 +212,8 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
 #else
     printf("#endif\n");
 #endif
-#ifndef p_Procs_Static
   }
+#ifndef p_Procs_Static
   printf("#endif // p_Procs_[Kernel|Field*]\n");
 #endif
 }
