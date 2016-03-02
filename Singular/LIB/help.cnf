@@ -32,7 +32,7 @@ firefox!xDhE:firefox:!firefox %h &
 konqueror!xDhE:konqueror:!konqueror %h &
 galeon!xDhE:galeon:!galeon -n %h &
 netscape!xDhE:netscape:!(netscape -remote "openURL(%h)")||(netscape %h) &
-cygwin!xhE:cygstart:!cygstart "%h" &
+cygwin!xhE:cygstart:!cygstart "%f" &
 cygwin-www!E:cygstart:!cygstart "%H" &
 safari!xhE:/Applications/Safari.app:!open -a /Applications/Safari.app %h
 tkinfo!xDiE:tkinfo:!tkinfo '(%i)%n' &
