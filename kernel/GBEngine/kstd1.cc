@@ -3369,7 +3369,11 @@ static BOOLEAN kMoraUseBucket(kStrategy strat)
   }
   else
   {
+    #ifdef HAVE_RINGS
     assume(strat->red == redEcart || strat->red == redRiloc);
+    #else
+    assume(strat->red == redEcart);
+    #endif
     if (strat->honey && (strat->syzComp==0))
       return TRUE;
   }
