@@ -33,9 +33,7 @@ int FieldGeneralProcs = 0,
   FieldIndepProcs = 0,
   FieldZpProcs = 0,
   FieldQProcs = 0,
-#ifdef HAVE_RINGS
   RingGeneralProcs = 0,
-#endif
   KernelProcs = 0,
   UnknownProcs = 0;
 
@@ -44,6 +42,9 @@ int IsKernelProc(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
 {
   // general procs go into kernel
   if (field == FieldGeneral && length == LengthGeneral && ord == OrdGeneral)
+    return 1;
+
+  if (field == RingGeneral && length == LengthGeneral && ord == OrdGeneral)
     return 1;
 
   // plus procs with FieldZp
@@ -111,20 +112,28 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
       FieldZpProcs++;
     else if (strcmp(module, "FieldQ") == 0)
       FieldQProcs++;
-#ifdef HAVE_RINGS
-    else if (strcmp(module, "RingGeneral") == 0)
-      RingGeneralProcs++;
-#endif
     else
       UnknownProcs++;
+    if (field==RingGeneral)
+      RingGeneralProcs++;
 
     printf("#ifdef p_Procs_%s\n", module);
   }
 #endif
-#ifdef HAVE_RINGS
   if (strcmp(s_field, "RingGeneral") == 0)
+  {
+#ifdef HAVE_RINGS
+    printf("#define HAVE_RINGS\n");
     printf("#define HAVE_ZERODIVISORS\n");
+#else
+    printf("#if 0\n");
 #endif
+  }
+  else
+  {
+    printf("#undef HAVE_RINGS\n");
+    printf("#undef HAVE_ZERODIVISORS\n");
+  }
   i = 0;
   while (macros_field[i] != NULL)
   {
@@ -197,11 +206,16 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
   printf("#undef %s__T\n#define %s__T %s\n", s_what, s_what, s_full_proc_name);
   printf("#include \"polys/templates/%s__T.cc\"\n", s_what);
   printf("#undef %s\n", s_what);
-#ifdef HAVE_RINGS
   if (strcmp(s_field, "RingGeneral") == 0)
+  {
+#ifdef HAVE_RINGS
+    printf("#undef HAVE_RINGS\n");
     printf("#undef HAVE_ZERODIVISORS\n");
+#else
+    printf("#endif\n");
 #endif
 #ifndef p_Procs_Static
+  }
   printf("#endif // p_Procs_[Kernel|Field*]\n");
 #endif
 }
@@ -317,7 +331,8 @@ int main()
   printf("* FieldIndepProcs      = %d\n",FieldIndepProcs);
   printf("* FieldZpProcs         = %d\n",FieldZpProcs);
   printf("* FieldQProcs          = %d\n",FieldQProcs);
-  printf("* FieldGeneralProcs    = %d\n",FieldGeneralProcs);
+  printf("* FieldGeneralProcs    = %d\n",FieldGeneralProcs-RingGeneralProcs);
+  printf("* RingGeneralProcs     = %d (in FieldGeneral module)\n",RingGeneralProcs);
   printf("* FieldUnknownProcs    = %d\n",UnknownProcs);
 #endif
 

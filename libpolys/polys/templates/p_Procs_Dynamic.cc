@@ -94,6 +94,32 @@ static void* GetGeneralProc(p_Proc proc)
         return cast_A_to_vptr(p_Delete__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_ShallowCopyDelete_Proc:
         return cast_A_to_vptr(p_ShallowCopyDelete__FieldGeneral_LengthGeneral_OrdGeneral);
+      case p_Add_q_Proc:
+        return cast_A_to_vptr(p_Add_q__FieldGeneral_LengthGeneral_OrdGeneral);
+      case p_Neg_Proc:
+        return cast_A_to_vptr(p_Neg__FieldGeneral_LengthGeneral_OrdGeneral);
+      case p_Merge_q_Proc:
+        return cast_A_to_vptr(p_Merge_q__FieldGeneral_LengthGeneral_OrdGeneral);
+      case p_kBucketSetLm_Proc:
+        return cast_A_to_vptr(p_kBucketSetLm__FieldGeneral_LengthGeneral_OrdGeneral);
+#ifdef HAVE_RINGS
+      case p_Mult_nn_Proc:
+        return cast_A_to_vptr(p_Mult_nn__RingGeneral_LengthGeneral_OrdGeneral);
+      case pp_Mult_nn_Proc:
+        return cast_A_to_vptr(pp_Mult_nn__RingGeneral_LengthGeneral_OrdGeneral);
+      case pp_Mult_mm_Proc:
+        return cast_A_to_vptr(pp_Mult_mm__RingGeneral_LengthGeneral_OrdGeneral);
+      case pp_Mult_mm_Noether_Proc:
+        return cast_A_to_vptr(pp_Mult_mm_Noether__RingGeneral_LengthGeneral_OrdGeneral);
+      case p_Mult_mm_Proc:
+        return cast_A_to_vptr(p_Mult_mm__RingGeneral_LengthGeneral_OrdGeneral);
+      case p_Minus_mm_Mult_qq_Proc:
+        return cast_A_to_vptr(p_Minus_mm_Mult_qq__RingGeneral_LengthGeneral_OrdGeneral);
+      case pp_Mult_Coeff_mm_DivSelect_Proc:
+        return cast_A_to_vptr(pp_Mult_Coeff_mm_DivSelect__RingGeneral_LengthGeneral_OrdGeneral);
+      case pp_Mult_Coeff_mm_DivSelectMult_Proc:
+        return cast_A_to_vptr(pp_Mult_Coeff_mm_DivSelectMult__RingGeneral_LengthGeneral_OrdGeneral);
+#else
       case p_Mult_nn_Proc:
         return cast_A_to_vptr(p_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral);
       case pp_Mult_nn_Proc:
@@ -104,20 +130,13 @@ static void* GetGeneralProc(p_Proc proc)
         return cast_A_to_vptr(pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_Mult_mm_Proc:
         return cast_A_to_vptr(p_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral);
-      case p_Add_q_Proc:
-        return cast_A_to_vptr(p_Add_q__FieldGeneral_LengthGeneral_OrdGeneral);
       case p_Minus_mm_Mult_qq_Proc:
         return cast_A_to_vptr(p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral);
-      case p_Neg_Proc:
-        return cast_A_to_vptr(p_Neg__FieldGeneral_LengthGeneral_OrdGeneral);
       case pp_Mult_Coeff_mm_DivSelect_Proc:
         return cast_A_to_vptr(pp_Mult_Coeff_mm_DivSelect__FieldGeneral_LengthGeneral_OrdGeneral);
       case pp_Mult_Coeff_mm_DivSelectMult_Proc:
         return cast_A_to_vptr(pp_Mult_Coeff_mm_DivSelectMult__FieldGeneral_LengthGeneral_OrdGeneral);
-      case p_Merge_q_Proc:
-        return cast_A_to_vptr(p_Merge_q__FieldGeneral_LengthGeneral_OrdGeneral);
-      case p_kBucketSetLm_Proc:
-        return cast_A_to_vptr(p_kBucketSetLm__FieldGeneral_LengthGeneral_OrdGeneral);
+#endif
       case p_Unknown_Proc:
         break;
   }
@@ -138,6 +157,34 @@ static const char* GetGeneralProcName(p_Proc proc)
         return "p_Delete__FieldGeneral_LengthGeneral_OrdGeneral";
       case p_ShallowCopyDelete_Proc:
         return "p_ShallowCopyDelete__FieldGeneral_LengthGeneral_OrdGeneral";
+      case p_Add_q_Proc:
+        return "p_Add_q__FieldGeneral_LengthGeneral_OrdGeneral";
+      case p_Neg_Proc:
+        return "p_Neg__FieldGeneral_LengthGeneral_OrdGeneral";
+      case p_Merge_q_Proc:
+        return "p_Merge_q__FieldGeneral_LengthGeneral_OrdGeneral";
+      case p_kBucketSetLm_Proc:
+        return "p_kBucketSetLm__FieldGeneral_LengthGeneral_OrdGeneral";
+      case p_Unknown_Proc:
+        break;
+#ifdef HAVE_RINGS
+      case p_Mult_nn_Proc:
+        return "p_Mult_nn__RingGeneral_LengthGeneral_OrdGeneral";
+      case pp_Mult_nn_Proc:
+        return "pp_Mult_nn__RingGeneral_LengthGeneral_OrdGeneral";
+      case pp_Mult_mm_Proc:
+        return "pp_Mult_mm__RingGeneral_LengthGeneral_OrdGeneral";
+      case pp_Mult_mm_Noether_Proc:
+        return "pp_Mult_mm_Noether__RingGeneral_LengthGeneral_OrdGeneral";
+      case p_Mult_mm_Proc:
+        return "p_Mult_mm__RingGeneral_LengthGeneral_OrdGeneral";
+      case p_Minus_mm_Mult_qq_Proc:
+        return "p_Minus_mm_Mult_qq__RingGeneral_LengthGeneral_OrdGeneral";
+      case pp_Mult_Coeff_mm_DivSelect_Proc:
+        return "pp_Mult_Coeff_mm_DivSelect__RingGeneral_LengthGeneral_OrdGeneral";
+      case pp_Mult_Coeff_mm_DivSelectMult_Proc:
+        return "pp_Mult_Coeff_mm_DivSelectMult__RingGeneral_LengthGeneral_OrdGeneral";
+#else
       case p_Mult_nn_Proc:
         return "p_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral";
       case pp_Mult_nn_Proc:
@@ -148,22 +195,13 @@ static const char* GetGeneralProcName(p_Proc proc)
         return "pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral";
       case p_Mult_mm_Proc:
         return "p_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_Add_q_Proc:
-        return "p_Add_q__FieldGeneral_LengthGeneral_OrdGeneral";
       case p_Minus_mm_Mult_qq_Proc:
         return "p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_Neg_Proc:
-        return "p_Neg__FieldGeneral_LengthGeneral_OrdGeneral";
       case pp_Mult_Coeff_mm_DivSelect_Proc:
         return "pp_Mult_Coeff_mm_DivSelect__FieldGeneral_LengthGeneral_OrdGeneral";
       case pp_Mult_Coeff_mm_DivSelectMult_Proc:
         return "pp_Mult_Coeff_mm_DivSelectMult__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_Merge_q_Proc:
-        return "p_Merge_q__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_kBucketSetLm_Proc:
-        return "p_kBucketSetLm__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_Unknown_Proc:
-        break;
+#endif
   }
   return "p_Unknown_Proc";
 }

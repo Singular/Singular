@@ -10,6 +10,8 @@
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
 
+#include <misc/auxiliary.h>
+
 /***************************************************************
  *
  * Configurations
@@ -88,13 +90,8 @@
 
 // Predicate which returns true if alloc/copy/free of numbers is
 // like that of Zp (rings should use GMP in future)
-#ifdef HAVE_RINGS
 #define ZP_COPY_FIELD(field) \
   (field == FieldZp || field == FieldGF || field == FieldR)
-#else
-#define ZP_COPY_FIELD(field) \
-  (field == FieldZp || field == FieldGF || field == FieldR)
-#endif
 
 /***************************************************************
  *
@@ -119,9 +116,7 @@ typedef enum p_Field
   FieldZp_a,
   FieldQ_a,
 #endif
-#ifdef HAVE_RINGS
   RingGeneral,
-#endif
   FieldUnknown
 } p_Field;
 typedef enum p_Length // Length of exponent vector in words
@@ -215,9 +210,7 @@ static inline const char* p_FieldEnum_2_String(p_Field field)
       case FieldZp_a: return "FieldZp_a";
       case FieldQ_a: return "FieldQ_a";
 #endif
-#ifdef HAVE_RINGS
       case RingGeneral: return "RingGeneral";
-#endif
       case FieldUnknown: return "FieldUnknown";
   }
   return "NoField_2_String";
@@ -404,9 +397,7 @@ static inline void StaticKernelFilter(p_Field &field, p_Length &length,
 {
   // simply exclude some things
   if ((proc == pp_Mult_mm_Noether_Proc || proc == p_kBucketSetLm_Proc) &&
-#ifdef HAVE_RINGS
       (field != RingGeneral) &&
-#endif
       (field != FieldZp))
   {
     field = FieldGeneral;
@@ -427,10 +418,7 @@ static inline void FastP_ProcsFilter(p_Field &field, p_Length &length, p_Ord &or
       (HAVE_FAST_P_PROCS <= 4 && field != FieldZp && field != FieldQ &&
        proc != p_Merge_q_Proc))
   {
-#ifdef HAVE_RINGS
-    if (field != RingGeneral)
-#endif
-    field = FieldGeneral;
+    if (field != RingGeneral) field = FieldGeneral;
     length = LengthGeneral;
     ord = OrdGeneral;
     return;
@@ -445,10 +433,7 @@ static inline void FastFieldFilter(p_Field &field)
   if (HAVE_FAST_FIELD <= 0 ||
       (HAVE_FAST_FIELD == 1 && field != FieldZp) ||
       (field != FieldZp && field != FieldQ))
-#ifdef HAVE_RINGS
-    if (field != RingGeneral)
-#endif
-    field = FieldGeneral;
+    if (field != RingGeneral) field = FieldGeneral;
 }
 
 static inline void FastLengthFilter(p_Length &length)
@@ -486,11 +471,12 @@ static inline void FastOrdZeroFilter(p_Ord &ord)
 static inline void NCopy__Filter(p_Field &field)
 {
   if (ZP_COPY_FIELD(field)) field = FieldZp;
+  else if (field == RingGeneral) field = FieldGeneral;
 }
 
 // in p_Add_q, p_MemCmp works with CompLSize,
 // hence, we do not need to consider ZeroOrds
-static inline void p_Add_q__Filter(p_Length &length, p_Ord &ord)
+static inline void p_Add_q__Filter(p_Field &field,p_Length &length, p_Ord &ord)
 {
   if (IsZeroOrd(ord))
   {
@@ -500,6 +486,14 @@ static inline void p_Add_q__Filter(p_Length &length, p_Ord &ord)
       length = (p_Length) ((int)length + 1);
     }
   }
+  if (field == RingGeneral) field = FieldGeneral;
+}
+
+static inline void p_Neg__Filter(p_Field &field,p_Length &length, p_Ord &ord)
+{
+  if (field == RingGeneral) field = FieldGeneral;
+  length =LengthGeneral;
+  ord =OrdGeneral;
 }
 
 static inline void pp_Mult_mm_Noether_Filter(p_Field &field,
@@ -515,10 +509,7 @@ static inline void pp_Mult_mm_Noether_Filter(p_Field &field,
       )
   {
     // all the other orderings might occur (remember Mixed Orderings!)
-#ifdef HAVE_RINGS
-    if (field != RingGeneral)
-#endif
-    field = FieldGeneral;
+    if (field != RingGeneral) field = FieldGeneral;
     ord = OrdGeneral;
     length = LengthGeneral;
   }
@@ -531,7 +522,11 @@ static inline void FastProcFilter(p_Proc proc, p_Field &field,
   {
       case p_Add_q_Proc:
       case p_Merge_q_Proc:
-        p_Add_q__Filter(length, ord);
+        p_Add_q__Filter(field, length, ord);
+        break;
+
+      case p_Neg_Proc:
+        p_Neg__Filter(field, length, ord);
         break;
 
       case p_Copy_Proc:
@@ -546,10 +541,7 @@ static inline void FastProcFilter(p_Proc proc, p_Field &field,
         case pp_Mult_Coeff_mm_DivSelectMult_Proc:
           if (length == LengthOne || length == LengthTwo)
           {
-#ifdef HAVE_RINGS
-            if (field != RingGeneral)
-#endif
-            field = FieldGeneral;
+            if (field != RingGeneral) field = FieldGeneral;
             length = LengthGeneral;
             ord = OrdGeneral;
             return;
@@ -569,7 +561,7 @@ static inline void FastProcFilter(p_Proc proc, p_Field &field,
 #endif
 }
 
-// returns 1 if combination of field/length/ord is invalid
+// returns 0 if combination of field/length/ord is invalid
 static inline int IsValidSpec(p_Field field, p_Length length, p_Ord ord)
 {
   if (field == FieldUnknown || length == LengthUnknown || ord == OrdUnknown)
@@ -588,8 +580,11 @@ static inline int IsValidSpec(p_Field field, p_Length length, p_Ord ord)
     return 0;
 
   // we cover everything for length <= two
-  if (ord == OrdGeneral && length >= LengthTwo)
+  if (ord == OrdGeneral && length > LengthTwo)
     return 0;
+#ifndef HAVE_RINGS
+  if (field == RingGeneral) return 0;
+#endif
   return 1;
 }
 
@@ -699,6 +694,26 @@ do                                                                      \
 }                                                                       \
 while (0)
 #endif
+
+#define SetProcs_ring(field, length, ord)                               \
+do                                                                      \
+{                                                                       \
+  SetProc(p_Copy, FieldGeneral, length, OrdGeneral);                    \
+  SetProc(p_Delete, FieldGeneral, LengthGeneral, OrdGeneral);           \
+  SetProc(p_ShallowCopyDelete, FieldGeneral, length, OrdGeneral);       \
+  SetProc(p_Add_q, FieldGeneral, length, ord);                          \
+  SetProc(p_Neg, FieldGeneral, LengthGeneral, OrdGeneral);              \
+  SetProc(p_Merge_q, FieldGeneral, length, ord);                        \
+  SetProc(p_Mult_nn, field, LengthGeneral, OrdGeneral);                 \
+  SetProc(pp_Mult_nn, field, LengthGeneral, OrdGeneral);                \
+  SetProc(pp_Mult_mm, field, length, OrdGeneral);                       \
+  SetProc(p_Mult_mm, field, length, OrdGeneral);                        \
+  SetProc(p_Minus_mm_Mult_qq, field, length, ord);                      \
+  SetProc(pp_Mult_mm_Noether, field, length, ord);                      \
+  SetProc(pp_Mult_Coeff_mm_DivSelect, field, length, OrdGeneral);       \
+  SetProc(pp_Mult_Coeff_mm_DivSelectMult, field, length, OrdGeneral);   \
+}                                                                       \
+while (0)
 
 #endif // P_PROCS_IMPL_H
 

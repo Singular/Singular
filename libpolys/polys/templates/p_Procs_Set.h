@@ -14,6 +14,7 @@
  *******************************************************************/
 
 #include <reporter/reporter.h>
+#include <libpolys/libpolysconfig.h>
 
 // extract p_Procs properties from a ring
 static inline p_Field p_FieldIs(ring r)
@@ -29,9 +30,7 @@ static inline p_Field p_FieldIs(ring r)
   if (rField_is_Zp_a(r)) return FieldZp_a;
   if (rField_is_Q_a(r)) return FieldQ_a;
 #endif
-#ifdef HAVE_RINGS
   if (rField_is_Ring(r)) return RingGeneral;
-#endif
   return FieldGeneral;
 }
 
@@ -128,7 +127,7 @@ do                                                          \
     WarnS("Singular will work properly, but much slower");  \
     WarnS("If you chose a coef ring, it may not work at all");\
     p_Procs->which =                 (which##_Proc_Ptr)(    \
-      which##__FieldGeneral_LengthGeneral_OrdGeneral);       \
+      which##__FieldGeneral_LengthGeneral_OrdGeneral);      \
   }                                                         \
 }                                                           \
 while (0);
@@ -156,6 +155,14 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
     SetProcs(FieldGeneral, length,ord); // p_Mult_nn, ...
     // set all non-mult/div. routines to FieldZp-variants
     SetProcs_nv(FieldZp, length,ord); // p_Delete, p_ShallowCopyDelete...
+  }
+  if (field==RingGeneral)
+  {
+    if (nCoeff_is_Domain(r->cf))
+      SetProcs_ring(FieldGeneral,length,ord);
+      // FieldGeneral vs. RingGeneral: HAVE_ZERODIVISORS
+    else
+      SetProcs_ring(RingGeneral,length,ord);
   }
   #endif
   CheckProc(p_Copy);
