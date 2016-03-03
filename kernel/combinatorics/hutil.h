@@ -9,8 +9,6 @@
 
 class intvec;
 
-struct omBin_s   ; typedef struct omBin_s omBin_t ; typedef omBin_t * omBin;
-
 struct ip_sring  ; typedef struct ip_sring                          * ring;
 struct sip_sideal; typedef struct sip_sideal                        * ideal;
 struct spolyrec  ; typedef struct spolyrec polyrec; typedef polyrec * poly;

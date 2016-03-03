@@ -8,6 +8,7 @@
 */
 #include <stdlib.h>
 #include <string.h>
+#include <omalloc/omConfig.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,6 +82,7 @@ static inline void *omRealloc(void *d, size_t ns)
     *dd=ns+sizeof(long);dd++; return dd;
   }
 }
+#define omReallocAligned(A,B) omRealloc(A,B)
 static inline void *omReallocSize(void *d, size_t os, size_t ns)
 { if (d==NULL) return omAlloc(ns);
   else

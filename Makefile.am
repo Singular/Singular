@@ -4,7 +4,7 @@ if ENABLE_FACTORY
   USE_FACTORY = factory
 endif
 
-SUBDIRS = resources omalloc xalloc $(USE_FACTORY) \
+SUBDIRS = resources omalloc $(USE_FACTORY) \
 libpolys gfanlib IntegerProgramming \
 kernel Singular \
 dox emacs redhat desktop
