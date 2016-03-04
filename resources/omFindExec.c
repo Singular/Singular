@@ -38,9 +38,6 @@ static char * omFindExec_link (const char *name, char* executable)
 {
   char *search;
   char *p;
-#ifdef WINNT
-  char *extra = NULL;
-#endif
   char tbuf[MAXPATHLEN];
 
   if (ABSOLUTE_FILENAME_P(name))
@@ -49,9 +46,6 @@ static char * omFindExec_link (const char *name, char* executable)
       if (! access (name, X_OK))
       {
         strcpy(executable, name);
-#ifdef __CYGWIN__
-        strcat(executable, ".exe");
-#endif
         return executable;
       }
   }
@@ -74,9 +68,6 @@ static char * omFindExec_link (const char *name, char* executable)
       if (! access(tbuf, X_OK))
       {
         strcpy(executable, tbuf);
-#ifdef __CYGWIN__
-        strcat(executable, ".exe");
-#endif
         return executable;
       }
     }
@@ -84,18 +75,6 @@ static char * omFindExec_link (const char *name, char* executable)
 
     search = getenv("PATH");
 /* for winnt under msdos, cwd is implictly in the path */
-#ifdef WINNT
-    p = getenv("SHELL");
-    if (p == NULL || strlen(p) < 2)
-    {
-      char *extra = NULL;
-      /* we are under msdos display */
-      extra = (char*) malloc((search != NULL ? strlen(search) : 0) + 3);
-      strcpy(extra, ".:");
-      if (search != NULL) strcat(extra, search);
-      search = extra;
-    }
-#endif
     p = search;
 
     if (p != NULL)
@@ -128,14 +107,7 @@ static char * omFindExec_link (const char *name, char* executable)
         /* If the named file exists, then return it. */
         if (! access (tbuf, F_OK))
         {
-#ifdef WINNT
-          if (extra != NULL)
-            free(extra);
-#endif
           strcpy(executable, tbuf);
-#ifdef __CYGWIN__
-          strcat(executable, ".exe");
-#endif
           return executable;
         }
 
@@ -218,9 +190,9 @@ static int full_readlink(const char* name, char* buf, size_t bufsize)
   return -1;
 }
 
-#ifdef WINNT
-char * _omFindExec (const char *name, char* exec);
+#ifdef __CYGWIN__
 /* for windows, serch first for .exe */
+char * _omFindExec (const char *name, char* exec);
 char* omFindExec(const char *name, char* exec)
 {
 
