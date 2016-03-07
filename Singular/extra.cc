@@ -975,7 +975,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   #endif
   /* =================== LLL via Flint ==============================*/
   #ifdef HAVE_FLINT
-  #ifdef FLINT_VER_2_4_5
+  #if __FLINT_RELEASE >= 20500
     if (strcmp(sys_cmd, "LLL_Flint") == 0)
     {
       if (h!=NULL)

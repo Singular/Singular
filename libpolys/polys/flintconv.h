@@ -11,7 +11,7 @@
  *
  * This file is work in progress and currently not part of the official Singular
  *
- * @note the code is garded by the undefined macro FLINT_VER_2_4_5
+ * @note the code is garded by the version test __FLINT_RELEASE >= 20500 (>=2.5)
  * In its current form it will never become an official part.
  * (conversion routines may be moved to other files/directories, etc.)
  *
@@ -25,16 +25,12 @@
  *
  **/
 
-//  Have to define this when this code shall be used:
-//#define FLINT_VER_2_4_5
-#ifdef FLINT_VER_2_4_5
-#include <polys/matpol.h>
-#include <coeffs/bigintmat.h>
-// #include <polys/monomials/ring.h>
-
-
 #ifdef HAVE_FLINT
 #include <flint/flint.h>
+
+#if __FLINT_RELEASE >= 20500
+#include <polys/matpol.h>
+#include <coeffs/bigintmat.h>
 #include <flint/fmpz.h>
 #include <flint/fmpq.h>
 #include <flint/fmpz_poly.h>
@@ -48,7 +44,6 @@ void convSingNFlintN(fmpz_t f, mpz_t z);
 bigintmat*  singflint_LLL(bigintmat* A, bigintmat* T);
 intvec* singflint_LLL(intvec* A, intvec* T);
 #endif
-
 #endif
 #endif
 // LIBPOLYS_POLYS_FLINTCONV_H

@@ -11,7 +11,8 @@
 #include <misc/auxiliary.h>
 #include "flintconv.h"
 
-#ifdef FLINT_VER_2_4_5
+#ifdef HAVE_FLINT
+#if __FLINT_RELEASE >= 20500
 #include <coeffs/coeffs.h>
 #include <polys/monomials/p_polys.h>
 
@@ -24,7 +25,6 @@
 #include "simpleideals.h"
 
 
-#ifdef HAVE_FLINT
 int convFlintISingI (fmpz_t f)
 {
   int res;
