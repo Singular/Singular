@@ -1019,13 +1019,15 @@ it is of course a good idea to take a look at @code{singular.el} in the
 singular-emacs-home-directory.
 
 @subheading CYGWIN and ESingular
-@begin itemize
-@item @code{X11 is needed}
+@itemize
+@item @strong{X11 server}
 install @code{xlaunch}, @code{emacs-X11}, @code{xterm} and all dependencies.
 Create with @code{xlaunch} a startup file for the X-server wich also starts
 the client @code{xterm}. From that one can start ESingular.
-@item @code{fork problems}
-The simplest way to do this is to run '/usr/bin/rebase-trigger full', then stop all Cygwin processes and services, and then run setup-x86.exe. The _autorebase postinstall script will then take care of the rebase.
+@item @strong{fork problems}
+The simplest way to overcome fork problem is to run @code{/usr/bin/rebase-trigger full},
+then stop all Cygwin processes and services, and then run @code{setup-x86.exe}.
+The _autorebase postinstall script will then take care of the rebase.
 Occasionally it is necessary to reboot the computer before doing this. 
 @end itemize
 @subheading Starting, interrupting and stopping SINGULAR
