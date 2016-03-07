@@ -1019,6 +1019,8 @@ it is of course a good idea to take a look at @code{singular.el} in the
 singular-emacs-home-directory.
 
 @subheading CYGWIN and ESingular
+@cindex CYGWIN and ESingular
+@cindex ESingular, CYGWIN
 @itemize
 @item @strong{X11 server}
 install @code{xlaunch}, @code{emacs-X11}, @code{xterm} and all dependencies.
