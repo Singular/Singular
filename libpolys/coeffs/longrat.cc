@@ -112,7 +112,7 @@ BOOLEAN nlDBTest(number a, const char *f,int l, const coeffs r);
 static inline number nlShort3(number x) // assume x->s==3
 {
   assume(x->s==3);
-  if (mpz_cmp_si(x->z,(long)0)==0)
+  if (mpz_cmp_ui(x->z,0L)==0)
   {
     mpz_clear(x->z);
     FREE_RNUMBER(x);
@@ -155,7 +155,7 @@ static inline number nlShort3(number x) // assume x->s==3
 // #define SR_TO_INT(SR)   (((long)SR) >> 2)
 
 #define MP_SMALL 1
-//#define mpz_isNeg(A) (mpz_cmp_si(A,(long)0)<0)
+//#define mpz_isNeg(A) (mpz_cmp_si(A,0L)<0)
 #define mpz_isNeg(A) ((A)->_mp_size<0)
 #define mpz_limb_size(A) ((A)->_mp_size)
 #define mpz_limb_d(A) ((A)->_mp_d)
@@ -305,7 +305,7 @@ BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs /*r*/)
     //omCheckIf(omCheckAddrSize(a->n[0]._mp_d,a->n[0]._mp_alloc*BYTES_PER_MP_LIMB), return FALSE);
     if (a->z[0]._mp_alloc==0)
       Print("!!longrat:n->alloc=0 in %s:%d\n",f,l);
-    if ((mpz_size1(a->n) ==1) && (mpz_cmp_si(a->n,(long)1)==0))
+    if ((mpz_size1(a->n) ==1) && (mpz_cmp_si(a->n,1L)==0))
     {
       Print("!!longrat:integer as rational in %s:%d\n",f,l);
       mpz_clear(a->n); a->s=3;
@@ -476,9 +476,8 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
     dd = (mp_ptr)omAlloc(sizeof(mp_limb_t)*al);
     for (i=0;i<size;i++) dd[i] = qp[i];
     bl = 1-e;
-    nn = (mp_ptr)omAlloc(sizeof(mp_limb_t)*bl);
+    nn = (mp_ptr)omAlloc0(sizeof(mp_limb_t)*bl);
     nn[bl-1] = 1;
-    for (i=bl-2;i>=0;i--) nn[i] = 0;
     ndest = res->n;
     ndest->_mp_d = nn;
     ndest->_mp_alloc = ndest->_mp_size = bl;
@@ -496,7 +495,7 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
 
   dest->_mp_d = dd;
   dest->_mp_alloc = al;
-  if (negative) dest->_mp_size = -dest->_mp_size;
+  if (negative) mpz_neg(dest,dest);
 
   if (res->s==0)
     nlNormalize(res,dst);
@@ -580,7 +579,7 @@ int nlSize(number a, const coeffs)
      return 0; /* rational 0*/
   if (SR_HDL(a) & SR_INT)
      return 1; /* immidiate int */
-  int s=a->z[0]._mp_alloc;
+  int s=mpz_size1(a->z);
 //  while ((s>0) &&(a->z._mp_d[s]==0L)) s--;
 //#if SIZEOF_LONG == 8
 //  if (a->z._mp_d[s] < (unsigned long)0x100000000L) s=s*2-1;
@@ -589,7 +588,7 @@ int nlSize(number a, const coeffs)
 //  s++;
   if (a->s<2)
   {
-    int d=a->n[0]._mp_alloc;
+    int d=mpz_size1(a->n);
 //    while ((d>0) && (a->n._mp_d[d]==0L)) d--;
 //#if SIZEOF_LONG == 8
 //    if (a->n._mp_d[d] < (unsigned long)0x100000000L) d=d*2-1;
@@ -673,14 +672,14 @@ number nlInvers(number a, const coeffs r)
     n->debug=123456;
 #endif
     n->s=1;
-    if ((long)a>0L)
+    if (((long)a)>0L)
     {
-      mpz_init_set_si(n->z,(long)1);
+      mpz_init_set_si(n->z,1L);
       mpz_init_set_si(n->n,(long)SR_TO_INT(a));
     }
     else
     {
-      mpz_init_set_si(n->z,(long)-1);
+      mpz_init_set_si(n->z,-1L);
       mpz_init_set_si(n->n,(long)-SR_TO_INT(a));
     }
     nlTest(n, r);
@@ -691,19 +690,19 @@ number nlInvers(number a, const coeffs r)
   n->debug=123456;
 #endif
   {
-    n->s=a->s;
     mpz_init_set(n->n,a->z);
     switch (a->s)
     {
       case 0:
       case 1:
+              n->s=a->s;
               mpz_init_set(n->z,a->n);
               if (mpz_isNeg(n->n)) /* && n->s<2*/
               {
                 mpz_neg(n->z,n->z);
                 mpz_neg(n->n,n->n);
               }
-              if (mpz_cmp_si(n->n,(long)1)==0)
+              if (mpz_cmp_ui(n->n,1L)==0)
               {
                 mpz_clear(n->n);
                 n->s=3;
@@ -711,15 +710,16 @@ number nlInvers(number a, const coeffs r)
               }
               break;
       case 3:
+              // i.e. |a| > 2^...
               n->s=1;
               if (mpz_isNeg(n->n)) /* && n->s<2*/
               {
                 mpz_neg(n->n,n->n);
-                mpz_init_set_si(n->z,(long)-1);
+                mpz_init_set_si(n->z,-1L);
               }
               else
               {
-                mpz_init_set_si(n->z,(long)1);
+                mpz_init_set_si(n->z,1L);
               }
               break;
     }
@@ -960,7 +960,7 @@ coeffs nlQuot1(number c, const coeffs r)
   long ch = r->cfInt(c, r);
   int p=IsPrime(ch);
   coeffs rr=NULL;
-  if ((long)p==ch)
+  if (((long)p)==ch)
   {
     rr = nInitChar(n_Zp,(void*)ch);
   }
@@ -1057,7 +1057,7 @@ number nlDiv (number a, number b, const coeffs r)
       if (a->s<2)
       {
         mpz_init_set(u->n,a->n);
-        if ((long)b>0L)
+        if (((long)b)>0L)
           mpz_mul_ui(u->n,u->n,SR_TO_INT(b));
         else
         {
@@ -1086,7 +1086,7 @@ number nlDiv (number a, number b, const coeffs r)
     mpz_neg(u->z,u->z);
     mpz_neg(u->n,u->n);
   }
-  if (mpz_cmp_si(u->n,(long)1)==0)
+  if (mpz_cmp_si(u->n,1L)==0)
   {
     mpz_clear(u->n);
     u->s=3;
@@ -1123,7 +1123,7 @@ void nlPower (number x,int exp,number * u, const coeffs r)
     mpz_pow_ui((*u)->z,x->z,(unsigned long)exp);
     if (x->s<2)
     {
-      if (mpz_cmp_si(x->n,(long)1)==0)
+      if (mpz_cmp_si(x->n,1L)==0)
       {
         x->s=3;
         mpz_clear(x->n);
@@ -1313,7 +1313,7 @@ static int int_extgcd(int a, int b, int * u, int* x, int * v, int* y)
 number nlShort1(number x) // assume x->s==0/1
 {
   assume(x->s<2);
-  if (mpz_cmp_ui(x->z,(long)0)==0)
+  if (mpz_cmp_ui(x->z,0L)==0)
   {
     _nlDelete_NoImm(&x);
     return INT_TO_SR(0);
@@ -1343,7 +1343,7 @@ void nlNormalize (number &x, const coeffs r)
   }
   else if (x->s==0)
   {
-    if (mpz_cmp_si(x->n,(long)1)==0)
+    if (mpz_cmp_si(x->n,1L)==0)
     {
       mpz_clear(x->n);
       x->s=3;
@@ -1355,11 +1355,11 @@ void nlNormalize (number &x, const coeffs r)
       mpz_init(gcd);
       mpz_gcd(gcd,x->z,x->n);
       x->s=1;
-      if (mpz_cmp_si(gcd,(long)1)!=0)
+      if (mpz_cmp_si(gcd,1L)!=0)
       {
         mpz_divexact(x->z,x->z,gcd);
         mpz_divexact(x->n,x->n,gcd);
-        if (mpz_cmp_si(x->n,(long)1)==0)
+        if (mpz_cmp_si(x->n,1L)==0)
         {
           mpz_clear(x->n);
           x->s=3;
@@ -1398,7 +1398,7 @@ number nlNormalizeHelper(number a, number b, const coeffs r)
     mpz_gcd_ui(gcd,b->n,ABS(SR_TO_INT(a)));
   else
     mpz_gcd(gcd,a->z,b->n);
-  if (mpz_cmp_si(gcd,(long)1)!=0)
+  if (mpz_cmp_si(gcd,1L)!=0)
   {
     mpz_t bt;
     mpz_init_set(bt,b->n);
@@ -1560,9 +1560,9 @@ BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b)
   {
     if (b->s!=0)
       return FALSE;
-    if (((long)a > 0L) && (mpz_isNeg(b->z)))
+    if ((((long)a) > 0L) && (mpz_isNeg(b->z)))
       return FALSE;
-    if (((long)a < 0L) && (!mpz_isNeg(b->z)))
+    if ((((long)a) < 0L) && (!mpz_isNeg(b->z)))
       return FALSE;
     mpz_t  bb;
     mpz_init_set(bb,b->n);
@@ -1652,11 +1652,11 @@ static void nlNormalize_Gcd(number &x)
   mpz_init(gcd);
   mpz_gcd(gcd,x->z,x->n);
   x->s=1;
-  if (mpz_cmp_si(gcd,(long)1)!=0)
+  if (mpz_cmp_si(gcd,1L)!=0)
   {
     mpz_divexact(x->z,x->z,gcd);
     mpz_divexact(x->n,x->n,gcd);
-    if (mpz_cmp_si(x->n,(long)1)==0)
+    if (mpz_cmp_si(x->n,1L)==0)
     {
       mpz_clear(x->n);
       x->s=3;
@@ -1691,7 +1691,7 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
         mpz_mul_si(x,b->n,SR_TO_INT(a));
         mpz_add(u->z,b->z,x);
         mpz_clear(x);
-        if (mpz_cmp_ui(u->z,(long)0)==0)
+        if (mpz_cmp_ui(u->z,0L)==0)
         {
           mpz_clear(u->z);
           FREE_RNUMBER(u);
@@ -1710,16 +1710,10 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
       }
       case 3:
       {
-        if ((long)a>0L)
+        if (((long)a)>0L)
           mpz_add_ui(u->z,b->z,SR_TO_INT(a));
         else
           mpz_sub_ui(u->z,b->z,-SR_TO_INT(a));
-        if (mpz_cmp_ui(u->z,(long)0)==0)
-        {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
-          return INT_TO_SR(0);
-        }
         u->s = 3;
         u=nlShort3(u);
         break;
@@ -1746,7 +1740,7 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
             mpz_add(u->z,u->z,x);
             mpz_clear(x);
 
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            if (mpz_cmp_ui(u->z,0L)==0)
             {
               mpz_clear(u->z);
               FREE_RNUMBER(u);
@@ -1769,7 +1763,7 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           {
             mpz_mul(u->z,b->z,a->n);
             mpz_add(u->z,u->z,a->z);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            if (mpz_cmp_ui(u->z,0L)==0)
             {
               mpz_clear(u->z);
               FREE_RNUMBER(u);
@@ -1798,7 +1792,7 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           {
             mpz_mul(u->z,a->z,b->n);
             mpz_add(u->z,u->z,b->z);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            if (mpz_cmp_ui(u->z,0L)==0)
             {
               mpz_clear(u->z);
               FREE_RNUMBER(u);
@@ -1818,12 +1812,6 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           case 3:
           {
             mpz_add(u->z,a->z,b->z);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
-            {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
-              return INT_TO_SR(0);
-            }
             u->s = 3;
             u=nlShort3(u);
             break;
@@ -1855,7 +1843,7 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
       }
       case 3:
       {
-        if ((long)b>0L)
+        if (((long)b)>0L)
           mpz_add_ui(a->z,a->z,SR_TO_INT(b));
         else
           mpz_sub_ui(a->z,a->z,-SR_TO_INT(b));
@@ -1892,7 +1880,7 @@ void _nlInpAdd_aNoImm_OR_bNoImm(number &a, number b)
       }
       case 3:
       {
-        if ((long)a>0L)
+        if (((long)a)>0L)
           mpz_add_ui(u->z,b->z,SR_TO_INT(a));
         else
           mpz_sub_ui(u->z,b->z,-SR_TO_INT(a));
@@ -1994,7 +1982,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
         mpz_mul_si(x,b->n,SR_TO_INT(a));
         mpz_sub(u->z,x,b->z);
         mpz_clear(x);
-        if (mpz_cmp_ui(u->z,(long)0)==0)
+        if (mpz_cmp_ui(u->z,0L)==0)
         {
           mpz_clear(u->z);
           FREE_RNUMBER(u);
@@ -2013,7 +2001,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       }
       case 3:
       {
-        if ((long)a>0L)
+        if (((long)a)>0L)
         {
           mpz_sub_ui(u->z,b->z,SR_TO_INT(a));
           mpz_neg(u->z,u->z);
@@ -2022,12 +2010,6 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
         {
           mpz_add_ui(u->z,b->z,-SR_TO_INT(a));
           mpz_neg(u->z,u->z);
-        }
-        if (mpz_cmp_ui(u->z,(long)0)==0)
-        {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
-          return INT_TO_SR(0);
         }
         u->s = 3;
         u=nlShort3(u);
@@ -2047,7 +2029,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
         mpz_mul_si(x,a->n,SR_TO_INT(b));
         mpz_sub(u->z,a->z,x);
         mpz_clear(x);
-        if (mpz_cmp_ui(u->z,(long)0)==0)
+        if (mpz_cmp_ui(u->z,0L)==0)
         {
           mpz_clear(u->z);
           FREE_RNUMBER(u);
@@ -2066,19 +2048,13 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       }
       case 3:
       {
-        if ((long)b>0L)
+        if (((long)b)>0L)
         {
           mpz_sub_ui(u->z,a->z,SR_TO_INT(b));
         }
         else
         {
           mpz_add_ui(u->z,a->z,-SR_TO_INT(b));
-        }
-        if (mpz_cmp_ui(u->z,(long)0)==0)
-        {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
-          return INT_TO_SR(0);
         }
         u->s = 3;
         u=nlShort3(u);
@@ -2107,7 +2083,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
             mpz_sub(u->z,y,x);
             mpz_clear(x);
             mpz_clear(y);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            if (mpz_cmp_ui(u->z,0L)==0)
             {
               mpz_clear(u->z);
               FREE_RNUMBER(u);
@@ -2133,7 +2109,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
             mpz_mul(x,b->z,a->n);
             mpz_sub(u->z,a->z,x);
             mpz_clear(x);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            if (mpz_cmp_ui(u->z,0L)==0)
             {
               mpz_clear(u->z);
               FREE_RNUMBER(u);
@@ -2165,7 +2141,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
             mpz_mul(x,a->z,b->n);
             mpz_sub(u->z,x,b->z);
             mpz_clear(x);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            if (mpz_cmp_ui(u->z,0L)==0)
             {
               mpz_clear(u->z);
               FREE_RNUMBER(u);
@@ -2185,12 +2161,6 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
           case 3: /* a:3 , b:3 */
           {
             mpz_sub(u->z,a->z,b->z);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
-            {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
-              return INT_TO_SR(0);
-            }
             u->s = 3;
             u=nlShort3(u);
             break;
@@ -2235,7 +2205,7 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
   {
     u->s=b->s;
     if (u->s==1) u->s=0;
-    if ((long)a>0L)
+    if (((long)a)>0L)
     {
       mpz_mul_ui(u->z,b->z,(unsigned long)SR_TO_INT(a));
     }
@@ -2455,7 +2425,7 @@ LINLINE number nlInit (long i, const coeffs r)
   else                      n=nlRInit(i);
   #else
   LONG ii=(LONG)i;
-  if ( (((long)ii==i) && ((ii << 3) >> 3) == ii )) n=INT_TO_SR(ii);
+  if ( ((((long)ii)==i) && ((ii << 3) >> 3) == ii )) n=INT_TO_SR(ii);
   else                                             n=nlRInit(i);
   #endif
   nlTest(n, r);
@@ -2479,7 +2449,7 @@ LINLINE BOOLEAN nlIsZero (number a, const coeffs)
   #if 0
   if (a==INT_TO_SR(0)) return TRUE;
   if ((SR_HDL(a) & SR_INT)||(a==NULL)) return FALSE;
-  if (mpz_cmp_si(a->z,(long)0)==0)
+  if (mpz_cmp_si(a->z,0L)==0)
   {
     printf("gmp-0 in nlIsZero\n");
     dErrorBreak();
@@ -2829,13 +2799,13 @@ number nlFarey(number nN, number nP, const coeffs r)
   else                     mpz_init_set(P,nP->z);
   assume(!mpz_isNeg(P));
   if (mpz_isNeg(N))  mpz_add(N,N,P);
-  mpz_init_set_si(A,(long)0);
+  mpz_init_set_si(A,0L);
   mpz_init_set_ui(B,(unsigned long)1);
-  mpz_init_set_si(C,(long)0);
+  mpz_init_set_si(C,0L);
   mpz_init(D);
   mpz_init_set(E,P);
   number z=INT_TO_SR(0);
-  while(mpz_cmp_si(N,(long)0)!=0)
+  while(mpz_cmp_si(N,0L)!=0)
   {
     mpz_mul(tmp,N,N);
     mpz_add(tmp,tmp,tmp);
