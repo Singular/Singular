@@ -1101,13 +1101,13 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(
          number coef=red.coef;
          if (row->idx_array)
          {
-           if (!((coef==(number)(long) 1)||(coef==minus_one)))
+           if (!((coef==(number)1L)||(coef==minus_one)))
            {
              add_coef_times_sparse(temp_array,temp_size,row,coef);
            }
            else
            {
-             if (coef==(number)(long) 1)
+             if (coef==(number)1L)
              {
                add_sparse(temp_array,temp_size,row);
              }
@@ -1119,13 +1119,13 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(
          }
          else
          //TODO: treat, 1,-1
-         if (!((coef==(number)(long) 1)||(coef==minus_one)))
+         if (!((coef==(number)1L)||(coef==minus_one)))
          {
           add_coef_times_dense(temp_array,temp_size,row->coef_array,row->len,coef);
          }
          else
          {
-           if (coef==(number)(long)1)
+           if (coef==(number)1L)
              add_dense(temp_array,temp_size,row->coef_array,row->len);
            else
            {

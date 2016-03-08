@@ -77,26 +77,25 @@ const char * nlRead (const char *s, number *a, const coeffs r)
       (*a)->s = 0;
       s++;
       s = nlEatLong((char *)s, n);
-      if (mpz_cmp_si(n,(long)0)==0)
+      if (mpz_cmp_si(n,0L)==0)
       {
         WerrorS(nDivBy0);
         mpz_clear(n);
         (*a)->s = 3;
       }
-      else if (mpz_cmp_si(n,(long)1)==0)
+      else if (mpz_cmp_si(n,1L)==0)
       {
         mpz_clear(n);
         (*a)->s=3;
       }
     }
-    if (mpz_cmp_si(z,(long)0)==0)
+    if (mpz_cmp_si(z,0L)==0)
     {
       mpz_clear(z);
       FREE_RNUMBER(*a);
       *a=INT_TO_SR(0);
     }
-    else
-    if ((*a)->s==3)
+    else if ((*a)->s==3)
     {
       number nlShort3_noinline(number x);
       *a=nlShort3_noinline(*a);

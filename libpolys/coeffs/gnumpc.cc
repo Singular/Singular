@@ -87,7 +87,7 @@ number   ngcParameter(int i, const coeffs r)
   assume(i==1);
 
   if( i == 1 )
-    return (number)(new gmp_complex( (long)0, (long)1 ));
+    return (number)(new gmp_complex( 0L, 1L ));
 
   return NULL; // new gmp_complex( )  // 0?
 }
@@ -99,7 +99,7 @@ number ngcInit (long i, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 
-  gmp_complex* n= new gmp_complex( (long)i, (long)0 );
+  gmp_complex* n= new gmp_complex( (long)i, 0L );
 
   return (number)n;
 }
@@ -387,12 +387,12 @@ const char * ngcRead (const char * s, number * a, const coeffs r)
   else if (strncmp(s, complex_parameter, N)==0)
   {
     s += N;
-    gmp_complex *aa=new gmp_complex((long)0,(long)1);
+    gmp_complex *aa=new gmp_complex(0L,1L);
     *a=(number)aa;
   }
   else
   {
-    *a=(number) new gmp_complex((long)1);
+    *a=(number) new gmp_complex(1L);
   }
   return s;
 }

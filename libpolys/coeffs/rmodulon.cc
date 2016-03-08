@@ -80,7 +80,7 @@ extern omBin gmp_nrz_bin;
 
 void    nrnCoeffWrite  (const coeffs r, BOOLEAN /*details*/)
 {
-  long l = (long)mpz_sizeinbase(r->modBase, 10) + 2;
+  size_t l = (size_t)mpz_sizeinbase(r->modBase, 10) + 2;
   char* s = (char*) omAlloc(l);
   s= mpz_get_str (s, 10, r->modBase);
   if (nCoeff_is_Ring_ModN(r)) Print("//   coeff. ring is : Z/%s\n", s);
@@ -96,7 +96,7 @@ static BOOLEAN nrnCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
 
 static char* nrnCoeffString(const coeffs r)
 {
-  long l = (long)mpz_sizeinbase(r->modBase, 10) +2;
+  size_t l = (size_t)mpz_sizeinbase(r->modBase, 10) +2;
   char* b = (char*) omAlloc(l);
   b= mpz_get_str (b, 10, r->modBase);
   char* s = (char*) omAlloc(7+2+10+l);
@@ -667,7 +667,7 @@ number nrnMod(number a, number b, const coeffs r)
   mpz_init(g);
   mpz_init_set_si(rr, 0);
   mpz_gcd(g, (mpz_ptr)r->modNumber, (mpz_ptr)b); // g is now as above
-  if (mpz_cmp_si(g, (long)1) != 0) mpz_mod(rr, (mpz_ptr)a, g); // the case g <> 1
+  if (mpz_cmp_si(g, 1L) != 0) mpz_mod(rr, (mpz_ptr)a, g); // the case g <> 1
   mpz_clear(g);
   omFreeBin(g, gmp_nrz_bin);
   return (number)rr;

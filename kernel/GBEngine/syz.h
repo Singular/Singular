@@ -15,7 +15,7 @@
 #define SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE 8
 // Logarithm of "distance" between a new component and prev component
 #define SYZ_SHIFT_BASE_LOG (BIT_SIZEOF_LONG - 1 - SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE)
-#define SYZ_SHIFT_BASE (((long)1) << SYZ_SHIFT_BASE_LOG)
+#define SYZ_SHIFT_BASE (1L << SYZ_SHIFT_BASE_LOG)
 struct sSObject{
                  poly  p;
                  poly  p1,p2; /*- the pair p comes from -*/

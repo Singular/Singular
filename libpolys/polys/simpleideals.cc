@@ -1173,7 +1173,7 @@ matrix id_Module2Matrix(ideal mod, const ring R)
       h=p;
       pIter(p);
       pNext(h)=NULL;
-      cp = si_max((long)1,p_GetComp(h, R));     // if used for ideals too
+      cp = si_max(1L,p_GetComp(h, R));     // if used for ideals too
       //cp = p_GetComp(h,R);
       p_SetComp(h,0,R);
       p_SetmComp(h,R);
@@ -1280,7 +1280,7 @@ BOOLEAN id_HomModule(ideal m, ideal Q, intvec **w, const ring R)
   for (i=length-1;i>=0;i--)
   {
     p=F[i]=P[i];
-    cmax=si_max(cmax,(long)p_MaxComp(p,R));
+    cmax=si_max(cmax,p_MaxComp(p,R));
   }
   cmax++;
   diff = (long *)omAlloc0(cmax*sizeof(long));

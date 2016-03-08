@@ -566,7 +566,7 @@ static inline number nrz_short(number x)
   StringAppendS("short(");
   nrzWrite(x, NULL);
 #endif
-  if (mpz_cmp_ui((mpz_ptr) x,(long)0)==0)
+  if (mpz_cmp_ui((mpz_ptr) x,0L)==0)
   {
     mpz_clear((mpz_ptr)x);
     omFreeBin(x, gmp_nrz_bin);
@@ -1551,7 +1551,7 @@ void nrzInitExp(int, coeffs)
 BOOLEAN nrzDBTest (number x, const char *f, const int l, const coeffs)
 {
   if (SR_HDL(x) & SR_INT) return TRUE;
-  if (mpz_cmp_ui((mpz_ptr) x,(long)0)==0)
+  if (mpz_cmp_ui((mpz_ptr) x,0L)==0)
   {
     Print("gmp-0 %s:%d\n",f,l);
     return FALSE;

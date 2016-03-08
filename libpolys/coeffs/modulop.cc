@@ -190,7 +190,7 @@ BOOLEAN npIsMOne (number a, const coeffs r)
 {
   n_Test(a, r);
 
-  return ((r->npPminus1M == (long)a)&&((long)1!=(long)a));
+  return ((r->npPminus1M == (long)a)&&(1L!=(long)a));
 }
 
 #ifdef HAVE_DIV_MOD
@@ -269,15 +269,15 @@ number npDiv (number a,number b, const coeffs r)
 //  if (r->ch>NV_MAX_PRIME)
 //    return nvDiv(a,b);
 //#endif
-  if ((long)a==0)
-    return (number)0;
+  if ((long)a==0L)
+    return (number)0L;
   number d;
 
 #ifndef HAVE_DIV_MOD
-  if ((long)b==0)
+  if ((long)b==0L)
   {
     WerrorS(nDivBy0);
-    return (number)0;
+    return (number)0L;
   }
 
   int s = r->npLogTable[(long)a] - r->npLogTable[(long)b];
@@ -297,10 +297,10 @@ number  npInvers (number c, const coeffs r)
 {
   n_Test(c, r);
 
-  if ((long)c==0)
+  if ((long)c==0L)
   {
     WerrorS("1/0");
-    return (number)0;
+    return (number)0L;
   }
   number d = npInversM(c,r);
 
@@ -313,7 +313,7 @@ number npNeg (number c, const coeffs r)
 {
   n_Test(c, r);
 
-  if ((long)c==0) return c;
+  if ((long)c==0L) return c;
 
 #if 0
   number d = npNegM(c,r);
@@ -332,7 +332,7 @@ BOOLEAN npGreater (number a,number b, const coeffs r)
   n_Test(b, r);
 
   //return (long)a != (long)b;
-  return (long)a > (long)b;
+  return ((long)a) > ((long)b);
 }
 
 BOOLEAN npEqual (number a,number b, const coeffs r)
@@ -631,7 +631,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
 #ifdef LDEBUG
 BOOLEAN npDBTest (number a, const char *f, const int l, const coeffs r)
 {
-  if (((long)a<0) || ((long)a>r->ch))
+  if (((long)a<0L) || ((long)a>(long)r->ch))
   {
     Print("wrong mod p number %ld at %s,%d\n",(long)a,f,l);
     return FALSE;
@@ -878,12 +878,12 @@ inline number nvInversM (number c, const coeffs r)
 
 number nvDiv (number a,number b, const coeffs r)
 {
-  if ((long)a==0)
-    return (number)0;
-  else if ((long)b==0)
+  if ((long)a==0L)
+    return (number)0L;
+  else if ((long)b==0L)
   {
     WerrorS(nDivBy0);
-    return (number)0;
+    return (number)0L;
   }
   else
   {
@@ -893,10 +893,10 @@ number nvDiv (number a,number b, const coeffs r)
 }
 number  nvInvers (number c, const coeffs r)
 {
-  if ((long)c==0)
+  if ((long)c==0L)
   {
     WerrorS(nDivBy0);
-    return (number)0;
+    return (number)0L;
   }
   return nvInversM(c,r);
 }

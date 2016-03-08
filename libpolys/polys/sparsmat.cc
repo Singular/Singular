@@ -510,7 +510,7 @@ ideal sparse_mat::smRes2Mod()
   for (i=crd; i; i--)
   {
     res->m[i-1] = sm_Smpoly2Poly(m_res[i],_R);
-    res->rank=si_max(res->rank, (long)p_MaxComp(res->m[i-1],_R));
+    res->rank=si_max(res->rank, p_MaxComp(res->m[i-1],_R));
   }
   return res;
 }
