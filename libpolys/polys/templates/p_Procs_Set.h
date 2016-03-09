@@ -144,7 +144,6 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   assume(p_Procs != NULL);
   memset(p_Procs, 0, sizeof(p_Procs_s));
   _p_procs = p_Procs;
-  assume(IsValidSpec(field, length, ord));
 
   SetProcs(field, length, ord);
   extern poly p_Mult_nn_pthread(poly p, const number n, const ring r);
