@@ -27,6 +27,7 @@
 #include <coeffs/OPAEQ.h>
 #include <coeffs/OPAEp.h>
 #include <coeffs/flintcf_Q.h>
+#include <coeffs/flintcf_Zn.h>
 
 #include <polys/ext_fields/algext.h>
 #include <polys/ext_fields/transext.h>
@@ -1191,6 +1192,28 @@ static BOOLEAN ii_pAE_init(leftv res,leftv a)
     return FALSE;
   }
 }
+#ifdef HAVE_FLINT
+static n_coeffType n_FlintZn=n_unknown;
+static BOOLEAN ii_FlintZn_init(leftv res,leftv a)
+{
+  if ((a->Typ()!=INT_CMD)
+  ||(a->next==NULL)
+  ||(a->next->Typ()!=STRING_CMD))
+  {
+    WerrorS("`int`i,`string` expected");
+    return TRUE;
+  }
+  else
+  {
+    flintZn_struct p;
+    p.ch=(int)(long)a->Data();
+    p.name=(char*)a->next->Data();
+    res->rtyp=CRING_CMD;
+    res->data=(void*)nInitChar(n_FlintZn,(void*)&p);
+    return FALSE;
+  }
+}
+#endif
 #endif
 /*2
 * initialize components of Singular
@@ -1314,6 +1337,11 @@ void siInit(char *name)
     {
       h=enterid(omStrDup("flint_poly_Q"),0/*level*/, CRING_CMD,&(basePack->idroot),FALSE /*init*/,FALSE /*search*/);
       IDDATA(h)=(char*)nInitChar(t,NULL);
+    }
+    n_FlintZn=nRegister(n_unknown,flintZn_InitChar);
+    if (n_FlintZn!=n_unknown)
+    {
+      iiAddCproc("kernel","flintZ",FALSE,ii_FlintZn_init);
     }
     #endif
   }

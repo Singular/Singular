@@ -17,7 +17,7 @@ SOURCES = \
   gnumpc.cc gnumpfl.cc longrat.cc longrat0.cc ffields.cc \
   modulop.cc mpr_complex.cc \
   bigintmat.cc  AE.cc OPAE.cc AEp.cc OPAEp.cc AEQ.cc OPAEQ.cc \
-  flintcf_Q.cc
+  flintcf_Q.cc flintcf_Zn.cc
 
 libcoeffs_la_SOURCES   = $(SOURCES)
 
@@ -26,7 +26,7 @@ libcoeffs_la_include_HEADERS = \
   coeffs.h numbers.h si_gmp.h gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h rintegers.h rmodulo2m.h rmodulon.h \
   shortfl.h mpr_complex.h mpr_global.h numstats.h \
   bigintmat.h Enumerator.h AE.h OPAE.h AEp.h OPAEp.h AEQ.h OPAEQ.h \
-  flintcf_Q.h
+  flintcf_Q.h flintcf_Zn.h
 
 libcoeffs_la_LIBADD = ${top_builddir}/reporter/libreporter.la ${top_builddir}/misc/libmisc.la \
 $(FACTORY_LIBS) $(RESOURCES_LIBS) $(OMALLOC_LIBS) \
