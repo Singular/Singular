@@ -579,7 +579,7 @@ int nlSize(number a, const coeffs)
      return 0; /* rational 0*/
   if (SR_HDL(a) & SR_INT)
      return 1; /* immidiate int */
-  int s=mpz_size1(a->z);
+  int s=a->z[0]._mp_alloc;
 //  while ((s>0) &&(a->z._mp_d[s]==0L)) s--;
 //#if SIZEOF_LONG == 8
 //  if (a->z._mp_d[s] < (unsigned long)0x100000000L) s=s*2-1;
@@ -588,7 +588,7 @@ int nlSize(number a, const coeffs)
 //  s++;
   if (a->s<2)
   {
-    int d=mpz_size1(a->n);
+    int d=a->n[0]._mp_alloc;
 //    while ((d>0) && (a->n._mp_d[d]==0L)) d--;
 //#if SIZEOF_LONG == 8
 //    if (a->n._mp_d[d] < (unsigned long)0x100000000L) d=d*2-1;
