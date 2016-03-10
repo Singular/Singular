@@ -4048,12 +4048,6 @@ static BOOLEAN jjDIM(leftv res, leftv v)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    //ring origR = currRing;
-    //ring tempR = rCopy(origR);
-    //coeffs new_cf=nInitChar(n_Q,NULL);
-    //nKillChar(tempR->cf);
-    //tempR->cf=new_cf;
-    //rComplete(tempR);
     ideal vid = (ideal)v->Data();
     int i = idPosConstant(vid);
     if ((i != -1) && (n_IsUnit(pGetCoeff(vid->m[i]),currRing->cf)))
@@ -4061,17 +4055,50 @@ static BOOLEAN jjDIM(leftv res, leftv v)
       res->data = (char *)-1;
       return FALSE;
     }
-    //rChangeCurrRing(tempR);
-    //ideal vv = idrCopyR(vid, origR, currRing);
     ideal vv = id_Head(vid,currRing);
-    /* drop degree zero generator from vv (if any) */
-    if (i != -1) pDelete(&vv->m[i]);
-    long d = (long)scDimInt(vv, currRing->qideal);
-    if (rField_is_Ring_Z(currRing) && (i == -1)) d++;
+    int j;
+    long d = 0;
+    //Anne's Idea for std(4,2x) = 0 bug
+    long dcurr = d;
+    for(i=0;i<idSize(vv);i++)
+    {
+      if(!n_IsUnit(pGetCoeff(vv->m[i]),currRing->cf))
+      {
+        ideal vc = idCopy(vv);
+        poly c = pInit();
+        pSetCoeff0(c,nCopy(pGetCoeff(vv->m[i])));
+        idInsertPoly(vc,c);
+        for(j = 0;j<idSize(vc)-1;j++)
+        {
+          if(n_DivBy(pGetCoeff(vc->m[j]),pGetCoeff(c),currRing->cf))
+          {
+            pDelete(&vc->m[j]);
+          }
+        }
+        idSkipZeroes(vc);
+        j = idPosConstant(vc);
+        if (j != -1) pDelete(&vc->m[j]);
+        dcurr = (long)scDimInt(vc, currRing->qideal);
+        // the following assumes the ground rings to be either zero- or one-dimensional
+        if((j==-1) && rField_is_Ring_Z(currRing))
+        {
+          // should also be activated for other euclidean domains as groundfield
+          dcurr++;
+        }
+        if(dcurr > d)
+          d = dcurr;
+        idDelete(&vc);
+      }
+      else
+      {
+        if(idPosConstant(vv)!= -1)
+        {
+          dcurr = -1;
+        }
+      }
+    }
     res->data = (char *)d;
     idDelete(&vv);
-    //rChangeCurrRing(origR);
-    //rDelete(tempR);
     return FALSE;
   }
 #endif
