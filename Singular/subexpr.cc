@@ -786,6 +786,13 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
         #ifdef SINGULAR_4_1
         case CNUMBER_CMD:
           return n2String((number2)d,typed);
+        case CRING_CMD:
+          return nCoeffString((coeffs)d);
+        case CMATRIX_CMD:
+          {
+            bigintmat *b=(bigintmat*)d;
+            return b->String();
+          }
         #endif
 
         case NUMBER_CMD:
