@@ -3924,7 +3924,7 @@ poly n_PermNumber(const number z, const int *par_perm, const int , const ring sr
 *returns a re-ordered copy of a polynomial, with permutation of the variables
 */
 poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
-       nMapFunc nMap, const int *par_perm, int OldPar)
+       nMapFunc nMap, const int *par_perm, int OldPar, BOOLEAN use_mult)
 {
 #if 0
     p_Test(p, oldRing);
@@ -3937,6 +3937,9 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
   poly qq; /* the mapped monomial */
   assume(dst != NULL);
   assume(dst->cf != NULL);
+  #ifdef HAVE_PLURAL
+  poly tmp_mm=p_One(dst);
+  #endif
   while (p != NULL)
   {
     // map the coefficient
@@ -3982,7 +3985,20 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
           if (perm==NULL)
             p_SetExp(qq, i, e, dst);
           else if (perm[i]>0)
+          {
+            #ifdef HAVE_PLURAL
+            if(use_mult)
+            {
+              p_SetExp(tmp_mm,perm[i],e,dst);
+              p_Setm(tmp_mm,dst);
+              qq=p_Mult_mm(qq,tmp_mm,dst);
+              p_SetExp(tmp_mm,perm[i],0,dst);
+
+            }
+            else
+            #endif
             p_AddExp(qq,perm[i], e/*p_GetExp( p,i,oldRing)*/, dst);
+          }
           else if (perm[i]<0)
           {
             number c = p_GetCoeff(qq, dst);
@@ -4123,6 +4139,9 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
   p_Test(result,dst);
   PrintS("result: "); p_Write(result,dst,dst);
 #endif
+  #ifdef HAVE_PLURAL
+  p_LmDelete(&tmp_mm,dst);
+  #endif
   return result;
 }
 /**************************************************************

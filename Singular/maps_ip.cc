@@ -24,6 +24,7 @@
 //#include <polys/ext_fields/longtrans.h>
 // #include <kernel/longalg.h>
 
+#include <misc/options.h>
 #include <kernel/GBEngine/kstd1.h>
 #include <kernel/maps/gen_maps.h>
 
@@ -48,6 +49,36 @@
 BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
                      int *perm, int *par_perm, int P, nMapFunc nMap)
 {
+  BOOLEAN use_mult=FALSE;
+#ifdef HAVE_PLURAL
+  if ((what==IMAP_CMD)
+  && rIsPluralRing(currRing)
+  && rIsPluralRing(preimage_r))
+  {
+    assume(perm!=NULL);
+    int i=1;
+    while((i<currRing->N)&&(perm[i]==0)) i++;
+    if (i<currRing->N)
+    {
+      int prev_nonnull=i;
+      i++;
+      for(;i<=currRing->N;i++)
+      {
+        if (perm[prev_nonnull] > perm[i])
+        {
+	  if (TEST_V_ALLWARN)
+	  {
+            Warn("imap not usable for permuting variables, use map (%s <-> %s)",currRing->names[prev_nonnull-1],currRing->names[i-1]);
+	  }
+          use_mult=TRUE;
+	  break;
+        }
+        else
+          prev_nonnull=i;
+      }
+    }
+  }
+#endif
   int i;
   int N = preimage_r->N;
 #if 0
@@ -102,7 +133,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         res->data=(void *)prCopyR( (poly)data, preimage_r, currRing);
       else
         if ( (what==IMAP_CMD) || /*(*/ (what==FETCH_CMD) /*)*/) /* && (nMap!=nCopy)*/
-        res->data=(void *)p_PermPoly((poly)data,perm,preimage_r,currRing, nMap,par_perm,P);
+        res->data=(void *)p_PermPoly((poly)data,perm,preimage_r,currRing, nMap,par_perm,P,use_mult);
       else /*if (what==MAP_CMD)*/
       {
         p_Test((poly)data,preimage_r);
@@ -143,7 +174,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         for (i=R*C-1;i>=0;i--)
         {
           m->m[i]=p_PermPoly(((ideal)data)->m[i],perm,preimage_r,currRing,
-                          nMap,par_perm,P);
+                          nMap,par_perm,P,use_mult);
           pTest(m->m[i]);
         }
       }
