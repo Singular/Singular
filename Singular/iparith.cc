@@ -4052,7 +4052,7 @@ static BOOLEAN jjDIM(leftv res, leftv v)
     int i = idPosConstant(vid);
     if ((i != -1) && (n_IsUnit(pGetCoeff(vid->m[i]),currRing->cf)))
     { /* ideal v contains unit; dim = -1 */
-      res->data = (char *)-1;
+      res->data = (char *)-1L;
       return FALSE;
     }
     ideal vv = id_Head(vid,currRing);

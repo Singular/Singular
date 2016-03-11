@@ -358,18 +358,18 @@ ring   rOpposite(ring r);
 ring   rEnvelope(ring r);
 
 /// we must always have this test!
-static inline bool rIsPluralRing(const ring r)
+static inline BOOLEAN rIsPluralRing(const ring r)
 {
   assume(r != NULL); assume(r->cf != NULL);
 #ifdef HAVE_PLURAL
   nc_struct *n;
   return (r != NULL) && ((n=r->GetNC()) != NULL) /*&& (n->type != nc_error)*/;
 #else
-  return false;
+  return FALSE;
 #endif
 }
 
-static inline bool rIsRatGRing(const ring r)
+static inline BOOLEAN rIsRatGRing(const ring r)
 {
   assume(r != NULL);
 #ifdef HAVE_PLURAL
@@ -377,12 +377,9 @@ static inline bool rIsRatGRing(const ring r)
   return (r != NULL) /* && ((n=r->GetNC()) != NULL) */
           && (r->real_var_start>1);
 #else
-  return false;
+  return FALSE;
 #endif
 }
-
-
-
 
 // The following are for LaScala3 only!
 void rChangeSComps(int* currComponents, long* currShiftedComponents, int length, ring r);
