@@ -4056,13 +4056,27 @@ static BOOLEAN jjDIM(leftv res, leftv v)
       return FALSE;
     }
     ideal vv = id_Head(vid,currRing);
-    int j;
-    long d = 0;
+    idSkipZeroes(vv);
+    int j = idPosConstant(vv);
+    long d;
+    if(j == -1)
+    {
+      d = (long)scDimInt(vv, currRing->qideal);
+      if(rField_is_Ring_Z(currRing))
+        d++;
+    }
+    else
+    {
+      if(n_IsUnit(pGetCoeff(vv->m[j]),currRing->cf))
+        d = -1;
+      else
+        d = (long)scDimInt(vv, currRing->qideal);
+    }
     //Anne's Idea for std(4,2x) = 0 bug
     long dcurr = d;
     for(i=0;i<idSize(vv);i++)
     {
-      if(!n_IsUnit(pGetCoeff(vv->m[i]),currRing->cf))
+      if(vv->m[i] != NULL && !n_IsUnit(pGetCoeff(vv->m[i]),currRing->cf))
       {
         ideal vc = idCopy(vv);
         poly c = pInit();
@@ -4085,17 +4099,10 @@ static BOOLEAN jjDIM(leftv res, leftv v)
           // should also be activated for other euclidean domains as groundfield
           dcurr++;
         }
-        if(dcurr > d)
-          d = dcurr;
         idDelete(&vc);
       }
-      else
-      {
-        if(idPosConstant(vv)!= -1)
-        {
-          dcurr = -1;
-        }
-      }
+      if(dcurr > d)
+          d = dcurr;
     }
     res->data = (char *)d;
     idDelete(&vv);
