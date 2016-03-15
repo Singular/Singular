@@ -64,4 +64,39 @@ i = std(i);
 dim(i);
 kill r;
 
+ring r = (integer),(x),dp;
+dim(ideal(x));
+dim(ideal(2x));
+dim(ideal(2x,0));
+dim(ideal(0,2x));
+dim(ideal(6x));
+dim(ideal(0,x));
+kill r;
+
+ring r=(integer,2,4),(x,y),dp;
+dim(ideal(x));
+kill r;
+
+ring r=(integer,2,4),x,dp;
+dim(std(ideal(x)));
+kill r;
+
+ring r=(integer,10),(x,y),dp;
+dim(std(ideal(x)));
+kill r;
+
+ring r=(integer,2,4),x,dp; 
+dim(std(ideal(x)));
+kill r;
+
+ring r=(integer,10),(x,y),dp;
+dim(std(ideal(x)));
+kill r;
+
+ring r=(integer,2,4),x,dp;
+dim(ideal(x,x));
+dim(ideal(x));
+dim(std(ideal(x)));
+kill r;
+
 tst_status(1);$
