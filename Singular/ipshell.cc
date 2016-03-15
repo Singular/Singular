@@ -2228,8 +2228,18 @@ void rComposeC(lists L, ring R)
   // ----------------------------------------
   // 1:
   if (L->m[1].rtyp!=LIST_CMD)
+  {
     Werror("invald coeff. field description, expecting precision list");
+    return;
+  }
   lists LL=(lists)L->m[1].data;
+  if ((LL->nr!=2)
+  || (LL->m[0].rtyp!=INT_CMD)
+  || (LL->m[1].rtyp!=INT_CMD))
+  {
+    Werror("invald coeff. field description list");
+    return;
+  }
   int r1=(int)(long)LL->m[0].data;
   int r2=(int)(long)LL->m[1].data;
   if (L->nr==2) // complex
