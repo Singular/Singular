@@ -59,7 +59,7 @@ static BOOLEAN sat_vars_sp(kStrategy strat)
     {
       nonTrivialSaturationToBeDone=false;
       p_GetExpV(p,m0,currRing);
-      for(int i=0; i<satstdSaturatingVariables.size(); i++)
+      for (int i=satstdSaturatingVariables.size()-1; i>=0; i--)
       {
         int li = satstdSaturatingVariables[i];
         mm[li]=si_min(mm[li],m0[li]);
@@ -77,7 +77,7 @@ static BOOLEAN sat_vars_sp(kStrategy strat)
       strat->P.p=p;
       while(p!=NULL)
       {
-        for (int i=0; i<satstdSaturatingVariables.size(); i++)
+        for (int i=satstdSaturatingVariables.size()-1; i>=0; i--)
         {
           int li = satstdSaturatingVariables[i];
           p_SubExp(p,li,mm[li],currRing);
@@ -104,16 +104,16 @@ static BOOLEAN sat_vars_sp(kStrategy strat)
     {
       nonTrivialSaturationToBeDone=false;
       p_GetExpV(p,m0,strat->tailRing);
-      for(int i=0; i<satstdSaturatingVariables.size(); i++)
+      for(int i=satstdSaturatingVariables.size()-1; i>=0; i--)
       {
         int li = satstdSaturatingVariables[i];
         mm[li]=si_min(mm[li],m0[li]);
         if (mm[li]>0) nonTrivialSaturationToBeDone = true;
       }
       // abort if the minimum is zero in each component
-      if (nonTrivialSaturationToBeDone==false) break;
+      if (!nonTrivialSaturationToBeDone) break;
     }
-    if (nonTrivialSaturationToBeDone==true)
+    if (nonTrivialSaturationToBeDone)
     {
       p=p_Copy(strat->P.t_p,strat->tailRing);
       memset(&strat->P,0,sizeof(strat->P));
@@ -121,7 +121,7 @@ static BOOLEAN sat_vars_sp(kStrategy strat)
       strat->P.t_p=p;
       while(p!=NULL)
       {
-        for(int i=0; i<satstdSaturatingVariables.size(); i++)
+        for(int i=satstdSaturatingVariables.size()-1; i>=0; i--)
         {
           int li = satstdSaturatingVariables[i];
           p_SubExp(p,li,mm[li],strat->tailRing);
@@ -149,7 +149,7 @@ static BOOLEAN satstd(leftv res, leftv args)
     {
       int n = rVar(currRing);
       satstdSaturatingVariables = std::vector<int>(n);
-      for (int i=0; i<n; i++)
+      for (int i=n-1; i>=0; i--)
         satstdSaturatingVariables[i] = i+1;
     }
     else
@@ -158,7 +158,7 @@ static BOOLEAN satstd(leftv res, leftv args)
       {
         ideal J = (ideal) v->Data();
 
-        int k = idSize(J);
+        int k = IDELEMS(J);
         satstdSaturatingVariables = std::vector<int>(k);
         for (int i=0; i<k; i++)
         {
