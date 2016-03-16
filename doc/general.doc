@@ -1024,7 +1024,7 @@ singular-emacs-home-directory.
 @itemize
 @item @strong{X11 server}
 install @code{xlaunch}, @code{emacs-X11}, @code{xterm} and all dependencies.
-Create with @code{xlaunch} a startup file for the X-server wich also starts
+Create with @code{xlaunch} a startup file for the X-server which also starts
 the client @code{xterm}. From that one can start ESingular.
 @item @strong{fork problems}
 The simplest way to overcome fork problem is to run @code{/usr/bin/rebase-trigger full},
