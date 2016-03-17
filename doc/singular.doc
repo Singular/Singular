@@ -1045,6 +1045,7 @@ Comments should be send to the author of the library directly.
 * cimonom_lib:: complete intersection for toric ideals
 * deRham_lib:: Computation of deRham cohomology
 * divisors_lib:: Divisors and P-Divisors
+* ffmodstd_lib::  Groebner bases in polynomial rings over algebraic function fields
 * finitediff_lib:: finite difference schemes for linear differential equations
 * gitfan_lib:: Compute GIT-fans
 * GND_lib:: General Neron Desingularization
@@ -1078,7 +1079,11 @@ Comments should be send to the author of the library directly.
 @c ----------------------------------------------------------
 @node divisors_lib
 @subsection divisors_lib
-@c lib divisors.lib no_ex
+@c lib divisors.lib
+@c ----------------------------------------------------------
+@node ffmodstd_lib
+@subsection ffmodstd_lib
+@c lib ffmodstd.lib
 @c ----------------------------------------------------------
 @node finitediff_lib
 @subsection finitediff_lib

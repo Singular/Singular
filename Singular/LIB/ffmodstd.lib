@@ -1,8 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
-version=" $Id";
+version="version poly.lib 4.0.3.0 Mar_2016 "; // $Id$
 category="Commutative Algebra";
 info="
-
 LIBRARY:   ffmodstd.lib  Groebner bases of ideals in polynomial rings
                            over algebraic function fields
 AUTHORS:   D.K. Boku       boku@mathematik.uni-kl.de
@@ -32,7 +31,7 @@ OVERVIEW:
   basis of I with high probability.
 
 REFERENCES:
- @* [1] E. A. Arnold: Modular algorithms for computing Groebner bases.
+    [1] E. A. Arnold: Modular algorithms for computing Groebner bases.
       J. Symb. Comput. 35, 403-419 (2003).
  @* [2] R. L. Burden and J. D. Faires: Numerical analysis. 9th ed. (1993).
  @* [3] M. Ben-Or and P. Tiwari: A deterministic algorithm for sparse multivariate
@@ -436,7 +435,7 @@ EXAMPLE: example BerlekampMassey; shows an example
         B(sp)=#[2];
         l(sp)=#[3];
         De=#[4];
-   }    
+   }
    for(j=sp+1;j<=n+sp;j++)
    {
        s=deg(g(j-1));
