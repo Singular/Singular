@@ -23,6 +23,7 @@
 
 New libraries:
 @itemize
+@item new library: ffmodstd.lib:  Groebner bases of ideals in polynomial rings over algebraic function fields(@nref{ffmodstd_lib})
 @item 
 @end itemize
 

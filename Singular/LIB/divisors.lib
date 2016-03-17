@@ -733,8 +733,8 @@ makePDivisor(list(list(PP,A),list(PP,B)));
 }
 
 static proc decomposePolyhedron(polytope P){
-intmat rays = vertices(P);
-intmat rays2 = rays;
+bigintmat rays = vertices(P);
+bigintmat rays2 = rays;
 int i,j;
 for (i=1; i<=nrows(rays);i++){
    if (rays[i,1]==1) {
