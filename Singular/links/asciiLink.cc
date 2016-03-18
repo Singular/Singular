@@ -157,17 +157,33 @@ BOOLEAN slWriteAscii(si_link l, leftv v)
   char *s;
   while (v!=NULL)
   {
-    s = v->String();
-    // free v ??
-    if (s!=NULL)
+    switch(v->Typ())
     {
-      fprintf(outfile,"%s\n",s);
-      omFree((ADDRESS)s);
-    }
-    else
-    {
-      Werror("cannot convert to string");
-      err=TRUE;
+    IDEAL_CMD:
+    MODUL_CMD:
+    MATRIX_CMD:
+      {
+        ideal I=(ideal)v->Data();
+        for(int i=0;i<IDELEMS(I);i++)
+        {
+          fprintf(outfile,"%s",pString(I->m[i]));
+          if (i<IDELEMS(I)-1) fprintf(outfile,",");
+        }
+        break;
+      }
+    default:
+      s = v->String();
+      // free v ??
+      if (s!=NULL)
+      {
+        fprintf(outfile,"%s\n",s);
+        omFree((ADDRESS)s);
+      }
+      else
+      {
+        Werror("cannot convert to string");
+        err=TRUE;
+      }
     }
     v = v->next;
   }
