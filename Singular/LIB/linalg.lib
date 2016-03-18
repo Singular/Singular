@@ -1326,6 +1326,7 @@ proc hessenberg(matrix M)
 ASSUME:  M constant square matrix
 RETURN:  matrix H;  Hessenberg form of M
 EXAMPLE: example hessenberg; shows examples
+SEE ALSO: system, hessenberg
 "
 {
   if(system("with","eigenval"))
@@ -1375,6 +1376,7 @@ list l;
 @end format
 EXAMPLE: example eigenvals; shows examples
 KEYWORDS: eigenvalue
+SEE ALSO: system, eigenvals
 "
 {
   if(system("with","eigenval"))
