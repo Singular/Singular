@@ -2725,25 +2725,11 @@ poly p_Cleardenom(poly p, const ring r)
 
   if(pNext(p)==NULL)
   {
-    /*
-    if (TEST_OPT_CONTENTSB)
-    {
-      number n=n_GetDenom(pGetCoeff(p),r->cf);
-      if (!n_IsOne(n,r->cf))
-      {
-        number nn=n_Mult(pGetCoeff(p),n,r->cf);
-        n_Normalize(nn,r->cf);
-        p_SetCoeff(p,nn,r);
-      }
-      n_Delete(&n,r->cf);
-    }
-    else
-    */
+    if (!TEST_OPT_CONTENTSB
+    && !rField_is_Ring(r))
       p_SetCoeff(p,n_Init(1,r->cf),r);
-
-    /*assume( n_GreaterZero(pGetCoeff(p),C) );
-    if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
-    */
+    else if(!n_GreaterZero(pGetCoeff(p),C))
+      p = p_Neg(p,r);
     return p;
   }
 
