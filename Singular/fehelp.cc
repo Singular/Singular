@@ -662,13 +662,17 @@ static BOOLEAN heOnlineHelp(char* s)
       if((lib!=NULL)&&(*lib!='\0'))
       {
         Print("// proc %s from lib %s\n",s,lib);
-        s=iiGetLibProcBuffer(IDPROC(h), 0);
-        if (s!=NULL)
+        procinfov pi=IDPROC(h);
+        if (pi->language==LANG_SINGULAR)
         {
-          PrintS(s);
-          omFree((ADDRESS)s);
+          s=iiGetLibProcBuffer(pi, 0);
+          if (s!=NULL)
+          {
+            PrintS(s);
+            omFree((ADDRESS)s);
+          }
+          return TRUE;
         }
-        return TRUE;
       }
     }
     else if (IDTYP(h)==PACKAGE_CMD)
