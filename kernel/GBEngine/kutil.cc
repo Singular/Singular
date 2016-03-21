@@ -260,7 +260,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
     p1 = p;
     while (pNext(p1)!=NULL)
     {
-    if (p_LmCmp(pNext(p1), strat->kNoetherTail(), L->tailRing) == -1)
+      if (p_LmCmp(pNext(p1), strat->kNoetherTail(), L->tailRing) == -1)
       {
         p_Delete(&pNext(p1), L->tailRing);
         if (p1 == p)
