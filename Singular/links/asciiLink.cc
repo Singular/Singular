@@ -159,9 +159,9 @@ BOOLEAN slWriteAscii(si_link l, leftv v)
   {
     switch(v->Typ())
     {
-    IDEAL_CMD:
-    MODUL_CMD:
-    MATRIX_CMD:
+    case IDEAL_CMD:
+    case MODUL_CMD:
+    case MATRIX_CMD:
       {
         ideal I=(ideal)v->Data();
         for(int i=0;i<IDELEMS(I);i++)

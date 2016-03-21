@@ -189,9 +189,9 @@ static const char *my_index (const char *str, int chr);
 extern char *getenv ();
 #endif
 
-static int my_strlen (const char *str)
+static unsigned my_strlen (const char *str)
 {
-  int n = 0;
+  unsigned n = 0;
   while (*str++)
     n++;
   return n;

@@ -561,6 +561,7 @@ static inline long gcd(const long a, const long b)
 /*****************************************************************************
  * compute the gcd of the entries of the vectors curr_weight and diff_weight *
  *****************************************************************************/
+/* unused:
 static int simplify_gcd(intvec* curr_weight, intvec* diff_weight)
 {
   int j;
@@ -587,6 +588,7 @@ static int simplify_gcd(intvec* curr_weight, intvec* diff_weight)
   }
   return gcd_tmp;
 }
+*/
 
 /*********************************************
  * cancel gcd of integers zaehler and nenner *
@@ -3047,6 +3049,7 @@ static void DefRingParlp(void)
 /*************************************************************
  * check whether one or more components of a vector are zero *
  *************************************************************/
+/* unused:
 static int isNolVector(intvec* hilb)
 {
   int i;
@@ -3059,6 +3062,7 @@ static int isNolVector(intvec* hilb)
   }
   return 0;
 }
+*/
 
 /*************************************************************
  * check whether one or more components of a vector are <= 0 *
