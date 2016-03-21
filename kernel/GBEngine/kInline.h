@@ -461,11 +461,7 @@ KINLINE void  sTObject::pCleardenom()
       }
       else
       {
-#ifdef HAVE_RATGRING
         p_ProjectiveUnique(p, currRing);
-#else
-        p_ProjectiveUnique(p, currRing);
-#endif
       }
     }
 }
