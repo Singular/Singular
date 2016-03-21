@@ -1204,7 +1204,7 @@ void updateLHC(kStrategy strat)
     }
     else
       deleteHC(&(strat->L[i]), strat);
-   if (strat->L[i].IsNull())
+    if (strat->L[i].IsNull())
       deleteInL(strat->L,&strat->Ll,i,strat);
     else
     {
@@ -1219,6 +1219,7 @@ void updateLHC(kStrategy strat)
 
 /*2
 * cuts in T above strat->kNoether and tries to cancel a unit
+* changes also S as S is a subset of T
 */
 void updateT(kStrategy strat)
 {
@@ -1231,6 +1232,8 @@ void updateT(kStrategy strat)
     deleteHC(&p,strat, TRUE);
     /*- tries to cancel a unit: -*/
     cancelunit(&p);
+    if (TEST_OPT_INTSTRATEGY) /* deleteHC and/or cancelunit may have changed p*/
+      p.pCleardenom();
     if (p.p != strat->T[i].p)
     {
       strat->sevT[i] = pGetShortExpVector(p.p);
@@ -1281,28 +1284,22 @@ void firstUpdate(kStrategy strat)
     if (TEST_OPT_FINDET)
       return;
 
-#ifndef HAVE_RINGS
-    strat->red = redFirst;
-    strat->use_buckets = kMoraUseBucket(strat);
-#else
+#ifdef HAVE_RINGS
     if ( (!rField_is_Ring(currRing)) || (rHasGlobalOrdering(currRing)))
+#endif
     {
       strat->red = redFirst;
       strat->use_buckets = kMoraUseBucket(strat);
     }
-#endif
     updateT(strat);
 
-#ifndef HAVE_RINGS
-    strat->posInT = posInT2;
-    reorderT(strat);
-#else
+#ifdef HAVE_RINGS
     if ( (!rField_is_Ring(currRing)) || (rHasGlobalOrdering(currRing)))
+#endif
     {
       strat->posInT = posInT2;
       reorderT(strat);
     }
-#endif
   }
   kTest_TS(strat);
 }
@@ -1723,6 +1720,7 @@ loop_count = 1;
       strat->P.PrepareRed(strat->use_buckets);
     }
 
+    // the s-poly
     if (!strat->P.IsNull())
     {
       // might be NULL from noether !!!
@@ -1749,13 +1747,16 @@ loop_count = 1;
       #endif
     }
 
+    // the reduced s-poly
     if (! strat->P.IsNull())
     {
       strat->P.GetP();
       // statistics
       if (TEST_OPT_PROT) PrintS("s");
       // normalization
-      if (!TEST_OPT_INTSTRATEGY)
+      if (TEST_OPT_INTSTRATEGY)
+        strat->P.pCleardenom();
+      else
         strat->P.pNorm();
       // tailreduction
       strat->P.p = redtail(&(strat->P),strat->sl,strat);
@@ -1770,7 +1771,8 @@ loop_count = 1;
       // cancel unit
       cancelunit(&strat->P);
       // for char 0, clear denominators
-      if (TEST_OPT_INTSTRATEGY)
+      if ((strat->P.p->next==NULL) /* i.e. cancelunit did something*/
+      && TEST_OPT_INTSTRATEGY)
         strat->P.pCleardenom();
 
       // put in T
@@ -1832,12 +1834,14 @@ loop_count = 1;
 
       // clear strat->P
       if (strat->P.lcm!=NULL)
+      {
 #if defined(HAVE_RINGS)
         pLmDelete(strat->P.lcm);
 #else
         pLmFree(strat->P.lcm);
 #endif
-      strat->P.lcm=NULL;
+        strat->P.lcm=NULL;
+      }
 #ifdef KDEBUG
       // make sure kTest_TS does not complain about strat->P
       memset(&strat->P,0,sizeof(strat->P));
