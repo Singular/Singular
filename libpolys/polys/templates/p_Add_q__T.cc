@@ -41,13 +41,8 @@ LINKAGE poly p_Add_q__T(poly p, poly q, int &Shorter, const ring r)
   Equal:
   n1 = pGetCoeff(p);
   n2 = pGetCoeff(q);
-  #if 0
-  t = n_Add__T(n1,n2, r->cf);
-  n_Delete__T(&n1, r->cf);
-  #else
   n_InpAdd__T(n1,n2,r->cf);
   t = n1;
-  #endif
   n_Delete__T(&n2, r->cf);
   q = p_LmFreeAndNext(q, r);
 

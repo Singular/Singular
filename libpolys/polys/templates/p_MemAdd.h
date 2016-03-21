@@ -36,49 +36,49 @@
 #define p_MemSum_LengthTwo(r, s1, s2, length)   \
 do                                              \
 {                                               \
-  _p_MemSum_Declare(r,s1,s2);                    \
+  _p_MemSum_Declare(r,s1,s2);                   \
   _p_MemSum_LengthTwo(_r, _s1, _s2);            \
 }                                               \
 while (0)
 #define p_MemSum_LengthThree(r, s1, s2, length) \
 do                                              \
 {                                               \
-  _p_MemSum_Declare(r,s1,s2);                    \
+  _p_MemSum_Declare(r,s1,s2);                   \
   _p_MemSum_LengthThree(_r, _s1, _s2);          \
 }                                               \
 while (0)
 #define p_MemSum_LengthFour(r, s1, s2, length)  \
 do                                              \
 {                                               \
-  _p_MemSum_Declare(r,s1,s2);                    \
+  _p_MemSum_Declare(r,s1,s2);                   \
   _p_MemSum_LengthFour(_r, _s1, _s2);           \
 }                                               \
 while (0)
 #define p_MemSum_LengthFive(r, s1, s2, length)  \
 do                                              \
 {                                               \
-  _p_MemSum_Declare(r,s1,s2);                    \
+  _p_MemSum_Declare(r,s1,s2);                   \
   _p_MemSum_LengthFive(_r, _s1, _s2);           \
 }                                               \
 while (0)
 #define p_MemSum_LengthSix(r, s1, s2, length)   \
 do                                              \
 {                                               \
-  _p_MemSum_Declare(r,s1,s2);                    \
+  _p_MemSum_Declare(r,s1,s2);                   \
   _p_MemSum_LengthSix(_r, _s1, _s2);            \
 }                                               \
 while (0)
 #define p_MemSum_LengthSeven(r, s1, s2, length) \
 do                                              \
 {                                               \
-  _p_MemSum_Declare(r,s1,s2);                    \
+  _p_MemSum_Declare(r,s1,s2);                   \
   _p_MemSum_LengthSeven(_r, _s1, _s2);          \
 }                                               \
 while (0)
 #define p_MemSum_LengthEight(r, s1, s2, length) \
 do                                              \
 {                                               \
-  _p_MemSum_Declare(r,s1,s2);                    \
+  _p_MemSum_Declare(r,s1,s2);                   \
   _p_MemSum_LengthEight(_r, _s1, _s2);          \
 }                                               \
 while (0)
@@ -87,7 +87,7 @@ while (0)
 do                                                  \
 {                                                   \
   _p_MemSum_Declare(r,s1,s2);                       \
-  const unsigned long _l = (unsigned long) length;       \
+  const unsigned long _l = (unsigned long) length;  \
   unsigned long _i = 0;                             \
                                                     \
   do                                                \
