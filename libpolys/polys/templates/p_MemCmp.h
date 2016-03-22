@@ -587,7 +587,7 @@ while (0)
  *  OrdGeneral
  *
  *******************************************************************/
-#define _p_MemCmp_OrdGeneral_Declare(s1, s2)    \
+#define _p_MemCmp_OrdGeneral_Declare(s1, s2)            \
   const unsigned long* _s1 = ((unsigned long*) s1);     \
   const unsigned long* _s2 = ((unsigned long*) s2);     \
   register unsigned long _v1;                           \
@@ -597,7 +597,7 @@ while (0)
 #define _p_MemCmp_OrdGeneral_NotEqual(ordsgn, actionG, actionS) \
 do                                                              \
 {                                                               \
-  const long* _ordsgn = (long*) ordsgn;                        \
+  const long* _ordsgn = (long*) ordsgn;                         \
   if (_v1 > _v2)                                                \
   {                                                             \
     if (_ordsgn[_i] == 1) actionG;                              \
@@ -608,7 +608,7 @@ do                                                              \
 }                                                               \
 while (0)
 
-#define _p_MemCmp_OrdGeneral(i, actionE)         \
+#define _p_MemCmp_OrdGeneral(i, actionE)        \
 do                                              \
 {                                               \
   _i = i;                                       \
@@ -652,7 +652,7 @@ while (0)
 do                                                                                          \
 {                                                                                           \
   _p_MemCmp_OrdGeneral_Declare(s1, s2);                                                     \
-  _p_MemCmp_LengthTwo_OrdGeneral(actionE);                                               \
+  _p_MemCmp_LengthTwo_OrdGeneral(actionE);                                                  \
   _p_MemCmp_OrdGeneral_NotEqual(ordsgn, actionG, actionS);                                  \
 }                                                                                           \
 while (0)
@@ -661,7 +661,7 @@ while (0)
 do                                                                                          \
 {                                                                                           \
   _p_MemCmp_OrdGeneral_Declare(s1, s2);                                                     \
-  _p_MemCmp_LengthThree_OrdGeneral(actionE);                                             \
+  _p_MemCmp_LengthThree_OrdGeneral(actionE);                                                \
   _p_MemCmp_OrdGeneral_NotEqual(ordsgn, actionG, actionS);                                  \
 }                                                                                           \
 while (0)
@@ -670,7 +670,7 @@ while (0)
 do                                                                                          \
 {                                                                                           \
   _p_MemCmp_OrdGeneral_Declare(s1, s2);                                                     \
-  _p_MemCmp_LengthFour_OrdGeneral(actionE);                                              \
+  _p_MemCmp_LengthFour_OrdGeneral(actionE);                                                 \
   _p_MemCmp_OrdGeneral_NotEqual(ordsgn, actionG, actionS);                                  \
 }                                                                                           \
 while (0)
@@ -679,7 +679,7 @@ while (0)
 do                                                                                          \
 {                                                                                           \
   _p_MemCmp_OrdGeneral_Declare(s1, s2);                                                     \
-  _p_MemCmp_LengthFive_OrdGeneral(actionE);                                              \
+  _p_MemCmp_LengthFive_OrdGeneral(actionE);                                                 \
   _p_MemCmp_OrdGeneral_NotEqual(ordsgn, actionG, actionS);                                  \
 }                                                                                           \
 while (0)
@@ -688,7 +688,7 @@ while (0)
 do                                                                                          \
 {                                                                                           \
   _p_MemCmp_OrdGeneral_Declare(s1, s2);                                                     \
-  _p_MemCmp_LengthSix_OrdGeneral(actionE);                                               \
+  _p_MemCmp_LengthSix_OrdGeneral(actionE);                                                  \
   _p_MemCmp_OrdGeneral_NotEqual(ordsgn, actionG, actionS);                                  \
 }                                                                                           \
 while (0)
@@ -697,7 +697,7 @@ while (0)
 do                                                                                          \
 {                                                                                           \
   _p_MemCmp_OrdGeneral_Declare(s1, s2);                                                     \
-  _p_MemCmp_LengthSeven_OrdGeneral(actionE);                                             \
+  _p_MemCmp_LengthSeven_OrdGeneral(actionE);                                                \
   _p_MemCmp_OrdGeneral_NotEqual(ordsgn, actionG, actionS);                                  \
 }                                                                                           \
 while (0)
