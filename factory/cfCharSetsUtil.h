@@ -69,8 +69,12 @@ sortListCFList (ListCFList& list);
 void
 sortCFListByLevel (CFList& list);
 
+/*BEGINPUBLIC*/
+
 CanonicalForm
 Prem (const CanonicalForm& F, const CanonicalForm& G);
+
+/*ENDPUBLIC*/
 
 CanonicalForm
 Premb (const CanonicalForm &f, const CFList &L);
