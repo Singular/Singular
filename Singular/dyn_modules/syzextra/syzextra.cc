@@ -845,7 +845,6 @@ ideal SchreyerSyzygyComputation::Compute1LeadingSyzygyTerms()
 
   // simplify(newid, 2 + 32)??
   // sort(newid, "C,ds")[1]???
-  id_DelDiv(newid, r); // #define SIMPL_LMDIV 32
 
 //   if( OPT__DEBUG & FALSE )
 //   {
@@ -853,6 +852,8 @@ ideal SchreyerSyzygyComputation::Compute1LeadingSyzygyTerms()
 //     dPrint(newid, r, r, 0);
 //   }
 
+  idSkipZeroes(newid); // #define SIMPL_NULL 2
+  id_DelDiv(newid, r); // #define SIMPL_LMDIV 32
   idSkipZeroes(newid); // #define SIMPL_NULL 2
 
 //   if( OPT__DEBUG )
@@ -1242,6 +1243,7 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
   {
     const poly a = LL->m[k]; assume( a != NULL );
 
+#if 1
     poly a2 = pNext(a);
 
     // Splitting 2-terms Leading syzygy module
@@ -1278,6 +1280,10 @@ void SchreyerSyzygyComputation::ComputeSyzygy()
 #endif
 
     TT->m[k] = nf;
+#else
+    poly a2 = NULL;
+    TT->m[k] = NULL;
+#endif
 
     if( UNLIKELY(OPT__SYZCHECK) )
     {
@@ -1572,6 +1578,8 @@ poly SchreyerSyzygyComputation::SchreyerSyzygyNF(const poly syz_lead, poly syz_2
 
 bool my_p_LmCmp (poly a, poly b, const ring r) { return p_LmCmp(a, b, r) == -1; } // TODO: change to simple lex. memory compare!
 
+#define CACHE_SYZEXTRA 1
+
 // NOTE: need p_Copy?????? for image + multiplier!!???
 // NOTE: better store complete syz. terms!!?
 poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) const
@@ -1590,6 +1598,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
   if( UNLIKELY(OPT__NOCACHING) )
     return ComputeImage(multiplier, tail);
 
+#if CACHE_SYZEXTRA
   // TODO: store (multiplier, tail) -.-^-.-^-.--> !
   TCache::iterator top_itr = m_cache.find(tail);
 
@@ -1689,6 +1698,7 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
   }
 
   CCacheCompare o(r); TP2PCache T(o);
+#endif   // CACHE_SYZEXTRA
 
   if( UNLIKELY(OPT__TREEOUTPUT) )
   {
@@ -1704,9 +1714,11 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
 
   if( UNLIKELY( OPT__PROT ) ) ++ m_stat[8]; // PrintS("S"); // store // %d", tail + 1);
 
+#if CACHE_SYZEXTRA
   T.insert( TP2PCache::value_type(myp_Head(multiplier, (p==NULL), r), p) );
 
   m_cache.insert( TCache::value_type(tail, T) );
+#endif   // CACHE_SYZEXTRA
 
 //  if( p == NULL )
 //    return (NULL);
@@ -1715,7 +1727,11 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, const int tail) co
   if( OPT__DEBUG )  {    m_div.Verify();    m_checker.Verify();  }
 #endif
 
+#if CACHE_SYZEXTRA
   return p_Copy(p, r);
+#else
+  return p;
+#endif   // CACHE_SYZEXTRA
 }
 
 poly SchreyerSyzygyComputation::ComputeImage(poly multiplier, const int tail) const
@@ -1756,6 +1772,11 @@ poly SchreyerSyzygyComputation::ComputeImage(poly multiplier, const int tail) co
   return NULL;
 }
 
+/* 0: use original code
+ * 1: use Singular's SBuckets
+ * 2: use Singular's polynomial arithmetic
+ */
+#define BUCKETWRAPPER 0
 
 poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 {
@@ -1795,7 +1816,13 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
 
   //    const bool bUsePolynomial = TEST_OPT_NOT_BUCKETS; //  || (pLength(tail) < MIN_LENGTH_BUCKET);
 
+#if BUCKETWRAPPER == 0
   SBucketWrapper sum(r, m_sum_bucket_factory);
+#elif BUCKETWRAPPER == 1
+  sBucket_pt sum = sBucketCreate(currRing);
+#else   // BUCKETWRAPPER == 2
+  poly s = NULL;
+#endif   // BUCKETWRAPPER
 /*
   sBucket_pt sum;
 
@@ -1833,7 +1860,13 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
   {
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     const poly rt = ReduceTerm(multiplier, p, NULL); // TODO: also return/store length?
+#if BUCKETWRAPPER == 0
     sum.Add(rt);
+#elif BUCKETWRAPPER == 1
+    sBucket_Add_p(sum, rt, pLength(rt));
+#else   // BUCKETWRAPPER == 2
+    s = p_Add_q(s, rt, r);
+#endif   // BUCKETWRAPPER
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1846,7 +1879,15 @@ poly SchreyerSyzygyComputation::TraverseTail(poly multiplier, poly tail) const
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 //  sBucketClearAdd(sum, &s, &len); // Will Not Clear?!?
+#if BUCKETWRAPPER == 0
   const poly s = sum.ClearAdd();
+#elif BUCKETWRAPPER == 1
+  poly s;
+  int l;
+  sBucketClearAdd(sum, &s, &l);
+#else   // BUCKETWRAPPER == 2
+  // nothing to do
+#endif   // BUCKETWRAPPER
 
 //  assume( sum != NULL ); assume ( sIsEmpty(sum) );
 /*
