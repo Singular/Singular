@@ -22,6 +22,7 @@ static poly leadmonom_test(const poly p, const ring r, const bool bSetZeroComp =
 
 static ideal m_idLeads_test;
 static ideal m_idTails_test;
+static ideal m_syzLeads_test;
 
 class CLCM_test: public std::vector<bool>
 {
@@ -250,6 +251,7 @@ static poly TraverseTail_test(poly multiplier, poly tail)
   poly s;
   int l;
   sBucketClearAdd(sum, &s, &l);
+  sBucketDestroy(&sum);
 #else   // BUCKETS == 2
   // nothing to do
 #endif   // BUCKETS
@@ -405,24 +407,34 @@ CReducerFinder_test::CReducerFinder_test(const ideal L):
 
 CReducerFinder_test::~CReducerFinder_test()
 {
-  for( CReducersHash::const_iterator it = m_hash.begin(); it != m_hash.end(); it++ )
+  for( CReducersHash::iterator it = m_hash.begin(); it != m_hash.end(); it++ )
   {
-    const TReducers& v = it->second;
+    TReducers& v = it->second;
     for(TReducers::const_iterator vit = v.begin(); vit != v.end(); vit++ )
       delete const_cast<CLeadingTerm_test*>(*vit);
+    v.erase(v.begin(), v.end());
   }
+  m_hash.erase(m_hash.begin(), m_hash.end());
 }
 
 void CReducerFinder_test::redefine(const ideal L)
 {
   m_L = const_cast<ideal>(L); // for debug anyway
+  for( CReducersHash::iterator it = m_hash.begin(); it != m_hash.end(); it++ )
+  {
+    TReducers& v = it->second;
+    for(TReducers::const_iterator vit = v.begin(); vit != v.end(); vit++ )
+      delete const_cast<CLeadingTerm_test*>(*vit);
+    v.erase(v.begin(), v.end());
+  }
+  m_hash.erase(m_hash.begin(), m_hash.end());
   m_hash.clear();
   if( L != NULL )
     Initialize(L);
 }
 
-CReducerFinder_test m_checker(NULL);
-CReducerFinder_test m_div(NULL);
+static CReducerFinder_test m_checker(NULL);
+static CReducerFinder_test m_div(NULL);
 
 class CDivisorEnumerator_test
 {
@@ -609,6 +621,7 @@ static poly ReduceTerm_test(poly multiplier, poly term4reduction, poly syztermCh
   poly b = leadmonom_test(s, r);
   const int c = p_GetComp(s, r) - 1;
   const poly t = TraverseTail_test(b, c);
+  pDelete(&b);
   if( t != NULL )
     s = p_Add_q(s, t, r);
   return s;
@@ -807,6 +820,9 @@ static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
 
 static void setGlobalVariables(const resolvente res, const int index)
 {
+    idDelete(&m_idLeads_test);
+    idDelete(&m_idTails_test);
+    idDelete(&m_syzLeads_test);
     m_idLeads_test = idCopy(res[index-1]);
     m_idTails_test = idInit(IDELEMS(res[index-1]), 1);
     for (int i = IDELEMS(res[index-1])-1; i >= 0; i--) {
@@ -815,9 +831,10 @@ static void setGlobalVariables(const resolvente res, const int index)
     }
     m_div.redefine(m_idLeads_test);
     m_lcm.redefine(m_idLeads_test);
-    ideal m_syzLeads_test = idCopy(res[index]);
+    m_syzLeads_test = idCopy(res[index]);
     for (int i = IDELEMS(res[index])-1; i >= 0; i--) {
         pDelete(&m_syzLeads_test->m[i]->next);
+        m_syzLeads_test->m[i]->next = NULL;
     }
     m_checker.redefine(m_syzLeads_test);
 #if CACHE
@@ -847,8 +864,8 @@ static void computeLiftings(const resolvente res, const int index)
     poly p;
     for (int j = res[index]->ncols-1; j >= 0; j--) {
         p = res[index]->m[j];
-        p->next = NULL;
         pDelete(&res[index]->m[j]->next);
+        p->next = NULL;
         res[index]->m[j]->next = TraverseNF_test(p, NULL);
     }
 #endif   // MYLIFT
@@ -912,6 +929,11 @@ syStrategy syFrank(const ideal arg, int &length, const char *method)
     }
     length = computeResolution(res, length, syzHead);
     sortPolys(res, length);
+
+    idDelete(&m_idLeads_test);
+    idDelete(&m_idTails_test);
+    idDelete(&m_syzLeads_test);
+
     result->fullres = res;
     result->length = length+1;
     return result;
