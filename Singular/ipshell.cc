@@ -2419,6 +2419,301 @@ static void rRenameVars(ring R)
   }
 }
 
+static BOOLEAN rComposeVar(const lists  L, ring R)
+{
+  assume(R!=NULL);
+  if (L->m[1].Typ()==LIST_CMD)
+  {
+    lists v=(lists)L->m[1].Data();
+    R->N = v->nr+1;
+    if (R->N<=0)
+    {
+      WerrorS("no ring variables");
+      return TRUE;
+    }
+    R->names   = (char **)omAlloc0(R->N * sizeof(char_ptr));
+    int i;
+    for(i=0;i<R->N;i++)
+    {
+      if (v->m[i].Typ()==STRING_CMD)
+        R->names[i]=omStrDup((char *)v->m[i].Data());
+      else if (v->m[i].Typ()==POLY_CMD)
+      {
+        poly p=(poly)v->m[i].Data();
+        int nr=pIsPurePower(p);
+        if (nr>0)
+          R->names[i]=omStrDup(currRing->names[nr-1]);
+        else
+        {
+          Werror("var name %d must be a string or a ring variable",i+1);
+          return TRUE;
+        }
+      }
+      else
+      {
+        Werror("var name %d must be `string`",i+1);
+        return TRUE;
+      }
+    }
+  }
+  else
+  {
+    WerrorS("variable must be given as `list`");
+    return TRUE;
+  }
+  return FALSE;
+}
+
+static BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ring R)
+{
+  assume(R!=NULL);
+  long bitmask=0L;
+  if (L->m[2].Typ()==LIST_CMD)
+  {
+    lists v=(lists)L->m[2].Data();
+    int n= v->nr+2;
+    int j_in_R,j_in_L;
+    // do we have an entry "L",... ?: set bitmask
+    for (int j=0; j < n-1; j++)
+    {
+      if (v->m[j].Typ()==LIST_CMD)
+      {
+        lists vv=(lists)v->m[j].Data();
+        if ((vv->nr==1)
+        &&(vv->m[0].Typ()==STRING_CMD)
+        &&(strcmp((char*)vv->m[0].Data(),"L")==0))
+        {
+          number nn=(number)vv->m[1].Data();
+          if (vv->m[1].Typ()==BIGINT_CMD)
+            bitmask=n_Int(nn,coeffs_BIGINT);
+          else if (vv->m[1].Typ()==INT_CMD)
+            bitmask=(long)nn;
+          else
+          {
+            Werror("illegal argument for pseudo ordering L: %d",vv->m[1].Typ());
+            return TRUE;
+          }
+          break;
+        }
+      }
+    }
+    if (bitmask!=0) n--;
+
+    // initialize fields of R
+    R->order=(int *)omAlloc0(n*sizeof(int));
+    R->block0=(int *)omAlloc0(n*sizeof(int));
+    R->block1=(int *)omAlloc0(n*sizeof(int));
+    R->wvhdl=(int**)omAlloc0(n*sizeof(int_ptr));
+    // init order, so that rBlocks works correctly
+    for (j_in_R= n-2; j_in_R>=0; j_in_R--)
+      R->order[j_in_R] = (int) ringorder_unspec;
+    // orderings
+    for(j_in_R=0,j_in_L=0;j_in_R<n-1;j_in_R++,j_in_L++)
+    {
+    // todo: a(..), M
+      if (v->m[j_in_L].Typ()!=LIST_CMD)
+      {
+        WerrorS("ordering must be list of lists");
+        return TRUE;
+      }
+      lists vv=(lists)v->m[j_in_L].Data();
+      if ((vv->nr==1)
+      && (vv->m[0].Typ()==STRING_CMD))
+      {
+        if (strcmp((char*)vv->m[0].Data(),"L")==0)
+        {
+          j_in_R--;
+          continue;
+        }
+        if ((vv->m[1].Typ()!=INTVEC_CMD) && (vv->m[1].Typ()!=INT_CMD))
+        {
+          PrintS(lString(vv));
+          WerrorS("ordering name must be a (string,intvec)(1)");
+          return TRUE;
+        }
+        R->order[j_in_R]=rOrderName(omStrDup((char*)vv->m[0].Data())); // assume STRING
+
+        if (j_in_R==0) R->block0[0]=1;
+        else
+        {
+           int jj=j_in_R-1;
+           while((jj>=0)
+           && ((R->order[jj]== ringorder_a)
+              || (R->order[jj]== ringorder_aa)
+              || (R->order[jj]== ringorder_am)
+              || (R->order[jj]== ringorder_c)
+              || (R->order[jj]== ringorder_C)
+              || (R->order[jj]== ringorder_s)
+              || (R->order[jj]== ringorder_S)
+           ))
+           {
+             //Print("jj=%, skip %s\n",rSimpleOrdStr(R->order[jj]));
+             jj--;
+           }
+           if (jj<0) R->block0[j_in_R]=1;
+           else       R->block0[j_in_R]=R->block1[jj]+1;
+        }
+        intvec *iv;
+        if (vv->m[1].Typ()==INT_CMD)
+          iv=new intvec((int)(long)vv->m[1].Data(),(int)(long)vv->m[1].Data());
+        else
+          iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
+        int iv_len=iv->length();
+        R->block1[j_in_R]=si_max(R->block0[j_in_R],R->block0[j_in_R]+iv_len-1);
+        if (R->block1[j_in_R]>R->N)
+        {
+          R->block1[j_in_R]=R->N;
+          iv_len=R->block1[j_in_R]-R->block0[j_in_R]+1;
+        }
+        //Print("block %d from %d to %d\n",j,R->block0[j], R->block1[j]);
+        int i;
+        switch (R->order[j_in_R])
+        {
+           case ringorder_ws:
+           case ringorder_Ws:
+              R->OrdSgn=-1;
+           case ringorder_aa:
+           case ringorder_a:
+           case ringorder_wp:
+           case ringorder_Wp:
+             R->wvhdl[j_in_R] =( int *)omAlloc(iv_len*sizeof(int));
+             for (i=0; i<iv_len;i++)
+             {
+               R->wvhdl[j_in_R][i]=(*iv)[i];
+             }
+             break;
+           case ringorder_am:
+             R->wvhdl[j_in_R] =( int *)omAlloc((iv->length()+1)*sizeof(int));
+             for (i=0; i<iv_len;i++)
+             {
+               R->wvhdl[j_in_R][i]=(*iv)[i];
+             }
+             R->wvhdl[j_in_R][i]=iv->length() - iv_len;
+             //printf("ivlen:%d,iv->len:%d,mod:%d\n",iv_len,iv->length(),R->wvhdl[j][i]);
+             for (; i<iv->length(); i++)
+             {
+                R->wvhdl[j_in_R][i+1]=(*iv)[i];
+             }
+             break;
+           case ringorder_M:
+             R->wvhdl[j_in_R] =( int *)omAlloc((iv->length())*sizeof(int));
+             for (i=0; i<iv->length();i++) R->wvhdl[j_in_R][i]=(*iv)[i];
+             R->block1[j_in_R]=si_max(R->block0[j_in_R],R->block0[j_in_R]+(int)sqrt((double)(iv->length()-1)));
+             if (R->block1[j_in_R]>R->N)
+             {
+               WerrorS("ordering matrix too big");
+               return TRUE;
+             }
+             break;
+           case ringorder_ls:
+           case ringorder_ds:
+           case ringorder_Ds:
+           case ringorder_rs:
+             R->OrdSgn=-1;
+           case ringorder_lp:
+           case ringorder_dp:
+           case ringorder_Dp:
+           case ringorder_rp:
+             break;
+           case ringorder_S:
+             break;
+           case ringorder_c:
+           case ringorder_C:
+             R->block1[j_in_R]=R->block0[j_in_R]=0;
+             break;
+
+           case ringorder_s:
+             break;
+
+           case ringorder_IS:
+           {
+             R->block1[j_in_R] = R->block0[j_in_R] = 0;
+             if( iv->length() > 0 )
+             {
+               const int s = (*iv)[0];
+               assume( -2 < s && s < 2 );
+               R->block1[j_in_R] = R->block0[j_in_R] = s;
+             }
+             break;
+           }
+           case 0:
+           case ringorder_unspec:
+             break;
+        }
+        delete iv;
+      }
+      else
+      {
+        PrintS(lString(vv));
+        WerrorS("ordering name must be a (string,intvec)");
+        return TRUE;
+      }
+    }
+    // sanity check
+    j_in_R=n-2;
+    if ((R->order[j_in_R]==ringorder_c)
+    || (R->order[j_in_R]==ringorder_C)
+    || (R->order[j_in_R]==ringorder_unspec)) j_in_R--;
+    if (R->block1[j_in_R] != R->N)
+    {
+      if (((R->order[j_in_R]==ringorder_dp) ||
+           (R->order[j_in_R]==ringorder_ds) ||
+           (R->order[j_in_R]==ringorder_Dp) ||
+           (R->order[j_in_R]==ringorder_Ds) ||
+           (R->order[j_in_R]==ringorder_rp) ||
+           (R->order[j_in_R]==ringorder_rs) ||
+           (R->order[j_in_R]==ringorder_lp) ||
+           (R->order[j_in_R]==ringorder_ls))
+          &&
+            R->block0[j_in_R] <= R->N)
+      {
+        R->block1[j_in_R] = R->N;
+      }
+      else
+      {
+        Werror("ordering incomplete: size (%d) should be %d",R->block1[j_in_R],R->N);
+        return TRUE;
+      }
+    }
+    if (R->block0[j_in_R]>R->N)
+    {
+      Werror("not enough variables (%d) for ordering block %d, scanned so far:",R->N,j_in_R+1);
+      for(int ii=0;ii<=j_in_R;ii++)
+        Werror("ord[%d]: %s from v%d to v%d",ii+1,rSimpleOrdStr(R->order[ii]),R->block0[ii],R->block1[ii]);
+      return TRUE;
+    }
+    if (check_comp)
+    {
+      BOOLEAN comp_order=FALSE;
+      int jj;
+      for(jj=0;jj<n;jj++)
+      {
+        if ((R->order[jj]==ringorder_c) ||
+            (R->order[jj]==ringorder_C)) { comp_order=TRUE; break; }
+      }
+      if (!comp_order)
+      {
+        R->order=(int*)omRealloc0Size(R->order,n*sizeof(int),(n+1)*sizeof(int));
+        R->block0=(int*)omRealloc0Size(R->block0,n*sizeof(int),(n+1)*sizeof(int));
+        R->block1=(int*)omRealloc0Size(R->block1,n*sizeof(int),(n+1)*sizeof(int));
+        R->wvhdl=(int**)omRealloc0Size(R->wvhdl,n*sizeof(int_ptr),(n+1)*sizeof(int_ptr));
+        R->order[n-1]=ringorder_C;
+        R->block0[n-1]=0;
+        R->block1[n-1]=0;
+        R->wvhdl[n-1]=NULL;
+        n++;
+      }
+    }
+  }
+  else
+  {
+    WerrorS("ordering must be given as `list`");
+    return TRUE;
+  }
+  if (bitmask!=0) R->bitmask=bitmask*2;
+  return FALSE;
+}
+
 ring rCompose(const lists  L, const BOOLEAN check_comp)
 {
   if ((L->nr!=3)
@@ -2437,7 +2732,6 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
   // 5: D
 
   ring R = (ring) omAlloc0Bin(sip_sring_bin);
-
 
   // ------------------------------------------------------------------
   // 0: char:
@@ -2530,13 +2824,6 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
       }
     }
   }
-  #ifdef SINGULAR_4_1
-  else if (L->m[0].Typ()==CRING_CMD)
-  {
-    R->cf=(coeffs)L->m[0].Data();
-    R->cf->ref++;
-  }
-  #endif
   else
   {
     WerrorS("coefficient field must be described by `int` or `list`");
@@ -2550,263 +2837,14 @@ ring rCompose(const lists  L, const BOOLEAN check_comp)
   }
 
   // ------------------------- VARS ---------------------------
-  if (L->m[1].Typ()==LIST_CMD)
-  {
-    lists v=(lists)L->m[1].Data();
-    R->N = v->nr+1;
-    if (R->N<=0)
-    {
-      WerrorS("no ring variables");
-      goto rCompose_err;
-    }
-    R->names   = (char **)omAlloc0(R->N * sizeof(char_ptr));
-    int i;
-    for(i=0;i<R->N;i++)
-    {
-      if (v->m[i].Typ()==STRING_CMD)
-        R->names[i]=omStrDup((char *)v->m[i].Data());
-      else if (v->m[i].Typ()==POLY_CMD)
-      {
-        poly p=(poly)v->m[i].Data();
-        int nr=pIsPurePower(p);
-        if (nr>0)
-          R->names[i]=omStrDup(currRing->names[nr-1]);
-        else
-        {
-          Werror("var name %d must be a string or a ring variable",i+1);
-          goto rCompose_err;
-        }
-      }
-      else
-      {
-        Werror("var name %d must be `string`",i+1);
-        goto rCompose_err;
-      }
-    }
-  }
-  else
-  {
-    WerrorS("variable must be given as `list`");
-    goto rCompose_err;
-  }
+  if (rComposeVar(L,R)) goto rCompose_err;
   // ------------------------ ORDER ------------------------------
-  if (L->m[2].Typ()==LIST_CMD)
-  {
-    lists v=(lists)L->m[2].Data();
-    int n= v->nr+2;
-    int j;
-    // initialize fields of R
-    R->order=(int *)omAlloc0(n*sizeof(int));
-    R->block0=(int *)omAlloc0(n*sizeof(int));
-    R->block1=(int *)omAlloc0(n*sizeof(int));
-    R->wvhdl=(int**)omAlloc0(n*sizeof(int_ptr));
-    // init order, so that rBlocks works correctly
-    for (j=0; j < n-1; j++)
-      R->order[j] = (int) ringorder_unspec;
-    // orderings
-    for(j=0;j<n-1;j++)
-    {
-    // todo: a(..), M
-      if (v->m[j].Typ()!=LIST_CMD)
-      {
-        WerrorS("ordering must be list of lists");
-        goto rCompose_err;
-      }
-      lists vv=(lists)v->m[j].Data();
-      if ((vv->nr!=1)
-      || (vv->m[0].Typ()!=STRING_CMD)
-      || ((vv->m[1].Typ()!=INTVEC_CMD) && (vv->m[1].Typ()!=INT_CMD)))
-      {
-        WerrorS("ordering name must be a (string,intvec)");
-        goto rCompose_err;
-      }
-      R->order[j]=rOrderName(omStrDup((char*)vv->m[0].Data())); // assume STRING
-
-      if (j==0) R->block0[0]=1;
-      else
-      {
-         int jj=j-1;
-         while((jj>=0)
-         && ((R->order[jj]== ringorder_a)
-            || (R->order[jj]== ringorder_aa)
-            || (R->order[jj]== ringorder_am)
-            || (R->order[jj]== ringorder_c)
-            || (R->order[jj]== ringorder_C)
-            || (R->order[jj]== ringorder_s)
-            || (R->order[jj]== ringorder_S)
-         ))
-         {
-           //Print("jj=%, skip %s\n",rSimpleOrdStr(R->order[jj]));
-           jj--;
-         }
-         if (jj<0) R->block0[j]=1;
-         else       R->block0[j]=R->block1[jj]+1;
-      }
-      intvec *iv;
-      if (vv->m[1].Typ()==INT_CMD)
-        iv=new intvec((int)(long)vv->m[1].Data(),(int)(long)vv->m[1].Data());
-      else
-        iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
-      int iv_len=iv->length();
-      R->block1[j]=si_max(R->block0[j],R->block0[j]+iv_len-1);
-      if (R->block1[j]>R->N)
-      {
-        R->block1[j]=R->N;
-        iv_len=R->block1[j]-R->block0[j]+1;
-      }
-      //Print("block %d from %d to %d\n",j,R->block0[j], R->block1[j]);
-      int i;
-      switch (R->order[j])
-      {
-         case ringorder_ws:
-         case ringorder_Ws:
-            R->OrdSgn=-1;
-         case ringorder_aa:
-         case ringorder_a:
-         case ringorder_wp:
-         case ringorder_Wp:
-           R->wvhdl[j] =( int *)omAlloc(iv_len*sizeof(int));
-           for (i=0; i<iv_len;i++)
-           {
-             R->wvhdl[j][i]=(*iv)[i];
-           }
-           break;
-         case ringorder_am:
-           R->wvhdl[j] =( int *)omAlloc((iv->length()+1)*sizeof(int));
-           for (i=0; i<iv_len;i++)
-           {
-             R->wvhdl[j][i]=(*iv)[i];
-           }
-           R->wvhdl[j][i]=iv->length() - iv_len;
-           //printf("ivlen:%d,iv->len:%d,mod:%d\n",iv_len,iv->length(),R->wvhdl[j][i]);
-           for (; i<iv->length(); i++)
-           {
-              R->wvhdl[j][i+1]=(*iv)[i];
-           }
-           break;
-         case ringorder_M:
-           R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
-           for (i=0; i<iv->length();i++) R->wvhdl[j][i]=(*iv)[i];
-           R->block1[j]=si_max(R->block0[j],R->block0[j]+(int)sqrt((double)(iv->length()-1)));
-           if (R->block1[j]>R->N)
-           {
-             WerrorS("ordering matrix too big");
-             goto rCompose_err;
-           }
-           break;
-         case ringorder_ls:
-         case ringorder_ds:
-         case ringorder_Ds:
-         case ringorder_rs:
-           R->OrdSgn=-1;
-         case ringorder_lp:
-         case ringorder_dp:
-         case ringorder_Dp:
-         case ringorder_rp:
-           break;
-         case ringorder_S:
-           break;
-         case ringorder_c:
-         case ringorder_C:
-           R->block1[j]=R->block0[j]=0;
-           break;
-
-         case ringorder_s:
-           break;
-
-         case ringorder_IS:
-         {
-           R->block1[j] = R->block0[j] = 0;
-           if( iv->length() > 0 )
-           {
-             const int s = (*iv)[0];
-             assume( -2 < s && s < 2 );
-             R->block1[j] = R->block0[j] = s;
-           }
-           break;
-         }
-         case 0:
-         case ringorder_unspec:
-           break;
-      }
-      delete iv;
-    }
-    // sanity check
-    j=n-2;
-    if ((R->order[j]==ringorder_c)
-    || (R->order[j]==ringorder_C)
-    || (R->order[j]==ringorder_unspec)) j--;
-    if (R->block1[j] != R->N)
-    {
-      if (((R->order[j]==ringorder_dp) ||
-           (R->order[j]==ringorder_ds) ||
-           (R->order[j]==ringorder_Dp) ||
-           (R->order[j]==ringorder_Ds) ||
-           (R->order[j]==ringorder_rp) ||
-           (R->order[j]==ringorder_rs) ||
-           (R->order[j]==ringorder_lp) ||
-           (R->order[j]==ringorder_ls))
-          &&
-            R->block0[j] <= R->N)
-      {
-        R->block1[j] = R->N;
-      }
-      else
-      {
-        Werror("ordering incomplete: size (%d) should be %d",R->block1[j],R->N);
-        goto rCompose_err;
-      }
-    }
-    if (R->block0[j]>R->N)
-    {
-      Werror("not enough variables (%d) for ordering block %d, scanned so far:",R->N,j+1);
-      for(int ii=0;ii<=j;ii++)
-        Werror("ord[%d]: %s from v%d to v%d",ii+1,rSimpleOrdStr(R->order[ii]),R->block0[ii],R->block1[ii]);
-      goto rCompose_err;
-    }
-    if (check_comp)
-    {
-      BOOLEAN comp_order=FALSE;
-      int jj;
-      for(jj=0;jj<n;jj++)
-      {
-        if ((R->order[jj]==ringorder_c) ||
-            (R->order[jj]==ringorder_C)) { comp_order=TRUE; break; }
-      }
-      if (!comp_order)
-      {
-        R->order=(int*)omRealloc0Size(R->order,n*sizeof(int),(n+1)*sizeof(int));
-        R->block0=(int*)omRealloc0Size(R->block0,n*sizeof(int),(n+1)*sizeof(int));
-        R->block1=(int*)omRealloc0Size(R->block1,n*sizeof(int),(n+1)*sizeof(int));
-        R->wvhdl=(int**)omRealloc0Size(R->wvhdl,n*sizeof(int_ptr),(n+1)*sizeof(int_ptr));
-        R->order[n-1]=ringorder_C;
-        R->block0[n-1]=0;
-        R->block1[n-1]=0;
-        R->wvhdl[n-1]=NULL;
-        n++;
-      }
-    }
-  }
-  else
-  {
-    WerrorS("ordering must be given as `list`");
-    goto rCompose_err;
-  }
+  if (rComposeOrder(L,check_comp,R)) goto rCompose_err;
 
   // ------------------------ ??????? --------------------
 
   rRenameVars(R);
   rComplete(R);
-
-/*#ifdef HAVE_RINGS
-// currently, coefficients which are ring elements require a global ordering:
-  if (rField_is_Ring(R) && (R->OrdSgn==-1))
-  {
-    WerrorS("global ordering required for these coefficients");
-    goto rCompose_err;
-  }
-#endif*/
-
 
   // ------------------------ Q-IDEAL ------------------------
 
