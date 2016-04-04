@@ -2419,7 +2419,7 @@ static void rRenameVars(ring R)
   }
 }
 
-static BOOLEAN rComposeVar(const lists  L, ring R)
+static inline BOOLEAN rComposeVar(const lists  L, ring R)
 {
   assume(R!=NULL);
   if (L->m[1].Typ()==LIST_CMD)
@@ -2464,7 +2464,7 @@ static BOOLEAN rComposeVar(const lists  L, ring R)
   return FALSE;
 }
 
-static BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ring R)
+static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ring R)
 {
   assume(R!=NULL);
   long bitmask=0L;

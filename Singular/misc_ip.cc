@@ -513,14 +513,7 @@ void singular_example(char *str)
 }
 
 
-struct soptionStruct
-{
-  const char * name;
-  unsigned   setval;
-  unsigned   resetval;
-};
-
-struct soptionStruct optionStruct[]=
+const struct soptionStruct optionStruct[]=
 {
   {"prot",         Sy_bit(OPT_PROT),           ~Sy_bit(OPT_PROT)   },
   {"redSB",        Sy_bit(OPT_REDSB),          ~Sy_bit(OPT_REDSB)   },
@@ -550,7 +543,7 @@ struct soptionStruct optionStruct[]=
   {"ne",           0,                          0 }
 };
 
-struct soptionStruct verboseStruct[]=
+const struct soptionStruct verboseStruct[]=
 {
   {"mem",      Sy_bit(V_SHOW_MEM),  ~Sy_bit(V_SHOW_MEM)   },
   {"yacc",     Sy_bit(V_YACC),      ~Sy_bit(V_YACC)       },

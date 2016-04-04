@@ -255,30 +255,30 @@ BOOLEAN iiTestAssume(leftv a, leftv b);
 BOOLEAN iiExprArith1Tab(leftv res,///< [out] pre-allocated result
                         leftv a,  ///< [in]  argument
                         int op,   ///< [in]  operation
-                        struct sValCmd1* dA1, ///< [in] table of possible proc
+                        const struct sValCmd1* dA1, ///< [in] table of possible proc
                                                   ///< assumes dArith1[0].cmd==op
                         int at,   ///< [in] a->Typ()
-                        struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
+                        const struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
                         );
 /// apply an operation 'op' to arguments a and a->next
 /// return TRUE on failure
 BOOLEAN iiExprArith2Tab(leftv res,///< [out] pre-allocated result
                         leftv a,  ///< [in]  2 arguments
                         int op,   ///< [in]  operation
-                        struct sValCmd2* dA2,///< [in] table of possible proc
+                        const struct sValCmd2* dA2,///< [in] table of possible proc
                                    ///< assumes dA2[0].cmd==op
                         int at,    ///< [in] a->Typ()
-                        struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
+                        const struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
                         );
 /// apply an operation 'op' to arguments a, a->next and a->next->next
 /// return TRUE on failure
 BOOLEAN iiExprArith3Tab(leftv res, ///< [out] pre-allocated result
                         leftv a,   ///< [in]  3 arguments
                         int op,    ///< [in]  operation
-                        struct sValCmd3* dA3,///< [in] table of possible proc
+                        const struct sValCmd3* dA3,///< [in] table of possible proc
                                    ///< assumes dA3[0].cmd==op
                         int at,    ///< [in] a->Typ()
-                        struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
+                        const struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
                         );
 
 /// check a list of arguemys against a given field of types

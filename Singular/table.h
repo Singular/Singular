@@ -16,7 +16,7 @@
 // the procedures have to be wrapped into the macro D(...)
 // with the exception of jjWRONG... (which always fails)
 /*=================== operations with 1 arg.: table =================*/
-struct sValCmd1 dArith1[]=
+const struct sValCmd1 dArith1[]=
 {
 // operations:
 // proc            cmd               res             arg            context
@@ -291,7 +291,7 @@ struct sValCmd1 dArith1[]=
 ,{NULL_VAL,        0,               0,              0             , NO_PLURAL |NO_RING}
 };
 /*=================== operations with 2 arg.: table =================*/
-struct sValCmd2 dArith2[]=
+const struct sValCmd2 dArith2[]=
 {
 // operations:
 // proc           cmd              res             arg1        arg2   context
@@ -707,7 +707,7 @@ struct sValCmd2 dArith2[]=
 ,{NULL_VAL,       0,              0,              0,          0, NO_PLURAL |NO_RING}
 };
 /*=================== operations with 3 args.: table =================*/
-struct sValCmd3 dArith3[]=
+const struct sValCmd3 dArith3[]=
 {
 // operations:
 // proc                cmd          res         arg1        arg2        arg3   context
@@ -817,7 +817,7 @@ struct sValCmd3 dArith3[]=
 };
 /*=================== operations with many arg.: table =================*/
 /* number_of_args:  -1: any), -2: any >0, .. */
-struct sValCmdM dArithM[]=
+const struct sValCmdM dArithM[]=
 {
 // operations:
 // proc            cmd               res        number_of_args   context
@@ -1171,7 +1171,7 @@ cmdnames cmds[] =
 #endif
 
 #ifdef IPCONV
-struct sConvertTypes dConvertTypes[] =
+const struct sConvertTypes dConvertTypes[] =
 {
 //   input type       output type     convert procedure
 //  int -> bigint
@@ -1247,10 +1247,10 @@ struct sConvertTypes dConvertTypes[] =
    { 0,               0,              NULL_VAL , NULL_VAL }
 };
 #else
-extern struct sConvertTypes dConvertTypes[];
+extern const struct sConvertTypes dConvertTypes[];
 #endif
 #ifdef IPASSIGN
-struct sValAssign dAssign[]=
+const struct sValAssign dAssign[]=
 {
 // same res types must be grouped together
 // proc         res             arg
@@ -1298,7 +1298,7 @@ struct sValAssign dAssign[]=
 #endif
 ,{NULL_VAL,        0,              0 }
 };
-struct sValAssign_sys dAssign_sys[]=
+const struct sValAssign_sys dAssign_sys[]=
 {
 // sysvars:
  {D(jjECHO),       VECHO,          INT_CMD }

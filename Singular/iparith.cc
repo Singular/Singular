@@ -8052,9 +8052,9 @@ static Subexpr jjMakeSub(leftv e)
 
 static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
                                     BOOLEAN proccall,
-                                    struct sValCmd2* dA2,
+                                    const struct sValCmd2* dA2,
                                     int at, int bt,
-                                    struct sConvertTypes *dConvertTypes)
+                                    const struct sConvertTypes *dConvertTypes)
 {
   memset(res,0,sizeof(sleftv));
   BOOLEAN call_failed=FALSE;
@@ -8210,9 +8210,9 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
   return TRUE;
 }
 BOOLEAN iiExprArith2Tab(leftv res, leftv a, int op,
-                                    struct sValCmd2* dA2,
+                                    const struct sValCmd2* dA2,
                                     int at,
-                                    struct sConvertTypes *dConvertTypes)
+                                    const struct sConvertTypes *dConvertTypes)
 {
   leftv b=a->next;
   a->next=NULL;
@@ -8281,7 +8281,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 /* must be ordered: first operations for chars (infix ops),
  * then alphabetically */
 
-BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dA1, int at, struct sConvertTypes *dConvertTypes)
+BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, int at, const struct sConvertTypes *dConvertTypes)
 {
   memset(res,0,sizeof(sleftv));
   BOOLEAN call_failed=FALSE;
@@ -8468,8 +8468,8 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
  * then alphabetically */
 
 static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv c,
-  struct sValCmd3* dA3, int at, int bt, int ct,
-  struct sConvertTypes *dConvertTypes)
+  const struct sValCmd3* dA3, int at, int bt, int ct,
+  const struct sConvertTypes *dConvertTypes)
 {
   memset(res,0,sizeof(sleftv));
   BOOLEAN call_failed=FALSE;
@@ -8674,9 +8674,9 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
   return TRUE;
 }
 BOOLEAN iiExprArith3Tab(leftv res, leftv a, int op,
-                                    struct sValCmd3* dA3,
+                                    const struct sValCmd3* dA3,
                                     int at,
-                                    struct sConvertTypes *dConvertTypes)
+                                    const struct sConvertTypes *dConvertTypes)
 {
   leftv b=a->next;
   a->next=NULL;

@@ -17,6 +17,7 @@
 #include <omalloc/omalloc.h>
 #include <polys/monomials/ring.h>
 #include <Singular/subexpr.h>
+#include <Singular/ipid.h>
 #include <Singular/ipshell.h>
 #include <Singular/fevoices.h>
 #include <Singular/lists.h>
@@ -307,17 +308,6 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
   }
   return NULL;
 }
-
-// see below:
-struct soptionStruct
-{
-  const char * name;
-  unsigned   setval;
-  unsigned   resetval;
-};
-extern struct soptionStruct optionStruct[];
-extern struct soptionStruct verboseStruct[];
-
 
 BOOLEAN iiAllStart(procinfov pi, char *p,feBufferTypes t, int l)
 {

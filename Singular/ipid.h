@@ -146,6 +146,18 @@ extern omBin sleftv_bin;
 extern coeffs coeffs_BIGINT;
 
 extern FILE   *feFilePending; /*temp. storage for grammar.y */
+
+/* options */
+struct soptionStruct
+{
+  const char * name;
+  unsigned   setval;
+  unsigned   resetval;
+};
+
+extern const struct soptionStruct optionStruct[];
+extern const struct soptionStruct verboseStruct[];
+
 #endif
 
 

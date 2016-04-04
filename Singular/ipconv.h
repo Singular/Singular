@@ -9,8 +9,8 @@
 #include <kernel/structs.h>
 #include <Singular/table.h>
 
-int iiTestConvert (int inputType, int outputType, struct sConvertTypes *dCT=dConvertTypes);
+int iiTestConvert (int inputType, int outputType, const struct sConvertTypes *dCT=dConvertTypes);
 BOOLEAN iiConvert (int inputType, int outputType, int index,
-                   leftv input, leftv output, struct sConvertTypes *dCT=dConvertTypes);
+                   leftv input, leftv output, const struct sConvertTypes *dCT=dConvertTypes);
 #endif
 
