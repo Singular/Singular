@@ -264,6 +264,12 @@ BOOLEAN atATTRIB1(leftv res,leftv v)
     if (((t=v->Typ())==RING_CMD)||(t==QRING_CMD))
     {
       PrintS("attr:global, type int\n");
+      PrintS("attr:maxExp, type int\n");
+      PrintS("attr:ring_cf, type int\n");
+      #ifdef HAVE_SHIFTBBA
+      PrintS("attr:isLPring, type int\n");
+      #endif
+
       haveNoAttribute=FALSE;
     }
   }
@@ -299,6 +305,12 @@ BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(((ring)v->Data())->OrdSgn==1);
+  }
+  else if ((strcmp(name,"maxExp")==0)
+  &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
+  {
+    res->rtyp=INT_CMD;
+    res->data=(void *)(long)(((ring)v->Data())->bitmask/2);
   }
   else if ((strcmp(name,"ring_cf")==0)
   &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
@@ -403,10 +415,12 @@ BOOLEAN atATTRIB3(leftv /*res*/,leftv v,leftv b,leftv c)
     int rk=id_RankFreeModule(I,currRing);
     I->rank=si_max(rk,(int)((long)c->Data()));
   }
-  else if ((strcmp(name,"global")==0)
+  else if (((strcmp(name,"global")==0)
+    || (strcmp(name,"ring_cf")==0)
+    || (strcmp(name,"maxExp")==0))
   &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
   {
-    WerrorS("can not set attribute `global`");
+    Werror("can not set attribute `%s`",name);
     return TRUE;
   }
 #ifdef HAVE_SHIFTBBA

@@ -304,8 +304,10 @@ Non-reserved attributes may be used, however, in procedures and can
 considerably speed up computations.
 @sp 1
 @item @strong{Reserved attributes:}
+@cindex global
 @cindex isSB
 @cindex isHomg
+@cindex maxExp
 @cindex rank
 @cindex ring_cf
 @cindex isCI
@@ -317,6 +319,8 @@ considerably speed up computations.
 @cindex withMult
 (isSB, isHomog, rank, ring_cf are used by the kernel, the other are used by libraries)
 @table @code
+@item global
+1, if the ordering is global
 @item isSB
 the standard basis property is set by all commands computing a standard
 basis like
@@ -328,6 +332,8 @@ the weight vector for homogeneous or quasihomogeneous ideals/modules
 complete intersection property
 @item isCM
 Cohen-Macaulay property
+@item maxExp
+limit for each exponent (32767 by default)
 @item rank
 set/get the rank of a module (see @ref{nrows})
 @item ring_cf
