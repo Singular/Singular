@@ -23,19 +23,7 @@
 
 /*0 implementation*/
 
-// omBin intvec_bin = omGetSpecBin(sizeof(intvec));
-#if 0
-intvec::intvec(intvec* iv)
-{
-  row = iv->rows();
-  col = iv->cols();
-  v   = (int *)omAlloc(sizeof(int)*row*col);
-  for (int i=0; i<row*col; i++)
-  {
-    v[i] = (*iv)[i];
-  }
-}
-#endif
+omBin intvec_bin = omGetSpecBin(sizeof(intvec));
 
 intvec::intvec(int s, int e)
 {
@@ -264,14 +252,6 @@ int intvec::compare(int o) const
   }
   return 0;
 }
-
-#if 0
-intvec * ivCopy(intvec * o)
-{
-  intvec * iv=new intvec(o);
-  return iv;
-}
-#endif
 
 intvec * ivAdd(intvec * a, intvec * b)
 {
