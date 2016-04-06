@@ -7,10 +7,6 @@
 #ifndef INTVEC_CC
 #define INTVEC_CC
 
-
-
-
-
 #include <misc/auxiliary.h>
 
 // #include <resources/feFopen.h>
@@ -22,8 +18,6 @@
 #pragma GCC optimize ("wrapv")
 
 /*0 implementation*/
-
-omBin intvec_bin = omGetSpecBin(sizeof(intvec));
 
 intvec::intvec(int s, int e)
 {

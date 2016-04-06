@@ -7,13 +7,11 @@
 * ABSTRACT: class intvec: lists/vectors of integers
 */
 #include <string.h>
-#include <omalloc/omalloc.h>
+#include <omalloc/omallocClass.h>
 #include <reporter/reporter.h>
 
 
-extern omBin intvec_bin;
-
-class intvec
+class intvec :public omallocClass
 {
 private:
   int *v;
@@ -121,17 +119,6 @@ public:
       for (int i=row*col-1; i>0; i--) if (v[i]<m) m=v[i];
     }
     return m;
-  }
-  void* operator new ( size_t size )
-  {
-    void* addr;
-    //omTypeAlloc(void*, addr, size);
-    addr=omAlloc0Bin(intvec_bin);
-    return addr;
-  }
-  void operator delete ( void* block )
-  { //omfree( block );
-    omFreeBin((ADDRESS)block, intvec_bin);
   }
   // keiner (ausser obachman) darf das folgenden benutzen !!!
   inline int * ivGetVec() { return v; }

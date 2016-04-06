@@ -7,11 +7,11 @@
 * ABSTRACT: class intvec: lists/vectors of int64
 */
 #include <string.h>
-#include <omalloc/omalloc.h>
+#include <omalloc/omallocClass.h>
 #include <misc/auxiliary.h>
 #include <misc/intvec.h>
 
-class int64vec
+class int64vec :public omallocClass
 {
 private:
   int64 *v;
@@ -88,14 +88,3 @@ int64vec * iv64Sub(int64vec * a, int64vec * b);
 #endif
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
