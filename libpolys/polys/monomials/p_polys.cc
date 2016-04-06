@@ -2093,6 +2093,14 @@ static poly p_Pow(poly p, int i, const ring r)
   return p_Mult_q(rc,p,r);
 }
 
+static poly p_Pow_charp(poly p, int i, const ring r)
+{
+  //assume char_p == i
+  poly h=p;
+  while(h!=NULL) { p_MonPower(h,i,r);pIter(h);}
+  return p;
+}
+
 /*2
 * returns the i-th power of p
 * p will be destroyed
@@ -2156,6 +2164,23 @@ poly p_Power(poly p, int i, const ring r)
             return p_MonPower(p,i,r);
           /* else: binom ?*/
           int char_p=rChar(r);
+          if ((char_p>0) && (i>char_p)
+          && ((rField_is_Zp(r,char_p)
+	    || (rField_is_Zp_a(r,char_p)))))
+          {
+	    poly h=p_Pow_charp(p_Copy(p,r),char_p,r);
+            int rest=i-char_p;
+	    while (rest>=char_p)
+	    {
+	      rest-=char_p;
+	      h=p_Mult_q(h,p_Pow_charp(p_Copy(p,r),char_p,r),r);
+	    }
+            poly res=h;
+	    if (rest>0)
+	      res=p_Mult_q(p_Power(p_Copy(p,r),rest,r),h,r);
+            p_Delete(&p,r);
+            return res;
+          }
           if ((pNext(rc) != NULL)
 #ifdef HAVE_RINGS
              || rField_is_Ring(r)
