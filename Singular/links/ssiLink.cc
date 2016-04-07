@@ -151,6 +151,8 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
   /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> */
   /* ch=-1: transext, coeff ring follows */
   /* ch=-2: algext, coeff ring and minpoly follows */
+  /* ch=-3: cf name follows */
+  BOOLEAN cf_name=FALSE;
   if (r!=NULL)
   {
     if (rField_is_Q(r) || rField_is_Zp(r))
@@ -160,7 +162,10 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
     else if (rFieldType(r)==n_algExt)
       fprintf(d->f_write,"-2 %d ",r->N);
     else /*dummy*/
-      fprintf(d->f_write,"0 %d ",r->N);
+    {
+      fprintf(d->f_write,"-3 %d ",r->N);
+      cf_name=TRUE;
+    }
 
     int i;
     for(i=0;i<r->N;i++)
@@ -203,6 +208,10 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
       }
       i++;
     }
+    if (cf_name)
+    {
+      ssiWriteString(d,nCoeffName(r->cf));
+    }
     if ((rFieldType(r)==n_transExt)
     || (rFieldType(r)==n_algExt))
     {
@@ -229,6 +238,7 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> */
   /* ch=-1: transext, coeff ring follows */
   /* ch=-2: algext, coeff ring and minpoly follows */
+  /* ch=-3: cf name follows */
   if (r==currRing) // see recursive calls for transExt/algExt
   {
     if (d->r!=NULL) rKill(d->r);
@@ -422,6 +432,14 @@ ring ssiReadRing(const ssiInfo *d)
   char **names;
   ch=s_readint(d->f_read);
   N=s_readint(d->f_read);
+  coeffs cf=NULL;
+  if (ch==-3)
+  {
+    char *cf_name=ssiReadString(d);
+    coeffs cf=nFindCoeffByName(cf_name);
+    if (cf==NULL)
+    { Werror("cannot find cf:%s",cf_name);return NULL;}
+  }
   if (N!=0)
   {
     names=(char**)omAlloc(N*sizeof(char*));
@@ -485,14 +503,18 @@ ring ssiReadRing(const ssiInfo *d)
     {
       TransExtInfo T;
       T.r=ssiReadRing(d);
-      coeffs cf=nInitChar(n_transExt,&T);
+      cf=nInitChar(n_transExt,&T);
       r=rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
     }
     else if (ch==-2) /* alg ext. */
     {
       TransExtInfo T;
       T.r=ssiReadRing(d); /* includes qideal */
-      coeffs cf=nInitChar(n_algExt,&T);
+      cf=nInitChar(n_algExt,&T);
+      r=rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
+    }
+    else if (ch==-3)
+    {
       r=rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
     }
     else
