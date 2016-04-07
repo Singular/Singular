@@ -546,6 +546,17 @@ n_coeffType nRegister(n_coeffType n, cfInitCharProc p)
   }
 }
 
+coeffs nFindCoeffByName(const char *cf_name)
+{
+  n_Procs_s* n=cf_root;
+  while(n!=NULL)
+  {
+    if ((n->cfCoeffName!=NULL)
+    && (strcmp(cf_name,n->cfCoeffName(n))==0)) return n;
+    n=n->next;
+  }
+  return NULL;
+}
 
 void n_Print(number& a,  const coeffs r)
 {
