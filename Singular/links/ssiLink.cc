@@ -59,13 +59,13 @@
 #include <sys/wait.h>
 #include <time.h>
 
-#define SSI_VERSION 11
+#define SSI_VERSION 10
 // 5->6: changed newstruct representation
 // 6->7: attributes
 // 7->8: qring
 // 8->9: module: added rank
 // 9->10: tokens in grammar.h/tok.h reorganized
-// 10->11: extended ring descr. for named coeffs
+// 10->11: extended ring descr. for named coeffs (not in used until 4.1)
 
 link_list ssiToBeClosed=NULL;
 volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
