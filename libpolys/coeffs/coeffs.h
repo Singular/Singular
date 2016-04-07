@@ -891,9 +891,6 @@ static FORCE_INLINE BOOLEAN nCoeff_is_Q_a(const coeffs r)
   return ((n_GetChar(r) == 0) && nCoeff_is_Extension(r));
 }
 
-
-
-
 static FORCE_INLINE BOOLEAN nCoeff_is_long_R(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_long_R; }
 
