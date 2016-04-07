@@ -555,6 +555,7 @@ coeffs nFindCoeffByName(const char *cf_name)
     && (strcmp(cf_name,n->cfCoeffName(n))==0)) return n;
     n=n->next;
   }
+  // TODO: parametrized cf, e.g. flint:Z/26[a]
   return NULL;
 }
 

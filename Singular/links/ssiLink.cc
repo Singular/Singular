@@ -59,12 +59,13 @@
 #include <sys/wait.h>
 #include <time.h>
 
-#define SSI_VERSION 10
+#define SSI_VERSION 11
 // 5->6: changed newstruct representation
 // 6->7: attributes
 // 7->8: qring
 // 8->9: module: added rank
 // 9->10: tokens in grammar.h/tok.h reorganized
+// 10->11: extended ring descr. for named coeffs
 
 link_list ssiToBeClosed=NULL;
 volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
@@ -152,7 +153,6 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
   /* ch=-1: transext, coeff ring follows */
   /* ch=-2: algext, coeff ring and minpoly follows */
   /* ch=-3: cf name follows */
-  BOOLEAN cf_name=FALSE;
   if (r!=NULL)
   {
     if (rField_is_Q(r) || rField_is_Zp(r))
@@ -164,7 +164,7 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
     else /*dummy*/
     {
       fprintf(d->f_write,"-3 %d ",r->N);
-      cf_name=TRUE;
+      ssiWriteString(d,nCoeffName(r->cf));
     }
 
     int i;
@@ -207,10 +207,6 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
         default: break;
       }
       i++;
-    }
-    if (cf_name)
-    {
-      ssiWriteString(d,nCoeffName(r->cf));
     }
     if ((rFieldType(r)==n_transExt)
     || (rFieldType(r)==n_algExt))
@@ -436,7 +432,7 @@ ring ssiReadRing(const ssiInfo *d)
   if (ch==-3)
   {
     char *cf_name=ssiReadString(d);
-    coeffs cf=nFindCoeffByName(cf_name);
+    cf=nFindCoeffByName(cf_name);
     if (cf==NULL)
     { Werror("cannot find cf:%s",cf_name);return NULL;}
   }
@@ -503,6 +499,7 @@ ring ssiReadRing(const ssiInfo *d)
     {
       TransExtInfo T;
       T.r=ssiReadRing(d);
+      if (T.r==NULL) return NULL;
       cf=nInitChar(n_transExt,&T);
       r=rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
     }
@@ -510,6 +507,7 @@ ring ssiReadRing(const ssiInfo *d)
     {
       TransExtInfo T;
       T.r=ssiReadRing(d); /* includes qideal */
+      if (T.r==NULL) return NULL;
       cf=nInitChar(n_algExt,&T);
       r=rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
     }
@@ -1250,6 +1248,7 @@ leftv ssiRead1(si_link l)
     case 15:
     case 5:{
              d->r=ssiReadRing(d);
+	     if (d->r==NULL) return NULL;
              res->data=(char*)d->r;
              if (d->r->qideal==NULL)
                res->rtyp=RING_CMD;

@@ -520,19 +520,20 @@ static number ReadFd(s_buff f, const coeffs)
   fmpq_poly_ptr aa=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
   fmpq_poly_init(aa);
   int l=s_readint(f);
-  mpz_t num,den;
+  mpz_t nm;
+  mpz_init(nm);
   mpq_t m;
   mpq_init(m);
   for (int i=l;i>=0;i--)
   {
-    s_readmpz_base (f,num, SSI_BASE);
-    mpq_set_num(m,num);
-    mpz_clear(num);
-    s_readmpz_base (f,den, SSI_BASE);
-    mpq_set_den(m,den);
-    mpz_clear(den);
+
+    s_readmpz_base (f,nm, SSI_BASE);
+    mpq_set_num(m,nm);
+    s_readmpz_base (f,nm, SSI_BASE);
+    mpq_set_den(m,nm);
     fmpq_poly_set_coeff_mpq(aa,i,m);
   }
+  mpz_clear(nm);
   mpq_clear(m);
   return (number)aa;
 }
