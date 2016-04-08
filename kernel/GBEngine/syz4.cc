@@ -335,9 +335,6 @@ bool CLeadingTerm_test::DivisibilityCheck(const poly m, const poly t, const unsi
 
 class CReducerFinder_test
 {
-  friend class CDivisorEnumerator_test;
-  friend class CDivisorEnumerator2_test;
-
   public:
     typedef long TComponentKey;
     typedef std::vector<const CLeadingTerm_test*> TReducers;
@@ -412,145 +409,42 @@ void CReducerFinder_test::redefine(const ideal L)
 static CReducerFinder_test m_checker(NULL);
 static CReducerFinder_test m_div(NULL);
 
-class CDivisorEnumerator_test
-{
-  private:
-    const CReducerFinder_test& m_reds;
-    const poly m_product;
-    const unsigned long m_not_sev;
-    const long m_comp;
-
-    CReducerFinder_test::CReducersHash::const_iterator m_itr;
-    CReducerFinder_test::TReducers::const_iterator m_current, m_finish;
-
-    bool m_active;
-
-  public:
-    CDivisorEnumerator_test(const CReducerFinder_test& self, const poly product):
-        m_reds(self),
-        m_product(product),
-        m_not_sev(~p_GetShortExpVector(product, currRing)),
-        m_comp(p_GetComp(product, currRing)),
-        m_itr(), m_current(), m_finish(),
-        m_active(false)
-    {
-    }
-
-    inline bool Reset()
-    {
-      m_active = false;
-      m_itr = m_reds.m_hash.find(m_comp);
-      if( m_itr == m_reds.m_hash.end() )
-        return false;
-      m_current = (m_itr->second).begin();
-      m_finish = (m_itr->second).end();
-      if (m_current == m_finish)
-        return false;
-      return true;
-    }
-
-    const CLeadingTerm_test& Current() const
-    {
-      return *(*m_current);
-    }
-
-    inline bool MoveNext()
-    {
-      if( m_active )
-        ++m_current;
-      else
-        m_active = true; // for Current()
-      for( ; m_current != m_finish; ++m_current )
-      {
-        if( Current().DivisibilityCheck(m_product, m_not_sev, currRing) )
-        {
-          return true;
-        }
-      }
-      m_active = false;
-      return false;
-    }
-};
-
-class CDivisorEnumerator2_test
-{
-  private:
-    const CReducerFinder_test& m_reds;
-    const poly m_multiplier, m_term;
-    const unsigned long m_not_sev;
-    const long m_comp;
-
-    CReducerFinder_test::CReducersHash::const_iterator m_itr;
-    CReducerFinder_test::TReducers::const_iterator m_current, m_finish;
-
-    bool m_active;
-
-  public:
-    CDivisorEnumerator2_test(const CReducerFinder_test& self, const poly m, const poly t):
-        m_reds(self),
-        m_multiplier(m), m_term(t),
-        m_not_sev(~p_GetShortExpVector(m, t, currRing)),
-        m_comp(p_GetComp(t, currRing)),
-        m_itr(), m_current(), m_finish(),
-        m_active(false)
-    {
-    }
-
-    inline bool Reset()
-    {
-      m_active = false;
-      m_itr = m_reds.m_hash.find(m_comp);
-      if( m_itr == m_reds.m_hash.end() )
-        return false;
-      m_current = (m_itr->second).begin();
-      m_finish = (m_itr->second).end();
-      if (m_current == m_finish)
-        return false;
-      return true;
-    }
-
-    const CLeadingTerm_test& Current() const
-    {
-      return *(*m_current);
-    }
-
-    inline bool MoveNext()
-    {
-      if( m_active )
-        ++m_current;
-      else
-        m_active = true;
-      // looking for the next good entry
-      for( ; m_current != m_finish; ++m_current )
-      {
-        if( Current().DivisibilityCheck(m_multiplier, m_term, m_not_sev, currRing) )
-        {
-          return true;
-        }
-      }
-      m_active = false;
-      return false;
-    }
-};
-
 poly CReducerFinder_test::FindReducer(const poly multiplier, const poly t,
                                  const poly syzterm,
                                  const CReducerFinder_test& syz_checker)
 {
   const ring r = currRing;
-  CDivisorEnumerator2_test itr(m_div, multiplier, t);
-  if( !itr.Reset() )
+  CReducerFinder_test::CReducersHash::const_iterator m_itr
+      = m_div.m_hash.find(p_GetComp(t, currRing));
+  if (m_itr == m_div.m_hash.end()) {
     return NULL;
+  }
+  CReducerFinder_test::TReducers::const_iterator m_current
+      = (m_itr->second).begin();
+  CReducerFinder_test::TReducers::const_iterator m_finish
+      = (m_itr->second).end();
+  if (m_current == m_finish) {
+    return NULL;
+  }
   long c = 0;
   if (syzterm != NULL)
     c = p_GetComp(syzterm, r) - 1;
   const BOOLEAN to_check = (syz_checker.IsNonempty());
   const poly q = p_New(r);
   pNext(q) = NULL;
-  while( itr.MoveNext() )
-  {
-    const poly p = itr.Current().lt();
-    const int k  = itr.Current().label();
+  const unsigned long m_not_sev = ~p_GetShortExpVector(multiplier, t, r);
+  while (true) {
+    for( ; m_current != m_finish; ++m_current) {
+      if((*(*m_current)).DivisibilityCheck(multiplier, t, m_not_sev, r) ) {
+        break;
+      }
+    }
+    if (m_current == m_finish) {
+      break;
+    }
+    const poly p = (*(*m_current)).lt();
+    const int k  = (*(*m_current)).label();
+    ++m_current;
     p_ExpVectorSum(q, multiplier, t, r); // q == product == multiplier * t
     p_ExpVectorDiff(q, q, p, r); // (LM(product) / LM(L[k]))
     p_SetComp(q, k + 1, r);
@@ -576,10 +470,22 @@ poly CReducerFinder_test::FindReducer(const poly multiplier, const poly t,
 
 bool CReducerFinder_test::IsDivisible(const poly product) const
 {
-  CDivisorEnumerator_test itr(*this, product);
-  if( !itr.Reset() )
+    CReducerFinder_test::CReducersHash::const_iterator m_itr
+        = (*this).m_hash.find(p_GetComp(product, currRing));
+    if (m_itr == (*this).m_hash.end()) {
+        return false;
+    }
+    CReducerFinder_test::TReducers::const_iterator m_current
+        = (m_itr->second).begin();
+    CReducerFinder_test::TReducers::const_iterator m_finish
+        = (m_itr->second).end();
+    const unsigned long m_not_sev = ~p_GetShortExpVector(product, currRing);
+    for ( ; m_current != m_finish; ++m_current) {
+        if ((*(*m_current)).DivisibilityCheck(product, m_not_sev, currRing)) {
+            return true;
+        }
+    }
     return false;
-  return itr.MoveNext();
 }
 
 static poly ReduceTerm_test(poly multiplier, poly term4reduction, poly syztermCheck)
