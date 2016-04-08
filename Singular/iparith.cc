@@ -703,38 +703,39 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
 {
-  idhdl packhdl;
   switch(u->Typ())
   {
-      case 0:
+    case 0:
+    {
+      int name_err=0;
+      if(isupper(u->name[0]))
       {
-        int name_err=0;
-        if(isupper(u->name[0]))
+        const char *c=u->name+1;
+        while((*c!='\0')&&(islower(*c)||(isdigit(*c)))) c++;
+        if (*c!='\0')
+          name_err=1;
+        else
         {
-          const char *c=u->name+1;
-          while((*c!='\0')&&(islower(*c)||(isdigit(*c)))) c++;
-          if (*c!='\0')
-            name_err=1;
-          else
+          Print("%s of type 'ANY'. Trying load.\n", u->name);
+          if(iiTryLoadLib(u, u->name))
           {
-            Print("%s of type 'ANY'. Trying load.\n", u->name);
-            if(iiTryLoadLib(u, u->name))
-            {
-              Werror("'%s' no such package", u->name);
-              return TRUE;
-            }
-            syMake(u,u->name,NULL);
+            Werror("'%s' no such package", u->name);
+            return TRUE;
           }
+          syMake(u,u->name,NULL);
         }
-        else name_err=1;
-        if(name_err)
-        { Werror("'%s' is an invalid package name",u->name);return TRUE;}
-        // and now, after the loading: use next case !!! no break !!!
       }
-      case PACKAGE_CMD:
-        packhdl = (idhdl)u->data;
-        if((!IDPACKAGE(packhdl)->loaded)
-        && (IDPACKAGE(packhdl)->language > LANG_TOP))
+      else name_err=1;
+      if(name_err)
+      { Werror("'%s' is an invalid package name",u->name);return TRUE;}
+      // and now, after the loading: use next case !!! no break !!!
+    }
+    case PACKAGE_CMD:
+      {
+        package pa=(package)u->Data();
+        if (u->rtyp==IDHDL) pa=IDPACKAGE((idhdl)u->data);
+        if((!pa->loaded)
+        && (pa->language > LANG_TOP))
         {
           Werror("'%s' not loaded", u->name);
           return TRUE;
@@ -748,16 +749,17 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
           WerrorS("reserved name with ::");
           return TRUE;
         }
-        v->req_packhdl=IDPACKAGE(packhdl);
-        syMake(v, v->name, packhdl);
+        v->req_packhdl=pa;
+        syMake(v, v->name, pa);
         memcpy(res, v, sizeof(sleftv));
         memset(v, 0, sizeof(sleftv));
-        break;
-      case DEF_CMD:
-        break;
-      default:
-        WerrorS("<package>::<id> expected");
-        return TRUE;
+      }
+      break;
+    case DEF_CMD:
+      break;
+    default:
+      WerrorS("<package>::<id> expected");
+      return TRUE;
   }
   return FALSE;
 }
