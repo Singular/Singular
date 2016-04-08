@@ -1478,7 +1478,7 @@ BOOLEAN assumeStdFlag(leftv h)
 * into an expression (sleftv), deletes the string
 * utility for grammar and iparith
 */
-void syMake(leftv v,const char * id, idhdl packhdl)
+void syMake(leftv v,const char * id, package pa)
 {
   /* resolv an identifier: (to DEF_CMD, if siq>0)
   * 1) reserved id: done by scanner
@@ -1502,10 +1502,9 @@ void syMake(leftv v,const char * id, idhdl packhdl)
 #endif
   idhdl save_ring=currRingHdl;
   v->Init();
-  if(packhdl != NULL)
+  if(pa != NULL)
   {
-  //  Print("setting req_packhdl to %s\n",IDID(packhdl));
-    v->req_packhdl = IDPACKAGE(packhdl);
+    v->req_packhdl = pa;
   }
   else v->req_packhdl = currPack;
 //  if (v->req_packhdl!=basePack)
