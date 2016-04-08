@@ -24,73 +24,39 @@ static ideal m_idLeads_test;
 static ideal m_idTails_test;
 static ideal m_syzLeads_test;
 
-class CLCM_test: public std::vector<bool>
+static std::vector<bool> CLCM_test_redefine(const ideal L)
 {
-  public:
-    CLCM_test(const ideal& L);
-    void redefine(const ideal L);
-    bool Check(const poly m) const;
-
-  private:
-    bool m_compute;
-    unsigned int m_N;   // number of ring variables
-};
-
-CLCM_test::CLCM_test(const ideal& L):
-    std::vector<bool>(),
-    m_compute(false), m_N(0)   // m_N(rVar(currRing))
-{
+  std::vector<bool> clcm;
   const ring R = currRing;
   if( L != NULL )
   {
     const int l = IDELEMS(L);
-    resize(l, false);
+    clcm.resize(currRing->N, false);
     for( int k = l - 1; k >= 0; k-- )
     {
       const poly a = L->m[k];
-      for (unsigned int j = m_N; j > 0; j--)
-        if ( !(*this)[j] )
-          (*this)[j] = (p_GetExp(a, j, R) > 0);
+      for (unsigned int j = currRing->N; j > 0; j--)
+        if ( !clcm[j-1] )
+          clcm[j-1] = (p_GetExp(a, j, R) > 0);
     }
-    m_compute = true;
   }
+  return clcm;
 }
 
-void CLCM_test::redefine(const ideal L)
+bool CLCM_test_Check(const std::vector<bool> &clcm, const poly m)
 {
-  resize(0); // std::vector<bool>()
-  m_compute = false;
-  m_N = rVar(currRing);
-  const ring R = currRing;
-  if( L != NULL )
-  {
-    const int l = IDELEMS(L);
-    resize(currRing->N, false);
-    for( int k = l - 1; k >= 0; k-- )
-    {
-      const poly a = L->m[k];
-      for (unsigned int j = m_N; j > 0; j--)
-        if ( !(*this)[j-1] )
-          (*this)[j-1] = (p_GetExp(a, j, R) > 0);
-    }
-    m_compute = true;
-  }
-}
-
-bool CLCM_test::Check(const poly m) const
-{
-  if( m_compute && (m != NULL))
+  if(m != NULL)
   {
     const ring R = currRing;
-    for (unsigned int j = m_N; j > 0; j--)
-      if ( (*this)[j-1] )
+    for (unsigned int j = currRing->N; j > 0; j--)
+      if ( clcm[j-1] )
         if(p_GetExp(m, j, R) > 0)
           return true;
     return false;
   } else return true;
 }
 
-static CLCM_test m_lcm(NULL);
+static std::vector<bool> m_lcm;
 
 static poly TraverseNF_test(const poly a)
 {
@@ -233,7 +199,7 @@ static poly ComputeImage_test(poly multiplier, const int tail)
 static poly TraverseTail_test(poly multiplier, poly tail)
 {
   const ring r = currRing;
-  if( !m_lcm.Check(multiplier) )
+  if( !CLCM_test_Check(m_lcm, multiplier) )
   {
     return NULL;
   }
@@ -620,7 +586,7 @@ static poly ReduceTerm_test(poly multiplier, poly term4reduction, poly syztermCh
 {
   const ring r = currRing;
   poly s = NULL;
-  if( m_lcm.Check(multiplier) )
+  if( CLCM_test_Check(m_lcm, multiplier) )
   {
     s = CReducerFinder_test::FindReducer(multiplier, term4reduction, syztermCheck, m_checker);
   }
@@ -840,7 +806,7 @@ static void setGlobalVariables(const resolvente res, const int index)
         m_idLeads_test->m[i]->next = NULL;
     }
     m_div.redefine(m_idLeads_test);
-    m_lcm.redefine(m_idLeads_test);
+    m_lcm = CLCM_test_redefine(m_idLeads_test);
     m_syzLeads_test = idCopy(res[index]);
     for (int i = IDELEMS(res[index])-1; i >= 0; i--) {
         pDelete(&m_syzLeads_test->m[i]->next);
