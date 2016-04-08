@@ -92,22 +92,14 @@ bool CLCM_test::Check(const poly m) const
 
 static CLCM_test m_lcm(NULL);
 
-static poly TraverseNF_test(const poly a, const poly a2)
+static poly TraverseNF_test(const poly a)
 {
   const ideal& L = m_idLeads_test;
   const ring R = currRing;
   const int r = p_GetComp(a, R) - 1;
   poly aa = leadmonom_test(a, R);
   poly t = TraverseTail_test(aa, r);
-  if( a2 != NULL )
-  {
-    const int r2 = p_GetComp(a2, R) - 1;
-    poly aa2 = leadmonom_test(a2, R);
-    poly s =  TraverseTail_test(aa2, r2);
-    p_Delete(&aa2, R);
-    t = p_Add_q(a2, p_Add_q(t, s, R), R);
-  } else
-    t = p_Add_q(t, ReduceTerm_test(aa, L->m[r], a), R);
+  t = p_Add_q(t, ReduceTerm_test(aa, L->m[r], a), R);
   p_Delete(&aa, R);
   return t;
 }
@@ -884,7 +876,7 @@ static void computeLiftings(const resolvente res, const int index)
         p = res[index]->m[j];
         pDelete(&res[index]->m[j]->next);
         p->next = NULL;
-        res[index]->m[j]->next = TraverseNF_test(p, NULL);
+        res[index]->m[j]->next = TraverseNF_test(p);
     }
 #endif   // MYLIFT
 }
