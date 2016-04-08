@@ -307,9 +307,8 @@ EXAMPLE: example splitring;  shows an example
          else { if (find(varnames,"o")==0)
                                     { algname="o";}
          else {
-           "** Sorry -- could not find a free name for the primitive element.";
-           "** Try e.g. a ring without 'a' or 'b' as variable.";
-           return();
+           ERROR("Sorry -- could not find a free name for the primitive element.
+           ** Try e.g. a ring without 'a' or 'b' as variable.");
          }}
        }
   }
