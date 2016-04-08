@@ -287,57 +287,17 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(const poly a, const poly b, const p
   return TRUE;
 }
 
-class CLeadingTerm_test
-{
-  public:
-    CLeadingTerm_test(unsigned int label,  const poly lt, const ring);
-
-    bool DivisibilityCheck(const poly multiplier, const poly t, const unsigned long not_sev, const ring r) const;
-    bool DivisibilityCheck(const poly product, const unsigned long not_sev, const ring r) const;
-
-    bool CheckLT( const ideal & L ) const;
-
-    inline poly lt() const { return m_lt; };
-    inline unsigned long sev() const { return m_sev; };
-    inline unsigned int label() const { return m_label; };
-
-  private:
-    const unsigned long m_sev; ///< not short exp. vector
-
-    // NOTE/TODO: either of the following should be enough:
-    const unsigned int  m_label; ///< index in the main L[] + 1
-
-    const poly          m_lt; ///< the leading term itself L[label-1]
-
-    // disable the following:
-    CLeadingTerm_test();
-    CLeadingTerm_test(const CLeadingTerm_test&);
-    void operator=(const CLeadingTerm_test&);
-};
-
-CLeadingTerm_test::CLeadingTerm_test(unsigned int _label,  const poly _lt, const ring R):
-    m_sev( p_GetShortExpVector(_lt, R) ),  m_label( _label ),  m_lt( _lt )
-{
-}
-
-bool CLeadingTerm_test::DivisibilityCheck(const poly product, const unsigned long not_sev, const ring r) const
-{
-  return p_LmShortDivisibleByNoComp(lt(), sev(), product, not_sev, r);
-}
-
-bool CLeadingTerm_test::DivisibilityCheck(const poly m, const poly t, const unsigned long not_sev, const ring r) const
-{
-  if (sev() & not_sev) {
-    return false;
-  }
-  return _p_LmDivisibleByNoComp(lt(), m, t, r);
-}
+typedef struct {
+    poly lt;
+    unsigned long sev;
+    unsigned int label;
+} CLeadingTerm_struct;
 
 class CReducerFinder_test
 {
   public:
     typedef long TComponentKey;
-    typedef std::vector<const CLeadingTerm_test*> TReducers;
+    typedef std::vector<const CLeadingTerm_struct*> TReducers;
 
   private:
     typedef std::map< TComponentKey, TReducers> CReducersHash;
@@ -384,7 +344,7 @@ CReducerFinder_test::~CReducerFinder_test()
   {
     TReducers& v = it->second;
     for(TReducers::const_iterator vit = v.begin(); vit != v.end(); vit++ )
-      delete const_cast<CLeadingTerm_test*>(*vit);
+      omfree(const_cast<CLeadingTerm_struct*>(*vit));
     v.erase(v.begin(), v.end());
   }
   m_hash.erase(m_hash.begin(), m_hash.end());
@@ -397,7 +357,7 @@ void CReducerFinder_test::redefine(const ideal L)
   {
     TReducers& v = it->second;
     for(TReducers::const_iterator vit = v.begin(); vit != v.end(); vit++ )
-      delete const_cast<CLeadingTerm_test*>(*vit);
+      omfree(const_cast<CLeadingTerm_struct*>(*vit));
     v.erase(v.begin(), v.end());
   }
   m_hash.erase(m_hash.begin(), m_hash.end());
@@ -435,15 +395,16 @@ poly CReducerFinder_test::FindReducer(const poly multiplier, const poly t,
   const unsigned long m_not_sev = ~p_GetShortExpVector(multiplier, t, r);
   while (true) {
     for( ; m_current != m_finish; ++m_current) {
-      if((*(*m_current)).DivisibilityCheck(multiplier, t, m_not_sev, r) ) {
+      if ( !((*m_current)->sev & m_not_sev)
+          && _p_LmDivisibleByNoComp((*m_current)->lt, multiplier, t, r)) {
         break;
       }
     }
     if (m_current == m_finish) {
       break;
     }
-    const poly p = (*(*m_current)).lt();
-    const int k  = (*(*m_current)).label();
+    const poly p = (*m_current)->lt;
+    const int k  = (*m_current)->label;
     ++m_current;
     p_ExpVectorSum(q, multiplier, t, r); // q == product == multiplier * t
     p_ExpVectorDiff(q, q, p, r); // (LM(product) / LM(L[k]))
@@ -481,7 +442,8 @@ bool CReducerFinder_test::IsDivisible(const poly product) const
         = (m_itr->second).end();
     const unsigned long m_not_sev = ~p_GetShortExpVector(product, currRing);
     for ( ; m_current != m_finish; ++m_current) {
-        if ((*(*m_current)).DivisibilityCheck(product, m_not_sev, currRing)) {
+        if (p_LmShortDivisibleByNoComp((*m_current)->lt, (*m_current)->sev,
+            product, m_not_sev, currRing)) {
             return true;
         }
     }
@@ -521,7 +483,12 @@ void CReducerFinder_test::Initialize(const ideal L)
       const poly a = L->m[k];
       if( a != NULL )
       {
-        m_hash[p_GetComp(a, R)].push_back( new CLeadingTerm_test(k, a, R) );
+        CLeadingTerm_struct *CLT
+            = (CLeadingTerm_struct*)omalloc(sizeof(CLeadingTerm_struct));
+        CLT->lt = a;
+        CLT->sev = p_GetShortExpVector(a, R);
+        CLT->label = k;
+        m_hash[p_GetComp(a, R)].push_back( CLT );
       }
     }
   }
