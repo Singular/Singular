@@ -6207,7 +6207,6 @@ EXAMPLE: example minAssGTZE; shows an example
 {
     list result = minAssGTZ_i(1,I,#);
     return(result);
-
 }
 example
 { "EXAMPLE:";  echo = 2;
