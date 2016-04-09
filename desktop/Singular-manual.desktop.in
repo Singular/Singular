@@ -1,5 +1,5 @@
 [Desktop Entry]
-Version=@PACKAGE_VERSION@
+Version=1.0
 Name=Singular Manual
 Name[de]=Singular-Handbuch
 Comment=read the user manual for Singular @PACKAGE_VERSION@
@@ -10,6 +10,4 @@ Comment[ru]=
 Type=Link
 URL=file://@DOC_DIR@/html/index.htm
 Icon=@DATA_DIR@/icons/Singular.png
-Categories=Math;Science;Development;Education;Documentation;
-Encoding=UTF-8
 
