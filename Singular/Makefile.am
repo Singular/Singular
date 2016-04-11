@@ -212,8 +212,6 @@ EXTRA_DIST = grammar.y libparse.ll make_alllib.sh LIB/all.lib.tmpl \
              singular-libs LIB/help.cnf LIB/.singularrc LIB/COPYING \
 	     links/slInit_Dynamic.cc ../doc/singular.idx
 
-dist_singularlibrary_DATA = ../doc/singular.idx
-
 singularalllibrarydir = ${datadir}/singular/LIB
 singularalllibrary = all.lib
 nobase_dist_singularalllibrary_DATA = all.lib
