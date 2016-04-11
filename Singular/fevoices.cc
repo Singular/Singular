@@ -592,8 +592,10 @@ int feReadLine(char* b, int l)
     }
     else if (currentVoice->sw==BI_file)
     {
+      fseek(currentVoice->files,currentVoice->ftellptr,SEEK_SET);
       s=fgets(currentVoice->buffer+offset,(MAX_FILE_BUFFER-1-sizeof(ADDRESS))-offset,
               currentVoice->files);
+      if (s!=NULL) currentVoice->ftellptr=ftell(currentVoice->files);
     }
     //else /* BI_buffer */ s==NULL  => return 0
     // done by the default return
