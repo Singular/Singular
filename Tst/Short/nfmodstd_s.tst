@@ -2,9 +2,10 @@ LIB "tst.lib";
 LIB "nfmodstd.lib";
 tst_init();
 
-proc tst_test_nfmodstd(ideal I)
+proc tst_test_nfmodstd(def I)
 {
-   ideal Jtst = nfmodStd(I);
+   // input type ideal or module
+   def Jtst = nfmodStd(I);
    Jtst;
 }
 
@@ -46,10 +47,19 @@ ideal Ua = [a*x + (a-1)*y + z + (a+2)*w + u,x*y + (a-1)*y*z + z*w +
 	  (a-11)*x*y*z*w + (a + 5)*x*y*z*u + a*x*y*w*u + a*x*z*w*u + a*y*z*w*u,(a + 3)*x*y*z*w*u + a+23];
 tst_test_nfmodstd(Ua);
 kill r;
-
+ring r = 0,(x,y,z),dp;
+module K = [x2z+x-7*y,z2+9*x], [y2+7*z+7,10*z3-7*x2], [-xz+52*yz,xy+49*z],
+           [52*xyz+yz,7*xy+y+z], [10*xy+z2,xz+x+7*z];
+tst_test_nfmodstd(K);
+kill r;
+ring r = (0,a),(x,y),(c,dp);
+    minpoly = a^3+2a+7;
+    module M = [(a/2+1)*x^2+2/3y, 3*x-a*y+ a/7+2], [ax, y];
+tst_test_nfmodstd(M);
+kill r;
 proc tst_test_chinrempoly(list l, list m)
 {
-   ideal Jtst = chinrempoly(l,m);
+   def Jtst = chinrempoly(l,m);
    Jtst;
 }
 
