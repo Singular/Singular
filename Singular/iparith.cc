@@ -4721,7 +4721,7 @@ static BOOLEAN jjOpenClose(leftv, leftv v)
 {
   si_link l=(si_link)v->Data();
   if (iiOp==OPEN_CMD) return slOpen(l, SI_LINK_OPEN,v);
-  else                return slClose(l);
+  else { slPrepClose(l); return slClose(l);}
 }
 static BOOLEAN jjORD(leftv res, leftv v)
 {
