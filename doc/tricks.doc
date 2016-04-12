@@ -625,13 +625,15 @@ short=0; 2x1; // resolved to monomial 2*x^1 !!!!!!
 @code{-lSingular} the link parameter,
 @code{lib/pkgconfig/Singular.pc} provides all parameters in the pkconfig format.
 It contains all parts of @sc{Singular} with two exceptions:
-@begin itemize
-@item memory allocation functions for gmp
+@enumerate
+@item
+memory allocation functions for gmp
 (see @code{mmInit} in @code{Singular/tesths.cc})
-@item signal handlers
+@item
+signal handlers
 (see @code{init_signals} in @code{Singular/cntrlc.cc}).
 At least a handler for @code{SIGCHLD} must be installed.
 If the child was started by @code{libSingular} the handler
 has to call @code{sig_chld_hdl} from @code{Singular/links/ssiLink.cc}
 or implement something similiar (call @code{slClose(l)} for ssi links).
-@end itemize
+@end enumerate
