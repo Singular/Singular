@@ -293,103 +293,53 @@ typedef struct {
     unsigned int label;
 } CLeadingTerm_struct;
 
-class CReducerFinder_test
+typedef std::vector<const CLeadingTerm_struct*> TReducers_test;
+typedef std::map<long, TReducers_test> CReducersHash_test;
+
+static void deleteCRH(CReducersHash_test *C)
 {
-  public:
-    typedef long TComponentKey;
-    typedef std::vector<const CLeadingTerm_struct*> TReducers;
-
-  private:
-    typedef std::map< TComponentKey, TReducers> CReducersHash;
-
-  public:
-    /// goes over all leading terms
-    CReducerFinder_test(const ideal L);
-
-    void redefine(const ideal L);
-
-    void Initialize(const ideal L);
-
-    ~CReducerFinder_test();
-
-    static poly FindReducer(const poly multiplier, const poly monom, const poly syzterm, const CReducerFinder_test& checker);
-
-    bool IsDivisible(const poly q) const;
-
-    inline bool IsNonempty() const { return !m_hash.empty(); }
-
-    int PreProcessTerm(const poly t, CReducerFinder_test& syzChecker) const;
-
-  private:
-    ideal m_L; ///< only for debug
-
-    CReducersHash m_hash; // can also be replaced with a vector indexed by components
-
-  private:
-    CReducerFinder_test(const CReducerFinder_test&);
-    void operator=(const CReducerFinder_test&);
-};
-
-CReducerFinder_test::CReducerFinder_test(const ideal L):
-    m_L(const_cast<ideal>(L)), // for debug anyway
-    m_hash()
-{
-  if( L != NULL )
-    Initialize(L);
+    for (CReducersHash_test::iterator it = C->begin(); it != C->end(); it++) {
+        TReducers_test& v = it->second;
+        for (TReducers_test::const_iterator vit = v.begin(); vit != v.end();
+            vit++) {
+            omfree(const_cast<CLeadingTerm_struct*>(*vit));
+        }
+        v.erase(v.begin(), v.end());
+    }
+    C->erase(C->begin(), C->end());
 }
 
-CReducerFinder_test::~CReducerFinder_test()
+static void initialize(CReducersHash_test &C, const ideal L);
+
+static void redefine(CReducersHash_test *C, const ideal L)
 {
-  for( CReducersHash::iterator it = m_hash.begin(); it != m_hash.end(); it++ )
-  {
-    TReducers& v = it->second;
-    for(TReducers::const_iterator vit = v.begin(); vit != v.end(); vit++ )
-      omfree(const_cast<CLeadingTerm_struct*>(*vit));
-    v.erase(v.begin(), v.end());
-  }
-  m_hash.erase(m_hash.begin(), m_hash.end());
+    deleteCRH(C);
+    initialize(*C, L);
 }
 
-void CReducerFinder_test::redefine(const ideal L)
-{
-  m_L = const_cast<ideal>(L); // for debug anyway
-  for( CReducersHash::iterator it = m_hash.begin(); it != m_hash.end(); it++ )
-  {
-    TReducers& v = it->second;
-    for(TReducers::const_iterator vit = v.begin(); vit != v.end(); vit++ )
-      omfree(const_cast<CLeadingTerm_struct*>(*vit));
-    v.erase(v.begin(), v.end());
-  }
-  m_hash.erase(m_hash.begin(), m_hash.end());
-  m_hash.clear();
-  if( L != NULL )
-    Initialize(L);
-}
+static CReducersHash_test m_checker;
+static CReducersHash_test m_div;
 
-static CReducerFinder_test m_checker(NULL);
-static CReducerFinder_test m_div(NULL);
+bool IsDivisible(const CReducersHash_test *C, const poly product);
 
-poly CReducerFinder_test::FindReducer(const poly multiplier, const poly t,
-                                 const poly syzterm,
-                                 const CReducerFinder_test& syz_checker)
+poly FindReducer(const poly multiplier, const poly t, const poly syzterm,
+    const CReducersHash_test &syz_checker)
 {
   const ring r = currRing;
-  CReducerFinder_test::CReducersHash::const_iterator m_itr
-      = m_div.m_hash.find(p_GetComp(t, currRing));
-  if (m_itr == m_div.m_hash.end()) {
+  CReducersHash_test::const_iterator m_itr
+      = m_div.find(p_GetComp(t, currRing));
+  if (m_itr == m_div.end()) {
     return NULL;
   }
-  CReducerFinder_test::TReducers::const_iterator m_current
-      = (m_itr->second).begin();
-  CReducerFinder_test::TReducers::const_iterator m_finish
-      = (m_itr->second).end();
+  TReducers_test::const_iterator m_current = (m_itr->second).begin();
+  TReducers_test::const_iterator m_finish  = (m_itr->second).end();
   if (m_current == m_finish) {
     return NULL;
   }
   long c = 0;
   if (syzterm != NULL)
     c = p_GetComp(syzterm, r) - 1;
-  const BOOLEAN to_check = (syz_checker.IsNonempty());
+  const BOOLEAN to_check = !syz_checker.empty();
   const poly q = p_New(r);
   pNext(q) = NULL;
   const unsigned long m_not_sev = ~p_GetShortExpVector(multiplier, t, r);
@@ -412,16 +362,13 @@ poly CReducerFinder_test::FindReducer(const poly multiplier, const poly t,
     p_Setm(q, r);
     // cannot allow something like: a*gen(i) - a*gen(i)
     if (syzterm != NULL && (k == c))
-    if (p_ExpVectorEqual(syzterm, q, r))
-    {
+    if (p_ExpVectorEqual(syzterm, q, r)) {
       continue;
     }
-    // while the complement (the fraction) is not reducible by leading syzygies
-    if( to_check && syz_checker.IsDivisible(q) )
-    {
+    if (to_check && IsDivisible(&syz_checker, q)) {
       continue;
     }
-    number n = n_Mult( p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
+    number n = n_Mult(p_GetCoeff(multiplier, r), p_GetCoeff(t, r), r);
     p_SetCoeff0(q, n_InpNeg(n, r), r);
     return q;
   }
@@ -429,17 +376,15 @@ poly CReducerFinder_test::FindReducer(const poly multiplier, const poly t,
   return NULL;
 }
 
-bool CReducerFinder_test::IsDivisible(const poly product) const
+bool IsDivisible(const CReducersHash_test *C, const poly product)
 {
-    CReducerFinder_test::CReducersHash::const_iterator m_itr
-        = (*this).m_hash.find(p_GetComp(product, currRing));
-    if (m_itr == (*this).m_hash.end()) {
+    CReducersHash_test::const_iterator m_itr
+        = C->find(p_GetComp(product, currRing));
+    if (m_itr == C->end()) {
         return false;
     }
-    CReducerFinder_test::TReducers::const_iterator m_current
-        = (m_itr->second).begin();
-    CReducerFinder_test::TReducers::const_iterator m_finish
-        = (m_itr->second).end();
+    TReducers_test::const_iterator m_current = (m_itr->second).begin();
+    TReducers_test::const_iterator m_finish  = (m_itr->second).end();
     const unsigned long m_not_sev = ~p_GetShortExpVector(product, currRing);
     for ( ; m_current != m_finish; ++m_current) {
         if (p_LmShortDivisibleByNoComp((*m_current)->lt, (*m_current)->sev,
@@ -456,7 +401,7 @@ static poly ReduceTerm_test(poly multiplier, poly term4reduction, poly syztermCh
   poly s = NULL;
   if( CLCM_test_Check(m_lcm, multiplier) )
   {
-    s = CReducerFinder_test::FindReducer(multiplier, term4reduction, syztermCheck, m_checker);
+    s = FindReducer(multiplier, term4reduction, syztermCheck, m_checker);
   }
   if( s == NULL )
   {
@@ -471,10 +416,8 @@ static poly ReduceTerm_test(poly multiplier, poly term4reduction, poly syztermCh
   return s;
 }
 
-void CReducerFinder_test::Initialize(const ideal L)
+static void initialize(CReducersHash_test &C, const ideal L)
 {
-  if( m_L == NULL )
-    m_L = L;
   if( L != NULL )
   {
     const ring R = currRing;
@@ -488,7 +431,7 @@ void CReducerFinder_test::Initialize(const ideal L)
         CLT->lt = a;
         CLT->sev = p_GetShortExpVector(a, R);
         CLT->label = k;
-        m_hash[p_GetComp(a, R)].push_back( CLT );
+        C[p_GetComp(a, R)].push_back( CLT );
       }
     }
   }
@@ -678,14 +621,14 @@ static void setGlobalVariables(const resolvente res, const int index)
         m_idTails_test->m[i] = m_idLeads_test->m[i]->next;
         m_idLeads_test->m[i]->next = NULL;
     }
-    m_div.redefine(m_idLeads_test);
+    redefine(&m_div, m_idLeads_test);
     m_lcm = CLCM_test_redefine(m_idLeads_test);
     m_syzLeads_test = idCopy(res[index]);
     for (int i = IDELEMS(res[index])-1; i >= 0; i--) {
         pDelete(&m_syzLeads_test->m[i]->next);
         m_syzLeads_test->m[i]->next = NULL;
     }
-    m_checker.redefine(m_syzLeads_test);
+    redefine(&m_checker, m_syzLeads_test);
 #if CACHE
     for (TCache_test::iterator it = m_cache_test.begin();
         it != m_cache_test.end(); it++) {
