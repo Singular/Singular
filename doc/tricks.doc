@@ -624,6 +624,7 @@ short=0; 2x1; // resolved to monomial 2*x^1 !!!!!!
 @code{Singular/libsingular.h} is the main include file,
 @code{-lSingular} the link parameter,
 @code{lib/pkgconfig/Singular.pc} provides all parameters in the pkconfig format.
+
 It contains all parts of @sc{Singular} with two exceptions:
 @enumerate
 @item

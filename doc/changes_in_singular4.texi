@@ -184,6 +184,8 @@ accessible to the user.
 In particular we have separated everything related to coeffcient rings into a separate library @code{libcoeffs}.
 Dependency tree between restructured packages is show at @uref{http://www.mathematik.uni-kl.de/~motsak/dox/singular.png}
 
+In order to use @code{libSingular} as a C++ library, see @ref{libSingular}.
+
 @end itemize
 @c @end table
 
