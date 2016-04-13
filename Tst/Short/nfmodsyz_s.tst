@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-=======
-//
->>>>>>> Stashed changes
 LIB "tst.lib";
 LIB "nfmodsyz.lib";
 tst_init();
@@ -10,19 +6,11 @@ proc tst_test_nfmodsyz(def I)
 {
    // input type ideal or module
    def Jtst = nfmodSyz(I);
-<<<<<<< Updated upstream
-   //Jtst;
-}
-
-ring r = (0,a),(x,y,z,w),(c,dp);
-minpoly = a6+a2+5;
-=======
    Jtst;
 }
 
 ring r = (0,a),(x,y,z,w),(c,dp);
 minpoly = a6 +a2+5;
->>>>>>> Stashed changes
 module M = (a+3)*x^2*z+y^2*w+xw + zy, x^2+11*a*x*z+(a)*z^2+y*w, 
              ax2 + a4y2+ w3, x2yzw +aw2, x+y+w;
 tst_test_nfmodsyz(M);
