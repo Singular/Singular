@@ -12,19 +12,28 @@ AUTHORS:   D.K. Boku       boku@mathematik.uni-kl.de
 OVERVIEW:
   A library for computing the Groebner basis of an ideal in the polynomial
   ring over an algebraic number field Q(t) using the modular methods, where t is
-  algebraic over the field of rational numbers Q. For the case Q(t) = Q, the procedure
-  is inspired by Arnold [1]. This idea is then extended
-  to the case t not in Q using factorization as follows:
+  algebraic over the field of rational numbers Q. For the case Q(t) = Q, the
+  procedure is inspired by Arnold [1]. This idea is then extended to the case
+  t not in Q using factorization as follows:
   Let f be the minimal polynomial of t.
-  For I, I' ideals in Q(t)[X], Q[X,t]/<f> respectively, we map I to I' via the map sending
-  t to t + <f>.
-  We first choose a prime p such that f has at least two factors in characteristic p and
-  add each factor f_i to I' to obtain the ideal J'_i = I' + <f_i>.
-  We then compute a standard basis G'_i of J'_i for each i and combine the G'_i to G_p
-  (a standard basis of I'_p) using chinese remaindering for polynomials. The procedure is
-  repeated for many primes p, where we compute the G_p in parallel until the
-  number of primes is sufficiently large to recover the correct standard basis G' of I'.
-  Finally, by mapping G' back to Q(t)[X], a standard basis G of I is obtained.
+  For I, I' ideals in Q(t)[X], Q[X,t]/<f> respectively, we map I to I' via the
+  map sending  t to t + <f>. We first choose a prime p such that f has at least
+  two factors in characteristic p and add each factor f_i to I' to obtain the
+  ideal J'_i = I' + <f_i>. We then compute a standard basis G'_i of J'_i for each
+  i and combine the G'_i to G_p (a standard basis of I'_p) using chinese remaindering
+  for polynomials. The procedure is repeated for many primes p, where we compute the
+  G_p in parallel until the number of primes is sufficiently large to recover the
+  correct standard basis G' of I'. Finally, by mapping G' back to Q(t)[X], a standard
+  basis G of I is obtained.
+@*The procedure also works if the input is a module. For this, we consider the
+  rings A = Q(t)[X] and A' = (Q[t]/<f>)[X]. For submodules I, I' in A^m, A'^m,
+  respectively, we map I to I' via the map sending t to t + <f>. As above, we first
+  choose a prime p such that f has at least two factors in characteristic p. For each
+  factor f_{i,p} of f_p := (f mod p), we set I'_{i,p} := (I'_p mod f_{i,p}). We then
+  compute a standard basis G'_i of I'_{i,p} over F_p[t]/<f_{i,p}> for each i and
+  combine the G'_i to G_p (a standard basis of I'_p) using chinese remaindering for
+  polynomials. The procedure is repeated for many primes p as described above and we
+  finally obtain a standard basis of I.
 
 REFERENCES:
   [1] E. A. Arnold: Modular algorithms for computing Groebner bases.
@@ -32,29 +41,35 @@ REFERENCES:
 
 PROCEDURES:
   chinrempoly(l,m);       chinese remaindering for polynomials
-  nfmodStd(I);          standard basis of I over algebraic number field using modular methods
+  nfmodStd(I);          standard basis of I over algebraic number field using modular
+                        methods
 ";
 
 LIB "modstd.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc testPrime(int p, ideal I)
+static proc testPrime(int p, list L)
 {
     /*
      * test whether a prime p divides the denominator(s)
      * and leading coefficients of generating set of ideal
      */
-    int i,j;
-    poly f;
+    int i,j,k, tmp;
+    def f;
+    def I = L[1]; // list L = def I
     number num;
     bigint d1,d2,d3;
-    for(i = 1; i <= size(I); i++)
+    if(typeof(I)=="ideal")
+    {
+        tmp=1;
+    }
+    for(i = 1; i <= ncols(I); i++)
     {
         f = cleardenom(I[i]);
         if(f == 0)
         {
-            return(0);
+             return(0);
         }
         num = leadcoef(I[i])/leadcoef(f);
         d1 = bigint(numerator(num));
@@ -67,14 +82,32 @@ static proc testPrime(int p, ideal I)
         {
             return(0);
         }
-        for(j = size(f); j > 0; j--)
+        if(tmp)
         {
-            d3 = bigint(leadcoef(f[j]));
-            if( (d3 mod p) == 0)
+            for(j = size(f); j > 0; j--)
             {
-                return(0);
+                d3 = bigint(leadcoef(f[j]));
+                if( (d3 mod p) == 0)
+                {
+                    return(0);
+                }
             }
         }
+        else
+        {
+            for(j = nrows(f); j > 0; j--)
+            {
+                for(k=1;k<=size(f[j]);k++)
+                {
+                    d3 = bigint(leadcoef(f[j][k]));
+                    if((d3 mod p) == 0)
+                    {
+                        return(0);
+                    }
+                }
+            }
+        }
+
     }
     return(1);
 }
@@ -102,7 +135,7 @@ static proc minpolyTask(poly f,int p)
         {
             nr = testfact(ur);
             k=ncols(L[1]);
-            if(nr < k && k < (ur-nr))// set bound for k
+            if(nr < k && k < (ur-nr))// set a bound for k
             {
                 return(1);
             }
@@ -117,12 +150,20 @@ static proc minpolyTask(poly f,int p)
 static proc PrimeTestTask(int p, list L)
 {
     /* L=list(I), I=J,f; J ideal , f minpoly */
-    int sz,nr,dg;
-    ideal J=L[1];
+    int sz,nr;
+    def J=L[1];
     sz=ncols(J);
-    poly f=J[sz];
-    dg=deg(f);
-    if(!testPrime(p,J) or !minpolyTask(f,p))
+    def f=J[sz];
+    poly g;
+    if(typeof(f)=="vector")
+    {
+        g = f[1];
+    }
+    else
+    {
+        g = f;
+    }
+    if(!testPrime(p,list(J)) or !minpolyTask(g,p))
     {
         return(0);
     }
@@ -205,39 +246,60 @@ static proc degtest(intvec v)
 
 static proc chinRm(list m, list ll, list lk,list l1,int uz)
 {
-    poly ff,c;
-
-    for(int i=1;i<=uz;i++)
+    if(typeof(l1[1])=="ideal" or typeof(l1[1])=="poly")
     {
-        c = division(l1[i]*ll[i],m[i])[2][1];
-        ff = ff + c*lk[i];
+        poly ff,c;
+        for(int i=1;i<=uz;i++)
+        {
+            c = division(l1[i]*ll[i],m[i])[2][1];
+            ff = ff + c*lk[i];
+        }
+        return(ff);
     }
-    return(ff);
+    else
+    {
+        vector ff,c;
+        for(int i=1;i<=uz;i++)
+        {
+            c = vector(m[i]);
+            attrib(c,"isSB",1);
+            ff = ff + (reduce(l1[i]*ll[i],c))*lk[i];
+        }
+        return(ff);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 proc chinrempoly(list l,list m)
 "USAGE:  chinrempoly(l, m); l list, m list
-RETURN:  a polynomial (resp. ideal) which is congruent to l[i] modulo m[i] for all i
+RETURN:  a polynomial (resp. ideal/module) which is congruent to l[i] modulo m[i]
+         for all i
 NOTE: The procedure applies chinese remaindering to the first argument w.r.t. the
-      moduli given in the second. The elements in the first list must be of same type
-      which can be polynomial or ideal. The moduli must be of type polynomial. Elements
-      in the second list must be distinct and co-prime.
+      moduli given in the second. The elements in the first list must be of the same
+      type which can be polynomial, ideal, or module. The moduli must be of type
+      polynomial. The elements in the second list must be distinct and co-prime.
 SEE ALSO: chinrem
 EXAMPLE: example chinrempoly; shows an example
 "
 {
-    int i,j,sz,uz;
+    int i,j,sz,uz, tmp;
     uz = size(l);
-    sz = ncols(ideal(l[1]));
+    if(typeof(l[1])=="ideal" or typeof(l[1])=="poly")
+    {
+        sz = ncols(ideal(l[1]));
+        tmp = 1;
+    }
+    else
+    {
+        sz = ncols(module(l[1]));
+    }
     poly f=1;
     for(i=1;i<=uz;i++)
     {
         f=f*m[i];
     }
 
-    ideal I,J;
     list l1,ll,lk,l2;
     poly c,ff;
     for(j=1;j<=uz;j++)
@@ -246,16 +308,34 @@ EXAMPLE: example chinrempoly; shows an example
         ll[j]=extgcd(lk[j],m[j])[2];
     }
 
-    for(i=1;i<=sz;i++)
+    if(tmp)
     {
-        for(j=1;j<=uz;j++)
+        ideal I,J;
+        for(i=1;i<=sz;i++)
         {
-            I = l[j];
-            l1[j] = I[i];
+            for(j=1;j<=uz;j++)
+            {
+                I = l[j];
+                l1[j] = I[i];
+            }
+            J[i] = chinRm(m,ll,lk,l1,uz);
         }
-        J[i] = chinRm(m,ll,lk,l1,uz);
+        return(J);
     }
-    return(J);
+    else
+    {
+        module I,J;
+        for(i=1;i<=sz;i++)
+        {
+            for(j=1;j<=uz;j++)
+            {
+                I = l[j];
+                l1[j] = I[i];
+            }
+            J[i] = chinRm(m,ll,lk,l1,uz);
+        }
+        return(J);
+    }
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -275,7 +355,7 @@ example
     int p=prime(536546513);
     ring r = p, (x,y,a), (dp(2),dp(1));
     poly minpolynomial = a^2+1;
-    ideal kf=factorize(minpolynomial,1);//return factors without multiplicity
+    ideal kf=factorize(minpolynomial,1); //return factors without multiplicity
     kf;
     ideal k=(a+1)*x2+y, 3x-ay+ a+2;
     option(redSB);
@@ -288,8 +368,10 @@ example
     ideal I=chinrempoly(l,m);
     I=simplify(I,2);
     I;
+    l = module(k1[2..ncols(k1)]), module(k2[2..ncols(k2)]);
+    module M = chinrempoly(l,m);
+    M;
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 
 static proc check_leadmonom_and_size(list L)
@@ -299,11 +381,11 @@ static proc check_leadmonom_and_size(list L)
      * check the corresponding leading monomials
      * size(L)>=2
      */
-    ideal J=L[1];
+    def J=L[1];
     int i=size(L);
     int sc=ncols(J);
     int j,k;
-    poly g=leadmonom(J[1]);
+    def g=leadmonom(J[1]);
     for(j=1;j<=i;j++)
     {
         if(ncols(L[j])!=sc)
@@ -326,56 +408,251 @@ static proc check_leadmonom_and_size(list L)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc LiftPolyCRT(ideal I)
+static proc LiftPolyCRT(def I)
 {
     /*
      * compute std for each factor and combine this result
      * to modulo minpoly via CRT for poly over char p>0
      */
+    def sl;
     int u,in,j;
-    list LL,Lk;
-    ideal J,K,II;
-    poly f;
-    u=ncols(I);
-    J=I[1..u-1];
-    f=I[u];
-    K=factorize(f,1);
-    in=ncols(K);
-    for(j=1;j<=in;j++)
+    list LL,Lk,T2;
+    if(typeof(I)=="ideal")
     {
-        LL[j]=K[j];
-        ideal I(j)=J,K[j];
-        I(j)=std(I(j));
-        if(size(I(j))==1)
+
+        ideal J,K,II;
+        poly f;
+        u=ncols(I);
+        J=I[1..u-1];
+        f=I[u];
+        K=factorize(f,1);
+        in=ncols(K);
+        for(j=1;j<=in;j++)
         {
-            Lk[j]=I(j);
+            LL[j]=K[j];
+            ideal I(j)=J,K[j];
+            I(j)=std(I(j));
+            if(size(I(j))==1)
+            {
+                Lk[j]=I(j);
+            }
+            else
+            {
+                I(j)[1]=0;
+                I(j)=simplify(I(j), 2);
+                Lk[j]=I(j);
+            }
+        }
+        if(check_leadmonom_and_size(Lk))
+        {
+            // apply CRT for polynomials
+            II =chinrempoly(Lk,LL),f;
         }
         else
         {
-            I(j)[1]=0;
-            I(j)=simplify(I(j), 2);
-            Lk[j]=I(j);
+            II=0;
         }
-    }
-    if(check_leadmonom_and_size(Lk))
-    {
-        // apply CRT for polynomials
-        II =chinrempoly(Lk,LL),f;
+        return(II);
     }
     else
     {
-        II=0;
+        module J,II;
+        vector f;
+        u=ncols(I);
+        J=I[1..u-1];
+        f=I[u];
+        poly ff = f[1];
+        ideal K=factorize(ff,1);
+        in=ncols(K);
+        def Ls = basering;
+        list l = ringlist(Ls);
+        if(l[3][1][1]=="c")
+        {
+             l[1] = list(l[1]) + list(list(l[2][size(l[2])])) +
+             list(list(l[3][size(l[3])]))+list(ideal(0));
+             l[2] = delete(l[2],size(l[2]));
+             l[3] = delete(l[3],size(l[3]));
+        }
+        else
+        {
+            l[1] = list(l[1]) + list(list(l[2][size(l[2])])) +
+            list(list(l[3][size(l[3])-1]))+list(ideal(0));
+            l[2] = delete(l[2],size(l[2]));
+            l[3] = delete(l[3],size(l[3])-1);
+        }
+
+        def S1 = ring(l);
+        setring S1;
+        number Num= number(imap(Ls,ff));
+        list l = ringlist(S1);
+        l[1][4][1] = Num;
+        S1 = ring(l);
+        setring S1;
+        ideal K = imap(Ls,K);
+        def S2;
+        module II;
+        number Num;
+        /* ++++++ if minpoly is irreducible then K will be the zero ideal +++ */
+        if(size(K)==0)
+        {
+            module M = std(imap(Ls,J));
+            if(size(M)==1 && M[1]==[1])
+            {
+                setring Ls;
+                return(module([1]));
+            }
+            II = normalize(M);
+        }
+        else
+        {
+            for(j=1;j<=in;j++)
+            {
+                LL[j]=K[j];
+                Num = number(K[j]);
+                T2 = ringlist(S1);
+                T2[1][4][1] = Num;
+                S2 = ring(T2);
+                setring S2;
+                module M = std(imap(Ls,J));
+                if(size(M)== 1 && M[1]==[1])
+                {
+                    setring Ls;
+                    return(module([1]));
+                }
+                setring S1;
+                Lk[j]= imap(S2,M);
+            }
+
+            if(check_leadmonom_and_size(Lk))
+            {
+                // apply CRT for polynomials
+                setring Ls;
+                II =chinrempoly(imap(S1,Lk),imap(S1,LL));
+                setring S1;
+                II = normalize(imap(Ls,II));
+            }
+            else
+            {
+                setring S1;
+                II=[0];
+            }
+        }
+        setring Ls;
+        return(imap(S1,II));
     }
-    return(II);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc PtestStd(string command, list args, ideal result, int p)
+/* test if 'result' is a GB of the input ideal */
+static proc final_Test_minpolyzero(string command, alias list args, module result)
+{
+    int i;
+    list arg = args;
+    attrib(result, "isSB", 1);
+    for (i = ncols(args[1]); i > 0; i--)
+    {
+         if (reduce(args[1][i], result, 1) != 0)
+         {
+              return(0);
+         }
+    }
+    /* test if result is a GB */
+    module G = std(result);
+    if (size(reduce(G, result,1))!=0) //Modstd::reduce_parallel(G, result)
+    {
+         return(0);
+    }
+    return(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+/* test if 'result' is a GB of the input ideal */
+static proc final_Test(string command, alias list args, def result)
+{
+    int i;
+    list arg = args;
+    // modified for module case
+    if(typeof(args[1])=="ideal")
+    {
+        /* test if args[1] is in result */
+        attrib(result, "isSB", 1);
+        for (i = ncols(args[1]); i > 0; i--)
+        {
+            if (reduce(args[1][i], result, 1) != 0)
+            {
+                return(0);
+            }
+        }
+
+        /* test if result is a GB */
+        ideal G = std(result);
+        if (size(reduce(G, result,1))!=0) //Modstd::reduce_parallel(G, result)
+        {
+            return(0);
+        }
+        return(1);
+    }
+    else
+    {
+        /* test if args[1] is in result */
+        def Ls = basering;
+        list l = ringlist(Ls);
+        if(l[3][1][1]=="c")
+        {
+             l[1] = list(l[1]) + list(list(l[2][size(l[2])])) +
+             list(list(l[3][size(l[3])]))+list(ideal(0));
+             l[2] = delete(l[2],size(l[2]));
+             l[3] = delete(l[3],size(l[3]));
+        }
+        else
+        {
+            l[1] = list(l[1]) + list(list(l[2][size(l[2])])) +
+            list(list(l[3][size(l[3])-1]))+list(ideal(0));
+            l[2] = delete(l[2],size(l[2]));
+            l[3] = delete(l[3],size(l[3])-1);
+        }
+        def sL = ring(l);
+        kill l;
+        setring sL;
+        list arg = imap(Ls,arg);
+        module arg_s =arg[1];
+        list l = ringlist(sL);
+        l[1][4][1] = arg_s[ncols(arg_s)][1];
+        arg_s = arg_s[1..ncols(arg_s)-1];
+        def cL = ring(l);
+        setring cL;
+        module ar_gs = imap(sL,arg_s);
+        def Result = imap(Ls,result);
+        attrib(Result, "isSB", 1);
+        for (i = ncols(ar_gs); i > 0; i--)
+        {
+            if (reduce(ar_gs[i], Result, 1) != 0)
+            {
+                setring Ls;
+                return(0);
+            }
+        }
+        // test if result is a GB
+        module G = std(Result);
+        if (size(reduce(G,Result,1))!=0) //Modstd::reduce_parallel(G, Result)
+        {
+            setring Ls;
+            return(0);
+        }
+        setring Ls;
+        return(1);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc PtestStd_minpolyzero(string command, list args, module result, int p)
 {
     /*
      * let G be std of I which is not yet known whether it is the correct
-     *  standard basis or not. So this procedure does the first test
+     *  standard basis. So this procedure does the first test
      */
     def br = basering;
     list lbr = ringlist(br);
@@ -389,10 +666,10 @@ static proc PtestStd(string command, list args, ideal result, int p)
     }
     def rp = ring(lbr);
     setring(rp);
-    ideal Ip = fetch(br, args)[1];
-    ideal Gp = fetch(br, result);
-    attrib(Gp, "isSB", 1);
+    module Ip = imap(br, args)[1];
     int i;
+    module Gp = imap(br, result);
+    attrib(Gp, "isSB", 1);
     for (i = ncols(Ip); i > 0; i--)
     {
         if (reduce(Ip[i], Gp, 1) != 0)
@@ -401,7 +678,7 @@ static proc PtestStd(string command, list args, ideal result, int p)
             return(0);
         }
     }
-    Ip = LiftPolyCRT(Ip);
+    Ip = std(Ip);
     attrib(Ip,"isSB",1);
     for (i = ncols(Gp); i > 0; i--)
     {
@@ -417,7 +694,155 @@ static proc PtestStd(string command, list args, ideal result, int p)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc cleardenomIdeal(ideal I)
+static proc PtestStd(string command, list args, def result, int p)
+{
+    /*
+     * let G be std of I which is not yet known whether it is the correct
+     *  standard basis. So this procedure does the first test
+     */
+    def br = basering;
+
+    list lbr = ringlist(br);
+    if (typeof(lbr[1]) == "int")
+    {
+        lbr[1] = p;
+    }
+    else
+    {
+        lbr[1][1] = p;
+    }
+    def rp = ring(lbr);
+    setring(rp);
+    def Ip = imap(br, args)[1];
+
+    int u,in,j,i;
+    list LL,Lk,T2;
+    if(typeof(Ip)!="ideal")
+    {
+        module J,II;
+        vector f;
+        u=ncols(Ip);
+        J=Ip[1..u-1];
+        f=Ip[u];
+        poly ff = f[1];
+        ideal K=factorize(ff,1);
+        in=ncols(K);
+        def Ls = basering;
+        list l = ringlist(Ls);
+        if(l[3][1][1]=="c")
+        {
+            l[1] = list(l[1]) + list(list(l[2][size(l[2])])) +
+            list(list(l[3][size(l[3])]))+list(ideal(0));
+            l[2] = delete(l[2],size(l[2]));
+            l[3] = delete(l[3],size(l[3]));
+        }
+        else
+        {
+            l[1] = list(l[1]) + list(list(l[2][size(l[2])])) +
+            list(list(l[3][size(l[3])-1]))+list(ideal(0));
+            l[2] = delete(l[2],size(l[2]));
+            l[3] = delete(l[3],size(l[3])-1);
+        }
+        def S1 = ring(l);
+        setring S1;
+        number Num= number(imap(Ls,ff));
+        list l = ringlist(S1);
+        l[1][4][1] = Num;
+        S1 = ring(l);
+        setring S1;
+        ideal K = imap(Ls,K);
+        module Jp = imap(Ls,J);
+        def S2;
+        module Ip;
+        number Num;
+        /* ++++++ if the minpoly is irreducible then K = ideal(0) +++ */
+        if(size(K)==0)
+        {
+            module M = std(Jp);
+            Ip = normalize(M);
+        }
+        else
+        {
+            for(j=1;j<=ncols(K);j++)
+            {
+                LL[j]=K[j];
+                Num = number(K[j]);
+                T2 = ringlist(S1);
+                T2[1][4][1] = Num;
+                S2 = ring(T2);
+                setring S2;
+                module M = std(imap(Ls,J));
+                setring S1;
+                Lk[j]= imap(S2,M);
+            }
+            if(check_leadmonom_and_size(Lk))
+            {
+                // apply CRT for polynomials
+                setring Ls;
+                II =chinrempoly(imap(S1,Lk),imap(S1,LL));
+                setring S1;
+                Ip = normalize(imap(Ls,II));
+            }
+            else
+            {
+                setring S1;
+                Ip=[0];
+            }
+        }
+        setring S1;
+        module Gp = imap(br, result);
+        attrib(Gp, "isSB", 1);
+        for (i = ncols(Jp); i > 0; i--)
+        {
+            if (reduce(Jp[i], Gp, 1) != 0)
+            {
+                setring(br);
+                return(0);
+            }
+        }
+
+        attrib(Ip,"isSB",1);
+        for (i = ncols(Gp); i > 0; i--)
+        {
+            if (reduce(Gp[i], Ip, 1) != 0)
+            {
+                setring(br);
+                return(0);
+            }
+        }
+        setring(br);
+        return(1);
+    }
+    else
+    {
+        ideal Gp = imap(br, result);
+        attrib(Gp, "isSB", 1);
+        for (i = ncols(Ip); i > 0; i--)
+        {
+            if (reduce(Ip[i], Gp, 1) != 0)
+            {
+                setring(br);
+                return(0);
+            }
+        }
+        Ip = LiftPolyCRT(Ip);
+        attrib(Ip,"isSB",1);
+        for (i = ncols(Gp); i > 0; i--)
+        {
+            if (reduce(Gp[i], Ip, 1) != 0)
+            {
+                setring(br);
+                return(0);
+            }
+        }
+        setring(br);
+        return(1);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc cleardenomIdeal(def I)
 {
     int t=ncols(I);
     if(size(I)==0)
@@ -436,14 +861,22 @@ static proc cleardenomIdeal(ideal I)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc modStdparallelized(ideal I)
+static proc modStdparallelized(def I, list #)
 {
     // apply modular.lib
     /* save options */
     intvec opt = option(get);
     option(redSB);
-    I = modular("Nfmodstd::LiftPolyCRT", list(I), PrimeTestTask, Modstd::deleteUnluckyPrimes_std,
-              PtestStd, Modstd::finalTest_std,536870909);
+    if(size(#)>0)
+    {
+        I = modular("std", list(I), testPrime, Modstd::deleteUnluckyPrimes_std,
+                PtestStd_minpolyzero, final_Test_minpolyzero,536870909);
+    }
+    else
+    {
+        I = modular("Nfmodstd::LiftPolyCRT", list(I), PrimeTestTask,
+                    Modstd::deleteUnluckyPrimes_std,PtestStd, final_Test,536870909);
+    }
     attrib(I, "isSB", 1);
     option(set,opt);
     return(I);
@@ -451,8 +884,8 @@ static proc modStdparallelized(ideal I)
 
 ////////////////////////////////////////////////////////////////////////////////
 /* main procedure */
-proc nfmodStd(ideal I, list #)
-"USAGE:  nfmodStd(I, #); I ideal, # optional parameters
+proc nfmodStd(def I, list #)
+"USAGE:  nfmodStd(I, #); I ideal or module, # optional parameters
 RETURN:  standard basis of I over algebraic number field
 NOTE: The procedure passes to @ref{modStd} if the ground field has no
       parameter. In this case, the optional parameters # (if given)
@@ -461,210 +894,103 @@ SEE ALSO: modStd
 EXAMPLE: example nfmodStd; shows an example
 "
 {
-    list L=#;
-    def Rbs=basering;
-    poly f;
-    ideal J;
-    int n=nvars(Rbs);
-    if(size(I)==0)
-    {
-        return(ideal(0));
-    }
-    if(npars(Rbs)==0)
-    {
-        J=modStd(I,L);//if algebraic number is in Q
-        if(size(#)>0)
-        {
-            return(cleardenomIdeal(J));
-        }
-        return(J);
-    }
-    list rl=ringlist(Rbs);
-    f=rl[1][4][1];
-    rl[2][n+1]=rl[1][2][1];
-    rl[1]=rl[1][1];
-    rl[3][size(rl[3])+1]=rl[3][size(rl[3])];
-    rl[3][size(rl[3])-1]=list("dp",1);
-    def S=ring(rl);
-    setring S;
-    poly f=imap(Rbs,f);
-    ideal I=imap(Rbs,I);
-    I = simplify(I,2);// eraze the zero generatos
-    ideal J;
-    if(f==0)
-    {
-        ERROR("minpoly must be non-zero");
-    }
-    I=I,f;
-    J=modStdparallelized(I);
-    setring Rbs;
-    J=imap(S,J);
-    J=simplify(J,2);
-    if(size(#)>0)
-    {
-        return(cleardenomIdeal(J));
-    }
-    return(J);
+     list L=#;
+     def Rbs=basering;
+     poly f;
+     int tmp=1;
+     if(typeof(I)!="ideal")
+     {
+         tmp =0;
+     }
+     int n=nvars(Rbs);
+     if(size(I)==0)
+     {
+         if(!tmp)
+         {
+             return(module([0]));
+         }
+         return(ideal(0));
+     }
+     if(npars(Rbs)==0)
+     {
+         //if algebraic number is in Q
+         if(typeof(I)=="module")
+         {
+             def J = modStdparallelized(I,1);
+             return(J);
+         }
+         else
+         {
+             def J=modStd(I,L);
+             return(J);
+         }
+     }
+     def S;
+     list rl=ringlist(Rbs);
+     f=rl[1][4][1];
+     if(tmp)
+     {
+         rl[2][n+1]=rl[1][2][1];
+         rl[1]=rl[1][1];
+         rl[3][size(rl[3])+1]=rl[3][size(rl[3])];
+         rl[3][size(rl[3])-1]=list("dp",1);
+     }
+     else
+     {
+         if(rl[3][1][1]!="c")
+         {
+             rl[2] = rl[2] + rl[1][2];
+             rl[3] = insert(rl[3], rl[1][3][1],1);
+             rl[1] = rl[1][1];
+         }
+         else
+         {
+             rl[2] = rl[2] + rl[1][2];
+             rl[3][size(rl[3])+1] = rl[1][3][1];
+             rl[1] = rl[1][1];
+         }
+     }
+     S = ring(rl);
+     setring S;
+     poly f=imap(Rbs,f);
+     def I=imap(Rbs,I);
+     I = simplify(I,2); // eraze the zero generatos
+     if(f==0)
+     {
+         ERROR("minpoly must be non-zero");
+     }
+     I=I,f;
+     def J_I=modStdparallelized(I);
+     setring Rbs;
+     def J=imap(S,J_I);
+     J=simplify(J,2);
+     return(J);
 }
 example
 { "EXAMPLE:"; echo = 2;
-    ring r1 =(0,a),(x,y),dp;
-    minpoly =a^2+1;
-    ideal k=(a/2+1)*x^2+2/3y, 3*x-a*y+ a/7+2;
-    ideal I=nfmodStd(k);
+    ring r1 = (0,a),(x,y),dp;
+    minpoly = a^2+1;
+    ideal k = (a/2+1)*x^2+2/3y, 3*x-a*y+ a/7+2;
+    ideal I = nfmodStd(k);
     I;
-    ring r2 =(0,a),(x,y,z),dp;
-    minpoly =a^3 +2;
-    ideal k=(a^2+a/2)*x^2+(a^2 -2/3*a)*yz, (3*a^2+1)*zx-(a+4/7)*y+ a+2/5;
-    ideal IJ=nfmodStd(k);
+    ring rm = (0,a),(x,y),(c,dp);
+    minpoly = a^3+2a+7;
+    module M = [(a/2+1)*x^2+2/3y, 3*x-a*y+ a/7+2], [ax, y];
+    M = nfmodStd(M);
+    M;
+    ring r2 = (0,a),(x,y,z),dp;
+    minpoly = a^3 +2;
+    ideal k = (a^2+a/2)*x^2+(a^2 -2/3*a)*yz, (3*a^2+1)*zx-(a+4/7)*y+ a+2/5;
+    ideal IJ = nfmodStd(k);
     IJ;
-    ring r3=0,(x,y),dp;// ring without parameter
+    ring r3 = 0, (x,y), dp; // ring without parameter
     ideal I = x2 + y, xy - 7y + 2x;
+    ideal J1 = nfmodStd(I);
+    J1;
+    module J2 = nfmodStd(module(I));
+    J2;
+    ring r4 = 0, (x,y), (c,dp);
+    module I = [x2, x-y], [xy,0], [0,-7y + 2x];
     I=nfmodStd(I);
     I;
 }
-
-//////////////////////////////////////////////////////////////////////////////
-
-/*
-Benchmark Problems from
-
-Boku, Decker, Fieker, Steenpass: Groebner Bases over Algebraic Number
-Fields.
-
-// 1
-ring R = (0,a), (x,y,z), dp;
-minpoly = (a^2+1);
-poly f1 = (a+8)*x^2*y^2+5*x*y^3+(-a+3)*x^3*z
-          +x^2*y*z;
-poly f2 = x^5+2*y^3*z^2+13*y^2*z^3+5*y*z^4;
-poly f3 = 8*x^3+(a+12)*y^3+x*z^2+3;
-poly f4 = (-a+7)*x^2*y^4+y^3*z^3+18*y^3*z^2;
-ideal I1 = f1,f2,f3,f4;
-
-// 2
-ring R = (0,a), (x,y,z), dp;
-minpoly = (a^5+a^2+2);
-poly f1 = 2*x*y^4*z^2+(a-1)*x^2*y^3*z
-          +(2*a)*x*y*z^2+7*y^3+(7*a+1);
-poly f2 = 2*x^2*y^4*z+(a)*x^2*y*z^2-x*y^2*z^2
-          +(2*a+3)*x^2*y*z-12*x+(12*a)*y;
-poly f3 = (2*a)*y^5*z+x^2*y^2*z-x*y^3*z
-          +(-a)*x*y^3+y^4+2*y^2*z;
-poly f4 = (3*a)*x*y^4*z^3+(a+1)*x^2*y^2*z
-          -x*y^3*z+4*y^3*z^2+(3*a)*x*y*z^3
-          +4*z^2-x+(a)*y;
-ideal I2 = f1,f2,f3,f4;
-
-// 3a
-ring R = (0,a), (v,w,x,y,z), dp;
-minpoly = (a^7-7*a+3);
-poly f1 = (a)*v+(a-1)*w+x+(a+2)*y+z;
-poly f2 = v*w+(a-1)*w*x+(a+2)*v*y+x*y+(a)*y*z;
-poly f3 = (a)*v*w*x+(a+5)*w*x*y+(a)*v*w*z
-          +(a+2)*v*y*z+(a)*x*y*z;
-poly f4 = (a-11)*v*w*x*y+(a+5)*v*w*x*z
-          +(a)*v*w*y*z+(a)*v*x*y*z
-          +(a)*w*x*y*z;
-poly f5 = (a+3)*v*w*x*y*z+(a+23);
-ideal I3a = f1,f2,f3,f4,f5;
-
-// 3b
-ring R = (0,a), (u,v,w,x,y,z), dp;
-minpoly = (a^7-7*a+3);
-poly f1 = (a)*u+(a+2)*v+w+x+y+z;
-poly f2 = u*v+v*w+w*x+x*y+(a+3)*u*z+y*z;
-poly f3 = u*v*w+v*w*x+(a+1)*w*x*y+u*v*z+u*y*z
-          +x*y*z;
-poly f4 = (a-1)*u*v*w*x+v*w*x*y+u*v*w*z
-          +u*v*y*z+u*x*y*z+w*x*y*z;
-poly f5 = u*v*w*x*y+(a+1)*u*v*w*x*z+u*v*w*y*z
-          +u*v*x*y*z+u*w*x*y*z+v*w*x*y*z;
-poly f6 = u*v*w*x*y*z+(-a+2);
-ideal I3b = f1,f2,f3,f4,f5,f6;
-
-// 4
-ring R = (0,a), (w,x,y,z), dp;
-minpoly = (a^6+a^5+a^4+a^3+a^2+a+1);
-poly f1 = (a+5)*w^3*x^2*y+(a-3)*w^2*x^3*y
-          +(a+7)*w*x^2*y^2;
-poly f2 = (a)*w^5+(a+3)*w*x^2*y^2
-          +(a^2+11)*x^2*y^2*z;
-poly f3 = (a+7)*w^3+12*x^3+4*w*x*y+(a)*z^3;
-poly f4 = 3*w^3+(a-4)*x^3+x*y^2;
-ideal I4 = f1,f2,f3,f4;
-
-// 5
-ring R = (0,a), (w,x,y,z), dp;
-minpoly = (a^12-5*a^11+24*a^10-115*a^9+551*a^8
-          -2640*a^7+12649*a^6-2640*a^5+551*a^4
-          -115*a^3+24*a^2-5*a+1);
-poly f1 = (2*a+3)*w*x^4*y^2+(a+1)*w^2*x^3*y*z
-          +2*w*x*y^2*z^3+(7*a-1)*x^3*z^4;
-poly f2 = 2*w^2*x^4*y+w^2*x*y^2*z^2
-          +(-a)*w*x^2*y^2*z^2
-          +(a+11)*w^2*x*y*z^3-12*w*z^6
-          +12*x*z^6;
-poly f3 = 2*x^5*y+w^2*x^2*y*z-w*x^3*y*z
-          -w*x^3*z^2+(a)*x^4*z^2+2*x^2*y*z^3;
-poly f4 = 3*w*x^4*y^3+w^2*x^2*y*z^3
-          -w*x^3*y*z^3+(a+4)*x^3*y^2*z^3
-          +3*w*x*y^3*z^3+(4*a)*y^2*z^6-w*z^7
-          +x*z^7;
-ideal I5 = f1,f2,f3,f4;
-
-// 6
-ring R = (0,a), (u,v,w,x,y,z), dp;
-minpoly = (a^2+5*a+1);
-poly f1 = u+v+w+x+y+z+(a);
-poly f2 = u*v+v*w+w*x+x*y+y*z+(a)*u+(a)*z;
-poly f3 = u*v*w+v*w*x+w*x*y+x*y*z+(a)*u*v
-          +(a)*u*z+(a)*y*z;
-poly f4 = u*v*w*x+v*w*x*y+w*x*y*z+(a)*u*v*w
-          +(a)*u*v*z+(a)*u*y*z+(a)*x*y*z;
-poly f5 = u*v*w*x*y+v*w*x*y*z+(a)*u*v*w*x
-          +(a)*u*v*w*z+(a)*u*v*y*z+(a)*u*x*y*z
-          +(a)*w*x*y*z;
-poly f6 = u*v*w*x*y*z+(a)*u*v*w*x*y
-          +(a)*u*v*w*x*z+(a)*u*v*w*y*z
-          +(a)*u*v*x*y*z+(a)*u*w*x*y*z
-          +(a)*v*w*x*y*z;
-poly f7 = (a)*u*v*w*x*y*z-1;
-ideal I6 = f1,f2,f3,f4,f5,f6,f7;
-
-// 7
-ring R = (0,a), (w,x,y,z), dp;
-minpoly = (a^8-16*a^7+19*a^6-a^5-5*a^4+13*a^3
-          -9*a^2+13*a+17);
-poly f1 = (-a^2-1)*x^2*y+2*w*x*z-2*w
-          +(a^2+1)*y;
-poly f2 = (a^3-a-3)*w^3*y+4*w*x^2*y+4*w^2*x*z
-          +2*x^3*z+(a)*w^2-10*x^2+4*w*y-10*x*z
-          +(2*a^2+a);
-poly f3 = (a^2+a+11)*x*y*z+w*z^2-w-2*y;
-poly f4 = -w*y^3+4*x*y^2*z+4*w*y*z^2+2*x*z^3
-          +(2*a^3+a^2)*w*y+4*y^2-10*x*z-10*z^2
-          +(3*a^2+5);
-ideal I7 = f1,f2,f3,f4;
-
-// 8
-ring R = (0,a), (t,u,v,w,x,y,z), dp;
-minpoly = (a^7+10*a^5+5*a^3+10*a+1);
-poly f1 = v*x+w*y-x*z-w-y;
-poly f2 = v*w-u*x+x*y-w*z+v+x+z;
-poly f3 = t*w-w^2+x^2-t;
-poly f4 = (-a)*v^2-u*y+y^2-v*z-z^2+u;
-poly f5 = t*v+v*w+(-a^2-a-5)*x*y-t*z+w*z+v+x+z
-          +(a+1);
-poly f6 = t*u+u*w+(-a-11)*v*x-t*y+w*y-x*z-t-u
-          +w+y;
-poly f7 = w^2*y^3-w*x*y^3+x^2*y^3+w^2*y^2*z
-          -w*x*y^2*z+x^2*y^2*z+w^2*y*z^2
-          -w*x*y*z^2+x^2*y*z^2+w^2*z^3-w*x*z^3
-          +x^2*z^3;
-poly f8 = t^2*u^3+t^2*u^2*v+t^2*u*v^2+t^2*v^3
-          -t*u^3*x-t*u^2*v*x-t*u*v^2*x-t*v^3*x
-          +u^3*x^2+u^2*v*x^2+u*v^2*x^2
-          +v^3*x^2;
-ideal I8 = f1,f2,f3,f4,f5,f6,f7,f8;
-*/
