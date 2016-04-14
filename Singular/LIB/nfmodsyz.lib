@@ -25,9 +25,10 @@ OVERVIEW:
   factor f_{i,p} of f_p:= (f mod p), we set I'_{i,p} := (I'_p mod f_{i,p}). We then
   compute the reduced Groebner bases G'_i of the syzygy modules of I'_{i,p} over
   F_p[t]/<f_{i,p}> and combine the G'_i to G_p (the syzygy module of I'_p) using chinese
-  remaindering for polynomials. The procedure is repeated for many primes p, where we compute
-  the G_p in parallel until the number of primes is sufficiently large to recover the correct
-  syzygy module G' of I' which is also a generating set for the syzygy module of I.
+  remaindering for polynomials. As described in [2], the procedure is repeated for many primes
+  p, where we compute the G_p in parallel until the number of primes is sufficiently large to
+  recover the correct generating set for the syzygy module G' of I' which is also a generating
+  set for the syzygy module of I.
 
 REFERENCES:
   [1] E. A. Arnold: Modular algorithms for computing Groebner bases.
@@ -779,7 +780,8 @@ proc syzMod(def I, list #)
      int i,j, s1,s2,s,k1,k2, i1,i2,i_I,j_I,i_3, tmp;
      if(size(#)>0)
      {
-         tmp = #[1];
+         tmp = #[1]; // in this case, the procedure returns the reduced Groebner basis of
+                     // I which may partitioned to 2x2 block matrix
      }
      module sy;
      module N = transpose(I),freemodule(ncols(I));
