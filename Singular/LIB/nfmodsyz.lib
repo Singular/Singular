@@ -10,31 +10,31 @@ AUTHORS:   D.K. Boku       boku@mathematik.uni-kl.de
 @*         C. Fieker       fieker@mathematik.uni-kl.de
 
 OVERVIEW:
-  A library for computing the syzygy module of a given submodule I over an
-  algebraic number field Q(t), where t is an algebraic number, using modular methods.
-  For the case Q(t)=Q, that is, t is an element of Q, we compute, following
-  [1], the syzygy module of I as follows: For I submodule of A^m with A = Q[X],
-  as described in [1], we first choose sufficiently large set of primes P and compute
-  the reduced Groebner basis of the syzygy module of I_p, for each p in P, in parallel.
-  We then use the Chinese remainder algorithm and rational reconstruction to obtain the syzygy
-  module of I over Q. For the case t is not in Q, we compute, following [2], the syzygy module
-  of I as follows:
-  Let f be the minimal polynomial of t. For I, I' submodules in A^m with A = Q(t)[X],
-  (Q[t]/<f>)[X] respectively, we map I to I' via the map sending t to t + <f>. We first
+  A library for computing the syzygy module of a given submodule I in a polynomial ring
+  over an algebraic number field Q(t), where t is an algebraic number, using modular methods.
+  For the case Q(t)=Q, that is, where t is an element of Q, we compute, following
+  [1], the syzygy module of I as follows: For a submodule I of A^m with A = Q[X], we first
+  choose a sufficiently large set of primes P and compute the reduced Groebner basis of the
+  syzygy module of I_p, for each p in P, in parallel. We then use the Chinese remainder
+  algorithm and rational reconstruction to obtain the syzygy module of I over Q.
+  For the case where t is not in Q, we compute, following [2], the syzygy module of I as
+  follows:
+  Let f be the minimal polynomial of t. For a submodule I in A^m with A = Q(t)[X], we map I
+  to a submodule I' in A^m with A = (Q[t]/<f>)[X] via the map sending t to t + <f>. We first
   choose a prime p such that f has at least two factors in characteristic p. For each
   factor f_{i,p} of f_p:= (f mod p), we set I'_{i,p} := (I'_p mod f_{i,p}). We then
   compute the reduced Groebner bases G'_i of the syzygy modules of I'_{i,p} over
   F_p[t]/<f_{i,p}> and combine the G'_i to G_p (the syzygy module of I'_p) using chinese
   remaindering for polynomials. As described in [2], the procedure is repeated for many primes
   p, where we compute the G_p in parallel until the number of primes is sufficiently large to
-  recover the correct generating set for the syzygy module G' of I' which is also a generating
-  set for the syzygy module of I.
+  recover the correct generating set for the syzygy module G' of I' which is, considered over
+  Q(t), also a generating set for the syzygy module of I.
 
 REFERENCES:
   [1] E. A. Arnold: Modular algorithms for computing Groebner bases.
       J. Symb. Comp. 35, 403-419 (2003).
   [2] D. Boku, W. Decker, C. Fieker, and A. Steenpass. Groebner bases over algebraic
-      number fields. In Proceedings of the 2015 International Workshop on Parallel
+      number fields. In: Proceedings of the 2015 International Workshop on Parallel
       Symb. Comp. PASCO'15, pages 16-24 (2015).
 
 PROCEDURES:
@@ -348,8 +348,8 @@ static proc LiftPolyCRT_syz(def I)
 static proc final_Test_syz(string command, alias list args, def result)
 {
     /*
-     * test if the set 'result' generates the syzygy module of args[1]
-     * in characteristic zero
+     * test if the set generating 'result' also generates the syzygy module
+     * of args[1] in characteristic zero
      */
     def Ls = basering;
     def Ip = args[1];
@@ -403,8 +403,8 @@ static proc final_Test_syz(string command, alias list args, def result)
 static proc final_test(string command, alias list args, def result)
 {
     /*
-     * test if the set 'result' generates the syzygy module of args[1]
-     * in characteristic zero
+     * test if the set  generating 'result' also generates the syzygy module
+     * of args[1] in characteristic zero
      */
     module M=args[1];
     if(size(result)==0)
@@ -426,8 +426,10 @@ static proc final_test(string command, alias list args, def result)
 static proc pTest_syzmod(string command, list args, def result, int p)
 {
      /*
-      * This procedure makes the first test in positive characteristic to verify whether the
-      * set 'result' generates the submodule args[1]. Note that this test works only over Z_p
+      * This procedure performs the first test in positive characteristic to
+      * verify whether the set generating 'result' also generates the syzygy
+      * module of the submodule args[1]. Note that this test works only
+      * over Z_p
       */
      def br = basering;
      if(size(result)==0)
@@ -473,9 +475,10 @@ static proc pTest_syzmod(string command, list args, def result, int p)
 static proc pTest_syz(string command, list args, def result, int p)
 {
      /*
-      * This procedure makes the first test in positive characteristic to verify whether the
-      * set 'result' generates the submodule args[1]. Note that this test works only over
-      * Z_p(t) where t is an algebraic number which is not Z_p.
+      * This procedure performs the first test in positive characteristic to
+      * verify whether the set generating 'result' also generates the syzygy
+      * module of args[1]. Note that this test works only over Z_p(t) where
+      * t is an algebraic number which is not in Z_p.
      */
 
      def br = basering;
@@ -617,7 +620,9 @@ static proc pTest_syz(string command, list args, def result, int p)
      /* save options */
      intvec opt = option(get);
      option(redSB);
-     option(returnSB); // forces the procedure to return std of syz(I)
+     option(returnSB);
+     /*------ if these options are set, the Singular command syz returns the
+      reduced Groebner basis of I ---------------------------------------*/
 
      // apply modular command from modular.lib
      if(size(#)>0)
@@ -707,123 +712,21 @@ example
     module M1 = [(a/2+1)*y, 3*x-a*y],
                 [y-x,y2],
                 [x2-xy, ax-y];
-    M1 = nfmodSyz(M1);
-    M1;
+    nfmodSyz(M1);
     ring r2 = (0,a),(x,y,z),(dp,c);
     minpoly = (a3+a+1);
     module M2 = [x2z+x+(-a)*y,z2+(a+2)*x],
                 [y2+(a)*z+(a),(a+3)*z3+(-a)*x2],
                 [-xz+(a2+3)*yz,xy+(a2)*z];
-    M2 = nfmodSyz(M2);
-    M2;
+    nfmodSyz(M2);
     ring r3=0,(x,y),dp; // ring without parameter
     module M3 = [x2 + y, xy], [-7y, 2x], [x2-y, 0];
-    M3=nfmodSyz(M3);
-    M3;
+    nfmodSyz(M3);
     ring r4=0,(x,y),(c,dp); // ring without parameter
     module M4 = [xy, x-y],
                 [x2 + y, 5y],
                 [- 7y, 2x],
                 [x2-y, 0];
-    M4 = nfmodSyz(M4);
-    M4;
-}
-
-/*
-////////////////////////////////////////////////////////////////////////////////
-
-//-------------nfmodSyz--old--version-----------------------------------
-
-static proc ret_indx(matrix M, int rp)
-{
-     int i,j,sc;
-     for(j=1;j<=ncols(M);j++)
-     {
-         sc=re_indx(M, rp, j,sc);
-         if(j>sc)
-         {
-             return(sc);
-             break;
-         }
-     }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-static proc re_indx(matrix M, int rp, int j, int sc)
-{
-     int i;
-     if(M[1,j]!=0)
-     {
-         return(sc);
-     }
-     else
-     {
-          for(i=2;i<=rp; i++)
-          {
-             if(M[i,j]!=0)
-             {
-                 return(sc);
-                 break;
-             }
-          }
-          return(j);
-     }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-proc syzMod(def I, list #)
-{
-     // compute the syzygy module of a given submodule
-
-     int i,j, s1,s2,s,k1,k2, i1,i2,i_I,j_I,i_3, tmp;
-     if(size(#)>0)
-     {
-         tmp = #[1]; // in this case, the procedure returns the reduced Groebner basis of
-                     // I which may partitioned to 2x2 block matrix
-     }
-     module sy;
-     module N = transpose(I),freemodule(ncols(I));
-     N= transpose(N);
-     matrix M = nfmodStd(N); // nfmodStd
-     i1 = ncols(M);
-     i2 = nrows(M);
-     i_I = ncols(I);
-     j_I = nrows(I);
-     i_3 = i2-i_I; // rows of zeros
-     j = ret_indx(M,j_I);
-     i = i_I; // i is nrows of syz module
-     if(j==0)
-     {
-         i = 0;
-     }
-
-     if(i==0)
-     {
-         if(tmp)
-         {
-             matrix T[i_I][i1] = M[(i_3+1)..i2,1..i1];
-             matrix G[i_3][i1] = M[1..i_3,1..i1];
-             list L = module([0]), module(G), T;
-             return(L);
-         }
-         return(module([0]));
-     }
-
-     if(!tmp)
-     {
-         matrix V[i][j] = M[(i_3+1)..i2,1..j];
-         sy = V;
-         return(sy);
-     }
-     else
-     {
-             matrix V[i][j] = M[(i_3+1)..i2,1..j];
-             matrix T[i_I][i1-j] = M[(i_3+1)..i2,(j+1)..i1];
-             matrix G[i_3][i1-j] = M[1..i_3,(j+1)..i1];
-             list L = module(V), module(G), T;
-             return(L);
-     }
+    nfmodSyz(M4);
 }
 
