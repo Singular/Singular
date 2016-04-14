@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-=======
-//
->>>>>>> Stashed changes
 LIB "tst.lib";
 LIB "nfmodsyz.lib";
 tst_init();
@@ -9,9 +5,7 @@ tst_init();
 proc tst_test_nfmodsyz(def I)
 {
    // input type ideal or module
-   //system("--ticks-per-sec",1000);
-   //int t = rtimer;
-   def Jtst = nfmodSyz(I); //rtimer-t;
+   def Jtst = nfmodSyz(I);
    Jtst;
 }
 

@@ -1,11 +1,4 @@
-<<<<<<< Updated upstream
-1 >> tst_memory_0 :: 1460570101:4031, 64 bit:4.0.3:x86_64-Linux:taschenbier:5775360
-1 >> tst_memory_1 :: 1460570101:4031, 64 bit:4.0.3:x86_64-Linux:taschenbier:17080320
-1 >> tst_memory_2 :: 1460570101:4031, 64 bit:4.0.3:x86_64-Linux:taschenbier:19177472
-1 >> tst_timer_1 :: 1460570101:4031, 64 bit:4.0.3:x86_64-Linux:taschenbier:16005
-=======
-1 >> tst_memory_0 :: 1460556282:4030, 64 bit:4.0.3:x86_64-Linux:taschenbier:5774512
-1 >> tst_memory_1 :: 1460556282:4030, 64 bit:4.0.3:x86_64-Linux:taschenbier:17080320
-1 >> tst_memory_2 :: 1460556282:4030, 64 bit:4.0.3:x86_64-Linux:taschenbier:19177472
-1 >> tst_timer_1 :: 1460556282:4030, 64 bit:4.0.3:x86_64-Linux:taschenbier:15835
->>>>>>> Stashed changes
+1 >> tst_memory_0 :: 1460624040:4031, 64 bit:4.0.3:x86_64-Linux:taschenbier:5775272
+1 >> tst_memory_1 :: 1460624040:4031, 64 bit:4.0.3:x86_64-Linux:taschenbier:17080320
+1 >> tst_memory_2 :: 1460624040:4031, 64 bit:4.0.3:x86_64-Linux:taschenbier:19177472
+1 >> tst_timer_1 :: 1460624040:4031, 64 bit:4.0.3:x86_64-Linux:taschenbier:15997
