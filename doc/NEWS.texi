@@ -47,11 +47,13 @@ New libraries:
 @item new library: GND.lib: General Neron Desingularization (@nref{GND_lib})
 @item new library: graal.lib: localization at prime ideals (@nref{graal_lib})
 @item new library: hess.lib: Riemann-Roch space of divisors (@nref{hess_lib})
+@item new library: nfmodsyz.lib: syzygy modules of submodules of free modules
+      over algebraic number fields(@nref{nfmodsyz_lib})
 @end itemize
 
 Changed libraries:
 @itemize
-@item renamed algemodstd_lib to @nref{nfmodstd_lib}
+@item renamed algemodstd_lib to @nref{nfmodstd_lib}, extended to @code{module}
 @item renamed derham_lib to @nref{deRham_lib}
 @item grobcov.lib (grobcovK): Groebner Cover for parametric ideals (@nref{grobcov_lib}) with new routine
    ConsLevels (@nref{ConsLevels}), removed AddCons  AddConsP.
