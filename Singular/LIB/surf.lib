@@ -13,7 +13,7 @@ NOTE:
   or from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}.
  The procedure surfer requires the program @code{surfer} to be installed.
  You can download @code{surfer} from
-  @uref{http://www.imaginary2008.de/surfer.imaginary2008.de}
+  @uref{http://imaginary.org/program/surfer}
  @*Under Windows, version 159 or newer of @code{surfer} is required.
  Under Mac OS X please move SURFER.app from http://www.mathematik.uni-kl.de/~motsak/files/SURFER.dmg
  under your /Applications.
