@@ -19,6 +19,7 @@
 
 
 #include <coeffs/longrat.h> // snumber is needed...
+#include <coeffs/numbers.h> // ndCopyMap
 
 #include <polys/PolyEnumerator.h>
 
@@ -3954,7 +3955,8 @@ poly p_PermPoly (poly p, const int * perm, const ring oldRing, const ring dst,
   while (p != NULL)
   {
     // map the coefficient
-    if ( ((OldPar == 0) || (par_perm == NULL) || rField_is_GF(oldRing)) && (nMap != NULL) )
+    if ( ((OldPar == 0) || (par_perm == NULL) || rField_is_GF(oldRing) || (nMap==ndCopyMap))
+    && (nMap != NULL) )
     {
       qq = p_Init(dst);
       assume( nMap != NULL );
