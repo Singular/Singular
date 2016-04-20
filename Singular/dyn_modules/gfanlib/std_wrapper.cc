@@ -12,6 +12,7 @@ ideal gfanlib_kStd_wrapper(ideal I, ring r, tHomog h=testHomog)
   ideal stdI = kStd(I,currRing->qideal,h,&nullVector); // there is still a memory leak here!!!
   id_DelDiv(stdI,currRing);
   idSkipZeroes(stdI);
+  if (nullVector!=NULL) delete nullVector;
 
   if (origin != r)
     rChangeCurrRing(origin);
