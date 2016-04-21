@@ -22,6 +22,8 @@ extern int     feProt;
 extern BOOLEAN feWarn;
 extern BOOLEAN feOut;
 extern int  traceit ;
+extern void (*WarnS_callback)(const char *s);
+
 // show entering/leaving proc:
 #define TRACE_SHOW_PROC   1
 // show current line-no:

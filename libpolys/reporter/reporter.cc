@@ -207,24 +207,24 @@ void Werror(const char *fmt, ...)
   va_end(ap);
 }
 
+void (*WarnS_callback)(const char *s) = NULL;
+
 void WarnS(const char *s)
 {
   #define warn_str "// ** "
-#ifdef HAVE_TCL
-  if (tclmode)
-  {
-    PrintTCLS('W',warn_str);
-    PrintTCLS('W',s);
-    PrintTCLS('W',"\n");
-  }
-  else
-#endif
   if (feWarn) /* ignore warnings if option --no-warn was given */
   {
-    fwrite(warn_str,1,6,stdout);
-    fwrite(s,1,strlen(s),stdout);
-    fwrite("\n",1,1,stdout);
-    fflush(stdout);
+    if (WarnS_callback==NULL)
+    {
+      fwrite(warn_str,1,6,stdout);
+      fwrite(s,1,strlen(s),stdout);
+      fwrite("\n",1,1,stdout);
+      fflush(stdout);
+    }
+    else
+    {
+      WarnS_callback(s);
+    }
     if (feProt&SI_PROT_O)
     {
       fwrite(warn_str,1,6,feProtFile);
