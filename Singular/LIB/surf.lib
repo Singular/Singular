@@ -42,7 +42,7 @@ An entry is zero if and only if the corresponding variable does not occur in the
   int i;
   for(i=ncols(vv);i>0;i--)
   {
-    v[univariate(vv[i])]=1; 
+    v[univariate(vv[i])]=1;
   }
   return(v);
 }
@@ -138,34 +138,26 @@ EXAMPLE: example plot; shows an example
   string surf_call; i = 0;
   if (isWindows())
   {
-    string surferPath = getShellOutput("which surfer");
-    if (find(surferPath, "no surfer in") != 0)
+    string surferPath = getShellOutput("which surf");
+    if (find(surferPath, "no surf in") != 0)
     { /* did not find surfer: either not installed or
          not yet included in $PATH variable */
-      err_mes = "calling `surfer` failed" + newline
-      + " (Either the program Surfer is not installed," + newline
+      err_mes = "calling `surf` failed" + newline
+      + " (Either the program Surf is not installed," + newline
       + "  or it has not yet been included in $PATH.)";
       ERROR(err_mes);
     }
     else
     {
-      surf_call = "((xwin -multiwindow -clipboard -silent-dup-error";
-      surf_call = surf_call + " >/dev/null 2>&1 &) && sleep 5 && (sinngularsurf ";
+      surf_call = "singularsurf_win ";
       surf_call = surf_call + l + ">/dev/null 2>&1))";
       surf_call = surf_call + "&& command rm " + l;
-      "Press q to exit from `surf`.";
-        " (You may leave the XServer running for further" + newline
-      + "  invocations of `plot`.)";
       i = system("sh", surf_call);
       if (i != 0)
       {
         err_mes = "calling `surf` failed" + newline
                 + " (The shell returned the error code "
-                + string(i) + "." + newline
-                + "  Perhaps the XServer was not properly set up, so" + newline
-                + "  try your plot command again. If `plot` fails" + newline
-                + "  again, then make sure that the program Surfer" + newline
-                + "  is installed and included in your $PATH variable.)";
+                + string(i) + "." + newline;
         ERROR(err_mes);
       }
     }
