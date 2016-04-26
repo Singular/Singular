@@ -169,7 +169,7 @@ Singulard_LDADD = libSingular.la ${BUILTIN_FLAGS}
 Singulard_LDFLAGS = -shared ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
 scriptdir = $(libexecdir)/singular/MOD
-dist_script_SCRIPTS = singularsurf singularsurf_jupyter
+dist_script_SCRIPTS = singularsurf singularsurf_jupyter singularsurf_win
 
 #### ESingular
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO
