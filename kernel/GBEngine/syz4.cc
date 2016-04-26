@@ -126,6 +126,41 @@ static ideal idConcat(const ideal* M, const int size, const int rank)
     return result;
 }
 
+#define SORT_MI 1
+
+#if SORT_MI
+static int compare_Mi(const void* a, const void *b)
+{
+    const ring r = currRing;
+    poly p_a = *((poly *)a);
+    poly p_b = *((poly *)b);
+    int cmp;
+    int deg_a = p_Deg(p_a, r);
+    int deg_b = p_Deg(p_b, r);
+    cmp = (deg_a > deg_b) - (deg_a < deg_b);
+    if (cmp != 0) {
+         return cmp;
+    }
+    int comp_a = p_GetComp(p_a, r);
+    int comp_b = p_GetComp(p_b, r);
+    cmp = (comp_a > comp_b) - (comp_a < comp_b);
+    if (cmp != 0) {
+         return cmp;
+    }
+    int exp_a[r->N+1];
+    int exp_b[r->N+1];
+    p_GetExpV(p_a, exp_a, r);
+    p_GetExpV(p_b, exp_b, r);
+    for (int i = r->N; i > 0; i--) {
+        cmp = (exp_a[i] > exp_b[i]) - (exp_a[i] < exp_b[i]);
+        if (cmp != 0) {
+            return cmp;
+        }
+    }
+    return 0;
+}
+#endif   // SORT_MI
+
 static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
     const syzHeadFunction *syzHead)
 {
@@ -141,6 +176,9 @@ static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
         }
     }
     omFree(M);
+#if SORT_MI
+    qsort(frame->m, IDELEMS(frame), sizeof(poly), compare_Mi);
+#endif
     return frame;
 }
 
