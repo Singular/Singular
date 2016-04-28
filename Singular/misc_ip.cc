@@ -780,7 +780,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
   StringSetS("");
   StringAppend("Singular for %s version %s (%d, %d bit) %s #%s",
                S_UNAME, VERSION, // SINGULAR_VERSION,
-               SINGULAR_VERSION, SIZEOF_VOIDP*8, singular_date, GIT_VERSION);
+               SINGULAR_VERSION, SIZEOF_VOIDP*8, VERSION_DATE, GIT_VERSION);
   StringAppendS("\nwith\n\t");
 
 #if defined(mpir_version)
@@ -1154,8 +1154,6 @@ void m2_end(int i)
   }
 }
 }
-
-const char *singular_date=__DATE__ " " __TIME__;
 
 extern "C"
 {
