@@ -142,7 +142,7 @@ struct fe_option feOptSpec[] =
 
 
   {"MPport",           required_argument,   LONG_OPTION_RETURN,
-   "PORT",     "Use PORT number for conections",                       feOptString,    0,      0},
+   "PORT",     "Use PORT number for connections",                       feOptString,    0,      0},
 
   {"MPhost",           required_argument,   LONG_OPTION_RETURN,
    "HOST",     "Use HOST for connections",                             feOptString,    0,   0},
