@@ -17,9 +17,9 @@ dist-hook:
 	$(srcdir)/git-version-gen $(srcdir)/.tarball-git-version > $(distdir)/.tarball-git-version
 
 install-data-local:
-	-cat ${top_srcdir}/doc/doc.tbz2| (cd $(datadir)/singular;tar jxf -)
-	-mkdir $(datadir)/info
-	-mv  $(datadir)/singular/singular.hlp  $(datadir)/info/.
+	-cat ${top_srcdir}/doc/doc.tbz2| (cd $(DESTDIR)$(datadir)/singular; tar jxf -)
+	-mkdir $(DESTDIR)$(datadir)/info
+	-mv  $(DESTDIR)$(datadir)/singular/singular.hlp  $(DESTDIR)$(datadir)/info/.
 
 configheaderdir = ${includedir}/singular
 nodist_configheader_HEADERS = singularconfig.h
