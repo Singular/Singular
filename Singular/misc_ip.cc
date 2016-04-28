@@ -787,7 +787,7 @@ char * versionString(/*const bool bShowDetails = false*/ )
                S_UNAME, VERSION, // SINGULAR_VERSION,
                SINGULAR_VERSION, SIZEOF_VOIDP*8, 
 #ifdef MAKE_DISTRIBUTION
-	       VERSIO_DATE, GIT_VERSION);
+	       VERSION_DATE, GIT_VERSION);
 #else
 	       singular_date, GIT_VERSION);
 #endif
