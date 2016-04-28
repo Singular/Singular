@@ -1348,12 +1348,15 @@ void siInit(char *name)
   }
 #endif
 // setting routines for PLURAL QRINGS:
+// allowing to use libpolys without libSingular(kStd)
+#ifdef HAVE_PLURAL
   nc_NF=k_NF;
   gnc_gr_bba=k_gnc_gr_bba;
   gnc_gr_mora=k_gnc_gr_mora;
   sca_bba=k_sca_bba;
   sca_mora=k_sca_mora;
   sca_gr_bba=k_sca_gr_bba;
+#endif  
 // loading standard.lib -----------------------------------------------
   if (! feOptValue(FE_OPT_NO_STDLIB))
   {
