@@ -42,6 +42,7 @@
 #include "feOpt.h"
 #include "links/silink.h"
 #include "mod_lib.h"
+#include <Singular/distrib.h>
 
 static FORCE_INLINE void number2mpz(number n, mpz_t m){ number2mpz(n, coeffs_BIGINT, m); }
 static FORCE_INLINE number mpz2number(mpz_t m){ return mpz2number(m, coeffs_BIGINT); }
@@ -775,12 +776,21 @@ extern "C"
 }
 #endif
 
+#ifndef MAKE_DISTRIBUTION
+const char *singular_date=__DATE__ " " __TIME__;
+#endif
+
 char * versionString(/*const bool bShowDetails = false*/ )
 {
   StringSetS("");
   StringAppend("Singular for %s version %s (%d, %d bit) %s #%s",
                S_UNAME, VERSION, // SINGULAR_VERSION,
-               SINGULAR_VERSION, SIZEOF_VOIDP*8, singular_date, GIT_VERSION);
+               SINGULAR_VERSION, SIZEOF_VOIDP*8, 
+#ifdef MAKE_DISTRIBUTION
+	       VERSIO_DATE, GIT_VERSION);
+#else
+	       singular_date, GIT_VERSION);
+#endif
   StringAppendS("\nwith\n\t");
 
 #if defined(mpir_version)
@@ -1154,8 +1164,6 @@ void m2_end(int i)
   }
 }
 }
-
-const char *singular_date=__DATE__ " " __TIME__;
 
 extern "C"
 {

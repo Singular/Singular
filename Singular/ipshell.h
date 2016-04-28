@@ -37,7 +37,6 @@ extern ring   *iiLocalRing;
 #endif
 //extern cmdnames cmds[];
 extern const char *lastreserved;
-extern const char *singular_date; /* tesths.cc, set by final compile */
 extern int myynest;
 extern int printlevel;
 extern int si_echo;
