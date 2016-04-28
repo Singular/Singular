@@ -207,6 +207,7 @@ include ${srcdir}/singular-libs
 
 singularlibrarydir = ${datadir}/singular
 singularlibrary = $(SLIB0:%=LIB/%) $(SLIB1:%=LIB/%) $(PLIBS:%=LIB/%) $(SLIB2:%=LIB/%)
+singularlibrary_DATA = $(top_srcdir)/doc/singular.idx
 nobase_dist_singularlibrary_DATA = LIB/tst.lib LIB/help.cnf ${singularlibrary}
 EXTRA_DIST = grammar.y libparse.ll make_alllib.sh LIB/all.lib.tmpl \
              singular-libs LIB/help.cnf LIB/.singularrc LIB/COPYING \
