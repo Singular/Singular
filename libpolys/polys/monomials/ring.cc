@@ -1365,7 +1365,6 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //memset: res->pOrdIndex=0;
   //memset: res->OrdSize=0;
   //memset: res->VarL_LowIndex=0;
-  //memset: res->MinExpPerLong=0;
   //memset: res->NegWeightL_Size=0;
   //memset: res->NegWeightL_Offset=NULL;
   //memset: res->VarL_Offset=NULL;
@@ -1508,7 +1507,6 @@ ring rCopy0AndAddA(const ring r,  int64vec *wv64, BOOLEAN copy_qideal, BOOLEAN c
   //memset: res->pOrdIndex=0;
   //memset: res->OrdSize=0;
   //memset: res->VarL_LowIndex=0;
-  //memset: res->MinExpPerLong=0;
   //memset: res->NegWeightL_Size=0;
   //memset: res->NegWeightL_Offset=NULL;
   //memset: res->VarL_Offset=NULL;
@@ -3982,7 +3980,6 @@ static void rSetVarL(ring r)
   if (r->VarL_LowIndex >= 0)
     r->VarL_LowIndex = r->VarL_Offset[0];
 
-  r->MinExpPerLong = min;
   if (min_j != 0)
   {
     j = r->VarL_Offset[min_j];
@@ -4049,7 +4046,7 @@ void rDebugPrint(const ring r)
   Print("VarL_Size:%d\n",r->VarL_Size);
   Print("bitmask=0x%lx (expbound=%ld) \n",r->bitmask, r->bitmask);
   Print("divmask=%lx\n", r->divmask);
-  Print("BitsPerExp=%d ExpPerLong=%d MinExpPerLong=%d at L[%d]\n", r->BitsPerExp, r->ExpPerLong, r->MinExpPerLong, r->VarL_Offset[0]);
+  Print("BitsPerExp=%d ExpPerLong=%d at L[%d]\n", r->BitsPerExp, r->ExpPerLong, r->VarL_Offset[0]);
 
   Print("VarL_LowIndex: %d\n", r->VarL_LowIndex);
   PrintS("VarL_Offset:\n");
