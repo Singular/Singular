@@ -27,9 +27,6 @@
 #include "canonicalform.h"
 
 #ifdef HAVE_OMALLOC
-#ifndef OM_NDEBUG
-#define OM_NDEBUG
-#endif
 #  include <omalloc/omalloc.h>
 #endif
 
