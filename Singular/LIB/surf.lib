@@ -347,7 +347,7 @@ static proc isWindows()
 0 otherwise"
 {
   string s = system("uname");
-  if((find(s,"WIN")!=0)
+  if((find(s,"CYGWIN")!=0)
   ||(find(s,"Win")!=0))
   { return(1); }
   return (0);
