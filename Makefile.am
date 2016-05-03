@@ -21,6 +21,9 @@ install-data-local:
 	-mkdir $(DESTDIR)$(datadir)/info
 	-mv  $(DESTDIR)$(datadir)/singular/singular.hlp  $(DESTDIR)$(datadir)/info/.
 
+uninstall-local:
+	-(cd $(DESTDIR)$(datadir); rm -rf singular info/singular.hlp)
+
 configheaderdir = ${includedir}/singular
 nodist_configheader_HEADERS = singularconfig.h
 DISTCLEANFILES = $(nodist_configheader_HEADERS)
