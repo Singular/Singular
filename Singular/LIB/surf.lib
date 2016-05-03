@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-version="version surf.lib 4.0.0.0 Jun_2013 "; // $Id$
+version="version surf.lib 4.0.3.0 May_2016 "; // $Id$
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -150,7 +150,7 @@ EXAMPLE: example plot; shows an example
     else
     {
       surf_call = "singularsurf_win ";
-      surf_call = surf_call + l + ">/dev/null 2>&1))";
+      surf_call = surf_call + l + ">/dev/null 2>&1";
       surf_call = surf_call + "&& command rm " + l;
       i = system("sh", surf_call);
       if (i != 0)
@@ -347,19 +347,9 @@ static proc isWindows()
 0 otherwise"
 {
   string s = system("uname");
-  for (int i = 1; i <= size(s)-2; i = i + 1)
-  {
-    if (s[i] == "W")
-    {
-      if (s[i+1] == "i")
-      {
-        if (s[i+2] == "n")
-        {
-          return (1);
-        }
-      }
-    }
-  }
+  if((find(s,"WIN")!=0)
+  ||(find(s,"Win")!=0))
+  { return(1); }
   return (0);
 }
 
