@@ -312,12 +312,13 @@ considerably speed up computations.
 @cindex ring_cf
 @cindex isCI
 @cindex isCM
+@cindex rowShift
 @cindex withSB
 @cindex withHilb
 @cindex withRes
 @cindex withDim
 @cindex withMult
-(isSB, isHomog, rank, ring_cf are used by the kernel, the other are used by libraries)
+(isSB, isHomog, rank, ring_cf, rowShift are used by the kernel, the other are used by libraries)
 @table @code
 @item global
 1, if the ordering is global
@@ -424,6 +425,7 @@ See
 @node betti, char, bareiss, Functions
 @subsection betti
 @cindex betti
+@cindex rowShift
 @table @code
 @item @strong{Syntax:}
 @code{betti (} list_expression @code{)}
@@ -467,6 +469,7 @@ to confusing results for a non-homogeneous input.
 If the optional second argument is non-zero, the Betti numbers will be minimized.
 @c If it is 0 then the Betti numbers correspond exactly to the input -
 @c otherwise the command is identical to the one-argument form.
+@*@code{betti} sets the attribute @code{rowShift}.
 @item @strong{Example:}
 @smallexample
 @c example
