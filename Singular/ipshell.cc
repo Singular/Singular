@@ -936,7 +936,8 @@ BOOLEAN jjBETTI2(leftv res, leftv u, leftv v)
 
   intvec *weights=NULL;
   int add_row_shift=0;
-  intvec *ww=(intvec *)atGet(&(l->m[0]),"isHomog",INTVEC_CMD);
+  intvec *ww=NULL;
+  if (l->nr>=0) ww=(intvec *)atGet(&(l->m[0]),"isHomog",INTVEC_CMD);
   if (ww!=NULL)
   {
      weights=ivCopy(ww);
@@ -1314,7 +1315,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
         }
         if (BVERBOSE(V_REDEFINE))
         {
-          Warn("redefining %s",IDID(h));
+          Warn("redefining %s (%s)",IDID(h),my_yylinebuf);
         }
 #ifdef USE_IILOCALRING
         if (iiLocalRing[0]==IDRING(h) && (!keepring)) iiLocalRing[0]=NULL;
@@ -1445,7 +1446,7 @@ BOOLEAN iiExport (leftv v, int toLev, package pack)
         {
           if (BVERBOSE(V_REDEFINE))
           {
-            Warn("redefining %s",IDID(old));
+            Warn("redefining %s (%s)",IDID(old),my_yylinebuf);
           }
           v->name=omStrDup(v->name);
           killhdl2(old,&(pack->idroot),currRing);
