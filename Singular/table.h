@@ -1236,9 +1236,9 @@ const struct sConvertTypes dConvertTypes[] =
 //  link
    { STRING_CMD,      LINK_CMD,       D(iiS2Link) , NULL_VAL },
 // resolution -> list
-   { RESOLUTION_CMD,  LIST_CMD,       NULL_VAL /*iiR2L*/ , D(iiR2L_l) },
+   { RESOLUTION_CMD,  LIST_CMD,       NULL_VAL , D(iiR2L_l) },
 // list -> resolution
-   { LIST_CMD,        RESOLUTION_CMD, D(iiL2R) , NULL_VAL},
+   { LIST_CMD,        RESOLUTION_CMD, NULL_VAL ,  D(iiL2R) },
 // qring -> ring
    { QRING_CMD,       RING_CMD,       D(iiDummy), NULL_VAL},
 //  end of list

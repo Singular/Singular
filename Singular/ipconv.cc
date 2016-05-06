@@ -321,13 +321,6 @@ static void * iiS2Link(void *data)
   return (void *)l;
 }
 
-/*
-static void * iiR2L(void * data)
-{
-  syStrategy tmp=(syStrategy)data;
-  return  (void *)syConvRes(tmp,TRUE);
-}
-*/
 static void iiR2L_l(leftv out, leftv in)
 {
   int add_row_shift = 0;
@@ -339,9 +332,18 @@ static void iiR2L_l(leftv out, leftv in)
   out->data=(void *)syConvRes(tmp,TRUE,add_row_shift);
 }
 
-static void * iiL2R(void * data)
+static void iiL2R(leftv out, leftv in)
 {
-  return (void *)syConvList((lists)data,TRUE);
+  int add_row_shift = 0;
+  lists l=(lists)in->Data();
+  intvec *ww=NULL;
+  if (l->nr>=0) ww=(intvec *)atGet(&(l->m[0]),"isHomog",INTVEC_CMD);
+  out->data=(void *)syConvList(l);
+  if (ww!=NULL)
+  {
+    intvec *weights=ivCopy(ww);
+    atSet(out,"isHomog",weights,INTVEC_CMD);
+  }
 }
 
 //

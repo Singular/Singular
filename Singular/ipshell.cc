@@ -3168,7 +3168,7 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
 /*3
 * converts a list of modules into a resolution
 */
-syStrategy syConvList(lists li,BOOLEAN toDel)
+syStrategy syConvList(lists li)
 {
   int typ0;
   syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
@@ -3191,7 +3191,6 @@ syStrategy syConvList(lists li,BOOLEAN toDel)
     omFreeSize(result, sizeof(ssyStrategy));
     result = NULL;
   }
-  if (toDel) li->Clean();
   return result;
 }
 

@@ -105,7 +105,7 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel=FALSE,int add_row_shift=0);
 // converts a list of modules into a minimal resolution
 syStrategy syForceMin(lists li);
 // converts a list of modules into a resolution
-syStrategy syConvList(lists li,BOOLEAN toDel);
+syStrategy syConvList(lists li);
 
 BOOLEAN syBetti1(leftv res, leftv u);
 BOOLEAN syBetti2(leftv res, leftv u, leftv w);

@@ -4511,7 +4511,7 @@ static BOOLEAN jjKBASE(leftv res, leftv v)
 }
 static BOOLEAN jjL2R(leftv res, leftv v)
 {
-  res->data=(char *)syConvList((lists)v->Data(),FALSE);
+  res->data=(char *)syConvList((lists)v->Data());
   if (res->data != NULL)
     return FALSE;
   else
