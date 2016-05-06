@@ -600,16 +600,16 @@ char *floatToStr( const gmp_float & r, const unsigned int oprec )
 
   mpf_get_str(in,&exponent,10,oprec,*(r.mpfp()));
 
-  if ( (exponent > 0)
-  && (exponent < (int)oprec)
-  && (strlen(in)-(in[0]=='-'?1:0) == oprec) )
-  {
-    omFree( (void *) in );
-    insize= (exponent+oprec+2) * sizeof(char) + 10;
-    in= (char*)omAlloc( insize );
-    int newprec= exponent+oprec;
-    mpf_get_str(in,&exponent,10,newprec,*(r.mpfp()));
-  }
+  //if ( (exponent > 0)
+  //&& (exponent < (int)oprec)
+  //&& (strlen(in)-(in[0]=='-'?1:0) == oprec) )
+  //{
+  //  omFree( (void *) in );
+  //  insize= (exponent+oprec+2) * sizeof(char) + 10;
+  //  in= (char*)omAlloc( insize );
+  //  int newprec= exponent+oprec;
+  //  mpf_get_str(in,&exponent,10,newprec,*(r.mpfp()));
+  //}
   nout= nicifyFloatStr( in, exponent, oprec, &size, SIGN_EMPTY );
   omFree( (void *) in );
   out= (char*)omAlloc( (strlen(nout)+1) * sizeof(char) );
