@@ -948,8 +948,16 @@ BOOLEAN jjBETTI2(leftv res, leftv u, leftv v)
 
   r=liFindRes(l,&len,&typ0);
   if (r==NULL) return TRUE;
-  res->data=(char *)syBetti(r,len,&reg,weights,(int)(long)v->Data());
+  intvec* res_im=syBetti(r,len,&reg,weights,(int)(long)v->Data());
+  res->data=(void*)res_im;
   omFreeSize((ADDRESS)r,(len)*sizeof(ideal));
+  //Print("rowShift: %d ",add_row_shift);
+  for(int i=1;i<=res_im->rows();i++)
+  {
+    if (IMATELEM(*res_im,1,i)==0) { add_row_shift--; }
+    else break;
+  }
+  //Print(" %d\n",add_row_shift);
   atSet(res,omStrDup("rowShift"),(void*)(long)add_row_shift,INT_CMD);
   if (weights!=NULL) delete weights;
   return FALSE;
