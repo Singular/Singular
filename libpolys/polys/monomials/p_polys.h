@@ -1503,6 +1503,30 @@ static inline int p_LmCmp(poly p, poly q, const ring r)
 
 }
 
+// The coefficient will be compared in absolute value
+static inline int p_LtCmp(poly p, poly q, const ring r)
+{
+  int res = p_LmCmp(p,q,r);
+  if(res == 0)
+  {
+    number pc = n_Copy(p_GetCoeff(p,r),r->cf);
+    number qc = n_Copy(p_GetCoeff(q,r),r->cf);
+    if(!n_GreaterZero(pc,r->cf))
+      pc = n_InpNeg(pc,r->cf);
+    if(!n_GreaterZero(qc,r->cf))
+      qc = n_InpNeg(qc,r->cf);
+    if(n_Greater(pc,qc,r->cf))
+      res = 1;
+    if(n_Greater(qc,pc,r->cf))
+      res = -1;
+    if(n_Equal(pc,qc,r->cf))
+      res = 0;
+    n_Delete(&pc,r->cf);
+    n_Delete(&qc,r->cf);
+  }
+  return res;
+}
+
 /// returns TRUE if p1 is a skalar multiple of p2
 /// assume p1 != NULL and p2 != NULL
 BOOLEAN p_ComparePolys(poly p1,poly p2, const ring r);

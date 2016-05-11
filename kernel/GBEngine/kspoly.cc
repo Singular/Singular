@@ -22,6 +22,8 @@
 #include <kernel/polys.h>
 #endif
 
+#define ADIDEBUG 0
+
 #ifdef KDEBUG
 int red_count = 0;
 int create_count = 0;
@@ -179,6 +181,11 @@ int ksReducePolySig(LObject* PR,
                  number *coef,
                  kStrategy strat)
 {
+#if ADIDEBUG
+printf("\nksReducePolySig\n");
+pWrite(PR->p);pWrite(PR->sig);
+pWrite(PW->p);pWrite(PW->sig);
+#endif
 #ifdef KDEBUG
   red_count++;
 #ifdef TEST_OPT_DEBUG_RED
@@ -234,6 +241,13 @@ int ksReducePolySig(LObject* PR,
     printf("--------------\n");
 #endif
     p_ExpVectorAddSub(sigMult,PR->GetLmCurrRing(),PW->GetLmCurrRing(),currRing);
+    //I have also to set the leading coeficient for sigMult (in the case of rings)
+    #ifdef HAVE_RINGS
+    if(rField_is_Ring(currRing))
+    {
+      pSetCoeff(sigMult,nMult(nDiv(pGetCoeff(PR->p),pGetCoeff(PW->p)), pGetCoeff(sigMult)));
+    }
+    #endif
 //#if 1
 #ifdef DEBUGF5
     printf("------------------- IN KSREDUCEPOLYSIG: --------------------\n");
@@ -243,7 +257,13 @@ int ksReducePolySig(LObject* PR,
     pWrite(PR->sig);
     printf("--------------\n");
 #endif
-    int sigSafe = p_LmCmp(PR->sig,sigMult,currRing);
+    int sigSafe;
+    #ifdef HAVE_RINGS
+    if(rField_is_Ring(currRing))
+      sigSafe = p_LtCmp(PR->sig,sigMult,currRing);
+    else
+    #endif
+      sigSafe = p_LmCmp(PR->sig,sigMult,currRing);
     // now we can delete the copied polynomial data used for checking for
     // sig-safeness of the reduction step
 //#if 1
@@ -251,11 +271,38 @@ int ksReducePolySig(LObject* PR,
     printf("%d -- %d sig\n",sigSafe,PW->is_sigsafe);
 
 #endif
+    #ifdef HAVE_RINGS
+    if(rField_is_Ring(currRing))
+    {
+      // Set the sig
+      if(pLmCmp(PR->sig, sigMult) == 0)
+      {
+        //The sigs have the same lm, have to substract
+        PR->sig = pSub(PR->sig, pCopy(sigMult));
+        //It may happen that now the signature is 0 (drop)
+        if(PR->sig == NULL)
+        {
+          #if ADIDEBUG
+          printf("\nPossible sigdrop in ksreducepolysig (lost signature)\n");
+          #endif
+          strat->sigdrop=TRUE;
+        }
+      }
+      else
+      {
+        if(sigSafe == -1)
+        {
+          p_Delete(&PR->sig,currRing);
+          PR->sig = pNeg(pCopy(sigMult));
+        }
+      }
+    }
+    #endif
     //pDelete(&f1);
     pDelete(&sigMult);
     // go on with the computations only if the signature of p2 is greater than the
     // signature of fm*p1
-    if(sigSafe != 1)
+    if(sigSafe != 1 && !rField_is_Ring(currRing))
     {
       PR->is_redundant = TRUE;
       return 3;
@@ -360,7 +407,6 @@ int ksReducePolySig(LObject* PR,
     PR->SetShortExpVector();
   }
 #endif
-
 #if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
   if (TEST_OPT_DEBUG)
   {

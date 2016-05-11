@@ -2502,7 +2502,8 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
   strat->homog=h;
 #ifdef KDEBUG
   idTest(F);
-  idTest(Q);
+  if(Q != NULL)
+    idTest(Q);
 
 #if MYTEST
   if (TEST_OPT_DEBUG)
@@ -2525,11 +2526,6 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
   }
   else
 #endif
-#ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing))
-    r=bba(F,Q,NULL,hilb,strat);
-  else
-#endif
   {
     if (rHasLocalOrMixedOrdering(currRing))
     {
@@ -2543,7 +2539,27 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
       if (w!=NULL)
         r=sba(F,Q,*w,hilb,strat);
       else
+      { 
+        //It is set to True, just to know that it is the first run 
+        strat->sigdrop = FALSE;
+        strat->sbaEnterS = -1;
         r=sba(F,Q,NULL,hilb,strat);
+        #if ADIDEBUG
+        printf("\nSBA Run 1: %i elements (syzCrit = %i)\n",strat->sl+1,strat->nrsyzcrit);
+        //idPrint(r);
+        getchar();
+        #endif
+        int sbarun = 2;
+        while(strat->sigdrop)
+        {
+          r=sba(r,Q,NULL,hilb,strat);
+          #if ADIDEBUG
+          printf("SBA Run %i: %i elements (syzCrit = %i)\n",sbarun++,strat->sl+1,strat->nrsyzcrit);
+          //idPrint(r);
+          getchar();
+          #endif
+        }
+      }
     }
   }
 #ifdef KDEBUG
@@ -2557,7 +2573,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
   currRing->pLexOrder = b;
 //Print("%d reductions canceled \n",strat->cel);
   HCord=strat->HCord;
-  delete(strat);
+  //delete(strat);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
   return r;
 }

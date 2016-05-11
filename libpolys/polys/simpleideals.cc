@@ -475,12 +475,15 @@ static int p_Comp_RevLex(poly a, poly b,BOOLEAN nolex, const ring R)
 
   if (nolex)
   {
-    int r=p_LmCmp(a,b,R);
+    int r=p_LtCmp(a,b,R);
+    return r;
+    #if 0
     if (r!=0) return r;
     number h=n_Sub(pGetCoeff(a),pGetCoeff(b),R->cf);
     r = -1+n_IsZero(h,R->cf)+2*n_GreaterZero(h,R->cf); /* -1: <, 0:==, 1: > */
     n_Delete(&h, R->cf);
     return r;
+    #endif
   }
   int l=rVar(R);
   while ((l>0) && (p_GetExp(a,l,R)==p_GetExp(b,l,R))) l--;
