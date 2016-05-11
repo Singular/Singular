@@ -292,8 +292,10 @@ pWrite(PW->p);pWrite(PW->sig);
       {
         if(sigSafe == -1)
         {
-          p_Delete(&PR->sig,currRing);
-          PR->sig = pNeg(pCopy(sigMult));
+          // do not allow this reduction - it will increase it's signature
+          // and the partially standard basis is just till the old sig, not the new one
+          PR->is_redundant = TRUE;
+          return 3;
         }
       }
     }

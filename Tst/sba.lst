@@ -44,7 +44,17 @@ SBA/sba_int_43.tst
 SBA/sba_int_44.tst
 SBA/sba_int_45.tst
 ; SBA/sba_int_46.tst ; Big Example - not for maunzerle (std very fast, sba uses a lot of memory)
-; ; SBA/sba_int_47.tst
-; ; SBA/sba_int_48.tst
-; ; SBA/sba_int_49.tst
-; ; SBA/sba_int_50.tst
+SBA/sba_int_47.tst
+SBA/sba_int_48.tst
+SBA/sba_int_49.tst
+SBA/sba_int_50.tst
+SBA/sba_int_51.tst
+; SBA/sba_int_52.tst ; Big
+SBA/sba_int_53.tst
+SBA/sba_int_54.tst
+SBA/sba_int_55.tst
+SBA/sba_int_56.tst
+;SBA/sba_int_57.tst
+;SBA/sba_int_58.tst
+;SBA/sba_int_59.tst
+;SBA/sba_int_60.tst

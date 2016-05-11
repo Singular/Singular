@@ -6133,11 +6133,7 @@ BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
  */
 BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kStrategy strat, int start=0)
 {
-  
-  #ifdef HAVE_RINGS
-  if(rField_is_Ring(currRing))
-    return FALSE;
-  #endif
+  return FALSE;
   //printf("Faugere Rewritten Criterion\n");
 //#if 1
 #ifdef DEBUGF5
@@ -6154,7 +6150,7 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
 #endif
     if (p_LmShortDivisibleBy(strat->sig[k], strat->sevSig[k], sig, not_sevSig, currRing)
     #ifdef HAVE_RINGS
-    && rField_is_Ring(currRing) && n_DivBy(pGetCoeff(sig),pGetCoeff(strat->sig[k]),currRing)
+    && (!rField_is_Ring(currRing) || n_DivBy(pGetCoeff(sig),pGetCoeff(strat->sig[k]),currRing))
     #endif
     )
     {
@@ -6198,17 +6194,14 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
 //        completely.
 BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, poly /*lm*/, kStrategy strat, int start=0)
 {
-  #ifdef HAVE_RINGS
-  if(rField_is_Ring(currRing))
-    return FALSE;
-  #endif
+  return FALSE;
   poly p1 = pOne();
   poly p2 = pOne();
   for (int ii=strat->sl; ii>start; ii--)
   {
     if (p_LmShortDivisibleBy(strat->sig[ii], strat->sevSig[ii], strat->P.sig, ~strat->P.sevSig, currRing)
     #ifdef HAVE_RINGS
-    &&(rField_is_Ring(currRing)) && n_DivBy(pGetCoeff(strat->P.sig),pGetCoeff(strat->sig[ii]),currRing)
+    && (!(rField_is_Ring(currRing)) || n_DivBy(pGetCoeff(strat->P.sig),pGetCoeff(strat->sig[ii]),currRing))
     #endif
     )
     {
@@ -6221,6 +6214,10 @@ BOOLEAN arriRewCriterion(poly /*sig*/, unsigned long /*not_sevSig*/, poly /*lm*/
       if (!(pLmCmp(p1,p2) == 1))
       #endif
       {
+        #if ADIDEBUG
+        printf("\narriRewCrit deleted: sig, P.sig\n");
+        
+        #endif
         pDelete(&p1);
         pDelete(&p2);
         return TRUE;

@@ -2,7 +2,7 @@ LIB "tst.lib";
 tst_init();
 
 ring r = (integer),(x,y,z),dp;
-ideal i = 20yz2+23y2+13z2,25xy2;
+ideal i = 52y2z+32z3+4xy,xz;
 ideal stdi = std(i);
 ideal sbai = sba(i,1,0);
 std(reduce(stdi,sbai));
