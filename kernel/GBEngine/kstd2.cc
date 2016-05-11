@@ -741,6 +741,7 @@ int redSig (LObject* h,kStrategy strat)
             #endif
             strat->sigdrop = FALSE;
             p_Delete(&h->sig,currRing);h->sig = NULL;
+            return 0;
           }
           else
           {
@@ -2155,7 +2156,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     #endif
     printf("\n   list   L\n");
     int iii;
-    #if 1
+    #if 0
     for(iii = 0; iii<= strat->Ll; iii++)
     {
         printf("\nL[%i]:\n",iii);
