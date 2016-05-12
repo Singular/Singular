@@ -13,7 +13,7 @@
 
 #define MYTEST 0
 
-#define ADIDEBUG 0
+#define ADIDEBUG 1
 #define ADIDEBUG_NF 0
 
 #include <kernel/mod2.h>
@@ -2545,18 +2545,18 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
         strat->sbaEnterS = -1;
         r=sba(F,Q,NULL,hilb,strat);
         #if ADIDEBUG
-        printf("\nSBA Run 1: %i elements (syzCrit = %i)\n",strat->sl+1,strat->nrsyzcrit);
+        printf("\nSBA Run 1: %i elements (syzCrit = %i)\n",IDELEMS(r),strat->nrsyzcrit);
         //idPrint(r);
-        getchar();
+        //getchar();
         #endif
         int sbarun = 2;
         while(strat->sigdrop)
         {
           r=sba(r,Q,NULL,hilb,strat);
           #if ADIDEBUG
-          printf("SBA Run %i: %i elements (syzCrit = %i)\n",sbarun++,strat->sl+1,strat->nrsyzcrit);
+          printf("SBA Run %i: %i elements (syzCrit = %i)\n",sbarun++,IDELEMS(r),strat->nrsyzcrit);
           //idPrint(r);
-          getchar();
+          //getchar();
           #endif
         }
       }
