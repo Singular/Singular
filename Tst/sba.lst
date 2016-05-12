@@ -49,7 +49,7 @@ SBA/sba_int_48.tst
 SBA/sba_int_49.tst
 SBA/sba_int_50.tst
 SBA/sba_int_51.tst
-; SBA/sba_int_52.tst ; Big
+SBA/sba_int_52.tst
 SBA/sba_int_53.tst
 SBA/sba_int_54.tst
 SBA/sba_int_55.tst
