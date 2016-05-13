@@ -321,13 +321,6 @@ static void * iiS2Link(void *data)
   return (void *)l;
 }
 
-/*
-static void * iiR2L(void * data)
-{
-  syStrategy tmp=(syStrategy)data;
-  return  (void *)syConvRes(tmp,TRUE);
-}
-*/
 static void iiR2L_l(leftv out, leftv in)
 {
   int add_row_shift = 0;
@@ -339,9 +332,18 @@ static void iiR2L_l(leftv out, leftv in)
   out->data=(void *)syConvRes(tmp,TRUE,add_row_shift);
 }
 
-static void * iiL2R(void * data)
+static void iiL2R(leftv out, leftv in)
 {
-  return (void *)syConvList((lists)data,TRUE);
+  int add_row_shift = 0;
+  lists l=(lists)in->Data();
+  intvec *ww=NULL;
+  if (l->nr>=0) ww=(intvec *)atGet(&(l->m[0]),"isHomog",INTVEC_CMD);
+  out->data=(void *)syConvList(l);
+  if (ww!=NULL)
+  {
+    intvec *weights=ivCopy(ww);
+    atSet(out,"isHomog",weights,INTVEC_CMD);
+  }
 }
 
 //
@@ -355,7 +357,7 @@ static void * iiL2R(void * data)
 * try to convert 'input' of type 'inputType' to 'output' of type 'outputType'
 * return FALSE on success
 */
-BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv output,struct sConvertTypes *dConvertTypes)
+BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv output,const struct sConvertTypes *dConvertTypes)
 {
   memset(output,0,sizeof(sleftv));
   if ((inputType==outputType)
@@ -479,7 +481,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
 * try to convert 'inputType' in 'outputType'
 * return 0 on failure, an index (<>0) on success
 */
-int iiTestConvert (int inputType, int outputType,struct sConvertTypes *dConvertTypes)
+int iiTestConvert (int inputType, int outputType,const struct sConvertTypes *dConvertTypes)
 {
   if ((inputType==outputType)
   || (outputType==DEF_CMD)

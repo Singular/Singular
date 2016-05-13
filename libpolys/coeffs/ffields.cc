@@ -58,7 +58,7 @@ static const n_coeffType ID = n_GF;
 
 const double sixteenlog2= 11.09035489;
 /* the q's from the table 'fftable' */
-unsigned short fftable[]={
+const unsigned short fftable[]={
     4,  8, 16, 32, 64, 128, 256, 512,1024,2048,4096,8192,16384, 32768,
 /*2^2 2^3 2^4 2^5 2^6  2^7  2^8  2^9 2^10 2^11 2^12 2^13  2^14  2^15*/
     9, 27, 81,243,729,2187, 6561,19683,59049,

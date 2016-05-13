@@ -482,7 +482,7 @@ void ttGen1()
 /*-------------------------------------------------------------------*/
   fprintf(outfile,"/*---------------------------------------------*/\n");
   fprintf(outfile,
-  "struct sValCmdTab dArithTab1[]=\n"
+  "const struct sValCmdTab dArithTab1[]=\n"
   "{\n");
   for (j=1;j<=MAX_TOK+1;j++)
   {
@@ -500,7 +500,7 @@ void ttGen1()
   fprintf(outfile,"#define JJTAB1LEN %d\n",l1);
 /*-------------------------------------------------------------------*/
   fprintf(outfile,
-  "struct sValCmdTab dArithTab2[]=\n"
+  "const struct sValCmdTab dArithTab2[]=\n"
   "{\n");
   for (j=1;j<=MAX_TOK+1;j++)
   {

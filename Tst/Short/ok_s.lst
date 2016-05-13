@@ -57,6 +57,9 @@ bug_tr738
 bug_tr739
 bug_tr745
 bug_tr753
+bug_tr758
+bug_tr759
+bug_tr760_761
 bug_genus_etc
 conv_bi
 facstd
@@ -83,6 +86,7 @@ ncfactor_facNthShift1_s
 ncfactor_landau_ex_s
 ncfactor_multipleFacsSameTopAndBottom_s
 ncfactor_nthweylringalt_s
+nfmodsyz_s
 parallel_s
 primdec3
 reesclos

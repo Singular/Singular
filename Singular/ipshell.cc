@@ -936,7 +936,8 @@ BOOLEAN jjBETTI2(leftv res, leftv u, leftv v)
 
   intvec *weights=NULL;
   int add_row_shift=0;
-  intvec *ww=(intvec *)atGet(&(l->m[0]),"isHomog",INTVEC_CMD);
+  intvec *ww=NULL;
+  if (l->nr>=0) ww=(intvec *)atGet(&(l->m[0]),"isHomog",INTVEC_CMD);
   if (ww!=NULL)
   {
      weights=ivCopy(ww);
@@ -947,8 +948,16 @@ BOOLEAN jjBETTI2(leftv res, leftv u, leftv v)
 
   r=liFindRes(l,&len,&typ0);
   if (r==NULL) return TRUE;
-  res->data=(char *)syBetti(r,len,&reg,weights,(int)(long)v->Data());
+  intvec* res_im=syBetti(r,len,&reg,weights,(int)(long)v->Data());
+  res->data=(void*)res_im;
   omFreeSize((ADDRESS)r,(len)*sizeof(ideal));
+  //Print("rowShift: %d ",add_row_shift);
+  for(int i=1;i<=res_im->rows();i++)
+  {
+    if (IMATELEM(*res_im,1,i)==0) { add_row_shift--; }
+    else break;
+  }
+  //Print(" %d\n",add_row_shift);
   atSet(res,omStrDup("rowShift"),(void*)(long)add_row_shift,INT_CMD);
   if (weights!=NULL) delete weights;
   return FALSE;
@@ -1314,7 +1323,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
         }
         if (BVERBOSE(V_REDEFINE))
         {
-          Warn("redefining %s",IDID(h));
+          Warn("redefining %s (%s)",IDID(h),my_yylinebuf);
         }
 #ifdef USE_IILOCALRING
         if (iiLocalRing[0]==IDRING(h) && (!keepring)) iiLocalRing[0]=NULL;
@@ -1445,7 +1454,7 @@ BOOLEAN iiExport (leftv v, int toLev, package pack)
         {
           if (BVERBOSE(V_REDEFINE))
           {
-            Warn("redefining %s",IDID(old));
+            Warn("redefining %s (%s)",IDID(old),my_yylinebuf);
           }
           v->name=omStrDup(v->name);
           killhdl2(old,&(pack->idroot),currRing);
@@ -2419,7 +2428,7 @@ static void rRenameVars(ring R)
   }
 }
 
-static BOOLEAN rComposeVar(const lists  L, ring R)
+static inline BOOLEAN rComposeVar(const lists  L, ring R)
 {
   assume(R!=NULL);
   if (L->m[1].Typ()==LIST_CMD)
@@ -2464,7 +2473,7 @@ static BOOLEAN rComposeVar(const lists  L, ring R)
   return FALSE;
 }
 
-static BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ring R)
+static inline BOOLEAN rComposeOrder(const lists  L, const BOOLEAN check_comp, ring R)
 {
   assume(R!=NULL);
   long bitmask=0L;
@@ -3167,7 +3176,7 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
 /*3
 * converts a list of modules into a resolution
 */
-syStrategy syConvList(lists li,BOOLEAN toDel)
+syStrategy syConvList(lists li)
 {
   int typ0;
   syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
@@ -3190,7 +3199,6 @@ syStrategy syConvList(lists li,BOOLEAN toDel)
     omFreeSize(result, sizeof(ssyStrategy));
     result = NULL;
   }
-  if (toDel) li->Clean();
   return result;
 }
 

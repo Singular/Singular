@@ -65,6 +65,7 @@
 // 7->8: qring
 // 8->9: module: added rank
 // 9->10: tokens in grammar.h/tok.h reorganized
+// 10->11: extended ring descr. for named coeffs (not in used until 4.1)
 
 link_list ssiToBeClosed=NULL;
 volatile BOOLEAN ssiToBeClosed_inactive=TRUE;
@@ -151,6 +152,7 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
   /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> */
   /* ch=-1: transext, coeff ring follows */
   /* ch=-2: algext, coeff ring and minpoly follows */
+  /* ch=-3: cf name follows */
   if (r!=NULL)
   {
     if (rField_is_Q(r) || rField_is_Zp(r))
@@ -160,7 +162,10 @@ void ssiWriteRing_R(ssiInfo *d,const ring r)
     else if (rFieldType(r)==n_algExt)
       fprintf(d->f_write,"-2 %d ",r->N);
     else /*dummy*/
-      fprintf(d->f_write,"0 %d ",r->N);
+    {
+      fprintf(d->f_write,"-3 %d ",r->N);
+      ssiWriteString(d,nCoeffName(r->cf));
+    }
 
     int i;
     for(i=0;i<r->N;i++)
@@ -229,6 +234,7 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   /* 5 <ch> <N> <l1> <v1> ...<lN> <vN> <number of orderings> <ord1> <block0_1> <block1_1> .... <extRing> <Q-ideal> */
   /* ch=-1: transext, coeff ring follows */
   /* ch=-2: algext, coeff ring and minpoly follows */
+  /* ch=-3: cf name follows */
   if (r==currRing) // see recursive calls for transExt/algExt
   {
     if (d->r!=NULL) rKill(d->r);
@@ -422,6 +428,14 @@ ring ssiReadRing(const ssiInfo *d)
   char **names;
   ch=s_readint(d->f_read);
   N=s_readint(d->f_read);
+  coeffs cf=NULL;
+  if (ch==-3)
+  {
+    char *cf_name=ssiReadString(d);
+    cf=nFindCoeffByName(cf_name);
+    if (cf==NULL)
+    { Werror("cannot find cf:%s",cf_name);return NULL;}
+  }
   if (N!=0)
   {
     names=(char**)omAlloc(N*sizeof(char*));
@@ -485,14 +499,20 @@ ring ssiReadRing(const ssiInfo *d)
     {
       TransExtInfo T;
       T.r=ssiReadRing(d);
-      coeffs cf=nInitChar(n_transExt,&T);
+      if (T.r==NULL) return NULL;
+      cf=nInitChar(n_transExt,&T);
       r=rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
     }
     else if (ch==-2) /* alg ext. */
     {
       TransExtInfo T;
       T.r=ssiReadRing(d); /* includes qideal */
-      coeffs cf=nInitChar(n_algExt,&T);
+      if (T.r==NULL) return NULL;
+      cf=nInitChar(n_algExt,&T);
+      r=rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
+    }
+    else if (ch==-3)
+    {
       r=rDefault(cf,N,names,num_ord,ord,block0,block1,wvhdl);
     }
     else
@@ -971,6 +991,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         else if(r == 1)
         {
           WarnS("program not specified, using /usr/local/bin/Singular");
+          Warn("in line >>%s<<",my_yylinebuf);
           strcpy(path,"/usr/local/bin/Singular");
         }
         char* ssh_command = (char*)omAlloc(256);
@@ -1099,6 +1120,7 @@ BOOLEAN ssiPrepClose(si_link l)
 {
   if (l!=NULL)
   {
+    SI_LINK_SET_CLOSE_P(l);
     ssiInfo *d = (ssiInfo *)l->data;
     if (d!=NULL)
     {
@@ -1121,15 +1143,16 @@ BOOLEAN ssiClose(si_link l)
     ssiInfo *d = (ssiInfo *)l->data;
     if (d!=NULL)
     {
+      // send quit signal
       if ((d->send_quit_at_exit)
       && (d->quit_sent==0))
       {
         fputs("99\n",d->f_write);
         fflush(d->f_write);
-        if (d->f_read!=NULL) { s_close(d->f_read);s_free(d->f_read);}
-        if (d->f_write!=NULL) { fclose(d->f_write); d->f_write=NULL; }
       }
+      // clean ring
       if (d->r!=NULL) rKill(d->r);
+      // did the child to stop ?
       si_waitpid(d->pid,NULL,WNOHANG);
       if ((d->pid!=0)
       && (kill(d->pid,0)==0)) // child is still running
@@ -1141,6 +1164,7 @@ BOOLEAN ssiClose(si_link l)
         int r;
         loop
         {
+          // wait till signal or time rem:
           r = nanosleep(&t, &rem);
           t = rem;
           // child finished:
@@ -1148,18 +1172,19 @@ BOOLEAN ssiClose(si_link l)
           // other signal, waited s>= 100 ms:
           if ((r==0) || (errno != EINTR)) break;
         }
-        if (kill(d->pid,0) == 0)
+        if (kill(d->pid,0) == 0) // pid still exists
         {
           kill(d->pid,15);
           t.tv_sec=5; // <=5s
           t.tv_nsec=0;
           loop
           {
+            // wait till signal or time rem:
             r = nanosleep(&t, &rem);
             t = rem;
             // child finished:
             if (si_waitpid(d->pid,NULL,WNOHANG) != 0) break;
-            // other signal, waited s>= 100 ms:
+            // other signal, waited s>=  5 s:
             if ((r==0) || (errno != EINTR)) break;
           }
           if (kill(d->pid,0) == 0)
@@ -1169,7 +1194,7 @@ BOOLEAN ssiClose(si_link l)
           }
         }
       }
-      if (d->f_read!=NULL) { s_close(d->f_read);s_free(d->f_read);}
+      if (d->f_read!=NULL) { s_close(d->f_read);s_free(d->f_read);d->f_read=NULL;}
       if (d->f_write!=NULL) { fclose(d->f_write); d->f_write=NULL; }
       if ((strcmp(l->mode,"tcp")==0)
       || (strcmp(l->mode,"fork")==0))
@@ -1228,6 +1253,7 @@ leftv ssiRead1(si_link l)
     case 15:
     case 5:{
              d->r=ssiReadRing(d);
+             if (d->r==NULL) return NULL;
              res->data=(char*)d->r;
              if (d->r->qideal==NULL)
                res->rtyp=RING_CMD;

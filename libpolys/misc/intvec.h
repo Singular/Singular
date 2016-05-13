@@ -7,13 +7,11 @@
 * ABSTRACT: class intvec: lists/vectors of integers
 */
 #include <string.h>
-#include <omalloc/omalloc.h>
+#include <omalloc/omallocClass.h>
 #include <reporter/reporter.h>
 
 
-//extern omBin intvec_bin;
-
-class intvec
+class intvec :public omallocClass
 {
 private:
   int *v;
@@ -51,9 +49,11 @@ public:
 
   void resize(int new_length);
   inline int range(int i) const
-    { return ((i<row) && (i>=0) && (col==1)); }
+    //{ return ((i<row) && (i>=0) && (col==1)); }
+    { return ((((unsigned)i)<((unsigned)row)) && (col==1)); }
   inline int range(int i, int j) const
-    { return ((i<row) && (i>=0) && (j<col) && (j>=0)); }
+    //{ return ((i<row) && (i>=0) && (j<col) && (j>=0)); }
+    { return ((((unsigned)i)<((unsigned)row)) && (((unsigned)j)<((unsigned)col))); }
   inline int& operator[](int i)
     {
 #ifndef SING_NDEBUG
@@ -86,7 +86,6 @@ public:
   inline int  length() const { return col*row; }
   inline int  cols() const { return col; }
   inline int  rows() const { return row; }
-  inline void length(int l) { row = l; col = 1; }
   void show(int mat=0,int spaces=0) const;
   #ifndef SING_NDEBUG
   void view() const;
@@ -121,20 +120,6 @@ public:
     }
     return m;
   }
-#if 0
-  // TODO: no omalloc Bin (de-)/allocation?
-  void* operator new ( size_t size )
-  {
-    void* addr;
-    //omTypeAlloc(void*, addr, size);
-    addr=omAlloc0Bin(intvec_bin);
-    return addr;
-  }
-  void operator delete ( void* block )
-  { //omfree( block );
-    omFreeBin((ADDRESS)block, intvec_bin);
-  }
-#endif
   // keiner (ausser obachman) darf das folgenden benutzen !!!
   inline int * ivGetVec() { return v; }
 };
@@ -142,7 +127,6 @@ inline intvec * ivCopy(const intvec * o)
 {
   if( o != NULL )
     return new intvec(o);
-
   return NULL;
 }
 

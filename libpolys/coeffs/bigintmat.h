@@ -116,9 +116,8 @@ class bigintmat
       {
         Werror("wrong bigintmat index:%d\n",i);
       }
-#endif
       assume ( !((i<0)||(i>=row*col)) );
-
+#endif
       return v[i];  // Hier sollte imho kein nlCopy rein...
     }
     inline const number& operator[](int i) const
@@ -128,9 +127,8 @@ class bigintmat
       {
         Werror("wrong bigintmat index:%d\n",i);
       }
-#endif
       assume ( !((i<0)||(i>=row*col)) );
-
+#endif
       return v[i];
     }
 #define BIMATELEM(M,I,J) (M)[(I-1)*(M).cols()+J-1]
@@ -140,7 +138,7 @@ class bigintmat
     /// problem: what about non-commuting rings. Is this from left or right?
     void operator*=(int intop);
 
-    /// inplace versio of skalar mult. CHANGES input.
+    /// inplace version of skalar mult. CHANGES input.
     void inpMult(number bintop, const coeffs C = NULL);
 
     inline int length() { return col*row; }
@@ -153,7 +151,7 @@ class bigintmat
     {
       if (v!=NULL)
       {
-        for (int i=0; i<row*col; i++) { n_Delete(&(v[i]), basecoeffs()); }
+        for (int i=row*col-1;i>=0; i--) { n_Delete(&(v[i]), basecoeffs()); }
         omFreeSize((ADDRESS)v, sizeof(number)*row*col);
         v=NULL;
       }

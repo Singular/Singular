@@ -1,0 +1,732 @@
+////////////////////////////////////////////////////////////////////////////////
+version="Id";  // $Id$
+category="Commutative Algebra";
+info="
+
+LIBRARY:   nfmodsyz.lib    Syzygy modules of submodules of free modules over
+                           algebraic number fields
+AUTHORS:   D.K. Boku       boku@mathematik.uni-kl.de
+@*         W. Decker       decker@mathematik.uni-kl.de
+@*         C. Fieker       fieker@mathematik.uni-kl.de
+
+OVERVIEW:
+  A library for computing the syzygy module of a given submodule I in a polynomial ring
+  over an algebraic number field Q(t), where t is an algebraic number, using modular methods.
+  For the case Q(t)=Q, that is, where t is an element of Q, we compute, following
+  [1], the syzygy module of I as follows: For a submodule I of A^m with A = Q[X], we first
+  choose a sufficiently large set of primes P and compute the reduced Groebner basis of the
+  syzygy module of I_p, for each p in P, in parallel. We then use the Chinese remainder
+  algorithm and rational reconstruction to obtain the syzygy module of I over Q.
+  For the case where t is not in Q, we compute, following [2], the syzygy module of I as
+  follows:
+  Let f be the minimal polynomial of t. For a submodule I in A^m with A = Q(t)[X], we map I
+  to a submodule I' in A^m with A = (Q[t]/<f>)[X] via the map sending t to t + <f>. We first
+  choose a prime p such that f has at least two factors in characteristic p. For each
+  factor f_{i,p} of f_p:= (f mod p), we set I'_{i,p} := (I'_p mod f_{i,p}). We then
+  compute the reduced Groebner bases G'_i of the syzygy modules of I'_{i,p} over
+  F_p[t]/<f_{i,p}> and combine the G'_i to G_p (the syzygy module of I'_p) using chinese
+  remaindering for polynomials. As described in [2], the procedure is repeated for many primes
+  p, where we compute the G_p in parallel until the number of primes is sufficiently large to
+  recover the correct generating set for the syzygy module G' of I' which is, considered over
+  Q(t), also a generating set for the syzygy module of I.
+
+REFERENCES:
+  [1] E. A. Arnold: Modular algorithms for computing Groebner bases.
+      J. Symb. Comp. 35, 403-419 (2003).
+  [2] D. Boku, W. Decker, C. Fieker, and A. Steenpass. Groebner bases over algebraic
+      number fields. In: Proceedings of the 2015 International Workshop on Parallel
+      Symb. Comp. PASCO'15, pages 16-24 (2015).
+
+PROCEDURES:
+  nfmodSyz(I);          syzygy module of I over algebraic number field using modular
+                        methods
+";
+
+LIB "nfmodstd.lib";
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc testPrime(int p, list args)
+{
+    /*
+     * test whether a prime p divides the denominator(s)
+     * and leading coefficients of generating set of ideal
+     */
+    int i,j,k;
+    vector f;
+    number num;
+    module I = args[1];
+    bigint d1,d2,d3;
+    for(i = 1; i <= ncols(I); i++)
+    {
+        f = cleardenom(I[i]);
+        if(f == 0)
+        {
+            return(0);
+        }
+        num = leadcoef(I[i])/leadcoef(f);
+        d1 = bigint(numerator(num));
+        d2 = bigint(denominator(num));
+        if( (d1 mod p) == 0)
+        {
+            return(0);
+        }
+        if((d2 mod p) == 0)
+        {
+            return(0);
+        }
+        for(j = nrows(f); j > 0; j--)
+        {
+            for(k=1;k<=size(f[j]);k++)
+            {
+                d3 = bigint(leadcoef(f[j][k]));
+                if((d3 mod p) == 0)
+                {
+                    return(0);
+                }
+            }
+        }
+    }
+    return(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/* return 1 if the number of factors are in the required bound , 0 else */
+
+static proc minpolyTask(poly f,int p)
+{
+    /*
+     * bound for irreducible factor(s) of (f mod p)
+     * see testfact()
+     */
+    int nr,k,ur;
+    ur=deg(f);
+    list L=factmodp(f,p);
+    if(degtest(L[2])==1)
+    {
+        // now each factor is squarefree
+        if(ur<=3)
+        {
+            return(1);
+        }
+        else
+        {
+            nr = testfact(ur);
+            k=ncols(L[1]);
+            if(nr < k && k < (ur-nr)) // set a bound for k
+            {
+                return(1);
+            }
+        }
+    }
+    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/* return 1 if both testPrime(p,J) and minpolyTask(f,p) is true, 0 else */
+
+static proc PrimeTestTask_syz(int p, list L)
+{
+    /* L=list(I), I=J,f; J ideal , f minpoly */
+    int sz,nr;
+    module J = L[1];
+    sz=ncols(J);
+    def f=J[sz];
+    poly g = f[1];
+    if(!testPrime(p,list(J)) or !minpolyTask(g,p))
+    {
+        return(0);
+    }
+    return(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/* compute factors of f mod p with multiplicity */
+
+static proc factmodp(poly f, int p)
+{
+    def R=basering;
+    list l=ringlist(R);
+    l[1]=p;
+    def S=ring(l);
+    setring S;
+    list L=factorize(imap(R,f),2);
+    ideal J=L[1];
+    intvec v=L[2];
+    list scx=J,v;
+    setring R;
+    return(imap(S,scx));
+    kill S;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/* set a bound for number of factors w.r.t degree nr*/
+
+static proc testfact(int nr)
+{
+    // nr must be greater than 3
+    int i;
+    if(nr>3 and nr<=5)
+    {
+        i=1;
+    }
+    if(nr>5 and nr<=10)
+    {
+        i=2;
+    }
+    if(nr>10 and nr<=15)
+    {
+        i=3;
+    }
+    if(nr>15 and nr<=20)
+    {
+        i=4;
+    }
+    if(nr>20 and nr<=25)
+    {
+        i=5;
+    }
+    if(nr>25 and nr<=30)
+    {
+        i=6;
+    }
+    if(nr>30)
+    {
+        i=10;
+    }
+    return(i);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// return 1 if v[i]>1 , 0 else
+
+static proc degtest(intvec v)
+{
+    for(int j=1;j<=nrows(v);j++)
+    {
+        if(v[j]>1)
+        {
+            return(0);
+        }
+    }
+    return(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc check_leadmonom_and_size(list L)
+{
+    /*
+     * compare the size of ideals in the list and
+     * check the corresponding leading monomials
+     * size(L)>=2
+     */
+    def J=L[1];
+    int i=size(L);
+    int sc=ncols(J);
+    int j,k;
+    def g=leadmonom(J[1]);
+    for(j=1;j<=i;j++)
+    {
+        if(ncols(L[j])!=sc)
+        {
+            return(0);
+        }
+    }
+    for(k=2;k<=i;k++)
+    {
+        for(j=1;j<=sc;j++)
+        {
+            if(leadmonom(J[j])!=leadmonom(L[k][j]))
+            {
+                return(0);
+            }
+        }
+    }
+    return(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc LiftPolyCRT_syz(def I)
+{
+    /*
+     * compute syz for each factor and combine this result
+     * to modulo minpoly via CRT for poly over char p>0
+     */
+    def sl;
+    int u,in,j;
+    list LL,Lk,T2;
+    module J,II;
+    vector f;
+    u=ncols(I);
+    J=I[1..u-1];
+    f=I[u];
+    poly ff = f[1];
+    ideal K=factorize(ff,1);
+    in=ncols(K);
+    def Ls = basering;
+    list l = ringlist(Ls);
+    if(l[3][1][1]=="c")
+    {
+        l[1] = list(l[1]) + list(list(l[2][size(l[2])])) +
+        list(list(l[3][size(l[3])]))+list(ideal(0));
+        l[2] = delete(l[2],size(l[2]));
+        l[3] = delete(l[3],size(l[3]));
+    }
+    else
+    {
+        l[1] = list(l[1]) + list(list(l[2][size(l[2])])) +
+        list(list(l[3][size(l[3])-1]))+list(ideal(0));
+        l[2] = delete(l[2],size(l[2]));
+        l[3] = delete(l[3],size(l[3])-1);
+    }
+
+    def S1 = ring(l);
+    setring S1;
+    number Num= number(imap(Ls,ff));
+    list l = ringlist(S1);
+    l[1][4][1] = Num;
+    S1 = ring(l);
+    setring S1;
+    ideal K = imap(Ls,K);
+    def S2;
+    module II;
+    number Num;
+    /* ++++++ if minpoly is irreducible then K will be the zero ideal +++ */
+    if(size(K)==0)
+    {
+        module M = syz(imap(Ls,J));
+        if(size(M)==0)
+        {
+            setring Ls;
+            return(module([0]));
+        }
+        II = normalize(M);
+    }
+    else
+    {
+        for(j=1;j<=in;j++)
+        {
+            LL[j]=K[j];
+            Num = number(K[j]);
+            T2 = ringlist(S1);
+            T2[1][4][1] = Num;
+            S2 = ring(T2);
+            setring S2;
+            module M = syz(imap(Ls,J));
+            if(size(M)==0)
+            {
+                setring Ls;
+                return(module([0]));
+                break;
+            }
+            setring S1;
+            Lk[j] = imap(S2,M);
+        }
+
+        if(check_leadmonom_and_size(Lk))
+        {
+            // apply CRT for polynomials
+            setring Ls;
+            II =chinrempoly(imap(S1,Lk),imap(S1,LL));
+            setring S1;
+            II = normalize(imap(Ls,II));
+        }
+        else
+        {
+            setring S1;
+            II=[0];
+        }
+     }
+     setring Ls;
+     return(imap(S1,II));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc final_Test_syz(string command, alias list args, def result)
+{
+    /*
+     * test if the set generating 'result' also generates the syzygy module
+     * of args[1] in characteristic zero
+     */
+    def Ls = basering;
+    def Ip = args[1];
+    vector f;
+    int u=ncols(Ip);
+    module J=Ip[1..u-1];
+    f=Ip[u];
+    poly ff = f[1];
+    list l = ringlist(Ls);
+
+    if(l[3][1][1]=="c")
+    {
+        l[1] = list(l[1]) + list(list(l[2][size(l[2])])) +
+        list(list(l[3][size(l[3])]))+list(ideal(0));
+        l[2] = delete(l[2],size(l[2]));
+        l[3] = delete(l[3],size(l[3]));
+    }
+    else
+    {
+        l[1] = list(l[1]) + list(list(l[2][size(l[2])])) +
+        list(list(l[3][size(l[3])-1]))+list(ideal(0));
+        l[2] = delete(l[2],size(l[2]));
+        l[3] = delete(l[3],size(l[3])-1);
+    }
+
+    def S1 = ring(l);
+    setring S1;
+    number Num= number(imap(Ls,ff));
+    list l = ringlist(S1);
+    l[1][4][1] = Num;
+    S1 = ring(l);
+    setring S1;
+    def result2 = imap(Ls,result);
+    def M = imap(Ls,J);
+    if(size(result2)==0)
+    {
+        return(1);
+    }
+    else
+    {
+        if(size(module(matrix(M)*matrix(result2)))!=0)
+        {
+            return(0);
+        }
+        return(1);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc final_test(string command, alias list args, def result)
+{
+    /*
+     * test if the set  generating 'result' also generates the syzygy module
+     * of args[1] in characteristic zero
+     */
+    module M=args[1];
+    if(size(result)==0)
+    {
+        return(1);
+    }
+    else
+    {
+        if(size(module(matrix(M)*matrix(result)))!=0)
+        {
+            return(0);
+        }
+        return(1);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// ------------------------ test in characteristic p ------------
+static proc pTest_syzmod(string command, list args, def result, int p)
+{
+     /*
+      * This procedure performs the first test in positive characteristic to
+      * verify whether the set generating 'result' also generates the syzygy
+      * module of the submodule args[1]. Note that this test works only
+      * over Z_p
+      */
+     def br = basering;
+     if(size(result)==0)
+     {
+         return(1);
+     }
+     list lbr = ringlist(br);
+     if (typeof(lbr[1]) == "int")
+     {
+         lbr[1] = p;
+     }
+     else
+     {
+         lbr[1][1] = p;
+     }
+     def rp = ring(lbr);
+     setring(rp);
+     module Jp = imap(br, args)[1];
+     module Gp = imap(br, result);
+     module Ip = syz(Jp);
+     // test if Ip is contained in Gp
+     attrib(Gp, "isSB", 1);
+     for (int i = ncols(Ip); i > 0; i--)
+     {
+          if (reduce(Ip[i], Gp, 1) != 0)
+          {
+              setring(br);
+              return(0);
+          }
+     }
+     // test if Gp is contained in syz(Jp)
+     if(size(module(matrix(Jp)*matrix(Gp)))!=0)
+     {
+         setring br;
+         return(0);
+     }
+     setring br;
+     return(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+ // ------------------------ test in characteristic p ------------
+static proc pTest_syz(string command, list args, def result, int p)
+{
+     /*
+      * This procedure performs the first test in positive characteristic to
+      * verify whether the set generating 'result' also generates the syzygy
+      * module of args[1]. Note that this test works only over Z_p(t) where
+      * t is an algebraic number which is not in Z_p.
+     */
+
+     def br = basering;
+     if(size(result)==0)
+     {
+         return(1);
+     }
+     list lbr = ringlist(br);
+     if (typeof(lbr[1]) == "int")
+     {
+         lbr[1] = p;
+     }
+     else
+     {
+         lbr[1][1] = p;
+     }
+     def rp = ring(lbr);
+     setring(rp);
+     def Ip = imap(br, args)[1];
+
+     int u,in,j,i;
+     list LL,Lk,T2;
+     module J,II;
+     vector f;
+     u=ncols(Ip);
+     J=Ip[1..u-1];
+     f=Ip[u];
+     poly ff = f[1];
+     ideal K=factorize(ff,1);
+     in=ncols(K);
+     def Ls = basering;
+     list l = ringlist(Ls);
+     if(l[3][1][1]=="c")
+     {
+        l[1] = list(l[1]) + list(list(l[2][size(l[2])])) +
+        list(list(l[3][size(l[3])]))+list(ideal(0));
+        l[2] = delete(l[2],size(l[2]));
+        l[3] = delete(l[3],size(l[3]));
+     }
+     else
+     {
+        l[1] = list(l[1]) + list(list(l[2][size(l[2])])) +
+        list(list(l[3][size(l[3])-1]))+list(ideal(0));
+        l[2] = delete(l[2],size(l[2]));
+        l[3] = delete(l[3],size(l[3])-1);
+     }
+
+     def S1 = ring(l);
+     setring S1;
+     number Num= number(imap(Ls,ff));
+     list l = ringlist(S1);
+     l[1][4][1] = Num;
+     S1 = ring(l);
+     setring S1;
+     ideal K = imap(Ls,K);
+     module Jp = imap(Ls,J);
+     def S2;
+     module Ip;
+     number Num;
+     /* ++++++ if the minpoly is irreducible then K = ideal(0) +++ */
+     if(size(K)==0)
+     {
+          module M = syz(Jp);
+          Ip = normalize(M);
+     }
+     else
+     {
+         for(j=1;j<=ncols(K);j++)
+         {
+              LL[j]=K[j];
+              Num = number(K[j]);
+              T2 = ringlist(S1);
+              T2[1][4][1] = Num;
+              S2 = ring(T2);
+              setring S2;
+              module M = syz(imap(Ls,J));
+              setring S1;
+              Lk[j]= imap(S2,M);
+         }
+         if(check_leadmonom_and_size(Lk))
+         {
+              // apply CRT for polynomials
+              setring Ls;
+              II =chinrempoly(imap(S1,Lk),imap(S1,LL));
+              setring S1;
+              Ip = normalize(imap(Ls,II));
+         }
+         else
+         {
+              setring S1;
+              Ip=[0];
+         }
+     }
+     setring S1;
+     module Gp = imap(br, result);
+     // test if Ip is contained in Gp
+     attrib(Gp, "isSB", 1);
+     for (i = ncols(Ip); i > 0; i--)
+     {
+          if (reduce(Ip[i], Gp, 1) != 0)
+          {
+              setring(br);
+              return(0);
+          }
+     }
+     // test if Gp is contained in syz(Jp)
+     if(size(module(matrix(Jp)*matrix(Gp)))!=0)
+     {
+         setring br;
+         return(0);
+     }
+     setring br;
+     return(1);
+}
+
+ ////////////////////////////////////////////////////////////////////////////////
+
+ static proc cleardenomIdeal(def I)
+ {
+     int t=ncols(I);
+     if(size(I)==0)
+     {
+         return(I);
+     }
+     else
+     {
+         for(int i=1;i<=t;i++)
+         {
+             I[i]=cleardenom(I[i]);
+         }
+     }
+     return(I);
+ }
+
+////////////////////////////////////////////////////////////////////////////////
+
+ static proc modStdparallelized_syzSB(module I, list #)
+ {
+     /* save options */
+     intvec opt = option(get);
+     option(redSB);
+     option(returnSB);
+     /*------ if these options are set, the Singular command syz returns the
+      reduced Groebner basis of I ---------------------------------------*/
+
+     // apply modular command from modular.lib
+     if(size(#)>0)
+     {
+         I = modular("syz", list(I), testPrime, Modstd::deleteUnluckyPrimes_std,
+             pTest_syzmod, final_test, 536870909);
+     }
+     else
+     {
+         I = modular("Nfmodsyz::LiftPolyCRT_syz", list(I), PrimeTestTask_syz,
+             Modstd::deleteUnluckyPrimes_std,pTest_syz, final_Test_syz,536870909);
+     }
+     attrib(I, "isSB", 1);
+     option(set,opt);
+     return(I);
+ }
+
+////////////////////////////////////////////////////////////////////////////////
+/* main procedure */
+proc nfmodSyz(def I)
+"USAGE:  nfmodSyz(I); I ideal or module
+RETURN:  syzygy module of I over an algebraic number field
+SEE ALSO: syz
+EXAMPLE: example nfmodSyz; shows an example
+"
+{
+     if(typeof(I)!="ideal" and typeof(I)!="module")
+     {
+        ERROR("type of input must be either ideal or module");
+     }
+     else
+     {
+        module F = I;
+        kill I;
+        module I = F;
+     }
+     def Rbs=basering;
+     poly f;
+     int n=nvars(Rbs);
+     if(size(I)==0)
+     {
+         return(module([0]));
+     }
+     if(npars(Rbs)==0)
+     {
+        module M = modStdparallelized_syzSB(I,1); //if algebraic number is in Q
+        return(M);
+     }
+
+     def S;
+     list rl=ringlist(Rbs);
+     f=rl[1][4][1];
+
+     if(rl[3][1][1]!="c")
+     {
+        rl[2] = rl[2] + rl[1][2];
+        rl[3] = insert(rl[3], rl[1][3][1],1);
+        rl[1] = rl[1][1];
+     }
+     else
+     {
+        rl[2] = rl[2] + rl[1][2];
+        rl[3][size(rl[3])+1] = rl[1][3][1];
+        rl[1] = rl[1][1];
+     }
+
+     S = ring(rl);
+     setring S;
+     poly f=imap(Rbs,f);
+     def I=imap(Rbs,I);
+     I = simplify(I,2); // eraze the zero generatos
+     if(f==0)
+     {
+         ERROR("minpoly must be non-zero");
+     }
+     I=I,f;
+     def J_I = modStdparallelized_syzSB(I);
+     setring Rbs;
+     def J=imap(S,J_I);
+     J=simplify(J,2);
+     return(J);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+    ring r1 =(0,a),(x,y),(c,dp);
+    minpoly = (a^3+2a+7);
+    module M1 = [(a/2+1)*y, 3*x-a*y],
+                [y-x,y2],
+                [x2-xy, ax-y];
+    nfmodSyz(M1);
+    ring r2 = (0,a),(x,y,z),(dp,c);
+    minpoly = (a3+a+1);
+    module M2 = [x2z+x+(-a)*y,z2+(a+2)*x],
+                [y2+(a)*z+(a),(a+3)*z3+(-a)*x2],
+                [-xz+(a2+3)*yz,xy+(a2)*z];
+    nfmodSyz(M2);
+    ring r3=0,(x,y),dp; // ring without parameter
+    module M3 = [x2 + y, xy], [-7y, 2x], [x2-y, 0];
+    nfmodSyz(M3);
+    ring r4=0,(x,y),(c,dp); // ring without parameter
+    module M4 = [xy, x-y],
+                [x2 + y, 5y],
+                [- 7y, 2x],
+                [x2-y, 0];
+    nfmodSyz(M4);
+}
+

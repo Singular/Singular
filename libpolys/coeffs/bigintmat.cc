@@ -62,17 +62,20 @@ void bigintmat::inpTranspose()
   v[__j] = c                \
 
   for (int i=0; i< nm; i++)
-    for (int j=i+1; j< nm; j++) {
+    for (int j=i+1; j< nm; j++)
+    {
       swap(i*m+j, j*n+i);
     }
   if (n<m)
     for (int i=nm; i<m; i++)
-      for(int j=0; j<n; j++) {
+      for(int j=0; j<n; j++)
+      {
         swap(j*n+i, i*m+j);
       }
   if (n>m)
     for (int i=nm; i<n; i++)
-      for(int j=0; j<m; j++) {
+      for(int j=0; j<m; j++)
+      {
         swap(i*m+j, j*n+i);
       }
 #undef swap
@@ -415,15 +418,18 @@ void bigintmat::Write()
   int n = cols(), m=rows();
 
   StringAppendS("[ ");
-  for(int i=1; i<= m; i++) {
+  for(int i=1; i<= m; i++)
+  {
     StringAppendS("[ ");
-    for(int j=1; j< n; j++) {
+    for(int j=1; j< n; j++)
+    {
       n_Write(v[(i-1)*n+j-1], basecoeffs());
       StringAppendS(", ");
     }
     if (n) n_Write(v[i*n-1], basecoeffs());
     StringAppendS(" ]");
-    if (i<m) {
+    if (i<m)
+    {
       StringAppendS(", ");
     }
   }
@@ -516,8 +522,7 @@ char* bigintmat::StringAsPrinted()
       ps[pos+colwid[cj]] = ',';
       pos += colwid[cj]+1;
     }
-
-      omFree(ts);  // Hier ts zerstören
+    omFree(ts);  // Hier ts zerstören
   }
   return(ps);
   // omFree(ps);
@@ -604,7 +609,7 @@ int * bigintmat::getwid(int maxwid)
     cwv[j] = getShorter(wv, cwv[j], j, col, row);
   }
   omFree(wv);
-return cwv;
+  return cwv;
 }
 
 void bigintmat::pprint(int maxwid)
@@ -687,26 +692,33 @@ void bigintmat::pprint(int maxwid)
 
 
 //swaps columns i and j
-void bigintmat::swap(int i, int j) {
-  if ((i <= col) && (j <= col) && (i>0) && (j>0)) {
+void bigintmat::swap(int i, int j)
+{
+  if ((i <= col) && (j <= col) && (i>0) && (j>0))
+  {
     number tmp;
     number t;
-    for (int k=1; k<=row; k++) {
+    for (int k=1; k<=row; k++)
+    {
       tmp = get(k, i);
       t = view(k, j);
       set(k, i, t);
       set(k, j, tmp);
       n_Delete(&tmp, basecoeffs());
     }
-  } else
-    Werror("Error in swap");
+  }
+  else
+    WerrorS("Error in swap");
 }
 
-void bigintmat::swaprow(int i, int j) {
-  if ((i <= row) && (j <= row) && (i>0) && (j>0)) {
+void bigintmat::swaprow(int i, int j)
+{
+  if ((i <= row) && (j <= row) && (i>0) && (j>0))
+  {
     number tmp;
     number t;
-    for (int k=1; k<=col; k++) {
+    for (int k=1; k<=col; k++)
+    {
       tmp = get(i, k);
       t = view(j, k);
       set(i, k, t);
@@ -715,12 +727,13 @@ void bigintmat::swaprow(int i, int j) {
     }
   }
   else
-    Werror("Error in swaprow");
+    WerrorS("Error in swaprow");
 }
 
 int bigintmat::findnonzero(int i)
 {
-  for (int j=1; j<=col; j++) {
+  for (int j=1; j<=col; j++)
+  {
     if (!n_IsZero(view(i,j), basecoeffs()))
     {
       return j;
@@ -731,7 +744,8 @@ int bigintmat::findnonzero(int i)
 
 int bigintmat::findcolnonzero(int j)
 {
-  for (int i=row; i>=1; i--) {
+  for (int i=row; i>=1; i--)
+  {
     if (!n_IsZero(view(i,j), basecoeffs()))
     {
       return i;
@@ -743,25 +757,29 @@ int bigintmat::findcolnonzero(int j)
 void bigintmat::getcol(int j, bigintmat *a)
 {
   assume((j<=col) && (j>=1));
-  if (((a->rows() != row) || (a->cols() != 1)) && ((a->rows() != 1) || (a->cols() != row))) {
+  if (((a->rows() != row) || (a->cols() != 1)) && ((a->rows() != 1) || (a->cols() != row)))
+  {
     assume(0);
-    Werror("Error in getcol. Dimensions must agree!");
+    WerrorS("Error in getcol. Dimensions must agree!");
     return;
   }
-  if (!nCoeffs_are_equal(basecoeffs(), a->basecoeffs())) {
+  if (!nCoeffs_are_equal(basecoeffs(), a->basecoeffs()))
+  {
     nMapFunc f = n_SetMap(basecoeffs(), a->basecoeffs());
     number t1, t2;
-    for (int i=1; i<=row;i++) {
-    t1 = get(i,j);
-    t2 = f(t1, basecoeffs(), a->basecoeffs());
-    a->set(i-1,t1);
-    n_Delete(&t1, basecoeffs());
-    n_Delete(&t2, a->basecoeffs());
-  }
+    for (int i=1; i<=row;i++)
+    {
+      t1 = get(i,j);
+      t2 = f(t1, basecoeffs(), a->basecoeffs());
+      a->set(i-1,t1);
+      n_Delete(&t1, basecoeffs());
+      n_Delete(&t2, a->basecoeffs());
+    }
     return;
   }
   number t1;
-  for (int i=1; i<=row;i++) {
+  for (int i=1; i<=row;i++)
+  {
     t1 = view(i,j);
     a->set(i-1,t1);
   }
@@ -770,8 +788,10 @@ void bigintmat::getcol(int j, bigintmat *a)
 void bigintmat::getColRange(int j, int no, bigintmat *a)
 {
   number t1;
-  for(int ii=0; ii< no; ii++) {
-    for (int i=1; i<=row;i++) {
+  for(int ii=0; ii< no; ii++)
+  {
+    for (int i=1; i<=row;i++)
+    {
       t1 = view(i, ii+j);
       a->set(i, ii+1, t1);
     }
@@ -780,18 +800,22 @@ void bigintmat::getColRange(int j, int no, bigintmat *a)
 
 void bigintmat::getrow(int i, bigintmat *a)
 {
-  if ((i>row) || (i<1)) {
-    Werror("Error in getrow: Index out of range!");
+  if ((i>row) || (i<1))
+  {
+    WerrorS("Error in getrow: Index out of range!");
     return;
   }
-  if (((a->rows() != 1) || (a->cols() != col)) && ((a->rows() != col) || (a->cols() != 1))) {
-    Werror("Error in getrow. Dimensions must agree!");
+  if (((a->rows() != 1) || (a->cols() != col)) && ((a->rows() != col) || (a->cols() != 1)))
+  {
+    WerrorS("Error in getrow. Dimensions must agree!");
     return;
   }
-  if (!nCoeffs_are_equal(basecoeffs(), a->basecoeffs())) {
+  if (!nCoeffs_are_equal(basecoeffs(), a->basecoeffs()))
+  {
     nMapFunc f = n_SetMap(basecoeffs(), a->basecoeffs());
     number t1, t2;
-    for (int j=1; j<=col;j++) {
+    for (int j=1; j<=col;j++)
+    {
       t1 = get(i,j);
       t2 = f(t1, basecoeffs(), a->basecoeffs());
       a->set(j-1,t2);
@@ -801,28 +825,32 @@ void bigintmat::getrow(int i, bigintmat *a)
     return;
   }
   number t1;
-  for (int j=1; j<=col;j++) {
+  for (int j=1; j<=col;j++)
+  {
     t1 = get(i,j);
     a->set(j-1,t1);
     n_Delete(&t1, basecoeffs());
   }
 }
 
-
 void bigintmat::setcol(int j, bigintmat *m)
 {
-   if ((j>col) || (j<1)) {
-    Werror("Error in setcol: Index out of range!");
+   if ((j>col) || (j<1))
+   {
+    WerrorS("Error in setcol: Index out of range!");
     return;
   }
-  if (((m->rows() != row) || (m->cols() != 1)) && ((m->rows() != 1) || (m->cols() != row))) {
-    Werror("Error in setcol. Dimensions must agree!");
+  if (((m->rows() != row) || (m->cols() != 1)) && ((m->rows() != 1) || (m->cols() != row)))
+  {
+    WerrorS("Error in setcol. Dimensions must agree!");
     return;
   }
-  if (!nCoeffs_are_equal(basecoeffs(), m->basecoeffs())) {
+  if (!nCoeffs_are_equal(basecoeffs(), m->basecoeffs()))
+  {
     nMapFunc f = n_SetMap(m->basecoeffs(), basecoeffs());
     number t1,t2;
-    for (int i=1; i<=row; i++) {
+    for (int i=1; i<=row; i++)
+    {
       t1 = m->get(i-1);
       t2 = f(t1, m->basecoeffs(),basecoeffs());
       set(i, j, t2);
@@ -832,53 +860,63 @@ void bigintmat::setcol(int j, bigintmat *m)
     return;
   }
   number t1;
-  for (int i=1; i<=row; i++) {
-      t1 = m->view(i-1);
-      set(i, j, t1);
+  for (int i=1; i<=row; i++)
+  {
+    t1 = m->view(i-1);
+    set(i, j, t1);
   }
 }
 
-void bigintmat::setrow(int j, bigintmat *m) {
-  if ((j>row) || (j<1)) {
-    Werror("Error in setrow: Index out of range!");
+void bigintmat::setrow(int j, bigintmat *m)
+{
+  if ((j>row) || (j<1))
+  {
+    WerrorS("Error in setrow: Index out of range!");
     return;
   }
-  if (((m->rows() != 1) || (m->cols() != col)) && ((m->rows() != col) || (m->cols() != 1))) {
-    Werror("Error in setrow. Dimensions must agree!");
+  if (((m->rows() != 1) || (m->cols() != col)) && ((m->rows() != col) || (m->cols() != 1)))
+  {
+    WerrorS("Error in setrow. Dimensions must agree!");
     return;
   }
-  if (!nCoeffs_are_equal(basecoeffs(), m->basecoeffs())) {
+  if (!nCoeffs_are_equal(basecoeffs(), m->basecoeffs()))
+  {
     nMapFunc f = n_SetMap(m->basecoeffs(), basecoeffs());
     number tmp1,tmp2;
-  for (int i=1; i<=col; i++) {
+    for (int i=1; i<=col; i++)
+    {
       tmp1 = m->get(i-1);
       tmp2 = f(tmp1, m->basecoeffs(),basecoeffs());
       set(j, i, tmp2);
       n_Delete(&tmp2, basecoeffs());
       n_Delete(&tmp1, m->basecoeffs());
-  }
+    }
     return;
   }
   number tmp;
-  for (int i=1; i<=col; i++) {
-      tmp = m->view(i-1);
-      set(j, i, tmp);
+  for (int i=1; i<=col; i++)
+  {
+    tmp = m->view(i-1);
+    set(j, i, tmp);
   }
-
 }
 
 bool bigintmat::add(bigintmat *b)
 {
-  if ((b->rows() != row) || (b->cols() != col)) {
-    Werror("Error in bigintmat::add. Dimensions do not agree!");
+  if ((b->rows() != row) || (b->cols() != col))
+  {
+    WerrorS("Error in bigintmat::add. Dimensions do not agree!");
     return false;
   }
-  if (!nCoeffs_are_equal(basecoeffs(), b->basecoeffs())) {
-    Werror("Error in bigintmat::add. coeffs do not agree!");
+  if (!nCoeffs_are_equal(basecoeffs(), b->basecoeffs()))
+  {
+    WerrorS("Error in bigintmat::add. coeffs do not agree!");
     return false;
   }
-  for (int i=1; i<=row; i++) {
-    for (int j=1; j<=col; j++) {
+  for (int i=1; i<=row; i++)
+  {
+    for (int j=1; j<=col; j++)
+    {
       rawset(i, j, n_Add(b->view(i,j), view(i,j), basecoeffs()));
     }
   }
@@ -887,16 +925,20 @@ bool bigintmat::add(bigintmat *b)
 
 bool bigintmat::sub(bigintmat *b)
 {
- if ((b->rows() != row) || (b->cols() != col)) {
-    Werror("Error in bigintmat::sub. Dimensions do not agree!");
+ if ((b->rows() != row) || (b->cols() != col))
+ {
+   WerrorS("Error in bigintmat::sub. Dimensions do not agree!");
+   return false;
+  }
+  if (!nCoeffs_are_equal(basecoeffs(), b->basecoeffs()))
+  {
+    WerrorS("Error in bigintmat::sub. coeffs do not agree!");
     return false;
   }
-  if (!nCoeffs_are_equal(basecoeffs(), b->basecoeffs())) {
-    Werror("Error in bigintmat::sub. coeffs do not agree!");
-    return false;
-  }
-  for (int i=1; i<=row; i++) {
-    for (int j=1; j<=col; j++) {
+  for (int i=1; i<=row; i++)
+  {
+    for (int j=1; j<=col; j++)
+    {
       rawset(i, j, n_Sub(view(i,j), b->view(i,j), basecoeffs()));
     }
   }
@@ -907,7 +949,7 @@ bool bigintmat::skalmult(number b, coeffs c)
 {
   if (!nCoeffs_are_equal(c, basecoeffs()))
   {
-    Werror("Wrong coeffs\n");
+    WerrorS("Wrong coeffs\n");
     return false;
   }
   number t1, t2;
@@ -926,99 +968,114 @@ bool bigintmat::skalmult(number b, coeffs c)
 
 bool bigintmat::addcol(int i, int j, number a, coeffs c)
 {
-  if ((i>col) || (j>col) || (i<1) || (j<1)) {
-    Werror("Error in addcol: Index out of range!");
+  if ((i>col) || (j>col) || (i<1) || (j<1))
+  {
+    WerrorS("Error in addcol: Index out of range!");
     return false;
   }
-  if (!nCoeffs_are_equal(c, basecoeffs())) {
-    Werror("Error in addcol: coeffs do not agree!");
+  if (!nCoeffs_are_equal(c, basecoeffs()))
+  {
+    WerrorS("Error in addcol: coeffs do not agree!");
     return false;
   }
-  number t1, t2, t3, t4;
+  number t1, t2, t3;
   for (int k=1; k<=row; k++)
   {
     t1 = view(k, j);
     t2 = view(k, i);
     t3 = n_Mult(t1, a, basecoeffs());
-    t4 = n_Add(t3, t2, basecoeffs());
-    rawset(k, i, t4);
-    n_Delete(&t3, basecoeffs());
+    n_InpAdd(t3, t2, basecoeffs());
+    rawset(k, i, t3);
   }
   return true;
 }
 
 bool bigintmat::addrow(int i, int j, number a, coeffs c)
 {
-  if ((i>row) || (j>row) || (i<1) || (j<1)) {
-    Werror("Error in addrow: Index out of range!");
+  if ((i>row) || (j>row) || (i<1) || (j<1))
+  {
+    WerrorS("Error in addrow: Index out of range!");
     return false;
   }
-  if (!nCoeffs_are_equal(c, basecoeffs())) {
-    Werror("Error in addrow: coeffs do not agree!");
+  if (!nCoeffs_are_equal(c, basecoeffs()))
+  {
+    WerrorS("Error in addrow: coeffs do not agree!");
     return false;
   }
-  number t1, t2, t3, t4;
+  number t1, t2, t3;
   for (int k=1; k<=col; k++)
   {
     t1 = view(j, k);
     t2 = view(i, k);
     t3 = n_Mult(t1, a, basecoeffs());
-    t4 = n_Add(t3, t2, basecoeffs());
-    rawset(i, k, t4);
-    n_Delete(&t3, basecoeffs());
+    n_InpAdd(t3, t2, basecoeffs());
+    rawset(i, k, t3);
   }
   return true;
 }
 
-void bigintmat::colskalmult(int i, number a, coeffs c) {
-  if ((i>=1) && (i<=col) && (nCoeffs_are_equal(c, basecoeffs()))) {
+void bigintmat::colskalmult(int i, number a, coeffs c)
+{
+  if ((i>=1) && (i<=col) && (nCoeffs_are_equal(c, basecoeffs())))
+  {
     number t, tmult;
-    for (int j=1; j<=row; j++) {
+    for (int j=1; j<=row; j++)
+    {
       t = view(j, i);
       tmult = n_Mult(a, t, basecoeffs());
       rawset(j, i, tmult);
     }
   }
   else
-    Werror("Error in colskalmult");
+    WerrorS("Error in colskalmult");
 }
 
-void bigintmat::rowskalmult(int i, number a, coeffs c) {
-  if ((i>=1) && (i<=row) && (nCoeffs_are_equal(c, basecoeffs()))) {
+void bigintmat::rowskalmult(int i, number a, coeffs c)
+{
+  if ((i>=1) && (i<=row) && (nCoeffs_are_equal(c, basecoeffs())))
+  {
     number t, tmult;
-    for (int j=1; j<=col; j++) {
+    for (int j=1; j<=col; j++)
+    {
       t = view(i, j);
       tmult = n_Mult(a, t, basecoeffs());
       rawset(i, j, tmult);
     }
   }
   else
-    Werror("Error in rowskalmult");
+    WerrorS("Error in rowskalmult");
 }
 
-void bigintmat::concatrow(bigintmat *a, bigintmat *b) {
+void bigintmat::concatrow(bigintmat *a, bigintmat *b)
+{
   int ay = a->cols();
   int ax = a->rows();
   int by = b->cols();
   int bx = b->rows();
   number tmp;
-  if (!((col == ay) && (col == by) && (ax+bx == row))) {
-    Werror("Error in concatrow. Dimensions must agree!");
+  if (!((col == ay) && (col == by) && (ax+bx == row)))
+  {
+    WerrorS("Error in concatrow. Dimensions must agree!");
     return;
   }
-  if (!(nCoeffs_are_equal(a->basecoeffs(), basecoeffs()) && nCoeffs_are_equal(b->basecoeffs(), basecoeffs()))) {
-    Werror("Error in concatrow. coeffs do not agree!");
+  if (!(nCoeffs_are_equal(a->basecoeffs(), basecoeffs()) && nCoeffs_are_equal(b->basecoeffs(), basecoeffs())))
+  {
+    WerrorS("Error in concatrow. coeffs do not agree!");
     return;
   }
-  for (int i=1; i<=ax; i++) {
-    for (int j=1; j<=ay; j++) {
+  for (int i=1; i<=ax; i++)
+  {
+    for (int j=1; j<=ay; j++)
+    {
       tmp = a->get(i,j);
       set(i, j, tmp);
       n_Delete(&tmp, basecoeffs());
     }
   }
-  for (int i=1; i<=bx; i++) {
-    for (int j=1; j<=by; j++) {
+  for (int i=1; i<=bx; i++)
+  {
+    for (int j=1; j<=by; j++)
+    {
       tmp = b->get(i,j);
       set(i+ax, j, tmp);
       n_Delete(&tmp, basecoeffs());
@@ -1026,12 +1083,15 @@ void bigintmat::concatrow(bigintmat *a, bigintmat *b) {
   }
 }
 
-void bigintmat::extendCols(int i) {
+void bigintmat::extendCols(int i)
+{
   bigintmat * tmp = new bigintmat(rows(), i, basecoeffs());
   appendCol(tmp);
   delete tmp;
 }
-void bigintmat::appendCol (bigintmat *a) {
+
+void bigintmat::appendCol (bigintmat *a)
+{
   coeffs R = basecoeffs();
   int ay = a->cols();
   int ax = a->rows();
@@ -1045,7 +1105,6 @@ void bigintmat::appendCol (bigintmat *a) {
   delete tmp;
 }
 
-
 void bigintmat::concatcol (bigintmat *a, bigintmat *b) {
   int ay = a->cols();
   int ax = a->rows();
@@ -1057,45 +1116,58 @@ void bigintmat::concatcol (bigintmat *a, bigintmat *b) {
 
   assume(nCoeffs_are_equal(a->basecoeffs(), basecoeffs()) && nCoeffs_are_equal(b->basecoeffs(), basecoeffs()));
 
-  for (int i=1; i<=ax; i++) {
-    for (int j=1; j<=ay; j++) {
+  for (int i=1; i<=ax; i++)
+  {
+    for (int j=1; j<=ay; j++)
+    {
       tmp = a->view(i,j);
       set(i, j, tmp);
     }
   }
-  for (int i=1; i<=bx; i++) {
-    for (int j=1; j<=by; j++) {
+  for (int i=1; i<=bx; i++)
+  {
+    for (int j=1; j<=by; j++)
+    {
       tmp = b->view(i,j);
       set(i, j+ay, tmp);
     }
   }
 }
 
-void bigintmat::splitrow(bigintmat *a, bigintmat *b) {
+void bigintmat::splitrow(bigintmat *a, bigintmat *b)
+{
   int ay = a->cols();
   int ax = a->rows();
   int by = b->cols();
   int bx = b->rows();
   number tmp;
-  if (!(ax + bx == row)) {
-    Werror("Error in splitrow. Dimensions must agree!");
+  if (!(ax + bx == row))
+  {
+    WerrorS("Error in splitrow. Dimensions must agree!");
   }
-  else if (!((col == ay) && (col == by))) {
-    Werror("Error in splitrow. Dimensions must agree!");
+  else if (!((col == ay) && (col == by)))
+  {
+    WerrorS("Error in splitrow. Dimensions must agree!");
   }
-  else if (!(nCoeffs_are_equal(a->basecoeffs(), basecoeffs()) && nCoeffs_are_equal(b->basecoeffs(), basecoeffs()))) {
-    Werror("Error in splitrow. coeffs do not agree!");
+  else if (!(nCoeffs_are_equal(a->basecoeffs(), basecoeffs()) && nCoeffs_are_equal(b->basecoeffs(), basecoeffs())))
+  {
+    WerrorS("Error in splitrow. coeffs do not agree!");
   }
-  else {
-    for(int i = 1; i<=ax; i++) {
-      for(int j = 1; j<=ay;j++) {
+  else
+  {
+    for(int i = 1; i<=ax; i++)
+    {
+      for(int j = 1; j<=ay;j++)
+      {
         tmp = get(i,j);
         a->set(i,j,tmp);
         n_Delete(&tmp, basecoeffs());
       }
     }
-    for (int i =1; i<=bx; i++) {
-      for (int j=1;j<=col;j++) {
+    for (int i =1; i<=bx; i++)
+    {
+      for (int j=1;j<=col;j++)
+      {
         tmp = get(i+ax, j);
         b->set(i,j,tmp);
         n_Delete(&tmp, basecoeffs());
@@ -1104,30 +1176,39 @@ void bigintmat::splitrow(bigintmat *a, bigintmat *b) {
   }
 }
 
-void bigintmat::splitcol(bigintmat *a, bigintmat *b) {
+void bigintmat::splitcol(bigintmat *a, bigintmat *b)
+{
   int ay = a->cols();
   int ax = a->rows();
   int by = b->cols();
   int bx = b->rows();
   number tmp;
-  if (!((row == ax) && (row == bx))) {
-    Werror("Error in splitcol. Dimensions must agree!");
+  if (!((row == ax) && (row == bx)))
+  {
+    WerrorS("Error in splitcol. Dimensions must agree!");
   }
-  else if (!(ay+by == col)) {
-    Werror("Error in splitcol. Dimensions must agree!");
+  else if (!(ay+by == col))
+  {
+    WerrorS("Error in splitcol. Dimensions must agree!");
   }
-  else if (!(nCoeffs_are_equal(a->basecoeffs(), basecoeffs()) && nCoeffs_are_equal(b->basecoeffs(), basecoeffs()))) {
-    Werror("Error in splitcol. coeffs do not agree!");
+  else if (!(nCoeffs_are_equal(a->basecoeffs(), basecoeffs()) && nCoeffs_are_equal(b->basecoeffs(), basecoeffs())))
+  {
+    WerrorS("Error in splitcol. coeffs do not agree!");
   }
-  else {
-    for (int i=1; i<=ax; i++) {
-      for (int j=1; j<=ay; j++) {
+  else
+  {
+    for (int i=1; i<=ax; i++)
+    {
+      for (int j=1; j<=ay; j++)
+      {
         tmp = view(i,j);
         a->set(i,j,tmp);
       }
     }
-    for (int i=1; i<=bx; i++) {
-      for (int j=1; j<=by; j++) {
+    for (int i=1; i<=bx; i++)
+    {
+      for (int j=1; j<=by; j++)
+      {
         tmp = view(i,j+ay);
         b->set(i,j,tmp);
       }
@@ -1135,19 +1216,24 @@ void bigintmat::splitcol(bigintmat *a, bigintmat *b) {
   }
 }
 
-void bigintmat::splitcol(bigintmat *a, int i) {
+void bigintmat::splitcol(bigintmat *a, int i)
+{
   number tmp;
-  if ((a->rows() != row) || (a->cols()+i-1 > col) || (i<1)) {
-    Werror("Error in splitcol. Dimensions must agree!");
+  if ((a->rows() != row) || (a->cols()+i-1 > col) || (i<1))
+  {
+    WerrorS("Error in splitcol. Dimensions must agree!");
     return;
   }
-  if (!(nCoeffs_are_equal(a->basecoeffs(), basecoeffs()))) {
-    Werror("Error in splitcol. coeffs do not agree!");
+  if (!(nCoeffs_are_equal(a->basecoeffs(), basecoeffs())))
+  {
+    WerrorS("Error in splitcol. coeffs do not agree!");
     return;
   }
   int width = a->cols();
-  for (int j=1; j<=width; j++) {
-    for (int k=1; k<=row; k++) {
+  for (int j=1; j<=width; j++)
+  {
+    for (int k=1; k<=row; k++)
+    {
       tmp = get(k, j+i-1);
       a->set(k, j, tmp);
       n_Delete(&tmp, basecoeffs());
@@ -1155,20 +1241,25 @@ void bigintmat::splitcol(bigintmat *a, int i) {
   }
 }
 
-void bigintmat::splitrow(bigintmat *a, int i) {
+void bigintmat::splitrow(bigintmat *a, int i)
+{
   number tmp;
-  if ((a->cols() != col) || (a->rows()+i-1 > row) || (i<1)) {
-    Werror("Error in Marco-splitrow");
+  if ((a->cols() != col) || (a->rows()+i-1 > row) || (i<1))
+  {
+    WerrorS("Error in Marco-splitrow");
     return;
   }
 
-  if (!(nCoeffs_are_equal(a->basecoeffs(), basecoeffs()))) {
-    Werror("Error in splitrow. coeffs do not agree!");
+  if (!(nCoeffs_are_equal(a->basecoeffs(), basecoeffs())))
+  {
+    WerrorS("Error in splitrow. coeffs do not agree!");
     return;
   }
   int height = a->rows();
-  for (int j=1; j<=height; j++) {
-    for (int k=1; k<=col; k++) {
+  for (int j=1; j<=height; j++)
+  {
+    for (int k=1; k<=col; k++)
+    {
       tmp = view(j+i-1, k);
       a->set(j, k, tmp);
     }
@@ -1177,12 +1268,14 @@ void bigintmat::splitrow(bigintmat *a, int i) {
 
 bool bigintmat::copy(bigintmat *b)
 {
-  if ((b->rows() != row) || (b->cols() != col)) {
-    Werror("Error in bigintmat::copy. Dimensions do not agree!");
+  if ((b->rows() != row) || (b->cols() != col))
+  {
+    WerrorS("Error in bigintmat::copy. Dimensions do not agree!");
     return false;
   }
-  if (!nCoeffs_are_equal(basecoeffs(), b->basecoeffs())) {
-    Werror("Error in bigintmat::copy. coeffs do not agree!");
+  if (!nCoeffs_are_equal(basecoeffs(), b->basecoeffs()))
+  {
+    WerrorS("Error in bigintmat::copy. coeffs do not agree!");
     return false;
   }
   number t1;
@@ -1214,17 +1307,22 @@ void bigintmat::copySubmatInto(bigintmat *B, int a, int b, int n, int m, int c, 
   }
 }
 
-
-int bigintmat::isOne() {
+int bigintmat::isOne()
+{
   coeffs r = basecoeffs();
-  if (row==col) {
-    for (int i=1; i<=row; i++) {
-      for (int j=1; j<=col; j++) {
-        if (i==j) {
+  if (row==col)
+  {
+    for (int i=1; i<=row; i++)
+    {
+      for (int j=1; j<=col; j++)
+      {
+        if (i==j)
+        {
           if (!n_IsOne(view(i, j), r))
             return 0;
         }
-        else {
+        else
+        {
           if (!n_IsZero(view(i,j), r))
             return 0;
         }
@@ -1234,16 +1332,22 @@ int bigintmat::isOne() {
   return 1;
 }
 
-
-void bigintmat::one() {
-  if (row==col) {
+void bigintmat::one()
+{
+  if (row==col)
+  {
     number one = n_Init(1, basecoeffs()),
            zero = n_Init(0, basecoeffs());
-    for (int i=1; i<=row; i++) {
-      for (int j=1; j<=col; j++) {
-        if (i==j) {
+    for (int i=1; i<=row; i++)
+    {
+      for (int j=1; j<=col; j++)
+      {
+        if (i==j)
+        {
           set(i, j, one);
-        } else {
+        }
+        else
+        {
           set(i, j, zero);
         }
       }
@@ -1253,17 +1357,21 @@ void bigintmat::one() {
   }
 }
 
-void bigintmat::zero() {
+void bigintmat::zero()
+{
   number tmp = n_Init(0, basecoeffs());
-  for (int i=1; i<=row; i++) {
-    for (int j=1; j<=col; j++) {
+  for (int i=1; i<=row; i++)
+  {
+    for (int j=1; j<=col; j++)
+    {
       set(i, j, tmp);
     }
   }
   n_Delete(&tmp,basecoeffs());
 }
 
-int bigintmat::isZero() {
+int bigintmat::isZero()
+{
   for (int i=1; i<=row; i++) {
     for (int j=1; j<=col; j++) {
       if (!n_IsZero(view(i,j), basecoeffs()))
@@ -1833,12 +1941,14 @@ void bigintmat::mod(number p)
 
 void bimMult(bigintmat *a, bigintmat *b, bigintmat *c)
 {
-  if (!nCoeffs_are_equal(a->basecoeffs(), b->basecoeffs())) {
-    Werror("Error in bimMult. Coeffs do not agree!");
+  if (!nCoeffs_are_equal(a->basecoeffs(), b->basecoeffs()))
+  {
+    WerrorS("Error in bimMult. Coeffs do not agree!");
     return;
   }
-  if ((a->rows() != c->rows()) || (b->cols() != c->cols()) || (a->cols() != b->rows())) {
-    Werror("Error in bimMult. Dimensions do not agree!");
+  if ((a->rows() != c->rows()) || (b->cols() != c->cols()) || (a->cols() != b->rows()))
+  {
+    WerrorS("Error in bimMult. Dimensions do not agree!");
     return;
   }
   bigintmat *tmp = bimMult(a, b);
@@ -1847,7 +1957,8 @@ void bimMult(bigintmat *a, bigintmat *b, bigintmat *c)
   delete tmp;
 }
 
-static void reduce_mod_howell(bigintmat *A, bigintmat *b, bigintmat * eps, bigintmat *x) {
+static void reduce_mod_howell(bigintmat *A, bigintmat *b, bigintmat * eps, bigintmat *x)
+{
   //write b = Ax + eps where eps is "small" in the sense of bounded by the
   //pivot entries in H. H does not need to be Howell (or HNF) but need
   //to be triagonal in the same direction.
@@ -1863,7 +1974,8 @@ static void reduce_mod_howell(bigintmat *A, bigintmat *b, bigintmat * eps, bigin
   assume(x->basecoeffs() == R);
   assume(b->basecoeffs() == R);
   assume(eps->basecoeffs() == R);
-  if (!A->cols()) {
+  if (!A->cols())
+  {
     x->zero();
     eps->copy(b);
 
@@ -1878,25 +1990,35 @@ static void reduce_mod_howell(bigintmat *A, bigintmat *b, bigintmat * eps, bigin
   }
 
   bigintmat * B = new bigintmat(b->rows(), 1, R);
-  for(int i=1; i<= b->cols(); i++) {
+  for(int i=1; i<= b->cols(); i++)
+  {
     int A_col = A->cols();
     b->getcol(i, B);
-    for(int j = B->rows(); j>0; j--) {
+    for(int j = B->rows(); j>0; j--)
+    {
       number Ai = A->view(A->rows() - B->rows() + j, A_col);
       if (n_IsZero(Ai, R) &&
-          n_IsZero(B->view(j, 1), R)) {
+          n_IsZero(B->view(j, 1), R))
+      {
         continue; //all is fine: 0*x = 0
-      } else if (n_IsZero(B->view(j, 1), R)) {
+      }
+      else if (n_IsZero(B->view(j, 1), R))
+      {
         x->rawset(x->rows() - B->rows() + j, i, n_Init(0, R));
         A_col--;
-      } else if (n_IsZero(Ai, R)) {
+      }
+      else if (n_IsZero(Ai, R))
+      {
         A_col--;
-      } else {
+      }
+      else
+      {
         // "solve" ax=b, possibly enlarging d
         number Bj = B->view(j, 1);
         number q = n_Div(Bj, Ai, R);
         x->rawset(x->rows() - B->rows() + j, i, q);
-        for(int k=j; k>B->rows() - A->rows(); k--) {
+        for(int k=j; k>B->rows() - A->rows(); k--)
+        {
           //B[k] = B[k] - x[k]A[k][j]
           number s = n_Mult(q, A->view(A->rows() - B->rows() + k, A_col), R);
           B->rawset(k, 1, n_Sub(B->view(k, 1), s, R));
@@ -1904,7 +2026,8 @@ static void reduce_mod_howell(bigintmat *A, bigintmat *b, bigintmat * eps, bigin
         }
         A_col--;
       }
-      if (!A_col) {
+      if (!A_col)
+      {
         break;
       }
     }
@@ -1932,20 +2055,24 @@ static bigintmat * prependIdentity(bigintmat *A)
   return m;
 }
 
-static number bimFarey(bigintmat *A, number N, bigintmat *L) {
+static number bimFarey(bigintmat *A, number N, bigintmat *L)
+{
   coeffs Z = A->basecoeffs(),
          Q = nInitChar(n_Q, 0);
   number den = n_Init(1, Z);
   nMapFunc f = n_SetMap(Q, Z);
 
-  for(int i=1; i<= A->rows(); i++) {
-    for(int j=1; j<= A->cols(); j++) {
+  for(int i=1; i<= A->rows(); i++)
+  {
+    for(int j=1; j<= A->cols(); j++)
+    {
       number ad = n_Mult(den, A->view(i, j), Z);
       number re = n_IntMod(ad, N, Z);
       n_Delete(&ad, Z);
       number q = n_Farey(re, N, Z);
       n_Delete(&re, Z);
-      if (!q) {
+      if (!q)
+      {
         n_Delete(&ad, Z);
         n_Delete(&den, Z);
         return NULL;
@@ -1961,7 +2088,8 @@ static number bimFarey(bigintmat *A, number N, bigintmat *L) {
       n_Delete(&d, Q);
       n_Delete(&n, Q);
 
-      if (!n_IsOne(dz, Z)) {
+      if (!n_IsOne(dz, Z))
+      {
         L->skalmult(dz, Z);
         n_InpMult(den, dz, Z);
 #if 0
@@ -1976,7 +2104,7 @@ static number bimFarey(bigintmat *A, number N, bigintmat *L) {
   }
 
   nKillChar(Q);
-  Print("bimFarey worked\n");
+  PrintS("bimFarey worked\n");
 #if 0
   L->Print();
   Print("\n * 1/");
@@ -2007,8 +2135,10 @@ static number solveAx_dixon(bigintmat *A, bigintmat *B, bigintmat *x, bigintmat 
 
   int i, j;
 
-  for(i=1; i<= A->cols(); i++) {
-    for(j=m->rows(); j>A->cols(); j--) {
+  for(i=1; i<= A->cols(); i++)
+  {
+    for(j=m->rows(); j>A->cols(); j--)
+    {
       if (!n_IsZero(m->view(j, i), Rp)) break;
     }
     if (j>A->cols()) break;
@@ -2037,13 +2167,15 @@ static number solveAx_dixon(bigintmat *A, bigintmat *B, bigintmat *x, bigintmat 
   bigintmat * b = new bigintmat(B);
   number pp = n_Init(1, R);
   i = 1;
-  do {
+  do
+  {
     bigintmat * b_p = bimChangeCoeff(b, Rp), * s;
     bigintmat * t1, *t2;
     reduce_mod_howell(Hp, b_p, eps_p, x_p);
     delete b_p;
-    if (!eps_p->isZero()) {
-      Print("no solution, since no modular solution\n");
+    if (!eps_p->isZero())
+    {
+      PrintS("no solution, since no modular solution\n");
 
       delete eps_p;
       delete x_p;
@@ -2074,7 +2206,8 @@ static number solveAx_dixon(bigintmat *A, bigintmat *B, bigintmat *x, bigintmat 
     x->swapMatrix(t1);
     delete t1;
 
-    if(kern && i==1) {
+    if(kern && i==1)
+    {
       bigintmat * ker = bimChangeCoeff(kp, R);
       t1 = bimMult(A, ker);
       t1->skaldiv(p);
@@ -2090,7 +2223,8 @@ static number solveAx_dixon(bigintmat *A, bigintmat *B, bigintmat *x, bigintmat 
 
     n_InpMult(pp, p, R);
 
-    if (b->isZero()) {
+    if (b->isZero())
+    {
       //exact solution found, stop
       delete eps_p;
       delete fps_p;
@@ -2104,21 +2238,27 @@ static number solveAx_dixon(bigintmat *A, bigintmat *B, bigintmat *x, bigintmat 
       nKillChar(Rp);
 
       return n_Init(1, R);
-    } else {
+    }
+    else
+    {
       bigintmat *y = new bigintmat(x->rows(), x->cols(), R);
       number d = bimFarey(x, pp, y);
-      if (d) {
+      if (d)
+      {
         bigintmat *c = bimMult(A, y);
         bigintmat *bd = new bigintmat(B);
         bd->skalmult(d, R);
-        if (kern) {
+        if (kern)
+        {
           bd->extendCols(kp->cols());
         }
-        if (*c == *bd) {
+        if (*c == *bd)
+        {
           x->swapMatrix(y);
           delete y;
           delete c;
-          if (kern) {
+          if (kern)
+          {
             y = new bigintmat(x->rows(), B->cols(), R);
             c = new bigintmat(x->rows(), kp->cols(), R);
             x->splitcol(y, c);
@@ -2165,7 +2305,8 @@ static number solveAx_dixon(bigintmat *A, bigintmat *B, bigintmat *x, bigintmat 
 #endif
 
 //TODO: re-write using reduce_mod_howell
-static number solveAx_howell(bigintmat *A, bigintmat *b, bigintmat *x, bigintmat *kern) {
+static number solveAx_howell(bigintmat *A, bigintmat *b, bigintmat *x, bigintmat *kern)
+{
   // try to solve Ax=b, more precisely, find
   //   number    d
   //   bigintmat x
@@ -2192,32 +2333,44 @@ static number solveAx_howell(bigintmat *A, bigintmat *b, bigintmat *x, bigintmat
   number den = n_Init(1, R);
 
   bigintmat * B = new bigintmat(A->rows(), 1, R);
-  for(int i=1; i<= b->cols(); i++) {
+  for(int i=1; i<= b->cols(); i++)
+  {
     int A_col = A->cols();
     b->getcol(i, B);
     B->skalmult(den, R);
-    for(int j = B->rows(); j>0; j--) {
+    for(int j = B->rows(); j>0; j--)
+    {
       number Ai = m->view(m->rows()-B->rows() + j, A_col);
       if (n_IsZero(Ai, R) &&
-          n_IsZero(B->view(j, 1), R)) {
+          n_IsZero(B->view(j, 1), R))
+      {
         continue; //all is fine: 0*x = 0
-      } else if (n_IsZero(B->view(j, 1), R)) {
+      }
+      else if (n_IsZero(B->view(j, 1), R))
+      {
         x->rawset(x->rows() - B->rows() + j, i, n_Init(0, R));
         A_col--;
-      } else if (n_IsZero(Ai, R)) {
+      }
+      else if (n_IsZero(Ai, R))
+      {
         delete m;
         delete B;
         n_Delete(&den, R);
         return 0;
-      } else {
+      }
+      else
+      {
         // solve ax=db, possibly enlarging d
         // so x = db/a
         number Bj = B->view(j, 1);
         number g = n_Gcd(Bj, Ai, R);
         number xi;
-        if (n_Equal(Ai, g, R)) { //good: den stable!
+        if (n_Equal(Ai, g, R))
+        { //good: den stable!
           xi = n_Div(Bj, Ai, R);
-        } else { //den <- den * (a/g), so old sol. needs to be adjusted
+        }
+        else
+        { //den <- den * (a/g), so old sol. needs to be adjusted
           number inc_d = n_Div(Ai, g, R);
           n_InpMult(den, inc_d, R);
           x->skalmult(inc_d, R);
@@ -2226,7 +2379,8 @@ static number solveAx_howell(bigintmat *A, bigintmat *b, bigintmat *x, bigintmat
           n_Delete(&inc_d, R);
         } //now for the back-substitution:
         x->rawset(x->rows() - B->rows() + j, i, xi);
-        for(int k=j; k>0; k--) {
+        for(int k=j; k>0; k--)
+        {
           //B[k] = B[k] - x[k]A[k][j]
           number s = n_Mult(xi, m->view(m->rows()-B->rows() + k, A_col), R);
           B->rawset(k, 1, n_Sub(B->view(k, 1), s, R));
@@ -2235,9 +2389,11 @@ static number solveAx_howell(bigintmat *A, bigintmat *b, bigintmat *x, bigintmat
         n_Delete(&g, R);
         A_col--;
       }
-      if (!A_col) {
+      if (!A_col)
+      {
         if (B->isZero()) break;
-        else {
+        else
+        {
           delete m;
           delete B;
           n_Delete(&den, R);
@@ -2249,10 +2405,13 @@ static number solveAx_howell(bigintmat *A, bigintmat *b, bigintmat *x, bigintmat
   delete B;
   bigintmat *T = new bigintmat(A->cols(), A->cols(), R);
   T->copySubmatInto(m, 1, 1, A->cols(), A->cols(), 1, 1);
-  if (kern) {
+  if (kern)
+  {
     int i, j;
-    for(i=1; i<= A->cols(); i++) {
-      for(j=m->rows(); j>A->cols(); j--) {
+    for(i=1; i<= A->cols(); i++)
+    {
+      for(j=m->rows(); j>A->cols(); j--)
+      {
         if (!n_IsZero(m->view(j, i), R)) break;
       }
       if (j>A->cols()) break;
@@ -2278,7 +2437,8 @@ static number solveAx_howell(bigintmat *A, bigintmat *b, bigintmat *x, bigintmat
   return den;
 }
 
-number solveAx(bigintmat *A, bigintmat *b, bigintmat *x) {
+number solveAx(bigintmat *A, bigintmat *b, bigintmat *x)
+{
 #if 0
   Print("Solve Ax=b for A=\n");
   A->Print();
@@ -2309,13 +2469,15 @@ number solveAx(bigintmat *A, bigintmat *b, bigintmat *x) {
     case n_GF:
     case n_algExt:
     case n_transExt:
-      Warn("have field, should use Gauss or better");
+      WarnS("have field, should use Gauss or better");
+      break;
     default:
       if (R->cfXExtGcd && R->cfAnn)
       { //assume it's Euclidean
         return solveAx_howell(A, b, x, NULL);
       }
-      Werror("have no solve algorithm");
+      WerrorS("have no solve algorithm");
+      break;
   }
   return NULL;
 }
@@ -2324,51 +2486,66 @@ void diagonalForm(bigintmat *A, bigintmat ** S, bigintmat ** T)
 {
   bigintmat * t, *s, *a=A;
   coeffs R = a->basecoeffs();
-  if (T) {
+  if (T)
+  {
     *T = new bigintmat(a->cols(), a->cols(), R),
     (*T)->one();
     t = new bigintmat(*T);
-  } else {
+  }
+  else
+  {
     t = *T;
   }
 
-  if (S) {
+  if (S)
+  {
     *S = new bigintmat(a->rows(), a->rows(), R);
     (*S)->one();
     s = new bigintmat(*S);
-  } else {
+  }
+  else
+  {
     s = *S;
   }
 
   int flip=0;
-  do {
+  do
+  {
     bigintmat * x, *X;
-    if (flip) {
+    if (flip)
+    {
       x = s;
       X = *S;
-    } else {
+    }
+    else
+    {
       x = t;
       X = *T;
     }
 
-    if (x) {
+    if (x)
+    {
       x->one();
       bigintmat * r = new bigintmat(a->rows()+a->cols(), a->cols(), R);
       bigintmat * rw = new bigintmat(1, a->cols(), R);
-      for(int i=0; i<a->cols(); i++) {
+      for(int i=0; i<a->cols(); i++)
+      {
         x->getrow(i+1, rw);
         r->setrow(i+1, rw);
       }
-      for (int i=0; i<a->rows(); i++) {
+      for (int i=0; i<a->rows(); i++)
+      {
         a->getrow(i+1, rw);
         r->setrow(i+a->cols()+1, rw);
       }
       r->hnf();
-      for(int i=0; i<a->cols(); i++) {
+      for(int i=0; i<a->cols(); i++)
+      {
         r->getrow(i+1, rw);
         x->setrow(i+1, rw);
       }
-      for(int i=0; i<a->rows(); i++) {
+      for(int i=0; i<a->rows(); i++)
+      {
         r->getrow(i+a->cols()+1, rw);
         a->setrow(i+1, rw);
       }
@@ -2389,14 +2566,19 @@ void diagonalForm(bigintmat *A, bigintmat ** S, bigintmat ** T)
       x->Print();
       Print("\n");
 #endif
-    } else {
+    }
+    else
+    {
       a->hnf();
     }
 
     int diag = 1;
-    for(int i=a->rows(); diag && i>0; i--) {
-      for(int j=a->cols(); j>0; j--) {
-        if ((a->rows()-i)!=(a->cols()-j) && !n_IsZero(a->view(i, j), R)) {
+    for(int i=a->rows(); diag && i>0; i--)
+    {
+      for(int j=a->cols(); j>0; j--)
+      {
+        if ((a->rows()-i)!=(a->cols()-j) && !n_IsZero(a->view(i, j), R))
+        {
           diag = 0;
           break;
         }
@@ -2425,7 +2607,8 @@ void diagonalForm(bigintmat *A, bigintmat ** S, bigintmat ** T)
 //a "q-base" for the kernel of a.
 //Should be re-done to use Howell rather than smith.
 //can be done using solveAx now.
-int kernbase (bigintmat *a, bigintmat *c, number p, coeffs q) {
+int kernbase (bigintmat *a, bigintmat *c, number p, coeffs q)
+{
 #if 0
   Print("Kernel of ");
   a->Print();
@@ -2452,15 +2635,15 @@ int kernbase (bigintmat *a, bigintmat *c, number p, coeffs q) {
 #define MIN(a,b) (a < b ? a : b)
   for(rg=0; rg<MIN(m->rows(), m->cols()) && !n_IsZero(m->view(m->rows()-rg,m->cols()-rg), coe); rg++);
 
-#undef MAX
-#define MAX(a,b) (a > b ? a : b)
   bigintmat * k = new bigintmat(m->cols(), m->rows(), coe);
-  for(int i=0; i<rg; i++) {
+  for(int i=0; i<rg; i++)
+  {
     number A = n_Ann(m->view(m->rows()-i, m->cols()-i), coe);
     k->set(m->cols()-i, i+1, A);
     n_Delete(&A, coe);
   }
-  for(int i=rg; i<m->cols(); i++) {
+  for(int i=rg; i<m->cols(); i++)
+  {
     k->set(m->cols()-i, i+1-rg, n_Init(1, coe));
   }
   bimMult(V, k, k);
@@ -2469,20 +2652,24 @@ int kernbase (bigintmat *a, bigintmat *c, number p, coeffs q) {
 }
 #endif
 
-
-bool nCoeffs_are_equal(coeffs r, coeffs s) {
+bool nCoeffs_are_equal(coeffs r, coeffs s)
+{
   if ((r == NULL) || (s == NULL))
     return false;
+  if (r == s)
+    return true;
   if ((getCoeffType(r)==n_Z) && (getCoeffType(s)==n_Z))
     return true;
-  if ((getCoeffType(r)==n_Zp) && (getCoeffType(s)==n_Zp)) {
+  if ((getCoeffType(r)==n_Zp) && (getCoeffType(s)==n_Zp))
+  {
     if (r->ch == s->ch)
       return true;
     else
       return false;
   }
   // n_Zn stimmt wahrscheinlich noch nicht
-  if ((getCoeffType(r)==n_Zn) && (getCoeffType(s)==n_Zn)) {
+  if ((getCoeffType(r)==n_Zn) && (getCoeffType(s)==n_Zn))
+  {
     if (r->ch == s->ch)
       return true;
     else
@@ -2500,7 +2687,8 @@ number bigintmat::content()
   coeffs r = basecoeffs();
   number g = get(1,1), h;
   int n=rows()*cols();
-  for(int i=1; i<n && !n_IsOne(g, r); i++) {
+  for(int i=1; i<n && !n_IsOne(g, r); i++)
+  {
     h = n_Gcd(g, view(i), r);
     n_Delete(&g, r);
     g=h;
@@ -2512,7 +2700,8 @@ void bigintmat::simplifyContentDen(number *d)
   coeffs r = basecoeffs();
   number g = n_Copy(*d, r), h;
   int n=rows()*cols();
-  for(int i=0; i<n && !n_IsOne(g, r); i++) {
+  for(int i=0; i<n && !n_IsOne(g, r); i++)
+  {
     h = n_Gcd(g, view(i), r);
     n_Delete(&g, r);
     g=h;

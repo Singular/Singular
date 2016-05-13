@@ -16,7 +16,7 @@
 // the procedures have to be wrapped into the macro D(...)
 // with the exception of jjWRONG... (which always fails)
 /*=================== operations with 1 arg.: table =================*/
-struct sValCmd1 dArith1[]=
+const struct sValCmd1 dArith1[]=
 {
 // operations:
 // proc            cmd               res             arg            context
@@ -54,7 +54,9 @@ struct sValCmd1 dArith1[]=
 ,{D(jjCHARSERIES), CHAR_SERIES_CMD, MATRIX_CMD,     IDEAL_CMD     , NO_PLURAL |NO_RING}
 ,{D(jjrCharStr),   CHARSTR_CMD,     STRING_CMD,     RING_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjOpenClose),  CLOSE_CMD,       NONE,           LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
+#ifdef SINGULAR_4_1
 ,{D(jjDUMMY),      CMATRIX_CMD,     CMATRIX_CMD,    CMATRIX_CMD ,   ALLOW_PLURAL |ALLOW_RING}
+#endif
 //,{  jjWRONG ,       COLS_CMD,        0,              VECTOR_CMD  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCOLS),       COLS_CMD,        INT_CMD,        MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCOLS),       COLS_CMD,        INT_CMD,        IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
@@ -188,9 +190,6 @@ struct sValCmd1 dArith1[]=
 ,{D(jjN2_N),       NUMBER_CMD,      NUMBER_CMD,     CNUMBER_CMD   , ALLOW_PLURAL |ALLOW_RING}
 #endif
 ,{D(jjDUMMY),      NUMBER_CMD,      NUMBER_CMD,     NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
-#ifdef SINGULAR_4_1
-,{D(jjN2_N),       NUMBER_CMD,      NUMBER_CMD,     CNUMBER_CMD   , ALLOW_PLURAL |ALLOW_RING}
-#endif
 ,{D(jjP2N),        NUMBER_CMD,      NUMBER_CMD,     POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBI2N),       NUMBER_CMD,      NUMBER_CMD,     BIGINT_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDUMMY),      CNUMBER_CMD,     CNUMBER_CMD,    CNUMBER_CMD   , ALLOW_PLURAL |ALLOW_RING}
@@ -291,7 +290,7 @@ struct sValCmd1 dArith1[]=
 ,{NULL_VAL,        0,               0,              0             , NO_PLURAL |NO_RING}
 };
 /*=================== operations with 2 arg.: table =================*/
-struct sValCmd2 dArith2[]=
+const struct sValCmd2 dArith2[]=
 {
 // operations:
 // proc           cmd              res             arg1        arg2   context
@@ -707,7 +706,7 @@ struct sValCmd2 dArith2[]=
 ,{NULL_VAL,       0,              0,              0,          0, NO_PLURAL |NO_RING}
 };
 /*=================== operations with 3 args.: table =================*/
-struct sValCmd3 dArith3[]=
+const struct sValCmd3 dArith3[]=
 {
 // operations:
 // proc                cmd          res         arg1        arg2        arg3   context
@@ -804,7 +803,6 @@ struct sValCmd3 dArith3[]=
 ,{D(jjSTD_HILB_W),     STD_CMD,    IDEAL_CMD,  IDEAL_CMD,  INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjSTD_HILB_W),     STD_CMD,    MODUL_CMD,  MODUL_CMD,  INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |NO_RING}
 ,{D(jjSUBST_P),        SUBST_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   POLY_CMD , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjSUBST_P),        SUBST_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   POLY_CMD , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSUBST_P),        SUBST_CMD,  VECTOR_CMD, VECTOR_CMD, POLY_CMD,   POLY_CMD , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSUBST_Id),       SUBST_CMD,  IDEAL_CMD,  IDEAL_CMD,  POLY_CMD,   POLY_CMD , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjSUBST_Id),       SUBST_CMD,  MODUL_CMD,  MODUL_CMD,  POLY_CMD,   POLY_CMD , ALLOW_PLURAL |ALLOW_RING}
@@ -817,7 +815,7 @@ struct sValCmd3 dArith3[]=
 };
 /*=================== operations with many arg.: table =================*/
 /* number_of_args:  -1: any), -2: any >0, .. */
-struct sValCmdM dArithM[]=
+const struct sValCmdM dArithM[]=
 {
 // operations:
 // proc            cmd               res        number_of_args   context
@@ -1171,7 +1169,7 @@ cmdnames cmds[] =
 #endif
 
 #ifdef IPCONV
-struct sConvertTypes dConvertTypes[] =
+const struct sConvertTypes dConvertTypes[] =
 {
 //   input type       output type     convert procedure
 //  int -> bigint
@@ -1238,19 +1236,19 @@ struct sConvertTypes dConvertTypes[] =
 //  link
    { STRING_CMD,      LINK_CMD,       D(iiS2Link) , NULL_VAL },
 // resolution -> list
-   { RESOLUTION_CMD,  LIST_CMD,       NULL_VAL /*iiR2L*/ , D(iiR2L_l) },
+   { RESOLUTION_CMD,  LIST_CMD,       NULL_VAL , D(iiR2L_l) },
 // list -> resolution
-   { LIST_CMD,        RESOLUTION_CMD, D(iiL2R) , NULL_VAL},
+   { LIST_CMD,        RESOLUTION_CMD, NULL_VAL ,  D(iiL2R) },
 // qring -> ring
    { QRING_CMD,       RING_CMD,       D(iiDummy), NULL_VAL},
 //  end of list
    { 0,               0,              NULL_VAL , NULL_VAL }
 };
 #else
-extern struct sConvertTypes dConvertTypes[];
+extern const struct sConvertTypes dConvertTypes[];
 #endif
 #ifdef IPASSIGN
-struct sValAssign dAssign[]=
+const struct sValAssign dAssign[]=
 {
 // same res types must be grouped together
 // proc         res             arg
@@ -1277,7 +1275,9 @@ struct sValAssign dAssign[]=
 ,{D(jiA_INTVEC),   INTVEC_CMD,     INTVEC_CMD }
 ,{D(jiA_INTVEC),   INTMAT_CMD,     INTMAT_CMD }
 ,{D(jiA_BIGINTMAT),BIGINTMAT_CMD,  BIGINTMAT_CMD}
+#ifdef SINGULAR_4_1
 ,{D(jiA_BIGINTMAT),CMATRIX_CMD,    CMATRIX_CMD}
+#endif
 ,{D(jiA_NUMBER),   NUMBER_CMD,     NUMBER_CMD }
 #ifdef SINGULAR_4_1
 ,{D(jiA_NUMBER2),  CNUMBER_CMD,    CNUMBER_CMD }
@@ -1290,15 +1290,13 @@ struct sValAssign dAssign[]=
 ,{D(jiA_PACKAGE),  PACKAGE_CMD,    PACKAGE_CMD }
 ,{D(jiA_DEF),      DEF_CMD,        DEF_CMD }
 #ifdef SINGULAR_4_1
-,{D(jiA_BIGINTMAT),CMATRIX_CMD,    CMATRIX_CMD}
-,{D(jiA_NUMBER2),  CNUMBER_CMD,    CNUMBER_CMD }
 ,{D(jiA_NUMBER2_I),CNUMBER_CMD,    INT_CMD }
 ,{D(jiA_NUMBER2_N),CNUMBER_CMD,    NUMBER_CMD }
 ,{D(jiA_CRING),    CRING_CMD,      CRING_CMD }
 #endif
 ,{NULL_VAL,        0,              0 }
 };
-struct sValAssign_sys dAssign_sys[]=
+const struct sValAssign_sys dAssign_sys[]=
 {
 // sysvars:
  {D(jjECHO),       VECHO,          INT_CMD }

@@ -25,6 +25,7 @@
 * Major differences to the C programming language::
 * Miscellaneous oddities::
 * Identifier resolution::
+* libSingular::
 @end menu
 
 @c -------------------------------------------------------------------------
@@ -562,7 +563,7 @@ listvar(K);
 @end enumerate
 
 @c ----------------------------------------------
-@node Identifier resolution,, Miscellaneous oddities, Tricks and pitfalls
+@node Identifier resolution,libSingular, Miscellaneous oddities, Tricks and pitfalls
 @section Identifier resolution
 @cindex identifier
 
@@ -614,3 +615,26 @@ short=0; 2x1; // resolved to monomial 2*x^1 !!!!!!
 2*x1; // resolved to product 2 times x1
 @c example
 @end smallexample
+@c ----------------------------------------------
+@node libSingular, ,Identifier resolution, Tricks and pitfalls
+@section libSingular
+@cindex libSingular
+
+@code{libSingular} is the C++-library version of @sc{Singular}.
+@code{Singular/libsingular.h} is the main include file,
+@code{-lSingular} the link parameter,
+@code{lib/pkgconfig/Singular.pc} provides all parameters in the pkconfig format.
+
+It contains all parts of @sc{Singular} with two exceptions:
+@enumerate
+@item
+memory allocation functions for gmp
+(see @code{mmInit} in @code{Singular/tesths.cc})
+@item
+signal handlers
+(see @code{init_signals} in @code{Singular/cntrlc.cc}).
+At least a handler for @code{SIGCHLD} must be installed.
+If the child was started by @code{libSingular} the handler
+has to call @code{sig_chld_hdl} from @code{Singular/links/ssiLink.cc}
+or implement something similiar (call @code{slClose(l)} for ssi links).
+@end enumerate

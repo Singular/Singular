@@ -1,0 +1,26 @@
+#!/bin/sh
+# this is a simple reminder how to produce scanner.cc and libparse.cc:
+# too many changes of flex (much more than to scanner.l/libparse.l)
+# and tired of porting:
+# we require flex version 2.4.5...2.5.4
+flex254 -B -Pyylp -t libparse.l >libparse.cc.lmp
+
+if diff -w libparse.cc.lmp libparse.cc >/dev/null
+then
+  echo libparse.cc was okay
+  command rm libparse.cc.lmp
+else
+  echo generating new libparse.cc
+  mv libparse.cc.lmp libparse.cc
+fi
+
+flex254  -s -I -t scanner.l > scanner.cc.lmp
+
+if diff -w scanner.cc.lmp scanner.cc >/dev/null
+then
+  echo scanner.cc was okay
+  command rm scanner.cc.lmp
+else
+  echo generating new scanner.cc
+  mv scanner.cc.lmp scanner.cc
+fi

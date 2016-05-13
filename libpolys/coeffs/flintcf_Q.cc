@@ -489,10 +489,59 @@ static number Parameter(const int i, const coeffs r)
   fmpq_poly_set_coeff_si(res,1,1);
   return (number)res;
 }
+static void WriteFd(number a, FILE *f, const coeffs)
+{
+  // format: len a_len(num den) .. a_0
+  fmpq_poly_ptr aa=(fmpq_poly_ptr)a;
+  int l=fmpq_poly_length(aa);
+  fprintf(f,"%d ",l);
+  mpq_t m;
+  mpq_init(m);
+  mpz_t num,den;
+  mpz_init(num);
+  mpz_init(den);
+  for(int i=l; i>=0; i--)
+  {
+    fmpq_poly_get_coeff_mpq(m,(fmpq_poly_ptr)a,i);
+    mpq_get_num(num,m);
+    mpq_get_den(den,m);
+    mpz_out_str (f,SSI_BASE, num);
+    fputc(' ',f);
+    mpz_out_str (f,SSI_BASE, den);
+    fputc(' ',f);
+  }
+  mpz_clear(den);
+  mpz_clear(num);
+  mpq_clear(m);
+}
+static number ReadFd(s_buff f, const coeffs)
+{
+  // format: len a_len .. a_0
+  fmpq_poly_ptr aa=(fmpq_poly_ptr)omAlloc(sizeof(fmpq_poly_t));
+  fmpq_poly_init(aa);
+  int l=s_readint(f);
+  mpz_t nm;
+  mpz_init(nm);
+  mpq_t m;
+  mpq_init(m);
+  for (int i=l;i>=0;i--)
+  {
+
+    s_readmpz_base (f,nm, SSI_BASE);
+    mpq_set_num(m,nm);
+    s_readmpz_base (f,nm, SSI_BASE);
+    mpq_set_den(m,nm);
+    fmpq_poly_set_coeff_mpq(aa,i,m);
+  }
+  mpz_clear(nm);
+  mpq_clear(m);
+  return (number)aa;
+}
 // cfClearContent
 // cfClearDenominators
 static number ConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 {
+  WerrorS("not yet: ConvFactoryNSingN");
 }
 static CanonicalForm ConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
 {
@@ -571,6 +620,8 @@ BOOLEAN flintQ_InitChar(coeffs cf, void * infoStruct)
   //  cf->cfClearDenominators = ClearDenominators;
   cf->convFactoryNSingN=ConvFactoryNSingN;
   cf->convSingNFactoryN=ConvSingNFactoryN;
+  cf->cfWriteFd  = WriteFd;
+  cf->cfReadFd = ReadFd;
 #ifdef LDEBUG
   cf->cfDBTest       = DBTest;
 #endif

@@ -46,7 +46,7 @@ enum n_coeffType
   n_CF /**< ? */
 };
 
-extern unsigned short fftable[];
+extern const unsigned short fftable[];
 
 struct snumber;
 typedef struct snumber *   number;
@@ -890,9 +890,6 @@ static FORCE_INLINE BOOLEAN nCoeff_is_Q_a(const coeffs r)
   assume(r != NULL);
   return ((n_GetChar(r) == 0) && nCoeff_is_Extension(r));
 }
-
-
-
 
 static FORCE_INLINE BOOLEAN nCoeff_is_long_R(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_long_R; }

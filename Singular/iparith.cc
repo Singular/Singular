@@ -703,38 +703,39 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
 {
-  idhdl packhdl;
   switch(u->Typ())
   {
-      case 0:
+    case 0:
+    {
+      int name_err=0;
+      if(isupper(u->name[0]))
       {
-        int name_err=0;
-        if(isupper(u->name[0]))
+        const char *c=u->name+1;
+        while((*c!='\0')&&(islower(*c)||(isdigit(*c)))) c++;
+        if (*c!='\0')
+          name_err=1;
+        else
         {
-          const char *c=u->name+1;
-          while((*c!='\0')&&(islower(*c)||(isdigit(*c)))) c++;
-          if (*c!='\0')
-            name_err=1;
-          else
+          Print("%s of type 'ANY'. Trying load.\n", u->name);
+          if(iiTryLoadLib(u, u->name))
           {
-            Print("%s of type 'ANY'. Trying load.\n", u->name);
-            if(iiTryLoadLib(u, u->name))
-            {
-              Werror("'%s' no such package", u->name);
-              return TRUE;
-            }
-            syMake(u,u->name,NULL);
+            Werror("'%s' no such package", u->name);
+            return TRUE;
           }
+          syMake(u,u->name,NULL);
         }
-        else name_err=1;
-        if(name_err)
-        { Werror("'%s' is an invalid package name",u->name);return TRUE;}
-        // and now, after the loading: use next case !!! no break !!!
       }
-      case PACKAGE_CMD:
-        packhdl = (idhdl)u->data;
-        if((!IDPACKAGE(packhdl)->loaded)
-        && (IDPACKAGE(packhdl)->language > LANG_TOP))
+      else name_err=1;
+      if(name_err)
+      { Werror("'%s' is an invalid package name",u->name);return TRUE;}
+      // and now, after the loading: use next case !!! no break !!!
+    }
+    case PACKAGE_CMD:
+      {
+        package pa=(package)u->Data();
+        if (u->rtyp==IDHDL) pa=IDPACKAGE((idhdl)u->data);
+        if((!pa->loaded)
+        && (pa->language > LANG_TOP))
         {
           Werror("'%s' not loaded", u->name);
           return TRUE;
@@ -748,16 +749,17 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
           WerrorS("reserved name with ::");
           return TRUE;
         }
-        v->req_packhdl=IDPACKAGE(packhdl);
-        syMake(v, v->name, packhdl);
+        v->req_packhdl=pa;
+        syMake(v, v->name, pa);
         memcpy(res, v, sizeof(sleftv));
         memset(v, 0, sizeof(sleftv));
-        break;
-      case DEF_CMD:
-        break;
-      default:
-        WerrorS("<package>::<id> expected");
-        return TRUE;
+      }
+      break;
+    case DEF_CMD:
+      break;
+    default:
+      WerrorS("<package>::<id> expected");
+      return TRUE;
   }
   return FALSE;
 }
@@ -4509,7 +4511,7 @@ static BOOLEAN jjKBASE(leftv res, leftv v)
 }
 static BOOLEAN jjL2R(leftv res, leftv v)
 {
-  res->data=(char *)syConvList((lists)v->Data(),FALSE);
+  res->data=(char *)syConvList((lists)v->Data());
   if (res->data != NULL)
     return FALSE;
   else
@@ -4719,7 +4721,7 @@ static BOOLEAN jjOpenClose(leftv, leftv v)
 {
   si_link l=(si_link)v->Data();
   if (iiOp==OPEN_CMD) return slOpen(l, SI_LINK_OPEN,v);
-  else                return slClose(l);
+  else { slPrepClose(l); return slClose(l);}
 }
 static BOOLEAN jjORD(leftv res, leftv v)
 {
@@ -8052,9 +8054,9 @@ static Subexpr jjMakeSub(leftv e)
 
 static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
                                     BOOLEAN proccall,
-                                    struct sValCmd2* dA2,
+                                    const struct sValCmd2* dA2,
                                     int at, int bt,
-                                    struct sConvertTypes *dConvertTypes)
+                                    const struct sConvertTypes *dConvertTypes)
 {
   memset(res,0,sizeof(sleftv));
   BOOLEAN call_failed=FALSE;
@@ -8210,9 +8212,9 @@ static BOOLEAN iiExprArith2TabIntern(leftv res, leftv a, int op, leftv b,
   return TRUE;
 }
 BOOLEAN iiExprArith2Tab(leftv res, leftv a, int op,
-                                    struct sValCmd2* dA2,
+                                    const struct sValCmd2* dA2,
                                     int at,
-                                    struct sConvertTypes *dConvertTypes)
+                                    const struct sConvertTypes *dConvertTypes)
 {
   leftv b=a->next;
   a->next=NULL;
@@ -8281,7 +8283,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 /* must be ordered: first operations for chars (infix ops),
  * then alphabetically */
 
-BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, struct sValCmd1* dA1, int at, struct sConvertTypes *dConvertTypes)
+BOOLEAN iiExprArith1Tab(leftv res, leftv a, int op, const struct sValCmd1* dA1, int at, const struct sConvertTypes *dConvertTypes)
 {
   memset(res,0,sizeof(sleftv));
   BOOLEAN call_failed=FALSE;
@@ -8468,8 +8470,8 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
  * then alphabetically */
 
 static BOOLEAN iiExprArith3TabIntern(leftv res, int op, leftv a, leftv b, leftv c,
-  struct sValCmd3* dA3, int at, int bt, int ct,
-  struct sConvertTypes *dConvertTypes)
+  const struct sValCmd3* dA3, int at, int bt, int ct,
+  const struct sConvertTypes *dConvertTypes)
 {
   memset(res,0,sizeof(sleftv));
   BOOLEAN call_failed=FALSE;
@@ -8674,9 +8676,9 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
   return TRUE;
 }
 BOOLEAN iiExprArith3Tab(leftv res, leftv a, int op,
-                                    struct sValCmd3* dA3,
+                                    const struct sValCmd3* dA3,
                                     int at,
-                                    struct sConvertTypes *dConvertTypes)
+                                    const struct sConvertTypes *dConvertTypes)
 {
   leftv b=a->next;
   a->next=NULL;

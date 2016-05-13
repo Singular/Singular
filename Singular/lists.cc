@@ -343,7 +343,7 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
       break;
     }
     r[i]=(ideal)L->m[i].data;
-    tw=(intvec*)atGet((idhdl)&L->m[i],"isHomog",INTVEC_CMD);
+    tw=(intvec*)atGet(&(L->m[i]),"isHomog",INTVEC_CMD);
     if (tw!=NULL)
     {
       w[i]=ivCopy(tw);
@@ -365,6 +365,7 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
       if (w[j]!=NULL) delete w[j];
     }
     omFreeSize((ADDRESS)w,(*len)*sizeof(intvec*));
+    if (weights!=NULL) *weights=NULL;
   }
   else
   {

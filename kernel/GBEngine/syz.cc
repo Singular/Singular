@@ -864,7 +864,9 @@ intvec * syBetti(resolvente res,int length, int * regularity,
       if (res[i]->m[j]!=NULL)
       {
         if ((pGetComp(res[i]->m[j])>l)
-        || ((i>1) && (res[i-1]->m[pGetComp(res[i]->m[j])-1]==NULL)))
+	// usual resolutions do not the following, but artifulal built may: (tr. #763)
+        //|| ((i>1) && (res[i-1]->m[pGetComp(res[i]->m[j])-1]==NULL))
+	)
         {
           WerrorS("input not a resolvent");
           omFreeSize((ADDRESS)temp1,(l+1)*sizeof(int));

@@ -1090,6 +1090,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r, BOOLEAN toplevel)
   if(rt==NONE)
   {
     WarnS("right side is not a datum, assignment ignored");
+    Warn("in line >>%s<<",my_yylinebuf);
     // if (!errorreported)
     //   WerrorS("right side is not a datum");
     //return TRUE;
@@ -2188,7 +2189,7 @@ BOOLEAN jjIMPORTFROM(leftv, leftv u, leftv v)
     idhdl t=basePack->idroot->get(vn /*v->Name()*/, myynest);
     if (t!=NULL)
     {
-      Warn("redefining `%s`",vn);
+      Warn("redefining %s (%s)",vn,my_yylinebuf);
       killhdl(t);
     }
     sleftv tmp_expr;

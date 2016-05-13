@@ -37,7 +37,6 @@ extern ring   *iiLocalRing;
 #endif
 //extern cmdnames cmds[];
 extern const char *lastreserved;
-extern const char *singular_date; /* tesths.cc, set by final compile */
 extern int myynest;
 extern int printlevel;
 extern int si_echo;
@@ -106,7 +105,7 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel=FALSE,int add_row_shift=0);
 // converts a list of modules into a minimal resolution
 syStrategy syForceMin(lists li);
 // converts a list of modules into a resolution
-syStrategy syConvList(lists li,BOOLEAN toDel);
+syStrategy syConvList(lists li);
 
 BOOLEAN syBetti1(leftv res, leftv u);
 BOOLEAN syBetti2(leftv res, leftv u, leftv w);
@@ -255,30 +254,30 @@ BOOLEAN iiTestAssume(leftv a, leftv b);
 BOOLEAN iiExprArith1Tab(leftv res,///< [out] pre-allocated result
                         leftv a,  ///< [in]  argument
                         int op,   ///< [in]  operation
-                        struct sValCmd1* dA1, ///< [in] table of possible proc
+                        const struct sValCmd1* dA1, ///< [in] table of possible proc
                                                   ///< assumes dArith1[0].cmd==op
                         int at,   ///< [in] a->Typ()
-                        struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
+                        const struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
                         );
 /// apply an operation 'op' to arguments a and a->next
 /// return TRUE on failure
 BOOLEAN iiExprArith2Tab(leftv res,///< [out] pre-allocated result
                         leftv a,  ///< [in]  2 arguments
                         int op,   ///< [in]  operation
-                        struct sValCmd2* dA2,///< [in] table of possible proc
+                        const struct sValCmd2* dA2,///< [in] table of possible proc
                                    ///< assumes dA2[0].cmd==op
                         int at,    ///< [in] a->Typ()
-                        struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
+                        const struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
                         );
 /// apply an operation 'op' to arguments a, a->next and a->next->next
 /// return TRUE on failure
 BOOLEAN iiExprArith3Tab(leftv res, ///< [out] pre-allocated result
                         leftv a,   ///< [in]  3 arguments
                         int op,    ///< [in]  operation
-                        struct sValCmd3* dA3,///< [in] table of possible proc
+                        const struct sValCmd3* dA3,///< [in] table of possible proc
                                    ///< assumes dA3[0].cmd==op
                         int at,    ///< [in] a->Typ()
-                        struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
+                        const struct sConvertTypes *dConvertTypes ///< [in] table of type conversions
                         );
 
 /// check a list of arguemys against a given field of types

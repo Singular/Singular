@@ -546,6 +546,18 @@ n_coeffType nRegister(n_coeffType n, cfInitCharProc p)
   }
 }
 
+coeffs nFindCoeffByName(const char *cf_name)
+{
+  n_Procs_s* n=cf_root;
+  while(n!=NULL)
+  {
+    if ((n->cfCoeffName!=NULL)
+    && (strcmp(cf_name,n->cfCoeffName(n))==0)) return n;
+    n=n->next;
+  }
+  // TODO: parametrized cf, e.g. flint:Z/26[a]
+  return NULL;
+}
 
 void n_Print(number& a,  const coeffs r)
 {

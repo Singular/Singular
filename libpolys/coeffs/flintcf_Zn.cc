@@ -61,7 +61,7 @@ static BOOLEAN CoeffIsEqual(const coeffs r, n_coeffType n, void * parameter)
   flintZn_struct *pp=(flintZn_struct*)parameter;
   return (r->type==n) &&(r->ch==pp->ch)
           &&(r->pParameterNames!=NULL)
-	  &&(strcmp(r->pParameterNames[0],pp->name)==0);
+          &&(strcmp(r->pParameterNames[0],pp->name)==0);
 }
 static void KillChar(coeffs r)
 {
@@ -240,14 +240,14 @@ static void WriteShort(number a, const coeffs r)
         if (need_plus) StringAppendS("+");
         need_plus=TRUE;
         if (i>0)
-	{
-	  if (m!=1) StringAppend("%d*",(int)m);
+        {
+          if (m!=1) StringAppend("%d*",(int)m);
           if (i>1)
             StringAppend("%s^%d",r->pParameterNames[0],i);
           else if (i==1)
             StringAppend("%s",r->pParameterNames[0]);
-	}
-	else StringAppend("%d",(int)m);
+        }
+        else StringAppend("%d",(int)m);
       }
     }
     StringAppendS(")");
@@ -435,6 +435,32 @@ static char* CoeffString(const coeffs r)
   sprintf(buf,"flintZ(%d,\"%s\")",r->ch,r->pParameterNames[0]);
   return buf;
 }
+static void WriteFd(number a, FILE *f, const coeffs)
+{
+  // format: len a_len .. a_0
+  nmod_poly_ptr aa=(nmod_poly_ptr)a;
+  int l=nmod_poly_length(aa);
+  fprintf(f,"%d ",l);
+  for(int i=l; i>=0; i--)
+  {
+    ulong ul=nmod_poly_get_coeff_ui(aa,i);
+    fprintf(f,"%lu ", ul);
+  }
+}
+static number ReadFd(s_buff f, const coeffs r)
+{
+  // format: len a_len .. a_0
+  nmod_poly_ptr aa=(nmod_poly_ptr)omAlloc(sizeof(nmod_poly_t));
+  nmod_poly_init(aa,r->ch);
+  int l=s_readint(f);
+  unsigned long ul;
+  for (int i=l;i>=0;i--)
+  {
+    unsigned long ul=s_readlong(f);
+    nmod_poly_set_coeff_ui(aa,i,ul);
+  }
+  return (number)aa;
+}
 #ifdef LDEBUG
 static BOOLEAN DBTest(number a, const char *f, const int l, const coeffs r)
 {
@@ -445,7 +471,7 @@ BOOLEAN flintZn_InitChar(coeffs cf, void * infoStruct)
 {
   flintZn_struct *pp=(flintZn_struct*)infoStruct;
   cf->ch=pp->ch;
-  
+
   cf->cfCoeffString  = CoeffString;
   cf->cfCoeffName    = CoeffName;
   cf->cfCoeffWrite   = CoeffWrite;
@@ -502,6 +528,8 @@ BOOLEAN flintZn_InitChar(coeffs cf, void * infoStruct)
   //  cf->cfClearDenominators = ClearDenominators;
   cf->convFactoryNSingN=ConvFactoryNSingN;
   cf->convSingNFactoryN=ConvSingNFactoryN;
+  cf->cfWriteFd = WriteFd;
+  cf->cfReadFd  = ReadFd;
 #ifdef LDEBUG
   cf->cfDBTest       = DBTest;
 #endif

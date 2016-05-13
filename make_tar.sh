@@ -1,6 +1,7 @@
 #!/bin/sh
+TARVERSION=4.0.3p1
 VERSION=4.0.3
-export VERSION
+export VERSION TARVERSION
 
 git archive --prefix=singular-$VERSION/ HEAD |tar xf -
 mkdir singular-$VERSION/doc
@@ -30,6 +31,6 @@ command rm singular-$VERSION/factory/ConwayList.txt
 command rm -rf singular-$VERSION/logo  singular-$VERSION/standalone.test  singular-$VERSION/templates  singular-$VERSION/tests
 cp redhat/singular.spec singular-$VERSION/redhat/singular.spec
 cp /tmp/wawa-i/share/singular/LIB/all.lib  singular-$VERSION/Singular/LIB/.
-tar cf singular-$VERSION.tar singular-$VERSION
-gzip -9 -f singular-$VERSION.tar
+tar cf singular-$TARVERSION.tar singular-$VERSION
+gzip -9 -f singular-$TARVERSION.tar
 command rm -rf singular-$VERSION

@@ -67,6 +67,8 @@ class Voice
     // for buffers only:
     char * buffer;        // buffer pointer
     long   fptr;          // current position in buffer
+    long   ftellptr;      // with glibc 2.22, file position gets lost
+                          // in sig_chld_hdl (ssi:ffork link), see examples/waitall.sing
 
     int    start_lineno;  // lineno, to restore in recursion
     int    curr_lineno;   // current lineno

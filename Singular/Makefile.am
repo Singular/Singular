@@ -169,7 +169,7 @@ Singulard_LDADD = libSingular.la ${BUILTIN_FLAGS}
 Singulard_LDFLAGS = -shared ${AM_LDFLAGS} ${BUILTIN_FLAGS}
 
 scriptdir = $(libexecdir)/singular/MOD
-dist_script_SCRIPTS = singularsurf singularsurf_jupyter
+dist_script_SCRIPTS = singularsurf singularsurf_jupyter singularsurf_win
 
 #### ESingular
 ESingular_CPPFLAGS = ${AM_CPPFLAGS} -DESINGULAR -DPROTO
@@ -207,12 +207,11 @@ include ${srcdir}/singular-libs
 
 singularlibrarydir = ${datadir}/singular
 singularlibrary = $(SLIB0:%=LIB/%) $(SLIB1:%=LIB/%) $(PLIBS:%=LIB/%) $(SLIB2:%=LIB/%)
+singularlibrary_DATA = $(top_srcdir)/doc/singular.idx
 nobase_dist_singularlibrary_DATA = LIB/tst.lib LIB/help.cnf ${singularlibrary}
 EXTRA_DIST = grammar.y libparse.ll make_alllib.sh LIB/all.lib.tmpl \
              singular-libs LIB/help.cnf LIB/.singularrc LIB/COPYING \
 	     links/slInit_Dynamic.cc ../doc/singular.idx
-
-dist_singularlibrary_DATA = ../doc/singular.idx
 
 singularalllibrarydir = ${datadir}/singular/LIB
 singularalllibrary = all.lib

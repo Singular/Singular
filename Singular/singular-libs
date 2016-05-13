@@ -36,17 +36,15 @@ SLIB0 = absfact.lib ainvar.lib aksaka.lib alexpoly.lib algebra.lib \
 # libs in beta testing:
 # the will be included in share.tar.gz, but not in all.lib
 # (they should be ordered alphabetically)
-# and use:
-# svn propset svn:keywords "Id" yourlib.lib
-# for new libs
 
-SLIB1 = classifyceq.lib classifyci.lib classify_aeq.lib nfmodstd.lib \
+SLIB1 = classifyceq.lib classifyci.lib classify_aeq.lib \
         dmodloc.lib divisors.lib \
         ffsolve.lib ffmodstd.lib decomp.lib template.lib \
         findifs.lib finitediff.lib \
         gitfan.lib gradedModules.lib \
         locnormal.lib modnormal.lib modular.lib \
-	JMBTest.lib JMSConst.lib multigrading.lib\
+	JMBTest.lib JMSConst.lib multigrading.lib \
+	nfmodstd.lib nfmodsyz.lib \
 	numerAlg.lib numerDecom.lib \
         orbitparam.lib parallel.lib polymake.lib\
 	realizationMatroids.lib resources.lib ringgb.lib \

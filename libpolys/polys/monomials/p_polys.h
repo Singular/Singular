@@ -788,12 +788,6 @@ p_GetTotalDegree(const unsigned long l, const ring r, const int number_of_exps)
   return sum;
 }
 
-static inline unsigned long
-p_GetTotalDegree(const unsigned long l, const ring r)
-{
-  return p_GetTotalDegree(l, r, r->ExpPerLong);
-}
-
 /***************************************************************
  *
  * Dispatcher to r->p_Procs, they do the tests/checks
@@ -1438,10 +1432,10 @@ static inline long p_Totaldegree(poly p, const ring r)
   p_LmCheckPolyRing1(p, r);
   unsigned long s = p_GetTotalDegree(p->exp[r->VarL_Offset[0]],
                                      r,
-                                     r->MinExpPerLong);
+                                     r->ExpPerLong);
   for (int i=r->VarL_Size-1; i>0; i--)
   {
-    s += p_GetTotalDegree(p->exp[r->VarL_Offset[i]], r);
+    s += p_GetTotalDegree(p->exp[r->VarL_Offset[i]], r,r->ExpPerLong);
   }
   return (long)s;
 }

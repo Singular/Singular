@@ -261,6 +261,7 @@ BOOLEAN slClose(si_link l)
   }
   defer_shutdown--;
   if (!defer_shutdown && do_shutdown) m2_end(1);
+  SI_LINK_SET_CLOSE_P(l);
   return res;
 }
 

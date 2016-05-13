@@ -40,6 +40,7 @@ void idDelEquals(ideal id);
 
 /// Count the effective size of an ideal
 /// (without the trailing allocated zero-elements)
+/// deprecated! (use IDELEMS)
 static inline int idSize(const ideal id)
 {
   int j = IDELEMS(id) - 1;

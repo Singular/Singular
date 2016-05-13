@@ -143,7 +143,7 @@ class sleftv
 inline BOOLEAN RingDependend(int t) { return (BEGIN_RING<t)&&(t<END_RING); }
 extern sleftv sLastPrinted;
 
-void syMake(leftv v,const char * name, idhdl packhdl = NULL);
+void syMake(leftv v,const char * name, package pa = NULL);
 BOOLEAN assumeStdFlag(leftv h);
 
 inline procinfov piCopy(procinfov pi)

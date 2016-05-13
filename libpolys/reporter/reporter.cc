@@ -165,16 +165,6 @@ char * StringEndS()
   return r;
 }
 
-#ifdef HAVE_TCL
-extern "C" {
-void PrintTCLS(const char c, const char *s)
-{
-  int l=strlen(s);
-  if (l>0) PrintTCL(c,l,s);
-}
-}
-#endif
-
 void WerrorS_batch(const char *s)
 {
   if (feErrors==NULL)
@@ -207,29 +197,29 @@ void Werror(const char *fmt, ...)
   va_end(ap);
 }
 
+void (*WarnS_callback)(const char *s) = NULL;
+
 void WarnS(const char *s)
 {
   #define warn_str "// ** "
-#ifdef HAVE_TCL
-  if (tclmode)
-  {
-    PrintTCLS('W',warn_str);
-    PrintTCLS('W',s);
-    PrintTCLS('W',"\n");
-  }
-  else
-#endif
   if (feWarn) /* ignore warnings if option --no-warn was given */
   {
-    fwrite(warn_str,1,6,stdout);
-    fwrite(s,1,strlen(s),stdout);
-    fwrite("\n",1,1,stdout);
-    fflush(stdout);
-    if (feProt&SI_PROT_O)
+    if (WarnS_callback==NULL)
     {
-      fwrite(warn_str,1,6,feProtFile);
-      fwrite(s,1,strlen(s),feProtFile);
-      fwrite("\n",1,1,feProtFile);
+      fwrite(warn_str,1,6,stdout);
+      fwrite(s,1,strlen(s),stdout);
+      fwrite("\n",1,1,stdout);
+      fflush(stdout);
+      if (feProt&SI_PROT_O)
+      {
+        fwrite(warn_str,1,6,feProtFile);
+        fwrite(s,1,strlen(s),feProtFile);
+        fwrite("\n",1,1,feProtFile);
+      }
+    }
+    else
+    {
+      WarnS_callback(s);
     }
   }
 }
@@ -306,13 +296,6 @@ void PrintS(const char *s)
       PrintS_callback(s);
     }
     else
-#ifdef HAVE_TCL
-    if (tclmode)
-    {
-      PrintTCLS('N',s);
-    }
-    else
-#endif
     {
       fwrite(s,1,strlen(s),stdout);
       fflush(stdout);

@@ -42,6 +42,7 @@
 #include "feOpt.h"
 #include "links/silink.h"
 #include "mod_lib.h"
+#include <Singular/distrib.h>
 
 static FORCE_INLINE void number2mpz(number n, mpz_t m){ number2mpz(n, coeffs_BIGINT, m); }
 static FORCE_INLINE number mpz2number(mpz_t m){ return mpz2number(m, coeffs_BIGINT); }
@@ -513,14 +514,7 @@ void singular_example(char *str)
 }
 
 
-struct soptionStruct
-{
-  const char * name;
-  unsigned   setval;
-  unsigned   resetval;
-};
-
-struct soptionStruct optionStruct[]=
+const struct soptionStruct optionStruct[]=
 {
   {"prot",         Sy_bit(OPT_PROT),           ~Sy_bit(OPT_PROT)   },
   {"redSB",        Sy_bit(OPT_REDSB),          ~Sy_bit(OPT_REDSB)   },
@@ -550,7 +544,7 @@ struct soptionStruct optionStruct[]=
   {"ne",           0,                          0 }
 };
 
-struct soptionStruct verboseStruct[]=
+const struct soptionStruct verboseStruct[]=
 {
   {"mem",      Sy_bit(V_SHOW_MEM),  ~Sy_bit(V_SHOW_MEM)   },
   {"yacc",     Sy_bit(V_YACC),      ~Sy_bit(V_YACC)       },
@@ -782,12 +776,21 @@ extern "C"
 }
 #endif
 
+#ifndef MAKE_DISTRIBUTION
+const char *singular_date=__DATE__ " " __TIME__;
+#endif
+
 char * versionString(/*const bool bShowDetails = false*/ )
 {
   StringSetS("");
   StringAppend("Singular for %s version %s (%d, %d bit) %s #%s",
                S_UNAME, VERSION, // SINGULAR_VERSION,
-               SINGULAR_VERSION, SIZEOF_VOIDP*8, singular_date, GIT_VERSION);
+               SINGULAR_VERSION, SIZEOF_VOIDP*8, 
+#ifdef MAKE_DISTRIBUTION
+	       VERSION_DATE, GIT_VERSION);
+#else
+	       singular_date, GIT_VERSION);
+#endif
   StringAppendS("\nwith\n\t");
 
 #if defined(mpir_version)
@@ -1162,8 +1165,6 @@ void m2_end(int i)
 }
 }
 
-const char *singular_date=__DATE__ " " __TIME__;
-
 extern "C"
 {
   void omSingOutOfMemoryFunc()
@@ -1347,12 +1348,15 @@ void siInit(char *name)
   }
 #endif
 // setting routines for PLURAL QRINGS:
+// allowing to use libpolys without libSingular(kStd)
+#ifdef HAVE_PLURAL
   nc_NF=k_NF;
   gnc_gr_bba=k_gnc_gr_bba;
   gnc_gr_mora=k_gnc_gr_mora;
   sca_bba=k_sca_bba;
   sca_mora=k_sca_mora;
   sca_gr_bba=k_sca_gr_bba;
+#endif  
 // loading standard.lib -----------------------------------------------
   if (! feOptValue(FE_OPT_NO_STDLIB))
   {

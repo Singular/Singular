@@ -301,9 +301,6 @@ struct ip_sring
   /* if >= 0, long vars in exp vector are consecutive and start there
      if <  0, long vars in exp vector are not consecutive */
   short     VarL_LowIndex;
-  // number of exponents in r->VarL_Offset[0]
-  // is minimal number of exponents in a long var
-  short     MinExpPerLong;
 
   short     NegWeightL_Size;
   /* array of size VarL_Size,

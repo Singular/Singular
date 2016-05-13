@@ -296,11 +296,12 @@ void yyerror(const char * fmt)
 
 /*%nonassoc '=' PLUSEQUAL DOTDOT*/
 /*%nonassoc '=' DOTDOT COLONCOLON*/
-%nonassoc '=' DOTDOT
+%nonassoc '='
 %left ','
 %left '&'
 %left EQUAL_EQUAL NOTEQUAL
 %left '<'
+%nonassoc DOTDOT
 %left '+' '-' ':'
 %left '/'
 %left UMINUS NOT

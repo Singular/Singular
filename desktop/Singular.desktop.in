@@ -1,15 +1,14 @@
 [Desktop Entry]
-Version=@PACKAGE_VERSION@
+Version=1.0
 Name=Singular
 Comment=run Singular @PACKAGE_VERSION@ in a terminal
 Comment[de]=Singular @PACKAGE_VERSION@ in einem Terminal starten
 Comment[es]=
-Comment[fr]=démarrer Singular @PACKAGE_VERSION@ dans un terminal
+Comment[fr]=dÃ©marrer Singular @PACKAGE_VERSION@ dans un terminal
 Comment[ru]=
 Type=Application
 Exec=Singular
 Terminal=true
 Categories=Math;Science;Education;
 Icon=@DATA_DIR@/icons/Singular.png
-Encoding=UTF-8
 
