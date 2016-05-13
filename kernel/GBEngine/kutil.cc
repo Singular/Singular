@@ -11,7 +11,7 @@
 
 #define MYTEST 0
 
-#define ADIDEBUG 0
+#define ADIDEBUG 1
 
 #include <kernel/mod2.h>
 
@@ -6133,7 +6133,7 @@ BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
  */
 BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kStrategy strat, int start=0)
 {
-  return FALSE;
+  //return FALSE;
   //printf("Faugere Rewritten Criterion\n");
 //#if 1
 #ifdef DEBUGF5
@@ -6158,6 +6158,7 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
 #ifdef DEBUGF5
       PrintS("DELETE!\n");
 #endif
+printf("\nFaugere RewCrit: * divisible by *\n");pWrite(sig);pWrite(strat->sig[k]);
       return TRUE;
     }
     //k--;
@@ -9699,6 +9700,75 @@ void postReduceByMon(LObject* h, kStrategy strat)
       {
         if(pLmDivisibleBy(strat->S[i], p))
         {
+          number dummy = n_IntMod(p->coef, strat->S[i]->coef, currRing->cf);
+          p_SetCoeff(p,dummy,currRing);
+        }
+        if(nIsZero(p->coef))
+        {
+          pLmDelete(&p);
+          deleted = TRUE;
+        }
+        else
+        {
+          ok = TRUE;
+        }
+      }
+      pp = pNext(p);
+      while(pp != NULL)
+      {
+        if(pLmDivisibleBy(strat->S[i], pp))
+        {
+          number dummy = n_IntMod(pp->coef, strat->S[i]->coef, currRing->cf);
+          p_SetCoeff(pp,dummy,currRing);
+          if(nIsZero(pp->coef))
+          {
+            pLmDelete(&pNext(p));
+            pp = pNext(p);
+            deleted = TRUE;
+          }
+          else
+          {
+            p = pp;
+            pp = pNext(p);
+          }
+        }
+        else
+        {
+          p = pp;
+          pp = pNext(p);
+        }
+      }
+    }
+  }
+  h->SetLmCurrRing();
+  if(deleted)
+    strat->initEcart(h);
+}
+
+void postReduceByMonSig(LObject* h, kStrategy strat)
+{
+  if(!nCoeff_is_Ring_Z(currRing->cf))
+      return;
+  printf("\npostreducebymon\n");
+  poly hSig = h->sig;
+  poly pH = h->GetP();
+  poly p,pp;
+  p = pH;
+  bool deleted = FALSE, ok = FALSE;
+  for(int i = 0; i<=strat->sl; i++)
+  {
+    p = pH;
+    if(pNext(strat->S[i]) == NULL)
+    {
+      printf("\n------------------\n");
+      pWrite(p);
+      pWrite(strat->S[i]);
+      while(ok == FALSE)
+      {
+        if(pLmDivisibleBy(strat->S[i], p))
+        {
+          poly dum = pDivideM(pHead(p),pHead(strat->S[i]));
+          pWrite(dum);getchar();
           number dummy = n_IntMod(p->coef, strat->S[i]->coef, currRing->cf);
           p_SetCoeff(p,dummy,currRing);
         }

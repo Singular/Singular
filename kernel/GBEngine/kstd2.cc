@@ -19,7 +19,7 @@
 # define MYTEST 0
 #endif /* ifndef SING_NDEBUG */
 
-#define ADIDEBUG 0
+#define ADIDEBUG 1
 #define ADIDEBUG_COUNT 0
 #define REV_BLOCK_SBA 0
 #define SIG_DROP_FIRST 1
@@ -721,41 +721,58 @@ int redSig (LObject* h,kStrategy strat)
     j = kFindDivisibleByInT(strat, h, start);
     if (j < 0)
     {
-      #ifdef HAVE_RINGS
-      if(rField_is_Ring(currRing))
+      // over ZZ: cleanup coefficients by complete reduction with monomials
+      postReduceByMonSig(h, strat);
+      if(nIsZero(pGetCoeff(h->p))) return 2;
+      j = kFindDivisibleByInT(strat, h,start);
+      if(j < 0)
       {
-        //Check for sigdrop after reduction
-        if(pLtCmp(beforeredsig,h->sig) == 1)
+        if(strat->tl >= 0)
+            h->i_r1 = strat->tl;
+        else
+            h->i_r1 = -1;
+        if (h->GetLmTailRing() == NULL)
         {
-          #if ADIDEBUG
-          printf("\nSigDrop after reduce\n");pWrite(beforeredsig);pWrite(h->sig);
-          #endif
-          strat->sigdrop = TRUE;
-          //Reduce it as much as you can
-          int red_result = redRing(h,strat);
-          if(red_result == 0)
-          {
-            //It reduced to 0, cancel the sigdrop
-            #if ADIDEBUG
-            printf("\nReduced to 0 via redRing. Cancel sigdrop\n");
-            #endif
-            strat->sigdrop = FALSE;
-            p_Delete(&h->sig,currRing);h->sig = NULL;
-            return 0;
-          }
-          else
-          {
-            #if ADIDEBUG
-            printf("\nReduced to this via redRing.SIGDROP\n");pWrite(h->p);
-            #endif
-            //strat->enterS(*h, strat->sl+1, strat, strat->tl);
-            return 0;
-          }
+          if (h->lcm!=NULL) pLmDelete(h->lcm);
+          h->Clear();
+          return 0;
         }
-        p_Delete(&beforeredsig,currRing);
+        #ifdef HAVE_RINGS
+        if(rField_is_Ring(currRing))
+        {
+          //Check for sigdrop after reduction
+          if(pLtCmp(beforeredsig,h->sig) == 1)
+          {
+            #if ADIDEBUG
+            printf("\nSigDrop after reduce\n");pWrite(beforeredsig);pWrite(h->sig);
+            #endif
+            strat->sigdrop = TRUE;
+            //Reduce it as much as you can
+            int red_result = redRing(h,strat);
+            if(red_result == 0)
+            {
+              //It reduced to 0, cancel the sigdrop
+              #if ADIDEBUG
+              printf("\nReduced to 0 via redRing. Cancel sigdrop\n");
+              #endif
+              strat->sigdrop = FALSE;
+              p_Delete(&h->sig,currRing);h->sig = NULL;
+              return 0;
+            }
+            else
+            {
+              #if ADIDEBUG
+              printf("\nReduced to this via redRing.SIGDROP\n");pWrite(h->p);
+              #endif
+              //strat->enterS(*h, strat->sl+1, strat, strat->tl);
+              return 0;
+            }
+          }
+          p_Delete(&beforeredsig,currRing);
+        }
+        #endif
+        return 1;
       }
-      #endif
-      return 1;
     }
 
     li = strat->T[j].pLength;
@@ -2156,7 +2173,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     #endif
     printf("\n   list   L\n");
     int iii;
-    #if 0
+    #if 1
     for(iii = 0; iii<= strat->Ll; iii++)
     {
         printf("\nL[%i]:\n",iii);

@@ -1486,9 +1486,15 @@ poly p_Div_nn(poly p, const number n, const ring r)
   while (p != NULL)
   {
     number nc = pGetCoeff(p);
+    printf("\n1,q=%p,p=%p\n",q,p);p_Write(p,r);p_Write(q,r);
     pSetCoeff0(p, n_Div(nc, n, r->cf));
     n_Delete(&nc, r->cf);
-    pIter(p);
+    printf("\n2,q=%p,p=%p\n",q,p);p_Write(p,r);p_Write(q,r);
+    if(n_IsZero(p_GetCoeff(p,r),r->cf))
+      p_LmDelete(&p,r);
+    else
+      pIter(p);
+    printf("\n3,q=%p,p=%p\n",q,p);p_Write(p,r);p_Write(q,r);
   }
   p_Test(q, r);
   return q;
@@ -1544,7 +1550,9 @@ poly p_DivideM(poly a, poly b, const ring r)
   }
   else
   {
+    p_Write(result,r);
     p_Div_nn(result,inv,r);
+    p_Write(result,r);
   }
 #else
   p_Mult_nn(result,inv,r);

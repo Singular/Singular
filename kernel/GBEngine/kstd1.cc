@@ -13,7 +13,7 @@
 
 #define MYTEST 0
 
-#define ADIDEBUG 1
+#define ADIDEBUG 0
 #define ADIDEBUG_NF 0
 
 #include <kernel/mod2.h>
