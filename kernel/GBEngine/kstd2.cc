@@ -19,7 +19,7 @@
 # define MYTEST 0
 #endif /* ifndef SING_NDEBUG */
 
-#define ADIDEBUG 1
+#define ADIDEBUG 0
 #define ADIDEBUG_COUNT 0
 #define REV_BLOCK_SBA 0
 #define SIG_DROP_FIRST 1
@@ -2250,8 +2250,9 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     pWrite(strat->P.sig);
     #endif
     /* reduction of the element chosen from L */
-
-    if (!strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat->P.GetLmCurrRing(), strat, strat->P.checked+1)) {
+    // We do not delete via RewCrit strong pairs or extended spolys over rings 
+    // these should have .lcm = NULL
+    if (strat->P.lcm == NULL || !strat->rewCrit2(strat->P.sig, ~strat->P.sevSig, strat->P.GetLmCurrRing(), strat, strat->P.checked+1)) {
       //#if 1
 #ifdef DEBUGF5
       Print("SIG OF NEXT PAIR TO HANDLE IN SIG-BASED ALGORITHM\n");
@@ -3007,6 +3008,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     rDelete (sRing);
   }
   #ifdef HAVE_RINGS
+  if(nCoeff_is_Ring_Z(currRing->cf))
+    finalReduceByMon(strat);
   if(rField_is_Ring(currRing) && !strat->sigdrop)
   #endif
     id_DelDiv(strat->Shdl, currRing);

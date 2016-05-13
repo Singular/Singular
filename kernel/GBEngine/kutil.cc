@@ -11,7 +11,7 @@
 
 #define MYTEST 0
 
-#define ADIDEBUG 1
+#define ADIDEBUG 0
 
 #include <kernel/mod2.h>
 
@@ -6133,7 +6133,6 @@ BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
  */
 BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kStrategy strat, int start=0)
 {
-  //return FALSE;
   //printf("Faugere Rewritten Criterion\n");
 //#if 1
 #ifdef DEBUGF5
@@ -6158,7 +6157,9 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
 #ifdef DEBUGF5
       PrintS("DELETE!\n");
 #endif
-printf("\nFaugere RewCrit: * divisible by *\n");pWrite(sig);pWrite(strat->sig[k]);
+      #if ADIDEBUG
+      printf("\nFaugere RewCrit: * divisible by *\n");pWrite(sig);pWrite(strat->sig[k]);
+      #endif
       return TRUE;
     }
     //k--;
@@ -9749,7 +9750,7 @@ void postReduceByMonSig(LObject* h, kStrategy strat)
 {
   if(!nCoeff_is_Ring_Z(currRing->cf))
       return;
-  printf("\npostreducebymon\n");
+  //printf("\npostReduceMonSig\n");
   poly hSig = h->sig;
   poly pH = h->GetP();
   poly p,pp;
@@ -9760,17 +9761,21 @@ void postReduceByMonSig(LObject* h, kStrategy strat)
     p = pH;
     if(pNext(strat->S[i]) == NULL)
     {
-      printf("\n------------------\n");
-      pWrite(p);
-      pWrite(strat->S[i]);
+      //printf("\n------------------\n");
+      //pWrite(p);
+      //pWrite(strat->S[i]);
       while(ok == FALSE)
       {
         if(pLmDivisibleBy(strat->S[i], p))
         {
-          poly dum = pDivideM(pHead(p),pHead(strat->S[i]));
-          pWrite(dum);getchar();
-          number dummy = n_IntMod(p->coef, strat->S[i]->coef, currRing->cf);
-          p_SetCoeff(p,dummy,currRing);
+          poly sigMult = pDivideM(pHead(p),pHead(strat->S[i]));
+          sigMult = ppMult_mm(sigMult,pCopy(strat->sig[i]));
+          if(sigMult!= NULL && pLtCmp(hSig,sigMult) == 1)
+          {
+            number dummy = n_IntMod(p->coef, strat->S[i]->coef, currRing->cf);
+            p_SetCoeff(p,dummy,currRing);
+          }
+          pDelete(&sigMult);
         }
         if(nIsZero(p->coef))
         {
@@ -9787,19 +9792,30 @@ void postReduceByMonSig(LObject* h, kStrategy strat)
       {
         if(pLmDivisibleBy(strat->S[i], pp))
         {
-          number dummy = n_IntMod(pp->coef, strat->S[i]->coef, currRing->cf);
-          p_SetCoeff(pp,dummy,currRing);
-          if(nIsZero(pp->coef))
+          poly sigMult = pDivideM(pHead(p),pHead(strat->S[i]));
+          sigMult = ppMult_mm(sigMult,pCopy(strat->sig[i]));
+          if(sigMult!= NULL && pLtCmp(hSig,sigMult) == 1)
           {
-            pLmDelete(&pNext(p));
-            pp = pNext(p);
-            deleted = TRUE;
+            number dummy = n_IntMod(pp->coef, strat->S[i]->coef, currRing->cf);
+            p_SetCoeff(pp,dummy,currRing);
+            if(nIsZero(pp->coef))
+            {
+              pLmDelete(&pNext(p));
+              pp = pNext(p);
+              deleted = TRUE;
+            }
+            else
+            {
+              p = pp;
+              pp = pNext(p);
+            }
           }
           else
           {
             p = pp;
             pp = pNext(p);
           }
+          pDelete(&sigMult);
         }
         else
         {
@@ -9807,6 +9823,7 @@ void postReduceByMonSig(LObject* h, kStrategy strat)
           pp = pNext(p);
         }
       }
+      //pWrite(h->p);
     }
   }
   h->SetLmCurrRing();
