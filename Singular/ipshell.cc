@@ -1524,18 +1524,16 @@ poly    iiHighCorner(ideal I, int ak)
 
 void iiCheckPack(package &p)
 {
-  if (p==basePack) return;
-
-  idhdl t=basePack->idroot;
-
-  while ((t!=NULL) && (IDTYP(t)!=PACKAGE_CMD) && (IDPACKAGE(t)!=p)) t=t->next;
-
-  if (t==NULL)
+  if (p!=basePack)
   {
-    WarnS("package not found\n");
-    p=basePack;
+    idhdl t=basePack->idroot;
+    while ((t!=NULL) && (IDTYP(t)!=PACKAGE_CMD) && (IDPACKAGE(t)!=p)) t=t->next;
+    if (t==NULL)
+    {
+      WarnS("package not found\n");
+      p=basePack;
+    }
   }
-  return;
 }
 
 idhdl rDefault(const char *s)
