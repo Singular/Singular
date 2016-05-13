@@ -2076,6 +2076,9 @@ See @ref{Type conversion and casting}.
 @node list operations, list related functions, list expressions, list
 @subsection list operations
 @cindex list operations
+@cindex +
+@cindex delete
+@cindex insert
 
 @table @asis
 @item @code{+}
@@ -2374,6 +2377,7 @@ map expressions combined by composition using parentheses (@code{(}, @code{)})
 @subsection map operations
 
 @cindex map operations
+@cindex ()
 
 @table @asis
 @item @code{( )}
@@ -2571,6 +2575,12 @@ See
 @node matrix operations, matrix related functions, matrix type cast, matrix
 @subsection matrix operations
 @cindex matrix operations
+@cindex +
+@cindex -
+@cindex *
+@cindex /
+@cindex ==
+@cindex <>
 
 @table @asis
 @item @code{+}
@@ -2787,6 +2797,9 @@ See
 @node module operations, module related functions, module expressions, module
 @subsection module operations
 @cindex module operations
+@cindex +
+@cindex *
+@cindex []
 
 @table @asis
 @item @code{+}
@@ -3077,6 +3090,16 @@ See
 @subsection number operations
 @cindex number operations
 @cindex mod
+@cindex +
+@cindex -
+@cindex *
+@cindex /
+@cindex %
+@cindex ^
+@cindex <=
+@cindex >=
+@cindex ==
+@cindex <>
 
 @table @asis
 @item @code{+}
@@ -3346,6 +3369,18 @@ See @ref{ring}; @ref{Type conversion and casting}.
 @node poly operations, poly related functions, poly expressions, poly
 @subsection poly operations
 @cindex poly operations
+@cindex +
+@cindex -
+@cindex *
+@cindex /
+@cindex ^
+@cindex <
+@cindex <=
+@cindex >
+@cindex >=
+@cindex ==
+@cindex <>
+@cindex []
 
 @table @asis
 @item @code{+}
@@ -3859,10 +3894,16 @@ name of the n-th ring variable (see @ref{varstr})
 @node ring operations, qring declaration, ring related functions, ring
 @subsection ring operations
 @cindex ring operations
+@cindex +
+@cindex ==
+@cindex <>
+
 @table @asis
 @item @code{+}
 construct a new ring @math{k[X,Y]} from @math{k_1[X]}  and @math{k_2[Y]}.
 (The sets of variables must be distinct).
+@item @code{==},@code{<>}
+compare two rings
 @end table
 
 @strong{Note:}
@@ -4116,6 +4157,12 @@ See
 @node string operations, string related functions, string type cast, string
 @subsection string operations
 @cindex string operations
+@cindex +
+@cindex <=
+@cindex >=
+@cindex ==
+@cindex <>
+@cindex []
 
 @table @asis
 @item @code{+}
@@ -4296,6 +4343,16 @@ See
 @node vector operations, vector related functions, vector expressions, vector
 @subsection vector operations
 @cindex vector operations
+@cindex +
+@cindex -
+@cindex /
+@cindex <
+@cindex <=
+@cindex >
+@cindex >=
+@cindex ==
+@cindex <>
+@cindex []
 
 @table @asis
 @item @code{+}
