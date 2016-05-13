@@ -1328,6 +1328,12 @@ static BOOLEAN jjEQUAL_Ma(leftv res, leftv u, leftv v)
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
+static BOOLEAN jjEQUAL_R(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)(long)(u->Data()==v->Data());
+  jjEQUAL_REST(res,u,v);
+  return FALSE;
+}
 static BOOLEAN jjEQUAL_N(leftv res, leftv u, leftv v)
 {
   res->data = (char *)((long)nEqual((number)u->Data(),(number)v->Data()));
