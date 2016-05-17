@@ -1692,6 +1692,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
+#if MYTEST
+      PrintS("New (reduced) S: "); p_DebugPrint(strat->P.p, currRing); PrintLn();
+#endif /* MYTEST */
 #endif /* KDEBUG */
 
       // min_std stuff
@@ -1745,41 +1748,39 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         }
 #endif
       }
-    }
-    if (strat->P.lcm!=NULL)
-    {
-#ifdef HAVE_RINGS
-      if (rField_is_Ring(currRing)) pLmDelete(strat->P.lcm);
-      else
-#else
-        pLmFree(strat->P.lcm);
-#endif
-        strat->P.lcm=NULL;
-    }
-    if ((red_result==1) && (strat->s_poly!=NULL))
-    {
-      // the only valid entries are: strat->P.p,
-      // strat->tailRing (read-only, keep it)
-      // (and P->p1, P->p2 (read-only, must set to NULL if P.p is changed)
-      if (strat->s_poly(strat))
+      if (strat->s_poly!=NULL)
       {
-        // we are called AFTER enterS, i.e. if we change P
-        // we have to add it also to S/T
-        // and add pairs
-        int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
-        enterT(strat->P, strat);
-        #ifdef HAVE_RINGS
-        if (rField_is_Ring(currRing))
-          superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
-        else
-        #endif
-          enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
-        strat->enterS(strat->P, pos, strat, strat->tl);
+        if (strat->s_poly(strat))
+        {
+          // we are called AFTER enterS, i.e. if we change P
+          // we have it also to S/T
+          // and add pairs
+          int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
+          enterT(strat->P, strat);
+          #ifdef HAVE_RINGS
+          if (rField_is_Ring(currRing))
+            superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+          else
+          #endif
+            enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+          strat->enterS(strat->P, pos, strat, strat->tl);
+        }
       }
-    }
+      #if ADIDEBUG
+      for(int iii = 0; iii<=strat->tl;iii++)
+      {
+        printf("\nT[%i] = ",iii);pWrite(strat->T[iii].p);
+      }
+      #endif
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
+      if (strat->P.lcm!=NULL)
+#ifdef HAVE_RINGS
+        pLmDelete(strat->P.lcm);
+#else
+        pLmFree(strat->P.lcm);
+#endif
     }
     else if (strat->P.p1 == NULL && strat->minim > 0)
     {

@@ -5622,6 +5622,7 @@ See
 @node primefactors, print, prime, Functions
 @subsection primefactors
 @cindex primefactors
+@cindex factorization
 @table @code
 @item @strong{Syntax:}
 @code{primefactors (} int/bigint/number_expression @code{)}
