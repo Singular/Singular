@@ -587,7 +587,6 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
 #ifdef USE_COEF_BUCKETS
       if (i<coef_start)
         bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
-#ifdef HAVE_RINGS
         /* Frank Seelisch on March 11, 2010:
            This looks a bit strange: The following "if" is indented
            like the previous line of code. But coded as it is,
@@ -600,7 +599,6 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
           bucket->buckets_length[i] = pLength(bucket->buckets[i]);
           kBucketAdjust(bucket, i);
         }
-#endif
       else
       if (bucket->coef[i]!=NULL)
       {
@@ -612,13 +610,11 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
       }
 #else
       bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
-#ifdef HAVE_RINGS
       if (rField_is_Ring(r) && !(rField_is_Domain(r)))
       {
         bucket->buckets_length[i] = pLength(bucket->buckets[i]);
         kBucketAdjust(bucket, i);
       }
-#endif
 #endif
     }
   }
@@ -718,7 +714,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   kbTest(bucket);
   i = pLogLength(l1);
 
-#if defined(HAVE_RINGS)||defined(HAVE_PLURAL)
+#if defined(HAVE_PLURAL)
   if ((rField_is_Ring(r) && !(rField_is_Domain(r)))
   ||(rIsPluralRing(r)))
   {

@@ -266,7 +266,6 @@ void id_DelMultiples(ideal id, const ring r)
       {
         if (id->m[j]!=NULL)
         {
-#ifdef HAVE_RINGS
           if (rField_is_Ring(r))
           {
             /* if id[j] = c*id[i] then delete id[j].
@@ -280,9 +279,6 @@ void id_DelMultiples(ideal id, const ring r)
           {
             if (p_ComparePolys(id->m[i], id->m[j],r)) p_Delete(&id->m[j],r);
           }
-#else
-          if (p_ComparePolys(id->m[i], id->m[j],r)) p_Delete(&id->m[j],r);
-#endif
         }
       }
     }
@@ -356,7 +352,6 @@ void id_DelDiv(ideal id, const ring r)
       {
         if (id->m[j]!=NULL)
         {
-#ifdef HAVE_RINGS
           if (rField_is_Ring(r))
           {
             if (p_DivisibleByRingCase(id->m[i], id->m[j],r))
@@ -371,20 +366,17 @@ void id_DelDiv(ideal id, const ring r)
           }
           else
           {
-#endif
-          /* the case of a ground field: */
-          if (p_DivisibleBy(id->m[i], id->m[j],r))
-          {
-            p_Delete(&id->m[j],r);
+            /* the case of a ground field: */
+            if (p_DivisibleBy(id->m[i], id->m[j],r))
+            {
+              p_Delete(&id->m[j],r);
+            }
+            else if (p_DivisibleBy(id->m[j], id->m[i],r))
+            {
+              p_Delete(&id->m[i],r);
+              break;
+            }
           }
-          else if (p_DivisibleBy(id->m[j], id->m[i],r))
-          {
-            p_Delete(&id->m[i],r);
-            break;
-          }
-#ifdef HAVE_RINGS
-          }
-#endif
         }
       }
     }
@@ -1432,14 +1424,9 @@ int id_ReadOutPivot(ideal arg,int* comp, const ring r)
       j = p_GetComp(p,r);
       if (componentIsUsed[j]==0)
       {
-#ifdef HAVE_RINGS
         if (p_LmIsConstantComp(p,r) &&
             (!rField_is_Ring(r) || n_IsUnit(pGetCoeff(p),r->cf)))
         {
-#else
-        if (p_LmIsConstantComp(p,r))
-        {
-#endif
           generator = i;
           componentIsUsed[j] = 1;
         }

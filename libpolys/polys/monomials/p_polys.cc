@@ -1220,17 +1220,11 @@ BOOLEAN p_OneComp(poly p, const ring r)
 }
 
 /*2
-*test if a monomial /head term is a pure power
+*test if a monomial /head term is a pure power,
+* i.e. depends on only one variable
 */
 int p_IsPurePower(const poly p, const ring r)
 {
-#ifdef HAVE_RINGS
-  if (rField_is_Ring(r))
-          {
-          if (p == NULL) return 0;
-          if (!n_IsUnit(pGetCoeff(p), r->cf)) return 0;
-          }
-#endif
   int i,k=0;
 
   for (i=r->N;i;i--)
@@ -2183,9 +2177,7 @@ poly p_Power(poly p, int i, const ring r)
             return res;
           }
           if ((pNext(rc) != NULL)
-#ifdef HAVE_RINGS
              || rField_is_Ring(r)
-#endif
              )
             return p_Pow(p,i,r);
           if ((char_p==0) || (i<=char_p))
@@ -2229,7 +2221,6 @@ void p_Content(poly ph, const ring r)
 #endif
 
 
-#ifdef HAVE_RINGS
   if (rField_is_Ring(r))
   {
     if (rField_has_Units(r))
@@ -2254,7 +2245,6 @@ void p_Content(poly ph, const ring r)
     }
     return;
   }
-#endif
   number h,d;
   poly p;
 
@@ -2732,14 +2722,12 @@ poly p_Cleardenom(poly p, const ring r)
 
   number d, h;
 
-#ifdef HAVE_RINGS
   if (rField_is_Ring(r))
   {
     p_Content(p,r);
     if(!n_GreaterZero(pGetCoeff(p),C)) p = p_Neg(p,r);
     return p;
   }
-#endif
 
   if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY)
   {
@@ -3027,7 +3015,6 @@ void p_ProjectiveUnique(poly ph, const ring r)
   number h;
   poly p;
 
-#ifdef HAVE_RINGS
   if (rField_is_Ring(r))
   {
     p_Content(ph,r);
@@ -3035,7 +3022,6 @@ void p_ProjectiveUnique(poly ph, const ring r)
         assume( n_GreaterZero(pGetCoeff(ph),C) );
     return;
   }
-#endif
 
   if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY)
   {
@@ -3576,15 +3562,12 @@ void pEnlargeSet(poly* *p, int l, int increment)
 */
 void p_Norm(poly p1, const ring r)
 {
-#ifdef HAVE_RINGS
   if (rField_is_Ring(r))
   {
     if (!n_IsUnit(pGetCoeff(p1), r->cf)) return;
     // Werror("p_Norm not possible in the case of coefficient rings.");
   }
-  else
-#endif
-  if (p1!=NULL)
+  else if (p1!=NULL)
   {
     if (pNext(p1)==NULL)
     {
@@ -4394,12 +4377,10 @@ BOOLEAN p_ComparePolys(poly p1,poly p2, const ring r)
      return FALSE;
   if (pLength(p1) != pLength(p2))
     return FALSE;
-#ifdef HAVE_RINGS
   if (rField_is_Ring(r))
   {
     if (!n_DivBy(p_GetCoeff(p1, r), p_GetCoeff(p2, r), r)) return FALSE;
   }
-#endif
   n=n_Div(p_GetCoeff(p1,r),p_GetCoeff(p2,r),r);
   while ((p1 != NULL) /*&& (p2 != NULL)*/)
   {

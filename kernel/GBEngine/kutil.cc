@@ -333,10 +333,8 @@ void cancelunit (LObject* L,BOOLEAN inNF)
   ring r = L->tailRing;
   poly p = L->GetLmTailRing();
 
-#ifdef HAVE_RINGS
     if (rField_is_Ring(r) /*&& (rHasLocalOrMixedOrdering(r))*/)
       lc = pGetCoeff(p);
-#endif
     #if ADIDEBUG
     printf("\n        cancelunit\n");
     pWrite(p);
@@ -364,11 +362,9 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       if (!inNF)
       {
         number eins;
-#ifdef HAVE_RINGS
         if (rField_is_Ring(r) /*&& (rHasLocalOrMixedOrdering(r))*/)
           eins = nCopy(lc);
         else
-#endif
           eins=nInit(1);
         if (L->p != NULL)
         {
@@ -452,6 +448,7 @@ void HEckeTest (poly pp,kStrategy strat)
   }
   // k = 0;
   p=pIsPurePower(pp);
+  if (rField_is_Ring(currRing) && (!n_IsUnit(pGetCoeff(pp),currRing->cf))) return;
   if (p!=0) strat->NotUsedAxis[p] = FALSE;
   /*- the leading term of pp is a power of the p-th variable -*/
   for (j=(currRing->N);j>0; j--)
@@ -2119,11 +2116,9 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
     // pSig = sSig, delete element due to Rewritten Criterion
     pDelete(&pSigMult);
     pDelete(&sSigMult);
-    #ifdef HAVE_RINGS
     if (rField_is_Ring(currRing))
       pLmDelete(Lp.lcm);
     else
-    #endif
       pLmFree(Lp.lcm);
     Lp.lcm=NULL;
     pDelete (&m1);
@@ -2140,11 +2135,9 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   {
     pDelete(&pSigMult);
     pDelete(&sSigMult);
-    #ifdef HAVE_RINGS
     if (rField_is_Ring(currRing))
       pLmDelete(Lp.lcm);
     else
-    #endif
       pLmFree(Lp.lcm);
     Lp.lcm=NULL;
     pDelete (&m1);
@@ -3985,9 +3978,7 @@ void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
   int j=pos;
 
-#ifdef HAVE_RINGS
   assume (!rField_is_Ring(currRing));
-#endif
   //#if ADIDEBUG
   #if 0
         Print("\n    Vor initenterpairs: The new pair list L -- after superenterpairs in loop\n");
@@ -4041,9 +4032,7 @@ void enterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int pos,kStrategy
 {
 int j=pos;
 
-#ifdef HAVE_RINGS
 assume (!rField_is_Ring(currRing));
-#endif
 
 initenterpairsSig(h,hSig,hFrom,k,ecart,0,strat, atR);
 if ( (!strat->fromT)
@@ -4072,7 +4061,6 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
   int j;
   const int iCompH = pGetComp(h);
 
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     for (j=0; j<=k; j++)
@@ -4088,7 +4076,6 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
     kMergeBintoL(strat);
   }
   else
-#endif
   for (j=0; j<=k; j++)
   {
     const int iCompSj = pGetComp(strat->S[j]);
@@ -4236,7 +4223,6 @@ int posInS (const kStrategy strat, const int length,const poly p,
   }
   else
   {
-#ifdef HAVE_RINGS
     if (rField_is_Ring(currRing))
     {
       if (pLmCmp(set[length],p)== -cmp_int)
@@ -4264,7 +4250,6 @@ int posInS (const kStrategy strat, const int length,const poly p,
       }
     }
     else
-#endif
     if (pLmCmp(set[length],p)== -cmp_int)
       return length+1;
 
@@ -5886,12 +5871,10 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
       if (strat->S[j]!= NULL && p_LmShortDivisibleBy(strat->S[j], sev[j], p, not_sev, r) &&
           (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
         {
-#ifdef HAVE_RINGS
             if(rField_is_Ring(r))
                 {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), r))
                      break;}
             else
-#endif
             break;
         }
 #else
@@ -5899,12 +5882,10 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
           (ecart== LONG_MAX || ecart>= strat->ecartS[j]) &&
           p_LmDivisibleBy(strat->S[j], p, r))
         {
-#ifdef HAVE_RINGS
             if(rField_is_Ring(r))
                 {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), r))
                     break;}
             else
-#endif
             break;
         }
 
@@ -5938,12 +5919,10 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
       if (p_LmShortDivisibleBy(t->t_p, sev[j], p, not_sev, r) &&
           (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
         {
-#ifdef HAVE_RINGS
             if(rField_is_Ring(r))
                 {if(n_DivBy(pGetCoeff(p), pGetCoeff(t->t_p), r))
                     return t;}
             else
-#endif
             return t;
         }
 #else
@@ -5953,12 +5932,10 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
         assume(t != NULL && t->t_p != NULL && t->tailRing == r && t->p == strat->S[j]);
         if (p_LmDivisibleBy(t->t_p, p, r))
         {
-#ifdef HAVE_RINGS
             if(rField_is_Ring(r))
                 {if(n_DivBy(pGetCoeff(p), pGetCoeff(t->t_p), r))
                     return t;}
             else
-#endif
             return t;
         }
       }
@@ -7361,10 +7338,8 @@ void updateS(BOOLEAN toT,kStrategy strat)
       while (i<=strat->sl)
       {
         change=FALSE;
-        #ifdef HAVE_RINGS
         if(rField_is_Ring(currRing))
             any_change = FALSE;
-        #endif
         if (((strat->fromQ==NULL) || (strat->fromQ[i]==0)) && (i>0))
         {
           redSi = pHead(strat->S[i]);
@@ -7967,7 +7942,6 @@ void enterT_strong(LObject &p, kStrategy strat, int atT)
   assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
   strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
   #if 1
-  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing) && rHasLocalOrMixedOrdering(currRing) && !n_IsUnit(p.p->coef, currRing->cf))
   {
     #if ADIDEBUG
@@ -7991,7 +7965,6 @@ void enterT_strong(LObject &p, kStrategy strat, int atT)
     pWrite(strat->T[i].p);
   }
   //getchar();*/
-  #endif
   #endif
   kTest_T(&(strat->T[atT]));
 }
@@ -8071,14 +8044,12 @@ void initHilbCrit(ideal/*F*/, ideal /*Q*/, intvec **hilb,kStrategy strat)
   //if the ordering is local, then hilb criterion
   //can be used also if the ideal is not homogenous
   if((rHasLocalOrMixedOrdering(currRing)) && (rHasMixedOrdering(currRing)==FALSE))
-  #ifdef HAVE_RINGS
   {
-  if(rField_is_Ring(currRing))
+    if(rField_is_Ring(currRing))
           *hilb=NULL;
-  else
+    else
            return;
   }
-#endif
   if (strat->homog!=isHomog)
   {
     *hilb=NULL;
@@ -8091,13 +8062,11 @@ void initBuchMoraCrit(kStrategy strat)
   strat->chainCrit=chainCritNormal;
   if (TEST_OPT_SB_1)
     strat->chainCrit=chainCritOpt_1;
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     strat->enterOnePair=enterOnePairRing;
     strat->chainCrit=chainCritRing;
   }
-#endif
 #ifdef HAVE_RATGRING
   if (rIsRatGRing(currRing))
   {
@@ -8134,7 +8103,6 @@ void initBuchMoraCrit(kStrategy strat)
   }
 #endif
 
-#ifdef HAVE_RINGS
   // Coefficient ring?
   if (rField_is_Ring(currRing))
   {
@@ -8142,7 +8110,6 @@ void initBuchMoraCrit(kStrategy strat)
     strat->Gebauer = FALSE ;
     strat->honey = FALSE;
   }
-#endif
   #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
@@ -8171,13 +8138,11 @@ void initSbaCrit(kStrategy strat)
   {
     strat->syzCrit  = syzCriterion;
   }
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     strat->enterOnePair=enterOnePairRing;
     strat->chainCrit=chainCritRing;
   }
-#endif
 #ifdef HAVE_RATGRING
   if (rIsRatGRing(currRing))
   {
@@ -8207,7 +8172,6 @@ void initSbaCrit(kStrategy strat)
   }
 #endif
 
-#ifdef HAVE_RINGS
   // Coefficient ring?
   if (rField_is_Ring(currRing))
   {
@@ -8215,7 +8179,6 @@ void initSbaCrit(kStrategy strat)
     strat->Gebauer = FALSE ;
     strat->honey = FALSE;
   }
-#endif
   #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
@@ -8319,7 +8282,6 @@ void initBuchMoraPos (kStrategy strat)
     strat->posInT = posInT19;
   else if (BTEST1(12) || BTEST1(14) || BTEST1(16) || BTEST1(18))
     strat->posInT = posInT1;
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     strat->posInL = posInL11Ring;
@@ -8327,7 +8289,6 @@ void initBuchMoraPos (kStrategy strat)
       strat->posInL = posInL11Ringls;
     strat->posInT = posInT11;
   }
-#endif
   strat->posInLDependsOnLength = kPosInLDependsOnLength(strat->posInL);
 }
 
@@ -8365,13 +8326,11 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
     if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
     if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
   }
-  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
     /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
   }
   else
-  #endif
   {
     if(TEST_OPT_SB_1)
     {
@@ -8400,9 +8359,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   strat->fromT = FALSE;
   strat->noTailReduction = !TEST_OPT_REDTAIL;
   if ((!TEST_OPT_SB_1)
-  #ifdef HAVE_RINGS
   || (rField_is_Ring(currRing))
-  #endif
   )
   {
     updateS(TRUE,strat);
@@ -8512,7 +8469,6 @@ void initSbaPos (kStrategy strat)
     strat->posInT = posInT19;
   else if (BTEST1(12) || BTEST1(14) || BTEST1(16) || BTEST1(18))
     strat->posInT = posInT1;
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     strat->posInL = posInL11Ring;
@@ -8520,7 +8476,6 @@ void initSbaPos (kStrategy strat)
       strat->posInL = posInL11Ringls;
     strat->posInT = posInT11;
   }
-#endif
   strat->posInLDependsOnLength = FALSE;
   strat->posInLSba  = posInLSig;
   //strat->posInL     = posInLSig;
@@ -8563,13 +8518,11 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
     if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
     if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
   }
-  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
     /*Shdl=*/initSLSba(F, Q,strat); /*sets also S, ecartS, fromQ */
   }
   else
-  #endif
   {
     if(TEST_OPT_SB_1)
     {
@@ -8597,10 +8550,7 @@ void initSbaBuchMora (ideal F,ideal Q,kStrategy strat)
   strat->fromT = FALSE;
   if (!TEST_OPT_SB_1)
   {
-    #ifdef HAVE_RINGS
-    if(!rField_is_Ring(currRing))
-    #endif
-    updateS(TRUE,strat);
+    if(!rField_is_Ring(currRing)) updateS(TRUE,strat);
   }
   //if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
   //strat->fromQ=NULL;
@@ -8667,9 +8617,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
           if ((Q->m[q]!=NULL)
           &&(pLmDivisibleBy(Q->m[q],r->m[l])))
           {
-            #if HAVE_RINGS
             if(!rField_is_Ring(currRing) || n_DivBy(r->m[l]->coef, Q->m[q]->coef, currRing))
-            #endif
             {
                 if (TEST_OPT_REDSB)
                 {
@@ -8764,19 +8712,15 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
             if ((l!=q)
             && (r->m[q]!=NULL)
             &&(pLmDivisibleBy(r->m[l],r->m[q]))
-            #if HAVE_RINGS
             && (!rField_is_Ring(currRing) ||
                 n_DivBy(r->m[q]->coef, r->m[l]->coef, currRing))
-            #endif
             )
             {
                 //If they are equal then take the one with the smallest length
                 if(pLmDivisibleBy(r->m[q],r->m[l])
-                #ifdef HAVE_RINGS
                 && ((rField_is_Ring(currRing)
                 && n_DivBy(r->m[q]->coef, r->m[l]->coef, currRing))
                 || !(rField_is_Ring(currRing)))
-                #endif
                 && (pLength(r->m[q]) < pLength(r->m[l]) ||
                 (pLength(r->m[q]) == pLength(r->m[l]) && nGreaterZero(r->m[q]->coef))))
                 {
@@ -8932,6 +8876,7 @@ BOOLEAN newHEdge(kStrategy strat)
 #else
   scComputeHC(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
 #endif
+  if (strat->kHEdge==NULL) return FALSE;
   if (strat->t_kHEdge != NULL) p_LmFree(strat->t_kHEdge, strat->tailRing);
   if (strat->tailRing != currRing)
     strat->t_kHEdge = k_LmInit_currRing_2_tailRing(strat->kHEdge, strat->tailRing);
@@ -8973,11 +8918,9 @@ BOOLEAN newHEdge(kStrategy strat)
 
     return TRUE;
   }
-  #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
     pLmDelete(newNoether);
   else
-  #endif
     pLmFree(newNoether);
   return FALSE;
 }
@@ -9365,11 +9308,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
   ring new_tailRing = rModifyRing(currRing,
   // Hmmm .. the condition pFDeg == p_Deg
   // might be too strong
-#ifdef HAVE_RINGS
-  (strat->homog && currRing->pFDeg == p_Deg && !(rField_is_Ring(currRing))), // TODO Oliver
-#else
-  (strat->homog && currRing->pFDeg == p_Deg), // omit_degree
-#endif
+  (strat->homog && currRing->pFDeg == p_Deg && !(rField_is_Ring(currRing))), // omit degree
   (strat->ak==0), // omit_comp if the input is an ideal
   expbound); // exp_limit
 
@@ -10207,12 +10146,10 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
     if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
     if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
   }
-  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
     /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
   }
-  #endif
   {
     if(TEST_OPT_SB_1)
     {
@@ -10241,10 +10178,7 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
   if (!TEST_OPT_SB_1)
   {
     /* the only change: we do not fill the set T*/
-    #ifdef HAVE_RINGS
-    if(!rField_is_Ring(currRing))
-    #endif
-    updateS(FALSE,strat);
+    if(!rField_is_Ring(currRing)) updateS(FALSE,strat);
   }
   if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
   strat->fromQ=NULL;
@@ -10695,9 +10629,7 @@ void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR,in
   /* Q: what is exactly the strat->fromT ? A: a local case trick; don't need it yet*/
   int j=pos;
 
-#ifdef HAVE_RINGS
   assume (!rField_is_Ring(currRing));
-#endif
   initenterpairsShift(h,k,ecart,0,strat, atR,uptodeg,lV);
   if ( (!strat->fromT)
   && ((strat->syzComp==0)

@@ -998,6 +998,7 @@ BOOLEAN hasPurePower (const poly p,int last, int *length,kStrategy strat)
   if (strat->ak <= 0 || p_MinComp(p, currRing, strat->tailRing) == strat->ak)
   {
     i = p_IsPurePower(p, currRing);
+    if (rField_is_Ring(currRing) && (!n_IsUnit(pGetCoeff(p), currRing->cf))) i=0;
     if (i == last)
     {
       *length = 0;
@@ -1008,6 +1009,7 @@ BOOLEAN hasPurePower (const poly p,int last, int *length,kStrategy strat)
     while (h != NULL)
     {
       i = p_IsPurePower(h, strat->tailRing);
+      if (rField_is_Ring(currRing) && (!n_IsUnit(pGetCoeff(h), currRing->cf))) i=0;
       if (i==last) return TRUE;
       (*length)++;
       pIter(h);
@@ -1888,10 +1890,8 @@ loop_count = 1;
 //      ecartWeights=NULL;
 //    }
 //  }
-#ifdef HAVE_RINGS
   if(nCoeff_is_Ring_Z(currRing->cf))
     finalReduceByMon(strat);
-#endif
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
   SI_RESTORE_OPT1(save1);
   idTest(strat->Shdl);
@@ -2124,12 +2124,10 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
           else assume(strat->sevS[j] == pGetShortExpVector(h.p));
           h.sev = strat->sevS[j];
           h.SetpFDeg();
-          #ifdef HAVE_RINGS
           if(rField_is_Ring(currRing) && rHasLocalOrMixedOrdering(currRing))
             enterT_strong(h,strat);
           else
-          #endif
-          enterT(h,strat);
+            enterT(h,strat);
         }
         if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
         p = redMoraNF(p,strat, lazyReduce & KSTD_NF_ECART);
@@ -2219,9 +2217,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
   if (TEST_OPT_SB_1
-    #ifdef HAVE_RINGS
     &&(!rField_is_Ring(currRing))
-    #endif
     )
     strat->newIdeal = newIdeal;
   if (rField_has_simple_inverse(currRing))
@@ -2287,7 +2283,6 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   }
   else
 #endif
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     if(nCoeff_is_Ring_Z(currRing->cf))
@@ -2359,7 +2354,6 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     }
   }
   else
-#endif
   {
     if (rHasLocalOrMixedOrdering(currRing))
     {
@@ -2419,10 +2413,8 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
   if (TEST_OPT_SB_1)
-    #ifdef HAVE_RINGS
     if(!rField_is_Ring(currRing))
-    #endif
-    strat->newIdeal = newIdeal;
+      strat->newIdeal = newIdeal;
   if (rField_has_simple_inverse(currRing))
     strat->LazyPass=20;
   else
@@ -2489,11 +2481,9 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
   }
   else
 #endif
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
     r=bba(F,Q,NULL,hilb,strat);
   else
-#endif
   {
     if (rHasLocalOrMixedOrdering(currRing))
     {
@@ -2538,10 +2528,8 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
   if (TEST_OPT_SB_1)
-    #ifdef HAVE_RINGS
     if(!rField_is_Ring(currRing))
-    #endif
-    strat->newIdeal = newIdeal;
+      strat->newIdeal = newIdeal;
   if (rField_has_simple_inverse(currRing))
     strat->LazyPass=20;
   else
@@ -2637,7 +2625,6 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     M=idInit(1,F->rank);
     return idInit(1,F->rank);
   }
-  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
     ideal sb;
@@ -2656,7 +2643,6 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
         return(sb);
     }
   }
-  #endif
   ideal r=NULL;
   int Kstd1_OldDeg = Kstd1_deg,i;
   intvec* temp_w=NULL;
@@ -3248,9 +3234,7 @@ ideal kInterRed (ideal F, ideal Q)
   if(rIsPluralRing(currRing)) return kInterRedOld(F,Q);
 #endif
   if ((rHasLocalOrMixedOrdering(currRing))|| (rField_is_numeric(currRing))
-  #ifdef HAVE_RINGS
   ||(rField_is_Ring(currRing))
-  #endif
   )
     return kInterRedOld(F,Q);
 

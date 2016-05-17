@@ -3374,9 +3374,7 @@ static void rSetOption(ring r)
   // set intStrategy
   if ( (r->cf->extRing!=NULL)
       || rField_is_Q(r)
-#ifdef HAVE_RINGS
       || rField_is_Ring(r)
-#endif
   )
     r->options |= Sy_bit(OPT_INTSTRATEGY);
   else
@@ -5117,12 +5115,10 @@ n_coeffType rFieldType(ring r)
   if (rField_is_Zp_a(r))   return getCoeffType(r->cf);
   if (rField_is_Q_a(r))    return getCoeffType(r->cf);
   if (rField_is_long_C(r)) return n_long_C;
-  #ifdef HAVE_RINGS
-   if (rField_is_Ring_Z(r)) return n_Z;
-   if (rField_is_Ring_ModN(r)) return n_Zn;
-   if (rField_is_Ring_PtoM(r)) return n_Znm;
-   if (rField_is_Ring_2toM(r)) return  n_Z2m;
-  #endif
+  if (rField_is_Ring_Z(r)) return n_Z;
+  if (rField_is_Ring_ModN(r)) return n_Zn;
+  if (rField_is_Ring_PtoM(r)) return n_Znm;
+  if (rField_is_Ring_2toM(r)) return  n_Z2m;
 
   return n_unknown;
 }

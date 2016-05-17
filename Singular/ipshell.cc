@@ -1797,10 +1797,10 @@ void rDecomposeRing_41(leftv h,const coeffs C)
 #endif
 #endif
 
-#ifdef HAVE_RINGS
 void rDecomposeRing(leftv h,const ring R)
 /* field is R or C */
 {
+#ifdef HAVE_RINGS
   lists L=(lists)omAlloc0Bin(slists_bin);
   if (rField_is_Ring_Z(R)) L->Init(1);
   else                     L->Init(2);
@@ -1823,8 +1823,10 @@ void rDecomposeRing(leftv h,const ring R)
   LL->m[1].data=(void *) R->cf->modExponent;
   L->m[1].rtyp=LIST_CMD;
   L->m[1].data=(void *)LL;
-}
+#else
+  WerrorS("rDecomposeRing");
 #endif
+}
 
 
 #ifdef SINGULAR_4_1
@@ -2071,12 +2073,10 @@ lists rDecompose(const ring r)
   {
     rDecomposeC(&(L->m[0]),r);
   }
-#ifdef HAVE_RINGS
   else if (rField_is_Ring(r))
   {
     rDecomposeRing(&(L->m[0]),r);
   }
-#endif
   else if ( r->cf->extRing!=NULL )// nCoeff_is_algExt(r->cf))
   {
     rDecomposeCF(&(L->m[0]), r->cf->extRing, r);
