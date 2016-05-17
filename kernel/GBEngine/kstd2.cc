@@ -1639,12 +1639,23 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         }
 #endif
       }
+      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+//      Print("[%d]",hilbeledeg);
+      if (strat->P.lcm!=NULL)
+      {
+        if (rField_is_Ring(currRing)) pLmDelete(strat->P.lcm);
+        else                          pLmFree(strat->P.lcm);
+        strat->P.lcm=NULL;
+      }
       if (strat->s_poly!=NULL)
       {
+        // the only valid entries are: strat->P.p,
+        // strat->tailRing (read-only, keep it)
+        // (and P->p1, P->p2 (read-only, must set to NULL if P.p is changed)
         if (strat->s_poly(strat))
         {
           // we are called AFTER enterS, i.e. if we change P
-          // we have it also to S/T
+          // we have to add it also to S/T
           // and add pairs
           int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
           enterT(strat->P, strat);
@@ -1654,15 +1665,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
             enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
           strat->enterS(strat->P, pos, strat, strat->tl);
         }
-      }
-
-      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
-//      Print("[%d]",hilbeledeg);
-      if (strat->P.lcm!=NULL)
-      {
-        if (rField_is_Ring(currRing)) pLmDelete(strat->P.lcm);
-        else                          pLmFree(strat->P.lcm);
-        strat->P.lcm=NULL;
       }
     }
     else if (strat->P.p1 == NULL && strat->minim > 0)
