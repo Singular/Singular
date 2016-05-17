@@ -11,8 +11,6 @@
 // define if buckets should be used
 #define MORA_USE_BUCKETS
 
-#define MYTEST 0
-
 #define ADIDEBUG 0
 #define ADIDEBUG_NF 0
 
@@ -22,12 +20,6 @@
 
 #include <misc/options.h>
 #include <misc/intvec.h>
-
-#if MYTEST
-#ifdef HAVE_TAIL_RING
-#undef HAVE_TAIL_RING
-#endif /* ifdef HAVE_TAIL_RING */
-#endif /* if MYTEST */
 
 #include <polys/weight.h>
 #include <kernel/polys.h>
@@ -1615,7 +1607,6 @@ loop_count = 1;
   }
   kTest_TS(strat);
   strat->use_buckets = kMoraUseBucket(strat);
-  /*- compute-------------------------------------------*/
 
 #ifdef HAVE_TAIL_RING
   if (strat->homog && strat->red == redFirst)
@@ -1628,6 +1619,7 @@ loop_count = 1;
     kDebugPrint(strat);
   }
 
+  /*- compute-------------------------------------------*/
   while (strat->Ll >= 0)
   {
     #if ADIDEBUG
@@ -1835,13 +1827,15 @@ loop_count = 1;
       // clear strat->P
       if (strat->P.lcm!=NULL)
       {
-#if defined(HAVE_RINGS)
-        pLmDelete(strat->P.lcm);
+#ifdef HAVE_RINGS
+        if (rField_is_Ring(currRing)) pLmDelete(strat->P.lcm);
+        else
 #else
-        pLmFree(strat->P.lcm);
+          pLmFree(strat->P.lcm);
 #endif
         strat->P.lcm=NULL;
       }
+
 #ifdef KDEBUG
       // make sure kTest_TS does not complain about strat->P
       memset(&strat->P,0,sizeof(strat->P));
@@ -1865,18 +1859,6 @@ loop_count = 1;
       }
     }
     kTest_TS(strat);
-
-#if ADIDEBUG
-    Print("\n    The new reducer list T -- at the end of loop %d -- is\n",loop_count);
-    for(int iii=0;iii<=strat->tl;iii++)
-    {
-      printf("\n    T[%d]:",iii);
-      p_Write(strat->T[iii].p,strat->tailRing);
-    }
-    PrintLn();
-
-    loop_count++;
-#endif /* ADIDEBUG */
   }
   /*- complete reduction of the standard basis------------------------ -*/
   if (TEST_OPT_REDSB) completeReduce(strat);
@@ -2292,15 +2274,6 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #ifdef KDEBUG
   idTest(F);
   if (Q!=NULL) idTest(Q);
-
-#if MYTEST
-  if (TEST_OPT_DEBUG)
-  {
-    PrintS("// kSTD: currRing: ");
-    rWrite(currRing);
-  }
-#endif
-
 #endif
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
@@ -2503,15 +2476,6 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
 #ifdef KDEBUG
   idTest(F);
   idTest(Q);
-
-#if MYTEST
-  if (TEST_OPT_DEBUG)
-  {
-    PrintS("// kSTD: currRing: ");
-    rWrite(currRing);
-  }
-#endif
-
 #endif
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
