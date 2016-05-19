@@ -14,6 +14,16 @@ reduce(J,gJ);
 ideal ggJ = std(gJ);
 size(gJ);size(ggJ);
 
+kill rng;
+
+// This example takes 2 minutes
+ring rng = (integer),(x,y,z),(dp(3),C);
+ideal I = -10*y^2*z^2-7*x*y-2*x+2, 7*x*y^3+11, 15*x*y^2*z-8*y*z-11;
+ideal gI =  std(I);
+reduce(I,gI);
+
+kill rng;
+
 tst_status(1);
 $
 

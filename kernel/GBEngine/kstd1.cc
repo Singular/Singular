@@ -483,7 +483,9 @@ int redRiloc (LObject* h,kStrategy strat)
       }
 #endif
     }
-
+    #if ADIDEBUG_NF
+    printf("\nReduce with this (ecart = %i): \n",ei);p_Write(strat->T[ii].p,strat->tailRing);
+    #endif
     // end of search: have to reduce with pi
     if (ei > h->ecart)
     {
@@ -746,6 +748,9 @@ int redFirst (LObject* h,kStrategy strat)
 */
 static poly redMoraNF (poly h,kStrategy strat, int flag)
 {
+  #if ADIDEBUG_NF
+  printf("\n-----------------redMoraNF\nreducing: ");pWrite(h);
+  #endif
   LObject H;
   H.p = h;
   int j = 0;
@@ -835,6 +840,9 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         pNormalize(H.p);
         z=0;
       }
+      #if ADIDEBUG_NF
+      printf("\nReduce with this (ecart = %i)\n",ei);pWrite(strat->T[ii].p);
+      #endif
       if ((ei > H.ecart) && (!strat->kHEdgeFound))
       {
         /*
@@ -1567,11 +1575,9 @@ void kDebugPrint(kStrategy strat);
 
 ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
-#ifdef HAVE_RINGS
 #if ADIDEBUG
 int loop_count;
 loop_count = 1;
-#endif
 #endif
   int olddeg = 0;
   int reduc = 0;
@@ -1627,7 +1633,6 @@ loop_count = 1;
   {
     kDebugPrint(strat);
   }
-
   while (strat->Ll >= 0)
   {
     #if ADIDEBUG
@@ -1776,21 +1781,8 @@ loop_count = 1;
         strat->P.pCleardenom();
 
       // put in T
-      //if(red_result!=3)
-      {
-        #ifdef HAVE_RINGS
-        if(rField_is_Ring(strat->tailRing) && rHasLocalOrMixedOrdering(currRing))
-        {
-            //int inittl = strat->tl;
-          enterT(strat->P,strat);
-          //enterT_strong(strat->P,strat);
-          //strat->tl = inittl+1;
-        }
-        else
-        #endif
-          enterT(strat->P,strat);
-          //enterT_strong(strat->P,strat);
-      }
+      enterT(strat->P,strat);
+
       // build new pairs
 #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
@@ -2317,72 +2309,70 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
+    #if 1
     if(nCoeff_is_Ring_Z(currRing->cf))
     {
-        #if 1
-        if(nCoeff_is_Ring_Z(currRing->cf))
+        ideal FCopy = idCopy(F);
+        poly pFmon = preIntegerCheck(FCopy, Q);
+        if(pFmon != NULL)
         {
-            ideal FCopy = idCopy(F);
-            poly pFmon = preIntegerCheck(FCopy, Q);
-            if(pFmon != NULL)
-            {
-              idInsertPoly(FCopy, pFmon);
-              #if ADIDEBUG
-              printf("\nPreintegerCheck found this constant:\n");pWrite(pFmon);
-              #endif
-            }
-            strat->kModW=kModW=NULL;
-            if (h==testHomog)
-            {
-                if (strat->ak == 0)
-                {
-                  h = (tHomog)idHomIdeal(FCopy,Q);
-                  w=NULL;
-                }
-                else if (!TEST_OPT_DEGBOUND)
-                {
-                    h = (tHomog)idHomModule(FCopy,Q,w);
-                }
-            }
-            currRing->pLexOrder=b;
-            if (h==isHomog)
-            {
-                if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
-                {
-                  strat->kModW = kModW = *w;
-                  if (vw == NULL)
-                  {
-                    strat->pOrigFDeg = currRing->pFDeg;
-                    strat->pOrigLDeg = currRing->pLDeg;
-                    pSetDegProcs(currRing,kModDeg);
-                    toReset = TRUE;
-                  }
-                }
-                currRing->pLexOrder = TRUE;
-                if (hilb==NULL) strat->LazyPass*=2;
-            }
-            strat->homog=h;
-            omTestMemory(1);
-            if(rHasLocalOrMixedOrdering(currRing))
-                r=mora(FCopy,Q,NULL,hilb,strat);
-            else
-                r=bba(FCopy,Q,NULL,hilb,strat);
+          idInsertPoly(FCopy, pFmon);
+          idSkipZeroes(FCopy);
+          #if ADIDEBUG
+          printf("\nPreintegerCheck found this constant:\n");pWrite(pFmon);
+          #endif
         }
         else
-        #endif
         {
-            if(rHasLocalOrMixedOrdering(currRing))
-                r=mora(F,Q,NULL,hilb,strat);
-            else
-                r=bba(F,Q,NULL,hilb,strat);
+          #if ADIDEBUG
+          printf("\nPreintegerCheck didn't find any new information.\n");
+          #endif
         }
+        strat->kModW=kModW=NULL;
+        if (h==testHomog)
+        {
+            if (strat->ak == 0)
+            {
+              h = (tHomog)idHomIdeal(FCopy,Q);
+              w=NULL;
+            }
+            else if (!TEST_OPT_DEGBOUND)
+            {
+                h = (tHomog)idHomModule(FCopy,Q,w);
+            }
+        }
+        currRing->pLexOrder=b;
+        if (h==isHomog)
+        {
+            if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
+            {
+              strat->kModW = kModW = *w;
+              if (vw == NULL)
+              {
+                strat->pOrigFDeg = currRing->pFDeg;
+                strat->pOrigLDeg = currRing->pLDeg;
+                pSetDegProcs(currRing,kModDeg);
+                toReset = TRUE;
+              }
+            }
+            currRing->pLexOrder = TRUE;
+            if (hilb==NULL) strat->LazyPass*=2;
+        }
+        strat->homog=h;
+        omTestMemory(1);
+        if(rHasLocalOrMixedOrdering(currRing))
+            r=mora(FCopy,Q,NULL,hilb,strat);
+        else
+            r=bba(FCopy,Q,NULL,hilb,strat);
+         idDelete(&FCopy);
     }
     else
+    #endif
     {
-      if(rHasLocalOrMixedOrdering(currRing))
-        r=mora(F,Q,NULL,hilb,strat);
-      else
-        r=bba(F,Q,NULL,hilb,strat);
+        if(rHasLocalOrMixedOrdering(currRing))
+            r=mora(F,Q,NULL,hilb,strat);
+        else
+            r=bba(F,Q,NULL,hilb,strat);
     }
   }
   else

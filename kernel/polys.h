@@ -103,6 +103,7 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
  ***************************************************************/
 /// returns 0|1|-1 if p=q|p>q|p<q w.r.t monomial ordering
 #define pLmCmp(p,q)         p_LmCmp(p,q,currRing)
+#define pLtCmp(p,q)         p_LtCmp(p,q,currRing)
 /// executes axtionE|actionG|actionS if p=q|p>q|p<q w.r.t monomial ordering
 /// action should be a "goto ..."
 #define pLmCmpAction(p,q, actionE, actionG, actionS)  \

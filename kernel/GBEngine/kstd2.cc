@@ -1504,9 +1504,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   }
 #endif /* MYTEST */
 #endif /* KDEBUG */
-
 #ifdef HAVE_TAIL_RING
-  if(!idIs0(F) &&(!rField_is_Ring(currRing)))  // create strong gcd poly computes with tailring and S[i] ->to be fixed
+  if((!idIs0(F)) && (!rField_is_Ring(currRing)))
     kStratInitChangeTailRing(strat);
 #endif
   if (BVERBOSE(23))
@@ -1538,9 +1537,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     for(iii = 0; iii<= strat->Ll; iii++)
     {
         printf("L[%i]:",iii);
-        p_Write(strat->L[iii].p, currRing);
-        p_Write(strat->L[iii].p1, currRing);
-        p_Write(strat->L[iii].p2, currRing);
+        pWrite(strat->L[iii].p);
+        p_Write(strat->L[iii].p1, strat->tailRing);
+        p_Write(strat->L[iii].p2, strat->tailRing);
     }
     #else
     {
@@ -1559,7 +1558,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         p_Write(strat->B[iii].p2, strat->tailRing);
     }
     #endif
-    //getchar();
+    getchar();
     #endif
     #ifdef KDEBUG
       if (TEST_OPT_DEBUG) messageSets(strat);
@@ -1732,7 +1731,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         #if ADIDEBUG
         printf("\nThis element is added to S\n");
         p_Write(strat->P.p, strat->tailRing);p_Write(strat->P.p1, strat->tailRing);p_Write(strat->P.p2, strat->tailRing);
-        getchar();
+        //getchar();
         #endif
         strat->enterS(strat->P, pos, strat, strat->tl);
 #if 0

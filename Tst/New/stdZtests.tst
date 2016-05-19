@@ -546,11 +546,8 @@ reduce(I,gI);
 kill rng;
 
 ring rng = (integer),(x,y,z),(dp(3),C);
-ideal I = -10*y^2*z^2-7*x*y-2*x+2, 7*x*y^3+11, 15*x*y^2*z-8*y*z-11;
+ideal I = 8*y^2*z+3*x*z, -3*x^2*z-9*y^2*z+3, 5*x*z^2-9*y*z+2*z;
 ideal gI =  std(I);
-reduce(I,gI);
-I = 8*y^2*z+3*x*z, -3*x^2*z-9*y^2*z+3, 5*x*z^2-9*y*z+2*z;
-gI =  std(I);
 reduce(I,gI);
 kill rng;
 
@@ -645,6 +642,15 @@ attrib(gI,"isSB",0);
 attrib(gJ,"isSB",0);
 ideal ngIJ = intersect(gI,gJ ); // wrong
 kill rng;
+
+// Janko's Beispiel
+
+ring r =integer,(z,x,y),lp;
+poly f = z7x5 + z2xy9 + zy11 + x3y9;
+ideal I = diff(f,x),diff(f,y),diff(f,z);
+ideal gI = std(I);
+reduce(I,gI);
+kill r;
 
 tst_status(1);$;
 
