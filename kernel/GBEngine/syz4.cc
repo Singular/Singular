@@ -182,17 +182,37 @@ static ideal computeFrame(const ideal G, const syzM_i_Function syzM_i,
     return frame;
 }
 
+static void computeLiftings(const resolvente res, const int index)
+{
+    for (int j = res[index]->ncols-1; j >= 0; j--) {
+//        liftTree(res[index]->m[j], res[index-1]);
+    }
+}
+
+static void sortPolysTails(const resolvente res, const int index)
+{
+    const ring r = currRing;
+    for (int j = res[index]->ncols-1; j >= 0; j--) {
+        if (res[index]->m[j]->next != NULL) {
+            res[index]->m[j]->next->next
+                = p_SortAdd(res[index]->m[j]->next->next, r);
+        }
+    }
+}
+
 static int computeResolution(resolvente &res, const int length,
     const syzHeadFunction *syzHead)
 {
     int index = 0;
     if (!idIs0(res[index]) && index < length) {
-        res[index+1] = computeFrame(res[index], syzM_i_unsorted, syzHead);
         index++;
+        res[index] = computeFrame(res[index-1], syzM_i_unsorted, syzHead);
     }
     while (!idIs0(res[index]) && index < length) {
-        res[index+1] = computeFrame(res[index], syzM_i_sorted, syzHead);
+        computeLiftings(res, index);
+        sortPolysTails(res, index);
         index++;
+        res[index] = computeFrame(res[index-1], syzM_i_sorted, syzHead);
     }
     if (index < length) {
         res = (resolvente)omReallocSize(res, (length+1)*sizeof(ideal),
@@ -206,7 +226,7 @@ static void sortPolys(const resolvente res, const int length)
     const ring r = currRing;
     for (int i = length; i > 0; i--) {
         for (int j = res[i]->ncols-1; j >= 0; j--) {
-            res[i]->m[j] = p_SortAdd(res[i]->m[j], r);
+            res[i]->m[j] = p_SortAdd(res[i]->m[j], r, TRUE);
         }
     }
 }
