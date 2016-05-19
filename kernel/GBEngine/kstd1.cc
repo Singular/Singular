@@ -2319,7 +2319,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   {
     if(nCoeff_is_Ring_Z(currRing->cf))
     {
-        #if 0
+        #if 1
         if(nCoeff_is_Ring_Z(currRing->cf))
         {
             ideal FCopy = idCopy(F);

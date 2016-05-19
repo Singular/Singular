@@ -5136,6 +5136,85 @@ int posInL11 (const LSet set, const int length,
 * For the same totaldegree, original pairs (from F) will
 * be put at the end and smalles coefficents
 */
+int posInL13Ring (const LSet set, const int length,
+              LObject* p,const kStrategy strat)
+{
+  if (length < 0) return 0;
+  int an,en,i;
+  an = 0;
+  en = length+1;
+  #if 0
+  printf("\n----------------------\n");
+  for(i=0;i<=length;i++)
+    pWrite(set[i].p);
+  printf("\n----------------------\n");
+  #endif
+  loop
+  {
+    if (an >= en-1)
+    {
+      if(an == en)
+        return en;
+      if (set[an].GetpFDeg() > p->GetpFDeg())
+        return en;
+      if (set[an].GetpFDeg() < p->GetpFDeg())
+        return an;
+      if (set[an].GetpFDeg() == p->GetpFDeg())
+      {
+        number lcset,lcp;
+        lcset = pGetCoeff(set[an].p);
+        lcp = pGetCoeff(p->p);
+        if(!nGreaterZero(lcset))
+        {
+          set[an].p=p_Neg(set[an].p,currRing);
+          if (set[an].t_p!=NULL)
+            pSetCoeff0(set[an].t_p,pGetCoeff(set[an].p));
+          lcset=pGetCoeff(set[an].p);
+        }
+        if(!nGreaterZero(lcp))
+        {
+          p->p=p_Neg(p->p,currRing);
+          if (p->t_p!=NULL)
+            pSetCoeff0(p->t_p,pGetCoeff(p->p));
+          lcp=pGetCoeff(p->p);
+        }
+        if(pLtCmp(set[an].p,p->p) == 1)
+        {
+          return en;
+        }
+        else
+        {
+          return an;
+        }
+      }
+    }
+    i=(an+en) / 2;
+    if (set[i].GetpFDeg() > p->GetpFDeg())
+      an=i;
+    if (set[i].GetpFDeg() < p->GetpFDeg())
+      en=i;
+    if (set[i].GetpFDeg() == p->GetpFDeg())
+    {
+      if(pLtCmp(set[an].p,p->p) == 1)
+      {
+        an = i;
+      }
+      else
+      {
+        en = i;
+      }
+    }
+  }
+}
+
+
+/*2
+* looks up the position of polynomial p in set
+* set[length] is the smallest element in set with respect
+* to the ordering-procedure pLmCmp,totaldegree,coefficient
+* For the same totaldegree, original pairs (from F) will
+* be put at the end and smalles coefficents
+*/
 int posInL11Ring (const LSet set, const int length,
               LObject* p,const kStrategy strat)
 {
@@ -8322,7 +8401,7 @@ void initBuchMoraPos (kStrategy strat)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    strat->posInL = posInL11Ring;
+    strat->posInL = posInL13Ring;
     if(rHasLocalOrMixedOrdering(currRing) && currRing->pLexOrder == TRUE)
       strat->posInL = posInL11Ringls;
     strat->posInT = posInT11;
@@ -9115,7 +9194,7 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
       {
           if(pGetComp(syz->m[i]) == 1)
           {
-              if(pIsConstant(syz->m[i]))
+              if(pIsConstant(pHead(syz->m[i])))
               {
                   integer = pHead(syz->m[i]);
                   pSetComp(integer, 0);
@@ -9165,9 +9244,10 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
           {
               if(pGetComp(syz->m[i]) == 1)
               {
-                  if(pIsConstant(syz->m[i]))
+                  pSetComp(syz->m[i], 0);
+                  if(pIsConstant(pHead(syz->m[i])))
                   {
-                      pSetCoeff(mindegmon, syz->m[i]->coef);
+                      pSetCoeff0(mindegmon, nCopy(pGetCoeff(syz->m[i])));
                       found = TRUE;
                         break;
                   }
@@ -9179,23 +9259,26 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
               rChangeCurrRing(origR);
               idDelete(&F);
               idDelete(&monred);
-              idDelete(&II);
+              //idDelete(&II);
               idDelete(&one);
               pDelete(&mindegmon);
               pDelete(&pmon);
               rDelete(QQ_ring);
               return NULL;
           }
+          pWrite(mindegmon);
           rChangeCurrRing(origR);
           nMapFunc nMap2 = n_SetMap(QQ_ring->cf, origR->cf);
           pmon = prMapR(mindegmon, nMap2, QQ_ring, origR);
+          pWrite(pmon);
           idDelete(&F);
           idDelete(&monred);
-          idDelete(&II);
-          idDelete(&one);
-          idDelete(&syz);
+          //idDelete(&II);
+          //idDelete(&one);
+          //idDelete(&syz);
           pDelete(&mindegmon);
           rDelete(QQ_ring);
+          pWrite(pmon);
           return pmon;
       }
       else

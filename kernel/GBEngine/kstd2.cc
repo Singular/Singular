@@ -1559,7 +1559,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         p_Write(strat->B[iii].p2, strat->tailRing);
     }
     #endif
-    getchar();
+    //getchar();
     #endif
     #ifdef KDEBUG
       if (TEST_OPT_DEBUG) messageSets(strat);
@@ -1732,6 +1732,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         #if ADIDEBUG
         printf("\nThis element is added to S\n");
         p_Write(strat->P.p, strat->tailRing);p_Write(strat->P.p1, strat->tailRing);p_Write(strat->P.p2, strat->tailRing);
+        getchar();
         #endif
         strat->enterS(strat->P, pos, strat, strat->tl);
 #if 0
