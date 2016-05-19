@@ -65,13 +65,13 @@ void CLCM_test::redefine(const ideal L)
   if( L != NULL )
   {
     const int l = IDELEMS(L);
-    resize(l, false);
+    resize(currRing->N, false);
     for( int k = l - 1; k >= 0; k-- )
     {
       const poly a = L->m[k];
       for (unsigned int j = m_N; j > 0; j--)
-        if ( !(*this)[j] )
-          (*this)[j] = (p_GetExp(a, j, R) > 0);
+        if ( !(*this)[j-1] )
+          (*this)[j-1] = (p_GetExp(a, j, R) > 0);
     }
     m_compute = true;
   }
@@ -83,7 +83,7 @@ bool CLCM_test::Check(const poly m) const
   {
     const ring R = currRing;
     for (unsigned int j = m_N; j > 0; j--)
-      if ( (*this)[j] )
+      if ( (*this)[j-1] )
         if(p_GetExp(m, j, R) > 0)
           return true;
     return false;
