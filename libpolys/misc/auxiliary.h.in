@@ -32,10 +32,6 @@
 #undef HAVE_DL
 #endif
 
-#ifndef HAVE_FACTORY
-#undef HAVE_FACTORY
-#endif
-
 #ifndef HAVE_NTL
 #undef HAVE_NTL
 #endif
