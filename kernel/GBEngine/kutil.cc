@@ -8988,12 +8988,12 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
   background: any known constant element of ideal suppresses
               intermediate coefficient swell
 */
-poly preIntegerCheck(ideal FOrig, ideal Q)
+poly preIntegerCheck(const ideal Forig, const ideal Q)
 {
   assume(nCoeff_is_Ring_Z(currRing->cf));
   if(!nCoeff_is_Ring_Z(currRing->cf))
     return NULL;
-  ideal F = idCopy(FOrig);
+  ideal F = idCopy(Forig);
   idSkipZeroes(F);
   poly pmon;
   ring origR = currRing;
@@ -9001,15 +9001,14 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
   for(int i=0; i<idElem(F); i++)
   {
     if(pNext(F->m[i]) == NULL)
-        idInsertPoly(monred, F->m[i]);
+        idInsertPoly(monred, pCopy(F->m[i]));
   }
   int posconst = idPosConstant(F);
   if((posconst != -1) && (!nIsZero(F->m[posconst]->coef)))
   {
-      pmon = pCopy(F->m[posconst]);
       idDelete(&F);
       idDelete(&monred);
-      return pmon;
+      return NULL;
   }
   int idelemQ = 0;
   if(Q!=NULL)
@@ -9018,7 +9017,7 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
       for(int i=0; i<idelemQ; i++)
       {
         if(pNext(Q->m[i]) == NULL)
-            idInsertPoly(monred, Q->m[i]);
+            idInsertPoly(monred, pCopy(Q->m[i]));
       }
       idSkipZeroes(monred);
       posconst = idPosConstant(monred);
@@ -9058,10 +9057,10 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
       {
           if(pGetComp(syz->m[i]) == 1)
           {
-              if(pIsConstant(syz->m[i]))
+              pSetComp(syz->m[i],0);
+              if(pIsConstant(pHead(syz->m[i])))
               {
                   integer = pHead(syz->m[i]);
-                  pSetComp(integer, 0);
                   break;
               }
           }
@@ -9069,12 +9068,12 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
       rChangeCurrRing(origR);
       nMapFunc nMap2 = n_SetMap(QQ_ring->cf, origR->cf);
       pmon = prMapR(integer, nMap2, QQ_ring, origR);
-      idDelete(&F);
       idDelete(&monred);
-      idDelete(&II);
-      idDelete(&one);
-      idDelete(&syz);
-      pDelete(&integer);
+      idDelete(&F);
+      id_Delete(&II,QQ_ring);
+      id_Delete(&one,QQ_ring);
+      id_Delete(&syz,QQ_ring);
+      p_Delete(&integer,QQ_ring);
       rDelete(QQ_ring);
       return pmon;
   }
@@ -9088,11 +9087,11 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
         if(pNext(one->m[i]) == NULL)
         {
           if(mindegmon == NULL)
-            mindegmon = one->m[i];
+            mindegmon = pCopy(one->m[i]);
           else
           {
             if(p_Deg(one->m[i], QQ_ring) < p_Deg(mindegmon, QQ_ring))
-              mindegmon = one->m[i];
+              mindegmon = pCopy(one->m[i]);
           }
         }
       }
@@ -9101,58 +9100,51 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
           for(int i = IDELEMS(II)-1; i>=0; i--)
               if(II->m[i] != NULL)
                   II->m[i+1] = II->m[i];
-          II->m[0] = mindegmon;
+          II->m[0] = pCopy(mindegmon);
           ideal syz = idSyzygies(II, isNotHomog, NULL);
           bool found = FALSE;
           for(int i = IDELEMS(syz)-1;i>=0; i--)
           {
               if(pGetComp(syz->m[i]) == 1)
               {
-                  if(pIsConstant(syz->m[i]))
+                  pSetComp(syz->m[i],0);
+                  if(pIsConstant(pHead(syz->m[i])))
                   {
-                      pSetCoeff(mindegmon, syz->m[i]->coef);
+                      pSetCoeff(mindegmon, nCopy(syz->m[i]->coef));
                       found = TRUE;
-                        break;
+                      break;
                   }
               }
           }
-          idDelete(&syz);
+          id_Delete(&syz,QQ_ring);
           if (found == FALSE)
           {
               rChangeCurrRing(origR);
-              idDelete(&F);
               idDelete(&monred);
-              idDelete(&II);
-              idDelete(&one);
-              pDelete(&mindegmon);
-              pDelete(&pmon);
+              idDelete(&F);
+              id_Delete(&II,QQ_ring);
+              id_Delete(&one,QQ_ring);
               rDelete(QQ_ring);
               return NULL;
           }
           rChangeCurrRing(origR);
           nMapFunc nMap2 = n_SetMap(QQ_ring->cf, origR->cf);
           pmon = prMapR(mindegmon, nMap2, QQ_ring, origR);
-          idDelete(&F);
           idDelete(&monred);
-          idDelete(&II);
-          idDelete(&one);
-          idDelete(&syz);
-          pDelete(&mindegmon);
+          idDelete(&F);
+          id_Delete(&II,QQ_ring);
+          id_Delete(&one,QQ_ring);
+          id_Delete(&syz,QQ_ring);
           rDelete(QQ_ring);
           return pmon;
       }
-      else
-          rChangeCurrRing(origR);
-      pDelete(&mindegmon);
     }
-    else
-      rChangeCurrRing(origR);
   }
-  idDelete(&F);
+  rChangeCurrRing(origR);
   idDelete(&monred);
-  idDelete(&II);
-  idDelete(&one);
-  pDelete(&pmon);
+  idDelete(&F);
+  id_Delete(&II,QQ_ring);
+  id_Delete(&one,QQ_ring);
   rDelete(QQ_ring);
   return NULL;
 }
