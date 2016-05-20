@@ -2283,91 +2283,92 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   }
   else
 #endif
-  if (rField_is_Ring(currRing))
   {
-    if(nCoeff_is_Ring_Z(currRing->cf))
+    #if 1
+    //the preinteger check strategy is not for modules
+    if(rField_is_Ring(currRing) && nCoeff_is_Ring_Z(currRing->cf) && strat->ak <= 0)
     {
-        #if 0
-        if(nCoeff_is_Ring_Z(currRing->cf))
-        {
-            ideal FCopy = idCopy(F);
-            poly pFmon = preIntegerCheck(FCopy, Q);
-            if(pFmon != NULL)
-            {
-              idInsertPoly(FCopy, pFmon);
-              #if ADIDEBUG
-              printf("\nPreintegerCheck found this constant:\n");pWrite(pFmon);
-              #endif
-            }
-            strat->kModW=kModW=NULL;
-            if (h==testHomog)
-            {
-                if (strat->ak == 0)
-                {
-                  h = (tHomog)idHomIdeal(FCopy,Q);
-                  w=NULL;
-                }
-                else if (!TEST_OPT_DEGBOUND)
-                {
-                    h = (tHomog)idHomModule(FCopy,Q,w);
-                }
-            }
-            currRing->pLexOrder=b;
-            if (h==isHomog)
-            {
-                if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
-                {
-                  strat->kModW = kModW = *w;
-                  if (vw == NULL)
-                  {
-                    strat->pOrigFDeg = currRing->pFDeg;
-                    strat->pOrigLDeg = currRing->pLDeg;
-                    pSetDegProcs(currRing,kModDeg);
-                    toReset = TRUE;
-                  }
-                }
-                currRing->pLexOrder = TRUE;
-                if (hilb==NULL) strat->LazyPass*=2;
-            }
-            strat->homog=h;
-            omTestMemory(1);
-            if(rHasLocalOrMixedOrdering(currRing))
-                r=mora(FCopy,Q,NULL,hilb,strat);
-            else
-                r=bba(FCopy,Q,NULL,hilb,strat);
-        }
-        else
+      ideal FCopy = idCopy(F);
+      poly pFmon = preIntegerCheck(FCopy, Q);
+      if(pFmon != NULL)
+      {
+        idInsertPoly(FCopy, pFmon);
+        #if ADIDEBUG
+        printf("\nPreintegerCheck found this constant:\n");pWrite(pFmon);
         #endif
+      
+        strat->kModW=kModW=NULL;
+        if (h==testHomog)
         {
-            if(rHasLocalOrMixedOrdering(currRing))
-                r=mora(F,Q,NULL,hilb,strat);
-            else
-                r=bba(F,Q,NULL,hilb,strat);
+            if (strat->ak == 0)
+            {
+              h = (tHomog)idHomIdeal(FCopy,Q);
+              w=NULL;
+            }
+            else if (!TEST_OPT_DEGBOUND)
+            {
+                h = (tHomog)idHomModule(FCopy,Q,w);
+            }
         }
+        currRing->pLexOrder=b;
+        if (h==isHomog)
+        {
+          if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
+          {
+            strat->kModW = kModW = *w;
+            if (vw == NULL)
+            {
+              strat->pOrigFDeg = currRing->pFDeg;
+              strat->pOrigLDeg = currRing->pLDeg;
+              pSetDegProcs(currRing,kModDeg);
+              toReset = TRUE;
+            }
+          }
+          currRing->pLexOrder = TRUE;
+          if (hilb==NULL) strat->LazyPass*=2;
+        }
+        strat->homog=h;
+      }
+      else
+      {
+        #if ADIDEBUG
+        printf("\npreIntegerCheck didn't found any new information\n");
+        #endif
+      }
+      omTestMemory(1);
+      if(w == NULL)
+      {
+        if(rHasLocalOrMixedOrdering(currRing))
+            r=mora(FCopy,Q,NULL,hilb,strat);
+        else
+            r=bba(FCopy,Q,NULL,hilb,strat);
+      }
+      else
+      {
+        if(rHasLocalOrMixedOrdering(currRing))
+            r=mora(FCopy,Q,*w,hilb,strat);
+        else
+            r=bba(FCopy,Q,*w,hilb,strat);
+      }
+      idDelete(&FCopy);
     }
     else
+    #endif
     {
-      if(rHasLocalOrMixedOrdering(currRing))
-        r=mora(F,Q,NULL,hilb,strat);
+      if(w==NULL)
+      {
+        if(rHasLocalOrMixedOrdering(currRing))
+          r=mora(F,Q,NULL,hilb,strat);
+        else
+          r=bba(F,Q,NULL,hilb,strat);
+      }
       else
-        r=bba(F,Q,NULL,hilb,strat);
-    }
-  }
-  else
-  {
-    if (rHasLocalOrMixedOrdering(currRing))
-    {
-      if (w!=NULL)
-        r=mora(F,Q,*w,hilb,strat);
-      else
-        r=mora(F,Q,NULL,hilb,strat);
-    }
-    else
-    {
-      if (w!=NULL)
-        r=bba(F,Q,*w,hilb,strat);
-      else
-        r=bba(F,Q,NULL,hilb,strat);
+      {
+        if(rHasLocalOrMixedOrdering(currRing))
+          r=mora(F,Q,*w,hilb,strat);
+        else
+          r=bba(F,Q,*w,hilb,strat);
+      }
     }
   }
 #ifdef KDEBUG
