@@ -13,6 +13,7 @@
 
 #define ADIDEBUG 0
 #define ADIDEBUG_NF 0
+#define PRE_INTEGER_CHECK 0
 
 #include <kernel/mod2.h>
 
@@ -1584,7 +1585,10 @@ loop_count = 1;
   initBuchMoraCrit(strat);
   initHilbCrit(F,Q,&hilb,strat);
   initMora(F,strat);
-  initBuchMoraPos(strat);
+  if(rField_is_Ring(currRing))
+    initBuchMoraPosRing(strat);
+  else
+    initBuchMoraPos(strat);
   /*Shdl=*/initBuchMora(F,Q,strat);
   if (TEST_OPT_FASTHC) missingAxis(&strat->lastAxis,strat);
   /*updateS in initBuchMora has Hecketest
@@ -1937,7 +1941,10 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
     strat->kHEdgeFound=TRUE;
   }
   initBuchMoraCrit(strat);
-  initBuchMoraPos(strat);
+  if(rField_is_Ring(currRing))
+    initBuchMoraPosRing(strat);
+  else
+    initBuchMoraPos(strat);
   initMora(F,strat);
   strat->enterS = enterSMoraNF;
   /*- set T -*/
@@ -2071,7 +2078,10 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
     strat->kHEdgeFound=TRUE;
   }
   initBuchMoraCrit(strat);
-  initBuchMoraPos(strat);
+  if(rField_is_Ring(currRing))
+    initBuchMoraPosRing(strat);
+  else
+    initBuchMoraPos(strat);
   initMora(F,strat);
   strat->enterS = enterSMoraNF;
   /*- set T -*/
@@ -2284,7 +2294,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   else
 #endif
   {
-    #if 1
+    #if PRE_INTEGER_CHECK
     //the preinteger check strategy is not for modules
     if(rField_is_Ring(currRing) && nCoeff_is_Ring_Z(currRing->cf) && strat->ak <= 0)
     {
@@ -3018,7 +3028,10 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
 #endif
 
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
-  initBuchMoraPos(strat);
+  if(rField_is_Ring(currRing))
+    initBuchMoraPosRing(strat);
+  else
+    initBuchMoraPos(strat);
   initBba(strat);
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   strat->posInL=posInL0; /* ord according pComp */

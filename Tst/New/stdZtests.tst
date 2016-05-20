@@ -13,7 +13,7 @@ dh+2ci+bj,
 df+2cg+aj,
 de+2bg+ai,
 ce+2bf+ah;
-std(inI);
+lead(std(inI));
 kill r;
 
 //Github Adi #39
@@ -23,7 +23,7 @@ ideal J = -2xz3+x2yz,3z-2xy-3xy2;
 ideal gJ = std(J);
 "Zweite:";
 ideal ggJ = std(gJ);
-gJ;ggJ;
+lead(gJ);lead(ggJ);
 reduce(J,gJ);
 kill rng;
 
@@ -57,8 +57,8 @@ option(redTail);
 ideal I = -5*z^2-y*z^2, x^3*y*z-z^2+1, y^2*z^2+5*x^2*y*z;
 ideal gI =  std(I);
 ideal ggI =  std(gI);
-gI;
-ggI;
+lead(gI);
+lead(ggI);
 reduce(I,gI);
 kill rng;
 
@@ -69,8 +69,8 @@ option(redTail);
 ideal I = -5*x*z^2-73*y*z^2, 68*x^3*y*z-129*x*z^2+98, 11*y^3*z^2+85*x^2*y*z;
 ideal gI =  std(I);
 ideal ggI =  std(gI);
-gI;
-ggI;
+lead(gI);
+lead(ggI);
 reduce(I,gI);
 kill rng;
 
@@ -80,8 +80,8 @@ ring rng = (integer),(x,y,z),(dp(3),C);
 ideal I = -49*y^2+40*z^2+17,-34*z^2-3,-25*y*z-28*z;
 ideal gI =  std(I);
 ideal ggI =  std(gI);
-gI;
-ggI;
+lead(gI);
+lead(ggI);
 reduce(I,gI);
 kill rng;
 
@@ -95,7 +95,7 @@ ideal gI = std(I);
 ideal ggI = std(gI);
 ideal gJ = std(J);
 ideal ggJ = std(gJ);
-gI;ggI;gJ;ggJ;
+lead(gI);lead(ggI);lead(gJ);lead(ggJ);
 reduce (I,gI );
 reduce (J,gJ );
 kill rng;
@@ -106,7 +106,7 @@ ring rng = (integer),(x,y,z),dp;
 ideal i = -5*z^2-y*z^2, x^3*y*z-z^2+1, y^2*z^2+5*x^2*y*z;
 ideal gI =  std(i);
 ideal ggI =  std(gI);
-gI;ggI;
+lead(gI);lead(ggI);
 reduce(i,gI);
 kill rng;
 
@@ -142,7 +142,7 @@ ideal gI =  std(I);
 ideal ggI =  std(gI);
 reduce(I,gI);
 idealsEqual(gI,ggI );
-gI;
+lead(gI);
 kill rng;
 
 
@@ -152,10 +152,10 @@ ring rng = (integer),(x,y,z),(ls(3),C);
 ideal I = -10*x*y*z,12*z^2-8*y-14*x*z+14*x^2*y*z,-7*y^4+4*x^2+9*x^2*y;
 ideal J = -1+7*y^3*z,-15+14*x+14*x*y*z,15*z+7*x-10*x*z+5*x*y^2;
 ideal gI =  std(I);
-gI;
+lead(gI);
 reduce(I,gI);
 ideal gJ =  std(J);
-gJ;
+lead(gJ);
 reduce(J,gJ);
 kill rng;
 
@@ -163,10 +163,10 @@ ring rng = (integer),(x,y,z),(ls(3),C);
 ideal I = 7*x*z+3*x*z^2-x^2,4*z+6*z^2+2*y;
 ideal J = 5-5*z^2+3*y^2*z;
 ideal gI =  std(I);
-gI;
+lead(gI);
 reduce(I,gI);
 ideal gJ =  std(J);
-gJ;
+lead(gJ);
 reduce(J,gJ);
 kill rng;
 
@@ -175,7 +175,7 @@ kill rng;
 ring rng = (integer),(y(1..4),x(1..3)),dp;
 ideal I  = 12*y(3)*y(4)+19*y(1)+6*y(4),2*x(3)*y(4)-2*y(1)+7,2*y(1)*y(3)+y(1)-7*y(3)+6,7*x(3)*y(3)-6*x(3)-6*y(3)-3,y(1)^2+126*y(3)*y(4)+196*y(1)+60*y(4),x(3)*y(1)-3,x(3)*y(3)*y(4)+30*y(3)*y(4)+48*y(1)+15*y(4)+3,48*y(3)*y(4)^2-76*y(1)*y(4)+24*y(4)^2+266*y(4),48*y(3)^2*y(4)+48*y(3)*y(4)+12*y(4),48*y(1)*y(3)*y(4)+24*y(1)*y(4)-168*y(3)*y(4)-84*y(4),48*x(3)*y(3)*y(4)-76*x(3)*y(1)-48*y(1)*y(3)+24*x(3)*y(4)+266*x(3)-24*y(1)+168*y(3)+84,-266*x(3)*y(4)+168*y(3)*y(4)+84*y(4),266*x(3)*y(3)+168*y(3)^2-228*x(3)-60*y(3)-72,336*x(3)*y(3)*y(4)-60*x(3)*y(4)-144*y(3)*y(4)-72*y(4),-266*x(3)^2-168*x(3)*y(3)+144*x(3)+144*y(3)+72,-168*y(3)^2*y(4)+266*y(1)*y(3)+60*y(3)*y(4)-228*y(1)-931*y(3)+72*y(4)+798,-168*y(3)^3-24*y(3)^2+102*y(3)+36,-168*y(1)*y(3)^2+60*y(1)*y(3)+588*y(3)^2+72*y(1)-210*y(3)-252,168*x(3)*y(3)^2+168*x(3)*y(3)-144*y(3)^2+42*x(3)-144*y(3)-36,28*x(3)*y(3)*y(4)-28*y(1)*y(3)+14*x(3)*y(4)-24*y(3)*y(4)+24*y(1)+98*y(3)-12*y(4)-84,-28*x(3)*y(3)^2+10*x(3)*y(3)+12*x(3),-28*x(3)*y(1)*y(3)+24*x(3)*y(1)+98*x(3)*y(3)-84*x(3),28*x(3)^2*y(3)+14*x(3)^2-24*x(3)*y(3)-12*x(3),48*y(1)*y(4)^2-84*y(4)^2,48*y(1)*y(3)*y(4)+24*y(1)*y(4)-84*y(3)*y(4)+72*y(4),72*y(4)^2,48*x(3)*y(1)*y(4)-84*x(3)*y(4)-72*y(4),-48*y(1)^2*y(3)-24*y(1)^2+252*y(1)*y(3)+72*y(3)*y(4)+12*y(1)-294*y(3)+36*y(4)+252,-8*y(1)^2*y(4)+504*y(3)*y(4)^2-756*y(1)*y(4)+252*y(4)^2+2744*y(4),504*y(3)^2*y(4)+492*y(3)*y(4)+120*y(4),504*y(1)*y(3)*y(4)+240*y(1)*y(4)-1764*y(3)*y(4)-840*y(4),-8*x(3)*y(1)^2+504*x(3)*y(3)*y(4)-756*x(3)*y(1)-504*y(1)*y(3)+252*x(3)*y(4)+2744*x(3)-240*y(1)+1764*y(3)+840,168*y(1)*y(3)*y(4)-144*y(1)*y(4)-294*y(3)*y(4)+252*y(4),168*y(1)*y(3)^2-60*y(1)*y(3)-294*y(3)^2-72*y(1)+504*y(3)-216,252*y(3)*y(4)-216*y(4),-168*x(3)*y(1)*y(3)-84*x(3)*y(1)+294*x(3)*y(3)+144*y(1)*y(3)-252*x(3)+72*y(1)-252*y(3)+216,-28*x(3)*y(1)*y(4)-2744*x(3)*y(4)+24*y(1)*y(4)+1764*y(3)*y(4)+840*y(4),28*x(3)*y(1)*y(3)-24*x(3)*y(1)+2744*x(3)*y(3)+1764*y(3)^2-2352*x(3)-672*y(3)-720,3528*x(3)*y(3)*y(4)-672*x(3)*y(4)-1512*y(3)*y(4)-720*y(4),-28*x(3)^2*y(1)-2744*x(3)^2+24*x(3)*y(1)-1764*x(3)*y(3)+1512*x(3)+1512*y(3)+720,28*y(1)^2*y(3)-1764*y(3)^2*y(4)-24*y(1)^2+2646*y(1)*y(3)+630*y(3)*y(4)-2268*y(1)-9604*y(3)+756*y(4)+8232,-1764*y(3)^3-210*y(3)^2+1056*y(3)+360,-1764*y(1)*y(3)^2+672*y(1)*y(3)+6174*y(3)^2+720*y(1)-2352*y(3)-2520,1764*x(3)*y(3)^2+1722*x(3)*y(3)-1512*y(3)^2+420*x(3)-1476*y(3)-360,24*x(3)*y(4)^2+24*y(1)*y(4),24*x(3)*y(3)*y(4)+38*x(3)*y(1)+24*y(1)*y(3)+12*x(3)*y(4)+12*y(1),24*x(3)*y(1)*y(4),24*x(3)^2*y(4),-24*y(1)*y(3)*y(4)+38*y(1)^2-12*y(1)*y(4)-133*y(1),-24*y(1)*y(3)^2-24*y(1)*y(3)-6*y(1),-24*y(1)^2*y(3)-12*y(1)^2+84*y(1)*y(3)+42*y(1),-24*x(3)*y(1)*y(3)-12*x(3)*y(1)+84*x(3)*y(3)+42*x(3),-4*x(3)*y(1)*y(4)-4*y(1)^2+14*x(3)*y(4)+14*y(1),-4*x(3)*y(1)*y(3)-2*x(3)*y(1),-4*x(3)*y(1)^2+14*x(3)*y(1),-4*x(3)^2*y(1)+14*x(3)^2,84*x(3)*y(3)*y(4)+133*x(3)*y(1)-72*x(3)*y(4)-114*y(1),84*x(3)*y(3)^2-30*x(3)*y(3)-36*x(3),-84*x(3)*y(1)*y(3)-42*x(3)*y(1)+72*y(1)*y(3)+36*y(1),-84*x(3)^2*y(3)-42*x(3)^2+72*x(3)*y(3)+36*x(3),-14*x(3)^2*y(4)-14*x(3)*y(1)+12*x(3)*y(4)+12*y(1),14*x(3)^2*y(3)-12*x(3)^2,-14*x(3)^2*y(1)+12*x(3)*y(1),-14*x(3)^3+12*x(3)^2,28*x(3)*y(1)*y(3)-5*x(3)*y(1)-49*x(3)*y(3)-12*y(1)*y(3)+42*x(3)-6*y(1),-24*y(1)^2*y(4)+42*y(1)*y(4),-24*y(1)^2*y(3)-12*y(1)^2+42*y(1)*y(3)-36*y(1),-36*y(1)*y(4),-36*x(3)*y(4),-252*x(3)*y(4)^2-252*y(1)*y(4),-4*x(3)*y(1)^2-252*x(3)*y(3)*y(4)-392*x(3)*y(1)-252*y(1)*y(3)-120*x(3)*y(4)-120*y(1),-252*x(3)*y(1)*y(4),-252*x(3)^2*y(4),-4*y(1)^3+252*y(1)*y(3)*y(4)-378*y(1)^2+126*y(1)*y(4)+1372*y(1),252*y(1)*y(3)^2+246*y(1)*y(3)+60*y(1),252*y(1)^2*y(3)+120*y(1)^2-882*y(1)*y(3)-420*y(1),252*x(3)*y(1)*y(3)+120*x(3)*y(1)-882*x(3)*y(3)-420*x(3),-14*x(3)*y(1)^2-882*x(3)*y(3)*y(4)-1372*x(3)*y(1)+12*y(1)^2+756*x(3)*y(4)+1176*y(1),-882*x(3)*y(3)^2+336*x(3)*y(3)+360*x(3),882*x(3)*y(1)*y(3)+420*x(3)*y(1)-756*y(1)*y(3)-360*y(1),882*x(3)^2*y(3)+420*x(3)^2-756*x(3)*y(3)-360*x(3),-38*x(3)*y(4)^2+24*y(3)*y(4)^2+12*y(4)^2,24*y(3)^2*y(4)+24*y(3)*y(4)+6*y(4),24*x(3)*y(3)*y(4)^2+12*x(3)*y(4)^2,-38*x(3)^2*y(4),-24*y(3)^2*y(4)^2+38*y(1)*y(3)*y(4)-12*y(3)*y(4)^2-133*y(3)*y(4),-24*y(3)^3*y(4)-24*y(3)^2*y(4)-6*y(3)*y(4),-24*y(1)*y(3)^2*y(4)-12*y(1)*y(3)*y(4)+84*y(3)^2*y(4)+42*y(3)*y(4),38*x(3)*y(1)*y(3)+12*x(3)*y(3)*y(4)-133*x(3)*y(3)-12*y(1)*y(3)+6*x(3)*y(4)-6*y(1)+42*y(3)+21,4*x(3)*y(3)*y(4)^2-4*y(1)*y(3)*y(4)+2*x(3)*y(4)^2+120*y(3)*y(4)^2-192*y(1)*y(4)+14*y(3)*y(4)+60*y(4)^2+672*y(4),120*y(3)^2*y(4)+120*y(3)*y(4)+30*y(4),120*y(1)*y(3)*y(4)+60*y(1)*y(4)-420*y(3)*y(4)-210*y(4),4*x(3)^2*y(3)*y(4)-4*x(3)*y(1)*y(3)+2*x(3)^2*y(4)+120*x(3)*y(3)*y(4)-192*x(3)*y(1)+14*x(3)*y(3)-120*y(1)*y(3)+60*x(3)*y(4)+672*x(3)-60*y(1)+420*y(3)+210,114*x(3)*y(4)-72*y(3)*y(4)-36*y(4),-133*x(3)*y(3)^2+114*x(3)*y(3)+42*y(3)^2-15*y(3)-18,-84*x(3)*y(3)^2*y(4)+72*y(3)^2*y(4)-36*x(3)*y(4)+36*y(3)*y(4),133*x(3)^2*y(3)-156*x(3)*y(3)-21*x(3)+36*y(3)+18,-684*x(3)*y(4)+432*y(3)*y(4)+216*y(4),14*x(3)*y(3)^2+660*x(3)*y(3)+420*y(3)^2-576*x(3)-150*y(3)-180,14*x(3)^2*y(3)*y(4)-12*x(3)^2*y(4)+840*x(3)*y(3)*y(4)-150*x(3)*y(4)-360*y(3)*y(4)-180*y(4),-14*x(3)^2*y(3)-672*x(3)^2-408*x(3)*y(3)+366*x(3)+360*y(3)+180,12*x(3)*y(3)*y(4)-432*y(3)^2*y(4)+672*y(1)*y(3)+6*x(3)*y(4)+144*y(3)*y(4)-576*y(1)-2352*y(3)+180*y(4)+2016,-14*x(3)*y(3)^3+5*x(3)*y(3)^2-420*y(3)^3+6*x(3)*y(3)-60*y(3)^2+255*y(3)+90,-14*x(3)*y(1)*y(3)^2+12*x(3)*y(1)*y(3)+49*x(3)*y(3)^2-420*y(1)*y(3)^2-42*x(3)*y(3)+150*y(1)*y(3)+1470*y(3)^2+180*y(1)-525*y(3)-630,14*x(3)^2*y(3)^2+7*x(3)^2*y(3)+408*x(3)*y(3)^2+414*x(3)*y(3)-360*y(3)^2+105*x(3)-360*y(3)-90,-24*y(1)*y(3)*y(4)^2+42*y(3)*y(4)^2,-24*y(1)*y(3)^2*y(4)-12*y(1)*y(3)*y(4)+42*y(3)^2*y(4)-36*y(3)*y(4),-36*y(3)*y(4)^2,12*x(3)*y(1)*y(4)+36*x(3)*y(4)-18*y(4),4*x(3)*y(1)*y(4)^2+392*x(3)*y(4)^2+120*y(1)*y(4)^2-252*y(3)*y(4)^2-336*y(4)^2,120*y(1)*y(3)*y(4)-252*y(3)^2*y(4)+60*y(1)*y(4)-456*y(3)*y(4)+120*y(4),-252*x(3)*y(3)*y(4)^2-120*x(3)*y(4)^2+180*y(4)^2,4*x(3)^2*y(1)*y(4)+392*x(3)^2*y(4)+120*x(3)*y(1)*y(4)-216*x(3)*y(4)-180*y(4),-4*y(1)^2*y(3)*y(4)+252*y(3)^2*y(4)^2-378*y(1)*y(3)*y(4)+126*y(3)*y(4)^2+1372*y(3)*y(4),252*y(3)^3*y(4)+246*y(3)^2*y(4)+60*y(3)*y(4),252*y(1)*y(3)^2*y(4)+120*y(1)*y(3)*y(4)-882*y(3)^2*y(4)-420*y(3)*y(4),-4*x(3)*y(1)^2*y(3)-378*x(3)*y(1)*y(3)-120*y(1)^2*y(3)-120*x(3)*y(3)*y(4)-60*y(1)^2+1372*x(3)*y(3)+756*y(1)*y(3)-60*x(3)*y(4)+180*y(3)*y(4)+90*y(1)-1176*y(3)+90*y(4)+420,-12*x(3)*y(1)*y(4)+432*y(1)*y(3)*y(4)-1176*x(3)*y(4)-360*y(1)*y(4)+1008*y(4),14*x(3)*y(1)*y(3)^2-12*x(3)*y(1)*y(3)+1372*x(3)*y(3)^2+420*y(1)*y(3)^2-1176*x(3)*y(3)-150*y(1)*y(3)-1176*y(3)^2-180*y(1)+1428*y(3)-360,882*x(3)*y(3)^2*y(4)-756*y(3)^2*y(4)+360*x(3)*y(4)+270*y(3)*y(4)-540*y(4),-14*x(3)^2*y(1)*y(3)-1372*x(3)^2*y(3)-408*x(3)*y(1)*y(3)-210*x(3)*y(1)+2352*x(3)*y(3)+360*y(1)*y(3)-420*x(3)+180*y(1)-1008*y(3)+360,-12*x(3)*y(3)*y(4)^2-19*x(3)*y(1)*y(4)+6*y(1)*y(4),-12*x(3)*y(3)^2*y(4)-19*x(3)*y(1)*y(3)-6*x(3)*y(3)*y(4)+6*y(1)*y(3)+3*y(1),6*x(3)*y(1)*y(4),6*x(3)^2*y(4),2*x(3)^2*y(4)^2+2*x(3)*y(1)*y(4)+60*x(3)*y(4)^2+60*y(1)*y(4),2*x(3)*y(1)*y(3)+60*x(3)*y(3)*y(4)+96*x(3)*y(1)+60*y(1)*y(3)+30*x(3)*y(4)+30*y(1),2*x(3)^2*y(1)*y(4)+60*x(3)*y(1)*y(4),2*x(3)^3*y(4)+60*x(3)^2*y(4),-4*x(3)*y(1)*y(3)*y(4)-x(3)*y(1)*y(4)+7*x(3)*y(3)*y(4)-60*y(1)*y(3)*y(4)+96*y(1)^2-30*y(1)*y(4)-336*y(1),-2*x(3)*y(1)*y(3)^2-x(3)*y(1)*y(3)-60*y(1)*y(3)^2-60*y(1)*y(3)-15*y(1),-2*x(3)*y(1)^2*y(3)+7*x(3)*y(1)*y(3)-60*y(1)^2*y(3)-30*y(1)^2+210*y(1)*y(3)+105*y(1),-2*x(3)^2*y(1)*y(3)+7*x(3)^2*y(3)-60*x(3)*y(1)*y(3)-30*x(3)*y(1)+210*x(3)*y(3)+105*x(3),-6*x(3)^2*y(4)+216*x(3)*y(3)*y(4)+336*x(3)*y(1)-180*x(3)*y(4)-288*y(1),7*x(3)^2*y(3)^2-6*x(3)^2*y(3)+210*x(3)*y(3)^2-75*x(3)*y(3)-90*x(3),-7*x(3)^2*y(1)*y(3)-204*x(3)*y(1)*y(3)-105*x(3)*y(1)+180*y(1)*y(3)+90*y(1),-7*x(3)^3*y(3)-204*x(3)^2*y(3)-105*x(3)^2+180*x(3)*y(3)+90*x(3),-2*x(3)*y(1)^2*y(4)-126*x(3)*y(3)*y(4)^2-196*x(3)*y(1)*y(4)-60*y(1)^2*y(4)+168*y(1)*y(4),-2*x(3)*y(1)^2*y(3)-126*x(3)*y(3)^2*y(4)-196*x(3)*y(1)*y(3)-60*y(1)^2*y(3)-60*x(3)*y(3)*y(4)-30*y(1)^2+168*y(1)*y(3)-60*y(1),60*x(3)*y(1)*y(4)-90*y(1)*y(4),60*x(3)^2*y(4)-90*x(3)*y(4);
 ideal J  = std(I);
-J;
+lead(J);
 reduce(I,J);
 kill rng;
 
@@ -196,10 +196,10 @@ ring rng = (integer),(x,y,z),(dp(1),dp(2),C);
 ideal I = 20*x*z+7*y^2;
 ideal J = 6*x*y+20*z+6,-5*x-16*y-11,8*x*y+2*y^2;
 ideal gI =  std(I);
-gI;
+lead(gI);
 ideal ggI =  std(gI);
 ideal gJ =  std(J);
-gJ;
+lead(gJ);
 ideal ggJ =  std(gJ);
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
@@ -220,7 +220,6 @@ ideal j = 6,x(5)-2,x(4)+2,x(3)-2,x(1)+3;
 ideal aJJ = quotient(a*j,j); // ?
 aJJ;
 std(aJJ);
-aJJ;
 kill rng;
 
 //segfaults
@@ -233,8 +232,8 @@ ideal gI =  std(I);
 ideal ggI =  std(gI);
 ideal gJ =  std(J);
 ideal ggJ =  std(gJ);
-gI;
-gJ;
+lead(gI);
+lead(gJ);
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
 kill rng;
@@ -247,8 +246,8 @@ ideal J = 14,35*x(1)*x(2)+12*x(1)*x(2)^3;
 ideal gI =  std(I);
 ideal ggI =  std(gI);
 ideal gJ =  std(J);
-gI;
-gJ;
+lead(gI);
+lead(gJ);
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
 kill rng;
@@ -261,8 +260,8 @@ ideal J = 16*x(1)*x(2),12-31*x(1)-43*x(1)*x(2);
 ideal gI =  std(I);
 ideal ggI =  std(gI);
 ideal gJ =  std(J);
-gI;
-gJ;
+lead(gI);
+lead(gJ);
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
 kill rng;
@@ -276,8 +275,8 @@ ideal J = -2*x(1)-11*x(1)^2+10*x(1)^2*x(2),-13*x(1)*x(2)-10*x(1)^3;
 ideal gI =  std(I);
 ideal ggI =  std(gI);
 ideal gJ =  std(J);
-gI;
-gJ;
+lead(gI);
+lead(gJ);
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
 kill rng;
@@ -289,8 +288,8 @@ ideal I = -10,15*x(1)*x(2)+8*x(1)*x(2)^2;
 ideal J = 2*x(1)^2*x(2),-3+2*x(1)*x(2);
 ideal gI =  std(I);
 ideal gJ =  std(J);
-gI;
-gJ;
+lead(gI);
+lead(gJ);
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
 kill rng;
@@ -302,8 +301,8 @@ ideal I = -12+2*x(1)^2;
 ideal J = -6*x(1)^2+11*x(1)^4,-15;
 ideal gI =  std(I);
 ideal gJ =  std(J);
-gI;
-gJ;
+lead(gI);
+lead(gJ);
 std(reduce (I,gI )  );
 std(reduce (J,gJ )  );
 kill rng;
@@ -400,8 +399,8 @@ kill r;
 ring rng = integer,x,ds;
 ideal I = -8*x+2*x^2, -16+9*x^2-x^3;
 ideal gI =  std(I);
-gI;
-std(gI);
+lead(gI);
+lead(std(gI));
 reduce(I,gI);
 kill rng;
 
@@ -422,8 +421,8 @@ ideal I   = -8*x^3+7*x^2-7*x, 8*x^2+10*x-2;
 ideal gI  =  std(I);
 ideal ggI =  std(gI);
 reduce (I,gI ); // <>0 !!
-gI;
-ggI;
+lead(gI);
+lead(ggI);
 kill rng;
 
 ring rng = integer,x,lp;
@@ -433,8 +432,8 @@ ideal I = 8*x^3-4,-10*x^3+9*x;
        ideal ggI =  std(gI);
 reduce (I,gI );
 size(gI)== size(ggI) ;
-gI;
-ggI;
+lead(gI);
+lead(ggI);
 kill rng;
 
 //Github Adi #25
@@ -442,14 +441,14 @@ kill rng;
 ring r = integer,(a,d,g,h,i,j),ws(-1,-1,-1,-1,-1,-1);
 ideal inI= gh+2i, dh+j, d+2g+aj, d+2g+ai;
 ideal g= std(inI);
-g;
+lead(g);
 reduce(inI,g);
 kill r;
 
 ring rng = (integer),(x,y,z),(ws(-1,-1,-1),C);
 ideal I = 6yz-6,6xy-6yz-8y;
 ideal gI =std(I);
-I;gI;
+lead(I);lead(gI);
 reduce(I,gI);
 kill rng;
 
@@ -464,9 +463,9 @@ ring s = integer,(t,x(1..4)),ws(1,-1,-1,-1,-1);
 ideal I = fetch(r,I);
 ideal J = I,2-t;
 ideal J2 = std(J);
-J2;
+lead(J2);
 reduce(J,J2);
-std(J2);
+lead(std(J2));
 kill r;
 
 //  Infinite reduction small example
@@ -474,7 +473,7 @@ kill r;
 ring r = integer,(t,x,y),(dp(1),ds);
 ideal i = 6+y+x2,4+x;
 ideal gi = std(i);
-gi;
+lead(gi);
 reduce(i,gi);
 kill r;
 
@@ -485,7 +484,7 @@ ideal I = -3*x^2-8;
 ideal J = 9,5*x^2+8;
 option(intersectSyz);
 ideal I_J =  intersect(I,J);
-I_J;
+lead(I_J);
 kill rng;
 
 //  Github Adi #61
@@ -517,7 +516,7 @@ ring rng = integer,(x,y),lp;
 ideal I = -2*y^2+11,14*x^2+5*y;
 ideal J = x^2-3*x,9*x*y+2*y^2;
 ideal I_J =  intersect(I,J);
-I_J;
+lead(I_J);
 reduce(I_J,std(I));
 reduce(I_J,std(J));
 kill rng;
@@ -541,7 +540,7 @@ kill rng;
 ring rng = (integer),(x,y),(ls(2),C);
 ideal I = -8-y^2+13*x^2*y,-12+2*x-9*x^2*y;
 ideal gI =  std(I);
-gI;
+lead(gI);
 reduce(I,gI);
 kill rng;
 
@@ -561,8 +560,8 @@ ideal I = -36+26*x(1)-29*x(1)^3,26+6*x(2)-13*x(1);
 ideal J = 44+28*x(1)*x(2);
 ideal gI =  std(I);
 ideal gJ =  std(J);
-gI;
-gJ;
+lead(gI);
+lead(gJ);
 std(gI);
 reduce(I,gI);
 reduce(J,gJ);
@@ -572,15 +571,14 @@ ring rng = (integer),(x,y,z),(Ds(1),Ds(2),C);
 option(redSB);
 ideal J = -3+4*z-x,-2*z+y^2-3*z^3;
 ideal gJ =  std(J);
-J;
-gJ;
+lead(gJ);
 reduce (J,gJ ) ;
 kill rng;
 
 ring rng = (integer),(x(1),x(2),x(3)),(rs(2),rs(1),C);
 ideal I = 2*x(3)+15*x(3)^3+x(1),-15+13*x(3)+6*x(1);
 ideal gI =  std(I);
-gI;
+lead(gI);
 reduce (I,gI );
 kill rng;
 
@@ -595,7 +593,7 @@ t*x(1)+3*t*x(2)+t^2*x(1),
 t*x(4)+21*t*x(5)+12*t^2*x(2)+2*t^2*x(3)+7*t^2*x(4),
 2-t;
 ideal Gstd = std(G);
-Gstd;
+lead(Gstd);
 reduce(h,Gstd);
 reduce(G,Gstd);
 kill r;
@@ -620,8 +618,8 @@ ring rng = (integer),(x,y),(Ds(2),C);
 intvec op = 67108864,16787537;
 ideal I = 6-x^2*y, -2-3*x+2*y;
 ideal gI =  std(I);
-gI;
-std(gI);
+lead(gI);
+lead(std(gI));
 reduce(I,gI);
 kill rng;
 
@@ -637,14 +635,23 @@ ideal gJ = std(J);
 ideal IJ   = intersect(I,J) ;
 ideal gIJ = intersect( gI,gJ ); // falsch!
 ASSUME(0, idealsEqual(IJ , gIJ )   ) ;
-gI;
-gJ;
-IJ;
-gIJ;
+lead(gI);
+lead(gJ);
+lead(IJ);
+lead(gIJ);
 attrib(gI,"isSB",0);
 attrib(gJ,"isSB",0);
 ideal ngIJ = intersect(gI,gJ ); // wrong
 kill rng;
+
+//  Janko's Beispiel
+
+ring r =integer,(z,x,y),lp;
+poly f = z7x5 + z2xy9 + zy11 + x3y9;
+ideal i = diff(f,x),diff(f,y),diff(f,z);
+ideal I = std(i);
+lead(I);
+kill r;
 
 tst_status(1);$;
 
