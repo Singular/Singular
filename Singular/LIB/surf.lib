@@ -111,6 +111,9 @@ EXAMPLE: example plot; shows an example
     }
     write(l,"curve=",I[1],";");
     write(l,"draw_curve;");
+    write(l,"color_file_format = jpg;");
+    write(l,"filename = \"/tmp/surf.jpg\";");
+    write(l,"save_color_image;");
   }
   else
   {
@@ -126,6 +129,9 @@ EXAMPLE: example plot; shows an example
       }
       write(l, "surface=",I[1],";");
       write(l, "draw_surface;");
+      write(l,"color_file_format = jpg;");
+      write(l,"filename = \"/tmp/surf.jpg\";");
+      write(l,"save_color_image;");
     }
     else
     {
@@ -149,9 +155,9 @@ EXAMPLE: example plot; shows an example
     }
     else
     {
-      surf_call = "singularsurf_win ";
+      surf_call = "surf ";
       surf_call = surf_call + l + ">/dev/null 2>&1";
-      surf_call = surf_call + "&& command rm " + l;
+      surf_call = surf_call + " && cygopen /tmp/surf.jpg";
       i = system("sh", surf_call);
       if (i != 0)
       {
@@ -164,8 +170,9 @@ EXAMPLE: example plot; shows an example
   }
   else
   {
-    surf_call = "singularsurf ";
+    surf_call = "surf ";
     surf_call = surf_call + l + " >/dev/null 2>&1";
+    surf_call = surf_call + " && display /tmp/surf.jpg";
     "Close window to exit from `singularsurf`.";
 
     i = system("sh", surf_call);
@@ -177,7 +184,7 @@ EXAMPLE: example plot; shows an example
       ERROR(err_mes);
     }
   }
-  system("sh", "command rm " + l);
+  system("sh", "command rm " + l +" /tmp/surf.jpg");
 }
 example
 { "EXAMPLE:"; echo = 2;
