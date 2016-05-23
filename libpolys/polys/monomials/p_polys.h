@@ -1502,10 +1502,10 @@ static inline int p_LmCmp(poly p, poly q, const ring r)
 static inline int p_LtCmp(poly p, poly q, const ring r)
 {
   int res = p_LmCmp(p,q,r);
-  if(p_GetCoeff(p,r) == NULL || p_GetCoeff(q,r) == NULL)
-    return res;
   if(res == 0)
   {
+    if(p_GetCoeff(p,r) == NULL || p_GetCoeff(q,r) == NULL)
+      return res;
     number pc = n_Copy(p_GetCoeff(p,r),r->cf);
     number qc = n_Copy(p_GetCoeff(q,r),r->cf);
     if(!n_GreaterZero(pc,r->cf))

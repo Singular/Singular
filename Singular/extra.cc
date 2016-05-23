@@ -2260,6 +2260,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #  include <polys/mod_raw.h>
 #  include <polys/monomials/ring.h>
 #  include <kernel/GBEngine/shiftgb.h>
+#  include <kernel/GBEngine/kutil.h>
 
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
@@ -2270,19 +2271,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   /*==================== test syz strat =================*/
       if (strcmp(sys_cmd, "syz") == 0)
       {
-         int posInT_EcartFDegpLength(const TSet set,const int length,LObject &p);
-         int posInT_FDegpLength(const TSet set,const int length,LObject &p);
-         int posInT_pLength(const TSet set,const int length,LObject &p);
-         int posInT0(const TSet set,const int length,LObject &p);
-         int posInT1(const TSet set,const int length,LObject &p);
-         int posInT2(const TSet set,const int length,LObject &p);
-         int posInT11(const TSet set,const int length,LObject &p);
-         int posInT110(const TSet set,const int length,LObject &p);
-         int posInT13(const TSet set,const int length,LObject &p);
-         int posInT15(const TSet set,const int length,LObject &p);
-         int posInT17(const TSet set,const int length,LObject &p);
-         int posInT17_c(const TSet set,const int length,LObject &p);
-         int posInT19(const TSet set,const int length,LObject &p);
          if ((h!=NULL) && (h->Typ()==STRING_CMD))
          {
            const char *s=(const char *)h->Data();
