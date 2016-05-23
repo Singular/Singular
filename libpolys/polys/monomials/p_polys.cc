@@ -2221,6 +2221,7 @@ void p_Content(poly ph, const ring r)
 #endif
 
 
+#ifdef HAVE_RINGS
   if (rField_is_Ring(r))
   {
     if (rField_has_Units(r))
@@ -2245,6 +2246,7 @@ void p_Content(poly ph, const ring r)
     }
     return;
   }
+#endif
   number h,d;
   poly p;
 
@@ -4377,10 +4379,12 @@ BOOLEAN p_ComparePolys(poly p1,poly p2, const ring r)
      return FALSE;
   if (pLength(p1) != pLength(p2))
     return FALSE;
+  #ifdef HAVE_RINGS
   if (rField_is_Ring(r))
   {
     if (!n_DivBy(p_GetCoeff(p1, r), p_GetCoeff(p2, r), r)) return FALSE;
   }
+  #endif
   n=n_Div(p_GetCoeff(p1,r),p_GetCoeff(p2,r),r);
   while ((p1 != NULL) /*&& (p2 != NULL)*/)
   {

@@ -11,14 +11,6 @@
 
 #include <omalloc/omalloc.h>
 
-#ifndef SING_NDEBUG
-# define MYTEST 0
-#else /* ifndef SING_NDEBUG */
-# define MYTEST 0
-#endif /* ifndef SING_NDEBUG */
-
-#include <omalloc/omalloc.h>
-
 #include <misc/options.h>
 #include <misc/intvec.h>
 
@@ -491,15 +483,6 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
   //  }
   //}
 
-#if MYTEST
-#ifdef RDEBUG
-  Print("Prepare::h2: ");
-  idPrint(h2);
-
-  idTest(h2);
-#endif
-#endif
-
   for (j=0; j<i; j++)
   {
     p = h2->m[j];
@@ -515,32 +498,9 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
       h2->m[j]=q;
   }
 
-#ifdef PDEBUG
-  for(j=0;j<IDELEMS(h2);j++) pTest(h2->m[j]);
-
-#if MYTEST
-#ifdef RDEBUG
-  Print("Prepare::Input: ");
-  idPrint(h2);
-
-  Print("Prepare::currQuotient: ");
-  idPrint(currRing->qideal);
-#endif
-#endif
-
-#endif
-
   idTest(h2);
 
   h3 = kStd(h2,currRing->qideal,hom,w,NULL,syzcomp);
-
-#if MYTEST
-#ifdef RDEBUG
-  Print("Prepare::Output: ");
-  idPrint(h3);
-  idpTest(h3);
-#endif
-#endif
 
   idDelete(&h2);
   return h3;

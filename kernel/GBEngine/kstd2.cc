@@ -109,25 +109,30 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
       {
+        #ifdef HAVE_RINGS
         if(rField_is_Ring(r))
         {
           if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r))
-            return j;}
-          else
-          {
             return j;
-          }
         }
+        else
+        #endif
+        {
+          return j;
+        }
+      }
 #else
       if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].p, p, r))
-        {
+      {
+        #ifdef HAVE_RINGS
           if(rField_is_Ring(r))
           {
             if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r))
               return j;
           }
           else
+        #endif
           {
             return j;
           }
@@ -146,31 +151,35 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
                                p, not_sev, r))
+      {
+        #ifdef HAVE_RINGS
+        if(rField_is_Ring(r))
         {
-          if(rField_is_Ring(r))
-          {
-            if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r))
-              return j;
-          }
-          else
-          {
+          if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r))
             return j;
-          }
         }
+        else
+        #endif
+        {
+          return j;
+        }
+      }
 #else
       if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].t_p, p, r))
+      {
+        #ifdef HAVE_RINGS
+        if(rField_is_Ring(r))
         {
-          if(rField_is_Ring(r))
-          {
-            if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r))
-              return j;
-          }
-          else
-          {
+          if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r))
             return j;
-          }
         }
+        else
+        #endif
+        {
+          return j;
+        }
+      }
 #endif
       j++;
     }
@@ -200,23 +209,31 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
     if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
                              p, not_sev, currRing))
-        {
-            if(rField_is_Ring(currRing))
-                {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
-                    return j;}
-            else
-            return j;
-        }
+    {
+      #ifdef HAVE_RINGS
+      if(rField_is_Ring(currRing))
+      {
+        if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
+          return j;
+      }
+      else
+      #endif
+        return j;
+    }
 #else
     if ( !(strat->sevS[j] & not_sev) &&
          p_LmDivisibleBy(strat->S[j], p, currRing))
-        {
-            if(rField_is_Ring(currRing))
-                {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
-                    return j;}
-            else
-            return j;
-        }
+    {
+      #ifdef HAVE_RINGS
+      if(rField_is_Ring(currRing))
+      {
+        if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
+          return j;
+      }
+      else
+      #endif
+        return j;
+    }
 #endif
     j++;
   }
@@ -240,21 +257,29 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
     if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
                              p, not_sev, currRing))
-        {
-            if(rField_is_Ring(currRing))
-                {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
-                    return j;}
-            else
-            return j;
+    {
+      #ifdef HAVE_RINGS
+      if(rField_is_Ring(currRing))
+      {
+        if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
+          return j;
+      }
+      else
+      #endif
+        return j;
         }
 #else
     if ( !(strat->sevS[j] & not_sev) &&
          p_LmDivisibleBy(strat->S[j], p, currRing))
         {
-            if(rField_is_Ring(currRing))
-                {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
-                    return j;}
-            else
+          #ifdef HAVE_RINGS
+          if(rField_is_Ring(currRing))
+          {
+            if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
+              return j;
+          }
+          else
+          #endif
             return j;
         }
 #endif
@@ -1622,9 +1647,11 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
       {
         enterT(strat->P, strat);
+        #ifdef HAVE_RINGS
         if (rField_is_Ring(currRing))
           superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         else
+        #endif
           enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         // posInS only depends on the leading term
         strat->enterS(strat->P, pos, strat, strat->tl);
@@ -1662,9 +1689,11 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           // and add pairs
           int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
           enterT(strat->P, strat);
+          #ifdef HAVE_RINGS
           if (rField_is_Ring(currRing))
             superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
           else
+          #endif
             enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
           strat->enterS(strat->P, pos, strat, strat->tl);
         }
@@ -1721,6 +1750,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
   }
   else if (TEST_OPT_PROT) PrintLn();
+  #ifdef HAVE_RINGS
   if(nCoeff_is_Ring_Z(currRing->cf))
     finalReduceByMon(strat);
   if(rField_is_Ring(currRing))
@@ -1733,6 +1763,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
     }
   }
+  #endif
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
 //  if (TEST_OPT_WEIGHTM)
@@ -2107,9 +2138,11 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       pWrite(strat->P.GetLmCurrRing());
       pWrite(strat->P.sig);
       */
+      #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
         superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       else
+      #endif
         enterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       // posInS only depends on the leading term
       strat->enterS(strat->P, pos, strat, strat->tl);
@@ -2478,11 +2511,13 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
   {
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
+    #ifdef HAVE_RINGS
     if (rField_is_Ring(currRing))
     {
       p = redtailBba_Z(p,max_ind,strat);
     }
     else
+    #endif
     {
       si_opt_1 &= ~Sy_bit(OPT_INTSTRATEGY);
       p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
@@ -2549,11 +2584,13 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
       if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
       {
         if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
+        #ifdef HAVE_RINGS
         if (rField_is_Ring(currRing))
         {
           p = redtailBba_Z(p,max_ind,strat);
         }
         else
+        #endif
         {
           p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
         }

@@ -1894,8 +1894,10 @@ loop_count = 1;
 //      ecartWeights=NULL;
 //    }
 //  }
+  #ifdef HAVE_RINGS
   if(nCoeff_is_Ring_Z(currRing->cf))
     finalReduceByMon(strat);
+  #endif
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
   SI_RESTORE_OPT1(save1);
   idTest(strat->Shdl);
@@ -2306,7 +2308,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
         #if ADIDEBUG
         printf("\nPreintegerCheck found this constant:\n");pWrite(pFmon);
         #endif
-      
+
         strat->kModW=kModW=NULL;
         if (h==testHomog)
         {

@@ -352,6 +352,7 @@ void id_DelDiv(ideal id, const ring r)
       {
         if (id->m[j]!=NULL)
         {
+#ifdef HAVE_RINGS
           if (rField_is_Ring(r))
           {
             if (p_DivisibleByRingCase(id->m[i], id->m[j],r))
@@ -365,8 +366,9 @@ void id_DelDiv(ideal id, const ring r)
             }
           }
           else
+#endif
           {
-            /* the case of a ground field: */
+            /* the case of a coefficient field: */
             if (p_DivisibleBy(id->m[i], id->m[j],r))
             {
               p_Delete(&id->m[j],r);
