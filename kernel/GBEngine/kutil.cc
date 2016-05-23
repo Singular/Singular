@@ -4405,6 +4405,41 @@ int posInT11 (const TSet set,const int length,LObject &p)
   }
 }
 
+int posInT11Ring (const TSet set,const int length,LObject &p)
+{
+  if (length==-1) return 0;
+
+  int o = p.GetpFDeg();
+  int op = set[length].GetpFDeg();
+
+  if ((op < o)
+  || ((op == o) && (pLtCmpOrdSgnDiffP(set[length].p,p.p))))
+    return length+1;
+
+  int i;
+  int an = 0;
+  int en= length;
+
+  loop
+  {
+    if (an >= en-1)
+    {
+      op= set[an].GetpFDeg();
+      if ((op > o)
+      || (( op == o) && (pLtCmpOrdSgnEqP(set[an].p,p.p))))
+        return an;
+      return en;
+    }
+    i=(an+en) / 2;
+    op = set[i].GetpFDeg();
+    if (( op > o)
+    || (( op == o) && (pLtCmpOrdSgnEqP(set[i].p,p.p))))
+      en=i;
+    else
+      an=i;
+  }
+}
+
 /*2 Pos for rings T: Here I am
 * looks up the position of p in T
 * set[0] is the smallest with respect to the ordering-procedure
@@ -4521,6 +4556,47 @@ int posInT110 (const TSet set,const int length,LObject &p)
     || (( op == o) && (set[i].length > p.length))
     || (( op == o) && (set[i].length == p.length)
        && (pLmCmp(set[i].p,p.p) == currRing->OrdSgn)))
+      en=i;
+    else
+      an=i;
+  }
+}
+
+int posInT110Ring (const TSet set,const int length,LObject &p)
+{
+  p.GetpLength();
+  if (length==-1) return 0;
+
+  int o = p.GetpFDeg();
+  int op = set[length].GetpFDeg();
+
+  if (( op < o)
+  || (( op == o) && (set[length].length<p.length))
+  || (( op == o) && (set[length].length == p.length)
+     && (pLtCmpOrdSgnDiffP(set[length].p,p.p))))
+    return length+1;
+
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      op = set[an].GetpFDeg();
+      if (( op > o)
+      || (( op == o) && (set[an].length > p.length))
+      || (( op == o) && (set[an].length == p.length)
+         && (pLtCmpOrdSgnEqP(set[an].p,p.p))))
+        return an;
+      return en;
+    }
+    i=(an+en) / 2;
+    op = set[i].GetpFDeg();
+    if (( op > o)
+    || (( op == o) && (set[i].length > p.length))
+    || (( op == o) && (set[i].length == p.length)
+       && (pLtCmpOrdSgnEqP(set[i].p,p.p))))
       en=i;
     else
       an=i;
@@ -4653,6 +4729,41 @@ int posInT15 (const TSet set,const int length,LObject &p)
   }
 }
 
+int posInT15Ring (const TSet set,const int length,LObject &p)
+{
+  if (length==-1) return 0;
+
+  int o = p.GetpFDeg() + p.ecart;
+  int op = set[length].GetpFDeg()+set[length].ecart;
+
+  if ((op < o)
+  || ((op == o)
+     && (pLtCmpOrdSgnDiffP(set[length].p,p.p))))
+    return length+1;
+
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      op = set[an].GetpFDeg()+set[an].ecart;
+      if (( op > o)
+      || (( op  == o) && (pLtCmpOrdSgnEqP(set[an].p,p.p))))
+        return an;
+      return en;
+    }
+    i=(an+en) / 2;
+    op = set[i].GetpFDeg()+set[i].ecart;
+    if (( op > o)
+    || (( op == o) && (pLtCmpOrdSgnEqP(set[i].p,p.p))))
+      en=i;
+    else
+      an=i;
+  }
+}
+
 /*2
 * looks up the position of p in set
 * set[0] is the smallest with respect to the ordering-procedure
@@ -4717,6 +4828,46 @@ int posInT17 (const TSet set,const int length,LObject &p)
       an=i;
   }
 }
+
+int posInT17Ring (const TSet set,const int length,LObject &p)
+{
+  if (length==-1) return 0;
+
+  int o = p.GetpFDeg() + p.ecart;
+  int op = set[length].GetpFDeg()+set[length].ecart;
+
+  if ((op < o)
+  || (( op == o) && (set[length].ecart > p.ecart))
+  || (( op == o) && (set[length].ecart==p.ecart)
+     && (pLtCmpOrdSgnDiffP(set[length].p,p.p))))
+    return length+1;
+
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      op = set[an].GetpFDeg()+set[an].ecart;
+      if (( op > o)
+      || (( op == o) && (set[an].ecart < p.ecart))
+      || (( op  == o) && (set[an].ecart==p.ecart)
+         && (pLtCmpOrdSgnEqP(set[an].p,p.p))))
+        return an;
+      return en;
+    }
+    i=(an+en) / 2;
+    op = set[i].GetpFDeg()+set[i].ecart;
+    if ((op > o)
+    || (( op == o) && (set[i].ecart < p.ecart))
+    || (( op == o) && (set[i].ecart == p.ecart)
+       && (pLtCmpOrdSgnEqP(set[i].p,p.p))))
+      en=i;
+    else
+      an=i;
+  }
+}
 /*2
 * looks up the position of p in set
 * set[0] is the smallest with respect to the ordering-procedure
@@ -4773,6 +4924,66 @@ int posInT17_c (const TSet set,const int length,LObject &p)
       || ((op == o) && (set[i].ecart < p.ecart))
       || ((op == o) && (set[i].ecart == p.ecart)
          && (pLmCmp(set[i].p,p.p) == currRing->OrdSgn)))
+        en=i;
+      else
+        an=i;
+    }
+    else
+      an=i;
+  }
+}
+
+int posInT17_cRing (const TSet set,const int length,LObject &p)
+{
+  if (length==-1) return 0;
+
+  int cc = (-1+2*currRing->order[0]==ringorder_c);
+  /* cc==1 for (c,..), cc==-1 for (C,..) */
+  int o = p.GetpFDeg() + p.ecart;
+  int c = pGetComp(p.p)*cc;
+
+  if (pGetComp(set[length].p)*cc < c)
+    return length+1;
+  if (pGetComp(set[length].p)*cc == c)
+  {
+    int op = set[length].GetpFDeg()+set[length].ecart;
+    if ((op < o)
+    || ((op == o) && (set[length].ecart > p.ecart))
+    || ((op == o) && (set[length].ecart==p.ecart)
+       && (pLtCmpOrdSgnDiffP(set[length].p,p.p))))
+      return length+1;
+  }
+
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      if (pGetComp(set[an].p)*cc < c)
+        return en;
+      if (pGetComp(set[an].p)*cc == c)
+      {
+        int op = set[an].GetpFDeg()+set[an].ecart;
+        if ((op > o)
+        || ((op == o) && (set[an].ecart < p.ecart))
+        || ((op == o) && (set[an].ecart==p.ecart)
+           && (pLtCmpOrdSgnEqP(set[an].p,p.p))))
+          return an;
+      }
+      return en;
+    }
+    i=(an+en) / 2;
+    if (pGetComp(set[i].p)*cc > c)
+      en=i;
+    else if (pGetComp(set[i].p)*cc == c)
+    {
+      int op = set[i].GetpFDeg()+set[i].ecart;
+      if ((op > o)
+      || ((op == o) && (set[i].ecart < p.ecart))
+      || ((op == o) && (set[i].ecart == p.ecart)
+         && (pLtCmpOrdSgnEqP(set[i].p,p.p))))
         en=i;
       else
         an=i;
@@ -4907,6 +5118,31 @@ int posInL0 (const LSet set, const int length,
     }
     i=(an+en) / 2;
     if (pLmCmp(set[i].p,p->p) == currRing->OrdSgn) an=i;
+    else                                 en=i;
+    /*aend. fuer lazy == in !=- machen */
+  }
+}
+
+int posInL0Ring (const LSet set, const int length,
+             LObject* p,const kStrategy)
+{
+  if (length<0) return 0;
+
+  if (pLtCmpOrdSgnEqP(set[length].p,p->p))
+    return length+1;
+
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      if (pLtCmpOrdSgnEqP(set[an].p,p->p)) return en;
+      return an;
+    }
+    i=(an+en) / 2;
+    if (pLtCmpOrdSgnEqP(set[i].p,p->p)) an=i;
     else                                 en=i;
     /*aend. fuer lazy == in !=- machen */
   }
@@ -5124,6 +5360,9 @@ int posInL11 (const LSet set, const int length,
 int posInL11Ring (const LSet set, const int length,
               LObject* p,const kStrategy strat)
 {
+  //1 - alte version 
+  //0 - neue version: sehr gut für Long/stdZtests.tst
+  #if 0
   if (length < 0) return 0;
   int an,en,i;
   an = 0;
@@ -5207,6 +5446,37 @@ int posInL11Ring (const LSet set, const int length,
       }
     }
   }
+  #else
+  if (length<0) return 0;
+
+  int o = p->GetpFDeg();
+  int op = set[length].GetpFDeg();
+
+  if ((op > o)
+  || ((op == o) && (pLtCmpOrdSgnDiffM(set[length].p,p->p))))
+    return length+1;
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      op = set[an].GetpFDeg();
+      if ((op > o)
+      || ((op == o) && (pLtCmpOrdSgnDiffM(set[an].p,p->p))))
+        return en;
+      return an;
+    }
+    i=(an+en) / 2;
+    op = set[i].GetpFDeg();
+    if ((op > o)
+    || ((op == o) && (pLtCmpOrdSgnDiffM(set[i].p,p->p))))
+      an=i;
+    else
+      en=i;
+  }
+  #endif
 }
 
 int posInL11Ringls (const LSet set, const int length,
@@ -5441,6 +5711,46 @@ int posInL110 (const LSet set, const int length,
   }
 }
 
+int posInL110Ring (const LSet set, const int length,
+               LObject* p,const kStrategy)
+{
+  if (length<0) return 0;
+
+  int o = p->GetpFDeg();
+  int op = set[length].GetpFDeg();
+
+  if ((op > o)
+  || ((op == o) && (set[length].length >p->length))
+  || ((op == o) && (set[length].length <= p->length)
+     && (pLtCmpOrdSgnDiffM(set[length].p,p->p))))
+    return length+1;
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      op = set[an].GetpFDeg();
+      if ((op > o)
+      || ((op == o) && (set[an].length >p->length))
+      || ((op == o) && (set[an].length <=p->length)
+         && (pLtCmpOrdSgnDiffM(set[an].p,p->p))))
+        return en;
+      return an;
+    }
+    i=(an+en) / 2;
+    op = set[i].GetpFDeg();
+    if ((op > o)
+    || ((op == o) && (set[i].length > p->length))
+    || ((op == o) && (set[i].length <= p->length)
+       && (pLtCmpOrdSgnDiffM(set[i].p,p->p))))
+      an=i;
+    else
+      en=i;
+  }
+}
+
 /*2
 * looks up the position of polynomial p in set
 * e is the ecart of p
@@ -5534,6 +5844,40 @@ int posInL15 (const LSet set, const int length,
   }
 }
 
+int posInL15Ring (const LSet set, const int length,
+              LObject* p,const kStrategy)
+{
+  if (length<0) return 0;
+
+  int o = p->GetpFDeg() + p->ecart;
+  int op = set[length].GetpFDeg() + set[length].ecart;
+
+  if ((op > o)
+  || ((op == o) && (pLtCmpOrdSgnDiffM(set[length].p,p->p))))
+    return length+1;
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      op = set[an].GetpFDeg() + set[an].ecart;
+      if ((op > o)
+      || ((op == o) && (pLtCmpOrdSgnDiffM(set[an].p,p->p))))
+        return en;
+      return an;
+    }
+    i=(an+en) / 2;
+    op = set[i].GetpFDeg() + set[i].ecart;
+    if ((op > o)
+    || ((op == o) && (pLtCmpOrdSgnDiffM(set[i].p,p->p))))
+      an=i;
+    else
+      en=i;
+  }
+}
+
 /*2
 * looks up the position of polynomial p in set
 * e is the ecart of p
@@ -5577,6 +5921,49 @@ int posInL17 (const LSet set, const int length,
     || ((set[i].GetpFDeg() +set[i].ecart == o)
        && (set[i].ecart == p->ecart)
        && (pLmCmp(set[i].p,p->p) != -currRing->OrdSgn)))
+      an=i;
+    else
+      en=i;
+  }
+}
+
+int posInL17Ring (const LSet set, const int length,
+              LObject* p,const kStrategy)
+{
+  if (length<0) return 0;
+
+  int o = p->GetpFDeg() + p->ecart;
+
+  if ((set[length].GetpFDeg() + set[length].ecart > o)
+  || ((set[length].GetpFDeg() + set[length].ecart == o)
+     && (set[length].ecart > p->ecart))
+  || ((set[length].GetpFDeg() + set[length].ecart == o)
+     && (set[length].ecart == p->ecart)
+     && (pLtCmpOrdSgnDiffM(set[length].p,p->p))))
+    return length+1;
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      if ((set[an].GetpFDeg() + set[an].ecart > o)
+      || ((set[an].GetpFDeg() + set[an].ecart == o)
+         && (set[an].ecart > p->ecart))
+      || ((set[an].GetpFDeg() + set[an].ecart == o)
+         && (set[an].ecart == p->ecart)
+         && (pLtCmpOrdSgnDiffM(set[an].p,p->p))))
+        return en;
+      return an;
+    }
+    i=(an+en) / 2;
+    if ((set[i].GetpFDeg() + set[i].ecart > o)
+    || ((set[i].GetpFDeg() + set[i].ecart == o)
+       && (set[i].ecart > p->ecart))
+    || ((set[i].GetpFDeg() +set[i].ecart == o)
+       && (set[i].ecart == p->ecart)
+       && (pLtCmpOrdSgnDiffM(set[i].p,p->p))))
       an=i;
     else
       en=i;
@@ -5642,6 +6029,69 @@ int posInL17_c (const LSet set, const int length,
       || ((set[i].GetpFDeg() +set[i].ecart == o)
          && (set[i].ecart == p->ecart)
          && (pLmCmp(set[i].p,p->p) != -currRing->OrdSgn)))
+        an=i;
+      else
+        en=i;
+    }
+    else
+      en=i;
+  }
+}
+
+int posInL17_cRing (const LSet set, const int length,
+                LObject* p,const kStrategy)
+{
+  if (length<0) return 0;
+
+  int cc = (-1+2*currRing->order[0]==ringorder_c);
+  /* cc==1 for (c,..), cc==-1 for (C,..) */
+  unsigned long c = pGetComp(p->p)*cc;
+  int o = p->GetpFDeg() + p->ecart;
+
+  if (pGetComp(set[length].p)*cc > c)
+    return length+1;
+  if (pGetComp(set[length].p)*cc == c)
+  {
+    if ((set[length].GetpFDeg() + set[length].ecart > o)
+    || ((set[length].GetpFDeg() + set[length].ecart == o)
+       && (set[length].ecart > p->ecart))
+    || ((set[length].GetpFDeg() + set[length].ecart == o)
+       && (set[length].ecart == p->ecart)
+       && (pLtCmpOrdSgnDiffM(set[length].p,p->p))))
+      return length+1;
+  }
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      if (pGetComp(set[an].p)*cc > c)
+        return en;
+      if (pGetComp(set[an].p)*cc == c)
+      {
+        if ((set[an].GetpFDeg() + set[an].ecart > o)
+        || ((set[an].GetpFDeg() + set[an].ecart == o)
+           && (set[an].ecart > p->ecart))
+        || ((set[an].GetpFDeg() + set[an].ecart == o)
+           && (set[an].ecart == p->ecart)
+           && (pLtCmpOrdSgnDiffM(set[an].p,p->p))))
+          return en;
+      }
+      return an;
+    }
+    i=(an+en) / 2;
+    if (pGetComp(set[i].p)*cc > c)
+      an=i;
+    else if (pGetComp(set[i].p)*cc == c)
+    {
+      if ((set[i].GetpFDeg() + set[i].ecart > o)
+      || ((set[i].GetpFDeg() + set[i].ecart == o)
+         && (set[i].ecart > p->ecart))
+      || ((set[i].GetpFDeg() +set[i].ecart == o)
+         && (set[i].ecart == p->ecart)
+         && (pLtCmpOrdSgnDiffM(set[i].p,p->p))))
         an=i;
       else
         en=i;
@@ -8192,8 +8642,9 @@ BOOLEAN kPosInLDependsOnLength(int (*pos_in_l)
                                (const LSet set, const int length,
                                 LObject* L,const kStrategy strat))
 {
-  if (pos_in_l == posInL110 ||
-      pos_in_l == posInL10  ||
+  if (pos_in_l == posInL110    ||
+      pos_in_l == posInL110Ring||
+      pos_in_l == posInL10     ||
       pos_in_l == posInLRing)
     return TRUE;
 
@@ -8282,13 +8733,94 @@ void initBuchMoraPos (kStrategy strat)
     strat->posInT = posInT19;
   else if (BTEST1(12) || BTEST1(14) || BTEST1(16) || BTEST1(18))
     strat->posInT = posInT1;
-  if (rField_is_Ring(currRing))
+  strat->posInLDependsOnLength = kPosInLDependsOnLength(strat->posInL);
+}
+
+void initBuchMoraPosRing (kStrategy strat)
+{
+  if (rHasGlobalOrdering(currRing))
   {
-    strat->posInL = posInL11Ring;
-    if(rHasLocalOrMixedOrdering(currRing) && currRing->pLexOrder == TRUE)
-      strat->posInL = posInL11Ringls;
-    strat->posInT = posInT11;
+    if (strat->honey)
+    {
+      strat->posInL = posInL15Ring;
+      // ok -- here is the deal: from my experiments for Singular-2-0
+      // I conclude that that posInT_EcartpLength is the best of
+      // posInT15, posInT_EcartFDegpLength, posInT_FDegLength, posInT_pLength
+      // see the table at the end of this file
+      if (TEST_OPT_OLDSTD)
+        strat->posInT = posInT15Ring;
+      else
+        strat->posInT = posInT_EcartpLength;
+    }
+    else if (currRing->pLexOrder && !TEST_OPT_INTSTRATEGY)
+    {
+      //printf("\nHere 1\n");
+      strat->posInL = posInL11Ring;
+      strat->posInT = posInT11;
+    }
+    else if (TEST_OPT_INTSTRATEGY)
+    {
+      //printf("\nHere 2\n");
+      strat->posInL = posInL11Ring;
+      strat->posInT = posInT11;
+    }
+    else
+    {
+      strat->posInL = posInL0Ring;
+      strat->posInT = posInT0;
+    }
+    //if (strat->minim>0) strat->posInL =posInLSpecial;
+    if (strat->homog)
+    {
+       strat->posInL = posInL110Ring;
+       strat->posInT = posInT110Ring;
+    }
   }
+  else
+  {
+    if (strat->homog)
+    {
+      //printf("\nHere 3\n");
+      strat->posInL = posInL11Ring;
+      strat->posInT = posInT11Ring;
+    }
+    else
+    {
+      if ((currRing->order[0]==ringorder_c)
+      ||(currRing->order[0]==ringorder_C))
+      {
+        strat->posInL = posInL17_cRing;
+        strat->posInT = posInT17_cRing;
+      }
+      else
+      {
+        strat->posInL = posInL11Ringls;
+        strat->posInT = posInT17Ring;
+      }
+    }
+  }
+  if (strat->minim>0) strat->posInL =posInLSpecial;
+  // for further tests only
+  if ((BTEST1(11)) || (BTEST1(12)))
+    strat->posInL = posInL11Ring;
+  else if ((BTEST1(13)) || (BTEST1(14)))
+    strat->posInL = posInL13;
+  else if ((BTEST1(15)) || (BTEST1(16)))
+    strat->posInL = posInL15Ring;
+  else if ((BTEST1(17)) || (BTEST1(18)))
+    strat->posInL = posInL17Ring;
+  if (BTEST1(11))
+    strat->posInT = posInT11Ring;
+  else if (BTEST1(13))
+    strat->posInT = posInT13;
+  else if (BTEST1(15))
+    strat->posInT = posInT15Ring;
+  else if ((BTEST1(17)))
+    strat->posInT = posInT17Ring;
+  else if ((BTEST1(19)))
+    strat->posInT = posInT19;
+  else if (BTEST1(12) || BTEST1(14) || BTEST1(16) || BTEST1(18))
+    strat->posInT = posInT1;
   strat->posInLDependsOnLength = kPosInLDependsOnLength(strat->posInL);
 }
 
@@ -8988,12 +9520,12 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
   background: any known constant element of ideal suppresses
               intermediate coefficient swell
 */
-poly preIntegerCheck(ideal FOrig, ideal Q)
+poly preIntegerCheck(const ideal Forig, const ideal Q)
 {
   assume(nCoeff_is_Ring_Z(currRing->cf));
   if(!nCoeff_is_Ring_Z(currRing->cf))
     return NULL;
-  ideal F = idCopy(FOrig);
+  ideal F = idCopy(Forig);
   idSkipZeroes(F);
   poly pmon;
   ring origR = currRing;
@@ -9001,15 +9533,14 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
   for(int i=0; i<idElem(F); i++)
   {
     if(pNext(F->m[i]) == NULL)
-        idInsertPoly(monred, F->m[i]);
+        idInsertPoly(monred, pCopy(F->m[i]));
   }
   int posconst = idPosConstant(F);
   if((posconst != -1) && (!nIsZero(F->m[posconst]->coef)))
   {
-      pmon = pCopy(F->m[posconst]);
       idDelete(&F);
       idDelete(&monred);
-      return pmon;
+      return NULL;
   }
   int idelemQ = 0;
   if(Q!=NULL)
@@ -9018,7 +9549,7 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
       for(int i=0; i<idelemQ; i++)
       {
         if(pNext(Q->m[i]) == NULL)
-            idInsertPoly(monred, Q->m[i]);
+            idInsertPoly(monred, pCopy(Q->m[i]));
       }
       idSkipZeroes(monred);
       posconst = idPosConstant(monred);
@@ -9058,10 +9589,10 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
       {
           if(pGetComp(syz->m[i]) == 1)
           {
-              if(pIsConstant(syz->m[i]))
+              pSetComp(syz->m[i],0);
+              if(pIsConstant(pHead(syz->m[i])))
               {
                   integer = pHead(syz->m[i]);
-                  pSetComp(integer, 0);
                   break;
               }
           }
@@ -9069,12 +9600,12 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
       rChangeCurrRing(origR);
       nMapFunc nMap2 = n_SetMap(QQ_ring->cf, origR->cf);
       pmon = prMapR(integer, nMap2, QQ_ring, origR);
-      idDelete(&F);
       idDelete(&monred);
-      idDelete(&II);
-      idDelete(&one);
-      idDelete(&syz);
-      pDelete(&integer);
+      idDelete(&F);
+      id_Delete(&II,QQ_ring);
+      id_Delete(&one,QQ_ring);
+      id_Delete(&syz,QQ_ring);
+      p_Delete(&integer,QQ_ring);
       rDelete(QQ_ring);
       return pmon;
   }
@@ -9088,11 +9619,11 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
         if(pNext(one->m[i]) == NULL)
         {
           if(mindegmon == NULL)
-            mindegmon = one->m[i];
+            mindegmon = pCopy(one->m[i]);
           else
           {
             if(p_Deg(one->m[i], QQ_ring) < p_Deg(mindegmon, QQ_ring))
-              mindegmon = one->m[i];
+              mindegmon = pCopy(one->m[i]);
           }
         }
       }
@@ -9101,58 +9632,51 @@ poly preIntegerCheck(ideal FOrig, ideal Q)
           for(int i = IDELEMS(II)-1; i>=0; i--)
               if(II->m[i] != NULL)
                   II->m[i+1] = II->m[i];
-          II->m[0] = mindegmon;
+          II->m[0] = pCopy(mindegmon);
           ideal syz = idSyzygies(II, isNotHomog, NULL);
           bool found = FALSE;
           for(int i = IDELEMS(syz)-1;i>=0; i--)
           {
               if(pGetComp(syz->m[i]) == 1)
               {
-                  if(pIsConstant(syz->m[i]))
+                  pSetComp(syz->m[i],0);
+                  if(pIsConstant(pHead(syz->m[i])))
                   {
-                      pSetCoeff(mindegmon, syz->m[i]->coef);
+                      pSetCoeff(mindegmon, nCopy(syz->m[i]->coef));
                       found = TRUE;
-                        break;
+                      break;
                   }
               }
           }
-          idDelete(&syz);
+          id_Delete(&syz,QQ_ring);
           if (found == FALSE)
           {
               rChangeCurrRing(origR);
-              idDelete(&F);
               idDelete(&monred);
-              idDelete(&II);
-              idDelete(&one);
-              pDelete(&mindegmon);
-              pDelete(&pmon);
+              idDelete(&F);
+              id_Delete(&II,QQ_ring);
+              id_Delete(&one,QQ_ring);
               rDelete(QQ_ring);
               return NULL;
           }
           rChangeCurrRing(origR);
           nMapFunc nMap2 = n_SetMap(QQ_ring->cf, origR->cf);
           pmon = prMapR(mindegmon, nMap2, QQ_ring, origR);
-          idDelete(&F);
           idDelete(&monred);
-          idDelete(&II);
-          idDelete(&one);
-          idDelete(&syz);
-          pDelete(&mindegmon);
+          idDelete(&F);
+          id_Delete(&II,QQ_ring);
+          id_Delete(&one,QQ_ring);
+          id_Delete(&syz,QQ_ring);
           rDelete(QQ_ring);
           return pmon;
       }
-      else
-          rChangeCurrRing(origR);
-      pDelete(&mindegmon);
     }
-    else
-      rChangeCurrRing(origR);
   }
-  idDelete(&F);
+  rChangeCurrRing(origR);
   idDelete(&monred);
-  idDelete(&II);
-  idDelete(&one);
-  pDelete(&pmon);
+  idDelete(&F);
+  id_Delete(&II,QQ_ring);
+  id_Delete(&one,QQ_ring);
   rDelete(QQ_ring);
   return NULL;
 }
@@ -9851,11 +10375,16 @@ void kDebugPrint(kStrategy strat)
     if (strat->posInT==posInT0) PrintS("posInT0\n");
     else if (strat->posInT==posInT1) PrintS("posInT1\n");
     else if (strat->posInT==posInT11) PrintS("posInT11\n");
+    else if (strat->posInT==posInT11Ring) PrintS("posInT11Ring\n");
     else if (strat->posInT==posInT110) PrintS("posInT110\n");
+    else if (strat->posInT==posInT110Ring) PrintS("posInT110Ring\n");
     else if (strat->posInT==posInT13) PrintS("posInT13\n");
     else if (strat->posInT==posInT15) PrintS("posInT15\n");
+    else if (strat->posInT==posInT15Ring) PrintS("posInT15Ring\n");
     else if (strat->posInT==posInT17) PrintS("posInT17\n");
+    else if (strat->posInT==posInT17Ring) PrintS("posInT17Ring\n");
     else if (strat->posInT==posInT17_c) PrintS("posInT17_c\n");
+    else if (strat->posInT==posInT17_cRing) PrintS("posInT17_cRing\n");
     else if (strat->posInT==posInT19) PrintS("posInT19\n");
     else if (strat->posInT==posInT2) PrintS("posInT2\n");
 #ifdef HAVE_MORE_POS_IN_T
@@ -9868,13 +10397,20 @@ void kDebugPrint(kStrategy strat)
     else  Print("%p\n",(void*)strat->posInT);
   PrintS("posInL: ");
     if (strat->posInL==posInL0) PrintS("posInL0\n");
+    else if (strat->posInL==posInL0) PrintS("posInL0Ring\n");
     else if (strat->posInL==posInL10) PrintS("posInL10\n");
     else if (strat->posInL==posInL11) PrintS("posInL11\n");
+    else if (strat->posInL==posInL11Ring) PrintS("posInL11Ring\n");
+    else if (strat->posInL==posInL11Ringls) PrintS("posInL11Ringls\n");
     else if (strat->posInL==posInL110) PrintS("posInL110\n");
+    else if (strat->posInL==posInL110Ring) PrintS("posInL110Ring\n");
     else if (strat->posInL==posInL13) PrintS("posInL13\n");
     else if (strat->posInL==posInL15) PrintS("posInL15\n");
+    else if (strat->posInL==posInL15Ring) PrintS("posInL15Ring\n");
     else if (strat->posInL==posInL17) PrintS("posInL17\n");
+    else if (strat->posInL==posInL17Ring) PrintS("posInL17Ring\n");
     else if (strat->posInL==posInL17_c) PrintS("posInL17_c\n");
+    else if (strat->posInL==posInL17_cRing) PrintS("posInL17_cRing\n");
     else if (strat->posInL==posInLSpecial) PrintS("posInLSpecial\n");
     else if (strat->posInL==posInLrg0) PrintS("posInLrg0\n");
     else  Print("%p\n",(void*)strat->posInL);

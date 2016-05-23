@@ -187,7 +187,7 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
   pAssume(~not_sev == p_GetShortExpVector(p, currRing));
 #if 1
   int ende;
-  if ((strat->ak>0) || currRing->pLexOrder) ende=strat->sl;
+  if ((strat->ak>0) || currRing->pLexOrder || rField_is_Ring(currRing)) ende=strat->sl;
   else ende=posInS(strat,*max_ind,p,0)+1;
   if (ende>(*max_ind)) ende=(*max_ind);
 #else
@@ -1438,7 +1438,10 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   SI_SAVE_OPT1(save);
 
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
-  initBuchMoraPos(strat);
+    if(rField_is_Ring(currRing))
+    initBuchMoraPosRing(strat);
+  else
+    initBuchMoraPos(strat);
   initHilbCrit(F,Q,&hilb,strat);
   initBba(strat);
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
@@ -1817,7 +1820,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   //initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initSbaCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initSbaPos(strat);
-  //initBuchMoraPos(strat);
   initHilbCrit(F,Q,&hilb,strat);
   initSba(F,strat);
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
@@ -2898,7 +2900,10 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   BOOLEAN withT = TRUE; // very important for shifts
 
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit, NO CHANGES */
-  initBuchMoraPos(strat); /*NO CHANGES YET: perhaps later*/
+  if(rField_is_Ring(currRing))
+    initBuchMoraPosRing(strat);
+  else
+    initBuchMoraPos(strat); /*NO CHANGES YET: perhaps later*/
   initHilbCrit(F,Q,&hilb,strat); /*NO CHANGES*/
   initBbaShift(strat); /* DONE */
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/

@@ -457,9 +457,13 @@ int posInL13 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL15 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
+int posInL15Ring (const LSet set, const int length,
+             LObject* L,const kStrategy strat);
 int posInL17 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL10 (const LSet set, const int length,
+             LObject* L,const kStrategy strat);
+int posInL10Ring (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL110 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
@@ -533,6 +537,7 @@ void initBuchMoraCrit(kStrategy strat);
 void initSbaCrit(kStrategy strat);
 void initHilbCrit(ideal F, ideal Q, intvec **hilb,kStrategy strat);
 void initBuchMoraPos(kStrategy strat);
+void initBuchMoraPosRing(kStrategy strat);
 void initSbaPos(kStrategy strat);
 void initBuchMora (ideal F, ideal Q,kStrategy strat);
 void initSbaBuchMora (ideal F, ideal Q,kStrategy strat);

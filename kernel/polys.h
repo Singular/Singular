@@ -102,7 +102,7 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
  *
  ***************************************************************/
 /// returns 0|1|-1 if p=q|p>q|p<q w.r.t monomial ordering
-#define pLmCmp(p,q)         p_LmCmp(p,q,currRing)
+#define pLmCmp(p,q)            p_LmCmp(p,q,currRing)
 /// executes axtionE|actionG|actionS if p=q|p>q|p<q w.r.t monomial ordering
 /// action should be a "goto ..."
 #define pLmCmpAction(p,q, actionE, actionG, actionS)  \
@@ -114,6 +114,17 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
 /// returns: (p2==NULL ? 1 : (p1 == NULL ? -1 : p_LmCmp(p1, p2)))
 #define pCmp(p1, p2)    p_Cmp(p1, p2, currRing)
 
+/***************************************************************
+ *
+ * Comparisons: these are all done regarding coeffs
+ *
+ ***************************************************************/
+
+#define pLtCmp(p,q)            p_LtCmp(p,q,currRing)
+#define pLtCmpOrdSgnDiffM(p,q) p_LtCmpOrdSgnDiffM(p,q,currRing)
+#define pLtCmpOrdSgnDiffP(p,q) p_LtCmpOrdSgnDiffP(p,q,currRing)
+#define pLtCmpOrdSgnEqM(p,q)   p_LtCmpOrdSgnEqM(p,q,currRing)
+#define pLtCmpOrdSgnEqP(p,q)   p_LtCmpOrdSgnEqP(p,q,currRing)
 
 /***************************************************************
  *
