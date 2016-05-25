@@ -1783,6 +1783,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
   return (strat->Shdl);
 }
+
 ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
   // ring order stuff:

@@ -494,11 +494,6 @@ int redRiloc (LObject* h,kStrategy strat)
           h->SetLength(strat->length_pLength);
         assume(h->FDeg == h->pFDeg());
         at = strat->posInL(strat->L,strat->Ll,h,strat);
-        #if 0
-        //#ifdef HAVE_RINGS
-        if(rField_is_Ring(currRing))
-          strat->fromT=FALSE;
-        #endif
         if (at <= strat->Ll && pLmCmp(h->p, strat->L[strat->Ll].p) != 0 && !nEqual(h->p->coef, strat->L[strat->Ll].p->coef))
         {
           /*- h will not become the next element to reduce -*/
@@ -840,31 +835,6 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         doRed(&H,&(strat->T[ii]),TRUE,strat,TRUE);
         if (H.p == NULL)
           return NULL;
-        #if 0
-        //kürzeste=1, kleinste ecart = 0
-        int dummy=0;
-        int z=-1;
-        for(int ii=0; ii<=strat->tl;ii++)
-        {
-          if(pLmIsConstant(strat->T[ii].p))
-          {
-            printf("\nFound one:\n");pWrite(strat->T[ii].p);
-            if(dummy==0 && strat->T[ii].ecart < strat->T[z].ecart)
-            {
-              z = ii;
-            }
-            if(dummy == 1 && strat->T[ii].length < strat->T[z].length)
-            {
-              z = ii;
-            }
-          }
-        }
-        printf("\n!!!!!!!!!!!!!!!!!   z = %i\n",z);
-        if(z!=-1)
-        {
-          enterOneStrongPoly(z,H.p,H.ecart,0,strat,-1 , TRUE);
-        }
-        #endif
       }
       else
       {
@@ -1642,16 +1612,9 @@ loop_count = 1;
     for(iii = 0; iii<= strat->Ll; iii++)
     {
         printf("L[%i]:",iii);
-        #if 0
-        p_Write(strat->L[iii].p, strat->tailRing);
-        p_Write(strat->L[iii].p1, strat->tailRing);
-        p_Write(strat->L[iii].p2, strat->tailRing);
-        #else
         pWrite(strat->L[iii].p);
         pWrite(strat->L[iii].p1);
         pWrite(strat->L[iii].p2);
-        pWrite(strat->L[iii].lcm);
-        #endif
     }
     #endif
     getchar();
@@ -1684,7 +1647,6 @@ loop_count = 1;
     strat->P = strat->L[strat->Ll];/*- picks the last element from the lazyset L -*/
     if (strat->Ll==0) strat->interpt=TRUE;
     strat->Ll--;
-    //printf("\nThis is P:\n");p_Write(strat->P.p,strat->tailRing);p_Write(strat->P.p1,strat->tailRing);p_Write(strat->P.p2,strat->tailRing);
     // create the real Spoly
     if (pNext(strat->P.p) == strat->tail)
     {
@@ -1732,9 +1694,7 @@ loop_count = 1;
       #ifdef HAVE_RINGS
       if(rField_is_Ring(strat->tailRing) && rHasLocalOrMixedOrdering(currRing))
       {
-        //int inittl = strat->tl;
         red_result = strat->red(&strat->P,strat);
-        //strat->tl = inittl;
       }
       else
       #endif
@@ -1773,22 +1733,7 @@ loop_count = 1;
       && TEST_OPT_INTSTRATEGY)
         strat->P.pCleardenom();
 
-      // put in T
-      //if(red_result!=3)
-      {
-        #ifdef HAVE_RINGS
-        if(rField_is_Ring(strat->tailRing) && rHasLocalOrMixedOrdering(currRing))
-        {
-            //int inittl = strat->tl;
-          enterT(strat->P,strat);
-          //enterT_strong(strat->P,strat);
-          //strat->tl = inittl+1;
-        }
-        else
-        #endif
-          enterT(strat->P,strat);
-          //enterT_strong(strat->P,strat);
-      }
+      enterT(strat->P,strat);
       // build new pairs
 #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
@@ -1810,7 +1755,6 @@ loop_count = 1;
           PrintS("         ");p_Write(strat->L[iii].p2,strat->tailRing);
         }
         #endif
-        //if(red_result!=3)
       strat->enterS(strat->P,
                     posInS(strat,strat->sl,strat->P.p, strat->P.ecart),
                     strat, strat->tl);
