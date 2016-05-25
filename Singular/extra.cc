@@ -13,6 +13,7 @@
 #include <kernel/mod2.h>
 #include <misc/auxiliary.h>
 #include <misc/sirandom.h>
+#include <resources/omFindExec.h>
 
 #include <factory/factory.h>
 
@@ -301,7 +302,21 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-
+/*==================== executable ==================================*/
+    if(strcmp(sys_cmd,"executable")==0)
+    {
+      if ((h!=NULL) && (h->Typ()==STRING_CMD))
+      {
+        char tbuf[MAXPATHLEN];
+        char *s=omFindExec((char*)h->Data(),tbuf);
+	if(s==NULL) s=(char*)"";
+        res->data=(void *)omStrDup(s);
+        res->rtyp=STRING_CMD;
+        return FALSE;
+      }
+      return TRUE;
+    }
+    else
 /*==================== sh ==================================*/
     if(strcmp(sys_cmd,"sh")==0)
     {
