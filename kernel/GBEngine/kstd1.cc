@@ -152,9 +152,11 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat, bool 
                              pGetShallowCopyDeleteProc(h->tailRing,
                                                        strat->tailRing));
     }
-    if(redMoraNF)
+    #ifdef HAVE_RINGS
+    if(redMoraNF && (rField_is_Ring(currRing)))
       enterT_strong(*h,strat);
     else
+    #endif
       enterT(*h,strat);
     *h = L;
   }
@@ -745,14 +747,106 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
   unsigned long not_sev = ~ H.sev;
   loop
   {
-    #if ADIDEBUG_NF
-    for(int ii=0;ii<=strat->tl;ii++)
+    if (j > strat->tl)
     {
-      printf("\nT[%i]:\nt^%i ",ii,strat->T[ii].ecart);
-      pWrite(strat->T[ii].p);
+      return H.p;
     }
-    //getchar();
-    #endif
+    if (TEST_V_DEG_STOP)
+    {
+      if (kModDeg(H.p)>Kstd1_deg) pLmDelete(&H.p);
+      if (H.p==NULL) return NULL;
+    }
+    if (p_LmShortDivisibleBy(strat->T[j].GetLmTailRing(), strat->sevT[j], H.GetLmTailRing(), not_sev, strat->tailRing)
+        )
+    {
+      /*- remember the found T-poly -*/
+      // poly pi = strat->T[j].p;
+      int ei = strat->T[j].ecart;
+      int li = strat->T[j].length;
+      int ii = j;
+      /*
+      * the polynomial to reduce with (up to the moment) is;
+      * pi with ecart ei and length li
+      */
+      loop
+      {
+        /*- look for a better one with respect to ecart -*/
+        /*- stop, if the ecart is small enough (<=ecart(H)) -*/
+        j++;
+        if (j > strat->tl) break;
+        if (ei <= H.ecart) break;
+        if (((strat->T[j].ecart < ei)
+          || ((strat->T[j].ecart == ei)
+        && (strat->T[j].length < li)))
+        && pLmShortDivisibleBy(strat->T[j].p,strat->sevT[j], H.p, not_sev)
+        )
+        {
+          /*
+          * the polynomial to reduce with is now;
+          */
+          // pi = strat->T[j].p;
+          ei = strat->T[j].ecart;
+          li = strat->T[j].length;
+          ii = j;
+        }
+      }
+      /*
+      * end of search: have to reduce with pi
+      */
+      z++;
+      if (z>10)
+      {
+        pNormalize(H.p);
+        z=0;
+      }
+      if ((ei > H.ecart) && (!strat->kHEdgeFound))
+      {
+        /*
+        * It is not possible to reduce h with smaller ecart;
+        * we have to reduce with bad ecart: H has to enter in T
+        */
+        doRed(&H,&(strat->T[ii]),TRUE,strat,TRUE);
+        if (H.p == NULL)
+          return NULL;
+      }
+      else
+      {
+        /*
+        * we reduce with good ecart, h need not to be put to T
+        */
+        doRed(&H,&(strat->T[ii]),FALSE,strat,TRUE);
+        if (H.p == NULL)
+          return NULL;
+      }
+      /*- try to reduce the s-polynomial -*/
+      o = H.SetpFDeg();
+      if ((flag &2 ) == 0) cancelunit(&H,TRUE);
+      H.ecart = currRing->pLDeg(H.p,&(H.length),currRing)-o;
+      j = 0;
+      H.sev = pGetShortExpVector(H.p);
+      not_sev = ~ H.sev;
+    }
+    else
+    {
+      j++;
+    }
+  }
+}
+
+#ifdef HAVE_RINGS
+static poly redMoraNFRing (poly h,kStrategy strat, int flag)
+{
+  LObject H;
+  H.p = h;
+  int j = 0;
+  int z = 10;
+  int o = H.SetpFDeg();
+  H.ecart = currRing->pLDeg(H.p,&H.length,currRing)-o;
+  if ((flag & 2) == 0) cancelunit(&H,TRUE);
+  H.sev = pGetShortExpVector(H.p);
+  unsigned long not_sev = ~ H.sev;
+  loop
+  {
     if (j > strat->tl)
     {
       return H.p;
@@ -766,10 +860,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
     printf("\nSearching for a reducer...\n");
     #endif
     if (p_LmShortDivisibleBy(strat->T[j].GetLmTailRing(), strat->sevT[j], H.GetLmTailRing(), not_sev, strat->tailRing)
-        #ifdef HAVE_RINGS
-        && (!rField_is_Ring(strat->tailRing) ||
-            n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing))
-        #endif
+        && (n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing))
         )
     {
       /*- remember the found T-poly -*/
@@ -795,10 +886,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
           || ((strat->T[j].ecart == ei)
         && (strat->T[j].length < li)))
         && pLmShortDivisibleBy(strat->T[j].p,strat->sevT[j], H.p, not_sev)
-        #ifdef HAVE_RINGS
-        && (!rField_is_Ring(strat->tailRing) ||
-            n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing))
-        #endif
+        && (n_DivBy(H.p->coef, strat->T[j].p->coef,strat->tailRing))
         )
         {
           /*
@@ -863,6 +951,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
     }
   }
 }
+#endif
 
 /*2
 *reorders  L with respect to posInL
@@ -1944,7 +2033,14 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   kTest(strat);
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
   if (BVERBOSE(23)) kDebugPrint(strat);
-  if (p!=NULL) p = redMoraNF(p,strat, lazyReduce & KSTD_NF_ECART);
+  #ifdef HAVE_RINGS
+  if(rField_is_Ring(currRing))
+  {
+    if (p!=NULL) p = redMoraNFRing(p,strat, lazyReduce & KSTD_NF_ECART);
+  }
+  else
+  #endif
+    if (p!=NULL) p = redMoraNF(p,strat, lazyReduce & KSTD_NF_ECART);
   if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
   {
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
@@ -2080,13 +2176,22 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
           else assume(strat->sevS[j] == pGetShortExpVector(h.p));
           h.sev = strat->sevS[j];
           h.SetpFDeg();
+          #ifdef HAVE_RINGS
           if(rField_is_Ring(currRing) && rHasLocalOrMixedOrdering(currRing))
             enterT_strong(h,strat);
           else
+          #endif
             enterT(h,strat);
         }
         if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
-        p = redMoraNF(p,strat, lazyReduce & KSTD_NF_ECART);
+        #ifdef HAVE_RINGS
+        if(rField_is_Ring(currRing))
+        {
+          p = redMoraNFRing(p,strat, lazyReduce & KSTD_NF_ECART);
+        }
+        else
+        #endif
+          p = redMoraNF(p,strat, lazyReduce & KSTD_NF_ECART);
         if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
         {
           if (TEST_OPT_PROT) { PrintS("t"); mflush(); }

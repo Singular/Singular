@@ -103,85 +103,100 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 
     pAssume(~not_sev == p_GetShortExpVector(p, r));
 
-    loop
+#ifdef HAVE_RINGS
+    if(rField_is_Ring(r))
     {
-      if (j > strat->tl) return -1;
-#if defined(PDEBUG) || defined(PDIV_DEBUG)
-      if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
+      loop
       {
-        #ifdef HAVE_RINGS
-        if(rField_is_Ring(r))
+        if (j > strat->tl) return -1;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+        if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
         {
           if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r))
             return j;
         }
-        else
-        #endif
+#else
+        if (!(sevT[j] & not_sev) &&
+          p_LmDivisibleBy(T[j].p, p, r))
+        {
+          if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r))
+            return j;
+        }
+#endif
+        j++;
+      }
+    }
+    else
+    {
+      loop
+      {
+        if (j > strat->tl) return -1;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+        if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
         {
           return j;
         }
-      }
 #else
-      if (!(sevT[j] & not_sev) &&
+        if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].p, p, r))
-      {
-        #ifdef HAVE_RINGS
-          if(rField_is_Ring(r))
-          {
-            if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r))
-              return j;
-          }
-          else
-        #endif
-          {
-            return j;
-          }
+        {
+          return j;
         }
 #endif
-      j++;
+        j++;
+      }
     }
+#endif
   }
   else
   {
     const poly p=L->t_p;
     const ring r=strat->tailRing;
-    loop
+#ifdef HAVE_RINGS
+    if(rField_is_Ring(r))
     {
-      if (j > strat->tl) return -1;
+      loop
+      {
+        if (j > strat->tl) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
-      if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
+        if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
                                p, not_sev, r))
-      {
-        #ifdef HAVE_RINGS
-        if(rField_is_Ring(r))
         {
           if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r))
             return j;
         }
-        else
-        #endif
-        {
-          return j;
-        }
-      }
 #else
-      if (!(sevT[j] & not_sev) &&
+        if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].t_p, p, r))
-      {
-        #ifdef HAVE_RINGS
-        if(rField_is_Ring(r))
         {
           if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r))
             return j;
         }
-        else
-        #endif
+#endif
+        j++;
+      }
+    }
+    else
+#endif
+    {
+      loop
+      {
+        if (j > strat->tl) return -1;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+        if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
+                               p, not_sev, r))
         {
           return j;
         }
-      }
+#else
+        if (!(sevT[j] & not_sev) &&
+          p_LmDivisibleBy(T[j].t_p, p, r))
+        {
+          return j;
+        }
 #endif
-      j++;
+        j++;
+      }
     }
   }
 }
@@ -203,39 +218,51 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
   int ende=strat->sl;
 #endif
   (*max_ind)=ende;
-  loop
+#ifdef HAVE_RINGS
+  if(rField_is_Ring(currRing))
   {
-    if (j > ende) return -1;
+    loop
+    {
+      if (j > ende) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
-    if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
+      if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
                              p, not_sev, currRing))
-    {
-      #ifdef HAVE_RINGS
-      if(rField_is_Ring(currRing))
       {
         if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
           return j;
       }
-      else
-      #endif
-        return j;
-    }
 #else
-    if ( !(strat->sevS[j] & not_sev) &&
+      if ( !(strat->sevS[j] & not_sev) &&
          p_LmDivisibleBy(strat->S[j], p, currRing))
-    {
-      #ifdef HAVE_RINGS
-      if(rField_is_Ring(currRing))
       {
         if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
           return j;
       }
-      else
-      #endif
-        return j;
-    }
 #endif
-    j++;
+      j++;
+    }
+  }
+  else
+#endif
+  {
+    loop
+    {
+      if (j > ende) return -1;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+      if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
+                             p, not_sev, currRing))
+      {
+        return j;
+      }
+#else
+      if ( !(strat->sevS[j] & not_sev) &&
+         p_LmDivisibleBy(strat->S[j], p, currRing))
+      {
+        return j;
+      }
+#endif
+      j++;
+    }
   }
 }
 
@@ -251,39 +278,51 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
 #else
   int ende=strat->sl;
 #endif
-  loop
+#ifdef HAVE_RINGS
+  if(rField_is_Ring(currRing))
   {
-    if (j > ende) return -1;
-#if defined(PDEBUG) || defined(PDIV_DEBUG)
-    if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
-                             p, not_sev, currRing))
+    loop
     {
-      #ifdef HAVE_RINGS
-      if(rField_is_Ring(currRing))
+      if (j > ende) return -1;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+      if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
+                             p, not_sev, currRing))
       {
         if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
           return j;
       }
-      else
-      #endif
-        return j;
-        }
 #else
-    if ( !(strat->sevS[j] & not_sev) &&
+      if ( !(strat->sevS[j] & not_sev) &&
          p_LmDivisibleBy(strat->S[j], p, currRing))
-        {
-          #ifdef HAVE_RINGS
-          if(rField_is_Ring(currRing))
-          {
-            if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
-              return j;
-          }
-          else
-          #endif
-            return j;
-        }
+      {
+        if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
+          return j;
+      }
 #endif
-    j++;
+      j++;
+    }
+  }
+  else
+#endif
+  {
+    loop
+    {
+      if (j > ende) return -1;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+      if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
+                             p, not_sev, currRing))
+      {
+        return j;
+      }
+#else
+      if ( !(strat->sevS[j] & not_sev) &&
+         p_LmDivisibleBy(strat->S[j], p, currRing))
+      {
+        return j;
+      }
+#endif
+      j++;
+    }
   }
 }
 
@@ -1463,7 +1502,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   SI_SAVE_OPT1(save);
 
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
-    if(rField_is_Ring(currRing))
+  if(rField_is_Ring(currRing))
     initBuchMoraPosRing(strat);
   else
     initBuchMoraPos(strat);

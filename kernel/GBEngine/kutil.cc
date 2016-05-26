@@ -354,68 +354,112 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 //    }
   h = pNext(p);
 
-  loop
+#ifdef HAVE_RINGS
+  if(rField_is_Ring(currRing))
   {
-    if (h==NULL)
-    {
-      p_Delete(&pNext(p), r);
-      if (!inNF)
-      {
-        number eins;
-        if (rField_is_Ring(r) /*&& (rHasLocalOrMixedOrdering(r))*/)
-          eins = nCopy(lc);
-        else
-          eins=nInit(1);
-        if (L->p != NULL)
-        {
-          pSetCoeff(L->p,eins);
-          if (L->t_p != NULL)
-            pSetCoeff0(L->t_p,eins);
-        }
-        else
-          pSetCoeff(L->t_p,eins);
-        /* p and t_p share the same coeff, if both are !=NULL */
-        /* p==NULL==t_p cannot happen here */
-      }
-      L->ecart = 0;
-      L->length = 1;
-      //if (L->pLength > 0)
-      L->pLength = 1;
-      L->max = NULL;
-
-      if (L->t_p != NULL && pNext(L->t_p) != NULL)
-        p_Delete(&pNext(L->t_p),r);
-      if (L->p != NULL && pNext(L->p) != NULL)
-        pNext(L->p) = NULL;
-
-      return;
-    }
-    i = 0;
     loop
     {
-      i++;
-      if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ; // does not divide
-      if (i == r->N) break; // does divide, try next monom
-    }
-    //wrp(p); PrintS(" divide ");wrp(h); PrintLn();
-    #ifdef HAVE_RINGS
-    // Note: As long as qring j forbidden if j contains integer (i.e. ground rings are
-    //       domains), no zerodivisor test needed  CAUTION
-    #if ADIDEBUG
-    pWrite(h);
-    #endif
-    if (rField_is_Ring(r) && !n_DivBy(pGetCoeff(h),lc,r->cf))
-    {
+      if (h==NULL)
+      {
+        p_Delete(&pNext(p), r);
+        if (!inNF)
+        {
+          number eins= nCopy(lc);
+          if (L->p != NULL)
+          {
+            pSetCoeff(L->p,eins);
+            if (L->t_p != NULL)
+              pSetCoeff0(L->t_p,eins);
+          }
+          else
+            pSetCoeff(L->t_p,eins);
+          /* p and t_p share the same coeff, if both are !=NULL */
+          /* p==NULL==t_p cannot happen here */
+        }
+        L->ecart = 0;
+        L->length = 1;
+        //if (L->pLength > 0)
+        L->pLength = 1;
+        L->max = NULL;
+
+        if (L->t_p != NULL && pNext(L->t_p) != NULL)
+          p_Delete(&pNext(L->t_p),r);
+        if (L->p != NULL && pNext(L->p) != NULL)
+          pNext(L->p) = NULL;
+
+        return;
+      }
+      i = 0;
+      loop
+      {
+        i++;
+        if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ; // does not divide
+        if (i == r->N) break; // does divide, try next monom
+      }
+      //wrp(p); PrintS(" divide ");wrp(h); PrintLn();
+      // Note: As long as qring j forbidden if j contains integer (i.e. ground rings are
+      //       domains), no zerodivisor test needed  CAUTION
       #if ADIDEBUG
-      printf("\nDoes not divide\n");
+      pWrite(h);
       #endif
-      return;
+      if (!n_DivBy(pGetCoeff(h),lc,r->cf))
+      {
+        #if ADIDEBUG
+        printf("\nDoes not divide\n");
+        #endif
+        return;
+      }
+      #if ADIDEBUG
+      printf("\nDivides. Go On\n");
+      #endif
+      pIter(h);
     }
-    #if ADIDEBUG
-    printf("\nDivides. Go On\n");
-    #endif
-    #endif
-    pIter(h);
+  }
+  else
+#endif
+  {
+    loop
+    {
+      if (h==NULL)
+      {
+        p_Delete(&pNext(p), r);
+        if (!inNF)
+        {
+          number eins=nInit(1);
+          if (L->p != NULL)
+          {
+            pSetCoeff(L->p,eins);
+            if (L->t_p != NULL)
+              pSetCoeff0(L->t_p,eins);
+          }
+          else
+            pSetCoeff(L->t_p,eins);
+          /* p and t_p share the same coeff, if both are !=NULL */
+          /* p==NULL==t_p cannot happen here */
+        }
+        L->ecart = 0;
+        L->length = 1;
+        //if (L->pLength > 0)
+        L->pLength = 1;
+        L->max = NULL;
+
+        if (L->t_p != NULL && pNext(L->t_p) != NULL)
+          p_Delete(&pNext(L->t_p),r);
+        if (L->p != NULL && pNext(L->p) != NULL)
+          pNext(L->p) = NULL;
+
+        return;
+      }
+      i = 0;
+      loop
+      {
+        i++;
+        if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ; // does not divide
+        if (i == r->N) break; // does divide, try next monom
+      }
+      //wrp(p); PrintS(" divide ");wrp(h); PrintLn();
+      pIter(h);
+    }
   }
 }
 
@@ -5219,6 +5263,7 @@ int posInL11Ring (const LSet set, const int length,
 }
 #endif
 
+#ifdef HAVE_RINGS
 int posInL11Ringls (const LSet set, const int length,
               LObject* p,const kStrategy strat)
 {
@@ -5300,7 +5345,7 @@ int posInL11Ringls (const LSet set, const int length,
     }
   }
 }
-
+#endif
 
 /*2 Position for rings L: Here I am
 * looks up the position of polynomial p in set
@@ -6067,6 +6112,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
         j++;
       }
     }
+    #ifdef HAVE_RINGS
     else
     {
       loop
@@ -6089,6 +6135,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
         j++;
       }
     }
+    #endif
     // if called from NF, T objects do not exist:
     if (strat->tl < 0 || strat->S_2_R[j] == -1)
     {
@@ -6134,6 +6181,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
         j++;
       }
     }
+    #ifdef HAVE_RINGS
     else
     {
       loop
@@ -6162,6 +6210,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
         j++;
       }
     }
+    #endif
   }
 }
 
@@ -8077,8 +8126,10 @@ void enterT(LObject &p, kStrategy strat, int atT)
 /*2
 * puts p to the set T at position atT
 */
+#ifdef HAVE_RINGS
 void enterT_strong(LObject &p, kStrategy strat, int atT)
 {
+  assume(rField_is_Ring(currRing));
   int i;
 
   pp_Test(p.p, currRing, p.tailRing);
@@ -8156,8 +8207,7 @@ void enterT_strong(LObject &p, kStrategy strat, int atT)
   assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
   strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
   #if 1
-  if(rField_is_Ring(currRing)
-  && rHasLocalOrMixedOrdering(currRing)
+  if(rHasLocalOrMixedOrdering(currRing)
   && !n_IsUnit(p.p->coef, currRing->cf))
   {
     #if ADIDEBUG
@@ -8184,7 +8234,7 @@ void enterT_strong(LObject &p, kStrategy strat, int atT)
   #endif
   kTest_T(&(strat->T[atT]));
 }
-
+#endif
 
 /*2
 * puts signature p.sig to the set syz
@@ -8278,7 +8328,7 @@ void initBuchMoraCrit(kStrategy strat)
   strat->chainCrit=chainCritNormal;
   if (TEST_OPT_SB_1)
     strat->chainCrit=chainCritOpt_1;
-#ifdef HAVE_RINGS  
+#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     strat->enterOnePair=enterOnePairRing;
@@ -8355,7 +8405,7 @@ void initSbaCrit(kStrategy strat)
   {
     strat->syzCrit  = syzCriterion;
   }
-#ifdef HAVE_RINGS  
+#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     strat->enterOnePair=enterOnePairRing;
@@ -8774,6 +8824,7 @@ void initSbaPos (kStrategy strat)
     strat->posInT = posInT19;
   else if (BTEST1(12) || BTEST1(14) || BTEST1(16) || BTEST1(18))
     strat->posInT = posInT1;
+#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     strat->posInL = posInL11Ring;
@@ -8781,6 +8832,7 @@ void initSbaPos (kStrategy strat)
       strat->posInL = posInL11Ringls;
     strat->posInT = posInT11;
   }
+#endif
   strat->posInLDependsOnLength = FALSE;
   strat->posInLSba  = posInLSig;
   //strat->posInL     = posInLSig;
@@ -8919,7 +8971,6 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
         //&& (pGetComp(r->m[l])<=strat->syzComp)
         )
         {
-          
           for(q=IDELEMS(Q)-1; q>=0;q--)
           {
             if ((Q->m[q]!=NULL)
@@ -8941,6 +8992,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
         }
       }
     }
+    #ifdef HAVE_RINGS
     else
     {
       for (l=IDELEMS(r)-1;l>=0;l--)
@@ -8974,7 +9026,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
         }
       }
     }
-
+    #endif
   }
   else
   {
@@ -9018,7 +9070,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
         {
           for(q=IDELEMS(Q)-1; q>=0;q--)
           {
-            if(!rField_is_Ring(currRing) || n_DivBy(r->m[l]->coef, Q->m[q]->coef, currRing))
+            if(n_DivBy(r->m[l]->coef, Q->m[q]->coef, currRing))
             {
               if ((Q->m[q]!=NULL)&&(pLmEqual(Q->m[q],r->m[l])) && pDivisibleBy(Q->m[q],r->m[l]))
               {
@@ -9043,6 +9095,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
     #endif
     if (/*TEST_OPT_REDSB &&*/ reduction_found)
     {
+      #ifdef HAVE_RINGS
       if(rField_is_Ring(currRing))
       {
         for (l=IDELEMS(r)-1;l>=0;l--)
@@ -9074,6 +9127,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
         }
       }
       else
+      #endif
       {
         for (l=IDELEMS(r)-1;l>=0;l--)
         {
@@ -9348,6 +9402,9 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
   }
   return TRUE;
 }
+#endif
+
+#ifdef HAVE_RINGS
 /*!
   used for GB over ZZ: look for constant and monomial elements in the ideal
   background: any known constant element of ideal suppresses
@@ -9513,7 +9570,9 @@ poly preIntegerCheck(const ideal Forig, const ideal Q)
   rDelete(QQ_ring);
   return NULL;
 }
+#endif
 
+#ifdef HAVE_RINGS
 /*!
   used for GB over ZZ: intermediate reduction by monomial elements
   background: any known constant element of ideal suppresses
@@ -9582,7 +9641,9 @@ void postReduceByMon(LObject* h, kStrategy strat)
   if(deleted)
     strat->initEcart(h);
 }
+#endif
 
+#ifdef HAVE_RINGS
 /*!
   used for GB over ZZ: final reduction by constant elements
   background: any known constant element of ideal suppresses
@@ -9652,7 +9713,6 @@ void finalReduceByMon(kStrategy strat)
   }
   //idSkipZeroes(strat->Shdl);
 }
-
 #endif
 
 BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned long expbound)
