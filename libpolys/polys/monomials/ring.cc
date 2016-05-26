@@ -643,7 +643,7 @@ char * rParStr(ring r)
 
 char * rString(ring r)
 {
-  if (r!=NULL)
+  if ((r!=NULL)&&(r->cf!=NULL))
   {
     char *ch=rCharStr(r);
     char *var=rVarStr(r);
@@ -656,7 +656,7 @@ char * rString(ring r)
     return res;
   }
   else
-    return omStrDup("NULL");
+    return omStrDup("undefined");
 }
 
 
@@ -1301,6 +1301,9 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
  */
 int rSum(ring r1, ring r2, ring &sum)
 {
+  if ((r1==NULL)||(r2==NULL)
+  ||(r1->cf==NULL)||(r2->cf==NULL))
+    return -1;
   if (r1==r2)
   {
     sum=r1;
