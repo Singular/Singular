@@ -170,7 +170,7 @@ void *idrecDataInit(int t)
     case LINK_CMD:
       return (void*) omAlloc0Bin(sip_link_bin);
     case RING_CMD:
-      return (void*) omAlloc0Bin(sip_sring_bin);
+      return NULL;
     case PACKAGE_CMD:
     {
       package pa=(package)omAlloc0Bin(sip_package_bin);

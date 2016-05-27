@@ -235,6 +235,11 @@ void ssiWriteRing(ssiInfo *d,const ring r)
   /* ch=-1: transext, coeff ring follows */
   /* ch=-2: algext, coeff ring and minpoly follows */
   /* ch=-3: cf name follows */
+  if ((r==NULL)||(r->cf==NULL))
+  {
+    WerrorS("undefined ring");
+    return;
+  }
   if (r==currRing) // see recursive calls for transExt/algExt
   {
     if (d->r!=NULL) rKill(d->r);

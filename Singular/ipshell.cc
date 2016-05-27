@@ -1550,7 +1550,7 @@ idhdl rDefault(const char *s)
     memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
-  ring r = IDRING(tmp);
+  ring r = IDRING(tmp) = (ring) omAlloc0Bin(sip_sring_bin);
 
   r->cf = nInitChar(n_Zp, (void*)32003); //   r->cf->ch = 32003;
   r->N      = 3;

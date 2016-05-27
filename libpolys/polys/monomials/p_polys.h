@@ -1503,6 +1503,8 @@ static inline int p_LtCmp(poly p, poly q, const ring r)
   int res = p_LmCmp(p,q,r);
   if(res == 0)
   {
+    if(p_GetCoeff(p,r) == NULL || p_GetCoeff(q,r) == NULL)
+      return res;
     number pc = n_Copy(p_GetCoeff(p,r),r->cf);
     number qc = n_Copy(p_GetCoeff(q,r),r->cf);
     if(!n_GreaterZero(pc,r->cf))
@@ -1520,6 +1522,57 @@ static inline int p_LtCmp(poly p, poly q, const ring r)
   }
   return res;
 }
+
+#ifdef HAVE_RINGS
+// This is the equivalent of pLmCmp(p,q) != -currRing->OrdSgn for rings
+// It is used in posInLRing and posInTRing
+static inline int p_LtCmpOrdSgnDiffM(poly p, poly q, const ring r)
+{
+  if(r->OrdSgn == 1)
+  {
+    return(p_LtCmp(p,q,r) != -1);
+  }
+  else
+  {
+    return(p_LmCmp(p,q,r) == -1);
+  }
+}
+#endif
+
+#ifdef HAVE_RINGS
+// This is the equivalent of pLmCmp(p,q) != currRing->OrdSgn for rings
+// It is used in posInLRing and posInTRing
+static inline int p_LtCmpOrdSgnDiffP(poly p, poly q, const ring r)
+{
+  if(r->OrdSgn == 1)
+  {
+    return(p_LmCmp(p,q,r) == -1);
+  }
+  else
+  {
+    return(p_LtCmp(p,q,r) != -1);
+  }
+
+}
+#endif
+
+#ifdef HAVE_RINGS
+// This is the equivalent of pLmCmp(p,q) == -currRing->OrdSgn for rings
+// It is used in posInLRing and posInTRing
+static inline int p_LtCmpOrdSgnEqM(poly p, poly q, const ring r)
+{
+  return(p_LtCmp(p,q,r) == -r->OrdSgn);
+}
+#endif
+
+#ifdef HAVE_RINGS
+// This is the equivalent of pLmCmp(p,q) == currRing->OrdSgn for rings
+// It is used in posInLRing and posInTRing
+static inline int p_LtCmpOrdSgnEqP(poly p, poly q, const ring r)
+{
+  return(p_LtCmp(p,q,r) == r->OrdSgn);
+}
+#endif
 
 /// returns TRUE if p1 is a skalar multiple of p2
 /// assume p1 != NULL and p2 != NULL

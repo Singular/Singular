@@ -1020,6 +1020,7 @@ static BOOLEAN jiA_RING(leftv res, leftv a, Subexpr e)
     have_id=FALSE;
   }
   ring r=(ring)a->Data();
+  if ((r==NULL)||(r->cf==NULL)) return TRUE;
   if (have_id)
   {
     idhdl rl=(idhdl)res->data;

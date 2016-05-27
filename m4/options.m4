@@ -210,8 +210,6 @@ AC_DEFUN([SING_USE_FACTORY],
   AC_MSG_CHECKING([  FACTORY_LIBS?..])
   AC_MSG_RESULT(${FACTORY_LIBS:-unset})
 
-  AC_DEFINE(HAVE_FACTORY,[1],[Enable factory])
-
   ENABLE_ARG="FACTORY_LIBS='$FACTORY_LIBS' FACTORY_INCLUDES='$FACTORY_INCLUDES'"
 
   ac_configure_args="$ac_configure_args $ENABLE_ARG"
@@ -270,8 +268,6 @@ AC_ARG_ENABLE(factory, AS_HELP_STRING([--disable-factory], [Disable factory]),
     LIBS="$LIBS_save"
 #
     AC_LANG_POP([C++])
-
-    AC_DEFINE(HAVE_FACTORY,[1],[Enable factory])
 
     PKG_REQUIRE="$PKG_REQUIRE factory"
     AC_SUBST(PKG_REQUIRE)

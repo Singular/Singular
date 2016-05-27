@@ -7320,6 +7320,12 @@ returns the list of the eigenvalues of the matrix (as ideal, intvec).
 returns the enveloping algebra (i.e. R tensor R^opp)
 See @code{system("opp")}.
 @c ..........................
+@item @code{system("executable",} string @code{)}
+@cindex system, executable
+returns the path of the command given as argument or the empty string (for: not found)
+See @code{system("Singular")}.
+See @code{system("getenv","PATH")}.
+@c ..........................
 @item @code{system("freegb",} ideal, i2, i3 @code{)}
 @cindex system, freegb
 returns the standrda basis in the shift algebra i(with i3 variables) up to degree i2.

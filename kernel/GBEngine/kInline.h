@@ -1143,6 +1143,7 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
 {
   assume(p_sev == pGetShortExpVector(p));
   if (strat->noClearS) return;
+  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
     if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at]))
@@ -1151,6 +1152,7 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
       return;
   }
   else
+  #endif
   {
     if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at])) return;
   }
