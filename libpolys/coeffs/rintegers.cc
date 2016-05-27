@@ -559,7 +559,7 @@ BOOLEAN nrzDBTest (number x, const char *f, const int l, const coeffs);
 #define nrzTest(A)
 #endif
 
-#undef CF_DEBUG 
+#undef CF_DEBUG
 static inline number nrz_short(number x)
 {
 #if CF_DEBUG

@@ -1030,7 +1030,7 @@ the client @code{xterm}. From that one can start ESingular.
 The simplest way to overcome fork problem is to run @code{/usr/bin/rebase-trigger full},
 then stop all Cygwin processes and services, and then run @code{setup-x86.exe}.
 The _autorebase postinstall script will then take care of the rebase.
-Occasionally it is necessary to reboot the computer before doing this. 
+Occasionally it is necessary to reboot the computer before doing this.
 @end itemize
 @subheading Starting, interrupting and stopping SINGULAR
 

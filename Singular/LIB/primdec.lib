@@ -2258,11 +2258,11 @@ static proc minAssPrimes_i(int patchPrimaryDecomposition, ideal i, list #)
   if (subsystem==0)
   {
     int k;
-  
+
     list result;
-  
+
     if(npars(P) == 0)  { option(redSB); }
-  
+
     if (attrib(i,"isSB")!=1)
     {
       i=groebner(q[1]);
@@ -2294,7 +2294,7 @@ static proc minAssPrimes_i(int patchPrimaryDecomposition, ideal i, list #)
         }
       }
     }
-  
+
     if( dim(i) == -1 )
     {
       option( set,op );
@@ -2351,7 +2351,7 @@ static proc minAssPrimes_i(int patchPrimaryDecomposition, ideal i, list #)
       option( set,origOp );
       return(re);
     }
-  
+
     if ((facstdOption == "noFacstd") || (dim(i) == 0))
     {
       if (algorithm == "GTZ")
@@ -9497,7 +9497,7 @@ static proc check_variables(alias ideal I, int NN)
     p=I[i];
     if (size(variables(p))<NN)
     {
-      JJ=J+ideal(p); 
+      JJ=J+ideal(p);
       if (size(variables(JJ))<NN)
       { J=JJ; }
     }

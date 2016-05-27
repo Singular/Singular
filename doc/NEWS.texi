@@ -24,7 +24,7 @@
 @c New libraries:
 @c @itemize
 @c @item new library: ffmodstd.lib:  Groebner bases of ideals in polynomial rings over algebraic function fields(@nref{ffmodstd_lib})
-@c @item 
+@c @item
 @c @end itemize
 
 @c Changed libraries:
@@ -57,6 +57,7 @@ Changed libraries:
 @item renamed derham_lib to @nref{deRham_lib}
 @item grobcov.lib (grobcovK): Groebner Cover for parametric ideals (@nref{grobcov_lib}) with new routine
    ConsLevels (@nref{ConsLevels}), removed AddCons  AddConsP.
+@item primdec.lib: new option "subsystem" @nref{primdec_lib}
 @end itemize
 
 @heading News for version 4-0-2

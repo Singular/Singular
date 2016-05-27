@@ -925,7 +925,7 @@ cmdnames cmds[] =
   { "continue",    0, CONTINUE_CMD ,      CONTINUE_CMD},
   { "contract",    0, CONTRACT_CMD ,      CMD_2},
   { "convhull",    0, NEWTONPOLY_CMD,     CMD_1},
-#ifdef SINGULAR_4_1  
+#ifdef SINGULAR_4_1
   { "cring",       0, CRING_CMD,          ROOT_DECL},
 #endif
   { "dbprint",     0, DBPRINT_CMD ,       CMD_M},
