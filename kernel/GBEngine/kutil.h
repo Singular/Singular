@@ -357,6 +357,7 @@ public:
   #ifdef HAVE_RINGS
   bool sigdrop; //This is used to check sigdrop in sba over Z
   int nrsyzcrit; // counts how many pairs are deleted by SyzCrit
+  int nrrewcrit; // counts how many pairs are deleted by FaugereRewCrit
   int sbaEnterS; // sba over Z strategy: if sigdrop element has _*gen(sbaEnterS+1), then 
                  // add directly sbaEnterS elements into S
   #endif
@@ -452,6 +453,8 @@ int posInLF5C (const LSet set, const int length,
                LObject* L,const kStrategy strat);
 int posInLSig (const LSet set, const int length,
                LObject* L,const kStrategy strat);
+int posInLSigRing (const LSet set, const int length,
+               LObject* L,const kStrategy strat);
 int posInLRing (const LSet set, const int length,
                LObject* L,const kStrategy strat);
 int posInSyz (const kStrategy strat, const poly sig);
@@ -518,6 +521,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
 BOOLEAN enterOneStrongPolySig (int i,poly p,poly sig,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR = -1);
 void message (int i,int* reduc,int* olddeg,kStrategy strat,int red_result);
 void messageStat (int hilbcount,kStrategy strat);
+void messageStatSBA (int hilbcount,kStrategy strat);
 #ifdef KDEBUG
 void messageSets (kStrategy strat);
 #else

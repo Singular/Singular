@@ -2563,7 +2563,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
         strat->sbaEnterS = -1;
         r=sba(F,Q,NULL,hilb,strat);
         #if ADIDEBUG
-        printf("\nSBA Run 1: %i elements (syzCrit = %i)\n",IDELEMS(r),strat->nrsyzcrit);
+        printf("\nSBA Run 1: %i elements (syzCrit = %i,rewCrit = %i)\n",IDELEMS(r),strat->nrsyzcrit,strat->nrrewcrit);
         //idPrint(r);
         //getchar();
         #endif
@@ -2572,7 +2572,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
         {
           r=sba(r,Q,NULL,hilb,strat);
           #if ADIDEBUG
-          printf("SBA Run %i: %i elements (syzCrit = %i)\n",sbarun++,IDELEMS(r),strat->nrsyzcrit);
+          printf("SBA Run %i: %i elements (syzCrit = %i,rewCrit = %i)\n",sbarun++,IDELEMS(r),strat->nrsyzcrit,strat->nrrewcrit);
           //idPrint(r);
           //getchar();
           #endif

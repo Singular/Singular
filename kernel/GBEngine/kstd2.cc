@@ -1655,7 +1655,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     #endif
     printf("\n   list   L\n");
     int iii;
-    #if 1
+    #if 0
     for(iii = 0; iii<= strat->Ll; iii++)
     {
         printf("L[%i]:",iii);
@@ -1671,7 +1671,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         p_Write(strat->L[strat->Ll].p2, strat->tailRing);
     }
     #endif
-    #if 1
+    #if 0
     for(iii = 0; iii<= strat->Bl; iii++)
     {
         printf("B[%i]:",iii);
@@ -2048,6 +2048,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if(rField_is_Ring(currRing))
     strat->sigdrop = FALSE;
   strat->nrsyzcrit = 0;
+  strat->nrrewcrit = 0;
   #endif
 #if SBA_INTERRED_START
   F = kInterRed(F,NULL);
@@ -2164,7 +2165,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         p_Write(strat->L[strat->Ll].sig, strat->tailRing);
     }
     #endif
-    //getchar();
+    getchar();
     #endif
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     #ifdef KDEBUG
@@ -2347,6 +2348,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         printf("\nStill Sigdrop - redRing reduced to:\n");pWrite(strat->P.p);
         #endif
         strat->enterS(strat->P, 0, strat, strat->tl);
+        if (TEST_OPT_PROT)
+          PrintS("-");
         break;
       }
     }
@@ -2364,6 +2367,15 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         printf("%d\n",red_result);
     }
 #endif
+    if (TEST_OPT_PROT)
+    {
+      if(strat->P.p != NULL)
+        message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
+                &olddeg,&reduc,strat, red_result);
+      else
+        message((strat->honey ? strat->P.ecart : 0),
+                &olddeg,&reduc,strat, red_result);
+    }
 
     if (strat->overflow)
     {
@@ -2824,7 +2836,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 //      ecartWeights=NULL;
 //    }
 //  }
-  if (TEST_OPT_PROT) messageStat(hilbcount,strat);
+  if (TEST_OPT_PROT) messageStatSBA(hilbcount,strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
 #if SBA_PRINT_SIZE_G
   size_g_non_red  = IDELEMS(strat->Shdl);

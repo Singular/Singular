@@ -5521,25 +5521,88 @@ int posInL0Ring (const LSet set, const int length,
 int posInLSig (const LSet set, const int length,
                LObject* p,const kStrategy /*strat*/)
 {
-if (length<0) return 0;
-if (pLtCmp(set[length].sig,p->sig)== currRing->OrdSgn)
-  return length+1;
+  if (length<0) return 0;
+  if (pLtCmp(set[length].sig,p->sig)== currRing->OrdSgn)
+    return length+1;
 
-int i;
-int an = 0;
-int en= length;
-loop
-{
-  if (an >= en-1)
+  int i;
+  int an = 0;
+  int en= length;
+  loop
   {
-    if (pLtCmp(set[an].sig,p->sig) == currRing->OrdSgn) return en;
-    return an;
+    if (an >= en-1)
+    {
+      if (pLtCmp(set[an].sig,p->sig) == currRing->OrdSgn) return en;
+      return an;
+    }
+    i=(an+en) / 2;
+    if (pLtCmp(set[i].sig,p->sig) == currRing->OrdSgn) an=i;
+    else                                      en=i;
+    /*aend. fuer lazy == in !=- machen */
   }
-  i=(an+en) / 2;
-  if (pLtCmp(set[i].sig,p->sig) == currRing->OrdSgn) an=i;
-  else                                      en=i;
-  /*aend. fuer lazy == in !=- machen */
 }
+//sorts the pair list in this order: pLtCmp on the sigs, FDeg, pLtCmp on the polys
+int posInLSigRing (const LSet set, const int length,
+               LObject* p,const kStrategy /*strat*/)
+{
+  assume(currRing->OrdSgn == 1 && rField_is_Ring(currRing));
+  if (length<0) return 0;
+  if (pLtCmp(set[length].sig,p->sig)== 1)
+    return length+1;
+
+  int an,en,i;
+  an = 0;
+  en = length+1;
+  int cmp;
+  loop
+  {
+    if (an >= en-1)
+    {
+      if(an == en)
+        return en;
+      cmp = pLtCmp(set[an].sig,p->sig);
+      if (cmp == 1)
+        return en;
+      if (cmp == -1)
+        return an;
+      if (cmp == 0)
+      {
+         if (set[an].FDeg > p->FDeg)
+          return en;
+         if (set[an].FDeg < p->FDeg)
+          return an;
+         if (set[an].FDeg == p->FDeg)
+         {
+            cmp = pLtCmp(set[an].p,p->p);
+            if(cmp == 1)
+              return en;
+            else
+              return an;
+         }
+      }
+    }
+    i=(an+en) / 2;
+    cmp = pLtCmp(set[i].sig,p->sig);
+    if (cmp == 1)
+      an = i;
+    if (cmp == -1)
+      en = i;
+    if (cmp == 0)
+    {
+       if (set[i].FDeg > p->FDeg)
+        an = i;
+       if (set[i].FDeg < p->FDeg)
+        en = i;
+       if (set[i].FDeg == p->FDeg)
+       {
+          cmp = pLtCmp(set[i].p,p->p);
+          if(cmp == 1)
+            an = i;
+          else
+            en = i;
+       }
+    }
+  }
 }
 
 int posInLRing (const LSet set, const int length,
@@ -6466,6 +6529,7 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
       #if ADIDEBUG
       printf("\nFaugere RewCrit: * divisible by *\n");pWrite(sig);pWrite(strat->sig[k]);
       #endif
+      strat->nrrewcrit++;
       return TRUE;
     }
     //k--;
@@ -7082,6 +7146,19 @@ void messageStat (int hilbcount,kStrategy strat)
   //Print("%d/%d polynomials in standard base\n",srmax,IDELEMS(Shdl));
   //Print("%d/%d polynomials in set L (for lazy alg.)",lrmax+1,strat->Lmax);
   Print("product criterion:%d chain criterion:%d\n",strat->cp,strat->c3);
+  if (hilbcount!=0) Print("hilbert series criterion:%d\n",hilbcount);
+  /* in usual case strat->cv is 0, it gets changed only in shift routines */
+  if (strat->cv!=0) Print("shift V criterion:%d\n",strat->cv);
+  /*mflush();*/
+}
+
+void messageStatSBA (int hilbcount,kStrategy strat)
+{
+  //PrintS("\nUsage/Allocation of temporary storage:\n");
+  //Print("%d/%d polynomials in standard base\n",srmax,IDELEMS(Shdl));
+  //Print("%d/%d polynomials in set L (for lazy alg.)",lrmax+1,strat->Lmax);
+  Print("syz criterion:%d rew criterion:%d\n",strat->nrsyzcrit,strat->nrrewcrit);
+  //Print("product criterion:%d chain criterion:%d\n",strat->cp,strat->c3);
   if (hilbcount!=0) Print("hilbert series criterion:%d\n",hilbcount);
   /* in usual case strat->cv is 0, it gets changed only in shift routines */
   if (strat->cv!=0) Print("shift V criterion:%d\n",strat->cv);
@@ -9398,6 +9475,11 @@ void initSbaPos (kStrategy strat)
   strat->posInLSba  = posInLSig;
   //strat->posInL     = posInLSig;
   strat->posInL     = posInLF5C;
+  if (rField_is_Ring(currRing))
+  {
+    strat->posInLSba  = posInLSigRing;
+    strat->posInL     = posInL11Ring;
+  }
   //strat->posInT     = posInTSig;
 }
 

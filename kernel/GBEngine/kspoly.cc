@@ -279,6 +279,7 @@ pWrite(PW->p);pWrite(PW->sig);
       {
         //The sigs have the same lm, have to substract
         PR->sig = pSub(PR->sig, pCopy(sigMult));
+        pDelete(&sigMult);
         //It may happen that now the signature is 0 (drop)
         if(PR->sig == NULL)
         {
@@ -287,21 +288,20 @@ pWrite(PW->p);pWrite(PW->sig);
           #endif
           strat->sigdrop=TRUE;
         }
-      }
-      else
-      {
-        if(sigSafe == -1)
+        else
         {
-          // do not allow this reduction - it will increase it's signature
-          // and the partially standard basis is just till the old sig, not the new one
-          PR->is_redundant = TRUE;
-          return 3;
+          if(sigSafe == -1)
+          {
+            // do not allow this reduction - it will increase it's signature
+            // and the partially standard basis is just till the old sig, not the new one
+            PR->is_redundant = TRUE;
+            return 3;
+          }
         }
       }
     }
     #endif
     //pDelete(&f1);
-    pDelete(&sigMult);
     // go on with the computations only if the signature of p2 is greater than the
     // signature of fm*p1
     if(sigSafe != 1 && !rField_is_Ring(currRing))
