@@ -2505,6 +2505,9 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         }
       }
       p_Delete(&beforetailred,currRing);
+      // strat->P.p = NULL may appear if we had  a sigdrop above and reduced to 0 via redRing
+      if(strat->P.p == NULL)
+        goto case_when_red_result_changed;
       if(!nGreaterZero(pGetCoeff(strat->P.p)))
       {
         strat->P.p = pNeg(strat->P.p);
@@ -2512,7 +2515,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
     }
     #endif
-
     // remove sigsafe label since it is no longer valid for the next element to
     // be reduced
     if (strat->sbaOrder == 1)
@@ -2747,6 +2749,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
     else
     {
+      case_when_red_result_changed:
       // adds signature of the zero reduction to
       // strat->syz. This is the leading term of
       // syzygy and can be used in syzCriterion()
@@ -3008,8 +3011,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     rDelete (sRing);
   }
   #ifdef HAVE_RINGS
-  if(nCoeff_is_Ring_Z(currRing->cf))
-    finalReduceByMon(strat);
+  //if(nCoeff_is_Ring_Z(currRing->cf))
+  //  finalReduceByMon(strat);
   if(rField_is_Ring(currRing) && !strat->sigdrop)
   #endif
     id_DelDiv(strat->Shdl, currRing);

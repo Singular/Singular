@@ -12,6 +12,10 @@
 #define MYTEST 0
 
 #define ADIDEBUG 0
+//All vs Just strategy over rings: 
+// 1 - Just 
+// 0 - All
+#define ALL_VS_JUST 0
 
 #include <kernel/mod2.h>
 
@@ -1180,6 +1184,25 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   assume(atR >= 0);
   assume(i<=strat->sl);
   assume(p!=NULL);
+  #if ALL_VS_JUST
+  //Over rings, if we construct the strong pair, do not add the spair
+  if(rField_is_Ring(currRing))
+  {
+    number s,t,d;
+    d = n_ExtGcd(pGetCoeff(p), pGetCoeff(strat->S[i]), &s, &t, currRing->cf);
+
+    if (!nIsZero(s) && !nIsZero(t))  // evtl. durch divBy tests ersetzen
+    {
+      nDelete(&d);
+      nDelete(&s);
+      nDelete(&t);
+      return;
+    }
+    nDelete(&d);
+    nDelete(&s);
+    nDelete(&t);
+  }
+  #endif
   int      l,j,compare,compareCoeff;
   LObject  h;
 
@@ -2285,6 +2308,25 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   pWrite(p);pWrite(pSig);
   pWrite(strat->S[i]);pWrite(strat->sig[i]);
   #endif
+  #if ALL_VS_JUST
+  //Over rings, if we construct the strong pair, do not add the spair
+  if(rField_is_Ring(currRing))
+  {
+    number s,t,d;
+    d = n_ExtGcd(pGetCoeff(p), pGetCoeff(strat->S[i]), &s, &t, currRing->cf);
+
+    if (!nIsZero(s) && !nIsZero(t))  // evtl. durch divBy tests ersetzen
+    {
+      nDelete(&d);
+      nDelete(&s);
+      nDelete(&t);
+      return;
+    }
+    nDelete(&d);
+    nDelete(&s);
+    nDelete(&t);
+  }
+  #endif
   assume(i<=strat->sl);
   int      l;
   poly m1 = NULL,m2 = NULL; // we need the multipliers for the s-polynomial to compute
@@ -2449,7 +2491,8 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   // NOTE: Arri's Rewritten Criterion is tested below, we need Lp.p for it!
   if  ( strat->syzCrit(pSigMult,pSigMultNegSev,strat) ||
         strat->syzCrit(sSigMult,sSigMultNegSev,strat)
-        || strat->rewCrit1(sSigMult,sSigMultNegSev,Lp.lcm,strat,i+1)
+        // With this rewCrit activated i get a wrong deletion in sba_int_56.tst
+        //|| strat->rewCrit1(sSigMult,sSigMultNegSev,Lp.lcm,strat,i+1)
       )
   {
     #if ADIDEBUG
@@ -6149,7 +6192,7 @@ BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kSt
 #endif
     if (p_LmShortDivisibleBy(strat->sig[k], strat->sevSig[k], sig, not_sevSig, currRing)
     #ifdef HAVE_RINGS
-    && (!rField_is_Ring(currRing) || n_DivBy(pGetCoeff(sig),pGetCoeff(strat->sig[k]),currRing))
+    && (!rField_is_Ring(currRing) || (n_DivBy(pGetCoeff(sig),pGetCoeff(strat->sig[k]),currRing)  && pLmCmp(sig,strat->sig[k]) == 1 ))
     #endif
     )
     {
