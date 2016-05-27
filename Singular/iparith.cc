@@ -1328,6 +1328,12 @@ static BOOLEAN jjEQUAL_Ma(leftv res, leftv u, leftv v)
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
+static BOOLEAN jjEQUAL_R(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)(long)(u->Data()==v->Data());
+  jjEQUAL_REST(res,u,v);
+  return FALSE;
+}
 static BOOLEAN jjEQUAL_N(leftv res, leftv u, leftv v)
 {
   res->data = (char *)((long)nEqual((number)u->Data(),(number)v->Data()));
@@ -3901,7 +3907,6 @@ static BOOLEAN jjDEG_M(leftv res, leftv u)
 static BOOLEAN jjDEGREE(leftv res, leftv v)
 {
   SPrintStart();
-#ifdef HAVE_RINGS
   if (rField_is_Ring_Z(currRing))
   {
     ring origR = currRing;
@@ -3926,7 +3931,6 @@ static BOOLEAN jjDEGREE(leftv res, leftv v)
     rChangeCurrRing(origR);
     rDelete(tempR);
   }
-#endif
   assumeStdFlag(v);
   intvec *module_w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   scDegree((ideal)v->Data(),module_w,currRing->qideal);
@@ -4047,7 +4051,6 @@ static BOOLEAN jjDET_S(leftv res, leftv v)
 static BOOLEAN jjDIM(leftv res, leftv v)
 {
   assumeStdFlag(v);
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     ideal vid = (ideal)v->Data();
@@ -4110,7 +4113,6 @@ static BOOLEAN jjDIM(leftv res, leftv v)
     idDelete(&vv);
     return FALSE;
   }
-#endif
   res->data = (char *)(long)scDimInt((ideal)(v->Data()),currRing->qideal);
   return FALSE;
 }
@@ -4275,7 +4277,6 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
 }
 static BOOLEAN jjHILBERT(leftv, leftv v)
 {
-#ifdef HAVE_RINGS
   if (rField_is_Ring_Z(currRing))
   {
     ring origR = currRing;
@@ -4302,7 +4303,6 @@ static BOOLEAN jjHILBERT(leftv, leftv v)
     rDelete(tempR);
     return FALSE;
   }
-#endif
   assumeStdFlag(v);
   intvec *module_w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   //scHilbertPoly((ideal)v->Data(),currRing->qideal);
@@ -4311,13 +4311,11 @@ static BOOLEAN jjHILBERT(leftv, leftv v)
 }
 static BOOLEAN jjHILBERT_IV(leftv res, leftv v)
 {
-#ifdef HAVE_RINGS
   if (rField_is_Ring_Z(currRing))
   {
     Print("// NOTE: computation of Hilbert series etc. is being\n");
     Print("//       performed for generic fibre, that is, over Q\n");
   }
-#endif
   res->data=(void *)hSecondSeries((intvec *)v->Data());
   return FALSE;
 }
@@ -4426,10 +4424,8 @@ static BOOLEAN jjINDEPSET(leftv res, leftv v)
 static BOOLEAN jjINTERRED(leftv res, leftv v)
 {
   ideal result=kInterRed((ideal)(v->Data()), currRing->qideal);
-  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
     Warn("interred: this command is experimental over the integers");
-  #endif
   if (TEST_OPT_PROT) { PrintLn(); mflush(); }
   res->data = result;
   return FALSE;
@@ -5917,7 +5913,6 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
            currRing->N,wdegree->length());
     return TRUE;
   }
-#ifdef HAVE_RINGS
   if (rField_is_Ring_Z(currRing))
   {
     ring origR = currRing;
@@ -5959,7 +5954,6 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
     rDelete(tempR);
     if (returnWithTrue) return TRUE; else return FALSE;
   }
-#endif
   assumeStdFlag(u);
   intvec *module_w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currRing->qideal,wdegree);
@@ -9238,7 +9232,6 @@ static BOOLEAN check_valid(const int p, const int op)
     /* else, ALLOW_PLURAL */
   }
   #endif
-  #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     if ((p & RING_MASK)==0 /*NO_RING*/)
@@ -9259,6 +9252,5 @@ static BOOLEAN check_valid(const int p, const int op)
       WarnS("considering the image in Q[...]");
     }
   }
-  #endif
   return FALSE;
 }

@@ -13,22 +13,10 @@
 
 #include <kernel/mod2.h>
 
-#ifndef SING_NDEBUG
-# define MYTEST 0
-#else /* ifndef SING_NDEBUG */
-# define MYTEST 0
-#endif /* ifndef SING_NDEBUG */
-
 #define ADIDEBUG 0
 #define ADIDEBUG_COUNT 0
 #define REV_BLOCK_SBA 0
 #define SIG_DROP_FIRST 1
-
-#if MYTEST
-# ifdef HAVE_TAIL_RING
-#  undef HAVE_TAIL_RING
-# endif // ifdef HAVE_TAIL_RING
-#endif
 
 // define if no buckets should be used
 // #define NO_BUCKETS
@@ -122,34 +110,29 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
       if (j > strat->tl) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       if (p_LmShortDivisibleBy(T[j].p, sevT[j],p, not_sev, r))
+      {
+        if(rField_is_Ring(r))
         {
-#ifdef HAVE_RINGS
-            if(rField_is_Ring(r))
-                {if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r))
-                    return j;}
-            else {
-                return j;
-                }
-#else
+          if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r))
+            return j;}
+          else
+          {
             return j;
-#endif
-
+          }
         }
 #else
       if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].p, p, r))
         {
-#ifdef HAVE_RINGS
-            if(rField_is_Ring(r))
-                {if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r))
-                    return j;}
-            else {
-                return j;
-                }
-#else
+          if(rField_is_Ring(r))
+          {
+            if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].p), r))
+              return j;
+          }
+          else
+          {
             return j;
-#endif
-
+          }
         }
 #endif
       j++;
@@ -166,33 +149,29 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
       if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
                                p, not_sev, r))
         {
-#ifdef HAVE_RINGS
-            if(rField_is_Ring(r))
-                {if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r))
-                    return j;}
-            else {
-                return j;
-            }
-#else
+          if(rField_is_Ring(r))
+          {
+            if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r))
+              return j;
+          }
+          else
+          {
             return j;
-#endif
-
+          }
         }
 #else
       if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].t_p, p, r))
         {
-#ifdef HAVE_RINGS
-            if(rField_is_Ring(r))
-                {if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r))
-                    return j;}
-            else {
-                return j;
-            }
-#else
+          if(rField_is_Ring(r))
+          {
+            if(n_DivBy(pGetCoeff(p), pGetCoeff(T[j].t_p), r))
+              return j;
+          }
+          else
+          {
             return j;
-#endif
-
+          }
         }
 #endif
       j++;
@@ -224,24 +203,20 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
     if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
                              p, not_sev, currRing))
         {
-#ifdef HAVE_RINGS
             if(rField_is_Ring(currRing))
                 {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
                     return j;}
             else
-#endif
             return j;
         }
 #else
     if ( !(strat->sevS[j] & not_sev) &&
          p_LmDivisibleBy(strat->S[j], p, currRing))
         {
-#ifdef HAVE_RINGS
             if(rField_is_Ring(currRing))
                 {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
                     return j;}
             else
-#endif
             return j;
         }
 #endif
@@ -268,24 +243,20 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
     if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
                              p, not_sev, currRing))
         {
-#ifdef HAVE_RINGS
             if(rField_is_Ring(currRing))
                 {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
                     return j;}
             else
-#endif
             return j;
         }
 #else
     if ( !(strat->sevS[j] & not_sev) &&
          p_LmDivisibleBy(strat->S[j], p, currRing))
         {
-#ifdef HAVE_RINGS
             if(rField_is_Ring(currRing))
                 {if(n_DivBy(pGetCoeff(p), pGetCoeff(strat->S[j]), currRing))
                     return j;}
             else
-#endif
             return j;
         }
 #endif
@@ -449,15 +420,8 @@ int redRing (LObject* h,kStrategy strat)
         return 1;
       }
     }
-    #if ADIDEBUG
-    pWrite(h->p);
-    printf("\nFound j = %i\n",j);pWrite(strat->T[j].p);
-    #endif
     //enterT(*h, strat);
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat); // with debug output
-    #if ADIDEBUG
-    printf("\nand after reduce: \n");pWrite(h->p);
-    #endif
 
     if (h->GetLmTailRing() == NULL)
     {
@@ -1595,18 +1559,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   // strat->posInT = posInT_pLength;
   kTest_TS(strat);
 
-#ifdef KDEBUG
-#if MYTEST
-  if (TEST_OPT_DEBUG)
-  {
-    PrintS("bba start GB: currRing: ");
-    // rWrite(currRing);PrintLn();
-    rDebugPrint(currRing);
-    PrintLn();
-  }
-#endif /* MYTEST */
-#endif /* KDEBUG */
-
 #ifdef HAVE_TAIL_RING
   if(!idIs0(F) &&(!rField_is_Ring(currRing)))  // create strong gcd poly computes with tailring and S[i] ->to be fixed
     kStratInitChangeTailRing(strat);
@@ -1692,11 +1644,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (pNext(strat->P.p) == strat->tail)
     {
       // deletes the short spoly
-#ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
         pLmDelete(strat->P.p);
       else
-#endif
         pLmFree(strat->P.p);
       strat->P.p = NULL;
       poly m1 = NULL, m2 = NULL;
@@ -1737,13 +1687,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
                 &olddeg,&reduc,strat, red_result);
 
       /* reduction of the element chosen from L */
-      #if ADIDEBUG
-      printf("\nBefore \n");pWrite(strat->P.p);
-      #endif
       red_result = strat->red(&strat->P,strat);
-      #if ADIDEBUG
-      printf("\nAfter \n");pWrite(strat->P.p);
-      #endif
       if (errorreported)  break;
     }
 
@@ -1767,12 +1711,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
 
-#ifdef KDEBUG
-#if MYTEST
-      PrintS("New S: "); p_DebugPrint(strat->P.p, currRing); PrintLn();
-#endif /* MYTEST */
-#endif /* KDEBUG */
-
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
       // therefore we call pContent instead of pNorm
@@ -1794,9 +1732,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
-#if MYTEST
-      PrintS("New (reduced) S: "); p_DebugPrint(strat->P.p, currRing); PrintLn();
-#endif /* MYTEST */
 #endif /* KDEBUG */
 
       // min_std stuff
@@ -1824,17 +1759,11 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
       {
         enterT(strat->P, strat);
-#ifdef HAVE_RINGS
         if (rField_is_Ring(currRing))
           superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         else
-#endif
           enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         // posInS only depends on the leading term
-        #if ADIDEBUG
-        printf("\nThis element is added to S\n");
-        p_Write(strat->P.p, strat->tailRing);p_Write(strat->P.p1, strat->tailRing);p_Write(strat->P.p2, strat->tailRing);
-        #endif
         strat->enterS(strat->P, pos, strat, strat->tl);
 #if 0
         int pl=pLength(strat->P.p);
@@ -1850,39 +1779,33 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         }
 #endif
       }
+      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+//      Print("[%d]",hilbeledeg);
+      if (strat->P.lcm!=NULL)
+      {
+        if (rField_is_Ring(currRing)) pLmDelete(strat->P.lcm);
+        else                          pLmFree(strat->P.lcm);
+        strat->P.lcm=NULL;
+      }
       if (strat->s_poly!=NULL)
       {
+        // the only valid entries are: strat->P.p,
+        // strat->tailRing (read-only, keep it)
+        // (and P->p1, P->p2 (read-only, must set to NULL if P.p is changed)
         if (strat->s_poly(strat))
         {
           // we are called AFTER enterS, i.e. if we change P
-          // we have it also to S/T
+          // we have to add it also to S/T
           // and add pairs
           int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
           enterT(strat->P, strat);
-          #ifdef HAVE_RINGS
           if (rField_is_Ring(currRing))
             superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
           else
-          #endif
             enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
           strat->enterS(strat->P, pos, strat, strat->tl);
         }
       }
-      #if ADIDEBUG
-      for(int iii = 0; iii<=strat->tl;iii++)
-      {
-        printf("\nT[%i] = ",iii);pWrite(strat->T[iii].p);
-      }
-      #endif
-
-      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
-//      Print("[%d]",hilbeledeg);
-      if (strat->P.lcm!=NULL)
-#ifdef HAVE_RINGS
-        pLmDelete(strat->P.lcm);
-#else
-        pLmFree(strat->P.lcm);
-#endif
     }
     else if (strat->P.p1 == NULL && strat->minim > 0)
     {
@@ -1895,17 +1818,12 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     kTest_TS(strat);
   }
 #ifdef KDEBUG
-#if MYTEST
-  PrintS("bba finish GB: currRing: "); rWrite(currRing);
-#endif /* MYTEST */
   if (TEST_OPT_DEBUG) messageSets(strat);
 #endif /* KDEBUG */
 
   if (TEST_OPT_SB_1)
   {
-    #ifdef HAVE_RINGS
     if(!rField_is_Ring(currRing))
-    #endif
     {
       int k=1;
       int j;
@@ -1940,7 +1858,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
   }
   else if (TEST_OPT_PROT) PrintLn();
-  #ifdef HAVE_RINGS
   if(nCoeff_is_Ring_Z(currRing->cf))
     finalReduceByMon(strat);
   if(rField_is_Ring(currRing))
@@ -1953,7 +1870,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
     }
   }
-  #endif
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
 //  if (TEST_OPT_WEIGHTM)
@@ -1969,11 +1885,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   SI_RESTORE_OPT1(save);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
 
-#ifdef KDEBUG
-#if MYTEST
-  PrintS("bba_end: currRing: "); rWrite(currRing);
-#endif /* MYTEST */
-#endif /* KDEBUG */
   idTest(strat->Shdl);
 
   return (strat->Shdl);
@@ -2100,18 +2011,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   //   withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
-  
-#ifdef KDEBUG
-#if MYTEST
-  if (TEST_OPT_DEBUG)
-  {
-    PrintS("bba start GB: currRing: ");
-    // rWrite(currRing);PrintLn();
-    rDebugPrint(currRing);
-    PrintLn();
-  }
-#endif /* MYTEST */
-#endif /* KDEBUG */
+  kTest_TS(strat);
 
 #ifdef HAVE_TAIL_RING
   if(!idIs0(F) &&(!rField_is_Ring(currRing)))  // create strong gcd poly computes with tailring and S[i] ->to be fixed
@@ -2267,11 +2167,9 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       {
         // deletes the short spoly
         /*
-#ifdef HAVE_RINGS
         if (rField_is_Ring(currRing))
           pLmDelete(strat->P.p);
         else
-#endif
           pLmFree(strat->P.p);
 */
           // TODO: needs some masking
@@ -2419,11 +2317,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // in F5E we know that the last reduced element is already the
       // the one with highest signature
       int pos = strat->sl+1;
-#ifdef KDEBUG
-#if MYTEST
-      PrintS("New S: "); pDebugPrint(strat->P.p); PrintLn();
-#endif /* MYTEST */
-#endif /* KDEBUG */
 
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
@@ -2536,10 +2429,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
-#if MYTEST
-//#if 1
-      PrintS("New (reduced) S: "); pDebugPrint(strat->P.p); PrintLn();
-#endif /* MYTEST */
 #endif /* KDEBUG */
 
       // min_std stuff
@@ -2572,11 +2461,9 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       pWrite(strat->P.GetLmCurrRing());
       pWrite(strat->P.sig);
       */
-#ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
         superenterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       else
-#endif
         enterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       #if ADIDEBUG
         printf("\nThis element is added to S\n");
@@ -2808,31 +2695,26 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   }
 #endif
 #ifdef KDEBUG
-#if MYTEST
-  PrintS("sba finish GB: currRing: "); rWrite(currRing);
-#endif /* MYTEST */
   if (TEST_OPT_DEBUG) messageSets(strat);
 #endif /* KDEBUG */
 
   if (TEST_OPT_SB_1)
   {
-    #ifdef HAVE_RINGS
     if(!rField_is_Ring(currRing))
-    #endif
     {
-        int k=1;
-        int j;
-        while(k<=strat->sl)
+      int k=1;
+      int j;
+      while(k<=strat->sl)
+      {
+        j=0;
+        loop
         {
-          j=0;
-          loop
-          {
-            if (j>=k) break;
-            clearS(strat->S[j],strat->sevS[j],&k,&j,strat);
-            j++;
-          }
-          k++;
+          if (j>=k) break;
+          clearS(strat->S[j],strat->sevS[j],&k,&j,strat);
+          j++;
         }
+        k++;
+      }
     }
   }
   /* complete reduction of the standard basis--------- */
@@ -2869,11 +2751,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 //  }
   if (TEST_OPT_PROT) messageStat(hilbcount,strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
-#ifdef KDEBUG
-#if MYTEST
-  PrintS("sba_end: currRing: "); rWrite(currRing);
-#endif /* MYTEST */
-#endif /* KDEBUG */
 #if SBA_PRINT_SIZE_G
   size_g_non_red  = IDELEMS(strat->Shdl);
 #endif
@@ -3123,13 +3000,11 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
   {
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-    #ifdef HAVE_RINGS
     if (rField_is_Ring(currRing))
     {
       p = redtailBba_Z(p,max_ind,strat);
     }
     else
-    #endif
     {
       si_opt_1 &= ~Sy_bit(OPT_INTSTRATEGY);
       p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
@@ -3196,13 +3071,11 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
       if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
       {
         if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-        #ifdef HAVE_RINGS
         if (rField_is_Ring(currRing))
         {
           p = redtailBba_Z(p,max_ind,strat);
         }
         else
-        #endif
         {
           p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
         }
@@ -3312,11 +3185,9 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
     if (pNext(strat->P.p) == strat->tail)
     {
       // deletes the short spoly
-#ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
         pLmDelete(strat->P.p);
       else
-#endif
         pLmFree(strat->P.p);
 
       // TODO: needs some masking
@@ -3389,12 +3260,6 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 
       int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
 
-#ifdef KDEBUG
-#if MYTEST
-      PrintS("New S: "); pDebugPrint(strat->P.p); PrintLn();
-#endif /* MYTEST */
-#endif /* KDEBUG */
-
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
       // therefore we call pContent instead of pNorm
@@ -3418,10 +3283,6 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 #endif
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
-#if MYTEST
-//#if 1
-      PrintS("New (reduced) S: "); pDebugPrint(strat->P.p); PrintLn();
-#endif /* MYTEST */
 #endif /* KDEBUG */
 
       // min_std stuff

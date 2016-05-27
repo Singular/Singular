@@ -190,7 +190,7 @@ BOOLEAN newstruct_Assign_user(int op, leftv l, leftv r)
     {
       if (iiRETURNEXPR.Typ() == op)
       {
-        l->Copy(&iiRETURNEXPR);
+        memcpy(l,&iiRETURNEXPR,sizeof(sleftv));
         iiRETURNEXPR.Init();
         return FALSE;
       }

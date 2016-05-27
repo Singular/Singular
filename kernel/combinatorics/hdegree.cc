@@ -1016,7 +1016,9 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
     ideal SS=id_Copy(S,tailRing);
     for(i=0;i<=idElem(S);i++)
     {
-      if(p_IsPurePower(SS->m[i],tailRing)==0)
+      if((SS->m[i]!=NULL)
+      && ((p_IsPurePower(SS->m[i],tailRing)==0)
+        ||(!n_IsUnit(pGetCoeff(SS->m[i]), tailRing->cf))))
       {
         p_Delete(&SS->m[i],tailRing);
       }

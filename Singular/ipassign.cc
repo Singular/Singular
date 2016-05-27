@@ -946,24 +946,22 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 
   ideal qid;
 
-#ifdef HAVE_RINGS
   if((rField_is_Ring(currRing)) && (cpos != -1))
-    {
-      int i, j;
-      int *perm = (int *)omAlloc0((qr->N+1)*sizeof(int));
+  {
+    int i, j;
+    int *perm = (int *)omAlloc0((qr->N+1)*sizeof(int));
 
-      for(i=qr->N;i>0;i--)
-        perm[i]=i;
+    for(i=qr->N;i>0;i--)
+      perm[i]=i;
 
-      nMapFunc nMap = n_SetMap(currRing->cf, newcf);
-      qid = idInit(IDELEMS(id)-1,1);
-      for(i = 0, j = 0; i<IDELEMS(id); i++)
-        if( i != cpos )
-          qid->m[j++] = p_PermPoly(id->m[i], perm, currRing, qr, nMap, NULL, 0);
-    }
-    else
-#endif
-      qid = idrCopyR(id,currRing,qr);
+    nMapFunc nMap = n_SetMap(currRing->cf, newcf);
+    qid = idInit(IDELEMS(id)-1,1);
+    for(i = 0, j = 0; i<IDELEMS(id); i++)
+      if( i != cpos )
+        qid->m[j++] = p_PermPoly(id->m[i], perm, currRing, qr, nMap, NULL, 0);
+  }
+  else
+    qid = idrCopyR(id,currRing,qr);
 
   idSkipZeroes(qid);
   //idPrint(qid);

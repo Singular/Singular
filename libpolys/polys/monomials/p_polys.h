@@ -1830,10 +1830,8 @@ static inline BOOLEAN p_IsConstantPoly(const poly p, const ring r)
 static inline BOOLEAN p_IsUnit(const poly p, const ring r)
 {
   if (p == NULL) return FALSE;
-#ifdef HAVE_RINGS
   if (rField_is_Ring(r))
     return (p_LmIsConstant(p, r) && n_IsUnit(pGetCoeff(p),r->cf));
-#endif
   return p_LmIsConstant(p, r);
 }
 

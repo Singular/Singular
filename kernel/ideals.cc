@@ -57,14 +57,12 @@ ideal idMinBase (ideal h1)
   int i,l,ll;
   intvec * wth;
   BOOLEAN homog;
-  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
       WarnS("minbase applies only to the local or homogeneous case over coefficient fields");
       e=idCopy(h1);
       return e;
   }
-  #endif
   homog = idHomModule(h1,currRing->qideal,&wth);
   if (rHasGlobalOrdering(currRing))
   {
@@ -655,9 +653,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   && (setRegularity)
   && (h==isHomog)
   && (!rIsPluralRing(currRing))
-  #ifdef HAVE_RINGS
   && (!rField_is_Ring(currRing))
-  #endif
   )
   {
     ring dp_C_ring = rAssure_dp_C(syz_ring); // will do rChangeCurrRing later
@@ -1292,10 +1288,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN *ad
       h4->m[i] = h4->m[i+1];
     }
     h4->m[IDELEMS(h4)-1] = p;
-    #ifdef HAVE_RINGS
-    if(!rField_is_Ring(currRing))
-    #endif
-    si_opt_1 |= Sy_bit(OPT_SB_1);
+    if(!rField_is_Ring(currRing)) si_opt_1 |= Sy_bit(OPT_SB_1);
   }
   idDelete(&temph1);
   //idTest(h4);//see remark at the beginning
