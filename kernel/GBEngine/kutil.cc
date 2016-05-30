@@ -4688,6 +4688,48 @@ int posInSMonFirst (const kStrategy strat, const int length,const poly p,
   }
 }
 
+// sorts by degree and pLtCmp in the block between start,end;
+// but puts pure monomials at the beginning
+int posInIdealMonFirst (const ideal F, const poly p,int start,int end)
+{
+  if(end < 0 || end >= IDELEMS(F))
+    end = IDELEMS(F);
+  if (end<0) return 0;
+  if(pNext(p) == NULL) return start;
+  polyset set=F->m;
+  int o = p_Deg(p,currRing);
+  int op;
+  int i;
+  int an = start;
+  for(i=start;i<end;i++)
+    if(set[i] != NULL && pNext(set[i]) == NULL)
+      an++;
+  if(an == end-1)
+    return end;
+  int en= end;
+  loop
+  {
+    if(an>=en)
+      return en;
+    if (an == en-1)
+    {
+      op = p_Deg(set[an],currRing);
+      if ((op < o)
+      || ((op == o) && (pLtCmp(set[an],p) == -1)))
+        return en;
+      return an;
+    }
+    i=(an+en) / 2;
+    op = p_Deg(set[i],currRing);
+    if ((op < o)
+    || ((op == o) && (pLtCmp(set[i],p) == -1)))
+      an=i;
+    else
+      en=i;
+  }
+}
+
+
 /*2
 * looks up the position of p in set
 * the position is the last one
