@@ -11,7 +11,7 @@
 // define if buckets should be used
 #define MORA_USE_BUCKETS
 
-#define ADIDEBUG 0
+#define ADIDEBUG 1
 #define ADIDEBUG_NF 0
 #define PRE_INTEGER_CHECK 0
 

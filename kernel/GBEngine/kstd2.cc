@@ -13,10 +13,8 @@
 
 #include <kernel/mod2.h>
 
-#define ADIDEBUG 0
+#define ADIDEBUG 1
 #define ADIDEBUG_COUNT 0
-#define REV_BLOCK_SBA 0
-#define SIG_DROP_FIRST 1
 
 // define if no buckets should be used
 // #define NO_BUCKETS
@@ -1655,7 +1653,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     #endif
     printf("\n   list   L\n");
     int iii;
-    #if 0
+    #if 1
     for(iii = 0; iii<= strat->Ll; iii++)
     {
         printf("L[%i]:",iii);
@@ -2097,8 +2095,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (test_PosInL!=NULL) strat->posInL=test_PosInL;
     kDebugPrint(strat);
   }
-
-  #if 1
+  // We add the elements directly in S from the previous loop
   if(rField_is_Ring(currRing) && strat->sbaEnterS >= 0)
   {
     for(int i = 0;i<strat->sbaEnterS;i++)
@@ -2111,7 +2108,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     strat->Ll = strat->Ll - strat->sbaEnterS; 
     strat->sbaEnterS = -1;
   }
-  #endif
   kTest_TS(strat);
 #ifdef KDEBUG
   //kDebugPrint(strat);
@@ -2165,7 +2161,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         p_Write(strat->L[strat->Ll].sig, strat->tailRing);
     }
     #endif
-    getchar();
+    //getchar();
     #endif
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     #ifdef KDEBUG
@@ -2841,19 +2837,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #if SBA_PRINT_SIZE_G
   size_g_non_red  = IDELEMS(strat->Shdl);
 #endif
-  //This is again done better at the beginning of the next loop because else damage S
-  //Put the element that caused the sigdrop ast the beginning
-  #if 0
-  //#if SIG_DROP_FIRST
-  poly dummy;
-  dummy = pCopy(strat->Shdl->m[strat->sl]);
-  for(int k=strat->sl;k>=1;k--)
-  {
-    strat->Shdl->m[k] = strat->Shdl->m[k-1];
-    strat->sig[k] = strat->sig[k-1];
-  }
-  strat->Shdl->m[0] = dummy;
-  #endif
+  
   idTest(strat->Shdl);
   // I have to add the initial input polynomials which where not used (p1 and p2 = NULL)
   #ifdef HAVE_RINGS
@@ -2900,70 +2884,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   //idSkipZeroes(strat->Shdl);
   //idPrint(strat->Shdl);
   idTest(strat->Shdl);
-  #if REV_BLOCK_SBA
-  #if ADIDEBUG
-  printf("\nSBA Endrun before block reverse sigdrop sorting: \n");
-  for(k = 0; k<=strat->sl; k++)
-  {
-    printf("[%i]:",k);pWrite(strat->Shdl->m[k]);
-    if(strat->sig[k]!= NULL)
-      {printf("       ");pWrite(strat->sig[k]);}
-    else
-      printf("        0\n");
-  }
-  #endif
-  //Reverse Blockwise Sorting of output needed for the Sig Drop Problem
-  #ifdef HAVE_RINGS
-  if(rField_is_Ring(currRing) && strat->sigdrop)
-  {
-    poly dummy;
-    int i,j;
-    for(i=0;i<=strat->sl;)
-    {
-      k = pGetComp(strat->sig[i]);
-      for(j = i; j<=strat->sl && strat->sig[j]!= NULL && pGetComp(strat->sig[j]) == k;++j)
-      {
-        //printf("\n%i is ok",j);
-      }
-      if(j == strat->sl && strat->sig[j] == NULL)
-        j++;
-      j--;
-      //printf("\ni = %i, j = %i\n",i,j);
-      //getchar();
-      for(k=0;k<(j-i)/2;k++)
-      {
-        //printf("\n%i <> %i\n",i+k,j-k);
-        dummy = pCopy(strat->Shdl->m[i+k]);
-        strat->Shdl->m[i+k] = strat->Shdl->m[j-k];
-        strat->Shdl->m[j-k] = pCopy(dummy);
-        p_Delete(&dummy, currRing);
-        if(strat->sig[i+k]!= NULL)
-          dummy = pCopy(strat->sig[i+k]);
-        else
-          dummy = NULL;
-        strat->sig[i+k] = strat->sig[j-k];
-        if(dummy!= NULL)
-        {
-          strat->sig[j-k] = pCopy(dummy);
-          p_Delete(&dummy, currRing);
-        }
-      }
-      i = j+1;
-    }
-  }
-  #endif
-  #if ADIDEBUG
-  printf("\nSBA Endrun after block reverse sigdrop sorting: \n");
-  for(k = 0; k<=strat->sl; k++)
-  {
-    printf("[%i]:",k);pWrite(strat->Shdl->m[k]);
-    if(strat->sig[k]!= NULL)
-      {printf("       ");pWrite(strat->sig[k]);}
-    else
-      printf("        0\n");
-  }
-  #endif
-  #endif
+  
   if ((strat->sbaOrder == 1 || strat->sbaOrder == 3) && sRing!=currRingOld)
   {
     rChangeCurrRing (currRingOld);
@@ -3461,6 +3382,12 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
   }
   for (cc=strat->sl+1; cc<IDELEMS(strat->Shdl); ++cc)
     strat->Shdl->m[cc]  = NULL;
+  #if 0
+  printf("\nAfter f5c sorting\n");
+  for(int i=0;i<=strat->sl;i++)
+  pWrite(pHead(strat->S[i]));
+  getchar();
+  #endif
 //#if 1
 #if DEBUGF5
   Print("------------------- STRAT S ---------------------\n");

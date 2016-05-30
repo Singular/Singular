@@ -9557,11 +9557,12 @@ void initSbaPos (kStrategy strat)
   strat->posInLSba  = posInLSig;
   //strat->posInL     = posInLSig;
   strat->posInL     = posInLF5C;
+  /*
   if (rField_is_Ring(currRing))
   {
     strat->posInLSba  = posInLSigRing;
     strat->posInL     = posInL11Ring;
-  }
+  }*/
   //strat->posInT     = posInTSig;
 }
 
