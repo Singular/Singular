@@ -278,6 +278,7 @@ pWrite(PW->p);pWrite(PW->sig);
       if(pLmCmp(PR->sig, sigMult) == 0)
       {
         //The sigs have the same lm, have to substract
+        poly origsig = pCopy(PR->sig);
         PR->sig = pSub(PR->sig, pCopy(sigMult));
         pDelete(&sigMult);
         //It may happen that now the signature is 0 (drop)
@@ -295,9 +296,12 @@ pWrite(PW->p);pWrite(PW->sig);
             // do not allow this reduction - it will increase it's signature
             // and the partially standard basis is just till the old sig, not the new one
             PR->is_redundant = TRUE;
+            pDelete(&PR->sig);
+            PR->sig = origsig;
             return 3;
           }
         }
+        pDelete(&origsig);
       }
     }
     #endif

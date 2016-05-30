@@ -11,7 +11,7 @@
 // define if buckets should be used
 #define MORA_USE_BUCKETS
 
-#define ADIDEBUG 1
+#define ADIDEBUG 0
 #define ADIDEBUG_NF 0
 #define PRE_INTEGER_CHECK 0
 
@@ -2565,7 +2565,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
         #if ADIDEBUG
         printf("\nSBA Run 1: %i elements (syzCrit = %i,rewCrit = %i)\n",IDELEMS(r),strat->nrsyzcrit,strat->nrrewcrit);
         //idPrint(r);
-        //getchar();
+        getchar();
         #endif
         int sbarun = 2;
         while(strat->sigdrop)
@@ -2574,7 +2574,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
           #if ADIDEBUG
           printf("SBA Run %i: %i elements (syzCrit = %i,rewCrit = %i)\n",sbarun++,IDELEMS(r),strat->nrsyzcrit,strat->nrrewcrit);
           //idPrint(r);
-          //getchar();
+          getchar();
           #endif
         }
       }
