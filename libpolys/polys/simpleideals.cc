@@ -654,6 +654,27 @@ BOOLEAN idInsertPoly (ideal h1, poly h2)
   return TRUE;
 }
 
+/// insert p into I on position pos
+BOOLEAN idInsertPolyOnPos (ideal I, poly p,int pos)
+{
+  if (p==NULL) return FALSE;
+  assume (I != NULL);
+
+  int j = IDELEMS(I) - 1;
+
+  while ((j >= 0) && (I->m[j] == NULL)) j--;
+  j++;
+  if (j==IDELEMS(I))
+  {
+    pEnlargeSet(&(I->m),IDELEMS(I),IDELEMS(I)+1);
+    IDELEMS(I)+=1;
+  }
+  for(j = IDELEMS(I)-1;j>pos;j--)
+    I->m[j] = I->m[j-1];
+  I->m[pos]=p;
+  return TRUE;
+}
+
 
 /*! insert h2 into h1 depending on the two boolean parameters:
  * - if zeroOk is true, then h2 will also be inserted when it is zero
