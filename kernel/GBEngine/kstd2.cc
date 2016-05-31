@@ -13,7 +13,7 @@
 
 #include <kernel/mod2.h>
 
-#define ADIDEBUG 1
+#define ADIDEBUG 0
 #define ADIDEBUG_COUNT 0
 
 // define if no buckets should be used
@@ -2005,25 +2005,16 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       F1 = idrMoveR (F0, currRingOld, currRing);
     }
   }
+  ideal F;
   // sort ideal F
-  ideal F       = idInit(IDELEMS(F1),F1->rank);
-  #if REV_BLOCK_SBA || SIG_DROP_FIRST
-  //#ifdef HAVE_RINGS
+  //Put the SigDrop element on the correct position (think of sbaEnterS)
+  //We also sort them
   if(rField_is_Ring(currRing) && strat->sigdrop)
   {
-    #if REV_BLOCK_SBA
+    #if 1
+    F = idInit(IDELEMS(F1),F1->rank);
     for (int i=0; i<IDELEMS(F1);++i)
       F->m[i] = F1->m[i];
-    #else
-    //Now I put the element on pos 0 already with enterS
-    #if 0
-    for (int i=IDELEMS(F1)-1; i>0;i--)
-      F->m[i] = F1->m[i-1];
-    F->m[0] = F1->m[IDELEMS(F1)-1];
-    #else
-    for (int i=0; i<IDELEMS(F1);++i)
-      F->m[i] = F1->m[i];
-    //Put the SigDrop element on the correct position (think of sbaEnterS)
     if(strat->sbaEnterS >= 0)
     {
       poly dummy;
@@ -2032,16 +2023,66 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         F->m[i] = F->m[i+1];
       F->m[strat->sbaEnterS] = dummy;
     }
+    #else
+    F = idInit(1,F1->rank);
+    //printf("\nBefore the initial block sorting:\n");idPrint(F1);
+    F->m[0] = F1->m[0];
+    int pos;
+    if(strat->sbaEnterS >= 0)
+    {
+      for(int i=1;i<=strat->sbaEnterS;i++)
+      {
+        pos = posInIdealMonFirst(F,F1->m[i],1,strat->sbaEnterS);
+        idInsertPolyOnPos(F,F1->m[i],pos);
+      }
+      for(int i=strat->sbaEnterS+1;i<IDELEMS(F1);i++)
+      {
+        pos = posInIdealMonFirst(F,F1->m[i],strat->sbaEnterS+1,IDELEMS(F));
+        idInsertPolyOnPos(F,F1->m[i],pos);
+      }
+      poly dummy;
+      dummy = pCopy(F->m[0]); //the sigdrop element
+      for(int i = 0;i<strat->sbaEnterS;i++)
+        F->m[i] = F->m[i+1];
+      F->m[strat->sbaEnterS] = dummy;
+    }
+    else
+    {
+      for(int i=1;i<IDELEMS(F1);i++)
+      {
+        pos = posInIdealMonFirst(F,F1->m[i],1,IDELEMS(F));
+        idInsertPolyOnPos(F,F1->m[i],pos);
+      }
+    }
     #endif
-    #endif
+    //printf("\nAfter the initial block sorting:\n");idPrint(F);getchar();
   }
   else
-  #endif
   {
+    F       = idInit(IDELEMS(F1),F1->rank);
     intvec *sort  = idSort(F1);
     for (int i=0; i<sort->length();++i)
       F->m[i] = F1->m[(*sort)[i]-1];
+  // put the monomials after the sbaEnterS polynomials
+  //printf("\nThis is the ideal before sorting (sbaEnterS = %i)\n",strat->sbaEnterS);idPrint(F);
+  int nrmon = 0;
+  for(int i = IDELEMS(F)-1,j;i>strat->sbaEnterS+nrmon+1 ;i--)
+  {
+    //pWrite(F->m[i]);
+    if(F->m[i] != NULL && pNext(F->m[i]) == NULL)
+    {
+      poly mon = F->m[i];
+      for(j = i;j>strat->sbaEnterS+nrmon+1;j--)
+      {
+        F->m[j] = F->m[j-1];
+      }
+      F->m[j] = mon;
+      nrmon++;
+    }
+    //idPrint(F);
   }
+  }
+    //printf("\nThis is the ideal after sorting\n");idPrint(F);getchar();
   #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
     strat->sigdrop = FALSE;
@@ -2143,7 +2184,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     #endif
     printf("\n   list   L\n");
     int iii;
-    #if 1
+    #if 0
     for(iii = 0; iii<= strat->Ll; iii++)
     {
         printf("\nL[%i]:\n",iii);
@@ -3269,9 +3310,15 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
 
       /* statistic */
       if (TEST_OPT_PROT) PrintS("s");
-
-      int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
-
+      int pos;
+      #if 0
+      if(!rField_is_Ring(currRing))
+        pos = posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
+      else
+        pos = posInSMonFirst(strat,strat->sl,strat->P.p,strat->P.ecart);
+      #else
+      pos = posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
+      #endif
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
       // therefore we call pContent instead of pNorm
