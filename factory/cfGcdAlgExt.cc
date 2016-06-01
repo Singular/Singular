@@ -814,15 +814,18 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
     tryBrownGCD( mapinto(f), mapinto(g), mipo, Dp, fail );
     TIMING_END_AND_PRINT (alg_gcd_p, "time for alg gcd mod p: ")
     if( fail ) // mipo splits in char p
+    {
+      setCharacteristic(0);
       continue;
+    }
     if( Dp.inCoeffDomain() ) // early termination
     {
       tryInvert(Dp,mipo,tmp,fail); // check if zero divisor
+      setCharacteristic(0);
       if(fail)
         continue;
       setReduce(a,true);
       if (off_rational) Off(SW_RATIONAL); else On(SW_RATIONAL);
-      setCharacteristic(0);
       return gcdcfcg;
     }
     setCharacteristic(0);
