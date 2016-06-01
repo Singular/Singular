@@ -2934,6 +2934,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     rChangeCurrRing (sRing);
     exitSba(strat);
     rChangeCurrRing (currRingOld);
+    if(strat->tailRing == sRing)
+      strat->tailRing = currRing;
     rDelete (sRing);
   }
   #ifdef HAVE_RINGS

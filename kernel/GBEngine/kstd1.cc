@@ -2451,149 +2451,298 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intvec *hilb,int syzComp,
           int newIdeal, intvec *vw)
 {
-  if(idIs0(F))
-    return idInit(1,F->rank);
+  if(!rField_is_Ring(currRing))
+  {
+    if(idIs0(F))
+      return idInit(1,F->rank);
 
-  ideal r;
-  BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
-  BOOLEAN delete_w=(w==NULL);
-  kStrategy strat=new skStrategy;
-  strat->sbaOrder = sbaOrder;
-  if (arri!=0)
-  {
-    strat->rewCrit1 = arriRewDummy;
-    strat->rewCrit2 = arriRewCriterion;
-    strat->rewCrit3 = arriRewCriterionPre;
-  }
-  else
-  {
-    strat->rewCrit1 = faugereRewCriterion;
-    strat->rewCrit2 = faugereRewCriterion;
-    strat->rewCrit3 = faugereRewCriterion;
-  }
+    ideal r;
+    BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
+    BOOLEAN delete_w=(w==NULL);
+    kStrategy strat=new skStrategy;
+    strat->sbaOrder = sbaOrder;
+    if (arri!=0)
+    {
+      strat->rewCrit1 = arriRewDummy;
+      strat->rewCrit2 = arriRewCriterion;
+      strat->rewCrit3 = arriRewCriterionPre;
+    }
+    else
+    {
+      strat->rewCrit1 = faugereRewCriterion;
+      strat->rewCrit2 = faugereRewCriterion;
+      strat->rewCrit3 = faugereRewCriterion;
+    }
 
-  if(!TEST_OPT_RETURN_SB)
-    strat->syzComp = syzComp;
-  if (TEST_OPT_SB_1)
-    if(!rField_is_Ring(currRing))
-      strat->newIdeal = newIdeal;
-  if (rField_has_simple_inverse(currRing))
-    strat->LazyPass=20;
-  else
-    strat->LazyPass=2;
-  strat->LazyDegree = 1;
-  strat->enterOnePair=enterOnePairNormal;
-  strat->chainCrit=chainCritNormal;
-  if (TEST_OPT_SB_1) strat->chainCrit=chainCritOpt_1;
-  strat->ak = id_RankFreeModule(F,currRing);
-  strat->kModW=kModW=NULL;
-  strat->kHomW=kHomW=NULL;
-  if (vw != NULL)
-  {
-    currRing->pLexOrder=FALSE;
-    strat->kHomW=kHomW=vw;
-    strat->pOrigFDeg = currRing->pFDeg;
-    strat->pOrigLDeg = currRing->pLDeg;
-    pSetDegProcs(currRing,kHomModDeg);
-    toReset = TRUE;
-  }
-  if (h==testHomog)
-  {
-    if (strat->ak == 0)
+    if(!TEST_OPT_RETURN_SB)
+      strat->syzComp = syzComp;
+    if (TEST_OPT_SB_1)
+      if(!rField_is_Ring(currRing))
+        strat->newIdeal = newIdeal;
+    if (rField_has_simple_inverse(currRing))
+      strat->LazyPass=20;
+    else
+      strat->LazyPass=2;
+    strat->LazyDegree = 1;
+    strat->enterOnePair=enterOnePairNormal;
+    strat->chainCrit=chainCritNormal;
+    if (TEST_OPT_SB_1) strat->chainCrit=chainCritOpt_1;
+    strat->ak = id_RankFreeModule(F,currRing);
+    strat->kModW=kModW=NULL;
+    strat->kHomW=kHomW=NULL;
+    if (vw != NULL)
     {
-      h = (tHomog)idHomIdeal(F,Q);
-      w=NULL;
+      currRing->pLexOrder=FALSE;
+      strat->kHomW=kHomW=vw;
+      strat->pOrigFDeg = currRing->pFDeg;
+      strat->pOrigLDeg = currRing->pLDeg;
+      pSetDegProcs(currRing,kHomModDeg);
+      toReset = TRUE;
     }
-    else if (!TEST_OPT_DEGBOUND)
+    if (h==testHomog)
     {
-      h = (tHomog)idHomModule(F,Q,w);
-    }
-  }
-  currRing->pLexOrder=b;
-  if (h==isHomog)
-  {
-    if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
-    {
-      strat->kModW = kModW = *w;
-      if (vw == NULL)
+      if (strat->ak == 0)
       {
-        strat->pOrigFDeg = currRing->pFDeg;
-        strat->pOrigLDeg = currRing->pLDeg;
-        pSetDegProcs(currRing,kModDeg);
-        toReset = TRUE;
+        h = (tHomog)idHomIdeal(F,Q);
+        w=NULL;
+      }
+      else if (!TEST_OPT_DEGBOUND)
+      {
+        h = (tHomog)idHomModule(F,Q,w);
       }
     }
-    currRing->pLexOrder = TRUE;
-    if (hilb==NULL) strat->LazyPass*=2;
-  }
-  strat->homog=h;
-#ifdef KDEBUG
-  idTest(F);
-  if(Q != NULL)
-    idTest(Q);
-#endif
-#ifdef HAVE_PLURAL
-  if (rIsPluralRing(currRing))
-  {
-    const BOOLEAN bIsSCA  = rIsSCA(currRing) && strat->z2homog; // for Z_2 prod-crit
-    strat->no_prod_crit   = ! bIsSCA;
-    if (w!=NULL)
-      r = nc_GB(F, Q, *w, hilb, strat, currRing);
-    else
-      r = nc_GB(F, Q, NULL, hilb, strat, currRing);
-  }
-  else
-#endif
-  {
-    if (rHasLocalOrMixedOrdering(currRing))
+    currRing->pLexOrder=b;
+    if (h==isHomog)
     {
+      if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
+      {
+        strat->kModW = kModW = *w;
+        if (vw == NULL)
+        {
+          strat->pOrigFDeg = currRing->pFDeg;
+          strat->pOrigLDeg = currRing->pLDeg;
+          pSetDegProcs(currRing,kModDeg);
+          toReset = TRUE;
+        }
+      }
+      currRing->pLexOrder = TRUE;
+      if (hilb==NULL) strat->LazyPass*=2;
+    }
+    strat->homog=h;
+  #ifdef KDEBUG
+    idTest(F);
+    if(Q != NULL)
+      idTest(Q);
+  #endif
+  #ifdef HAVE_PLURAL
+    if (rIsPluralRing(currRing))
+    {
+      const BOOLEAN bIsSCA  = rIsSCA(currRing) && strat->z2homog; // for Z_2 prod-crit
+      strat->no_prod_crit   = ! bIsSCA;
       if (w!=NULL)
-        r=mora(F,Q,*w,hilb,strat);
+        r = nc_GB(F, Q, *w, hilb, strat, currRing);
       else
-        r=mora(F,Q,NULL,hilb,strat);
+        r = nc_GB(F, Q, NULL, hilb, strat, currRing);
     }
     else
+  #endif
     {
-      if (w!=NULL)
-        r=sba(F,Q,*w,hilb,strat);
+      if (rHasLocalOrMixedOrdering(currRing))
+      {
+        if (w!=NULL)
+          r=mora(F,Q,*w,hilb,strat);
+        else
+          r=mora(F,Q,NULL,hilb,strat);
+      }
       else
-      { 
-        //It is set to True, just to know that it is the first run 
-        strat->sigdrop = FALSE;
-        strat->sbaEnterS = -1;
-        r=sba(F,Q,NULL,hilb,strat);
-        #if ADIDEBUG
-        printf("\nSBA Run 1: %i elements (syzCrit = %i,rewCrit = %i)\n",IDELEMS(r),strat->nrsyzcrit,strat->nrrewcrit);
-        //idPrint(r);
-        getchar();
-        #endif
-        int sbarun = 2;
-        while(strat->sigdrop)
+      {
+        if (w!=NULL)
+          r=sba(F,Q,*w,hilb,strat);
+        else
+          r=sba(F,Q,NULL,hilb,strat);
+      }
+    }
+  #ifdef KDEBUG
+    idTest(r);
+  #endif
+    if (toReset)
+    {
+      kModW = NULL;
+      pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
+    }
+    currRing->pLexOrder = b;
+  //Print("%d reductions canceled \n",strat->cel);
+    HCord=strat->HCord;
+    //delete(strat);
+    if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
+    return r;
+  }
+  else
+  {
+    //--------------------------RING CASE-------------------------
+    if(idIs0(F))
+      return idInit(1,F->rank);
+    ideal r;
+    r = idCopy(F);
+    int sbaEnterS = -1;
+    bool sigdrop = TRUE;
+    #if ADIDEBUG
+    printf("\nEnter the nice kSba loop\n");
+    #endif
+    //This is how we set the SBA algorithm;
+    int totalsbaruns = -1,loops = 0;
+    while(sigdrop && (loops < totalsbaruns || totalsbaruns == -1))
+    {
+      loops++;
+      if(loops == 1)
+        sigdrop = FALSE;
+      BOOLEAN b=currRing->pLexOrder,toReset=FALSE;
+      BOOLEAN delete_w=(w==NULL);
+      kStrategy strat=new skStrategy;
+      strat->sbaEnterS = sbaEnterS;
+      strat->sigdrop = sigdrop;
+      printf("\nsbaEnterS beginning = %i\n",strat->sbaEnterS);
+      printf("\nsigdrop beginning = %i\n",strat->sigdrop);
+      strat->sbaOrder = sbaOrder;
+      if (arri!=0)
+      {
+        strat->rewCrit1 = arriRewDummy;
+        strat->rewCrit2 = arriRewCriterion;
+        strat->rewCrit3 = arriRewCriterionPre;
+      }
+      else
+      {
+        strat->rewCrit1 = faugereRewCriterion;
+        strat->rewCrit2 = faugereRewCriterion;
+        strat->rewCrit3 = faugereRewCriterion;
+      }
+
+      if(!TEST_OPT_RETURN_SB)
+        strat->syzComp = syzComp;
+      if (TEST_OPT_SB_1)
+        if(!rField_is_Ring(currRing))
+          strat->newIdeal = newIdeal;
+      if (rField_has_simple_inverse(currRing))
+        strat->LazyPass=20;
+      else
+        strat->LazyPass=2;
+      strat->LazyDegree = 1;
+      strat->enterOnePair=enterOnePairNormal;
+      strat->chainCrit=chainCritNormal;
+      if (TEST_OPT_SB_1) strat->chainCrit=chainCritOpt_1;
+      strat->ak = id_RankFreeModule(F,currRing);
+      strat->kModW=kModW=NULL;
+      strat->kHomW=kHomW=NULL;
+      if (vw != NULL)
+      {
+        currRing->pLexOrder=FALSE;
+        strat->kHomW=kHomW=vw;
+        strat->pOrigFDeg = currRing->pFDeg;
+        strat->pOrigLDeg = currRing->pLDeg;
+        pSetDegProcs(currRing,kHomModDeg);
+        toReset = TRUE;
+      }
+      if (h==testHomog)
+      {
+        if (strat->ak == 0)
         {
-          r=sba(r,Q,NULL,hilb,strat);
+          h = (tHomog)idHomIdeal(F,Q);
+          w=NULL;
+        }
+        else if (!TEST_OPT_DEGBOUND)
+        {
+          h = (tHomog)idHomModule(F,Q,w);
+        }
+      }
+      currRing->pLexOrder=b;
+      if (h==isHomog)
+      {
+        if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
+        {
+          strat->kModW = kModW = *w;
+          if (vw == NULL)
+          {
+            strat->pOrigFDeg = currRing->pFDeg;
+            strat->pOrigLDeg = currRing->pLDeg;
+            pSetDegProcs(currRing,kModDeg);
+            toReset = TRUE;
+          }
+        }
+        currRing->pLexOrder = TRUE;
+        if (hilb==NULL) strat->LazyPass*=2;
+      }
+      strat->homog=h;
+    #ifdef KDEBUG
+      idTest(F);
+      if(Q != NULL)
+        idTest(Q);
+    #endif
+    #ifdef HAVE_PLURAL
+      if (rIsPluralRing(currRing))
+      {
+        const BOOLEAN bIsSCA  = rIsSCA(currRing) && strat->z2homog; // for Z_2 prod-crit
+        strat->no_prod_crit   = ! bIsSCA;
+        if (w!=NULL)
+          r = nc_GB(F, Q, *w, hilb, strat, currRing);
+        else
+          r = nc_GB(F, Q, NULL, hilb, strat, currRing);
+      }
+      else
+    #endif
+      {
+        if (rHasLocalOrMixedOrdering(currRing))
+        {
+          if (w!=NULL)
+            r=mora(F,Q,*w,hilb,strat);
+          else
+            r=mora(F,Q,NULL,hilb,strat);
+        }
+        else
+        {
+          if (w!=NULL)
+            r=sba(r,Q,*w,hilb,strat);
+          else
+          { 
+            r=sba(r,Q,NULL,hilb,strat);
+          }
           #if ADIDEBUG
-          printf("SBA Run %i: %i elements (syzCrit = %i,rewCrit = %i)\n",sbarun++,IDELEMS(r),strat->nrsyzcrit,strat->nrrewcrit);
-          //idPrint(r);
-          getchar();
+          printf("\nSBA Run %i: %i elements (syzCrit = %i,rewCrit = %i)\n",loops,IDELEMS(r),strat->nrsyzcrit,strat->nrrewcrit);
+          idPrint(r);
+          //getchar();
           #endif
         }
       }
+    #ifdef KDEBUG
+      idTest(r);
+    #endif
+      if (toReset)
+      {
+        kModW = NULL;
+        pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
+      }
+      currRing->pLexOrder = b;
+    //Print("%d reductions canceled \n",strat->cel);
+      HCord=strat->HCord;
+      sigdrop = strat->sigdrop;
+      sbaEnterS = strat->sbaEnterS;
+      #if ADIDEBUG
+      printf("\nsbaEnterS = %i\n",sbaEnterS);
+      #endif
+      delete(strat);
+      if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
     }
+    // Go to std
+    if(sigdrop)
+    {
+      #if ADIDEBUG
+      printf("\nWent to std\n");
+      //idPrint(r);
+      getchar();
+      #endif
+      r = kStd(r, Q, h, w, hilb, syzComp, newIdeal, vw);
+    }
+    return r;
   }
-#ifdef KDEBUG
-  idTest(r);
-#endif
-  if (toReset)
-  {
-    kModW = NULL;
-    pRestoreDegProcs(currRing,strat->pOrigFDeg, strat->pOrigLDeg);
-  }
-  currRing->pLexOrder = b;
-//Print("%d reductions canceled \n",strat->cel);
-  HCord=strat->HCord;
-  //delete(strat);
-  if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
-  return r;
 }
 
 #ifdef HAVE_SHIFTBBA

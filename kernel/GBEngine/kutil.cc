@@ -10898,7 +10898,7 @@ skStrategy::~skStrategy()
 {
   if (lmBin != NULL)
     omMergeStickyBinIntoBin(lmBin, currRing->PolyBin);
-  if (tailBin != NULL)
+  if (tailBin != NULL && !rField_is_Ring(currRing))
     omMergeStickyBinIntoBin(tailBin,
                             (tailRing != NULL ? tailRing->PolyBin:
                              currRing->PolyBin));

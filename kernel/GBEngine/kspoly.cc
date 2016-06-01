@@ -271,7 +271,6 @@ pWrite(PW->p);pWrite(PW->sig);
     printf("%d -- %d sig\n",sigSafe,PW->is_sigsafe);
 
 #endif
-    #ifdef HAVE_RINGS
     if(rField_is_Ring(currRing))
     {
       // Set the sig
@@ -304,7 +303,6 @@ pWrite(PW->p);pWrite(PW->sig);
         pDelete(&origsig);
       }
     }
-    #endif
     //pDelete(&f1);
     // go on with the computations only if the signature of p2 is greater than the
     // signature of fm*p1
