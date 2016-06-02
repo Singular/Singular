@@ -283,6 +283,7 @@ KEYWORDS: algebraic field extension; extension of rings
 EXAMPLE: example splitring;  shows an example
 "
 {
+ ASSUME(0,size(factorize(f)[1])==2);// f not irreduzible
  //----------------- split ist bereits eine proc in 'inout.lib' ! -------------
  if (size(#)>=1) {
     list L=#;
