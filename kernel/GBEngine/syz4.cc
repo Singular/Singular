@@ -185,15 +185,33 @@ static poly TraverseTail_test(poly multiplier, const int tail)
        return p;
      }
      const poly p = ComputeImage_test(multiplier, tail);
-     T.insert(TP2PCache_test::value_type(myp_Head_test(multiplier, (p==NULL),
-       r), p) );
-     return p_Copy(p, r);
+     itr = T.find(multiplier);
+     if( itr == T.end() )
+     {
+       T.insert(TP2PCache_test::value_type(myp_Head_test(multiplier, (p==NULL),
+         r), p) );
+       return p_Copy(p, r);
+     }
+     return p;
   }
-  CCacheCompare_test o(r);
-  TP2PCache_test T(o);
 #endif   // CACHE
   const poly p = ComputeImage_test(multiplier, tail);
 #if CACHE
+  top_itr = m_cache_test.find(tail);
+  if ( top_itr != m_cache_test.end() )
+  {
+    TP2PCache_test& T = top_itr->second;
+    TP2PCache_test::iterator itr = T.find(multiplier);
+    if( itr == T.end() )
+    {
+      T.insert(TP2PCache_test::value_type(myp_Head_test(multiplier, (p==NULL),
+          r), p));
+      return p_Copy(p, r);
+    }
+    return p;
+  }
+  CCacheCompare_test o(r);
+  TP2PCache_test T(o);
   T.insert(TP2PCache_test::value_type(myp_Head_test(multiplier, (p==NULL), r),
     p));
   m_cache_test.insert( TCache_test::value_type(tail, T) );
