@@ -2498,8 +2498,8 @@ static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
       delete iv;
       return FALSE;
   }
-  WerrorS(feNotImplemented);
   delete iv;
+  WerrorS(feNotImplemented);
   return TRUE;
 }
 static BOOLEAN jjHOMOG_P(leftv res, leftv u, leftv v)
