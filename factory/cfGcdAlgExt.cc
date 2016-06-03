@@ -52,8 +52,7 @@ TIMING_DEFINE_PRINT(alg_euclid_p)
 
 /// compressing two polynomials F and G, M is used for compressing,
 /// N to reverse the compression
-static
-int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
+static int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
                 CFMap & N, bool topLevel)
 {
   int n= tmax (F.level(), G.level());
@@ -348,11 +347,6 @@ void tryEuclid( const CanonicalForm & A, const CanonicalForm & B, const Canonica
 }
 #endif
 
-CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G );
-int * leadDeg(const CanonicalForm & f, int *degs);
-bool isLess(int *a, int *b, int lower, int upper);
-bool isEqual(int *a, int *b, int lower, int upper);
-CanonicalForm firstLC(const CanonicalForm & f);
 static CanonicalForm trycontent ( const CanonicalForm & f, const Variable & x, const CanonicalForm & M, bool & fail );
 static CanonicalForm tryvcontent ( const CanonicalForm & f, const Variable & x, const CanonicalForm & M, bool & fail );
 static CanonicalForm trycf_content ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & M, bool & fail );
@@ -707,8 +701,7 @@ myicontent ( const CanonicalForm & f, const CanonicalForm & c )
 #endif
 }
 
-CanonicalForm
-myicontent ( const CanonicalForm & f )
+static CanonicalForm myicontent ( const CanonicalForm & f )
 {
 #ifdef HAVE_NTL
     return myicontent( f, 0 );
@@ -959,7 +952,7 @@ CanonicalForm firstLC(const CanonicalForm & f)
 }
 
 #ifndef HAVE_NTL
-void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail )
+static void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail )
 { // F, G are univariate polynomials (i.e. they have exactly one polynomial variable)
   // F and G must have the same level AND level > 0
   // we try to calculate gcd(F,G) = s*F + t*G

@@ -37,8 +37,7 @@ TIMING_DEFINE_PRINT(fac_alg_factor_sqrf)
 TIMING_DEFINE_PRINT(fac_alg_time_shift)
 
 // squarefree part of F
-CanonicalForm
-uniSqrfPart (const CanonicalForm& F)
+static CanonicalForm uniSqrfPart (const CanonicalForm& F)
 {
   ASSERT (F.isUnivariate(), "univariate input expected");
   ASSERT (getCharacteristic() == 0, "characteristic 0 expected");
@@ -47,7 +46,7 @@ uniSqrfPart (const CanonicalForm& F)
   return F/G;
 }
 
-CanonicalForm Norm (const CanonicalForm& F, const Variable& alpha)
+static CanonicalForm Norm (const CanonicalForm& F, const Variable& alpha)
 {
   Variable x= Variable (F.level() + 1);
   Variable y= F.mvar();
@@ -71,7 +70,7 @@ CanonicalForm Norm (const CanonicalForm& F, const Variable& alpha)
 }
 
 // i is an integer such that Norm (F (x-i*alpha)) is squarefree
-CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
+static CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
 {
   Variable x= Variable (F.level() + 1);
   Variable y= F.mvar();
@@ -140,8 +139,7 @@ CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
   } while (1);
 }
 
-CFList
-AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
+CFList AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
 {
   ASSERT (F.isUnivariate(), "univariate input expected");
   ASSERT (getCharacteristic() == 0, "characteristic 0 expected");
@@ -363,8 +361,7 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
   return factors;
 }*/
 
-CFFList
-AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
+CFFList AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
 {
   ASSERT (F.isUnivariate(), "univariate input expected");
   ASSERT (getCharacteristic() == 0, "characteristic 0 expected");
