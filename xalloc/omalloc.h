@@ -65,8 +65,12 @@ typedef struct omOpts_s omOpts_t;
 
 extern int om_sing_opt_show_mem;
 
+static inline void * omalloc(size_t s)
+{ if (d!=0) {long *d=(long*)malloc(s+sizeof(long)); *d=s;d++;return d; }
+  else return NULL;
+}
 static inline void * omAlloc(size_t s)
-{ if (s!=0) {long *d=(long*)malloc(s+sizeof(long)); *d=s;d++;return d; }
+{ long *d=(long*)malloc(s+sizeof(long)); *d=s;d++;return d; }
   else return NULL;
 }
 static inline void * omAlloc0(size_t s)
@@ -168,7 +172,6 @@ enum omError_e
 #define omTypeAllocBin(T,P,B)    P=(T)omAlloc(B)
 #define omTypeAlloc(T,P,S)       P=(T)omAlloc(S)
 #define omTypeAlloc0Bin(T,P,B)   P=(T)omAlloc0(B)
-#define omalloc(S)               omAlloc(S)
 #define omAlloc0Aligned(S)       omAlloc0(S)
 #define omAllocAligned(S)        omAlloc(S)
 #define omAllocBin(B)            omAlloc(B)
