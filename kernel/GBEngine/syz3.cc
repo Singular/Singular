@@ -237,11 +237,7 @@ static void syCreateRegularExtension(syStrategy syzstr,ideal old_ideal,
 * set of generators;
 * only for tests
 */
-#ifdef SING_NDEBUG
-static void syTestPairs(SSet resPairs,int length,ideal /*old_generators*/)
-#else
 static void syTestPairs(SSet resPairs,int length,ideal old_generators)
-#endif
 {
   int i=0;
 
