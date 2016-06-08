@@ -7,14 +7,11 @@
 
 // #define PDEBUG 2
 
-
-
-
-
 #include <kernel/mod2.h>
 
 #define ADIDEBUG 0
 #define ADIDEBUG_COUNT 0
+#define GCD_SBA 1
 
 // define if no buckets should be used
 // #define NO_BUCKETS
@@ -103,7 +100,6 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
 
     pAssume(~not_sev == p_GetShortExpVector(p, r));
 
-#ifdef HAVE_RINGS
     if(rField_is_Ring(r))
     {
       loop
@@ -146,13 +142,11 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
         j++;
       }
     }
-#endif
   }
   else
   {
     const poly p=L->t_p;
     const ring r=strat->tailRing;
-#ifdef HAVE_RINGS
     if(rField_is_Ring(r))
     {
       loop
@@ -177,7 +171,6 @@ int kFindDivisibleByInT(const kStrategy strat, const LObject* L, const int start
       }
     }
     else
-#endif
     {
       loop
       {
@@ -482,9 +475,10 @@ int redRing (LObject* h,kStrategy strat)
         return 1;
       }
     }
+    //printf("\nFound one: ");pWrite(strat->T[j].p);
     //enterT(*h, strat);
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat); // with debug output
-
+    //printf("\nAfter small red: ");pWrite(h->p);
     if (h->GetLmTailRing() == NULL)
     {
       if (h->lcm!=NULL) pLmDelete(h->lcm);
@@ -671,18 +665,17 @@ KINLINE int ksReducePolyTailSig(LObject* PR, TObject* PW, LObject* Red, kStrateg
 {
   BOOLEAN ret;
   number coef;
-
   assume(PR->GetLmCurrRing() != PW->GetLmCurrRing());
-  Red->HeadNormalize();
+  if(!rField_is_Ring(currRing))
+    Red->HeadNormalize();
   /*
   printf("------------------------\n");
   pWrite(Red->GetLmCurrRing());
   */
   ret = ksReducePolySig(Red, PW, 1, NULL, &coef, strat);
-
   if (!ret)
   {
-    if (! n_IsOne(coef, currRing->cf))
+    if (! n_IsOne(coef, currRing->cf) && !rField_is_Ring(currRing))
     {
       PR->Mult_nn(coef);
       // HANNES: mark for Normalize
@@ -704,6 +697,25 @@ KINLINE int ksReducePolyTailSig(LObject* PR, TObject* PW, LObject* Red, kStrateg
 */
 int redSig (LObject* h,kStrategy strat)
 {
+  //Since reduce is really bad for SBA we use the following idea:
+  // We first check if we can build a gcd pair between h and S
+  //where the sig remains the same and replace h by this gcd poly
+  #if GCD_SBA
+  #if ADIDEBUG
+  printf("\nBefore sbaCheckGcdPair ");pWrite(h->p);
+  #endif
+  //sbaCheckGcdPair(h,strat);
+  while(sbaCheckGcdPair(h,strat)) 
+  {
+    #if ADIDEBUG
+    printf("\nIntermidiate sbaCheckGcdPair ");pWrite(h->p);
+    #endif
+    h->sev = pGetShortExpVector(h->p);
+  }
+  #if ADIDEBUG
+  printf("\nAfter sbaCheckGcdPair ");pWrite(h->p);
+  #endif
+  #endif
   #ifdef HAVE_RINGS
   poly beforeredsig;
   if(rField_is_Ring(currRing)) 
@@ -747,6 +759,24 @@ int redSig (LObject* h,kStrategy strat)
     j = kFindDivisibleByInT(strat, h, start);
     if (j < 0)
     {
+      #if GCD_SBA
+      #if ADIDEBUG
+      printf("\nBefore sbaCheckGcdPair ");pWrite(h->p);
+      #endif
+      //sbaCheckGcdPair(h,strat);
+      while(sbaCheckGcdPair(h,strat)) 
+      {
+        #if ADIDEBUG
+        printf("\nIntermidiate sbaCheckGcdPair ");pWrite(h->p);
+        #endif
+        h->sev = pGetShortExpVector(h->p);
+        h->is_redundant = FALSE;
+        start = 0;
+      }
+      #if ADIDEBUG
+      printf("\nAfter sbaCheckGcdPair ");pWrite(h->p);
+      #endif
+      #endif
       // over ZZ: cleanup coefficients by complete reduction with monomials
       postReduceByMonSig(h, strat);
       if(nIsZero(pGetCoeff(h->p))) return 2;
@@ -808,32 +838,53 @@ int redSig (LObject* h,kStrategy strat)
      * pi with length li
      */
     i = j;
-#if 1
     if (TEST_OPT_LENGTH)
-    loop
+    if(rField_is_Ring(currRing))
     {
-      /*- search the shortest possible with respect to length -*/
-      i++;
-      if (i > strat->tl)
-        break;
-      if (li<=1)
-        break;
-      if ((strat->T[i].pLength < li)
-         #ifdef HAVE_RINGS
-         && (!rField_is_Ring(currRing) || n_DivBy(pGetCoeff(h_p),pGetCoeff(strat->T[i].p),currRing->cf))
-         #endif
-         && p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
-                               h_p, not_sev, strat->tailRing))
+      loop
       {
-        /*
-         * the polynomial to reduce with is now;
-         */
-        li = strat->T[i].pLength;
-        ii = i;
+        /*- search the shortest possible with respect to length -*/
+        i++;
+        if (i > strat->tl)
+          break;
+        if (li<=1)
+          break;
+        if ((strat->T[i].pLength < li)
+           && n_DivBy(pGetCoeff(h_p),pGetCoeff(strat->T[i].p),currRing->cf)
+           && p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                                 h_p, not_sev, strat->tailRing))
+        {
+          /*
+           * the polynomial to reduce with is now;
+           */
+          li = strat->T[i].pLength;
+          ii = i;
+        }
+      }
+    }
+    else
+    {
+      loop
+      {
+        /*- search the shortest possible with respect to length -*/
+        i++;
+        if (i > strat->tl)
+          break;
+        if (li<=1)
+          break;
+        if ((strat->T[i].pLength < li)
+           && p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                                 h_p, not_sev, strat->tailRing))
+        {
+          /*
+           * the polynomial to reduce with is now;
+           */
+          li = strat->T[i].pLength;
+          ii = i;
+        }
       }
     }
     start = ii+1;
-#endif
 
     /*
      * end of search: have to reduce with pi
@@ -868,17 +919,35 @@ int redSig (LObject* h,kStrategy strat)
     #if ADIDEBUG
     printf("\nAfter small reduction:\n");pWrite(h->p);pWrite(h->sig);
     #endif
-    #ifdef HAVE_RINGS
     if(rField_is_Ring(currRing) && h->p == NULL && h->sig == NULL)
     {
       //Trivial case catch
       strat->sigdrop = FALSE;
     }
-    if(rField_is_Ring(currRing) && strat->sigdrop)
+    //If the reducer has the same lt (+ or -) as the other one, reduce it via redRing
+    if(rField_is_Ring(currRing) && h->p != NULL && pLmCmp(h->p,strat->T[ii].p)==0)
     {
-      return 1;
+      #if ADIDEBUG
+      printf("\nReducer and Original have same LT. Force it with redRing!\n");
+      #endif
+      int red_result = redRing(h,strat);
+      if(red_result == 0)
+      {
+        #if ADIDEBUG
+        printf("\nRedRing reduced it to 0. Perfect\n");
+        #endif
+        pDelete(&h->sig);h->sig = NULL;
+        return 0;
+      }
+      else
+      {
+        #if ADIDEBUG
+        printf("\nRedRing reduced it to *.\nHave to sigdrop now\n");pWrite(h->p);
+        #endif
+        strat->sigdrop = TRUE;
+        return 1;
+      }
     }
-    #endif
 #if SBA_PRINT_REDUCTION_STEPS
     if (sigSafe != 3)
       sba_reduction_steps++;
@@ -980,10 +1049,8 @@ poly redtailSba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
   {
     loop
     {
-      #ifdef HAVE_RINGS
       if(rField_is_Ring(currRing) && strat->sigdrop)
         break;
-      #endif
       Ln.SetShortExpVector();
       if (withT)
       {
@@ -1002,14 +1069,14 @@ poly redtailSba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
       {
         cnt=REDTAIL_CANONICALIZE;
         /*poly tmp=*/Ln.CanonicalizeP();
-        if (normalize)
+        if (normalize && !rField_is_Ring(currRing))
         {
           Ln.Normalize();
           //pNormalize(tmp);
           //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
         }
       }
-      if (normalize && (!TEST_OPT_INTSTRATEGY) && (!nIsOne(pGetCoeff(With->p))))
+      if (normalize && (!TEST_OPT_INTSTRATEGY) && !rField_is_Ring(currRing) && (!nIsOne(pGetCoeff(With->p))))
       {
         With->pNorm();
       }
@@ -1019,17 +1086,10 @@ poly redtailSba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
       pWrite(With->p);pWrite(With->sig);pWrite(L->sig);
       #endif
       int ret = ksReducePolyTailSig(L, With, &Ln, strat);
-      #ifdef HAVE_RINGS
-      if(rField_is_Ring(currRing) && strat->sigdrop)
-      {
-        //Cannot break the loop here so easily
-        break;
-      }
       if(rField_is_Ring(currRing))
         L->sig = Ln.sig;
       //Because Ln.sig is set to L->sig, but in ksReducePolyTailSig -> ksReducePolySig
       // I delete it an then set Ln.sig. Hence L->sig is lost
-      #endif
       #if ADIDEBUG
       printf("\nAfter small TAILreduce:\n");pWrite(Ln.p);pWrite(Ln.sig);pWrite(L->sig);
       #endif
@@ -1057,10 +1117,16 @@ poly redtailSba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
       }
       if (Ln.IsNull()) goto all_done;
       if (! withT) With_s.Init(currRing);
+      if(rField_is_Ring(currRing) && strat->sigdrop)
+      {
+        //Cannot break the loop here so easily
+        break;
+      }
     }
     pNext(h) = Ln.LmExtractAndIter();
     pIter(h);
-    pNormalize(h);
+    if(!rField_is_Ring(currRing))
+      pNormalize(h);
     L->pLength++;
   }
   all_done:
@@ -1071,7 +1137,6 @@ poly redtailSba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
   {
     L->length = 0;
   }
-
   //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
   //L->Normalize(); // HANNES: should have a test
   kTest_L(L);
@@ -1832,6 +1897,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         // posInS only depends on the leading term
         strat->enterS(strat->P, pos, strat, strat->tl);
+        #if ADIDEBUG
+        printf("\nThis element has been added to S:\n");pWrite(strat->P.p);pWrite(strat->P.p1);pWrite(strat->P.p2);
+        #endif
 #if 0
         int pl=pLength(strat->P.p);
         if (pl==1)
@@ -2312,7 +2380,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         if (strat->minim > 0)
           strat->P.p2=p_Copy(strat->P.p, currRing, strat->tailRing);
         // for input polys, prepare reduction
-        strat->P.PrepareRed(strat->use_buckets);
+        if(!rField_is_Ring(currRing))
+          strat->P.PrepareRed(strat->use_buckets);
       }
       if (strat->P.p == NULL && strat->P.t_p == NULL)
       {
@@ -2350,16 +2419,19 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         */
       red_result = 2;
     }
-    #ifdef HAVE_RINGS
     if(rField_is_Ring(currRing))
     {
+      if(strat->P.sig!= NULL && !nGreaterZero(pGetCoeff(strat->P.sig)))
+      {
+        strat->P.p = pNeg(strat->P.p);
+        strat->P.sig = pNeg(strat->P.sig);
+      }
       strat->P.pLength = pLength(strat->P.p);
       if(strat->P.sig != NULL)
         strat->P.sevSig = pGetShortExpVector(strat->P.sig);
       if(strat->P.p != NULL)
         strat->P.sev = pGetShortExpVector(strat->P.p);
     }
-    #endif
     #if ADIDEBUG
     printf("\nAfter reduce (redresult=%i): \n",red_result);pWrite(strat->P.p);pWrite(strat->P.sig);
     #endif
@@ -2378,6 +2450,8 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         printf("\nSigdrop cancelled since redRing reduced to 0\n");
         #endif
         strat->sigdrop = FALSE;
+        pDelete(&strat->P.sig);
+        strat->P.sig = NULL;
       }
       else
       {
@@ -2449,14 +2523,12 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         beforetailred = pCopy(strat->P.sig);
       #endif
 #if SBA_TAIL_RED
-#ifdef HAVE_RINGS
       if(rField_is_Ring(currRing))
       {  
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
           strat->P.p = redtailSba(&(strat->P),pos-1,strat, withT);
       }
       else
-#endif
       {
         if (strat->sbaOrder != 2) {
           if (TEST_OPT_INTSTRATEGY)
@@ -2479,7 +2551,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // It may happen that we have lost the sig in redtailsba
       // It cannot reduce to 0 since here we are doing just tail reduction. 
       // Best case scenerio: remains the leading term
-      #ifdef HAVE_RINGS
       if(rField_is_Ring(currRing) && strat->sigdrop)     
       {
         #if ADIDEBUG
@@ -2488,9 +2559,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         strat->enterS(strat->P, 0, strat, strat->tl);
         break;
       }
-      #endif
 #endif
-    #ifdef HAVE_RINGS
     if(rField_is_Ring(currRing))
     {
       if(strat->P.sig == NULL || pLtCmp(beforetailred,strat->P.sig) == 1)
@@ -2523,12 +2592,10 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // strat->P.p = NULL may appear if we had  a sigdrop above and reduced to 0 via redRing
       if(strat->P.p == NULL)
         goto case_when_red_result_changed;
-      if(!nGreaterZero(pGetCoeff(strat->P.p)))
-      {
-        strat->P.p = pNeg(strat->P.p);
-        strat->P.sig = pNeg(strat->P.sig);
-      }
     }
+    #if ADIDEBUG
+    printf("\nNach redTailSba: \n");
+    pWrite(strat->P.p);pWrite(strat->P.sig);
     #endif
     // remove sigsafe label since it is no longer valid for the next element to
     // be reduced
@@ -2583,15 +2650,15 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       pWrite(strat->P.GetLmCurrRing());
       pWrite(strat->P.sig);
       */
-      #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
+        superenterpairsSig(strat->P.p,strat->P.sig,strat->P.sig_sba_max,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         superenterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       else
-      #endif
         enterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       #if ADIDEBUG
         printf("\nThis element is added to S\n");
         p_Write(strat->P.p, strat->tailRing);p_Write(strat->P.p1, strat->tailRing);p_Write(strat->P.p2, strat->tailRing);pWrite(strat->P.sig);
+        //getchar();
         #endif
       // posInS only depends on the leading term
       
@@ -3273,7 +3340,8 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
       if (strat->minim > 0)
         strat->P.p2=p_Copy(strat->P.p, currRing, strat->tailRing);
       // for input polys, prepare reduction
-      strat->P.PrepareRed(strat->use_buckets);
+      if(!rField_is_Ring(currRing))
+        strat->P.PrepareRed(strat->use_buckets);
     }
 
     if (strat->P.p == NULL && strat->P.t_p == NULL)

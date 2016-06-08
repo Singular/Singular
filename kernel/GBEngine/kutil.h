@@ -521,6 +521,7 @@ void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void entersets (LObject h);
 void pairs ();
 BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR = -1, bool enterTstrong = FALSE);
+BOOLEAN sbaCheckGcdPair (LObject* h,kStrategy strat);
 BOOLEAN enterOneStrongPolySig (int i,poly p,poly sig,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR = -1);
 void message (int i,int* reduc,int* olddeg,kStrategy strat,int red_result);
 void messageStat (int hilbcount,kStrategy strat);

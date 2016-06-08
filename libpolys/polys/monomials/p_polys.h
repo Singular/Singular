@@ -1523,6 +1523,26 @@ static inline int p_LtCmp(poly p, poly q, const ring r)
   return res;
 }
 
+// The coefficient will be compared in absolute value
+static inline int p_LtCmpNoAbs(poly p, poly q, const ring r)
+{
+  int res = p_LmCmp(p,q,r);
+  if(res == 0)
+  {
+    if(p_GetCoeff(p,r) == NULL || p_GetCoeff(q,r) == NULL)
+      return res;
+    number pc = p_GetCoeff(p,r);
+    number qc = p_GetCoeff(q,r);
+    if(n_Greater(pc,qc,r->cf))
+      res = 1;
+    if(n_Greater(qc,pc,r->cf))
+      res = -1;
+    if(n_Equal(pc,qc,r->cf))
+      res = 0;
+  }
+  return res;
+}
+
 #ifdef HAVE_RINGS
 // This is the equivalent of pLmCmp(p,q) != -currRing->OrdSgn for rings
 // It is used in posInLRing and posInTRing

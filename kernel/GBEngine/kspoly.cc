@@ -22,7 +22,7 @@
 #include <kernel/polys.h>
 #endif
 
-#define ADIDEBUG 0
+#define ADIDEBUG 1
 
 #ifdef KDEBUG
 int red_count = 0;
@@ -242,12 +242,10 @@ pWrite(PW->p);pWrite(PW->sig);
 #endif
     p_ExpVectorAddSub(sigMult,PR->GetLmCurrRing(),PW->GetLmCurrRing(),currRing);
     //I have also to set the leading coeficient for sigMult (in the case of rings)
-    #ifdef HAVE_RINGS
     if(rField_is_Ring(currRing))
     {
       pSetCoeff(sigMult,nMult(nDiv(pGetCoeff(PR->p),pGetCoeff(PW->p)), pGetCoeff(sigMult)));
     }
-    #endif
 //#if 1
 #ifdef DEBUGF5
     printf("------------------- IN KSREDUCEPOLYSIG: --------------------\n");
@@ -258,11 +256,7 @@ pWrite(PW->p);pWrite(PW->sig);
     printf("--------------\n");
 #endif
     int sigSafe;
-    #ifdef HAVE_RINGS
-    if(rField_is_Ring(currRing))
-      sigSafe = p_LtCmp(PR->sig,sigMult,currRing);
-    else
-    #endif
+    if(!rField_is_Ring(currRing))
       sigSafe = p_LmCmp(PR->sig,sigMult,currRing);
     // now we can delete the copied polynomial data used for checking for
     // sig-safeness of the reduction step
@@ -274,34 +268,37 @@ pWrite(PW->p);pWrite(PW->sig);
     if(rField_is_Ring(currRing))
     {
       // Set the sig
-      if(pLmCmp(PR->sig, sigMult) == 0)
+      poly origsig = pCopy(PR->sig);
+      PR->sig = pHead(pSub(PR->sig, sigMult));
+      //The sigs have the same lm, have to substract
+      //It may happen that now the signature is 0 (drop)
+      if(PR->sig == NULL)
       {
-        //The sigs have the same lm, have to substract
-        poly origsig = pCopy(PR->sig);
-        PR->sig = pSub(PR->sig, pCopy(sigMult));
-        pDelete(&sigMult);
-        //It may happen that now the signature is 0 (drop)
-        if(PR->sig == NULL)
+        #if ADIDEBUG
+        printf("\nPossible sigdrop in ksreducepolysig (lost signature)\n");
+        #endif
+        strat->sigdrop=TRUE;
+      }
+      else
+      {
+        if(pLtCmp(PR->sig,origsig) == 1)
+        {
+          // do not allow this reduction - it will increase it's signature
+          // and the partially standard basis is just till the old sig, not the new one
+          PR->is_redundant = TRUE;
+          pDelete(&PR->sig);
+          PR->sig = origsig;
+          return 3;
+        }
+        if(pLtCmp(PR->sig,origsig) == -1)
         {
           #if ADIDEBUG
-          printf("\nPossible sigdrop in ksreducepolysig (lost signature)\n");
+          printf("\nSigdrop in ksreducepolysig from * to *\n");pWrite(origsig);pWrite(PR->sig);
           #endif
           strat->sigdrop=TRUE;
         }
-        else
-        {
-          if(sigSafe == -1)
-          {
-            // do not allow this reduction - it will increase it's signature
-            // and the partially standard basis is just till the old sig, not the new one
-            PR->is_redundant = TRUE;
-            pDelete(&PR->sig);
-            PR->sig = origsig;
-            return 3;
-          }
-        }
-        pDelete(&origsig);
       }
+      pDelete(&origsig);
     }
     //pDelete(&f1);
     // go on with the computations only if the signature of p2 is greater than the
@@ -374,24 +371,30 @@ pWrite(PW->p);pWrite(PW->sig);
       ret = 1;
     }
   }
-
   // take care of coef buisness
-  if (! n_IsOne(pGetCoeff(p2), tailRing))
+  if(rField_is_Ring(currRing))
   {
-    number bn = pGetCoeff(lm);
-    number an = pGetCoeff(p2);
-    int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
-    p_SetCoeff(lm, bn, tailRing);
-    if ((ct == 0) || (ct == 2))
-      PR->Tail_Mult_nn(an);
-    if (coef != NULL) *coef = an;
-    else n_Delete(&an, tailRing);
+    p_SetCoeff(lm, nDiv(pGetCoeff(lm),pGetCoeff(p2)), tailRing);
+    if (coef != NULL) *coef = n_Init(1, tailRing);
   }
   else
   {
-    if (coef != NULL) *coef = n_Init(1, tailRing);
+    if (! n_IsOne(pGetCoeff(p2), tailRing))
+    {
+      number bn = pGetCoeff(lm);
+      number an = pGetCoeff(p2);
+      int ct = ksCheckCoeff(&an, &bn, tailRing->cf);    // Calculate special LC
+      p_SetCoeff(lm, bn, tailRing);
+      if (((ct == 0) || (ct == 2)))
+        PR->Tail_Mult_nn(an);
+      if (coef != NULL) *coef = an;
+      else n_Delete(&an, tailRing);
+    }
+    else
+    {
+      if (coef != NULL) *coef = n_Init(1, tailRing);
+    }
   }
-
 
   // and finally,
   PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);

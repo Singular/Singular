@@ -1589,6 +1589,68 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int /*ecart*/, int /*isFromQ*/,kStrateg
   return TRUE;
 }
 
+BOOLEAN sbaCheckGcdPair (LObject* h,kStrategy strat)
+{
+  if(strat->sl < 0) return FALSE;
+  int i;
+  for(i=0;i<strat->sl;i++)
+  {
+    //Construct the gcd pair between h and S[i]
+    number d, s, t;
+    poly m1, m2, gcd;
+    d = n_ExtGcd(pGetCoeff(h->p), pGetCoeff(strat->S[i]), &s, &t, currRing->cf);
+    if (nIsZero(s) || nIsZero(t))  // evtl. durch divBy tests ersetzen
+    {
+      nDelete(&d);
+      nDelete(&s);
+      nDelete(&t);
+    }
+    else
+    {
+      k_GetStrongLeadTerms(h->p, strat->S[i], currRing, m1, m2, gcd, strat->tailRing);
+      pSetCoeff0(m1, s);
+      pSetCoeff0(m2, t);
+      pSetCoeff0(gcd, d);
+      pNext(gcd) = p_Add_q(pp_Mult_mm(pNext(h->p), m1, strat->tailRing), pp_Mult_mm(pNext(strat->S[i]), m2, strat->tailRing), strat->tailRing);
+      poly pSigMult = p_Copy(h->sig,currRing);
+      poly sSigMult = p_Copy(strat->sig[i],currRing);
+      pSigMult = p_Mult_mm(pSigMult,m1,currRing);
+      sSigMult = p_Mult_mm(sSigMult,m2,currRing);
+      p_LmDelete(m1, strat->tailRing);
+      p_LmDelete(m2, strat->tailRing);
+      poly pairsig = p_Add_q(pSigMult,sSigMult,currRing);
+      if(pairsig!= NULL && pLtCmp(pairsig,h->sig) == 0)
+      {
+        #if ADIDEBUG
+        printf("\nCan replace * (sig = *) with * (sig = *) since of * with sig *\n");
+        pWrite(h->p);pWrite(h->sig);pWrite(gcd);pWrite(pairsig);pWrite(strat->S[i]);pWrite(strat->sig[i]);
+        //getchar();
+        #endif
+        pDelete(&h->p);
+        h->p = gcd;
+        pDelete(&h->sig);
+        h->sig = pairsig;
+        pNext(h->sig) = NULL;
+        strat->initEcart(h);
+        h->sev = pGetShortExpVector(h->p);
+        h->sevSig = pGetShortExpVector(h->sig);
+        h->i_r1 = -1;h->i_r2 = -1;
+        if(h->lcm != NULL)
+        {
+          pDelete(&h->lcm);
+          h->lcm = NULL;
+        }
+        if (currRing!=strat->tailRing)
+          h->t_p = k_LmInit_currRing_2_tailRing(h->p, strat->tailRing);
+        return TRUE;
+      }
+      //Delete what you didn't use
+      pDelete(&gcd);
+      pDelete(&pairsig);
+    }
+  }
+  return FALSE;
+}
 
 BOOLEAN enterOneStrongPolySig (int i,poly p,poly sig,int /*ecart*/, int /*isFromQ*/,kStrategy strat, int atR)
 {
@@ -1704,7 +1766,7 @@ BOOLEAN enterOneStrongPolySig (int i,poly p,poly sig,int /*ecart*/, int /*isFrom
   if(h.sig == NULL)
     {
       #if ADIDEBUG
-      printf("\nPossible sigdrop in enterpairSig (due to lost of sig)\n");
+      printf("\nPossible sigdrop in enterpairstrongSig (due to lost of sig)\n");
       #endif
       //sigdrop since we loose the signature
       strat->sigdrop = TRUE;
@@ -2417,7 +2479,7 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   int sigCmp;
   #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
-    sigCmp = p_LtCmp(pSigMult,sSigMult,currRing);
+    sigCmp = p_LtCmpNoAbs(pSigMult,sSigMult,currRing);
   else
   #endif
     sigCmp = p_LmCmp(pSigMult,sSigMult,currRing);
@@ -2428,9 +2490,9 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   pWrite(sSigMult);
 #endif
   //In the ring case we already build the sig
-  #ifdef HAVE_RINGS
   if(rField_is_Ring(currRing))
   {
+    //I have to test it not in absolute value
     if(sigCmp == 0)
     {
       #if ADIDEBUG
@@ -2484,7 +2546,6 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
     }
     Lp.sevSig = p_GetShortExpVector(Lp.sig,currRing);
   }
-  #endif
   
   #if 0  
   if(sigCmp==0)

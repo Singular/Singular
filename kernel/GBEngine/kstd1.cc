@@ -2590,7 +2590,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
     printf("\nEnter the nice kSba loop\n");
     #endif
     //This is how we set the SBA algorithm;
-    int totalsbaruns = -1,loops = 0;
+    int totalsbaruns =-1,loops = 0;
     while(sigdrop && (loops < totalsbaruns || totalsbaruns == -1))
     {
       loops++;
@@ -2601,8 +2601,8 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
       kStrategy strat=new skStrategy;
       strat->sbaEnterS = sbaEnterS;
       strat->sigdrop = sigdrop;
-      printf("\nsbaEnterS beginning = %i\n",strat->sbaEnterS);
-      printf("\nsigdrop beginning = %i\n",strat->sigdrop);
+      //printf("\nsbaEnterS beginning = %i\n",strat->sbaEnterS);
+      //printf("\nsigdrop beginning = %i\n",strat->sigdrop);
       strat->sbaOrder = sbaOrder;
       if (arri!=0)
       {
@@ -2708,7 +2708,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
           #if ADIDEBUG
           printf("\nSBA Run %i: %i elements (syzCrit = %i,rewCrit = %i)\n",loops,IDELEMS(r),strat->nrsyzcrit,strat->nrrewcrit);
           idPrint(r);
-          //getchar();
+          getchar();
           #endif
         }
       }
