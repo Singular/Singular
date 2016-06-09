@@ -4715,37 +4715,75 @@ int posInSMonFirst (const kStrategy strat, const int length,const poly p,
             const int ecart_p)
 {
   if (length<0) return 0;
-  if(pNext(p) == NULL) return 0;
   polyset set=strat->S;
-  int o = p_Deg(p,currRing);
-  int op = p_Deg(set[length],currRing);
-
-  if ((op < o)
-  || ((op == o) && (pLtCmp(set[length],p) == -1)))
-    return length+1;
-  int i;
-  int an = 0;
-  for(i=0;i<=length;i++)
-    if(set[i] != NULL && pNext(set[i]) == NULL)
-      an++;
-  int en= length;
-  loop
+  if(pNext(p) == NULL)
   {
-    if (an >= en-1)
+    int mon = 0;
+    for(int i = 0;i<=length;i++)
     {
-      op = p_Deg(set[an],currRing);
-      if ((op < o)
-      || ((op == o) && (pLtCmp(set[an],p) == -1)))
-        return en;
-      return an;
+      if(set[i] != NULL && pNext(set[i]) == NULL)
+        mon++;
     }
-    i=(an+en) / 2;
-    op = p_Deg(set[i],currRing);
+    int o = p_Deg(p,currRing);
+    int op = p_Deg(set[mon],currRing);
+    
     if ((op < o)
-    || ((op == o) && (pLtCmp(set[i],p) == -1)))
-      an=i;
-    else
-      en=i;
+    || ((op == o) && (pLtCmp(set[mon],p) == -1)))
+      return length+1;
+    int i;
+    int an = 0;
+    int en= mon;
+    loop
+    {
+      if (an >= en-1)
+      {
+        op = p_Deg(set[an],currRing);
+        if ((op < o)
+        || ((op == o) && (pLtCmp(set[an],p) == -1)))
+          return en;
+        return an;
+      }
+      i=(an+en) / 2;
+      op = p_Deg(set[i],currRing);
+      if ((op < o)
+      || ((op == o) && (pLtCmp(set[i],p) == -1)))
+        an=i;
+      else
+        en=i;
+    }
+  }
+  if(pNext(p) != NULL)
+  {
+    int o = p_Deg(p,currRing);
+    int op = p_Deg(set[length],currRing);
+    
+    if ((op < o)
+    || ((op == o) && (pLtCmp(set[length],p) == -1)))
+      return length+1;
+    int i;
+    int an = 0;
+    for(i=0;i<=length;i++)
+      if(set[i] != NULL && pNext(set[i]) == NULL)
+        an++;
+    int en= length;
+    loop
+    {
+      if (an >= en-1)
+      {
+        op = p_Deg(set[an],currRing);
+        if ((op < o)
+        || ((op == o) && (pLtCmp(set[an],p) == -1)))
+          return en;
+        return an;
+      }
+      i=(an+en) / 2;
+      op = p_Deg(set[i],currRing);
+      if ((op < o)
+      || ((op == o) && (pLtCmp(set[i],p) == -1)))
+        an=i;
+      else
+        en=i;
+    }
   }
 }
 
@@ -6646,6 +6684,8 @@ BOOLEAN syzCriterionInc(poly sig, unsigned long not_sevSig, kStrategy strat)
 BOOLEAN faugereRewCriterion(poly sig, unsigned long not_sevSig, poly /*lm*/, kStrategy strat, int start=0)
 {
   //printf("Faugere Rewritten Criterion\n");
+  if(rField_is_Ring(currRing))
+    return FALSE;
 //#if 1
 #ifdef DEBUGF5
   PrintS("rewritten criterion checks:  ");

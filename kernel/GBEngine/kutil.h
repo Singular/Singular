@@ -360,6 +360,8 @@ public:
   int nrrewcrit; // counts how many pairs are deleted by FaugereRewCrit
   int sbaEnterS; // sba over Z strategy: if sigdrop element has _*gen(sbaEnterS+1), then 
                  // add directly sbaEnterS elements into S
+  int blockred;  // counter for blocked reductions in redSig
+  int blockredmax;
   #endif
   #ifdef HAVE_SHIFTBBA
   int lV;

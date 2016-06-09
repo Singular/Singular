@@ -2590,8 +2590,9 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
     printf("\nEnter the nice kSba loop\n");
     #endif
     //This is how we set the SBA algorithm;
-    int totalsbaruns =-1,loops = 0;
-    while(sigdrop && (loops < totalsbaruns || totalsbaruns == -1))
+    int totalsbaruns = 1,blockedreductions = 10,blockred = 0,loops = 0;
+    while(sigdrop && (loops < totalsbaruns || totalsbaruns == -1) 
+                  && (blockred <= blockedreductions))
     {
       loops++;
       if(loops == 1)
@@ -2601,6 +2602,12 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
       kStrategy strat=new skStrategy;
       strat->sbaEnterS = sbaEnterS;
       strat->sigdrop = sigdrop;
+      #if 0
+      strat->blockred = blockred;
+      #else
+      strat->blockred = 0;
+      #endif
+      strat->blockredmax = blockedreductions;
       //printf("\nsbaEnterS beginning = %i\n",strat->sbaEnterS);
       //printf("\nsigdrop beginning = %i\n",strat->sigdrop);
       strat->sbaOrder = sbaOrder;
@@ -2725,6 +2732,7 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
       HCord=strat->HCord;
       sigdrop = strat->sigdrop;
       sbaEnterS = strat->sbaEnterS;
+      blockred = strat->blockred;
       #if ADIDEBUG
       printf("\nsbaEnterS = %i\n",sbaEnterS);
       #endif
@@ -2732,12 +2740,12 @@ ideal kSba(ideal F, ideal Q, tHomog h,intvec ** w, int sbaOrder, int arri, intve
       if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
     }
     // Go to std
-    if(sigdrop)
+    if(sigdrop || blockred > blockedreductions)
     {
       #if ADIDEBUG
       printf("\nWent to std\n");
       //idPrint(r);
-      getchar();
+      //getchar();
       #endif
       r = kStd(r, Q, h, w, hilb, syzComp, newIdeal, vw);
     }

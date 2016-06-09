@@ -22,7 +22,7 @@
 #include <kernel/polys.h>
 #endif
 
-#define ADIDEBUG 1
+#define ADIDEBUG 0
 
 #ifdef KDEBUG
 int red_count = 0;
@@ -288,6 +288,7 @@ pWrite(PW->p);pWrite(PW->sig);
           PR->is_redundant = TRUE;
           pDelete(&PR->sig);
           PR->sig = origsig;
+          strat->blockred++;
           return 3;
         }
         if(pLtCmp(PR->sig,origsig) == -1)

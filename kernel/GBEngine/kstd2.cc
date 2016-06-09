@@ -924,7 +924,9 @@ int redSig (LObject* h,kStrategy strat)
       //Trivial case catch
       strat->sigdrop = FALSE;
     }
+    #if 0
     //If the reducer has the same lt (+ or -) as the other one, reduce it via redRing
+    //In some cases this proves to be very bad
     if(rField_is_Ring(currRing) && h->p != NULL && pLmCmp(h->p,strat->T[ii].p)==0)
     {
       #if ADIDEBUG
@@ -948,6 +950,9 @@ int redSig (LObject* h,kStrategy strat)
         return 1;
       }
     }
+    #endif
+    if(strat->sigdrop)
+      return 1;
 #if SBA_PRINT_REDUCTION_STEPS
     if (sigSafe != 3)
       sba_reduction_steps++;
@@ -2252,7 +2257,7 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     #endif
     printf("\n   list   L\n");
     int iii;
-    #if 0
+    #if 1
     for(iii = 0; iii<= strat->Ll; iii++)
     {
         printf("\nL[%i]:\n",iii);
@@ -2435,7 +2440,6 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     #if ADIDEBUG
     printf("\nAfter reduce (redresult=%i): \n",red_result);pWrite(strat->P.p);pWrite(strat->P.sig);
     #endif
-    #ifdef HAVE_RINGS
     //sigdrop case
     if(rField_is_Ring(currRing) && strat->sigdrop)
     {
@@ -2464,7 +2468,14 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         break;
       }
     }
-    #endif
+    if(strat->blockred > strat->blockredmax)
+    {
+      #if ADIDEBUG
+      printf("\nToo many blocked reductions\n");
+      #endif
+      strat->sigdrop = TRUE;
+      break;
+    }
     
     if (errorreported)  break;
 
@@ -2651,14 +2662,13 @@ ideal sba (ideal F0, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       pWrite(strat->P.sig);
       */
       if (rField_is_Ring(currRing))
-        superenterpairsSig(strat->P.p,strat->P.sig,strat->P.sig_sba_max,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         superenterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       else
         enterpairsSig(strat->P.p,strat->P.sig,strat->sl+1,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       #if ADIDEBUG
         printf("\nThis element is added to S\n");
         p_Write(strat->P.p, strat->tailRing);p_Write(strat->P.p1, strat->tailRing);p_Write(strat->P.p2, strat->tailRing);pWrite(strat->P.sig);
-        //getchar();
+        getchar();
         #endif
       // posInS only depends on the leading term
       
@@ -3381,7 +3391,7 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
       /* statistic */
       if (TEST_OPT_PROT) PrintS("s");
       int pos;
-      #if 0
+      #if 1
       if(!rField_is_Ring(currRing))
         pos = posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
       else
