@@ -1638,6 +1638,12 @@ gets the status of a link (see @ref{status})
 writes to a link (see @ref{write})
 @item kill
 closes and kills a link (see @ref{kill})
+@item waitall
+wait till all links of a list of links become ready (only ssi:tcp links)
+(see @ref{waitall})
+@item waitfirst
+wait till at least one link of a list of links become ready (only ssi:tcp links)
+(see @ref{waitfirst})
 @end table
 
 @c ------------------------------
