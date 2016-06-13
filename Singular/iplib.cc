@@ -58,7 +58,6 @@ BOOLEAN load_modules(const char *newlib, char *fullname, BOOLEAN autoexport);
 procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
               const char *procname, int line, long pos, BOOLEAN pstatic=FALSE);
 #endif /* HAVE_LIBPARSER */
-#define NS_LRING (procstack->cRing)
 
 extern int iiArithAddCmd(const char *szName, short nAlias, short nTokval,
                          short nToktype, short nPos);
@@ -418,9 +417,6 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   {
     err=iiAllStart(pi,pi->data.s.body,BT_proc,pi->data.s.body_lineno-(v!=NULL));
 
-#if 0
-  if(procstack->cRing != iiLocalRing[myynest]) Print("iiMake_proc: 1 ring not saved procs:%x, iiLocal:%x\n",procstack->cRing, iiLocalRing[myynest]);
-#endif
     if (iiLocalRing[myynest-1] != currRing)
     {
       if (iiRETURNEXPR.RingDependend())
@@ -486,18 +482,6 @@ static void iiShowLevRings()
     else                      Print("%lx",(long)iiLocalRing[i]);
     PrintLn();
   }
-#if  0
-  i=myynest;
-  proclevel *p=procstack;
-  while (p!=NULL)
-  {
-    Print("lev %d:",i);
-    if (p->cRingHdl==NULL) PrintS("NULL");
-    else                   Print("%s",IDID(p->cRingHdl));
-    PrintLn();
-    p=p->next;
-  }
-#endif
   if (currRing==NULL) PrintS("curr:NULL\n");
   else                Print ("curr:%lx\n",(long)currRing);
 }
@@ -635,21 +619,6 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
     {
       rSetHdl(rFindHdl(iiLocalRing[myynest],NULL));
       iiLocalRing[myynest]=NULL;
-    }
-    else
-    {
-      currRingHdl=NULL;
-      currRing=NULL;
-    }
-  }
-  if (NS_LRING != currRing)
-  {
-    if (NS_LRING!=NULL)
-    {
-      idhdl rh=procstack->cRingHdl;
-      if ((rh==NULL)||(IDRING(rh)!=NS_LRING))
-        rh=rFindHdl(NS_LRING,NULL);
-      rSetHdl(rh);
     }
     else
     {

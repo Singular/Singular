@@ -3955,8 +3955,6 @@ yyreduce:
 #endif
                   }
                   iiLocalRing[myynest-1]=IDRING(h);
-                  procstack->cRing=IDRING(h);
-                  procstack->cRingHdl=h;
                 }
                 else
                 {

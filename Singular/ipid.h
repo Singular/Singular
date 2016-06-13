@@ -57,8 +57,6 @@ class proclevel
 {
   public:
   proclevel * next;
-  idhdl      cRingHdl;
-  ring       cRing;
   idhdl      cPackHdl;
   package    cPack;
   char      * name;
