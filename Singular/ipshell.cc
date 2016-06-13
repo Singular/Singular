@@ -6078,7 +6078,7 @@ void rKill(ring r)
     {
       if (iiLocalRing[j]==r)
       {
-        if (j+1==myynest) Warn("killing the basering for level %d",j);
+        if (j==0) WarnS("killing the basering for level 0");
         iiLocalRing[j]=NULL;
       }
     }
@@ -6135,6 +6135,13 @@ void rKill(idhdl h)
   int ref=0;
   if (r!=NULL)
   {
+    // avoid, that sLastPrinted is the last reference to the base ring:
+    // clean up before killing the last "named" refrence:
+    if ((sLastPrinted.rtyp==RING_CMD)
+    && (sLastPrinted.data==(void*)r))
+    {
+      sLastPrinted.CleanUp(r);
+    }
     ref=r->ref;
     rKill(r);
   }
