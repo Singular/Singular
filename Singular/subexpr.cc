@@ -102,8 +102,6 @@ void sleftv::Print(leftv store, int spaces)
     char *s;
     void *d=Data();
     if (errorreported) return;
-    if ((store!=NULL)&&(store!=this))
-      store->CleanUp();
 
     switch (t /*=Typ()*/)
       {
@@ -283,6 +281,8 @@ void sleftv::Print(leftv store, int spaces)
           else
           ::Print("Print:unknown type %s(%d)", Tok2Cmdname(t),t);
       } /* end switch: (Typ()) */
+    if ((store!=NULL)&&(store!=this))
+      store->CleanUp();
   }
   if (next!=NULL)
   {
@@ -320,45 +320,48 @@ void sleftv::Print(leftv store, int spaces)
 
 void sleftv::CleanUp(ring r)
 {
-  if ((name!=NULL) && (name!=sNoName) && (rtyp!=IDHDL) && (rtyp!=ALIAS_CMD))
+  if (rtyp!=IDHDL)
   {
-    //::Print("free %x (%s)\n",name,name);
-    omFree((ADDRESS)name);
-  }
-  //name=NULL;
-  //flag=0;
-  if (data!=NULL)
-  {
-     if (rtyp==IDHDL) attribute=NULL; // is only a pointer to attribute of id
-     else s_internalDelete(rtyp,data,r);
-    //data=NULL; // will be done by Init() at the end
-  }
-  if (attribute!=NULL)
-  {
-    switch (rtyp)
+    if ((name!=NULL) && (name!=sNoName) && (rtyp!=ALIAS_CMD))
     {
-      case PACKAGE_CMD:
-      case IDHDL:
-      case ANY_TYPE:
-      case VECHO:
-      case VPRINTLEVEL:
-      case VCOLMAX:
-      case VTIMER:
-      case VRTIMER:
-      case VOICE:
-      case VMAXDEG:
-      case VMAXMULT:
-      case TRACE:
-      case VSHORTOUT:
-      case VNOETHER:
-      case VMINPOLY:
-      case LIB_CMD:
-      case 0:
-        //attribute=NULL; // will be done by Init() at the end
-        break;
-      default:
+      //::Print("free %x (%s)\n",name,name);
+      omFree((ADDRESS)name);
+    }
+    //name=NULL;
+    //flag=0;
+    if (data!=NULL)
+    {
+      //if (rtyp==IDHDL) attribute=NULL; // is only a pointer to attribute of id
+      s_internalDelete(rtyp,data,r);
+      //data=NULL; // will be done by Init() at the end
+    }
+    if (attribute!=NULL)
+    {
+      switch (rtyp)
       {
-        attribute->killAll(r);
+        case PACKAGE_CMD:
+        //case IDHDL:
+        case ANY_TYPE:
+        case VECHO:
+        case VPRINTLEVEL:
+        case VCOLMAX:
+        case VTIMER:
+        case VRTIMER:
+        case VOICE:
+        case VMAXDEG:
+        case VMAXMULT:
+        case TRACE:
+        case VSHORTOUT:
+        case VNOETHER:
+        case VMINPOLY:
+        case LIB_CMD:
+        case 0:
+          //attribute=NULL; // will be done by Init() at the end
+          break;
+        default:
+        {
+          attribute->killAll(r);
+        }
       }
     }
   }
@@ -448,8 +451,11 @@ static inline void * s_internalCopy(const int t,  void *d)
     case QRING_CMD:
       {
         ring r=(ring)d;
-        if (r!=NULL) r->ref++;
-        //Print("+  ring %d, ref %d\n",r,r->ref);
+        if (r!=NULL)
+        {
+          r->ref++;
+          //Print("s_internalCopy:+  ring %d, ref %d\n",r,r->ref);
+        }
         return d;
       }
     case RESOLUTION_CMD:
