@@ -1378,9 +1378,7 @@ setringcmd:
                     }
 #endif
                   }
-#ifdef USE_IILOCALRING
                   iiLocalRing[myynest-1]=IDRING(h);
-#endif
                   procstack->cRing=IDRING(h);
                   procstack->cRingHdl=h;
                 }
