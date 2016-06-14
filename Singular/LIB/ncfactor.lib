@@ -11,7 +11,7 @@ OVERVIEW: In this library, new methods for factorization on polynomials
    2*n, n in NN, generators (n'th Weyl, n'th shift and graded polynomials in n'th q-Weyl algebras)
    over a field K.
 @* More detailled description of the algorithms and related publications can be found at
-@url{https://cs.uwaterloo.ca/\~aheinle/}.
+@uref{https://cs.uwaterloo.ca/\~aheinle/}.
 
 PROCEDURES:
   facWeyl(h);                Factorization in the n'th Weyl algebra

@@ -46,7 +46,7 @@
 + fuer Ellipsen (...) das Kommando @dots{} verwenden.  Eine Ellipse am Ende
   eines Satzes mit @enddots{} schreiben.
 
-+ Email Adressen in @email{...} notieren, URL's in @url{...}
++ Email Adressen in @email{...} notieren, URL's in @uref{...}
 
 + Multicolumn tables: Rows of multicolumn tables need to go in one
   line, otherwise texi2html chockes. Space beween rows with "empty"
