@@ -22,10 +22,10 @@ IMPORTANT NOTE:
    such as the Newton polytope or the Groebner fan of a polynomial, most of
    the hard computations are NOT done by Singular but by the program
 @* - polymake by Ewgenij Gawrilow, TU Berlin and Michael Joswig, TU Darmstadt
-@*   (see http://www.math.tu-berlin.de/polymake/),
+@*   (see http://www.polymake.org/),
 @* respectively (only in the procedure triangulations) by the program
 @* - topcom by Joerg Rambau, Universitaet Bayreuth (see
-@*   http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM);
+@*   http://www.rambau.wm.uni-bayreuth.de/TOPCOM/);
 @*   this library should rather be seen as an interface which allows to use a
      (very limited) number of options which polymake respectively topcom offers
      to compute with polytopes and fans and to make the results available in
