@@ -15,7 +15,7 @@ NOTE:
  You can download @code{surfer} from
   @uref{http://imaginary.org/program/surfer}
  @*Under Windows, version 159 or newer of @code{surfer} is required.
- Under Mac OS X please move SURFER.app from http://www.mathematik.uni-kl.de/~motsak/files/SURFER.dmg
+ Under Mac OS X please move SURFER.app from @url{http://www.mathematik.uni-kl.de/~motsak/files/SURFER.dmg}
  under your /Applications.
  @end texinfo
 

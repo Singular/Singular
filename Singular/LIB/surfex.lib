@@ -12,7 +12,7 @@ AUTHOR: Oliver Labs
 NOTE:
  This library requires the program surfex, surf and java to be installed.
  The software is used for producing raytraced images of surfaces.
- You can download @code{surfex} from http://www.surfex.AlgebraicSurface.net
+ You can download @code{surfex} from @url{http://www.surfex.AlgebraicSurface.net}
 
  surfex is a front-end for surf which aims to be easier to use than
  the original tool.
