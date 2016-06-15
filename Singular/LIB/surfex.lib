@@ -3,16 +3,20 @@ version="version surfex.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Visualization";
 info="
 LIBRARY: surfex.lib      Procedures for visualizing and rotating surfaces.
-@*         It is still an alpha version (see http://www.AlgebraicSurface.net)
+@texinfo
+@*         It is still an alpha version (see @uref{http://www.AlgebraicSurface.net})
+@end texinfo
 AUTHOR: Oliver Labs
         This library uses the program surf
         (written by Stefan Endrass and others)
         and surfex (written by Oliver Labs and others, mainly Stephan Holzer).
 
 NOTE:
+@texinfo
  This library requires the program surfex, surf and java to be installed.
  The software is used for producing raytraced images of surfaces.
- You can download @code{surfex} from @url{http://www.surfex.AlgebraicSurface.net}
+ You can download @code{surfex} from @ref{http://www.surfex.AlgebraicSurface.net}
+ @end texinfo 
 
  surfex is a front-end for surf which aims to be easier to use than
  the original tool.
