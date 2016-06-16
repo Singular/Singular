@@ -779,7 +779,7 @@ int redSig (LObject* h,kStrategy strat)
       #endif
       // over ZZ: cleanup coefficients by complete reduction with monomials
       postReduceByMonSig(h, strat);
-      if(nIsZero(pGetCoeff(h->p))) return 2;
+      if(h->p == NULL || nIsZero(pGetCoeff(h->p))) return 2;
       j = kFindDivisibleByInT(strat, h,start);
       if(j < 0)
       {

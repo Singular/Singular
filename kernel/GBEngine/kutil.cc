@@ -10422,7 +10422,7 @@ void postReduceByMon(LObject* h, kStrategy strat)
     {
       //pWrite(p);
       //pWrite(strat->S[i]);
-      while(ok == FALSE)
+      while(ok == FALSE && p != NULL)
       {
         if(pLmDivisibleBy(strat->S[i], p))
         {
@@ -10432,6 +10432,7 @@ void postReduceByMon(LObject* h, kStrategy strat)
         if(nIsZero(p->coef))
         {
           pLmDelete(&p);
+          h->p = p;
           deleted = TRUE;
         }
         else
@@ -10475,7 +10476,6 @@ void postReduceByMonSig(LObject* h, kStrategy strat)
 {
   if(!nCoeff_is_Ring_Z(currRing->cf))
       return;
-  //printf("\npostReduceMonSig\n");
   poly hSig = h->sig;
   poly pH = h->GetP();
   poly p,pp;
@@ -10486,10 +10486,7 @@ void postReduceByMonSig(LObject* h, kStrategy strat)
     p = pH;
     if(pNext(strat->S[i]) == NULL)
     {
-      //printf("\n------------------\n");
-      //pWrite(p);
-      //pWrite(strat->S[i]);
-      while(ok == FALSE)
+      while(ok == FALSE && p!=NULL)
       {
         if(pLmDivisibleBy(strat->S[i], p))
         {
@@ -10505,6 +10502,7 @@ void postReduceByMonSig(LObject* h, kStrategy strat)
         if(nIsZero(p->coef))
         {
           pLmDelete(&p);
+          h->p = p;
           deleted = TRUE;
         }
         else
@@ -10548,12 +10546,12 @@ void postReduceByMonSig(LObject* h, kStrategy strat)
           pp = pNext(p);
         }
       }
-      //pWrite(h->p);
     }
   }
   h->SetLmCurrRing();
   if(deleted)
     strat->initEcart(h);
+  
 }
 
 /*!
