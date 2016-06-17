@@ -5974,6 +5974,40 @@ int posInL11Ring (const LSet set, const int length,
       en=i;
   }
 }
+
+int posInLF5CRing (const LSet set, int start,const int length,
+              LObject* p,const kStrategy strat)
+{
+  if (length<0) return 0;
+  if(start == (length +1)) return (length+1);
+  int o = p->GetpFDeg();
+  int op = set[length].GetpFDeg();
+
+  if ((op > o)
+  || ((op == o) && (pLtCmpOrdSgnDiffM(set[length].p,p->p))))
+    return length+1;
+  int i;
+  int an = start;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      op = set[an].GetpFDeg();
+      if ((op > o)
+      || ((op == o) && (pLtCmpOrdSgnDiffM(set[an].p,p->p))))
+        return en;
+      return an;
+    }
+    i=(an+en) / 2;
+    op = set[i].GetpFDeg();
+    if ((op > o)
+    || ((op == o) && (pLtCmpOrdSgnDiffM(set[i].p,p->p))))
+      an=i;
+    else
+      en=i;
+  }
+}
 #endif
 
 #ifdef HAVE_RINGS
@@ -9645,7 +9679,6 @@ void initSbaPos (kStrategy strat)
     strat->posInT = posInT19;
   else if (BTEST1(12) || BTEST1(14) || BTEST1(16) || BTEST1(18))
     strat->posInT = posInT1;
-#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     strat->posInL = posInL11Ring;
@@ -9653,7 +9686,6 @@ void initSbaPos (kStrategy strat)
       strat->posInL = posInL11Ringls;
     strat->posInT = posInT11;
   }
-#endif
   strat->posInLDependsOnLength = FALSE;
   strat->posInLSba  = posInLSig;
   //strat->posInL     = posInLSig;

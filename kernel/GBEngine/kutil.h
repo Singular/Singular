@@ -469,6 +469,8 @@ int posInL11 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL11Ring (const LSet set, const int length,
              LObject* L,const kStrategy strat);
+int posInLF5CRing (const LSet set, int start , const int length,
+             LObject* L,const kStrategy strat);
 int posInL11Ringls (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL13 (const LSet set, const int length,

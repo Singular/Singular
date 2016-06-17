@@ -3283,7 +3283,10 @@ void f5c (kStrategy strat, int& olddeg, int& minimcnt, int& hilbeledeg,
             h.pNorm();
           }
           strat->initEcart(&h);
-          pos = strat->Ll+1;
+          if(rField_is_Ring(currRing))
+            pos = posInLF5CRing(strat->L, Ll_old+1,strat->Ll,&h,strat);
+          else
+            pos = strat->Ll+1;
           h.sev = pGetShortExpVector(h.p);
           enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
         }

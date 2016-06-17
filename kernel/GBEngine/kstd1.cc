@@ -1507,15 +1507,13 @@ void initSba(ideal F,kStrategy strat)
     strat->LazyPass *=4;
     strat->red2 = redHomog;
   }
-#if defined(HAVE_RINGS)
   if (rField_is_Ring(currRing))
   {
     if(rHasLocalOrMixedOrdering(currRing))
-      {strat->red = redRiloc;}
+      {strat->red2 = redRiloc;}
     else
       {strat->red2 = redRing;}
   }
-#endif
   if (currRing->pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
   else
