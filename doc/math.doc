@@ -53,7 +53,7 @@ if $L(f_1), \ldots, L(f_s)$ generate $L(I)$.
 
 A standard basis is {\bf minimal} if $\forall i: (f_1,..,f_{i-1},f_{i+1},..,f_s) \neq I$.
 
-A minimal standard basis is {\bf completely reduced} if $\forall i: {\tt reduce}(f_i,(f_1,..,f_{i-1},f_{i+1},..,f_s)=f_i$
+A minimal standard basis is {\bf completely reduced} if $\forall i: {\tt reduce}(f_i,(f_1,..,f_{i-1},f_{i+1},..,f_s))=f_i$
 @end tex
 @ifinfo
 Let R = Loc K[x] and let I be a submodule of $R^r$.
@@ -64,7 +64,7 @@ if L(f_1), @dots{}, L(f_s) generate L(I).
 
 A standard basis is strong{minimal} if for for all i: (f_1,..,f_(i-1),f_(i+1),..,f_s) != I.
 
-A minimal standard basis is @strong{completely reduced} if for all i: @code{reduce(f_i,(f_1,..,f_(i-1),f_(i+1),..,f_s)=f_i}.
+A minimal standard basis is @strong{completely reduced} if for all i: @code{reduce(f_i,(f_1,..,f_(i-1),f_(i+1),..,f_s))=f_i}.
 @end ifinfo
 
 @subheading Properties
