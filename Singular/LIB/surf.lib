@@ -11,12 +11,10 @@ NOTE:
  You can download @code{surf} either from
   @uref{http://sourceforge.net/projects/surf}
   or from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}.
- The procedure surfer requires the program @code{surfer} to be installed.
+ The procedure surfer requires the program @code{surfer} (version 1.4.1 or newwer)
+ to be installed.
  You can download @code{surfer} from
   @uref{http://imaginary.org/program/surfer}
- @*Under Windows, version 159 or newer of @code{surfer} is required.
- Under Mac OS X please move SURFER.app from @uref{http://www.mathematik.uni-kl.de/~motsak/files/SURFER.dmg}
- under your /Applications.
  @end texinfo
 
 SEE ALSO: surfex_lib
@@ -226,8 +224,7 @@ NOTE: requires the external program `surfer` to be installed,
 EXAMPLE: example surfer; shows an example
 "
 {
-  string lForWindows = "surfer" + string(system("pid"));
-  string l = "./" + lForWindows;
+  string l = "/tmp/surfer" + string(system("pid"));
   string err_mes; // string containing error messages
   def base=basering;
   intvec v=num_of_vars(I);
@@ -258,7 +255,62 @@ EXAMPLE: example surfer; shows an example
   if (leadcoef(I[1]) <0) { I[1]=-I[1]; }
   if (ncols(I)==1 and (n==3 or nvars(base)==3)) // surface
   {
-    write(":w " + l, "surface=" + string(I[1]) + ";");
+    write(":w " + l,
+"#jSurfer surface description
+#Fri Jul 08 16:45:41 CEST 2011
+
+nt_material_specular_iIntensity=0.5
+camera_type=ORTHOGRAPHIC_CAMERA
+back_material_specular_iIntensity=0.5
+surface_parameter_a=0.5
+light_position_7=0.0 0.0 0.0
+light_position_6=0.0 0.0 0.0
+light_position_5=0.0 0.0 0.0
+light_position_4=0.0 0.0 0.0
+light_position_3=0.0 0.0 0.0
+light_position_2=0.0 -100.0 100.0
+camera_fov_y=60.0
+light_position_1=100.0 100.0 100.0
+light_position_0=-100.0 100.0 100.0
+front_material_color=0.7058824 0.44313726 0.0627451
+background_color=1.0 1.0 1.0
+light_intensity_7=1.0
+front_material_ambient_intensity=0.4
+light_intensity_6=1.0
+scale_factor=0.3000002
+light_intensity_5=1.0
+light_intensity_4=1.0
+light_intensity_3=1.0
+light_intensity_2=0.3
+light_intensity_1=0.7
+light_intensity_0=0.5
+rotation_matrix=0.5272737 -0.8403951 -0.1254016 0.0 -0.19924057 -0.26575094 0.94323117 0.0 -0.8260085 -0.47235364 -0.30756372 0.0 0.0 0.0 0.0 1.0
+light_color_7=1.0 1.0 1.0
+light_color_6=1.0 1.0 1.0
+front_material_diffuse_intensity=0.8
+light_color_5=1.0 1.0 1.0
+light_color_4=1.0 1.0 1.0
+light_color_3=1.0 1.0 1.0
+light_color_2=1.0 1.0 1.0
+light_color_1=1.0 1.0 1.0
+light_color_0=1.0 1.0 1.0
+light_status_7=OFF
+light_status_6=OFF
+light_status_5=OFF
+light_status_4=OFF
+front_material_shininess=30.0
+light_status_3=OFF
+light_status_2=ON
+light_status_1=ON
+light_status_0=ON
+camera_height=2.0");
+    write(":a " + l, "surface_equation=" + string(I[1]));
+write(":a " + l,
+"camera_transform=1.0 0.0 0.0 -0.0 0.0 1.0 0.0 -0.0 0.0 0.0 1.0 -1.0 0.0 0.0 0.0 1.0
+back_material_ambient_intensity=0.4
+back_material_color=0.8392157 0.8117647 0.47058824
+back_material_shininess=30.0
+back_material_diffuse_intensity=0.8");
   }
   else
   {
@@ -318,9 +370,6 @@ EXAMPLE: example surfer; shows an example
       "Close window to exit from `surfer`.";
       i = system("sh", surf_call);
     }
-
-
-
   }
   system("sh", "command rm " + l);
 
