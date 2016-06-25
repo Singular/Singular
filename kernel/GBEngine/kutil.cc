@@ -16,6 +16,10 @@
 // 1 - Just 
 // 0 - All
 #define ALL_VS_JUST 0
+//Extended Spoly Strategy:
+// 0 - new gen sig
+// 1 - ann*old sig
+#define EXT_POLY_NEW 0
 
 #include <kernel/mod2.h>
 
@@ -2501,7 +2505,16 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
       //sigdrop since we loose the signature
       strat->sigdrop = TRUE;
       //Try to reduce it as far as we can via redRing
-      Lp.p = pCopy(p);
+      if(rField_is_Ring(currRing))
+      {
+        poly p1 = p_Copy(p,currRing);
+        poly p2 = p_Copy(strat->S[i],currRing);
+        p1 = p_Mult_mm(p1,m1,currRing);
+        p2 = p_Mult_mm(p2,m2,currRing);
+        Lp.p = p_Sub(p1,p2,currRing);
+        if(Lp.p != NULL)
+          Lp.sev = p_GetShortExpVector(Lp.p,currRing);
+      }
       int red_result = redRing(&Lp,strat);
       #if ADIDEBUG
       printf("\nAfter redRing reduce:\n");pWrite(Lp.p);
@@ -2602,7 +2615,6 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
   else
   {
     //Build p
-    #ifdef HAVE_RINGS
     if(rField_is_Ring(currRing))
     {
       poly p1 = p_Copy(p,currRing);
@@ -2614,7 +2626,6 @@ void enterOnePairSig (int i, poly p, poly pSig, int, int ecart, int isFromQ, kSt
         Lp.sev = p_GetShortExpVector(Lp.p,currRing);
     }
     else
-    #endif
     {
       #ifdef HAVE_PLURAL
       if ( rIsPluralRing(currRing) )
@@ -4335,31 +4346,148 @@ void enterExtendedSpoly(poly h,kStrategy strat)
       p_Setm(tmp, currRing);
       p = p_LmFreeAndNext(p, strat->tailRing);
       pNext(tmp) = p;
-      LObject h;
-      h.Init();
-      h.p = tmp;
-      h.tailRing = strat->tailRing;
+      LObject Lp;
+      Lp.Init();
+      Lp.p = tmp;
+      Lp.tailRing = strat->tailRing;
       int posx;
-      if (h.p!=NULL)
+      if (Lp.p!=NULL)
       {
-        if (TEST_OPT_INTSTRATEGY)
-        {
-          //pContent(h.p);
-          h.pCleardenom(); // also does a pContent
-        }
-        else
-        {
-          h.pNorm();
-        }
-        strat->initEcart(&h);
+        strat->initEcart(&Lp);
         if (strat->Ll==-1)
           posx =0;
         else
-          posx = strat->posInL(strat->L,strat->Ll,&h,strat);
-        h.sev = pGetShortExpVector(h.p);
+          posx = strat->posInL(strat->L,strat->Ll,&Lp,strat);
+        Lp.sev = pGetShortExpVector(Lp.p);
         if (strat->tailRing != currRing)
         {
-          h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+          Lp.t_p = k_LmInit_currRing_2_tailRing(Lp.p, strat->tailRing);
+        }
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+        {
+          p_wrp(tmp,currRing,strat->tailRing);
+          PrintLn();
+        }
+#endif
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,Lp,posx);
+      }
+    }
+  }
+  nDelete(&gcd);
+}
+
+void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat)
+{
+  if (nIsOne(pGetCoeff(h))) return;
+  number gcd;
+  bool go = false;
+  if (n_DivBy((number) 0, pGetCoeff(h), currRing->cf))
+  {
+    gcd = n_Ann(pGetCoeff(h),currRing->cf);
+    go = true;
+  }
+  else
+    gcd = n_Gcd((number) 0, pGetCoeff(h), strat->tailRing->cf);
+  if (go || !nIsOne(gcd))
+  {
+    poly p = h->next;
+    if (!go)
+    {
+      number tmp = gcd;
+      gcd = n_Ann(gcd,currRing->cf);
+      nDelete(&tmp);
+    }
+    p_Test(p,strat->tailRing);
+    p = pp_Mult_nn(p, gcd, strat->tailRing);
+
+    if (p != NULL)
+    {
+      if (TEST_OPT_PROT)
+      {
+        PrintS("Z");
+      }
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("--- create zero spoly: ");
+        p_wrp(h,currRing,strat->tailRing);
+        PrintS(" ---> ");
+      }
+#endif
+      poly tmp = pInit();
+      pSetCoeff0(tmp, pGetCoeff(p));
+      for (int i = 1; i <= rVar(currRing); i++)
+      {
+        pSetExp(tmp, i, p_GetExp(p, i, strat->tailRing));
+      }
+      if (rRing_has_Comp(currRing) && rRing_has_Comp(strat->tailRing))
+      {
+        p_SetComp(tmp, p_GetComp(p, strat->tailRing), currRing);
+      }
+      p_Setm(tmp, currRing);
+      p = p_LmFreeAndNext(p, strat->tailRing);
+      pNext(tmp) = p;
+      LObject Lp;
+      Lp.Init();
+      Lp.p = tmp;
+      //printf("\nOld\n");pWrite(h);pWrite(hSig);
+      #if EXT_POLY_NEW
+      Lp.sig = pp_Mult_nn(hSig, gcd, currRing);
+      if(Lp.sig == NULL || nIsZero(pGetCoeff(Lp.sig)))
+      {
+        #if ADIDEBUG
+        printf("\nSigdrop in enterextended spoly\n");pWrite(h);pWrite(hSig);
+        #endif
+        strat->sigdrop = TRUE;
+        //Try to reduce it as far as we can via redRing
+        int red_result = redRing(&Lp,strat);
+        #if ADIDEBUG
+        printf("\nAfter redRing reduce:\n");pWrite(Lp.p);
+        #endif
+        if(red_result == 0)
+        {
+          // Cancel the sigdrop
+          #if ADIDEBUG
+          printf("\nCancel the sigdrop. It reduced to 0\n");
+          #endif
+          p_Delete(&Lp.sig,currRing);Lp.sig = NULL;
+          strat->sigdrop = FALSE;
+          return;
+        }
+        else
+        {
+          #if ADIDEBUG
+          printf("\nSigdrop. end\n");
+          #endif
+          strat->enterS(strat->P,strat->sl+1,strat, strat->tl+1);
+          #if 1
+          strat->enterS(Lp,0,strat,strat->tl);
+          #endif
+          return;
+        }
+        
+      }
+      #else
+      Lp.sig = pOne();
+      if(strat->Ll >= 0)
+        p_SetComp(Lp.sig,pGetComp(strat->L[0].sig)+1,currRing);
+      else
+        p_SetComp(Lp.sig,pGetComp(hSig)+1,currRing);
+      #endif
+      Lp.tailRing = strat->tailRing;
+      int posx;
+      if (Lp.p!=NULL)
+      {
+        strat->initEcart(&Lp);
+        if (strat->Ll==-1)
+          posx =0;
+        else
+          posx = strat->posInLSba(strat->L,strat->Ll,&Lp,strat);
+        Lp.sev = pGetShortExpVector(Lp.p);
+        if (strat->tailRing != currRing)
+        {
+          Lp.t_p = k_LmInit_currRing_2_tailRing(Lp.p, strat->tailRing);
         }
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
@@ -4369,8 +4497,10 @@ void enterExtendedSpoly(poly h,kStrategy strat)
         }
 #endif
         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,Lp,posx);
       }
     }
+    nDelete(&gcd);
   }
   nDelete(&gcd);
 }
@@ -4417,15 +4547,21 @@ void superenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int pos,kStr
 {
   assume (rField_is_Ring_Z(currRing));
   // enter also zero divisor * poly, if this is non zero and of smaller degree
-  //if (!(rField_is_Domain(currRing))) enterExtendedSpoly(h, strat);
+  #if ADIDEBUG
+  printf("\n      Trying to add extended spolys\n");
+  #endif
+  if (!(rField_is_Domain(currRing))) enterExtendedSpolySig(h, hSig, strat);
+  if(strat->sigdrop) return;
   #if ADIDEBUG
   printf("\n      Trying to add spolys\n");
   #endif
   initenterpairsSig(h, hSig, hFrom, k, ecart, 0, strat, atR);
+  if(strat->sigdrop) return;
   #if ADIDEBUG
   printf("\n      Trying to add gcd-polys\n");
   #endif
   initenterstrongPairsSig(h, hSig, hFrom,k, ecart, 0, strat, atR);
+  if(strat->sigdrop) return;
   clearSbatch(h, k, pos, strat);
 }
 #endif

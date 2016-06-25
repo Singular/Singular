@@ -507,6 +507,7 @@ int redHoney (LObject* h, kStrategy strat);
 int redRing (LObject* h,kStrategy strat);
 int redRiloc (LObject* h,kStrategy strat);
 void enterExtendedSpoly(poly h,kStrategy strat);
+void enterExtendedSpolySig(poly h,poly hSig,kStrategy strat);
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR = -1);
 void superenterpairsSig (poly h,poly hSig,int hFrom,int k,int ecart,int pos,kStrategy strat, int atR = -1);
 poly kCreateZeroPoly(long exp[], long cabsind, poly* t_p, ring leadRing, ring tailRing);
