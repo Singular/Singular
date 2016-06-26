@@ -3,8 +3,9 @@ version="version surfex.lib 4.0.0.0 Jun_2013 "; // $Id$
 category="Visualization";
 info="
 LIBRARY: surfex.lib      Procedures for visualizing and rotating surfaces.
-@*         It is still an alpha version (see http://www.AlgebraicSurface.net)
-
+@texinfo
+@*         It is still an alpha version (see @uref{http://www.AlgebraicSurface.net})
+@end texinfo
 AUTHOR: Oliver Labs
         This library uses the program surf
         (written by Stefan Endrass and others)
