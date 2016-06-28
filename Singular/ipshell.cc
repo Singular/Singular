@@ -4617,8 +4617,6 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
 
   int ldummy;
   int deg= currRing->pLDeg( gls, &ldummy, currRing );
-  //  int deg= pDeg( gls );
-  //  int len= pLength( gls );
   int i,vpos=0;
   poly piter;
   lists elist;
@@ -4653,7 +4651,6 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   piter= gls;
   for ( i= deg; i >= 0; i-- )
   {
-    //if ( piter ) Print("deg %d, pDeg(piter) %d\n",i,pTotaldegree(piter));
     if ( piter && pTotaldegree(piter) == i )
     {
       pcoeffs[i]= nCopy( pGetCoeff( piter ) );

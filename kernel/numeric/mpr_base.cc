@@ -3121,7 +3121,6 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
     piter= pures;
     for ( i= tdg; i >= 0; i-- )
     {
-      //if ( piter ) Print("deg %d, pDeg(piter) %d\n",i,pTotaldegree(piter));
       if ( piter && pTotaldegree(piter) == i )
       {
         ncpoly[i]= nCopy( pGetCoeff( piter ) );
