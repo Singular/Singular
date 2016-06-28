@@ -1411,7 +1411,7 @@ EXAMPLE: example partial_molien; shows an example
   else
   { ERROR("the first parameter has to be a 1x2-matrix, i.e. the matrix
          returned by the procedure 'reynolds_molien', the second one
-         should be > 0 and there should be no more than 3 parameters;)";
+         should be > 0 and there should be no more than 3 parameters");
   }
 }
 example
@@ -1591,30 +1591,20 @@ EXAMPLE: example invariant_basis_reynolds; shows an example
 {
  //---------------------- checking that the input is ok -----------------------
   if (d<=0)
-  { "  ERROR:   the second parameter should be > 0";
-     return();
-  }
+  { ERROR("the second parameter should be > 0"); }
   if (size(#)>1)
-  { "  ERROR:   there should be at most three parameters";
-    return();
-  }
+  { ERROR("there should be at most three parameters"); }
   if (size(#)==1)
   { if (typeof(#[1])<>"intvec")
-    { "  ERROR: the third parameter should be of type <intvec>";
-      return();
-    }
+    { ERROR("the third parameter should be of type <intvec>"); }
     if (size(#[1])<>2)
-    { "  ERROR: there should be two components in <intvec>";
-      return();
-    }
+    { ERROR("there should be two components in <intvec>"); }
     else
     { int cd=#[1][1];
       int step_fac=#[1][2];
     }
     if (step_fac<=0)
-    { "  ERROR: the second component of <intvec> should be > 0";
-      return();
-    }
+    { ERROR("the second component of <intvec> should be > 0"); }
     if (cd==0)
     { return(ideal(0));
     }
