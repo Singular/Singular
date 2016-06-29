@@ -2656,7 +2656,7 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
   setFlag(res,FLAG_STD); v->flag=0;
   return FALSE;
 }
-static BOOLEAN jjLOAD2(leftv /*res*/, leftv, leftv v)
+static BOOLEAN jjLOAD2(leftv /*res*/, leftv/* LIB */ , leftv v)
 {
   return jjLOAD((char*)v->Data(),TRUE);
 }
