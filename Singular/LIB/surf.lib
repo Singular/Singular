@@ -170,7 +170,7 @@ EXAMPLE: example plot; shows an example
   {
     surf_call = "surf ";
     surf_call = surf_call + l + " >/dev/null 2>&1";
-    surf_call = surf_call + " && display /tmp/surf.jpg";
+    surf_call = surf_call + " && "+FindDisplayProgram()+" /tmp/surf.jpg";
     "Close window to exit from `singularsurf`.";
 
     i = system("sh", surf_call);
@@ -460,3 +460,22 @@ and returns the resulting string"
   return (s);
 }
 ///////////////////////////////////////////////////////////////////////////////
+static proc FindDisplayProgram()
+{
+ string s=system("executable","mimeopen");
+ if (s!="")
+ {
+   return(s);
+   //return(s+" -d");
+ }
+ s=system("executable","xdg-open");
+ if (s!="") { return(s); }
+ s=system("executable","cygopen"); // windows
+ if (s!="") { return(s); }
+ s=system("executable","open"); // osx
+ if (s!="") { return(s); }
+ s=system("executable","display"); // imagemagick
+ if (s!="") { return(s); }
+ " No display program for jpg files found";
+ return("");
+}
