@@ -1,5 +1,6 @@
 LIB "tst.lib";
 tst_init();
+tst_ignore("CVS ID $Id$");
 LIB "ncfactor.lib";
 
 ring R = 0,(x,y),dp;
