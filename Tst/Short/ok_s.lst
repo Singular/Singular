@@ -86,6 +86,16 @@ ncfactor_facNthShift1_s
 ncfactor_landau_ex_s
 ncfactor_multipleFacsSameTopAndBottom_s
 ncfactor_nthweylringalt_s
+ncfactor_SingerEx_s
+ncfactor_buginterchange2_s
+ncfactor_buginterchange_s
+ncfactor_facSubWeyl1_s
+ncfactor_facSubWeyl2_s
+ncfactor_facSubWeyl3_s
+ncfactor_facSubWeyl4_s
+ncfactor_nthweylringalt2_s
+ncfactor_usl2_reducible_bug_s
+ncfactor_usl2_s 
 nfmodsyz_s
 parallel_s
 primdec3
