@@ -90,7 +90,7 @@ ASSUME:  The ideal must be radical, for non-radical ideals the output may
          and hence normal computes the normalization of the radical of id.@*
 NOTE:    \"isPrim\" should only be used if id is known to be prime.
 RETURN:  a list, say nor, of size 2 (resp. 3 with option \"withDelta\").
-@format  Let R denote the basering and id the input ideal.
+         Let R denote the basering and id the input ideal.
          * nor[1] is a list of r rings, where r is the number of associated
          primes P_i with option \"prim\" (resp. >= no of equidimenensional
          components P_i with option \"equidim\").@*
@@ -111,7 +111,6 @@ RETURN:  a list, say nor, of size 2 (resp. 3 with option \"withDelta\").
          of size r, the delta invariants of the r components, and an integer,
          the total delta invariant of basering/id (-1 means infinite, and 0
          that R/P_i resp. R/id is normal).
-@end format
 THEORY:  We use here a general algorithm described in [G.-M.Greuel, S.Laplagne,
          F.Seelisch: Normalization of Rings (2009)].@*
          The procedure computes the R-module structure, the algebra structure
