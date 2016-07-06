@@ -21,23 +21,25 @@
 
 @heading News for version @value{VERSION}
 
-@c New libraries:
-@c @itemize
-@c @item new library: ffmodstd.lib:  Groebner bases of ideals in polynomial rings over algebraic function fields(@nref{ffmodstd_lib})
-@c @item
-@c @end itemize
+New libraries:
+@itemize
+@item new library: ffmodstd.lib:  Groebner bases of ideals in polynomial rings over algebraic function fields(@nref{ffmodstd_lib})
+@item new library: nfmodsyz.lib: syzygy modules of submodules of free modules
+      over algebraic number fields(@nref{nfmodsyz_lib})
+@end itemize
 
-@c Changed libraries:
-@c @itemize
-@c @item
-@c @end itemize
+Changed libraries:
+@itemize
+@item ncfactor.lib: factorization in some noncommuative algebras (@nref{ncfactor_lib}) with new routine ncfactor (@nref{ncfactor}).
+@item primdec.lib: new option "subsystem" (@nref{primdec_lib})
+@end itemize
 
-@c Changes in the kernel:
-@c @itemize
-@c @item improved mapping of polynomials/idea;s/...
-@c @end itemize
+Changes in the kernel:
+@itemize
+@item improved mapping of polynomials/ideals/...
+@end itemize
 
-@c @heading News for version 4-0-3
+@heading News for version 4-0-3
 
 New libraries:
 @itemize
@@ -47,8 +49,6 @@ New libraries:
 @item new library: GND.lib: General Neron Desingularization (@nref{GND_lib})
 @item new library: graal.lib: localization at prime ideals (@nref{graal_lib})
 @item new library: hess.lib: Riemann-Roch space of divisors (@nref{hess_lib})
-@item new library: nfmodsyz.lib: syzygy modules of submodules of free modules
-      over algebraic number fields(@nref{nfmodsyz_lib})
 @end itemize
 
 Changed libraries:
@@ -57,7 +57,6 @@ Changed libraries:
 @item renamed derham_lib to @nref{deRham_lib}
 @item grobcov.lib (grobcovK): Groebner Cover for parametric ideals (@nref{grobcov_lib}) with new routine
    ConsLevels (@nref{ConsLevels}), removed AddCons  AddConsP.
-@item primdec.lib: new option "subsystem" @nref{primdec_lib}
 @end itemize
 
 @heading News for version 4-0-2
