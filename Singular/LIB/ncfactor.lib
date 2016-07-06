@@ -11465,12 +11465,15 @@ example
 //NO TESTS NEEDED SINCE CALL TO HOMOGFACNTHQWEYL_ALL
 
 proc homogfacNthQWeyl(poly h)
-"USAGE: homogfacNthQWeyl(h); h is a homogeneous polynomial in the
+"USAGE:
+@format
+homogfacNthQWeyl(h); h is a homogeneous polynomial in the
  n'th q-Weyl algebra with respect to the weight vector
-@* [-1,...,-1,1,...,1].
-@*  \__  __/  \__  __/
-@*     \/        \/
-@*     n/2       n/2
+ [-1,...,-1,1,...,1].
+  \__  __/  \__  __/
+     \/        \/
+     n/2       n/2
+@end format
 RETURN: list
 PURPOSE: Computes a factorization of a homogeneous polynomial h
 in the n'th q-Weyl algebra
@@ -11762,12 +11765,16 @@ static proc test_homogfacNthQWeyl()
 
 
 proc homogfacNthQWeyl_all(poly h)
-"USAGE: homogfacNthQWeyl_all(h); h is a homogeneous polynomial in the
- n'th q-Weyl algebra with respect to the weight vector
-@ [-1,...,-1,1,...,1].
-@  \__  __/  \__  __/
-@     \/        \/
-@     n/2       n/2
+"USAGE:
+@format
+homogfacNthQWeyl_all(h); h is a homogeneous polynomial in the
+  n'th q-Weyl algebra with respect to the weight vector
+ 
+  [-1,...,-1,1,...,1].
+   \__  __/  \__  __/
+      \/        \/
+      n/2       n/2
+@end format
 RETURN: list
 PURPOSE: Computes all factorizations of a homogeneous polynomial h
 in the n'th q-Weyl algebra
