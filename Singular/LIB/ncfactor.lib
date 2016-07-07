@@ -11769,7 +11769,7 @@ proc homogfacNthQWeyl_all(poly h)
 @format
 homogfacNthQWeyl_all(h); h is a homogeneous polynomial in the
   n'th q-Weyl algebra with respect to the weight vector
- 
+
   [-1,...,-1,1,...,1].
    \__  __/  \__  __/
       \/        \/

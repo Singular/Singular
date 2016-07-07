@@ -14,7 +14,7 @@ NOTE:
  This library requires the program surfex, surf and java to be installed.
  The software is used for producing raytraced images of surfaces.
  You can download @code{surfex} from @uref{http://www.surfex.AlgebraicSurface.net}
-@end texinfo 
+@end texinfo
 
  surfex is a front-end for surf which aims to be easier to use than
  the original tool.
