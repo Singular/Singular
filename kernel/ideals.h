@@ -38,18 +38,6 @@ void idDelEquals(ideal id);
 //int id_PosConstant(ideal id, const ring r)
 #define idPosConstant(I) id_PosConstant(I,currRing)
 
-/// Count the effective size of an ideal
-/// (without the trailing allocated zero-elements)
-/// deprecated! (use IDELEMS)
-static inline int idSize(const ideal id)
-{
-  int j = IDELEMS(id) - 1;
-  poly* mm = id->m;
-  while ((j >= 0) && (mm[j] == NULL)) j--;
-  return (j + 1);
-}
-
-
 //BOOLEAN id_IsConstant(ideal id, const ring r);
 #define idIsConstant(I) id_IsConstant(I,currRing)
 

@@ -209,12 +209,11 @@ int idElem(const ideal F)
 {
   assume (F != NULL);
 
-  int i=0,j=IDELEMS(F)-1;
+  int i=0;
 
-  while(j>=0)
+  for(int j=IDELEMS(F)-1;j>=0;j--)
   {
     if ((F->m)[j]!=NULL) i++;
-    j--;
   }
   return i;
 }

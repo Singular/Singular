@@ -4079,7 +4079,7 @@ static BOOLEAN jjDIM(leftv res, leftv v)
     }
     //Anne's Idea for std(4,2x) = 0 bug
     long dcurr = d;
-    for(i=0;i<idSize(vv);i++)
+    for(i=0;i<IDELEMS(vv);i++)
     {
       if(vv->m[i] != NULL && !n_IsUnit(pGetCoeff(vv->m[i]),currRing->cf))
       {
@@ -4087,9 +4087,11 @@ static BOOLEAN jjDIM(leftv res, leftv v)
         poly c = pInit();
         pSetCoeff0(c,nCopy(pGetCoeff(vv->m[i])));
         idInsertPoly(vc,c);
-        for(j = 0;j<idSize(vc)-1;j++)
+        idSkipZeroes(vc);
+        for(j = 0;j<IDELEMS(vc)-1;j++)
         {
-          if(n_DivBy(pGetCoeff(vc->m[j]),pGetCoeff(c),currRing->cf))
+          if((vc->m[j]!=NULL)
+          && (n_DivBy(pGetCoeff(vc->m[j]),pGetCoeff(c),currRing->cf)))
           {
             pDelete(&vc->m[j]);
           }

@@ -1991,7 +1991,7 @@ void syPrint(syStrategy syzstr, const char *sn)
       int k=0;
       while ((k<syzstr->length) && (rr[k]!=NULL))
       {
-        (*resolution)[k+1] = idSize(rr[k]);
+        (*resolution)[k+1] = idElem(rr[k]);
         k++;
       }
     }

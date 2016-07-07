@@ -400,7 +400,7 @@ if ((s)->v != NULL) \
   for (int iLevel = 0; (iLevel < iLength) && ( ((s)->v)[iLevel] != NULL ); iLevel++) \
   { \
     /* const ring rrr = (iLevel > 0) ? save : save; */ \
-    Print("id '%10s'[%d]: (%p) ncols = %d / size: %d; nrows = %d, rank = %ld / rk: %ld", #v, iLevel, reinterpret_cast<const void*>(((s)->v)[iLevel]), ((s)->v)[iLevel]->ncols, idSize(((s)->v)[iLevel]), ((s)->v)[iLevel]->nrows, ((s)->v)[iLevel]->rank, -1L/*id_RankFreeModule(((s)->v)[iLevel], rrr)*/ ); \
+    Print("id '%10s'[%d]: (%p) ncols = %d / size: %d; nrows = %d, rank = %ld / rk: %ld", #v, iLevel, reinterpret_cast<const void*>(((s)->v)[iLevel]), ((s)->v)[iLevel]->ncols, IDELEMS(((s)->v)[iLevel]), ((s)->v)[iLevel]->nrows, ((s)->v)[iLevel]->rank, -1L/*id_RankFreeModule(((s)->v)[iLevel], rrr)*/ ); \
     PrintLn(); \
   } \
   PrintLn();

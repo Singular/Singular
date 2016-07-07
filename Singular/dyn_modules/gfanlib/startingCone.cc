@@ -118,7 +118,7 @@ BOOLEAN positiveTropicalStartingPoint(leftv res, leftv args)
   if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
   {
     ideal I = (ideal) u->Data();
-    if (idSize(I)==1)
+    if ((I->m[0]!=NULL) && (idElem(I)==1))
     {
       tropicalStrategy currentStrategy(I,currRing);
       poly g = I->m[0];
@@ -153,7 +153,7 @@ BOOLEAN nonNegativeTropicalStartingPoint(leftv res, leftv args)
   if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
   {
     ideal I = (ideal) u->Data();
-    if (idSize(I)==1)
+    if ((I->m[0]!=NULL) && (idElem(I)==1))
     {
       tropicalStrategy currentStrategy(I,currRing);
       poly g = I->m[0];
@@ -188,7 +188,7 @@ BOOLEAN negativeTropicalStartingPoint(leftv res, leftv args)
   if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
   {
     ideal I = (ideal) u->Data();
-    if (idSize(I)==1)
+    if ((I->m[0]!=NULL) && (idElem(I)==1))
     {
       tropicalStrategy currentStrategy(I,currRing);
       poly g = I->m[0];
@@ -224,7 +224,7 @@ BOOLEAN nonPositiveTropicalStartingPoint(leftv res, leftv args)
   if ((u!=NULL) && (u->Typ()==IDEAL_CMD))
   {
     ideal I = (ideal) u->Data();
-    if (idSize(I)==1)
+    if ((I->m[0]!=NULL) && (idElem(I)==1))
     {
       tropicalStrategy currentStrategy(I,currRing);
       poly g = I->m[0];
@@ -261,7 +261,7 @@ BOOLEAN tropicalStartingPoint(leftv res, leftv args)
   {
     ideal I = (ideal) u->Data();
     tropicalStrategy currentStrategy(I,currRing);
-    if (idSize(I)==1)
+    if ((I->m[0]!=NULL) && (idElem(I)==1))
     {
       poly g = I->m[0];
       std::set<gfan::ZCone> Tg = tropicalVariety(g,currRing,&currentStrategy);
@@ -310,7 +310,7 @@ static gfan::ZCone linealitySpaceOfGroebnerFan(const ideal I, const ring r)
   int n = rVar(r);
   gfan::ZMatrix equations = gfan::ZMatrix(0,n);
   int* expv = (int*) omAlloc((n+1)*sizeof(int));
-  int k = idSize(I);
+  int k = IDELEMS(I);
   for (int i=0; i<k; i++)
   {
     poly g = I->m[i];
@@ -343,10 +343,15 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     // s <- r
     // inI <- I
     ring s = rCopy(r);
-    int k = idSize(I); ideal inI = idInit(k);
+    int k = IDELEMS(I); ideal inI = idInit(k);
     nMapFunc identityMap = n_SetMap(r->cf,s->cf);
     for (int i=0; i<k; i++)
-      inI->m[i] = p_PermPoly(I->m[i],NULL,r,s,identityMap,NULL,0);
+    {
+      if(I->m[i]!=NULL)
+      {
+        inI->m[i] = p_PermPoly(I->m[i],NULL,r,s,identityMap,NULL,0);
+      }
+    }
 
     // repeatedly computes a point in the tropical variety outside the lineality space,
     // take the initial ideal with respect to it
@@ -407,10 +412,15 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     // s <- r
     // inJ <- I
     ring s = rCopy(r);
-    int k = idSize(I); ideal inJ = idInit(k);
+    int k = IDELEMS(I); ideal inJ = idInit(k);
     nMapFunc identityMap = n_SetMap(r->cf,s->cf);
     for (int i=0; i<k; i++)
-      inJ->m[i] = p_PermPoly(I->m[i],NULL,r,s,identityMap,NULL,0);
+    {
+      if(I->m[i]!=NULL)
+      {
+        inJ->m[i] = p_PermPoly(I->m[i],NULL,r,s,identityMap,NULL,0);
+      }
+    }
 
     // and check whether the dimension of its homogeneity space
     // equals the dimension of the tropical variety
@@ -463,11 +473,16 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     rShortcut->cf = nCopyCoeff((currentStrategy.getShortcutRing())->cf);
     rComplete(rShortcut);
     rTest(rShortcut);
-    k = idSize(inJ);
+    k = IDELEMS(inJ);
     ideal inJShortcut = idInit(k);
     nMapFunc takingResidues = n_SetMap(s->cf,rShortcut->cf);
     for (int i=0; i<k; i++)
-      inJShortcut->m[i] = p_PermPoly(inJ->m[i],NULL,s,rShortcut,takingResidues,NULL,0);
+    {
+      if(inJ->m[i]!=NULL)
+      {
+        inJShortcut->m[i] = p_PermPoly(inJ->m[i],NULL,s,rShortcut,takingResidues,NULL,0);
+      }
+    }
     idSkipZeroes(inJShortcut);
     id_Delete(&inJ,s);
 
@@ -495,14 +510,19 @@ groebnerCone tropicalStartingCone(const tropicalStrategy& currentStrategy)
     rComplete(s);
     rTest(s);
 
-    k = idSize(inJShortcut); // inJ will be overwritten with initial of inJ
+    k = IDELEMS(inJShortcut); // inJ will be overwritten with initial of inJ
     inJ = idInit(k+1);
     inJ->m[0] = p_One(s);    // with respect to that weight
     identityMap = n_SetMap(r->cf,s->cf); // first element will obviously be p
     p_SetCoeff(inJ->m[0],identityMap(currentStrategy.getUniformizingParameter(),r->cf,s->cf),s);
     nMapFunc findingRepresentatives = n_SetMap(sShortcut->cf,s->cf);
     for (int i=0; i<k; i++)              // and then come the rest
-      inJ->m[i+1] = p_PermPoly(inJShortcut->m[i],NULL,sShortcut,s,findingRepresentatives,NULL,0);
+    {
+      if(inJShortcut->m[i]!=NULL)
+      {
+        inJ->m[i+1] = p_PermPoly(inJShortcut->m[i],NULL,sShortcut,s,findingRepresentatives,NULL,0);
+      }
+    }
 
     ideal J = currentStrategy.computeLift(inJ,s,inI,I,r);
     // currentStrategy.reduce(J,s);

@@ -67,9 +67,14 @@ std::pair<ideal,ring> flip(const ideal I, const ring r,
 
   /* compute initial ideal and map it to the new ordering */
   ideal inIr = initial(I,r,interiorPoint);
-  int k = idSize(I); ideal inIsAdjusted = idInit(k);
+  int k = IDELEMS(I); ideal inIsAdjusted = idInit(k);
   for (int i=0; i<k; i++)
-    inIsAdjusted->m[i] = p_PermPoly(inIr->m[i],NULL,r,sAdjusted,identity,NULL,0);
+  {
+    if (inIr->m[i]!=NULL)
+    {
+      inIsAdjusted->m[i] = p_PermPoly(inIr->m[i],NULL,r,sAdjusted,identity,NULL,0);
+    }
+  }
   id_Delete(&inIr,r);
 
   /* compute Groebner basis of the initial ideal  */
@@ -103,9 +108,14 @@ std::pair<ideal,ring> flip(const ideal I, const ring r,
   rComplete(s);
   rTest(s);
   identity = n_SetMap(sAdjusted->cf,s->cf);
-  k = idSize(IsAdjustedGB); ideal IsGB = idInit(k);
+  k = IDELEMS(IsAdjustedGB); ideal IsGB = idInit(k);
   for (int i=0; i<k; i++)
-    IsGB->m[i] = p_PermPoly(IsAdjustedGB->m[i],NULL,sAdjusted,s,identity,NULL,0);
+  {
+    if (IsAdjustedGB->m[i]!=NULL)
+    {
+      IsGB->m[i] = p_PermPoly(IsAdjustedGB->m[i],NULL,sAdjusted,s,identity,NULL,0);
+    }
+  }
   id_Delete(&IsAdjustedGB,sAdjusted);
   rDelete(sAdjusted);
   rChangeCurrRing(origin);
